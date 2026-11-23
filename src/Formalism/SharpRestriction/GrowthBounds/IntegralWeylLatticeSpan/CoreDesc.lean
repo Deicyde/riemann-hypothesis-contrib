@@ -1,6 +1,52 @@
 module
 
 public import Formalism.SharpRestriction.GrowthBounds.IntegralWeylLatticeSpan.WeylLatticeDescent
+import Mathlib.Algebra.Module.StablyFree.Basic
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -14,27 +60,23 @@ section Desc
 
 variable {LL Kf ι : Type} [Field LL] [Field Kf] [Algebra LL Kf]
 
-theorem desc_fun
-    (ℓ : Kf →ₗ[LL] LL)
-    (t : Finset (MvPolynomial ι LL)) (c : MvPolynomial ι LL → Kf) (c0 : Kf) (Q : MvPolynomial ι LL)
-    (h : ∑ x ∈ t, C (c x) * map (algebraMap LL Kf) x = C c0 * map (algebraMap LL Kf) Q)
-    : ∑ x ∈ t, ℓ (c x) • x = ℓ c0 • Q := by
+theorem desc_fun (ℓ : Kf →ₗ[LL] LL) (t : Finset (MvPolynomial ι LL)) (c : MvPolynomial ι LL → Kf) (c0 : Kf)
+    (Q : MvPolynomial ι LL)
+    (h : ∑ x ∈ t, C (c x) * map (algebraMap LL Kf) x = C c0 * map (algebraMap LL Kf) Q) :
+    ∑ x ∈ t, ℓ (c x) • x = ℓ c0 • Q := by
   ext m
   have hm := congrArg (fun P => ℓ (AddMonoidAlgebra.coeff P m)) h
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [coeff_sum, coeff_C_mul, coeff_map, map_sum] at hm
-  simp only [coeff_sum, coeff_smul, smul_eq_mul]
+
+  simp only [coeff_sum, coeff_C_mul, coeff_map, map_sum] at hm
+  simp only [coeff_sum, MvPolynomial.coeff_smul, smul_eq_mul]
   have e : ∀ (a : Kf) (r : LL), ℓ (a * algebraMap LL Kf r) = ℓ a * r := by
     intro a r
     rw [mul_comm, ← Algebra.smul_def, LinearMap.map_smul, smul_eq_mul, mul_comm]
   simp only [e] at hm
   exact hm
 
-theorem exists_pivot
-    {α : Type} [DecidableEq α]
-    (R0 : Subring LL) (hv : ∀ x : LL, x ∈ R0 ∨ x⁻¹ ∈ R0)
-    (f : α → LL) (t : Finset α)
-    : (∃ x ∈ t, f x ≠ 0) → ∃ j ∈ t, f j ≠ 0 ∧ ∀ x ∈ t, f x / f j ∈ R0 := by
+theorem exists_pivot {α : Type} [DecidableEq α] (R0 : Subring LL) (hv : ∀ x : LL, x ∈ R0 ∨ x⁻¹ ∈ R0) (f : α → LL)
+    (t : Finset α) : (∃ x ∈ t, f x ≠ 0) → ∃ j ∈ t, f j ≠ 0 ∧ ∀ x ∈ t, f x / f j ∈ R0 := by
   classical
   induction t using Finset.induction_on with
   | empty =>
@@ -64,7 +106,8 @@ theorem exists_pivot
         · rw [div_self hfa]
           exact R0.one_mem
         · have h3 := R0.mul_mem (hall y hy) hinv
-          have e : f y / f j * (f j / f a) = f y / f a := by field_simp
+          have e : f y / f j * (f j / f a) = f y / f a := by
+            field_simp
           rwa [e] at h3
     · push_neg at hex
       have hfa : f a ≠ 0 := by
@@ -84,16 +127,11 @@ theorem exists_dual_ne {v : Kf} (hv : v ≠ 0) : ∃ ℓ : Kf →ₗ[LL] LL, ℓ
   push_neg at hc
   exact hv ((Module.forall_dual_apply_eq_zero_iff LL v).mp hc)
 
-theorem desc_main
-    (A : Subring Kf) (hA : ∀ x : Kf, x ∈ A ∨ x⁻¹ ∈ A)
-    (R0 : Subring LL) (hR0 : ∀ x, x ∈ R0 ↔ algebraMap LL Kf x ∈ A)
-    : ∀ (n : ℕ) (t : Finset (MvPolynomial ι LL)),
-      t.card = n
-        → ∀ c : MvPolynomial ι LL → Kf,
-          (∀ x ∈ t, c x ∈ A)
-            → ∀ Q : MvPolynomial ι LL,
-              ∑ x ∈ t, C (c x) * map (algebraMap LL Kf) x = map (algebraMap LL Kf) Q
-                → Q ∈ Submodule.span R0 (t : Set (MvPolynomial ι LL)) := by
+theorem desc_main (A : Subring Kf) (hA : ∀ x : Kf, x ∈ A ∨ x⁻¹ ∈ A) (R0 : Subring LL)
+    (hR0 : ∀ x, x ∈ R0 ↔ algebraMap LL Kf x ∈ A) :
+    ∀ (n : ℕ) (t : Finset (MvPolynomial ι LL)), t.card = n → ∀ c : MvPolynomial ι LL → Kf, (∀ x ∈ t, c x ∈ A) →
+    ∀ Q : MvPolynomial ι LL, ∑ x ∈ t, C (c x) * map (algebraMap LL Kf) x = map (algebraMap LL Kf) Q →
+    Q ∈ Submodule.span R0 (t : Set (MvPolynomial ι LL)) := by
   classical
   intro n
   induction n with
@@ -110,7 +148,8 @@ theorem desc_main
   | succ k ih =>
     intro t ht c hc Q hQ
     by_cases hdep : LinearIndependent LL (fun x : t => (x : MvPolynomial ι LL))
-    · have hsum : ∀ ℓ : Kf →ₗ[LL] LL, ∑ x ∈ t, ℓ (c x) • x = ℓ 1 • Q := by
+    ·
+      have hsum : ∀ ℓ : Kf →ₗ[LL] LL, ∑ x ∈ t, ℓ (c x) • x = ℓ 1 • Q := by
         intro ℓ
         apply desc_fun ℓ t c 1 Q
         rw [map_one, one_mul]
@@ -119,14 +158,12 @@ theorem desc_main
         intro x0 hx0
         by_contra hnot
         have hmk : (Submodule.span LL {(1 : Kf)}).mkQ (c x0) ≠ 0 := by
-          rw [ne_eq, Submodule.mkQ_apply, Submodule.Quotient.mk_eq_zero,
-            Submodule.mem_span_singleton]
+          rw [ne_eq, Submodule.mkQ_apply, Submodule.Quotient.mk_eq_zero, Submodule.mem_span_singleton]
           rintro ⟨a, ha⟩
           apply hnot
           exact ⟨a, by rw [Algebra.algebraMap_eq_smul_one]; exact ha⟩
-        obtain ⟨φ, hφ⟩
-            : ∃ φ : Module.Dual LL (Kf ⧸ Submodule.span LL {(1 : Kf)}),
-              φ ((Submodule.span LL {(1 : Kf)}).mkQ (c x0)) ≠ 0 := by
+        obtain ⟨φ, hφ⟩ : ∃ φ : Module.Dual LL (Kf ⧸ Submodule.span LL {(1 : Kf)}),
+            φ ((Submodule.span LL {(1 : Kf)}).mkQ (c x0)) ≠ 0 := by
           by_contra hc'
           push_neg at hc'
           exact hmk ((Module.forall_dual_apply_eq_zero_iff LL _).mp hc')
@@ -149,28 +186,26 @@ theorem desc_main
       rw [← h0]
       refine Submodule.sum_mem _ fun x hx => ?_
       have hdx : ℓ1 (c x) = d x hx := by
-        rw [← hd x hx, Algebra.algebraMap_eq_smul_one, LinearMap.map_smul, hℓ11, smul_eq_mul,
-          mul_one]
+        rw [← hd x hx, Algebra.algebraMap_eq_smul_one, LinearMap.map_smul, hℓ11, smul_eq_mul, mul_one]
       have hR : d x hx ∈ R0 := by
         rw [hR0, hd x hx]
         exact hc x hx
       rw [hdx]
       exact Submodule.smul_mem _ (⟨d x hx, hR⟩ : R0) (Submodule.subset_span hx)
-    · obtain ⟨g, hg, i0, hi0⟩ := Fintype.not_linearIndependent_iff.mp hdep
+    ·
+      obtain ⟨g, hg, i0, hi0⟩ := Fintype.not_linearIndependent_iff.mp hdep
       set f : MvPolynomial ι LL → LL := fun x => if h : x ∈ t then g ⟨x, h⟩ else 0 with hfdef
       have hfsum : ∑ x ∈ t, f x • x = 0 := by
         rw [← hg, ← Finset.sum_coe_sort t]
         refine Finset.sum_congr rfl fun x _ => ?_
         simp [hfdef, x.2]
-      obtain ⟨j, hj, hfj, hpiv⟩ :=
-        exists_pivot R0
-          (fun x => by
-            by_cases hx : algebraMap LL Kf x ∈ A
-            · exact Or.inl ((hR0 x).mpr hx)
-            · right
-              rw [hR0, map_inv₀]
-              exact (hA _).resolve_left hx)
-          f t ⟨i0, i0.2, by simpa [hfdef] using hi0⟩
+      obtain ⟨j, hj, hfj, hpiv⟩ := exists_pivot R0
+        (fun x => by
+          by_cases hx : algebraMap LL Kf x ∈ A
+          · exact Or.inl ((hR0 x).mpr hx)
+          · right
+            rw [hR0, map_inv₀]
+            exact (hA _).resolve_left hx) f t ⟨i0, i0.2, by simpa [hfdef] using hi0⟩
       have hcard : (t.erase j).card = k := by
         rw [Finset.card_erase_of_mem hj, ht]
         simp
@@ -188,30 +223,24 @@ theorem desc_main
           refine Finset.sum_congr rfl fun x _ => ?_
           rw [smul_smul, div_eq_mul_inv, mul_comm]
         rw [h2, eq_neg_of_add_eq_zero_right h1, smul_neg, smul_smul, inv_mul_cancel₀ hfj, one_smul]
-      have hQ'
-          : ∑ x ∈ (t.erase j), C (c' x) * map (algebraMap LL Kf) x = map (algebraMap LL Kf) Q := by
+      have hQ' : ∑ x ∈ (t.erase j), C (c' x) * map (algebraMap LL Kf) x = map (algebraMap LL Kf) Q := by
         rw [← hQ, ← Finset.add_sum_erase t _ hj]
         simp only [hc'def, map_sub, map_mul, sub_mul, Finset.sum_sub_distrib]
-        have e1
-            : ∑ x ∈ (t.erase j), C (c j) * C (algebraMap LL Kf (f x / f j)) * map (algebraMap LL Kf) x
-              = C (c j) * map (algebraMap LL Kf) (∑ x ∈ (t.erase j), (f x / f j) • x) := by
-          set_option synthInstance.maxHeartbeats 100000 in
-            rw [map_sum, Finset.mul_sum]
+        have e1 : ∑ x ∈ (t.erase j), C (c j) * C (algebraMap LL Kf (f x / f j)) * map (algebraMap LL Kf) x =
+            C (c j) * map (algebraMap LL Kf) (∑ x ∈ (t.erase j), (f x / f j) • x) := by
+
+          rw [map_sum, Finset.mul_sum]
           refine Finset.sum_congr rfl fun x _ => ?_
           rw [MvPolynomial.smul_eq_C_mul, map_mul, MvPolynomial.map_C, mul_assoc]
         rw [e1]
-        have e2
-            : map (algebraMap LL Kf) (∑ x ∈ (t.erase j), (f x / f j) • x)
-              = - map (algebraMap LL Kf) j := by
+        have e2 : map (algebraMap LL Kf) (∑ x ∈ (t.erase j), (f x / f j) • x) = -map (algebraMap LL Kf) j := by
           rw [hrel, map_neg]
         rw [e2]
         ring
       have hmem := ih (t.erase j) hcard c' hc' Q hQ'
-      exact Submodule.span_mono
-        (by
-          intro x hx
-          exact Finset.mem_of_mem_erase hx)
-        hmem
+      exact Submodule.span_mono (by
+        intro x hx
+        exact Finset.mem_of_mem_erase hx) hmem
 
 end Desc
 
@@ -233,8 +262,7 @@ theorem descVal : DescVal := by
   obtain ⟨cc, hsupp, hsum⟩ := Submodule.mem_span_set.mp hQ
   have hpre : ∀ y ∈ cc.support, ∃ q ∈ S, MvPolynomial.map e q = y := fun y hy => hsupp hy
   choose! qof hqS hqy using hpre
-  have htS
-      : ((cc.support.image qof : Finset (MvPolynomial ι LL)) : Set (MvPolynomial ι LL)) ⊆ S := by
+  have htS : ((cc.support.image qof : Finset (MvPolynomial ι LL)) : Set (MvPolynomial ι LL)) ⊆ S := by
     intro q hq
     rw [Finset.coe_image] at hq
     obtain ⟨y, hy, rfl⟩ := hq
@@ -244,9 +272,8 @@ theorem descVal : DescVal := by
     rw [← hqy y hy, ← hqy y' hy', h]
   let c' : MvPolynomial ι LL → Kf := fun q => algebraMap O Kf (cc (MvPolynomial.map e q))
   have hc' : ∀ q ∈ cc.support.image qof, c' q ∈ A := fun q _ => ⟨_, rfl⟩
-  have hrel
-      : ∑ q ∈ cc.support.image qof, C (c' q) * MvPolynomial.map (algebraMap LL Kf) q
-        = MvPolynomial.map (algebraMap LL Kf) Q := by
+  have hrel : ∑ q ∈ cc.support.image qof, C (c' q) * MvPolynomial.map (algebraMap LL Kf) q =
+      MvPolynomial.map (algebraMap LL Kf) Q := by
     show ∑ q ∈ cc.support.image qof, C (c' q) * MvPolynomial.map e q = MvPolynomial.map e Q
     rw [Finset.sum_image hinjOn, ← hsum, Finsupp.sum]
     refine Finset.sum_congr rfl fun y hy => ?_

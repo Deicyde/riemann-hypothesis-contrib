@@ -1,6 +1,54 @@
 module
 
 public import Formalism.LocalToGlobal.SiegelLatticeTheory.CasimirReductionTheory.OneParameterDerivatives.AdmissibleCasimirScalars.CompactDerivativesBounded
+public import Formalism.RealPlaceAnalysis.RealPlaceTaylor.CompactHaarRightInvariantInst
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Real
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+public import Mathlib.Analysis.InnerProductSpace.Calculus
+public import Mathlib.Analysis.InnerProductSpace.Spectrum
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.Normed.Algebra.MatrixExponential
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -253,8 +301,8 @@ theorem bound_on_sup (Λ : Finset ℝ) (v : H) (hv : v ∈ ⨆ μ ∈ Λ, Ev σ 
       (fun t : ℝ => σ (NormedSpace.exp ((t : ℂ) • gen ε p)) v)
       (∑ μ ∈ Λ, ((μ : ℂ) * Complex.I) • (c μ : H)) 0 := by
     rw [← hc]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum]
+
+    simp only [map_sum]
     exact HasDerivAt.fun_sum fun μ _ => (c μ).2
   have hpy : ‖v‖ ^ 2 = ∑ μ ∈ Λ, ‖(c μ : H)‖ ^ 2 := by
     rw [← hc]
@@ -375,8 +423,8 @@ theorem isoK_le (S : Submodule ℂ H) (hfd : FiniteDimensional ℂ S) (hst : IsK
     rw [hbA i, map_smul] at h4
     exact h4
   rintro _ ⟨v, rfl⟩
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [← (hB.eigenvectorBasis rfl).sum_repr v, map_sum]
+
+  rw [← (hB.eigenvectorBasis rfl).sum_repr v, map_sum]
   refine Submodule.sum_mem _ fun i _ => ?_
   rw [map_smul]
   exact Submodule.smul_mem _ _ (hmemΛ i (hΘEv i))

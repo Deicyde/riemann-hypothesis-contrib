@@ -1,6 +1,55 @@
 module
 
-public import Mathlib
+public import Mathlib.Algebra.Category.Grp.Preadditive
+public import Mathlib.Algebra.Group.Pi.Hom
+public import Mathlib.AlgebraicTopology.AlternatingFaceMapComplex
+public import Mathlib.Combinatorics.Quiver.ReflQuiver
+public import Mathlib.Topology.Category.TopCat.Basic
+public import Mathlib.Topology.Sets.Opens
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Lemma
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
+public import Mathlib.Algebra.BigOperators.Pi
 
 @[expose] public section
 
@@ -98,8 +147,8 @@ variable {P} in
 lemma push_d {P' : (Opens X)ᵒᵖ ⥤ AddCommGrpCat.{u}} (φ : P ⟶ P') (n : ℕ) (σ : Cochain P U n) :
     push U φ (n + 1) (d P U n σ) = d P' U n (push U φ n σ) := by
   funext i
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [push, AddMonoidHom.coe_mk, ZeroHom.coe_mk, d_apply, map_sum, map_zsmul, app_res]
+
+  simp only [push, AddMonoidHom.coe_mk, ZeroHom.coe_mk, d_apply, map_sum, map_zsmul, app_res]
 
 variable {P} in
 lemma push_comp {P' P'' : (Opens X)ᵒᵖ ⥤ AddCommGrpCat.{u}} (φ : P ⟶ P') (ψ : P' ⟶ P'')
@@ -165,8 +214,8 @@ lemma ev_d {n : ℕ} (σ : Cochain (discPresheaf A) U n) (i : Fin (n + 2) → ι
     (hx : x ∈ inter U i) :
     ev A x hx (d (discPresheaf A) U n σ i) = ∑ k : Fin (n + 2), ((-1 : ℤ) ^ (k : ℕ)) •
       ev A x (inter_le_comp U i k.succAbove hx) (σ (i ∘ k.succAbove)) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [d_apply, map_sum]
+
+  rw [d_apply, map_sum]
   refine Finset.sum_congr rfl fun k _ => ?_
   rw [map_zsmul, ev_res]
 

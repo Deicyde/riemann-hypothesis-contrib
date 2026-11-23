@@ -1,26 +1,67 @@
 module
 
-public import Mathlib
+import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.DerivativeOfProductInducedIso
 public import Development.WeilBound.RepresentationTheoryGL.GenericUnitaryGL.LeibnizOrders.LeibnizOrd
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.CoFunSmooth
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.MirProjEqOneOfMem
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.SmoothPsiMinus
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.InvariantPairingMirabolicVanishing
-public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.LeviIntegralFacts
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.ParabolicProductTwoRepsEquivTwoBlockInduction
-public import Development.AbelianVarietyTheory.Definitions.Divisors.T2SpaceGeneralLinearGroup
+import Development.AbelianVarietyTheory.Definitions.Divisors.T2SpaceGeneralLinearGroup
+public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.LeviIntegralFacts
+public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.CoFunSmooth
+public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.CompactInductionTwistedKernelStatement
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.GpProjContinuousStatement
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.HGPClosedStatement
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.MemHGPIffParabolicStatement
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.GpProjLeviFormulaStatement
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.GpProjUnipotentStatement
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.GpProjUnipotentSurjectiveStatement
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.CompactInductionTwistedKernelStatement
+public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.HGPClosedStatement
+public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.InvariantPairingMirabolicVanishing
+import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.IsOpenFixedOfSubgroup
+public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.MemHGPIffParabolicStatement
+public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.SmoothPsiMinus
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
-open Matrix GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.BZMir GlobalTheory.BZMir.Leib
-  GlobalTheory.RgGu.Leib
+open Matrix GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.BZMir GlobalTheory.BZMir.Leib GlobalTheory.RgGu.Leib
 open scoped TensorProduct
 
 noncomputable section
@@ -29,9 +70,8 @@ namespace GlobalTheory.CompanionTheory.RgGu.PsiGP
 
 section Tensor
 
-variable
-  {V₁ V Z Y : Type} [AddCommGroup V₁] [Module ℂ V₁] [AddCommGroup V] [Module ℂ V] [AddCommGroup Z]
-  [Module ℂ Z] [AddCommGroup Y] [Module ℂ Y]
+variable {V₁ V Z Y : Type} [AddCommGroup V₁] [Module ℂ V₁] [AddCommGroup V] [Module ℂ V] [AddCommGroup Z] [Module ℂ Z]
+  [AddCommGroup Y] [Module ℂ Y]
 
 def pair (a : V) (y : Y) : ∀ x : Bool, TwoT V Y x
   | false => a
@@ -40,45 +80,36 @@ def pair (a : V) (y : Y) : ∀ x : Bool, TwoT V Y x
 def cMap (i : V₁ ≃ₗ[ℂ] V) (mk : Z →ₗ[ℂ] Y) : V₁ ⊗[ℂ] Z →ₗ[ℂ] PiTensorProduct ℂ (TwoT V Y) :=
   (Exponents.boolTensorEquiv (X := TwoT V Y)).symm.toLinearMap ∘ₗ TensorProduct.map i.toLinearMap mk
 
-theorem bool_tprod_pair (a : V) (y : Y)
-    : Exponents.boolTensorEquiv (X := TwoT V Y) (PiTensorProduct.tprod ℂ (pair a y))
-      = (a ⊗ₜ[ℂ] y : V ⊗[ℂ] Y) :=
+theorem bool_tprod_pair (a : V) (y : Y) :
+    Exponents.boolTensorEquiv (X := TwoT V Y) (PiTensorProduct.tprod ℂ (pair a y)) = (a ⊗ₜ[ℂ] y : V ⊗[ℂ] Y) :=
   Exponents.boolTensorEquiv_tprod _
 
-theorem cMap_tmul (i : V₁ ≃ₗ[ℂ] V) (mk : Z →ₗ[ℂ] Y) (a : V₁) (b : Z)
-    : cMap i mk (a ⊗ₜ[ℂ] b) = PiTensorProduct.tprod ℂ (pair (i a) (mk b)) := by
+theorem cMap_tmul (i : V₁ ≃ₗ[ℂ] V) (mk : Z →ₗ[ℂ] Y) (a : V₁) (b : Z) :
+    cMap i mk (a ⊗ₜ[ℂ] b) = PiTensorProduct.tprod ℂ (pair (i a) (mk b)) := by
   apply (Exponents.boolTensorEquiv (X := TwoT V Y)).injective
   rw [bool_tprod_pair]
   show (Exponents.boolTensorEquiv (X := TwoT V Y)) ((Exponents.boolTensorEquiv (X := TwoT V Y)).symm _) = _
   rw [LinearEquiv.apply_symm_apply]
   rfl
 
-theorem tprod_pair_smul (a : V) (d : ℂ) (y : Y)
-    : PiTensorProduct.tprod ℂ (pair a (d • y)) = d • PiTensorProduct.tprod ℂ (pair a y) := by
+theorem tprod_pair_smul (a : V) (d : ℂ) (y : Y) :
+    PiTensorProduct.tprod ℂ (pair a (d • y)) = d • PiTensorProduct.tprod ℂ (pair a y) := by
   apply (Exponents.boolTensorEquiv (X := TwoT V Y)).injective
   rw [map_smul, bool_tprod_pair, bool_tprod_pair]
   exact TensorProduct.tmul_smul d a y
 
-theorem cMap_surjective (i : V₁ ≃ₗ[ℂ] V) (mk : Z →ₗ[ℂ] Y) (h : Function.Surjective mk)
-    : Function.Surjective (cMap i mk) :=
-  (Exponents.boolTensorEquiv (X := TwoT V Y)).symm.surjective.comp
-    (TensorProduct.map_surjective i.surjective h)
+theorem cMap_surjective (i : V₁ ≃ₗ[ℂ] V) (mk : Z →ₗ[ℂ] Y) (h : Function.Surjective mk) :
+    Function.Surjective (cMap i mk) :=
+  (Exponents.boolTensorEquiv (X := TwoT V Y)).symm.surjective.comp (TensorProduct.map_surjective i.surjective h)
 
-theorem cMap_eq_zero
-    (i : V₁ ≃ₗ[ℂ] V)
-    (mk : Z →ₗ[ℂ] Y) (h : Function.Surjective mk)
-    (w : V₁ ⊗[ℂ] Z) (hw : cMap i mk w = 0)
-    : w ∈ LinearMap.range (LinearMap.lTensor V₁ (LinearMap.ker mk).subtype) := by
+theorem cMap_eq_zero (i : V₁ ≃ₗ[ℂ] V) (mk : Z →ₗ[ℂ] Y) (h : Function.Surjective mk) (w : V₁ ⊗[ℂ] Z)
+    (hw : cMap i mk w = 0) : w ∈ LinearMap.range (LinearMap.lTensor V₁ (LinearMap.ker mk).subtype) := by
   have h0 : TensorProduct.map i.toLinearMap mk w = 0 := by
-    have : (Exponents.boolTensorEquiv (X := TwoT V Y)).symm (TensorProduct.map i.toLinearMap mk w)
-        = 0 :=
-      hw
+    have : (Exponents.boolTensorEquiv (X := TwoT V Y)).symm (TensorProduct.map i.toLinearMap mk w) = 0 := hw
     simpa using this
   have h1 : LinearMap.lTensor V₁ mk w = 0 := by
-    have e
-        : ∀ w : V₁ ⊗[ℂ] Z,
-          TensorProduct.map i.symm.toLinearMap LinearMap.id (TensorProduct.map i.toLinearMap mk w)
-            = LinearMap.lTensor V₁ mk w := by
+    have e : ∀ w : V₁ ⊗[ℂ] Z, TensorProduct.map i.symm.toLinearMap LinearMap.id (TensorProduct.map i.toLinearMap mk w) =
+        LinearMap.lTensor V₁ mk w := by
       intro w
       induction w using TensorProduct.induction_on with
       | zero => simp
@@ -92,20 +123,15 @@ end Tensor
 
 section Intertwine
 
-variable
-  {G M W W' : Type}
-  [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [Group M] [TopologicalSpace M]
-  [IsTopologicalGroup M] [AddCommGroup W] [Module ℂ W] [AddCommGroup W'] [Module ℂ W']
+variable {G M W W' : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [Group M]
+  [TopologicalSpace M] [IsTopologicalGroup M] [AddCommGroup W] [Module ℂ W] [AddCommGroup W'] [Module ℂ W']
 
-theorem coinv_intertwine
-    (H U : Subgroup G) (Q : Subgroup M) (s : M →* G) (χ : M →* ℂˣ)
+theorem coinv_intertwine (H U : Subgroup G) (Q : Subgroup M) (s : M →* G) (χ : M →* ℂˣ)
     (σ : Representation ℂ H W) (σ' : Representation ℂ Q W') (c : W →ₗ[ℂ] W')
     (E : (cIndSpace H σ ⧸ twKer (cInd H σ) U 1) ≃ₗ[ℂ] smoothPart (ind Q σ'))
-    (hE : ∀ (f : cIndSpace H σ) (x : M),
-      (E (Submodule.Quotient.mk f)).1.1 x = (χ x : ℂ) • c (f.1.1.1 (s x)))
-    (g : M) (f : cIndSpace H σ)
-    : E ((χ g : ℂ) • Submodule.Quotient.mk (cInd H σ (s g) f))
-      = smInd Q σ' g (E (Submodule.Quotient.mk f)) := by
+    (hE : ∀ (f : cIndSpace H σ) (x : M), (E (Submodule.Quotient.mk f)).1.1 x = (χ x : ℂ) • c (f.1.1.1 (s x)))
+    (g : M) (f : cIndSpace H σ) :
+    E ((χ g : ℂ) • Submodule.Quotient.mk (cInd H σ (s g) f)) = smInd Q σ' g (E (Submodule.Quotient.mk f)) := by
   refine Subtype.ext (Subtype.ext (funext fun x => ?_))
   rw [LinearEquiv.map_smul]
   show (χ g : ℂ) • (E (Submodule.Quotient.mk (cInd H σ (s g) f))).1.1 x = (E (Submodule.Quotient.mk f)).1.1 (x * g)
@@ -119,40 +145,22 @@ section Concrete
 
 variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
 
-theorem parab_mul_KO
-    {α n : Type} {m : α → Type} [Fintype α] [LinearOrder α] [∀ a, Fintype (m a)]
-    [∀ a, DecidableEq (m a)] [Fintype n] [DecidableEq n]
-    (e : (Σ a, m a) ≃ n)
-    : ∀ g : GL n k, ∃ p ∈ parab k e, ∃ x ∈ GlobalTheory.SplitWeil.KO k n, g = p * x := by
+theorem parab_mul_KO {α n : Type} {m : α → Type} [Fintype α] [LinearOrder α] [∀ a, Fintype (m a)]
+    [∀ a, DecidableEq (m a)] [Fintype n] [DecidableEq n] (e : (Σ a, m a) ≃ n) :
+    ∀ g : GL n k, ∃ p ∈ parab k e, ∃ x ∈ GlobalTheory.SplitWeil.KO k n, g = p * x := by
   obtain ⟨-, -, -, -, -, -, -, -, h⟩ := GlobalTheory.SmGL.LeviInt.levi_integral_facts k α n m e
   exact h
 
-theorem det_levi (n : ℕ) (g : GL (Fin n) k)
-    : GeneralLinearGroup.det ((levi k n g : Mir k n) : GL (Fin (n + 1)) k)
-      = GeneralLinearGroup.det g := by
+theorem det_levi (n : ℕ) (g : GL (Fin n) k) :
+    GeneralLinearGroup.det ((levi k n g : Mir k n) : GL (Fin (n + 1)) k) = GeneralLinearGroup.det g := by
   ext
   exact GlobalTheory.CompanionTheory.MirPsiPair.det_glEmbMat n _
 
-theorem det_unip (n : ℕ) (v : Multiplicative (Fin n → k))
-    : GeneralLinearGroup.det (unip k n v) = 1 := by
-  ext
-  show (1 + colMat k n v.toAdd : Matrix (Fin (n + 1)) (Fin (n + 1)) k).det = 1
-  rw [Matrix.det_of_upperTriangular]
-  · refine Finset.prod_eq_one fun i _ => ?_
-    by_cases hi : i = Fin.last n
-    · subst hi
-      simp [colMat]
-    · simp [colMat, hi]
-  · intro a b hab
-    have hb : b ≠ Fin.last n := fun h => by
-      subst h
-      exact absurd (Fin.le_last a) (not_le.2 hab)
-    have hne : a ≠ b := fun h => by
-      subst h
-      exact lt_irrefl _ hab
-    simp [colMat, hb, Matrix.one_apply, hne]
+theorem det_unip (n : ℕ) (v : Multiplicative (Fin n → k)) : GeneralLinearGroup.det (unip k n v) = 1 := by
+  apply GlobalTheory.CompanionTheory.BZPsiPG.Norm.det_unip' <;> assumption
 
-theorem dpowM_levi (n : ℕ) (s : ℝ) (g : GL (Fin n) k) : dpowM n s (levi k n g) = dpow n s g := by
+theorem dpowM_levi (n : ℕ) (s : ℝ) (g : GL (Fin n) k) :
+    dpowM n s (levi k n g) = dpow n s g := by
   show absPow k (s : ℂ) (GeneralLinearGroup.det ((levi k n g : Mir k n) : GL (Fin (n + 1)) k)) = absPow k (s : ℂ) _
   rw [det_levi]
 
@@ -162,13 +170,11 @@ theorem dpowM_of_mem (n : ℕ) (s : ℝ) (u : Mir k n) (hu : u ∈ MirUin k n) :
   have hv' : (u : GL (Fin (n + 1)) k) = unip k n v := hv.symm
   rw [hv', det_unip, map_one]
 
-theorem scalar_id (m j : ℕ) (a b : kˣ)
-    : absPow k ((-1 / 2 : ℝ) : ℂ) (a * b) * absPow k (((((j + 1 : ℕ) : ℝ) / 2 : ℝ)) : ℂ) a
-        * absPow k (((-((m : ℕ) : ℝ) / 2 : ℝ)) : ℂ) b
-      = absPow k ((j : ℂ) / 2) a * absPow k (-(m : ℂ) / 2) b * absPow k ((-1 / 2 : ℝ) : ℂ) b := by
-  have e1
-      : absPow k (((((j + 1 : ℕ) : ℝ) / 2 : ℝ)) : ℂ)
-        = absPow k ((j : ℂ) / 2) * absPow k (1 / 2) := by
+theorem scalar_id (m j : ℕ) (a b : kˣ) :
+    absPow k ((-1 / 2 : ℝ) : ℂ) (a * b) * absPow k (((((j + 1 : ℕ) : ℝ) / 2 : ℝ)) : ℂ) a *
+        absPow k (((-((m : ℕ) : ℝ) / 2 : ℝ)) : ℂ) b =
+      absPow k ((j : ℂ) / 2) a * absPow k (-(m : ℂ) / 2) b * absPow k ((-1 / 2 : ℝ) : ℂ) b := by
+  have e1 : absPow k (((((j + 1 : ℕ) : ℝ) / 2 : ℝ)) : ℂ) = absPow k ((j : ℂ) / 2) * absPow k (1 / 2) := by
     rw [← absPow_add]
     congr 1
     push_cast
@@ -188,9 +194,7 @@ theorem scalar_id (m j : ℕ) (a b : kˣ)
   generalize absPow k (1 / 2) b = B
   generalize absPow k ((j : ℂ) / 2) a = P
   generalize absPow k (-(m : ℂ) / 2) b = R
-  calc
-    A⁻¹ * B⁻¹ * (P * A) * R
-      = (A⁻¹ * A) * (P * R * B⁻¹) := by ac_rfl
+  calc A⁻¹ * B⁻¹ * (P * A) * R = (A⁻¹ * A) * (P * R * B⁻¹) := by ac_rfl
     _ = P * R * B⁻¹ := by rw [inv_mul_cancel, one_mul]
 
 end Concrete
@@ -199,8 +203,7 @@ section Main
 
 variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
 
-abbrev eMJ (m j : ℕ) : (Σ x, Two (Fin m) (Fin j) x) ≃ Fin (m + j) :=
-  two (stdSum (rfl : m + j = m + j))
+abbrev eMJ (m j : ℕ) : (Σ x, Two (Fin m) (Fin j) x) ≃ Fin (m + j) := two (stdSum (rfl : m + j = m + j))
 
 variable {m j : ℕ} (ρ : GRep k m) (τ : MRep k j)
 
@@ -208,12 +211,10 @@ abbrev Vt : Type := (ρ.tw (((j + 1 : ℕ) : ℝ) / 2)).V
 
 abbrev Zt (m : ℕ) : Type := (mtw τ (-((m : ℕ) : ℝ) / 2)).V
 
-abbrev sig :=
-  (extTensor (ρ.tw (((j + 1 : ℕ) : ℝ) / 2)).ρ (mtw τ (-((m : ℕ) : ℝ) / 2)).ρ).comp (gpProj k m j)
+abbrev sig := (extTensor (ρ.tw (((j + 1 : ℕ) : ℝ) / 2)).ρ (mtw τ (-((m : ℕ) : ℝ) / 2)).ρ).comp (gpProj k m j)
 
 abbrev sigP : Representation ℂ (parab k (eMJ m j)) (PiTensorProduct ℂ (TwoT ρ.V (psiN τ).V)) :=
-  (twist (piTensor (twoRep ρ.ρ (psiN τ).ρ)) (deltaHalf k (Two (Fin m) (Fin j)))).comp
-    (leviProj k (eMJ m j))
+  (twist (piTensor (twoRep ρ.ρ (psiN τ).ρ)) (deltaHalf k (Two (Fin m) (Fin j)))).comp (leviProj k (eMJ m j))
 
 abbrev mkY : τ.V →ₗ[ℂ] (psiN τ).V := (twKer τ.ρ (MirUin k j) 1).mkQ
 
@@ -221,50 +222,42 @@ abbrev mkZ (m : ℕ) : Zt τ m →ₗ[ℂ] (psiN τ).V := (twKer τ.ρ (MirUin k
 
 abbrev iV (j : ℕ) : Vt (j := j) ρ ≃ₗ[ℂ] ρ.V := LinearEquiv.refl ℂ ρ.V
 
-abbrev cc : Vt (j := j) ρ ⊗[ℂ] Zt τ m →ₗ[ℂ] PiTensorProduct ℂ (TwoT ρ.V (psiN τ).V) :=
-  cMap (iV ρ j) (mkZ τ m)
+abbrev cc : Vt (j := j) ρ ⊗[ℂ] Zt τ m →ₗ[ℂ] PiTensorProduct ℂ (TwoT ρ.V (psiN τ).V) := cMap (iV ρ j) (mkZ τ m)
 
-theorem cc_tmul (a : ρ.V) (b : τ.V)
-    : cc ρ τ ((a : Vt (j := j) ρ) ⊗ₜ[ℂ] (b : Zt τ m))
-      = PiTensorProduct.tprod ℂ (pair a (mkY τ b)) :=
+theorem cc_tmul (a : ρ.V) (b : τ.V) : cc ρ τ ((a : Vt (j := j) ρ) ⊗ₜ[ℂ] (b : Zt τ m)) =
+    PiTensorProduct.tprod ℂ (pair a (mkY τ b)) :=
   cMap_tmul _ _ _ _
 
-theorem levi_mem_HGP (p : GL (Fin (m + j)) k) (hp : p ∈ parab k (eMJ m j))
-    : levi k (m + j) p ∈ MirabolicParabolic k m j := by
+theorem levi_mem_HGP (p : GL (Fin (m + j)) k) (hp : p ∈ parab k (eMJ m j)) : levi k (m + j) p ∈ MirabolicParabolic k m j := by
   have hproj : mirabolicProjection k (m + j) (levi k (m + j) p) = p := by
     apply Units.ext
     ext a b
-    change blockMat k (m + j) (glEmbMat k (m + j) (p : Matrix (Fin (m + j)) (Fin (m + j)) k)) a b
-      = _
+    change blockMat k (m + j) (glEmbMat k (m + j) (p : Matrix (Fin (m + j)) (Fin (m + j)) k)) a b = _
     simp [blockMat, glEmbMat]
   apply (GlobalTheory.T.mem_mirabolicParabolic_iff_parabolic k m j _).2
   rwa [hproj]
 
-theorem hcomp (p : parab k (eMJ m j)) (w : Vt (j := j) ρ ⊗[ℂ] Zt τ m)
-    : ((dpow (m + j) (-1 / 2) (p : GL (Fin (m + j)) k) : ℂˣ) : ℂ)
-        • cc ρ τ (sig ρ τ ⟨levi k (m + j) p, levi_mem_HGP _ p.2⟩ w)
-      = sigP ρ τ p (cc ρ τ w) := by
+theorem hcomp (p : parab k (eMJ m j)) (w : Vt (j := j) ρ ⊗[ℂ] Zt τ m) :
+    ((dpow (m + j) (-1 / 2) (p : GL (Fin (m + j)) k) : ℂˣ) : ℂ) •
+        cc ρ τ (sig ρ τ ⟨levi k (m + j) p, levi_mem_HGP _ p.2⟩ w) = sigP ρ τ p (cc ρ τ w) := by
   induction w using TensorProduct.induction_on with
   | zero => simp
   | add x y hx hy => simp only [map_add (f := _), smul_add, hx, hy]
   | tmul a b =>
     set g₁ : GL (Fin m) k := leviProj k (eMJ m j) p false with hg₁
     set g₂ : GL (Fin j) k := leviProj k (eMJ m j) p true with hg₂
-    have hgp :=
-      GlobalTheory.T.gpProj_levi_formula k m j (p : GL (Fin (m + j)) k) p.2 (levi_mem_HGP _ p.2)
-    have h1
-        : sig ρ τ ⟨levi k (m + j) p, levi_mem_HGP _ p.2⟩ (a ⊗ₜ[ℂ] b)
-          = (((dpow m (((j + 1 : ℕ) : ℝ) / 2) g₁ : ℂˣ) : ℂ) • ρ.ρ g₁ a : Vt (j := j) ρ) ⊗ₜ[ℂ]
-              (((dpow j (-((m : ℕ) : ℝ) / 2) g₂ : ℂˣ) : ℂ) • τ.ρ (levi k j g₂) b : Zt τ m) := by
+    have hgp := GlobalTheory.T.gpProj_levi_formula k m j (p : GL (Fin (m + j)) k) p.2 (levi_mem_HGP _ p.2)
+    have h1 : sig ρ τ ⟨levi k (m + j) p, levi_mem_HGP _ p.2⟩ (a ⊗ₜ[ℂ] b) =
+        (((dpow m (((j + 1 : ℕ) : ℝ) / 2) g₁ : ℂˣ) : ℂ) • ρ.ρ g₁ a : Vt (j := j) ρ) ⊗ₜ[ℂ]
+          (((dpow j (-((m : ℕ) : ℝ) / 2) g₂ : ℂˣ) : ℂ) • τ.ρ (levi k j g₂) b : Zt τ m) := by
       show extTensor _ _ (gpProj k m j _) _ = _
       rw [hgp]
       refine (extTensor_tmul _ _ _ a b).trans ?_
       show (((dpow m (((j + 1 : ℕ) : ℝ) / 2) g₁ : ℂˣ) : ℂ) • ρ.ρ g₁ a : Vt (j := j) ρ) ⊗ₜ[ℂ]
         (((dpowM j (-((m : ℕ) : ℝ) / 2) (levi k j g₂) : ℂˣ) : ℂ) • τ.ρ (levi k j g₂) b : Zt τ m) = _
       rw [dpowM_levi]
-    have h2
-        : (fun x => twoRep ρ.ρ (psiN τ).ρ x (leviProj k (eMJ m j) p x) (pair a (mkY τ b) x))
-          = pair (ρ.ρ g₁ a) (((dpow j (-1 / 2) g₂ : ℂˣ) : ℂ) • mkY τ (τ.ρ (levi k j g₂) b)) := by
+    have h2 : (fun x => twoRep ρ.ρ (psiN τ).ρ x (leviProj k (eMJ m j) p x) (pair a (mkY τ b) x)) =
+        pair (ρ.ρ g₁ a) (((dpow j (-1 / 2) g₂ : ℂˣ) : ℂ) • mkY τ (τ.ρ (levi k j g₂) b)) := by
       funext x
       cases x
       · rfl
@@ -274,27 +267,21 @@ theorem hcomp (p : parab k (eMJ m j)) (w : Vt (j := j) ρ ⊗[ℂ] Zt τ m)
       cases x
       · rfl
       · rfl
-    have hdet
-        : GeneralLinearGroup.det (p : GL (Fin (m + j)) k)
-          = GeneralLinearGroup.det g₁ * GeneralLinearGroup.det g₂ := by
+    have hdet : GeneralLinearGroup.det (p : GL (Fin (m + j)) k) =
+        GeneralLinearGroup.det g₁ * GeneralLinearGroup.det g₂ := by
       rw [det_parab, Fintype.prod_bool, mul_comm]
-    have hs
-        : ((dpow (m + j) (-1 / 2) (p : GL (Fin (m + j)) k) : ℂˣ) : ℂ)
-            * (((dpow m (((j + 1 : ℕ) : ℝ) / 2) g₁ : ℂˣ) : ℂ)
-              * ((dpow j (-((m : ℕ) : ℝ) / 2) g₂ : ℂˣ) : ℂ))
-          = ((deltaHalf k (Two (Fin m) (Fin j)) (leviProj k (eMJ m j) p) : ℂˣ) : ℂ)
-            * ((dpow j (-1 / 2) g₂ : ℂˣ) : ℂ) := by
+    have hs : ((dpow (m + j) (-1 / 2) (p : GL (Fin (m + j)) k) : ℂˣ) : ℂ) *
+        (((dpow m (((j + 1 : ℕ) : ℝ) / 2) g₁ : ℂˣ) : ℂ) * ((dpow j (-((m : ℕ) : ℝ) / 2) g₂ : ℂˣ) : ℂ)) =
+        ((deltaHalf k (Two (Fin m) (Fin j)) (leviProj k (eMJ m j) p) : ℂˣ) : ℂ) * ((dpow j (-1 / 2) g₂ : ℂˣ) : ℂ) := by
       rw [hlev, deltaHalf_two, ← Units.val_mul, ← Units.val_mul, ← Units.val_mul]
       congr 1
       have := scalar_id (k := k) m j (GeneralLinearGroup.det g₁) (GeneralLinearGroup.det g₂)
       simp only [dpow, detChar_apply, hdet, Fintype.card_fin]
       rw [← mul_assoc]
       exact this
-    have h3
-        : cc ρ τ (sig ρ τ ⟨levi k (m + j) p, levi_mem_HGP _ p.2⟩ (a ⊗ₜ[ℂ] b))
-          = (((dpow m (((j + 1 : ℕ) : ℝ) / 2) g₁ : ℂˣ) : ℂ)
-              * ((dpow j (-((m : ℕ) : ℝ) / 2) g₂ : ℂˣ) : ℂ))
-            • PiTensorProduct.tprod ℂ (pair (ρ.ρ g₁ a) (mkY τ (τ.ρ (levi k j g₂) b))) := by
+    have h3 : cc ρ τ (sig ρ τ ⟨levi k (m + j) p, levi_mem_HGP _ p.2⟩ (a ⊗ₜ[ℂ] b)) =
+        (((dpow m (((j + 1 : ℕ) : ℝ) / 2) g₁ : ℂˣ) : ℂ) * ((dpow j (-((m : ℕ) : ℝ) / 2) g₂ : ℂˣ) : ℂ)) •
+          PiTensorProduct.tprod ℂ (pair (ρ.ρ g₁ a) (mkY τ (τ.ρ (levi k j g₂) b))) := by
       rw [h1, TensorProduct.smul_tmul_smul]
       exact (LinearMap.map_smul (cc ρ τ) _ _).trans (congrArg _ (cc_tmul ρ τ _ _))
     have h4 : cc ρ τ (a ⊗ₜ[ℂ] b) = PiTensorProduct.tprod ℂ (pair a (mkY τ b)) := cc_tmul ρ τ a b
@@ -302,8 +289,7 @@ theorem hcomp (p : parab k (eMJ m j)) (w : Vt (j := j) ρ ⊗[ℂ] Zt τ m)
     show _ = ((deltaHalf k (Two (Fin m) (Fin j)) (leviProj k (eMJ m j) p) : ℂˣ) : ℂ) •
       piTensor (twoRep ρ.ρ (psiN τ).ρ) (leviProj k (eMJ m j) p) (PiTensorProduct.tprod ℂ (pair a (mkY τ b)))
     rw [piTensor_tprod]
-    exact congrArg _
-      ((tprod_pair_smul _ _ _).symm.trans (congrArg (PiTensorProduct.tprod ℂ) h2.symm))
+    exact congrArg _ ((tprod_pair_smul _ _ _).symm.trans (congrArg (PiTensorProduct.tprod ℂ) h2.symm))
 
 theorem mkZ_surjective : Function.Surjective (mkZ τ m) :=
   Submodule.mkQ_surjective (twKer τ.ρ (MirUin k j) 1)
@@ -312,11 +298,9 @@ theorem mkY_unip (u : Mir k j) (hu : u ∈ MirUin k j) (b : τ.V) : mkY τ (τ.�
   refine (Submodule.Quotient.eq _).2 (Submodule.subset_span ⟨⟨u, hu⟩, b, ?_⟩)
   simp
 
-theorem sig_tmul
-    (v : MirabolicParabolic k m j)
-    (a : Vt (j := j) ρ) (b : Zt τ m) (hv : (gpProj k m j v).1 = 1)
-    (hv2 : (gpProj k m j v).2 ∈ MirUin k j)
-    : sig ρ τ v (a ⊗ₜ[ℂ] b) = a ⊗ₜ[ℂ] (τ.ρ (gpProj k m j v).2 b : Zt τ m) := by
+theorem sig_tmul (v : MirabolicParabolic k m j) (a : Vt (j := j) ρ) (b : Zt τ m) (hv : (gpProj k m j v).1 = 1)
+    (hv2 : (gpProj k m j v).2 ∈ MirUin k j) :
+    sig ρ τ v (a ⊗ₜ[ℂ] b) = a ⊗ₜ[ℂ] (τ.ρ (gpProj k m j v).2 b : Zt τ m) := by
   refine (extTensor_tmul _ _ _ a b).trans ?_
   rw [hv]
   show (((dpow m (((j + 1 : ℕ) : ℝ) / 2) 1 : ℂˣ) : ℂ) • ρ.ρ 1 a : Vt (j := j) ρ) ⊗ₜ[ℂ]
@@ -325,12 +309,9 @@ theorem sig_tmul
   simp
   rfl
 
-theorem tmul_mem_twKer (a : Vt (j := j) ρ) (t : Zt τ m) (ht : t ∈ twKer τ.ρ (MirUin k j) 1)
-    : a ⊗ₜ[ℂ] t ∈ twKer (sig ρ τ) ((MirUin k (m + j)).subgroupOf (MirabolicParabolic k m j)) 1 := by
-  refine Submodule.span_induction
-    (p := fun t _ =>
-      a ⊗ₜ[ℂ] (t : Zt τ m)
-        ∈ twKer (sig ρ τ) ((MirUin k (m + j)).subgroupOf (MirabolicParabolic k m j)) 1)
+theorem tmul_mem_twKer (a : Vt (j := j) ρ) (t : Zt τ m) (ht : t ∈ twKer τ.ρ (MirUin k j) 1) :
+    a ⊗ₜ[ℂ] t ∈ twKer (sig ρ τ) ((MirUin k (m + j)).subgroupOf (MirabolicParabolic k m j)) 1 := by
+  refine Submodule.span_induction (p := fun t _ => a ⊗ₜ[ℂ] (t : Zt τ m) ∈ twKer (sig ρ τ) ((MirUin k (m + j)).subgroupOf (MirabolicParabolic k m j)) 1)
     ?_ ?_ ?_ ?_ ht
   · rintro _ ⟨n, b, rfl⟩
     obtain ⟨v, hv, hv2⟩ := GlobalTheory.T.gpProj_unipotent_surjective k m j (n : Mir k j) n.2
@@ -353,9 +334,8 @@ theorem tmul_mem_twKer (a : Vt (j := j) ρ) (t : Zt τ m) (ht : t ∈ twKer τ.�
     rw [TensorProduct.tmul_smul]
     exact Submodule.smul_mem _ _ hx
 
-theorem hck (w : Vt (j := j) ρ ⊗[ℂ] Zt τ m)
-    : cc ρ τ w = 0
-      ↔ w ∈ twKer (sig ρ τ) ((MirUin k (m + j)).subgroupOf (MirabolicParabolic k m j)) 1 := by
+theorem hck (w : Vt (j := j) ρ ⊗[ℂ] Zt τ m) :
+    cc ρ τ w = 0 ↔ w ∈ twKer (sig ρ τ) ((MirUin k (m + j)).subgroupOf (MirabolicParabolic k m j)) 1 := by
   constructor
   · intro hw
     obtain ⟨y, rfl⟩ := cMap_eq_zero (iV ρ j) (mkZ τ m) (mkZ_surjective τ) w hw
@@ -365,11 +345,10 @@ theorem hck (w : Vt (j := j) ρ ⊗[ℂ] Zt τ m)
     | add x y hx hy =>
       rw [map_add (f := _)]
       exact Submodule.add_mem _ hx hy
-    | tmul a t => exact tmul_mem_twKer ρ τ a _ ((Submodule.Quotient.mk_eq_zero _).1 t.2)
+    | tmul a t =>
+      exact tmul_mem_twKer ρ τ a _ ((Submodule.Quotient.mk_eq_zero _).1 t.2)
   · intro hw
-    have hle
-        : twKer (sig ρ τ) ((MirUin k (m + j)).subgroupOf (MirabolicParabolic k m j)) 1
-          ≤ LinearMap.ker (cc ρ τ) := by
+    have hle : twKer (sig ρ τ) ((MirUin k (m + j)).subgroupOf (MirabolicParabolic k m j)) 1 ≤ LinearMap.ker (cc ρ τ) := by
       refine Submodule.span_le.2 ?_
       rintro _ ⟨u, w, rfl⟩
       have hu : ((u : MirabolicParabolic k m j) : Mir k (m + j)) ∈ MirUin k (m + j) := u.2
@@ -381,10 +360,8 @@ theorem hck (w : Vt (j := j) ρ ⊗[ℂ] Zt τ m)
         | add x y hx hy => simp only [map_add (f := _), hx, hy]
         | tmul a b =>
           rw [sig_tmul ρ τ _ a b h1 h2]
-          exact (cc_tmul ρ τ _ _).trans
-            ((congrArg
-              (fun y => PiTensorProduct.tprod ℂ (pair (V := ρ.V) a y))
-              (mkY_unip τ _ h2 b)).trans (cc_tmul ρ τ a b).symm)
+          exact (cc_tmul ρ τ _ _).trans ((congrArg (fun y => PiTensorProduct.tprod ℂ (pair (V := ρ.V) a y)) (mkY_unip τ _ h2 b)).trans
+            (cc_tmul ρ τ a b).symm)
       show cc ρ τ (sig ρ τ (u : MirabolicParabolic k m j) w - (((1 : ((MirUin k (m + j)).subgroupOf (MirabolicParabolic k m j)) →* ℂˣ) u : ℂˣ) : ℂ) • w) = 0
       simp only [MonoidHom.one_apply, Units.val_one, one_smul, map_sub]
       exact sub_eq_zero.2 (key w)
@@ -394,19 +371,15 @@ theorem isOpen_dpow_ker (n : ℕ) (s : ℝ) : IsOpen ((dpow (k := k) n s).ker : 
   (isSmoothChar_of_isUnram (isUnram_absPow k _)).detChar
 
 theorem isSmooth_sig (hρ : IsSmooth ρ.ρ) (hτ : IsSmooth τ.ρ) : IsSmooth (sig ρ τ) := by
-  refine isSmooth_comp (isSmooth_extTensor (isSmooth_twist hρ (isOpen_dpow_ker _ _)) ?_) _
-    (GlobalTheory.T.gpProj_continuous k m j)
-  exact isSmooth_twist hτ
-    (IsSmoothChar.comp (χ := dpow (j + 1) (-((m : ℕ) : ℝ) / 2)) (isOpen_dpow_ker _ _)
-      (Mir k j).subtype continuous_subtype_val)
+  refine isSmooth_comp (isSmooth_extTensor (isSmooth_twist hρ (isOpen_dpow_ker _ _)) ?_) _ (GlobalTheory.T.gpProj_continuous k m j)
+  exact isSmooth_twist hτ (IsSmoothChar.comp (χ := dpow (j + 1) (-((m : ℕ) : ℝ) / 2)) (isOpen_dpow_ker _ _) (Mir k j).subtype
+    continuous_subtype_val)
 
-theorem exE (hρ : IsSmooth ρ.ρ) (hτ : IsSmooth τ.ρ)
-    : ∃ E
-        : (cIndSpace (MirabolicParabolic k m j) (sig ρ τ) ⧸ twKer (cInd (MirabolicParabolic k m j) (sig ρ τ)) (MirUin k (m + j)) 1) ≃ₗ[ℂ]
-          smoothPart (ind (parab k (eMJ m j)) (sigP ρ τ)),
-      ∀ (f : cIndSpace (MirabolicParabolic k m j) (sig ρ τ)) (x : GL (Fin (m + j)) k),
-        (E (Submodule.Quotient.mk f)).1.1 x
-          = ((dpow (m + j) (-1 / 2) x : ℂˣ) : ℂ) • cc ρ τ (f.1.1.1 (levi k (m + j) x)) := by
+theorem exE (hρ : IsSmooth ρ.ρ) (hτ : IsSmooth τ.ρ) :
+    ∃ E : (cIndSpace (MirabolicParabolic k m j) (sig ρ τ) ⧸ twKer (cInd (MirabolicParabolic k m j) (sig ρ τ)) (MirUin k (m + j)) 1) ≃ₗ[ℂ]
+        smoothPart (ind (parab k (eMJ m j)) (sigP ρ τ)),
+      ∀ (f : cIndSpace (MirabolicParabolic k m j) (sig ρ τ)) (x : GL (Fin (m + j)) k), (E (Submodule.Quotient.mk f)).1.1 x =
+        ((dpow (m + j) (-1 / 2) x : ℂˣ) : ℂ) • cc ρ τ (f.1.1.1 (levi k (m + j) x)) := by
   have hPK := parab_mul_KO (k := k) (eMJ m j)
   have hker : ∀ g, mirabolicProjection k (m + j) g = 1 ↔ g ∈ MirUin k (m + j) := by
     intro g
@@ -414,19 +387,16 @@ theorem exE (hρ : IsSmooth ρ.ρ) (hτ : IsSmooth τ.ρ)
     · intro hg
       let A : Matrix (Fin (m + j + 1)) (Fin (m + j + 1)) k := (g : GL (Fin (m + j + 1)) k)
       have hrow : A (Fin.last (m + j)) = eLast k (m + j) := (mem_Mir_iff k g.1).1 g.2
-      have hblock (a b : Fin (m + j))
-          : A a.castSucc b.castSucc = (1 : Matrix (Fin (m + j)) (Fin (m + j)) k) a b :=
+      have hblock (a b : Fin (m + j)) : A a.castSucc b.castSucc = (1 : Matrix (Fin (m + j)) (Fin (m + j)) k) a b :=
         congrArg (fun u : GL (Fin (m + j)) k => (u : Matrix (Fin (m + j)) (Fin (m + j)) k) a b) hg
       refine ⟨Multiplicative.ofAdd (fun a => A a.castSucc (Fin.last (m + j))), ?_⟩
       apply Units.ext
       ext a b
-      change ((1 : Matrix (Fin (m + j + 1)) (Fin (m + j + 1)) k)
-            + colMat k (m + j) (fun i => A i.castSucc (Fin.last (m + j))))
-          a b
-        = A a b
+      change ((1 : Matrix (Fin (m + j + 1)) (Fin (m + j + 1)) k) +
+        colMat k (m + j) (fun i => A i.castSucc (Fin.last (m + j)))) a b = A a b
       rw [Matrix.add_apply, colMat]
-      rcases Fin.eq_castSucc_or_eq_last a with ⟨a, rfl⟩ | rfl
-        <;> rcases Fin.eq_castSucc_or_eq_last b with ⟨b, rfl⟩ | rfl
+      rcases Fin.eq_castSucc_or_eq_last a with ⟨a, rfl⟩ | rfl <;>
+        rcases Fin.eq_castSucc_or_eq_last b with ⟨b, rfl⟩ | rfl
       · simp [Matrix.one_apply, hblock]
       · simp [Matrix.one_apply, Fin.castSucc_ne_last]
       · simp [Matrix.one_apply, Fin.castSucc_ne_last, (Fin.castSucc_ne_last _).symm, hrow, eLast]
@@ -439,8 +409,7 @@ theorem exE (hρ : IsSmooth ρ.ρ) (hτ : IsSmooth τ.ρ)
       change blockMat k (m + j) (g.1 : Matrix (Fin (m + j + 1)) (Fin (m + j + 1)) k) a b = _
       rw [blockMat, ← hv']
       change ((1 : Matrix (Fin (m + j + 1)) (Fin (m + j + 1)) k) + colMat k (m + j) v.toAdd)
-          a.castSucc b.castSucc
-        = (1 : Matrix (Fin (m + j)) (Fin (m + j)) k) a b
+        a.castSucc b.castSucc = (1 : Matrix (Fin (m + j)) (Fin (m + j)) k) a b
       simp [colMat, Matrix.one_apply, Fin.castSucc_ne_last]
   have hUH : MirUin k (m + j) ≤ MirabolicParabolic k m j := fun g hg => by
     refine (GlobalTheory.T.mem_mirabolicParabolic_iff_parabolic k m j g).2 ?_
@@ -452,12 +421,10 @@ theorem exE (hρ : IsSmooth ρ.ρ) (hτ : IsSmooth τ.ρ)
       rw [MonoidHom.mem_ker, hker]
     rw [this]
     infer_instance
-  have hproj_levi (g : GL (Fin (m + j)) k)
-      : mirabolicProjection k (m + j) (levi k (m + j) g) = g := by
+  have hproj_levi (g : GL (Fin (m + j)) k) : mirabolicProjection k (m + j) (levi k (m + j) g) = g := by
     apply Units.ext
     ext a b
-    change blockMat k (m + j) (glEmbMat k (m + j) (g : Matrix (Fin (m + j)) (Fin (m + j)) k)) a b
-      = _
+    change blockMat k (m + j) (glEmbMat k (m + j) (g : Matrix (Fin (m + j)) (Fin (m + j)) k)) a b = _
     simp [blockMat, glEmbMat]
   have hproj_cont : Continuous (mirabolicProjection k (m + j)) := by
     have hval : Continuous fun g : Mir k (m + j) =>
@@ -472,48 +439,34 @@ theorem exE (hρ : IsSmooth ρ.ρ) (hτ : IsSmooth τ.ρ)
         (mirabolicProjection k (m + j) g⁻¹ : Matrix (Fin (m + j)) (Fin (m + j)) k) :=
       hblock.comp continuous_inv
     simpa only [map_inv] using hblock_inv
-  exact GlobalTheory.CompanionTheory.CIndCoinv.coinv_equiv (MirabolicParabolic k m j)
-    (MirUin k (m + j)) (parab k (eMJ m j)) (levi k (m + j)) (mirabolicProjection k (m + j))
-    (GlobalTheory.T.isClosed_mirabolicParabolic k m j)
-    (GlobalTheory.CompanionTheory.BZMirOnto.exists_compactOpen k (m + j))
-    (GlobalTheory.CompanionTheory.BZMirFun.continuous_levi k (m + j)) hproj_cont hproj_levi hker hUH
-    (fun g hg => (GlobalTheory.T.mem_mirabolicParabolic_iff_parabolic k m j g).1 hg)
-    (fun p hp => levi_mem_HGP p hp)
-    (GlobalTheory.SplitWeil.KO k (Fin (m + j))) GlobalTheory.SplitFlip.isCompact_KO hPK
+  exact GlobalTheory.CompanionTheory.CIndCoinv.coinv_equiv (MirabolicParabolic k m j) (MirUin k (m + j)) (parab k (eMJ m j)) (levi k (m + j))
+    (mirabolicProjection k (m + j)) (GlobalTheory.T.isClosed_mirabolicParabolic k m j) (GlobalTheory.CompanionTheory.BZMirOnto.exists_compactOpen k (m + j))
+    (GlobalTheory.CompanionTheory.BZMirFun.continuous_levi k (m + j)) hproj_cont
+    hproj_levi hker hUH (fun g hg => (GlobalTheory.T.mem_mirabolicParabolic_iff_parabolic k m j g).1 hg)
+    (fun p hp => levi_mem_HGP p hp) (GlobalTheory.SplitWeil.KO k (Fin (m + j))) GlobalTheory.SplitFlip.isCompact_KO hPK
     (dpow (m + j) (-1 / 2)) (isOpen_dpow_ker _ _) (sig ρ τ) (isSmooth_sig ρ τ hρ hτ) (sigP ρ τ)
     (cc ρ τ) (cMap_surjective _ _ (mkZ_surjective τ)) (hck ρ τ) (hcomp ρ τ)
-    (GlobalTheory.T.compact_induction_twisted_kernel _ _ hUH
-      (GlobalTheory.CompanionTheory.BZMirOnto.exists_compactOpen k (m + j)) _
-      (isSmooth_sig ρ τ hρ hτ))
+    (GlobalTheory.T.compact_induction_twisted_kernel _ _ hUH (GlobalTheory.CompanionTheory.BZMirOnto.exists_compactOpen k (m + j)) _ (isSmooth_sig ρ τ hρ hτ))
 
 set_option synthInstance.maxHeartbeats 100000 in
-theorem psiMinus_cInd_equiv_smInd (hρ : IsSmooth ρ.ρ) (hτ : IsSmooth τ.ρ)
-    : Nonempty ((twist (psiMinus k (cInd (MirabolicParabolic k m j) (sig ρ τ)))
-      (dpow (m + j) (-1 / 2))).Equiv (smInd (parab k (eMJ m j)) (sigP ρ τ))) := by
+theorem psiMinus_cInd_equiv_smInd (hρ : IsSmooth ρ.ρ) (hτ : IsSmooth τ.ρ) :
+    Nonempty ((twist (psiMinus k (cInd (MirabolicParabolic k m j) (sig ρ τ))) (dpow (m + j) (-1 / 2))).Equiv
+      (smInd (parab k (eMJ m j)) (sigP ρ τ))) := by
   refine (exE ρ τ hρ hτ).elim fun E hE => ?_
   have key := coinv_intertwine _ _ _ (levi k (m + j)) (dpow (m + j) (-1 / 2)) _ _ _ E hE
   refine ⟨Representation.Equiv.mk E ?_⟩
   intro g
   refine LinearMap.ext fun y => ?_
   refine Submodule.Quotient.induction_on _ y fun f => ?_
-  have h1
-      : twist (psiMinus k (cInd (MirabolicParabolic k m j) (sig ρ τ))) (dpow (m + j) (-1 / 2)) g
-          (Submodule.Quotient.mk f)
-        = ((dpow (m + j) (-1 / 2) g : ℂˣ) : ℂ) • Submodule.Quotient.mk (cInd
-          (MirabolicParabolic k m j) (sig ρ τ) (levi k (m + j) g) f) :=
-    rfl
-  have h2
-      : E (twist (psiMinus k (cInd (MirabolicParabolic k m j) (sig ρ τ))) (dpow (m + j) (-1 / 2)) g
-          (Submodule.Quotient.mk f))
-        = smInd (parab k (eMJ m j)) (sigP ρ τ) g (E (Submodule.Quotient.mk f)) :=
-    (congrArg E h1).trans (key g f)
+  have h1 : twist (psiMinus k (cInd (MirabolicParabolic k m j) (sig ρ τ))) (dpow (m + j) (-1 / 2)) g (Submodule.Quotient.mk f) =
+      ((dpow (m + j) (-1 / 2) g : ℂˣ) : ℂ) • Submodule.Quotient.mk (cInd (MirabolicParabolic k m j) (sig ρ τ) (levi k (m + j) g) f) := rfl
+  have h2 : E (twist (psiMinus k (cInd (MirabolicParabolic k m j) (sig ρ τ))) (dpow (m + j) (-1 / 2)) g (Submodule.Quotient.mk f)) =
+      smInd (parab k (eMJ m j)) (sigP ρ τ) g (E (Submodule.Quotient.mk f)) := (congrArg E h1).trans (key g f)
   exact h2
 
 end Main
 
-theorem psiGP
-    : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k],
-      PsiGP k := by
+theorem psiGP : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k], PsiGP k := by
   intro k _ _ _ _ m j ρ τ hρ hτ
   exact psiMinus_cInd_equiv_smInd ρ τ hρ hτ
 

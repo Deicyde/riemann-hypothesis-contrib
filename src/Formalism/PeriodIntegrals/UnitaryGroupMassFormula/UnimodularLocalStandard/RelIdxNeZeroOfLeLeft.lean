@@ -1,6 +1,50 @@
 module
 
-public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.UnimodularLocalStandard.Development
+public import Formalism.PeriodIntegrals.UnimodLocStd
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.CStarAlgebra.Classes
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Lemma
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -153,18 +197,10 @@ lemma stdLat_smul_idx (L : PeriodPair) (m : Type*) [Fintype m] {N : ℕ} (hN : N
         first
         | exact Int.ediv_add_emod _ _
         | exact EuclideanDomain.div_add_mod _ _
-        | exact Int.mul_ediv_add_emod _ _
-        | (rw [add_comm]; exact Int.emod_add_ediv _ _)
-        | (rw [Int.emod_def]; ring)
-        | (have e := Int.emod_def (p j) (N : ℤ); linarith)
       have d2 : (N : ℤ) * (q j / N) + q j % N = q j := by
         first
         | exact Int.ediv_add_emod _ _
         | exact EuclideanDomain.div_add_mod _ _
-        | exact Int.mul_ediv_add_emod _ _
-        | (rw [add_comm]; exact Int.emod_add_ediv _ _)
-        | (rw [Int.emod_def]; ring)
-        | (have e := Int.emod_def (q j) (N : ℤ); linarith)
       have c1 : (N : ℂ) * ((p j / N : ℤ) : ℂ) + ((p j % N : ℤ) : ℂ) = (p j : ℂ) := by
         exact_mod_cast d1
       have c2 : (N : ℂ) * ((q j / N : ℤ) : ℂ) + ((q j % N : ℤ) : ℂ) = (q j : ℂ) := by
@@ -179,9 +215,6 @@ lemma theta_conj (b : ℤ) (d : ℕ) : conj (cmTheta b d) = b - cmTheta b d := b
   have h2 : (starRingEnd ℂ) (2 : ℂ) = 2 := map_ofNat _ 2
   first
   | (simp only [PI.ULS.cmTheta, map_div₀, map_add (f := _), map_mul, Complex.conj_I, Complex.conj_ofReal, map_intCast, h2]; ring)
-  | (simp [PI.ULS.cmTheta, map_div₀]; ring)
-  | (simp [PI.ULS.cmTheta, map_div₀]; done)
-  | (apply Complex.ext <;> simp [PI.ULS.cmTheta] <;> ring)
 
 lemma theta_norm (h : 4 * (a : ℤ) * c = b ^ 2 + d) :
     cmTheta b d * (b - cmTheta b d) = (a : ℂ) * c := by

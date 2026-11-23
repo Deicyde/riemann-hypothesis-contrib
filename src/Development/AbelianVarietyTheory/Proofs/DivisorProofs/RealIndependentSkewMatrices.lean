@@ -1,7 +1,48 @@
 module
 
-public import Mathlib
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.FundamentalDomains.Signature
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -9,23 +50,19 @@ open NumberField Matrix ReciprocityTheory.ChartRestriction.G.FD
 
 namespace GlobalTheory
 
-theorem linearIndependent_of_skew_of_real
-    : ∀ {E : Type} [Field E] [NumberField E] [IsCMField E] {r n : ℕ} (G : Matrix (Fin r) (Fin r) E),
-      G.det ≠ 0
-        → ∀ e : Fin n → Matrix (Fin r) (Fin r) E,
-          (∀ i, (e i)ᵀ * G + G * (e i).map cc = 0) → LinearIndependent (maximalRealSubfield E) e
-            → LinearIndependent E e := by
+theorem linearIndependent_of_skew_of_real : ∀ {E : Type} [Field E] [NumberField E] [IsCMField E]
+    {r n : ℕ} (G : Matrix (Fin r) (Fin r) E), G.det ≠ 0 →
+    ∀ e : Fin n → Matrix (Fin r) (Fin r) E, (∀ i, (e i)ᵀ * G + G * (e i).map cc = 0) →
+    LinearIndependent (maximalRealSubfield E) e → LinearIndependent E e := by
   intro E _ _ _ r n G hG e he hF
-  have cc_mul' : ∀ x y : E, cc (x * y) = cc x * cc y := fun x y =>
-    map_mul (IsCMField.complexConj E) x y
-  have cc_add' : ∀ x y : E, cc (x + y) = cc x + cc y := fun x y =>
-    map_add (IsCMField.complexConj E) x y
+  have cc_mul' : ∀ x y : E, cc (x * y) = cc x * cc y := fun x y => map_mul (IsCMField.complexConj E) x y
+  have cc_add' : ∀ x y : E, cc (x + y) = cc x + cc y := fun x y => map_add (IsCMField.complexConj E) x y
   have cc_cc' : ∀ x : E, cc (cc x) = x := fun x => IsCMField.complexConj_apply_apply E x
 
   have hmap : ∀ g : Fin n → E, (∑ i, g i • e i).map cc = ∑ i, cc (g i) • (e i).map cc := by
     intro g
     ext a b
-    set_option synthInstance.maxHeartbeats 100000 in
+
     simp [Matrix.sum_apply, cc, map_sum]
   have hinj : ∀ M : Matrix (Fin r) (Fin r) E, Mᵀ * G = 0 → M = 0 := by
     intro M hM
@@ -68,7 +105,8 @@ theorem linearIndependent_of_skew_of_real
   rw [Fintype.linearIndependent_iff]
   intro g hg i
   have h1 := sum_real g hg i
-  have hxg : ∑ i, (x * g i) • e i = 0 := by simp only [mul_smul, ← Finset.smul_sum, hg, smul_zero]
+  have hxg : ∑ i, (x * g i) • e i = 0 := by
+    simp only [mul_smul, ← Finset.smul_sum, hg, smul_zero]
   have h2 := sum_real (fun i => x * g i) hxg i
   simp only [cc_mul'] at h2
   have h3 : cc (g i) = - g i := eq_neg_of_add_eq_zero_right h1

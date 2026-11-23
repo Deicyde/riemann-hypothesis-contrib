@@ -1,20 +1,52 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Definitions.GaloisGeometry.NormalFam
-public import Development.AbelianVarietyTheory.PublishedTheorems.GaloisGeometry₂.HoweUnram
 public import Development.AbelianVarietyTheory.Definitions.TwistedInnerProducts.IsStepWeil
-public import Development.AbelianVarietyTheory.PublishedTheorems.AutomorphicForms₂.ExistsNormLeHeightPow
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FinRepApply
-public import Formalism.LocalToGlobal.IndefiniteReal.BaseLiftsPackageOfPrimitiveLinks
-public import Formalism.LocalToGlobal.Divisibility.TrivialExtensionSideWellFormed
-public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.MatchedSphericalPairsCommuteCompositeLiftStatement
+public import Formalism.LocalToGlobal.IndefiniteReal.ZeroPartEigenvalueConvention
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CoreClausesOfWeakCharacterisation
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsLabelThetaLiftSpaceIffDualStatement
 public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.InertHeckeOperatorsRowsRationalSelfAdjointLabelsStatement
-public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.IsSphericalDoubleCosetLabelIffDecreasingStatement
+import Development.AbelianVarietyTheory.Proofs.SatakeParameters.IsSphericalDoubleCosetLabelIffDecreasingStatement
+public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.MatchedSphericalPairsCommuteCompositeLiftStatement
+import Development.AbelianVarietyTheory.Proofs.SatakeParameters.RealizationFamilyNormalOperatorsStatement
 public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.SelfDualAntitoneListIffInertPrimeHeckeExponents
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CoreClausesOfWeakCharacterisation
-public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.RealizationFamilyNormalOperatorsStatement
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -222,7 +254,6 @@ variable
   {Pl0 I0 T : Type} {A3 : FamIn3 D.what₂.LL G Pl0 I0 (List ℕ) T D.R.m} {Ks : Type}
   [Field Ks] [NumberField Ks] [Algebra Ks D.what₂.LL]
 
-set_option maxHeartbeats 4000000 in
 theorem ev_lemma
     (R : RealDat3 D A3 Ks) (F : Face3 D A3) (hCore : Core R.toRealDat F.lv2)
     (hSchur : SchurAll R.toRealDat) (hSF : IsSF R.toRealDat R.SF)
@@ -259,7 +290,6 @@ theorem ev_lemma
     exact (GlobalTheory.T.matched_spherical_pairs_commute_composite_lift R.toRealDat F.lv2 hCore
       hSchur R.SF hSF A3.A.μ0 P hP cX c0 hM hX hXops).2 e w (by rw [← hEEc]; exact hw)
 
-set_option maxHeartbeats 4000000 in
 theorem lin_lemma
     (R : RealDat3 D A3 Ks) (hX : Pl D.host.E → (List ℤ →₀ ℂ) → Module.End ℂ (R.HX A3.A.μ0).H)
     (hXops : GlobalTheory.Hk3.IsOpsX R.toRealDat A3.A.μ0 hX)
@@ -272,7 +302,6 @@ theorem lin_lemma
   simp only [map_smul, hXops P hP]
   exact hkF_eq_sum _ _ _ _
 
-set_option maxHeartbeats 4000000 in
 theorem zer_lemma
     (R : RealDat3 D A3 Ks) (hX : Pl D.host.E → (List ℤ →₀ ℂ) → Module.End ℂ (R.HX A3.A.μ0).H)
     (hXops : GlobalTheory.Hk3.IsOpsX R.toRealDat A3.A.μ0 hX)
@@ -284,7 +313,6 @@ theorem zer_lemma
   apply heInj
   rw [hXops P hP, map_zero, hkF_single_of_not _ _ _ hd]
 
-set_option maxHeartbeats 4000000 in
 theorem opv_lemma
     (R : RealDat3 D A3 Ks) (F : Face3 D A3) (hCore : Core R.toRealDat F.lv2)
     (hIn : R.IsInert) (hAll : R.AllPlaces)
@@ -330,7 +358,6 @@ def muQ (Q : A3.okI A3.A.μ0) (q : A3.fam3.base3.Ix) (d : List ℤ) : ℂ :=
   else
     0
 
-set_option maxHeartbeats 4000000 in
 theorem mu_lemma
     (R : RealDat3 D A3 Ks) (F : Face3 D A3) (hCore : Core R.toRealDat F.lv2)
     (hIn : R.IsInert) (hAll : R.AllPlaces)
@@ -362,7 +389,6 @@ theorem mu_lemma
       (fun hl => h (labs _ _ _ hl (tie2 R hIn hAll Q).2))
       v
 
-set_option maxHeartbeats 4000000 in
 theorem dir1
     (R : RealDat3 D A3 Ks)
     (F : Face3 D A3)
@@ -416,7 +442,6 @@ theorem dir1
   · exact congrArg D.what₂.embLL (hp (Q, h.choose))
   · rfl
 
-set_option maxHeartbeats 4000000 in
 theorem dir2
     (R : RealDat3 D A3 Ks)
     (F : Face3 D A3)
@@ -512,7 +537,6 @@ theorem dir2
 
 end Ctx3
 
-set_option maxHeartbeats 4000000 in
 theorem inert_vals_iff_labels
     : ∀ {D : D7} {G : Type} [Group G] [Fintype G] {Pl0 I0 T : Type}
         {A3 : FamIn3 D.what₂.LL G Pl0 I0 (List ℕ) T D.R.m} {Ks : Type} [Field Ks] [NumberField Ks]

@@ -1,6 +1,38 @@
 module
 
 public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.ExistsIsBIffCoreB
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
 
 @[expose] public section
 
@@ -9,7 +41,7 @@ open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.Inhab Fo
   GlobalTheory.Mem.Top.GroupRetwisting GlobalTheory.Mem.Top.Bl GlobalTheory.Mem.Db NumberField
   IsDedekindDomain
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
-set_option maxHeartbeats 4000000
+
 
 namespace GlobalTheory.Mem.Top.Bl.ThTTr
 
@@ -66,14 +98,12 @@ def besDatTr {A B : TH.HSp (w.D Z)} {ι : A.V →ₗ[(w.D Z).host.E] B.V} (d : B
   d with
 }
 
-set_option maxHeartbeats 4000000 in
 def thetaTiedTr {X : ThetaX (w.D Z)} (T : ThetaTied (w.D Z) X)
     : ThetaTied (w.D (setDivZ Z N h)) (thTrZ w Z N h X) := {
   T with
   ev_aut := fun V F => (isAutFun_tr w Z N h).1 (T.ev_aut V F)
 }
 
-set_option maxHeartbeats 4000000 in
 def weilTiedTr {X : ThetaX (w.D Z)} {T : ThetaTied (w.D Z) X} (Wl : WeilTied (w.D Z) X T)
     : WeilTied (w.D (setDivZ Z N h)) (thTrZ w Z N h X) (thetaTiedTr w Z N h T) := {
   Wl with
@@ -81,7 +111,6 @@ def weilTiedTr {X : ThetaX (w.D Z)} {T : ThetaTied (w.D Z) X} (Wl : WeilTied (w.
   om_tw := { Wl.om_tw with }
 }
 
-set_option maxHeartbeats 4000000 in
 theorem weilTiedEq_tr
     {X : ThetaX (w.D Z)} {T : ThetaTied (w.D Z) X} {Wl : WeilTied (w.D Z) X T}
     (e : WeilCompatibleEquivariance Wl)
@@ -91,7 +120,6 @@ theorem weilTiedEq_tr
   om_tw := { e.om_tw with }
 }
 
-set_option maxHeartbeats 4000000 in
 def allTiedTr {X : ThetaX (w.D Z)} {A : TH.ProvA} (a : AllTied (w.D Z) X A)
     : AllTied (w.D (setDivZ Z N h)) (thTrZ w Z N h X) A where
   T := thetaTiedTr w Z N h a.T
@@ -113,7 +141,6 @@ def allTiedTr {X : ThetaX (w.D Z)} {A : TH.ProvA} (a : AllTied (w.D Z) X A)
 
 end
 
-set_option maxHeartbeats 16000000 in
 theorem thT_setDiv
     {B : Base} {f : Fr B.toPre} {T : TwDat B} (w : ColW B f T) (Z : w.Lt)
     {Wt : Set B.places.Pl} {nch : NChoice (w.D Z)} (n : NchT w Z Wt nch)

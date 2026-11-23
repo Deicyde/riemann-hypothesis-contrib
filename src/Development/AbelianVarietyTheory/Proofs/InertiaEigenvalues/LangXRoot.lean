@@ -1,6 +1,58 @@
 module
 
-public import Mathlib
+public import Mathlib.FieldTheory.IsAlgClosed.Basic
+import Mathlib.Algebra.AffineMonoid.UniqueSums
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Int
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
@@ -18,10 +70,11 @@ noncomputable def langX (q : ℕ) (a : ℕ → k) : ℕ → k[X]
 theorem langX_dvd (q : ℕ) (hq : 1 < q) (a : ℕ → k) (i : ℕ) : (X : k[X]) ^ q ∣ langX q a i := by
   induction i with
   | zero => exact Dvd.intro_left _ rfl
-  | succ i ih => exact dvd_add (ih.trans (dvd_pow_self _ (by omega))) (Dvd.intro_left _ rfl)
+  | succ i ih =>
+    exact dvd_add (ih.trans (dvd_pow_self _ (by omega))) (Dvd.intro_left _ rfl)
 
-theorem langX_ne (q : ℕ) (hq : 1 < q) (a : ℕ → k) (i : ℕ) (h : ∃ j ≤ i, a j ≠ 0)
-    : langX q a i ≠ 0 := by
+theorem langX_ne (q : ℕ) (hq : 1 < q) (a : ℕ → k) (i : ℕ) (h : ∃ j ≤ i, a j ≠ 0) :
+    langX q a i ≠ 0 := by
   induction i with
   | zero =>
     obtain ⟨j, hj, ha⟩ := h
@@ -30,7 +83,7 @@ theorem langX_ne (q : ℕ) (hq : 1 < q) (a : ℕ → k) (i : ℕ) (h : ∃ j ≤
   | succ i ih =>
     intro h0
     have h0' : (langX q a i) ^ q + C (a (i + 1)) * X ^ q = 0 := h0
-    have h1 : (langX q a i) ^ q = -(C (a (i + 1)) * X ^ q) := eq_neg_of_add_eq_zero_left h0'
+    have h1 : (langX q a i) ^ q = - (C (a (i + 1)) * X ^ q) := eq_neg_of_add_eq_zero_left h0'
     have hd : (X : k[X]) ^ (q * q) ∣ (langX q a i) ^ q := by
       rw [pow_mul]; exact pow_dvd_pow_of_dvd (langX_dvd q hq a i) q
     have hc := (X_pow_dvd_iff.1 hd) q (by nlinarith)
@@ -47,8 +100,8 @@ theorem langX_ne (q : ℕ) (hq : 1 < q) (a : ℕ → k) (i : ℕ) (h : ∃ j ≤
     have : j = i + 1 := by omega
     exact haj (this ▸ ha)
 
-theorem langX_root (q : ℕ) (hq : 1 < q) (a : ℕ → k) (i : ℕ) (h : langX q a i ≠ 0)
-    : ∃ y : k, y ≠ 0 ∧ (langX q a i).eval y = y := by
+theorem langX_root (q : ℕ) (hq : 1 < q) (a : ℕ → k) (i : ℕ) (h : langX q a i ≠ 0) :
+    ∃ y : k, y ≠ 0 ∧ (langX q a i).eval y = y := by
   obtain ⟨T, hT⟩ := langX_dvd q hq a i
   have hT0 : T ≠ 0 := by
     rintro rfl
@@ -59,8 +112,8 @@ theorem langX_root (q : ℕ) (hq : 1 < q) (a : ℕ → k) (i : ℕ) (h : langX q
     have h1 : (0 : WithBot ℕ) < ((q - 1 : ℕ) : WithBot ℕ) := by
       exact_mod_cast (by omega : 0 < q - 1)
     exact add_pos_of_pos_of_nonneg h1 h0
-  obtain ⟨y, hy⟩ :=
-    IsAlgClosed.exists_root (X ^ (q - 1) * T - C 1) (by rw [degree_sub_C hdeg]; exact hdeg.ne')
+  obtain ⟨y, hy⟩ := IsAlgClosed.exists_root (X ^ (q - 1) * T - C 1)
+    (by rw [degree_sub_C hdeg]; exact hdeg.ne')
   have hy' : y ^ (q - 1) * T.eval y = 1 := by
     have h2 : (X ^ (q - 1) * T - C 1).eval y = 0 := hy
     simp only [eval_sub, eval_mul, eval_pow, eval_X, eval_C] at h2
@@ -71,7 +124,8 @@ theorem langX_root (q : ℕ) (hq : 1 < q) (a : ℕ → k) (i : ℕ) (h : langX q
     simp at hy'
   · rw [hT]
     simp only [eval_mul, eval_pow, eval_X]
-    have h3 : y ^ q = y * y ^ (q - 1) := by rw [← pow_succ']; congr 1; omega
+    have h3 : y ^ q = y * y ^ (q - 1) := by
+      rw [← pow_succ']; congr 1; omega
     rw [h3, mul_assoc, hy', mul_one]
 
 theorem as_root (q : ℕ) (hq : 1 < q) (c : k) : ∃ z : k, z ^ q - z = c := by
@@ -79,9 +133,8 @@ theorem as_root (q : ℕ) (hq : 1 < q) (c : k) : ∃ z : k, z ^ q - z = c := by
     rw [degree_sub_eq_left_of_degree_lt, degree_X_pow]
     rw [degree_X_pow, degree_X_add_C]
     exact_mod_cast hq
-  obtain ⟨z, hz⟩ :=
-    IsAlgClosed.exists_root (X ^ q - (X + C c) : k[X])
-      (by rw [hdeg]; exact_mod_cast (by omega : q ≠ 0))
+  obtain ⟨z, hz⟩ := IsAlgClosed.exists_root (X ^ q - (X + C c) : k[X]) (by
+    rw [hdeg]; exact_mod_cast (by omega : q ≠ 0))
   have h2 : (X ^ q - (X + C c) : k[X]).eval z = 0 := hz
   simp only [eval_sub, eval_add, eval_pow, eval_X, eval_C] at h2
   exact ⟨z, by linear_combination h2⟩
@@ -89,11 +142,9 @@ theorem as_root (q : ℕ) (hq : 1 < q) (c : k) : ∃ z : k, z ^ q - z = c := by
 def langQ (U : Submodule k V) (F : V → V) (v : V) (r : ℕ) : Prop :=
   ∃ u ∈ U, ∃ a : ℕ → k, F^[r] v = u + ∑ i ∈ Finset.range r, a i • F^[i] v
 
-theorem lang_span
-    [FiniteDimensional k V]
-    (q : ℕ) (hq : 1 < q)
-    (F : V →+ V) (hF : ∀ (a : k) (v : V), F (a • v) = a ^ q • F v) (hinj : Function.Injective F)
-    : Submodule.span k {v : V | F v = v} = ⊤ := by
+theorem lang_span [FiniteDimensional k V] (q : ℕ) (hq : 1 < q) (F : V →+ V)
+    (hF : ∀ (a : k) (v : V), F (a • v) = a ^ q • F v) (hinj : Function.Injective F) :
+    Submodule.span k {v : V | F v = v} = ⊤ := by
   classical
   set U := Submodule.span k {v : V | F v = v} with hU
   have hfix : ∀ w, F w = w → w ∈ U := fun w hw => Submodule.subset_span hw
@@ -124,8 +175,7 @@ theorem lang_span
   have h4 : ∀ x, F x ∈ U → x ∈ U := by
     intro x hx
     obtain ⟨u', hu', e⟩ := h3 _ hx
-    rw [← hinj e]
-    exact hu'
+    rw [← hinj e]; exact hu'
   have h4' : ∀ (n : ℕ) (x : V), (⇑F)^[n] x ∈ U → x ∈ U := by
     intro n
     induction n with
@@ -140,14 +190,12 @@ theorem lang_span
     push Not at hall
     exact hne (eq_top_iff.2 fun x _ => hall x)
   have hex : ∃ r, langQ U (⇑F) v r := by
-    let N : ℕ →o Submodule k V := ⟨
-      fun j => Submodule.span k (Set.range fun i : Fin j => (⇑F)^[(i : ℕ)] v),
-      by
+    let N : ℕ →o Submodule k V :=
+      ⟨fun j => Submodule.span k (Set.range fun i : Fin j => (⇑F)^[(i : ℕ)] v), by
         intro j j' h
         refine Submodule.span_mono ?_
         rintro _ ⟨i, rfl⟩
-        exact ⟨Fin.castLE h i, rfl⟩
-    ⟩
+        exact ⟨Fin.castLE h i, rfl⟩⟩
     obtain ⟨n, hn⟩ := monotone_stabilizes_iff_noetherian.2 inferInstance N
     have hmem : (⇑F)^[n] v ∈ N (n + 1) := Submodule.subset_span ⟨Fin.last n, rfl⟩
     rw [← hn (n + 1) (by omega)] at hmem
@@ -167,7 +215,8 @@ theorem lang_span
     · exact ⟨r - 1, by omega⟩
   by_cases hall : ∀ j ≤ s, a j = 0
   · have h0 : ∑ i ∈ Finset.range (s + 1), a i • (⇑F)^[i] v = 0 :=
-      Finset.sum_eq_zero fun i hi => by rw [hall i (by simpa [Nat.lt_succ_iff] using hi), zero_smul]
+      Finset.sum_eq_zero fun i hi => by
+        rw [hall i (by simpa [Nat.lt_succ_iff] using hi), zero_smul]
     rw [h0, add_zero] at ha
     exact hv (h4' (s + 1) v (ha ▸ hu))
   · push Not at hall
@@ -188,19 +237,18 @@ theorem lang_span
     have hxy : x s = y := by rw [hxdef]; exact hy
     obtain ⟨z, hz⟩ : ∃ z : V, z = ∑ i ∈ Finset.range (s + 1), x i • (⇑F)^[i] v := ⟨_, rfl⟩
     have hFz : F z - z = y ^ q • u := by
-      have e1
-          : F z = ∑ i ∈ Finset.range s, (x i) ^ q • (⇑F)^[i + 1] v + y ^ q • (⇑F)^[s + 1] v := by
-        set_option synthInstance.maxHeartbeats 100000 in
-          rw [hz, map_sum, Finset.sum_range_succ]
+      have e1 : F z = ∑ i ∈ Finset.range s, (x i) ^ q • (⇑F)^[i + 1] v +
+          y ^ q • (⇑F)^[s + 1] v := by
+
+        rw [hz, map_sum, Finset.sum_range_succ]
         congr 1
         · refine Finset.sum_congr rfl fun i _ => ?_
           rw [hF, Function.iterate_succ_apply']
         · rw [hF, Function.iterate_succ_apply', hxy]
       have e2 : z = x 0 • v + ∑ i ∈ Finset.range s, x (i + 1) • (⇑F)^[i + 1] v := by
         rw [hz, Finset.sum_range_succ', add_comm]; rfl
-      have e3
-          : ∑ i ∈ Finset.range (s + 1), a i • (⇑F)^[i] v
-            = a 0 • v + ∑ i ∈ Finset.range s, a (i + 1) • (⇑F)^[i + 1] v := by
+      have e3 : ∑ i ∈ Finset.range (s + 1), a i • (⇑F)^[i] v =
+          a 0 • v + ∑ i ∈ Finset.range s, a (i + 1) • (⇑F)^[i + 1] v := by
         rw [Finset.sum_range_succ', add_comm]; rfl
       rw [sub_eq_iff_eq_add, e1, ha, e3]
       conv_rhs => rw [e2]
@@ -208,21 +256,20 @@ theorem lang_span
       abel
     obtain ⟨u', hu', e'⟩ := h2 (y ^ q • u) (U.smul_mem _ hu)
     have hzU : z ∈ U := by
-      have h5 : F (z - u') = z - u' := by rw [map_sub, sub_eq_sub_iff_sub_eq_sub, hFz, e']
+      have h5 : F (z - u') = z - u' := by
+        rw [map_sub, sub_eq_sub_iff_sub_eq_sub, hFz, e']
       have h6 := U.add_mem (hfix _ h5) hu'
       simpa using h6
     apply hmin s (by omega)
-    refine ⟨y⁻¹ • z, U.smul_mem _ hzU, fun i => -(y⁻¹ * x i), ?_⟩
+    refine ⟨y⁻¹ • z, U.smul_mem _ hzU, fun i => - (y⁻¹ * x i), ?_⟩
     rw [hz, Finset.sum_range_succ, hxy, smul_add, smul_smul, inv_mul_cancel₀ hy0, one_smul,
       Finset.smul_sum]
     simp only [neg_smul, Finset.sum_neg_distrib, smul_smul]
     abel
 
-theorem lang_basis
-    [FiniteDimensional k V]
-    (q : ℕ) (hq : 1 < q)
-    (F : V →+ V) (hF : ∀ (a : k) (v : V), F (a • v) = a ^ q • F v) (hinj : Function.Injective F)
-    : ∃ b : Module.Basis (Fin (Module.finrank k V)) k V, ∀ i, F (b i) = b i := by
+theorem lang_basis [FiniteDimensional k V] (q : ℕ) (hq : 1 < q) (F : V →+ V)
+    (hF : ∀ (a : k) (v : V), F (a • v) = a ^ q • F v) (hinj : Function.Injective F) :
+    ∃ b : Module.Basis (Fin (Module.finrank k V)) k V, ∀ i, F (b i) = b i := by
   classical
   have hs : ⊤ ≤ Submodule.span k {v : V | F v = v} := (lang_span q hq F hF hinj).ge
   let b' := Module.Basis.ofSpan hs

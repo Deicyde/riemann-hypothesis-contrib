@@ -1,37 +1,77 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.Definitions.Divisors.EqZeroOfForallPowDvd
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.SandwichKernelRangeExact
+public import Development.AbelianVarietyTheory.Definitions.Divisors.GhostFrobenius
+import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ConvEqOneOfForallPairing
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsPowEqOfIntegers
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ConvEqOneOfForallPairing
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.SandwichKernelRangeExact
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.SimpleRing.Principal
+public import Mathlib.RingTheory.Valuation.Integral
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+public import Development.AbelianVarietyTheory.BlockTheory.DivisorBase.SandwichMaps
+import Development.AbelianVarietyTheory.Definitions.Divisors.EqZeroOfForallPowDvd
+import Development.AbelianVarietyTheory.Definitions.Divisors.FormalCoboundarySmul
 
 @[expose] public section
 
 set_option autoImplicit false
 noncomputable section
-open MvPowerSeries GlobalTheory GlobalTheory.Katz GlobalTheory.QLog GlobalTheory.PDivGroup
-  GlobalTheory.Sandwich GlobalTheory.IndefiniteRowSideFullHecke.EpsilonPairingZeta
-  GlobalTheory.PDivLat
+open MvPowerSeries GlobalTheory GlobalTheory.Katz GlobalTheory.QLog GlobalTheory.PDivGroup GlobalTheory.Sandwich GlobalTheory.IndefiniteRowSideFullHecke.EpsilonPairingZeta GlobalTheory.PDivLat
 
 namespace GlobalTheory.DatumOfMatrices
 
 def sumIdx {d k h : ℕ} (hdk : d + k = h) : Fin d ⊕ Fin k ≃ Fin h :=
   finSumFinEquiv.trans (finCongr hdk)
 
-variable
-  {p : ℕ} [Fact p.Prime]
-  {O : Type} [CommRing O] [Fact ¬ IsUnit (p : O)] [IsAdicComplete (Ideal.span {(p : O)}) O]
+variable {p : ℕ} [Fact p.Prime] {O : Type} [CommRing O] [Fact ¬IsUnit (p : O)]
+  [IsAdicComplete (Ideal.span {(p : O)}) O]
 
-def datumOf
-    (ε : PreTilt O p)
-    {d k h : ℕ} (hdk : d + k = h) (Fa : Matrix (Fin d ⊕ Fin k) (Fin h) (Ainf p O))
-    (Ga : Matrix (Fin h) (Fin d ⊕ Fin k) (Ainf p O))
+def datumOf (ε : PreTilt O p) {d k h : ℕ} (hdk : d + k = h)
+    (Fa : Matrix (Fin d ⊕ Fin k) (Fin h) (Ainf p O)) (Ga : Matrix (Fin h) (Fin d ⊕ Fin k) (Ainf p O))
     (Ψ Ψ' : Matrix (Fin d ⊕ Fin k) (Fin d ⊕ Fin k) (Ainf p O))
     (hGF : Ga * Fa = Sandwich.mu ε • (1 : Matrix (Fin h) (Fin h) (Ainf p O)))
     (hF : Fa = Ψ * Fa.map (phiInv p O))
-    (hΨ : Ψ * Ψ' = xi ε • (1 : Matrix (Fin d ⊕ Fin k) (Fin d ⊕ Fin k) (Ainf p O)))
-    : Datum ε h ℤ_[p] where
+    (hΨ : Ψ * Ψ' = xi ε • (1 : Matrix (Fin d ⊕ Fin k) (Fin d ⊕ Fin k) (Ainf p O))) :
+    Datum ε h ℤ_[p] where
   F := Fa.submatrix (sumIdx hdk).symm id
   G := Ga.submatrix id (sumIdx hdk).symm
   Ψ := Ψ.submatrix (sumIdx hdk).symm (sumIdx hdk).symm
@@ -42,13 +82,12 @@ def datumOf
     rw [Matrix.submatrix_mul_equiv, hGF]
     rfl
   F_eq := by
-    calc
-      Fa.submatrix (sumIdx hdk).symm id
-          = (Ψ * Fa.map (phiInv p O)).submatrix (sumIdx hdk).symm id :=
-        congrArg (fun M => M.submatrix (sumIdx hdk).symm id) hF
-      _ = Ψ.submatrix (sumIdx hdk).symm (sumIdx hdk).symm
-          * (Fa.map (phiInv p O)).submatrix (sumIdx hdk).symm id :=
-        (Matrix.submatrix_mul_equiv _ _ _ _ _).symm
+    calc Fa.submatrix (sumIdx hdk).symm id
+        = (Ψ * Fa.map (phiInv p O)).submatrix (sumIdx hdk).symm id :=
+          congrArg (fun M => M.submatrix (sumIdx hdk).symm id) hF
+      _ = Ψ.submatrix (sumIdx hdk).symm (sumIdx hdk).symm *
+            (Fa.map (phiInv p O)).submatrix (sumIdx hdk).symm id :=
+          (Matrix.submatrix_mul_equiv _ _ _ _ _).symm
       _ = _ := by rw [Matrix.submatrix_map]
   Ψ_mul := by
     rw [Matrix.submatrix_mul_equiv, hΨ]
@@ -64,26 +103,21 @@ end GlobalTheory.DatumOfMatrices
 
 namespace GlobalTheory.DatumOfMatrices
 
-variable
-  {p : ℕ} [Fact p.Prime]
-  {O : Type}
-  [CommRing O] [Fact ¬ IsUnit (p : O)] [IsAdicComplete (Ideal.span {(p : O)}) O] [IsDomain O]
+variable {p : ℕ} [Fact p.Prime] {O : Type} [CommRing O] [Fact ¬IsUnit (p : O)]
+  [IsAdicComplete (Ideal.span {(p : O)}) O] [IsDomain O]
 
-theorem eq_sum_epsPairing_smul
-    {ε : PreTilt O p} (hε : IsPrimitiveSystem ε)
-    (C : Type) [Field C] [Algebra O C] [IsIntegrallyClosedIn O C] [IsAlgClosed C] [CharZero C]
-    (G : PDivGroup p O) (tb : Module.Basis (Fin G.height) ℤ_[p] G.Tate)
-    (χ : Fin G.height → G.dual.Tate)
-    (hpair : ∀ m m', epsPairing hε G (tb m) (χ m') = if m = m' then 1 else 0) (χ0 : G.dual.Tate)
-    : χ0 = ∑ m', epsPairing hε G (tb m') χ0 • χ m' := by
+theorem eq_sum_epsPairing_smul {ε : PreTilt O p} (hε : IsPrimitiveSystem ε) (C : Type) [Field C]
+    [Algebra O C] [IsIntegrallyClosedIn O C] [IsAlgClosed C] [CharZero C] (G : PDivGroup p O)
+    (tb : Module.Basis (Fin G.height) ℤ_[p] G.Tate) (χ : Fin G.height → G.dual.Tate)
+    (hpair : ∀ m m', epsPairing hε G (tb m) (χ m') = if m = m' then 1 else 0)
+    (χ0 : G.dual.Tate) : χ0 = ∑ m', epsPairing hε G (tb m') χ0 • χ m' := by
   classical
   apply (G.pairing_flip_bijective C).1
   refine tb.ext fun m => ?_
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [LinearMap.flip_apply, LinearMap.flip_apply, map_sum]
-  have hlin
-      : ∀ (t : G.Tate) (c : ℤ_[p]) (ψ : G.dual.Tate),
-        epsPairing hε G t (c • ψ) = c * epsPairing hε G t ψ := by
+
+  rw [LinearMap.flip_apply, LinearMap.flip_apply, map_sum]
+  have hlin : ∀ (t : G.Tate) (c : ℤ_[p]) (ψ : G.dual.Tate),
+      epsPairing hε G t (c • ψ) = c * epsPairing hε G t ψ := by
     intro t c ψ
     simp [epsPairing, map_smul]
   simp only [← epsPairing_smul hε, hlin, hpair, mul_ite, mul_one, mul_zero, ite_smul, zero_smul]
@@ -93,34 +127,14 @@ end GlobalTheory.DatumOfMatrices
 
 namespace GlobalTheory.DatumOfMatrices
 
-theorem hasDatum_of_matrices
-    : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C] [CharZero C]
-        (v : Valuation C NNReal) (O : Type) [CommRing O] [Algebra O C] [Fact ¬ IsUnit (p : O)]
-        [IsAdicComplete (Ideal.span {(p : O)}) O] [IsDomain O],
-      v.Integers O
-        → ∀ (ε : PreTilt O p) (hε : IsPrimitiveSystem ε), ∀ (G : PDivGroup p O) (d k : ℕ),
-          d + k = G.height
-            → ∀ (tb : Module.Basis (Fin G.height) ℤ_[p] G.Tate) (χ : Fin G.height → G.dual.Tate)
-                (w : Module.Basis (Fin d) O G.omega) (lb : Module.Basis (Fin k) O G.dual.Lie)
-                (Fa : Matrix (Fin d ⊕ Fin k) (Fin G.height) (Ainf p O))
-                (Ga : Matrix (Fin G.height) (Fin d ⊕ Fin k) (Ainf p O))
-                (Ψ Ψ' : Matrix (Fin d ⊕ Fin k) (Fin d ⊕ Fin k) (Ainf p O)),
-              Ga * Fa = Sandwich.mu ε • (1 : Matrix (Fin G.height) (Fin G.height) (Ainf p O))
-                → Fa = Ψ * Fa.map (phiInv p O)
-                → Ψ * Ψ' = xi ε • (1 : Matrix (Fin d ⊕ Fin k) (Fin d ⊕ Fin k) (Ainf p O))
-                → (∀ m m', epsPairing hε G (tb m) (χ m') = if m = m' then 1 else 0)
-                → (∀ i m, WittVector.fontaineTheta O p (Fa (Sum.inl i) m) = 0)
-                → (∀ j m,
-                  WittVector.fontaineTheta O p (Fa (Sum.inr j) m) = lb j (hodgeTate G (tb m)))
-                → (∀ m j, WittVector.fontaineTheta O p (Ga m (Sum.inr j)) = 0)
-                → (∀ m, dlog G (χ m) = ∑ i, WittVector.fontaineTheta O p (Ga m (Sum.inl i)) • w i)
-                → HasDatum hε G := by
-  intro p _ C _ _ _ v O _ _ _ _ _ hv ε hε G d k hdk tb χ w lb Fa Ga Ψ Ψ' hGF hF hΨ hpair hθl hθr hGr
-    hdlog
+theorem hasDatum_of_matrices : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C] [CharZero C] (v : Valuation C NNReal) (O : Type) [CommRing O] [Algebra O C] [Fact ¬IsUnit (p : O)] [IsAdicComplete (Ideal.span {(p : O)}) O] [IsDomain O], v.Integers O → ∀ (ε : PreTilt O p) (hε : IsPrimitiveSystem ε), ∀ (G : PDivGroup p O) (d k : ℕ), d + k = G.height → ∀ (tb : Module.Basis (Fin G.height) ℤ_[p] G.Tate) (χ : Fin G.height → G.dual.Tate) (w : Module.Basis (Fin d) O G.omega) (lb : Module.Basis (Fin k) O G.dual.Lie) (Fa : Matrix (Fin d ⊕ Fin k) (Fin G.height) (Ainf p O)) (Ga : Matrix (Fin G.height) (Fin d ⊕ Fin k) (Ainf p O)) (Ψ Ψ' : Matrix (Fin d ⊕ Fin k) (Fin d ⊕ Fin k) (Ainf p O)), Ga * Fa = Sandwich.mu ε • (1 : Matrix (Fin G.height) (Fin G.height) (Ainf p O)) → Fa = Ψ * Fa.map (phiInv p O) → Ψ * Ψ' = xi ε • (1 : Matrix (Fin d ⊕ Fin k) (Fin d ⊕ Fin k) (Ainf p O)) → (∀ m m', epsPairing hε G (tb m) (χ m') = if m = m' then 1 else 0) → (∀ i m, WittVector.fontaineTheta O p (Fa (Sum.inl i) m) = 0) → (∀ j m, WittVector.fontaineTheta O p (Fa (Sum.inr j) m) = lb j (hodgeTate G (tb m))) → (∀ m j, WittVector.fontaineTheta O p (Ga m (Sum.inr j)) = 0) → (∀ m, dlog G (χ m) = ∑ i, WittVector.fontaineTheta O p (Ga m (Sum.inl i)) • w i) → HasDatum hε G := by
+  intro p _ C _ _ _ v O _ _ _ _ _ hv ε hε G d k hdk tb χ w lb Fa Ga Ψ Ψ' hGF hF hΨ hpair hθl hθr
+    hGr hdlog
   classical
   have := hv.isFractionRing
   have := hv.isIntegrallyClosed
-  have : IsIntegrallyClosedIn O C := (isIntegrallyClosed_iff_isIntegrallyClosedIn C).1 inferInstance
+  have : IsIntegrallyClosedIn O C :=
+    (isIntegrallyClosed_iff_isIntegrallyClosedIn C).1 inferInstance
   obtain ⟨hfin, hproj⟩ := GlobalTheory.PDiv.omega_finite_projective p C v O hv G.dual
   haveI := hfin
   haveI := hproj
@@ -130,9 +144,8 @@ theorem hasDatum_of_matrices
   have hal : ∀ y a, D.al y (σ a) = ∑ m, WittVector.fontaineTheta O p (Fa a m) * y m := by
     intro y a
     simp [D, datumOf, Datum.al, Matrix.toLin'_apply, Matrix.mulVec, dotProduct, σ]
-  have hbb
-      : ∀ y m',
-        D.bb y m' = ∑ i, WittVector.fontaineTheta O p (Ga m' (Sum.inl i)) * y (σ (Sum.inl i)) := by
+  have hbb : ∀ y m', D.bb y m' =
+      ∑ i, WittVector.fontaineTheta O p (Ga m' (Sum.inl i)) * y (σ (Sum.inl i)) := by
     intro y m'
     have h1 : D.bb y m' = ∑ a, WittVector.fontaineTheta O p (Ga m' a) * y (σ a) := by
       simp only [D, datumOf, Datum.bb, Matrix.toLin'_apply, Matrix.mulVec, dotProduct,
@@ -142,23 +155,17 @@ theorem hasDatum_of_matrices
     rw [h1, Fintype.sum_sum_type]
     simp [hGr]
 
-  have hbC
-      : ∀ z : Fin G.height → O,
-        GlobalTheory.IndefiniteRowSideFullHecke.SandwichMaps.bC C D (fun l => algebraMap O C (z l))
-          = fun m' => algebraMap O C (D.bb z m') := by
+  have hbC : ∀ z : Fin G.height → O, GlobalTheory.IndefiniteRowSideFullHecke.SandwichMaps.bC C D (fun l => algebraMap O C (z l)) =
+      fun m' => algebraMap O C (D.bb z m') := by
     intro z
     funext m'
-    set_option synthInstance.maxHeartbeats 100000 in
-    simp [GlobalTheory.IndefiniteRowSideFullHecke.SandwichMaps.bC,
-      GlobalTheory.IndefiniteRowSideFullHecke.SandwichMaps.redC, Datum.bb, Matrix.toLin'_apply,
-      Matrix.mulVec, dotProduct, map_sum, map_mul]
-  have halC
-      : ∀ (y : Fin G.height → C) a,
-        GlobalTheory.IndefiniteRowSideFullHecke.SandwichMaps.alC C D y (σ a)
-          = ∑ m, algebraMap O C (WittVector.fontaineTheta O p (Fa a m)) * y m := by
+
+    simp [GlobalTheory.IndefiniteRowSideFullHecke.SandwichMaps.bC, GlobalTheory.IndefiniteRowSideFullHecke.SandwichMaps.redC, Datum.bb, Matrix.toLin'_apply, Matrix.mulVec,
+    dotProduct, map_sum, map_mul]
+  have halC : ∀ (y : Fin G.height → C) a, GlobalTheory.IndefiniteRowSideFullHecke.SandwichMaps.alC C D y (σ a) =
+      ∑ m, algebraMap O C (WittVector.fontaineTheta O p (Fa a m)) * y m := by
     intro y a
-    simp [GlobalTheory.IndefiniteRowSideFullHecke.SandwichMaps.alC,
-      GlobalTheory.IndefiniteRowSideFullHecke.SandwichMaps.redC, D, datumOf, Matrix.toLin'_apply,
+    simp [GlobalTheory.IndefiniteRowSideFullHecke.SandwichMaps.alC, GlobalTheory.IndefiniteRowSideFullHecke.SandwichMaps.redC, D, datumOf, Matrix.toLin'_apply,
       Matrix.mulVec, dotProduct, σ]
   let projL : (Fin G.height → O) →ₗ[O] (Fin d → O) := LinearMap.funLeft O O (σ ∘ Sum.inl)
   let projR : (Fin G.height → O) →ₗ[O] (Fin k → O) := LinearMap.funLeft O O (σ ∘ Sum.inr)
@@ -167,15 +174,12 @@ theorem hasDatum_of_matrices
     change D.bb m = 0 ↔ projL m = 0
     constructor
     · intro hm
-      have hker
-          : (fun l => algebraMap O C (m l))
-            ∈ LinearMap.ker (GlobalTheory.IndefiniteRowSideFullHecke.SandwichMaps.bC C D) := by
+      have hker : (fun l => algebraMap O C (m l)) ∈ LinearMap.ker (GlobalTheory.IndefiniteRowSideFullHecke.SandwichMaps.bC C D) := by
         rw [LinearMap.mem_ker, hbC, hm]
         funext m'
         simp
       rw [(GlobalTheory.DetInv.ker_bC_eq_range_alC_and_ker_alC_eq_range_bC p C v O hv ε hζ ℤ_[p]
-          G.height D).1]
-        at hker
+        G.height D).1] at hker
       obtain ⟨y, hy⟩ := hker
       funext i
       apply hv.hom_inj
@@ -194,17 +198,16 @@ theorem hasDatum_of_matrices
   have hcoordE : ∀ x j, coordE x j = lb j x := by
     intro x j
     simp [coordE]
-  let incl : (Fin k → O) →ₗ[O] (Fin G.height → O) := {
-    toFun := fun c l => Sum.elim (0 : Fin d → O) c (σ.symm l)
-    map_add' := by
-      intro a b
-      funext l
-      rcases h : σ.symm l with i | j <;> simp [h]
-    map_smul' := by
-      intro r a
-      funext l
-      rcases h : σ.symm l with i | j <;> simp [h]
-  }
+  let incl : (Fin k → O) →ₗ[O] (Fin G.height → O) :=
+    { toFun := fun c l => Sum.elim (0 : Fin d → O) c (σ.symm l)
+      map_add' := by
+        intro a b
+        funext l
+        rcases h : σ.symm l with i | j <;> simp [h]
+      map_smul' := by
+        intro r a
+        funext l
+        rcases h : σ.symm l with i | j <;> simp [h] }
   have hincl : ∀ c a, incl c (σ a) = Sum.elim (0 : Fin d → O) c a := by
     intro c a
     simp [incl]
@@ -213,30 +216,29 @@ theorem hasDatum_of_matrices
     rw [hFil, LinearMap.mem_ker]
     funext i
     simp [projL, hincl]
-  let filE : (Fin k → O) ≃ₗ[O] D.Fil := {
-    toFun := fun c => ⟨incl c, hinclF c⟩
-    map_add' := by intro a b; ext1; simp
-    map_smul' := by intro r a; ext1; simp
-    invFun := fun m => projR m
-    left_inv := by
-      intro c
-      funext j
-      simp [projR, hincl]
-    right_inv := by
-      intro m
-      ext1
-      funext l
-      obtain ⟨a, rfl⟩ := σ.surjective l
-      have hFil' : ∀ y, y ∈ D.Fil ↔ projL y = 0 := fun y => by rw [hFil, LinearMap.mem_ker]
-      have hm : projL (m : Fin G.height → O) = 0 := (hFil' _).1 m.2
-      rcases a with i | j
-      · simp only [hincl, Sum.elim_inl, Pi.zero_apply]
-        exact (congrFun hm i).symm
-      · simp [hincl, projR]
-  }
+  let filE : (Fin k → O) ≃ₗ[O] D.Fil :=
+    { toFun := fun c => ⟨incl c, hinclF c⟩
+      map_add' := by intro a b; ext1; simp
+      map_smul' := by intro r a; ext1; simp
+      invFun := fun m => projR m
+      left_inv := by
+        intro c
+        funext j
+        simp [projR, hincl]
+      right_inv := by
+        intro m
+        ext1
+        funext l
+        obtain ⟨a, rfl⟩ := σ.surjective l
+        have hFil' : ∀ y, y ∈ D.Fil ↔ projL y = 0 := fun y => by rw [hFil, LinearMap.mem_ker]
+        have hm : projL (m : Fin G.height → O) = 0 := (hFil' _).1 m.2
+        rcases a with i | j
+        · simp only [hincl, Sum.elim_inl, Pi.zero_apply]
+          exact (congrFun hm i).symm
+        · simp [hincl, projR] }
   let fil : G.dual.omega ≃ₗ[O] D.Fil := coordE ≪≫ₗ filE
-  have hfil
-      : ∀ x a, (fil x : Fin G.height → O) (σ a) = Sum.elim (0 : Fin d → O) (fun j => lb j x) a := by
+  have hfil : ∀ x a, (fil x : Fin G.height → O) (σ a) =
+      Sum.elim (0 : Fin d → O) (fun j => lb j x) a := by
     intro x a
     change incl (coordE x) (σ a) = _
     rw [hincl]
@@ -249,24 +251,21 @@ theorem hasDatum_of_matrices
     funext i
     simp [projL]
   let lie : ((Fin G.height → O) ⧸ D.Fil) ≃ₗ[O] G.Lie :=
-    Submodule.quotEquivOfEq _ _ hFil ≪≫ₗ projL.quotKerEquivOfSurjective hsurjL
-      ≪≫ₗ w.dualBasis.equivFun.symm
+    Submodule.quotEquivOfEq _ _ hFil ≪≫ₗ projL.quotKerEquivOfSurjective hsurjL ≪≫ₗ
+      w.dualBasis.equivFun.symm
   have hlie : ∀ m i, lie (D.Fil.mkQ m) (w i) = m (σ (Sum.inl i)) := by
     intro m i
     change (w.dualBasis.equivFun.symm (projL.quotKerEquivOfSurjective hsurjL
-          (Submodule.quotEquivOfEq _ _ hFil (D.Fil.mkQ m))))
-        (w i)
-      = _
+      (Submodule.quotEquivOfEq _ _ hFil (D.Fil.mkQ m)))) (w i) = _
     rw [← Module.Basis.dualBasis_equivFun, LinearEquiv.apply_symm_apply]
     rfl
 
-  have hexpHT
-      : ∀ j t,
-        lb j (hodgeTate G t) = ∑ m, lb j (hodgeTate G (tb m)) * padicToO p O (tb.repr t m) := by
+  have hexpHT : ∀ j t, lb j (hodgeTate G t) =
+      ∑ m, lb j (hodgeTate G (tb m)) * padicToO p O (tb.repr t m) := by
     intro j t
     conv_lhs => rw [← tb.sum_repr t]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum (hodgeTate G), map_sum (lb j)]
+
+    rw [map_sum (hodgeTate G), map_sum (lb j)]
     refine Finset.sum_congr rfl fun m _ => ?_
     rw [hodgeTate_smul (padicToO p O), map_smul, smul_eq_mul, mul_comm]
   have hχexp : ∀ χ0 : G.dual.Tate, χ0 = ∑ m', epsPairing hε G (tb m') χ0 • χ m' :=
@@ -290,15 +289,15 @@ theorem hasDatum_of_matrices
     rw [hbq]
     have hbbx : ∀ m', D.bb m m' = lie (D.Fil.mkQ m) (dlog G (χ m')) := by
       intro m'
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [hbb, hdlog, map_sum]
+
+      rw [hbb, hdlog, map_sum]
       refine Finset.sum_congr rfl fun i _ => ?_
       rw [map_smul, hlie, smul_eq_mul]
     rw [pairingO]
     simp only [hbbx, he]
     conv_rhs => rw [hχexp χ0]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum (dlog G), map_sum]
+
+    rw [map_sum (dlog G), map_sum]
     refine Finset.sum_congr rfl fun m' _ => ?_
     rw [dlog_smul (padicToO p O), map_smul, smul_eq_mul, mul_comm]
 

@@ -1,10 +1,61 @@
 module
 
-public import Mathlib
 public import GroundTheory.HeightsAndTheta.Heights.StabilizerCovolume.EigenLatDifferent
-public import Development.AutomorphicSpectrum.Proofs.AlgebraProofs.ProjSumSumEmbeddingsEqTrace
+public import Development.AutomorphicSpectrum.Definitions.CommutativeAlgebra.LatNormGrLatNeZeroOfSpan
 public import Development.AutomorphicSpectrum.Proofs.AlgebraProofs.DifferentGeneratorDualIntegral
+public import Development.AutomorphicSpectrum.Proofs.AlgebraProofs.ProjSumSumEmbeddingsEqTrace
+import Lemmata.GeneralBFactThirdAlt.Imports
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Etale.Weakly
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.TotallySplit
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 public import Development.AutomorphicArithmetic.IntegralCasts.CapelliIdentities.CapelliComplements.GeneralBFactThird
+import GroundTheory.HeightsAndTheta.Heights.StabilizerCovolume.ThreeLeLevel
 
 @[expose] public section
 
@@ -17,15 +68,17 @@ open scoped nonZeroDivisors
 
 variable {E : Type} [Field E] [NumberField E] {K : Type} [Field K] [NumberField K] {N : ℕ}
 
+
 open Classical in
-theorem sum_dual_mul (σ τ : E →+* K)
-    : ∑ k, σ (HT.dualInt E k) * τ ((RingOfIntegers.basis E k : 𝓞 E) : E)
-      = if τ = σ then 1 else 0 := by
-  let ρ : 𝓞 E →+* Module.End K K := (Algebra.lmul K K).toRingHom.comp (τ.comp (algebraMap (𝓞 E) E))
+theorem sum_dual_mul (σ τ : E →+* K) :
+    ∑ k, σ (HT.dualInt E k) * τ ((RingOfIntegers.basis E k : 𝓞 E) : E) = if τ = σ then 1 else 0 := by
+  let ρ : 𝓞 E →+* Module.End K K :=
+    (Algebra.lmul K K).toRingHom.comp (τ.comp (algebraMap (𝓞 E) E))
   have hρ : ∀ (a : 𝓞 E) (z : K), ρ a z = τ (a : E) * z := fun a z => rfl
-  have hmem : (1 : K) ∈ HT.eigSp ρ τ := HT.LatBasic.mem_eigSp.2 fun a => by rw [hρ, smul_eq_mul]
-  have hP
-      : HT.eigProj ρ σ 1 = ∑ k, σ (HT.dualInt E k) * τ ((RingOfIntegers.basis E k : 𝓞 E) : E) := by
+  have hmem : (1 : K) ∈ HT.eigSp ρ τ := HT.LatBasic.mem_eigSp.2 fun a => by
+    rw [hρ, smul_eq_mul]
+  have hP : HT.eigProj ρ σ 1 =
+      ∑ k, σ (HT.dualInt E k) * τ ((RingOfIntegers.basis E k : 𝓞 E) : E) := by
     simp [HT.eigProj, LinearMap.sum_apply, hρ]
   rw [← hP]
   split_ifs with h
@@ -33,9 +86,9 @@ theorem sum_dual_mul (σ τ : E →+* K)
     exact HT.LatBasic.eigProj_of_mem hmem
   · exact HT.LatBasic.eigProj_of_ne (Ne.symm h) hmem
 
-theorem card_embeddings
-    [Fintype (E →+* K)] (ι : K →+* ℂ) (h : ∀ σ : E →+* ℂ, ∃ t : E →+* K, ι.comp t = σ)
-    : Fintype.card (E →+* K) = Module.finrank ℚ E := by
+theorem card_embeddings [Fintype (E →+* K)] (ι : K →+* ℂ)
+    (h : ∀ σ : E →+* ℂ, ∃ t : E →+* K, ι.comp t = σ) :
+    Fintype.card (E →+* K) = Module.finrank ℚ E := by
   classical
   rw [← Embeddings.card E ℂ]
   refine Fintype.card_of_bijective (f := fun t : E →+* K => ι.comp t) ⟨fun a b hab => ?_, h⟩
@@ -44,6 +97,7 @@ theorem card_embeddings
 
 def diffIm (s : E →+* K) : Submodule (𝓞 K) K :=
   Submodule.span (𝓞 K) ((fun x : 𝓞 E => s (x : E)) '' (differentIdeal ℤ (𝓞 E) : Set (𝓞 E)))
+
 
 variable (E K) in
 def intLat : Submodule (𝓞 K) ((E →+* K) → K) :=
@@ -54,45 +108,37 @@ def pair [Fintype (E →+* K)] (y : E) : ((E →+* K) → K) →ₗ[𝓞 K] K wh
   map_add' u v := by simp [mul_add, Finset.sum_add_distrib]
   map_smul' c v := by simp [Finset.smul_sum, mul_smul_comm]
 
-theorem pair_mem
-    [Fintype (E →+* K)]
-    (hc : Fintype.card (E →+* K) = Module.finrank ℚ E)
-    {y : E} (hy : y ∈ FractionalIdeal.dual ℤ ℚ (1 : FractionalIdeal (𝓞 E)⁰ E))
-    {v : (E →+* K) → K} (hv : v ∈ intLat E K)
-    : pair y v ∈ LinearMap.range (Algebra.linearMap (𝓞 K) K) := by
+theorem pair_mem [Fintype (E →+* K)] (hc : Fintype.card (E →+* K) = Module.finrank ℚ E) {y : E}
+    (hy : y ∈ FractionalIdeal.dual ℤ ℚ (1 : FractionalIdeal (𝓞 E)⁰ E)) {v : (E →+* K) → K}
+    (hv : v ∈ intLat E K) : pair y v ∈ LinearMap.range (Algebra.linearMap (𝓞 K) K) := by
   have hle : (intLat E K).map (pair y) ≤ LinearMap.range (Algebra.linearMap (𝓞 K) K) := by
     rw [intLat, Submodule.map_span, Submodule.span_le]
     rintro _ ⟨_, ⟨b, rfl⟩, rfl⟩
-    have h1 :=
-      (FractionalIdeal.mem_dual (one_ne_zero (α := FractionalIdeal (𝓞 E)⁰ E))).1 hy (b : E)
-        ((FractionalIdeal.mem_one_iff _).2 ⟨b, rfl⟩)
+    have h1 := (FractionalIdeal.mem_dual (one_ne_zero (α := FractionalIdeal (𝓞 E)⁰ E))).1 hy (b : E)
+      ((FractionalIdeal.mem_one_iff _).2 ⟨b, rfl⟩)
     obtain ⟨n, hn⟩ := h1
     refine ⟨(n : 𝓞 K), ?_⟩
     have h2 : pair (K := K) y (fun σ : E →+* K => σ (b : E)) = ∑ σ : E →+* K, σ (y * b) := by
       simp [pair]
     rw [h2, HT.projSum_sum_embeddings_eq_trace K E hc]
-    have h3 : Algebra.trace ℚ E (y * b) = (n : ℚ) := by rw [← Algebra.traceForm_apply, ← hn]; simp
+    have h3 : Algebra.trace ℚ E (y * b) = (n : ℚ) := by
+      rw [← Algebra.traceForm_apply, ← hn]; simp
     rw [h3]
     simp
   exact hle (Submodule.mem_map_of_mem hv)
 
-theorem mem_diffIm_of_single_mem
-    [Fintype (E →+* K)] [DecidableEq (E →+* K)]
-    (hc : Fintype.card (E →+* K) = Module.finrank ℚ E)
-    (s : E →+* K)
-    {w : K} (hw : Pi.single s w ∈ intLat E K)
-    : w ∈ diffIm s := by
-  have h0
-      : ∀ y ∈ FractionalIdeal.dual ℤ ℚ (1 : FractionalIdeal (𝓞 E)⁰ E),
-        s y * w ∈ LinearMap.range (Algebra.linearMap (𝓞 K) K) := by
+theorem mem_diffIm_of_single_mem [Fintype (E →+* K)] [DecidableEq (E →+* K)]
+    (hc : Fintype.card (E →+* K) = Module.finrank ℚ E) (s : E →+* K) {w : K}
+    (hw : Pi.single s w ∈ intLat E K) : w ∈ diffIm s := by
+  have h0 : ∀ y ∈ FractionalIdeal.dual ℤ ℚ (1 : FractionalIdeal (𝓞 E)⁰ E),
+      s y * w ∈ LinearMap.range (Algebra.linearMap (𝓞 K) K) := by
     intro y hy
     have := pair_mem hc hy hw
-    have e : pair y (Pi.single s w : (E →+* K) → K) = s y * w := by simp [pair, Pi.single_apply]
+    have e : pair y (Pi.single s w : (E →+* K) → K) = s y * w := by
+      simp [pair, Pi.single_apply]
     rwa [e] at this
-  have h1
-      : (1 : E)
-        ∈ ((differentIdeal ℤ (𝓞 E) : Ideal (𝓞 E)) : FractionalIdeal (𝓞 E)⁰ E)
-          * FractionalIdeal.dual ℤ ℚ (1 : FractionalIdeal (𝓞 E)⁰ E) := by
+  have h1 : (1 : E) ∈ ((differentIdeal ℤ (𝓞 E) : Ideal (𝓞 E)) : FractionalIdeal (𝓞 E)⁰ E) *
+      FractionalIdeal.dual ℤ ℚ (1 : FractionalIdeal (𝓞 E)⁰ E) := by
     rw [HT.different_mul_dual_one]
     exact FractionalIdeal.one_mem_one _
   have h2 : s 1 * w ∈ diffIm s := by
@@ -122,45 +168,43 @@ def tmap (φ : Fin N → E) : ((E →+* K) → Fin N → K) →ₗ[𝓞 K] ((E �
     funext σ
     simp [Finset.smul_sum, mul_smul_comm]
 
-theorem tmap_gen (φ : Fin N → E) (u : Fin N → E) (σ : E →+* K)
-    : tmap φ (fun (τ : E →+* K) a => τ (u a)) σ = σ (∑ n, u n * φ n) := by
+theorem tmap_gen (φ : Fin N → E) (u : Fin N → E) (σ : E →+* K) :
+    tmap φ (fun (τ : E →+* K) a => τ (u a)) σ = σ (∑ n, u n * φ n) := by
   simp [tmap, mul_comm]
 
-theorem tmap_single [DecidableEq (E →+* K)] (φ : Fin N → E) (s : E →+* K) (w : Fin N → K)
-    : tmap φ (Pi.single s w : (E →+* K) → Fin N → K) = Pi.single s (∑ n, s (φ n) * w n) := by
+theorem tmap_single [DecidableEq (E →+* K)] (φ : Fin N → E) (s : E →+* K) (w : Fin N → K) :
+    tmap φ (Pi.single s w : (E →+* K) → Fin N → K) = Pi.single s (∑ n, s (φ n) * w n) := by
   funext σ
   by_cases h : σ = s
   · subst h
     simp [tmap]
   · simp [tmap, Pi.single_apply, h]
 
-theorem exists_smul_mem
-    (I : Submodule (𝓞 E) (Fin N → E))
-    {v : Fin N → E} (hv : v ∈ Submodule.span E (I : Set (Fin N → E)))
-    : ∃ d : 𝓞 E, d ≠ 0 ∧ d • v ∈ I := by
-  apply _root_.Bl.general_b_fact_third_alt.goal1 <;> assumption
+theorem exists_smul_mem (I : Submodule (𝓞 E) (Fin N → E)) {v : Fin N → E}
+    (hv : v ∈ Submodule.span E (I : Set (Fin N → E))) :
+    ∃ d : 𝓞 E, d ≠ 0 ∧ d • v ∈ I :=
+  by apply _root_.Bl.general_b_fact_third_alt.goal1 <;> assumption
 
-theorem isUnit_end
-    {M : Type} [AddCommGroup M] [Module E M] [Module (𝓞 E) M] [IsScalarTower (𝓞 E) E M] (a : (𝓞 E)⁰)
-    : IsUnit (algebraMap (𝓞 E) (Module.End (𝓞 E) M) a) := by
-  have ha : algebraMap (𝓞 E) E (a : 𝓞 E) ≠ 0 := by simpa using nonZeroDivisors.ne_zero a.2
+theorem isUnit_end {M : Type} [AddCommGroup M] [Module E M] [Module (𝓞 E) M]
+    [IsScalarTower (𝓞 E) E M] (a : (𝓞 E)⁰) :
+    IsUnit (algebraMap (𝓞 E) (Module.End (𝓞 E) M) a) := by
+  have ha : algebraMap (𝓞 E) E (a : 𝓞 E) ≠ 0 := by
+    simpa using nonZeroDivisors.ne_zero a.2
   rw [Module.End.isUnit_iff]
   refine ⟨fun u v h => ?_, fun u => ⟨(algebraMap (𝓞 E) E (a : 𝓞 E))⁻¹ • u, ?_⟩⟩
   · rw [Module.algebraMap_end_apply, Module.algebraMap_end_apply, ← algebraMap_smul E (a : 𝓞 E) u,
-        ← algebraMap_smul E (a : 𝓞 E) v]
-      at h
+      ← algebraMap_smul E (a : 𝓞 E) v] at h
     exact smul_right_injective M ha h
-  · rw [Module.algebraMap_end_apply, ← algebraMap_smul E (a : 𝓞 E), smul_smul, mul_inv_cancel₀ ha,
-      one_smul]
+  · rw [Module.algebraMap_end_apply, ← algebraMap_smul E (a : 𝓞 E), smul_smul,
+      mul_inv_cancel₀ ha, one_smul]
 
-theorem exists_extend (I : Submodule (𝓞 E) (Fin N → E)) (f : I →ₗ[𝓞 E] 𝓞 E)
-    : ∃ φ : Fin N → E, ∀ y : I, ∑ n, (y : Fin N → E) n * φ n = ((f y : 𝓞 E) : E) := by
+theorem exists_extend (I : Submodule (𝓞 E) (Fin N → E)) (f : I →ₗ[𝓞 E] 𝓞 E) :
+    ∃ φ : Fin N → E, ∀ y : I, ∑ n, (y : Fin N → E) n * φ n = ((f y : 𝓞 E) : E) := by
   let W : Submodule E (Fin N → E) := Submodule.span E (I : Set (Fin N → E))
-  let incl : I →ₗ[𝓞 E] W := {
-    toFun := fun y => ⟨y, Submodule.subset_span y.2⟩
-    map_add' := fun _ _ => rfl
-    map_smul' := fun _ _ => rfl
-  }
+  let incl : I →ₗ[𝓞 E] W :=
+    { toFun := fun y => ⟨y, Submodule.subset_span y.2⟩
+      map_add' := fun _ _ => rfl
+      map_smul' := fun _ _ => rfl }
   haveI : IsLocalizedModule (𝓞 E)⁰ incl :=
     { map_units := fun a => isUnit_end a
       surj := fun v => by
@@ -181,8 +225,8 @@ theorem exists_extend (I : Submodule (𝓞 E) (Fin N → E)) (f : I →ₗ[𝓞 
   rw [← h1, LinearMap.pi_apply_eq_sum_univ F (y : Fin N → E)]
   rfl
 
-theorem exists_dual_system (I : Submodule (𝓞 E) (Fin N → E)) (hI : I.FG)
-    : ∃ (m : ℕ) (x : Fin m → I) (f : Fin m → I →ₗ[𝓞 E] 𝓞 E), ∀ y : I, ∑ i, f i y • x i = y := by
+theorem exists_dual_system (I : Submodule (𝓞 E) (Fin N → E)) (hI : I.FG) :
+    ∃ (m : ℕ) (x : Fin m → I) (f : Fin m → I →ₗ[𝓞 E] 𝓞 E), ∀ y : I, ∑ i, f i y • x i = y := by
   haveI : Module.Finite (𝓞 E) I := Module.Finite.iff_fg.2 hI
   have htors : Submodule.torsion (𝓞 E) I = ⊥ := by
     rw [eq_bot_iff]
@@ -210,30 +254,23 @@ theorem exists_dual_system (I : Submodule (𝓞 E) (Fin N → E)) (hI : I.FG)
   rw [e2]
   rfl
 
-theorem smul_mem_diffLat
-    {s : E →+* K} {I : Submodule (𝓞 E) (Fin N → E)} {d : K} (hd : d ∈ diffIm s)
-    {x : Fin N → E} (hx : x ∈ I)
-    : d • (fun a => s (x a)) ∈ diffLat s I := by
+theorem smul_mem_diffLat {s : E →+* K} {I : Submodule (𝓞 E) (Fin N → E)} {d : K} (hd : d ∈ diffIm s)
+    {x : Fin N → E} (hx : x ∈ I) : d • (fun a => s (x a)) ∈ diffLat s I := by
   induction hd using Submodule.span_induction with
   | mem z hz =>
     obtain ⟨e, he, rfl⟩ := hz
     refine Submodule.subset_span ⟨(e : E) • x, ⟨e, he, x, hx, rfl⟩, ?_⟩
     funext a
     simp
-  | zero =>
-    simp
-  | add a b _ _ ha hb =>
-    rw [add_smul]; exact add_mem ha hb
+  | zero => simp
+  | add a b _ _ ha hb => rw [add_smul]; exact add_mem ha hb
   | smul c a _ ha =>
     rw [smul_assoc]
     exact Submodule.smul_mem _ c ha
 
-theorem eigenLat_le
-    [Fintype (E →+* K)]
-    (hc : Fintype.card (E →+* K) = Module.finrank ℚ E)
-    (I : Submodule (𝓞 E) (Fin N → E)) (hI : I.FG)
-    (s : E →+* K)
-    : eigenLat I s ≤ diffLat s I := by
+theorem eigenLat_le [Fintype (E →+* K)] (hc : Fintype.card (E →+* K) = Module.finrank ℚ E)
+    (I : Submodule (𝓞 E) (Fin N → E)) (hI : I.FG) (s : E →+* K) :
+    eigenLat I s ≤ diffLat s I := by
   classical
   intro w hw
   have hw' : (Pi.single s w : (E →+* K) → Fin N → K) ∈ baseChangeLat K I := hw
@@ -248,26 +285,25 @@ theorem eigenLat_le
       funext σ
       rw [tmap_gen, hφ i ⟨u, hu⟩]
     exact hle (Submodule.mem_map_of_mem hv)
-  have hrec
-      : ∀ v ∈ baseChangeLat K I,
-        v s = ∑ i, (tmap (φ i) v s) • (fun a => s ((x i : Fin N → E) a)) := by
+  have hrec : ∀ v ∈ baseChangeLat K I,
+      v s = ∑ i, (tmap (φ i) v s) • (fun a => s ((x i : Fin N → E) a)) := by
     intro v hv
     induction hv using Submodule.span_induction with
     | mem v hv =>
       obtain ⟨u, hu, rfl⟩ := hv
       funext a
       have e := congrArg (fun z : I => s ((z : Fin N → E) a)) (hxf ⟨u, hu⟩)
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [Submodule.coe_sum, Finset.sum_apply, map_sum] at e
-      simp only [tmap_gen, hφ _ ⟨u, hu⟩, Finset.sum_apply, Pi.smul_apply, smul_eq_mul]
+
+      simp only [Submodule.coe_sum, Finset.sum_apply, map_sum] at e
+      simp only [tmap_gen, hφ _ ⟨u, hu⟩ , Finset.sum_apply, Pi.smul_apply, smul_eq_mul]
       rw [← e]
       refine Finset.sum_congr rfl fun i _ => ?_
       rw [← map_mul, Submodule.coe_smul, Pi.smul_apply, Algebra.smul_def]
-    | zero =>
-      simp
+    | zero => simp
     | add a b _ _ ha hb =>
       simp only [map_add (f := _), Pi.add_apply, add_smul, Finset.sum_add_distrib, ← ha, ← hb]
-    | smul c a _ ha => simp only [map_smul, Pi.smul_apply, smul_assoc, ← Finset.smul_sum, ← ha]
+    | smul c a _ ha =>
+      simp only [map_smul, Pi.smul_apply, smul_assoc, ← Finset.smul_sum, ← ha]
   have hsum := hrec _ hw'
   simp only [tmap_single, Pi.single_eq_same] at hsum
   rw [hsum]
@@ -276,29 +312,25 @@ theorem eigenLat_le
   rw [← tmap_single]
   exact hT i _ hw'
 
-theorem diffLat_le [Fintype (E →+* K)] (I : Submodule (𝓞 E) (Fin N → E)) (s : E →+* K)
-    : diffLat s I ≤ eigenLat I s := by
+theorem diffLat_le [Fintype (E →+* K)] (I : Submodule (𝓞 E) (Fin N → E)) (s : E →+* K) :
+    diffLat s I ≤ eigenLat I s := by
   classical
   rw [diffLat, Submodule.span_le]
   rintro _ ⟨_, ⟨x, hx, y, hy, rfl⟩, rfl⟩
   choose z hz using HT.exists_different_mul_dualInt E x hx
   change (Pi.single s _ : (E →+* K) → Fin N → K) ∈ baseChangeLat K I
-  have e
-      : (Pi.single s (fun i => s (((x : E) • y) i)) : (E →+* K) → Fin N → K)
-        = ∑ k, RingOfIntegers.mapRingHom s (z k) •
-            (fun (σ : E →+* K) a => σ (((RingOfIntegers.basis E k : 𝓞 E) • y) a)) := by
+  have e : (Pi.single s (fun i => s (((x : E) • y) i)) : (E →+* K) → Fin N → K) =
+      ∑ k, RingOfIntegers.mapRingHom s (z k) •
+        (fun (σ : E →+* K) a => σ (((RingOfIntegers.basis E k : 𝓞 E) • y) a)) := by
     funext σ a
-    have h1
-        : ∀ k,
-          ((RingOfIntegers.mapRingHom s (z k) : 𝓞 K) : K)
-            = s (x : E) * s (HT.dualInt E k) := fun k => by
+    have h1 : ∀ k, ((RingOfIntegers.mapRingHom s (z k) : 𝓞 K) : K) =
+        s (x : E) * s (HT.dualInt E k) := fun k => by
       rw [← map_mul, ← hz k]; rfl
     have h2 := sum_dual_mul s σ
-    have h3
-        : ∑ k, (RingOfIntegers.mapRingHom s (z k)) •
-            (σ ((RingOfIntegers.basis E k : 𝓞 E) • y a))
-          = s (x : E) * σ (y a)
-            * ∑ k, s (HT.dualInt E k) * σ ((RingOfIntegers.basis E k : 𝓞 E) : E) := by
+    have h3 : ∑ k, (RingOfIntegers.mapRingHom s (z k)) •
+        (σ ((RingOfIntegers.basis E k : 𝓞 E) • y a)) =
+        s (x : E) * σ (y a) *
+          ∑ k, s (HT.dualInt E k) * σ ((RingOfIntegers.basis E k : 𝓞 E) : E) := by
       rw [Finset.mul_sum]
       refine Finset.sum_congr rfl fun k _ => ?_
       rw [Algebra.smul_def]
@@ -313,8 +345,8 @@ theorem diffLat_le [Fintype (E →+* K)] (I : Submodule (𝓞 E) (Fin N → E)) 
       simp
     · simp [Pi.single_apply, h]
   rw [e]
-  exact Submodule.sum_mem _ fun k _ =>
-    Submodule.smul_mem _ _ (Submodule.subset_span ⟨_, I.smul_mem _ hy, rfl⟩)
+  exact Submodule.sum_mem _ fun k _ => Submodule.smul_mem _ _
+    (Submodule.subset_span ⟨_, I.smul_mem _ hy, rfl⟩)
 
 theorem eigenLat_eq_diffLat : EigenLatDifferent.Statement := by
   intro E _ _ K _ _ ι hι N I hI s

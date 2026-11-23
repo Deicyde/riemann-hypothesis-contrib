@@ -1,10 +1,53 @@
 module
 
-public import Mathlib
-public import Formalism.UnipotentAdelicQuotients.SiegelWeilUnitaryConvergent
-public import Formalism.LocalToGlobal.SiegelLatticeTheory.CasimirVolumeRatios.AdeleLC
+import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.ArchimedeanOrbitMeasures.SqChartCore
 public import Formalism.UnipotentAdelicQuotients.SWXSDefs
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsNontrivialAdeleCharTrivialOnTotallyReal
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.LocallyConvex.AbsConvexOpen
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Algebra.Group.Units
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -15,50 +58,35 @@ open HeckeCharacterZeroLocus.SiegelWeilU
 
 namespace GlobalTheory.SiegelWeilConvCompare
 
-theorem exists_coord_pi
-    {X : Type} [AddCommGroup X] [TopologicalSpace X]
-    {k : ℕ} (e : X ≃ₜ (Fin k → ℝ)) (he : ∀ x y, e (x + y) = e x + e y)
-    (κ : Type) [Fintype κ]
-    : ∃ (n : ℕ) (e' : (κ → X) ≃ₜ (Fin n → ℝ)), ∀ x y, e' (x + y) = e' x + e' y := by
+theorem exists_coord_pi {X : Type} [AddCommGroup X] [TopologicalSpace X] {k : ℕ}
+    (e : X ≃ₜ (Fin k → ℝ)) (he : ∀ x y, e (x + y) = e x + e y) (κ : Type) [Fintype κ] :
+    ∃ (n : ℕ) (e' : (κ → X) ≃ₜ (Fin n → ℝ)), ∀ x y, e' (x + y) = e' x + e' y := by
   let e1 : (κ → X) ≃ₜ (κ → Fin k → ℝ) := Homeomorph.piCongrRight fun _ => e
-  have h1 : ∀ x y, e1 (x + y) = e1 x + e1 y := by intro x y; funext i; exact he (x i) (y i)
-  let L :=
-    ContinuousLinearEquiv.ofFinrankEq (𝕜 := ℝ) (E := κ → Fin k → ℝ)
-      (F := Fin (Module.finrank ℝ (κ → Fin k → ℝ)) → ℝ) (Module.finrank_fin_fun ℝ).symm
-  refine ⟨_, e1.trans L.toHomeomorph, fun x y => ?_⟩
-  show L (e1 (x + y)) = L (e1 x) + L (e1 y)
-  rw [h1, map_add (f := _)]
-
-theorem exists_coord_Ainf (F : Type) [Field F] [NumberField F] [IsTotallyReal F]
-    : ∃ (k : ℕ) (e : Ainf F ≃ₜ (Fin k → ℝ)), ∀ x y, e (x + y) = e x + e y := by
-  let e1 : Ainf F ≃ₜ (InfinitePlace F → ℝ) :=
-    Homeomorph.piCongrRight fun v =>
-      (InfinitePlace.Completion.isometryEquivRealOfIsReal (IsTotallyReal.isReal v)).toHomeomorph
   have h1 : ∀ x y, e1 (x + y) = e1 x + e1 y := by
-    intro x y
-    funext v
-    exact (InfinitePlace.Completion.ringEquivRealOfIsReal (IsTotallyReal.isReal v)).map_add _ _
-  let L :=
-    ContinuousLinearEquiv.ofFinrankEq (𝕜 := ℝ) (E := InfinitePlace F → ℝ)
-      (F := Fin (Module.finrank ℝ (InfinitePlace F → ℝ)) → ℝ) (Module.finrank_fin_fun ℝ).symm
+    intro x y; funext i; exact he (x i) (y i)
+  let L := ContinuousLinearEquiv.ofFinrankEq (𝕜 := ℝ) (E := κ → Fin k → ℝ)
+    (F := Fin (Module.finrank ℝ (κ → Fin k → ℝ)) → ℝ) (Module.finrank_fin_fun ℝ).symm
   refine ⟨_, e1.trans L.toHomeomorph, fun x y => ?_⟩
   show L (e1 (x + y)) = L (e1 x) + L (e1 y)
   rw [h1, map_add (f := _)]
 
-theorem exists_coord_tens
-    (F E : Type) [Field F] [NumberField F] [IsTotallyReal F] [Field E] [NumberField E] [Algebra F E]
-    : ∃ (k : ℕ) (e : Ainf F ⊗[F] E ≃ₜ (Fin k → ℝ)), ∀ x y, e (x + y) = e x + e y := by
+theorem exists_coord_Ainf (F : Type) [Field F] [NumberField F] [IsTotallyReal F] :
+    ∃ (k : ℕ) (e : Ainf F ≃ₜ (Fin k → ℝ)), ∀ x y, e (x + y) = e x + e y := by
+  apply _root_.PI.AprimeInfW.sq_coord_Ainf <;> assumption
+
+theorem exists_coord_tens (F E : Type) [Field F] [NumberField F] [IsTotallyReal F] [Field E]
+    [NumberField E] [Algebra F E] :
+    ∃ (k : ℕ) (e : Ainf F ⊗[F] E ≃ₜ (Fin k → ℝ)), ∀ x y, e (x + y) = e x + e y := by
   classical
   let R := Ainf F
   let b := Module.Free.chooseBasis R (R ⊗[F] E)
   let eL : (R ⊗[F] E) ≃ₗ[R] (Module.Free.ChooseBasisIndex R (R ⊗[F] E) → R) := b.equivFun
   haveI : IsModuleTopology R (R ⊗[F] E) := ⟨rfl⟩
   haveI : ContinuousAdd (R ⊗[F] E) := IsModuleTopology.toContinuousAdd R (R ⊗[F] E)
-  let e0 : R ⊗[F] E ≃ₜ (Module.Free.ChooseBasisIndex R (R ⊗[F] E) → R) := {
-    toEquiv := eL.toEquiv
-    continuous_toFun := IsModuleTopology.continuous_of_linearMap eL.toLinearMap
-    continuous_invFun := IsModuleTopology.continuous_of_linearMap eL.symm.toLinearMap
-  }
+  let e0 : R ⊗[F] E ≃ₜ (Module.Free.ChooseBasisIndex R (R ⊗[F] E) → R) :=
+    { toEquiv := eL.toEquiv
+      continuous_toFun := IsModuleTopology.continuous_of_linearMap eL.toLinearMap
+      continuous_invFun := IsModuleTopology.continuous_of_linearMap eL.symm.toLinearMap }
   obtain ⟨k0, eA, hA⟩ := exists_coord_Ainf F
   obtain ⟨k, e1, h1⟩ := exists_coord_pi eA hA (Module.Free.ChooseBasisIndex R (R ⊗[F] E))
   refine ⟨k, e0.trans e1, fun x y => ?_⟩
@@ -71,13 +99,9 @@ variable {V : Type} [AddCommGroup V] [TopologicalSpace V] [MeasurableSpace V] [S
 
 end Zero
 
-theorem measure_fundamentalDomain_pos
-    (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-    (σ : E →ₐ[F] E)
-    (M : ℕ) (J : Matrix (Fin M) (Fin M) E)
-    (μ) (hμ : IsHaarH F E σ M J μ)
-    (𝓕) (h : IsFDH F E σ M J μ 𝓕)
-    : 0 < μ 𝓕 := by
+theorem measure_fundamentalDomain_pos (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E]
+    [Algebra F E] (σ : E →ₐ[F] E) (M : ℕ) (J : Matrix (Fin M) (Fin M) E) (μ) (hμ : IsHaarH F E σ M J μ)
+    (𝓕) (h : IsFDH F E σ M J μ 𝓕) : 0 < μ 𝓕 := by
   haveI : μ.IsHaarMeasure := hμ
   haveI : Countable E := (Module.Free.chooseBasis ℚ E).equivFun.toEquiv.injective.countable
   haveI : Countable (Matrix (Fin M) (Fin M) E) := inferInstanceAs (Countable (Fin M → Fin M → E))
@@ -102,23 +126,19 @@ theorem measure_fundamentalDomain_pos
 
 section HermTop
 
-variable
-  {F E : Type} [Field F] [Field E] [Algebra F E] [FiniteDimensional F E]
+variable {F E : Type} [Field F] [Field E] [Algebra F E] [FiniteDimensional F E]
   (R : Type) [CommRing R] [Algebra F R] [TopologicalSpace R] [IsTopologicalRing R]
 
 def tensHomeo {κ : Type} [Finite κ] (b : Module.Basis κ F E) : R ⊗[F] E ≃ₜ (κ → R) :=
   haveI : IsModuleTopology R (R ⊗[F] E) := ⟨rfl⟩
   haveI : ContinuousAdd (R ⊗[F] E) := IsModuleTopology.toContinuousAdd R (R ⊗[F] E)
-  {
-    toEquiv := (Algebra.TensorProduct.basis R b).equivFun.toEquiv
+  { toEquiv := (Algebra.TensorProduct.basis R b).equivFun.toEquiv
     continuous_toFun :=
-      IsModuleTopology.continuous_of_linearMap (Algebra.TensorProduct.basis R
-        b).equivFun.toLinearMap
+      IsModuleTopology.continuous_of_linearMap (Algebra.TensorProduct.basis R b).equivFun.toLinearMap
     continuous_invFun :=
-      IsModuleTopology.continuous_of_linearMap (Algebra.TensorProduct.basis R
-        b).equivFun.symm.toLinearMap
-  }
+      IsModuleTopology.continuous_of_linearMap (Algebra.TensorProduct.basis R b).equivFun.symm.toLinearMap }
 
 end HermTop
+
 
 end GlobalTheory.SiegelWeilConvCompare

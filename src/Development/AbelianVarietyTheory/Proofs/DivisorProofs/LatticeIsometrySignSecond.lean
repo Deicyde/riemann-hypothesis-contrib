@@ -1,21 +1,58 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.LatticeIsometrySignFirst
-public import Development.AbelianVarietyTheory.Definitions.Divisors.GenReads
-public import Formalism.SharpRestriction.Divisibility.GeneratorPowers.ThExprUniqOfChartIndep2
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ThetaPairCharactersAtLevel
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.LevelPointSmulIntegralOfFourierCoeffNeZeroStatement
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.OneSubIdempotentSmulMemLatticeStatement
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IdempotentSumConjSumOrthogonalDvdStatement
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FiniteAdelicMatrixMemLatticeOfColumnsStatement
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsSelfDualCHLat
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.GenMapTranspose
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FinPartConjMem
+public import Development.AbelianVarietyTheory.Definitions.Divisors.MarkAd
+public import Development.AbelianVarietyTheory.Definitions.Divisors.PerCEmb
+public import Development.AbelianVarietyTheory.Proofs.AdelicLatticeProofs.FinTensMemLatO
+public import Formalism.LocalToGlobal.ProjectiveLattices.HalfOneAddSqrtNegIsIntegral
+public import Development.AbelianVarietyTheory.Proofs.AdelicLatticeProofs.MemLatOIffExistsActO
 public import Development.AbelianVarietyTheory.Proofs.AdelicLatticeProofs.SelfDualLatticePairingDual
+import Development.AbelianVarietyTheory.Proofs.AdelicLatticeProofs.SmulMemLatO
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FinPartConjMem
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FiniteAdelicMatrixMemLatticeOfColumnsStatement
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.GenMapTranspose
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IdempotentSumConjSumOrthogonalDvdStatement
+import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsSelfDualCHLat
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.OneSubIdempotentSmulMemLatticeStatement
+import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.IdempotentMulEqZeroOfOrthogonal
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Development.AbelianVarietyTheory.Definitions.SpanningFamilies.DatEqZero
 public import Development.AbelianVarietyTheory.Proofs.AdelicLatticeProofs.IsSelfDualCLatFrame
-public import Development.AbelianVarietyTheory.Proofs.AdelicLatticeProofs.SmulMemLatO
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.IdempotentMulEqZeroOfOrthogonal
 
 @[expose] public section
 
@@ -31,8 +68,8 @@ open Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH
 open scoped TensorProduct Classical ComplexConjugate
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 1600000
+
+
 
 namespace GlobalTheory.AdTh.MovedDatum
 
@@ -121,8 +158,8 @@ theorem idem_div_mem
     (s : 𝓞 D.host.E) (hs : ∀ PP ∈ P, s ∉ PP.asIdeal)
     : finPart D (e * incA D (s : D.host.E)⁻¹) ∈ intAE D := by
   obtain ⟨⟨es, hes, rfl⟩, -⟩ := he
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [Finset.sum_mul, map_sum]
+
+  rw [Finset.sum_mul, map_sum]
   refine sum_mem fun PP hPP => ?_
   by_contra h
   exact hs PP hPP (((hes PP hPP).2 s fun h0 => hs PP hPP (h0 ▸ zero_mem _)).2 h)
@@ -239,8 +276,8 @@ theorem finPart_moved
         finPart D ((Formalism.L2.Theta.mt W k * GlobalTheory.LatVac.finTens (D := D) 1 ρ) a b))
       = (finHom W k).1 *ᵥ finVec W (fun a => ρ a b) := by
   funext a
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [Matrix.mul_apply, map_sum]
+
+  rw [Matrix.mul_apply, map_sum]
   exact Finset.sum_congr rfl fun c _ => RingHom.map_mul _ _ _
 
 theorem smul_moved

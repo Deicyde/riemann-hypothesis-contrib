@@ -1,33 +1,68 @@
 module
 
 public import Development.AutomorphicArithmetic.AutomorphicVarieties.CommutativeAlgebraHeight.OfDetToDet
-public import Development.AutomorphicArithmetic.AutomorphicVarieties.CommutativeAlgebraHeight.IsLocalHom
 public import Development.AutomorphicArithmetic.IntegralCasts.CapelliIdentities.MapSurj
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Topology.Sheaves.Init
+import Development.AutomorphicArithmetic.AutomorphicVarieties.CommutativeAlgebraHeight.IsLocalHom
 
 @[expose] public section
 
 open TensorProduct IsLocalRing Polynomial UpperTheory.V.W UpperTheory.V.Alg UpperTheory.V.CA
 
 section
-variable
-  {n : ℕ} {A E : Type} [CommRing A] [Ring E] [Algebra A E]
-  (D : Det n A E)
-  {E' : Type} [Ring E'] [Algebra A E']
-  (f : E' →ₐ[A] E)
+variable {n : ℕ} {A E : Type} [CommRing A] [Ring E] [Algebra A E] (D : Det n A E) {E' : Type} [Ring E']
+  [Algebra A E'] (f : E' →ₐ[A] E)
 
-private theorem pull_D (S : Type) [CommRing S] [Algebra A S] (y : S ⊗[A] E')
-    : (D.pull f).D S y = D.D S (Algebra.TensorProduct.map (AlgHom.id S S) f y) :=
-  rfl
+private theorem pull_D (S : Type) [CommRing S] [Algebra A S] (y : S ⊗[A] E') :
+    (D.pull f).D S y = D.D S (Algebra.TensorProduct.map (AlgHom.id S S) f y) := rfl
 
-private theorem map_gen {ι : Type} [Fintype ι] (x : ι → E')
-    : Algebra.TensorProduct.map (AlgHom.id (MvPolynomial ι A) (MvPolynomial ι A)) f
-        (Det.gen (A := A) x)
-      = Det.gen (A := A) (fun a => f (x a)) := by
-  set_option synthInstance.maxHeartbeats 100000 in
+private theorem map_gen {ι : Type} [Fintype ι] (x : ι → E') :
+    Algebra.TensorProduct.map (AlgHom.id (MvPolynomial ι A) (MvPolynomial ι A)) f (Det.gen (A := A) x) =
+      Det.gen (A := A) (fun a => f (x a)) := by
+
   simp [Det.gen, map_sum]
 
-private theorem pull_chiS (S : Type) [CommRing S] [Algebra A S] (y : S ⊗[A] E')
-    : (D.pull f).chiS S y = D.chiS S (Algebra.TensorProduct.map (AlgHom.id S S) f y) := by
+private theorem pull_chiS (S : Type) [CommRing S] [Algebra A S] (y : S ⊗[A] E') :
+    (D.pull f).chiS S y = D.chiS S (Algebra.TensorProduct.map (AlgHom.id S S) f y) := by
   unfold Det.chiS
   rw [pull_D]
   congr 1
@@ -39,35 +74,28 @@ private theorem pull_chiS (S : Type) [CommRing S] [Algebra A S] (y : S ⊗[A] E'
     | tmul a b => simp
     | add a b ha hb => simp only [map_add (f := _), ha, hb]
 
-private theorem map_coeff {ι : Type} (α : ι →₀ ℕ) (y : MvPolynomial ι A ⊗[A] E')
-    : f (TensorProduct.lid A E' ((MvPolynomial.lcoeff A α).rTensor E' y))
-      = TensorProduct.lid A E
-        ((MvPolynomial.lcoeff A α).rTensor E
-          (Algebra.TensorProduct.map (AlgHom.id (MvPolynomial ι A) (MvPolynomial ι A)) f y)) := by
+private theorem map_coeff {ι : Type} (α : ι →₀ ℕ) (y : MvPolynomial ι A ⊗[A] E') :
+    f (TensorProduct.lid A E' ((MvPolynomial.lcoeff A α).rTensor E' y)) =
+      TensorProduct.lid A E ((MvPolynomial.lcoeff A α).rTensor E
+        (Algebra.TensorProduct.map (AlgHom.id (MvPolynomial ι A) (MvPolynomial ι A)) f y)) := by
   induction y using TensorProduct.induction_on with
   | zero => simp
   | tmul a b => simp
   | add a b ha hb => simp only [map_add (f := _), ha, hb]
 
-private theorem map_chElt {k : ℕ} (x : Fin k → E') (α : Fin k →₀ ℕ)
-    : f ((D.pull f).chElt x α) = D.chElt (fun a => f (x a)) α := by
+private theorem map_chElt {k : ℕ} (x : Fin k → E') (α : Fin k →₀ ℕ) :
+    f ((D.pull f).chElt x α) = D.chElt (fun a => f (x a)) α := by
   unfold Det.chElt
   rw [map_coeff, pull_chiS, ← Polynomial.aeval_algHom_apply, map_gen]
 
-private theorem map_surj (hf : Function.Surjective f) (S : Type) [CommRing S] [Algebra A S]
-    : Function.Surjective (Algebra.TensorProduct.map (AlgHom.id S S) f) := by
-  apply _root_.UpperTheory.Reformulated.B.Qk2.map_surj <;> assumption
+private theorem map_surj (hf : Function.Surjective f) (S : Type) [CommRing S] [Algebra A S] :
+    Function.Surjective (Algebra.TensorProduct.map (AlgHom.id S S) f) :=
+  by apply _root_.UpperTheory.Reformulated.B.Qk2.map_surj <;> assumption
 
 end
 
-theorem UpperTheory.V.CA.d_pull
-    : ∀ {n : ℕ} {A E : Type} [CommRing A] [Ring E] [Algebra A E] (D : Det n A E) {E' : Type}
-        [Ring E'] [Algebra A E'] (f : E' →ₐ[A] E),
-      (∀ x, (D.pull f).chi x = D.chi (f x)) ∧ (∀ x, f x ∈ D.ker → x ∈ (D.pull f).ker)
-        ∧ (∀ x ∈ (D.pull f).CH, f x ∈ D.CH)
-        ∧ (Function.Surjective f
-          → (∀ x, x ∈ (D.pull f).ker → f x ∈ D.ker)
-            ∧ ∀ y ∈ D.CH, ∃ x ∈ (D.pull f).CH, f x = y) := by
+theorem UpperTheory.V.CA.d_pull :
+    ∀ {n : ℕ} {A E : Type} [CommRing A] [Ring E] [Algebra A E] (D : Det n A E) {E' : Type} [Ring E'] [Algebra A E'] (f : E' →ₐ[A] E), (∀ x, (D.pull f).chi x = D.chi (f x)) ∧ (∀ x, f x ∈ D.ker → x ∈ (D.pull f).ker) ∧ (∀ x ∈ (D.pull f).CH, f x ∈ D.CH) ∧ (Function.Surjective f → (∀ x, x ∈ (D.pull f).ker → f x ∈ D.ker) ∧ ∀ y ∈ D.CH, ∃ x ∈ (D.pull f).CH, f x = y) := by
   intro n A E _ _ _ D E' _ _ f
   refine ⟨fun x => ?_, fun x hx => ?_, fun x hx => ?_, fun hf => ⟨fun x hx => ?_, fun y hy => ?_⟩⟩
   · unfold Det.chi
@@ -102,8 +130,7 @@ theorem UpperTheory.V.CA.d_pull
       refine ⟨(D.pull f).chElt w α, TwoSidedIdeal.subset_span ⟨k, w, α, rfl⟩, ?_⟩
       rw [map_chElt]
       simp only [hw]
-    | zero =>
-      exact ⟨0, (D.pull f).CH.zero_mem, map_zero f⟩
+    | zero => exact ⟨0, (D.pull f).CH.zero_mem, map_zero f⟩
     | add x y _ _ hx hy =>
       obtain ⟨x', hx', rfl⟩ := hx
       obtain ⟨y', hy', rfl⟩ := hy

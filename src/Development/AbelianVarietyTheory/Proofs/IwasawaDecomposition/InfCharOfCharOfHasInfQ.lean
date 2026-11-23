@@ -1,21 +1,57 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.CGTrue
-public import Development.AbelianVarietyTheory.PublishedTheorems.AutomorphicForms₂.ExistsSpanFormsNeBot
-public import Development.AbelianVarietyTheory.PublishedTheorems.AutomorphicForms₂.ExistsSteinberg
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.HostEtaTildeCharacterExists
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.LocalIdeleSndSelf
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.UnderEqOfMapEq
-public import Development.AbelianVarietyTheory.Definitions.GaloisGeometry.RankOneUnitary
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Mono0OfLpDimEqOne
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsEquivOfMapEq
-public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.TeichmullerInertiaLabelCondition
-public import Formalism.LocalRingCardinality.SpanPowerMembership.PlacesOverNcardOfSplitInj
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.HeckeCharExponentOfInfinityType
+public import Formalism.LocalRingCardinality.SpanPowerMembership.ExampleLayerExistsGenerators
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsUnitaryRationalInfTypeSubgroupAndInfTypeUnique
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.HeckeCharConjSelfDualFiniteIdelicIffLocalStatement
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.HeckeCharConjSelfDualInfinityInfinitesimalIffFieStatement
+import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.HostCmEmbeddingProperties
+import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.LocalIdeleSndSelf
+import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.UnderEqIffConjPl
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.UnderEqOfMapEq
+import Development.AbelianVarietyTheory.Proofs.TwistedOperators.ExistsFixedIff
+public import Development.AbelianVarietyTheory.PublishedTheorems.AutomorphicForms₂.ExistsSteinberg
+import Formalism.LocalToGlobal.UnitaryNorms.CharUniq
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -199,8 +235,6 @@ theorem ofU_unr_iff {χ : HChar D.host.E} (h : χ.IsUnitary) (w)
   have := host_isCMField D.host
   exact (unr_symm T w _).trans (locPar_unr_iff hL χ (D.nd.plOm.2 w))
 
-set_option maxHeartbeats 2000000 in
-set_option synthInstance.maxHeartbeats 400000 in
 def trueK {η : HChar D.host.E} (hη : IsEtaT D.host η) : CGK D.naut :=
   haveI := host_isCMField D.host
   have L := ParLaws.laws hL hF D.host D.nd.Om D.nd.plOm
@@ -246,8 +280,6 @@ def trueK {η : HChar D.host.E} (hη : IsEtaT D.host η) : CGK D.naut :=
       rw [← ha, ← hb, ← Units.val_mul, ← mul_inv, val_split hη hw hc, inv_one, Units.val_one]
   }
 
-set_option maxHeartbeats 2000000 in
-set_option synthInstance.maxHeartbeats 400000 in
 def trueCG (hE : IsEmpty D.nd.Loc) {η : HChar D.host.E} (hη : IsEtaT D.host η)
     : CGTrue hL (setCG D hE (trueK hL hF T hη)) (wdCG hE _ T) where
   e := fun _ => ⟨Subtype.val, Subtype.val_injective⟩
@@ -329,8 +361,6 @@ theorem exists_ofU {R : Ranks} {H : Formalism.BasicNotions.Host R} (σ : HostCGu
     : ∃ χ h, σ = ofU χ h :=
   ⟨_, _, eq_ofU σ⟩
 
-set_option maxHeartbeats 2000000 in
-set_option synthInstance.maxHeartbeats 400000 in
 def trueSide (hE : IsEmpty D.nd.Loc) (cf : CharFrame D) (hP : ∀ k v, cf.P.Div k (D.naut.plGw k v))
     : CharSide (setCG D hE (trueK hL hF T cf.isEta)) (cfCG hE _ cf) :=
   haveI := host_isCMField D.host

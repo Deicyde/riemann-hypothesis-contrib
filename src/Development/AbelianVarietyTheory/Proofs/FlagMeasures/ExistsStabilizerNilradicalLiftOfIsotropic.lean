@@ -1,14 +1,51 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.Definitions.SemilocalFrames.LayerProd
+import Development.AbelianVarietyTheory.Proofs.FlagMeasures.IwasawaDecompositionUnitaryIsotropicFlag
 public import Development.AbelianVarietyTheory.BlockTheory.SiegelWeilLocal.CenteredPerpendicularSets
-public import Formalism.HarderNarasimhan.ShiftInvariance
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Coalgebra.IsFrobenius
+import Mathlib.RingTheory.HopfAlgebra.Basic
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
-open GlobalTheory.Count GlobalTheory.IndefiniteRowSideFullHecke.CenteredPerpendicularSets
-  Formalism.MainNotions.S Formalism.HN Formalism.REAL Matrix NumberField Finset
+open GlobalTheory.Count GlobalTheory.IndefiniteRowSideFullHecke.CenteredPerpendicularSets Formalism.MainNotions.S Formalism.HN Formalism.REAL Matrix NumberField Finset
 
 open scoped ComplexOrder
 
@@ -30,37 +67,12 @@ theorem hs_nonneg' (M : Matrix (Fin n) (Fin n) ℂ) : 0 ≤ hs M := by
   simp only [Formalism.REAL.hs]
   positivity
 
-theorem exists_proj (W : Submodule ℂ (Fin n → ℂ))
-    : ∃ P : Matrix (Fin n) (Fin n) ℂ, Pᴴ = P ∧ (∀ u, P *ᵥ u ∈ W) ∧ ∀ u ∈ W, P *ᵥ u = u := by
-  classical
-  let K : Submodule ℂ (EuclideanSpace ℂ (Fin n)) :=
-    W.comap (WithLp.linearEquiv 2 ℂ (Fin n → ℂ)).toLinearMap
-  let T : EuclideanSpace ℂ (Fin n) →ₗ[ℂ] EuclideanSpace ℂ (Fin n) := K.starProjection
-  have hT : ∀ u, (Matrix.toEuclideanLin.symm T) *ᵥ u = WithLp.ofLp (T (WithLp.toLp 2 u)) := by
-    intro u
-    have h :=
-      congrArg
-        (fun f : EuclideanSpace ℂ (Fin n) →ₗ[ℂ] EuclideanSpace ℂ (Fin n) =>
-          WithLp.ofLp (f (WithLp.toLp 2 u)))
-        (LinearEquiv.apply_symm_apply Matrix.toEuclideanLin T)
-    exact h
-  refine ⟨Matrix.toEuclideanLin.symm T, ?_, ?_, ?_⟩
-  · have hH : (Matrix.toEuclideanLin.symm T).IsHermitian := by
-      rw [← Matrix.isSymmetric_toEuclideanLin_iff, LinearEquiv.apply_symm_apply]
-      exact K.starProjection_isSymmetric
-    exact hH
-  · intro u
-    rw [hT]
-    have hm : T (WithLp.toLp 2 u) ∈ K := K.starProjection_apply_mem _
-    exact hm
-  · intro u hu
-    rw [hT]
-    have hm : WithLp.toLp 2 u ∈ K := hu
-    have h2 : T (WithLp.toLp 2 u) = WithLp.toLp 2 u := K.starProjection_eq_self_iff.mpr hm
-    rw [h2]
+theorem exists_proj (W : Submodule ℂ (Fin n → ℂ)) :
+    ∃ P : Matrix (Fin n) (Fin n) ℂ, Pᴴ = P ∧ (∀ u, P *ᵥ u ∈ W) ∧ ∀ u ∈ W, P *ᵥ u = u := by
+  apply GlobalTheory.RealIwasawa.exists_proj <;> assumption
 
-theorem hs_mul_le (D Q : Matrix (Fin n) (Fin n) ℂ) (h1 : Qᴴ = Q) (h2 : Q * Q = Q)
-    : hs (D * (1 - Q)) ≤ hs D := by
+theorem hs_mul_le (D Q : Matrix (Fin n) (Fin n) ℂ) (h1 : Qᴴ = Q) (h2 : Q * Q = Q) :
+    hs (D * (1 - Q)) ≤ hs D := by
   have hR : (1 - Q) * (1 - Q) = 1 - Q := by
     rw [sub_mul, one_mul, mul_sub, mul_one, h2, sub_self, sub_zero]
   have hDQ : hs (D * Q) = (trace (D * Q * Dᴴ)).re := by
@@ -74,15 +86,15 @@ theorem hs_mul_le (D Q : Matrix (Fin n) (Fin n) ℂ) (h1 : Qᴴ = Q) (h2 : Q * Q
   have h0 := hs_nonneg' (D * Q)
   linarith
 
-theorem core
-    (J P D : Matrix (Fin n) (Fin n) ℂ) (j1 : J * J = 1) (j2 : Jᴴ = J) (p1 : Pᴴ = P) (p2 : P * P = P)
-    (p3 : P * J * P = 0) (d1 : D * P = 0) (d2 : P * (D * (1 - J * P * J)) = D * (1 - J * P * J))
-    : ∃ A : Matrix (Fin n) (Fin n) ℂ,
-      Aᴴ * J + J * A = 0 ∧ P * J * A = 0 ∧ (∀ u, (P * J) *ᵥ u = 0 → A *ᵥ u = D *ᵥ u)
-        ∧ hs A ≤ 2 * hs D := by
+theorem core (J P D : Matrix (Fin n) (Fin n) ℂ) (j1 : J * J = 1) (j2 : Jᴴ = J) (p1 : Pᴴ = P)
+    (p2 : P * P = P) (p3 : P * J * P = 0) (d1 : D * P = 0)
+    (d2 : P * (D * (1 - J * P * J)) = D * (1 - J * P * J)) :
+    ∃ A : Matrix (Fin n) (Fin n) ℂ, Aᴴ * J + J * A = 0 ∧ P * J * A = 0 ∧
+      (∀ u, (P * J) *ᵥ u = 0 → A *ᵥ u = D *ᵥ u) ∧ hs A ≤ 2 * hs D := by
   have hJJ : ∀ X : Matrix (Fin n) (Fin n) ℂ, J * (J * X) = X := fun X => by
     rw [← mul_assoc, j1, one_mul]
-  have hPP : ∀ X : Matrix (Fin n) (Fin n) ℂ, P * (P * X) = P * X := fun X => by rw [← mul_assoc, p2]
+  have hPP : ∀ X : Matrix (Fin n) (Fin n) ℂ, P * (P * X) = P * X := fun X => by
+    rw [← mul_assoc, p2]
   have hPJP : ∀ X : Matrix (Fin n) (Fin n) ℂ, P * (J * (P * X)) = 0 := fun X => by
     rw [← mul_assoc, ← mul_assoc, p3, zero_mul]
   have hPDh : P * Dᴴ = 0 := by
@@ -94,9 +106,7 @@ theorem core
     rw [hB]
     simp only [mul_assoc, sub_mul, mul_sub, one_mul, mul_one, hJJ, p2, hPP, sub_self, mul_zero]
   have hBJB : B * (J * B) = 0 := by
-    calc
-      B * (J * B)
-        = B * (J * (P * B)) := by rw [d2]
+    calc B * (J * B) = B * (J * (P * B)) := by rw [d2]
       _ = B * (J * P) * B := by simp only [mul_assoc]
       _ = 0 := by rw [hBJP, zero_mul]
   have hBhP : Bᴴ * P = Bᴴ := by
@@ -109,9 +119,7 @@ theorem core
   have hPBhX : ∀ X : Matrix (Fin n) (Fin n) ℂ, P * (Bᴴ * X) = 0 := fun X => by
     rw [← mul_assoc, hPBh, zero_mul]
   have hPJB : P * (J * B) = 0 := by
-    calc
-      P * (J * B)
-        = P * (J * (P * B)) := by rw [d2]
+    calc P * (J * B) = P * (J * (P * B)) := by rw [d2]
       _ = 0 := hPJP B
   have hBhJBh : ∀ X : Matrix (Fin n) (Fin n) ℂ, Bᴴ * (J * (Bᴴ * X)) = 0 := by
     intro X
@@ -133,8 +141,10 @@ theorem core
     have hA : B - J * Bᴴ * J = D - (D * J + J * Bᴴ) * (P * J) := by
       rw [e1, add_mul, ← sub_sub, ← e2]
     rw [hA, sub_mulVec, ← mulVec_mulVec, hu, mulVec_zero, sub_zero]
-  · have hK1 : (J * P * J)ᴴ = J * P * J := by simp only [conjTranspose_mul, j2, p1, mul_assoc]
-    have hK2 : J * P * J * (J * P * J) = J * P * J := by simp only [mul_assoc, hJJ, hPP]
+  · have hK1 : (J * P * J)ᴴ = J * P * J := by
+      simp only [conjTranspose_mul, j2, p1, mul_assoc]
+    have hK2 : J * P * J * (J * P * J) = J * P * J := by
+      simp only [mul_assoc, hJJ, hPP]
     have hsB : hs B ≤ hs D := by
       rw [hB]
       exact hs_mul_le D (J * P * J) hK1 hK2
@@ -149,13 +159,13 @@ theorem core
     rw [hsA]
     linarith
 
-theorem hform_eq (H : Matrix (Fin n) (Fin n) ℂ) (x y : Fin n → ℂ)
-    : Formalism.UG.hform (starRingEnd ℂ) H x y = star x ⬝ᵥ (H *ᵥ y) := by
+theorem hform_eq (H : Matrix (Fin n) (Fin n) ℂ) (x y : Fin n → ℂ) :
+    Formalism.UG.hform (starRingEnd ℂ) H x y = star x ⬝ᵥ (H *ᵥ y) := by
   unfold Formalism.UG.hform
   simp only [dotProduct, Matrix.mulVec, Finset.mul_sum, Pi.star_apply, starRingEnd_apply, mul_assoc]
 
-theorem hform_mulVec (H X Y : Matrix (Fin n) (Fin n) ℂ) (x y : Fin n → ℂ)
-    : Formalism.UG.hform (starRingEnd ℂ) H (X *ᵥ x) (Y *ᵥ y) = star x ⬝ᵥ ((Xᴴ * H * Y) *ᵥ y) := by
+theorem hform_mulVec (H X Y : Matrix (Fin n) (Fin n) ℂ) (x y : Fin n → ℂ) :
+    Formalism.UG.hform (starRingEnd ℂ) H (X *ᵥ x) (Y *ᵥ y) = star x ⬝ᵥ ((Xᴴ * H * Y) *ᵥ y) := by
   rw [hform_eq, Matrix.star_mulVec, ← Matrix.dotProduct_mulVec]
   simp only [Matrix.mulVec_mulVec, Matrix.mul_assoc]
 
@@ -166,8 +176,7 @@ theorem ext_mulVec' {X Y : Matrix (Fin n) (Fin n) ℂ} (h : ∀ u, X *ᵥ u = Y 
 
 private theorem jm_sq_lemma (ε : Fin n → Bool) : Jm ε * Jm ε = 1 := by
   ext i j
-  simp only [Formalism.REAL.Jm, Matrix.diagonal_mul_diagonal, Matrix.diagonal_apply,
-    Matrix.one_apply]
+  simp only [Formalism.REAL.Jm, Matrix.diagonal_mul_diagonal, Matrix.diagonal_apply, Matrix.one_apply]
   split_ifs <;> simp
 
 private theorem jm_herm_lemma_2 (ε : Fin n → Bool) : (Jm ε)ᴴ = Jm ε := by
@@ -177,13 +186,7 @@ private theorem jm_herm_lemma_2 (ε : Fin n → Bool) : (Jm ε)ᴴ = Jm ε := by
   simp only [Pi.star_apply]
   split_ifs <;> simp
 
-theorem exists_lift
-    : ∀ (n : ℕ) (ε : Fin n → Bool) (H G D : Matrix (Fin n) (Fin n) ℂ) (W : Submodule ℂ (Fin n → ℂ)),
-      IsUnit G.det → Gᴴ * H * G = Jm ε → (∀ u ∈ W, u ∈ perpSet (starRingEnd ℂ) H W)
-        → (∀ u ∈ W, D *ᵥ u = 0) → (∀ u ∈ perpSet (starRingEnd ℂ) H W, D *ᵥ u ∈ W)
-        → ∃ A : Matrix (Fin n) (Fin n) ℂ,
-          InNil (starRingEnd ℂ) H W A ∧ (∀ u ∈ perpSet (starRingEnd ℂ) H W, A *ᵥ u = D *ᵥ u)
-            ∧ hs (G⁻¹ * A * G) ≤ 2 * hs (G⁻¹ * D * G) := by
+theorem exists_lift : ∀ (n : ℕ) (ε : Fin n → Bool) (H G D : Matrix (Fin n) (Fin n) ℂ) (W : Submodule ℂ (Fin n → ℂ)), IsUnit G.det → Gᴴ * H * G = Jm ε → (∀ u ∈ W, u ∈ perpSet (starRingEnd ℂ) H W) → (∀ u ∈ W, D *ᵥ u = 0) → (∀ u ∈ perpSet (starRingEnd ℂ) H W, D *ᵥ u ∈ W) → ∃ A : Matrix (Fin n) (Fin n) ℂ, InNil (starRingEnd ℂ) H W A ∧ (∀ u ∈ perpSet (starRingEnd ℂ) H W, A *ᵥ u = D *ᵥ u) ∧ hs (G⁻¹ * A * G) ≤ 2 * hs (G⁻¹ * D * G) := by
   intro n ε H G D W hG hJ hiso hDW hDperp
   classical
   have j1 : Jm ε * Jm ε = 1 := jm_sq_lemma ε
@@ -192,7 +195,8 @@ theorem exists_lift
   have hiG : G⁻¹ * G = 1 := Matrix.nonsing_inv_mul G hG
   have hiGX : ∀ X : Matrix (Fin n) (Fin n) ℂ, G⁻¹ * (G * X) = X := fun X => by
     rw [← mul_assoc, hiG, one_mul]
-  have hGu : ∀ u : Fin n → ℂ, G *ᵥ (G⁻¹ *ᵥ u) = u := fun u => by rw [mulVec_mulVec, hGi, one_mulVec]
+  have hGu : ∀ u : Fin n → ℂ, G *ᵥ (G⁻¹ *ᵥ u) = u := fun u => by
+    rw [mulVec_mulVec, hGi, one_mulVec]
   have hJJ : ∀ X : Matrix (Fin n) (Fin n) ℂ, Jm ε * (Jm ε * X) = X := fun X => by
     rw [← mul_assoc, j1, one_mul]
   obtain ⟨P, p1, hPW, hPfix⟩ := exists_proj (W.comap (Matrix.toLin' G))
@@ -201,15 +205,13 @@ theorem exists_lift
     rwa [Submodule.mem_comap, Matrix.toLin'_apply] at h
   have hPfix' : ∀ v, G *ᵥ v ∈ W → P *ᵥ v = v := fun v hv =>
     hPfix v (by rwa [Submodule.mem_comap, Matrix.toLin'_apply])
-  have p2 : P * P = P :=
-    ext_mulVec' fun u => by
-      rw [← mulVec_mulVec]
-      exact hPfix' _ (hPW' u)
-  have hPP : ∀ X : Matrix (Fin n) (Fin n) ℂ, P * (P * X) = P * X := fun X => by rw [← mul_assoc, p2]
-  have hf
-      : ∀ a b : Fin n → ℂ,
-        Formalism.UG.hform (starRingEnd ℂ) H (G *ᵥ a) (G *ᵥ b)
-          = star a ⬝ᵥ (Jm ε *ᵥ b) := fun a b => by
+  have p2 : P * P = P := ext_mulVec' fun u => by
+    rw [← mulVec_mulVec]
+    exact hPfix' _ (hPW' u)
+  have hPP : ∀ X : Matrix (Fin n) (Fin n) ℂ, P * (P * X) = P * X := fun X => by
+    rw [← mul_assoc, p2]
+  have hf : ∀ a b : Fin n → ℂ,
+      Formalism.UG.hform (starRingEnd ℂ) H (G *ᵥ a) (G *ᵥ b) = star a ⬝ᵥ (Jm ε *ᵥ b) := fun a b => by
     rw [hform_mulVec, hJ]
   have hPs : ∀ a z : Fin n → ℂ, star (P *ᵥ a) ⬝ᵥ z = star a ⬝ᵥ (P *ᵥ z) := fun a z => by
     rw [star_mulVec, ← dotProduct_mulVec, p1]
@@ -224,14 +226,13 @@ theorem exists_lift
     · intro h w hw
       rw [← hGu w, hf, ← hPfix' (G⁻¹ *ᵥ w) (by rw [hGu]; exact hw), hPs, mulVec_mulVec, h,
         dotProduct_zero]
-  have p3 : P * Jm ε * P = 0 :=
-    ext_mulVec' fun u => by
-      rw [zero_mulVec, ← mulVec_mulVec]
-      exact (hperp _).mp (hiso _ (hPW' u))
+  have p3 : P * Jm ε * P = 0 := ext_mulVec' fun u => by
+    rw [zero_mulVec, ← mulVec_mulVec]
+    exact (hperp _).mp (hiso _ (hPW' u))
   have hDv : ∀ v, (G⁻¹ * D * G) *ᵥ v = G⁻¹ *ᵥ (D *ᵥ (G *ᵥ v)) := fun v => by
     simp only [← mulVec_mulVec]
-  have d1 : G⁻¹ * D * G * P = 0 :=
-    ext_mulVec' fun u => by rw [zero_mulVec, ← mulVec_mulVec, hDv, hDW _ (hPW' u), mulVec_zero]
+  have d1 : G⁻¹ * D * G * P = 0 := ext_mulVec' fun u => by
+    rw [zero_mulVec, ← mulVec_mulVec, hDv, hDW _ (hPW' u), mulVec_zero]
   have d2 : P * (G⁻¹ * D * G * (1 - Jm ε * P * Jm ε)) = G⁻¹ * D * G * (1 - Jm ε * P * Jm ε) :=
     ext_mulVec' fun u => by
       have hz : (P * Jm ε) *ᵥ ((1 - Jm ε * P * Jm ε) *ᵥ u) = 0 := by
@@ -266,7 +267,8 @@ theorem exists_lift
     · intro u hu
       rw [hagree u (hiso u hu)]
       exact hDW u hu
-  · have hc : G⁻¹ * (G * A' * G⁻¹) * G = A' := by simp only [mul_assoc, hiG, mul_one, hiGX]
+  · have hc : G⁻¹ * (G * A' * G⁻¹) * G = A' := by
+      simp only [mul_assoc, hiG, mul_one, hiGX]
     rw [hc]
     exact hA4
 

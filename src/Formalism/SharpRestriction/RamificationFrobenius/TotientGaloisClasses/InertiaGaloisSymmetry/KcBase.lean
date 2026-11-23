@@ -1,7 +1,58 @@
 module
 
+import Formalism.SharpRestriction.RamificationFrobenius.TotientGaloisClasses.InertiaGaloisSymmetry.CycBasic
 public import Formalism.SharpRestriction.RamificationFrobenius.TotientGaloisClasses.InertiaGaloisSymmetry.DecompTypeI
-public import Formalism.FrobeniusOrbits.HostCorollaries
+public import Mathlib.RingTheory.SimpleRing.Principal
+public import Formalism.FrobeniusOrbits.FrobeniusOrbitsProofs.Decomp
+public import Formalism.FrobeniusOrbits.FrobeniusOrbitsProofs.NcardEqTwoIff
+public import Formalism.FrobeniusOrbits.FrobeniusOrbitsProofs.SplitK
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
@@ -31,22 +82,7 @@ theorem kc_sqd_ne_zero : H.sqd ≠ 0 := by
   omega
 
 theorem kc_mem_Psi_iff (σ : H.E ≃ₐ[ℚ] H.E) : H.gal σ ∈ φ.Psi ↔ σ H.sqd = H.sqd := by
-  rw [Frame.Psi, MonoidHom.mem_ker, H.gal_sqd]
-  simp only [Frame.chD, MonoidHom.coe_comp, Function.comp_apply, MonoidHom.coe_fst,
-    MonoidHom.coe_snd]
-  rcases Int.units_eq_one_or ((H.gal σ).1.2) with h | h <;> rw [h]
-  · simp
-  · constructor
-    · intro h1
-      exact absurd h1 (by decide)
-    · intro h1
-      exfalso
-      have h2 : (2 : H.E) * H.sqd = 0 := by
-        push_cast at h1
-        linear_combination -h1
-      rcases mul_eq_zero.mp h2 with h3 | h3
-      · norm_num at h3
-      · exact kc_sqd_ne_zero H h3
+  apply Formalism.HC.Der.gal_mem_Psi_iff <;> assumption
 
 theorem kc_gal_conj : H.gal H.conj = φ.cc := by
   unfold HostRaw.conj
@@ -71,29 +107,24 @@ theorem kc_fixK (σ : H.E ≃ₐ[ℚ] H.E) (hσ : H.gal σ ∈ φ.Psi) (x : H.K)
   exact hx σ ((kc_mem_Psi_iff H σ).mp hσ)
 
 theorem kc_cc_not_mem : φ.cc ∉ φ.Psi := by
-  simp only [Frame.Psi, MonoidHom.mem_ker, Frame.chD, Frame.cc, c0, MonoidHom.coe_comp,
-    Function.comp_apply, MonoidHom.coe_fst, MonoidHom.coe_snd]
+  simp only [Frame.Psi, MonoidHom.mem_ker, Frame.chD, Frame.cc, c0, MonoidHom.coe_comp, Function.comp_apply,
+    MonoidHom.coe_fst, MonoidHom.coe_snd]
   decide
 
 theorem kc_iod_not_mem : φ.iod ∉ φ.Psi := by
-  simp only [Frame.Psi, MonoidHom.mem_ker, Frame.chD, Frame.iod, MonoidHom.coe_comp,
-    Function.comp_apply, MonoidHom.coe_fst, MonoidHom.coe_snd]
+  simp only [Frame.Psi, MonoidHom.mem_ker, Frame.chD, Frame.iod, MonoidHom.coe_comp, Function.comp_apply,
+    MonoidHom.coe_fst, MonoidHom.coe_snd]
   decide
 
-theorem kc_ne_bot
-    {M : Type} [Field M] [NumberField M]
-    (p : ℕ) (hp : p.Prime)
-    (P : Ideal (𝓞 M)) [P.LiesOver (span {(p : ℤ)})]
-    : P ≠ ⊥ := by
+theorem kc_ne_bot {M : Type} [Field M] [NumberField M] (p : ℕ) (hp : p.Prime) (P : Ideal (𝓞 M))
+    [P.LiesOver (span {(p : ℤ)})] : P ≠ ⊥ := by
   have hne : span {(p : ℤ)} ≠ ⊥ := by simp [hp.ne_zero]
   exact Ideal.ne_bot_of_liesOver_of_ne_bot hne P
 
 theorem kc_two_dvd : 2 ∣ H.QS := (dvd_pow_self 2 (by omega)).trans H.tower_dvd
 
-theorem kc_stab_of_inertia
-    {G S : Type*} [Group G] [CommRing S] [MulSemiringAction G S]
-    (g : G) (P : Ideal S) (h : ∀ x : S, g • x - x ∈ P)
-    : g ∈ MulAction.stabilizer G P := by
+theorem kc_stab_of_inertia {G S : Type*} [Group G] [CommRing S] [MulSemiringAction G S] (g : G) (P : Ideal S)
+    (h : ∀ x : S, g • x - x ∈ P) : g ∈ MulAction.stabilizer G P := by
   rw [MulAction.mem_stabilizer_iff]
   ext x
   rw [Ideal.mem_pointwise_smul_iff_inv_smul_mem]
@@ -105,27 +136,21 @@ theorem kc_stab_of_inertia
   · intro hx
     simpa using P.sub_mem hx h1
 
-theorem splitK
-    : ∀ p : ℕ,
-      p.Prime
-        → ((primesOver (span {(p : ℤ)}) (𝓞 H.K)).ncard = 2
-          ↔ (p = 2 ∨ (p ≠ 2 ∧ jacobiSym (-(H.d : ℤ)) p = 1))) := fun p hp =>
-  SplitK.clause (L := H.E) (b := H.sqd) H.hyp.2.1 (by have := H.hyp.2.2.2.1; omega) H.sqd_sq p hp
+theorem splitK : ∀ p : ℕ, p.Prime →
+    ((primesOver (span {(p : ℤ)}) (𝓞 H.K)).ncard = 2 ↔ (p = 2 ∨ (p ≠ 2 ∧ jacobiSym (-(H.d : ℤ)) p = 1))) :=
+  fun p hp => SplitK.clause (L := H.E) (b := H.sqd) H.hyp.2.1 (by have := H.hyp.2.2.2.1; omega) H.sqd_sq p hp
 
 variable (C : HostCore H)
 include C
 
-theorem ordinary
-    : ∀ (p : ℕ) [Fact p.Prime] (P : Ideal (𝓞 H.E)) [P.IsPrime] [P.LiesOver (span {(p : ℤ)})],
-      (∀ σ τ : H.E ≃ₐ[ℚ] H.E,
-          τ ∈ MulAction.stabilizer _ P → (H.gal (σ * τ) ∈ φ.Psi ↔ H.gal σ ∈ φ.Psi))
-        ↔ (primesOver (span {(p : ℤ)}) (𝓞 H.K)).ncard = 2 := by
+theorem ordinary : ∀ (p : ℕ) [Fact p.Prime] (P : Ideal (𝓞 H.E)) [P.IsPrime] [P.LiesOver (span {(p : ℤ)})],
+    (∀ σ τ : H.E ≃ₐ[ℚ] H.E, τ ∈ MulAction.stabilizer _ P → (H.gal (σ * τ) ∈ φ.Psi ↔ H.gal σ ∈ φ.Psi)) ↔
+      (primesOver (span {(p : ℤ)}) (𝓞 H.K)).ncard = 2 := by
   intro p hpf P _ _
   have hp : p.Prime := hpf.out
-  have hred
-      : (∀ σ τ : H.E ≃ₐ[ℚ] H.E,
-          τ ∈ MulAction.stabilizer _ P → (H.gal (σ * τ) ∈ φ.Psi ↔ H.gal σ ∈ φ.Psi))
-        ↔ ∀ τ : H.E ≃ₐ[ℚ] H.E, τ ∈ MulAction.stabilizer _ P → H.gal τ ∈ φ.Psi := by
+  have hred : (∀ σ τ : H.E ≃ₐ[ℚ] H.E, τ ∈ MulAction.stabilizer _ P →
+      (H.gal (σ * τ) ∈ φ.Psi ↔ H.gal σ ∈ φ.Psi)) ↔
+      ∀ τ : H.E ≃ₐ[ℚ] H.E, τ ∈ MulAction.stabilizer _ P → H.gal τ ∈ φ.Psi := by
     constructor
     · intro h τ hτ
       have := h 1 τ hτ
@@ -185,10 +210,8 @@ theorem kc_conj_eq : haveI := C.cm; (IsCMField.complexConj H.E).restrictScalars 
   let ψ : H.E →+* ℂ := (IsAlgClosed.lift : H.E →ₐ[ℚ] ℂ).toRingHom
   exact (C.conj_iff ψ _).mp (fun x => IsCMField.complexEmbedding_complexConj H.E ψ x)
 
-theorem kc_unr
-    : haveI := C.cm
-      ∀ P : Ideal (𝓞 H.E),
-        P.IsPrime → P ≠ ⊥ → ¬ ∀ x : 𝓞 H.E, IsCMField.complexConj H.E • x - x ∈ P := by
+theorem kc_unr : haveI := C.cm; ∀ P : Ideal (𝓞 H.E), P.IsPrime → P ≠ ⊥ →
+    ¬ ∀ x : 𝓞 H.E, IsCMField.complexConj H.E • x - x ∈ P := by
   haveI := C.cm
   intro P hP hne h
   apply C.unramEF P hP hne
@@ -199,29 +222,21 @@ theorem kc_unr
   rw [e]
   exact h x
 
-theorem eta
-    : (∀ 𝔭 : Ideal (𝓞 H.F),
-        𝔭.IsPrime → 𝔭 ≠ ⊥
-          → (primesOver 𝔭 (𝓞 H.E)).ncard = 2
-            ∨ ((primesOver 𝔭 (𝓞 H.E)).ncard = 1 ∧ 𝔭.inertiaDegIn (𝓞 H.E) = 2))
-      ∧ (∀ (p : ℕ) [Fact p.Prime],
-        ¬ p ∣ H.condN
-          → ∀ (P : Ideal (𝓞 H.E)) [P.IsPrime] [P.LiesOver (span {(p : ℤ)})] (σ : H.E ≃ₐ[ℚ] H.E),
-            IsArithFrobAt ℤ σ P
-              → (H.etaF (P.comap (algebraMap (𝓞 H.F) (𝓞 H.E))) = -1
-                ↔ φ.cc ∈ Subgroup.zpowers (H.gal σ)))
-      ∧ (∀ (p : ℕ) [Fact p.Prime],
-        p ∣ H.condN
-          → ∀ (P : Ideal (𝓞 H.E)) [P.IsPrime] [P.LiesOver (span {(p : ℤ)})],
-            H.etaF (P.comap (algebraMap (𝓞 H.F) (𝓞 H.E))) = 1) := by
+theorem eta : (∀ 𝔭 : Ideal (𝓞 H.F), 𝔭.IsPrime → 𝔭 ≠ ⊥ →
+      (primesOver 𝔭 (𝓞 H.E)).ncard = 2 ∨ ((primesOver 𝔭 (𝓞 H.E)).ncard = 1 ∧ 𝔭.inertiaDegIn (𝓞 H.E) = 2)) ∧
+    (∀ (p : ℕ) [Fact p.Prime], ¬ p ∣ H.condN →
+      ∀ (P : Ideal (𝓞 H.E)) [P.IsPrime] [P.LiesOver (span {(p : ℤ)})] (σ : H.E ≃ₐ[ℚ] H.E), IsArithFrobAt ℤ σ P →
+        (H.etaF (P.comap (algebraMap (𝓞 H.F) (𝓞 H.E))) = -1 ↔ φ.cc ∈ Subgroup.zpowers (H.gal σ))) ∧
+    (∀ (p : ℕ) [Fact p.Prime], p ∣ H.condN →
+      ∀ (P : Ideal (𝓞 H.E)) [P.IsPrime] [P.LiesOver (span {(p : ℤ)})],
+        H.etaF (P.comap (algebraMap (𝓞 H.F) (𝓞 H.E))) = 1) := by
   have := C.cm
   have hunr := kc_unr H C
   have hsm : ∀ P : Ideal (𝓞 H.E), IsCMField.complexConj H.E • P = H.conj • P := fun P => by
     rw [← kc_conj_eq H C]
     rfl
-  have hetaiff
-      : ∀ (P : Ideal (𝓞 H.E)) [P.IsPrime],
-        P ≠ ⊥ → (H.etaF (P.comap (algebraMap (𝓞 H.F) (𝓞 H.E))) = 1 ↔ H.conj • P ≠ P) := by
+  have hetaiff : ∀ (P : Ideal (𝓞 H.E)) [P.IsPrime], P ≠ ⊥ →
+      (H.etaF (P.comap (algebraMap (𝓞 H.F) (𝓞 H.E))) = 1 ↔ H.conj • P ≠ P) := by
     intro P _ hP0
     have hk := Eta.ncard_eq_two_iff H.E hunr P hP0
     rw [hsm] at hk
@@ -238,9 +253,8 @@ theorem eta
     have hP0 := kc_ne_bot p hpf.out P
     have hm1 : H.etaF (P.comap (algebraMap (𝓞 H.F) (𝓞 H.E))) = -1 ↔ H.conj • P = P := by
       have h1 := hetaiff P hP0
-      have hval
-          : H.etaF (P.comap (algebraMap (𝓞 H.F) (𝓞 H.E))) = 1
-            ∨ H.etaF (P.comap (algebraMap (𝓞 H.F) (𝓞 H.E))) = -1 := by
+      have hval : H.etaF (P.comap (algebraMap (𝓞 H.F) (𝓞 H.E))) = 1 ∨
+          H.etaF (P.comap (algebraMap (𝓞 H.F) (𝓞 H.E))) = -1 := by
         unfold HostRaw.etaF; split_ifs <;> simp
       constructor
       · intro hm

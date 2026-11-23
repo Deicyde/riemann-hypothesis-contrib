@@ -1,16 +1,50 @@
 module
 
-public import Development.AbelianVarietyTheory.Definitions.Divisors.CechFam
-public import Development.AbelianVarietyTheory.Definitions.QuasicoherentCohomology.FiniteCohPushforwardIffOfIsClosedImmersion
-public import Development.AbelianVarietyTheory.Proofs.CoherentCohomologyProofs.CechModulesFunctorShortExactOfIsAffineOpen
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsSubsingletonCohTwistTensLbPow
 public import Development.AbelianVarietyTheory.Definitions.Divisors.IsFrameOfForallExists
+public import Development.AbelianVarietyTheory.Definitions.Divisors.IsEulerContraction
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
 
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace Limits
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
-  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory GlobalTheory.Cartier GlobalTheory.LogDR
 
 set_option autoImplicit false
@@ -19,44 +53,33 @@ noncomputable section
 
 namespace GlobalTheory.LogDR.LatFinite
 
-variable
-  {X : Scheme.{0}} [IsIntegral X]
-  {V : Type} [AddCommGroup V] [Module X.functionField V]
+variable {X : Scheme.{0}} [IsIntegral X] {V : Type} [AddCommGroup V] [Module X.functionField V]
   {M : X → AddSubgroup V} {F : X.Modules}
 
-theorem val_linearCombination
-    (L : LatModel M F)
-    {U W : X.Opens} (h : W ≤ U) (hW : genericPoint X ∈ W)
-    {m : ℕ} (e : Fin m → Γ(F, U)) (a : Fin m → Γ(X, W))
-    : L.val W hW (Fintype.linearCombination Γ(X, W) (fun i => Twist.resM F h (e i)) a)
-      = ∑ i, fnOf W hW (a i) • L.val U (h hW) (e i) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [Fintype.linearCombination_apply, map_sum, L.smul]
+theorem val_linearCombination (L : LatModel M F) {U W : X.Opens} (h : W ≤ U)
+    (hW : genericPoint X ∈ W) {m : ℕ} (e : Fin m → Γ(F, U)) (a : Fin m → Γ(X, W)) :
+    L.val W hW (Fintype.linearCombination Γ(X, W) (fun i => Twist.resM F h (e i)) a) =
+      ∑ i, fnOf W hW (a i) • L.val U (h hW) (e i) := by
+
+  simp only [Fintype.linearCombination_apply, map_sum, L.smul]
   refine Finset.sum_congr rfl fun i _ => ?_
   rw [← L.res U W h hW (e i)]
 
-theorem val_mem
-    (L : LatModel M F) {W : X.Opens} (hW : genericPoint X ∈ W) (s : Γ(F, W)) {z : X} (hz : z ∈ W)
-    : L.val W hW s ∈ M z := by
+theorem val_mem (L : LatModel M F) {W : X.Opens} (hW : genericPoint X ∈ W) (s : Γ(F, W))
+    {z : X} (hz : z ∈ W) : L.val W hW s ∈ M z := by
   have h : L.val W hW s ∈ latSec M W := L.range W hW ▸ ⟨s, rfl⟩
   simp only [latSec, AddSubgroup.mem_iInf] at h
   exact h z hz
 
-theorem isFrame
-    (L : LatModel M F)
-    {U : X.Opens} (hU : genericPoint X ∈ U)
-    {m : ℕ} {v : Fin m → V} (hv : LinearIndependent X.functionField v)
-    (hM : ∀ z ∈ U, ∀ w,
-      w ∈ M z ↔ ∃ c : Fin m → X.functionField, (∀ i, RegAt z (c i)) ∧ w = ∑ i, c i • v i)
-    (e : Fin m → Γ(F, U)) (he : ∀ i, L.val U hU (e i) = v i)
-    : VB.IsFrame e := by
+theorem isFrame (L : LatModel M F) {U : X.Opens} (hU : genericPoint X ∈ U) {m : ℕ}
+    {v : Fin m → V} (hv : LinearIndependent X.functionField v)
+    (hM : ∀ z ∈ U, ∀ w, w ∈ M z ↔
+      ∃ c : Fin m → X.functionField, (∀ i, RegAt z (c i)) ∧ w = ∑ i, c i • v i)
+    (e : Fin m → Γ(F, U)) (he : ∀ i, L.val U hU (e i) = v i) : VB.IsFrame e := by
   refine VB.isFrame_of_forall_exists fun W h x hx => ⟨W, le_rfl, hx, ?_⟩
   have hW : genericPoint X ∈ W := gen_mem hx
-  have key
-      : ∀ a : Fin m → Γ(X, W),
-        L.val W hW
-            (Fintype.linearCombination Γ(X, W) (fun i => Twist.resM F (le_rfl.trans h) (e i)) a)
-          = ∑ i, fnOf W hW (a i) • v i := fun a => by
+  have key : ∀ a : Fin m → Γ(X, W), L.val W hW (Fintype.linearCombination Γ(X, W)
+      (fun i => Twist.resM F (le_rfl.trans h) (e i)) a) = ∑ i, fnOf W hW (a i) • v i := fun a => by
     rw [val_linearCombination L]
     simp only [he]
   constructor
@@ -77,15 +100,12 @@ theorem isFrame
     rw [key, hc]
     simp only [ha]
 
-theorem isFiniteQC_of_latModel
-    : ∀ (X : Scheme.{0}) [IsIntegral X] {V : Type} [AddCommGroup V] [Module X.functionField V]
-        (M : X → AddSubgroup V) (F : X.Modules),
-      LatModel M F
-        → (∀ y : X, ∃ (U : X.Opens) (m : ℕ) (v : Fin m → V),
-          y ∈ U ∧ IsAffineOpen U ∧ LinearIndependent X.functionField v
-            ∧ ∀ z ∈ U, ∀ w,
-              w ∈ M z ↔ ∃ c : Fin m → X.functionField, (∀ i, RegAt z (c i)) ∧ w = ∑ i, c i • v i)
-        → GlobalTheory.QCoh.IsFiniteQC F := by
+theorem isFiniteQC_of_latModel : ∀ (X : Scheme.{0}) [IsIntegral X] {V : Type} [AddCommGroup V]
+    [Module X.functionField V] (M : X → AddSubgroup V) (F : X.Modules), LatModel M F →
+    (∀ y : X, ∃ (U : X.Opens) (m : ℕ) (v : Fin m → V), y ∈ U ∧ IsAffineOpen U ∧
+      LinearIndependent X.functionField v ∧ ∀ z ∈ U, ∀ w, w ∈ M z ↔
+        ∃ c : Fin m → X.functionField, (∀ i, RegAt z (c i)) ∧ w = ∑ i, c i • v i) →
+    GlobalTheory.QCoh.IsFiniteQC F := by
   intro X _ V _ _ M F L H
   choose U m v hy _ hv hM using H
   have frame : ∀ y, ∃ e : Fin (m y) → Γ(F, U y), VB.IsFrame e := by
@@ -104,8 +124,8 @@ theorem isFiniteQC_of_latModel
     choose e he using fun i => (L.range (U y) hU).ge (hmem i)
     exact ⟨e, isFrame L hU (hv y) (hM y) e he⟩
   choose e he using frame
-  refine
-    QCoh.IsFiniteQC.of_restrict (fun y => (U y).ι) (fun x => ⟨x, by simpa using hy x⟩) fun y => ?_
+  refine QCoh.IsFiniteQC.of_restrict (fun y => (U y).ι) (fun x => ⟨x, by simpa using hy x⟩)
+    fun y => ?_
   have hf := (VB.isFrame_restrict_iff (U y).ι _).2 ((he y).res ((U y).ι_image_le ⊤))
   exact (VB.IsFrame.isVB hf).isFiniteQC
 

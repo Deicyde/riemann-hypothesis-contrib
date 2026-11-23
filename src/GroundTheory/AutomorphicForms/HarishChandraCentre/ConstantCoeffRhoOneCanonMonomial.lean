@@ -1,8 +1,49 @@
 module
 
-public import Mathlib
 public import GroundTheory.AutomorphicForms.HarishChandraCentre.MemOfMemSupportToFinsupp
 public import GroundTheory.AutomorphicForms.HarishChandraCentre.RhoOneEqZeroOfRhoZeroEqZero
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.CStarAlgebra.Classes
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -20,35 +61,33 @@ noncomputable def transposeExp (m : Fin n × Fin n →₀ ℕ) : Fin n × Fin n 
 theorem transposeExp_injective : Function.Injective (transposeExp (n := n)) :=
   Finsupp.mapDomain_injective Prod.swap_injective
 
-theorem toFinsupp_map_swap (w : List (Fin n × Fin n))
-    : Multiset.toFinsupp ((w.map Prod.swap : List _) : Multiset (Fin n × Fin n))
-      = transposeExp (Multiset.toFinsupp (w : Multiset (Fin n × Fin n))) := by
+theorem toFinsupp_map_swap (w : List (Fin n × Fin n)) :
+    Multiset.toFinsupp ((w.map Prod.swap : List _) : Multiset (Fin n × Fin n)) =
+      transposeExp (Multiset.toFinsupp (w : Multiset (Fin n × Fin n))) := by
   induction w with
   | nil => simp [transposeExp]
   | cons a w ih =>
     rw [List.map_cons,
-      show ((Prod.swap a :: w.map Prod.swap : List _) : Multiset _)
-          = {Prod.swap a} + ((w.map Prod.swap : List _) : Multiset _) by
-        simp,
+      show ((Prod.swap a :: w.map Prod.swap : List _) : Multiset _) =
+        {Prod.swap a} + ((w.map Prod.swap : List _) : Multiset _) by simp,
       show ((a :: w : List _) : Multiset _) = {a} + (w : Multiset _) by simp,
       Multiset.toFinsupp_add, Multiset.toFinsupp_add, Multiset.toFinsupp_singleton,
       Multiset.toFinsupp_singleton, ih, transposeExp, transposeExp, Finsupp.mapDomain_add,
       Finsupp.mapDomain_single]
 
-theorem degree_transposeExp (m : Fin n × Fin n →₀ ℕ) : (transposeExp m).degree = m.degree := by
+theorem degree_transposeExp (m : Fin n × Fin n →₀ ℕ) :
+    (transposeExp m).degree = m.degree := by
   have h1 := degree_toFinsupp ((expand m).map Prod.swap)
   rw [toFinsupp_map_swap, toFinsupp_expand, List.length_map, length_expand] at h1
   exact h1
 
-theorem constantCoeff_rho_one_canon_monomial (m s : Fin n × Fin n →₀ ℕ) (h : m.degree = s.degree)
-    : constantCoeff (rho 1 (canon m) (monomial s 1)) ≠ 0 ↔ transposeExp m = s := by
-  rw [canon, constantCoeff_rho_one_word_monomial _ _ (by rw [length_expand, h]), toFinsupp_map_swap,
-    toFinsupp_expand]
+theorem constantCoeff_rho_one_canon_monomial (m s : Fin n × Fin n →₀ ℕ) (h : m.degree = s.degree) :
+    constantCoeff (rho 1 (canon m) (monomial s 1)) ≠ 0 ↔ transposeExp m = s := by
+  rw [canon, constantCoeff_rho_one_word_monomial _ _ (by rw [length_expand, h]),
+    toFinsupp_map_swap, toFinsupp_expand]
 
-theorem coeff_eq_zero_of_rho_one
-    (s : Finset (Fin n × Fin n →₀ ℕ)) (c : (Fin n × Fin n →₀ ℕ) → ℂ)
-    (h : rho 1 (∑ m ∈ s, c m • canon m) = 0)
-    : ∀ m ∈ s, c m = 0 := by
+theorem coeff_eq_zero_of_rho_one (s : Finset (Fin n × Fin n →₀ ℕ)) (c : (Fin n × Fin n →₀ ℕ) → ℂ)
+    (h : rho 1 (∑ m ∈ s, c m • canon m) = 0) : ∀ m ∈ s, c m = 0 := by
   by_contra hne
   push Not at hne
   obtain ⟨m, hms, hm⟩ := hne
@@ -73,10 +112,9 @@ theorem coeff_eq_zero_of_rho_one
         exact fun h' => hne (transposeExp_injective h')
       rw [not_not.1 this, mul_zero]
   have hsum := congrArg (fun T : Module.End ℂ (Poly n) => constantCoeff (T (monomial N 1))) h
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, map_smul, LinearMap.sum_apply, LinearMap.smul_apply, map_zero,
-        LinearMap.zero_apply, MvPolynomial.smul_eq_C_mul, map_mul, MvPolynomial.constantCoeff_C]
-      at hsum
+
+  simp only [map_sum, map_smul, LinearMap.sum_apply, LinearMap.smul_apply, map_zero,
+  LinearMap.zero_apply, MvPolynomial.smul_eq_C_mul, map_mul, MvPolynomial.constantCoeff_C] at hsum
   rw [Finset.sum_eq_single m₀ (fun m hm hne => key m hm hne) (fun h' => absurd hm₀.1 h')] at hsum
   have h0 : constantCoeff (rho 1 (canon m₀) (monomial N 1)) ≠ 0 :=
     (constantCoeff_rho_one_canon_monomial _ _ hN.symm).2 rfl
@@ -90,10 +128,11 @@ theorem linearIndependent_canon : LinearIndependent ℂ (canon (n := n)) := by
 noncomputable def pbw : Module.Basis (Fin n × Fin n →₀ ℕ) ℂ (U n) :=
   Module.Basis.mk linearIndependent_canon span_canon_eq_top.ge
 
-@[simp]
-theorem pbw_apply (m : Fin n × Fin n →₀ ℕ) : pbw (n := n) m = canon m := Module.Basis.mk_apply _ _ _
+@[simp] theorem pbw_apply (m : Fin n × Fin n →₀ ℕ) : pbw (n := n) m = canon m :=
+  Module.Basis.mk_apply _ _ _
 
-theorem sum_repr_canon (u : U n) : ∑ m ∈ (pbw.repr u).support, pbw.repr u m • canon m = u := by
+theorem sum_repr_canon (u : U n) :
+    ∑ m ∈ (pbw.repr u).support, pbw.repr u m • canon m = u := by
   conv_rhs => rw [← pbw.linearCombination_repr u]
   rw [Finsupp.linearCombination_apply, Finsupp.sum]
   simp

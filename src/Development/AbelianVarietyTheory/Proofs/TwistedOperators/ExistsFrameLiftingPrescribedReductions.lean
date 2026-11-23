@@ -1,13 +1,46 @@
 module
 
-public import Mathlib
-public import Formalism.LocalToGlobal.IndefiniteReal.ZeroPartEigenvalueConvention
-public import Formalism.LocalToGlobal.IndefiniteReal.EvalTieTOne
-public import Formalism.LocalToGlobal.IndefiniteReal.RationalEmbedding
-public import Formalism.LocalToGlobal.SiegelLatticeTheory.FlagStabilizerTensors.RowLevelMatch
-public import Development.AbelianVarietyTheory.PublishedTheorems.DiscreteSeriesUnitary₂.DiscreteSeriesClassificationIff
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.PairTable
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.MemHatIffOfSelfDual
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
+import Formalism.LocalToGlobal.IndefiniteReal.AutomorphicEvaluation
+import Formalism.LocalToGlobal.SiegelLatticeTheory.FlagStabilizerTensors.RowDict
+import Formalism.LocalToGlobal.SiegelLatticeTheory.FlagStabilizerTensors.RowLevelMatch
+import Formalism.LocalToGlobal.SiegelLatticeTheory.FlagStabilizerTensors.RowsJoinPinned
 
 @[expose] public section
 
@@ -73,8 +106,8 @@ theorem glob
     refine GlobalTheory.StdFrames.cpt_ext fun Q => ?_
     have e := congrArg (fun M => M i j) (h1 Q)
     simp only [Matrix.mul_apply] at e ⊢
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     simp only [map_mul, Z, Z', Matrix.of_apply, hz, hz']
     rw [e, Matrix.one_apply, Matrix.one_apply]
     split_ifs <;> simp
@@ -110,7 +143,6 @@ end GlobalTheory.SeeConjRead.CyclotomicLifting
 
 namespace GlobalTheory.SeeConjRead
 
-set_option maxHeartbeats 1000000 in
 open GlobalTheory.SeeConjRead.CyclotomicLifting in
 theorem exists_lift_redIs
     : ∀ {D : D7} {n : ℕ} (β₀ : GL (Fin n) (EAf D)) (S : Finset (Pl D.host.E))
@@ -165,8 +197,8 @@ theorem exists_lift_redIs
         = (1 : Matrix (Fin n) (Fin n) _) i j := by
     have e : c' Q * c Q = 1 := mul_eq_one_comm.1 (h1 Q)
     rw [hS Q hQ] at e
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← e, Matrix.mul_apply, Matrix.mul_apply, map_sum]
+
+    rw [← e, Matrix.mul_apply, Matrix.mul_apply, map_sum]
     refine Finset.sum_congr rfl fun k _ => ?_
     rw [map_mul, hCc]
     rfl

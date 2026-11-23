@@ -1,20 +1,66 @@
 module
 
 public import Formalism.HermitianCurvature.ThetaExistenceInductiveFromPieces
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Etale.Weakly
+import Mathlib.RingTheory.Finiteness.ModuleFinitePresentation
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.TotallySplit
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
 noncomputable section
 
-open Matrix Formalism.DoubleCosetMeasures Formalism.FourierDecayAlt.A5 Formalism.FourierDecayAlt.A6
-  Filter Topology
+open Matrix Formalism.DoubleCosetMeasures Formalism.FourierDecayAlt.A5 Formalism.FourierDecayAlt.A6 Filter Topology
 open scoped ComplexConjugate
 
 namespace Formalism.FourierDecayAlt.P.GermSumLattices
 
-theorem finsum_if
-    {α : Type} {P : α → Prop} {inst : DecidablePred P} (hfin : {x | P x}.Finite) (G : α → ℂ)
-    : ∑ᶠ x, (if P x then G x else 0) = ∑ x ∈ hfin.toFinset, G x := by
+theorem finsum_if {α : Type} {P : α → Prop} {inst : DecidablePred P} (hfin : {x | P x}.Finite)
+    (G : α → ℂ) : ∑ᶠ x, (if P x then G x else 0) = ∑ x ∈ hfin.toFinset, G x := by
   rw [finsum_eq_sum_of_support_subset (s := hfin.toFinset)]
   · apply Finset.sum_congr rfl
     intro x hx
@@ -30,8 +76,8 @@ section Top
 
 variable {K : Type} [CommRing K] [TopologicalSpace K] [IsTopologicalRing K]
 
-theorem compact_mul_small {C : Set K} (hC : IsCompact C) {W : Set K} (hW : W ∈ 𝓝 (0 : K))
-    : ∃ E ∈ 𝓝 (0 : K), ∀ z ∈ C, ∀ e ∈ E, z * e ∈ W := by
+theorem compact_mul_small {C : Set K} (hC : IsCompact C) {W : Set K} (hW : W ∈ 𝓝 (0 : K)) :
+    ∃ E ∈ 𝓝 (0 : K), ∀ z ∈ C, ∀ e ∈ E, z * e ∈ W := by
   obtain ⟨W', hW'W, hW'o, h0⟩ := mem_nhds_iff.1 hW
   have hn : IsOpen {p : K × K | p.1 * p.2 ∈ W'} := hW'o.preimage continuous_mul
   obtain ⟨u, v, hu, hv, hCu, h0v, huv⟩ :=
@@ -40,21 +86,18 @@ theorem compact_mul_small {C : Set K} (hC : IsCompact C) {W : Set K} (hW : W ∈
       have hb' : b = 0 := hb
       subst hb'
       simpa using h0)
-  exact ⟨
-    v,
-    hv.mem_nhds (h0v rfl),
-    fun z hz e he => hW'W (huv (show ((z, e) : K × K) ∈ u ×ˢ v from ⟨hCu hz, he⟩))
-  ⟩
+  exact ⟨v, hv.mem_nhds (h0v rfl), fun z hz e he =>
+    hW'W (huv (show ((z, e) : K × K) ∈ u ×ˢ v from ⟨hCu hz, he⟩))⟩
 
-theorem lat_inf {L M : AddSubgroup K} (hL : IsLat L) (hM : IsOpen (M : Set K)) : IsLat (L ⊓ M) := by
+theorem lat_inf {L M : AddSubgroup K} (hL : IsLat L) (hM : IsOpen (M : Set K)) :
+    IsLat (L ⊓ M) := by
   refine ⟨by rw [AddSubgroup.coe_inf]; exact hL.1.inter hM, ?_⟩
   rw [AddSubgroup.coe_inf]
   exact hL.2.inter_right (AddSubgroup.isClosed_of_isOpen M hM)
 
-theorem exists_lat_le
-    {ι : Type} (I : Finset ι) (M : ι → AddSubgroup K) (hM : ∀ i ∈ I, IsOpen (M i : Set K))
-    {Λ : AddSubgroup K} (hΛ : IsLat Λ)
-    : ∃ Λ' : AddSubgroup K, IsLat Λ' ∧ Λ' ≤ Λ ∧ ∀ i ∈ I, Λ' ≤ M i := by
+theorem exists_lat_le {ι : Type} (I : Finset ι) (M : ι → AddSubgroup K)
+    (hM : ∀ i ∈ I, IsOpen (M i : Set K)) {Λ : AddSubgroup K} (hΛ : IsLat Λ) :
+    ∃ Λ' : AddSubgroup K, IsLat Λ' ∧ Λ' ≤ Λ ∧ ∀ i ∈ I, Λ' ≤ M i := by
   classical
   induction I using Finset.induction_on with
   | empty => exact ⟨Λ, hΛ, le_rfl, by simp⟩
@@ -66,11 +109,8 @@ theorem exists_lat_le
     · exact inf_le_right
     · exact inf_le_left.trans (h3 i hi)
 
-theorem cut_finite
-    (R : Subring K) (hRo : IsOpen (R : Set K))
-    {S : Set K} (hS : IsCompact S)
-    (cr : K ⧸ R.toAddSubgroup → Kˣ) (hcr : IsCr R cr)
-    : {x | (cr x : K) ∈ S}.Finite := by
+theorem cut_finite (R : Subring K) (hRo : IsOpen (R : Set K)) {S : Set K} (hS : IsCompact S)
+    (cr : K ⧸ R.toAddSubgroup → Kˣ) (hcr : IsCr R cr) : {x | (cr x : K) ∈ S}.Finite := by
   have : DiscreteTopology (K ⧸ R.toAddSubgroup) := QuotientAddGroup.discreteTopology hRo
   have h1 : IsCompact ((QuotientAddGroup.mk : K → K ⧸ R.toAddSubgroup) '' S) :=
     hS.image QuotientAddGroup.continuous_mk
@@ -78,8 +118,8 @@ theorem cut_finite
   intro x hx
   exact ⟨cr x, hx, hcr x⟩
 
-theorem cutSet_compact (m : ℕ) {Om : Set K} (hOm : IsCompact Om) (t : Kˣ)
-    : IsCompact (cutSet m Om t) := by
+theorem cutSet_compact (m : ℕ) {Om : Set K} (hOm : IsCompact Om) (t : Kˣ) :
+    IsCompact (cutSet m Om t) := by
   have h : cutSet m Om t = (fun z : K => ((((-t) ^ m)⁻¹ : Kˣ) : K) * z ^ (m + 1)) '' Om := by
     ext c
     constructor
@@ -101,20 +141,17 @@ section Alg
 
 variable {K : Type} [CommRing K] (R : Subring K) (ψ : AddChar K ℂ) (m : ℕ) (γ : Kˣ → ℂ)
 
-theorem germSum_eq (hroots : ∀ D : Kˣ, {z : Kˣ | z ^ (m + 1) = D}.Finite) (t c : Kˣ) (f : Kˣ → ℂ)
-    : germSum R ψ m γ t c f
-      = ((modK R (t : K) ^ (-((m : ℝ) ^ 2) / 2) : ℝ) : ℂ)
-        * ∑ z ∈ (hroots ((-t) ^ m * c)).toFinset, germCoef R ψ m γ t z * f z := by
+theorem germSum_eq (hroots : ∀ D : Kˣ, {z : Kˣ | z ^ (m + 1) = D}.Finite) (t c : Kˣ)
+    (f : Kˣ → ℂ) : germSum R ψ m γ t c f =
+      ((modK R (t : K) ^ (-((m : ℝ) ^ 2) / 2) : ℝ) : ℂ) *
+        ∑ z ∈ (hroots ((-t) ^ m * c)).toFinset, germCoef R ψ m γ t z * f z := by
   unfold germSum
   congr 1
   exact finsum_if (hroots ((-t) ^ m * c)) _
 
-theorem roots_reindex
-    (μ : Finset Kˣ) (hμ : ∀ ζ : Kˣ, ζ ∈ μ ↔ ζ ^ (m + 1) = 1)
-    (hroots : ∀ D : Kˣ, {z : Kˣ | z ^ (m + 1) = D}.Finite)
-    (D z₀ : Kˣ) (hz₀ : z₀ ^ (m + 1) = D)
-    (G : Kˣ → ℂ)
-    : ∑ z ∈ (hroots D).toFinset, G z = ∑ ζ ∈ μ, G (ζ * z₀) := by
+theorem roots_reindex (μ : Finset Kˣ) (hμ : ∀ ζ : Kˣ, ζ ∈ μ ↔ ζ ^ (m + 1) = 1)
+    (hroots : ∀ D : Kˣ, {z : Kˣ | z ^ (m + 1) = D}.Finite) (D z₀ : Kˣ) (hz₀ : z₀ ^ (m + 1) = D)
+    (G : Kˣ → ℂ) : ∑ z ∈ (hroots D).toFinset, G z = ∑ ζ ∈ μ, G (ζ * z₀) := by
   symm
   apply Finset.sum_bij (fun ζ _ => ζ * z₀)
   · intro ζ hζ
@@ -128,29 +165,23 @@ theorem roots_reindex
   · intros
     rfl
 
-theorem double_germ
-    (h h' : Point K) (t₁ t₂ κ : Kˣ) (cr : K ⧸ R.toAddSubgroup → Kˣ) (S : Set K)
+theorem double_germ (h h' : Point K) (t₁ t₂ κ : Kˣ) (cr : K ⧸ R.toAddSubgroup → Kˣ) (S : Set K)
     (μ : Finset Kˣ) (hμ : ∀ ζ : Kˣ, ζ ∈ μ ↔ ζ ^ (m + 1) = 1)
-    (hSfin : {x | (cr x : K) ∈ S}.Finite) (hroots : ∀ D : Kˣ, {z : Kˣ | z ^ (m + 1) = D}.Finite)
+    (hSfin : {x | (cr x : K) ∈ S}.Finite)
+    (hroots : ∀ D : Kˣ, {z : Kˣ | z ^ (m + 1) = D}.Finite)
     (hherm : ∀ w w' : Point K, Kp R ψ w' w = conj (Kp R ψ w w'))
-    (hG1 : ∀ x,
-      (cr x : K) ∈ S
-        → ∀ w',
-          Kp R ψ (pt2 h m t₁ (cr x)) w'
-            = germSum R ψ m γ t₁ (cr x) (fun z => Kp R ψ (addBlock h (m + 1) z) w'))
-    (hG2 : ∀ x,
-      (cr x : K) ∈ S
-        → ∀ w',
-          Kp R ψ (pt2 h' m t₂ (cr x)) w'
-            = germSum R ψ m γ t₂ (cr x) (fun z => Kp R ψ (addBlock h' (m + 1) z) w'))
-    (hκ : κ ^ (m + 1) = (t₂ * t₁⁻¹) ^ m)
-    : uGram R ψ m cr S h h' t₁ t₂
-      = ((modK R ((t₁ : K) * (t₂ : K)) ^ (m * (m + 1) / 2) : ℝ) : ℂ)
-        * ((((modK R (t₁ : K) ^ (-((m : ℝ) ^ 2) / 2) : ℝ) : ℂ)
-            * ((modK R (t₂ : K) ^ (-((m : ℝ) ^ 2) / 2) : ℝ) : ℂ))
-          * ∑ ζ ∈ μ, ∑ x ∈ hSfin.toFinset, ∑ z ∈ (hroots ((-t₁) ^ m * cr x)).toFinset,
-              germCoef R ψ m γ t₁ z * conj (germCoef R ψ m γ t₂ (ζ * κ * z)) *
-                Kp R ψ (addBlock h (m + 1) z) (addBlock h' (m + 1) (ζ * κ * z))) := by
+    (hG1 : ∀ x, (cr x : K) ∈ S → ∀ w', Kp R ψ (pt2 h m t₁ (cr x)) w' =
+      germSum R ψ m γ t₁ (cr x) (fun z => Kp R ψ (addBlock h (m + 1) z) w'))
+    (hG2 : ∀ x, (cr x : K) ∈ S → ∀ w', Kp R ψ (pt2 h' m t₂ (cr x)) w' =
+      germSum R ψ m γ t₂ (cr x) (fun z => Kp R ψ (addBlock h' (m + 1) z) w'))
+    (hκ : κ ^ (m + 1) = (t₂ * t₁⁻¹) ^ m) :
+    uGram R ψ m cr S h h' t₁ t₂ =
+      ((modK R ((t₁ : K) * (t₂ : K)) ^ (m * (m + 1) / 2) : ℝ) : ℂ) *
+      ((((modK R (t₁ : K) ^ (-((m : ℝ) ^ 2) / 2) : ℝ) : ℂ) *
+        ((modK R (t₂ : K) ^ (-((m : ℝ) ^ 2) / 2) : ℝ) : ℂ)) *
+      ∑ ζ ∈ μ, ∑ x ∈ hSfin.toFinset, ∑ z ∈ (hroots ((-t₁) ^ m * cr x)).toFinset,
+        germCoef R ψ m γ t₁ z * conj (germCoef R ψ m γ t₂ (ζ * κ * z)) *
+          Kp R ψ (addBlock h (m + 1) z) (addBlock h' (m + 1) (ζ * κ * z))) := by
   unfold uGram
   congr 1
   rw [finsum_if hSfin, Finset.sum_comm, Finset.mul_sum]
@@ -163,9 +194,9 @@ theorem double_germ
   apply Finset.sum_congr rfl
   intro z hz
   have hz' : z ^ (m + 1) = (-t₁) ^ m * cr x := by simpa using hz
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [hherm (pt2 h' m t₂ (cr x)) (addBlock h (m + 1) z), hG2 x hx', germSum_eq R ψ m γ hroots,
-      map_mul, Complex.conj_ofReal, map_sum]
+
+  rw [hherm (pt2 h' m t₂ (cr x)) (addBlock h (m + 1) z), hG2 x hx', germSum_eq R ψ m γ hroots,
+  map_mul, Complex.conj_ofReal, map_sum]
   have hz₀ : (κ * z) ^ (m + 1) = (-t₂) ^ m * cr x := by
     rw [mul_pow, hκ, hz', ← mul_assoc, ← mul_pow]
     congr 2
@@ -182,8 +213,8 @@ section Mod
 
 variable {K : Type} [CommRing K] (R : Subring K)
 
-def MM : Prop :=
-  ∀ x y : Kˣ, 0 < modK R (x : K) ∧ modK R ((x : K) * (y : K)) = modK R (x : K) * modK R (y : K)
+def MM : Prop := ∀ x y : Kˣ,
+  0 < modK R (x : K) ∧ modK R ((x : K) * (y : K)) = modK R (x : K) * modK R (y : K)
 
 variable {R}
 
@@ -204,29 +235,30 @@ theorem mm_inv (h : MM R) (z : Kˣ) : modK R ((z⁻¹ : Kˣ) : K) = (modK R (z :
   rw [Units.mul_inv, mm_one h] at h1
   exact eq_inv_of_mul_eq_one_right h1.symm
 
-theorem mm_root (h : MM R) (z : Kˣ) (n : ℕ) (hz : modK R (z : K) ^ (n + 1) = 1)
-    : modK R (z : K) = 1 :=
+theorem mm_root (h : MM R) (z : Kˣ) (n : ℕ) (hz : modK R (z : K) ^ (n + 1) = 1) :
+    modK R (z : K) = 1 :=
   (pow_eq_one_iff_of_nonneg (h z z).1.le (Nat.succ_ne_zero n)).1 hz
 
 theorem mm_root_one (h : MM R) (z : Kˣ) (n : ℕ) (hz : z ^ (n + 1) = 1) : modK R (z : K) = 1 := by
   apply mm_root h z n
   rw [← mm_pow h, ← Units.val_pow_eq_pow_val, hz, Units.val_one, mm_one h]
 
-theorem half_sq (A : ℝ) (hA : 0 < A) (m : ℕ)
-    : A ^ ((m : ℝ) ^ 2 / 2) * A ^ ((m : ℝ) ^ 2 / 2) = A ^ (m ^ 2) := by
+theorem half_sq (A : ℝ) (hA : 0 < A) (m : ℕ) :
+    A ^ ((m : ℝ) ^ 2 / 2) * A ^ ((m : ℝ) ^ 2 / 2) = A ^ (m ^ 2) := by
   rw [← Real.rpow_add hA, ← Real.rpow_natCast A (m ^ 2)]
   congr 1
   push_cast
   ring
 
-theorem neg_half_sq (A : ℝ) (hA : 0 < A) (m : ℕ)
-    : A ^ (-((m : ℝ) ^ 2) / 2) * A ^ (-((m : ℝ) ^ 2) / 2) = (A ^ (m ^ 2))⁻¹ := by
+theorem neg_half_sq (A : ℝ) (hA : 0 < A) (m : ℕ) :
+    A ^ (-((m : ℝ) ^ 2) / 2) * A ^ (-((m : ℝ) ^ 2) / 2) = (A ^ (m ^ 2))⁻¹ := by
   rw [← Real.rpow_add hA, ← Real.rpow_natCast A (m ^ 2), ← Real.rpow_neg hA.le]
   congr 1
   push_cast
   ring
 
-theorem inv_half_sq (A : ℝ) (hA : 0 < A) : A ^ (-(1 : ℝ) / 2) * A ^ (-(1 : ℝ) / 2) = A⁻¹ := by
+theorem inv_half_sq (A : ℝ) (hA : 0 < A) :
+    A ^ (-(1 : ℝ) / 2) * A ^ (-(1 : ℝ) / 2) = A⁻¹ := by
   rw [← Real.rpow_add hA, ← Real.rpow_neg_one]
   congr 1
   norm_num
@@ -238,104 +270,93 @@ theorem tri_pow (A : ℝ) (m : ℕ) : (A * A) ^ (m * (m + 1) / 2) = A ^ (m ^ 2 +
 
 variable (R) (ψ : AddChar K ℂ) (m : ℕ) (γ : Kˣ → ℂ)
 
-theorem coef_mul
-    (hMM : MM R) (hun : ∀ x : K, conj (ψ x) = ψ (-x)) (hs : IsUnit ((m + 1 : ℕ) : K))
-    (t₁ t₂ z z' : Kˣ) (hN : modK R (z' : K) = modK R (z : K))
-    : germCoef R ψ m γ t₁ z * conj (germCoef R ψ m γ t₂ z')
-      = γ (z * t₁) * conj (γ (z' * t₂))
-        * (((modK R ((m + 1 : ℕ) : K))⁻¹ * modK R (z : K) ^ (m ^ 2) : ℝ) : ℂ)
-        * ψ
-          (((m + 1 : ℕ) : K) * (z : K) * ((t₁⁻¹ : Kˣ) : K)
-            - ((m + 1 : ℕ) : K) * (z' : K) * ((t₂⁻¹ : Kˣ) : K)) := by
+theorem coef_mul (hMM : MM R) (hun : ∀ x : K, conj (ψ x) = ψ (-x))
+    (hs : IsUnit ((m + 1 : ℕ) : K)) (t₁ t₂ z z' : Kˣ) (hN : modK R (z' : K) = modK R (z : K)) :
+    germCoef R ψ m γ t₁ z * conj (germCoef R ψ m γ t₂ z') =
+      γ (z * t₁) * conj (γ (z' * t₂)) *
+        (((modK R ((m + 1 : ℕ) : K))⁻¹ * modK R (z : K) ^ (m ^ 2) : ℝ) : ℂ) *
+        ψ (((m + 1 : ℕ) : K) * (z : K) * ((t₁⁻¹ : Kˣ) : K) -
+          ((m + 1 : ℕ) : K) * (z' : K) * ((t₂⁻¹ : Kˣ) : K)) := by
   have hS : 0 < modK R ((m + 1 : ℕ) : K) := by
     obtain ⟨u, hu⟩ := hs
     rw [← hu]
     exact (hMM u u).1
-  have key
-      : ((modK R ((m + 1 : ℕ) : K) ^ (-(1 : ℝ) / 2) * modK R (z : K) ^ ((m : ℝ) ^ 2 / 2) : ℝ) : ℂ)
-          * ((modK R ((m + 1 : ℕ) : K) ^ (-(1 : ℝ) / 2) * modK R (z : K) ^ ((m : ℝ) ^ 2 / 2) : ℝ)
-            : ℂ)
-        = (((modK R ((m + 1 : ℕ) : K))⁻¹ * modK R (z : K) ^ (m ^ 2) : ℝ) : ℂ) := by
+  have key : ((modK R ((m + 1 : ℕ) : K) ^ (-(1 : ℝ) / 2) *
+      modK R (z : K) ^ ((m : ℝ) ^ 2 / 2) : ℝ) : ℂ) *
+      ((modK R ((m + 1 : ℕ) : K) ^ (-(1 : ℝ) / 2) * modK R (z : K) ^ ((m : ℝ) ^ 2 / 2) : ℝ) : ℂ) =
+      (((modK R ((m + 1 : ℕ) : K))⁻¹ * modK R (z : K) ^ (m ^ 2) : ℝ) : ℂ) := by
     rw [← Complex.ofReal_mul]
     congr 1
     rw [← inv_half_sq _ hS, ← half_sq _ (hMM z z).1 m]
     ring
   unfold germCoef
-  rw [map_mul (starRingEnd ℂ), map_mul (starRingEnd ℂ), Complex.conj_ofReal, hun, hN,
-    sub_eq_add_neg, AddChar.map_add_eq_mul, ← key]
+  rw [map_mul (starRingEnd ℂ), map_mul (starRingEnd ℂ), Complex.conj_ofReal, hun, hN, sub_eq_add_neg, AddChar.map_add_eq_mul,
+    ← key]
   ring
 
-theorem nsK_unit (hMM : MM R) (h h' : Point K) (z : Kˣ)
-    : NsK R ψ (m + 1) h h' (z : K)
-      = ((modK R (z : K) ^ (m ^ 2 + m) : ℝ) : ℂ)
-        * Kp R ψ (addBlock h (m + 1) z) (addBlock h' (m + 1) z) := by
+theorem nsK_unit (hMM : MM R) (h h' : Point K) (z : Kˣ) :
+    NsK R ψ (m + 1) h h' (z : K) = ((modK R (z : K) ^ (m ^ 2 + m) : ℝ) : ℂ) *
+      Kp R ψ (addBlock h (m + 1) z) (addBlock h' (m + 1) z) := by
   unfold NsK
   rw [dite_eq_left z.isUnit, IsUnit.unit_of_val_units]
   unfold Ns
   rw [(hMM z z).2, Nat.add_sub_cancel, mul_comm (m + 1) m, tri_pow]
 
+
 open Classical in
 def amp (h h' : Point K) (t₁ ζ : Kˣ) (z : K) : ℂ := by
   classical
-  exact
-    if hz : IsUnit z then
-      γ (hz.unit * t₁) * conj (γ (ζ * hz.unit * t₁))
-        * (((modK R ((m + 1 : ℕ) : K))⁻¹ * modK R z ^ (m ^ 2) : ℝ) : ℂ)
-        * Kp R ψ (addBlock h (m + 1) hz.unit) (addBlock h' (m + 1) (ζ * hz.unit))
-    else
-      0
+  exact if hz : IsUnit z then
+    γ (hz.unit * t₁) * conj (γ (ζ * hz.unit * t₁)) *
+      (((modK R ((m + 1 : ℕ) : K))⁻¹ * modK R z ^ (m ^ 2) : ℝ) : ℂ) *
+      Kp R ψ (addBlock h (m + 1) hz.unit) (addBlock h' (m + 1) (ζ * hz.unit))
+  else 0
 
-theorem amp_unit (h h' : Point K) (t₁ ζ z : Kˣ)
-    : amp R ψ m γ h h' t₁ ζ (z : K)
-      = γ (z * t₁) * conj (γ (ζ * z * t₁))
-        * (((modK R ((m + 1 : ℕ) : K))⁻¹ * modK R (z : K) ^ (m ^ 2) : ℝ) : ℂ)
-        * Kp R ψ (addBlock h (m + 1) z) (addBlock h' (m + 1) (ζ * z)) := by
+theorem amp_unit (h h' : Point K) (t₁ ζ z : Kˣ) :
+    amp R ψ m γ h h' t₁ ζ (z : K) = γ (z * t₁) * conj (γ (ζ * z * t₁)) *
+      (((modK R ((m + 1 : ℕ) : K))⁻¹ * modK R (z : K) ^ (m ^ 2) : ℝ) : ℂ) *
+      Kp R ψ (addBlock h (m + 1) z) (addBlock h' (m + 1) (ζ * z)) := by
   unfold amp
   rw [dite_eq_left z.isUnit, IsUnit.unit_of_val_units]
 
-theorem amp_latInv
-    (h h' : Point K)
-    (t₁ ζ : Kˣ)
-    (Om Esq : Set K) (Λ' Λ₁ Λ₂ : AddSubgroup K)
+theorem amp_latInv (h h' : Point K) (t₁ ζ : Kˣ) (Om Esq : Set K) (Λ' Λ₁ Λ₂ : AddSubgroup K)
     (hγ2 : ∀ a b : Kˣ, γ (a * b ^ 2) = γ a)
-    (hherm : ∀ w w' : Point K, Kp R ψ w' w = conj (Kp R ψ w w')) (hOmU : ∀ z ∈ Om, IsUnit z)
-    (hML
-      : ∀ z ∈ Om, ∀ l ∈ Λ', IsUnit (z + l) ∧ modK R (z + l) = modK R z ∧ l * Ring.inverse z ∈ Esq)
+    (hherm : ∀ w w' : Point K, Kp R ψ w' w = conj (Kp R ψ w w'))
+    (hOmU : ∀ z ∈ Om, IsUnit z)
+    (hML : ∀ z ∈ Om, ∀ l ∈ Λ', IsUnit (z + l) ∧ modK R (z + l) = modK R z ∧
+      l * Ring.inverse z ∈ Esq)
     (hsq : ∀ a : Kˣ, (a : K) - 1 ∈ Esq → ∃ b : Kˣ, a = b ^ 2)
-    (hLC1 : ∀ z z' : Kˣ,
-      (z : K) ∈ Om → (z' : K) - (z : K) ∈ Λ₁
-        → ∀ w' : Point K, Kp R ψ (addBlock h (m + 1) z') w' = Kp R ψ (addBlock h (m + 1) z) w')
-    (hLC2 : ∀ z z' : Kˣ,
-      (z : K) ∈ Om → (z' : K) - (z : K) ∈ Λ₂
-        → ∀ w' : Point K, Kp R ψ (addBlock h' (m + 1) z') w' = Kp R ψ (addBlock h' (m + 1) z) w')
-    (h1 : ∀ l ∈ Λ', l ∈ Λ₁) (h2 : ∀ l ∈ Λ', (ζ : K) * l ∈ Λ₂) (hζ : ∀ z ∈ Om, (ζ : K) * z ∈ Om)
-    : LatInv Λ' Om (amp R ψ m γ h h' t₁ ζ) := by
+    (hLC1 : ∀ z z' : Kˣ, (z : K) ∈ Om → (z' : K) - (z : K) ∈ Λ₁ → ∀ w' : Point K,
+      Kp R ψ (addBlock h (m + 1) z') w' = Kp R ψ (addBlock h (m + 1) z) w')
+    (hLC2 : ∀ z z' : Kˣ, (z : K) ∈ Om → (z' : K) - (z : K) ∈ Λ₂ → ∀ w' : Point K,
+      Kp R ψ (addBlock h' (m + 1) z') w' = Kp R ψ (addBlock h' (m + 1) z) w')
+    (h1 : ∀ l ∈ Λ', l ∈ Λ₁) (h2 : ∀ l ∈ Λ', (ζ : K) * l ∈ Λ₂)
+    (hζ : ∀ z ∈ Om, (ζ : K) * z ∈ Om) :
+    LatInv Λ' Om (amp R ψ m γ h h' t₁ ζ) := by
   intro z hz l hl
   obtain ⟨u, rfl⟩ := hOmU z hz
   obtain ⟨hu', hmod, hE⟩ := hML _ hz l hl
   obtain ⟨u', hu'⟩ := hu'
   rw [← hu', amp_unit, amp_unit, hu', hmod]
   rw [Ring.inverse_unit] at hE
-  obtain ⟨b, hb⟩ :=
-    hsq (u' * u⁻¹) (by
-      rw [Units.val_mul, hu', add_mul, Units.mul_inv, add_sub_cancel_left]
-      exact hE)
+  obtain ⟨b, hb⟩ := hsq (u' * u⁻¹) (by
+    rw [Units.val_mul, hu', add_mul, Units.mul_inv, add_sub_cancel_left]
+    exact hE)
   have hub : u' = u * b ^ 2 := by rw [← hb]; simp
-  have e1 : γ (u' * t₁) = γ (u * t₁) := by rw [hub, mul_right_comm, hγ2]
-  have e2 : γ (ζ * u' * t₁) = γ (ζ * u * t₁) := by rw [hub, ← mul_assoc, mul_right_comm, hγ2]
-  have e3
-      : Kp R ψ (addBlock h (m + 1) u') (addBlock h' (m + 1) (ζ * u'))
-        = Kp R ψ (addBlock h (m + 1) u) (addBlock h' (m + 1) (ζ * u)) := by
+  have e1 : γ (u' * t₁) = γ (u * t₁) := by
+    rw [hub, mul_right_comm, hγ2]
+  have e2 : γ (ζ * u' * t₁) = γ (ζ * u * t₁) := by
+    rw [hub, ← mul_assoc, mul_right_comm, hγ2]
+  have e3 : Kp R ψ (addBlock h (m + 1) u') (addBlock h' (m + 1) (ζ * u')) =
+      Kp R ψ (addBlock h (m + 1) u) (addBlock h' (m + 1) (ζ * u)) := by
     rw [hLC1 u u' hz (by rw [hu', add_sub_cancel_left]; exact h1 l hl), hherm,
       hLC2 (ζ * u) (ζ * u') (by rw [Units.val_mul]; exact hζ _ hz) (by
         rw [Units.val_mul, Units.val_mul, hu', mul_add, add_sub_cancel_left]
-        exact h2 l hl),
-      ← hherm]
+        exact h2 l hl), ← hherm]
   rw [e1, e2, e3]
 
-theorem intLat_smul
-    (Λ : AddSubgroup K) (Om : Set K) (F G : K → ℂ) (c : ℂ) (hF : ∀ z ∈ Om, F z = c * G z)
-    : intLat R Λ Om F = c * intLat R Λ Om G := by
+theorem intLat_smul (Λ : AddSubgroup K) (Om : Set K) (F G : K → ℂ) (c : ℂ)
+    (hF : ∀ z ∈ Om, F z = c * G z) : intLat R Λ Om F = c * intLat R Λ Om G := by
   unfold intLat
   rw [mul_left_comm]
   congr 1
@@ -352,73 +373,56 @@ section Core
 
 variable {K : Type} [CommRing K] (R : Subring K) (ψ : AddChar K ℂ) (m : ℕ) (γ : Kˣ → ℂ)
 
-theorem back
-    {cr : K ⧸ R.toAddSubgroup → Kˣ} {S : Set K}
-    (t₁ : Kˣ)
+theorem back {cr : K ⧸ R.toAddSubgroup → Kˣ} {S : Set K} (t₁ : Kˣ)
     (hSfin : {x | (cr x : K) ∈ S}.Finite) (hroots : ∀ D : Kˣ, {z : Kˣ | z ^ (m + 1) = D}.Finite)
     {i1 : DecidablePred fun x => (cr x : K) ∈ S}
-    {i2 : ∀ x, DecidablePred fun z : Kˣ => z ^ (m + 1) = (-t₁) ^ m * cr x}
-    (G : Kˣ → ℂ)
-    : ∑ᶠ x, (if (cr x : K) ∈ S then
-        ∑ᶠ z : Kˣ, (if z ^ (m + 1) = (-t₁) ^ m * cr x then G z else 0) else 0)
-      = ∑ x ∈ hSfin.toFinset, ∑ z ∈ (hroots ((-t₁) ^ m * cr x)).toFinset, G z := by
+    {i2 : ∀ x, DecidablePred fun z : Kˣ => z ^ (m + 1) = (-t₁) ^ m * cr x} (G : Kˣ → ℂ) :
+    ∑ᶠ x, (if (cr x : K) ∈ S then
+      ∑ᶠ z : Kˣ, (if z ^ (m + 1) = (-t₁) ^ m * cr x then G z else 0) else 0) =
+      ∑ x ∈ hSfin.toFinset, ∑ z ∈ (hroots ((-t₁) ^ m * cr x)).toFinset, G z := by
   rw [finsum_if hSfin]
   apply Finset.sum_congr rfl
   intro x _
   exact finsum_if (hroots _) G
 
 def f1 (h h' : Point K) (d : K) (z : K) : ℂ :=
-  (((modK R ((m + 1 : ℕ) : K))⁻¹ * (modK R z ^ m)⁻¹ : ℝ) : ℂ) * (NsK R ψ (m + 1) h h' z * ψ (z * d))
+  (((modK R ((m + 1 : ℕ) : K))⁻¹ * (modK R z ^ m)⁻¹ : ℝ) : ℂ) *
+    (NsK R ψ (m + 1) h h' z * ψ (z * d))
 
 open Classical in
-theorem core2
-    (hMM : MM R) (hun : ∀ x : K, conj (ψ x) = ψ (-x)) (hψR : ∀ r ∈ R, ψ r = 1)
-    (hs : IsUnit ((m + 1 : ℕ) : K)) (hγ1 : ∀ a, ‖γ a‖ = 1) (hγ2 : ∀ a b : Kˣ, γ (a * b ^ 2) = γ a)
-    (h h' : Point K)
-    (t₁ t₂ κ : Kˣ)
-    (cr : K ⧸ R.toAddSubgroup → Kˣ)
-    (S Om : Set K)
+theorem core2 (hMM : MM R) (hun : ∀ x : K, conj (ψ x) = ψ (-x)) (hψR : ∀ r ∈ R, ψ r = 1)
+    (hs : IsUnit ((m + 1 : ℕ) : K)) (hγ1 : ∀ a, ‖γ a‖ = 1)
+    (hγ2 : ∀ a b : Kˣ, γ (a * b ^ 2) = γ a)
+    (h h' : Point K) (t₁ t₂ κ : Kˣ) (cr : K ⧸ R.toAddSubgroup → Kˣ) (S Om : Set K)
     (μ : Finset Kˣ) (hμ : ∀ ζ : Kˣ, ζ ∈ μ ↔ ζ ^ (m + 1) = 1)
-    (hSfin : {x | (cr x : K) ∈ S}.Finite) (hroots : ∀ D : Kˣ, {z : Kˣ | z ^ (m + 1) = D}.Finite)
+    (hSfin : {x | (cr x : K) ∈ S}.Finite)
+    (hroots : ∀ D : Kˣ, {z : Kˣ | z ^ (m + 1) = D}.Finite)
     (hherm : ∀ w w' : Point K, Kp R ψ w' w = conj (Kp R ψ w w'))
-    (hG1 : ∀ x,
-      (cr x : K) ∈ S
-        → ∀ w',
-          Kp R ψ (pt2 h m t₁ (cr x)) w'
-            = germSum R ψ m γ t₁ (cr x) (fun z => Kp R ψ (addBlock h (m + 1) z) w'))
-    (hG2 : ∀ x,
-      (cr x : K) ∈ S
-        → ∀ w',
-          Kp R ψ (pt2 h' m t₂ (cr x)) w'
-            = germSum R ψ m γ t₂ (cr x) (fun z => Kp R ψ (addBlock h' (m + 1) z) w'))
-    (hκ : κ ^ (m + 1) = (t₂ * t₁⁻¹) ^ m) (hT : modK R (t₂ : K) = modK R (t₁ : K))
+    (hG1 : ∀ x, (cr x : K) ∈ S → ∀ w', Kp R ψ (pt2 h m t₁ (cr x)) w' =
+      germSum R ψ m γ t₁ (cr x) (fun z => Kp R ψ (addBlock h (m + 1) z) w'))
+    (hG2 : ∀ x, (cr x : K) ∈ S → ∀ w', Kp R ψ (pt2 h' m t₂ (cr x)) w' =
+      germSum R ψ m γ t₂ (cr x) (fun z => Kp R ψ (addBlock h' (m + 1) z) w'))
+    (hκ : κ ^ (m + 1) = (t₂ * t₁⁻¹) ^ m)
+    (hT : modK R (t₂ : K) = modK R (t₁ : K))
     (b : Kˣ) (hb : κ * t₂ * t₁⁻¹ = b ^ 2)
     (hmem : ∀ x, (cr x : K) ∈ S → ∀ z : Kˣ, z ^ (m + 1) = (-t₁) ^ m * cr x → (z : K) ∈ Om)
     (hμOm : ∀ z ∈ Om, ∀ ζ ∈ μ, (ζ : K) * z ∈ Om)
-    (hLCκ : ∀ z : Kˣ,
-      (z : K) ∈ Om
-        → ∀ w', Kp R ψ (addBlock h' (m + 1) (κ * z)) w' = Kp R ψ (addBlock h' (m + 1) z) w')
-    (d : K)
-    (hphase : ∀ z ∈ Om,
-      ((m + 1 : ℕ) : K) * z * ((t₁⁻¹ : Kˣ) : K)
-          - ((m + 1 : ℕ) : K) * ((κ : K) * z) * ((t₂⁻¹ : Kˣ) : K) - z * d
-        ∈ R)
-    (hX : ∀ ζ ∈ μ,
-      ζ ≠ 1
-        → ∑ᶠ x : K ⧸ R.toAddSubgroup, (if (cr x : K) ∈ S then
-            ∑ᶠ z : Kˣ, if z ^ (m + 1) = (-t₁) ^ m * cr x then
-              amp R ψ m γ h h' t₁ ζ (z : K) * ψ (((m + 1 : ℕ) : K) * (z : K) * ((t₁⁻¹ : Kˣ) : K) -
-                ((m + 1 : ℕ) : K) * ((ζ : K) * (κ : K) * (z : K)) * ((t₂⁻¹ : Kˣ) : K)) else 0
-            else 0)
-          = 0)
+    (hLCκ : ∀ z : Kˣ, (z : K) ∈ Om → ∀ w', Kp R ψ (addBlock h' (m + 1) (κ * z)) w' =
+      Kp R ψ (addBlock h' (m + 1) z) w')
+    (d : K) (hphase : ∀ z ∈ Om, ((m + 1 : ℕ) : K) * z * ((t₁⁻¹ : Kˣ) : K) -
+      ((m + 1 : ℕ) : K) * ((κ : K) * z) * ((t₂⁻¹ : Kˣ) : K) - z * d ∈ R)
+    (hX : ∀ ζ ∈ μ, ζ ≠ 1 → ∑ᶠ x : K ⧸ R.toAddSubgroup, (if (cr x : K) ∈ S then
+        ∑ᶠ z : Kˣ, if z ^ (m + 1) = (-t₁) ^ m * cr x then
+          amp R ψ m γ h h' t₁ ζ (z : K) * ψ (((m + 1 : ℕ) : K) * (z : K) * ((t₁⁻¹ : Kˣ) : K) -
+            ((m + 1 : ℕ) : K) * ((ζ : K) * (κ : K) * (z : K)) * ((t₂⁻¹ : Kˣ) : K)) else 0
+        else 0) = 0)
     (I : ℂ)
-    (hCV
-      : ∑ᶠ x : K ⧸ R.toAddSubgroup, (if (cr x : K) ∈ S then
-          ∑ᶠ z : Kˣ, if z ^ (m + 1) = (-t₁) ^ m * cr x then f1 R ψ m h h' d (z : K) else 0
-          else 0)
-        = (((modK R (t₁ : K) ^ m)⁻¹ * modK R ((m + 1 : ℕ) : K) : ℝ) : ℂ)
-          * ((((modK R ((m + 1 : ℕ) : K))⁻¹ : ℝ) : ℂ) * I))
-    : uGram R ψ m cr S h h' t₁ t₂ = I := by
+    (hCV : ∑ᶠ x : K ⧸ R.toAddSubgroup, (if (cr x : K) ∈ S then
+        ∑ᶠ z : Kˣ, if z ^ (m + 1) = (-t₁) ^ m * cr x then f1 R ψ m h h' d (z : K) else 0
+        else 0) =
+      (((modK R (t₁ : K) ^ m)⁻¹ * modK R ((m + 1 : ℕ) : K) : ℝ) : ℂ) *
+        ((((modK R ((m + 1 : ℕ) : K))⁻¹ : ℝ) : ℂ) * I)) :
+    uGram R ψ m cr S h h' t₁ t₂ = I := by
   have hS : 0 < modK R ((m + 1 : ℕ) : K) := by
     obtain ⟨u, hu⟩ := hs
     rw [← hu]
@@ -430,14 +434,12 @@ theorem core2
     rw [← mm_pow hMM, ← Units.val_pow_eq_pow_val, hκ, Units.val_pow_eq_pow_val, mm_pow hMM,
       Units.val_mul, (hMM _ _).2, mm_inv hMM, hT, mul_inv_cancel₀ hTp.ne', one_pow]
   rw [double_germ R ψ m γ h h' t₁ t₂ κ cr S μ hμ hSfin hroots hherm hG1 hG2 hκ]
-  have hterm
-      : ∀ ζ ∈ μ,
-        ∑ x ∈ hSfin.toFinset, ∑ z ∈ (hroots ((-t₁) ^ m * cr x)).toFinset,
-            germCoef R ψ m γ t₁ z * conj (germCoef R ψ m γ t₂ (ζ * κ * z)) *
-              Kp R ψ (addBlock h (m + 1) z) (addBlock h' (m + 1) (ζ * κ * z))
-          = ∑ x ∈ hSfin.toFinset, ∑ z ∈ (hroots ((-t₁) ^ m * cr x)).toFinset,
-              amp R ψ m γ h h' t₁ ζ (z : K) * ψ (((m + 1 : ℕ) : K) * (z : K) * ((t₁⁻¹ : Kˣ) : K) -
-                  ((m + 1 : ℕ) : K) * ((ζ : K) * (κ : K) * (z : K)) * ((t₂⁻¹ : Kˣ) : K)) := by
+  have hterm : ∀ ζ ∈ μ, ∑ x ∈ hSfin.toFinset, ∑ z ∈ (hroots ((-t₁) ^ m * cr x)).toFinset,
+        germCoef R ψ m γ t₁ z * conj (germCoef R ψ m γ t₂ (ζ * κ * z)) *
+          Kp R ψ (addBlock h (m + 1) z) (addBlock h' (m + 1) (ζ * κ * z)) =
+      ∑ x ∈ hSfin.toFinset, ∑ z ∈ (hroots ((-t₁) ^ m * cr x)).toFinset,
+        amp R ψ m γ h h' t₁ ζ (z : K) * ψ (((m + 1 : ℕ) : K) * (z : K) * ((t₁⁻¹ : Kˣ) : K) -
+            ((m + 1 : ℕ) : K) * ((ζ : K) * (κ : K) * (z : K)) * ((t₂⁻¹ : Kˣ) : K)) := by
     intro ζ hζ
     apply Finset.sum_congr rfl
     intro x hx
@@ -454,24 +456,21 @@ theorem core2
         have e' : ζ * z * t₁ * (κ * t₂ * t₁⁻¹) = ζ * κ * z * t₂ * (t₁ * t₁⁻¹) := by ac_rfl
         rw [e', mul_inv_cancel, mul_one]
       rw [e, hγ2]
-    have e2
-        : Kp R ψ (addBlock h (m + 1) z) (addBlock h' (m + 1) (ζ * κ * z))
-          = Kp R ψ (addBlock h (m + 1) z) (addBlock h' (m + 1) (ζ * z)) := by
+    have e2 : Kp R ψ (addBlock h (m + 1) z) (addBlock h' (m + 1) (ζ * κ * z)) =
+        Kp R ψ (addBlock h (m + 1) z) (addBlock h' (m + 1) (ζ * z)) := by
       rw [hherm, show ζ * κ * z = κ * (ζ * z) by ac_rfl,
         hLCκ (ζ * z) (by rw [Units.val_mul]; exact hμOm _ hzOm ζ hζ), ← hherm]
     rw [e1, e2]
     push_cast
     ring
-  rw [Finset.sum_congr rfl hterm,
-    Finset.sum_eq_single_of_mem 1 h1μ (fun ζ hζ hne => by
-      rw [← back R m t₁ hSfin hroots]
-      exact hX ζ hζ hne)]
-  have hdiag
-      : ∑ x ∈ hSfin.toFinset, ∑ z ∈ (hroots ((-t₁) ^ m * cr x)).toFinset,
-          amp R ψ m γ h h' t₁ 1 (z : K) * ψ (((m + 1 : ℕ) : K) * (z : K) * ((t₁⁻¹ : Kˣ) : K) -
-              ((m + 1 : ℕ) : K) * (((1 : Kˣ) : K) * (κ : K) * (z : K)) * ((t₂⁻¹ : Kˣ) : K))
-        = ∑ x ∈ hSfin.toFinset, ∑ z ∈ (hroots ((-t₁) ^ m * cr x)).toFinset,
-            f1 R ψ m h h' d (z : K) := by
+  rw [Finset.sum_congr rfl hterm, Finset.sum_eq_single_of_mem 1 h1μ (fun ζ hζ hne => by
+    rw [← back R m t₁ hSfin hroots]
+    exact hX ζ hζ hne)]
+  have hdiag : ∑ x ∈ hSfin.toFinset, ∑ z ∈ (hroots ((-t₁) ^ m * cr x)).toFinset,
+        amp R ψ m γ h h' t₁ 1 (z : K) * ψ (((m + 1 : ℕ) : K) * (z : K) * ((t₁⁻¹ : Kˣ) : K) -
+            ((m + 1 : ℕ) : K) * (((1 : Kˣ) : K) * (κ : K) * (z : K)) * ((t₂⁻¹ : Kˣ) : K)) =
+      ∑ x ∈ hSfin.toFinset, ∑ z ∈ (hroots ((-t₁) ^ m * cr x)).toFinset,
+        f1 R ψ m h h' d (z : K) := by
     apply Finset.sum_congr rfl
     intro x hx
     apply Finset.sum_congr rfl
@@ -482,21 +481,15 @@ theorem core2
     have e1 : γ (z * t₁) * conj (γ (z * t₁)) = 1 := by
       rw [Complex.mul_conj, Complex.normSq_eq_norm_sq, hγ1]
       simp
-    have e2
-        : ψ
-            (((m + 1 : ℕ) : K) * (z : K) * ((t₁⁻¹ : Kˣ) : K)
-              - ((m + 1 : ℕ) : K) * ((κ : K) * (z : K)) * ((t₂⁻¹ : Kˣ) : K))
-          = ψ ((z : K) * d) := by
+    have e2 : ψ (((m + 1 : ℕ) : K) * (z : K) * ((t₁⁻¹ : Kˣ) : K) -
+        ((m + 1 : ℕ) : K) * ((κ : K) * (z : K)) * ((t₂⁻¹ : Kˣ) : K)) = ψ ((z : K) * d) := by
       have e := hψR _ (hphase _ hzOm)
-      rw [← sub_add_cancel
-          (((m + 1 : ℕ) : K) * (z : K) * ((t₁⁻¹ : Kˣ) : K)
-            - ((m + 1 : ℕ) : K) * ((κ : K) * (z : K)) * ((t₂⁻¹ : Kˣ) : K))
-          ((z : K) * d),
+      rw [← sub_add_cancel (((m + 1 : ℕ) : K) * (z : K) * ((t₁⁻¹ : Kˣ) : K) -
+        ((m + 1 : ℕ) : K) * ((κ : K) * (z : K)) * ((t₂⁻¹ : Kˣ) : K)) ((z : K) * d),
         AddChar.map_add_eq_mul, e, one_mul]
-    have e3
-        : (((modK R ((m + 1 : ℕ) : K))⁻¹ * modK R (z : K) ^ (m ^ 2) : ℝ) : ℂ)
-          = (((modK R ((m + 1 : ℕ) : K))⁻¹ * (modK R (z : K) ^ m)⁻¹ : ℝ) : ℂ)
-            * ((modK R (z : K) ^ (m ^ 2 + m) : ℝ) : ℂ) := by
+    have e3 : (((modK R ((m + 1 : ℕ) : K))⁻¹ * modK R (z : K) ^ (m ^ 2) : ℝ) : ℂ) =
+        (((modK R ((m + 1 : ℕ) : K))⁻¹ * (modK R (z : K) ^ m)⁻¹ : ℝ) : ℂ) *
+          ((modK R (z : K) ^ (m ^ 2 + m) : ℝ) : ℂ) := by
       rw [← Complex.ofReal_mul]
       congr 1
       rw [pow_add]
@@ -504,11 +497,9 @@ theorem core2
     rw [e1, e2, f1, nsK_unit R ψ m hMM, e3]
     ring
   rw [hdiag, ← back R m t₁ hSfin hroots, hCV, (hMM t₁ t₂).2, hT]
-  have hP
-      : (modK R (t₁ : K) * modK R (t₁ : K)) ^ (m * (m + 1) / 2)
-          * (modK R (t₁ : K) ^ (-((m : ℝ) ^ 2) / 2) * modK R (t₁ : K) ^ (-((m : ℝ) ^ 2) / 2))
-          * ((modK R (t₁ : K) ^ m)⁻¹ * modK R ((m + 1 : ℕ) : K)) * (modK R ((m + 1 : ℕ) : K))⁻¹
-        = 1 := by
+  have hP : (modK R (t₁ : K) * modK R (t₁ : K)) ^ (m * (m + 1) / 2) *
+      (modK R (t₁ : K) ^ (-((m : ℝ) ^ 2) / 2) * modK R (t₁ : K) ^ (-((m : ℝ) ^ 2) / 2)) *
+      ((modK R (t₁ : K) ^ m)⁻¹ * modK R ((m + 1 : ℕ) : K)) * (modK R ((m + 1 : ℕ) : K))⁻¹ = 1 := by
     rw [tri_pow, neg_half_sq _ hTp, pow_add]
     field_simp
   have hP' := congrArg (fun r : ℝ => (r : ℂ)) hP
@@ -521,8 +512,8 @@ section Cut
 
 variable {K : Type} [CommRing K]
 
-theorem cut_Q (m : ℕ) (Om : Set K) (t c : Kˣ) (hc : (c : K) ∈ cutSet m Om t)
-    : (c : K) * (t : K) ^ m ∈ (fun z : K => (-1) ^ m * z ^ (m + 1)) '' Om := by
+theorem cut_Q (m : ℕ) (Om : Set K) (t c : Kˣ) (hc : (c : K) ∈ cutSet m Om t) :
+    (c : K) * (t : K) ^ m ∈ (fun z : K => (-1) ^ m * z ^ (m + 1)) '' Om := by
   obtain ⟨z, hz, hzc⟩ := hc
   refine ⟨z, hz, ?_⟩
   simp only
@@ -530,11 +521,8 @@ theorem cut_Q (m : ℕ) (Om : Set K) (t c : Kˣ) (hc : (c : K) ∈ cutSet m Om t
   have h1 : ((-1 : K) ^ m) * ((-1) ^ m) = 1 := by rw [← mul_pow]; simp
   linear_combination ((t : K) ^ m * c) * h1
 
-theorem cut_mem
-    [TopologicalSpace K]
-    (m : ℕ) (Om : Set K) (hOm : IsOmega (m + 1) Om)
-    (t c z : Kˣ) (hc : (c : K) ∈ cutSet m Om t) (hz : z ^ (m + 1) = (-t) ^ m * c)
-    : (z : K) ∈ Om := by
+theorem cut_mem [TopologicalSpace K] (m : ℕ) (Om : Set K) (hOm : IsOmega (m + 1) Om) (t c z : Kˣ)
+    (hc : (c : K) ∈ cutSet m Om t) (hz : z ^ (m + 1) = (-t) ^ m * c) : (z : K) ∈ Om := by
   obtain ⟨z₀, hz₀, hzc⟩ := hc
   obtain ⟨u, rfl⟩ := hOm.2.2.1 z₀ hz₀
   have h1 : ((z * u⁻¹ : Kˣ) : K) ^ (m + 1) = 1 := by
@@ -545,8 +533,8 @@ theorem cut_mem
   have h3 := hOm.2.2.2 u hz₀ _ h1
   simpa using h3
 
-theorem shift_ratio (t t₁ t₂ : Kˣ) (σ σ' : K) (h1 : IsShift t t₁ σ) (h2 : IsShift t t₂ σ')
-    : ((t₂ * t₁⁻¹ : Kˣ) : K) = 1 + (σ - σ') * (t₂ : K) := by
+theorem shift_ratio (t t₁ t₂ : Kˣ) (σ σ' : K) (h1 : IsShift t t₁ σ) (h2 : IsShift t t₂ σ') :
+    ((t₂ * t₁⁻¹ : Kˣ) : K) = 1 + (σ - σ') * (t₂ : K) := by
   unfold IsShift at h1 h2
   have h3 : (t₂ : K) * ((t₂⁻¹ : Kˣ) : K) = 1 := Units.mul_inv t₂
   rw [Units.val_mul, h1]
@@ -601,11 +589,10 @@ theorem germIdentityOfSteps : Formalism.FourierDecayAlt.A6.GermIdentityAssemble 
   obtain ⟨Esq, hEsq, hsq⟩ := hSN K R ψ hD hn
   obtain ⟨ΛM, hΛM, hΛM'⟩ := hML K R ψ hD hn Om hOmc hOmU Esq hEsq
 
-  obtain ⟨Λ', hΛ'lat, hΛ'le, hΛ'M⟩ :=
-    exists_lat_le (F ×ˢ μ)
-      (fun p => (ΛL p.1).comap (AddMonoidHom.mulLeft (p.2 : K)))
-      (fun p _ => (hΛL p.1).1.preimage (continuous_const.mul continuous_id))
-      (lat_inf hΛ hΛM.1)
+  obtain ⟨Λ', hΛ'lat, hΛ'le, hΛ'M⟩ := exists_lat_le (F ×ˢ μ)
+    (fun p => (ΛL p.1).comap (AddMonoidHom.mulLeft (p.2 : K)))
+    (fun p _ => (hΛL p.1).1.preimage (continuous_const.mul continuous_id))
+    (lat_inf hΛ hΛM.1)
   have hΛ'Λ : Λ' ≤ Λ := hΛ'le.trans inf_le_left
   have hΛ'ΛM : Λ' ≤ ΛM := hΛ'le.trans inf_le_right
   have hΛ'ζ : ∀ h ∈ F, ∀ ζ ∈ μ, ∀ l ∈ Λ', (ζ : K) * l ∈ ΛL h := by
@@ -616,35 +603,26 @@ theorem germIdentityOfSteps : Formalism.FourierDecayAlt.A6.GermIdentityAssemble 
     have h1 := hΛ'ζ h hh 1 h1μ l hl
     rwa [Units.val_one, one_mul] at h1
   have hst : ∀ z ∈ Om, ∀ l ∈ Λ', z + l ∈ Om := fun z hz l hl => hOmΛ z hz l (hΛ'Λ hl)
-  have hML'
-      : ∀ z ∈ Om, ∀ l ∈ Λ', IsUnit (z + l) ∧ modK R (z + l) = modK R z ∧ l * Ring.inverse z ∈ Esq :=
-    fun z hz l hl => hΛM' z hz l (hΛ'ΛM hl)
-  obtain ⟨VCV, hVCV, hCV'⟩ :=
-    hCV K R ψ hD hn m hm Om Λ' hOm hΛ'lat hst (fun z hz l hl => (hML' z hz l hl).2.1)
+  have hML' : ∀ z ∈ Om, ∀ l ∈ Λ', IsUnit (z + l) ∧ modK R (z + l) = modK R z ∧
+      l * Ring.inverse z ∈ Esq := fun z hz l hl => hΛM' z hz l (hΛ'ΛM hl)
+  obtain ⟨VCV, hVCV, hCV'⟩ := hCV K R ψ hD hn m hm Om Λ' hOm hΛ'lat hst
+    (fun z hz l hl => (hML' z hz l hl).2.1)
   choose EX hEX VX hVX hXX using fun (ζ : Kˣ) (h1 : ζ ^ (m + 1) = 1) (h2 : ζ ≠ 1) =>
     hXV K R ψ hD hn m hm Om Λ' Sg ζ hOm hΛ'lat hst h1 h2
-  obtain ⟨EXs, hEXs, hEXs'⟩
-      : ∃ E ∈ 𝓝 (0 : K), ∀ x ∈ E, ∀ (ζ : Kˣ) (h1 : ζ ^ (m + 1) = 1) (h2 : ζ ≠ 1),
-        x ∈ EX ζ h1 h2 := by
-    refine ⟨
-      ⋂ ζ ∈ μ, (if hh : ζ ^ (m + 1) = 1 ∧ ζ ≠ 1 then EX ζ hh.1 hh.2 else Set.univ),
-      (Filter.biInter_finset_mem μ).2 (fun ζ _ => ?_),
-      ?_
-    ⟩
+  obtain ⟨EXs, hEXs, hEXs'⟩ : ∃ E ∈ 𝓝 (0 : K), ∀ x ∈ E, ∀ (ζ : Kˣ) (h1 : ζ ^ (m + 1) = 1)
+      (h2 : ζ ≠ 1), x ∈ EX ζ h1 h2 := by
+    refine ⟨⋂ ζ ∈ μ, (if hh : ζ ^ (m + 1) = 1 ∧ ζ ≠ 1 then EX ζ hh.1 hh.2 else Set.univ),
+      (Filter.biInter_finset_mem μ).2 (fun ζ _ => ?_), ?_⟩
     · split_ifs with hh
       · exact hEX ζ hh.1 hh.2
       · exact Filter.univ_mem
     · intro x hx ζ h1 h2
       have h3 := Set.mem_iInter₂.1 hx ζ ((hμ ζ).2 h1)
       rwa [dite_eq_left ⟨h1, h2⟩] at h3
-  obtain ⟨VXs, hVXs, hVXs'⟩
-      : ∃ E ∈ 𝓝 (0 : K), ∀ x ∈ E, ∀ (ζ : Kˣ) (h1 : ζ ^ (m + 1) = 1) (h2 : ζ ≠ 1),
-        x ∈ VX ζ h1 h2 := by
-    refine ⟨
-      ⋂ ζ ∈ μ, (if hh : ζ ^ (m + 1) = 1 ∧ ζ ≠ 1 then VX ζ hh.1 hh.2 else Set.univ),
-      (Filter.biInter_finset_mem μ).2 (fun ζ _ => ?_),
-      ?_
-    ⟩
+  obtain ⟨VXs, hVXs, hVXs'⟩ : ∃ E ∈ 𝓝 (0 : K), ∀ x ∈ E, ∀ (ζ : Kˣ) (h1 : ζ ^ (m + 1) = 1)
+      (h2 : ζ ≠ 1), x ∈ VX ζ h1 h2 := by
+    refine ⟨⋂ ζ ∈ μ, (if hh : ζ ^ (m + 1) = 1 ∧ ζ ≠ 1 then VX ζ hh.1 hh.2 else Set.univ),
+      (Filter.biInter_finset_mem μ).2 (fun ζ _ => ?_), ?_⟩
     · split_ifs with hh
       · exact hVX ζ hh.1 hh.2
       · exact Filter.univ_mem
@@ -654,36 +632,28 @@ theorem germIdentityOfSteps : Formalism.FourierDecayAlt.A6.GermIdentityAssemble 
   obtain ⟨EP, hEP, VP, hVP, hP⟩ := hPD K R ψ hD hn m Om Sg hOmc
   obtain ⟨ELC, hELC, hELC'⟩ := compact_mul_small hOmc (hΛ'lat.1.mem_nhds Λ'.zero_mem)
 
-  obtain ⟨E1, hE1, W1, hW1, hEW⟩
-      : ∃ E1 ∈ 𝓝 (0 : K), ∃ W1 ∈ 𝓝 (0 : K), ∀ a ∈ E1, ∀ b ∈ W1, a * (1 + b) + b ∈ Esq := by
+  obtain ⟨E1, hE1, W1, hW1, hEW⟩ : ∃ E1 ∈ 𝓝 (0 : K), ∃ W1 ∈ 𝓝 (0 : K), ∀ a ∈ E1, ∀ b ∈ W1,
+      a * (1 + b) + b ∈ Esq := by
     have hc : Continuous (fun p : K × K => p.1 * (1 + p.2) + p.2) := by fun_prop
-    have ht
-        : Tendsto (fun p : K × K => p.1 * (1 + p.2) + p.2) (𝓝 ((0 : K), (0 : K))) (𝓝 (0 : K)) := by
+    have ht : Tendsto (fun p : K × K => p.1 * (1 + p.2) + p.2) (𝓝 ((0 : K), (0 : K)))
+        (𝓝 (0 : K)) := by
       simpa using hc.tendsto ((0 : K), (0 : K))
     have h1 := ht hEsq
     rw [nhds_prod_eq] at h1
     obtain ⟨E1, hE1, W1, hW1, hsub⟩ := Filter.mem_prod_iff.1 h1
     exact ⟨E1, hE1, W1, hW1, fun a ha b hb => hsub (show ((a, b) : K × K) ∈ E1 ×ˢ W1 from ⟨ha, hb⟩)⟩
-  obtain ⟨W2, hW2, hW2'⟩ :=
-    compact_mul_small (C := (((Sg ×ˢ Sg).image (fun p : K × K => p.1 - p.2) : Finset K) : Set K))
-      (Finset.finite_toSet _).isCompact hW1
-  obtain ⟨VR, hVR, hR⟩ :=
-    hRC K R ψ hD hn m Sg (EP ∩ ELC ∩ E1 ∩ EXs)
-      (Filter.inter_mem (Filter.inter_mem (Filter.inter_mem hEP hELC) hE1) hEXs)
-  obtain ⟨VS, hVS, hS⟩ :=
-    hSS K R ψ hD hn Sg ((⋂ h ∈ F, VG h) ∩ VCV ∩ W2)
-      (Filter.inter_mem (Filter.inter_mem ((Filter.biInter_finset_mem F).2 fun h _ => hVG h) hVCV)
-        hW2)
+  obtain ⟨W2, hW2, hW2'⟩ := compact_mul_small
+    (C := (((Sg ×ˢ Sg).image (fun p : K × K => p.1 - p.2) : Finset K) : Set K))
+    (Finset.finite_toSet _).isCompact hW1
+  obtain ⟨VR, hVR, hR⟩ := hRC K R ψ hD hn m Sg (EP ∩ ELC ∩ E1 ∩ EXs)
+    (Filter.inter_mem (Filter.inter_mem (Filter.inter_mem hEP hELC) hE1) hEXs)
+  obtain ⟨VS, hVS, hS⟩ := hSS K R ψ hD hn Sg ((⋂ h ∈ F, VG h) ∩ VCV ∩ W2)
+    (Filter.inter_mem (Filter.inter_mem ((Filter.biInter_finset_mem F).2 fun h _ => hVG h) hVCV)
+      hW2)
   obtain ⟨VU, hVU, hU⟩ := hSU K R ψ hD hn Sg
   obtain ⟨VC, hVC, hC⟩ := hCS K R ψ hD hn m hm Om Sg hOm
-  refine ⟨
-    VS ∩ VU ∩ VC ∩ VR ∩ VP ∩ VXs,
-    Filter.inter_mem
-      (Filter.inter_mem (Filter.inter_mem (Filter.inter_mem (Filter.inter_mem hVS hVU) hVC) hVR)
-        hVP)
-      hVXs,
-    ?_
-  ⟩
+  refine ⟨VS ∩ VU ∩ VC ∩ VR ∩ VP ∩ VXs, Filter.inter_mem (Filter.inter_mem (Filter.inter_mem
+    (Filter.inter_mem (Filter.inter_mem hVS hVU) hVC) hVR) hVP) hVXs, ?_⟩
   rintro t t₁ t₂ cr ⟨⟨⟨⟨⟨htS, htU⟩, htC⟩, htR⟩, htP⟩, htX⟩ hcr σ hσ σ' hσ' hsh1 hsh2 h hh h' hh'
   obtain ⟨κ, hκ, ⟨⟨⟨hκP, hκLC⟩, hκ1⟩, hκX⟩⟩ := hR t t₁ t₂ htR σ hσ σ' hσ' hsh1 hsh2
   obtain ⟨⟨ht1G, ht1CV⟩, -⟩ := hS t t₁ htS σ hσ hsh1
@@ -697,23 +667,17 @@ theorem germIdentityOfSteps : Formalism.FourierDecayAlt.A6.GermIdentityAssemble 
     have h1 := (hU t htU τ hτ).2
     rw [← hsh, mm_inv hMM, mm_inv hMM] at h1
     exact inv_injective h1
-  obtain ⟨b, hb⟩ :=
-    hsq (κ * t₂ * t₁⁻¹) (by
-      have h1 :=
-        hEW _ hκ1 _
-          (hW2' (σ - σ')
-            (by
-              rw [Finset.mem_coe, Finset.mem_image]
-              exact ⟨(σ, σ'), Finset.mem_product.2 ⟨hσ, hσ'⟩, rfl⟩)
-            _ ht2W)
-      have h2 := shift_ratio t t₁ t₂ σ σ' hsh1 hsh2
-      have h3
-          : ((κ * t₂ * t₁⁻¹ : Kˣ) : K) - 1
-            = ((κ : K) - 1) * (1 + (σ - σ') * (t₂ : K)) + (σ - σ') * (t₂ : K) := by
-        rw [mul_assoc, Units.val_mul, h2]
-        ring
-      rw [h3]
-      exact h1)
+  obtain ⟨b, hb⟩ := hsq (κ * t₂ * t₁⁻¹) (by
+    have h1 := hEW _ hκ1 _ (hW2' (σ - σ') (by
+      rw [Finset.mem_coe, Finset.mem_image]
+      exact ⟨(σ, σ'), Finset.mem_product.2 ⟨hσ, hσ'⟩, rfl⟩) _ ht2W)
+    have h2 := shift_ratio t t₁ t₂ σ σ' hsh1 hsh2
+    have h3 : ((κ * t₂ * t₁⁻¹ : Kˣ) : K) - 1 =
+        ((κ : K) - 1) * (1 + (σ - σ') * (t₂ : K)) + (σ - σ') * (t₂ : K) := by
+      rw [mul_assoc, Units.val_mul, h2]
+      ring
+    rw [h3]
+    exact h1)
   have hGinv : LatInv Λ Om (fun z => NsK R ψ (m + 1) h h' z * ψ (z * (σ - σ'))) := by
     intro z hz l hl
     simp only

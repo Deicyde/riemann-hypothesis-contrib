@@ -1,28 +1,59 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.NormOneAtOne
 public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.SelfDualSplitComponentIsLatticeStabilizerEq
 public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.AdelicPointComponentsAtPlacesLatticesVacua
+public import Development.AbelianVarietyTheory.Definitions.LatticeFrames.LineLatAt
 public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.FractionalIdealCompletionLocallyPrincipal
 public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.TmulOneMemIntAt
-public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.UnitIdealCompletionAtPlaceEqIntegralAdelesAtPlac
-public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.MemSpanSingletonMulIdealCompletionIff
+import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.UnitIdealCompletionAtPlaceEqIntegralAdelesAtPlac
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Development.AbelianVarietyTheory.Definitions.LatticeFrames.ThetaIdentityOfMapsAll
+import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.NormOneAtOne
+import Formalism.LocalToGlobal.IndefiniteReal.AutomorphicEvaluation
+import Formalism.LocalToGlobal.SiegelLatticeTheory.FlagStabilizerTensors.RowDict
+import Formalism.LocalToGlobal.SiegelLatticeTheory.FlagStabilizerTensors.RowsJoinPinned
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.S
-  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes MeasureTheory IsDedekindDomain
-  NumberField Matrix Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Links
-  Formalism.IndefR.Lev Formalism.IndefR.Mult Formalism.IndefR.Datum
-  Formalism.IndefR.AutomorphicEvaluation Formalism.L2.SG.HidaSetting
-  Formalism.L2.SG.PoincareInHH.PoincareSetting Formalism.L2.SG.RowDict
-  Formalism.L2.SG.RowsJoinPinned GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Unf
-  GlobalTheory.Core.Rk GlobalTheory.Core.Mi
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.S Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes MeasureTheory IsDedekindDomain NumberField Matrix Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Lev Formalism.IndefR.Mult Formalism.IndefR.Datum Formalism.IndefR.AutomorphicEvaluation Formalism.L2.SG.HidaSetting Formalism.L2.SG.PoincareInHH.PoincareSetting Formalism.L2.SG.RowDict Formalism.L2.SG.RowsJoinPinned GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Unf GlobalTheory.Core.Rk GlobalTheory.Core.Mi
 open scoped TensorProduct InnerProductSpace Classical
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
-open GlobalTheory.FinPl
-  (latV Moves MonoAt OrthAt PrimAt idAt intAt grpAt colMul Lat SplitPt GoodBF GluedCore IsSumFrame)
+open GlobalTheory.FinPl (latV Moves MonoAt OrthAt PrimAt idAt intAt grpAt colMul Lat SplitPt GoodBF GluedCore IsSumFrame)
 open GlobalTheory.SeeSaw (idV dI FI)
 open ValuativeRel
 open GlobalTheory.Core.Mi.LatMatch
@@ -35,11 +66,8 @@ open GlobalTheory.FinPl.FrameLat GlobalTheory.SeeSaw.IdVMul
 
 variable {D : D7}
 
-theorem mul_idV_int
-    {𝔠 : FI D} {v : GlobalTheory.FinPl.Pl D} {a : AE D}
-    (h : ∀ c ∈ 𝔠, incA D c * a ∈ intAt D (· = v))
-    {y : AE D} (hy : y ∈ idV 𝔠 v)
-    : y * a ∈ intAt D (· = v) := by
+theorem mul_idV_int {𝔠 : FI D} {v : GlobalTheory.FinPl.Pl D} {a : AE D}
+    (h : ∀ c ∈ 𝔠, incA D c * a ∈ intAt D (· = v)) {y : AE D} (hy : y ∈ idV 𝔠 v) : y * a ∈ intAt D (· = v) := by
   induction hy using AddSubgroup.closure_induction with
   | mem y hy =>
     obtain ⟨α, hα, h0, c, hc, rfl⟩ := hy
@@ -51,11 +79,8 @@ theorem mul_idV_int
   | add x y _ _ hx hy => rw [add_mul]; exact intAt_add hx hy
   | neg x _ hx => rw [neg_mul]; exact intAt_neg hx
 
-theorem mem_idV_inv
-    {𝔠 : FI D} (h𝔠 : 𝔠 ≠ 0)
-    {v : GlobalTheory.FinPl.Pl D} {a : AE D}
-    (ha : a ∈ idAt D (· = v)) (h : ∀ c ∈ 𝔠, incA D c * a ∈ intAt D (· = v))
-    : a ∈ idV 𝔠⁻¹ v := by
+theorem mem_idV_inv {𝔠 : FI D} (h𝔠 : 𝔠 ≠ 0) {v : GlobalTheory.FinPl.Pl D} {a : AE D} (ha : a ∈ idAt D (· = v))
+    (h : ∀ c ∈ 𝔠, incA D c * a ∈ intAt D (· = v)) : a ∈ idV 𝔠⁻¹ v := by
   obtain ⟨b, hb0, hb⟩ := GlobalTheory.IdVGen.idV_gen D v 𝔠⁻¹ (inv_ne_zero h𝔠)
   obtain ⟨c, hc0, hc⟩ := GlobalTheory.IdVGen.idV_gen D v 𝔠 h𝔠
   have hm := idV_mul_gen D v 𝔠⁻¹ 𝔠 b c hb0 hc0 hb hc (GlobalTheory.FinPlLoc.idem D (· = v))
@@ -69,18 +94,16 @@ theorem mem_idV_inv
   rw [mul_assoc, (GlobalTheory.FinPlLoc.mem_idAt_iff _ a).1 ha] at h4
   exact (hb a).2 ⟨h4, ha⟩
 
-theorem pairing_smul_ratV (S : HSp D) (s x : Fin S.rank → D.host.E) (a : AE D)
-    : pairing S s (a • ratV x) = incA D (∑ b, row S s b * x b) * a := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [pairing, ratV, Pi.smul_apply, smul_eq_mul, map_sum, map_mul, Finset.sum_mul]
+theorem pairing_smul_ratV (S : HSp D) (s x : Fin S.rank → D.host.E) (a : AE D) :
+    pairing S s (a • ratV x) = incA D (∑ b, row S s b * x b) * a := by
+
+  simp only [pairing, ratV, Pi.smul_apply, smul_eq_mul, map_sum, map_mul, Finset.sum_mul]
   exact Finset.sum_congr rfl fun b _ => by ring
 
 theorem incA_inj : Function.Injective (incA D) := GlobalTheory.MixModel.incA_injective
 
-theorem smul_mem_latV
-    {S : HSp D} {L : Lat S} {x : Fin S.rank → D.host.E} {𝔞 : FI D} (h : ∀ t ∈ 𝔞, t • x ∈ L)
-    {v : GlobalTheory.FinPl.Pl D} {a : AE D} (ha : a ∈ idV 𝔞 v)
-    : a • ratV x ∈ latV S L (· = v) := by
+theorem smul_mem_latV {S : HSp D} {L : Lat S} {x : Fin S.rank → D.host.E} {𝔞 : FI D} (h : ∀ t ∈ 𝔞, t • x ∈ L)
+    {v : GlobalTheory.FinPl.Pl D} {a : AE D} (ha : a ∈ idV 𝔞 v) : a • ratV x ∈ latV S L (· = v) := by
   induction ha using AddSubgroup.closure_induction with
   | mem y hy =>
     obtain ⟨α, hα, h0, t, ht, rfl⟩ := hy
@@ -96,13 +119,7 @@ theorem smul_mem_latV
   | add x y _ _ hx hy => rw [add_smul]; exact add_mem hx hy
   | neg x _ hx => rw [neg_smul]; exact neg_mem hx
 
-theorem line_trace
-    : ∀ (D : D7) (S : HSp D) (L : Lat S) (x : Fin S.rank → D.host.E),
-      IsSelfDualC S L → x ≠ 0
-        → ∃ 𝔞 : FI D,
-          𝔞 ≠ 0 ∧ (∀ t : D.host.E, t • x ∈ L ↔ t ∈ 𝔞)
-            ∧ ∀ v : GlobalTheory.FinPl.Pl D, ∀ a ∈ idAt D (· = v),
-              a • ratV x ∈ latV S L (· = v) ↔ a ∈ idV 𝔞 v := by
+theorem line_trace : ∀ (D : D7) (S : HSp D) (L : Lat S) (x : Fin S.rank → D.host.E), IsSelfDualC S L → x ≠ 0 → ∃ 𝔞 : FI D, 𝔞 ≠ 0 ∧ (∀ t : D.host.E, t • x ∈ L ↔ t ∈ 𝔞) ∧ ∀ v : GlobalTheory.FinPl.Pl D, ∀ a ∈ idAt D (· = v), a • ratV x ∈ latV S L (· = v) ↔ a ∈ idV 𝔞 v := by
   intro D S L x hL hx
   obtain ⟨m, s, s', hs, hs', hexp⟩ := exists_expansion hL
   set c : Fin m → D.host.E := fun l => ∑ b, row S (s' l) b * x b with hc
@@ -111,14 +128,13 @@ theorem line_trace
     apply incA_inj (D := D)
     have := hexp ((1 : AE D) • ratV x) i
     simp only [pairing_smul_ratV, mul_one] at this
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     simpa only [one_smul, ratV, map_mul] using this
   set 𝔠 : FI D := FractionalIdeal.spanFinset (𝓞 D.host.E) Finset.univ c with h𝔠def
   have hmem : ∀ y, y ∈ 𝔠 ↔ y ∈ Submodule.span (𝓞 D.host.E) (Set.range c) := by
     intro y
-    rw [← FractionalIdeal.mem_coe, h𝔠def, FractionalIdeal.spanFinset_coe, Finset.coe_univ,
-      Set.image_univ]
+    rw [← FractionalIdeal.mem_coe, h𝔠def, FractionalIdeal.spanFinset_coe, Finset.coe_univ, Set.image_univ]
   have h𝔠 : 𝔠 ≠ 0 := by
     intro h0
     apply hx
@@ -142,8 +158,7 @@ theorem line_trace
         rw [FractionalIdeal.mem_coe, FractionalIdeal.mem_one_iff]
         refine ⟨o, ho.trans ?_⟩
         rw [Finset.sum_comm]
-        simp only [hc, GlobalTheory.FinPl.FrameLat.row, Pi.smul_apply, smul_eq_mul, Finset.mul_sum,
-          Finset.sum_mul]
+        simp only [hc, GlobalTheory.FinPl.FrameLat.row, Pi.smul_apply, smul_eq_mul, Finset.mul_sum, Finset.sum_mul]
         exact Finset.sum_congr rfl fun _ _ => Finset.sum_congr rfl fun _ _ => by ring
       | zero => rw [mul_zero]; exact zero_mem _
       | add y z _ _ hy hz => rw [mul_add]; exact add_mem hy hz
@@ -159,12 +174,7 @@ theorem line_trace
         rw [Pi.smul_apply, Algebra.smul_def, ho, mul_assoc]
       rw [this]
       exact Submodule.sum_mem _ fun l _ => L.smul_mem _ (hs l)
-  refine ⟨
-    𝔠⁻¹,
-    inv_ne_zero h𝔠,
-    hglob,
-    fun v a ha => ⟨fun h => ?_, smul_mem_latV fun t ht => (hglob t).2 ht⟩
-  ⟩
+  refine ⟨𝔠⁻¹, inv_ne_zero h𝔠, hglob, fun v a ha => ⟨fun h => ?_, smul_mem_latV fun t ht => (hglob t).2 ht⟩⟩
   refine mem_idV_inv h𝔠 ha fun y hy => ?_
   rw [hmem] at hy
   induction hy using Submodule.span_induction with
@@ -173,23 +183,16 @@ theorem line_trace
     refine ⟨Ideal.mul_mem_left _ _ ha, ?_⟩
     have := pairing_int hL (hs' l) h
     rwa [pairing_smul_ratV] at this
-  | zero =>
-    rw [map_zero, zero_mul]; exact intAt_zero
-  | add y z _ _ hy hz =>
-    rw [map_add (f := _), add_mul]; exact intAt_add hy hz
+  | zero => rw [map_zero, zero_mul]; exact intAt_zero
+  | add y z _ _ hy hz => rw [map_add (f := _), add_mul]; exact intAt_add hy hz
   | smul o y hy' hy =>
-    have h1 :=
-      GlobalTheory.IdVGen.gen_mem_intAt (v := v) (GlobalTheory.FinPlLoc.ePl_int (· = v))
-        (fun w hw => by rw [GlobalTheory.FinPlLoc.evalV_ePl, if_neg hw])
-        o
-    have e :=
-      incA_mul_tmul (D := D) (algebraMap (𝓞 D.host.E) D.host.E o)
-        (pairA D.host.F 0 (GlobalTheory.FinPlLoc.ePl D (· = v))) 1
+    have h1 := GlobalTheory.IdVGen.gen_mem_intAt (v := v) (GlobalTheory.FinPlLoc.ePl_int (· = v))
+      (fun w hw => by rw [GlobalTheory.FinPlLoc.evalV_ePl, if_neg hw]) o
+    have e := incA_mul_tmul (D := D) (algebraMap (𝓞 D.host.E) D.host.E o) (pairA D.host.F 0 (GlobalTheory.FinPlLoc.ePl D (· = v))) 1
     rw [mul_one] at e
     have h2 := intAt_mul h1 hy
     rw [← e] at h2
-    have h3 : GlobalTheory.FinPlLoc.idem D (· = v) * a = a :=
-      (GlobalTheory.FinPlLoc.mem_idAt_iff _ a).1 ha
+    have h3 : GlobalTheory.FinPlLoc.idem D (· = v) * a = a := (GlobalTheory.FinPlLoc.mem_idAt_iff _ a).1 ha
     convert h2 using 1
     rw [Algebra.smul_def, map_mul]
     conv_lhs => rw [← h3]

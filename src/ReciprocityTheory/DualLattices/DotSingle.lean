@@ -1,8 +1,59 @@
 module
 
+public import ReciprocityTheory.DualLattices.CotangentSurjective
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Coalgebra.IsFrobenius
+import Mathlib.RingTheory.HopfAlgebra.Basic
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 public import ReciprocityTheory.DualLattices.BlockOneMulMulBlockOne
-public import ReciprocityTheory.DualLattices.ProdDvdOfIso
 public import ReciprocityTheory.DualLattices.ExistsSmulMemOfMemSpan
+public import ReciprocityTheory.DualLattices.ProdDvdOfIso
+import ReciprocityTheory.DualLattices.UpSmith
+public import Mathlib.LinearAlgebra.Matrix.NonsingularInverse
 
 @[expose] public section
 
@@ -14,11 +65,11 @@ namespace ReciprocityTheory.PGsh.Up.ED
 
 variable {C : Type} [Field C] {v : Valuation C NNReal} {R : Type} [CommRing R] [Algebra R C]
 
-theorem dot_single {ι : Type} [Fintype ι] [DecidableEq ι] (f : (ι → R) →ₗ[R] R) (x : ι → R)
-    : (fun k => f (Pi.single k 1)) ⬝ᵥ x = f x := by
+theorem dot_single {ι : Type} [Fintype ι] [DecidableEq ι] (f : (ι → R) →ₗ[R] R) (x : ι → R) :
+    (fun k => f (Pi.single k 1)) ⬝ᵥ x = f x := by
   conv_rhs => rw [← Finset.univ_sum_single x]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum, dotProduct]
+
+  rw [map_sum, dotProduct]
   refine Finset.sum_congr rfl fun k _ => ?_
   have hk : (Pi.single k (x k) : ι → R) = x k • (Pi.single k (1 : R) : ι → R) := by
     ext i
@@ -27,33 +78,26 @@ theorem dot_single {ι : Type} [Fintype ι] [DecidableEq ι] (f : (ι → R) →
     · simp [Pi.single_apply, hi]
   rw [hk, map_smul, smul_eq_mul, mul_comm]
 
-theorem eq_of_dot {ι : Type} [Fintype ι] [DecidableEq ι] {w w' : ι → R} (h : ∀ x, w ⬝ᵥ x = w' ⬝ᵥ x)
-    : w = w' := by
+theorem eq_of_dot {ι : Type} [Fintype ι] [DecidableEq ι] {w w' : ι → R}
+    (h : ∀ x, w ⬝ᵥ x = w' ⬝ᵥ x) : w = w' := by
   funext i
   simpa using h (Pi.single i 1)
 
-theorem block
-    (hv : v.Integers R)
-    {ι κ' : Type} [Fintype ι] [DecidableEq ι] [Fintype κ'] [DecidableEq κ']
-    (Φ : Matrix κ' ι R)
-    (ε : Matrix ι ι R) (hε : ε * ε = ε)
-    (Pq : Matrix κ' κ' R) (Qs : Submodule R (κ' → R))
-    (hPqmem : ∀ w, Pq *ᵥ w ∈ Qs) (hPqid : ∀ w ∈ Qs, Pq *ᵥ w = w)
-    (hcomm : Φ * ε = Pq * Φ)
+theorem block (hv : v.Integers R) {ι κ' : Type} [Fintype ι] [DecidableEq ι] [Fintype κ']
+    [DecidableEq κ'] (Φ : Matrix κ' ι R)
+    (ε : Matrix ι ι R) (hε : ε * ε = ε) (Pq : Matrix κ' κ' R) (Qs : Submodule R (κ' → R))
+    (hPqmem : ∀ w, Pq *ᵥ w ∈ Qs) (hPqid : ∀ w ∈ Qs, Pq *ᵥ w = w) (hcomm : Φ * ε = Pq * Φ)
     (n : ℕ) (hnT : Module.finrank R (LinearMap.range (Matrix.mulVecLin ε)) = n)
-    (hnQ : Module.finrank R Qs = n)
-    (X : NNReal)
-    (hX : HasLen v R
-      (Qs ⧸ ((LinearMap.range (Matrix.mulVecLin ε)).map (Matrix.mulVecLin Φ)).comap
-        Qs.subtype)
-      X)
-    (cp : R) (hcp : ∀ w : ι → R, w ᵥ* ε = w → ∃ u : κ' → R, cp • w = u ᵥ* (Φ * ε))
-    : ∃ (lam : Fin n → ι → R) (a : Fin n → R) (y : Fin n → ι → R),
-      (∀ j, lam j ᵥ* ε = lam j) ∧ (∀ l, ε *ᵥ y l = y l)
-        ∧ (∀ j l, lam j ⬝ᵥ y l = if j = l then 1 else 0) ∧ (∀ j, ∃ c, cp = a j * c)
-        ∧ ∏ j, v (algebraMap R C (a j)) = X
-        ∧ Submodule.span R (Set.range fun k => (Φ * ε) k)
-          = Submodule.span R (Set.range fun j => a j • lam j) := by
+    (hnQ : Module.finrank R Qs = n) (X : NNReal)
+    (hX : HasLen v R (Qs ⧸ ((LinearMap.range (Matrix.mulVecLin ε)).map (Matrix.mulVecLin Φ)).comap
+      Qs.subtype) X)
+    (cp : R) (hcp : ∀ w : ι → R, w ᵥ* ε = w → ∃ u : κ' → R, cp • w = u ᵥ* (Φ * ε)) :
+    ∃ (lam : Fin n → ι → R) (a : Fin n → R) (y : Fin n → ι → R),
+      (∀ j, lam j ᵥ* ε = lam j) ∧ (∀ l, ε *ᵥ y l = y l) ∧
+      (∀ j l, lam j ⬝ᵥ y l = if j = l then 1 else 0) ∧ (∀ j, ∃ c, cp = a j * c) ∧
+      ∏ j, v (algebraMap R C (a j)) = X ∧
+      Submodule.span R (Set.range fun k => (Φ * ε) k) =
+        Submodule.span R (Set.range fun j => a j • lam j) := by
   classical
   have : IsDomain R := hv.hom_inj.isDomain
   have := ValuationRing.of_integers v hv
@@ -67,8 +111,8 @@ theorem block
     apply Subtype.ext
     funext i
     have := congrFun (congrArg Subtype.val h) i
-    simp only [Submodule.coe_smul, Pi.smul_apply, smul_eq_mul, Submodule.coe_zero, Pi.zero_apply]
-      at this
+    simp only [Submodule.coe_smul, Pi.smul_apply, smul_eq_mul, Submodule.coe_zero,
+      Pi.zero_apply] at this
     exact (mul_eq_zero.1 this).resolve_left hr
   have : Module.Finite R T := Module.Finite.iff_fg.2 hTfg
   have : Module.Finite R Qs := Module.Finite.iff_fg.2 hQfg
@@ -102,8 +146,8 @@ theorem block
     intro t
     simp only [Module.Basis.equivFun_apply]
     rw [hM, LinearMap.toMatrix_mulVec_repr]
-  have hmapM
-      : (LinearMap.range Φi).map γ.equivFun.toLinearMap = LinearMap.range (Matrix.mulVecLin M) := by
+  have hmapM : (LinearMap.range Φi).map γ.equivFun.toLinearMap =
+      LinearMap.range (Matrix.mulVecLin M) := by
     ext z
     constructor
     · rintro ⟨_, ⟨t, rfl⟩, rfl⟩
@@ -115,13 +159,8 @@ theorem block
   have hLen : HasLen v R (Qs ⧸ ((T.map (Matrix.mulVecLin Φ)).comap Qs.subtype))
       (v (algebraMap R C M.det)) := by
     obtain ⟨m', c', ⟨f⟩, hf⟩ := Smith.hasLen_coker_det (C := C) (v := v) hv M
-    exact ⟨
-      m',
-      c',
-      ⟨((Submodule.quotEquivOfEq _ _ hrange).trans
-        (Submodule.Quotient.equiv _ _ γ.equivFun hmapM)).trans f⟩,
-      hf
-    ⟩
+    exact ⟨m', c', ⟨((Submodule.quotEquivOfEq _ _ hrange).trans
+      (Submodule.Quotient.equiv _ _ γ.equivFun hmapM)).trans f⟩, hf⟩
   have hXM : X = v (algebraMap R C M.det) := hasLen_unique hv hX hLen
 
   obtain ⟨P, Q', a, hP, hQ', hD⟩ := Smith.smith_mat hv n n Mᵀ
@@ -133,9 +172,9 @@ theorem block
     · have : (k : ℕ) ≠ (j : ℕ) := fun e => h (Fin.ext e.symm)
       simp [h, this]
   have hprod : ∏ j, v (algebraMap R C (a j)) = X := by
-    rw [hXM, ← map_prod, ← map_prod, ← Matrix.det_diagonal, ← hdiag, Matrix.det_mul, Matrix.det_mul,
-      Matrix.det_transpose, map_mul, map_mul, map_mul, map_mul, hv.one_of_isUnit hP,
-      hv.one_of_isUnit hQ', one_mul, mul_one]
+    rw [hXM, ← map_prod, ← map_prod, ← Matrix.det_diagonal, ← hdiag, Matrix.det_mul,
+      Matrix.det_mul, Matrix.det_transpose, map_mul, map_mul, map_mul, map_mul,
+      hv.one_of_isUnit hP, hv.one_of_isUnit hQ', one_mul, mul_one]
   set Pi' := P⁻¹ with hPi'
   have hPP : P * Pi' = 1 := Matrix.mul_nonsing_inv P hP
   have hPP' : Pi' * P = 1 := Matrix.nonsing_inv_mul P hP
@@ -165,7 +204,8 @@ theorem block
     rw [e, dot_single]
     simp [LinearMap.sum_apply]
   set y : Fin n → ι → R := fun l => ∑ m, P l m • (β m : ι → R) with hy
-  have hyT : ∀ l, y l ∈ T := fun l => Submodule.sum_mem _ fun m _ => Submodule.smul_mem _ _ (β m).2
+  have hyT : ∀ l, y l ∈ T := fun l =>
+    Submodule.sum_mem _ fun m _ => Submodule.smul_mem _ _ (β m).2
 
   have hdotε : ∀ (w : ι → R) x, (w ᵥ* ε) ⬝ᵥ x = w ⬝ᵥ (ε *ᵥ x) := fun w x =>
     (Matrix.dotProduct_mulVec w ε x).symm
@@ -180,9 +220,9 @@ theorem block
     rw [hlamdot]
     have e1 : ∀ l', ℓ l' (y l) = P l l' := by
       intro l'
-      set_option synthInstance.maxHeartbeats 100000 in
+
       simp only [hy, map_sum, map_smul, hℓβ, smul_eq_mul, mul_ite, mul_one, mul_zero,
-        Finset.sum_ite_eq', Finset.mem_univ, if_true]
+      Finset.sum_ite_eq', Finset.mem_univ, if_true]
     simp only [e1]
     have := congrFun (congrFun hPP l) j
     rw [Matrix.mul_apply, Matrix.one_apply] at this
@@ -191,21 +231,18 @@ theorem block
     rw [h2, ← this]
     exact Finset.sum_congr rfl fun _ _ => mul_comm _ _
 
-  let K : (ι → R) →ₗ[R] (Fin n → R) := {
-    toFun := fun w l => w ⬝ᵥ (β l : ι → R)
-    map_add' := fun w w' => by funext l; simp [add_dotProduct]
-    map_smul' := fun c w => by funext l; simp [smul_dotProduct]
-  }
+  let K : (ι → R) →ₗ[R] (Fin n → R) :=
+    { toFun := fun w l => w ⬝ᵥ (β l : ι → R)
+      map_add' := fun w w' => by funext l; simp [add_dotProduct]
+      map_smul' := fun c w => by funext l; simp [smul_dotProduct] }
   have hKapp : ∀ w l, K w l = w ⬝ᵥ (β l : ι → R) := fun _ _ => rfl
   have hKlam : ∀ j, K (lam j) = fun l => Pi' l j := by
-    intro j
-    funext l
+    intro j; funext l
     rw [hKapp, hlamdot]
     simp only [hℓβ, mul_ite, mul_one, mul_zero, Finset.sum_ite_eq, Finset.mem_univ, if_true]
   set cvec : κ' → Fin n → R := fun k m => (γ m : κ' → R) k with hcvec
   have hKrow : ∀ k, K ((Φ * ε) k) = Mᵀ *ᵥ cvec k := by
-    intro k
-    funext l
+    intro k; funext l
     rw [hKapp]
     have e1 : (Φ * ε) k ⬝ᵥ (β l : ι → R) = ((Φ * ε) *ᵥ (β l : ι → R)) k := rfl
     rw [e1, ← mulVec_mulVec, hεT _ (β l).2, ← hΦiapp]
@@ -219,8 +256,8 @@ theorem block
   set gs : Fin n → κ' → R := fun m k => γ.coord m ⟨Pq *ᵥ Pi.single k 1, hPqmem _⟩ with hgs
   have hgsc : ∀ m m', ∑ k, gs m k * cvec k m' = if m' = m then 1 else 0 := by
     intro m m'
-    let f : (κ' → R) →ₗ[R] R :=
-      (γ.coord m).comp (LinearMap.codRestrict Qs (Matrix.mulVecLin Pq) hPqmem)
+    let f : (κ' → R) →ₗ[R] R := (γ.coord m).comp
+      (LinearMap.codRestrict Qs (Matrix.mulVecLin Pq) hPqmem)
     have hf : ∀ k, f (Pi.single k 1) = gs m k := fun k => rfl
     have h1 : (fun k => f (Pi.single k 1)) ⬝ᵥ (γ m' : κ' → R) = f (γ m') := dot_single f _
     have h2 : f (γ m') = if m' = m then 1 else 0 := by
@@ -237,15 +274,14 @@ theorem block
       funext m'
       simp only [Finset.sum_apply, Pi.smul_apply, smul_eq_mul, Finset.sum_mul]
       rw [Finset.sum_comm]
-      simp only [mul_assoc, ← Finset.mul_sum, hgsc, mul_ite, mul_one, mul_zero, Finset.sum_ite_eq,
-        Finset.mem_univ, if_true]
+      simp only [mul_assoc, ← Finset.mul_sum, hgsc, mul_ite, mul_one, mul_zero,
+        Finset.sum_ite_eq, Finset.mem_univ, if_true]
     rw [hz, mulVec_sum]
     exact Submodule.sum_mem _ fun k _ => by
       rw [mulVec_smul]
       exact Submodule.smul_mem _ _ (Submodule.subset_span ⟨k, rfl⟩)
-  have hmapN
-      : (Submodule.span R (Set.range fun k => (Φ * ε) k)).map K
-        = LinearMap.range (Matrix.mulVecLin Mᵀ) := by
+  have hmapN : (Submodule.span R (Set.range fun k => (Φ * ε) k)).map K =
+      LinearMap.range (Matrix.mulVecLin Mᵀ) := by
     rw [Submodule.map_span, ← Set.range_comp]
     apply le_antisymm
     · rw [Submodule.span_le]
@@ -255,9 +291,8 @@ theorem block
       have e : (K ∘ fun k => (Φ * ε) k) = fun k => Mᵀ *ᵥ cvec k := funext hKrow
       rw [e]
       exact hMrange z
-  have hmapS
-      : (Submodule.span R (Set.range fun j => a j • lam j)).map K
-        = LinearMap.range (Matrix.mulVecLin Mᵀ) := by
+  have hmapS : (Submodule.span R (Set.range fun j => a j • lam j)).map K =
+      LinearMap.range (Matrix.mulVecLin Mᵀ) := by
     rw [Submodule.map_span, ← Set.range_comp]
     have e1 : (K ∘ fun j => a j • lam j) = fun j => fun l => (Pi' * Matrix.diagonal a) l j := by
       funext j l
@@ -268,9 +303,8 @@ theorem block
     have e2 : Pi' * Matrix.diagonal a = Mᵀ * Q' := by
       rw [← hdiag, ← Matrix.mul_assoc, ← Matrix.mul_assoc, hPP', Matrix.one_mul]
     rw [e2]
-    have e3
-        : Submodule.span R (Set.range fun j => fun l => (Mᵀ * Q') l j)
-          = LinearMap.range (Matrix.mulVecLin (Mᵀ * Q')) := by
+    have e3 : Submodule.span R (Set.range fun j => fun l => (Mᵀ * Q') l j) =
+        LinearMap.range (Matrix.mulVecLin (Mᵀ * Q')) := by
       rw [Matrix.range_mulVecLin]; rfl
     rw [e3]
     apply le_antisymm
@@ -319,9 +353,8 @@ theorem block
     | zero => simp
     | add x y _ _ hx hy => rw [add_vecMul, hx, hy]
     | smul c x _ hx => rw [smul_vecMul, hx]
-  have hspan
-      : Submodule.span R (Set.range fun k => (Φ * ε) k)
-        = Submodule.span R (Set.range fun j => a j • lam j) := by
+  have hspan : Submodule.span R (Set.range fun k => (Φ * ε) k) =
+      Submodule.span R (Set.range fun j => a j • lam j) := by
     apply le_antisymm
     · intro w hw
       have hKw : K w ∈ (Submodule.span R (Set.range fun j => a j • lam j)).map K := by
@@ -349,7 +382,8 @@ theorem block
     rw [hmapN] at hK
     obtain ⟨z, hz⟩ := hK
 
-    have hz' : Mᵀ *ᵥ z = cp • fun l => Pi' l j := by rw [← hKlam, ← map_smul]; exact hz
+    have hz' : Mᵀ *ᵥ z = cp • fun l => Pi' l j := by
+      rw [← hKlam, ← map_smul]; exact hz
     have h2 : Matrix.diagonal a *ᵥ (Q'⁻¹ *ᵥ z) = cp • Pi.single j 1 := by
       rw [← hdiag, mulVec_mulVec, Matrix.mul_assoc, Matrix.mul_assoc, Matrix.mul_nonsing_inv _ hQ',
         Matrix.mul_one, ← mulVec_mulVec]
@@ -361,7 +395,8 @@ theorem block
       rw [Matrix.mul_apply, Matrix.one_apply] at this
       simp only [mulVec, dotProduct, this, Pi.single_apply, eq_comm]
     have h3 := congrFun h2 j
-    simp only [Matrix.mulVec_diagonal, Pi.smul_apply, Pi.single_eq_same, smul_eq_mul, mul_one] at h3
+    simp only [Matrix.mulVec_diagonal, Pi.smul_apply, Pi.single_eq_same, smul_eq_mul,
+      mul_one] at h3
     exact ⟨_, h3.symm⟩
   refine ⟨lam, a, y, hlamε, fun l => hεT _ (hyT l), hlamy, hdvd, hprod, hspan⟩
 

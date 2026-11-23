@@ -2,6 +2,46 @@ module
 
 public import Formalism.LocalToGlobal.HermitianForms.IsLocBasis
 public import Formalism.SharpRestriction.GrowthBounds.DataG
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -47,8 +87,8 @@ theorem map_substR [CommRing R] [CommRing S] (f : R →+* S)
   | add p q hp hq => simp only [map_add (f := _), hp, hq]
   | mul_X p v hp =>
     rw [map_mul, map_mul, map_mul, hp]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp [substR, map_sum, Matrix.map_apply]
+
+    simp [substR, map_sum, Matrix.map_apply]
 
 theorem map_natActR [Field R] [Field S] (f : R →+* S) (g : ∀ v, Fin (P.n' v) → GL (Fin (P.m + 1)) R) (Q : XR P R) :
     MvPolynomial.map f (natActR P R g Q) =
@@ -145,8 +185,8 @@ theorem evC_natAct (h : P.m + 1 = n) (pos : (Σ v : Fin P.nV, Fin (P.n' v)) ≃ 
     | mul_X p x hp =>
       rw [map_mul, map_mul, map_mul, hp]
       congr 1
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [substR, MvPolynomial.aeval_X, map_sum, map_mul, MvPolynomial.eval_C, MvPolynomial.eval_X]
+
+      simp only [substR, MvPolynomial.aeval_X, map_sum, map_mul, MvPolynomial.eval_C, MvPolynomial.eval_X]
       rw [← hz x.1 x.2.1, Matrix.mul_apply]
   have hdet : ∀ v s, (hAt P h pos M g v s : Matrix (Fin (P.m + 1)) (Fin (P.m + 1)) ℂ).det ≠ 0 := fun v s =>
     ((Matrix.isUnit_iff_isUnit_det _).1 (Units.isUnit _)).ne_zero

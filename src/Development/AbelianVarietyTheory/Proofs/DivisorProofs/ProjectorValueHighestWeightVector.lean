@@ -1,6 +1,50 @@
 module
 
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.NablaSchur
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Rat
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -10,15 +54,14 @@ namespace GlobalTheory.LeviCut.StepScalarProof
 
 variable {V : Type} [AddCommGroup V] [Module ℚ V]
 
-theorem adj_apply' (x S : Module.End ℚ V) : adj x S = x * S - S * x := by simp [adj]
+theorem adj_apply' (x S : Module.End ℚ V) : adj x S = x * S - S * x := by
+  simp [adj]
 
-theorem H_pow
-    (F H : Module.End ℚ V) (v : V) (n : ℕ) (hHF : H * F - F * H = -(F + F)) (hv : H v = (n : ℚ) • v)
-    : ∀ i : ℕ, H ((F ^ i) v) = ((n : ℚ) - 2 * i) • (F ^ i) v := by
+theorem H_pow (F H : Module.End ℚ V) (v : V) (n : ℕ)
+    (hHF : H * F - F * H = -(F + F)) (hv : H v = (n : ℚ) • v) :
+    ∀ i : ℕ, H ((F ^ i) v) = ((n : ℚ) - 2 * i) • (F ^ i) v := by
   have h1 : H * F = F * H - (F + F) := by
-    calc
-      H * F
-        = (H * F - F * H) + F * H := by abel
+    calc H * F = (H * F - F * H) + F * H := by abel
       _ = F * H - (F + F) := by rw [hHF]; abel
   intro i
   induction i with
@@ -29,14 +72,11 @@ theorem H_pow
     push_cast
     module
 
-theorem E_pow
-    (E F H : Module.End ℚ V) (v : V) (n : ℕ) (hEF : E * F - F * E = H)
-    (hHF : H * F - F * H = -(F + F)) (hE : E v = 0) (hv : H v = (n : ℚ) • v)
-    : ∀ i : ℕ, E ((F ^ (i + 1)) v) = (((i : ℚ) + 1) * ((n : ℚ) - i)) • (F ^ i) v := by
+theorem E_pow (E F H : Module.End ℚ V) (v : V) (n : ℕ)
+    (hEF : E * F - F * E = H) (hHF : H * F - F * H = -(F + F)) (hE : E v = 0) (hv : H v = (n : ℚ) • v) :
+    ∀ i : ℕ, E ((F ^ (i + 1)) v) = (((i : ℚ) + 1) * ((n : ℚ) - i)) • (F ^ i) v := by
   have h1 : E * F = F * E + H := by
-    calc
-      E * F
-        = (E * F - F * E) + F * E := by abel
+    calc E * F = (E * F - F * E) + F * E := by abel
       _ = F * E + H := by rw [hEF]; abel
   have hH := H_pow F H v n hHF hv
   intro i
@@ -51,14 +91,12 @@ theorem E_pow
     push_cast
     module
 
-theorem adjE_pow
-    (E F H T : Module.End ℚ V) (v : V) (n : ℕ)
-    (hEF : E * F - F * E = H) (hHF : H * F - F * H = -(F + F)) (hE : E v = 0)
-    (hv : H v = (n : ℚ) • v) (hT : ∀ k : ℕ, 0 < k → T ((F ^ k) v) = 0)
-    : ∀ k : ℕ,
-      (∀ i, k < i → (((adj E) ^ k) T) ((F ^ i) v) = 0)
-        ∧ (((adj E) ^ k) T) ((F ^ k) v)
-          = ((-1 : ℚ) ^ k * (k.factorial : ℚ) * ∏ t ∈ Finset.range k, ((n : ℚ) - t)) • T v := by
+theorem adjE_pow (E F H T : Module.End ℚ V) (v : V) (n : ℕ)
+    (hEF : E * F - F * E = H) (hHF : H * F - F * H = -(F + F)) (hE : E v = 0) (hv : H v = (n : ℚ) • v)
+    (hT : ∀ k : ℕ, 0 < k → T ((F ^ k) v) = 0) :
+    ∀ k : ℕ, (∀ i, k < i → (((adj E) ^ k) T) ((F ^ i) v) = 0) ∧
+      (((adj E) ^ k) T) ((F ^ k) v) =
+        ((-1 : ℚ) ^ k * (k.factorial : ℚ) * ∏ t ∈ Finset.range k, ((n : ℚ) - t)) • T v := by
   have hEp := E_pow E F H v n hEF hHF hE hv
   intro k
   induction k with
@@ -67,8 +105,7 @@ theorem adjE_pow
     simpa using hT i hi
   | succ k ih =>
     obtain ⟨ih1, ih2⟩ := ih
-    have hstep
-        : ∀ y, (((adj E) ^ (k + 1)) T) y = E ((((adj E) ^ k) T) y) - (((adj E) ^ k) T) (E y) := by
+    have hstep : ∀ y, (((adj E) ^ (k + 1)) T) y = E ((((adj E) ^ k) T) y) - (((adj E) ^ k) T) (E y) := by
       intro y
       rw [pow_succ', Module.End.mul_apply, adj_apply']
       simp [Module.End.mul_apply]
@@ -84,9 +121,8 @@ theorem adjE_pow
       push_cast
       ring
 
-theorem phi_adjF_pow (F : Module.End ℚ V) (φ : V →ₗ[ℚ] ℚ) (hφ : ∀ x, φ (F x) = 0)
-    : ∀ (k : ℕ) (S : Module.End ℚ V) (y : V),
-      φ ((((adj F) ^ k) S) y) = (-1 : ℚ) ^ k * φ (S ((F ^ k) y)) := by
+theorem phi_adjF_pow (F : Module.End ℚ V) (φ : V →ₗ[ℚ] ℚ) (hφ : ∀ x, φ (F x) = 0) :
+    ∀ (k : ℕ) (S : Module.End ℚ V) (y : V), φ ((((adj F) ^ k) S) y) = (-1 : ℚ) ^ k * φ (S ((F ^ k) y)) := by
   intro k
   induction k with
   | zero => intro S y; simp
@@ -97,19 +133,16 @@ theorem phi_adjF_pow (F : Module.End ℚ V) (φ : V →ₗ[ℚ] ℚ) (hφ : ∀ 
     rw [← Module.End.mul_apply (f := F), ← pow_succ', pow_succ]
     ring
 
-theorem partial_sum (n j : ℕ)
-    : ∀ K : ℕ,
-      ((n : ℚ) + j + 1)
-          * ∑ k ∈ Finset.range (K + 1),
-            (-1 : ℚ) ^ k * (j.factorial : ℚ) * (∏ t ∈ Finset.range k, ((n : ℚ) - t)) / ((k + j + 1).factorial : ℚ)
-        = 1
-          + (-1 : ℚ) ^ K * (j.factorial : ℚ) * (∏ t ∈ Finset.range (K + 1), ((n : ℚ) - t))
-            / ((K + j + 1).factorial : ℚ) := by
+theorem partial_sum (n j : ℕ) :
+    ∀ K : ℕ, ((n : ℚ) + j + 1) * ∑ k ∈ Finset.range (K + 1),
+        (-1 : ℚ) ^ k * (j.factorial : ℚ) * (∏ t ∈ Finset.range k, ((n : ℚ) - t)) / ((k + j + 1).factorial : ℚ) =
+      1 + (-1 : ℚ) ^ K * (j.factorial : ℚ) * (∏ t ∈ Finset.range (K + 1), ((n : ℚ) - t)) /
+        ((K + j + 1).factorial : ℚ) := by
   intro K
   induction K with
   | zero =>
-    simp only [zero_add, Finset.sum_range_one, pow_zero, Finset.prod_range_zero, one_mul,
-      Finset.prod_range_one, Nat.cast_zero, sub_zero]
+    simp only [zero_add, Finset.sum_range_one, pow_zero, Finset.prod_range_zero, one_mul, Finset.prod_range_one,
+      Nat.cast_zero, sub_zero]
     rw [Nat.factorial_succ j]
     have h : (j.factorial : ℚ) ≠ 0 := by positivity
     push_cast
@@ -130,10 +163,8 @@ theorem stepScalar : StepScalar := by
   intro V _ _ E F H T v φ n K j hEF hHF hE hv hnK hφ hT
   have hA := adjE_pow E F H T v n hEF hHF hE hv hT
   have hB := phi_adjF_pow F φ hφ
-  have hterm
-      : ∀ k : ℕ,
-        φ ((((adj F) ^ k * (adj E) ^ k) T) v)
-          = (k.factorial : ℚ) * (∏ t ∈ Finset.range k, ((n : ℚ) - t)) * φ (T v) := by
+  have hterm : ∀ k : ℕ, φ ((((adj F) ^ k * (adj E) ^ k) T) v) =
+      (k.factorial : ℚ) * (∏ t ∈ Finset.range k, ((n : ℚ) - t)) * φ (T v) := by
     intro k
     rw [Module.End.mul_apply, hB, (hA k).2, map_smul, smul_eq_mul]
     rw [← mul_assoc, ← mul_assoc, ← mul_assoc, ← pow_add, ← two_mul, pow_mul]
@@ -142,14 +173,12 @@ theorem stepScalar : StepScalar := by
     Finset.prod_eq_zero (i := n) (Finset.mem_range.2 (by omega)) (sub_self _)
   have hS := partial_sum n j K
   simp only [hP, mul_zero, zero_div, add_zero] at hS
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [proj, LinearMap.sum_apply, LinearMap.smul_apply, map_sum, map_smul, smul_eq_mul,
-      hterm]
-  have hc
-      : ∀ k : ℕ,
-        coef j k * ((k.factorial : ℚ) * (∏ t ∈ Finset.range k, ((n : ℚ) - t)) * φ (T v))
-          = (-1 : ℚ) ^ k * (j.factorial : ℚ) * (∏ t ∈ Finset.range k, ((n : ℚ) - t))
-            / ((k + j + 1).factorial : ℚ) * φ (T v) := by
+
+  simp only [proj, LinearMap.sum_apply, LinearMap.smul_apply, map_sum, map_smul, smul_eq_mul,
+  hterm]
+  have hc : ∀ k : ℕ, coef j k * ((k.factorial : ℚ) * (∏ t ∈ Finset.range k, ((n : ℚ) - t)) * φ (T v)) =
+      (-1 : ℚ) ^ k * (j.factorial : ℚ) * (∏ t ∈ Finset.range k, ((n : ℚ) - t)) / ((k + j + 1).factorial : ℚ) *
+        φ (T v) := by
     intro k
     have h1 : (k.factorial : ℚ) ≠ 0 := by positivity
     have h2 : ((k + j + 1).factorial : ℚ) ≠ 0 := by positivity

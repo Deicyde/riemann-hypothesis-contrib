@@ -1,6 +1,46 @@
 module
 
 public import Formalism.SharpRestriction.GrowthBounds.MultisetValuation.ThLinKConst
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
@@ -45,7 +85,6 @@ theorem th_sSer_int (R : Subring K') (t : Fin n') (a : Fin r0) (b : Fin r1)
   · exact R.pow_mem (R.neg_mem R.one_mem) l
   · exact R.zero_mem
 
-set_option maxHeartbeats 200000 in
 theorem th_sumR
     {ν : ℕ} (w1 w2 : Fin ν → WW p)
     (P Q : Finset (Fin n')) (hQ : ∀ t' ∈ Q, posAdd t' 1 ∈ P)
@@ -76,8 +115,8 @@ theorem th_sumR
         intro r
         rw [map_mul]
         ring
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [Finset.sum_congr rfl (fun r _ => h1 r), ← Finset.sum_mul, ← map_sum, hD t ht t' ht']
+
+      rw [Finset.sum_congr rfl (fun r _ => h1 r), ← Finset.sum_mul, ← map_sum, hD t ht t' ht']
       split_ifs <;> simp
     rw [Finset.sum_congr rfl e, Finset.sum_ite_eq' P (posAdd t' 1), if_pos (hQ t' ht')]
   simp only [Finset.sum_mul, Finset.mul_sum]
@@ -122,8 +161,8 @@ theorem th_dual_K
     (hT2 : DualH p) (hev : Even n') (B : OmBasis p n') (a b : Fin n') (hab : a.val % 2 = b.val % 2)
     : ∑ r, Aw K' (B.omS r) a.val * Aw K' (B.om r) b.val = if a = b then 1 else 0 := by
   have := congrArg (wK' p K') (hT2 n' B hev a b hab)
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [wK', map_sum, map_mul] at this
+
+  simp only [wK', map_sum, map_mul] at this
   rw [apply_ite (algebraMap (WW p) (K0 p)), apply_ite (algebraMap (K0 p) K')] at this
   simpa [Aw, wK'] using this
 
@@ -177,8 +216,8 @@ private theorem intR_sum'
     (R : Subring F) (s : Finset α) (f : α → MvPowerSeries ι F) (h : ∀ i ∈ s, IntR R (f i))
     : IntR R (∑ i ∈ s, f i) := by
   intro n
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+
+  rw [map_sum]
   exact R.sum_mem fun i hi => h i hi n
 
 private theorem cg_of_eq'

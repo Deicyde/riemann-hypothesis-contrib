@@ -1,10 +1,51 @@
 module
 
-public import Mathlib
-public import Development.AutomorphicSpectrum.Statements.GeometryStatements.IsPolLatticePlane
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.DUnitMemRangeOfMemKerIdeal
+public import Development.AbelianVarietyTheory.Definitions.Divisors.ToSpanSingletonConstGenInjective
+public import Mathlib.Analysis.SpecialFunctions.Pow.Real
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ConvEqOneOfForallPairing
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.DUnitMemRangeOfMemKerIdeal
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.DerivationDivisibleOfCocomm
+import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.IsIntegralOfDivisibleCharacters
+import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.NormSmulLeOneOfPrimitiveBoundedPowers
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.Valuation.Integral
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
 public import ReciprocityTheory.DualLattices.BlockOneMulMulBlockOne
 
 @[expose] public section
@@ -250,8 +291,8 @@ theorem exists_diag
   have hsum : ∀ w, w = ∑ j, φ j w • e j := fun w => by
     apply b.equivFun.injective
     funext i
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, Finset.sum_apply]
+
+    rw [map_sum, Finset.sum_apply]
     have h := congrFun (Matrix.mulVec_mulVec (b.equivFun w) P⁻¹ P) i
     rw [hPP', Matrix.one_mulVec] at h
     rw [← h]
@@ -289,8 +330,8 @@ theorem exists_diag
         Submodule.sum_mem _ fun k _ => Submodule.smul_mem _ _ (Submodule.subset_span ⟨k, rfl⟩)
       have hφx : ∀ i, φ i x = if (j : ℕ) = (i : ℕ) then a i else 0 := fun i => by
         have h1 : φ i x = (P * A * Q) i ⟨j, h⟩ := by
-          set_option synthInstance.maxHeartbeats 100000 in
-            rw [Matrix.mul_apply, map_sum]
+
+          rw [Matrix.mul_apply, map_sum]
           refine Finset.sum_congr rfl fun k _ => ?_
           rw [map_smul, hφg, smul_eq_mul, mul_comm]
         rw [h1, hD]

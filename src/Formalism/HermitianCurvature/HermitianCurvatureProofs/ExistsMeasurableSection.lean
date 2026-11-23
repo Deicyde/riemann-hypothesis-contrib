@@ -1,14 +1,61 @@
 module
 
-public import Formalism.HermitianCurvature.HermitianCurvatureProofs.SqrtDivMulEqSqrtMul
+public import Formalism.HermitianCurvature.HermitianCurvatureProofs.HcoSmulRight
+import Formalism.HermitianCurvature.HermitianCurvatureProofs.CompactGroupHaarExists
 public import Formalism.HermitianCurvature.HermitianCurvatureProofs.ContDiffAtSecondCoordinate
+public import Formalism.HermitianCurvature.HermitianCurvatureProofs.SqrtDivMulEqSqrtMul
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
 namespace Formalism.FourierDecayAlt.P.PBI
 
-open Finset Matrix Formalism.QuantumDeterminants Formalism.FourierDecayAlt
-  Formalism.FourierDecayAlt.P.Dx2.DF
+open Finset Matrix Formalism.QuantumDeterminants Formalism.FourierDecayAlt Formalism.FourierDecayAlt.P.Dx2.DF
 open scoped ComplexConjugate
 
 noncomputable section
@@ -17,29 +64,22 @@ section coef
 
 variable {r : ℕ} (T T' : ℝ) (Zm : Matrix (Fin (r + 1)) (Fin (r + 1)) ℂ)
 
-theorem fco_gram (hT : 0 < T) (hT' : 0 < T') (a a' : Fin (r + 1))
-    : hco T' (fco T T' a) (fco T T' a')
-      = if a = Fin.last r ∧ a' = Fin.last r then -((T : ℝ) : ℂ) else 0 := by
-  have hs
-      : ((Real.sqrt (T / T') : ℝ) : ℂ) * conj ((Real.sqrt (T / T') : ℝ) : ℂ)
-        = ((T / T' : ℝ) : ℂ) := by
+theorem fco_gram (hT : 0 < T) (hT' : 0 < T') (a a' : Fin (r + 1)) :
+    hco T' (fco T T' a) (fco T T' a') = if a = Fin.last r ∧ a' = Fin.last r then -((T : ℝ) : ℂ) else 0 := by
+  have hs : ((Real.sqrt (T / T') : ℝ) : ℂ) * conj ((Real.sqrt (T / T') : ℝ) : ℂ) = ((T / T' : ℝ) : ℂ) := by
     rw [Complex.conj_ofReal, ← Complex.ofReal_mul, Real.mul_self_sqrt (div_pos hT hT').le]
-  simp only [hco, fco, Pi.zero_apply, map_zero, mul_zero, zero_mul, Finset.sum_const_zero, add_zero,
-    zero_add]
+  simp only [hco, fco, Pi.zero_apply, map_zero, mul_zero, zero_mul, Finset.sum_const_zero, add_zero, zero_add]
   by_cases ha : a = Fin.last r <;> by_cases ha' : a' = Fin.last r
   · subst ha ha'
     simp only [if_true, and_self]
     have hT0 : ((T' : ℝ) : ℂ) ≠ 0 := by exact_mod_cast hT'.ne'
-    rw [mul_assoc, hs]
-    push_cast
-    field_simp
-    ring
+    rw [mul_assoc, hs]; push_cast; field_simp; ring
   · simp [ha, ha']
   · simp [ha, ha']
   · simp [ha, ha']
 
-theorem fco_xco (hT : 0 < T) (hT' : 0 < T') (hdet : Zm.det ≠ 0) (a b : Fin (r + 1))
-    : hco T' (fco T T' a) (xco T T' Zm b) = conj (Zm a b) := by
+theorem fco_xco (hT : 0 < T) (hT' : 0 < T') (hdet : Zm.det ≠ 0) (a b : Fin (r + 1)) :
+    hco T' (fco T T' a) (xco T T' Zm b) = conj (Zm a b) := by
   rw [hco_symm, xco_fco T T' Zm hT hT' hdet]
 
 theorem Ap_cs (c : Fin r) (d : Fin (r + 1)) : Ap T' c.castSucc d = 0 := by
@@ -50,75 +90,58 @@ theorem Ap_cs' (d : Fin (r + 1)) (c : Fin r) : Ap T' d c.castSucc = 0 := by
 
 theorem Ap_last : Ap T' (Fin.last r) (Fin.last r) = -((T' : ℝ) : ℂ) := by simp [Ap]
 
-theorem dual_coordinates_kronecker
-    (hT : 0 < T) (hT' : 0 < T') (hdet : Zm.det ≠ 0) (b : Fin r) (c : Fin (r + 1))
-    : hco T' (y0 T T' Zm b) (xco T T' Zm c) = if c = b.castSucc then 1 else 0 := by
-  simp only [y0, hco_sum_left, hco_smul_left, fco_xco T T' Zm hT hT' hdet,
-    Matrix.conjTranspose_apply]
+theorem dual_coordinates_kronecker (hT : 0 < T) (hT' : 0 < T') (hdet : Zm.det ≠ 0) (b : Fin r) (c : Fin (r + 1)) :
+    hco T' (y0 T T' Zm b) (xco T T' Zm c) = if c = b.castSucc then 1 else 0 := by
+  simp only [y0, hco_sum_left, hco_smul_left, fco_xco T T' Zm hT hT' hdet, Matrix.conjTranspose_apply]
   have hu : IsUnit Zm.det := isUnit_iff_ne_zero.mpr hdet
   have h := congrArg (fun M => conj (M b.castSucc c)) (Matrix.nonsing_inv_mul Zm hu)
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [Matrix.mul_apply, map_sum, map_mul, Matrix.one_apply, Complex.star_def] at h
+
+  simp only [Matrix.mul_apply, map_sum, map_mul, Matrix.one_apply, Complex.star_def] at h
   simp only [Complex.star_def]
   rw [h]
   by_cases hc : c = b.castSucc
   · subst hc; simp
   · rw [if_neg hc, if_neg (Ne.symm hc)]; simp
 
-theorem ysco_xco
-    (hT : 0 < T) (hT' : 0 < T') (hdet : Zm.det ≠ 0) (hG : 0 < gPoly (T * T') Zm) (b : Fin r)
-    (d : Fin (r + 1))
-    : hco T' (ysco T T' Zm b) (xco T T' Zm d) = if d = b.castSucc then 1 else 0 := by
-  simp only [ysco, hco_sub_left, hco_smul_left, hco_sum_left, xco_gram T T' Zm hT hT' hdet hG,
-    Ap_cs, mul_zero, Finset.sum_const_zero, sub_zero,
-    dual_coordinates_kronecker T T' Zm hT hT' hdet]
+theorem ysco_xco (hT : 0 < T) (hT' : 0 < T') (hdet : Zm.det ≠ 0) (hG : 0 < gPoly (T * T') Zm) (b : Fin r)
+    (d : Fin (r + 1)) : hco T' (ysco T T' Zm b) (xco T T' Zm d) = if d = b.castSucc then 1 else 0 := by
+  simp only [ysco, hco_sub_left, hco_smul_left, hco_sum_left, xco_gram T T' Zm hT hT' hdet hG, Ap_cs, mul_zero,
+    Finset.sum_const_zero, sub_zero, dual_coordinates_kronecker T T' Zm hT hT' hdet]
 
-theorem xco_ysco
-    (hT : 0 < T) (hT' : 0 < T') (hdet : Zm.det ≠ 0) (hG : 0 < gPoly (T * T') Zm) (b : Fin r)
-    (d : Fin (r + 1))
-    : hco T' (xco T T' Zm d) (ysco T T' Zm b) = if d = b.castSucc then 1 else 0 := by
+theorem xco_ysco (hT : 0 < T) (hT' : 0 < T') (hdet : Zm.det ≠ 0) (hG : 0 < gPoly (T * T') Zm) (b : Fin r)
+    (d : Fin (r + 1)) : hco T' (xco T T' Zm d) (ysco T T' Zm b) = if d = b.castSucc then 1 else 0 := by
   rw [hco_symm, ysco_xco T T' Zm hT hT' hdet hG]; split_ifs <;> simp
 
-theorem ysco_ysco
-    (hT : 0 < T) (hT' : 0 < T') (hdet : Zm.det ≠ 0) (hG : 0 < gPoly (T * T') Zm) (b e : Fin r)
-    : hco T' (ysco T T' Zm b) (ysco T T' Zm e) = 0 := by
-  have hx
-      : ∀ (c : Fin r) (d : Fin r),
-        hco T' (xco T T' Zm c.castSucc) (y0 T T' Zm d) = if c = d then 1 else 0 := by
-    intro c d
-    rw [hco_symm, dual_coordinates_kronecker T T' Zm hT hT' hdet]
-    simp [Fin.castSucc_inj, eq_comm]
-  have hy
-      : ∀ (c : Fin r) (d : Fin r),
-        hco T' (y0 T T' Zm d) (xco T T' Zm c.castSucc) = if c = d then 1 else 0 := by
+theorem ysco_ysco (hT : 0 < T) (hT' : 0 < T') (hdet : Zm.det ≠ 0) (hG : 0 < gPoly (T * T') Zm) (b e : Fin r) :
+    hco T' (ysco T T' Zm b) (ysco T T' Zm e) = 0 := by
+  have hx : ∀ (c : Fin r) (d : Fin r), hco T' (xco T T' Zm c.castSucc) (y0 T T' Zm d) = if c = d then 1 else 0 := by
+    intro c d; rw [hco_symm, dual_coordinates_kronecker T T' Zm hT hT' hdet]; simp [Fin.castSucc_inj, eq_comm]
+  have hy : ∀ (c : Fin r) (d : Fin r), hco T' (y0 T T' Zm d) (xco T T' Zm c.castSucc) = if c = d then 1 else 0 := by
     intro c d; rw [dual_coordinates_kronecker T T' Zm hT hT' hdet]; simp [Fin.castSucc_inj]
   have hxx : ∀ (c d : Fin r), hco T' (xco T T' Zm c.castSucc) (xco T T' Zm d.castSucc) = 0 := by
     intro c d; rw [xco_gram T T' Zm hT hT' hdet hG, Ap_cs]
-  simp only [ysco, hco_sub_left, hco_sub_right, hco_smul_left, hco_smul_right, hco_sum_left,
-    hco_sum_right, hx, hy, hxx, mul_zero, Finset.sum_const_zero, mul_ite, mul_one,
-    Finset.sum_ite_eq', Finset.mem_univ, if_true, Finset.sum_ite_eq]
+  simp only [ysco, hco_sub_left, hco_sub_right, hco_smul_left, hco_smul_right, hco_sum_left, hco_sum_right, hx, hy,
+    hxx, mul_zero, Finset.sum_const_zero, mul_ite, mul_one, Finset.sum_ite_eq', Finset.mem_univ, if_true,
+    Finset.sum_ite_eq]
   simp only [sub_zero, mul_ite, mul_one, mul_zero, Finset.sum_ite_eq', Finset.mem_univ, if_true]
   rw [← hco_symm T' (y0 T T' Zm e) (y0 T T' Zm b)]
   simp only [map_div₀, map_one, map_ofNat]
   ring
 
-theorem cofco_xco (hT : 0 < T) (hT' : 0 < T') (hdet : Zm.det ≠ 0) (b : Fin (r + 1))
-    : hco T' (cofco T T' Zm) (xco T T' Zm b) = if b = Fin.last r then conj Zm.det else 0 := by
+theorem cofco_xco (hT : 0 < T) (hT' : 0 < T') (hdet : Zm.det ≠ 0) (b : Fin (r + 1)) :
+    hco T' (cofco T T' Zm) (xco T T' Zm b) = if b = Fin.last r then conj Zm.det else 0 := by
   simp only [cofco, hco_sum_left, hco_smul_left, fco_xco T T' Zm hT hT' hdet]
   have h := congrArg (fun M => conj (M (Fin.last r) b)) (Matrix.adjugate_mul Zm)
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [Matrix.mul_apply, map_sum, map_mul, Matrix.smul_apply, Matrix.one_apply, smul_eq_mul]
-      at h
+
+  simp only [Matrix.mul_apply, map_sum, map_mul, Matrix.smul_apply, Matrix.one_apply, smul_eq_mul] at h
   rw [h]
   by_cases hb : b = Fin.last r
   · subst hb; simp
   · rw [if_neg (Ne.symm hb), if_neg hb]; simp
 
-theorem cofco_self (hT : 0 < T) (hT' : 0 < T')
-    : hco T' (cofco T T' Zm) (cofco T T' Zm)
-      = -((T : ℝ) : ℂ) * ((Complex.normSq (kap Zm (Fin.last r)) : ℝ) : ℂ) := by
-  simp only [cofco, hco_sum_left, hco_sum_right, hco_smul_left, hco_smul_right,
-    fco_gram T T' hT hT']
+theorem cofco_self (hT : 0 < T) (hT' : 0 < T') :
+    hco T' (cofco T T' Zm) (cofco T T' Zm) = -((T : ℝ) : ℂ) * ((Complex.normSq (kap Zm (Fin.last r)) : ℝ) : ℂ) := by
+  simp only [cofco, hco_sum_left, hco_sum_right, hco_smul_left, hco_smul_right, fco_gram T T' hT hT']
   simp only [mul_ite, mul_zero, Finset.sum_ite_irrel, Finset.sum_const_zero]
   rw [Finset.sum_eq_single (Fin.last r), Finset.sum_eq_single (Fin.last r)]
   · simp only [and_self, if_true, kap, Complex.conj_conj, Complex.normSq_eq_conj_mul_self]; ring
@@ -127,49 +150,42 @@ theorem cofco_self (hT : 0 < T) (hT' : 0 < T')
   · intro a _ ha; simp [ha]
   · simp
 
-theorem pco_xco
-    (hT : 0 < T) (hT' : 0 < T') (hdet : Zm.det ≠ 0) (hG : 0 < gPoly (T * T') Zm) (d : Fin (r + 1))
-    : hco T' (pco T T' Zm) (xco T T' Zm d) = 0 := by
+theorem pco_xco (hT : 0 < T) (hT' : 0 < T') (hdet : Zm.det ≠ 0) (hG : 0 < gPoly (T * T') Zm) (d : Fin (r + 1)) :
+    hco T' (pco T T' Zm) (xco T T' Zm d) = 0 := by
   have hT0 : ((T' : ℝ) : ℂ) ≠ 0 := by exact_mod_cast hT'.ne'
-  simp only [pco, hco_add_left, hco_sub_left, hco_smul_left, hco_sum_left,
-    xco_gram T T' Zm hT hT' hdet hG, Ap_cs, mul_zero, Finset.sum_const_zero, sub_zero,
-    ysco_xco T T' Zm hT hT' hdet hG]
+  simp only [pco, hco_add_left, hco_sub_left, hco_smul_left, hco_sum_left, xco_gram T T' Zm hT hT' hdet hG, Ap_cs,
+    mul_zero, Finset.sum_const_zero, sub_zero, ysco_xco T T' Zm hT hT' hdet hG]
   induction d using Fin.lastCases with
   | last =>
     simp only [Ap_last, if_false]
     simp only [mul_ite, mul_one, mul_zero, Finset.sum_const_zero, sub_zero]
-    have : ∀ b : Fin r, ¬(Fin.last r = b.castSucc) := fun b h => Fin.castSucc_ne_last b h.symm
+    have : ∀ b : Fin r, ¬ (Fin.last r = b.castSucc) := fun b h => Fin.castSucc_ne_last b h.symm
     simp only [this, if_false, Finset.sum_const_zero, sub_zero]
-    field_simp
-    ring
+    field_simp; ring
   | cast d =>
     simp only [Ap_cs', mul_zero, add_zero, mul_ite, mul_one, Fin.castSucc_inj, Finset.sum_ite_eq',
       Finset.sum_ite_eq, Finset.mem_univ, if_true, sub_self]
 
-theorem pco_ysco
-    (hT : 0 < T) (hT' : 0 < T') (hdet : Zm.det ≠ 0) (hG : 0 < gPoly (T * T') Zm) (e : Fin r)
-    : hco T' (pco T T' Zm) (ysco T T' Zm e) = 0 := by
-  simp only [pco, hco_add_left, hco_sub_left, hco_smul_left, hco_sum_left,
-    xco_ysco T T' Zm hT hT' hdet hG, ysco_ysco T T' Zm hT hT' hdet hG, mul_zero,
-    Finset.sum_const_zero, sub_zero, mul_ite, mul_one, Fin.castSucc_inj, Finset.sum_ite_eq,
-    Finset.mem_univ, if_true, if_false, add_zero]
+theorem pco_ysco (hT : 0 < T) (hT' : 0 < T') (hdet : Zm.det ≠ 0) (hG : 0 < gPoly (T * T') Zm) (e : Fin r) :
+    hco T' (pco T T' Zm) (ysco T T' Zm e) = 0 := by
+  simp only [pco, hco_add_left, hco_sub_left, hco_smul_left, hco_sum_left, xco_ysco T T' Zm hT hT' hdet hG,
+    ysco_ysco T T' Zm hT hT' hdet hG, mul_zero, Finset.sum_const_zero, sub_zero, mul_ite, mul_one,
+    Fin.castSucc_inj, Finset.sum_ite_eq, Finset.mem_univ, if_true, if_false, add_zero]
   simp [Fin.castSucc_ne_last, eq_comm]
 
-theorem pco_self (hT : 0 < T) (hT' : 0 < T') (hdet : Zm.det ≠ 0) (hG : 0 < gPoly (T * T') Zm)
-    : hco T' (pco T T' Zm) (pco T T' Zm) = ((gPoly (T * T') Zm / T' : ℝ) : ℂ) := by
+theorem pco_self (hT : 0 < T) (hT' : 0 < T') (hdet : Zm.det ≠ 0) (hG : 0 < gPoly (T * T') Zm) :
+    hco T' (pco T T' Zm) (pco T T' Zm) = ((gPoly (T * T') Zm / T' : ℝ) : ℂ) := by
   have hT0 : ((T' : ℝ) : ℂ) ≠ 0 := by exact_mod_cast hT'.ne'
   have h1 : hco T' (pco T T' Zm) (pco T T' Zm) = hco T' (pco T T' Zm) (cofco T T' Zm) := by
     conv_lhs => arg 3; rw [pco]
-    simp only [hco_add_right, hco_sub_right, hco_smul_right, hco_sum_right,
-      pco_xco T T' Zm hT hT' hdet hG, pco_ysco T T' Zm hT hT' hdet hG, mul_zero,
-      Finset.sum_const_zero, sub_zero, add_zero]
-  have hxc
-      : ∀ d, hco T' (xco T T' Zm d) (cofco T T' Zm) = if d = Fin.last r then Zm.det else 0 := by
+    simp only [hco_add_right, hco_sub_right, hco_smul_right, hco_sum_right, pco_xco T T' Zm hT hT' hdet hG,
+      pco_ysco T T' Zm hT hT' hdet hG, mul_zero, Finset.sum_const_zero, sub_zero, add_zero]
+  have hxc : ∀ d, hco T' (xco T T' Zm d) (cofco T T' Zm) = if d = Fin.last r then Zm.det else 0 := by
     intro d; rw [hco_symm, cofco_xco T T' Zm hT hT' hdet]; split_ifs <;> simp
   rw [h1]
-  simp only [pco, hco_add_left, hco_sub_left, hco_smul_left, hco_sum_left, hxc,
-    cofco_xco T T' Zm hT hT' hdet, cofco_self T T' Zm hT hT', Fin.castSucc_ne_last, if_false,
-    mul_zero, zero_mul, Finset.sum_const_zero, sub_zero, if_true]
+  simp only [pco, hco_add_left, hco_sub_left, hco_smul_left, hco_sum_left, hxc, cofco_xco T T' Zm hT hT' hdet,
+    cofco_self T T' Zm hT hT', Fin.castSucc_ne_last, if_false, mul_zero, zero_mul, Finset.sum_const_zero,
+    sub_zero, if_true]
   rw [kap_last]
   simp only [gPoly]
   push_cast
@@ -180,18 +196,16 @@ theorem pco_self (hT : 0 < T) (hT' : 0 < T') (hdet : Zm.det ≠ 0) (hG : 0 < gPo
 theorem ph_ne (hdet : Zm.det ≠ 0) : ph Zm ≠ 0 := by
   intro h; have := ph_conj Zm hdet; rw [h, zero_mul] at this; exact zero_ne_one this
 
-theorem nco_xco
-    (hT : 0 < T) (hT' : 0 < T') (hdet : Zm.det ≠ 0) (hG : 0 < gPoly (T * T') Zm) (d : Fin (r + 1))
-    : hco T' (nco T T' Zm) (xco T T' Zm d) = 0 := by
+theorem nco_xco (hT : 0 < T) (hT' : 0 < T') (hdet : Zm.det ≠ 0) (hG : 0 < gPoly (T * T') Zm) (d : Fin (r + 1)) :
+    hco T' (nco T T' Zm) (xco T T' Zm d) = 0 := by
   rw [nco, hco_smul_left, pco_xco T T' Zm hT hT' hdet hG, mul_zero]
 
-theorem nco_ysco
-    (hT : 0 < T) (hT' : 0 < T') (hdet : Zm.det ≠ 0) (hG : 0 < gPoly (T * T') Zm) (e : Fin r)
-    : hco T' (nco T T' Zm) (ysco T T' Zm e) = 0 := by
+theorem nco_ysco (hT : 0 < T) (hT' : 0 < T') (hdet : Zm.det ≠ 0) (hG : 0 < gPoly (T * T') Zm) (e : Fin r) :
+    hco T' (nco T T' Zm) (ysco T T' Zm e) = 0 := by
   rw [nco, hco_smul_left, pco_ysco T T' Zm hT hT' hdet hG, mul_zero]
 
-theorem nco_self (hT : 0 < T) (hT' : 0 < T') (hdet : Zm.det ≠ 0) (hG : 0 < gPoly (T * T') Zm)
-    : hco T' (nco T T' Zm) (nco T T' Zm) = 1 := by
+theorem nco_self (hT : 0 < T) (hT' : 0 < T') (hdet : Zm.det ≠ 0) (hG : 0 < gPoly (T * T') Zm) :
+    hco T' (nco T T' Zm) (nco T T' Zm) = 1 := by
   have hq : 0 < gPoly (T * T') Zm / T' := div_pos hG hT'
   have hs : sGT' T T' Zm ^ 2 = gPoly (T * T') Zm / T' := Real.sq_sqrt hq.le
   have hs0 : sGT' T T' Zm ≠ 0 := (Real.sqrt_pos.2 hq).ne'
@@ -208,20 +222,18 @@ section vecs
 
 variable {k r : ℕ} {z' ν' : Fin (2 * r + k + 1) → ℂ}
 
-theorem herm_x_cvec (x : Fin (2 * r + k + 1) → ℂ) (c : Co r)
-    : herm (Hpk k r) x (cvec k z' ν' c)
-      = (∑ a, conj (c.1 a) * herm (Hpk k r) x (ee k r a))
-        + (∑ a, conj (c.2.1 a) * herm (Hpk k r) x (es k r a)) + conj c.2.2.1 * herm (Hpk k r) x z'
-        + conj c.2.2.2 * herm (Hpk k r) x ν' := by
+theorem herm_x_cvec (x : Fin (2 * r + k + 1) → ℂ) (c : Co r) :
+    herm (Hpk k r) x (cvec k z' ν' c) = (∑ a, conj (c.1 a) * herm (Hpk k r) x (ee k r a)) +
+      (∑ a, conj (c.2.1 a) * herm (Hpk k r) x (es k r a)) + conj c.2.2.1 * herm (Hpk k r) x z' +
+      conj c.2.2.2 * herm (Hpk k r) x ν' := by
   simp only [cvec, B2x4.herm_add_right, herm_sum_right, B2x4.herm_smul_right, Complex.star_def]
 
 theorem prW_zero (z : Fin (2 * r + k + 1) → ℂ) : D.prW k r z 0 = 0 := by
   have := prW_smul (k := k) (r := r) z 0 0
   simpa using this
 
-theorem prW_sum
-    (z : Fin (2 * r + k + 1) → ℂ) {ι : Type*} (s : Finset ι) (f : ι → Fin (2 * r + k + 1) → ℂ)
-    : D.prW k r z (∑ i ∈ s, f i) = ∑ i ∈ s, D.prW k r z (f i) := by
+theorem prW_sum (z : Fin (2 * r + k + 1) → ℂ) {ι : Type*} (s : Finset ι) (f : ι → Fin (2 * r + k + 1) → ℂ) :
+    D.prW k r z (∑ i ∈ s, f i) = ∑ i ∈ s, D.prW k r z (f i) := by
   classical
   induction s using Finset.induction_on with
   | empty => simp [prW_zero]
@@ -233,28 +245,24 @@ theorem prW_ee (z : Fin (2 * r + k + 1) → ℂ) (a : Fin r) : D.prW k r z (ee k
 theorem prW_es (z : Fin (2 * r + k + 1) → ℂ) (a : Fin r) : D.prW k r z (es k r a) = 0 := by
   rw [prW_eq, Wb_es]; simp [herm]
 
-theorem prW_cvec
-    (hz' : inWb k r z') (hν : inWb k r ν') (hνz : herm (Hpk k r) ν' z' = 0)
-    (hzz0 : herm (Hpk k r) z' z' ≠ 0) (c : Co r)
-    : D.prW k r z' (cvec k z' ν' c) = c.2.2.2 • ν' := by
-  simp only [cvec, prW_add, prW_smul, prW_sum, prW_ee, prW_es, smul_zero, Finset.sum_const_zero,
-    zero_add, prW_self hz' hzz0, prW_perp hν hνz]
+theorem prW_cvec (hz' : inWb k r z') (hν : inWb k r ν') (hνz : herm (Hpk k r) ν' z' = 0)
+    (hzz0 : herm (Hpk k r) z' z' ≠ 0) (c : Co r) : D.prW k r z' (cvec k z' ν' c) = c.2.2.2 • ν' := by
+  simp only [cvec, prW_add, prW_smul, prW_sum, prW_ee, prW_es, smul_zero, Finset.sum_const_zero, zero_add,
+    prW_self hz' hzz0, prW_perp hν hνz]
 
 end vecs
 
 section main
 
-variable
-  {k r : ℕ} {Wp Wq : Type}
-  [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq]
+variable {k r : ℕ} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
+  [InnerProductSpace ℂ Wq]
 
-theorem secM_spec
-    (S : B.RealPlaceData k r Wp Wq) (ν' : Fin (2 * r + k + 1) → ℂ) (m₀ : B.Mat k r)
-    (hbase : D.IsBaseFrame S ν' m₀)
-    (Zm : Matrix (Fin (r + 1)) (Fin (r + 1)) ℂ) (hG : 0 < gPoly (Tz k r S.z * Tz k r S.z') Zm)
-    : secM S.z' ν' m₀ (Tz k r S.z) (Tz k r S.z') Zm ∈ B.GV k r
-      ∧ Zhat k r S.z S.z' (secM S.z' ν' m₀ (Tz k r S.z) (Tz k r S.z') Zm) = Zm
-      ∧ D.IsDFrame S ν' m₀ (secM S.z' ν' m₀ (Tz k r S.z) (Tz k r S.z') Zm) := by
+theorem secM_spec (S : B.RealPlaceData k r Wp Wq) (ν' : Fin (2 * r + k + 1) → ℂ) (m₀ : B.Mat k r)
+    (hbase : D.IsBaseFrame S ν' m₀) (Zm : Matrix (Fin (r + 1)) (Fin (r + 1)) ℂ)
+    (hG : 0 < gPoly (Tz k r S.z * Tz k r S.z') Zm) :
+    secM S.z' ν' m₀ (Tz k r S.z) (Tz k r S.z') Zm ∈ B.GV k r ∧
+      Zhat k r S.z S.z' (secM S.z' ν' m₀ (Tz k r S.z) (Tz k r S.z') Zm) = Zm ∧
+      D.IsDFrame S ν' m₀ (secM S.z' ν' m₀ (Tz k r S.z) (Tz k r S.z') Zm) := by
   obtain ⟨hν, hνz, hνν, ⟨hmU, hmfix⟩, hmz⟩ := hbase
   have hme : ∀ a : Fin r, m₀ *ᵥ ee k r a = ee k r a := fun a => (hmfix a a.isLt).1
   have hms : ∀ a : Fin r, m₀ *ᵥ es k r a = es k r a := fun a => (hmfix a a.isLt).2
@@ -276,8 +284,8 @@ theorem secM_spec
   set μ := Real.sqrt (T' / T) with hμdef
   have hμ : 0 < μ := Real.sqrt_pos.2 (div_pos hT' hT)
   have hμ' : (μ : ℂ) ≠ 0 := by exact_mod_cast hμ.ne'
-  have hprW :=
-    orthoProj_m0_intertwine m₀ (hmU := hmU) (hme := hme) (hms := hms) hz hz' μ hμ.ne' hmz hzz0
+  have hprW := orthoProj_m0_intertwine m₀ (hmU := hmU) (hme := hme) (hms := hms)
+    hz hz' μ hμ.ne' hmz hzz0
   have hdet : Zm.det ≠ 0 := Sm.det_ne_of_gPoly (T := T) (T' := T') hT hT' hG
   have hdn : (‖Zm.det‖ : ℝ) ≠ 0 := norm_ne_zero_iff.mpr hdet
   have hdn' : 0 < ‖Zm.det‖ := norm_pos_iff.mpr hdet
@@ -301,15 +309,12 @@ theorem secM_spec
     rcases i with ((b | b) | i) <;> rcases j with ((c | c) | j)
     all_goals try fin_cases i
     all_goals try fin_cases j
-    all_goals
-      simp only [hYdef, Yv, uB, Fin.zero_eta, Fin.mk_one, Matrix.cons_val_zero, Matrix.cons_val_one,
-        Matrix.head_cons, hcv]
-    all_goals
-      simp [hxx, hxy, hyx, hyy, hnx, hny, hnn, hxn, hyn, Ap, Fin.castSucc_inj, Fin.castSucc_ne_last,
-        h_w_ee hz', h_w_ee hν, h_w_es hz', h_w_es hν, h_ee_w hz', h_ee_w hν, h_es_w hz', h_es_w hν,
-        hzz, hνz, hνν, hzν, hs2]
-    all_goals
-      first
+    all_goals simp only [hYdef, Yv, uB, Fin.zero_eta, Fin.mk_one, Matrix.cons_val_zero, Matrix.cons_val_one,
+      Matrix.head_cons, hcv]
+    all_goals simp [hxx, hxy, hyx, hyy, hnx, hny, hnn, hxn, hyn, Ap, Fin.castSucc_inj, Fin.castSucc_ne_last,
+      h_w_ee hz', h_w_ee hν, h_w_es hz', h_w_es hν, h_ee_w hz', h_ee_w hν, h_es_w hz', h_es_w hν, hzz, hνz,
+      hνν, hzν, hs2]
+    all_goals first
       | (intro h; exact Fin.castSucc_ne_last _ h.symm)
       | (split_ifs <;> simp_all)
       | (exact_mod_cast hs2.symm)
@@ -339,19 +344,13 @@ theorem secM_spec
     rcases cast_or_last b with hb | ⟨b', rfl⟩
     · subst hb; rw [fvec_lastI]; exact hσu (Sum.inr 0)
     · rw [fvec_cs]; exact hσu (Sum.inl (Sum.inl b'))
-  have hσc
-      : ∀ d : Co r,
-        σ *ᵥ cvec k S.z' ν' d
-          = cvec k S.z' ν'
-            ((∑ a, d.1 a • xco T T' Zm a.castSucc) + (∑ b, d.2.1 b • ysco T T' Zm b)
-              + d.2.2.1 • xco T T' Zm (Fin.last r) + d.2.2.2 • nco T T' Zm) := by
+  have hσc : ∀ d : Co r, σ *ᵥ cvec k S.z' ν' d = cvec k S.z' ν' ((∑ a, d.1 a • xco T T' Zm a.castSucc) +
+      (∑ b, d.2.1 b • ysco T T' Zm b) + d.2.2.1 • xco T T' Zm (Fin.last r) + d.2.2.2 • nco T T' Zm) := by
     intro d
     simp only [cvec_add, cvec_sum, cvec_smul]
     simp only [cvec, Matrix.mulVec_add, Matrix.mulVec_sum, Matrix.mulVec_smul]
-    have e1 : ∀ a, σ *ᵥ ee k r a = cvec k S.z' ν' (xco T T' Zm a.castSucc) := fun a =>
-      hσu (Sum.inl (Sum.inl a))
-    have e2 : ∀ a, σ *ᵥ es k r a = cvec k S.z' ν' (ysco T T' Zm a) := fun a =>
-      hσu (Sum.inl (Sum.inr a))
+    have e1 : ∀ a, σ *ᵥ ee k r a = cvec k S.z' ν' (xco T T' Zm a.castSucc) := fun a => hσu (Sum.inl (Sum.inl a))
+    have e2 : ∀ a, σ *ᵥ es k r a = cvec k S.z' ν' (ysco T T' Zm a) := fun a => hσu (Sum.inl (Sum.inr a))
     have e3 : σ *ᵥ S.z' = cvec k S.z' ν' (xco T T' Zm (Fin.last r)) := hσu (Sum.inr 0)
     have e4 : σ *ᵥ ν' = cvec k S.z' ν' (nco T T' Zm) := hσu (Sum.inr 1)
     simp only [e1, e2, e3, e4, cvec]
@@ -368,10 +367,10 @@ theorem secM_spec
       simp [cvec, fco, Fin.castSucc_ne_last, Fin.castSucc_inj, Pi.single_apply, ite_smul]
   have hZ : Zhat k r S.z S.z' (m₀ * σ) = Zm := by
     ext a b
-    rw [reduced_matrix_of_stabilizer m₀ σ hmU hme μ hμ.ne' hmz a b, hσf, hff, hcv,
-      xco_fco T T' Zm hT hT' hdet]
+    rw [reduced_matrix_of_stabilizer m₀ σ hmU hme μ hμ.ne' hmz a b, hσf, hff, hcv, xco_fco T T' Zm hT hT' hdet]
   refine ⟨hγ, hZ, ?_, ?_, ?_⟩
-  · have hsG : 0 < sGT T T' Zm := Real.sqrt_pos.2 (div_pos hG hT)
+  ·
+    have hsG : 0 < sGT T T' Zm := Real.sqrt_pos.2 (div_pos hG hT)
     refine ⟨sGT T T' Zm / ‖Zm.det‖, div_pos hsG hdn', ?_⟩
     have hcof : D.cofR S (m₀ * σ) = m₀ *ᵥ cvec k S.z' ν' (∑ b, kap Zm b • xco T T' Zm b) := by
       unfold D.cofR
@@ -385,7 +384,8 @@ theorem secM_spec
     rw [hsum, sum_kap_be T T' Zm hdet, ph]
     push_cast
     field_simp
-  · have hsG : 0 < sGT' T T' Zm := Real.sqrt_pos.2 (div_pos hG hT')
+  ·
+    have hsG : 0 < sGT' T T' Zm := Real.sqrt_pos.2 (div_pos hG hT')
     have hsG0 : ((sGT' T T' Zm : ℝ) : ℂ) ≠ 0 := by exact_mod_cast hsG.ne'
     have hph := ph_ne Zm hdet
     refine ⟨sGT' T T' Zm / ‖Zm.det‖, div_pos hsG hdn', ?_⟩
@@ -394,8 +394,7 @@ theorem secM_spec
       rw [← hff]
       rcases cast_or_last a with ha | ⟨a', rfl⟩
       · subst ha
-        rw [fvec_lastI, fvec_lastI, Matrix.mulVec_smul, hmz, smul_smul, inv_mul_cancel₀ hμ',
-          one_smul]
+        rw [fvec_lastI, fvec_lastI, Matrix.mulVec_smul, hmz, smul_smul, inv_mul_cancel₀ hμ', one_smul]
       · rw [fvec_cs, fvec_cs, hme]
     have hcofL : D.cofL S (m₀ * σ) = m₀ *ᵥ cvec k S.z' ν' (cofco T T' Zm) := by
       unfold D.cofL
@@ -410,8 +409,7 @@ theorem secM_spec
       rw [hσc]
       congr 1
       have hn : (((sGT' T T' Zm : ℝ) : ℂ) / ph Zm) • nco T T' Zm = pco T T' Zm := by
-        rw [nco, smul_smul, div_mul_div_comm, mul_comm (ph Zm), div_self (mul_ne_zero hsG0 hph),
-          one_smul]
+        rw [nco, smul_smul, div_mul_div_comm, mul_comm (ph Zm), div_self (mul_ne_zero hsG0 hph), one_smul]
       simp only [hddef]
       rw [hn, pco]
       simp only [neg_smul, neg_div]
@@ -431,30 +429,21 @@ theorem secM_spec
     rw [hph']
     push_cast
     field_simp
-    first
-    | exact hnorm.symm
-    | linear_combination -hnorm
-    | linear_combination (-(((sGT' T T' Zm : ℝ) : ℂ))) * hnorm
-  · intro u hu
+    first | exact hnorm.symm | linear_combination -hnorm | linear_combination (-(((sGT' T T' Zm : ℝ) : ℂ))) * hnorm
+  ·
+    intro u hu
     set v := m₀⁻¹ *ᵥ u with hvdef
     have hmv : m₀ *ᵥ v = u := by
       rw [hvdef, Matrix.mulVec_mulVec, Matrix.mul_nonsing_inv _ hm0u, Matrix.one_mulVec]
     have hv1 : ∀ a : Fin r, herm (Hpk k r) v (ee k r a) = 0 := by
-      intro a
-      have := (hu a.castSucc).1
-      rw [fvec_cs, ← hmv, ← hme a, herm_m0_mulVec_invariant m₀ hmU] at this
-      exact this
-    have hzeq : S.z = (μ : ℂ)⁻¹ • (m₀ *ᵥ S.z') := by
-      rw [hmz, smul_smul, inv_mul_cancel₀ hμ', one_smul]
+      intro a; have := (hu a.castSucc).1; rw [fvec_cs, ← hmv, ← hme a, herm_m0_mulVec_invariant m₀ hmU] at this; exact this
+    have hzeq : S.z = (μ : ℂ)⁻¹ • (m₀ *ᵥ S.z') := by rw [hmz, smul_smul, inv_mul_cancel₀ hμ', one_smul]
     have hv2 : herm (Hpk k r) v S.z' = 0 := by
       have := (hu (Fin.last r)).1
       rw [fvec_lastI, ← hmv, hzeq, B2x4.herm_smul_right, herm_m0_mulVec_invariant m₀ hmU] at this
       simpa [hμ'] using this
     have hvY : ∀ b, herm (Hpk k r) v (cvec k S.z' ν' (xco T T' Zm b)) = 0 := by
-      intro b
-      have := (hu b).2
-      rw [← hmv, ← Matrix.mulVec_mulVec, herm_m0_mulVec_invariant m₀ hmU, hσf] at this
-      exact this
+      intro b; have := (hu b).2; rw [← hmv, ← Matrix.mulVec_mulVec, herm_m0_mulVec_invariant m₀ hmU, hσf] at this; exact this
     set t : Fin r → ℂ := fun a => herm (Hpk k r) v (es k r a) with htdef
     set tn : ℂ := herm (Hpk k r) v ν' with htndef
     have hlin : ∀ b, (∑ a, Zm a.castSucc b * conj (t a)) + be T T' Zm b * conj tn = 0 := by
@@ -463,17 +452,14 @@ theorem secM_spec
       rw [herm_x_cvec] at h
       simp only [hv1, hv2, mul_zero, Finset.sum_const_zero, zero_add, add_zero, xco] at h
       have h' := congrArg conj h
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [map_add (f := _), map_sum, map_mul, Complex.conj_conj, map_zero] at h'
+
+      simp only [map_add (f := _), map_sum, map_mul, Complex.conj_conj, map_zero] at h'
       rw [← h']
     have htn : tn = 0 := by
-      have hsum
-          : ∑ b, kap Zm b * ((∑ a, Zm a.castSucc b * conj (t a)) + be T T' Zm b * conj tn) = 0 := by
+      have hsum : ∑ b, kap Zm b * ((∑ a, Zm a.castSucc b * conj (t a)) + be T T' Zm b * conj tn) = 0 := by
         simp [hlin]
-      have hsplit
-          : ∑ b, kap Zm b * ((∑ a, Zm a.castSucc b * conj (t a)) + be T T' Zm b * conj tn)
-            = (∑ a, conj (t a) * ∑ b, Zm a.castSucc b * kap Zm b)
-              + conj tn * ∑ b, kap Zm b * be T T' Zm b := by
+      have hsplit : ∑ b, kap Zm b * ((∑ a, Zm a.castSucc b * conj (t a)) + be T T' Zm b * conj tn) =
+          (∑ a, conj (t a) * ∑ b, Zm a.castSucc b * kap Zm b) + conj tn * ∑ b, kap Zm b * be T T' Zm b := by
         simp only [mul_add, Finset.sum_add_distrib, Finset.mul_sum]
         congr 1
         · rw [Finset.sum_comm]
@@ -481,8 +467,7 @@ theorem secM_spec
         · exact Finset.sum_congr rfl (fun b _ => by ring)
       rw [hsplit] at hsum
       simp only [mul_kap, Fin.castSucc_ne_last, if_false, mul_zero, Finset.sum_const_zero, zero_add,
-          sum_kap_be T T' Zm hdet]
-        at hsum
+        sum_kap_be T T' Zm hdet] at hsum
       have hsG : 0 < sGT T T' Zm := Real.sqrt_pos.2 (div_pos hG hT)
       have hsG0 : ((sGT T T' Zm : ℝ) : ℂ) ≠ 0 := by exact_mod_cast hsG.ne'
       have := mul_eq_zero.1 hsum
@@ -533,11 +518,8 @@ open Formalism.QuantumDeterminants Formalism.FourierDecayAlt
 
 theorem pbi_sectionExists_proof : PBI.SectionExists := by
   intro k r Wp Wq _ _ _ _ Bs ν' m₀ hbase
-  refine ⟨
-    fun Z => Matrix.of.symm (PBI.secM Bs.z' ν' m₀ (Tz k r Bs.z) (Tz k r Bs.z') (Matrix.of Z)),
-    PBI.secM_contDiffOn Bs.z' ν' m₀ _ _ Bs.T_pos Bs.T'_pos,
-    fun Z hZ => ?_
-  ⟩
+  refine ⟨fun Z => Matrix.of.symm (PBI.secM Bs.z' ν' m₀ (Tz k r Bs.z) (Tz k r Bs.z') (Matrix.of Z)),
+    PBI.secM_contDiffOn Bs.z' ν' m₀ _ _ Bs.T_pos Bs.T'_pos, fun Z hZ => ?_⟩
   simpa only [Equiv.apply_symm_apply] using PBI.secM_spec Bs ν' m₀ hbase (Matrix.of Z) hZ
 
 end Formalism.FourierDecayAlt.P

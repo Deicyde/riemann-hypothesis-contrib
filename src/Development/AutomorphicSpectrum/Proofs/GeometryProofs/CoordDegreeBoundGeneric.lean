@@ -1,34 +1,74 @@
 module
 
-public import Mathlib
+import Development.AutomorphicSpectrum.Proofs.MetricProofs.LatticeRationalEmbedding
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.LocRatio
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.GrGenOfIsFlagVBOn
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.ExistsLieModel
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.LieModelExistsUniqueSemilinearStatement
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.LieModelIsBaseChangeStatement
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.LieLatticeEvalAtLocalRingStatement
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.GradedSandwichDegreeBoundStatement
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.LatticeRegularAtLocalPointStatement
+import Development.AutomorphicSpectrum.Proofs.GeometryProofs.LieLatticeEvalAtLocalRingStatement
+import Development.AutomorphicSpectrum.Proofs.GeometryProofs.LieModelExistsUniqueSemilinearStatement
+import Development.AutomorphicSpectrum.Proofs.GeometryProofs.LieModelIsBaseChangeStatement
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Std.Tactic.BVDecide.Normalize.Prop
+public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.IsCocharLie
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
-  NumberField TensorProduct Filter Topology Matrix
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo
-  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
-  GlobalTheory.CompanionTheory.Ar
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField TensorProduct Filter Topology Matrix
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CompanionTheory.Ar
 open GlobalTheory.CompanionTheory.Ar.RootHt GroundTheory.Heights₂.Heights
 
 noncomputable section
 
 namespace GlobalTheory.CompanionTheory.Ar.RootHt.FinPhi
 
-theorem flag_coord
-    {Ω E : Type} [Field Ω] [AddCommGroup E] [Module Ω E]
-    {r : ℕ}
-    (b : Fin r → E) (π : Fin r → Module.Dual Ω E) (hπ : ∀ j l, π j (b l) = if j = l then 1 else 0)
-    (n : ℕ) (e : E) (he : e ∈ flagStep Ω b n)
-    : e = ∑ l, π l e • b l ∧ ∀ l : Fin r, n ≤ l → π l e = 0 := by
+theorem flag_coord {Ω E : Type} [Field Ω] [AddCommGroup E] [Module Ω E] {r : ℕ} (b : Fin r → E)
+    (π : Fin r → Module.Dual Ω E) (hπ : ∀ j l, π j (b l) = if j = l then 1 else 0) (n : ℕ) (e : E)
+    (he : e ∈ flagStep Ω b n) : e = ∑ l, π l e • b l ∧ ∀ l : Fin r, n ≤ l → π l e = 0 := by
   unfold flagStep at he
   induction he using Submodule.span_induction with
   | mem x hx =>
@@ -39,8 +79,7 @@ theorem flag_coord
         rintro rfl
         exact absurd hk (by simpa using hl)
       simp [hπ, this]
-  | zero =>
-    simp
+  | zero => simp
   | add x y _ _ hx hy =>
     refine ⟨?_, fun l hl => by simp [hx.2 l hl, hy.2 l hl]⟩
     simp only [map_add (f := _), add_smul, Finset.sum_add_distrib]
@@ -52,32 +91,14 @@ theorem flag_coord
 
 section Clear
 
-variable
-  {L : Type} [Field L] [NumberField L]
-  {B T : Type} [AddCommGroup B] [Module (𝓞 L) B] [AddCommGroup T] [Module L T] [Module (𝓞 L) T]
-  [IsScalarTower (𝓞 L) L T]
+variable {L : Type} [Field L] [NumberField L] {B T : Type} [AddCommGroup B] [Module (𝓞 L) B]
+  [AddCommGroup T] [Module L T] [Module (𝓞 L) T] [IsScalarTower (𝓞 L) L T]
 
 theorem dvd_nat (c : 𝓞 L) (hc : c ≠ 0) : ∃ (n : ℕ) (d : 𝓞 L), n ≠ 0 ∧ (n : 𝓞 L) = d * c := by
-  obtain ⟨d, k, hk, h⟩ := Algebra.IsAlgebraic.exists_smul_eq_mul ℤ (1 : 𝓞 L) hc
-  refine ⟨k.natAbs, if 0 ≤ k then d else -d, by simpa using hk, ?_⟩
-  have h' : (k : 𝓞 L) = c * d := by simpa [zsmul_eq_mul] using h
-  rcases le_total 0 k with h0 | h0
-  · have : ((k.natAbs : ℤ)) = k := Int.natAbs_of_nonneg h0
-    have e : ((k.natAbs : ℕ) : 𝓞 L) = (k : 𝓞 L) := by rw [← this]; simp
-    by_cases h1 : 0 ≤ k
-    · simp only [h1, if_true]; rw [e, h', mul_comm]
-    · exact absurd h0 h1
-  · have : ((k.natAbs : ℤ)) = -k := Int.ofNat_natAbs_of_nonpos h0
-    have e : ((k.natAbs : ℕ) : 𝓞 L) = -(k : 𝓞 L) := by
-      have := congrArg (fun q : ℤ => (q : 𝓞 L)) this
-      simpa using this
-    by_cases h1 : 0 ≤ k
-    · have : k = 0 := le_antisymm h0 h1
-      exact absurd this hk
-    · simp only [h1, if_false]; rw [e, h']; ring
+  apply GlobalTheory.CompanionTheory.Ar.Cusp.Dict.LatticeCoordinates.exists_nat_eq_mul <;> assumption
 
-theorem clear_int [Module.Projective (𝓞 L) B] (j : B →ₗ[𝓞 L] T) (h : IsBaseChange L j)
-    : Function.Injective j ∧ ∀ t : T, ∃ (n : ℕ) (x : B), n ≠ 0 ∧ j x = n • t := by
+theorem clear_int [Module.Projective (𝓞 L) B] (j : B →ₗ[𝓞 L] T) (h : IsBaseChange L j) :
+    Function.Injective j ∧ ∀ t : T, ∃ (n : ℕ) (x : B), n ≠ 0 ∧ j x = n • t := by
   haveI : IsLocalizedModule (nonZeroDivisors (𝓞 L)) j :=
     (isLocalizedModule_iff_isBaseChange (nonZeroDivisors (𝓞 L)) L j).2 h
   constructor
@@ -93,33 +114,23 @@ theorem clear_int [Module.Projective (𝓞 L) B] (j : B →ₗ[𝓞 L] T) (h : I
     rw [← this, hd, map_smul, ← hx, mul_smul]
     rfl
 
-theorem clear_span
-    (j : B →ₗ[𝓞 L] T)
-    {A : Type} (v : A → T)
-    (S : Set B) (hS : ∀ l, ∃ (n : ℕ) (x : B), n ≠ 0 ∧ x ∈ S ∧ j x = n • v l)
-    (w : T) (hw : w ∈ Submodule.span L (Set.range v))
-    : ∃ (d : 𝓞 L) (y : B), d ≠ 0 ∧ y ∈ Submodule.span (𝓞 L) S ∧ j y = d • w := by
+theorem clear_span (j : B →ₗ[𝓞 L] T) {A : Type} (v : A → T) (S : Set B)
+    (hS : ∀ l, ∃ (n : ℕ) (x : B), n ≠ 0 ∧ x ∈ S ∧ j x = n • v l) (w : T)
+    (hw : w ∈ Submodule.span L (Set.range v)) :
+    ∃ (d : 𝓞 L) (y : B), d ≠ 0 ∧ y ∈ Submodule.span (𝓞 L) S ∧ j y = d • w := by
   induction hw using Submodule.span_induction with
   | mem x hx =>
     obtain ⟨l, rfl⟩ := hx
     obtain ⟨n, x, hn, hx, hj⟩ := hS l
     refine ⟨n, x, by exact_mod_cast hn, Submodule.subset_span hx, ?_⟩
-    rw [hj]
-    exact (Nat.cast_smul_eq_nsmul _ _ _).symm
-  | zero =>
-    exact ⟨1, 0, one_ne_zero, zero_mem _, by simp⟩
+    rw [hj]; exact (Nat.cast_smul_eq_nsmul _ _ _).symm
+  | zero => exact ⟨1, 0, one_ne_zero, zero_mem _, by simp⟩
   | add x y _ _ hx hy =>
     obtain ⟨d, a, hd, ha, hja⟩ := hx
     obtain ⟨d', a', hd', ha', hja'⟩ := hy
-    refine ⟨
-      d * d',
-      d' • a + d • a',
-      mul_ne_zero hd hd',
-      add_mem (Submodule.smul_mem _ _ ha) (Submodule.smul_mem _ _ ha'),
-      ?_
-    ⟩
-    rw [map_add (f := _), map_smul, map_smul, hja, hja', smul_add, smul_smul, smul_smul,
-      mul_comm d' d]
+    refine ⟨d * d', d' • a + d • a', mul_ne_zero hd hd',
+      add_mem (Submodule.smul_mem _ _ ha) (Submodule.smul_mem _ _ ha'), ?_⟩
+    rw [map_add (f := _), map_smul, map_smul, hja, hja', smul_add, smul_smul, smul_smul, mul_comm d' d]
   | smul s x _ hx =>
     obtain ⟨d, a, hd, ha, hja⟩ := hx
     obtain ⟨p, q, hq, rfl⟩ := IsFractionRing.div_surjective (A := 𝓞 L) s
@@ -135,52 +146,42 @@ end Clear
 
 section Val
 
-variable
-  {X : Scheme.{0}} {Ω : Type} [Field Ω]
-  {ξ : Sp Ω ⟶ X} {R : Type} [CommRing R] [IsLocalRing R]
-  {z : Sp R ⟶ X}
+variable {X : Scheme.{0}} {Ω : Type} [Field Ω] {ξ : Sp Ω ⟶ X} {R : Type} [CommRing R] [IsLocalRing R] {z : Sp R ⟶ X}
 
-theorem val_unique (hξ : IsCptGen ξ) {a : Ω} {r r' : R} (h : ValAt ξ z a r) (h' : ValAt ξ z a r')
-    : r = r' := by
+theorem val_unique (hξ : IsCptGen ξ) {a : Ω} {r r' : R} (h : ValAt ξ z a r) (h' : ValAt ξ z a r') : r = r' := by
   obtain ⟨h1, s, hs, rfl⟩ := h
   obtain ⟨h2, s', hs', rfl⟩ := h'
   have : s = s' := hξ.inj ⟨centre z, h1⟩ (hs.trans hs'.symm)
   rw [this]
 
-theorem val_mul {a a' : Ω} {r r' : R} (h : ValAt ξ z a r) (h' : ValAt ξ z a' r')
-    : ValAt ξ z (a * a') (r * r') := by
+theorem val_mul {a a' : Ω} {r r' : R} (h : ValAt ξ z a r) (h' : ValAt ξ z a' r') :
+    ValAt ξ z (a * a') (r * r') := by
   obtain ⟨h1, s, rfl, rfl⟩ := h
   obtain ⟨h2, s', rfl, rfl⟩ := h'
   exact ⟨h1, s * s', map_mul _ _ _, map_mul _ _ _⟩
 
-theorem val_exists (h : genPt ξ ⤳ centre z) {a : Ω} (ha : a ∈ regAt ξ ⟨centre z, h⟩)
-    : ∃ r, ValAt ξ z a r := by
+theorem val_exists (h : genPt ξ ⤳ centre z) {a : Ω} (ha : a ∈ regAt ξ ⟨centre z, h⟩) : ∃ r, ValAt ξ z a r := by
   obtain ⟨s, rfl⟩ := ha
   exact ⟨_, h, s, rfl, rfl⟩
 
-theorem val_zero (h : genPt ξ ⤳ centre z) : ValAt ξ z (0 : Ω) (0 : R) :=
-  ⟨h, 0, map_zero _, map_zero _⟩
+theorem val_zero (h : genPt ξ ⤳ centre z) : ValAt ξ z (0 : Ω) (0 : R) := ⟨h, 0, map_zero _, map_zero _⟩
 
 theorem val_one (h : genPt ξ ⤳ centre z) : ValAt ξ z (1 : Ω) (1 : R) := ⟨h, 1, map_one _, map_one _⟩
 
-theorem reg_of_val {a : Ω} {r : R} (h : ValAt ξ z a r) (h' : genPt ξ ⤳ centre z)
-    : a ∈ regAt ξ ⟨centre z, h'⟩ := by
+theorem reg_of_val {a : Ω} {r : R} (h : ValAt ξ z a r) (h' : genPt ξ ⤳ centre z) :
+    a ∈ regAt ξ ⟨centre z, h'⟩ := by
   obtain ⟨_, s, rfl, -⟩ := h
   exact ⟨s, rfl⟩
 
-theorem inv_nat_reg
-    {F : Type} [Field F] [CharZero F] {z : Sp F ⟶ X} (h : genPt ξ ⤳ centre z) {m : ℕ} (hm : 0 < m)
-    : (m : Ω)⁻¹ ∈ regAt ξ ⟨centre z, h⟩ ∧ (m : Ω) ≠ 0 := by
+theorem inv_nat_reg {F : Type} [Field F] [CharZero F] {z : Sp F ⟶ X} (h : genPt ξ ⤳ centre z) {m : ℕ} (hm : 0 < m) :
+    (m : Ω)⁻¹ ∈ regAt ξ ⟨centre z, h⟩ ∧ (m : Ω) ≠ 0 := by
   let f : X.presheaf.stalk (centre z) →+* F := (Scheme.stalkClosedPointTo z).hom
   haveI : IsLocalHom f := inferInstanceAs (IsLocalHom (Scheme.stalkClosedPointTo z).hom)
   have hu : IsUnit (f (m : X.presheaf.stalk (centre z))) := by
     rw [map_natCast f m]
     exact (Nat.cast_ne_zero.2 hm.ne' : (m : F) ≠ 0).isUnit
   obtain ⟨u, hu⟩ := (isUnit_map_iff f _).1 hu
-  have e
-      : (m : Ω) * genMap ξ ⟨centre z, h⟩
-          ((u⁻¹ : (X.presheaf.stalk (centre z))ˣ) : X.presheaf.stalk (centre z))
-        = 1 := by
+  have e : (m : Ω) * genMap ξ ⟨centre z, h⟩ ((u⁻¹ : (X.presheaf.stalk (centre z))ˣ) : X.presheaf.stalk (centre z)) = 1 := by
     rw [← map_natCast (genMap ξ ⟨centre z, h⟩) m, ← hu, ← map_mul]
     simp
   have h0 : (m : Ω) ≠ 0 := left_ne_zero_of_mul_eq_one e
@@ -259,8 +260,8 @@ theorem exists_phi : ∀ (X : Scheme.{0}) (Ω : Type) [Field Ω] (ξ : Sp Ω ⟶
       apply Subtype.ext
       rw [Submodule.coe_sum]
       exact h1
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [h3, map_sum]
+
+    rw [h3, map_sum]
     exact Finset.sum_congr rfl fun l _ => hevs _ _ _ (hρ l)
   have hval : ∀ (x : B.carrier) (e : Li) (v : epsAt (spMap (algebraMap (𝓞 L) L) ≫ z) ⟶ G),
       M.ValAt _ e v → (v.left ≫ (𝟙 G.left) = ReciprocityTheory.ChartRestriction.G.Geo.Tor.spMap (GlobalTheory.CompanionTheory.Ar.dualMap (algebraMap (𝓞 L) L)) ≫ (MB.pt x).left) →

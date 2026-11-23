@@ -1,6 +1,49 @@
 module
 
-public import Development.WeilBound.RepresentationTheoryGL.CasimirAlgebra.TensorRelationsGL.PTransAllA
+public import Development.WeilBound.RepresentationTheoryGL.CasimirAlgebra.TensorRelationsGL.KTypeData
+public import Mathlib.CategoryTheory.Category.Basic
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
@@ -10,28 +53,23 @@ open Formalism.REAL Matrix
 
 namespace PositivityTheory.Rg.Cz.TA
 
-variable
-  {n : ℕ} {M : Type} [AddCommGroup M] [Module ℂ M]
-  {P : Type} [Fintype P] [DecidableEq P]
+variable {n : ℕ} {M : Type} [AddCommGroup M] [Module ℂ M] {P : Type} [Fintype P] [DecidableEq P]
   (q : P → Prop) [DecidablePred q]
 
-def merge (J : {p // q p} → Fin n) (I : {p // ¬ q p} → Fin n) : P → Fin n := fun p =>
-  if h : q p then J ⟨p, h⟩ else I ⟨p, h⟩
+def merge (J : {p // q p} → Fin n) (I : {p // ¬ q p} → Fin n) : P → Fin n :=
+  fun p => if h : q p then J ⟨p, h⟩ else I ⟨p, h⟩
 
 omit [Fintype P] [DecidableEq P] in
-theorem merge_left (J : {p // q p} → Fin n) (I : {p // ¬ q p} → Fin n) (x : {p // q p})
-    : merge q J I x.1 = J x := by
-  simp [merge, x.2]
+theorem merge_left (J : {p // q p} → Fin n) (I : {p // ¬ q p} → Fin n) (x : {p // q p}) :
+    merge q J I x.1 = J x := by simp [merge, x.2]
 
 omit [Fintype P] [DecidableEq P] in
-theorem merge_right (J : {p // q p} → Fin n) (I : {p // ¬ q p} → Fin n) (x : {p // ¬ q p})
-    : merge q J I x.1 = I x := by
-  simp [merge, x.2]
+theorem merge_right (J : {p // q p} → Fin n) (I : {p // ¬ q p} → Fin n) (x : {p // ¬ q p}) :
+    merge q J I x.1 = I x := by simp [merge, x.2]
 
 omit [Fintype P] in
-theorem merge_upd_left
-    (J : {p // q p} → Fin n) (I : {p // ¬ q p} → Fin n) (x : {p // q p}) (c : Fin n)
-    : merge q (Function.update J x c) I = Function.update (merge q J I) x.1 c := by
+theorem merge_upd_left (J : {p // q p} → Fin n) (I : {p // ¬ q p} → Fin n) (x : {p // q p}) (c : Fin n) :
+    merge q (Function.update J x c) I = Function.update (merge q J I) x.1 c := by
   funext p
   by_cases h : q p
   · by_cases hp : p = x.1
@@ -43,9 +81,8 @@ theorem merge_upd_left
     simp [merge, h, hp]
 
 omit [Fintype P] in
-theorem merge_upd_right
-    (J : {p // q p} → Fin n) (I : {p // ¬ q p} → Fin n) (x : {p // ¬ q p}) (c : Fin n)
-    : merge q J (Function.update I x c) = Function.update (merge q J I) x.1 c := by
+theorem merge_upd_right (J : {p // q p} → Fin n) (I : {p // ¬ q p} → Fin n) (x : {p // ¬ q p}) (c : Fin n) :
+    merge q J (Function.update I x c) = Function.update (merge q J I) x.1 c := by
   funext p
   by_cases h : q p
   · have hp : p ≠ x.1 := fun e => x.2 (e ▸ h)
@@ -75,17 +112,15 @@ def spl : TV n M P ≃ₗ[ℂ] TV n (TV n M {p // ¬ q p}) {p // q p} where
     · exact merge_right q J I x
 
 omit [Fintype P] [DecidableEq P] in
-theorem spl_apply (F : TV n M P) (J : {p // q p} → Fin n) (I : {p // ¬ q p} → Fin n)
-    : spl q F J I = F (merge q J I) :=
-  rfl
+theorem spl_apply (F : TV n M P) (J : {p // q p} → Fin n) (I : {p // ¬ q p} → Fin n) :
+    spl q F J I = F (merge q J I) := rfl
 
 omit [Fintype P] in
-theorem spl_tE (S : Finset P) (F : Fin n → Fin n → Module.End ℂ M) (a b : Fin n) (f : TV n M P)
-    : spl q (tE S F a b f)
-      = tE (S.subtype q) (fun a b => tE (S.subtype fun p => ¬ q p) F a b) a b (spl q f) := by
+theorem spl_tE (S : Finset P) (F : Fin n → Fin n → Module.End ℂ M) (a b : Fin n) (f : TV n M P) :
+    spl q (tE S F a b f) =
+      tE (S.subtype q) (fun a b => tE (S.subtype fun p => ¬ q p) F a b) a b (spl q f) := by
   funext J I
-  simp only [spl_apply, tE, lift, eAt, LinearMap.add_apply, LinearMap.sum_apply, Finset.sum_apply,
-    LinearMap.pi_apply, LinearMap.comp_apply, LinearMap.proj_apply, Pi.add_apply]
+  simp only [spl_apply, tE, lift, eAt, LinearMap.add_apply, LinearMap.sum_apply, Finset.sum_apply, LinearMap.pi_apply, LinearMap.comp_apply, LinearMap.proj_apply, Pi.add_apply]
   rw [add_assoc]
   congr 1
   rw [← Finset.sum_filter_add_sum_filter_not S q, add_comm]
@@ -102,18 +137,16 @@ theorem spl_tE (S : Finset P) (F : Fin n → Fin n → Module.End ℂ M) (a b : 
     · simp [h, merge_left]
 
 omit [DecidableEq P] in
-theorem card_sub (r : P → Prop) [DecidablePred r]
-    : (Finset.univ.filter fun x : {p // q p} => r x.1).card
-      = (Finset.univ.filter fun p => q p ∧ r p).card := by
+theorem card_sub (r : P → Prop) [DecidablePred r] :
+    (Finset.univ.filter fun x : {p // q p} => r x.1).card = (Finset.univ.filter fun p => q p ∧ r p).card := by
   rw [← Finset.card_map (Function.Embedding.subtype q)]
   congr 1
   ext p
   simp [and_comm]
 
-private theorem subtypePerm_subtypeCongr_eq
-    {q : P → Prop} [DecidablePred q]
-    (σ : Equiv.Perm P) (h0 : ∀ x, q (σ x) ↔ q x) (h1 : ∀ x, ¬ q (σ x) ↔ ¬ q x)
-    : (σ.subtypePerm h0).subtypeCongr (σ.subtypePerm (p := fun x => ¬ q x) h1) = σ := by
+private theorem subtypePerm_subtypeCongr_eq {q : P → Prop} [DecidablePred q] (σ : Equiv.Perm P)
+    (h0 : ∀ x, q (σ x) ↔ q x) (h1 : ∀ x, ¬ q (σ x) ↔ ¬ q x) :
+    (σ.subtypePerm h0).subtypeCongr (σ.subtypePerm (p := fun x => ¬ q x) h1) = σ := by
   ext x
   by_cases hx : q x
   · rw [Equiv.Perm.subtypeCongr.left_apply _ _ hx]
@@ -121,19 +154,12 @@ private theorem subtypePerm_subtypeCongr_eq
   · rw [Equiv.Perm.subtypeCongr.right_apply _ _ hx]
     rfl
 
-theorem cA_split
-    {C : Type} [DecidableEq C]
-    (col : P → C) (hq : ∀ p p', col p = col p' → (q p ↔ q p'))
-    (b : P → Fin n) (F : TV n M P)
-    : cA col b F
-      = cA
-        (fun x : {p // ¬ q p} => col x.1)
-        (fun x => b x.1)
-        (cA (fun x : {p // q p} => col x.1) (fun x => b x.1) (spl q F)) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [cA, alt, colG, LinearMap.comp_apply, LinearMap.proj_apply, LinearMap.sum_apply,
-      Finset.sum_apply, LinearMap.smul_apply, Pi.smul_apply, map_sum, map_smul, pm,
-      LinearMap.pi_apply]
+theorem cA_split {C : Type} [DecidableEq C] (col : P → C) (hq : ∀ p p', col p = col p' → (q p ↔ q p'))
+    (b : P → Fin n) (F : TV n M P) :
+    cA col b F = cA (fun x : {p // ¬ q p} => col x.1) (fun x => b x.1)
+      (cA (fun x : {p // q p} => col x.1) (fun x => b x.1) (spl q F)) := by
+
+  simp only [cA, alt, colG, LinearMap.comp_apply, LinearMap.proj_apply, LinearMap.sum_apply, Finset.sum_apply, LinearMap.smul_apply, Pi.smul_apply, map_sum, map_smul, pm, LinearMap.pi_apply]
   simp_rw [Finset.smul_sum, smul_smul, spl_apply]
   rw [← Finset.sum_product']
   symm
@@ -163,11 +189,7 @@ theorem cA_split
     simp only [Finset.mem_filter, Finset.mem_univ, true_and] at hσ
     have h0 : ∀ x, q (σ x) ↔ q x := fun x => hq _ _ (hσ x)
     have h1 : ∀ x, ¬ q (σ x) ↔ ¬ q x := fun x => not_congr (h0 x)
-    refine ⟨
-      (σ.subtypePerm h0, σ.subtypePerm (p := fun x => ¬ q x) h1),
-      ?_,
-      subtypePerm_subtypeCongr_eq σ h0 h1
-    ⟩
+    refine ⟨(σ.subtypePerm h0, σ.subtypePerm (p := fun x => ¬ q x) h1), ?_, subtypePerm_subtypeCongr_eq σ h0 h1⟩
     simp only [Finset.mem_product, Finset.mem_filter, Finset.mem_univ, true_and]
     exact ⟨fun x => hσ x.1, fun x => hσ x.1⟩
   · rintro ⟨σ0, σ1⟩ _

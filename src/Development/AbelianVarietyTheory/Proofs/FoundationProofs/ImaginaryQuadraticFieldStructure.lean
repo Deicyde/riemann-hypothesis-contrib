@@ -1,12 +1,55 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.Definitions.Foundations.NormSumPairRankZeroOfCurveCoordNorm
-public import Formalism.PairingDivisors.StatementH
-public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.DifferentiableComb
+public import Formalism.SharpRestriction.GlobalSchurBounds.StandardLatticesGL3
 public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.InducedTypeThetaGenusOnePermutes
 public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.OrthonormalTransitionDetMulConjEqOne
 public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.RatOfImEqZero
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Rat
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+public import Mathlib.NumberTheory.SumFourSquares
+import Mathlib.RingTheory.PicardGroup
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
+import Development.AbelianVarietyTheory.Definitions.Foundations.NormSumPairRankZeroOfCurveCoordNorm
+import Development.AbelianVarietyTheory.Proofs.FoundationProofs.DifferentiableComb
 
 @[expose] public section
 
@@ -36,8 +79,8 @@ theorem exists_orthogonal_family
     have hx : ∀ j, h (v j) (x - p) = 0 := by
       intro j
       have hj : h (v j) (v j) ≠ 0 := fun e => h0 j (hdef _ e)
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sub, hp, map_sum, Finset.sum_eq_single j]
+
+      rw [map_sub, hp, map_sum, Finset.sum_eq_single j]
       · rw [map_smul, smul_eq_mul, div_mul_cancel₀ _ hj, sub_self]
       · intro i _ hij
         rw [map_smul, ho i j hij, smul_zero]
@@ -104,8 +147,8 @@ theorem exists_rat_pos {N N' : ℕ} (x : Matrix (Fin N') (Fin N) D.host.E) (hx :
         = ((∑ τ, ∑ i, ∑ j, Complex.normSq (embT D τ (x i j)) : ℝ) : ℂ) := by
     unfold hYY
     rw [← (GlobalTheory.InducedType.induced_type D).1.2]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_mul, hc, Complex.mul_conj]
+
+    simp only [map_sum, map_mul, hc, Complex.mul_conj]
     push_cast
     rfl
   obtain ⟨a, ha⟩ := exists_rat_of_real D (hYY D x x) (by rw [h, Complex.ofReal_im])

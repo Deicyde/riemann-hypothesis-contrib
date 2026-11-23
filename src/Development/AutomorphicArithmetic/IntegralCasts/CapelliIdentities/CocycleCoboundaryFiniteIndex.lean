@@ -1,16 +1,57 @@
 module
 
-public import Mathlib
+public import Mathlib.GroupTheory.Index
+public import Mathlib.RepresentationTheory.Basic
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
-theorem
-    UpperTheory.Reformulated.B.CocycleCoboundaryFiniteIndex.coboundary_of_vanishing_on_finite_index
-    : ∀ {R Q M : Type} [inst : CommRing R] [inst_1 : Group Q] [inst_2 : AddCommGroup M]
-        [inst_3 : _root_.Module R M] (π : Representation R Q M) (H : Subgroup Q) (f : Q → M),
-      (∀ (g h : Q), f (g * h) = f g + ((π : Q → M →ₗ[R] M) g : M → M) (f h))
-        → (∀ u ∈ H, f u = (0 : M)) → IsUnit (↑H.index : R) → H.index ≠ (0 : ℕ)
-        → ∃ (m : M), ∀ (g : Q), f g = ((π : Q → M →ₗ[R] M) g : M → M) m - m := by
+theorem UpperTheory.Reformulated.B.CocycleCoboundaryFiniteIndex.coboundary_of_vanishing_on_finite_index :
+    ∀ {R Q M : Type} [inst : CommRing R] [inst_1 : Group Q]
+    [inst_2 : AddCommGroup M] [inst_3 : _root_.Module R M] (π : Representation R Q M) (H : Subgroup Q) (f : Q → M),
+    (∀ (g h : Q), f (g * h) = f g + ((π : Q → M →ₗ[R] M) g : M → M) (f h)) →
+      (∀ u ∈ H, f u = (0 : M)) →
+        IsUnit (↑H.index : R) →
+          H.index ≠ (0 : ℕ) → ∃ (m : M), ∀ (g : Q), f g = ((π : Q → M →ₗ[R] M) g : M → M) m - m := by
   intro R Q M _ _ _ _ π H f hf hH hu hn
   classical
   haveI : Fintype (Q ⧸ H) := Subgroup.fintypeOfIndexNeZero hn
@@ -21,7 +62,8 @@ theorem
     rw [mul_inv_cancel_left, hH _ hmem, map_zero, add_zero] at h1
     exact h1.symm
   let F : Q ⧸ H → M := fun x => f x.out
-  have hF : ∀ a : Q, F (a : Q ⧸ H) = f a := fun a => hconst _ _ (QuotientGroup.out_eq' _)
+  have hF : ∀ a : Q, F (a : Q ⧸ H) = f a := fun a =>
+    hconst _ _ (QuotientGroup.out_eq' _)
   have hstep : ∀ (g : Q) (x : Q ⧸ H), F (g • x) = f g + π g (F x) := by
     intro g x
     induction x using QuotientGroup.induction_on with
@@ -32,20 +74,16 @@ theorem
     rw [Subgroup.index_eq_card, Nat.card_eq_fintype_card]
   have hsum : ∀ g : Q, ∑ x, F x = (H.index : R) • f g + π g (∑ x, F x) := by
     intro g
-    calc
-      ∑ x, F x
-        = ∑ x, F (g • x) := (Equiv.sum_comp (MulAction.toPerm g) F).symm
+    calc ∑ x, F x = ∑ x, F (g • x) := (Equiv.sum_comp (MulAction.toPerm g) F).symm
       _ = ∑ x : Q ⧸ H, (f g + π g (F x)) := Finset.sum_congr rfl fun x _ => hstep g x
       _ = _ := by
-        set_option synthInstance.maxHeartbeats 100000 in
+
         rw [Finset.sum_add_distrib, Finset.sum_const, Finset.card_univ, hcard, map_sum,
-          Nat.cast_smul_eq_nsmul]
+        Nat.cast_smul_eq_nsmul]
   obtain ⟨c, hc⟩ := hu.exists_left_inv
   refine ⟨-(c • ∑ x, F x), fun g => ?_⟩
   have h3 : (H.index : R) • f g = ∑ x, F x - π g (∑ x, F x) := eq_sub_of_add_eq (hsum g).symm
-  calc
-    f g
-      = c • ((H.index : R) • f g) := by rw [smul_smul, hc, one_smul]
+  calc f g = c • ((H.index : R) • f g) := by rw [smul_smul, hc, one_smul]
     _ = _ := by
       rw [h3, map_neg, map_smul, smul_sub]
       abel

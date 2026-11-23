@@ -1,8 +1,51 @@
 module
 
-public import Formalism.LocalToGlobal.Columns.RecLevelSym
 public import Formalism.LocalToGlobal.Columns.TiedGlMat
 public import Formalism.LocalToGlobal.HermitianForms.DefsSym
+public import Formalism.LocalToGlobal.Columns.LevGSym
+public import Formalism.LocalToGlobal.Columns.RecLevelSym
+public import Formalism.LocalToGlobal.Columns.RowFormsLemmas
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
+public import Formalism.LocalToGlobal.Columns.AbelianHostFieldConditions
 
 @[expose] public section
 
@@ -15,16 +58,14 @@ section TieFormsSym
 
 variable {κ : Type} [CommRing κ] {k' : Type} [Field k']
 
-theorem blkIdx_replicate_top {t : ℕ} (_ht : 0 < t) (j : ℕ)
-    : blkIdx (List.replicate j t) (j * t) = j := by
+theorem blkIdx_replicate_top {t : ℕ} (_ht : 0 < t) (j : ℕ) : blkIdx (List.replicate j t) (j * t) = j := by
   induction j with
   | zero => rfl
   | succ j ih =>
-    rw [List.replicate_succ, blkIdx, if_neg (by rw [Nat.succ_mul]; omega),
-      show (j + 1) * t - t = j * t by rw [Nat.succ_mul]; omega, ih]
+    rw [List.replicate_succ, blkIdx, if_neg (by rw [Nat.succ_mul]; omega), show (j + 1) * t - t = j * t by rw [Nat.succ_mul]; omega, ih]
 
-theorem coarse_rep {r t j x : ℕ} (ht : 0 < t) (hx : x ≤ r + j * t)
-    : coarse r (List.replicate j t) x = if x < r then 0 else (x - r) / t + 1 := by
+theorem coarse_rep {r t j x : ℕ} (ht : 0 < t) (hx : x ≤ r + j * t) :
+    coarse r (List.replicate j t) x = if x < r then 0 else (x - r) / t + 1 := by
   split_ifs with h
   · exact coarse_of_lt h
   · rw [coarse_of_le (Nat.not_lt.mp h)]
@@ -37,33 +78,21 @@ theorem posSym_eq_symIdx (k rS x : ℕ) : Formalism.L2.Forms.posSym k rS x = sym
   unfold Formalism.L2.Forms.posSym symIdx
   split_ifs <;> omega
 
-theorem mem_HJsym_iff_InJSym
-    (e : κ ≃+* k')
-    {n k rS t j : ℕ}
-    (ht : 0 < t) (hn : n ≤ k + 2 * rS + 1 + j * t + 1) (h : k + 2 * rS + 1 ≤ n) (M : GL (Fin n) κ)
-    : M ∈ HJsym κ n k (k + 2 * rS + 1) t j rS h
-      ↔ Formalism.L2.Forms.InJSym k rS t false ((M : Matrix (Fin n) (Fin n) κ).map e) := by
+theorem mem_HJsym_iff_InJSym (e : κ ≃+* k') {n k rS t j : ℕ} (ht : 0 < t) (hn : n ≤ k + 2 * rS + 1 + j * t + 1)
+    (h : k + 2 * rS + 1 ≤ n) (M : GL (Fin n) κ) :
+    M ∈ HJsym κ n k (k + 2 * rS + 1) t j rS h ↔
+      Formalism.L2.Forms.InJSym k rS t false ((M : Matrix (Fin n) (Fin n) κ).map e) := by
   have hrS : k + rS ≤ k + 2 * rS + 1 := by omega
-  have hlv
-      : ∀ x : Fin n,
-        Formalism.L2.Forms.lvSym k rS t x.val
-          = if x.val < k + 2 * rS + 1 then
-              symIdx k rS x.val
-            else
-              k + 2 * rS + 1 + (x.val - (k + 2 * rS + 1)) / t := by
+  have hlv : ∀ x : Fin n, Formalism.L2.Forms.lvSym k rS t x.val =
+      if x.val < k + 2 * rS + 1 then symIdx k rS x.val else k + 2 * rS + 1 + (x.val - (k + 2 * rS + 1)) / t := by
     intro x
     unfold Formalism.L2.Forms.lvSym Formalism.L2.Forms.rSym
     rw [posSym_eq_symIdx]
-  have hco
-      : ∀ x : Fin n,
-        coarse (k + 2 * rS + 1) (List.replicate j t) x.val
-          = if x.val < k + 2 * rS + 1 then 0 else (x.val - (k + 2 * rS + 1)) / t + 1 := fun x =>
-    coarse_rep ht (by have := x.2; omega)
-  have hsym : ∀ x : ℕ, x < k + 2 * rS + 1 → symIdx k rS x < k + 2 * rS + 1 := fun x hx =>
-    symIdx_lt hrS hx
+  have hco : ∀ x : Fin n, coarse (k + 2 * rS + 1) (List.replicate j t) x.val =
+      if x.val < k + 2 * rS + 1 then 0 else (x.val - (k + 2 * rS + 1)) / t + 1 := fun x => coarse_rep ht (by have := x.2; omega)
+  have hsym : ∀ x : ℕ, x < k + 2 * rS + 1 → symIdx k rS x < k + 2 * rS + 1 := fun x hx => symIdx_lt hrS hx
   have z0 : ∀ a : κ, e a = 0 ↔ a = 0 := fun a => EmbeddingLike.map_eq_zero_iff
-  have z1 : ∀ a : κ, e a = 1 ↔ a = 1 := fun a =>
-    ⟨fun h' => e.injective (by rw [h', map_one]), fun h' => by rw [h', map_one]⟩
+  have z1 : ∀ a : κ, e a = 1 ↔ a = 1 := fun a => ⟨fun h' => e.injective (by rw [h', map_one]), fun h' => by rw [h', map_one]⟩
   unfold HJsym
   rw [mem_HPar]
   constructor
@@ -99,18 +128,12 @@ theorem mem_HJsym_iff_InJSym
       have := h3 ⟨x.val, by omega⟩ ⟨y.val, by omega⟩ hx hy
       rwa [blockZero_val] at this
   · rintro ⟨h1, h2, h3, _⟩
-    have h1'
-        : ∀ x y : Fin n,
-          Formalism.L2.Forms.lvSym k rS t y.val < Formalism.L2.Forms.lvSym k rS t x.val
-            → (M : Matrix (Fin n) (Fin n) κ) x y = 0 := fun x y hxy =>
-      (z0 _).mp (by rw [← Matrix.map_apply (f := e)]; exact h1 x y hxy)
+    have h1' : ∀ x y : Fin n, Formalism.L2.Forms.lvSym k rS t y.val < Formalism.L2.Forms.lvSym k rS t x.val →
+        (M : Matrix (Fin n) (Fin n) κ) x y = 0 := fun x y hxy => (z0 _).mp (by rw [← Matrix.map_apply (f := e)]; exact h1 x y hxy)
     have hB : M ∈ blockUT n κ (k + 2 * rS + 1) (List.replicate j t) := by
       intro x y hxy
       apply h1'
-      have hxy'
-          : coarse (k + 2 * rS + 1) (List.replicate j t) y.val
-            < coarse (k + 2 * rS + 1) (List.replicate j t) x.val :=
-        hxy
+      have hxy' : coarse (k + 2 * rS + 1) (List.replicate j t) y.val < coarse (k + 2 * rS + 1) (List.replicate j t) x.val := hxy
       rw [hco, hco] at hxy'
       rw [hlv, hlv]
       generalize hqy : (y.val - (k + 2 * rS + 1)) / t = qy at hxy' ⊢
@@ -134,22 +157,16 @@ theorem mem_HJsym_iff_InJSym
     · rw [blockZero_val]
       exact (z1 _).mp (by rw [← Matrix.map_apply (f := e)]; exact h2 (Fin.castLE h a) a.2)
     · rw [blockZero_val]
-      exact (z0 _).mp
-        (by rw [← Matrix.map_apply (f := e)]; exact h3 (Fin.castLE h a) (Fin.castLE h b) ha hb)
+      exact (z0 _).mp (by rw [← Matrix.map_apply (f := e)]; exact h3 (Fin.castLE h a) (Fin.castLE h b) ha hb)
 
-theorem HJsym_eq_JSymG
-    {κ : Type} [Field κ]
-    {n k rS t j : ℕ} (ht : 0 < t) (hn : n ≤ k + 2 * rS + 1 + j * t + 1) (h : k + 2 * rS + 1 ≤ n)
-    : HJsym κ n k (k + 2 * rS + 1) t j rS h
-      = Formalism.L2.Forms.JSymG (κ := κ) (n := n) k rS t false := by
+theorem HJsym_eq_JSymG {κ : Type} [Field κ] {n k rS t j : ℕ} (ht : 0 < t) (hn : n ≤ k + 2 * rS + 1 + j * t + 1)
+    (h : k + 2 * rS + 1 ≤ n) :
+    HJsym κ n k (k + 2 * rS + 1) t j rS h = Formalism.L2.Forms.JSymG (κ := κ) (n := n) k rS t false := by
   ext M
   have e1 := mem_HJsym_iff_InJSym (RingEquiv.refl κ) ht hn h M
   have e2 := mem_HJsym_iff_InJSym (RingEquiv.refl κ) ht hn h M⁻¹
   rw [show ((M : Matrix (Fin n) (Fin n) κ).map (RingEquiv.refl κ)) = M from by ext; rfl] at e1
-  rw [show (((M⁻¹ : GL (Fin n) κ) : Matrix (Fin n) (Fin n) κ).map (RingEquiv.refl κ))
-        = ((M⁻¹ : GL (Fin n) κ) : Matrix (Fin n) (Fin n) κ) from by
-      ext; rfl]
-    at e2
+  rw [show (((M⁻¹ : GL (Fin n) κ) : Matrix (Fin n) (Fin n) κ).map (RingEquiv.refl κ)) = ((M⁻¹ : GL (Fin n) κ) : Matrix (Fin n) (Fin n) κ) from by ext; rfl] at e2
   constructor
   · intro hM
     exact ⟨e1.mp hM, e2.mp (Subgroup.inv_mem _ hM)⟩
@@ -162,44 +179,33 @@ section TieLamSym
 
 variable {κ : Type} [CommRing κ] {k' : Type} [Field k'] {K : Type} [Field K]
 
-theorem supSum_map_eq
-    (e : κ ≃+* k')
-    {n a skip : ℕ} (S : Finset ℕ) (hS : ∀ x, x + 1 < a → (x ∈ S ↔ x + 1 ≠ skip))
-    (M : Matrix (Fin n) (Fin n) κ)
-    : e (supSum a S M)
-      = ∑ x : Fin n, ∑ y : Fin n, if (x : ℕ) + 1 = y ∧ (y : ℕ) < a ∧ (y : ℕ) ≠ skip then (M.map e) x y else 0 :=
-  by
-    unfold supSum
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
-    refine Finset.sum_congr rfl fun x _ => ?_
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
-    refine Finset.sum_congr rfl fun y _ => ?_
-    by_cases h : (x : ℕ) + 1 = y ∧ (y : ℕ) < a
-    · have h2 : ((x : ℕ) ∈ S ↔ (y : ℕ) ≠ skip) := by rw [← h.1]; exact hS x (by omega)
-      by_cases h3 : (x : ℕ) ∈ S
-      · rw [if_pos ⟨h.1, h.2, h3⟩, if_pos ⟨h.1, h.2, h2.1 h3⟩]; rfl
-      · rw [if_neg (fun h' => h3 h'.2.2), if_neg (fun h' => h3 (h2.2 h'.2.2)), map_zero]
-    · rw [if_neg (fun h' => h ⟨h'.1, h'.2.1⟩), if_neg (fun h' => h ⟨h'.1, h'.2.1⟩), map_zero]
+theorem supSum_map_eq (e : κ ≃+* k') {n a skip : ℕ} (S : Finset ℕ) (hS : ∀ x, x + 1 < a → (x ∈ S ↔ x + 1 ≠ skip))
+    (M : Matrix (Fin n) (Fin n) κ) :
+    e (supSum a S M) = ∑ x : Fin n, ∑ y : Fin n, if (x : ℕ) + 1 = y ∧ (y : ℕ) < a ∧ (y : ℕ) ≠ skip then (M.map e) x y else 0 := by
+  unfold supSum
 
-theorem lamJsym_eq_lamSym
-    (e : κ ≃+* k') (σ₀ : K →+* ℂ) (ψ : AddChar κ K) (χ : ℕ → κˣ →* Kˣ)
-    {n k rS t j : ℕ} (ht : 0 < t) (hn : k + 2 * rS + 1 + j * t ≤ n) (h : k + 2 * rS + 1 ≤ n)
-    (M : ↥(HJsym κ n k (k + 2 * rS + 1) t j rS h))
-    : σ₀ ((lamJsym ψ χ n k (k + 2 * rS + 1) t j rS h M : Kˣ) : K)
-      = Formalism.L2.Forms.lamSym (glmPsi e σ₀ ψ)
-        (fun s => glmChi e σ₀ (χ s))
-        k rS t j ((M.1 : Matrix (Fin n) (Fin n) κ).map e) := by
+  rw [map_sum]
+  refine Finset.sum_congr rfl fun x _ => ?_
+
+  rw [map_sum]
+  refine Finset.sum_congr rfl fun y _ => ?_
+  by_cases h : (x : ℕ) + 1 = y ∧ (y : ℕ) < a
+  · have h2 : ((x : ℕ) ∈ S ↔ (y : ℕ) ≠ skip) := by rw [← h.1]; exact hS x (by omega)
+    by_cases h3 : (x : ℕ) ∈ S
+    · rw [if_pos ⟨h.1, h.2, h3⟩, if_pos ⟨h.1, h.2, h2.1 h3⟩]; rfl
+    · rw [if_neg (fun h' => h3 h'.2.2), if_neg (fun h' => h3 (h2.2 h'.2.2)), map_zero]
+  · rw [if_neg (fun h' => h ⟨h'.1, h'.2.1⟩), if_neg (fun h' => h ⟨h'.1, h'.2.1⟩), map_zero]
+
+theorem lamJsym_eq_lamSym (e : κ ≃+* k') (σ₀ : K →+* ℂ) (ψ : AddChar κ K) (χ : ℕ → κˣ →* Kˣ) {n k rS t j : ℕ} (ht : 0 < t)
+    (hn : k + 2 * rS + 1 + j * t ≤ n) (h : k + 2 * rS + 1 ≤ n) (M : ↥(HJsym κ n k (k + 2 * rS + 1) t j rS h)) :
+    σ₀ ((lamJsym ψ χ n k (k + 2 * rS + 1) t j rS h M : Kˣ) : K) =
+      Formalism.L2.Forms.lamSym (glmPsi e σ₀ ψ) (fun s => glmChi e σ₀ (χ s)) k rS t j ((M.1 : Matrix (Fin n) (Fin n) κ).map e) := by
   unfold lamJsym lamPar Formalism.L2.Forms.lamSym Formalism.L2.Forms.lamJ Formalism.L2.Forms.rSym
   rw [MonoidHom.mul_apply, Units.val_mul, map_mul]
   congr 1
   · rw [MonoidHom.comp_apply, chiSymF_val rfl]
-    have e1
-        : ((HPar0 h (List.replicate j t) (HPsymF κ (k + 2 * rS + 1) k rS) M).1
-            : Matrix (Fin (k + 2 * rS + 1)) (Fin (k + 2 * rS + 1)) κ)
-          = restr h (M.1 : Matrix (Fin n) (Fin n) κ) :=
-      rfl
+    have e1 : ((HPar0 h (List.replicate j t) (HPsymF κ (k + 2 * rS + 1) k rS) M).1 : Matrix (Fin (k + 2 * rS + 1)) (Fin (k + 2 * rS + 1)) κ) =
+        restr h (M.1 : Matrix (Fin n) (Fin n) κ) := rfl
     rw [e1, supSum_restr, ← glmPsi_apply e σ₀ ψ]
     congr 1
     refine supSum_map_eq e _ (fun x hx => ?_) _
@@ -210,16 +216,9 @@ theorem lamJsym_eq_lamSym
     · exact fun h' => ⟨by omega, h'⟩
   · rw [MonoidHom.comp_apply, detChar_apply, List.length_replicate, Units.coe_prod, map_prod]
     refine Finset.prod_congr rfl fun s hs => ?_
-    have h2 :=
-      glm_blkDet e ht (Finset.mem_range.1 hs) hn
-        (Subgroup.inclusion (HPar_le h (List.replicate j t) _) M)
-    have h3
-        : (((Subgroup.inclusion (HPar_le h (List.replicate j t) (HPsymF κ (k + 2 * rS + 1) k rS))
-                M).1
-              : GL (Fin n) κ)
-            : Matrix (Fin n) (Fin n) κ)
-          = (M.1 : Matrix (Fin n) (Fin n) κ) :=
-      rfl
+    have h2 := glm_blkDet e ht (Finset.mem_range.1 hs) hn (Subgroup.inclusion (HPar_le h (List.replicate j t) _) M)
+    have h3 : (((Subgroup.inclusion (HPar_le h (List.replicate j t) (HPsymF κ (k + 2 * rS + 1) k rS)) M).1 : GL (Fin n) κ) :
+        Matrix (Fin n) (Fin n) κ) = (M.1 : Matrix (Fin n) (Fin n) κ) := rfl
     rw [h3] at h2
     rw [← h2]
     exact (glmChi_apply e σ₀ (χ s) _).symm

@@ -1,16 +1,57 @@
 module
 
-public import Mathlib
-public import Formalism.LocalToGlobal.IndefiniteReal.OneMapT
-public import Formalism.LocalToGlobal.IndefiniteReal.OneMapEq
-public import Formalism.LocalToGlobal.IndefiniteReal.ConcretePkgSpec
-public import Formalism.LocalToGlobal.IndefiniteReal.FWExist
 public import Development.AbelianVarietyTheory.Definitions.TwistedInnerProducts.TupPrimeEmpty
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsOmegaField
+public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsHalfOfBasePins
+public import Formalism.LocalToGlobal.IndefiniteReal.FWTie
+public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsRepsOfFiniteIndex
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsCoeffExtRationalFormsValuesFieldStatement
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsNumberFieldHeckeCharacterSqrtNormValues
-public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.PbEqOfTie
-public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.LocKIntMem
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsOmegaField
+import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.InverseSelfDualFrameStandardSpaceIntegralStatement
+import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.LawOfSquaresSelfDualSplitLatticeStatement
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.CoversAtOverField
+public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.LocKIntMem
+public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.PbEqOfTie
+import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.ExistsFirstOfSecond
+import Formalism.LocalToGlobal.IndefiniteReal.FWExist
+import Formalism.LocalToGlobal.ProjectiveLattices.LevelPb
+import Formalism.SharpRestriction.RamificationFrobenius.TotientGaloisClasses.HostFacts
+import Mathlib.Algebra.AffineMonoid.Basic
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
 
 @[expose] public section
 
@@ -198,7 +239,6 @@ theorem exists_BIs
   simp only [dif_pos (And.intro h0 h1)]
   rfl
 
-set_option maxHeartbeats 1000000 in
 theorem exists_phi_over
     {F : Face D A} (hR : R.Char F)
     (hV : VStd D i)
@@ -249,7 +289,6 @@ theorem exists_phi_over
     exists_datum (Vc D i) (Wc D i) hV.1 _ hβ (R.βW i) e ι hi J PP (hJ PP hPP) x _ fun b =>
       (Submodule.Quotient.eq _).1 (Quotient.out_eq _)
 
-set_option maxHeartbeats 2000000 in
 theorem pinsOverL
     : ∀ (D : D7) (G : Type) [Group G] [Fintype G] (Pl0 T0 : Type)
         (A : FamIn D.what₂.LL G Pl0 T0 D.R.m) (T : CoreJ D) [Algebra T.Q.c.F D.what₂.LL]

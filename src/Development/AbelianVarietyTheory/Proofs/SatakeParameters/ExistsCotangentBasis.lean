@@ -1,15 +1,51 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.FRatioSelf
-public import Development.AbelianVarietyTheory.Definitions.Divisors.IsAffCoverSpec
 public import Development.AbelianVarietyTheory.Definitions.Divisors.ComparisonMemCechHodgeFiltration
+public import Development.AbelianVarietyTheory.Definitions.Divisors.DetJacMatCoordsEqTransitionJacobianDet
 public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.SmoothOfRelativeDimensionOfDimOfFinrankDerivatio
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Finiteness.ModuleFinitePresentation
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.TotallySplit
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Development.AbelianVarietyTheory.Definitions.Divisors.CupPair
 
 @[expose] public section
 
-open CategoryTheory AlgebraicGeometry ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory
-  GlobalTheory.CechDR GlobalTheory.PD
+open CategoryTheory AlgebraicGeometry ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory GlobalTheory.CechDR GlobalTheory.PD
 
 set_option autoImplicit false
 
@@ -19,14 +55,12 @@ namespace GlobalTheory.CotDim
 
 open TensorProduct KaehlerDifferential
 
-theorem exists_basis_mod_sq
-    {A : Type} [CommRing A] [Algebra ℂ A]
-    (e : A →+* ℂ) (he : ∀ c : ℂ, e (algebraMap ℂ A c) = c)
-    (d : ℕ) (hb : letI := e.toAlgebra; Nonempty (Module.Basis (Fin d) ℂ (ℂ ⊗[A] Ω[A⁄ℂ])))
-    : ∃ g : Fin d → A,
-      (∀ j, e (g j) = 0)
-        ∧ (∀ a : A, e a = 0 → ∃ c : Fin d → ℂ, a - ∑ j, c j • g j ∈ RingHom.ker e ^ 2)
-        ∧ (∀ c : Fin d → ℂ, ∑ j, c j • g j ∈ RingHom.ker e ^ 2 → c = 0) := by
+theorem exists_basis_mod_sq {A : Type} [CommRing A] [Algebra ℂ A] (e : A →+* ℂ)
+    (he : ∀ c : ℂ, e (algebraMap ℂ A c) = c) (d : ℕ)
+    (hb : letI := e.toAlgebra; Nonempty (Module.Basis (Fin d) ℂ (ℂ ⊗[A] Ω[A⁄ℂ]))) :
+    ∃ g : Fin d → A, (∀ j, e (g j) = 0) ∧
+      (∀ a : A, e a = 0 → ∃ c : Fin d → ℂ, a - ∑ j, c j • g j ∈ RingHom.ker e ^ 2) ∧
+      (∀ c : Fin d → ℂ, ∑ j, c j • g j ∈ RingHom.ker e ^ 2 → c = 0) := by
   letI : Algebra A ℂ := e.toAlgebra
   haveI : IsScalarTower ℂ A ℂ := IsScalarTower.of_algebraMap_eq fun c => (he c).symm
   obtain ⟨b⟩ := hb
@@ -37,20 +71,17 @@ theorem exists_basis_mod_sq
     congr 1
     rw [Algebra.smul_def, mul_one, smul_eq_mul, mul_one]
     exact he c
-  let φ : A →ₗ[ℂ] ℂ ⊗[A] Ω[A⁄ℂ] := {
-    toFun := fun a => (1 : ℂ) ⊗ₜ[A] D ℂ A a
-    map_add' := fun a b => by rw [map_add (f := _), TensorProduct.tmul_add]
-    map_smul' := fun c a => by rw [(D ℂ A).map_smul c a, key]; rfl
-  }
-  have hφ
-      : ∀ x : RingHom.ker (algebraMap A ℂ),
-        φ x = kerCotangentToTensor ℂ A ℂ ((RingHom.ker (algebraMap A ℂ)).toCotangent x) := fun x =>
-    (kerCotangentToTensor_toCotangent ℂ A ℂ x).symm
+  let φ : A →ₗ[ℂ] ℂ ⊗[A] Ω[A⁄ℂ] :=
+    { toFun := fun a => (1 : ℂ) ⊗ₜ[A] D ℂ A a
+      map_add' := fun a b => by rw [map_add (f := _), TensorProduct.tmul_add]
+      map_smul' := fun c a => by rw [(D ℂ A).map_smul c a, key]; rfl }
+  have hφ : ∀ x : RingHom.ker (algebraMap A ℂ), φ x =
+      kerCotangentToTensor ℂ A ℂ ((RingHom.ker (algebraMap A ℂ)).toCotangent x) :=
+    fun x => (kerCotangentToTensor_toCotangent ℂ A ℂ x).symm
   have hinj := GlobalTheory.SmoothTangent.kerCotangentToTensor_injective ℂ A ℂ hs
   have hsurj : ∀ v, ∃ x : RingHom.ker (algebraMap A ℂ), φ x = v := by
     intro v
-    obtain ⟨y, hy⟩ :=
-      (exact_kerCotangentToTensor_mapBaseChange ℂ A ℂ hs v).mp (Subsingleton.elim _ _)
+    obtain ⟨y, hy⟩ := (exact_kerCotangentToTensor_mapBaseChange ℂ A ℂ hs v).mp (Subsingleton.elim _ _)
     obtain ⟨x, rfl⟩ := Ideal.toCotangent_surjective _ y
     exact ⟨x, (hφ x).trans hy⟩
   have hker : ∀ x : RingHom.ker (algebraMap A ℂ), φ x = 0 → (x : A) ∈ RingHom.ker e ^ 2 := by
@@ -61,7 +92,7 @@ theorem exists_basis_mod_sq
   have hmemg : ∀ c : Fin d → ℂ, ∑ j, c j • (g j : A) ∈ RingHom.ker (algebraMap A ℂ) := fun c =>
     Ideal.sum_mem _ fun j _ => by rw [Algebra.smul_def]; exact Ideal.mul_mem_left _ _ (g j).2
   have hφg : ∀ c : Fin d → ℂ, φ (∑ j, c j • (g j : A)) = ∑ j, c j • b j := fun c => by
-    set_option synthInstance.maxHeartbeats 100000 in
+
     rw [map_sum]; simp only [map_smul, hg]
   refine ⟨fun j => g j, fun j => (g j).2, ?_, ?_⟩
   · intro a ha
@@ -86,12 +117,10 @@ namespace GlobalTheory.CotDim
 
 open TensorProduct KaehlerDifferential
 
-theorem nonempty_basis_fibre
-    {A : Type} [CommRing A] [Algebra ℂ A]
-    (e : A →+* ℂ) (he : ∀ c : ℂ, e (algebraMap ℂ A c) = c)
-    (d : ℕ) (t : A) (ht : e t ≠ 0)
-    [Algebra.IsStandardSmoothOfRelativeDimension d ℂ (Localization.Away t)]
-    : letI := e.toAlgebra; Nonempty (Module.Basis (Fin d) ℂ (ℂ ⊗[A] Ω[A⁄ℂ])) := by
+theorem nonempty_basis_fibre {A : Type} [CommRing A] [Algebra ℂ A] (e : A →+* ℂ)
+    (he : ∀ c : ℂ, e (algebraMap ℂ A c) = c) (d : ℕ) (t : A) (ht : e t ≠ 0)
+    [Algebra.IsStandardSmoothOfRelativeDimension d ℂ (Localization.Away t)] :
+    letI := e.toAlgebra; Nonempty (Module.Basis (Fin d) ℂ (ℂ ⊗[A] Ω[A⁄ℂ])) := by
   letI : Algebra A ℂ := e.toAlgebra
   haveI : IsScalarTower ℂ A ℂ := IsScalarTower.of_algebraMap_eq fun c => (he c).symm
   let et : Localization.Away t →+* ℂ := IsLocalization.Away.lift t (isUnit_iff_ne_zero.2 ht)
@@ -103,18 +132,14 @@ theorem nonempty_basis_fibre
     Algebra.FormallyEtale.of_isLocalization (Submonoid.powers t)
   haveI : Algebra.IsStandardSmooth ℂ (Localization.Away t) :=
     Algebra.IsStandardSmoothOfRelativeDimension.isStandardSmooth d
-  have hr :=
-    Algebra.IsStandardSmoothOfRelativeDimension.rank_kaehlerDifferential (R := ℂ)
-      (S := Localization.Away t) d
+  have hr := Algebra.IsStandardSmoothOfRelativeDimension.rank_kaehlerDifferential
+    (R := ℂ) (S := Localization.Away t) d
   haveI : Module.Finite (Localization.Away t) Ω[Localization.Away t⁄ℂ] := Module.finite_of_rank_eq_nat hr
-  let b0 :=
-    Module.finBasisOfFinrankEq (Localization.Away t) Ω[Localization.Away t⁄ℂ]
-      (Module.finrank_eq_of_rank_eq hr)
-  let b1 : Module.Basis (Fin d) ℂ (ℂ ⊗[Localization.Away t] Ω[Localization.Away t⁄ℂ]) :=
-    b0.baseChange ℂ
-  let E1
-      : ℂ ⊗[Localization.Away t] (Localization.Away t ⊗[A] Ω[A⁄ℂ]) ≃ₗ[ℂ]
-        ℂ ⊗[Localization.Away t] Ω[Localization.Away t⁄ℂ] :=
+  let b0 := Module.finBasisOfFinrankEq (Localization.Away t) Ω[Localization.Away t⁄ℂ]
+    (Module.finrank_eq_of_rank_eq hr)
+  let b1 : Module.Basis (Fin d) ℂ (ℂ ⊗[Localization.Away t] Ω[Localization.Away t⁄ℂ]) := b0.baseChange ℂ
+  let E1 : ℂ ⊗[Localization.Away t] (Localization.Away t ⊗[A] Ω[A⁄ℂ]) ≃ₗ[ℂ]
+      ℂ ⊗[Localization.Away t] Ω[Localization.Away t⁄ℂ] :=
     TensorProduct.AlgebraTensorModule.congr (LinearEquiv.refl ℂ ℂ)
       (tensorKaehlerEquivOfFormallyEtale ℂ A (Localization.Away t))
   let E2 := TensorProduct.AlgebraTensorModule.cancelBaseChange A (Localization.Away t) ℂ ℂ Ω[A⁄ℂ]
@@ -122,44 +147,35 @@ theorem nonempty_basis_fibre
 
 end GlobalTheory.CotDim
 
-theorem GlobalTheory.CotDim.exists_cotangent_basis
-    : ∀ (X : Scheme.{0}) (p : X ⟶ Sp ℂ) (d : ℕ) [SmoothOfRelativeDimension d p] (U : X.Opens),
-      IsAffineOpen U
-        → ∀ (y : CxPts p (RingHom.id ℂ)) (hy : y ∈ CxPts.ptsIn p (RingHom.id ℂ) U),
-          let e : Sec p U →+* ℂ := CxPts.evHom hy
-          ∃ g : Fin d → Sec p U,
-            (∀ j, e (g j) = 0)
-              ∧ (∀ a : Sec p U, e a = 0 → ∃ c : Fin d → ℂ, a - ∑ j, c j • g j ∈ RingHom.ker e ^ 2)
-              ∧ (∀ c : Fin d → ℂ, ∑ j, c j • g j ∈ RingHom.ker e ^ 2 → c = 0) := by
+theorem GlobalTheory.CotDim.exists_cotangent_basis : ∀ (X : Scheme.{0}) (p : X ⟶ Sp ℂ) (d : ℕ) [SmoothOfRelativeDimension d p]
+    (U : X.Opens), IsAffineOpen U → ∀ (y : CxPts p (RingHom.id ℂ)) (hy : y ∈ CxPts.ptsIn p (RingHom.id ℂ) U),
+    let e : Sec p U →+* ℂ := CxPts.evHom hy; ∃ g : Fin d → Sec p U, (∀ j, e (g j) = 0) ∧
+      (∀ a : Sec p U, e a = 0 → ∃ c : Fin d → ℂ, a - ∑ j, c j • g j ∈ RingHom.ker e ^ 2) ∧
+      (∀ c : Fin d → ℂ, ∑ j, c j • g j ∈ RingHom.ker e ^ 2 → c = 0) := by
   intro X p d _ U hU y hy e
   have he : ∀ c : ℂ, e (algebraMap ℂ (Sec p U) c) = c := fun c => by
     exact (CxPts.ev_eq hy _).symm.trans (CxPts.ev_algX hy c)
-  have h :=
-    HasRingHomProperty.appLE (@SmoothOfRelativeDimension d) p ‹_› ⟨⊤, isAffineOpen_top _⟩ ⟨U, hU⟩
-      le_top
-  obtain ⟨s, hs, h⟩ :=
-    (RingHom.locally_iff_isLocalization RingHom.isStandardSmoothOfRelativeDimension_respectsIso _).1
-      h
+  have h := HasRingHomProperty.appLE (@SmoothOfRelativeDimension d) p ‹_›
+    ⟨⊤, isAffineOpen_top _⟩ ⟨U, hU⟩ le_top
+  obtain ⟨s, hs, h⟩ := (RingHom.locally_iff_isLocalization
+    RingHom.isStandardSmoothOfRelativeDimension_respectsIso _).1 h
   obtain ⟨t, hts, ht⟩ : ∃ t : Sec p U, t ∈ s ∧ e t ≠ 0 := by
     by_contra hcon
     push_neg at hcon
     have hle : Ideal.span (↑s : Set Γ(X, U)) ≤ RingHom.ker (e : Γ(X, U) →+* ℂ) :=
       Ideal.span_le.2 fun t ht => hcon t ht
-    have h1 : (1 : Γ(X, U)) ∈ RingHom.ker (e : Γ(X, U) →+* ℂ) :=
-      hle (by rw [hs]; exact Submodule.mem_top)
+    have h1 : (1 : Γ(X, U)) ∈ RingHom.ker (e : Γ(X, U) →+* ℂ) := hle (by rw [hs]; exact Submodule.mem_top)
     have h2 : e 1 = 0 := h1
     rw [map_one] at h2
     exact one_ne_zero h2
-  have h₁ :=
-    RingHom.isStandardSmoothOfRelativeDimension_respectsIso.2 _
-      (Scheme.ΓSpecIso (CommRingCat.of ℂ)).symm.commRingCatIsoToRingEquiv
-      (@h t hts (Localization.Away t) _ (inferInstance : Algebra (Sec p U) (Localization.Away t))
-        (by exact (inferInstance : IsLocalization (Submonoid.powers t) (Localization.Away t))))
+  have h₁ := RingHom.isStandardSmoothOfRelativeDimension_respectsIso.2 _
+    (Scheme.ΓSpecIso (CommRingCat.of ℂ)).symm.commRingCatIsoToRingEquiv
+    (@h t hts (Localization.Away t) _ (inferInstance : Algebra (Sec p U) (Localization.Away t))
+      (by exact (inferInstance : IsLocalization (Submonoid.powers t) (Localization.Away t))))
   haveI : Algebra.IsStandardSmoothOfRelativeDimension d ℂ (Localization.Away (t : Sec p U)) := by
     rw [← RingHom.isStandardSmoothOfRelativeDimension_algebraMap,
       IsScalarTower.algebraMap_eq ℂ (Sec p U) (Localization.Away (t : Sec p U))]
     first
       | exact h₁
       | (convert h₁ using 1 <;> rfl)
-  exact GlobalTheory.CotDim.exists_basis_mod_sq e he d
-    (GlobalTheory.CotDim.nonempty_basis_fibre e he d t ht)
+  exact GlobalTheory.CotDim.exists_basis_mod_sq e he d (GlobalTheory.CotDim.nonempty_basis_fibre e he d t ht)

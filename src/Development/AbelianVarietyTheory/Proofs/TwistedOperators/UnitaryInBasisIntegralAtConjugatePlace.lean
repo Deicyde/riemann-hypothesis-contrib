@@ -1,17 +1,48 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.LocCO
-public import Development.AbelianVarietyTheory.Definitions.Divisors.BplusOfEquivariant
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.MemGLintOfEntries
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.PlacesApart
-public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.ThetaLiftLevelsGoodPrimesProperties
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ConjPlaceIntegerMem
-public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.LatSelfDualOfUnimod
-public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.MemHatIffOfSelfDual
-public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.IsSelfDualCoordLatticeOfSelfDualFrame
-public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.PadOneMemSecondBlockTriangular
+public import Development.AbelianVarietyTheory.BlockTheory.TwistedDiscreteSeries.FlatSpaceComponents
+public import Development.AbelianVarietyTheory.Definitions.Divisors.InvVolConjLevelOne
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.AuxiliaryVectorDecompositionEqZero
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ConjPlaceIntegerMem
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.MemGLintOfEntries
+import Development.AbelianVarietyTheory.Proofs.TwistedOperators.ExistsFixedIff
+import Development.AbelianVarietyTheory.Proofs.TwistedOperators.IsSelfDualCoordLatticeOfSelfDualFrame
+import Development.AbelianVarietyTheory.Proofs.TwistedOperators.MemHatIffOfSelfDual
+public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.PadOneMemSecondBlockTriangular
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
 
 @[expose] public section
 
@@ -150,8 +181,8 @@ theorem cpt_conj_mem
     : cpt (Formalism.DivisionValues.conjPl w) ((P * Formalism.UG.cT (cjA D) C * M) i j)
       ∈ (Formalism.DivisionValues.conjPl w).adicCompletionIntegers D.host.E := by
   rw [GlobalTheory.FunObj.conjPl_eq_cP]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [Matrix.mul_apply, map_sum, map_mul]
+
+  simp only [Matrix.mul_apply, map_sum, map_mul]
   refine sum_mem fun l _ => mul_mem (sum_mem fun k _ => mul_mem ?_ ?_) ?_
   · exact (mem_OA_iff _).1 (hP i k) _
   · exact ConjugatePlaceIntegrality.GlobalTheory.CompanionTheory.ConjPlaceInt.cpt_sg_mem_integers w

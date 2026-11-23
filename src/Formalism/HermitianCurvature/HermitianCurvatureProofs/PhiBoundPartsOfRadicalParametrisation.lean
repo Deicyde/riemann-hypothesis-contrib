@@ -1,36 +1,87 @@
 module
 
+import Formalism.HermitianCurvature.HermitianCurvatureProofs.CompactlySupportedBanachModel
 public import Formalism.HermitianCurvature.StatementU
 public import Formalism.HermitianCurvature.HermitianCurvatureProofs.DilationUnipotentWeylMeasure
-public import Formalism.HermitianCurvature.HermitianCurvatureProofs.BetaSesquilinearity
-public import Formalism.HermitianCurvature.HermitianCurvatureProofs.SymmetricScalarBlockMatrixTranspose
-public import Formalism.HermitianCurvature.HermitianCurvatureProofs.SymmetricScalarBlockMatrixMul
-public import Formalism.HermitianCurvature.HermitianCurvatureProofs.DirectionsInParabolic
-public import Formalism.HermitianCurvature.HermitianCurvatureProofs.Block3MulBlocks
-public import Formalism.HermitianCurvature.HermitianCurvatureProofs.CoordinateSizesOfHypotheses
+public import Mathlib.LinearAlgebra.Matrix.Permutation
 public import Development.AutomorphicArithmetic.IntegralCasts.CapelliIdentities.CayleyTransformPreservesForm
+public import Formalism.FormalDegreeBessel.FinalG
+import Formalism.FormalDegreeBessel.FormalDegreeRatio.UnitaryWeylNormalHolds
+public import Formalism.HermitianCurvature.HermitianCurvatureProofs.BetaSesquilinearity
+public import Formalism.HermitianCurvature.HermitianCurvatureProofs.SymmetricScalarBlockMatrixMul
+public import Formalism.HermitianCurvature.HermitianCurvatureProofs.SymmetricScalarBlockMatrixTranspose
+import Mathlib.Algebra.Order.Archimedean.Real.Hom
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Real
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.CategoryTheory.Countable
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.Order.CompletePartialOrder
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Lemma
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Separation.CompletelyRegular
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
+public import Mathlib.Analysis.Calculus.ParametricIntegral
 
 @[expose] public section
 
 noncomputable section
 
 open Matrix MeasureTheory
-open Formalism.FourierDecayAlt Formalism.FourierDecayAlt.U Formalism.REAL
-  Formalism.QuantumDeterminants
+open Formalism.FourierDecayAlt Formalism.FourierDecayAlt.U Formalism.REAL Formalism.QuantumDeterminants
 
 namespace Formalism.FourierDecayAlt.P.Ux10
 
-theorem block2_det_lower_triangular
-    {p s : ℕ}
-    (A : Matrix (Fin p) (Fin p) ℂ) (C : Matrix (Fin s) (Fin p) ℂ) (D : Matrix (Fin s) (Fin s) ℂ)
-    : (blk2 A 0 C D).det = A.det * D.det := by
+theorem block2_det_lower_triangular {p s : ℕ} (A : Matrix (Fin p) (Fin p) ℂ) (C : Matrix (Fin s) (Fin p) ℂ)
+    (D : Matrix (Fin s) (Fin s) ℂ) : (blk2 A 0 C D).det = A.det * D.det := by
   unfold blk2
   rw [Matrix.det_reindex_self, Matrix.det_fromBlocks_zero₁₂]
 
-theorem block2_det_upper_triangular
-    {p s : ℕ}
-    (A : Matrix (Fin p) (Fin p) ℂ) (B : Matrix (Fin p) (Fin s) ℂ) (D : Matrix (Fin s) (Fin s) ℂ)
-    : (blk2 A B 0 D).det = A.det * D.det := by
+theorem block2_det_upper_triangular {p s : ℕ} (A : Matrix (Fin p) (Fin p) ℂ) (B : Matrix (Fin p) (Fin s) ℂ)
+    (D : Matrix (Fin s) (Fin s) ℂ) : (blk2 A B 0 D).det = A.det * D.det := by
   unfold blk2
   rw [Matrix.det_reindex_self, Matrix.det_fromBlocks_zero₂₁]
 
@@ -46,7 +97,7 @@ theorem det_lowW {p : ℕ} (σ : Equiv.Perm (Fin p)) (v : LW σ → ℂ) : (lowW
   have h : (lowW σ v).BlockTriangular OrderDual.toDual := by
     intro i j hij
     have hij' : i < j := hij
-    have : ¬(j < i ∧ σ.symm j < σ.symm i) := fun h => absurd h.1 (not_lt.mpr (le_of_lt hij'))
+    have : ¬ (j < i ∧ σ.symm j < σ.symm i) := fun h => absurd h.1 (not_lt.mpr (le_of_lt hij'))
     simp [lowW, ne_of_lt hij', this]
   rw [Matrix.det_of_isLowerTriangular _ h]
   simp [lowW]
@@ -54,18 +105,16 @@ theorem det_lowW {p : ℕ} (σ : Equiv.Perm (Fin p)) (v : LW σ → ℂ) : (lowW
 theorem detZj : DetZj := by
   intro p s σ d η Z
   unfold ZjH Zj headH hMat G.detM
-  rw [Matrix.det_mul, Matrix.det_mul, block2_det_lower_triangular, block2_det_lower_triangular,
-    block2_det_upper_triangular]
+  rw [Matrix.det_mul, Matrix.det_mul, block2_det_lower_triangular, block2_det_lower_triangular, block2_det_upper_triangular]
   simp only [Matrix.det_mul, det_upper, det_lowW, Matrix.det_one]
   ring
 
-theorem permutationMatrix_eq_permMatrix {p : ℕ} (σ : Equiv.Perm (Fin p))
-    : wP σ = σ.permMatrix ℂ := by
+theorem permutationMatrix_eq_permMatrix {p : ℕ} (σ : Equiv.Perm (Fin p)) : wP σ = σ.permMatrix ℂ := by
   ext a b
   simp [wP, Equiv.Perm.permMatrix, PEquiv.toMatrix_apply, Equiv.toPEquiv_apply, eq_comm]
 
-theorem det_hMat_ne {p : ℕ} (σ : Equiv.Perm (Fin p)) (d : Fin p → ℂ) (hd : ∀ i, d i ≠ 0)
-    : (hMat σ d).det ≠ 0 := by
+theorem det_hMat_ne {p : ℕ} (σ : Equiv.Perm (Fin p)) (d : Fin p → ℂ) (hd : ∀ i, d i ≠ 0) :
+    (hMat σ d).det ≠ 0 := by
   unfold hMat
   rw [Matrix.det_mul, permutationMatrix_eq_permMatrix, Matrix.det_permutation, Matrix.det_diagonal]
   refine mul_ne_zero ?_ (Finset.prod_ne_zero_iff.mpr fun i _ => hd i)
@@ -75,24 +124,18 @@ theorem Rn_mem (hR : RadicalParam) (k j ρ : ℕ) (x : RC k j ρ) : Rn k j ρ x 
   have h : Rn k j ρ x ∈ Rset k j ρ := (hR k j ρ).2.1 ▸ Set.mem_range_self x
   exact h.1
 
-theorem gaXi_mem
-    (hM : SliceMem) (hR : RadicalParam)
-    {k p s ρ : ℕ} (σ : Equiv.Perm (Fin p)) (d : Fin p → ℂ) (hd : ∀ i, d i ≠ 0) (ξ : Xi k p s ρ σ)
-    (Z : G.Mat s) (hZ : G.detM Z ≠ 0)
-    {γ : B.Mat k ρ} (hγ : γ ∈ B.GV k ρ)
-    : gaXi k ρ σ d ξ Z γ ∈ B.GV k (p + s + ρ) := by
-  have hdet : (ZjH σ d ξ.2 Z).det ≠ 0 := by rw [detZj]; exact mul_ne_zero (det_hMat_ne σ d hd) hZ
+theorem gaXi_mem (hM : SliceMem) (hR : RadicalParam) {k p s ρ : ℕ} (σ : Equiv.Perm (Fin p)) (d : Fin p → ℂ)
+    (hd : ∀ i, d i ≠ 0) (ξ : Xi k p s ρ σ) (Z : G.Mat s) (hZ : G.detM Z ≠ 0) {γ : B.Mat k ρ}
+    (hγ : γ ∈ B.GV k ρ) : gaXi k ρ σ d ξ Z γ ∈ B.GV k (p + s + ρ) := by
+  have hdet : (ZjH σ d ξ.2 Z).det ≠ 0 := by
+    rw [detZj]; exact mul_ne_zero (det_hMat_ne σ d hd) hZ
   unfold gaXi
-  refine BetaSesquilinearity.gv_mul
-    (BetaSesquilinearity.gv_mul (BetaSesquilinearity.gv_inv (Rn_mem hR _ _ _ _))
-      ((hM k (p + s) ρ).1 _ _ hdet hγ))
+  refine BetaSesquilinearity.gv_mul (BetaSesquilinearity.gv_mul (BetaSesquilinearity.gv_inv (Rn_mem hR _ _ _ _)) ((hM k (p + s) ρ).1 _ _ hdet hγ))
     (Rn_mem hR _ _ _ _)
 
-theorem DjU_gaXi
-    (hZh : ZhSlice)
-    {k p s ρ : ℕ}
-    (σ : Equiv.Perm (Fin p)) (d : Fin p → ℂ) (ξ : Xi k p s ρ σ) (Z : G.Mat s) (γ : B.Mat k ρ)
-    : DjU k (p + s) ρ (gaXi k ρ σ d ξ Z γ) = (hMat σ d).det * G.detM Z := by
+theorem DjU_gaXi (hZh : ZhSlice) {k p s ρ : ℕ} (σ : Equiv.Perm (Fin p)) (d : Fin p → ℂ)
+    (ξ : Xi k p s ρ σ) (Z : G.Mat s) (γ : B.Mat k ρ) :
+    DjU k (p + s) ρ (gaXi k ρ σ d ξ Z γ) = (hMat σ d).det * G.detM Z := by
   unfold DjU gaXi
   rw [hZh, detZj]
 
@@ -115,9 +158,7 @@ namespace Formalism.FourierDecayAlt.P.Ux10
 
 section meas
 
-variable
-  {α : Type*} [MeasurableSpace α]
-  {μ : Measure α} {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E]
+variable {α : Type*} [MeasurableSpace α] {μ : Measure α} {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E]
 
 lemma tendsto_inv_succ_nhdsNE : Tendsto (fun n : ℕ => ((n : ℝ) + 1)⁻¹) atTop (𝓝[≠] 0) := by
   refine tendsto_nhdsWithin_iff.2 ⟨?_, Eventually.of_forall fun n => ?_⟩
@@ -153,8 +194,8 @@ lemma aesm_fderiv {X : Type*} [NormedAddCommGroup X] [NormedSpace ℝ X] [Finite
     simp only [FunLike.coe_sum, Finset.sum_apply, ContinuousLinearMap.smulRight_apply,
       LinearMap.coe_toContinuousLinearMap']
     conv_lhs => rw [← b.sum_repr v]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     refine Finset.sum_congr rfl fun j _ => ?_
     rw [map_smul, Module.Basis.coord_apply]
   rw [e]
@@ -170,7 +211,7 @@ lemma aesm_fderiv {X : Type*} [NormedAddCommGroup X] [NormedSpace ℝ X] [Finite
         simpa using this
       exact ht.eventually hm
   have hc : Continuous fun e : E => (LinearMap.toContinuousLinearMap (b.coord j)).smulRight e :=
-    (ContinuousLinearMap.smulRightL ℝ X E (LinearMap.toContinuousLinearMap (b.coord j))).continuous
+    (StrongDual.smulRightL ℝ X E (LinearMap.toContinuousLinearMap (b.coord j))).continuous
   exact hc.comp_aestronglyMeasurable hj
 
 end meas
@@ -179,18 +220,14 @@ section pint
 
 variable {α : Type*} [MeasurableSpace α] {μ : Measure α}
 
-theorem pint
-    {X : Type} [NormedAddCommGroup X] [NormedSpace ℝ X] [FiniteDimensional ℝ X]
-    {U : Set X} (hU : IsOpen U)
-    (b : α → ℝ) (hb : Integrable b μ)
-    : ∀ (N : ℕ) (E' : Type) [NormedAddCommGroup E'] [NormedSpace ℝ E'] [CompleteSpace E']
-        (F : α → X → E'),
-      (∀ ξ, ContDiffOn ℝ N (F ξ) U) → (∀ y ∈ U, AEStronglyMeasurable (fun ξ => F ξ y) μ)
-        → (∀ i ≤ N, ∀ y ∈ U, ∀ ξ, ‖iteratedFDeriv ℝ i (F ξ) y‖ ≤ b ξ)
-        → ContDiffOn ℝ N (fun y => ∫ ξ, F ξ y ∂μ) U
-          ∧ ∀ i ≤ N, ∀ y ∈ U, ∀ b' : α → ℝ,
-            Integrable b' μ → (∀ ξ, ‖iteratedFDeriv ℝ i (F ξ) y‖ ≤ b' ξ)
-              → ‖iteratedFDeriv ℝ i (fun y => ∫ ξ, F ξ y ∂μ) y‖ ≤ ∫ ξ, b' ξ ∂μ := by
+theorem pint {X : Type} [NormedAddCommGroup X] [NormedSpace ℝ X] [FiniteDimensional ℝ X] {U : Set X} (hU : IsOpen U)
+    (b : α → ℝ) (hb : Integrable b μ) :
+    ∀ (N : ℕ) (E' : Type) [NormedAddCommGroup E'] [NormedSpace ℝ E'] [CompleteSpace E'] (F : α → X → E'),
+      (∀ ξ, ContDiffOn ℝ N (F ξ) U) → (∀ y ∈ U, AEStronglyMeasurable (fun ξ => F ξ y) μ) →
+      (∀ i ≤ N, ∀ y ∈ U, ∀ ξ, ‖iteratedFDeriv ℝ i (F ξ) y‖ ≤ b ξ) →
+      ContDiffOn ℝ N (fun y => ∫ ξ, F ξ y ∂μ) U ∧
+      ∀ i ≤ N, ∀ y ∈ U, ∀ b' : α → ℝ, Integrable b' μ → (∀ ξ, ‖iteratedFDeriv ℝ i (F ξ) y‖ ≤ b' ξ) →
+        ‖iteratedFDeriv ℝ i (fun y => ∫ ξ, F ξ y ∂μ) y‖ ≤ ∫ ξ, b' ξ ∂μ := by
   intro N
   induction N with
   | zero =>
@@ -199,11 +236,8 @@ theorem pint
       simpa [norm_iteratedFDeriv_zero] using hbd 0 le_rfl y hy ξ
     refine ⟨?_, ?_⟩
     · rw [Nat.cast_zero, contDiffOn_zero]
-      refine continuousOn_of_dominated
-        (F := fun y ξ => F ξ y)
-        (bound := b) hm
-        (fun y hy => Eventually.of_forall fun ξ => h0 y hy ξ)
-        hb (Eventually.of_forall fun ξ => ?_)
+      refine continuousOn_of_dominated (F := fun y ξ => F ξ y) (bound := b) hm
+        (fun y hy => Eventually.of_forall fun ξ => h0 y hy ξ) hb (Eventually.of_forall fun ξ => ?_)
       exact (hc ξ).continuousOn
     · intro i hi y hy b' hb' hbd'
       have hi0 : i = 0 := by omega
@@ -219,21 +253,16 @@ theorem pint
       (hc ξ).fderiv_of_isOpen hU (by push_cast; exact le_rfl)
     have hm' : ∀ y ∈ U, AEStronglyMeasurable (fun ξ => fderiv ℝ (F ξ) y) μ := fun y hy =>
       aesm_fderiv (fun ξ => hdiff ξ y hy) (Filter.eventually_of_mem (hU.mem_nhds hy) hm)
-    have hbd'
-        : ∀ i ≤ N, ∀ y ∈ U, ∀ ξ,
-          ‖iteratedFDeriv ℝ i (fun y => fderiv ℝ (F ξ) y) y‖ ≤ b ξ := fun i hi y hy ξ => by
-      rw [norm_iteratedFDeriv_fderiv]; exact hbd (i + 1) (by omega) y hy ξ
+    have hbd' : ∀ i ≤ N, ∀ y ∈ U, ∀ ξ, ‖iteratedFDeriv ℝ i (fun y => fderiv ℝ (F ξ) y) y‖ ≤ b ξ :=
+      fun i hi y hy ξ => by rw [norm_iteratedFDeriv_fderiv]; exact hbd (i + 1) (by omega) y hy ξ
     obtain ⟨ihc, ihb⟩ := ih (X →L[ℝ] E') (fun ξ y => fderiv ℝ (F ξ) y) hc' hm' hbd'
     have hint : ∀ y ∈ U, Integrable (fun ξ => F ξ y) μ := fun y hy =>
-      hb.mono' (hm y hy)
-        (Eventually.of_forall fun ξ => by
-          simpa [norm_iteratedFDeriv_zero] using hbd 0 (by omega) y hy ξ)
+      hb.mono' (hm y hy) (Eventually.of_forall fun ξ => by
+        simpa [norm_iteratedFDeriv_zero] using hbd 0 (by omega) y hy ξ)
     have hder : ∀ y ∈ U, HasFDerivAt (fun y => ∫ ξ, F ξ y ∂μ) (∫ ξ, fderiv ℝ (F ξ) y ∂μ) y := by
       intro y hy
-      refine hasFDerivAt_integral_of_dominated_of_fderiv_le
-        (F := fun y ξ => F ξ y)
-        (F' := fun y ξ => fderiv ℝ (F ξ) y)
-        (bound := b) (hU.mem_nhds hy) ?_ (hint y hy) (hm' y hy) ?_ hb ?_
+      refine hasFDerivAt_integral_of_dominated_of_fderiv_le (F := fun y ξ => F ξ y)
+        (F' := fun y ξ => fderiv ℝ (F ξ) y) (bound := b) (hU.mem_nhds hy) ?_ (hint y hy) (hm' y hy) ?_ hb ?_
       · filter_upwards [hU.mem_nhds hy] with z hz using hm z hz
       · refine Eventually.of_forall fun ξ z hz => ?_
         have h1 := hbd 1 (by omega) z hz ξ
@@ -244,11 +273,7 @@ theorem pint
     refine ⟨?_, ?_⟩
     · rw [show ((N + 1 : ℕ) : WithTop ℕ∞) = (N : WithTop ℕ∞) + 1 by push_cast; rfl,
         contDiffOn_succ_iff_fderiv_of_isOpen hU]
-      refine ⟨
-        fun y hy => (hder y hy).differentiableAt.differentiableWithinAt,
-        fun h => absurd h (by simp),
-        ?_
-      ⟩
+      refine ⟨fun y hy => (hder y hy).differentiableAt.differentiableWithinAt, fun h => absurd h (by simp), ?_⟩
       exact ihc.congr fun y hy => hfd y hy
     · intro i hi y hy b' hb' hbd''
       cases i with
@@ -258,29 +283,24 @@ theorem pint
         simpa [norm_iteratedFDeriv_zero] using hbd'' ξ
       | succ j =>
         rw [← norm_iteratedFDeriv_fderiv]
-        have heq
-            : (fderiv ℝ (fun y => ∫ ξ, F ξ y ∂μ)) =ᶠ[𝓝 y] (fun y => ∫ ξ, fderiv ℝ (F ξ) y ∂μ) := by
+        have heq : (fderiv ℝ (fun y => ∫ ξ, F ξ y ∂μ)) =ᶠ[𝓝 y] (fun y => ∫ ξ, fderiv ℝ (F ξ) y ∂μ) := by
           filter_upwards [hU.mem_nhds hy] with z hz using hfd z hz
         rw [(heq.iteratedFDeriv ℝ j).eq_of_nhds]
-        exact ihb j (by omega) y hy b' hb' fun ξ => by
-          rw [norm_iteratedFDeriv_fderiv]; exact hbd'' ξ
+        exact ihb j (by omega) y hy b' hb' fun ξ => by rw [norm_iteratedFDeriv_fderiv]; exact hbd'' ξ
 
 end pint
 
 section struct
 
-variable
-  {𝔤 E : Type*} [NormedAddCommGroup 𝔤] [NormedSpace ℝ 𝔤] [NormedAddCommGroup E] [NormedSpace ℝ E]
+variable {𝔤 E : Type*} [NormedAddCommGroup 𝔤] [NormedSpace ℝ 𝔤] [NormedAddCommGroup E] [NormedSpace ℝ E]
   {ι : Type*} [Fintype ι]
 
-theorem ALd
-    {Ω : Set 𝔤} (hΩ : IsOpen Ω)
-    (a : ι → 𝔤 → (𝔤 →L[ℝ] ℝ)) (ha : ∀ i, ContDiffOn ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) (a i) Ω)
-    : ∀ (m : ℕ) (L : List ι → 𝔤 → E),
-      (∀ w : List ι, w.length ≤ m → ContinuousOn (L w) Ω)
-        → (∀ w : List ι,
-          w.length < m → ∀ Y ∈ Ω, HasFDerivAt (L w) (∑ i, (a i Y).smulRight (L (i :: w) Y)) Y)
-        → ContDiffOn ℝ (m : WithTop ℕ∞) (L []) Ω := by
+theorem ALd {Ω : Set 𝔤} (hΩ : IsOpen Ω) (a : ι → 𝔤 → (𝔤 →L[ℝ] ℝ))
+    (ha : ∀ i, ContDiffOn ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) (a i) Ω) :
+    ∀ (m : ℕ) (L : List ι → 𝔤 → E),
+      (∀ w : List ι, w.length ≤ m → ContinuousOn (L w) Ω) →
+      (∀ w : List ι, w.length < m → ∀ Y ∈ Ω, HasFDerivAt (L w) (∑ i, (a i Y).smulRight (L (i :: w) Y)) Y) →
+      ContDiffOn ℝ (m : WithTop ℕ∞) (L []) Ω := by
   intro m
   induction m with
   | zero =>
@@ -291,19 +311,13 @@ theorem ALd
     intro L hc hd
     have hL : ∀ j : ι, ContDiffOn ℝ (m : WithTop ℕ∞) (L [j]) Ω := by
       intro j
-      have :=
-        ih
-          (fun w => L (w ++ [j]))
-          (fun w hw => hc _ (by simp; omega))
-          (fun w hw Y hY => by simpa using hd (w ++ [j]) (by simp; omega) Y hY)
+      have := ih (fun w => L (w ++ [j])) (fun w hw => hc _ (by simp; omega))
+        (fun w hw Y hY => by simpa using hd (w ++ [j]) (by simp; omega) Y hY)
       simpa using this
     rw [show ((m + 1 : ℕ) : WithTop ℕ∞) = (m : WithTop ℕ∞) + 1 by push_cast; rfl,
       contDiffOn_succ_iff_fderiv_of_isOpen hΩ]
-    refine ⟨
-      fun Y hY => (hd [] (by simp) Y hY).differentiableAt.differentiableWithinAt,
-      fun h => absurd h (by simp),
-      ?_
-    ⟩
+    refine ⟨fun Y hY => (hd [] (by simp) Y hY).differentiableAt.differentiableWithinAt,
+      fun h => absurd h (by simp), ?_⟩
     have hcd : ContDiffOn ℝ (m : WithTop ℕ∞) (fun Y => ∑ i, (a i Y).smulRight (L [i] Y)) Ω :=
       ContDiffOn.sum fun i _ => ((ha i).of_le (by exact_mod_cast le_top)).smulRight (hL i)
     exact hcd.congr fun Y hY => (hd [] (by simp) Y hY).fderiv
@@ -316,8 +330,7 @@ open Matrix Filter Topology
 
 namespace Formalism.FourierDecayAlt.P.Ux10
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B
-  Formalism.FourierDecayAlt.P.B4
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.P.B4
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
@@ -424,56 +437,7 @@ lemma kap_mem {Y : Mat k r} (hY : inLie k r Y) (hu : IsUnit (1 - Y).det) : kap Y
 
 lemma iot_facts {h : Mat k r} (hh : h ∈ GV k r) (hu : IsUnit (h + 1).det) :
     inLie k r (iot h) ∧ IsUnit (1 - iot h).det ∧ kap (iot h) = h := by
-  have hh' : hᴴ * Hpk k r * h = Hpk k r := hh
-  set D := h + 1 with hD
-  set C := h - 1 with hC
-  have hDD : D⁻¹ * D = 1 := Matrix.nonsing_inv_mul _ hu
-  have hDD' : D * D⁻¹ = 1 := Matrix.mul_nonsing_inv _ hu
-  have hZD : iot h * D = C := by
-    unfold iot; rw [Matrix.mul_assoc, hDD, Matrix.mul_one]
-
-  have h1Z : 1 - iot h = (2 : ℂ) • D⁻¹ := by
-    have : (1 - iot h) * D = (2 : ℂ) • (1 : Mat k r) := by
-      rw [Matrix.sub_mul, Matrix.one_mul, hZD, hD, hC]
-      rw [two_smul]; abel
-    calc 1 - iot h = (1 - iot h) * D * D⁻¹ := by rw [Matrix.mul_assoc, hDD', Matrix.mul_one]
-      _ = (2 : ℂ) • D⁻¹ := by rw [this, Matrix.smul_mul, Matrix.one_mul]
-  have hu1 : IsUnit (1 - iot h).det := by
-    rw [h1Z, Matrix.det_smul]
-    exact (IsUnit.pow _ (isUnit_iff_ne_zero.2 two_ne_zero)).mul (Matrix.isUnit_nonsing_inv_det _ hu)
-  refine ⟨?_, hu1, ?_⟩
-  ·
-    have hDu : IsUnit (Dᴴ).det := by rw [det_conjTranspose]; exact hu.star
-    have e1 : Cᴴ * Hpk k r * D = hᴴ * Hpk k r - Hpk k r * h := by
-      rw [hC, hD, conjTranspose_sub, conjTranspose_one]
-      calc (hᴴ - 1) * Hpk k r * (h + 1) = hᴴ * Hpk k r * h + hᴴ * Hpk k r - Hpk k r * h - Hpk k r := by
-            noncomm_ring
-        _ = hᴴ * Hpk k r - Hpk k r * h := by rw [hh']; abel
-    have e2 : Dᴴ * Hpk k r * C = -(hᴴ * Hpk k r - Hpk k r * h) := by
-      rw [hC, hD, conjTranspose_add, conjTranspose_one]
-      calc (hᴴ + 1) * Hpk k r * (h - 1) = hᴴ * Hpk k r * h - hᴴ * Hpk k r + Hpk k r * h - Hpk k r := by
-            noncomm_ring
-        _ = -(hᴴ * Hpk k r - Hpk k r * h) := by rw [hh']; abel
-    have e3 : Dᴴ * ((iot h)ᴴ * Hpk k r + Hpk k r * iot h) * D = 0 := by
-      have : Dᴴ * ((iot h)ᴴ * Hpk k r + Hpk k r * iot h) * D
-          = (iot h * D)ᴴ * Hpk k r * D + Dᴴ * Hpk k r * (iot h * D) := by
-        rw [conjTranspose_mul]; simp only [Matrix.mul_add, Matrix.add_mul, Matrix.mul_assoc]
-      rw [this, hZD, e1, e2, add_neg_cancel]
-    have hDH : (Dᴴ)⁻¹ * Dᴴ = 1 := Matrix.nonsing_inv_mul _ hDu
-    show (iot h)ᴴ * Hpk k r + Hpk k r * iot h = 0
-    calc (iot h)ᴴ * Hpk k r + Hpk k r * iot h
-        = (Dᴴ)⁻¹ * (Dᴴ * ((iot h)ᴴ * Hpk k r + Hpk k r * iot h) * D) * D⁻¹ := by
-          simp only [← Matrix.mul_assoc, hDH, Matrix.one_mul]
-          rw [Matrix.mul_assoc, hDD', Matrix.mul_one]
-      _ = 0 := by rw [e3, Matrix.mul_zero, Matrix.zero_mul]
-  ·
-    have hp : (1 + iot h) * D = h * ((1 - iot h) * D) := by
-      rw [Matrix.add_mul, Matrix.sub_mul, Matrix.one_mul, hZD, hD, hC]; noncomm_ring
-    have hq : 1 + iot h = h * (1 - iot h) := by
-      calc 1 + iot h = (1 + iot h) * D * D⁻¹ := by rw [Matrix.mul_assoc, hDD', Matrix.mul_one]
-        _ = h * (1 - iot h) := by rw [hp, ← Matrix.mul_assoc, Matrix.mul_assoc _ D, hDD', Matrix.mul_one]
-    unfold kap
-    rw [hq, Matrix.mul_assoc, Matrix.mul_nonsing_inv _ hu1, Matrix.mul_one]
+  apply Formalism.FourierDecayAlt.P.Ux1.iot_facts <;> assumption
 
 section smooth2
 
@@ -603,71 +567,28 @@ lemma chart_diff (g0 : Mat k r) {Y : J k r → ℝ} (hY : Y ∈ Dom k r) : Diffe
   ((chart_cd g0).differentiableOn (by simp)).differentiableAt (dom_open.mem_nhds hY)
 
 def mulB (k r : ℕ) : Mat k r →L[ℝ] Mat k r →L[ℝ] Mat k r :=
-  LinearMap.toContinuousLinearMap {
-    toFun := fun A => mulL A
-    map_add' := fun A B => by ext g : 1; simp [mulL_apply, Matrix.add_mul]
-    map_smul' := fun c A => by ext g : 1; simp [mulL_apply]
-  }
+  LinearMap.toContinuousLinearMap
+    { toFun := fun A => mulL A
+      map_add' := fun A B => by ext g : 1; simp [mulL_apply, Matrix.add_mul]
+      map_smul' := fun c A => by ext g : 1; simp [mulL_apply] }
 
 lemma mulB_apply (A B : Mat k r) : mulB k r A B = A * B := rfl
 
 def cT (k r : ℕ) : Mat k r →L[ℝ] Mat k r :=
-  LinearMap.toContinuousLinearMap {
-    toFun := fun A => Aᴴ
-    map_add' := fun A B => conjTranspose_add A B
-    map_smul' := fun c A => by
-      simp only [RingHom.id_apply]
-      rw [RCLike.real_smul_eq_coe_smul (K := ℂ), RCLike.real_smul_eq_coe_smul (K := ℂ),
-        conjTranspose_smul]
-      simp only [RCLike.star_def, RCLike.conj_ofReal]
-  }
+  LinearMap.toContinuousLinearMap
+    { toFun := fun A => Aᴴ
+      map_add' := fun A B => conjTranspose_add A B
+      map_smul' := fun c A => by
+        simp only [RingHom.id_apply]
+        rw [RCLike.real_smul_eq_coe_smul (K := ℂ), RCLike.real_smul_eq_coe_smul (K := ℂ),
+          conjTranspose_smul]
+        simp only [RCLike.star_def, RCLike.conj_ofReal] }
 
 lemma cT_apply (A : Mat k r) : cT k r A = Aᴴ := rfl
 
 lemma tangent {g0 : Mat k r} (hg0 : g0 ∈ GV k r) {Y : J k r → ℝ} (hY : Y ∈ Dom k r) (W : J k r → ℝ) :
     inLie k r (-(fderiv ℝ (chart g0) Y W) * (chart g0 Y)⁻¹) := by
-  set c := chart g0 Y with hc
-  set T := fderiv ℝ (chart g0) Y W with hT
-  have hcG : c ∈ GV k r := chart_mem hg0 hY
-  have hcu : IsUnit c.det := Formalism.QuantumDeterminants.WeylGroupFacts.isUnit_of_uh hcG
-  set γ : ℝ → Mat k r := fun t => chart g0 (Y + t • W) with hγ
-  have hline : HasDerivAt (fun t : ℝ => Y + t • W) W 0 := by
-    have h := ((hasDerivAt_id (0:ℝ)).smul_const W).const_add Y
-    rw [one_smul] at h
-    exact h
-  have hγd : HasDerivAt γ T 0 :=
-    (chart_diff g0 hY).hasFDerivAt.comp_hasDerivAt_of_eq (0 : ℝ) hline (by simp)
-  have hγ0 : γ 0 = c := by simp [hγ, hc]
-  have h1 : HasDerivAt (fun t => cT k r (γ t)) (cT k r T) 0 :=
-    (cT k r).hasFDerivAt.comp_hasDerivAt 0 hγd
-  have h2 : HasDerivAt (fun t => mulB k r (cT k r (γ t)) (Hpk k r))
-      (mulB k r (cT k r (γ 0)) 0 + mulB k r (cT k r T) (Hpk k r)) 0 :=
-    ContinuousLinearMap.hasDerivAt_of_bilinear (fun _ => h1) (fun _ => hasDerivAt_const _ _)
-  have h3 : HasDerivAt (fun t => mulB k r (mulB k r (cT k r (γ t)) (Hpk k r)) (γ t))
-      (mulB k r (mulB k r (cT k r (γ 0)) (Hpk k r)) T +
-        mulB k r (mulB k r (cT k r (γ 0)) 0 + mulB k r (cT k r T) (Hpk k r)) (γ 0)) 0 :=
-    ContinuousLinearMap.hasDerivAt_of_bilinear (fun _ => h2) (fun _ => hγd)
-  have hev : ∀ᶠ t in 𝓝 (0:ℝ), Y + t • W ∈ Dom k r :=
-    ((continuous_const.add (continuous_id.smul continuous_const)).continuousAt (x := (0:ℝ))).preimage_mem_nhds
-      (dom_open.mem_nhds (by simpa using hY))
-  have h4 : HasDerivAt (fun t => mulB k r (mulB k r (cT k r (γ t)) (Hpk k r)) (γ t)) 0 0 := by
-    refine (hasDerivAt_const (0:ℝ) (Hpk k r)).congr_of_eventuallyEq ?_
-    filter_upwards [hev] with t ht
-    have hm : γ t ∈ GV k r := chart_mem hg0 ht
-    exact hm
-  have hz := h3.unique h4
-  simp only [mulB_apply, cT_apply, hγ0, Matrix.mul_zero, zero_add] at hz
-
-  have hci : c * c⁻¹ = 1 := Matrix.mul_nonsing_inv _ hcu
-  have hci' : (c⁻¹)ᴴ * cᴴ = 1 := by rw [← conjTranspose_mul, hci, conjTranspose_one]
-  show (-T * c⁻¹)ᴴ * Hpk k r + Hpk k r * (-T * c⁻¹) = 0
-  have : (-T * c⁻¹)ᴴ * Hpk k r + Hpk k r * (-T * c⁻¹)
-      = -((c⁻¹)ᴴ * (cᴴ * Hpk k r * T + Tᴴ * Hpk k r * c) * c⁻¹) := by
-    rw [conjTranspose_mul, conjTranspose_neg]
-    simp only [Matrix.mul_add, Matrix.add_mul, Matrix.neg_mul, Matrix.mul_neg, ← Matrix.mul_assoc, hci']
-    simp only [Matrix.mul_assoc, hci, Matrix.mul_one, Matrix.one_mul]
-    abel
-  rw [this, hz, Matrix.mul_zero, Matrix.zero_mul, neg_zero]
+  apply Formalism.FourierDecayAlt.P.Ux1.tangent <;> assumption
 
 def ebv (b : J k r) : J k r → ℝ := fun j => if b = j then 1 else 0
 
@@ -683,8 +604,8 @@ lemma aC_apply (g0 : Mat k r) (i : J k r) (Y W : J k r → ℝ) :
   have e1 : -(fderiv ℝ (chart g0) Y W) * (chart g0 Y)⁻¹ =
       ∑ b, W b • (-(fderiv ℝ (chart g0) Y (ebv b)) * (chart g0 Y)⁻¹) := by
     conv_lhs => rw [hW]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, ← Finset.sum_neg_distrib, Finset.sum_mul]
+
+    rw [map_sum, ← Finset.sum_neg_distrib, Finset.sum_mul]
     refine Finset.sum_congr rfl fun b _ => ?_
     rw [map_smul, ← smul_neg, Matrix.smul_mul]
   rw [e1, kc_sum]
@@ -711,38 +632,7 @@ lemma hasFDeriv_chart {g0 : Mat k r} (hg0 : g0 ∈ GV k r) {H : Mat k r → E}
     (hH : CkOn ((1 : ℕ) : ℕ∞) (GV k r) H) {Y : J k r → ℝ} (hY : Y ∈ Dom k r) :
     HasFDerivAt (fun Y' => H (chart g0 Y'))
       (∑ i, (aC g0 i Y).smulRight (op true (Lt i) H (chart g0 Y))) Y := by
-  set c := chart g0 Y with hc
-  have hcG : c ∈ GV k r := chart_mem hg0 hY
-  have hcu : IsUnit c.det := Formalism.QuantumDeterminants.WeylGroupFacts.isUnit_of_uh hcG
-  obtain ⟨U, h', hU, hcU, hcd, hff⟩ := hH c hcG
-  have hdiff : DifferentiableAt ℝ h' c :=
-    (hcd.differentiableOn (cast_ne_zero 0)).differentiableAt (hU.mem_nhds hcU)
-  have hchd := chart_diff g0 hY
-  have hcomp : HasFDerivAt (fun Y' => h' (chart g0 Y'))
-      ((fderiv ℝ h' c).comp (fderiv ℝ (chart g0) Y)) Y :=
-    hdiff.hasFDerivAt.comp Y hchd.hasFDerivAt
-  have heq : (fun Y' => H (chart g0 Y')) =ᶠ[𝓝 Y] (fun Y' => h' (chart g0 Y')) := by
-    filter_upwards [hchd.continuousAt.preimage_mem_nhds (hU.mem_nhds hcU), dom_open.mem_nhds hY]
-      with Y' h1 h2
-    exact hff _ h1 (chart_mem hg0 h2)
-  refine (hcomp.congr_of_eventuallyEq heq).congr_fderiv ?_
-  ext1 W
-  rw [ContinuousLinearMap.comp_apply, _root_.sum_apply]
-  simp only [ContinuousLinearMap.smulRight_apply]
-  have hop : ∀ i, op true (Lt i) H c = fderiv ℝ h' c (-(Lt i * c)) := fun i =>
-    op_eq_op' 0 true hU hcd hff (Lt_unit i).1 c hcU hcG
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp_rw [hop, ← map_smul, ← map_sum]
-  congr 1
-  set Xv := -(fderiv ℝ (chart g0) Y W) * c⁻¹ with hXv
-  have hXl : inLie k r Xv := tangent hg0 hY W
-  have hA : ∀ i, aC g0 i Y W = kc i Xv := fun i => aC_apply g0 i Y W
-  have hXc : Xv * c = -(fderiv ℝ (chart g0) Y W) := by
-    rw [hXv, Matrix.mul_assoc, Matrix.nonsing_inv_mul _ hcu, Matrix.mul_one]
-  calc fderiv ℝ (chart g0) Y W = -(Xv * c) := by rw [hXc, neg_neg]
-    _ = -((∑ i, kc i Xv • Lt i) * c) := by rw [← expandL hXl]
-    _ = ∑ i, aC g0 i Y W • -(Lt i * c) := by
-        simp only [hA, Finset.sum_mul, Matrix.smul_mul, smul_neg, Finset.sum_neg_distrib]
+  apply Formalism.FourierDecayAlt.P.Ux1.hasFDeriv_chart <;> assumption
 
 lemma cont_chart {g0 : Mat k r} (hg0 : g0 ∈ GV k r) {H : Mat k r → E}
     (hH : CkOn ((0 : ℕ) : ℕ∞) (GV k r) H) : ContinuousOn (fun Y => H (chart g0 Y)) (Dom k r) := by
@@ -782,14 +672,12 @@ open Matrix MeasureTheory Filter Topology
 
 namespace Formalism.FourierDecayAlt.P.Ux10
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B
-  Formalism.FourierDecayAlt.P.B4
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.P.B4
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
-variable
-  {k r : ℕ} {α : Type*} [MeasurableSpace α]
-  {μ : Measure α} {E : Type} [NormedAddCommGroup E] [NormedSpace ℂ E]
+variable {k r : ℕ} {α : Type*} [MeasurableSpace α] {μ : Measure α}
+  {E : Type} [NormedAddCommGroup E] [NormedSpace ℂ E]
 
 lemma meas_alt {h : α → Mat k r → E} {mm : ℕ} (hh : ∀ ξ, CkOn ((mm : ℕ) : ℕ∞) (GV k r) (h ξ))
     (hm : ∀ g ∈ GV k r, AEStronglyMeasurable (fun ξ => h ξ g) μ) :
@@ -849,38 +737,25 @@ section exch
 
 variable [CompleteSpace E]
 
-theorem exch_dLR
-    (ψ : α → ℂ) (hψ : ∀ ξ, ‖ψ ξ‖ ≤ 1) (hψm : AEStronglyMeasurable ψ μ)
-    (h : α → Mat k r → E) (mm : ℕ) (hh : ∀ ξ, CkOn ((mm : ℕ) : ℕ∞) (GV k r) (h ξ))
-    (hm : ∀ g ∈ GV k r, AEStronglyMeasurable (fun ξ => h ξ g) μ)
-    (β : α → ℝ) (hβ : Integrable β μ)
-    (hbd : ∀ u v : List (Mat k r),
-      (∀ X ∈ u, unitLie k r X) → (∀ X ∈ v, unitLie k r X) → u.length + v.length ≤ mm
-        → ∀ g ∈ GV k r, ∀ ξ, ‖dLR u v (h ξ) g‖ ≤ β ξ)
-    : ∀ u v : List (Mat k r),
-      (∀ X ∈ u, unitLie k r X) → (∀ X ∈ v, unitLie k r X) → u.length + v.length ≤ mm
-        → ∀ g ∈ GV k r,
-          dLR u v (fun g' => ∫ ξ, ψ ξ • h ξ g' ∂μ) g = ∫ ξ, ψ ξ • dLR u v (h ξ) g ∂μ := by
-  have hC
-      : ∀ u v : List (Mat k r),
-        (∀ X ∈ u, unitLie k r X) → (∀ X ∈ v, unitLie k r X) → u.length + v.length + 1 ≤ mm
-          → ∀ ξ, CkOn ((1 : ℕ) : ℕ∞) (GV k r) (dLR u v (h ξ)) := by
+theorem exch_dLR (ψ : α → ℂ) (hψ : ∀ ξ, ‖ψ ξ‖ ≤ 1) (hψm : AEStronglyMeasurable ψ μ) (h : α → Mat k r → E) (mm : ℕ)
+    (hh : ∀ ξ, CkOn ((mm : ℕ) : ℕ∞) (GV k r) (h ξ))
+    (hm : ∀ g ∈ GV k r, AEStronglyMeasurable (fun ξ => h ξ g) μ) (β : α → ℝ) (hβ : Integrable β μ)
+    (hbd : ∀ u v : List (Mat k r), (∀ X ∈ u, unitLie k r X) → (∀ X ∈ v, unitLie k r X) → u.length + v.length ≤ mm →
+      ∀ g ∈ GV k r, ∀ ξ, ‖dLR u v (h ξ) g‖ ≤ β ξ) :
+    ∀ u v : List (Mat k r), (∀ X ∈ u, unitLie k r X) → (∀ X ∈ v, unitLie k r X) → u.length + v.length ≤ mm →
+      ∀ g ∈ GV k r, dLR u v (fun g' => ∫ ξ, ψ ξ • h ξ g' ∂μ) g = ∫ ξ, ψ ξ • dLR u v (h ξ) g ∂μ := by
+  have hC : ∀ u v : List (Mat k r), (∀ X ∈ u, unitLie k r X) → (∀ X ∈ v, unitLie k r X) →
+      u.length + v.length + 1 ≤ mm → ∀ ξ, CkOn ((1 : ℕ) : ℕ∞) (GV k r) (dLR u v (h ξ)) := by
     intro u v hu hv hl ξ
     rw [dLR_eq]
-    exact smooth_on_of_word_derivatives _ (allLie_lr hu hv) 1
-      (ckOn_mono (by rw [length_lr]; omega) (hh ξ))
-  have hM
-      : ∀ u v : List (Mat k r),
-        (∀ X ∈ u, unitLie k r X) → (∀ X ∈ v, unitLie k r X) → u.length + v.length ≤ mm
-          → ∀ g ∈ GV k r, AEStronglyMeasurable (fun ξ => dLR u v (h ξ) g) μ := by
+    exact smooth_on_of_word_derivatives _ (allLie_lr hu hv) 1 (ckOn_mono (by rw [length_lr]; omega) (hh ξ))
+  have hM : ∀ u v : List (Mat k r), (∀ X ∈ u, unitLie k r X) → (∀ X ∈ v, unitLie k r X) →
+      u.length + v.length ≤ mm → ∀ g ∈ GV k r, AEStronglyMeasurable (fun ξ => dLR u v (h ξ) g) μ := by
     intro u v hu hv hl g hg
     simp_rw [dLR_eq]
     exact meas_alt hh hm _ (allLie_lr hu hv) (by rw [length_lr]; exact hl) g hg
-  have base
-      : ∀ v : List (Mat k r),
-        (∀ X ∈ v, unitLie k r X) → v.length ≤ mm
-          → ∀ g ∈ GV k r,
-            dLR [] v (fun g' => ∫ ξ, ψ ξ • h ξ g' ∂μ) g = ∫ ξ, ψ ξ • dLR [] v (h ξ) g ∂μ := by
+  have base : ∀ v : List (Mat k r), (∀ X ∈ v, unitLie k r X) → v.length ≤ mm →
+      ∀ g ∈ GV k r, dLR [] v (fun g' => ∫ ξ, ψ ξ • h ξ g' ∂μ) g = ∫ ξ, ψ ξ • dLR [] v (h ξ) g ∂μ := by
     intro v
     induction v with
     | nil => intro _ _ g _; rfl
@@ -890,11 +765,9 @@ theorem exch_dLR
       have hX := hv X List.mem_cons_self
       have hl' : v.length + 1 ≤ mm := by simpa using hl
       show op false X (dLR [] v (fun g' => ∫ ξ, ψ ξ • h ξ g' ∂μ)) g = ∫ ξ, ψ ξ • op false X (dLR [] v (h ξ)) g ∂μ
-      exact step_int (b := false) hX.1 ψ hψ hψm
-        (fun ξ => dLR [] v (h ξ))
-        (hC [] v (by simp) hv' (by simpa using hl')) (hM [] v (by simp) hv' (by simp; omega)) β hβ
-        (hbd [] v (by simp) hv' (by simp; omega)) (hbd [] (X :: v) (by simp) hv (by simpa using hl))
-        _ (ih hv' (by omega)) g hg
+      exact step_int (b := false) hX.1 ψ hψ hψm (fun ξ => dLR [] v (h ξ)) (hC [] v (by simp) hv' (by simpa using hl'))
+        (hM [] v (by simp) hv' (by simp; omega)) β hβ (hbd [] v (by simp) hv' (by simp; omega))
+        (hbd [] (X :: v) (by simp) hv (by simpa using hl)) _ (ih hv' (by omega)) g hg
   intro u
   induction u with
   | nil => intro v _ hv hl; exact base v hv (by simpa using hl)
@@ -904,10 +777,9 @@ theorem exch_dLR
     have hX := hu X List.mem_cons_self
     have hl' : u.length + v.length + 1 ≤ mm := by simp at hl; omega
     show op true X (dLR u v (fun g' => ∫ ξ, ψ ξ • h ξ g' ∂μ)) g = ∫ ξ, ψ ξ • op true X (dLR u v (h ξ)) g ∂μ
-    exact step_int (b := true) hX.1 ψ hψ hψm
-      (fun ξ => dLR u v (h ξ))
-      (hC u v hu' hv hl') (hM u v hu' hv (by omega)) β hβ (hbd u v hu' hv (by omega))
-      (hbd (X :: u) v hu hv hl) _ (ih v hu' hv (by omega)) g hg
+    exact step_int (b := true) hX.1 ψ hψ hψm (fun ξ => dLR u v (h ξ)) (hC u v hu' hv hl')
+      (hM u v hu' hv (by omega)) β hβ (hbd u v hu' hv (by omega)) (hbd (X :: u) v hu hv hl) _
+      (ih v hu' hv (by omega)) g hg
 
 end exch
 
@@ -915,19 +787,16 @@ section ck
 
 variable [CompleteSpace E]
 
-theorem ck_of_chart
-    {F : Mat k r → E} {mm : ℕ}
-    (h : ∀ g0 ∈ GV k r, ∃ δ > 0,
-      Metric.ball (0 : J k r → ℝ) δ ⊆ Dom k r
-        ∧ ContDiffOn ℝ ((mm : ℕ) : WithTop ℕ∞) (fun Y => F (chart g0 Y)) (Metric.ball 0 δ))
-    : CkOn ((mm : ℕ) : ℕ∞) (GV k r) F := by
+theorem ck_of_chart {F : Mat k r → E} {mm : ℕ}
+    (h : ∀ g0 ∈ GV k r, ∃ δ > 0, Metric.ball (0 : J k r → ℝ) δ ⊆ Dom k r ∧
+      ContDiffOn ℝ ((mm : ℕ) : WithTop ℕ∞) (fun Y => F (chart g0 Y)) (Metric.ball 0 δ)) :
+    CkOn ((mm : ℕ) : ℕ∞) (GV k r) F := by
   intro g0 hg0
   obtain ⟨δ, hδ, -, hAL⟩ := h g0 hg0
   have hgu : IsUnit g0.det := Formalism.QuantumDeterminants.WeylGroupFacts.isUnit_of_uh hg0
   have hg1 : g0 * g0⁻¹ = 1 := Matrix.mul_nonsing_inv _ hgu
   set U := Sr g0 ∩ rho g0 ⁻¹' Metric.ball (0 : J k r → ℝ) δ with hUdef
-  have hUo : IsOpen U :=
-    (rho_cd g0).continuousOn.isOpen_inter_preimage (sr_open g0) Metric.isOpen_ball
+  have hUo : IsOpen U := (rho_cd g0).continuousOn.isOpen_inter_preimage (sr_open g0) Metric.isOpen_ball
   have hg0U : g0 ∈ U := by
     have h2 : (1 + 1 : Mat k r) = (2 : ℂ) • (1 : Mat k r) := by rw [two_smul]
     refine ⟨?_, ?_⟩
@@ -939,33 +808,26 @@ theorem ck_of_chart
         funext i
         simp only [rho, hg1, iot, sub_self, Matrix.zero_mul]
         exact co_zero i
-      rw [h3]
-      exact Metric.mem_ball_self hδ
+      rw [h3]; exact Metric.mem_ball_self hδ
   refine ⟨U, fun x => F (chart g0 (rho g0 x)), hUo, hg0U, ?_, ?_⟩
   · have h4 : ContDiffOn ℝ ((mm : ℕ) : WithTop ℕ∞) (rho g0) U :=
       ((rho_cd g0).mono Set.inter_subset_left).of_le (by exact_mod_cast le_top)
     exact hAL.comp h4 (by intro x hx; exact hx.2)
   · intro x hx hxG
-    have hh : x * g0⁻¹ ∈ GV k r :=
-      Formalism.FourierDecayAlt.P.BetaSesquilinearity.gv_mul hxG
-        (Formalism.FourierDecayAlt.P.BetaSesquilinearity.gv_inv hg0)
+    have hh : x * g0⁻¹ ∈ GV k r := Formalism.FourierDecayAlt.P.BetaSesquilinearity.gv_mul hxG (Formalism.FourierDecayAlt.P.BetaSesquilinearity.gv_inv hg0)
     obtain ⟨hl, -, hk⟩ := iot_facts hh hx.1
     show F x = F (kap (prj (Mv (co (iot (x * g0⁻¹))))) * g0)
     rw [Mv_co, prj_of_lie hl, hk, Matrix.mul_assoc, Matrix.nonsing_inv_mul _ hgu, Matrix.mul_one]
 
-theorem int_ck
-    (ψ : α → ℂ) (hψ : ∀ ξ, ‖ψ ξ‖ ≤ 1) (hψm : AEStronglyMeasurable ψ μ)
-    (h : α → Mat k r → E) (mm : ℕ) (hh : ∀ ξ, CkOn ((mm : ℕ) : ℕ∞) (GV k r) (h ξ))
-    (hm : ∀ g ∈ GV k r, AEStronglyMeasurable (fun ξ => h ξ g) μ)
-    (β : α → ℝ) (hβ : Integrable β μ)
-    (hbd : ∀ u v : List (Mat k r),
-      (∀ X ∈ u, unitLie k r X) → (∀ X ∈ v, unitLie k r X) → u.length + v.length ≤ mm
-        → ∀ g ∈ GV k r, ∀ ξ, ‖dLR u v (h ξ) g‖ ≤ β ξ)
-    : CkOn ((mm : ℕ) : ℕ∞) (GV k r) (fun g => ∫ ξ, ψ ξ • h ξ g ∂μ) := by
+theorem int_ck (ψ : α → ℂ) (hψ : ∀ ξ, ‖ψ ξ‖ ≤ 1) (hψm : AEStronglyMeasurable ψ μ) (h : α → Mat k r → E) (mm : ℕ)
+    (hh : ∀ ξ, CkOn ((mm : ℕ) : ℕ∞) (GV k r) (h ξ))
+    (hm : ∀ g ∈ GV k r, AEStronglyMeasurable (fun ξ => h ξ g) μ) (β : α → ℝ) (hβ : Integrable β μ)
+    (hbd : ∀ u v : List (Mat k r), (∀ X ∈ u, unitLie k r X) → (∀ X ∈ v, unitLie k r X) → u.length + v.length ≤ mm →
+      ∀ g ∈ GV k r, ∀ ξ, ‖dLR u v (h ξ) g‖ ≤ β ξ) :
+    CkOn ((mm : ℕ) : ℕ∞) (GV k r) (fun g => ∫ ξ, ψ ξ • h ξ g ∂μ) := by
   apply ck_of_chart
   intro g0 hg0
-  obtain ⟨δ0, hδ0, hball⟩ :=
-    Metric.mem_nhds_iff.1 (dom_open.mem_nhds (zero_mem_dom (k := k) (r := r)))
+  obtain ⟨δ0, hδ0, hball⟩ := Metric.mem_nhds_iff.1 (dom_open.mem_nhds (zero_mem_dom (k := k) (r := r)))
   set δ := δ0 / 2 with hδ
   have hδp : 0 < δ := by rw [hδ]; linarith
   have hcl : Metric.closedBall (0 : J k r → ℝ) δ ⊆ Dom k r :=
@@ -979,64 +841,43 @@ theorem int_ck
     intro Y hY
     have h1 := hBa Y (Metric.ball_subset_closedBall hY)
     rwa [Real.norm_eq_abs, abs_of_nonneg (Finset.sum_nonneg fun _ _ => norm_nonneg _)] at h1
-  have hBa0 : 0 ≤ Ba :=
-    (Finset.sum_nonneg fun _ _ => norm_nonneg _).trans (hBa' 0 (Metric.mem_ball_self hδp))
+  have hBa0 : 0 ≤ Ba := (Finset.sum_nonneg fun _ _ => norm_nonneg _).trans (hBa' 0 (Metric.mem_ball_self hδp))
   have hunit : ∀ w : List (J k r), ∀ X ∈ w.map Lt, unitLie k r X := by
     intro w X hX
     obtain ⟨i, _, rfl⟩ := List.mem_map.1 hX
     exact Lt_unit i
-  have hckw
-      : ∀ ξ (w : List (J k r)) (m : ℕ),
-        m + w.length ≤ mm → CkOn ((m : ℕ) : ℕ∞) (GV k r) (dLR (w.map Lt) [] (h ξ)) := by
+  have hckw : ∀ ξ (w : List (J k r)) (m : ℕ), m + w.length ≤ mm →
+      CkOn ((m : ℕ) : ℕ∞) (GV k r) (dLR (w.map Lt) [] (h ξ)) := by
     intro ξ w m hm'
     rw [dLR_eq]
-    exact smooth_on_of_word_derivatives _ (allLie_lr (hunit w) (by simp)) m
-      (ckOn_mono (by rw [length_lr]; simp; omega) (hh ξ))
-  have hM
-      : ∀ (w : List (J k r)),
-        w.length ≤ mm
-          → ∀ g ∈ GV k r, AEStronglyMeasurable (fun ξ => dLR (w.map Lt) [] (h ξ) g) μ := by
+    exact smooth_on_of_word_derivatives _ (allLie_lr (hunit w) (by simp)) m (ckOn_mono (by rw [length_lr]; simp; omega) (hh ξ))
+  have hM : ∀ (w : List (J k r)), w.length ≤ mm → ∀ g ∈ GV k r,
+      AEStronglyMeasurable (fun ξ => dLR (w.map Lt) [] (h ξ) g) μ := by
     intro w hw g hg
     simp_rw [dLR_eq]
     exact meas_alt hh hm _ (allLie_lr (hunit w) (by simp)) (by rw [length_lr]; simpa using hw) g hg
   have hsm : ∀ ξ (e : E), ‖ψ ξ • e‖ ≤ ‖e‖ := fun ξ e => by
     rw [norm_smul]; exact mul_le_of_le_one_left (norm_nonneg _) (hψ ξ)
-  have hbw
-      : ∀ (w : List (J k r)),
-        w.length ≤ mm
-          → ∀ Y ∈ Metric.ball (0 : J k r → ℝ) δ, ∀ ξ,
-            ‖ψ ξ • dLR (w.map Lt) [] (h ξ) (chart g0 Y)‖ ≤ β ξ := fun w hw Y hY ξ =>
+  have hbw : ∀ (w : List (J k r)), w.length ≤ mm → ∀ Y ∈ Metric.ball (0 : J k r → ℝ) δ, ∀ ξ,
+      ‖ψ ξ • dLR (w.map Lt) [] (h ξ) (chart g0 Y)‖ ≤ β ξ := fun w hw Y hY ξ =>
     (hsm ξ _).trans (hbd _ [] (hunit w) (by simp) (by simpa using hw) _ (chart_mem hg0 (hΩ hY)) ξ)
-  have hmw
-      : ∀ (w : List (J k r)),
-        w.length ≤ mm
-          → ∀ Y ∈ Metric.ball (0 : J k r → ℝ) δ,
-            AEStronglyMeasurable (fun ξ => ψ ξ • dLR (w.map Lt) [] (h ξ) (chart g0 Y)) μ :=
-    fun w hw Y hY => hψm.smul (hM w hw _ (chart_mem hg0 (hΩ hY)))
+  have hmw : ∀ (w : List (J k r)), w.length ≤ mm → ∀ Y ∈ Metric.ball (0 : J k r → ℝ) δ,
+      AEStronglyMeasurable (fun ξ => ψ ξ • dLR (w.map Lt) [] (h ξ) (chart g0 Y)) μ := fun w hw Y hY =>
+    hψm.smul (hM w hw _ (chart_mem hg0 (hΩ hY)))
   set L : List (J k r) → (J k r → ℝ) → E :=
     fun w Y => ∫ ξ, ψ ξ • dLR (w.map Lt) [] (h ξ) (chart g0 Y) ∂μ with hL
-  have hLc
-      : ∀ w : List (J k r), w.length ≤ mm → ContinuousOn (L w) (Metric.ball (0 : J k r → ℝ) δ) := by
+  have hLc : ∀ w : List (J k r), w.length ≤ mm → ContinuousOn (L w) (Metric.ball (0 : J k r → ℝ) δ) := by
     intro w hw
-    refine continuousOn_of_dominated
-      (F := fun Y ξ => ψ ξ • dLR (w.map Lt) [] (h ξ) (chart g0 Y))
-      (bound := β)
-      (fun Y hY => hmw w hw Y hY)
-      (fun Y hY => Eventually.of_forall fun ξ => hbw w hw Y hY ξ)
-      hβ (Eventually.of_forall fun ξ => ?_)
+    refine continuousOn_of_dominated (F := fun Y ξ => ψ ξ • dLR (w.map Lt) [] (h ξ) (chart g0 Y)) (bound := β)
+      (fun Y hY => hmw w hw Y hY) (fun Y hY => Eventually.of_forall fun ξ => hbw w hw Y hY ξ) hβ
+      (Eventually.of_forall fun ξ => ?_)
     exact ((cont_chart hg0 (hckw ξ w 0 (by omega))).mono hΩ).const_smul (ψ ξ)
-  have hLd
-      : ∀ w : List (J k r),
-        w.length < mm
-          → ∀ Y ∈ Metric.ball (0 : J k r → ℝ) δ,
-            HasFDerivAt (L w) (∑ i, (aC g0 i Y).smulRight (L (i :: w) Y)) Y := by
+  have hLd : ∀ w : List (J k r), w.length < mm → ∀ Y ∈ Metric.ball (0 : J k r → ℝ) δ,
+      HasFDerivAt (L w) (∑ i, (aC g0 i Y).smulRight (L (i :: w) Y)) Y := by
     intro w hw Y hY
-    have hD
-        : ∀ ξ, ∀ Y' ∈ Metric.ball (0 : J k r → ℝ) δ,
-          HasFDerivAt
-            (fun Y'' => ψ ξ • dLR (w.map Lt) [] (h ξ) (chart g0 Y''))
-            (∑ i, (aC g0 i Y').smulRight (ψ ξ • dLR ((i :: w).map Lt) [] (h ξ) (chart g0 Y')))
-            Y' := by
+    have hD : ∀ ξ, ∀ Y' ∈ Metric.ball (0 : J k r → ℝ) δ,
+        HasFDerivAt (fun Y'' => ψ ξ • dLR (w.map Lt) [] (h ξ) (chart g0 Y''))
+          (∑ i, (aC g0 i Y').smulRight (ψ ξ • dLR ((i :: w).map Lt) [] (h ξ) (chart g0 Y'))) Y' := by
       intro ξ Y' hY'
       have h1 := (hasFDeriv_chart hg0 (hckw ξ w 1 (by omega)) (hΩ hY')).const_smul (ψ ξ)
       refine h1.congr_fderiv ?_
@@ -1048,58 +889,41 @@ theorem int_ck
       rfl
     have hβ0 : ∀ ξ, 0 ≤ β ξ := fun ξ =>
       (norm_nonneg _).trans (hbd [] [] (by simp) (by simp) (by simp) g0 hg0 ξ)
-    have hF'm : AEStronglyMeasurable
-        (fun ξ =>
-          ∑ i, (aC g0 i Y).smulRight
-            (ψ ξ • dLR ((i :: w).map Lt) [] (h ξ) (chart g0 Y)))
-        μ := by
+    have hF'm : AEStronglyMeasurable (fun ξ => ∑ i, (aC g0 i Y).smulRight
+        (ψ ξ • dLR ((i :: w).map Lt) [] (h ξ) (chart g0 Y))) μ := by
       refine Finset.aestronglyMeasurable_fun_sum _ fun i _ => ?_
-      exact (ContinuousLinearMap.smulRightL ℝ (J k r → ℝ) E
-        (aC g0 i Y)).continuous.comp_aestronglyMeasurable (hmw (i :: w) (by simp; omega) Y hY)
-    have hbF'
-        : ∀ ξ, ∀ Y' ∈ Metric.ball (0 : J k r → ℝ) δ,
-          ‖∑ i, (aC g0 i Y').smulRight
-              (ψ ξ • dLR ((i :: w).map Lt) [] (h ξ) (chart g0 Y'))‖
-            ≤ Ba * β ξ := by
+      exact (StrongDual.smulRightL ℝ (J k r → ℝ) E (aC g0 i Y)).continuous.comp_aestronglyMeasurable
+        (hmw (i :: w) (by simp; omega) Y hY)
+    have hbF' : ∀ ξ, ∀ Y' ∈ Metric.ball (0 : J k r → ℝ) δ, ‖∑ i, (aC g0 i Y').smulRight
+        (ψ ξ • dLR ((i :: w).map Lt) [] (h ξ) (chart g0 Y'))‖ ≤ Ba * β ξ := by
       intro ξ Y' hY'
-      calc
-        _ ≤ ∑ i, ‖(aC g0 i Y').smulRight (ψ ξ • dLR ((i :: w).map Lt) [] (h ξ) (chart g0 Y'))‖ :=
-          norm_sum_le _ _
-        _ ≤ ∑ i, ‖aC g0 i Y'‖ * β ξ :=
-          Finset.sum_le_sum fun i _ => by
+      calc _ ≤ ∑ i, ‖(aC g0 i Y').smulRight (ψ ξ • dLR ((i :: w).map Lt) [] (h ξ) (chart g0 Y'))‖ :=
+            norm_sum_le _ _
+        _ ≤ ∑ i, ‖aC g0 i Y'‖ * β ξ := Finset.sum_le_sum fun i _ => by
             rw [ContinuousLinearMap.norm_smulRight_apply]
             exact mul_le_mul_of_nonneg_left (hbw (i :: w) (by simp; omega) Y' hY' ξ) (norm_nonneg _)
         _ = (∑ i, ‖aC g0 i Y'‖) * β ξ := by rw [Finset.sum_mul]
         _ ≤ Ba * β ξ := mul_le_mul_of_nonneg_right (hBa' Y' hY') (hβ0 ξ)
-    have key :=
-      hasFDerivAt_integral_of_dominated_of_fderiv_le (μ := μ) (𝕜 := ℝ)
-        (F := fun Y' ξ => ψ ξ • dLR (w.map Lt) [] (h ξ) (chart g0 Y'))
-        (F' := fun Y' ξ =>
-          ∑ i, (aC g0 i Y').smulRight (ψ ξ • dLR ((i :: w).map Lt) [] (h ξ) (chart g0 Y')))
-        (bound := fun ξ => Ba * β ξ)
-        (Metric.isOpen_ball.mem_nhds hY)
-        (by filter_upwards [Metric.isOpen_ball.mem_nhds hY] with Y' hY' using hmw w hw.le Y' hY')
-        (hβ.mono' (hmw w hw.le Y hY) (Eventually.of_forall fun ξ => hbw w hw.le Y hY ξ)) hF'm
-        (Eventually.of_forall fun ξ Y' hY' => hbF' ξ Y' hY') (hβ.const_mul Ba)
-        (Eventually.of_forall fun ξ Y' hY' => hD ξ Y' hY')
+    have key := hasFDerivAt_integral_of_dominated_of_fderiv_le (μ := μ) (𝕜 := ℝ)
+      (F := fun Y' ξ => ψ ξ • dLR (w.map Lt) [] (h ξ) (chart g0 Y'))
+      (F' := fun Y' ξ => ∑ i, (aC g0 i Y').smulRight (ψ ξ • dLR ((i :: w).map Lt) [] (h ξ) (chart g0 Y')))
+      (bound := fun ξ => Ba * β ξ) (Metric.isOpen_ball.mem_nhds hY)
+      (by filter_upwards [Metric.isOpen_ball.mem_nhds hY] with Y' hY' using hmw w hw.le Y' hY')
+      (hβ.mono' (hmw w hw.le Y hY) (Eventually.of_forall fun ξ => hbw w hw.le Y hY ξ))
+      hF'm (Eventually.of_forall fun ξ Y' hY' => hbF' ξ Y' hY') (hβ.const_mul Ba)
+      (Eventually.of_forall fun ξ Y' hY' => hD ξ Y' hY')
     refine key.congr_fderiv ?_
-    have hint
-        : ∀ i, Integrable (fun ξ => ψ ξ • dLR ((i :: w).map Lt) [] (h ξ) (chart g0 Y)) μ := fun i =>
+    have hint : ∀ i, Integrable (fun ξ => ψ ξ • dLR ((i :: w).map Lt) [] (h ξ) (chart g0 Y)) μ := fun i =>
       hβ.mono' (hmw (i :: w) (by simp; omega) Y hY)
         (Eventually.of_forall fun ξ => hbw (i :: w) (by simp; omega) Y hY ξ)
-    have hI
-        : ∀ i,
-          Integrable
-            (fun ξ => (aC g0 i Y).smulRight (ψ ξ • dLR ((i :: w).map Lt) [] (h ξ) (chart g0 Y)))
-            μ := fun i =>
-      (ContinuousLinearMap.smulRightL ℝ (J k r → ℝ) E (aC g0 i Y)).integrable_comp (hint i)
+    have hI : ∀ i, Integrable (fun ξ => (aC g0 i Y).smulRight
+        (ψ ξ • dLR ((i :: w).map Lt) [] (h ξ) (chart g0 Y))) μ := fun i =>
+      (StrongDual.smulRightL ℝ (J k r → ℝ) E (aC g0 i Y)).integrable_comp (hint i)
     rw [integral_finsetSum _ (fun i _ => hI i)]
     refine Finset.sum_congr rfl fun i _ => ?_
-    exact (ContinuousLinearMap.smulRightL ℝ (J k r → ℝ) E (aC g0 i Y)).integral_comp_comm (hint i)
-  have hAL :=
-    ALd (𝔤 := J k r → ℝ) (E := E) Metric.isOpen_ball (aC g0)
-      (fun i => (aC_cd hg0 i).mono hΩ)
-      mm L hLc hLd
+    exact (StrongDual.smulRightL ℝ (J k r → ℝ) E (aC g0 i Y)).integral_comp_comm (hint i)
+  have hAL := ALd (𝔤 := J k r → ℝ) (E := E) Metric.isOpen_ball (aC g0) (fun i => (aC_cd hg0 i).mono hΩ) mm L
+    hLc hLd
   exact ⟨δ, hδp, hΩ, hAL.congr fun Y _ => rfl⟩
 
 end ck
@@ -1110,8 +934,7 @@ open Matrix MeasureTheory Filter Topology
 
 namespace Formalism.FourierDecayAlt.P.Ux10
 
-open Formalism.FourierDecayAlt Formalism.FourierDecayAlt.U Formalism.REAL
-  Formalism.QuantumDeterminants
+open Formalism.FourierDecayAlt Formalism.FourierDecayAlt.U Formalism.REAL Formalism.QuantumDeterminants
 
 section cont
 
@@ -1324,8 +1147,7 @@ open Matrix MeasureTheory Filter Topology
 
 namespace Formalism.FourierDecayAlt.P.Ux10
 
-open Formalism.FourierDecayAlt Formalism.FourierDecayAlt.U Formalism.REAL
-  Formalism.QuantumDeterminants Formalism.FourierDecayAlt.P.B4
+open Formalism.FourierDecayAlt Formalism.FourierDecayAlt.U Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.P.B4
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
@@ -1357,26 +1179,16 @@ lemma dLR_vanish {k r : ℕ} {E : Type} [NormedAddCommGroup E] [NormedSpace ℂ 
   have h2 := Formalism.FourierDecayAlt.P.BetaSesquilinearity.dLR_zero (E := E) u v
   exact congrFun h2 g
 
-theorem slice_bound
-    (hM : SliceMem) (hR : RadicalParam) (hZh : ZhSlice) (hC : DerivativeCost) (hS : CoordinateDecay)
+theorem slice_bound (hM : SliceMem) (hR : RadicalParam) (hZh : ZhSlice) (hC : DerivativeCost) (hS : CoordinateDecay)
     {k p s ρ : ℕ} (σ : Equiv.Perm (Fin p)) (d : Fin p → ℂ) (hd : ∀ i, d i ≠ 0) (hs : 1 ≤ s)
-    {K : Set ℝ} (hK : IsCompact K) (hK0 : K ⊆ Set.Ioi 0)
-    (m mm Q : ℕ) (A₁ : ℝ) (hQ : m + 1 + mm ≤ Q) (ha : 0 < a1 (p + s + ρ) A₁ m mm)
-    : ∃ Cb : ℝ,
-      0 ≤ Cb
-        ∧ ∀ (E : Type) [NormedAddCommGroup E] [NormedSpace ℂ E] (F₁ : B.Mat k (p + s + ρ) → E)
-            (B₁ : ℝ),
-          Star k (p + s) ρ F₁ A₁ Q B₁ K
-            → ∀ (ξ : Xi k p s ρ σ) (Z : G.Mat s),
-              G.detM Z ≠ 0
-                → ∀ γ ∈ B.GV k ρ, ∀ u v : List (B.Mat k ρ),
-                  unitW k ρ u → unitW k ρ v → u.length + v.length ≤ mm
-                    → ∀ q ≤ m + 1,
-                      ‖iteratedFDeriv ℝ q (fun Z' : G.Mat s => B.dLR u v (fun γ' => F₁ (gaXi k ρ σ d ξ Z' γ')) γ) Z‖
-                        ≤ Cb * B₁
-                          * ((1 + ‖Z‖) ^ (- a1 (p + s + ρ) A₁ m mm)
-                            * B.gN γ ^ (- a1 (p + s + ρ) A₁ m mm))
-                          * wt ξ ^ (- a1 (p + s + ρ) A₁ m mm) := by
+    {K : Set ℝ} (hK : IsCompact K) (hK0 : K ⊆ Set.Ioi 0) (m mm Q : ℕ) (A₁ : ℝ) (hQ : m + 1 + mm ≤ Q)
+    (ha : 0 < a1 (p + s + ρ) A₁ m mm) :
+    ∃ Cb : ℝ, 0 ≤ Cb ∧ ∀ (E : Type) [NormedAddCommGroup E] [NormedSpace ℂ E] (F₁ : B.Mat k (p + s + ρ) → E) (B₁ : ℝ),
+      Star k (p + s) ρ F₁ A₁ Q B₁ K → ∀ (ξ : Xi k p s ρ σ) (Z : G.Mat s), G.detM Z ≠ 0 → ∀ γ ∈ B.GV k ρ,
+      ∀ u v : List (B.Mat k ρ), unitW k ρ u → unitW k ρ v → u.length + v.length ≤ mm → ∀ q ≤ m + 1,
+        ‖iteratedFDeriv ℝ q (fun Z' : G.Mat s => B.dLR u v (fun γ' => F₁ (gaXi k ρ σ d ξ Z' γ')) γ) Z‖ ≤
+          Cb * B₁ * ((1 + ‖Z‖) ^ (-a1 (p + s + ρ) A₁ m mm) * B.gN γ ^ (-a1 (p + s + ρ) A₁ m mm)) *
+            wt ξ ^ (-a1 (p + s + ρ) A₁ m mm) := by
   set a := a1 (p + s + ρ) A₁ m mm with ha_def
   set R : ℝ := ((p + s + ρ : ℕ) : ℝ) with hRdef
   have hR0 : 0 ≤ R := Nat.cast_nonneg _
@@ -1385,16 +1197,13 @@ theorem slice_bound
   have hAa : As / (8 * (2 * R + 1)) = a := by rw [ha_def]; unfold a1; rfl
   have hAs0 : 0 ≤ As := by
     have : As = a * (8 * (2 * R + 1)) := by rw [← hAa]; field_simp
-    rw [this]
-    positivity
+    rw [this]; positivity
   obtain ⟨C₃, hC₃⟩ := hC k p s ρ σ d hd hs K hK hK0 Q
   obtain ⟨C₂, hC₂⟩ := hS k p s ρ σ d hd hs K hK hK0 As hAs0
   refine ⟨|C₃| * |C₂|, by positivity, ?_⟩
   intro E _ _ F₁ B₁ hStar ξ Z hZ γ hγ u v hu hv hl q hq
   have hB₁ : 0 ≤ B₁ := by
-    have :=
-      hStar.2.2 [] [] (by simp [unitP]) (by simp [unitP]) (by simp) 1
-        Formalism.FourierDecayAlt.P.BetaSesquilinearity.gv_one
+    have := hStar.2.2 [] [] (by simp [unitP]) (by simp [unitP]) (by simp) 1 Formalism.FourierDecayAlt.P.BetaSesquilinearity.gv_one
     exact le_trans (mul_nonneg (Real.rpow_nonneg (Real.sqrt_nonneg _) _) (norm_nonneg _)) this
   have hγ1 : 1 ≤ B.gN γ := Formalism.FourierDecayAlt.P.BetaSesquilinearity.gN_ge_one hγ
   have hw1 : 1 ≤ wt ξ := one_le_wt ξ
@@ -1402,40 +1211,32 @@ theorem slice_bound
   by_cases hKZ : ‖(hMat σ d).det * G.detM Z‖ ∈ K
   · obtain ⟨-, hb⟩ := hC₃ E F₁ A₁ B₁ hStar ξ u v q hu hv (by omega) Z γ hZ hγ
     have hg := gaXi_mem hM hR σ d hd ξ Z hZ hγ
-    have hg1 : 1 ≤ B.gN (gaXi k ρ σ d ξ Z γ) :=
-      Formalism.FourierDecayAlt.P.BetaSesquilinearity.gN_ge_one hg
+    have hg1 : 1 ≤ B.gN (gaXi k ρ σ d ξ Z γ) := Formalism.FourierDecayAlt.P.BetaSesquilinearity.gN_ge_one hg
     have hDj : ‖DjU k (p + s) ρ (gaXi k ρ σ d ξ Z γ)‖ ∈ K := by rw [DjU_gaXi hZh]; exact hKZ
     have hs22 := hC₂ ξ Z γ hγ hDj
     have hexp : -A₁ + 5 * R * (q : ℝ) + 2 * R * ((u.length + v.length : ℕ) : ℝ) ≤ -As := by
       have hq' : (q : ℝ) ≤ (m : ℝ) + 1 := by exact_mod_cast hq
       have hl' : ((u.length + v.length : ℕ) : ℝ) ≤ (mm : ℝ) := by exact_mod_cast hl
-      rw [hAsdef]
-      nlinarith
-    calc
-      _ ≤ C₃ * B₁
-          * B.gN (gaXi k ρ σ d ξ Z γ)
-            ^ (-A₁ + 5 * R * (q : ℝ) + 2 * R * ((u.length + v.length : ℕ) : ℝ)) :=
-        hb
+      rw [hAsdef]; nlinarith
+    calc _ ≤ C₃ * B₁ * B.gN (gaXi k ρ σ d ξ Z γ) ^
+            (-A₁ + 5 * R * (q : ℝ) + 2 * R * ((u.length + v.length : ℕ) : ℝ)) := hb
       _ ≤ |C₃| * B₁ * B.gN (gaXi k ρ σ d ξ Z γ) ^ (-As) :=
-        mul_le_mul (mul_le_mul_of_nonneg_right (le_abs_self _) hB₁)
-          (Real.rpow_le_rpow_of_exponent_le hg1 hexp) (Real.rpow_nonneg (by linarith) _)
-          (by positivity)
+          mul_le_mul (mul_le_mul_of_nonneg_right (le_abs_self _) hB₁) (Real.rpow_le_rpow_of_exponent_le hg1 hexp)
+            (Real.rpow_nonneg (by linarith) _) (by positivity)
       _ ≤ |C₃| * B₁ * (|C₂| * (wt ξ * (1 + ‖Z‖) * B.gN γ) ^ (-a)) := by
-        refine mul_le_mul_of_nonneg_left ?_ (by positivity)
-        refine hs22.trans ?_
-        rw [hAa]
-        exact mul_le_mul_of_nonneg_right (le_abs_self _) (Real.rpow_nonneg (by positivity) _)
+          refine mul_le_mul_of_nonneg_left ?_ (by positivity)
+          refine hs22.trans ?_
+          rw [hAa]
+          exact mul_le_mul_of_nonneg_right (le_abs_self _) (Real.rpow_nonneg (by positivity) _)
       _ = |C₃| * |C₂| * B₁ * ((1 + ‖Z‖) ^ (-a) * B.gN γ ^ (-a)) * wt ξ ^ (-a) := by
-        rw [Real.mul_rpow (by positivity) (by positivity),
-          Real.mul_rpow (by positivity) (by positivity)]
-        ring
+          rw [Real.mul_rpow (by positivity) (by positivity), Real.mul_rpow (by positivity) (by positivity)]
+          ring
   · have hO : IsOpen {Z' : G.Mat s | G.detM Z' ≠ 0 ∧ ‖(hMat σ d).det * G.detM Z'‖ ∉ K} := by
       have hc : Continuous (fun Z' : G.Mat s => G.detM Z') := by unfold G.detM; fun_prop
       exact (isOpen_ne_fun hc continuous_const).inter
         (hK.isClosed.isOpen_compl.preimage (continuous_norm.comp (continuous_const.mul hc)))
-    have hev
-        : (fun Z' : G.Mat s => B.dLR u v (fun γ' => F₁ (gaXi k ρ σ d ξ Z' γ')) γ) =ᶠ[𝓝 Z]
-          fun _ => (0 : E) := by
+    have hev : (fun Z' : G.Mat s => B.dLR u v (fun γ' => F₁ (gaXi k ρ σ d ξ Z' γ')) γ) =ᶠ[𝓝 Z]
+        fun _ => (0 : E) := by
       filter_upwards [hO.mem_nhds ⟨hZ, hKZ⟩] with Z' hZ'
       exact dLR_vanish (slice_vanish hM hR hZh σ d hd hStar ξ Z' hZ'.1 hZ'.2) u v hu hv γ hγ
     rw [(hev.iteratedFDeriv ℝ q).eq_of_nhds, iteratedFDeriv_fun_zero]
@@ -1448,8 +1249,7 @@ open Matrix MeasureTheory Filter Topology
 
 namespace Formalism.FourierDecayAlt.P.Ux10
 
-open Formalism.FourierDecayAlt Formalism.FourierDecayAlt.U Formalism.REAL
-  Formalism.QuantumDeterminants Formalism.FourierDecayAlt.P.B4
+open Formalism.FourierDecayAlt Formalism.FourierDecayAlt.U Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.P.B4
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
@@ -1460,23 +1260,19 @@ lemma fin_step {x g a T c I : ℝ} (hg : 0 < g) (hx : x ≤ c * (T * g ^ (-a)) *
     _ = (g ^ a * g ^ (-a)) * (c * I * T) := by ring
     _ = c * I * T := by rw [hga, one_mul]
 
-theorem phi_bound_parts_of_radical_and_slice (hR : RadicalParam) (hZh : ZhSlice)
-    : PointwiseIntegralBoundFromComponents := by
+theorem phi_bound_parts_of_radical_and_slice (hR : RadicalParam) (hZh : ZhSlice) : PointwiseIntegralBoundFromComponents := by
   intro hM hC hS hI k p s ρ σ d hd hs K hK hK0 m mm Q A₁ hQ ha
   set a := a1 (p + s + ρ) A₁ m mm with ha_def
   have hn0 : 0 ≤ 2 * ((p + s + ρ : ℕ) : ℝ) * ((2 * (p + s + ρ) + k + 1 : ℕ) : ℝ) := by positivity
   have ha0 : 0 < a := lt_of_le_of_lt hn0 ha
   obtain ⟨Cb, hCb0, hbd⟩ := slice_bound hM hR hZh hC hS σ d hd hs hK hK0 m mm Q A₁ hQ ha0
   obtain ⟨C₃, hC₃⟩ := hC k p s ρ σ d hd hs K hK hK0 Q
-  have hInt : Integrable (fun ξ : Xi k p s ρ σ => wt ξ ^ (-a)) (muXi k p s ρ σ) :=
-    hI k p s ρ σ a hs ha
+  have hInt : Integrable (fun ξ : Xi k p s ρ σ => wt ξ ^ (-a)) (muXi k p s ρ σ) := hI k p s ρ σ a hs ha
   set I := ∫ ξ, wt ξ ^ (-a) ∂(muXi k p s ρ σ) with hIdef
   refine ⟨Cb * I, ?_⟩
   intro z z' E _ _ _ F₁ B₁ hStar
   have hB₁ : 0 ≤ B₁ := by
-    have :=
-      hStar.2.2 [] [] (by simp [unitP]) (by simp [unitP]) (by simp) 1
-        Formalism.FourierDecayAlt.P.BetaSesquilinearity.gv_one
+    have := hStar.2.2 [] [] (by simp [unitP]) (by simp [unitP]) (by simp) 1 Formalism.FourierDecayAlt.P.BetaSesquilinearity.gv_one
     exact le_trans (mul_nonneg (Real.rpow_nonneg (Real.sqrt_nonneg _) _) (norm_nonneg _)) this
   have hψ : ∀ ξ, ‖psiStar k ρ σ z z' ξ‖ ≤ 1 := fun ξ => (norm_psiStar k ρ σ z z' ξ).le
   have : BorelSpace (XiH p s σ) := Prod.borelSpace
@@ -1485,183 +1281,112 @@ theorem phi_bound_parts_of_radical_and_slice (hR : RadicalParam) (hZh : ZhSlice)
   have : SecondCountableTopology (Xi k p s ρ σ) := inferInstance
   have hψm : AEStronglyMeasurable (fun ξ => psiStar k ρ σ z z' ξ) (muXi k p s ρ σ) :=
     (cont_psiStar k ρ σ z z').aestronglyMeasurable
-  have hck
-      : ∀ ξ (Z : G.Mat s),
-        G.detM Z ≠ 0 → B.CkOn ((mm : ℕ) : ℕ∞) (B.GV k ρ) (fun γ => F₁ (gaXi k ρ σ d ξ Z γ)) :=
+  have hck : ∀ ξ (Z : G.Mat s), G.detM Z ≠ 0 →
+      B.CkOn ((mm : ℕ) : ℕ∞) (B.GV k ρ) (fun γ => F₁ (gaXi k ρ σ d ξ Z γ)) :=
     fun ξ Z hZ => ckOn_mono (by omega) (ckOn_slice hM hR σ d hd hStar.1 ξ Z hZ)
   have hcont1 : ContinuousOn F₁ (B.GV k (p + s + ρ)) :=
-    Formalism.FourierDecayAlt.P.BetaSesquilinearity.CkOn_cont subset_rfl
-      (Formalism.FourierDecayAlt.P.BetaSesquilinearity.sCkOn_mono (by simp) hStar.1)
-  have hmeas
-      : ∀ (Z : G.Mat s),
-        G.detM Z ≠ 0
-          → ∀ γ ∈ B.GV k ρ,
-            AEStronglyMeasurable (fun ξ => F₁ (gaXi k ρ σ d ξ Z γ)) (muXi k p s ρ σ) := by
+    Formalism.FourierDecayAlt.P.BetaSesquilinearity.CkOn_cont subset_rfl (Formalism.FourierDecayAlt.P.BetaSesquilinearity.sCkOn_mono (by simp) hStar.1)
+  have hmeas : ∀ (Z : G.Mat s), G.detM Z ≠ 0 → ∀ γ ∈ B.GV k ρ,
+      AEStronglyMeasurable (fun ξ => F₁ (gaXi k ρ σ d ξ Z γ)) (muXi k p s ρ σ) := by
     intro Z hZ γ hγ
-    exact (hcont1.comp_continuous (cont_gaXi hR σ d hd Z hZ γ) fun ξ =>
-      gaXi_mem hM hR σ d hd ξ Z hZ hγ).aestronglyMeasurable
+    exact (hcont1.comp_continuous (cont_gaXi hR σ d hd Z hZ γ)
+      fun ξ => gaXi_mem hM hR σ d hd ξ Z hZ hγ).aestronglyMeasurable
   have hsm : ∀ ξ (e : E), ‖psiStar k ρ σ z z' ξ • e‖ ≤ ‖e‖ := fun ξ e => by
     rw [norm_smul]; exact mul_le_of_le_one_left (norm_nonneg _) (hψ ξ)
   have hwt0 : ∀ ξ : Xi k p s ρ σ, 0 ≤ wt ξ ^ (-a) := fun ξ =>
     Real.rpow_nonneg (le_trans zero_le_one (one_le_wt ξ)) _
-  have hTle
-      : ∀ (Z : G.Mat s) (g : B.Mat k ρ),
-        g ∈ B.GV k ρ → (1 + ‖Z‖) ^ (-a) * B.gN g ^ (-a) ≤ 1 := fun Z g hg =>
-    mul_le_one₀ (Real.rpow_le_one_of_one_le_of_nonpos (by linarith [norm_nonneg Z]) (by linarith))
-      (Real.rpow_nonneg
-        (le_trans zero_le_one (Formalism.FourierDecayAlt.P.BetaSesquilinearity.gN_ge_one hg)) _)
-      (Real.rpow_le_one_of_one_le_of_nonpos
-        (Formalism.FourierDecayAlt.P.BetaSesquilinearity.gN_ge_one hg) (by linarith))
-  have hweak
-      : ∀ (ξ : Xi k p s ρ σ) (Z : G.Mat s) (g : B.Mat k ρ),
-        g ∈ B.GV k ρ
-          → Cb * B₁ * ((1 + ‖Z‖) ^ (-a) * B.gN g ^ (-a)) * wt ξ ^ (-a) ≤ Cb * B₁ * wt ξ ^ (-a) := by
+  have hTle : ∀ (Z : G.Mat s) (g : B.Mat k ρ), g ∈ B.GV k ρ → (1 + ‖Z‖) ^ (-a) * B.gN g ^ (-a) ≤ 1 :=
+    fun Z g hg => mul_le_one₀
+      (Real.rpow_le_one_of_one_le_of_nonpos (by linarith [norm_nonneg Z]) (by linarith))
+      (Real.rpow_nonneg (le_trans zero_le_one (Formalism.FourierDecayAlt.P.BetaSesquilinearity.gN_ge_one hg)) _)
+      (Real.rpow_le_one_of_one_le_of_nonpos (Formalism.FourierDecayAlt.P.BetaSesquilinearity.gN_ge_one hg) (by linarith))
+  have hweak : ∀ (ξ : Xi k p s ρ σ) (Z : G.Mat s) (g : B.Mat k ρ), g ∈ B.GV k ρ →
+      Cb * B₁ * ((1 + ‖Z‖) ^ (-a) * B.gN g ^ (-a)) * wt ξ ^ (-a) ≤ Cb * B₁ * wt ξ ^ (-a) := by
     intro ξ Z g hg
     have h1 := hTle Z g hg
     have h2 : 0 ≤ Cb * B₁ := mul_nonneg hCb0 hB₁
-    calc
-      Cb * B₁ * ((1 + ‖Z‖) ^ (-a) * B.gN g ^ (-a)) * wt ξ ^ (-a) ≤ Cb * B₁ * 1 * wt ξ ^ (-a) :=
-        mul_le_mul_of_nonneg_right (mul_le_mul_of_nonneg_left h1 h2) (hwt0 ξ)
+    calc Cb * B₁ * ((1 + ‖Z‖) ^ (-a) * B.gN g ^ (-a)) * wt ξ ^ (-a)
+        ≤ Cb * B₁ * 1 * wt ξ ^ (-a) :=
+          mul_le_mul_of_nonneg_right (mul_le_mul_of_nonneg_left h1 h2) (hwt0 ξ)
       _ = Cb * B₁ * wt ξ ^ (-a) := by ring
-  have hbγ
-      : ∀ (Z : G.Mat s),
-        G.detM Z ≠ 0
-          → ∀ u v : List (B.Mat k ρ),
-            (∀ X ∈ u, B.unitLie k ρ X) → (∀ X ∈ v, B.unitLie k ρ X) → u.length + v.length ≤ mm
-              → ∀ g ∈ B.GV k ρ, ∀ ξ,
-                ‖B.dLR u v (fun γ => F₁ (gaXi k ρ σ d ξ Z γ)) g‖ ≤ Cb * B₁ * wt ξ ^ (-a) := by
+  have hbγ : ∀ (Z : G.Mat s), G.detM Z ≠ 0 → ∀ u v : List (B.Mat k ρ), (∀ X ∈ u, B.unitLie k ρ X) →
+      (∀ X ∈ v, B.unitLie k ρ X) → u.length + v.length ≤ mm → ∀ g ∈ B.GV k ρ, ∀ ξ,
+      ‖B.dLR u v (fun γ => F₁ (gaXi k ρ σ d ξ Z γ)) g‖ ≤ Cb * B₁ * wt ξ ^ (-a) := by
     intro Z hZ u v hu hv hl g hg ξ
     have h0 := hbd E F₁ B₁ hStar ξ Z hZ g hg u v hu hv hl 0 (by omega)
     rw [norm_iteratedFDeriv_zero] at h0
     exact h0.trans (hweak ξ Z g hg)
   have hβ : Integrable (fun ξ => Cb * B₁ * wt ξ ^ (-a)) (muXi k p s ρ σ) := hInt.const_mul _
-  have hexch
-      : ∀ (Z : G.Mat s),
-        G.detM Z ≠ 0
-          → ∀ u v : List (B.Mat k ρ),
-            (∀ X ∈ u, B.unitLie k ρ X) → (∀ X ∈ v, B.unitLie k ρ X) → u.length + v.length ≤ mm
-              → ∀ g ∈ B.GV k ρ,
-                B.dLR u v (PhiFun k ρ σ d z z' F₁ Z) g
-                  = ∫ ξ, psiStar k ρ σ z z' ξ • B.dLR u v (fun γ => F₁ (gaXi k ρ σ d ξ Z γ)) g ∂(muXi k p s ρ σ) :=
-    fun Z hZ =>
-      exch_dLR (μ := muXi k p s ρ σ)
-        (fun ξ => psiStar k ρ σ z z' ξ)
-        hψ hψm
-        (fun ξ γ => F₁ (gaXi k ρ σ d ξ Z γ))
-        mm
-        (fun ξ => hck ξ Z hZ)
-        (fun g hg => hmeas Z hZ g hg)
-        _ hβ (hbγ Z hZ)
+  have hexch : ∀ (Z : G.Mat s), G.detM Z ≠ 0 → ∀ u v : List (B.Mat k ρ), (∀ X ∈ u, B.unitLie k ρ X) →
+      (∀ X ∈ v, B.unitLie k ρ X) → u.length + v.length ≤ mm → ∀ g ∈ B.GV k ρ,
+      B.dLR u v (PhiFun k ρ σ d z z' F₁ Z) g =
+        ∫ ξ, psiStar k ρ σ z z' ξ • B.dLR u v (fun γ => F₁ (gaXi k ρ σ d ξ Z γ)) g ∂(muXi k p s ρ σ) :=
+    fun Z hZ => exch_dLR (μ := muXi k p s ρ σ) (fun ξ => psiStar k ρ σ z z' ξ) hψ hψm
+      (fun ξ γ => F₁ (gaXi k ρ σ d ξ Z γ)) mm (fun ξ => hck ξ Z hZ) (fun g hg => hmeas Z hZ g hg) _ hβ (hbγ Z hZ)
   refine ⟨fun Z γ hZ hγ => ?_, fun Z hZ => ?_, fun u v hu hv hl γ hγ => ?_⟩
   · refine hβ.mono' (hψm.smul (hmeas Z hZ γ hγ)) (Eventually.of_forall fun ξ => ?_)
     exact (hsm ξ _).trans (hbγ Z hZ [] [] (by simp) (by simp) (by simp) γ hγ ξ)
-  · refine ⟨
-      int_ck (μ := muXi k p s ρ σ)
-        (fun ξ => psiStar k ρ σ z z' ξ)
-        hψ hψm
-        (fun ξ γ => F₁ (gaXi k ρ σ d ξ Z γ))
-        mm
-        (fun ξ => hck ξ Z hZ)
-        (fun g hg => hmeas Z hZ g hg)
-        _ hβ (hbγ Z hZ),
-      ?_
-    ⟩
+  · refine ⟨int_ck (μ := muXi k p s ρ σ) (fun ξ => psiStar k ρ σ z z' ξ) hψ hψm
+      (fun ξ γ => F₁ (gaXi k ρ σ d ξ Z γ)) mm (fun ξ => hck ξ Z hZ) (fun g hg => hmeas Z hZ g hg) _ hβ (hbγ Z hZ), ?_⟩
     intro u v hu hv hl g hg
     rw [hexch Z hZ u v hu hv hl g hg]
-    have hb'
-        : ∀ ξ,
-          ‖psiStar k ρ σ z z' ξ • B.dLR u v (fun γ => F₁ (gaXi k ρ σ d ξ Z γ)) g‖
-            ≤ Cb * B₁ * ((1 + ‖Z‖) ^ (-a) * B.gN g ^ (-a)) * wt ξ ^ (-a) := fun ξ => by
+    have hb' : ∀ ξ, ‖psiStar k ρ σ z z' ξ • B.dLR u v (fun γ => F₁ (gaXi k ρ σ d ξ Z γ)) g‖ ≤
+        Cb * B₁ * ((1 + ‖Z‖) ^ (-a) * B.gN g ^ (-a)) * wt ξ ^ (-a) := fun ξ => by
       refine (hsm ξ _).trans ?_
       have h0 := hbd E F₁ B₁ hStar ξ Z hZ g hg u v hu hv hl 0 (by omega)
       rwa [norm_iteratedFDeriv_zero] at h0
-    have hnorm :=
-      norm_integral_le_of_norm_le (hInt.const_mul (Cb * B₁ * ((1 + ‖Z‖) ^ (-a) * B.gN g ^ (-a))))
-        (Eventually.of_forall hb')
+    have hnorm := norm_integral_le_of_norm_le (hInt.const_mul (Cb * B₁ * ((1 + ‖Z‖) ^ (-a) * B.gN g ^ (-a))))
+      (Eventually.of_forall hb')
     rw [integral_const_mul] at hnorm
-    have hg0 : 0 < B.gN g :=
-      lt_of_lt_of_le one_pos (Formalism.FourierDecayAlt.P.BetaSesquilinearity.gN_ge_one hg)
+    have hg0 : 0 < B.gN g := lt_of_lt_of_le one_pos (Formalism.FourierDecayAlt.P.BetaSesquilinearity.gN_ge_one hg)
     have := fin_step (c := Cb * B₁) (T := (1 + ‖Z‖) ^ (-a)) hg0 hnorm
-    calc
-      _ ≤ Cb * B₁ * I * (1 + ‖Z‖) ^ (-a) := this
+    calc _ ≤ Cb * B₁ * I * (1 + ‖Z‖) ^ (-a) := this
       _ = Cb * I * B₁ * (1 + ‖Z‖) ^ (-a) := by ring
   · have hcD : Continuous (fun Z' : G.Mat s => G.detM Z') := by unfold G.detM; fun_prop
     have hUo : IsOpen {Z : G.Mat s | G.detM Z ≠ 0} := isOpen_ne_fun hcD continuous_const
-    have hcda
-        : ∀ ξ (i : ℕ),
-          i ≤ m + 1
-            → ∀ Z' : G.Mat s,
-              G.detM Z' ≠ 0
-                → ContDiffAt ℝ i
-                  (fun Z'' : G.Mat s => B.dLR u v (fun γ' => F₁ (gaXi k ρ σ d ξ Z'' γ')) γ)
-                  Z' := fun ξ i hi Z' hZ' =>
-      (hC₃ E F₁ A₁ B₁ hStar ξ u v i hu hv (by omega) Z' γ hZ' hγ).1
-    have hcd
-        : ∀ ξ,
-          ContDiffOn ℝ ((m + 1 : ℕ) : WithTop ℕ∞)
-            (fun Z' : G.Mat s =>
-              psiStar k ρ σ z z' ξ • B.dLR u v (fun γ' => F₁ (gaXi k ρ σ d ξ Z' γ')) γ)
-            {Z | G.detM Z ≠ 0} := fun ξ Z' hZ' =>
+    have hcda : ∀ ξ (i : ℕ), i ≤ m + 1 → ∀ Z' : G.Mat s, G.detM Z' ≠ 0 →
+        ContDiffAt ℝ i (fun Z'' : G.Mat s => B.dLR u v (fun γ' => F₁ (gaXi k ρ σ d ξ Z'' γ')) γ) Z' :=
+      fun ξ i hi Z' hZ' => (hC₃ E F₁ A₁ B₁ hStar ξ u v i hu hv (by omega) Z' γ hZ' hγ).1
+    have hcd : ∀ ξ, ContDiffOn ℝ ((m + 1 : ℕ) : WithTop ℕ∞)
+        (fun Z' : G.Mat s => psiStar k ρ σ z z' ξ • B.dLR u v (fun γ' => F₁ (gaXi k ρ σ d ξ Z' γ')) γ)
+        {Z | G.detM Z ≠ 0} := fun ξ Z' hZ' =>
       ((hcda ξ (m + 1) le_rfl Z' hZ').const_smul (psiStar k ρ σ z z' ξ)).contDiffWithinAt
-    have hmZ
-        : ∀ Z' ∈ {Z : G.Mat s | G.detM Z ≠ 0},
-          AEStronglyMeasurable
-            (fun ξ => psiStar k ρ σ z z' ξ • B.dLR u v (fun γ' => F₁ (gaXi k ρ σ d ξ Z' γ')) γ)
-            (muXi k p s ρ σ) := by
+    have hmZ : ∀ Z' ∈ {Z : G.Mat s | G.detM Z ≠ 0}, AEStronglyMeasurable
+        (fun ξ => psiStar k ρ σ z z' ξ • B.dLR u v (fun γ' => F₁ (gaXi k ρ σ d ξ Z' γ')) γ) (muXi k p s ρ σ) := by
       intro Z' hZ'
       refine hψm.smul ?_
       simp_rw [dLR_eq]
-      exact meas_alt
-        (fun ξ => hck ξ Z' hZ')
-        (fun g hg => hmeas Z' hZ' g hg)
-        _ (allLie_lr hu hv) (by rw [length_lr]; exact hl) γ hγ
-    have hdf
-        : ∀ ξ (i : ℕ),
-          i ≤ m + 1
-            → ∀ Z' : G.Mat s,
-              G.detM Z' ≠ 0
-                → ‖iteratedFDeriv ℝ i (fun Z'' : G.Mat s => psiStar k ρ σ z z' ξ •
-                    B.dLR u v (fun γ' => F₁ (gaXi k ρ σ d ξ Z'' γ')) γ) Z'‖
-                  ≤ Cb * B₁ * ((1 + ‖Z'‖) ^ (-a) * B.gN γ ^ (-a)) * wt ξ ^ (-a) := by
+      exact meas_alt (fun ξ => hck ξ Z' hZ') (fun g hg => hmeas Z' hZ' g hg) _ (allLie_lr hu hv)
+        (by rw [length_lr]; exact hl) γ hγ
+    have hdf : ∀ ξ (i : ℕ), i ≤ m + 1 → ∀ Z' : G.Mat s, G.detM Z' ≠ 0 →
+        ‖iteratedFDeriv ℝ i (fun Z'' : G.Mat s => psiStar k ρ σ z z' ξ •
+          B.dLR u v (fun γ' => F₁ (gaXi k ρ σ d ξ Z'' γ')) γ) Z'‖ ≤
+          Cb * B₁ * ((1 + ‖Z'‖) ^ (-a) * B.gN γ ^ (-a)) * wt ξ ^ (-a) := by
       intro ξ i hi Z' hZ'
       have e := iteratedFDeriv_const_smul_apply (a := psiStar k ρ σ z z' ξ) (hcda ξ i hi Z' hZ')
-      have e2
-          : (fun Z'' : G.Mat s =>
-              psiStar k ρ σ z z' ξ • B.dLR u v (fun γ' => F₁ (gaXi k ρ σ d ξ Z'' γ')) γ)
-            = psiStar k ρ σ z z' ξ
-              • (fun Z'' : G.Mat s => B.dLR u v (fun γ' => F₁ (gaXi k ρ σ d ξ Z'' γ')) γ) :=
-        rfl
+      have e2 : (fun Z'' : G.Mat s => psiStar k ρ σ z z' ξ • B.dLR u v (fun γ' => F₁ (gaXi k ρ σ d ξ Z'' γ')) γ) =
+          psiStar k ρ σ z z' ξ • (fun Z'' : G.Mat s => B.dLR u v (fun γ' => F₁ (gaXi k ρ σ d ξ Z'' γ')) γ) := rfl
       rw [e2, e, norm_smul]
       exact (mul_le_of_le_one_left (norm_nonneg _) (hψ ξ)).trans
         (hbd E F₁ B₁ hStar ξ Z' hZ' γ hγ u v hu hv hl i hi)
-    obtain ⟨hcont, hbnd⟩ :=
-      pint hUo
-        (fun ξ => Cb * B₁ * wt ξ ^ (-a))
-        hβ (m + 1) E
-        (fun ξ Z' => psiStar k ρ σ z z' ξ • B.dLR u v (fun γ' => F₁ (gaXi k ρ σ d ξ Z' γ')) γ)
-        hcd hmZ
-        (fun i hi Z' hZ' ξ => (hdf ξ i hi Z' hZ').trans (hweak ξ Z' γ hγ))
-    have heqU
-        : ∀ Z' ∈ {Z : G.Mat s | G.detM Z ≠ 0},
-          B.dLR u v (PhiFun k ρ σ d z z' F₁ Z') γ
-            = ∫ ξ, psiStar k ρ σ z z' ξ • B.dLR u v (fun γ' => F₁ (gaXi k ρ σ d ξ Z' γ')) γ ∂(muXi k p s ρ σ) :=
+    obtain ⟨hcont, hbnd⟩ := pint hUo (fun ξ => Cb * B₁ * wt ξ ^ (-a)) hβ (m + 1) E
+      (fun ξ Z' => psiStar k ρ σ z z' ξ • B.dLR u v (fun γ' => F₁ (gaXi k ρ σ d ξ Z' γ')) γ) hcd hmZ
+      (fun i hi Z' hZ' ξ => (hdf ξ i hi Z' hZ').trans (hweak ξ Z' γ hγ))
+    have heqU : ∀ Z' ∈ {Z : G.Mat s | G.detM Z ≠ 0}, B.dLR u v (PhiFun k ρ σ d z z' F₁ Z') γ =
+        ∫ ξ, psiStar k ρ σ z z' ξ • B.dLR u v (fun γ' => F₁ (gaXi k ρ σ d ξ Z' γ')) γ ∂(muXi k p s ρ σ) :=
       fun Z' hZ' => hexch Z' hZ' u v hu hv hl γ hγ
     refine ⟨hcont.congr heqU, fun q hq Z hZ => ?_⟩
-    have hev
-        : (fun Z' : G.Mat s => B.dLR u v (PhiFun k ρ σ d z z' F₁ Z') γ) =ᶠ[𝓝 Z]
-          (fun Z' => ∫ ξ, psiStar k ρ σ z z' ξ • B.dLR u v (fun γ' => F₁ (gaXi k ρ σ d ξ Z' γ')) γ
-            ∂(muXi k p s ρ σ)) := by
+    have hev : (fun Z' : G.Mat s => B.dLR u v (PhiFun k ρ σ d z z' F₁ Z') γ) =ᶠ[𝓝 Z]
+        (fun Z' => ∫ ξ, psiStar k ρ σ z z' ξ • B.dLR u v (fun γ' => F₁ (gaXi k ρ σ d ξ Z' γ')) γ
+          ∂(muXi k p s ρ σ)) := by
       filter_upwards [hUo.mem_nhds hZ] with Z' hZ' using heqU Z' hZ'
     rw [(hev.iteratedFDeriv ℝ q).eq_of_nhds]
-    have hn :=
-      hbnd q hq Z hZ _ (hInt.const_mul (Cb * B₁ * ((1 + ‖Z‖) ^ (-a) * B.gN γ ^ (-a))))
-        (fun ξ => hdf ξ q hq Z hZ)
+    have hn := hbnd q hq Z hZ _ (hInt.const_mul (Cb * B₁ * ((1 + ‖Z‖) ^ (-a) * B.gN γ ^ (-a))))
+      (fun ξ => hdf ξ q hq Z hZ)
     rw [integral_const_mul] at hn
-    have hg0 : 0 < B.gN γ :=
-      lt_of_lt_of_le one_pos (Formalism.FourierDecayAlt.P.BetaSesquilinearity.gN_ge_one hγ)
+    have hg0 : 0 < B.gN γ := lt_of_lt_of_le one_pos (Formalism.FourierDecayAlt.P.BetaSesquilinearity.gN_ge_one hγ)
     have := fin_step (c := Cb * B₁) (T := (1 + ‖Z‖) ^ (-a)) hg0 hn
-    calc
-      _ ≤ Cb * B₁ * I * (1 + ‖Z‖) ^ (-a) := this
+    calc _ ≤ Cb * B₁ * I * (1 + ‖Z‖) ^ (-a) := this
       _ = Cb * I * B₁ * (1 + ‖Z‖) ^ (-a) := by ring
 
 end Formalism.FourierDecayAlt.P.Ux10
@@ -1670,17 +1395,14 @@ namespace Formalism.FourierDecayAlt.P
 
 open Formalism.FourierDecayAlt.U
 
-theorem Ux10.phi_bound_parts_of_radical_parametrisation (hR : RadicalParam)
-    : PointwiseIntegralBoundFromComponents :=
+theorem Ux10.phi_bound_parts_of_radical_parametrisation (hR : RadicalParam) : PointwiseIntegralBoundFromComponents :=
   Ux10.phi_bound_parts_of_radical_and_slice hR hat_z_on_slice
 
 theorem Ux10.phiSupport_of_parts (hM : SliceMem) (hR : RadicalParam) : PhiSupport :=
   Ux10.phiSupport_of hM hR hat_z_on_slice
 
-theorem phi_bound_of_parts : Formalism.FourierDecayAlt.U.PointwiseIntegralBoundFromComponents :=
-  Ux10.phi_bound_parts_of_radical_parametrisation radical_parametrisation
+theorem phi_bound_of_parts : Formalism.FourierDecayAlt.U.PointwiseIntegralBoundFromComponents := Ux10.phi_bound_parts_of_radical_parametrisation radical_parametrisation
 
-theorem phi_support_determinant : Formalism.FourierDecayAlt.U.PhiSupport :=
-  Ux10.phiSupport_of_parts slice_membership radical_parametrisation
+theorem phi_support_determinant : Formalism.FourierDecayAlt.U.PhiSupport := Ux10.phiSupport_of_parts slice_membership radical_parametrisation
 
 end Formalism.FourierDecayAlt.P

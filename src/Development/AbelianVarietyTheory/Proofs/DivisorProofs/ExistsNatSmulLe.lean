@@ -1,6 +1,50 @@
 module
 
-public import Mathlib
+import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsNatSmulMem
+public import Mathlib.NumberTheory.NumberField.Basic
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
@@ -8,57 +52,25 @@ namespace GlobalTheory.NatMultipleIntegralSmulBound
 
 open NumberField
 
-theorem exists_nat_mul_integral {E : Type} [Field E] [NumberField E] (a : E)
-    : ∃ m : ℕ, 0 < m ∧ ∃ b : RingOfIntegers E, (b : E) = (m : E) * a := by
-  have ha : IsAlgebraic ℤ a :=
-    (IsFractionRing.isAlgebraic_iff ℤ ℚ E).2 (Algebra.IsAlgebraic.isAlgebraic a)
+theorem exists_nat_mul_integral {E : Type} [Field E] [NumberField E] (a : E) :
+    ∃ m : ℕ, 0 < m ∧ ∃ b : RingOfIntegers E, (b : E) = (m : E) * a := by
+  have ha : IsAlgebraic ℤ a := (IsFractionRing.isAlgebraic_iff ℤ ℚ E).2 (Algebra.IsAlgebraic.isAlgebraic a)
   obtain ⟨y, hy, hint⟩ := ha.exists_integral_multiple
-  refine ⟨
-    y.natAbs * y.natAbs,
-    Nat.mul_pos (Int.natAbs_pos.2 hy) (Int.natAbs_pos.2 hy),
-    ⟨y • (y • a), (mem_integralClosure_iff ℤ E).2 (hint.smul y)⟩,
-    ?_
-  ⟩
+  refine ⟨y.natAbs * y.natAbs, Nat.mul_pos (Int.natAbs_pos.2 hy) (Int.natAbs_pos.2 hy),
+    ⟨y • (y • a), (mem_integralClosure_iff ℤ E).2 (hint.smul y)⟩, ?_⟩
   show y • (y • a) = ((y.natAbs * y.natAbs : ℕ) : E) * a
   rw [smul_smul, zsmul_eq_mul, ← Int.cast_natCast, Int.natAbs_mul_self]
 
-theorem exists_nat_smul_mem
-    {E : Type} [Field E] [NumberField E]
-    {n : ℕ} (L' : Submodule (RingOfIntegers E) (Fin n → E))
-    (h : Submodule.span E (↑L' : Set (Fin n → E)) = ⊤) (x : Fin n → E)
-    : ∃ c : ℕ, 0 < c ∧ (c : E) • x ∈ L' := by
-  have key : ∀ x ∈ Submodule.span E (↑L' : Set (Fin n → E)), ∃ c : ℕ, 0 < c ∧ (c : E) • x ∈ L' := by
-    intro x hx
-    induction hx using Submodule.span_induction with
-    | mem x hx => exact ⟨1, one_pos, by simpa using hx⟩
-    | zero => exact ⟨1, one_pos, by simp⟩
-    | add x y _ _ hx hy =>
-      obtain ⟨c, hc, hcx⟩ := hx
-      obtain ⟨d, hd, hdy⟩ := hy
-      refine ⟨c * d, Nat.mul_pos hc hd, ?_⟩
-      have e : ((c * d : ℕ) : E) • (x + y) = d • ((c : E) • x) + c • ((d : E) • y) := by
-        rw [smul_add, ← Nat.cast_smul_eq_nsmul E d, ← Nat.cast_smul_eq_nsmul E c, smul_smul,
-          smul_smul, Nat.cast_mul, mul_comm (d : E)]
-      rw [e]
-      exact L'.add_mem (L'.nsmul_mem hcx d) (L'.nsmul_mem hdy c)
-    | smul e x _ hx =>
-      obtain ⟨c, hc, hcx⟩ := hx
-      obtain ⟨m, hm, b, hb⟩ := exists_nat_mul_integral e
-      refine ⟨m * c, Nat.mul_pos hm hc, ?_⟩
-      have e' : ((m * c : ℕ) : E) • (e • x) = (b : E) • ((c : E) • x) := by
-        rw [hb, smul_smul, smul_smul, Nat.cast_mul]
-        congr 1
-        ring
-      have hb' : (b : E) • ((c : E) • x) = b • ((c : E) • x) := algebraMap_smul E b _
-      rw [e', hb']
-      exact L'.smul_mem b hcx
-  exact key x (h ▸ Submodule.mem_top)
+theorem exists_nat_smul_mem {E : Type} [Field E] [NumberField E] {n : ℕ}
+    (L' : Submodule (RingOfIntegers E) (Fin n → E))
+    (h : Submodule.span E (↑L' : Set (Fin n → E)) = ⊤) (x : Fin n → E) :
+    ∃ c : ℕ, 0 < c ∧ (c : E) • x ∈ L' := by
+  apply GlobalTheory.PrincLat.exists_nat_smul_mem <;> assumption
 
-theorem exists_nat_smul_le
-    {E : Type} [inst : Field E] [NumberField E]
-    {n : ℕ} (L L' : Submodule (NumberField.RingOfIntegers E) (Fin n → E)) (hL : Submodule.FG L)
-    (h : Submodule.span E (↑L' : Set (Fin n → E)) = ⊤)
-    : ∃ (c : ℕ), (0 : ℕ) < c ∧ ∀ x ∈ L, (↑c : E) • x ∈ L' := by
+theorem exists_nat_smul_le {E : Type} [inst : Field E] [NumberField E] {n : ℕ}
+    (L L' : Submodule (NumberField.RingOfIntegers E) (Fin n → E)) (hL : Submodule.FG L)
+    (h : Submodule.span E (↑L' : Set (Fin n → E)) = ⊤) :
+    ∃ (c : ℕ), (0 : ℕ) < c ∧ ∀ x ∈ L, (↑c : E) • x ∈ L' := by
   classical
   obtain ⟨s, rfl⟩ := hL
   have hs : ∃ c : ℕ, 0 < c ∧ ∀ x ∈ s, (c : E) • x ∈ L' := by

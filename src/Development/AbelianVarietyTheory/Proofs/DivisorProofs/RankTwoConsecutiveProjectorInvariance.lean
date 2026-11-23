@@ -1,7 +1,51 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.NablaSchur
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Rat
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -178,8 +222,8 @@ theorem rankTwo : RankTwo := by
     ⟨_, rfl⟩
 
   have hZT' : D p q T' = D p o U := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hT', hproj, map_sum, Finset.sum_range_succ', hU, map_sum]
+
+    rw [hT', hproj, map_sum, Finset.sum_range_succ', hU, map_sum]
     simp only [map_smul, pow_zero, Module.End.one_apply, hpqT, smul_zero, add_zero]
     refine Finset.sum_congr rfl (fun k _ => ?_)
     rw [comm_pow_apply _ _ _ rZYq rYpYq, hZv, map_zero, zero_add, smul_smul, mul_comm]
@@ -212,16 +256,16 @@ theorem rankTwo : RankTwo := by
         rw [Finset.sum_range_succ, ih, hXq_step n, Finset.sum_range_succ, ← key n]
         module
   have hXqT' : D o q T' = (-((j : ℚ) + 1)) • U := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hT', hproj, map_sum]
+
+    rw [hT', hproj, map_sum]
     simp only [map_smul]
     rw [hS K, hXqK, map_zero, smul_zero, zero_add, hU, Finset.smul_sum]
     refine Finset.sum_congr rfl (fun k _ => ?_)
     rw [smul_smul]
 
   have hHpU : (D o o - D p p) U = (1 : ℚ) • U := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hU, map_sum, Finset.smul_sum]
+
+    rw [hU, map_sum, Finset.smul_sum]
     refine Finset.sum_congr rfl (fun k _ => ?_)
     rw [map_smul, eig_pow _ _ (-1) _ hHpYq _ (eig_pow _ _ 1 0 hHpXq T hHpT (k + 1)) k, smul_smul,
       smul_smul]

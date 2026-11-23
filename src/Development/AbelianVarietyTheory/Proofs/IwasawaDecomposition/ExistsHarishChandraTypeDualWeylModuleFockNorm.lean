@@ -1,16 +1,55 @@
 module
 
-public import Mathlib
-public import Formalism.SharpRestriction.CuspSpanNormBounds.RelevantZeroGramTerms
-public import Formalism.LocalRingCardinality.DataCoeff
 public import Development.AbelianVarietyTheory.Definitions.Foundations.ExistsUnitaryMulTriangular
-public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.IsIrreducibleSmallRepUnitary
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.HasModelOfAntitone
+import Development.AbelianVarietyTheory.Counterexamples.HeightSurvey.ExistsGoodFamily
+public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.IsIrreducibleSmallRepUnitary
+import Formalism.GradedWeylDivisibility.FinalC
+import Formalism.GradedWeylDivisibility.FockSpaceTableaux.LDlatLemmas
+import Formalism.GradedWeylDivisibility.FockSpaceTableaux.LDrowLemmas
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
-open MvPolynomial Formalism.BasicNotions Formalism.MainNotions.S GlobalTheory.DualWeyl
-  GlobalTheory.CompactDS
+open MvPolynomial Formalism.BasicNotions Formalism.MainNotions.S GlobalTheory.DualWeyl GlobalTheory.CompactDS
 open Formalism.GradedWeylDivisibility (rowAct rowDeg)
 open scoped Matrix
 
@@ -20,11 +59,9 @@ namespace GlobalTheory.NablaType
 
 variable {n : ℕ}
 
-theorem cdom_of_partial_sums
-    (μ ν : Fin n → ℕ)
+theorem cdom_of_partial_sums (μ ν : Fin n → ℕ)
     (h : ∀ k : ℕ, (∑ a : Fin n with a.val < k, μ a) ≤ ∑ a : Fin n with a.val < k, ν a)
-    (he : ∑ a, μ a = ∑ a, ν a)
-    : CDom (allPos n) (fun a => (μ a : ℝ)) (fun a => (ν a : ℝ)) := by
+    (he : ∑ a, μ a = ∑ a, ν a) : CDom (allPos n) (fun a => (μ a : ℝ)) (fun a => (ν a : ℝ)) := by
   classical
   let D : ℕ → ℕ := fun k => (∑ a : Fin n with a.val < k, ν a) - ∑ a : Fin n with a.val < k, μ a
   have hD : ∀ k, (D k : ℝ) = ∑ a : Fin n, if a.val < k then ((ν a : ℝ) - μ a) else 0 := by
@@ -49,8 +86,7 @@ theorem cdom_of_partial_sums
   · have : b.val = a.val + 1 := by by_contra h'; exact hab (if_neg h')
     exact ⟨Fin.lt_def.2 (by omega), rfl⟩
   · funext i
-    have e1
-        : ∑ b : Fin n, ((if b.val = i.val + 1 then D b.val else 0 : ℕ) : ℝ) = D (i.val + 1) := by
+    have e1 : ∑ b : Fin n, ((if b.val = i.val + 1 then D b.val else 0 : ℕ) : ℝ) = D (i.val + 1) := by
       by_cases hi : i.val + 1 < n
       · rw [Finset.sum_eq_single ⟨i.val + 1, hi⟩]
         · simp
@@ -71,17 +107,15 @@ theorem cdom_of_partial_sums
         intro b _
         rw [if_neg (by omega), Nat.cast_zero]
     rw [Pi.sub_apply, ← hstep, ← e1, ← e2]
-    simp only [Finset.sum_apply, Pi.smul_apply, Formalism.REAL.root, Pi.sub_apply, smul_eq_mul,
-      mul_sub, Finset.sum_sub_distrib, Pi.single_apply, mul_ite, mul_one, mul_zero]
+    simp only [Finset.sum_apply, Pi.smul_apply, Formalism.REAL.root, Pi.sub_apply, smul_eq_mul, mul_sub,
+      Finset.sum_sub_distrib, Pi.single_apply, mul_ite, mul_one, mul_zero]
     congr 1
     · rw [Finset.sum_comm]
       simp only [Finset.sum_ite_eq, Finset.mem_univ, if_true]
     · simp only [Finset.sum_ite_eq, Finset.mem_univ, if_true]
 
-theorem cdom_of_coeff_ne_zero
-    {la : Fin n → ℕ} {f : Pol n ℂ} (hf : f ∈ nabla la ℂ)
-    (m : Fin n × Fin n →₀ ℕ) (hm : AddMonoidAlgebra.coeff f m ≠ 0)
-    : CDom (allPos n) (fun a => (rowDeg m a : ℝ)) (fun a => (la a : ℝ)) := by
+theorem cdom_of_coeff_ne_zero {la : Fin n → ℕ} {f : Pol n ℂ} (hf : f ∈ nabla la ℂ) (m : Fin n × Fin n →₀ ℕ)
+    (hm : AddMonoidAlgebra.coeff f m ≠ 0) : CDom (allPos n) (fun a => (rowDeg m a : ℝ)) (fun a => (la a : ℝ)) := by
   unfold nabla at hf
   rw [Formalism.GradedWeylDivisibility.standardMonomialSpanDomain ℂ n n la] at hf
   by_contra hc
@@ -91,12 +125,11 @@ theorem cdom_of_coeff_ne_zero
   | mem x hx =>
     obtain ⟨K, sz, hsz, I, rfl, rfl⟩ := hx
     by_contra h0
-    obtain ⟨h1, h2⟩ :=
-      Formalism.GradedWeylDivisibility.bidetDominance ℂ n n K sz hsz I m (mem_support_iff.2 h0)
+    obtain ⟨h1, h2⟩ := Formalism.GradedWeylDivisibility.bidetDominance ℂ n n K sz hsz I m (mem_support_iff.2 h0)
     exact hc (cdom_of_partial_sums _ _ h1 h2)
   | zero => simp
   | add x y _ _ hx hy => rw [MvPolynomial.coeff_add, hx, hy, add_zero]
-  | smul c x _ hx => rw [coeff_smul, hx, smul_zero]
+  | smul c x _ hx => rw [MvPolynomial.coeff_smul, hx, smul_zero]
 
 def act (lam : DomWeight n) (g : Matrix (Fin n) (Fin n) ℂ) : Space lam.natW →L[ℂ] Space lam.natW :=
   LinearMap.toContinuousLinearMap
@@ -111,16 +144,13 @@ theorem incl_injective (lam : DomWeight n) : Function.Injective (incl lam) :=
 theorem incl_mem (lam : DomWeight n) (x : Space lam.natW) : incl lam x ∈ nabla lam.natW ℂ :=
   ((toSpace lam.natW).symm x).2
 
-theorem incl_act (lam : DomWeight n) (g : Matrix (Fin n) (Fin n) ℂ) (x : Space lam.natW)
-    : incl lam (act lam g x) = (g.det ^ lam.detShift) • rowAct ℂ gᵀ (incl lam x) :=
-  rfl
+theorem incl_act (lam : DomWeight n) (g : Matrix (Fin n) (Fin n) ℂ) (x : Space lam.natW) :
+    incl lam (act lam g x) = (g.det ^ lam.detShift) • rowAct ℂ gᵀ (incl lam x) := rfl
 
-theorem act_unitary (lam : DomWeight n) (u : UN n) (x : Space lam.natW)
-    : act lam u.1 x = (u.1.det ^ lam.detShift) • rhoSpace lam.natW u x :=
-  rfl
+theorem act_unitary (lam : DomWeight n) (u : UN n) (x : Space lam.natW) :
+    act lam u.1 x = (u.1.det ^ lam.detShift) • rhoSpace lam.natW u x := rfl
 
-theorem det_ne_zero {g : Matrix (Fin n) (Fin n) ℂ} (hg : g ∈ Matrix.unitaryGroup (Fin n) ℂ)
-    : g.det ≠ 0 :=
+theorem det_ne_zero {g : Matrix (Fin n) (Fin n) ℂ} (hg : g ∈ Matrix.unitaryGroup (Fin n) ℂ) : g.det ≠ 0 :=
   (Matrix.UnitaryGroup.det_isUnit ⟨g, hg⟩).ne_zero
 
 theorem isURepOn_act (lam : DomWeight n) : IsURepOn (UJset (allPos n)) (act lam) := by
@@ -133,8 +163,7 @@ theorem isURepOn_act (lam : DomWeight n) : IsURepOn (UJset (allPos n)) (act lam)
   · ext x
     apply incl_injective
     rw [ContinuousLinearMap.comp_apply, incl_act, incl_act, incl_act, Matrix.transpose_mul,
-      ← Formalism.GradedWeylDivisibility.rowActMul ℂ n n, Matrix.det_mul, mul_zpow, map_smul,
-      smul_smul]
+      ← Formalism.GradedWeylDivisibility.rowActMul ℂ n n, Matrix.det_mul, mul_zpow, map_smul, smul_smul]
     rfl
   · have h1 : ‖g.det‖ = 1 := CStarRing.norm_of_mem_unitary (Matrix.det_of_mem_unitary hg)
     rw [act_unitary lam ⟨g, hg⟩, norm_smul, norm_zpow, h1, one_zpow, one_mul, norm_rhoSpace]
@@ -143,14 +172,11 @@ theorem isURepOn_act (lam : DomWeight n) : IsURepOn (UJset (allPos n)) (act lam)
       (continuous_subtype_val.matrix_det).zpow₀ _ fun u => Or.inl (det_ne_zero u.2)
     exact h1.smul (continuous_rhoSpace v)
 
-theorem coeff_torus
-    (lam : DomWeight n) (θ : Fin n → ℝ) (x : Space lam.natW) (m : Fin n × Fin n →₀ ℕ)
-    : AddMonoidAlgebra.coeff (incl lam (act lam (torus θ) x)) m
-      = chr (fun a => (rowDeg m a : ℝ) + lam.detShift) θ
-        * AddMonoidAlgebra.coeff (incl lam x) m := by
-  rw [incl_act, torus, Matrix.diagonal_transpose, coeff_smul,
-    Formalism.GradedWeylDivisibility.ldrow_coeff_rowAct_diag, Matrix.det_diagonal, smul_eq_mul,
-    mul_left_comm, mul_comm]
+theorem coeff_torus (lam : DomWeight n) (θ : Fin n → ℝ) (x : Space lam.natW) (m : Fin n × Fin n →₀ ℕ) :
+    AddMonoidAlgebra.coeff (incl lam (act lam (torus θ) x)) m =
+      chr (fun a => (rowDeg m a : ℝ) + lam.detShift) θ * AddMonoidAlgebra.coeff (incl lam x) m := by
+  rw [incl_act, torus, Matrix.diagonal_transpose, MvPolynomial.coeff_smul, Formalism.GradedWeylDivisibility.ldrow_coeff_rowAct_diag, Matrix.det_diagonal,
+    smul_eq_mul, mul_left_comm, mul_comm]
   congr 1
   simp only [← Complex.exp_nat_mul]
   rw [chr, ← Complex.exp_sum, ← Complex.exp_sum, ← Complex.exp_int_mul, ← Complex.exp_add]
@@ -162,31 +188,23 @@ theorem coeff_torus
 theorem natW_add (lam : DomWeight n) (a : Fin n) : (lam.natW a : ℝ) + lam.detShift = lam.w a := by
   exact_mod_cast (factNatW n lam).2.1 a
 
-theorem isKTypeOf_act (lam : DomWeight n)
-    : IsKTypeOf (allPos n) (act lam) (fun a => (lam.w a : ℝ)) ⊤ := by
+theorem isKTypeOf_act (lam : DomWeight n) : IsKTypeOf (allPos n) (act lam) (fun a => (lam.w a : ℝ)) ⊤ := by
   have ha := (factNatW n lam).1
   refine ⟨inferInstance, fun _ _ _ _ => trivial, fun S _ hS => ?_, ?_, fun μ v _ hv hw => ?_⟩
   · by_cases h0 : S = ⊥
     · exact Or.inl h0
     right
-    have hU
-        : ∀ u ∈ Matrix.unitaryGroup (Fin n) ℂ, ∀ f ∈ S.map (incl lam),
-          rowAct ℂ u f ∈ S.map (incl lam) := by
+    have hU : ∀ u ∈ Matrix.unitaryGroup (Fin n) ℂ, ∀ f ∈ S.map (incl lam), rowAct ℂ u f ∈ S.map (incl lam) := by
       rintro u hu _ ⟨f, hf, rfl⟩
       have hu' := transpose_mem_unitaryGroup hu
-      have h1 : incl lam (act lam uᵀ f) ∈ S.map (incl lam) :=
-        ⟨_, hS _ (by rw [kset_eq]; exact hu') f hf, rfl⟩
+      have h1 : incl lam (act lam uᵀ f) ∈ S.map (incl lam) := ⟨_, hS _ (by rw [kset_eq]; exact hu') f hf, rfl⟩
       rw [incl_act, Matrix.transpose_transpose] at h1
       exact (Submodule.smul_mem_iff _ (zpow_ne_zero _ (det_ne_zero hu'))).1 h1
-    have hcl :=
-      GlobalTheory.Branching.rowDivClosed_of_rowAct_stable _
-        (GlobalTheory.Branching.rowAct_mem_of_unitary_stable _ hU)
-    have hne : S.map (incl lam) ≠ ⊥ := fun e =>
-      h0 (Submodule.map_injective_of_injective (incl_injective lam)
-        (e.trans (Submodule.map_bot _).symm))
-    have hle :=
-      GlobalTheory.Branching.dualWeyl_le_of_rowDivClosed le_rfl lam.natW ha _
-        (by rintro _ ⟨f, -, rfl⟩; exact incl_mem lam f) hcl hne
+    have hcl := GlobalTheory.Branching.rowDivClosed_of_rowAct_stable _ (GlobalTheory.Branching.rowAct_mem_of_unitary_stable _ hU)
+    have hne : S.map (incl lam) ≠ ⊥ := fun e => h0 (Submodule.map_injective_of_injective (incl_injective lam)
+      (e.trans (Submodule.map_bot _).symm))
+    have hle := GlobalTheory.Branching.dualWeyl_le_of_rowDivClosed le_rfl lam.natW ha _
+      (by rintro _ ⟨f, -, rfl⟩; exact incl_mem lam f) hcl hne
     refine eq_top_iff.2 fun f _ => ?_
     obtain ⟨g, hg, e⟩ := hle (incl_mem lam f)
     rwa [← incl_injective lam e]
@@ -196,7 +214,7 @@ theorem isKTypeOf_act (lam : DomWeight n)
       ext m
       have h1 := coeff_torus lam θ (toSpace _ ⟨_, extremal_mem ha⟩) m
       refine h1.trans ?_
-      rw [map_smul, coeff_smul, smul_eq_mul]
+      rw [map_smul, MvPolynomial.coeff_smul, smul_eq_mul]
       by_cases hm : AddMonoidAlgebra.coeff (incl lam (toSpace _ ⟨_, extremal_mem ha⟩)) m = 0
       · rw [hm, mul_zero, mul_zero]
       have h2 := Formalism.GradedWeylDivisibility.hwRowWeight ℂ n n le_rfl lam.natW ha hm
@@ -212,44 +230,21 @@ theorem isKTypeOf_act (lam : DomWeight n)
       refine chr_inj fun θ => ?_
       have h2 := coeff_torus lam θ v m
       have h3 : act lam (torus θ) v = chr μ θ • v := hw θ (by rw [kset_eq]; exact torus_mem θ)
-      rw [h3, map_smul, coeff_smul, smul_eq_mul] at h2
+      rw [h3, map_smul, MvPolynomial.coeff_smul, smul_eq_mul] at h2
       exact mul_right_cancel₀ hm h2
-    have h4 :=
-      cdom_add (cdom_of_coeff_ne_zero (incl_mem lam v) m hm)
-        (cdom_refl (allPos n) fun _ => (lam.detShift : ℝ))
+    have h4 := cdom_add (cdom_of_coeff_ne_zero (incl_mem lam v) m hm)
+      (cdom_refl (allPos n) fun _ => (lam.detShift : ℝ))
     rw [h1]
-    have h5
-        : (fun a => (lam.w a : ℝ)) = (fun a => (lam.natW a : ℝ)) + fun _ => (lam.detShift : ℝ) :=
+    have h5 : (fun a => (lam.w a : ℝ)) = (fun a => (lam.natW a : ℝ)) + fun _ => (lam.detShift : ℝ) :=
       funext fun a => (natW_add lam a).symm
     rw [h5]
     exact h4
 
-theorem exists_isHCTypeU_nablaSq
-    : ∀ (n : ℕ) (lam : Formalism.BasicNotions.DomWeight n),
-      ∃ (H : Type) (_ : NormedAddCommGroup H) (_ : InnerProductSpace ℂ H)
-          (π : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)) (e : H →ₗ[ℂ] MvPolynomial (Fin n × Fin n) ℂ),
-        Formalism.MainNotions.S.IsHCTypeU n
-            (fun i => (lam.w i : ℝ) + ((Formalism.BasicNotions.rhoVec n i : ℚ) : ℝ))
-            π
-          ∧ Function.Injective e ∧ (∀ x, e x ∈ Formalism.BasicNotions.nablaSq ℂ n lam)
-          ∧ ∀ g : GL (Fin n) ℂ,
-            (g : Matrix (Fin n) (Fin n) ℂ) ∈ Matrix.unitaryGroup (Fin n) ℂ
-              → ∀ x,
-                e (π (g : Matrix (Fin n) (Fin n) ℂ) x)
-                  = Formalism.BasicNotions.sqAct ℂ n lam g (e x) := by
+theorem exists_isHCTypeU_nablaSq : ∀ (n : ℕ) (lam : Formalism.BasicNotions.DomWeight n), ∃ (H : Type) (_ : NormedAddCommGroup H) (_ : InnerProductSpace ℂ H) (π : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)) (e : H →ₗ[ℂ] MvPolynomial (Fin n × Fin n) ℂ), Formalism.MainNotions.S.IsHCTypeU n (fun i => (lam.w i : ℝ) + ((Formalism.BasicNotions.rhoVec n i : ℚ) : ℝ)) π ∧ Function.Injective e ∧ (∀ x, e x ∈ Formalism.BasicNotions.nablaSq ℂ n lam) ∧ ∀ g : GL (Fin n) ℂ, (g : Matrix (Fin n) (Fin n) ℂ) ∈ Matrix.unitaryGroup (Fin n) ℂ → ∀ x, e (π (g : Matrix (Fin n) (Fin n) ℂ) x) = Formalism.BasicNotions.sqAct ℂ n lam g (e x) := by
   intro n lam
   have hK := isKTypeOf_act lam
-  refine ⟨
-    Space lam.natW,
-    inferInstance,
-    inferInstance,
-    act lam,
-    incl lam,
-    ⟨?_, inferInstance, isURepOn_act lam, ?_⟩,
-    incl_injective lam,
-    incl_mem lam,
-    fun g _ x => ?_
-  ⟩
+  refine ⟨Space lam.natW, inferInstance, inferInstance, act lam, incl lam,
+    ⟨?_, inferInstance, isURepOn_act lam, ?_⟩, incl_injective lam, incl_mem lam, fun g _ x => ?_⟩
   · obtain ⟨v, -, hv, -⟩ := hK.2.2.2.1
     exact ⟨v, 0, hv⟩
   · convert hK using 1

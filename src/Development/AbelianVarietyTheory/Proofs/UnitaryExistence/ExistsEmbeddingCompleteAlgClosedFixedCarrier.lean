@@ -1,22 +1,60 @@
 module
 
-public import Mathlib
-public import Formalism.LocalToGlobal.ProjectiveLattices.HasDataCondition
-public import Formalism.LocalToGlobal.ProjectiveLattices.LatPAddRight
-public import Formalism.LocalToGlobal.ProjectiveLattices.FamilyUniformisationBasePointOrthogonalBis
-public import Formalism.LocalToGlobal.ProjectiveLattices.ParCanon
-public import Formalism.LocalToGlobal.ProjectiveLattices.ExistsParameterConditions
-public import Formalism.LocalToGlobal.ProjectiveLattices.DepLaws
-public import Formalism.SharpRestriction.Divisibility.GeneratorPowers.ThExprUniqOfChartIndep2
-public import Development.AbelianVarietyTheory.Proofs.UnramifiedDepth.ExistsCompleteIsAlgClosedAddValuation
+import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsComplexEmbeddingFractionFieldCdvr
+public import Formalism.LocalToGlobal.ProjectiveLattices.OneLtAbsNormReal
+public import Formalism.SharpRestriction.Divisibility.AbelianOpenPart.IsOpenPart
+public import Development.AbelianVarietyTheory.Proofs.HomogeneousIdeals.ExistsAbsoluteValueOfIsDiscreteValuationRing
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+public import Mathlib.RingTheory.Algebraic.Cardinality
+public import Mathlib.RingTheory.Localization.Cardinality
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.Valuation.Integral
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
+import Formalism.LocalRingCardinality.DataTheta
+import Formalism.LocalToGlobal.BesselHermitianTheta.NoncompactGapAtLeastRange
+import Formalism.SharpRestriction.Divisibility.AbelianOpenPart.AbelianAt
+import Formalism.SharpRestriction.GlobalSchurBounds.GeneralLinearActions.GenusMassVolumes
+import Mathlib.Topology.Sheaves.Presheaf
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.CocycleRightZeroThd
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.FundamentalDomains.Signature
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits NumberField IsDedekindDomain IsLocalRing
-  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD
-  Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH Formalism.L2.Theta
-  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Pj
-  Formalism.MainNotions.DIV.Cons
+open AlgebraicGeometry CategoryTheory Limits NumberField IsDedekindDomain IsLocalRing ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH Formalism.L2.Theta Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Pj Formalism.MainNotions.DIV.Cons
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -24,42 +62,27 @@ namespace GlobalTheory.SmallClosedField
 
 open Cardinal
 
-theorem mk_le_of_denseRange {A C : Type} [MetricSpace C] (f : A → C) (hf : DenseRange f)
-    : #C ≤ #A ^ ℵ₀ := by
+theorem mk_le_of_denseRange {A C : Type} [MetricSpace C] (f : A → C) (hf : DenseRange f) :
+    #C ≤ #A ^ ℵ₀ := by
   have h : ∀ x : C, ∃ s : ℕ → A, Filter.Tendsto (fun n => f (s n)) Filter.atTop (nhds x) := by
     intro x
     obtain ⟨u, hu, hx⟩ := mem_closure_iff_seq_limit.1 (hf x)
     choose s hs using hu
     exact ⟨s, by simpa [hs] using hx⟩
   choose s hs using h
-  have hinj : Function.Injective s := fun x y hxy => tendsto_nhds_unique (hs x) (hxy ▸ hs y)
+  have hinj : Function.Injective s := fun x y hxy =>
+    tendsto_nhds_unique (hs x) (hxy ▸ hs y)
   simpa using mk_le_of_injective hinj
 
-theorem mk_le_continuum_of_finite_residueField
-    (V : Type) [CommRing V] [IsLocalRing V] [IsNoetherianRing V] [Finite (ResidueField V)]
-    : #V ≤ 𝔠 := by
-  have hfin : ∀ n : ℕ, Finite (V ⧸ maximalIdeal V ^ n) := fun n =>
-    haveI : Finite (V ⧸ maximalIdeal V) := inferInstanceAs (Finite (ResidueField V))
-    Ideal.finite_quotient_pow (maximalIdeal V).fg_of_isNoetherianRing n
-  let f : V → ∀ n : ℕ, V ⧸ maximalIdeal V ^ n := fun x n => Ideal.Quotient.mk _ x
-  have hinj : Function.Injective f := by
-    intro x y hxy
-    have : x - y ∈ ⨅ n : ℕ, maximalIdeal V ^ n :=
-      Ideal.mem_iInf.2 fun n => Ideal.Quotient.eq.1 (congrFun hxy n)
-    rw [Ideal.iInf_pow_eq_bot_of_isLocalRing _ (maximalIdeal.isMaximal V).ne_top] at this
-    exact sub_eq_zero.1 this
-  refine (mk_le_of_injective hinj).trans ?_
-  rw [mk_pi]
-  refine (prod_le_prod _ (fun _ => ℵ₀) fun n => mk_le_aleph0).trans ?_
-  simp
+theorem mk_le_continuum_of_finite_residueField (V : Type) [CommRing V] [IsLocalRing V]
+    [IsNoetherianRing V] [Finite (ResidueField V)] : #V ≤ 𝔠 := by
+  apply _root_.GlobalTheory.ComplexEmbedding.mk_le_continuum_of_finite_residueField <;> assumption
 
-theorem exists_small_closed_subfield
-    {K C : Type} [Field K] [NontriviallyNormedField C] [IsUltrametricDist C] [CompleteSpace C]
-    [IsAlgClosed C] [Algebra K C]
-    (hK : #K ≤ 𝔠)
-    {x : K} (hx : 1 < ‖algebraMap K C x‖)
-    : ∃ L : Subfield C,
-      (∀ y : K, algebraMap K C y ∈ L) ∧ IsClosed (L : Set C) ∧ IsAlgClosed L ∧ #L ≤ 𝔠 := by
+theorem exists_small_closed_subfield {K C : Type} [Field K] [NontriviallyNormedField C]
+    [IsUltrametricDist C] [CompleteSpace C] [IsAlgClosed C] [Algebra K C] (hK : #K ≤ 𝔠)
+    {x : K} (hx : 1 < ‖algebraMap K C x‖) :
+    ∃ L : Subfield C, (∀ y : K, algebraMap K C y ∈ L) ∧ IsClosed (L : Set C) ∧ IsAlgClosed L ∧
+      #L ≤ 𝔠 := by
   let A := algebraicClosure K C
   let L : Subfield C := A.toSubfield.topologicalClosure
   have hAL : A.toSubfield ≤ L := A.toSubfield.le_topologicalClosure
@@ -77,11 +100,9 @@ theorem exists_small_closed_subfield
     (Algebra.IsAlgebraic.cardinalMk_le_max K A).trans (max_le hK aleph0_le_continuum)
   exact (power_le_power_right hA).trans continuum_power_aleph0.le
 
-theorem exists_scf_isometry
-    {p : ℕ} {C : Type}
-    [NontriviallyNormedField C] [IsUltrametricDist C] [CompleteSpace C] [IsAlgClosed C] [CharZero C]
-    (hp : ‖(p : C)‖ = (p : ℝ)⁻¹) (hC : #C ≤ 𝔠)
-    : ∃ (D : SCF p) (e : C →+* ↥D.S), ∀ x, ‖e x‖ = ‖x‖ := by
+theorem exists_scf_isometry {p : ℕ} {C : Type} [NontriviallyNormedField C] [IsUltrametricDist C]
+    [CompleteSpace C] [IsAlgClosed C] [CharZero C] (hp : ‖(p : C)‖ = (p : ℝ)⁻¹) (hC : #C ≤ 𝔠) :
+    ∃ (D : SCF p) (e : C →+* ↥D.S), ∀ x, ‖e x‖ = ‖x‖ := by
   have hle : #C ≤ #BigT := by
     refine hC.trans ?_
     rw [mk_set, mk_set, mk_real]
@@ -109,12 +130,10 @@ theorem exists_scf_isometry
   haveI : CharZero S := charZero_of_injective_ringHom (f := r.symm.toRingHom) r.symm.injective
   exact ⟨{ S := S, norm_p := by rw [hn, map_natCast, hp] }, r.symm.toRingHom, hn'⟩
 
-theorem exists_extension_intO
-    {V W C : Type} [CommRing V] [IsDomain V] [CommRing W] [IsDomain W] [NormedField C]
-    [IsUltrametricDist C] [IsAlgClosed C]
-    (g : V →+* intO C) (φ : V →+* W)
-    (hg : Function.Injective g) (hφ : Function.Injective φ) (hf : φ.Finite)
-    : ∃ g' : W →+* intO C, g'.comp φ = g ∧ Function.Injective g' := by
+theorem exists_extension_intO {V W C : Type} [CommRing V] [IsDomain V] [CommRing W] [IsDomain W]
+    [NormedField C] [IsUltrametricDist C] [IsAlgClosed C] (g : V →+* intO C) (φ : V →+* W)
+    (hg : Function.Injective g) (hφ : Function.Injective φ) (hf : φ.Finite) :
+    ∃ g' : W →+* intO C, g'.comp φ = g ∧ Function.Injective g' := by
   letI : Algebra V W := φ.toAlgebra
   letI : Algebra V C := ((intO C).subtype.comp g).toAlgebra
   haveI : Module.Finite V W := hf
@@ -123,7 +142,8 @@ theorem exists_extension_intO
   haveI : FaithfulSMul V C := (faithfulSMul_iff_algebraMap_injective V C).2 hgC
   let l : W →ₐ[V] C := (by
     refine @_root_.IsAlgClosed.lift _ _ _ _ _ _ _ _ _ _ _ ?_ ?_ ?_
-    solve_by_elim* (maxDepth := 2) only [*, @_root_.DivisionSemiring.to_moduleIsTorsionFree,
+    solve_by_elim* (maxDepth := 2) only [*,
+      @_root_.DivisionSemiring.to_moduleIsTorsionFree,
       @_root_.Algebra.IsIntegral.isAlgebraic, @_root_.inferInstance])
   have hl : Function.Injective l := by
     rw [RingHom.injective_iff_ker_eq_bot]
@@ -136,8 +156,8 @@ theorem exists_extension_intO
     intro a
     have hO := normIntegers_integers C
     obtain ⟨q, hq, hqa⟩ := (Algebra.IsIntegral.isIntegral (R := V) a).map l
-    let g₀ : V →+* normIntegers C :=
-      (algebraMap V C).codRestrict (normIntegers C) fun v => mem_normIntegers_iff.2 (g v).2
+    let g₀ : V →+* normIntegers C := (algebraMap V C).codRestrict (normIntegers C) fun v =>
+      mem_normIntegers_iff.2 (g v).2
     have hint : IsIntegral (normIntegers C) (l a) :=
       ⟨q.map g₀, hq.map g₀, by rw [Polynomial.eval₂_map]; exact hqa⟩
     exact mem_normIntegers_iff.1 (hO.mem_of_integral hint)
@@ -145,12 +165,9 @@ theorem exists_extension_intO
   ext a
   exact l.commutes a
 
-theorem norm_lt_one_of_mem_maximalIdeal
-    {W C : Type} [CommRing W] [IsDomain W] [IsDiscreteValuationRing W] [NormedField C]
-    (g : W →+* C) (hg : ∀ a, ‖g a‖ ≤ 1)
-    {b : W} (hb0 : b ≠ 0) (hb : ‖g b‖ < 1)
-    {a : W} (ha : a ∈ maximalIdeal W)
-    : ‖g a‖ < 1 := by
+theorem norm_lt_one_of_mem_maximalIdeal {W C : Type} [CommRing W] [IsDomain W]
+    [IsDiscreteValuationRing W] [NormedField C] (g : W →+* C) (hg : ∀ a, ‖g a‖ ≤ 1) {b : W}
+    (hb0 : b ≠ 0) (hb : ‖g b‖ < 1) {a : W} (ha : a ∈ maximalIdeal W) : ‖g a‖ < 1 := by
   obtain ⟨π, hπ⟩ := IsDiscreteValuationRing.exists_irreducible W
   obtain ⟨n, u, rfl⟩ := IsDiscreteValuationRing.eq_unit_mul_pow_irreducible hb0 hπ
   rw [hπ.maximalIdeal_eq, Ideal.mem_span_singleton] at ha
@@ -160,18 +177,8 @@ theorem norm_lt_one_of_mem_maximalIdeal
     exact mul_lt_one_of_nonneg_of_lt_one_left (norm_nonneg _) hb (hg c)
   exact lt_of_not_ge fun h1 => absurd (one_le_pow₀ h1) (not_le.2 h)
 
-theorem exists_embedding_and_extension
-    : ∀ (T : CDVR) (p : ℕ),
-      p.Prime → T.FinRes → (p : T.V) ∈ maximalIdeal T.V
-        → (∃ (C : SCF p) (eF : T.Fr →+* ↥C.S),
-            (∀ a : T.V, ‖eF (algebraMap T.V T.Fr a)‖ ≤ 1)
-              ∧ ∀ a ∈ maximalIdeal T.V, ‖eF (algebraMap T.V T.Fr a)‖ < 1)
-          ∧ ∀ (C : SCF p) (g : T.V →+* intO ↥C.S) (T' : CDVR) (φ : T.V →+* T'.V),
-            Function.Injective g → (∀ a ∈ maximalIdeal T.V, ‖((g a : intO ↥C.S) : ↥C.S)‖ < 1)
-              → Function.Injective φ → φ.Finite
-              → ∃ g' : T'.V →+* intO ↥C.S,
-                g'.comp φ = g ∧ Function.Injective g'
-                  ∧ ∀ a ∈ maximalIdeal T'.V, ‖((g' a : intO ↥C.S) : ↥C.S)‖ < 1 := by
+theorem exists_embedding_and_extension :
+    ∀ (T : CDVR) (p : ℕ), p.Prime → T.FinRes → (p : T.V) ∈ maximalIdeal T.V → (∃ (C : SCF p) (eF : T.Fr →+* ↥C.S), (∀ a : T.V, ‖eF (algebraMap T.V T.Fr a)‖ ≤ 1) ∧ ∀ a ∈ maximalIdeal T.V, ‖eF (algebraMap T.V T.Fr a)‖ < 1) ∧ ∀ (C : SCF p) (g : T.V →+* intO ↥C.S) (T' : CDVR) (φ : T.V →+* T'.V), Function.Injective g → (∀ a ∈ maximalIdeal T.V, ‖((g a : intO ↥C.S) : ↥C.S)‖ < 1) → Function.Injective φ → φ.Finite → ∃ g' : T'.V →+* intO ↥C.S, g'.comp φ = g ∧ Function.Injective g' ∧ ∀ a ∈ maximalIdeal T'.V, ‖((g' a : intO ↥C.S) : ↥C.S)‖ < 1 := by
   intro T p hp hfin hpm
   have hp0 : (p : T.V) ≠ 0 := Nat.cast_ne_zero.2 hp.ne_zero
   have h1 : (1 : ℝ) < p := by exact_mod_cast hp.one_lt
@@ -204,8 +211,7 @@ theorem exists_embedding_and_extension
     exact inv_lt_one_of_one_lt₀ h1
   · obtain ⟨g', hc, hinj⟩ := exists_extension_intO g φ hg hφ hf
     refine ⟨g', hc, hinj, fun a ha => ?_⟩
-    refine norm_lt_one_of_mem_maximalIdeal ((intO ↥C.S).subtype.comp g')
-      (fun b => (g' b).2)
+    refine norm_lt_one_of_mem_maximalIdeal ((intO ↥C.S).subtype.comp g') (fun b => (g' b).2)
       ((map_ne_zero_iff φ hφ).2 hp0) ?_ ha
     have := hgm p hpm
     rw [← hc] at this

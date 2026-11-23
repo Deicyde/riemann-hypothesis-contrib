@@ -1,10 +1,51 @@
 module
 
-public import Mathlib
-public import GroundTheory.AutomorphicForms.L2LocalComponents.Analytic
-public import GroundTheory.AutomorphicForms.L2LocalComponents.ArchPolar
 public import GroundTheory.AutomorphicForms.L2LocalComponents.CuspSmooth
 public import GroundTheory.AutomorphicForms.TensorProductTheorem.CuspidalRep
+public import GroundTheory.AutomorphicForms.TensorProductTheorem.CentralCuspSplit
+public import GroundTheory.AutomorphicForms.CuspidalDiscreteness.SummandsAreCuspForms
+public import GroundTheory.AutomorphicForms.L2LocalComponents.Analytic
+public import GroundTheory.AutomorphicForms.L2LocalComponents.ArchPolar
+import GroundTheory.AutomorphicForms.UnitaryAdmissible.CuspFinite
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -86,7 +127,6 @@ theorem aeval_uAction_cuspVecL
       Module.algebraMap_end_apply, Module.algebraMap_end_apply, ← map_pow, ← map_pow,
       Submodule.coe_smul, uAction_cuspToL2 μ hφ, map_smul]
 
-set_option maxHeartbeats 1000000 in
 theorem isInvariant_topologicalClosure_map
     {W : Submodule ℂ (cuspForms K n)}
     (hW : W ≤ centralCuspForms K n) (hWρ : ∀ X, ∀ φ ∈ W, (gkModuleCusp K n).ρ X φ ∈ W)
@@ -161,7 +201,6 @@ theorem isInvariant_topologicalClosure_map
   rw [archRepT_apply] at this
   exact this
 
-set_option maxHeartbeats 1000000 in
 theorem sup_orthRel_of_finite
     {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
     (ι : cuspForms K n →ₗ[ℂ] H) (hinj : ∀ a ∈ centralCuspForms K n, ι a = 0 → a = 0)
@@ -182,8 +221,8 @@ theorem sup_orthRel_of_finite
       : ∀ φ : cuspForms K n,
         Δ φ = ∑ i, (gkModuleCusp K n).ρ (b i) ((gkModuleCusp K n).ρ (b i) φ) := by
     intro φ
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [Δ, laplacianU, map_sum, map_mul, LinearMap.sum_apply, mul_apply_eq_comp]
+
+    simp only [Δ, laplacianU, map_sum, map_mul, LinearMap.sum_apply, mul_apply_eq_comp]
     rfl
   have hΔV : ∀ φ ∈ centralCuspForms K n, Δ φ ∈ centralCuspForms K n := fun φ hφ =>
     uActionCusp_mem_centralCuspForms _ hφ
@@ -199,8 +238,8 @@ theorem sup_orthRel_of_finite
       : ∀ x ∈ centralCuspForms K n, ∀ y ∈ centralCuspForms K n,
         inner ℂ (ι (Δ x)) (ι y) = inner ℂ (ι x) (ι (Δ y)) := by
     intro x hx y hy
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hΔsum, hΔsum, map_sum, map_sum, sum_inner, inner_sum]
+
+    rw [hΔsum, hΔsum, map_sum, map_sum, sum_inner, inner_sum]
     exact Finset.sum_congr rfl fun i _ => hXX (b i) x hx y hy
   have hUΔ : ∀ φ ∈ U, Δ φ ∈ U := fun φ hφ => by
     rw [hΔsum]

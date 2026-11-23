@@ -1,11 +1,55 @@
 module
 
-public import Mathlib
-public import Development.AutomorphicSpectrum.Definitions.MetricPeriods.GroupDict
-public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.IsSheetCover
-public import GroundTheory.HeightsAndTheta.Heights.FiniteCovolume.StatementsProved
-public import GroundTheory.HeightsAndTheta.Heights.CountingLowerBound.Assembly
 public import Development.AutomorphicSpectrum.Definitions.CommutativeAlgebra.LatNormGrLatNeZeroOfSpan
+public import Development.AutomorphicSpectrum.Definitions.MetricPeriods.IsEigFrames
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.IsHolPeriods
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Coalgebra.IsFrobenius
+import Mathlib.RingTheory.Etale.Weakly
+import Mathlib.RingTheory.Finiteness.ModuleFinitePresentation
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.TotallySplit
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Std.Tactic.BVDecide.Normalize.Prop
+import GroundTheory.HeightsAndTheta.Heights.FiniteCovolume.PUnipotentModulusMatrix
 
 @[expose] public section
 
@@ -57,8 +101,8 @@ theorem lat_of_herm [Module.Free ℤ Λ] [Module.Finite ℤ Λ] (hr : Module.fin
   have hrange : Q.range.toIntSubmodule = Submodule.span ℤ (Set.range c) := by
     apply le_antisymm
     · rintro _ ⟨x, rfl⟩
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [← b.sum_repr x, map_sum]
+
+      rw [← b.sum_repr x, map_sum]
       refine Submodule.sum_mem _ fun i _ => ?_
       rw [map_zsmul, ← hc]
       exact Submodule.smul_mem _ _ (Submodule.subset_span (Set.mem_range_self i))
@@ -201,8 +245,8 @@ theorem exists_adapted (B : 𝓞 E →+* Module.End ℂ (Fin g → ℂ)) (ty : F
   obtain ⟨s, hs⟩ : ∃ s, ty i₀ = s := ⟨_, rfl⟩
   have h1 : ∑ i, c i • HT.eigProj B s (u i) = 0 := by
     have := congrArg (HT.eigProj B s) hc
-    set_option synthInstance.maxHeartbeats 100000 in
-      simpa [map_sum] using this
+
+    simpa [map_sum] using this
   have h2 : ∀ i, HT.eigProj B s (u i) = if ty i = s then u i else 0 := by
     intro i
     split_ifs with h
@@ -232,8 +276,8 @@ theorem frame_type (B : 𝓞 E →+* Module.End ℂ (Fin g → ℂ)) (ty : Fin g
   have hz : z = W *ᵥ (h *ᵥ z) := by rw [mulVec_mulVec, hWh, one_mulVec]
   have hB : B c z = W *ᵥ (fun i => ty i (c : E) * (h *ᵥ z) i) := by
     conv_lhs => rw [hz, hcol]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, hcol]
+
+    rw [map_sum, hcol]
     refine Finset.sum_congr rfl fun j _ => ?_
     rw [map_smul, HT.LatBasic.mem_eigSp.1 (hv j) c, smul_smul, mul_comm]
   rw [hB, mulVec_mulVec, hhW, one_mulVec]
@@ -260,8 +304,8 @@ theorem act_diff (R : (Fin n → ℂ) → RiemLat E g Λ) (U : Set (Fin n → �
       ext i
       simp [mulVec, dotProduct, M, Finset.sum_apply, mul_comm]
     conv_lhs => rw [hu]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_smul, (R t).act]
+
+    simp only [map_sum, map_smul, (R t).act]
   refine DifferentiableOn.congr ?_ key
   refine DifferentiableOn.fun_sum fun j _ => ?_
   have hc : DifferentiableOn ℂ (fun t => ((M t)⁻¹ *ᵥ u) j) U := by

@@ -1,37 +1,88 @@
 module
 
 public import Development.AutomorphicArithmetic.Foundations.IwahoriReduction.NormProducts.LUnH
-public import Development.AbelianVarietyTheory.Definitions.Foundations.HahnPowOrderLeadingCoeff
-public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.SpecialLinearGroupIntMapZmodSurjective
+public import Development.AutomorphicArithmetic.AutomorphicVarieties.CommutativeAlgebra.ResMapBijective
+public import Mathlib.RingTheory.AdicCompletion.Noetherian
+public import Mathlib.RingTheory.Coalgebra.IsFrobenius
+public import Mathlib.RingTheory.Flat.FaithfullyFlat.Basic
+public import Mathlib.RingTheory.Flat.TorsionFree
+public import Mathlib.RingTheory.Henselian
+public import Mathlib.RingTheory.HopfAlgebra.Basic
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Development.AutomorphicArithmetic.Foundations.IwahoriReduction.NormProducts.InvMod
 
 @[expose] public section
 
 open GlobalTheory.KZ GlobalTheory.K4 UpperTheory.Kd.K4 Polynomial
 open scoped Matrix MatrixGroups
 
-private theorem one_eq_zero_of_products_vanish (N : ℕ) (γ : SL(2, ℤ))
-    : γ ∈ CongruenceSubgroup.Gamma N
-      ↔ ((N : ℤ) ∣ γ 0 0 - 1 ∧ (N : ℤ) ∣ γ 0 1 ∧ (N : ℤ) ∣ γ 1 0 ∧ (N : ℤ) ∣ γ 1 1 - 1) := by
+private theorem one_eq_zero_of_products_vanish (N : ℕ) (γ : SL(2, ℤ)) :
+    γ ∈ CongruenceSubgroup.Gamma N ↔
+      ((N : ℤ) ∣ γ 0 0 - 1 ∧ (N : ℤ) ∣ γ 0 1 ∧ (N : ℤ) ∣ γ 1 0 ∧ (N : ℤ) ∣ γ 1 1 - 1) := by
   rw [CongruenceSubgroup.Gamma_mem]
   simp only [← ZMod.intCast_zmod_eq_zero_iff_dvd, Int.cast_sub, Int.cast_one, sub_eq_zero]
 
-private theorem mem_gamma_of_dvd_of_mem_gamma
-    {N P : ℕ} (h : N ∣ P) (γ : SL(2, ℤ)) (hγ : γ ∈ CongruenceSubgroup.Gamma P)
-    : γ ∈ CongruenceSubgroup.Gamma N := by
+private theorem mem_gamma_of_dvd_of_mem_gamma {N P : ℕ} (h : N ∣ P) (γ : SL(2, ℤ)) (hγ : γ ∈ CongruenceSubgroup.Gamma P) :
+    γ ∈ CongruenceSubgroup.Gamma N := by
   have h' : (N : ℤ) ∣ (P : ℤ) := Int.natCast_dvd_natCast.2 h
   rw [one_eq_zero_of_products_vanish] at hγ ⊢
   obtain ⟨h1, h2, h3, h4⟩ := hγ
   exact ⟨h'.trans h1, h'.trans h2, h'.trans h3, h'.trans h4⟩
 
-private theorem exists_sl2_neg_mem_gamma_commutator_mem_gamma_mul (A R : ℕ) (hAR : Nat.Coprime A R)
-    : ∃ z : SL(2, ℤ),
-      -z ∈ CongruenceSubgroup.Gamma A ∧ z ∈ CongruenceSubgroup.Gamma R
-        ∧ ∀ γ : SL(2, ℤ), γ * z * γ⁻¹ * z⁻¹ ∈ CongruenceSubgroup.Gamma (A * R) := by
+private theorem exists_sl2_neg_mem_gamma_commutator_mem_gamma_mul (A R : ℕ) (hAR : Nat.Coprime A R) :
+    ∃ z : SL(2, ℤ), -z ∈ CongruenceSubgroup.Gamma A ∧ z ∈ CongruenceSubgroup.Gamma R ∧
+      ∀ γ : SL(2, ℤ), γ * z * γ⁻¹ * z⁻¹ ∈ CongruenceSubgroup.Gamma (A * R) := by
   obtain ⟨s, r, hsr⟩ := Nat.isCoprime_iff_coprime.2 hAR
   set P : ℤ := (A : ℤ) * R with hP
   set c : ℤ := s * A - r * R with hcdef
   set j : ℤ := -4 * s * r with hj
-  have hc : c ^ 2 = 1 + P * j := by rw [hcdef, hP, hj]; linear_combination (s * A + r * R + 1) * hsr
+  have hc : c ^ 2 = 1 + P * j := by
+    rw [hcdef, hP, hj]; linear_combination (s * A + r * R + 1) * hsr
   have hdet : Matrix.det !![c, P; -P * j ^ 2, c * (1 - P * j)] = 1 := by
     rw [Matrix.det_fin_two_of]; linear_combination (1 - P * j) * hc
   let z : SL(2, ℤ) := ⟨!![c, P; -P * j ^ 2, c * (1 - P * j)], hdet⟩
@@ -59,16 +110,12 @@ private theorem exists_sl2_neg_mem_gamma_commutator_mem_gamma_mul (A R : ℕ) (h
   · intro γ
     set π : SL(2, ℤ) →* SL(2, ZMod (A * R)) :=
       Matrix.SpecialLinearGroup.map (Int.castRingHom (ZMod (A * R))) with hπ
-    have hz
-        : ((π z : SL(2, ZMod (A * R))) : Matrix (Fin 2) (Fin 2) (ZMod (A * R)))
-          = (c : ZMod (A * R)) • (1 : Matrix (Fin 2) (Fin 2) (ZMod (A * R))) := by
+    have hz : ((π z : SL(2, ZMod (A * R))) : Matrix (Fin 2) (Fin 2) (ZMod (A * R))) =
+        (c : ZMod (A * R)) • (1 : Matrix (Fin 2) (Fin 2) (ZMod (A * R))) := by
       have hP0 : ((P : ℤ) : ZMod (A * R)) = 0 := by
         rw [hP]; push_cast; exact_mod_cast ZMod.natCast_self (A * R)
-      have hentry
-          : ∀ i k,
-            ((π z : SL(2, ZMod (A * R))) : Matrix (Fin 2) (Fin 2) (ZMod (A * R))) i k
-              = (((z : Matrix (Fin 2) (Fin 2) ℤ) i k : ℤ) : ZMod (A * R)) := fun _ _ =>
-        rfl
+      have hentry : ∀ i k, ((π z : SL(2, ZMod (A * R))) : Matrix (Fin 2) (Fin 2) (ZMod (A * R))) i k =
+          (((z : Matrix (Fin 2) (Fin 2) ℤ) i k : ℤ) : ZMod (A * R)) := fun _ _ => rfl
       ext i k
       rw [hentry]
       fin_cases i <;> fin_cases k <;> simp [z, hP0]
@@ -81,15 +128,14 @@ private theorem exists_sl2_neg_mem_gamma_commutator_mem_gamma_mul (A R : ℕ) (h
     rw [MonoidHom.mem_ker, map_mul, map_mul, map_mul, map_inv, map_inv, hcomm, mul_assoc (π z),
       mul_inv_cancel (π γ), mul_one, mul_inv_cancel]
 
-private theorem exists_ne_zero_act_eq_mul_of_cocycle
-    {K : Type} [Field K]
-    {Q : Type} [Group Q]
-    (E : Type) [Monoid E]
+private theorem exists_ne_zero_act_eq_mul_of_cocycle {K : Type} [Field K] {Q : Type} [Group Q] (E : Type) [Monoid E]
     (act : Q → K ≃+* K) (res : Q → (E →* K))
-    (hres : ∀ p q x, res (p * q) x = act q (res p x)) (hfin : (Set.range res).Finite)
-    (t : Q → K) (ht0 : ∀ q, t q ≠ 0) (hcoc : ∀ p q, t (p * q) = t q * act q (t p))
-    (hwd : ∀ p q, res p = res q → t p = t q)
-    : ∃ β : K, β ≠ 0 ∧ ∀ q, act q β = t q * β := by
+    (hres : ∀ p q x, res (p * q) x = act q (res p x))
+    (hfin : (Set.range res).Finite)
+    (t : Q → K) (ht0 : ∀ q, t q ≠ 0)
+    (hcoc : ∀ p q, t (p * q) = t q * act q (t p))
+    (hwd : ∀ p q, res p = res q → t p = t q) :
+    ∃ β : K, β ≠ 0 ∧ ∀ q, act q β = t q * β := by
   classical
   set S := hfin.toFinset with hS
   have memS : ∀ s, s ∈ S ↔ ∃ p, res p = s := fun s => by
@@ -102,10 +148,9 @@ private theorem exists_ne_zero_act_eq_mul_of_cocycle
   obtain ⟨y, hy⟩ : ∃ y : E, ∑ s ∈ S, tt s * s y ≠ 0 := by
     by_contra hcon
     push_neg at hcon
-    have hli :=
-      linearIndependent_iff'.1 (linearIndependent_monoidHom E K) S (fun s => tt s) (by
-        funext y
-        simpa [Finset.sum_apply, smul_eq_mul] using hcon y)
+    have hli := linearIndependent_iff'.1 (linearIndependent_monoidHom E K) S (fun s => tt s) (by
+      funext y
+      simpa [Finset.sum_apply, smul_eq_mul] using hcon y)
     have h1 := hli (res 1) ((memS _).2 ⟨1, rfl⟩)
     rw [htt] at h1
     exact ht0 1 h1
@@ -113,12 +158,10 @@ private theorem exists_ne_zero_act_eq_mul_of_cocycle
     ext x; simp [hres]
   have key : ∀ q, act q (∑ s ∈ S, tt s * s y) = (t q)⁻¹ * ∑ s ∈ S, tt s * s y := by
     intro q
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, Finset.mul_sum]
-    refine Finset.sum_nbij'
-      (fun s => (act q).toMonoidHom.comp s)
-      (fun s => (act q⁻¹).toMonoidHom.comp s)
-      ?_ ?_ ?_ ?_ ?_
+
+    rw [map_sum, Finset.mul_sum]
+    refine Finset.sum_nbij' (fun s => (act q).toMonoidHom.comp s)
+      (fun s => (act q⁻¹).toMonoidHom.comp s) ?_ ?_ ?_ ?_ ?_
     · intro s hs
       obtain ⟨p, rfl⟩ := (memS s).1 hs
       exact (memS _).2 ⟨p * q, (hres' p q).symm⟩
@@ -141,38 +184,27 @@ private theorem exists_ne_zero_act_eq_mul_of_cocycle
   refine ⟨(∑ s ∈ S, tt s * s y)⁻¹, inv_ne_zero hy, fun q => ?_⟩
   rw [map_inv₀, key, mul_inv, inv_inv]
 
-private theorem sl_apply_eq_of_pow_eq_one
-    {Ω : Type} [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω]
-    {ε : Ω →+* ℂ} (X : Tower Ω ε)
-    (g : GQ)
-    (m : ℕ) (hm : 0 < m)
-    (r : X.K) (hr : r ^ m = 1)
-    : X.sl g r = r := by
+private theorem sl_apply_eq_of_pow_eq_one {Ω : Type} [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] {ε : Ω →+* ℂ}
+    (X : Tower Ω ε) (g : GQ) (m : ℕ) (hm : 0 < m) (r : X.K) (hr : r ^ m = 1) :
+    X.sl g r = r := by
   haveI : IsAlgClosed Ω := IsAlgClosure.isAlgClosed ℚ
   have hint : IsIntegral Ω r := IsIntegral.of_pow hm (by rw [hr]; exact isIntegral_one)
   have hdeg : (minpoly Ω r).natDegree = 1 :=
-    Polynomial.natDegree_eq_of_degree_eq_some (IsAlgClosed.degree_eq_one_of_irreducible Ω
-      (minpoly.irreducible hint))
+    Polynomial.natDegree_eq_of_degree_eq_some
+      (IsAlgClosed.degree_eq_one_of_irreducible Ω (minpoly.irreducible hint))
   obtain ⟨c, hc⟩ := minpoly.natDegree_eq_one_iff.1 hdeg
   rw [← hc]
   exact (X.sl g).commutes c
 
-theorem UpperTheory.Kd.K4.h90
-    : ∀ {Ω : Type} [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (ε : Ω →+* ℂ) (X : Tower Ω ε),
-      ∀ (H : Subgroup SL(2, ℤ)) (M L m : ℕ) (a : X.Kˣ),
-        0 < M → 0 < m → L.Prime → CongruenceSubgroup.Gamma M ≤ H → -1 ∉ H → InvH X H m a
-          → ∀ v N : ℕ,
-            0 < N → Nat.Coprime L N
-              → ∃ z : SL(2, ℤ),
-                -z ∈ CongruenceSubgroup.Gamma (L ^ v) ∧ z ∈ CongruenceSubgroup.Gamma N
-                  ∧ (∀ γ : SL(2, ℤ), γ * z * γ⁻¹ * z⁻¹ ∈ H)
-                  ∧ (∀ γ : SL(2, ℤ), X.sl (ofSL (γ * z)) (a : X.K) = X.sl (ofSL (z * γ)) (a : X.K))
-                  ∧ ∃ f ∈ lev X H, ∃ h : X.K,
-                    h ≠ 0 ∧ (a : X.K) / X.sl (ofSL z) (a : X.K) = f * h ^ m := by
+theorem UpperTheory.Kd.K4.h90 :
+    ∀ {Ω : Type} [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (ε : Ω →+* ℂ) (X : Tower Ω ε), ∀ (H : Subgroup SL(2, ℤ)) (M L m : ℕ) (a : X.Kˣ), 0 < M → 0 < m → L.Prime → CongruenceSubgroup.Gamma M ≤ H → -1 ∉ H → InvH X H m a → ∀ v N : ℕ, 0 < N → Nat.Coprime L N →
+      ∃ z : SL(2, ℤ), -z ∈ CongruenceSubgroup.Gamma (L ^ v) ∧ z ∈ CongruenceSubgroup.Gamma N ∧ (∀ γ : SL(2, ℤ), γ * z * γ⁻¹ * z⁻¹ ∈ H) ∧
+        (∀ γ : SL(2, ℤ), X.sl (ofSL (γ * z)) (a : X.K) = X.sl (ofSL (z * γ)) (a : X.K)) ∧
+        ∃ f ∈ lev X H, ∃ h : X.K, h ≠ 0 ∧ (a : X.K) / X.sl (ofSL z) (a : X.K) = f * h ^ m := by
   intro Ω _ _ _ ε X H M L m a hM hm hL hMH _hneg hInv v N hN hLN
   classical
-  have hmul
-      : ∀ (γ δ : SL(2, ℤ)) (f : X.K), X.sl (ofSL (γ * δ)) f = X.sl (ofSL δ) (X.sl (ofSL γ) f) := by
+  have hmul : ∀ (γ δ : SL(2, ℤ)) (f : X.K),
+      X.sl (ofSL (γ * δ)) f = X.sl (ofSL δ) (X.sl (ofSL γ) f) := by
     intro γ δ f; rw [map_mul]; exact X.sl_mul _ _ f
   have ha0 : (a : X.K) ≠ 0 := a.ne_zero
   obtain ⟨Ma, hMa, hfixa⟩ := X.level (a : X.K)
@@ -188,19 +220,16 @@ theorem UpperTheory.Kd.K4.h90
       exact ⟨γ, fun _ => ⟨hγ, hw⟩⟩
     · exact ⟨1, fun h' => absurd h' h⟩
   choose rep hrep using hrep
-  have hu
-      : ∀ w : SL(2, ZMod W0), ∃ u : X.K,
-        u ≠ 0 ∧ (rep w ∈ H → X.sl (ofSL (rep w)) (a : X.K) = (a : X.K) * u ^ m) := by
+  have hu : ∀ w : SL(2, ZMod W0), ∃ u : X.K, u ≠ 0 ∧
+      (rep w ∈ H → X.sl (ofSL (rep w)) (a : X.K) = (a : X.K) * u ^ m) := by
     intro w
     by_cases h : rep w ∈ H
     · obtain ⟨u, hu⟩ := hInv _ h
       exact ⟨u, u.ne_zero, fun _ => hu⟩
     · exact ⟨1, one_ne_zero, fun h' => absurd h' h⟩
   choose uq huq0 huq using hu
-  have hlev
-      : ∀ w : SL(2, ZMod W0), ∃ Lw : ℕ,
-        0 < Lw ∧ ∀ γ ∈ CongruenceSubgroup.Gamma Lw, X.sl (ofSL γ) (uq w) = uq w := fun w =>
-    X.level (uq w)
+  have hlev : ∀ w : SL(2, ZMod W0), ∃ Lw : ℕ, 0 < Lw ∧
+      ∀ γ ∈ CongruenceSubgroup.Gamma Lw, X.sl (ofSL γ) (uq w) = uq w := fun w => X.level (uq w)
   choose Lw hLw0 hLw using hlev
   set W := W0 * ∏ w, Lw w with hWdef
   have hWpos : 0 < W := Nat.mul_pos hW0pos (Finset.prod_pos fun w _ => hLw0 w)
@@ -241,10 +270,8 @@ theorem UpperTheory.Kd.K4.h90
   have hWP : W ∣ A * R := by rw [hAR, hPdef]; exact ⟨N * L ^ v, by ring⟩
   have hcomm : ∀ γ : SL(2, ℤ), γ * z * γ⁻¹ * z⁻¹ ∈ CongruenceSubgroup.Gamma W := fun γ =>
     mem_gamma_of_dvd_of_mem_gamma hWP _ (hz3 γ)
-  have hcz
-      : ∀ (γ : SL(2, ℤ)) (x : X.K),
-        (∀ c ∈ CongruenceSubgroup.Gamma W, X.sl (ofSL c) x = x)
-          → X.sl (ofSL z) (X.sl (ofSL γ) x) = X.sl (ofSL γ) (X.sl (ofSL z) x) := by
+  have hcz : ∀ (γ : SL(2, ℤ)) (x : X.K), (∀ c ∈ CongruenceSubgroup.Gamma W, X.sl (ofSL c) x = x) →
+      X.sl (ofSL z) (X.sl (ofSL γ) x) = X.sl (ofSL γ) (X.sl (ofSL z) x) := by
     intro γ x hx
     rw [← hmul, ← hmul]
     have : γ * z = (γ * z * γ⁻¹ * z⁻¹) * (z * γ) := by group
@@ -252,28 +279,27 @@ theorem UpperTheory.Kd.K4.h90
   haveI : NeZero W := ⟨hWpos.ne'⟩
   set πW : SL(2, ℤ) →* SL(2, ZMod W) :=
     Matrix.SpecialLinearGroup.map (Int.castRingHom (ZMod W)) with hπW
-  let E : Submonoid X.K := {
-    carrier := {x | ∀ c ∈ CongruenceSubgroup.Gamma W, X.sl (ofSL c) x = x}
-    mul_mem' := by
-      intro x y hx hy c hc
-      simp only [Set.mem_setOf_eq] at hx hy ⊢
-      rw [map_mul, hx c hc, hy c hc]
-    one_mem' := by
-      intro c _
-      simp
-  }
+  let E : Submonoid X.K :=
+    { carrier := {x | ∀ c ∈ CongruenceSubgroup.Gamma W, X.sl (ofSL c) x = x}
+      mul_mem' := by
+        intro x y hx hy c hc
+        simp only [Set.mem_setOf_eq] at hx hy ⊢
+        rw [map_mul, hx c hc, hy c hc]
+      one_mem' := by
+        intro c _
+        simp }
   let act : H → X.K ≃+* X.K := fun q => (X.sl (ofSL (q : SL(2, ℤ)))).toRingEquiv
-  let res : H → (E →* X.K) := fun q => {
-    toFun := fun x => X.sl (ofSL (q : SL(2, ℤ))) (x : X.K)
-    map_one' := by simp
-    map_mul' := by intro x y; simp
-  }
+  let res : H → (E →* X.K) := fun q =>
+    { toFun := fun x => X.sl (ofSL (q : SL(2, ℤ))) (x : X.K)
+      map_one' := by simp
+      map_mul' := by intro x y; simp }
   let U : H → X.K := fun q => uq (π0 q)
   let t : H → X.K := fun q => U q / X.sl (ofSL z) (U q)
   have hszne : ∀ x : X.K, x ≠ 0 → X.sl (ofSL z) x ≠ 0 := fun x hx => (_root_.map_ne_zero _).2 hx
   have hres : ∀ p q x, res (p * q) x = act q (res p x) := fun p q x => hmul _ _ _
   have hfin : (Set.range res).Finite := by
-    let g : SL(2, ZMod W) → (E →* X.K) := fun w => if h : ∃ q : H, πW q = w then res h.choose else 1
+    let g : SL(2, ZMod W) → (E →* X.K) := fun w =>
+      if h : ∃ q : H, πW q = w then res h.choose else 1
     have hg : ∀ q, res q = g (πW q) := by
       intro q
       have h : ∃ q' : H, πW q' = πW q := ⟨q, rfl⟩
@@ -328,10 +354,8 @@ theorem UpperTheory.Kd.K4.h90
     show U p / X.sl (ofSL z) (U p) = U q / X.sl (ofSL z) (U q)
     rw [hUp, map_mul, hζ, mul_div_mul_left _ _ hζ0]
   obtain ⟨β, hβ0, hβ⟩ := exists_ne_zero_act_eq_mul_of_cocycle (↥E) act res hres hfin t ht0 hcoc hwd
-  have hinv
-      : ∀ γ ∈ H,
-        X.sl (ofSL γ) ((a : X.K) / X.sl (ofSL z) (a : X.K) / β ^ m)
-          = (a : X.K) / X.sl (ofSL z) (a : X.K) / β ^ m := by
+  have hinv : ∀ γ ∈ H, X.sl (ofSL γ) ((a : X.K) / X.sl (ofSL z) (a : X.K) / β ^ m) =
+      (a : X.K) / X.sl (ofSL z) (a : X.K) / β ^ m := by
     intro γ hγ
     have hb : X.sl (ofSL γ) β = t ⟨γ, hγ⟩ * β := hβ ⟨γ, hγ⟩
     rw [map_div₀, map_div₀, map_pow, hb, ← hcz γ _ hfixW, hU γ hγ, map_mul, map_pow]
@@ -342,18 +366,8 @@ theorem UpperTheory.Kd.K4.h90
         (uq (π0 γ) / X.sl (ofSL z) (uq (π0 γ)) * β) ^ m = _
     rw [mul_pow, div_pow]
     field_simp
-  refine ⟨
-    z,
-    mem_gamma_of_dvd_of_mem_gamma hLvA _ hz1,
-    mem_gamma_of_dvd_of_mem_gamma hNR _ hz2,
-    fun γ => hWH _ (hcomm γ),
-    ?_,
-    (a : X.K) / X.sl (ofSL z) (a : X.K) / β ^ m,
-    ?_,
-    β,
-    hβ0,
-    ?_
-  ⟩
+  refine ⟨z, mem_gamma_of_dvd_of_mem_gamma hLvA _ hz1, mem_gamma_of_dvd_of_mem_gamma hNR _ hz2, fun γ => hWH _ (hcomm γ), ?_,
+    (a : X.K) / X.sl (ofSL z) (a : X.K) / β ^ m, ?_, β, hβ0, ?_⟩
   · intro γ
     rw [hmul, hmul]
     exact hcz γ _ hfixW

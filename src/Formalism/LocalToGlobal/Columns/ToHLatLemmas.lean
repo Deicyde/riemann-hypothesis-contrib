@@ -1,15 +1,60 @@
 module
 
-public import Mathlib
 public import Formalism.LocalToGlobal.Columns.ToHLat
+public import Formalism.LocalToGlobal.GlobalTheory.HLatOps
+public import Formalism.LocalToGlobal.Columns.CoefficientsModP
+public import Formalism.LocalToGlobal.Columns.HeckeSpCount
+public import Formalism.LocalToGlobal.Columns.RowFormsGood
+public import Formalism.LocalToGlobal.Divisibility.ClassSumLemmas
 public import Formalism.LocalToGlobal.Divisibility.FramesLemmas
 public import Formalism.LocalToGlobal.Divisibility.ProjLemmas
 public import Formalism.LocalToGlobal.GlobalTheory.HLatOpsP
-public import Formalism.QuotientMetricDivisors.HermitianTwistDivisors.ClassSumDualGeOfFamily
-public import Formalism.LocalToGlobal.Columns.AtTRank
-public import Formalism.LocalToGlobal.Columns.RowFormsGood
-public import Formalism.LocalToGlobal.Columns.ColFormsLemmas
-public import Formalism.LocalToGlobal.Columns.BaseInst
+import Formalism.QuotientMetricDivisors.HermitianTwistDivisors.ClassSumDualGeOfFamily
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
 
 @[expose] public section
 
@@ -20,30 +65,26 @@ noncomputable section
 
 namespace Formalism.L2.Col
 
-open Formalism.BasicNotions Formalism.DivisionValues Formalism.L2.DIV
-  Formalism.L2.GlobalTheoryTheory.HLatOps Formalism.HermitianLatticesTheory
+open Formalism.BasicNotions Formalism.DivisionValues Formalism.L2.DIV Formalism.L2.GlobalTheoryTheory.HLatOps Formalism.HermitianLatticesTheory
 
 section Coord
 
 variable {K : Type} [Field K] [NumberField K] {V : Type} [AddCommGroup V] [Module K V] {n : ℕ}
 
-theorem thl_fcoord_coord
-    (b : Basis (Fin n) K V) (X : InfinitePlace K → Matrix (Fin n) (Fin n) ℂ) (v : InfinitePlace K)
-    (x : V)
-    : fcoord b X v x = fcoord (Pi.basisFun K (Fin n)) X v (b.equivFun x) := by
+theorem thl_fcoord_coord (b : Basis (Fin n) K V) (X : InfinitePlace K → Matrix (Fin n) (Fin n) ℂ)
+    (v : InfinitePlace K) (x : V) :
+    fcoord b X v x = fcoord (Pi.basisFun K (Fin n)) X v (b.equivFun x) := by
   simp only [Formalism.HermitianLatticesTheory.fcoord]
   congr 1
 
-theorem thl_majAt_coord
-    (b : Basis (Fin n) K V) (X : InfinitePlace K → Matrix (Fin n) (Fin n) ℂ) (v : InfinitePlace K)
-    (x y : V)
-    : majAt b X v x y = majAt (Pi.basisFun K (Fin n)) X v (b.equivFun x) (b.equivFun y) := by
+theorem thl_majAt_coord (b : Basis (Fin n) K V) (X : InfinitePlace K → Matrix (Fin n) (Fin n) ℂ)
+    (v : InfinitePlace K) (x y : V) :
+    majAt b X v x y = majAt (Pi.basisFun K (Fin n)) X v (b.equivFun x) (b.equivFun y) := by
   simp only [majAt, thl_fcoord_coord b X v]
 
-theorem thl_normAt_coord
-    (b : Basis (Fin n) K V) (X : InfinitePlace K → Matrix (Fin n) (Fin n) ℂ) (v : InfinitePlace K)
-    (x : V)
-    : normAt b X v x = normAt (Pi.basisFun K (Fin n)) X v (b.equivFun x) := by
+theorem thl_normAt_coord (b : Basis (Fin n) K V) (X : InfinitePlace K → Matrix (Fin n) (Fin n) ℂ)
+    (v : InfinitePlace K) (x : V) :
+    normAt b X v x = normAt (Pi.basisFun K (Fin n)) X v (b.equivFun x) := by
   simp only [normAt, thl_fcoord_coord b X v]
 
 end Coord
@@ -56,73 +97,61 @@ theorem hB_equivFun (h : S.Ok) (φ : S.EqFun) : (S.hB h).equivFun φ = S.hCoord 
   ext i
   rfl
 
-theorem hB_apply (h : S.Ok) (i : Fin (S.hDim h)) : S.res h (S.hB h i) = (S.toCSD h).basis i := by
+theorem hB_apply (h : S.Ok) (i : Fin (S.hDim h)) :
+    S.res h (S.hB h i) = (S.toCSD h).basis i := by
   simp only [hB, Basis.map_apply, LinearEquiv.apply_symm_apply]
 
-theorem subB_equivFun (h : S.Ok) (U : Submodule K S.EqFun) (x : U)
-    : (S.subMat h U).mulVec ((S.subB h U).equivFun x) = S.hCoord h (x : S.EqFun) := by
+theorem subB_equivFun (h : S.Ok) (U : Submodule K S.EqFun) (x : U) :
+    (S.subMat h U).mulVec ((S.subB h U).equivFun x) = S.hCoord h (x : S.EqFun) := by
   have hx : (S.subB h U).equivFun x = (subBasis (S.subZ h U)).equivFun (S.subEq h U x) := by
     ext i
     rfl
   rw [subMat, subE_mulVec, hx, LinearEquiv.symm_apply_apply]
   rfl
 
-theorem subMat_injective (h : S.Ok) (U : Submodule K S.EqFun)
-    : Function.Injective (S.subMat h U).mulVec := by
+theorem subMat_injective (h : S.Ok) (U : Submodule K S.EqFun) : Function.Injective (S.subMat h U).mulVec := by
   intro x y hxy
   rw [subMat, subE_mulVec, subE_mulVec] at hxy
   exact (subBasis (S.subZ h U)).equivFun.symm.injective (Subtype.ext hxy)
 
 variable {S}
 
-theorem PosH.frameOK {h : S.Ok} (hp : S.PosH h) (L : Submodule (𝓞 K) S.EqFun)
-    : FrameOK (S.toH h L) := by
+theorem PosH.frameOK {h : S.Ok} (hp : S.PosH h) (L : Submodule (𝓞 K) S.EqFun) : FrameOK (S.toH h L) := by
   exact fun v => (Formalism.L2.DIV.stdFrameHermAt K v _ (S.hGram h) hp).1 v
 
-theorem PosH.met {h : S.Ok} (hp : S.PosH h) (v : InfinitePlace K)
-    : metOf (stdFrame (S.hGram h) v) = (S.hGram h).map v.embedding := by
+theorem PosH.met {h : S.Ok} (hp : S.PosH h) (v : InfinitePlace K) :
+    metOf (stdFrame (S.hGram h) v) = (S.hGram h).map v.embedding := by
   exact (Formalism.L2.DIV.stdFrameHermAt K v _ (S.hGram h) hp).2
 
-theorem PosH.frameOK_sub
-    {h : S.Ok} (hp : S.PosH h) (U : Submodule K S.EqFun) (L : Submodule (𝓞 K) U)
-    : FrameOK (S.subH h U L) := by
-  exact fun v =>
-    (Formalism.L2.DIV.restrFrameSpec K _ _ (S.hGram h) hp (S.subMat h U) (S.subMat_injective h U)
-      v).1
+theorem PosH.frameOK_sub {h : S.Ok} (hp : S.PosH h) (U : Submodule K S.EqFun) (L : Submodule (𝓞 K) U) :
+    FrameOK (S.subH h U L) := by
+  exact fun v => (Formalism.L2.DIV.restrFrameSpec K _ _ (S.hGram h) hp (S.subMat h U) (S.subMat_injective h U) v).1
 
-theorem PosH.sub_maj
-    {h : S.Ok} (hp : S.PosH h) (U : Submodule K S.EqFun) (v : InfinitePlace K) (x y : U)
-    : majAt (S.subB h U) (restrFrame (S.subMat h U) (S.hGram h)) v x y
-      = majAt (S.hB h) (stdFrame (S.hGram h)) v (x : S.EqFun) (y : S.EqFun) := by
+theorem PosH.sub_maj {h : S.Ok} (hp : S.PosH h) (U : Submodule K S.EqFun) (v : InfinitePlace K) (x y : U) :
+    majAt (S.subB h U) (restrFrame (S.subMat h U) (S.hGram h)) v x y =
+      majAt (S.hB h) (stdFrame (S.hGram h)) v (x : S.EqFun) (y : S.EqFun) := by
   rw [thl_majAt_coord (S.subB h U), thl_majAt_coord (S.hB h),
-    (Formalism.L2.DIV.restrFrameSpec K _ _ (S.hGram h) hp (S.subMat h U) (S.subMat_injective h U)
-      v).2.2,
+    (Formalism.L2.DIV.restrFrameSpec K _ _ (S.hGram h) hp (S.subMat h U) (S.subMat_injective h U) v).2.2,
     S.subB_equivFun h U, S.subB_equivFun h U, S.hB_equivFun h, S.hB_equivFun h]
 
-theorem PosH.sub_norm
-    {h : S.Ok} (hp : S.PosH h) (U : Submodule K S.EqFun) (v : InfinitePlace K) (x : U)
-    : normAt (S.subB h U) (restrFrame (S.subMat h U) (S.hGram h)) v x
-      = normAt (S.hB h) (stdFrame (S.hGram h)) v (x : S.EqFun) := by
+theorem PosH.sub_norm {h : S.Ok} (hp : S.PosH h) (U : Submodule K S.EqFun) (v : InfinitePlace K) (x : U) :
+    normAt (S.subB h U) (restrFrame (S.subMat h U) (S.hGram h)) v x =
+      normAt (S.hB h) (stdFrame (S.hGram h)) v (x : S.EqFun) := by
   have hm := hp.sub_maj U v x x
   simp only [Formalism.HermitianLatticesTheory.majAt] at hm
   simp only [Formalism.HermitianLatticesTheory.normAt, Formalism.HermitianLatticesTheory.cnorm]
   congr 1
-  have key
-      : ∀ {ι : Type} [Fintype ι] (u : ι → ℂ),
-        ((∑ i, ‖u i‖ ^ 2 : ℝ) : ℂ) = ∑ i, star (u i) * u i := by
+  have key : ∀ {ι : Type} [Fintype ι] (u : ι → ℂ), ((∑ i, ‖u i‖ ^ 2 : ℝ) : ℂ) = ∑ i, star (u i) * u i := by
     intro ι _ u
     push_cast
     refine Finset.sum_congr rfl fun i _ => ?_
     rw [Complex.star_def, Complex.conj_mul']
-  exact Complex.ofReal_injective ((key (Formalism.HermitianLatticesTheory.fcoord (S.subB h U)
-      (restrFrame (S.subMat h U) (S.hGram h)) v x)).trans
-    (hm.trans (key (Formalism.HermitianLatticesTheory.fcoord (S.hB h) (stdFrame (S.hGram h)) v
-      (x : S.EqFun))).symm))
+  exact Complex.ofReal_injective ((key (Formalism.HermitianLatticesTheory.fcoord (S.subB h U) (restrFrame (S.subMat h U) (S.hGram h)) v x)).trans
+    (hm.trans (key (Formalism.HermitianLatticesTheory.fcoord (S.hB h) (stdFrame (S.hGram h)) v (x : S.EqFun))).symm))
 
 variable (S)
 
-def isoHc (h : S.Ok) (L : Submodule (𝓞 K) S.EqFun)
-    : Formalism.L2.GlobalTheoryTheory.HLatOps.Iso (S.toH h L) (S.toHc h L) where
+def isoHc (h : S.Ok) (L : Submodule (𝓞 K) S.EqFun) : Formalism.L2.GlobalTheoryTheory.HLatOps.Iso (S.toH h L) (S.toHc h L) where
   e := S.hCoord h
   map_L := rfl
   norm := fun v x => by
@@ -130,42 +159,40 @@ def isoHc (h : S.Ok) (L : Submodule (𝓞 K) S.EqFun)
       normAt (S.hB h) (stdFrame (S.hGram h)) v x
     rw [thl_normAt_coord (S.hB h), hB_equivFun]
 
-theorem isLattice_of_map
-    (h : S.Ok) (L : Submodule (𝓞 K) S.EqFun)
-    (hL : Submodule.IsLattice K (L.map ((S.hCoord h).toLinearMap.restrictScalars (𝓞 K))))
-    : Submodule.IsLattice K L := by
+theorem isLattice_of_map (h : S.Ok) (L : Submodule (𝓞 K) S.EqFun)
+    (hL : Submodule.IsLattice K (L.map ((S.hCoord h).toLinearMap.restrictScalars (𝓞 K)))) :
+    Submodule.IsLattice K L := by
   exact Submodule.IsLattice.of_fg K
     (Submodule.fg_of_fg_map_injective ((S.hCoord h).toLinearMap.restrictScalars (𝓞 K))
       (S.hCoord h).injective hL.fg)
 
-theorem intDel_isLattice (h : S.Ok) (hD : ∀ d, Submodule.IsLattice K (S.Del d))
-    : Submodule.IsLattice K S.intDel := by
+theorem intDel_isLattice (h : S.Ok) (hD : ∀ d, Submodule.IsLattice K (S.Del d)) :
+    Submodule.IsLattice K S.intDel := by
   apply S.isLattice_of_map h
   rw [show S.intDel.map ((S.hCoord h).toLinearMap.restrictScalars (𝓞 K)) = (S.toCSD h).delLat from
     S.map_intDel h S.outSec]
   let _ : Fintype S.Cl := h.fintypeCl
   exact ValuationLatticeField.valLatF_isLattice _ (S.toCSD h).I_injective _ fun c => hD _
 
-theorem intNab_isLattice (h : S.Ok) (hD : ∀ d, Submodule.IsLattice K (S.Nab d))
-    : Submodule.IsLattice K S.intNab := by
+theorem intNab_isLattice (h : S.Ok) (hD : ∀ d, Submodule.IsLattice K (S.Nab d)) :
+    Submodule.IsLattice K S.intNab := by
   apply S.isLattice_of_map h
   rw [show S.intNab.map ((S.hCoord h).toLinearMap.restrictScalars (𝓞 K)) = (S.toCSD h).nabLat from
     S.map_intNab h S.outSec]
   let _ : Fintype S.Cl := h.fintypeCl
   exact ValuationLatticeField.valLatF_isLattice _ (S.toCSD h).I_injective _ fun c => hD _
 
-theorem intNab_isFullLattice (h : S.Ok) (hD : ∀ d, Submodule.IsFullLattice K (S.Nab d))
-    : Submodule.IsFullLattice K S.intNab := by
+theorem intNab_isFullLattice (h : S.Ok) (hD : ∀ d, Submodule.IsFullLattice K (S.Nab d)) :
+    Submodule.IsFullLattice K S.intNab := by
   classical
   letI : Fintype S.Cl := h.fintypeCl
   letI := S.intNab_isLattice h (fun d => (hD d).toIsLattice)
   refine { span_eq_top := top_unique ?_ }
   intro φ _
-  have hex (c : S.Cl)
-      : ∃ a : 𝓞 K, a ≠ 0 ∧ a • (φ : S.D → S.V) (S.outSec.rep c) ∈ S.Nab (S.outSec.rep c) := by
-    have hs
-        : (φ : S.D → S.V) (S.outSec.rep c)
-          ∈ Submodule.span K (S.Nab (S.outSec.rep c) : Set S.V) := by
+  have hex (c : S.Cl) : ∃ a : 𝓞 K, a ≠ 0 ∧
+      a • (φ : S.D → S.V) (S.outSec.rep c) ∈ S.Nab (S.outSec.rep c) := by
+    have hs : (φ : S.D → S.V) (S.outSec.rep c) ∈
+        Submodule.span K (S.Nab (S.outSec.rep c) : Set S.V) := by
       rw [(hD (S.outSec.rep c)).span_eq_top]
       exact Submodule.mem_top
     obtain ⟨a, ha⟩ := multiple_mem_span_of_mem_localization_span (nonZeroDivisors (𝓞 K)) K _ _ hs
@@ -185,19 +212,14 @@ theorem intNab_isFullLattice (h : S.Ok) (hD : ∀ d, Submodule.IsFullLattice K (
 
 variable {S}
 
-theorem PosH.good
-    {h : S.Ok} (hp : S.PosH h) {L : Submodule (𝓞 K) S.EqFun} (hL : Submodule.IsFullLattice K L)
-    : (S.toH h L).Good :=
-  ⟨hp.frameOK L, hL.fg, hL.span_eq_top⟩
+theorem PosH.good {h : S.Ok} (hp : S.PosH h) {L : Submodule (𝓞 K) S.EqFun} (hL : Submodule.IsFullLattice K L) :
+    (S.toH h L).Good := ⟨hp.frameOK L, hL.fg, hL.span_eq_top⟩
 
 end GSD
 
-theorem thl_posDef_sum
-    {ι κ γ : Type} [Fintype ι] [Fintype κ] [Fintype γ]
-    (a : γ → ℂ) (ha : ∀ c, 0 < a c)
-    (G : Matrix κ κ ℂ) (hG : G.PosDef)
-    (P : γ → Matrix κ ι ℂ) (hinj : ∀ x, (∀ c, P c *ᵥ x = 0) → x = 0)
-    : (∑ c, a c • ((P c)ᴴ * G * P c)).PosDef := by
+theorem thl_posDef_sum {ι κ γ : Type} [Fintype ι] [Fintype κ] [Fintype γ] (a : γ → ℂ) (ha : ∀ c, 0 < a c)
+    (G : Matrix κ κ ℂ) (hG : G.PosDef) (P : γ → Matrix κ ι ℂ) (hinj : ∀ x, (∀ c, P c *ᵥ x = 0) → x = 0) :
+    (∑ c, a c • ((P c)ᴴ * G * P c)).PosDef := by
   have hs : ∀ c, (a c • ((P c)ᴴ * G * P c)).PosSemidef := fun c =>
     (hG.posSemidef.conjTranspose_mul_mul_same (P c)).smul (ha c).le
   have hS := Matrix.posSemidef_sum (s := Finset.univ) (fun c _ => hs c)
@@ -209,17 +231,15 @@ theorem thl_posDef_sum
     exact hx (hinj x hcon)
   refine Finset.sum_pos' (fun c _ => (hs c).dotProduct_mulVec_nonneg x) ⟨c, Finset.mem_univ c, ?_⟩
   have h1 := hG.dotProduct_mulVec_pos hc
-  have h2
-      : star x ⬝ᵥ ((a c • ((P c)ᴴ * G * P c)) *ᵥ x)
-        = a c * (star (P c *ᵥ x) ⬝ᵥ (G *ᵥ (P c *ᵥ x))) := by
+  have h2 : star x ⬝ᵥ ((a c • ((P c)ᴴ * G * P c)) *ᵥ x) = a c * (star (P c *ᵥ x) ⬝ᵥ (G *ᵥ (P c *ᵥ x))) := by
     rw [Matrix.smul_mulVec, dotProduct_smul, smul_eq_mul]
     congr 1
     simp only [Matrix.star_mulVec, Matrix.dotProduct_mulVec, Matrix.vecMul_vecMul]
   rw [h2]
   exact mul_pos (ha c) h1
 
-theorem csd_hasRatBasis {K : Type} [Field K] [NumberField K] [StarRing K] (S : CSD K) (R : S.Rat)
-    : S.HasRatBasis := by
+theorem csd_hasRatBasis {K : Type} [Field K] [NumberField K] [StarRing K] (S : CSD K) (R : S.Rat) :
+    S.HasRatBasis := by
   classical
   let A : ∀ c, Module.End K S.V := fun c => (S.wt c : K)⁻¹ • ∑ γ : S.Gam c, S.ρ c γ
   let P : (S.Cl → S.V) →ₗ[K] (S.Cl → S.V) := LinearMap.pi fun c => (A c) ∘ₗ LinearMap.proj c
@@ -229,16 +249,16 @@ theorem csd_hasRatBasis {K : Type} [Field K] [NumberField K] [StarRing K] (S : C
   have hwt : ∀ c, (S.wt c : K) ≠ 0 := fun c => by exact_mod_cast (S.wt_pos c).ne'
   have hmem : ∀ f, P f ∈ S.Forms := by
     intro f c γ'
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hPc, map_smul, map_sum]
+
+    rw [hPc, map_smul, map_sum]
     congr 1
     refine Fintype.sum_equiv (Equiv.mulLeft γ') _ _ fun γ => ?_
     rw [Equiv.coe_mulLeft, map_mul, Module.End.mul_apply]
   have hfix : ∀ f ∈ S.Forms, P f = f := by
     intro f hf
     funext c
-    rw [hPc, Finset.sum_congr rfl fun γ _ => hf c γ, Finset.sum_const, Finset.card_univ,
-      ← Nat.cast_smul_eq_nsmul K, smul_smul]
+    rw [hPc, Finset.sum_congr rfl fun γ _ => hf c γ, Finset.sum_const, Finset.card_univ, ← Nat.cast_smul_eq_nsmul K,
+      smul_smul]
     change ((S.wt c : K)⁻¹ * (S.wt c : K)) • f c = f c
     rw [inv_mul_cancel₀ (hwt c), one_smul]
   let B : Basis (Σ _ : S.Cl, S.ιV) K (S.Cl → S.V) := Pi.basis fun _ => S.bV
@@ -255,9 +275,9 @@ theorem csd_hasRatBasis {K : Type} [Field K] [NumberField K] [StarRing K] (S : C
     rw [hPc, Pi.basis_apply]
     by_cases hcc : c' = c
     · subst hcc
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [Pi.single_eq_same, map_smul, map_sum, Finsupp.smul_apply, Finsupp.coe_finsetSum,
-          Finset.sum_apply, smul_eq_mul]
+
+      simp only [Pi.single_eq_same, map_smul, map_sum, Finsupp.smul_apply, Finsupp.coe_finsetSum, Finset.sum_apply,
+      smul_eq_mul]
       exact mul_mem (inv_mem (natCast_mem _ _)) (sum_mem fun γ _ => R.act_rat c' γ i j)
     · simp [Pi.single_eq_of_ne hcc]
   obtain ⟨b, hbT, hsp, hli⟩ := exists_linearIndependent K (P '' Set.range B)
@@ -268,8 +288,8 @@ theorem csd_hasRatBasis {K : Type} [Field K] [NumberField K] [StarRing K] (S : C
   have := Fintype.ofFinite b
   have hcard : Fintype.card b = S.dim := (finrank_eq_card_basis B1).symm
   refine ⟨B1.reindex (Fintype.equivFinOfCardEq hcard), fun j => ?_⟩
-  have : ((B1.reindex (Fintype.equivFinOfCardEq hcard)) j : S.Cl → S.V)
-      = (((Fintype.equivFinOfCardEq hcard).symm j : b) : S.Cl → S.V) := by
+  have : ((B1.reindex (Fintype.equivFinOfCardEq hcard)) j : S.Cl → S.V) =
+      (((Fintype.equivFinOfCardEq hcard).symm j : b) : S.Cl → S.V) := by
     simp [B1, Basis.span_apply]
   rw [this]
   exact hrat _ (hbT ((Fintype.equivFinOfCardEq hcard).symm j).2)
@@ -278,22 +298,22 @@ namespace GSD
 
 variable {K : Type} [Field K] [NumberField K] [StarRing K] (S : GSD K)
 
-theorem pairAt_add_left (v : InfinitePlace K) (x x' y : S.V)
-    : S.pairAt v (x + x') y = S.pairAt v x y + S.pairAt v x' y := by
+theorem pairAt_add_left (v : InfinitePlace K) (x x' y : S.V) :
+    S.pairAt v (x + x') y = S.pairAt v x y + S.pairAt v x' y := by
   simp only [pairAt, map_add (f := _), Finsupp.add_apply, add_mul, Finset.sum_add_distrib]
 
-theorem pairAt_add_right (v : InfinitePlace K) (x y y' : S.V)
-    : S.pairAt v x (y + y') = S.pairAt v x y + S.pairAt v x y' := by
+theorem pairAt_add_right (v : InfinitePlace K) (x y y' : S.V) :
+    S.pairAt v x (y + y') = S.pairAt v x y + S.pairAt v x y' := by
   simp only [pairAt, map_add (f := _), Finsupp.add_apply, mul_add, Finset.sum_add_distrib]
 
-theorem pairAt_smul_left (v : InfinitePlace K) (a : K) (x y : S.V)
-    : S.pairAt v (a • x) y = starRingEnd ℂ (v.embedding a) * S.pairAt v x y := by
+theorem pairAt_smul_left (v : InfinitePlace K) (a : K) (x y : S.V) :
+    S.pairAt v (a • x) y = starRingEnd ℂ (v.embedding a) * S.pairAt v x y := by
   simp only [pairAt, map_smul, Finsupp.smul_apply, smul_eq_mul, map_mul, Finset.mul_sum]
   refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
   ring
 
-theorem pairAt_smul_right (v : InfinitePlace K) (a : K) (x y : S.V)
-    : S.pairAt v x (a • y) = v.embedding a * S.pairAt v x y := by
+theorem pairAt_smul_right (v : InfinitePlace K) (a : K) (x y : S.V) :
+    S.pairAt v x (a • y) = v.embedding a * S.pairAt v x y := by
   simp only [pairAt, map_smul, Finsupp.smul_apply, smul_eq_mul, map_mul, Finset.mul_sum]
   refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
   ring
@@ -301,10 +321,8 @@ theorem pairAt_smul_right (v : InfinitePlace K) (a : K) (x y : S.V)
 theorem isSesq_ipAt (h : S.Ok) : IsSesq (fun v (φ ψ : S.EqFun) => S.ipAt h v φ ψ) := by
   intro v
   refine ⟨fun x x' y => ?_, fun x y y' => ?_, fun a x y => ?_, fun a x y => ?_⟩
-  · simp only [ipAt, Submodule.coe_add, Pi.add_apply, pairAt_add_left, mul_add,
-      Finset.sum_add_distrib]
-  · simp only [ipAt, Submodule.coe_add, Pi.add_apply, pairAt_add_right, mul_add,
-      Finset.sum_add_distrib]
+  · simp only [ipAt, Submodule.coe_add, Pi.add_apply, pairAt_add_left, mul_add, Finset.sum_add_distrib]
+  · simp only [ipAt, Submodule.coe_add, Pi.add_apply, pairAt_add_right, mul_add, Finset.sum_add_distrib]
   · simp only [ipAt, Submodule.coe_smul, Pi.smul_apply, pairAt_smul_left, Finset.mul_sum]
     refine Finset.sum_congr rfl fun c _ => ?_
     ring
@@ -312,68 +330,53 @@ theorem isSesq_ipAt (h : S.Ok) : IsSesq (fun v (φ ψ : S.EqFun) => S.ipAt h v �
     refine Finset.sum_congr rfl fun c _ => ?_
     ring
 
-theorem pairAt_of_rat (v : InfinitePlace K) (x y : S.V) (hx : ∀ i, S.bV.repr x i ∈ cmMax K)
-    : v.embedding (S.pair x y) = S.pairAt v x y := by
+theorem pairAt_of_rat (v : InfinitePlace K) (x y : S.V) (hx : ∀ i, S.bV.repr x i ∈ cmMax K) :
+    v.embedding (S.pair x y) = S.pairAt v x y := by
   conv_lhs => rw [← S.bV.sum_repr x, ← S.bV.sum_repr y]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, LinearMap.sum_apply, LinearMap.map_smulₛₗ, LinearMap.smul_apply,
-      smul_eq_mul, map_mul, pairAt, Finset.mul_sum]
+
+  simp only [map_sum, LinearMap.sum_apply, LinearMap.map_smulₛₗ, LinearMap.smul_apply, smul_eq_mul, map_mul, pairAt,
+  Finset.mul_sum]
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
-  have h1
-      : v.embedding ((starRingEnd K) (S.bV.repr x i))
-        = starRingEnd ℂ (v.embedding (S.bV.repr x i)) :=
+  have h1 : v.embedding ((starRingEnd K) (S.bV.repr x i)) = starRingEnd ℂ (v.embedding (S.bV.repr x i)) :=
     hx i v.embedding
   rw [h1, RingHom.id_apply]
   simp only [gramV, Matrix.of_apply]
   ring
 
-def evRep (h : S.Ok) : S.EqFun →ₗ[K] (S.Cl → S.V) :=
-  (S.toCSD h).Forms.subtype ∘ₗ (S.res h).toLinearMap
+def evRep (h : S.Ok) : S.EqFun →ₗ[K] (S.Cl → S.V) := (S.toCSD h).Forms.subtype ∘ₗ (S.res h).toLinearMap
 
-theorem evRep_apply (h : S.Ok) (φ : S.EqFun) (c : S.Cl)
-    : S.evRep h φ c = (φ : S.D → S.V) (S.outSec.rep c) :=
-  rfl
+theorem evRep_apply (h : S.Ok) (φ : S.EqFun) (c : S.Cl) : S.evRep h φ c = (φ : S.D → S.V) (S.outSec.rep c) := rfl
 
 theorem evRep_injective (h : S.Ok) : Function.Injective (S.evRep h) :=
   (Submodule.injective_subtype _).comp (S.res h).injective
 
-theorem posAt_ipAt
-    (h : S.Ok) (hpos : ∀ v : InfinitePlace K, (S.gramV.map v.embedding).PosDef)
-    {ι : Type} [Fintype ι] [DecidableEq ι]
-    (b : Basis ι K S.EqFun)
-    : PosAt b (fun v (φ ψ : S.EqFun) => S.ipAt h v φ ψ) := by
+theorem posAt_ipAt (h : S.Ok) (hpos : ∀ v : InfinitePlace K, (S.gramV.map v.embedding).PosDef)
+    {ι : Type} [Fintype ι] [DecidableEq ι] (b : Basis ι K S.EqFun) :
+    PosAt b (fun v (φ ψ : S.EqFun) => S.ipAt h v φ ψ) := by
   classical
   intro v
   let _ : Fintype S.Cl := h.fintypeCl
-  let P : S.Cl → Matrix S.ιV ι ℂ := fun c =>
-    Matrix.of fun i a => v.embedding (S.bV.repr (S.evRep h (b a) c) i)
-  have hgram
-      : gramOf b (fun (φ ψ : S.EqFun) => S.ipAt h v φ ψ)
-        = ∑ c, (((S.toCSD h).wt c : ℕ) : ℂ)⁻¹ • ((P c)ᴴ * S.gramV.map v.embedding * P c) := by
+  let P : S.Cl → Matrix S.ιV ι ℂ := fun c => Matrix.of fun i a => v.embedding (S.bV.repr (S.evRep h (b a) c) i)
+  have hgram : gramOf b (fun (φ ψ : S.EqFun) => S.ipAt h v φ ψ) =
+      ∑ c, (((S.toCSD h).wt c : ℕ) : ℂ)⁻¹ • ((P c)ᴴ * S.gramV.map v.embedding * P c) := by
     ext a a'
     simp only [gramOf, Matrix.of_apply, ipAt, Matrix.sum_apply, Matrix.smul_apply, smul_eq_mul]
     refine Finset.sum_congr rfl fun c _ => ?_
     congr 1
-    simp only [pairAt, Matrix.mul_apply, Matrix.conjTranspose_apply, Finset.sum_mul, P,
-      Matrix.of_apply, Matrix.map_apply, evRep_apply]
+    simp only [pairAt, Matrix.mul_apply, Matrix.conjTranspose_apply, Finset.sum_mul, P, Matrix.of_apply,
+      Matrix.map_apply, evRep_apply]
     rw [Finset.sum_comm]
     rfl
   rw [hgram]
   refine thl_posDef_sum _ (fun c => ?_) _ (hpos v) P fun x hx => ?_
-  · have : (0 : ℝ) < (((S.toCSD h).wt c : ℕ) : ℝ)⁻¹ :=
-      inv_pos.2 (by exact_mod_cast (S.toCSD h).wt_pos c)
-    have h2 : ((((S.toCSD h).wt c : ℕ) : ℝ)⁻¹ : ℂ) = (((S.toCSD h).wt c : ℕ) : ℂ)⁻¹ := by
-      push_cast; rfl
+  · have : (0 : ℝ) < (((S.toCSD h).wt c : ℕ) : ℝ)⁻¹ := inv_pos.2 (by exact_mod_cast (S.toCSD h).wt_pos c)
+    have h2 : ((((S.toCSD h).wt c : ℕ) : ℝ)⁻¹ : ℂ) = (((S.toCSD h).wt c : ℕ) : ℂ)⁻¹ := by push_cast; rfl
     rw [← h2]
     exact_mod_cast this
   · let Bb : Basis (Σ _ : S.Cl, S.ιV) K (S.Cl → S.V) := Pi.basis fun _ => S.bV
-    obtain ⟨g, hg⟩ :=
-      (S.evRep h).exists_leftInverse_of_injective (LinearMap.ker_eq_bot.2 (S.evRep_injective h))
-    have h1
-        : (LinearMap.toMatrix Bb b g).map v.embedding
-            * (LinearMap.toMatrix b Bb (S.evRep h)).map v.embedding
-          = 1 := by
+    obtain ⟨g, hg⟩ := (S.evRep h).exists_leftInverse_of_injective (LinearMap.ker_eq_bot.2 (S.evRep_injective h))
+    have h1 : (LinearMap.toMatrix Bb b g).map v.embedding * (LinearMap.toMatrix b Bb (S.evRep h)).map v.embedding = 1 := by
       rw [← Matrix.map_mul, ← LinearMap.toMatrix_comp, hg, LinearMap.toMatrix_id]
       simp
     have h2 : (LinearMap.toMatrix b Bb (S.evRep h)).map v.embedding *ᵥ x = 0 := by
@@ -383,18 +386,14 @@ theorem posAt_ipAt
     have h3 := congrArg ((LinearMap.toMatrix Bb b g).map v.embedding).mulVec h2
     simpa [Matrix.mulVec_mulVec, h1] using h3
 
-theorem gram_ipAt (h : S.Ok) (hr : (S.toCSD h).HasRatBasis) (v : InfinitePlace K)
-    : gramOf (S.hB h) (fun (φ ψ : S.EqFun) => S.ipAt h v φ ψ) = (S.hGram h).map v.embedding := by
+theorem gram_ipAt (h : S.Ok) (hr : (S.toCSD h).HasRatBasis) (v : InfinitePlace K) :
+    gramOf (S.hB h) (fun (φ ψ : S.EqFun) => S.ipAt h v φ ψ) = (S.hGram h).map v.embedding := by
   ext a a'
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [gramOf, Matrix.of_apply, ipAt, Matrix.map_apply, CSD.H, CSD.csum, map_sum, map_mul,
-      map_inv₀, map_natCast]
+
+  simp only [gramOf, Matrix.of_apply, ipAt, Matrix.map_apply, CSD.H, CSD.csum, map_sum, map_mul, map_inv₀, map_natCast]
   refine Finset.sum_congr rfl fun c _ => ?_
   congr 1
-  have e
-      : ∀ a,
-        ((S.hB h a : S.EqFun) : S.D → S.V) (S.outSec.rep c)
-          = ((S.toCSD h).basis a : S.Cl → S.V) c := by
+  have e : ∀ a, ((S.hB h a : S.EqFun) : S.D → S.V) (S.outSec.rep c) = ((S.toCSD h).basis a : S.Cl → S.V) c := by
     intro a
     rw [← S.hB_apply h a]
     rfl
@@ -406,8 +405,8 @@ theorem Rat.posH {S : GSD K} (R : S.Rat) (h : S.Ok) : S.PosH h := by
   rw [← S.gram_ipAt h (csd_hasRatBasis _ (S.toCSDOf_rat h R S.outSec)) v]
   exact S.posAt_ipAt h R.pos (S.hB h) v
 
-theorem Rat.maj_eq {S : GSD K} (R : S.Rat) (h : S.Ok) (v : InfinitePlace K) (φ ψ : S.EqFun)
-    : majAt (S.hB h) (stdFrame (S.hGram h)) v φ ψ = S.ipAt h v φ ψ := by
+theorem Rat.maj_eq {S : GSD K} (R : S.Rat) (h : S.Ok) (v : InfinitePlace K) (φ ψ : S.EqFun) :
+    majAt (S.hB h) (stdFrame (S.hGram h)) v φ ψ = S.ipAt h v φ ψ := by
   rw [sesq_eq_sum (isSesq_maj (S.hB h) (stdFrame (S.hGram h))) (S.hB h) v φ ψ,
     sesq_eq_sum (S.isSesq_ipAt h) (S.hB h) v φ ψ, gramOf_maj,
     S.gram_ipAt h (csd_hasRatBasis _ (S.toCSDOf_rat h R S.outSec)) v]
@@ -432,21 +431,18 @@ theorem bV_rat (i k : S.ιV) : S.bV.repr (S.bV i) k ∈ cmMax K := by
 
 variable {S}
 
-theorem Rat.pairAt_inv (R : S.Rat) (h : S.Ok) (v : InfinitePlace K) (g : S.G) (x y : S.V)
-    : S.pairAt v (S.ρ g x) (S.ρ g y) = S.pairAt v x y := by
-  rw [sesq_eq_sum (isSesq_comp S.isSesq_pairAt (S.ρ g)) S.bV v x y,
-    sesq_eq_sum S.isSesq_pairAt S.bV v x y]
+theorem Rat.pairAt_inv (R : S.Rat) (h : S.Ok) (v : InfinitePlace K) (g : S.G) (x y : S.V) :
+    S.pairAt v (S.ρ g x) (S.ρ g y) = S.pairAt v x y := by
+  rw [sesq_eq_sum (isSesq_comp S.isSesq_pairAt (S.ρ g)) S.bV v x y, sesq_eq_sum S.isSesq_pairAt S.bV v x y]
   refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
   congr 2
   simp only [gramOf, Matrix.of_apply]
-  rw [← S.pairAt_of_rat v _ _ (fun k => R.act_rat g k i), ← S.pairAt_of_rat v _ _ (S.bV_rat i),
-    h.inv]
+  rw [← S.pairAt_of_rat v _ _ (fun k => R.act_rat g k i), ← S.pairAt_of_rat v _ _ (S.bV_rat i), h.inv]
 
-theorem Rat.ipAt_indep (R : S.Rat) (h : S.Ok) (s : S.Sec) (v : InfinitePlace K) (φ ψ : S.EqFun)
-    : S.ipAt h v φ ψ
-      = letI := h.fintypeCl
-        ∑ c : S.Cl, ((Nat.card (MulAction.stabilizer S.G (s.rep c)) : ℕ) : ℂ)⁻¹ *
-          S.pairAt v ((φ : S.D → S.V) (s.rep c)) ((ψ : S.D → S.V) (s.rep c)) := by
+theorem Rat.ipAt_indep (R : S.Rat) (h : S.Ok) (s : S.Sec) (v : InfinitePlace K) (φ ψ : S.EqFun) :
+    S.ipAt h v φ ψ = letI := h.fintypeCl
+      ∑ c : S.Cl, ((Nat.card (MulAction.stabilizer S.G (s.rep c)) : ℕ) : ℂ)⁻¹ *
+        S.pairAt v ((φ : S.D → S.V) (s.rep c)) ((ψ : S.D → S.V) (s.rep c)) := by
   unfold ipAt
   refine Finset.sum_congr rfl fun c _ => ?_
   obtain ⟨g, hg⟩ := S.outSec.exists_smul s c
@@ -471,30 +467,27 @@ end ColsRat
 
 section Cols
 
-variable
-  {X : Fields} {Pr : Primes X} {R : Ranks} (W : Wts X Pr.Word R) (Ch : Chars X Pr R.m) (hX : X.Ok)
+variable {X : Fields} {Pr : Primes X} {R : Ranks} (W : Wts X Pr.Word R) (Ch : Chars X Pr R.m) (hX : X.Ok)
 
 theorem colPosH (u : Pr.Word) (j : ℕ) : (colGSD W Ch u j).PosH (colOk W Ch hX u j) :=
   (colRat W Ch hX u j).posH (colOk W Ch hX u j)
 
-theorem latH_maj (u : Pr.Word) (j : ℕ) (v : InfinitePlace X.K) (φ ψ : ColV W Ch u j)
-    : majAt (latH W Ch hX u j).b (latH W Ch hX u j).X v φ ψ
-      = (colGSD W Ch u j).ipAt (colOk W Ch hX u j) v φ ψ :=
+
+theorem latH_maj (u : Pr.Word) (j : ℕ) (v : InfinitePlace X.K) (φ ψ : ColV W Ch u j) :
+    majAt (latH W Ch hX u j).b (latH W Ch hX u j).X v φ ψ = (colGSD W Ch u j).ipAt (colOk W Ch hX u j) v φ ψ :=
   (colRat W Ch hX u j).maj_eq (colOk W Ch hX u j) v φ ψ
 
-theorem ramInclH_norm (u : Pr.Word) (v : InfinitePlace X.K) (x : (MramH W Ch hX u).V)
-    : normAt (MramH W Ch hX u).b (MramH W Ch hX u).X v x
-      = normAt (Mu0H W Ch hX u).b (Mu0H W Ch hX u).X v (ramInclH W Ch hX u x) :=
+theorem ramInclH_norm (u : Pr.Word) (v : InfinitePlace X.K) (x : (MramH W Ch hX u).V) :
+    normAt (MramH W Ch hX u).b (MramH W Ch hX u).X v x =
+      normAt (Mu0H W Ch hX u).b (Mu0H W Ch hX u).X v (ramInclH W Ch hX u x) :=
   (colPosH W Ch hX u 0).sub_norm (MramV W Ch u) v x
 
 end Cols
 
 section Rows
 
-variable
-  {X : Fields} {Pr : Primes X} {R : Ranks} (W : Wts X Pr.Word R) (Ch : Chars X Pr R.m) (hX : X.Ok)
-  (sel : HeightOneSpectrum (𝓞 X.F) → HeightOneSpectrum (𝓞 X.E))
-  {S : Set ℕ} (mu : Tup X.F X.E X.K S)
+variable {X : Fields} {Pr : Primes X} {R : Ranks} (W : Wts X Pr.Word R) (Ch : Chars X Pr R.m) (hX : X.Ok)
+  (sel : HeightOneSpectrum (𝓞 X.F) → HeightOneSpectrum (𝓞 X.E)) {S : Set ℕ} (mu : Tup X.F X.E X.K S)
 
 theorem MtildeH_good (P : LevFam X.E X.K R.r Pr.vGs) : (MtildeH W Ch hX sel mu P).Good :=
   ((mtilde_rat W Ch sel mu hX P).posH (mtildeOk W Ch sel mu hX P)).good

@@ -1,22 +1,49 @@
 module
 
-public import Development.AbelianVarietyTheory.Definitions.LatticeFrames.FrameTopAlt
-public import Mathlib
-public import Development.AbelianVarietyTheory.Definitions.LatticeFrames.PairForm
-public import Development.AbelianVarietyTheory.Definitions.LatticeFrames.TailRd
-public import Development.AbelianVarietyTheory.Definitions.LatticeFrames.NotBadPrimeBase
-public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.ValuationEqZeroOfRootOfSUnitRatio
-public import Development.AbelianVarietyTheory.Definitions.LatticeFrames.ChainParSucc
 public import Development.AbelianVarietyTheory.PublishedTheorems.AutomorphicForms₂.ExistsNormLeHeightPow
-public import Development.AbelianVarietyTheory.PublishedTheorems.TwistedTraceFormula.AdmissibleDiscreteSeriesOfHasParam
-public import Development.AbelianVarietyTheory.PublishedTheorems.TwistedTraceFormula.HarishChandraModulesOn
-public import Development.AbelianVarietyTheory.PublishedTheorems.AutomorphicForms₂.HasDRepIffHasDerivAt
-public import Development.AbelianVarietyTheory.PublishedTheorems.AutomorphicForms₂.WeilRepresentationUnitaryPair
-public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.ChainCompositeLiftIntertwinesFiniteGroupActions
-public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.ActEqTranslate
+public import Formalism.LocalToGlobal.IndefiniteReal.LinksChar
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.HcFiniteAndSchurMult
-public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.CuspFormsRapidDecayStatement
-public import Formalism.LocalToGlobal.Divisibility.ProjLemmas
+public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.ActEqTranslate
+public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.ChainCompositeLiftIntertwinesFiniteGroupActions
+import Formalism.LocalToGlobal.Divisibility.ProjLemmas
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
+import Development.AbelianVarietyTheory.Definitions.LatticeFrames.MiStarOfMid
+import Development.AbelianVarietyTheory.Definitions.LatticeFrames.PairForm
+import Development.AbelianVarietyTheory.Definitions.LatticeFrames.UnitRatio
 
 @[expose] public section
 
@@ -60,8 +87,8 @@ theorem good_fix
           = ∑ g, a.coeff g • B.r g (B.S.basis.equivFun.symm x) := by
     intro a x
     apply B.S.basis.equivFun.injective
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [LinearEquiv.apply_symm_apply, map_sum]
+
+    rw [LinearEquiv.apply_symm_apply, map_sum]
     simp only [CSD.gaMat, Matrix.sum_mulVec, Matrix.smul_mulVec, map_smul, CSD.actMat]
     refine Finset.sum_congr rfl fun g _ => ?_
     congr 1
@@ -79,7 +106,6 @@ namespace GlobalTheory.GoodFix
 
 open Formalism.L2.DIV Formalism.IndefR.Links Formalism.IndefR.Lev
 
-set_option maxHeartbeats 1000000 in
 theorem thDn_act
     (hCR : GlobalTheory.Published.CuspRapidDecay)
     {D : D7} {G : Type} [Group G] [Fintype G]
@@ -114,7 +140,6 @@ namespace GlobalTheory.GoodFix
 
 open Formalism.L2.DIV Formalism.IndefR.Links Formalism.IndefR.Lev
 
-set_option maxHeartbeats 1000000 in
 theorem goodProjector_fixes_compositeThetaLift_of_fixed
     (hCR : GlobalTheory.Published.CuspRapidDecay)
     {D : D7} {G : Type} [Group G] [Fintype G]
@@ -131,8 +156,8 @@ theorem goodProjector_fixes_compositeThetaLift_of_fixed
       : R.thDn t (R.jX t x) (PiTensorProduct.tprod ℂ v)
         = R.e0 (R.thDn t (R.jX t x) (PiTensorProduct.tprod ℂ v)) := by
     conv_lhs => rw [← hx]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, LinearMap.map_smulₛₗ, LinearMap.sum_apply, LinearMap.smul_apply]
+
+    simp only [map_sum, LinearMap.map_smulₛₗ, LinearMap.sum_apply, LinearMap.smul_apply]
     simp only [RealDat.e0, gaL, LinearMap.sum_apply, LinearMap.smul_apply]
     refine Finset.sum_congr rfl fun g _ => ?_
     exact congrArg

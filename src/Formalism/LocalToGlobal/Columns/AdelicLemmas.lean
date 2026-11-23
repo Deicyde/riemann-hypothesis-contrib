@@ -1,7 +1,59 @@
 module
 
-public import Formalism.LocalToGlobal.Columns.Adelic
 public import Formalism.LocalToGlobal.Columns.Inputs
+import Formalism.LocalToGlobal.Columns.DecoFin
+import Formalism.SatakeDualWeyl.AdelicIwasawaHecke.AdelstabL
+import Formalism.SatakeDualWeyl.AdelicIwasawaHecke.Bridge
+import Formalism.SatakeDualWeyl.AdelicIwasawaHecke.CsApprox
+public import Formalism.SatakeDualWeyl.AdelicIwasawaHecke.CsDual
+import Formalism.SatakeDualWeyl.AdelicIwasawaHecke.CsGlob
+import Formalism.SatakeDualWeyl.AdelicIwasawaHecke.CsScale
+public import Formalism.SatakeDualWeyl.AdelicIwasawaHecke.CsSpan
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
@@ -145,8 +197,8 @@ theorem redA_sum
           = resS F P (y j * ⟨_, hu j⟩) := by
     intro j
     rw [mul_left_comm (Ideal.Quotient.mk P.asIdeal s), redA_spec P hs (hu j), map_mul]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [Finset.mul_sum, Finset.sum_congr rfl fun j _ => e1 j, ← map_sum]
+
+  rw [Finset.mul_sum, Finset.sum_congr rfl fun j _ => e1 j, ← map_sum]
   congr 1
   apply Subtype.ext
   simp only [AddSubmonoidClass.coe_finsetSum, MulMemClass.coe_mul, Subtype.coe_mk]
@@ -1537,8 +1589,8 @@ theorem lin_factor
   refine ⟨Matrix.of fun i j => ψ (u j) i, fun v hv => ?_⟩
   let g : Fin n → N := fun j => ⟨r (φ v j) • u j, N.smul_mem _ (hu j)⟩
   have hgφ : Φ (∑ j, g j) = φ v := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     have e : ∀ j, Φ (g j) = φ v j • Pi.single j (1 : κ) := fun j => by
       show φ (r (φ v j) • u j) = _
       rw [hφs _ _ (hu j), hu' j, hr]
@@ -1546,8 +1598,8 @@ theorem lin_factor
     ext i
     simp [Finset.sum_apply, Pi.single_apply]
   have hgψ : Ψ (∑ j, g j) = Matrix.of (fun i j => ψ (u j) i) *ᵥ φ v := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     have e : ∀ j, Ψ (g j) = φ v j • ψ (u j) := fun j => by
       show ψ (r (φ v j) • u j) = _
       rw [hψs _ _ (hu j), hr]

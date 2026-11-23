@@ -1,11 +1,47 @@
 module
 
-public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentations.HeckeGaloisCriteria.RhoBar
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.JointConditionOfEigenCentralSeries
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsTypeLocus
+public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.StepJumpDirect
+public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentations.TypeConditions.AutomorphicGaloisAdmissible
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ConjPlMemPlacesOver
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.DepthZeroOfHyp
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsTypeLocus
 public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentations.TypeConditions.CardRootsBar
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -62,8 +98,8 @@ theorem exists_unit_one_add_generator
         = (D.what₂.restRowsFiniteGroupCard : ℂ) • D.ntypes.e0 := by
     rw [e0_eq, eGood, Finset.smul_sum, AddSubmonoidClass.coe_finsetSum]
     show MonoidAlgebra.mapRingHom _ (iotaO D.nd D.naut i) _ = _
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     refine Finset.sum_congr rfl fun p _ => ?_
     split_ifs with hg
     · exact hp p
@@ -147,8 +183,8 @@ theorem exists_tuple
       : D.ntypes.onMt μ j (c : MonoidAlgebra ℂ (G0g D.nd)) = D.ntypes.cenMt μ j c := by
     unfold NTypes.onMt
     rw [dite_eq_left c.2]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [he, onMt_coe, map_sum, LinearMap.sum_apply]
+
+  rw [he, onMt_coe, map_sum, LinearMap.sum_apply]
   refine Finset.sum_eq_zero fun p _ => ?_
   split_ifs with hg
   · by_contra hc

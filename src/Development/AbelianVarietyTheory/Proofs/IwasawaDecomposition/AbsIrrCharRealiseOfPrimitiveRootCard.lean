@@ -1,8 +1,54 @@
 module
 
-public import Mathlib
 public import Formalism.LocalToGlobal.Columns.GoodXgFin
 public import Development.AbelianVarietyTheory.Proofs.CharacterTheory.IsCharOfIsPrimitiveRoot
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Coalgebra.IsFrobenius
+import Mathlib.RingTheory.HopfAlgebra.Basic
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+public import Development.AbelianVarietyTheory.Definitions.CommutativeAlgebra.AbByPOfComm
 
 @[expose] public section
 
@@ -14,13 +60,11 @@ namespace GlobalTheory.BrauerRealise
 
 variable {G : Type} [Group G] [Fintype G]
 
+
 omit [Fintype G] in
-theorem isIrreducible_of_sum_char_mul_char_inv
-    [Fintype G]
-    {k : Type} [Field k] [CharZero k]
-    {V : Type} [AddCommGroup V] [Module k V] [FiniteDimensional k V]
-    (ρ : Representation k G V) (h : ∑ x, ρ.character x * ρ.character x⁻¹ = (Nat.card G : k))
-    : ρ.IsIrreducible := by
+theorem isIrreducible_of_sum_char_mul_char_inv [Fintype G] {k : Type} [Field k] [CharZero k] {V : Type}
+    [AddCommGroup V] [Module k V] [FiniteDimensional k V] (ρ : Representation k G V)
+    (h : ∑ x, ρ.character x * ρ.character x⁻¹ = (Nat.card G : k)) : ρ.IsIrreducible := by
   classical
   have hcard : (Nat.card G : k) ≠ 0 := Nat.cast_ne_zero.mpr Nat.card_pos.ne'
   letI : Invertible (Nat.card G : k) := invertibleOfNonzero hcard
@@ -34,8 +78,7 @@ theorem isIrreducible_of_sum_char_mul_char_inv
       rw [Representation.character, Subsingleton.elim (ρ g) 0, map_zero]
     simp only [h0, zero_mul, Finset.sum_const_zero] at h
     exact hcard h.symm
-  let idI : ρ.IntertwiningMap ρ :=
-    ⟨LinearMap.id, fun g => by rw [LinearMap.id_comp, LinearMap.comp_id]⟩
+  let idI : ρ.IntertwiningMap ρ := ⟨LinearMap.id, fun g => by rw [LinearMap.id_comp, LinearMap.comp_id]⟩
   have hid0 : idI ≠ 0 := by
     obtain ⟨v, hv⟩ := exists_ne (0 : V)
     intro e
@@ -53,8 +96,7 @@ theorem isIrreducible_of_sum_char_mul_char_inv
       have hqU : ∀ u ∈ U.toSubmodule, q u = u := fun u hu =>
         congrArg Subtype.val (Submodule.projectionOnto_apply_left hW0 ⟨u, hu⟩)
       have hqR : ∀ v, q v ∈ U.toSubmodule := fun v => (Submodule.projectionOnto _ _ hW0 v).2
-      have hinv : ∀ g, ∀ v ∈ U.toSubmodule, ρ g v ∈ U.toSubmodule := fun g v hv =>
-        U.apply_mem_toSubmodule g hv
+      have hinv : ∀ g, ∀ v ∈ U.toSubmodule, ρ g v ∈ U.toSubmodule := fun g v hv => U.apply_mem_toSubmodule g hv
       have hρρ : ∀ g (v : V), ρ g (ρ g⁻¹ v) = v := fun g v => by
         rw [← Module.End.mul_apply, ← map_mul, mul_inv_cancel, map_one, Module.End.one_apply]
       let P : V →ₗ[k] V := (Fintype.card G : k)⁻¹ • ∑ g : G, ρ g ∘ₗ q ∘ₗ ρ g⁻¹
@@ -64,15 +106,14 @@ theorem isIrreducible_of_sum_char_mul_char_inv
         intro h
         apply LinearMap.ext
         intro v
-        set_option synthInstance.maxHeartbeats 100000 in
-          rw [LinearMap.comp_apply, LinearMap.comp_apply, hPv, hPv, map_smul, map_sum]
+
+        rw [LinearMap.comp_apply, LinearMap.comp_apply, hPv, hPv, map_smul, map_sum]
         congr 1
         refine Fintype.sum_equiv (Equiv.mulLeft h⁻¹) _ _ (fun g => ?_)
         simp only [Equiv.coe_mulLeft, mul_inv_rev, inv_inv, map_mul, Module.End.mul_apply]
         rw [hρρ]
       obtain ⟨c, hc⟩ := (finrank_eq_one_iff_of_nonzero' idI hid0).mp hfr ⟨P, hPI⟩
-      have hcv : ∀ v, c • v = P v := fun v =>
-        congrArg (fun φ : ρ.IntertwiningMap ρ => φ.toLinearMap v) hc
+      have hcv : ∀ v, c • v = P v := fun v => congrArg (fun φ : ρ.IntertwiningMap ρ => φ.toLinearMap v) hc
       have hPU : ∀ u ∈ U.toSubmodule, P u = u := fun u hu => by
         rw [hPv]
         have : ∀ g : G, ρ g (q (ρ g⁻¹ u)) = u := fun g => by rw [hqU _ (hinv _ _ hu), hρρ]
@@ -93,47 +134,34 @@ theorem isIrreducible_of_sum_char_mul_char_inv
       rw [e2, hPv]
       exact Submodule.smul_mem _ _ (Submodule.sum_mem _ fun g _ => hinv g _ (hqR _))
 
-theorem character_eq_trace_toMatrix'
-    {k : Type} [Field k] {n : ℕ} (ρ : Representation k G (Fin n → k)) (g : G)
-    : ρ.character g = Matrix.trace (LinearMap.toMatrix' (ρ g)) := by
+theorem character_eq_trace_toMatrix' {k : Type} [Field k] {n : ℕ} (ρ : Representation k G (Fin n → k)) (g : G) :
+    ρ.character g = Matrix.trace (LinearMap.toMatrix' (ρ g)) := by
   rw [Representation.character, LinearMap.trace_eq_matrix_trace _ (Pi.basisFun _ (Fin n)),
     LinearMap.toMatrix_eq_toMatrix']
 
-def mapScalars
-    {K k : Type} [Field K] [Field k] (f : K →+* k) {n : ℕ} (ρ : Representation K G (Fin n → K))
-    : Representation k G (Fin n → k) :=
-  (Matrix.toLinAlgEquiv'
-      : Matrix (Fin n) (Fin n) k ≃ₐ[k] Module.End k (Fin n → k)).toRingEquiv.toMonoidHom.comp
+def mapScalars {K k : Type} [Field K] [Field k] (f : K →+* k) {n : ℕ} (ρ : Representation K G (Fin n → K)) :
+    Representation k G (Fin n → k) :=
+  (Matrix.toLinAlgEquiv' : Matrix (Fin n) (Fin n) k ≃ₐ[k] Module.End k (Fin n → k)).toRingEquiv.toMonoidHom.comp
     ((f.mapMatrix : Matrix (Fin n) (Fin n) K →+* Matrix (Fin n) (Fin n) k).toMonoidHom.comp
-      ((LinearMap.toMatrixAlgEquiv'
-        : Module.End K (Fin n → K) ≃ₐ[K] Matrix (Fin n) (Fin n) K).toRingEquiv.toMonoidHom.comp ρ))
+      ((LinearMap.toMatrixAlgEquiv' : Module.End K (Fin n → K) ≃ₐ[K] Matrix (Fin n) (Fin n) K).toRingEquiv.toMonoidHom.comp ρ))
 
-theorem character_mapScalars
-    {K k : Type} [Field K] [Field k]
-    (f : K →+* k)
-    {n : ℕ} (ρ : Representation K G (Fin n → K))
-    (g : G)
-    : (mapScalars f ρ).character g = f (ρ.character g) := by
+theorem character_mapScalars {K k : Type} [Field K] [Field k] (f : K →+* k) {n : ℕ}
+    (ρ : Representation K G (Fin n → K)) (g : G) : (mapScalars f ρ).character g = f (ρ.character g) := by
   rw [character_eq_trace_toMatrix', character_eq_trace_toMatrix']
-  set_option synthInstance.maxHeartbeats 100000 in
+
   simp [mapScalars, Matrix.trace, Matrix.diag, map_sum]
 
-theorem absIrr_realise_of_isPrimitiveRoot
-    {K : Type} [Field K]
-    (σ : K →+* ℂ)
-    (z : K) (hz : IsPrimitiveRoot z (Fintype.card G))
-    (ψ : G → ℂ) (hψ : ψ ∈ Formalism.L2.Col.gxIrrSet (G := G) ℂ)
-    : ∃ χ : G → K, IsAbsIrrChar χ ∧ ∀ g, σ (χ g) = ψ g := by
+theorem absIrr_realise_of_isPrimitiveRoot {K : Type} [Field K] (σ : K →+* ℂ) (z : K)
+    (hz : IsPrimitiveRoot z (Fintype.card G)) (ψ : G → ℂ) (hψ : ψ ∈ Formalism.L2.Col.gxIrrSet (G := G) ℂ) :
+    ∃ χ : G → K, IsAbsIrrChar χ ∧ ∀ g, σ (χ g) = ψ g := by
   classical
   haveI : CharZero K := σ.charZero
   letI : Algebra K ℂ := σ.toAlgebra
   have hψC : GlobalTheory.BI.IsChar ℂ ℂ ψ := by
     obtain ⟨n, ρ, -, hρ⟩ := hψ
     exact ⟨n, ρ, fun g => by rw [← hρ]; rfl⟩
-  obtain ⟨m, τ, hτ⟩ :=
-    GlobalTheory.BI.isChar_of_isPrimitiveRoot K ℂ (Fintype.card G) z Fintype.card_ne_zero hz G
-      (fun g => pow_card_eq_one)
-      ψ hψC
+  obtain ⟨m, τ, hτ⟩ := GlobalTheory.BI.isChar_of_isPrimitiveRoot K ℂ (Fintype.card G) z Fintype.card_ne_zero hz G
+    (fun g => pow_card_eq_one) ψ hψC
   have hτσ : ∀ g, σ (τ.character g) = ψ g := fun g => (hτ g).symm
   refine ⟨τ.character, ?_, hτσ⟩
   let A := AlgebraicClosure K
@@ -147,10 +175,10 @@ theorem absIrr_realise_of_isPrimitiveRoot
     rw [← mul_one (Nat.card G : ℂ), ← horth, ← mul_assoc, mul_inv_cancel₀ hcardC, one_mul]
   have hsumK : ∑ g, τ.character g * τ.character g⁻¹ = (Nat.card G : K) := by
     apply σ.injective
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, map_natCast, ← hsumC]
+
+    rw [map_sum, map_natCast, ← hsumC]
     exact Finset.sum_congr rfl fun g _ => by rw [map_mul, hτσ, hτσ]
-  set_option synthInstance.maxHeartbeats 100000 in
+
   simp only [hch, ← map_mul, ← map_sum, hsumK, map_natCast]
 
 end GlobalTheory.BrauerRealise

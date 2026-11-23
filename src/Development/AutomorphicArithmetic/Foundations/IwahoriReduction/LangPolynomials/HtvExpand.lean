@@ -1,19 +1,55 @@
 module
 
 public import Development.AutomorphicArithmetic.Foundations.IwahoriReduction.LangPolynomials.FixedIntegersIsUnitOfNotMemPrimeSpan
-public import Development.AutomorphicArithmetic.Foundations.IwahoriReduction.LangPolynomials.PresTr
+public import Development.AutomorphicArithmetic.Foundations.IwahoriReduction.LangPolynomials.DvdOfNormLe
+public import Development.AutomorphicArithmetic.Foundations.IwahoriReduction.LangPolynomials.KumAlg
+public import Development.AutomorphicArithmetic.Foundations.IwahoriReduction.LangPolynomials.PEvHom
 public import Development.AutomorphicArithmetic.Foundations.IwahoriReduction.LangPolynomials.PresDl
 public import Development.AutomorphicArithmetic.Foundations.IwahoriReduction.LangPolynomials.PresMono
-public import Development.AutomorphicArithmetic.Foundations.IwahoriReduction.LangPolynomials.KumAlg
-public import Development.AutomorphicArithmetic.Foundations.IwahoriReduction.LangPolynomials.WdVal
-public import Development.AutomorphicArithmetic.Foundations.IwahoriReduction.LangPolynomials.PEvHom
-public import Development.AutomorphicArithmetic.Foundations.IwahoriReduction.LangPolynomials.DvdOfNormLe
+public import Development.AutomorphicArithmetic.Foundations.IwahoriReduction.LangPolynomials.PresTr
+import Development.AutomorphicArithmetic.Foundations.IwahoriReduction.LangPolynomials.WdVal
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Lemma
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
-  Formalism.MainNotions.N GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.HV
-  GlobalTheory.Ord2 GlobalTheory.KZ GlobalTheory.Col UpperTheory.Kd.C7
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.MainNotions.N GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.HV GlobalTheory.Ord2 GlobalTheory.KZ GlobalTheory.Col UpperTheory.Kd.C7
 
 namespace UpperTheory.Kd.C7.Cl1
 
@@ -40,10 +76,7 @@ private lemma der_eval {R : Type} [CommRing R] (P : Polynomial R) :
     simp
     ring
 
-variable
-  {Ω : Type} [Field Ω] [Algebra ℚ Ω]
-  {l : ℕ} [Fact l.Prime]
-  {A : ValuationSubring Ω} {j : Ω →+* Qbar l}
+variable {Ω : Type} [Field Ω] [Algebra ℚ Ω] {l : ℕ} [Fact l.Prime] {A : ValuationSubring Ω} {j : Ω →+* Qbar l}
 
 private lemma ser_mul (Φ : Fr l A j) (P Q : Polynomial (R0 A)) : Φ.ser (P * Q) = Φ.ser P * Φ.ser Q := by
   unfold Fr.ser
@@ -90,12 +123,12 @@ private lemma lam_act (Φ : Fr l A j) {c : Coef l} (β : Bas c) (a : c.O) (x : F
     rw [mul_comm, ← Algebra.smul_def]
     rfl
   unfold Fr.lam
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, map_mul, Finset.mul_sum, Φ.jh_alg]
+
+  simp only [map_sum, map_mul, Finset.mul_sum, Φ.jh_alg]
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun k _ => ?_
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [← mul_assoc, ← map_mul, ← h k, map_sum, Finset.sum_mul]
+
+  rw [← mul_assoc, ← map_mul, ← h k, map_sum, Finset.sum_mul]
   simp only [map_mul, mul_assoc]
 
 private lemma tw_succ (Φ : Fr l A j) {d : ℕ} (M : Matrix (Fin d) (Fin d) ℤ_[l]) (D : Fin d → PowerSeries Φ.R)
@@ -103,10 +136,10 @@ private lemma tw_succ (Φ : Fr l A j) {d : ℕ} (M : Matrix (Fin d) (Fin d) ℤ_
     (Φ.tw (m + 1) (D i)).coeff n = ∑ k, algebraMap ℤ_[l] Φ.R (M i k) * (Φ.tw m (D k)).coeff n := by
   haveI := Φ.fl.complete
   have h1 := congrArg (PowerSeries.coeff n) (h i)
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [Fr.tw, Fr.act, PowerSeries.coeff_map, pow_one, map_sum, PowerSeries.coeff_C_mul] at h1 ⊢
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [pow_succ, RingHom.mul_def, RingHom.comp_apply, h1, map_sum]
+
+  simp only [Fr.tw, Fr.act, PowerSeries.coeff_map, pow_one, map_sum, PowerSeries.coeff_C_mul] at h1 ⊢
+
+  rw [pow_succ, RingHom.mul_def, RingHom.comp_apply, h1, map_sum]
   refine Finset.sum_congr rfl fun k _ => ?_
   rw [map_mul]
   congr 1
@@ -205,7 +238,8 @@ private lemma htv_expand {ι : Type} [Fintype ι] (P : ι → Polynomial Ω) (o 
 end UpperTheory.Kd.C7.Cl1
 
 open UpperTheory.Kd.C7.Cl1 in
-theorem UpperTheory.Kd.C7.pClause1 : UpperTheory.Kd.C7.SClause1 := by
+theorem UpperTheory.Kd.C7.pClause1 :
+    UpperTheory.Kd.C7.SClause1 := by
   intro l _ hl Ω _ _ _ A hA j Φ c β ζ hζ hj Z hZ d₀ hd D a Gs v vm hRep hFr hGs hlam hvm e₀
   obtain ⟨c₁, m₁, hR⟩ := hRep
   refine ⟨c₁ + e₀ + 1, m₁ + 1, fun m hm P hP b => ?_⟩
@@ -213,20 +247,16 @@ theorem UpperTheory.Kd.C7.pClause1 : UpperTheory.Kd.C7.SClause1 := by
   obtain ⟨S, hS, hSD⟩ := hR m (by omega)
   set n := m - (c₁ + e₀ + 1) with hn
   have hd0 : 0 < d₀ := Nat.pos_of_ne_zero (by rintro rfl; exact hd (dvd_zero l))
-  have hP' : BPres β A ζ Z m n P :=
-    pPresMono l hl Ω A hA c β ζ hζ Z Z m _ n P (by omega) (fun s _ => by simp [Cg]) hP
+  have hP' : BPres β A ζ Z m n P := pPresMono l hl Ω A hA c β ζ hζ Z Z m _ n P (by omega) (fun s _ => by simp [Cg]) hP
   have hS' : BPres β A ζ (sharp d₀ hd Z) m n S :=
     pPresMono l hl Ω A hA c β ζ hζ _ _ m _ n S (by omega) (fun s _ => by simp [Cg]) hS
   have hE := pPresTr l hl Ω A hA c β ζ hζ Z hZ d₀ hd m n P hP'
   have hM : BPres β A ζ Z m n (fun i => S i * Polynomial.expand (R0 A) d₀ (P i)) :=
-    pPresMono l hl Ω A hA c β ζ hζ _ _ m n n _ le_rfl
-      (fun s _ => by simp [Cg, sharp])
-      (bpres_mul hl hA β hζ hS' hE)
+    pPresMono l hl Ω A hA c β ζ hζ _ _ m n n _ le_rfl (fun s _ => by simp [Cg, sharp]) (bpres_mul hl hA β hζ hS' hE)
   have hU := pWD l hl Ω A hA j Φ ζ hζ m hm1
   have uP : ∀ i, IsUnit (Φ.ser (P i)) := fun i => (hU _).2 (hP'.2.2.1 i)
   have uS : ∀ i, IsUnit (Φ.ser (S i)) := fun i => (hU _).2 (hS'.2.2.1 i)
-  have uE : ∀ i, IsUnit (Φ.ser (Polynomial.expand (R0 A) d₀ (P i))) := fun i =>
-    (hU _).2 (hE.2.2.1 i)
+  have uE : ∀ i, IsUnit (Φ.ser (Polynomial.expand (R0 A) d₀ (P i))) := fun i => (hU _).2 (hE.2.2.1 i)
   have hdl := fun i => (pPresDl l hl Ω A hA j Φ c β ζ hζ Z m n hm1 _ _ hP' hM i).2
   haveI : NeZero (l ^ m) := ⟨(pow_pos (Fact.out : l.Prime).pos m).ne'⟩
   set w : Ω := ζ m ^ (b : ZMod (l ^ m)).val with hw
@@ -236,48 +266,32 @@ theorem UpperTheory.Kd.C7.pClause1 : UpperTheory.Kd.C7.SClause1 := by
   obtain ⟨ε, hε1, hεC, hεz, hεt⟩ := pEvHom l hl Ω A hA j Φ m hm1 _ hzp
   have key := fun Q hQ => eps_dl Φ (ε.comp (ev Φ.R l m)) w hεC hεz Q hQ
   simp only [RingHom.comp_apply] at key
-  have hβ : ∀ i, ‖algebraMap (PadicAlgCl l) ℂ_[l] (β.val i)‖ ≤ 1 := fun i => by
-    rw [norm_alg]; exact hP.2.2.2.1 i
-  have hh
-      : ∀ Q : Fin β.d → Polynomial (R0 A),
-        (∀ i, IsUnit (Φ.ser (Q i)))
-          → algebraMap (PadicAlgCl l) ℂ_[l]
-              (htv j (ζ m) (fun i => (Q i).map (R0 A).subtype) β.val (b : ZMod (l ^ m)).val)
-            = ∑ i, algebraMap (PadicAlgCl l) ℂ_[l] (β.val i) * ε (ev Φ.R l m (dl (Φ.ser (Q i)))) :=
-    by
-      intro Q hQ
-      unfold htv
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum]
-      exact Finset.sum_congr rfl fun i _ => by rw [map_mul, key _ (hQ i)]
-  have hex
-      : (d₀ : Qbar l) * htv j (ζ m)
-          (fun i => (P i).map (R0 A).subtype)
-          β.val ((b * un d₀ hd m : (ZMod (l ^ m))ˣ) : ZMod (l ^ m)).val
-        = htv j (ζ m)
-          (fun i => (Polynomial.expand (R0 A) d₀ (P i)).map (R0 A).subtype)
-          β.val (b : ZMod (l ^ m)).val := by
+  have hβ : ∀ i, ‖algebraMap (PadicAlgCl l) ℂ_[l] (β.val i)‖ ≤ 1 := fun i => by rw [norm_alg]; exact hP.2.2.2.1 i
+  have hh : ∀ Q : Fin β.d → Polynomial (R0 A), (∀ i, IsUnit (Φ.ser (Q i))) →
+      algebraMap (PadicAlgCl l) ℂ_[l] (htv j (ζ m) (fun i => (Q i).map (R0 A).subtype) β.val (b : ZMod (l ^ m)).val) =
+      ∑ i, algebraMap (PadicAlgCl l) ℂ_[l] (β.val i) * ε (ev Φ.R l m (dl (Φ.ser (Q i)))) := by
+    intro Q hQ
+    unfold htv
+
+    rw [map_sum]
+    exact Finset.sum_congr rfl fun i _ => by rw [map_mul, key _ (hQ i)]
+  have hex : (d₀ : Qbar l) * htv j (ζ m) (fun i => (P i).map (R0 A).subtype) β.val
+      ((b * un d₀ hd m : (ZMod (l ^ m))ˣ) : ZMod (l ^ m)).val =
+      htv j (ζ m) (fun i => (Polynomial.expand (R0 A) d₀ (P i)).map (R0 A).subtype) β.val (b : ZMod (l ^ m)).val := by
     simp only [Polynomial.map_expand]
     refine (htv_expand _ _ _ _ _ _ hd0 ?_).symm
-    rw [← pow_mul, Units.val_mul, un, ZMod.coe_unitOfCoprime, ZMod.val_mul, ZMod.val_natCast,
-      Nat.mul_mod_mod]
+    rw [← pow_mul, Units.val_mul, un, ZMod.coe_unitOfCoprime, ZMod.val_mul, ZMod.val_natCast, Nat.mul_mod_mod]
     exact (pow_eq_pow_mod _ (hζ m).1.pow_eq_one).symm
   set ι := algebraMap (PadicAlgCl l) ℂ_[l] with hι
   have hr := norm_nonneg ((l : ℂ_[l]) ^ n)
-  have e1
-      : ‖∑ i, ι (β.val i) * (ε (ev Φ.R l m (dl (Φ.ser (P i)))) -
-          ε (ev Φ.R l m (dl (Φ.ser (S i * Polynomial.expand (R0 A) d₀ (P i))))))‖
-        ≤ ‖(l : ℂ_[l]) ^ n‖ :=
+  have e1 : ‖∑ i, ι (β.val i) * (ε (ev Φ.R l m (dl (Φ.ser (P i)))) -
+      ε (ev Φ.R l m (dl (Φ.ser (S i * Polynomial.expand (R0 A) d₀ (P i))))))‖ ≤ ‖(l : ℂ_[l]) ^ n‖ :=
     sum_le _ _ _ hr hβ fun i => (lc_norm ε hε1 (hdl i)).trans (pow_le (by omega))
-  have e2
-      : ‖∑ i, ι (β.val i) * (ε (ev Φ.R l m (dl (Φ.ser (S i)))) - ε (ev Φ.R l m (Φ.tw m (D i))))‖
-        ≤ ‖(l : ℂ_[l]) ^ n‖ :=
+  have e2 : ‖∑ i, ι (β.val i) * (ε (ev Φ.R l m (dl (Φ.ser (S i)))) - ε (ev Φ.R l m (Φ.tw m (D i))))‖ ≤ ‖(l : ℂ_[l]) ^ n‖ :=
     sum_le _ _ _ hr hβ fun i => by
       rw [norm_sub_rev]; exact (lc_norm ε hε1 (hSD i)).trans (pow_le (by omega))
-  have e3
-      : ‖∑ i, ι (β.val i) * (ε (ev Φ.R l m (Φ.tw m (D i))) -
-          ∑ k ∈ Finset.range (l ^ (3 * m)), Φ.jh ((Φ.tw m (D i)).coeff k) * (ι (j w) - 1) ^ k)‖
-        ≤ ‖(l : ℂ_[l]) ^ n‖ :=
+  have e3 : ‖∑ i, ι (β.val i) * (ε (ev Φ.R l m (Φ.tw m (D i))) -
+      ∑ k ∈ Finset.range (l ^ (3 * m)), Φ.jh ((Φ.tw m (D i)).coeff k) * (ι (j w) - 1) ^ k)‖ ≤ ‖(l : ℂ_[l]) ^ n‖ :=
     sum_le _ _ _ hr hβ fun i => (hεt _).trans (pow_le (by omega))
   have ht : ‖tval Gs (l ^ (3 * m)) (j w)‖ ≤ 1 := by
     refine sum_le _ _ _ zero_le_one hGs fun k => ?_
@@ -292,11 +306,10 @@ theorem UpperTheory.Kd.C7.pClause1 : UpperTheory.Kd.C7.SClause1 := by
     refine (mul_le_of_le_one_right (norm_nonneg _) ?_).trans ((hvm m).trans (pow_le (by omega)))
     rw [norm_mul, norm_pow, norm_alg, norm_alg]
     exact mul_le_one₀ (pow_le_one₀ (norm_nonneg _) (coef_le β a)) (norm_nonneg _) ht
-  have e5
-      : ∑ i, ι (β.val i) * ∑ k ∈ Finset.range (l ^ (3 * m)), Φ.jh ((Φ.tw m (D i)).coeff k) * (ι (j w) - 1) ^ k
-        = v * (ι a ^ m * ι (tval Gs (l ^ (3 * m)) (j w))) := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [tval, Finset.mul_sum, map_sum, map_mul, map_pow, map_sub, map_one]
+  have e5 : ∑ i, ι (β.val i) * ∑ k ∈ Finset.range (l ^ (3 * m)), Φ.jh ((Φ.tw m (D i)).coeff k) * (ι (j w) - 1) ^ k =
+      v * (ι a ^ m * ι (tval Gs (l ^ (3 * m)) (j w))) := by
+
+    simp only [tval, Finset.mul_sum, map_sum, map_mul, map_pow, map_sub, map_one]
     rw [Finset.sum_comm]
     refine Finset.sum_congr rfl fun k _ => ?_
     have h1 := lam_tw Φ β a D hFr m k
@@ -305,9 +318,8 @@ theorem UpperTheory.Kd.C7.pClause1 : UpperTheory.Kd.C7.SClause1 := by
     rw [← Finset.sum_mul, h1]
     ring
   unfold Cg
-  rw [hex, ← map_pow j, ← hw, ← norm_alg, ← norm_alg ((l : PadicAlgCl l) ^ n), ← hι, map_pow ι,
-    map_natCast, map_sub, map_sub, hh P uP, hh _ uE]
+  rw [hex, ← map_pow j, ← hw, ← norm_alg, ← norm_alg ((l : PadicAlgCl l) ^ n), ← hι, map_pow ι, map_natCast, map_sub, map_sub, hh P uP, hh _ uE]
   refine le_of_eq_of_le (congrArg _ ?_) (add_le (add_le (add_le e1 e2) e3) e4)
-  simp only [ser_mul, dl_mul (uS _) (uE _), map_add (f := _), mul_sub, mul_add,
-    Finset.sum_sub_distrib, Finset.sum_add_distrib, e5, map_mul, map_pow]
+  simp only [ser_mul, dl_mul (uS _) (uE _), map_add (f := _), mul_sub, mul_add, Finset.sum_sub_distrib, Finset.sum_add_distrib, e5,
+    map_mul, map_pow]
   ring

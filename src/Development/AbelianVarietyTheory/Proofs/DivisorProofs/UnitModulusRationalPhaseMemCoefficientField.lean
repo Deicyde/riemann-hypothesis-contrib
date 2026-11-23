@@ -1,21 +1,62 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.TraceOfAt
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsIsNormIsRatScalar
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ConjFunBaseRoot
+public import Development.AbelianVarietyTheory.PublishedTheorems.PublishedFoundations.NonemptyAlgHomOfIsRayOfDvd
+public import Development.AbelianVarietyTheory.Definitions.Divisors.LevelOfOfSameBut
+public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.ConjTupRefl
+public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.IsRatScalarMulIff
+public import Development.AbelianVarietyTheory.PublishedTheorems.AutomorphicForms₂.ExistsNormLeHeightPow
+public import Development.AbelianVarietyTheory.Counterexamples.DegenerateExamples.PlaceExOfSurjective
+public import Development.AbelianVarietyTheory.Proofs.CuspFormEvaluations.EmbeddingsDifferOnInteger
+public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.MemOfForallRingEquivFixed
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.AdjointIntertwines
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.DefiniteSideRealisationsCoefMapDifferRootOfUnityStatement
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ConjFunBaseRoot
+import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ConjugateTuplesConjugateResidueLevelsStatement
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsConjugateFormsThetaLiftEqThetaSeries
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsIsNormIsRatScalar
+import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ContinuousCoeffBlockAct
+import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.HeckeCharacterIdeleCharacterMatchUnique
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.MovedFiniteDatumFourierExpansionChainless
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.RatOfOneMapOverL
 public import Formalism.LocalToGlobal.IndefiniteReal.FWCentral
-public import Development.AbelianVarietyTheory.Counterexamples.DegenerateExamples.PlaceExOfSurjective
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.AdjointIntertwines
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ConjugateTuplesConjugateResidueLevelsStatement
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsConjugateFormsThetaLiftEqThetaSeries
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ContinuousCoeffBlockAct
-public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.MemOfForallRingEquivFixed
-public import Development.AbelianVarietyTheory.Proofs.CuspFormEvaluations.EmbeddingsDifferOnInteger
-public import Development.AbelianVarietyTheory.PublishedTheorems.PublishedFoundations.NonemptyAlgHomOfIsRayOfDvd
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.MovedFiniteDatumFourierExpansionChainless
+import Formalism.LocalToGlobal.ProjectiveLattices.SpMapAlgHomId
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Development.AbelianVarietyTheory.Definitions.Divisors.KerDatTuple
+import Development.AbelianVarietyTheory.Proofs.DivisorProofs.TraceOfAt
+import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.LevelLiftIsLiftPrincipalLevelDatumRealisation
 
 @[expose] public section
 
@@ -30,8 +71,8 @@ open GlobalTheory.BigOn GlobalTheory.BigOn.Exp Formalism.L2.Theta GlobalTheory.E
   GlobalTheory.IndefiniteRowSideFullHecke.RationalRayLevels
 open GlobalTheory.BigOn.Exp.SerBase
 open scoped TensorProduct
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 800000
+
+
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 set_option autoImplicit false
 
@@ -97,7 +138,6 @@ variable
   {Pl0 T0 : Type} {A : FamIn D.what₂.LL G Pl0 T0 D.R.m} {T : CoreJ D} [Algebra T.Q.c.F D.what₂.LL]
   {R : RealDat D A T.Q.c.F}
 
-set_option maxHeartbeats 1600000 in
 theorem exists_comb_base
     {i : Fin D.R.m} {κ : WeightFamilies.Wt D ((i : ℕ) + 1)} {v : (R.MW i (sg0 D A)).Vec} {ι x₀}
     {ph : ℂ}
@@ -151,7 +191,6 @@ variable
   {κ : ∀ i : Fin D.R.m, WeightFamilies.Wt D ((i : ℕ) + 1)}
   {v₀ : ∀ (i : Fin D.R.m) (σ : D.what₂.LL →+* ℂ), (R.MW i σ).Vec}
 
-set_option maxHeartbeats 1600000 in
 theorem expands_thF_jV
     {F : Face D A} (hR : GlobalTheory.Hk3.Core R F)
     (fw : FWTie T R κ v₀) (hU : R.LUnif)
@@ -203,7 +242,6 @@ theorem conjTup_base {F : Face D A} (hR : GlobalTheory.Hk3.Core R F) (τ : ℂ �
   rw [GlobalTheory.ChrEqUnique.eq_one_of_chrEq h1 z]
   simp
 
-set_option maxHeartbeats 1600000 in
 theorem conjForm_jV
     {F : Face D A} (hR : GlobalTheory.Hk3.Core R F)
     {i : Fin D.R.m} (O : ∀ i, OMDat T.toCore R i Unit (fun _ => A.μ0)) (hpins : OMPins T R κ v₀ O i)

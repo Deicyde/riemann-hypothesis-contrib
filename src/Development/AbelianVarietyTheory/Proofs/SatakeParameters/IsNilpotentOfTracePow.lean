@@ -1,6 +1,52 @@
 module
 
-public import Mathlib
+public import Mathlib.LinearAlgebra.Trace
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+public import Mathlib.LinearAlgebra.Charpoly.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -8,22 +54,17 @@ open Polynomial
 
 namespace GlobalTheory.NilpotentOfTracePowers
 
-theorem trace_mul_aeval
-    {K : Type} [Field K]
-    {V : Type} [AddCommGroup V] [Module K V]
-    (f : Module.End K V) (h : ∀ k : ℕ, 1 ≤ k → LinearMap.trace K V (f ^ k) = 0)
-    (p : K[X])
-    : LinearMap.trace K V (f * aeval f p) = 0 := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [Polynomial.aeval_eq_sum_range, Finset.mul_sum, map_sum]
+theorem trace_mul_aeval {K : Type} [Field K] {V : Type} [AddCommGroup V] [Module K V]
+    (f : Module.End K V) (h : ∀ k : ℕ, 1 ≤ k → LinearMap.trace K V (f ^ k) = 0) (p : K[X]) :
+    LinearMap.trace K V (f * aeval f p) = 0 := by
+
+  rw [Polynomial.aeval_eq_sum_range, Finset.mul_sum, map_sum]
   refine Finset.sum_eq_zero fun i _ => ?_
   rw [mul_smul_comm, map_smul, ← pow_succ', h (i + 1) (by omega), smul_zero]
 
-theorem exists_pow_eq
-    {K : Type} [Field K]
-    {V : Type} [AddCommGroup V] [Module K V] [FiniteDimensional K V]
-    (f : Module.End K V)
-    : ∃ (m : ℕ) (g : K[X]), f ^ m = f ^ m * aeval f (X * g) := by
+theorem exists_pow_eq {K : Type} [Field K] {V : Type} [AddCommGroup V] [Module K V]
+    [FiniteDimensional K V] (f : Module.End K V) :
+    ∃ (m : ℕ) (g : K[X]), f ^ m = f ^ m * aeval f (X * g) := by
   have hp : f.charpoly ≠ 0 := f.charpoly_monic.ne_zero
   obtain ⟨q, hq, hnd⟩ := exists_eq_pow_rootMultiplicity_mul_and_not_dvd f.charpoly hp 0
   set m := rootMultiplicity 0 f.charpoly
@@ -33,9 +74,8 @@ theorem exists_pow_eq
     rw [map_zero, sub_zero]
     exact X_dvd_iff.mpr h0
   have h0 : aeval f f.charpoly = 0 := f.aeval_self_charpoly
-  have hpoly
-      : (X : K[X]) ^ m
-        = X ^ m * (X * (C (-(q.coeff 0)⁻¹) * q.divX)) + C (q.coeff 0)⁻¹ * f.charpoly := by
+  have hpoly : (X : K[X]) ^ m = X ^ m * (X * (C (-(q.coeff 0)⁻¹) * q.divX))
+      + C (q.coeff 0)⁻¹ * f.charpoly := by
     have h1 : X * q.divX + C (q.coeff 0) = q := X_mul_divX_add q
     have h2 : C (q.coeff 0)⁻¹ * C (q.coeff 0) = (1 : K[X]) := by
       rw [← map_mul, inv_mul_cancel₀ hc, map_one]
@@ -45,15 +85,12 @@ theorem exists_pow_eq
   refine ⟨m, C (-(q.coeff 0)⁻¹) * q.divX, ?_⟩
   have := congrArg (aeval f) hpoly
   rw [map_add (f := _), map_mul (aeval f) _ f.charpoly, h0, mul_zero, add_zero, map_mul, map_pow,
-      aeval_X]
-    at this
+    aeval_X] at this
   exact this
 
-theorem isNilpotent_of_trace_pow
-    {K : Type} [Field K] [CharZero K]
-    {V : Type} [AddCommGroup V] [Module K V] [FiniteDimensional K V]
-    (f : Module.End K V) (h : ∀ k : ℕ, 1 ≤ k → LinearMap.trace K V (f ^ k) = 0)
-    : IsNilpotent f := by
+theorem isNilpotent_of_trace_pow {K : Type} [Field K] [CharZero K] {V : Type} [AddCommGroup V]
+    [Module K V] [FiniteDimensional K V] (f : Module.End K V)
+    (h : ∀ k : ℕ, 1 ≤ k → LinearMap.trace K V (f ^ k) = 0) : IsNilpotent f := by
   obtain ⟨m, g, hm⟩ := exists_pow_eq f
   have hiter : ∀ j : ℕ, f ^ m = f ^ m * aeval f ((X * g) ^ j) := by
     intro j
@@ -72,12 +109,11 @@ theorem isNilpotent_of_trace_pow
     have : (X * g) ^ (m + 1) = X * (g ^ (m + 1) * X ^ m) := by ring
     rw [he, this, map_mul, aeval_X]
     exact trace_mul_aeval f h _
-  have hproj : LinearMap.IsProj (LinearMap.range e) e := {
-    map_mem := fun x => LinearMap.mem_range_self e x
-    map_id := by
-      rintro _ ⟨x, rfl⟩
-      exact LinearMap.congr_fun hid x
-  }
+  have hproj : LinearMap.IsProj (LinearMap.range e) e :=
+    { map_mem := fun x => LinearMap.mem_range_self e x
+      map_id := by
+        rintro _ ⟨x, rfl⟩
+        exact LinearMap.congr_fun hid x }
   have hrk : Module.finrank K (LinearMap.range e) = 0 := by
     have := hproj.trace
     rw [htr] at this

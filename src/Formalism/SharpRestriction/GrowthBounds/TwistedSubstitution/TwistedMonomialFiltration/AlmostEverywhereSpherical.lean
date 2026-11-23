@@ -1,6 +1,49 @@
 module
 
 public import Formalism.SharpRestriction.GrowthBounds.TwistedSubstitution.TwistedMonomialFiltration.TMemLaurentFiltration
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Int
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
@@ -12,12 +55,8 @@ namespace Formalism.MainNotions.TestSideWords.TwistedFiltration.G1
 
 open Formalism.MainNotions.G
 
-theorem flt_twistMat_mem
-    (R : Type*) [CommRing R]
-    (n : ℕ) (j : Fin n)
-    (k e t : ℤ) (h0 : t ≤ 0) (hk : t ≤ e * k)
-    (b c : Fin n)
-    : twistMat R n j k b c ∈ (flt_L (GLCoord R n) e).F t := by
+theorem flt_twistMat_mem (R : Type*) [CommRing R] (n : ℕ) (j : Fin n) (k e t : ℤ) (h0 : t ≤ 0) (hk : t ≤ e * k)
+    (b c : Fin n) : twistMat R n j k b c ∈ (flt_L (GLCoord R n) e).F t := by
   unfold twistMat
   rw [Matrix.mul_apply]
   refine sum_mem fun a _ => ?_
@@ -35,14 +74,14 @@ theorem flt_twistMat_mem
   have hm := (flt_L (GLCoord R n) e).mul_mem ((flt_L (GLCoord R n) e).mul_mem hg hd) hgi
   rwa [zero_add, add_zero] at hm
 
+
 open Classical in
 def flt_cost {ι : Type*} {n : ℕ} (LL : Letters ι) (S : Set ι) (b : Bool) : (ι × Fin n →₀ ℕ) →+ ℤ :=
   Finsupp.liftAddHom fun v => if v.1 ∈ S ∧ LL.vec v.1 = b then Nat.castAddMonoidHom ℤ else 0
 
 open Classical in
-theorem flt_cost_single
-    {ι : Type*} {n : ℕ} (LL : Letters ι) (S : Set ι) (b : Bool) (v : ι × Fin n) (k : ℕ)
-    : flt_cost LL S b (Finsupp.single v k) = if v.1 ∈ S ∧ LL.vec v.1 = b then (k : ℤ) else 0 := by
+theorem flt_cost_single {ι : Type*} {n : ℕ} (LL : Letters ι) (S : Set ι) (b : Bool) (v : ι × Fin n) (k : ℕ) :
+    flt_cost LL S b (Finsupp.single v k) = if v.1 ∈ S ∧ LL.vec v.1 = b then (k : ℤ) else 0 := by
   unfold flt_cost
   rw [Finsupp.liftAddHom_apply_single]
   split_ifs
@@ -51,19 +90,13 @@ theorem flt_cost_single
 
 def flt_compat (e : ℤ) (bm : Bool) : Prop := (e = 1 ∧ bm = false) ∨ (e = -1 ∧ bm = true)
 
-theorem flt_twistX_mem
-    {R : Type*} [CommRing R]
-    {ι : Type*} {n : ℕ} (LL : Letters ι) (S : Set ι) (j : Fin n)
-    {e : ℤ} {bm : Bool} (h : flt_compat e bm)
-    (v : ι × Fin n)
-    : twistSub LL S j (X v : MvPolynomial (ι × Fin n) R)
-      ∈ (laurentCoeffFiltration R n (ι × Fin n) e).F
-        ((- flt_cost LL S bm) (Finsupp.single v 1)) := by
+theorem flt_twistX_mem {R : Type*} [CommRing R] {ι : Type*} {n : ℕ} (LL : Letters ι) (S : Set ι) (j : Fin n)
+    {e : ℤ} {bm : Bool} (h : flt_compat e bm) (v : ι × Fin n) :
+    twistSub LL S j (X v : MvPolynomial (ι × Fin n) R) ∈
+      (laurentCoeffFiltration R n (ι × Fin n) e).F ((-flt_cost LL S bm) (Finsupp.single v 1)) := by
   classical
-  have hX
-      : ∀ w : ι × Fin n,
-        (X w : MvPolynomial (ι × Fin n) (GLLaurent R n))
-          ∈ (laurentCoeffFiltration R n (ι × Fin n) e).F 0 := by
+  have hX : ∀ w : ι × Fin n,
+      (X w : MvPolynomial (ι × Fin n) (GLLaurent R n)) ∈ (laurentCoeffFiltration R n (ι × Fin n) e).F 0 := by
     intro w
     rw [laurentCoeffFiltration, flt_lift_mem]
     intro m
@@ -71,10 +104,8 @@ theorem flt_twistX_mem
     split_ifs
     · exact (flt_L (GLCoord R n) e).one_mem
     · exact zero_mem _
-  have hterm
-      : ∀ (a : GLLaurent R n) (w : ι × Fin n) (t : ℤ),
-        a ∈ (flt_L (GLCoord R n) e).F t
-          → MvPolynomial.C a * X w ∈ (laurentCoeffFiltration R n (ι × Fin n) e).F t := by
+  have hterm : ∀ (a : GLLaurent R n) (w : ι × Fin n) (t : ℤ), a ∈ (flt_L (GLCoord R n) e).F t →
+      MvPolynomial.C a * X w ∈ (laurentCoeffFiltration R n (ι × Fin n) e).F t := by
     intro a w t ha
     have hm := (laurentCoeffFiltration R n (ι × Fin n) e).mul_mem (flt_C_mem ha) (hX w)
     rwa [add_zero] at hm
@@ -82,45 +113,37 @@ theorem flt_twistX_mem
   rw [MvPolynomial.eval₂Hom_X', AddMonoidHom.neg_apply, flt_cost_single]
   by_cases hS : v.1 ∈ S
   · rw [if_pos hS]
-    rcases h with ⟨rfl, rfl⟩ | ⟨rfl, rfl⟩ <;> cases hb : LL.vec v.1 <;> simp only [hS, true_and]
-      <;> norm_num
-      <;> exact sum_mem fun b _ =>
-        hterm _ _ _ (flt_twistMat_mem R n j _ _ _ (by norm_num) (by norm_num) _ _)
+    rcases h with ⟨rfl, rfl⟩ | ⟨rfl, rfl⟩ <;> cases hb : LL.vec v.1 <;> simp only [hS, true_and] <;>
+      norm_num <;>
+      exact sum_mem fun b _ => hterm _ _ _ (flt_twistMat_mem R n j _ _ _ (by norm_num) (by norm_num) _ _)
   · rw [if_neg hS, if_neg (fun h' => hS h'.1), neg_zero]
     exact hX v
 
-theorem flt_twist_monomial_mem
-    {R : Type*} [CommRing R]
-    {ι : Type*} {n : ℕ} (LL : Letters ι) (S : Set ι) (j : Fin n)
-    {e : ℤ} {bm : Bool} (h : flt_compat e bm)
-    (al : ι × Fin n →₀ ℕ)
-    : twistSub LL S j (monomial al (1 : R))
-      ∈ (laurentCoeffFiltration R n (ι × Fin n) e).F (- flt_cost LL S bm al) :=
-  flt_hom_monomial (laurentCoeffFiltration R n (ι × Fin n) e) (twistSub LL S j) (- flt_cost LL S bm)
-    (fun w => flt_twistX_mem LL S j h w)
-    al
+theorem flt_twist_monomial_mem {R : Type*} [CommRing R] {ι : Type*} {n : ℕ} (LL : Letters ι) (S : Set ι) (j : Fin n)
+    {e : ℤ} {bm : Bool} (h : flt_compat e bm) (al : ι × Fin n →₀ ℕ) :
+    twistSub LL S j (monomial al (1 : R)) ∈ (laurentCoeffFiltration R n (ι × Fin n) e).F (-flt_cost LL S bm al) :=
+  flt_hom_monomial (laurentCoeffFiltration R n (ι × Fin n) e) (twistSub LL S j) (-flt_cost LL S bm)
+    (fun w => flt_twistX_mem LL S j h w) al
 
 theorem flt_gL_mul_gLinv (R : Type*) [CommRing R] (n : ℕ) : gL R n * gLinv R n = 1 := by
   ext i k
-  have hu
-      : algebraMap _ (GLCoord R n) (genMat R n).det * IsLocalization.Away.invSelf (genMat R n).det
-        = 1 :=
+  have hu : algebraMap _ (GLCoord R n) (genMat R n).det *
+      IsLocalization.Away.invSelf (genMat R n).det = 1 :=
     IsLocalization.Away.mul_invSelf _
-  have e
-      : ∑ j, algebraMap _ (GLCoord R n) (genMat R n i j) *
-          (IsLocalization.Away.invSelf (genMat R n).det *
-            algebraMap _ (GLCoord R n) ((genMat R n).adjugate j k))
-        = IsLocalization.Away.invSelf (genMat R n).det
-          * algebraMap _ (GLCoord R n) ((genMat R n * (genMat R n).adjugate) i k) := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [Matrix.mul_apply, map_sum, Finset.mul_sum]
+  have e : ∑ j, algebraMap _ (GLCoord R n) (genMat R n i j) *
+      (IsLocalization.Away.invSelf (genMat R n).det *
+        algebraMap _ (GLCoord R n) ((genMat R n).adjugate j k)) =
+      IsLocalization.Away.invSelf (genMat R n).det *
+        algebraMap _ (GLCoord R n) ((genMat R n * (genMat R n).adjugate) i k) := by
+
+    rw [Matrix.mul_apply, map_sum, Finset.mul_sum]
     refine Finset.sum_congr rfl fun j _ => ?_
     rw [map_mul]
     ring
   rw [Matrix.mul_adjugate, Matrix.smul_apply, Matrix.one_apply, smul_eq_mul] at e
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [Matrix.mul_apply, gL, gLinv, Matrix.map_apply, ← map_mul, ← map_sum, e,
-      Matrix.one_apply]
+
+  simp only [Matrix.mul_apply, gL, gLinv, Matrix.map_apply, ← map_mul, ← map_sum, e,
+  Matrix.one_apply]
   split_ifs
   · rw [mul_one, mul_comm, hu, map_one]
   · rw [mul_zero, map_zero, mul_zero, map_zero]
@@ -128,12 +151,10 @@ theorem flt_gL_mul_gLinv (R : Type*) [CommRing R] (n : ℕ) : gL R n * gLinv R n
 theorem flt_gLinv_mul_gL (R : Type*) [CommRing R] (n : ℕ) : gLinv R n * gL R n = 1 :=
   mul_eq_one_comm.1 (flt_gL_mul_gLinv R n)
 
-theorem flt_twistMat_mul (R : Type*) [CommRing R] (n : ℕ) (j : Fin n) (k : ℤ)
-    : twistMat R n j k * twistMat R n j (-k) = 1 := by
-  have hd
-      : Matrix.diagonal (fun a => if a = j then (LaurentPolynomial.T k : GLLaurent R n) else 1)
-          * Matrix.diagonal (fun a => if a = j then LaurentPolynomial.T (-k) else 1)
-        = 1 := by
+theorem flt_twistMat_mul (R : Type*) [CommRing R] (n : ℕ) (j : Fin n) (k : ℤ) :
+    twistMat R n j k * twistMat R n j (-k) = 1 := by
+  have hd : Matrix.diagonal (fun a => if a = j then (LaurentPolynomial.T k : GLLaurent R n) else 1) *
+      Matrix.diagonal (fun a => if a = j then LaurentPolynomial.T (-k) else 1) = 1 := by
     rw [Matrix.diagonal_mul_diagonal, ← Matrix.diagonal_one]
     congr 1
     funext a
@@ -143,7 +164,6 @@ theorem flt_twistMat_mul (R : Type*) [CommRing R] (n : ℕ) (j : Fin n) (k : ℤ
   unfold twistMat
   simp only [Matrix.mul_assoc]
   rw [← Matrix.mul_assoc (gLinv R n) (gL R n), flt_gLinv_mul_gL, Matrix.one_mul,
-    ← Matrix.mul_assoc (Matrix.diagonal _) (Matrix.diagonal _), hd, Matrix.one_mul,
-    flt_gL_mul_gLinv]
+    ← Matrix.mul_assoc (Matrix.diagonal _) (Matrix.diagonal _), hd, Matrix.one_mul, flt_gL_mul_gLinv]
 
 end Formalism.MainNotions.TestSideWords.TwistedFiltration.G1

@@ -1,20 +1,58 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Definitions.LatticeFrames.PlacesToAdeles
 public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.AdelicPointComponentsAtPlacesLatticesVacuaStatement
-public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.SelfDualImageAdelicPointWittCoreStatement
 public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.LatticesAgreeAlmostEverywhereStatement
+public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.SelfDualImageAdelicPointWittCoreStatement
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
+import Formalism.LocalToGlobal.IndefiniteReal.SelfDualFullLattice
 
 @[expose] public section
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH
-  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
-  Formalism.L2.Theta Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField Matrix
-open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Grow GlobalTheory.Unf
-  GlobalTheory.LatPair GlobalTheory.SplitWeil
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField Matrix
+open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Grow GlobalTheory.Unf GlobalTheory.LatPair GlobalTheory.SplitWeil
 open GlobalTheory.IndefiniteRowSideFullHecke.UnramifiedCharacter (compFin ExtUnramAt CharUnramAt)
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -22,9 +60,8 @@ namespace GlobalTheory.FinPl.PlacesAdeles
 
 variable {D : D7}
 
-theorem mem_congGrp {V : HSp D} {I : Ideal (AE D)} {g : GA D V}
-    : g ∈ congGrp V I
-      ↔ ∀ i j, mt V g i j - (1 : Matrix (Fin V.rank) (Fin V.rank) (AE D)) i j ∈ I := by
+theorem mem_congGrp {V : HSp D} {I : Ideal (AE D)} {g : GA D V} :
+    g ∈ congGrp V I ↔ ∀ i j, mt V g i j - (1 : Matrix (Fin V.rank) (Fin V.rank) (AE D)) i j ∈ I := by
   unfold congGrp
   rw [MonoidHom.mem_ker]
   constructor
@@ -68,29 +105,25 @@ theorem congGrp_mono {V : HSp D} {I J : Ideal (AE D)} (h : I ≤ J) : congGrp V 
   rw [mem_congGrp] at hg ⊢
   exact fun i j => h (hg i j)
 
-theorem eq_zero_of_at_off (P : Pl D → Prop) {a : AE D} (h1 : a ∈ idAt D P) (h2 : a ∈ idOff D P)
-    : a = 0 := by
-  obtain ⟨ε, -, -, -, hA, hO⟩ :=
-    (GlobalTheory.T.adelicPoint_components_atPlaces_lattices_vacua D P).1
+theorem eq_zero_of_at_off (P : Pl D → Prop) {a : AE D} (h1 : a ∈ idAt D P) (h2 : a ∈ idOff D P) : a = 0 := by
+  obtain ⟨ε, -, -, -, hA, hO⟩ := (GlobalTheory.T.adelicPoint_components_atPlaces_lattices_vacua D P).1
   rw [← (hA a).1 h1]
   exact (hO a).1 h2
 
 theorem mt_mul (S : HSp D) (a b : GA D S) : mt S (a * b) = mt S a * mt S b := by
   simp [Formalism.L2.Theta.mt, map_mul]
 
-theorem mt_one (S : HSp D) : mt S 1 = 1 := by simp [Formalism.L2.Theta.mt]
+theorem mt_one (S : HSp D) : mt S 1 = 1 := by
+  simp [Formalism.L2.Theta.mt]
 
-theorem supp_mulVec
-    (S : HSp D) (P : Pl D → Prop) (g : GA D S) {y : Fin S.rank → AE D} (hy : ∀ i, y i ∈ idAt D P)
-    : ∀ i, (mt S g *ᵥ y) i ∈ idAt D P := by
+theorem supp_mulVec (S : HSp D) (P : Pl D → Prop) (g : GA D S) {y : Fin S.rank → AE D}
+    (hy : ∀ i, y i ∈ idAt D P) : ∀ i, (mt S g *ᵥ y) i ∈ idAt D P := by
   intro i
   simp only [Matrix.mulVec, dotProduct]
   exact Ideal.sum_mem _ fun j _ => Ideal.mul_mem_left _ _ (hy j)
 
-theorem mulVec_off
-    {S : HSp D} {P : Pl D → Prop} {b : GA D S} (hb : b ∈ grpOff S P)
-    {y : Fin S.rank → AE D} (hy : ∀ i, y i ∈ idAt D P)
-    : mt S b *ᵥ y = y := by
+theorem mulVec_off {S : HSp D} {P : Pl D → Prop} {b : GA D S} (hb : b ∈ grpOff S P) {y : Fin S.rank → AE D}
+    (hy : ∀ i, y i ∈ idAt D P) : mt S b *ᵥ y = y := by
   rw [grpOff, mem_congGrp] at hb
   have key : (mt S b - 1) *ᵥ y = 0 := by
     funext i
@@ -102,88 +135,23 @@ theorem mulVec_off
   rw [Matrix.sub_mulVec, sub_eq_zero, Matrix.one_mulVec] at key
   exact key
 
-theorem moves_mul
-    {S : HSp D} {L : Lat S} {P : Pl D → Prop} {x x' : GA D S}
-    (hx : Moves S x L L P) (hx' : Moves S x' L L P)
-    : Moves S (x * x') L L P := by
+theorem moves_mul {S : HSp D} {L : Lat S} {P : Pl D → Prop} {x x' : GA D S} (hx : Moves S x L L P)
+    (hx' : Moves S x' L L P) : Moves S (x * x') L L P := by
   intro y hy
   rw [mt_mul, ← Matrix.mulVec_mulVec, hx' y hy]
   exact hx _ (supp_mulVec S P x' hy)
 
-theorem moves_off {S : HSp D} {L : Lat S} {P : Pl D → Prop} {b : GA D S} (hb : b ∈ grpOff S P)
-    : Moves S b L L P := by
+theorem moves_off {S : HSp D} {L : Lat S} {P : Pl D → Prop} {b : GA D S} (hb : b ∈ grpOff S P) :
+    Moves S b L L P := by
   intro y hy
   rw [mulVec_off hb hy]
 
-theorem selfDual_isFull
-    : ∀ (V : HSp D) (Λ : Submodule (𝓞 D.host.E) (Fin V.rank → D.host.E)),
-      IsSelfDualC V Λ → Submodule.IsFullLattice D.host.E Λ := by
+theorem selfDual_isFull : ∀ (V : HSp D) (Λ : Submodule (𝓞 D.host.E) (Fin V.rank → D.host.E)),
+    IsSelfDualC V Λ → Submodule.IsFullLattice D.host.E Λ := by
   intro V Λ hΛ
-  haveI : Submodule.IsLattice D.host.E Λ := hΛ.1
-  refine ⟨?_⟩
-  obtain ⟨s, hs⟩ := hΛ.1.fg
-  apply eq_top_iff.mpr
-  intro y _
-  let f : (Fin V.rank → D.host.E) → D.host.E := fun x => ∑ i, ∑ j, star (x i) * V.gram i j * y j
-  obtain ⟨a, ha⟩ := IsLocalization.exist_integer_multiples (nonZeroDivisors (𝓞 D.host.E)) s f
-  have ha0 : (algebraMap (𝓞 D.host.E) D.host.E a) ≠ 0 := by
-    exact (FaithfulSMul.algebraMap_injective _ _).ne (mem_nonZeroDivisors_iff_ne_zero.mp a.2)
-  let P : Submodule (𝓞 D.host.E) (Fin V.rank → D.host.E) := {
-    carrier := {x | ∃ b : 𝓞 D.host.E, (b : D.host.E) = (algebraMap (𝓞 D.host.E) D.host.E a) * f x}
-    zero_mem' := by refine ⟨0, ?_⟩; simp [f]
-    add_mem' := by
-      rintro x z ⟨b, hb⟩ ⟨c, hc⟩
-      refine ⟨b + c, ?_⟩
-      change (b : D.host.E) + c = _
-      rw [hb, hc]
-      simp [f, map_add, add_mul, Finset.sum_add_distrib, mul_add]
-    smul_mem' := by
-      rintro c x ⟨b, hb⟩
-      refine ⟨RingOfIntegers.mapRingHom (starRingEnd D.host.E) c * b, ?_⟩
-      simp only [map_mul, hb, f, Pi.smul_apply, Algebra.smul_def, map_mul,
-        RingOfIntegers.mapRingHom_apply, star_mul]
-      simp only [Finset.mul_sum]
-      apply Finset.sum_congr rfl
-      intro i _
-      apply Finset.sum_congr rfl
-      intro j _
-      change star (c : D.host.E) * _ = _
-      ring
-  }
-  have hsP : (s : Set (Fin V.rank → D.host.E)) ⊆ P := by
-    intro x hx
-    obtain ⟨b, hb⟩ := ha x hx
-    exact ⟨b, by simpa [Algebra.smul_def] using hb⟩
-  have hy : (algebraMap (𝓞 D.host.E) D.host.E a) • y ∈ Λ := by
-    apply (hΛ.2 _).2
-    intro x hx
-    have hxP : x ∈ P := (hs ▸ Submodule.span_le.mpr hsP) hx
-    obtain ⟨b, hb⟩ := hxP
-    refine ⟨b, ?_⟩
-    rw [hb]
-    dsimp only [f, Pi.smul_apply]
-    simp only [smul_eq_mul, Finset.mul_sum]
-    apply Finset.sum_congr rfl
-    intro i _
-    apply Finset.sum_congr rfl
-    intro j _
-    ring
-  have hy'
-      : (algebraMap (𝓞 D.host.E) D.host.E a) • y
-        ∈ Submodule.span D.host.E (Λ : Set (Fin V.rank → D.host.E)) :=
-    Submodule.subset_span hy
-  have :=
-    (Submodule.span D.host.E (Λ : Set (Fin V.rank → D.host.E))).smul_mem
-      (algebraMap (𝓞 D.host.E) D.host.E a)⁻¹ hy'
-  change (algebraMap (𝓞 D.host.E) D.host.E a)⁻¹ • ((algebraMap (𝓞 D.host.E) D.host.E a) • y) ∈ _
-    at this
-  rw [← smul_assoc, smul_eq_mul, inv_mul_cancel₀ ha0, one_smul] at this
-  exact this
+  exact Formalism.IndefR.Datum.IsSelfDualC.isFullLattice V Λ hΛ
 
-theorem latV_eq_ae
-    : ∀ (D : D7) (S : HSp D) (L M : Lat S),
-      Submodule.IsFullLattice D.host.E L → Submodule.IsFullLattice D.host.E M
-        → ∃ T : Finset (Pl D), ∀ v, v ∉ T → latV S L (· = v) = latV S M (· = v) := by
+theorem latV_eq_ae : ∀ (D : D7) (S : HSp D) (L M : Lat S), Submodule.IsFullLattice D.host.E L → Submodule.IsFullLattice D.host.E M → ∃ T : Finset (Pl D), ∀ v, v ∉ T → latV S L (· = v) = latV S M (· = v) := by
   intro D S L M hL hM
   first
   | exact GlobalTheory.T.lattices_agree_almost_everywhere D S L M hL hM
@@ -192,6 +160,7 @@ theorem latV_eq_ae
 end GlobalTheory.FinPl.PlacesAdeles
 
 namespace GlobalTheory.FinPl
+
 
 open GlobalTheory.FinPl.PlacesAdeles in
 theorem placesToAdeles (D : D7) : PlacesToAdeles D := by
@@ -211,12 +180,8 @@ theorem placesToAdeles (D : D7) : PlacesToAdeles D := by
     have : r⁻¹ * h = κ * h' := by rw [hdec, hvk]; group
     rw [this]
     exact moves_mul hκ.2 (moves_off hh')
-  have key
-      : ∀ T' : Finset (Pl D),
-        (∀ v ∈ T', P v)
-          → ∃ r ∈ R,
-            r ∈ grpAt S P ∧ (∀ v, v ∉ T' → r ∈ grpOff S (· = v))
-              ∧ ∀ v ∈ T', Moves S (r⁻¹ * h) L L (· = v) := by
+  have key : ∀ T' : Finset (Pl D), (∀ v ∈ T', P v) → ∃ r ∈ R, r ∈ grpAt S P ∧
+      (∀ v, v ∉ T' → r ∈ grpOff S (· = v)) ∧ ∀ v ∈ T', Moves S (r⁻¹ * h) L L (· = v) := by
     intro T'
     induction T' using Finset.induction_on with
     | empty =>
@@ -227,13 +192,7 @@ theorem placesToAdeles (D : D7) : PlacesToAdeles D := by
       obtain ⟨r, hr, hrP, hroff, hrm⟩ := ih (fun v hv => hP v (Finset.mem_insert_of_mem hv))
       have hP₀ : P v₀ := hP v₀ (Finset.mem_insert_self _ _)
       obtain ⟨r₀, hr₀, hr₀v, hm₀⟩ := hloc v₀ hP₀
-      refine ⟨
-        r * r₀,
-        R.mul_mem hr hr₀,
-        (grpAt S P).mul_mem hrP (congGrp_mono (idAt_single_le hP₀) hr₀v),
-        ?_,
-        ?_
-      ⟩
+      refine ⟨r * r₀, R.mul_mem hr hr₀, (grpAt S P).mul_mem hrP (congGrp_mono (idAt_single_le hP₀) hr₀v), ?_, ?_⟩
       · intro v hv
         have hne : v ≠ v₀ := fun e => hv (e ▸ Finset.mem_insert_self _ _)
         exact (grpOff S _).mul_mem (hroff v fun h => hv (Finset.mem_insert_of_mem h))
@@ -243,8 +202,7 @@ theorem placesToAdeles (D : D7) : PlacesToAdeles D := by
         rcases Finset.mem_insert.1 hv with rfl | hv
         · have hroff0 := hroff v hv₀
           have hcomm : r₀⁻¹ * r⁻¹ = r⁻¹ * r₀⁻¹ :=
-            ((GlobalTheory.T.adelicPoint_components_atPlaces_lattices_vacua D (· = v)).2 S).2.1 _
-              (inv_mem hr₀v) _ (inv_mem hroff0)
+            ((GlobalTheory.T.adelicPoint_components_atPlaces_lattices_vacua D (· = v)).2 S).2.1 _ (inv_mem hr₀v) _ (inv_mem hroff0)
           rw [← mul_assoc, hcomm, mul_assoc]
           exact moves_mul (moves_off (inv_mem hroff0)) hm₀
         · have hne : v ≠ v₀ := fun e => hv₀ (e ▸ hv)
@@ -254,10 +212,8 @@ theorem placesToAdeles (D : D7) : PlacesToAdeles D := by
     intro v hv
     by_cases hvT : v ∈ T
     · exact hrm v (Finset.mem_filter.2 ⟨hvT, hv⟩)
-    · exact moves_mul (moves_off (inv_mem (hroff v (fun h => hvT (Finset.mem_filter.1 h).1))))
-        (hfar v hvT)
-  obtain ⟨hdec, hcomm, -, hlat⟩ :=
-    (GlobalTheory.T.adelicPoint_components_atPlaces_lattices_vacua D P).2 S
+    · exact moves_mul (moves_off (inv_mem (hroff v (fun h => hvT (Finset.mem_filter.1 h).1)))) (hfar v hvT)
+  obtain ⟨hdec, hcomm, -, hlat⟩ := (GlobalTheory.T.adelicPoint_components_atPlaces_lattices_vacua D P).2 S
   obtain ⟨κ, hκ, g, hg, hx⟩ := hdec (r⁻¹ * h)
   have hκv : ∀ v, P v → Moves S κ L L (· = v) := by
     intro v hv
@@ -280,8 +236,7 @@ theorem placesToAdeles (D : D7) : PlacesToAdeles D := by
       have := h2 v hv e he
       rw [← Matrix.mulVec_smul] at this
       exact (hκv v hv _ (hey v e he)).2 this
-  · calc
-      h = r * (r⁻¹ * h) := by group
+  · calc h = r * (r⁻¹ * h) := by group
       _ = r * (κ * g) := by rw [hx]
       _ = r * g * κ := by rw [hcomm κ hκ g hg, mul_assoc]
 

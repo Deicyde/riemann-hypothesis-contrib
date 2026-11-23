@@ -1,6 +1,51 @@
 module
 
-public import Mathlib
+public import Mathlib.RingTheory.IsTensorProduct
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
+public import Mathlib.Algebra.Module.BigOperators
+public import Mathlib.Data.Matrix.Diagonal
+public import Mathlib.Data.Matrix.Mul
+public import Mathlib.LinearAlgebra.Matrix.Determinant.Basic
+public import Mathlib.LinearAlgebra.Matrix.NonsingularInverse
 
 @[expose] public section
 
@@ -8,24 +53,9 @@ open TensorProduct
 
 namespace GlobalTheory
 
-theorem isBaseChange_subtype_of_basis_after_extension
-    : ∀ (S A EE O W RW D Y : Type) [CommRing S] [CommRing A] [CommRing EE] [CommRing O] [CommRing W]
-        [CommRing RW] [Algebra O A] [Algebra A EE] [Algebra O EE] [IsScalarTower O A EE]
-        [Algebra O RW] [AddCommGroup D] [Module EE D] [Module A D] [IsScalarTower A EE D]
-        [AddCommGroup Y] [Module RW Y] (a : S →+* A) (ι : EE →ₐ[O] RW) (c : W →+* RW) (jD : D →+ Y),
-      Function.Injective ι → (∀ e, IsUnit (ι e) → IsUnit e)
-        → (∀ (e : EE) (x : D), jD (e • x) = ι e • jD x)
-        → (∀ s, ι (algebraMap A EE (a s)) ∈ Set.range c)
-        → ∀ (d r : ℕ) (o : Fin d → O),
-          (∀ e : EE, ∃ e' : Fin d → EE, (∀ j, ι (e' j) ∈ Set.range c) ∧ e = ∑ j, o j • e' j)
-            → Nonempty (Module.Basis (Fin r) EE D)
-            → ∀ (q : ℕ) (x : Fin q → D),
-              q = d * r → (∀ y : Y, ∃! w : Fin q → W, y = ∑ i, c (w i) • jD (x i))
-                → ∀ N : Submodule A D,
-                  (∀ y, y ∈ N ↔ ∃ s : Fin q → S, y = ∑ i, a (s i) • x i)
-                    → IsBaseChange EE N.subtype := by
-  intro S A EE O W RW D Y _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ a ι c jD hinj hunit hjD ha d r o ho ⟨b⟩
-    q x hq huniq N hN
+theorem isBaseChange_subtype_of_basis_after_extension : ∀ (S A EE O W RW D Y : Type) [CommRing S] [CommRing A] [CommRing EE] [CommRing O] [CommRing W] [CommRing RW] [Algebra O A] [Algebra A EE] [Algebra O EE] [IsScalarTower O A EE] [Algebra O RW] [AddCommGroup D] [Module EE D] [Module A D] [IsScalarTower A EE D] [AddCommGroup Y] [Module RW Y] (a : S →+* A) (ι : EE →ₐ[O] RW) (c : W →+* RW) (jD : D →+ Y), Function.Injective ι → (∀ e, IsUnit (ι e) → IsUnit e) → (∀ (e : EE) (x : D), jD (e • x) = ι e • jD x) → (∀ s, ι (algebraMap A EE (a s)) ∈ Set.range c) → ∀ (d r : ℕ) (o : Fin d → O), (∀ e : EE, ∃ e' : Fin d → EE, (∀ j, ι (e' j) ∈ Set.range c) ∧ e = ∑ j, o j • e' j) → Nonempty (Module.Basis (Fin r) EE D) → ∀ (q : ℕ) (x : Fin q → D), q = d * r → (∀ y : Y, ∃! w : Fin q → W, y = ∑ i, c (w i) • jD (x i)) → ∀ N : Submodule A D, (∀ y, y ∈ N ↔ ∃ s : Fin q → S, y = ∑ i, a (s i) • x i) → IsBaseChange EE N.subtype := by
+  intro S A EE O W RW D Y _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ a ι c jD hinj hunit hjD ha d r o ho
+    ⟨b⟩ q x hq huniq N hN
   classical
   subst hq
   have hxN : ∀ i, x i ∈ N := by
@@ -36,12 +66,11 @@ theorem isBaseChange_subtype_of_basis_after_extension
     · intro j _ hj
       simp [Pi.single_eq_of_ne hj]
     · simp
-  have hjsum
-      : ∀ e : Fin (d * r) → EE, ∀ v : Fin (d * r) → D,
-        jD (∑ i, e i • v i) = ∑ i, ι (e i) • jD (v i) := by
+  have hjsum : ∀ e : Fin (d * r) → EE, ∀ v : Fin (d * r) → D,
+      jD (∑ i, e i • v i) = ∑ i, ι (e i) • jD (v i) := by
     intro e v
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     exact Finset.sum_congr rfl fun i _ => hjD _ _
 
   have hspan : ∀ y : D, y ∈ Submodule.span EE (Set.range x) := by
@@ -70,8 +99,8 @@ theorem isBaseChange_subtype_of_basis_after_extension
       ext i m
       have h1 : jD (x i) = ∑ m, c ((C * Matrix.of B) i m) • jD (x m) := by
         conv_lhs => rw [hx i, hjsum]
-        set_option synthInstance.maxHeartbeats 100000 in
-          simp only [Matrix.mul_apply, map_sum, map_mul, Finset.sum_smul, Matrix.of_apply]
+
+        simp only [Matrix.mul_apply, map_sum, map_mul, Finset.sum_smul, Matrix.of_apply]
         rw [Finset.sum_comm]
         refine Finset.sum_congr rfl fun l _ => ?_
         rw [hB l, Finset.smul_sum, ← hCC]
@@ -110,7 +139,8 @@ theorem isBaseChange_subtype_of_basis_after_extension
           simp [Matrix.one_apply_ne hj.symm]
         · simp
       rw [h1]
-      exact Submodule.sum_mem _ fun i _ => Submodule.smul_mem _ _ (Submodule.subset_span ⟨i, rfl⟩)
+      exact Submodule.sum_mem _ fun i _ =>
+        Submodule.smul_mem _ _ (Submodule.subset_span ⟨i, rfl⟩)
     have hb : ∀ k, b k ∈ Submodule.span EE (Set.range x) := by
       intro k
       have h1 : b k = ∑ j, e' 1 j • u (finProdFinEquiv (j, k)) := by
@@ -124,21 +154,18 @@ theorem isBaseChange_subtype_of_basis_after_extension
     rw [← b.sum_repr y]
     exact Submodule.sum_mem _ fun k _ => Submodule.smul_mem _ _ (hb k)
 
-  have hnf
-      : ∀ t : EE ⊗[A] N, ∃ e : Fin (d * r) → EE,
-        (∀ i, ι (e i) ∈ c.range) ∧ t = ∑ i, e i ⊗ₜ[A] (⟨x i, hxN i⟩ : N) := by
-    let P : AddSubmonoid (EE ⊗[A] N) := {
-      carrier :=
-        {t | ∃ e : Fin (d * r) → EE, (∀ i, ι (e i) ∈ c.range) ∧
+  have hnf : ∀ t : EE ⊗[A] N, ∃ e : Fin (d * r) → EE, (∀ i, ι (e i) ∈ c.range) ∧
+      t = ∑ i, e i ⊗ₜ[A] (⟨x i, hxN i⟩ : N) := by
+    let P : AddSubmonoid (EE ⊗[A] N) :=
+      { carrier := {t | ∃ e : Fin (d * r) → EE, (∀ i, ι (e i) ∈ c.range) ∧
           t = ∑ i, e i ⊗ₜ[A] (⟨x i, hxN i⟩ : N)}
-      zero_mem' := ⟨0, fun i => by simp, by simp⟩
-      add_mem' := by
-        rintro _ _ ⟨e₁, h₁, rfl⟩ ⟨e₂, h₂, rfl⟩
-        refine ⟨e₁ + e₂, fun i => ?_, ?_⟩
-        · rw [Pi.add_apply, map_add (f := _)]
-          exact add_mem (h₁ i) (h₂ i)
-        · simp [TensorProduct.add_tmul, Finset.sum_add_distrib]
-    }
+        zero_mem' := ⟨0, fun i => by simp, by simp⟩
+        add_mem' := by
+          rintro _ _ ⟨e₁, h₁, rfl⟩ ⟨e₂, h₂, rfl⟩
+          refine ⟨e₁ + e₂, fun i => ?_, ?_⟩
+          · rw [Pi.add_apply, map_add (f := _)]
+            exact add_mem (h₁ i) (h₂ i)
+          · simp [TensorProduct.add_tmul, Finset.sum_add_distrib] }
     have hP : ∀ (e : EE) (n : N), ι e ∈ c.range → e ⊗ₜ[A] n ∈ P := by
       intro e n he
       obtain ⟨s, hs⟩ := (hN n).1 n.2
@@ -171,7 +198,7 @@ theorem isBaseChange_subtype_of_basis_after_extension
       obtain ⟨e, he, rfl⟩ := hnf t
       choose w hw using he
       have h1 : ∑ i, e i • x i = 0 := by
-        set_option synthInstance.maxHeartbeats 100000 in
+
         simpa [map_sum, LinearMap.liftBaseChange_tmul] using ht
       have h2 : (0 : Y) = ∑ i, c (w i) • jD (x i) := by
         simp only [hw]

@@ -1,59 +1,51 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.GoodFtEntries
-public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.StrictHenselianAcyclic
-public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.OExt
 public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.IsComp
-public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.GaloisSideTwistedSelmerAuxiliaryPrimes
-public import Development.AbelianVarietyTheory.PublishedTheorems.GaloisCohomology₂.DepthZeroInertia
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.HasSupportOfIsSubquotientProdIrr
-public import Development.AutomorphicArithmetic.CharacterBoxes.ExS
-public import Development.AbelianVarietyTheory.Definitions.GlobalTwisting.CountsIrreducibilityConstants
-public import Formalism.SharpRestriction.GlobalSchurBounds.LinkTied
-public import Formalism.SharpRestriction.GlobalSchurBounds.MainSup
-public import Formalism.LocalToGlobal.GroupLattices.AdmissibleAtGeneratorPlaces
-public import Formalism.LocalToGlobal.SiegelLatticeTheory.FlagStabilizerTensors.RootLatticeThresholds.WuDecayAll
-public import Formalism.LocalToGlobal.SiegelLatticeTheory.FlagStabilizerTensors.RowsPos
-public import Formalism.LocalToGlobal.GlobalTheory.GL5.PNamed
-public import Formalism.LocalToGlobal.GlobalTheory.GL5.DiscreteSeriesOfFormalDegree
-public import Development.AbelianVarietyTheory.Definitions.GlobalTwisting.DivRows3GIff
-public import Formalism.LocalToGlobal.FiniteTOf
-public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.ThetaChr
-public import Development.AbelianVarietyTheory.Definitions.GlobalTwisting.ColumnCompatibleSelection
-public import Formalism.LocalToGlobal.SiegelLatticeTheory.FlagStabilizerTensors.STiesR
-public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.SameDegreeZeroFormsSelf
-public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.DivisionPairOfAdelicFormsFaceColumnsData
-public import Formalism.LocalToGlobal.CarriedPlMap
-public import Formalism.LocalToGlobal.SelSide
-public import Formalism.LocalToGlobal.IndefiniteReal.DoubleCosetOperators.TwistedCharacterValue
-public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.TwArgs
-public import Formalism.LocalToGlobal.Divisibility.ColPins
-public import Development.AbelianVarietyTheory.Definitions.GlobalTwisting.AllRows
-public import Development.AbelianVarietyTheory.Definitions.Divisors.BaseRankDimension
-public import Development.AbelianVarietyTheory.Definitions.Divisors.RowSideOfCompatibleThetaPair
-public import Formalism.LocalToGlobal.IndefiniteReal.NonzeroIndexPlaceIndepConstants
-public import Development.AbelianVarietyTheory.Definitions.TwistedInnerProducts.ClassSumPin
-public import Development.AbelianVarietyTheory.Definitions.Divisors.CovolXOfCovol
-public import Development.AbelianVarietyTheory.Statements.PlaceShiftStatements.SingleIndexPlacesAreTwisted
-public import Development.AbelianVarietyTheory.Definitions.Divisors.SlopeTestRemainingChoicesAlt
-public import Development.AbelianVarietyTheory.Definitions.SemilocalFrames.SerFixOne
-public import Development.AutomorphicArithmetic.ThetaCorrespondence.ThetaPairLifts.ThirdPlaceSeries.CohomologicalCsdTempered
-public import Development.AutomorphicArithmetic.ThetaCorrespondence.ThetaPairLifts.ThirdPlaceSeries.NormChoiceOfExtension
 public import Development.AutomorphicArithmetic.ThetaCorrespondence.ThetaPairLifts.ThirdPlaceSeries.SameGaloisLevelExists
 public import Development.AutomorphicArithmetic.ThetaCorrespondence.ThetaPairLifts.ThirdPlaceSeries.RowGood
-public import Development.AutomorphicArithmetic.ThetaCorrespondence.ThetaPairLifts.ThirdPlaceSeries.CoreAltAltBis
-public import Development.AutomorphicArithmetic.ThetaCorrespondence.ThetaPairLifts.ThirdPlaceSeries.ColumnChoiceWithTies
-public import Development.AutomorphicArithmetic.ThetaCorrespondence.ThetaPairLifts.ThirdPlaceSeries.HeckeOpen
-public import Development.AutomorphicArithmetic.ThetaCorrespondence.ThetaPairLifts.ThirdPlaceSeries.RootsOfUnityRingLeWittIntegers
-public import Development.AutomorphicArithmetic.ThetaCorrespondence.ThetaPairLifts.ThirdPlaceSeries.TwistedBundle
 public import Development.AutomorphicArithmetic.ThetaCorrespondence.ThetaPairLifts.ThirdPlaceSeries.GenPin
+public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.ConstructedSpectralObjectsIrreducibilityConditioStatement
+public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.ImportsTerAlt
 public import Development.AutomorphicArithmetic.ThetaCorrespondence.ThetaPairLifts.ThirdPlaceSeries.LocalSeriesConcreteOfDzSwap
-public import Development.AutomorphicArithmetic.Foundations.LocalLanglands.IsRecTOfIsRec
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Formalism.SharpRestriction.GlobalSchurBounds.TheoremThreeUnderScaleOfGeneral
 
 @[expose] public section
 
-set_option synthInstance.maxHeartbeats 200000
+
 
 section
 section
@@ -63,7 +55,6 @@ open Formalism.BasicNotions Formalism.MainNotions Formalism.L2 Formalism.L2.Host
 attribute [local instance]
   Formalism.BasicNotions.Host.cmStar GlobalTheory.TypeRec.factG GlobalTheory.LabPin.instCM
 namespace GlobalTheory.Fc.LabLinked
-set_option maxHeartbeats 2000000 in
 theorem typeLab_of_gen_alt_alt
     (hG : GlobalTheory.GLq.Green) (hZ : GlobalTheory.Published.ZelevinskyPolynomialRing)
     {hL : _root_.UpperTheory.Zero.LLC.RecTExists} {D : D7} {cf : CharFrame D} {nch : NChoice D}
@@ -94,7 +85,6 @@ theorem typeLab_of_gen_alt_alt
 section Rows
 open Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Lev
   Formalism.IndefR.NX
-set_option maxHeartbeats 1000000 in
 theorem ties_of_nAtData_real
     (hG : GlobalTheory.GLq.Green) (hZ : GlobalTheory.Published.ZelevinskyPolynomialRing)
     {D : D7} {G : Type} [Group G] [Fintype G]
@@ -122,7 +112,6 @@ theorem ties_of_nAtData_real
       hR.1 hR.2 hT hg
   ⟩
 end Rows
-set_option maxHeartbeats 1000000 in
 theorem ties_of_genPin_goodFTAll'
     (hG : GlobalTheory.GLq.Green) (hZ : GlobalTheory.Published.ZelevinskyPolynomialRing)
     {hL : _root_.UpperTheory.Zero.LLC.RecTExists} {p : _root_.GlobalTheory.Mem.Top.Bl.Parameters hL}
@@ -195,7 +184,6 @@ end
 section
 open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.RT GlobalTheory.EX
   GlobalTheory.EX.OB GlobalTheory.Mem GlobalTheory.Mem.Top GlobalTheory.Mem.Top.Bl GlobalTheory.Fc
-set_option maxHeartbeats 1000000 in
 theorem _root_.GlobalTheory.T.good_ft_entries_alt_alt
     : GlobalTheory.GLq.Green → GlobalTheory.Published.ZelevinskyPolynomialRing
       → ∀ (hL : _root_.UpperTheory.Zero.LLC.RecTExists)

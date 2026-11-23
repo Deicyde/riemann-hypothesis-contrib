@@ -1,15 +1,59 @@
 module
 
-public import Mathlib
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.DiscreteValuationRings.ValuationMultiplicationInvariance
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.DiscreteValuationRings.TwistBCPf
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.DivCalc
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.DiscreteValuationRings.BOfNsmulLeft
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.DiscreteValuationRings.ExistsFamRep
+public import Development.AbelianVarietyTheory.Proofs.RingsOfIntegers.ExistsBasisOfEq
 public import Development.AbelianVarietyTheory.Proofs.RingsOfIntegers.ExistsLeastOfDiscrete
 public import Development.AbelianVarietyTheory.Proofs.RingsOfIntegers.ExistsRepresentativesModNsmul
-public import Development.AbelianVarietyTheory.Proofs.RingsOfIntegers.ExistsBasisOfEq
 public import Development.AbelianVarietyTheory.Proofs.RingsOfIntegers.FamEqOnClassOfEq
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Tactic.TypeStar
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.DiscreteValuationRings.BOfNsmulLeft
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.DiscreteValuationRings.ExistsFamRep
 
 @[expose] public section
 
@@ -17,40 +61,27 @@ set_option autoImplicit false
 
 noncomputable section
 
-open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory
-  CartesianMonoidalCategory MonObj IsLocalRing
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
-  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.DVR
+open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj IsLocalRing
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.DVR
 
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.UnitBallFree
 
-theorem exists_basis_of_coord
-    {F : Type} [Field F]
-    (v : AddValuation F (WithTop ℚ))
-    {M : Type*} [AddCommGroup M] [Module F M]
-    {J : Type} [Fintype J] [DecidableEq J]
-    (φ : M →ₗ[F] (J → F)) (hφ : Function.Injective φ)
-    (B : J → M) (hB : ∀ p, φ (B p) = Pi.single p 1)
-    (q : J → ℚ)
-    (ht : ∀ p, ∃ t : F,
-      t ≠ 0 ∧ ((q p : ℚ) : WithTop ℚ) ≤ v t
-        ∧ ∀ a : F, ((q p : ℚ) : WithTop ℚ) ≤ v a → ∃ c : F, (0 : WithTop ℚ) ≤ v c ∧ a = c * t)
-    (P : M → Prop) (hP : ∀ s, P s ↔ ∀ p, ((q p : ℚ) : WithTop ℚ) ≤ v (φ s p))
-    {n : ℕ} (e : Fin n ≃ J)
-    : ∃ b : Fin n → M,
-      LinearIndependent F b ∧ (∀ i, P (b i))
-        ∧ ∀ s : M,
-          P s ↔ ∃ c : Fin n → F, (∀ i, (0 : WithTop ℚ) ≤ v (c i)) ∧ s = ∑ i, c i • b i := by
+theorem exists_basis_of_coord {F : Type} [Field F] (v : AddValuation F (WithTop ℚ)) {M : Type*} [AddCommGroup M]
+    [Module F M] {J : Type} [Fintype J] [DecidableEq J] (φ : M →ₗ[F] (J → F)) (hφ : Function.Injective φ)
+    (B : J → M) (hB : ∀ p, φ (B p) = Pi.single p 1) (q : J → ℚ)
+    (ht : ∀ p, ∃ t : F, t ≠ 0 ∧ ((q p : ℚ) : WithTop ℚ) ≤ v t ∧
+      ∀ a : F, ((q p : ℚ) : WithTop ℚ) ≤ v a → ∃ c : F, (0 : WithTop ℚ) ≤ v c ∧ a = c * t)
+    (P : M → Prop) (hP : ∀ s, P s ↔ ∀ p, ((q p : ℚ) : WithTop ℚ) ≤ v (φ s p)) {n : ℕ} (e : Fin n ≃ J) :
+    ∃ b : Fin n → M, LinearIndependent F b ∧ (∀ i, P (b i)) ∧
+      ∀ s : M, P s ↔ ∃ c : Fin n → F, (∀ i, (0 : WithTop ℚ) ≤ v (c i)) ∧ s = ∑ i, c i • b i := by
   choose t ht0 htq htd using ht
 
-  have key
-      : ∀ (c : Fin n → F) (p : J), φ (∑ i, c i • (t (e i) • B (e i))) p = c (e.symm p) * t p := by
+  have key : ∀ (c : Fin n → F) (p : J), φ (∑ i, c i • (t (e i) • B (e i))) p = c (e.symm p) * t p := by
     intro c p
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_smul, hB, Finset.sum_apply, Pi.smul_apply, smul_eq_mul,
-        Pi.single_apply]
+
+    simp only [map_sum, map_smul, hB, Finset.sum_apply, Pi.smul_apply, smul_eq_mul, Pi.single_apply]
     rw [Finset.sum_eq_single (e.symm p)]
     · simp
     · intro i _ hi
@@ -109,17 +140,14 @@ theorem main : GlobalFnsSt → TwistBaseChangeStatement → UUStatement := by
     refine Finset.sum_congr rfl fun c _ => ?_
     rw [constBF_eq, constBF_eq]
     simp only [map_mul, resTop, _root_.mul_assoc]
-  let φ
-      : Fam D.toPre F k →ₗ[F] (Fin (k ^ Module.finrank ℤ D.toPre.X) × Fin (k ^ D.toPre.P.g) → F) :=
-    {
-      toFun := fun s p => crd s p.1 p.2
+  let φ : Fam D.toPre F k →ₗ[F] (Fin (k ^ Module.finrank ℤ D.toPre.X) × Fin (k ^ D.toPre.P.g) → F) :=
+    { toFun := fun s p => crd s p.1 p.2
       map_add' := fun s t => by
         funext p
         simp only [hadd, Pi.add_apply]
       map_smul' := fun ζ s => by
         funext p
-        simp only [hsmul, RingHom.id_apply, Pi.smul_apply, smul_eq_mul]
-    }
+        simp only [hsmul, RingHom.id_apply, Pi.smul_apply, smul_eq_mul] }
 
   have hφ : Function.Injective φ := by
     intro s t h
@@ -133,8 +161,8 @@ theorem main : GlobalFnsSt → TwistBaseChangeStatement → UUStatement := by
       rw [show crd s i c = crd t i c from congrFun h (i, c)]
     exact GlobalTheory.fam_eq_on_class_of_eq hG V D.toPre F k s t (e0 i) hag m j
 
-  have hcls : ∀ i (a b : D.toPre.X), e0 i + k • a = e0 i + k • b → a = b := fun i a b h =>
-    hinj a b (add_left_cancel h)
+  have hcls : ∀ i (a b : D.toPre.X), e0 i + k • a = e0 i + k • b → a = b :=
+    fun i a b h => hinj a b (add_left_cancel h)
   choose B hB1 hB2 using fun p : Fin (k ^ Module.finrank ℤ D.toPre.X) × Fin (k ^ D.toPre.P.g) =>
     ReciprocityTheory.ChartRestriction.G.DVR.UUA.exists_fam_rep hG D.tau_bimult k (e0 p.1) (hcls p.1) (bb p.1 p.2)
   have hB : ∀ p, φ (B p) = Pi.single p 1 := by
@@ -175,13 +203,11 @@ theorem main : GlobalFnsSt → TwistBaseChangeStatement → UUStatement := by
       rw [h1]
       simp [hne]
 
-  have hπ
-      : v (algebraMap (FractionRing V) F (algebraMap V (FractionRing V) ϖ))
-        = ((1 : ℚ) : WithTop ℚ) := by
+  have hπ : v (algebraMap (FractionRing V) F (algebraMap V (FractionRing V) ϖ)) = ((1 : ℚ) : WithTop ℚ) := by
     have h1 := hv (algebraMap V (FractionRing V) ϖ) 1 ⟨1, by simp⟩
     simpa using h1
-  let q : Fin (k ^ Module.finrank ℤ D.toPre.X) × Fin (k ^ D.toPre.P.g) → ℚ := fun p =>
-    0 + (Q (e0 p.1) : ℚ) / k
+  let q : Fin (k ^ Module.finrank ℤ D.toPre.X) × Fin (k ^ D.toPre.P.g) → ℚ :=
+    fun p => 0 + (Q (e0 p.1) : ℚ) / k
   have ht := fun p => GlobalTheory.ValuedPrincipal.main F v _ hπ hF (q p)
 
   have hP : ∀ s, NuGe D Q F v k s 0 ↔ ∀ p, ((q p : ℚ) : WithTop ℚ) ≤ v (φ s p) := by
@@ -202,8 +228,7 @@ theorem main : GlobalFnsSt → TwistBaseChangeStatement → UUStatement := by
       intro c
       exact h (i, c)
   have hr : D.toPre.rank = Module.finrank ℤ D.toPre.X := Nat.add_zero _
-  exact exists_basis_of_coord v φ hφ B hB q ht
-    (fun s => NuGe D Q F v k s 0)
-    hP ((finCongr (by rw [pow_add, hr])).trans finProdFinEquiv.symm)
+  exact exists_basis_of_coord v φ hφ B hB q ht (fun s => NuGe D Q F v k s 0) hP
+    ((finCongr (by rw [pow_add, hr])).trans finProdFinEquiv.symm)
 
 end GlobalTheory.UnitBallFree

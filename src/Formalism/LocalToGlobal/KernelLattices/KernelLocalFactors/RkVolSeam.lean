@@ -1,68 +1,52 @@
 module
 
 public import Formalism.LocalToGlobal.KernelLattices.KernelLocalFactors.RkVolKerStd
-public import Formalism.LocalToGlobal.KernelLattices.KernelLocalFactors.ColInst
-public import Formalism.LocalToGlobal.KernelLattices.KernelLocalFactors.BaseEx
-public import Formalism.LocalToGlobal.GlobalTheory.GL3.PStdOK
-public import Formalism.LocalToGlobal.KernelLattices.KernelLocalFactors.SelfDualLatticeNorms.EmbCInjective
-public import Formalism.LocalToGlobal.KernelLattices.ColumnData
-public import Formalism.LocalToGlobal.KernelLattices.ColumnData.BaseLinkOfNonzeroDelta
-public import Formalism.LocalToGlobal.KernelLattices.ColumnData.BaseExP
-public import Formalism.LocalToGlobal.KernelLattices.ColumnData.ProvisionExtensionLink
-public import Mathlib
-public import Formalism.FrobeniusOrbits.FrobeniusOrbitsProofs.CardTrivialFirstComponent
-public import Formalism.SharpRestriction.RamificationFrobenius.TotientGaloisClasses.FrameFacts
-public import Development.AutomorphicArithmetic.WeightCongruences.IsRootOfIntegral
-public import Formalism.FrobeniusOrbits.FrobeniusOrbitsProofs.MuCardLeTwo
-public import Formalism.LocalToGlobal.KernelLattices.ColumnData.DetIdealsKernelNormOne
-public import Formalism.LocalToGlobal.KernelLattices.ColumnData.IsAdmissibleFlagPairOfUnitriangularLeftAutomorph
-public import Formalism.LocalToGlobal.KernelLattices.ColumnData.ColumnDataEquations.GMConjTranspose
-public import Formalism.LocalToGlobal.KernelLattices.ColumnData.ColumnDataEquations.MemSmulLat
-public import Formalism.LocalToGlobal.KernelLattices.ColumnData.ColumnDataEquations.NormOneUnitIdeal
-public import Formalism.LocalToGlobal.KernelLattices.ColumnData.ColumnDataEquations.Reduction
-public import Formalism.LocalToGlobal.KernelLattices.ColumnData.ColumnDataEquations.EqPOf
-public import Formalism.LocalToGlobal.KernelLattices.ColumnData.ColumnDataEquations.SplitPairOfGen
-public import Formalism.LocalToGlobal.KernelLattices.ColumnData.ColumnDataEquations.JArith
-public import Formalism.LocalToGlobal.KernelLattices.ColumnData.ColumnDataEquations.JFinal
-public import Formalism.LocalToGlobal.KernelLattices.ColumnData.ColumnDataEquations.SecondConstantOfTrianglesData
-public import Formalism.LocalToGlobal.KernelLattices.ColumnData.ColumnDataEquations.ZeroInjectionMemFourthPower
-public import Formalism.LocalToGlobal.KernelLattices.ColumnData.ColumnDataEquations.OneEntryMem
-public import Formalism.LocalToGlobal.KernelLattices.ColumnData.ColumnDataEquations.PullMulRight
-public import Formalism.LocalToGlobal.KernelLattices.ColumnData.ColumnDataEquations.SecondConstantHolds
-public import Formalism.LocalToGlobal.KernelLattices.ColumnData.ColumnDataEquations.JNoEig
-public import Formalism.LocalToGlobal.KernelLattices.ColumnData.ColumnDataEquations.JNormOne
-public import Formalism.LocalToGlobal.KernelLattices.ColumnData.ColumnDataEquations.MemStandardThetaLatticeIffAdelicIdeal
-public import Formalism.LocalToGlobal.KernelLattices.ColumnData.ColumnDataEquations.FinrankRow
-public import Formalism.LocalToGlobal.KernelLattices.ColumnData.ColumnDataEquations.MuConc
-public import Formalism.LocalToGlobal.KernelLattices.ColumnData.ColumnDataEquations.MuFinal
-public import Formalism.LocalToGlobal.KernelLattices.ColumnData.ColumnDataEquations.NormOneUnitIdealAlt
-public import Formalism.LocalToGlobal.KernelLattices.ColumnData.ColumnDataEquations.CharacterFactorUnitaryAction
-public import Formalism.LocalToGlobal.KernelLattices.ColumnData.ColumnDataEquations.ReductionOf
-public import Formalism.LocalToGlobal.KernelLattices.ColumnData.ColumnDataEquations.SqFacts
-public import Formalism.LocalToGlobal.KernelLattices.ColumnData.ColumnDataEquations.SqFinal
-public import Formalism.LocalToGlobal.KernelLattices.ColumnData.ColumnDataEquations.SqLComm
-public import Formalism.LocalToGlobal.KernelLattices.ColumnData.ColumnDataEquations.SqLInput
-public import Formalism.LocalToGlobal.KernelLattices.ColumnData.ColumnDataEquations.SqLLaw
-public import Formalism.LocalToGlobal.KernelLattices.ColumnData.ColumnDataEquations.SqLMain
-public import Formalism.LocalToGlobal.KernelLattices.ColumnData.ColumnDataEquations.SqLMat
-public import Formalism.LocalToGlobal.KernelLattices.ColumnData.ColumnDataEquations.SqLTop
-public import Formalism.LocalToGlobal.KernelLattices.ColumnData.ColumnDataEquations.RightMoveTrianglesOfUnit
-public import Formalism.LocalToGlobal.KernelLattices.ColumnData.Family
-public import Formalism.LocalToGlobal.KernelLattices.ColumnData.HfArith
-public import Formalism.LocalToGlobal.KernelLattices.ColumnData.LinkThIndepOfGen
-public import Formalism.LocalToGlobal.KernelLattices.ColumnData.HermitianPairingIntegral
-public import Formalism.LocalToGlobal.KernelLattices.ColumnData.HfTrace
-public import Formalism.LocalToGlobal.KernelLattices.ColumnData.AmbOfENeSd
-public import Formalism.LocalToGlobal.KernelLattices.ColumnData.IopIso
-public import Formalism.LocalToGlobal.KernelLattices.ColumnData.IopNorm
-public import Formalism.LocalToGlobal.GlobalTheory.GL3.PFourSq
-public import Formalism.LocalToGlobal.KernelLattices.ColumnData.LinkThIndep
-public import Formalism.LocalToGlobal.KernelLattices.ColumnData.LinkThU
-public import Formalism.LocalToGlobal.KernelLattices.ColumnData.SelfDual
 public import Formalism.LocalToGlobal.KernelLattices.ColumnData.Smooth
-public import Formalism.LocalToGlobal.KernelLattices.ColumnData.StdLat
-public import Formalism.LocalToGlobal.KernelLattices.ColumnData.StdOKP
-public import Formalism.LocalToGlobal.KernelLattices.ColumnData.ThIndep
+public import Formalism.LocalToGlobal.AlgebraicTheory.StatementEig
+public import Formalism.LocalToGlobal.KernelLattices.ColumnData.BaseExP
+import Formalism.LocalToGlobal.KernelLattices.ColumnData.StdOKP
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
+public import Formalism.LocalToGlobal.KernelLattices.KernelLocalFactors.SelfDualLatticeNorms.EmbCInjective
 
 @[expose] public section
 
@@ -102,8 +86,8 @@ theorem mat_mulVec (x : HomE X.E a b) (y : Sp X.E a)
   funext i
   have h : x y = ∑ j, y j • x (Pi.single j 1) := by
     conv_lhs => rw [← Finset.univ_sum_single y]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     refine Finset.sum_congr rfl fun j _ => ?_
     rw [← map_smul]
     congr 1
@@ -112,8 +96,8 @@ theorem mat_mulVec (x : HomE X.E a b) (y : Sp X.E a)
     · subst hk; simp
     · simp [hk]
   show ∑ j, s.iE (x (Pi.single j 1) i) * s.iE (y j) = s.iE (x y i)
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [h, Finset.sum_apply, map_sum]
+
+  rw [h, Finset.sum_apply, map_sum]
   refine Finset.sum_congr rfl fun j _ => ?_
   rw [Pi.smul_apply, smul_eq_mul, map_mul, mul_comm]
 

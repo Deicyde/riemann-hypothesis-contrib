@@ -1,6 +1,52 @@
 module
 
-public import Mathlib
+public import Mathlib.Algebra.MvPolynomial.PDeriv
+public import Mathlib.Basic.Complex.Basic
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
+public import Mathlib.Algebra.Order.BigOperators.GroupWithZero.Finset
+public import Mathlib.Algebra.Star.BigOperators
 
 @[expose] public section
 
@@ -12,15 +58,14 @@ variable {σ : Type*}
 
 def mfact (m : σ →₀ ℕ) : ℕ := m.prod fun _ k => k.factorial
 
-theorem mfact_pos (m : σ →₀ ℕ) : 0 < mfact m := Finset.prod_pos fun _ _ => Nat.factorial_pos _
+theorem mfact_pos (m : σ →₀ ℕ) : 0 < mfact m :=
+  Finset.prod_pos fun _ _ => Nat.factorial_pos _
 
-theorem mfact_add_single [DecidableEq σ] (s : σ →₀ ℕ) (a : σ)
-    : mfact (s + Finsupp.single a 1) = mfact s * (s a + 1) := by
+theorem mfact_add_single [DecidableEq σ] (s : σ →₀ ℕ) (a : σ) :
+    mfact (s + Finsupp.single a 1) = mfact s * (s a + 1) := by
   unfold mfact
-  have h1 :=
-    Finsupp.mul_prod_erase' (s + Finsupp.single a 1) a
-      (fun _ k => k.factorial)
-      (fun _ => Nat.factorial_zero)
+  have h1 := Finsupp.mul_prod_erase' (s + Finsupp.single a 1) a (fun _ k => k.factorial)
+    (fun _ => Nat.factorial_zero)
   have h2 := Finsupp.mul_prod_erase' s a (fun _ k => k.factorial) (fun _ => Nat.factorial_zero)
   have he : Finsupp.erase a (s + Finsupp.single a 1) = Finsupp.erase a s := by
     ext v
@@ -34,51 +79,46 @@ theorem mfact_add_single [DecidableEq σ] (s : σ →₀ ℕ) (a : σ)
 noncomputable def fischer (f g : MvPolynomial σ ℂ) : ℂ :=
   ∑ m ∈ g.support, (mfact m : ℂ) * star (AddMonoidAlgebra.coeff f m) * AddMonoidAlgebra.coeff g m
 
-theorem fischer_eq_sum (f g : MvPolynomial σ ℂ) (s : Finset (σ →₀ ℕ)) (hg : g.support ⊆ s)
-    : fischer f g
-      = ∑ m ∈ s, (mfact m : ℂ) * star (AddMonoidAlgebra.coeff f m) * AddMonoidAlgebra.coeff g m :=
+theorem fischer_eq_sum (f g : MvPolynomial σ ℂ) (s : Finset (σ →₀ ℕ)) (hg : g.support ⊆ s) :
+    fischer f g = ∑ m ∈ s, (mfact m : ℂ) * star (AddMonoidAlgebra.coeff f m) * AddMonoidAlgebra.coeff g m :=
   Finset.sum_subset hg fun m _ hm => by simp [MvPolynomial.notMem_support_iff.1 hm]
 
-theorem fischer_add_left (f f' g : MvPolynomial σ ℂ)
-    : fischer (f + f') g = fischer f g + fischer f' g := by
+theorem fischer_add_left (f f' g : MvPolynomial σ ℂ) :
+    fischer (f + f') g = fischer f g + fischer f' g := by
   simp only [fischer, MvPolynomial.coeff_add, star_add, mul_add, add_mul, Finset.sum_add_distrib]
 
-theorem fischer_smul_left (c : ℂ) (f g : MvPolynomial σ ℂ)
-    : fischer (c • f) g = star c * fischer f g := by
-  simp only [fischer, coeff_smul, smul_eq_mul, star_mul', Finset.mul_sum]
+theorem fischer_smul_left (c : ℂ) (f g : MvPolynomial σ ℂ) :
+    fischer (c • f) g = star c * fischer f g := by
+  simp only [fischer, MvPolynomial.coeff_smul, smul_eq_mul, star_mul', Finset.mul_sum]
   exact Finset.sum_congr rfl fun _ _ => by ring
 
-theorem fischer_add_right (f g g' : MvPolynomial σ ℂ)
-    : fischer f (g + g') = fischer f g + fischer f g' := by
+theorem fischer_add_right (f g g' : MvPolynomial σ ℂ) :
+    fischer f (g + g') = fischer f g + fischer f g' := by
   classical
   set s := g.support ∪ g'.support
   rw [fischer_eq_sum f (g + g') s (MvPolynomial.support_add),
     fischer_eq_sum f g s Finset.subset_union_left, fischer_eq_sum f g' s Finset.subset_union_right]
   simp only [MvPolynomial.coeff_add, mul_add, Finset.sum_add_distrib]
 
-theorem fischer_smul_right (c : ℂ) (f g : MvPolynomial σ ℂ)
-    : fischer f (c • g) = c * fischer f g := by
+theorem fischer_smul_right (c : ℂ) (f g : MvPolynomial σ ℂ) :
+    fischer f (c • g) = c * fischer f g := by
   rw [fischer_eq_sum f (c • g) g.support (MvPolynomial.support_smul), fischer, Finset.mul_sum]
-  simp only [coeff_smul, smul_eq_mul]
+  simp only [MvPolynomial.coeff_smul, smul_eq_mul]
   exact Finset.sum_congr rfl fun _ _ => by ring
 
-@[simp]
-theorem fischer_zero_left (g : MvPolynomial σ ℂ) : fischer 0 g = 0 := by simp [fischer]
+@[simp] theorem fischer_zero_left (g : MvPolynomial σ ℂ) : fischer 0 g = 0 := by simp [fischer]
 
-@[simp]
-theorem fischer_zero_right (f : MvPolynomial σ ℂ) : fischer f 0 = 0 := by simp [fischer]
+@[simp] theorem fischer_zero_right (f : MvPolynomial σ ℂ) : fischer f 0 = 0 := by simp [fischer]
 
-theorem fischer_sum_left
-    {ι : Type*} (s : Finset ι) (f : ι → MvPolynomial σ ℂ) (g : MvPolynomial σ ℂ)
-    : fischer (∑ i ∈ s, f i) g = ∑ i ∈ s, fischer (f i) g := by
+theorem fischer_sum_left {ι : Type*} (s : Finset ι) (f : ι → MvPolynomial σ ℂ)
+    (g : MvPolynomial σ ℂ) : fischer (∑ i ∈ s, f i) g = ∑ i ∈ s, fischer (f i) g := by
   classical
   induction s using Finset.induction_on with
   | empty => simp
   | insert a s ha ih => rw [Finset.sum_insert ha, Finset.sum_insert ha, fischer_add_left, ih]
 
-theorem fischer_sum_right
-    {ι : Type*} (s : Finset ι) (f : MvPolynomial σ ℂ) (g : ι → MvPolynomial σ ℂ)
-    : fischer f (∑ i ∈ s, g i) = ∑ i ∈ s, fischer f (g i) := by
+theorem fischer_sum_right {ι : Type*} (s : Finset ι) (f : MvPolynomial σ ℂ)
+    (g : ι → MvPolynomial σ ℂ) : fischer f (∑ i ∈ s, g i) = ∑ i ∈ s, fischer f (g i) := by
   classical
   induction s using Finset.induction_on with
   | empty => simp
@@ -92,16 +132,16 @@ theorem fischer_conj_symm (f g : MvPolynomial σ ℂ) : star (fischer f g) = fis
   simp only [star_mul', Complex.star_def, Complex.conj_natCast, Complex.conj_conj]
   ring
 
-theorem fischer_monomial [DecidableEq σ] (s t : σ →₀ ℕ) (c d : ℂ)
-    : fischer (monomial s c) (monomial t d) = if s = t then (mfact s : ℂ) * star c * d else 0 := by
+theorem fischer_monomial [DecidableEq σ] (s t : σ →₀ ℕ) (c d : ℂ) :
+    fischer (monomial s c) (monomial t d) = if s = t then (mfact s : ℂ) * star c * d else 0 := by
   rw [fischer_eq_sum _ _ {t} (MvPolynomial.support_monomial_subset), Finset.sum_singleton]
   simp only [coeff_monomial]
   by_cases h : s = t
   · subst h; simp
   · simp [h]
 
-theorem fischer_X_mul (a : σ) (f g : MvPolynomial σ ℂ)
-    : fischer (X a * f) g = fischer f (pderiv a g) := by
+theorem fischer_X_mul (a : σ) (f g : MvPolynomial σ ℂ) :
+    fischer (X a * f) g = fischer f (pderiv a g) := by
   classical
   induction f using MvPolynomial.induction_on' with
   | add p q hp hq => rw [mul_add, fischer_add_left, fischer_add_left, hp, hq]
@@ -130,20 +170,19 @@ theorem fischer_X_mul (a : σ) (f g : MvPolynomial σ ℂ)
         by_cases h : s = t - Finsupp.single a 1
         · have h' := hiff.2 h
           rw [if_pos h', if_pos h]
-          have hsa : (s a + 1 : ℕ) = t a := by rw [← h']; simp [add_comm]
+          have hsa : (s a + 1 : ℕ) = t a := by
+            rw [← h']; simp [add_comm]
           rw [add_comm (Finsupp.single a 1) s, mfact_add_single, ← hsa]
           push_cast
           ring
         · rw [if_neg (fun h' => h (hiff.1 h')), if_neg h]
 
-theorem fischer_pderiv (a : σ) (f g : MvPolynomial σ ℂ)
-    : fischer (pderiv a f) g = fischer f (X a * g) := by
+theorem fischer_pderiv (a : σ) (f g : MvPolynomial σ ℂ) :
+    fischer (pderiv a f) g = fischer f (X a * g) := by
   rw [← fischer_conj_symm, ← fischer_X_mul, fischer_conj_symm]
 
-theorem fischer_self (f : MvPolynomial σ ℂ)
-    : fischer f f
-      = ((∑ m ∈ f.support, (mfact m : ℝ) * Complex.normSq (AddMonoidAlgebra.coeff f m) : ℝ)
-        : ℂ) := by
+theorem fischer_self (f : MvPolynomial σ ℂ) :
+    fischer f f = ((∑ m ∈ f.support, (mfact m : ℝ) * Complex.normSq (AddMonoidAlgebra.coeff f m) : ℝ) : ℂ) := by
   rw [fischer]
   push_cast
   refine Finset.sum_congr rfl fun m _ => ?_

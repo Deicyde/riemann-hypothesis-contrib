@@ -1,18 +1,58 @@
 module
 
-public import Mathlib
-public import ReciprocityTheory.DualLattices.Imports
+public import ReciprocityTheory.DualLattices.AinfFacts
+public import ReciprocityTheory.DualLattices.FormalChartAtZero
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+public import Mathlib.CategoryTheory.Monoidal.Cartesian.Over
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Lemma
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
 public import ReciprocityTheory.DualLattices.CyclicRecursion
-public import ReciprocityTheory.DualLattices.TowerZeroSurjective
-public import ReciprocityTheory.DualLattices.LinPairStatement
-public import ReciprocityTheory.DualLattices.SubMemOfCompat
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDescent.ChartPullbacks.UniversalCharts.LePreimageOfNil
+public import ReciprocityTheory.DualLattices.Imports
+import Std.Tactic.BVDecide.Normalize.Prop
+import Mathlib.Topology.Sheaves.Presheaf
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDescent.ChartPullbacks.UniversalCharts.LePreimageOfNil
 
 @[expose] public section
 
-open TensorProduct IsLocalRing Matrix CategoryTheory AlgebraicGeometry MonoidalCategory
-  CartesianMonoidalCategory MonObj ReciprocityTheory.PGsh ReciprocityTheory.PGsh.Up
-  ReciprocityTheory.PGsh.L2 ReciprocityTheory.PGsh.Be2 ReciprocityTheory.ChartRestriction.G.Chart
+open TensorProduct IsLocalRing Matrix CategoryTheory AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj ReciprocityTheory.PGsh ReciprocityTheory.PGsh.Up ReciprocityTheory.PGsh.L2 ReciprocityTheory.PGsh.Be2 ReciprocityTheory.ChartRestriction.G.Chart
 open scoped CategoryTheory.Obj CategoryTheory.MonObj
 attribute [local instance] Over.cartesianMonoidalCategory
 
@@ -23,8 +63,8 @@ private lemma wS_mul (p : ℕ) [hp : Fact p.Prime] (n : ℕ) : (p : MvPolynomial
   set q : MvPolynomial (Fin n) ℤ := (∑ j, (MvPolynomial.X j) ^ p) - (∑ j, MvPolynomial.X j) ^ p with hq
   have hd : MvPolynomial.C (p : ℤ) ∣ q := by
     rw [MvPolynomial.C_dvd_iff_zmod, hq]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sub, map_sum, map_pow, MvPolynomial.map_X]
+
+    simp only [map_sub, map_sum, map_pow, MvPolynomial.map_X]
     rw [sum_pow_char, sub_self]
   rw [MvPolynomial.C_dvd_iff_dvd_coeff] at hd
   conv_rhs => rw [q.as_sum]
@@ -49,27 +89,16 @@ private lemma teich_decomp (p : ℕ) [Fact p.Prime] {K : Type} [CommRing K] [Cha
   rw [pow_one] at hw
   rw [mul_comm, hw]; abel
 
-theorem teichmuller_quot
-    : (∀ (p : ℕ) [Fact p.Prime] {C : Type} [Field C] [IsAlgClosed C] [CharZero C]
-        {v : Valuation C NNReal} (O : Type) [CommRing O] [Algebra O C] [Fact ¬ IsUnit (p : O)]
-        [IsAdicComplete (Ideal.span {(p : O)}) O] (hv : v.Integers O) (ε : PreTilt O p)
-        (hε : IsPrimitiveRoot (((frobeniusEquiv (PreTilt O p) p).symm ε).untilt) p)
-        (ϖ : PreTilt O p),
-      ϖ.untilt = (p : O)
-        → ∀ (W : Type) [CommRing W] (pr : Ainf.A p O →+* W),
-          Function.Surjective pr
-            → RingHom.ker pr = Ideal.span {(p : Ainf.A p O) ^ 2, WittVector.teichmuller p ϖ}
-            → (∀ w : W, ∃ c : PreTilt O p, ∃ c' : W, w = pr (WittVector.teichmuller p c) + p * c')
-              ∧ (∀ (n : ℕ) (a : Fin n → PreTilt O p),
-                ∑ j, pr (WittVector.teichmuller p (a j))
-                  = pr (WittVector.teichmuller p (∑ j, a j))
-                    + p * pr (WittVector.teichmuller p
-                      (MvPolynomial.eval₂ (Int.castRingHom (PreTilt O p))
-                        (fun j => (frobeniusEquiv (PreTilt O p) p).symm (a j))
-                        (wS p n))))
-              ∧ (∀ c : PreTilt O p,
-                WittVector.fontaineTheta O p (WittVector.teichmuller p c) ∈ Ideal.span {(p : O)}
-                  → pr (WittVector.teichmuller p c) = 0)) := by
+theorem teichmuller_quot :
+  (∀ (p : ℕ) [Fact p.Prime] {C : Type} [Field C] [IsAlgClosed C] [CharZero C] {v : Valuation C NNReal} (O : Type) [CommRing O] [Algebra O C]
+    [Fact ¬IsUnit (p : O)] [IsAdicComplete (Ideal.span {(p : O)}) O] (hv : v.Integers O) (ε : PreTilt O p)
+    (hε : IsPrimitiveRoot (((frobeniusEquiv (PreTilt O p) p).symm ε).untilt) p) (ϖ : PreTilt O p), ϖ.untilt = (p : O) →
+    ∀ (W : Type) [CommRing W] (pr : Ainf.A p O →+* W), Function.Surjective pr →
+    RingHom.ker pr = Ideal.span {(p : Ainf.A p O) ^ 2, WittVector.teichmuller p ϖ} →
+    (∀ w : W, ∃ c : PreTilt O p, ∃ c' : W, w = pr (WittVector.teichmuller p c) + p * c') ∧
+    (∀ (n : ℕ) (a : Fin n → PreTilt O p), ∑ j, pr (WittVector.teichmuller p (a j)) = pr (WittVector.teichmuller p (∑ j, a j)) +
+      p * pr (WittVector.teichmuller p (MvPolynomial.eval₂ (Int.castRingHom (PreTilt O p)) (fun j => (frobeniusEquiv (PreTilt O p) p).symm (a j)) (wS p n)))) ∧
+    (∀ c : PreTilt O p, WittVector.fontaineTheta O p (WittVector.teichmuller p c) ∈ Ideal.span {(p : O)} → pr (WittVector.teichmuller p c) = 0)) := by
   intro p _ C _ _ _ v O _ _ _ _ hv ε hε ϖ hϖ W _ pr hpr hker
   have hp2 : pr ((p : Ainf.A p O) ^ 2) = 0 := by
     rw [← RingHom.mem_ker, hker]; exact Ideal.subset_span (by simp)
@@ -83,22 +112,18 @@ theorem teichmuller_quot
     rw [map_add (f := _), map_mul, map_natCast]
   · obtain ⟨w, hw⟩ := ((teichSum p (Fin n) Finset.univ).2 (PreTilt O p) a (wS p n) (wS_mul p n)).1
     have h := congrArg pr hw
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, map_add (f := _), map_add (f := _), map_mul, map_mul, hp2, zero_mul, add_zero,
-          map_natCast]
-        at h
+
+    rw [map_sum, map_add (f := _), map_add (f := _), map_mul, map_mul, hp2, zero_mul, add_zero, map_natCast] at h
     rw [h, MvPolynomial.aeval_def]
     rfl
   · have hK := ((a0 p C v O hv).2.2.1 ϖ hϖ).2.2
-    have hm
-        : WittVector.teichmuller p c
-          ∈ Ideal.span {(p : WittVector p (PreTilt O p)), WittVector.teichmuller p ϖ} := by
+    have hm : WittVector.teichmuller p c ∈
+        Ideal.span {(p : WittVector p (PreTilt O p)), WittVector.teichmuller p ϖ} := by
       rw [← hK, RingHom.mem_ker, RingHom.comp_apply, Ideal.Quotient.eq_zero_iff_mem]
       exact hc
     obtain ⟨x, y, hxy⟩ := Ideal.mem_span_pair.mp hm
     have h := congrArg (WittVector.constantCoeff (p := p) (R := PreTilt O p)) hxy
-    rw [map_add (f := _), map_mul, map_mul, map_natCast, CharP.cast_eq_zero, mul_zero, zero_add]
-      at h
+    rw [map_add (f := _), map_mul, map_mul, map_natCast, CharP.cast_eq_zero, mul_zero, zero_add] at h
     simp only [WittVector.constantCoeff_apply, WittVector.teichmuller_coeff_zero] at h
     rw [← h, map_mul, map_mul, hϖ0, mul_zero]
 

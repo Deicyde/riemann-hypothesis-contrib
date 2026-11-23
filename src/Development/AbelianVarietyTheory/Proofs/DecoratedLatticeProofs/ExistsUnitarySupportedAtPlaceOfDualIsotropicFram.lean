@@ -1,7 +1,48 @@
 module
 
-public import Mathlib
+public import Development.AbelianVarietyTheory.Definitions.LatticeFrames.IsSumFrame
 public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.WittCoreEmbeddingPreservesSupportedUnitarySubgro
+import Formalism.LocalToGlobal.BesselHermitianTheta.LemmasWeil
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -90,7 +131,6 @@ theorem diag_const {ε : AE D} {n : ℕ} {α β : Fin n → AE D} (hαβ : ∀ i
   · subst h; simp
   · simp [h]
 
-set_option maxHeartbeats 1000000 in
 theorem imYX
     {ε : AE D} (hεε : ε * ε = ε) (hεc : cA D ε = ε)
     {α β : Fin ρ → AE D} (hαε : ∀ i, ε * α i = α i) (hαβ : ∀ i, α i * β i = ε)
@@ -132,7 +172,6 @@ theorem imXX {ε : AE D} {β : Fin ρ → AE D} {b : Mx D ρ ρ}
       = 0 := by
   rw [adj_mul, Matrix.mul_assoc, gXX, Matrix.mul_zero]
 
-set_option maxHeartbeats 1000000 in
 theorem imYY
     {ε : AE D} (hεε : ε * ε = ε) (hεc : cA D ε = ε)
     {α : Fin ρ → AE D} (hαε : ∀ i, ε * α i = α i)
@@ -149,7 +188,6 @@ theorem imYY
   simp only [mul_tail₃ H2, Matrix.mul_zero, Matrix.smul_mul, Matrix.mul_smul, smul_smul, d.gram_YY,
     smul_zero, kill_mid₂ hεε hc, kill_left hεε (diag_absorb hαε), add_zero, Matrix.zero_mul]
 
-set_option maxHeartbeats 1000000 in
 theorem imOO {b : Mx D ρ ρ} {c' : Mx D S.rank ρ}
     : adj (d.j0 - (d.jX * b) * (adj c' * (gA S * d.j0)))
         * (gA S * (d.j0 - (d.jX * b) * (adj c' * (gA S * d.j0))))
@@ -157,7 +195,6 @@ theorem imOO {b : Mx D ρ ρ} {c' : Mx D S.rank ρ}
   simp only [adj_sub, adj_mul, adj_gA, adj_adj, Matrix.mul_sub, Matrix.sub_mul, Matrix.mul_assoc,
     d.gram_00, d.wittDecomp_gram_X_anisotropic, gXX, g0X, Matrix.mul_zero, sub_zero]
 
-set_option maxHeartbeats 1000000 in
 theorem imOX {ε : AE D} {β : Fin ρ → AE D} {b : Mx D ρ ρ} {c' : Mx D S.rank ρ}
     : adj (d.j0 - (d.jX * b) * (adj c' * (gA S * d.j0)))
         * (gA S * (d.jX * (b * Matrix.diagonal β + (1 - ε) • (1 : Mx D ρ ρ))))
@@ -165,7 +202,6 @@ theorem imOX {ε : AE D} {β : Fin ρ → AE D} {b : Mx D ρ ρ} {c' : Mx D S.ra
   simp only [adj_sub, adj_mul, Matrix.sub_mul, Matrix.mul_assoc, gXX, g0X, Matrix.mul_zero,
     sub_zero]
 
-set_option maxHeartbeats 1000000 in
 theorem imOY
     {ε : AE D} (hεε : ε * ε = ε) (hεc : cA D ε = ε)
     {α : Fin ρ → AE D} {b : Mx D ρ ρ} (hb : ε • b = b)
@@ -187,7 +223,6 @@ namespace GlobalTheory.IwaPlace.BuildQ
 
 variable {D : D7} {S S₀ : HSp D} {ρ : ℕ} (d : HypDec S S₀ ρ)
 
-set_option maxHeartbeats 1000000 in
 theorem smul_sub_one
     {ε : AE D} (M : Mx D S.rank S.rank) (hX : ε • (M * d.jX - d.jX) = M * d.jX - d.jX)
     (h0 : ε • (M * d.j0 - d.j0) = M * d.j0 - d.j0) (hY : ε • (M * d.jY - d.jY) = M * d.jY - d.jY)
@@ -214,7 +249,6 @@ theorem scalar_X
 end GlobalTheory.IwaPlace.BuildQ
 
 open GlobalTheory.IwaPlace.BuildQ in
-set_option maxHeartbeats 1000000 in
 theorem GlobalTheory.IwaPlace.exists_grpAt_of_dual_frames
     : ∀ (D : D7) (S S₀ : HSp D) (ρ : ℕ) (d : HypDec S S₀ ρ) (v : Pl D) (ε : AE D) (hεε : ε * ε = ε)
         (hεc : cA D ε = ε) (hεI : ε ∈ intAt D (· = v)) (hε : ∀ a, a ∈ idAt D (· = v) ↔ ε * a = a)

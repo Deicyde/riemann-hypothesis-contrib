@@ -1,30 +1,78 @@
 module
 
-public import Mathlib
-public import Development.WeilBound.ThetaLifts.LatticeBasics.HypothesesE
-public import Development.WeilBound.ThetaLifts.LatticeBasics.UnfoldC
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.EmbBar
+public import Mathlib.Analysis.Complex.Norm
+public import Mathlib.NumberTheory.NumberField.Basic
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Real
+import Mathlib.Analysis.CStarAlgebra.Classes
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.NumberField.CanonicalEmbedding.Basic
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Coalgebra.IsFrobenius
+import Mathlib.RingTheory.HopfAlgebra.Basic
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Development.AbelianVarietyTheory.BlockTheory.DivisorBase.WeilTensorModels
+import Development.AbelianVarietyTheory.Definitions.Divisors.HilbertNinetyQuotientHomEqIff
+import Development.AbelianVarietyTheory.Definitions.Foundations.EventuallyNormFinLeOne
+import Development.AbelianVarietyTheory.Definitions.Foundations.IsIwasawaOfIsCompact
+import Development.AbelianVarietyTheory.Definitions.Foundations.NormEulerPolySubOneLe
+public import Development.AbelianVarietyTheory.Definitions.Foundations.T2SpaceTensorProductFiniteExtension
+import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.EmbBar
+import Development.WeilBound.ThetaLifts.LatticeBasics.UnfoldA
+import Formalism.SharpRestriction.GlobalSchurBounds.GeneralLinearActions.GenusMassVolumes
 
 @[expose] public section
 
 open scoped TensorProduct NNReal Matrix
-open NumberField IsDedekindDomain MeasureTheory Filter Topology
-  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
-open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
-  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK.Dbl
+open NumberField IsDedekindDomain MeasureTheory Filter Topology Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK.Dbl
 open GlobalTheory.Doubling (absE)
 open GlobalTheory.CompanionTheory.GodementH
 
 namespace GlobalTheory.CompanionTheory.IntegerCount
 
-theorem card_bounded_conjugates_le
-    : ∀ (E : Type) [Field E] [NumberField E], ∃ C : ℝ,
-      0 < C
-        ∧ ∀ R : ℝ,
-          1 ≤ R
-            → {β : 𝓞 E | ∀ τ : E →+* ℂ, ‖τ (β : E)‖ ≤ R}.Finite
-              ∧ (Set.ncard {β : 𝓞 E | ∀ τ : E →+* ℂ, ‖τ (β : E)‖ ≤ R} : ℝ)
-                ≤ C * R ^ Module.finrank ℚ E := by
+theorem card_bounded_conjugates_le :
+    ∀ (E : Type) [Field E] [NumberField E], ∃ C : ℝ, 0 < C ∧ ∀ R : ℝ, 1 ≤ R →
+    {β : 𝓞 E | ∀ τ : E →+* ℂ, ‖τ (β : E)‖ ≤ R}.Finite ∧
+    (Set.ncard {β : 𝓞 E | ∀ τ : E →+* ℂ, ‖τ (β : E)‖ ≤ R} : ℝ) ≤ C * R ^ Module.finrank ℚ E := by
   intro E _ _
   classical
   let ι := Module.Free.ChooseBasisIndex ℤ (𝓞 E)
@@ -34,28 +82,24 @@ theorem card_bounded_conjugates_le
   let L : ι → (((E →+* ℂ) → ℂ) →L[ℂ] ℂ) := fun i => LinearMap.toContinuousLinearMap (B.coord i)
   let C₀ : ℝ := ∑ i, ‖L i‖
   have hC₀ : 0 ≤ C₀ := Finset.sum_nonneg fun _ _ => norm_nonneg _
-  have hcoord
-      : ∀ (β : 𝓞 E) (i : ι), L i (canonicalEmbedding E (β : E)) = ((b.repr β i : ℤ) : ℂ) := by
+  have hcoord : ∀ (β : 𝓞 E) (i : ι), L i (canonicalEmbedding E (β : E)) = ((b.repr β i : ℤ) : ℂ) := by
     intro β i
     have hx : canonicalEmbedding E (β : E) = ∑ j, ((b.repr β j : ℤ) : ℂ) • B j := by
       have h0 : (β : E) = ∑ j, ((b.repr β j : ℤ) : E) * ((b j : 𝓞 E) : E) := by
         conv_lhs => rw [← b.sum_repr β]
-        set_option synthInstance.maxHeartbeats 100000 in
+
         simp [map_sum, zsmul_eq_mul]
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [h0, map_sum]
+
+      rw [h0, map_sum]
       refine Finset.sum_congr rfl fun j _ => ?_
       ext τ
       simp [B, b, canonicalEmbedding.latticeBasis_apply, integralBasis_apply]
     change B.coord i _ = _
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hx, map_sum]
+
+    rw [hx, map_sum]
     simp [Module.Basis.coord_apply, Finsupp.single_apply]
-  have hbound
-      : ∀ (R : ℝ),
-        1 ≤ R
-          → ∀ β : 𝓞 E,
-            (∀ τ : E →+* ℂ, ‖τ (β : E)‖ ≤ R) → ∀ i, |((b.repr β i : ℤ) : ℝ)| ≤ C₀ * R := by
+  have hbound : ∀ (R : ℝ), 1 ≤ R → ∀ β : 𝓞 E, (∀ τ : E →+* ℂ, ‖τ (β : E)‖ ≤ R) →
+      ∀ i, |((b.repr β i : ℤ) : ℝ)| ≤ C₀ * R := by
     intro R hR β hβ i
     have hx : ‖canonicalEmbedding E (β : E)‖ ≤ R :=
       (pi_norm_le_iff_of_nonneg (by linarith)).2 fun τ => by simpa using hβ τ
@@ -97,18 +141,17 @@ theorem card_bounded_conjugates_le
     have h1 : ((Finset.Icc (-N) N).card : ℤ) = 2 * N + 1 := by
       rw [Int.card_Icc]
       omega
-    have h2 : ((Finset.Icc (-N) N).card : ℝ) = 2 * (N : ℝ) + 1 := by exact_mod_cast h1
+    have h2 : ((Finset.Icc (-N) N).card : ℝ) = 2 * (N : ℝ) + 1 := by
+      exact_mod_cast h1
     simp only [box, Fintype.card_piFinset, Finset.prod_const, Finset.card_univ, hcard]
     push_cast
     rw [h2]
   have hNle : (N : ℝ) ≤ C₀ * R := Int.floor_le _
-  calc
-    (S.ncard : ℝ)
-      ≤ box.card := by exact_mod_cast hle
+  calc (S.ncard : ℝ) ≤ box.card := by exact_mod_cast hle
     _ = (2 * (N : ℝ) + 1) ^ Module.finrank ℚ E := hboxcard
     _ ≤ ((2 * C₀ + 1) * R) ^ Module.finrank ℚ E := by
-      have hN0' : (0 : ℝ) ≤ N := by exact_mod_cast hN0
-      exact pow_le_pow_left₀ (by positivity) (by nlinarith) _
+        have hN0' : (0 : ℝ) ≤ N := by exact_mod_cast hN0
+        exact pow_le_pow_left₀ (by positivity) (by nlinarith) _
     _ = (2 * C₀ + 1) ^ Module.finrank ℚ E * R ^ Module.finrank ℚ E := mul_pow _ _ _
 
 end GlobalTheory.CompanionTheory.IntegerCount

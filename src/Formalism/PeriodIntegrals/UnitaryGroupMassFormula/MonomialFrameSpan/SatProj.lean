@@ -1,6 +1,48 @@
 module
 
 public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.MonomialFrameSpan.SatDefs
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -29,11 +71,12 @@ theorem emb_inj (s : Lt) : Function.Injective (emb (N0 := N0) s) := by
 def res (s : Lt) (m : Lt × ℕ × Fin N0 →₀ ℕ) : ℕ × Fin N0 →₀ ℕ :=
   m.comapDomain (emb s) (emb_inj s).injOn
 
-theorem res_apply (s : Lt) (m : Lt × ℕ × Fin N0 →₀ ℕ) (p : ℕ × Fin N0) : res s m p = m (emb s p) :=
+theorem res_apply (s : Lt) (m : Lt × ℕ × Fin N0 →₀ ℕ) (p : ℕ × Fin N0) :
+    res s m p = m (emb s p) :=
   Finsupp.comapDomain_apply _ _ _ _
 
-theorem res_sum (n : Lt → (ℕ × Fin N0 →₀ ℕ)) (t : Lt)
-    : res t (∑ s, (n s).mapDomain (emb s)) = n t := by
+theorem res_sum (n : Lt → (ℕ × Fin N0 →₀ ℕ)) (t : Lt) :
+    res t (∑ s, (n s).mapDomain (emb s)) = n t := by
   ext p
   rw [res_apply, Finsupp.finsetSum_apply, Finset.sum_eq_single t]
   · exact Finsupp.mapDomain_apply_of_injective (emb_inj t) _ _
@@ -45,46 +88,42 @@ theorem res_sum (n : Lt → (ℕ × Fin N0 →₀ ℕ)) (t : Lt)
   · intro h
     exact absurd (Finset.mem_univ t) h
 
-theorem prod_rename_monomial (n : Lt → (ℕ × Fin N0 →₀ ℕ))
-    : ∏ s, rename (emb s) (monomial (n s) (1 : ℤ)) = monomial (∑ s, (n s).mapDomain (emb s)) 1 := by
+theorem prod_rename_monomial (n : Lt → (ℕ × Fin N0 →₀ ℕ)) :
+    ∏ s, rename (emb s) (monomial (n s) (1 : ℤ)) =
+      monomial (∑ s, (n s).mapDomain (emb s)) 1 := by
   simp only [rename_monomial]
   rw [monomial_sum_one]
 
-theorem nablaX_eq (nu : Lt → YoungDiagram) (J : ColChoice N0 nu)
-    : nablaX N0 nu J
-      = ∏ s, rename (emb s) (∏ c : Fin ((nu s).rowLen 0), minorX ℤ N0 ((nu s).colLen c) (J s c)) :=
-  by
-    unfold nablaX minorX
-    refine Finset.prod_congr rfl fun s _ => ?_
-    rw [map_prod]
-    refine Finset.prod_congr rfl fun c _ => ?_
-    rw [AlgHom.map_det]
-    congr 1
-    ext i k
-    simp [emb]
+theorem nablaX_eq (nu : Lt → YoungDiagram) (J : ColChoice N0 nu) :
+    nablaX N0 nu J = ∏ s, rename (emb s) (∏ c : Fin ((nu s).rowLen 0), minorX ℤ N0 ((nu s).colLen c) (J s c)) := by
+  unfold nablaX minorX
+  refine Finset.prod_congr rfl fun s _ => ?_
+  rw [map_prod]
+  refine Finset.prod_congr rfl fun c _ => ?_
+  rw [AlgHom.map_det]
+  congr 1
+  ext i k
+  simp [emb]
 
-def Tmap (π : Lt → (MvPolynomial (ℕ × Fin N0) ℤ →ₗ[ℤ] MvPolynomial (ℕ × Fin N0) ℤ))
-    : MvPolynomial (Lt × ℕ × Fin N0) ℤ →ₗ[ℤ] MvPolynomial (Lt × ℕ × Fin N0) ℤ :=
+def Tmap (π : Lt → (MvPolynomial (ℕ × Fin N0) ℤ →ₗ[ℤ] MvPolynomial (ℕ × Fin N0) ℤ)) :
+    MvPolynomial (Lt × ℕ × Fin N0) ℤ →ₗ[ℤ] MvPolynomial (Lt × ℕ × Fin N0) ℤ :=
   (basisMonomials (Lt × ℕ × Fin N0) ℤ).constr ℤ fun m =>
     ∏ s, rename (emb s) (π s (monomial (res s m) 1))
 
-theorem Tmap_monomial
-    (π : Lt → (MvPolynomial (ℕ × Fin N0) ℤ →ₗ[ℤ] MvPolynomial (ℕ × Fin N0) ℤ))
-    (m : Lt × ℕ × Fin N0 →₀ ℕ)
-    : Tmap π (monomial m 1) = ∏ s, rename (emb s) (π s (monomial (res s m) 1)) := by
-  have : (monomial m (1 : ℤ) : MvPolynomial (Lt × ℕ × Fin N0) ℤ)
-      = basisMonomials (Lt × ℕ × Fin N0) ℤ m := by
+theorem Tmap_monomial (π : Lt → (MvPolynomial (ℕ × Fin N0) ℤ →ₗ[ℤ] MvPolynomial (ℕ × Fin N0) ℤ))
+    (m : Lt × ℕ × Fin N0 →₀ ℕ) :
+    Tmap π (monomial m 1) = ∏ s, rename (emb s) (π s (monomial (res s m) 1)) := by
+  have : (monomial m (1 : ℤ) : MvPolynomial (Lt × ℕ × Fin N0) ℤ) =
+      basisMonomials (Lt × ℕ × Fin N0) ℤ m := by
     rw [coe_basisMonomials]
   rw [this, Tmap, Module.Basis.constr_basis]
 
-theorem Tmap_prod
-    (π : Lt → (MvPolynomial (ℕ × Fin N0) ℤ →ₗ[ℤ] MvPolynomial (ℕ × Fin N0) ℤ))
-    (h : Lt → MvPolynomial (ℕ × Fin N0) ℤ)
-    : Tmap π (∏ s, rename (emb s) (h s)) = ∏ s, rename (emb s) (π s (h s)) := by
-  suffices H
-      : ∀ F : Finset Lt, ∀ h : Lt → MvPolynomial (ℕ × Fin N0) ℤ,
-        (∀ s ∉ F, ∃ n, h s = monomial n 1)
-          → Tmap π (∏ s, rename (emb s) (h s)) = ∏ s, rename (emb s) (π s (h s)) from
+theorem Tmap_prod (π : Lt → (MvPolynomial (ℕ × Fin N0) ℤ →ₗ[ℤ] MvPolynomial (ℕ × Fin N0) ℤ))
+    (h : Lt → MvPolynomial (ℕ × Fin N0) ℤ) :
+    Tmap π (∏ s, rename (emb s) (h s)) = ∏ s, rename (emb s) (π s (h s)) := by
+  suffices H : ∀ F : Finset Lt, ∀ h : Lt → MvPolynomial (ℕ × Fin N0) ℤ,
+      (∀ s ∉ F, ∃ n, h s = monomial n 1) →
+      Tmap π (∏ s, rename (emb s) (h s)) = ∏ s, rename (emb s) (π s (h s)) from
     H Finset.univ h (fun s hs => absurd (Finset.mem_univ s) hs)
   intro F
   induction F using Finset.induction_on with
@@ -98,46 +137,38 @@ theorem Tmap_prod
     rw [res_sum]
   | insert a F haF ih =>
     intro h hh
-    have key
-        : ∀ g : MvPolynomial (ℕ × Fin N0) ℤ,
-          Tmap π (rename (emb a) g * ∏ s ∈ Finset.univ.erase a, rename (emb s) (h s))
-            = rename (emb a) (π a g) * ∏ s ∈ Finset.univ.erase a, rename (emb s) (π s (h s)) := by
+    have key : ∀ g : MvPolynomial (ℕ × Fin N0) ℤ,
+        Tmap π (rename (emb a) g * ∏ s ∈ Finset.univ.erase a, rename (emb s) (h s)) =
+          rename (emb a) (π a g) * ∏ s ∈ Finset.univ.erase a, rename (emb s) (π s (h s)) := by
       let A : MvPolynomial (ℕ × Fin N0) ℤ →ₗ[ℤ] MvPolynomial (Lt × ℕ × Fin N0) ℤ :=
-        Tmap π ∘ₗ LinearMap.mulRight ℤ (∏ s ∈ Finset.univ.erase a, rename (emb s) (h s))
-          ∘ₗ (rename (emb a)).toLinearMap
+        Tmap π ∘ₗ LinearMap.mulRight ℤ (∏ s ∈ Finset.univ.erase a, rename (emb s) (h s)) ∘ₗ
+          (rename (emb a)).toLinearMap
       let B : MvPolynomial (ℕ × Fin N0) ℤ →ₗ[ℤ] MvPolynomial (Lt × ℕ × Fin N0) ℤ :=
-        LinearMap.mulRight ℤ (∏ s ∈ Finset.univ.erase a, rename (emb s) (π s (h s)))
-          ∘ₗ (rename (emb a)).toLinearMap ∘ₗ π a
+        LinearMap.mulRight ℤ (∏ s ∈ Finset.univ.erase a, rename (emb s) (π s (h s))) ∘ₗ
+          (rename (emb a)).toLinearMap ∘ₗ π a
       have hAB : A = B := by
         refine (basisMonomials (ℕ × Fin N0) ℤ).ext fun u => ?_
         rw [coe_basisMonomials]
         simp only [A, B, LinearMap.coe_comp, Function.comp_apply, LinearMap.mulRight_apply,
           AlgHom.toLinearMap_apply]
-        have h1 :=
-          ih (Function.update h a (monomial u 1)) (by
-            intro s hs
-            by_cases hsa : s = a
-            · subst hsa
-              exact ⟨u, by simp⟩
-            · rw [Function.update_of_ne hsa]
-              exact hh s (by simp [hsa, hs]))
+        have h1 := ih (Function.update h a (monomial u 1)) (by
+          intro s hs
+          by_cases hsa : s = a
+          · subst hsa
+            exact ⟨u, by simp⟩
+          · rw [Function.update_of_ne hsa]
+            exact hh s (by simp [hsa, hs]))
         rw [← Finset.mul_prod_erase _ _ (Finset.mem_univ a),
-            ← Finset.mul_prod_erase _
-              (fun s => rename (emb s) (π s (Function.update h a (monomial u 1) s)))
-              (Finset.mem_univ a)]
-          at h1
+          ← Finset.mul_prod_erase _ (fun s => rename (emb s) (π s (Function.update h a (monomial u 1) s)))
+            (Finset.mem_univ a)] at h1
         simp only [Function.update_self] at h1
-        have e1
-            : ∏ s ∈ Finset.univ.erase a, rename (emb s) (Function.update h a (monomial u 1) s)
-              = ∏ s ∈ Finset.univ.erase a, rename (emb s) (h s) :=
-          Finset.prod_congr rfl fun s hs => by
-            rw [Function.update_of_ne (Finset.ne_of_mem_erase hs)]
-        have e2
-            : ∏ s ∈ Finset.univ.erase a,
-                rename (emb s) (π s (Function.update h a (monomial u 1) s))
-              = ∏ s ∈ Finset.univ.erase a, rename (emb s) (π s (h s)) :=
-          Finset.prod_congr rfl fun s hs => by
-            rw [Function.update_of_ne (Finset.ne_of_mem_erase hs)]
+        have e1 : ∏ s ∈ Finset.univ.erase a, rename (emb s) (Function.update h a (monomial u 1) s) =
+            ∏ s ∈ Finset.univ.erase a, rename (emb s) (h s) :=
+          Finset.prod_congr rfl fun s hs => by rw [Function.update_of_ne (Finset.ne_of_mem_erase hs)]
+        have e2 : ∏ s ∈ Finset.univ.erase a,
+            rename (emb s) (π s (Function.update h a (monomial u 1) s)) =
+            ∏ s ∈ Finset.univ.erase a, rename (emb s) (π s (h s)) :=
+          Finset.prod_congr rfl fun s hs => by rw [Function.update_of_ne (Finset.ne_of_mem_erase hs)]
         rw [e1, e2] at h1
         exact h1
       intro g
@@ -146,22 +177,17 @@ theorem Tmap_prod
       ← Finset.mul_prod_erase _ (fun s => rename (emb s) (π s (h s))) (Finset.mem_univ a)]
     exact key (h a)
 
-theorem prod_mem_span
-    (nu : Lt → YoungDiagram) (g : Lt → MvPolynomial (ℕ × Fin N0) ℤ)
-    (hg : ∀ s, g s ∈ nablaSpan ℤ N0 (nu s))
-    : ∏ s, rename (emb s) (g s) ∈ Submodule.span ℤ (Set.range (nablaX N0 nu)) := by
+theorem prod_mem_span (nu : Lt → YoungDiagram) (g : Lt → MvPolynomial (ℕ × Fin N0) ℤ)
+    (hg : ∀ s, g s ∈ nablaSpan ℤ N0 (nu s)) :
+    ∏ s, rename (emb s) (g s) ∈ Submodule.span ℤ (Set.range (nablaX N0 nu)) := by
   by_cases hne : Nonempty (ColChoice N0 nu)
   · obtain ⟨J0⟩ := hne
-    suffices H
-        : ∀ F : Finset Lt,
-          ∏ s ∈ F, rename (emb s) (g s) ∈ Submodule.span ℤ
-            (Set.range fun J : ColChoice N0 nu =>
-              ∏ s ∈ F, rename (emb s) (∏ c : Fin ((nu s).rowLen 0), minorX ℤ N0 ((nu s).colLen c) (J s c))) by
+    suffices H : ∀ F : Finset Lt, ∏ s ∈ F, rename (emb s) (g s) ∈ Submodule.span ℤ
+        (Set.range fun J : ColChoice N0 nu =>
+          ∏ s ∈ F, rename (emb s) (∏ c : Fin ((nu s).rowLen 0), minorX ℤ N0 ((nu s).colLen c) (J s c))) by
       have H1 := H Finset.univ
-      have hf
-          : (fun J : ColChoice N0 nu =>
-              ∏ s, rename (emb s) (∏ c : Fin ((nu s).rowLen 0), minorX ℤ N0 ((nu s).colLen c) (J s c)))
-            = nablaX N0 nu :=
+      have hf : (fun J : ColChoice N0 nu =>
+          ∏ s, rename (emb s) (∏ c : Fin ((nu s).rowLen 0), minorX ℤ N0 ((nu s).colLen c) (J s c))) = nablaX N0 nu :=
         funext fun J => (nablaX_eq nu J).symm
       rw [hf] at H1
       exact H1
@@ -172,11 +198,9 @@ theorem prod_mem_span
       exact Submodule.subset_span ⟨J0, rfl⟩
     | insert a F haF ih =>
       rw [Finset.prod_insert haF]
-      have ha
-          : rename (emb a) (g a) ∈ Submodule.span ℤ
-            (Set.range fun j : (∀ c : Fin ((nu a).rowLen 0), Fin ((nu a).colLen c) ↪o Fin N0) =>
-              rename (emb a)
-                (∏ c : Fin ((nu a).rowLen 0), minorX ℤ N0 ((nu a).colLen c) (j c))) := by
+      have ha : rename (emb a) (g a) ∈ Submodule.span ℤ (Set.range fun
+          j : (∀ c : Fin ((nu a).rowLen 0), Fin ((nu a).colLen c) ↪o Fin N0) =>
+            rename (emb a) (∏ c : Fin ((nu a).rowLen 0), minorX ℤ N0 ((nu a).colLen c) (j c))) := by
         have := Submodule.mem_map_of_mem (f := (rename (emb a)).toLinearMap) (hg a)
         rw [nablaSpan, Submodule.map_span, ← Set.range_comp] at this
         exact this
@@ -224,14 +248,13 @@ theorem projZ : ProjZ := by
     simp only [π, LinearMap.coe_comp, Function.comp_apply, Submodule.coe_subtype]
     rw [Submodule.projectionOnto_apply_left (hCm s) ⟨x, hx⟩]
   refine ⟨Tmap π, fun P => ?_, fun J => ?_⟩
-  set_option synthInstance.maxHeartbeats 100000 in
-    · rw [MvPolynomial.as_sum P, map_sum]
-      refine Submodule.sum_mem _ fun m _ => ?_
-      have : monomial m (AddMonoidAlgebra.coeff P m)
-          = AddMonoidAlgebra.coeff P m • monomial m (1 : ℤ) := by
-        rw [smul_monomial, smul_eq_mul, mul_one]
-      rw [this, LinearMap.map_smul, Tmap_monomial]
-      exact Submodule.smul_mem _ _ (prod_mem_span nu _ fun s => hπmem s _)
+
+  · rw [MvPolynomial.as_sum P, map_sum]
+    refine Submodule.sum_mem _ fun m _ => ?_
+    have : monomial m (AddMonoidAlgebra.coeff P m) = AddMonoidAlgebra.coeff P m • monomial m (1 : ℤ) := by
+      rw [smul_monomial, smul_eq_mul, mul_one]
+    rw [this, LinearMap.map_smul, Tmap_monomial]
+    exact Submodule.smul_mem _ _ (prod_mem_span nu _ fun s => hπmem s _)
   · rw [nablaX_eq, Tmap_prod]
     refine Finset.prod_congr rfl fun s _ => ?_
     rw [hπfix]

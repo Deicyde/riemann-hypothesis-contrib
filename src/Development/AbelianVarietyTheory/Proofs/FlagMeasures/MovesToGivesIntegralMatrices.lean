@@ -1,20 +1,52 @@
 module
 
-public import Mathlib
 public import Formalism.LocalToGlobal.SiegelLatticeTheory.CokernelGLCounts.NGData
-public import Formalism.LocalToGlobal.SiegelLatticeTheory.FlagStabilizerTensors.VolPin
-public import Formalism.LocalToGlobal.SiegelLatticeTheory.ClosedLocalOrbits.GaugeLatticeShifts.Vanish
-public import Development.AbelianVarietyTheory.Definitions.SemilocalFrames.AtBase
 public import Development.AbelianVarietyTheory.Definitions.SemilocalFrames.PlacesOf
 public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.UpperUnitriangularMul
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
+import Development.AbelianVarietyTheory.Definitions.SemilocalFrames.AtBase
 
 @[expose] public section
 
 noncomputable section
-open MeasureTheory NumberField Formalism.BasicNotions Formalism.MainNotions.S
-  Formalism.MainNotions.S.Lat Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.HidaSetting
-  Formalism.L2.SG.TermOp Formalism.L2.SG.Full Formalism.L2.SG.RowsConc Formalism.L2.SG.NGData
-  Formalism.L2.SG.TermLoc GlobalTheory.HL GlobalTheory.LocOver
+open MeasureTheory NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.HidaSetting Formalism.L2.SG.TermOp Formalism.L2.SG.Full Formalism.L2.SG.RowsConc Formalism.L2.SG.NGData Formalism.L2.SG.TermLoc GlobalTheory.HL GlobalTheory.LocOver
 open scoped Pointwise ENNReal Classical
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -24,11 +56,9 @@ section Gen
 
 variable {E : Type} [Field E] [NumberField E] [StarRing E] {S : HSpace E} {r : ℕ} {T : E}
 
-theorem exists_coef_of_mem_span_image
-    {V : Type*} [AddCommGroup V] [Module E V]
-    (e : Fin r → V) (s : Set (Fin r))
-    {x : V} (hx : x ∈ Submodule.span E (e '' s))
-    : ∃ l : Fin r → E, (∀ k, k ∉ s → l k = 0) ∧ x = ∑ k, l k • e k := by
+theorem exists_coef_of_mem_span_image {V : Type*} [AddCommGroup V] [Module E V] (e : Fin r → V)
+    (s : Set (Fin r)) {x : V} (hx : x ∈ Submodule.span E (e '' s)) :
+    ∃ l : Fin r → E, (∀ k, k ∉ s → l k = 0) ∧ x = ∑ k, l k • e k := by
   rw [Finsupp.mem_span_image_iff_linearCombination] at hx
   obtain ⟨l, hl, rfl⟩ := hx
   refine ⟨l, fun k hk => ?_, ?_⟩
@@ -45,15 +75,13 @@ theorem z_mem_orth (F : FlagG S r T) : F.z ∈ orth S (Submodule.span E (Set.ran
   | add a b _ _ ha hb => simp [map_add (f := _), ha, hb]
   | smul c a _ ha => simp [ha]
 
-theorem exists_upUni
-    (F : LFlag S r T) (n : S.V ≃ₗ[E] S.V) (h1 : ∀ j, ∀ x ∈ Xflag F (j + 1), n x - x ∈ Xflag F j)
-    (h2 : ∀ x ∈ orth S (Xsp F), n x - x ∈ Xsp F)
-    : ∃ W : Matrix (Fin (r + 1)) (Fin (r + 1)) E,
-      (∀ a b, b < a → W a b = 0) ∧ (∀ a, W a a = 1)
-        ∧ ∀ b, n (frame F b) = ∑ a, W a b • frame F a := by
-  have key
-      : ∀ b : Fin (r + 1), ∃ l : Fin r → E,
-        (∀ k, b ≤ Fin.castSucc k → l k = 0) ∧ n (frame F b) = frame F b + ∑ k, l k • F.fl.e k := by
+theorem exists_upUni (F : LFlag S r T) (n : S.V ≃ₗ[E] S.V)
+    (h1 : ∀ j, ∀ x ∈ Xflag F (j + 1), n x - x ∈ Xflag F j)
+    (h2 : ∀ x ∈ orth S (Xsp F), n x - x ∈ Xsp F) :
+    ∃ W : Matrix (Fin (r + 1)) (Fin (r + 1)) E, (∀ a b, b < a → W a b = 0) ∧ (∀ a, W a a = 1) ∧
+      ∀ b, n (frame F b) = ∑ a, W a b • frame F a := by
+  have key : ∀ b : Fin (r + 1), ∃ l : Fin r → E, (∀ k, b ≤ Fin.castSucc k → l k = 0) ∧
+      n (frame F b) = frame F b + ∑ k, l k • F.fl.e k := by
     intro b
     induction b using Fin.lastCases with
     | last =>
@@ -63,13 +91,11 @@ theorem exists_upUni
         rw [Set.image_univ]; exact hm
       obtain ⟨l, -, hl⟩ := exists_coef_of_mem_span_image F.fl.e Set.univ hm'
       refine ⟨l, fun k hk => absurd hk (not_le.mpr (Fin.castSucc_lt_last k)), ?_⟩
-      rw [hz, ← hl]
-      abel
+      rw [hz, ← hl]; abel
     | cast i =>
       have hf : frame F (Fin.castSucc i) = F.fl.e i := by simp [frame, FlagG.fvec]
       have hmem : F.fl.e i ∈ Xflag F (i.val + 1) :=
-        Submodule.subset_span (Set.mem_image_of_mem _
-          (show i ∈ {k : Fin r | k.1 < i.1 + 1} from Nat.lt_succ_self _))
+        Submodule.subset_span (Set.mem_image_of_mem _ (show i ∈ {k : Fin r | k.1 < i.1 + 1} from Nat.lt_succ_self _))
       have hm : n (F.fl.e i) - F.fl.e i ∈ Submodule.span E (F.fl.e '' {k : Fin r | k.1 < i.1}) := by
         have := h1 i.val _ hmem
         rw [hf] at *
@@ -79,8 +105,7 @@ theorem exists_upUni
       · simp only [Set.mem_setOf_eq, not_lt]; exact Fin.castSucc_le_castSucc_iff.mp hk
       · rw [hf, ← hl]; abel
   choose l hl0 hl using key
-  refine
-    ⟨Matrix.of fun a b => Fin.snoc (α := fun _ => E) (l b) 0 a + if a = b then 1 else 0, ?_, ?_, ?_⟩
+  refine ⟨Matrix.of fun a b => Fin.snoc (α := fun _ => E) (l b) 0 a + if a = b then 1 else 0, ?_, ?_, ?_⟩
   · intro a b hab
     simp only [Matrix.of_apply, if_neg (ne_of_gt hab), add_zero]
     induction a using Fin.lastCases with
@@ -98,26 +123,19 @@ theorem exists_upUni
     rw [Fin.sum_univ_castSucc]
     simp [frame, FlagG.fvec, add_comm]
 
-theorem upUni_mul
-    {N : ℕ} {U W : Matrix (Fin N) (Fin N) E} (hU0 : ∀ a b, b < a → U a b = 0) (hU1 : ∀ a, U a a = 1)
-    (hW0 : ∀ a b, b < a → W a b = 0) (hW1 : ∀ a, W a a = 1)
-    : (∀ a b, b < a → (U * W) a b = 0) ∧ (∀ a, (U * W) a a = 1) := by
+theorem upUni_mul {N : ℕ} {U W : Matrix (Fin N) (Fin N) E} (hU0 : ∀ a b, b < a → U a b = 0)
+    (hU1 : ∀ a, U a a = 1) (hW0 : ∀ a b, b < a → W a b = 0) (hW1 : ∀ a, W a a = 1) :
+    (∀ a b, b < a → (U * W) a b = 0) ∧ (∀ a, (U * W) a a = 1) := by
   first
   | exact @_root_.GlobalTheory.UpperUnitriangularMul.upperUnitriangular_mul
   | exact _root_.GlobalTheory.UpperUnitriangularMul.upperUnitriangular_mul
   | (apply _root_.GlobalTheory.UpperUnitriangularMul.upperUnitriangular_mul <;> assumption)
   | (intros; apply _root_.GlobalTheory.UpperUnitriangularMul.upperUnitriangular_mul <;> assumption)
-  | (
-      intros
-      apply @_root_.GlobalTheory.UpperUnitriangularMul.upperUnitriangular_mul
-        <;> first | assumption | infer_instance
-    )
+  | (intros; apply @_root_.GlobalTheory.UpperUnitriangularMul.upperUnitriangular_mul <;> first | assumption | infer_instance)
   | (intros; exact _root_.GlobalTheory.UpperUnitriangularMul.upperUnitriangular_mul ..)
 
-theorem frame_mapLF
-    (γ : S.V ≃ₗ[E] S.V) (hγ : γ ∈ Formalism.HermitianLatticesTheory.isom S.hT)
-    (F : LFlag S r T) (b : Fin (r + 1))
-    : frame (mapLF γ F) b = γ (frame F b) := by
+theorem frame_mapLF (γ : S.V ≃ₗ[E] S.V) (hγ : γ ∈ Formalism.HermitianLatticesTheory.isom S.hT) (F : LFlag S r T) (b : Fin (r + 1)) :
+    frame (mapLF γ F) b = γ (frame F b) := by
   unfold mapLF
   rw [dite_eq_left hγ]
   induction b using Fin.lastCases with
@@ -130,14 +148,11 @@ end GlobalTheory.MovedFrames
 
 namespace GlobalTheory.MovedFrames
 
-theorem map_sum_frame
-    {E V : Type*} [Field E] [AddCommGroup V] [Module E V]
-    {N : ℕ} (ρ : V ≃ₗ[E] V) (U W : Matrix (Fin N) (Fin N) E) (f g : Fin N → V)
-    (hF : ∀ a, ρ (f a) = ∑ c, U c a • g c)
-    (b : Fin N)
-    : ρ (∑ a, W a b • f a) = ∑ c, (U * W) c b • g c := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+theorem map_sum_frame {E V : Type*} [Field E] [AddCommGroup V] [Module E V] {N : ℕ} (ρ : V ≃ₗ[E] V)
+    (U W : Matrix (Fin N) (Fin N) E) (f g : Fin N → V) (hF : ∀ a, ρ (f a) = ∑ c, U c a • g c) (b : Fin N) :
+    ρ (∑ a, W a b • f a) = ∑ c, (U * W) c b • g c := by
+
+  rw [map_sum]
   simp only [map_smul, hF, Finset.smul_sum, smul_smul, Matrix.mul_apply, Finset.sum_smul]
   rw [Finset.sum_comm]
   exact Finset.sum_congr rfl fun c _ => Finset.sum_congr rfl fun a _ => by rw [mul_comm]
@@ -146,28 +161,13 @@ end GlobalTheory.MovedFrames
 
 namespace GlobalTheory.MovedFrames
 
-theorem moved_frames
-    : ∀ (D : D7) (X : HidaSetting D) (Y : Full X) (u u' : D.what₂.Word)
-        (F00 : LFlag (D.sp.Y 0) D.R.rS (((D.mem u).A.T : ℕ) : D.host.E))
-        (F'0 : LFlag (D.sp.Y 0) D.R.rS (((D.mem u').A.T : ℕ) : D.host.E)) (t₀ : TauC Y u u')
-        (ρ : (VS D).V ≃ₗ[D.host.E] (VS D).V) (U U' : Formalism.L2.SG.PairVal.MatR D),
-      MovesTo F00 F'0 (lf D (X.Fu u)) t₀.frame ρ U U'
-        → ∀ n m,
-          n ∈ NRat (lf D (X.Fu u)) → m ∈ NRat (lf D (X.Fu u'))
-            → ∃ B B' : Matrix (Fin (D.R.rS + 1)) (Fin (D.R.rS + 1)) D.host.E,
-              (∀ a b, b < a → B a b = 0) ∧ (∀ a, B a a = 1) ∧ (∀ a b, b < a → B' a b = 0)
-                ∧ (∀ a, B' a a = 1)
-                ∧ ∀ b,
-                  ρ (n (frame (lf D (X.Fu u)) b)) = ∑ a, B a b • frame F00 a
-                    ∧ ρ (n (frame (mapLF (n⁻¹ * t₀.lin * m) (lf D (X.Fu u'))) b))
-                      = ∑ a, B' a b • frame F'0 a := by
+theorem moved_frames : ∀ (D : D7) (X : HidaSetting D) (Y : Full X) (u u' : D.what₂.Word) (F00 : LFlag (D.sp.Y 0) D.R.rS (((D.mem u).A.T : ℕ) : D.host.E)) (F'0 : LFlag (D.sp.Y 0) D.R.rS (((D.mem u').A.T : ℕ) : D.host.E)) (t₀ : TauC Y u u') (ρ : (VS D).V ≃ₗ[D.host.E] (VS D).V) (U U' : Formalism.L2.SG.PairVal.MatR D), MovesTo F00 F'0 (lf D (X.Fu u)) t₀.frame ρ U U' → ∀ n m, n ∈ NRat (lf D (X.Fu u)) → m ∈ NRat (lf D (X.Fu u')) → ∃ B B' : Matrix (Fin (D.R.rS + 1)) (Fin (D.R.rS + 1)) D.host.E, (∀ a b, b < a → B a b = 0) ∧ (∀ a, B a a = 1) ∧ (∀ a b, b < a → B' a b = 0) ∧ (∀ a, B' a a = 1) ∧ ∀ b, ρ (n (frame (lf D (X.Fu u)) b)) = ∑ a, B a b • frame F00 a ∧ ρ (n (frame (mapLF (n⁻¹ * t₀.lin * m) (lf D (X.Fu u'))) b)) = ∑ a, B' a b • frame F'0 a := by
   intro D X Y u u' F00 F'0 t₀ ρ U U' hM n m hn hm
   obtain ⟨_, hU, hU', hF, hF'⟩ := hM
   obtain ⟨W, hW0, hW1, hWe⟩ := exists_upUni _ n hn.2.1 hn.2.2
   obtain ⟨W', hW'0, hW'1, hW'e⟩ := exists_upUni _ m hm.2.1 hm.2.2
   have hlin : t₀.lin ∈ Formalism.HermitianLatticesTheory.isom (VS D).hT := t₀.rep.2.2.1
-  have hγ : n⁻¹ * t₀.lin * m ∈ Formalism.HermitianLatticesTheory.isom (VS D).hT :=
-    mul_mem (mul_mem (inv_mem hn.1) hlin) hm.1
+  have hγ : n⁻¹ * t₀.lin * m ∈ Formalism.HermitianLatticesTheory.isom (VS D).hT := mul_mem (mul_mem (inv_mem hn.1) hlin) hm.1
   obtain ⟨hB0, hB1⟩ := upUni_mul (fun a b h => (hU a b).1 h) (fun a => (hU a a).2 rfl) hW0 hW1
   obtain ⟨hB'0, hB'1⟩ := upUni_mul (fun a b h => (hU' a b).1 h) (fun a => (hU' a a).2 rfl) hW'0 hW'1
   refine ⟨U * W, U' * W', hB0, hB1, hB'0, hB'1, fun b => ⟨?_, ?_⟩⟩
@@ -183,7 +183,7 @@ theorem moved_frames
       rw [LinearEquiv.trans_apply, ht, hF']
     rw [frame_mapLF _ hγ, hx, hW'e]
     have := map_sum_frame (t₀.lin.trans ρ) U' W' _ _ hF2 b
-    set_option synthInstance.maxHeartbeats 100000 in
+
     rw [← this, LinearEquiv.trans_apply, map_sum]
 
 end GlobalTheory.MovedFrames

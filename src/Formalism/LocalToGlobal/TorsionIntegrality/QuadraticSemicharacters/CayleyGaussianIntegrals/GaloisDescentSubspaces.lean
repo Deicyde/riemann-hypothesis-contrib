@@ -1,6 +1,54 @@
 module
 
 public import Formalism.LocalToGlobal.TorsionIntegrality.QuadraticSemicharacters.KerPNonzero
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Real
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
+public import Mathlib.Analysis.SpecialFunctions.JapaneseBracket
 
 @[expose] public section
 
@@ -10,8 +58,7 @@ open MeasureTheory
 
 namespace Formalism.L2.Th1.H
 
-theorem exp_neg_le_factorial_div {s : ℝ} (hs : 0 < s) (n : ℕ)
-    : Real.exp (-s) ≤ (n ! : ℝ) / s ^ n := by
+theorem exp_neg_le_factorial_div {s : ℝ} (hs : 0 < s) (n : ℕ) : Real.exp (-s) ≤ (n ! : ℝ) / s ^ n := by
   have h1 : s ^ n / (n ! : ℝ) ≤ Real.exp s := Real.pow_div_factorial_le_exp s hs.le n
   have hf : (0 : ℝ) < (n ! : ℝ) := by exact_mod_cast n.factorial_pos
   have hp : 0 < s ^ n := pow_pos hs n
@@ -19,20 +66,19 @@ theorem exp_neg_le_factorial_div {s : ℝ} (hs : 0 < s) (n : ℕ)
   rw [div_le_iff₀ hf] at h1
   linarith
 
-theorem half_sq_sub_le {V : Type*} [NormedAddCommGroup V] (x z₀ : V)
-    : ‖x‖ ^ 2 / 2 - ‖z₀‖ ^ 2 ≤ ‖x - z₀‖ ^ 2 := by
-  have h : ‖x‖ ≤ ‖x - z₀‖ + ‖z₀‖ := by simpa using norm_add_le (x - z₀) z₀
+theorem half_sq_sub_le {V : Type*} [NormedAddCommGroup V] (x z₀ : V) :
+    ‖x‖ ^ 2 / 2 - ‖z₀‖ ^ 2 ≤ ‖x - z₀‖ ^ 2 := by
+  have h : ‖x‖ ≤ ‖x - z₀‖ + ‖z₀‖ := by
+    simpa using norm_add_le (x - z₀) z₀
   have h0 := norm_nonneg x
   have h1 := norm_nonneg (x - z₀)
   have h2 := norm_nonneg z₀
   have h3 : ‖x‖ ^ 2 ≤ (‖x - z₀‖ + ‖z₀‖) ^ 2 := pow_le_pow_left₀ h0 h 2
   nlinarith [sq_nonneg (‖x - z₀‖ - ‖z₀‖)]
 
-theorem summable_gauss_of_discrete
-    {V : Type*} [NormedAddCommGroup V] [NormedSpace ℝ V] [FiniteDimensional ℝ V]
-    (Λ : AddSubgroup V) [hd : DiscreteTopology Λ]
-    {a : ℝ} (ha : 0 < a)
-    : Summable fun x : Λ => Real.exp (-a * ‖(x : V)‖ ^ 2) := by
+theorem summable_gauss_of_discrete {V : Type*} [NormedAddCommGroup V] [NormedSpace ℝ V] [FiniteDimensional ℝ V]
+    (Λ : AddSubgroup V) [hd : DiscreteTopology Λ] {a : ℝ} (ha : 0 < a) :
+    Summable fun x : Λ => Real.exp (-a * ‖(x : V)‖ ^ 2) := by
   classical
   let L : Submodule ℤ V := AddSubgroup.toIntSubmodule Λ
   have : DiscreteTopology L := hd
@@ -40,11 +86,8 @@ theorem summable_gauss_of_discrete
   have hsum : Summable fun z : L => ‖z‖⁻¹ ^ (2 * n) :=
     ZLattice.summable_norm_pow_inv L (2 * n) (by omega)
   have hsum' : Summable fun x : Λ => ‖(x : V)‖⁻¹ ^ (2 * n) := hsum
-  have hite : Summable fun x : Λ => if x = 0 then (1 : ℝ) else 0 :=
-    (hasSum_ite_eq (0 : Λ) (1 : ℝ)).summable
-  refine Summable.of_nonneg_of_le
-    (fun x => (Real.exp_pos _).le)
-    (fun x => ?_)
+  have hite : Summable fun x : Λ => if x = 0 then (1 : ℝ) else 0 := (hasSum_ite_eq (0 : Λ) (1 : ℝ)).summable
+  refine Summable.of_nonneg_of_le (fun x => (Real.exp_pos _).le) (fun x => ?_)
     ((hsum'.mul_left ((n ! : ℝ) / a ^ n)).add hite)
   by_cases hx : x = 0
   · subst hx
@@ -55,13 +98,11 @@ theorem summable_gauss_of_discrete
     have hs : 0 < a * ‖(x : V)‖ ^ 2 := by positivity
     have h1 := exp_neg_le_factorial_div hs n
     rw [if_neg hx, add_zero]
-    calc
-      Real.exp (-a * ‖(x : V)‖ ^ 2)
-        = Real.exp (-(a * ‖(x : V)‖ ^ 2)) := by rw [neg_mul]
+    calc Real.exp (-a * ‖(x : V)‖ ^ 2) = Real.exp (-(a * ‖(x : V)‖ ^ 2)) := by rw [neg_mul]
       _ ≤ (n ! : ℝ) / (a * ‖(x : V)‖ ^ 2) ^ n := h1
       _ = (n ! : ℝ) / a ^ n * ‖(x : V)‖⁻¹ ^ (2 * n) := by
-        rw [mul_pow, ← pow_mul, inv_pow]
-        field_simp
+          rw [mul_pow, ← pow_mul, inv_pow]
+          field_simp
 
 theorem latticeGaussSummable : LatGaussSummable := by
   intro V _ _ _ Λ hΛ c r hc
@@ -77,24 +118,22 @@ theorem latticeGaussSummable : LatGaussSummable := by
   have h2 : ‖z₀‖ ^ 2 ≤ r ^ 2 := pow_le_pow_left₀ (norm_nonneg z₀) hz 2
   nlinarith
 
-theorem continuous_diag
-    {V : Type*} [NormedAddCommGroup V] [NormedSpace ℂ V] [FiniteDimensional ℂ V] (H : Sesq V)
-    : Continuous fun z => H z z := by
+theorem continuous_diag {V : Type*} [NormedAddCommGroup V] [NormedSpace ℂ V] [FiniteDimensional ℂ V] (H : Sesq V) :
+    Continuous fun z => H z z := by
   let b := Module.finBasis ℂ V
   have h : (fun z => H z z) = fun z => ∑ j, conj (b.coord j z) * H.flip (b j) z := by
     funext z
     have e : H z z = H z (∑ j, b.repr z j • b j) := by rw [b.sum_repr z]
     rw [e]
-    set_option synthInstance.maxHeartbeats 100000 in
+
     simp only [map_sum, map_smulₛₗ, smul_eq_mul, LinearMap.flip_apply, Module.Basis.coord_apply]
   rw [h]
   refine continuous_finsetSum _ fun j _ => ?_
   exact (Complex.continuous_conj.comp (LinearMap.continuous_of_finiteDimensional (b.coord j))).mul
     (LinearMap.continuous_of_finiteDimensional (H.flip (b j)))
 
-theorem exp_neg_sq_le_japanese {a : ℝ} (ha : 0 < a) (m : ℕ) {t : ℝ} (ht : 0 ≤ t)
-    : Real.exp (-a * t ^ 2)
-      ≤ Real.exp a * (m ! : ℝ) * 2 ^ m / a ^ m * (1 + t) ^ (-((2 * m : ℕ) : ℝ)) := by
+theorem exp_neg_sq_le_japanese {a : ℝ} (ha : 0 < a) (m : ℕ) {t : ℝ} (ht : 0 ≤ t) :
+    Real.exp (-a * t ^ 2) ≤ Real.exp a * (m ! : ℝ) * 2 ^ m / a ^ m * (1 + t) ^ (-((2 * m : ℕ) : ℝ)) := by
   have hs : 0 < a * (1 + t ^ 2) := by positivity
   have h1 := exp_neg_le_factorial_div hs m
   have h2 : (1 + t) ^ 2 ≤ 2 * (1 + t ^ 2) := by nlinarith [sq_nonneg (1 - t)]
@@ -111,12 +150,13 @@ theorem exp_neg_sq_le_japanese {a : ℝ} (ha : 0 < a) (m : ℕ) {t : ℝ} (ht : 
   have h6 : ((1 + t ^ 2) ^ m)⁻¹ ≤ 2 ^ m * ((1 + t) ^ (2 * m))⁻¹ := by
     rw [← div_eq_mul_inv, inv_eq_one_div, div_le_div_iff₀ h5 h4]
     linarith
-  calc
-    Real.exp a * Real.exp (-(a * (1 + t ^ 2))) ≤ Real.exp a * ((m ! : ℝ) / (a * (1 + t ^ 2)) ^ m) :=
-      mul_le_mul_of_nonneg_left h1 (Real.exp_pos a).le
-    _ = Real.exp a * (m ! : ℝ) / a ^ m * ((1 + t ^ 2) ^ m)⁻¹ := by rw [mul_pow]; field_simp
+  calc Real.exp a * Real.exp (-(a * (1 + t ^ 2)))
+      ≤ Real.exp a * ((m ! : ℝ) / (a * (1 + t ^ 2)) ^ m) :=
+        mul_le_mul_of_nonneg_left h1 (Real.exp_pos a).le
+    _ = Real.exp a * (m ! : ℝ) / a ^ m * ((1 + t ^ 2) ^ m)⁻¹ := by
+        rw [mul_pow]; field_simp
     _ ≤ Real.exp a * (m ! : ℝ) / a ^ m * (2 ^ m * ((1 + t) ^ (2 * m))⁻¹) :=
-      mul_le_mul_of_nonneg_left h6 (by positivity)
+        mul_le_mul_of_nonneg_left h6 (by positivity)
     _ = Real.exp a * (m ! : ℝ) * 2 ^ m / a ^ m * ((1 + t) ^ (2 * m))⁻¹ := by ring
 
 theorem GaussIntegrable_of (h : FormNorm) : GaussIntegrable := by

@@ -1,18 +1,52 @@
 module
 
-public import Mathlib
-public import Formalism.SharpRestriction.LevelLetterCocycles.UsedLocalConclusion
 public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.NotFullBot
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.MemRangeOfFrob
+public import Formalism.SharpRestriction.LevelLetterCocycles.DeltaInvariantLattices
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.EtaleComparisonOfWachBasis
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.WachInclusionXQFrobenius
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.MapConstantCoeffEqOne
+import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.MapMulLeft
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.MemRangeOfFrob
+import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.WachInclusionXQFrobenius
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
 open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc
   TensorProduct GlobalTheory.NL Formalism.MainNotions.DeltaInvariantLattices
-set_option maxHeartbeats 1000000
 
 namespace GlobalTheory.NL.DenomStep
 
@@ -46,8 +80,8 @@ theorem mem_N_of_jD
       obtain ⟨a, x, hxN, rfl⟩ := hz
       obtain ⟨α, hα, -⟩ := hbA x hxN
       refine ⟨fun j => a * E.io (α j), ?_⟩
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [hα, map_sum, Finset.smul_sum]
+
+      rw [hα, map_sum, Finset.smul_sum]
       refine Finset.sum_congr rfl fun j _ => ?_
       rw [GlobalTheory.NL.FrobDenom.jD_smulA, smul_smul, map_mul]
     | zero =>
@@ -81,8 +115,8 @@ theorem mem_N_of_jD
   obtain ⟨β, hβ⟩ := hNA _ hx
   obtain ⟨μ, rfl⟩ := hDE x
   have hj : E.jD T (∑ j, μ j • b j) = ∑ j, E.ioE (μ j) • E.jD T (b j) := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     exact Finset.sum_congr rfl fun j _ => E.jD_smul T _ _
   obtain ⟨c, -, hc⟩ := hbW (E.jD T (∑ j, μ j • b j))
   have e1 := hc (fun j => E.ioE (μ j)) hj
@@ -151,7 +185,6 @@ theorem of_tie
 
 end Generic
 
-set_option synthInstance.maxHeartbeats 200000 in
 theorem main
     : ∀ (D : Formalism.BasicNotions.D7) (HW : HWOf D.loc) (F : FonOf D.loc D.locA HW) (l : ℕ)
         [Fact l.Prime] (K : FinExt l) (s : ℕ) (LL : FinExt l) (h : Good K s LL),

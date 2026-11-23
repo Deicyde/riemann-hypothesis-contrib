@@ -1,15 +1,54 @@
 module
 
-public import Mathlib
 public import Formalism.LocalToGlobal.SiegelLatticeTheory.ClosedLocalOrbits.GaugeLatticeShifts.NormStepsB
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
 noncomputable section
 
 open scoped Classical TensorProduct
-open Matrix NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat
-  Formalism.L2.SG.HidaSetting Formalism.L2.SG.TermOp Formalism.L2.SG.PoincareInHH.PoincareSetting
+open Matrix NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.L2.SG.HidaSetting Formalism.L2.SG.TermOp
+  Formalism.L2.SG.PoincareInHH.PoincareSetting
 
 namespace Formalism.L2.SG.Pf.NormSteps
 
@@ -32,13 +71,13 @@ variable {D : D7} (X : Formalism.L2.SG.HidaSetting.HidaSetting D)
 def matL (A : Matrix (Fin X.B.I.n) (Fin X.B.I.n) D.host.E) : (VS D).V →ₗ[D.host.E] (VS D).V :=
   X.bas.equivFun.symm.toLinearMap ∘ₗ Matrix.toLin' A ∘ₗ X.bas.equivFun.toLinearMap
 
-theorem matL_repr (A : Matrix (Fin X.B.I.n) (Fin X.B.I.n) D.host.E) (y : (VS D).V)
-    : X.bas.equivFun (matL X A y) = A *ᵥ X.bas.equivFun y := by
+theorem matL_repr (A : Matrix (Fin X.B.I.n) (Fin X.B.I.n) D.host.E) (y : (VS D).V) :
+    X.bas.equivFun (matL X A y) = A *ᵥ X.bas.equivFun y := by
   simp only [matL, LinearMap.comp_apply, LinearEquiv.coe_coe, LinearEquiv.apply_symm_apply,
     Matrix.toLin'_apply]
 
-theorem matL_mul (A B : Matrix (Fin X.B.I.n) (Fin X.B.I.n) D.host.E)
-    : matL X (A * B) = matL X A ∘ₗ matL X B := by
+theorem matL_mul (A B : Matrix (Fin X.B.I.n) (Fin X.B.I.n) D.host.E) :
+    matL X (A * B) = matL X A ∘ₗ matL X B := by
   apply LinearMap.ext
   intro y
   apply X.bas.equivFun.injective
@@ -50,8 +89,7 @@ theorem matL_one : matL X 1 = LinearMap.id := by
   apply X.bas.equivFun.injective
   rw [matL_repr, Matrix.one_mulVec, LinearMap.id_apply]
 
-abbrev mapM
-    : Matrix (Fin X.B.I.n) (Fin X.B.I.n) X.B.I.E →+* Matrix (Fin X.B.I.n) (Fin X.B.I.n) D.host.E :=
+abbrev mapM : Matrix (Fin X.B.I.n) (Fin X.B.I.n) X.B.I.E →+* Matrix (Fin X.B.I.n) (Fin X.B.I.n) D.host.E :=
   (X.ιE : X.B.I.E →+* D.host.E).mapMatrix
 
 def matE (M : GL (Fin X.B.I.n) X.B.I.E) : (VS D).V ≃ₗ[D.host.E] (VS D).V :=
@@ -60,61 +98,53 @@ def matE (M : GL (Fin X.B.I.n) X.B.I.E) : (VS D).V ≃ₗ[D.host.E] (VS D).V :=
     (by rw [← matL_mul, ← map_mul, M.mul_inv, map_one, matL_one])
     (by rw [← matL_mul, ← map_mul, M.inv_mul, map_one, matL_one])
 
-theorem matE_repr (M : GL (Fin X.B.I.n) X.B.I.E) (y : (VS D).V)
-    : X.bas.equivFun (matE X M y) = mapM X (M : Matrix _ _ _) *ᵥ X.bas.equivFun y :=
+theorem matE_repr (M : GL (Fin X.B.I.n) X.B.I.E) (y : (VS D).V) :
+    X.bas.equivFun (matE X M y) = mapM X (M : Matrix _ _ _) *ᵥ X.bas.equivFun y :=
   matL_repr X _ y
 
-theorem matE_crd (M : GL (Fin X.B.I.n) X.B.I.E) (y : (VS D).V)
-    : X.crd (matE X M y) = (M : Matrix _ _ _) *ᵥ X.crd y := by
+theorem matE_crd (M : GL (Fin X.B.I.n) X.B.I.E) (y : (VS D).V) :
+    X.crd (matE X M y) = (M : Matrix _ _ _) *ᵥ X.crd y := by
   funext i
   simp only [Formalism.L2.SG.HidaSetting.HidaSetting.crd, Formalism.L2.SG.HidaSetting.crdOf]
   rw [← Module.Basis.equivFun_apply, matE_repr]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [Matrix.mulVec, dotProduct, RingHom.mapMatrix_apply, Matrix.map_apply, map_sum,
-      map_mul, RingEquiv.coe_toRingHom, RingEquiv.symm_apply_apply, Module.Basis.equivFun_apply]
+
+  simp only [Matrix.mulVec, dotProduct, RingHom.mapMatrix_apply, Matrix.map_apply, map_sum, map_mul,
+  RingEquiv.coe_toRingHom, RingEquiv.symm_apply_apply, Module.Basis.equivFun_apply]
   rfl
 
-theorem matE_incl (M : GL (Fin X.B.I.n) X.B.I.E) (y : (VS D).V)
-    : incl X.B.I (X.crd (matE X M y))
-      = (M : Matrix _ _ _).map (Formalism.UG.inclE (F := X.B.I.F) (Af X.B.I.F))
-        *ᵥ incl X.B.I (X.crd y) := by
+theorem matE_incl (M : GL (Fin X.B.I.n) X.B.I.E) (y : (VS D).V) :
+    incl X.B.I (X.crd (matE X M y)) =
+      (M : Matrix _ _ _).map (Formalism.UG.inclE (F := X.B.I.F) (Af X.B.I.F)) *ᵥ incl X.B.I (X.crd y) := by
   rw [matE_crd]
   funext i
-  set_option synthInstance.maxHeartbeats 100000 in
-  simp only [Formalism.L2.SG.HidaSetting.incl, Matrix.mulVec, dotProduct, Matrix.map_apply, map_sum,
-    map_mul]
 
-theorem hT_expand (x y : (VS D).V)
-    : (VS D).hT x y
-      = ∑ i, ∑ j, star (X.bas.equivFun x i) * (X.bas.equivFun y j * (VS D).hT (X.bas i) (X.bas j)) :=
-  by
-    conv_lhs => rw [← X.bas.sum_equivFun x, ← X.bas.sum_equivFun y]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, LinearMap.sum_apply, map_smulₛₗ, LinearMap.smul_apply, smul_eq_mul,
-        starRingEnd_apply, Finset.mul_sum]
-    rw [Finset.sum_comm]
-    refine Finset.sum_congr rfl (fun i _ => Finset.sum_congr rfl (fun j _ => ?_))
-    simp only [RingHom.id_apply]
-    ring
+  simp only [Formalism.L2.SG.HidaSetting.incl, Matrix.mulVec, dotProduct, Matrix.map_apply, map_sum, map_mul]
 
-theorem qform (a c : Fin X.B.I.n → D.host.E)
-    : ∑ i, ∑ j, star (a i) * (c j * X.ιE (X.B.I.J i j)) = star a ⬝ᵥ (mapM X X.B.I.J *ᵥ c) := by
+theorem hT_expand (x y : (VS D).V) :
+    (VS D).hT x y =
+      ∑ i, ∑ j, star (X.bas.equivFun x i) * (X.bas.equivFun y j * (VS D).hT (X.bas i) (X.bas j)) := by
+  conv_lhs => rw [← X.bas.sum_equivFun x, ← X.bas.sum_equivFun y]
+
+  simp only [map_sum, LinearMap.sum_apply, map_smulₛₗ, LinearMap.smul_apply,
+  smul_eq_mul, starRingEnd_apply, Finset.mul_sum]
+  rw [Finset.sum_comm]
+  refine Finset.sum_congr rfl (fun i _ => Finset.sum_congr rfl (fun j _ => ?_))
+  simp only [RingHom.id_apply]
+  ring
+
+theorem qform (a c : Fin X.B.I.n → D.host.E) :
+    ∑ i, ∑ j, star (a i) * (c j * X.ιE (X.B.I.J i j)) = star a ⬝ᵥ (mapM X X.B.I.J *ᵥ c) := by
   simp only [dotProduct, Matrix.mulVec, RingHom.mapMatrix_apply, Matrix.map_apply, Pi.star_apply,
     Finset.mul_sum, RingEquiv.coe_toRingHom]
   refine Finset.sum_congr rfl (fun i _ => Finset.sum_congr rfl (fun j _ => ?_))
   ring
 
-theorem mapM_unitary
-    (M : GL (Fin X.B.I.n) X.B.I.E) (hM : M ∈ Formalism.UG.UJ (starRingEnd X.B.I.E) X.B.I.J)
-    : (mapM X (M : Matrix _ _ _))ᴴ * mapM X X.B.I.J * mapM X (M : Matrix _ _ _)
-      = mapM X X.B.I.J := by
-  have hM'
-      : Formalism.UG.cT (starRingEnd X.B.I.E) (M : Matrix _ _ _) * X.B.I.J * (M : Matrix _ _ _)
-        = X.B.I.J :=
-    hM
-  have hc
-      : mapM X (Formalism.UG.cT (starRingEnd X.B.I.E) (M : Matrix _ _ _))
-        = (mapM X (M : Matrix _ _ _))ᴴ := by
+theorem mapM_unitary (M : GL (Fin X.B.I.n) X.B.I.E) (hM : M ∈ Formalism.UG.UJ (starRingEnd X.B.I.E) X.B.I.J) :
+    (mapM X (M : Matrix _ _ _))ᴴ * mapM X X.B.I.J * mapM X (M : Matrix _ _ _) = mapM X X.B.I.J := by
+  have hM' : Formalism.UG.cT (starRingEnd X.B.I.E) (M : Matrix _ _ _) * X.B.I.J * (M : Matrix _ _ _) =
+      X.B.I.J := hM
+  have hc : mapM X (Formalism.UG.cT (starRingEnd X.B.I.E) (M : Matrix _ _ _)) =
+      (mapM X (M : Matrix _ _ _))ᴴ := by
     ext i j
     simp only [RingHom.mapMatrix_apply, Matrix.map_apply, Formalism.UG.cT, Matrix.transpose_apply,
       Matrix.conjTranspose_apply, starRingEnd_apply, RingEquiv.coe_toRingHom]
@@ -124,12 +154,10 @@ theorem mapM_unitary
   rw [map_mul, map_mul, hc] at h
   exact h
 
-theorem matE_isom
-    (M : GL (Fin X.B.I.n) X.B.I.E) (hM : M ∈ Formalism.UG.UJ (starRingEnd X.B.I.E) X.B.I.J)
-    : matE X M ∈ Formalism.HermitianLatticesTheory.isom (VS D).hT := by
-  have key
-      : ∀ a b : (VS D).V,
-        (VS D).hT a b = star (X.bas.equivFun a) ⬝ᵥ (mapM X X.B.I.J *ᵥ X.bas.equivFun b) := by
+theorem matE_isom (M : GL (Fin X.B.I.n) X.B.I.E) (hM : M ∈ Formalism.UG.UJ (starRingEnd X.B.I.E) X.B.I.J) :
+    matE X M ∈ Formalism.HermitianLatticesTheory.isom (VS D).hT := by
+  have key : ∀ a b : (VS D).V,
+      (VS D).hT a b = star (X.bas.equivFun a) ⬝ᵥ (mapM X X.B.I.J *ᵥ X.bas.equivFun b) := by
     intro a b
     rw [hT_expand X, ← qform X]
     refine Finset.sum_congr rfl (fun i _ => Finset.sum_congr rfl (fun j _ => ?_))
@@ -148,31 +176,23 @@ theorem af_nontriv (F : Type) [Field F] [NumberField F] : Nontrivial (Af F) := b
   have h1 := congrArg (fun x : Af F => x v) h
   first
   | exact one_ne_zero h1
-  | (
-      simp only [RestrictedProduct.one_apply, RestrictedProduct.zero_apply] at h1
-      exact one_ne_zero h1
-    )
+  | (simp only [RestrictedProduct.one_apply, RestrictedProduct.zero_apply] at h1
+     exact one_ne_zero h1)
 
-theorem inclE_inj
-    : Function.Injective
-      (Formalism.UG.inclE (F := X.B.I.F) (Af X.B.I.F)
-        : X.B.I.E → X.B.I.E ⊗[X.B.I.F] Af X.B.I.F) := by
+theorem inclE_inj :
+    Function.Injective (Formalism.UG.inclE (F := X.B.I.F) (Af X.B.I.F) : X.B.I.E → X.B.I.E ⊗[X.B.I.F] Af X.B.I.F) := by
   haveI := af_nontriv X.B.I.F
   exact Algebra.TensorProduct.includeLeft_injective (S := X.B.I.F) (RingHom.injective _)
 
-theorem gamIsom (u : D.what₂.Word) (g : Gam X u)
-    : ∃ γ : (VS D).V ≃ₗ[D.host.E] (VS D).V,
-      γ ∈ stabF D (X.Fu u)
-        ∧ ∀ y, incl X.B.I (X.crd (γ y)) = X.B.I.fmat (g : X.B.I.GA).2 *ᵥ incl X.B.I (X.crd y) := by
+theorem gamIsom (u : D.what₂.Word) (g : Gam X u) :
+    ∃ γ : (VS D).V ≃ₗ[D.host.E] (VS D).V, γ ∈ stabF D (X.Fu u) ∧
+      ∀ y, incl X.B.I (X.crd (γ y)) = X.B.I.fmat (g : X.B.I.GA).2 *ᵥ incl X.B.I (X.crd y) := by
   obtain ⟨hGF, hH⟩ := Subgroup.mem_inf.1 g.2
   have hGF' : (g : X.B.I.GA) ∈ X.B.I.GFset := hGF
   obtain ⟨M, hM, -, hf⟩ := hGF'
   have hfin := (Subgroup.mem_prod.1 hH).2
-  have hincl
-      : ∀ y,
-        incl X.B.I (X.crd (matE X M y))
-          = X.B.I.fmat (g : X.B.I.GA).2 *ᵥ incl X.B.I (X.crd y) := fun y => by
-    rw [matE_incl, hf]
+  have hincl : ∀ y, incl X.B.I (X.crd (matE X M y)) = X.B.I.fmat (g : X.B.I.GA).2 *ᵥ incl X.B.I (X.crd y) :=
+    fun y => by rw [matE_incl, hf]
   have hfix : ∀ y, X.crd y ∈ fixSet X u → matE X M y = y := by
     intro y hy
     have h1 : incl X.B.I (X.crd (matE X M y)) = incl X.B.I (X.crd y) := by
@@ -193,30 +213,28 @@ theorem gamIsom (u : D.what₂.Word) (g : Gam X u)
     rw [X.flagZVector u]
     exact hfix _ (Or.inr rfl)
 
-theorem one_mem_stabF (u : D.what₂.Word)
-    : (1 : (VS D).V ≃ₗ[D.host.E] (VS D).V) ∈ stabF D (X.Fu u) :=
+theorem one_mem_stabF (u : D.what₂.Word) : (1 : (VS D).V ≃ₗ[D.host.E] (VS D).V) ∈ stabF D (X.Fu u) :=
   ⟨(Formalism.HermitianLatticesTheory.isom _).one_mem, fun j => Submodule.map_id _, rfl⟩
 
-theorem gmap_one (Λ : Submodule (𝓞 D.host.E) (VS D).V)
-    : Formalism.HermitianLatticesTheory.gmap (1 : (VS D).V ≃ₗ[D.host.E] (VS D).V) Λ = Λ := by
+theorem gmap_one (Λ : Submodule (𝓞 D.host.E) (VS D).V) :
+    Formalism.HermitianLatticesTheory.gmap (1 : (VS D).V ≃ₗ[D.host.E] (VS D).V) Λ = Λ := by
   ext x
   simp [Formalism.HermitianLatticesTheory.gmap]
 
 theorem fmat_mul (a b : X.B.I.Gf) : X.B.I.fmat (a * b) = X.B.I.fmat a * X.B.I.fmat b := rfl
 
-theorem fmat_one : X.B.I.fmat 1 = 1 := by rfl
+theorem fmat_one : X.B.I.fmat 1 = 1 := by
+  rfl
 
 theorem fmat_inv_mul (a : X.B.I.Gf) : X.B.I.fmat a⁻¹ * X.B.I.fmat a = 1 := by
   rw [← fmat_mul, inv_mul_cancel, fmat_one]
 
-theorem kset_iff
-    {k : X.B.I.Gf} (hk : k ∈ X.B.I.Kset) (w : Fin X.B.I.n → X.B.I.E ⊗[X.B.I.F] Af X.B.I.F)
-    : X.B.I.fmat k *ᵥ w ∈ X.B.I.Lf ↔ w ∈ X.B.I.Lf :=
+theorem kset_iff {k : X.B.I.Gf} (hk : k ∈ X.B.I.Kset) (w : Fin X.B.I.n → X.B.I.E ⊗[X.B.I.F] Af X.B.I.F) :
+    X.B.I.fmat k *ᵥ w ∈ X.B.I.Lf ↔ w ∈ X.B.I.Lf :=
   (hk w).symm
 
-theorem kset_inv_iff
-    {k : X.B.I.Gf} (hk : k ∈ X.B.I.Kset) (w : Fin X.B.I.n → X.B.I.E ⊗[X.B.I.F] Af X.B.I.F)
-    : X.B.I.fmat k⁻¹ *ᵥ w ∈ X.B.I.Lf ↔ w ∈ X.B.I.Lf := by
+theorem kset_inv_iff {k : X.B.I.Gf} (hk : k ∈ X.B.I.Kset) (w : Fin X.B.I.n → X.B.I.E ⊗[X.B.I.F] Af X.B.I.F) :
+    X.B.I.fmat k⁻¹ *ᵥ w ∈ X.B.I.Lf ↔ w ∈ X.B.I.Lf := by
   exact ((Formalism.UG.stabGL X.B.I.Lf).inv_mem hk w).symm
 
 end Mat
@@ -225,52 +243,44 @@ end ColLatRepSPf
 
 open ColLatRepSPf
 
-variable
-  {D : D7} {X : Formalism.L2.SG.HidaSetting.HidaSetting D} {u : D.what₂.Word}
+variable {D : D7} {X : Formalism.L2.SG.HidaSetting.HidaSetting D} {u : D.what₂.Word}
   {what₂ : Finset (Submodule (𝓞 D.host.E) (VS D).V)}
 
-theorem column_lattice_representatives
-    (cs : ColSys X u what₂) (hK : X.LevelSubgroupCharacter) (hR : IsRowReps D (X.Fu u) what₂)
-    : ColLatRepS cs hK := by
+theorem column_lattice_representatives (cs : ColSys X u what₂) (hK : X.LevelSubgroupCharacter) (hR : IsRowReps D (X.Fu u) what₂) :
+    ColLatRepS cs hK := by
   intro q h ρ γ κ hc hh
   obtain ⟨g, hg, hgc⟩ := gamIsom X u γ
 
-  have h1
-      : ∀ y,
-        y ∈ q.1 ↔ X.B.I.fmat ((h : X.B.I.Gf) * X.xu u)⁻¹ *ᵥ incl X.B.I (X.crd y) ∈ X.B.I.Lf := by
+  have h1 : ∀ y, y ∈ q.1 ↔
+      X.B.I.fmat ((h : X.B.I.Gf) * X.xu u)⁻¹ *ᵥ incl X.B.I (X.crd y) ∈ X.B.I.Lf := by
     intro y
     have e := cs.lat_eq (cs.base q.1) y
     rw [cs.base_lam q.1 q.2] at e
     rw [e]
-    have ec
-        : ((cs.h (cs.base q.1) : X.B.I.Gf) * X.xu u)⁻¹
-          = colDS (cs.h (cs.base q.1)) h * ((h : X.B.I.Gf) * X.xu u)⁻¹ := by
+    have ec : ((cs.h (cs.base q.1) : X.B.I.Gf) * X.xu u)⁻¹ =
+        colDS (cs.h (cs.base q.1)) h * ((h : X.B.I.Gf) * X.xu u)⁻¹ := by
       unfold colDS
       group
     rw [ec, fmat_mul, ← Matrix.mulVec_mulVec]
     exact kset_iff X hc _
 
   have hk : (X.xu u)⁻¹ * (κ : X.B.I.Gf) * X.xu u ∈ X.B.I.Kset := (κ.2 : _ ∈ X.K2).1
-  have hginv
-      : ∀ y,
-        X.B.I.fmat ((γ : X.B.I.GA).2)⁻¹ *ᵥ incl X.B.I (X.crd y)
-          = incl X.B.I (X.crd (g.symm y)) := by
+  have hginv : ∀ y, X.B.I.fmat ((γ : X.B.I.GA).2)⁻¹ *ᵥ incl X.B.I (X.crd y) =
+      incl X.B.I (X.crd (g.symm y)) := by
     intro y
     have h2 := hgc (g.symm y)
     rw [g.apply_symm_apply] at h2
     rw [h2, Matrix.mulVec_mulVec, fmat_inv_mul, Matrix.one_mulVec]
-  have egrp
-      : ((h : X.B.I.Gf) * X.xu u)⁻¹
-        = ((X.xu u)⁻¹ * (κ : X.B.I.Gf) * X.xu u)⁻¹
-          * (((cs.h ρ : X.B.I.Gf) * X.xu u)⁻¹ * ((γ : X.B.I.GA).2)⁻¹) := by
+  have egrp : ((h : X.B.I.Gf) * X.xu u)⁻¹ =
+      ((X.xu u)⁻¹ * (κ : X.B.I.Gf) * X.xu u)⁻¹ *
+        (((cs.h ρ : X.B.I.Gf) * X.xu u)⁻¹ * ((γ : X.B.I.GA).2)⁻¹) := by
     rw [hh]
     show ((γ : X.B.I.GA).2 * (cs.h ρ : X.B.I.Gf) * (κ : X.B.I.Gf) * X.xu u)⁻¹ = _
     group
 
   have h2 : ∀ y, y ∈ Formalism.HermitianLatticesTheory.gmap g (cs.lamOf ρ) ↔ y ∈ q.1 := by
     intro y
-    have hmap
-        : y ∈ Formalism.HermitianLatticesTheory.gmap g (cs.lamOf ρ) ↔ g.symm y ∈ cs.lamOf ρ := by
+    have hmap : y ∈ Formalism.HermitianLatticesTheory.gmap g (cs.lamOf ρ) ↔ g.symm y ∈ cs.lamOf ρ := by
       simp only [Formalism.HermitianLatticesTheory.gmap, Submodule.mem_map]
       constructor
       · rintro ⟨x, hx, rfl⟩

@@ -1,7 +1,56 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.Definitions.Foundations.IntegralLocallyConstCochainModPow
+public import Development.AbelianVarietyTheory.Definitions.Foundations.NotCoboundaryConstantOne
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -9,40 +58,31 @@ open GlobalTheory.K5
 
 namespace GlobalTheory.K5.Span
 
-theorem sum_range_shift_one
-    {A : Type*} [AddCommGroup A] {M : ℕ} (f : ℕ → A) (hf : ∀ i, f (i + M) = f i)
-    : ∑ i ∈ Finset.range M, f (i + 1) = ∑ i ∈ Finset.range M, f i := by
+theorem sum_range_shift_one {A : Type*} [AddCommGroup A] {M : ℕ} (f : ℕ → A)
+    (hf : ∀ i, f (i + M) = f i) :
+    ∑ i ∈ Finset.range M, f (i + 1) = ∑ i ∈ Finset.range M, f i := by
   have h1 := Finset.sum_range_succ' f M
   have h2 := Finset.sum_range_succ f M
   have h3 : f M = f 0 := by simpa using hf 0
   rw [h3] at h2
   exact add_right_cancel (h1.symm.trans h2)
 
-theorem sum_range_shift
-    {A : Type*} [AddCommGroup A] {M : ℕ} (f : ℕ → A) (hf : ∀ i, f (i + M) = f i) (s : ℕ)
-    : ∑ i ∈ Finset.range M, f (i + s) = ∑ i ∈ Finset.range M, f i := by
+theorem sum_range_shift {A : Type*} [AddCommGroup A] {M : ℕ} (f : ℕ → A)
+    (hf : ∀ i, f (i + M) = f i) (s : ℕ) :
+    ∑ i ∈ Finset.range M, f (i + s) = ∑ i ∈ Finset.range M, f i := by
   induction s generalizing f with
   | zero => simp
   | succ s ih =>
-    have :=
-      sum_range_shift_one
-        (fun i => f (i + s))
-        (fun i => by
-          show f (i + M + s) = f (i + s)
-          rw [add_right_comm, hf])
+    have := sum_range_shift_one (fun i => f (i + s)) (fun i => by
+      show f (i + M + s) = f (i + s)
+      rw [add_right_comm, hf])
     rw [← ih f hf, ← this]
     exact Finset.sum_congr rfl fun i _ => by congr 1; omega
 
-theorem span
-    : ∀ (p : ℕ) [Fact p.Prime] (Ω : Type) [Field Ω] [Algebra (O0 p) Ω],
-      IsClo p Ω
-        → ∀ (T : Tower p Ω) (τ : Gal p Ω),
-          τ ∈ Ggeo (p := p) Ω → (∀ n, τ (T.qq n) = T.ζ n * T.qq n)
-            → ∀ (N : ℕ) (z : Ω),
-              (∀ g ∈ Ggeo (p := p) Ω ⊓ MulAction.stabilizer (Gal p Ω) (T.qq N), g z = z)
-                → ∃ c : ℕ → Ω,
-                  (∀ j, ∀ g ∈ Ggeo (p := p) Ω, g (c j) = c j)
-                    ∧ z = ∑ j ∈ Finset.range (p ^ N), c j * T.qq N ^ j := by
+theorem span : ∀ (p : ℕ) [Fact p.Prime] (Ω : Type) [Field Ω] [Algebra (O0 p) Ω], IsClo p Ω →
+  ∀ (T : Tower p Ω) (τ : Gal p Ω), τ ∈ Ggeo (p := p) Ω → (∀ n, τ (T.qq n) = T.ζ n * T.qq n) →
+  ∀ (N : ℕ) (z : Ω), (∀ g ∈ Ggeo (p := p) Ω ⊓ MulAction.stabilizer (Gal p Ω) (T.qq N), g z = z) →
+  ∃ c : ℕ → Ω, (∀ j, ∀ g ∈ Ggeo (p := p) Ω, g (c j) = c j) ∧ z = ∑ j ∈ Finset.range (p ^ N), c j * T.qq N ^ j := by
   intro p _ Ω _ _ hΩ T τ hτ hτq N z hz
   haveI : CharZero Ω := charZero_of_injective_algebraMap hΩ.inj
   have hprim : IsPrimitiveRoot (T.ζ N) (p ^ N) := T.prim N
@@ -71,24 +111,18 @@ theorem span
   have hconj : ∀ g ∈ Ggeo (p := p) Ω, g q = q → ∀ i : ℕ, g ((τ ^ i) z) = (τ ^ i) z := by
     intro g hg hgq i
     have hk : (τ ^ i)⁻¹ * g * τ ^ i ∈ Ggeo (p := p) Ω ⊓ MulAction.stabilizer (Gal p Ω) q := by
-      refine Subgroup.mem_inf.2 ⟨
-        Subgroup.mul_mem _ (Subgroup.mul_mem _ (Subgroup.inv_mem _ (hτG i)) hg) (hτG i),
-        MulAction.mem_stabilizer_iff.2 ?_
-      ⟩
+      refine Subgroup.mem_inf.2 ⟨Subgroup.mul_mem _ (Subgroup.mul_mem _ (Subgroup.inv_mem _ (hτG i)) hg)
+        (hτG i), MulAction.mem_stabilizer_iff.2 ?_⟩
       show ((τ ^ i)⁻¹ * g * τ ^ i) q = q
       rw [AlgEquiv.mul_apply, AlgEquiv.mul_apply, hτpow, map_mul, map_pow, hfixζ g hg, hgq, ← hτpow,
         AlgEquiv.aut_inv, AlgEquiv.symm_apply_apply]
     have hkz := hz _ hk
     have e : τ ^ i * ((τ ^ i)⁻¹ * g * τ ^ i) = g * τ ^ i := by group
-    calc
-      g ((τ ^ i) z)
-        = (g * τ ^ i) z := rfl
+    calc g ((τ ^ i) z) = (g * τ ^ i) z := rfl
       _ = (τ ^ i * ((τ ^ i)⁻¹ * g * τ ^ i)) z := by rw [e]
       _ = (τ ^ i) (((τ ^ i)⁻¹ * g * τ ^ i) z) := rfl
       _ = (τ ^ i) z := by rw [hkz]
-  have hdec
-      : ∀ g ∈ Ggeo (p := p) Ω, ∃ s : ℕ,
-        g q = ζ ^ s * q ∧ ∀ i : ℕ, g ((τ ^ i) z) = (τ ^ (s + i)) z := by
+  have hdec : ∀ g ∈ Ggeo (p := p) Ω, ∃ s : ℕ, g q = ζ ^ s * q ∧ ∀ i : ℕ, g ((τ ^ i) z) = (τ ^ (s + i)) z := by
     intro g hg
     have h1 : (g q / q) ^ M = 1 := by
       rw [div_pow, ← map_pow, hqpow, AlgEquiv.commutes, ← hqpow, div_self (pow_ne_zero _ hq0)]
@@ -107,19 +141,16 @@ theorem span
     rw [hτpow, hprim.pow_eq_one, one_mul]
   set η := ζ⁻¹ with hηdef
   have hηprim : IsPrimitiveRoot η M := hprim.inv
-  have hfixη : ∀ g ∈ Ggeo (p := p) Ω, g η = η := by intro g hg; rw [hηdef, map_inv₀, hfixζ g hg]
-  obtain ⟨P, hP⟩
-      : ∃ P : ℕ → Ω, ∀ j, P j = (M : Ω)⁻¹ * ∑ i ∈ Finset.range M, η ^ (i * j) * (τ ^ i) z :=
-    ⟨_, fun _ => rfl⟩
-  have hgP
-      : ∀ g ∈ Ggeo (p := p) Ω, ∀ s : ℕ,
-        (∀ i : ℕ, g ((τ ^ i) z) = (τ ^ (s + i)) z) → ∀ j, g (P j) = ζ ^ (s * j) * P j := by
+  have hfixη : ∀ g ∈ Ggeo (p := p) Ω, g η = η := by
+    intro g hg; rw [hηdef, map_inv₀, hfixζ g hg]
+  obtain ⟨P, hP⟩ : ∃ P : ℕ → Ω, ∀ j,
+      P j = (M : Ω)⁻¹ * ∑ i ∈ Finset.range M, η ^ (i * j) * (τ ^ i) z := ⟨_, fun _ => rfl⟩
+  have hgP : ∀ g ∈ Ggeo (p := p) Ω, ∀ s : ℕ, (∀ i : ℕ, g ((τ ^ i) z) = (τ ^ (s + i)) z) →
+      ∀ j, g (P j) = ζ ^ (s * j) * P j := by
     intro g hg s hs j
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hP, map_mul, map_inv₀, map_natCast, map_sum]
-    have hper
-        : ∀ i,
-          (fun i => η ^ (i * j) * (τ ^ i) z) (i + M) = (fun i => η ^ (i * j) * (τ ^ i) z) i := by
+
+    rw [hP, map_mul, map_inv₀, map_natCast, map_sum]
+    have hper : ∀ i, (fun i => η ^ (i * j) * (τ ^ i) z) (i + M) = (fun i => η ^ (i * j) * (τ ^ i) z) i := by
       intro i
       show η ^ ((i + M) * j) * (τ ^ (i + M)) z = η ^ (i * j) * (τ ^ i) z
       rw [add_mul, pow_add, show η ^ (M * j) = 1 by rw [pow_mul, hηprim.pow_eq_one, one_pow],
@@ -130,41 +161,37 @@ theorem span
     rw [map_mul, map_pow, hfixη g hg, hs, add_comm s i]
     have hζη : ζ ^ (s * j) * η ^ (s * j) = 1 := by
       rw [← mul_pow, hηdef, mul_inv_cancel₀ hζ0, one_pow]
-    calc
-      (M : Ω)⁻¹ * (η ^ (i * j) * (τ ^ (i + s)) z)
-          = (M : Ω)⁻¹ * ((ζ ^ (s * j) * η ^ (s * j)) * η ^ (i * j) * (τ ^ (i + s)) z) := by
-        rw [hζη, one_mul]
+    calc (M : Ω)⁻¹ * (η ^ (i * j) * (τ ^ (i + s)) z)
+        = (M : Ω)⁻¹ * ((ζ ^ (s * j) * η ^ (s * j)) * η ^ (i * j) * (τ ^ (i + s)) z) := by
+          rw [hζη, one_mul]
       _ = ζ ^ (s * j) * ((M : Ω)⁻¹ * (η ^ ((i + s) * j) * (τ ^ (i + s)) z)) := by
-        rw [add_mul, pow_add]; ring
+          rw [add_mul, pow_add]; ring
   obtain ⟨c, hc⟩ : ∃ c : ℕ → Ω, ∀ j, c j = P j / q ^ j := ⟨_, fun _ => rfl⟩
   refine ⟨c, ?_, ?_⟩
   · intro j g hg
     obtain ⟨s, hgq, hs⟩ := hdec g hg
     rw [hc, map_div₀, map_pow, hgq, hgP g hg s hs j, mul_pow, ← pow_mul,
       mul_div_mul_left _ _ (pow_ne_zero _ hζ0)]
-  · have hgeom
-        : ∀ i ∈ Finset.range M,
-          ∑ j ∈ Finset.range M, η ^ (i * j) = if i = 0 then (M : Ω) else 0 := by
+  · have hgeom : ∀ i ∈ Finset.range M,
+        ∑ j ∈ Finset.range M, η ^ (i * j) = if i = 0 then (M : Ω) else 0 := by
       intro i hi
       split_ifs with h0
       · simp [h0]
-      · have hne : η ^ i ≠ 1 := hηprim.pow_ne_one_of_pos_of_lt h0 (Finset.mem_range.1 hi)
+      · have hne : η ^ i ≠ 1 :=
+          hηprim.pow_ne_one_of_pos_of_lt h0 (Finset.mem_range.1 hi)
         simp_rw [pow_mul]
         rw [geom_sum_eq hne, pow_right_comm, hηprim.pow_eq_one, one_pow, sub_self, zero_div]
-    have e1
-        : ∑ i ∈ Finset.range M, (∑ j ∈ Finset.range M, η ^ (i * j)) * (τ ^ i) z
-          = ∑ i ∈ Finset.range M, (if i = 0 then (M : Ω) else 0) * (τ ^ i) z :=
+    have e1 : ∑ i ∈ Finset.range M, (∑ j ∈ Finset.range M, η ^ (i * j)) * (τ ^ i) z =
+        ∑ i ∈ Finset.range M, (if i = 0 then (M : Ω) else 0) * (τ ^ i) z :=
       Finset.sum_congr rfl fun i hi => by rw [hgeom i hi]
-    calc
-      z = (M : Ω)⁻¹ * ∑ i ∈ Finset.range M, (∑ j ∈ Finset.range M, η ^ (i * j)) * (τ ^ i) z := by
-        rw [e1,
-          Finset.sum_eq_single_of_mem 0 (Finset.mem_range.2 hMpos) (fun b _ hb => by simp [hb])]
-        simp [hM0]
+    calc z = (M : Ω)⁻¹ * ∑ i ∈ Finset.range M, (∑ j ∈ Finset.range M, η ^ (i * j)) * (τ ^ i) z := by
+          rw [e1, Finset.sum_eq_single_of_mem 0 (Finset.mem_range.2 hMpos) (fun b _ hb => by simp [hb])]
+          simp [hM0]
       _ = ∑ j ∈ Finset.range M, P j := by
-        simp only [hP]
-        rw [← Finset.mul_sum, Finset.sum_comm]
-        simp only [Finset.sum_mul]
+          simp only [hP]
+          rw [← Finset.mul_sum, Finset.sum_comm]
+          simp only [Finset.sum_mul]
       _ = ∑ j ∈ Finset.range M, c j * q ^ j :=
-        Finset.sum_congr rfl fun j _ => by rw [hc, div_mul_cancel₀ _ (pow_ne_zero j hq0)]
+          Finset.sum_congr rfl fun j _ => by rw [hc, div_mul_cancel₀ _ (pow_ne_zero j hq0)]
 
 end GlobalTheory.K5.Span

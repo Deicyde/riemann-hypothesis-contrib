@@ -1,10 +1,48 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.OneMapOfExt
+public import Development.AbelianVarietyTheory.Definitions.GaloisGeometry.NormalFam
+public import Development.AbelianVarietyTheory.Definitions.TwistedInnerProducts.IsStepWeil
+public import Development.AbelianVarietyTheory.PublishedTheorems.AutomorphicForms₂.ExistsNormLeHeightPow
+public import Development.AbelianVarietyTheory.PublishedTheorems.AutomorphicForms₂.HasDRepIffHasDerivAt
+public import Development.AbelianVarietyTheory.PublishedTheorems.TwistedTraceFormula.AdmissibleDiscreteSeriesOfHasParam
+public import Development.AbelianVarietyTheory.PublishedTheorems.TwistedTraceFormula.HarishChandraModulesOn
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsMeasY
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ModelsWith
-public import Development.AbelianVarietyTheory.Definitions.GaloisGeometry.NormalFam
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
 
 @[expose] public section
 
@@ -42,7 +80,6 @@ def FamC (Y : NewReal R V X) : Prop :=
   (extR R Y).grp_red_R ∧ (extR R Y).grp_red_L ∧ TieExt R Y ∧ (extR R Y).fam_roots
     ∧ RealDat.fam_degR (A := extA A X) ∧ RealDat.fam_degL (A := extA A X) ∧ (extR R Y).fam_muVal
 
-set_option maxHeartbeats 2000000 in
 def updM
     (Y : NewReal R V X) (HX : type_of% Y.HX) (HV : type_of% Y.HV)
     (jX : ∀ n, (extA A X).fam.amb.FR (.inr n) →ₛₗ[D.what₂.embLL] (HX n).H)
@@ -67,7 +104,6 @@ def updM
   thG := fun _ _ => 0
 }
 
-set_option maxHeartbeats 2000000 in
 def updK
     (Y : NewReal R V X) (ωY : type_of% Y.ωY) (ωX : type_of% Y.ωX) (ωP : type_of% Y.ωP)
     (vY : type_of% Y.vY) (vX : type_of% Y.vX) (vP : type_of% Y.vP)
@@ -81,7 +117,6 @@ def updK
   vP := vP
 }
 
-set_option maxHeartbeats 2000000 in
 def updL
     (Y : NewReal R V X) (ioY : type_of% (extR R Y).ioY) (ioX : type_of% (extR R Y).ioX)
     (Th : type_of% (extR R Y).Th) (thF : type_of% (extR R Y).thF) (thG : type_of% (extR R Y).thG)
@@ -94,7 +129,6 @@ def updL
   thG := fun i n => thG i (.inr n)
 }
 
-set_option maxHeartbeats 2000000 in
 theorem isModels_ext (hM : R.IsModels) (Y : NewReal R V X) (h : ModC (extR R Y))
     : (extR R Y).IsModels := by
   refine ⟨
@@ -133,7 +167,7 @@ theorem isModels_ext (hM : R.IsModels) (Y : NewReal R V X) (h : ModC (extR R Y))
   · exact (by with_unfolding_all exact (hM.BV :))
   · exact (by with_unfolding_all exact (hM.order :))
 
-set_option maxHeartbeats 2000000 in
+
 theorem isFam_ext (hF : R.IsFam) (Y : NewReal R V X) (h : FamC Y) : (extR R Y).IsFam := by
   refine ⟨?_, ?_, h.2.2.2.1, ?_, h.2.2.2.2.1, h.2.2.2.2.2.1, h.2.2.2.2.2.2, ?_⟩
   · obtain ⟨g, c, c', ht⟩ := hF.tie
@@ -146,7 +180,6 @@ theorem isFam_ext (hF : R.IsFam) (Y : NewReal R V X) (h : FamC Y) : (extR R Y).I
   · exact (by with_unfolding_all exact (hF.pl_onto :))
   · exact (by with_unfolding_all exact (hF.etaVal :))
 
-set_option maxHeartbeats 2000000 in
 theorem isGrp_ext {F : Face D A} (hG : R.IsGrp F) (Y : NewReal R V X) (h : FamC Y)
     : (extR R Y).IsGrp (extF F X) := by
   refine ⟨h.1, h.2.1, ?_, ?_, ?_⟩
@@ -154,7 +187,6 @@ theorem isGrp_ext {F : Face D A} (hG : R.IsGrp F) (Y : NewReal R V X) (h : FamC 
   · exact (by with_unfolding_all exact (hG.record :))
   · exact (by with_unfolding_all exact (hG.chiW :))
 
-set_option maxHeartbeats 2000000 in
 theorem models_stage (hM : R.IsModels) (Y : NewReal R V X) (h : FamC Y)
     : ∃ Y' : NewReal R V X, FamC Y' ∧ ModC (extR R Y') := by
   choose HX jX h1 h2 using fun n => exists_modX (extR R Y) (.inr n)
@@ -189,7 +221,6 @@ theorem models_stage (hM : R.IsModels) (Y : NewReal R V X) (h : FamC Y)
     · exact (by with_unfolding_all exact (hM.νV i t :))
     · exact (by with_unfolding_all exact (h8 i n :))
 
-set_option maxHeartbeats 2000000 in
 theorem ker_stage
     (hc : R.IsChain) (hp : R.IsThP) (hL : (extL R.toLevCh V).Is (.inl A.μ0))
     (Y : NewReal R V X) (h : FamC Y) (hm : ModC (extR R Y))
@@ -220,7 +251,6 @@ theorem ker_stage
     · exact (by with_unfolding_all exact (hp.vP i t :))
     · exact (by with_unfolding_all exact (h5 i n :))
 
-set_option maxHeartbeats 2000000 in
 theorem isChain_updL
     (hc : R.IsChain)
     (Y : NewReal R V X) (ioY ioX Th thF thG)
@@ -245,7 +275,6 @@ theorem isChain_updL
     · exact (by with_unfolding_all exact (hc.Th t :))
     · exact (by with_unfolding_all exact (h.Th (.inr n) :))
 
-set_option maxHeartbeats 2000000 in
 theorem isThP_updL
     (hp : R.IsThP)
     (Y : NewReal R V X) (ioY ioX Th thF thG)
@@ -266,7 +295,6 @@ theorem isThP_updL
     · exact (by with_unfolding_all exact (hp.thG i t :))
     · exact (by with_unfolding_all exact (h.thG i (.inr n) :))
 
-set_option maxHeartbeats 2000000 in
 theorem core_ext
     (h₁ : GlobalTheory.Published.DiscreteSeriesCover)
     (h₂ : GlobalTheory.Published.HarishChandraModules) (h₃ : GlobalTheory.Published.CuspRapidDecay)

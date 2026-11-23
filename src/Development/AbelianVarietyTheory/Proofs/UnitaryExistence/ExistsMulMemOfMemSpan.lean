@@ -1,9 +1,55 @@
 module
 
-public import Mathlib
 public import Formalism.LocalToGlobal.ProjectiveLattices.ThShort
 public import Development.AbelianVarietyTheory.BlockTheory.ExistenceTori.AdmissibleHarmonicLattice
 public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.ExistsNeZeroSmulMemOfMemSpan
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Ring.IsFormallyReal
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
@@ -13,8 +59,7 @@ noncomputable section
 
 namespace GlobalTheory.GenusLatCompare
 
-open NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj MvPolynomial
-  GlobalTheory.IndefiniteRowSideFullHecke.AdmissibleHarmonicLattice
+open NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj MvPolynomial GlobalTheory.IndefiniteRowSideFullHecke.AdmissibleHarmonicLattice
 open scoped Pointwise
 
 variable {E : Type} [Field E] [NumberField E] {n : ℕ}
@@ -30,8 +75,8 @@ def latEquiv : Lat E n ≃ {Λ : GenLat E n // IsLat Λ} where
   right_inv _ := rfl
 
 omit [NumberField E] in
-theorem span_smul_le_iff (k : ℕ) (A B : Submodule (𝓞 E) (Fin n → E))
-    : Ideal.span {(k : 𝓞 E)} • A ≤ B ↔ ∀ x ∈ A, k • x ∈ B := by
+theorem span_smul_le_iff (k : ℕ) (A B : Submodule (𝓞 E) (Fin n → E)) :
+    Ideal.span {(k : 𝓞 E)} • A ≤ B ↔ ∀ x ∈ A, k • x ∈ B := by
   rw [Submodule.smul_le]
   constructor
   · intro h x hx
@@ -42,9 +87,9 @@ theorem span_smul_le_iff (k : ℕ) (A B : Submodule (𝓞 E) (Fin n → E))
     rw [mul_smul, Nat.cast_smul_eq_nsmul]
     exact B.smul_mem _ (h x hx)
 
-theorem fg_of_smul_mem
-    {A : Submodule (𝓞 E) (Fin n → E)} {o : 𝓞 E} (ho : o ≠ 0) (h : ∀ x ∈ A, o • x ∈ stdMod E n)
-    : A.FG := by
+
+theorem fg_of_smul_mem {A : Submodule (𝓞 E) (Fin n → E)} {o : 𝓞 E} (ho : o ≠ 0)
+    (h : ∀ x ∈ A, o • x ∈ stdMod E n) : A.FG := by
   have hinj : Function.Injective (LinearMap.lsmul (𝓞 E) (Fin n → E) o) := by
     intro x y hxy
     funext j
@@ -59,61 +104,46 @@ theorem fg_of_smul_mem
 
 variable [IsCMField E]
 
-theorem eq_zero_of_sum_conj (v : Fin n → E) (h : ∑ j, IsCMField.complexConj E (v j) * v j = 0)
-    : v = 0 := by
+theorem eq_zero_of_sum_conj (v : Fin n → E) (h : ∑ j, IsCMField.complexConj E (v j) * v j = 0) : v = 0 := by
   obtain ⟨φ⟩ : Nonempty (E →+* ℂ) := inferInstance
   have h1 := congrArg φ h
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, map_mul, IsCMField.complexEmbedding_complexConj, map_zero,
-        Complex.conj_mul']
-      at h1
+
+  simp only [map_sum, map_mul, IsCMField.complexEmbedding_complexConj, map_zero,
+  Complex.conj_mul'] at h1
   have h2 : ∑ j, ‖φ (v j)‖ ^ 2 = 0 := by exact_mod_cast h1
   rw [Finset.sum_eq_zero_iff_of_nonneg fun _ _ => by positivity] at h2
   funext j
   simpa using h2 j (Finset.mem_univ j)
 
+
 omit [IsCMField E] in
-private theorem exists_mul_mem_of_mem_span
-    (A : Submodule (𝓞 E) (Fin n → E))
-    {x : Fin n → E} (hx : x ∈ Submodule.span E (A : Set (Fin n → E)))
-    : ∃ o : 𝓞 E, o ≠ 0 ∧ o • x ∈ A := by
+private theorem exists_mul_mem_of_mem_span (A : Submodule (𝓞 E) (Fin n → E)) {x : Fin n → E}
+    (hx : x ∈ Submodule.span E (A : Set (Fin n → E))) : ∃ o : 𝓞 E, o ≠ 0 ∧ o • x ∈ A := by
   first
   | exact @_root_.GlobalTheory.NonzeroSmulMemSpan.exists_ne_zero_smul_mem_of_mem_span
   | exact _root_.GlobalTheory.NonzeroSmulMemSpan.exists_ne_zero_smul_mem_of_mem_span
-  | (
-      apply _root_.GlobalTheory.NonzeroSmulMemSpan.exists_ne_zero_smul_mem_of_mem_span
-        <;> assumption
-    )
-  | (
-      intros
-      apply _root_.GlobalTheory.NonzeroSmulMemSpan.exists_ne_zero_smul_mem_of_mem_span
-        <;> assumption
-    )
-  | (
-      intros
-      apply @_root_.GlobalTheory.NonzeroSmulMemSpan.exists_ne_zero_smul_mem_of_mem_span
-        <;> first | assumption | infer_instance
-    )
+  | (apply _root_.GlobalTheory.NonzeroSmulMemSpan.exists_ne_zero_smul_mem_of_mem_span <;> assumption)
+  | (intros; apply _root_.GlobalTheory.NonzeroSmulMemSpan.exists_ne_zero_smul_mem_of_mem_span <;> assumption)
+  | (intros; apply @_root_.GlobalTheory.NonzeroSmulMemSpan.exists_ne_zero_smul_mem_of_mem_span <;> first | assumption | infer_instance)
   | (intros; exact _root_.GlobalTheory.NonzeroSmulMemSpan.exists_ne_zero_smul_mem_of_mem_span ..)
 
-private theorem span_eq_top_of_unimod (Λ : GenLat E n) (h : Λ.Unimod)
-    : Submodule.span E (Λ.La : Set (Fin n → E)) = ⊤ := by
+private theorem span_eq_top_of_unimod (Λ : GenLat E n) (h : Λ.Unimod) :
+    Submodule.span E (Λ.La : Set (Fin n → E)) = ⊤ := by
   classical
   by_contra hne
   obtain ⟨f, hf0, hf⟩ := Submodule.exists_le_ker_of_lt_top _ (lt_top_iff_ne_top.2 hne)
   let v : Fin n → E := fun j => IsCMField.complexConj E (f (Pi.single j 1))
   have hpair : ∀ w : Fin n → E, ∑ j, IsCMField.complexConj E (v j) * w j = f w := by
     intro w
-    set_option synthInstance.maxHeartbeats 100000 in
-      conv_rhs => rw [pi_eq_sum_univ' w, map_sum]
+
+    conv_rhs => rw [pi_eq_sum_univ' w, map_sum]
     refine Finset.sum_congr rfl fun j _ => ?_
     rw [map_smul, smul_eq_mul, mul_comm]
     simp only [v, IsCMField.complexConj_apply_apply]
   have hkill : ∀ w ∈ Λ.La, f w = 0 := fun w hw => hf (Submodule.subset_span hw)
-  have hv : v ∈ Λ.La :=
-    (h v).2 fun w hw => by
-      rw [hpair, hkill w hw]
-      exact zero_mem _
+  have hv : v ∈ Λ.La := (h v).2 fun w hw => by
+    rw [hpair, hkill w hw]
+    exact zero_mem _
   have hv0 : v = 0 := eq_zero_of_sum_conj v (by rw [hpair, hkill v hv])
   refine hf0 (LinearMap.ext fun w => ?_)
   rw [← hpair, hv0]

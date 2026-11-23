@@ -1,14 +1,54 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.Definitions.SemilocalFrames.AtBase
 public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.FrameDualUnipotentGroupActsUnitriangularOnto
 public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.IsPrincipalIdealRingOfHenselian
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Lemma
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
-open ValuativeRel Formalism.MainNotions.S Formalism.MainNotions.S.Loc Formalism.MainNotions.S.LocNG
-  GlobalTheory.LocOver
+open ValuativeRel Formalism.MainNotions.S Formalism.MainNotions.S.Loc Formalism.MainNotions.S.LocNG GlobalTheory.LocOver
 open scoped Classical
 
 noncomputable section
@@ -17,18 +57,19 @@ namespace GlobalTheory.LocOver.ZStep
 
 open GlobalTheory.LocOver.UnipOnto
 
-variable
-  {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F]
+variable {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F]
   {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] [MeasurableSpace E]
-  {M : Model F E} {V : Type} [AddCommGroup V] [Module E V]
-  (H : HermSp M V)
+  {M : Model F E} {V : Type} [AddCommGroup V] [Module E V] (H : HermSp M V)
 
-def eichG (x v : V) (c : E) (w : V) : V := w + H.h w v • x - H.h w x • v + (c * H.h w x) • x
+def eichG (x v : V) (c : E) (w : V) : V :=
+  w + H.h w v • x - H.h w x • v + (c * H.h w x) • x
 
 def eichGL (x v : V) (c : E) : V →ₗ[E] V where
   toFun := eichG H x v c
-  map_add' y y' := by simp only [eichG, H.h_add_left, add_smul, mul_add]; abel
-  map_smul' a y := by simp only [eichG, H.h_smul_left, RingHom.id_apply]; module
+  map_add' y y' := by
+    simp only [eichG, H.h_add_left, add_smul, mul_add]; abel
+  map_smul' a y := by
+    simp only [eichG, H.h_smul_left, RingHom.id_apply]; module
 
 lemma eichG_hL (x v : V) (c : E) (y w : V) : H.h (eichG H x v c y) w =
     H.h y w + H.h y v * H.h x w - H.h y x * H.h v w + c * H.h y x * H.h x w := by
@@ -105,11 +146,9 @@ namespace GlobalTheory.LocOver.ZStep
 
 open GlobalTheory.LocOver.UnipOnto
 
-variable
-  {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F]
+variable {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F]
   {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] [MeasurableSpace E]
-  {M : Model F E} {V : Type} [AddCommGroup V] [Module E V]
-  {H : HermSp M V} {r : ℕ} (Fr : FrameD H r)
+  {M : Model F E} {V : Type} [AddCommGroup V] [Module E V] {H : HermSp M V} {r : ℕ} (Fr : FrameD H r)
 
 lemma e_mem_X (a : Fin r) : Fr.f a.castSucc ∈ H.X Fr.f := Submodule.subset_span ⟨a, rfl⟩
 
@@ -138,20 +177,14 @@ namespace GlobalTheory.LocOver.ZStep
 
 open GlobalTheory.LocOver.UnipOnto
 
-theorem zstep
-    : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] {E : Type} [CommRing E]
-        [Algebra F E] [TopologicalSpace E] [MeasurableSpace E] (M : Model F E),
-      M.OK
-        → ∀ {V : Type} [AddCommGroup V] [Module E V] (H : HermSp M V) (r : ℕ) (Fr : FrameD H r)
-            (L : Submodule M.L.O (H.Wb Fr.f)),
-          Fr.IsInner L
-            → ∀ y : ↥(H.perp (H.X Fr.f)),
-              H.mkW Fr.f y ∈ L → H.h (Fr.f (Fin.last r)) (y : V) = 1
-                → (∀ a, H.h (y : V) (Fr.es a) = 0)
-                → ∀ x ∈ Submodule.span M.L.O (Set.range fun a : Fin r => Fr.f a.castSucc),
-                  ∃ n ∈ Fr.N,
-                    n (Fr.f (Fin.last r)) = Fr.f (Fin.last r) + x ∧ (∀ w ∈ H.X Fr.f, n w = w)
-                      ∧ img n (Fr.LamStd L) = Fr.LamStd L := by
+theorem zstep : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] {E : Type} [CommRing E] [Algebra F E]
+    [TopologicalSpace E] [MeasurableSpace E] (M : Model F E), M.OK → ∀ {V : Type} [AddCommGroup V] [Module E V]
+    (H : HermSp M V) (r : ℕ) (Fr : FrameD H r) (L : Submodule M.L.O (H.Wb Fr.f)), Fr.IsInner L →
+    ∀ y : ↥(H.perp (H.X Fr.f)), H.mkW Fr.f y ∈ L → H.h (Fr.f (Fin.last r)) (y : V) = 1 →
+    (∀ a, H.h (y : V) (Fr.es a) = 0) →
+    ∀ x ∈ Submodule.span M.L.O (Set.range fun a : Fin r => Fr.f a.castSucc),
+    ∃ n ∈ Fr.N, n (Fr.f (Fin.last r)) = Fr.f (Fin.last r) + x ∧ (∀ w ∈ H.X Fr.f, n w = w) ∧
+      img n (Fr.LamStd L) = Fr.LamStd L := by
   intro F _ _ _ E _ _ _ _ M hOK V _ _ H r Fr L hL y hyL hzy hyes x hx
   letI := hOK.loc
   haveI := hOK.char0
@@ -173,13 +206,12 @@ theorem zstep
   have hc2 : M.L.cj c + c + H.h (y : V) y = 0 := by rw [← hc1]; ring
   have hcjO : M.L.cj c ∈ M.L.O := GlobalTheory.UnramOrder.cj_mem M.L hcO
 
-  let n : V ≃ₗ[E] V :=
-    LinearEquiv.ofLinear (ZStep.eichGL H x y c) (ZStep.eichGL H (-x) y (M.L.cj c))
-      (LinearMap.ext fun w => ZStep.eichG_inv hxx hxy hc1 w)
-      (LinearMap.ext fun w => by
-        have := ZStep.eichG_inv (c := M.L.cj c) (c' := c) hnx hny hc2 w
-        rw [neg_neg] at this
-        exact this)
+  let n : V ≃ₗ[E] V := LinearEquiv.ofLinear (ZStep.eichGL H x y c) (ZStep.eichGL H (-x) y (M.L.cj c))
+    (LinearMap.ext fun w => ZStep.eichG_inv hxx hxy hc1 w)
+    (LinearMap.ext fun w => by
+      have := ZStep.eichG_inv (c := M.L.cj c) (c' := c) hnx hny hc2 w
+      rw [neg_neg] at this
+      exact this)
   have hn : ∀ w, n w = ZStep.eichG H x y c w := fun w => rfl
 
   set Λ := Fr.LamStd L with hΛ
@@ -189,34 +221,24 @@ theorem zstep
     rintro _ ⟨a, rfl⟩
     exact heL a
   have hyLam : (y : V) ∈ Λ := by
-    refine Submodule.subset_span ⟨
-      fun a => by rw [hyes a]; exact M.L.O.zero_mem,
-      fun a => by
-        rw [show H.h (y : V) (Fr.e a) = 0 from y.2 _ (e_mem_X Fr a)]; exact M.L.O.zero_mem,
-      ⟨y, ?_, hyL⟩
-    ⟩
+    refine Submodule.subset_span ⟨fun a => by rw [hyes a]; exact M.L.O.zero_mem,
+      fun a => by rw [show H.h (y : V) (Fr.e a) = 0 from y.2 _ (e_mem_X Fr a)]; exact M.L.O.zero_mem, ⟨y, ?_, hyL⟩⟩
     have h2 : ∀ a, H.h (y : V) (Fr.e a) = 0 := fun a => y.2 _ (e_mem_X Fr a)
     simp [FrameD.prF, hyes, h2]
 
-  have hgen
-      : ∀ g
-          ∈ {v | (∀ a, H.h v (Fr.es a) ∈ M.L.O) ∧ (∀ a, H.h v (Fr.e a) ∈ M.L.O) ∧
-            ∃ w : ↥(H.perp (H.X Fr.f)), (w : V) = Fr.prF v ∧ H.mkW Fr.f w ∈ L},
-        H.h g y ∈ M.L.O ∧ H.h g x ∈ M.L.O := by
+  have hgen : ∀ g ∈ {v | (∀ a, H.h v (Fr.es a) ∈ M.L.O) ∧ (∀ a, H.h v (Fr.e a) ∈ M.L.O) ∧
+      ∃ w : ↥(H.perp (H.X Fr.f)), (w : V) = Fr.prF v ∧ H.mkW Fr.f w ∈ L},
+      H.h g y ∈ M.L.O ∧ H.h g x ∈ M.L.O := by
     rintro g ⟨hges, hge, w, hw, hwL⟩
     refine ⟨?_, ?_⟩
     · have hpr : H.h (Fr.prF g) y = H.h g y := by
         have h1 : ∀ a, H.h (Fr.es a) (y : V) = 0 := fun a => by rw [h_right, hyes a, map_zero]
         have h2 : ∀ a, H.h (Fr.e a) (y : V) = 0 := fun a => hyX _ (e_mem_X Fr a)
         simp only [FrameD.prF, h_sub_left]
-        set_option synthInstance.maxHeartbeats 100000 in
-          rw [show H.h (∑ a, H.h g (Fr.es a) • Fr.e a) (y : V)
-                = UnipOnto.lf H (y : V) (∑ a, H.h g (Fr.es a) • Fr.e a) from
-              rfl,
-            show H.h (∑ a, H.h g (Fr.e a) • Fr.es a) (y : V)
-                = UnipOnto.lf H (y : V) (∑ a, H.h g (Fr.e a) • Fr.es a) from
-              rfl,
-            map_sum, map_sum]
+
+        rw [show H.h (∑ a, H.h g (Fr.es a) • Fr.e a) (y : V) = UnipOnto.lf H (y : V) (∑ a, H.h g (Fr.es a) • Fr.e a) from rfl,
+        show H.h (∑ a, H.h g (Fr.e a) • Fr.es a) (y : V) = UnipOnto.lf H (y : V) (∑ a, H.h g (Fr.e a) • Fr.es a) from rfl,
+        map_sum, map_sum]
         simp [UnipOnto.lf, H.h_smul_left, h1, h2]
       rw [← hpr, ← hw]
       exact (hL.2.1 w).1 hwL y hyL

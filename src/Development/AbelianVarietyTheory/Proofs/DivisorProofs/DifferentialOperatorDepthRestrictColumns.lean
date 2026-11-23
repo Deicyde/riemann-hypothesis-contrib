@@ -1,18 +1,56 @@
 module
 
-public import Mathlib
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.WeightedSumBounds.TypicalCurveStructureConstants
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.WeightedSumBounds.RootStatement
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.WeightedSumBounds.FactorialWeightedSumBound
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.WeightedSumBounds.OmBStatement
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.WeightedSumBounds.WtSubOneLe
 public import Development.AbelianVarietyTheory.Definitions.Foundations.IsSatFrame
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FormalGroupExpTwoSidedInverseUniqueStatement
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Presheaf
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.WeightedSumBounds.PtOrderProdSub
 
 @[expose] public section
 
-open MvPowerSeries ReciprocityTheory.PGsh ReciprocityTheory.ChartRestriction.G.Sh
-  GlobalTheory.FGDepth
+open MvPowerSeries ReciprocityTheory.PGsh ReciprocityTheory.ChartRestriction.G.Sh GlobalTheory.FGDepth
 
 namespace GlobalTheory.FGDepth
 
@@ -20,12 +58,10 @@ noncomputable section
 
 variable {C : Type} [Field C]
 
-theorem coeff_subst_extend_zero
-    {σ τ : Type} [Finite σ]
-    {j : τ → σ} (hj : Function.Injective j)
-    (g : MvPowerSeries σ C) (α : τ →₀ ℕ)
-    : coeff α (subst (Function.extend j (X : τ → MvPowerSeries τ C) 0) g)
-      = coeff (Finsupp.mapDomain j α) g := by
+theorem coeff_subst_extend_zero {σ τ : Type} [Finite σ] {j : τ → σ} (hj : Function.Injective j)
+    (g : MvPowerSeries σ C) (α : τ →₀ ℕ) :
+    coeff α (subst (Function.extend j (X : τ → MvPowerSeries τ C) 0) g) =
+      coeff (Finsupp.mapDomain j α) g := by
   classical
   have hc : ∀ s, constantCoeff (Function.extend j (X : τ → MvPowerSeries τ C) 0 s) = 0 := by
     intro s
@@ -51,16 +87,15 @@ theorem coeff_subst_extend_zero
       have hs' : D s ≠ 0 := Finsupp.mem_support_iff.mp hs
       rw [Finsupp.prod, Finset.prod_eq_zero hs (by simp [hz, hs']), map_zero, smul_zero]
 
-theorem subst_zero_of_constantCoeff
-    {σ τ : Type} [Finite σ] (h : MvPowerSeries σ C) (h0 : constantCoeff h = 0)
-    : subst (0 : σ → MvPowerSeries τ C) h = 0 := by
+theorem subst_zero_of_constantCoeff {σ τ : Type} [Finite σ] (h : MvPowerSeries σ C)
+    (h0 : constantCoeff h = 0) : subst (0 : σ → MvPowerSeries τ C) h = 0 := by
   exact subst_zero_of_constantCoeff_zero h0
 
-theorem subst_sum_smul_X
-    {σ τ ι : Type} [Fintype ι] {s : σ → MvPowerSeries τ C} (hs : HasSubst s) (c : ι → C) (k : ι → σ)
-    : subst s (∑ a, c a • (X (k a) : MvPowerSeries σ C)) = ∑ a, c a • s (k a) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [← coe_substAlgHom hs, map_sum]
+theorem subst_sum_smul_X {σ τ ι : Type} [Fintype ι] {s : σ → MvPowerSeries τ C} (hs : HasSubst s)
+    (c : ι → C) (k : ι → σ) :
+    subst s (∑ a, c a • (X (k a) : MvPowerSeries σ C)) = ∑ a, c a • s (k a) := by
+
+  rw [← coe_substAlgHom hs, map_sum]
   simp only [map_smul, substAlgHom_X]
 
 end
@@ -73,11 +108,9 @@ noncomputable section
 
 variable {C : Type} [Field C] [CharZero C] {v : AddValuation C (WithTop ℝ)}
 
-theorem constantCoeff_expAlong
-    {κ : Type} {d : κ → ℕ} (G : ∀ b, LogFGL v (d b))
-    {ι : κ → Type} [∀ b, Fintype (ι b)]
-    (u : ∀ b, ι b → Fin (d b) → C) (x : Σ b, Fin (d b))
-    : constantCoeff (expAlong G u x) = 0 := by
+theorem constantCoeff_expAlong {κ : Type} {d : κ → ℕ} (G : ∀ b, LogFGL v (d b)) {ι : κ → Type}
+    [∀ b, Fintype (ι b)] (u : ∀ b, ι b → Fin (d b) → C) (x : Σ b, Fin (d b)) :
+    constantCoeff (expAlong G u x) = 0 := by
   have hE := (GlobalTheory.T.formalGroupExp_twoSided_inverse_unique C v (d x.1) (G x.1)).1
   unfold IsExp at hE
   simp only [expAlong]
@@ -86,18 +119,14 @@ theorem constantCoeff_expAlong
   · intro e
     simp [MvPowerSeries.smul_eq_C_mul]
 
-theorem depth_rename
-    (κ : Type) [Fintype κ] [DecidableEq κ]
-    (d : κ → ℕ) (G : ∀ b, LogFGL v (d b))
-    (ι : κ → Type) [∀ b, Fintype (ι b)] [∀ b, DecidableEq (ι b)]
-    (u : ∀ b, ι b → Fin (d b) → C)
-    (κ' : Type) [Fintype κ'] [DecidableEq κ']
-    (e : κ' ↪ κ) (P : MvPolynomial (Σ b : κ', ι (e b)) C)
-    : depth G u (MvPolynomial.rename (fun x => (⟨e x.1, x.2⟩ : Σ b, ι b)) P)
-      = depth (fun b => G (e b)) (fun b => u (e b)) P := by
-  have hinj
-      : ∀ (β : κ → Type),
-        Function.Injective (fun x : (Σ b : κ', β (e b)) => (⟨e x.1, x.2⟩ : Σ b, β b)) := by
+theorem depth_rename (κ : Type) [Fintype κ] [DecidableEq κ] (d : κ → ℕ)
+    (G : ∀ b, LogFGL v (d b)) (ι : κ → Type) [∀ b, Fintype (ι b)] [∀ b, DecidableEq (ι b)]
+    (u : ∀ b, ι b → Fin (d b) → C) (κ' : Type) [Fintype κ'] [DecidableEq κ'] (e : κ' ↪ κ)
+    (P : MvPolynomial (Σ b : κ', ι (e b)) C) :
+    depth G u (MvPolynomial.rename (fun x => (⟨e x.1, x.2⟩ : Σ b, ι b)) P) =
+      depth (fun b => G (e b)) (fun b => u (e b)) P := by
+  have hinj : ∀ (β : κ → Type),
+      Function.Injective (fun x : (Σ b : κ', β (e b)) => (⟨e x.1, x.2⟩ : Σ b, β b)) := by
     intro β
     rintro ⟨a, x⟩ ⟨c, y⟩ h
     simp only [Sigma.mk.inj_iff] at h
@@ -106,12 +135,9 @@ theorem depth_rename
     rw [heq_eq_eq] at h2
     rw [h2]
   have hjt : Function.Injective (fun x : (Σ b : κ', ι (e b)) => (⟨e x.1, x.2⟩ : Σ b, ι b)) := hinj ι
-  have hjv
-      : Function.Injective (fun x : (Σ b : κ', Fin (d (e b))) => (⟨e x.1, x.2⟩ : Σ b, Fin (d b))) :=
-    hinj (fun b => Fin (d b))
-  have hcc
-      : ∀ {σ τ : Type} (j : τ → σ) (s : σ),
-        constantCoeff (Function.extend j (X : τ → MvPowerSeries τ C) 0 s) = 0 := by
+  have hjv : Function.Injective (fun x : (Σ b : κ', Fin (d (e b))) => (⟨e x.1, x.2⟩ : Σ b, Fin (d b))) := hinj (fun b => Fin (d b))
+  have hcc : ∀ {σ τ : Type} (j : τ → σ) (s : σ),
+      constantCoeff (Function.extend j (X : τ → MvPowerSeries τ C) 0 s) = 0 := by
     intro σ τ j s
     classical
     rw [Function.extend_def]
@@ -124,70 +150,36 @@ theorem depth_rename
   have hA : HasSubst (expAlong G u) := hasSubst_of_constantCoeff_zero (constantCoeff_expAlong G u)
   have hA' : HasSubst (expAlong (fun b => G (e b)) (fun b => u (e b))) :=
     hasSubst_of_constantCoeff_zero (constantCoeff_expAlong _ _)
-  have hRt : HasSubst (Function.extend
-      (fun x : (Σ b : κ', ι (e b)) => (⟨e x.1, x.2⟩ : Σ b, ι b))
-      (X : (Σ b : κ', ι (e b)) → MvPowerSeries (Σ b : κ', ι (e b)) C) 0) :=
+  have hRt : HasSubst (Function.extend (fun x : (Σ b : κ', ι (e b)) => (⟨e x.1, x.2⟩ : Σ b, ι b)) (X : (Σ b : κ', ι (e b)) → MvPowerSeries (Σ b : κ', ι (e b)) C) 0) :=
     hasSubst_of_constantCoeff_zero (hcc _)
-  have hRv : HasSubst (Function.extend
-      (fun x : (Σ b : κ', Fin (d (e b))) => (⟨e x.1, x.2⟩ : Σ b, Fin (d b)))
-      (X : (Σ b : κ', Fin (d (e b))) → MvPowerSeries (Σ b : κ', Fin (d (e b))) C) 0) :=
+  have hRv : HasSubst (Function.extend (fun x : (Σ b : κ', Fin (d (e b))) => (⟨e x.1, x.2⟩ : Σ b, Fin (d b))) (X : (Σ b : κ', Fin (d (e b))) → MvPowerSeries (Σ b : κ', Fin (d (e b))) C) 0) :=
     hasSubst_of_constantCoeff_zero (hcc _)
-  have hin
-      : ∀ b,
-        HasSubst (fun e' : Fin (d b) => ∑ a, u b a e' • (X ⟨b, a⟩ : MvPowerSeries (Σ b, ι b) C)) :=
-    fun b => hasSubst_of_constantCoeff_zero (fun e' => by simp [MvPowerSeries.smul_eq_C_mul])
+  have hin : ∀ b, HasSubst (fun e' : Fin (d b) =>
+      ∑ a, u b a e' • (X ⟨b, a⟩ : MvPowerSeries (Σ b, ι b) C)) := fun b =>
+    hasSubst_of_constantCoeff_zero (fun e' => by simp [MvPowerSeries.smul_eq_C_mul])
 
-  have K1
-      : ∀ F : MvPowerSeries (Σ b, ι b) C,
-        derivAt0 (MvPolynomial.rename (fun x : (Σ b : κ', ι (e b)) => (⟨e x.1, x.2⟩ : Σ b, ι b)) P)
-            F
-          = derivAt0 P
-            (subst
-              (Function.extend
-                (fun x : (Σ b : κ', ι (e b)) => (⟨e x.1, x.2⟩ : Σ b, ι b))
-                (X : (Σ b : κ', ι (e b)) → MvPowerSeries (Σ b : κ', ι (e b)) C) 0)
-              F) := by
+  have K1 : ∀ F : MvPowerSeries (Σ b, ι b) C,
+      derivAt0 (MvPolynomial.rename (fun x : (Σ b : κ', ι (e b)) => (⟨e x.1, x.2⟩ : Σ b, ι b)) P) F =
+        derivAt0 P (subst (Function.extend (fun x : (Σ b : κ', ι (e b)) => (⟨e x.1, x.2⟩ : Σ b, ι b)) (X : (Σ b : κ', ι (e b)) → MvPowerSeries (Σ b : κ', ι (e b)) C) 0) F) := by
     intro F
     unfold derivAt0
     rw [MvPolynomial.support_rename_of_injective hjt,
       Finset.sum_image (Finsupp.mapDomain_injective hjt).injOn]
     refine Finset.sum_congr rfl fun α _ => ?_
-    have hm
-        : (mfact (Finsupp.mapDomain (fun x : (Σ b : κ', ι (e b)) => (⟨e x.1, x.2⟩ : Σ b, ι b)) α)
-            : C)
-          = mfact α := by
+    have hm : (mfact (Finsupp.mapDomain (fun x : (Σ b : κ', ι (e b)) => (⟨e x.1, x.2⟩ : Σ b, ι b)) α) : C) = mfact α := by
       unfold mfact
       exact Finsupp.prod_mapDomain_index_inj hjt
     rw [MvPolynomial.coeff_rename_mapDomain _ hjt, coeff_subst_extend_zero hjt, hm]
 
-  have K2
-      : ∀ x : Σ b, Fin (d b),
-        subst
-            (Function.extend
-              (fun x : (Σ b : κ', ι (e b)) => (⟨e x.1, x.2⟩ : Σ b, ι b))
-              (X : (Σ b : κ', ι (e b)) → MvPowerSeries (Σ b : κ', ι (e b)) C) 0)
-            (expAlong G u x)
-          = subst (expAlong (fun b => G (e b)) (fun b => u (e b)))
-            (Function.extend
-              (fun x : (Σ b : κ', Fin (d (e b))) => (⟨e x.1, x.2⟩ : Σ b, Fin (d b)))
-              (X : (Σ b : κ', Fin (d (e b))) → MvPowerSeries (Σ b : κ', Fin (d (e b))) C) 0 x) := by
+  have K2 : ∀ x : Σ b, Fin (d b),
+      subst (Function.extend (fun x : (Σ b : κ', ι (e b)) => (⟨e x.1, x.2⟩ : Σ b, ι b)) (X : (Σ b : κ', ι (e b)) → MvPowerSeries (Σ b : κ', ι (e b)) C) 0) (expAlong G u x) =
+        subst (expAlong (fun b => G (e b)) (fun b => u (e b))) (Function.extend (fun x : (Σ b : κ', Fin (d (e b))) => (⟨e x.1, x.2⟩ : Σ b, Fin (d b))) (X : (Σ b : κ', Fin (d (e b))) → MvPowerSeries (Σ b : κ', Fin (d (e b))) C) 0 x) := by
     rintro ⟨b, k⟩
     by_cases hb : ∃ b', e b' = b
     · obtain ⟨b', rfl⟩ := hb
-      have h1
-          : Function.extend
-              (fun x : (Σ b : κ', Fin (d (e b))) => (⟨e x.1, x.2⟩ : Σ b, Fin (d b)))
-              (X : (Σ b : κ', Fin (d (e b))) → MvPowerSeries (Σ b : κ', Fin (d (e b))) C) 0
-              ⟨e b', k⟩
-            = X ⟨b', k⟩ :=
-        hjv.extend_apply _ _ ⟨b', k⟩
-      have h2
-          : ∀ a,
-            Function.extend
-                (fun x : (Σ b : κ', ι (e b)) => (⟨e x.1, x.2⟩ : Σ b, ι b))
-                (X : (Σ b : κ', ι (e b)) → MvPowerSeries (Σ b : κ', ι (e b)) C) 0 ⟨e b', a⟩
-              = X ⟨b', a⟩ := fun a =>
-        hjt.extend_apply _ _ ⟨b', a⟩
+      have h1 : Function.extend (fun x : (Σ b : κ', Fin (d (e b))) => (⟨e x.1, x.2⟩ : Σ b, Fin (d b))) (X : (Σ b : κ', Fin (d (e b))) → MvPowerSeries (Σ b : κ', Fin (d (e b))) C) 0 ⟨e b', k⟩ = X ⟨b', k⟩ := hjv.extend_apply _ _ ⟨b', k⟩
+      have h2 : ∀ a, Function.extend (fun x : (Σ b : κ', ι (e b)) => (⟨e x.1, x.2⟩ : Σ b, ι b)) (X : (Σ b : κ', ι (e b)) → MvPowerSeries (Σ b : κ', ι (e b)) C) 0 ⟨e b', a⟩ = X ⟨b', a⟩ :=
+        fun a => hjt.extend_apply _ _ ⟨b', a⟩
       rw [h1, subst_X hA']
       simp only [expAlong]
       rw [subst_comp_subst_apply (hin (e b')) hRt]
@@ -195,88 +187,42 @@ theorem depth_rename
       funext e'
       rw [subst_sum_smul_X hRt]
       simp only [h2]
-    · have h1
-          : Function.extend
-              (fun x : (Σ b : κ', Fin (d (e b))) => (⟨e x.1, x.2⟩ : Σ b, Fin (d b)))
-              (X : (Σ b : κ', Fin (d (e b))) → MvPowerSeries (Σ b : κ', Fin (d (e b))) C) 0 ⟨b, k⟩
-            = 0 :=
+    · have h1 : Function.extend (fun x : (Σ b : κ', Fin (d (e b))) => (⟨e x.1, x.2⟩ : Σ b, Fin (d b))) (X : (Σ b : κ', Fin (d (e b))) → MvPowerSeries (Σ b : κ', Fin (d (e b))) C) 0 ⟨b, k⟩ = 0 :=
         Function.extend_apply' _ _ _ (by
           rintro ⟨⟨b', k'⟩, h⟩
           exact hb ⟨b', congrArg Sigma.fst h⟩)
-      have h2
-          : ∀ a,
-            Function.extend
-                (fun x : (Σ b : κ', ι (e b)) => (⟨e x.1, x.2⟩ : Σ b, ι b))
-                (X : (Σ b : κ', ι (e b)) → MvPowerSeries (Σ b : κ', ι (e b)) C) 0 ⟨b, a⟩
-              = 0 := fun a =>
+      have h2 : ∀ a, Function.extend (fun x : (Σ b : κ', ι (e b)) => (⟨e x.1, x.2⟩ : Σ b, ι b)) (X : (Σ b : κ', ι (e b)) → MvPowerSeries (Σ b : κ', ι (e b)) C) 0 ⟨b, a⟩ = 0 := fun a =>
         Function.extend_apply' _ _ _ (by
           rintro ⟨⟨b', a'⟩, h⟩
           exact hb ⟨b', congrArg Sigma.fst h⟩)
       rw [h1, ← coe_substAlgHom hA', map_zero]
       simp only [expAlong]
       rw [subst_comp_subst_apply (hin b) hRt]
-      have h3
-          : (fun e' : Fin (d b) =>
-              subst
-                (Function.extend
-                  (fun x : (Σ b : κ', ι (e b)) => (⟨e x.1, x.2⟩ : Σ b, ι b))
-                  (X : (Σ b : κ', ι (e b)) → MvPowerSeries (Σ b : κ', ι (e b)) C) 0)
-                (∑ a, u b a e' • (X ⟨b, a⟩ : MvPowerSeries (Σ b, ι b) C)))
-            = 0 := by
+      have h3 : (fun e' : Fin (d b) => subst (Function.extend (fun x : (Σ b : κ', ι (e b)) => (⟨e x.1, x.2⟩ : Σ b, ι b)) (X : (Σ b : κ', ι (e b)) → MvPowerSeries (Σ b : κ', ι (e b)) C) 0)
+          (∑ a, u b a e' • (X ⟨b, a⟩ : MvPowerSeries (Σ b, ι b) C))) = 0 := by
         funext e'
         rw [subst_sum_smul_X hRt]
         simp [h2]
       rw [h3]
       exact subst_zero_of_constantCoeff _ (hE b k)
-  have K
-      : ∀ f : MvPowerSeries (Σ b, Fin (d b)) C,
-        derivAt0 (MvPolynomial.rename (fun x : (Σ b : κ', ι (e b)) => (⟨e x.1, x.2⟩ : Σ b, ι b)) P)
-            (subst (expAlong G u) f)
-          = derivAt0 P
-            (subst (expAlong (fun b => G (e b)) (fun b => u (e b)))
-              (subst
-                (Function.extend
-                  (fun x : (Σ b : κ', Fin (d (e b))) => (⟨e x.1, x.2⟩ : Σ b, Fin (d b)))
-                  (X : (Σ b : κ', Fin (d (e b))) → MvPowerSeries (Σ b : κ', Fin (d (e b))) C) 0)
-                f)) := by
+  have K : ∀ f : MvPowerSeries (Σ b, Fin (d b)) C,
+      derivAt0 (MvPolynomial.rename (fun x : (Σ b : κ', ι (e b)) => (⟨e x.1, x.2⟩ : Σ b, ι b)) P) (subst (expAlong G u) f) =
+        derivAt0 P (subst (expAlong (fun b => G (e b)) (fun b => u (e b))) (subst (Function.extend (fun x : (Σ b : κ', Fin (d (e b))) => (⟨e x.1, x.2⟩ : Σ b, Fin (d b))) (X : (Σ b : κ', Fin (d (e b))) → MvPowerSeries (Σ b : κ', Fin (d (e b))) C) 0) f)) := by
     intro f
     rw [K1, subst_comp_subst_apply hA hRt, subst_comp_subst_apply hRv hA']
     exact congrArg (fun F => derivAt0 P (subst F f)) (funext K2)
 
-  have Rint
-      : ∀ f : MvPowerSeries (Σ b, Fin (d b)) C,
-        MvIsInt v f
-          → MvIsInt v
-            (subst
-              (Function.extend
-                (fun x : (Σ b : κ', Fin (d (e b))) => (⟨e x.1, x.2⟩ : Σ b, Fin (d b)))
-                (X : (Σ b : κ', Fin (d (e b))) → MvPowerSeries (Σ b : κ', Fin (d (e b))) C) 0)
-              f) := by
+  have Rint : ∀ f : MvPowerSeries (Σ b, Fin (d b)) C, MvIsInt v f →
+      MvIsInt v (subst (Function.extend (fun x : (Σ b : κ', Fin (d (e b))) => (⟨e x.1, x.2⟩ : Σ b, Fin (d b))) (X : (Σ b : κ', Fin (d (e b))) → MvPowerSeries (Σ b : κ', Fin (d (e b))) C) 0) f) := by
     intro f hf α
     rw [coeff_subst_extend_zero hjv]
     exact hf _
-  have Rsec
-      : ∀ g : MvPowerSeries (Σ b : κ', Fin (d (e b))) C,
-        MvIsInt v g
-          → ∃ f,
-            MvIsInt v f
-              ∧ subst
-                  (Function.extend
-                    (fun x : (Σ b : κ', Fin (d (e b))) => (⟨e x.1, x.2⟩ : Σ b, Fin (d b)))
-                    (X : (Σ b : κ', Fin (d (e b))) → MvPowerSeries (Σ b : κ', Fin (d (e b))) C) 0)
-                  f
-                = g := by
+  have Rsec : ∀ g : MvPowerSeries (Σ b : κ', Fin (d (e b))) C, MvIsInt v g →
+      ∃ f, MvIsInt v f ∧ subst (Function.extend (fun x : (Σ b : κ', Fin (d (e b))) => (⟨e x.1, x.2⟩ : Σ b, Fin (d b))) (X : (Σ b : κ', Fin (d (e b))) → MvPowerSeries (Σ b : κ', Fin (d (e b))) C) 0) f = g := by
     intro g hg
     classical
-    refine ⟨
-      @id (MvPowerSeries (Σ b, Fin (d b)) C)
-        (Function.extend
-          (Finsupp.mapDomain (fun x : (Σ b : κ', Fin (d (e b))) => (⟨e x.1, x.2⟩ : Σ b, Fin (d b))))
-          (fun α => coeff α g)
-          0),
-      ?_,
-      ?_
-    ⟩
+    refine ⟨@id (MvPowerSeries (Σ b, Fin (d b)) C)
+      (Function.extend (Finsupp.mapDomain (fun x : (Σ b : κ', Fin (d (e b))) => (⟨e x.1, x.2⟩ : Σ b, Fin (d b)))) (fun α => coeff α g) 0), ?_, ?_⟩
     · intro β
       show IsIntV v (Function.extend (Finsupp.mapDomain (fun x : (Σ b : κ', Fin (d (e b))) => (⟨e x.1, x.2⟩ : Σ b, Fin (d b)))) (fun α => coeff α g) 0 β)
       rw [Function.extend_def]
@@ -294,14 +240,7 @@ theorem depth_rename
     dsimp only
     rw [K f, hfg]
   · refine le_iInf fun f => ?_
-    refine (iInf_le _ ⟨
-      subst
-        (Function.extend
-          (fun x : (Σ b : κ', Fin (d (e b))) => (⟨e x.1, x.2⟩ : Σ b, Fin (d b)))
-          (X : (Σ b : κ', Fin (d (e b))) → MvPowerSeries (Σ b : κ', Fin (d (e b))) C) 0)
-        f.1,
-      Rint f.1 f.2
-    ⟩).trans_eq ?_
+    refine (iInf_le _ ⟨subst (Function.extend (fun x : (Σ b : κ', Fin (d (e b))) => (⟨e x.1, x.2⟩ : Σ b, Fin (d b))) (X : (Σ b : κ', Fin (d (e b))) → MvPowerSeries (Σ b : κ', Fin (d (e b))) C) 0) f.1, Rint f.1 f.2⟩).trans_eq ?_
     dsimp only
     rw [K f.1]
 
@@ -311,13 +250,7 @@ end GlobalTheory.FGDepth
 
 namespace GlobalTheory.FGDepth
 
-theorem depth_restrict
-    : ∀ (C : Type) [Field C] [CharZero C] (v : AddValuation C (WithTop ℝ)) (κ : Type) [Fintype κ]
-        [DecidableEq κ] (d : κ → ℕ) (G : ∀ b, LogFGL v (d b)) (ι : κ → Type) [∀ b, Fintype (ι b)]
-        [∀ b, DecidableEq (ι b)] (u : ∀ b, ι b → Fin (d b) → C) (κ' : Type) [Fintype κ']
-        [DecidableEq κ'] (e : κ' ↪ κ) (P : MvPolynomial (Σ b : κ', ι (e b)) C),
-      depth G u (MvPolynomial.rename (fun x => (⟨e x.1, x.2⟩ : Σ b, ι b)) P)
-        = depth (fun b => G (e b)) (fun b => u (e b)) P := by
+theorem depth_restrict : ∀ (C : Type) [Field C] [CharZero C] (v : AddValuation C (WithTop ℝ)) (κ : Type) [Fintype κ] [DecidableEq κ] (d : κ → ℕ) (G : ∀ b, LogFGL v (d b)) (ι : κ → Type) [∀ b, Fintype (ι b)] [∀ b, DecidableEq (ι b)] (u : ∀ b, ι b → Fin (d b) → C) (κ' : Type) [Fintype κ'] [DecidableEq κ'] (e : κ' ↪ κ) (P : MvPolynomial (Σ b : κ', ι (e b)) C), depth G u (MvPolynomial.rename (fun x => (⟨e x.1, x.2⟩ : Σ b, ι b)) P) = depth (fun b => G (e b)) (fun b => u (e b)) P := by
   intro C _ _ v κ _ _ d G ι _ _ u κ' _ _ e P
   exact depth_rename κ d G ι u κ' e P
 

@@ -1,6 +1,55 @@
 module
 
-public import Mathlib
+public import Mathlib.RingTheory.RingHom.Flat
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Coalgebra.IsFrobenius
+import Mathlib.RingTheory.HopfAlgebra.Basic
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.TotallySplit
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Lemma
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+public import Mathlib.RingTheory.Flat.EquationalCriterion
+public import Mathlib.RingTheory.Ideal.BigOperators
 
 @[expose] public section
 
@@ -64,26 +113,15 @@ private lemma mem_ideal_of_sum_mul_mem_of_independent_mod_max {A : Type} [CommRi
     have := I.mul_mem_right (↑v⁻¹ : A) h1
     rwa [← hv, mul_assoc, Units.mul_inv, mul_one] at this
 
+
 open IsLocalRing TensorProduct in
-theorem _root_.GlobalTheory.coeff_mem_pow_of_flat_of_indep_mod_max
-    : ∀ {A R : Type} [CommRing A] [IsLocalRing A] [CommRing R] [IsLocalRing R] (φ : A →+* R),
-      φ.Flat → (maximalIdeal A).map φ = maximalIdeal R
-        → ∀ (θ : R) (q : Polynomial A),
-          q.Monic → (q.map φ).eval θ = 0
-            → (∀ (n : ℕ) (r : R), ∃ P : Polynomial A, r - (P.map φ).eval θ ∈ maximalIdeal R ^ n)
-            → (∀ P : Polynomial A,
-              P.natDegree < q.natDegree → (P.map φ).eval θ ∈ maximalIdeal R
-                → ∀ i, P.coeff i ∈ maximalIdeal A)
-            → ∀ (n : ℕ) (P : Polynomial A),
-              P.natDegree < q.natDegree → (P.map φ).eval θ ∈ maximalIdeal R ^ n
-                → ∀ i, P.coeff i ∈ maximalIdeal A ^ n := by
+theorem _root_.GlobalTheory.coeff_mem_pow_of_flat_of_indep_mod_max : ∀ {A R : Type} [CommRing A] [IsLocalRing A] [CommRing R] [IsLocalRing R] (φ : A →+* R), φ.Flat → (maximalIdeal A).map φ = maximalIdeal R → ∀ (θ : R) (q : Polynomial A), q.Monic → (q.map φ).eval θ = 0 → (∀ (n : ℕ) (r : R), ∃ P : Polynomial A, r - (P.map φ).eval θ ∈ maximalIdeal R ^ n) → (∀ P : Polynomial A, P.natDegree < q.natDegree → (P.map φ).eval θ ∈ maximalIdeal R → ∀ i, P.coeff i ∈ maximalIdeal A) → ∀ (n : ℕ) (P : Polynomial A), P.natDegree < q.natDegree → (P.map φ).eval θ ∈ maximalIdeal R ^ n → ∀ i, P.coeff i ∈ maximalIdeal A ^ n := by
   intro A R _ _ _ _ φ hflat hmax θ q _ _ _ hind n P hdeg hP i
   letI := φ.toAlgebra
   haveI : Module.Flat A R := hflat
   have hsm : ∀ (a : A) (r : R), a • r = φ a * r := fun a r => by
     rw [Algebra.smul_def, RingHom.algebraMap_toAlgebra]
-  have hφm : ∀ a ∈ maximalIdeal A, φ a ∈ maximalIdeal R := fun a ha =>
-    hmax ▸ Ideal.mem_map_of_mem φ ha
+  have hφm : ∀ a ∈ maximalIdeal A, φ a ∈ maximalIdeal R := fun a ha => hmax ▸ Ideal.mem_map_of_mem φ ha
   by_cases hi : i < q.natDegree
   swap
   · rw [Polynomial.coeff_eq_zero_of_natDegree_lt (lt_of_lt_of_le hdeg (not_lt.mp hi))]
@@ -114,8 +152,8 @@ theorem _root_.GlobalTheory.coeff_mem_pow_of_flat_of_indep_mod_max
   have hz : ∀ x : Fin k →₀ A, z x = ∑ l, φ (x l) * w l := by
     intro x
     conv_lhs => rw [← Finsupp.univ_sum_single x]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     exact Finset.sum_congr rfl (fun l _ => by rw [← Finsupp.smul_single_one, map_smul, hsm])
   have hθ : ∀ j : Fin d, θ ^ (j : ℕ) = ∑ l, φ (C j l) * w l := by
     intro j
@@ -128,11 +166,9 @@ theorem _root_.GlobalTheory.coeff_mem_pow_of_flat_of_indep_mod_max
     have h2 := DFunLike.congr_fun haf l
     rw [LinearMap.pi_apply_eq_sum_univ a f, Finsupp.finsetSum_apply, Fintype.sum_sum_type] at h2
     simp only [f, e, C, Sum.elim_inl, Sum.elim_inr, Finsupp.smul_apply, smul_eq_mul, neg_mul,
-        Finset.sum_neg_distrib, Finsupp.coe_zero, Pi.zero_apply]
-      at h2
+      Finset.sum_neg_distrib, Finsupp.coe_zero, Pi.zero_apply] at h2
     linear_combination h2
-  have hCm
-      : ∀ c : Fin d → A, (∀ l, ∑ j, c j * C j l ∈ maximalIdeal A) → ∀ j, c j ∈ maximalIdeal A := by
+  have hCm : ∀ c : Fin d → A, (∀ l, ∑ j, c j * C j l ∈ maximalIdeal A) → ∀ j, c j ∈ maximalIdeal A := by
     intro c hc j
     let Q : Polynomial A := ∑ j' : Fin d, Polynomial.C (c j') * Polynomial.X ^ (j' : ℕ)
     have hQdeg : Q.natDegree < d := by
@@ -140,27 +176,24 @@ theorem _root_.GlobalTheory.coeff_mem_pow_of_flat_of_indep_mod_max
       · rw [hQ, Polynomial.natDegree_zero]; exact lt_of_le_of_lt (Nat.zero_le _) j.2
       · exact (Polynomial.natDegree_lt_iff_degree_lt hQ).mpr (Polynomial.degree_sum_fin_lt c)
     have hQc : Q.coeff j = c j := by
-      simp [Q, Polynomial.finsetSum_coeff, Polynomial.coeff_C_mul, Polynomial.coeff_X_pow,
-        Fin.val_inj]
+      simp [Q, Polynomial.finsetSum_coeff, Polynomial.coeff_C_mul, Polynomial.coeff_X_pow, Fin.val_inj]
     have hQe : (Q.map φ).eval θ = ∑ l, φ (∑ j', c j' * C j' l) * w l := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [Q, Polynomial.map_sum, Polynomial.eval_finsetSum, Polynomial.map_mul,
-          Polynomial.map_C, Polynomial.map_pow, Polynomial.map_X, Polynomial.eval_mul,
-          Polynomial.eval_C, Polynomial.eval_pow, Polynomial.eval_X, hθ, Finset.mul_sum]
+
+      simp only [Q, Polynomial.map_sum, Polynomial.eval_finsetSum, Polynomial.map_mul, Polynomial.map_C,
+      Polynomial.map_pow, Polynomial.map_X, Polynomial.eval_mul, Polynomial.eval_C, Polynomial.eval_pow,
+      Polynomial.eval_X, hθ, Finset.mul_sum]
       rw [Finset.sum_comm]
       refine Finset.sum_congr rfl (fun l _ => ?_)
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum, Finset.sum_mul]
+
+      rw [map_sum, Finset.sum_mul]
       exact Finset.sum_congr rfl (fun j' _ => by rw [map_mul]; ring)
     rw [← hQc]
     refine hind Q hQdeg ?_ j
     rw [hQe]
     exact Ideal.sum_mem _ (fun l _ => Ideal.mul_mem_right _ _ (hφm _ (hc l)))
-  exact mem_ideal_of_sum_mul_mem_of_independent_mod_max d C hCm (maximalIdeal A ^ n)
-    (fun j => P.coeff j)
+  exact mem_ideal_of_sum_mul_mem_of_independent_mod_max d C hCm (maximalIdeal A ^ n) (fun j => P.coeff j)
     (fun l => by
       rw [haf' l]
-      exact Ideal.sum_mem _ (fun k' _ => Ideal.mul_mem_right _ _ (hbI k')))
-    ⟨i, hi⟩
+      exact Ideal.sum_mem _ (fun k' _ => Ideal.mul_mem_right _ _ (hbI k'))) ⟨i, hi⟩
 
 end GlobalTheory

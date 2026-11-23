@@ -1,36 +1,71 @@
 module
 
-public import Mathlib
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.PlaceDivisors.StChartFH
 public import ReciprocityTheory.DualLattices.TowerZeroSurjective
 public import ReciprocityTheory.DualLattices.LinPairStatement
-public import ReciprocityTheory.DualLattices.LengthDegreeAbelianVariety
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDescent.ChartPullbacks.UniversalCharts.LePreimageOfNil
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.Clauses
 public import ReciprocityTheory.DualLattices.SubMemOfCompat
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.SemiabelianSchemes.Biextensions.GenericFiberCubeInclusion
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.RosVal
-public import Development.AbelianVarietyTheory.Definitions.ModuliSpaces.IsSeparatedOfIsQProjOver
-public import Development.AbelianVarietyTheory.Definitions.TeichmullerDepth.IsEigBasisIff
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDescent.RosatiAdj
 public import Development.AbelianVarietyTheory.Proofs.AbelianSchemeLawProofs.GlobalFnsHolds
+public import Development.AbelianVarietyTheory.Proofs.UnramifiedDepth.BiextPairingNondegenerateGeometricFibre
 public import Development.AbelianVarietyTheory.Proofs.UnramifiedDepth.BiextValAxioms
-public import Development.AbelianVarietyTheory.Proofs.UnramifiedDepth.GrpPullbackSquareProductLift
-public import Development.AbelianVarietyTheory.Proofs.UnramifiedDepth.ExistsBXOfFactorSystems
-public import Development.AbelianVarietyTheory.Proofs.UnramifiedDepth.PointsFibreProduct
-public import Development.AbelianVarietyTheory.Proofs.UnramifiedDepth.TransportRightSmulFrame
-public import Development.AbelianVarietyTheory.Proofs.UnramifiedDepth.MulEqZeroOfSqZero
 public import Development.AbelianVarietyTheory.Proofs.UnramifiedDepth.BiextensionSecondLawCommutativityValue
 public import Development.AbelianVarietyTheory.Proofs.UnramifiedDepth.BiextensionSecondLawProduct
-public import Development.AbelianVarietyTheory.Proofs.UnramifiedDepth.NilpotentCoordinates
+public import Development.AbelianVarietyTheory.Proofs.UnramifiedDepth.ExistsBXOfFactorSystems
 public import Development.AbelianVarietyTheory.Proofs.UnramifiedDepth.ExistsCompatibleBasis
-public import Development.AbelianVarietyTheory.Proofs.UnramifiedDepth.ModPToValuationResidueFieldSurjective
+public import Development.AbelianVarietyTheory.Proofs.UnramifiedDepth.GrpPullbackSquareProductLift
 public import Development.AbelianVarietyTheory.Proofs.UnramifiedDepth.InvariantGeneratorDescendsMulN
-public import Development.AbelianVarietyTheory.Proofs.UnramifiedDepth.BiextPairingNondegenerateGeometricFibre
-public import Development.AbelianVarietyTheory.Proofs.UnramifiedDepth.TorsionInvariantDescendsFibre
-public import Development.AbelianVarietyTheory.Proofs.UnramifiedDepth.ProdCocycleMul
+import Development.AbelianVarietyTheory.Proofs.UnramifiedDepth.ModPToValuationResidueFieldSurjective
+public import Development.AbelianVarietyTheory.Proofs.UnramifiedDepth.MulEqZeroOfSqZero
+import Development.AbelianVarietyTheory.Proofs.UnramifiedDepth.NilpotentCoordinates
+public import Development.AbelianVarietyTheory.Proofs.UnramifiedDepth.NonemptyIsBiextOfCubeGen
 public import Development.AbelianVarietyTheory.Proofs.UnramifiedDepth.PairingNondegenerateIntegralTorsion
 public import Development.AbelianVarietyTheory.Proofs.UnramifiedDepth.PointsDivisibleAndTorsionOfValuationIntegers
-public import Development.AbelianVarietyTheory.Proofs.UnramifiedDepth.NonemptyIsBiextOfCubeGen
+public import Development.AbelianVarietyTheory.Proofs.UnramifiedDepth.PointsFibreProduct
+public import Development.AbelianVarietyTheory.Proofs.UnramifiedDepth.ProdCocycleMul
+public import Development.AbelianVarietyTheory.Proofs.UnramifiedDepth.TorsionInvariantDescendsFibre
+public import Development.AbelianVarietyTheory.Proofs.UnramifiedDepth.TransportRightSmulFrame
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Development.AbelianVarietyTheory.Definitions.TeichmullerDepth.IsEigBasisIff
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.CocycleRightZeroThd
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.PlaceDivisors.StChartF
 
 @[expose] public section
 

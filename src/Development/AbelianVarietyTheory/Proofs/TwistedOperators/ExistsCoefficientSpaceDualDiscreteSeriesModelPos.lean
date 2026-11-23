@@ -1,12 +1,55 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.FactTypePrime
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ColLieApply
+public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsCompactAdele
+public import Development.AbelianVarietyTheory.Proofs.HeightProofs.AdelicUnitaryActionAtRealPlace
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ContinuousOnAtTau
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.FiniteSmoothIrreducible
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.TensorProductDefiniteUnitaryLocalModelsIrreducib
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ContinuousOnAtTau
-public import Development.AbelianVarietyTheory.Proofs.HeightProofs.AdelicUnitaryActionAtRealPlace
-public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsCompactAdele
+import Mathlib.Algebra.Module.StablyFree.Basic
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.LinearAlgebra.PiTensorProduct.Basis
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Coalgebra.IsFrobenius
+import Mathlib.RingTheory.HopfAlgebra.Basic
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Development.AbelianVarietyTheory.Proofs.TwistedOperators.FactTypePrime
 
 @[expose] public section
 
@@ -16,16 +59,15 @@ open scoped TensorProduct
 
 namespace GlobalTheory.DualCoef
 
-theorem exists_contragredient
-    {G X κ : Type} [Group G] [TopologicalSpace G] [AddCommGroup X] [Module ℂ X] [Fintype κ]
+theorem exists_contragredient {G X κ : Type} [Group G] [TopologicalSpace G] [AddCommGroup X] [Module ℂ X] [Fintype κ]
     (B : Module.Basis κ ℂ X) (T : G →* Module.End ℂ X)
     (hu : ∀ g p q, B.repr (T g⁻¹ (B p)) q = starRingEnd ℂ (B.repr (T g (B q)) p))
     (hc : ∀ p q, Continuous fun g => B.repr (T g (B q)) p)
-    (hi : ∀ U : Submodule ℂ X, (∀ g, ∀ x ∈ U, T g x ∈ U) → U = ⊥ ∨ U = ⊤)
-    : ∃ (ρ : G →* Module.End ℂ (EuclideanSpace ℂ κ)) (e : EuclideanSpace ℂ κ ≃ₗ[ℂ] Module.Dual ℂ X),
-      (∀ g w x, e (ρ g w) x = e w (T g⁻¹ x)) ∧ (∀ g x y, inner ℂ (ρ g x) (ρ g y) = inner ℂ x y)
-        ∧ (∀ x, Continuous fun g => ρ g x)
-        ∧ ∀ U : Submodule ℂ (EuclideanSpace ℂ κ), (∀ g, U.map (ρ g) ≤ U) → U = ⊥ ∨ U = ⊤ := by
+    (hi : ∀ U : Submodule ℂ X, (∀ g, ∀ x ∈ U, T g x ∈ U) → U = ⊥ ∨ U = ⊤) :
+    ∃ (ρ : G →* Module.End ℂ (EuclideanSpace ℂ κ)) (e : EuclideanSpace ℂ κ ≃ₗ[ℂ] Module.Dual ℂ X),
+      (∀ g w x, e (ρ g w) x = e w (T g⁻¹ x)) ∧ (∀ g x y, inner ℂ (ρ g x) (ρ g y) = inner ℂ x y) ∧
+      (∀ x, Continuous fun g => ρ g x) ∧
+      ∀ U : Submodule ℂ (EuclideanSpace ℂ κ), (∀ g, U.map (ρ g) ≤ U) → U = ⊥ ∨ U = ⊤ := by
   classical
   have : Module.Finite ℂ X := Module.Finite.of_basis B
   let e : EuclideanSpace ℂ κ ≃ₗ[ℂ] Module.Dual ℂ X :=
@@ -33,19 +75,18 @@ theorem exists_contragredient
   have he : ∀ w y, e w y = ∑ p, w p * B.repr y p := by
     intro w y
     simp [e, Module.Basis.equivFun_symm_apply]
-  let ρ : G →* Module.End ℂ (EuclideanSpace ℂ κ) := {
-    toFun := fun g => e.symm.toLinearMap ∘ₗ (T g⁻¹).dualMap ∘ₗ e.toLinearMap
-    map_one' := by
-      ext w : 1
-      apply e.injective
-      ext y
-      simp
-    map_mul' := fun g h => by
-      ext w : 1
-      apply e.injective
-      ext y
-      simp [mul_inv_rev, Module.End.mul_apply]
-  }
+  let ρ : G →* Module.End ℂ (EuclideanSpace ℂ κ) :=
+    { toFun := fun g => e.symm.toLinearMap ∘ₗ (T g⁻¹).dualMap ∘ₗ e.toLinearMap
+      map_one' := by
+        ext w : 1
+        apply e.injective
+        ext y
+        simp
+      map_mul' := fun g h => by
+        ext w : 1
+        apply e.injective
+        ext y
+        simp [mul_inv_rev, Module.End.mul_apply] }
   have hρ : ∀ g w x, e (ρ g w) x = e w (T g⁻¹ x) := by
     intro g w x
     simp [ρ]
@@ -56,53 +97,45 @@ theorem exists_contragredient
       simp [Finsupp.single_apply]
     rw [h1, hρ, he]
     exact Finset.sum_congr rfl fun p _ => by rw [hu]
-  have horth
-      : ∀ g p r,
-        ∑ q, B.repr (T g (B p)) q * starRingEnd ℂ (B.repr (T g (B r)) q)
-          = if p = r then 1 else 0 := by
+  have horth : ∀ g p r, ∑ q, B.repr (T g (B p)) q * starRingEnd ℂ (B.repr (T g (B r)) q) =
+      if p = r then 1 else 0 := by
     intro g p r
-    have h2 : ∀ q, starRingEnd ℂ (B.repr (T g (B r)) q) = B.repr (T g⁻¹ (B q)) r := fun q =>
-      (hu g q r).symm
+    have h2 : ∀ q, starRingEnd ℂ (B.repr (T g (B r)) q) = B.repr (T g⁻¹ (B q)) r := fun q => (hu g q r).symm
     simp_rw [h2]
-    have h3
-        : ∑ q, B.repr (T g (B p)) q * B.repr (T g⁻¹ (B q)) r
-          = B.repr (T g⁻¹ (∑ q, B.repr (T g (B p)) q • B q)) r := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum, map_sum, Finsupp.coe_finsetSum, Finset.sum_apply]
+    have h3 : ∑ q, B.repr (T g (B p)) q * B.repr (T g⁻¹ (B q)) r =
+        B.repr (T g⁻¹ (∑ q, B.repr (T g (B p)) q • B q)) r := by
+
+      rw [map_sum, map_sum, Finsupp.coe_finsetSum, Finset.sum_apply]
       refine Finset.sum_congr rfl fun q _ => ?_
       rw [map_smul, map_smul, Finsupp.smul_apply, smul_eq_mul]
-    rw [h3, B.sum_repr, ← Module.End.mul_apply, ← map_mul, inv_mul_cancel, map_one,
-      Module.End.one_apply, B.repr_self, Finsupp.single_apply]
+    rw [h3, B.sum_repr, ← Module.End.mul_apply, ← map_mul, inv_mul_cancel, map_one, Module.End.one_apply,
+      B.repr_self, Finsupp.single_apply]
   refine ⟨ρ, e, hρ, ?_, ?_, ?_⟩
   · intro g x y
     simp only [PiLp.inner_apply, RCLike.inner_apply, hcoord]
-    calc
-      ∑ q, (∑ r, y r * starRingEnd ℂ (B.repr (T g (B r)) q)) *
-       starRingEnd ℂ (∑ p, x p * starRingEnd ℂ (B.repr (T g (B p)) q))
-          = ∑ p, ∑ r, starRingEnd ℂ (x p) * y r *
-              ∑ q, B.repr (T g (B p)) q * starRingEnd ℂ (B.repr (T g (B r)) q) := by
-        set_option synthInstance.maxHeartbeats 100000 in
+    calc ∑ q, (∑ r, y r * starRingEnd ℂ (B.repr (T g (B r)) q)) *
+          starRingEnd ℂ (∑ p, x p * starRingEnd ℂ (B.repr (T g (B p)) q))
+        = ∑ p, ∑ r, starRingEnd ℂ (x p) * y r *
+            ∑ q, B.repr (T g (B p)) q * starRingEnd ℂ (B.repr (T g (B r)) q) := by
+
           simp only [map_sum, map_mul, Complex.conj_conj, Finset.sum_mul, Finset.mul_sum]
-        rw [Finset.sum_comm]
-        refine Finset.sum_congr rfl fun r _ => ?_
-        rw [Finset.sum_comm]
-        refine Finset.sum_congr rfl fun p _ => ?_
-        refine Finset.sum_congr rfl fun q _ => ?_
-        ring
+          rw [Finset.sum_comm]
+          refine Finset.sum_congr rfl fun r _ => ?_
+          rw [Finset.sum_comm]
+          refine Finset.sum_congr rfl fun p _ => ?_
+          refine Finset.sum_congr rfl fun q _ => ?_
+          ring
       _ = ∑ p, y p * starRingEnd ℂ (x p) := by
-        simp only [horth, mul_ite, mul_one, mul_zero, Finset.sum_ite_eq, Finset.mem_univ, if_true]
-        exact Finset.sum_congr rfl fun p _ => mul_comm _ _
+          simp only [horth, mul_ite, mul_one, mul_zero, Finset.sum_ite_eq, Finset.mem_univ, if_true]
+          exact Finset.sum_congr rfl fun p _ => mul_comm _ _
   · intro x
-    have hfun
-        : (fun g => ρ g x)
-          = fun g => WithLp.toLp 2 (fun q => ∑ p, x p * starRingEnd ℂ (B.repr (T g (B p)) q)) := by
+    have hfun : (fun g => ρ g x) = fun g => WithLp.toLp 2 (fun q => ∑ p, x p * starRingEnd ℂ (B.repr (T g (B p)) q)) := by
       funext g
       ext q
       simp [hcoord]
     rw [hfun]
     refine (PiLp.continuous_toLp 2 _).comp (continuous_pi fun q => ?_)
-    exact continuous_finsetSum _ fun p _ =>
-      continuous_const.mul (Complex.continuous_conj.comp (hc q p))
+    exact continuous_finsetSum _ fun p _ => continuous_const.mul (Complex.continuous_conj.comp (hc q p))
   · intro U hU
     let W : Submodule ℂ (Module.Dual ℂ X) := U.map e.toLinearMap
     have hinv : ∀ g, ∀ x ∈ W.dualCoannihilator, T g x ∈ W.dualCoannihilator := by
@@ -117,21 +150,16 @@ theorem exists_contragredient
     rcases hi _ hinv with h | h
     · right
       have hW : W = ⊤ := by
-        rw [← Subspace.dualCoannihilator_dualAnnihilator_eq (W := W), h,
-          Submodule.dualAnnihilator_bot]
+        rw [← Subspace.dualCoannihilator_dualAnnihilator_eq (W := W), h, Submodule.dualAnnihilator_bot]
       rw [hUW, hW, Submodule.comap_top]
     · left
       have hW : W = ⊥ := by
-        rw [← Subspace.dualCoannihilator_dualAnnihilator_eq (W := W), h,
-          Submodule.dualAnnihilator_top]
+        rw [← Subspace.dualCoannihilator_dualAnnihilator_eq (W := W), h, Submodule.dualAnnihilator_top]
       rw [hUW, hW, Submodule.comap_bot]
       exact LinearMap.ker_eq_bot.mpr e.injective
 
-def tensRep
-    {G ι : Type} [Group G]
-    {H : ι → Type} [∀ i, AddCommGroup (H i)] [∀ i, Module ℂ (H i)]
-    (r : ∀ i, G →* Module.End ℂ (H i))
-    : G →* Module.End ℂ (⨂[ℂ] i, H i) where
+def tensRep {G ι : Type} [Group G] {H : ι → Type} [∀ i, AddCommGroup (H i)] [∀ i, Module ℂ (H i)]
+    (r : ∀ i, G →* Module.End ℂ (H i)) : G →* Module.End ℂ (⨂[ℂ] i, H i) where
   toFun g := PiTensorProduct.map fun i => r i g
   map_one' := by
     ext v
@@ -140,42 +168,31 @@ def tensRep
     ext v
     simp
 
-theorem tensRep_apply
-    {G ι : Type} [Group G]
-    {H : ι → Type} [∀ i, AddCommGroup (H i)] [∀ i, Module ℂ (H i)]
-    (r : ∀ i, G →* Module.End ℂ (H i)) (g : G)
-    : tensRep r g = PiTensorProduct.map fun i => r i g :=
-  rfl
+theorem tensRep_apply {G ι : Type} [Group G] {H : ι → Type} [∀ i, AddCommGroup (H i)] [∀ i, Module ℂ (H i)]
+    (r : ∀ i, G →* Module.End ℂ (H i)) (g : G) : tensRep r g = PiTensorProduct.map fun i => r i g := rfl
 
-theorem exists_contragredient_tensor
-    {G ι : Type} [Group G] [TopologicalSpace G] [Fintype ι]
-    {H : ι → Type} [∀ i, NormedAddCommGroup (H i)] [∀ i, InnerProductSpace ℂ (H i)]
-    [∀ i, FiniteDimensional ℂ (H i)]
-    (r : ∀ i, G →* Module.End ℂ (H i))
-    (hu : ∀ i g v, ‖r i g v‖ = ‖v‖) (hc : ∀ i v, Continuous fun g => r i g v)
-    (hi : ∀ U : Submodule ℂ (⨂[ℂ] i, H i), (∀ g, ∀ x ∈ U, tensRep r g x ∈ U) → U = ⊥ ∨ U = ⊤)
-    : ∃ (κ : Type) (_ : Fintype κ) (ρ : G →* Module.End ℂ (EuclideanSpace ℂ κ))
-        (e : EuclideanSpace ℂ κ ≃ₗ[ℂ] Module.Dual ℂ (⨂[ℂ] i, H i)),
-      (∀ g w x, e (ρ g w) x = e w (tensRep r g⁻¹ x))
-        ∧ (∀ g x y, inner ℂ (ρ g x) (ρ g y) = inner ℂ x y) ∧ (∀ x, Continuous fun g => ρ g x)
-        ∧ ∀ U : Submodule ℂ (EuclideanSpace ℂ κ), (∀ g, U.map (ρ g) ≤ U) → U = ⊥ ∨ U = ⊤ := by
+theorem exists_contragredient_tensor {G ι : Type} [Group G] [TopologicalSpace G] [Fintype ι] {H : ι → Type}
+    [∀ i, NormedAddCommGroup (H i)] [∀ i, InnerProductSpace ℂ (H i)] [∀ i, FiniteDimensional ℂ (H i)]
+    (r : ∀ i, G →* Module.End ℂ (H i)) (hu : ∀ i g v, ‖r i g v‖ = ‖v‖) (hc : ∀ i v, Continuous fun g => r i g v)
+    (hi : ∀ U : Submodule ℂ (⨂[ℂ] i, H i), (∀ g, ∀ x ∈ U, tensRep r g x ∈ U) → U = ⊥ ∨ U = ⊤) :
+    ∃ (κ : Type) (_ : Fintype κ) (ρ : G →* Module.End ℂ (EuclideanSpace ℂ κ))
+      (e : EuclideanSpace ℂ κ ≃ₗ[ℂ] Module.Dual ℂ (⨂[ℂ] i, H i)),
+      (∀ g w x, e (ρ g w) x = e w (tensRep r g⁻¹ x)) ∧ (∀ g x y, inner ℂ (ρ g x) (ρ g y) = inner ℂ x y) ∧
+      (∀ x, Continuous fun g => ρ g x) ∧
+      ∀ U : Submodule ℂ (EuclideanSpace ℂ κ), (∀ g, U.map (ρ g) ≤ U) → U = ⊥ ∨ U = ⊤ := by
   classical
-  let b : ∀ i, OrthonormalBasis (Fin (Module.finrank ℂ (H i))) ℂ (H i) := fun i =>
-    stdOrthonormalBasis ℂ (H i)
+  let b : ∀ i, OrthonormalBasis (Fin (Module.finrank ℂ (H i))) ℂ (H i) := fun i => stdOrthonormalBasis ℂ (H i)
   let B : Module.Basis (∀ i, Fin (Module.finrank ℂ (H i))) ℂ (⨂[ℂ] i, H i) :=
     Basis.piTensorProduct fun i => (b i).toBasis
-  have hrepr
-      : ∀ (x : ∀ i, H i) p,
-        B.repr (PiTensorProduct.tprod ℂ x) p = ∏ i, inner ℂ (b i (p i)) (x i) := by
+  have hrepr : ∀ (x : ∀ i, H i) p, B.repr (PiTensorProduct.tprod ℂ x) p = ∏ i, inner ℂ (b i (p i)) (x i) := by
     intro x p
     simp only [B, Basis.piTensorProduct_repr_tprod_apply, OrthonormalBasis.coe_toBasis_repr_apply]
     exact Finset.prod_congr rfl fun i _ => (b i).repr_apply_apply (x i) (p i)
   have hB : ∀ p, B p = PiTensorProduct.tprod ℂ fun i => b i (p i) := by
     intro p
     simp [B]
-  have hT
-      : ∀ g (x : ∀ i, H i),
-        tensRep r g (PiTensorProduct.tprod ℂ x) = PiTensorProduct.tprod ℂ fun i => r i g (x i) := by
+  have hT : ∀ g (x : ∀ i, H i), tensRep r g (PiTensorProduct.tprod ℂ x) =
+      PiTensorProduct.tprod ℂ fun i => r i g (x i) := by
     intro g x
     rw [tensRep_apply, PiTensorProduct.map_tprod]
   have hinner : ∀ i g (v w : H i), inner ℂ (r i g v) (r i g w) = inner ℂ v w := by
@@ -184,8 +201,7 @@ theorem exists_contragredient_tensor
   have hback : ∀ i g (v : H i), r i g (r i g⁻¹ v) = v := by
     intro i g v
     rw [← Module.End.mul_apply, ← map_mul, mul_inv_cancel, map_one, Module.End.one_apply]
-  have huB
-      : ∀ g p q, B.repr (tensRep r g⁻¹ (B p)) q = starRingEnd ℂ (B.repr (tensRep r g (B q)) p) := by
+  have huB : ∀ g p q, B.repr (tensRep r g⁻¹ (B p)) q = starRingEnd ℂ (B.repr (tensRep r g (B q)) p) := by
     intro g p q
     rw [hB, hB, hT, hT, hrepr, hrepr, map_prod]
     refine Finset.prod_congr rfl fun i _ => ?_
@@ -197,10 +213,8 @@ theorem exists_contragredient_tensor
   obtain ⟨ρ, e, h1, h2, h3, h4⟩ := exists_contragredient B (tensRep r) huB hcB hi
   exact ⟨_, inferInstance, ρ, e, h1, h2, h3, h4⟩
 
-theorem nontrivial_dual_tensor
-    {ι : Type} [Fintype ι]
-    {H : ι → Type} [∀ i, AddCommGroup (H i)] [∀ i, Module ℂ (H i)] [∀ i, Nontrivial (H i)]
-    : Nontrivial (Module.Dual ℂ (⨂[ℂ] i, H i)) := by
+theorem nontrivial_dual_tensor {ι : Type} [Fintype ι] {H : ι → Type} [∀ i, AddCommGroup (H i)] [∀ i, Module ℂ (H i)]
+    [∀ i, Nontrivial (H i)] : Nontrivial (Module.Dual ℂ (⨂[ℂ] i, H i)) := by
   classical
   have hv : ∀ i, ∃ v : H i, v ≠ 0 := fun i => exists_ne 0
   choose v hv using hv
@@ -214,13 +228,12 @@ theorem nontrivial_dual_tensor
   let φ : Module.Dual ℂ (⨂[ℂ] i, H i) := PiTensorProduct.lift m
   refine ⟨⟨φ, 0, fun h => ?_⟩⟩
   have hz := LinearMap.congr_fun h (PiTensorProduct.tprod ℂ v)
-  have hprod : φ (PiTensorProduct.tprod ℂ v) = ∏ i, f i (v i) := by simp [φ, m]
+  have hprod : φ (PiTensorProduct.tprod ℂ v) = ∏ i, f i (v i) := by
+    simp [φ, m]
   rw [hprod, LinearMap.zero_apply] at hz
   exact Finset.prod_ne_zero_iff.mpr (fun i _ => hf i) hz
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH
-  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
-  Formalism.MainNotions.S IsDedekindDomain NumberField
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.MainNotions.S IsDedekindDomain NumberField
 open Formalism.L2.Theta Formalism.L2.DIV Formalism.L2.Indef Formalism.DivisionValues
 open Formalism.IndefR.Lev Formalism.IndefR.Mult Formalism.IndefR.Cx Formalism.IndefR.Links
 open Formalism.IndefR.Datum (InfFam)
@@ -229,28 +242,22 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 variable {D : D7} {θ : InfFam D} {V : HSp D} {S : D.what₂.Tau → SPar}
 
-theorem frame_mem
-    (M : DSModel V S)
-    (τ : D.what₂.Tau)
-    {g : Matrix (Fin V.rank) (Fin V.rank) ℂ}
-    (hg : g ∈ Formalism.QuantumDeterminants.UH (gramAt D V τ))
-    : M.fr τ * g * (M.fr τ)⁻¹ ∈ UJset (M.ε τ) := by
+theorem frame_mem (M : DSModel V S) (τ : D.what₂.Tau) {g : Matrix (Fin V.rank) (Fin V.rank) ℂ}
+    (hg : g ∈ Formalism.QuantumDeterminants.UH (gramAt D V τ)) : M.fr τ * g * (M.fr τ)⁻¹ ∈ UJset (M.ε τ) := by
   have hdet : IsUnit (M.fr τ).det := (Matrix.isUnit_iff_isUnit_det _).mp (M.fr_unit τ)
   have hg' : gᴴ * gramAt D V τ * g = gramAt D V τ := hg
   have hJ : Formalism.REAL.Jm (M.ε τ) = ((M.fr τ)⁻¹)ᴴ * gramAt D V τ * (M.fr τ)⁻¹ := by
     rw [← M.fr_gram τ]
     simp only [Matrix.mul_assoc]
-    rw [Matrix.mul_nonsing_inv _ hdet, Matrix.mul_one, ← Matrix.mul_assoc,
-      ← Matrix.conjTranspose_mul, Matrix.mul_nonsing_inv _ hdet, Matrix.conjTranspose_one,
-      Matrix.one_mul]
+    rw [Matrix.mul_nonsing_inv _ hdet, Matrix.mul_one, ← Matrix.mul_assoc, ← Matrix.conjTranspose_mul,
+      Matrix.mul_nonsing_inv _ hdet, Matrix.conjTranspose_one, Matrix.one_mul]
   show (M.fr τ * g * (M.fr τ)⁻¹)ᴴ * Formalism.REAL.Jm (M.ε τ) * (M.fr τ * g * (M.fr τ)⁻¹) = Formalism.REAL.Jm (M.ε τ)
   rw [Matrix.conjTranspose_mul, Matrix.conjTranspose_mul]
-  calc
-    ((M.fr τ)⁻¹)ᴴ * (gᴴ * (M.fr τ)ᴴ) * Formalism.REAL.Jm (M.ε τ) * (M.fr τ * g * (M.fr τ)⁻¹)
-        = ((M.fr τ)⁻¹)ᴴ * (gᴴ * ((M.fr τ)ᴴ * Formalism.REAL.Jm (M.ε τ) * M.fr τ) * g)
-          * (M.fr τ)⁻¹ := by
-      simp only [Matrix.mul_assoc]
-    _ = Formalism.REAL.Jm (M.ε τ) := by rw [M.fr_gram τ, hg', hJ]
+  calc ((M.fr τ)⁻¹)ᴴ * (gᴴ * (M.fr τ)ᴴ) * Formalism.REAL.Jm (M.ε τ) * (M.fr τ * g * (M.fr τ)⁻¹)
+      = ((M.fr τ)⁻¹)ᴴ * (gᴴ * ((M.fr τ)ᴴ * Formalism.REAL.Jm (M.ε τ) * M.fr τ) * g) * (M.fr τ)⁻¹ := by
+        simp only [Matrix.mul_assoc]
+    _ = Formalism.REAL.Jm (M.ε τ) := by
+        rw [M.fr_gram τ, hg', hJ]
 
 theorem rep_one (M : DSModel V S) (τ : D.what₂.Tau) : M.rep τ 1 = 1 := by
   have hdet : IsUnit (M.fr τ).det := (Matrix.isUnit_iff_isUnit_det _).mp (M.fr_unit τ)
@@ -258,60 +265,42 @@ theorem rep_one (M : DSModel V S) (τ : D.what₂.Tau) : M.rep τ 1 = 1 := by
   rw [DSModel.rep, Matrix.mul_one, Matrix.mul_nonsing_inv _ hdet]
   exact h1
 
-theorem rep_mul
-    (M : DSModel V S)
-    (τ : D.what₂.Tau)
-    {g g' : Matrix (Fin V.rank) (Fin V.rank) ℂ}
-    (hg : g ∈ Formalism.QuantumDeterminants.UH (gramAt D V τ))
-    (hg' : g' ∈ Formalism.QuantumDeterminants.UH (gramAt D V τ))
-    (v : M.H τ)
-    : M.rep τ (g * g') v = M.rep τ g (M.rep τ g' v) := by
+theorem rep_mul (M : DSModel V S) (τ : D.what₂.Tau) {g g' : Matrix (Fin V.rank) (Fin V.rank) ℂ}
+    (hg : g ∈ Formalism.QuantumDeterminants.UH (gramAt D V τ)) (hg' : g' ∈ Formalism.QuantumDeterminants.UH (gramAt D V τ)) (v : M.H τ) :
+    M.rep τ (g * g') v = M.rep τ g (M.rep τ g' v) := by
   have hdet : IsUnit (M.fr τ).det := (Matrix.isUnit_iff_isUnit_det _).mp (M.fr_unit τ)
-  have hm
-      : M.fr τ * (g * g') * (M.fr τ)⁻¹
-        = (M.fr τ * g * (M.fr τ)⁻¹) * (M.fr τ * g' * (M.fr τ)⁻¹) := by
+  have hm : M.fr τ * (g * g') * (M.fr τ)⁻¹ = (M.fr τ * g * (M.fr τ)⁻¹) * (M.fr τ * g' * (M.fr τ)⁻¹) := by
     simp only [Matrix.mul_assoc]
     rw [← Matrix.mul_assoc (M.fr τ)⁻¹ (M.fr τ), Matrix.nonsing_inv_mul _ hdet, Matrix.one_mul]
   obtain ⟨-, -, ⟨⟨-, hmul⟩, -, -⟩, -⟩ := M.ds τ
   rw [DSModel.rep, DSModel.rep, DSModel.rep, hm, hmul _ (frame_mem M τ hg) _ (frame_mem M τ hg'),
     ContinuousLinearMap.comp_apply]
 
-def locRep (hθ : IsInfFam θ) (M : DSModel V S) (τ : D.what₂.Tau) (hs : M.sm τ = ⊤)
-    : GA D V →* Module.End ℂ (M.sm τ) where
-  toFun h :=
-    (M.rep τ (infMat D.sp.cm.sig V.gram (θ τ) h) : M.H τ →ₗ[ℂ] M.H τ).restrict fun _ _ =>
-      hs ▸ Submodule.mem_top
+def locRep (hθ : IsInfFam θ) (M : DSModel V S) (τ : D.what₂.Tau) (hs : M.sm τ = ⊤) :
+    GA D V →* Module.End ℂ (M.sm τ) where
+  toFun h := (M.rep τ (infMat D.sp.cm.sig V.gram (θ τ) h) : M.H τ →ₗ[ℂ] M.H τ).restrict
+    fun _ _ => hs ▸ Submodule.mem_top
   map_one' := by
     ext v
     simp [GlobalTheory.PointAtPlaceHom.infMat_one, rep_one]
   map_mul' g h := by
     ext v
-    simp [GlobalTheory.PointAtPlaceHom.infMat_mul,
-      rep_mul M τ (GlobalTheory.FockCompare.RealAction.infMat_mem_UH hθ V g τ)
-        (GlobalTheory.FockCompare.RealAction.infMat_mem_UH hθ V h τ)]
+    simp [GlobalTheory.PointAtPlaceHom.infMat_mul, rep_mul M τ (GlobalTheory.FockCompare.RealAction.infMat_mem_UH hθ V g τ)
+      (GlobalTheory.FockCompare.RealAction.infMat_mem_UH hθ V h τ)]
 
-theorem coe_locRep
-    (hθ : IsInfFam θ)
-    (M : DSModel V S) (τ : D.what₂.Tau) (hs : M.sm τ = ⊤)
-    (h : GA D V) (v : M.sm τ)
-    : (locRep hθ M τ hs h v : M.H τ) = M.rep τ (infMat D.sp.cm.sig V.gram (θ τ) h) v :=
-  rfl
+theorem coe_locRep (hθ : IsInfFam θ) (M : DSModel V S) (τ : D.what₂.Tau) (hs : M.sm τ = ⊤) (h : GA D V) (v : M.sm τ) :
+    (locRep hθ M τ hs h v : M.H τ) = M.rep τ (infMat D.sp.cm.sig V.gram (θ τ) h) v := rfl
 
-theorem locRep_of_one
-    (hθ : IsInfFam θ)
-    (M : DSModel V S) (τ : D.what₂.Tau) (hs : M.sm τ = ⊤)
-    {h : GA D V} (hh : infMat D.sp.cm.sig V.gram (θ τ) h = 1)
-    : locRep hθ M τ hs h = LinearMap.id := by
+theorem locRep_of_one (hθ : IsInfFam θ) (M : DSModel V S) (τ : D.what₂.Tau) (hs : M.sm τ = ⊤) {h : GA D V}
+    (hh : infMat D.sp.cm.sig V.gram (θ τ) h = 1) : locRep hθ M τ hs h = LinearMap.id := by
   refine LinearMap.ext fun v => Subtype.ext ?_
   rw [coe_locRep, hh, rep_one, one_apply_eq_self, LinearMap.id_apply]
 
-theorem infMat_of_fin (φ : Ainf D.host.F ⊗[D.host.F] D.host.E →+* ℂ) {h : GA D V} (hh : h ∈ GfC V)
-    : infMat D.sp.cm.sig V.gram φ h = 1 := by
+theorem infMat_of_fin (φ : Ainf D.host.F ⊗[D.host.F] D.host.E →+* ℂ) {h : GA D V} (hh : h ∈ GfC V) :
+    infMat D.sp.cm.sig V.gram φ h = 1 := by
   have h1 : infHom V h = 1 := hh
-  have h2
-      : ((infHom V h : GL (Fin V.rank) (Ainf D.host.F ⊗[D.host.F] D.host.E))
-          : Matrix (Fin V.rank) (Fin V.rank) (Ainf D.host.F ⊗[D.host.F] D.host.E))
-        = 1 := by
+  have h2 : ((infHom V h : GL (Fin V.rank) (Ainf D.host.F ⊗[D.host.F] D.host.E)) :
+      Matrix (Fin V.rank) (Fin V.rank) (Ainf D.host.F ⊗[D.host.F] D.host.E)) = 1 := by
     rw [h1, Units.val_one]
   unfold infMat
   simp only [infHom, matHom, Formalism.UG.bc] at h2
@@ -319,11 +308,7 @@ theorem infMat_of_fin (φ : Ainf D.host.F ⊗[D.host.F] D.host.E →+* ℂ) {h :
   rw [Matrix.map_one _ (map_zero φ) (map_one φ)] at h3
   exact h3
 
-theorem exists_dual_coef
-    : ∀ (D : D7) (θ : InfFam D) (V : HSp D) (S : D.what₂.Tau → SPar) (M : DSModel V S),
-      IsInfFam θ → AllPlus M
-        → ∃ (c : CoefA V) (pr : c.W →ₗ[ℂ] SmT M →ₗ[ℂ] ℂ),
-          c.Is ∧ IsDualPair θ M c pr ∧ Function.Surjective pr := by
+theorem exists_dual_coef : ∀ (D : D7) (θ : InfFam D) (V : HSp D) (S : D.what₂.Tau → SPar) (M : DSModel V S), IsInfFam θ → AllPlus M → ∃ (c : CoefA V) (pr : c.W →ₗ[ℂ] SmT M →ₗ[ℂ] ℂ), c.Is ∧ IsDualPair θ M c pr ∧ Function.Surjective pr := by
   intro D θ V S M hθ hall
   classical
   have hfsi := AllPlus.finite_smooth_irreducible D V S M hall
@@ -332,8 +317,8 @@ theorem exists_dual_coef
   let r : ∀ τ, GA D V →* Module.End ℂ (M.sm τ) := fun τ => locRep hθ M τ (hs τ)
   have hr : ∀ τ g (v : M.sm τ), (r τ g v : M.H τ) = M.rep τ (infMat D.sp.cm.sig V.gram (θ τ) g) v :=
     fun τ g v => coe_locRep hθ M τ (hs τ) g v
-  have hid : ∀ τ k, infMat D.sp.cm.sig V.gram (θ τ) k = 1 → r τ k = LinearMap.id := fun τ k hk =>
-    locRep_of_one hθ M τ (hs τ) hk
+  have hid : ∀ τ k, infMat D.sp.cm.sig V.gram (θ τ) k = 1 → r τ k = LinearMap.id :=
+    fun τ k hk => locRep_of_one hθ M τ (hs τ) hk
   have hu : ∀ τ g (v : M.sm τ), ‖r τ g v‖ = ‖v‖ := by
     intro τ g v
     obtain ⟨-, -, ⟨-, hn, -⟩, -⟩ := M.ds τ
@@ -343,39 +328,29 @@ theorem exists_dual_coef
   have hc : ∀ τ (v : M.sm τ), Continuous fun g => r τ g v := by
     intro τ v
     obtain ⟨-, -, ⟨-, -, hcont⟩, -⟩ := M.ds τ
-    have hm
-        : Continuous fun g : GA D V => M.fr τ * infMat D.sp.cm.sig V.gram (θ τ) g * (M.fr τ)⁻¹ :=
-      (continuous_const.mul (GlobalTheory.Mem.VolExists.continuous_infMat V.gram (hθ τ))).mul
-        continuous_const
-    have hv : Continuous fun g : GA D V =>
-        M.σ τ (M.fr τ * infMat D.sp.cm.sig V.gram (θ τ) g * (M.fr τ)⁻¹) v :=
-      (hcont (v : M.H τ)).comp_continuous hm fun g =>
-        frame_mem M τ (GlobalTheory.FockCompare.RealAction.infMat_mem_UH hθ V g τ)
+    have hm : Continuous fun g : GA D V => M.fr τ * infMat D.sp.cm.sig V.gram (θ τ) g * (M.fr τ)⁻¹ :=
+      (continuous_const.mul (GlobalTheory.Mem.VolExists.continuous_infMat V.gram (hθ τ))).mul continuous_const
+    have hv : Continuous fun g : GA D V => M.σ τ (M.fr τ * infMat D.sp.cm.sig V.gram (θ τ) g * (M.fr τ)⁻¹) v :=
+      (hcont (v : M.H τ)).comp_continuous hm
+        fun g => frame_mem M τ (GlobalTheory.FockCompare.RealAction.infMat_mem_UH hθ V g τ)
     refine continuous_induced_rng.2 ?_
     convert hv using 1
     funext g
     exact hr τ g v
-  have hat
-      : ∀ τ, ∀ g ∈ Formalism.QuantumDeterminants.UH (gramAt D V τ), ∀ τ',
-        τ' ≠ τ → r τ' (atTau θ V τ g) = LinearMap.id := fun τ g hg τ' hne =>
-    hid τ' _ ((GlobalTheory.PointAtPlaceHom.atTau_spec hθ V τ hg).2.2 τ' hne)
-  have hsingle
-      : ∀ τ, ∀ g ∈ Formalism.QuantumDeterminants.UH (gramAt D V τ),
-        (fun τ' => r τ' (atTau θ V τ g))
-          = Function.update
-            (fun τ' => (LinearMap.id : Module.End ℂ (M.sm τ')))
-            τ (r τ (atTau θ V τ g)) := by
+  have hat : ∀ τ, ∀ g ∈ Formalism.QuantumDeterminants.UH (gramAt D V τ), ∀ τ', τ' ≠ τ → r τ' (atTau θ V τ g) = LinearMap.id :=
+    fun τ g hg τ' hne => hid τ' _ ((GlobalTheory.PointAtPlaceHom.atTau_spec hθ V τ hg).2.2 τ' hne)
+  have hsingle : ∀ τ, ∀ g ∈ Formalism.QuantumDeterminants.UH (gramAt D V τ), (fun τ' => r τ' (atTau θ V τ g)) =
+      Function.update (fun τ' => (LinearMap.id : Module.End ℂ (M.sm τ'))) τ (r τ (atTau θ V τ g)) := by
     intro τ g hg
     funext τ'
     by_cases h : τ' = τ
     · subst h
       rw [Function.update_self]
     · rw [Function.update_of_ne h, hat τ g hg τ' h]
-  have hi
-      : ∀ U : Submodule ℂ (⨂[ℂ] τ, M.sm τ), (∀ g, ∀ x ∈ U, tensRep r g x ∈ U) → U = ⊥ ∨ U = ⊤ := by
+  have hi : ∀ U : Submodule ℂ (⨂[ℂ] τ, M.sm τ), (∀ g, ∀ x ∈ U, tensRep r g x ∈ U) → U = ⊥ ∨ U = ⊤ := by
     intro U hU
-    let σ' : ∀ τ, Matrix.unitaryGroup (Fin V.rank) ℂ → Module.End ℂ (M.sm τ) := fun τ u =>
-      r τ (atTau θ V τ (unfr M τ u))
+    let σ' : ∀ τ, Matrix.unitaryGroup (Fin V.rank) ℂ → Module.End ℂ (M.sm τ) :=
+      fun τ u => r τ (atTau θ V τ (unfr M τ u))
     have hσ' : ∀ τ u (x : M.sm τ), (σ' τ u x : M.H τ) = M.σ τ u x := by
       intro τ u x
       show (r τ _ x : M.H τ) = _
@@ -384,8 +359,7 @@ theorem exists_dual_coef
     · intro τ U' hU'
       rcases (hfsi τ).2.2 (U'.map (M.sm τ).subtype) (by
           rintro u _ ⟨x, hx, rfl⟩
-          exact ⟨σ' τ u x, hU' u x hx, hσ' τ u x⟩)
-        with h | h
+          exact ⟨σ' τ u x, hU' u x hx, hσ' τ u x⟩) with h | h
       · left
         rw [eq_bot_iff]
         intro x hx
@@ -435,8 +409,8 @@ theorem exists_dual_coef
         exact Subtype.ext (by rw [hr, hspec.2.1, huv])
       · rw [Function.update_of_ne h, hat τ g hg τ' h, LinearMap.id_apply]
     show e (ρ (atTau θ V τ g) w) _ = e w _
-    rw [h1, hupd, ← PiTensorProduct.map_tprod, ← tensRep_apply, ← Module.End.mul_apply, ← map_mul,
-      inv_mul_cancel, map_one, Module.End.one_apply]
+    rw [h1, hupd, ← PiTensorProduct.map_tprod, ← tensRep_apply, ← Module.End.mul_apply, ← map_mul, inv_mul_cancel,
+      map_one, Module.End.one_apply]
 
 end GlobalTheory.DualCoef
 

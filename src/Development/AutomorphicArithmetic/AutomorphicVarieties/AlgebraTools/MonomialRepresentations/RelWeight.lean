@@ -1,16 +1,67 @@
 module
 
-public import Mathlib
+public import Mathlib.GroupTheory.OrderOfElement
+import Mathlib.Algebra.Module.StablyFree.Basic
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+public import Mathlib.GroupTheory.CosetCover
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
+public import Mathlib.Algebra.BigOperators.Pi
+public import Mathlib.Algebra.Module.LinearMap.Defs
+public import Mathlib.Algebra.Module.Submodule.Defs
+public import Mathlib.Algebra.Module.Submodule.Ker
+public import Mathlib.LinearAlgebra.Dual.Lemmas
 
 @[expose] public section
 
 open Polynomial Matrix
 
-theorem UpperTheory.V.AlgebraTools.relWeight
-    : ∀ (A : Type) [CommGroup A] (ι : Type) [Fintype ι] (a : ι → A),
-      (∀ i j, i ≠ j → ¬ IsOfFinOrder (a i / a j))
-        → ∃ w : ι → ℤ,
-          Function.Injective w ∧ ∀ m : ι → ℤ, ∏ i, a i ^ m i = 1 → ∑ i, m i * w i = 0 := by
+theorem UpperTheory.V.AlgebraTools.relWeight :
+    ∀ (A : Type) [CommGroup A] (ι : Type) [Fintype ι] (a : ι → A), (∀ i j, i ≠ j → ¬ IsOfFinOrder (a i / a j)) →
+      ∃ w : ι → ℤ, Function.Injective w ∧ ∀ m : ι → ℤ, ∏ i, a i ^ m i = 1 → ∑ i, m i * w i = 0 := by
   intro A _ ι _ a ha
   classical
   obtain ⟨P, hP⟩ : ∃ P : (ι → ℤ) → A, ∀ m, P m = ∏ i, a i ^ m i := ⟨_, fun _ => rfl⟩
@@ -35,19 +86,18 @@ theorem UpperTheory.V.AlgebraTools.relWeight
     · intro j _ hj
       simp [Pi.single_eq_of_ne hj]
     · simp
-  let L : Submodule ℤ (ι → ℤ) := {
-    carrier := {m | ∃ k : ℤ, k ≠ 0 ∧ P (k • m) = 1}
-    add_mem' := by
-      rintro m n ⟨k, hk, hm⟩ ⟨l, hl, hn⟩
-      refine ⟨k * l, mul_ne_zero hk hl, ?_⟩
-      have e1 : P ((k * l) • m) = 1 := by rw [mul_comm, mul_smul, hPsmul, hm, _root_.one_zpow]
-      have e2 : P ((k * l) • n) = 1 := by rw [mul_smul, hPsmul, hn, _root_.one_zpow]
-      rw [smul_add, hPadd, e1, e2, one_mul]
-    zero_mem' := ⟨1, one_ne_zero, by simp [hP]⟩
-    smul_mem' := by
-      rintro c m ⟨k, hk, hm⟩
-      exact ⟨k, hk, by rw [smul_comm, hPsmul, hm, _root_.one_zpow]⟩
-  }
+  let L : Submodule ℤ (ι → ℤ) :=
+    { carrier := {m | ∃ k : ℤ, k ≠ 0 ∧ P (k • m) = 1}
+      add_mem' := by
+        rintro m n ⟨k, hk, hm⟩ ⟨l, hl, hn⟩
+        refine ⟨k * l, mul_ne_zero hk hl, ?_⟩
+        have e1 : P ((k * l) • m) = 1 := by rw [mul_comm, mul_smul, hPsmul, hm, _root_.one_zpow]
+        have e2 : P ((k * l) • n) = 1 := by rw [mul_smul, hPsmul, hn, _root_.one_zpow]
+        rw [smul_add, hPadd, e1, e2, one_mul]
+      zero_mem' := ⟨1, one_ne_zero, by simp [hP]⟩
+      smul_mem' := by
+        rintro c m ⟨k, hk, hm⟩
+        exact ⟨k, hk, by rw [smul_comm, hPsmul, hm, _root_.one_zpow]⟩ }
   haveI : Module.IsTorsionFree ℤ ((ι → ℤ) ⧸ L) :=
     Module.IsTorsionFree.of_smul_eq_zero fun r x hx => by
       obtain ⟨m, rfl⟩ := Submodule.Quotient.mk_surjective L x
@@ -72,8 +122,8 @@ theorem UpperTheory.V.AlgebraTools.relWeight
     by_contra hno
     push_neg at hno
     let s : Finset (ι × ι) := Finset.univ.filter fun x => x.1 ≠ x.2
-    let p : ι × ι → Submodule ℤ (Module.Dual ℤ ((ι → ℤ) ⧸ L)) := fun x =>
-      LinearMap.ker (Module.Dual.eval ℤ _ (q x.1 - q x.2))
+    let p : ι × ι → Submodule ℤ (Module.Dual ℤ ((ι → ℤ) ⧸ L)) :=
+      fun x => LinearMap.ker (Module.Dual.eval ℤ _ (q x.1 - q x.2))
     have hc : ⋃ x ∈ s, (p x : Set (Module.Dual ℤ ((ι → ℤ) ⧸ L))) = Set.univ := by
       apply Set.eq_univ_of_forall
       intro f
@@ -103,9 +153,7 @@ theorem UpperTheory.V.AlgebraTools.relWeight
     have h3 : ∑ i, m i • q i = 0 := by
       rw [← hm0]
       conv_rhs => rw [hsum]
-      set_option synthInstance.maxHeartbeats 100000 in
+
       simp only [q, map_sum, LinearMap.map_smul]
-    calc
-      ∑ i, m i * f (q i)
-        = f (∑ i, m i • q i) := by simp [map_sum]
+    calc ∑ i, m i * f (q i) = f (∑ i, m i • q i) := by simp [map_sum]
       _ = 0 := by rw [h3, map_zero]

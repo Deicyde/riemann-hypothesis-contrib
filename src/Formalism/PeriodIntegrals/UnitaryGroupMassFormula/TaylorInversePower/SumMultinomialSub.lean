@@ -1,6 +1,51 @@
 module
 
 public import Formalism.PeriodIntegrals.TayInvPow
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
@@ -17,7 +62,8 @@ def deg (β : σ →₀ ℕ) : ℕ := β.sum fun _ n => n
 theorem deg_add (β γ : σ →₀ ℕ) : deg (β + γ) = deg β + deg γ :=
   Finsupp.sum_add_index' (fun _ => rfl) (fun _ _ _ => rfl)
 
-theorem deg_single (p : σ) (n : ℕ) : deg (Finsupp.single p n) = n := Finsupp.sum_single_index rfl
+theorem deg_single (p : σ) (n : ℕ) : deg (Finsupp.single p n) = n :=
+  Finsupp.sum_single_index rfl
 
 theorem deg_eq_zero {β : σ →₀ ℕ} : deg β = 0 ↔ β = 0 := by
   unfold deg
@@ -39,16 +85,15 @@ theorem cprod_add (c : σ →₀ A) (β γ : σ →₀ ℕ) : cprod c (β + γ) 
 theorem cprod_single (c : σ →₀ A) (p : σ) (n : ℕ) : cprod c (Finsupp.single p n) = c p ^ n :=
   Finsupp.prod_single_index (pow_zero _)
 
-theorem sum_multinomial_sub (β : σ →₀ ℕ) (hβ : β ≠ 0)
-    : ∑ p ∈ β.support, Nat.multinomial β.support (β - Finsupp.single p 1 : σ →₀ ℕ)
-      = Nat.multinomial β.support β := by
+theorem sum_multinomial_sub (β : σ →₀ ℕ) (hβ : β ≠ 0) :
+    ∑ p ∈ β.support, Nat.multinomial β.support (β - Finsupp.single p 1 : σ →₀ ℕ) =
+      Nat.multinomial β.support β := by
   classical
-  have hP : 0 < ∏ i ∈ β.support, (β i).factorial := Finset.prod_pos (fun i _ => Nat.factorial_pos _)
-  have key
-      : ∀ p ∈ β.support,
-        (∏ i ∈ β.support, (β i).factorial)
-            * Nat.multinomial β.support (β - Finsupp.single p 1 : σ →₀ ℕ)
-          = β p * (∑ i ∈ β.support, β i - 1).factorial := by
+  have hP : 0 < ∏ i ∈ β.support, (β i).factorial :=
+    Finset.prod_pos (fun i _ => Nat.factorial_pos _)
+  have key : ∀ p ∈ β.support, (∏ i ∈ β.support, (β i).factorial) *
+      Nat.multinomial β.support (β - Finsupp.single p 1 : σ →₀ ℕ) =
+        β p * (∑ i ∈ β.support, β i - 1).factorial := by
     intro p hp
     have hp' : β p ≠ 0 := Finsupp.mem_support_iff.1 hp
     have herase : ∀ i ∈ β.support.erase p, (β - Finsupp.single p 1 : σ →₀ ℕ) i = β i := by
@@ -57,19 +102,15 @@ theorem sum_multinomial_sub (β : σ →₀ ℕ) (hβ : β ≠ 0)
       rw [Finsupp.tsub_apply, Finsupp.single_apply, if_neg hne, Nat.sub_zero]
     have hpp : (β - Finsupp.single p 1 : σ →₀ ℕ) p = β p - 1 := by
       rw [Finsupp.tsub_apply, Finsupp.single_eq_same]
-    have hsum
-        : ∑ i ∈ β.support, (β - Finsupp.single p 1 : σ →₀ ℕ) i = ∑ i ∈ β.support, β i - 1 := by
+    have hsum : ∑ i ∈ β.support, (β - Finsupp.single p 1 : σ →₀ ℕ) i = ∑ i ∈ β.support, β i - 1 := by
       rw [← Finset.add_sum_erase β.support _ hp, ← Finset.add_sum_erase β.support _ hp,
         Finset.sum_congr rfl herase, hpp]
       have e : (∑ x ∈ β.support.erase p, β x) = (β.support.erase p).sum ⇑β := rfl
       omega
-    have hprod
-        : ∏ i ∈ β.support, (β i).factorial
-          = β p * ∏ i ∈ β.support, ((β - Finsupp.single p 1 : σ →₀ ℕ) i).factorial := by
+    have hprod : ∏ i ∈ β.support, (β i).factorial =
+        β p * ∏ i ∈ β.support, ((β - Finsupp.single p 1 : σ →₀ ℕ) i).factorial := by
       rw [← Finset.mul_prod_erase β.support _ hp,
-        ← Finset.mul_prod_erase β.support
-          (fun i => ((β - Finsupp.single p 1 : σ →₀ ℕ) i).factorial)
-          hp,
+        ← Finset.mul_prod_erase β.support (fun i => ((β - Finsupp.single p 1 : σ →₀ ℕ) i).factorial) hp,
         Finset.prod_congr rfl (fun i hi => congrArg Nat.factorial (herase i hi)), hpp, ← mul_assoc,
         Nat.mul_factorial_pred hp']
     rw [hprod, mul_assoc, Nat.multinomial_spec, hsum]
@@ -81,25 +122,23 @@ theorem sum_multinomial_sub (β : σ →₀ ℕ) (hβ : β ≠ 0)
   exact Nat.mul_factorial_pred (by omega)
 
 def cf (c : σ →₀ A) (t : A) (k : ℕ) (β : σ →₀ ℕ) : A :=
-  (-1) ^ deg β * (((k + deg β - 1).choose (deg β) : ℕ) : A)
-    * ((Nat.multinomial β.support β : ℕ) : A) * cprod c β * t ^ (k + deg β)
+  (-1) ^ deg β * (((k + deg β - 1).choose (deg β) : ℕ) : A) *
+    ((Nat.multinomial β.support β : ℕ) : A) * cprod c β * t ^ (k + deg β)
 
-theorem cf_rec (c : σ →₀ A) (s t : A) (hst : s * t = 1) (k : ℕ) (β : σ →₀ ℕ)
-    : s * cf c t (k + 1) β + ∑ p ∈ β.support, c p * cf c t (k + 1) (β - Finsupp.single p 1 : σ →₀ ℕ)
-      = cf c t k β := by
+theorem cf_rec (c : σ →₀ A) (s t : A) (hst : s * t = 1) (k : ℕ) (β : σ →₀ ℕ) :
+    s * cf c t (k + 1) β + ∑ p ∈ β.support, c p * cf c t (k + 1) (β - Finsupp.single p 1 : σ →₀ ℕ) =
+      cf c t k β := by
   classical
   by_cases hβ : β = 0
   · subst hβ
-    simp only [cf, deg, cprod, Finsupp.sum_zero_index, Finsupp.prod_zero_index,
-      Finsupp.support_zero, Finset.sum_empty, add_zero, Nat.multinomial_empty, pow_zero,
-      Nat.choose_zero_right, Nat.cast_one, one_mul, mul_one]
+    simp only [cf, deg, cprod, Finsupp.sum_zero_index, Finsupp.prod_zero_index, Finsupp.support_zero,
+      Finset.sum_empty, add_zero, Nat.multinomial_empty, pow_zero, Nat.choose_zero_right, Nat.cast_one,
+      one_mul, mul_one]
     linear_combination t ^ k * hst
   · obtain ⟨m, hm⟩ : ∃ m, deg β = m + 1 := ⟨deg β - 1, by have := mt deg_eq_zero.1 hβ; omega⟩
-    have hterm
-        : ∀ p ∈ β.support,
-          c p * cf c t (k + 1) (β - Finsupp.single p 1 : σ →₀ ℕ)
-            = ((-1) ^ m * (((k + m).choose m : ℕ) : A) * cprod c β * t ^ (k + m + 1))
-              * ((Nat.multinomial β.support (β - Finsupp.single p 1 : σ →₀ ℕ) : ℕ) : A) := by
+    have hterm : ∀ p ∈ β.support, c p * cf c t (k + 1) (β - Finsupp.single p 1 : σ →₀ ℕ) =
+        ((-1) ^ m * (((k + m).choose m : ℕ) : A) * cprod c β * t ^ (k + m + 1)) *
+          ((Nat.multinomial β.support (β - Finsupp.single p 1 : σ →₀ ℕ) : ℕ) : A) := by
       intro p hp
       have hp' : 1 ≤ β p := Nat.one_le_iff_ne_zero.2 (Finsupp.mem_support_iff.1 hp)
       have hdec : β - Finsupp.single p 1 + Finsupp.single p 1 = β :=
@@ -111,10 +150,8 @@ theorem cf_rec (c : σ →₀ A) (s t : A) (hst : s * t = 1) (k : ℕ) (β : σ 
       have hcp : cprod c β = cprod c (β - Finsupp.single p 1 : σ →₀ ℕ) * c p := by
         conv_lhs => rw [← hdec]
         rw [cprod_add, cprod_single, pow_one]
-      have hM
-          : Nat.multinomial (β - Finsupp.single p 1 : σ →₀ ℕ).support
-              (β - Finsupp.single p 1 : σ →₀ ℕ)
-            = Nat.multinomial β.support (β - Finsupp.single p 1 : σ →₀ ℕ) :=
+      have hM : Nat.multinomial (β - Finsupp.single p 1 : σ →₀ ℕ).support (β - Finsupp.single p 1 : σ →₀ ℕ) =
+          Nat.multinomial β.support (β - Finsupp.single p 1 : σ →₀ ℕ) :=
         (Finsupp.multinomial_eq _).symm.trans
           (Finsupp.multinomial_of_support_subset Finsupp.support_tsub).symm
       unfold cf
@@ -142,44 +179,36 @@ theorem F_zero (c : σ →₀ A) (t : A) : F c t 0 = 1 := by
   · obtain ⟨m, hm⟩ : ∃ m, deg β = m + 1 := ⟨deg β - 1, by have := mt deg_eq_zero.1 h; omega⟩
     simp [cf, hm]
 
-theorem L_mul_F (c : σ →₀ A) (s t : A) (hst : s * t = 1) (k : ℕ)
-    : (C s + c.sum (fun p a => C a * X p)) * F c t (k + 1) = F c t k := by
+theorem L_mul_F (c : σ →₀ A) (s t : A) (hst : s * t = 1) (k : ℕ) :
+    (C s + c.sum (fun p a => C a * X p)) * F c t (k + 1) = F c t k := by
   classical
   ext β
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [add_mul, map_add (f := _), coeff_C_mul, Finsupp.sum, Finset.sum_mul, map_sum]
-  have hterm
-      : ∀ p,
-        coeff β (C (c p) * X p * F c t (k + 1))
-          = if Finsupp.single p 1 ≤ β then
-              c p * cf c t (k + 1) (β - Finsupp.single p 1 : σ →₀ ℕ)
-            else
-              0 := by
+
+  rw [add_mul, map_add (f := _), coeff_C_mul, Finsupp.sum, Finset.sum_mul, map_sum]
+  have hterm : ∀ p, coeff β (C (c p) * X p * F c t (k + 1)) =
+      if Finsupp.single p 1 ≤ β then c p * cf c t (k + 1) (β - Finsupp.single p 1 : σ →₀ ℕ) else 0 := by
     intro p
     rw [mul_assoc, coeff_C_mul, X_def, coeff_monomial_mul, one_mul]
     split_ifs <;> simp [coeff_F]
   rw [Finset.sum_congr rfl (fun p _ => hterm p)]
-  have h1
-      : ∑ p ∈ c.support,
-          (if Finsupp.single p 1 ≤ β then c p * cf c t (k + 1) (β - Finsupp.single p 1 : σ →₀ ℕ) else 0)
-        = ∑ p ∈ c.support ∪ β.support,
-          (if Finsupp.single p 1 ≤ β then c p * cf c t (k + 1) (β - Finsupp.single p 1 : σ →₀ ℕ) else 0) :=
+  have h1 : ∑ p ∈ c.support,
+      (if Finsupp.single p 1 ≤ β then c p * cf c t (k + 1) (β - Finsupp.single p 1 : σ →₀ ℕ) else 0) =
+      ∑ p ∈ c.support ∪ β.support,
+      (if Finsupp.single p 1 ≤ β then c p * cf c t (k + 1) (β - Finsupp.single p 1 : σ →₀ ℕ) else 0) :=
     Finset.sum_subset Finset.subset_union_left
       (fun p _ hp => by simp [Finsupp.notMem_support_iff.1 hp])
-  have h2
-      : ∑ p ∈ β.support,
-          (if Finsupp.single p 1 ≤ β then c p * cf c t (k + 1) (β - Finsupp.single p 1 : σ →₀ ℕ) else 0)
-        = ∑ p ∈ c.support ∪ β.support,
-          (if Finsupp.single p 1 ≤ β then c p * cf c t (k + 1) (β - Finsupp.single p 1 : σ →₀ ℕ) else 0) :=
+  have h2 : ∑ p ∈ β.support,
+      (if Finsupp.single p 1 ≤ β then c p * cf c t (k + 1) (β - Finsupp.single p 1 : σ →₀ ℕ) else 0) =
+      ∑ p ∈ c.support ∪ β.support,
+      (if Finsupp.single p 1 ≤ β then c p * cf c t (k + 1) (β - Finsupp.single p 1 : σ →₀ ℕ) else 0) :=
     Finset.sum_subset Finset.subset_union_right (fun p _ hp => by
       rw [if_neg]
       intro h
       have h' := Finsupp.single_le_iff.1 h
       exact hp (Finsupp.mem_support_iff.2 (by omega)))
-  have h3
-      : ∑ p ∈ β.support,
-          (if Finsupp.single p 1 ≤ β then c p * cf c t (k + 1) (β - Finsupp.single p 1 : σ →₀ ℕ) else 0)
-        = ∑ p ∈ β.support, c p * cf c t (k + 1) (β - Finsupp.single p 1 : σ →₀ ℕ) :=
+  have h3 : ∑ p ∈ β.support,
+      (if Finsupp.single p 1 ≤ β then c p * cf c t (k + 1) (β - Finsupp.single p 1 : σ →₀ ℕ) else 0) =
+      ∑ p ∈ β.support, c p * cf c t (k + 1) (β - Finsupp.single p 1 : σ →₀ ℕ) :=
     Finset.sum_congr rfl (fun p hp =>
       if_pos (Finsupp.single_le_iff.2 (Nat.one_le_iff_ne_zero.2 (Finsupp.mem_support_iff.1 hp))))
   rw [h1, ← h2, h3, coeff_F, coeff_F]
@@ -197,9 +226,7 @@ theorem main.{u, v} : PI.TayInvPow.{u, v} := by
     | succ k ih => rw [pow_succ, mul_assoc, hτ, L_mul_F c s t hst k, ← hτ, ih]
   have hk : τ (t ^ k) = F c t k := by
     rw [map_pow]
-    calc
-      (τ t) ^ k
-        = (τ t) ^ k * ((τ s) ^ k * F c t k) := by rw [hpow, mul_one]
+    calc (τ t) ^ k = (τ t) ^ k * ((τ s) ^ k * F c t k) := by rw [hpow, mul_one]
       _ = (τ s * τ t) ^ k * F c t k := by rw [mul_pow]; ring
       _ = F c t k := by rw [hu, one_pow, one_mul]
   rw [hk, coeff_F]

@@ -1,25 +1,65 @@
 module
 
-public import Mathlib
 public import Formalism.LocalToGlobal.IndefiniteReal.ScalarOnPartsFull
-public import Formalism.LocalToGlobal.IndefiniteReal.SubgroupCharExtensionOneApply
 public import Formalism.LocalToGlobal.IndefiniteReal.LocalNewformFunction
 public import Formalism.LocalToGlobal.Columns.HeckeSp
-public import Formalism.SatakeDualWeyl.KpqSubgroupCompact
 public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.IsIntOv
-public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.ExistsInvariantForm
+public import Development.AbelianVarietyTheory.Proofs.AdelicLatticeProofs.MemLatOIffExistsActO
+public import Development.AbelianVarietyTheory.Proofs.AdelicLatticeProofs.NotMemSpanOfCommute
+public import Development.AbelianVarietyTheory.Proofs.AdelicLatticeProofs.OmVacuumEqSplitFacSmulSum
+public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.CardCosetsEqSubspacesKernelResidueStatement
 public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.CardKerSubspacesAndHeckePolyOfConvolutionStatement
+public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.CardSubspacesKerTransposeEqCardRangeStatement
+public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.ExistsInvariantForm
 public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.ExistsPlaceChartOfSplitIdempotentStatement
-public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.SplitChartUniformiserAndResidueCardStatement
 public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.ExistsSplitFrameSelfDualLatticeCompletionStatement
+public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.ExistsSplitSupportedUnitaryComponentStatement
+public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.FinrankReductionRangeAddCorankStatement
+public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.HeckeElementComponentMemStandardDoubleCosetStatement
 public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.MemHomLatticeIffIntegralMatrixSplitChartStatement
 public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.MemHyperspecialIffGIntOfSuppAtSplitStatement
-public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.ExistsSplitSupportedUnitaryComponentStatement
-public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.HeckeElementComponentMemStandardDoubleCosetStatement
-public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.FinrankReductionRangeAddCorankStatement
-public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.CardCosetsEqSubspacesKernelResidueStatement
 public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.NatCardMatricesMulEqZeroStatement
-public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.CardSubspacesKerTransposeEqCardRangeStatement
+public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.SplitChartUniformiserAndResidueCardStatement
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Coalgebra.IsFrobenius
+import Mathlib.RingTheory.HopfAlgebra.Basic
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -506,7 +546,7 @@ theorem const_eq (z : Circle) (q j m : ℕ)
   rw [this, Circle.coe_inv, Circle.coe_pow, Complex.ofReal_pow, inv_pow, mul_pow, mul_inv,
     ← pow_mul, mul_comm m j]
 
-set_option maxHeartbeats 1000000 in
+
 open IsLocalRing MeasureTheory in
 theorem hecke_identity_split : ∀ {D : D7} (ψ : AddChar (AF D.host.F) ℂ) (S T : HSp D) (χS χT : (Formalism.L2.Theta.AE D)ˣ →* Circle) (om : GA D S × GA D T →* Module.End ℂ (Formalism.IndefR.Datum.WO S T → ℂ)) (P : HeightOneSpectrum (𝓞 D.host.E)) (e : Formalism.L2.Theta.AE D) (ϖ : 𝓞 D.host.E) (x : (Formalism.L2.Theta.AE D)ˣ) (f : Formalism.IndefR.Datum.WO S T → ℂ) (αS : ℕ → GA D S) (αT : ℕ → GA D T) (RS : ℕ → Finset (GA D S)) (RT : ℕ → Finset (GA D T)) (t : ℕ), Formalism.IndefR.Datum.IsWeilDatumO ψ S T χS χT om → IsIdemAt e P → ϖ ∈ P.asIdeal → ϖ ∉ P.asIdeal ^ 2 → (x : Formalism.L2.Theta.AE D) = e * incA D (ϖ : D.host.E) + (1 - e) → (∀ y : (Formalism.L2.Theta.AE D)ˣ, (1 - e) * (y : Formalism.L2.Theta.AE D) = 1 - e → finPart D (e * (y : Formalism.L2.Theta.AE D)) ∈ intAE D → finPart D (e * ((y⁻¹ : (Formalism.L2.Theta.AE D)ˣ) : Formalism.L2.Theta.AE D)) ∈ intAE D → χS y = 1 ∧ χT y = 1) → Formalism.IndefR.Datum.IsThetaFunO ψ S T f → (∀ u ∈ Formalism.IndefR.Datum.latO S T (L0c D S) (L0c D T) (fun _ => True), Formalism.IndefR.Datum.IsHalf e u ∨ Formalism.IndefR.Datum.IsHalf (cA D e) u → Formalism.IndefR.Datum.heisO ψ S T u f = f) → (∀ j, j ≤ S.rank → IsHeckeElt S e (ϖ : D.host.E) j (αS j) ∧ (∀ γ ∈ RS j, SuppAt e S γ) ∧ IsCosetRep S (locPart S (KsphC S ∅) e) (αS j) (RS j)) → (∀ j, j ≤ T.rank → IsHeckeElt T e (ϖ : D.host.E) j (αT j) ∧ (∀ γ ∈ RT j, SuppAt e T γ) ∧ IsCosetRep T (locPart T (KsphC T ∅) e) (αT j)⁻¹ (RT j)) → (∀ k ∈ locPart S (KsphC S ∅) e, ∀ k' ∈ locPart T (KsphC T ∅) e, om (k, k') f = f) ∧ (T.rank = S.rank + t → ∀ k, k ≤ T.rank → ∑ b ∈ RT k, om (1, b) f = ∑ j ∈ Finset.range (min k S.rank + 1), (((Ideal.absNorm P.asIdeal : ℂ)) ^ ((S.rank - j) * (k - j)) * (Formalism.L2.Col.gaussBin (Ideal.absNorm P.asIdeal) t (k - j) : ℂ) * ((χS x : ℂ) * (Real.sqrt (Ideal.absNorm P.asIdeal) : ℂ) ^ S.rank)⁻¹ ^ k * ((χT x : ℂ) * (Real.sqrt (Ideal.absNorm P.asIdeal) : ℂ) ^ T.rank) ^ j) • ∑ a ∈ RS j, om (a, 1) f) ∧ (S.rank = T.rank + t → ∀ k, k ≤ S.rank → ∑ a ∈ RS k, om (a, 1) f = ∑ j ∈ Finset.range (min k T.rank + 1), (((Ideal.absNorm P.asIdeal : ℂ)) ^ ((T.rank - j) * (k - j)) * (Formalism.L2.Col.gaussBin (Ideal.absNorm P.asIdeal) t (k - j) : ℂ) * ((χT x : ℂ) * (Real.sqrt (Ideal.absNorm P.asIdeal) : ℂ) ^ T.rank)⁻¹ ^ k * ((χS x : ℂ) * (Real.sqrt (Ideal.absNorm P.asIdeal) : ℂ) ^ S.rank) ^ j) • ∑ b ∈ RT j, om (1, b) f) := by
   intro D ψ S T χS χT om P e ϖ x f αS αT RS RT t hW hP hϖ hϖ2 hx hχ hf hfix hS hT

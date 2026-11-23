@@ -1,6 +1,50 @@
 module
 
 public import Formalism.SharpRestriction.GrowthBounds.MixedCoefficientClosed
+public import Formalism.LocalToGlobal.CharacterGerms.ConstMemTypeSetOfNonneg
+public import Formalism.LocalToGlobal.CharacterGerms.GeOfPowEqOne
+public import Formalism.LocalToGlobal.CharacterGerms.ValNonnegLeadingCoeffOfMemTySet
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
@@ -17,14 +61,14 @@ namespace SelfConjCharts
 
 variable {C : Type} [Field C]
 
-theorem subst_tyS_Fs {l : ℕ} (hl : 2 ≤ l) {ζ : C} (hζ : IsPrimitiveRoot ζ l) (a : ℕ → C)
-    : PowerSeries.subst ((PowerSeries.X : PowerSeries C) ^ l) (tyS l fun s => (l : C) * a (s + 1))
-      = ∑ k ∈ Finset.range l, PowerSeries.rescale (ζ ^ k) (tyS l a) := by
+theorem subst_tyS_Fs {l : ℕ} (hl : 2 ≤ l) {ζ : C} (hζ : IsPrimitiveRoot ζ l) (a : ℕ → C) :
+    PowerSeries.subst ((PowerSeries.X : PowerSeries C) ^ l) (tyS l fun s => (l : C) * a (s + 1)) =
+      ∑ k ∈ Finset.range l, PowerSeries.rescale (ζ ^ k) (tyS l a) := by
   rw [← tyS_Vpow hl]
   apply tyS_eq hl
   · intro s
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     simp only [PowerSeries.coeff_rescale, coeff_tyS_pow hl]
     rw [← Finset.sum_mul]
     cases s with
@@ -39,45 +83,39 @@ theorem subst_tyS_Fs {l : ℕ} (hl : 2 ≤ l) {ζ : C} (hζ : IsPrimitiveRoot ζ
       simp only [h1, Finset.sum_const, Finset.card_range, nsmul_eq_mul, mul_one]
       simp
   · intro m hm
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     apply Finset.sum_eq_zero
     intro k _
     rw [PowerSeries.coeff_rescale, coeff_tyS_of_ne _ m hm, mul_zero]
 
-theorem rescale_sum_smul {ι : Type} [Fintype ι] (a : C) (u : ι → C) (f : ι → PowerSeries C)
-    : PowerSeries.rescale a (∑ c, u c • f c) = ∑ c, u c • PowerSeries.rescale a (f c) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+theorem rescale_sum_smul {ι : Type} [Fintype ι] (a : C) (u : ι → C) (f : ι → PowerSeries C) :
+    PowerSeries.rescale a (∑ c, u c • f c) = ∑ c, u c • PowerSeries.rescale a (f c) := by
+
+  rw [map_sum]
   refine Finset.sum_congr rfl fun c _ => ?_
   ext n
   simp only [PowerSeries.coeff_rescale, PowerSeries.coeff_smul, smul_eq_mul]
   ring
 
-theorem subst_pow_sum_smul
-    {n : ℕ} (hn : 0 < n) {ι : Type} [Fintype ι] (u : ι → C) (f : ι → PowerSeries C)
-    : PowerSeries.subst ((PowerSeries.X : PowerSeries C) ^ n) (∑ c, u c • f c)
-      = ∑ c, u c • PowerSeries.subst ((PowerSeries.X : PowerSeries C) ^ n) (f c) := by
+theorem subst_pow_sum_smul {n : ℕ} (hn : 0 < n) {ι : Type} [Fintype ι] (u : ι → C) (f : ι → PowerSeries C) :
+    PowerSeries.subst ((PowerSeries.X : PowerSeries C) ^ n) (∑ c, u c • f c) =
+      ∑ c, u c • PowerSeries.subst ((PowerSeries.X : PowerSeries C) ^ n) (f c) := by
   have hS : PowerSeries.HasSubst ((PowerSeries.X : PowerSeries C) ^ n) :=
     PowerSeries.HasSubst.of_constantCoeff_zero' (by simp [hn.ne'])
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [← PowerSeries.coe_substAlgHom hS, map_sum]
+
+  rw [← PowerSeries.coe_substAlgHom hS, map_sum]
   simp only [map_smul]
 
 variable {d : ℕ} {I : Fin 2 → Type} [∀ g, Fintype (I g)] {κ : Type} [Fintype κ]
 
-theorem coeff_one_alongCv_lg
-    (X : RawChart C d I κ)
-    {V : VF C} (hB : Basic X V)
-    {γ : κ → PowerSeries C} (hγ : ∀ i, PowerSeries.constantCoeff (γ i) = 0)
-    (i : κ)
-    : PowerSeries.coeff 1 (alongCv γ (X.lg i)) = PowerSeries.coeff 1 (γ i) := by
-  rw [coeff_alongCv_low le_rfl
-    (fun j m hm => by
+theorem coeff_one_alongCv_lg (X : RawChart C d I κ) {V : VF C} (hB : Basic X V) {γ : κ → PowerSeries C}
+    (hγ : ∀ i, PowerSeries.constantCoeff (γ i) = 0) (i : κ) :
+    PowerSeries.coeff 1 (alongCv γ (X.lg i)) = PowerSeries.coeff 1 (γ i) := by
+  rw [coeff_alongCv_low le_rfl (fun j m hm => by
       have : m = 0 := by omega
       subst this
-      rw [PowerSeries.coeff_zero_eq_constantCoeff_apply, hγ j])
-    (hB.lg0 i)]
+      rw [PowerSeries.coeff_zero_eq_constantCoeff_apply, hγ j]) (hB.lg0 i)]
   rw [Finset.sum_eq_single i]
   · rw [hB.lin i _ (by simp), MvPowerSeries.coeff_X, if_pos rfl, one_mul]
   · intro j _ hj
@@ -91,16 +129,12 @@ theorem coeff_one_tyS {l : ℕ} (hl : 2 ≤ l) (a : ℕ → C) : PowerSeries.coe
   have h := coeff_tyS_pow hl a 0
   rwa [pow_zero] at h
 
-theorem coeff_one_of_mem
-    (X : RawChart C d I κ)
-    {V : VF C} (hB : Basic X V)
-    {g : Fin 2} {γ : κ → PowerSeries C} (hγ : ∀ i, PowerSeries.constantCoeff (γ i) = 0)
-    {x : ℕ → I g ⊕ JJ I g → C}
-    (h1 : ∀ i : κ, alongCv γ (X.lg i) = ∑ c : I g, X.u g c i • tyS V.l (fun s => x s (Sum.inl c)))
-    (i : κ)
-    : PowerSeries.coeff 1 (γ i) = ∑ c : I g, X.u g c i * x 0 (Sum.inl c) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [← coeff_one_alongCv_lg X hB hγ i, h1 i, map_sum]
+theorem coeff_one_of_mem (X : RawChart C d I κ) {V : VF C} (hB : Basic X V) {g : Fin 2} {γ : κ → PowerSeries C}
+    (hγ : ∀ i, PowerSeries.constantCoeff (γ i) = 0) {x : ℕ → I g ⊕ JJ I g → C}
+    (h1 : ∀ i : κ, alongCv γ (X.lg i) = ∑ c : I g, X.u g c i • tyS V.l (fun s => x s (Sum.inl c))) (i : κ) :
+    PowerSeries.coeff 1 (γ i) = ∑ c : I g, X.u g c i * x 0 (Sum.inl c) := by
+
+  rw [← coeff_one_alongCv_lg X hB hγ i, h1 i, map_sum]
   refine Finset.sum_congr rfl fun c _ => ?_
   rw [PowerSeries.coeff_smul, coeff_one_tyS V.l_prime.two_le, smul_eq_mul]
 
@@ -111,14 +145,12 @@ theorem r1sRestB_holds : OtherGroupCurvesClosed := by
   intro C _ _ V d I _ κ _ X hB H ζ hζ g q
   have hl2 := V.l_prime.two_le
   set g' : Fin 2 := 1 - g with hg'
-  obtain ⟨x, hx, hx0, -⟩ :=
-    (H g').t4 (X.ty g' q)
-      (fun c => if c = q then 1 else 0)
-      (fun c => by split_ifs <;> simp [VF.Ge.zero, VF.Ge.one])
-      (fun c hc => by
-        rw [if_neg]
-        rintro rfl
-        exact hc rfl)
+  obtain ⟨x, hx, hx0, -⟩ := (H g').t4 (X.ty g' q) (fun c => if c = q then 1 else 0)
+    (fun c => by split_ifs <;> simp [VF.Ge.zero, VF.Ge.one])
+    (fun c hc => by
+      rw [if_neg]
+      rintro rfl
+      exact hc rfl)
   have hF := (H g').Fm x hx
   obtain ⟨z, -, hz, -, hz1, -⟩ := id hx
   obtain ⟨ε, -, hε, -, hε1, -⟩ := hF
@@ -133,8 +165,7 @@ theorem r1sRestB_holds : OtherGroupCurvesClosed := by
     exact subst_tyS_Fs hl2 hζ (fun s => x s (Sum.inl c))
   · intro i
     rw [coeff_one_of_mem X hB (fun i => (hz i).1) hz1 i, hx0]
-    simp only [Sum.elim_inl, mul_ite, mul_one, mul_zero, Finset.sum_ite_eq', Finset.mem_univ,
-      if_true]
+    simp only [Sum.elim_inl, mul_ite, mul_one, mul_zero, Finset.sum_ite_eq', Finset.mem_univ, if_true]
     rfl
   · intro i
     rw [coeff_one_of_mem X hB (fun i => (hε i).1) hε1 i]

@@ -1,10 +1,58 @@
 module
 
-public import Mathlib
+public import Mathlib.RingTheory.Flat.Basic
+public import Mathlib.RingTheory.Trace.Basic
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsBasisInFiniteDomainTraceMemStatement
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.FlatTensorEmbedsTensorFractionFieldsStatement
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.IsUnitMapOfMemNonZeroDivisorsTensorStatement
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.IntegralOfFiniteBaseChangeImageStatement
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.IsUnitMapOfMemNonZeroDivisorsTensorStatement
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+public import Mathlib.FieldTheory.IsAlgClosed.Spectrum
+import Mathlib.Geometry.Euclidean.Volume.Basic
+public import Mathlib.LinearAlgebra.Matrix.Charpoly.Eigs
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
+public import Mathlib.Algebra.Algebra.Spectrum.Basic
+public import Mathlib.RingTheory.Discriminant
 
 @[expose] public section
 
@@ -14,9 +62,8 @@ namespace GlobalTheory.DiscConductor
 
 theorem isIntegral_trace_of_isIntegral
     (U L Ω : Type) [CommRing U] [Field L] [CommRing Ω] [Algebra U L] [Algebra L Ω] [Algebra U Ω]
-    [IsScalarTower U L Ω] [Module.Finite L Ω]
-    (ω : Ω) (h : IsIntegral U ω)
-    : IsIntegral U (Algebra.trace L Ω ω) := by
+    [IsScalarTower U L Ω] [Module.Finite L Ω] (ω : Ω) (h : IsIntegral U ω) :
+    IsIntegral U (Algebra.trace L Ω ω) := by
   classical
   let b := Module.finBasis L Ω
   let A := AlgebraicClosure L
@@ -25,10 +72,11 @@ theorem isIntegral_trace_of_isIntegral
   have hM : IsIntegral U (f ω) := h.map f
   have htr : algebraMap L A (Algebra.trace L Ω ω) = (f ω).trace := by
     rw [Algebra.trace_eq_matrix_trace b]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [Matrix.trace, Matrix.diag, map_sum]
+
+    simp only [Matrix.trace, Matrix.diag, map_sum]
     rfl
-  rw [← isIntegral_algebraMap_iff (A := L) (B := A), htr, Matrix.trace_eq_sum_roots_charpoly]
+  rw [← isIntegral_algebraMap_iff (A := L) (B := A) , htr,
+    Matrix.trace_eq_sum_roots_charpoly]
   refine IsIntegral.multiset_sum fun μ hμ => ?_
   have hroot : IsRoot (f ω).charpoly μ := (mem_roots'.1 hμ).2
   have hspec : μ ∈ spectrum A (f ω) := Matrix.mem_spectrum_iff_isRoot_charpoly.2 hroot
@@ -46,12 +94,11 @@ theorem isIntegral_trace_of_isIntegral
   simpa [eval_map] using h1
 
 theorem det_smul_eq_sum
-    (U L Ω ι : Type)
-    [CommRing U] [Field L] [CommRing Ω] [Algebra U L] [Algebra L Ω] [Fintype ι] [DecidableEq ι]
-    (b : Module.Basis ι L Ω) (ω : Ω)
+    (U L Ω ι : Type) [CommRing U] [Field L] [CommRing Ω] [Algebra U L] [Algebra L Ω]
+    [Fintype ι] [DecidableEq ι] (b : Module.Basis ι L Ω) (ω : Ω)
     (hG : ∀ i j, ∃ u : U, algebraMap U L u = Algebra.trace L Ω (b i * b j))
-    (hω : ∀ i, ∃ u : U, algebraMap U L u = Algebra.trace L Ω (ω * b i))
-    : ∃ v : ι → U, (Algebra.traceMatrix L b).det • ω = ∑ j, algebraMap U L (v j) • b j := by
+    (hω : ∀ i, ∃ u : U, algebraMap U L u = Algebra.trace L Ω (ω * b i)) :
+    ∃ v : ι → U, (Algebra.traceMatrix L b).det • ω = ∑ j, algebraMap U L (v j) • b j := by
   choose g hg using hG
   choose w hw using hω
   have hG : (algebraMap U L).mapMatrix (Matrix.of g) = Algebra.traceMatrix L b := by
@@ -61,9 +108,8 @@ theorem det_smul_eq_sum
     rw [Algebra.traceMatrix_of_basis_mulVec]
     ext i
     rw [hw]
-  have h2
-      : (Algebra.traceMatrix L b).det • b.equivFun ω
-        = fun j => algebraMap U L ((Matrix.of g).adjugate.mulVec w j) := by
+  have h2 : (Algebra.traceMatrix L b).det • b.equivFun ω =
+      fun j => algebraMap U L ((Matrix.of g).adjugate.mulVec w j) := by
     have h3 := congrArg ((Algebra.traceMatrix L b).adjugate.mulVec) h1
     rw [Matrix.mulVec_mulVec, Matrix.adjugate_mul, Matrix.smul_mulVec, Matrix.one_mulVec] at h3
     rw [h3, ← hG, ← RingHom.map_adjugate]
@@ -76,24 +122,20 @@ theorem det_smul_eq_sum
   rfl
 
 theorem exists_conductor_of_fractionFields
-    (T U C F K L : Type) [CommRing T] [IsDomain T] [IsIntegrallyClosed T] [CharZero T] [CommRing U]
-    [IsDomain U] [IsIntegrallyClosed U] [CommRing C] [IsDomain C] [Field F] [Field K] [Field L]
-    [Algebra T U] [Algebra T C] [Algebra T F] [IsFractionRing T F] [Algebra C K]
-    [IsFractionRing C K] [Algebra U L] [IsFractionRing U L] [Algebra T K] [Algebra F K]
-    [IsScalarTower T C K] [IsScalarTower T F K] [Algebra T L] [Algebra F L] [IsScalarTower T U L]
-    [IsScalarTower T F L] [Module.Flat T U] [Module.Finite T C]
-    : ∃ d : T,
-      d ≠ 0
-        ∧ ∀ c : FractionRing (U ⊗[T] C),
-          IsIntegral (U ⊗[T] C) c
-            → ∃ s : (U ⊗[T] C),
-              algebraMap (U ⊗[T] C) (FractionRing (U ⊗[T] C)) s
-                = algebraMap (U ⊗[T] C) (FractionRing (U ⊗[T] C)) (algebraMap T (U ⊗[T] C) d)
-                  * c := by
+    (T U C F K L : Type) [CommRing T] [IsDomain T] [IsIntegrallyClosed T] [CharZero T]
+    [CommRing U] [IsDomain U] [IsIntegrallyClosed U]
+    [CommRing C] [IsDomain C] [Field F] [Field K] [Field L]
+    [Algebra T U] [Algebra T C] [Algebra T F] [IsFractionRing T F]
+    [Algebra C K] [IsFractionRing C K] [Algebra U L] [IsFractionRing U L]
+    [Algebra T K] [Algebra F K] [IsScalarTower T C K] [IsScalarTower T F K]
+    [Algebra T L] [Algebra F L] [IsScalarTower T U L] [IsScalarTower T F L]
+    [Module.Flat T U] [Module.Finite T C] :
+    ∃ d : T, d ≠ 0 ∧ ∀ c : FractionRing (U ⊗[T] C), IsIntegral (U ⊗[T] C) c →
+      ∃ s : (U ⊗[T] C), algebraMap (U ⊗[T] C) (FractionRing (U ⊗[T] C)) s =
+        algebraMap (U ⊗[T] C) (FractionRing (U ⊗[T] C)) (algebraMap T (U ⊗[T] C) d) * c := by
   classical
   obtain ⟨n, b, hbC, hbT⟩ := GlobalTheory.T.exists_basis_of_integral_with_trace_in_base T C F K
-  obtain ⟨φ, hφi, hφ⟩ :=
-    GlobalTheory.T.exists_injective_tensor_into_tensor_fractionFields T U C F K L
+  obtain ⟨φ, hφi, hφ⟩ := GlobalTheory.T.exists_injective_tensor_into_tensor_fractionFields T U C F K L
   have hφu := GlobalTheory.T.isUnit_map_of_mem_nonZeroDivisors_tensor' T U C F K L φ hφi hφ
   choose t ht using hbT
   choose e he using hbC
@@ -103,7 +145,8 @@ theorem exists_conductor_of_fractionFields
     simp [Gt, ht, Algebra.traceMatrix_apply, Algebra.traceForm_apply]
   haveI : FiniteDimensional F K := Module.Finite.of_basis b
   haveI : CharZero F := charZero_of_injective_algebraMap (IsFractionRing.injective T F)
-  have hd : algebraMap T F Gt.det = (Algebra.traceMatrix F b).det := by rw [RingHom.map_det, hG]
+  have hd : algebraMap T F Gt.det = (Algebra.traceMatrix F b).det := by
+    rw [RingHom.map_det, hG]
   refine ⟨Gt.det, ?_, ?_⟩
   · intro h0
     apply Algebra.discr_not_zero_of_basis F b
@@ -112,17 +155,15 @@ theorem exists_conductor_of_fractionFields
   let B : Module.Basis (Fin n) L (L ⊗[F] K) := b.baseChange L
   have hB : ∀ i, B i = 1 ⊗ₜ b i := fun i => Module.Basis.baseChange_apply L b i
   haveI : Module.Finite L (L ⊗[F] K) := Module.Finite.of_basis B
-  have htr
-      : ∀ x : K, Algebra.trace L (L ⊗[F] K) (1 ⊗ₜ x) = algebraMap F L (Algebra.trace F K x) := by
+  have htr : ∀ x : K, Algebra.trace L (L ⊗[F] K) (1 ⊗ₜ x) = algebraMap F L (Algebra.trace F K x) := by
     intro x
     rw [Algebra.trace_apply, Algebra.trace_apply, ← Algebra.baseChange_lmul,
       LinearMap.trace_baseChange]
   have htow : ∀ x : T, algebraMap F L (algebraMap T F x) = algebraMap U L (algebraMap T U x) := by
     intro x
     rw [← IsScalarTower.algebraMap_apply, ← IsScalarTower.algebraMap_apply]
-  have hBB
-      : ∀ i j,
-        algebraMap U L (algebraMap T U (t i j)) = Algebra.trace L (L ⊗[F] K) (B i * B j) := by
+  have hBB : ∀ i j, algebraMap U L (algebraMap T U (t i j)) =
+      Algebra.trace L (L ⊗[F] K) (B i * B j) := by
     intro i j
     rw [hB, hB, Algebra.TensorProduct.tmul_mul_tmul, one_mul, htr, ← ht, htow]
   let ψ : FractionRing (U ⊗[T] C) →+* L ⊗[F] K :=
@@ -146,45 +187,30 @@ theorem exists_conductor_of_fractionFields
     rwa [h2] at h1
   have hBi : ∀ i, IsIntegral U (B i) := by
     intro i
-    refine GlobalTheory.T.isIntegral_of_monic_eval_tmul_map_eq_zero T U C F K L φ hφ (B i)
-      (X - Polynomial.C (1 ⊗ₜ e i)) (monic_X_sub_C _) ?_
+    refine GlobalTheory.T.isIntegral_of_monic_eval_tmul_map_eq_zero T U C F K L φ hφ (B i) (X - Polynomial.C (1 ⊗ₜ e i))
+      (monic_X_sub_C _) ?_
     rw [eval₂_sub, eval₂_X, eval₂_C, hφ, map_one, he, hB, sub_self]
-  obtain ⟨v, hv⟩ :=
-    det_smul_eq_sum U L (L ⊗[F] K) (Fin n) B (ψ c)
-      (fun i j => ⟨_, hBB i j⟩)
-      (fun i =>
-        IsIntegrallyClosed.isIntegral_iff.1 (isIntegral_trace_of_isIntegral U L (L ⊗[F] K) _
-          (hω.mul (hBi i))))
+  obtain ⟨v, hv⟩ := det_smul_eq_sum U L (L ⊗[F] K) (Fin n) B (ψ c)
+    (fun i j => ⟨_, hBB i j⟩) (fun i => IsIntegrallyClosed.isIntegral_iff.1
+      (isIntegral_trace_of_isIntegral U L (L ⊗[F] K) _ (hω.mul (hBi i))))
   have hdet : (Algebra.traceMatrix L B).det = algebraMap U L (algebraMap T U Gt.det) := by
     rw [RingHom.map_det, RingHom.map_det]
     congr 1
     ext i j
     simp [Gt, hBB, Algebra.traceMatrix_apply, Algebra.traceForm_apply]
   refine ⟨∑ j, v j ⊗ₜ e j, hψi ?_⟩
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_mul, hψ, hψ, map_sum, Algebra.TensorProduct.algebraMap_apply, hφ, map_one, ← hdet]
-  have h1
-      : ((Algebra.traceMatrix L B).det ⊗ₜ[F] (1 : K)) * ψ c
-        = (Algebra.traceMatrix L B).det • ψ c := by
+
+  rw [map_mul, hψ, hψ, map_sum, Algebra.TensorProduct.algebraMap_apply, hφ, map_one, ← hdet]
+  have h1 : ((Algebra.traceMatrix L B).det ⊗ₜ[F] (1 : K)) * ψ c =
+      (Algebra.traceMatrix L B).det • ψ c := by
     rw [Algebra.smul_def]; rfl
   rw [h1, hv]
   refine Finset.sum_congr rfl fun j _ => ?_
   rw [hφ, he, hB, smul_tmul', smul_eq_mul, mul_one]
 
+
 attribute [local instance] FractionRing.liftAlgebra FractionRing.isScalarTower_liftAlgebra in
-theorem discr_mul_mem_of_isIntegral
-    : ∀ (T U C : Type) [CommRing T] [IsDomain T] [IsIntegrallyClosed T] [CharZero T] [CommRing U]
-        [IsDomain U] [IsIntegrallyClosed U] [Algebra T U] [Module.Flat T U] [CommRing C]
-        [IsDomain C] [Algebra T C] [Module.Finite T C],
-      Function.Injective (algebraMap T U) → Function.Injective (algebraMap T C)
-        → ∃ d : T,
-          d ≠ 0
-            ∧ ∀ c : FractionRing (U ⊗[T] C),
-              IsIntegral (U ⊗[T] C) c
-                → ∃ s : (U ⊗[T] C),
-                  algebraMap (U ⊗[T] C) (FractionRing (U ⊗[T] C)) s
-                    = algebraMap (U ⊗[T] C) (FractionRing (U ⊗[T] C)) (algebraMap T (U ⊗[T] C) d)
-                      * c := by
+theorem discr_mul_mem_of_isIntegral : ∀ (T U C : Type) [CommRing T] [IsDomain T] [IsIntegrallyClosed T] [CharZero T] [CommRing U] [IsDomain U] [IsIntegrallyClosed U] [Algebra T U] [Module.Flat T U] [CommRing C] [IsDomain C] [Algebra T C] [Module.Finite T C], Function.Injective (algebraMap T U) → Function.Injective (algebraMap T C) → ∃ d : T, d ≠ 0 ∧ ∀ c : FractionRing (U ⊗[T] C), IsIntegral (U ⊗[T] C) c → ∃ s : (U ⊗[T] C), algebraMap (U ⊗[T] C) (FractionRing (U ⊗[T] C)) s = algebraMap (U ⊗[T] C) (FractionRing (U ⊗[T] C)) (algebraMap T (U ⊗[T] C) d) * c := by
   intro T U C _ _ _ _ _ _ _ _ _ _ _ _ _ hU hC
   haveI : FaithfulSMul T U := (faithfulSMul_iff_algebraMap_injective _ _).2 hU
   haveI : FaithfulSMul T C := (faithfulSMul_iff_algebraMap_injective _ _).2 hC

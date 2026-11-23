@@ -1,24 +1,78 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.Definitions.CMLattices.ExistsIsThetaDegOfIsLocalModel
+public import Mathlib.NumberTheory.NumberField.Basic
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
+import Development.AbelianVarietyTheory.Definitions.CMLattices.IsCyclotomicExtensionCyclotomicField28
+import Development.AbelianVarietyTheory.Proofs.HomogeneousIdeals.IsIrreducibleGeneralizations
+public import Mathlib.Algebra.Module.FinitePresentation
+import Mathlib.CategoryTheory.Monoidal.Cartesian.Basic
+import Mathlib.CategoryTheory.Monoidal.Category
+import Mathlib.CategoryTheory.Monoidal.Mon
+public import Mathlib.RingTheory.Flat.EquationalCriterion
+import Mathlib.Topology.Sheaves.Presheaf
+import ReciprocityTheory.GeometryOfNumbers.LatticeCovolumes.ConjSymm
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.IsCompletedStrictHens
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.DiscreteValuationRings.QuadTie
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.SemiabelianSchemes.CubicalStructures.CubeSymmetricSwapFirst
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
-  NumberField IsDedekindDomain
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
-  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.GeometryOfNumbersTheory
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField IsDedekindDomain
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.GeometryOfNumbersTheory
 open scoped CategoryTheory.Obj
 open GlobalTheory GlobalTheory.CM
 
 namespace GlobalTheory.CM
 
-theorem eigenBC_relation
-    {K K' : Type} [Field K] [NumberField K] [Field K'] [NumberField K'] [Algebra K K']
-    {m : ℕ} (s : Fin m → 𝓞 K') (x : Fin m → K)
-    (φ : 𝓞 K' →ₗ[𝓞 K] 𝓞 K) (h : ∑ i, (s i : K') * algebraMap K K' (x i) = 0)
-    : ∑ i, ((φ (s i) : 𝓞 K) : K) * x i = 0 := by
+theorem eigenBC_relation {K K' : Type} [Field K] [NumberField K] [Field K'] [NumberField K']
+    [Algebra K K'] {m : ℕ} (s : Fin m → 𝓞 K') (x : Fin m → K) (φ : 𝓞 K' →ₗ[𝓞 K] 𝓞 K)
+    (h : ∑ i, (s i : K') * algebraMap K K' (x i) = 0) :
+    ∑ i, ((φ (s i) : 𝓞 K) : K) * x i = 0 := by
   obtain ⟨d, hd⟩ := IsLocalization.exist_integer_multiples_of_finite (nonZeroDivisors (𝓞 K)) x
   choose y hy using hd
   have hd0 : ((d : 𝓞 K) : K) ≠ 0 := by
@@ -31,11 +85,10 @@ theorem eigenBC_relation
     exact this
   have h1 : ∑ i, y i • s i = 0 := by
     apply RingOfIntegers.coe_injective
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, map_zero]
-    have : ∀ i,
-        algebraMap (𝓞 K') K' (y i • s i)
-          = algebraMap K K' ((d : 𝓞 K) : K) * ((s i : K') * algebraMap K K' (x i)) := by
+
+    rw [map_sum, map_zero]
+    have : ∀ i, algebraMap (𝓞 K') K' (y i • s i)
+        = algebraMap K K' ((d : 𝓞 K) : K) * ((s i : K') * algebraMap K K' (x i)) := by
       intro i
       rw [Algebra.smul_def, map_mul, ← IsScalarTower.algebraMap_apply,
         IsScalarTower.algebraMap_apply (𝓞 K) K K']
@@ -47,11 +100,11 @@ theorem eigenBC_relation
     rw [← Finset.mul_sum, h, mul_zero]
   have h2 : ∑ i, y i * φ (s i) = 0 := by
     have := congrArg φ h1
-    set_option synthInstance.maxHeartbeats 100000 in
+
     simpa [map_sum] using this
   have h3 := congrArg (algebraMap (𝓞 K) K) h2
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum, map_zero] at h3
+
+  rw [map_sum, map_zero] at h3
   apply mul_left_cancel₀ hd0
   rw [mul_zero, Finset.mul_sum, ← h3]
   refine Finset.sum_congr rfl fun i _ => ?_
@@ -61,9 +114,9 @@ theorem eigenBC_relation
   show _ = _ * ((φ (s i) : 𝓞 K) : K)
   ring
 
-theorem eigenBC_frame
-    (K K' : Type) [Field K] [NumberField K] [Field K'] [NumberField K'] [Algebra K K']
-    : ∃ (m : ℕ) (b : Fin m → 𝓞 K') (φ : Fin m → (𝓞 K' →ₗ[𝓞 K] 𝓞 K)), ∀ s, s = ∑ k, φ k s • b k := by
+theorem eigenBC_frame (K K' : Type) [Field K] [NumberField K] [Field K'] [NumberField K']
+    [Algebra K K'] : ∃ (m : ℕ) (b : Fin m → 𝓞 K') (φ : Fin m → (𝓞 K' →ₗ[𝓞 K] 𝓞 K)),
+      ∀ s, s = ∑ k, φ k s • b k := by
   haveI : Module.FinitePresentation (𝓞 K) (𝓞 K') := Module.finitePresentation_of_finite _ _
   haveI : Module.Projective (𝓞 K) (𝓞 K') := Module.Flat.projective_of_finitePresentation
   obtain ⟨m, f, g, -, -, hfg⟩ := Module.Finite.exists_comp_eq_id_of_projective (𝓞 K) (𝓞 K')
@@ -77,33 +130,17 @@ theorem eigenBC_frame
   funext i
   simp [Pi.single_apply, eq_comm]
 
-theorem eigenLattice_baseChange
-    : ∀ (K K' O : Type) [Field K] [NumberField K] [Field K'] [NumberField K'] [CommRing O]
-        (j : K →+* K') (n : ℕ) (Λ : Submodule (𝓞 K) (Fin n → K)) (r : O → Matrix (Fin n) (Fin n) K)
-        (τ : O → K) (c' : Fin n → K'),
-      Λ.FG
-        → (c' ∈ Submodule.span (𝓞 K')
-            ((fun c i => j (c i)) '' {c | c ∈ Λ ∧ ∀ a, (r a).mulVec c = τ a • c})
-          ↔ c' ∈ Submodule.span (𝓞 K') ((fun c i => j (c i)) '' (Λ : Set (Fin n → K)))
-            ∧ ∀ a, ((r a).map j).mulVec c' = j (τ a) • c') := by
+theorem eigenLattice_baseChange : ∀ (K K' O : Type) [Field K] [NumberField K] [Field K'] [NumberField K'] [CommRing O] (j : K →+* K') (n : ℕ) (Λ : Submodule (𝓞 K) (Fin n → K)) (r : O → Matrix (Fin n) (Fin n) K) (τ : O → K) (c' : Fin n → K'), Λ.FG → (c' ∈ Submodule.span (𝓞 K') ((fun c i => j (c i)) '' {c | c ∈ Λ ∧ ∀ a, (r a).mulVec c = τ a • c}) ↔ c' ∈ Submodule.span (𝓞 K') ((fun c i => j (c i)) '' (Λ : Set (Fin n → K))) ∧ ∀ a, ((r a).map j).mulVec c' = j (τ a) • c') := by
   intro K K' O _ _ _ _ _ j n Λ r τ c' _
-  have hmap
-      : ∀ a (c : Fin n → K),
-        ((r a).map j).mulVec (fun i => j (c i)) = fun i => j ((r a).mulVec c i) := by
+  have hmap : ∀ a (c : Fin n → K), ((r a).map j).mulVec (fun i => j (c i))
+      = fun i => j ((r a).mulVec c i) := by
     intro a c
     funext i
-    set_option synthInstance.maxHeartbeats 100000 in
+
     simp [Matrix.mulVec, dotProduct, map_sum]
   constructor
   · intro h
-    refine ⟨
-      Submodule.span_mono
-        (Set.image_mono (show {c | c ∈ Λ ∧ ∀ a, (r a).mulVec c = τ a • c}
-            ⊆ (Λ : Set (Fin n → K)) from fun c hc =>
-          hc.1))
-        h,
-      fun a => ?_
-    ⟩
+    refine ⟨Submodule.span_mono (Set.image_mono (show {c | c ∈ Λ ∧ ∀ a, (r a).mulVec c = τ a • c} ⊆ (Λ : Set (Fin n → K)) from fun c hc => hc.1)) h, fun a => ?_⟩
     induction h using Submodule.span_induction with
     | mem x hx =>
       obtain ⟨c, ⟨-, hc⟩, rfl⟩ := hx
@@ -130,8 +167,8 @@ theorem eigenLattice_baseChange
       have e : ∀ i, (s i : K') = ∑ k, j ((φ k (s i) : 𝓞 K) : K) * (b k : K') := by
         intro i
         have := congrArg (algebraMap (𝓞 K') K') (hb (s i))
-        set_option synthInstance.maxHeartbeats 100000 in
-          rw [map_sum] at this
+
+        rw [map_sum] at this
         refine this.trans (Finset.sum_congr rfl fun k _ => ?_)
         rw [Algebra.smul_def, map_mul, ← IsScalarTower.algebraMap_apply,
           IsScalarTower.algebraMap_apply (𝓞 K) K K']
@@ -139,31 +176,26 @@ theorem eigenLattice_baseChange
       rw [Finset.sum_congr rfl fun i _ => by rw [e i, Finset.sum_mul], Finset.sum_comm]
       refine Finset.sum_congr rfl fun k _ => ?_
       show _ = (b k : K') * j ((∑ i, φ k (s i) • l i) t)
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [Finset.sum_apply, map_sum, Finset.mul_sum]
+
+      rw [Finset.sum_apply, map_sum, Finset.mul_sum]
       refine Finset.sum_congr rfl fun i _ => ?_
       show _ = (b k : K') * j (((φ k (s i) : 𝓞 K) : K) * l i t)
-      rw [map_mul]
-      ring
+      rw [map_mul]; ring
     rw [hc2]
-    refine Submodule.sum_mem _ fun k _ =>
-      Submodule.smul_mem _ _
-        (Submodule.subset_span ⟨_, ⟨Λ.sum_mem fun i _ => Λ.smul_mem _ (hl i), fun a => ?_⟩, rfl⟩)
+    refine Submodule.sum_mem _ fun k _ => Submodule.smul_mem _ _ (Submodule.subset_span
+      ⟨_, ⟨Λ.sum_mem fun i _ => Λ.smul_mem _ (hl i), fun a => ?_⟩, rfl⟩)
     funext t
-    have key :=
-      eigenBC_relation s (fun i => (r a).mulVec (l i) t - τ a * l i t) (φ k) (by
-        have h1 := congrFun (he a) t
-        rw [← hg, Matrix.mulVec_sum, Finset.smul_sum, Finset.sum_apply, Finset.sum_apply,
-            ← sub_eq_zero, ← Finset.sum_sub_distrib]
-          at h1
-        rw [← h1]
-        refine Finset.sum_congr rfl fun i _ => ?_
-        rw [← hlg i, Matrix.mulVec_smul, hmap]
-        show (s i : K') * j _ = (s i : K') * j _ - j (τ a) * ((s i : K') * j (l i t))
-        rw [map_sub, map_mul]
-        ring)
-    rw [Matrix.mulVec_sum, Finset.smul_sum, Finset.sum_apply, Finset.sum_apply, ← sub_eq_zero,
-      ← Finset.sum_sub_distrib, ← key]
+    have key := eigenBC_relation s (fun i => (r a).mulVec (l i) t - τ a * l i t) (φ k) (by
+      have h1 := congrFun (he a) t
+      rw [← hg, Matrix.mulVec_sum, Finset.smul_sum, Finset.sum_apply, Finset.sum_apply,
+        ← sub_eq_zero, ← Finset.sum_sub_distrib] at h1
+      rw [← h1]
+      refine Finset.sum_congr rfl fun i _ => ?_
+      rw [← hlg i, Matrix.mulVec_smul, hmap]
+      show (s i : K') * j _ = (s i : K') * j _ - j (τ a) * ((s i : K') * j (l i t))
+      rw [map_sub, map_mul]; ring)
+    rw [Matrix.mulVec_sum, Finset.smul_sum, Finset.sum_apply, Finset.sum_apply,
+        ← sub_eq_zero, ← Finset.sum_sub_distrib, ← key]
     refine Finset.sum_congr rfl fun i _ => ?_
     rw [Matrix.mulVec_smul]
     show ((φ k (s i) : 𝓞 K) : K) * _ - τ a * (((φ k (s i) : 𝓞 K) : K) * l i t) = _

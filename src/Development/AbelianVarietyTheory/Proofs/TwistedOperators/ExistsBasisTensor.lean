@@ -1,7 +1,56 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.BlockTheory.TwistedDiscreteSeries.SemilinearExtensionBases
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+public import Mathlib.LinearAlgebra.Dimension.OrzechProperty
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
+public import Mathlib.LinearAlgebra.Basis.Basic
+public import Mathlib.LinearAlgebra.Dimension.Finrank
+public import Mathlib.RingTheory.TensorProduct.Free
 
 @[expose] public section
 
@@ -16,13 +65,12 @@ open GlobalTheory.IndefiniteRowSideFullHecke.SemilinearExtensionBases
 
 section
 
-variable
-  {O K K'' : Type} [CommRing O] [Field K] [Algebra O K] [IsFractionRing O K] [Field K'']
-  [Algebra O K''] [Algebra K K''] [IsScalarTower O K K'']
+variable {O K K'' : Type} [CommRing O] [Field K] [Algebra O K] [IsFractionRing O K]
+  [Field K''] [Algebra O K''] [Algebra K K''] [IsScalarTower O K K'']
   {Fm : Type} [AddCommGroup Fm] [Module K Fm] [Module O Fm] [IsScalarTower O K Fm]
 
-theorem algebraMap_tmul (c : K) (m : Fm)
-    : algebraMap K K'' c ⊗ₜ[O] m = (1 : K'') ⊗ₜ[O] (c • m) := by
+theorem algebraMap_tmul (c : K) (m : Fm) :
+    algebraMap K K'' c ⊗ₜ[O] m = (1 : K'') ⊗ₜ[O] (c • m) := by
   obtain ⟨⟨a, b⟩, hc⟩ := IsLocalization.mk'_surjective (nonZeroDivisors O) c
   dsimp only at hc
   subst hc
@@ -35,46 +83,35 @@ theorem algebraMap_tmul (c : K) (m : Fm)
   have h3 : (b : O) • algebraMap K K'' (IsLocalization.mk' K a b) = (a : O) • (1 : K'') := by
     rw [Algebra.smul_def, Algebra.smul_def, mul_one, IsScalarTower.algebraMap_apply O K K'' (b : O),
       IsScalarTower.algebraMap_apply O K K'' a, ← map_mul, IsLocalization.mk'_spec']
-  calc
-    algebraMap K K'' (IsLocalization.mk' K a b) ⊗ₜ[O] m
+  calc algebraMap K K'' (IsLocalization.mk' K a b) ⊗ₜ[O] m
       = algebraMap K K'' (IsLocalization.mk' K a b) ⊗ₜ[O] ((b : O) • m₀) := by rw [h1]
     _ = ((b : O) • algebraMap K K'' (IsLocalization.mk' K a b)) ⊗ₜ[O] m₀ :=
-      (TensorProduct.smul_tmul _ _ _).symm
+        (TensorProduct.smul_tmul _ _ _).symm
     _ = ((a : O) • (1 : K'')) ⊗ₜ[O] m₀ := by rw [h3]
     _ = (1 : K'') ⊗ₜ[O] ((a : O) • m₀) := TensorProduct.smul_tmul _ _ _
     _ = (1 : K'') ⊗ₜ[O] (IsLocalization.mk' K a b • m) := by rw [h2]
 
-theorem exists_basis_tensor {ι : Type} (b : Basis ι K Fm)
-    : ∃ c : Basis ι K'' (K'' ⊗[O] Fm), ∀ i, c i = (1 : K'') ⊗ₜ[O] b i := by
-  have : TensorProduct.CompatibleSMul O K K'' Fm :=
-    ⟨fun c x m => by
-      rw [Algebra.smul_def, mul_comm, ← smul_eq_mul x, ← TensorProduct.smul_tmul', algebraMap_tmul,
-        TensorProduct.smul_tmul', smul_eq_mul, mul_one]⟩
-  refine ⟨
-    (Algebra.TensorProduct.basis K'' b).map (TensorProduct.equivOfCompatibleSMul O K K'' K'' Fm),
-    fun i => ?_
-  ⟩
+theorem exists_basis_tensor {ι : Type} (b : Basis ι K Fm) :
+    ∃ c : Basis ι K'' (K'' ⊗[O] Fm), ∀ i, c i = (1 : K'') ⊗ₜ[O] b i := by
+  have : TensorProduct.CompatibleSMul O K K'' Fm := ⟨fun c x m => by
+    rw [Algebra.smul_def, mul_comm, ← smul_eq_mul x, ← TensorProduct.smul_tmul', algebraMap_tmul,
+      TensorProduct.smul_tmul', smul_eq_mul, mul_one]⟩
+  refine ⟨(Algebra.TensorProduct.basis K'' b).map (TensorProduct.equivOfCompatibleSMul O K K'' K'' Fm),
+    fun i => ?_⟩
   rw [Basis.map_apply, Algebra.TensorProduct.basis_apply]
   rfl
 
 end
 
-def extOfBasis
-    {L L' V V' : Type}
-    [Field L] [Field L'] [AddCommGroup V] [Module L V] [AddCommGroup V'] [Module L' V']
-    (σ : L →+* L')
-    {n : ℕ} (B : Basis (Fin n) L V) (w : Fin n → V')
-    : V →ₛₗ[σ] V' where
+def extOfBasis {L L' V V' : Type} [Field L] [Field L'] [AddCommGroup V] [Module L V] [AddCommGroup V'] [Module L' V']
+    (σ : L →+* L') {n : ℕ} (B : Basis (Fin n) L V) (w : Fin n → V') : V →ₛₗ[σ] V' where
   toFun x := ∑ k, σ (B.repr x k) • w k
   map_add' x y := by simp [add_smul, Finset.sum_add_distrib]
   map_smul' a x := by simp [mul_smul, Finset.smul_sum]
 
-theorem extOfBasis_basis
-    {L L' V V' : Type}
-    [Field L] [Field L'] [AddCommGroup V] [Module L V] [AddCommGroup V'] [Module L' V']
-    (σ : L →+* L')
-    {n : ℕ} (B : Basis (Fin n) L V) (w : Fin n → V') (k : Fin n)
-    : extOfBasis σ B w (B k) = w k := by
+theorem extOfBasis_basis {L L' V V' : Type} [Field L] [Field L'] [AddCommGroup V] [Module L V] [AddCommGroup V']
+    [Module L' V'] (σ : L →+* L') {n : ℕ} (B : Basis (Fin n) L V) (w : Fin n → V') (k : Fin n) :
+    extOfBasis σ B w (B k) = w k := by
   show ∑ j, σ (B.repr (B k) j) • w j = w k
   rw [B.repr_self, Finset.sum_eq_single k]
   · simp
@@ -83,13 +120,9 @@ theorem extOfBasis_basis
   · intro h
     exact absurd (Finset.mem_univ k) h
 
-theorem carries_of_basis
-    {L L' V V' : Type}
-    [Field L] [Field L'] [AddCommGroup V] [Module L V] [AddCommGroup V'] [Module L' V']
-    {σ : L →+* L'} (e : V →ₛₗ[σ] V')
-    {n : ℕ} (B : Basis (Fin n) L V) (C : Basis (Fin n) L' V') (h : ∀ k, e (B k) = C k)
-    {ι : Type} (b : Basis ι L V)
-    : ∃ c : Basis ι L' V', ∀ i, c i = e (b i) := by
+theorem carries_of_basis {L L' V V' : Type} [Field L] [Field L'] [AddCommGroup V] [Module L V] [AddCommGroup V']
+    [Module L' V'] {σ : L →+* L'} (e : V →ₛₗ[σ] V') {n : ℕ} (B : Basis (Fin n) L V) (C : Basis (Fin n) L' V')
+    (h : ∀ k, e (B k) = C k) {ι : Type} (b : Basis ι L V) : ∃ c : Basis ι L' V', ∀ i, c i = e (b i) := by
   classical
   have : Module.Finite L V := Module.Finite.of_basis B
   have : Module.Finite L' V' := Module.Finite.of_basis C
@@ -98,8 +131,8 @@ theorem carries_of_basis
   have hspan : ⊤ ≤ Submodule.span L' (Set.range fun i => e (b i)) := by
     rw [← C.span_eq, Submodule.span_le]
     rintro _ ⟨k, rfl⟩
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← h k, ← b.sum_repr (B k), map_sum]
+
+    rw [← h k, ← b.sum_repr (B k), map_sum]
     refine Submodule.sum_mem _ fun i _ => ?_
     rw [map_smulₛₗ]
     exact Submodule.smul_mem _ _ (Submodule.subset_span ⟨i, rfl⟩)
@@ -118,42 +151,37 @@ theorem semilinearExtension : SemilinearExtension := by
   obtain ⟨c, hc⟩ := exists_basis_tensor (O := O) (K'' := K'') bF
   have hck : ∀ k, c k = (1 : K'') ⊗ₜ[O] eF.symm ((1 : K) ⊗ₜ[Ks] BK k) := fun k => by
     rw [hc, Basis.map_apply, Algebra.TensorProduct.basis_apply]
-  have hscal
-      : ∀ (a : Ks) (m : Fm),
-        emb (algebraMap Ks LL a) ⊗ₜ[O] m = (1 : K'') ⊗ₜ[O] (algebraMap Ks K a • m) := by
+  have hscal : ∀ (a : Ks) (m : Fm),
+      emb (algebraMap Ks LL a) ⊗ₜ[O] m = (1 : K'') ⊗ₜ[O] (algebraMap Ks K a • m) := by
     intro a m
     rw [← RingHom.comp_apply emb (algebraMap Ks LL) a, hemb, RingHom.comp_apply, algebraMap_tmul]
-  have hf
-      : ∀ e : WL →ₛₗ[emb] K'' ⊗[O] Fm,
-        (∀ k, e (bv k) = (1 : K'') ⊗ₜ[O] eF.symm ((1 : K) ⊗ₜ[Ks] BK k))
-          → ∀ f : WK, e f = (1 : K'') ⊗ₜ[O] eF.symm ((1 : K) ⊗ₜ[Ks] f) := by
+  have hf : ∀ e : WL →ₛₗ[emb] K'' ⊗[O] Fm,
+      (∀ k, e (bv k) = (1 : K'') ⊗ₜ[O] eF.symm ((1 : K) ⊗ₜ[Ks] BK k)) →
+      ∀ f : WK, e f = (1 : K'') ⊗ₜ[O] eF.symm ((1 : K) ⊗ₜ[Ks] f) := by
     intro e he f
-    have hterm
-        : ∀ (r : Ks) (j : Fin n),
-          e (r • bv j) = (1 : K'') ⊗ₜ[O] eF.symm ((1 : K) ⊗ₜ[Ks] (r • BK j)) := by
+    have hterm : ∀ (r : Ks) (j : Fin n),
+        e (r • bv j) = (1 : K'') ⊗ₜ[O] eF.symm ((1 : K) ⊗ₜ[Ks] (r • BK j)) := by
       intro r j
-      rw [← algebraMap_smul LL r (bv j), map_smulₛₗ, he, TensorProduct.smul_tmul', smul_eq_mul,
-        mul_one, hscal, ← map_smul, TensorProduct.smul_tmul', smul_eq_mul, mul_one,
-        Algebra.algebraMap_eq_smul_one, TensorProduct.smul_tmul]
+      rw [← algebraMap_smul LL r (bv j), map_smulₛₗ, he, TensorProduct.smul_tmul', smul_eq_mul, mul_one,
+        hscal, ← map_smul, TensorProduct.smul_tmul', smul_eq_mul, mul_one, Algebra.algebraMap_eq_smul_one,
+        TensorProduct.smul_tmul]
     have hsum : (f : WL) = ∑ j, BK.repr f j • bv j := by
       conv_lhs => rw [← BK.sum_repr f]
       simp only [Submodule.coe_sum, Submodule.coe_smul, hBK]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hsum, map_sum]
+
+    rw [hsum, map_sum]
     simp_rw [hterm]
-    set_option synthInstance.maxHeartbeats 100000 in
+
     rw [← TensorProduct.tmul_sum, ← map_sum eF.symm, ← TensorProduct.tmul_sum, BK.sum_repr]
-  have hext
-      : ∀ e : WL →ₛₗ[emb] K'' ⊗[O] Fm,
-        (∀ k, e (bv k) = (1 : K'') ⊗ₜ[O] eF.symm ((1 : K) ⊗ₜ[Ks] BK k)) → IsExt O emb eF e := by
+  have hext : ∀ e : WL →ₛₗ[emb] K'' ⊗[O] Fm,
+      (∀ k, e (bv k) = (1 : K'') ⊗ₜ[O] eF.symm ((1 : K) ⊗ₜ[Ks] BK k)) → IsExt O emb eF e := by
     intro e he ι _ a f
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     refine Finset.sum_congr rfl fun i _ => ?_
     rw [map_smulₛₗ, hf e he, TensorProduct.smul_tmul', smul_eq_mul, mul_one]
-  have hval
-      : ∀ e : WL →ₛₗ[emb] K'' ⊗[O] Fm,
-        IsExt O emb eF e → ∀ k, e (bv k) = (1 : K'') ⊗ₜ[O] eF.symm ((1 : K) ⊗ₜ[Ks] BK k) := by
+  have hval : ∀ e : WL →ₛₗ[emb] K'' ⊗[O] Fm, IsExt O emb eF e →
+      ∀ k, e (bv k) = (1 : K'') ⊗ₜ[O] eF.symm ((1 : K) ⊗ₜ[Ks] BK k) := by
     intro e he k
     rw [← hBK]
     exact he.apply_coe (BK k)

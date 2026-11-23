@@ -1,17 +1,50 @@
 module
 
-public import Mathlib
-public import Formalism.LocalRingCardinality.RhoDetPrimeEqMuTildeMulChiPow
-public import Formalism.SharpRestriction.LevelLetterCocycles.LocalSituation
-public import Formalism.LocalRingCardinality.AdicCompletionLocal.LocTied
-public import Development.AbelianVarietyTheory.Definitions.Foundations.HTBasis
-public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.ExpStar
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.PowMulMemLatIff
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.BoundedAndEventuallySubMemLatStatement
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.AinfMuFrobeniusEquationSolvableAndTendstoStatement
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.BoundedAndEventuallySubMemLatStatement
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsLiftsOfNormLeOneStatement
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.MemDeRhamFiltrationOfForallAinfLatticeStatement
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.TeichmullerEpsilonRootPowSubZetaExpMemFiltrationStatement
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsLiftsOfNormLeOneStatement
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Int
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -19,9 +52,7 @@ noncomputable section
 
 namespace GlobalTheory.ExpImage.Tail
 
-open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc
-  Formalism.MainNotions.N Formalism.MainNotions.LocalSituation GlobalTheory.Cyc
-  GlobalTheory.ExpImage
+open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N Formalism.MainNotions.LocalSituation GlobalTheory.Cyc GlobalTheory.ExpImage
 
 variable {l : ℕ} [Fact l.Prime] {P : LocPrime l} {AI : LocAinf l P} {K : FinExt l}
 
@@ -34,31 +65,29 @@ theorem Fr_succ (n : ℕ) (a : Ainf l) : Fr l (n + 1) a = WittVector.frobenius (
 theorem Fr_succ' (n : ℕ) (a : Ainf l) : Fr l (n + 1) a = Fr l n (WittVector.frobenius a) := by
   rw [Fr, pow_succ]; rfl
 
-theorem frob_teich (x : OCb l)
-    : WittVector.frobenius (WittVector.teichmuller l x) = WittVector.teichmuller l x ^ l := by
+theorem frob_teich (x : OCb l) :
+    WittVector.frobenius (WittVector.teichmuller l x) = WittVector.teichmuller l x ^ l := by
   rw [WittVector.frobenius_eq_map_frobenius, WittVector.map_teichmuller, frobenius_def, map_pow]
 
-theorem Fr_teich (n : ℕ) (x : OCb l)
-    : Fr l n (WittVector.teichmuller l x) = WittVector.teichmuller l x ^ l ^ n := by
+theorem Fr_teich (n : ℕ) (x : OCb l) :
+    Fr l n (WittVector.teichmuller l x) = WittVector.teichmuller l x ^ l ^ n := by
   induction n with
   | zero => simp [Fr]
   | succ n ih => rw [Fr_succ, ih, map_pow, frob_teich, ← pow_mul, pow_succ']
 
-theorem lifts_Fr {w : Ainf l} {c : ↥(K0 K)} (h : Lifts AI K w c) (n : ℕ)
-    : Lifts AI K (Fr l n w) ((frK P K ^ n) c) := by
+theorem lifts_Fr {w : Ainf l} {c : ↥(K0 K)} (h : Lifts AI K w c) (n : ℕ) :
+    Lifts AI K (Fr l n w) ((frK P K ^ n) c) := by
   induction n with
   | zero => simpa [Fr] using h
   | succ n ih =>
     rw [Fr_succ, pow_succ']
     exact ih.frob
 
-theorem lifts_sum
-    {ι : Type}
-    (T : Finset ι) (w : ι → Ainf l) (c : ι → ↥(K0 K)) (h : ∀ i ∈ T, Lifts AI K (w i) (c i))
-    : Lifts AI K (∑ i ∈ T, w i) (∑ i ∈ T, c i) := by
+theorem lifts_sum {ι : Type} (T : Finset ι) (w : ι → Ainf l) (c : ι → ↥(K0 K))
+    (h : ∀ i ∈ T, Lifts AI K (w i) (c i)) : Lifts AI K (∑ i ∈ T, w i) (∑ i ∈ T, c i) := by
   unfold Lifts at h ⊢
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum, map_sum]
+
+  rw [map_sum, map_sum]
   exact Finset.sum_congr rfl h
 
 def oK (P : LocPrime l) (K : FinExt l) : ↥(K0 K) →+* P.R.BdR :=
@@ -72,17 +101,17 @@ theorem u_mem (j : ℕ) : u P j ∈ FilB P 0 := by
   refine qB_mul_mem _ (FilB_anti ?_ (FilB_pow tD_mem j))
   simp
 
-theorem taylor0 (hT : LocTied l P AI) (m M : ℕ)
-    : io AI (WittVector.teichmuller l AI.ε ^ m) - ∑ j ∈ Finset.range M, (m : P.R.BdR) ^ j * u P j
-      ∈ FilB P (M : ℤ) := by
+theorem taylor0 (hT : LocTied l P AI) (m M : ℕ) :
+    io AI (WittVector.teichmuller l AI.ε ^ m) - ∑ j ∈ Finset.range M, (m : P.R.BdR) ^ j * u P j ∈
+      FilB P (M : ℤ) := by
   have h := GlobalTheory.T.teichmullerEpsilonRoot_pow_sub_zeta_exp_mem_filtration l P AI hT 0 m M
   rw [P.ζQ_zero, one_pow, map_one, one_mul] at h
   convert h using 3 with j hj
   · rfl
   · rw [pow_zero, div_one, div_eq_mul_inv, map_mul, map_pow, map_natCast, u, mul_assoc]
 
-theorem span_mem_Lat {M n : ℕ} {a : Ainf l} (ha : a ∈ Ideal.span {((l : ℕ) : Ainf l) ^ n, AI.ξ ^ M})
-    : io AI a ∈ Lat AI M n := by
+theorem span_mem_Lat {M n : ℕ} {a : Ainf l}
+    (ha : a ∈ Ideal.span {((l : ℕ) : Ainf l) ^ n, AI.ξ ^ M}) : io AI a ∈ Lat AI M n := by
   obtain ⟨x, y, rfl⟩ := Ideal.mem_span_pair.mp ha
   refine ⟨x, ?_⟩
   have h := FilB_zero_mul (io_mem AI y) (FilB_pow (io_ξ_mem AI) M)
@@ -91,21 +120,15 @@ theorem span_mem_Lat {M n : ℕ} {a : Ainf l} (ha : a ∈ Ideal.span {((l : ℕ)
   simp only [map_add (f := _), map_mul, map_pow]
   ring
 
-theorem tail
-    (l : ℕ) [Fact l.Prime]
-    (P : LocPrime l) (AI : LocAinf l P) (hT : LocTied l P AI)
-    (K : FinExt l) (ι : Type) (T : Finset ι) (w : ι → Ainf l) (c : ι → ↥(K0 K)) (m : ι → ℕ)
-    (M : ℕ) (d : ℕ → ↥(K0 K))
-    (hM : 1 ≤ M) (hw : ∀ i ∈ T, Lifts AI K (w i) (c i))
-    (hd : ∀ j < M,
-      ‖(d j : Om l)‖ ≤ 1
-        ∧ d j - (l : ↥(K0 K)) ^ j * frK P K (d j) = ∑ i ∈ T, c i * (m i : ↥(K0 K)) ^ j)
-    : ∃ y : Ainf l,
-      y - WittVector.frobenius y = ∑ i ∈ T, w i * WittVector.teichmuller l AI.ε ^ m i
-        ∧ io AI y
-            - ∑ j ∈ Finset.range M,
-              qB P ((j.factorial : ℚ_[l])⁻¹) * oB P (d j : Om l) * tD P ^ j
-          ∈ FilB P (M : ℤ) := by
+theorem tail (l : ℕ) [Fact l.Prime] (P : LocPrime l) (AI : LocAinf l P) (hT : LocTied l P AI)
+    (K : FinExt l) (ι : Type) (T : Finset ι) (w : ι → Ainf l) (c : ι → ↥(K0 K)) (m : ι → ℕ) (M : ℕ)
+    (d : ℕ → ↥(K0 K)) (hM : 1 ≤ M) (hw : ∀ i ∈ T, Lifts AI K (w i) (c i))
+    (hd : ∀ j < M, ‖(d j : Om l)‖ ≤ 1 ∧
+      d j - (l : ↥(K0 K)) ^ j * frK P K (d j) = ∑ i ∈ T, c i * (m i : ↥(K0 K)) ^ j) :
+    ∃ y : Ainf l, y - WittVector.frobenius y =
+        ∑ i ∈ T, w i * WittVector.teichmuller l AI.ε ^ m i ∧
+      io AI y - ∑ j ∈ Finset.range M,
+        qB P ((j.factorial : ℚ_[l])⁻¹) * oB P (d j : Om l) * tD P ^ j ∈ FilB P (M : ℤ) := by
   have hD : ∀ j, ∃ D : Ainf l, j < M → Lifts AI K D (d j) := by
     intro j
     by_cases hj : j < M
@@ -125,54 +148,47 @@ theorem tail
     rwa [one_pow] at this
   obtain ⟨hc1, hc2⟩ := GlobalTheory.T.ainf_mu_frobenius_equation_solvable_and_tendsto l P AI
   obtain ⟨y', hy'⟩ := hc1 q
-  have hy
-      : (D 0 + AI.μ * y') - WittVector.frobenius (D 0 + AI.μ * y')
-        = ∑ i ∈ T, w i * WittVector.teichmuller l AI.ε ^ m i := by
+  have hy : (D 0 + AI.μ * y') - WittVector.frobenius (D 0 + AI.μ * y') =
+      ∑ i ∈ T, w i * WittVector.teichmuller l AI.ε ^ m i := by
     simp only [mul_sub, mul_one, Finset.sum_sub_distrib] at hq
     rw [map_add (f := _)]
     linear_combination h0 + hy' - hq
   refine ⟨D 0 + AI.μ * y', hy, ?_⟩
   set y := D 0 + AI.μ * y' with hydef
-  let E : ℕ → P.R.BdR := fun n =>
-    io AI (Fr l n y)
-      - ∑ j ∈ Finset.range M, (l : P.R.BdR) ^ (j * n) * oK P K ((frK P K ^ n) (d j)) * u P j
+  let E : ℕ → P.R.BdR := fun n => io AI (Fr l n y) -
+    ∑ j ∈ Finset.range M, (l : P.R.BdR) ^ (j * n) * oK P K ((frK P K ^ n) (d j)) * u P j
   have hstep : ∀ n, E n - E (n + 1) ∈ FilB P (M : ℤ) := by
     intro n
-    have h1
-        : io AI (Fr l n y) - io AI (Fr l (n + 1) y)
-          = ∑ i ∈ T, oK P K ((frK P K ^ n) (c i)) *
-              io AI (WittVector.teichmuller l AI.ε ^ (m i * l ^ n)) := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [Fr_succ', ← map_sub, ← map_sub, hy, map_sum, map_sum]
+    have h1 : io AI (Fr l n y) - io AI (Fr l (n + 1) y) =
+        ∑ i ∈ T, oK P K ((frK P K ^ n) (c i)) *
+          io AI (WittVector.teichmuller l AI.ε ^ (m i * l ^ n)) := by
+
+      rw [Fr_succ', ← map_sub, ← map_sub, hy, map_sum, map_sum]
       refine Finset.sum_congr rfl fun i hi => ?_
       rw [map_mul, map_mul, (lifts_Fr (hw i hi) n).io_eq, map_pow (Fr l n), Fr_teich, ← pow_mul,
         mul_comm (l ^ n), oK_apply]
-    have h2
-        : ∀ j ∈ Finset.range M,
-          (l : P.R.BdR) ^ (j * n) * oK P K ((frK P K ^ n) (d j)) * u P j
-              - (l : P.R.BdR) ^ (j * (n + 1)) * oK P K ((frK P K ^ (n + 1)) (d j)) * u P j
-            = ∑ i ∈ T, oK P K ((frK P K ^ n) (c i)) * (((m i * l ^ n : ℕ) : P.R.BdR) ^ j * u P j) :=
-      by
-        intro j hj
-        have h3 := congrArg (fun x => oK P K ((frK P K ^ n) x)) (hd j (Finset.mem_range.mp hj)).2
-        set_option synthInstance.maxHeartbeats 100000 in
-          simp only [map_sub, map_mul, map_pow, map_natCast, map_sum] at h3
-        have h4 : (frK P K ^ (n + 1)) (d j) = (frK P K ^ n) (frK P K (d j)) := by rw [pow_succ]; rfl
-        have h5
-            : ∑ i ∈ T, oK P K ((frK P K ^ n) (c i)) * (((m i * l ^ n : ℕ) : P.R.BdR) ^ j * u P j)
-              = (l : P.R.BdR) ^ (j * n) * u P j
-                * ∑ i ∈ T, oK P K ((frK P K ^ n) (c i)) * (m i : P.R.BdR) ^ j := by
-          rw [Finset.mul_sum]
-          refine Finset.sum_congr rfl fun i _ => ?_
-          push_cast
-          ring
-        rw [h4, h5, ← h3]
+    have h2 : ∀ j ∈ Finset.range M,
+        (l : P.R.BdR) ^ (j * n) * oK P K ((frK P K ^ n) (d j)) * u P j -
+          (l : P.R.BdR) ^ (j * (n + 1)) * oK P K ((frK P K ^ (n + 1)) (d j)) * u P j =
+        ∑ i ∈ T, oK P K ((frK P K ^ n) (c i)) * (((m i * l ^ n : ℕ) : P.R.BdR) ^ j * u P j) := by
+      intro j hj
+      have h3 := congrArg (fun x => oK P K ((frK P K ^ n) x)) (hd j (Finset.mem_range.mp hj)).2
+
+      simp only [map_sub, map_mul, map_pow, map_natCast, map_sum] at h3
+      have h4 : (frK P K ^ (n + 1)) (d j) = (frK P K ^ n) (frK P K (d j)) := by
+        rw [pow_succ]; rfl
+      have h5 : ∑ i ∈ T, oK P K ((frK P K ^ n) (c i)) * (((m i * l ^ n : ℕ) : P.R.BdR) ^ j * u P j)
+          = (l : P.R.BdR) ^ (j * n) * u P j *
+            ∑ i ∈ T, oK P K ((frK P K ^ n) (c i)) * (m i : P.R.BdR) ^ j := by
+        rw [Finset.mul_sum]
+        refine Finset.sum_congr rfl fun i _ => ?_
+        push_cast
         ring
-    have h6
-        : E n - E (n + 1)
-          = ∑ i ∈ T, oK P K ((frK P K ^ n) (c i)) *
-            (io AI (WittVector.teichmuller l AI.ε ^ (m i * l ^ n)) -
-              ∑ j ∈ Finset.range M, ((m i * l ^ n : ℕ) : P.R.BdR) ^ j * u P j) := by
+      rw [h4, h5, ← h3]
+      ring
+    have h6 : E n - E (n + 1) = ∑ i ∈ T, oK P K ((frK P K ^ n) (c i)) *
+        (io AI (WittVector.teichmuller l AI.ε ^ (m i * l ^ n)) -
+          ∑ j ∈ Finset.range M, ((m i * l ^ n : ℕ) : P.R.BdR) ^ j * u P j) := by
       simp only [mul_sub, Finset.sum_sub_distrib, Finset.mul_sum]
       rw [← h1, Finset.sum_comm, ← Finset.sum_congr rfl h2, Finset.sum_sub_distrib]
       simp only [E]
@@ -199,17 +215,13 @@ theorem tail
       obtain ⟨M', rfl⟩ := Nat.exists_eq_add_of_le' hM
       have e0 : oK P K ((frK P K ^ n) (d 0)) = io AI (Fr l n (D 0)) := by
         rw [oK_apply, (lifts_Fr (hD 0 hM) n).io_eq]
-      have e1
-          : E n
-            = io AI (Fr l n y') * io AI (Fr l n AI.μ)
-              - ∑ j ∈ Finset.range M',
-                (l : P.R.BdR) ^ ((j + 1) * n) * oK P K ((frK P K ^ n) (d (j + 1))) * u P (j + 1) :=
-        by
-          simp only [E, hydef]
-          rw [Finset.sum_range_succ', e0]
-          simp only [map_add (f := _), map_mul, u, zero_mul, pow_zero, Nat.factorial_zero,
-            Nat.cast_one, inv_one, map_one]
-          ring
+      have e1 : E n = io AI (Fr l n y') * io AI (Fr l n AI.μ) - ∑ j ∈ Finset.range M',
+          (l : P.R.BdR) ^ ((j + 1) * n) * oK P K ((frK P K ^ n) (d (j + 1))) * u P (j + 1) := by
+        simp only [E, hydef]
+        rw [Finset.sum_range_succ', e0]
+        simp only [map_add (f := _), map_mul, u, zero_mul, pow_zero, Nat.factorial_zero, Nat.cast_one,
+          inv_one, map_one]
+        ring
       rw [e1]
       refine sub_mem (io_mul_mem_Lat AI _ (span_mem_Lat ?_)) (sum_mem fun j hj => ?_)
       · have := hk₀ n (Nat.le_add_right _ _)

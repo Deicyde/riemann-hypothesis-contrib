@@ -1,23 +1,62 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicArithmetic.AutomorphicVarieties.AlgebraTools.CotInd
 public import Development.AutomorphicArithmetic.AutomorphicVarieties.AlgebraTools.DetLocus
-public import Development.AutomorphicArithmetic.AutomorphicVarieties.AlgebraTools.CaDetKerLe
-public import Development.AutomorphicArithmetic.AutomorphicVarieties.AlgebraTools.CaDetKerPrime
-public import Development.AutomorphicArithmetic.AutomorphicVarieties.AlgebraTools.CaDetKerIndep
+public import Mathlib.RingTheory.RegularLocalRing.Defs
 public import Development.AutomorphicArithmetic.AutomorphicVarieties.AlgebraTools.CaDetField
+public import Development.AutomorphicArithmetic.AutomorphicVarieties.AlgebraTools.CaDetKerIndep
+import Development.AutomorphicArithmetic.AutomorphicVarieties.AlgebraTools.CaDetKerLe
+public import Development.AutomorphicArithmetic.AutomorphicVarieties.AlgebraTools.CaDetKerPrime
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+public import Mathlib.RingTheory.Valuation.LocalSubring
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
 open IsLocalRing UpperTheory.V.AlgebraTools
 
-theorem UpperTheory.V.AlgebraTools.exists_least_prime_detIdeal
-    : ∀ (P : Type) [CommRing P] [IsRegularLocalRing P] (ι : Type) [Fintype ι] [DecidableEq ι]
-        (z : Matrix ι ι P) (m : ι → P),
-      CotInd P (Sum.elim (fun ij : ι × ι => z ij.1 ij.2) m) → Nonempty ι
-        → ∃ K : Ideal P,
-          K.IsPrime ∧ detIdeal z m ≤ K ∧ ∀ Q : Ideal P, Q.IsPrime → detIdeal z m ≤ Q → K ≤ Q := by
+theorem UpperTheory.V.AlgebraTools.exists_least_prime_detIdeal :
+    ∀ (P : Type) [CommRing P] [IsRegularLocalRing P] (ι : Type) [Fintype ι] [DecidableEq ι] (z : Matrix ι ι P) (m : ι → P),
+      CotInd P (Sum.elim (fun ij : ι × ι => z ij.1 ij.2) m) → Nonempty ι →
+      ∃ K : Ideal P, K.IsPrime ∧ detIdeal z m ≤ K ∧ ∀ Q : Ideal P, Q.IsPrime → detIdeal z m ≤ Q → K ≤ Q := by
   intro P _ _ ι _ _ z m h hι
   obtain ⟨c0⟩ := id hι
   refine ⟨genKer z m c0, (genKer_isPrime P ι z m h c0).1, (genKer_isPrime P ι z m h c0).2, ?_⟩
@@ -32,9 +71,10 @@ theorem UpperTheory.V.AlgebraTools.exists_least_prime_detIdeal
   obtain ⟨V, hV, hloc⟩ := IsLocalRing.exists_factor_valuationRing f
   have h1 : (z.map f).mulVec (fun j => f (m j)) = 0 := by
     funext i
-    have hi : z.mulVec m i ∈ Q := hle (Ideal.mem_sup_left (Ideal.subset_span ⟨i, rfl⟩))
+    have hi : z.mulVec m i ∈ Q :=
+      hle (Ideal.mem_sup_left (Ideal.subset_span ⟨i, rfl⟩))
     have h2 := (hf _).2 hi
-    set_option synthInstance.maxHeartbeats 100000 in
+
     simpa [Matrix.mulVec, dotProduct, map_sum, map_mul] using h2
   have h2 : (z.map f).det = 0 := by
     have hi : z.det ∈ Q := hle (Ideal.mem_sup_right (Ideal.subset_span rfl))
@@ -43,16 +83,12 @@ theorem UpperTheory.V.AlgebraTools.exists_least_prime_detIdeal
     exact h3
   obtain ⟨c, l, hc, hl, hz, hm⟩ := exists_kernel_vector _ V ι (z.map f) (fun j => f (m j)) h1 h2
   haveI : IsLocalRing V.toSubring := inferInstanceAs (IsLocalRing V)
-  have hk :=
-    genKer_le_ker P ι z m h c V.toSubring (f.codRestrict V.toSubring hV)
-      (fun j => ⟨l j, hl j⟩)
-      (Subtype.ext hc)
-      (by
-        funext i
-        apply Subtype.ext
-        have h4 := congrFun hz i
-        simpa [Matrix.mulVec, dotProduct] using h4)
-      (fun j => Subtype.ext (hm j))
+  have hk := genKer_le_ker P ι z m h c V.toSubring (f.codRestrict V.toSubring hV)
+    (fun j => ⟨l j, hl j⟩) (Subtype.ext hc) (by
+      funext i
+      apply Subtype.ext
+      have h4 := congrFun hz i
+      simpa [Matrix.mulVec, dotProduct] using h4) (fun j => Subtype.ext (hm j))
   rw [genKer_eq P ι z m h c0 c]
   intro x hx
   have h5 := hk hx

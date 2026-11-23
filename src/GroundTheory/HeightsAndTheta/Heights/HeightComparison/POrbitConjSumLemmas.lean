@@ -1,8 +1,57 @@
 module
 
-public import Mathlib
-public import GroundTheory.HeightsAndTheta.Heights.HeightComparison.HeightOrbitConjSum
+public import GroundTheory.HeightsAndTheta.Heights.HeightComparison.HeightObjects
+public import GroundTheory.HeightsAndTheta.Heights.HeightComparison.HeightPtsIntegralPoints
+public import GroundTheory.HeightsAndTheta.Heights.HeightComparison.POrbitDegree
 public import GroundTheory.HeightsAndTheta.Heights.HeightsOfSets.FieldChange
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -60,8 +109,8 @@ theorem mem_orbitIdeal_of_homog
         = C (aeval (flatCone x) f) * ∏ k, (X k : MvPolynomial ι (AlgebraicClosure ℚ)) ^ d k := by
     conv_lhs => rw [f.as_sum]
     conv_rhs => rw [f.as_sum]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, map_sum, map_sum, Finset.sum_mul]
+
+    rw [map_sum, map_sum, map_sum, Finset.sum_mul]
     refine Finset.sum_congr rfl fun m hm => ?_
     have hX
         : ∏ p : Coord n, (X p.1 : MvPolynomial ι (AlgebraicClosure ℚ)) ^ m p
@@ -161,8 +210,8 @@ theorem aeval_chartHomog
         = ∑ m ∈ P.support, aeval (fun p ↦ w p / w ⟨p.1, c p.1⟩) (monomial m (P.coeff m)) := by
     conv_lhs => rw [P.as_sum]
     exact map_sum _ _ _
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [hP, chartHomog, map_sum, Finset.mul_sum]
+
+  rw [hP, chartHomog, map_sum, Finset.mul_sum]
   refine Finset.sum_congr rfl fun m hm ↦ ?_
   have hden : ∏ p : Coord n, w ⟨p.1, c p.1⟩ ^ m p = ∏ k, w ⟨k, c k⟩ ^ ∑ i, m ⟨k, i⟩ := by
     rw [Fintype.prod_sigma]

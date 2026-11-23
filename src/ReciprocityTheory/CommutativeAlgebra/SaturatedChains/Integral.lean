@@ -1,49 +1,83 @@
 module
 
-public import ReciprocityTheory.CommutativeAlgebra.SaturatedChains.IsSaturatedChain
+public import Mathlib.RingTheory.IntegralClosure.Algebra.Defs
+public import Mathlib.RingTheory.KrullDimension.Basic
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.Order.CompletePartialOrder
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
+public import Mathlib.RingTheory.Ideal.GoingUp
 
 @[expose] public section
 
 namespace ReciprocityTheory.CA
 
-private theorem exists_prime_over_lemma
-    {A B : Type*} [CommRing A] [CommRing B] [Algebra A B] [Algebra.IsIntegral A B]
-    (p : Ideal A) [p.IsPrime]
-    (I : Ideal B) (hI : I.comap (algebraMap A B) ≤ p)
-    : ∃ Q : Ideal B, I ≤ Q ∧ Q.IsPrime ∧ Q.comap (algebraMap A B) = p := by
+private theorem exists_prime_over_lemma {A B : Type*} [CommRing A] [CommRing B] [Algebra A B]
+    [Algebra.IsIntegral A B] (p : Ideal A) [p.IsPrime] (I : Ideal B)
+    (hI : I.comap (algebraMap A B) ≤ p) :
+    ∃ Q : Ideal B, I ≤ Q ∧ Q.IsPrime ∧ Q.comap (algebraMap A B) = p := by
   first
   | exact Ideal.exists_ideal_over_prime_of_isIntegral p I hI
-  | exact Ideal.exists_ideal_over_prime_of_isIntegral_of_isPrime p I hI
-  | (
-      obtain ⟨Q, h1, h2, h3⟩ := Ideal.exists_ideal_over_prime_of_isIntegral p I hI
-      exact ⟨Q, h1, h2, h3⟩
-    )
 
-theorem exists_ltSeries_lift_of_isIntegral
-    {A B : Type*} [CommRing A] [CommRing B] [Algebra A B] [Algebra.IsIntegral A B]
-    (h : Function.Injective (algebraMap A B)) (l : LTSeries (PrimeSpectrum A))
-    : ∃ l' : LTSeries (PrimeSpectrum B),
-      l'.length = l.length ∧ l'.last.asIdeal.comap (algebraMap A B) = l.last.asIdeal := by
-  suffices H
-      : ∀ n, ∀ l : LTSeries (PrimeSpectrum A),
-        l.length = n
-          → ∃ l' : LTSeries (PrimeSpectrum B),
-            l'.length = l.length ∧ l'.last.asIdeal.comap (algebraMap A B) = l.last.asIdeal by
+theorem exists_ltSeries_lift_of_isIntegral {A B : Type*} [CommRing A] [CommRing B]
+    [Algebra A B] [Algebra.IsIntegral A B] (h : Function.Injective (algebraMap A B))
+    (l : LTSeries (PrimeSpectrum A)) :
+    ∃ l' : LTSeries (PrimeSpectrum B), l'.length = l.length ∧
+      l'.last.asIdeal.comap (algebraMap A B) = l.last.asIdeal := by
+  suffices H : ∀ n, ∀ l : LTSeries (PrimeSpectrum A), l.length = n →
+      ∃ l' : LTSeries (PrimeSpectrum B), l'.length = l.length ∧
+        l'.last.asIdeal.comap (algebraMap A B) = l.last.asIdeal by
     exact H _ l rfl
   intro n
   induction n with
   | zero =>
     intro l hl
-    obtain ⟨Q, -, hQ, hQc⟩ :=
-      exists_prime_over_lemma l.last.asIdeal ⊥ (by
-        first
-        | (rw [Ideal.comap_bot_of_injective _ h]; exact bot_le)
-        | (
-            intro y hy
-            rw [Ideal.mem_comap, Ideal.mem_bot] at hy
-            rw [show y = 0 from h (by rw [hy, map_zero])]
-            exact Ideal.zero_mem _
-          ))
+    obtain ⟨Q, -, hQ, hQc⟩ := exists_prime_over_lemma l.last.asIdeal ⊥ (by
+      first
+      | (rw [Ideal.comap_bot_of_injective _ h]; exact bot_le)
+      | (intro y hy
+         rw [Ideal.mem_comap, Ideal.mem_bot] at hy
+         rw [show y = 0 from h (by rw [hy, map_zero])]
+         exact Ideal.zero_mem _))
     refine ⟨RelSeries.singleton _ ⟨Q, hQ⟩, ?_, ?_⟩
     · simp [hl]
     · simpa using hQc
@@ -52,10 +86,9 @@ theorem exists_ltSeries_lift_of_isIntegral
     have hne : l.length ≠ 0 := by omega
     obtain ⟨l', hlen, hlast⟩ := ih l.eraseLast (by simp [hl])
     have hlt : l.eraseLast.last < l.last := l.eraseLast_last_rel_last hne
-    obtain ⟨Q, hQle, hQ, hQc⟩ :=
-      exists_prime_over_lemma l.last.asIdeal l'.last.asIdeal (by
-        rw [hlast]
-        exact le_of_lt hlt)
+    obtain ⟨Q, hQle, hQ, hQc⟩ := exists_prime_over_lemma l.last.asIdeal l'.last.asIdeal (by
+      rw [hlast]
+      exact le_of_lt hlt)
     have hlt' : l'.last < ⟨Q, hQ⟩ := by
       refine lt_of_le_of_ne hQle ?_
       intro heq
@@ -64,13 +97,13 @@ theorem exists_ltSeries_lift_of_isIntegral
       rw [hlast, hQc] at hc
       exact (ne_of_lt hlt) (PrimeSpectrum.ext hc)
     refine ⟨l'.snoc ⟨Q, hQ⟩ hlt', ?_, ?_⟩
-    · first | (simp [hlen, hl]; done) | (simp [hlen, hl]; omega)
+    · first
+      | (simp [hlen, hl]; done)
     · simpa using hQc
 
-theorem ringKrullDim_eq_of_isIntegral_of_injective
-    {A B : Type*} [CommRing A] [CommRing B] [Algebra A B] [Algebra.IsIntegral A B]
-    (hinj : Function.Injective (algebraMap A B))
-    : ringKrullDim B = ringKrullDim A := by
+theorem ringKrullDim_eq_of_isIntegral_of_injective {A B : Type*} [CommRing A] [CommRing B]
+    [Algebra A B] [Algebra.IsIntegral A B] (hinj : Function.Injective (algebraMap A B)) :
+    ringKrullDim B = ringKrullDim A := by
   have hmono : StrictMono (fun q : PrimeSpectrum B =>
       (⟨q.asIdeal.comap (algebraMap A B), inferInstance⟩ : PrimeSpectrum A)) := by
     intro q q' hqq'
@@ -81,24 +114,18 @@ theorem ringKrullDim_eq_of_isIntegral_of_injective
   apply le_antisymm
   · first
     | exact Order.krullDim_le_of_strictMono _ hmono
-    | (
-        apply iSup_le
-        intro l'
-        exact le_iSup_of_le (l'.map _ hmono) le_rfl
-      )
   · apply iSup_le
     intro l
     obtain ⟨l', hlen, -⟩ := exists_ltSeries_lift_of_isIntegral hinj l
     rw [← hlen]
     exact le_iSup (fun p : LTSeries (PrimeSpectrum B) => (p.length : WithBot ℕ∞)) l'
 
-theorem ringKrullDim_quotient_eq_quotient_comap_of_isIntegral
-    {A B : Type*} [CommRing A] [CommRing B] [Algebra A B] [Algebra.IsIntegral A B] (I : Ideal B)
-    : ringKrullDim (B ⧸ I) = ringKrullDim (A ⧸ I.comap (algebraMap A B)) := by
+theorem ringKrullDim_quotient_eq_quotient_comap_of_isIntegral {A B : Type*} [CommRing A]
+    [CommRing B] [Algebra A B] [Algebra.IsIntegral A B] (I : Ideal B) :
+    ringKrullDim (B ⧸ I) = ringKrullDim (A ⧸ I.comap (algebraMap A B)) := by
   haveI : Algebra.IsIntegral (A ⧸ I.comap (algebraMap A B)) (B ⧸ I) := by
     first
     | infer_instance
-    | exact Algebra.IsIntegral.quotient I
   exact ringKrullDim_eq_of_isIntegral_of_injective Ideal.algebraMap_quotient_injective
 
 end ReciprocityTheory.CA

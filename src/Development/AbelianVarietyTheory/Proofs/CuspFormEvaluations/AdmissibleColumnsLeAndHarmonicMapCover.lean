@@ -1,53 +1,76 @@
 module
 
-public import Mathlib
 public import Formalism.LocalToGlobal.ProjectiveLattices.ThShort
-public import Formalism.LocalToGlobal.ProjectiveLattices.IsLevMove
-public import Formalism.LocalToGlobal.ProjectiveLattices.AllTest
-public import Formalism.SharpRestriction.Divisibility.GeneratorPowers.ThExprUniqOfChartIndep2
-public import Formalism.SharpRestriction.Divisibility.GeneratorPowers.CIndBC
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDescent.SecBaseChangeAnySt
+import Mathlib.Algebra.AffineMonoid.Basic
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Formalism.SharpRestriction.Divisibility.GeneratorPowers.CIndRaw
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
-  NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
-  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
-  Formalism.L2.Pj Formalism.MainNotions.ModuliIntegralCharts.H1
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj Formalism.MainNotions.ModuliIntegralCharts.H1
 attribute [local instance] Over.cartesianMonoidalCategory
 
 set_option autoImplicit false
 
 namespace GlobalTheory
 
+
 open MvPolynomial in
-theorem map_lap_one
-    {T : Type} (r : T → ℕ)
-    (n : ℕ)
-    {k k' : Type} [Field k] [Field k']
-    (f : k →+* k')
-    (τ τ' : T) (a : Fin (r τ)) (a' : Fin (r τ'))
-    (P : MvPolynomial (Letter T r n) k)
-    : lap r n k' 1 τ τ' a a' (MvPolynomial.map f P)
-      = MvPolynomial.map f (lap r n k 1 τ τ' a a' P) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [lap, LinearMap.sum_apply, LinearMap.smul_apply, LinearMap.comp_apply, map_sum,
-      Derivation.coeFn_coe, MvPolynomial.smul_eq_C_mul, map_mul, map_C, pderiv_map]
+theorem map_lap_one {T : Type} (r : T → ℕ) (n : ℕ) {k k' : Type} [Field k] [Field k'] (f : k →+* k')
+    (τ τ' : T) (a : Fin (r τ)) (a' : Fin (r τ')) (P : MvPolynomial (Letter T r n) k) :
+    lap r n k' 1 τ τ' a a' (MvPolynomial.map f P) = MvPolynomial.map f (lap r n k 1 τ τ' a a' P) := by
+
+  simp only [lap, LinearMap.sum_apply, LinearMap.smul_apply, LinearMap.comp_apply, map_sum,
+  Derivation.coeFn_coe, MvPolynomial.smul_eq_C_mul, map_mul, map_C, pderiv_map]
   refine Finset.sum_congr rfl fun b _ => Finset.sum_congr rfl fun b' _ => ?_
   congr 2
   by_cases h : b = b' <;> simp [Matrix.one_apply, h]
 
+
 open MvPolynomial in
-theorem map_rowShift
-    {T : Type} (r : T → ℕ)
-    (n : ℕ)
-    {k k' : Type} [Field k] [Field k']
-    (f : k →+* k')
-    (σ : T) (i i' : Fin (r σ))
-    (t : k) (P : MvPolynomial (Letter T r n) k)
-    : rowShift r n k' σ i i' (f t) (MvPolynomial.map f P)
-      = MvPolynomial.map f (rowShift r n k σ i i' t P) := by
+theorem map_rowShift {T : Type} (r : T → ℕ) (n : ℕ) {k k' : Type} [Field k] [Field k'] (f : k →+* k')
+    (σ : T) (i i' : Fin (r σ)) (t : k) (P : MvPolynomial (Letter T r n) k) :
+    rowShift r n k' σ i i' (f t) (MvPolynomial.map f P) = MvPolynomial.map f (rowShift r n k σ i i' t P) := by
   induction P using MvPolynomial.induction_on with
   | C a => simp [rowShift]
   | add p q hp hq => simp only [map_add (f := _), hp, hq]
@@ -57,14 +80,10 @@ theorem map_rowShift
     simp only [rowShift, aeval_X]
     split_ifs <;> simp
 
-theorem map_mem_HHa
-    {T : Type} (r : T → ℕ)
-    (n : ℕ)
-    {k k' : Type} [Field k] [Field k']
-    (f : k →+* k') (hf : Function.Surjective f)
-    (cc : T → T) (isX : T → Prop) (a : T → ℕ → ℕ) (P : MvPolynomial (Letter T r n) k)
-    (hP : P ∈ HHa r n k cc isX a)
-    : MvPolynomial.map f P ∈ HHa r n k' cc isX a := by
+theorem map_mem_HHa {T : Type} (r : T → ℕ) (n : ℕ) {k k' : Type} [Field k] [Field k'] (f : k →+* k')
+    (hf : Function.Surjective f) (cc : T → T) (isX : T → Prop) (a : T → ℕ → ℕ)
+    (P : MvPolynomial (Letter T r n) k) (hP : P ∈ HHa r n k cc isX a) :
+    MvPolynomial.map f P ∈ HHa r n k' cc isX a := by
   obtain ⟨h1, h2, h3⟩ := hP
   refine ⟨?_, ?_, ?_⟩
   · simp only [harmK, Submodule.mem_iInf, LinearMap.mem_ker] at h1 ⊢
@@ -76,16 +95,12 @@ theorem map_mem_HHa
   · intro m hm
     exact h3 m (MvPolynomial.support_map_subset f P hm)
 
-theorem finrank_le_of_span_sup_smul_top
-    {R M : Type} [CommRing R] [IsDomain R] [AddCommGroup M] [Module R M] [Module.Finite R M]
-    [Module.Projective R M]
-    {n : ℕ} (x : Fin n → M)
-    (I : Ideal R) (hI : I ≠ ⊤) (h : Submodule.span R (Set.range x) ⊔ (I • ⊤ : Submodule R M) = ⊤)
-    : Module.finrank R M ≤ n := by
+theorem finrank_le_of_span_sup_smul_top {R M : Type} [CommRing R] [IsDomain R] [AddCommGroup M] [Module R M]
+    [Module.Finite R M] [Module.Projective R M] {n : ℕ} (x : Fin n → M) (I : Ideal R) (hI : I ≠ ⊤)
+    (h : Submodule.span R (Set.range x) ⊔ (I • ⊤ : Submodule R M) = ⊤) : Module.finrank R M ≤ n := by
   set N := Submodule.span R (Set.range x) with hN
-  obtain ⟨r, hr1, hr⟩ :=
-    Submodule.exists_sub_one_mem_and_smul_le_of_fg_of_le_sup (N := N) (N' := ⊤) (P := ⊤) (I := I)
-      Module.Finite.fg_top le_rfl (by rw [h])
+  obtain ⟨r, hr1, hr⟩ := Submodule.exists_sub_one_mem_and_smul_le_of_fg_of_le_sup
+    (N := N) (N' := ⊤) (P := ⊤) (I := I) Module.Finite.fg_top le_rfl (by rw [h])
   have hr0 : r ≠ 0 := by
     rintro rfl
     apply hI
@@ -99,16 +114,16 @@ theorem finrank_le_of_span_sup_smul_top
     exact smul_right_injective M hr0 this
   haveI : Module.Finite R N := Module.Finite.span_of_finite R (Set.finite_range x)
   have h1 := LinearMap.finrank_le_finrank_of_injective hinj
-  have h2 : Module.finrank R N ≤ n := by simpa [Set.finrank] using finrank_range_le_card (R := R) x
+  have h2 : Module.finrank R N ≤ n := by
+    simpa [Set.finrank] using finrank_range_le_card (R := R) x
   exact h1.trans h2
 
-theorem Mfr_ne_top {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} (l : Level H)
-    : Mfr l ≠ ⊤ := by
+theorem Mfr_ne_top {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} (l : Level H) :
+    Mfr l ≠ ⊤ := by
   intro h
   have hb : l.Mb = ⊤ := by
     rw [Ideal.eq_top_iff_one] at h ⊢
-    obtain ⟨y, hy, hy1⟩ :=
-      (Ideal.mem_map_iff_of_surjective (H.bar : 𝓞 E →+* 𝓞 E) H.bar.surjective).1 h
+    obtain ⟨y, hy, hy1⟩ := (Ideal.mem_map_iff_of_surjective (H.bar : 𝓞 E →+* 𝓞 E) H.bar.surjective).1 h
     have : y = 1 := H.bar.injective (by simpa using hy1)
     exact this ▸ hy
   have hp := l.prod
@@ -119,19 +134,11 @@ theorem Mfr_ne_top {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host 
   have hpos : 0 < Module.finrank ℤ (𝓞 E) := Module.finrank_pos
   rcases Nat.pow_eq_one.1 hn.symm with h' | h' <;> omega
 
-theorem admissible_columns_le_and_harmonic_map_cover
-    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H) (l : Level H)
-        (Xo : Moduli Dw l) (c : Coeff l) (n : ℕ) (d : DeltaDat Xo c n),
-      (∀ (rk : Bool) (x0 : Fin n → Dw.La), AdmX (l := l) rk x0 → Dw.p + Dw.q ≤ n)
-        ∧ ∀ (a : (E →+* ℂ) × ℕ → ℕ) (P : MvPolynomial (LtN Dw n) c.F),
-          P ∈ HHa Dw.mult n c.F ComplexEmbedding.conjugate (InPsi H) (fun τ i => a (τ, i))
-            → MvPolynomial.map (d.eF : c.F →+* d.c₂.F) P ∈ HHa Dw.mult n d.c₂.F
-              ComplexEmbedding.conjugate (InPsi H) (fun τ i => a (τ, i)) := by
+theorem admissible_columns_le_and_harmonic_map_cover : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H) (l : Level H) (Xo : Moduli Dw l) (c : Coeff l) (n : ℕ) (d : DeltaDat Xo c n), (∀ (rk : Bool) (x0 : Fin n → Dw.La), AdmX (l := l) rk x0 → Dw.p + Dw.q ≤ n) ∧ ∀ (a : (E →+* ℂ) × ℕ → ℕ) (P : MvPolynomial (LtN Dw n) c.F), P ∈ HHa Dw.mult n c.F ComplexEmbedding.conjugate (InPsi H) (fun τ i => a (τ, i)) → MvPolynomial.map (d.eF : c.F →+* d.c₂.F) P ∈ HHa Dw.mult n d.c₂.F ComplexEmbedding.conjugate (InPsi H) (fun τ i => a (τ, i)) := by
   intro E _ _ _ H Dw l Xo c n d
   refine ⟨fun rk x0 hx => ?_, fun a P hP => ?_⟩
   swap
-  · have hs : Function.Surjective (d.eF : c.F →+* d.c₂.F) := fun y =>
-      ⟨d.eF.symm y, d.eF.apply_symm_apply y⟩
+  · have hs : Function.Surjective (d.eF : c.F →+* d.c₂.F) := fun y => ⟨d.eF.symm y, d.eF.apply_symm_apply y⟩
     generalize (d.eF : c.F →+* d.c₂.F) = f at hs ⊢
     exact map_mem_HHa Dw.mult n f hs _ _ _ P hP
   haveI := Dw.fin

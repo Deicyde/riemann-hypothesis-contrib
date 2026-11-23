@@ -1,10 +1,49 @@
 module
 
-public import Mathlib
-public import Formalism.PeriodIntegrals.ScRefExists
 public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.LatticeReferenceFrame.Development
 public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.LatticeReferenceFrame.HANegRight
-public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.LatticeReferenceFrame.HypsNonvacuous
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -23,28 +62,25 @@ variable (I : Formalism.MainNotions.S.AutInst) (g : ℕ)
 
 theorem zmod_zero : ZMod' I g 0 := ⟨0, zero_mem _, by simp⟩
 
-theorem zmod_of_GE {x : I.E} (h : GE I g x)
-    : ZMod' I g (Formalism.UG.inclE (F := I.F) (Af I.F) x) := by
+theorem zmod_of_GE {x : I.E} (h : GE I g x) : ZMod' I g (Formalism.UG.inclE (F := I.F) (Af I.F) x) := by
   obtain ⟨t, rfl⟩ := h
-  exact
-    ⟨Formalism.UG.inclE (F := I.F) (Af I.F) (t : I.E), inclE_mem' I t, by rw [map_mul, map_natCast]⟩
+  exact ⟨Formalism.UG.inclE (F := I.F) (Af I.F) (t : I.E), inclE_mem' I t, by rw [map_mul, map_natCast]⟩
 
-theorem zmod_add {x y : I.E ⊗[I.F] Af I.F} (h1 : ZMod' I g x) (h2 : ZMod' I g y)
-    : ZMod' I g (x + y) := by
+theorem zmod_add {x y : I.E ⊗[I.F] Af I.F} (h1 : ZMod' I g x) (h2 : ZMod' I g y) :
+    ZMod' I g (x + y) := by
   obtain ⟨a, ha, rfl⟩ := h1
   obtain ⟨b, hb, rfl⟩ := h2
   exact ⟨a + b, add_mem ha hb, (mul_add _ _ _).symm⟩
 
-theorem zmod_mul_int {x y : I.E ⊗[I.F] Af I.F} (h : ZMod' I g x) (hy : y ∈ IntAf I.F I.E)
-    : ZMod' I g (x * y) := by
+theorem zmod_mul_int {x y : I.E ⊗[I.F] Af I.F} (h : ZMod' I g x) (hy : y ∈ IntAf I.F I.E) :
+    ZMod' I g (x * y) := by
   obtain ⟨a, ha, rfl⟩ := h
   exact ⟨a * y, mul_mem ha hy, mul_assoc _ _ _⟩
 
-theorem zmod_eps
-    {ε : I.E ⊗[I.F] Af I.F} {θ : I.E}
-    (hε : ZMod' I g (ε - Formalism.UG.inclE (F := I.F) (Af I.F) θ))
-    {x : I.E} (hx : x ∈ (algebraMap (𝓞 I.E) I.E).range) (h : GE I g (θ * x))
-    : ZMod' I g (ε * Formalism.UG.inclE (F := I.F) (Af I.F) x) := by
+theorem zmod_eps {ε : I.E ⊗[I.F] Af I.F} {θ : I.E}
+    (hε : ZMod' I g (ε - Formalism.UG.inclE (F := I.F) (Af I.F) θ)) {x : I.E}
+    (hx : x ∈ (algebraMap (𝓞 I.E) I.E).range) (h : GE I g (θ * x)) :
+    ZMod' I g (ε * Formalism.UG.inclE (F := I.F) (Af I.F) x) := by
   obtain ⟨s, rfl⟩ := hx
   have h1 := zmod_mul_int I g hε (inclE_mem' I s)
   have h2 := zmod_add I g h1 (zmod_of_GE I g h)
@@ -54,25 +90,20 @@ theorem zmod_eps
   rw [e]
   ring
 
-theorem zmod_sig
-    {ε : I.E ⊗[I.F] Af I.F} {θ : I.E}
-    (hε : ZMod' I g (ε - Formalism.UG.inclE (F := I.F) (Af I.F) θ))
-    : ZMod' I g (sigA I ε - Formalism.UG.inclE (F := I.F) (Af I.F) (star θ)) := by
+theorem zmod_sig {ε : I.E ⊗[I.F] Af I.F} {θ : I.E}
+    (hε : ZMod' I g (ε - Formalism.UG.inclE (F := I.F) (Af I.F) θ)) :
+    ZMod' I g (sigA I ε - Formalism.UG.inclE (F := I.F) (Af I.F) (star θ)) := by
   obtain ⟨t, ht, he⟩ := hε
-  have hinc
-      : ∀ a : I.E,
-        sigA I (Formalism.UG.inclE (F := I.F) (Af I.F) a)
-          = Formalism.UG.inclE (F := I.F) (Af I.F) (star a) := by
+  have hinc : ∀ a : I.E, sigA I (Formalism.UG.inclE (F := I.F) (Af I.F) a) =
+      Formalism.UG.inclE (F := I.F) (Af I.F) (star a) := by
     intro a
     show (Algebra.TensorProduct.map I.cm.sig (AlgHom.id I.F (Af I.F))) (a ⊗ₜ[I.F] (1 : Af I.F)) =
       (star a) ⊗ₜ[I.F] (1 : Af I.F)
     rw [Algebra.TensorProduct.map_tmul]
     rfl
-  have hcl
-      : Subring.closure
-          (Set.range (fun x : Formalism.UG.intOE I.E => (x : I.E) ⊗ₜ[I.F] (1 : Af I.F))
-            ∪ Set.range (fun y : Formalism.UG.intAd I.F => (1 : I.E) ⊗ₜ[I.F] (y : Af I.F)))
-        ≤ (IntAf I.F I.E).comap (sigA I) := by
+  have hcl : Subring.closure (Set.range (fun x : Formalism.UG.intOE I.E => (x : I.E) ⊗ₜ[I.F] (1 : Af I.F)) ∪
+      Set.range (fun y : Formalism.UG.intAd I.F => (1 : I.E) ⊗ₜ[I.F] (y : Af I.F))) ≤
+      (IntAf I.F I.E).comap (sigA I) := by
     rw [Subring.closure_le]
     rintro _ (⟨⟨s, hs⟩, rfl⟩ | ⟨⟨y, hy⟩, rfl⟩)
     · obtain ⟨s', rfl⟩ := hs
@@ -88,16 +119,14 @@ theorem zmod_sig
   refine ⟨sigA I t, hcl ht, ?_⟩
   rw [← hinc, ← map_sub, he, map_mul, map_natCast]
 
-theorem hG_nsmul_left (m : ℕ) (x y : Fin I.n → I.E)
-    : Formalism.UG.hform (starRingEnd I.E) I.J (m • x) y
-      = (m : I.E) * Formalism.UG.hform (starRingEnd I.E) I.J x y := by
+theorem hG_nsmul_left (m : ℕ) (x y : Fin I.n → I.E) :
+    Formalism.UG.hform (starRingEnd I.E) I.J (m • x) y = (m : I.E) * Formalism.UG.hform (starRingEnd I.E) I.J x y := by
   simp only [Formalism.UG.hform, Pi.smul_apply, nsmul_eq_mul, map_mul, map_natCast, Finset.mul_sum]
   refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
   ring
 
-theorem hG_nsmul_right (m : ℕ) (x y : Fin I.n → I.E)
-    : Formalism.UG.hform (starRingEnd I.E) I.J x (m • y)
-      = (m : I.E) * Formalism.UG.hform (starRingEnd I.E) I.J x y := by
+theorem hG_nsmul_right (m : ℕ) (x y : Fin I.n → I.E) :
+    Formalism.UG.hform (starRingEnd I.E) I.J x (m • y) = (m : I.E) * Formalism.UG.hform (starRingEnd I.E) I.J x y := by
   simp only [Formalism.UG.hform, Pi.smul_apply, nsmul_eq_mul, Finset.mul_sum]
   refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
   ring
@@ -105,10 +134,9 @@ theorem hG_nsmul_right (m : ℕ) (x y : Fin I.n → I.E)
 theorem mem_mL {x : VA I} (hx : x ∈ I.Lf) : ((g : ℕ) : I.E ⊗[I.F] Af I.F) • x ∈ mL I g :=
   Submodule.subset_span ⟨x, hx, rfl⟩
 
-theorem incl_osmul (c : 𝓞 I.E) (x : Fin I.n → I.E)
-    : incl I (c • x)
-      = (⟨Formalism.UG.inclE (F := I.F) (Af I.F) (c : I.E), inclE_mem' I c⟩ : IntAf I.F I.E)
-        • incl I x := by
+theorem incl_osmul (c : 𝓞 I.E) (x : Fin I.n → I.E) :
+    incl I (c • x) = (⟨Formalism.UG.inclE (F := I.F) (Af I.F) (c : I.E), inclE_mem' I c⟩ : IntAf I.F I.E) •
+      incl I x := by
   funext i
   simp only [incl, Pi.smul_apply, Subring.smul_def, smul_eq_mul, Algebra.smul_def, map_mul]
   rfl
@@ -117,13 +145,10 @@ theorem mem_L_of (h3 : LocGlob) {x : Fin I.n → I.E} (hx : incl I x ∈ I.Lf) :
   refine (I.L_dual x).mpr fun y hy => ?_
   let H : VA I → I.E ⊗[I.F] Af I.F := fun v =>
     ∑ i, ∑ j, Formalism.UG.inclE (F := I.F) (Af I.F) (starRingEnd I.E (y i) * I.J i j) * v j
-  have hinc
-      : ∀ z : Fin I.n → I.E,
-        H (incl I z)
-          = Formalism.UG.inclE (F := I.F) (Af I.F)
-            (Formalism.UG.hform (starRingEnd I.E) I.J y z) := by
+  have hinc : ∀ z : Fin I.n → I.E, H (incl I z) =
+      Formalism.UG.inclE (F := I.F) (Af I.F) (Formalism.UG.hform (starRingEnd I.E) I.J y z) := by
     intro z
-    set_option synthInstance.maxHeartbeats 100000 in
+
     simp only [H, incl, Formalism.UG.hform, map_sum, map_mul]
   have key : ∀ v ∈ I.Lf, H v ∈ IntAf I.F I.E := by
     intro v hv
@@ -135,8 +160,7 @@ theorem mem_L_of (h3 : LocGlob) {x : Fin I.n → I.E} (hx : incl I x ∈ I.Lf) :
       obtain ⟨s, hs⟩ := (I.L_dual z).mp z.2 y hy
       rw [hinc, ← hs]
       exact inclE_mem' I s
-    | zero =>
-      simp [H]
+    | zero => simp [H]
     | add a b _ _ ha hb =>
       have e : H (a + b) = H a + H b := by
         simp only [H, Pi.add_apply, mul_add, Finset.sum_add_distrib]

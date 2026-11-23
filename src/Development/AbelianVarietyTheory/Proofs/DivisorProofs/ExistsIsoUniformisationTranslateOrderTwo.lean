@@ -449,7 +449,6 @@ theorem even_uV
   exact alg e₁ e₂ e₃ e₅ e₆
 
 omit u sq in
-set_option maxHeartbeats 400000 in
 theorem exists_level
     [IsLocalRing R]
     (hG : IsSemiAbelian G) (ha : a ^ 2 = 1) (hf : Function.Surjective G.hom.appTop.hom)
@@ -660,7 +659,6 @@ theorem surjective_appTop
       (surj_comp (RigidIsoCube.surjective_snd_of_generic hG (jK R) G A.isAb hg _) s₁)
   ⟩
 
-set_option maxHeartbeats 400000 in
 theorem exists_iso_translate
     [IsLocalRing R]
     (hR : AdmBase R I) (hG : IsSemiAbelian G)

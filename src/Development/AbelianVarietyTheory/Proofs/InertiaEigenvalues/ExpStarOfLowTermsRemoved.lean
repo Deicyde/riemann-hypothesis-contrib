@@ -1,17 +1,51 @@
 module
 
-public import Mathlib
-public import Formalism.LocalRingCardinality.RhoDetPrimeEqMuTildeMulChiPow
-public import Formalism.SharpRestriction.LevelLetterCocycles.LocalSituation
-public import Formalism.LocalRingCardinality.AdicCompletionLocal.LocTied
-public import Development.AbelianVarietyTheory.Definitions.Foundations.HTBasis
 public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.ExpStar
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.PowMulMemLatIff
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.CyclotomicCharacterPadicBasicProperties
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.PadicNormZpowSubOnePadicValInt
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.NormUnitPowSubOne
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.NonemptyThetaOnBdRPlusPeriodData
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.IntegralCocycleOfGeneratorAndFixingStatement
+import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.NonemptyThetaOnBdRPlusPeriodData
+import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.NormUnitPowSubOne
+import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.PadicNormZpowSubOnePadicValInt
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Int
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -19,9 +53,7 @@ noncomputable section
 
 namespace GlobalTheory.ExpImage.LowTerms
 
-open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc
-  Formalism.MainNotions.N Formalism.MainNotions.LocalSituation GlobalTheory.Cyc
-  GlobalTheory.ExpImage
+open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N Formalism.MainNotions.LocalSituation GlobalTheory.Cyc GlobalTheory.ExpImage
 
 variable {l : ℕ} [Fact l.Prime] {P : LocPrime l}
 
@@ -32,9 +64,9 @@ theorem oB_mem_zero {AI : LocAinf l P} (T : LocTied l P AI) (x : Om l) : oB P x 
 theorem tD_pow_mem_zero (j : ℕ) : tD P ^ j ∈ FilB P 0 :=
   FilB_anti (by simp) (FilB_pow (tD_mem (P := P)) j)
 
-theorem act_term (g : GQ l) (c : ℚ_[l]) {x : Om l} (hx : g x = x) (j : ℕ)
-    : P.actQdR g (qB P c * (oB P x * tD P ^ j))
-      = qB P (c * (P.χQ g : ℚ_[l]) ^ j) * (oB P x * tD P ^ j) := by
+theorem act_term (g : GQ l) (c : ℚ_[l]) {x : Om l} (hx : g x = x) (j : ℕ) :
+    P.actQdR g (qB P c * (oB P x * tD P ^ j)) =
+      qB P (c * (P.χQ g : ℚ_[l]) ^ j) * (oB P x * tD P ^ j) := by
   rw [map_mul, map_mul, map_pow, act_tD, P.actQdR_Om, hx, AlgEquiv.commutes, map_mul, map_pow,
     mul_pow]
   ring
@@ -42,25 +74,7 @@ theorem act_term (g : GQ l) (c : ℚ_[l]) {x : Om l} (hx : g x = x) (j : ℕ)
 theorem Ks_le_Kinf (K : FinExt l) (s : ℕ) : Ks K s ≤ Kinf K :=
   sup_le_sup_left (IntermediateField.adjoin.mono _ _ _ fun _ hx => Exists.intro s hx) _
 
-theorem expStar_of_sum
-    : ∀ (LT : LocTheory) (l : ℕ) [Fact l.Prime] (AI : LocAinf l (LT l)),
-      LocTied l (LT l) AI
-        → ∀ (K : FinExt l) (s : ℕ),
-          Lev l s
-            → ∀ (e : ℕ) (g : GQ l),
-              IsGen (LT l).χQ K s g
-                → ∀ w : ℕ → Om l,
-                  (∀ j, w j ∈ Ks K s)
-                    → ∀ b ∈ FilB (LT l) 0,
-                      (∀ h ∈ Hinf K, NearZ (LT l) (e + 1) ((LT l).actQdR h b - b))
-                        → NearZ (LT l) (e + 1)
-                          (∑ j ∈ Finset.range (e + 1), oB (LT l) (w j) * tD (LT l) ^ j
-                            + (qB (LT l) (((LT l).χQ g ^ (-(e : ℤ)) : ℚ_[l]ˣ) : ℚ_[l])
-                                * (LT l).actQdR g b
-                              - b))
-                        → ∃ z : GQ l → ℚ_[l],
-                          (∀ σ ∈ Gj K s, ‖z σ‖ ≤ 1) ∧ ExpStar LT (Gj K s) e z
-                            (algebraMap ℚ_[l] (Om l) (logZl l ((LT l).χQ g : ℚ_[l]))⁻¹ * w e) := by
+theorem expStar_of_sum : ∀ (LT : LocTheory) (l : ℕ) [Fact l.Prime] (AI : LocAinf l (LT l)), LocTied l (LT l) AI → ∀ (K : FinExt l) (s : ℕ), Lev l s → ∀ (e : ℕ) (g : GQ l), IsGen (LT l).χQ K s g → ∀ w : ℕ → Om l, (∀ j, w j ∈ Ks K s) → ∀ b ∈ FilB (LT l) 0, (∀ h ∈ Hinf K, NearZ (LT l) (e + 1) ((LT l).actQdR h b - b)) → NearZ (LT l) (e + 1) (∑ j ∈ Finset.range (e + 1), oB (LT l) (w j) * tD (LT l) ^ j + (qB (LT l) (((LT l).χQ g ^ (-(e : ℤ)) : ℚ_[l]ˣ) : ℚ_[l]) * (LT l).actQdR g b - b)) → ∃ z : GQ l → ℚ_[l], (∀ σ ∈ Gj K s, ‖z σ‖ ≤ 1) ∧ ExpStar LT (Gj K s) e z (algebraMap ℚ_[l] (Om l) (logZl l ((LT l).χQ g : ℚ_[l]))⁻¹ * w e) := by
   intro LT l _ AI T K s hs e g hg w hw b hb hH hN
   have hχ : IsCyc (LT l).χQ := (LT l).χQ_cyc
   obtain ⟨hn, -, hker⟩ := GlobalTheory.Cyc.cyc_basic l _ hχ
@@ -87,16 +101,15 @@ theorem expStar_of_sum
   have hSH : ∀ h ∈ Hinf K, (LT l).actQdR h S = S := by
     intro h hh
     have h1 : (LT l).χQ h = 1 := (hker K h (Hinf_le_fix hh)).2.1 hh
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hS, map_sum]
+
+    rw [hS, map_sum]
     refine Finset.sum_congr rfl fun j _ => ?_
     rw [act_term h _ (hh ⟨w j, Ks_le_Kinf K s (hw j)⟩), h1]
     simp
-  have hSg
-      : qB (LT l) (((LT l).χQ g ^ (-(e : ℤ)) : ℚ_[l]ˣ) : ℚ_[l]) * (LT l).actQdR g S - S
-        = ∑ j ∈ Finset.range e, oB (LT l) (w j) * tD (LT l) ^ j := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hS, map_sum, Finset.mul_sum, ← Finset.sum_sub_distrib]
+  have hSg : qB (LT l) (((LT l).χQ g ^ (-(e : ℤ)) : ℚ_[l]ˣ) : ℚ_[l]) * (LT l).actQdR g S - S =
+      ∑ j ∈ Finset.range e, oB (LT l) (w j) * tD (LT l) ^ j := by
+
+    rw [hS, map_sum, Finset.mul_sum, ← Finset.sum_sub_distrib]
     refine Finset.sum_congr rfl fun j hj => ?_
     rw [act_term g _ (hg.1 ⟨w j, hw j⟩), ← mul_assoc, ← map_mul, ← sub_mul, ← map_sub]
     have : (((LT l).χQ g ^ (-(e : ℤ)) : ℚ_[l]ˣ) : ℚ_[l]) * (c j * u ^ j) - c j = 1 := by
@@ -109,8 +122,7 @@ theorem expStar_of_sum
     rw [this, map_one, one_mul]
   refine GlobalTheory.T.integral_cocycle_of_generator_and_fixing LT l AI T K s hs e g hg _
     (mul_mem (IntermediateField.algebraMap_mem _ _) (hw e)) (b + S) (add_mem hb hS0)
-    (fun h hh => ?_)
-    ?_
+    (fun h hh => ?_) ?_
   · have := hH h hh
     rwa [map_add, hSH h hh, add_sub_add_right_eq_sub]
   · have h4 : qB (LT l) (logZl l u) * oB (LT l) (algebraMap ℚ_[l] (Om l) (logZl l u)⁻¹) = 1 := by

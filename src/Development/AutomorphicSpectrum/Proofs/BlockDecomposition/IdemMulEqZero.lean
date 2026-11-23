@@ -1,16 +1,54 @@
 module
 
-public import Mathlib
-public import Development.WeilBound.CoreStatements.PadicHodgeComparison.EtaleCohomologyComparison.KummerCupProducts.EtaleComparisonMapOfFacts
+public import Development.WeilBound.CoreStatements.PadicHodgeComparison.EtaleCohomologyComparison.KummerCupProducts.FirstChernCompatibleSystem
+public import Development.WeilBound.CoreStatements.PadicHodgeComparison.EtaleCohomologyComparison.KummerCupProducts.MapUgCToUg
 public import Development.WeilBound.CoreStatements.PadicHodgeComparison.EtaleCohomologyComparison.AcrisKummerUnits.ConstantCoeffSurjective
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.TypeStar
 
 @[expose] public section
 
 set_option backward.isDefEq.respectTransparency false
 
-open CategoryTheory Limits AlgebraicGeometry Opposite GroundTheory.PAdicHodge
-  CrystallineSemistableComparison CrystallineSemistableComparison.CH
-  CrystallineSemistableComparison.E GlobalTheory.EtC
+open CategoryTheory Limits AlgebraicGeometry Opposite GroundTheory.PAdicHodge CrystallineSemistableComparison CrystallineSemistableComparison.CH CrystallineSemistableComparison.E GlobalTheory.EtC
 
 set_option autoImplicit false
 
@@ -20,10 +58,8 @@ namespace GlobalTheory.CompanionTheory.LcLogProof
 
 variable {l : ℕ} [Fact l.Prime]
 
-theorem eq_of_idem
-    (A : PAlg l)
-    {a b : A.W} (ha : IsIdempotentElem a) (hb : IsIdempotentElem b) (h : a.coeff 0 = b.coeff 0)
-    : a = b := by
+theorem eq_of_idem (A : PAlg l) {a b : A.W} (ha : IsIdempotentElem a) (hb : IsIdempotentElem b)
+    (h : a.coeff 0 = b.coeff 0) : a = b := by
   have ha' : a * a = a := ha
   have hb' : b * b = b := hb
   set d := a - b with hd
@@ -40,42 +76,37 @@ theorem eq_of_idem
     | succ k ih =>
       rw [← hd3, pow_succ]
       exact Ideal.mul_mem_mul (Ideal.mul_mem_left _ _ ih) hmem
-  have h0 : d = 0 :=
-    IsHausdorff.haus (A.completeW.toIsHausdorff) d fun k => by
-      rw [SModEq.zero, smul_eq_mul, Ideal.mul_top]
-      exact hall k
+  have h0 : d = 0 := IsHausdorff.haus (A.completeW.toIsHausdorff) d fun k => by
+    rw [SModEq.zero, smul_eq_mul, Ideal.mul_top]
+    exact hall k
   exact sub_eq_zero.1 h0
 
-theorem teich_sum_one
-    (A : PAlg l) {ι : Type} [Fintype ι] {e : ι → A.A} (he : CompleteOrthogonalIdempotents e)
-    : ∑ a, WittVector.teichmuller l (e a) = (1 : A.W) := by
-  have ho : OrthogonalIdempotents fun i => (WittVector.teichmuller l (e i) : A.W) := ⟨
-    fun i => by
+theorem teich_sum_one (A : PAlg l) {ι : Type} [Fintype ι] {e : ι → A.A}
+    (he : CompleteOrthogonalIdempotents e) : ∑ a, WittVector.teichmuller l (e a) = (1 : A.W) := by
+  have ho : OrthogonalIdempotents fun i => (WittVector.teichmuller l (e i) : A.W) :=
+    ⟨fun i => by
       show _ * _ = _
       rw [← map_mul, (he.idem i).eq],
-    fun i j hij => by
+     fun i j hij => by
       show _ * _ = _
-      rw [← map_mul, he.ortho hij, WittVector.teichmuller_zero]
-  ⟩
+      rw [← map_mul, he.ortho hij, WittVector.teichmuller_zero]⟩
   refine eq_of_idem A ho.isIdempotentElem_sum IsIdempotentElem.one ?_
   show WittVector.constantCoeff (∑ a, (WittVector.teichmuller l (e a) : A.W)) = WittVector.constantCoeff (1 : A.W)
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum, map_one]
+
+  rw [map_sum, map_one]
   simp only [WittVector.constantCoeff_apply, WittVector.teichmuller_coeff_zero]
   exact he.complete
 
-theorem mul_pow_congr {R : Type*} [CommRing R] {s x y : R} (h : s * x = s * y) (k : ℕ)
-    : s * x ^ k = s * y ^ k := by
+theorem mul_pow_congr {R : Type*} [CommRing R] {s x y : R} (h : s * x = s * y) (k : ℕ) :
+    s * x ^ k = s * y ^ k := by
   induction k with
   | zero => simp
   | succ k ih =>
     rw [pow_succ, pow_succ, ← mul_assoc, ih]
     linear_combination y ^ k * h
 
-theorem idem_mul_eq_zero
-    {R : Type} [CommRing R]
-    {c x : R} (hc : IsIdempotentElem c) (h : algebraMap R (Localization.Away c) x = 0)
-    : c * x = 0 := by
+theorem idem_mul_eq_zero {R : Type} [CommRing R] {c x : R} (hc : IsIdempotentElem c)
+    (h : algebraMap R (Localization.Away c) x = 0) : c * x = 0 := by
   obtain ⟨⟨_, k, rfl⟩, hk⟩ := (IsLocalization.map_eq_zero_iff (Submonoid.powers c) _ x).1 h
   cases k with
   | zero => simp only [pow_zero, one_mul] at hk; simp [hk]
@@ -85,26 +116,20 @@ theorem toΓ_injective (B : Type) [CommRing B] : Function.Injective (toΓ B) := 
   have := congrArg (Scheme.ΓSpecIso (CommRingCat.of B)).hom.hom h
   simpa [toΓ] using this
 
-theorem pow_on_part
-    (r : Roots l)
-    (A : PAlg l) (n : ℕ)
-    (f : LocallyConstant (SU A) (ZMod (l ^ n))) (x : A.Ug) (hp : IsPow (r.zeta A n) f (toΓ A.Ug x))
-    (a : ZMod (l ^ n)) (c : A.Ug)
-    (hc : IsIdempotentElem c) (hf : ∀ p : PrimeSpectrum A.Ug, c ∉ p.asIdeal → f p = a)
-    : c * (x - kb A (r.ρ n).1 ^ a.val) = 0 := by
-  have hv
-      : ∀ v : Spec (CommRingCat.of (Localization.Away c)),
-        f ((Spec.map (CommRingCat.ofHom (algebraMap A.Ug (Localization.Away c)))) v) = a := by
+theorem pow_on_part (r : Roots l) (A : PAlg l) (n : ℕ) (f : LocallyConstant (SU A) (ZMod (l ^ n))) (x : A.Ug)
+    (hp : IsPow (r.zeta A n) f (toΓ A.Ug x)) (a : ZMod (l ^ n)) (c : A.Ug) (hc : IsIdempotentElem c)
+    (hf : ∀ p : PrimeSpectrum A.Ug, c ∉ p.asIdeal → f p = a) :
+    c * (x - kb A (r.ρ n).1 ^ a.val) = 0 := by
+  have hv : ∀ v : Spec (CommRingCat.of (Localization.Away c)),
+      f ((Spec.map (CommRingCat.ofHom (algebraMap A.Ug (Localization.Away c)))) v) = a := by
     intro v
     refine hf (PrimeSpectrum.comap (algebraMap A.Ug (Localization.Away c)) v) fun hm => ?_
-    have hu : IsUnit (algebraMap A.Ug (Localization.Away c) c) :=
-      IsLocalization.Away.algebraMap_isUnit c
+    have hu : IsUnit (algebraMap A.Ug (Localization.Away c) c) := IsLocalization.Away.algebraMap_isUnit c
     have hm' : algebraMap A.Ug (Localization.Away c) c ∈ PrimeSpectrum.asIdeal v := hm
     exact (PrimeSpectrum.isPrime v).ne_top (Ideal.eq_top_of_isUnit_mem _ hm' hu)
   have h := hp _ (Spec.map (CommRingCat.ofHom (algebraMap A.Ug (Localization.Away c)))) a hv
-  have h2
-      : toΓ _ (algebraMap A.Ug (Localization.Away c) x)
-        = toΓ _ (algebraMap A.Ug (Localization.Away c) (kb A (r.ρ n).1 ^ a.val)) := by
+  have h2 : toΓ _ (algebraMap A.Ug (Localization.Away c) x) =
+      toΓ _ (algebraMap A.Ug (Localization.Away c) (kb A (r.ρ n).1 ^ a.val)) := by
     rw [map_pow, map_pow, ← toΓ_nat, h, ← toΓ_nat]
     rfl
   refine idem_mul_eq_zero hc ?_
@@ -113,8 +138,8 @@ theorem pow_on_part
 theorem ug_injective (H : RIn l) (A : PAlg l) : Function.Injective (algebraMap A.U A.Ug) :=
   IsLocalization.injective _ (Submonoid.powers_le.2 (H.tf A))
 
-theorem kb_rho (r : Roots l) (A : PAlg l) (n : ℕ)
-    : kb A (r.ρ n).1 = algebraMap A.U A.Ug (A.oC (rootSeqInt l n)) := by
+theorem kb_rho (r : Roots l) (A : PAlg l) (n : ℕ) :
+    kb A (r.ρ n).1 = algebraMap A.U A.Ug (A.oC (rootSeqInt l n)) := by
   show A.cToUg (clToC l (r.ρ n).1) = _
   rw [r.hρ]
   exact A.cToUg_coe (rootSeqInt l n)
@@ -130,12 +155,8 @@ theorem isLog_one (hEx : LogEx) (hMul : LogMul) (A : PAlg l) (n : ℕ) : IsLog A
   have : y = 0 := by linear_combination h0
   rwa [this] at hy
 
-theorem isLog_pow
-    (hEx : LogEx) (hMul : LogMul)
-    (A : PAlg l) (n : ℕ)
-    {w : A.W} {y : A.Acr n} (h1 : A.th w = 1) (hy : IsLog A n w y)
-    (k : ℕ)
-    : IsLog A n (w ^ k) ((k : A.Acr n) * y) := by
+theorem isLog_pow (hEx : LogEx) (hMul : LogMul) (A : PAlg l) (n : ℕ) {w : A.W} {y : A.Acr n} (h1 : A.th w = 1)
+    (hy : IsLog A n w y) (k : ℕ) : IsLog A n (w ^ k) ((k : A.Acr n) * y) := by
   induction k with
   | zero => simpa using isLog_one hEx hMul A n
   | succ k ih =>
@@ -147,22 +168,16 @@ theorem isLog_pow
 theorem natCast_q (A : PAlg l) (n : ℕ) : ((l ^ n : ℕ) : A.Acr n) = 0 := by
   rw [Nat.cast_pow]; exact A.pow_l_acr n
 
-theorem log_on_part
-    (hEx : LogEx) (hMul : LogMul) (hEps : LogEps)
-    (A : PAlg l) (n : ℕ)
-    {η u c : A.A} {v : ℕ} (hη : η ^ l ^ n = A.s (epsilon l)) (hz : A.sharp η ^ l ^ n = 1)
-    (hc : IsIdempotentElem c) (hE : A.sharp c * (A.sharp u - A.sharp η ^ v) = 0)
-    {y : A.Acr n}
+theorem log_on_part (hEx : LogEx) (hMul : LogMul) (hEps : LogEps) (A : PAlg l) (n : ℕ) {η u c : A.A} {v : ℕ}
+    (hη : η ^ l ^ n = A.s (epsilon l)) (hz : A.sharp η ^ l ^ n = 1) (hc : IsIdempotentElem c)
+    (hE : A.sharp c * (A.sharp u - A.sharp η ^ v) = 0) {y : A.Acr n}
     (h1 : A.th (WittVector.teichmuller l (u ^ l ^ n)) = 1)
-    (hy : IsLog A n (WittVector.teichmuller l (u ^ l ^ n)) y)
-    : A.toAcr n (WittVector.teichmuller l c) * y
-      = A.toAcr n (WittVector.teichmuller l c)
-        * ((v : A.Acr n) * A.cris n (ACris.periodT (untilt_epsilon (p := l)))) := by
+    (hy : IsLog A n (WittVector.teichmuller l (u ^ l ^ n)) y) :
+    A.toAcr n (WittVector.teichmuller l c) * y = A.toAcr n (WittVector.teichmuller l c) * ((v : A.Acr n) *
+      A.cris n (ACris.periodT (untilt_epsilon (p := l)))) := by
   have hq : 1 ≤ l ^ n := Nat.one_le_pow _ _ (Fact.out : l.Prime).pos
-  obtain ⟨m, hm⟩ : ∃ m, m + v = l ^ n * v := ⟨
-    (l ^ n - 1) * v,
-    by rw [Nat.sub_mul, one_mul]; exact Nat.sub_add_cancel (Nat.le_mul_of_pos_left _ hq)
-  ⟩
+  obtain ⟨m, hm⟩ : ∃ m, m + v = l ^ n * v := ⟨(l ^ n - 1) * v, by
+    rw [Nat.sub_mul, one_mul]; exact Nat.sub_add_cancel (Nat.le_mul_of_pos_left _ hq)⟩
   set E : A.W := WittVector.teichmuller l c with hEdef
   set U : A.W := WittVector.teichmuller l u with hU
   set N : A.W := WittVector.teichmuller l η with hN
@@ -184,15 +199,11 @@ theorem log_on_part
     rw [← hη]; exact (map_pow A.sharp η (l ^ n)).trans hz
   have hεm := isLog_pow hEx hMul A n hε1 (hEps l A n) m
   have hprod := hMul l A n _ _ _ _ h1 (by rw [map_pow, hε1, one_pow]) hy hεm
-  have hid
-      : E * (E * U * N ^ m + (1 - E)) ^ l ^ n
-        = E
-          * (WittVector.teichmuller l (u ^ l ^ n)
-            * WittVector.teichmuller l (A.s (epsilon l)) ^ m) := by
+  have hid : E * (E * U * N ^ m + (1 - E)) ^ l ^ n =
+      E * (WittVector.teichmuller l (u ^ l ^ n) * WittVector.teichmuller l (A.s (epsilon l)) ^ m) := by
     have h2 : E * (E * U * N ^ m + (1 - E)) = E * (U * N ^ m) := by
       linear_combination (U * N ^ m - 1) * hEi
-    rw [mul_pow_congr h2, ← hη, map_pow, map_pow, ← hU, ← hN, mul_pow, ← pow_mul, ← pow_mul,
-      mul_comm m]
+    rw [mul_pow_congr h2, ← hη, map_pow, map_pow, ← hU, ← hN, mul_pow, ← pow_mul, ← pow_mul, mul_comm m]
   have key := (hEx l A n).2.2 E _ _ _ _ (show IsIdempotentElem E from hEi) hid hwq hprod
   have hm' : (m : A.Acr n) + (v : A.Acr n) = 0 := by
     have := congrArg (Nat.cast : ℕ → A.Acr n) hm
@@ -200,12 +211,8 @@ theorem log_on_part
     exact this
   linear_combination (-1 : A.Acr n) * key + (A.toAcr n E * A.cris n (ACris.periodT (untilt_epsilon (p := l)))) * (-hm')
 
-theorem lcLog
-    : CrystallineSemistableComparison.E.LcIdem → CrystallineSemistableComparison.E.LcSpec
-      → CrystallineSemistableComparison.E.LcCover → CrystallineSemistableComparison.E.LogEx
-      → CrystallineSemistableComparison.E.LogMul → CrystallineSemistableComparison.E.LogEps
-      → CrystallineSemistableComparison.E.EpsRoot
-      → CrystallineSemistableComparison.E.LcLog := by
+theorem lcLog : CrystallineSemistableComparison.E.LcIdem → CrystallineSemistableComparison.E.LcSpec → CrystallineSemistableComparison.E.LcCover → CrystallineSemistableComparison.E.LogEx → CrystallineSemistableComparison.E.LogMul → CrystallineSemistableComparison.E.LogEps →
+    CrystallineSemistableComparison.E.EpsRoot → CrystallineSemistableComparison.E.LcLog := by
   intro hI hS _ hEx hMul hEps hR l _ H r A hA n u f hp
   obtain ⟨η, hη, hsh⟩ := hR l n
   obtain ⟨e, he, hiff, -⟩ := hI l H A hA (ZMod (l ^ n)) f
@@ -235,7 +242,7 @@ theorem lcLog
   obtain ⟨y, hy⟩ := (hEx l A n).1 _ h1
   have hloc := fun a : ZMod (l ^ n) => log_on_part hEx hMul hEps A n hη' hz (he.idem a) (hE a) h1 hy
   have hsumA : ∑ a, A.toAcr n (WittVector.teichmuller l (e a)) = 1 := by
-    set_option synthInstance.maxHeartbeats 100000 in
+
     rw [← map_sum, teich_sum_one A he, map_one]
   have hlc := ((hS l H A hA n).2.2.2 f e he (fun a p hpn => (hiff a p).1 hpn))
   have hfin : y = (ACris.periodT (untilt_epsilon (p := l)) : Acris l) • lcA A n f := by
@@ -243,8 +250,7 @@ theorem lcLog
     show y = A.cris n _ * _
     rw [← one_mul y, ← hsumA, Finset.sum_mul, Finset.mul_sum]
     refine Finset.sum_congr rfl fun a _ => ?_
-    rw [hloc a]
-    ring
+    rw [hloc a]; ring
   rwa [← hfin]
 
 end GlobalTheory.CompanionTheory.LcLogProof

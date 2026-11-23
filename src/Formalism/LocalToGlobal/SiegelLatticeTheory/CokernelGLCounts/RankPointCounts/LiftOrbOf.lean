@@ -1,7 +1,51 @@
 module
 
-public import Mathlib
 public import Formalism.LocalToGlobal.SiegelLatticeTheory.CokernelGLCounts.RankPointCounts.MulVecInj
+public import Formalism.LocalToGlobal.SiegelLatticeTheory.CokernelGLCounts.RankPointCounts.SRLift
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -11,7 +55,7 @@ open Matrix
 
 namespace Formalism.L2.SG.Pf.Coef.SplitCoefficientComponents
 
-set_option maxHeartbeats 1600000
+
 
 theorem liftOrb_of (hSR : SRLift) : LiftOrb := by
   intro F _ _ _ E _ _ _ _ M hOK m Z Z' ⟨φ⟩ hκ
@@ -22,54 +66,46 @@ theorem liftOrb_of (hSR : SRLift) : LiftOrb := by
   have hmkZ' : ∀ x : Fin (m + 1) → M.R, (Submodule.Quotient.mk (Z'.Z.mulVec x) : M.Cok Z') = 0 :=
     fun x => (Submodule.Quotient.mk_eq_zero _).2 ⟨x, rfl⟩
 
-  have hcol
-      : ∀ j : Fin (m + 1), ∃ w : Fin (m + 1) → M.R,
-        (Submodule.Quotient.mk w : M.Cok Z') = φ.1 (Submodule.Quotient.mk (Pi.single j 1))
-          ∧ mu M Z' w = mu M Z (Pi.single j 1) ∧ (j = Fin.last m → w = e) := by
+  have hcol : ∀ j : Fin (m + 1), ∃ w : Fin (m + 1) → M.R,
+      (Submodule.Quotient.mk w : M.Cok Z') = φ.1 (Submodule.Quotient.mk (Pi.single j 1)) ∧
+      mu M Z' w = mu M Z (Pi.single j 1) ∧ (j = Fin.last m → w = e) := by
     intro j
     by_cases hj : j = Fin.last m
     · subst hj
       refine ⟨e, φ.2.1.symm, ?_, fun _ => rfl⟩
       rw [he, mu_e, mu_e, hκ]
-    · obtain ⟨v, hv⟩ :=
-        Submodule.Quotient.mk_surjective _ (φ.1 (Submodule.Quotient.mk (Pi.single j 1)))
+    · obtain ⟨v, hv⟩ := Submodule.Quotient.mk_surjective _ (φ.1 (Submodule.Quotient.mk (Pi.single j 1)))
       have hl := φ.2.2 (Submodule.Quotient.mk (Pi.single j 1))
-      rw [← hv, lam_mk, lam_mk, Submodule.mkQ_apply, Submodule.mkQ_apply, Submodule.Quotient.eq]
-        at hl
+      rw [← hv, lam_mk, lam_mk, Submodule.mkQ_apply, Submodule.mkQ_apply, Submodule.Quotient.eq] at hl
       obtain ⟨t, ht⟩ := hl
       refine ⟨v - Z'.Z.mulVec (t • e), ?_, ?_, fun h => absurd h hj⟩
       · rw [Submodule.Quotient.mk_sub, hmkZ', sub_zero, hv]
       · have ht' : ((t : M.R) : E) = mu M Z' v - mu M Z (Pi.single j 1) := ht
         rw [sub_eq_add_neg, ← Matrix.mulVec_neg, mu_add, mu_Z]
-        simp only [Pi.neg_apply, Pi.smul_apply, he, Pi.single_eq_same, smul_eq_mul, mul_one,
-          NegMemClass.coe_neg]
+        simp only [Pi.neg_apply, Pi.smul_apply, he, Pi.single_eq_same, smul_eq_mul, mul_one, NegMemClass.coe_neg]
         rw [ht']
         ring
   choose w hw1 hw2 hw3 using hcol
   set l₁ : Matrix (Fin (m + 1)) (Fin (m + 1)) M.R := Matrix.of fun i j => w j i with hl₁
   have hl₁v : ∀ x, l₁.mulVec x = ∑ j, x j • w j := by
-    intro x
-    funext i
+    intro x; funext i
     simp [hl₁, Matrix.mulVec, dotProduct, Finset.sum_apply, mul_comm]
   have hx : ∀ x : Fin (m + 1) → M.R, ∑ j, x j • (Pi.single j 1 : Fin (m + 1) → M.R) = x := by
     intro x; funext i; simp [Finset.sum_apply, Pi.single_apply]
-  have hP1
-      : ∀ x, (Submodule.Quotient.mk (l₁.mulVec x) : M.Cok Z') = φ.1 (Submodule.Quotient.mk x) := by
+  have hP1 : ∀ x, (Submodule.Quotient.mk (l₁.mulVec x) : M.Cok Z') = φ.1 (Submodule.Quotient.mk x) := by
     intro x
     conv_rhs => rw [← hx x]
     rw [hl₁v]
-    have e1
-        : (Submodule.Quotient.mk (∑ j, x j • w j) : M.Cok Z')
-          = ∑ j, x j • (Submodule.Quotient.mk (w j) : M.Cok Z') := by
-      set_option synthInstance.maxHeartbeats 100000 in
+    have e1 : (Submodule.Quotient.mk (∑ j, x j • w j) : M.Cok Z') =
+        ∑ j, x j • (Submodule.Quotient.mk (w j) : M.Cok Z') := by
+
       rw [← Submodule.mkQ_apply, map_sum]; simp
-    have e2
-        : (Submodule.Quotient.mk (∑ j, x j • (Pi.single j 1 : Fin (m + 1) → M.R)) : M.Cok Z)
-          = ∑ j, x j • (Submodule.Quotient.mk (Pi.single j 1) : M.Cok Z) := by
-      set_option synthInstance.maxHeartbeats 100000 in
+    have e2 : (Submodule.Quotient.mk (∑ j, x j • (Pi.single j 1 : Fin (m + 1) → M.R)) : M.Cok Z) =
+        ∑ j, x j • (Submodule.Quotient.mk (Pi.single j 1) : M.Cok Z) := by
+
       rw [← Submodule.mkQ_apply, map_sum]; simp
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [e1, e2, map_sum]
+
+    rw [e1, e2, map_sum]
     refine Finset.sum_congr rfl fun j _ => ?_
     rw [map_smul, hw1 j]
   have hP2 : ∀ x, mu M Z' (l₁.mulVec x) = mu M Z x := by
@@ -89,8 +125,7 @@ theorem liftOrb_of (hSR : SRLift) : LiftOrb := by
   have hK2 : ∀ y ∈ headK M Z', mu M Z' y = 0 := by
     intro y hy
     obtain ⟨x, hx0, rfl⟩ := (mem_headK M Z').1 hy
-    rw [mu_Z, hx0]
-    simp
+    rw [mu_Z, hx0]; simp
 
   have hb : ∃ y₀, Z'.Z.mulVec y₀ = l₁.mulVec (Z.Z.mulVec e) ∧ y₀ (Fin.last m) = 1 := by
     have h0 : (Submodule.Quotient.mk (l₁.mulVec (Z.Z.mulVec e)) : M.Cok Z') = 0 := by
@@ -109,8 +144,7 @@ theorem liftOrb_of (hSR : SRLift) : LiftOrb := by
       rw [Submodule.Quotient.mk_sub, hP1, hx₀, LinearEquiv.apply_symm_apply, sub_self]
     obtain ⟨y, hy⟩ := (Submodule.Quotient.mk_eq_zero _).1 h1
     simp only [Matrix.mulVecLin_apply] at hy
-    refine
-      ⟨x₀ + y (Fin.last m) • Z.Z.mulVec e, (mem_headK M Z').2 ⟨y - y (Fin.last m) • y₀, ?_, ?_⟩⟩
+    refine ⟨x₀ + y (Fin.last m) • Z.Z.mulVec e, (mem_headK M Z').2 ⟨y - y (Fin.last m) • y₀, ?_, ?_⟩⟩
     · simp [hy₀l]
     · rw [Matrix.mulVec_sub, Matrix.mulVec_smul, hy₀, hy, Matrix.mulVec_add, Matrix.mulVec_smul]
       abel
@@ -122,8 +156,7 @@ theorem liftOrb_of (hSR : SRLift) : LiftOrb := by
       funext i; simp [Matrix.mulVec, dotProduct, Finset.sum_apply, mul_comm]
     rw [this]
     exact Submodule.sum_mem _ fun j _ => Submodule.smul_mem _ _ (hHK j)
-  have hQ1
-      : ∀ x, (Submodule.Quotient.mk (l.mulVec x) : M.Cok Z') = φ.1 (Submodule.Quotient.mk x) := by
+  have hQ1 : ∀ x, (Submodule.Quotient.mk (l.mulVec x) : M.Cok Z') = φ.1 (Submodule.Quotient.mk x) := by
     intro x
     rw [hl, Matrix.add_mulVec, Submodule.Quotient.mk_add, hK1 _ (hHx x), add_zero, hP1]
   have hQ2 : ∀ x, mu M Z' (l.mulVec x) = mu M Z x := by
@@ -186,20 +219,17 @@ theorem liftOrb_of (hSR : SRLift) : LiftOrb := by
   refine ⟨l, ρ₀⁻¹, hlu, (Matrix.isUnit_nonsing_inv_det_iff).2 hρu, hle, fun j => ?_, ?_⟩
   · have h1 : Matrix.vecMul e ρ₀ = e := by
       funext j
-      simp only [Matrix.vecMul, dotProduct, he, Pi.single_apply, ite_mul, one_mul, zero_mul,
-        Finset.sum_ite_eq', Finset.mem_univ, if_true]
+      simp only [Matrix.vecMul, dotProduct, he, Pi.single_apply, ite_mul, one_mul, zero_mul, Finset.sum_ite_eq',
+        Finset.mem_univ, if_true]
       rw [hρl]
     have h2 : Matrix.vecMul e ρ₀⁻¹ = e := by
       conv_lhs => rw [← h1]
       rw [Matrix.vecMul_vecMul, Matrix.mul_nonsing_inv _ hρu, Matrix.vecMul_one]
     have := congrFun h2 j
-    simp only [Matrix.vecMul, dotProduct, he, Pi.single_apply, ite_mul, one_mul, zero_mul,
-        Finset.sum_ite_eq', Finset.mem_univ, if_true]
-      at this
+    simp only [Matrix.vecMul, dotProduct, he, Pi.single_apply, ite_mul, one_mul, zero_mul, Finset.sum_ite_eq',
+      Finset.mem_univ, if_true] at this
     rw [this]
-  · calc
-      Z'.Z
-        = Z'.Z * ρ₀ * ρ₀⁻¹ := by rw [Matrix.mul_assoc, Matrix.mul_nonsing_inv _ hρu, Matrix.mul_one]
+  · calc Z'.Z = Z'.Z * ρ₀ * ρ₀⁻¹ := by rw [Matrix.mul_assoc, Matrix.mul_nonsing_inv _ hρu, Matrix.mul_one]
       _ = l * Z.Z * ρ₀⁻¹ := by rw [hZρ]
 
 end Formalism.L2.SG.Pf.Coef.SplitCoefficientComponents

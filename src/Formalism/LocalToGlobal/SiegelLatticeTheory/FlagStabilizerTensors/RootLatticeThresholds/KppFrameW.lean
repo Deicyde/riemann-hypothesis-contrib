@@ -1,8 +1,50 @@
 module
 
-public import Mathlib
 public import Formalism.LocalToGlobal.SiegelLatticeTheory.FlagStabilizerTensors.RootLatticeThresholds.KppRedW
 public import Formalism.LocalToGlobal.SiegelLatticeTheory.FlagStabilizerTensors.RootLatticeThresholds.AllRowsRho
+import Formalism.LocalToGlobal.SiegelLatticeTheory.FlagStabilizerTensors.RootLatticeThresholds.RedBasicsPf
+import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.AdelicClassFiniteness.DictLat
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -15,55 +57,46 @@ namespace Formalism.L2.SG.Pf.KppFrameW
 
 attribute [local instance] Ideal.Quotient.field
 
-open Formalism.MainNotions.S Formalism.L2.SG.Pf.RowDictPf PIW.AdelClassFin
-  Formalism.L2.SG.Pf.RedBasicsPf Formalism.L2.SG.Pf.unitaryCongruence
+open Formalism.MainNotions.S Formalism.L2.SG.Pf.RowDictPf PIW.AdelClassFin Formalism.L2.SG.Pf.RedBasicsPf Formalism.L2.SG.Pf.unitaryCongruence
   Formalism.L2.SG.Pf.AllRowsRedKerA Formalism.L2.SG.Pf.KppRedW Formalism.L2.SG.Pf.AllRowsRho
 
 variable {I : AutInst} {w : HeightOneSpectrum (𝓞 I.E)} {p : ℕ} {m : ℕ}
 
-theorem hhat_sum_right
-    (u : Fin I.n → I.E ⊗[I.F] Af I.F)
-    {ι : Type*} (s : Finset ι) (a : ι → I.E ⊗[I.F] Af I.F) (v : ι → Fin I.n → I.E ⊗[I.F] Af I.F)
-    : hhat I u (∑ j ∈ s, a j • v j) = ∑ j ∈ s, a j * hhat I u (v j) := by
+theorem hhat_sum_right (u : Fin I.n → I.E ⊗[I.F] Af I.F) {ι : Type*} (s : Finset ι) (a : ι → I.E ⊗[I.F] Af I.F)
+    (v : ι → Fin I.n → I.E ⊗[I.F] Af I.F) :
+    hhat I u (∑ j ∈ s, a j • v j) = ∑ j ∈ s, a j * hhat I u (v j) := by
   classical
   induction s using Finset.induction_on with
   | empty => simp [DictLat.hhat_zero_right]
   | insert b s hb ih =>
-    rw [Finset.sum_insert hb, Finset.sum_insert hb, DictLat.hhat_add_right, DictLat.hhat_smul_right,
-      ih]
+    rw [Finset.sum_insert hb, Finset.sum_insert hb, DictLat.hhat_add_right, DictLat.hhat_smul_right, ih]
 
-theorem iv_sum_int (b : Fin m → Fin I.n → I.E) (c : Fin m → ℤ)
-    : iv I (∑ j, ((c j : ℤ) : I.E) • b j) = ∑ j, ((c j : ℤ) : I.E ⊗[I.F] Af I.F) • iv I (b j) := by
+theorem iv_sum_int (b : Fin m → Fin I.n → I.E) (c : Fin m → ℤ) :
+    iv I (∑ j, ((c j : ℤ) : I.E) • b j) = ∑ j, ((c j : ℤ) : I.E ⊗[I.F] Af I.F) • iv I (b j) := by
   funext k
-  set_option synthInstance.maxHeartbeats 100000 in
+
   simp [iv, Finset.sum_apply, map_sum]
 
-def GramW (w : HeightOneSpectrum (𝓞 I.E)) {r : ℕ} (fr frd : Fin r → Fin I.n → I.E ⊗[I.F] Af I.F)
-    : Prop :=
+def GramW (w : HeightOneSpectrum (𝓞 I.E)) {r : ℕ} (fr frd : Fin r → Fin I.n → I.E ⊗[I.F] Af I.F) : Prop :=
   ∀ i j, hhat I (frd i) (fr j) - (if i = j then 1 else 0) ∈ Wq I w
 
-theorem exists_lifts
-    (hp : p.Prime) (hcard : Nat.card (𝓞 I.E ⧸ w.asIdeal) = p)
-    {r : ℕ} {fr : Fin r → Fin I.n → I.E ⊗[I.F] Af I.F} (hfr : ∀ j, fr j ∈ I.Lf)
-    : ∃ c : Fin r → Fin I.n → I.E, ∀ j, c j ∈ I.L ∧ fr j - iv I (c j) ∈ Lq I w := by
+theorem exists_lifts (hp : p.Prime) (hcard : Nat.card (𝓞 I.E ⧸ w.asIdeal) = p) {r : ℕ}
+    {fr : Fin r → Fin I.n → I.E ⊗[I.F] Af I.F} (hfr : ∀ j, fr j ∈ I.Lf) :
+    ∃ c : Fin r → Fin I.n → I.E, ∀ j, c j ∈ I.L ∧ fr j - iv I (c j) ∈ Lq I w := by
   choose c hcL hc using fun j => dense I w hp hcard (hfr j)
   exact ⟨c, fun j => ⟨hcL j, hc j⟩⟩
 
-theorem gram_lift
-    {r : ℕ} {fr frd : Fin r → Fin I.n → I.E ⊗[I.F] Af I.F}
-    (hfrd : ∀ i, frd i ∈ I.Lf) (hg : GramW w fr frd)
-    {c : Fin r → Fin I.n → I.E} (hc : ∀ j, fr j - iv I (c j) ∈ Lq I w)
-    : GramW w (fun j => iv I (c j)) frd := fun i j => by
+theorem gram_lift {r : ℕ} {fr frd : Fin r → Fin I.n → I.E ⊗[I.F] Af I.F} (hfrd : ∀ i, frd i ∈ I.Lf)
+    (hg : GramW w fr frd) {c : Fin r → Fin I.n → I.E} (hc : ∀ j, fr j - iv I (c j) ∈ Lq I w) :
+    GramW w (fun j => iv I (c j)) frd := fun i j => by
   have := sub_mem (hg i j) (hhat_Lq_right (hfrd i) (hc j))
   convert this using 1
   rw [hhat_sub_right]
   ring
 
-theorem isRedBasis_of_gram
-    (hp : p.Prime) (hcard : Nat.card (𝓞 I.E ⧸ w.asIdeal) = p) (hm : m = I.n)
-    {frd : Fin m → Fin I.n → I.E ⊗[I.F] Af I.F} (hfrd : ∀ i, frd i ∈ I.Lf)
-    {c : Fin m → Fin I.n → I.E} (hcL : ∀ j, c j ∈ I.L) (hg : GramW w (fun j => iv I (c j)) frd)
-    : IsRedBasis0 I w c := by
+theorem isRedBasis_of_gram (hp : p.Prime) (hcard : Nat.card (𝓞 I.E ⧸ w.asIdeal) = p) (hm : m = I.n)
+    {frd : Fin m → Fin I.n → I.E ⊗[I.F] Af I.F} (hfrd : ∀ i, frd i ∈ I.Lf) {c : Fin m → Fin I.n → I.E}
+    (hcL : ∀ j, c j ∈ I.L) (hg : GramW w (fun j => iv I (c j)) frd) : IsRedBasis0 I w c := by
   subst hm
   refine ⟨hcL, ?_⟩
   let b' : Fin I.n → I.L := fun j => ⟨c j, hcL j⟩
@@ -85,17 +118,15 @@ theorem isRedBasis_of_gram
       simp [b']
     have hiv : iv I (∑ j, ((α j : 𝓞 I.E) : I.E) • c j) = ∑ j, iE I (α j) • iv I (c j) := by
       funext k
-      set_option synthInstance.maxHeartbeats 100000 in
+
       simp only [iv, iE, Finset.sum_apply, Pi.smul_apply, smul_eq_mul, map_sum, map_mul]
     have h2 := hhat_Lq_right (hfrd i) h1
     rw [hiv, hhat_sum_right] at h2
     have h3 : ∑ j, iE I (α j) * (hhat I (frd i) (iv I (c j)) - (if i = j then 1 else 0)) ∈ Wq I w :=
       sum_mem fun j _ => Wq_mul (hg i j) (iE_int I (α j))
     have h4 := sub_mem h2 h3
-    have e
-        : ∑ j, iE I (α j) * hhat I (frd i) (iv I (c j))
-            - ∑ j, iE I (α j) * (hhat I (frd i) (iv I (c j)) - (if i = j then 1 else 0))
-          = iE I (α i) := by
+    have e : ∑ j, iE I (α j) * hhat I (frd i) (iv I (c j)) -
+        ∑ j, iE I (α j) * (hhat I (frd i) (iv I (c j)) - (if i = j then 1 else 0)) = iE I (α i) := by
       rw [← Finset.sum_sub_distrib]
       simp only [mul_sub, sub_sub_cancel, mul_ite, mul_one, mul_zero]
       rw [Finset.sum_ite_eq]
@@ -132,24 +163,14 @@ theorem isRedBasis_of_gram
   convert h1 using 1
   simp [b', Int.cast_smul_eq_zsmul]
 
-def RepV
-    (w : HeightOneSpectrum (𝓞 I.E))
-    (p : ℕ)
-    {r : ℕ} (u : Fin r → Fin I.n → I.E ⊗[I.F] Af I.F)
-    (v : Fin I.n → I.E ⊗[I.F] Af I.F) (a : Fin r → ZMod p)
-    : Prop :=
+def RepV (w : HeightOneSpectrum (𝓞 I.E)) (p : ℕ) {r : ℕ} (u : Fin r → Fin I.n → I.E ⊗[I.F] Af I.F)
+    (v : Fin I.n → I.E ⊗[I.F] Af I.F) (a : Fin r → ZMod p) : Prop :=
   v - ∑ j, (((a j).val : ℕ) : I.E ⊗[I.F] Af I.F) • u j ∈ Lq I w
 
-theorem coef
-    [NeZero p]
-    {r : ℕ} {frd u : Fin r → Fin I.n → I.E ⊗[I.F] Af I.F}
-    (hfrd : ∀ i, frd i ∈ I.Lf) (hu : ∀ j, u j ∈ I.Lf) (hg : GramW w u frd)
-    {v : Fin I.n → I.E ⊗[I.F] Af I.F} {a : Fin r → ZMod p} (hv : RepV w p u v a)
-    (i : Fin r)
-    : CongW (w := w) p (hhat I (frd i) v) (a i) := by
-  have h1
-      : hhat I (frd i) v - hhat I (frd i) (∑ j, (((a j).val : ℕ) : I.E ⊗[I.F] Af I.F) • u j)
-        ∈ Wq I w := by
+theorem coef [NeZero p] {r : ℕ} {frd u : Fin r → Fin I.n → I.E ⊗[I.F] Af I.F} (hfrd : ∀ i, frd i ∈ I.Lf)
+    (hu : ∀ j, u j ∈ I.Lf) (hg : GramW w u frd) {v : Fin I.n → I.E ⊗[I.F] Af I.F} {a : Fin r → ZMod p}
+    (hv : RepV w p u v a) (i : Fin r) : CongW (w := w) p (hhat I (frd i) v) (a i) := by
+  have h1 : hhat I (frd i) v - hhat I (frd i) (∑ j, (((a j).val : ℕ) : I.E ⊗[I.F] Af I.F) • u j) ∈ Wq I w := by
     rw [← hhat_sub_right]; exact hhat_Lq_right (hfrd i) hv
   refine congW_of_sub ?_ h1
   rw [hhat_sum_right]
@@ -167,16 +188,14 @@ theorem coef
         split_ifs <;> simp
   simpa [mul_ite, Finset.sum_ite_eq] using h2
 
-theorem natSmul_Lq' (k : ℕ) {z : Fin I.n → I.E ⊗[I.F] Af I.F} (hz : z ∈ Lq I w)
-    : (k : I.E ⊗[I.F] Af I.F) • z ∈ Lq I w := by
+theorem natSmul_Lq' (k : ℕ) {z : Fin I.n → I.E ⊗[I.F] Af I.F} (hz : z ∈ Lq I w) :
+    (k : I.E ⊗[I.F] Af I.F) • z ∈ Lq I w := by
   rw [Nat.cast_smul_eq_nsmul]; exact nsmul_mem hz k
 
-theorem rep_unique
-    (hp : p.Prime) (hcard : Nat.card (𝓞 I.E ⧸ w.asIdeal) = p) (hm : m = I.n)
-    {b : Fin m → Fin I.n → I.E} (hb : IsRedBasis0 I w b)
-    {v : Fin I.n → I.E ⊗[I.F] Af I.F} {a a' : Fin m → ZMod p}
-    (h : RepV w p (fun j => iv I (b j)) v a) (h' : RepV w p (fun j => iv I (b j)) v a')
-    : a = a' := by
+theorem rep_unique (hp : p.Prime) (hcard : Nat.card (𝓞 I.E ⧸ w.asIdeal) = p) (hm : m = I.n)
+    {b : Fin m → Fin I.n → I.E} (hb : IsRedBasis0 I w b) {v : Fin I.n → I.E ⊗[I.F] Af I.F}
+    {a a' : Fin m → ZMod p} (h : RepV w p (fun j => iv I (b j)) v a) (h' : RepV w p (fun j => iv I (b j)) v a') :
+    a = a' := by
   subst hm
   have : NeZero p := ⟨hp.ne_zero⟩
   have h1 : iv I (∑ j, ((((a' j).val : ℤ) - (a j).val : ℤ) : I.E) • b j) ∈ Lq I w := by
@@ -191,18 +210,14 @@ theorem rep_unique
   rw [← ZMod.intCast_eq_intCast_iff_dvd_sub] at h3
   simpa using h3
 
-theorem rep_exists
-    (hp : p.Prime) (hcard : Nat.card (𝓞 I.E ⧸ w.asIdeal) = p)
-    {b : Fin m → Fin I.n → I.E} (hb : IsRedBasis0 I w b)
-    {v : Fin I.n → I.E ⊗[I.F] Af I.F} (hv : v ∈ I.Lf)
-    : ∃ a, RepV w p (fun j => iv I (b j)) v a := by
+theorem rep_exists (hp : p.Prime) (hcard : Nat.card (𝓞 I.E ⧸ w.asIdeal) = p) {b : Fin m → Fin I.n → I.E}
+    (hb : IsRedBasis0 I w b) {v : Fin I.n → I.E ⊗[I.F] Af I.F} (hv : v ∈ I.Lf) :
+    ∃ a, RepV w p (fun j => iv I (b j)) v a := by
   have : NeZero p := ⟨hp.ne_zero⟩
   obtain ⟨c, hc⟩ := coords I w hp hcard hb hv
   refine ⟨fun j => (c j : ZMod p), ?_⟩
-  have h2
-      : ∑ j, (c j : I.E ⊗[I.F] Af I.F) • iv I (b j)
-          - ∑ j, ((((c j : ℤ) : ZMod p).val : ℕ) : I.E ⊗[I.F] Af I.F) • iv I (b j)
-        ∈ Lq I w := by
+  have h2 : ∑ j, (c j : I.E ⊗[I.F] Af I.F) • iv I (b j) -
+      ∑ j, ((((c j : ℤ) : ZMod p).val : ℕ) : I.E ⊗[I.F] Af I.F) • iv I (b j) ∈ Lq I w := by
     rw [← Finset.sum_sub_distrib]
     refine sum_mem fun j _ => ?_
     have := neg_mem (val_sub I w hp hcard (hb.1 j) (c j))
@@ -212,38 +227,30 @@ theorem rep_exists
   convert this using 1
   abel
 
-theorem rep_comp
-    (hp : p.Prime) (hcard : Nat.card (𝓞 I.E ⧸ w.asIdeal) = p)
-    {r : ℕ} {b : Fin m → Fin I.n → I.E} (hb : ∀ k, b k ∈ I.L)
-    {u : Fin r → Fin I.n → I.E ⊗[I.F] Af I.F} {v : Fin I.n → I.E ⊗[I.F] Af I.F} {A : Fin r → ZMod p}
-    (hA : RepV w p u v A)
-    {P : Matrix (Fin m) (Fin r) (ZMod p)}
-    (hP : ∀ j, RepV w p (fun k => iv I (b k)) (u j) (fun k => P k j))
-    : RepV w p (fun k => iv I (b k)) v (P *ᵥ A) := by
+theorem rep_comp (hp : p.Prime) (hcard : Nat.card (𝓞 I.E ⧸ w.asIdeal) = p) {r : ℕ}
+    {b : Fin m → Fin I.n → I.E} (hb : ∀ k, b k ∈ I.L) {u : Fin r → Fin I.n → I.E ⊗[I.F] Af I.F}
+    {v : Fin I.n → I.E ⊗[I.F] Af I.F} {A : Fin r → ZMod p} (hA : RepV w p u v A)
+    {P : Matrix (Fin m) (Fin r) (ZMod p)} (hP : ∀ j, RepV w p (fun k => iv I (b k)) (u j) (fun k => P k j)) :
+    RepV w p (fun k => iv I (b k)) v (P *ᵥ A) := by
   have : NeZero p := ⟨hp.ne_zero⟩
-  have s2
-      : ∑ j, (((A j).val : ℕ) : I.E ⊗[I.F] Af I.F) • u j
-          - ∑ j, (((A j).val : ℕ) : I.E ⊗[I.F] Af I.F) •
-              ∑ k, (((P k j).val : ℕ) : I.E ⊗[I.F] Af I.F) • iv I (b k)
-        ∈ Lq I w := by
+  have s2 : ∑ j, (((A j).val : ℕ) : I.E ⊗[I.F] Af I.F) • u j -
+      ∑ j, (((A j).val : ℕ) : I.E ⊗[I.F] Af I.F) •
+        ∑ k, (((P k j).val : ℕ) : I.E ⊗[I.F] Af I.F) • iv I (b k) ∈ Lq I w := by
     rw [← Finset.sum_sub_distrib]
     refine sum_mem fun j _ => ?_
     rw [← smul_sub]
     exact natSmul_Lq' _ (hP j)
-  have e3
-      : ∑ j, (((A j).val : ℕ) : I.E ⊗[I.F] Af I.F) •
-          ∑ k, (((P k j).val : ℕ) : I.E ⊗[I.F] Af I.F) • iv I (b k)
-        = ∑ k, (((∑ j, (P k j).val * (A j).val : ℕ) : ℤ) : I.E ⊗[I.F] Af I.F) • iv I (b k) := by
+  have e3 : ∑ j, (((A j).val : ℕ) : I.E ⊗[I.F] Af I.F) •
+        ∑ k, (((P k j).val : ℕ) : I.E ⊗[I.F] Af I.F) • iv I (b k) =
+      ∑ k, (((∑ j, (P k j).val * (A j).val : ℕ) : ℤ) : I.E ⊗[I.F] Af I.F) • iv I (b k) := by
     simp only [Finset.smul_sum, smul_smul]
     rw [Finset.sum_comm]
     refine Finset.sum_congr rfl fun k _ => ?_
     rw [Int.cast_natCast, Nat.cast_sum, Finset.sum_smul]
     refine Finset.sum_congr rfl fun j _ => ?_
     rw [Nat.cast_mul, mul_comm]
-  have s3
-      : ∑ k, (((∑ j, (P k j).val * (A j).val : ℕ) : ℤ) : I.E ⊗[I.F] Af I.F) • iv I (b k)
-          - ∑ k, ((((P *ᵥ A) k).val : ℕ) : I.E ⊗[I.F] Af I.F) • iv I (b k)
-        ∈ Lq I w := by
+  have s3 : ∑ k, (((∑ j, (P k j).val * (A j).val : ℕ) : ℤ) : I.E ⊗[I.F] Af I.F) • iv I (b k) -
+      ∑ k, ((((P *ᵥ A) k).val : ℕ) : I.E ⊗[I.F] Af I.F) • iv I (b k) ∈ Lq I w := by
     rw [← Finset.sum_sub_distrib]
     refine sum_mem fun k _ => ?_
     have hc : (((∑ j, (P k j).val * (A j).val : ℕ) : ℤ) : ZMod p) = (P *ᵥ A) k := by
@@ -260,23 +267,18 @@ theorem rep_comp
   convert this using 1
   abel
 
-theorem rep_mulVec
-    {x : I.Gf} (hx : x ∈ I.Kset)
-    {r : ℕ} {u : Fin r → Fin I.n → I.E ⊗[I.F] Af I.F} {v : Fin I.n → I.E ⊗[I.F] Af I.F}
-    {a : Fin r → ZMod p} (h : RepV w p u v a)
-    : RepV w p (fun j => I.fmat x *ᵥ u j) (I.fmat x *ᵥ v) a := by
+theorem rep_mulVec {x : I.Gf} (hx : x ∈ I.Kset) {r : ℕ} {u : Fin r → Fin I.n → I.E ⊗[I.F] Af I.F}
+    {v : Fin I.n → I.E ⊗[I.F] Af I.F} {a : Fin r → ZMod p} (h : RepV w p u v a) :
+    RepV w p (fun j => I.fmat x *ᵥ u j) (I.fmat x *ᵥ v) a := by
   unfold RepV at h ⊢
   have := stab_w I w hx h
   rw [Matrix.mulVec_sub, Matrix.mulVec_sum] at this
   simpa only [Matrix.mulVec_smul] using this
 
-theorem rep_self
-    [NeZero p] (hp : p.Prime) {r : ℕ} (u : Fin r → Fin I.n → I.E ⊗[I.F] Af I.F) (j : Fin r)
-    : RepV w p u (u j) (fun i => (1 : Matrix (Fin r) (Fin r) (ZMod p)) i j) := by
+theorem rep_self [NeZero p] (hp : p.Prime) {r : ℕ} (u : Fin r → Fin I.n → I.E ⊗[I.F] Af I.F) (j : Fin r) :
+    RepV w p u (u j) (fun i => (1 : Matrix (Fin r) (Fin r) (ZMod p)) i j) := by
   have : Fact (1 < p) := ⟨hp.one_lt⟩
-  have e
-      : ∑ i, ((((1 : Matrix (Fin r) (Fin r) (ZMod p)) i j).val : ℕ) : I.E ⊗[I.F] Af I.F) • u i
-        = u j := by
+  have e : ∑ i, ((((1 : Matrix (Fin r) (Fin r) (ZMod p)) i j).val : ℕ) : I.E ⊗[I.F] Af I.F) • u i = u j := by
     rw [Finset.sum_eq_single j]
     · simp only [Matrix.one_apply_eq, ZMod.val_one, Nat.cast_one, one_smul]
     · intro i _ hi; simp [Matrix.one_apply_ne hi]
@@ -285,20 +287,15 @@ theorem rep_self
   rw [e, sub_self]
   exact zero_mem _
 
-theorem redMatB_rep
-    {b : Fin m → Fin I.n → I.E} {x : I.Gf} {M : Matrix (Fin m) (Fin m) (ZMod p)}
-    (h : RedMatB I w p b x M)
-    (i : Fin m)
-    : RepV w p (fun j => iv I (b j)) (I.fmat x *ᵥ iv I (b i)) (fun j => M j i) :=
-  h i
+theorem redMatB_rep {b : Fin m → Fin I.n → I.E} {x : I.Gf} {M : Matrix (Fin m) (Fin m) (ZMod p)}
+    (h : RedMatB I w p b x M) (i : Fin m) :
+    RepV w p (fun j => iv I (b j)) (I.fmat x *ᵥ iv I (b i)) (fun j => M j i) := h i
 
-theorem conj_basis
-    (hp : p.Prime) (hcard : Nat.card (𝓞 I.E ⧸ w.asIdeal) = p) (hm : m = I.n)
-    {b c : Fin m → Fin I.n → I.E} (hb : IsRedBasis0 I w b) (hc : IsRedBasis0 I w c)
-    : ∃ P Q : Matrix (Fin m) (Fin m) (ZMod p),
-      P * Q = 1 ∧ Q * P = 1
-        ∧ ∀ x ∈ I.Kset, ∀ M N : Matrix (Fin m) (Fin m) (ZMod p),
-          RedMatB I w p b x M → RedMatB I w p c x N → M * P = P * N := by
+theorem conj_basis (hp : p.Prime) (hcard : Nat.card (𝓞 I.E ⧸ w.asIdeal) = p) (hm : m = I.n)
+    {b c : Fin m → Fin I.n → I.E} (hb : IsRedBasis0 I w b) (hc : IsRedBasis0 I w c) :
+    ∃ P Q : Matrix (Fin m) (Fin m) (ZMod p), P * Q = 1 ∧ Q * P = 1 ∧
+      ∀ x ∈ I.Kset, ∀ M N : Matrix (Fin m) (Fin m) (ZMod p), RedMatB I w p b x M → RedMatB I w p c x N →
+        M * P = P * N := by
   have : NeZero p := ⟨hp.ne_zero⟩
   choose Pc hPc using fun j => rep_exists hp hcard hb (DictLat.iv_mem I (hc.1 j))
   choose Qc hQc using fun j => rep_exists hp hcard hc (DictLat.iv_mem I (hb.1 j))
@@ -322,15 +319,11 @@ theorem conj_basis
   have := congrFun this i
   simpa [Matrix.mulVec, dotProduct, Matrix.mul_apply] using this
 
-theorem entry
-    [NeZero p]
-    {fr frd : Fin m → Fin I.n → I.E ⊗[I.F] Af I.F} (hfrd : ∀ i, frd i ∈ I.Lf)
+theorem entry [NeZero p] {fr frd : Fin m → Fin I.n → I.E ⊗[I.F] Af I.F} (hfrd : ∀ i, frd i ∈ I.Lf)
     {c : Fin m → Fin I.n → I.E} (hcL : ∀ j, c j ∈ I.L) (hc : ∀ j, fr j - iv I (c j) ∈ Lq I w)
-    (hg : GramW w (fun j => iv I (c j)) frd)
-    {x : I.Gf} (hx : x ∈ I.Kset)
-    {N : Matrix (Fin m) (Fin m) (ZMod p)} (hN : RedMatB I w p c x N)
-    (i j : Fin m)
-    : CongW (w := w) p (hhat I (frd i) (I.fmat x *ᵥ fr j)) (N i j) := by
+    (hg : GramW w (fun j => iv I (c j)) frd) {x : I.Gf} (hx : x ∈ I.Kset) {N : Matrix (Fin m) (Fin m) (ZMod p)}
+    (hN : RedMatB I w p c x N) (i j : Fin m) :
+    CongW (w := w) p (hhat I (frd i) (I.fmat x *ᵥ fr j)) (N i j) := by
   have h1 := coef hfrd (fun k => DictLat.iv_mem I (hcL k)) hg (redMatB_rep hN j) i
   refine congW_of_sub h1 ?_
   rw [← hhat_sub_right, ← Matrix.mulVec_sub]

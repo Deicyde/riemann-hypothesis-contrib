@@ -1,92 +1,105 @@
 module
 
-public import Mathlib
-public import Development.AutomorphicSpectrum.Proofs.MetricProofs.PeriodDecompositionNearBoundary
-public import Development.AutomorphicSpectrum.Proofs.MetricProofs.IsotropicSublatticeCovolumePositiveStatement
-public import Development.AutomorphicSpectrum.Proofs.MetricProofs.FirstMinimumAndCuspWeightBoundsStatement
+public import Development.AutomorphicSpectrum.Definitions.MetricPeriods.IsEigFrames
+public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.LogPeriodLimit
+public import Development.AutomorphicSpectrum.Proofs.MetricProofs.ChartQContinuousAtAndLocalSolutionStatement
+public import Development.AutomorphicSpectrum.Proofs.MetricProofs.ChartQHermitianAndRealPairingStatement
+public import Development.AutomorphicSpectrum.Proofs.MetricProofs.ChartWSaturatedAndContinuousSectionStatement
+public import Development.AutomorphicSpectrum.Proofs.MetricProofs.ExistsEigenComponentPolynomialStatement
 public import Development.AutomorphicSpectrum.Proofs.MetricProofs.ExistsExtendLinearIndependentOfSpanStatement
+public import Development.AutomorphicSpectrum.Proofs.MetricProofs.ExistsIsKerProjStatement
+public import Development.AutomorphicSpectrum.Proofs.MetricProofs.FirstMinimumAndCuspWeightBoundsStatement
+import Development.AutomorphicSpectrum.Proofs.MetricProofs.IsotropicSublatticeCovolumePositiveStatement
+public import Development.AutomorphicSpectrum.Proofs.MetricProofs.MemChartWOfContinuousPeriodStatement
+public import Development.AutomorphicSpectrum.Proofs.MetricProofs.PeriodDecompositionNearBoundary
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+public import Mathlib.LinearAlgebra.LinearIndependent.BaseChange
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
 
 @[expose] public section
 
 noncomputable section
 namespace LevelTowerAlt
 
-open NumberField Matrix Filter Topology GlobalTheory.CompanionTheory.Ar
-  GlobalTheory.CompanionTheory.Ar.Cusp GroundTheory.Heights₂.Heights.LowerBoundFree
-  GroundTheory.Heights₂.Heights.Regular
+open NumberField Matrix Filter Topology GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Cusp GroundTheory.Heights₂.Heights.LowerBoundFree GroundTheory.Heights₂.Heights.Regular
 open GlobalTheory.CompanionTheory.Ar.RiemannLimit GlobalTheory.CompanionTheory.Ar.Cusp.BoundaryLimit
 
-theorem limit_strong
-    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (n a g : ℕ) (Λ : Type) [AddCommGroup Λ]
-        [Module (𝓞 E) Λ] (Ψ : Type) [Fintype Ψ] (L : ActPeriods E n a g Λ) (σ : Ψ → (𝓞 E →+* ℂ))
-        (m : ℕ) (b : Ψ → Fin m → (Fin n → ℂ) → Fin g → ℂ),
-      IsCMFam σ → IsEigFrames (Metric.ball 0 1) L.B σ b
-        → ∃ (W : Submodule (𝓞 E) Λ) (I : Submodule (𝓞 E) Λ) (per : W →+ (Fin g → ℂ))
-            (Hb M : Matrix (Fin g) (Fin g) ℂ) (u : Λ →ₗ[ℤ] (Fin g → ℤ)),
-          (∀ x, x ∈ I ↔ x ∈ W ∧ ∀ y ∈ W, L.toLogPeriods.E x y = 0) ∧ IsSaturated I
-            ∧ Function.Injective per ∧ (∀ (c : 𝓞 E) (x : W), per (c • x) = L.B 0 c (per x))
-            ∧ M.det ≠ 0 ∧ (∀ x : W, (x : Λ) ∈ I → per x = M *ᵥ cst (u x))
-            ∧ ∀ ν : ℝ,
-              PhiNormSq (L.B 0)
-                  (fun x y => y ⬝ᵥ Hb *ᵥ star x)
-                  (AddSubgroup.closure {p | ∃ x : W, (x : Λ) ∈ I ∧ p = per x}) 1 σ
-                  (fun τ i => b τ i 0)
-                  ν
-                → 0 < ν
-                  ∧ ∀ ε > (0 : ℝ), ∃ δ > (0 : ℝ), ∀ w (hw : w ∈ logCover L.a_le),
-                    ‖expCover a w‖ < δ
-                      → |(L.riem w hw).logDet (fun τ i => b τ i (expCover a w)) - Real.log (RiemLat.nz (L.riem w hw) σ I) - Real.log ν|
-                        < ε := by
+theorem limit_strong : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (n a g : ℕ) (Λ : Type) [AddCommGroup Λ] [Module (𝓞 E) Λ] (Ψ : Type) [Fintype Ψ] (L : ActPeriods E n a g Λ) (σ : Ψ → (𝓞 E →+* ℂ)) (m : ℕ) (b : Ψ → Fin m → (Fin n → ℂ) → Fin g → ℂ), IsCMFam σ → IsEigFrames (Metric.ball 0 1) L.B σ b → ∃ (W : Submodule (𝓞 E) Λ) (I : Submodule (𝓞 E) Λ) (per : W →+ (Fin g → ℂ)) (Hb M : Matrix (Fin g) (Fin g) ℂ) (u : Λ →ₗ[ℤ] (Fin g → ℤ)), (∀ x, x ∈ I ↔ x ∈ W ∧ ∀ y ∈ W, L.toLogPeriods.E x y = 0) ∧ IsSaturated I ∧ Function.Injective per ∧ (∀ (c : 𝓞 E) (x : W), per (c • x) = L.B 0 c (per x)) ∧ M.det ≠ 0 ∧ (∀ x : W, (x : Λ) ∈ I → per x = M *ᵥ cst (u x)) ∧ ∀ ν : ℝ, PhiNormSq (L.B 0) (fun x y => y ⬝ᵥ Hb *ᵥ star x) (AddSubgroup.closure {p | ∃ x : W, (x : Λ) ∈ I ∧ p = per x}) 1 σ (fun τ i => b τ i 0) ν → 0 < ν ∧ ∀ ε > (0 : ℝ), ∃ δ > (0 : ℝ), ∀ w (hw : w ∈ logCover L.a_le), ‖expCover a w‖ < δ → |(L.riem w hw).logDet (fun τ i => b τ i (expCover a w)) - Real.log (RiemLat.nz (L.riem w hw) σ I) - Real.log ν| < ε := by
   intro E _ _ _ n a g Λ _ _ Ψ _ L σ m b hσ hb
   classical
   obtain ⟨bas, A, T0, B, c, ρ, h⟩ := exists_isChart L.toLogPeriods
   obtain ⟨Pr, hPr⟩ := GlobalTheory.T.exists_isKerProj' g (∑ j, B j)
-  obtain ⟨hsat, hs, hinj, hspan⟩ :=
-    GlobalTheory.T.chartW_saturated_and_continuous_section n a g Λ L.toLogPeriods bas A T0 B c ρ h
-  obtain ⟨hext, hlim⟩ :=
-    GlobalTheory.T.mem_chartW_of_continuous_period n a g Λ L.toLogPeriods bas A T0 B c ρ h
-  obtain ⟨hHerm, hIm, hKill, hPos⟩ :=
-    GlobalTheory.T.chartQ_hermitian_and_real_pairing n a g Λ L.toLogPeriods bas A T0 B c ρ Pr h hPr
-  obtain ⟨hQc, ρ', hρ', hrep⟩ :=
-    GlobalTheory.T.chartQ_continuousAt_and_local_solution n a g Λ L.toLogPeriods bas A T0 B c ρ Pr h
-      hPr
+  obtain ⟨hsat, hs, hinj, hspan⟩ := GlobalTheory.T.chartW_saturated_and_continuous_section n a g Λ L.toLogPeriods bas A T0 B c ρ h
+  obtain ⟨hext, hlim⟩ := GlobalTheory.T.mem_chartW_of_continuous_period n a g Λ L.toLogPeriods bas A T0 B c ρ h
+  obtain ⟨hHerm, hIm, hKill, hPos⟩ := GlobalTheory.T.chartQ_hermitian_and_real_pairing n a g Λ L.toLogPeriods bas A T0 B c ρ Pr h hPr
+  obtain ⟨hQc, ρ', hρ', hrep⟩ := GlobalTheory.T.chartQ_continuousAt_and_local_solution n a g Λ L.toLogPeriods bas A T0 B c ρ Pr h hPr
   have h0ball : (0 : Fin n → ℂ) ∈ Metric.ball (0 : Fin n → ℂ) 1 := Metric.mem_ball_self one_pos
 
-  have hBc
-      : ∀ (c' : 𝓞 E) (t : (Fin n → ℂ) → Fin g → ℂ),
-        ContinuousAt t 0 → ContinuousAt (fun z => L.B z c' (t z)) 0 := fun c' t ht =>
-    contAt_act L c' t ht
+  have hBc : ∀ (c' : 𝓞 E) (t : (Fin n → ℂ) → Fin g → ℂ), ContinuousAt t 0 →
+      ContinuousAt (fun z => L.B z c' (t z)) 0 := fun c' t ht => contAt_act L c' t ht
   have hstab : ∀ (c' : 𝓞 E) (x : Λ), x ∈ chartW bas B → c' • x ∈ chartW bas B := by
     intro c' x hx
-    refine
-      hext (c' • x) (fun z => L.B z c' (chartS bas A T0 x z)) (hBc c' _ (hs x hx).1) fun w hw => ?_
+    refine hext (c' • x) (fun z => L.B z c' (chartS bas A T0 x z)) (hBc c' _ (hs x hx).1) fun w hw => ?_
     rw [L.act w hw, (hs x hx).2 w hw]
   have hconj : ∀ c' : 𝓞 E, ∃ c'' : 𝓞 E, (c'' : E) = IsCMField.complexConj E (c' : E) := by
     intro c'
     refine ⟨⟨IsCMField.complexConj E (c' : E), ?_⟩, rfl⟩
     exact (NumberField.RingOfIntegers.isIntegral_coe c').map (IsCMField.complexConj E)
-  let W : Submodule (𝓞 E) Λ := {
-    carrier := chartW bas B
-    add_mem' := fun hx hy => (chartW bas B).add_mem hx hy
-    zero_mem' := (chartW bas B).zero_mem
-    smul_mem' := fun c' x hx => hstab c' x hx
-  }
+  let W : Submodule (𝓞 E) Λ :=
+    { carrier := chartW bas B
+      add_mem' := fun hx hy => (chartW bas B).add_mem hx hy
+      zero_mem' := (chartW bas B).zero_mem
+      smul_mem' := fun c' x hx => hstab c' x hx }
   have hW : ∀ x, x ∈ W ↔ x ∈ chartW bas B := fun x => Iff.rfl
-  let I : Submodule (𝓞 E) Λ := {
-    carrier := {x | x ∈ chartW bas B ∧ ∀ y ∈ chartW bas B, L.toLogPeriods.E x y = 0}
-    add_mem' := fun {x y} hx hy => ⟨
-      (chartW bas B).add_mem hx.1 hy.1,
-      fun u hu => by rw [map_add (f := _), LinearMap.add_apply, hx.2 u hu, hy.2 u hu, add_zero]
-    ⟩
-    zero_mem' := ⟨(chartW bas B).zero_mem, fun u _ => by simp⟩
-    smul_mem' := fun c' x hx => ⟨
-      hstab c' x hx.1,
-      fun u hu => by
+  let I : Submodule (𝓞 E) Λ :=
+    { carrier := {x | x ∈ chartW bas B ∧ ∀ y ∈ chartW bas B, L.toLogPeriods.E x y = 0}
+      add_mem' := fun {x y} hx hy => ⟨(chartW bas B).add_mem hx.1 hy.1, fun u hu => by
+        rw [map_add (f := _), LinearMap.add_apply, hx.2 u hu, hy.2 u hu, add_zero]⟩
+      zero_mem' := ⟨(chartW bas B).zero_mem, fun u _ => by simp⟩
+      smul_mem' := fun c' x hx => ⟨hstab c' x hx.1, fun u hu => by
         obtain ⟨c'', hc⟩ := hconj c'
         rw [L.adj c' c'' hc]
-        exact hx.2 _ (hstab c'' u hu)
-    ⟩
-  }
+        exact hx.2 _ (hstab c'' u hu)⟩ }
   have hI : ∀ x, x ∈ I ↔ x ∈ W ∧ ∀ y ∈ W, L.toLogPeriods.E x y = 0 := fun x => Iff.rfl
   let toZ : W →+ chartW bas B := AddMonoidHom.mk' (fun x => ⟨x.1, x.2⟩) (fun _ _ => rfl)
   have hrad : ∀ x : chartW bas B, (∀ x' : chartW bas B, L.toLogPeriods.E x x' = 0) ↔ (x : Λ) ∈ I :=
@@ -94,21 +107,12 @@ theorem limit_strong
   let per : W →+ (Fin g → ℂ) := (chartPer bas A T0 B).comp toZ
   have hper : ∀ x : W, per x = chartS bas A T0 (x : Λ) 0 := fun _ => rfl
   let s : W → (Fin n → ℂ) → Fin g → ℂ := fun x => chartS bas A T0 (x : Λ)
-  have hs'
-      : ∀ x : W,
-        ContinuousAt (s x) 0 ∧ s x 0 = per x
-          ∧ ∀ w ∈ logCover L.a_le, s x (expCover a w) = L.P w x := fun x =>
-    ⟨(hs x.1 x.2).1, rfl, (hs x.1 x.2).2⟩
-  have hinj' : Function.Injective per := fun x y hxy =>
-    Subtype.ext (congrArg Subtype.val (hinj hxy))
-  have hseq
-      : ∃ ws : ℕ → Fin n → ℂ,
-        (∀ m, ws m ∈ logCover L.a_le) ∧ Tendsto (fun m => expCover a (ws m)) atTop (𝓝 0) := by
-    refine ⟨
-      fun m k => if k.val < a then -(((m : ℝ) + 1 : ℝ) : ℂ) else 0,
-      fun m => ⟨fun i => ?_, fun k hk => ?_⟩,
-      ?_
-    ⟩
+  have hs' : ∀ x : W, ContinuousAt (s x) 0 ∧ s x 0 = per x ∧ ∀ w ∈ logCover L.a_le, s x (expCover a w) = L.P w x :=
+    fun x => ⟨(hs x.1 x.2).1, rfl, (hs x.1 x.2).2⟩
+  have hinj' : Function.Injective per := fun x y hxy => Subtype.ext (congrArg Subtype.val (hinj hxy))
+  have hseq : ∃ ws : ℕ → Fin n → ℂ, (∀ m, ws m ∈ logCover L.a_le) ∧
+      Tendsto (fun m => expCover a (ws m)) atTop (𝓝 0) := by
+    refine ⟨fun m k => if k.val < a then -(((m : ℝ) + 1 : ℝ) : ℂ) else 0, fun m => ⟨fun i => ?_, fun k hk => ?_⟩, ?_⟩
     · have hi : (Fin.castLE L.a_le i).val < a := i.2
       have hm : (0 : ℝ) ≤ m := Nat.cast_nonneg m
       simp only [hi, if_true, Complex.neg_re, Complex.ofReal_re]
@@ -120,50 +124,30 @@ theorem limit_strong
       by_cases hk : k.val < a
       · simp only [expCover, hk, if_true, Pi.zero_apply]
         have h1 : Tendsto (fun m : ℕ => Real.exp (-((m : ℝ) + 1))) atTop (𝓝 0) :=
-          Real.tendsto_exp_atBot.comp (tendsto_neg_atTop_atBot.comp (tendsto_atTop_add_const_right _
-            _ tendsto_natCast_atTop_atTop))
+          Real.tendsto_exp_atBot.comp (tendsto_neg_atTop_atBot.comp
+            (tendsto_atTop_add_const_right _ _ tendsto_natCast_atTop_atTop))
         have h2 := (Complex.continuous_ofReal.tendsto 0).comp h1
-        simpa only [Function.comp_def, Complex.ofReal_zero, Complex.ofReal_exp, Complex.ofReal_neg]
-          using h2
+        simpa only [Function.comp_def, Complex.ofReal_zero, Complex.ofReal_exp, Complex.ofReal_neg] using h2
       · simp [expCover, hk]
   have hact : ∀ (c' : 𝓞 E) (x : W), per (c' • x) = L.B 0 c' (per x) := by
     intro c' x
     obtain ⟨ws, hws, hlim0⟩ := hseq
-    have h1 : Tendsto
-        (fun m => chartS bas A T0 ((c' • x : W) : Λ) (expCover a (ws m)))
-        atTop (𝓝 (per (c' • x))) :=
-      (hs' (c' • x)).1.tendsto.comp hlim0 |>.congr fun _ => rfl
-    have h2 : Tendsto
-        (fun m => L.B (expCover a (ws m)) c' (chartS bas A T0 (x : Λ) (expCover a (ws m))))
-        atTop (𝓝 (L.B 0 c' (per x))) :=
-      (hBc c' _ (hs' x).1).tendsto.comp hlim0 |>.congr fun _ => rfl
+    have h1 : Tendsto (fun m => chartS bas A T0 ((c' • x : W) : Λ) (expCover a (ws m))) atTop
+        (𝓝 (per (c' • x))) := (hs' (c' • x)).1.tendsto.comp hlim0 |>.congr fun _ => rfl
+    have h2 : Tendsto (fun m => L.B (expCover a (ws m)) c' (chartS bas A T0 (x : Λ) (expCover a (ws m)))) atTop
+        (𝓝 (L.B 0 c' (per x))) := (hBc c' _ (hs' x).1).tendsto.comp hlim0 |>.congr fun _ => rfl
     refine tendsto_nhds_unique h1 (h2.congr fun m => ?_)
     rw [(hs x.1 x.2).2 _ (hws m), ← L.act _ (hws m)]
     exact ((hs _ (hstab c' x.1 x.2)).2 _ (hws m)).symm
-  have hset
-      : {p | ∃ x : chartW bas B, (∀ x' : chartW bas B, L.toLogPeriods.E x x' = 0) ∧ p = chartPer bas A T0 B x}
-        = {p | ∃ x : W, (x : Λ) ∈ I ∧ p = per x} := by
+  have hset : {p | ∃ x : chartW bas B, (∀ x' : chartW bas B, L.toLogPeriods.E x x' = 0) ∧ p = chartPer bas A T0 B x} =
+      {p | ∃ x : W, (x : Λ) ∈ I ∧ p = per x} := by
     ext p
     constructor
     · rintro ⟨x, hx, rfl⟩
       exact ⟨⟨x.1, x.2⟩, (hrad x).1 hx, rfl⟩
     · rintro ⟨x, hx, rfl⟩
       exact ⟨⟨x.1, x.2⟩, (hrad ⟨x.1, x.2⟩).2 hx, rfl⟩
-  refine ⟨
-    W,
-    I,
-    per,
-    chartQ Pr A T0 0,
-    (A 0)ᵀ,
-    uCo bas,
-    hI,
-    ?_,
-    hinj',
-    hact,
-    by rw [det_transpose]; exact h.A_det,
-    ?_,
-    ?_
-  ⟩
+  refine ⟨W, I, per, chartQ Pr A T0 0, (A 0)ᵀ, uCo bas, hI, ?_, hinj', hact, by rw [det_transpose]; exact h.A_det, ?_, ?_⟩
   · intro x k hk hx
     have h2 : x ∈ chartW bas B := hsat x k hk hx.1
     refine ⟨h2, fun y hy => ?_⟩
@@ -188,10 +172,8 @@ theorem limit_strong
     congr 1
     funext k
     simp [cst, mulVec, dotProduct]
-  · refine limit_of_data E n a g Λ Ψ L σ m b W I per s (chartQ Pr A T0 0) (chartQ Pr A T0) ρ' hσ hb
-      (fun x hx => hx.1)
-      (fun x hx y hy => hx.2 y hy.1)
-      hinj' hact hs' hHerm ?_ hQc rfl hρ' ?_
+  · refine limit_of_data E n a g Λ Ψ L σ m b W I per s (chartQ Pr A T0 0) (chartQ Pr A T0) ρ' hσ hb (fun x hx => hx.1)
+      (fun x hx y hy => hx.2 y hy.1) hinj' hact hs' hHerm ?_ hQc rfl hρ' ?_
     · intro v
       rw [← hset]
       exact hPos v
@@ -203,24 +185,18 @@ theorem limit_strong
         exact ⟨x, (hrad x).1 hx, rfl⟩
       · exact h2 ⟨x, hx.1⟩ ((hrad ⟨x, hx.1⟩).2 hx)
 
-theorem eig_indep
-    {E : Type} [Field E] [NumberField E]
-    {g r : ℕ} {Λ : Type} [AddCommGroup Λ] [Module (𝓞 E) Λ]
-    {W I : Submodule (𝓞 E) Λ} (per : W →+ (Fin g → ℂ))
-    (ρ : 𝓞 E →+* Module.End ℂ (Fin g → ℂ))
-    (M : Matrix (Fin g) (Fin g) ℂ) (u : Λ →ₗ[ℤ] (Fin g → ℤ))
-    (hinj : Function.Injective per) (hact : ∀ (c : 𝓞 E) (x : W), per (c • x) = ρ c (per x))
-    (hM : M.det ≠ 0) (hu : ∀ x : W, (x : Λ) ∈ I → per x = M *ᵥ cst (u x))
-    (y : Fin r → W) (hy : ∀ a, (y a : Λ) ∈ I) (hli : LinearIndependent (𝓞 E) y)
-    (s : 𝓞 E →+* ℂ)
-    {x₀ : Fin g → ℂ} (hx₀ : x₀ ∈ eigSp ρ s) (h0 : x₀ ≠ 0)
-    : LinearIndependent ℂ fun a => eigComp ρ s (per (y a)) := by
+theorem eig_indep {E : Type} [Field E] [NumberField E] {g r : ℕ} {Λ : Type} [AddCommGroup Λ] [Module (𝓞 E) Λ]
+    {W I : Submodule (𝓞 E) Λ} (per : W →+ (Fin g → ℂ)) (ρ : 𝓞 E →+* Module.End ℂ (Fin g → ℂ))
+    (M : Matrix (Fin g) (Fin g) ℂ) (u : Λ →ₗ[ℤ] (Fin g → ℤ)) (hinj : Function.Injective per)
+    (hact : ∀ (c : 𝓞 E) (x : W), per (c • x) = ρ c (per x)) (hM : M.det ≠ 0)
+    (hu : ∀ x : W, (x : Λ) ∈ I → per x = M *ᵥ cst (u x)) (y : Fin r → W) (hy : ∀ a, (y a : Λ) ∈ I)
+    (hli : LinearIndependent (𝓞 E) y) (s : 𝓞 E →+* ℂ) {x₀ : Fin g → ℂ} (hx₀ : x₀ ∈ eigSp ρ s) (h0 : x₀ ≠ 0) :
+    LinearIndependent ℂ fun a => eigComp ρ s (per (y a)) := by
   classical
   obtain ⟨c, hc⟩ := GlobalTheory.T.exists_eigenComponent_polynomial E s
   obtain ⟨hc1, -, hc3⟩ := hc _ ρ
   let e := RingOfIntegers.basis E
-  let γ : Module.Free.ChooseBasisIndex ℤ (𝓞 E) → ℂ := fun k =>
-    ∑ x ∈ c.support, c x * (e.repr x k : ℂ)
+  let γ : Module.Free.ChooseBasisIndex ℤ (𝓞 E) → ℂ := fun k => ∑ x ∈ c.support, c x * (e.repr x k : ℂ)
   have hγ : ∀ v, eigComp ρ s v = ∑ k, γ k • ρ (e k) v := by
     intro v
     rw [hc1]
@@ -229,9 +205,9 @@ theorem eig_indep
     refine Finset.sum_congr rfl fun x _ => ?_
     have hx : ρ x = ρ (∑ k, e.repr x k • e k) := by rw [e.sum_repr]
     rw [hx]
-    set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, map_zsmul, LinearMap.sum_apply, LinearMap.smul_apply, Finset.smul_sum,
-      mul_smul, Int.cast_smul_eq_zsmul]
+
+    simp only [map_sum, map_zsmul, LinearMap.sum_apply, LinearMap.smul_apply, Finset.smul_sum, mul_smul,
+    Int.cast_smul_eq_zsmul]
   have hk : ∃ k, γ k ≠ 0 := by
     by_contra hn
     push_neg at hn
@@ -239,8 +215,7 @@ theorem eig_indep
     rw [← hc3 x₀ hx₀, hγ]
     simp [hn]
   obtain ⟨k₀, hk₀⟩ := hk
-  have h1
-      : LinearIndependent ℤ fun p : Module.Free.ChooseBasisIndex ℤ (𝓞 E) × Fin r => e p.1 • y p.2 :=
+  have h1 : LinearIndependent ℤ fun p : Module.Free.ChooseBasisIndex ℤ (𝓞 E) × Fin r => e p.1 • y p.2 :=
     linearIndependent_smul e.linearIndependent hli
   have hmem : ∀ p : Module.Free.ChooseBasisIndex ℤ (𝓞 E) × Fin r, ((e p.1 • y p.2 : W) : Λ) ∈ I :=
     fun p => I.smul_mem _ (hy p.2)
@@ -251,21 +226,19 @@ theorem eig_indep
     refine h1 l (hinj ?_)
     rw [hu _ (by rw [Submodule.coe_sum]; exact I.sum_mem fun p _ => zsmul_mem (hmem p) _), map_zero]
     have : u ((∑ p, l p • e p.1 • y p.2 : W) : Λ) = 0 := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [← hl, Submodule.coe_sum, map_sum]
+
+      rw [← hl, Submodule.coe_sum, map_sum]
       exact Finset.sum_congr rfl fun p _ => map_zsmul u _ _
     rw [this]
     have : cst (0 : Fin g → ℤ) = 0 := by funext k; simp [cst]
     rw [this, mulVec_zero]
   have h3 : LinearIndependent ℂ fun p : Module.Free.ChooseBasisIndex ℤ (𝓞 E) × Fin r =>
-      cst (u ((e p.1 • y p.2 : W) : Λ)) :=
-    (linearIndependent_algebraMap_comp_iff (R := ℤ) (S := ℂ)).2 h2
+      cst (u ((e p.1 • y p.2 : W) : Λ)) := (linearIndependent_algebraMap_comp_iff (R := ℤ) (S := ℂ)).2 h2
   have h4 : LinearIndependent ℂ fun p : Module.Free.ChooseBasisIndex ℤ (𝓞 E) × Fin r =>
       ρ (e p.1) (per (y p.2)) := by
     have := h3.map' M.mulVecLin (LinearMap.ker_eq_bot.2 (mulVec_injective_of_det_ne_zero hM))
-    have e4
-        : (fun p : Module.Free.ChooseBasisIndex ℤ (𝓞 E) × Fin r => ρ (e p.1) (per (y p.2)))
-          = M.mulVecLin ∘ fun p => cst (u ((e p.1 • y p.2 : W) : Λ)) := by
+    have e4 : (fun p : Module.Free.ChooseBasisIndex ℤ (𝓞 E) × Fin r => ρ (e p.1) (per (y p.2))) =
+        M.mulVecLin ∘ fun p => cst (u ((e p.1 • y p.2 : W) : Λ)) := by
       funext p
       rw [← hact, hu _ (hmem p)]
       rfl
@@ -273,32 +246,20 @@ theorem eig_indep
     exact this
   rw [Fintype.linearIndependent_iff] at h4 ⊢
   intro l hl a
-  have :=
-    h4
-      (fun p => l p.2 * γ p.1)
-      (by
-        rw [← hl, Fintype.sum_prod_type, Finset.sum_comm]
-        simp only [hγ, Finset.smul_sum, mul_smul])
-      (k₀, a)
+  have := h4 (fun p => l p.2 * γ p.1) (by
+    rw [← hl, Fintype.sum_prod_type, Finset.sum_comm]
+    simp only [hγ, Finset.smul_sum, mul_smul]) (k₀, a)
   exact (mul_eq_zero.1 this).resolve_right hk₀
 
-theorem oFamily_image
-    {E : Type} [Field E] [NumberField E]
-    {g r : ℕ} {Λ : Type} [AddCommGroup Λ] [Module (𝓞 E) Λ]
-    {W I : Submodule (𝓞 E) Λ} (per : W →+ (Fin g → ℂ))
-    (ρ : 𝓞 E →+* Module.End ℂ (Fin g → ℂ))
-    (hIW : I ≤ W) (hinj : Function.Injective per)
-    (hact : ∀ (c : 𝓞 E) (x : W), per (c • x) = ρ c (per x))
+theorem oFamily_image {E : Type} [Field E] [NumberField E] {g r : ℕ} {Λ : Type} [AddCommGroup Λ] [Module (𝓞 E) Λ]
+    {W I : Submodule (𝓞 E) Λ} (per : W →+ (Fin g → ℂ)) (ρ : 𝓞 E →+* Module.End ℂ (Fin g → ℂ)) (hIW : I ≤ W)
+    (hinj : Function.Injective per) (hact : ∀ (c : 𝓞 E) (x : W), per (c • x) = ρ c (per x))
     (y : Fin r → W) (hy : ∀ a, (y a : Λ) ∈ I) (hli : LinearIndependent (𝓞 E) y)
-    (hidx
-      : (Submodule.span (𝓞 E) (Set.range fun a => (y a : Λ))).toAddSubgroup.relIndex I.toAddSubgroup
-        ≠ 0)
-    : IsOFamily ρ (AddSubgroup.closure {p | ∃ x : W, (x : Λ) ∈ I ∧ p = per x}) fun a =>
-      per (y a) := by
+    (hidx : (Submodule.span (𝓞 E) (Set.range fun a => (y a : Λ))).toAddSubgroup.relIndex I.toAddSubgroup ≠ 0) :
+    IsOFamily ρ (AddSubgroup.closure {p | ∃ x : W, (x : Λ) ∈ I ∧ p = per x}) fun a => per (y a) := by
   classical
   set J : Submodule (𝓞 E) W := I.comap W.subtype with hJ
-  have hS
-      : AddSubgroup.closure {p | ∃ x : W, (x : Λ) ∈ I ∧ p = per x} = J.toAddSubgroup.map per := by
+  have hS : AddSubgroup.closure {p | ∃ x : W, (x : Λ) ∈ I ∧ p = per x} = J.toAddSubgroup.map per := by
     apply le_antisymm
     · rw [AddSubgroup.closure_le]
       rintro p ⟨x, hx, rfl⟩
@@ -307,8 +268,8 @@ theorem oFamily_image
       exact AddSubgroup.subset_closure ⟨x, hx, rfl⟩
   have hsum : ∀ c : Fin r → 𝓞 E, per (∑ i, c i • y i) = ∑ i, ρ (c i) (per (y i)) := by
     intro c
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     exact Finset.sum_congr rfl fun i _ => hact _ _
   refine ⟨fun a => AddSubgroup.subset_closure ⟨y a, hy a, rfl⟩, fun c hc => ?_, ?_⟩
   · funext i
@@ -324,9 +285,8 @@ theorem oFamily_image
         show per _ ∈ _
         rw [hsum]
         exact sum_mem fun i _ => AddSubgroup.subset_closure ⟨c i, i, rfl⟩
-    have hPΛ
-        : (Submodule.span (𝓞 E) (Set.range fun a => (y a : Λ))).toAddSubgroup
-          = P.toAddSubgroup.map W.subtype.toAddMonoidHom := by
+    have hPΛ : (Submodule.span (𝓞 E) (Set.range fun a => (y a : Λ))).toAddSubgroup
+        = P.toAddSubgroup.map W.subtype.toAddMonoidHom := by
       have : Submodule.span (𝓞 E) (Set.range fun a => (y a : Λ)) = P.map W.subtype := by
         rw [hP, Submodule.map_span, ← Set.range_comp]
         rfl
@@ -344,40 +304,25 @@ theorem oFamily_image
     rw [hspan, hS, AddSubgroup.relIndex_map_map_of_injective _ _ hinj]
     exact hidx
 
-theorem exists_phiNormSq
-    {O Ψ : Type} [CommRing O] [Fintype Ψ]
-    {g m r : ℕ} [Nonempty Ψ]
-    (ρ : O →+* Module.End ℂ (Fin g → ℂ))
-    (hb : (Fin g → ℂ) → (Fin g → ℂ) → ℂ)
-    (I : AddSubgroup (Fin g → ℂ))
-    (κ : ℝ)
-    (σ : Ψ → (O →+* ℂ)) (b : Ψ → Fin m → Fin g → ℂ)
-    (v : Fin r → Fin g → ℂ) (hv : IsOFamily ρ I v)
-    (hbi : ∀ τ, LinearIndependent ℂ (b τ))
-    (hbs : ∀ τ, Submodule.span ℂ (Set.range (b τ)) = eigSp ρ (σ τ))
+theorem exists_phiNormSq {O Ψ : Type} [CommRing O] [Fintype Ψ] {g m r : ℕ} [Nonempty Ψ]
+    (ρ : O →+* Module.End ℂ (Fin g → ℂ)) (hb : (Fin g → ℂ) → (Fin g → ℂ) → ℂ) (I : AddSubgroup (Fin g → ℂ)) (κ : ℝ)
+    (σ : Ψ → (O →+* ℂ)) (b : Ψ → Fin m → Fin g → ℂ) (v : Fin r → Fin g → ℂ) (hv : IsOFamily ρ I v)
+    (hbi : ∀ τ, LinearIndependent ℂ (b τ)) (hbs : ∀ τ, Submodule.span ℂ (Set.range (b τ)) = eigSp ρ (σ τ))
     (hmem : ∀ τ a, eigComp ρ (σ τ) (v a) ∈ eigSp ρ (σ τ))
-    (hli : ∀ τ, LinearIndependent ℂ fun a => eigComp ρ (σ τ) (v a))
-    : ∃ ν, PhiNormSq ρ hb I κ σ b ν := by
+    (hli : ∀ τ, LinearIndependent ℂ fun a => eigComp ρ (σ τ) (v a)) : ∃ ν, PhiNormSq ρ hb I κ σ b ν := by
   classical
-  have h1 := fun τ =>
-    GlobalTheory.T.exists_extend_linearIndependent_of_span g m r _ (b τ) (hli τ) (hbi τ) fun a => by
-      rw [hbs]; exact hmem τ a
+  have h1 := fun τ => GlobalTheory.T.exists_extend_linearIndependent_of_span g m r _ (b τ) (hli τ) (hbi τ) fun a => by rw [hbs]; exact hmem τ a
   obtain ⟨k, -, rfl, -⟩ := h1 (Classical.arbitrary Ψ)
-  have h2
-      : ∀ τ, ∃ q : Fin k → Fin g → ℂ,
-        (∀ c, q c ∈ eigSp ρ (σ τ))
-          ∧ ∃ T : Matrix (Fin (r + k)) (Fin (r + k)) ℂ,
-            (∀ i, Fin.append (fun a => eigComp ρ (σ τ) (v a)) q i = ∑ j, T j i • b τ j)
-              ∧ T.det ≠ 0 := by
+  have h2 : ∀ τ, ∃ q : Fin k → Fin g → ℂ, (∀ c, q c ∈ eigSp ρ (σ τ)) ∧
+      ∃ T : Matrix (Fin (r + k)) (Fin (r + k)) ℂ,
+        (∀ i, Fin.append (fun a => eigComp ρ (σ τ) (v a)) q i = ∑ j, T j i • b τ j) ∧ T.det ≠ 0 := by
     intro τ
     obtain ⟨k', J, hk, hl⟩ := h1 τ
     obtain rfl : k' = k := by omega
     have hq : ∀ c, b τ (J c) ∈ eigSp ρ (σ τ) := fun c => by
       rw [← hbs]; exact Submodule.subset_span ⟨_, rfl⟩
-    have hT
-        : ∀ i, ∃ t : Fin (r + k') → ℂ,
-          ∑ j, t j • b τ j
-            = Fin.append (fun a => eigComp ρ (σ τ) (v a)) (fun c => b τ (J c)) i := by
+    have hT : ∀ i, ∃ t : Fin (r + k') → ℂ,
+        ∑ j, t j • b τ j = Fin.append (fun a => eigComp ρ (σ τ) (v a)) (fun c => b τ (J c)) i := by
       intro i
       rw [← Submodule.mem_span_range_iff_exists_fun, hbs]
       refine Fin.addCases (fun a => ?_) (fun c => ?_) i
@@ -393,71 +338,50 @@ theorem exists_phiNormSq
     rw [← Finset.sum_smul]
     have := congrFun hl1 j
     simp only [mulVec, dotProduct, Matrix.of_apply, Pi.zero_apply] at this
-    rw [show ∑ i, l i * t i j = 0 from by
-        rw [← this]; exact Finset.sum_congr rfl fun _ _ => mul_comm _ _,
+    rw [show ∑ i, l i * t i j = 0 from by rw [← this]; exact Finset.sum_congr rfl fun _ _ => mul_comm _ _,
       zero_smul]
   choose q hq T hT hd using h2
   exact ⟨_, r, k, rfl, v, q, T, hv, hq, hT, hd, rfl⟩
 
-theorem lower_centre
-    {E : Type} [Field E] [NumberField E] [IsCMField E]
-    {n a g : ℕ} {Λ : Type} [AddCommGroup Λ] [Module (𝓞 E) Λ]
-    {Ψ : Type} [Fintype Ψ]
-    (L : ActPeriods E n a g Λ) (σ : Ψ → (𝓞 E →+* ℂ))
-    {m : ℕ} (b : Ψ → Fin m → (Fin n → ℂ) → Fin g → ℂ)
-    (hσ : IsCMFam σ) (hm : 1 ≤ m) (hb : IsEigFrames (Metric.ball 0 1) L.B σ b)
-    : ∃ δ > (0 : ℝ), ∃ C : ℝ, ∀ w (hw : w ∈ logCover L.a_le),
-      ‖expCover a w‖ < δ
-        → -C
-          ≤ (L.riem w hw).logDet (fun τ i => b τ i (expCover a w))
-            + RiemLat.cuspW (L.riem w hw) σ := by
+theorem lower_centre {E : Type} [Field E] [NumberField E] [IsCMField E] {n a g : ℕ} {Λ : Type} [AddCommGroup Λ]
+    [Module (𝓞 E) Λ] {Ψ : Type} [Fintype Ψ] (L : ActPeriods E n a g Λ) (σ : Ψ → (𝓞 E →+* ℂ)) {m : ℕ}
+    (b : Ψ → Fin m → (Fin n → ℂ) → Fin g → ℂ) (hσ : IsCMFam σ) (hm : 1 ≤ m)
+    (hb : IsEigFrames (Metric.ball 0 1) L.B σ b) :
+    ∃ δ > (0 : ℝ), ∃ C : ℝ, ∀ w (hw : w ∈ logCover L.a_le), ‖expCover a w‖ < δ →
+      -C ≤ (L.riem w hw).logDet (fun τ i => b τ i (expCover a w)) + RiemLat.cuspW (L.riem w hw) σ := by
   classical
   have hne : Nonempty Ψ := by
     by_contra hn
     obtain ⟨s⟩ : Nonempty (E →+* ℂ) := inferInstance
     obtain ⟨τ, -⟩ := (hσ.2 (s.comp (algebraMap (𝓞 E) E))).2 fun ⟨τ, _⟩ => hn ⟨τ⟩
     exact hn ⟨τ⟩
-  obtain ⟨W, I, per, Hb, M, u, hI, hsat, hinj, hact, hM, hu, hν⟩ :=
-    limit_strong E n a g Λ Ψ L σ m b hσ hb
+  obtain ⟨W, I, per, Hb, M, u, hI, hsat, hinj, hact, hM, hu, hν⟩ := limit_strong E n a g Λ Ψ L σ m b hσ hb
   have hIW : I ≤ W := fun x hx => ((hI x).1 hx).1
-  have hiso : ∀ w (hw : w ∈ logCover L.a_le), IsIsoSub (L.riem w hw).form I := fun w hw x hx y hy =>
-    ((hI x).1 hx).2 y (hIW hy)
+  have hiso : ∀ w (hw : w ∈ logCover L.a_le), IsIsoSub (L.riem w hw).form I :=
+    fun w hw x hx y hy => ((hI x).1 hx).2 y (hIW hy)
   have hw₀ : (fun k : Fin n => if k.val < a then (-1 : ℂ) else 0) ∈ logCover L.a_le := by
     refine ⟨fun i => ?_, fun k hk => ?_⟩
     · have hi : (Fin.castLE L.a_le i).val < a := i.2
       simp only [hi, if_true]
       norm_num
     · simp [not_lt.2 hk]
-  have hfam
-      : ∃ (r : ℕ) (y : Fin r → Λ),
-        (∀ i, y i ∈ I) ∧ LinearIndependent (𝓞 E) y
-          ∧ (Submodule.span (𝓞 E) (Set.range y)).toAddSubgroup.relIndex I.toAddSubgroup ≠ 0 := by
+  have hfam : ∃ (r : ℕ) (y : Fin r → Λ), (∀ i, y i ∈ I) ∧ LinearIndependent (𝓞 E) y ∧
+      (Submodule.span (𝓞 E) (Set.range y)).toAddSubgroup.relIndex I.toAddSubgroup ≠ 0 := by
     by_cases h : I = ⊥
     · refine ⟨0, Fin.elim0, fun i => i.elim0, linearIndependent_empty_type, ?_⟩
       rw [h]
       simp
-    · obtain ⟨r, y, -, h1⟩ :=
-        (GlobalTheory.T.isotropic_sublattice_covolume_positive E g Λ Ψ (L.riem _ hw₀) σ I hσ
-          (hiso _ hw₀) h).1
+    · obtain ⟨r, y, -, h1⟩ := (GlobalTheory.T.isotropic_sublattice_covolume_positive E g Λ Ψ (L.riem _ hw₀) σ I hσ (hiso _ hw₀) h).1
       exact ⟨r, y, h1⟩
   obtain ⟨r, y, hy, hli, hidx⟩ := hfam
   let y' : Fin r → W := fun i => ⟨y i, hIW (hy i)⟩
   have hli' : LinearIndependent (𝓞 E) y' := LinearIndependent.of_comp W.subtype hli
   have h0 : (0 : Fin n → ℂ) ∈ Metric.ball (0 : Fin n → ℂ) 1 := Metric.mem_ball_self one_pos
-  obtain ⟨ν, hν'⟩ :=
-    exists_phiNormSq (L.B 0)
-      (fun x y => y ⬝ᵥ Hb *ᵥ star x)
-      _ 1 σ
-      (fun τ i => b τ i 0)
-      _ (oFamily_image per (L.B 0) hIW hinj hact y' hy hli' hidx)
-      (fun τ => (hb.2 0 h0 τ).1)
-      (fun τ => (hb.2 0 h0 τ).2)
-      (fun τ a =>
-        ((GlobalTheory.T.exists_eigenComponent_polynomial E (σ τ)).choose_spec _ (L.B 0)).2.1 _)
-      fun τ =>
-        eig_indep per (L.B 0) M u hinj hact hM hu y' hy hli' (σ τ) (x₀ := b τ ⟨0, hm⟩ 0)
-          (by rw [← (hb.2 0 h0 τ).2]; exact Submodule.subset_span ⟨_, rfl⟩)
-          ((hb.2 0 h0 τ).1.ne_zero ⟨0, hm⟩)
+  obtain ⟨ν, hν'⟩ := exists_phiNormSq (L.B 0) (fun x y => y ⬝ᵥ Hb *ᵥ star x) _ 1 σ (fun τ i => b τ i 0) _
+    (oFamily_image per (L.B 0) hIW hinj hact y' hy hli' hidx) (fun τ => (hb.2 0 h0 τ).1) (fun τ => (hb.2 0 h0 τ).2)
+    (fun τ a => ((GlobalTheory.T.exists_eigenComponent_polynomial E (σ τ)).choose_spec _ (L.B 0)).2.1 _)
+    fun τ => eig_indep per (L.B 0) M u hinj hact hM hu y' hy hli' (σ τ) (x₀ := b τ ⟨0, hm⟩ 0)
+      (by rw [← (hb.2 0 h0 τ).2]; exact Submodule.subset_span ⟨_, rfl⟩) ((hb.2 0 h0 τ).1.ne_zero ⟨0, hm⟩)
   obtain ⟨δ, hδ, h⟩ := (hν ν hν').2 1 one_pos
   refine ⟨min δ 1, lt_min hδ one_pos, 1 - Real.log ν, fun w hw hwδ => ?_⟩
   have h1 := (abs_lt.1 (h w hw (hwδ.trans_le (min_le_left _ _)))).1
@@ -466,9 +390,8 @@ theorem lower_centre
   have hrk : (L.riem w hw).HasRank σ m := fun τ => by
     show Module.finrank ℂ (eigSp (L.B (expCover a w)) (σ τ)) = m
     rw [← (hb.2 _ hz τ).2, finrank_span_eq_card (hb.2 _ hz τ).1, Fintype.card_fin]
-  obtain ⟨-, -, h2, h3, -⟩ :=
-    GlobalTheory.T.first_minimum_and_cusp_weight_bounds E g Λ Ψ (L.riem w hw) σ m hσ hrk hm
-  have h4 : - Real.log (RiemLat.nz (L.riem w hw) σ I) ≤ RiemLat.cuspW (L.riem w hw) σ := by
+  obtain ⟨-, -, h2, h3, -⟩ := GlobalTheory.T.first_minimum_and_cusp_weight_bounds E g Λ Ψ (L.riem w hw) σ m hσ hrk hm
+  have h4 : -Real.log (RiemLat.nz (L.riem w hw) σ I) ≤ RiemLat.cuspW (L.riem w hw) σ := by
     by_cases hI0 : I = ⊥
     · have : RiemLat.nz (L.riem w hw) σ I = 1 := by
         refine dif_neg ?_

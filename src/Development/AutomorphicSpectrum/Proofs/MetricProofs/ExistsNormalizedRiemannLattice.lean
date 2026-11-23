@@ -1,8 +1,51 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.MetricProofs.BigZe
-public import Development.AutomorphicSpectrum.Proofs.MetricProofs.RiemannLatticeEigenProjectionStatement
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Coalgebra.IsFrobenius
+import Mathlib.RingTheory.HopfAlgebra.Basic
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import GroundTheory.HeightsAndTheta.Heights.FiniteCovolume.PUnipotentModulusMatrix
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.IsCompletedStrictHens
 
 @[expose] public section
 
@@ -60,8 +103,8 @@ theorem sum_ip_smul (hc : ∀ i i', R.ip (c i) (c i') = if i = i' then 1 else 0)
     rw [Fintype.linearIndependent_iff]
     intro a ha k
     have h := congrArg (ipLin R (c k)) ha
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_zero, map_sum] at h
+
+    rw [map_zero, map_sum] at h
     simp only [map_smul, ← ip_eq_ipLin, hc, smul_eq_mul] at h
     simpa using h
   have hspan : Submodule.span ℂ (Set.range c) = ⊤ :=
@@ -70,16 +113,16 @@ theorem sum_ip_smul (hc : ∀ i i', R.ip (c i) (c i') = if i = i' then 1 else 0)
   obtain ⟨a, rfl⟩ := (Submodule.mem_span_range_iff_exists_fun ℂ).1 hz
   refine Finset.sum_congr rfl fun i _ => ?_
   congr 1
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [ip_eq_ipLin, map_sum]
+
+  rw [ip_eq_ipLin, map_sum]
   simp only [map_smul, ← ip_eq_ipLin, hc, smul_eq_mul]
   simp
 
 theorem sum_ip_mul_conj (hc : ∀ i i', R.ip (c i) (c i') = if i = i' then 1 else 0) (u v : Fin g → ℂ)
     : ∑ i, R.ip (c i) u * starRingEnd ℂ (R.ip (c i) v) = R.ip v u := by
   conv_rhs => rw [← sum_ip_smul R e c hc u]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [ip_eq_ipLin, map_sum]
+
+  rw [ip_eq_ipLin, map_sum]
   refine Finset.sum_congr rfl fun i _ => ?_
   rw [map_smul, ← ip_eq_ipLin, conj_ip, smul_eq_mul]
 
@@ -93,8 +136,8 @@ theorem ip_act
     have h' := LinearMap.mem_ker.1 h
     simpa [sub_eq_zero] using h'
   conv_lhs => rw [← sum_ip_smul R e c hc z]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum, ip_eq_ipLin, map_sum]
+
+  rw [map_sum, ip_eq_ipLin, map_sum]
   simp only [map_smul, hB, ← ip_eq_ipLin, hc, smul_eq_mul]
   simp [mul_comm]
 

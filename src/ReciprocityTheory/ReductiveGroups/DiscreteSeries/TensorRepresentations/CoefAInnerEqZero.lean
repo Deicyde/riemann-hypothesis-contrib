@@ -1,6 +1,51 @@
 module
 
-public import Mathlib
+public import Mathlib.Analysis.CStarAlgebra.Module.Constructions
+public import Mathlib.LinearAlgebra.FiniteDimensional.Defs
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+public import Mathlib.Analysis.InnerProductSpace.Spectrum
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
+public import Mathlib.Analysis.InnerProductSpace.Dual
 
 @[expose] public section
 
@@ -129,8 +174,8 @@ theorem coefA_toSum
       (Submodule.span ℂ {y | y ∈ M' ∧ ∃ θ : ℝ, θ ≤ C ∧ T y = (θ : ℂ) • y}) ℓ
   refine ⟨z, hZM (hLZ hzL), fun y hy => ?_⟩
   obtain ⟨m, b, θ, hsum, hb⟩ := coefA_decompM hT hloc hy
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [hsum, inner_sum, map_sum]
+
+  rw [hsum, inner_sum, map_sum]
   refine Finset.sum_congr rfl (fun i _ => ?_)
   by_cases hθ : θ i ≤ C
   · exact hz (b i) (Submodule.subset_span ⟨(hb i).1, θ i, hθ, (hb i).2⟩)
@@ -233,11 +278,11 @@ theorem coefA_ofSum
   refine ⟨ι (∑ k, x k), Submodule.mem_map_of_mem (Submodule.sum_mem _ (fun k _ => hxM k)), ?_⟩
   intro y hy
   obtain ⟨n, c, η, hys, hc⟩ := coefA_decompM hT hloc hy
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum, hzs, hys, sum_inner, sum_inner]
+
+  rw [map_sum, hzs, hys, sum_inner, sum_inner]
   refine Finset.sum_congr rfl (fun k _ => ?_)
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum, inner_sum, inner_sum]
+
+  rw [map_sum, inner_sum, inner_sum]
   refine Finset.sum_congr rfl (fun j _ => ?_)
   by_cases hkj : θ k = η j
   · exact hxr k (c j) (hc j).1 (by rw [hkj]; exact (hc j).2)

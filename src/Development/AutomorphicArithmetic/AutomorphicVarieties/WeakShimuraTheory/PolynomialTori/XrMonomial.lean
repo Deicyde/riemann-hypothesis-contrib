@@ -1,9 +1,57 @@
 module
 
-public import Development.AutomorphicArithmetic.AutomorphicVarieties.CommutativeAlgebra.Graded
-public import Development.AutomorphicArithmetic.AutomorphicVarieties.CommutativeAlgebra.PartSpan
+public import Development.AutomorphicArithmetic.AutomorphicVarieties.CommutativeAlgebra.ResMapBijective
 public import Development.AutomorphicArithmetic.AutomorphicVarieties.CommutativeAlgebra.KerGen
-public import Development.AutomorphicArithmetic.AutomorphicVarieties.SymplecticGSp4.MapRepApply
+public import Development.AutomorphicArithmetic.AutomorphicVarieties.CommutativeAlgebra.PartSpan
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+public import Mathlib.RingTheory.AdicCompletion.Topology
+import Mathlib.RingTheory.MvPowerSeries.Evaluation
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
+import Development.AutomorphicArithmetic.AutomorphicVarieties.SymplecticGSp4.MapRepApply
 
 @[expose] public section
 
@@ -13,11 +61,9 @@ section SlopeTestRemainingChoices
 
 open MvPowerSeries
 
-private theorem xr_ev
-    {O S σ : Type} [CommRing O] [CommRing S] [Algebra O S] [Finite σ]
-    (m : Ideal S) [IsAdicComplete m S]
-    (a : σ → S) (ha : ∀ s, a s ∈ m)
-    : ∃ F : MvPowerSeries σ O →ₐ[O] S, ∀ s, F (X s) = a s := by
+private theorem xr_ev {O S σ : Type} [CommRing O] [CommRing S] [Algebra O S] [Finite σ] (m : Ideal S)
+    [IsAdicComplete m S] (a : σ → S) (ha : ∀ s, a s ∈ m) :
+    ∃ F : MvPowerSeries σ O →ₐ[O] S, ∀ s, F (X s) = a s := by
   letI : UniformSpace O := ⊥
   haveI : DiscreteTopology O := ⟨rfl⟩
   letI : WithIdeal S := ⟨m⟩
@@ -35,45 +81,35 @@ private theorem xr_ev
   refine ⟨MvPowerSeries.aeval hE, fun s => ?_⟩
   rw [← MvPolynomial.coe_X, MvPowerSeries.aeval_coe, MvPolynomial.aeval_X]
 
-private theorem xr_monomial {O σ : Type} [CommRing O] [Fintype σ] (m : σ →₀ ℕ)
-    : (monomial m (1 : O) : MvPowerSeries σ O) = ∏ i, (MvPowerSeries.X i) ^ (m i) := by
+private theorem xr_monomial {O σ : Type} [CommRing O] [Fintype σ] (m : σ →₀ ℕ) :
+    (monomial m (1 : O) : MvPowerSeries σ O) = ∏ i, (MvPowerSeries.X i) ^ (m i) := by
   classical
   rw [← MvPolynomial.coe_monomial, ← MvPolynomial.prod_X_pow_eq_monomial]
-  have h :=
-    map_prod (MvPolynomial.coeToMvPowerSeries.ringHom (σ := σ) (R := O))
-      (fun x => MvPolynomial.X x ^ m x)
-      m.support
+  have h := map_prod (MvPolynomial.coeToMvPowerSeries.ringHom (σ := σ) (R := O)) (fun x => MvPolynomial.X x ^ m x) m.support
   simp only [map_pow, MvPolynomial.coeToMvPowerSeries.ringHom_apply, MvPolynomial.coe_X] at h
   rw [h]
   refine Finset.prod_subset (Finset.subset_univ _) ?_
   intro i _ hi
   rw [Finsupp.notMem_support_iff.1 hi, pow_zero]
 
-private theorem mvPowerSeries_algHom_monomial_eq_prod_X_pow
-    {O σ K : Type} [CommRing O] [Fintype σ] [CommRing K] [Algebra O K]
-    (G : MvPowerSeries σ O →ₐ[O] K) (m : σ →₀ ℕ)
-    : G (MvPowerSeries.monomial m 1) = ∏ s, G (MvPowerSeries.X s) ^ m s := by
+private theorem mvPowerSeries_algHom_monomial_eq_prod_X_pow {O σ K : Type} [CommRing O] [Fintype σ] [CommRing K] [Algebra O K]
+    (G : MvPowerSeries σ O →ₐ[O] K) (m : σ →₀ ℕ) :
+    G (MvPowerSeries.monomial m 1) = ∏ s, G (MvPowerSeries.X s) ^ m s := by
   rw [xr_monomial, map_prod]
   simp only [map_pow]
 
-private theorem prod_pow_mem_ideal_pow_of_mem_of_le_exponent
-    {σ K : Type} [Fintype σ] [CommRing K]
-    (I : Ideal K) (c : σ → K) (hc : ∀ s, c s ∈ I)
-    (m : σ →₀ ℕ) (k : ℕ) (s0 : σ) (hs0 : k ≤ m s0)
-    : ∏ s, c s ^ m s ∈ I ^ k := by
+private theorem prod_pow_mem_ideal_pow_of_mem_of_le_exponent {σ K : Type} [Fintype σ] [CommRing K] (I : Ideal K) (c : σ → K)
+    (hc : ∀ s, c s ∈ I) (m : σ →₀ ℕ) (k : ℕ) (s0 : σ) (hs0 : k ≤ m s0) :
+    ∏ s, c s ^ m s ∈ I ^ k := by
   classical
   rw [← Finset.mul_prod_erase Finset.univ (fun s => c s ^ m s) (Finset.mem_univ s0)]
   exact Ideal.mul_mem_right _ _ (Ideal.pow_le_pow_right hs0 (Ideal.pow_mem_pow (hc s0) _))
 
-private theorem xr_agree
-    {O R X K : Type} [CommRing O] [CommRing R] [Algebra O R] [AddCommGroup X] [Module.Free ℤ X]
-    [Module.Finite ℤ X] [CommRing K] [Algebra O K]
-    (I : Ideal K) [IsHausdorff I K]
+private theorem xr_agree {O R X K : Type} [CommRing O] [CommRing R] [Algebra O R] [AddCommGroup X]
+    [Module.Free ℤ X] [Module.Finite ℤ X] [CommRing K] [Algebra O K] (I : Ideal K) [IsHausdorff I K]
     (W : WPres O X R) (F : MvPowerSeries W.σ O →ₐ[O] K) (η : W.A →ₐ[O] K)
-    (hX : ∀ s, F (MvPowerSeries.X s) = η (W.zA s)) (hz : ∀ s, η (W.zA s) ∈ I)
-    (j : X) (f : MvPowerSeries W.σ O) (hf : f ∈ wtPart O W.wt j)
-    (x : W.A) (hx : (x : R) = W.π f)
-    : F f = η x := by
+    (hX : ∀ s, F (MvPowerSeries.X s) = η (W.zA s)) (hz : ∀ s, η (W.zA s) ∈ I) (j : X)
+    (f : MvPowerSeries W.σ O) (hf : f ∈ wtPart O W.wt j) (x : W.A) (hx : (x : R) = W.π f) : F f = η x := by
   classical
   apply sub_eq_zero.1
   refine IsHausdorff.haus' (I := I) _ fun k => ?_
@@ -83,61 +119,56 @@ private theorem xr_agree
   let p : MvPowerSeries W.σ O := ∑ m ∈ T, coeff m f • monomial m 1
   have hpc : ∀ m, coeff m p = if m ≤ n' then coeff m f else 0 := by
     intro m
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [p, map_sum, MvPowerSeries.coeff_smul, MvPowerSeries.coeff_monomial, mul_ite,
-        mul_one, mul_zero]
+
+    simp only [p, map_sum, MvPowerSeries.coeff_smul, MvPowerSeries.coeff_monomial, mul_ite, mul_one,
+    mul_zero]
     rw [Finset.sum_ite_eq]
     simp only [T, Finset.mem_Iic]
   have hf' : ∀ n, Finsupp.weight W.wt n ≠ j → coeff n f = 0 := hf
   obtain ⟨μ, hμ, hμf⟩ :=
     part_span O R X W {m | Finsupp.weight W.wt m = j ∧ ¬ m ≤ n'} j (fun n hn => hn.1)
-  obtain ⟨b, hb, hg⟩ :=
-    hμf (f - p) (by
-      intro n hn
-      rw [map_sub, hpc]
-      split_ifs with h
-      · exact sub_self _
-      · rw [sub_zero]
-        apply hf'
-        intro hw
-        exact hn ⟨hw, h⟩)
-  have hG
-      : ∀ (K' : Type) [CommRing K'] [Algebra O K'] (G : MvPowerSeries W.σ O →ₐ[O] K'),
-        G p = ∑ m ∈ T, coeff m f • ∏ s, G (MvPowerSeries.X s) ^ m s := by
+  obtain ⟨b, hb, hg⟩ := hμf (f - p) (by
+    intro n hn
+    rw [map_sub, hpc]
+    split_ifs with h
+    · exact sub_self _
+    · rw [sub_zero]
+      apply hf'
+      intro hw
+      exact hn ⟨hw, h⟩)
+  have hG : ∀ (K' : Type) [CommRing K'] [Algebra O K'] (G : MvPowerSeries W.σ O →ₐ[O] K'),
+      G p = ∑ m ∈ T, coeff m f • ∏ s, G (MvPowerSeries.X s) ^ m s := by
     intro K' _ _ G
-    set_option synthInstance.maxHeartbeats 100000 in
+
     simp only [p, map_sum, map_smul, mvPowerSeries_algHom_monomial_eq_prod_X_pow]
   let y : W.A := ∑ m ∈ T, coeff m f • ∏ s, W.zA s ^ m s
   have hy : F p = η y := by
     rw [hG K F]
-    set_option synthInstance.maxHeartbeats 100000 in
+
     simp only [y, map_sum, map_smul, map_prod, map_pow, hX]
   have hyR : (y : R) = W.π p := by
     rw [hG R W.π]
     show W.A.val y = _
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [y, map_sum, map_smul, map_prod, map_pow]
+
+    simp only [y, map_sum, map_smul, map_prod, map_pow]
     rfl
-  let e : W.A :=
-    ∑ m ∈ μ, (⟨W.π (b m), W.part_le_A (j := 0) (Submodule.mem_map_of_mem (hb m))⟩ : W.A) *
-      ∏ s, W.zA s ^ m s
+  let e : W.A := ∑ m ∈ μ, (⟨W.π (b m), W.part_le_A (j := 0) (Submodule.mem_map_of_mem (hb m))⟩ : W.A) *
+    ∏ s, W.zA s ^ m s
   have he : x - y = e := by
     apply Subtype.ext
     show W.A.val (x - y) = W.A.val e
     rw [map_sub]
     show (x : R) - (y : R) = _
     rw [hx, hyR, ← map_sub, hg]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [e, map_sum, map_mul, map_prod, map_pow,
-        mvPowerSeries_algHom_monomial_eq_prod_X_pow]
+
+    simp only [e, map_sum, map_mul, map_prod, map_pow, mvPowerSeries_algHom_monomial_eq_prod_X_pow]
     rfl
   have hdiff : F f - η x = F (f - p) - η e := by
     rw [← he, map_sub, map_sub, hy]
     ring
   rw [hdiff, hg]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [e, map_sum, map_mul, mvPowerSeries_algHom_monomial_eq_prod_X_pow, hX, map_prod,
-      map_pow]
+
+  simp only [e, map_sum, map_mul, mvPowerSeries_algHom_monomial_eq_prod_X_pow, hX, map_prod, map_pow]
   rw [← Finset.sum_sub_distrib]
   refine Ideal.sum_mem _ fun m hm => ?_
   rw [← sub_mul]
@@ -150,15 +181,12 @@ private theorem xr_agree
   obtain ⟨s0, hs0⟩ := hex
   exact prod_pow_mem_ideal_pow_of_mem_of_le_exponent I _ hz m k s0 hs0.le
 
-private theorem xr_const
-    {O S σ : Type} [CommRing O] [CommRing S] [Algebra O S] [Fintype σ]
-    (I : Ideal S) (F : MvPowerSeries σ O →ₐ[O] S) (hF : ∀ s, F (X s) ∈ I)
-    (f : MvPowerSeries σ O)
-    : F f - algebraMap O S (constantCoeff f) ∈ I := by
+private theorem xr_const {O S σ : Type} [CommRing O] [CommRing S] [Algebra O S] [Fintype σ] (I : Ideal S)
+    (F : MvPowerSeries σ O →ₐ[O] S) (hF : ∀ s, F (X s) ∈ I) (f : MvPowerSeries σ O) :
+    F f - algebraMap O S (constantCoeff f) ∈ I := by
   classical
-  have key
-      : ∀ T : Finset σ, ∀ g : MvPowerSeries σ O,
-        (∀ n : σ →₀ ℕ, (∀ s ∈ T, n s = 0) → coeff n g = 0) → F g ∈ I := by
+  have key : ∀ T : Finset σ, ∀ g : MvPowerSeries σ O,
+      (∀ n : σ →₀ ℕ, (∀ s ∈ T, n s = 0) → coeff n g = 0) → F g ∈ I := by
     intro T
     refine Finset.induction_on T ?_ ?_
     · intro g hg
@@ -194,24 +222,15 @@ private theorem xr_const
   · intro n hn
     have hn0 : n = 0 := Finsupp.ext fun s => hn s (Finset.mem_univ s)
     subst hn0
-    rw [map_sub, MvPowerSeries.coeff_zero_eq_constantCoeff_apply,
-      MvPowerSeries.coeff_zero_eq_constantCoeff_apply, ← MvPowerSeries.c_eq_algebraMap,
-      MvPowerSeries.constantCoeff_C, sub_self]
+    rw [map_sub, MvPowerSeries.coeff_zero_eq_constantCoeff_apply, MvPowerSeries.coeff_zero_eq_constantCoeff_apply,
+      ← MvPowerSeries.c_eq_algebraMap, MvPowerSeries.constantCoeff_C, sub_self]
 
 end SlopeTestRemainingChoices
 
-theorem UpperTheory.V.Ws.Po.extR
-    : ∀ (O : Type) [CommRing O] [IsLocalRing O] [IsNoetherianRing O]
-        [IsAdicComplete (maximalIdeal O) O] (X : Type) [AddCommGroup X] [Module.Free ℤ X]
-        [Module.Finite ℤ X] [DecidableEq X] (R : Type) [CommRing R] [Algebra O R] [IsCO O R]
-        (W : WPres O X R),
-      (∀ s, W.z s ∈ maximalIdeal R)
-        → ∀ (A' : Type) [CommRing A'] [IsLocalRing A'] [IsAdicComplete (maximalIdeal A') A']
-            [Algebra O A'] (η : W.A →ₐ[O] A'),
-          (∀ s, η (W.zA s) ∈ maximalIdeal A')
-            → (∀ b ∈ W.gr 0, (b : R) ∈ maximalIdeal R → η b ∈ maximalIdeal A')
-            → ∃ Ξ : R →ₐ[O] A',
-              Ξ.comp W.A.val = η ∧ ∀ x ∈ maximalIdeal R, Ξ x ∈ maximalIdeal A' := by
+theorem UpperTheory.V.Ws.Po.extR :
+    ∀ (O : Type) [CommRing O] [IsLocalRing O] [IsNoetherianRing O] [IsAdicComplete (maximalIdeal O) O] (X : Type) [AddCommGroup X] [Module.Free ℤ X] [Module.Finite ℤ X] [DecidableEq X] (R : Type) [CommRing R] [Algebra O R] [IsCO O R] (W : WPres O X R), (∀ s, W.z s ∈ maximalIdeal R) → ∀ (A' : Type) [CommRing A'] [IsLocalRing A'] [IsAdicComplete (maximalIdeal A') A'] [Algebra O A'] (η : W.A →ₐ[O] A'),
+      (∀ s, η (W.zA s) ∈ maximalIdeal A') → (∀ b ∈ W.gr 0, (b : R) ∈ maximalIdeal R → η b ∈ maximalIdeal A') →
+      ∃ Ξ : R →ₐ[O] A', Ξ.comp W.A.val = η ∧ ∀ x ∈ maximalIdeal R, Ξ x ∈ maximalIdeal A' := by
   intro O _ _ _ _ X _ _ _ _ R _ _ _ W hzm A' _ _ _ _ η hηz hη0
   classical
   obtain ⟨F, hF⟩ := xr_ev (O := O) (σ := W.σ) (maximalIdeal A') (fun s => η (W.zA s)) hηz
@@ -227,8 +246,7 @@ theorem UpperTheory.V.Ws.Po.extR
         exact Ideal.subset_span ⟨i, rfl⟩
       rw [RingHom.mem_ker] at hfi
       show F (f i) = 0
-      have h :=
-        xr_agree (I := maximalIdeal A') W F η hF hηz (c i) (f i) (hfc i) 0 (by rw [hfi]; rfl)
+      have h := xr_agree (I := maximalIdeal A') W F η hF hηz (c i) (f i) (hfc i) 0 (by rw [hfi]; rfl)
       rw [h, map_zero]
     exact hle ha
   let e := Ideal.quotientKerAlgEquivOfSurjective W.surj
@@ -249,9 +267,8 @@ theorem UpperTheory.V.Ws.Po.extR
     intro a
     have key : ∀ y : R, y ∈ (⨆ j, W.part j) → y ∈ W.A ∧ ∀ h : y ∈ W.A, Ξ y = η ⟨y, h⟩ := by
       intro y hy
-      refine Submodule.iSup_induction
-        (motive := fun y => y ∈ W.A ∧ ∀ h : y ∈ W.A, Ξ y = η ⟨y, h⟩)
-        _ hy ?_ ?_ ?_
+      refine Submodule.iSup_induction (motive := fun y => y ∈ W.A ∧ ∀ h : y ∈ W.A, Ξ y = η ⟨y, h⟩) _ hy
+        ?_ ?_ ?_
       · intro i y hy
         refine ⟨W.part_le_A hy, fun h => ?_⟩
         obtain ⟨g, hg, rfl⟩ := Submodule.mem_map.1 hy
@@ -274,18 +291,17 @@ theorem UpperTheory.V.Ws.Po.extR
     have hb : (algebraMap O W.A (MvPowerSeries.constantCoeff g)) ∈ W.gr 0 := by
       show W.A.val (algebraMap O W.A (MvPowerSeries.constantCoeff g)) ∈ W.part 0
       rw [AlgHom.commutes]
-      refine Submodule.mem_map.2
-        ⟨algebraMap O (MvPowerSeries W.σ O) (MvPowerSeries.constantCoeff g), ?_, W.π.commutes _⟩
+      refine Submodule.mem_map.2 ⟨algebraMap O (MvPowerSeries W.σ O) (MvPowerSeries.constantCoeff g), ?_,
+        W.π.commutes _⟩
       show ∀ k : W.σ →₀ ℕ, Finsupp.weight W.wt k ≠ 0 → MvPowerSeries.coeff k _ = 0
       intro k hk
       rw [← MvPowerSeries.c_eq_algebraMap, MvPowerSeries.coeff_C, if_neg]
       rintro rfl
       exact hk (map_zero _)
-    have h3 :=
-      hη0 _ hb (by
-        show W.A.val (algebraMap O W.A (MvPowerSeries.constantCoeff g)) ∈ maximalIdeal R
-        rw [AlgHom.commutes]
-        exact h2)
+    have h3 := hη0 _ hb (by
+      show W.A.val (algebraMap O W.A (MvPowerSeries.constantCoeff g)) ∈ maximalIdeal R
+      rw [AlgHom.commutes]
+      exact h2)
     rw [AlgHom.commutes] at h3
     have h4 := xr_const (maximalIdeal A') F hF' g
     have h5 := Ideal.add_mem _ h4 h3

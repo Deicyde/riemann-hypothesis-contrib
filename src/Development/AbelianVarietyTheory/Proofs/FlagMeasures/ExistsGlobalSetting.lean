@@ -1,32 +1,54 @@
 module
 
-public import Mathlib
 public import Formalism.UnipotentAdelicQuotients.SiegelWeilUnitaryConvergent
 public import Development.AbelianVarietyTheory.Definitions.SemilocalFrames.LevelMatchIff
 public import Formalism.LocalToGlobal.SiegelLatticeTheory.HaarTransversals.UnitaryHaarProducts.InstExists
-public import Formalism.LocalToGlobal.SiegelLatticeTheory.FlagStabilizerTensors.RootLatticeThresholds.LocalAdditiveCharContinuous
-public import Formalism.PeriodIntegrals.BesselMapUniq
-public import Formalism.LocalToGlobal.SiegelLatticeTheory.WeightedGaugeFactors.FactsDS
-public import Formalism.LocalToGlobal.SiegelLatticeTheory.ClosedVolumeStatements.CoefWeightedLocHolds
-public import Formalism.LocalToGlobal.SiegelLatticeTheory.FlagStabilizerTensors.RootLatticeThresholds.WuDecayAll
-public import Formalism.SharpRestriction.CuspSpanNormBounds.FamilyDoubleCosetBesselBoundOfGap
-public import Formalism.LocalToGlobal.SiegelLatticeTheory.FlagStabilizerTensors.RootLatticeThresholds.BesselOfWPf
-public import Formalism.LocalToGlobal.SiegelLatticeTheory.ClosedVolumeStatements.SettingExistsOfGap
-public import Formalism.LocalToGlobal.SiegelLatticeTheory.FlagStabilizerTensors.RootLatticeThresholds.LocUniqGen
-public import Formalism.LocalToGlobal.SiegelLatticeTheory.FlagStabilizerTensors.RootLatticeThresholds.LocScalarPf
-public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.JExistsAll
-public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.LatExistsOfForms0
-public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.MExistsHolds
-public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.RealPlaceFunctionBlockExistsOfBesselCoef
 public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.GenusMatchHolds
 public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.HcExistsAll
+public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.JExistsAll
+public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.LatExistsOfForms0
 public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.LevelConjHolds
-public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.WittExistsHolds
+public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.MExistsHolds
+public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.RealPlaceFunctionBlockExistsOfBesselCoef
 public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.RescaleStep3
-public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.ColDictCoreHolds
-public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.FullExistsOfLocTied
-public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.ColumnLevelStabTriv
-public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.FinXOfDecay
+public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.WittExistsHolds
+public import Formalism.LocalToGlobal.SiegelLatticeTheory.ClosedVolumeStatements.CoefWeightedLocHolds
+import Formalism.LocalToGlobal.SiegelLatticeTheory.WeightedGaugeFactors.FactsDS
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 

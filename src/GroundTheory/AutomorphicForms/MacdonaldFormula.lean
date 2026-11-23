@@ -1,8 +1,53 @@
 module
 
-public import Mathlib
 public import GroundTheory.AutomorphicForms.MacdonaldSpherical
 public import GroundTheory.AutomorphicForms.MacdonaldNormalization
+import GroundTheory.AutomorphicForms.MacdonaldRecursion
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Tactic.TypeStar
 
 @[expose] public section
 
@@ -15,11 +60,11 @@ namespace Spherical
 open MeasureTheory Matrix GLnLocal Iwasawa HeckeAlgebra AddMonoidAlgebra Finset
 open scoped ValuativeRel
 
-variable
-  {F : Type*} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F] {n : ℕ}
+variable {F : Type*} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
+  {n : ℕ}
 
-theorem vPoly_ne_zero {t : ℂ} (ht : Function.Injective fun k : ℕ => t ^ k) (m : ℕ)
-    : vPoly m t ≠ 0 := by
+theorem vPoly_ne_zero {t : ℂ} (ht : Function.Injective fun k : ℕ => t ^ k) (m : ℕ) :
+    vPoly m t ≠ 0 := by
   refine Finset.prod_ne_zero_iff.2 fun k _ => div_ne_zero ?_ ?_
   · intro h
     have h' : t ^ (k + 1) = t ^ 0 := by rw [pow_zero]; exact (sub_eq_zero.1 h).symm
@@ -45,40 +90,34 @@ theorem injective_qInv_pow : Function.Injective fun k : ℕ => ((qF F : ℂ))⁻
   push_cast
   exact hab
 
-theorem halfModulus_mul_recursion
-    (Q : (Fin n → ℤ) → LaurentRing n)
-    (hQ : ∀ r l,
-      esymmL n r * Q l = ∑ S ∈ (Finset.univ : Finset (Fin n)).powersetCard r, Q (l + lamS S))
-    (z : Fin n → ℂˣ)
-    {r : ℕ} (hr : r ≤ n)
-    (l : Fin n → ℤ)
-    : sqrtQ F ^ (r * (n - r)) * evalAt z (esymmL n r) * (halfModulus F l * evalAt z (Q l))
-      = ∑ S ∈ (Finset.univ : Finset (Fin n)).powersetCard r,
-          (kappa F S : ℂ) * (halfModulus F (l + lamS S) * evalAt z (Q (l + lamS S))) := by
-  have h1
-      : evalAt z (esymmL n r) * evalAt z (Q l)
-        = ∑ S ∈ (Finset.univ : Finset (Fin n)).powersetCard r, evalAt z (Q (l + lamS S)) := by
-    set_option synthInstance.maxHeartbeats 100000 in
+theorem halfModulus_mul_recursion (Q : (Fin n → ℤ) → LaurentRing n)
+    (hQ : ∀ r l, esymmL n r * Q l = ∑ S ∈ (Finset.univ : Finset (Fin n)).powersetCard r, Q (l + lamS S))
+    (z : Fin n → ℂˣ) {r : ℕ} (hr : r ≤ n) (l : Fin n → ℤ) :
+    sqrtQ F ^ (r * (n - r)) * evalAt z (esymmL n r) * (halfModulus F l * evalAt z (Q l)) =
+      ∑ S ∈ (Finset.univ : Finset (Fin n)).powersetCard r,
+        (kappa F S : ℂ) * (halfModulus F (l + lamS S) * evalAt z (Q (l + lamS S))) := by
+  have h1 : evalAt z (esymmL n r) * evalAt z (Q l) =
+      ∑ S ∈ (Finset.univ : Finset (Fin n)).powersetCard r, evalAt z (Q (l + lamS S)) := by
+
     rw [← map_mul, hQ, map_sum]
-  calc
-    _ = sqrtQ F ^ (r * (n - r)) * halfModulus F l * (evalAt z (esymmL n r) * evalAt z (Q l)) := by
-      ring
+  calc _ = sqrtQ F ^ (r * (n - r)) * halfModulus F l * (evalAt z (esymmL n r) * evalAt z (Q l)) := by
+        ring
     _ = _ := by
-      rw [h1, Finset.mul_sum]
-      refine Finset.sum_congr rfl fun S hS => ?_
-      rw [halfModulus_add, ← kappa_mul_halfModulus hr (Finset.mem_powersetCard.1 hS).2]
-      ring
+        rw [h1, Finset.mul_sum]
+        refine Finset.sum_congr rfl fun S hS => ?_
+        rw [halfModulus_add, ← kappa_mul_halfModulus hr (Finset.mem_powersetCard.1 hS).2]
+        ring
 
 theorem rhoPair_add (a b : Fin n → ℤ) : rhoPair (a + b) = rhoPair a + rhoPair b := by
   simp only [rhoPair, Pi.add_apply, mul_add, Finset.sum_add_distrib]
 
-theorem rhoPair_neg (a : Fin n → ℤ) : rhoPair (-a) = - rhoPair a := by
+theorem rhoPair_neg (a : Fin n → ℤ) : rhoPair (-a) = -rhoPair a := by
   simp only [rhoPair, Pi.neg_apply, mul_neg, Finset.sum_neg_distrib]
 
-theorem rhoPair_comp_swap {μ : Fin n → ℤ} {i j : Fin n} (hij : (j : ℕ) = i + 1) (hμ : μ j = μ i + 1)
-    : rhoPair (μ ∘ Equiv.swap i j) = rhoPair μ + 2 := by
+theorem rhoPair_comp_swap {μ : Fin n → ℤ} {i j : Fin n} (hij : (j : ℕ) = i + 1)
+    (hμ : μ j = μ i + 1) : rhoPair (μ ∘ Equiv.swap i j) = rhoPair μ + 2 := by
   have hne : i ≠ j := fun h => by rw [h] at hij; omega
-  have hs : μ ∘ Equiv.swap i j = μ + (Pi.single i 1 + - Pi.single j 1) := by
+  have hs : μ ∘ Equiv.swap i j = μ + (Pi.single i 1 + -Pi.single j 1) := by
     funext x
     simp only [Function.comp_apply, Pi.add_apply, Pi.neg_apply, Pi.single_apply,
       Equiv.swap_apply_def]
@@ -87,10 +126,10 @@ theorem rhoPair_comp_swap {μ : Fin n → ℤ} {i j : Fin n} (hij : (j : ℕ) = 
   push_cast [hij]
   ring
 
-theorem halfModulus_hlR_swap
-    (z : Fin n → ℂˣ) {μ : Fin n → ℤ} {i j : Fin n} (hij : (j : ℕ) = i + 1) (hμ : μ j = μ i + 1)
-    : halfModulus F (μ ∘ Equiv.swap i j) * evalAt z (hlR ((qF F : ℂ))⁻¹ (μ ∘ Equiv.swap i j))
-      = halfModulus F μ * evalAt z (hlR ((qF F : ℂ))⁻¹ μ) := by
+theorem halfModulus_hlR_swap (z : Fin n → ℂˣ) {μ : Fin n → ℤ} {i j : Fin n}
+    (hij : (j : ℕ) = i + 1) (hμ : μ j = μ i + 1) :
+    halfModulus F (μ ∘ Equiv.swap i j) * evalAt z (hlR ((qF F : ℂ))⁻¹ (μ ∘ Equiv.swap i j)) =
+      halfModulus F μ * evalAt z (hlR ((qF F : ℂ))⁻¹ μ) := by
   rw [hlR_swap _ hij hμ, map_smul, smul_eq_mul, halfModulus_eq, halfModulus_eq,
     rhoPair_comp_swap hij hμ, neg_add, zpow_add₀ sqrtQ_ne_zero, ← sqrtQ_sq]
   rw [show (sqrtQ F) ^ (-2 : ℤ) = ((sqrtQ F) ^ 2)⁻¹ by rw [_root_.zpow_neg]; norm_cast]
@@ -107,68 +146,56 @@ theorem schur_zero : schur (0 : Fin n → ℤ) = 1 := by
   rw [mul_one, zero_add]
   rfl
 
-variable
-  [MeasurableSpace (GL (Fin n) F)] [BorelSpace (GL (Fin n) F)]
+variable [MeasurableSpace (GL (Fin n) F)] [BorelSpace (GL (Fin n) F)]
   {μ : Measure (GL (Fin n) F)} [μ.IsHaarMeasure]
 
-theorem macdonald_formula_hlR (z : Fin n → ℂˣ) {l : Fin n → ℤ} (hl : Antitone l)
-    : vPoly n ((qF F : ℂ))⁻¹ * zonalSpherical μ z (torusPow F n l)
-      = halfModulus F l * evalAt z (hlR ((qF F : ℂ))⁻¹ l) := by
+theorem macdonald_formula_hlR (z : Fin n → ℂˣ) {l : Fin n → ℤ} (hl : Antitone l) :
+    vPoly n ((qF F : ℂ))⁻¹ * zonalSpherical μ z (torusPow F n l) =
+      halfModulus F l * evalAt z (hlR ((qF F : ℂ))⁻¹ l) := by
   set t : ℂ := ((qF F : ℂ))⁻¹
   set f : (Fin n → ℤ) → ℂ := fun m =>
     vPoly n t * zonalSpherical μ z (torusPow F n m) - halfModulus F m * evalAt z (hlR t m) with hf
-  have hswap
-      : ∀ (m : Fin n → ℤ) (i j : Fin n),
-        (j : ℕ) = i + 1 → m j = m i + 1 → f (m ∘ Equiv.swap i j) = f m := by
+  have hswap : ∀ (m : Fin n → ℤ) (i j : Fin n), (j : ℕ) = i + 1 → m j = m i + 1 →
+      f (m ∘ Equiv.swap i j) = f m := by
     intro m i j hij hm
     simp only [hf]
     rw [zonalSpherical_torusPow_comp, halfModulus_hlR_swap z hij hm]
-  have key :=
-    eq_zero_of_recursion
-      (fun S => (kappa F S : ℝ))
-      (fun S => by exact_mod_cast kappa_pos S)
-      (fun r => sqrtQ F ^ (r * (n - r)) * evalAt z (esymmL n r))
-      (by
-        rw [Nat.sub_self, mul_zero, pow_zero, one_mul]
-        exact evalAt_esymmL_self_ne_zero z)
-      f
-      (by
-        intro m hm r hr
-        have h1 := zonalSpherical_recursion (μ := μ) z hm hr
-        have h2 :=
-          halfModulus_mul_recursion (F := F) (hlR t) (fun r l => esymmL_mul_hlR t r l) z hr m
-        simp only [hf, Complex.ofReal_natCast]
-        calc
-          _ = vPoly n t
-                * (sqrtQ F ^ (r * (n - r)) * evalAt z (esymmL n r)
-                  * zonalSpherical μ z (torusPow F n m))
-              - sqrtQ F ^ (r * (n - r)) * evalAt z (esymmL n r)
-                * (halfModulus F m * evalAt z (hlR t m)) := by
-            ring
-          _ = _ := by
-            rw [h1, h2, Finset.mul_sum, ← Finset.sum_sub_distrib]
-            exact Finset.sum_congr rfl fun S _ => by ring)
-      (fun m hm S =>
-        Or.inr (by
-          obtain ⟨σ, hσ, hfσ⟩ := exists_perm_antitone f hswap hm S
-          exact ⟨σ, hσ, hfσ.symm⟩))
-      (by
-        simp only [hf, torusPow_zero, zonalSpherical_one, halfModulus_zero, one_mul, mul_one]
-        rw [hlR_zero t injective_qInv_pow, AlgHom.commutes]
-        simp)
+  have key := eq_zero_of_recursion (fun S => (kappa F S : ℝ)) (fun S => by exact_mod_cast kappa_pos S)
+    (fun r => sqrtQ F ^ (r * (n - r)) * evalAt z (esymmL n r))
+    (by
+      rw [Nat.sub_self, mul_zero, pow_zero, one_mul]
+      exact evalAt_esymmL_self_ne_zero z)
+    f
+    (by
+      intro m hm r hr
+      have h1 := zonalSpherical_recursion (μ := μ) z hm hr
+      have h2 := halfModulus_mul_recursion (F := F) (hlR t) (fun r l => esymmL_mul_hlR t r l) z hr m
+      simp only [hf, Complex.ofReal_natCast]
+      calc _ = vPoly n t * (sqrtQ F ^ (r * (n - r)) * evalAt z (esymmL n r) *
+              zonalSpherical μ z (torusPow F n m)) -
+            sqrtQ F ^ (r * (n - r)) * evalAt z (esymmL n r) *
+              (halfModulus F m * evalAt z (hlR t m)) := by ring
+        _ = _ := by
+          rw [h1, h2, Finset.mul_sum, ← Finset.sum_sub_distrib]
+          exact Finset.sum_congr rfl fun S _ => by ring)
+    (fun m hm S => Or.inr (by
+      obtain ⟨σ, hσ, hfσ⟩ := exists_perm_antitone f hswap hm S
+      exact ⟨σ, hσ, hfσ.symm⟩))
+    (by
+      simp only [hf, torusPow_zero, zonalSpherical_one, halfModulus_zero, one_mul, mul_one]
+      rw [hlR_zero t injective_qInv_pow, AlgHom.commutes]
+      simp)
   exact sub_eq_zero.1 (key l hl)
 
-theorem casselman_shalika
-    (ψ₀ : AddChar F ℂ)
-    (hψ₀ : ∀ x ∈ 𝒪[F], ψ₀ x = 1) (hψ₁ : ∃ x : F, (GLnLocal.uniformizer F : F) * x ∈ 𝒪[F] ∧ ψ₀ x ≠ 1)
-    (z : Fin n → ℂˣ)
-    {W : GL (Fin n) F → ℂ} (hWN : ∀ u ∈ unipotent F n, ∀ g, W (u * g) = Whittaker.psiN ψ₀ u * W g)
+theorem casselman_shalika (ψ₀ : AddChar F ℂ) (hψ₀ : ∀ x ∈ 𝒪[F], ψ₀ x = 1)
+    (hψ₁ : ∃ x : F, (GLnLocal.uniformizer F : F) * x ∈ 𝒪[F] ∧ ψ₀ x ≠ 1) (z : Fin n → ℂˣ)
+    {W : GL (Fin n) F → ℂ}
+    (hWN : ∀ u ∈ unipotent F n, ∀ g, W (u * g) = Whittaker.psiN ψ₀ u * W g)
     (hWK : ∀ g, ∀ k ∈ integralGL F n, W (g * k) = W g)
     (heig : ∀ (h : SphericalHecke μ (F := F) (n := n)) (g : GL (Fin n) F),
       ∫ x, (h : HeckeAlgebra μ) x * W (g * x) ∂μ = evalAt z (satakeTransform μ h) * W g)
-    (l : Fin n → ℤ)
-    : W (torusPow F n l)
-      = if Antitone l then W 1 * halfModulus F l * evalAt z (schur l) else 0 := by
+    (l : Fin n → ℤ) :
+    W (torusPow F n l) = if Antitone l then W 1 * halfModulus F l * evalAt z (schur l) else 0 := by
   split_ifs with hl
   swap
   · exact eq_zero_of_not_antitone hψ₁ hWN hWK hl
@@ -177,42 +204,36 @@ theorem casselman_shalika
     rw [hWN u hu.1, psiN_eq_one_of_mem hψ₀ hu, one_mul]
   set f : (Fin n → ℤ) → ℂ := fun m =>
     W (torusPow F n m) - W 1 * (halfModulus F m * evalAt z (schur m)) with hf
-  have key :=
-    eq_zero_of_recursion
-      (fun S => (kappa F S : ℝ))
-      (fun S => by exact_mod_cast kappa_pos S)
-      (fun r => sqrtQ F ^ (r * (n - r)) * evalAt z (esymmL n r))
-      (by
-        rw [Nat.sub_self, mul_zero, pow_zero, one_mul]
-        exact evalAt_esymmL_self_ne_zero z)
-      f
-      (by
-        intro m hm r hr
-        have h1 := recursion_of_integral_eq (μ := μ) z hWK hN hm hr (heig _ _)
-        have h2 := halfModulus_mul_recursion (F := F) schur (fun r l => esymmL_mul_schur r l) z hr m
-        simp only [hf, Complex.ofReal_natCast]
-        calc
-          _ = sqrtQ F ^ (r * (n - r)) * evalAt z (esymmL n r) * W (torusPow F n m)
-              - W 1
-                * (sqrtQ F ^ (r * (n - r)) * evalAt z (esymmL n r)
-                  * (halfModulus F m * evalAt z (schur m))) := by
-            ring
-          _ = _ := by
-            rw [h1, h2, Finset.mul_sum, ← Finset.sum_sub_distrib]
-            exact Finset.sum_congr rfl fun S _ => by ring)
-      (by
-        intro m hm S
-        by_cases hant : Antitone (m + lamS S)
-        · exact Or.inr ⟨1, by simpa using hant, by simp⟩
-        · left
-          obtain ⟨i, j, hij, hmij, hiS, hjS⟩ := exists_ascent hm hant
-          have hasc : (m + lamS S) j = (m + lamS S) i + 1 := by
-            simp only [Pi.add_apply, lamS_apply, hiS, hjS, if_true, if_false, hmij]
-            ring
-          simp only [hf]
-          rw [eq_zero_of_not_antitone hψ₁ hWN hWK hant, schur_eq_zero_of_ascent hij hasc, map_zero,
-            mul_zero, mul_zero, sub_zero])
-      (by simp only [hf, torusPow_zero, halfModulus_zero, schur_zero, map_one, mul_one, sub_self])
+  have key := eq_zero_of_recursion (fun S => (kappa F S : ℝ)) (fun S => by exact_mod_cast kappa_pos S)
+    (fun r => sqrtQ F ^ (r * (n - r)) * evalAt z (esymmL n r))
+    (by
+      rw [Nat.sub_self, mul_zero, pow_zero, one_mul]
+      exact evalAt_esymmL_self_ne_zero z)
+    f
+    (by
+      intro m hm r hr
+      have h1 := recursion_of_integral_eq (μ := μ) z hWK hN hm hr (heig _ _)
+      have h2 := halfModulus_mul_recursion (F := F) schur (fun r l => esymmL_mul_schur r l) z hr m
+      simp only [hf, Complex.ofReal_natCast]
+      calc _ = sqrtQ F ^ (r * (n - r)) * evalAt z (esymmL n r) * W (torusPow F n m) -
+            W 1 * (sqrtQ F ^ (r * (n - r)) * evalAt z (esymmL n r) *
+              (halfModulus F m * evalAt z (schur m))) := by ring
+        _ = _ := by
+          rw [h1, h2, Finset.mul_sum, ← Finset.sum_sub_distrib]
+          exact Finset.sum_congr rfl fun S _ => by ring)
+    (by
+      intro m hm S
+      by_cases hant : Antitone (m + lamS S)
+      · exact Or.inr ⟨1, by simpa using hant, by simp⟩
+      · left
+        obtain ⟨i, j, hij, hmij, hiS, hjS⟩ := exists_ascent hm hant
+        have hasc : (m + lamS S) j = (m + lamS S) i + 1 := by
+          simp only [Pi.add_apply, lamS_apply, hiS, hjS, if_true, if_false, hmij]
+          ring
+        simp only [hf]
+        rw [eq_zero_of_not_antitone hψ₁ hWN hWK hant, schur_eq_zero_of_ascent hij hasc, map_zero,
+          mul_zero, mul_zero, sub_zero])
+    (by simp only [hf, torusPow_zero, halfModulus_zero, schur_zero, map_one, mul_one, sub_self])
   have := key l hl
   simp only [hf] at this
   rw [mul_assoc]

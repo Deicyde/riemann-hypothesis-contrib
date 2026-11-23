@@ -1,8 +1,48 @@
 module
 
-public import Mathlib
 public import GroundTheory.GlobalFields.Adele.BaseChange.FiniteTensor
 public import GroundTheory.GlobalFields.SemilocalAlgebras.InfiniteAdeleTopology
+public import Mathlib.NumberTheory.NumberField.AdeleRing
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -22,17 +62,16 @@ def adeleMap : 𝔸[K] →+* 𝔸[L] :=
   RingHom.prodMap (GroundTheory.Global.InfinitePlace.infiniteAdeleRingMap (K := K) (L := L))
     (finiteAdeleMap K L)
 
-theorem adeleMap_apply (x : 𝔸[K])
-    : adeleMap K L x
-      = (GroundTheory.Global.InfinitePlace.infiniteAdeleRingMap x.1, finiteAdeleMap K L x.2) :=
+theorem adeleMap_apply (x : 𝔸[K]) :
+    adeleMap K L x =
+      (GroundTheory.Global.InfinitePlace.infiniteAdeleRingMap x.1, finiteAdeleMap K L x.2) :=
   rfl
 
 theorem continuous_adeleMap : Continuous (adeleMap K L) :=
-  GroundTheory.Global.InfinitePlace.continuous_infiniteAdeleRingMap.prodMap
-    continuous_finiteAdeleMap
+  GroundTheory.Global.InfinitePlace.continuous_infiniteAdeleRingMap.prodMap continuous_finiteAdeleMap
 
-theorem adeleMap_algebraMap (k : K)
-    : adeleMap K L (algebraMap K 𝔸[K] k) = algebraMap L 𝔸[L] (algebraMap K L k) :=
+theorem adeleMap_algebraMap (k : K) :
+    adeleMap K L (algebraMap K 𝔸[K] k) = algebraMap L 𝔸[L] (algebraMap K L k) :=
   Prod.ext (GroundTheory.Global.InfinitePlace.infiniteAdeleRingMap_algebraMap k)
     (finiteAdeleMap_algebraMap k)
 
@@ -42,14 +81,14 @@ def adeleTensorEquiv : L ⊗[K] 𝔸[K] ≃ₐ[L] 𝔸[L] :=
     (AlgEquiv.prodCongr GroundTheory.Global.InfinitePlace.tensorInfiniteAdeleRingEquiv
       (finiteTensorEquiv K L))
 
-theorem adeleTensorEquiv_tmul (l : L) (a : 𝔸[K])
-    : adeleTensorEquiv K L (l ⊗ₜ a) = algebraMap L 𝔸[L] l * adeleMap K L a :=
+theorem adeleTensorEquiv_tmul (l : L) (a : 𝔸[K]) :
+    adeleTensorEquiv K L (l ⊗ₜ a) = algebraMap L 𝔸[L] l * adeleMap K L a :=
   Prod.ext (GroundTheory.Global.InfinitePlace.tensorInfiniteAdeleRingEquiv_tmul' l a.1)
     (finiteTensorEquiv_tmul l a.2)
 
-theorem adeleTensorEquiv_tmul_snd (l : L) (a : 𝔸[K]) (w : HeightOneSpectrum (𝓞 L))
-    : (adeleTensorEquiv K L (l ⊗ₜ a)).2 w
-      = SemiLocal.tensorEquiv' L (below K w) (l ⊗ₜ a.2 (below K w)) ⟨w, liesOver_below w⟩ :=
+theorem adeleTensorEquiv_tmul_snd (l : L) (a : 𝔸[K]) (w : HeightOneSpectrum (𝓞 L)) :
+    (adeleTensorEquiv K L (l ⊗ₜ a)).2 w =
+      SemiLocal.tensorEquiv' L (below K w) (l ⊗ₜ a.2 (below K w)) ⟨w, liesOver_below w⟩ :=
   finiteTensorEquiv_tmul_apply l a.2 w
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι] (b : Basis ι K L)
@@ -71,31 +110,31 @@ def sndAddHom : 𝔸[L] →+ FiniteAdeleRing (𝓞 L) L where
   map_zero' := rfl
   map_add' _ _ := rfl
 
-theorem adeleTensorEquiv_sum_coord (y : 𝔸[L])
-    : adeleTensorEquiv K L (∑ i, b i ⊗ₜ coord b i y) = y := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+theorem adeleTensorEquiv_sum_coord (y : 𝔸[L]) :
+    adeleTensorEquiv K L (∑ i, b i ⊗ₜ coord b i y) = y := by
+
+  rw [map_sum]
   simp_rw [adeleTensorEquiv_tmul]
   refine Prod.ext ?_ ?_
   · change fstAddHom (∑ i, algebraMap L 𝔸[L] (b i) * adeleMap K L (coord b i y)) = y.1
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     conv_rhs => rw [← GroundTheory.Global.InfinitePlace.tensorInfiniteAdeleRingEquiv_sum_adeleCoord b y.1]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     simp_rw [GroundTheory.Global.InfinitePlace.tensorInfiniteAdeleRingEquiv_tmul']
     rfl
   · change sndAddHom (∑ i, algebraMap L 𝔸[L] (b i) * adeleMap K L (coord b i y)) = y.2
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     conv_rhs => rw [← finiteTensorMap_sum_finiteCoord b y.2]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     simp_rw [finiteTensorMap_tmul]
     rfl
 
-theorem adeleTensorEquiv_symm_apply (y : 𝔸[L])
-    : (adeleTensorEquiv K L).symm y = ∑ i, b i ⊗ₜ coord b i y := by
+theorem adeleTensorEquiv_symm_apply (y : 𝔸[L]) :
+    (adeleTensorEquiv K L).symm y = ∑ i, b i ⊗ₜ coord b i y := by
   rw [AlgEquiv.symm_apply_eq]
   exact (adeleTensorEquiv_sum_coord b y).symm
 

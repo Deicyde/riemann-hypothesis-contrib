@@ -1,6 +1,49 @@
 module
 
-public import Mathlib
+public import Mathlib.NumberTheory.NumberField.Basic
+public import Mathlib.NumberTheory.Padics.PadicIntegers
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Ring.IsFormallyReal
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -21,19 +64,18 @@ variable {K ℓ}
 theorem BA_apply (i : Module.Free.ChooseBasisIndex ℤ (𝓞 K)) : BA K ℓ i = 1 ⊗ₜ integralBasis K i :=
   Algebra.TensorProduct.basis_apply _ i
 
-theorem BA_repr_tmul (x : K) (i : Module.Free.ChooseBasisIndex ℤ (𝓞 K))
-    : (BA K ℓ).repr (1 ⊗ₜ x) i = (((integralBasis K).repr x i : ℚ) : ℚ_[ℓ]) := by
+theorem BA_repr_tmul (x : K) (i : Module.Free.ChooseBasisIndex ℤ (𝓞 K)) :
+    (BA K ℓ).repr (1 ⊗ₜ x) i = (((integralBasis K).repr x i : ℚ) : ℚ_[ℓ]) := by
   simp [BA, Finsupp.mapRange_apply]
 
-theorem coord_int (x : K) (hx : IsIntegral ℤ x) (i : Module.Free.ChooseBasisIndex ℤ (𝓞 K))
-    : ∃ z : ℤ, (integralBasis K).repr x i = z := by
-  obtain ⟨a, rfl⟩ : ∃ a : 𝓞 K, algebraMap (𝓞 K) K a = x :=
-    ⟨⟨x, (mem_integralClosure_iff ℤ K).2 hx⟩, rfl⟩
+theorem coord_int (x : K) (hx : IsIntegral ℤ x) (i : Module.Free.ChooseBasisIndex ℤ (𝓞 K)) :
+    ∃ z : ℤ, (integralBasis K).repr x i = z := by
+  obtain ⟨a, rfl⟩ : ∃ a : 𝓞 K, algebraMap (𝓞 K) K a = x := ⟨⟨x, (mem_integralClosure_iff ℤ K).2 hx⟩, rfl⟩
   rw [integralBasis_repr_apply]
   exact ⟨_, rfl⟩
 
-theorem BA_repr_natPow_mul (D : ℕ) (x : ℚ_[ℓ] ⊗[ℚ] K) (i : Module.Free.ChooseBasisIndex ℤ (𝓞 K))
-    : (BA K ℓ).repr ((ℓ : ℚ_[ℓ] ⊗[ℚ] K) ^ D * x) i = (ℓ : ℚ_[ℓ]) ^ D * (BA K ℓ).repr x i := by
+theorem BA_repr_natPow_mul (D : ℕ) (x : ℚ_[ℓ] ⊗[ℚ] K) (i : Module.Free.ChooseBasisIndex ℤ (𝓞 K)) :
+    (BA K ℓ).repr ((ℓ : ℚ_[ℓ] ⊗[ℚ] K) ^ D * x) i = (ℓ : ℚ_[ℓ]) ^ D * (BA K ℓ).repr x i := by
   rw [show ((ℓ : ℚ_[ℓ] ⊗[ℚ] K)) ^ D * x = ((ℓ : ℚ_[ℓ]) ^ D) • x by
     rw [Algebra.smul_def, map_pow, map_natCast]]
   rw [map_smul, Finsupp.smul_apply, smul_eq_mul]
@@ -66,11 +108,10 @@ def S : Subring (ℚ_[ℓ] ⊗[ℚ] K) where
       rw [Finset.sum_mul_sum]
       simp only [smul_mul_smul_comm]
     rw [e]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_smul, Finsupp.coe_finsetSum, Finset.sum_apply, Finsupp.smul_apply,
-        smul_eq_mul]
-    refine Subring.sum_mem _ fun j _ =>
-      Subring.sum_mem _ fun k _ => Subring.mul_mem _ (Subring.mul_mem _ (ha j) (hb k)) ?_
+
+    simp only [map_sum, map_smul, Finsupp.coe_finsetSum, Finset.sum_apply, Finsupp.smul_apply, smul_eq_mul]
+    refine Subring.sum_mem _ fun j _ => Subring.sum_mem _ fun k _ =>
+      Subring.mul_mem _ (Subring.mul_mem _ (ha j) (hb k)) ?_
     rw [BA_apply, BA_apply, Algebra.TensorProduct.tmul_mul_tmul, one_mul, BA_repr_tmul]
     have hi : IsIntegral ℤ (integralBasis K j * integralBasis K k) := by
       rw [integralBasis_apply, integralBasis_apply]
@@ -81,8 +122,7 @@ def S : Subring (ℚ_[ℓ] ⊗[ℚ] K) where
 
 variable {K ℓ}
 
-theorem mem_S {x : ℚ_[ℓ] ⊗[ℚ] K} : x ∈ S K ℓ ↔ ∀ i, (BA K ℓ).repr x i ∈ PadicInt.subring ℓ :=
-  Iff.rfl
+theorem mem_S {x : ℚ_[ℓ] ⊗[ℚ] K} : x ∈ S K ℓ ↔ ∀ i, (BA K ℓ).repr x i ∈ PadicInt.subring ℓ := Iff.rfl
 
 theorem tmul_mem_S (x : K) (hx : IsIntegral ℤ x) : (1 ⊗ₜ x : ℚ_[ℓ] ⊗[ℚ] K) ∈ S K ℓ := by
   rw [mem_S]
@@ -92,9 +132,8 @@ theorem tmul_mem_S (x : K) (hx : IsIntegral ℤ x) : (1 ⊗ₜ x : ℚ_[ℓ] ⊗
   rw [hz, Rat.cast_intCast]
   exact intCast_mem _ z
 
-theorem isIntegral_of_pow_bdd
-    (s : K) (d : ℕ) (hd : d ≠ 0) (h : ∀ n : ℕ, IsIntegral ℤ ((d : K) * s ^ n))
-    : IsIntegral ℤ s := by
+theorem isIntegral_of_pow_bdd (s : K) (d : ℕ) (hd : d ≠ 0) (h : ∀ n : ℕ, IsIntegral ℤ ((d : K) * s ^ n)) :
+    IsIntegral ℤ s := by
   let T : Submodule ℤ K :=
     (Submodule.span ℤ (Set.range (integralBasis K))).map (LinearMap.mulLeft ℤ ((d : K)⁻¹))
   have hT : T.FG := (Submodule.fg_span (Set.finite_range _)).map _
@@ -110,17 +149,15 @@ theorem isIntegral_of_pow_bdd
       rw [inv_mul_cancel_left₀ (Nat.cast_ne_zero.2 hd)]
   exact IsIntegral.of_mem_of_fg _ (hT.of_le hle) s (Algebra.self_mem_adjoin_singleton ℤ s)
 
-theorem isIntegral_of_tmul_mem
-    (X : K) (E : ℕ) (hX : IsIntegral ℤ ((ℓ : K) ^ E * X)) (hS : (1 ⊗ₜ X : ℚ_[ℓ] ⊗[ℚ] K) ∈ S K ℓ)
-    : IsIntegral ℤ X := by
+theorem isIntegral_of_tmul_mem (X : K) (E : ℕ) (hX : IsIntegral ℤ ((ℓ : K) ^ E * X))
+    (hS : (1 ⊗ₜ X : ℚ_[ℓ] ⊗[ℚ] K) ∈ S K ℓ) : IsIntegral ℤ X := by
   have hℓ : (ℓ : ℚ) ≠ 0 := Nat.cast_ne_zero.2 (Fact.out : ℓ.Prime).ne_zero
   have hw : ∀ i, ∃ w : ℤ, (integralBasis K).repr X i = w := by
     intro i
     obtain ⟨z, hz⟩ := coord_int _ hX i
-    have hz'
-        : (integralBasis K).repr ((ℓ : K) ^ E * X) i
-          = (ℓ : ℚ) ^ E * (integralBasis K).repr X i := by
-      rw [show ((ℓ : K)) ^ E * X = ((ℓ : ℚ) ^ E) • X by rw [Algebra.smul_def, map_pow, map_natCast]]
+    have hz' : (integralBasis K).repr ((ℓ : K) ^ E * X) i = (ℓ : ℚ) ^ E * (integralBasis K).repr X i := by
+      rw [show ((ℓ : K)) ^ E * X = ((ℓ : ℚ) ^ E) • X by
+        rw [Algebra.smul_def, map_pow, map_natCast]]
       rw [map_smul, Finsupp.smul_apply, smul_eq_mul]
     have hn : ‖(((integralBasis K).repr X i : ℚ) : ℚ_[ℓ])‖ ≤ 1 := by
       have := mem_S.1 hS i
@@ -133,9 +170,8 @@ theorem isIntegral_of_tmul_mem
         push_cast at h2
         exact h2
       rw [hq, norm_mul, Padic.norm_p_pow]
-      calc
-        (ℓ : ℝ) ^ (-(E : ℤ)) * ‖(((integralBasis K).repr X i : ℚ) : ℚ_[ℓ])‖
-          ≤ (ℓ : ℝ) ^ (-(E : ℤ)) * 1 := mul_le_mul_of_nonneg_left hn (by positivity)
+      calc (ℓ : ℝ) ^ (-(E : ℤ)) * ‖(((integralBasis K).repr X i : ℚ) : ℚ_[ℓ])‖ ≤ (ℓ : ℝ) ^ (-(E : ℤ)) * 1 :=
+            mul_le_mul_of_nonneg_left hn (by positivity)
         _ = _ := mul_one _
     obtain ⟨w, hw⟩ := hdiv
     refine ⟨w, ?_⟩

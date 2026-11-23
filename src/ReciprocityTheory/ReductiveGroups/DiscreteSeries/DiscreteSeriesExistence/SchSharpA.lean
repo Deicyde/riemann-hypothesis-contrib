@@ -1,8 +1,58 @@
 module
 
 public import ReciprocityTheory.ReductiveGroups.DiscreteSeries.DiscreteSeriesExistence.CFPrimeB
-public import ReciprocityTheory.ReductiveGroups.DiscreteSeries.TensorRepresentations.LowFock
-public import ReciprocityTheory.ReductiveGroups.DiscreteSeries.TensorRepresentations.CARUnit
+public import ReciprocityTheory.ReductiveGroups.DiscreteSeries.TensorRepresentations.DSymmHypsInhabited
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Real
+import Mathlib.Algebra.Ring.IsFormallyReal
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
+public import ReciprocityTheory.ReductiveGroups.DiscreteSeries.HighestWeights.PRVComponents
+public import ReciprocityTheory.ReductiveGroups.DiscreteSeries.HighestWeights.PieriRules.WeylPos
+public import ReciprocityTheory.ReductiveGroups.DiscreteSeries.TensorRepresentations.LowFockA
+public import ReciprocityTheory.ReductiveGroups.DiscreteSeries.TensorRepresentations.LowFockD
+import Std.Tactic.BVDecide.Normalize.Prop
+public import Formalism.RealPlaceAnalysis.StatementKT
 
 @[expose] public section
 
@@ -17,50 +67,48 @@ variable {n : ℕ} {M : Type*} [NormedAddCommGroup M] [InnerProductSpace ℂ M]
 abbrev tco (s : Finset (Fin (n * n))) (y : TensorProduct ℂ M (Fock n)) : M :=
   tcoef ((fockBasis n).coord s) y
 
-def tform (y y' : TensorProduct ℂ M (Fock n)) : ℂ := ∑ s, inner ℂ (tco s y) (tco s y')
+def tform (y y' : TensorProduct ℂ M (Fock n)) : ℂ :=
+  ∑ s, inner ℂ (tco s y) (tco s y')
 
 theorem tform_conj (y y' : TensorProduct ℂ M (Fock n)) : star (tform y y') = tform y' y := by
   unfold tform
   rw [star_sum]
   exact sum_congr rfl fun s _ => inner_conj_symm _ _
 
-theorem tform_sum_left
-    {ι : Type*} (t : Finset ι) (f : ι → TensorProduct ℂ M (Fock n))
-    (y' : TensorProduct ℂ M (Fock n))
-    : tform (∑ i ∈ t, f i) y' = ∑ i ∈ t, tform (f i) y' := by
+theorem tform_sum_left {ι : Type*} (t : Finset ι) (f : ι → TensorProduct ℂ M (Fock n))
+    (y' : TensorProduct ℂ M (Fock n)) : tform (∑ i ∈ t, f i) y' = ∑ i ∈ t, tform (f i) y' := by
   unfold tform
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, sum_inner]
+
+  simp only [map_sum, sum_inner]
   exact sum_comm
 
-theorem tform_sum_right
-    {ι : Type*} (t : Finset ι) (f : ι → TensorProduct ℂ M (Fock n)) (y : TensorProduct ℂ M (Fock n))
-    : tform y (∑ i ∈ t, f i) = ∑ i ∈ t, tform y (f i) := by
+theorem tform_sum_right {ι : Type*} (t : Finset ι) (f : ι → TensorProduct ℂ M (Fock n))
+    (y : TensorProduct ℂ M (Fock n)) : tform y (∑ i ∈ t, f i) = ∑ i ∈ t, tform y (f i) := by
   unfold tform
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, inner_sum]
+
+  simp only [map_sum, inner_sum]
   exact sum_comm
 
-theorem tform_neg_left (y y' : TensorProduct ℂ M (Fock n)) : tform (-y) y' = - tform y y' := by
+theorem tform_neg_left (y y' : TensorProduct ℂ M (Fock n)) : tform (-y) y' = -tform y y' := by
   unfold tform
   simp [inner_neg_left]
 
-theorem tform_neg_right (y y' : TensorProduct ℂ M (Fock n)) : tform y (-y') = - tform y y' := by
+theorem tform_neg_right (y y' : TensorProduct ℂ M (Fock n)) : tform y (-y') = -tform y y' := by
   unfold tform
   simp [inner_neg_right]
 
-theorem tform_add_left (y z y' : TensorProduct ℂ M (Fock n))
-    : tform (y + z) y' = tform y y' + tform z y' := by
+theorem tform_add_left (y z y' : TensorProduct ℂ M (Fock n)) :
+    tform (y + z) y' = tform y y' + tform z y' := by
   unfold tform
   simp [sum_add_distrib]
 
-theorem tform_add_right (y y' z : TensorProduct ℂ M (Fock n))
-    : tform y (y' + z) = tform y y' + tform y z := by
+theorem tform_add_right (y y' z : TensorProduct ℂ M (Fock n)) :
+    tform y (y' + z) = tform y y' + tform y z := by
   unfold tform
   simp [sum_add_distrib]
 
-theorem tform_smul_right (c : ℂ) (y y' : TensorProduct ℂ M (Fock n))
-    : tform y (c • y') = c * tform y y' := by
+theorem tform_smul_right (c : ℂ) (y y' : TensorProduct ℂ M (Fock n)) :
+    tform y (c • y') = c * tform y y' := by
   unfold tform
   simp [mul_sum]
 
@@ -88,30 +136,26 @@ theorem tform_self_re_pos {y : TensorProduct ℂ M (Fock n)} (hy : y ≠ 0) : 0 
   rw [tcoef_expand y]
   exact sum_eq_zero fun s _ => by rw [h0 s, TensorProduct.zero_tmul]
 
-theorem tco_map_left
-    (T : Module.End ℂ M) (s : Finset (Fin (n * n))) (y : TensorProduct ℂ M (Fock n))
-    : tco s (TensorProduct.map T LinearMap.id y) = T (tco s y) :=
+theorem tco_map_left (T : Module.End ℂ M) (s : Finset (Fin (n * n))) (y : TensorProduct ℂ M (Fock n)) :
+    tco s (TensorProduct.map T LinearMap.id y) = T (tco s y) :=
   tcoef_map_left _ T y
 
-theorem tco_lTensor
-    (g : Module.End ℂ (Fock n)) (s : Finset (Fin (n * n))) (y : TensorProduct ℂ M (Fock n))
-    : tco s (TensorProduct.map LinearMap.id g y)
-      = ∑ t, (fockBasis n).repr (g (fockBasis n t)) s • tco t y := by
+theorem tco_lTensor (g : Module.End ℂ (Fock n)) (s : Finset (Fin (n * n))) (y : TensorProduct ℂ M (Fock n)) :
+    tco s (TensorProduct.map LinearMap.id g y) =
+      ∑ t, (fockBasis n).repr (g (fockBasis n t)) s • tco t y := by
   conv_lhs => rw [tcoef_expand y]
-  set_option synthInstance.maxHeartbeats 100000 in
-  simp only [map_sum, TensorProduct.map_tmul, LinearMap.id_apply, tcoef_tmul,
-    Module.Basis.coord_apply]
 
-theorem tform_eT
-    {ε : Fin n → Bool} {E : Fin n → Fin n → Module.End ℂ M} (hU : IsInfUnitary ε E)
-    (a b : Fin n) (y y' : TensorProduct ℂ M (Fock n))
-    : tform (eT E a b y) y' = adjSign ε a b * tform y (eT E b a y') := by
+  simp only [map_sum, TensorProduct.map_tmul, LinearMap.id_apply, tcoef_tmul, Module.Basis.coord_apply]
+
+theorem tform_eT {ε : Fin n → Bool} {E : Fin n → Fin n → Module.End ℂ M} (hU : IsInfUnitary ε E) (a b : Fin n)
+    (y y' : TensorProduct ℂ M (Fock n)) :
+    tform (eT E a b y) y' = adjSign ε a b * tform y (eT E b a y') := by
   unfold tform eT
   simp only [tco_map_left, mul_sum]
   exact sum_congr rfl fun s _ => hU a b _ _
 
-theorem tform_cpT (i a : Fin n) (y y' : TensorProduct ℂ M (Fock n))
-    : tform (cpT i a y) y' = tform y (cmT i a y') := by
+theorem tform_cpT (i a : Fin n) (y y' : TensorProduct ℂ M (Fock n)) :
+    tform (cpT i a y) y' = tform y (cmT i a y') := by
   unfold tform cpT cmT
   simp only [tco_lTensor, sum_inner, inner_sum, inner_smul_left, inner_smul_right]
   rw [sum_comm]
@@ -122,17 +166,16 @@ theorem tform_cpT (i a : Fin n) (y y' : TensorProduct ℂ M (Fock n))
   rw [h2, starRingEnd_apply]
   exact h1
 
-theorem tform_cmT (i a : Fin n) (y y' : TensorProduct ℂ M (Fock n))
-    : tform (cmT i a y) y' = tform y (cpT i a y') := by
+theorem tform_cmT (i a : Fin n) (y y' : TensorProduct ℂ M (Fock n)) :
+    tform (cmT i a y) y' = tform y (cpT i a y') := by
   rw [← tform_conj y' (cmT i a y), ← tform_cpT, tform_conj]
 
-theorem tform_dOp
-    {ε : Fin n → Bool} {E : Fin n → Fin n → Module.End ℂ M} (hU : IsInfUnitary ε E)
-    (y y' : TensorProduct ℂ M (Fock n))
-    : tform (dOp ε (eT E) cpT y) y' = tform y (dOp' ε (eT E) cmT y') := by
+theorem tform_dOp {ε : Fin n → Bool} {E : Fin n → Fin n → Module.End ℂ M} (hU : IsInfUnitary ε E)
+    (y y' : TensorProduct ℂ M (Fock n)) :
+    tform (dOp ε (eT E) cpT y) y' = tform y (dOp' ε (eT E) cmT y') := by
   unfold dOp dOp'
-  simp only [LinearMap.sum_apply, LinearMap.neg_apply, tform_sum_left, tform_neg_right,
-    tform_sum_right, Module.End.mul_apply, ← sum_neg_distrib]
+  simp only [LinearMap.sum_apply, LinearMap.neg_apply, tform_sum_left, tform_neg_right, tform_sum_right,
+    Module.End.mul_apply, ← sum_neg_distrib]
   refine sum_congr rfl fun i hi => sum_congr rfl fun a ha => ?_
   simp only [plusIdx, minusIdx, mem_filter, mem_univ, true_and] at hi ha
   rw [tform_eT hU, tform_cpT]
@@ -143,15 +186,13 @@ theorem tform_dOp
   rw [hc]
   simp [adjSign, hi, ha]
 
-theorem tform_D
-    {ε : Fin n → Bool} {E : Fin n → Fin n → Module.End ℂ M} (hU : IsInfUnitary ε E)
-    (y y' : TensorProduct ℂ M (Fock n))
-    : tform ((dOp ε (eT E) cpT + dOp' ε (eT E) cmT) y) y'
-      = tform y ((dOp ε (eT E) cpT + dOp' ε (eT E) cmT) y') := by
+theorem tform_D {ε : Fin n → Bool} {E : Fin n → Fin n → Module.End ℂ M} (hU : IsInfUnitary ε E)
+    (y y' : TensorProduct ℂ M (Fock n)) :
+    tform ((dOp ε (eT E) cpT + dOp' ε (eT E) cmT) y) y' =
+      tform y ((dOp ε (eT E) cpT + dOp' ε (eT E) cmT) y') := by
   have h' : tform (dOp' ε (eT E) cmT y) y' = tform y (dOp ε (eT E) cpT y') := by
     rw [← tform_conj y' (dOp' ε (eT E) cmT y), ← tform_dOp hU, tform_conj]
-  rw [LinearMap.add_apply, LinearMap.add_apply, tform_add_left, tform_add_right, tform_dOp hU, h',
-    add_comm]
+  rw [LinearMap.add_apply, LinearMap.add_apply, tform_add_left, tform_add_right, tform_dOp hU, h', add_comm]
 
 section Shift
 
@@ -165,13 +206,13 @@ theorem ssh_root_ge (a b c : Fin n) : -1 ≤ root a b c := by
   simp only [Pi.sub_apply, Pi.single_apply]
   split_ifs <;> norm_num
 
-theorem ssh_rhoN_consec
-    (ε : Fin n → Bool)
-    {x y : Fin n} (hxy : x < y) (he : ε x = ε y) (hc : ∀ c, x < c → c < y → False)
-    : rhoN ε x = rhoN ε y := by
+theorem ssh_rhoN_consec (ε : Fin n → Bool) {x y : Fin n} (hxy : x < y) (he : ε x = ε y)
+    (hc : ∀ c, x < c → c < y → False) : rhoN ε x = rhoN ε y := by
   have h := lfD_cnt (fun c => ε c ≠ ε x) hxy
-  have h1 : (univ.filter fun c => c = x ∧ ε c ≠ ε x).card = 0 := by rw [lfD_single]; simp
-  have h2 : (univ.filter fun c => c = y ∧ ε c ≠ ε x).card = 0 := by rw [lfD_single]; simp [he]
+  have h1 : (univ.filter fun c => c = x ∧ ε c ≠ ε x).card = 0 := by
+    rw [lfD_single]; simp
+  have h2 : (univ.filter fun c => c = y ∧ ε c ≠ ε x).card = 0 := by
+    rw [lfD_single]; simp [he]
   have h3 : (univ.filter fun c => x < c ∧ c < y ∧ ε c ≠ ε x).card = 0 := by
     rw [card_eq_zero, filter_eq_empty_iff]
     intro c _ hc'
@@ -182,14 +223,10 @@ theorem ssh_rhoN_consec
   push_cast at h'
   linarith
 
-theorem ssh_strictAnti
-    {ε : Fin n → Bool} {lam : Fin n → ℝ} (hmono : StrictAnti lam)
-    {h : ℝ} (hh : GapAtLeast ε lam h) (h2 : 2 < h)
-    {N : Type*} [AddCommGroup N] [Module ℂ N]
-    {E : Fin n → Fin n → Module.End ℂ N} (hE : IsGlRep E)
-    (a b : Fin n)
-    {W : Submodule ℂ N} (hW : IsKIrrHW ε E (lowK ε (lam - root a b)) W)
-    : StrictAnti (lam - root a b) := by
+theorem ssh_strictAnti {ε : Fin n → Bool} {lam : Fin n → ℝ} (hmono : StrictAnti lam) {h : ℝ}
+    (hh : GapAtLeast ε lam h) (h2 : 2 < h) {N : Type*} [AddCommGroup N] [Module ℂ N]
+    {E : Fin n → Fin n → Module.End ℂ N} (hE : IsGlRep E) (a b : Fin n) {W : Submodule ℂ N}
+    (hW : IsKIrrHW ε E (lowK ε (lam - root a b)) W) : StrictAnti (lam - root a b) := by
   have hF : Formalism.REAL.KRel ε E := fun a b c d _ _ => hE a b c d
   cases n with
   | zero => exact fun x => x.elim0
@@ -217,15 +254,14 @@ theorem ssh_strictAnti
       have := ssh_root_ge a b i.succ
       linarith
 
-theorem ssh_casimir_eT
-    {N : Type*} [AddCommGroup N] [Module ℂ N] (E : Fin n → Fin n → Module.End ℂ N)
-    : casimir (eT (n := n) E) = TensorProduct.map (casimir E) LinearMap.id := by
+theorem ssh_casimir_eT {N : Type*} [AddCommGroup N] [Module ℂ N] (E : Fin n → Fin n → Module.End ℂ N) :
+    casimir (eT (n := n) E) = TensorProduct.map (casimir E) LinearMap.id := by
   apply TensorProduct.ext'
   intro m f
   simp [casimir, eT, LinearMap.sum_apply, TensorProduct.sum_tmul]
 
-theorem ssh_nsq_sub_root (lam : Fin n → ℝ) {a b : Fin n} (hab : a ≠ b)
-    : nsq (lam - root a b) = nsq lam - 2 * (lam a - lam b) + 2 := by
+theorem ssh_nsq_sub_root (lam : Fin n → ℝ) {a b : Fin n} (hab : a ≠ b) :
+    nsq (lam - root a b) = nsq lam - 2 * (lam a - lam b) + 2 := by
   have e : nsq (lam - root a b) = nsq lam - 2 * dot (root a b) lam + dot (root a b) (root a b) := by
     unfold nsq dot
     rw [mul_sum, ← sum_sub_distrib, ← sum_add_distrib]

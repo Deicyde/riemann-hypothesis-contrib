@@ -1,7 +1,57 @@
 module
 
 public import Formalism.GL3MeanSquares.GenusMeanAsymptotics.UnimodularClassRepresentatives.CardQuotExtPPow
+import Formalism.GL3MeanSquares.GenusMeanAsymptotics.UnimodularClassRepresentatives.ExistsMulSubOneMemPow
 public import Formalism.GL3MeanSquares.GenusMeanAsymptotics.UnimodularClassRepresentatives.MemSmulOfMemSmulLocF
+import Formalism.GL3MeanSquares.GenusMeanAsymptotics.UnimodularClassRepresentatives.StarAlgebraMap
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -28,33 +78,30 @@ theorem bO_apply (b : Basis κ K V) (i : κ) : (bO b i : V) = b i := Basis.coe_s
 
 def crd (b : Basis κ K V) (y : spanO b) : κ → 𝓞 K := (bO b).equivFun y
 
-theorem coe_eq_sum (b : Basis κ K V) (y : spanO b)
-    : (y : V) = ∑ i, algebraMap (𝓞 K) K (crd b y i) • b i := by
+theorem coe_eq_sum (b : Basis κ K V) (y : spanO b) :
+    (y : V) = ∑ i, algebraMap (𝓞 K) K (crd b y i) • b i := by
   conv_lhs => rw [← (bO b).sum_equivFun y]
   rw [Submodule.coe_sum]
   refine Finset.sum_congr rfl fun i _ => ?_
   rw [Submodule.coe_smul, bO_apply, algebraMap_smul]
   rfl
 
-theorem form_eq
-    (h : V →ₗ⋆[K] V →ₗ[K] K)
-    (b : Basis κ K V)
-    {H : Matrix κ κ (𝓞 K)} (hH : ∀ i j, algebraMap (𝓞 K) K (H i j) = h (b i) (b j))
-    (y y' : spanO b)
-    : h (y : V) (y' : V) = algebraMap (𝓞 K) K (star (crd b y) ⬝ᵥ (H *ᵥ crd b y')) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [coe_eq_sum b y, map_sum, LinearMap.sum_apply, dotProduct, map_sum]
+theorem form_eq (h : V →ₗ⋆[K] V →ₗ[K] K) (b : Basis κ K V) {H : Matrix κ κ (𝓞 K)}
+    (hH : ∀ i j, algebraMap (𝓞 K) K (H i j) = h (b i) (b j)) (y y' : spanO b) :
+    h (y : V) (y' : V) = algebraMap (𝓞 K) K (star (crd b y) ⬝ᵥ (H *ᵥ crd b y')) := by
+
+  rw [coe_eq_sum b y, map_sum, LinearMap.sum_apply, dotProduct, map_sum]
   refine Finset.sum_congr rfl fun i _ => ?_
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [coe_eq_sum b y', map_smulₛₗ, LinearMap.smul_apply, map_sum, map_mul, mulVec, dotProduct,
-      map_sum, smul_eq_mul]
+
+  rw [coe_eq_sum b y', map_smulₛₗ, LinearMap.smul_apply, map_sum, map_mul, mulVec, dotProduct, map_sum,
+  smul_eq_mul]
   congr 1
   refine Finset.sum_congr rfl fun j _ => ?_
   rw [map_smul, smul_eq_mul, map_mul, hH, mul_comm]
 
-theorem congrP_int {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal) (k : ℕ) (a c : 𝓞 K)
-    : CongrP 𝔭 k (algebraMap (𝓞 K) K a) (algebraMap (𝓞 K) K c)
-      ↔ Ideal.Quotient.mk (extP K 𝔭 ^ k) a = Ideal.Quotient.mk (extP K 𝔭 ^ k) c := by
+theorem congrP_int {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal) (k : ℕ) (a c : 𝓞 K) :
+    CongrP 𝔭 k (algebraMap (𝓞 K) K a) (algebraMap (𝓞 K) K c) ↔
+      Ideal.Quotient.mk (extP K 𝔭 ^ k) a = Ideal.Quotient.mk (extP K 𝔭 ^ k) c := by
   rw [Ideal.Quotient.eq]
   constructor
   · rintro ⟨t, ht, z, hz, e⟩
@@ -75,9 +122,8 @@ theorem congrP_int {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal) (k : ℕ) (a
 def redL (b : Basis κ K V) (J : Ideal (𝓞 K)) : spanO b →ₗ[𝓞 K] (κ → 𝓞 K ⧸ J) :=
   (J.mkQ.compLeft κ) ∘ₗ (bO b).equivFun.toLinearMap
 
-theorem redL_apply (b : Basis κ K V) (J : Ideal (𝓞 K)) (y : spanO b)
-    : redL b J y = fun i => Ideal.Quotient.mk J (crd b y i) :=
-  rfl
+theorem redL_apply (b : Basis κ K V) (J : Ideal (𝓞 K)) (y : spanO b) :
+    redL b J y = fun i => Ideal.Quotient.mk J (crd b y i) := rfl
 
 theorem redL_surjective (b : Basis κ K V) (J : Ideal (𝓞 K)) : Function.Surjective (redL b J) := by
   intro x
@@ -87,8 +133,8 @@ theorem redL_surjective (b : Basis κ K V) (J : Ideal (𝓞 K)) : Function.Surje
   funext i
   rw [crd, LinearEquiv.apply_symm_apply, hc]
 
-theorem ker_redL (b : Basis κ K V) (J : Ideal (𝓞 K))
-    : LinearMap.ker (redL b J) = (J • ⊤ : Submodule (𝓞 K) (spanO b)) := by
+theorem ker_redL (b : Basis κ K V) (J : Ideal (𝓞 K)) :
+    LinearMap.ker (redL b J) = (J • ⊤ : Submodule (𝓞 K) (spanO b)) := by
   apply le_antisymm
   · intro y hy
     rw [LinearMap.mem_ker, redL_apply] at hy
@@ -104,45 +150,36 @@ theorem ker_redL (b : Basis κ K V) (J : Ideal (𝓞 K))
     rw [this, zero_mul]
     rfl
 
-def qE (b : Basis κ K V) (J : Ideal (𝓞 K))
-    : (spanO b ⧸ (J • ⊤ : Submodule (𝓞 K) (spanO b))) ≃ₗ[𝓞 K] (κ → 𝓞 K ⧸ J) :=
+def qE (b : Basis κ K V) (J : Ideal (𝓞 K)) :
+    (spanO b ⧸ (J • ⊤ : Submodule (𝓞 K) (spanO b))) ≃ₗ[𝓞 K] (κ → 𝓞 K ⧸ J) :=
   (Submodule.quotEquivOfEq _ _ (ker_redL b J).symm).trans
     ((redL b J).quotKerEquivOfSurjective (redL_surjective b J))
 
-theorem qE_mk (b : Basis κ K V) (J : Ideal (𝓞 K)) (y : spanO b)
-    : qE b J (Submodule.Quotient.mk y) = fun i => Ideal.Quotient.mk J (crd b y i) :=
-  rfl
+theorem qE_mk (b : Basis κ K V) (J : Ideal (𝓞 K)) (y : spanO b) :
+    qE b J (Submodule.Quotient.mk y) = fun i => Ideal.Quotient.mk J (crd b y i) := rfl
 
 variable [Fact (IsFixF K F)]
 
-theorem mk_form (𝔭 : Ideal (𝓞 F)) (k : ℕ) (H : Matrix κ κ (𝓞 K)) (c c' : κ → 𝓞 K)
-    : Ideal.Quotient.mk (extP K 𝔭 ^ k) (star c ⬝ᵥ (H *ᵥ c'))
-      = star (fun i => Ideal.Quotient.mk (extP K 𝔭 ^ k) (c i))
-        ⬝ᵥ (H.map (Ideal.Quotient.mk (extP K 𝔭 ^ k))
-          *ᵥ fun i => Ideal.Quotient.mk (extP K 𝔭 ^ k) (c' i)) := by
+theorem mk_form (𝔭 : Ideal (𝓞 F)) (k : ℕ) (H : Matrix κ κ (𝓞 K)) (c c' : κ → 𝓞 K) :
+    Ideal.Quotient.mk (extP K 𝔭 ^ k) (star c ⬝ᵥ (H *ᵥ c')) =
+      star (fun i => Ideal.Quotient.mk (extP K 𝔭 ^ k) (c i)) ⬝ᵥ
+        (H.map (Ideal.Quotient.mk (extP K 𝔭 ^ k)) *ᵥ fun i => Ideal.Quotient.mk (extP K 𝔭 ^ k) (c' i)) := by
   rw [RingHom.map_dotProduct]
   congr 1
   funext i
   exact RingHom.map_mulVec _ H c' i
 
-theorem nkCount_free
-    (h : V →ₗ⋆[K] V →ₗ[K] K) (b : Basis κ K V)
-    {H : Matrix κ κ (𝓞 K)} (hH : ∀ i j, algebraMap (𝓞 K) K (H i j) = h (b i) (b j))
-    {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal)
-    (k : ℕ) (n : 𝓞 F)
-    : nkCount h (spanO b) 𝔭 k n
-      = Nat.card
-        {x : κ → 𝓞 K ⧸ extP K 𝔭 ^ k // star x ⬝ᵥ (H.map (Ideal.Quotient.mk (extP K 𝔭 ^ k)) *ᵥ x)
-          = Ideal.Quotient.mk _ (ι n)} := by
+theorem nkCount_free (h : V →ₗ⋆[K] V →ₗ[K] K) (b : Basis κ K V) {H : Matrix κ κ (𝓞 K)}
+    (hH : ∀ i j, algebraMap (𝓞 K) K (H i j) = h (b i) (b j)) {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal)
+    (k : ℕ) (n : 𝓞 F) :
+    nkCount h (spanO b) 𝔭 k n = Nat.card {x : κ → 𝓞 K ⧸ extP K 𝔭 ^ k //
+      star x ⬝ᵥ (H.map (Ideal.Quotient.mk (extP K 𝔭 ^ k)) *ᵥ x) = Ideal.Quotient.mk _ (ι n)} := by
   unfold nkCount
   refine Nat.card_congr ((qE b (extP K 𝔭 ^ k)).toEquiv.subtypeEquiv fun x => ?_)
-  have key
-      : ∀ y : spanO b,
-        CongrP 𝔭 k (h (y : V) (y : V)) (algebraMap F K (n : F))
-          ↔ star (qE b (extP K 𝔭 ^ k) (Submodule.Quotient.mk y))
-              ⬝ᵥ (H.map (Ideal.Quotient.mk (extP K 𝔭 ^ k))
-                *ᵥ (qE b (extP K 𝔭 ^ k) (Submodule.Quotient.mk y)))
-            = Ideal.Quotient.mk _ (ι n) := by
+  have key : ∀ y : spanO b, CongrP 𝔭 k (h (y : V) (y : V)) (algebraMap F K (n : F)) ↔
+      star (qE b (extP K 𝔭 ^ k) (Submodule.Quotient.mk y)) ⬝ᵥ
+        (H.map (Ideal.Quotient.mk (extP K 𝔭 ^ k)) *ᵥ (qE b (extP K 𝔭 ^ k) (Submodule.Quotient.mk y))) =
+        Ideal.Quotient.mk _ (ι n) := by
     intro y
     rw [form_eq h b hH, ← MeanB.algebraMap_comp, congrP_int h𝔭, mk_form, qE_mk]
   constructor
@@ -152,12 +189,12 @@ theorem nkCount_free
     obtain ⟨y, rfl⟩ := Submodule.Quotient.mk_surjective _ x
     exact ⟨y, rfl, (key y).2 hx⟩
 
-theorem form_mulVec {A : Type*} [CommRing A] [StarRing A] (M N : Matrix κ κ A) (u v : κ → A)
-    : star (M *ᵥ u) ⬝ᵥ (N *ᵥ (M *ᵥ v)) = star u ⬝ᵥ ((Mᴴ * N * M) *ᵥ v) := by
+theorem form_mulVec {A : Type*} [CommRing A] [StarRing A] (M N : Matrix κ κ A) (u v : κ → A) :
+    star (M *ᵥ u) ⬝ᵥ (N *ᵥ (M *ᵥ v)) = star u ⬝ᵥ ((Mᴴ * N * M) *ᵥ v) := by
   rw [star_mulVec, ← dotProduct_mulVec, mulVec_mulVec, mulVec_mulVec, Matrix.mul_assoc]
 
-theorem form_single {A : Type*} [CommRing A] [StarRing A] (N : Matrix κ κ A) (i j : κ)
-    : star (Pi.single i (1 : A)) ⬝ᵥ (N *ᵥ Pi.single j (1 : A)) = N i j := by
+theorem form_single {A : Type*} [CommRing A] [StarRing A] (N : Matrix κ κ A) (i j : κ) :
+    star (Pi.single i (1 : A)) ⬝ᵥ (N *ᵥ Pi.single j (1 : A)) = N i j := by
   have : star (Pi.single i (1 : A) : κ → A) = Pi.single i 1 := by
     funext l
     by_cases hl : l = i
@@ -166,8 +203,8 @@ theorem form_single {A : Type*} [CommRing A] [StarRing A] (N : Matrix κ κ A) (
   rw [this, mulVec_single_one, single_one_dotProduct]
   rfl
 
-theorem qE_bO (b : Basis κ K V) (J : Ideal (𝓞 K)) (i : κ)
-    : qE b J (Submodule.Quotient.mk (bO b i)) = Pi.single i 1 := by
+theorem qE_bO (b : Basis κ K V) (J : Ideal (𝓞 K)) (i : κ) :
+    qE b J (Submodule.Quotient.mk (bO b i)) = Pi.single i 1 := by
   rw [qE_mk]
   funext l
   rw [crd, Basis.equivFun_self]
@@ -175,48 +212,37 @@ theorem qE_bO (b : Basis κ K V) (J : Ideal (𝓞 K)) (i : κ)
   · subst hl; simp
   · rw [if_neg hl, map_zero, Pi.single_eq_of_ne (Ne.symm hl)]
 
-def eM (b : Basis κ K V) (J : Ideal (𝓞 K))
-    : Module.End (𝓞 K) (spanO b ⧸ (J • ⊤ : Submodule (𝓞 K) (spanO b))) ≃ Matrix κ κ (𝓞 K ⧸ J) :=
+def eM (b : Basis κ K V) (J : Ideal (𝓞 K)) :
+    Module.End (𝓞 K) (spanO b ⧸ (J • ⊤ : Submodule (𝓞 K) (spanO b))) ≃ Matrix κ κ (𝓞 K ⧸ J) :=
   (qE b J).conj.toEquiv.trans
     ((LinearMap.extendScalarsOfSurjectiveEquiv (R := 𝓞 K) (S := 𝓞 K ⧸ J)
       Ideal.Quotient.mk_surjective).toEquiv.trans LinearMap.toMatrix'.toEquiv)
 
-theorem eM_mulVec
-    (b : Basis κ K V) (J : Ideal (𝓞 K))
-    (X : Module.End (𝓞 K) (spanO b ⧸ (J • ⊤ : Submodule (𝓞 K) (spanO b))))
-    (q)
-    : eM b J X *ᵥ qE b J q = qE b J (X q) := by
-  have : eM b J X
-      = LinearMap.toMatrix' (LinearMap.extendScalarsOfSurjectiveEquiv (R := 𝓞 K) (S := 𝓞 K ⧸ J)
-        Ideal.Quotient.mk_surjective ((qE b J).conj X)) :=
-    rfl
+theorem eM_mulVec (b : Basis κ K V) (J : Ideal (𝓞 K))
+    (X : Module.End (𝓞 K) (spanO b ⧸ (J • ⊤ : Submodule (𝓞 K) (spanO b)))) (q) :
+    eM b J X *ᵥ qE b J q = qE b J (X q) := by
+  have : eM b J X = LinearMap.toMatrix' (LinearMap.extendScalarsOfSurjectiveEquiv (R := 𝓞 K)
+      (S := 𝓞 K ⧸ J) Ideal.Quotient.mk_surjective ((qE b J).conj X)) := rfl
   rw [this, LinearMap.toMatrix'_mulVec]
   show (qE b J).conj X (qE b J q) = _
   rw [LinearEquiv.conj_apply_apply, LinearEquiv.symm_apply_apply]
 
-theorem akCount_free
-    (h : V →ₗ⋆[K] V →ₗ[K] K) (b : Basis κ K V)
-    {H : Matrix κ κ (𝓞 K)} (hH : ∀ i j, algebraMap (𝓞 K) K (H i j) = h (b i) (b j))
-    {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal)
-    (k : ℕ)
-    : akCount h (spanO b) 𝔭 k
-      = Nat.card
-        {X : Matrix κ κ (𝓞 K ⧸ extP K 𝔭 ^ k) // Xᴴ * H.map (Ideal.Quotient.mk (extP K 𝔭 ^ k)) * X
-          = H.map (Ideal.Quotient.mk (extP K 𝔭 ^ k))} := by
+theorem akCount_free (h : V →ₗ⋆[K] V →ₗ[K] K) (b : Basis κ K V) {H : Matrix κ κ (𝓞 K)}
+    (hH : ∀ i j, algebraMap (𝓞 K) K (H i j) = h (b i) (b j)) {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal)
+    (k : ℕ) :
+    akCount h (spanO b) 𝔭 k = Nat.card {X : Matrix κ κ (𝓞 K ⧸ extP K 𝔭 ^ k) //
+      Xᴴ * H.map (Ideal.Quotient.mk (extP K 𝔭 ^ k)) * X = H.map (Ideal.Quotient.mk (extP K 𝔭 ^ k))} := by
   unfold akCount
   refine Nat.card_congr ((eM b (extP K 𝔭 ^ k)).subtypeEquiv fun X => ?_)
-  have key
-      : ∀ x y x' y' : spanO b,
-        Submodule.Quotient.mk x' = X (Submodule.Quotient.mk x)
-          → Submodule.Quotient.mk y' = X (Submodule.Quotient.mk y)
-          → (CongrP 𝔭 k (h (x' : V) (y' : V)) (h (x : V) (y : V))
-            ↔ star (qE b (extP K 𝔭 ^ k) (Submodule.Quotient.mk x))
-                ⬝ᵥ (((eM b (extP K 𝔭 ^ k) X)ᴴ * H.map (Ideal.Quotient.mk (extP K 𝔭 ^ k))
-                    * eM b (extP K 𝔭 ^ k) X)
-                  *ᵥ qE b (extP K 𝔭 ^ k) (Submodule.Quotient.mk y))
-              = star (qE b (extP K 𝔭 ^ k) (Submodule.Quotient.mk x))
-                ⬝ᵥ (H.map (Ideal.Quotient.mk (extP K 𝔭 ^ k))
-                  *ᵥ qE b (extP K 𝔭 ^ k) (Submodule.Quotient.mk y))) := by
+  have key : ∀ x y x' y' : spanO b, Submodule.Quotient.mk x' = X (Submodule.Quotient.mk x) →
+      Submodule.Quotient.mk y' = X (Submodule.Quotient.mk y) →
+      (CongrP 𝔭 k (h (x' : V) (y' : V)) (h (x : V) (y : V)) ↔
+        star (qE b (extP K 𝔭 ^ k) (Submodule.Quotient.mk x)) ⬝ᵥ
+          (((eM b (extP K 𝔭 ^ k) X)ᴴ * H.map (Ideal.Quotient.mk (extP K 𝔭 ^ k)) *
+            eM b (extP K 𝔭 ^ k) X) *ᵥ qE b (extP K 𝔭 ^ k) (Submodule.Quotient.mk y)) =
+        star (qE b (extP K 𝔭 ^ k) (Submodule.Quotient.mk x)) ⬝ᵥ
+          (H.map (Ideal.Quotient.mk (extP K 𝔭 ^ k)) *ᵥ
+            qE b (extP K 𝔭 ^ k) (Submodule.Quotient.mk y))) := by
     intro x y x' y' hx hy
     rw [form_eq h b hH, form_eq h b hH, congrP_int h𝔭, mk_form, mk_form, ← qE_mk, ← qE_mk, ← qE_mk,
       ← qE_mk, hx, hy, ← eM_mulVec, ← eM_mulVec, form_mulVec]
@@ -230,29 +256,19 @@ theorem akCount_free
   · intro hX x y x' y' hx hy
     rw [key x y x' y' hx hy, hX]
 
-theorem nkCount_eq
-    (h : V →ₗ⋆[K] V →ₗ[K] K)
-    {L : Submodule (𝓞 K) V} {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal)
-    (b : Basis κ K V) (hb : locF 𝔭 (spanO b) = locF 𝔭 L)
-    {H : Matrix κ κ (𝓞 K)} (hH : ∀ i j, algebraMap (𝓞 K) K (H i j) = h (b i) (b j))
-    (k : ℕ) (n : 𝓞 F)
-    : nkCount h L 𝔭 k n
-      = Nat.card
-        {x : κ → 𝓞 K ⧸ extP K 𝔭 ^ k // star x ⬝ᵥ (H.map (Ideal.Quotient.mk (extP K 𝔭 ^ k)) *ᵥ x)
-          = Ideal.Quotient.mk _ (ι n)} := by
+theorem nkCount_eq (h : V →ₗ⋆[K] V →ₗ[K] K) {L : Submodule (𝓞 K) V} {𝔭 : Ideal (𝓞 F)}
+    (h𝔭 : 𝔭.IsMaximal) (b : Basis κ K V) (hb : locF 𝔭 (spanO b) = locF 𝔭 L) {H : Matrix κ κ (𝓞 K)}
+    (hH : ∀ i j, algebraMap (𝓞 K) K (H i j) = h (b i) (b j)) (k : ℕ) (n : 𝓞 F) :
+    nkCount h L 𝔭 k n = Nat.card {x : κ → 𝓞 K ⧸ extP K 𝔭 ^ k //
+      star x ⬝ᵥ (H.map (Ideal.Quotient.mk (extP K 𝔭 ^ k)) *ᵥ x) = Ideal.Quotient.mk _ (ι n)} := by
   have hF : IsFixF K F := Fact.out
   rw [← nkCount_free h b hH h𝔭, ← nkCount_locF hF h L 𝔭 h𝔭, ← hb, nkCount_locF hF h _ 𝔭 h𝔭]
 
-theorem akCount_eq
-    (h : V →ₗ⋆[K] V →ₗ[K] K)
-    {L : Submodule (𝓞 K) V} {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal)
-    (b : Basis κ K V) (hb : locF 𝔭 (spanO b) = locF 𝔭 L)
-    {H : Matrix κ κ (𝓞 K)} (hH : ∀ i j, algebraMap (𝓞 K) K (H i j) = h (b i) (b j))
-    (k : ℕ)
-    : akCount h L 𝔭 k
-      = Nat.card
-        {X : Matrix κ κ (𝓞 K ⧸ extP K 𝔭 ^ k) // Xᴴ * H.map (Ideal.Quotient.mk (extP K 𝔭 ^ k)) * X
-          = H.map (Ideal.Quotient.mk (extP K 𝔭 ^ k))} := by
+theorem akCount_eq (h : V →ₗ⋆[K] V →ₗ[K] K) {L : Submodule (𝓞 K) V} {𝔭 : Ideal (𝓞 F)}
+    (h𝔭 : 𝔭.IsMaximal) (b : Basis κ K V) (hb : locF 𝔭 (spanO b) = locF 𝔭 L) {H : Matrix κ κ (𝓞 K)}
+    (hH : ∀ i j, algebraMap (𝓞 K) K (H i j) = h (b i) (b j)) (k : ℕ) :
+    akCount h L 𝔭 k = Nat.card {X : Matrix κ κ (𝓞 K ⧸ extP K 𝔭 ^ k) //
+      Xᴴ * H.map (Ideal.Quotient.mk (extP K 𝔭 ^ k)) * X = H.map (Ideal.Quotient.mk (extP K 𝔭 ^ k))} := by
   have hF : IsFixF K F := Fact.out
   rw [← akCount_free h b hH h𝔭, ← akCount_locF hF h L 𝔭 h𝔭, ← hb, akCount_locF hF h _ 𝔭 h𝔭]
 

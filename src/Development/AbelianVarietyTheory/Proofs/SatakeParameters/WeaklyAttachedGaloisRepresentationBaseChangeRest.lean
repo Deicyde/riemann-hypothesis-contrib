@@ -1,26 +1,51 @@
 module
 
 public import Development.AbelianVarietyTheory.Definitions.GaloisGeometry.IsWeight
-public import Development.AbelianVarietyTheory.Definitions.GlobalTwisting.Imports
-public import Development.AbelianVarietyTheory.PublishedTheorems.AutomorphicForms₂.ExistsSpanFormsNeBot
-public import Development.AbelianVarietyTheory.PublishedTheorems.GaloisCohomology₂.IsComplementaryProductOfIsCuspidal
-public import Development.AbelianVarietyTheory.PublishedTheorems.GaloisCohomology₂.StrongMultiplicityOne
-public import Development.AbelianVarietyTheory.PublishedTheorems.GaloisGeometry₂.GelfandKazhdanDual
-public import Development.AbelianVarietyTheory.PublishedTheorems.GaloisCohomology₂.HeckeLAdicCharacterAboveIff
-public import Development.AbelianVarietyTheory.PublishedTheorems.GaloisGeometry₂.AlgebraicCharacterWD
-public import Development.AbelianVarietyTheory.PublishedTheorems.AutomorphicForms₂.DeRhamPotSemistable
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.IsPolarizedTwistAbsPow
-public import CompanionTheory.EightfoldTheory.VariationTheory.TwistedTheory.FrobeniusPowerCompatibility
-public import CompanionTheory.EightfoldTheory.VariationTheory.TwistedTheory.SemisimpleRestrictionToNormalSubgroup
-public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.GaloisRepTowerRestriction
-public import Development.AbelianVarietyTheory.BlockTheory.AdelicCMFields.UnitaryHeckeCharacterIdele
+public import Development.AutomorphicArithmetic.AutomorphicVarieties.AutomorphicForms.BcDefs
+import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.MkMemAdmissibleAtIffCocycle
+public import Development.AutomorphicArithmetic.AutomorphicVarieties.AutomorphicForms.AdTransfer
+public import Development.AutomorphicArithmetic.AutomorphicVarieties.BuildingsResidueChars.FrobeniusPowerCompatibility
+public import Development.AutomorphicArithmetic.AutomorphicVarieties.BuildingsResidueChars.SemisimpleRestrictionToNormalSubgroup
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+public import PositivityTheory.AutomorphicForms.PublishedInputs.RealGaloisRepresentations.IwahoriSphericalTransfer.NormVUnderPow
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
-  ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
-open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands
-  GlobalTheory.HeckeGal GlobalTheory.LocGL GlobalTheory.GalOfCusp
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
+open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands GlobalTheory.HeckeGal GlobalTheory.LocGL GlobalTheory.GalOfCusp
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 open GlobalTheory.GalCut GlobalTheory.Published
 open UpperTheory.V UpperTheory.V.Af UpperTheory.V.Af.Bc
@@ -29,12 +54,8 @@ noncomputable section
 
 namespace GlobalTheory.WeakBaseChange
 
-theorem isSSRep_of_finiteIndex
-    {Γ k : Type} [Group Γ] [Field k] [CharZero k]
-    {n : ℕ} (r : Γ →* GL (Fin n) k)
-    (N : Subgroup Γ) [N.FiniteIndex]
-    (h : IsSSRep (r.comp N.subtype))
-    : IsSSRep r := by
+theorem isSSRep_of_finiteIndex {Γ k : Type} [Group Γ] [Field k] [CharZero k] {n : ℕ} (r : Γ →* GL (Fin n) k)
+    (N : Subgroup Γ) [N.FiniteIndex] (h : IsSSRep (r.comp N.subtype)) : IsSSRep r := by
   classical
   intro W hW
   obtain ⟨W', hW', hc⟩ := h W (fun g v hv => hW g v hv)
@@ -53,15 +74,13 @@ theorem isSSRep_of_finiteIndex
     exact e
   have hpN : ∀ m ∈ N, ∀ v, p (ρ m v) = ρ m (p v) := by
     intro m hm v
-    obtain ⟨a, ha, b, hb, rfl⟩ :=
-      Submodule.mem_sup.mp (hc.sup_eq_top ▸ Submodule.mem_top : v ∈ W ⊔ W')
+    obtain ⟨a, ha, b, hb, rfl⟩ := Submodule.mem_sup.mp (hc.sup_eq_top ▸ Submodule.mem_top : v ∈ W ⊔ W')
     have hb' : ρ m b ∈ W' := hW' ⟨m, hm⟩ b hb
-    rw [show p (a + b) = a by rw [map_add (f := _), hpl a ha, hpr b hb, add_zero], map_add (f := _),
-      map_add (f := _), hpl _ (hWρ m a ha), hpr _ hb', add_zero]
+    rw [show p (a + b) = a by rw [map_add (f := _), hpl a ha, hpr b hb, add_zero], map_add (f := _), map_add (f := _), hpl _ (hWρ m a ha),
+      hpr _ hb', add_zero]
   let T : Γ → (Fin n → k) →ₗ[k] (Fin n → k) := fun g => ρ g ∘ₗ p ∘ₗ ρ g⁻¹
   have hTN : ∀ g, ∀ m ∈ N, T (g * m) = T g := by
-    intro g m hm
-    refine LinearMap.ext fun v => ?_
+    intro g m hm; refine LinearMap.ext fun v => ?_
     simp only [T, LinearMap.comp_apply]
     rw [mul_inv_rev, ← hρ m⁻¹ g⁻¹ v, hpN _ (inv_mem hm), hρ (g * m), mul_inv_cancel_right]
   have hTc : ∀ h g v, ρ h (T g v) = T (h * g) (ρ h v) := by
@@ -80,15 +99,13 @@ theorem isSSRep_of_finiteIndex
     have e1 : ((h * q.out : Γ) : Γ ⧸ N) = h • q := by
       conv_rhs => rw [← QuotientGroup.out_eq' q]
       rfl
-    have hm : (h * q.out)⁻¹ * (h • q).out ∈ N :=
-      QuotientGroup.eq.mp (e1.trans (QuotientGroup.out_eq' _).symm)
+    have hm : (h * q.out)⁻¹ * (h • q).out ∈ N := QuotientGroup.eq.mp (e1.trans (QuotientGroup.out_eq' _).symm)
     rw [← hTN (h * q.out) _ hm, mul_inv_cancel_left]
   have hS : ∀ h v, ρ h (S v) = S (ρ h v) := by
     intro h v
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [S, LinearMap.sum_apply, map_sum, hTc h]
-    rw [← Equiv.sum_comp (MulAction.toPerm h : Equiv.Perm (Γ ⧸ N))
-      (fun q => T (Quotient.out q) (ρ h v))]
+
+    simp only [S, LinearMap.sum_apply, map_sum, hTc h]
+    rw [← Equiv.sum_comp (MulAction.toPerm h : Equiv.Perm (Γ ⧸ N)) (fun q => T (Quotient.out q) (ρ h v))]
     refine Finset.sum_congr rfl fun q _ => ?_
     simp only [MulAction.toPerm_apply]
     rw [hout]
@@ -100,17 +117,14 @@ theorem isSSRep_of_finiteIndex
     exact W.smul_mem _ (W.sum_mem fun q _ => hTW _ _)
   have hPfix : ∀ w ∈ W, P w = w := fun w hw => by
     simp only [P, S, LinearMap.smul_apply, LinearMap.sum_apply]
-    rw [Finset.sum_congr rfl fun q _ => hTfix q.out w hw, Finset.sum_const, Finset.card_univ,
-      ← Nat.cast_smul_eq_nsmul k, smul_smul, inv_mul_cancel₀ hc0, one_smul]
+    rw [Finset.sum_congr rfl fun q _ => hTfix q.out w hw, Finset.sum_const, Finset.card_univ, ← Nat.cast_smul_eq_nsmul k,
+      smul_smul, inv_mul_cancel₀ hc0, one_smul]
   have hP : ∀ h v, ρ h (P v) = P (ρ h v) := fun h v => by
     simp only [P, LinearMap.smul_apply, map_smul, hS]
   refine ⟨LinearMap.ker P, fun g v hv => ?_, ?_⟩
   · show P (ρ g v) = 0
     rw [← hP, LinearMap.mem_ker.mp hv, map_zero]
-  · refine ⟨
-      Submodule.disjoint_def.mpr fun v hv hv' => ?_,
-      codisjoint_iff.mpr (eq_top_iff.mpr fun v _ => ?_)
-    ⟩
+  · refine ⟨Submodule.disjoint_def.mpr fun v hv hv' => ?_, codisjoint_iff.mpr (eq_top_iff.mpr fun v _ => ?_)⟩
     · rw [← hPfix v hv]; exact hv'
     · have : v = P v + (v - P v) := by abel
       rw [this]
@@ -121,10 +135,8 @@ end GlobalTheory.WeakBaseChange
 
 namespace GlobalTheory.WeakBaseChange
 
-theorem finiteIndex_range_res
-    (E M Ω : Type) [Field E] [NumberField E] [Field M] [NumberField M] [Field Ω] [Algebra E M]
-    [Algebra E Ω] [Algebra M Ω] [IsScalarTower E M Ω]
-    : (res E Ω M).range.FiniteIndex := by
+theorem finiteIndex_range_res (E M Ω : Type) [Field E] [NumberField E] [Field M] [NumberField M] [Field Ω] [Algebra E M]
+    [Algebra E Ω] [Algebra M Ω] [IsScalarTower E M Ω] : (res E Ω M).range.FiniteIndex := by
   classical
   haveI : FiniteDimensional E M := Module.Finite.of_restrictScalars_finite ℚ E M
   let f : G E Ω ⧸ (res E Ω M).range → (M →ₐ[E] Ω) := fun q =>
@@ -135,12 +147,10 @@ theorem finiteIndex_range_res
     apply QuotientGroup.eq.mpr
     set a : G E Ω := Quotient.out q
     set b : G E Ω := Quotient.out q'
-    have hab : ∀ x : M, a (algebraMap M Ω x) = b (algebraMap M Ω x) := fun x =>
-      DFunLike.congr_fun hqq x
-    let ρ : G M Ω :=
-      AlgEquiv.ofRingEquiv (f := (a⁻¹ * b).toRingEquiv) (fun x => by
-        show a.symm (b (algebraMap M Ω x)) = algebraMap M Ω x
-        rw [← hab, AlgEquiv.symm_apply_apply])
+    have hab : ∀ x : M, a (algebraMap M Ω x) = b (algebraMap M Ω x) := fun x => DFunLike.congr_fun hqq x
+    let ρ : G M Ω := AlgEquiv.ofRingEquiv (f := (a⁻¹ * b).toRingEquiv) (fun x => by
+      show a.symm (b (algebraMap M Ω x)) = algebraMap M Ω x
+      rw [← hab, AlgEquiv.symm_apply_apply])
     exact ⟨ρ, AlgEquiv.ext fun x => rfl⟩
   haveI : Finite (G E Ω ⧸ (res E Ω M).range) := Finite.of_injective f hf
   exact Subgroup.finiteIndex_of_finite_quotient
@@ -149,9 +159,8 @@ end GlobalTheory.WeakBaseChange
 
 namespace GlobalTheory.WeakBaseChange
 
-theorem finiteIndex_comap
-    {Γ Γ' : Type} [Group Γ] [Group Γ'] (f : Γ' →* Γ) (N : Subgroup Γ) [N.FiniteIndex]
-    : (N.comap f).FiniteIndex := by
+theorem finiteIndex_comap {Γ Γ' : Type} [Group Γ] [Group Γ'] (f : Γ' →* Γ) (N : Subgroup Γ) [N.FiniteIndex] :
+    (N.comap f).FiniteIndex := by
   classical
   let g : Γ' ⧸ N.comap f → Γ ⧸ N := fun q => ((f (Quotient.out q) : Γ) : Γ ⧸ N)
   have hg : Function.Injective g := by
@@ -164,13 +173,11 @@ theorem finiteIndex_comap
   haveI : Finite (Γ' ⧸ N.comap f) := Finite.of_injective g hg
   exact Subgroup.finiteIndex_of_finite_quotient
 
-theorem algSat_pow (n q f : ℕ) (B : Multiset ℂˣ)
-    : algSat n (q ^ f) (B.map (· ^ f)) = (algSat n q B).map (· ^ f) := by
-  have hr
-      : ((((q : ℝ) ^ f) ^ (((n : ℝ) - 1) / 2) : ℝ) : ℂ)
-        = (((q : ℝ) ^ (((n : ℝ) - 1) / 2) : ℝ) : ℂ) ^ f := by
-    rw [← Complex.ofReal_pow, ← Real.rpow_natCast_mul (Nat.cast_nonneg _),
-      ← Real.rpow_mul_natCast (Nat.cast_nonneg _), mul_comm]
+theorem algSat_pow (n q f : ℕ) (B : Multiset ℂˣ) :
+    algSat n (q ^ f) (B.map (· ^ f)) = (algSat n q B).map (· ^ f) := by
+  have hr : ((((q : ℝ) ^ f) ^ (((n : ℝ) - 1) / 2) : ℝ) : ℂ) = (((q : ℝ) ^ (((n : ℝ) - 1) / 2) : ℝ) : ℂ) ^ f := by
+    rw [← Complex.ofReal_pow, ← Real.rpow_natCast_mul (Nat.cast_nonneg _), ← Real.rpow_mul_natCast (Nat.cast_nonneg _),
+      mul_comm]
   induction B using Multiset.induction_on with
   | empty => rfl
   | cons b B ih =>
@@ -179,15 +186,9 @@ theorem algSat_pow (n q f : ℕ) (B : Multiset ℂˣ)
 
 end GlobalTheory.WeakBaseChange
 
+
 open GlobalTheory.WeakBaseChange in
-theorem GlobalTheory.GalCut.weak_comp_res
-    : ∀ (E M Ω : Type) [Field E] [NumberField E] [IsCMField E] [Field M] [NumberField M]
-        [IsCMField M] [Algebra E M] [Field Ω] [Algebra E Ω] [Algebra M Ω] [IsScalarTower E M Ω]
-        [IsAlgClosure E Ω] [IsAlgClosure M Ω] (l : ℕ) [Fact l.Prime] (ι : Qbar l ≃+* ℂ) (a : ℕ)
-        (π : CuspSub E a) (P : CuspSub M a),
-      IsLift π P
-        → ∀ r : G E Ω →* GL (Fin a) (Qbar l),
-          Weak π ι r → Weak P ι (r.comp (UpperTheory.V.Af.Bc.res E Ω M)) := by
+theorem GlobalTheory.GalCut.weak_comp_res : ∀ (E M Ω : Type) [Field E] [NumberField E] [IsCMField E] [Field M] [NumberField M] [IsCMField M] [Algebra E M] [Field Ω] [Algebra E Ω] [Algebra M Ω] [IsScalarTower E M Ω] [IsAlgClosure E Ω] [IsAlgClosure M Ω] (l : ℕ) [Fact l.Prime] (ι : Qbar l ≃+* ℂ) (a : ℕ) (π : CuspSub E a) (P : CuspSub M a), IsLift π P → ∀ r : G E Ω →* GL (Fin a) (Qbar l), Weak π ι r → Weak P ι (r.comp (UpperTheory.V.Af.Bc.res E Ω M)) := by
   intro E M Ω _ _ _ _ _ _ _ _ _ _ _ _ _ l _ ι a π P hL r hr
   obtain ⟨hc, hss, hatt⟩ := hr
   refine ⟨hc.comp (UpperTheory.V.Af.continuous_restrictScalarsHom E M Ω), ?_, ?_⟩
@@ -195,8 +196,7 @@ theorem GlobalTheory.GalCut.weak_comp_res
     set H := (res E Ω M).range with hH
     haveI : (H.normalCore.comap (res E Ω M)).FiniteIndex := finiteIndex_comap _ _
     refine isSSRep_of_finiteIndex _ (H.normalCore.comap (res E Ω M)) ?_
-    have hrange
-        : ((res E Ω M).comp (H.normalCore.comap (res E Ω M)).subtype).range = H.normalCore := by
+    have hrange : ((res E Ω M).comp (H.normalCore.comap (res E Ω M)).subtype).range = H.normalCore := by
       ext x
       constructor
       · rintro ⟨y, rfl⟩
@@ -204,10 +204,8 @@ theorem GlobalTheory.GalCut.weak_comp_res
       · intro hx
         obtain ⟨y, hy⟩ := (Subgroup.normalCore_le H hx : x ∈ (res E Ω M).range)
         exact ⟨⟨y, by rw [Subgroup.mem_comap, hy]; exact hx⟩, hy⟩
-    have :=
-      UpperTheory.semisimple_restriction_to_normal_subgroup _ _ _ a r
-        ((res E Ω M).comp (H.normalCore.comap (res E Ω M)).subtype)
-        (by rw [hrange]; exact Subgroup.normalCore_normal H) hss
+    have := UpperTheory.semisimple_restriction_to_normal_subgroup _ _ _ a r ((res E Ω M).comp (H.normalCore.comap (res E Ω M)).subtype)
+      (by rw [hrange]; exact Subgroup.normalCore_normal H) hss
     rwa [MonoidHom.comp_assoc]
   · filter_upwards [(GlobalTheory.IndefiniteRowSideFullHecke.UnitaryHeckeCharacterIdele.tendsto_under E M).eventually hatt] with w h
     obtain ⟨B, hB, hF⟩ := h

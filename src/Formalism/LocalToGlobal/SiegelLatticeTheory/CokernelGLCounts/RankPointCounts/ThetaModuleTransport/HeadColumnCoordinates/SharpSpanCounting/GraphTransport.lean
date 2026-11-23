@@ -1,6 +1,46 @@
 module
 
+import Formalism.LocalToGlobal.SiegelLatticeTheory.CokernelGLCounts.RankPointCounts.LsDatumACorr
 public import Formalism.LocalToGlobal.SiegelLatticeTheory.CokernelGLCounts.RankPointCounts.ThetaModuleTransport.HeadColumnCoordinates.SharpSpanCounting.MemPerpSpanIff
+public import Formalism.LocalToGlobal.SiegelLatticeTheory.CokernelGLCounts.RankPointCounts.ThetaModuleTransport.HeadColumnCoordinates.SharpSpanCounting.HSumRight
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
+import Formalism.LocalToGlobal.SiegelLatticeTheory.CokernelGLCounts.RankPointCounts.LsDatumA
 
 @[expose] public section
 
@@ -12,14 +52,14 @@ namespace Formalism.L2.SG.LocalCountModules.LocCntCommon
 
 section Transport
 
-theorem graph_transport
-    {D₁ D₂ Dc₁ Dc₂ W₁ W₂ P : Type}
-    (Ψ₁ : D₁ ≃ Dc₁) (Ψ₂ : D₂ ≃ Dc₂) (θ : D₁ ≃ D₂) (φ : W₁ → W₂) (Pc₁ : W₁ → P) (Pc₂ : W₂ → P)
-    (Γ₁ : Set (D₁ × W₁)) (Γ₂ : Set (D₂ × W₂)) (Γc₁ : Set (Dc₁ × P)) (Γc₂ : Set (Dc₂ × P))
+theorem graph_transport {D₁ D₂ Dc₁ Dc₂ W₁ W₂ P : Type} (Ψ₁ : D₁ ≃ Dc₁) (Ψ₂ : D₂ ≃ Dc₂)
+    (θ : D₁ ≃ D₂) (φ : W₁ → W₂) (Pc₁ : W₁ → P) (Pc₂ : W₂ → P) (Γ₁ : Set (D₁ × W₁))
+    (Γ₂ : Set (D₂ × W₂)) (Γc₁ : Set (Dc₁ × P)) (Γc₂ : Set (Dc₂ × P))
     (h1 : (fun p => (Ψ₁ p.1, Pc₁ p.2)) '' Γ₁ = Γc₁) (h2 : (fun p => (Ψ₂ p.1, Pc₂ p.2)) '' Γ₂ = Γc₂)
-    (hP : ∀ w, Pc₂ (φ w) = Pc₁ w) (hinj : ∀ p ∈ Γ₁, ∀ q ∈ Γ₂, Pc₂ q.2 = Pc₁ p.2 → q.2 = φ p.2)
-    : ((fun p => (θ p.1, φ p.2)) '' Γ₁ = Γ₂)
-      ↔ ((fun p => (Ψ₂ (θ (Ψ₁.symm p.1)), p.2)) '' Γc₁ = Γc₂) := by
+    (hP : ∀ w, Pc₂ (φ w) = Pc₁ w)
+    (hinj : ∀ p ∈ Γ₁, ∀ q ∈ Γ₂, Pc₂ q.2 = Pc₁ p.2 → q.2 = φ p.2) :
+    ((fun p => (θ p.1, φ p.2)) '' Γ₁ = Γ₂) ↔
+      ((fun p => (Ψ₂ (θ (Ψ₁.symm p.1)), p.2)) '' Γc₁ = Γc₂) := by
   constructor
   · intro h
     rw [← h1, ← h2, ← h, Set.image_image, Set.image_image]
@@ -62,75 +102,46 @@ variable {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F]
 variable {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] [MeasurableSpace E]
 variable {M : Model F E} {V : Type} [AddCommGroup V] [Module E V] (H : HermSp M V)
 
-theorem smul_transport
-    {A B : Type} [AddCommGroup A] [Module E A] [AddCommGroup B] [Module E B]
-    (φ : A ≃ₗ[E] B)
-    (c₁ c₂ k₁ k₂ : E) (hk₁ : k₁ * c₁ = 1) (hk₂ : k₂ * c₂ = 1)
-    (a : A) (b : B) (e : c₂ • φ a = c₁ • b)
-    : φ (k₁ • a) = k₂ • b := by
+theorem smul_transport {A B : Type} [AddCommGroup A] [Module E A] [AddCommGroup B] [Module E B]
+    (φ : A ≃ₗ[E] B) (c₁ c₂ k₁ k₂ : E) (hk₁ : k₁ * c₁ = 1) (hk₂ : k₂ * c₂ = 1) (a : A) (b : B)
+    (e : c₂ • φ a = c₁ • b) : φ (k₁ • a) = k₂ • b := by
   rw [map_smul]
   have h1 : φ a = k₂ • (c₂ • φ a) := by rw [smul_smul, hk₂, one_smul]
   rw [h1, e, smul_smul, smul_smul]
   congr 1
-  calc
-    k₁ * k₂ * c₁
-      = k₂ * (k₁ * c₁) := by ring
+  calc k₁ * k₂ * c₁ = k₂ * (k₁ * c₁) := by ring
     _ = k₂ := by rw [hk₁, mul_one]
 
 variable {r : ℕ}
 
 theorem om'_mem (f f' : Fin (r + 1) → V) : H.om' f f' ∈ H.perp (H.X f) := by
-  intro x hx
-  refine Submodule.span_induction (p := fun x _ => H.h (H.om' f f') x = 0) ?_ ?_ ?_ ?_ hx
-  · rintro _ ⟨a, rfl⟩
-    unfold HermSp.om'
-    rw [h_sum_left]
-    have hm := congrFun (congrFun (Matrix.mul_adjugate (H.Zhat f f')) a.castSucc) (Fin.last r)
-    rw [Matrix.mul_apply, Matrix.smul_apply, Matrix.one_apply_ne (Fin.castSucc_lt_last a).ne,
-        smul_zero]
-      at hm
-    rw [← hm]
-    apply Finset.sum_congr rfl
-    intro b _
-    simp [HermSp.Zhat, mul_comm]
-  · exact h_zero_right H _
-  · intro x y _ _ hx hy
-    rw [h_add_right, hx, hy, add_zero]
-  · intro c x _ hx
-    rw [h_smul_right, hx, mul_zero]
+  apply Formalism.L2.SG.LsDatumA.om'_mem_perpX <;> assumption
 
-theorem sends_one
-    {f₁ f₂ : Fin (r + 1) → V} (φ : H.Wb f₁ ≃ₗ[E] H.Wb f₂)
-    (v₁ v₂ : V)
-    (h₁ : v₁ ∈ H.perp (H.X f₁)) (h₂ : v₂ ∈ H.perp (H.X f₂)) (hs : H.SendsTo φ.toLinearMap 1 1 v₁ v₂)
-    : φ (H.mkW f₁ ⟨v₁, h₁⟩) = H.mkW f₂ ⟨v₂, h₂⟩ := by
+theorem sends_one {f₁ f₂ : Fin (r + 1) → V} (φ : H.Wb f₁ ≃ₗ[E] H.Wb f₂) (v₁ v₂ : V)
+    (h₁ : v₁ ∈ H.perp (H.X f₁)) (h₂ : v₂ ∈ H.perp (H.X f₂))
+    (hs : H.SendsTo φ.toLinearMap 1 1 v₁ v₂) : φ (H.mkW f₁ ⟨v₁, h₁⟩) = H.mkW f₂ ⟨v₂, h₂⟩ := by
   have := hs ⟨v₁, h₁⟩ ⟨v₂, h₂⟩ rfl rfl
   simpa using this
 
-theorem sends_omP
-    {f₁ f₁' f₂ f₂' : Fin (r + 1) → V} (φ : H.Wb f₁ ≃ₗ[E] H.Wb f₂)
+theorem sends_omP {f₁ f₁' f₂ f₂' : Fin (r + 1) → V} (φ : H.Wb f₁ ≃ₗ[E] H.Wb f₂)
     (hD₁ : IsUnit (H.Dl f₁ f₁' (r + 1))) (hD₂ : IsUnit (H.Dl f₂ f₂' (r + 1)))
     (hs : H.SendsTo φ.toLinearMap (H.Dl f₂ f₂' (r + 1)) (H.Dl f₁ f₁' (r + 1)) (H.om' f₁ f₁')
-      (H.om' f₂ f₂'))
-    : φ (H.mkW f₁ ⟨omP H f₁ f₁', omP_mem H f₁ f₁' hD₁⟩)
-      = H.mkW f₂ ⟨omP H f₂ f₂', omP_mem H f₂ f₂' hD₂⟩ := by
+      (H.om' f₂ f₂')) :
+    φ (H.mkW f₁ ⟨omP H f₁ f₁', omP_mem H f₁ f₁' hD₁⟩) = H.mkW f₂ ⟨omP H f₂ f₂', omP_mem H f₂ f₂' hD₂⟩ := by
   have e := hs ⟨_, om'_mem H f₁ f₁'⟩ ⟨_, om'_mem H f₂ f₂'⟩ rfl rfl
-  have e1
-      : H.mkW f₁ ⟨omP H f₁ f₁', omP_mem H f₁ f₁' hD₁⟩
-        = Ring.inverse (H.Dl f₁ f₁' (r + 1)) • H.mkW f₁ ⟨_, om'_mem H f₁ f₁'⟩ := by
+  have e1 : H.mkW f₁ ⟨omP H f₁ f₁', omP_mem H f₁ f₁' hD₁⟩ =
+      Ring.inverse (H.Dl f₁ f₁' (r + 1)) • H.mkW f₁ ⟨_, om'_mem H f₁ f₁'⟩ := by
     rw [← LinearMap.map_smul]
     rfl
-  have e2
-      : H.mkW f₂ ⟨omP H f₂ f₂', omP_mem H f₂ f₂' hD₂⟩
-        = Ring.inverse (H.Dl f₂ f₂' (r + 1)) • H.mkW f₂ ⟨_, om'_mem H f₂ f₂'⟩ := by
+  have e2 : H.mkW f₂ ⟨omP H f₂ f₂', omP_mem H f₂ f₂' hD₂⟩ =
+      Ring.inverse (H.Dl f₂ f₂' (r + 1)) • H.mkW f₂ ⟨_, om'_mem H f₂ f₂'⟩ := by
     rw [← LinearMap.map_smul]
     rfl
   rw [e1, e2]
-  exact smul_transport φ _ _ _ _ (Ring.inverse_mul_cancel _ hD₁) (Ring.inverse_mul_cancel _ hD₂) _ _
-    e
+  exact smul_transport φ _ _ _ _ (Ring.inverse_mul_cancel _ hD₁) (Ring.inverse_mul_cancel _ hD₂) _ _ e
 
-theorem h_omP (f f' : Fin (r + 1) → V) (u : V)
-    : H.h u (omP H f f') = ∑ b, M.L.cj ((H.Zhat f f')⁻¹ b (Fin.last r)) * H.h u (f' b) := by
+theorem h_omP (f f' : Fin (r + 1) → V) (u : V) :
+    H.h u (omP H f f') = ∑ b, M.L.cj ((H.Zhat f f')⁻¹ b (Fin.last r)) * H.h u (f' b) := by
   have hD : H.Dl f f' (r + 1) = (H.Zhat f f').det := by
     unfold HermSp.Dl
     rw [dite_eq_left le_rfl]

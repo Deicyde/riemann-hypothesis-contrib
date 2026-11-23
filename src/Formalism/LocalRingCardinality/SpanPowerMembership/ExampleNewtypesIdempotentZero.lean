@@ -2,9 +2,52 @@ module
 
 public import Formalism.LocalRingCardinality.DataJet
 public import Formalism.LocalRingCardinality.SpanPowerMembership.PlacesOverNcardOfSplitInj
-public import Formalism.CyclotomicNorms.NonsquarefreeBounds.NonsquarefreeMonicBoundHolds
 public import Formalism.LocalRingCardinality.SpanPowerMembership.UnitsPowSurjective
+public import Formalism.CyclotomicNorms.NonsquarefreeBounds.NonsquarefreeMonicBoundHolds
+public import Formalism.LocalRingCardinality.SpanPowerMembership.ExampleLayerExistsGenerators
 public import Formalism.LocalRingCardinality.SpanPowerMembership.ExistsTameGen
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -103,7 +146,6 @@ theorem galK_comm {R : Ranks} (H : Host R) (σ τ : H.E ≃ₐ[H.K] H.E) : σ * 
   ext x
   exact AlgEquiv.congr_fun h x
 
-set_option synthInstance.maxHeartbeats 400000 in
 def toyNtypes
     (ht : THyp H) (htm : TameHyp H)
     (teichC : ∀ k, Fb (H.g k) (H.g_prime k) →* ℂ)
@@ -227,7 +269,6 @@ variable
   {what₂ : Rows.Data R} [NumberField what₂.LL] [StarRing what₂.LL]
   (LL0 : IntermediateField ℚ what₂.LL) (h : NHyp H what₂)
 
-set_option synthInstance.maxHeartbeats 400000 in
 def nthToy : NTh R H what₂ LL0 (ndToy H what₂ h) (ntwToy H LL0 h) (nexpToy H LL0 h) where
   iC := fun i => i.elim
   iC_int := fun i => i.elim

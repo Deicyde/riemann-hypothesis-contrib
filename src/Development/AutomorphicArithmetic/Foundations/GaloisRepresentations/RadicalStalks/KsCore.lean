@@ -2,27 +2,62 @@ module
 
 public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentations.RadicalStalks.IsConst
 public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.CrystallinePull2SumCup
-public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentations.RadicalStalks.EpsMulSub
-public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentations.RadicalStalks.CommutingSurjectivity
+public import Development.AbelianVarietyTheory.Definitions.Divisors.InfUniv
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.HarrisTaylorCrystalActionAdjointStatement
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.HarrisTaylorPairingSkewHodgeLagrangianStatement
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.HarrisTaylorPolarisationPairingNondegenerateStatement
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.HarrisTaylorCrystalActionAdjointStatement
+public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentations.RadicalStalks.CommutingSurjectivity
+public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentations.RadicalStalks.EpsMulSub
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.LinearAlgebra.Matrix.FiniteDimensional
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.TypeStar
 
 @[expose] public section
 
-open CategoryTheory AlgebraicGeometry Limits MonoidalCategory CartesianMonoidalCategory MonObj
-  NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
-  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.Cris GlobalTheory.DeRham
-  GlobalTheory.ConjSeq GlobalTheory.UPel.HT GlobalTheory.UPel.HT.ES UpperTheory.Gal.Ord
+open CategoryTheory AlgebraicGeometry Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.Cris GlobalTheory.DeRham GlobalTheory.ConjSeq GlobalTheory.UPel.HT GlobalTheory.UPel.HT.ES UpperTheory.Gal.Ord
 open scoped TensorProduct
 
-private theorem exists_rep
-    {k H : Type*} [Field k] [AddCommGroup H] [Module k H] [FiniteDimensional k H]
-    (φ : LinearMap.BilinForm k H)
-    (hskew : ∀ x y, φ x y = - φ y x) (hnd : ∀ x, (∀ y, φ x y = 0) → x = 0)
-    (L : H →ₗ[k] k)
-    : ∃ α, ∀ h, φ h α = L h := by
+private theorem exists_rep {k H : Type*} [Field k] [AddCommGroup H] [Module k H] [FiniteDimensional k H]
+    (φ : LinearMap.BilinForm k H) (hskew : ∀ x y, φ x y = -φ y x) (hnd : ∀ x, (∀ y, φ x y = 0) → x = 0)
+    (L : H →ₗ[k] k) : ∃ α, ∀ h, φ h α = L h := by
   have hinj : Function.Injective φ.flip := by
     rw [← LinearMap.ker_eq_bot, LinearMap.ker_eq_bot']
     intro y hy
@@ -35,25 +70,20 @@ private theorem exists_rep
   obtain ⟨α, hα⟩ := hsurj L
   exact ⟨α, fun h => by rw [← hα]; rfl⟩
 
-private theorem ks_core
-    {k H C : Type*} [Field k] [AddCommGroup H] [Module k H] [CommRing C]
-    (σ : C →+* Module.End k H)
-    (bar : C → C)
-    (χ : C →+* k)
-    (φ : LinearMap.BilinForm k H)
-    (Fl : Submodule k H)
-    (hskew : ∀ x y, φ x y = - φ y x) (hnd : ∀ x, (∀ y, φ x y = 0) → x = 0)
-    (hiso : ∀ x ∈ Fl, ∀ y ∈ Fl, φ x y = 0) (hadj : ∀ c x y, φ (σ c x) y = φ x (σ (bar c) y))
+private theorem ks_core {k H C : Type*} [Field k] [AddCommGroup H] [Module k H] [CommRing C]
+    (σ : C →+* Module.End k H) (bar : C → C) (χ : C →+* k) (φ : LinearMap.BilinForm k H) (Fl : Submodule k H)
+    (hskew : ∀ x y, φ x y = -φ y x) (hnd : ∀ x, (∀ y, φ x y = 0) → x = 0)
+    (hiso : ∀ x ∈ Fl, ∀ y ∈ Fl, φ x y = 0)
+    (hadj : ∀ c x y, φ (σ c x) y = φ x (σ (bar c) y))
     (ω e : C) (T r : k) (hT : ∀ v, σ ω v + σ (bar ω) v = T • v) (hdisc : 2 * r - T ≠ 0)
     (hL1 : ∀ c h, σ c (σ e h) - χ c • σ e h ∈ Fl) (hL3 : ∀ h, σ ω (σ e h) = r • σ e h)
-    (h₀ : H) (hh₀ : σ e h₀ ∉ Fl)
-    (x : H) (hxe : σ e x = x)
-    (α : H) (hα : ∀ c h, φ (σ c h) α = χ c * φ h α) (hxα : φ x α ≠ 0)
-    : ∃ g : H →ₗ[k] H,
-      (∀ c, ∀ u ∈ Fl, g (σ c u) - σ c (g u) ∈ Fl)
-        ∧ (∀ (n : ℕ) (lam : Fin n → k) (c : Fin n → C) (u : H),
-          ∑ l, lam l * χ (c l) = 0 → g (∑ l, lam l • σ (c l) ((σ ω - (T - r) • 1) u)) = 0)
-        ∧ (∀ u ∈ Fl, ∀ v ∈ Fl, φ (g u) v + φ u (g v) = 0) ∧ g x ∉ Fl := by
+    (h₀ : H) (hh₀ : σ e h₀ ∉ Fl) (x : H) (hxe : σ e x = x) (α : H)
+    (hα : ∀ c h, φ (σ c h) α = χ c * φ h α) (hxα : φ x α ≠ 0) :
+    ∃ g : H →ₗ[k] H,
+      (∀ c, ∀ u ∈ Fl, g (σ c u) - σ c (g u) ∈ Fl) ∧
+      (∀ (n : ℕ) (lam : Fin n → k) (c : Fin n → C) (u : H), ∑ l, lam l * χ (c l) = 0 →
+        g (∑ l, lam l • σ (c l) ((σ ω - (T - r) • 1) u)) = 0) ∧
+      (∀ u ∈ Fl, ∀ v ∈ Fl, φ (g u) v + φ u (g v) = 0) ∧ g x ∉ Fl := by
   have hcomm : ∀ a b v, σ a (σ b v) = σ b (σ a v) := by
     intro a b v
     show (σ a * σ b) v = (σ b * σ a) v
@@ -84,7 +114,8 @@ private theorem ks_core
     have h2 : φ (σ ω x) (σ e h₀) = (T - r) * φ x (σ e h₀) := by
       rw [hadj, hbar, hL3 h₀, map_sub, map_smul, map_smul, smul_eq_mul, smul_eq_mul]
       ring
-    have h3 : (2 * r - T) * φ x (σ e h₀) = 0 := by linear_combination h2 - h1
+    have h3 : (2 * r - T) * φ x (σ e h₀) = 0 := by
+      linear_combination h2 - h1
     exact (mul_eq_zero.1 h3).resolve_left hdisc
   have hPz : ∀ d v, φ ((σ ω - (T - r) • 1) v) (σ d (σ e h₀)) = 0 := by
     intro d v
@@ -92,37 +123,29 @@ private theorem ks_core
       smul_eq_mul]
     rw [hadj, hbar, hzw, map_sub, map_smul, map_smul, smul_eq_mul, smul_eq_mul]
     ring
-  have happ
-      : ∀ u,
-        ((φ.flip α).smulRight (σ e h₀) + (φ.flip (σ e h₀)).smulRight α) u
-          = φ u α • σ e h₀ + φ u (σ e h₀) • α := fun u =>
-    rfl
+  have happ : ∀ u, ((φ.flip α).smulRight (σ e h₀) + (φ.flip (σ e h₀)).smulRight α) u =
+      φ u α • σ e h₀ + φ u (σ e h₀) • α := fun u => rfl
   refine ⟨(φ.flip α).smulRight (σ e h₀) + (φ.flip (σ e h₀)).smulRight α, ?_, ?_, ?_, ?_⟩
   · intro c u hu
-    rw [happ, happ, map_add (f := _), map_smul, map_smul, hα c u, hadj c u (σ e h₀), hwfl c u hu,
-      hαc c]
-    have key
-        : (χ c * φ u α) • σ e h₀ + (χ (bar c) * φ u (σ e h₀)) • α
-            - (φ u α • σ c (σ e h₀) + φ u (σ e h₀) • χ (bar c) • α)
-          = -(φ u α • (σ c (σ e h₀) - χ c • σ e h₀)) := by
+    rw [happ, happ, map_add (f := _), map_smul, map_smul, hα c u, hadj c u (σ e h₀), hwfl c u hu, hαc c]
+    have key : (χ c * φ u α) • σ e h₀ + (χ (bar c) * φ u (σ e h₀)) • α -
+        (φ u α • σ c (σ e h₀) + φ u (σ e h₀) • χ (bar c) • α) =
+        -(φ u α • (σ c (σ e h₀) - χ c • σ e h₀)) := by
       module
     rw [key]
     exact Fl.neg_mem (Fl.smul_mem _ (hL1 c h₀))
   · intro n lam c u hsum
     rw [happ]
     have h1 : φ (∑ l, lam l • σ (c l) ((σ ω - (T - r) • 1) u)) α = 0 := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [map_sum, LinearMap.sum_apply, map_smul, LinearMap.smul_apply, smul_eq_mul, hα]
-      have e1
-          : ∀ l,
-            lam l * (χ (c l) * φ ((σ ω - (T - r) • 1) u) α)
-              = (lam l * χ (c l)) * φ ((σ ω - (T - r) • 1) u) α := fun l => by
-        ring
+
+      simp only [map_sum, LinearMap.sum_apply, map_smul, LinearMap.smul_apply, smul_eq_mul, hα]
+      have e1 : ∀ l, lam l * (χ (c l) * φ ((σ ω - (T - r) • 1) u) α) =
+          (lam l * χ (c l)) * φ ((σ ω - (T - r) • 1) u) α := fun l => by ring
       rw [Finset.sum_congr rfl fun l _ => e1 l, ← Finset.sum_mul, hsum, zero_mul]
     have h2 : φ (∑ l, lam l • σ (c l) ((σ ω - (T - r) • 1) u)) (σ e h₀) = 0 := by
-      set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, LinearMap.sum_apply, map_smul, LinearMap.smul_apply, smul_eq_mul, hadj,
-        hPz, mul_zero, Finset.sum_const_zero]
+
+      simp only [map_sum, LinearMap.sum_apply, map_smul, LinearMap.smul_apply, smul_eq_mul, hadj, hPz,
+      mul_zero, Finset.sum_const_zero]
     rw [h1, h2, zero_smul, zero_smul, add_zero]
   · intro u _ v _
     rw [happ, happ, map_add (f := _), map_smul, map_smul, LinearMap.add_apply, LinearMap.smul_apply,
@@ -135,47 +158,34 @@ private theorem ks_core
     have := Fl.smul_mem (φ x α)⁻¹ hmem
     rwa [smul_smul, inv_mul_cancel₀ hxα, one_smul] at this
 
-theorem UpperTheory.Gal.Ord.ks
-    : ∀ (p : ℕ) [Fact p.Prime] (D : Datum p) (R : Type) [CommRing R] (b : Base D R) (N : ℕ),
-      3 ≤ N → N.Coprime p → D.m = 1
-        → ∀ (k : Type) [Field k] [IsAlgClosed k] (hk : (p : k) = 0) (β : R →+* k)
-            (o : Obj b N (spMap β)) (i : Fin D.a) (w : Ideal (𝓞 D.F)) (f : ℕ),
-          RingHom.ker (β.comp (b.t i)) = w → Ideal.absNorm w = p ^ f → 0 < f
-            → ∀ π : Par p w f, ∀ φ : LinearMap.BilinForm k (HdR o.A),
-              GlobalTheory.AbDual.IsCorrForm (dp0 k) (𝟙 _) o.A o.A o.P φ
-                → ∀ x ∈ Fil o.A,
-                  hom o π.ε x = x → (∃ y, (∀ c, coh o c y = β (b.t i c) • y) ∧ x y ≠ 0)
-                    → ∃ g : HdR o.A →ₗ[k] HdR o.A,
-                      GlobalTheory.UPel.Sm.IsKS (GlobalTheory.HTCount.crysAct o) φ (Fil o.A)
-                          (GlobalTheory.HTCount.lieZ o β) g
-                        ∧ g x ∉ Fil o.A := by
+theorem UpperTheory.Gal.Ord.ks :
+    ∀ (p : ℕ) [Fact p.Prime] (D : Datum p) (R : Type) [CommRing R] (b : Base D R) (N : ℕ), 3 ≤ N → N.Coprime p → D.m = 1 →
+      ∀ (k : Type) [Field k] [IsAlgClosed k] (hk : (p : k) = 0) (β : R →+* k) (o : Obj b N (spMap β)) (i : Fin D.a) (w : Ideal (𝓞 D.F)) (f : ℕ),
+      RingHom.ker (β.comp (b.t i)) = w → Ideal.absNorm w = p ^ f → 0 < f → ∀ π : Par p w f,
+      ∀ φ : LinearMap.BilinForm k (HdR o.A), GlobalTheory.AbDual.IsCorrForm (dp0 k) (𝟙 _) o.A o.A o.P φ → ∀ x ∈ Fil o.A, hom o π.ε x = x →
+      (∃ y, (∀ c, coh o c y = β (b.t i c) • y) ∧ x y ≠ 0) →
+      ∃ g : HdR o.A →ₗ[k] HdR o.A, GlobalTheory.UPel.Sm.IsKS (GlobalTheory.HTCount.crysAct o) φ (Fil o.A) (GlobalTheory.HTCount.lieZ o β) g ∧ g x ∉ Fil o.A := by
   intro p _ D R _ b N hN hNp hm k _ _ hk β o i w f hw hf hf0 π φ hφ x hxF hxe hyex
   obtain ⟨y, hy, hxy⟩ := hyex
-  obtain ⟨hfd, -, hskew, hiso⟩ :=
-    GlobalTheory.T.harrisTaylor_pairing_skew_hodge_lagrangian p D R b N hN hNp k (spMap β) o β rfl φ
-      hφ
-  have hnd :=
-    GlobalTheory.T.harrisTaylor_polarisation_pairing_nondegenerate p D R b N hN hNp k (spMap β) o β
-      rfl φ hφ
-  have hadj0 :=
-    GlobalTheory.T.harrisTaylor_crystal_action_adjoint p D R b N hN hNp k (spMap β) o β rfl φ hφ
+  obtain ⟨hfd, -, hskew, hiso⟩ := GlobalTheory.T.harrisTaylor_pairing_skew_hodge_lagrangian p D R b N hN hNp k (spMap β) o β rfl φ hφ
+  have hnd := GlobalTheory.T.harrisTaylor_polarisation_pairing_nondegenerate p D R b N hN hNp k (spMap β) o β rfl φ hφ
+  have hadj0 := GlobalTheory.T.harrisTaylor_crystal_action_adjoint p D R b N hN hNp k (spMap β) o β rfl φ hφ
   obtain ⟨hL1, ⟨h₀, hh₀, -⟩, hL3⟩ := lie p D R b N hN hNp hm k hk β o i w f hw hf hf0 π
   haveI := hfd
-  let L : HdR o.A →ₗ[k] k := {
-    toFun := fun h => h y
-    map_add' := fun _ _ => rfl
-    map_smul' := fun _ _ => rfl
-  }
+  let L : HdR o.A →ₗ[k] k :=
+    { toFun := fun h => h y
+      map_add' := fun _ _ => rfl
+      map_smul' := fun _ _ => rfl }
   obtain ⟨α, hα0⟩ := exists_rep φ hskew hnd L
-  let σ : 𝓞 D.F →+* Module.End k (HdR o.A) :=
-    (GlobalTheory.HTCount.crysAct o).comp (algebraMap (𝓞 D.F) D.O)
+  let σ : 𝓞 D.F →+* Module.End k (HdR o.A) := (GlobalTheory.HTCount.crysAct o).comp (algebraMap (𝓞 D.F) D.O)
   have hadj : ∀ c u v, φ (σ c u) v = φ u (σ (D.bar c) v) := by
     intro c u v
     have := hadj0 (algebraMap _ _ c) u v
     rwa [D.star_F, MulOpposite.unop_op] at this
   have hT : ∀ v, σ D.ω v + σ (D.bar D.ω) v = (D.tr : k) • v := by
     intro v
-    have e1 : σ D.ω + σ (D.bar D.ω) = σ (D.tr : 𝓞 D.F) := by rw [← map_add (f := _), D.tr_eq]
+    have e1 : σ D.ω + σ (D.bar D.ω) = σ (D.tr : 𝓞 D.F) := by
+      rw [← map_add (f := _), D.tr_eq]
     have e2 := LinearMap.congr_fun e1 v
     rw [LinearMap.add_apply, map_intCast] at e2
     rw [e2]
@@ -199,9 +209,8 @@ theorem UpperTheory.Gal.Ord.ks
   have hxα : φ x α ≠ 0 := by
     rw [hα0]
     exact hxy
-  obtain ⟨g, ga, gb, gc, gd⟩ :=
-    ks_core σ D.bar (β.comp (b.t i)) φ (Fil o.A) hskew hnd hiso hadj D.ω π.ε (D.tr : k) (β b.ρ) hT
-      hdisc hL1 hL3 h₀ hh₀ x hxe α hα hxα
+  obtain ⟨g, ga, gb, gc, gd⟩ := ks_core σ D.bar (β.comp (b.t i)) φ (Fil o.A) hskew hnd hiso hadj D.ω π.ε
+    (D.tr : k) (β b.ρ) hT hdisc hL1 hL3 h₀ hh₀ x hxe α hα hxα
   refine ⟨g, ⟨?_, ?_, gc⟩, gd⟩
   · intro a u hu
     obtain ⟨c, rfl⟩ := surjO p D hm a

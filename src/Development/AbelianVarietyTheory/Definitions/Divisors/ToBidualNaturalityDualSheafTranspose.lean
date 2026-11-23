@@ -1,7 +1,47 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Definitions.Divisors.IsFrameOfForallExists
+public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ClsLinCombSingle
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.TypeStar
 
 @[expose] public section
 
@@ -360,8 +400,8 @@ theorem dual_ext (he : IsFrame e) (h : V ≤ U) {l l' : Γ(dual F, V)}
       ∑ i, (he.basis (h'.trans h)).repr s i * resG X h' (dualApp m le_rfl (resM F h (e i))) := by
     intro m
     conv_lhs => rw [← (he.basis (h'.trans h)).sum_repr s]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     refine Finset.sum_congr rfl fun i _ => ?_
     rw [map_smul, he.basis_apply, ← dualApp_resM m le_rfl h', resM_resM, smul_eq_mul]
   rw [key l, key l']
@@ -499,8 +539,8 @@ private theorem repr_map_iso_app_eq_repr (he : IsFrame e) (φ : F ⟶ G) [IsIso 
     ((he.map_iso φ).basis h).repr (φ.app V s) i = (he.basis h).repr s i := by
   have key : φ.app V s = ∑ j, (he.basis h).repr s j • ((he.map_iso φ).basis h) j := by
     conv_lhs => rw [← (he.basis h).sum_repr s]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← appLinear_apply, map_sum]
+
+    rw [← appLinear_apply, map_sum]
     refine Finset.sum_congr rfl fun j _ => ?_
     rw [map_smul, appLinear_apply]
     simp only [IsFrame.basis_apply, app_resM]
@@ -531,8 +571,8 @@ theorem pullback_basis_repr [F.IsQuasicoherent] (he : IsFrame e) (f : Y ⟶ X) (
   have key : QCoh.pullbackSections f F hT s = ∑ j, f.appLE V T hT ((he.basis h).repr s j) •
       ((he.pullback f).basis (hT.trans (f.preimage_mono h))) j := by
     conv_lhs => rw [← (he.basis h).sum_repr s]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     refine Finset.sum_congr rfl fun j _ => ?_
     rw [QCoh.pullbackSections_smul, IsFrame.basis_apply, IsFrame.basis_apply, pullbackSections_resM]
   rw [key, Module.Basis.repr_sum_self]

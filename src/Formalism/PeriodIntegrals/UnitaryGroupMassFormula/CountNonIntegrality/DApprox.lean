@@ -1,9 +1,50 @@
 module
 
-public import Mathlib
 public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.CountNonIntegrality.LGDefs
-public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.CountNonIntegrality.TraceOfKer
 public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.CountNonIntegrality.DSurjDef
+public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.CountNonIntegrality.TraceOfKer
+import Mathlib.Algebra.Module.StablyFree.Basic
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -15,71 +56,56 @@ open NumberField IsDedekindDomain Formalism.MainNotions.S
 open Classical ValuativeRel
 open scoped TensorProduct
 
-theorem resChar_memK {K : Type} [Field K] [NumberField K] (p : HeightOneSpectrum (𝓞 K))
-    : ((Loc.resChar p : ℕ) : 𝓞 K) ∈ p.asIdeal := by
+theorem resChar_memK {K : Type} [Field K] [NumberField K] (p : HeightOneSpectrum (𝓞 K)) :
+    ((Loc.resChar p : ℕ) : 𝓞 K) ∈ p.asIdeal := by
   rw [← Ideal.Quotient.eq_zero_iff_mem, map_natCast]
   exact ringChar.Nat.cast_ringChar
 
-theorem int_memK
-    {K : Type} [Field K] [NumberField K]
-    {p : HeightOneSpectrum (𝓞 K)} {Fp : Type} [Field Fp] [ValuativeRel Fp]
-    (ι : K →+* Fp) (hval : ∀ x y : K, (ι x ≤ᵥ ι y) ↔ p.valuation K x ≤ p.valuation K y)
-    (a : 𝓞 K)
-    : ι (a : K) ∈ 𝒪[Fp] := by
+theorem int_memK {K : Type} [Field K] [NumberField K] {p : HeightOneSpectrum (𝓞 K)}
+    {Fp : Type} [Field Fp] [ValuativeRel Fp] (ι : K →+* Fp)
+    (hval : ∀ x y : K, (ι x ≤ᵥ ι y) ↔ p.valuation K x ≤ p.valuation K y) (a : 𝓞 K) :
+    ι (a : K) ∈ 𝒪[Fp] := by
   rw [Valuation.mem_integer_iff]
   have h := (hval (a : K) 1).mpr (by rw [map_one]; exact p.valuation_le_one a)
   rw [Valuation.Compatible.vle_iff_le (v := ValuativeRel.valuation Fp)] at h
   simpa only [map_one] using h
 
-theorem val_ell_lt
-    {K : Type} [Field K] [NumberField K]
-    {p : HeightOneSpectrum (𝓞 K)} {Fp : Type} [Field Fp] [ValuativeRel Fp]
-    (ι : K →+* Fp) (hval : ∀ x y : K, (ι x ≤ᵥ ι y) ↔ p.valuation K x ≤ p.valuation K y)
-    : valuation Fp ((Loc.resChar p : ℕ) : Fp) < 1 := by
+theorem val_ell_lt {K : Type} [Field K] [NumberField K] {p : HeightOneSpectrum (𝓞 K)}
+    {Fp : Type} [Field Fp] [ValuativeRel Fp] (ι : K →+* Fp)
+    (hval : ∀ x y : K, (ι x ≤ᵥ ι y) ↔ p.valuation K x ≤ p.valuation K y) :
+    valuation Fp ((Loc.resChar p : ℕ) : Fp) < 1 := by
   have hmem := resChar_memK p
   have h1 : p.valuation K ((Loc.resChar p : ℕ) : K) < 1 := by
     have h := (p.valuation_lt_one_iff_mem (K := K) ((Loc.resChar p : ℕ) : 𝓞 K)).mpr hmem
     simpa using h
-  have h2 : ¬(ι 1 ≤ᵥ ι ((Loc.resChar p : ℕ) : K)) := by
+  have h2 : ¬ (ι 1 ≤ᵥ ι ((Loc.resChar p : ℕ) : K)) := by
     rw [hval, map_one]
     exact not_le.mpr h1
   rw [Valuation.Compatible.vle_iff_le (v := ValuativeRel.valuation Fp)] at h2
   simp only [map_one, map_natCast] at h2
   exact not_le.mp h2
 
-theorem zp_memK
-    {ℓ : ℕ} [Fact ℓ.Prime]
-    {Fp : Type} [Field Fp] [ValuativeRel Fp] [TopologicalSpace Fp] [IsNonarchimedeanLocalField Fp]
-    [Algebra ℚ_[ℓ] Fp]
-    (hc : Continuous (algebraMap ℚ_[ℓ] Fp)) (x : ℤ_[ℓ])
-    : algebraMap ℚ_[ℓ] Fp (x : ℚ_[ℓ]) ∈ 𝒪[Fp] := by
+theorem zp_memK {ℓ : ℕ} [Fact ℓ.Prime] {Fp : Type} [Field Fp] [ValuativeRel Fp] [TopologicalSpace Fp]
+    [IsNonarchimedeanLocalField Fp] [Algebra ℚ_[ℓ] Fp] (hc : Continuous (algebraMap ℚ_[ℓ] Fp))
+    (x : ℤ_[ℓ]) : algebraMap ℚ_[ℓ] Fp (x : ℚ_[ℓ]) ∈ 𝒪[Fp] := by
   have hg : Continuous fun y : ℤ_[ℓ] => algebraMap ℚ_[ℓ] Fp (y : ℚ_[ℓ]) :=
     hc.comp continuous_subtype_val
   have hcl : IsClosed {y : ℤ_[ℓ] | algebraMap ℚ_[ℓ] Fp (y : ℚ_[ℓ]) ∈ 𝒪[Fp]} :=
     Valuation.isClosed_integer.preimage hg
-  have hsub
-      : Set.range (Nat.cast : ℕ → ℤ_[ℓ])
-        ⊆ {y : ℤ_[ℓ] | algebraMap ℚ_[ℓ] Fp (y : ℚ_[ℓ]) ∈ 𝒪[Fp]} := by
+  have hsub : Set.range (Nat.cast : ℕ → ℤ_[ℓ]) ⊆ {y : ℤ_[ℓ] | algebraMap ℚ_[ℓ] Fp (y : ℚ_[ℓ]) ∈ 𝒪[Fp]} := by
     rintro _ ⟨k, rfl⟩
     simp only [Set.mem_setOf_eq]
     push_cast
     exact natCast_mem _ k
   exact hcl.closure_subset_iff.mpr hsub (PadicInt.denseRange_natCast x)
 
-theorem approx_core
-    {K : Type} [Field K] [NumberField K]
-    {ℓ : ℕ} [Fact ℓ.Prime]
-    {Fp : Type} [Field Fp] [CharZero Fp] [ValuativeRel Fp] [TopologicalSpace Fp]
-    [IsNonarchimedeanLocalField Fp] [Algebra ℚ_[ℓ] Fp]
-    (hS : PowSmall) (hc : Continuous (algebraMap ℚ_[ℓ] Fp)) (hfin : FiniteDimensional ℚ_[ℓ] Fp)
-    (ι : K →+* Fp)
+theorem approx_core {K : Type} [Field K] [NumberField K] {ℓ : ℕ} [Fact ℓ.Prime] {Fp : Type} [Field Fp]
+    [CharZero Fp] [ValuativeRel Fp] [TopologicalSpace Fp] [IsNonarchimedeanLocalField Fp] [Algebra ℚ_[ℓ] Fp]
+    (hS : PowSmall) (hc : Continuous (algebraMap ℚ_[ℓ] Fp)) (hfin : FiniteDimensional ℚ_[ℓ] Fp) (ι : K →+* Fp)
     (hsurj : Function.Surjective (piMap K ℓ Fp ι)) (hint : ∀ a : 𝓞 K, ι (a : K) ∈ 𝒪[Fp])
-    (hℓ : valuation Fp (ℓ : Fp) < 1)
-    (z : Fp) (hz : ∀ c ∈ 𝒪[Fp], ‖Algebra.trace ℚ_[ℓ] Fp (c * z)‖ ≤ 1)
-    (k : ℕ)
-    : ∃ t : K,
-      (∀ a : 𝓞 K, ∃ n : ℤ, Algebra.trace ℚ K (t * a) = n)
-        ∧ ∃ μ ∈ 𝒪[Fp], ι t = z + (ℓ : Fp) ^ k * μ := by
+    (hℓ : valuation Fp (ℓ : Fp) < 1) (z : Fp) (hz : ∀ c ∈ 𝒪[Fp], ‖Algebra.trace ℚ_[ℓ] Fp (c * z)‖ ≤ 1)
+    (k : ℕ) : ∃ t : K, (∀ a : 𝓞 K, ∃ n : ℤ, Algebra.trace ℚ K (t * a) = n) ∧
+      ∃ μ ∈ 𝒪[Fp], ι t = z + (ℓ : Fp) ^ k * μ := by
   have hπ1 : ∀ y : K, piMap K ℓ Fp ι (1 ⊗ₜ y) = ι y := piMap_one_tmul K ℓ Fp ι
   let b := NumberField.integralBasis K
   let bd := (Algebra.traceForm ℚ K).dualBasis (traceForm_nondegenerate ℚ K) b
@@ -92,25 +118,22 @@ theorem approx_core
   let Bb := Algebra.TensorProduct.basis ℚ_[ℓ] b
   have hBb : ∀ i, Bb i = 1 ⊗ₜ b i := fun i => Algebra.TensorProduct.basis_apply b i
   have : FiniteDimensional ℚ_[ℓ] (ℚ_[ℓ] ⊗[ℚ] K) := Module.Finite.of_basis BA
-  have htb
-      : ∀ i j,
-        Algebra.trace ℚ_[ℓ] (ℚ_[ℓ] ⊗[ℚ] K) ((1 ⊗ₜ bd i) * (1 ⊗ₜ b j)) = if j = i then 1 else 0 := by
+  have htb : ∀ i j, Algebra.trace ℚ_[ℓ] (ℚ_[ℓ] ⊗[ℚ] K) ((1 ⊗ₜ bd i) * (1 ⊗ₜ b j)) =
+      if j = i then 1 else 0 := by
     intro i j
     rw [Algebra.TensorProduct.tmul_mul_tmul, one_mul, trace_one_tmul, hdb]
     split_ifs <;> simp
-  have hnd
-      : ∀ γ : ℚ_[ℓ] ⊗[ℚ] K,
-        (∀ j, Algebra.trace ℚ_[ℓ] (ℚ_[ℓ] ⊗[ℚ] K) (γ * (1 ⊗ₜ b j)) = 0) → γ = 0 := by
+  have hnd : ∀ γ : ℚ_[ℓ] ⊗[ℚ] K,
+      (∀ j, Algebra.trace ℚ_[ℓ] (ℚ_[ℓ] ⊗[ℚ] K) (γ * (1 ⊗ₜ b j)) = 0) → γ = 0 := by
     intro γ hγ
     have hexp := BA.sum_repr γ
     have hc0 : ∀ j, BA.repr γ j = 0 := by
       intro j
       have h := hγ j
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [← hexp, Finset.sum_mul, map_sum] at h
+
+      rw [← hexp, Finset.sum_mul, map_sum] at h
       simpa only [smul_mul_assoc, map_smul, hBA, htb, smul_eq_mul, mul_ite, mul_one, mul_zero,
-          Finset.sum_ite_eq, Finset.mem_univ, if_true]
-        using h
+        Finset.sum_ite_eq, Finset.mem_univ, if_true] using h
     rw [← hexp]
     simp [hc0]
   let φ : ℚ_[ℓ] ⊗[ℚ] K →ₗ[ℚ_[ℓ]] ℚ_[ℓ] :=
@@ -122,9 +145,9 @@ theorem approx_core
       apply Bb.ext
       intro j
       rw [hBb, LinearMap.comp_apply, LinearMap.mulLeft_apply]
-      set_option synthInstance.maxHeartbeats 100000 in
-      simp only [β, Finset.sum_mul, map_sum, smul_mul_assoc, map_smul, htb, smul_eq_mul, mul_ite,
-        mul_one, mul_zero, Finset.sum_ite_eq, Finset.mem_univ, if_true]
+
+      simp only [β, Finset.sum_mul, map_sum, smul_mul_assoc, map_smul, htb, smul_eq_mul, mul_ite, mul_one,
+      mul_zero, Finset.sum_ite_eq, Finset.mem_univ, if_true]
     intro x
     exact congrArg (fun L => L x) hL
   have hker : ∀ x, piMap K ℓ Fp ι x = 0 → β * x = 0 := by
@@ -132,10 +155,8 @@ theorem approx_core
     apply hnd
     intro j
     rw [mul_assoc, hβ, hφ, map_mul (piMap K ℓ Fp ι), hx, zero_mul, mul_zero, map_zero]
-  have htr
-      : ∀ x,
-        Algebra.trace ℚ_[ℓ] (ℚ_[ℓ] ⊗[ℚ] K) (β * x)
-          = Algebra.trace ℚ_[ℓ] Fp (piMap K ℓ Fp ι β * piMap K ℓ Fp ι x) := by
+  have htr : ∀ x, Algebra.trace ℚ_[ℓ] (ℚ_[ℓ] ⊗[ℚ] K) (β * x) =
+      Algebra.trace ℚ_[ℓ] Fp (piMap K ℓ Fp ι β * piMap K ℓ Fp ι x) := by
     intro x
     rw [trace_of_ker (piMap K ℓ Fp ι) hsurj (β * x), map_mul]
     intro y hy
@@ -146,66 +167,60 @@ theorem approx_core
     obtain ⟨x, hx⟩ := hsurj (piMap K ℓ Fp ι β - z)⁻¹
     have e1 : Algebra.trace ℚ_[ℓ] Fp ((piMap K ℓ Fp ι β - z) * piMap K ℓ Fp ι x) = 0 := by
       rw [sub_mul, map_sub, ← htr, hβ, hφ, sub_self]
-    rw [hx, mul_inv_cancel₀ hd0, ← map_one (algebraMap ℚ_[ℓ] Fp), Algebra.trace_algebraMap,
-        nsmul_eq_mul, mul_one]
-      at e1
+    rw [hx, mul_inv_cancel₀ hd0, ← map_one (algebraMap ℚ_[ℓ] Fp), Algebra.trace_algebraMap, nsmul_eq_mul,
+      mul_one] at e1
     exact (Nat.cast_ne_zero.2 Module.finrank_pos.ne') e1
   have hzi : ∀ i, ‖φ (1 ⊗ₜ b i)‖ ≤ 1 := by
     intro i
     rw [hφ, hπ1, mul_comm]
     apply hz
-    have hb : b i = algebraMap (𝓞 K) K (RingOfIntegers.basis K i) :=
-      NumberField.integralBasis_apply K i
+    have hb : b i = algebraMap (𝓞 K) K (RingOfIntegers.basis K i) := NumberField.integralBasis_apply K i
     rw [hb]
     exact hint _
   choose N hN using fun i => hS Fp (ι (bd i)) (ℓ : Fp) hℓ
   let w : Module.Free.ChooseBasisIndex ℤ (𝓞 K) → ℤ_[ℓ] := fun i => ⟨φ (1 ⊗ₜ b i), hzi i⟩
   let n : Module.Free.ChooseBasisIndex ℤ (𝓞 K) → ℕ := fun i => PadicInt.appr (w i) (k + N i)
-  have hsp : ∀ i, ∃ e : ℤ_[ℓ], e * (ℓ : ℤ_[ℓ]) ^ (k + N i) = w i - n i := fun i =>
-    Ideal.mem_span_singleton'.1 (PadicInt.appr_spec (k + N i) (w i))
+  have hsp : ∀ i, ∃ e : ℤ_[ℓ], e * (ℓ : ℤ_[ℓ]) ^ (k + N i) = w i - n i :=
+    fun i => Ideal.mem_span_singleton'.1 (PadicInt.appr_spec (k + N i) (w i))
   choose e he using hsp
   let t : K := ∑ i, (n i : ℚ) • bd i
   refine ⟨t, ?_, -(∑ i, algebraMap ℚ_[ℓ] Fp (e i : ℚ_[ℓ]) * ((ℓ : Fp) ^ N i * ι (bd i))), ?_, ?_⟩
   · have htj : ∀ j, Algebra.trace ℚ K (t * b j) = (n j : ℚ) := by
       intro j
-      set_option synthInstance.maxHeartbeats 100000 in
-      simp only [t, Finset.sum_mul, map_sum, smul_mul_assoc, map_smul, hdb, smul_eq_mul, mul_ite,
-        mul_one, mul_zero, Finset.sum_ite_eq, Finset.mem_univ, if_true]
+
+      simp only [t, Finset.sum_mul, map_sum, smul_mul_assoc, map_smul, hdb, smul_eq_mul, mul_ite, mul_one,
+      mul_zero, Finset.sum_ite_eq, Finset.mem_univ, if_true]
     intro a
     have ha : (a : K) = ∑ j, ((RingOfIntegers.basis K).repr a j) • b j := by
       have h := congrArg (algebraMap (𝓞 K) K) ((RingOfIntegers.basis K).sum_repr a)
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum] at h
+
+      rw [map_sum] at h
       simp only [map_zsmul, ← NumberField.integralBasis_apply] at h
       exact h.symm
     refine ⟨∑ j, (RingOfIntegers.basis K).repr a j * (n j : ℤ), ?_⟩
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [ha, Finset.mul_sum, map_sum]
+
+    rw [ha, Finset.mul_sum, map_sum]
     push_cast
     refine Finset.sum_congr rfl (fun j _ => ?_)
     rw [mul_smul_comm, map_zsmul, htj, zsmul_eq_mul]
-  · exact Subring.neg_mem _
-      (Subring.sum_mem _ fun i _ =>
-        Subring.mul_mem _ (zp_memK hc (e i)) ((Valuation.mem_integer_iff _ _).2 (hN i).le))
+  · exact Subring.neg_mem _ (Subring.sum_mem _ fun i _ =>
+      Subring.mul_mem _ (zp_memK hc (e i)) ((Valuation.mem_integer_iff _ _).2 (hN i).le))
   · have hz' : z = ∑ i, algebraMap ℚ_[ℓ] Fp (w i : ℚ_[ℓ]) * ι (bd i) := by
       rw [← hπβ]
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [β, map_sum]
+
+      simp only [β, map_sum]
       refine Finset.sum_congr rfl (fun i _ => ?_)
       rw [map_smul, hπ1, Algebra.smul_def]
-    have hw
-        : ∀ i,
-          algebraMap ℚ_[ℓ] Fp (w i : ℚ_[ℓ])
-            = (n i : Fp) + (ℓ : Fp) ^ (k + N i) * algebraMap ℚ_[ℓ] Fp (e i : ℚ_[ℓ]) := by
+    have hw : ∀ i, algebraMap ℚ_[ℓ] Fp (w i : ℚ_[ℓ]) =
+        (n i : Fp) + (ℓ : Fp) ^ (k + N i) * algebraMap ℚ_[ℓ] Fp (e i : ℚ_[ℓ]) := by
       intro i
       have h := congrArg (fun x : ℤ_[ℓ] => algebraMap ℚ_[ℓ] Fp (x : ℚ_[ℓ])) (he i)
-      simp only [PadicInt.coe_mul, PadicInt.coe_pow, PadicInt.coe_natCast, PadicInt.coe_sub,
-          map_mul, map_pow, map_natCast, map_sub]
-        at h
+      simp only [PadicInt.coe_mul, PadicInt.coe_pow, PadicInt.coe_natCast, PadicInt.coe_sub, map_mul, map_pow,
+        map_natCast, map_sub] at h
       linear_combination -h
     have hιt : ι t = ∑ i, (n i : Fp) * ι (bd i) := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [t, map_sum]
+
+      simp only [t, map_sum]
       refine Finset.sum_congr rfl (fun i _ => ?_)
       rw [Rat.smul_def, map_mul, map_ratCast, Rat.cast_natCast]
     rw [hιt, hz']

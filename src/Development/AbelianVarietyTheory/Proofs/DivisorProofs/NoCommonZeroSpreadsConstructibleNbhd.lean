@@ -1,11 +1,65 @@
 module
 
-public import Mathlib
+public import Mathlib.FieldTheory.IsAlgClosed.Basic
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Henselian
+public import Mathlib.RingTheory.Nullstellensatz
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Lemma
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
+public import Mathlib.Algebra.MvPolynomial.CommRing
+import Mathlib.CategoryTheory.Monoidal.Cartesian.Basic
+import Mathlib.CategoryTheory.Monoidal.Category
+import Mathlib.CategoryTheory.Monoidal.Mon
+import Mathlib.Topology.Sheaves.Presheaf
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
-  TopologicalSpace TensorProduct
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj TopologicalSpace TensorProduct
 open scoped CategoryTheory.Obj
 
 namespace GlobalTheory
@@ -40,15 +94,7 @@ lemma exists_common_denominator {A Ω : Type} [CommRing A] [Field Ω] (φ : A �
         rw [map_mul, hd, map_mul]
         ring
 
-theorem no_common_zero_spreads
-    : ∀ (A : Type) [CommRing A] (τ J : Type) [Finite τ] (F : J → MvPolynomial τ A) (Ω : Type)
-        [Field Ω] [IsAlgClosed Ω] (φ : A →+* Ω),
-      (¬ ∃ z : τ → Ω, ∀ j, MvPolynomial.eval₂ φ z (F j) = 0)
-        → ∃ (a : A) (I : Finset A),
-          φ a ≠ 0 ∧ (∀ c ∈ I, φ c = 0)
-            ∧ ∀ (k : Type) [Field k] (ψ : A →+* k),
-              ψ a ≠ 0 → (∀ c ∈ I, ψ c = 0)
-                → ¬ ∃ z : τ → k, ∀ j, MvPolynomial.eval₂ ψ z (F j) = 0 := by
+theorem no_common_zero_spreads : ∀ (A : Type) [CommRing A] (τ J : Type) [Finite τ] (F : J → MvPolynomial τ A) (Ω : Type) [Field Ω] [IsAlgClosed Ω] (φ : A →+* Ω), (¬ ∃ z : τ → Ω, ∀ j, MvPolynomial.eval₂ φ z (F j) = 0) → ∃ (a : A) (I : Finset A), φ a ≠ 0 ∧ (∀ c ∈ I, φ c = 0) ∧ ∀ (k : Type) [Field k] (ψ : A →+* k), ψ a ≠ 0 → (∀ c ∈ I, ψ c = 0) → ¬ ∃ z : τ → k, ∀ j, MvPolynomial.eval₂ ψ z (F j) = 0 := by
   intro A _ τ J _ F Ω _ _ φ hno
   classical
   let G : J → MvPolynomial τ Ω := fun j => MvPolynomial.map φ (F j)
@@ -64,15 +110,14 @@ theorem no_common_zero_spreads
       simpa [G, MvPolynomial.coe_aeval_eq_eval, MvPolynomial.eval_map] using this
     have := MvPolynomial.vanishingIdeal_zeroLocus_eq_radical (K := Ω) (Ideal.span (Set.range G))
     rw [hz, MvPolynomial.vanishingIdeal_empty, eq_comm, Ideal.radical_eq_top] at this
-    rw [this]
-    exact Submodule.mem_top
+    rw [this]; exact Submodule.mem_top
   obtain ⟨c, hc⟩ := (Finsupp.mem_span_range_iff_exists_finsupp).1 h1
 
   let K : Subfield Ω := Subfield.closure (φ.range : Set Ω)
-  obtain ⟨g, hg⟩ :=
-    LinearMap.exists_leftInverse_of_injective (Algebra.linearMap K Ω)
-      (LinearMap.ker_eq_bot.2 (algebraMap K Ω).injective)
-  have hg1 : ∀ y : K, g (y : Ω) = y := fun y => by exact LinearMap.congr_fun hg y
+  obtain ⟨g, hg⟩ := LinearMap.exists_leftInverse_of_injective (Algebra.linearMap K Ω)
+    (LinearMap.ker_eq_bot.2 (algebraMap K Ω).injective)
+  have hg1 : ∀ y : K, g (y : Ω) = y := fun y => by
+    exact LinearMap.congr_fun hg y
   have hgK : ∀ (x : Ω) (y : K), ((g (x * y) : K) : Ω) = (g x : Ω) * y := by
     intro x y
     have : x * (y : Ω) = y • x := by rw [mul_comm]; rfl
@@ -96,10 +141,9 @@ theorem no_common_zero_spreads
     · have := hg1 1; simpa using this
     · simp
   have hPmul : ∀ h j, P (h * G j) = P h * G j := by
-    intro h j
-    ext n
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hPc, MvPolynomial.coeff_mul, MvPolynomial.coeff_mul, map_sum]
+    intro h j; ext n
+
+    rw [hPc, MvPolynomial.coeff_mul, MvPolynomial.coeff_mul, map_sum]
     refine (map_sum K.subtype _ _).trans (Finset.sum_congr rfl fun x _ => ?_)
     show ((g _ : K) : Ω) = _
     have e : (G j).coeff x.2 = ((⟨φ ((F j).coeff x.2), hφK _⟩ : K) : Ω) := by
@@ -109,8 +153,8 @@ theorem no_common_zero_spreads
   have hsum : ∑ j ∈ c.support, P (c j) * G j = 1 := by
     simp only [Finsupp.sum, smul_eq_mul] at hc
     have := congrArg PA hc
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum] at this
+
+    rw [map_sum] at this
     simp only [PA, AddMonoidHom.mk'_apply] at this
     rw [← hP1]
     convert this using 1
@@ -118,14 +162,13 @@ theorem no_common_zero_spreads
     exact (hPmul _ _).symm
 
   let S : Finset Ω := c.support.biUnion (fun j => (P (c j)).coeffs)
-  obtain ⟨b, hb, hbS⟩ :=
-    exists_common_denominator φ S (by
-      intro x hx
-      obtain ⟨j, -, hj⟩ := Finset.mem_biUnion.1 hx
-      obtain ⟨n, -, rfl⟩ := MvPolynomial.mem_coeffs_iff.1 hj
-      rw [hPc]
-      exact (g _).2)
-  have hQ : ∀ j, ∃ q : MvPolynomial τ A, MvPolynomial.map φ q = MvPolynomial.C (φ b) * P (c j) := by
+  obtain ⟨b, hb, hbS⟩ := exists_common_denominator φ S (by
+    intro x hx
+    obtain ⟨j, -, hj⟩ := Finset.mem_biUnion.1 hx
+    obtain ⟨n, -, rfl⟩ := MvPolynomial.mem_coeffs_iff.1 hj
+    rw [hPc]; exact (g _).2)
+  have hQ : ∀ j, ∃ q : MvPolynomial τ A,
+      MvPolynomial.map φ q = MvPolynomial.C (φ b) * P (c j) := by
     intro j
     have : MvPolynomial.C (φ b) * P (c j) ∈ Set.range (MvPolynomial.map (σ := τ) φ) := by
       rw [MvPolynomial.mem_range_map_iff_coeffs_subset]
@@ -136,20 +179,16 @@ theorem no_common_zero_spreads
       · rw [hn, mul_zero]; exact ⟨0, map_zero φ⟩
       · have hj : j ∈ c.support := by
           rw [Finsupp.mem_support_iff]
-          intro h0
-          apply hn
-          rw [hPc, h0]
-          simp
-        exact hbS _
-          (Finset.mem_biUnion.2
-            ⟨j, hj, MvPolynomial.mem_coeffs_iff.2 ⟨n, MvPolynomial.mem_support_iff.2 hn, rfl⟩⟩)
+          intro h0; apply hn; rw [hPc, h0]; simp
+        exact hbS _ (Finset.mem_biUnion.2 ⟨j, hj,
+          MvPolynomial.mem_coeffs_iff.2 ⟨n, MvPolynomial.mem_support_iff.2 hn, rfl⟩⟩)
     exact this
   choose q hq using hQ
   let E : MvPolynomial τ A := MvPolynomial.C b - ∑ j ∈ c.support, q j * F j
   have hE : MvPolynomial.map φ E = 0 := by
     have hG : ∀ j, MvPolynomial.map φ (F j) = G j := fun j => rfl
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [E, map_sub, map_sum, map_mul, MvPolynomial.map_C, hq, hG, _root_.mul_assoc]
+
+    simp only [E, map_sub, map_sum, map_mul, MvPolynomial.map_C, hq, hG, _root_.mul_assoc]
     rw [← Finset.mul_sum, hsum, _root_.mul_one, sub_self]
   refine ⟨b, E.coeffs, hb, ?_, ?_⟩
   · intro y hy
@@ -164,7 +203,8 @@ theorem no_common_zero_spreads
       · exact hψI _ (MvPolynomial.mem_coeffs_iff.2 ⟨n, hn, rfl⟩)
       · rw [MvPolynomial.notMem_support_iff.1 hn, map_zero]
         rfl
-    have h2 : MvPolynomial.eval₂ ψ z E = 0 := by rw [MvPolynomial.eval₂_eq_eval_map, h0, map_zero]
+    have h2 : MvPolynomial.eval₂ ψ z E = 0 := by
+      rw [MvPolynomial.eval₂_eq_eval_map, h0, map_zero]
     have h3 : MvPolynomial.eval₂ ψ z E = ψ b := by
       simp [E, MvPolynomial.eval₂_sub, MvPolynomial.eval₂_C, MvPolynomial.eval₂_sum,
         MvPolynomial.eval₂_mul, hz]

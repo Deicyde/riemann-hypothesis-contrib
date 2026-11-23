@@ -1,8 +1,58 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.Proofs.CovolumeBounds.ExistsShortBasisAdaptedOfSubsetSpan
 public import Development.AbelianVarietyTheory.Definitions.ThetaMetrics.SumFinsuppAntidiagProdPowDivMultiFactorial
+public import Mathlib.Analysis.CStarAlgebra.Classes
+public import Mathlib.NumberTheory.NumberField.InfinitePlace.Embeddings
+public import Development.AbelianVarietyTheory.Proofs.CovolumeBounds.ExistsShortBasisAdaptedOfSubsetSpan
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Real
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+public import Mathlib.NumberTheory.NumberField.House
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
@@ -12,21 +62,17 @@ open Module Submodule MvPolynomial NumberField
 
 namespace GlobalTheory
 
-theorem exists_short_basis_of_ratSpan
-    {V E ι : Type*} [AddCommGroup V] [Module ℚ V] [NormedAddCommGroup E] [InnerProductSpace ℝ E]
-    [FiniteDimensional ℝ E]
-    (H : Submodule ℤ V)
-    (φ : V →+ E)
-    {ε : ℝ} (hε : 0 < ε) (hφ : ∀ x ∈ H, x ≠ 0 → ε ≤ ‖φ x‖)
-    (v : ι → V) (hvH : ∀ j, v j ∈ H) (hsp : (H : Set V) ⊆ span ℚ (Set.range v))
-    {r : ℝ} (hr : ∀ j, ‖φ (v j)‖ ≤ r)
-    {R : ℕ} (hR : R = finrank ℚ (span ℚ (Set.range v)))
-    : ∃ b : Basis (Fin R) ℤ H, ∀ i, ‖φ (b i)‖ ^ 2 ≤ ((R + 3 : ℝ) / 4) * r ^ 2 := by
+theorem exists_short_basis_of_ratSpan {V E ι : Type*} [AddCommGroup V] [Module ℚ V]
+    [NormedAddCommGroup E] [InnerProductSpace ℝ E] [FiniteDimensional ℝ E]
+    (H : Submodule ℤ V) (φ : V →+ E) {ε : ℝ} (hε : 0 < ε)
+    (hφ : ∀ x ∈ H, x ≠ 0 → ε ≤ ‖φ x‖) (v : ι → V) (hvH : ∀ j, v j ∈ H)
+    (hsp : (H : Set V) ⊆ span ℚ (Set.range v)) {r : ℝ} (hr : ∀ j, ‖φ (v j)‖ ≤ r) {R : ℕ}
+    (hR : R = finrank ℚ (span ℚ (Set.range v))) :
+    ∃ b : Basis (Fin R) ℤ H, ∀ i, ‖φ (b i)‖ ^ 2 ≤ ((R + 3 : ℝ) / 4) * r ^ 2 := by
   classical
   let ψ : H →ₗ[ℤ] E := φ.toIntLinearMap ∘ₗ H.subtype
   have hψ : Function.Injective ψ := by
-    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
-      rw [injective_iff_map_eq_zero]
+    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
     intro x hx
     by_contra h
     have := hφ x x.2 (fun h' => h (Subtype.ext h'))
@@ -73,7 +119,8 @@ theorem exists_short_basis_of_ratSpan
     exact this.symm
   have hn : n = R := by
     have h1 : LinearIndependent ℚ (fun i => (b' i : V)) :=
-      (LinearIndependent.iff_fractionRing ℤ ℚ).1 (b'.linearIndependent.map' H.subtype H.ker_subtype)
+      (LinearIndependent.iff_fractionRing ℤ ℚ).1
+        (b'.linearIndependent.map' H.subtype H.ker_subtype)
     have h2 : span ℚ (Set.range fun i => (b' i : V)) = span ℚ (Set.range v) := by
       refine le_antisymm (span_le.2 ?_) (span_le.2 ?_)
       · rintro _ ⟨i, rfl⟩; exact hsp (b' i).2
@@ -86,9 +133,8 @@ theorem exists_short_basis_of_ratSpan
   subst hn
   refine ⟨b', fun i => ?_⟩
   rw [hb']
-  refine (hb i).trans
-    ((norm_sq_add_sum_Iio_le (r := r) fun j _ => hr (a (e.symm j))).trans
-      (mul_le_mul_of_nonneg_right ?_ (sq_nonneg _)))
+  refine (hb i).trans ((norm_sq_add_sum_Iio_le (r := r) fun j _ => hr (a (e.symm j))).trans
+    (mul_le_mul_of_nonneg_right ?_ (sq_nonneg _)))
   have : ((i : ℕ) + 1 : ℝ) ≤ n := by exact_mod_cast i.2
   linarith
 
@@ -99,24 +145,20 @@ variable {K σ : Type*} [Field K]
 def integralPart (W : Submodule K (MvPolynomial σ K)) : Submodule ℤ (MvPolynomial σ K) :=
   W.restrictScalars ℤ ⊓ coeffsIn σ (integralClosure ℤ K).toSubmodule
 
-theorem mem_integralPart {W : Submodule K (MvPolynomial σ K)} {P : MvPolynomial σ K}
-    : P ∈ integralPart W ↔ P ∈ W ∧ ∀ α, IsIntegral ℤ (P.coeff α) :=
-  Iff.rfl
+theorem mem_integralPart {W : Submodule K (MvPolynomial σ K)} {P : MvPolynomial σ K} :
+    P ∈ integralPart W ↔ P ∈ W ∧ ∀ α, IsIntegral ℤ (P.coeff α) := Iff.rfl
 
-theorem smul_mem_integralPart
-    {W : Submodule K (MvPolynomial σ K)} (c : 𝓞 K) {P : MvPolynomial σ K} (hP : P ∈ integralPart W)
-    : c • P ∈ integralPart W := ⟨
-  W.smul_mem (c : K) hP.1,
-  fun α => by
+theorem smul_mem_integralPart {W : Submodule K (MvPolynomial σ K)} (c : 𝓞 K)
+    {P : MvPolynomial σ K} (hP : P ∈ integralPart W) : c • P ∈ integralPart W :=
+  ⟨W.smul_mem (c : K) hP.1, fun α => by
     change IsIntegral ℤ (AddMonoidAlgebra.coeff ((c : K) • P) α)
-    rw [coeff_smul, smul_eq_mul]
-    exact c.isIntegral_coe.mul (hP.2 α)
-⟩
+    rw [MvPolynomial.coeff_smul, smul_eq_mul]
+    exact c.isIntegral_coe.mul (hP.2 α)⟩
 
-theorem span_ringOfIntegers_basis_integralPart
-    {W : Submodule K (MvPolynomial σ K)} {ι : Type*} (b : Basis ι ℤ (integralPart W))
-    : (span (𝓞 K) (Set.range fun i => (b i : MvPolynomial σ K))).restrictScalars ℤ
-      = integralPart W := by
+theorem span_ringOfIntegers_basis_integralPart {W : Submodule K (MvPolynomial σ K)} {ι : Type*}
+    (b : Basis ι ℤ (integralPart W)) :
+    (span (𝓞 K) (Set.range fun i => (b i : MvPolynomial σ K))).restrictScalars ℤ =
+      integralPart W := by
   refine le_antisymm (fun P hP => ?_) (fun P hP => ?_)
   · change P ∈ span (𝓞 K) _ at hP
     induction hP using span_induction with
@@ -130,44 +172,41 @@ theorem span_ringOfIntegers_basis_integralPart
 
 variable [NumberField K] [Fintype σ]
 
-def conjCoeffs (K σ : Type*) [Field K] [NumberField K] [Fintype σ] [DecidableEq σ] (D : ℕ)
-    : MvPolynomial σ K →+ EuclideanSpace ℂ ((K →+* ℂ) × monomialsLE σ D) where
+def conjCoeffs (K σ : Type*) [Field K] [NumberField K] [Fintype σ] [DecidableEq σ] (D : ℕ) :
+    MvPolynomial σ K →+ EuclideanSpace ℂ ((K →+* ℂ) × monomialsLE σ D) where
   toFun P := WithLp.toLp 2 fun p => p.1 (P.coeff p.2)
   map_zero' := by ext; simp
   map_add' P Q := by ext; simp
 
-theorem norm_conjCoeffs_sq [DecidableEq σ] {D : ℕ} {P : MvPolynomial σ K} (hP : P.totalDegree ≤ D)
-    : ‖conjCoeffs K σ D P‖ ^ 2 = ∑ s : K →+* ℂ, l2Norm (map s P) ^ 2 := by
+theorem norm_conjCoeffs_sq [DecidableEq σ] {D : ℕ} {P : MvPolynomial σ K}
+    (hP : P.totalDegree ≤ D) :
+    ‖conjCoeffs K σ D P‖ ^ 2 = ∑ s : K →+* ℂ, l2Norm (map s P) ^ 2 := by
   rw [EuclideanSpace.norm_sq_eq, Fintype.sum_prod_type]
   refine Finset.sum_congr rfl fun s _ => ?_
-  rw [l2Norm_eq_sqrt_sum_of_subset ((support_map_subset s P).trans
-      (support_subset_monomialsLE.2 hP)),
-    Real.sq_sqrt (Finset.sum_nonneg fun _ _ => sq_nonneg _),
-    ← Finset.sum_coe_sort (monomialsLE σ D)]
+  rw [l2Norm_eq_sqrt_sum_of_subset
+    ((support_map_subset s P).trans (support_subset_monomialsLE.2 hP)),
+    Real.sq_sqrt (Finset.sum_nonneg fun _ _ => sq_nonneg _), ← Finset.sum_coe_sort (monomialsLE σ D)]
   simp only [conjCoeffs, coeff_map, AddMonoidHom.coe_mk, ZeroHom.coe_mk]
 
+
 omit [NumberField K] in
-theorem finrank_le_one_add_pow
-    {W : Submodule K (MvPolynomial σ K)} {D : ℕ} (hD : ∀ P ∈ W, P.totalDegree ≤ D)
-    : finrank K W ≤ (1 + D) ^ Fintype.card σ := by
+theorem finrank_le_one_add_pow {W : Submodule K (MvPolynomial σ K)} {D : ℕ}
+    (hD : ∀ P ∈ W, P.totalDegree ≤ D) : finrank K W ≤ (1 + D) ^ Fintype.card σ := by
   classical
   have h : W ≤ restrictTotalDegree σ K D := fun P hP => (mem_restrictTotalDegree σ D P).2 (hD P hP)
   refine (Submodule.finrank_mono h).trans ?_
   rw [finrank_restrictTotalDegree]
   exact choose_add_le_one_add_pow _ _
 
-theorem exists_basis_integralPart_sum_l2Norm_sq_le
-    {κ : Type*}
-    (W : Submodule K (MvPolynomial σ K))
-    {D : ℕ} (hD : ∀ P ∈ W, P.totalDegree ≤ D)
-    (S : Set (MvPolynomial σ K)) (hSH : S ⊆ integralPart W) (hSW : span K S = W)
-    {B : ℝ} (hB : ∀ P ∈ S, ∀ s : K →+* ℂ, l2Norm (map s P) ≤ B)
-    (ω : κ → 𝓞 K) (hω : span ℚ (Set.range fun k => (ω k : K)) = ⊤)
-    {A : ℝ} (hA : ∀ (s : K →+* ℂ) k, ‖s (ω k)‖ ≤ A)
-    {R : ℕ} (hR : R = finrank ℚ K * finrank K W)
-    : ∃ b : Basis (Fin R) ℤ (integralPart W), ∀ i,
-      √(∑ s : K →+* ℂ, l2Norm (map s (b i : MvPolynomial σ K)) ^ 2)
-        ≤ √((R + 3) / 4) * √(finrank ℚ K) * A * B := by
+theorem exists_basis_integralPart_sum_l2Norm_sq_le {κ : Type*}
+    (W : Submodule K (MvPolynomial σ K)) {D : ℕ} (hD : ∀ P ∈ W, P.totalDegree ≤ D)
+    (S : Set (MvPolynomial σ K)) (hSH : S ⊆ integralPart W) (hSW : span K S = W) {B : ℝ}
+    (hB : ∀ P ∈ S, ∀ s : K →+* ℂ, l2Norm (map s P) ≤ B)
+    (ω : κ → 𝓞 K) (hω : span ℚ (Set.range fun k => (ω k : K)) = ⊤) {A : ℝ}
+    (hA : ∀ (s : K →+* ℂ) k, ‖s (ω k)‖ ≤ A) {R : ℕ} (hR : R = finrank ℚ K * finrank K W) :
+    ∃ b : Basis (Fin R) ℤ (integralPart W), ∀ i,
+      √(∑ s : K →+* ℂ, l2Norm (map s (b i : MvPolynomial σ K)) ^ 2) ≤
+        √((R + 3) / 4) * √(finrank ℚ K) * A * B := by
   classical
   let v : κ × S → MvPolynomial σ K := fun p => ω p.1 • (p.2 : MvPolynomial σ K)
   have hvH : ∀ p, v p ∈ integralPart W := fun p => smul_mem_integralPart _ (hSH p.2.2)
@@ -193,9 +232,8 @@ theorem exists_basis_integralPart_sum_l2Norm_sq_le
   have hφ : ∀ P ∈ integralPart W, P ≠ 0 → 1 ≤ ‖conjCoeffs K σ D P‖ := by
     intro P hP h0
     obtain ⟨α, hα⟩ := support_nonempty.2 h0
-    obtain ⟨s, hs⟩ :=
-      exists_conjugate_one_le_norm (K := K) (α := ⟨P.coeff α, hP.2 α⟩)
-        (fun h => mem_support_iff.1 hα (congrArg Subtype.val h))
+    obtain ⟨s, hs⟩ := exists_conjugate_one_le_norm (K := K) (α := ⟨P.coeff α, hP.2 α⟩)
+      (fun h => mem_support_iff.1 hα (congrArg Subtype.val h))
     exact hs.trans (PiLp.norm_apply_le (conjCoeffs K σ D P)
       (s, ⟨α, support_subset_monomialsLE.2 (hD P hP.1) hα⟩))
   have hr : ∀ p, ‖conjCoeffs K σ D (v p)‖ ≤ √(finrank ℚ K) * A * B := by
@@ -203,7 +241,7 @@ theorem exists_basis_integralPart_sum_l2Norm_sq_le
     have h1 : ∀ s : K →+* ℂ, l2Norm (map s (v p)) ≤ A * B := fun s => by
       have : map s (v p) = s (ω p.1) • map s (p.2 : MvPolynomial σ K) := by
         ext α
-        rw [coeff_smul, coeff_map, coeff_map, smul_eq_mul, ← map_mul]
+        rw [MvPolynomial.coeff_smul, coeff_map, coeff_map, smul_eq_mul, ← map_mul]
         rfl
       rw [this, vectorL2Norm_const_mul]
       exact mul_le_mul (hA s _) (hB _ p.2.2 s) (l2Norm_nonneg _) ((norm_nonneg _).trans (hA s p.1))
@@ -213,10 +251,9 @@ theorem exists_basis_integralPart_sum_l2Norm_sq_le
     rw [norm_conjCoeffs_sq (hD _ (hvH p).1), mul_pow, Real.sq_sqrt (Nat.cast_nonneg _),
       ← Embeddings.card K ℂ, ← nsmul_eq_mul, ← Finset.card_univ]
     exact Finset.sum_le_card_nsmul _ _ _ fun s _ => pow_le_pow_left₀ (l2Norm_nonneg _) (h1 s) 2
-  obtain ⟨b, hb⟩ :=
-    exists_short_basis_of_ratSpan (integralPart W) (conjCoeffs K σ D) one_pos hφ v hvH
-      (by rw [hsp]; exact fun P hP => hP.1) hr (R := R)
-      (by rw [hsp, hR]; exact Module.finrank_mul_finrank ℚ K W)
+  obtain ⟨b, hb⟩ := exists_short_basis_of_ratSpan (integralPart W) (conjCoeffs K σ D) one_pos hφ v
+    hvH (by rw [hsp]; exact fun P hP => hP.1) hr (R := R)
+    (by rw [hsp, hR]; exact Module.finrank_mul_finrank ℚ K W)
   refine ⟨b, fun i => ?_⟩
   have hne : Nonempty (κ × S) := by
     by_contra h
@@ -229,41 +266,32 @@ theorem exists_basis_integralPart_sum_l2Norm_sq_le
     ← Real.sqrt_sq h0, ← Real.sqrt_mul (by positivity)]
   exact Real.sqrt_le_sqrt (hb i)
 
-theorem exists_reduced_basis_integralPart
-    {κ : Type*}
-    (W : Submodule K (MvPolynomial σ K))
-    {D : ℕ} (hD : ∀ P ∈ W, P.totalDegree ≤ D)
-    (S : Set (MvPolynomial σ K)) (hSH : S ⊆ integralPart W) (hSW : span K S = W)
-    {B : ℝ} (hB : ∀ P ∈ S, ∀ s : K →+* ℂ, l1Norm (map s P) ≤ B)
-    (ω : κ → 𝓞 K) (hω : span ℚ (Set.range fun k => (ω k : K)) = ⊤)
-    {A : ℝ} (hA : ∀ (s : K →+* ℂ) k, ‖s (ω k)‖ ≤ A)
-    {R : ℕ} (hR : R = finrank ℚ K * finrank K W)
-    : R ≤ finrank ℚ K * (1 + D) ^ Fintype.card σ
-      ∧ ∃ b : Basis (Fin R) ℤ (integralPart W),
-        (∀ i (s : K →+* ℂ),
-            l2Norm (map s (b i : MvPolynomial σ K)) ≤ √((R + 3) / 4) * √(finrank ℚ K) * A * B)
-          ∧ (∀ i (s : K →+* ℂ),
-            l1Norm (map s (b i : MvPolynomial σ K))
-              ≤ (1 + D : ℝ) ^ ((Fintype.card σ : ℝ) / 2)
-                * (√((R + 3) / 4) * √(finrank ℚ K) * A * B))
-          ∧ (span (𝓞 K) (Set.range fun i => (b i : MvPolynomial σ K))).restrictScalars ℤ
-            = integralPart W := by
+theorem exists_reduced_basis_integralPart {κ : Type*}
+    (W : Submodule K (MvPolynomial σ K)) {D : ℕ} (hD : ∀ P ∈ W, P.totalDegree ≤ D)
+    (S : Set (MvPolynomial σ K)) (hSH : S ⊆ integralPart W) (hSW : span K S = W) {B : ℝ}
+    (hB : ∀ P ∈ S, ∀ s : K →+* ℂ, l1Norm (map s P) ≤ B)
+    (ω : κ → 𝓞 K) (hω : span ℚ (Set.range fun k => (ω k : K)) = ⊤) {A : ℝ}
+    (hA : ∀ (s : K →+* ℂ) k, ‖s (ω k)‖ ≤ A) {R : ℕ} (hR : R = finrank ℚ K * finrank K W) :
+    R ≤ finrank ℚ K * (1 + D) ^ Fintype.card σ ∧
+    ∃ b : Basis (Fin R) ℤ (integralPart W),
+      (∀ i (s : K →+* ℂ), l2Norm (map s (b i : MvPolynomial σ K)) ≤
+        √((R + 3) / 4) * √(finrank ℚ K) * A * B) ∧
+      (∀ i (s : K →+* ℂ), l1Norm (map s (b i : MvPolynomial σ K)) ≤
+        (1 + D : ℝ) ^ ((Fintype.card σ : ℝ) / 2) * (√((R + 3) / 4) * √(finrank ℚ K) * A * B)) ∧
+      (span (𝓞 K) (Set.range fun i => (b i : MvPolynomial σ K))).restrictScalars ℤ =
+        integralPart W := by
   refine ⟨hR ▸ Nat.mul_le_mul_left _ (finrank_le_one_add_pow hD), ?_⟩
-  obtain ⟨b, hb⟩ :=
-    exists_basis_integralPart_sum_l2Norm_sq_le W hD S hSH hSW
-      (fun P hP s => (l2Norm_le_l1Norm _).trans (hB P hP s))
-      ω hω hA hR
-  have h2
-      : ∀ i (s : K →+* ℂ),
-        l2Norm (map s (b i : MvPolynomial σ K))
-          ≤ √((R + 3) / 4) * √(finrank ℚ K) * A * B := fun i s =>
+  obtain ⟨b, hb⟩ := exists_basis_integralPart_sum_l2Norm_sq_le W hD S hSH hSW
+    (fun P hP s => (l2Norm_le_l1Norm _).trans (hB P hP s)) ω hω hA hR
+  have h2 : ∀ i (s : K →+* ℂ), l2Norm (map s (b i : MvPolynomial σ K)) ≤
+      √((R + 3) / 4) * √(finrank ℚ K) * A * B := fun i s =>
     (Real.le_sqrt_of_sq_le (Finset.single_le_sum
       (f := fun s : K →+* ℂ => l2Norm (map s (b i : MvPolynomial σ K)) ^ 2)
-      (fun _ _ => sq_nonneg _)
-      (Finset.mem_univ s))).trans (hb i)
+      (fun _ _ => sq_nonneg _) (Finset.mem_univ s))).trans (hb i)
   refine ⟨b, h2, fun i s => ?_, span_ringOfIntegers_basis_integralPart b⟩
   have hdeg : (map s (b i : MvPolynomial σ K)).totalDegree ≤ D :=
-    Finset.sup_le fun α hα => (le_totalDegree (support_map_subset s _ hα)).trans (hD _ (b i).2.1)
+    Finset.sup_le fun α hα =>
+      (le_totalDegree (support_map_subset s _ hα)).trans (hD _ (b i).2.1)
   refine (l1Norm_le_sqrt_choose_mul_l2Norm hdeg).trans
     (mul_le_mul ?_ (h2 i s) (l2Norm_nonneg _) (by positivity))
   rw [Real.sqrt_le_left (by positivity), ← Real.rpow_natCast, ← Real.rpow_mul (by positivity)]

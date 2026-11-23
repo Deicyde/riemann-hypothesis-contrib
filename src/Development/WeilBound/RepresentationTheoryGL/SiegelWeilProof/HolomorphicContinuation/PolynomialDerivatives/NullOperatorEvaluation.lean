@@ -1,6 +1,56 @@
 module
 
 public import Development.WeilBound.RepresentationTheoryGL.SiegelWeilProof.HolomorphicContinuation.PolynomialDerivatives.PolyExpBound
+public import Development.WeilBound.RepresentationTheoryGL.SiegelWeilProof.HolomorphicContinuation.PolynomialDerivatives.HasFDerivAtEvX
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+public import Mathlib.Analysis.Calculus.LineDeriv.IntegrationByParts
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.LocallyConvex.AbsConvexOpen
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Bool
+import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
@@ -35,16 +85,16 @@ theorem mom_sub (c : ℝ) (hc : 0 < c) (P Q : PX m n) : mom c (P - Q) = mom c P 
   funext x
   simp [evX, sub_mul]
 
-theorem mom_sum (c : ℝ) (hc : 0 < c) {ι : Type*} (s : Finset ι) (f : ι → PX m n)
-    : mom c (∑ i ∈ s, f i) = ∑ i ∈ s, mom c (f i) := by
+theorem mom_sum (c : ℝ) (hc : 0 < c) {ι : Type*} (s : Finset ι) (f : ι → PX m n) :
+    mom c (∑ i ∈ s, f i) = ∑ i ∈ s, mom c (f i) := by
   unfold mom
   rw [← MeasureTheory.integral_finsetSum s (fun i _ => integrable_pg c hc (f i))]
   congr 1
   funext x
   simp [evX, Finset.sum_mul]
 
-theorem pderiv_Sg (c : ℝ) (k : Fin m × Fin n × Bool)
-    : pderiv k (Sg c : PX m n) = C (-(c : ℂ)) * X (k.1, k.2.1, !k.2.2) := by
+theorem pderiv_Sg (c : ℝ) (k : Fin m × Fin n × Bool) :
+    pderiv k (Sg c : PX m n) = C (-(c : ℂ)) * X (k.1, k.2.1, !k.2.2) := by
   obtain ⟨a, i, b⟩ := k
   cases b <;> simp [Sg, pderiv_X, Pi.single_apply, Finset.mul_sum, mul_comm, ite_and,
     Finset.sum_ite_eq', Finset.sum_ite_eq]
@@ -52,10 +102,8 @@ theorem pderiv_Sg (c : ℝ) (k : Fin m × Fin n × Bool)
 def Qv (c : ℝ) (P : PX m n) (v : Fin m → Fin n → ℂ) : PX m n :=
   ∑ k, C (crd k v) * (pderiv k P + P * pderiv k (Sg c))
 
-theorem hasFDerivAt_pg (c : ℝ) (P : PX m n) (x : Fin m → Fin n → ℂ)
-    : HasFDerivAt
-      (fun y => evX P y * gs c y)
-      (evX P x • (gs c x • dP (Sg c) x) + gs c x • dP P x) x := by
+theorem hasFDerivAt_pg (c : ℝ) (P : PX m n) (x : Fin m → Fin n → ℂ) :
+    HasFDerivAt (fun y => evX P y * gs c y) (evX P x • (gs c x • dP (Sg c) x) + gs c x • dP P x) x := by
   have hg : HasFDerivAt (fun y : Fin m → Fin n → ℂ => gs c y) (gs c x • dP (Sg c) x) x := by
     have h := (hasFDerivAt_evX (Sg c) x).cexp
     have he : (fun y : Fin m → Fin n → ℂ => gs c y) = fun y => Complex.exp (evX (Sg c) y) :=
@@ -64,22 +112,21 @@ theorem hasFDerivAt_pg (c : ℝ) (P : PX m n) (x : Fin m → Fin n → ℂ)
     exact h
   exact (hasFDerivAt_evX P x).mul hg
 
-theorem fderiv_pg (c : ℝ) (P : PX m n) (x v : Fin m → Fin n → ℂ)
-    : fderiv ℝ (fun y => evX P y * gs c y) x v = evX (Qv c P v) x * gs c x := by
+theorem fderiv_pg (c : ℝ) (P : PX m n) (x v : Fin m → Fin n → ℂ) :
+    fderiv ℝ (fun y => evX P y * gs c y) x v = evX (Qv c P v) x * gs c x := by
   rw [(hasFDerivAt_pg c P x).fderiv]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [ContinuousLinearMap.add_apply, ContinuousLinearMap.smul_apply, dP,
-      ContinuousLinearMap.sum_apply, smul_eq_mul, Qv, evX, map_sum, map_add, map_mul, eval_C]
+
+  simp only [ContinuousLinearMap.add_apply, ContinuousLinearMap.smul_apply, dP,
+  ContinuousLinearMap.sum_apply, smul_eq_mul, Qv, evX, map_sum, map_add, map_mul, eval_C]
   rw [Finset.mul_sum, Finset.mul_sum, Finset.mul_sum, Finset.sum_mul, ← Finset.sum_add_distrib]
   refine Finset.sum_congr rfl (fun k _ => ?_)
   ring
 
-theorem integral_fderiv_pg (c : ℝ) (hc : 0 < c) (P : PX m n) (v : Fin m → Fin n → ℂ)
-    : mom c (Qv c P v) = 0 := by
+theorem integral_fderiv_pg (c : ℝ) (hc : 0 < c) (P : PX m n) (v : Fin m → Fin n → ℂ) :
+    mom c (Qv c P v) = 0 := by
   unfold mom
-  have e
-      : (fun x => evX (Qv c P v) x * gs c x)
-        = fun x => (1 : ℂ) * fderiv ℝ (fun y => evX P y * gs c y) x v := by
+  have e : (fun x => evX (Qv c P v) x * gs c x) =
+      fun x => (1 : ℂ) * fderiv ℝ (fun y => evX P y * gs c y) x v := by
     funext x
     rw [fderiv_pg, one_mul]
   rw [e, integral_mul_fderiv_eq_neg_fderiv_mul_of_integrable]
@@ -92,13 +139,11 @@ theorem integral_fderiv_pg (c : ℝ) (hc : 0 < c) (P : PX m n) (v : Fin m → Fi
   · intro x _
     exact (hasFDerivAt_pg c P x).differentiableAt
 
-def ev1 (k : Fin m × Fin n × Bool) (z : ℂ) : Fin m → Fin n → ℂ := fun a i =>
-  if a = k.1 ∧ i = k.2.1 then z else 0
+def ev1 (k : Fin m × Fin n × Bool) (z : ℂ) : Fin m → Fin n → ℂ := fun a i => if a = k.1 ∧ i = k.2.1 then z else 0
 
-theorem null_operator_evaluation (c : ℝ) (P : PX m n) (k : Fin m × Fin n × Bool) (z : ℂ)
-    : Qv c P (ev1 k z)
-      = C z * (pderiv (k.1, k.2.1, false) P + P * pderiv (k.1, k.2.1, false) (Sg c))
-        + C (star z) * (pderiv (k.1, k.2.1, true) P + P * pderiv (k.1, k.2.1, true) (Sg c)) := by
+theorem null_operator_evaluation (c : ℝ) (P : PX m n) (k : Fin m × Fin n × Bool) (z : ℂ) :
+    Qv c P (ev1 k z) = C z * (pderiv (k.1, k.2.1, false) P + P * pderiv (k.1, k.2.1, false) (Sg c)) +
+      C (star z) * (pderiv (k.1, k.2.1, true) P + P * pderiv (k.1, k.2.1, true) (Sg c)) := by
   obtain ⟨a, i, b⟩ := k
   unfold Qv
   rw [Fintype.sum_prod_type, Finset.sum_eq_single a, Fintype.sum_prod_type, Finset.sum_eq_single i,
@@ -111,23 +156,21 @@ theorem null_operator_evaluation (c : ℝ) (P : PX m n) (k : Fin m × Fin n × B
     simp [crd_apply, ev1, hj]
   · simp
 
-theorem mom_dPhi (c : ℝ) (hc : 0 < c) (k : Fin m × Fin n × Bool) (P : PX m n)
-    : mom c (pderiv k P - C (c : ℂ) * X (k.1, k.2.1, !k.2.2) * P) = 0 := by
+theorem mom_dPhi (c : ℝ) (hc : 0 < c) (k : Fin m × Fin n × Bool) (P : PX m n) :
+    mom c (pderiv k P - C (c : ℂ) * X (k.1, k.2.1, !k.2.2) * P) = 0 := by
   obtain ⟨a, i, b⟩ := k
   have h1 := integral_fderiv_pg c hc P (ev1 (a, i, b) 1)
   have h2 := integral_fderiv_pg c hc P (ev1 (a, i, b) Complex.I)
   rw [null_operator_evaluation, mom_add c hc, mom_C_mul, mom_C_mul] at h1 h2
   simp only [star_one, one_mul, Complex.star_def, Complex.conj_I] at h1 h2
   have hu : mom c (pderiv (a, i, false) P + P * pderiv (a, i, false) (Sg c)) = 0 := by
-    have h3
-        : 2 * Complex.I * mom c (pderiv (a, i, false) P + P * pderiv (a, i, false) (Sg c)) = 0 := by
+    have h3 : 2 * Complex.I * mom c (pderiv (a, i, false) P + P * pderiv (a, i, false) (Sg c)) = 0 := by
       linear_combination h2 + Complex.I * h1
     simpa [Complex.I_ne_zero] using h3
   have hw : mom c (pderiv (a, i, true) P + P * pderiv (a, i, true) (Sg c)) = 0 := by
     linear_combination h1 - hu
-  have key
-      : pderiv (a, i, b) P - C (c : ℂ) * X (a, i, !b) * P
-        = pderiv (a, i, b) P + P * pderiv (a, i, b) (Sg c) := by
+  have key : pderiv (a, i, b) P - C (c : ℂ) * X (a, i, !b) * P =
+      pderiv (a, i, b) P + P * pderiv (a, i, b) (Sg c) := by
     rw [pderiv_Sg, map_neg]
     ring
   rw [key]

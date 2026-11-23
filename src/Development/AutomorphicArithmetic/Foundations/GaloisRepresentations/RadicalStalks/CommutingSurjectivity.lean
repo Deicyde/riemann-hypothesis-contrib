@@ -1,36 +1,80 @@
 module
 
-public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentations.RadicalStalks.IsConst
-public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.CrystallinePull2SumCup
+public import Development.AbelianVarietyTheory.Definitions.Divisors.NotCompactOfMEqOne
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Development.AbelianVarietyTheory.Definitions.Divisors.ExistsTjCorrDiagModel
+import Development.AbelianVarietyTheory.Definitions.Divisors.IsKSValueOneOfRetraction
+import Development.AbelianVarietyTheory.Definitions.Divisors.Pullback1MemHodgeFiltration
+import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsDeRhamSheafIffAlt
+import Development.AutomorphicArithmetic.Foundations.GaloisRepresentations.RadicalStalks.IsConst
 
 @[expose] public section
 
-open CategoryTheory AlgebraicGeometry Limits MonoidalCategory CartesianMonoidalCategory MonObj
-  NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
-  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.Cris GlobalTheory.DeRham
-  GlobalTheory.ConjSeq GlobalTheory.UPel.HT GlobalTheory.UPel.HT.ES UpperTheory.Gal.Ord
+open CategoryTheory AlgebraicGeometry Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.Cris GlobalTheory.DeRham GlobalTheory.ConjSeq GlobalTheory.UPel.HT GlobalTheory.UPel.HT.ES UpperTheory.Gal.Ord
 open scoped TensorProduct
 
-private theorem laurent_adjoin_eq_of_image_eq
-    {F O : Type}
-    [Field F] [NumberField F] [Ring O] [Algebra (𝓞 F) O] [Module.Free ℤ O] [Module.Finite ℤ O]
-    (h0 : 0 < Module.finrank ℤ O)
-    : Function.Injective (algebraMap (𝓞 F) O) := by
+private theorem laurent_adjoin_eq_of_image_eq {F O : Type} [Field F] [NumberField F] [Ring O] [Algebra (𝓞 F) O]
+    [Module.Free ℤ O] [Module.Finite ℤ O] (h0 : 0 < Module.finrank ℤ O) :
+    Function.Injective (algebraMap (𝓞 F) O) := by
   classical
-  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
-    rw [injective_iff_map_eq_zero]
+  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
   intro x hx
   by_contra hne
-  have hI : Ideal.span {x} ≠ ⊥ := by rwa [Ne, Ideal.span_singleton_eq_bot]
+  have hI : Ideal.span {x} ≠ ⊥ := by
+    rwa [Ne, Ideal.span_singleton_eq_bot]
   have hmem : ((Ideal.absNorm (Ideal.span {x}) : ℕ) : 𝓞 F) ∈ Ideal.span {x} := Ideal.absNorm_mem _
   obtain ⟨y, hy⟩ := Ideal.mem_span_singleton'.mp hmem
-  have hn0 : Ideal.absNorm (Ideal.span {x}) ≠ 0 := by rwa [Ne, Ideal.absNorm_eq_zero_iff]
+  have hn0 : Ideal.absNorm (Ideal.span {x}) ≠ 0 := by
+    rwa [Ne, Ideal.absNorm_eq_zero_iff]
   have h1 : ((Ideal.absNorm (Ideal.span {x}) : ℕ) : O) = 0 := by
     rw [← map_natCast (algebraMap (𝓞 F) O), ← hy, map_mul, hx, mul_zero]
-  have h2
-      : ((Ideal.absNorm (Ideal.span {x}) : ℕ) : ℤ) • (1 : O)
-        = ((Ideal.absNorm (Ideal.span {x}) : ℕ) : ℤ) • (0 : O) := by
+  have h2 : ((Ideal.absNorm (Ideal.span {x}) : ℕ) : ℤ) • (1 : O) =
+      ((Ideal.absNorm (Ideal.span {x}) : ℕ) : ℤ) • (0 : O) := by
     rw [smul_zero, zsmul_eq_mul, _root_.mul_one]
     exact_mod_cast h1
   have h3 : (1 : O) = 0 := smul_right_injective O (by exact_mod_cast hn0) h2
@@ -38,16 +82,14 @@ private theorem laurent_adjoin_eq_of_image_eq
   rw [Module.finrank_zero_of_subsingleton] at h0
   exact lt_irrefl 0 h0
 
-private theorem wachExpansion_smul_compatible
-    {F O : Type}
-    [Field F] [NumberField F] [Ring O] [Algebra (𝓞 F) O] [Module.Free ℤ O] [Module.Finite ℤ O]
-    (hr : Module.finrank ℤ O = Module.finrank ℚ F) (hinj : Function.Injective (algebraMap (𝓞 F) O))
-    (x : O)
-    : ∃ e : ℤ, e ≠ 0 ∧ ∃ c : 𝓞 F, e • x = algebraMap (𝓞 F) O c := by
+private theorem wachExpansion_smul_compatible {F O : Type} [Field F] [NumberField F] [Ring O] [Algebra (𝓞 F) O]
+    [Module.Free ℤ O] [Module.Finite ℤ O] (hr : Module.finrank ℤ O = Module.finrank ℚ F)
+    (hinj : Function.Injective (algebraMap (𝓞 F) O)) (x : O) :
+    ∃ e : ℤ, e ≠ 0 ∧ ∃ c : 𝓞 F, e • x = algebraMap (𝓞 F) O c := by
   classical
   let b := Module.finBasis ℤ (𝓞 F)
-  let v : Option (Fin (Module.finrank ℤ (𝓞 F))) → O := fun o =>
-    Option.elim o x (fun i => algebraMap (𝓞 F) O (b i))
+  let v : Option (Fin (Module.finrank ℤ (𝓞 F))) → O :=
+    fun o => Option.elim o x (fun i => algebraMap (𝓞 F) O (b i))
   have hcard : ¬ LinearIndependent ℤ v := by
     intro hli
     have hle := hli.fintype_card_le_finrank
@@ -55,11 +97,10 @@ private theorem wachExpansion_smul_compatible
     omega
   obtain ⟨g, hg, i, hi⟩ := Fintype.not_linearIndependent_iff.mp hcard
   rw [Fintype.sum_option] at hg
-  have hmap
-      : algebraMap (𝓞 F) O (∑ j, g (some j) • b j)
-        = ∑ j, g (some j) • algebraMap (𝓞 F) O (b j) := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+  have hmap : algebraMap (𝓞 F) O (∑ j, g (some j) • b j) =
+      ∑ j, g (some j) • algebraMap (𝓞 F) O (b j) := by
+
+    rw [map_sum]
     simp only [map_zsmul]
   have hg' : g none • x + algebraMap (𝓞 F) O (∑ j, g (some j) • b j) = 0 := by
     rw [hmap]
@@ -76,12 +117,11 @@ private theorem wachExpansion_smul_compatible
   rw [map_neg, eq_neg_iff_add_eq_zero]
   exact hg'
 
-private theorem surj_comm
-    {F O : Type}
-    [Field F] [NumberField F] [CommRing O] [Algebra (𝓞 F) O] [Module.Free ℤ O] [Module.Finite ℤ O]
+private theorem surj_comm {F O : Type} [Field F] [NumberField F] [CommRing O] [Algebra (𝓞 F) O]
+    [Module.Free ℤ O] [Module.Finite ℤ O]
     (hinj : Function.Injective (algebraMap (𝓞 F) O))
-    (hs : ∀ x : O, ∃ e : ℤ, e ≠ 0 ∧ ∃ c : 𝓞 F, e • x = algebraMap (𝓞 F) O c)
-    : Function.Surjective (algebraMap (𝓞 F) O) := by
+    (hs : ∀ x : O, ∃ e : ℤ, e ≠ 0 ∧ ∃ c : 𝓞 F, e • x = algebraMap (𝓞 F) O c) :
+    Function.Surjective (algebraMap (𝓞 F) O) := by
   classical
   intro x
   obtain ⟨e, he, c, hc⟩ := hs x
@@ -108,7 +148,9 @@ private theorem surj_comm
     apply RingOfIntegers.ext
     show ((e : 𝓞 F) : F) * ((c : F) / e) = (c : F)
     have hcoe : ((e : 𝓞 F) : F) = (e : F) := by
-      first | simp | exact map_intCast (algebraMap (𝓞 F) F) e
+      first
+        | simp
+        | exact map_intCast (algebraMap (𝓞 F) F) e
     rw [hcoe]
     field_simp
   refine ⟨d, ?_⟩
@@ -116,11 +158,9 @@ private theorem surj_comm
   show e • algebraMap (𝓞 F) O d = e • x
   rw [hc, ← hed, map_mul, map_intCast, zsmul_eq_mul]
 
-private theorem exists_finset_adjoin_laurent_preimage
-    {F O : Type}
-    [Field F] [NumberField F] [Ring O] [Algebra (𝓞 F) O] [Module.Free ℤ O] [Module.Finite ℤ O]
-    (hr : Module.finrank ℤ O = Module.finrank ℚ F)
-    : Function.Surjective (algebraMap (𝓞 F) O) := by
+private theorem exists_finset_adjoin_laurent_preimage {F O : Type} [Field F] [NumberField F] [Ring O] [Algebra (𝓞 F) O]
+    [Module.Free ℤ O] [Module.Finite ℤ O] (hr : Module.finrank ℤ O = Module.finrank ℚ F) :
+    Function.Surjective (algebraMap (𝓞 F) O) := by
   have hpos : 0 < Module.finrank ℤ O := by
     rw [hr]
     exact Module.finrank_pos
@@ -132,9 +172,7 @@ private theorem exists_finset_adjoin_laurent_preimage
     obtain ⟨b, hb, c', hc'⟩ := hs y
     apply smul_right_injective O (mul_ne_zero ha hb)
     show (a * b) • (x * y) = (a * b) • (y * x)
-    calc
-      (a * b) • (x * y)
-        = (a • x) * (b • y) := by rw [smul_mul_smul_comm]
+    calc (a * b) • (x * y) = (a • x) * (b • y) := by rw [smul_mul_smul_comm]
       _ = algebraMap (𝓞 F) O (c * c') := by rw [hc, hc', map_mul]
       _ = algebraMap (𝓞 F) O (c' * c) := by rw [_root_.mul_comm c c']
       _ = (b • y) * (a • x) := by rw [hc, hc', map_mul]
@@ -142,9 +180,8 @@ private theorem exists_finset_adjoin_laurent_preimage
   letI : CommRing O := { (inferInstance : Ring O) with mul_comm := hcomm }
   exact surj_comm hinj hs
 
-theorem UpperTheory.Gal.Ord.surjO
-    : ∀ (p : ℕ) [Fact p.Prime] (D : Datum p),
-      D.m = 1 → Function.Surjective (algebraMap (𝓞 D.F) D.O) := by
+theorem UpperTheory.Gal.Ord.surjO :
+    ∀ (p : ℕ) [Fact p.Prime] (D : Datum p), D.m = 1 → Function.Surjective (algebraMap (𝓞 D.F) D.O) := by
   intro p _ D hm
   haveI := D.freeO
   haveI := D.finO

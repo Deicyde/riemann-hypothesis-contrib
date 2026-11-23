@@ -1,8 +1,49 @@
 module
 
-public import Mathlib
 public import Formalism.SharpRestriction.CuspSpanNormBounds.BlockEnds
-public import Formalism.SharpRestriction.CuspSpanNormBounds.IsPrimitiveSub
+public import Mathlib.RingTheory.Nilpotent.Exp
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
@@ -14,15 +55,12 @@ namespace Formalism.L2.SG.NonRelPf
 
 variable {E : Type} [Field E] [NumberField E] [StarRing E] {S : HSpace E} {r : ℕ} {T : E}
 
-@[reducible]
-def qMod (S : HSpace E) : Module ℚ (Module.End E S.V) :=
+@[reducible] def qMod (S : HSpace E) : Module ℚ (Module.End E S.V) :=
   Module.compHom (Module.End E S.V) (algebraMap ℚ E)
 
 attribute [local instance] qMod
 
-theorem qsmul_apply (q : ℚ) (A : Module.End E S.V) (x : S.V)
-    : (q • A) x = (algebraMap ℚ E q) • A x :=
-  rfl
+theorem qsmul_apply (q : ℚ) (A : Module.End E S.V) (x : S.V) : (q • A) x = (algebraMap ℚ E q) • A x := rfl
 
 section Xa
 
@@ -32,8 +70,7 @@ theorem Xa_zero : F.Xa 0 = ⊥ := by
   unfold FlagG.Xa
   simp
 
-theorem Xa_mono {a b : ℕ} (h : a ≤ b) : F.Xa a ≤ F.Xa b :=
-  Submodule.span_mono (Set.image_mono fun (i : Fin r) (hi : i.1 < a) => lt_of_lt_of_le hi h)
+theorem Xa_mono {a b : ℕ} (h : a ≤ b) : F.Xa a ≤ F.Xa b := Submodule.span_mono (Set.image_mono fun (i : Fin r) (hi : i.1 < a) => lt_of_lt_of_le hi h)
 
 theorem Xa_ge {a : ℕ} (h : r ≤ a) : F.Xa a = F.X := by
   unfold FlagG.Xa FlagG.X
@@ -45,12 +82,10 @@ theorem Xa_min (a : ℕ) : F.Xa a = F.Xa (min a r) := by
   · rw [min_eq_left h]
   · rw [min_eq_right h, Xa_ge F h, Xa_ge F le_rfl]
 
-theorem e_mem_Xa (a : Fin r) : F.e a ∈ F.Xa (a.1 + 1) :=
-  Submodule.subset_span ⟨a, Nat.lt_succ_self _, rfl⟩
+theorem e_mem_Xa (a : Fin r) : F.e a ∈ F.Xa (a.1 + 1) := Submodule.subset_span ⟨a, Nat.lt_succ_self _, rfl⟩
 
-theorem hT_Xa_zero
-    (f : S.V) (a : ℕ) (hf : ∀ b : Fin r, b.1 < a → S.hT f (F.e b) = 0) {x : S.V} (hx : x ∈ F.Xa a)
-    : S.hT f x = 0 := by
+theorem hT_Xa_zero (f : S.V) (a : ℕ) (hf : ∀ b : Fin r, b.1 < a → S.hT f (F.e b) = 0) {x : S.V}
+    (hx : x ∈ F.Xa a) : S.hT f x = 0 := by
   have hle : F.Xa a ≤ LinearMap.ker (S.hT f) := by
     unfold FlagG.Xa
     rw [Submodule.span_le]
@@ -58,20 +93,19 @@ theorem hT_Xa_zero
     exact LinearMap.mem_ker.mpr (hf b hb)
   exact LinearMap.mem_ker.mp (hle hx)
 
-theorem hT_eq_coefX
-    (f : S.V) (a : Fin r) (hf : ∀ b, S.hT f (F.e b) = if b = a then 1 else 0)
-    {x : S.V} (hx : x ∈ F.X)
-    : S.hT f x = F.coefX x a := by
+theorem hT_eq_coefX (f : S.V) (a : Fin r) (hf : ∀ b, S.hT f (F.e b) = if b = a then 1 else 0) {x : S.V}
+    (hx : x ∈ F.X) : S.hT f x = F.coefX x a := by
   classical
   have hx' : x ∈ Submodule.span E (Set.range F.e) := hx
-  have hc : F.coefX x a = F.e_indep.repr ⟨x, hx'⟩ a := by simp [FlagG.coefX, hx']
+  have hc : F.coefX x a = F.e_indep.repr ⟨x, hx'⟩ a := by
+    simp [FlagG.coefX, hx']
   rw [hc]
   have hsum : x = ∑ b, F.e_indep.repr ⟨x, hx'⟩ b • F.e b := by
     have h1 := F.e_indep.linearCombination_repr ⟨x, hx'⟩
     rw [Finsupp.linearCombination_apply, Finsupp.sum_fintype _ _ (by simp)] at h1
     exact h1.symm
   conv_lhs => rw [hsum]
-  set_option synthInstance.maxHeartbeats 100000 in
+
   simp [map_sum, map_smul, hf]
 
 end Xa
@@ -80,8 +114,8 @@ section Lie
 
 variable {F : FlagG S r T} {Y : Module.End E S.V}
 
-theorem lie_skew_pow (hY : Y ∈ F.LieN) (k : ℕ) (x y : S.V)
-    : S.hT x ((Y ^ k) y) = (-1) ^ k * S.hT ((Y ^ k) x) y := by
+theorem lie_skew_pow (hY : Y ∈ F.LieN) (k : ℕ) (x y : S.V) :
+    S.hT x ((Y ^ k) y) = (-1) ^ k * S.hT ((Y ^ k) x) y := by
   induction k generalizing x y with
   | zero => simp
   | succ k ih =>
@@ -91,16 +125,15 @@ theorem lie_skew_pow (hY : Y ∈ F.LieN) (k : ℕ) (x y : S.V)
     rw [h1, h2, ih, pow_succ]
     linear_combination ((-1 : E) ^ k) * h3
 
-theorem lie_Xa (hY : Y ∈ F.LieN) {j : ℕ} (hj : j ≤ r) {x : S.V} (hx : x ∈ F.Xa j)
-    : Y x ∈ F.Xa (j - 1) := by
+theorem lie_Xa (hY : Y ∈ F.LieN) {j : ℕ} (hj : j ≤ r) {x : S.V} (hx : x ∈ F.Xa j) : Y x ∈ F.Xa (j - 1) := by
   rcases Nat.eq_zero_or_pos j with rfl | hj0
   · rw [Xa_zero F] at hx
     rw [(Submodule.mem_bot E).1 hx, map_zero]
     exact Submodule.zero_mem _
   · exact hY.2.1 j hj0 hj x hx
 
-theorem lie_pow_Xa (hY : Y ∈ F.LieN) (k : ℕ) {j : ℕ} (hj : j ≤ r) {x : S.V} (hx : x ∈ F.Xa j)
-    : (Y ^ k) x ∈ F.Xa (j - k) := by
+theorem lie_pow_Xa (hY : Y ∈ F.LieN) (k : ℕ) {j : ℕ} (hj : j ≤ r) {x : S.V} (hx : x ∈ F.Xa j) :
+    (Y ^ k) x ∈ F.Xa (j - k) := by
   induction k with
   | zero => simpa using hx
   | succ k ih =>
@@ -153,14 +186,12 @@ theorem sY_nilp (hY : Y ∈ F.LieN) : (s • Y) ^ (2 * r + 1) = 0 := by
 
 theorem sY_isNilp (hY : Y ∈ F.LieN) : IsNilpotent (s • Y) := ⟨2 * r + 1, sY_nilp s hY⟩
 
-theorem nexp_apply (hY : Y ∈ F.LieN) (x : S.V)
-    : nexp Y s x
-      = ∑ i ∈ Finset.range (2 * r + 1), (algebraMap ℚ E (i.factorial : ℚ)⁻¹ * s ^ i) • (Y ^ i) x :=
-  by
-    unfold nexp
-    rw [IsNilpotent.exp_eq_sum (sY_nilp s hY), LinearMap.sum_apply]
-    refine Finset.sum_congr rfl fun i _ => ?_
-    rw [qsmul_apply, smul_pow, LinearMap.smul_apply, mul_smul]
+theorem nexp_apply (hY : Y ∈ F.LieN) (x : S.V) :
+    nexp Y s x = ∑ i ∈ Finset.range (2 * r + 1), (algebraMap ℚ E (i.factorial : ℚ)⁻¹ * s ^ i) • (Y ^ i) x := by
+  unfold nexp
+  rw [IsNilpotent.exp_eq_sum (sY_nilp s hY), LinearMap.sum_apply]
+  refine Finset.sum_congr rfl fun i _ => ?_
+  rw [qsmul_apply, smul_pow, LinearMap.smul_apply, mul_smul]
 
 variable {s}
 
@@ -168,10 +199,10 @@ theorem star_alg_rat (q : ℚ) : star (algebraMap ℚ E q) = algebraMap ℚ E q 
   rw [eq_ratCast (algebraMap ℚ E) q]
   exact star_ratCast q
 
-theorem nexp_adj (hY : Y ∈ F.LieN) (hs : star s = s) (x y : S.V)
-    : S.hT (nexp Y s x) y = S.hT x (nexp Y (-s) y) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [nexp_apply s hY, nexp_apply (-s) hY, map_sum, LinearMap.sum_apply, map_sum]
+theorem nexp_adj (hY : Y ∈ F.LieN) (hs : star s = s) (x y : S.V) :
+    S.hT (nexp Y s x) y = S.hT x (nexp Y (-s) y) := by
+
+  rw [nexp_apply s hY, nexp_apply (-s) hY, map_sum, LinearMap.sum_apply, map_sum]
   refine Finset.sum_congr rfl fun i _ => ?_
   have hsk := lie_skew_pow hY i x y
   have hsk' : S.hT ((Y ^ i) x) y = (-1) ^ i * S.hT x ((Y ^ i) y) := by
@@ -198,22 +229,18 @@ def nexpE (hY : Y ∈ F.LieN) (s : E) : S.V ≃ₗ[E] S.V :=
 
 theorem nexpE_apply (hY : Y ∈ F.LieN) (x : S.V) : nexpE hY s x = nexp Y s x := rfl
 
-theorem nexpE_isom (hY : Y ∈ F.LieN) (hs : star s = s)
-    : nexpE hY s ∈ Formalism.HermitianLatticesTheory.isom S.hT := by
+theorem nexpE_isom (hY : Y ∈ F.LieN) (hs : star s = s) : nexpE hY s ∈ Formalism.HermitianLatticesTheory.isom S.hT := by
   show ∀ x y, S.hT (nexpE hY s x) (nexpE hY s y) = S.hT x y
   intro x y
   rw [nexpE_apply, nexpE_apply, nexp_adj hY hs, ← Module.End.mul_apply, nexp_neg_mul hY,
     Module.End.one_apply]
 
-theorem nexp_sub (hY : Y ∈ F.LieN) (x : S.V)
-    : nexp Y s x - x
-      = ∑ i ∈ Finset.Ico 1 (2 * r + 1), (algebraMap ℚ E (i.factorial : ℚ)⁻¹ * s ^ i) • (Y ^ i) x :=
-  by
-    rw [nexp_apply s hY, Finset.range_eq_Ico, Finset.sum_eq_sum_Ico_succ_bot (by omega)]
-    simp
+theorem nexp_sub (hY : Y ∈ F.LieN) (x : S.V) :
+    nexp Y s x - x = ∑ i ∈ Finset.Ico 1 (2 * r + 1), (algebraMap ℚ E (i.factorial : ℚ)⁻¹ * s ^ i) • (Y ^ i) x := by
+  rw [nexp_apply s hY, Finset.range_eq_Ico, Finset.sum_eq_sum_Ico_succ_bot (by omega)]
+  simp
 
-theorem nexp_Xa (hY : Y ∈ F.LieN) (j : ℕ) {x : S.V} (hx : x ∈ F.Xa (j + 1))
-    : nexp Y s x - x ∈ F.Xa j := by
+theorem nexp_Xa (hY : Y ∈ F.LieN) (j : ℕ) {x : S.V} (hx : x ∈ F.Xa (j + 1)) : nexp Y s x - x ∈ F.Xa j := by
   rw [nexp_sub hY]
   refine Submodule.sum_mem _ fun i hi => Submodule.smul_mem _ _ ?_
   have hi1 : 1 ≤ i := (Finset.mem_Ico.1 hi).1
@@ -227,11 +254,9 @@ theorem nexp_perp (hY : Y ∈ F.LieN) {x : S.V} (hx : x ∈ perpS S F.X) : nexp 
   rw [pow_succ, Module.End.mul_apply]
   exact lie_pow_X hY k (hY.2.2 x hx)
 
-theorem nexp_root
-    (hY : Y ∈ F.LieN)
-    (f : S.V) (a : Fin r) (hf : ∀ b, S.hT f (F.e b) = if b = a then 1 else 0)
-    (hfz : S.hT f F.z = 0)
-    : S.hT f (nexp Y s (F.fvec a.succ)) = s * F.coefX (Y (F.fvec a.succ)) a := by
+theorem nexp_root (hY : Y ∈ F.LieN) (f : S.V) (a : Fin r)
+    (hf : ∀ b, S.hT f (F.e b) = if b = a then 1 else 0) (hfz : S.hT f F.z = 0) :
+    S.hT f (nexp Y s (F.fvec a.succ)) = s * F.coefX (Y (F.fvec a.succ)) a := by
   have ha := a.isLt
   have hXa1 : F.Xa (a.1 + 1) ≤ F.X := by
     rw [← Xa_ge F (le_refl r)]
@@ -248,7 +273,8 @@ theorem nexp_root
   obtain ⟨hw, hfv⟩ : Y (F.fvec a.succ) ∈ F.Xa (a.1 + 1) ∧ S.hT f (F.fvec a.succ) = 0 := by
     by_cases h : a.1 + 1 < r
     · have hs : a.succ = (⟨a.1 + 1, h⟩ : Fin r).castSucc := Fin.ext (by simp)
-      have he : F.fvec a.succ = F.e ⟨a.1 + 1, h⟩ := by rw [FlagG.fvec, hs, Fin.snoc_castSucc]
+      have he : F.fvec a.succ = F.e ⟨a.1 + 1, h⟩ := by
+        rw [FlagG.fvec, hs, Fin.snoc_castSucc]
       rw [he]
       refine ⟨?_, ?_⟩
       · have h1 := lie_Xa hY (j := a.1 + 1 + 1) h (e_mem_Xa F ⟨a.1 + 1, h⟩)
@@ -262,8 +288,8 @@ theorem nexp_root
       have hr : a.1 + 1 = r := by omega
       rw [he, hr, Xa_ge F le_rfl]
       exact ⟨hY.2.2 _ hzperp, hfz⟩
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [nexp_apply s hY, map_sum, Finset.sum_eq_single 1]
+
+  rw [nexp_apply s hY, map_sum, Finset.sum_eq_single 1]
   · simp only [pow_one, map_smul, smul_eq_mul, Nat.factorial_one, Nat.cast_one, inv_one, map_one,
       one_mul]
     rw [hT_eq_coefX F f a hf (hXa1 hw)]

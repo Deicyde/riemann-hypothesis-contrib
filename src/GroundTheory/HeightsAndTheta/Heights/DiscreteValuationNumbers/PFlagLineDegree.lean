@@ -1,8 +1,57 @@
 module
 
-public import Mathlib
 public import GroundTheory.HeightsAndTheta.Heights.DiscreteValuationNumbers.StatementsFlagLineDegree
 public import GroundTheory.HeightsAndTheta.Heights.FieldsOfNumbers.PSplitRelDeg
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Sub.Prod
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
+public import Mathlib.RingTheory.AlgebraicIndependent.Basic
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.IsSemipositiveOn
 
 @[expose] public section
 
@@ -34,8 +83,8 @@ theorem cone_of_isMultiHomog
       = C (eval₂ r x h) * ∏ k, (X (τ k) : MvPolynomial Kt S) ^ D k := by
   conv_lhs => rw [h.as_sum]
   conv_rhs => rw [h.as_sum]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum, eval₂_sum, map_sum, Finset.sum_mul]
+
+  rw [map_sum, eval₂_sum, map_sum, Finset.sum_mul]
   refine Finset.sum_congr rfl fun μ hμ => ?_
   rw [eval₂Hom_monomial, eval₂_monomial, Finsupp.prod_fintype _ _ (fun _ => pow_zero _),
     Finsupp.prod_fintype _ _ (fun _ => pow_zero _)]
@@ -132,8 +181,8 @@ theorem subst_homog
       rw [this]
       exact isWeightedHomogeneous_X F _ _
   have hD : (fun k => D (some k) + D none * m) = L D := rfl
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [hD, h.as_sum, map_sum]
+
+  rw [hD, h.as_sum, map_sum]
   apply IsWeightedHomogeneous.sum
   intro μ hμ
   rw [aeval_monomial, algebraMap_eq, Finsupp.prod]
@@ -145,8 +194,8 @@ theorem subst_homog
         (fun v _ => (hω v).pow (μ v)))
   rw [zero_add] at this
   have e : L D = ∑ i ∈ μ.support, μ i • L (blockWeight _ i) := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← hh (mem_support_iff.mp hμ), Finsupp.weight_apply, Finsupp.sum, map_sum]
+
+    rw [← hh (mem_support_iff.mp hμ), Finsupp.weight_apply, Finsupp.sum, map_sum]
     simp only [map_nsmul]
   rw [e]
   exact this
@@ -176,8 +225,8 @@ theorem FlagLineDegree.proof : FlagLineDegree.Statement := by
   have hφv : ∀ l, φ l v = s * φ l (w i0) := by
     intro l
     conv_lhs => rw [← w.sum_repr v]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, Finset.sum_eq_single i0]
+
+    rw [map_sum, Finset.sum_eq_single i0]
     · rw [map_smul, smul_eq_mul, hvs]
     · intro j _ hj
       have hj' : i0 < j := by

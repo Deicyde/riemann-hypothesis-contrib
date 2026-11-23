@@ -1,8 +1,59 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.Definitions.Divisors.HasBlockOfOccurs
+public import Formalism.ConjugateSelfDual.Statement
+public import Formalism.SharpRestriction.LevelLetterCocycles.DataNLoc
+public import Mathlib.RingTheory.Flat.FaithfullyFlat.Basic
+public import Mathlib.RingTheory.Flat.TorsionFree
+public import Mathlib.RingTheory.Henselian
+public import Mathlib.RingTheory.RegularLocalRing.Defs
+public import Mathlib.RingTheory.SimpleRing.Principal
+public import Mathlib.Topology.Instances.Matrix
 public import Formalism.LocalRingCardinality.SpanPowerMembership.NDLocE
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Real
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.FieldTheory.Galois.Profinite
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Coalgebra.IsFrobenius
+import Mathlib.RingTheory.HopfAlgebra.Basic
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -37,8 +88,7 @@ def vec {n : ℕ} (v : Fin n → ↥(OL LL)) : Fin n → PadicAlgCl l := fun j =
 
 variable {E Ω : Type} [Field E] [Field Ω] [Algebra E Ω] {n : ℕ}
 
-def stab (LL : FinExt l) (r : G E Ω →* GL (Fin n) (PadicAlgCl l))
-    : Submodule ↥(OL LL) (Fin n → ↥(OL LL)) where
+def stab (LL : FinExt l) (r : G E Ω →* GL (Fin n) (PadicAlgCl l)) : Submodule ↥(OL LL) (Fin n → ↥(OL LL)) where
   carrier := {v | ∀ g i, ‖(r g : Matrix (Fin n) (Fin n) (PadicAlgCl l)).mulVec (vec v) i‖ ≤ 1}
   zero_mem' := by
     intro g i
@@ -55,44 +105,30 @@ def stab (LL : FinExt l) (r : G E Ω →* GL (Fin n) (PadicAlgCl l))
     rw [this, Matrix.mulVec_smul, Pi.smul_apply, norm_smul]
     exact mul_le_one₀ (norm_emb_le LL a) (norm_nonneg _) (hv g i)
 
-theorem stab_stable
-    (LL : FinExt l) (r : G E Ω →* GL (Fin n) (PadicAlgCl l))
-    (hLL : ∀ g i j, (r g : Matrix (Fin n) (Fin n) (PadicAlgCl l)) i j ∈ LL.1)
-    (v : Fin n → ↥(OL LL)) (hv : v ∈ stab LL r)
-    (g : G E Ω)
-    : ∃ u ∈ stab LL r, vec u = (r g : Matrix (Fin n) (Fin n) (PadicAlgCl l)).mulVec (vec v) := by
-  have hmem
-      : ∀ i, (r g : Matrix (Fin n) (Fin n) (PadicAlgCl l)).mulVec (vec v) i ∈ LL.1 := fun i => by
+theorem stab_stable (LL : FinExt l) (r : G E Ω →* GL (Fin n) (PadicAlgCl l))
+    (hLL : ∀ g i j, (r g : Matrix (Fin n) (Fin n) (PadicAlgCl l)) i j ∈ LL.1) (v : Fin n → ↥(OL LL)) (hv : v ∈ stab LL r) (g : G E Ω) :
+    ∃ u ∈ stab LL r, vec u = (r g : Matrix (Fin n) (Fin n) (PadicAlgCl l)).mulVec (vec v) := by
+  have hmem : ∀ i, (r g : Matrix (Fin n) (Fin n) (PadicAlgCl l)).mulVec (vec v) i ∈ LL.1 := fun i => by
     simp only [Matrix.mulVec, dotProduct]
     exact LL.1.sum_mem fun j _ => LL.1.mul_mem (hLL g i j) (emb_mem LL (v j))
   refine ⟨fun i => lift LL _ (hmem i) (hv g i), ?_, rfl⟩
   intro g' i
-  have e
-      : vec (fun i => lift LL _ (hmem i) (hv g i))
-        = (r g : Matrix (Fin n) (Fin n) (PadicAlgCl l)).mulVec (vec v) :=
-    rfl
+  have e : vec (fun i => lift LL _ (hmem i) (hv g i)) = (r g : Matrix (Fin n) (Fin n) (PadicAlgCl l)).mulVec (vec v) := rfl
   rw [e, Matrix.mulVec_mulVec, ← Units.val_mul, ← map_mul]
   exact hv (g' * g) i
 
-theorem bdd
-    [NumberField E] [IsAlgClosure E Ω] (r : G E Ω →* GL (Fin n) (PadicAlgCl l)) (hr : Continuous r)
-    : ∃ B : ℝ, ∀ g i j, ‖(r g : Matrix (Fin n) (Fin n) (PadicAlgCl l)) i j‖ ≤ B := by
+theorem bdd [NumberField E] [IsAlgClosure E Ω] (r : G E Ω →* GL (Fin n) (PadicAlgCl l)) (hr : Continuous r) :
+    ∃ B : ℝ, ∀ g i j, ‖(r g : Matrix (Fin n) (Fin n) (PadicAlgCl l)) i j‖ ≤ B := by
   let f : G E Ω → ℝ := fun g => ∑ i, ∑ j, ‖(r g : Matrix (Fin n) (Fin n) (PadicAlgCl l)) i j‖
   have hc : Continuous fun g => (r g : Matrix (Fin n) (Fin n) (PadicAlgCl l)) :=
     (Units.continuous_val (M := Matrix (Fin n) (Fin n) (PadicAlgCl l))).comp hr
-  have hf : Continuous f :=
-    continuous_finsetSum _ fun i _ => continuous_finsetSum _ fun j _ => (hc.matrix_elem i j).norm
+  have hf : Continuous f := continuous_finsetSum _ fun i _ => continuous_finsetSum _ fun j _ => (hc.matrix_elem i j).norm
   obtain ⟨B, hB⟩ := (isCompact_range hf).bddAbove
   refine ⟨B, fun g i j => le_trans ?_ (hB ⟨g, rfl⟩)⟩
-  refine le_trans ?_
-    (Finset.single_le_sum
-      (f := fun i' => ∑ j', ‖(r g : Matrix (Fin n) (Fin n) (PadicAlgCl l)) i' j'‖)
-      (fun _ _ => Finset.sum_nonneg fun _ _ => norm_nonneg _)
-      (Finset.mem_univ i))
-  exact Finset.single_le_sum
-    (f := fun j' => ‖(r g : Matrix (Fin n) (Fin n) (PadicAlgCl l)) i j'‖)
-    (fun _ _ => norm_nonneg _)
-    (Finset.mem_univ j)
+  refine le_trans ?_ (Finset.single_le_sum (f := fun i' => ∑ j', ‖(r g : Matrix (Fin n) (Fin n) (PadicAlgCl l)) i' j'‖)
+    (fun _ _ => Finset.sum_nonneg fun _ _ => norm_nonneg _) (Finset.mem_univ i))
+  exact Finset.single_le_sum (f := fun j' => ‖(r g : Matrix (Fin n) (Fin n) (PadicAlgCl l)) i j'‖)
+    (fun _ _ => norm_nonneg _) (Finset.mem_univ j)
 
 end Main
 
@@ -100,25 +136,20 @@ section Conj
 
 variable {E Ω : Type} [Field E] [Field Ω] [Algebra E Ω] {n : ℕ}
 
-theorem smul_mem_stab
-    [NumberField E] [IsAlgClosure E Ω]
-    (LL : FinExt l)
-    (r : G E Ω →* GL (Fin n) (PadicAlgCl l)) (hr : Continuous r)
-    : ∃ c : ↥(OL LL), emb LL c ≠ 0 ∧ ∀ v : Fin n → ↥(OL LL), c • v ∈ stab LL r := by
+theorem smul_mem_stab [NumberField E] [IsAlgClosure E Ω] (LL : FinExt l) (r : G E Ω →* GL (Fin n) (PadicAlgCl l)) (hr : Continuous r) :
+    ∃ c : ↥(OL LL), emb LL c ≠ 0 ∧ ∀ v : Fin n → ↥(OL LL), c • v ∈ stab LL r := by
   obtain ⟨B, hB⟩ := bdd r hr
-  obtain ⟨k, hk⟩ :=
-    pow_unbounded_of_one_lt B (by exact_mod_cast (Fact.out : l.Prime).one_lt : (1 : ℝ) < l)
+  obtain ⟨k, hk⟩ := pow_unbounded_of_one_lt B (by exact_mod_cast (Fact.out : l.Prime).one_lt : (1 : ℝ) < l)
   have he : emb LL ((l : ↥(OL LL)) ^ k) = (l : PadicAlgCl l) ^ k := by rw [map_pow, map_natCast]
   refine ⟨(l : ↥(OL LL)) ^ k, ?_, ?_⟩
   · rw [he]
     exact pow_ne_zero _ (Nat.cast_ne_zero.2 (Fact.out : l.Prime).ne_zero)
   · intro v g i
-    have hv : vec (((l : ↥(OL LL)) ^ k) • v) = ((l : PadicAlgCl l) ^ k) • vec v :=
-      funext fun j => by simp only [vec, Pi.smul_apply, smul_eq_mul, map_mul, he]
+    have hv : vec (((l : ↥(OL LL)) ^ k) • v) = ((l : PadicAlgCl l) ^ k) • vec v := funext fun j => by
+      simp only [vec, Pi.smul_apply, smul_eq_mul, map_mul, he]
     have hX : ‖(r g : Matrix (Fin n) (Fin n) (PadicAlgCl l)).mulVec (vec v) i‖ ≤ B := by
       simp only [Matrix.mulVec, dotProduct]
-      refine IsUltrametricDist.norm_sum_le_of_forall_le_of_nonneg ((norm_nonneg _).trans (hB g i i))
-        fun j _ => ?_
+      refine IsUltrametricDist.norm_sum_le_of_forall_le_of_nonneg ((norm_nonneg _).trans (hB g i i)) fun j _ => ?_
       rw [norm_mul]
       exact (mul_le_of_le_one_right (norm_nonneg _) (norm_emb_le LL (v j))).trans (hB g i j)
     rw [hv, Matrix.mulVec_smul, Pi.smul_apply, norm_smul, norm_pow, norm_l, inv_pow]
@@ -126,24 +157,19 @@ theorem smul_mem_stab
 
 end Conj
 
-theorem exists_basis
-    {O : Type} [CommRing O] [IsDomain O] [IsPrincipalIdealRing O]
-    {n : ℕ} (N : Submodule O (Fin n → O))
-    {c : O} (hc : c ≠ 0) (hcN : ∀ v : Fin n → O, c • v ∈ N)
-    : Nonempty (Module.Basis (Fin n) O N) := by
+theorem exists_basis {O : Type} [CommRing O] [IsDomain O] [IsPrincipalIdealRing O] {n : ℕ} (N : Submodule O (Fin n → O))
+    {c : O} (hc : c ≠ 0) (hcN : ∀ v : Fin n → O, c • v ∈ N) : Nonempty (Module.Basis (Fin n) O N) := by
   obtain ⟨m, b0⟩ := Submodule.basisOfPid (Pi.basisFun O (Fin n)) N
   have hm : m = n := by
     have : Module.Finite O N := Module.Finite.of_basis b0
     have h1 : Module.finrank O N = m := by rw [Module.finrank_eq_card_basis b0, Fintype.card_fin]
     have h2 := Submodule.finrank_le N
     rw [Module.finrank_fin_fun] at h2
-    let φ : (Fin n → O) →ₗ[O] (Fin n → O) := {
-      toFun := fun v j => c * v j
-      map_add' := fun v w => funext fun j => mul_add c (v j) (w j)
-      map_smul' := fun a v => funext fun j => mul_left_comm c a (v j)
-    }
-    have hinj : Function.Injective φ := fun x y hxy =>
-      funext fun j => mul_left_cancel₀ hc (congrFun hxy j)
+    let φ : (Fin n → O) →ₗ[O] (Fin n → O) :=
+      { toFun := fun v j => c * v j
+        map_add' := fun v w => funext fun j => mul_add c (v j) (w j)
+        map_smul' := fun a v => funext fun j => mul_left_comm c a (v j) }
+    have hinj : Function.Injective φ := fun x y hxy => funext fun j => mul_left_cancel₀ hc (congrFun hxy j)
     have h3 : LinearMap.range φ ≤ N := by
       rintro _ ⟨v, rfl⟩
       exact hcN v
@@ -152,31 +178,16 @@ theorem exists_basis
     omega
   exact ⟨b0.reindex (finCongr hm)⟩
 
-theorem sum_repr_map
-    {O K : Type} [CommRing O] [CommRing K]
-    (e : O →+* K)
-    {n : ℕ} {N : Submodule O (Fin n → O)} (b : Module.Basis (Fin n) O N) (x : N) (j : Fin n)
-    : ∑ k, e ((b k : Fin n → O) j) * e (b.repr x k) = e ((x : Fin n → O) j) := by
+theorem sum_repr_map {O K : Type} [CommRing O] [CommRing K] (e : O →+* K) {n : ℕ} {N : Submodule O (Fin n → O)}
+    (b : Module.Basis (Fin n) O N) (x : N) (j : Fin n) :
+    ∑ k, e ((b k : Fin n → O) j) * e (b.repr x k) = e ((x : Fin n → O) j) := by
   have := congrArg (fun y : N => e ((y : Fin n → O) j)) (b.sum_repr x)
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [Submodule.coe_sum, Submodule.coe_smul, Finset.sum_apply, Pi.smul_apply, smul_eq_mul,
-        map_sum, map_mul]
-      at this
+
+  simp only [Submodule.coe_sum, Submodule.coe_smul, Finset.sum_apply, Pi.smul_apply, smul_eq_mul, map_sum, map_mul] at this
   rw [← this]
   exact Finset.sum_congr rfl fun k _ => mul_comm _ _
 
-theorem exists_conj_integral
-    : ∀ (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω] (l : ℕ)
-        [Fact l.Prime] (n : ℕ) (LL : FinExt l) (r : G E Ω →* GL (Fin n) (PadicAlgCl l)),
-      Continuous r → (∀ g i j, (r g : Matrix (Fin n) (Fin n) (PadicAlgCl l)) i j ∈ LL.1)
-        → ∃ A : GL (Fin n) (PadicAlgCl l),
-          (∀ i j, (A : Matrix (Fin n) (Fin n) (PadicAlgCl l)) i j ∈ LL.1)
-            ∧ (∀ i j,
-              ((A⁻¹ : GL (Fin n) (PadicAlgCl l)) : Matrix (Fin n) (Fin n) (PadicAlgCl l)) i j
-                ∈ LL.1)
-            ∧ ∀ g i j,
-              ‖((A⁻¹ * r g * A : GL (Fin n) (PadicAlgCl l)) : Matrix (Fin n) (Fin n) (PadicAlgCl l)) i j‖
-                ≤ 1 := by
+theorem exists_conj_integral : ∀ (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω] (l : ℕ) [Fact l.Prime] (n : ℕ) (LL : FinExt l) (r : G E Ω →* GL (Fin n) (PadicAlgCl l)), Continuous r → (∀ g i j, (r g : Matrix (Fin n) (Fin n) (PadicAlgCl l)) i j ∈ LL.1) → ∃ A : GL (Fin n) (PadicAlgCl l), (∀ i j, (A : Matrix (Fin n) (Fin n) (PadicAlgCl l)) i j ∈ LL.1) ∧ (∀ i j, ((A⁻¹ : GL (Fin n) (PadicAlgCl l)) : Matrix (Fin n) (Fin n) (PadicAlgCl l)) i j ∈ LL.1) ∧ ∀ g i j, ‖((A⁻¹ * r g * A : GL (Fin n) (PadicAlgCl l)) : Matrix (Fin n) (Fin n) (PadicAlgCl l)) i j‖ ≤ 1 := by
   intro E Ω _ _ _ _ _ l _ n LL r hr hLL
   obtain ⟨c, hc0, hcN⟩ := smul_mem_stab LL r hr
   have : IsDiscreteValuationRing ↥(OL LL) := Examples₂.LB.OL_dvr LL
@@ -184,8 +195,7 @@ theorem exists_conj_integral
   obtain ⟨b⟩ := exists_basis (stab LL r) hc hcN
   have hrep := sum_repr_map (emb LL) b
   let A : Matrix (Fin n) (Fin n) (PadicAlgCl l) := fun i j => emb LL ((b j : Fin n → ↥(OL LL)) i)
-  let D : Matrix (Fin n) (Fin n) (PadicAlgCl l) := fun k i =>
-    emb LL (b.repr ⟨c • Pi.single i 1, hcN _⟩ k)
+  let D : Matrix (Fin n) (Fin n) (PadicAlgCl l) := fun k i => emb LL (b.repr ⟨c • Pi.single i 1, hcN _⟩ k)
   have hAD : A * D = emb LL c • (1 : Matrix (Fin n) (Fin n) (PadicAlgCl l)) := by
     ext j i
     rw [Matrix.mul_apply]
@@ -211,9 +221,8 @@ theorem exists_conj_integral
       have h' := congrFun (hvu j) i
       simp only [vec, Matrix.mulVec, dotProduct] at h'
       exact h'.symm
-    have hU
-        : ((AU⁻¹ * r g * AU : GL (Fin n) (PadicAlgCl l)) : Matrix (Fin n) (Fin n) (PadicAlgCl l))
-          = Ai * (r g : Matrix (Fin n) (Fin n) (PadicAlgCl l)) * A := by
+    have hU : ((AU⁻¹ * r g * AU : GL (Fin n) (PadicAlgCl l)) : Matrix (Fin n) (Fin n) (PadicAlgCl l)) =
+        Ai * (r g : Matrix (Fin n) (Fin n) (PadicAlgCl l)) * A := by
       simp only [Units.val_mul]
       rfl
     rw [hU, mul_assoc, hRA, ← mul_assoc, h2, one_mul]

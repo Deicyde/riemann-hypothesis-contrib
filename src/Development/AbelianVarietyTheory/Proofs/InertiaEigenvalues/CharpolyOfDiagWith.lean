@@ -1,17 +1,59 @@
 module
 
-public import Mathlib
-public import Formalism.SharpRestriction.LevelLetterCocycles.DataNLoc
 public import Development.AbelianVarietyTheory.BlockTheory.NonGaloisCusps.DiagonalQuotientEigen
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.CompletionLines
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.InjectiveOfSpan
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.CoeffEqOfApply
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsSubstInvariants
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.DvrComplete
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsPrimitiveRootCoeffRingOfGood
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.MemXSmulOfProjective
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsBasisAddPiSmul
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsMatrixFrobenius
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.InjectiveOfSpan
+public import Mathlib.Algebra.Module.Lattice.Full
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+public import Mathlib.LinearAlgebra.Charpoly.BaseChange
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Coalgebra.IsFrobenius
+import Mathlib.RingTheory.Etale.Weakly
+import Mathlib.RingTheory.HopfAlgebra.Basic
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.TotallySplit
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
+public import Mathlib.Algebra.Module.Lattice.Basic
 
 @[expose] public section
 
@@ -19,18 +61,14 @@ noncomputable section
 
 namespace GlobalTheory.SenLines
 
-open PowerSeries Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions
-  Formalism.BasicNotions.Loc GlobalTheory.AdmLoc
-  GlobalTheory.IndefiniteRowSideFullHecke.DiagonalQuotientEigen TensorProduct
+open PowerSeries Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc GlobalTheory.AdmLoc GlobalTheory.IndefiniteRowSideFullHecke.DiagonalQuotientEigen TensorProduct
 open GlobalTheory.WachTie.MatF
 
 section Algebra
 
-theorem quot_equiv
-    {O P : Type} [CommRing O] [AddCommGroup P] [Module O P]
-    (P' : Submodule O P)
-    {r : ℕ} (m : ℕ) (θ : (Fin r → O⟦X⟧) ≃ₗ[O] P) (h : ∀ c, θ c ∈ P' ↔ ∀ k, (X : O⟦X⟧) ^ m ∣ c k)
-    : Nonempty ((P ⧸ P') ≃ₗ[O] (Fin m × Fin r → O)) := by
+theorem quot_equiv {O P : Type} [CommRing O] [AddCommGroup P] [Module O P] (P' : Submodule O P) {r : ℕ} (m : ℕ)
+    (θ : (Fin r → O⟦X⟧) ≃ₗ[O] P) (h : ∀ c, θ c ∈ P' ↔ ∀ k, (X : O⟦X⟧) ^ m ∣ c k) :
+    Nonempty ((P ⧸ P') ≃ₗ[O] (Fin m × Fin r → O)) := by
   let tr : (Fin r → O⟦X⟧) →ₗ[O] (Fin m × Fin r → O) :=
     LinearMap.pi fun x => (coeff (x.1 : ℕ)).comp (LinearMap.proj x.2)
   let f : P →ₗ[O] (Fin m × Fin r → O) := tr.comp θ.symm.toLinearMap
@@ -43,15 +81,14 @@ theorem quot_equiv
     ext x
     obtain ⟨c, rfl⟩ := θ.surjective x
     rw [h, LinearMap.mem_ker, funext_iff]
-    simp only [X_pow_dvd_iff, f, tr, LinearMap.comp_apply, LinearEquiv.coe_coe,
-      LinearEquiv.symm_apply_apply, LinearMap.pi_apply, LinearMap.proj_apply, Pi.zero_apply]
+    simp only [X_pow_dvd_iff, f, tr, LinearMap.comp_apply, LinearEquiv.coe_coe, LinearEquiv.symm_apply_apply,
+      LinearMap.pi_apply, LinearMap.proj_apply, Pi.zero_apply]
     exact ⟨fun H x => H x.2 x.1 x.1.2, fun H k a ha => H (⟨a, ha⟩, k)⟩
   exact ⟨(Submodule.quotEquivOfEq _ _ hk).trans (f.quotKerEquivOfSurjective hs)⟩
 
-theorem charpoly_of_diagWith
-    {F M : Type} [Field F] [AddCommGroup M] [Module F M] [Module.Finite F M]
-    (f : M →ₗ[F] M) (S : Multiset F) (h : DiagWith f S)
-    : f.charpoly = (S.map fun s => Polynomial.X - Polynomial.C s).prod := by
+theorem charpoly_of_diagWith {F M : Type} [Field F] [AddCommGroup M] [Module F M] [Module.Finite F M]
+    (f : M →ₗ[F] M) (S : Multiset F) (h : DiagWith f S) :
+    f.charpoly = (S.map fun s => Polynomial.X - Polynomial.C s).prod := by
   obtain ⟨m, b, e, he, rfl⟩ := h
   have hm : LinearMap.toMatrix b b f = Matrix.diagonal e := by
     ext a c
@@ -62,17 +99,15 @@ theorem charpoly_of_diagWith
   rw [← LinearMap.charpoly_toMatrix f b, hm, Matrix.charpoly_diagonal, Multiset.map_map]
   rfl
 
-theorem eigWith_of_diagWith
-    {O F k Q : Type} [CommRing O] [Field F] [Field k] [Algebra O F] [Algebra O k] [AddCommGroup Q]
-    [Module O Q] [Module.Free O Q] [Module.Finite O Q]
-    (hinj : Function.Injective (algebraMap O F))
-    (f : Q →ₗ[O] Q) (S : Multiset O) (h : DiagWith (f.baseChange F) (S.map (algebraMap O F)))
-    : EigWith (f.baseChange k) (S.map (algebraMap O k)) := by
+theorem eigWith_of_diagWith {O F k Q : Type} [CommRing O] [Field F] [Field k] [Algebra O F] [Algebra O k]
+    [AddCommGroup Q] [Module O Q] [Module.Free O Q] [Module.Finite O Q]
+    (hinj : Function.Injective (algebraMap O F)) (f : Q →ₗ[O] Q) (S : Multiset O)
+    (h : DiagWith (f.baseChange F) (S.map (algebraMap O F))) :
+    EigWith (f.baseChange k) (S.map (algebraMap O k)) := by
   have h1 := charpoly_of_diagWith _ _ h
-  have key
-      : ∀ (E : Type) [Field E] [Algebra O E],
-        ((S.map (algebraMap O E)).map fun s => Polynomial.X - Polynomial.C s).prod
-          = (S.map fun s => Polynomial.X - Polynomial.C s).prod.map (algebraMap O E) := by
+  have key : ∀ (E : Type) [Field E] [Algebra O E],
+      ((S.map (algebraMap O E)).map fun s => Polynomial.X - Polynomial.C s).prod =
+        (S.map fun s => Polynomial.X - Polynomial.C s).prod.map (algebraMap O E) := by
     intro E _ _
     rw [Polynomial.map_multiset_prod, Multiset.map_map, Multiset.map_map]
     congr 2
@@ -82,11 +117,9 @@ theorem eigWith_of_diagWith
   refine ⟨inferInstance, ?_⟩
   rw [key, LinearMap.charpoly_baseChange, Polynomial.map_injective _ hinj h1]
 
-theorem exists_cc
-    {O F : Type} [CommRing O] [Field F] [CharZero F] [Algebra O F]
-    (l : ℕ) (hl : l ≠ 0) (hu : IsUnit (1 + (l : O)))
-    (a : ℤ)
-    : ∃ c : O, algebraMap O F c = ((cc l a : ℚ) : F) ∧ (l : O) ∣ c + a := by
+theorem exists_cc {O F : Type} [CommRing O] [Field F] [CharZero F] [Algebra O F] (l : ℕ) (hl : l ≠ 0)
+    (hu : IsUnit (1 + (l : O))) (a : ℤ) :
+    ∃ c : O, algebraMap O F c = ((cc l a : ℚ) : F) ∧ (l : O) ∣ c + a := by
   have hl' : (l : F) ≠ 0 := Nat.cast_ne_zero.2 hl
   have h1 : (1 + (l : F)) ≠ 0 := by exact_mod_cast (by omega : 1 + l ≠ 0)
   obtain ⟨w, hw⟩ := hu.exists_right_inv
@@ -119,23 +152,18 @@ theorem exists_cc
     · push_cast at hd ⊢
       linear_combination hd + (c + 1) * hw
 
-theorem exists_factor
-    {O P D : Type} [CommRing O] [AddCommGroup P] [Module O P] [AddCommGroup D] [Module O D]
-    (f g : P →ₗ[O] D) (hf : Function.Injective f) (h : ∀ x, ∃ y, f y = g x)
-    : ∃ nb : P →ₗ[O] P, ∀ x, f (nb x) = g x := by
-  refine ⟨
-    (LinearEquiv.ofInjective f hf).symm.toLinearMap.comp (g.codRestrict (LinearMap.range f) h),
-    fun x => ?_
-  ⟩
+theorem exists_factor {O P D : Type} [CommRing O] [AddCommGroup P] [Module O P] [AddCommGroup D] [Module O D]
+    (f g : P →ₗ[O] D) (hf : Function.Injective f) (h : ∀ x, ∃ y, f y = g x) :
+    ∃ nb : P →ₗ[O] P, ∀ x, f (nb x) = g x := by
+  refine ⟨(LinearEquiv.ofInjective f hf).symm.toLinearMap.comp (g.codRestrict (LinearMap.range f) h),
+    fun x => ?_⟩
   have := (LinearEquiv.ofInjective f hf).apply_symm_apply (g.codRestrict (LinearMap.range f) h x)
   exact congrArg Subtype.val this
 
-theorem dvd_zpow_sub_one {R : Type} [CommRing R] (x : R) (s : Rˣ) (h : x ∣ (s : R) - 1) (j : ℤ)
-    : x ∣ ((s ^ j : Rˣ) : R) - 1 := by
-  have key
-      : ∀ t : Rˣ,
-        x ∣ (t : R) - 1
-          ↔ Units.map (Ideal.Quotient.mk (Ideal.span {x})).toMonoidHom t = 1 := fun t => by
+theorem dvd_zpow_sub_one {R : Type} [CommRing R] (x : R) (s : Rˣ) (h : x ∣ (s : R) - 1) (j : ℤ) :
+    x ∣ ((s ^ j : Rˣ) : R) - 1 := by
+  have key : ∀ t : Rˣ, x ∣ (t : R) - 1 ↔
+      Units.map (Ideal.Quotient.mk (Ideal.span {x})).toMonoidHom t = 1 := fun t => by
     rw [Units.ext_iff, ← Ideal.mem_span_singleton, ← Ideal.Quotient.eq]
     simp
   rw [key] at h ⊢
@@ -145,15 +173,10 @@ end Algebra
 
 section Series
 
-theorem exists_mu
-    {F : Type} [Field F]
-    (χ : F) (hχ : χ ≠ 0)
-    (η m S A : (F⟦X⟧)ˣ)
-    (j w : ℤ)
+theorem exists_mu {F : Type} [Field F] (χ : F) (hχ : χ ≠ 0) (η m S A : (F⟦X⟧)ˣ) (j w : ℤ)
     (h1 : (η : F⟦X⟧) * S = C χ * rescale χ (η : F⟦X⟧))
-    (h2 : (A : F⟦X⟧) * m = C (χ ^ (-w)) * rescale χ (m : F⟦X⟧))
-    : ∃ μ : (F⟦X⟧)ˣ,
-      ((S ^ j : (F⟦X⟧)ˣ) : F⟦X⟧) * μ = C (χ ^ (j + w)) * A * rescale χ (μ : F⟦X⟧) := by
+    (h2 : (A : F⟦X⟧) * m = C (χ ^ (-w)) * rescale χ (m : F⟦X⟧)) :
+    ∃ μ : (F⟦X⟧)ˣ, ((S ^ j : (F⟦X⟧)ˣ) : F⟦X⟧) * μ = C (χ ^ (j + w)) * A * rescale χ (μ : F⟦X⟧) := by
   let R : (F⟦X⟧)ˣ →* (F⟦X⟧)ˣ := Units.map (rescale χ).toMonoidHom
   let c : (F⟦X⟧)ˣ := Units.map (C : F →+* F⟦X⟧).toMonoidHom (Units.mk0 χ hχ)
   have hc : ∀ k : ℤ, ((c ^ k : (F⟦X⟧)ˣ) : F⟦X⟧) = C (χ ^ k) := fun k => by
@@ -163,8 +186,8 @@ theorem exists_mu
   have e1 : η * S = c * R η := Units.ext h1
   have e2 : A * m = c ^ (-w) * R m := Units.ext (by rw [Units.val_mul, Units.val_mul, hc]; exact h2)
   have e3 : S ^ j * (η ^ j * m⁻¹) = c ^ (j + w) * A * R (η ^ j * m⁻¹) := by
-    rw [← mul_assoc, ← mul_zpow, mul_comm S, e1, eq_mul_inv_of_mul_eq e2, map_mul, map_zpow,
-      map_inv, mul_zpow, zpow_add, zpow_neg]
+    rw [← mul_assoc, ← mul_zpow, mul_comm S, e1, eq_mul_inv_of_mul_eq e2, map_mul, map_zpow, map_inv,
+      mul_zpow, zpow_add, zpow_neg]
     apply Additive.ofMul.injective
     simp only [ofMul_mul, ofMul_inv]
     abel
@@ -173,16 +196,14 @@ theorem exists_mu
   rw [Units.val_mul, Units.val_mul (c ^ (j + w) * A), Units.val_mul (c ^ (j + w)), hc] at this
   exact this
 
-theorem eigMs_eq {F : Type} [Field F] [CharZero F] (l : ℕ) {r : ℕ} (u : Fin r → ℤ) (w j j' : ℤ)
-    : eigMs F l (Finset.univ.val.map u) w j j'
-      = (Finset.univ : Finset (Fin r × Fin (j' - j).toNat)).val.map fun x =>
+theorem eigMs_eq {F : Type} [Field F] [CharZero F] (l : ℕ) {r : ℕ} (u : Fin r → ℤ) (w j j' : ℤ) :
+    eigMs F l (Finset.univ.val.map u) w j j' =
+      (Finset.univ : Finset (Fin r × Fin (j' - j).toNat)).val.map fun x =>
         ((1 + (l : F)) ^ (j + w - u x.1) * (1 + (l : F)) ^ (x.2 : ℕ) - 1) / (-(l : F)) := by
   have h1 : (1 + (l : F)) ≠ 0 := by exact_mod_cast (by omega : 1 + l ≠ 0)
   rw [← Finset.univ_product_univ, Finset.product_val, eigMs, Multiset.bind_map]
   rw [show ∀ (s : Multiset (Fin r)) (t : Multiset (Fin (j' - j).toNat)),
-        s ×ˢ t = s.bind fun a => t.map (Prod.mk a) from fun _ _ =>
-      rfl,
-    Multiset.map_bind]
+    s ×ˢ t = s.bind fun a => t.map (Prod.mk a) from fun _ _ => rfl, Multiset.map_bind]
   refine Multiset.bind_congr fun k _ => ?_
   rw [Int.Ico_eq_finset_map, ← Nat.Iio_eq_range, ← Fin.map_valEmbedding_univ]
   simp only [Finset.map_val, Multiset.map_map]
@@ -198,20 +219,15 @@ end Series
 
 section Generic
 
-variable
-  {G : Type} [Group G] [TopologicalSpace G]
-  {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K] [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K]
-  [IsScalarTower Qp K₀ K]
-  {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
-  [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
-  [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
-  {PD : PeriodData G Qp K₀ K B BdR} {LL O : Type}
-  [Field LL] [Algebra Qp LL] [CommRing O] [Algebra O LL] [TopologicalSpace LL]
-  {v : AddValuation LL (WithTop ℚ)} {n : ℕ} (W : LocWach PD LL O v n)
-  (T : LocLat G Qp LL O)
-  (J : O⟦X⟧ →ₐ[O] O⟦X⟧)
-  {r : ℕ} (b : Module.Basis (Fin r) (LetA O n) ↥(W.N T))
-  (i : ZMod n)
+variable {G : Type} [Group G] [TopologicalSpace G] {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K]
+    [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K] [IsScalarTower Qp K₀ K]
+    {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
+    [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
+    [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
+    {PD : PeriodData G Qp K₀ K B BdR} {LL O : Type} [Field LL] [Algebra Qp LL]
+    [CommRing O] [Algebra O LL] [TopologicalSpace LL] {v : AddValuation LL (WithTop ℚ)} {n : ℕ}
+    (W : LocWach PD LL O v n) (T : LocLat G Qp LL O)
+    (J : O⟦X⟧ →ₐ[O] O⟦X⟧) {r : ℕ} (b : Module.Basis (Fin r) (LetA O n) ↥(W.N T)) (i : ZMod n)
 
 def th : (Fin r → O⟦X⟧) →ₗ[O] W.DD T where
   toFun c := ∑ k, (Pi.single i (J (c k)) : LetA O n) • (b k : W.DD T)
@@ -224,9 +240,8 @@ def th : (Fin r → O⟦X⟧) →ₗ[O] W.DD T where
     refine Finset.sum_congr rfl fun k _ => ?_
     rw [Pi.smul_apply, map_smul, Pi.single_smul, smul_assoc]
 
-theorem th_apply (c : Fin r → O⟦X⟧)
-    : th W T J b i c = ∑ k, (Pi.single i (J (c k)) : LetA O n) • (b k : W.DD T) :=
-  rfl
+theorem th_apply (c : Fin r → O⟦X⟧) :
+    th W T J b i c = ∑ k, (Pi.single i (J (c k)) : LetA O n) • (b k : W.DD T) := rfl
 
 theorem mul_single (a : LetA O n) (x : O⟦X⟧) : a * Pi.single i x = Pi.single i (a i * x) := by
   funext m
@@ -234,21 +249,19 @@ theorem mul_single (a : LetA O n) (x : O⟦X⟧) : a * Pi.single i x = Pi.single
   · subst h; simp
   · simp [Pi.single_eq_of_ne h]
 
-theorem smul_th_eq (a : LetA O n) (c : Fin r → O⟦X⟧)
-    : a • th W T J b i c = ∑ k, (Pi.single i (a i * J (c k)) : LetA O n) • (b k : W.DD T) := by
+theorem smul_th_eq (a : LetA O n) (c : Fin r → O⟦X⟧) :
+    a • th W T J b i c = ∑ k, (Pi.single i (a i * J (c k)) : LetA O n) • (b k : W.DD T) := by
   rw [th_apply, Finset.smul_sum]
   refine Finset.sum_congr rfl fun k _ => ?_
   rw [smul_smul, mul_single]
 
-theorem smul_th {a : LetA O n} {e : O⟦X⟧} (h : a i = J e) (c : Fin r → O⟦X⟧)
-    : a • th W T J b i c = th W T J b i (e • c) := by
+theorem smul_th {a : LetA O n} {e : O⟦X⟧} (h : a i = J e) (c : Fin r → O⟦X⟧) :
+    a • th W T J b i c = th W T J b i (e • c) := by
   rw [smul_th_eq, th_apply]
   simp only [h, Pi.smul_apply, smul_eq_mul, map_mul]
 
-theorem th_coord
-    {c : Fin r → O⟦X⟧} {a : Fin r → LetA O n} (h : th W T J b i c = ∑ k, a k • (b k : W.DD T))
-    (k : Fin r)
-    : J (c k) = a k i := by
+theorem th_coord {c : Fin r → O⟦X⟧} {a : Fin r → LetA O n}
+    (h : th W T J b i c = ∑ k, a k • (b k : W.DD T)) (k : Fin r) : J (c k) = a k i := by
   have := congrFun (congrFun (coord_unique W T b _ _ h) k) i
   simpa using this
 
@@ -269,10 +282,8 @@ theorem γA_single (g : W.Gam) (x : O⟦X⟧) : W.γA g (Pi.single i x) = Pi.sin
   · subst h; simp
   · simp [Pi.single_eq_of_ne h]
 
-theorem mem_NΔl_iff
-    (hr : ∀ a, (∃ b, J b = a) ↔ ∀ δ ∈ W.DelF, W.γ₀ δ a = a) (hb : ∀ k, (b k : W.DD T) ∈ W.NΔ T)
-    (x : W.DD T)
-    : x ∈ NΔl W T i ↔ ∃ c, th W T J b i c = x := by
+theorem mem_NΔl_iff (hr : ∀ a, (∃ b, J b = a) ↔ ∀ δ ∈ W.DelF, W.γ₀ δ a = a)
+    (hb : ∀ k, (b k : W.DD T) ∈ W.NΔ T) (x : W.DD T) : x ∈ NΔl W T i ↔ ∃ c, th W T J b i c = x := by
   constructor
   · rintro ⟨⟨hx, hΔ⟩, y, hy, hyx⟩
     obtain ⟨a, ha⟩ := exists_coord W T b y hy
@@ -281,13 +292,12 @@ theorem mem_NΔl_iff
       simp only [LinearMap.smul_apply, LinearMap.id_apply, Finset.smul_sum, smul_smul]
       refine Finset.sum_congr rfl fun k _ => ?_
       rw [mul_comm, letE, mul_single, mul_one]
-    have hc : ∀ k, ∃ c, J c = a k i := fun k =>
-      (hr _).2 fun δ hδ => by
-        have h1 := hΔ δ hδ
-        set_option synthInstance.maxHeartbeats 100000 in
-          rw [hxa, map_sum] at h1
-        simp only [γD_smulA, γA_single, (hb _).2 δ hδ] at h1
-        simpa using congrFun (congrFun (coord_unique W T b _ _ h1) k) i
+    have hc : ∀ k, ∃ c, J c = a k i := fun k => (hr _).2 fun δ hδ => by
+      have h1 := hΔ δ hδ
+
+      rw [hxa, map_sum] at h1
+      simp only [γD_smulA, γA_single, (hb _).2 δ hδ] at h1
+      simpa using congrFun (congrFun (coord_unique W T b _ _ h1) k) i
     choose c hc using hc
     exact ⟨c, by rw [hxa, th_apply]; simp only [hc]⟩
   · rintro ⟨c, rfl⟩
@@ -301,39 +311,34 @@ theorem mem_NΔl_iff
 
 theorem γD_mem_NΔl (g : W.Gam) {x : W.DD T} (hx : x ∈ NΔl W T i) : W.γD T g x ∈ NΔl W T i := by
   obtain ⟨⟨hx, hΔ⟩, y, hy, hyx⟩ := hx
-  refine ⟨
-    ⟨W.N_Γ T g x hx, fun δ hδ => by rw [← W.γD_mul, mul_comm, W.γD_mul, hΔ δ hδ]⟩,
-    W.γD T g y,
-    W.N_Γ T g y hy,
-    ?_
-  ⟩
+  refine ⟨⟨W.N_Γ T g x hx, fun δ hδ => by rw [← W.γD_mul, mul_comm, W.γD_mul, hΔ δ hδ]⟩,
+    W.γD T g y, W.N_Γ T g y hy, ?_⟩
   rw [← hyx]
   change (letE i : LetA O n) • W.γD T g y = W.γD T g ((letE i : LetA O n) • y)
   rw [γD_smulA, letE, γA_single, map_one]
 
-theorem γD_th {g : W.Gam} (hJ : QFrame W g J) (hb : ∀ k, (b k : W.DD T) ∈ W.NΔ T) (c : Fin r → O⟦X⟧)
-    : ∃ c₁ : Fin r → O⟦X⟧,
-      W.γD T g (th W T J b i c) = th W T J b i (c + (X - ((PD.p : ℕ) : O⟦X⟧)) • c₁) := by
+theorem γD_th {g : W.Gam} (hJ : QFrame W g J) (hb : ∀ k, (b k : W.DD T) ∈ W.NΔ T) (c : Fin r → O⟦X⟧) :
+    ∃ c₁ : Fin r → O⟦X⟧, W.γD T g (th W T J b i c) =
+      th W T J b i (c + (X - ((PD.p : ℕ) : O⟦X⟧)) • c₁) := by
   obtain ⟨-, hr, -, h0, -⟩ := hJ
   have hc := (mem_NΔl_iff W T J b i hr hb _).2 ⟨c, rfl⟩
-  obtain ⟨c', hc'⟩ :=
-    (mem_NΔl_iff W T J b i hr hb _).1 ((NΔl W T i).sub_mem (γD_mem_NΔl W T i g hc) hc)
+  obtain ⟨c', hc'⟩ := (mem_NΔl_iff W T J b i hr hb _).1
+    ((NΔl W T i).sub_mem (γD_mem_NΔl W T i g hc) hc)
   obtain ⟨y, hy, hy'⟩ := W.N_π T g _ (th_mem_N W T J b i c)
   obtain ⟨a, ha⟩ := exists_coord W T b y hy
   have h1 : th W T J b i c' = ∑ k, (letπ * a k) • (b k : W.DD T) := by
     rw [hc', hy', ha, Finset.smul_sum]
     simp only [smul_smul]
-  have h2 : ∀ k, X - ((PD.p : ℕ) : O⟦X⟧) ∣ c' k := fun k =>
-    h0 _ (by rw [th_coord W T J b i h1 k]; simp [letπ])
+  have h2 : ∀ k, X - ((PD.p : ℕ) : O⟦X⟧) ∣ c' k := fun k => h0 _ (by
+    rw [th_coord W T J b i h1 k]; simp [letπ])
   choose c₁ hc₁ using h2
   refine ⟨c₁, ?_⟩
   have : (X - ((PD.p : ℕ) : O⟦X⟧)) • c₁ = c' := funext fun k => (hc₁ k).symm
   rw [this, map_add (f := _), hc']
   abel
 
-theorem mem_qN_iff
-    (Qu : W.EEˣ) (hQ : (Qu : W.EE) = algebraMap (LetA O n) W.EE (qΔ W)) (j : ℤ) (x : W.DD T)
-    : x ∈ qN W T i j ↔ ∃ y ∈ NΔl W T i, ((Qu ^ j : W.EEˣ) : W.EE) • y = x := by
+theorem mem_qN_iff (Qu : W.EEˣ) (hQ : (Qu : W.EE) = algebraMap (LetA O n) W.EE (qΔ W)) (j : ℤ) (x : W.DD T) :
+    x ∈ qN W T i j ↔ ∃ y ∈ NΔl W T i, ((Qu ^ j : W.EEˣ) : W.EE) • y = x := by
   have hm : ∀ (k : ℕ) (z : W.DD T), mulD W T (qΔ W ^ k) z = (Qu ^ (k : ℤ)) • z := fun k z => by
     change (qΔ W ^ k) • z = ((Qu ^ (k : ℤ) : W.EEˣ) : W.EE) • z
     rw [zpow_natCast, Units.val_pow_eq_pow_val, hQ, ← map_pow, algebraMap_smul]
@@ -350,23 +355,21 @@ theorem cst_apply (c : O⟦X⟧) : (cst J c : LetA O n) i = J c := rfl
 
 def abelian₂ (ζ : LL) : O⟦X⟧ →ₐ[O] LL⟦X⟧ := (W.lev i ζ).comp (cst J)
 
-theorem lev_eq (ζ : LL) {a : LetA O n} {e : O⟦X⟧} (h : a i = J e)
-    : W.lev i ζ a = abelian₂ W J i ζ e := by
+theorem lev_eq (ζ : LL) {a : LetA O n} {e : O⟦X⟧} (h : a i = J e) : W.lev i ζ a = abelian₂ W J i ζ e := by
   have := W.lev_letter i ζ (a - cst J e) (by rw [Pi.sub_apply, h, cst_apply, sub_self])
   rw [map_sub, sub_eq_zero] at this
   exact this
 
-theorem exists_matrix
-    (ζ : LL) {r' : ℕ} (e : ↥(W.N T) →+ (Fin r' → LL⟦X⟧)) (he : ∀ a x, e (a • x) = W.lev i ζ a • e x)
-    : ∃ M : Matrix (Fin r') (Fin r) LL⟦X⟧,
-      (Submodule.span LL⟦X⟧ (Set.range e) = ⊤ → Function.Surjective M.mulVec)
-        ∧ ∀ c,
-          e ⟨th W T J b i c, th_mem_N W T J b i c⟩ = M.mulVec fun k => abelian₂ W J i ζ (c k) := by
+theorem exists_matrix (ζ : LL) {r' : ℕ} (e : ↥(W.N T) →+ (Fin r' → LL⟦X⟧))
+    (he : ∀ a x, e (a • x) = W.lev i ζ a • e x) :
+    ∃ M : Matrix (Fin r') (Fin r) LL⟦X⟧,
+      (Submodule.span LL⟦X⟧ (Set.range e) = ⊤ → Function.Surjective M.mulVec) ∧
+      ∀ c, e ⟨th W T J b i c, th_mem_N W T J b i c⟩ = M.mulVec fun k => abelian₂ W J i ζ (c k) := by
   let M : Matrix (Fin r') (Fin r) LL⟦X⟧ := Matrix.of fun u k => e (b k) u
   have h1 : ∀ a : Fin r → LetA O n, e (∑ k, a k • b k) = M.mulVec fun k => W.lev i ζ (a k) := by
     intro a
     funext u
-    set_option synthInstance.maxHeartbeats 100000 in
+
     simp [M, map_sum, he, Matrix.mulVec, dotProduct, mul_comm]
   refine ⟨M, fun hs => ?_, fun c => ?_⟩
   · have : Submodule.span LL⟦X⟧ (Set.range e) ≤ LinearMap.range M.mulVecLin := by
@@ -375,8 +378,8 @@ theorem exists_matrix
       exact ⟨fun k => W.lev i ζ (b.repr x k), by rw [Matrix.mulVecLin_apply, ← h1, b.sum_repr]⟩
     intro y
     exact this (hs ▸ Submodule.mem_top)
-  · have : (⟨th W T J b i c, th_mem_N W T J b i c⟩ : ↥(W.N T))
-        = ∑ k, (Pi.single i (J (c k)) : LetA O n) • b k := by
+  · have : (⟨th W T J b i c, th_mem_N W T J b i c⟩ : ↥(W.N T)) =
+        ∑ k, (Pi.single i (J (c k)) : LetA O n) • b k := by
       apply Subtype.ext
       simp [th_apply]
     rw [this, h1]
@@ -384,13 +387,9 @@ theorem exists_matrix
     funext k
     exact lev_eq W J i ζ (by simp)
 
-theorem exists_theta
-    {g : W.Gam} (hJ : QFrame W g J)
-    (hb : ∀ k, (b k : W.DD T) ∈ W.NΔ T)
-    (Qu : W.EEˣ) (hQ : (Qu : W.EE) = algebraMap (LetA O n) W.EE (qΔ W))
-    (j : ℤ)
-    : ∃ θ : (Fin r → O⟦X⟧) ≃ₗ[O] ↥(qN W T i j), ∀ c,
-      (θ c : W.DD T) = (Qu ^ j) • th W T J b i c := by
+theorem exists_theta {g : W.Gam} (hJ : QFrame W g J) (hb : ∀ k, (b k : W.DD T) ∈ W.NΔ T)
+    (Qu : W.EEˣ) (hQ : (Qu : W.EE) = algebraMap (LetA O n) W.EE (qΔ W)) (j : ℤ) :
+    ∃ θ : (Fin r → O⟦X⟧) ≃ₗ[O] ↥(qN W T i j), ∀ c, (θ c : W.DD T) = (Qu ^ j) • th W T J b i c := by
   let f : (Fin r → O⟦X⟧) →ₗ[O] W.DD T :=
     (Algebra.lsmul O O (W.DD T) ((Qu ^ j : W.EEˣ) : W.EE)).comp (th W T J b i)
   have hf : ∀ c, f c = (Qu ^ j) • th W T J b i c := fun _ => rfl
@@ -405,29 +404,23 @@ theorem exists_theta
     exact ⟨c, Subtype.ext hx⟩
 
 theorem smul_unit_comm (a : LetA O n) (u : W.EEˣ) (x : W.DD T) : a • u • x = u • a • x := by
-  rw [← algebraMap_smul W.EE a, ← algebraMap_smul W.EE a x, Units.smul_def, Units.smul_def,
-    smul_comm]
+  rw [← algebraMap_smul W.EE a, ← algebraMap_smul W.EE a x, Units.smul_def, Units.smul_def, smul_comm]
 
 theorem qΔ_eq {g : W.Gam} (hJ : QFrame W g J) : qΔ W = cst J X := funext fun _ => hJ.2.2.1.symm
 
-theorem zpow_th
-    {g : W.Gam} (hJ : QFrame W g J)
-    (Qu : W.EEˣ) (hQ : (Qu : W.EE) = algebraMap (LetA O n) W.EE (qΔ W))
-    {j j' : ℤ} (hj : j ≤ j')
-    (d : Fin r → O⟦X⟧)
-    : (Qu ^ j') • th W T J b i d = (Qu ^ j) • th W T J b i ((X : O⟦X⟧) ^ (j' - j).toNat • d) := by
+theorem zpow_th {g : W.Gam} (hJ : QFrame W g J)
+    (Qu : W.EEˣ) (hQ : (Qu : W.EE) = algebraMap (LetA O n) W.EE (qΔ W)) {j j' : ℤ} (hj : j ≤ j')
+    (d : Fin r → O⟦X⟧) : (Qu ^ j') • th W T J b i d =
+      (Qu ^ j) • th W T J b i ((X : O⟦X⟧) ^ (j' - j).toNat • d) := by
   rw [← smul_th W T J b i (a := qΔ W ^ (j' - j).toNat) (by rw [qΔ_eq W J hJ, ← map_pow, cst_apply]),
     ← algebraMap_smul W.EE, map_pow, ← hQ, ← Units.val_pow_eq_pow_val, ← Units.smul_def, smul_smul,
     ← zpow_natCast, ← zpow_add]
   rw [show j + ((j' - j).toNat : ℤ) = j' by omega]
 
-theorem theta_mem
-    {g : W.Gam} (hJ : QFrame W g J)
-    (hb : ∀ k, (b k : W.DD T) ∈ W.NΔ T)
-    (Qu : W.EEˣ) (hQ : (Qu : W.EE) = algebraMap (LetA O n) W.EE (qΔ W))
-    {j j' : ℤ} (hj : j ≤ j')
-    (c : Fin r → O⟦X⟧)
-    : (Qu ^ j) • th W T J b i c ∈ qN W T i j' ↔ ∀ k, (X : O⟦X⟧) ^ (j' - j).toNat ∣ c k := by
+theorem theta_mem {g : W.Gam} (hJ : QFrame W g J) (hb : ∀ k, (b k : W.DD T) ∈ W.NΔ T)
+    (Qu : W.EEˣ) (hQ : (Qu : W.EE) = algebraMap (LetA O n) W.EE (qΔ W)) {j j' : ℤ} (hj : j ≤ j')
+    (c : Fin r → O⟦X⟧) :
+    (Qu ^ j) • th W T J b i c ∈ qN W T i j' ↔ ∀ k, (X : O⟦X⟧) ^ (j' - j).toNat ∣ c k := by
   have h1 := zpow_th W T J b i hJ Qu hQ hj
   rw [mem_qN_iff W T i Qu hQ]
   constructor
@@ -441,13 +434,9 @@ theorem theta_mem
     congr 2
     exact funext fun k => (hd k).symm
 
-theorem γD_zpow
-    {g : W.Gam} (hJ : QFrame W g J)
-    (s : (O⟦X⟧)ˣ) (hs : W.γ₀ g (J X) = J X * J s)
-    (Qu : W.EEˣ) (hQ : (Qu : W.EE) = algebraMap (LetA O n) W.EE (qΔ W))
-    (j : ℤ) (x : W.DD T)
-    : W.γD T g ((Qu ^ j) • x)
-      = (Qu ^ j) • (cst J ((s ^ j : (O⟦X⟧)ˣ) : O⟦X⟧) : LetA O n) • W.γD T g x := by
+theorem γD_zpow {g : W.Gam} (hJ : QFrame W g J) (s : (O⟦X⟧)ˣ) (hs : W.γ₀ g (J X) = J X * J s)
+    (Qu : W.EEˣ) (hQ : (Qu : W.EE) = algebraMap (LetA O n) W.EE (qΔ W)) (j : ℤ) (x : W.DD T) :
+    W.γD T g ((Qu ^ j) • x) = (Qu ^ j) • (cst J ((s ^ j : (O⟦X⟧)ˣ) : O⟦X⟧) : LetA O n) • W.γD T g x := by
   let φ : O⟦X⟧ →* W.EE := ((algebraMap (LetA O n) W.EE).comp (cst J).toRingHom).toMonoidHom
   let ψ : W.EE →* W.EE := (W.γE g).toRingHom.toMonoidHom
   have h1 : Units.map ψ Qu = Qu * Units.map φ s := by
@@ -458,23 +447,17 @@ theorem γD_zpow
     exact funext fun _ => hs
   have h2 : Units.map ψ (Qu ^ j) = Qu ^ j * Units.map φ (s ^ j) := by
     rw [map_zpow, map_zpow, h1, mul_zpow]
-  have h3
-      : W.γE g ((Qu ^ j : W.EEˣ) : W.EE)
-        = ((Qu ^ j : W.EEˣ) : W.EE)
-          * algebraMap (LetA O n) W.EE (cst J ((s ^ j : (O⟦X⟧)ˣ) : O⟦X⟧)) :=
-    congrArg Units.val h2
+  have h3 : W.γE g ((Qu ^ j : W.EEˣ) : W.EE) = ((Qu ^ j : W.EEˣ) : W.EE) *
+      algebraMap (LetA O n) W.EE (cst J ((s ^ j : (O⟦X⟧)ˣ) : O⟦X⟧)) := congrArg Units.val h2
   rw [Units.smul_def, W.γD_smul, h3, mul_smul, algebraMap_smul, Units.smul_def]
 
-theorem nab_iff
-    {g : W.Gam} (hJ : QFrame W g J)
-    (s : (O⟦X⟧)ˣ) (hs : W.γ₀ g (J X) = J X * J s)
-    (Qu : W.EEˣ) (hQ : (Qu : W.EE) = algebraMap (LetA O n) W.EE (qΔ W))
-    (j : ℤ)
-    {a : LetA O n} {a₀ : O⟦X⟧} (ha : a i = J a₀)
-    {c c' d : Fin r → O⟦X⟧} (hd : W.γD T g (th W T J b i c) = th W T J b i d)
-    : (a * W.π₀) • (Qu ^ j) • th W T J b i c'
-        = W.γD T g ((Qu ^ j) • th W T J b i c) - a • (Qu ^ j) • th W T J b i c
-      ↔ (a₀ * (X - ((PD.p : ℕ) : O⟦X⟧))) • c' = ((s ^ j : (O⟦X⟧)ˣ) : O⟦X⟧) • d - a₀ • c := by
+theorem nab_iff {g : W.Gam} (hJ : QFrame W g J) (s : (O⟦X⟧)ˣ) (hs : W.γ₀ g (J X) = J X * J s)
+    (Qu : W.EEˣ) (hQ : (Qu : W.EE) = algebraMap (LetA O n) W.EE (qΔ W)) (j : ℤ)
+    {a : LetA O n} {a₀ : O⟦X⟧} (ha : a i = J a₀) {c c' d : Fin r → O⟦X⟧}
+    (hd : W.γD T g (th W T J b i c) = th W T J b i d) :
+    (a * W.π₀) • (Qu ^ j) • th W T J b i c' =
+        W.γD T g ((Qu ^ j) • th W T J b i c) - a • (Qu ^ j) • th W T J b i c ↔
+      (a₀ * (X - ((PD.p : ℕ) : O⟦X⟧))) • c' = ((s ^ j : (O⟦X⟧)ˣ) : O⟦X⟧) • d - a₀ • c := by
   have h1 : (a * W.π₀) i = J (a₀ * (X - ((PD.p : ℕ) : O⟦X⟧))) := by
     rw [map_mul, map_sub, hJ.2.2.1, map_natCast, add_sub_cancel_right, Pi.mul_apply, ha]
     rfl
@@ -482,9 +465,8 @@ theorem nab_iff
     smul_th W T J b i ha, smul_th W T J b i (cst_apply J i _), ← smul_sub, ← map_sub,
     (MulAction.injective _).eq_iff, (th_inj W T J b i hJ.1).eq_iff]
 
-theorem exists_eta
-    [CharZero LL] {g : W.Gam} (hJ : QFrame W g J) (ζ : LL) (hζ : IsPrimitiveRoot ζ PD.p)
-    : ∃ η : (LL⟦X⟧)ˣ, abelian₂ W J i ζ X = X * (η : LL⟦X⟧) := by
+theorem exists_eta [CharZero LL] {g : W.Gam} (hJ : QFrame W g J) (ζ : LL) (hζ : IsPrimitiveRoot ζ PD.p) :
+    ∃ η : (LL⟦X⟧)ˣ, abelian₂ W J i ζ X = X * (η : LL⟦X⟧) := by
   obtain ⟨E, hE0, hE1, hE⟩ := W.lev_π i ζ ⟨1, by rwa [pow_one]⟩
   obtain ⟨w, hw⟩ := hJ.2.2.2.2.2.1
   have hp := PD.hp
@@ -503,46 +485,37 @@ theorem exists_eta
   have hu3 : IsUnit (W.lev i ζ letπ) := by
     rw [eq_sub_of_add_eq' hE, isUnit_iff_constantCoeff]
     simpa [hE0, sub_eq_zero] using hζ.ne_one hp.one_lt
-  have hu4 : IsUnit (W.lev i ζ fun _ => (w : O⟦X⟧)) :=
-    IsUnit.map _ (Pi.isUnit_iff.2 fun _ => w.isUnit)
+  have hu4 : IsUnit (W.lev i ζ fun _ => (w : O⟦X⟧)) := IsUnit.map _ (Pi.isUnit_iff.2 fun _ => w.isUnit)
   have h3 : (letπ : LetA O n) * (cst J X * fun _ => (w : O⟦X⟧)) = (1 + letπ) ^ PD.p - 1 :=
     funext fun _ => by
       change X * (J X * (w : O⟦X⟧)) = (1 + X) ^ PD.p - 1
       rw [hw, W.q₀_def]
   have h4 := congrArg (W.lev i ζ) h3
-  rw [map_mul, map_mul, map_sub, map_pow, map_add (f := _), map_one, hE, mul_pow, ← map_pow,
-      hζ.pow_eq_one, map_one, one_mul, ← mul_geom_sum, hE']
-    at h4
+  rw [map_mul, map_mul, map_sub, map_pow, map_add (f := _), map_one, hE, mul_pow, ← map_pow, hζ.pow_eq_one, map_one,
+    one_mul, ← mul_geom_sum, hE'] at h4
   refine ⟨(hu1.mul hu2).unit * ((hu3.mul hu4).unit)⁻¹, ?_⟩
   rw [Units.val_mul, ← mul_assoc, Units.eq_mul_inv_iff_mul_eq, IsUnit.unit_spec, IsUnit.unit_spec]
   change W.lev i ζ (cst J X) * _ = _
   linear_combination h4
 
-theorem diagQuot
-    [IsDomain O] [CharZero LL]
-    (hinj : Function.Injective (algebraMap O LL))
-    {g : W.Gam} (hJ : QFrame W g J)
-    (b : Module.Basis (Fin (Module.finrank LL T.V)) (LetA O n) ↥(W.N T))
-    (hb : ∀ k, (b k : W.DD T) ∈ W.NΔ T)
-    (ζ : LL) (hζ : IsPrimitiveRoot ζ PD.p)
+theorem diagQuot [IsDomain O] [CharZero LL] (hinj : Function.Injective (algebraMap O LL))
+    {g : W.Gam} (hJ : QFrame W g J) (b : Module.Basis (Fin (Module.finrank LL T.V)) (LetA O n) ↥(W.N T))
+    (hb : ∀ k, (b k : W.DD T) ∈ W.NΔ T) (ζ : LL) (hζ : IsPrimitiveRoot ζ PD.p)
     (hρ : ∀ f, W.lev i ζ (W.γA g f) = rescale (1 + (PD.p : LL)) (W.lev i ζ f))
     (u : Fin (Module.finrank LL T.V) → ℤ) (e : ↥(W.N T) →+ (Fin (Module.finrank LL T.V) → LL⟦X⟧))
     (he : ∀ a x, e (a • x) = W.lev i ζ a • e x) (hsp : Submodule.span LL⟦X⟧ (Set.range e) = ⊤)
-    (hγ : ∀ (x : ↥(W.N T)) hx k,
-      e ⟨W.γD T g x, hx⟩ k = C ((1 + (PD.p : LL)) ^ (- u k)) * rescale (1 + (PD.p : LL)) (e x k))
-    (a : LetA O n) (a₀ : (O⟦X⟧)ˣ)
-    (ha : a i = J a₀) (ha₁ : X - ((PD.p : ℕ) : O⟦X⟧) ∣ (a₀ : O⟦X⟧) - 1)
+    (hγ : ∀ (x : ↥(W.N T)) hx k, e ⟨W.γD T g x, hx⟩ k =
+      C ((1 + (PD.p : LL)) ^ (-u k)) * rescale (1 + (PD.p : LL)) (e x k))
+    (a : LetA O n) (a₀ : (O⟦X⟧)ˣ) (ha : a i = J a₀) (ha₁ : X - ((PD.p : ℕ) : O⟦X⟧) ∣ (a₀ : O⟦X⟧) - 1)
     (w : ℤ) (m : (LL⟦X⟧)ˣ)
     (hm : W.lev i ζ a * m = C ((1 + (PD.p : LL)) ^ (-w)) * rescale (1 + (PD.p : LL)) (m : LL⟦X⟧))
-    (j j' : ℤ) (hj : j < j')
-    : DiagQuot W T g a i j j' (eigMs LL PD.p (Finset.univ.val.map u) w j j') := by
+    (j j' : ℤ) (hj : j < j') :
+    DiagQuot W T g a i j j' (eigMs LL PD.p (Finset.univ.val.map u) w j j') := by
   obtain ⟨s, hs, hs₁⟩ := hJ.2.2.2.2.1
   obtain ⟨Qu, hQ⟩ : IsUnit (algebraMap (LetA O n) W.EE (qΔ W)) := hJ.2.2.2.2.2.2
   obtain ⟨θ, hθ⟩ := exists_theta W T J b i hJ hb Qu hQ j
-  have hP
-      : ∀ c,
-        θ c ∈ (qN W T i j').submoduleOf (qN W T i j)
-          ↔ ∀ k, (X : O⟦X⟧) ^ (j' - j).toNat ∣ c k := fun c => by
+  have hP : ∀ c, θ c ∈ (qN W T i j').submoduleOf (qN W T i j) ↔
+      ∀ k, (X : O⟦X⟧) ^ (j' - j).toNat ∣ c k := fun c => by
     rw [← theta_mem W T J b i hJ hb Qu hQ hj.le, ← hθ]; rfl
   obtain ⟨eq⟩ := quot_equiv _ _ θ hP
   have hp := PD.hp
@@ -550,17 +523,9 @@ theorem diagQuot
   have hX : X - ((PD.p : ℕ) : O⟦X⟧) ≠ 0 := fun h => by
     have := congrArg (coeff 1) h
     rw [← map_natCast (C : O →+* O⟦X⟧), map_sub, coeff_one_X, coeff_C, if_neg one_ne_zero, sub_zero,
-        map_zero]
-      at this
+      map_zero] at this
     exact one_ne_zero this
-  refine ⟨
-    fun x hx => ?_,
-    Module.Free.of_equiv eq.symm,
-    Module.Finite.equiv eq.symm,
-    ?_,
-    ?_,
-    fun nb hnb => ?_
-  ⟩
+  refine ⟨fun x hx => ?_, Module.Free.of_equiv eq.symm, Module.Finite.equiv eq.symm, ?_, ?_, fun nb hnb => ?_⟩
   · obtain ⟨θ', hθ'⟩ := exists_theta W T J b i hJ hb Qu hQ j'
     obtain ⟨c, hc⟩ := θ'.surjective ⟨x, hx⟩
     have h1 : x = (Qu ^ j') • th W T J b i c := by rw [← hθ', hc]
@@ -572,9 +537,8 @@ theorem diagQuot
     · rw [injective_iff_map_eq_zero]
       intro x hx
       obtain ⟨c, rfl⟩ := θ.surjective x
-      have h1 :=
-        (nab_iff W T J b i hJ s hs Qu hQ j ha (c := 0) (c' := c) (d := 0) (by simp)).1
-          (by rw [← hθ, map_zero, smul_zero, map_zero, smul_zero, sub_zero]; exact hx)
+      have h1 := (nab_iff W T J b i hJ s hs Qu hQ j ha (c := 0) (c' := c) (d := 0) (by simp)).1
+        (by rw [← hθ, map_zero, smul_zero, map_zero, smul_zero, sub_zero]; exact hx)
       rw [smul_zero, smul_zero, sub_zero, smul_eq_zero_iff_right (mul_ne_zero a₀.ne_zero hX)] at h1
       rw [h1, map_zero]
     · obtain ⟨c, rfl⟩ := θ.surjective x
@@ -582,10 +546,8 @@ theorem diagQuot
       obtain ⟨y, hy⟩ := dvd_zpow_sub_one _ s hs₁ j
       obtain ⟨z, hz⟩ := ha₁
       refine ⟨θ (((a₀⁻¹ : (O⟦X⟧)ˣ) : O⟦X⟧) • ((y - z) • c + ((s ^ j : (O⟦X⟧)ˣ) : O⟦X⟧) • c₁)), ?_⟩
-      have :=
-        (nab_iff W T J b i hJ s hs Qu hQ j ha hc₁
-            (c' :=
-              ((a₀⁻¹ : (O⟦X⟧)ˣ) : O⟦X⟧) • ((y - z) • c + ((s ^ j : (O⟦X⟧)ˣ) : O⟦X⟧) • c₁))).2 (by
+      have := (nab_iff W T J b i hJ s hs Qu hQ j ha hc₁
+        (c' := ((a₀⁻¹ : (O⟦X⟧)ˣ) : O⟦X⟧) • ((y - z) • c + ((s ^ j : (O⟦X⟧)ˣ) : O⟦X⟧) • c₁))).2 (by
           funext k
           simp only [Pi.smul_apply, Pi.sub_apply, Pi.add_apply, smul_eq_mul]
           have := a₀.mul_inv
@@ -598,28 +560,21 @@ theorem diagQuot
     have hMu : IsUnit M.det :=
       (Matrix.isUnit_iff_isUnit_det M).1 (Matrix.mulVec_surjective_iff_isUnit.1 (hM hsp))
     let Λu : (O⟦X⟧)ˣ →* (LL⟦X⟧)ˣ := Units.map (abelian₂ W J i ζ).toRingHom.toMonoidHom
-    obtain ⟨μ, hμ⟩ :=
-      exists_mu _ hχ η m (Λu s) (Λu a₀) j w
-        (by
-          have h1 := hρ (cst J X)
-          rw [lev_eq W J i ζ (e := X * (s : O⟦X⟧)) (by rw [map_mul, ← hs]; rfl), map_mul] at h1
-          change _ = rescale _ (abelian₂ W J i ζ X) at h1
-          rw [hη, map_mul, rescale_X] at h1
-          apply mul_left_cancel₀ (X_ne_zero (R := LL))
-          change X * ((η : LL⟦X⟧) * abelian₂ W J i ζ s) = _
-          linear_combination h1)
-        (by rw [← hm, lev_eq W J i ζ ha]; rfl)
+    obtain ⟨μ, hμ⟩ := exists_mu _ hχ η m (Λu s) (Λu a₀) j w (by
+      have h1 := hρ (cst J X)
+      rw [lev_eq W J i ζ (e := X * (s : O⟦X⟧)) (by rw [map_mul, ← hs]; rfl), map_mul] at h1
+      change _ = rescale _ (abelian₂ W J i ζ X) at h1
+      rw [hη, map_mul, rescale_X] at h1
+      apply mul_left_cancel₀ (X_ne_zero (R := LL))
+      change X * ((η : LL⟦X⟧) * abelian₂ W J i ζ s) = _
+      linear_combination h1) (by rw [← hm, lev_eq W J i ζ ha]; rfl)
     rw [← map_zpow] at hμ
-    change abelian₂ W J i ζ ((s ^ j : (O⟦X⟧)ˣ) : O⟦X⟧) * (μ : LL⟦X⟧) = C _ * abelian₂ W J i ζ a₀ * _
-      at hμ
+    change abelian₂ W J i ζ ((s ^ j : (O⟦X⟧)ˣ) : O⟦X⟧) * (μ : LL⟦X⟧) = C _ * abelian₂ W J i ζ a₀ * _ at hμ
     have hc : constantCoeff (X * (η : LL⟦X⟧) - ((PD.p : ℕ) : LL⟦X⟧)) = -(PD.p : LL) := by simp
     rw [eigMs_eq, ← hc]
-    refine GlobalTheory.TruncDiag.diagWith_trunc _ _ _ θ (abelian₂ W J i ζ) η
-      (X * (η : LL⟦X⟧) - ((PD.p : ℕ) : LL⟦X⟧)) ((μ : LL⟦X⟧) • M) (1 + (PD.p : LL))
-      (fun k => (1 + (PD.p : LL)) ^ (j + w - u k))
-      nb hinj hP hη η.isUnit ?_ ?_ hχ ?_
-      (fun k => zpow_ne_zero _ hχ)
-      ?_
+    refine GlobalTheory.TruncDiag.diagWith_trunc _ _ _ θ (abelian₂ W J i ζ) η (X * (η : LL⟦X⟧) - ((PD.p : ℕ) : LL⟦X⟧))
+      ((μ : LL⟦X⟧) • M) (1 + (PD.p : LL)) (fun k => (1 + (PD.p : LL)) ^ (j + w - u k)) nb hinj hP hη η.isUnit ?_ ?_ hχ ?_
+      (fun k => zpow_ne_zero _ hχ) ?_
     · rw [Matrix.det_smul]
       exact (μ.isUnit.pow _).mul hMu
     · rw [hc, neg_ne_zero]
@@ -634,11 +589,9 @@ theorem diagQuot
       set d' := c + (X - ((PD.p : ℕ) : O⟦X⟧)) • d
       have h1 := hnb (θ c)
       rw [hcc, hθ, hθ, nab_iff W T J b i hJ s hs Qu hQ j ha hd] at h1
-      have h2
-          : (abelian₂ W J i ζ a₀ * (X * (η : LL⟦X⟧) - ((PD.p : ℕ) : LL⟦X⟧)))
-              • (fun k => abelian₂ W J i ζ (c' k))
-            = abelian₂ W J i ζ ((s ^ j : (O⟦X⟧)ˣ) : O⟦X⟧) • (fun k => abelian₂ W J i ζ (d' k))
-              - abelian₂ W J i ζ a₀ • (fun k => abelian₂ W J i ζ (c k)) := by
+      have h2 : (abelian₂ W J i ζ a₀ * (X * (η : LL⟦X⟧) - ((PD.p : ℕ) : LL⟦X⟧))) • (fun k => abelian₂ W J i ζ (c' k)) =
+          abelian₂ W J i ζ ((s ^ j : (O⟦X⟧)ˣ) : O⟦X⟧) • (fun k => abelian₂ W J i ζ (d' k)) -
+            abelian₂ W J i ζ a₀ • (fun k => abelian₂ W J i ζ (c k)) := by
         funext k
         have := congrArg (abelian₂ W J i ζ) (congrFun h1 k)
         simpa [hη] using this
@@ -656,47 +609,30 @@ theorem diagQuot
         rescale (1 + (PD.p : LL)) (M.mulVec (fun k => abelian₂ W J i ζ (c k)) k) * hμ
 
 def HasCoords (g : W.Gam) (ζ : LL) (r : ℕ) (U : Multiset ℤ) : Prop :=
-  ∃ (u : Fin r → ℤ) (e : ↥(W.N T) →+ (Fin r → LL⟦X⟧)),
-    Finset.univ.val.map u = U ∧ (∀ a x, e (a • x) = W.lev i ζ a • e x)
-      ∧ Submodule.span LL⟦X⟧ (Set.range e) = ⊤
-      ∧ ∀ (x : ↥(W.N T)) hx k,
-        e ⟨W.γD T g x, hx⟩ k = C ((1 + (PD.p : LL)) ^ (- u k)) * rescale (1 + (PD.p : LL)) (e x k)
+  ∃ (u : Fin r → ℤ) (e : ↥(W.N T) →+ (Fin r → LL⟦X⟧)), Finset.univ.val.map u = U ∧
+    (∀ a x, e (a • x) = W.lev i ζ a • e x) ∧ Submodule.span LL⟦X⟧ (Set.range e) = ⊤ ∧
+    ∀ (x : ↥(W.N T)) hx k, e ⟨W.γD T g x, hx⟩ k =
+      C ((1 + (PD.p : LL)) ^ (-u k)) * rescale (1 + (PD.p : LL)) (e x k)
 
-theorem coords_of_lines
-    [CharZero LL]
-    (g : W.Gam)
-    (ζ : LL) (U : Multiset ℤ) (h : LinesAt W T i ζ U)
-    (hγ : ∀ (x : ↥(W.N T)) hx (k : ℤ),
-      W.levN T i ζ ⟨W.γD T g x, hx⟩ k = (1 + (PD.p : LL)) ^ k • W.levN T i ζ x k)
-    : HasCoords W T i g ζ (Module.finrank LL T.V) U := by
+theorem coords_of_lines [CharZero LL] (g : W.Gam) (ζ : LL) (U : Multiset ℤ) (h : LinesAt W T i ζ U)
+    (hγ : ∀ (x : ↥(W.N T)) hx (k : ℤ), W.levN T i ζ ⟨W.γD T g x, hx⟩ k =
+      (1 + (PD.p : LL)) ^ k • W.levN T i ζ x k) : HasCoords W T i g ζ (Module.finrank LL T.V) U := by
   obtain ⟨u, d, hu, hd, hs⟩ := h
-  obtain ⟨e, h1, h2, h3⟩ :=
-    GlobalTheory.SenLines.Coords.exists_coords (W.lev i ζ) (W.levN T i ζ) u d hd
-      (fun a x => funext fun k => W.levN_smul T i ζ a x k)
-      hs
-  exact ⟨
-    u,
-    e,
-    hu,
-    h1,
-    h2,
-    fun x hx k => h3 _ x _ (by exact_mod_cast (by omega : 1 + PD.p ≠ 0)) (hγ x hx) k
-  ⟩
+  obtain ⟨e, h1, h2, h3⟩ := GlobalTheory.SenLines.Coords.exists_coords (W.lev i ζ) (W.levN T i ζ) u d hd
+    (fun a x => funext fun k => W.levN_smul T i ζ a x k) hs
+  exact ⟨u, e, hu, h1, h2, fun x hx k => h3 _ x _
+    (by exact_mod_cast (by omega : 1 + PD.p ≠ 0)) (hγ x hx) k⟩
 
-theorem senPair
-    [IsDomain O] [IsLocalRing O] [CharZero LL]
-    (hinj : Function.Injective (algebraMap O LL)) (hl : ¬ IsUnit ((PD.p : ℕ) : O))
-    {g : W.Gam} (hJ : QFrame W g J)
-    (b : Module.Basis (Fin (Module.finrank LL T.V)) (LetA O n) ↥(W.N T))
-    (hb : ∀ k, (b k : W.DD T) ∈ W.NΔ T)
-    (ζ : LL) (hζ : IsPrimitiveRoot ζ PD.p)
+theorem senPair [IsDomain O] [IsLocalRing O] [CharZero LL] (hinj : Function.Injective (algebraMap O LL))
+    (hl : ¬ IsUnit ((PD.p : ℕ) : O))
+    {g : W.Gam} (hJ : QFrame W g J) (b : Module.Basis (Fin (Module.finrank LL T.V)) (LetA O n) ↥(W.N T))
+    (hb : ∀ k, (b k : W.DD T) ∈ W.NΔ T) (ζ : LL) (hζ : IsPrimitiveRoot ζ PD.p)
     (hρ : ∀ f, W.lev i ζ (W.γA g f) = rescale (1 + (PD.p : LL)) (W.lev i ζ f))
     (U : Multiset ℤ) (hC : HasCoords W T i g ζ (Module.finrank LL T.V) U)
-    (a : LetA O n) (a₀ : (O⟦X⟧)ˣ)
-    (ha : a i = J a₀) (ha₁ : X - ((PD.p : ℕ) : O⟦X⟧) ∣ (a₀ : O⟦X⟧) - 1)
+    (a : LetA O n) (a₀ : (O⟦X⟧)ˣ) (ha : a i = J a₀) (ha₁ : X - ((PD.p : ℕ) : O⟦X⟧) ∣ (a₀ : O⟦X⟧) - 1)
     (w : ℤ) (m : (LL⟦X⟧)ˣ)
-    (hm : W.lev i ζ a * m = C ((1 + (PD.p : LL)) ^ (-w)) * rescale (1 + (PD.p : LL)) (m : LL⟦X⟧))
-    : SenPair W T g a i U w := by
+    (hm : W.lev i ζ a * m = C ((1 + (PD.p : LL)) ^ (-w)) * rescale (1 + (PD.p : LL)) (m : LL⟦X⟧)) :
+    SenPair W T g a i U w := by
   obtain ⟨u, e, hu, he, hsp, hγ⟩ := hC
   have hD : ∀ j j' : ℤ, j < j' → DiagQuot W T g a i j j' (eigMs LL PD.p U w j j') := fun j j' hj =>
     hu ▸ diagQuot W T J i hinj hJ b hb ζ hζ hρ u e he hsp hγ a a₀ ha ha₁ w m hm j j' hj
@@ -714,13 +650,10 @@ theorem senPair
     rw [← RingHom.mem_ker, this]
     exact hl
   have e1 : eigMs LL PD.p U w 0 1 = (U.map fun x => c (0 - (x - w))).map (algebraMap O LL) := by
-    rw [eigMs, show Finset.Ico (0 : ℤ) 1 = {0} from rfl, Multiset.map_map,
-      ← Multiset.bind_singleton]
+    rw [eigMs, show Finset.Ico (0 : ℤ) 1 = {0} from rfl, Multiset.map_map, ← Multiset.bind_singleton]
     refine Multiset.bind_congr fun x _ => ?_
     simp only [Finset.singleton_val, Multiset.map_singleton, Function.comp, hc]
-  have e2
-      : (U.map fun x => ((x - w : ℤ) : k))
-        = (U.map fun x => c (0 - (x - w))).map (algebraMap O k) := by
+  have e2 : (U.map fun x => ((x - w : ℤ) : k)) = (U.map fun x => c (0 - (x - w))).map (algebraMap O k) := by
     rw [Multiset.map_map]
     refine Multiset.map_congr rfl fun x _ => ?_
     obtain ⟨d, hd⟩ := hc' (0 - (x - w))
@@ -733,36 +666,28 @@ theorem senPair
   rw [e1] at hd
   exact eigWith_of_diagWith hinj _ _ hd
 
-theorem tie_γ
-    {Zl Ai : Type} [CommRing Zl] [CommRing Ai] [Algebra Zl O] [Algebra Zl Ai]
+theorem tie_γ {Zl Ai : Type} [CommRing Zl] [CommRing Ai] [Algebra Zl O] [Algebra Zl Ai]
     {RW : Type} [CommRing RW] [Algebra O RW]
     {inclR : (O ⊗[Zl] Ai) →ₐ[O] RW} {φR : RW →ₐ[O] RW} {gR : G → (RW →ₐ[O] RW)} {πA : O ⊗[Zl] Ai}
     {E : EtTie W (O ⊗[Zl] Ai) RW inclR φR gR πA} {ιdR : Ai →+* BdR} {p1 : Ai} {tS zS : BdR}
-    (tie : CmpTie W E ιdR p1 tS zS)
-    {g : W.Gam} (hχ : algebraMap O LL (W.χΓ g : O) = 1 + (PD.p : LL))
-    {ζ : LL} (hζ : IsPrimitiveRoot ζ PD.p)
-    : (∀ i f, W.lev i ζ (W.γA g f) = rescale (1 + (PD.p : LL)) (W.lev i ζ f))
-      ∧ ∀ T : LocLat G Qp LL O,
-        IsCrys PD T.ρ
-          → ∀ i (x : ↥(W.N T)) hx (k : ℤ),
-            W.levN T i ζ ⟨W.γD T g x, hx⟩ k = (1 + (PD.p : LL)) ^ k • W.levN T i ζ x k := by
+    (tie : CmpTie W E ιdR p1 tS zS) {g : W.Gam} (hχ : algebraMap O LL (W.χΓ g : O) = 1 + (PD.p : LL))
+    {ζ : LL} (hζ : IsPrimitiveRoot ζ PD.p) :
+    (∀ i f, W.lev i ζ (W.γA g f) = rescale (1 + (PD.p : LL)) (W.lev i ζ f)) ∧
+      ∀ T : LocLat G Qp LL O, IsCrys PD T.ρ → ∀ i (x : ↥(W.N T)) hx (k : ℤ),
+        W.levN T i ζ ⟨W.γD T g x, hx⟩ k = (1 + (PD.p : LL)) ^ k • W.levN T i ζ x k := by
   have hv : ((1 : ℕ) : WithTop ℚ) ≤ v (algebraMap O LL (W.χΓ g : O) - ((1 : ℕ) : LL)) := by
     rw [hχ, Nat.cast_one, Nat.cast_one, add_sub_cancel_left, W.v_l]
-  refine ⟨
-    fun i f => hχ ▸ tie.lev_Γ g i ζ ζ 1 1 (by rwa [pow_one]) hv (pow_one ζ).symm f,
-    fun T hT i x hx k => ?_
-  ⟩
-  rw [tie.levN_eq, tie.levN_eq,
-    tie.levB_Γ T hT g i ζ ζ 1 1 (by rwa [pow_one]) hv (pow_one ζ).symm x hx k, map_smul, hχ]
+  refine ⟨fun i f => hχ ▸ tie.lev_Γ g i ζ ζ 1 1 (by rwa [pow_one]) hv (pow_one ζ).symm f,
+    fun T hT i x hx k => ?_⟩
+  rw [tie.levN_eq, tie.levN_eq, tie.levB_Γ T hT g i ζ ζ 1 1 (by rwa [pow_one]) hv (pow_one ζ).symm x hx k,
+    map_smul, hχ]
 
 end Generic
 
-theorem finrank_lattice
-    {G LL O V : Type}
-    [Group G] [Field LL] [CommRing O] [IsDomain O] [Algebra O LL] [IsPrincipalIdealRing O]
+theorem finrank_lattice {G LL O V : Type} [Group G] [Field LL] [CommRing O] [IsDomain O] [Algebra O LL]
+    [IsPrincipalIdealRing O]
     [IsFractionRing O LL] [AddCommGroup V] [Module LL V] [Module O V] [IsScalarTower O LL V]
-    {ρ : Representation LL G V} (L : Lattice (O := O) ρ)
-    : Module.finrank O ↥L.T = Module.finrank LL V := by
+    {ρ : Representation LL G V} (L : Lattice (O := O) ρ) : Module.finrank O ↥L.T = Module.finrank LL V := by
   have : L.T.IsLattice LL := Submodule.IsLattice.of_fg LL L.fg
   have : L.T.IsFullLattice LL := ⟨L.span⟩
   exact Submodule.IsFullLattice.finrank_eq LL L.T

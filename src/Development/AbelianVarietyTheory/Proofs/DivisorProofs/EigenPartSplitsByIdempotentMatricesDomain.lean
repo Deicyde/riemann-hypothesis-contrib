@@ -1,22 +1,74 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.HenselianLocalRingOfIsAdicComplete
-public import Development.AbelianVarietyTheory.Definitions.AbelianSchemeLaws.FirstCohomologyVanishesSpecOfIsLocalRing
-public import Development.AbelianVarietyTheory.Definitions.Degenerations.ExistsGenPullTriv
-public import Development.AbelianVarietyTheory.Definitions.Uniformization.IsCPPullback
-public import Development.AbelianVarietyTheory.Statements.SemistableTorsion.SemistableFin
-public import Development.AbelianVarietyTheory.Definitions.Degenerations.OfDerivationFnOn
-public import Development.AbelianVarietyTheory.Definitions.Divisors.NotCompactOfMEqOne
+public import Mathlib.Algebra.BigOperators.Finsupp.Basic
+public import Mathlib.Data.Matrix.Mul
+public import Mathlib.RingTheory.Ideal.Span
+public import Mathlib.RingTheory.Localization.FractionRing
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Development.AbelianVarietyTheory.Definitions.AbelianSchemeLaws.FirstCohomologyVanishesSpecOfIsLocalRing
+import Development.AbelianVarietyTheory.Definitions.Degenerations.ExistsGenPullTriv
+import Development.AbelianVarietyTheory.Definitions.Divisors.NotCompactOfMEqOne
+import Development.AbelianVarietyTheory.Definitions.Uniformization.ExistsUniqueTorusCompat
+import Development.AbelianVarietyTheory.Proofs.HomogeneousIdeals.DiagZEqNegAddY
+import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.HenselianLocalRingOfIsAdicComplete
+import Mathlib.CategoryTheory.Monoidal.Cartesian.Basic
+import Mathlib.CategoryTheory.Monoidal.Category
+import Mathlib.CategoryTheory.Monoidal.Mon
+public import Mathlib.Data.Matrix.Basic
+public import Mathlib.LinearAlgebra.Finsupp.LinearCombination
+public import Mathlib.LinearAlgebra.Matrix.ToLin
+import Mathlib.Topology.Sheaves.Presheaf
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.IsCompletedStrictHens
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.DiscreteValuationRings.QuadTie
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.SemiabelianSchemes.CubicalStructures.CubeSymmetricSwapFirst
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj
-  AlgebraicGeometry NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
-  ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory GlobalTheory.AbLaw GlobalTheory.UU GlobalTheory.LN GlobalTheory.Raynaud
-  IsLocalRing
+open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory GlobalTheory.AbLaw GlobalTheory.UU GlobalTheory.LN GlobalTheory.Raynaud IsLocalRing
 open scoped CategoryTheory.Obj
 open GlobalTheory.UPel.HT
 
@@ -29,54 +81,44 @@ variable {W : Type} [CommRing W] {n : ℕ} {R' : Type} [CommRing R'] (β : W →
 theorem act_one : ((1 : Matrix (Fin n) (Fin n) W).map β) *ᵥ v = (1 : R') • v := by
   rw [Matrix.map_one _ (map_zero β) (map_one β), one_mulVec, one_smul]
 
-theorem act_add
-    {M N : Matrix (Fin n) (Fin n) W} {s s' : R'}
-    (hM : (M.map β) *ᵥ v = s • v) (hN : (N.map β) *ᵥ v = s' • v)
-    : ((M + N).map β) *ᵥ v = (s + s') • v := by
+theorem act_add {M N : Matrix (Fin n) (Fin n) W} {s s' : R'} (hM : (M.map β) *ᵥ v = s • v)
+    (hN : (N.map β) *ᵥ v = s' • v) : ((M + N).map β) *ᵥ v = (s + s') • v := by
   rw [Matrix.map_add _ (map_add β), add_mulVec, hM, hN, add_smul]
 
-theorem act_sub
-    {M N : Matrix (Fin n) (Fin n) W} {s s' : R'}
-    (hM : (M.map β) *ᵥ v = s • v) (hN : (N.map β) *ᵥ v = s' • v)
-    : ((M - N).map β) *ᵥ v = (s - s') • v := by
+theorem act_sub {M N : Matrix (Fin n) (Fin n) W} {s s' : R'} (hM : (M.map β) *ᵥ v = s • v)
+    (hN : (N.map β) *ᵥ v = s' • v) : ((M - N).map β) *ᵥ v = (s - s') • v := by
   rw [Matrix.map_sub _ (map_sub β), sub_mulVec, hM, hN, sub_smul]
 
-theorem act_smul {M : Matrix (Fin n) (Fin n) W} {s : R'} (r : W) (hM : (M.map β) *ᵥ v = s • v)
-    : ((r • M).map β) *ᵥ v = (β r * s) • v := by
+theorem act_smul {M : Matrix (Fin n) (Fin n) W} {s : R'} (r : W) (hM : (M.map β) *ᵥ v = s • v) :
+    ((r • M).map β) *ᵥ v = (β r * s) • v := by
   have : (r • M).map β = β r • M.map β := by ext; simp
   rw [this, Matrix.smul_mulVec, hM, smul_smul]
 
-theorem act_mul
-    {M N : Matrix (Fin n) (Fin n) W} {s s' : R'}
-    (hM : (M.map β) *ᵥ v = s • v) (hN : (N.map β) *ᵥ v = s' • v)
-    : ((M * N).map β) *ᵥ v = (s * s') • v := by
+theorem act_mul {M N : Matrix (Fin n) (Fin n) W} {s s' : R'} (hM : (M.map β) *ᵥ v = s • v)
+    (hN : (N.map β) *ᵥ v = s' • v) : ((M * N).map β) *ᵥ v = (s * s') • v := by
   rw [Matrix.map_mul, ← mulVec_mulVec, hN, mulVec_smul, hM, smul_smul, mul_comm]
 
-theorem act_list
-    {κ : Type} (F : κ → Matrix (Fin n) (Fin n) W) (S : κ → R')
-    (h : ∀ j, ((F j).map β) *ᵥ v = S j • v) (l : List κ)
-    : (((l.map F).prod).map β) *ᵥ v = (l.map S).prod • v := by
+theorem act_list {κ : Type} (F : κ → Matrix (Fin n) (Fin n) W) (S : κ → R')
+    (h : ∀ j, ((F j).map β) *ᵥ v = S j • v) (l : List κ) :
+    (((l.map F).prod).map β) *ᵥ v = (l.map S).prod • v := by
   induction l with
   | nil => simpa using act_one β v
   | cons j l ih => simpa using act_mul β v (h j) ih
 
-theorem act_finset
-    {κ : Type} (F : κ → Matrix (Fin n) (Fin n) W) (S : κ → R')
-    (h : ∀ j, ((F j).map β) *ᵥ v = S j • v) (s : Finset κ)
-    : ((∑ j ∈ s, F j).map β) *ᵥ v = (∑ j ∈ s, S j) • v := by
+theorem act_finset {κ : Type} (F : κ → Matrix (Fin n) (Fin n) W) (S : κ → R')
+    (h : ∀ j, ((F j).map β) *ᵥ v = S j • v) (s : Finset κ) :
+    ((∑ j ∈ s, F j).map β) *ᵥ v = (∑ j ∈ s, S j) • v := by
   classical
   induction s using Finset.induction_on with
   | empty => simp
   | insert j s hj ih => rw [Finset.sum_insert hj, Finset.sum_insert hj]; exact act_add β v (h j) ih
 
-theorem act_finsupp
-    {O : Type} (F : O → Matrix (Fin n) (Fin n) W) (S : O → R')
-    (h : ∀ x, ((F x).map β) *ᵥ v = S x • v) (f : O →₀ W)
-    : ((f.sum fun x r => r • F x).map β) *ᵥ v = (f.sum fun x r => β r * S x) • v :=
+theorem act_finsupp {O : Type} (F : O → Matrix (Fin n) (Fin n) W) (S : O → R')
+    (h : ∀ x, ((F x).map β) *ᵥ v = S x • v) (f : O →₀ W) :
+    ((f.sum fun x r => r • F x).map β) *ᵥ v = (f.sum fun x r => β r * S x) • v :=
   act_finset β v _ _ (fun x => act_smul β v (f x) (h x)) f.support
 
-theorem ext_mulVec {L : Type} [Field L] {M N : Matrix (Fin n) (Fin n) L} (h : ∀ x, M *ᵥ x = N *ᵥ x)
-    : M = N :=
+theorem ext_mulVec {L : Type} [Field L] {M N : Matrix (Fin n) (Fin n) L} (h : ∀ x, M *ᵥ x = N *ᵥ x) : M = N :=
   Matrix.toLin'.injective (LinearMap.ext fun x => by simpa [Matrix.toLin'_apply] using h x)
 
 end GlobalTheory.LieExtProj
@@ -84,24 +126,7 @@ end GlobalTheory.LieExtProj
 namespace GlobalTheory.LieExtProj
 open Matrix
 
-theorem rhoPart_splits_by_idempotents
-    : ∀ (W L : Type) [CommRing W] [IsDomain W] [Field L] [Algebra W L] [IsFractionRing W L]
-        (O : Type) [CommRing O] (n a : ℕ) (A : O →+* Matrix (Fin n) (Fin n) W) (ω : O) (tr nm : ℤ)
-        (ρ : W) (t : Fin a → (O →+* W)),
-      ω ^ 2 - tr * ω + nm = 0 → ρ ^ 2 - tr * ρ + nm = 0 → (∀ i, t i ω = ρ)
-        → (∀ i j, i ≠ j → Ideal.span (Set.range fun x => t i x - t j x) = ⊤)
-        → IsUnit ((tr ^ 2 - 4 * nm : ℤ) : W)
-        → (∀ v : Fin n → L,
-          ((A ω).map (algebraMap W L)).mulVec v = algebraMap W L ρ • v
-            → ∃ w : Fin a → Fin n → L,
-              (∀ i c, ((A c).map (algebraMap W L)).mulVec (w i) = algebraMap W L (t i c) • w i)
-                ∧ v = ∑ i, w i)
-        → ∃ Q : Fin a → Matrix (Fin n) (Fin n) W,
-          (∀ i, Q i * Q i = Q i) ∧ (∀ i c, A c * Q i = t i c • Q i)
-            ∧ (∀ (R' : Type) [CommRing R'] (β : W →+* R') (v : Fin n → R'),
-              ((A ω).map β).mulVec v = β ρ • v → v = ∑ i, ((Q i).map β).mulVec v)
-            ∧ ∀ (R' : Type) [CommRing R'] (β : W →+* R') (i : Fin a) (v : Fin n → R'),
-              (∀ c, ((A c).map β).mulVec v = β (t i c) • v) → ((Q i).map β).mulVec v = v := by
+theorem rhoPart_splits_by_idempotents : ∀ (W L : Type) [CommRing W] [IsDomain W] [Field L] [Algebra W L] [IsFractionRing W L] (O : Type) [CommRing O] (n a : ℕ) (A : O →+* Matrix (Fin n) (Fin n) W) (ω : O) (tr nm : ℤ) (ρ : W) (t : Fin a → (O →+* W)), ω ^ 2 - tr * ω + nm = 0 → ρ ^ 2 - tr * ρ + nm = 0 → (∀ i, t i ω = ρ) → (∀ i j, i ≠ j → Ideal.span (Set.range fun x => t i x - t j x) = ⊤) → IsUnit ((tr ^ 2 - 4 * nm : ℤ) : W) → (∀ v : Fin n → L, ((A ω).map (algebraMap W L)).mulVec v = algebraMap W L ρ • v → ∃ w : Fin a → Fin n → L, (∀ i c, ((A c).map (algebraMap W L)).mulVec (w i) = algebraMap W L (t i c) • w i) ∧ v = ∑ i, w i) → ∃ Q : Fin a → Matrix (Fin n) (Fin n) W, (∀ i, Q i * Q i = Q i) ∧ (∀ i c, A c * Q i = t i c • Q i) ∧ (∀ (R' : Type) [CommRing R'] (β : W →+* R') (v : Fin n → R'), ((A ω).map β).mulVec v = β ρ • v → v = ∑ i, ((Q i).map β).mulVec v) ∧ ∀ (R' : Type) [CommRing R'] (β : W →+* R') (i : Fin a) (v : Fin n → R'), (∀ c, ((A c).map β).mulVec v = β (t i c) • v) → ((Q i).map β).mulVec v = v := by
   intro W L _ _ _ _ _ O _ n a A ω tr nm ρ t hω hρ htω hcop hdisc hsplit
   classical
   have hu2 : (2 * ρ - tr) * (2 * ρ - tr) = ((tr ^ 2 - 4 * nm : ℤ) : W) := by
@@ -110,9 +135,8 @@ theorem rhoPart_splits_by_idempotents
   obtain ⟨ui, hui⟩ := hu.exists_left_inv
   set P : Matrix (Fin n) (Fin n) W := ui • (A ω + (ρ - tr) • 1) with hPdef
 
-  have hf
-      : ∀ i j, ∃ f : O →₀ W,
-        i ≠ j → (f.sum fun x r => r * t i x) - (f.sum fun x r => r * t j x) = 1 := by
+  have hf : ∀ i j, ∃ f : O →₀ W, i ≠ j →
+      (f.sum fun x r => r * t i x) - (f.sum fun x r => r * t j x) = 1 := by
     intro i j
     by_cases hij : i = j
     · exact ⟨0, fun h => (h hij).elim⟩
@@ -124,15 +148,13 @@ theorem rhoPart_splits_by_idempotents
       simp [Finsupp.sum, smul_eq_mul, mul_sub]
   choose f hf using hf
   let Z : Fin a → Fin a → Matrix (Fin n) (Fin n) W := fun i j =>
-    ((f i j).sum fun x r => r • A x)
-      - ((f i j).sum fun x r => r * t j x) • (1 : Matrix (Fin n) (Fin n) W)
+    ((f i j).sum fun x r => r • A x) - ((f i j).sum fun x r => r * t j x) • (1 : Matrix (Fin n) (Fin n) W)
   let E : Fin a → Matrix (Fin n) (Fin n) W := fun i =>
     ((List.finRange a).map fun j => if j = i then 1 else Z i j).prod
   let Q : Fin a → Matrix (Fin n) (Fin n) W := fun i => E i * P
 
-  have hP
-      : ∀ (R' : Type) [CommRing R'] (β : W →+* R') (v : Fin n → R'),
-        ((A ω).map β) *ᵥ v = β ρ • v → (P.map β) *ᵥ v = v := by
+  have hP : ∀ (R' : Type) [CommRing R'] (β : W →+* R') (v : Fin n → R'),
+      ((A ω).map β) *ᵥ v = β ρ • v → (P.map β) *ᵥ v = v := by
     intro R' _ β v hv
     have h := act_smul β v ui (act_add β v hv (act_smul β v (ρ - tr) (act_one β v)))
     rw [h]
@@ -140,19 +162,11 @@ theorem rhoPart_splits_by_idempotents
       simp only [map_mul, map_sub, map_ofNat, _root_.mul_one]; ring
     rw [this, hui, map_one, one_smul]
 
-  have hE
-      : ∀ (R' : Type) [CommRing R'] (β : W →+* R') (k i : Fin a) (v : Fin n → R'),
-        (∀ c, ((A c).map β) *ᵥ v = β (t k c) • v)
-          → ((E i).map β) *ᵥ v = (if k = i then (1 : R') else 0) • v := by
+  have hE : ∀ (R' : Type) [CommRing R'] (β : W →+* R') (k i : Fin a) (v : Fin n → R'),
+      (∀ c, ((A c).map β) *ᵥ v = β (t k c) • v) → ((E i).map β) *ᵥ v = (if k = i then (1 : R') else 0) • v := by
     intro R' _ β k i v hv
-    have hZ
-        : ∀ j,
-          ((if j = i then 1 else Z i j).map β) *ᵥ v
-            = (if j = i then
-                 1
-               else
-                 β ((f i j).sum fun x r => r * t k x) - β ((f i j).sum fun x r => r * t j x))
-              • v := by
+    have hZ : ∀ j, ((if j = i then 1 else Z i j).map β) *ᵥ v =
+        (if j = i then 1 else β ((f i j).sum fun x r => r * t k x) - β ((f i j).sum fun x r => r * t j x)) • v := by
       intro j
       split_ifs
       · exact act_one β v
@@ -160,7 +174,7 @@ theorem rhoPart_splits_by_idempotents
         have h2 := act_sub β v h1 (act_smul β v ((f i j).sum fun x r => r * t j x) (act_one β v))
         refine h2.trans ?_
         congr 1
-        set_option synthInstance.maxHeartbeats 100000 in
+
         simp [Finsupp.sum, map_sum, map_mul]
     rw [act_list β v _ _ hZ]
     by_cases hki : k = i
@@ -178,12 +192,11 @@ theorem rhoPart_splits_by_idempotents
       apply List.prod_eq_zero
       refine List.mem_map.2 ⟨k, List.mem_finRange k, ?_⟩
       rw [if_neg hki, sub_self]
-  have hQ
-      : ∀ (R' : Type) [CommRing R'] (β : W →+* R') (k i : Fin a) (v : Fin n → R'),
-        (∀ c, ((A c).map β) *ᵥ v = β (t k c) • v)
-          → ((Q i).map β) *ᵥ v = (if k = i then (1 : R') else 0) • v := by
+  have hQ : ∀ (R' : Type) [CommRing R'] (β : W →+* R') (k i : Fin a) (v : Fin n → R'),
+      (∀ c, ((A c).map β) *ᵥ v = β (t k c) • v) → ((Q i).map β) *ᵥ v = (if k = i then (1 : R') else 0) • v := by
     intro R' _ β k i v hv
-    have h1 : (P.map β) *ᵥ v = (1 : R') • v := by rw [one_smul]; exact hP R' β v (by rw [hv, htω])
+    have h1 : (P.map β) *ᵥ v = (1 : R') • v := by
+      rw [one_smul]; exact hP R' β v (by rw [hv, htω])
     have h2 := hE R' β k i v hv
     have h3 := act_mul β v h2 h1
     rw [_root_.mul_one] at h3
@@ -201,10 +214,9 @@ theorem rhoPart_splits_by_idempotents
   set βL := algebraMap W L
   have hinj : Function.Injective fun M : Matrix (Fin n) (Fin n) W => M.map βL :=
     Matrix.map_injective (IsFractionRing.injective W L)
-  have hdec
-      : ∀ x : Fin n → L, ∃ w : Fin a → Fin n → L,
-        (∀ i, ((Q i).map βL) *ᵥ x = w i) ∧ (∀ i c, ((A c).map βL) *ᵥ w i = βL (t i c) • w i)
-          ∧ (P.map βL) *ᵥ x = ∑ i, w i := by
+  have hdec : ∀ x : Fin n → L, ∃ w : Fin a → Fin n → L,
+      (∀ i, ((Q i).map βL) *ᵥ x = w i) ∧ (∀ i c, ((A c).map βL) *ᵥ w i = βL (t i c) • w i) ∧
+      (P.map βL) *ᵥ x = ∑ i, w i := by
     intro x
     have hy : ((A ω).map βL) *ᵥ ((P.map βL) *ᵥ x) = βL ρ • ((P.map βL) *ᵥ x) := by
       rw [mulVec_mulVec, ← Matrix.map_mul, hAP]

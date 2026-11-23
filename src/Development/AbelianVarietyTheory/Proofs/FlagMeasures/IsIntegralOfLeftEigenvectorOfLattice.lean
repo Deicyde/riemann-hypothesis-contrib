@@ -1,43 +1,92 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.Definitions.SemilocalFrames.HermitianFormUnitaryOneOne
-public import Development.AbelianVarietyTheory.Statements.CuspFrameWeights.DiscreteSpectrumKFiniteDecomposition
-public import Formalism.HarderNarasimhan.ShiftInvariance
+public import Mathlib.NumberTheory.NumberField.Basic
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+public import Mathlib.LinearAlgebra.Matrix.Charpoly.Eigs
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Etale.Weakly
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.TotallySplit
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Development.AbelianVarietyTheory.Definitions.SemilocalFrames.LayerProd
+import Development.AbelianVarietyTheory.Definitions.SemilocalFrames.PosPartUnitaryMul
+import Formalism.FormalDegreeBessel.StatementWR
+import Formalism.RealPlaceAnalysis.StatementA
+import Formalism.SharpRestriction.CuspSpanNormBounds.Point
 
 @[expose] public section
 
-open MeasureTheory NumberField Matrix Finset Formalism.MainNotions.S Formalism.REAL
-  Formalism.QuantumDeterminants GlobalTheory.Count GlobalTheory.Dec
+open MeasureTheory NumberField Matrix Finset Formalism.MainNotions.S Formalism.REAL Formalism.QuantumDeterminants GlobalTheory.Count GlobalTheory.Dec
 open scoped InnerProductSpace ComplexOrder ContDiff
 
 namespace GlobalTheory
 
-theorem isIntegral_of_left_eigenvector_of_lattice
-    {E K : Type}
-    [Field E] [NumberField E] [Field K] [Algebra E K] [Algebra (𝓞 E) K] [IsScalarTower (𝓞 E) E K]
-    {n : ℕ} (Λ : Submodule (𝓞 E) (Fin n → E)) (B : Matrix (Fin n) (Fin n) E)
-    (c : E) (w : K) (v : Fin n → K)
-    (hfg : Λ.FG) (hsp : Submodule.span E (Λ : Set (Fin n → E)) = ⊤) (hc : c ≠ 0)
-    (hB : ∀ y ∈ Λ, ∃ z ∈ Λ, B *ᵥ y = c • z) (hv : v ≠ 0)
-    (hw : v ᵥ* (B.map (algebraMap E K)) = (algebraMap E K c * w) • v)
-    : IsIntegral (𝓞 E) w := by
-  let φ : (Fin n → E) →ₗ[E] K := {
-    toFun := fun y => v ⬝ᵥ (fun i => algebraMap E K (y i))
-    map_add' := by
-      intro x y
-      simp [dotProduct, mul_add, Finset.sum_add_distrib]
-    map_smul' := by
-      intro a x
-      simp [dotProduct, Finset.mul_sum, Algebra.smul_def, mul_left_comm]
-  }
+theorem isIntegral_of_left_eigenvector_of_lattice {E K : Type} [Field E] [NumberField E] [Field K]
+    [Algebra E K] [Algebra (𝓞 E) K] [IsScalarTower (𝓞 E) E K] {n : ℕ}
+    (Λ : Submodule (𝓞 E) (Fin n → E)) (B : Matrix (Fin n) (Fin n) E) (c : E) (w : K)
+    (v : Fin n → K) (hfg : Λ.FG) (hsp : Submodule.span E (Λ : Set (Fin n → E)) = ⊤)
+    (hc : c ≠ 0) (hB : ∀ y ∈ Λ, ∃ z ∈ Λ, B *ᵥ y = c • z) (hv : v ≠ 0)
+    (hw : v ᵥ* (B.map (algebraMap E K)) = (algebraMap E K c * w) • v) :
+    IsIntegral (𝓞 E) w := by
+  let φ : (Fin n → E) →ₗ[E] K :=
+    { toFun := fun y => v ⬝ᵥ (fun i => algebraMap E K (y i))
+      map_add' := by
+        intro x y
+        simp [dotProduct, mul_add, Finset.sum_add_distrib]
+      map_smul' := by
+        intro a x
+        simp [dotProduct, Finset.mul_sum, Algebra.smul_def, mul_left_comm] }
   have hφ : ∀ y, φ (B *ᵥ y) = (algebraMap E K c * w) * φ y := by
     intro y
-    have h1
-        : (fun i => algebraMap E K ((B *ᵥ y) i))
-          = (B.map (algebraMap E K)) *ᵥ (fun i => algebraMap E K (y i)) := by
+    have h1 : (fun i => algebraMap E K ((B *ᵥ y) i))
+        = (B.map (algebraMap E K)) *ᵥ (fun i => algebraMap E K (y i)) := by
       ext i
-      set_option synthInstance.maxHeartbeats 100000 in
+
       simp [Matrix.mulVec, dotProduct, map_sum]
     show v ⬝ᵥ (fun i => algebraMap E K ((B *ᵥ y) i)) = _ * (v ⬝ᵥ (fun i => algebraMap E K (y i)))
     rw [h1, Matrix.dotProduct_mulVec, hw, smul_dotProduct, smul_eq_mul]
@@ -67,12 +116,12 @@ theorem isIntegral_of_left_eigenvector_of_lattice
     have h' := mul_left_cancel₀ hcK h
     simpa using h'
 
-theorem trace_mem_of_nilpotent_mod_radical
-    (E : Type) [Field E] [NumberField E]
-    (n m g : ℕ) (Λ : Submodule (𝓞 E) (Fin n → E)) (A : Matrix (Fin n) (Fin n) E) (hfg : Λ.FG)
-    (hsp : Submodule.span E (Λ : Set (Fin n → E)) = ⊤) (hrad : (Ideal.span {(g : 𝓞 E)}).IsRadical)
-    (hg : 1 ≤ g) (hA : ∀ y ∈ Λ, A *ᵥ y ∈ Λ) (hm : ∀ y ∈ Λ, ∃ z ∈ Λ, (A ^ m) *ᵥ y = (g : E) • z)
-    : ∃ t : 𝓞 E, A.trace = (g : E) * (t : E) := by
+theorem trace_mem_of_nilpotent_mod_radical (E : Type) [Field E] [NumberField E] (n m g : ℕ)
+    (Λ : Submodule (𝓞 E) (Fin n → E)) (A : Matrix (Fin n) (Fin n) E) (hfg : Λ.FG)
+    (hsp : Submodule.span E (Λ : Set (Fin n → E)) = ⊤)
+    (hrad : (Ideal.span {(g : 𝓞 E)}).IsRadical) (hg : 1 ≤ g)
+    (hA : ∀ y ∈ Λ, A *ᵥ y ∈ Λ) (hm : ∀ y ∈ Λ, ∃ z ∈ Λ, (A ^ m) *ᵥ y = (g : E) • z) :
+    ∃ t : 𝓞 E, A.trace = (g : E) * (t : E) := by
   let K := AlgebraicClosure E
   let f : E →+* K := algebraMap E K
   let R := integralClosure (𝓞 E) K
@@ -80,9 +129,8 @@ theorem trace_mem_of_nilpotent_mod_radical
   have hgK : (g : K) ≠ 0 := by
     have : f (g : E) ≠ 0 := by simpa only [map_ne_zero] using hgE
     simpa using this
-  have hroot
-      : ∀ z ∈ (A.map f).charpoly.roots, ∃ r : R,
-        r ∈ (Ideal.span {(g : R)}).radical ∧ (r : K) = z := by
+  have hroot : ∀ z ∈ (A.map f).charpoly.roots,
+      ∃ r : R, r ∈ (Ideal.span {(g : R)}).radical ∧ (r : K) = z := by
     intro z hz
     have h0 : (Matrix.scalar (Fin n) z - A.map f).det = 0 := by
       rw [← Matrix.eval_charpoly]
@@ -98,12 +146,11 @@ theorem trace_mem_of_nilpotent_mod_radical
       induction k with
       | zero => simp
       | succ k ih =>
-        rw [pow_succ, Matrix.map_mul, ← Matrix.vecMul_vecMul, ih, Matrix.smul_vecMul, h1, smul_smul,
-          pow_succ]
+        rw [pow_succ, Matrix.map_mul, ← Matrix.vecMul_vecMul, ih, Matrix.smul_vecMul, h1,
+          smul_smul, pow_succ]
     have hi1 : IsIntegral (𝓞 E) z :=
       isIntegral_of_left_eigenvector_of_lattice Λ A 1 z v hfg hsp one_ne_zero
-        (fun y hy => ⟨_, hA y hy, by simp⟩)
-        hv (by simpa using h1)
+        (fun y hy => ⟨_, hA y hy, by simp⟩) hv (by simpa using h1)
     have hi2 : IsIntegral (𝓞 E) (z ^ m / (g : K)) :=
       isIntegral_of_left_eigenvector_of_lattice Λ (A ^ m) (g : E) _ v hfg hsp hgE hm hv (by
         rw [map_natCast, mul_div_cancel₀ _ hgK]
@@ -113,11 +160,10 @@ theorem trace_mem_of_nilpotent_mod_radical
     show z ^ m / (g : K) * ((g : R) : K) = z ^ m
     have : ((g : R) : K) = (g : K) := by simp
     rw [this, div_mul_cancel₀ _ hgK]
-  have hsum
-      : ∃ r : R, r ∈ (Ideal.span {(g : R)}).radical ∧ (r : K) = (A.map f).charpoly.roots.sum := by
-    refine Multiset.sum_induction
-      (fun x : K => ∃ r : R, r ∈ (Ideal.span {(g : R)}).radical ∧ (r : K) = x)
-      _ ?_ ⟨0, Ideal.zero_mem _, rfl⟩ hroot
+  have hsum : ∃ r : R, r ∈ (Ideal.span {(g : R)}).radical ∧
+      (r : K) = (A.map f).charpoly.roots.sum := by
+    refine Multiset.sum_induction (fun x : K => ∃ r : R,
+      r ∈ (Ideal.span {(g : R)}).radical ∧ (r : K) = x) _ ?_ ⟨0, Ideal.zero_mem _, rfl⟩ hroot
     rintro _ _ ⟨a, ha, rfl⟩ ⟨b, hb, rfl⟩
     exact ⟨a + b, Ideal.add_mem _ ha hb, rfl⟩
   rw [← Matrix.trace_eq_sum_roots_charpoly, ← AddMonoidHom.map_trace f A] at hsum
@@ -125,20 +171,21 @@ theorem trace_mem_of_nilpotent_mod_radical
   obtain ⟨s, hs⟩ := Ideal.mem_span_singleton'.1 hN
   have hdown : ∀ x : E, IsIntegral (𝓞 E) (f x) → ∃ t : 𝓞 E, (t : E) = x := by
     intro x hx
-    exact IsIntegrallyClosed.isIntegral_iff.1 ((isIntegral_algebraMap_iff).1 hx)
+    exact IsIntegrallyClosed.isIntegral_iff.1
+      ((isIntegral_algebraMap_iff ).1 hx)
   obtain ⟨t₀, ht₀⟩ := hdown A.trace (hr ▸ r.2)
   have hsK : (s : K) * (g : K) = f A.trace ^ N := by
     have := congrArg (fun x : R => (x : K)) hs
     simpa [hr] using this
-  obtain ⟨u, hu⟩ :=
-    hdown (A.trace ^ N / (g : E)) (by
-      rw [map_div₀, map_pow, map_natCast, ← hsK, mul_div_cancel_right₀ _ hgK]
-      exact s.2)
+  obtain ⟨u, hu⟩ := hdown (A.trace ^ N / (g : E)) (by
+    rw [map_div₀, map_pow, map_natCast, ← hsK, mul_div_cancel_right₀ _ hgK]
+    exact s.2)
   have hmem : t₀ ∈ Ideal.span {(g : 𝓞 E)} := by
     apply hrad
     refine ⟨N, Ideal.mem_span_singleton'.2 ⟨u, ?_⟩⟩
     apply RingOfIntegers.coe_injective
-    have h : (u : E) * (g : E) = (t₀ : E) ^ N := by rw [hu, ht₀, div_mul_cancel₀ _ hgE]
+    have h : (u : E) * (g : E) = (t₀ : E) ^ N := by
+      rw [hu, ht₀, div_mul_cancel₀ _ hgE]
     simpa using h
   obtain ⟨t, ht⟩ := Ideal.mem_span_singleton'.1 hmem
   refine ⟨t, ?_⟩

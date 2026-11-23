@@ -1,6 +1,54 @@
 module
 
-public import Mathlib
+public import Mathlib.Algebra.MvPolynomial.PDeriv
+public import Mathlib.LinearAlgebra.Matrix.Determinant.Basic
+public import Mathlib.RingTheory.Ideal.Maps
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+public import Mathlib.LinearAlgebra.Matrix.Nondegenerate
+public import Mathlib.RingTheory.Ideal.BigOperators
 
 @[expose] public section
 
@@ -22,48 +70,31 @@ def firstOrderKer (η : MvPolynomial σ B →+* O) : Ideal (MvPolynomial σ B) w
     rintro G F ⟨hF, hF'⟩
     exact ⟨by simp [hF], fun l => by simp [pderiv_mul, hF, hF' l]⟩
 
-theorem pderiv_comb
-    [Fintype σ]
-    (η : MvPolynomial σ B →+* O) (f g : σ → MvPolynomial σ B) (hf : ∀ i, η (f i) = 0)
-    (k : MvPolynomial σ B) (hk : k ∈ firstOrderKer η)
-    (l : σ)
-    : η (pderiv l (∑ i, g i * f i + k)) = ∑ i, η (g i) * η (pderiv l (f i)) := by
+theorem pderiv_comb [Fintype σ] (η : MvPolynomial σ B →+* O) (f g : σ → MvPolynomial σ B)
+    (hf : ∀ i, η (f i) = 0) (k : MvPolynomial σ B) (hk : k ∈ firstOrderKer η) (l : σ) :
+    η (pderiv l (∑ i, g i * f i + k)) = ∑ i, η (g i) * η (pderiv l (f i)) := by
   have := hk.2 l
-  set_option synthInstance.maxHeartbeats 100000 in
+
   simp [map_sum, pderiv_mul, hf, this]
 
-theorem det_ne_zero_of_mul_eq
-    [Fintype σ] [DecidableEq σ] [IsDomain O]
-    {N J : Matrix σ σ O} {c : O} (hc : c ≠ 0) (h : N * J = c • (1 : Matrix σ σ O))
-    : J.det ≠ 0 := by
+theorem det_ne_zero_of_mul_eq [Fintype σ] [DecidableEq σ] [IsDomain O] {N J : Matrix σ σ O}
+    {c : O} (hc : c ≠ 0) (h : N * J = c • (1 : Matrix σ σ O)) : J.det ≠ 0 := by
   intro hJ
   have := congrArg Matrix.det h
   rw [Matrix.det_mul, hJ, mul_zero, Matrix.det_smul, Matrix.det_one, mul_one] at this
   exact pow_ne_zero _ hc this.symm
 
-theorem cotangent_map_injective_of_square_presentation
-    : ∀ (O B A σ : Type) [CommRing O] [IsDomain O] [CommRing B] [CommRing A] [Algebra O B]
-        [Algebra O A] [Algebra B A] [IsScalarTower O B A] [Fintype σ] (ε : A →ₐ[O] O) (x : σ → A)
-        (f : σ → MvPolynomial σ B) (c : O),
-      c ≠ 0 → Function.Surjective (MvPolynomial.aeval x : MvPolynomial σ B →ₐ[B] A)
-        → (∀ i, MvPolynomial.aeval x (f i) = 0)
-        → RingHom.ker (MvPolynomial.aeval x : MvPolynomial σ B →ₐ[B] A)
-          ≤ Ideal.span (Set.range f)
-            ⊔ (RingHom.ker ε).comap (MvPolynomial.aeval x : MvPolynomial σ B →ₐ[B] A)
-              * RingHom.ker (MvPolynomial.aeval x : MvPolynomial σ B →ₐ[B] A)
-        → (∀ a ∈ RingHom.ker ε,
-          c • a ∈ RingHom.ker ε ^ 2 ⊔ ((RingHom.ker ε).comap (algebraMap B A)).map (algebraMap B A))
-        → ∀ b : B,
-          algebraMap B A b ∈ RingHom.ker ε ^ 2
-            → b ∈ ((RingHom.ker ε).comap (algebraMap B A)) ^ 2 := by
+theorem cotangent_map_injective_of_square_presentation : ∀ (O B A σ : Type) [CommRing O] [IsDomain O] [CommRing B] [CommRing A] [Algebra O B] [Algebra O A] [Algebra B A] [IsScalarTower O B A] [Fintype σ] (ε : A →ₐ[O] O) (x : σ → A) (f : σ → MvPolynomial σ B) (c : O), c ≠ 0 → Function.Surjective (MvPolynomial.aeval x : MvPolynomial σ B →ₐ[B] A) → (∀ i, MvPolynomial.aeval x (f i) = 0) → RingHom.ker (MvPolynomial.aeval x : MvPolynomial σ B →ₐ[B] A) ≤ Ideal.span (Set.range f) ⊔ (RingHom.ker ε).comap (MvPolynomial.aeval x : MvPolynomial σ B →ₐ[B] A) * RingHom.ker (MvPolynomial.aeval x : MvPolynomial σ B →ₐ[B] A) → (∀ a ∈ RingHom.ker ε, c • a ∈ RingHom.ker ε ^ 2 ⊔ ((RingHom.ker ε).comap (algebraMap B A)).map (algebraMap B A)) → ∀ b : B, algebraMap B A b ∈ RingHom.ker ε ^ 2 → b ∈ ((RingHom.ker ε).comap (algebraMap B A)) ^ 2 := by
   intro O B A σ _ _ _ _ _ _ _ _ _ ε x f c hc hsurj hf hker hc2 b hb
   classical
   set Ψ := (MvPolynomial.aeval x : MvPolynomial σ B →ₐ[B] A) with hΨ
   let η : MvPolynomial σ B →+* O := (ε : A →+* O).comp (Ψ : MvPolynomial σ B →+* A)
   have hη : ∀ F, η F = ε (Ψ F) := fun F => rfl
   set q := (RingHom.ker ε).comap Ψ with hq
-  have hqmem : ∀ F, F ∈ q ↔ η F = 0 := fun F => by rw [hq, Ideal.mem_comap, RingHom.mem_ker, hη]
-  have hkerq : RingHom.ker Ψ ≤ q := fun F hF => by rw [hqmem, hη, (RingHom.mem_ker).1 hF, map_zero]
+  have hqmem : ∀ F, F ∈ q ↔ η F = 0 := fun F => by
+    rw [hq, Ideal.mem_comap, RingHom.mem_ker, hη]
+  have hkerq : RingHom.ker Ψ ≤ q := fun F hF => by
+    rw [hqmem, hη, (RingHom.mem_ker).1 hF, map_zero]
   have hηf : ∀ i, η (f i) = 0 := fun i => by rw [hη, hf i, map_zero]
   set K := firstOrderKer η with hK
   have hq2 : q ^ 2 ≤ K := by
@@ -73,21 +104,17 @@ theorem cotangent_map_injective_of_square_presentation
     exact ⟨by simp [ha, hb'], fun l => by simp [pderiv_mul, ha, hb']⟩
   have hkerL : RingHom.ker Ψ ≤ Ideal.span (Set.range f) ⊔ q ^ 2 := by
     refine hker.trans (sup_le_sup_left ?_ _)
-    rw [pow_two]
-    exact Ideal.mul_mono_right hkerq
+    rw [pow_two]; exact Ideal.mul_mono_right hkerq
   have hkerK : RingHom.ker Ψ ≤ Ideal.span (Set.range f) ⊔ K := hkerL.trans (sup_le_sup_left hq2 _)
   have hsq : RingHom.ker ε ^ 2 = (q ^ 2).map Ψ := by
     rw [Ideal.map_pow, hq, Ideal.map_comap_of_surjective Ψ hsurj]
-  have lift
-      : ∀ (L : Ideal (MvPolynomial σ B)),
-        RingHom.ker Ψ ≤ Ideal.span (Set.range f) ⊔ L
-          → ∀ F, Ψ F ∈ L.map Ψ → F ∈ Ideal.span (Set.range f) ⊔ L := by
+  have lift : ∀ (L : Ideal (MvPolynomial σ B)), RingHom.ker Ψ ≤ Ideal.span (Set.range f) ⊔ L →
+      ∀ F, Ψ F ∈ L.map Ψ → F ∈ Ideal.span (Set.range f) ⊔ L := by
     intro L hL F hF
     obtain ⟨G, hG, hGF⟩ := (Ideal.mem_map_iff_of_surjective Ψ hsurj).1 hF
     have h1 : F - G ∈ RingHom.ker Ψ := by rw [RingHom.mem_ker, map_sub, hGF, sub_self]
     have h2 : F = (F - G) + G := by ring
-    rw [h2]
-    exact Ideal.add_mem _ (hL h1) (Ideal.mem_sup_right hG)
+    rw [h2]; exact Ideal.add_mem _ (hL h1) (Ideal.mem_sup_right hG)
   have hIB : ((RingHom.ker ε).comap (algebraMap B A)).map (algebraMap B A) ≤ K.map Ψ := by
     rw [Ideal.map_le_iff_le_comap]
     intro i hi
@@ -96,22 +123,20 @@ theorem cotangent_map_injective_of_square_presentation
     have : algebraMap B A i = Ψ (C i) := by simp [hΨ]
     rw [this]
     refine Ideal.mem_map_of_mem _ ⟨?_, fun l => by simp⟩
-    rw [hη]
-    simpa [hΨ] using hi
+    rw [hη]; simpa [hΨ] using hi
   let Jac : Matrix σ σ O := fun i l => η (pderiv l (f i))
-  have hrow
-      : ∀ j, ∃ g : σ → MvPolynomial σ B, ∀ l,
-        (if j = l then c else 0) = ∑ i, η (g i) * Jac i l := by
+  have hrow : ∀ j, ∃ g : σ → MvPolynomial σ B, ∀ l,
+      (if j = l then c else 0) = ∑ i, η (g i) * Jac i l := by
     intro j
     set F := C (algebraMap O B c) * (X j - C (algebraMap O B (ε (x j)))) with hF
-    have ha : x j - algebraMap O A (ε (x j)) ∈ RingHom.ker ε := by rw [RingHom.mem_ker]; simp
+    have ha : x j - algebraMap O A (ε (x j)) ∈ RingHom.ker ε := by
+      rw [RingHom.mem_ker]; simp
     have hΨF : Ψ F = c • (x j - algebraMap O A (ε (x j))) := by
       simp [hF, hΨ, Algebra.smul_def, ← IsScalarTower.algebraMap_apply]
     have hmem : Ψ F ∈ K.map Ψ := by
       rw [hΨF]
       refine (sup_le ?_ hIB) (hc2 _ ha)
-      rw [hsq]
-      exact Ideal.map_mono hq2
+      rw [hsq]; exact Ideal.map_mono hq2
     have hF2 := lift K hkerK F hmem
     rw [Submodule.mem_sup] at hF2
     obtain ⟨s, hs, k, hk, hsk⟩ := hF2
@@ -133,8 +158,7 @@ theorem cotangent_map_injective_of_square_presentation
   have hdet : Jac.det ≠ 0 := det_ne_zero_of_mul_eq hc hNJ
   have hCb : C b ∈ Ideal.span (Set.range f) ⊔ q ^ 2 := by
     refine lift _ hkerL (C b) ?_
-    rw [← hsq]
-    simpa [hΨ] using hb
+    rw [← hsq]; simpa [hΨ] using hb
   rw [Submodule.mem_sup] at hCb
   obtain ⟨s, hs, k, hk, hsk⟩ := hCb
   obtain ⟨g', rfl⟩ := Ideal.mem_span_range_iff_exists_fun.1 hs

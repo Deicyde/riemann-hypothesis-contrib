@@ -1,13 +1,52 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.RealMoveOfParts
-public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.NonzeroPlacesOverPrimesOfLifts
+public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.IsBaseEnlargementFixedCoefFieldOfCoeffEnlargemen
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsOmPinsLev
 public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.NonzeroIndexPlacesAdelicDataResizedEq
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsCoefficientMapExtensionOverEnlargedBase
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.DefiniteFamilyCoefficientMapsMulRootOfUnity
+public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.NonzeroPlacesOverPrimesOfLifts
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.CoefficientMapEnlargedBaseEqComplexMultiple
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsCoefficientMapsAgreeRootOfUnityEnlarged
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.DefiniteFamilyCoefficientMapsMulRootOfUnity
+import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsAdelicCoreTransportEnlargedCoefficientBase
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsCoefficientMapExtensionOverEnlargedBase
+import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsCoefficientMapsAgreeRootOfUnityEnlarged
+import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.IsIntegralOfLine
+import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ReferenceTupleLiftFormsPassToCoeffEnlargement
+import Development.AbelianVarietyTheory.Proofs.SatakeParameters.ClassPresBasic
+import Formalism.LocalToGlobal.Columns.RowFormsAdelic
+import Formalism.PadicSubsetSums.StableGradedCounts.ZBrauerNesbittAlg
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
 
 @[expose] public section
 
@@ -69,7 +108,6 @@ theorem exists_form
   cx_form (R.toCx3 F) F.cr false (hH.prim.pos false) (hRw.what₂ false).1 hRw.lifts0.1
     (hH.prim.sumE false) hH.prim.dimParts i
 
-set_option maxHeartbeats 1000000 in
 theorem coefFam_roots
     {D : D7} {G : Type} [Group G] [Fintype G]
     {Pl0 T0 : Type} {A : FamIn D.what₂.LL G Pl0 T0 D.R.m} {Ks : Type}
@@ -117,7 +155,6 @@ variable
   {w' : ColW B' f' T'} {Z : w.Lt} {Z' : w'.Lt} {hX : B.fields.Ok} {hX' : B'.fields.Ok}
   {Wt : Set B.places.Pl} {Wt' : Set B'.places.Pl}
 
-set_option maxHeartbeats 4000000 in
 theorem heq_io
     (q : B'.toPre = B.toPre)
     (i : Fin (w.st Z).toD7.R.m) (i' : Fin (w'.st Z').toD7.R.m) (hi : (i : ℕ) = i')
@@ -164,7 +201,6 @@ theorem heq_io
   subst e2
   exact HEq.rfl
 
-set_option maxHeartbeats 4000000 in
 theorem heq_pol
     (q : B'.toPre = B.toPre)
     (i : Fin (w.st Z).toD7.R.m) (i' : Fin (w'.st Z').toD7.R.m) (hi : (i : ℕ) = i')
@@ -191,7 +227,6 @@ theorem heq_pol
 section Lift
 open OmExt LiftUnit Formalism.DivisionValues Formalism.L2.Col
 
-set_option maxHeartbeats 4000000 in
 theorem coef_schur
     (z : Dat (w.st Z) w.I hX T Wt)
     (z' : Dat (w'.st Z') w'.I hX' T' Wt')
@@ -344,7 +379,6 @@ theorem agree_root
         (heq_of_eq hv2'.symm).trans (hjh.trans (heq_of_eq hv2))
       ⟩
 
-set_option maxHeartbeats 4000000 in
 theorem one_lift
     (z : Dat (w.st Z) w.I hX T Wt)
     (z' : Dat (w'.st Z') w'.I hX' T' Wt')
@@ -395,7 +429,6 @@ theorem one_lift
 
 end Lift
 
-set_option maxHeartbeats 2000000 in
 theorem exists_roots
     (z : Dat (w.st Z) w.I hX T Wt)
     (z' : Dat (w'.st Z') w'.I hX' T' Wt')
@@ -422,7 +455,6 @@ theorem exists_roots
     exact h2.2.2
   · exact ⟨1, 1, one_ne_zero, one_pow _, fun i hi => absurd ⟨i, hi⟩ h⟩
 
-set_option maxHeartbeats 2000000 in
 theorem sameModel_extN
     (z : Dat (w.st Z) w.I hX T Wt) (z' : Dat (w'.st Z') w'.I hX' T' Wt') (hN : ExtN z z')
     (i : Fin (w.st Z).toD7.R.m) (i' : Fin (w'.st Z').toD7.R.m) (hi : (i : ℕ) = i')
@@ -442,7 +474,6 @@ theorem sameModel_extN
     s.fr.trans (m.2.2.2.2.2.2.1.symm.trans s'.fr.symm)
   ⟩
 
-set_option maxHeartbeats 2000000 in
 theorem io_at
     (z : Dat (w.st Z) w.I hX T Wt) (z' : Dat (w'.st Z') w'.I hX' T' Wt')
     (hE : Enl0 B B') (hN : ExtN z z')
@@ -470,7 +501,6 @@ theorem io_at
       y' hy
   exact (by with_unfolding_all exact (k :))
 
-set_option maxHeartbeats 4000000 in
 theorem io_of_extN
     (z : Dat (w.st Z) w.I hX T Wt) (z' : Dat (w'.st Z') w'.I hX' T' Wt')
     (hE : Enl0 B B') (hf : HEq f' f) (hpx : HEq w'.px w.px) (hstd : z.Std) (hB : z'.Std)
@@ -533,8 +563,8 @@ open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formal
   GlobalTheory.Mem.Top.Bl GlobalTheory.Mem.R3 GlobalTheory.Mem.R3.Rw GlobalTheory.HeightCounting
   GlobalTheory.HeightCounting.Up GlobalTheory.TwistChoice
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 2000000
+
+
 open GlobalTheory.HeightCounting.SerMove GlobalTheory.Mem.R3.Tr
 
 theorem GlobalTheory.HeightCounting.SerMove.ioCl_of_link

@@ -1,9 +1,53 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.RigExtMapRelFrobCompRigOfOmega
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FrobKerIdealLeAugIdeal
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.PowFinrankCotangentLeFinrankFrobeniusKernelQuoti
+public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.EqZeroOfCobOneEqZero
+public import Mathlib.LinearAlgebra.FreeModule.PID
+public import Mathlib.RingTheory.Flat.TorsionFree
+public import Mathlib.RingTheory.SimpleRing.Principal
+public import ReciprocityTheory.DualLattices.RidConvolutionDerivation
+public import Development.AbelianVarietyTheory.Proofs.UnramifiedDepth.AevalSurjectiveOfSpanCotangent
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.Noetherian.Nilpotent
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
 
 @[expose] public section
 
@@ -11,15 +55,14 @@ set_option autoImplicit false
 
 noncomputable section
 
-open CategoryTheory TensorProduct Coalgebra Bialgebra GlobalTheory GlobalTheory.PDiv
-  GlobalTheory.PDivGroup
+open CategoryTheory TensorProduct Coalgebra Bialgebra GlobalTheory GlobalTheory.PDiv GlobalTheory.PDivGroup
 
 namespace GlobalTheory.HeightOneDual
 
 variable {K H : Type} [Field K] [CommRing H] [HopfAlgebra K H] [IsCocomm K H] [Module.Finite K H]
 
-theorem cobOne_toConv_eq_zero {δ : H →ₗ[K] K} (hδ : ReciprocityTheory.PGsh.IsPtDer δ)
-    : cobOne K (CartierDual K H) (WithConv.toConv δ) = 0 := by
+theorem cobOne_toConv_eq_zero {δ : H →ₗ[K] K} (hδ : ReciprocityTheory.PGsh.IsPtDer δ) :
+    cobOne K (CartierDual K H) (WithConv.toConv δ) = 0 := by
   rw [cobOne_apply, sub_sub, sub_eq_zero, CartierDual.comul_eq_iff]
   intro a b
   rw [map_add (f := _), LinearMap.add_apply, CartierDual.pair_tmul_tmul, CartierDual.pair_tmul_tmul,
@@ -29,21 +72,19 @@ theorem cobOne_toConv_eq_zero {δ : H →ₗ[K] K} (hδ : ReciprocityTheory.PGsh
   change δ a * counit b + counit a * δ b = _
   ring
 
-theorem apply_convD (φ : CartierDual K H) (δ : H →ₗ[K] K) (y : H)
-    : φ (ReciprocityTheory.PGsh.convD δ y) = (φ * WithConv.toConv δ) y := by
+theorem apply_convD (φ : CartierDual K H) (δ : H →ₗ[K] K) (y : H) :
+    φ (ReciprocityTheory.PGsh.convD δ y) = (φ * WithConv.toConv δ) y := by
   rw [CartierDual.mul_apply, CartierDual.pair_tmul]
-  simp only [ReciprocityTheory.PGsh.convD, LinearMap.coe_comp, LinearEquiv.coe_coe,
-    Function.comp_apply]
+  simp only [ReciprocityTheory.PGsh.convD, LinearMap.coe_comp, LinearEquiv.coe_coe, Function.comp_apply]
   generalize comul (R := K) y = t
   induction t with
   | add u v hu hv => simp only [map_add (f := _), hu, hv]
   | tmul a b => simp [mul_comm]
 
-theorem adjoin_primitive_eq_top
-    : ∀ (p : ℕ) [Fact p.Prime] (K H : Type) [Field K] [CharP K p] [CommRing H] [HopfAlgebra K H]
-        [IsCocomm K H] [Module.Finite K H],
-      (∀ a ∈ augIdeal K H, a ^ p = 0)
-        → Algebra.adjoin K {φ : CartierDual K H | cobOne K (CartierDual K H) φ = 0} = ⊤ := by
+theorem adjoin_primitive_eq_top : ∀ (p : ℕ) [Fact p.Prime] (K H : Type) [Field K] [CharP K p]
+    [CommRing H] [HopfAlgebra K H] [IsCocomm K H] [Module.Finite K H],
+    (∀ a ∈ augIdeal K H, a ^ p = 0) →
+    Algebra.adjoin K {φ : CartierDual K H | cobOne K (CartierDual K H) φ = 0} = ⊤ := by
   intro p hp K H _ _ _ _ _ _ hpow
   classical
   set ε := counitAlgHom K H with hεdef
@@ -53,28 +94,25 @@ theorem adjoin_primitive_eq_top
   choose x hx using fun i => (RingHom.ker ε).toCotangent_surjective (b i)
   let y : Fin (Module.finrank K (AugCot ε)) → H := fun i => (x i : H)
   have hy : ∀ i, y i ∈ RingHom.ker ε := fun i => (x i).2
-  have hsum
-      : ∀ l : Fin (Module.finrank K (AugCot ε)) → K,
-        AugCot.d ε (∑ i, l i • y i) = ∑ i, l i • b i := by
+  have hsum : ∀ l : Fin (Module.finrank K (AugCot ε)) → K,
+      AugCot.d ε (∑ i, l i • y i) = ∑ i, l i • b i := by
     intro l
-    set_option synthInstance.maxHeartbeats 100000 in
+
     simp [y, map_sum, hx]
   have hmem : ∀ l : Fin (Module.finrank K (AugCot ε)) → K, (∑ i, l i • y i) ∈ RingHom.ker ε := by
     intro l
     refine Ideal.sum_mem _ fun i _ => ?_
     rw [Algebra.smul_def]
     exact Ideal.mul_mem_left _ _ (hy i)
-  have hspan
-      : ∀ z ∈ RingHom.ker ε, ∃ l : Fin (Module.finrank K (AugCot ε)) → K,
-        z - ∑ i, l i • y i ∈ RingHom.ker ε ^ 2 := by
+  have hspan : ∀ z ∈ RingHom.ker ε, ∃ l : Fin (Module.finrank K (AugCot ε)) → K,
+      z - ∑ i, l i • y i ∈ RingHom.ker ε ^ 2 := by
     intro z hz
     refine ⟨b.repr (AugCot.d ε z), ?_⟩
     have h1 : AugCot.d ε (z - ∑ i, b.repr (AugCot.d ε z) i • y i) = 0 := by
       rw [map_sub, hsum, b.sum_repr, sub_self]
     rwa [AugCot.d_of_mem _ (sub_mem hz (hmem _)), Ideal.toCotangent_eq_zero] at h1
-  have hind
-      : ∀ l : Fin (Module.finrank K (AugCot ε)) → K,
-        ∑ i, l i • y i ∈ RingHom.ker ε ^ 2 → l = 0 := by
+  have hind : ∀ l : Fin (Module.finrank K (AugCot ε)) → K,
+      ∑ i, l i • y i ∈ RingHom.ker ε ^ 2 → l = 0 := by
     intro l hl
     have h1 : AugCot.d ε (∑ i, l i • y i) = 0 := by
       rw [AugCot.d_of_mem _ (hmem _), Ideal.toCotangent_eq_zero]
@@ -100,18 +138,13 @@ theorem adjoin_primitive_eq_top
   have hZ0 : ∀ h ∈ Z, h = 0 := by
     intro h hh
     obtain ⟨P, rfl⟩ := hsurj h
-    have hc :=
-      ReciprocityTheory.PGsh.coeff_eq_zero_of_stable ε y hy
-        (fun i => ReciprocityTheory.PGsh.convD (δ i))
-        (fun i => ReciprocityTheory.PGsh.convD_mul _ (hδ i))
-        (fun i j => (ReciprocityTheory.PGsh.counit_convD (δ i) (y j)).trans (hδx i j))
-        hsurj (CharP.cast_eq_zero K p)
-        (fun n h0 hn => by
-          rw [isUnit_iff_ne_zero, Ne, CharP.cast_eq_zero_iff K p]
-          exact Nat.not_dvd_of_pos_of_lt h0 hn)
-        Z hZε hZD P hh
-    exact ReciprocityTheory.PGsh.aeval_eq_zero_of_mem_span y
-      (fun j => hpow _ (hy j))
+    have hc := ReciprocityTheory.PGsh.coeff_eq_zero_of_stable ε y hy (fun i => ReciprocityTheory.PGsh.convD (δ i))
+      (fun i => ReciprocityTheory.PGsh.convD_mul _ (hδ i)) (fun i j =>
+        (ReciprocityTheory.PGsh.counit_convD (δ i) (y j)).trans (hδx i j)) hsurj
+      (CharP.cast_eq_zero K p) (fun n h0 hn => by
+        rw [isUnit_iff_ne_zero, Ne, CharP.cast_eq_zero_iff K p]
+        exact Nat.not_dvd_of_pos_of_lt h0 hn) Z hZε hZD P hh
+    exact ReciprocityTheory.PGsh.aeval_eq_zero_of_mem_span y (fun j => hpow _ (hy j))
       (ReciprocityTheory.PGsh.mem_span_pow_of_coeff hc)
 
   let W : Submodule K (Module.Dual K H) :=

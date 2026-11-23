@@ -1,14 +1,59 @@
 module
 
 public import Formalism.SharpRestriction.LevelLetterCocycles.BlochKatoDuality
+public import Formalism.CharacterColumnKernels.StatementRho
+public import Formalism.CharacterColumnKernels.IdempotentNormalForms.LengthKerOfDetEqZero
 public import Formalism.WachLatticeTwists.LatticeDualFibres.LatticeDualProofs.LocDualOrth
 public import Formalism.WachLatticeTwists.LatticeDualFibres.LatticeDualProofs.QuotLen
-public import Formalism.WachLatticeTwists.LatticeDualFibres.Statement
-public import ReciprocityTheory.GaloisValuations.ContinuousConstSMulQuotient
-public import Formalism.WachLatticeTwists.LatticeDualFibres.FibreDualStable
-public import Formalism.WachLatticeTwists.LatticeDualFibres.LatticeDualProofs.ExistsPowSmulIntegral
-public import Formalism.WachLatticeTwists.LatticeDualFibres.StatDualFibreLattice
-public import Formalism.WeaklyAdmissibleFiltrations.PhtGalois
+public import Formalism.WeaklyAdmissibleFiltrations.CrystallineStableLifts.Galois
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Real
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.LinearAlgebra.Matrix.FiniteDimensional
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.Padics.LocalField
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Coalgebra.IsFrobenius
+import Mathlib.RingTheory.HopfAlgebra.Basic
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.TotallySplit
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -242,8 +287,8 @@ theorem basis_repr_left_eq_pairing
     : b.repr x i = P x (b' i) := by
   have h : P x (b' i) = ∑ j, b.repr x j * P (b j) (b' i) := by
     conv_lhs => rw [← b.sum_repr x]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, LinearMap.sum_apply]
+
+    rw [map_sum, LinearMap.sum_apply]
     refine Finset.sum_congr rfl fun j _ => ?_
     rw [map_smul, LinearMap.smul_apply, smul_eq_mul]
   rw [h, Finset.sum_eq_single i]
@@ -261,8 +306,8 @@ theorem basis_repr_right_eq_pairing
     : b'.repr y j = P (b j) y := by
   have h : P (b j) y = ∑ k, b'.repr y k * P (b j) (b' k) := by
     conv_lhs => rw [← b'.sum_repr y]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     refine Finset.sum_congr rfl fun k _ => ?_
     rw [map_smul, smul_eq_mul]
   rw [h, Finset.sum_eq_single j]
@@ -302,8 +347,8 @@ theorem dualS_lattice
     refine ⟨b.repr ⟨x, hx⟩ i, ?_⟩
     have hx' : x = ∑ k, algebraMap O LL (b.repr ⟨x, hx⟩ k) • bV k := by
       have := congrArg (Submodule.subtype T) (b.sum_repr ⟨x, hx⟩)
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [map_sum, map_smul, Submodule.subtype_apply] at this
+
+      simp only [map_sum, map_smul, Submodule.subtype_apply] at this
       refine this.symm.trans ?_
       exact Finset.sum_congr rfl fun k _ => by rw [hbV, algebraMap_smul]
     have h := congrFun (bV.repr_sum_self fun k => algebraMap O LL (b.repr ⟨x, hx⟩ k)) i

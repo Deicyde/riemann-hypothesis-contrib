@@ -1,7 +1,49 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.HeightProofs.IsLieDataCircle
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
@@ -10,31 +52,22 @@ open scoped ContDiff Topology
 
 namespace GlobalTheory.SmoothForms
 
-theorem bicomm_left_mul
-    {ι G : Type} [Fintype ι] [DecidableEq ι]
-    (ρ : G → Matrix ι ι ℂ) (p : Matrix ι ι ℂ →ₗ[ℂ] Matrix ι ι ℂ)
-    (hp : ∀ g X, p (ρ g * X) = ρ g * p X)
-    (M : Matrix ι ι ℂ) (hM : ∀ T : Matrix ι ι ℂ, (∀ g, T * ρ g = ρ g * T) → M * T = T * M)
-    (X : Matrix ι ι ℂ)
-    : p (M * X) = M * p X := by
-  have key
-      : ∀ (A : Matrix ι ι ℂ) (i j a b : ι),
-        ((Matrix.of fun a b => p (Matrix.single b i 1) a j) * A) a b
-          = p (A * Matrix.single b i 1) a j := by
+theorem bicomm_left_mul {ι G : Type} [Fintype ι] [DecidableEq ι] (ρ : G → Matrix ι ι ℂ)
+    (p : Matrix ι ι ℂ →ₗ[ℂ] Matrix ι ι ℂ) (hp : ∀ g X, p (ρ g * X) = ρ g * p X) (M : Matrix ι ι ℂ)
+    (hM : ∀ T : Matrix ι ι ℂ, (∀ g, T * ρ g = ρ g * T) → M * T = T * M) (X : Matrix ι ι ℂ) :
+    p (M * X) = M * p X := by
+  have key : ∀ (A : Matrix ι ι ℂ) (i j a b : ι),
+      ((Matrix.of fun a b => p (Matrix.single b i 1) a j) * A) a b = p (A * Matrix.single b i 1) a j := by
     intro A i j a b
     have : A * Matrix.single b i 1 = ∑ c, A c b • Matrix.single c i (1 : ℂ) := by
       ext x y
-      simp only [Matrix.sum_apply, Matrix.smul_apply, Matrix.mul_apply, Matrix.single_apply,
-        smul_eq_mul]
+      simp only [Matrix.sum_apply, Matrix.smul_apply, Matrix.mul_apply, Matrix.single_apply, smul_eq_mul]
       by_cases h : i = y <;> simp [h]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [this, map_sum]
-    simp only [Matrix.mul_apply, Matrix.sum_apply, map_smul, Matrix.smul_apply, smul_eq_mul,
-      Matrix.of_apply, mul_comm]
-  have key2
-      : ∀ (A : Matrix ι ι ℂ) (i j a b : ι),
-        (A * (Matrix.of fun a b => p (Matrix.single b i 1) a j)) a b
-          = (A * p (Matrix.single b i 1)) a j := by
+
+    rw [this, map_sum]
+    simp only [Matrix.mul_apply, Matrix.sum_apply, map_smul, Matrix.smul_apply, smul_eq_mul, Matrix.of_apply, mul_comm]
+  have key2 : ∀ (A : Matrix ι ι ℂ) (i j a b : ι),
+      (A * (Matrix.of fun a b => p (Matrix.single b i 1) a j)) a b = (A * p (Matrix.single b i 1)) a j := by
     intro A i j a b
     simp [Matrix.mul_apply]
   have h1 : ∀ b i, p (M * Matrix.single b i 1) = M * p (Matrix.single b i 1) := by
@@ -48,14 +81,13 @@ theorem bicomm_left_mul
     conv_lhs => rw [Matrix.matrix_eq_sum_single X]
     simp [Matrix.smul_single]
   rw [h2]
-  set_option synthInstance.maxHeartbeats 100000 in
+
   simp only [Matrix.mul_sum, map_sum, Matrix.mul_smul, map_smul, h1]
 
-theorem bicomm_mem_span
-    {ι G : Type} [Fintype ι] [DecidableEq ι] [Group G] [Fintype G]
-    (ρ : G → Matrix ι ι ℂ) (h1 : ρ 1 = 1) (hmul : ∀ g h, ρ g * ρ h = ρ (h * g))
-    (M : Matrix ι ι ℂ) (hM : ∀ T : Matrix ι ι ℂ, (∀ g, T * ρ g = ρ g * T) → M * T = T * M)
-    : M ∈ Submodule.span ℂ (Set.range ρ) := by
+theorem bicomm_mem_span {ι G : Type} [Fintype ι] [DecidableEq ι] [Group G] [Fintype G] (ρ : G → Matrix ι ι ℂ)
+    (h1 : ρ 1 = 1) (hmul : ∀ g h, ρ g * ρ h = ρ (h * g)) (M : Matrix ι ι ℂ)
+    (hM : ∀ T : Matrix ι ι ℂ, (∀ g, T * ρ g = ρ g * T) → M * T = T * M) :
+    M ∈ Submodule.span ℂ (Set.range ρ) := by
   set B := Submodule.span ℂ (Set.range ρ) with hB
   have hst : ∀ g, ∀ X ∈ B, ρ g * X ∈ B := by
     intro g X hX
@@ -97,11 +129,7 @@ theorem bicomm_mem_span
   have h3 := B.smul_mem (Fintype.card G : ℂ)⁻¹ (hpB M)
   rwa [this, smul_smul, inv_mul_cancel₀ hc, one_smul] at h3
 
-theorem bicomm_permMat
-    : ∀ (n d : ℕ) (M : Matrix (Fin d → Fin n) (Fin d → Fin n) ℂ),
-      (∀ T : Matrix (Fin d → Fin n) (Fin d → Fin n) ℂ,
-          (∀ π, T * permMat n d π = permMat n d π * T) → M * T = T * M)
-        → M ∈ Submodule.span ℂ (Set.range (permMat n d)) := by
+theorem bicomm_permMat : ∀ (n d : ℕ) (M : Matrix (Fin d → Fin n) (Fin d → Fin n) ℂ), (∀ T : Matrix (Fin d → Fin n) (Fin d → Fin n) ℂ, (∀ π, T * permMat n d π = permMat n d π * T) → M * T = T * M) → M ∈ Submodule.span ℂ (Set.range (permMat n d)) := by
   intro n d M hM
   refine bicomm_mem_span (permMat n d) ?_ ?_ M hM
   · ext I K

@@ -1,10 +1,61 @@
 module
 
-public import Mathlib
+import Development.AutomorphicSpectrum.Proofs.GeometryProofs.LocalRatioProductFormula
 public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.ArchBetween
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.ArchimedeanValueBoundStatement
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.HeightLowerBoundChartNormStatement
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Ring.IsFormallyReal
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+public import Mathlib.Analysis.InnerProductSpace.Calculus
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.Order.CompletePartialOrder
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Lemma
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Presheaf
 public import ReciprocityTheory.SemistableReduction.LogNormCoeffSubLeBlockSphereLogMean
+import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
@@ -59,35 +110,7 @@ lemma log_support {x : L} (hx : x ≠ 0) : (Function.support fun v : FinitePlace
 
 lemma product_formula {x : L} (hx : x ≠ 0) :
     (∑ᶠ v : FinitePlace L, Real.log (v x)) + ∑ σ : L →+* ℂ, Real.log ‖σ x‖ = 0 := by
-  classical
-  have h := prod_abs_eq_one hx
-  rw [InfinitePlace.prod_eq_abs_norm] at h
-  rw [ReciprocityTheory.MultiplicativeHeights.sum_log_norm_embedding_eq x hx]
-  have hf : (Function.mulSupport fun v : FinitePlace L => v x).Finite := FinitePlace.hasFiniteMulSupport hx
-  have hpos : ∀ v : FinitePlace L, v x ≠ 0 := fun v => by
-    simpa using hx
-  have e : (∑ᶠ v : FinitePlace L, Real.log (v x)) = Real.log (∏ᶠ v : FinitePlace L, v x) := by
-    rw [finprod_eq_prod_of_mulSupport_subset (s := hf.toFinset) _ (by simp),
-      finsum_eq_sum_of_support_subset (s := hf.toFinset) _ ?_, Real.log_prod fun v _ => hpos v]
-    intro v hv
-    simp only [Set.Finite.coe_toFinset, Function.mem_mulSupport]
-    intro h1
-    apply hv
-    simp only [h1, Real.log_one]
-  have hP : (∏ᶠ v : FinitePlace L, v x) ≠ 0 := by
-    intro h0
-    rw [h0, mul_zero] at h
-    exact zero_ne_one h
-  have hN : ((Algebra.norm ℚ x : ℚ) : ℝ) ≠ 0 := by
-    exact_mod_cast (Algebra.norm_ne_zero_iff.2 hx)
-  rw [e, Real.log_abs]
-  have h2 : |((Algebra.norm ℚ x : ℚ) : ℝ)| * ∏ᶠ v : FinitePlace L, v x = 1 := by
-    rw [← h]
-    push_cast
-    rfl
-  have h3 := congrArg Real.log h2
-  rw [Real.log_mul (abs_ne_zero.2 hN) hP, Real.log_abs, Real.log_one] at h3
-  linarith
+  apply GlobalTheory.CompanionTheory.Ar.RootHt.RatioSum.finsum_log_add_sum_log <;> assumption
 
 lemma finsum_le_of_le {α : Type} {f g : α → ℝ} (hf : (Function.support f).Finite) (hg : (Function.support g).Finite)
     (h : ∀ a, f a ≤ g a) : ∑ᶠ a, f a ≤ ∑ᶠ a, g a := by

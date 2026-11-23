@@ -1,14 +1,55 @@
 module
 
-public import Mathlib
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.IsCliff
+public import Development.WeilBound.RepresentationTheoryGL.ArchimedeanBaseChange.ArchimedeanBaseChangeProof.ArchimedeanGelfandKernels.IsMultZero
+public import Mathlib.RingTheory.Coalgebra.IsFrobenius
+public import Mathlib.RingTheory.HopfAlgebra.Basic
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.IsCliff
+import Development.WeilBound.RepresentationTheoryGL.ArchimedeanBaseChange.ArchimedeanBaseChangeProof.RealDescent.RealLeviDescent.IsCoreMod
+import Development.WeilBound.RepresentationTheoryGL.ArchimedeanBaseChange.ArchimedeanBaseChangeProof.RealDescent.RealLoc
 
 @[expose] public section
 
 open Matrix Finset
 open scoped InnerProductSpace
-open PositivityTheory.RgBcC PositivityTheory.RgBcC.Real PositivityTheory.RgBcC.RealD
-  GlobalTheory.CompanionTheory.RealCount
+open PositivityTheory.RgBcC PositivityTheory.RgBcC.Real PositivityTheory.RgBcC.RealD GlobalTheory.CompanionTheory.RealCount
 
 noncomputable section
 
@@ -16,7 +57,8 @@ namespace GlobalTheory.CompanionTheory.RealCount
 
 variable {n : ℕ}
 
-def dualCoord (E : KMod n) : (E.V →L[ℂ] ℂ) ≃ₗ[ℂ] EuclideanSpace ℂ (Fin (Module.finrank ℂ E.V)) where
+def dualCoord (E : KMod n) :
+    (E.V →L[ℂ] ℂ) ≃ₗ[ℂ] EuclideanSpace ℂ (Fin (Module.finrank ℂ E.V)) where
   toFun ξ := WithLp.toLp 2 fun i => ξ (stdOrthonormalBasis ℂ E.V i)
   map_add' x y := by
     ext i
@@ -29,7 +71,7 @@ def dualCoord (E : KMod n) : (E.V →L[ℂ] ℂ) ≃ₗ[ℂ] EuclideanSpace ℂ 
     ext x
     have hx := (stdOrthonormalBasis ℂ E.V).sum_repr' x
     conv_rhs => rw [← hx]
-    set_option synthInstance.maxHeartbeats 100000 in
+
     simp [map_sum, mul_comm]
   right_inv v := by
     ext j
@@ -48,16 +90,13 @@ theorem norm_dualCoord (E : KMod n) (ξ : E.V →L[ℂ] ℂ) : ‖dualCoord E ξ
   rw [h3, OrthonormalBasis.repr_apply_apply, ← InnerProductSpace.toDual_symm_apply (𝕜 := ℂ), ← hr,
     norm_inner_symm]
 
-def dualAct (E : KMod n)
-    : (E.V →L[ℂ] E.V) →ₗ[ℂ]
-      (EuclideanSpace ℂ (Fin (Module.finrank ℂ E.V)) →L[ℂ]
-        EuclideanSpace ℂ (Fin (Module.finrank ℂ E.V))) where
-  toFun T :=
-    LinearMap.toContinuousLinearMap
-      ((dualCoord E).toLinearMap
-        ∘ₗ (((ContinuousLinearMap.compL ℂ E.V E.V ℂ).flip T : (E.V →L[ℂ] ℂ) →L[ℂ] (E.V →L[ℂ] ℂ))
-          : (E.V →L[ℂ] ℂ) →ₗ[ℂ] (E.V →L[ℂ] ℂ))
-        ∘ₗ (dualCoord E).symm.toLinearMap)
+def dualAct (E : KMod n) : (E.V →L[ℂ] E.V) →ₗ[ℂ]
+    (EuclideanSpace ℂ (Fin (Module.finrank ℂ E.V)) →L[ℂ]
+      EuclideanSpace ℂ (Fin (Module.finrank ℂ E.V))) where
+  toFun T := LinearMap.toContinuousLinearMap
+    ((dualCoord E).toLinearMap ∘ₗ
+      (((ContinuousLinearMap.compL ℂ E.V E.V ℂ).flip T : (E.V →L[ℂ] ℂ) →L[ℂ] (E.V →L[ℂ] ℂ)) :
+        (E.V →L[ℂ] ℂ) →ₗ[ℂ] (E.V →L[ℂ] ℂ)) ∘ₗ (dualCoord E).symm.toLinearMap)
   map_add' S T := by
     ext v : 1
     simp
@@ -65,41 +104,40 @@ def dualAct (E : KMod n)
     ext v : 1
     simp
 
-theorem dualAct_apply (E : KMod n) (T : E.V →L[ℂ] E.V) (v)
-    : dualAct E T v = dualCoord E ((dualCoord E).symm v ∘L T) := by
+theorem dualAct_apply (E : KMod n) (T : E.V →L[ℂ] E.V) (v) :
+    dualAct E T v = dualCoord E ((dualCoord E).symm v ∘L T) := by
   simp [dualAct]
 
-theorem continuous_unitary_inv : Continuous fun k : Matrix.unitaryGroup (Fin n) ℂ => k⁻¹ := by
+theorem continuous_unitary_inv :
+    Continuous fun k : Matrix.unitaryGroup (Fin n) ℂ => k⁻¹ := by
   refine Continuous.subtype_mk (p := (· ∈ Matrix.unitaryGroup (Fin n) ℂ)) ?_ _
-  simpa using
-    (continuous_subtype_val.star : Continuous fun k : Matrix.unitaryGroup (Fin n) ℂ => star k.1)
+  simpa using (continuous_subtype_val.star :
+    Continuous fun k : Matrix.unitaryGroup (Fin n) ℂ => star k.1)
 
-theorem dualRep_exists {n : ℕ} (E : KMod n)
-    : ∃ (e : (E.V →L[ℂ] ℂ) ≃ₗ[ℂ] EuclideanSpace ℂ (Fin (Module.finrank ℂ E.V)))
-        (ρ' : Matrix.unitaryGroup (Fin n) ℂ
-          →* (EuclideanSpace ℂ (Fin (Module.finrank ℂ E.V)) →L[ℂ]
-               EuclideanSpace ℂ (Fin (Module.finrank ℂ E.V)))),
+theorem dualRep_exists {n : ℕ} (E : KMod n) :
+    ∃ (e : (E.V →L[ℂ] ℂ) ≃ₗ[ℂ] EuclideanSpace ℂ (Fin (Module.finrank ℂ E.V)))
+      (ρ' : Matrix.unitaryGroup (Fin n) ℂ →*
+        (EuclideanSpace ℂ (Fin (Module.finrank ℂ E.V)) →L[ℂ]
+          EuclideanSpace ℂ (Fin (Module.finrank ℂ E.V)))),
       Continuous ρ' ∧ (∀ k v, ‖ρ' k v‖ = ‖v‖) ∧ ∀ k ξ, e (ξ ∘L E.ρ k⁻¹) = ρ' k (e ξ) := by
   have hact : ∀ k ξ, dualAct E (E.ρ k⁻¹) (dualCoord E ξ) = dualCoord E (ξ ∘L E.ρ k⁻¹) := by
     intro k ξ
     rw [dualAct_apply, LinearEquiv.symm_apply_apply]
-  let ρ'
-      : Matrix.unitaryGroup (Fin n) ℂ
-        →* (EuclideanSpace ℂ (Fin (Module.finrank ℂ E.V)) →L[ℂ]
-             EuclideanSpace ℂ (Fin (Module.finrank ℂ E.V))) := {
-    toFun := fun k => dualAct E (E.ρ k⁻¹)
-    map_one' := by
-      ext1 v
-      rw [dualAct_apply, inv_one, map_one]
-      change dualCoord E ((dualCoord E).symm v ∘L ContinuousLinearMap.id ℂ E.V) = v
-      rw [ContinuousLinearMap.comp_id, LinearEquiv.apply_symm_apply]
-    map_mul' := by
-      intro k l
-      ext1 v
-      obtain ⟨ξ, rfl⟩ := (dualCoord E).surjective v
-      rw [ContinuousLinearMap.mul_apply, hact l, hact k, hact (k * l), _root_.mul_inv_rev, map_mul]
-      rfl
-  }
+  let ρ' : Matrix.unitaryGroup (Fin n) ℂ →*
+      (EuclideanSpace ℂ (Fin (Module.finrank ℂ E.V)) →L[ℂ]
+        EuclideanSpace ℂ (Fin (Module.finrank ℂ E.V))) :=
+    { toFun := fun k => dualAct E (E.ρ k⁻¹)
+      map_one' := by
+        ext1 v
+        rw [dualAct_apply, inv_one, map_one]
+        change dualCoord E ((dualCoord E).symm v ∘L ContinuousLinearMap.id ℂ E.V) = v
+        rw [ContinuousLinearMap.comp_id, LinearEquiv.apply_symm_apply]
+      map_mul' := by
+        intro k l
+        ext1 v
+        obtain ⟨ξ, rfl⟩ := (dualCoord E).surjective v
+        rw [ContinuousLinearMap.mul_apply, hact l, hact k, hact (k * l), _root_.mul_inv_rev, map_mul]
+        rfl }
   refine ⟨dualCoord E, ρ', ?_, ?_, fun k ξ => (hact k ξ).symm⟩
   · have h1 : Continuous (dualAct E) := LinearMap.continuous_of_finiteDimensional _
     exact h1.comp (E.cont.comp continuous_unitary_inv)
@@ -117,9 +155,7 @@ theorem dualRep_exists {n : ℕ} (E : KMod n)
       simp [this]
     have h2 : ‖ξ ∘L E.ρ k⁻¹‖ = ‖ξ‖ := by
       refine le_antisymm (hle _ _) ?_
-      calc
-        ‖ξ‖
-          = ‖(ξ ∘L E.ρ k⁻¹) ∘L E.ρ k‖ := by rw [hback]
+      calc ‖ξ‖ = ‖(ξ ∘L E.ρ k⁻¹) ∘L E.ρ k‖ := by rw [hback]
         _ ≤ _ := hle _ _
     change ‖dualAct E (E.ρ k⁻¹) (dualCoord E ξ)‖ = _
     rw [hact, norm_dualCoord, norm_dualCoord, h2]

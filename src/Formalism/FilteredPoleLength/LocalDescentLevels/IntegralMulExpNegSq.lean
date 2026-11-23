@@ -1,6 +1,54 @@
 module
 
 public import Formalism.FilteredPoleLength.ReducedBasisBounds.TransvectionIsometry
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Real
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+public import Mathlib.MeasureTheory.Measure.Lebesgue.VolumeOfBalls
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
+public import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
 
 @[expose] public section
 
@@ -10,8 +58,8 @@ namespace Formalism.LatticeBaseChangeAlt
 
 open Finset MeasureTheory Filter Topology Set
 
-private theorem pow_le_pow_left_of_nonneg {x y : ℝ} (hx : 0 ≤ x) (hxy : x ≤ y) (n : ℕ)
-    : x ^ n ≤ y ^ n := by
+private theorem pow_le_pow_left_of_nonneg {x y : ℝ} (hx : 0 ≤ x) (hxy : x ≤ y) (n : ℕ) :
+    x ^ n ≤ y ^ n := by
   exact pow_le_pow_left₀ hx hxy n
 
 theorem ballVolume : BallVolume := by
@@ -48,15 +96,14 @@ theorem ballVolume : BallVolume := by
   congr 1
   ring
 
-private theorem exp_neg_sq_div_sixteen_antitone {s t : ℝ} (hs : 0 ≤ s) (hst : s ≤ t)
-    : Real.exp (- t ^ 2 / 16) ≤ Real.exp (- s ^ 2 / 16) :=
+private theorem exp_neg_sq_div_sixteen_antitone {s t : ℝ} (hs : 0 ≤ s) (hst : s ≤ t) :
+    Real.exp (-t ^ 2 / 16) ≤ Real.exp (-s ^ 2 / 16) :=
   Real.exp_le_exp.mpr (by nlinarith)
 
-private theorem gaussian_tail_pow_mul_exp_le
-    {g : ℕ} {R0 s t : ℝ}
-    (hR0 : 0 < R0) (hg : 16 * (2 * (g : ℝ) + 1) ≤ R0 ^ 2) (hs : R0 ≤ s) (hst : s ≤ t)
-    : (2 * (3 * t / R0) ^ (2 * g) - (3 * s / R0) ^ (2 * g)) * Real.exp (- t ^ 2 / 16)
-      ≤ (3 * s / R0) ^ (2 * g) * Real.exp (- s ^ 2 / 16) := by
+private theorem gaussian_tail_pow_mul_exp_le {g : ℕ} {R0 s t : ℝ} (hR0 : 0 < R0)
+    (hg : 16 * (2 * (g : ℝ) + 1) ≤ R0 ^ 2) (hs : R0 ≤ s) (hst : s ≤ t) :
+    (2 * (3 * t / R0) ^ (2 * g) - (3 * s / R0) ^ (2 * g)) * Real.exp (-t ^ 2 / 16) ≤
+      (3 * s / R0) ^ (2 * g) * Real.exp (-s ^ 2 / 16) := by
   have hs0 : 0 < s := lt_of_lt_of_le hR0 hs
   obtain ⟨u, hu⟩ : ∃ u : ℝ, u = (t ^ 2 - s ^ 2) / 16 := ⟨_, rfl⟩
   have hu0 : 0 ≤ u := by rw [hu]; nlinarith
@@ -65,7 +112,7 @@ private theorem gaussian_tail_pow_mul_exp_le
     rw [show E ^ 2 = E * E by ring, hE, ← Real.exp_add]
     congr 1
     ring
-  have hfs : Real.exp (- s ^ 2 / 16) = Real.exp (- t ^ 2 / 16) * E ^ 2 := by
+  have hfs : Real.exp (-s ^ 2 / 16) = Real.exp (-t ^ 2 / 16) * E ^ 2 := by
     rw [hE2, ← Real.exp_add]
     congr 1
     rw [hu]
@@ -94,18 +141,17 @@ private theorem gaussian_tail_pow_mul_exp_le
     have h3 : (1 + v) ^ g ≤ E := by
       have hexp : (1 + v) ^ g ≤ (Real.exp v) ^ g :=
         pow_le_pow_left_of_nonneg (by linarith) (by linarith [Real.add_one_le_exp v]) g
-      have hnat : (Real.exp v) ^ g = Real.exp (g * v) := by exact (Real.exp_nat_mul v g).symm
+      have hnat : (Real.exp v) ^ g = Real.exp (g * v) := by
+        exact (Real.exp_natCast_mul g v).symm
       have hle : Real.exp (g * v) ≤ E := by
         rw [hE]
         apply Real.exp_le_exp.mpr
         nlinarith
       linarith
-    calc
-      ((3 / R0) ^ 2 * t ^ 2) ^ g
-        ≤ (((3 / R0) ^ 2 * s ^ 2) * (1 + v)) ^ g := h2
+    calc ((3 / R0) ^ 2 * t ^ 2) ^ g ≤ (((3 / R0) ^ 2 * s ^ 2) * (1 + v)) ^ g := h2
       _ = ((3 / R0) ^ 2 * s ^ 2) ^ g * (1 + v) ^ g := mul_pow _ _ _
       _ ≤ ((3 / R0) ^ 2 * s ^ 2) ^ g * E := mul_le_mul_of_nonneg_left h3 (by positivity)
-  have hft : 0 ≤ Real.exp (- t ^ 2 / 16) := (Real.exp_pos _).le
+  have hft : 0 ≤ Real.exp (-t ^ 2 / 16) := (Real.exp_pos _).le
   have hBs : 0 ≤ (3 * s / R0) ^ (2 * g) := by rw [hP s]; positivity
   rw [hfs]
   nlinarith [mul_le_mul_of_nonneg_right hBt hft, mul_nonneg (mul_nonneg hBs hft) (sq_nonneg (E - 1))]
@@ -113,20 +159,19 @@ private theorem gaussian_tail_pow_mul_exp_le
 theorem gaussian_tail_bound : GaussianTailBound := by
   intro ι h g R0 hR0 hg hlow hcount
   classical
-  have claim
-      : ∀ S : Finset ι, ∀ M : ℝ,
-        R0 ≤ M → (∀ i ∈ S, h i ≤ M)
-          → ∑ i ∈ S, Real.exp (-(h i) ^ 2 / 16)
-            ≤ 2 * (3 * R0 / R0) ^ (2 * g) * Real.exp (- R0 ^ 2 / 16)
-              - 2 * (3 * M / R0) ^ (2 * g) * Real.exp (- M ^ 2 / 16)
-              + (S.card : ℝ) * Real.exp (- M ^ 2 / 16) := by
+  have claim : ∀ S : Finset ι, ∀ M : ℝ, R0 ≤ M → (∀ i ∈ S, h i ≤ M) →
+      ∑ i ∈ S, Real.exp (-(h i) ^ 2 / 16) ≤
+        2 * (3 * R0 / R0) ^ (2 * g) * Real.exp (-R0 ^ 2 / 16)
+          - 2 * (3 * M / R0) ^ (2 * g) * Real.exp (-M ^ 2 / 16)
+          + (S.card : ℝ) * Real.exp (-M ^ 2 / 16) := by
     intro S
     refine Finset.induction_on_max_value h S ?_ ?_
     · intro M hM _
       have k := gaussian_tail_pow_mul_exp_le hR0 hg le_rfl hM
-      have hfa : Real.exp (- M ^ 2 / 16) ≤ Real.exp (- R0 ^ 2 / 16) :=
+      have hfa : Real.exp (-M ^ 2 / 16) ≤ Real.exp (-R0 ^ 2 / 16) :=
         exp_neg_sq_div_sixteen_antitone hR0.le hM
-      have hB0 : 0 ≤ (3 * R0 / R0) ^ (2 * g) := pow_nonneg (div_nonneg (by linarith) hR0.le) _
+      have hB0 : 0 ≤ (3 * R0 / R0) ^ (2 * g) :=
+        pow_nonneg (div_nonneg (by linarith) hR0.le) _
       simp only [Finset.sum_empty, Finset.card_empty, Nat.cast_zero, zero_mul, add_zero]
       nlinarith [mul_le_mul_of_nonneg_left hfa hB0]
     · intro a S haS hmax ih M hM hSM
@@ -141,23 +186,22 @@ theorem gaussian_tail_bound : GaussianTailBound := by
       have hcard := hcount (h a) hxR (insert a S) hins
       have hc : (insert a S).card = S.card + 1 := by
         first
-        | exact Finset.card_insert_of_notMem haS
-        | exact Finset.card_insert_of_not_mem haS
-        | simp [haS]
+          | exact Finset.card_insert_of_notMem haS
+          | exact Finset.card_insert_of_not_mem haS
+          | simp [haS]
       rw [hc] at hcard
       rw [Finset.sum_insert haS, hc]
       push_cast at hcard ⊢
       have k := gaussian_tail_pow_mul_exp_le hR0 hg hxR hxM
-      have hfa : Real.exp (- M ^ 2 / 16) ≤ Real.exp (- (h a) ^ 2 / 16) :=
+      have hfa : Real.exp (-M ^ 2 / 16) ≤ Real.exp (-(h a) ^ 2 / 16) :=
         exp_neg_sq_div_sixteen_antitone (hR0.le.trans hxR) hxM
       nlinarith [mul_le_mul_of_nonneg_right hcard (sub_nonneg.mpr hfa)]
   have hG0 : (3 * R0 / R0) ^ (2 * g) = (9 : ℝ) ^ g := by
     rw [show 3 * R0 / R0 = (3 : ℝ) by field_simp, pow_mul]
     norm_num
   have hpos : ∀ i, 0 ≤ h i := fun i => hR0.le.trans (hlow i)
-  have hsum
-      : ∀ S : Finset ι,
-        ∑ i ∈ S, Real.exp (-(h i) ^ 2 / 16) ≤ 2 * 9 ^ g * Real.exp (- R0 ^ 2 / 16) := by
+  have hsum : ∀ S : Finset ι, ∑ i ∈ S, Real.exp (-(h i) ^ 2 / 16) ≤
+      2 * 9 ^ g * Real.exp (-R0 ^ 2 / 16) := by
     intro S
     have hM0 : R0 ≤ R0 + ∑ j ∈ S, h j :=
       le_add_of_nonneg_right (Finset.sum_nonneg fun j _ => hpos j)
@@ -167,11 +211,11 @@ theorem gaussian_tail_bound : GaussianTailBound := by
     have c2 := hcount _ hM0 S hMi
     have hBM : 0 ≤ (3 * (R0 + ∑ j ∈ S, h j) / R0) ^ (2 * g) :=
       pow_nonneg (div_nonneg (by linarith) hR0.le) _
-    have hfM := (Real.exp_pos (- (R0 + ∑ j ∈ S, h j) ^ 2 / 16)).le
+    have hfM := (Real.exp_pos (-(R0 + ∑ j ∈ S, h j) ^ 2 / 16)).le
     rw [hG0] at c1
     nlinarith [mul_le_mul_of_nonneg_right c2 hfM, mul_nonneg hBM hfM]
-  have hnn : ∀ i, 0 ≤ Real.exp (- (h i) ^ 2 / 16) := fun i => (Real.exp_pos _).le
-  have hsm : Summable (fun i => Real.exp (- (h i) ^ 2 / 16)) := summable_of_sum_le hnn hsum
+  have hnn : ∀ i, 0 ≤ Real.exp (-(h i) ^ 2 / 16) := fun i => (Real.exp_pos _).le
+  have hsm : Summable (fun i => Real.exp (-(h i) ^ 2 / 16)) := summable_of_sum_le hnn hsum
   refine ⟨hsm, ?_⟩
   exact Real.tsum_le_of_sum_le hnn hsum
 

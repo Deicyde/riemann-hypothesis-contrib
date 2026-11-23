@@ -1,13 +1,54 @@
 module
 
-public import Development.AbelianVarietyTheory.Definitions.Divisors.DivisorSupportCondition
 public import Development.AbelianVarietyTheory.Definitions.Divisors.SecClass
 public import Development.AutomorphicArithmetic.IntegralCasts.CapelliIdentities.AlternatingSumZero
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.Finsupp.Pointwise
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.TypeStar
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
-  GlobalTheory.EtC
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex GlobalTheory.EtC
 
 noncomputable section
 
@@ -15,11 +56,8 @@ namespace GlobalTheory.EtC.PrCx
 
 open SimplexCategory
 
-theorem alt_sum_zero
-    {A : Type*} [AddCommGroup A]
-    {n : ℕ} (G : (SimplexCategory.mk n ⟶ SimplexCategory.mk (n + 2)) → A)
-    : ∑ i : Fin (n + 3), ∑ j : Fin (n + 2), ((-1 : ℤ) ^ (i : ℕ) * (-1) ^ (j : ℕ)) • G (δ j ≫ δ i)
-      = 0 :=
+theorem alt_sum_zero {A : Type*} [AddCommGroup A] {n : ℕ} (G : (SimplexCategory.mk n ⟶ SimplexCategory.mk (n + 2)) → A) :
+    ∑ i : Fin (n + 3), ∑ j : Fin (n + 2), ((-1 : ℤ) ^ (i : ℕ) * (-1) ^ (j : ℕ)) • G (δ j ≫ δ i) = 0 :=
   _root_.UpperTheory.Reformulated.B.AlternatingSumZero.alt_sum_zero G
 
 end GlobalTheory.EtC.PrCx
@@ -30,42 +68,27 @@ open SimplexCategory Finsupp
 
 variable {N : ℕ}
 
-theorem d₁_zero
-    {r : ℕ}
-    (a : SimplexCategory.mk 0 ⟶ SimplexCategory.mk N)
-    (b : SimplexCategory.mk r ⟶ SimplexCategory.mk N)
-    : Pr.d₁ (⟨0, r, a, b⟩ : Pr N) = 0 :=
-  rfl
+theorem d₁_zero {r : ℕ} (a : SimplexCategory.mk 0 ⟶ SimplexCategory.mk N) (b : SimplexCategory.mk r ⟶ SimplexCategory.mk N) : Pr.d₁ (⟨0, r, a, b⟩ : Pr N) = 0 := rfl
 
-theorem d₁_succ
-    {p r : ℕ} (a : SimplexCategory.mk (p + 1) ⟶ SimplexCategory.mk N)
-    (b : SimplexCategory.mk r ⟶ SimplexCategory.mk N)
-    : Pr.d₁ (⟨p + 1, r, a, b⟩ : Pr N)
-      = ∑ i : Fin (p + 2), single ⟨p, r, δ i ≫ a, b⟩ ((-1) ^ (i : ℕ)) :=
-  rfl
+theorem d₁_succ {p r : ℕ} (a : SimplexCategory.mk (p + 1) ⟶ SimplexCategory.mk N) (b : SimplexCategory.mk r ⟶ SimplexCategory.mk N) :
+    Pr.d₁ (⟨p + 1, r, a, b⟩ : Pr N) = ∑ i : Fin (p + 2), single ⟨p, r, δ i ≫ a, b⟩ ((-1) ^ (i : ℕ)) := rfl
 
-theorem d₂_zero
-    {p : ℕ} (a : SimplexCategory.mk p ⟶ SimplexCategory.mk N)
-    (b : SimplexCategory.mk 0 ⟶ SimplexCategory.mk N)
-    : Pr.d₂ (⟨p, 0, a, b⟩ : Pr N) = 0 :=
-  rfl
+theorem d₂_zero {p : ℕ} (a : SimplexCategory.mk p ⟶ SimplexCategory.mk N) (b : SimplexCategory.mk 0 ⟶ SimplexCategory.mk N) : Pr.d₂ (⟨p, 0, a, b⟩ : Pr N) = 0 := rfl
 
-theorem d₂_succ
-    {p r : ℕ} (a : SimplexCategory.mk p ⟶ SimplexCategory.mk N)
-    (b : SimplexCategory.mk (r + 1) ⟶ SimplexCategory.mk N)
-    : Pr.d₂ (⟨p, r + 1, a, b⟩ : Pr N)
-      = ∑ j : Fin (r + 2), single ⟨p, r, a, δ j ≫ b⟩ ((-1) ^ (j : ℕ)) :=
-  rfl
+theorem d₂_succ {p r : ℕ} (a : SimplexCategory.mk p ⟶ SimplexCategory.mk N) (b : SimplexCategory.mk (r + 1) ⟶ SimplexCategory.mk N) :
+    Pr.d₂ (⟨p, r + 1, a, b⟩ : Pr N) = ∑ j : Fin (r + 2), single ⟨p, r, a, δ j ≫ b⟩ ((-1) ^ (j : ℕ)) := rfl
+
 
 variable (N) in
 def D₁ (N : ℕ) : (Pr N →₀ ℤ) →ₗ[ℤ] (Pr N →₀ ℤ) := linearCombination ℤ fun z => z.d₁
 
+
 variable (N) in
 def D₂ (N : ℕ) : (Pr N →₀ ℤ) →ₗ[ℤ] (Pr N →₀ ℤ) := linearCombination ℤ fun z => z.d₂
 
+
 variable (N) in
-def E (N : ℕ) : (Pr N →₀ ℤ) →ₗ[ℤ] (Pr N →₀ ℤ) :=
-  linearCombination ℤ fun z : Pr N => (-1 : ℤ) ^ z.1 • single z (1 : ℤ)
+def E (N : ℕ) : (Pr N →₀ ℤ) →ₗ[ℤ] (Pr N →₀ ℤ) := linearCombination ℤ fun z : Pr N => (-1 : ℤ) ^ z.1 • single z (1 : ℤ)
 
 theorem D₁_single (z : Pr N) (c : ℤ) : D₁ N (single z c) = c • z.d₁ := by simp [D₁]
 
@@ -81,14 +104,14 @@ theorem E_d₂ (z : Pr N) : E N z.d₂ = (-1 : ℤ) ^ z.1 • z.d₂ := by
   obtain ⟨p, r, a, b⟩ := z
   rcases r with _ | r
   · simp [d₂_zero]
-  set_option synthInstance.maxHeartbeats 100000 in
+
   · simp [d₂_succ, map_sum, E_single, Finset.smul_sum]
 
 theorem E_d₁ (z : Pr N) : E N z.d₁ = -((-1 : ℤ) ^ z.1 • z.d₁) := by
   obtain ⟨p, r, a, b⟩ := z
   rcases p with _ | p
   · simp [d₁_zero]
-  set_option synthInstance.maxHeartbeats 100000 in
+
   · simp [d₁_succ, map_sum, E_single, Finset.smul_sum, pow_succ]
 
 theorem d_eq (c : Pr N →₀ ℤ) : Pr.d N c = D₁ N c + E N (D₂ N c) := by
@@ -109,7 +132,7 @@ theorem D₂_E (c : Pr N →₀ ℤ) : D₂ N (E N c) = E N (D₂ N c) := by
   | add f g hf hg => simp only [map_add (f := _), hf, hg]
   | single z c => rw [E_single, map_zsmul, D₂_single, map_zsmul, E_d₂, smul_comm]
 
-theorem D₁_E (c : Pr N →₀ ℤ) : D₁ N (E N c) = - E N (D₁ N c) := by
+theorem D₁_E (c : Pr N →₀ ℤ) : D₁ N (E N c) = -E N (D₁ N c) := by
   induction c using Finsupp.induction_linear with
   | zero => simp
   | add f g hf hg => simp only [map_add (f := _), hf, hg]; abel
@@ -126,11 +149,11 @@ theorem D₁_D₁ (c : Pr N →₀ ℤ) : D₁ N (D₁ N c) = 0 := by
     rcases p with _ | p
     · simp [d₁_zero]
     rcases p with _ | p
-    set_option synthInstance.maxHeartbeats 100000 in
-      · simp [d₁_succ, map_sum, D₁_single, d₁_zero]
+
+    · simp [d₁_succ, map_sum, D₁_single, d₁_zero]
     have h := alt_sum_zero (n := p) (fun θ => single (⟨p, r, θ ≫ a, b⟩ : Pr N) (1 : ℤ))
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [d₁_succ, map_sum]
+
+    rw [d₁_succ, map_sum]
     simp only [D₁_single, d₁_succ, Finset.smul_sum]
     rw [← h]
     refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
@@ -147,11 +170,11 @@ theorem D₂_D₂ (c : Pr N →₀ ℤ) : D₂ N (D₂ N c) = 0 := by
     rcases r with _ | r
     · simp [d₂_zero]
     rcases r with _ | r
-    set_option synthInstance.maxHeartbeats 100000 in
-      · simp [d₂_succ, map_sum, D₂_single, d₂_zero]
+
+    · simp [d₂_succ, map_sum, D₂_single, d₂_zero]
     have h := alt_sum_zero (n := r) (fun θ => single (⟨p, r, a, θ ≫ b⟩ : Pr N) (1 : ℤ))
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [d₂_succ, map_sum]
+
+    rw [d₂_succ, map_sum]
     simp only [D₂_single, d₂_succ, Finset.smul_sum]
     rw [← h]
     refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
@@ -167,13 +190,12 @@ theorem D₁_D₂ (c : Pr N →₀ ℤ) : D₁ N (D₂ N c) = D₂ N (D₁ N c) 
     obtain ⟨p, r, a, b⟩ := z
     rcases p with _ | p <;> rcases r with _ | r
     · simp [d₁_zero, d₂_zero]
-    set_option synthInstance.maxHeartbeats 100000 in
-      · simp [d₁_zero, d₂_succ, map_sum, D₁_single]
-    set_option synthInstance.maxHeartbeats 100000 in
-      · simp [d₂_zero, d₁_succ, map_sum, D₂_single]
-    set_option synthInstance.maxHeartbeats 100000 in
-    · simp only [d₁_succ, d₂_succ, map_sum, D₁_single, D₂_single, Finset.smul_sum, smul_single,
-        smul_eq_mul]
+
+    · simp [d₁_zero, d₂_succ, map_sum, D₁_single]
+
+    · simp [d₂_zero, d₁_succ, map_sum, D₂_single]
+
+    · simp only [d₁_succ, d₂_succ, map_sum, D₁_single, D₂_single, Finset.smul_sum, smul_single, smul_eq_mul]
       rw [Finset.sum_comm]
       refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
       rw [mul_comm]
@@ -189,38 +211,37 @@ namespace GlobalTheory.EtC.PrCx
 
 open SimplexCategory Finsupp
 
-theorem push_single {N M : ℕ} (θ : SimplexCategory.mk N ⟶ SimplexCategory.mk M) (z : Pr N) (c : ℤ)
-    : Pr.push θ (single z c) = single (⟨z.1, z.2.1, z.2.2.1 ≫ θ, z.2.2.2 ≫ θ⟩ : Pr M) c := by
+theorem push_single {N M : ℕ} (θ : SimplexCategory.mk N ⟶ SimplexCategory.mk M) (z : Pr N) (c : ℤ) :
+    Pr.push θ (single z c) = single (⟨z.1, z.2.1, z.2.2.1 ≫ θ, z.2.2.2 ≫ θ⟩ : Pr M) c := by
   simp [Pr.push]
 
-theorem push_d₁ {N M : ℕ} (θ : SimplexCategory.mk N ⟶ SimplexCategory.mk M) (z : Pr N)
-    : Pr.push θ z.d₁ = Pr.d₁ (⟨z.1, z.2.1, z.2.2.1 ≫ θ, z.2.2.2 ≫ θ⟩ : Pr M) := by
+theorem push_d₁ {N M : ℕ} (θ : SimplexCategory.mk N ⟶ SimplexCategory.mk M) (z : Pr N) :
+    Pr.push θ z.d₁ = Pr.d₁ (⟨z.1, z.2.1, z.2.2.1 ≫ θ, z.2.2.2 ≫ θ⟩ : Pr M) := by
   obtain ⟨p, r, a, b⟩ := z
   rcases p with _ | p
   · simp [d₁_zero]
-  set_option synthInstance.maxHeartbeats 100000 in
+
   · simp [d₁_succ, map_sum, push_single, Category.assoc]
 
-theorem push_d₂ {N M : ℕ} (θ : SimplexCategory.mk N ⟶ SimplexCategory.mk M) (z : Pr N)
-    : Pr.push θ z.d₂ = Pr.d₂ (⟨z.1, z.2.1, z.2.2.1 ≫ θ, z.2.2.2 ≫ θ⟩ : Pr M) := by
+theorem push_d₂ {N M : ℕ} (θ : SimplexCategory.mk N ⟶ SimplexCategory.mk M) (z : Pr N) :
+    Pr.push θ z.d₂ = Pr.d₂ (⟨z.1, z.2.1, z.2.2.1 ≫ θ, z.2.2.2 ≫ θ⟩ : Pr M) := by
   obtain ⟨p, r, a, b⟩ := z
   rcases r with _ | r
   · simp [d₂_zero]
-  set_option synthInstance.maxHeartbeats 100000 in
+
   · simp [d₂_succ, map_sum, push_single, Category.assoc]
 
-theorem d_push {N M : ℕ} (θ : SimplexCategory.mk N ⟶ SimplexCategory.mk M) (c : Pr N →₀ ℤ)
-    : Pr.d M (Pr.push θ c) = Pr.push θ (Pr.d N c) := by
+theorem d_push {N M : ℕ} (θ : SimplexCategory.mk N ⟶ SimplexCategory.mk M) (c : Pr N →₀ ℤ) :
+    Pr.d M (Pr.push θ c) = Pr.push θ (Pr.d N c) := by
   induction c using Finsupp.induction_linear with
   | zero => simp
   | add f g hf hg => simp only [map_add (f := _), hf, hg]
   | single z c =>
     rw [push_single, d_single, d_single, map_zsmul, map_add (f := _), map_zsmul, push_d₁, push_d₂]
 
-theorem push_push
-    {N M K : ℕ} (θ : SimplexCategory.mk N ⟶ SimplexCategory.mk M)
-    (θ' : SimplexCategory.mk M ⟶ SimplexCategory.mk K) (c : Pr N →₀ ℤ)
-    : Pr.push θ' (Pr.push θ c) = Pr.push (θ ≫ θ') c := by
+theorem push_push {N M K : ℕ} (θ : SimplexCategory.mk N ⟶ SimplexCategory.mk M)
+    (θ' : SimplexCategory.mk M ⟶ SimplexCategory.mk K) (c : Pr N →₀ ℤ) :
+    Pr.push θ' (Pr.push θ c) = Pr.push (θ ≫ θ') c := by
   induction c using Finsupp.induction_linear with
   | zero => simp
   | add f g hf hg => simp only [map_add (f := _), hf, hg]
@@ -228,37 +249,31 @@ theorem push_push
 
 theorem bd_bd {N : ℕ} (c : Pr N →₀ ℤ) : Pr.bd (Pr.bd c) = 0 := by
   have h := alt_sum_zero (n := N) (fun θ => Pr.push θ c)
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [Pr.bd, map_sum, map_zsmul, push_push, Finset.smul_sum, smul_smul]
+
+  simp only [Pr.bd, map_sum, map_zsmul, push_push, Finset.smul_sum, smul_smul]
   exact h
 
 theorem d_bd {N : ℕ} (c : Pr N →₀ ℤ) : Pr.d (N + 1) (Pr.bd c) = Pr.bd (Pr.d N c) := by
-  set_option synthInstance.maxHeartbeats 100000 in
+
   simp only [Pr.bd, map_sum, map_zsmul, d_push]
 
-theorem deg_iff {N : ℕ} (k : ℕ) (c : Pr N →₀ ℤ)
-    : Pr.Deg k c ↔ c ∈ supported ℤ ℤ {z : Pr N | z.1 + z.2.1 = k} := by
+theorem deg_iff {N : ℕ} (k : ℕ) (c : Pr N →₀ ℤ) :
+    Pr.Deg k c ↔ c ∈ supported ℤ ℤ {z : Pr N | z.1 + z.2.1 = k} := by
   simp [Pr.Deg, mem_supported, Set.subset_def]
 
-theorem deg_push
-    {N M : ℕ} (θ : SimplexCategory.mk N ⟶ SimplexCategory.mk M)
-    (k : ℕ) (c : Pr N →₀ ℤ) (hc : Pr.Deg k c)
-    : Pr.Deg k (Pr.push θ c) := by
+theorem deg_push {N M : ℕ} (θ : SimplexCategory.mk N ⟶ SimplexCategory.mk M) (k : ℕ) (c : Pr N →₀ ℤ)
+    (hc : Pr.Deg k c) : Pr.Deg k (Pr.push θ c) := by
   classical
   intro z hz
-  have hz' :=
-    Finsupp.mapDomain_support
-      (f := fun z : Pr N => (⟨z.1, z.2.1, z.2.2.1 ≫ θ, z.2.2.2 ≫ θ⟩ : Pr M))
-      (s := c) hz
+  have hz' := Finsupp.mapDomain_support (f := fun z : Pr N => (⟨z.1, z.2.1, z.2.2.1 ≫ θ, z.2.2.2 ≫ θ⟩ : Pr M))
+    (s := c) hz
   obtain ⟨w, hw, rfl⟩ := Finset.mem_image.1 hz'
   exact hc w hw
 
 theorem deg_d {N : ℕ} (k : ℕ) (c : Pr N →₀ ℤ) (hc : Pr.Deg (k + 1) c) : Pr.Deg k (Pr.d N c) := by
   rw [deg_iff] at hc ⊢
-  have key
-      : ∀ z : Pr N,
-        z.1 + z.2.1 = k + 1
-          → z.d₁ + (-1 : ℤ) ^ z.1 • z.d₂ ∈ supported ℤ ℤ {z : Pr N | z.1 + z.2.1 = k} := by
+  have key : ∀ z : Pr N, z.1 + z.2.1 = k + 1 →
+      z.d₁ + (-1 : ℤ) ^ z.1 • z.d₂ ∈ supported ℤ ℤ {z : Pr N | z.1 + z.2.1 = k} := by
     rintro ⟨p, r, a, b⟩ hz
     simp only at hz
     refine add_mem ?_ (Submodule.smul_mem _ _ ?_)
@@ -274,10 +289,9 @@ theorem deg_d {N : ℕ} (k : ℕ) (c : Pr N →₀ ℤ) (hc : Pr.Deg (k + 1) c) 
   exact Submodule.sum_mem _ fun z hz => Submodule.smul_mem _ _ (key z ((mem_supported _ _).1 hc hz))
 
 theorem deg_bd {N : ℕ} (k : ℕ) (c : Pr N →₀ ℤ) (hc : Pr.Deg k c) : Pr.Deg k (Pr.bd c) := by
-  have h
-      : ∀ θ : SimplexCategory.mk N ⟶ SimplexCategory.mk (N + 1),
-        Pr.push θ c ∈ supported ℤ ℤ {z : Pr (N + 1) | z.1 + z.2.1 = k} := fun θ =>
-    (deg_iff k _).1 (deg_push θ k c hc)
+  have h : ∀ θ : SimplexCategory.mk N ⟶ SimplexCategory.mk (N + 1),
+      Pr.push θ c ∈ supported ℤ ℤ {z : Pr (N + 1) | z.1 + z.2.1 = k} :=
+    fun θ => (deg_iff k _).1 (deg_push θ k c hc)
   rw [deg_iff, Pr.bd]
   exact Submodule.sum_mem _ fun i _ => Submodule.smul_mem _ _ (h _)
 
@@ -289,22 +303,15 @@ theorem deg_wa (N : ℕ) : Pr.Deg N (Pr.wa N) := by
   rw [deg_iff, Pr.wa]
   exact Submodule.sum_mem _ fun p _ => single_mem_supported ℤ _ (by simp; omega)
 
-theorem pr_complex
-    : (∀ N (c : Pr N →₀ ℤ), Pr.d N (Pr.d N c) = 0)
-      ∧ (∀ {N M : ℕ} (θ : SimplexCategory.mk N ⟶ SimplexCategory.mk M) c,
-        Pr.d M (Pr.push θ c) = Pr.push θ (Pr.d N c))
-      ∧ (∀ N k (c : Pr N →₀ ℤ), Pr.Deg (k + 1) c → Pr.Deg k (Pr.d N c))
-      ∧ (∀ N k (c : Pr N →₀ ℤ), Pr.Deg k c → Pr.Deg k (Pr.bd c))
-      ∧ (∀ N (c : Pr N →₀ ℤ), Pr.bd (Pr.bd c) = 0)
-      ∧ (∀ N (c : Pr N →₀ ℤ), Pr.d (N + 1) (Pr.bd c) = Pr.bd (Pr.d N c))
-      ∧ ∀ N, Pr.Deg N (Pr.aw N) ∧ Pr.Deg N (Pr.wa N) := ⟨
-  fun _ c => d_d c,
-  fun θ c => d_push θ c,
-  fun _ k c h => deg_d k c h,
-  fun _ k c h => deg_bd k c h,
-  fun _ c => bd_bd c,
-  fun _ c => d_bd c,
-  fun N => ⟨deg_aw N, deg_wa N⟩
-⟩
+theorem pr_complex :
+    (∀ N (c : Pr N →₀ ℤ), Pr.d N (Pr.d N c) = 0) ∧
+    (∀ {N M : ℕ} (θ : SimplexCategory.mk N ⟶ SimplexCategory.mk M) c, Pr.d M (Pr.push θ c) = Pr.push θ (Pr.d N c)) ∧
+    (∀ N k (c : Pr N →₀ ℤ), Pr.Deg (k + 1) c → Pr.Deg k (Pr.d N c)) ∧
+    (∀ N k (c : Pr N →₀ ℤ), Pr.Deg k c → Pr.Deg k (Pr.bd c)) ∧
+    (∀ N (c : Pr N →₀ ℤ), Pr.bd (Pr.bd c) = 0) ∧
+    (∀ N (c : Pr N →₀ ℤ), Pr.d (N + 1) (Pr.bd c) = Pr.bd (Pr.d N c)) ∧
+    ∀ N, Pr.Deg N (Pr.aw N) ∧ Pr.Deg N (Pr.wa N) :=
+  ⟨fun _ c => d_d c, fun θ c => d_push θ c, fun _ k c h => deg_d k c h, fun _ k c h => deg_bd k c h,
+    fun _ c => bd_bd c, fun _ c => d_bd c, fun N => ⟨deg_aw N, deg_wa N⟩⟩
 
 end GlobalTheory.EtC.PrCx

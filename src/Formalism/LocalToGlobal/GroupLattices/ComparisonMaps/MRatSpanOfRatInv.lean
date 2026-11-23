@@ -1,7 +1,46 @@
 module
 
 public import Formalism.LocalToGlobal.GroupLattices.ComparisonMaps.HRatInvOfTriv
+public import Formalism.LocalToGlobal.GroupLattices.ComparisonMaps.ProdMemSpan
+public import Formalism.LocalToGlobal.GroupLattices.ComparisonMaps.RatActGOf
 public import Formalism.LocalRingCardinality.Lemmas
+import Formalism.LocalToGlobal.GroupLattices.ComparisonMaps.DeterminantTwistRowActionMem
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -48,8 +87,8 @@ theorem span_inv
     rfl
   let ξj : Fin (Module.finrank LL C) → V := fun j => c.sum fun x a => π j a • x
   have hdec : (c.sum fun x a => a • φ x) = ∑ j, (κ j : Kf) • φ (ξj j) := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [ξj, Finsupp.sum, map_sum, hsm, Finset.smul_sum, smul_smul]
+
+    simp only [ξj, Finsupp.sum, map_sum, hsm, Finset.smul_sum, smul_smul]
     rw [Finset.sum_comm]
     refine Finset.sum_congr rfl fun x hx => ?_
     have h1 : c x • φ x = ∑ j, ((κ j : Kf) * e (π j (c x))) • φ x := by
@@ -67,8 +106,8 @@ theorem span_inv
   have hzero : ∑ j, (κ j : Kf) • φ (y (ξj j) - ξj j) = 0 := by
     simp only [map_sub, hy, smul_sub, Finset.sum_sub_distrib]
     have h2 : ∑ x, (κ x : Kf) • Tm (φ (ξj x)) = Tm (∑ x, (κ x : Kf) • φ (ξj x)) := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum]
+
+      rw [map_sum]
       exact Finset.sum_congr rfl fun x _ => (map_smul Tm _ _).symm
     rw [h2, ← hdec, hinv Tm hTm, sub_self]
   have hli : LinearIndependent LL fun j => (κ j : Kf) :=
@@ -77,8 +116,8 @@ theorem span_inv
     refine hsep _ fun t => ?_
     choose q hq using fun j' => hval (y (ξj j') - ξj j') t
     have h3 := congrArg (ev t) hzero
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, map_zero] at h3
+
+    rw [map_sum, map_zero] at h3
     simp only [map_smul, smul_eq_mul, ← hq] at h3
     have h4 : ∑ j', q j' • (κ j' : Kf) = 0 := by
       rw [← h3]

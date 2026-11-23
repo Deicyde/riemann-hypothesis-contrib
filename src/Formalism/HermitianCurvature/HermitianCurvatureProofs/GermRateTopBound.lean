@@ -1,34 +1,66 @@
 module
 
 public import Formalism.HermitianCurvature.HermitianCurvatureProofs.TopCore
-public import Formalism.HermitianCurvature.HermitianCurvatureProofs.VecVNonloc
+public import Formalism.HermitianCurvature.HermitianCurvatureProofs.GermRateSplit
 public import Formalism.HermitianCurvature.HermitianCurvatureProofs.NormSumLeOfGram
+public import Formalism.HermitianCurvature.HermitianCurvatureProofs.VecVNonloc
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
 namespace Formalism.FourierDecayAlt.P.GermRateSplit
 
-open Formalism.FourierDecayAlt Formalism.FourierDecayAlt.P.PBK
-  Formalism.FourierDecayAlt.P.GermRealisation Formalism.FourierDecayAlt.P.GermFibreKernels Finset
-  Filter Topology MeasureTheory NumberField
+open Formalism.FourierDecayAlt Formalism.FourierDecayAlt.P.PBK Formalism.FourierDecayAlt.P.GermRealisation Formalism.FourierDecayAlt.P.GermFibreKernels Finset Filter Topology MeasureTheory NumberField
 open scoped ComplexConjugate InnerProductSpace
 
 noncomputable section
 
-theorem germ_sum
-    {E : Type} [Field E] [NumberField E] [IsCMField E]
-    {Wp Wq : InfinitePlace E → Type}
-    [∀ x, NormedAddCommGroup (Wp x)] [∀ x, InnerProductSpace ℂ (Wp x)]
-    [∀ x, NormedAddCommGroup (Wq x)] [∀ x, InnerProductSpace ℂ (Wq x)]
-    (S : C.HidaSetting E Wp Wq)
-    {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
-    (Vec : C.LPt → H)
-    (b s : ℕ) (hs : 2 ≤ s) (hbs : b + s - 1 = S.G.r + 1)
-    (h : C.LPt)
-    (x D : ℂ) (hD : D ≠ 0)
-    : utOf s (vOf (KB.dlB S (b + s - 1) 1) Vec) h x D
-        - mainD s (betaL S) 1 (fun z => (fun _ => (1 : ℂ)) z • btOf s (KB.dlB S b s) Vec h z) x D
-      = ∑ j ∈ Finset.insertNone (G.rootSet s D), coJ S b s x j • Vec (ptJ s h x D j) := by
+theorem germ_sum {E : Type} [Field E] [NumberField E] [IsCMField E] {Wp Wq : InfinitePlace E → Type}
+    [∀ x, NormedAddCommGroup (Wp x)] [∀ x, InnerProductSpace ℂ (Wp x)] [∀ x, NormedAddCommGroup (Wq x)]
+    [∀ x, InnerProductSpace ℂ (Wq x)] (S : C.HidaSetting E Wp Wq) {H : Type} [NormedAddCommGroup H]
+    [InnerProductSpace ℂ H] (Vec : C.LPt → H) (b s : ℕ) (hs : 2 ≤ s) (hbs : b + s - 1 = S.G.r + 1) (h : C.LPt)
+    (x D : ℂ) (hD : D ≠ 0) :
+    utOf s (vOf (KB.dlB S (b + s - 1) 1) Vec) h x D -
+        mainD s (betaL S) 1 (fun z => (fun _ => (1 : ℂ)) z • btOf s (KB.dlB S b s) Vec h z) x D =
+      ∑ j ∈ Finset.insertNone (G.rootSet s D), coJ S b s x j • Vec (ptJ s h x D j) := by
   rw [Finset.sum_insertNone, hbs, sub_eq_add_neg]
   have hz : ∀ z ∈ G.rootSet s D, z ≠ 0 := by
     intro z hz h0
@@ -51,9 +83,7 @@ end Formalism.FourierDecayAlt.P.GermRateSplit
 
 namespace Formalism.FourierDecayAlt.P
 
-open Formalism.FourierDecayAlt Formalism.FourierDecayAlt.P.PBK
-  Formalism.FourierDecayAlt.P.GermRealisation Formalism.FourierDecayAlt.P.GermFibreKernels
-  Formalism.FourierDecayAlt.P.GermRateSplit Finset
+open Formalism.FourierDecayAlt Formalism.FourierDecayAlt.P.PBK Formalism.FourierDecayAlt.P.GermRealisation Formalism.FourierDecayAlt.P.GermFibreKernels Formalism.FourierDecayAlt.P.GermRateSplit Finset
 open scoped ComplexConjugate InnerProductSpace
 
 theorem germ_rate_top_bound : Formalism.FourierDecayAlt.P.GermRateSplit.GermRateTopB := by
@@ -73,49 +103,37 @@ theorem germ_rate_top_bound : Formalism.FourierDecayAlt.P.GermRateSplit.GermRate
   refine ⟨∑ i, √(c i) * ‖L i‖ * Ci i, fun x hx D hD => ?_⟩
   have hD0 : D ≠ 0 := fun h0 => hK0 (h0 ▸ hD)
   rw [germ_sum (PBL.setC S p (PBASM.cutSeq S p f χ n)) Vec b s hs hb1 h x D hD0]
-  have hk
-      : ∀ j ∈ Finset.insertNone (G.rootSet s D), ∀ l ∈ Finset.insertNone (G.rootSet s D),
-        KB.gN (PBL.setC S p (PBASM.cutSeq S p f χ n)) v ε (b + s - 1) a (ptJ s h x D j)
-            (ptJ s h x D l)
-          = ∑ i, (c i : ℂ) * ⟪(omN S a.length (ptJ s h x D l) : ℂ) • L i ((p v).V (Fi i) (PBL.stdS S (ptJ s h x D l))),
-              (omN S a.length (ptJ s h x D j) : ℂ) • L i ((p v).V (Fi i) (PBL.stdS S (ptJ s h x D j)))⟫_ℂ :=
-    by
-      intro j _ l _
-      rw [hb1]
-      exact hgram _ _
-  have h2 :=
-    norm_sum_le_of_gram
-      (fun P Q => KB.gN (PBL.setC S p (PBASM.cutSeq S p f χ n)) v ε (b + s - 1) a P Q)
-      Vec hVec c hc
-      (fun i P => (omN S a.length P : ℂ) • L i ((p v).V (Fi i) (PBL.stdS S P)))
-      (Finset.insertNone (G.rootSet s D)) (ptJ s h x D) hk (coJ S b s x)
+  have hk : ∀ j ∈ Finset.insertNone (G.rootSet s D), ∀ l ∈ Finset.insertNone (G.rootSet s D),
+      KB.gN (PBL.setC S p (PBASM.cutSeq S p f χ n)) v ε (b + s - 1) a (ptJ s h x D j) (ptJ s h x D l) =
+        ∑ i, (c i : ℂ) * ⟪(omN S a.length (ptJ s h x D l) : ℂ) • L i ((p v).V (Fi i) (PBL.stdS S (ptJ s h x D l))),
+          (omN S a.length (ptJ s h x D j) : ℂ) • L i ((p v).V (Fi i) (PBL.stdS S (ptJ s h x D j)))⟫_ℂ := by
+    intro j _ l _
+    rw [hb1]
+    exact hgram _ _
+  have h2 := norm_sum_le_of_gram (fun P Q => KB.gN (PBL.setC S p (PBASM.cutSeq S p f χ n)) v ε (b + s - 1) a P Q)
+    Vec hVec c hc (fun i P => (omN S a.length P : ℂ) • L i ((p v).V (Fi i) (PBL.stdS S P)))
+    (Finset.insertNone (G.rootSet s D)) (ptJ s h x D) hk (coJ S b s x)
   refine h2.trans ?_
   rw [Finset.sum_mul]
   refine Finset.sum_le_sum fun i _ => ?_
-  have e
-      : ∑ j ∈ Finset.insertNone (G.rootSet s D), conj (coJ S b s x j) •
-          ((omN S a.length (ptJ s h x D j) : ℂ) • L i ((p v).V (Fi i) (PBL.stdS S (ptJ s h x D j))))
-        = L i
-          (∑ j ∈ Finset.insertNone (G.rootSet s D), (conj (coJ S b s x j) * (omN S a.length (ptJ s h x D j) : ℂ)) •
-            (p v).V (Fi i) (PBL.stdS S (ptJ s h x D j))) := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+  have e : ∑ j ∈ Finset.insertNone (G.rootSet s D), conj (coJ S b s x j) •
+        ((omN S a.length (ptJ s h x D j) : ℂ) • L i ((p v).V (Fi i) (PBL.stdS S (ptJ s h x D j)))) =
+      L i (∑ j ∈ Finset.insertNone (G.rootSet s D), (conj (coJ S b s x j) * (omN S a.length (ptJ s h x D j) : ℂ)) •
+        (p v).V (Fi i) (PBL.stdS S (ptJ s h x D j))) := by
+
+    rw [map_sum]
     refine Finset.sum_congr rfl fun j _ => ?_
     rw [map_smul, smul_smul]
   rw [e]
   have h3 := hCi i x hx D hD
   have hsq := Real.sqrt_nonneg (c i)
-  calc
-    √(c i)
-          * ‖L i (∑ j ∈ Finset.insertNone (G.rootSet s D),
-            (conj (coJ S b s x j) * (omN S a.length (ptJ s h x D j) : ℂ)) • (p v).V (Fi i) (PBL.stdS S (ptJ s h x D j)))‖
-        ≤ √(c i)
-          * (‖L i‖
-            * ‖∑ j ∈ Finset.insertNone (G.rootSet s D),
-              (conj (coJ S b s x j) * (omN S a.length (ptJ s h x D j) : ℂ)) • (p v).V (Fi i) (PBL.stdS S (ptJ s h x D j))‖) :=
-      mul_le_mul_of_nonneg_left (ContinuousLinearMap.le_opNorm _ _) hsq
+  calc √(c i) * ‖L i (∑ j ∈ Finset.insertNone (G.rootSet s D),
+        (conj (coJ S b s x j) * (omN S a.length (ptJ s h x D j) : ℂ)) • (p v).V (Fi i) (PBL.stdS S (ptJ s h x D j)))‖
+      ≤ √(c i) * (‖L i‖ * ‖∑ j ∈ Finset.insertNone (G.rootSet s D),
+        (conj (coJ S b s x j) * (omN S a.length (ptJ s h x D j) : ℂ)) • (p v).V (Fi i) (PBL.stdS S (ptJ s h x D j))‖) :=
+        mul_le_mul_of_nonneg_left (ContinuousLinearMap.le_opNorm _ _) hsq
     _ ≤ √(c i) * (‖L i‖ * (Ci i * ‖x‖⁻¹)) :=
-      mul_le_mul_of_nonneg_left (mul_le_mul_of_nonneg_left h3 (norm_nonneg _)) hsq
+        mul_le_mul_of_nonneg_left (mul_le_mul_of_nonneg_left h3 (norm_nonneg _)) hsq
     _ = √(c i) * ‖L i‖ * Ci i * ‖x‖⁻¹ := by ring
 
 end Formalism.FourierDecayAlt.P

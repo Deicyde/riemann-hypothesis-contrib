@@ -1,7 +1,64 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.VecPairApply
+public import Mathlib.RingTheory.AdjoinRoot
+public import Mathlib.RingTheory.DiscreteValuationRing.Basic
+public import Mathlib.RingTheory.LocalRing.ResidueField.Defs
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Henselian
+public import Mathlib.RingTheory.Ideal.Quotient.Index
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
+public import Mathlib.Algebra.MvPolynomial.Funext
+public import Mathlib.FieldTheory.IntermediateField.Adjoin.Algebra
+public import Mathlib.FieldTheory.IntermediateField.Adjoin.Basic
+public import Mathlib.FieldTheory.IsAlgClosed.AlgebraicClosure
+public import Mathlib.FieldTheory.PrimitiveElement
+public import Mathlib.RingTheory.LocalRing.ResidueField.Basic
 
 @[expose] public section
 
@@ -9,14 +66,11 @@ open Polynomial
 
 namespace GlobalTheory.NewPrime.LocalRing
 
-theorem isUnit_of_map_ne_zero
-    {A L : Type} [CommRing A] [Finite A] [CommRing L] [IsDomain L]
-    (ψ : A →+* L) (h : ∀ x, ψ x = 0 → IsNilpotent x)
-    {x : A} (hx : ψ x ≠ 0)
-    : IsUnit x := by
+theorem isUnit_of_map_ne_zero {A L : Type} [CommRing A] [Finite A] [CommRing L] [IsDomain L]
+    (ψ : A →+* L) (h : ∀ x, ψ x = 0 → IsNilpotent x) {x : A} (hx : ψ x ≠ 0) : IsUnit x := by
   by_contra hu
-  obtain ⟨M, hM, hxM⟩ :=
-    Ideal.exists_le_maximal (Ideal.span {x}) (by rwa [Ne, Ideal.span_singleton_eq_top])
+  obtain ⟨M, hM, hxM⟩ := Ideal.exists_le_maximal (Ideal.span {x})
+    (by rwa [Ne, Ideal.span_singleton_eq_top])
   have hxM' : x ∈ M := hxM (Ideal.mem_span_singleton_self x)
   have hle : RingHom.ker ψ ≤ M := by
     intro y hy
@@ -29,10 +83,8 @@ theorem isUnit_of_map_ne_zero
   have hEq := hmax.eq_of_le hM.ne_top hle
   exact hx (RingHom.mem_ker.1 (hEq ▸ hxM'))
 
-theorem isLocalRing_of_map
-    {A L : Type} [CommRing A] [Finite A] [CommRing L] [IsDomain L]
-    (ψ : A →+* L) (h : ∀ x, ψ x = 0 → IsNilpotent x)
-    : IsLocalRing A := by
+theorem isLocalRing_of_map {A L : Type} [CommRing A] [Finite A] [CommRing L] [IsDomain L]
+    (ψ : A →+* L) (h : ∀ x, ψ x = 0 → IsNilpotent x) : IsLocalRing A := by
   have : Nontrivial A := ψ.domain_nontrivial
   refine IsLocalRing.of_isUnit_or_isUnit_one_sub_self fun a => ?_
   by_cases ha : ψ a = 0
@@ -42,12 +94,8 @@ theorem isLocalRing_of_map
     exact one_ne_zero
   · exact Or.inl (isUnit_of_map_ne_zero ψ h ha)
 
-theorem adjoinRoot_eq_zero
-    {R : Type} [CommRing R]
-    {g : R[X]} (hg : g.Monic)
-    {j : ℕ} (hj : j < g.natDegree)
-    {r : R} (h : AdjoinRoot.of g r * AdjoinRoot.root g ^ j = 0)
-    : r = 0 := by
+theorem adjoinRoot_eq_zero {R : Type} [CommRing R] {g : R[X]} (hg : g.Monic) {j : ℕ}
+    (hj : j < g.natDegree) {r : R} (h : AdjoinRoot.of g r * AdjoinRoot.root g ^ j = 0) : r = 0 := by
   nontriviality R
   have h1 : AdjoinRoot.mk g (C r * X ^ j) = 0 := by
     rw [map_mul, map_pow, AdjoinRoot.mk_C, AdjoinRoot.mk_X]
@@ -60,14 +108,13 @@ theorem adjoinRoot_eq_zero
   rw [(Polynomial.modByMonic_eq_self_iff hg).2 hdeg] at h1
   simpa using congrArg (fun p => _root_.AddMonoidAlgebra.coeff (M := ℕ) p j) h1
 
-theorem aeval_C_mul_X_coeff
-    {ι L : Type} [Fintype ι] [CommRing L] (F : MvPolynomial ι L) (b : ι → L) (d : ℕ)
-    : (MvPolynomial.aeval (fun q => C (b q) * X) F : L[X]).coeff d
-      = ∑ m ∈ F.support, if m.degree = d then F.coeff m * ∏ q, b q ^ m q else 0 := by
+theorem aeval_C_mul_X_coeff {ι L : Type} [Fintype ι] [CommRing L] (F : MvPolynomial ι L) (b : ι → L)
+    (d : ℕ) : (MvPolynomial.aeval (fun q => C (b q) * X) F : L[X]).coeff d =
+      ∑ m ∈ F.support, if m.degree = d then F.coeff m * ∏ q, b q ^ m q else 0 := by
   classical
   conv_lhs => rw [F.as_sum]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum, Polynomial.finsetSum_coeff]
+
+  rw [map_sum, Polynomial.finsetSum_coeff]
   refine Finset.sum_congr rfl fun m _ => ?_
   rw [MvPolynomial.aeval_monomial, Finsupp.prod_fintype _ _ (fun i => pow_zero _)]
   have hprod : (∏ q, (C (b q) * X : L[X]) ^ m q) = C (∏ q, b q ^ m q) * X ^ m.degree := by
@@ -77,15 +124,12 @@ theorem aeval_C_mul_X_coeff
   · simp [hmd]
   · simp [hmd, Ne.symm hmd]
 
-theorem exists_point
-    {ι L : Type} [Fintype ι] [Field L] [Infinite L]
-    (K : Set ι) (F : MvPolynomial ι L) (m : ι →₀ ℕ) (hK : ∀ q ∈ K, m q = 0) (hm : F.coeff m ≠ 0)
-    : ∃ b : ι → L,
-      (∀ q ∈ K, b q = 0) ∧ (∀ q ∉ K, b q ≠ 0)
-        ∧ (MvPolynomial.aeval (fun q => C (b q) * X) F : L[X]).coeff m.degree ≠ 0 := by
+theorem exists_point {ι L : Type} [Fintype ι] [Field L] [Infinite L] (K : Set ι)
+    (F : MvPolynomial ι L) (m : ι →₀ ℕ) (hK : ∀ q ∈ K, m q = 0) (hm : F.coeff m ≠ 0) :
+    ∃ b : ι → L, (∀ q ∈ K, b q = 0) ∧ (∀ q ∉ K, b q ≠ 0) ∧
+      (MvPolynomial.aeval (fun q => C (b q) * X) F : L[X]).coeff m.degree ≠ 0 := by
   classical
-  let H : MvPolynomial ι L :=
-    ∑ m' ∈ F.support.filter
+  let H : MvPolynomial ι L := ∑ m' ∈ F.support.filter
       (fun m' => m'.degree = m.degree ∧ ∀ q ∈ K, m' q = 0), MvPolynomial.monomial m' (F.coeff m')
   have hHm : H.coeff m = F.coeff m := by
     simp only [H, MvPolynomial.coeff_sum, MvPolynomial.coeff_monomial]
@@ -114,18 +158,12 @@ theorem exists_point
     apply hx
     simp only [P, map_mul, map_prod, MvPolynomial.eval_X]
     rw [Finset.prod_eq_zero (i := q) (by simp [hq]) h0, mul_zero]
-  refine ⟨
-    fun q => if q ∈ K then 0 else x q,
-    fun q hq => by simp [hq],
-    fun q hq => by simp [hq, hxq q hq],
-    ?_
-  ⟩
-  have key
-      : MvPolynomial.eval x H
-        = ∑ m' ∈ F.support, if m'.degree = m.degree then
-          F.coeff m' * ∏ q, (if q ∈ K then 0 else x q) ^ m' q else 0 := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [H, Finset.sum_filter, map_sum]
+  refine ⟨fun q => if q ∈ K then 0 else x q, fun q hq => by simp [hq],
+    fun q hq => by simp [hq, hxq q hq], ?_⟩
+  have key : MvPolynomial.eval x H = ∑ m' ∈ F.support, if m'.degree = m.degree then
+      F.coeff m' * ∏ q, (if q ∈ K then 0 else x q) ^ m' q else 0 := by
+
+    simp only [H, Finset.sum_filter, map_sum]
     refine Finset.sum_congr rfl fun m' _ => ?_
     by_cases hd : m'.degree = m.degree
     · by_cases hz : ∀ q ∈ K, m' q = 0
@@ -144,10 +182,9 @@ theorem exists_point
   rw [aeval_C_mul_X_coeff, ← key]
   exact hxH
 
-theorem exists_primitive
-    {k L ι : Type} [Field k] [Finite k] [Field L] [Algebra k L] [Algebra.IsAlgebraic k L] [Finite ι]
-    (b : ι → L)
-    : ∃ α : L, ∀ q, ∃ p : k[X], aeval α p = b q := by
+theorem exists_primitive {k L ι : Type} [Field k] [Finite k] [Field L] [Algebra k L]
+    [Algebra.IsAlgebraic k L] [Finite ι] (b : ι → L) :
+    ∃ α : L, ∀ q, ∃ p : k[X], aeval α p = b q := by
   classical
   let E := IntermediateField.adjoin k (Set.range b)
   haveI : FiniteDimensional k E := IntermediateField.finiteDimensional_adjoin
@@ -159,8 +196,7 @@ theorem exists_primitive
     rw [IntermediateField.mem_toSubalgebra, hα]
     exact IntermediateField.mem_top
   rw [IntermediateField.adjoin_simple_toSubalgebra_of_isAlgebraic (IsAlgebraic.of_finite k α),
-      Algebra.adjoin_singleton_eq_range_aeval]
-    at hmem
+    Algebra.adjoin_singleton_eq_range_aeval] at hmem
   obtain ⟨p, hp⟩ := hmem
   refine ⟨p, ?_⟩
   have h1 : aeval (E.val α) p = E.val (aeval α p) := Polynomial.aeval_algHom_apply E.val α p
@@ -169,46 +205,31 @@ theorem exists_primitive
   rw [h2]
   rfl
 
-private theorem finite_adjoinRoot_of_monic
-    {R : Type} [CommRing R] [Finite R] {g : R[X]} (hg : g.Monic)
-    : Finite (AdjoinRoot g) := by
+private theorem finite_adjoinRoot_of_monic {R : Type} [CommRing R] [Finite R] {g : R[X]}
+    (hg : g.Monic) : Finite (AdjoinRoot g) := by
   haveI := (AdjoinRoot.powerBasis' hg).finite
   exact Module.finite_of_finite R
 
-theorem exists_lift
-    {R k L ι : Type} [CommRing R] [Finite R] [Field k] [Finite k] [Field L] [Algebra k L]
-    [Algebra.IsAlgebraic k L] [Finite ι]
-    (φ : R →+* k) (hφ : Function.Surjective φ)
-    (π : R) (hπ : ∀ x, φ x = 0 → π ∣ x)
-    (b : ι → L)
-    : ∃ (S : Type) (_ : CommRing S) (_ : Finite S) (f : R →+* S) (ψ : S →+* L),
-      Function.Injective f ∧ (∀ x, ψ (f x) = algebraMap k L (φ x)) ∧ (∀ x, ψ x = 0 → f π ∣ x)
-        ∧ ∀ q, ∃ s, ψ s = b q := by
+theorem exists_lift {R k L ι : Type} [CommRing R] [Finite R] [Field k] [Finite k] [Field L]
+    [Algebra k L] [Algebra.IsAlgebraic k L] [Finite ι] (φ : R →+* k) (hφ : Function.Surjective φ)
+    (π : R) (hπ : ∀ x, φ x = 0 → π ∣ x) (b : ι → L) :
+    ∃ (S : Type) (_ : CommRing S) (_ : Finite S) (f : R →+* S) (ψ : S →+* L),
+      Function.Injective f ∧ (∀ x, ψ (f x) = algebraMap k L (φ x)) ∧
+      (∀ x, ψ x = 0 → f π ∣ x) ∧ ∀ q, ∃ s, ψ s = b q := by
   classical
   obtain ⟨α, hα⟩ := exists_primitive (k := k) b
   choose p hp using hα
   have hint : IsIntegral k α := (Algebra.IsAlgebraic.isAlgebraic α).isIntegral
-  obtain ⟨g, hgmap, hgdeg, hgmon⟩ :=
-    Polynomial.lifts_and_natDegree_eq_and_monic
-      ((Polynomial.mem_lifts _).2 (Polynomial.map_surjective φ hφ (minpoly k α)))
-      (minpoly.monic hint)
+  obtain ⟨g, hgmap, hgdeg, hgmon⟩ := Polynomial.lifts_and_natDegree_eq_and_monic
+    ((Polynomial.mem_lifts _).2 (Polynomial.map_surjective φ hφ (minpoly k α))) (minpoly.monic hint)
   have hdegpos : 0 < g.natDegree := by
     rw [hgdeg]
     exact minpoly.natDegree_pos hint
   have hg0 : g.eval₂ ((algebraMap k L).comp φ) α = 0 := by
     rw [← Polynomial.eval₂_map, hgmap, ← Polynomial.aeval_def]
     exact minpoly.aeval k α
-  refine ⟨
-    AdjoinRoot g,
-    inferInstance,
-    finite_adjoinRoot_of_monic hgmon,
-    AdjoinRoot.of g,
-    AdjoinRoot.lift ((algebraMap k L).comp φ) α hg0,
-    ?_,
-    ?_,
-    ?_,
-    ?_
-  ⟩
+  refine ⟨AdjoinRoot g, inferInstance, finite_adjoinRoot_of_monic hgmon, AdjoinRoot.of g,
+    AdjoinRoot.lift ((algebraMap k L).comp φ) α hg0, ?_, ?_, ?_, ?_⟩
   · intro x y hxy
     have h0 : AdjoinRoot.of g (x - y) * AdjoinRoot.root g ^ 0 = 0 := by
       rw [map_sub, hxy, sub_self, zero_mul]
@@ -234,21 +255,17 @@ theorem exists_lift
     have hsplit : h = C π * u + g * t' := by
       rw [← hu]
       ring
-    rw [hsplit, map_add (f := _), map_mul, map_mul, AdjoinRoot.mk_self, zero_mul, add_zero,
-      AdjoinRoot.mk_C]
+    rw [hsplit, map_add (f := _), map_mul, map_mul, AdjoinRoot.mk_self, zero_mul, add_zero, AdjoinRoot.mk_C]
   · intro q
     obtain ⟨r, hr⟩ := Polynomial.map_surjective φ hφ (p q)
     refine ⟨AdjoinRoot.mk g r, ?_⟩
     rw [AdjoinRoot.lift_mk, ← Polynomial.eval₂_map, hr, ← Polynomial.aeval_def, hp q]
 
-theorem exists_truncation
-    {R L : Type} [CommRing R] [Finite R] [Field L]
-    (ψ : R →+* L)
-    (π : R) (n w N : ℕ) (hn : π ^ n = 0)
-    (hπ : ∀ x, ψ x = 0 → π ∣ x)
-    (P : R[X]) (d : ℕ) (hd : d ≤ w) (hP : ψ (P.coeff d) ≠ 0)
-    : IsLocalRing (AdjoinRoot (X ^ (N + 1) : R[X]))
-      ∧ AdjoinRoot.mk (X ^ (N + 1) : R[X]) P ∣ AdjoinRoot.root (X ^ (N + 1) : R[X]) ^ (n * w) := by
+theorem exists_truncation {R L : Type} [CommRing R] [Finite R] [Field L] (ψ : R →+* L) (π : R)
+    (n w N : ℕ) (hn : π ^ n = 0) (hπ : ∀ x, ψ x = 0 → π ∣ x) (P : R[X]) (d : ℕ) (hd : d ≤ w)
+    (hP : ψ (P.coeff d) ≠ 0) :
+    IsLocalRing (AdjoinRoot (X ^ (N + 1) : R[X])) ∧
+      AdjoinRoot.mk (X ^ (N + 1) : R[X]) P ∣ AdjoinRoot.root (X ^ (N + 1) : R[X]) ^ (n * w) := by
   classical
   have hnil : ∀ x, ψ x = 0 → IsNilpotent x := fun x hx => by
     obtain ⟨c, rfl⟩ := hπ x hx
@@ -300,25 +317,23 @@ theorem exists_truncation
     refine isUnit_of_map_ne_zero _ hnil' ?_
     rw [AdjoinRoot.lift_mk, Polynomial.eval₂_at_zero, hV0]
     exact hd0
-  have hy
-      : AdjoinRoot.mk (X ^ (N + 1) : R[X]) P
-        = AdjoinRoot.of (X ^ (N + 1) : R[X]) π * AdjoinRoot.mk (X ^ (N + 1) : R[X]) A'
-          + AdjoinRoot.root (X ^ (N + 1) : R[X]) ^ d0 * AdjoinRoot.mk (X ^ (N + 1) : R[X]) V := by
+  have hy : AdjoinRoot.mk (X ^ (N + 1) : R[X]) P =
+      AdjoinRoot.of (X ^ (N + 1) : R[X]) π * AdjoinRoot.mk (X ^ (N + 1) : R[X]) A' +
+        AdjoinRoot.root (X ^ (N + 1) : R[X]) ^ d0 * AdjoinRoot.mk (X ^ (N + 1) : R[X]) V := by
     have hP' : P = C π * A' + X ^ d0 * V := by
       rw [← hV]
       ring
     rw [hP', map_add (f := _), map_mul, map_mul, map_pow, AdjoinRoot.mk_C, AdjoinRoot.mk_X]
-  have hπ0 : AdjoinRoot.of (X ^ (N + 1) : R[X]) π ^ n = 0 := by rw [← map_pow, hn, map_zero]
+  have hπ0 : AdjoinRoot.of (X ^ (N + 1) : R[X]) π ^ n = 0 := by
+    rw [← map_pow, hn, map_zero]
   rw [← Ideal.mem_span_singleton, ← Ideal.Quotient.eq_zero_iff_mem]
   set J := Ideal.span {AdjoinRoot.mk (X ^ (N + 1) : R[X]) P} with hJ
   have h1 : Ideal.Quotient.mk J (AdjoinRoot.mk (X ^ (N + 1) : R[X]) P) = 0 :=
     Ideal.Quotient.eq_zero_iff_mem.2 (Ideal.mem_span_singleton_self _)
   rw [hy, map_add (f := _)] at h1
   have h2 := eq_neg_of_add_eq_zero_right h1
-  have h3
-      : Ideal.Quotient.mk J
-          ((AdjoinRoot.root (X ^ (N + 1) : R[X]) ^ d0 * AdjoinRoot.mk (X ^ (N + 1) : R[X]) V) ^ n)
-        = 0 := by
+  have h3 : Ideal.Quotient.mk J ((AdjoinRoot.root (X ^ (N + 1) : R[X]) ^ d0 *
+      AdjoinRoot.mk (X ^ (N + 1) : R[X]) V) ^ n) = 0 := by
     rw [map_pow, h2, neg_pow, ← map_pow, mul_pow, hπ0, zero_mul, map_zero, mul_zero]
   rw [mul_pow, ← pow_mul, map_mul] at h3
   have h4 := ((hu.pow n).map (Ideal.Quotient.mk J)).mul_left_eq_zero.1 h3
@@ -328,20 +343,15 @@ theorem exists_truncation
   rw [hw, pow_add (AdjoinRoot.root (X ^ (N + 1) : R[X])) (d0 * n) (n * (w - d0)), map_mul, h4,
     zero_mul]
 
-theorem exists_finite_local_ring
-    (O : Type)
-    [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Finite (IsLocalRing.ResidueField O)]
-    (l : O) (e w : ℕ)
-    (ι : Type) [Fintype ι]
-    (K : Set ι) (F : MvPolynomial ι O)
-    (hl : IsDiscreteValuationRing.addVal O l = e)
-    (hF : ∃ m : ι →₀ ℕ, m.degree < w + 1 ∧ (∀ q ∈ K, m q = 0) ∧ IsUnit (F.coeff m))
-    : ∃ (A : Type) (_ : CommRing A) (_ : IsLocalRing A) (_ : Finite A) (_ : Algebra O A) (t : A)
-        (a : ι → A),
-      (∀ x ∈ Ideal.span {l} * IsLocalRing.maximalIdeal O, algebraMap O A x = 0)
-        ∧ t ^ (2 * (e + 1) * w + 2) = 0 ∧ algebraMap O A l * t ^ (2 * (e + 1) * w + 1) ≠ 0
-        ∧ (∀ q ∈ K, a q = 0) ∧ (∀ q ∉ K, IsUnit (a q))
-        ∧ MvPolynomial.aeval (fun q => a q * t) F ∣ t ^ ((e + 1) * w) := by
+theorem exists_finite_local_ring (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+    [Finite (IsLocalRing.ResidueField O)] (l : O) (e w : ℕ) (ι : Type) [Fintype ι] (K : Set ι)
+    (F : MvPolynomial ι O) (hl : IsDiscreteValuationRing.addVal O l = e)
+    (hF : ∃ m : ι →₀ ℕ, m.degree < w + 1 ∧ (∀ q ∈ K, m q = 0) ∧ IsUnit (F.coeff m)) :
+    ∃ (A : Type) (_ : CommRing A) (_ : IsLocalRing A) (_ : Finite A) (_ : Algebra O A) (t : A)
+      (a : ι → A), (∀ x ∈ Ideal.span {l} * IsLocalRing.maximalIdeal O, algebraMap O A x = 0) ∧
+      t ^ (2 * (e + 1) * w + 2) = 0 ∧ algebraMap O A l * t ^ (2 * (e + 1) * w + 1) ≠ 0 ∧
+      (∀ q ∈ K, a q = 0) ∧ (∀ q ∉ K, IsUnit (a q)) ∧
+      MvPolynomial.aeval (fun q => a q * t) F ∣ t ^ ((e + 1) * w) := by
   classical
   obtain ⟨m, hmw, hmK, hmu⟩ := hF
   obtain ⟨ϖ, hϖ⟩ := IsDiscreteValuationRing.exists_irreducible O
@@ -370,16 +380,15 @@ theorem exists_finite_local_ring
     (inferInstance : Finite (IsLocalRing.ResidueField O))
   have : Finite (O ⧸ IsLocalRing.maximalIdeal O ^ (e + 1)) :=
     Ideal.finite_quotient_pow (IsNoetherian.noetherian _) _
-  have : Finite (O ⧸ I) :=
-    Finite.of_surjective (Ideal.Quotient.factor hpow) (Ideal.Quotient.factor_surjective hpow)
+  have : Finite (O ⧸ I) := Finite.of_surjective (Ideal.Quotient.factor hpow)
+    (Ideal.Quotient.factor_surjective hpow)
   have hIm : I ≤ IsLocalRing.maximalIdeal O := by
     rw [hI]
     exact Ideal.mul_le_inf.trans inf_le_right
   have hIle : ∀ x ∈ I, IsLocalRing.residue O x = 0 := fun x hx =>
     (IsLocalRing.residue_eq_zero_iff x).2 (hIm hx)
-  obtain ⟨φ, hφdef⟩
-      : ∃ φ : O ⧸ I →+* IsLocalRing.ResidueField O, ∀ x,
-        φ (Ideal.Quotient.mk I x) = IsLocalRing.residue O x :=
+  obtain ⟨φ, hφdef⟩ : ∃ φ : O ⧸ I →+* IsLocalRing.ResidueField O,
+      ∀ x, φ (Ideal.Quotient.mk I x) = IsLocalRing.residue O x :=
     ⟨Ideal.Quotient.lift I (IsLocalRing.residue O) hIle, fun x => Ideal.Quotient.lift_mk I _ hIle⟩
   have hφsurj : Function.Surjective φ := by
     intro y
@@ -390,9 +399,8 @@ theorem exists_finite_local_ring
     obtain ⟨x, rfl⟩ := Ideal.Quotient.mk_surjective x
     rw [hφdef, IsLocalRing.residue_eq_zero_iff, hmax, Ideal.mem_span_singleton] at hx
     exact map_dvd _ hx
-  obtain ⟨χ, hχdef⟩
-      : ∃ χ : O →+* AlgebraicClosure (IsLocalRing.ResidueField O), ∀ x,
-        χ x = algebraMap _ _ (IsLocalRing.residue O x) :=
+  obtain ⟨χ, hχdef⟩ : ∃ χ : O →+* AlgebraicClosure (IsLocalRing.ResidueField O),
+      ∀ x, χ x = algebraMap _ _ (IsLocalRing.residue O x) :=
     ⟨(algebraMap _ _).comp (IsLocalRing.residue O), fun x => rfl⟩
   have hcoef : (F.map χ).coeff m ≠ 0 := by
     rw [MvPolynomial.coeff_map, hχdef]
@@ -439,38 +447,22 @@ theorem exists_finite_local_ring
   have hcoefP : ψ (Pp.coeff m.degree) ≠ 0 := by
     rw [← Polynomial.coeff_map, hmapP]
     exact hbcoef
-  obtain ⟨hloc, hdiv⟩ :=
-    exists_truncation ψ (f (Ideal.Quotient.mk I ϖ)) (e + 1) w (2 * (e + 1) * w + 1) hfπ hψker Pp
-      m.degree (by omega) hcoefP
+  obtain ⟨hloc, hdiv⟩ := exists_truncation ψ (f (Ideal.Quotient.mk I ϖ)) (e + 1) w
+    (2 * (e + 1) * w + 1) hfπ hψker Pp m.degree (by omega) hcoefP
   have hTmon : (X ^ (2 * (e + 1) * w + 1 + 1) : S[X]).Monic := Polynomial.monic_X_pow _
   have := finite_adjoinRoot_of_monic hTmon
   let alg : Algebra O (AdjoinRoot (X ^ (2 * (e + 1) * w + 1 + 1) : S[X])) :=
     ((AdjoinRoot.of _).comp hOS).toAlgebra
-  refine ⟨
-    AdjoinRoot (X ^ (2 * (e + 1) * w + 1 + 1) : S[X]),
-    inferInstance,
-    hloc,
-    inferInstance,
-    alg,
-    AdjoinRoot.root _,
-    fun q => AdjoinRoot.of _ (a q),
-    ?_,
-    ?_,
-    ?_,
-    ?_,
-    ?_,
-    ?_
-  ⟩
+  refine ⟨AdjoinRoot (X ^ (2 * (e + 1) * w + 1 + 1) : S[X]), inferInstance, hloc, inferInstance, alg,
+    AdjoinRoot.root _, fun q => AdjoinRoot.of _ (a q), ?_, ?_, ?_, ?_, ?_, ?_⟩
   · intro x hx
-    rw [RingHom.algebraMap_toAlgebra, RingHom.comp_apply, hOSdef,
-      Ideal.Quotient.eq_zero_iff_mem.2 (hI ▸ hx), map_zero, map_zero]
+    rw [RingHom.algebraMap_toAlgebra, RingHom.comp_apply, hOSdef, Ideal.Quotient.eq_zero_iff_mem.2 (hI ▸ hx), map_zero, map_zero]
   · rw [show 2 * (e + 1) * w + 2 = 2 * (e + 1) * w + 1 + 1 by ring, ← AdjoinRoot.mk_X, ← map_pow]
     exact AdjoinRoot.mk_self
   · intro h0
     rw [RingHom.algebraMap_toAlgebra, RingHom.comp_apply] at h0
-    have h1 :=
-      adjoinRoot_eq_zero (r := hOS l) (j := 2 * (e + 1) * w + 1) hTmon
-        (by rw [Polynomial.natDegree_X_pow]; omega) h0
+    have h1 := adjoinRoot_eq_zero (r := hOS l) (j := 2 * (e + 1) * w + 1) hTmon
+      (by rw [Polynomial.natDegree_X_pow]; omega) h0
     rw [hOSdef, ← map_zero f] at h1
     have hlI : l ∈ I := Ideal.Quotient.eq_zero_iff_mem.1 (hfinj h1)
     rw [hI, hmax, Ideal.span_singleton_mul_span_singleton, Ideal.mem_span_singleton] at hlI
@@ -486,21 +478,14 @@ theorem exists_finite_local_ring
     rw [haK q hq, map_zero]
   · intro q hq
     exact (haU q hq).map _
-  · have hev
-        : MvPolynomial.aeval
-            (fun q =>
-              AdjoinRoot.of (X ^ (2 * (e + 1) * w + 1 + 1) : S[X]) (a q) * AdjoinRoot.root _)
-            F
-          = AdjoinRoot.mk (X ^ (2 * (e + 1) * w + 1 + 1) : S[X]) Pp := by
-      have e3
-          : (AdjoinRoot.mk (X ^ (2 * (e + 1) * w + 1 + 1) : S[X])).comp (C.comp hOS)
-            = (AdjoinRoot.of _).comp hOS := by
+  · have hev : MvPolynomial.aeval (fun q => AdjoinRoot.of (X ^ (2 * (e + 1) * w + 1 + 1) : S[X]) (a q) *
+        AdjoinRoot.root _) F = AdjoinRoot.mk (X ^ (2 * (e + 1) * w + 1 + 1) : S[X]) Pp := by
+      have e3 : (AdjoinRoot.mk (X ^ (2 * (e + 1) * w + 1 + 1) : S[X])).comp (C.comp hOS) =
+          (AdjoinRoot.of _).comp hOS := by
         refine RingHom.ext fun x => ?_
         simp only [RingHom.comp_apply, AdjoinRoot.mk_C]
-      have e4
-          : (⇑(AdjoinRoot.mk (X ^ (2 * (e + 1) * w + 1 + 1) : S[X])) ∘ fun q => C (a q) * X)
-            = fun q =>
-              AdjoinRoot.of (X ^ (2 * (e + 1) * w + 1 + 1) : S[X]) (a q) * AdjoinRoot.root _ := by
+      have e4 : (⇑(AdjoinRoot.mk (X ^ (2 * (e + 1) * w + 1 + 1) : S[X])) ∘ fun q => C (a q) * X) =
+          fun q => AdjoinRoot.of (X ^ (2 * (e + 1) * w + 1 + 1) : S[X]) (a q) * AdjoinRoot.root _ := by
         funext q
         simp [AdjoinRoot.mk_C, AdjoinRoot.mk_X]
       rw [MvPolynomial.aeval_def, RingHom.algebraMap_toAlgebra, hPp, MvPolynomial.eval₂_comp_left,

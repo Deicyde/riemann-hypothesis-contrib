@@ -1,16 +1,53 @@
 module
 
-public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.BoundAtTwoAndThreeForFamily
-public import Formalism.SharpRestriction.GlobalTheoremInputs
-public import Formalism.SharpRestriction.LevelLetterCocycles.JointConditionsZpowers.JointConditionTameBound
-public import Formalism.SharpRestriction.LevelLetterCocycles.JointConditionsZpowers.CrysOnCond
-public import Formalism.SharpRestriction.LevelLetterCocycles.WachCoordinates
-public import Formalism.SharpRestriction.LevelLetterCocycles.RamifiedCoefficientChains
-public import Formalism.SharpRestriction.LevelLetterCocycles.ArcLiftingSetup
-public import Development.AbelianVarietyTheory.BlockTheory.NonGaloisCusps.BaseSizes
 public import Formalism.SharpRestriction.LevelLetterCocycles.AdmissibleParameterJ
-public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.JumpSetDistinctOfRealPlaceFacts
+public import Formalism.LocalRingCardinality.DataParams
+public import Formalism.SharpRestriction.LevelLetterCocycles.EmbeddingTypeJumps
 public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.ExistsLetterOfLocalEmbedding
+import Formalism.LocalRingCardinality.RankBoundMonotoneInDimension
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Rat
+import Mathlib.Algebra.Order.Star.Real
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
+import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.BoundAtTwoThreeFamily
 
 @[expose] public section
 
@@ -138,15 +175,10 @@ theorem sz_bounds
     split_ifs <;> simp
   rw [← hw]
   have hx : 1 < L.sc.x := L.sc.one_lt_alt
-  have hx0 : 0 < L.sc.x := by linarith
   have hb' : 0 < L.sc.b' := by
     unfold Scale.b' Scale.a Scale.X' Scale.b
     positivity
-  have hb : 0 < L.sc.b := Real.exp_pos _
   have hn : (1 : ℝ) ≤ (D.R.n : ℝ) := by exact_mod_cast D.R.ord_pos
-  have hw''0 : 0 ≤ L.sc.w'' D.R.n := by
-    unfold Scale.w''
-    exact div_nonneg hb'.le (by positivity)
   have hw''b' : L.sc.w'' D.R.n ≤ L.sc.b' := by
     unfold Scale.w''
     exact div_le_self hb'.le (by nlinarith)
@@ -274,9 +306,6 @@ theorem key_sets
     push_cast
     rfl
   have ht1 : (1 : ℝ) ≤ D.R.t := L.t_win.1
-  have hS0 : 0 < L.Sc := L.Sc_pos
-  have hη : 0 < L.etaSz := L.etaSz_pos
-  have hkc0 : (0 : ℝ) ≤ kc := by rw [hkR]; linarith
   have hc0 := jumpBlockCentreOffset_coe_real (D := D)
   rw [hzR] at hlo hhi
   cases up

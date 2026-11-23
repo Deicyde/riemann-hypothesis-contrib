@@ -1,49 +1,78 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Definitions.ModuliSpaces.IsInvDer
 public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ExistsDualFamilyModSubspace
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.ThetaUnifAV
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.UniformisationConclusion
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.IsHolPeriods
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDescent.UnifUniqSt
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.AlgebraicGeometry.Modules.Sheaf
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
-  NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
-  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj TensorProduct ContDiff
 open GlobalTheory.KS
 
 namespace GlobalTheory.KS.Kunneth
 
-theorem pushout_functional
-    {K : Type} [Field K]
-    {A B C : CommRingCat.{0}} (f : CommRingCat.of K ⟶ A) (g : CommRingCat.of K ⟶ B) (i : A ⟶ C)
-    (j : B ⟶ C) (po : IsPushout f g i j)
-    : (∀ (α : A →+ K) (β : B →+ K),
-        (∀ c a, α (f.hom c * a) = c * α a) → (∀ c b, β (g.hom c * b) = c * β b)
-          → ∃ F : C →+ K, ∀ a b, F (i.hom a * j.hom b) = α a * β b)
-      ∧ ∀ G : C →+ K, (∀ a b, G (i.hom a * j.hom b) = 0) → ∀ w, G w = 0 := by
+theorem pushout_functional {K : Type} [Field K] {A B C : CommRingCat.{0}} (f : CommRingCat.of K ⟶ A)
+    (g : CommRingCat.of K ⟶ B) (i : A ⟶ C) (j : B ⟶ C) (po : IsPushout f g i j) :
+    (∀ (α : A →+ K) (β : B →+ K), (∀ c a, α (f.hom c * a) = c * α a) → (∀ c b, β (g.hom c * b) = c * β b) →
+      ∃ F : C →+ K, ∀ a b, F (i.hom a * j.hom b) = α a * β b) ∧
+    ∀ G : C →+ K, (∀ a b, G (i.hom a * j.hom b) = 0) → ∀ w, G w = 0 := by
   letI : Algebra K A := f.hom.toAlgebra
   letI : Algebra K B := g.hom.toAlgebra
-  have hw
-      : f ≫ CommRingCat.ofHom (Algebra.TensorProduct.includeLeftRingHom (R := K) (A := A) (B := B))
-        = g ≫ CommRingCat.ofHom (Algebra.TensorProduct.includeRight (R := K) (A := A)
-          (B := B)).toRingHom := by
+  have hw : f ≫ CommRingCat.ofHom (Algebra.TensorProduct.includeLeftRingHom (R := K) (A := A) (B := B)) =
+      g ≫ CommRingCat.ofHom (Algebra.TensorProduct.includeRight (R := K) (A := A) (B := B)).toRingHom := by
     ext c
     show f.hom c ⊗ₜ[K] (1 : B) = (1 : A) ⊗ₜ[K] g.hom c
     have h1 : f.hom c = c • (1 : A) := by rw [Algebra.smul_def, _root_.mul_one]; rfl
     have h2 : g.hom c = c • (1 : B) := by rw [Algebra.smul_def, _root_.mul_one]; rfl
     rw [h1, h2, TensorProduct.smul_tmul]
-  obtain ⟨φ, hφi', hφj'⟩
-      : ∃ φ : C ⟶ CommRingCat.of (A ⊗[K] B),
-        i ≫ φ = CommRingCat.ofHom Algebra.TensorProduct.includeLeftRingHom
-          ∧ j ≫ φ
-            = CommRingCat.ofHom (Algebra.TensorProduct.includeRight (R := K) (A := A)
-              (B := B)).toRingHom :=
+  obtain ⟨φ, hφi', hφj'⟩ : ∃ φ : C ⟶ CommRingCat.of (A ⊗[K] B),
+      i ≫ φ = CommRingCat.ofHom Algebra.TensorProduct.includeLeftRingHom ∧
+      j ≫ φ = CommRingCat.ofHom (Algebra.TensorProduct.includeRight (R := K) (A := A) (B := B)).toRingHom :=
     ⟨po.desc _ _ hw, po.inl_desc _ _ hw, po.inr_desc _ _ hw⟩
   have hφi : ∀ a, φ.hom (i.hom a) = a ⊗ₜ[K] (1 : B) := fun a => by
     have := congrArg (fun m => m.hom a) hφi'
@@ -52,31 +81,20 @@ theorem pushout_functional
     have := congrArg (fun m => m.hom b) hφj'
     exact this
   refine ⟨fun α β hα hβ => ?_, fun G hG w => ?_⟩
-  · let α' : A →ₗ[K] K := {
-      toFun := α
-      map_add' := map_add α
-      map_smul' := fun c a => by rw [Algebra.smul_def]; exact hα c a
-    }
-    let β' : B →ₗ[K] K := {
-      toFun := β
-      map_add' := map_add β
-      map_smul' := fun c b => by rw [Algebra.smul_def]; exact hβ c b
-    }
-    refine ⟨
-      ((LinearMap.mul' K K).comp (TensorProduct.map α' β')).toAddMonoidHom.comp
-        φ.hom.toAddMonoidHom,
-      fun a b => ?_
-    ⟩
+  · let α' : A →ₗ[K] K :=
+      { toFun := α, map_add' := map_add α, map_smul' := fun c a => by rw [Algebra.smul_def]; exact hα c a }
+    let β' : B →ₗ[K] K :=
+      { toFun := β, map_add' := map_add β, map_smul' := fun c b => by rw [Algebra.smul_def]; exact hβ c b }
+    refine ⟨((LinearMap.mul' K K).comp (TensorProduct.map α' β')).toAddMonoidHom.comp φ.hom.toAddMonoidHom,
+      fun a b => ?_⟩
     show LinearMap.mul' K K (TensorProduct.map α' β' (φ.hom (i.hom a * j.hom b))) = α a * β b
-    rw [map_mul, hφi, hφj, Algebra.TensorProduct.tmul_mul_tmul, _root_.mul_one, _root_.one_mul,
-      TensorProduct.map_tmul, LinearMap.mul'_apply]
+    rw [map_mul, hφi, hφj, Algebra.TensorProduct.tmul_mul_tmul, _root_.mul_one, _root_.one_mul, TensorProduct.map_tmul,
+      LinearMap.mul'_apply]
     rfl
   · letI : Algebra K C := (f ≫ i).hom.toAlgebra
     let iA : A →ₐ[K] C := { i.hom with commutes' := fun _ => rfl }
-    let jA : B →ₐ[K] C := {
-      j.hom with
-      commutes' := fun c => (congrArg (fun m => m.hom c) po.w).symm
-    }
+    let jA : B →ₐ[K] C :=
+      { j.hom with commutes' := fun c => (congrArg (fun m => m.hom c) po.w).symm }
     let ψ := Algebra.TensorProduct.productMap iA jA
     have hψ : φ ≫ CommRingCat.ofHom ψ.toRingHom = 𝟙 C := by
       apply po.hom_ext
@@ -100,23 +118,19 @@ theorem pushout_functional
       exact hG a b
     | add x y hx hy => rw [map_add (f := _), map_add (f := _), hx, hy, add_zero]
 
-theorem pbT_of_le
-    {Z Y : Scheme.{0}} (f : Z ⟶ Y) {O₀ : Y.Opens} (s : Γ(Y, O₀)) {O : Z.Opens} (h : O ≤ f ⁻¹ᵁ O₀)
-    : pbT f s O = (f.appLE O₀ O h).hom s := by
+theorem pbT_of_le {Z Y : Scheme.{0}} (f : Z ⟶ Y) {O₀ : Y.Opens} (s : Γ(Y, O₀)) {O : Z.Opens}
+    (h : O ≤ f ⁻¹ᵁ O₀) : pbT f s O = (f.appLE O₀ O h).hom s := by
   unfold pbT
   rw [dite_eq_left h]
 
-theorem rsT_of_le {Y : Scheme.{0}} {O₀ : Y.Opens} (s : Γ(Y, O₀)) {O : Y.Opens} (h : O ≤ O₀)
-    : rsT s O = resG Y h s := by
+theorem rsT_of_le {Y : Scheme.{0}} {O₀ : Y.Opens} (s : Γ(Y, O₀)) {O : Y.Opens}
+    (h : O ≤ O₀) : rsT s O = resG Y h s := by
   unfold rsT
   rw [dite_eq_left h]
 
-theorem res_pbT
-    {Z Y : Scheme.{0}} (f : Z ⟶ Y)
-    {O₀ O₁ : Y.Opens} (s : Γ(Y, O₀))
-    {O O' : Z.Opens} (h : O ≤ f ⁻¹ᵁ O₀) (h' : O' ≤ O)
-    (h₁ : O₁ ≤ O₀) (h₂ : O' ≤ f ⁻¹ᵁ O₁)
-    : resG Z h' (pbT f s O) = pbT f (rsT s O₁) O' := by
+theorem res_pbT {Z Y : Scheme.{0}} (f : Z ⟶ Y) {O₀ O₁ : Y.Opens} (s : Γ(Y, O₀)) {O O' : Z.Opens}
+    (h : O ≤ f ⁻¹ᵁ O₀) (h' : O' ≤ O) (h₁ : O₁ ≤ O₀) (h₂ : O' ≤ f ⁻¹ᵁ O₁) :
+    resG Z h' (pbT f s O) = pbT f (rsT s O₁) O' := by
   rw [pbT_of_le f s h, rsT_of_le s h₁, pbT_of_le f _ h₂]
   show (f.appLE O₀ O h ≫ Z.presheaf.map (homOfLE h').op).hom s =
     (Y.presheaf.map (homOfLE h₁).op ≫ f.appLE O₁ O' h₂).hom s
@@ -126,17 +140,15 @@ theorem rsT_self {Y : Scheme.{0}} {O₀ : Y.Opens} (s : Γ(Y, O₀)) : rsT s O�
   rw [rsT_of_le s le_rfl]
   simp [resG]
 
-noncomputable def cstHom {K : Type} [Field K] {Y : Scheme.{0}} (q : Y ⟶ Sp K) (O : Y.Opens)
-    : CommRingCat.of K ⟶ Γ(Y, O) :=
+noncomputable def cstHom {K : Type} [Field K] {Y : Scheme.{0}} (q : Y ⟶ Sp K) (O : Y.Opens) :
+    CommRingCat.of K ⟶ Γ(Y, O) :=
   (Scheme.ΓSpecIso (CommRingCat.of K)).inv ≫ q.appLE ⊤ O (fun _ _ => trivial)
 
-theorem cstHom_apply {K : Type} [Field K] {Y : Scheme.{0}} (q : Y ⟶ Sp K) (O : Y.Opens) (c : K)
-    : (cstHom q O).hom c = constFn q O c :=
-  rfl
+theorem cstHom_apply {K : Type} [Field K] {Y : Scheme.{0}} (q : Y ⟶ Sp K) (O : Y.Opens) (c : K) :
+    (cstHom q O).hom c = constFn q O c := rfl
 
-theorem res_constFn
-    {K : Type} [Field K] {Y : Scheme.{0}} (q : Y ⟶ Sp K) {O O' : Y.Opens} (h : O' ≤ O) (c : K)
-    : resG Y h (constFn q O c) = constFn q O' c := by
+theorem res_constFn {K : Type} [Field K] {Y : Scheme.{0}} (q : Y ⟶ Sp K) {O O' : Y.Opens} (h : O' ≤ O) (c : K) :
+    resG Y h (constFn q O c) = constFn q O' c := by
   rw [← cstHom_apply, ← cstHom_apply]
   have e : cstHom q O ≫ Y.presheaf.map (homOfLE h).op = cstHom q O' := by
     unfold cstHom
@@ -146,84 +158,66 @@ theorem res_constFn
   rw [← e]
   rfl
 
-theorem prod_functional
-    {K : Type} [Field K]
-    {Y Z : Scheme.{0}} {q : Y ⟶ Sp K} {p₁ p₂ : Z ⟶ Y} (H : IsPullback p₁ p₂ q q)
-    {O O' : Y.Opens} (hO : IsAffineOpen O) (hO' : IsAffineOpen O')
-    : (∀ (α : Γ(Y, O) →+ K) (β : Γ(Y, O') →+ K),
-        (∀ c a, α (constFn q O c * a) = c * α a) → (∀ c b, β (constFn q O' c * b) = c * β b)
-          → ∃ F : Γ(Z, p₁ ⁻¹ᵁ O ⊓ p₂ ⁻¹ᵁ O') →+ K, ∀ a b,
-            F (pbT p₁ a (p₁ ⁻¹ᵁ O ⊓ p₂ ⁻¹ᵁ O') * pbT p₂ b (p₁ ⁻¹ᵁ O ⊓ p₂ ⁻¹ᵁ O')) = α a * β b)
-      ∧ ∀ G : Γ(Z, p₁ ⁻¹ᵁ O ⊓ p₂ ⁻¹ᵁ O') →+ K,
-        (∀ (a : Γ(Y, O)) (b : Γ(Y, O')),
-            G (pbT p₁ a (p₁ ⁻¹ᵁ O ⊓ p₂ ⁻¹ᵁ O') * pbT p₂ b (p₁ ⁻¹ᵁ O ⊓ p₂ ⁻¹ᵁ O')) = 0)
-          → ∀ w, G w = 0 := by
+theorem prod_functional {K : Type} [Field K] {Y Z : Scheme.{0}} {q : Y ⟶ Sp K} {p₁ p₂ : Z ⟶ Y}
+    (H : IsPullback p₁ p₂ q q) {O O' : Y.Opens} (hO : IsAffineOpen O) (hO' : IsAffineOpen O') :
+    (∀ (α : Γ(Y, O) →+ K) (β : Γ(Y, O') →+ K), (∀ c a, α (constFn q O c * a) = c * α a) →
+      (∀ c b, β (constFn q O' c * b) = c * β b) →
+      ∃ F : Γ(Z, p₁ ⁻¹ᵁ O ⊓ p₂ ⁻¹ᵁ O') →+ K, ∀ a b,
+        F (pbT p₁ a (p₁ ⁻¹ᵁ O ⊓ p₂ ⁻¹ᵁ O') * pbT p₂ b (p₁ ⁻¹ᵁ O ⊓ p₂ ⁻¹ᵁ O')) = α a * β b) ∧
+    ∀ G : Γ(Z, p₁ ⁻¹ᵁ O ⊓ p₂ ⁻¹ᵁ O') →+ K,
+      (∀ (a : Γ(Y, O)) (b : Γ(Y, O')), G (pbT p₁ a (p₁ ⁻¹ᵁ O ⊓ p₂ ⁻¹ᵁ O') * pbT p₂ b (p₁ ⁻¹ᵁ O ⊓ p₂ ⁻¹ᵁ O')) = 0) →
+      ∀ w, G w = 0 := by
   have hO1 : p₁ ⁻¹ᵁ O ⊓ p₂ ⁻¹ᵁ O' ≤ p₁ ⁻¹ᵁ O := inf_le_left
   have hO2 : p₁ ⁻¹ᵁ O ⊓ p₂ ⁻¹ᵁ O' ≤ p₂ ⁻¹ᵁ O' := inf_le_right
-  have hiso :=
-    isIso_pushoutSection_of_isAffineOpen H (US := ⊤) (UX := O) (UT := O')
-      (UY := p₁ ⁻¹ᵁ O ⊓ p₂ ⁻¹ᵁ O') (by simp) (by simp) rfl (isAffineOpen_top _) hO' hO
+  have hiso := isIso_pushoutSection_of_isAffineOpen H (US := ⊤) (UX := O) (UT := O')
+    (UY := p₁ ⁻¹ᵁ O ⊓ p₂ ⁻¹ᵁ O') (by simp) (by simp) rfl (isAffineOpen_top _) hO' hO
   have po₀ := (isIso_pushoutSection_iff H _ _ _).mp hiso
   have po : IsPushout (cstHom q O) (cstHom q O') (p₁.appLE O _ hO1) (p₂.appLE O' _ hO2) :=
     IsPushout.of_iso po₀ (Scheme.ΓSpecIso (CommRingCat.of K)) (Iso.refl _) (Iso.refl _) (Iso.refl _)
       (by simp [cstHom]) (by simp [cstHom]) (by simp) (by simp)
   obtain ⟨h1, h2⟩ := pushout_functional (cstHom q O) (cstHom q O') _ _ po
   refine ⟨fun α β hα hβ => ?_, fun G hG w => ?_⟩
-  · obtain ⟨F, hF⟩ :=
-      h1 α β
-        (fun c a => by rw [cstHom_apply]; exact hα c a)
-        (fun c b => by rw [cstHom_apply]; exact hβ c b)
+  · obtain ⟨F, hF⟩ := h1 α β (fun c a => by rw [cstHom_apply]; exact hα c a)
+      (fun c b => by rw [cstHom_apply]; exact hβ c b)
     exact ⟨F, fun a b => by rw [pbT_of_le p₁ a hO1, pbT_of_le p₂ b hO2]; exact hF a b⟩
   · refine h2 G (fun a b => ?_) w
     have e := hG a b
     rwa [pbT_of_le p₁ a hO1, pbT_of_le p₂ b hO2] at e
 
-theorem functional_eq_sum
-    {K : Type} [Field K]
-    {Y : Scheme.{0}} {I : Type} [Fintype I] [DecidableEq I]
-    {U : I → Y.Opens} (α : C1 U →+ K) (c : C1 U)
-    : α c = ∑ i, ∑ j, α (Pi.single i (Pi.single j (c i j))) := by
+theorem functional_eq_sum {K : Type} [Field K] {Y : Scheme.{0}} {I : Type} [Fintype I] [DecidableEq I]
+    {U : I → Y.Opens} (α : C1 U →+ K) (c : C1 U) :
+    α c = ∑ i, ∑ j, α (Pi.single i (Pi.single j (c i j))) := by
   have hc : c = ∑ i, ∑ j, (Pi.single i (Pi.single j (c i j)) : C1 U) := by
     conv_lhs => rw [← Finset.univ_sum_single c]
     refine Finset.sum_congr rfl fun i _ => ?_
     conv_lhs => rw [← Finset.univ_sum_single (c i)]
     exact map_sum (AddMonoidHom.single _ i) _ _
   conv_lhs => rw [hc]
-  set_option synthInstance.maxHeartbeats 100000 in
+
   simp only [map_sum]
 
-theorem functional_cob
-    {K : Type} [Field K]
-    {Y : Scheme.{0}} {I : Type} [Fintype I] [DecidableEq I]
-    {U : I → Y.Opens} (α : C1 U →+ K) (h : ∀ c, IsCob U c → α c = 0)
-    (j : I) (b : Γ(Y, U j))
-    : ∑ k, α (Pi.single k (Pi.single j (rsT b (U k ⊓ U j))))
-      = ∑ k, α (Pi.single j (Pi.single k (rsT b (U j ⊓ U k)))) := by
+theorem functional_cob {K : Type} [Field K] {Y : Scheme.{0}} {I : Type} [Fintype I] [DecidableEq I]
+    {U : I → Y.Opens} (α : C1 U →+ K) (h : ∀ c, IsCob U c → α c = 0) (j : I) (b : Γ(Y, U j)) :
+    ∑ k, α (Pi.single k (Pi.single j (rsT b (U k ⊓ U j)))) =
+      ∑ k, α (Pi.single j (Pi.single k (rsT b (U j ⊓ U k)))) := by
   have hz : ∀ (O₀ O : Y.Opens), rsT (0 : Γ(Y, O₀)) O = 0 := by
     intro O₀ O
     unfold rsT
     split_ifs <;> simp
-  have hcob :=
-    h
-      (fun i k =>
-        rsT ((Pi.single j b : ∀ i, Γ(Y, U i)) k) (U i ⊓ U k)
-          - rsT ((Pi.single j b : ∀ i, Γ(Y, U i)) i) (U i ⊓ U k))
-      ⟨Pi.single j b, fun _ _ => rfl⟩
+  have hcob := h (fun i k => rsT ((Pi.single j b : ∀ i, Γ(Y, U i)) k) (U i ⊓ U k) -
+      rsT ((Pi.single j b : ∀ i, Γ(Y, U i)) i) (U i ⊓ U k)) ⟨Pi.single j b, fun _ _ => rfl⟩
   rw [functional_eq_sum] at hcob
   simp only [Pi.single_sub, map_sub, Finset.sum_sub_distrib, sub_eq_zero] at hcob
-  have e1
-      : ∀ i,
-        ∑ k, α (Pi.single i (Pi.single k (rsT ((Pi.single j b : ∀ i, Γ(Y, U i)) k) (U i ⊓ U k))))
-          = α (Pi.single i (Pi.single j (rsT b (U i ⊓ U j)))) := by
+  have e1 : ∀ i, ∑ k, α (Pi.single i (Pi.single k (rsT ((Pi.single j b : ∀ i, Γ(Y, U i)) k) (U i ⊓ U k)))) =
+      α (Pi.single i (Pi.single j (rsT b (U i ⊓ U j)))) := by
     intro i
     rw [Finset.sum_eq_single j]
     · rw [Pi.single_eq_same]
     · intro k _ hk
       rw [Pi.single_eq_of_ne hk, hz, Pi.single_zero, Pi.single_zero, map_zero]
     · intro hj; exact absurd (Finset.mem_univ j) hj
-  have e2
-      : ∑ i, ∑ k, α (Pi.single i (Pi.single k (rsT ((Pi.single j b : ∀ i, Γ(Y, U i)) i) (U i ⊓ U k))))
-        = ∑ k, α (Pi.single j (Pi.single k (rsT b (U j ⊓ U k)))) := by
+  have e2 : ∑ i, ∑ k, α (Pi.single i (Pi.single k (rsT ((Pi.single j b : ∀ i, Γ(Y, U i)) i) (U i ⊓ U k)))) =
+      ∑ k, α (Pi.single j (Pi.single k (rsT b (U j ⊓ U k)))) := by
     rw [Finset.sum_eq_single j]
     · simp only [Pi.single_eq_same]
     · intro i _ hi
@@ -378,8 +372,8 @@ theorem pair_symm {K : Type} [Field K] {Y Z : Scheme.{0}} {q : Y ⟶ Sp K} {p₁
       α (Pi.single i (Pi.single i' (φ a i i'))) * β (Pi.single j (Pi.single j' (θ a j j')))) =
       F i i' j j' (rsT (u i i' j') _ - rsT (u i i' j) _ + (rsT (u' i' j j') _ - rsT (u' i j j') _)) := by
     intro i i' j j'
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← hu, map_sum]
+
+    rw [← hu, map_sum]
     refine Finset.sum_congr rfl fun a _ => ?_
     rw [map_sub, hF, hF]
   have expand : ∀ x y : C1 U, α x * β y = ∑ i, ∑ i', ∑ j, ∑ j',

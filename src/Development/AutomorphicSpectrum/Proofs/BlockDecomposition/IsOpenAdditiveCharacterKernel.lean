@@ -1,6 +1,50 @@
 module
 
-public import Mathlib
+import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ThetaOpenMirabolic
+public import Mathlib.Analysis.Complex.Circle
+public import Mathlib.NumberTheory.LocalField.Basic
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Real
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -8,8 +52,8 @@ open Matrix Filter Topology ValuativeRel
 
 namespace GlobalTheory.CompanionTheory.LocalFieldChar
 
-theorem circle_eq_one_of_forall_re_pow_pos (z : Circle) (h : ∀ n : ℕ, 0 < ((z ^ n : Circle) : ℂ).re)
-    : z = 1 := by
+theorem circle_eq_one_of_forall_re_pow_pos (z : Circle)
+    (h : ∀ n : ℕ, 0 < ((z ^ n : Circle) : ℂ).re) : z = 1 := by
   have hsq : ∀ w : Circle, (w : ℂ).re ^ 2 + (w : ℂ).im ^ 2 = 1 := by
     intro w
     have := Circle.normSq_coe w
@@ -29,7 +73,8 @@ theorem circle_eq_one_of_forall_re_pow_pos (z : Circle) (h : ∀ n : ℕ, 0 < ((
   have hstep : ∀ j, a (j + 1) = 2 * a j ^ 2 - 1 := by
     intro j
     have h2 := hsq (z ^ (2 ^ j))
-    have hp : z ^ (2 ^ (j + 1)) = z ^ (2 ^ j) * z ^ (2 ^ j) := by rw [pow_succ, pow_mul, sq]
+    have hp : z ^ (2 ^ (j + 1)) = z ^ (2 ^ j) * z ^ (2 ^ j) := by
+      rw [pow_succ, pow_mul, sq]
     simp only [ha]
     rw [hp, Circle.coe_mul, Complex.mul_re]
     nlinarith
@@ -54,39 +99,9 @@ theorem circle_eq_one_of_forall_re_pow_pos (z : Circle) (h : ∀ n : ℕ, 0 < ((
   have hpos : 0 < a j := h _
   linarith
 
-theorem isOpen_addChar_ker
-    : ∀ {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
-        (ψ : AddChar k Circle),
-      Continuous ψ → IsOpen {x : k | ψ x = 1} := by
-  intro k _ _ _ _ ψ hψ
-  let H : AddSubgroup k := {
-    carrier := {x | ψ x = 1}
-    add_mem' := fun {a b} ha hb => by
-      simp only [Set.mem_setOf_eq] at ha hb ⊢
-      rw [AddChar.map_add_eq_mul, ha, hb, one_mul]
-    zero_mem' := by simp
-    neg_mem' := fun {a} ha => by
-      simp only [Set.mem_setOf_eq] at ha ⊢
-      rw [AddChar.map_neg_eq_inv, ha, inv_one]
-  }
-  have hV : IsOpen {z : Circle | 0 < (z : ℂ).re} :=
-    isOpen_lt continuous_const (Complex.continuous_re.comp continuous_induced_dom)
-  have hU : ψ ⁻¹' {z : Circle | 0 < (z : ℂ).re} ∈ 𝓝 (0 : k) := (hV.preimage hψ).mem_nhds (by simp)
-  obtain ⟨γ, hγ, hball⟩ := (IsValuativeTopology.hasBasis_nhds_zero' k).mem_iff.1 hU
-  have hsmul : ∀ x : k, valuation k x < γ → ∀ n : ℕ, valuation k (n • x) < γ := by
-    intro x hx n
-    induction n with
-    | zero => simpa using zero_lt_iff.2 hγ
-    | succ n ih =>
-      rw [succ_nsmul]
-      exact Valuation.map_add_lt _ ih hx
-  have hone : ∀ x : k, valuation k x < γ → x ∈ H := by
-    intro x hx
-    refine circle_eq_one_of_forall_re_pow_pos (ψ x) fun n => ?_
-    have h1 : 0 < ((ψ (n • x) : Circle) : ℂ).re := hball (hsmul x hx n)
-    rwa [AddChar.map_nsmul_eq_pow] at h1
-  have hnh : (H : Set k) ∈ 𝓝 (0 : k) :=
-    (IsValuativeTopology.hasBasis_nhds_zero' k).mem_iff.2 ⟨γ, hγ, fun x hx => hone x hx⟩
-  exact H.isOpen_of_mem_nhds hnh
+theorem isOpen_addChar_ker : ∀ {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k]
+    [IsNonarchimedeanLocalField k] (ψ : AddChar k Circle), Continuous ψ →
+    IsOpen {x : k | ψ x = 1} := by
+  apply GlobalTheory.CompanionTheory.BZFun.isOpen_addChar_eq_one <;> assumption
 
 end GlobalTheory.CompanionTheory.LocalFieldChar

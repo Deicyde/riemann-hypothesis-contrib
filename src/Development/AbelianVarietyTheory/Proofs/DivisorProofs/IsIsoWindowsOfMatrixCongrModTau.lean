@@ -1,14 +1,55 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Definitions.Divisors.EqZeroOfForallPowDvd
+public import Development.AbelianVarietyTheory.BlockTheory.DivisorBase.EpsilonPairingZeta
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.AinfFrobeniusSemilinearEquationExistsUniqueStatement
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Development.AbelianVarietyTheory.Definitions.Divisors.GhostFrobenius
 
 @[expose] public section
 
-open MvPowerSeries GlobalTheory GlobalTheory.Katz GlobalTheory.QLog GlobalTheory.PDivGroup
-  GlobalTheory.Sandwich GlobalTheory.IndefiniteRowSideFullHecke.EpsilonPairingZeta
-  GlobalTheory.PDivLat
+open MvPowerSeries GlobalTheory GlobalTheory.Katz GlobalTheory.QLog GlobalTheory.PDivGroup GlobalTheory.Sandwich GlobalTheory.IndefiniteRowSideFullHecke.EpsilonPairingZeta GlobalTheory.PDivLat
 
 namespace GlobalTheory.WindowIso
 
@@ -24,20 +65,21 @@ noncomputable def rgt (σ : B →+* B) (N : Matrix ι ι B) : ℕ → Matrix ι 
   | 0 => 1
   | n + 1 => (rgt σ N n).map σ * N
 
-theorem iter_vec (σ : B →+* B) (M : Matrix ι ι B) (n : ℕ) (w : ι → B)
-    : (fun w : ι → B => M.mulVec fun j => σ (w j))^[n] w
-      = (lft σ M n).mulVec fun j => σ^[n] (w j) := by
+theorem iter_vec (σ : B →+* B) (M : Matrix ι ι B) (n : ℕ) (w : ι → B) :
+    (fun w : ι → B => M.mulVec fun j => σ (w j))^[n] w =
+      (lft σ M n).mulVec fun j => σ^[n] (w j) := by
   induction n with
   | zero => simp [lft]
   | succ n ih =>
     rw [Function.iterate_succ_apply', ih, lft, ← Matrix.mulVec_mulVec]
     congr 1
     funext j
-    set_option synthInstance.maxHeartbeats 100000 in
+
     simp [Matrix.mulVec, dotProduct, map_sum, map_mul, Function.iterate_succ_apply']
 
-theorem iter_mat (σ : B →+* B) (M N : Matrix ι ι B) (n : ℕ) (Y : Matrix ι ι B)
-    : (fun Y : Matrix ι ι B => M * Y.map σ * N)^[n] Y = lft σ M n * Y.map σ^[n] * rgt σ N n := by
+theorem iter_mat (σ : B →+* B) (M N : Matrix ι ι B) (n : ℕ) (Y : Matrix ι ι B) :
+    (fun Y : Matrix ι ι B => M * Y.map σ * N)^[n] Y =
+      lft σ M n * Y.map σ^[n] * rgt σ N n := by
   induction n with
   | zero => simp [lft, rgt]
   | succ n ih =>
@@ -48,25 +90,24 @@ theorem iter_mat (σ : B →+* B) (M N : Matrix ι ι B) (n : ℕ) (Y : Matrix �
 noncomputable def kron (M N : Matrix ι ι B) : Matrix (ι × ι) (ι × ι) B :=
   Matrix.of fun x y => M x.1 y.1 * N y.2 x.2
 
-theorem kron_mulVec (σ : B →+* B) (M N Y : Matrix ι ι B) (x : ι × ι)
-    : (kron M N).mulVec (fun y => σ (Y y.1 y.2)) x = (M * Y.map σ * N) x.1 x.2 := by
+theorem kron_mulVec (σ : B →+* B) (M N Y : Matrix ι ι B) (x : ι × ι) :
+    (kron M N).mulVec (fun y => σ (Y y.1 y.2)) x = (M * Y.map σ * N) x.1 x.2 := by
   simp only [kron, Matrix.mulVec, dotProduct, Matrix.of_apply, Matrix.mul_apply, Matrix.map_apply,
     Fintype.sum_prod_type, Finset.sum_mul]
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun m _ => Finset.sum_congr rfl fun j _ => ?_
   ring
 
-theorem kron_iter (σ : B →+* B) (M N : Matrix ι ι B) (n : ℕ) (v : ι × ι → B) (x : ι × ι)
-    : (fun w : ι × ι → B => (kron M N).mulVec fun j => σ (w j))^[n] v x
-      = (lft σ M n * (Matrix.of fun j m => v (j, m)).map σ^[n] * rgt σ N n) x.1 x.2 := by
+theorem kron_iter (σ : B →+* B) (M N : Matrix ι ι B) (n : ℕ) (v : ι × ι → B) (x : ι × ι) :
+    (fun w : ι × ι → B => (kron M N).mulVec fun j => σ (w j))^[n] v x =
+      (lft σ M n * (Matrix.of fun j m => v (j, m)).map σ^[n] * rgt σ N n) x.1 x.2 := by
   rw [← iter_mat]
   induction n generalizing x with
   | zero => rfl
   | succ n ih =>
     rw [Function.iterate_succ_apply', Function.iterate_succ_apply']
-    have : (fun w : ι × ι → B => (kron M N).mulVec fun j => σ (w j))^[n] v
-        = fun y =>
-          ((fun Y : Matrix ι ι B => M * Y.map σ * N)^[n] (Matrix.of fun j m => v (j, m))) y.1 y.2 :=
+    have : (fun w : ι × ι → B => (kron M N).mulVec fun j => σ (w j))^[n] v =
+        fun y => ((fun Y : Matrix ι ι B => M * Y.map σ * N)^[n] (Matrix.of fun j m => v (j, m))) y.1 y.2 :=
       funext ih
     rw [this, kron_mulVec]
 
@@ -78,10 +119,8 @@ namespace GlobalTheory.WindowIso
 
 section Nil
 
-theorem isNil_kron
-    {B O ι : Type} [CommRing B] [CommRing O] [IsLocalRing O] [Fintype ι] [DecidableEq ι]
-    (θ : B →+* O) (σ : B →+* B) (M N : Matrix ι ι B) (h : IsNil θ σ M)
-    : IsNil θ σ (kron M N) := by
+theorem isNil_kron {B O ι : Type} [CommRing B] [CommRing O] [IsLocalRing O] [Fintype ι] [DecidableEq ι]
+    (θ : B →+* O) (σ : B →+* B) (M N : Matrix ι ι B) (h : IsNil θ σ M) : IsNil θ σ (kron M N) := by
   obtain ⟨n, hn⟩ := h
   have hL : ∀ i j, θ (lft σ M n i j) ∈ IsLocalRing.maximalIdeal O := by
     intro i j
@@ -94,32 +133,25 @@ theorem isNil_kron
       · simp [hm, Function.iterate_fixed (map_zero σ)]
     rw [h2] at h1
     simp only [Matrix.mulVec, dotProduct, Pi.single_apply, mul_ite, mul_one, mul_zero,
-        Finset.sum_ite_eq', Finset.mem_univ, if_true]
-      at h1
+      Finset.sum_ite_eq', Finset.mem_univ, if_true] at h1
     exact (IsLocalRing.mem_maximalIdeal _).2 h1
   refine ⟨n, fun v x => ?_⟩
   rw [kron_iter]
   refine (IsLocalRing.mem_maximalIdeal _).1 ?_
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [Matrix.mul_apply, map_sum, map_mul]
-  exact Ideal.sum_mem _ fun m _ =>
-    Ideal.mul_mem_right _ _ (Ideal.sum_mem _ fun j _ => Ideal.mul_mem_right _ _ (hL _ _))
 
-theorem isNil_lift
-    {A B O ι : Type} [CommRing A] [CommRing B] [CommRing O] [Fintype ι]
-    (θB : B →+* O) (σB : B →+* B)
-    (θA : A →+* O) (φ : A →+* A)
-    (a : A →+* B) (I : Ideal B) (hθ : ∀ x, θB (a x) = θA x) (hσ : ∀ x, σB (a x) = a (φ x))
-    (hI : ∀ x ∈ I, θB x = 0) (hσI : ∀ x ∈ I, σB x ∈ I)
-    (K : Matrix ι ι B) (KA : Matrix ι ι A) (hK : ∀ i j, K i j - a (KA i j) ∈ I)
-    (h : IsNil θB σB K)
-    : IsNil θA φ KA := by
+  simp only [Matrix.mul_apply, map_sum, map_mul]
+  exact Ideal.sum_mem _ fun m _ => Ideal.mul_mem_right _ _ (Ideal.sum_mem _ fun j _ =>
+    Ideal.mul_mem_right _ _ (hL _ _))
+
+theorem isNil_lift {A B O ι : Type} [CommRing A] [CommRing B] [CommRing O] [Fintype ι]
+    (θB : B →+* O) (σB : B →+* B) (θA : A →+* O) (φ : A →+* A) (a : A →+* B) (I : Ideal B)
+    (hθ : ∀ x, θB (a x) = θA x) (hσ : ∀ x, σB (a x) = a (φ x)) (hI : ∀ x ∈ I, θB x = 0)
+    (hσI : ∀ x ∈ I, σB x ∈ I) (K : Matrix ι ι B) (KA : Matrix ι ι A)
+    (hK : ∀ i j, K i j - a (KA i j) ∈ I) (h : IsNil θB σB K) : IsNil θA φ KA := by
   obtain ⟨n, hn⟩ := h
-  have key
-      : ∀ (m : ℕ) (v : ι → A) (i : ι),
-        (fun w : ι → B => K.mulVec fun j => σB (w j))^[m] (fun j => a (v j)) i
-            - a ((fun w : ι → A => KA.mulVec fun j => φ (w j))^[m] v i)
-          ∈ I := by
+  have key : ∀ (m : ℕ) (v : ι → A) (i : ι),
+      (fun w : ι → B => K.mulVec fun j => σB (w j))^[m] (fun j => a (v j)) i -
+        a ((fun w : ι → A => KA.mulVec fun j => φ (w j))^[m] v i) ∈ I := by
     intro m v
     induction m with
     | zero => intro i; simp
@@ -128,12 +160,11 @@ theorem isNil_lift
       rw [Function.iterate_succ_apply', Function.iterate_succ_apply']
       set w := (fun w : ι → B => K.mulVec fun j => σB (w j))^[m] (fun j => a (v j))
       set u := (fun w : ι → A => KA.mulVec fun j => φ (w j))^[m] v
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [Matrix.mulVec, dotProduct, map_sum, map_mul, ← Finset.sum_sub_distrib]
+
+      simp only [Matrix.mulVec, dotProduct, map_sum, map_mul, ← Finset.sum_sub_distrib]
       refine Ideal.sum_mem _ fun j _ => ?_
-      have e
-          : K i j * σB (w j) - a (KA i j) * a (φ (u j))
-            = (K i j - a (KA i j)) * σB (w j) + a (KA i j) * σB (w j - a (u j)) := by
+      have e : K i j * σB (w j) - a (KA i j) * a (φ (u j)) =
+          (K i j - a (KA i j)) * σB (w j) + a (KA i j) * σB (w j - a (u j)) := by
         rw [map_sub, hσ]; ring
       rw [e]
       exact I.add_mem (I.mul_mem_right _ (hK i j)) (I.mul_mem_left _ (hσI _ (ih j)))
@@ -147,10 +178,8 @@ end Nil
 
 section Frame
 
-variable
-  {p : ℕ} [Fact p.Prime]
-  {O : Type} [CommRing O] [Fact ¬ IsUnit (p : O)] [IsAdicComplete (Ideal.span {(p : O)}) O]
-  {ε : PreTilt O p} (F : BFrame ε)
+variable {p : ℕ} [Fact p.Prime] {O : Type} [CommRing O] [Fact ¬IsUnit (p : O)]
+  [IsAdicComplete (Ideal.span {(p : O)}) O] {ε : PreTilt O p} (F : BFrame ε)
 
 theorem p_cancel {x y : F.B} (h : (p : F.B) * x = p * y) : x = y := by
   apply F.frame.inj
@@ -173,8 +202,7 @@ theorem σ_τ : F.σ F.τ = p * F.τ := by
     exact Finset.dvd_sum fun i _ => sub_dvd_pow_sub_pow x 1 i
   obtain ⟨w, hw⟩ := hd
   have hS : (∑ i ∈ Finset.range p, x ^ i) = p + (x - 1) * w := by rw [← hw]; ring
-  rw [hφ, hS, map_mul, map_add (f := _), map_mul, map_natCast, show x - 1 = Sandwich.mu ε from rfl,
-    ← F.p_τ]
+  rw [hφ, hS, map_mul, map_add (f := _), map_mul, map_natCast, show x - 1 = Sandwich.mu ε from rfl, ← F.p_τ]
   linear_combination ((p : F.B) * p * F.a w) * F.τ_sq
 
 theorem θ_τ (hε : IsPrimitiveSystem ε) : F.θ F.τ = 0 := by
@@ -191,18 +219,7 @@ end GlobalTheory.WindowIso
 
 namespace GlobalTheory.WindowIso
 
-theorem window_iso
-    : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C] [CharZero C]
-        (v : Valuation C NNReal) (O : Type) [CommRing O] [Algebra O C] [Fact ¬ IsUnit (p : O)]
-        [IsAdicComplete (Ideal.span {(p : O)}) O] [IsDomain O],
-      v.Integers O
-        → ∀ (ε : PreTilt O p) (hε : IsPrimitiveSystem ε), ∀ F : BFrame ε,
-          ∀ (d k : ℕ) (U U' : Matrix (Fin d ⊕ Fin k) (Fin d ⊕ Fin k) F.B),
-            IsUnit U → IsUnit U' → (∀ i j, F.τ ∣ U i j - U' i j)
-              → IsNil F.θ F.σ (U * blk d k (p : F.B) 1)
-              → ∃ X : Matrix (Fin d ⊕ Fin k) (Fin d ⊕ Fin k) F.B,
-                (∀ i j, F.τ ∣ X i j - (1 : Matrix (Fin d ⊕ Fin k) (Fin d ⊕ Fin k) F.B) i j)
-                  ∧ X * (U' * blk d k (p : F.B) 1) = U * blk d k (p : F.B) 1 * X.map F.σ := by
+theorem window_iso : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C] [CharZero C] (v : Valuation C NNReal) (O : Type) [CommRing O] [Algebra O C] [Fact ¬IsUnit (p : O)] [IsAdicComplete (Ideal.span {(p : O)}) O] [IsDomain O], v.Integers O → ∀ (ε : PreTilt O p) (hε : IsPrimitiveSystem ε), ∀ F : BFrame ε, ∀ (d k : ℕ) (U U' : Matrix (Fin d ⊕ Fin k) (Fin d ⊕ Fin k) F.B), IsUnit U → IsUnit U' → (∀ i j, F.τ ∣ U i j - U' i j) → IsNil F.θ F.σ (U * blk d k (p : F.B) 1) → ∃ X : Matrix (Fin d ⊕ Fin k) (Fin d ⊕ Fin k) F.B, (∀ i j, F.τ ∣ X i j - (1 : Matrix (Fin d ⊕ Fin k) (Fin d ⊕ Fin k) F.B) i j) ∧ X * (U' * blk d k (p : F.B) 1) = U * blk d k (p : F.B) 1 * X.map F.σ := by
   intro p _ C _ _ _ v O _ _ _ _ _ hv ε hε F d k U U' hU _ hUU' hnil
   classical
   haveI : Nontrivial O := ⟨⟨p, 1, fun h => (Fact.out : ¬IsUnit (p : O)) (h ▸ isUnit_one)⟩⟩
@@ -217,8 +234,8 @@ theorem window_iso
   set Pd : Matrix (Fin d ⊕ Fin k) (Fin d ⊕ Fin k) F.B := blk d k 1 (p : F.B) with hPd
   have hPP : Pd * P = (p : F.B) • 1 := by
     ext i j
-    rcases i with i | i <;> rcases j with j | j
-      <;> simp [hP, hPd, blk, Matrix.diagonal_mul_diagonal, Matrix.diagonal_apply, Matrix.one_apply]
+    rcases i with i | i <;> rcases j with j | j <;>
+      simp [hP, hPd, blk, Matrix.diagonal_mul_diagonal, Matrix.diagonal_apply, Matrix.one_apply]
   have hUi : U⁻¹ * U = 1 := Matrix.nonsing_inv_mul U ((Matrix.isUnit_iff_isUnit_det U).1 hU)
   choose E hE using hUU'
   set M := U * P with hM
@@ -244,32 +261,24 @@ theorem window_iso
     rw [show b - F.a (g b) = F.a (h b) * F.τ by linear_combination hg b]
     exact Ideal.mul_mem_left _ _ (Ideal.mem_span_singleton_self _)
   set KA : Matrix (_ × _) (_ × _) (Ainf p O) := Matrix.of fun x y => g (K x y) with hKA
-  have hnilA
-      : IsNil (WittVector.fontaineTheta O p) (WittVector.frobenius : Ainf p O →+* Ainf p O) KA :=
-    isNil_lift F.θ F.σ _ _ F.a I F.θ_a F.σ_a hθI hσI K KA
-      (fun i j => hgI _)
+  have hnilA : IsNil (WittVector.fontaineTheta O p) (WittVector.frobenius : Ainf p O →+* Ainf p O) KA :=
+    isNil_lift F.θ F.σ _ _ F.a I F.θ_a F.σ_a hθI hσI K KA (fun i j => hgI _)
       (isNil_kron F.θ F.σ M N hnil)
-  obtain ⟨vA, hvA⟩ :=
-    (GlobalTheory.T.ainf_frobenius_semilinear_equation_existsUnique p C v O hv ε hε _ KA hnilA).1
-      (fun y => g (c y.1 y.2))
+  obtain ⟨vA, hvA⟩ := (GlobalTheory.T.ainf_frobenius_semilinear_equation_existsUnique p C v O hv ε hε _ KA hnilA).1 (fun y => g (c y.1 y.2))
   set Z : Matrix (Fin d ⊕ Fin k) (Fin d ⊕ Fin k) F.B := Matrix.of fun j m => F.a (vA (j, m)) with hZ
   have hΔ : ∀ i l, (Z - M * Z.map F.σ * N - c) i l ∈ I := by
     intro i l
     have h1 := congrArg F.a (hvA (i, l))
-    have h2
-        : F.a ((KA.mulVec fun j => WittVector.frobenius (vA j)) (i, l))
-          = (KA.map F.a).mulVec (fun j => F.σ (F.a (vA j))) (i, l) := by
-      set_option synthInstance.maxHeartbeats 100000 in
+    have h2 : F.a ((KA.mulVec fun j => WittVector.frobenius (vA j)) (i, l)) =
+        (KA.map F.a).mulVec (fun j => F.σ (F.a (vA j))) (i, l) := by
+
       simp [Matrix.mulVec, dotProduct, map_sum, map_mul, F.σ_a]
     have h3 : (M * Z.map F.σ * N) i l = K.mulVec (fun y => F.σ (F.a (vA y))) (i, l) :=
       (kron_mulVec F.σ M N Z (i, l)).symm
     rw [map_sub, h2] at h1
-    have e
-        : (Z - M * Z.map F.σ * N - c) i l
-          = (F.a (vA (i, l)) - (KA.map F.a).mulVec (fun j => F.σ (F.a (vA j))) (i, l)
-              - F.a (g (c i l)))
-            - (K - KA.map F.a).mulVec (fun j => F.σ (F.a (vA j))) (i, l)
-            + (F.a (g (c i l)) - c i l) := by
+    have e : (Z - M * Z.map F.σ * N - c) i l =
+        (F.a (vA (i, l)) - (KA.map F.a).mulVec (fun j => F.σ (F.a (vA j))) (i, l) - F.a (g (c i l)))
+          - (K - KA.map F.a).mulVec (fun j => F.σ (F.a (vA j))) (i, l) + (F.a (g (c i l)) - c i l) := by
       rw [Matrix.sub_apply, Matrix.sub_apply, h3, Matrix.sub_mulVec, Pi.sub_apply]
       simp only [hZ, Matrix.of_apply]
       ring
@@ -302,9 +311,8 @@ theorem window_iso
     ext i j
     simp [Matrix.one_apply, apply_ite F.σ, σ_τ F]
   rw [hU', hXσ, ← sub_eq_zero]
-  have e
-      : (1 + F.τ • Z) * ((U - F.τ • Matrix.of E) * P) - U * P * (1 + ((p : F.B) * F.τ) • Z.map F.σ)
-        = F.τ • R - (F.τ * F.τ) • (Z * (Matrix.of E * P)) := by
+  have e : (1 + F.τ • Z) * ((U - F.τ • Matrix.of E) * P) - U * P * (1 + ((p : F.B) * F.τ) • Z.map F.σ) =
+      F.τ • R - (F.τ * F.τ) • (Z * (Matrix.of E * P)) := by
     simp only [hR, hM, mul_add, add_mul, mul_sub, sub_mul, Matrix.smul_mul, Matrix.mul_smul,
       Matrix.mul_one, Matrix.one_mul, Matrix.mul_assoc, smul_sub, smul_smul]
     module

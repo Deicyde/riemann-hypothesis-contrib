@@ -1,41 +1,75 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.IsStratHom
-public import Development.AbelianVarietyTheory.PublishedTheorems.GaloisCohomology₂.BhattScholzeIntegral
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.UnramifiedIntegersTensorEqLetterwiseProductAinf
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ThetaBdRPlusSurjectiveKerUnitsEquivariant
+public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.IsCrisP
+public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.IsAdicCompleteOfPowLe
+import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.UnramifiedIntegersTensorEqLetterwiseProductAinf
+import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ThetaBdRPlusSurjectiveKerUnitsEquivariant
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.MemBallOfGaugeLt
 
 @[expose] public section
 
-open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc
-  Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism
-  GlobalTheory.BKReal GlobalTheory.Per GlobalTheory.BSP GlobalTheory.MemLoc
+open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism GlobalTheory.BKReal GlobalTheory.Per GlobalTheory.BSP GlobalTheory.MemLoc
 open scoped Formalism.Per NNReal
 
 noncomputable section
 
 namespace GlobalTheory.SeedSec
 
-theorem eq_of_pow_eq_self
-    {R K : Type} [CommRing R] [Field K] [CharZero K]
-    (θ : R →+* K) (hθ : ∀ y, θ y ≠ 0 → IsUnit y)
-    {n : ℕ} (hn : 2 ≤ n)
-    {u v : R} (hu : u ^ n = u) (hv : v ^ n = v) (h : θ u = θ v)
-    : u = v := by
+theorem eq_of_pow_eq_self {R K : Type} [CommRing R] [Field K] [CharZero K] (θ : R →+* K)
+    (hθ : ∀ y, θ y ≠ 0 → IsUnit y) {n : ℕ} (hn : 2 ≤ n) {u v : R} (hu : u ^ n = u) (hv : v ^ n = v)
+    (h : θ u = θ v) : u = v := by
   set S := ∑ i ∈ Finset.range n, u ^ i * v ^ (n - 1 - i) with hS
   have h1 : S * (u - v) = u - v := by rw [hS, geom_sum₂_mul, hu, hv]
   have hc : θ u ^ n = θ u := by rw [← map_pow, hu]
   have e : θ S = n * θ u ^ (n - 1) := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hS, map_sum,
-        Finset.sum_congr rfl
-          (g := fun _ => θ u ^ (n - 1))
-          (fun i hi => by
-            have := Finset.mem_range.1 hi
-            rw [map_mul, map_pow, map_pow, ← h, ← pow_add]
-            congr 1
-            omega)]
+
+    rw [hS, map_sum, Finset.sum_congr rfl (g := fun _ => θ u ^ (n - 1)) (fun i hi => by
+    have := Finset.mem_range.1 hi
+    rw [map_mul, map_pow, map_pow, ← h, ← pow_add]
+    congr 1
+    omega)]
     simp
   have h2 : θ (S - 1) ≠ 0 := by
     rw [map_sub, map_one, e]
@@ -50,9 +84,8 @@ theorem eq_of_pow_eq_self
   have h4 : (S - 1) * (u - v) = 0 := by rw [sub_mul, h1, one_mul, sub_self]
   exact sub_eq_zero.1 ((hθ _ h2).mul_right_eq_zero.1 h4)
 
-theorem exists_om_of_pow_eq_self
-    (l : ℕ) [Fact l.Prime] {n : ℕ} (hn : 2 ≤ n) (c : ℂ_[l]) (hc : c ^ n = c)
-    : ∃ x : Om l, algebraMap (Om l) ℂ_[l] x = c := by
+theorem exists_om_of_pow_eq_self (l : ℕ) [Fact l.Prime] {n : ℕ} (hn : 2 ≤ n) (c : ℂ_[l]) (hc : c ^ n = c) :
+    ∃ x : Om l, algebraMap (Om l) ℂ_[l] x = c := by
   have hs : (Polynomial.X ^ n - Polynomial.X : Polynomial (Om l)).Splits := IsAlgClosed.splits _
   have h0 : (Polynomial.X ^ n - Polynomial.X : Polynomial (Om l)) ≠ 0 := fun h => by
     have := congrArg (fun p : Polynomial (Om l) => p.coeff n) h
@@ -60,11 +93,8 @@ theorem exists_om_of_pow_eq_self
   obtain ⟨x, hx⟩ := hs.mem_range_of_isRoot h0 (i := algebraMap (Om l) ℂ_[l]) (x := c) (by simp [hc])
   exact ⟨x, hx⟩
 
-private theorem padicInt_hom_apply_eq
-    {l : ℕ} [Fact l.Prime]
-    {R : Type} [CommRing R]
-    (hR : IsHausdorff (Ideal.span {(l : R)}) R) (f g : ℤ_[l] →+* R) (z : ℤ_[l])
-    : f z = g z := by
+private theorem padicInt_hom_apply_eq {l : ℕ} [Fact l.Prime] {R : Type} [CommRing R]
+    (hR : IsHausdorff (Ideal.span {(l : R)}) R) (f g : ℤ_[l] →+* R) (z : ℤ_[l]) : f z = g z := by
   rw [← sub_eq_zero]
   refine IsHausdorff.haus hR _ fun n => ?_
   obtain ⟨c, hc⟩ := Ideal.mem_span_singleton'.1 (PadicInt.appr_spec n z)
@@ -75,12 +105,10 @@ private theorem padicInt_hom_apply_eq
   simp only [map_mul, map_pow, map_natCast, map_sub] at hf hg
   linear_combination hf - hg
 
-theorem exists_sec (l : ℕ) [Fact l.Prime] (a : ℕ) [NeZero a] (C : Core l) (w : Wq l a)
-    : ∃ x : Om l,
-      ((Per.θ l (wA l a w) : OC l) : ℂ_[l]) = algebraMap (Om l) ℂ_[l] x
-        ∧ C.o x = aDp l (wA l a w) := by
-  have hspan
-      : w ∈ Submodule.span ℤ_[l] (Set.range (WittVector.teichmuller l : Fq l a → Wq l a)) := by
+theorem exists_sec (l : ℕ) [Fact l.Prime] (a : ℕ) [NeZero a] (C : Core l) (w : Wq l a) :
+    ∃ x : Om l, ((Per.θ l (wA l a w) : OC l) : ℂ_[l]) = algebraMap (Om l) ℂ_[l] x ∧
+      C.o x = aDp l (wA l a w) := by
+  have hspan : w ∈ Submodule.span ℤ_[l] (Set.range (WittVector.teichmuller l : Fq l a → Wq l a)) := by
     rw [span_teich]; trivial
   induction hspan using Submodule.span_induction with
   | mem y hy =>
@@ -94,16 +122,11 @@ theorem exists_sec (l : ℕ) [Fact l.Prime] (a : ℕ) [NeZero a] (C : Core l) (w
       rw [← SubmonoidClass.coe_pow, ← map_pow, hA]
     obtain ⟨x, hx⟩ := exists_om_of_pow_eq_self l hq _ hc
     have hxq : x ^ (l ^ a) = x := (algebraMap (Om l) ℂ_[l]).injective (by rw [map_pow, hx, hc])
-    refine ⟨
-      x,
-      hx.symm,
-      eq_of_pow_eq_self (Per.θD l) (thetaD_props l).2.2.1 hq (by rw [← map_pow, hxq])
-        (by rw [← map_pow, hA]) ?_
-    ⟩
+    refine ⟨x, hx.symm, eq_of_pow_eq_self (Per.θD l) (thetaD_props l).2.2.1 hq
+      (by rw [← map_pow, hxq]) (by rw [← map_pow, hA]) ?_⟩
     rw [C.o_sec.th, (thetaD_props l).2.2.2.1]
     exact hx
-  | zero =>
-    exact ⟨0, by simp, by simp⟩
+  | zero => exact ⟨0, by simp, by simp⟩
   | add y y' _ _ hy hy' =>
     obtain ⟨x, hx1, hx2⟩ := hy
     obtain ⟨x', hx1', hx2'⟩ := hy'
@@ -122,9 +145,8 @@ theorem exists_sec (l : ℕ) [Fact l.Prime] (a : ℕ) [NeZero a] (C : Core l) (w
       have hA : IsAdicComplete (Ideal.span {(l : Ainf l)}) (Ainf l) := inferInstance
       rw [padicInt_hom_apply_eq hA.toIsHausdorff (Per.zA l) (algebraMap ℤ_[l] (Ainf l)) r]
 
-theorem o_eq_aDp_wA
-    : ∀ (l : ℕ) [Fact l.Prime] (a : ℕ) [NeZero a] (C : Core l) (w : Wq l a) (x : Om l),
-      ((Per.θ l (wA l a w) : OC l) : ℂ_[l]) = (x : ℂ_[l]) → C.o x = aDp l (wA l a w) := by
+theorem o_eq_aDp_wA : ∀ (l : ℕ) [Fact l.Prime] (a : ℕ) [NeZero a] (C : Core l) (w : Wq l a) (x : Om l),
+    ((Per.θ l (wA l a w) : OC l) : ℂ_[l]) = (x : ℂ_[l]) → C.o x = aDp l (wA l a w) := by
   intro l _ a _ C w x hx
   obtain ⟨y, hy1, hy2⟩ := exists_sec l a C w
   have hxy : x = y := (algebraMap (Om l) ℂ_[l]).injective (hx.symm.trans hy1)

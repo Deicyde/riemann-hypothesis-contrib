@@ -1,7 +1,50 @@
 module
 
-public import Mathlib
 public import GroundTheory.HeightsAndTheta.Heights.FieldsOfNumbers.Statements
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
+public import Mathlib.Order.Filter.AtTopBot.Group
 
 @[expose] public section
 
@@ -22,24 +65,23 @@ variable {K : Type}
 def shiftPoly (b : K → ℤ) (p : MvPolynomial K ℚ) : MvPolynomial K ℚ :=
   aeval (fun k => X k - C ((b k : ℤ) : ℚ)) p
 
-def polyStep (b : K → ℤ) (p : MvPolynomial K ℚ) : MvPolynomial K ℚ := p - shiftPoly b p
+def polyStep (b : K → ℤ) (p : MvPolynomial K ℚ) : MvPolynomial K ℚ :=
+  p - shiftPoly b p
 
-theorem eval_shiftPoly (b : K → ℤ) (p : MvPolynomial K ℚ) (x : K → ℚ)
-    : eval x (shiftPoly b p) = eval (fun k => x k - b k) p := by
+theorem eval_shiftPoly (b : K → ℤ) (p : MvPolynomial K ℚ) (x : K → ℚ) :
+    eval x (shiftPoly b p) = eval (fun k => x k - b k) p := by
   induction p using MvPolynomial.induction_on with
   | C a => simp [shiftPoly]
   | add p q hp hq => simp only [shiftPoly, map_add (f := _)] at hp hq ⊢; rw [hp, hq]
   | mul_X p k hp => simp only [shiftPoly, map_mul] at hp ⊢; rw [hp]; simp
 
-theorem monomial_good (b : K → ℤ) (s : K →₀ ℕ) (a : ℚ)
-    : (shiftPoly b (monomial s a)).totalDegree ≤ (monomial s a).totalDegree
-      ∧ (polyStep b (monomial s a) = 0
-        ∨ (polyStep b (monomial s a)).totalDegree + 1 ≤ (monomial s a).totalDegree) := by
-  refine MvPolynomial.induction_on_monomial
-    (motive := fun q =>
-      (shiftPoly b q).totalDegree ≤ q.totalDegree
-        ∧ (polyStep b q = 0 ∨ (polyStep b q).totalDegree + 1 ≤ q.totalDegree))
-    ?_ ?_ s a
+theorem monomial_good (b : K → ℤ) (s : K →₀ ℕ) (a : ℚ) :
+    (shiftPoly b (monomial s a)).totalDegree ≤ (monomial s a).totalDegree ∧
+      (polyStep b (monomial s a) = 0 ∨
+        (polyStep b (monomial s a)).totalDegree + 1 ≤ (monomial s a).totalDegree) := by
+  refine MvPolynomial.induction_on_monomial (motive := fun q =>
+    (shiftPoly b q).totalDegree ≤ q.totalDegree ∧
+      (polyStep b q = 0 ∨ (polyStep b q).totalDegree + 1 ≤ q.totalDegree)) ?_ ?_ s a
   · intro a; simp [shiftPoly, polyStep]
   · intro p k hp
     obtain ⟨h1, h2⟩ := hp
@@ -63,29 +105,27 @@ theorem monomial_good (b : K → ℤ) (s : K →₀ ℕ) (a : ℚ)
         · exact (totalDegree_mul _ _).trans (by rw [totalDegree_X]; exact h2)
       · exact (totalDegree_mul _ _).trans (by rw [totalDegree_C, zero_add]; exact h1)
 
-theorem sum_eq (b : K → ℤ) (p : MvPolynomial K ℚ)
-    : shiftPoly b p = ∑ v ∈ p.support, shiftPoly b (monomial v (AddMonoidAlgebra.coeff p v))
-      ∧ polyStep b p = ∑ v ∈ p.support, polyStep b (monomial v (AddMonoidAlgebra.coeff p v)) := by
-  have hs
-      : shiftPoly b p = ∑ v ∈ p.support, shiftPoly b (monomial v (AddMonoidAlgebra.coeff p v)) := by
+theorem sum_eq (b : K → ℤ) (p : MvPolynomial K ℚ) :
+    shiftPoly b p = ∑ v ∈ p.support, shiftPoly b (monomial v (AddMonoidAlgebra.coeff p v)) ∧
+      polyStep b p = ∑ v ∈ p.support, polyStep b (monomial v (AddMonoidAlgebra.coeff p v)) := by
+  have hs : shiftPoly b p = ∑ v ∈ p.support, shiftPoly b (monomial v (AddMonoidAlgebra.coeff p v)) := by
     conv_lhs => rw [p.as_sum]
-    set_option synthInstance.maxHeartbeats 100000 in
+
     simp only [shiftPoly, map_sum]
   refine ⟨hs, ?_⟩
   simp only [polyStep, Finset.sum_sub_distrib]
   rw [← hs, ← p.as_sum]
 
-theorem monomial_le (p : MvPolynomial K ℚ) {v : K →₀ ℕ} (hv : v ∈ p.support)
-    : (monomial v (AddMonoidAlgebra.coeff p v)).totalDegree ≤ p.totalDegree :=
+theorem monomial_le (p : MvPolynomial K ℚ) {v : K →₀ ℕ} (hv : v ∈ p.support) :
+    (monomial v (AddMonoidAlgebra.coeff p v)).totalDegree ≤ p.totalDegree :=
   (totalDegree_monomial_le _ _).trans (le_totalDegree hv)
 
-theorem polyStep_deg (b : K → ℤ) (p : MvPolynomial K ℚ)
-    : polyStep b p = 0 ∨ (polyStep b p).totalDegree + 1 ≤ p.totalDegree := by
+theorem polyStep_deg (b : K → ℤ) (p : MvPolynomial K ℚ) :
+    polyStep b p = 0 ∨ (polyStep b p).totalDegree + 1 ≤ p.totalDegree := by
   by_cases h0 : p.totalDegree = 0
   · left
     rw [totalDegree_eq_zero_iff_eq_C] at h0
-    rw [h0]
-    simp [polyStep, shiftPoly]
+    rw [h0]; simp [polyStep, shiftPoly]
   · right
     have : (polyStep b p).totalDegree ≤ p.totalDegree - 1 := by
       rw [(sum_eq b p).2]
@@ -97,9 +137,8 @@ theorem polyStep_deg (b : K → ℤ) (p : MvPolynomial K ℚ)
 
 section Eventual
 
-theorem eventuallyPoly_diffStep
-    (b : K → ℤ) {g : (K → ℤ) → ℤ} {q : MvPolynomial K ℚ} (hq : EventuallyPoly g q)
-    : EventuallyPoly (diffStep b g) (polyStep b q) := by
+theorem eventuallyPoly_diffStep (b : K → ℤ) {g : (K → ℤ) → ℤ} {q : MvPolynomial K ℚ}
+    (hq : EventuallyPoly g q) : EventuallyPoly (diffStep b g) (polyStep b q) := by
   have ht : Tendsto (fun m : K → ℤ => m - b) atTop atTop := by
     simpa [sub_eq_add_neg] using tendsto_atTop_add_const_right atTop (-b) tendsto_id
   filter_upwards [hq, ht.eventually hq] with m h1 h2
@@ -107,15 +146,14 @@ theorem eventuallyPoly_diffStep
   rw [Int.cast_sub, h1, h2]
   simp [Pi.sub_apply]
 
-theorem eventuallyPoly_foldr
-    (L : List (K → ℤ)) {h : (K → ℤ) → ℤ} {p : MvPolynomial K ℚ} (hp : EventuallyPoly h p)
-    : EventuallyPoly (L.foldr diffStep h) (L.foldr polyStep p) := by
+theorem eventuallyPoly_foldr (L : List (K → ℤ)) {h : (K → ℤ) → ℤ} {p : MvPolynomial K ℚ}
+    (hp : EventuallyPoly h p) : EventuallyPoly (L.foldr diffStep h) (L.foldr polyStep p) := by
   induction L with
   | nil => simpa using hp
   | cons b L ih => simpa using eventuallyPoly_diffStep b ih
 
-theorem foldr_polyStep_deg (L : List (K → ℤ)) (p : MvPolynomial K ℚ)
-    : L.foldr polyStep p = 0 ∨ (L.foldr polyStep p).totalDegree + L.length ≤ p.totalDegree := by
+theorem foldr_polyStep_deg (L : List (K → ℤ)) (p : MvPolynomial K ℚ) :
+    L.foldr polyStep p = 0 ∨ (L.foldr polyStep p).totalDegree + L.length ≤ p.totalDegree := by
   induction L with
   | nil => simp
   | cons b L ih =>
@@ -130,10 +168,10 @@ end Eventual
 
 end MixedDiffConst
 
+
 open MixedDiffConst in
-theorem MixedDiffConst.proof
-    (h1 : HilbDegreeBound.Statement.{u}) (h2 : HilbEventuallyPoly.Statement.{u})
-    : MixedDiffConst.Statement.{u} := by
+theorem MixedDiffConst.proof (h1 : HilbDegreeBound.Statement.{u})
+    (h2 : HilbEventuallyPoly.Statement.{u}) : MixedDiffConst.Statement.{u} := by
   intro F _ K _ _ ι _ I hI hrel n hn
   obtain ⟨p, hp⟩ := h2 F K ι I hI
   have hdeg : p.totalDegree ≤ n := by
@@ -142,9 +180,8 @@ theorem MixedDiffConst.proof
     · have := (h1 F K ι I hI).1 hrel p hp hp0
       rw [hn] at this
       exact_mod_cast this
-  have key
-      : ∀ (r : ℕ) (bs : Fin r → K → ℤ),
-        n ≤ r → ∃ c : ℚ, (n < r → c = 0) ∧ ∀ᶠ m in atTop, (mixedDiff bs (hilbFn I) m : ℚ) = c := by
+  have key : ∀ (r : ℕ) (bs : Fin r → K → ℤ), n ≤ r → ∃ c : ℚ, (n < r → c = 0) ∧
+      ∀ᶠ m in atTop, (mixedDiff bs (hilbFn I) m : ℚ) = c := by
     intro r bs hr
     have hE := eventuallyPoly_foldr (List.ofFn bs) hp
     rcases foldr_polyStep_deg (List.ofFn bs) p with h0 | hd

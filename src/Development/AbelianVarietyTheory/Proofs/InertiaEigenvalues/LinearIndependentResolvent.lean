@@ -1,6 +1,51 @@
 module
 
-public import Mathlib
+public import Mathlib.Algebra.Polynomial.AlgebraMap
+public import Mathlib.Basic.Complex.Basic
+public import Mathlib.LinearAlgebra.Dimension.Basic
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.CStarAlgebra.Classes
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
+public import Mathlib.Algebra.Polynomial.Div
+public import Mathlib.Analysis.Complex.Cardinality
+public import Mathlib.FieldTheory.IsAlgClosed.Basic
 
 @[expose] public section
 
@@ -10,9 +55,9 @@ open Polynomial
 
 variable {V : Type} [AddCommGroup V] [Module ℂ V]
 
-theorem isUnit_aeval
-    (T : Module.End ℂ V) (h : ∀ c : ℂ, IsUnit (T - algebraMap ℂ (Module.End ℂ V) c))
-    : ∀ (n : ℕ) (p : ℂ[X]), p.natDegree = n → p ≠ 0 → IsUnit (aeval T p) := by
+theorem isUnit_aeval (T : Module.End ℂ V)
+    (h : ∀ c : ℂ, IsUnit (T - algebraMap ℂ (Module.End ℂ V) c)) :
+    ∀ (n : ℕ) (p : ℂ[X]), p.natDegree = n → p ≠ 0 → IsUnit (aeval T p) := by
   intro n
   induction n with
   | zero =>
@@ -36,27 +81,25 @@ theorem isUnit_aeval
       exact hp0 hq
     have hqdeg : q.natDegree = n := by
       have h2 := congrArg Polynomial.natDegree hq
-      rw [Polynomial.natDegree_mul (Polynomial.X_sub_C_ne_zero r) hq0, Polynomial.natDegree_X_sub_C,
-          hp]
-        at h2
+      rw [Polynomial.natDegree_mul (Polynomial.X_sub_C_ne_zero r) hq0, Polynomial.natDegree_X_sub_C, hp] at h2
       omega
     rw [hq, map_mul]
     refine IsUnit.mul ?_ (ih q hqdeg hq0)
     simpa [map_sub] using h r
 
-theorem linearIndependent_resolvent
-    (T : Module.End ℂ V) (h : ∀ c : ℂ, IsUnit (T - algebraMap ℂ (Module.End ℂ V) c))
-    (v : V) (hv : v ≠ 0)
-    (w : ℂ → V) (hw : ∀ c, (T - algebraMap ℂ (Module.End ℂ V) c) (w c) = v)
-    : LinearIndependent ℂ w := by
+theorem linearIndependent_resolvent (T : Module.End ℂ V)
+    (h : ∀ c : ℂ, IsUnit (T - algebraMap ℂ (Module.End ℂ V) c)) (v : V) (hv : v ≠ 0)
+    (w : ℂ → V) (hw : ∀ c, (T - algebraMap ℂ (Module.End ℂ V) c) (w c) = v) :
+    LinearIndependent ℂ w := by
   classical
   rw [linearIndependent_iff']
   intro s g hs i hi
   set q : ℂ[X] := ∑ j ∈ s, C (g j) * ∏ k ∈ s.erase j, (X - C k) with hq
   have key : aeval T q v = 0 := by
-    have h1 : aeval T (∏ k ∈ s, (X - C k)) (∑ j ∈ s, g j • w j) = 0 := by rw [hs, map_zero]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← h1, hq, map_sum, map_sum, LinearMap.sum_apply]
+    have h1 : aeval T (∏ k ∈ s, (X - C k)) (∑ j ∈ s, g j • w j) = 0 := by
+      rw [hs, map_zero]
+
+    rw [← h1, hq, map_sum, map_sum, LinearMap.sum_apply]
     refine Finset.sum_congr rfl fun j hj => ?_
     rw [← Finset.prod_erase_mul s _ hj, map_mul, map_mul, aeval_C, map_sub, aeval_X, aeval_C,
       map_smul, Module.End.mul_apply, Module.End.mul_apply, hw, Module.algebraMap_end_apply]
@@ -69,8 +112,8 @@ theorem linearIndependent_resolvent
     rw [hq, eval_finsetSum, Finset.sum_eq_single i]
     · simp [eval_prod]
     · intro j _ hji
-      rw [eval_mul, eval_prod,
-        Finset.prod_eq_zero (i := i) (Finset.mem_erase.2 ⟨hji.symm, hi⟩) (by simp), mul_zero]
+      rw [eval_mul, eval_prod, Finset.prod_eq_zero (i := i) (Finset.mem_erase.2 ⟨hji.symm, hi⟩) (by simp),
+        mul_zero]
     · intro h3
       exact absurd hi h3
   rw [hq0, eval_zero] at h2
@@ -79,21 +122,14 @@ theorem linearIndependent_resolvent
   · obtain ⟨k, hk, hk0⟩ := Finset.prod_eq_zero_iff.1 h3
     exact absurd (sub_eq_zero.1 hk0).symm (Finset.mem_erase.1 hk).1
 
-theorem exists_not_isUnit_sub
-    : ∀ {V : Type} [inst : AddCommGroup V] [inst_1 : Module ℂ V] [Nontrivial V],
-      Module.rank ℂ V ≤ Cardinal.aleph0
-        → ∀ (T : Module.End ℂ V), ∃ (c : ℂ),
-          ¬ IsUnit (T - (Algebra.algebraMap ℂ (Module.End ℂ V) : ℂ → Module.End ℂ V) c) := by
+theorem exists_not_isUnit_sub : ∀ {V : Type} [inst : AddCommGroup V] [inst_1 : Module ℂ V] [Nontrivial V], Module.rank ℂ V ≤ Cardinal.aleph0 → ∀ (T : Module.End ℂ V), ∃ (c : ℂ), ¬IsUnit (T - (Algebra.algebraMap ℂ (Module.End ℂ V) : ℂ → Module.End ℂ V) c) := by
   intro V _ _ _ hrank T
   by_contra hcon
   push_neg at hcon
   obtain ⟨v, hv⟩ := exists_ne (0 : V)
   let w : ℂ → V := fun c => (((hcon c).unit⁻¹ : (Module.End ℂ V)ˣ) : Module.End ℂ V) v
   have hw : ∀ c, (T - algebraMap ℂ (Module.End ℂ V) c) (w c) = v := fun c => by
-    have h1
-        : ((hcon c).unit : Module.End ℂ V)
-            * (((hcon c).unit⁻¹ : (Module.End ℂ V)ˣ) : Module.End ℂ V)
-          = 1 :=
+    have h1 : ((hcon c).unit : Module.End ℂ V) * (((hcon c).unit⁻¹ : (Module.End ℂ V)ˣ) : Module.End ℂ V) = 1 :=
       (hcon c).unit.mul_inv
     rw [IsUnit.unit_spec] at h1
     have h2 := congrArg (fun f : Module.End ℂ V => f v) h1

@@ -1,6 +1,43 @@
 module
 
 public import Development.WeilBound.ThetaLifts.FrameEstimates.SquareIntegrableWeilRange
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Development.AbelianVarietyTheory.Definitions.Divisors.MatchingOfParts
 
 @[expose] public section
 
@@ -11,25 +48,21 @@ set_option linter.unusedSectionVars false
 namespace PositivityTheory.ThKEst.LatArchPf
 
 open scoped TensorProduct NNReal ENNReal Matrix
-open NumberField IsDedekindDomain MeasureTheory Filter Topology
-  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
-open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
-  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK
+open NumberField IsDedekindDomain MeasureTheory Filter Topology Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK
 
-variable
-  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E}
+variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E}
 
 theorem mul_realAd {u : AF F} (hu : evI F u = 0) (t : ℝ) : u * realAd F t = 0 := by
-  have h1 : u.1 = 0 :=
-    (InfiniteAdeleRing.ringEquiv_mixedSpace F).injective (hu.trans (map_zero _).symm)
+  have h1 : u.1 = 0 := (InfiniteAdeleRing.ringEquiv_mixedSpace F).injective (hu.trans (map_zero _).symm)
   refine Prod.ext ?_ ?_
   · change u.1 * _ = 0
     rw [h1, zero_mul]
   · change u.2 * 0 = 0
     rw [mul_zero]
 
-theorem emb_realAd (hF : IsTotallyReal F) (w : InfinitePlace F) (t : ℝ)
-    : InfinitePlace.Completion.extensionEmbedding w (evInf F w (realAd F t)) = t := by
+theorem emb_realAd (hF : IsTotallyReal F) (w : InfinitePlace F) (t : ℝ) :
+    InfinitePlace.Completion.extensionEmbedding w (evInf F w (realAd F t)) = t := by
   have hw : w.IsReal := IsTotallyReal.isReal w
   set a := (InfiniteAdeleRing.ringEquiv_mixedSpace F).symm (algebraMap ℝ _ t) with ha
   have h1 : InfiniteAdeleRing.ringEquiv_mixedSpace F a = algebraMap ℝ _ t := by
@@ -40,36 +73,32 @@ theorem emb_realAd (hF : IsTotallyReal F) (w : InfinitePlace F) (t : ℝ)
   rw [← h3]
   exact (InfinitePlace.Completion.extensionEmbeddingOfIsReal_apply hw (a w)).symm
 
-theorem piInf_alg {w : InfinitePlace F} (τ : EmbOver E w) (a : AF F)
-    : piInf τ (algebraMap (AF F) (AE F E) a)
-      = InfinitePlace.Completion.extensionEmbedding w (evInf F w a) := by
+theorem piInf_alg {w : InfinitePlace F} (τ : EmbOver E w) (a : AF F) :
+    piInf τ (algebraMap (AF F) (AE F E) a) = InfinitePlace.Completion.extensionEmbedding w (evInf F w a) := by
   change infEmb τ (evInf F w a ⊗ₜ[F] (1 : E)) = _
   rw [infEmb_tmul, map_one, mul_one]
 
-theorem piInf_rId (hF : IsTotallyReal F) {w : InfinitePlace F} (τ : EmbOver E w) (t : ℝ)
-    : piInf τ (algebraMap (AF F) (AE F E) (rId F t)) = (Real.exp t : ℝ) := by
+theorem piInf_rId (hF : IsTotallyReal F) {w : InfinitePlace F} (τ : EmbOver E w) (t : ℝ) :
+    piInf τ (algebraMap (AF F) (AE F E) (rId F t)) = (Real.exp t : ℝ) := by
   rw [piInf_alg, rId, map_add (f := _), map_add (f := _), map_one, map_one, emb_realAd hF]
   push_cast
   ring
 
-theorem sz_nonneg (τ : ∀ w : InfinitePlace F, EmbOver E w) {n d : ℕ} (z : Ten F E n d)
-    : 0 ≤ sz τ z := by
+theorem sz_nonneg (τ : ∀ w : InfinitePlace F, EmbOver E w) {n d : ℕ} (z : Ten F E n d) : 0 ≤ sz τ z := by
   unfold sz
   positivity
 
-theorem sz_mul_le
-    (τ : ∀ w : InfinitePlace F, EmbOver E w)
-    {n d : ℕ} (y : Ten F E n d) (B : Matrix (Fin d) (Fin d) (AE F E))
-    (M : ℝ) (hB : ∀ w i j, ‖piInf (τ w) (B i j)‖ ≤ M)
-    : sz τ (y * Bᵀ) ≤ d * M * sz τ y := by
+theorem sz_mul_le (τ : ∀ w : InfinitePlace F, EmbOver E w) {n d : ℕ} (y : Ten F E n d)
+    (B : Matrix (Fin d) (Fin d) (AE F E)) (M : ℝ) (hB : ∀ w i j, ‖piInf (τ w) (B i j)‖ ≤ M) :
+    sz τ (y * Bᵀ) ≤ d * M * sz τ y := by
   unfold sz
   rw [Finset.mul_sum]
   refine Finset.sum_le_sum fun w _ => ?_
   rw [Finset.mul_sum]
   refine Finset.sum_le_sum fun i _ => ?_
   have h : ∀ j, ‖piInf (τ w) ((y * Bᵀ) i j)‖ ≤ M * ∑ k, ‖piInf (τ w) (y i k)‖ := fun j => by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [Matrix.mul_apply, map_sum, Finset.mul_sum]
+
+    rw [Matrix.mul_apply, map_sum, Finset.mul_sum]
     refine (norm_sum_le _ _).trans (Finset.sum_le_sum fun k _ => ?_)
     rw [map_mul, norm_mul, Matrix.transpose_apply, mul_comm]
     exact mul_le_mul_of_nonneg_right (hB w j k) (norm_nonneg _)
@@ -82,26 +111,20 @@ theorem incM_mul {n : ℕ} (x y : Matrix (Fin n) (Fin n) E) : incM F (x * y) = i
 theorem incM_one {n : ℕ} : incM F (1 : Matrix (Fin n) (Fin n) E) = 1 :=
   Matrix.map_one _ (map_zero _) (map_one _)
 
-theorem torus
-    (hb : FrameBasis) (hc : IsCMExt F E σ) (τ : ∀ w : InfinitePlace F, EmbOver E w)
-    {d : ℕ} {J : Matrix (Fin d) (Fin d) E} (hJ : EpsHerm σ J) (fr : Frame σ J) (hg : fr.IsGood)
-    : ∃ K : ℝ,
-      0 ≤ K
-        ∧ ∀ t ∈ Cone fr.r,
-          At (evI F) (mat (fr.a t) - 1)
-            ∧ ∀ w i j, ‖piInf (τ w) (mat (fr.a t) i j)‖ ≤ K * Real.exp (∑ j, t j) := by
+theorem torus (hb : FrameBasis) (hc : IsCMExt F E σ) (τ : ∀ w : InfinitePlace F, EmbOver E w) {d : ℕ}
+    {J : Matrix (Fin d) (Fin d) E} (hJ : EpsHerm σ J) (fr : Frame σ J) (hg : fr.IsGood) :
+    ∃ K : ℝ, 0 ≤ K ∧ ∀ t ∈ Cone fr.r, At (evI F) (mat (fr.a t) - 1) ∧
+      ∀ w i j, ‖piInf (τ w) (mat (fr.a t) i j)‖ ≤ K * Real.exp (∑ j, t j) := by
   obtain ⟨b, lam, ix, iy, -, h2, h3, -, h5⟩ := hb F E σ hc d J hJ fr hg
   set P := incM F b.1 with hP
   set Q := incM F (b⁻¹).1 with hQ
-  have hPQ : P * Q = 1 := by rw [hP, hQ, ← incM_mul, Units.mul_inv, incM_one]
-  refine ⟨
-    ∑ w, ∑ i, ∑ j, ∑ k, ‖piInf (τ w) (P i k)‖ * ‖piInf (τ w) (Q k j)‖,
-    by positivity,
-    fun t ht => ?_
-  ⟩
+  have hPQ : P * Q = 1 := by
+    rw [hP, hQ, ← incM_mul, Units.mul_inv, incM_one]
+  refine ⟨∑ w, ∑ i, ∑ j, ∑ k, ‖piInf (τ w) (P i k)‖ * ‖piInf (τ w) (Q k j)‖, by positivity, fun t ht => ?_⟩
   set D : Matrix (Fin d) (Fin d) (AE F E) :=
     Matrix.diagonal fun k => algebraMap (AF F) (AE F E) (rId F (lam k t)) with hD
-  have hB : mat (fr.a t) = P * D * Q := by rw [← h5 t, Matrix.mul_assoc, hPQ, Matrix.mul_one]
+  have hB : mat (fr.a t) = P * D * Q := by
+    rw [← h5 t, Matrix.mul_assoc, hPQ, Matrix.mul_one]
   have hlam : ∀ k, lam k t ≤ ∑ j, t j := fun k => by
     have h0 : 0 ≤ ∑ j, t j := Finset.sum_nonneg fun j _ => ht.2 j
     by_cases hk : ∀ i, ix i ≠ k ∧ iy i ≠ k
@@ -118,52 +141,33 @@ theorem torus
       ext k l
       by_cases e : k = l
       · subst e
-        simp only [hD, Matrix.smul_apply, Matrix.sub_apply, Matrix.diagonal_apply_eq,
-          Matrix.one_apply_eq, Matrix.zero_apply, rId, map_add, map_one, add_sub_cancel_left]
+        simp only [hD, Matrix.smul_apply, Matrix.sub_apply, Matrix.diagonal_apply_eq, Matrix.one_apply_eq,
+          Matrix.zero_apply, rId, map_add, map_one, add_sub_cancel_left]
         rw [Algebra.smul_def, ← map_mul, mul_realAd hu, map_zero]
       · simp [hD, Matrix.diagonal_apply_ne _ e, Matrix.one_apply_ne e]
     have e : mat (fr.a t) - 1 = P * (D - 1) * Q := by
       rw [Matrix.mul_sub, Matrix.sub_mul, Matrix.mul_one, hPQ, hB]
     rw [e, ← Matrix.smul_mul, ← Matrix.mul_smul, hu', Matrix.mul_zero, Matrix.zero_mul]
-  · have h1
-        : ‖piInf (τ w) (mat (fr.a t) i j)‖
-          ≤ (∑ k, ‖piInf (τ w) (P i k)‖ * ‖piInf (τ w) (Q k j)‖) * Real.exp (∑ j, t j) := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [hB, Matrix.mul_apply, map_sum, Finset.sum_mul]
+  · have h1 : ‖piInf (τ w) (mat (fr.a t) i j)‖ ≤
+        (∑ k, ‖piInf (τ w) (P i k)‖ * ‖piInf (τ w) (Q k j)‖) * Real.exp (∑ j, t j) := by
+
+      rw [hB, Matrix.mul_apply, map_sum, Finset.sum_mul]
       refine (norm_sum_le _ _).trans (Finset.sum_le_sum fun k _ => ?_)
-      rw [hD, Matrix.mul_diagonal, map_mul, map_mul, piInf_rId hc.1, norm_mul, norm_mul,
-        Complex.norm_real, Real.norm_of_nonneg (Real.exp_pos _).le, mul_right_comm]
+      rw [hD, Matrix.mul_diagonal, map_mul, map_mul, piInf_rId hc.1, norm_mul, norm_mul, Complex.norm_real,
+        Real.norm_of_nonneg (Real.exp_pos _).le, mul_right_comm]
       exact mul_le_mul_of_nonneg_left (Real.exp_le_exp.2 (hlam k)) (by positivity)
     refine h1.trans (mul_le_mul_of_nonneg_right ?_ (Real.exp_pos _).le)
-    refine le_trans ?_
-      (Finset.single_le_sum
-        (f := fun w =>
-          ∑ i, ∑ j, ∑ k,
-            ‖piInf (τ w) (P i k)‖ * ‖piInf (τ w) (Q k j)‖)
-        (fun _ _ => by positivity)
-        (Finset.mem_univ w))
-    refine le_trans ?_
-      (Finset.single_le_sum
-        (f := fun i =>
-          ∑ j, ∑ k,
-            ‖piInf (τ w) (P i k)‖ * ‖piInf (τ w) (Q k j)‖)
-        (fun _ _ => by positivity)
-        (Finset.mem_univ i))
-    exact Finset.single_le_sum
-      (f := fun j =>
-        ∑ k,
-          ‖piInf (τ w) (P i k)‖ * ‖piInf (τ w) (Q k j)‖)
-      (fun _ _ => by positivity)
-      (Finset.mem_univ j)
+    refine le_trans ?_ (Finset.single_le_sum (f := fun w => ∑ i, ∑ j, ∑ k,
+      ‖piInf (τ w) (P i k)‖ * ‖piInf (τ w) (Q k j)‖) (fun _ _ => by positivity) (Finset.mem_univ w))
+    refine le_trans ?_ (Finset.single_le_sum (f := fun i => ∑ j, ∑ k,
+      ‖piInf (τ w) (P i k)‖ * ‖piInf (τ w) (Q k j)‖) (fun _ _ => by positivity) (Finset.mem_univ i))
+    exact Finset.single_le_sum (f := fun j => ∑ k,
+      ‖piInf (τ w) (P i k)‖ * ‖piInf (τ w) (Q k j)‖) (fun _ _ => by positivity) (Finset.mem_univ j)
 
-theorem maj_le
-    (τ : ∀ w : InfinitePlace F, EmbOver E w)
-    {n d : ℕ} (C : Set (Ten F E n d))
-    (N : ℕ) (y : Ten F E n d)
-    (B : Matrix (Fin d) (Fin d) (AE F E))
-    (K s : ℝ) (hK : 0 ≤ K) (hs : 1 ≤ s)
-    (h1 : At (evI F) (B - 1)) (hB : ∀ w i j, ‖piInf (τ w) (B i j)‖ ≤ K * s)
-    : maj τ C N y ≤ ((1 + d * K) * s) ^ N * maj τ C N (y * Bᵀ) := by
+theorem maj_le (τ : ∀ w : InfinitePlace F, EmbOver E w) {n d : ℕ} (C : Set (Ten F E n d)) (N : ℕ) (y : Ten F E n d)
+    (B : Matrix (Fin d) (Fin d) (AE F E)) (K s : ℝ) (hK : 0 ≤ K) (hs : 1 ≤ s) (h1 : At (evI F) (B - 1))
+    (hB : ∀ w i j, ‖piInf (τ w) (B i j)‖ ≤ K * s) :
+    maj τ C N y ≤ ((1 + d * K) * s) ^ N * maj τ C N (y * Bᵀ) := by
   have hy := sz_nonneg τ y
   have hz := sz_nonneg τ (y * Bᵀ)
   have hs0 : 0 < s := by linarith
@@ -174,8 +178,7 @@ theorem maj_le
       have : 0 ≤ d * K * s := by positivity
       have : 0 ≤ s * sz τ y := by positivity
       nlinarith
-    rw [← div_eq_mul_inv, inv_eq_one_div, div_le_div_iff₀ (by positivity) (by positivity), one_mul,
-      ← mul_pow]
+    rw [← div_eq_mul_inv, inv_eq_one_div, div_le_div_iff₀ (by positivity) (by positivity), one_mul, ← mul_pow]
     exact pow_le_pow_left₀ (by positivity) h5 N
   · refine absurd ?_ h3
     obtain ⟨c, hc, h⟩ := h2
@@ -183,8 +186,8 @@ theorem maj_le
     have e : y * Bᵀ - c = (y - c) + y * (B - 1)ᵀ := by
       rw [Matrix.transpose_sub, Matrix.mul_sub, Matrix.transpose_one, Matrix.mul_one]
       abel
-    rw [e, smul_add, h u hu, zero_add, ← Matrix.mul_smul, ← Matrix.transpose_smul, h1 u hu,
-      Matrix.transpose_zero, Matrix.mul_zero]
+    rw [e, smul_add, h u hu, zero_add, ← Matrix.mul_smul, ← Matrix.transpose_smul, h1 u hu, Matrix.transpose_zero,
+      Matrix.mul_zero]
   · positivity
   · simp
 
@@ -193,10 +196,8 @@ end PositivityTheory.ThKEst.LatArchPf
 namespace PositivityTheory.ThKEst
 
 open scoped TensorProduct NNReal ENNReal Matrix
-open NumberField IsDedekindDomain MeasureTheory Filter Topology
-  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
-open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
-  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK LatArchPf
+open NumberField IsDedekindDomain MeasureTheory Filter Topology Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK LatArchPf
 
 theorem latArch_of (hb : FrameBasis) : LatArch := by
   intro F E _ _ _ _ _ σ hc τ n d J J' _ hJ' fr hg C N hC
@@ -207,9 +208,7 @@ theorem latArch_of (hb : FrameBasis) : LatArch := by
   rw [← ENNReal.tsum_mul_left]
   refine ENNReal.tsum_le_tsum fun x => ?_
   have h0 : 0 ≤ ∑ j, t j := Finset.sum_nonneg fun j _ => ht.2 j
-  have h3 :=
-    maj_le τ C N (mat g⁻¹ * incM F x.1 * (mat (fr.a t)⁻¹)ᵀ) (mat (fr.a t)) K _ hK
-      (Real.one_le_exp h0) h1 h2
+  have h3 := maj_le τ C N (mat g⁻¹ * incM F x.1 * (mat (fr.a t)⁻¹)ᵀ) (mat (fr.a t)) K _ hK (Real.one_le_exp h0) h1 h2
   have e : mat (fr.a t) * mat (fr.a t)⁻¹ = mat (1 : UA σ J')⁻¹ := by
     rw [inv_one, ← mul_inv_cancel (fr.a t)]
     rfl

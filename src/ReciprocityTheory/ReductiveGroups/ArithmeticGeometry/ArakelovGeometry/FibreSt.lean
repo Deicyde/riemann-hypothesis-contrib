@@ -1,16 +1,63 @@
 module
 
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArakelovGeometry.IsBergDensity
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArakelovGeometry.EqZeroOfSecTraceMulEqZero
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.LemCone
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArakelovGeometry.IsSmoothPts
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+public import Mathlib.Topology.Algebra.MvPolynomial
+import Mathlib.Topology.Sheaves.Init
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArakelovGeometry.FibreStE
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.LemCone
+import ReciprocityTheory.GeometryOfNumbers.PluriharmonicAnalysis.BergmanDefs
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArakelovGeometry.FibreStA
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArakelovGeometry.FibreStB
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArakelovGeometry.FibreStC
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArakelovGeometry.FibreStD
 
 @[expose] public section
 
 namespace ReciprocityTheory.ChartRestriction.G.ArakelovGeometry
 
-open ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.GeometryOfNumbersTheory MvPolynomial
-  MeasureTheory Module Filter Asymptotics
+open ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.GeometryOfNumbersTheory MvPolynomial MeasureTheory Module Filter Asymptotics
 open scoped ComplexOrder
 
 variable {Ω : Type} [Field Ω] [CharZero Ω] {κ : Type} [Fintype κ] {D : ℕ}
@@ -18,13 +65,12 @@ variable {Ω : Type} [Field Ω] [CharZero Ω] {κ : Type} [Fintype κ] {D : ℕ}
 def prFib (x : Ix κ → Ω) (e : Fin (D + 1) → Ix κ) (w : Fin (D + 1) → ℂ) : Set (Ix κ → ℂ) :=
   {z | z ∈ pts (coordIdeal ℤ x) ∧ ∀ k, z (e k) = w k}
 
-theorem exists_proj_ne_zero
-    {x : Ix κ → Ω} {e : Fin (D + 1) → Ix κ} (hfr : IsProjFrame x e)
-    {z : Ix κ → ℂ} (hz : z ∈ pts (coordIdeal ℤ x))
-    : ∃ k, z (e k) ≠ 0 := by
+theorem exists_proj_ne_zero {x : Ix κ → Ω} {e : Fin (D + 1) → Ix κ} (hfr : IsProjFrame x e)
+    {z : Ix κ → ℂ} (hz : z ∈ pts (coordIdeal ℤ x)) : ∃ k, z (e k) ≠ 0 := by
   by_contra hcon
   push Not at hcon
-  obtain ⟨i, hi⟩ : ∃ i, z i ≠ 0 := by by_contra h; push Not at h; exact hz.1 (funext h)
+  obtain ⟨i, hi⟩ : ∃ i, z i ≠ 0 := by
+    by_contra h; push Not at h; exact hz.1 (funext h)
   obtain ⟨q, hqm, hq⟩ := hfr.integral i
   have hg : ∀ j, ∃ g, coneMap ℤ (x ∘ e) g = ((q.coeff j : coneRing ℤ (x ∘ e)) : Polynomial Ω) :=
     fun j => (q.coeff j).2
@@ -34,8 +80,8 @@ theorem exists_proj_ne_zero
   have hQ : Q ∈ coordIdeal ℤ x := by
     rw [coordIdeal, RingHom.mem_ker]
     rw [Polynomial.eval₂_eq_sum_range] at hq
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [Q, map_sum, map_mul, map_pow, Fib.coneMap_rename, hg]
+
+    simp only [Q, map_sum, map_mul, map_pow, Fib.coneMap_rename, hg]
     convert hq using 2
     simp [coneMap]
   have hz0 := Fib.coneMap_eq_zero_of_mem_pts (coordIdeal_isHomogIdeal ℤ x) hz hQ
@@ -47,19 +93,17 @@ theorem exists_proj_ne_zero
     simp at h1
     exact_mod_cast h1
   have h2 := congrArg (fun p => _root_.AddMonoidAlgebra.coeff (M := ℕ) p n) hz0
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [Q, map_sum, map_mul, map_pow, Fib.coneMap_rename, hze] at h2
-  have h3
-      : ∀ j,
-        coneMap ℤ (0 : Fin (D + 1) → ℂ) (g j) = Polynomial.C ((constantCoeff (g j) : ℤ) : ℂ) := by
+
+  simp only [Q, map_sum, map_mul, map_pow, Fib.coneMap_rename, hze] at h2
+  have h3 : ∀ j, coneMap ℤ (0 : Fin (D + 1) → ℂ) (g j) =
+      Polynomial.C ((constantCoeff (g j) : ℤ) : ℂ) := by
     intro j
     simp [coneMap]
   have hX : coneMap ℤ z (X i) = Polynomial.C (z i) * Polynomial.X := by simp [coneMap]
   simp only [h3, hX, Polynomial.finsetSum_coeff, Polynomial.coeff_zero] at h2
   rw [Finset.sum_eq_single n] at h2
   · rw [mul_pow, ← Polynomial.C_pow, ← mul_assoc, ← Polynomial.C_mul, Polynomial.coeff_C_mul_X_pow,
-        if_pos rfl, hcn]
-      at h2
+      if_pos rfl, hcn] at h2
     simp at h2
     exact hi h2.1
   · intro j _ hj
@@ -68,31 +112,25 @@ theorem exists_proj_ne_zero
   · intro h; simp at h
 
 def IsDiscr (x : Ix κ → Ω) (e : Fin (D + 1) → Ix κ) (Δ : MvPolynomial (Fin (D + 1)) ℂ) : Prop :=
-  Δ ≠ 0
-    ∧ ∀ w,
-      eval w Δ ≠ 0
-        → (prFib x e w).Finite ∧ (prFib x e w).ncard = projDeg x e
-          ∧ (∀ z ∈ prFib x e w, ∃ (U : Set (Fin (D + 1) → ℂ)) (γ : (Fin (D + 1) → ℂ) → Ix κ → ℂ),
-            IsOpen U ∧ w ∈ U ∧ DifferentiableOn ℂ γ U ∧ γ w = z ∧ ∀ w' ∈ U, γ w' ∈ prFib x e w')
-          ∧ ∀ (n : ℕ) (f : MvPolynomial (Ix κ) ℤ) (g : MvPolynomial (Fin (D + 1)) ℤ),
-            f.IsHomogeneous n → g.IsHomogeneous n → aeval (x ∘ e) g = secTrace x e n (aeval x f)
-              → eval w (map (Int.castRingHom ℂ) g)
-                = ∑ᶠ z ∈ prFib x e w, eval z (map (Int.castRingHom ℂ) f)
+  Δ ≠ 0 ∧ ∀ w, eval w Δ ≠ 0 →
+    (prFib x e w).Finite ∧ (prFib x e w).ncard = projDeg x e ∧
+    (∀ z ∈ prFib x e w, ∃ (U : Set (Fin (D + 1) → ℂ)) (γ : (Fin (D + 1) → ℂ) → Ix κ → ℂ),
+      IsOpen U ∧ w ∈ U ∧ DifferentiableOn ℂ γ U ∧ γ w = z ∧ ∀ w' ∈ U, γ w' ∈ prFib x e w') ∧
+    ∀ (n : ℕ) (f : MvPolynomial (Ix κ) ℤ) (g : MvPolynomial (Fin (D + 1)) ℤ),
+      f.IsHomogeneous n → g.IsHomogeneous n → aeval (x ∘ e) g = secTrace x e n (aeval x f) →
+      eval w (map (Int.castRingHom ℂ) g) = ∑ᶠ z ∈ prFib x e w, eval z (map (Int.castRingHom ℂ) f)
 
-theorem exists_isDiscr {x : Ix κ → Ω} {e : Fin (D + 1) → Ix κ} (hfr : IsProjFrame x e)
-    : ∃ Δ, IsDiscr x e Δ := by
+theorem exists_isDiscr {x : Ix κ → Ω} {e : Fin (D + 1) → Ix κ} (hfr : IsProjFrame x e) :
+    ∃ Δ, IsDiscr x e Δ := by
   classical
   obtain ⟨G, hdeg, hTr, hsc⟩ := Fib.exists_gen x e hfr
   have hy0 : (x ∘ e) 0 ≠ 0 := Fib.coord_ne_zero _ hfr.free 0
   have hx0 : x (e 0) ≠ 0 := hy0
   let Δ0 : MvPolynomial (Fin (D + 1)) ℤ :=
     X 0 * Fib.homog 0 G.dd.totalDegree G.dd * Fib.homog 0 G.cc.totalDegree G.cc
-  have hevΔ
-      : ∀ w : Fin (D + 1) → ℂ,
-        w 0 ≠ 0
-          → eval w (map (Int.castRingHom ℂ) Δ0)
-            = w 0 * (w 0 ^ G.dd.totalDegree * Fib.deh w 0 G.dd)
-              * (w 0 ^ G.cc.totalDegree * Fib.deh w 0 G.cc) := by
+  have hevΔ : ∀ w : Fin (D + 1) → ℂ, w 0 ≠ 0 →
+      eval w (map (Int.castRingHom ℂ) Δ0) = w 0 * (w 0 ^ G.dd.totalDegree * Fib.deh w 0 G.dd) *
+        (w 0 ^ G.cc.totalDegree * Fib.deh w 0 G.cc) := by
     intro w hw0
     rw [eval_map]
     simp only [Δ0, eval₂_mul, eval₂_X, Fib.eval₂_homog w 0 hw0 _ le_rfl]
@@ -106,22 +144,18 @@ theorem exists_isDiscr {x : Ix κ → Ω} {e : Fin (D + 1) → Ix κ} (hfr : IsP
     rw [hevΔ w hw0] at hw
     refine ⟨hw0, fun m hm => ?_, fun h0 => hw (by rw [h0]; ring), fun h0 => hw (by rw [h0]; ring)⟩
     exact Fib.deh_eq_zero_of_deh_eq_zero (x ∘ e) w 0 hy0 hw0
-      (fun f hf => by rw [hfr.free, Ideal.mem_bot] at hf; simp [hf])
-      hm
+      (fun f hf => by rw [hfr.free, Ideal.mem_bot] at hf; simp [hf]) hm
   refine ⟨map (Int.castRingHom ℂ) Δ0, ?_, fun w hw => ?_⟩
   · intro h0
     have h1 : Δ0 = 0 :=
       map_injective _ (RingHom.injective_int (Int.castRingHom ℂ)) (by rw [h0, map_zero])
-    have h2
-        : aeval (x ∘ e) Δ0
-          = (x ∘ e) 0 * ((x ∘ e) 0 ^ G.dd.totalDegree * Fib.deh (x ∘ e) 0 G.dd)
-            * ((x ∘ e) 0 ^ G.cc.totalDegree * Fib.deh (x ∘ e) 0 G.cc) := by
+    have h2 : aeval (x ∘ e) Δ0 = (x ∘ e) 0 * ((x ∘ e) 0 ^ G.dd.totalDegree *
+        Fib.deh (x ∘ e) 0 G.dd) * ((x ∘ e) 0 ^ G.cc.totalDegree * Fib.deh (x ∘ e) 0 G.cc) := by
       simp only [Δ0, aeval_def, algebraMap_int_eq, eval₂_mul, eval₂_X,
         Fib.eval₂_homog _ 0 hy0 _ le_rfl]
     rw [h1, map_zero] at h2
     exact (mul_ne_zero (mul_ne_zero hy0 (mul_ne_zero (pow_ne_zero _ hy0) G.dd_ne))
-        (mul_ne_zero (pow_ne_zero _ hy0) G.cc_ne))
-      h2.symm
+      (mul_ne_zero (pow_ne_zero _ hy0) G.cc_ne)) h2.symm
   have hgw := hgood w hw
   have hfib : prFib x e w = Fib.fib x e w := rfl
   refine ⟨hfib ▸ G.fib_finite hx0 hgw, by rw [hfib, G.fib_ncard hx0 hgw, hdeg], ?_, ?_⟩

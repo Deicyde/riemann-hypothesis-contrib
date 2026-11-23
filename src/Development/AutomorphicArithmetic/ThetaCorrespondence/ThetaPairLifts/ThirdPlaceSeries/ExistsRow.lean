@@ -1,22 +1,47 @@
 module
 
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.CongrFunHeq
 public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.NonzeroPlacesOverPrimesLifts
 public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.OmPinsTr
-public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.LabConj
-public import Development.AutomorphicArithmetic.ThetaCorrespondence.ThetaPairLifts.ThirdPlaceSeries.CohomologicalCsdTempered
-public import Development.AutomorphicArithmetic.ThetaCorrespondence.ThetaPairLifts.ThirdPlaceSeries.RingSpecNormalisedCharacterEq
-public import Development.AutomorphicArithmetic.ThetaCorrespondence.ThetaPairLifts.ThirdPlaceSeries.MMvDmvAll
-public import Development.AutomorphicArithmetic.ThetaCorrespondence.ThetaPairLifts.ThirdPlaceSeries.NormChoiceOfExtension
 public import Development.AutomorphicArithmetic.ThetaCorrespondence.ThetaPairLifts.ThirdPlaceSeries.AtSame
 public import Development.AutomorphicArithmetic.ThetaCorrespondence.ThetaPairLifts.ThirdPlaceSeries.RootsOfUnityRingLeWittIntegers
-public import Development.AutomorphicArithmetic.ThetaCorrespondence.ThetaPairLifts.ThirdPlaceSeries.HeckeOpen
-public import Development.AutomorphicArithmetic.ThetaCorrespondence.ThetaPairLifts.ThirdPlaceSeries.NGalTied
-public import Development.AutomorphicArithmetic.ThetaCorrespondence.ThetaPairLifts.ThirdPlaceSeries.Inner
-public import Development.AutomorphicArithmetic.ThetaCorrespondence.ThetaPairLifts.ThirdPlaceSeries.RowLocPin
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.AtSame
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ChoiceSide
 public import Development.AutomorphicArithmetic.ThetaCorrespondence.ThetaPairLifts.ThirdPlaceSeries.TauTrue
-public import Development.AutomorphicArithmetic.ThetaCorrespondence.ThetaPairLifts.ThirdPlaceSeries.NGalTiedRowLoc
-public import Development.AutomorphicArithmetic.Foundations.LocalLanglands.IsRecTOfIsRec
+import Formalism.LocalToGlobal.SiegelLatticeTheory.CokernelGLCounts.RankPointCounts.NormalIntegrality
+import Lean.Exception
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.StrictHenselianAcyclic
 
 @[expose] public section
 
@@ -38,7 +63,7 @@ local elab "row_exact " term:term : tactic =>
 
 local macro "row_cast%" t:term:max : term => `(by row_exact $t)
 
-set_option synthInstance.maxHeartbeats 200000
+
 
 section
 open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.Inhab Formalism.L2.Host GlobalTheory.EX GlobalTheory.EX.OB GlobalTheory.Mem GlobalTheory.Mem.Col2 GlobalTheory.Mem.Top GlobalTheory.Mem.Top.GroupRetwisting GlobalTheory.Mem.Top.Bl NumberField IsDedekindDomain
@@ -47,7 +72,7 @@ open GlobalTheory.HeightCounting.Up GlobalTheory.Mem.SRe GlobalTheory.Mem.R3.Rw
 open GlobalTheory.HeightCounting GlobalTheory.Mem.R3.Tr
 noncomputable section
 namespace GlobalTheory.LayerMove
-set_option maxHeartbeats 4000000
+
 variable {D : D7} (m : Mv D)
 theorem Mv.rowLoc_alt {D : D7} (m : Mv D) {C : NChoice D} (a : _root_.GlobalTheory.HeightCounting.NAllCAlt D C) (F : Formalism.L2.RowFrame D) (F' : Formalism.L2.RowFrame m.D)
     (hF : HEq F'.rep F.rep) (x : _root_.Formalism.L2.RowLocTiedAlt D a.gal.lp F) : _root_.Formalism.L2.RowLocTiedAlt m.D ((_root_.UpperTheory.One.M.mvAll_alt trivial) m a).gal.lp F' := by
@@ -59,7 +84,7 @@ theorem Mv.rowLoc_alt {D : D7} (m : Mv D) {C : NChoice D} (a : _root_.GlobalTheo
     (sat := row_cast% x.sat)
     )
 
-set_option maxHeartbeats 16000000 in
+
 theorem exists_nonempty_nMore_upL (hL : _root_.UpperTheory.Zero.LLC.RecTExists) (K : Ctx) (B : Base) (f : Fr B.toPre) (T : TwDat B) (w : ColW B f T) (Z : w.Lt) (Wt : Set B.places.Pl) (S' : SStage B w.C Z.W) (N : ∀ u, Submodule (𝓞 B.LL) (Z.V.div.Nu u).V) (h : B.Word → ℝ) (nch : NChoice (w.D Z)) (xd : ThData (w.D Z))
     (p0 : BaseLevelRowSide (w.D Z)) (t : RowsT K w Z Wt p0) (p0' : BaseLevelRowSide (w.D (upL Z S' N h))) (t' : RowsT K w (upL Z S' N h) Wt p0')
     (hs : RowsSame t t')
@@ -108,8 +133,10 @@ theorem exists_nonempty_nMore_upL (hL : _root_.UpperTheory.Zero.LLC.RecTExists) 
   have e10 : eW' = row_cast% t.r.Y.mj.eW := eq_of_heq (row_cast% hs.eW)
   subst e10
   obtain ⟨Sb, ev, hSb, hev, hE⟩ := eig
-  obtain ⟨i1, i2, i3⟩ := s7 ⟨labc, zeta, pht⟩
-  obtain ⟨l1, l2, l3, l4, l5, lv⟩ := grp.lvl
+  -- Bind the level witnesses before destructuring them to avoid generalizing over the dependent goal.
+  have inner' := s7 ⟨labc, zeta, pht⟩
+  have lvl := grp.lvl
+  obtain ⟨l1, l2, l3, l4, l5, lv⟩ := lvl
   refine Nonempty.elim (hser kKs hk nexp (row_cast% kKs) (row_cast% hk) (@_root_.Formalism.IndefR.NX.NExpRealS.mk (_) (_) (_) (_) (_) (_) (_) (_) (_) (_) (_) (_) (_) (_) (_)
     (fi := row_cast% nexp.fi)
     (geq := row_cast% nexp.geq)
@@ -203,7 +230,7 @@ theorem exists_nonempty_nMore_upL (hL : _root_.UpperTheory.Zero.LLC.RecTExists) 
       (hk_none := row_cast% (@_root_.GlobalTheory.GeoTie.ThetaTie.side (_) (_) (_) (_) (_) (_) (_) (_) (_) (_) (_) (_) (_) (_) (_) (_) (_) (_) geo (row_cast% x1) (row_cast% x2) (row_cast% x3)).hk_none))
     (isUnramified₂ := row_cast% geo.isUnramified₂)
     ⟩
-    (row_cast% ok) (row_cast% th) (row_cast% xda) (row_cast% ((mvOf w Z S' N h).large large)) (row_cast% i1) (row_cast% i2) (row_cast% i3)⟩⟩
+    (row_cast% ok) (row_cast% th) (row_cast% xda) (row_cast% ((mvOf w Z S' N h).large large)) (row_cast% inner'.1) (row_cast% inner'.2.1) (row_cast% inner'.2.2)⟩⟩
   row_exact ((mvOf w Z S' N h).tauTrue_alt (a := a.all) tau)
 end GlobalTheory.LayerMove
 end

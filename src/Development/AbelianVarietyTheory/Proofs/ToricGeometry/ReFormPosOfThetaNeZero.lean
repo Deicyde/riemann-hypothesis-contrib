@@ -1,6 +1,59 @@
 module
 
-public import Mathlib
+public import Mathlib.Algebra.Module.ZLattice.Basic
+public import Mathlib.Analysis.CStarAlgebra.Classes
+public import Mathlib.Analysis.Calculus.FDeriv.Defs
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Real
+import Mathlib.Algebra.Ring.IsFormallyReal
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Lemma
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+public import Mathlib.Analysis.Calculus.FDeriv.Add
+public import Mathlib.Analysis.Calculus.FDeriv.Mul
+public import Mathlib.Analysis.Complex.Liouville
 
 @[expose] public section
 
@@ -10,6 +63,7 @@ open scoped BigOperators Real
 namespace GlobalTheory.ThetaPositivity
 
 variable {g : ℕ}
+
 
 open Complex Matrix Filter Topology in
 open scoped BigOperators Real in
@@ -36,6 +90,7 @@ variable {g : ℕ} in
 private lemma continuous_re_dotProduct_mulVec_star (Hm : Matrix (Fin g) (Fin g) ℂ) :
     Continuous (fun z : Fin g → ℂ => (z ⬝ᵥ Hm.mulVec (star z)).re) :=
   Complex.continuous_re.comp (continuous_id.dotProduct (continuous_const.matrix_mulVec continuous_star))
+
 
 open Complex Matrix Filter Topology in
 open scoped BigOperators Real in
@@ -101,6 +156,7 @@ private lemma re_form_add_smul_of_isHermitian {Hm : Matrix (Fin g) (Fin g) ℂ} 
       ← mul_assoc, mul_comm (star t), Complex.star_def, Complex.mul_conj]
   rw [h1, h2, Complex.re_ofReal_mul]
 
+
 open Complex Matrix Filter Topology in
 open scoped BigOperators Real in
 variable {g : ℕ} in
@@ -148,24 +204,21 @@ lemma _root_.GlobalTheory.ThetaPositivity.eq_zero_of_neg {Hm : Matrix (Fin g) (F
   have := hf.apply_eq_of_tendsto_cocompact 0 hf0
   simpa [hfdef] using this
 
+
 open Complex Matrix Filter Topology in
 open scoped BigOperators Real in
 variable {g : ℕ} in
-theorem _root_.GlobalTheory.ThetaPositivity.re_form_pos_of_theta_ne_zero
-    : ∀ (g : ℕ) (Λ : Submodule ℤ (Fin g → ℂ)),
-      DiscreteTopology Λ → Submodule.span ℝ (Λ : Set (Fin g → ℂ)) = ⊤
-        → ∀ (Hm : Matrix (Fin g) (Fin g) ℂ) (χ : Λ → ℂ) (Ef : LinearMap.BilinForm ℤ Λ)
-            (θ : (Fin g → ℂ) → ℂ),
-          Hm.IsHermitian → (∀ l, ‖χ l‖ = 1)
-            → (∀ l m : Λ, (Ef l m : ℝ) = ((l : Fin g → ℂ) ⬝ᵥ Hm.mulVec (star (m : Fin g → ℂ))).im)
-            → Function.Injective Ef → Differentiable ℂ θ → θ ≠ 0
-            → (∀ (l : Λ) z,
-              θ (z + l)
-                = (χ l * cexp
-                    (Real.pi * (z ⬝ᵥ Hm.mulVec (star (l : Fin g → ℂ)))
-                      + Real.pi / 2 * ((l : Fin g → ℂ) ⬝ᵥ Hm.mulVec (star (l : Fin g → ℂ)))))
-                  * θ z)
-            → ∀ z : Fin g → ℂ, z ≠ 0 → 0 < (z ⬝ᵥ Hm.mulVec (star z)).re := by
+theorem _root_.GlobalTheory.ThetaPositivity.re_form_pos_of_theta_ne_zero :
+    ∀ (g : ℕ) (Λ : Submodule ℤ (Fin g → ℂ)), DiscreteTopology Λ →
+      Submodule.span ℝ (Λ : Set (Fin g → ℂ)) = ⊤ →
+      ∀ (Hm : Matrix (Fin g) (Fin g) ℂ) (χ : Λ → ℂ) (Ef : LinearMap.BilinForm ℤ Λ)
+        (θ : (Fin g → ℂ) → ℂ), Hm.IsHermitian → (∀ l, ‖χ l‖ = 1) →
+        (∀ l m : Λ, (Ef l m : ℝ) = ((l : Fin g → ℂ) ⬝ᵥ Hm.mulVec (star (m : Fin g → ℂ))).im) →
+        Function.Injective Ef → Differentiable ℂ θ → θ ≠ 0 →
+        (∀ (l : Λ) z, θ (z + l) =
+          (χ l * cexp (Real.pi * (z ⬝ᵥ Hm.mulVec (star (l : Fin g → ℂ))) +
+            Real.pi / 2 * ((l : Fin g → ℂ) ⬝ᵥ Hm.mulVec (star (l : Fin g → ℂ))))) * θ z) →
+        ∀ z : Fin g → ℂ, z ≠ 0 → 0 < (z ⬝ᵥ Hm.mulVec (star z)).re := by
   intro g Λ hdisc hspan Hm χ Ef θ hH hχ hE hinj hθ hθ0 htr z hz
   classical
   haveI : IsZLattice ℝ Λ := ⟨hspan⟩
@@ -178,15 +231,13 @@ theorem _root_.GlobalTheory.ThetaPositivity.re_form_pos_of_theta_ne_zero
   refine lt_of_le_of_ne (hpsd z) (fun hz0 => hz ?_)
   have him : ∀ v : Fin g → ℂ, (z ⬝ᵥ Hm.mulVec (star v)).im = 0 := by
     intro v
-    have key
-        : ∀ s : ℝ,
-          0 ≤ 2 * s * (z ⬝ᵥ Hm.mulVec (star v)).im + s ^ 2 * (v ⬝ᵥ Hm.mulVec (star v)).re := by
+    have key : ∀ s : ℝ, 0 ≤ 2 * s * (z ⬝ᵥ Hm.mulVec (star v)).im
+        + s ^ 2 * (v ⬝ᵥ Hm.mulVec (star v)).re := by
       intro s
       have h := hpsd (z + ((s : ℂ) * Complex.I) • v)
       rw [re_form_add_smul_of_isHermitian hH, ← hz0] at h
-      have e1
-          : (star ((s : ℂ) * Complex.I) * (z ⬝ᵥ Hm.mulVec (star v))).re
-            = s * (z ⬝ᵥ Hm.mulVec (star v)).im := by
+      have e1 : (star ((s : ℂ) * Complex.I) * (z ⬝ᵥ Hm.mulVec (star v))).re =
+          s * (z ⬝ᵥ Hm.mulVec (star v)).im := by
         simp [Complex.mul_re]
       have e2 : Complex.normSq ((s : ℂ) * Complex.I) = s ^ 2 := by simp [sq]
       rw [e1, e2] at h
@@ -195,8 +246,7 @@ theorem _root_.GlobalTheory.ThetaPositivity.re_form_pos_of_theta_ne_zero
     set d := (v ⬝ᵥ Hm.mulVec (star v)).re
     have hd1 : 0 < d + 1 := by linarith [hpsd v]
     have h' : 0 ≤ -(c ^ 2 * (d + 2)) / (d + 1) ^ 2 := by
-      have e
-          : 2 * (-c / (d + 1)) * c + (-c / (d + 1)) ^ 2 * d = -(c ^ 2 * (d + 2)) / (d + 1) ^ 2 := by
+      have e : 2 * (-c / (d + 1)) * c + (-c / (d + 1)) ^ 2 * d = -(c ^ 2 * (d + 2)) / (d + 1) ^ 2 := by
         field_simp
         ring
       linarith [key (-c / (d + 1))]
@@ -213,7 +263,7 @@ theorem _root_.GlobalTheory.ThetaPositivity.re_form_pos_of_theta_ne_zero
     have hl : Ef (b.equivFun.symm c) = 0 := by
       refine b.ext fun j => ?_
       have := congrFun hc j
-      set_option synthInstance.maxHeartbeats 100000 in
+
       simpa [Module.Basis.equivFun_symm_apply, map_sum, Matrix.vecMul, dotProduct, M] using this
     have := hinj (hl.trans (map_zero Ef).symm)
     have h2 := congrArg b.equivFun this
@@ -223,8 +273,7 @@ theorem _root_.GlobalTheory.ThetaPositivity.re_form_pos_of_theta_ne_zero
     have h := him (b j : Fin g → ℂ)
     rw [← bR.sum_repr z] at h
     simp only [sum_dotProduct, smul_dotProduct, Complex.im_sum, Complex.smul_im,
-        Module.Basis.ofZLatticeBasis_apply, bR, ← hE]
-      at h
+      Module.Basis.ofZLatticeBasis_apply, bR, ← hE] at h
     simpa [Matrix.vecMul, dotProduct, M] using h
   have hdetR : (M.map (Int.cast : ℤ → ℝ)).det ≠ 0 := by
     have e : (M.map (Int.castRingHom ℝ)).det = Int.castRingHom ℝ M.det := (RingHom.map_det _ _).symm

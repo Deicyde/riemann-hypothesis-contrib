@@ -1,16 +1,57 @@
 module
 
-public import Mathlib
-public import Development.AutomorphicSpectrum.PublishedTheorems.Metrics₂.PoincareLelong
 public import Development.AutomorphicSpectrum.PublishedTheorems.Metrics₂.SheetDensityEqSetSheetDensity
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.InterRed
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.InterRedF
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.InterGood
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.InterDivSupp
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.InterSheet
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.InterFibB
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Sub.Prod
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+public import Mathlib.RingTheory.Nullstellensatz
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Lemma
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.InterFib
-public import Development.AutomorphicSpectrum.Proofs.MetricProofs.CxPosDens
-public import Development.AutomorphicSpectrum.Proofs.MetricProofs.CxSimple
+import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
@@ -46,8 +87,8 @@ private lemma multiHomog_weighted_lemma_2 [DecidableEq K] {f : MRingOver ℂ ι}
   intro d hd
   exact weight_blkW_lemma d a (ha d (MvPolynomial.mem_support_iff.mpr hd))
 
-theorem ideal_homog [DecidableEq K] {Q : Ideal (MRingOver ℂ ι)} (hQ : IsMultiHomogIdeal Q)
-    : Q.IsHomogeneous (weightedHomogeneousSubmodule ℂ (blkW (ι := ι))) := by
+theorem ideal_homog [DecidableEq K] {Q : Ideal (MRingOver ℂ ι)} (hQ : IsMultiHomogIdeal Q) :
+    Q.IsHomogeneous (weightedHomogeneousSubmodule ℂ (blkW (ι := ι))) := by
   obtain ⟨S, hS, rfl⟩ := hQ
   apply Ideal.homogeneous_span
   intro f hf
@@ -171,25 +212,21 @@ private lemma exists_segre_poly_lemma_6 [DecidableEq K] [∀ k, DecidableEq (ι 
     · intro _
       rfl
   · conv_lhs => rw [b.as_sum]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, eval_monomial]
+
+    simp only [map_sum, eval_monomial]
     refine Finset.sum_congr rfl (fun m hm => ?_)
     rw [(hμ m hm).2 z]
 
-theorem segre_rel
-    [DecidableEq K] [∀ k, DecidableEq (ι k)]
-    {Q : Ideal (MRingOver ℂ ι)} (hQ : IsMultiHomogIdeal Q)
+theorem segre_rel [DecidableEq K] [∀ k, DecidableEq (ι k)] {Q : Ideal (MRingOver ℂ ι)}
+    (hQ : IsMultiHomogIdeal Q)
     (Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ)) (hΨ : IsSetGoodProj (conePts Q) Ψ)
-    (i : (k : K) → ι k)
-    : ∃ r : ℕ,
-      0 < r
-        ∧ ∃ G : Fin (e + 1) → MvPolynomial ((k : K) → ι k) ℂ,
-          (∀ j, (G j).totalDegree ≤ r - 1)
-            ∧ ∀ z ∈ conePts Q, segre z i ^ r = ∑ j, Ψ (segre z) j * eval (segre z) (G j) := by
+    (i : (k : K) → ι k) :
+    ∃ r : ℕ, 0 < r ∧ ∃ G : Fin (e + 1) → MvPolynomial ((k : K) → ι k) ℂ,
+      (∀ j, (G j).totalDegree ≤ r - 1) ∧
+      ∀ z ∈ conePts Q, segre z i ^ r = ∑ j, Ψ (segre z) j * eval (segre z) (G j) := by
   have hQh := ideal_homog hQ
-  have hvan
-      : segMono ι i ∈ MvPolynomial.vanishingIdeal ℂ
-        (MvPolynomial.zeroLocus ℂ (Q ⊔ Ideal.span (Set.range (psiPoly Ψ)))) := by
+  have hvan : segMono ι i ∈ MvPolynomial.vanishingIdeal ℂ
+      (MvPolynomial.zeroLocus ℂ (Q ⊔ Ideal.span (Set.range (psiPoly Ψ)))) := by
     rw [MvPolynomial.mem_vanishingIdeal_iff]
     intro x hx
     rw [MvPolynomial.mem_zeroLocus_iff] at hx
@@ -218,9 +255,7 @@ theorem segre_rel
   obtain ⟨q, hq, t, ht, hqt⟩ := Submodule.mem_sup.1 hn1
   obtain ⟨a, rfl⟩ := Ideal.mem_span_range_iff_exists_fun.1 ht
   have hle1 : (fun _ : K => (1 : ℕ)) ≤ fun _ => n + 1 := Pi.le_def.2 (fun k => by simp)
-  have hsN
-      : segMono ι i ^ (n + 1)
-        ∈ weightedHomogeneousSubmodule ℂ (blkW (ι := ι)) (fun _ => n + 1) := by
+  have hsN : segMono ι i ^ (n + 1) ∈ weightedHomogeneousSubmodule ℂ (blkW (ι := ι)) (fun _ => n + 1) := by
     rw [mem_weightedHomogeneousSubmodule]
     have h := (segMono_homog (ι := ι) i).pow (n + 1)
     have e1 : ((n + 1) • fun _ : K => (1 : ℕ)) = fun _ => n + 1 := by
@@ -230,43 +265,33 @@ theorem segre_rel
   have eN : ((fun _ : K => n + 1) - fun _ => 1) = fun _ : K => n := by
     funext k
     simp
-  have key
-      : GradedAlgebra.proj (weightedHomogeneousSubmodule ℂ (blkW (ι := ι))) (fun _ => n + 1) q
-          + ∑ j, GradedAlgebra.proj (weightedHomogeneousSubmodule ℂ (blkW (ι := ι))) (fun _ => n) (a j) *
-              psiPoly Ψ j
-        = segMono ι i ^ (n + 1) := by
-    have h :=
-      congrArg
-        (GradedAlgebra.proj (weightedHomogeneousSubmodule ℂ (blkW (ι := ι))) (fun _ => n + 1)) hqt
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_add (f := _), map_sum,
-          GradedAlgebra.proj_apply (weightedHomogeneousSubmodule ℂ (blkW (ι := ι)))
-            (fun _ => n + 1)
-            (segMono ι i ^ (n + 1)),
-          DirectSum.decompose_of_mem_same _ hsN]
-        at h
+  have key : GradedAlgebra.proj (weightedHomogeneousSubmodule ℂ (blkW (ι := ι))) (fun _ => n + 1) q +
+      ∑ j, GradedAlgebra.proj (weightedHomogeneousSubmodule ℂ (blkW (ι := ι))) (fun _ => n) (a j) *
+        psiPoly Ψ j = segMono ι i ^ (n + 1) := by
+    have h := congrArg
+      (GradedAlgebra.proj (weightedHomogeneousSubmodule ℂ (blkW (ι := ι))) (fun _ => n + 1)) hqt
+
+    rw [map_add (f := _), map_sum, GradedAlgebra.proj_apply (weightedHomogeneousSubmodule ℂ (blkW (ι := ι))) (fun _ => n + 1)
+      (segMono ι i ^ (n + 1)),
+    DirectSum.decompose_of_mem_same _ hsN] at h
     rw [← h]
     congr 1
     refine Finset.sum_congr rfl (fun j _ => ?_)
     rw [GradedAlgebra.proj_apply, GradedAlgebra.proj_apply,
       DirectSum.coe_decompose_mul_of_right_mem_of_le _ (psi_mem_lemma_4 Ψ j) hle1, eN]
-  have hb
-      : ∀ j,
-        GradedAlgebra.proj (weightedHomogeneousSubmodule ℂ (blkW (ι := ι))) (fun _ => n) (a j)
-          ∈ weightedHomogeneousSubmodule ℂ (blkW (ι := ι)) (fun _ => n) := by
+  have hb : ∀ j, GradedAlgebra.proj (weightedHomogeneousSubmodule ℂ (blkW (ι := ι))) (fun _ => n) (a j) ∈
+      weightedHomogeneousSubmodule ℂ (blkW (ι := ι)) (fun _ => n) := by
     intro j
     rw [GradedAlgebra.proj_apply]
     exact SetLike.coe_mem _
   choose G hGdeg hGev using fun j => exists_segre_poly_lemma_6 n _ (hb j)
-  have hqQ
-      : GradedAlgebra.proj (weightedHomogeneousSubmodule ℂ (blkW (ι := ι))) (fun _ => n + 1) q
-        ∈ Q := by
+  have hqQ : GradedAlgebra.proj (weightedHomogeneousSubmodule ℂ (blkW (ι := ι))) (fun _ => n + 1) q ∈ Q := by
     rw [GradedAlgebra.proj_apply]
     exact hQh _ hq
   refine ⟨n + 1, Nat.succ_pos n, G, fun j => by simpa using hGdeg j, fun z hz => ?_⟩
   have hk := congrArg (MvPolynomial.eval z) key
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_add (f := _), map_sum, map_pow, eval_segMono, hz.2 _ hqQ, zero_add] at hk
+
+  rw [map_add (f := _), map_sum, map_pow, eval_segMono, hz.2 _ hqQ, zero_add] at hk
   rw [← hk]
   refine Finset.sum_congr rfl (fun j _ => ?_)
   rw [map_mul, eval_psiPoly, hGev j z, mul_comm]
@@ -322,9 +347,9 @@ private lemma finite_zeros_lemma_9 {V : Type} [Fintype V] [DecidableEq V] (r : V
         have hXr : Ideal.Quotient.mkₐ ℂ I (X v ^ r v) = Ideal.Quotient.mkₐ ℂ I (H v) := by
           rw [Ideal.Quotient.mkₐ_eq_mk, Ideal.Quotient.eq]
           exact Ideal.subset_span ⟨v, rfl⟩
-        set_option synthInstance.maxHeartbeats 100000 in
-          rw [← hαβ, monomial_add_single, map_mul, hXr, ← map_mul, (H v).as_sum, Finset.mul_sum,
-          map_sum]
+
+        rw [← hαβ, monomial_add_single, map_mul, hXr, ← map_mul, (H v).as_sum, Finset.mul_sum,
+        map_sum]
         refine M.sum_mem (fun γ hγ => ?_)
         have e1 : monomial β (1 : ℂ) * monomial γ (AddMonoidAlgebra.coeff (H v) γ) =
             AddMonoidAlgebra.coeff (H v) γ • monomial (β + γ) (1 : ℂ) := by
@@ -339,8 +364,8 @@ private lemma finite_zeros_lemma_9 {V : Type} [Fintype V] [DecidableEq V] (r : V
   have htop : M = ⊤ := by
     refine eq_top_iff.2 (fun x _ => ?_)
     obtain ⟨p, rfl⟩ := Ideal.Quotient.mkₐ_surjective ℂ I x
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [p.as_sum, map_sum]
+
+    rw [p.as_sum, map_sum]
     refine M.sum_mem (fun α _ => ?_)
     have e1 : monomial α (AddMonoidAlgebra.coeff p α) = AddMonoidAlgebra.coeff p α • monomial α (1 : ℂ) := by
       rw [smul_monomial, smul_eq_mul, mul_one]
@@ -377,21 +402,17 @@ private lemma finite_zeros_lemma_9 {V : Type} [Fintype V] [DecidableEq V] (r : V
   rw [h3, Polynomial.coe_aeval_eq_eval] at h2
   exact h2
 
-theorem setFibre_finite_of_multiHomog
-    {Q : Ideal (MRingOver ℂ ι)} (hQ : IsMultiHomogIdeal Q)
+theorem setFibre_finite_of_multiHomog {Q : Ideal (MRingOver ℂ ι)} (hQ : IsMultiHomogIdeal Q)
     (Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ)) (hΨ : IsSetGoodProj (conePts Q) Ψ)
-    (y : Fin e → ℂ)
-    : (setFibre (conePts Q) Ψ y).Finite := by
+    (y : Fin e → ℂ) : (setFibre (conePts Q) Ψ y).Finite := by
   classical
   choose r hr G hGdeg hGrel using fun i => segre_rel hQ Ψ hΨ i
-  have hsub
-      : setFibre (conePts Q) Ψ y
-        ⊆ {w | ∀ v, eval w (X v ^ r v -
-          ∑ j, C ((Fin.cons 1 y : Fin (e + 1) → ℂ) j) * G v j) = 0} := by
+  have hsub : setFibre (conePts Q) Ψ y ⊆ {w | ∀ v, eval w (X v ^ r v -
+      ∑ j, C ((Fin.cons 1 y : Fin (e + 1) → ℂ) j) * G v j) = 0} := by
     rintro w ⟨z, hz, rfl, hw⟩
     intro v
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sub, map_pow, eval_X, map_sum, hGrel v z hz, hw, sub_eq_zero]
+
+    rw [map_sub, map_pow, eval_X, map_sum, hGrel v z hz, hw, sub_eq_zero]
     refine Finset.sum_congr rfl (fun j _ => ?_)
     rw [map_mul, eval_C]
   refine (finite_zeros_lemma_9 r _ (fun v => ?_)).subset hsub
@@ -403,9 +424,9 @@ theorem setFibre_finite_of_multiHomog
   have h3 := hr v
   omega
 
-theorem setFibre_finite
-    : ∀ (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fintype (ι k)] (Q : Ideal (MRingOver ℂ ι))
-        (e : ℕ) (Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ)),
+theorem setFibre_finite :
+    ∀ (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fintype (ι k)]
+      (Q : Ideal (MRingOver ℂ ι)) (e : ℕ) (Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ)),
       IsCxVar Q e → IsSetGoodProj (conePts Q) Ψ → ∀ y, (setFibre (conePts Q) Ψ y).Finite := by
   intro K _ ι _ Q e Ψ hV hΨ y
   exact setFibre_finite_of_multiHomog hV.2.1.2.1 Ψ hΨ y

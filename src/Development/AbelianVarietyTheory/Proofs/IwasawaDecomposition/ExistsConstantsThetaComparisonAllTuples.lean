@@ -1,29 +1,67 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.JEvExists
-public import Formalism.LocalToGlobal.UnitaryNorms.CharTied
-public import Formalism.LocalRingCardinality.DataKap
-public import Formalism.LocalToGlobal.ProjectiveLattices.HasDataCondition
-public import Formalism.LocalToGlobal.ProjectiveLattices.RecCond
-public import Formalism.LocalToGlobal.ProjectiveLattices.ParCanon
-public import Formalism.LocalToGlobal.ProjectiveLattices.ExistsParameterConditions
-public import Formalism.SharpRestriction.Divisibility.GeneratorPowers.ThExprUniqOfChartIndep2
-public import Development.AbelianVarietyTheory.PublishedTheorems.AutomorphicForms₂.DsExistsOfDiscreteSeriesExists
-public import Development.AbelianVarietyTheory.PublishedTheorems.AutomorphicForms₂.ExistsNormLeHeightPow
-public import Development.AbelianVarietyTheory.Definitions.Divisors.GenReads
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.OneMapOfOfExtends
+public import Development.AbelianVarietyTheory.Definitions.GaloisGeometry.NormalFam
+public import Development.AbelianVarietyTheory.Counterexamples.RotationExamples.OfBeforeProjector
+public import Development.AbelianVarietyTheory.Definitions.Divisors.MarkAd
+import Development.AbelianVarietyTheory.Definitions.ThetaValues.IoOverLeftUnique
+import Development.AbelianVarietyTheory.Proofs.CuspFormEvaluations.ActLevAndActBC
+public import Development.AbelianVarietyTheory.Proofs.CuspFormEvaluations.EmbeddingsDifferOnInteger
+import Development.AbelianVarietyTheory.Proofs.CuspFormEvaluations.SecBCAndCuspBC
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsUnitModulusConstantsEquivariantDictionaryStatement
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.OscillatorModelsCompatible
+import Development.AbelianVarietyTheory.Proofs.DivisorProofs.UnfoldingFrameDeltaChange
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.VectorValuedLiftFieldChange
+import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsCoversOfHalves
+import Development.AbelianVarietyTheory.Proofs.FoundationProofs.IntValuationEqOfMem
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsCharField
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsGeometricHalfRealisationGeometricAction
-public import Development.AbelianVarietyTheory.Definitions.GaloisGeometry.NormalFam
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsUnitModulusConstantsEquivariantDictionaryStatement
-public import Development.AbelianVarietyTheory.Proofs.CuspFormEvaluations.EmbeddingsDifferOnInteger
+import Formalism.SharpRestriction.Divisibility.LiftErrorLocal
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.LinearAlgebra.FreeModule.IdealQuotient
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
 
 @[expose] public section
 
 set_option autoImplicit false
-set_option synthInstance.maxHeartbeats 200000
+
 
 noncomputable section
 
@@ -56,7 +94,6 @@ variable
   (hw₃ : VsV D i c₃.F) (u : J → c₃.F) (h : ∀ j, (src j).Cl' () → GA D (Vc D i))
   (v₀ : (R.MW i (sg0 D A)).Vec)
 
-set_option maxHeartbeats 1000000 in
 theorem pins_merge
     (hR : R.IsModels)
     {κ : WeightFamilies.Wt D ((i : ℕ) + 1)} {ι x₀}
@@ -127,7 +164,6 @@ variable
   {R : RealDat D A T.Q.c.F} {i : Fin D.R.m}
   {κ : WeightFamilies.Wt D ((i : ℕ) + 1)} {v₀ : (R.MW i (sg0 D A)).Vec}
 
-set_option maxHeartbeats 1600000 in
 theorem exists_extension
     [Finite T0]
     (hR : R.IsModels)
@@ -288,7 +324,6 @@ theorem isRat_act
       O.phi cc (f k : C.R ((i : ℕ) + 1)) (x * hk.choose))) * e3
   · exact IsRat.zero O κ cc
 
-set_option maxHeartbeats 1000000 in
 theorem phRat_of_before
     (hE : O.EquivAt κ cc)
     {chi : G →* D.what₂.LLˣ} (hχ : ChiIs R i chi)
@@ -323,7 +358,6 @@ variable
   {R : RealDat D A T.Q.c.F} {κ : ∀ i : Fin D.R.m, WeightFamilies.Wt D ((i : ℕ) + 1)}
   {v₀ : ∀ (i : Fin D.R.m) (σ : D.what₂.LL →+* ℂ), (R.MW i σ).Vec} {i : Fin D.R.m}
 
-set_option maxHeartbeats 1000000 in
 theorem oneMapOf_of_serOf
     (hR : PreChar R) (hT : TieIn T R κ v₀)
     {O : OMDat T.toCore R i Unit (fun _ => A.μ0)}
@@ -388,7 +422,6 @@ theorem oneMapOf_of_serOf
       fun j => rfl
     exact this.trans (GlobalTheory.PhRatCommon.sum_shape e1 (fun j => hb (as j)) e2)
 
-set_option maxHeartbeats 1000000 in
 theorem exists_common
     [Finite T0]
     (hR : PreChar R) (hT : TieIn T R κ v₀)
@@ -584,7 +617,6 @@ variable
   {R : RealDat D A T.Q.c.F} {κ : ∀ i : Fin D.R.m, WeightFamilies.Wt D ((i : ℕ) + 1)}
   {v₀ : ∀ (i : Fin D.R.m) (σ : D.what₂.LL →+* ℂ), (R.MW i σ).Vec}
 
-set_option maxHeartbeats 1600000 in
 theorem exists_core (hR : PreChar R) (hT : TieIn T R κ v₀)
     : ∃ F : Face D A, GlobalTheory.Hk3.Core (topR T R κ v₀) F := by
   have h := Half.preChar_updFW R (nTop T κ) (fun i => formsN T R κ v₀ i (nTop T κ i)) hR
@@ -605,7 +637,6 @@ theorem exists_core (hR : PreChar R) (hT : TieIn T R κ v₀)
     h.thP
   ⟩
 
-set_option maxHeartbeats 1600000 in
 theorem exists_serOf
     (hR : PreChar R) (hT : TieIn T R κ v₀) (hio : IoExt R)
     (i : Fin D.R.m) (Tp : Type) (tup : Tp → T0) (M : OMDat T.toCore R i Tp tup)
@@ -650,7 +681,6 @@ open NumberField IsDedekindDomain MeasureTheory Formalism.BasicNotions Formalism
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-set_option maxHeartbeats 1600000 in
 theorem exists_const_oneMapOf_all
     : ∀ (D : D7) (G : Type) [Group G] [Fintype G] (Pl0 T0 : Type)
         (A : FamIn D.what₂.LL G Pl0 T0 D.R.m) (T : CoreJ D) [Algebra T.Q.c.F D.what₂.LL]

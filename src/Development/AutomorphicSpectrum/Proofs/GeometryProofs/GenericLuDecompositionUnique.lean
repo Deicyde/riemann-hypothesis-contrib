@@ -1,6 +1,59 @@
 module
 
-public import Mathlib
+public import Mathlib.LinearAlgebra.Matrix.Determinant.Basic
+public import Mathlib.RingTheory.AlgebraicIndependent.Defs
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.MvPolynomial.IrreducibleQuadratic
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+public import Mathlib.FieldTheory.IntermediateField.Adjoin.Defs
+public import Mathlib.LinearAlgebra.Matrix.ToLinearEquiv
+public import Mathlib.RingTheory.AlgebraicIndependent.AlgebraicClosure
 
 @[expose] public section
 
@@ -8,59 +61,50 @@ open Matrix
 
 namespace GlobalTheory.CompanionTheory.GenericLU
 
-theorem affine_form_ne_zero
-    {K L : Type} [Field K] [Field L] [Algebra K L]
-    {n : ℕ}
-    (a : K) (b : Fin n → K)
-    (x : Fin n → L) (hx : AlgebraicIndependent K x)
-    (hab : a ≠ 0 ∨ ∃ j, b j ≠ 0)
-    : algebraMap K L a + ∑ j, algebraMap K L (b j) * x j ≠ 0 := by
+theorem affine_form_ne_zero {K L : Type} [Field K] [Field L] [Algebra K L] {n : ℕ}
+    (a : K) (b : Fin n → K) (x : Fin n → L) (hx : AlgebraicIndependent K x)
+    (hab : a ≠ 0 ∨ ∃ j, b j ≠ 0) :
+    algebraMap K L a + ∑ j, algebraMap K L (b j) * x j ≠ 0 := by
   classical
   intro h
-  let P : MvPolynomial (Fin n) K := MvPolynomial.C a + ∑ j, MvPolynomial.C (b j) * MvPolynomial.X j
+  let P : MvPolynomial (Fin n) K :=
+    MvPolynomial.C a + ∑ j, MvPolynomial.C (b j) * MvPolynomial.X j
   have hP : MvPolynomial.aeval x P = 0 := by
-    set_option synthInstance.maxHeartbeats 100000 in
-    simpa [P, map_add (f := _), map_sum, map_mul, MvPolynomial.aeval_C, MvPolynomial.aeval_X] using
-      h
+
+    simpa [P, map_add (f := _), map_sum, map_mul, MvPolynomial.aeval_C, MvPolynomial.aeval_X] using h
   have hP0 : P = 0 := by
-    have :=
-      (injective_iff_map_eq_zero (MvPolynomial.aeval x : MvPolynomial (Fin n) K →ₐ[K] L)).mp hx
+    have := (injective_iff_map_eq_zero (MvPolynomial.aeval x : MvPolynomial (Fin n) K →ₐ[K] L)).mp hx
     exact this P hP
   rcases hab with ha | ⟨j, hj⟩
   · apply ha
     have := congrArg (AddMonoidAlgebra.coeff · 0) hP0
     simpa [P, MvPolynomial.coeff_add, MvPolynomial.coeff_sum, MvPolynomial.coeff_C_mul,
-        MvPolynomial.coeff_C, MvPolynomial.coeff_X']
-      using this
+      MvPolynomial.coeff_C, MvPolynomial.coeff_X'] using this
   · apply hj
     have := congrArg (AddMonoidAlgebra.coeff · (Finsupp.single j 1)) hP0
     have hne : (0 : Fin n →₀ ℕ) ≠ Finsupp.single j 1 :=
       (Finsupp.single_ne_zero.mpr one_ne_zero).symm
     simpa [P, hne, MvPolynomial.coeff_add, MvPolynomial.coeff_sum, MvPolynomial.coeff_C_mul,
-        MvPolynomial.coeff_C, MvPolynomial.coeff_X', Finsupp.single_left_inj,
-        Finsupp.single_eq_single_iff]
-      using this
+      MvPolynomial.coeff_C, MvPolynomial.coeff_X', Finsupp.single_left_inj, Finsupp.single_eq_single_iff] using this
 
-theorem schur_det_ne_zero
-    {F : Type} [Field F]
-    {n : ℕ} (A : Matrix (Fin (n + 1)) (Fin (n + 1)) F) (x : Fin n → F) (hA : A.det ≠ 0)
-    (q : Fin (n + 1) → F) (hq : ∀ i, q i = A i 0 + ∑ k, A i k.succ * x k) (h0 : q 0 ≠ 0)
-    : (Matrix.of fun i j : Fin n => A i.succ j.succ - q i.succ / q 0 * A 0 j.succ).det ≠ 0 := by
+theorem schur_det_ne_zero {F : Type} [Field F] {n : ℕ} (A : Matrix (Fin (n + 1)) (Fin (n + 1)) F)
+    (x : Fin n → F) (hA : A.det ≠ 0) (q : Fin (n + 1) → F)
+    (hq : ∀ i, q i = A i 0 + ∑ k, A i k.succ * x k) (h0 : q 0 ≠ 0) :
+    (Matrix.of fun i j : Fin n => A i.succ j.succ - q i.succ / q 0 * A 0 j.succ).det ≠ 0 := by
   intro hdet
   obtain ⟨y, hy, hSy⟩ := Matrix.exists_mulVec_eq_zero_iff.mpr hdet
   set t : F := -(∑ j, A 0 j.succ * y j) / q 0 with ht
   apply hA
-  refine Matrix.exists_mulVec_eq_zero_iff.mp ⟨Fin.cons t (fun k => y k + t * x k), ?_, ?_⟩
+  refine Matrix.exists_mulVec_eq_zero_iff.mp
+    ⟨Fin.cons t (fun k => y k + t * x k), ?_, ?_⟩
   · intro hz
     have h1 : t = 0 := by simpa using congrFun hz 0
     apply hy
     funext k
     have := congrFun hz k.succ
     simpa [h1] using this
-  · have key
-        : ∀ i,
-          (A *ᵥ (Fin.cons t (fun k => y k + t * x k) : Fin (n + 1) → F)) i
-            = t * q i + ∑ k, A i k.succ * y k := by
+  · have key : ∀ i, (A *ᵥ (Fin.cons t (fun k => y k + t * x k) : Fin (n + 1) → F)) i
+        = t * q i + ∑ k, A i k.succ * y k := by
       intro i
       simp only [Matrix.mulVec, dotProduct, Fin.sum_univ_succ, Fin.cons_zero, Fin.cons_succ, hq,
         mul_add, Finset.sum_add_distrib, Finset.mul_sum]
@@ -75,30 +119,24 @@ theorem schur_det_ne_zero
       ring
     · have h := congrFun hSy i
       simp only [Matrix.mulVec, dotProduct, Matrix.of_apply, Pi.zero_apply, sub_mul,
-          Finset.sum_sub_distrib, mul_assoc, ← Finset.mul_sum]
-        at h
+        Finset.sum_sub_distrib, mul_assoc, ← Finset.mul_sum] at h
       simp only [ht, Pi.zero_apply]
       field_simp at h ⊢
       linear_combination h
 
-theorem lu_step
-    {L : Type} [Field L]
-    {n : ℕ}
-    (M : Matrix (Fin (n + 1)) (Fin (n + 1)) L) (hM : M 0 0 ≠ 0) (v' w' : Matrix (Fin n) (Fin n) L)
+theorem lu_step {L : Type} [Field L] {n : ℕ} (M : Matrix (Fin (n + 1)) (Fin (n + 1)) L)
+    (hM : M 0 0 ≠ 0) (v' w' : Matrix (Fin n) (Fin n) L)
     (hsch : ∀ i j, M i.succ j.succ - M i.succ 0 / M 0 0 * M 0 j.succ = (v' * w') i j)
-    (h1 : ∀ k, v' k k = 1) (h2 : ∀ l k, l < k → v' l k = 0) (h3 : ∀ l k, k < l → w' l k = 0)
-    (h4 : ∀ k, w' k k ≠ 0)
-    : ∃ v w : Matrix (Fin (n + 1)) (Fin (n + 1)) L,
-      M = v * w ∧ (∀ k, v k k = 1) ∧ (∀ l k, l < k → v l k = 0) ∧ (∀ l k, k < l → w l k = 0)
-        ∧ ∀ k, w k k ≠ 0 := by
+    (h1 : ∀ k, v' k k = 1) (h2 : ∀ l k, l < k → v' l k = 0)
+    (h3 : ∀ l k, k < l → w' l k = 0) (h4 : ∀ k, w' k k ≠ 0) :
+    ∃ v w : Matrix (Fin (n + 1)) (Fin (n + 1)) L, M = v * w ∧ (∀ k, v k k = 1) ∧
+      (∀ l k, l < k → v l k = 0) ∧ (∀ l k, k < l → w l k = 0) ∧ ∀ k, w k k ≠ 0 := by
   let v : Matrix (Fin (n + 1)) (Fin (n + 1)) L := fun i j =>
     Fin.cases (Fin.cases 1 (fun _ => 0) j)
-      (fun i' => Fin.cases (M i'.succ 0 / M 0 0) (fun j' => v' i' j') j)
-      i
+      (fun i' => Fin.cases (M i'.succ 0 / M 0 0) (fun j' => v' i' j') j) i
   let w : Matrix (Fin (n + 1)) (Fin (n + 1)) L := fun i j =>
     Fin.cases (Fin.cases (M 0 0) (fun j' => M 0 j'.succ) j)
-      (fun i' => Fin.cases 0 (fun j' => w' i' j') j)
-      i
+      (fun i' => Fin.cases 0 (fun j' => w' i' j') j) i
   have v00 : v 0 0 = 1 := rfl
   have v0s : ∀ j, v 0 (Fin.succ j) = 0 := fun _ => rfl
   have vs0 : ∀ i, v (Fin.succ i) 0 = M i.succ 0 / M 0 0 := fun _ => rfl
@@ -141,46 +179,38 @@ theorem lu_step
     · rw [w00]; exact hM
     · rw [wss]; exact h4 k
 
-theorem generic_lu_decomposition_exists (n : ℕ)
-    : ∀ (K L : Type) [Field K] [Field L] [Algebra K L] (A : Matrix (Fin n) (Fin n) K)
-        (u : Matrix (Fin n) (Fin n) L),
-      A.det ≠ 0 → (∀ k, u k k = 1) → (∀ l k, l < k → u l k = 0)
-        → AlgebraicIndependent K (fun q : {lk : Fin n × Fin n // lk.2 < lk.1} => u q.1.1 q.1.2)
-        → ∃ v w : Matrix (Fin n) (Fin n) L,
-          A.map (algebraMap K L) * u = v * w ∧ (∀ k, v k k = 1) ∧ (∀ l k, l < k → v l k = 0)
-            ∧ (∀ l k, k < l → w l k = 0) ∧ ∀ k, w k k ≠ 0 := by
+theorem generic_lu_decomposition_exists (n : ℕ) : ∀ (K L : Type) [Field K] [Field L] [Algebra K L]
+    (A : Matrix (Fin n) (Fin n) K) (u : Matrix (Fin n) (Fin n) L), A.det ≠ 0 →
+    (∀ k, u k k = 1) → (∀ l k, l < k → u l k = 0) →
+    AlgebraicIndependent K (fun q : {lk : Fin n × Fin n // lk.2 < lk.1} => u q.1.1 q.1.2) →
+    ∃ v w : Matrix (Fin n) (Fin n) L, A.map (algebraMap K L) * u = v * w ∧ (∀ k, v k k = 1) ∧
+      (∀ l k, l < k → v l k = 0) ∧ (∀ l k, k < l → w l k = 0) ∧ ∀ k, w k k ≠ 0 := by
   induction n with
   | zero =>
     intro K L _ _ _ A u _ _ _ _
-    exact ⟨
-      0,
-      0,
-      Subsingleton.elim _ _,
-      fun k => k.elim0,
-      fun l => l.elim0,
-      fun l => l.elim0,
-      fun k => k.elim0
-    ⟩
+    exact ⟨0, 0, Subsingleton.elim _ _, fun k => k.elim0, fun l => l.elim0, fun l => l.elim0,
+      fun k => k.elim0⟩
   | succ n ih =>
     intro K L _ _ _ A u hA hdiag hup hind
     let x : Fin n → L := fun i => u i.succ 0
     let u' : Matrix (Fin n) (Fin n) L := fun i j => u i.succ j.succ
     let y : {lk : Fin n × Fin n // lk.2 < lk.1} → L := fun q => u' q.1.1 q.1.2
-    let idx
-        : {lk : Fin n × Fin n // lk.2 < lk.1} ⊕ Fin n
-          → {lk : Fin (n + 1) × Fin (n + 1) // lk.2 < lk.1} :=
-      Sum.elim
-        (fun q => ⟨(q.1.1.succ, q.1.2.succ), Fin.succ_lt_succ_iff.mpr q.2⟩)
+    let idx : {lk : Fin n × Fin n // lk.2 < lk.1} ⊕ Fin n →
+        {lk : Fin (n + 1) × Fin (n + 1) // lk.2 < lk.1} :=
+      Sum.elim (fun q => ⟨(q.1.1.succ, q.1.2.succ), Fin.succ_lt_succ_iff.mpr q.2⟩)
         (fun i => ⟨(i.succ, 0), Fin.succ_pos i⟩)
     have hidx : Function.Injective idx := by
       rintro (s | i) (s' | i') hh
-      · have e : (s.1.1.succ, s.1.2.succ) = (s'.1.1.succ, s'.1.2.succ) := congrArg Subtype.val hh
-        exact congrArg Sum.inl
-          (Subtype.ext (Prod.ext (Fin.succ_injective _ (congrArg Prod.fst e))
-            (Fin.succ_injective _ (congrArg Prod.snd e))))
-      · have e : (s.1.1.succ, s.1.2.succ) = (i'.succ, (0 : Fin (n + 1))) := congrArg Subtype.val hh
+      · have e : (s.1.1.succ, s.1.2.succ) = (s'.1.1.succ, s'.1.2.succ) :=
+          congrArg Subtype.val hh
+        exact congrArg Sum.inl (Subtype.ext (Prod.ext
+          (Fin.succ_injective _ (congrArg Prod.fst e))
+          (Fin.succ_injective _ (congrArg Prod.snd e))))
+      · have e : (s.1.1.succ, s.1.2.succ) = (i'.succ, (0 : Fin (n + 1))) :=
+          congrArg Subtype.val hh
         exact absurd (congrArg Prod.snd e) (Fin.succ_ne_zero _)
-      · have e : (i.succ, (0 : Fin (n + 1))) = (s'.1.1.succ, s'.1.2.succ) := congrArg Subtype.val hh
+      · have e : (i.succ, (0 : Fin (n + 1))) = (s'.1.1.succ, s'.1.2.succ) :=
+          congrArg Subtype.val hh
         exact absurd (congrArg Prod.snd e).symm (Fin.succ_ne_zero _)
       · have e : (i.succ, (0 : Fin (n + 1))) = (i'.succ, (0 : Fin (n + 1))) :=
           congrArg Subtype.val hh
@@ -208,9 +238,9 @@ theorem generic_lu_decomposition_exists (n : ℕ)
     have hxs : ∀ k, algebraMap K₁ L (xs k) = x k := fun _ => rfl
     have hM0 : ∀ i, M i 0 = algebraMap K₁ L (q i) := by
       intro i
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [M, q, Matrix.mul_apply, Fin.sum_univ_succ, Matrix.map_apply, hdiag,
-          map_add (f := _), map_sum, map_mul, hcoe, hxs, mul_one]
+
+      simp only [M, q, Matrix.mul_apply, Fin.sum_univ_succ, Matrix.map_apply, hdiag, map_add (f := _),
+      map_sum, map_mul, hcoe, hxs, mul_one]
       rfl
     have hMs : ∀ i j, M i j.succ = ∑ k, algebraMap K L (A i k.succ) * u' k j := by
       intro i j
@@ -237,11 +267,8 @@ theorem generic_lu_decomposition_exists (n : ℕ)
     let S : Matrix (Fin n) (Fin n) K₁ :=
       Matrix.of fun i j : Fin n => A₁ i.succ j.succ - q i.succ / q 0 * A₁ 0 j.succ
     have hS : S.det ≠ 0 := schur_det_ne_zero A₁ xs hA₁ q (fun _ => rfl) hq0
-    obtain ⟨v', w', hvw, h1, h2, h3, h4⟩ :=
-      ih K₁ L S u' hS
-        (fun k => hdiag k.succ)
-        (fun l k h => hup l.succ k.succ (Fin.succ_lt_succ_iff.mpr h))
-        hy'
+    obtain ⟨v', w', hvw, h1, h2, h3, h4⟩ := ih K₁ L S u' hS (fun k => hdiag k.succ)
+      (fun l k h => hup l.succ k.succ (Fin.succ_lt_succ_iff.mpr h)) hy'
     refine lu_step M hp v' w' ?_ h1 h2 h3 h4
     intro i j
     rw [← hvw, Matrix.mul_apply, hMs, hMs, hM0, hM0, Finset.mul_sum, ← Finset.sum_sub_distrib]
@@ -249,14 +276,12 @@ theorem generic_lu_decomposition_exists (n : ℕ)
     simp only [S, Matrix.map_apply, Matrix.of_apply, map_sub, map_mul, map_div₀, hcoe]
     ring
 
-theorem generic_lu
-    : ∀ (K L : Type) [Field K] [Field L] [Algebra K L] (n : ℕ) (A : Matrix (Fin n) (Fin n) K)
-        (u : Matrix (Fin n) (Fin n) L),
-      A.det ≠ 0 → (∀ k, u k k = 1) → (∀ l k, l < k → u l k = 0)
-        → AlgebraicIndependent K (fun q : {lk : Fin n × Fin n // lk.2 < lk.1} => u q.1.1 q.1.2)
-        → ∃ v w : Matrix (Fin n) (Fin n) L,
-          A.map (algebraMap K L) * u = v * w ∧ (∀ k, v k k = 1) ∧ (∀ l k, l < k → v l k = 0)
-            ∧ (∀ l k, k < l → w l k = 0) ∧ ∀ k, w k k ≠ 0 := by
+theorem generic_lu : ∀ (K L : Type) [Field K] [Field L] [Algebra K L] (n : ℕ)
+    (A : Matrix (Fin n) (Fin n) K) (u : Matrix (Fin n) (Fin n) L), A.det ≠ 0 →
+    (∀ k, u k k = 1) → (∀ l k, l < k → u l k = 0) →
+    AlgebraicIndependent K (fun q : {lk : Fin n × Fin n // lk.2 < lk.1} => u q.1.1 q.1.2) →
+    ∃ v w : Matrix (Fin n) (Fin n) L, A.map (algebraMap K L) * u = v * w ∧ (∀ k, v k k = 1) ∧
+      (∀ l k, l < k → v l k = 0) ∧ (∀ l k, k < l → w l k = 0) ∧ ∀ k, w k k ≠ 0 := by
   intro K L _ _ _ n
   exact generic_lu_decomposition_exists n K L
 

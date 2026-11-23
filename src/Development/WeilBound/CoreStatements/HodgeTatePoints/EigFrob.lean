@@ -1,11 +1,55 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Definitions.CommutativeAlgebra.IsSplitGaussChars
-public import Development.AutomorphicSpectrum.Definitions.CommutativeAlgebra.GapCondExample
+public import Mathlib.RingTheory.Coalgebra.IsFrobenius
+public import Mathlib.RingTheory.HopfAlgebra.Basic
 public import Development.AutomorphicSpectrum.Proofs.AlgebraProofs.DualLatticeDegreeNegStatement
 public import Development.AutomorphicSpectrum.Proofs.AlgebraProofs.EigenProjectorsSplitActionStatement
 public import Development.AutomorphicSpectrum.Proofs.AlgebraProofs.SubAndQuotientBundlesStatement
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.LinearAlgebra.Matrix.FiniteDimensional
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -13,16 +57,11 @@ open GlobalTheory.CompanionTheory.Ar.Crv
 
 namespace PositivityTheory.HtPt.Ci
 
-theorem mem_eig
-    {K O V : Type} [Field K] [AddCommGroup V] [Module K V] {ρ : O → V →ₗ[K] V} {χ : O → K} {x : V}
-    : x ∈ eig ρ χ ↔ ∀ a, ρ a x = χ a • x := by
+theorem mem_eig {K O V : Type} [Field K] [AddCommGroup V] [Module K V] {ρ : O → V →ₗ[K] V} {χ : O → K} {x : V} :
+    x ∈ eig ρ χ ↔ ∀ a, ρ a x = χ a • x := by
   simp [eig, sub_eq_zero]
 
-theorem eig_frob
-    : ∀ (K : Type) [Field K] (p : ℕ) [Fact p.Prime] [CharP K p] (d : ℕ) (O : Type)
-        (ρ : O → Matrix (Fin d) (Fin d) K) (χ : O → K),
-      eig (fun a => Matrix.toLin' ((ρ a).map (· ^ p))) (fun a => χ a ^ p)
-        = frobSub p (eig (fun a => Matrix.toLin' (ρ a)) χ) := by
+theorem eig_frob : ∀ (K : Type) [Field K] (p : ℕ) [Fact p.Prime] [CharP K p] (d : ℕ) (O : Type) (ρ : O → Matrix (Fin d) (Fin d) K) (χ : O → K), eig (fun a => Matrix.toLin' ((ρ a).map (· ^ p))) (fun a => χ a ^ p) = frobSub p (eig (fun a => Matrix.toLin' (ρ a)) χ) := by
   intro K _ p _ _ d O ρ χ
   apply le_antisymm
   · classical
@@ -38,15 +77,14 @@ theorem eig_frob
       rfl
     have hsum : ∀ ι (f : Fin d → K), (β.repr (∑ j, f j) ι : K) = ∑ j, (β.repr (f j) ι : K) := by
       intro ι f
-      set_option synthInstance.maxHeartbeats 100000 in
+
       simp [map_sum, Finsupp.finsetSum_apply]
     let z : _ → Fin d → K := fun ι j => (β.repr (y j) ι : K)
     have hz : ∀ ι a r, ∑ j, ρ a r j ^ p * z ι j = χ a ^ p * z ι r := by
       intro ι a r
       have h1 := congrFun (hy a) r
       simp only [Matrix.toLin'_apply, Matrix.mulVec, dotProduct, Matrix.map_apply, Pi.smul_apply,
-          smul_eq_mul]
-        at h1
+        smul_eq_mul] at h1
       have h2 := congrArg (fun u => (β.repr u ι : K)) h1
       simp only [hsum, hrepr] at h2
       exact h2
@@ -71,10 +109,8 @@ theorem eig_frob
       rw [Finset.sum_apply]
       conv_lhs => rw [← β.linearCombination_repr (y j)]
       rw [Finsupp.linearCombination_apply,
-        Finsupp.sum_of_support_subset _
-          (Finset.subset_biUnion_of_mem (fun j => (β.repr (y j)).support) (Finset.mem_univ j))
-          (fun i (a : K0) => a • β i)
-          (fun i _ => zero_smul _ _)]
+        Finsupp.sum_of_support_subset _ (Finset.subset_biUnion_of_mem
+          (fun j => (β.repr (y j)).support) (Finset.mem_univ j)) (fun i (a : K0) => a • β i) (fun i _ => zero_smul _ _)]
       refine Finset.sum_congr rfl fun ι _ => ?_
       show (β.repr (y j) ι : K) * β ι = β ι * x ι j ^ p
       rw [hx ι j, mul_comm]
@@ -90,27 +126,14 @@ theorem eig_frob
     simp only [Matrix.toLin'_apply] at hxa ⊢
     funext r
     have h1 := congrFun hxa r
-    simp only [Matrix.mulVec, dotProduct, Pi.smul_apply, smul_eq_mul, frobVec, Matrix.map_apply]
-      at h1 ⊢
+    simp only [Matrix.mulVec, dotProduct, Pi.smul_apply, smul_eq_mul, frobVec, Matrix.map_apply] at h1 ⊢
     rw [← mul_pow, ← h1, sum_pow_char]
     simp only [mul_pow]
 
-theorem eig_dual
-    : ∀ (K : Type) [Field K] (C : ACurve K) (d : ℕ) (L : C.I → AddSubgroup (Fin d → K))
-        (O k S : Type) [CommRing O] [Field k] [Algebra k K] [Fintype S] [DecidableEq S]
-        (χ : S → (O →+* k)),
-      IsSplit χ → (∀ i (c : k), C.v i (algebraMap k K c) ≤ 1)
-        → ∀ ρ : O →+* Matrix (Fin d) (Fin d) K,
-          IsBun C L → (∀ a, IsHom C L L (Matrix.toLin' (ρ a)))
-            → ∀ s,
-              subDeg C (dotDual C L)
-                  (eig (fun a => Matrix.toLin' (ρ a).transpose) (fun a => algebraMap k K (χ s a)))
-                = - subDeg C L
-                  (eig (fun a => Matrix.toLin' (ρ a)) (fun a => algebraMap k K (χ s a))) := by
+theorem eig_dual : ∀ (K : Type) [Field K] (C : ACurve K) (d : ℕ) (L : C.I → AddSubgroup (Fin d → K)) (O k S : Type) [CommRing O] [Field k] [Algebra k K] [Fintype S] [DecidableEq S] (χ : S → (O →+* k)), IsSplit χ → (∀ i (c : k), C.v i (algebraMap k K c) ≤ 1) → ∀ ρ : O →+* Matrix (Fin d) (Fin d) K, IsBun C L → (∀ a, IsHom C L L (Matrix.toLin' (ρ a))) → ∀ s, subDeg C (dotDual C L) (eig (fun a => Matrix.toLin' (ρ a).transpose) (fun a => algebraMap k K (χ s a))) = - subDeg C L (eig (fun a => Matrix.toLin' (ρ a)) (fun a => algebraMap k K (χ s a))) := by
   intro K _ C d L O k S _ _ _ _ _ χ hχ hv ρ hL hρ s
   let ρL : O →+* Module.End K (Fin d → K) :=
-    (Matrix.toLinAlgEquiv'.toRingEquiv
-      : Matrix (Fin d) (Fin d) K ≃+* Module.End K (Fin d → K)).toRingHom.comp ρ
+    (Matrix.toLinAlgEquiv'.toRingEquiv : Matrix (Fin d) (Fin d) K ≃+* Module.End K (Fin d → K)).toRingHom.comp ρ
   obtain ⟨e, he_hom, he_mem, he_id, -, he_comb⟩ :=
     GlobalTheory.T.eigen_projectors_split_action K C (Fin d → K) L O k S χ hχ hv ρL hL hρ
   obtain ⟨m, c, b, hc, hes⟩ := he_comb s
@@ -118,14 +141,13 @@ theorem eig_dual
   set W' := eig (fun a => Matrix.toLin' (ρ a).transpose) (fun a => algebraMap k K (χ s a)) with hW'
   set E : Matrix (Fin d) (Fin d) K := ∑ j, algebraMap k K (c j) • ρ (b j) with hE
   have hlin : Matrix.toLin' E = ∑ j, algebraMap k K (c j) • Matrix.toLin' (ρ (b j)) := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hE, map_sum]
+
+    rw [hE, map_sum]
     simp only [map_smul]
-  have hlinT
-      : Matrix.toLin' E.transpose
-        = ∑ j, algebraMap k K (c j) • Matrix.toLin' (ρ (b j)).transpose := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hE, Matrix.transpose_sum, map_sum]
+  have hlinT : Matrix.toLin' E.transpose =
+      ∑ j, algebraMap k K (c j) • Matrix.toLin' (ρ (b j)).transpose := by
+
+    rw [hE, Matrix.transpose_sum, map_sum]
     simp only [Matrix.transpose_smul, map_smul]
   have heE : ∀ x, e s x = E.mulVec x := by
     intro x
@@ -138,9 +160,9 @@ theorem eig_dual
     intro y hy
     simp only [hW', mem_eig, Matrix.toLin'_apply] at hy
     rw [← Matrix.toLin'_apply, hlinT, LinearMap.sum_apply]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [LinearMap.smul_apply, Matrix.toLin'_apply, hy, smul_smul, ← map_mul,
-        ← Finset.sum_smul, ← map_sum]
+
+    simp only [LinearMap.smul_apply, Matrix.toLin'_apply, hy, smul_smul, ← map_mul,
+    ← Finset.sum_smul, ← map_sum]
     rw [hc s, if_pos rfl, map_one, one_smul]
   have hETW : ∀ z, E.transpose.mulVec z ∈ W' := by
     intro z
@@ -196,9 +218,7 @@ theorem eig_dual
   have hfr : Module.finrank K W = Module.finrank K (W' →ₗ[K] K) := by omega
   have hbij : Function.Bijective B :=
     ⟨hinj, (LinearMap.injective_iff_surjective_of_finrank_eq_finrank hfr).1 hinj⟩
-  obtain ⟨-, hdeg, -⟩ :=
-    GlobalTheory.T.dual_lattice_degree_neg K C W W' (sub C L W) B
-      (GlobalTheory.T.sub_and_quotient_bundles K C _ L W hL).1 hbij
+  obtain ⟨-, hdeg, -⟩ := GlobalTheory.T.dual_lattice_degree_neg K C W W' (sub C L W) B (GlobalTheory.T.sub_and_quotient_bundles K C _ L W hL).1 hbij
   have hident : dualLat C (sub C L W) B = sub C (dotDual C L) W' := by
     funext i
     ext y

@@ -1,13 +1,49 @@
 module
 
 public import Development.AutomorphicArithmetic.Foundations.Convolution.PowerSumTraces.CuspidalMultiplicityOneTotallyComplex
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Lemma
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
-open MeasureTheory NumberField GroundTheory.Automorphic GroundTheory.Automorphic.Reduction
-  GroundTheory.Automorphic.RightCosetSpace
-open GroundTheory.Automorphic.AutomorphicForm GroundTheory.Automorphic.CuspidalSpectrum
-  UpperTheory.ConvolutionTheory.C
+open MeasureTheory NumberField GroundTheory.Automorphic GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.RightCosetSpace
+open GroundTheory.Automorphic.AutomorphicForm GroundTheory.Automorphic.CuspidalSpectrum UpperTheory.ConvolutionTheory.C
 
 private lemma prj_idem {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
     (V : Submodule ℂ H) : prj V ∘L prj V = prj V := by
@@ -35,25 +71,20 @@ private lemma prj_comp_le' {H : Type*} [NormedAddCommGroup H] [InnerProductSpace
   have := congrArg ContinuousLinearMap.adjoint (prj_comp_le h)
   simpa [ContinuousLinearMap.adjoint_comp, prj_adj] using this
 
-theorem UpperTheory.trOn_sub_sum_eq_trace_comp_compression
-    : ∀ (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
-        (W : Submodule ℂ H) (E : ℝ → Submodule ℂ H) (S : Finset ℝ) (a : ℝ → ℂ) (F T : H →L[ℂ] H),
-      (∀ x, E x ≤ W) → IsTraceClass (prj W ∘L T ∘L prj W)
-        → trOn W (F ∘L prj W ∘L T) - ∑ x ∈ S, a x * trOn (E x) T
-          = trace ((prj W ∘L F ∘L prj W - ∑ x ∈ S, a x • prj (E x)) ∘L (prj W ∘L T ∘L prj W)) := by
+theorem UpperTheory.trOn_sub_sum_eq_trace_comp_compression :
+    ∀ (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H] (W : Submodule ℂ H) (E : ℝ → Submodule ℂ H) (S : Finset ℝ) (a : ℝ → ℂ) (F T : H →L[ℂ] H), (∀ x, E x ≤ W) → IsTraceClass (prj W ∘L T ∘L prj W) → trOn W (F ∘L prj W ∘L T) - ∑ x ∈ S, a x * trOn (E x) T = trace ((prj W ∘L F ∘L prj W - ∑ x ∈ S, a x • prj (E x)) ∘L (prj W ∘L T ∘L prj W)) := by
   intro H _ _ _ W E S a F T hE hT
   set P := prj W with hPdef
   set T0 := P ∘L T ∘L P with hT0
   have hPP : P ∘L P = P := prj_idem W
-  let L : (H →L[ℂ] H) →ₗ[ℂ] ℂ := {
-    toFun := fun C => trace (C ∘L T0)
-    map_add' := fun C D => by
-      rw [ContinuousLinearMap.add_comp]
-      exact trace_add (hT.comp_left C) (hT.comp_left D)
-    map_smul' := fun c C => by
-      rw [ContinuousLinearMap.smul_comp]
-      exact trace_smul c (hT.comp_left C)
-  }
+  let L : (H →L[ℂ] H) →ₗ[ℂ] ℂ :=
+    { toFun := fun C => trace (C ∘L T0)
+      map_add' := fun C D => by
+        rw [ContinuousLinearMap.add_comp]
+        exact trace_add (hT.comp_left C) (hT.comp_left D)
+      map_smul' := fun c C => by
+        rw [ContinuousLinearMap.smul_comp]
+        exact trace_smul c (hT.comp_left C) }
   have hL : ∀ C, L C = trace (C ∘L T0) := fun _ => rfl
   have h1 : trOn W (F ∘L P ∘L T) = L (P ∘L F ∘L P) := by
     rw [hL, trOn]
@@ -69,7 +100,8 @@ theorem UpperTheory.trOn_sub_sum_eq_trace_comp_compression
     have hPQ : P ∘L Q = Q := prj_comp_le (hE x)
     have hQQ : Q ∘L Q = Q := prj_idem (E x)
     have hc := trace_comp_comm (hT.comp_left Q) Q
-    have e1 : Q ∘L (Q ∘L T0) = Q ∘L T0 := by rw [← ContinuousLinearMap.comp_assoc, hQQ]
+    have e1 : Q ∘L (Q ∘L T0) = Q ∘L T0 := by
+      rw [← ContinuousLinearMap.comp_assoc, hQQ]
     have e2 : (Q ∘L T0) ∘L Q = Q ∘L T ∘L Q := by
       have : (Q ∘L T0) ∘L Q = (Q ∘L P) ∘L T ∘L (P ∘L Q) := by
         simp only [hT0, ContinuousLinearMap.comp_assoc]
@@ -78,10 +110,7 @@ theorem UpperTheory.trOn_sub_sum_eq_trace_comp_compression
     rw [hL, trOn, hc]
   rw [h1]
   simp only [h2]
-  have h3
-      : L (P ∘L F ∘L P - ∑ x ∈ S, a x • prj (E x))
-        = trace ((P ∘L F ∘L P - ∑ x ∈ S, a x • prj (E x)) ∘L T0) :=
-    rfl
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [← h3, map_sub, map_sum]
+  have h3 : L (P ∘L F ∘L P - ∑ x ∈ S, a x • prj (E x)) = trace ((P ∘L F ∘L P - ∑ x ∈ S, a x • prj (E x)) ∘L T0) := rfl
+
+  rw [← h3, map_sub, map_sum]
   simp only [map_smul, smul_eq_mul]

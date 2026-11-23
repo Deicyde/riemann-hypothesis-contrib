@@ -1,15 +1,48 @@
 module
 
-public import Mathlib
 public import Formalism.LocalToGlobal.Divisibility.DivisionCompatibleToSub2Indef2
-public import Formalism.LocalToGlobal.Divisibility.TiedLemmas
 public import Formalism.LocalToGlobal.Divisibility.LiftLatLemmas
-public import Formalism.LocalToGlobal.HilbertRowConditions.CenterIdempotentAction
-public import Formalism.LocalRingCardinality.DataBu
-public import Formalism.QuotientMetricDivisors.ClassSumDualLe
-public import Formalism.LocalRingCardinality.DataRows
-public import Formalism.HermitianLattices.StatementMaj
-public import Formalism.LocalToGlobal.Divisibility.GoodPartHermitianSpec
+import Formalism.LocalToGlobal.Divisibility.RowLatLemmas
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Formalism.LocalToGlobal.HilbertRowConditions.CenterIdempotentAction
 
 @[expose] public section
 
@@ -140,8 +173,8 @@ theorem semilinear_eq_sum_single
   have hx : x = ∑ i, x i • (Pi.single i 1 : Fin n → K) := by
     ext k; simp [Finset.sum_apply, Pi.single_apply]
   conv_lhs => rw [hx]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+
+  rw [map_sum]
   simp only [map_smulₛₗ]
 
 theorem isCxBasis_coord
@@ -279,8 +312,8 @@ private theorem v0_int_lemma_5
     have hgen : ∀ v ∈ M.gen, ∃ y, j y = v := hM.1
     choose! pre hpre using hgen
     have hjy : j (∑ v ∈ M.gen, (c v : K) • pre v) = x := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum, hc]
+
+      rw [map_sum, hc]
       refine Finset.sum_congr rfl fun v hv => ?_
       rw [map_smulₛₗ, hpre v hv]
     set y := ∑ v ∈ M.gen, (c v : K) • pre v with hy
@@ -353,8 +386,8 @@ private theorem jEE_injective'
     rw [injective_iff_map_eq_zero]
   intro y hy
   have hsum : y = ∑ i, X.RR.b.repr y i • X.RR.b i := (X.RR.b.sum_repr y).symm
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [hsum, map_sum] at hy
+
+  rw [hsum, map_sum] at hy
   simp only [map_smulₛₗ] at hy
   have h0 := Fintype.linearIndependent_iff.mp X.jEE_basis.1 _ hy
   rw [hsum]
@@ -433,8 +466,8 @@ private theorem le_span_lemma_9
       : eRR ((S.ι t).mulVec (((A.side P ψ Zs).Pq t).mulVec F))
         = ∑ u ∈ s', (c u : D.what₂.LL) • z u := by
     apply jEE_injective' X
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← hX.iota t F, hxs, map_sum, map_sum]
+
+    rw [← hX.iota t F, hxs, map_sum, map_sum]
     refine Finset.sum_congr rfl fun u hu => ?_
     rw [LinearMap.map_smul, map_smulₛₗ, hz u hu]
   have hsm : ∀ (a : 𝓞 D.what₂.LL) (v : X.RR.V), (a : D.what₂.LL) • v = a • v := fun a v => by

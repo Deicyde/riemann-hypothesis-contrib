@@ -1,6 +1,57 @@
 module
 
-public import Mathlib
+public import Mathlib.LinearAlgebra.Matrix.GeneralLinearGroup.Defs
+public import Mathlib.RingTheory.Valuation.ValuationSubring
+import Mathlib.Algebra.GroupWithZero.Submonoid.CancelMulZero
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.PicardGroup
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+public import Mathlib.LinearAlgebra.FreeModule.PID
 
 @[expose] public section
 
@@ -11,14 +62,12 @@ namespace MassDataIdxLatFree
 open scoped Matrix
 open Module
 
-variable
-  {K : Type} [Field K]
-  (O : ValuationSubring K) [IsPrincipalIdealRing O]
+variable {K : Type} [Field K] (O : ValuationSubring K) [IsPrincipalIdealRing O]
   {n : Type} [Fintype n] [DecidableEq n]
 
-theorem exists_gl
-    (M : Submodule O (n → K)) (hfg : M.FG) (hsp : Submodule.span K (M : Set (n → K)) = ⊤)
-    : ∃ P : GL n K, ∀ y, y ∈ M ↔ ∀ i, (((P⁻¹ : GL n K) : Matrix n n K) *ᵥ y) i ∈ O := by
+theorem exists_gl (M : Submodule O (n → K)) (hfg : M.FG)
+    (hsp : Submodule.span K (M : Set (n → K)) = ⊤) :
+    ∃ P : GL n K, ∀ y, y ∈ M ↔ ∀ i, (((P⁻¹ : GL n K) : Matrix n n K) *ᵥ y) i ∈ O := by
   classical
   haveI : Module.Finite O M := Module.Finite.iff_fg.mpr hfg
   haveI : Module.Free O M := Module.free_of_finite_type_torsion_free'
@@ -55,9 +104,9 @@ theorem exists_gl
       funext k
       simp [Finset.sum_apply, Pi.single_apply]
     conv_rhs => rw [hy]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_smul, Finsupp.coe_finsetSum, Finsupp.coe_smul, Finset.sum_apply,
-        Pi.smul_apply, smul_eq_mul, Matrix.mulVec, dotProduct, Qm]
+
+    simp only [map_sum, map_smul, Finsupp.coe_finsetSum, Finsupp.coe_smul, Finset.sum_apply, Pi.smul_apply,
+    smul_eq_mul, Matrix.mulVec, dotProduct, Qm]
     exact Finset.sum_congr rfl (fun j _ => mul_comm _ _)
   have hQP : Qm * Pm = 1 := by
     ext i k
@@ -93,7 +142,8 @@ theorem exists_gl
       simpa using this
     rw [← bK.sum_repr y]
     refine Submodule.sum_mem _ (fun j _ => ?_)
-    have h5 : bK.repr y j • bK j = (⟨bK.repr y j, hc' j⟩ : O) • (bM j : n → K) := by rw [hsmul, hbK]
+    have h5 : bK.repr y j • bK j = (⟨bK.repr y j, hc' j⟩ : O) • (bM j : n → K) := by
+      rw [hsmul, hbK]
     rw [h5]
     exact M.smul_mem _ (bM j).2
 

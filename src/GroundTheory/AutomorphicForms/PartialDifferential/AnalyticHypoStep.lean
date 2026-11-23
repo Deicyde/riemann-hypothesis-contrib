@@ -1,7 +1,53 @@
 module
 
-public import Mathlib
+public import GroundTheory.AutomorphicForms.PartialDifferential.AnalyticHypoBasic
+public import GroundTheory.AutomorphicForms.PartialDifferential.AnalyticHypoCalc
+public import GroundTheory.AutomorphicForms.PartialDifferential.AnalyticHypoCutoff
 public import GroundTheory.AutomorphicForms.PartialDifferential.SqrtSumPdTMulSubLe
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Real
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.Order.CompletePartialOrder
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
+import Mathlib.Topology.UniformSpace.Uniformizable
 
 @[expose] public section
 
@@ -23,8 +69,6 @@ theorem powMul_bound_le
   have h2 : (p : ℝ) ^ i * (p : ℝ) ^ q ≤ (p : ℝ) ^ p := by
     rw [← pow_add]; exact pow_le_pow_right₀ hp' (by omega)
   have h3 : L ^ q ≤ L ^ (p - 1) := pow_le_pow_right₀ hL (by omega)
-  have hpi : 0 ≤ (p : ℝ) ^ i := by positivity
-  have hqq : 0 ≤ (q : ℝ) ^ q := by positivity
   calc
     (p : ℝ) ^ i * (B * L ^ q * (q : ℝ) ^ q)
       = B * L ^ q * ((p : ℝ) ^ i * (q : ℝ) ^ q) := by ring
@@ -36,7 +80,6 @@ theorem coefTerm_le
     {p k i q : ℕ} (hp : 1 ≤ p) (hk : k ≤ p) (hqi : q + i ≤ p)
     : (k.choose i : ℝ) * (Ma ^ i * i.factorial) * (B * L ^ q * (q : ℝ) ^ q)
       ≤ B * L ^ p * (p : ℝ) ^ p * (Ma / L) ^ i := by
-  have hL0 : 0 < L := by linarith
   have hp' : (1 : ℝ) ≤ p := by exact_mod_cast hp
   have hc : (k.choose i : ℝ) * i.factorial ≤ (p : ℝ) ^ i := by
     have : k.choose i * i.factorial ≤ p ^ i := by
@@ -53,12 +96,7 @@ theorem coefTerm_le
     rw [← pow_add]; exact pow_le_pow_right₀ hp' (by omega)
   have h3 : L ^ q ≤ L ^ (p - i) := pow_le_pow_right₀ hL (by omega)
   have hLp : L ^ p = L ^ (p - i) * L ^ i := by rw [← pow_add, Nat.sub_add_cancel hiq]
-  have hLi : 0 < L ^ i := by positivity
   rw [div_pow, hLp]
-  have hqq : 0 ≤ (q : ℝ) ^ q := by positivity
-  have hMi : 0 ≤ Ma ^ i := by positivity
-  have hfac : 0 ≤ (i.factorial : ℝ) := by positivity
-  have hch : 0 ≤ (k.choose i : ℝ) := by positivity
   calc
     (k.choose i : ℝ) * (Ma ^ i * i.factorial) * (B * L ^ q * (q : ℝ) ^ q)
       = Ma ^ i * B * L ^ q * (((k.choose i : ℝ) * i.factorial) * (q : ℝ) ^ q) := by ring
@@ -695,16 +733,12 @@ theorem sum_choose_weight_le
     (hidx : ∀ ij ∈ S, ij.2 + k + 1 ≤ P ∧ ij.2 + k + ij.1 ≤ P)
     : ∑ ij ∈ S, (j.choose ij.1 : ℝ) * (K * (P : ℝ) ^ ij.1) * w (ij.2 + k)
       ≤ 2 ^ j * K * (B * L ^ (P - 1) * (P : ℝ) ^ P) := by
-  have hT : 0 ≤ B * L ^ (P - 1) * (P : ℝ) ^ P := by
-    have : (0 : ℝ) ≤ L := by linarith
-    positivity
   calc
     ∑ ij ∈ S, (j.choose ij.1 : ℝ) * (K * (P : ℝ) ^ ij.1) * w (ij.2 + k)
         ≤ ∑ ij ∈ S, (j.choose ij.1 : ℝ) * K * (B * L ^ (P - 1) * (P : ℝ) ^ P) := by
       refine Finset.sum_le_sum fun ij hij ↦ ?_
       obtain ⟨h1, h2⟩ := hidx ij hij
       have hb := powMul_bound_le hB0 hL1 (p := P) (q := ij.2 + k) (i := ij.1) hP1 h1 h2
-      have hPi : 0 ≤ (P : ℝ) ^ ij.1 := by positivity
       calc
         (j.choose ij.1 : ℝ) * (K * (P : ℝ) ^ ij.1) * w (ij.2 + k)
             ≤ (j.choose ij.1 : ℝ) * (K * (P : ℝ) ^ ij.1)
@@ -733,7 +767,6 @@ theorem sum_coef_weight_le
   have hL0 : 0 < L := by linarith
   have hr0 : 0 ≤ Ma / L := div_nonneg hMa hL0.le
   have hr : Ma / L ≤ 1 / 2 := by rw [div_le_iff₀ hL0]; linarith
-  have hT : 0 ≤ B * L ^ P * (P : ℝ) ^ P := by positivity
   calc
     ∑ ij ∈ (antidiagonal k).filter (fun ij ↦ 0 < ij.1),
      (k.choose ij.1 : ℝ) * (Ca * Ma ^ ij.1 * ij.1.factorial) * w (d + ij.2)

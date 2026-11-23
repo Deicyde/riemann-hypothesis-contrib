@@ -1,17 +1,61 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.PublishedTheorems.TwistedTraceFormula.NotIsCompactUnivFv
-public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.MemClosureUnitary
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ContinuousLocAdele
+public import Development.AbelianVarietyTheory.Proofs.AdelicLatticeProofs.UnitaryGroupWeakApproximationAtPrimes
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ClosureDivMem
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ContinuousLocAdele
+public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.UnitaryTranspose
+public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.MemClosureUnitary
+import GroundTheory.GlobalFields.Adele.WeakApprox
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Coalgebra.IsFrobenius
+import Mathlib.RingTheory.HopfAlgebra.Basic
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
 noncomputable section
 
-open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
-  GlobalTheory.Published
+open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.Published
 open scoped TensorProduct
 
 namespace GlobalTheory.SUWeakApprox
@@ -20,11 +64,9 @@ section Abstract
 
 open Formalism.UG Matrix
 
-theorem exists_aniso
-    {K : Type} [Field K]
-    (c : K →+* K) (hne : ∃ z, c z ≠ z)
-    {n : ℕ} (hn : 0 < n) (J : Matrix (Fin n) (Fin n) K) (hdet : J.det ≠ 0)
-    : ∃ x : Fin n → K, (c ∘ x) ⬝ᵥ (J *ᵥ x) ≠ 0 := by
+theorem exists_aniso {K : Type} [Field K] (c : K →+* K) (hne : ∃ z, c z ≠ z) {n : ℕ} (hn : 0 < n)
+    (J : Matrix (Fin n) (Fin n) K) (hdet : J.det ≠ 0) :
+    ∃ x : Fin n → K, (c ∘ x) ⬝ᵥ (J *ᵥ x) ≠ 0 := by
   by_contra h
   push Not at h
   obtain ⟨z, hz⟩ := hne
@@ -41,18 +83,13 @@ theorem exists_aniso
   have ho : ∀ i j t, J i j * t + c t * J j i = 0 := by
     intro i j t
     have := h (Pi.single i 1 + Pi.single j t)
-    have e
-        : c ∘ (Pi.single i 1 + Pi.single j t : Fin n → K) = Pi.single i 1 + Pi.single j (c t) := by
+    have e : c ∘ (Pi.single i 1 + Pi.single j t : Fin n → K) = Pi.single i 1 + Pi.single j (c t) := by
       have e1 := hs i 1
       rw [map_one] at e1
-      calc
-        _ = c ∘ (Pi.single i 1 : Fin n → K) + c ∘ (Pi.single j t : Fin n → K) :=
-          funext fun k => map_add c _ _
+      calc _ = c ∘ (Pi.single i 1 : Fin n → K) + c ∘ (Pi.single j t : Fin n → K) := funext fun k => map_add c _ _
         _ = _ := by rw [e1, hs]
     rw [e] at this
-    simp only [mulVec_add, add_dotProduct, dotProduct_add, single_dotProduct, mulVec_single,
-        Pi.smul_apply, col_apply, hd]
-      at this
+    simp only [mulVec_add, add_dotProduct, dotProduct_add, single_dotProduct, mulVec_single, Pi.smul_apply, col_apply, hd] at this
     simpa [add_comm] using this
   have hJ : J = 0 := by
     ext i j
@@ -64,12 +101,9 @@ theorem exists_aniso
   haveI : Nonempty (Fin n) := ⟨⟨0, hn⟩⟩
   exact hdet (by rw [hJ, det_zero])
 
-theorem exists_proj
-    {K : Type} [Field K]
-    (c : K →+* K) (hc : ∀ x, c (c x) = x) (hne : ∃ z, c z ≠ z)
-    {n : ℕ} (hn : 0 < n) (J : Matrix (Fin n) (Fin n) K) (hJ : cT c J = J) (hdet : J.det ≠ 0)
-    : ∃ P : Matrix (Fin n) (Fin n) K,
-      P * P = P ∧ cT c P * J = J * P ∧ ∀ a : K, (1 + a • P).det = 1 + a := by
+theorem exists_proj {K : Type} [Field K] (c : K →+* K) (hc : ∀ x, c (c x) = x) (hne : ∃ z, c z ≠ z) {n : ℕ}
+    (hn : 0 < n) (J : Matrix (Fin n) (Fin n) K) (hJ : cT c J = J) (hdet : J.det ≠ 0) :
+    ∃ P : Matrix (Fin n) (Fin n) K, P * P = P ∧ cT c P * J = J * P ∧ ∀ a : K, (1 + a • P).det = 1 + a := by
   obtain ⟨x, hx⟩ := exists_aniso c hne hn J hdet
   have hJ' : ∀ i j, c (J j i) = J i j := fun i j => congrFun (congrFun hJ i) j
   set d := (c ∘ x) ⬝ᵥ (J *ᵥ x) with hd
@@ -77,16 +111,16 @@ theorem exists_proj
   have hyx : y ⬝ᵥ x = d := by rw [hd, dotProduct_mulVec]
   have hcy : c ∘ y = J *ᵥ x := by
     funext i
-    set_option synthInstance.maxHeartbeats 100000 in
+
     simp [hy, vecMul, mulVec, dotProduct, map_sum, hc, hJ', mul_comm]
   have hcd : c d = d := by
     conv_lhs => rw [← hyx]
     rw [hd, ← hcy]
-    set_option synthInstance.maxHeartbeats 100000 in
+
     simp [dotProduct, map_sum, mul_comm]
   refine ⟨d⁻¹ • vecMulVec x y, ?_, ?_, fun a => ?_⟩
-  · rw [smul_mul_assoc, mul_smul_comm, vecMulVec_mul_vecMulVec, hyx, vecMulVec_smul,
-      smul_smul d⁻¹ d, inv_mul_cancel₀ hx, one_smul]
+  · rw [smul_mul_assoc, mul_smul_comm, vecMulVec_mul_vecMulVec, hyx, vecMulVec_smul, smul_smul d⁻¹ d,
+      inv_mul_cancel₀ hx, one_smul]
   · have e : cT c (d⁻¹ • vecMulVec x y) = d⁻¹ • vecMulVec (c ∘ y) (c ∘ x) := by
       ext i j
       simp [cT, vecMulVec_apply, hcd, mul_comm]
@@ -94,32 +128,23 @@ theorem exists_proj
   · rw [smul_smul, ← smul_vecMulVec, vecMulVec_eq Unit, det_one_add_replicateCol_mul_replicateRow,
       dotProduct_smul, hyx, smul_eq_mul, mul_assoc, inv_mul_cancel₀ hx, mul_one]
 
-theorem mem_closure_su
-    {K R : Type} [Field K] [CharZero K] [CommRing R] [TopologicalSpace R] [IsTopologicalRing R]
-    [IsArtinianRing R]
-    (ι : K →+* R) (c : K →+* K) (σ : R →+* R) (hσι : ∀ x, σ (ι x) = ι (c x))
-    (hc : ∀ x, c (c x) = x) (hne : ∃ z, c z ≠ z) (hσ : ∀ x, σ (σ x) = x) (hσc : Continuous σ)
-    (hd : DenseRange ι) (h1 : IsOpen {x : R | IsUnit x})
-    (h2 : ∀ x : R, IsUnit x → ContinuousAt Ring.inverse x)
-    {n : ℕ} (J : Matrix (Fin n) (Fin n) K) (hJ : cT c J = J) (hdet : J.det ≠ 0)
-    (g : Matrix (Fin n) (Fin n) R) (hg : cT σ g * J.map ι * g = J.map ι) (hg1 : g.det = 1)
-    : g ∈ closure
-      {m | ∃ γ : Matrix (Fin n) (Fin n) K, cT c γ * J * γ = J ∧ γ.det = 1 ∧ m = γ.map ι} := by
+theorem mem_closure_su {K R : Type} [Field K] [CharZero K] [CommRing R] [TopologicalSpace R]
+    [IsTopologicalRing R] [IsArtinianRing R] (ι : K →+* R) (c : K →+* K) (σ : R →+* R)
+    (hσι : ∀ x, σ (ι x) = ι (c x)) (hc : ∀ x, c (c x) = x) (hne : ∃ z, c z ≠ z) (hσ : ∀ x, σ (σ x) = x)
+    (hσc : Continuous σ) (hd : DenseRange ι) (h1 : IsOpen {x : R | IsUnit x})
+    (h2 : ∀ x : R, IsUnit x → ContinuousAt Ring.inverse x) {n : ℕ}
+    (J : Matrix (Fin n) (Fin n) K) (hJ : cT c J = J) (hdet : J.det ≠ 0)
+    (g : Matrix (Fin n) (Fin n) R) (hg : cT σ g * J.map ι * g = J.map ι) (hg1 : g.det = 1) :
+    g ∈ closure {m | ∃ γ : Matrix (Fin n) (Fin n) K, cT c γ * J * γ = J ∧ γ.det = 1 ∧ m = γ.map ι} := by
   rcases subsingleton_or_nontrivial R with hR | hR
-  · exact subset_closure
-      ⟨1, by rw [cT_one, Matrix.one_mul, Matrix.mul_one], det_one, Subsingleton.elim _ _⟩
+  · exact subset_closure ⟨1, by rw [cT_one, Matrix.one_mul, Matrix.mul_one], det_one, Subsingleton.elim _ _⟩
   rcases Nat.eq_zero_or_pos n with rfl | hn
-  · exact subset_closure
-      ⟨1, by rw [cT_one, Matrix.one_mul, Matrix.mul_one], det_one, Subsingleton.elim _ _⟩
+  · exact subset_closure ⟨1, by rw [cT_one, Matrix.one_mul, Matrix.mul_one], det_one, Subsingleton.elim _ _⟩
   obtain ⟨P, hPP, hPJ, hPd⟩ := exists_proj c hc hne hn J hJ hdet
-  have h :=
-    GlobalTheory.RealApprox.mem_closure_unitary ι c σ hσι hc hne hσ hσc hd h1 h2 Jᵀ
-      (by rw [Matrix.transpose_map]; exact congrArg Matrix.transpose hJ)
-      (by rwa [Matrix.det_transpose]) g
-      (by
-        rw [Matrix.transpose_map]; exact (GlobalTheory.Mass.OnePlace.unitary_transpose _ _ _).1 hg)
-  let Ψ : Matrix (Fin n) (Fin n) R → Matrix (Fin n) (Fin n) R := fun m =>
-    m * (1 + (σ m.det - 1) • P.map ι)
+  have h := GlobalTheory.RealApprox.mem_closure_unitary ι c σ hσι hc hne hσ hσc hd h1 h2 Jᵀ
+    (by rw [Matrix.transpose_map]; exact congrArg Matrix.transpose hJ) (by rwa [Matrix.det_transpose]) g
+    (by rw [Matrix.transpose_map]; exact (GlobalTheory.Mass.OnePlace.unitary_transpose _ _ _).1 hg)
+  let Ψ : Matrix (Fin n) (Fin n) R → Matrix (Fin n) (Fin n) R := fun m => m * (1 + (σ m.det - 1) • P.map ι)
   have hΨ : Continuous Ψ :=
     continuous_id.matrix_mul (continuous_const.add
       (((hσc.comp continuous_id.matrix_det).sub continuous_const).smul continuous_const))
@@ -138,19 +163,16 @@ theorem mem_closure_su
       ext i j
       simp [cT, hc, one_apply, eq_comm]
       by_cases h : i = j <;> simp [Matrix.one_apply, h, eq_comm]
-    rw [cT_mul, e, Matrix.mul_assoc _ _ J, Matrix.mul_assoc, ← Matrix.mul_assoc _ γ, hγ',
-      ← Matrix.mul_assoc]
-    simp only [Matrix.add_mul, Matrix.mul_add, Matrix.one_mul, Matrix.mul_one, Matrix.smul_mul,
-      Matrix.mul_smul, hPJ, Matrix.mul_assoc, hPP, smul_add, smul_smul]
+    rw [cT_mul, e, Matrix.mul_assoc _ _ J, Matrix.mul_assoc, ← Matrix.mul_assoc _ γ, hγ', ← Matrix.mul_assoc]
+    simp only [Matrix.add_mul, Matrix.mul_add, Matrix.one_mul, Matrix.mul_one, Matrix.smul_mul, Matrix.mul_smul, hPJ,
+      Matrix.mul_assoc, hPP, smul_add, smul_smul]
     rw [add_assoc, ← add_smul, ← add_smul,
-      show γ.det - 1 + (c γ.det - 1 + (c γ.det - 1) * (γ.det - 1)) = 0 by linear_combination hN,
-      zero_smul, add_zero]
+      show γ.det - 1 + (c γ.det - 1 + (c γ.det - 1) * (γ.det - 1)) = 0 by linear_combination hN, zero_smul, add_zero]
   · rw [det_mul, hPd]
     linear_combination hN
   · simp only [Ψ]
-    rw [Matrix.map_mul, ← RingHom.mapMatrix_apply, ← RingHom.map_det, hσι,
-      Matrix.map_add _ (map_add ι), Matrix.map_one _ (map_zero ι) (map_one ι),
-      GlobalTheory.UnRep.WeakApprox.map_smul'', map_sub, map_one]
+    rw [Matrix.map_mul, ← RingHom.mapMatrix_apply, ← RingHom.map_det, hσι, Matrix.map_add _ (map_add ι),
+      Matrix.map_one _ (map_zero ι) (map_one ι), GlobalTheory.UnRep.WeakApprox.map_smul'', map_sub, map_one]
 
 end Abstract
 
@@ -161,36 +183,29 @@ open Formalism.UG hiding sigR
 
 variable {F E : Type} [Field F] [Field E] [Algebra F E]
 
-theorem sigR_inclR (R : Type) [CommRing R] [Algebra F R] (σ : E →ₐ[F] E) (x : E)
-    : sigR R σ (inclR (F := F) R x) = inclR (F := F) R (σ x) := by
+theorem sigR_inclR (R : Type) [CommRing R] [Algebra F R] (σ : E →ₐ[F] E) (x : E) :
+    sigR R σ (inclR (F := F) R x) = inclR (F := F) R (σ x) := by
   simp [sigR, inclR]
 
-theorem sigR_sigR
-    (R : Type) [CommRing R] [Algebra F R] (σ : E →ₐ[F] E) (hc : ∀ x, σ (σ x) = x) (x : R ⊗[F] E)
-    : sigR R σ (sigR R σ x) = x := by
+theorem sigR_sigR (R : Type) [CommRing R] [Algebra F R] (σ : E →ₐ[F] E) (hc : ∀ x, σ (σ x) = x) (x : R ⊗[F] E) :
+    sigR R σ (sigR R σ x) = x := by
   induction x using TensorProduct.induction_on with
   | zero => simp
   | tmul a y => simp [sigR, hc]
   | add x y hx hy => rw [map_add (f := _), map_add (f := _), hx, hy]
 
-theorem continuous_sigR
-    (R : Type) [CommRing R] [Algebra F R] [TopologicalSpace R] [IsTopologicalRing R] (σ : E →ₐ[F] E)
-    : Continuous (sigR R σ) := by
+theorem continuous_sigR (R : Type) [CommRing R] [Algebra F R] [TopologicalSpace R] [IsTopologicalRing R]
+    (σ : E →ₐ[F] E) : Continuous (sigR R σ) := by
   haveI : IsModuleTopology R (R ⊗[F] E) := ⟨rfl⟩
   haveI : ContinuousAdd (R ⊗[F] E) := IsModuleTopology.toContinuousAdd R _
-  exact IsModuleTopology.continuous_of_linearMap (Algebra.TensorProduct.map (AlgHom.id R R)
-    σ).toLinearMap
+  exact IsModuleTopology.continuous_of_linearMap (Algebra.TensorProduct.map (AlgHom.id R R) σ).toLinearMap
 
-theorem denseRange_inclR
-    (R : Type)
-    [CommRing R] [Algebra F R] [TopologicalSpace R] [IsTopologicalRing R] [FiniteDimensional F E]
-    (hd : DenseRange (algebraMap F R))
-    : DenseRange (inclR (F := F) (E := E) R) := by
+theorem denseRange_inclR (R : Type) [CommRing R] [Algebra F R] [TopologicalSpace R] [IsTopologicalRing R]
+    [FiniteDimensional F E] (hd : DenseRange (algebraMap F R)) : DenseRange (inclR (F := F) (E := E) R) := by
   haveI : IsModuleTopology R (R ⊗[F] E) := ⟨rfl⟩
   haveI : IsTopologicalRing (R ⊗[F] E) := IsModuleTopology.isTopologicalRing R _
   intro y
-  let S : AddSubgroup (R ⊗[F] E) :=
-    (inclR (F := F) (E := E) R).toAddMonoidHom.range.topologicalClosure
+  let S : AddSubgroup (R ⊗[F] E) := (inclR (F := F) (E := E) R).toAddMonoidHom.range.topologicalClosure
   have hS : IsClosed (S : Set (R ⊗[F] E)) := AddSubgroup.isClosed_topologicalClosure _
   show y ∈ S
   induction y using TensorProduct.induction_on with
@@ -202,31 +217,24 @@ theorem denseRange_inclR
         funext a
         rw [TensorProduct.smul_tmul', smul_eq_mul, mul_one]
       rw [this]
-      exact Continuous.smul
-        (f := fun a : R => a)
-        (g := fun _ : R => ((1 : R) ⊗ₜ[F] x : R ⊗[F] E))
+      exact Continuous.smul (f := fun a : R => a) (g := fun _ : R => ((1 : R) ⊗ₜ[F] x : R ⊗[F] E))
         continuous_id continuous_const
     refine DenseRange.induction_on hd a (p := fun a => a ⊗ₜ[F] x ∈ S) (hS.preimage hc) fun f => ?_
     refine AddSubgroup.le_topologicalClosure _ ⟨f • x, ?_⟩
     show (1 : R) ⊗ₜ[F] (f • x) = algebraMap F _ f ⊗ₜ[F] x
     rw [Algebra.algebraMap_eq_smul_one, TensorProduct.smul_tmul]
 
-theorem mem_closure_trunc
-    [CharZero E] [FiniteDimensional F E]
-    (A B : Type) [CommRing A] [Algebra F A] [TopologicalSpace A] [IsTopologicalRing A] [CommRing B]
-    [Algebra F B] [TopologicalSpace B] [IsTopologicalRing B] [IsArtinianRing B]
-    (π : A →ₐ[F] B)
-    (s : B → A) (hs : Continuous s)
-    (η : A) (hη : ∀ a, s (π a) = η * a)
+theorem mem_closure_trunc [CharZero E] [FiniteDimensional F E] (A B : Type) [CommRing A] [Algebra F A]
+    [TopologicalSpace A] [IsTopologicalRing A] [CommRing B] [Algebra F B] [TopologicalSpace B] [IsTopologicalRing B]
+    [IsArtinianRing B] (π : A →ₐ[F] B) (s : B → A) (hs : Continuous s) (η : A) (hη : ∀ a, s (π a) = η * a)
     (hd : DenseRange (algebraMap F B)) (h1 : IsOpen {x : B | IsUnit x})
     (h2 : ∀ x : B, IsUnit x → ContinuousAt Ring.inverse x)
-    (σ : E →ₐ[F] E) (hc : ∀ x, σ (σ x) = x) (hne : ∃ z, σ z ≠ z)
-    {n : ℕ} (J : Matrix (Fin n) (Fin n) E) (hJ : cT (σ : E →+* E) J = J) (hdet : J.det ≠ 0)
-    (g : Matrix (Fin n) (Fin n) (A ⊗[F] E)) (hg : cT (sigR A σ) g * JR A J * g = JR A J)
-    (hg1 : g.det = 1) (hgη : algebraMap A (A ⊗[F] E) η • (g - 1) = g - 1)
-    : g ∈ closure
-      {m | ∃ γ : Matrix (Fin n) (Fin n) E, cT (σ : E →+* E) γ * J * γ = J ∧ γ.det = 1 ∧
-        m = 1 + algebraMap A (A ⊗[F] E) η • (γ.map (inclR (F := F) A) - 1)} := by
+    (σ : E →ₐ[F] E) (hc : ∀ x, σ (σ x) = x) (hne : ∃ z, σ z ≠ z) {n : ℕ}
+    (J : Matrix (Fin n) (Fin n) E) (hJ : cT (σ : E →+* E) J = J) (hdet : J.det ≠ 0)
+    (g : Matrix (Fin n) (Fin n) (A ⊗[F] E)) (hg : cT (sigR A σ) g * JR A J * g = JR A J) (hg1 : g.det = 1)
+    (hgη : algebraMap A (A ⊗[F] E) η • (g - 1) = g - 1) :
+    g ∈ closure {m | ∃ γ : Matrix (Fin n) (Fin n) E, cT (σ : E →+* E) γ * J * γ = J ∧ γ.det = 1 ∧
+      m = 1 + algebraMap A (A ⊗[F] E) η • (γ.map (inclR (F := F) A) - 1)} := by
   classical
   haveI : IsModuleTopology A (A ⊗[F] E) := ⟨rfl⟩
   haveI : IsTopologicalRing (A ⊗[F] E) := IsModuleTopology.isTopologicalRing A _
@@ -254,36 +262,28 @@ theorem mem_closure_trunc
     | tmul a y => simp [hp, bA, bB, Algebra.TensorProduct.basis_repr_tmul]
     | add x y hx hy => simp only [map_add (f := _), Finsupp.add_apply, hx, hy]
   let S : B ⊗[F] E → A ⊗[F] E := fun y => ∑ i, s (bB.repr y i) • bA i
-  have hS : Continuous S :=
-    continuous_finsetSum _ fun i _ =>
-      (hs.comp (IsModuleTopology.continuous_of_linearMap (bB.coord i))).smul continuous_const
+  have hS : Continuous S := continuous_finsetSum _ fun i _ =>
+    (hs.comp (IsModuleTopology.continuous_of_linearMap (bB.coord i))).smul continuous_const
   have hSp : ∀ y, S (p y) = algebraMap A (A ⊗[F] E) η * y := by
     intro y
     simp only [S, hrepr, hη, mul_smul]
     rw [← Finset.smul_sum, bA.sum_repr, Algebra.smul_def]
-  have hmap
-      : ∀ γ : Matrix (Fin n) (Fin n) E,
-        (γ.map (inclR (F := F) A)).map p = γ.map (inclR (F := F) B) := by
+  have hmap : ∀ γ : Matrix (Fin n) (Fin n) E, (γ.map (inclR (F := F) A)).map p = γ.map (inclR (F := F) B) := by
     intro γ
     ext i j
     exact hpι _
-  have h :=
-    mem_closure_su (inclR (F := F) B) (σ : E →+* E) (sigR B σ) (sigR_inclR B σ) hc hne
-      (sigR_sigR B σ hc) (continuous_sigR B σ) (denseRange_inclR B hd) u1 u2 J hJ hdet (g.map p)
-      (by
-        have e : cT (sigR B σ) (g.map p) = (cT (sigR A σ) g).map p := by
-          ext i j
-          exact hpσ _
-        rw [e, ← hmap, ← Matrix.map_mul, ← Matrix.map_mul]
-        exact congrArg (·.map p) hg)
-      (by rw [← RingHom.mapMatrix_apply, ← RingHom.map_det, hg1, map_one])
-  let Ψ : Matrix (Fin n) (Fin n) (B ⊗[F] E) → Matrix (Fin n) (Fin n) (A ⊗[F] E) := fun m =>
-    1 + (m - 1).map S
-  have hΨ : Continuous Ψ :=
-    continuous_const.add ((continuous_id.sub continuous_const).matrix_map hS)
-  have hΨp
-      : ∀ m : Matrix (Fin n) (Fin n) (A ⊗[F] E),
-        Ψ (m.map p) = 1 + algebraMap A (A ⊗[F] E) η • (m - 1) := by
+  have h := mem_closure_su (inclR (F := F) B) (σ : E →+* E) (sigR B σ) (sigR_inclR B σ) hc hne (sigR_sigR B σ hc)
+    (continuous_sigR B σ) (denseRange_inclR B hd) u1 u2 J hJ hdet (g.map p)
+    (by
+      have e : cT (sigR B σ) (g.map p) = (cT (sigR A σ) g).map p := by
+        ext i j
+        exact hpσ _
+      rw [e, ← hmap, ← Matrix.map_mul, ← Matrix.map_mul]
+      exact congrArg (·.map p) hg)
+    (by rw [← RingHom.mapMatrix_apply, ← RingHom.map_det, hg1, map_one])
+  let Ψ : Matrix (Fin n) (Fin n) (B ⊗[F] E) → Matrix (Fin n) (Fin n) (A ⊗[F] E) := fun m => 1 + (m - 1).map S
+  have hΨ : Continuous Ψ := continuous_const.add ((continuous_id.sub continuous_const).matrix_map hS)
+  have hΨp : ∀ m : Matrix (Fin n) (Fin n) (A ⊗[F] E), Ψ (m.map p) = 1 + algebraMap A (A ⊗[F] E) η • (m - 1) := by
     intro m
     simp only [Ψ]
     rw [← Matrix.map_one p (map_zero p) (map_one p), ← Matrix.map_sub _ (map_sub p)]
@@ -303,23 +303,18 @@ section Main
 open Matrix
 open Formalism.UG hiding sigR evalV
 
-theorem isInducing_val
-    {R : Type} [CommRing R] [TopologicalSpace R] [IsTopologicalRing R]
-    (σ : R →+* R) (hσ : Continuous σ)
-    {n : ℕ} (J K : Matrix (Fin n) (Fin n) R) (hK : K * J = 1)
-    : Topology.IsInducing fun u : UJ σ J => (u.1 : Matrix (Fin n) (Fin n) R) := by
+theorem isInducing_val {R : Type} [CommRing R] [TopologicalSpace R] [IsTopologicalRing R] (σ : R →+* R)
+    (hσ : Continuous σ) {n : ℕ} (J K : Matrix (Fin n) (Fin n) R) (hK : K * J = 1) :
+    Topology.IsInducing fun u : UJ σ J => (u.1 : Matrix (Fin n) (Fin n) R) := by
   have hφ : Continuous fun m : Matrix (Fin n) (Fin n) R => (m, MulOpposite.op (K * cT σ m * J)) :=
     continuous_id.prodMk (MulOpposite.continuous_op.comp
-      ((continuous_const.matrix_mul (continuous_id.matrix_map hσ).matrix_transpose).matrix_mul
-        continuous_const))
+      ((continuous_const.matrix_mul (continuous_id.matrix_map hσ).matrix_transpose).matrix_mul continuous_const))
   refine Topology.IsInducing.of_comp (Units.continuous_val.comp continuous_subtype_val) hφ ?_
-  have he :=
-    (Units.isInducing_embedProduct (M := Matrix (Fin n) (Fin n) R)).comp
-      (Topology.IsInducing.subtypeVal (t := (UJ σ J : Set (GL (Fin n) R))))
-  suffices e
-      : ((fun m : Matrix (Fin n) (Fin n) R => (m, MulOpposite.op (K * cT σ m * J)))
-          ∘ fun u : UJ σ J => (u.1 : Matrix (Fin n) (Fin n) R))
-        = fun u : UJ σ J => Units.embedProduct (Matrix (Fin n) (Fin n) R) u.1 by
+  have he := (Units.isInducing_embedProduct (M := Matrix (Fin n) (Fin n) R)).comp
+    (Topology.IsInducing.subtypeVal (t := (UJ σ J : Set (GL (Fin n) R))))
+  suffices e : ((fun m : Matrix (Fin n) (Fin n) R => (m, MulOpposite.op (K * cT σ m * J))) ∘
+      fun u : UJ σ J => (u.1 : Matrix (Fin n) (Fin n) R)) =
+      fun u : UJ σ J => Units.embedProduct (Matrix (Fin n) (Fin n) R) u.1 by
     rw [e]
     exact he
   funext u
@@ -328,20 +323,16 @@ theorem isInducing_val
   refine (Units.inv_eq_of_mul_eq_one_left ?_).symm
   rw [Matrix.mul_assoc K, Matrix.mul_assoc K, hu, hK]
 
-theorem unitary_trunc
-    {R : Type} [CommRing R]
-    (σ : R →+* R)
-    {n : ℕ} (J u : Matrix (Fin n) (Fin n) R)
-    (e : R) (he : e * e = e) (hσ : σ e = e)
-    (hu : cT σ u * J * u = J)
-    : cT σ (1 + e • (u - 1)) * J * (1 + e • (u - 1)) = J := by
+theorem unitary_trunc {R : Type} [CommRing R] (σ : R →+* R) {n : ℕ} (J u : Matrix (Fin n) (Fin n) R) (e : R)
+    (he : e * e = e) (hσ : σ e = e) (hu : cT σ u * J * u = J) :
+    cT σ (1 + e • (u - 1)) * J * (1 + e • (u - 1)) = J := by
   have e1 : cT σ (1 + e • (u - 1)) = 1 + e • (cT σ u - 1) := by
     ext i j
     simp [cT, hσ, one_apply, eq_comm]
     by_cases h : i = j <;> simp [Matrix.one_apply, h, eq_comm]
   rw [e1]
-  simp only [Matrix.add_mul, Matrix.mul_add, Matrix.sub_mul, Matrix.mul_sub, Matrix.one_mul,
-    Matrix.mul_one, Matrix.smul_mul, Matrix.mul_smul, smul_add, smul_sub, smul_smul, he, hu]
+  simp only [Matrix.add_mul, Matrix.mul_add, Matrix.sub_mul, Matrix.mul_sub, Matrix.one_mul, Matrix.mul_one,
+    Matrix.smul_mul, Matrix.mul_smul, smul_add, smul_sub, smul_smul, he, hu]
   abel
 
 theorem weak_approx_SU : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E), IsCMExt F E σ → ∀ (M : ℕ) (J : Matrix (Fin M) (Fin M) E), IsHermND σ J → ∀ (T₁ : Finset (InfinitePlace F)) (T₂ : Finset (HeightOneSpectrum (𝓞 F))) (η : AF F), IsPlacesIdem T₁ T₂ η → ∀ h ∈ SUSupp σ J η, h ∈ closure {x : HA (AF F) σ J | ∃ γ ∈ SURat σ J, (∀ i j, ((HA.mat (AF F) σ J x).1 : Matrix (Fin M) (Fin M) (AF F ⊗[F] E)) i j = (1 : Matrix (Fin M) (Fin M) (AF F ⊗[F] E)) i j + algebraMap (AF F) (AF F ⊗[F] E) η * (((HA.mat (AF F) σ J γ).1 : Matrix (Fin M) (Fin M) (AF F ⊗[F] E)) - 1) i j)} := by

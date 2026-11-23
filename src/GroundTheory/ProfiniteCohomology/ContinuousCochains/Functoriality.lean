@@ -1,7 +1,49 @@
 module
 
-public import Mathlib
 public import GroundTheory.ProfiniteCohomology.ContinuousCochains
+public import Mathlib.RepresentationTheory.Invariants
+public import Mathlib.Algebra.Homology.ShortComplex.ModuleCat
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -19,24 +61,22 @@ section Map
 
 variable {A B C : Rep.{u} k G} [IsDiscreteRep A] [IsDiscreteRep B] [IsDiscreteRep C]
 
-noncomputable def cochainsMapLinear (f : A ⟶ B) (n : ℕ)
-    : locallyConstantCochains A n →ₗ[k] locallyConstantCochains B n :=
+noncomputable def cochainsMapLinear (f : A ⟶ B) (n : ℕ) :
+    locallyConstantCochains A n →ₗ[k] locallyConstantCochains B n :=
   (f.hom.toLinearMap.compLeft (Fin n → G)).restrict fun _ hc => IsLocallyConstant.comp hc _
 
+
 noncomputable def cochainsMap (f : A ⟶ B) : cochainsComplex A ⟶ cochainsComplex B :=
-  CochainComplex.ofHom
-    (fun n => ModuleCat.ofHom (cochainsMapLinear f n))
-    fun n => by
-      rw [cochainsComplex_d, cochainsComplex_d]
-      ext c₀ : 2
-      let c : locallyConstantCochains A n := c₀
-      apply Subtype.ext
-      funext g
-      change (inhomogeneousCochains.d B n).hom (fun x => f.hom (c.1 x)) g
-        = f.hom ((inhomogeneousCochains.d A n).hom c.1 g)
-      set_option synthInstance.maxHeartbeats 100000 in
-      simp [inhomogeneousCochains.d_hom_apply, Rep.hom_comm_apply, map_add (f := _), map_sum,
-        map_smul]
+  CochainComplex.ofHom (fun n => ModuleCat.ofHom (cochainsMapLinear f n)) fun n => by
+    rw [cochainsComplex_d, cochainsComplex_d]
+    ext c₀ : 2
+    let c : locallyConstantCochains A n := c₀
+    apply Subtype.ext
+    funext g
+    change (inhomogeneousCochains.d B n).hom (fun x => f.hom (c.1 x)) g =
+      f.hom ((inhomogeneousCochains.d A n).hom c.1 g)
+
+    simp [inhomogeneousCochains.d_hom_apply, Rep.hom_comm_apply, map_add (f := _), map_sum, map_smul]
 
 @[simp]
 theorem cochainsMap_id : cochainsMap (𝟙 A) = 𝟙 (cochainsComplex A) := by
@@ -44,8 +84,8 @@ theorem cochainsMap_id : cochainsMap (𝟙 A) = 𝟙 (cochainsComplex A) := by
   rfl
 
 @[simp]
-theorem cochainsMap_comp (f : A ⟶ B) (g : B ⟶ C)
-    : cochainsMap (f ≫ g) = cochainsMap f ≫ cochainsMap g := by
+theorem cochainsMap_comp (f : A ⟶ B) (g : B ⟶ C) :
+    cochainsMap (f ≫ g) = cochainsMap f ≫ cochainsMap g := by
   ext n c : 3
   rfl
 
@@ -61,11 +101,8 @@ instance (f : A ⟶ B) [Epi f] (n : ℕ) : Epi ((cochainsMap f).f n) := by
   intro d
   obtain ⟨s, hs⟩ := ((Rep.epi_iff_surjective f).1 ‹_›).hasRightInverse
   let d' : locallyConstantCochains B n := d
-  refine ⟨
-    (⟨s ∘ d'.1, (mem_locallyConstantCochains A _).2 (IsLocallyConstant.comp d'.2 s)⟩
-      : locallyConstantCochains A n),
-    Subtype.ext ?_
-  ⟩
+  refine ⟨(⟨s ∘ d'.1, (mem_locallyConstantCochains A _).2 (IsLocallyConstant.comp d'.2 s)⟩ :
+    locallyConstantCochains A n), Subtype.ext ?_⟩
   funext x
   exact hs _
 
@@ -76,14 +113,14 @@ noncomputable def cohomologyMap (f : A ⟶ B) (n : ℕ) : cohomology A n ⟶ coh
 theorem cohomologyMap_id (n : ℕ) : cohomologyMap (𝟙 A) n = 𝟙 (cohomology A n) := by
   simp [cohomologyMap, cohomology]
 
-theorem cohomologyMap_comp (f : A ⟶ B) (g : B ⟶ C) (n : ℕ)
-    : cohomologyMap (f ≫ g) n = cohomologyMap f n ≫ cohomologyMap g n := by
+theorem cohomologyMap_comp (f : A ⟶ B) (g : B ⟶ C) (n : ℕ) :
+    cohomologyMap (f ≫ g) n = cohomologyMap f n ≫ cohomologyMap g n := by
   rw [cohomologyMap, cochainsMap_comp]
   exact HomologicalComplex.homologyMap_comp _ _ _
 
-theorem cohomologyπ_comp_cohomologyMap (f : A ⟶ B) (n : ℕ)
-    : cohomologyπ A n ≫ cohomologyMap f n
-      = HomologicalComplex.cyclesMap (cochainsMap f) n ≫ cohomologyπ B n :=
+theorem cohomologyπ_comp_cohomologyMap (f : A ⟶ B) (n : ℕ) :
+    cohomologyπ A n ≫ cohomologyMap f n =
+      HomologicalComplex.cyclesMap (cochainsMap f) n ≫ cohomologyπ B n :=
   HomologicalComplex.homologyπ_naturality _ _
 
 end Map
@@ -107,12 +144,12 @@ instance isIso_cochainsComplexι [DiscreteTopology G] : IsIso (cochainsComplexι
     refine ⟨Subtype.val_injective, fun c => ⟨⟨c, IsLocallyConstant.of_discrete c⟩, rfl⟩⟩
   exact HomologicalComplex.Hom.isIso_of_components _
 
-noncomputable def cohomologyIsoGroupCohomology [DiscreteTopology G] (n : ℕ)
-    : cohomology A n ≅ groupCohomology A n :=
+noncomputable def cohomologyIsoGroupCohomology [DiscreteTopology G] (n : ℕ) :
+    cohomology A n ≅ groupCohomology A n :=
   HomologicalComplex.homologyMapIso (asIso (cochainsComplexι A)) n
 
-theorem cohomologyIsoGroupCohomology_hom [DiscreteTopology G] (n : ℕ)
-    : (cohomologyIsoGroupCohomology A n).hom = cohomologyToGroupCohomology A n :=
+theorem cohomologyIsoGroupCohomology_hom [DiscreteTopology G] (n : ℕ) :
+    (cohomologyIsoGroupCohomology A n).hom = cohomologyToGroupCohomology A n :=
   rfl
 
 end Comparison
@@ -121,7 +158,8 @@ section H0
 
 variable (A : Rep.{u} k G) [IsDiscreteRep A]
 
-noncomputable def invariantsToCochains₀ : A.ρ.invariants →ₗ[k] locallyConstantCochains A 0 where
+noncomputable def invariantsToCochains₀ :
+    A.ρ.invariants →ₗ[k] locallyConstantCochains A 0 where
   toFun v := ⟨fun _ => v.1, IsLocallyConstant.const _⟩
   map_add' _ _ := rfl
   map_smul' _ _ := rfl
@@ -156,7 +194,8 @@ theorem shortComplexH0_exact : (shortComplexH0 A).Exact := by
     change c.1 Fin.elim0 = c.1 x
     rw [Subsingleton.elim x Fin.elim0]
 
-theorem cochainsComplex_d_zero_one : (cochainsComplex A).d 0 1 = dLocallyConstant A 0 :=
+theorem cochainsComplex_d_zero_one :
+    (cochainsComplex A).d 0 1 = dLocallyConstant A 0 :=
   cochainsComplex_d A 0
 
 noncomputable def cocyclesIso₀ : cocycles A 0 ≅ ModuleCat.of k A.ρ.invariants :=

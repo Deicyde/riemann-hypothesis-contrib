@@ -1,43 +1,78 @@
 module
 
 public import Development.AutomorphicArithmetic.Foundations.Convolution.BlockHeckeSlices.SliceShift
+public import Formalism.SatakeDualWeyl.AdelicIwasawaHecke.Satake
 public import Development.AutomorphicArithmetic.AutomorphicVarieties.ConjugateRepresentations.CuspidalSupport.HkSum
+import Formalism.SatakeDualWeyl.AdelicIwasawaHecke.SatakeRes
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
-open MeasureTheory NumberField IsDedekindDomain GlobalTheory.CuspRep
-  GlobalTheory.CompanionTheory.CTFin GlobalTheory.LFun Formalism.UG Formalism.UG.P
-open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction
-  GroundTheory.Automorphic.RightCosetSpace UpperTheory.ConvolutionTheory.BW
+open MeasureTheory NumberField IsDedekindDomain GlobalTheory.CuspRep GlobalTheory.CompanionTheory.CTFin GlobalTheory.LFun Formalism.UG Formalism.UG.P
+open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.RightCosetSpace UpperTheory.ConvolutionTheory.BW
 
 private def zGL {L : Type} [Field L] (r : ℕ) {π : L} (hπ : π ≠ 0) : GL (Fin r) L :=
-  Units.map
-    ((Matrix.scalar (Fin r) : L →+* Matrix (Fin r) (Fin r) L) : L →* Matrix (Fin r) (Fin r) L)
-    (Units.mk0 π hπ)
+  Units.map ((Matrix.scalar (Fin r) : L →+* Matrix (Fin r) (Fin r) L) : L →* Matrix (Fin r) (Fin r) L) (Units.mk0 π hπ)
 
-private theorem zGL_val {L : Type} [Field L] (r : ℕ) {π : L} (hπ : π ≠ 0)
-    : ((zGL r hπ : GL (Fin r) L) : Matrix (Fin r) (Fin r) L) = Matrix.diagonal fun _ => π :=
-  rfl
+private theorem zGL_val {L : Type} [Field L] (r : ℕ) {π : L} (hπ : π ≠ 0) :
+    ((zGL r hπ : GL (Fin r) L) : Matrix (Fin r) (Fin r) L) = Matrix.diagonal fun _ => π := rfl
 
-private theorem zGL_comm {L : Type} [Field L] (r : ℕ) {π : L} (hπ : π ≠ 0) (g : GL (Fin r) L)
-    : zGL r hπ * g = g * zGL r hπ := by
+private theorem zGL_comm {L : Type} [Field L] (r : ℕ) {π : L} (hπ : π ≠ 0) (g : GL (Fin r) L) :
+    zGL r hπ * g = g * zGL r hπ := by
   apply Units.ext
   rw [Units.val_mul, Units.val_mul, zGL_val]
   ext i j
   simp [Matrix.diagonal_mul, Matrix.mul_diagonal, mul_comm]
 
-private theorem card_top {r a : ℕ} (h : a ≤ r)
-    : ((Finset.univ.filter fun i : Fin r => (i : ℕ) < r - a)ᶜ).card = a := by
+private theorem card_top {r a : ℕ} (h : a ≤ r) :
+    ((Finset.univ.filter fun i : Fin r => (i : ℕ) < r - a)ᶜ).card = a := by
   rw [Finset.card_compl, Fintype.card_fin, Fin.card_filter_val_lt]
   omega
 
-private theorem inv_mem
-    {E : Type} [Field E] [NumberField E]
-    (w : Pl E)
-    {r a : ℕ} (har : a ≤ r)
-    {ϖ : w.adicCompletion E} (hπ : ϖ ≠ 0)
-    {b : GL (Fin r) (w.adicCompletion E)} (hb : b ∈ satakeTset w ϖ (r - a))
-    : b⁻¹ * zGL r hπ ∈ satakeTset w ϖ a := by
+private theorem inv_mem {E : Type} [Field E] [NumberField E] (w : Pl E) {r a : ℕ} (har : a ≤ r)
+    {ϖ : w.adicCompletion E} (hπ : ϖ ≠ 0) {b : GL (Fin r) (w.adicCompletion E)}
+    (hb : b ∈ satakeTset w ϖ (r - a)) : b⁻¹ * zGL r hπ ∈ satakeTset w ϖ a := by
   classical
   obtain ⟨k₁, hk₁, k₂, hk₂, e⟩ := hb
   set S : Finset (Fin r) := (Finset.univ.filter fun i : Fin r => (i : ℕ) < r - a)ᶜ with hSdef
@@ -56,16 +91,11 @@ private theorem inv_mem
   set d : GL (Fin r) (w.adicCompletion E) := k₁⁻¹ * b * k₂⁻¹ with hddef
   have hd : (d : Matrix (Fin r) (Fin r) (w.adicCompletion E)) = diagJ r ϖ (r - a) := by
     rw [hddef, Units.val_mul, Units.val_mul, e]
-    have h1
-        : ((k₁⁻¹ : GL (Fin r) (w.adicCompletion E)) : Matrix (Fin r) (Fin r) (w.adicCompletion E))
-            * (k₁ : Matrix (Fin r) (Fin r) (w.adicCompletion E))
-          = 1 := by
+    have h1 : ((k₁⁻¹ : GL (Fin r) (w.adicCompletion E)) : Matrix (Fin r) (Fin r) (w.adicCompletion E)) *
+        (k₁ : Matrix (Fin r) (Fin r) (w.adicCompletion E)) = 1 := by
       rw [← Units.val_mul, inv_mul_cancel, Units.val_one]
-    have h2
-        : (k₂ : Matrix (Fin r) (Fin r) (w.adicCompletion E))
-            * ((k₂⁻¹ : GL (Fin r) (w.adicCompletion E))
-              : Matrix (Fin r) (Fin r) (w.adicCompletion E))
-          = 1 := by
+    have h2 : (k₂ : Matrix (Fin r) (Fin r) (w.adicCompletion E)) *
+        ((k₂⁻¹ : GL (Fin r) (w.adicCompletion E)) : Matrix (Fin r) (Fin r) (w.adicCompletion E)) = 1 := by
       rw [← Units.val_mul, mul_inv_cancel, Units.val_one]
     simp only [Matrix.mul_assoc]
     rw [h2, Matrix.mul_one, ← Matrix.mul_assoc, h1, Matrix.one_mul]
@@ -83,25 +113,22 @@ private theorem inv_mem
     · simp [hSdef, h]
       intro h'
       omega
-  have hb' : b = k₁ * d * k₂ := by rw [hddef]; group
-  have hz : d⁻¹ * zGL r hπ = G := by rw [← zGL_comm, ← hGd]; group
+  have hb' : b = k₁ * d * k₂ := by
+    rw [hddef]; group
+  have hz : d⁻¹ * zGL r hπ = G := by
+    rw [← zGL_comm, ← hGd]; group
   have hfin : b⁻¹ * zGL r hπ = k₂⁻¹ * G * k₁⁻¹ := by
     rw [← hz, hb', mul_inv_rev, mul_inv_rev]
     have := zGL_comm r hπ k₁⁻¹
     simp only [mul_assoc]
     rw [← this]
   rw [hfin]
-  exact satake_Tset_right w (satake_Tset_left w hG ((GLint _ _).inv_mem hk₂))
-    ((GLint _ _).inv_mem hk₁)
+  exact satake_Tset_right w (satake_Tset_left w hG ((GLint _ _).inv_mem hk₂)) ((GLint _ _).inv_mem hk₁)
 
-theorem UpperTheory.exists_satakeTset_sum_eigenvector
-    : ∀ (E : Type) [Field E] [NumberField E] (w : Pl E) (r a : ℕ) (ϖ : w.adicCompletion E),
-      IsUnifV E w ϖ → a ≤ r
-        → ∀ (V : Type) [AddCommGroup V] [Module ℂ V]
-            (ρ : Representation ℂ (GL (Fin r) (w.adicCompletion E)) V) (f : V) (B : Multiset ℂˣ),
-          IsSatVecGL w ρ f B
-            → ∃ (n : ℕ) (c : Fin n → GL (Fin r) (w.adicCompletion E)) (μ : ℂ),
-              0 < n ∧ (∀ i, (c i)⁻¹ ∈ satakeTset w ϖ a) ∧ ∑ i, ρ (c i) f = μ • f := by
+theorem UpperTheory.exists_satakeTset_sum_eigenvector :
+    ∀ (E : Type) [Field E] [NumberField E] (w : Pl E) (r a : ℕ) (ϖ : w.adicCompletion E), IsUnifV E w ϖ → a ≤ r →
+      ∀ (V : Type) [AddCommGroup V] [Module ℂ V] (ρ : Representation ℂ (GL (Fin r) (w.adicCompletion E)) V) (f : V) (B : Multiset ℂˣ), IsSatVecGL w ρ f B →
+      ∃ (n : ℕ) (c : Fin n → GL (Fin r) (w.adicCompletion E)) (μ : ℂ), 0 < n ∧ (∀ i, (c i)⁻¹ ∈ satakeTset w ϖ a) ∧ ∑ i, ρ (c i) f = μ • f := by
   intro E _ _ w r a ϖ hu har V _ _ ρ f B hf
   classical
   obtain ⟨hf0, hfix, -, hT⟩ := hf
@@ -110,15 +137,11 @@ theorem UpperTheory.exists_satakeTset_sum_eigenvector
   letI : Fintype (satakeRes (Ov E w) ⟨ϖ, hϖ⟩) := @Fintype.ofFinite _ (satake_res_finite w hϖ hu)
   have hne : ∀ j, j ≤ r → Nonempty (SatakeIdx w hϖ (n := r) j) := by
     intro j hj
-    obtain ⟨S, -, hS⟩ :=
-      Finset.exists_subset_card_eq (s := (Finset.univ : Finset (Fin r))) (n := j)
-        (by simpa using hj)
+    obtain ⟨S, -, hS⟩ := Finset.exists_subset_card_eq (s := (Finset.univ : Finset (Fin r))) (n := j)
+      (by simpa using hj)
     exact ⟨⟨⟨S, hS⟩, fun _ => 0⟩⟩
-  have hsum
-      : ∀ j,
-        j ≤ r
-          → ∑ i : SatakeIdx w hϖ (n := r) j, ρ (satakeB w hϖ hu i) f
-            = satEig (qV E w) r B j • f := fun j hj => by
+  have hsum : ∀ j, j ≤ r → ∑ i : SatakeIdx w hϖ (n := r) j, ρ (satakeB w hϖ hu i) f =
+      satEig (qV E w) r B j • f := fun j hj => by
     rw [← UpperTheory.V.Cj.S.hkSum E w r V ρ ϖ hϖ hu j hj f hfix, hT ϖ hu j hj]
   set z := zGL r hπ with hzdef
   have hfx : ∀ k ∈ KGL w (n := r), ρ k f = f := fun k hk => GlobalTheory.LGrp.mem_fixed.1 hfix _ hk
@@ -145,8 +168,7 @@ theorem UpperTheory.exists_satakeTset_sum_eigenvector
   have hzf : ρ z f = c • f := by
     have h := hsum r le_rfl
     simp only [hB, Finset.sum_const, Finset.card_univ] at h
-    rw [hcdef, mul_smul, ← h, ← Nat.cast_smul_eq_nsmul ℂ, smul_smul, inv_mul_cancel₀ hcard,
-      one_smul]
+    rw [hcdef, mul_smul, ← h, ← Nat.cast_smul_eq_nsmul ℂ, smul_smul, inv_mul_cancel₀ hcard, one_smul]
   have hc : c ≠ 0 := by
     intro h0
     rw [h0, zero_smul] at hzf
@@ -162,17 +184,11 @@ theorem UpperTheory.exists_satakeTset_sum_eigenvector
     exact this
   obtain ⟨i₁⟩ := hne (r - a) (Nat.sub_le _ _)
   let e := Fintype.equivFin (SatakeIdx w hϖ (n := r) (r - a))
-  refine ⟨
-    Fintype.card (SatakeIdx w hϖ (n := r) (r - a)),
-    fun i => z⁻¹ * satakeB w hϖ hu (e.symm i),
-    satEig (qV E w) r B (r - a) * c⁻¹,
-    Fintype.card_pos_iff.2 ⟨i₁⟩,
-    fun i => ?_,
-    ?_
-  ⟩
+  refine ⟨Fintype.card (SatakeIdx w hϖ (n := r) (r - a)), fun i => z⁻¹ * satakeB w hϖ hu (e.symm i),
+    satEig (qV E w) r B (r - a) * c⁻¹, Fintype.card_pos_iff.2 ⟨i₁⟩, fun i => ?_, ?_⟩
   · rw [mul_inv_rev, inv_inv]
     exact inv_mem w har hπ (satakeB_mem w hϖ hu _)
   · rw [Equiv.sum_comp e.symm (fun i => ρ (z⁻¹ * satakeB w hϖ hu i) f)]
     simp only [map_mul, Module.End.mul_apply]
-    set_option synthInstance.maxHeartbeats 100000 in
+
     rw [← map_sum, hsum _ (Nat.sub_le _ _), map_smul, hzi, smul_smul]

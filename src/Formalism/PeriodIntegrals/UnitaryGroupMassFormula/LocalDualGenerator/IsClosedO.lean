@@ -1,7 +1,58 @@
 module
 
-public import Mathlib
-public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.LocalDualGenerator.FpDualUnram
+public import Mathlib.Algebra.Algebra.ZMod
+public import Mathlib.NumberTheory.LocalField.Basic
+public import Mathlib.NumberTheory.Padics.RingHoms
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.Padics.ProperSpace
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -11,8 +62,7 @@ open ValuativeRel IsLocalRing
 
 namespace PI.LocDualGen.FpU
 
-variable
-  (K : Type) [Field K] [ValuativeRel K] [TopologicalSpace K] [IsNonarchimedeanLocalField K]
+variable (K : Type) [Field K] [ValuativeRel K] [TopologicalSpace K] [IsNonarchimedeanLocalField K]
   (l : ℕ) [Fact l.Prime] [Algebra ℚ_[l] K]
 
 theorem t2 : T2Space K := by
@@ -33,8 +83,8 @@ theorem isClosed_O : IsClosed ((𝒪[K] : Set K)) := by
   haveI : T2Space K := t2 (K := K)
   exact (IsNonarchimedeanLocalField.isCompact_closedBall K 1).isClosed
 
-theorem iota_mem (hcont : Continuous (algebraMap ℚ_[l] K)) (a : ℤ_[l])
-    : algebraMap ℚ_[l] K (a : ℚ_[l]) ∈ 𝒪[K] := by
+theorem iota_mem (hcont : Continuous (algebraMap ℚ_[l] K)) (a : ℤ_[l]) :
+    algebraMap ℚ_[l] K (a : ℚ_[l]) ∈ 𝒪[K] := by
   have hcl : IsClosed {a : ℤ_[l] | algebraMap ℚ_[l] K (a : ℚ_[l]) ∈ 𝒪[K]} :=
     (isClosed_O (K := K)).preimage (hcont.comp continuous_subtype_val)
   refine PadicInt.denseRange_intCast.induction_on a hcl ?_
@@ -46,19 +96,16 @@ def iotaR (hcont : Continuous (algebraMap ℚ_[l] K)) : ℤ_[l] →+* 𝒪[K] :=
   ((algebraMap ℚ_[l] K).comp (PadicInt.Coe.ringHom (p := l))).codRestrict 𝒪[K]
     (fun a => iota_mem K l hcont a)
 
-theorem iotaR_coe (hcont : Continuous (algebraMap ℚ_[l] K)) (a : ℤ_[l])
-    : ((iotaR K l hcont a : 𝒪[K]) : K) = algebraMap ℚ_[l] K (a : ℚ_[l]) :=
-  rfl
+theorem iotaR_coe (hcont : Continuous (algebraMap ℚ_[l] K)) (a : ℤ_[l]) :
+    ((iotaR K l hcont a : 𝒪[K]) : K) = algebraMap ℚ_[l] K (a : ℚ_[l]) := rfl
 
 theorem charP_res (huni : Irreducible ((l : ℕ) : 𝒪[K])) : CharP 𝓀[K] l := by
   rw [CharP.charP_iff_prime_eq_zero (Fact.out : l.Prime), ← map_natCast (residue 𝒪[K]) l,
     IsLocalRing.residue_eq_zero_iff]
   exact (IsLocalRing.mem_maximalIdeal _).2 (mem_nonunits_iff.2 huni.not_isUnit)
 
-theorem repr_sum
-    {ι R M : Type*} [Fintype ι] [CommRing R] [AddCommGroup M] [Module R M]
-    (b : Module.Basis ι R M) (c : ι → R) (i : ι)
-    : b.repr (∑ j, c j • b j) i = c i := by
+theorem repr_sum {ι R M : Type*} [Fintype ι] [CommRing R] [AddCommGroup M] [Module R M]
+    (b : Module.Basis ι R M) (c : ι → R) (i : ι) : b.repr (∑ j, c j • b j) i = c i := by
   exact congrFun (b.repr_sum_self c) i
 
 section Res
@@ -69,8 +116,8 @@ abbrev algRes : Algebra (ZMod l) 𝓀[K] := ZMod.algebra _ l
 
 attribute [local instance] algRes
 
-theorem res_iotaR (hcont : Continuous (algebraMap ℚ_[l] K)) (a : ℤ_[l])
-    : residue 𝒪[K] (iotaR K l hcont a) = algebraMap (ZMod l) 𝓀[K] (PadicInt.toZMod a) := by
+theorem res_iotaR (hcont : Continuous (algebraMap ℚ_[l] K)) (a : ℤ_[l]) :
+    residue 𝒪[K] (iotaR K l hcont a) = algebraMap (ZMod l) 𝓀[K] (PadicInt.toZMod a) := by
   obtain ⟨-, h⟩ := PadicInt.zmodRepr_spec a
   rw [PadicInt.maximalIdeal_eq_span_p, Ideal.mem_span_singleton'] at h
   obtain ⟨b, hb⟩ := h
@@ -90,27 +137,24 @@ theorem res_blift (i : Fin (fdim K l)) : residue 𝒪[K] (blift K l i) = bb K l 
 def Phi (hcont : Continuous (algebraMap ℚ_[l] K)) (c : Fin (fdim K l) → ℤ_[l]) : 𝒪[K] :=
   ∑ i, iotaR K l hcont (c i) * blift K l i
 
-theorem Phi_coe (hcont : Continuous (algebraMap ℚ_[l] K)) (c : Fin (fdim K l) → ℤ_[l])
-    : ((Phi K l hcont c : 𝒪[K]) : K)
-      = ∑ i, algebraMap ℚ_[l] K (c i : ℚ_[l]) * (blift K l i : K) := by
+theorem Phi_coe (hcont : Continuous (algebraMap ℚ_[l] K)) (c : Fin (fdim K l) → ℤ_[l]) :
+    ((Phi K l hcont c : 𝒪[K]) : K) = ∑ i, algebraMap ℚ_[l] K (c i : ℚ_[l]) * (blift K l i : K) := by
   unfold Phi
   push_cast
   simp only [iotaR_coe]
 
-theorem Phi_add
-    (hcont : Continuous (algebraMap ℚ_[l] K)) (c c' : Fin (fdim K l) → ℤ_[l]) (s : ℤ_[l])
-    : Phi K l hcont (c + s • c') = Phi K l hcont c + iotaR K l hcont s * Phi K l hcont c' := by
+theorem Phi_add (hcont : Continuous (algebraMap ℚ_[l] K)) (c c' : Fin (fdim K l) → ℤ_[l]) (s : ℤ_[l]) :
+    Phi K l hcont (c + s • c') = Phi K l hcont c + iotaR K l hcont s * Phi K l hcont c' := by
   simp only [Phi, Pi.add_apply, Pi.smul_apply, smul_eq_mul, map_add (f := _), map_mul, add_mul,
     Finset.sum_add_distrib, Finset.mul_sum, mul_assoc]
 
-theorem res_Phi (hcont : Continuous (algebraMap ℚ_[l] K)) (c : Fin (fdim K l) → ℤ_[l])
-    : residue 𝒪[K] (Phi K l hcont c) = ∑ i, PadicInt.toZMod (c i) • bb K l i := by
-  set_option synthInstance.maxHeartbeats 100000 in
+theorem res_Phi (hcont : Continuous (algebraMap ℚ_[l] K)) (c : Fin (fdim K l) → ℤ_[l]) :
+    residue 𝒪[K] (Phi K l hcont c) = ∑ i, PadicInt.toZMod (c i) • bb K l i := by
+
   simp only [Phi, map_sum, map_mul, res_iotaR, res_blift, Algebra.smul_def]
 
-theorem one_step
-    (hcont : Continuous (algebraMap ℚ_[l] K)) (huni : Irreducible ((l : ℕ) : 𝒪[K])) (x : 𝒪[K])
-    : ∃ c, ∃ y : 𝒪[K], x = Phi K l hcont c + (l : 𝒪[K]) * y := by
+theorem one_step (hcont : Continuous (algebraMap ℚ_[l] K)) (huni : Irreducible ((l : ℕ) : 𝒪[K]))
+    (x : 𝒪[K]) : ∃ c, ∃ y : 𝒪[K], x = Phi K l hcont c + (l : 𝒪[K]) * y := by
   haveI : NeZero l := ⟨(Fact.out : l.Prime).ne_zero⟩
   set r := (bb K l).repr (residue 𝒪[K] x) with hr
   refine ?_
@@ -122,15 +166,13 @@ theorem one_step
     exact (bb K l).sum_repr (residue 𝒪[K] x)
   have hm : x - Phi K l hcont (fun i => ((r i).val : ℤ_[l])) ∈ maximalIdeal 𝒪[K] := by
     rw [← IsLocalRing.residue_eq_zero_iff, map_sub, hc, sub_self]
-  rw [(IsDiscreteValuationRing.irreducible_iff_uniformizer _).1 huni, Ideal.mem_span_singleton']
-    at hm
+  rw [(IsDiscreteValuationRing.irreducible_iff_uniformizer _).1 huni,
+    Ideal.mem_span_singleton'] at hm
   obtain ⟨y, hy⟩ := hm
   exact ⟨_, y, by rw [mul_comm, hy]; ring⟩
 
-theorem n_step
-    (hcont : Continuous (algebraMap ℚ_[l] K)) (huni : Irreducible ((l : ℕ) : 𝒪[K])) (j : ℕ)
-    (x : 𝒪[K])
-    : ∃ c, ∃ y : 𝒪[K], x = Phi K l hcont c + (l : 𝒪[K]) ^ j * y := by
+theorem n_step (hcont : Continuous (algebraMap ℚ_[l] K)) (huni : Irreducible ((l : ℕ) : 𝒪[K]))
+    (j : ℕ) (x : 𝒪[K]) : ∃ c, ∃ y : 𝒪[K], x = Phi K l hcont c + (l : 𝒪[K]) ^ j * y := by
   induction j with
   | zero => exact ⟨0, x, by simp [Phi]⟩
   | succ j ih =>
@@ -141,9 +183,8 @@ theorem n_step
     simp only [map_pow, map_natCast]
     ring
 
-theorem span
-    (hcont : Continuous (algebraMap ℚ_[l] K)) (huni : Irreducible ((l : ℕ) : 𝒪[K])) (x : 𝒪[K])
-    : ∃ c, x = Phi K l hcont c := by
+theorem span (hcont : Continuous (algebraMap ℚ_[l] K)) (huni : Irreducible ((l : ℕ) : 𝒪[K]))
+    (x : 𝒪[K]) : ∃ c, x = Phi K l hcont c := by
   haveI : T2Space K := t2 (K := K)
   choose c y hxy using fun j => n_step K l hcont huni j x
   let F : (Fin (fdim K l) → ℤ_[l]) → K := fun c => ((Phi K l hcont c : 𝒪[K]) : K)
@@ -168,9 +209,8 @@ theorem span
     show valuation K ((l : K) ^ j * (y j : K)) < γ
     rw [map_mul]
     have hy1 : valuation K (y j : K) ≤ 1 := (Valuation.mem_integer_iff _ _).1 (y j).2
-    calc
-      valuation K ((l : K) ^ j) * valuation K (y j : K)
-        ≤ valuation K ((l : K) ^ j) * 1 := by gcongr
+    calc valuation K ((l : K) ^ j) * valuation K (y j : K) ≤ valuation K ((l : K) ^ j) * 1 :=
+          by gcongr
       _ = valuation K ((l : K) ^ j) := mul_one _
       _ < _ := hj'
   have heq : (fun j => F (c j)) = fun j => (x : K) - (l : K) ^ j * (y j : K) := by

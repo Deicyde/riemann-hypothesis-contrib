@@ -1,19 +1,52 @@
 module
 
-public import Mathlib
-public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.IsCMFrame
+public import Development.AbelianVarietyTheory.Definitions.CMLattices.IsDiffOf
+public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.IsHodgeGram
 public import Development.AutomorphicSpectrum.Proofs.AlgebraProofs.SesqSesquilinearSkewHermitianStatement
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
 
 @[expose] public section
 
 noncomputable section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
-  NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
-  ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open Matrix GlobalTheory GlobalTheory.CM GlobalTheory.CompanionTheory.Ar
-  GlobalTheory.CompanionTheory.Ar.Fl
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open Matrix GlobalTheory GlobalTheory.CM GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Fl
 open scoped ComplexOrder
 
 namespace GlobalTheory.CompanionTheory.Ar.Fl.KForm
@@ -22,15 +55,17 @@ section Embeddings
 
 variable {E : Type} [Field E] [NumberField E]
 
+
 open Classical in
-theorem sum_dual_mul (σ τ : E →+* ℂ)
-    : ∑ k, σ (HT.dualInt E k) * τ ((RingOfIntegers.basis E k : 𝓞 E) : E)
-      = if τ = σ then 1 else 0 := by
-  let ρ : 𝓞 E →+* Module.End ℂ ℂ := (Algebra.lmul ℂ ℂ).toRingHom.comp (τ.comp (algebraMap (𝓞 E) E))
+theorem sum_dual_mul (σ τ : E →+* ℂ) :
+    ∑ k, σ (HT.dualInt E k) * τ ((RingOfIntegers.basis E k : 𝓞 E) : E) = if τ = σ then 1 else 0 := by
+  let ρ : 𝓞 E →+* Module.End ℂ ℂ :=
+    (Algebra.lmul ℂ ℂ).toRingHom.comp (τ.comp (algebraMap (𝓞 E) E))
   have hρ : ∀ (a : 𝓞 E) (z : ℂ), ρ a z = τ (a : E) * z := fun a z => rfl
-  have hmem : (1 : ℂ) ∈ HT.eigSp ρ τ := HT.LatBasic.mem_eigSp.2 fun a => by rw [hρ, smul_eq_mul]
-  have hP
-      : HT.eigProj ρ σ 1 = ∑ k, σ (HT.dualInt E k) * τ ((RingOfIntegers.basis E k : 𝓞 E) : E) := by
+  have hmem : (1 : ℂ) ∈ HT.eigSp ρ τ := HT.LatBasic.mem_eigSp.2 fun a => by
+    rw [hρ, smul_eq_mul]
+  have hP : HT.eigProj ρ σ 1 =
+      ∑ k, σ (HT.dualInt E k) * τ ((RingOfIntegers.basis E k : 𝓞 E) : E) := by
     simp [HT.eigProj, LinearMap.sum_apply, hρ]
   rw [← hP]
   split_ifs with h
@@ -38,7 +73,8 @@ theorem sum_dual_mul (σ τ : E →+* ℂ)
     exact HT.LatBasic.eigProj_of_mem hmem
   · exact HT.LatBasic.eigProj_of_ne (Ne.symm h) hmem
 
-theorem trace_cast (z : E) : ((Algebra.trace ℚ E z : ℚ) : ℂ) = ∑ τ : E →ₐ[ℚ] ℂ, τ z := by
+theorem trace_cast (z : E) :
+    ((Algebra.trace ℚ E z : ℚ) : ℂ) = ∑ τ : E →ₐ[ℚ] ℂ, τ z := by
   have := trace_eq_sum_embeddings (K := ℚ) (L := E) ℂ (x := z)
   simpa using this
 
@@ -46,20 +82,17 @@ end Embeddings
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {D : Datum H}
 
-theorem kappa_form
-    {ε : ℤˣ} {h : D.La → D.La → OK H} {σ : E →+* ℂ} {κ : OK H →+* ℂ}
-    (hh : IsKForm D ε h) (hκ : κ (wK H) = σ (H.w0 : E))
-    (X Y : D.La)
-    : κ (h X Y)
-      = ((ε : ℤ) : ℂ) * ∑ τ : E →ₐ[ℚ] ℂ, τ (sesq D X Y) * (τ (H.w0 : E) - 1 + σ (H.w0 : E)) := by
+theorem kappa_form {ε : ℤˣ} {h : D.La → D.La → OK H} {σ : E →+* ℂ} {κ : OK H →+* ℂ}
+    (hh : IsKForm D ε h) (hκ : κ (wK H) = σ (H.w0 : E)) (X Y : D.La) :
+    κ (h X Y) = ((ε : ℤ) : ℂ) *
+      ∑ τ : E →ₐ[ℚ] ℂ, τ (sesq D X Y) * (τ (H.w0 : E) - 1 + σ (H.w0 : E)) := by
   obtain ⟨hT, -⟩ := GlobalTheory.T.sesq_sesquilinear_skew_hermitian E H D
-  have e1
-      : h X Y
-        = (((ε : ℤ) * (D.EF (H.w0 • X) Y - D.EF X Y) : ℤ) : OK H)
-          + (((ε : ℤ) * D.EF X Y : ℤ) : OK H) * wK H := by
+  have e1 : h X Y = (((ε : ℤ) * (D.EF (H.w0 • X) Y - D.EF X Y) : ℤ) : OK H) +
+      (((ε : ℤ) * D.EF X Y : ℤ) : OK H) * wK H := by
     apply Subtype.ext
     simpa [wK] using hh X Y
-  have t1 : ((D.EF (H.w0 • X) Y : ℤ) : ℂ) = ∑ τ : E →ₐ[ℚ] ℂ, τ (H.w0 : E) * τ (sesq D X Y) := by
+  have t1 : ((D.EF (H.w0 • X) Y : ℤ) : ℂ) =
+      ∑ τ : E →ₐ[ℚ] ℂ, τ (H.w0 : E) * τ (sesq D X Y) := by
     have := congrArg (fun q : ℚ => (q : ℂ)) (hT H.w0 X Y)
     simp only [trace_cast, map_mul] at this
     rw [this]
@@ -68,10 +101,9 @@ theorem kappa_form
     have h1 : Algebra.trace ℚ E (sesq D X Y) = (D.EF X Y : ℚ) := by simpa using hT 1 X Y
     rw [← trace_cast, h1]
     simp
-  have hs
-      : ∑ τ : E →ₐ[ℚ] ℂ, τ (sesq D X Y) * (τ (H.w0 : E) - 1 + σ (H.w0 : E))
-        = ∑ τ : E →ₐ[ℚ] ℂ, τ (H.w0 : E) * τ (sesq D X Y) - ∑ τ : E →ₐ[ℚ] ℂ, τ (sesq D X Y)
-          + (∑ τ : E →ₐ[ℚ] ℂ, τ (sesq D X Y)) * σ (H.w0 : E) := by
+  have hs : ∑ τ : E →ₐ[ℚ] ℂ, τ (sesq D X Y) * (τ (H.w0 : E) - 1 + σ (H.w0 : E)) =
+      ∑ τ : E →ₐ[ℚ] ℂ, τ (H.w0 : E) * τ (sesq D X Y) - ∑ τ : E →ₐ[ℚ] ℂ, τ (sesq D X Y) +
+        (∑ τ : E →ₐ[ℚ] ℂ, τ (sesq D X Y)) * σ (H.w0 : E) := by
     rw [Finset.sum_mul, ← Finset.sum_sub_distrib, ← Finset.sum_add_distrib]
     exact Finset.sum_congr rfl fun τ _ => by ring
   set_option synthInstance.maxHeartbeats 100000 in
@@ -80,23 +112,14 @@ theorem kappa_form
   rw [t1, t0]
   ring
 
-theorem sigma_component
-    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H) (ε : ℤˣ)
-        (h : D.La → D.La → OK H) (σ : E →+* ℂ) (κ : OK H →+* ℂ) (n : ℕ)
-        (e : Fin n ≃ Module.Free.ChooseBasisIndex ℤ (𝓞 E)) (x y : D.La),
-      IsKForm D ε h → κ (wK H) = σ (H.w0 : E)
-        → ∑ k, ∑ k', σ (HT.dualInt E (e k)) * κ (h (RingOfIntegers.basis E (e k) • x) (RingOfIntegers.basis E (e k') • y)) * starRingEnd ℂ (σ (HT.dualInt E (e k')))
-          = ((ε : ℤ) : ℂ) * σ ((H.rt : E) * sesq D x y) := by
+theorem sigma_component : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H) (ε : ℤˣ) (h : D.La → D.La → OK H) (σ : E →+* ℂ) (κ : OK H →+* ℂ) (n : ℕ) (e : Fin n ≃ Module.Free.ChooseBasisIndex ℤ (𝓞 E)) (x y : D.La), IsKForm D ε h → κ (wK H) = σ (H.w0 : E) → ∑ k, ∑ k', σ (HT.dualInt E (e k)) * κ (h (RingOfIntegers.basis E (e k) • x) (RingOfIntegers.basis E (e k') • y)) * starRingEnd ℂ (σ (HT.dualInt E (e k'))) = ((ε : ℤ) : ℂ) * σ ((H.rt : E) * sesq D x y) := by
   classical
   intro E _ _ _ H D ε h σ κ n e x y hh hκ
   obtain ⟨-, -, -, hL, hR, -⟩ := GlobalTheory.T.sesq_sesquilinear_skew_hermitian E H D
 
-  have hform
-      : ∀ a c : 𝓞 E,
-        κ (h (a • x) (c • y))
-          = ((ε : ℤ) : ℂ)
-            * ∑ τ : E →ₐ[ℚ] ℂ, τ (a : E) * starRingEnd ℂ (τ (c : E)) *
-                (τ (sesq D x y) * (τ (H.w0 : E) - 1 + σ (H.w0 : E))) := by
+  have hform : ∀ a c : 𝓞 E, κ (h (a • x) (c • y)) = ((ε : ℤ) : ℂ) *
+      ∑ τ : E →ₐ[ℚ] ℂ, τ (a : E) * starRingEnd ℂ (τ (c : E)) *
+        (τ (sesq D x y) * (τ (H.w0 : E) - 1 + σ (H.w0 : E))) := by
     intro a c
     rw [kappa_form hh hκ]
     congr 1
@@ -115,13 +138,12 @@ theorem sigma_component
     exact this
   set c : (E →ₐ[ℚ] ℂ) → ℂ := fun τ =>
     τ (sesq D x y) * (τ (H.w0 : E) - 1 + σ (H.w0 : E)) with hcdef
-  have hexp
-      : ∑ k, ∑ k', σ (HT.dualInt E (e k)) *
-          κ (h (RingOfIntegers.basis E (e k) • x) (RingOfIntegers.basis E (e k') • y)) *
-          starRingEnd ℂ (σ (HT.dualInt E (e k')))
-        = ((ε : ℤ) : ℂ) * ∑ τ : E →ₐ[ℚ] ℂ, S τ * starRingEnd ℂ (S τ) * c τ := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [hform, hSdef, hcdef, map_sum, map_mul, Finset.sum_mul, Finset.mul_sum]
+  have hexp : ∑ k, ∑ k', σ (HT.dualInt E (e k)) *
+        κ (h (RingOfIntegers.basis E (e k) • x) (RingOfIntegers.basis E (e k') • y)) *
+        starRingEnd ℂ (σ (HT.dualInt E (e k'))) =
+      ((ε : ℤ) : ℂ) * ∑ τ : E →ₐ[ℚ] ℂ, S τ * starRingEnd ℂ (S τ) * c τ := by
+
+    simp only [hform, hSdef, hcdef, map_sum, map_mul, Finset.sum_mul, Finset.mul_sum]
     rw [Finset.sum_congr rfl fun k _ => Finset.sum_comm]
     rw [Finset.sum_comm]
     refine Finset.sum_congr rfl fun τ _ => ?_

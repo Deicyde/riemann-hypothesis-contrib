@@ -1,8 +1,49 @@
 module
 
 public import Formalism.SharpRestriction.GrowthBounds.AevalValuation.PlDefs
-public import Formalism.SharpRestriction.GrowthBounds.TwistedSubstitution.TwistedMonomialFiltration.TwistSubXMemSupported
-public import Formalism.SharpRestriction.GrowthBounds.PolynomialLevels.LowestWeightNonposOffSet
+public import Formalism.SharpRestriction.GrowthBounds.DiagonalSupport.MembDefs
+public import Formalism.SharpRestriction.GrowthBounds.TwistedSubstitution.TwistedMonomialFiltration.TMemLaurentFiltration
+public import Formalism.SharpRestriction.GrowthBounds.ValuationLowestDegreeMapFractionField
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Formalism.SharpRestriction.GrowthBounds.DiagonalSupport.TwiceValuationFactorialProduct
+import Formalism.SharpRestriction.GrowthBounds.PolynomialLevels.TlNonempty
 
 @[expose] public section
 
@@ -12,17 +53,12 @@ open MvPolynomial Finset Classical
 
 namespace Formalism.MainNotions.TraceSpectra
 
-open Formalism.MainNotions.G Formalism.MainNotions.Proposition5Numerics
-  Formalism.MainNotions.NormalSetCounting Formalism.MainNotions.TestSideWords.TwistedFiltration.G1
+open Formalism.MainNotions.G Formalism.MainNotions.Proposition5Numerics Formalism.MainNotions.NormalSetCounting Formalism.MainNotions.TestSideWords.TwistedFiltration.G1
 
-private theorem le_valS_iff_forall_coeff_ne_zero
-    {R : Type} [CommRing R]
-    {ι : Type} {n : ℕ} [NeZero n]
-    (LL : Letters ι) (S : Set ι) (G : MvPolynomial (ι × Fin n) R) (a : WithTop ℤ)
-    : a ≤ valS LL S G
-      ↔ ∀ (m : ι × Fin n →₀ ℕ) (k : ℤ),
-        (AddMonoidAlgebra.coeff (twistSub LL S (lastIdx n) G) m).coeff k ≠ 0
-          → a ≤ (k : WithTop ℤ) := by
+private theorem le_valS_iff_forall_coeff_ne_zero {R : Type} [CommRing R] {ι : Type} {n : ℕ} [NeZero n] (LL : Letters ι)
+    (S : Set ι) (G : MvPolynomial (ι × Fin n) R) (a : WithTop ℤ) :
+    a ≤ valS LL S G ↔ ∀ (m : ι × Fin n →₀ ℕ) (k : ℤ),
+      (AddMonoidAlgebra.coeff (twistSub LL S (lastIdx n) G) m).coeff k ≠ 0 → a ≤ (k : WithTop ℤ) := by
   rw [valS, Finset.le_inf_iff]
   constructor
   · intro h m k hk
@@ -40,13 +76,9 @@ private theorem le_valS_iff_forall_coeff_ne_zero
     obtain ⟨m, -, hm⟩ := hk
     exact h m k (Finsupp.mem_support_iff.mp hm)
 
-private theorem ringHom_eq_of_mem_supported_of_eqOn
-    {σ R T : Type} [CommRing R] [CommRing T]
-    (φ ψ : MvPolynomial σ R →+* T)
-    (s : Set σ)
-    (hC : ∀ c, φ (C c) = ψ (C c)) (hX : ∀ v ∈ s, φ (X v) = ψ (X v))
-    {F : MvPolynomial σ R} (hF : F ∈ supported R s)
-    : φ F = ψ F := by
+private theorem ringHom_eq_of_mem_supported_of_eqOn {σ R T : Type} [CommRing R] [CommRing T] (φ ψ : MvPolynomial σ R →+* T)
+    (s : Set σ) (hC : ∀ c, φ (C c) = ψ (C c)) (hX : ∀ v ∈ s, φ (X v) = ψ (X v))
+    {F : MvPolynomial σ R} (hF : F ∈ supported R s) : φ F = ψ F := by
   rw [supported_eq_range_rename, AlgHom.mem_range] at hF
   obtain ⟨p, rfl⟩ := hF
   have h : φ.comp (rename ((↑) : s → σ)).toRingHom = ψ.comp (rename ((↑) : s → σ)).toRingHom := by
@@ -57,41 +89,32 @@ private theorem ringHom_eq_of_mem_supported_of_eqOn
       simp [hX v.1 v.2]
   exact RingHom.congr_fun h p
 
-private theorem homComp_eq_polComp
-    {R ι : Type} [CommRing R] {n : ℕ} (d : ι → ℕ) (F : MvPolynomial (ι × Fin n) R)
-    : homComp d F = Joints.StandardMonomialSpace.polComp R n d F := by
+private theorem homComp_eq_polComp {R ι : Type} [CommRing R] {n : ℕ} (d : ι → ℕ)
+    (F : MvPolynomial (ι × Fin n) R) : homComp d F = Joints.StandardMonomialSpace.polComp R n d F := by
   conv_rhs => rw [F.as_sum]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
-  simp only [Joints.StandardMonomialSpace.polComp, Joints.StandardMonomialSpace.suppProj_monomial,
-    Set.mem_setOf_eq]
+
+  rw [map_sum]
+  simp only [Joints.StandardMonomialSpace.polComp, Joints.StandardMonomialSpace.suppProj_monomial, Set.mem_setOf_eq]
   rw [homComp, Finset.sum_filter]
 
-theorem valS_sum_ge
-    {R : Type} [CommRing R]
-    {ι : Type} {n : ℕ} [NeZero n]
-    (LL : Letters ι) (S : Set ι)
-    {α : Type} (s : Finset α) (f : α → MvPolynomial (ι × Fin n) R)
-    (a : WithTop ℤ) (h : ∀ i ∈ s, a ≤ valS LL S (f i))
-    : a ≤ valS LL S (∑ i ∈ s, f i) := by
+theorem valS_sum_ge {R : Type} [CommRing R] {ι : Type} {n : ℕ} [NeZero n] (LL : Letters ι) (S : Set ι) {α : Type}
+    (s : Finset α) (f : α → MvPolynomial (ι × Fin n) R) (a : WithTop ℤ) (h : ∀ i ∈ s, a ≤ valS LL S (f i)) :
+    a ≤ valS LL S (∑ i ∈ s, f i) := by
   rw [le_valS_iff_forall_coeff_ne_zero]
   intro m k hk
   have hs : Joints.StandardMonomialSpace.SuppIn {k : ℤ | a ≤ (k : WithTop ℤ)}
       (AddMonoidAlgebra.coeff (twistSub LL S (lastIdx n) (∑ i ∈ s, f i)) m) := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, coeff_sum]
+
+    rw [map_sum, coeff_sum]
     apply Joints.StandardMonomialSpace.SuppIn.sum
     intro i hi k' hk'
     exact (le_valS_iff_forall_coeff_ne_zero LL S (f i) a).mp (h i hi) m k' hk'
   exact hs k hk
 
-theorem filtQ_eq_sum
-    {Kf : Type} [Field Kf] {ι : Type} {n : ℕ} (Q : (ι → ℕ) → Prop) (F : MvPolynomial (ι × Fin n) Kf)
-    : filtQ Q F
-      = ∑ δ ∈ (F.support.image fun mo => fun i => multideg mo i).filter Q, homComp δ F := by
-  have hmaps
-      : ∀ mo ∈ F.support.filter (fun mo => Q fun i => multideg mo i),
-        (fun i => multideg mo i) ∈ (F.support.image fun mo => fun i => multideg mo i).filter Q := by
+theorem filtQ_eq_sum {Kf : Type} [Field Kf] {ι : Type} {n : ℕ} (Q : (ι → ℕ) → Prop) (F : MvPolynomial (ι × Fin n) Kf) :
+    filtQ Q F = ∑ δ ∈ (F.support.image fun mo => fun i => multideg mo i).filter Q, homComp δ F := by
+  have hmaps : ∀ mo ∈ F.support.filter (fun mo => Q fun i => multideg mo i),
+      (fun i => multideg mo i) ∈ (F.support.image fun mo => fun i => multideg mo i).filter Q := by
     intro mo hmo
     rw [Finset.mem_filter] at hmo
     rw [Finset.mem_filter, Finset.mem_image]
@@ -125,23 +148,18 @@ section Aeval
 
 variable {Kf : Type} [Field Kf] {ι κ : Type} {n : ℕ}
 
-def thetaG (g : ι × Fin n → MvPolynomial (κ × Fin n) Kf)
-    : MvPolynomial (ι × Fin n) (GLLaurent Kf n) →+* MvPolynomial (κ × Fin n) (GLLaurent Kf n) :=
+def thetaG (g : ι × Fin n → MvPolynomial (κ × Fin n) Kf) :
+    MvPolynomial (ι × Fin n) (GLLaurent Kf n) →+* MvPolynomial (κ × Fin n) (GLLaurent Kf n) :=
   eval₂Hom C fun v => MvPolynomial.map (coefL Kf n) (g v)
 
-theorem twist_aeval
-    (LL : Letters ι) (LL' : Letters κ)
-    (S L : Set ι)
-    (S' : Set κ) (f : ι → κ) (g : ι × Fin n → MvPolynomial (κ × Fin n) Kf)
-    (F : MvPolynomial (ι × Fin n) Kf) (hF : F ∈ supported Kf {v : ι × Fin n | v.1 ∈ L})
-    (h1 : ∀ v : ι × Fin n,
-      v.1 ∈ L → v.1 ∈ S → g v = X (f v.1, v.2) ∧ f v.1 ∈ S' ∧ LL'.vec (f v.1) = LL.vec v.1)
-    (h2 : ∀ v : ι × Fin n, v.1 ∈ L → v.1 ∉ S → g v ∈ supported Kf {u : κ × Fin n | u.1 ∉ S'})
-    (j : Fin n)
-    : twistSub LL' S' j (aeval g F) = thetaG g (twistSub LL S j F) := by
-  have key :=
-    ringHom_eq_of_mem_supported_of_eqOn ((twistSub LL' S' j).comp (aeval g).toRingHom)
-      ((thetaG g).comp (twistSub LL S j)) {v | v.1 ∈ L} ?_ ?_ hF
+theorem twist_aeval (LL : Letters ι) (LL' : Letters κ) (S L : Set ι) (S' : Set κ) (f : ι → κ)
+    (g : ι × Fin n → MvPolynomial (κ × Fin n) Kf) (F : MvPolynomial (ι × Fin n) Kf)
+    (hF : F ∈ supported Kf {v : ι × Fin n | v.1 ∈ L})
+    (h1 : ∀ v : ι × Fin n, v.1 ∈ L → v.1 ∈ S → g v = X (f v.1, v.2) ∧ f v.1 ∈ S' ∧ LL'.vec (f v.1) = LL.vec v.1)
+    (h2 : ∀ v : ι × Fin n, v.1 ∈ L → v.1 ∉ S → g v ∈ supported Kf {u : κ × Fin n | u.1 ∉ S'}) (j : Fin n) :
+    twistSub LL' S' j (aeval g F) = thetaG g (twistSub LL S j F) := by
+  have key := ringHom_eq_of_mem_supported_of_eqOn ((twistSub LL' S' j).comp (aeval g).toRingHom)
+    ((thetaG g).comp (twistSub LL S j)) {v | v.1 ∈ L} ?_ ?_ hF
   · simpa using key
   · intro c
     simp [twistSub, thetaG]
@@ -174,13 +192,10 @@ theorem twist_aeval
         have hu' : u.1 ∉ S' := hu
         simp only [twistSub, eval₂Hom_X', if_neg hu', map_X]
 
-theorem thetaG_mem
-    (g : ι × Fin n → MvPolynomial (κ × Fin n) Kf)
-    (e t : ℤ) (P : MvPolynomial (ι × Fin n) (GLLaurent Kf n))
-    (hP : P ∈ (laurentCoeffFiltration Kf n (ι × Fin n) e).F t)
-    : thetaG g P ∈ (laurentCoeffFiltration Kf n (κ × Fin n) e).F t := by
-  refine flt_hom_mem (flt_L (GLCoord Kf n) e) (laurentCoeffFiltration Kf n (κ × Fin n) e) (thetaG g)
-    0 ?_ ?_ hP
+theorem thetaG_mem (g : ι × Fin n → MvPolynomial (κ × Fin n) Kf) (e t : ℤ)
+    (P : MvPolynomial (ι × Fin n) (GLLaurent Kf n)) (hP : P ∈ (laurentCoeffFiltration Kf n (ι × Fin n) e).F t) :
+    thetaG g P ∈ (laurentCoeffFiltration Kf n (κ × Fin n) e).F t := by
+  refine flt_hom_mem (flt_L (GLCoord Kf n) e) (laurentCoeffFiltration Kf n (κ × Fin n) e) (thetaG g) 0 ?_ ?_ hP
   · intro t b hb
     rw [thetaG, eval₂Hom_C]
     exact flt_C_mem hb

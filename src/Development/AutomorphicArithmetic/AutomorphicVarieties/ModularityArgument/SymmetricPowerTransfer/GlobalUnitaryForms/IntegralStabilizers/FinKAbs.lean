@@ -1,95 +1,126 @@
 module
 
 public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityArgument.SymmetricPowerTransfer.TraceFormulaEigenvalues.IsGenEig
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Int
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+public import Mathlib.LinearAlgebra.Matrix.AbsoluteValue
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.Order.CompletePartialOrder
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+public import Mathlib.LinearAlgebra.Determinant
+public import Mathlib.LinearAlgebra.FreeModule.Finite.CardQuotient
 
 @[expose] public section
 
 namespace UpperTheory.V.Z.Sym.Glob
 
-private theorem index_range_mulLeft_eq_natAbs_det_and_det_ne_zero
-    {B : Type} [Ring B] [Module.Free ℤ B] [Module.Finite ℤ B]
-    (x : B) (hx : Function.Injective (fun z : B => x * z))
-    : (LinearMap.range (LinearMap.mulLeft ℤ x)).toAddSubgroup.index
-        = (LinearMap.det (LinearMap.mulLeft ℤ x)).natAbs
-      ∧ LinearMap.det (LinearMap.mulLeft ℤ x) ≠ 0 := by
+private theorem index_range_mulLeft_eq_natAbs_det_and_det_ne_zero {B : Type} [Ring B] [Module.Free ℤ B] [Module.Finite ℤ B] (x : B)
+    (hx : Function.Injective (fun z : B => x * z)) :
+    (LinearMap.range (LinearMap.mulLeft ℤ x)).toAddSubgroup.index =
+      (LinearMap.det (LinearMap.mulLeft ℤ x)).natAbs ∧ LinearMap.det (LinearMap.mulLeft ℤ x) ≠ 0 := by
   have hinj : Function.Injective (LinearMap.mulLeft ℤ x) := hx
   refine ⟨?_, ?_⟩
   · let e := LinearEquiv.ofInjective (LinearMap.mulLeft ℤ x) hinj
     have h := Submodule.natAbs_det_equiv (LinearMap.range (LinearMap.mulLeft ℤ x)) e
-    calc
-      (LinearMap.range (LinearMap.mulLeft ℤ x)).toAddSubgroup.index
+    calc (LinearMap.range (LinearMap.mulLeft ℤ x)).toAddSubgroup.index
         = Nat.card (B ⧸ LinearMap.range (LinearMap.mulLeft ℤ x)) := rfl
       _ = _ := h.symm
-      _ = _ := by congr 2
+      _ = _ := by
+        congr 2
   · rw [Ne, LinearMap.det_eq_zero_iff_ker_ne_bot, not_not, LinearMap.ker_eq_bot]
     exact hinj
 
-private theorem exists_natAbs_det_mulLeft_sum_le_mul_pow_card
-    {B : Type} [Ring B] {ι : Type} [Fintype ι] [DecidableEq ι] (b : Module.Basis ι ℤ B)
-    : ∃ C : ℕ, ∀ (c : ι → ℤ) (m : ℕ),
-      (∀ i, |c i| ≤ m)
-        → (LinearMap.det (LinearMap.mulLeft ℤ (∑ i, c i • b i))).natAbs
-          ≤ C * m ^ Fintype.card ι := by
+private theorem exists_natAbs_det_mulLeft_sum_le_mul_pow_card {B : Type} [Ring B] {ι : Type} [Fintype ι] [DecidableEq ι] (b : Module.Basis ι ℤ B) :
+    ∃ C : ℕ, ∀ (c : ι → ℤ) (m : ℕ), (∀ i, |c i| ≤ m) →
+      (LinearMap.det (LinearMap.mulLeft ℤ (∑ i, c i • b i))).natAbs ≤ C * m ^ Fintype.card ι := by
   set K0 : ℤ := ∑ t, ∑ l, ∑ i, |b.repr (b t * b l) i| with hK0
-  have hK0n : 0 ≤ K0 :=
-    Finset.sum_nonneg fun _ _ =>
-      Finset.sum_nonneg fun _ _ => Finset.sum_nonneg fun _ _ => abs_nonneg _
+  have hK0n : 0 ≤ K0 := Finset.sum_nonneg fun _ _ => Finset.sum_nonneg fun _ _ =>
+    Finset.sum_nonneg fun _ _ => abs_nonneg _
   refine ⟨(Fintype.card ι).factorial * K0.natAbs ^ Fintype.card ι, fun c m hc => ?_⟩
   rw [← LinearMap.det_toMatrix b]
-  have hent
-      : ∀ i l,
-        |LinearMap.toMatrix b b (LinearMap.mulLeft ℤ (∑ t, c t • b t)) i l| ≤ (m : ℤ) * K0 := by
+  have hent : ∀ i l, |LinearMap.toMatrix b b (LinearMap.mulLeft ℤ (∑ t, c t • b t)) i l| ≤ (m : ℤ) * K0 := by
     intro i l
     rw [LinearMap.toMatrix_apply, LinearMap.mulLeft_apply, Finset.sum_mul]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [smul_mul_assoc, map_sum, map_zsmul, Finset.sum_apply', Finsupp.smul_apply,
-        smul_eq_mul]
-    calc
-      |∑ t, c t * b.repr (b t * b l) i|
-        ≤ ∑ t, |c t * b.repr (b t * b l) i| := Finset.abs_sum_le_sum_abs _ _
+
+    simp only [smul_mul_assoc, map_sum, map_zsmul, Finset.sum_apply',
+    Finsupp.smul_apply, smul_eq_mul]
+    calc |∑ t, c t * b.repr (b t * b l) i| ≤ ∑ t, |c t * b.repr (b t * b l) i| :=
+          Finset.abs_sum_le_sum_abs _ _
       _ ≤ ∑ t, (m : ℤ) * |b.repr (b t * b l) i| := by
-        apply Finset.sum_le_sum
-        intro t _
-        rw [abs_mul]
-        exact mul_le_mul_of_nonneg_right (hc t) (abs_nonneg _)
+          apply Finset.sum_le_sum
+          intro t _
+          rw [abs_mul]
+          exact mul_le_mul_of_nonneg_right (hc t) (abs_nonneg _)
       _ = (m : ℤ) * ∑ t, |b.repr (b t * b l) i| := by rw [Finset.mul_sum]
       _ ≤ (m : ℤ) * K0 := by
-        apply mul_le_mul_of_nonneg_left _ (Nat.cast_nonneg m)
-        apply Finset.sum_le_sum
-        intro t _
-        calc
-          |b.repr (b t * b l) i| ≤ ∑ i', |b.repr (b t * b l) i'| :=
-            Finset.single_le_sum
-              (f := fun i' => |b.repr (b t * b l) i'|)
-              (fun _ _ => abs_nonneg _)
-              (Finset.mem_univ i)
-          _ ≤ ∑ l', ∑ i', |b.repr (b t * b l') i'| :=
-            Finset.single_le_sum
-              (f := fun l' => ∑ i', |b.repr (b t * b l') i'|)
-              (fun _ _ => Finset.sum_nonneg fun _ _ => abs_nonneg _)
-              (Finset.mem_univ l)
+          apply mul_le_mul_of_nonneg_left _ (Nat.cast_nonneg m)
+          apply Finset.sum_le_sum
+          intro t _
+          calc |b.repr (b t * b l) i| ≤ ∑ i', |b.repr (b t * b l) i'| :=
+                Finset.single_le_sum (f := fun i' => |b.repr (b t * b l) i'|)
+                  (fun _ _ => abs_nonneg _) (Finset.mem_univ i)
+            _ ≤ ∑ l', ∑ i', |b.repr (b t * b l') i'| :=
+                Finset.single_le_sum (f := fun l' => ∑ i', |b.repr (b t * b l') i'|)
+                  (fun _ _ => Finset.sum_nonneg fun _ _ => abs_nonneg _) (Finset.mem_univ l)
   have hdet := Matrix.det_le (abv := AbsoluteValue.abs) (x := (m : ℤ) * K0) (fun i l => hent i l)
-  have key
-      : (((LinearMap.toMatrix b b (LinearMap.mulLeft ℤ (∑ t, c t • b t))).det.natAbs : ℕ) : ℤ)
-        ≤ (((Fintype.card ι).factorial * K0.natAbs ^ Fintype.card ι * m ^ Fintype.card ι : ℕ)
-          : ℤ) := by
+  have key : (((LinearMap.toMatrix b b (LinearMap.mulLeft ℤ (∑ t, c t • b t))).det.natAbs : ℕ) : ℤ) ≤
+      (((Fintype.card ι).factorial * K0.natAbs ^ Fintype.card ι * m ^ Fintype.card ι : ℕ) : ℤ) := by
     rw [Int.natCast_natAbs]
     push_cast
     rw [abs_of_nonneg hK0n]
-    calc
-      |(LinearMap.toMatrix b b (LinearMap.mulLeft ℤ (∑ t, c t • b t))).det|
+    calc |(LinearMap.toMatrix b b (LinearMap.mulLeft ℤ (∑ t, c t • b t))).det|
         ≤ (Fintype.card ι).factorial • ((m : ℤ) * K0) ^ Fintype.card ι := hdet
       _ = _ := by rw [nsmul_eq_mul, mul_pow]; ring
   exact_mod_cast key
 
-private theorem exists_nat_mul_mem_principal_of_rightIdeal_index_ne_zero
-    {B : Type} [Ring B] [Nontrivial B] [Module.Free ℤ B] [Module.Finite ℤ B]
-    (hinj : ∀ x : B, x ≠ 0 → Function.Injective (fun z : B => x * z))
-    : ∃ N : ℕ,
-      N ≠ 0
-        ∧ ∀ I : AddSubgroup B,
-          (∀ y ∈ I, ∀ z : B, y * z ∈ I) → I.index ≠ 0
-            → ∃ x ∈ I, x ≠ 0 ∧ ∀ y ∈ I, ∃ z : B, (N : B) * y = x * z := by
+private theorem exists_nat_mul_mem_principal_of_rightIdeal_index_ne_zero {B : Type} [Ring B] [Nontrivial B] [Module.Free ℤ B] [Module.Finite ℤ B]
+    (hinj : ∀ x : B, x ≠ 0 → Function.Injective (fun z : B => x * z)) :
+    ∃ N : ℕ, N ≠ 0 ∧ ∀ I : AddSubgroup B, (∀ y ∈ I, ∀ z : B, y * z ∈ I) → I.index ≠ 0 →
+      ∃ x ∈ I, x ≠ 0 ∧ ∀ y ∈ I, ∃ z : B, (N : B) * y = x * z := by
   classical
   let b := Module.Free.chooseBasis ℤ B
   obtain ⟨C, hC⟩ := exists_natAbs_det_mulLeft_sum_le_mul_pow_card b
@@ -100,9 +131,8 @@ private theorem exists_nat_mul_mem_principal_of_rightIdeal_index_ne_zero
   set k := Fintype.card (Module.Free.ChooseBasisIndex ℤ B) with hkdef
   set D := I.index with hDdef
   set m := Nat.findGreatest (fun m => m ^ k ≤ D) D with hmdef
-  have hm1 : m ^ k ≤ D :=
-    Nat.findGreatest_spec (P := fun m => m ^ k ≤ D) (Nat.zero_le D) (by
-      rw [zero_pow hk.ne']; exact Nat.zero_le _)
+  have hm1 : m ^ k ≤ D := Nat.findGreatest_spec (P := fun m => m ^ k ≤ D) (Nat.zero_le D)
+    (by rw [zero_pow hk.ne']; exact Nat.zero_le _)
   have hm2 : D < (m + 1) ^ k := by
     by_contra hcon
     push_neg at hcon
@@ -111,10 +141,9 @@ private theorem exists_nat_mul_mem_principal_of_rightIdeal_index_ne_zero
   haveI : I.FiniteIndex := ⟨hD⟩
   haveI : Finite (B ⧸ I) := AddSubgroup.finite_quotient_of_finiteIndex
   letI := Fintype.ofFinite (B ⧸ I)
-  let f : (Module.Free.ChooseBasisIndex ℤ B → Fin (m + 1)) → B ⧸ I := fun c =>
-    QuotientAddGroup.mk (∑ i, ((c i : ℕ) : ℤ) • b i)
-  have hcard
-      : Fintype.card (B ⧸ I) < Fintype.card (Module.Free.ChooseBasisIndex ℤ B → Fin (m + 1)) := by
+  let f : (Module.Free.ChooseBasisIndex ℤ B → Fin (m + 1)) → B ⧸ I :=
+    fun c => QuotientAddGroup.mk (∑ i, ((c i : ℕ) : ℤ) • b i)
+  have hcard : Fintype.card (B ⧸ I) < Fintype.card (Module.Free.ChooseBasisIndex ℤ B → Fin (m + 1)) := by
     rw [Fintype.card_fun, Fintype.card_fin, ← Nat.card_eq_fintype_card]
     exact hm2
   obtain ⟨c, c', hne, hcc⟩ := Fintype.exists_ne_map_eq_of_card_lt f hcard
@@ -171,15 +200,12 @@ private theorem exists_nat_mul_mem_principal_of_rightIdeal_index_ne_zero
   obtain ⟨z, hz⟩ := hCy
   exact ⟨z, hz.symm⟩
 
-theorem cls_abs
-    {A M Γ G : Type} [Ring A] [CharZero A] [Ring M] [Group Γ] [Group G]
-    (j : A →+* M) (R : Subring M) [Module.Finite ℤ (R.comap j)]
-    (ι : Γ →* G) (σ : Γ →* A) (ρ : G →* M) (hι : ∀ γ, ρ (ι γ) = j (σ γ))
-    (U : Subgroup G) (hU : ∀ g, ρ g ∈ R → ρ g⁻¹ ∈ R → g ∈ U)
-    (hσ : ∀ y ∈ R.comap j, y ≠ 0 → ∃ γ, σ γ = y)
+theorem cls_abs {A M Γ G : Type} [Ring A] [CharZero A] [Ring M] [Group Γ] [Group G] (j : A →+* M) (R : Subring M)
+    [Module.Finite ℤ (R.comap j)] (ι : Γ →* G) (σ : Γ →* A) (ρ : G →* M) (hι : ∀ γ, ρ (ι γ) = j (σ γ)) (U : Subgroup G)
+    (hU : ∀ g, ρ g ∈ R → ρ g⁻¹ ∈ R → g ∈ U) (hσ : ∀ y ∈ R.comap j, y ≠ 0 → ∃ γ, σ γ = y)
     (hap : ∀ m ∈ R, ∀ n : ℕ, n ≠ 0 → ∃ x ∈ R.comap j, ∃ r ∈ R, m = j x + (n : M) * r)
-    (hden : ∀ g, ∃ n : ℕ, n ≠ 0 ∧ (n : M) * ρ g ∈ R)
-    : ∃ S : Finset G, ∀ g, ∃ γ, ∃ s ∈ S, ∃ u ∈ U, g = ι γ * s * u := by
+    (hden : ∀ g, ∃ n : ℕ, n ≠ 0 ∧ (n : M) * ρ g ∈ R) :
+    ∃ S : Finset G, ∀ g, ∃ γ, ∃ s ∈ S, ∃ u ∈ U, g = ι γ * s * u := by
   classical
   have hunit : ∀ γ, σ γ * σ γ⁻¹ = 1 ∧ σ γ⁻¹ * σ γ = 1 := fun γ =>
     ⟨by rw [← map_mul, mul_inv_cancel, map_one], by rw [← map_mul, inv_mul_cancel, map_one]⟩
@@ -190,8 +216,7 @@ theorem cls_abs
   have hinjA : ∀ y : A, y ∈ R.comap j → y ≠ 0 → ∀ z z' : A, y * z = y * z' → z = z' := by
     intro y hy hy0 z z' h
     obtain ⟨γ, rfl⟩ := hσ y hy hy0
-    calc
-      z = σ γ⁻¹ * (σ γ * z) := by rw [← mul_assoc, (hunit γ).2, one_mul]
+    calc z = σ γ⁻¹ * (σ γ * z) := by rw [← mul_assoc, (hunit γ).2, one_mul]
       _ = z' := by rw [h, ← mul_assoc, (hunit γ).2, one_mul]
   haveI : NoZeroSMulDivisors ℤ (R.comap j) := ⟨fun {c x} h => by
     by_contra hc
@@ -208,9 +233,8 @@ theorem cls_abs
     exact hc0 (Int.cast_eq_zero.1 h3)⟩
   haveI : Module.Free ℤ (R.comap j) := Module.free_of_finite_type_torsion_free'
   haveI : Nontrivial (R.comap j) := inferInstance
-  obtain ⟨N, hN0, hNA⟩ :=
-    exists_nat_mul_mem_principal_of_rightIdeal_index_ne_zero (B := R.comap j) (fun x hx z z' h =>
-      Subtype.ext (hinjA _ x.2 (fun h' => hx (Subtype.ext h')) _ _ (congrArg Subtype.val h)))
+  obtain ⟨N, hN0, hNA⟩ := exists_nat_mul_mem_principal_of_rightIdeal_index_ne_zero (B := R.comap j) (fun x hx z z' h =>
+    Subtype.ext (hinjA _ x.2 (fun h' => hx (Subtype.ext h')) _ _ (congrArg Subtype.val h)))
   let good : G → Prop := fun k => ρ k⁻¹ ∈ R ∧ (N : M) * ρ k ∈ R
   have hstep : ∀ g, ∃ γ k, good k ∧ g = ι γ * k := by
     intro g
@@ -231,39 +255,27 @@ theorem cls_abs
     have hn'R2 : a' * (n' : M) ∈ R := by
       rw [← Nat.cast_comm]
       exact hn'R
-    let I : AddSubgroup (R.comap j) := {
-      carrier := {y | ∃ r ∈ R, j (y : A) = a * r}
-      add_mem' := by
-        rintro x y ⟨r, hr, hx⟩ ⟨s, hs, hy⟩
-        exact ⟨
-          r + s,
-          R.add_mem hr hs,
-          by simp only [Subring.coe_add, map_add (f := _), hx, hy, mul_add]
-        ⟩
-      zero_mem' := ⟨0, R.zero_mem, by simp⟩
-      neg_mem' := by
-        rintro x ⟨r, hr, hx⟩
-        exact ⟨-r, R.neg_mem hr, by simp only [Subring.coe_neg, map_neg, hx, mul_neg]⟩
-    }
+    let I : AddSubgroup (R.comap j) :=
+      { carrier := {y | ∃ r ∈ R, j (y : A) = a * r}
+        add_mem' := by
+          rintro x y ⟨r, hr, hx⟩ ⟨s, hs, hy⟩
+          exact ⟨r + s, R.add_mem hr hs, by simp only [Subring.coe_add, map_add (f := _), hx, hy, mul_add]⟩
+        zero_mem' := ⟨0, R.zero_mem, by simp⟩
+        neg_mem' := by
+          rintro x ⟨r, hr, hx⟩
+          exact ⟨-r, R.neg_mem hr, by simp only [Subring.coe_neg, map_neg, hx, mul_neg]⟩ }
     have hIr : ∀ y ∈ I, ∀ z : R.comap j, y * z ∈ I := by
       rintro y ⟨r, hr, hy⟩ z
-      exact
-        ⟨r * j (z : A), R.mul_mem hr z.2, by simp only [Subring.coe_mul, map_mul, hy, mul_assoc]⟩
-    have hn'I : ((n' : R.comap j)) ∈ I := ⟨
-      a' * n',
-      hn'R2,
-      by simp only [Subring.coe_natCast, map_natCast]; rw [← mul_assoc, haa', one_mul]
-    ⟩
+      exact ⟨r * j (z : A), R.mul_mem hr z.2, by simp only [Subring.coe_mul, map_mul, hy, mul_assoc]⟩
+    have hn'I : ((n' : R.comap j)) ∈ I :=
+      ⟨a' * n', hn'R2, by simp only [Subring.coe_natCast, map_natCast]; rw [← mul_assoc, haa', one_mul]⟩
     have hn'0B : ((n' : R.comap j)) ≠ 0 := by
       intro h
       apply hn'0
       have h2 := congrArg Subtype.val h
       simpa using h2
-    obtain ⟨hidx, hdet⟩ :=
-      index_range_mulLeft_eq_natAbs_det_and_det_ne_zero (n' : R.comap j) (fun z z' h =>
-        Subtype.ext (hinjA _ (n' : R.comap j).2
-          (fun h' => hn'0B (Subtype.ext h'))
-          _ _ (congrArg Subtype.val h)))
+    obtain ⟨hidx, hdet⟩ := index_range_mulLeft_eq_natAbs_det_and_det_ne_zero (n' : R.comap j) (fun z z' h =>
+      Subtype.ext (hinjA _ (n' : R.comap j).2 (fun h' => hn'0B (Subtype.ext h')) _ _ (congrArg Subtype.val h)))
     have hle : (LinearMap.range (LinearMap.mulLeft ℤ (n' : R.comap j))).toAddSubgroup ≤ I := by
       rintro _ ⟨z, rfl⟩
       exact hIr _ hn'I z
@@ -296,12 +308,11 @@ theorem cls_abs
       exact hr0R
     · rw [map_mul, hι]
       have h3 : (N : M) * (j (σ γx⁻¹) * a) = j (z : A) + j (z' : A) * r := by
-        calc
-          (N : M) * (j (σ γx⁻¹) * a)
-            = j (σ γx⁻¹) * ((N : M) * a) := by rw [← mul_assoc, Nat.cast_comm, mul_assoc]
+        calc (N : M) * (j (σ γx⁻¹) * a) = j (σ γx⁻¹) * ((N : M) * a) := by
+              rw [← mul_assoc, Nat.cast_comm, mul_assoc]
           _ = j (σ γx⁻¹) * (j (σ γx) * (j (z : A) + j (z' : A) * r)) := by
-            congr 1
-            rw [hay, mul_add, hz1, ← mul_assoc (N : M) (n' : M) r, hz2, mul_add, mul_assoc]
+              congr 1
+              rw [hay, mul_add, hz1, ← mul_assoc (N : M) (n' : M) r, hz2, mul_add, mul_assoc]
           _ = _ := by rw [← mul_assoc, (hjunit γx).2, one_mul]
       rw [h3]
       exact R.add_mem z.2 (R.mul_mem z'.2 hr)
@@ -312,10 +323,8 @@ theorem cls_abs
     apply hN0
     have h2 := congrArg Subtype.val h
     simpa using h2
-  obtain ⟨hKidx, hKdet⟩ :=
-    index_range_mulLeft_eq_natAbs_det_and_det_ne_zero (N : R.comap j) (fun z z' h =>
-      Subtype.ext
-        (hinjA _ (N : R.comap j).2 (fun h' => hN0B (Subtype.ext h')) _ _ (congrArg Subtype.val h)))
+  obtain ⟨hKidx, hKdet⟩ := index_range_mulLeft_eq_natAbs_det_and_det_ne_zero (N : R.comap j) (fun z z' h =>
+    Subtype.ext (hinjA _ (N : R.comap j).2 (fun h' => hN0B (Subtype.ext h')) _ _ (congrArg Subtype.val h)))
   set K := (LinearMap.range (LinearMap.mulLeft ℤ (N : R.comap j))).toAddSubgroup with hKd
   haveI : K.FiniteIndex := ⟨by rw [hKidx]; exact Int.natAbs_ne_zero.2 hKdet⟩
   haveI : Finite (R.comap j ⧸ K) := AddSubgroup.finite_quotient_of_finiteIndex
@@ -334,8 +343,7 @@ theorem cls_abs
     have hw' : j y = j (y' : A) + (N : M) * j (w : A) := by
       have h2 := congrArg (fun v : R.comap j => j (v : A)) hw
       simp only [LinearMap.mulLeft_apply, Subring.coe_mul, Subring.coe_natCast, Subring.coe_add,
-          Subring.coe_neg, map_mul, map_natCast, map_add, map_neg]
-        at h2
+        Subring.coe_neg, map_mul, map_natCast, map_add, map_neg] at h2
       rw [h2]
       abel
     have e1 : j (w : A) * ((N : M) * ρ k) * ρ k⁻¹ = (N : M) * j (w : A) := by
@@ -347,10 +355,8 @@ theorem cls_abs
     rw [map_mul, key, mul_assoc, (hρinv k).2, mul_one]
     exact R.add_mem (R.add_mem hr' (R.mul_mem w.2 hk2)) (R.mul_mem hr hk2)
   have hfin : (φ '' {k | good k}).Finite := Set.toFinite _
-  refine ⟨
-    hfin.toFinset.image (fun v => if h : ∃ k, good k ∧ φ k = v then Classical.choose h else 1),
-    fun g => ?_
-  ⟩
+  refine ⟨hfin.toFinset.image (fun v => if h : ∃ k, good k ∧ φ k = v then Classical.choose h else 1),
+    fun g => ?_⟩
   obtain ⟨γ, k, hk, rfl⟩ := hstep g
   have hex : ∃ k', good k' ∧ φ k' = φ k := ⟨k, hk, rfl⟩
   have hs := Classical.choose_spec hex
@@ -363,44 +369,28 @@ theorem cls_abs
     · rw [mul_inv_rev, inv_inv]
       exact hsub k _ hk hs.1 hs.2.ge
 
-theorem cls_of_relIndex
-    {Γ G : Type} [Group Γ] [Group G]
-    (ι : Γ →* G) (U U' : Subgroup G)
-    (h : U'.relIndex U ≠ 0) (hS : ∃ S : Finset G, ∀ g, ∃ γ, ∃ s ∈ S, ∃ u ∈ U, g = ι γ * s * u)
-    : ∃ S : Finset G, ∀ g, ∃ γ, ∃ s ∈ S, ∃ u ∈ U', g = ι γ * s * u := by
+theorem cls_of_relIndex {Γ G : Type} [Group Γ] [Group G] (ι : Γ →* G) (U U' : Subgroup G) (h : U'.relIndex U ≠ 0)
+    (hS : ∃ S : Finset G, ∀ g, ∃ γ, ∃ s ∈ S, ∃ u ∈ U, g = ι γ * s * u) :
+    ∃ S : Finset G, ∀ g, ∃ γ, ∃ s ∈ S, ∃ u ∈ U', g = ι γ * s * u := by
   classical
   obtain ⟨S, hS⟩ := hS
   haveI : (U'.subgroupOf U).FiniteIndex := ⟨h⟩
   haveI : Finite (U ⧸ U'.subgroupOf U) := Subgroup.finite_quotient_of_finiteIndex
   letI := Fintype.ofFinite (U ⧸ U'.subgroupOf U)
-  refine ⟨
-    (S ×ˢ (Finset.univ.image (fun q : U ⧸ U'.subgroupOf U => ((Quotient.out q : U) : G)))).image
-      (fun p => p.1 * p.2),
-    fun g => ?_
-  ⟩
+  refine ⟨(S ×ˢ (Finset.univ.image (fun q : U ⧸ U'.subgroupOf U => ((Quotient.out q : U) : G)))).image
+    (fun p => p.1 * p.2), fun g => ?_⟩
   obtain ⟨γ, s, hs, u, hu, rfl⟩ := hS g
   obtain ⟨k, hk⟩ := QuotientGroup.mk_out_eq_mul (U'.subgroupOf U) (⟨u, hu⟩ : U)
-  refine ⟨
-    γ,
-    s * ((Quotient.out (QuotientGroup.mk (⟨u, hu⟩ : U) : U ⧸ U'.subgroupOf U) : U) : G),
-    ?_,
-    ((k : U) : G)⁻¹,
-    ?_,
-    ?_
-  ⟩
-  · exact Finset.mem_image.2
-      ⟨(s, _), Finset.mem_product.2 ⟨hs, Finset.mem_image.2 ⟨_, Finset.mem_univ _, rfl⟩⟩, rfl⟩
+  refine ⟨γ, s * ((Quotient.out (QuotientGroup.mk (⟨u, hu⟩ : U) : U ⧸ U'.subgroupOf U) : U) : G), ?_,
+    ((k : U) : G)⁻¹, ?_, ?_⟩
+  · exact Finset.mem_image.2 ⟨(s, _), Finset.mem_product.2 ⟨hs, Finset.mem_image.2 ⟨_, Finset.mem_univ _, rfl⟩⟩, rfl⟩
   · exact U'.inv_mem (Subgroup.mem_subgroupOf.1 k.2)
   · rw [hk]
     simp [mul_assoc]
 
-theorem box_relIndex
-    {I G : Type} [Group G]
-    {Gv : I → Type} [∀ v, Group (Gv v)]
-    {K : ∀ v, Subgroup (Gv v)} (P : RPG G Gv K)
-    (U U' : ∀ v, Subgroup (Gv v)) (S : Finset I)
-    (h1 : ∀ v ∈ S, (U' v).relIndex (U v) ≠ 0) (h2 : ∀ v ∉ S, U v ≤ U' v)
-    : (P.box U').relIndex (P.box U) ≠ 0 := by
+theorem box_relIndex {I G : Type} [Group G] {Gv : I → Type} [∀ v, Group (Gv v)] {K : ∀ v, Subgroup (Gv v)} (P : RPG G Gv K)
+    (U U' : ∀ v, Subgroup (Gv v)) (S : Finset I) (h1 : ∀ v ∈ S, (U' v).relIndex (U v) ≠ 0) (h2 : ∀ v ∉ S, U v ≤ U' v) :
+    (P.box U').relIndex (P.box U) ≠ 0 := by
   classical
   have hC : (⨅ v : S, Subgroup.comap (P.p v) (U' v)).relIndex (P.box U) ≠ 0 := by
     refine Subgroup.relIndex_iInf_ne_zero (fun v => ?_)
@@ -420,8 +410,7 @@ theorem box_relIndex
     by_cases hv : v ∈ S
     · exact hx1 ⟨v, hv⟩
     · exact h2 v hv (hx2 v)
-  refine Subgroup.relIndex_ne_zero_trans (K := (⨅ v : S, Subgroup.comap (P.p v) (U' v)) ⊓ P.box U)
-    ?_ ?_
+  refine Subgroup.relIndex_ne_zero_trans (K := (⨅ v : S, Subgroup.comap (P.p v) (U' v)) ⊓ P.box U) ?_ ?_
   · rw [Subgroup.relIndex_eq_one.mpr hX]
     exact one_ne_zero
   · refine Subgroup.relIndex_inf_ne_zero hC ?_

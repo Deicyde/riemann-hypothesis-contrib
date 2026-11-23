@@ -1,35 +1,63 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.GrothendieckDeformation
-public import Development.AbelianVarietyTheory.Definitions.Divisors.CovolXOfCovol
-public import Development.AbelianVarietyTheory.Definitions.Divisors.ToKnownTheoremsOf
-public import Development.AbelianVarietyTheory.Definitions.Divisors.CuspIso
-public import Development.AbelianVarietyTheory.Definitions.Divisors.WellChosen
-public import Development.AbelianVarietyTheory.Definitions.Divisors.IntegralBound
-public import Development.AbelianVarietyTheory.Definitions.Divisors.ExistsCoordAtPoints
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.NormalizedPointHeightLatticeSmul
-public import Development.AbelianVarietyTheory.Definitions.Divisors.IsHeightIffOfDegreeEq
-public import Development.AbelianVarietyTheory.Definitions.Divisors.WedgeNrmLeOfWedgeNormLe
-public import Development.AbelianVarietyTheory.Definitions.Divisors.VolMeasureOfAdd
-public import Development.AbelianVarietyTheory.Definitions.Divisors.MemLevEigenIffTransl
-public import Formalism.LocalToGlobal.IndefiniteForms.IndefiniteTree.RealCubicMeans.LogMeanShares.LogMeanStatements.HSClaim
-public import Development.AbelianVarietyTheory.Definitions.Divisors.GenRatios
-public import Development.AbelianVarietyTheory.Definitions.Divisors.BadElt
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsWhittakerDatumAndHalfLevels
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ComplexificationBaseChangeLinearOneTmul
 public import Development.AbelianVarietyTheory.Definitions.Divisors.EigLatLe
 public import Development.AbelianVarietyTheory.Definitions.Divisors.QuoIff
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ActCCoe
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.SubMemSmulTopOfLevel
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FinalRowWeightGramAlgebraic
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.AdelicCongruenceSelfDualOfPrincipalLatticeStatement
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FinalRowGramAlgebraicSection
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.HostBoundHolds
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FinalRowWeightGramAlgebraic
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FrameReductionEqOneOfCongruentModIdealStatement
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.LevelMoveLiftCongruentModIdealStatement
+import Development.AbelianVarietyTheory.Proofs.DivisorProofs.MulVecMemLatGHat
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.SubMemSmulTopOfLevel
 public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.FamPSizesRecord
+import Development.AbelianVarietyTheory.Proofs.FoundationProofs.FinCongMemLevEnv
+import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsLevelAtEachIndex
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+public import Development.AbelianVarietyTheory.BlockTheory.TorsionBlocks.LevelCarrying
+import Development.AbelianVarietyTheory.Definitions.Divisors.CuspIso
+import Development.AbelianVarietyTheory.Definitions.Divisors.GenRatios
+public import Development.AbelianVarietyTheory.Definitions.Divisors.IsCoprimeOfNatCast
+import Development.AbelianVarietyTheory.Definitions.Divisors.IsRightActFunPull
+import Development.AbelianVarietyTheory.Definitions.Divisors.IsoOverOfIsOpenImmersion
+public import Development.AbelianVarietyTheory.Definitions.Divisors.MemLevEigenIffTransl
+import Development.AbelianVarietyTheory.Definitions.Divisors.Multiplier
 
 @[expose] public section
 
-set_option synthInstance.maxHeartbeats 400000
+
 
 noncomputable section
 
@@ -47,7 +75,6 @@ open scoped TensorProduct
 
 namespace GlobalTheory.NeatOne
 
-set_option maxHeartbeats 1000000 in
 theorem eq_one_of_lev_cong
     {D : D7} {L : SizeData₂ D} {hT : GatTies D} {Gi : Formalism.MainNotions.G.Inst D L}
     {Gl : Formalism.MainNotions.G.LatInst D} {Kc : Formalism.MainNotions.G.Consts} {Y0 : DivX D}

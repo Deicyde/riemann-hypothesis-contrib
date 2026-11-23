@@ -1,23 +1,59 @@
 module
 
-public import Mathlib
-public import Formalism.LocalToGlobal.ProjectiveLattices.RegXInst
-public import Formalism.LocalToGlobal.ProjectiveLattices.CurveLocInst
 public import Formalism.LocalToGlobal.ProjectiveLattices.LocRingPf
-public import Formalism.LocalToGlobal.ProjectiveLattices.CurveSec
-public import Formalism.LocalToGlobal.ProjectiveLattices.SecPtRed
-public import Formalism.LocalToGlobal.ProjectiveLattices.TieInst
-public import Formalism.LocalToGlobal.ProjectiveLattices.RealPtPf
-public import Formalism.PeriodIntegrals.OrbitalBoundsConclusion.EfRankSum
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ValuationLifting.RApprox
+public import Formalism.LocalToGlobal.ProjectiveLattices.CurveAsm
+public import Formalism.LocalToGlobal.ProjectiveLattices.CurveLoc
+public import Formalism.LocalToGlobal.ProjectiveLattices.CurveOpen
+public import Development.AbelianVarietyTheory.Proofs.GenericRegularity.ExistsIntegralCongrWeakApproximationStatement
+public import Development.AbelianVarietyTheory.Proofs.GenericRegularity.ExistsRatioFormsAtPointsStatement
+public import Development.AbelianVarietyTheory.Proofs.GenericRegularity.ExistsSubfieldValuationClosureStatement
 public import Development.AbelianVarietyTheory.Proofs.GenericRegularity.FinrankHostDivTwo
+public import Development.AbelianVarietyTheory.Proofs.GenericRegularity.GaussValuationDensityGenerationLocalisationStatement
 public import Development.AbelianVarietyTheory.Proofs.GenericRegularity.GenericSectionPointsInequivalentValuationsStatement
 public import Development.AbelianVarietyTheory.Proofs.GenericRegularity.IntegralElementsGenericLinearSectionGaussPointStatement
 public import Development.AbelianVarietyTheory.Proofs.GenericRegularity.SubalgebraEqIntegralClosureOfValuesResiduesStatement
-public import Development.AbelianVarietyTheory.Proofs.GenericRegularity.ExistsRatioFormsAtPointsStatement
-public import Development.AbelianVarietyTheory.Proofs.GenericRegularity.GaussValuationDensityGenerationLocalisationStatement
-public import Development.AbelianVarietyTheory.Proofs.GenericRegularity.ExistsSubfieldValuationClosureStatement
-public import Development.AbelianVarietyTheory.Proofs.GenericRegularity.ExistsIntegralCongrWeakApproximationStatement
+import Formalism.LocalToGlobal.ProjectiveLattices.CurveLocInst
+public import Formalism.LocalToGlobal.ProjectiveLattices.CurveSec
+import Formalism.LocalToGlobal.ProjectiveLattices.SecPtRed
+public import Formalism.PeriodIntegrals.OrbitalBoundsConclusion.EfRankSum
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Coalgebra.IsFrobenius
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ValuationLifting.RApprox
 
 @[expose] public section
 
@@ -501,8 +537,8 @@ theorem ev_sec (i : Fin (WeightFamilies.dimY D j + 1))
       = ∑ k, h.ev (algebraMap (Kp (xplus X E hM) la G.N) (Rp (xplus X E hM) la G.N) (@algebraMap (Op (xplus X E hM) la G.N) (Kp (xplus X E hM) la G.N) _ _ _ (Tv (xplus X E hM) la G.N (i, k)))) *
           h.ev (emb (xplus X E hM) la G.N (X.inc wL (G.w k))) := by
   unfold Formalism.MainNotions.Gaps.EtaleWeightGaps.sec
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+
+  rw [map_sum]
   refine Finset.sum_congr rfl fun k _ => ?_
   rw [Algebra.smul_def, map_mul]
   rfl
@@ -841,8 +877,6 @@ namespace GlobalTheory.Reg
 
 open ReciprocityTheory.ChartRestriction.G.Geo.Tor
 
-set_option maxHeartbeats 4000000 in
-set_option synthInstance.maxHeartbeats 400000 in
 theorem locStructSt_record
     : ∀ (D : D7) (T : Top D) (h : LawsP T) (j : ℕ) (hj : InR D j) (hG : GenFrEx (T.Q.Xo j) T.Q.c)
         (hT : GenFromTest (T.Q.Xo j) T.Q.c hG) (ka wL wF : WeightFamilies.Wt D j)

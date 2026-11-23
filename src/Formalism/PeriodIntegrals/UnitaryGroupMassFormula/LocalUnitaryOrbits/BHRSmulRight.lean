@@ -1,8 +1,47 @@
 module
 
-public import Mathlib
+import Formalism.LocalToGlobal.SiegelLatticeTheory.CokernelGLCounts.RankPointCounts.DualFamilyCounting.NcSIntWittOEv
 public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.LocalUnitaryOrbits.TraceEqAdd
-public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.LocalUnitaryOrbits.SdVolHOfPi
+public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.LocalUnitaryOrbits.SdVolWOfTop
+import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.LocalUnitaryOrbits.PairHermZeroRight
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.Valuation.LocalSubring
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -10,25 +49,21 @@ noncomputable section
 
 namespace PI.OmLocU.SdB
 
-open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub
-  Formalism.L2.SG.LocVol NumberField IsDedekindDomain PI.OmLocU PI.VolStabSW
+open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub Formalism.L2.SG.LocVol NumberField IsDedekindDomain PI.OmLocU PI.VolStabSW
 open scoped TensorProduct
 
 section Int
 
-variable
-  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
   (v : HeightOneSpectrum (𝓞 F))
 
-theorem b_fg
-    : (Submodule.span (v.adicCompletionIntegers F)
-      ((fun x : 𝓞 E => inclR (F := F) (Fv F v) (x : E)) '' Set.univ)).FG := by
+theorem b_fg : (Submodule.span (v.adicCompletionIntegers F)
+    ((fun x : 𝓞 E => inclR (F := F) (Fv F v) (x : E)) '' Set.univ)).FG := by
   let b := RingOfIntegers.basis E
-  have h
-      : Submodule.span (v.adicCompletionIntegers F)
-          ((fun x : 𝓞 E => inclR (F := F) (Fv F v) (x : E)) '' Set.univ)
-        = Submodule.span (v.adicCompletionIntegers F)
-          (Set.range fun i => inclR (F := F) (Fv F v) ((b i : 𝓞 E) : E)) := by
+  have h : Submodule.span (v.adicCompletionIntegers F)
+      ((fun x : 𝓞 E => inclR (F := F) (Fv F v) (x : E)) '' Set.univ) =
+      Submodule.span (v.adicCompletionIntegers F)
+        (Set.range fun i => inclR (F := F) (Fv F v) ((b i : 𝓞 E) : E)) := by
     apply le_antisymm
     · rw [Submodule.span_le]
       rintro _ ⟨x, -, rfl⟩
@@ -36,8 +71,8 @@ theorem b_fg
         have := congrArg (fun y : 𝓞 E => (y : E)) (b.sum_repr x)
         simpa using this.symm
       simp only
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [hx, map_sum]
+
+      rw [hx, map_sum]
       refine Submodule.sum_mem _ fun i _ => ?_
       rw [map_zsmul]
       exact zsmul_mem (Submodule.subset_span (Set.mem_range_self i)) _
@@ -48,13 +83,11 @@ theorem b_fg
   exact Submodule.fg_span (Set.finite_range _)
 
 def bAlg : Subalgebra (v.adicCompletionIntegers F) (Fv F v ⊗[F] E) :=
-  Submodule.toSubalgebra
-    (Submodule.span (v.adicCompletionIntegers F)
-      ((fun x : 𝓞 E => inclR (F := F) (Fv F v) (x : E)) '' Set.univ))
-    (b_one_mem (E := E) v) (fun _ _ hx hy => b_mul_mem v hx hy)
+  Submodule.toSubalgebra (Submodule.span (v.adicCompletionIntegers F)
+    ((fun x : 𝓞 E => inclR (F := F) (Fv F v) (x : E)) '' Set.univ)) (b_one_mem (E := E) v)
+    (fun _ _ hx hy => b_mul_mem v hx hy)
 
-theorem b_int_of_sc {a : Fv F v} (ha : sc (E := E) v a ∈ OEv (E := E) v)
-    : a ∈ v.adicCompletionIntegers F := by
+theorem b_int_of_sc {a : Fv F v} (ha : sc (E := E) v a ∈ OEv (E := E) v) : a ∈ v.adicCompletionIntegers F := by
   have hfg : (Subalgebra.toSubmodule (bAlg (E := E) v)).FG := b_fg v
   have hi : IsIntegral (v.adicCompletionIntegers F) (sc (E := E) v a) :=
     IsIntegral.of_mem_of_fg (bAlg (E := E) v) hfg _ ha
@@ -67,59 +100,30 @@ theorem b_int_of_sc {a : Fv F v} (ha : sc (E := E) v a ∈ OEv (E := E) v)
   rw [← hy]
   exact y.2
 
-theorem b_sigR_mem (σ : E →ₐ[F] E) {z : Fv F v ⊗[F] E} (hz : z ∈ OEv (E := E) v)
-    : sigR (Fv F v) σ z ∈ OEv (E := E) v := by
-  induction hz using Submodule.span_induction with
-  | mem x hx =>
-    obtain ⟨b, -, rfl⟩ := hx
-    have hb : IsIntegral ℤ (σ (b : E)) := by
-      simpa using (b.isIntegral_coe).map (σ.toRingHom.toIntAlgHom)
-    have e
-        : sigR (Fv F v) σ (inclR (F := F) (Fv F v) (b : E))
-          = inclR (F := F) (Fv F v) ((⟨σ (b : E), hb⟩ : 𝓞 E) : E) := by
-      simp [sigR, inclR]
-    rw [e]
-    exact b_inclR_mem (F := F) (E := E) v ⟨σ (b : E), hb⟩
-  | zero =>
-    rw [map_zero]; exact Submodule.zero_mem _
-  | add x y _ _ hx hy =>
-    rw [map_add (f := _)]; exact Submodule.add_mem _ hx hy
-  | smul r x _ hx =>
-    have h1 : r • x = algebraMap (Fv F v) (Fv F v ⊗[F] E) (r : Fv F v) * x := by
-      rw [← Algebra.smul_def]; rfl
-    have h2
-        : algebraMap (Fv F v) (Fv F v ⊗[F] E) (r : Fv F v) * sigR (Fv F v) σ x
-          = r • sigR (Fv F v) σ x := by
-      rw [← Algebra.smul_def]; rfl
-    have h3
-        : sigR (Fv F v) σ (algebraMap (Fv F v) (Fv F v ⊗[F] E) (r : Fv F v))
-          = algebraMap (Fv F v) (Fv F v ⊗[F] E) (r : Fv F v) := by
-      simp [sigR, Algebra.TensorProduct.algebraMap_apply]
-    rw [h1, map_mul, h3, h2]
-    exact Submodule.smul_mem _ r hx
+theorem b_sigR_mem (σ : E →ₐ[F] E) {z : Fv F v ⊗[F] E} (hz : z ∈ OEv (E := E) v) :
+    sigR (Fv F v) σ z ∈ OEv (E := E) v := by
+  apply Formalism.L2.SG.Pf.NcS.IntWittPf.oev_sigR <;> assumption
 
-theorem b_tr_sc (s : Fv F v) (w : Fv F v ⊗[F] E)
-    : Algebra.trace (Fv F v) (Fv F v ⊗[F] E) (sc (E := E) v s * w)
-      = s * Algebra.trace (Fv F v) (Fv F v ⊗[F] E) w := by
+theorem b_tr_sc (s : Fv F v) (w : Fv F v ⊗[F] E) :
+    Algebra.trace (Fv F v) (Fv F v ⊗[F] E) (sc (E := E) v s * w) =
+      s * Algebra.trace (Fv F v) (Fv F v ⊗[F] E) w := by
   rw [b_sc_eq, ← Algebra.smul_def, map_smul, smul_eq_mul]
 
 end Int
 
 section DualW
 
-variable
-  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-  (σ : E →ₐ[F] E)
-  {n : ℕ} (J : Matrix (Fin n) (Fin n) E)
-  (ψ : AddChar (AF F) ℂ) (v : HeightOneSpectrum (𝓞 F)) (Λ : Set (Fin n → E))
+variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+  (σ : E →ₐ[F] E) {n : ℕ} (J : Matrix (Fin n) (Fin n) E) (ψ : AddChar (AF F) ℂ)
+  (v : HeightOneSpectrum (𝓞 F)) (Λ : Set (Fin n → E))
 
-theorem b_hR_smul_right (x y : Fin n → Fv F v ⊗[F] E) (c : Fv F v ⊗[F] E)
-    : hR (Fv F v) σ J x (c • y) = c * hR (Fv F v) σ J x y := by
+theorem b_hR_smul_right (x y : Fin n → Fv F v ⊗[F] E) (c : Fv F v ⊗[F] E) :
+    hR (Fv F v) σ J x (c • y) = c * hR (Fv F v) σ J x y := by
   simp only [hR, Formalism.UG.hform, Pi.smul_apply, smul_eq_mul, Finset.mul_sum]
   exact Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => by ring
 
-theorem b_hR_smul_left (c : Fv F v ⊗[F] E) (x y : Fin n → Fv F v ⊗[F] E)
-    : hR (Fv F v) σ J (c • x) y = sigR (Fv F v) σ c * hR (Fv F v) σ J x y := by
+theorem b_hR_smul_left (c : Fv F v ⊗[F] E) (x y : Fin n → Fv F v ⊗[F] E) :
+    hR (Fv F v) σ J (c • x) y = sigR (Fv F v) σ c * hR (Fv F v) σ J x y := by
   simp only [hR, Formalism.UG.hform, Pi.smul_apply, smul_eq_mul, map_mul, Finset.mul_sum]
   exact Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => by ring
 
@@ -132,15 +136,15 @@ theorem b_smulF (s : Fv F v) (y : Fin n → Fv F v ⊗[F] E) : s • y = sc (E :
   rw [Algebra.smul_def]
   rfl
 
-theorem b_BR_smul_right {a : ℕ} (s : Fv F v) (X Y : TupV (E := E) v n a)
-    : BR (Fv F v) σ J X (s • Y) = s * BR (Fv F v) σ J X Y := by
+theorem b_BR_smul_right {a : ℕ} (s : Fv F v) (X Y : TupV (E := E) v n a) :
+    BR (Fv F v) σ J X (s • Y) = s * BR (Fv F v) σ J X Y := by
   simp only [BR, Pi.smul_apply, Finset.mul_sum]
   refine Finset.sum_congr rfl fun i _ => ?_
   rw [b_smulF v s (Y i), b_hR_smul_right, b_tr_sc]
 
-theorem b_BR_single {a : ℕ} (i : Fin a) (u : Fin n → Fv F v ⊗[F] E) (Y : TupV (E := E) v n a)
-    : BR (Fv F v) σ J (Pi.single i u) Y
-      = Algebra.trace (Fv F v) (Fv F v ⊗[F] E) (hR (Fv F v) σ J u (Y i)) := by
+theorem b_BR_single {a : ℕ} (i : Fin a) (u : Fin n → Fv F v ⊗[F] E) (Y : TupV (E := E) v n a) :
+    BR (Fv F v) σ J (Pi.single i u) Y =
+      Algebra.trace (Fv F v) (Fv F v ⊗[F] E) (hR (Fv F v) σ J u (Y i)) := by
   classical
   rw [BR, Finset.sum_eq_single i]
   · rw [Pi.single_eq_same]

@@ -1,8 +1,57 @@
 module
 
-public import Mathlib
 public import GroundTheory.AutomorphicForms.HarishChandraCentre.RepBase
 public import GroundTheory.AutomorphicForms.HarishChandraCentre.FischerForm
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Int
+import Mathlib.Analysis.CStarAlgebra.Classes
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+public import Mathlib.RingTheory.Derivation.Lie
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
@@ -12,14 +61,14 @@ open MvPolynomial
 
 variable {n : ℕ}
 
-theorem fischer_rowOp (i j : Fin n) (f g : Poly n)
-    : fischer (rowOp i j f) g = fischer f (rowOp j i g) := by
+theorem fischer_rowOp (i j : Fin n) (f g : Poly n) :
+    fischer (rowOp i j f) g = fischer f (rowOp j i g) := by
   rw [rowOp_apply, rowOp_apply, fischer_sum_left, fischer_sum_right]
   refine Finset.sum_congr rfl fun k _ => ?_
   rw [fischer_X_mul, fischer_pderiv]
 
-theorem rowOp_X (i j b c : Fin n)
-    : rowOp i j (X (b, c) : Poly n) = if b = j then X (i, c) else 0 := by
+theorem rowOp_X (i j b c : Fin n) :
+    rowOp i j (X (b, c) : Poly n) = if b = j then X (i, c) else 0 := by
   rw [rowOp_apply]
   by_cases hb : b = j
   · subst hb
@@ -42,18 +91,17 @@ noncomputable def rowDer (i j : Fin n) : Derivation ℂ (Poly n) (Poly n) :=
 
 theorem rowDer_apply (i j : Fin n) (f : Poly n) : rowDer i j f = rowOp i j f := rfl
 
-theorem rowOp_comm_self (a i j : Fin n)
-    : rowOp a a * rowOp i j
-      = rowOp i j * rowOp a a
-        + ((if i = a then 1 else 0) - (if j = a then 1 else 0) : ℂ) • rowOp i j := by
-  have key
-      : ⁅rowDer a a, rowDer i j⁆
-        = ((if i = a then 1 else 0) - (if j = a then 1 else 0) : ℂ) • rowDer i j := by
+theorem rowOp_comm_self (a i j : Fin n) :
+    rowOp a a * rowOp i j =
+      rowOp i j * rowOp a a + ((if i = a then 1 else 0) - (if j = a then 1 else 0) : ℂ) • rowOp i j := by
+  have key : ⁅rowDer a a, rowDer i j⁆ =
+      ((if i = a then 1 else 0) - (if j = a then 1 else 0) : ℂ) • rowDer i j := by
     apply MvPolynomial.derivation_ext
     rintro ⟨b, c⟩
     rw [Derivation.commutator_apply, Derivation.smul_apply, rowDer_apply, rowDer_apply,
       rowDer_apply, rowDer_apply]
-    by_cases hbj : b = j <;> by_cases hba : b = a <;> by_cases hia : i = a <;> simp_all [rowOp_X]
+    by_cases hbj : b = j <;> by_cases hba : b = a <;> by_cases hia : i = a <;>
+      simp_all [rowOp_X]
   refine LinearMap.ext fun f => ?_
   have h := congrArg (fun D : Derivation ℂ (Poly n) (Poly n) => D f) key
   simp only [Derivation.commutator_apply, Derivation.smul_apply, rowDer_apply] at h
@@ -63,10 +111,10 @@ theorem rowOp_comm_self (a i j : Fin n)
 
 def rowWt (m : Fin n × Fin n →₀ ℕ) (i : Fin n) : ℕ := ∑ k, m (i, k)
 
-theorem rowOp_self_monomial (i : Fin n) (s : Fin n × Fin n →₀ ℕ) (c : ℂ)
-    : rowOp i i (monomial s c) = monomial s (c * (rowWt s i : ℂ)) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [rowOp_apply, rowWt, Nat.cast_sum, Finset.mul_sum, map_sum]
+theorem rowOp_self_monomial (i : Fin n) (s : Fin n × Fin n →₀ ℕ) (c : ℂ) :
+    rowOp i i (monomial s c) = monomial s (c * (rowWt s i : ℂ)) := by
+
+  rw [rowOp_apply, rowWt, Nat.cast_sum, Finset.mul_sum, map_sum]
   refine Finset.sum_congr rfl fun k _ => ?_
   rw [pderiv_monomial, X, monomial_mul, one_mul]
   by_cases hk : s (i, k) = 0
@@ -79,25 +127,21 @@ theorem rowOp_self_monomial (i : Fin n) (s : Fin n × Fin n →₀ ℕ) (c : ℂ
       · exact Nat.zero_le _
     rw [add_tsub_cancel_of_le hle]
 
-theorem coeff_rowOp_self (i : Fin n) (m : Fin n × Fin n →₀ ℕ) (f : Poly n)
-    : AddMonoidAlgebra.coeff (rowOp i i f) m = (rowWt m i : ℂ) * AddMonoidAlgebra.coeff f m := by
+theorem coeff_rowOp_self (i : Fin n) (m : Fin n × Fin n →₀ ℕ) (f : Poly n) :
+    AddMonoidAlgebra.coeff (rowOp i i f) m = (rowWt m i : ℂ) * AddMonoidAlgebra.coeff f m := by
   classical
   induction f using MvPolynomial.induction_on' with
-  | add p q hp hq =>
-    rw [map_add (f := _), MvPolynomial.coeff_add, MvPolynomial.coeff_add, hp, hq, mul_add]
+  | add p q hp hq => rw [map_add (f := _), MvPolynomial.coeff_add, MvPolynomial.coeff_add, hp, hq, mul_add]
   | monomial s c =>
     rw [rowOp_self_monomial, coeff_monomial, coeff_monomial]
     by_cases h : s = m
     · subst h; simp [mul_comm]
     · simp [h]
 
-theorem rowWt_eq_of_eigen
-    {h : Poly n} {c : Fin n → ℂ} (hc : ∀ a, rowOp a a h = c a • h)
-    {m : Fin n × Fin n →₀ ℕ} (hm : m ∈ h.support)
-    (a : Fin n)
-    : (rowWt m a : ℂ) = c a := by
+theorem rowWt_eq_of_eigen {h : Poly n} {c : Fin n → ℂ} (hc : ∀ a, rowOp a a h = c a • h)
+    {m : Fin n × Fin n →₀ ℕ} (hm : m ∈ h.support) (a : Fin n) : (rowWt m a : ℂ) = c a := by
   have := congrArg (AddMonoidAlgebra.coeff · m) (hc a)
-  rw [coeff_rowOp_self, coeff_smul, smul_eq_mul] at this
+  rw [coeff_rowOp_self, MvPolynomial.coeff_smul, smul_eq_mul] at this
   exact mul_right_cancel₀ (MvPolynomial.mem_support_iff.1 hm) this
 
 noncomputable def wtProj (μ : Fin n → ℕ) : Module.End ℂ (Poly n) where
@@ -106,38 +150,33 @@ noncomputable def wtProj (μ : Fin n → ℕ) : Module.End ℂ (Poly n) where
     classical
     ext m
     simp only [coeff_sum, coeff_monomial, MvPolynomial.coeff_add]
-    simp only [Finset.sum_ite_eq', Finset.mem_filter, MvPolynomial.mem_support_iff,
-      MvPolynomial.coeff_add]
+    simp only [Finset.sum_ite_eq', Finset.mem_filter, MvPolynomial.mem_support_iff, MvPolynomial.coeff_add]
     by_cases hm : rowWt m = μ <;> simp only [hm, and_true, and_false, if_false]
-    · by_cases h1 : AddMonoidAlgebra.coeff f m = 0 <;> by_cases h2 : AddMonoidAlgebra.coeff g m = 0
-        <;> by_cases h3 : AddMonoidAlgebra.coeff f m + AddMonoidAlgebra.coeff g m = 0 <;> simp_all
+    · by_cases h1 : AddMonoidAlgebra.coeff f m = 0 <;> by_cases h2 : AddMonoidAlgebra.coeff g m = 0 <;> by_cases h3 : AddMonoidAlgebra.coeff f m + AddMonoidAlgebra.coeff g m = 0 <;>
+        simp_all
     · simp
   map_smul' c f := by
     classical
     ext m
-    simp only [coeff_sum, coeff_monomial, coeff_smul, smul_eq_mul, RingHom.id_apply]
-    simp only [Finset.sum_ite_eq', Finset.mem_filter, MvPolynomial.mem_support_iff, coeff_smul,
+    simp only [coeff_sum, coeff_monomial, MvPolynomial.coeff_smul, smul_eq_mul, RingHom.id_apply]
+    simp only [Finset.sum_ite_eq', Finset.mem_filter, MvPolynomial.mem_support_iff, MvPolynomial.coeff_smul,
       smul_eq_mul]
     by_cases hm : rowWt m = μ <;> simp only [hm, and_true, and_false, if_false]
-    · by_cases h1 : AddMonoidAlgebra.coeff f m = 0
-        <;> by_cases h2 : c * AddMonoidAlgebra.coeff f m = 0 <;> simp_all
+    · by_cases h1 : AddMonoidAlgebra.coeff f m = 0 <;> by_cases h2 : c * AddMonoidAlgebra.coeff f m = 0 <;> simp_all
     · simp
 
-theorem coeff_wtProj (μ : Fin n → ℕ) (m : Fin n × Fin n →₀ ℕ) (f : Poly n)
-    : AddMonoidAlgebra.coeff (wtProj μ f) m
-      = if rowWt m = μ then AddMonoidAlgebra.coeff f m else 0 := by
+theorem coeff_wtProj (μ : Fin n → ℕ) (m : Fin n × Fin n →₀ ℕ) (f : Poly n) :
+    AddMonoidAlgebra.coeff (wtProj μ f) m = if rowWt m = μ then AddMonoidAlgebra.coeff f m else 0 := by
   classical
-  change AddMonoidAlgebra.coeff
-      (∑ m ∈ f.support with rowWt m = μ, monomial m (AddMonoidAlgebra.coeff f m)) m
-    = _
+  change AddMonoidAlgebra.coeff (∑ m ∈ f.support with rowWt m = μ, monomial m (AddMonoidAlgebra.coeff f m)) m = _
   simp only [coeff_sum, coeff_monomial, Finset.sum_ite_eq', Finset.mem_filter,
     MvPolynomial.mem_support_iff]
   by_cases hm : rowWt m = μ
   · by_cases h1 : AddMonoidAlgebra.coeff f m = 0 <;> simp [hm, h1]
   · simp [hm]
 
-theorem wtProj_eq_self_iff (μ : Fin n → ℕ) (f : Poly n)
-    : wtProj μ f = f ↔ ∀ m ∈ f.support, rowWt m = μ := by
+theorem wtProj_eq_self_iff (μ : Fin n → ℕ) (f : Poly n) :
+    wtProj μ f = f ↔ ∀ m ∈ f.support, rowWt m = μ := by
   constructor
   · intro h m hm
     by_contra hne
@@ -152,8 +191,8 @@ theorem wtProj_eq_self_iff (μ : Fin n → ℕ) (f : Poly n)
     · by_contra hc
       exact hm (h m (MvPolynomial.mem_support_iff.2 (Ne.symm hc)))
 
-theorem wtProj_wtProj (μ ν : Fin n → ℕ) (f : Poly n)
-    : wtProj μ (wtProj ν f) = if μ = ν then wtProj ν f else 0 := by
+theorem wtProj_wtProj (μ ν : Fin n → ℕ) (f : Poly n) :
+    wtProj μ (wtProj ν f) = if μ = ν then wtProj ν f else 0 := by
   by_cases h : μ = ν
   · subst h
     rw [if_pos rfl]
@@ -168,16 +207,16 @@ theorem wtProj_wtProj (μ ν : Fin n → ℕ) (f : Poly n)
     · rfl
     · rfl
 
-theorem rowOp_self_of_wtProj (μ : Fin n → ℕ) (v : Poly n) (i : Fin n) (h : wtProj μ v = v)
-    : rowOp i i v = (μ i : ℂ) • v := by
+theorem rowOp_self_of_wtProj (μ : Fin n → ℕ) (v : Poly n) (i : Fin n) (h : wtProj μ v = v) :
+    rowOp i i v = (μ i : ℂ) • v := by
   ext m
-  rw [coeff_rowOp_self, coeff_smul, smul_eq_mul]
+  rw [coeff_rowOp_self, MvPolynomial.coeff_smul, smul_eq_mul]
   by_cases hm : m ∈ v.support
   · rw [(wtProj_eq_self_iff μ v).1 h m hm]
   · rw [MvPolynomial.notMem_support_iff.1 hm]; simp
 
-theorem wtProj_eq_self_of_eigen {h : Poly n} (ν : Fin n → ℕ) (hc : ∀ a, rowOp a a h = (ν a : ℂ) • h)
-    : wtProj ν h = h := by
+theorem wtProj_eq_self_of_eigen {h : Poly n} (ν : Fin n → ℕ)
+    (hc : ∀ a, rowOp a a h = (ν a : ℂ) • h) : wtProj ν h = h := by
   rw [wtProj_eq_self_iff]
   intro m hm
   funext a
@@ -193,8 +232,8 @@ theorem sum_wtProj (f : Poly n) : ∑ ν ∈ f.support.image rowWt, wtProj ν f 
   · by_contra hc
     exact h ⟨m, MvPolynomial.mem_support_iff.2 (Ne.symm hc), rfl⟩
 
-theorem fischer_wtProj (μ : Fin n → ℕ) (f g : Poly n)
-    : fischer (wtProj μ f) g = fischer f (wtProj μ g) := by
+theorem fischer_wtProj (μ : Fin n → ℕ) (f g : Poly n) :
+    fischer (wtProj μ f) g = fischer f (wtProj μ g) := by
   classical
   set s := f.support ∪ g.support
   have hg : (wtProj μ g).support ⊆ s := fun m hm => by
@@ -207,18 +246,16 @@ theorem fischer_wtProj (μ : Fin n → ℕ) (f g : Poly n)
   rw [coeff_wtProj, coeff_wtProj]
   split_ifs <;> simp
 
-theorem wtProj_comm
-    {T : Module.End ℂ (Poly n)} (hT : ∀ a, T * rowOp a a = rowOp a a * T)
-    (μ : Fin n → ℕ) (f : Poly n)
-    : wtProj μ (T f) = T (wtProj μ f) := by
+theorem wtProj_comm {T : Module.End ℂ (Poly n)} (hT : ∀ a, T * rowOp a a = rowOp a a * T)
+    (μ : Fin n → ℕ) (f : Poly n) : wtProj μ (T f) = T (wtProj μ f) := by
   classical
   have hν : ∀ ν, wtProj ν (T (wtProj ν f)) = T (wtProj ν f) := fun ν =>
     wtProj_eq_self_of_eigen ν fun a => by
       have h1 := congrArg (fun S : Module.End ℂ (Poly n) => S (wtProj ν f)) (hT a)
       simp only [mul_apply_eq_comp] at h1
       rw [← h1, rowOp_self_of_wtProj ν _ a (by rw [wtProj_wtProj, if_pos rfl]), map_smul]
-  set_option synthInstance.maxHeartbeats 100000 in
-    conv_lhs => rw [← sum_wtProj f, map_sum, map_sum]
+
+  conv_lhs => rw [← sum_wtProj f, map_sum, map_sum]
   rw [Finset.sum_eq_single μ]
   · exact hν μ
   · intro ν _ hne
@@ -235,16 +272,14 @@ theorem wtProj_comm
 
 def wtHeight (μ : Fin n → ℕ) : ℤ := ∑ a, ((n : ℤ) - a) * μ a
 
-theorem rowOp_shift
-    {μ : Fin n → ℕ} {v : Poly n} (hv : wtProj μ v = v)
-    {i j : Fin n} (hij : i < j) (hne : rowOp i j v ≠ 0)
-    : ∃ μ' : Fin n → ℕ,
-      wtProj μ' (rowOp i j v) = rowOp i j v ∧ ∑ a, μ' a = ∑ a, μ a ∧ wtHeight μ < wtHeight μ' := by
+theorem rowOp_shift {μ : Fin n → ℕ} {v : Poly n} (hv : wtProj μ v = v) {i j : Fin n} (hij : i < j)
+    (hne : rowOp i j v ≠ 0) :
+    ∃ μ' : Fin n → ℕ, wtProj μ' (rowOp i j v) = rowOp i j v ∧ ∑ a, μ' a = ∑ a, μ a ∧
+      wtHeight μ < wtHeight μ' := by
   classical
   set w := rowOp i j v
-  have heig
-      : ∀ a,
-        rowOp a a w = ((μ a : ℂ) + ((if i = a then 1 else 0) - (if j = a then 1 else 0))) • w := by
+  have heig : ∀ a, rowOp a a w =
+      ((μ a : ℂ) + ((if i = a then 1 else 0) - (if j = a then 1 else 0))) • w := by
     intro a
     have h1 := congrArg (fun S : Module.End ℂ (Poly n) => S v) (rowOp_comm_self a i j)
     simp only [mul_apply_eq_comp, LinearMap.add_apply, LinearMap.smul_apply] at h1
@@ -253,14 +288,12 @@ theorem rowOp_shift
     by_contra h
     push Not at h
     exact hne (MvPolynomial.support_eq_empty.1 (Finset.eq_empty_of_forall_notMem h))
-  have hwt
-      : ∀ m' ∈ w.support, ∀ a,
-        ((rowWt m' a : ℕ) : ℤ)
-          = (μ a : ℤ) + ((if i = a then 1 else 0) - (if j = a then 1 else 0)) := by
+  have hwt : ∀ m' ∈ w.support, ∀ a, ((rowWt m' a : ℕ) : ℤ) =
+      (μ a : ℤ) + ((if i = a then 1 else 0) - (if j = a then 1 else 0)) := by
     intro m' hm' a
     have := rowWt_eq_of_eigen heig hm' a
-    have : ((rowWt m' a : ℤ) : ℂ)
-        = (((μ a : ℤ) + ((if i = a then 1 else 0) - (if j = a then 1 else 0)) : ℤ) : ℂ) := by
+    have : ((rowWt m' a : ℤ) : ℂ) = (((μ a : ℤ) + ((if i = a then 1 else 0) -
+        (if j = a then 1 else 0)) : ℤ) : ℂ) := by
       push_cast; rw [this]
     exact_mod_cast this
   refine ⟨rowWt m, ?_, ?_, ?_⟩
@@ -270,8 +303,7 @@ theorem rowOp_shift
     have h1 := hwt m' hm' a
     have h2 := hwt m hm a
     omega
-  · have : ∀ a,
-        ((rowWt m a : ℕ) : ℤ) = (μ a : ℤ) + ((if i = a then 1 else 0) - (if j = a then 1 else 0)) :=
+  · have : ∀ a, ((rowWt m a : ℕ) : ℤ) = (μ a : ℤ) + ((if i = a then 1 else 0) - (if j = a then 1 else 0)) :=
       hwt m hm
     have hs : ((∑ a, rowWt m a : ℕ) : ℤ) = ((∑ a, μ a : ℕ) : ℤ) := by
       push_cast
@@ -287,13 +319,14 @@ theorem rowOp_shift
     rw [hsum]
     linarith
 
-theorem eq_zero_of_forall_highestWeight
-    (T T' : Module.End ℂ (Poly n)) (hcomm : ∀ i j, T * rowOp i j = rowOp i j * T)
-    (hadj : ∀ f g, fischer (T f) g = fischer f (T' g)) (hnormal : T * T' = T' * T)
-    (hhw
-      : ∀ (v : Poly n) (μ : Fin n → ℕ), (∀ i j, i < j → rowOp i j v = 0) → wtProj μ v = v → T v = 0)
-    : T = 0 := by
+theorem eq_zero_of_forall_highestWeight (T T' : Module.End ℂ (Poly n))
+    (hcomm : ∀ i j, T * rowOp i j = rowOp i j * T)
+    (hadj : ∀ f g, fischer (T f) g = fischer f (T' g))
+    (hnormal : T * T' = T' * T)
+    (hhw : ∀ (v : Poly n) (μ : Fin n → ℕ), (∀ i j, i < j → rowOp i j v = 0) → wtProj μ v = v →
+      T v = 0) : T = 0 := by
   classical
+
   have hadj' : ∀ f g, fischer (T' f) g = fischer f (T g) := fun f g => by
     rw [← fischer_conj_symm, ← hadj, fischer_conj_symm]
 
@@ -318,7 +351,8 @@ theorem eq_zero_of_forall_highestWeight
     have := congrArg (fun S : Module.End ℂ (Poly n) => S k) (hcomm j i)
     simp only [mul_apply_eq_comp] at this
     rw [this, hk, map_zero]
-  have hS4 : ∀ s ∈ S, T s = 0 → s = 0 := fun s hs hT => (fischer_self_eq_zero_iff s).1 (hs s hT)
+  have hS4 : ∀ s ∈ S, T s = 0 → s = 0 := fun s hs hT =>
+    (fischer_self_eq_zero_iff s).1 (hs s hT)
   refine LinearMap.ext fun f => ?_
   rw [LinearMap.zero_apply]
   by_contra hg
@@ -339,8 +373,8 @@ theorem eq_zero_of_forall_highestWeight
       fun μ => ∑ a, μ a = d ∧ ∃ s ∈ S, wtProj μ s ≠ 0
   have hmemW : ∀ μ : Fin n → ℕ, ∑ a, μ a = d → (∃ s ∈ S, wtProj μ s ≠ 0) → μ ∈ W := by
     intro μ hsum hex
-    refine Finset.mem_filter.2
-      ⟨Finset.mem_image.2 ⟨fun i => ⟨μ i, ?_⟩, Finset.mem_univ _, rfl⟩, hsum, hex⟩
+    refine Finset.mem_filter.2 ⟨Finset.mem_image.2 ⟨fun i => ⟨μ i, ?_⟩, Finset.mem_univ _, rfl⟩,
+      hsum, hex⟩
     have : μ i ≤ d := hsum ▸ Finset.single_le_sum (fun a _ => Nat.zero_le (μ a)) (Finset.mem_univ i)
     omega
   have hW : W.Nonempty := ⟨μ₀, hmemW μ₀ rfl ⟨g, hS1 f, hμ₀⟩⟩
@@ -353,8 +387,7 @@ theorem eq_zero_of_forall_highestWeight
     intro i j hij
     by_contra hne
     obtain ⟨μ', h1, h2, h3⟩ := rowOp_shift hvv hij hne
-    have hmem : μ' ∈ W :=
-      hmemW μ' (h2.trans hμsum) ⟨rowOp i j v, hS3 i j v hvS, by rw [h1]; exact hne⟩
+    have hmem : μ' ∈ W := hmemW μ' (h2.trans hμsum) ⟨rowOp i j v, hS3 i j v hvS, by rw [h1]; exact hne⟩
     exact absurd (hμmax μ' hmem) (not_le.2 h3)
   exact hvne (hS4 v hvS (hhw v μ hhwv hvv))
 

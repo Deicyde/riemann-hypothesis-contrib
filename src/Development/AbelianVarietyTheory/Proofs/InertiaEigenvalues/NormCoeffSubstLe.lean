@@ -1,8 +1,52 @@
 module
 
-public import Mathlib
-public import Formalism.LocalRingCardinality.AdicCompletionLocal.LocTied
 public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.ConvZero
+public import Mathlib.Algebra.CharP.IntermediateField
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Real
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Lemma
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -101,8 +145,8 @@ private lemma exists_norm_coeff_pow_le_mul_pow_sub (u : K⟦X⟧) {r : ℝ} (hr 
   have hr0 : 0 ≤ r := (norm_nonneg _).trans hr
   refine ⟨∑ i ∈ Finset.range (k + 1), ‖coeff k (w ^ i)‖, Finset.sum_nonneg (fun _ _ => norm_nonneg _), fun j => ?_⟩
   have hu : u = w + C (constantCoeff u) := by simp [hw]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [hu, add_pow, map_sum]
+
+  rw [hu, add_pow, map_sum]
   calc ‖∑ i ∈ Finset.range (j + 1), coeff k (w ^ i * C (constantCoeff u) ^ (j - i) * (j.choose i : K⟦X⟧))‖
       ≤ ∑ i ∈ Finset.range (j + 1), ‖coeff k (w ^ i * C (constantCoeff u) ^ (j - i) * (j.choose i : K⟦X⟧))‖ :=
         norm_sum_le _ _
@@ -141,8 +185,8 @@ private lemma exists_norm_coeff_aeval_le_mul_of_weighted_bound (u : K⟦X⟧) {r
       ‖coeff k (Polynomial.aeval u p)‖ ≤ C * ε := by
   obtain ⟨B, hB0, hB⟩ := exists_norm_coeff_pow_le_mul_pow_sub u hr hr1 k
   refine ⟨B / r ^ k, by positivity, fun p ε hε hp => ?_⟩
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [Polynomial.aeval_eq_sum_range, map_sum]
+
+  rw [Polynomial.aeval_eq_sum_range, map_sum]
   apply IsUltrametricDist.norm_sum_le_of_forall_le_of_nonneg (by positivity)
   intro j _
   rw [PowerSeries.coeff_smul, smul_eq_mul, norm_mul]

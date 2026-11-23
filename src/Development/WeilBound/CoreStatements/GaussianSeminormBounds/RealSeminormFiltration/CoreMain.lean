@@ -1,44 +1,88 @@
 module
 
+public import Development.WeilBound.CoreStatements.GaussianSeminormBounds.RealSeminormFiltration.CoreDefs
 public import Development.WeilBound.CoreStatements.GaussianSeminormBounds.RealSeminormFiltration.CoreCasGl
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.LinearAlgebra.Eigenspace.Minpoly
+import Mathlib.LinearAlgebra.Matrix.FiniteDimensional
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
+public import Mathlib.Analysis.InnerProductSpace.ProdL2
 
 @[expose] public section
 
 noncomputable section
 
-open ReciprocityTheory.ThetaSummability.Real ReciprocityTheory.ChartRestriction.G.ThK.Real
-  FockH1Action MvPolynomial Matrix
+open ReciprocityTheory.ThetaSummability.Real ReciprocityTheory.ChartRestriction.G.ThK.Real FockH1Action MvPolynomial Matrix
 open scoped InnerProductSpace
 
 namespace PositivityTheory.KReal
 
-theorem exists_factor
-    {M T P : Type}
-    [AddCommGroup M] [Module ℂ M] [AddCommGroup T] [Module ℂ T] [AddCommGroup P] [Module ℂ P]
-    (φ : M →ₗ[ℂ] T) (hφ : Function.Surjective φ)
-    (g : M →ₗ[ℂ] P) (h : LinearMap.ker φ ≤ LinearMap.ker g)
-    : ∃ π : T →ₗ[ℂ] P, ∀ m, π (φ m) = g m := by
-  refine
-    ⟨((LinearMap.ker φ).liftQ g h) ∘ₗ (φ.quotKerEquivOfSurjective hφ).symm.toLinearMap, fun m => ?_⟩
+theorem exists_factor {M T P : Type} [AddCommGroup M] [Module ℂ M] [AddCommGroup T] [Module ℂ T]
+    [AddCommGroup P] [Module ℂ P] (φ : M →ₗ[ℂ] T) (hφ : Function.Surjective φ) (g : M →ₗ[ℂ] P)
+    (h : LinearMap.ker φ ≤ LinearMap.ker g) : ∃ π : T →ₗ[ℂ] P, ∀ m, π (φ m) = g m := by
+  refine ⟨((LinearMap.ker φ).liftQ g h) ∘ₗ (φ.quotKerEquivOfSurjective hφ).symm.toLinearMap, fun m => ?_⟩
   have e : (φ.quotKerEquivOfSurjective hφ).symm (φ m) = Submodule.Quotient.mk m := by
     rw [LinearEquiv.symm_apply_eq]
     rfl
   simp only [LinearMap.comp_apply, LinearEquiv.coe_coe, e, Submodule.liftQ_apply]
 
-theorem quot_of_local
-    {J M T T' : Type} [AddCommGroup M] [Module ℂ M] [AddCommGroup T] [Module ℂ T] [AddCommGroup T']
-    [Module ℂ T'] [Nontrivial T] [Nontrivial T']
-    (actM : J → Module.End ℂ M)
-    (act : J → Module.End ℂ T) (act' : J → Module.End ℂ T')
-    (R : Submodule ℂ M)
-    (hR : R ≠ ⊤) (hN : ∀ N : Submodule ℂ M, (∀ W, ∀ x ∈ N, actM W x ∈ N) → N ≠ ⊤ → N ≤ R)
+theorem quot_of_local {J M T T' : Type} [AddCommGroup M] [Module ℂ M] [AddCommGroup T] [Module ℂ T]
+    [AddCommGroup T'] [Module ℂ T'] [Nontrivial T] [Nontrivial T']
+    (actM : J → Module.End ℂ M) (act : J → Module.End ℂ T) (act' : J → Module.End ℂ T')
+    (R : Submodule ℂ M) (hR : R ≠ ⊤)
+    (hN : ∀ N : Submodule ℂ M, (∀ W, ∀ x ∈ N, actM W x ∈ N) → N ≠ ⊤ → N ≤ R)
     (φ : M →ₗ[ℂ] T) (φ' : M →ₗ[ℂ] T') (hφ : Function.Surjective φ) (hφ' : Function.Surjective φ')
-    (e : ∀ W x, φ (actM W x) = act W (φ x)) (e' : ∀ W x, φ' (actM W x) = act' W (φ' x))
-    : ∃ (Pi : Type) (_ : AddCommGroup Pi) (_ : Module ℂ Pi) (actP : J → Module.End ℂ Pi)
-        (π : T →ₗ[ℂ] Pi) (π' : T' →ₗ[ℂ] Pi),
-      Function.Surjective π ∧ Function.Surjective π' ∧ (∀ W x, π (act W x) = actP W (π x))
-        ∧ (∀ W x, π' (act' W x) = actP W (π' x)) ∧ Nontrivial Pi
-        ∧ ∀ N : Submodule ℂ Pi, (∀ W, ∀ x ∈ N, actP W x ∈ N) → N = ⊥ ∨ N = ⊤ := by
+    (e : ∀ W x, φ (actM W x) = act W (φ x)) (e' : ∀ W x, φ' (actM W x) = act' W (φ' x)) :
+    ∃ (Pi : Type) (_ : AddCommGroup Pi) (_ : Module ℂ Pi) (actP : J → Module.End ℂ Pi)
+      (π : T →ₗ[ℂ] Pi) (π' : T' →ₗ[ℂ] Pi), Function.Surjective π ∧ Function.Surjective π' ∧
+      (∀ W x, π (act W x) = actP W (π x)) ∧ (∀ W x, π' (act' W x) = actP W (π' x)) ∧ Nontrivial Pi ∧
+      ∀ N : Submodule ℂ Pi, (∀ W, ∀ x ∈ N, actP W x ∈ N) → N = ⊥ ∨ N = ⊤ := by
   classical
   set S : Set (Submodule ℂ M) := {N | (∀ W, ∀ x ∈ N, actM W x ∈ N) ∧ N ≠ ⊤} with hS
   set Rm : Submodule ℂ M := sSup S with hRm
@@ -49,10 +93,9 @@ theorem quot_of_local
     have hle : Rm ≤ Rm.comap (actM W) :=
       sSup_le fun N hN x hx => (le_sSup hN : N ≤ Rm) (hN.1 W x hx)
     exact fun x hx => hle hx
-  have hker
-      : ∀ {T₀ : Type} [AddCommGroup T₀] [Module ℂ T₀] [Nontrivial T₀] (act₀ : J → Module.End ℂ T₀)
-          (ψ : M →ₗ[ℂ] T₀),
-        Function.Surjective ψ → (∀ W x, ψ (actM W x) = act₀ W (ψ x)) → LinearMap.ker ψ ≤ Rm := by
+  have hker : ∀ {T₀ : Type} [AddCommGroup T₀] [Module ℂ T₀] [Nontrivial T₀]
+      (act₀ : J → Module.End ℂ T₀) (ψ : M →ₗ[ℂ] T₀), Function.Surjective ψ →
+      (∀ W x, ψ (actM W x) = act₀ W (ψ x)) → LinearMap.ker ψ ≤ Rm := by
     intro T₀ _ _ _ act₀ ψ hψ eψ
     refine le_sSup ⟨fun W x hx => ?_, fun htop => ?_⟩
     · rw [LinearMap.mem_ker] at hx ⊢
@@ -105,14 +148,12 @@ variable {r s : ℕ} {M : Type} [AddCommGroup M] [Module ℂ M]
 theorem le_genG' (act : Mat r s →ₗ[ℂ] Module.End ℂ M) (S : Submodule ℂ M) : S ≤ genG act S :=
   le_sInf fun _ hN => hN.1
 
-theorem genG_le'
-    {act : Mat r s →ₗ[ℂ] Module.End ℂ M} {S N : Submodule ℂ M}
-    (h1 : S ≤ N) (h2 : ∀ W, ∀ x ∈ N, act W x ∈ N)
-    : genG act S ≤ N :=
+theorem genG_le' {act : Mat r s →ₗ[ℂ] Module.End ℂ M} {S N : Submodule ℂ M} (h1 : S ≤ N)
+    (h2 : ∀ W, ∀ x ∈ N, act W x ∈ N) : genG act S ≤ N :=
   sInf_le ⟨h1, h2⟩
 
-theorem genG_stable' (act : Mat r s →ₗ[ℂ] Module.End ℂ M) (S : Submodule ℂ M)
-    : ∀ W, ∀ x ∈ genG act S, act W x ∈ genG act S := by
+theorem genG_stable' (act : Mat r s →ₗ[ℂ] Module.End ℂ M) (S : Submodule ℂ M) :
+    ∀ W, ∀ x ∈ genG act S, act W x ∈ genG act S := by
   intro W x hx
   simp only [genG, Submodule.mem_sInf, Set.mem_setOf_eq] at hx ⊢
   intro N hN
@@ -121,59 +162,49 @@ theorem genG_stable' (act : Mat r s →ₗ[ℂ] Module.End ℂ M) (S : Submodule
 theorem sameBlock_symm' {a b : Ix r s} (h : sameBlock a b) : sameBlock b a := by
   exact (CasGl.sb_iff _ _).2 ((CasGl.sb_iff _ _).1 h).symm
 
-theorem casK_mem
-    {ρ : Ix r s → Ix r s → Module.End ℂ M} {N : Submodule ℂ M} (h : KSt ρ N) {x : M} (hx : x ∈ N)
-    : casK ρ x ∈ N := by
+theorem casK_mem {ρ : Ix r s → Ix r s → Module.End ℂ M} {N : Submodule ℂ M} (h : KSt ρ N) {x : M}
+    (hx : x ∈ N) : casK ρ x ∈ N := by
   simp only [casK, LinearMap.sum_apply]
   refine N.sum_mem fun a _ => N.sum_mem fun b _ => ?_
   split_ifs with hab
   · exact h a b hab _ (h b a (sameBlock_symm' hab) _ hx)
   · exact N.zero_mem
 
-theorem casK_intertw
-    {V : Type} [AddCommGroup V] [Module ℂ V]
-    {ρ : Ix r s → Ix r s → Module.End ℂ V} {ρ' : Ix r s → Ix r s → Module.End ℂ M}
-    (ι : V →ₗ[ℂ] M) (h : ∀ a b, sameBlock a b → ∀ v, ι (ρ a b v) = ρ' a b (ι v))
-    (v : V)
-    : ι (casK ρ v) = casK ρ' (ι v) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [casK, LinearMap.sum_apply, map_sum]
+theorem casK_intertw {V : Type} [AddCommGroup V] [Module ℂ V] {ρ : Ix r s → Ix r s → Module.End ℂ V}
+    {ρ' : Ix r s → Ix r s → Module.End ℂ M} (ι : V →ₗ[ℂ] M)
+    (h : ∀ a b, sameBlock a b → ∀ v, ι (ρ a b v) = ρ' a b (ι v)) (v : V) :
+    ι (casK ρ v) = casK ρ' (ι v) := by
+
+  simp only [casK, LinearMap.sum_apply, map_sum]
   refine Finset.sum_congr rfl fun a _ => Finset.sum_congr rfl fun b _ => ?_
   split_ifs with hab
   · simp only [Module.End.mul_apply]
     rw [h a b hab, h b a (sameBlock_symm' hab)]
   · simp
 
-private theorem sameBlock_trans_real_seminorm_filtration
-    {r s : ℕ} {a b c : Ix r s} (h1 : sameBlock a b) (h2 : sameBlock b c)
-    : sameBlock a c :=
+private theorem sameBlock_trans_real_seminorm_filtration {r s : ℕ} {a b c : Ix r s} (h1 : sameBlock a b) (h2 : sameBlock b c) :
+    sameBlock a c :=
   (CasGl.sb_iff _ _).2 (((CasGl.sb_iff _ _).1 h1).trans ((CasGl.sb_iff _ _).1 h2))
 
 private theorem sameBlock_refl_real_seminorm_filtration {r s : ℕ} (a : Ix r s) : sameBlock a a :=
   (CasGl.sb_iff _ _).2 rfl
 
-private theorem posC_props_and_sameBlock_trichotomy {r s : ℕ} (a b : Ix r s)
-    : (posC a b → sameBlock a b) ∧ (posC a b → a ≠ b) ∧ (posC a b → ¬ posC b a)
-      ∧ (sameBlock a b → a = b ∨ posC a b ∨ posC b a) := by
-  rcases a with a | a <;> rcases b with b | b
-    <;> simp only [posC, sameBlock, ne_eq, Sum.inl.injEq, Sum.inr.injEq, reduceCtorEq,
-      not_false_eq_true, true_implies, false_implies, implies_true, and_true, true_and, false_or,
-      or_false, not_lt]
-    <;> omega
+private theorem posC_props_and_sameBlock_trichotomy {r s : ℕ} (a b : Ix r s) :
+    (posC a b → sameBlock a b) ∧ (posC a b → a ≠ b) ∧ (posC a b → ¬ posC b a) ∧
+      (sameBlock a b → a = b ∨ posC a b ∨ posC b a) := by
+  rcases a with a | a <;> rcases b with b | b <;>
+    simp only [posC, sameBlock, ne_eq, Sum.inl.injEq, Sum.inr.injEq, reduceCtorEq,
+      not_false_eq_true, true_implies, false_implies, implies_true, and_true, true_and,
+      false_or, or_false, not_lt] <;> omega
 
-theorem local_of
-    (act : Mat r s →ₗ[ℂ] Module.End ℂ M) (hL : IsLie act)
-    (La : Ix r s → ℚ)
+theorem local_of (act : Mat r s →ₗ[ℂ] Module.End ℂ M) (hL : IsLie act) (La : Ix r s → ℚ)
     {A : Type} [NormedAddCommGroup A] [InnerProductSpace ℂ A] [FiniteDimensional ℂ A]
-    (ρ : Ix r s → Ix r s → Module.End ℂ A) (ι : A →ₗ[ℂ] M) (f : A) (hadj : AdjK ρ) (hgl : GlK ρ)
-    (hw : HwK ρ La f) (hι : ∀ a b, sameBlock a b → ∀ u, ι (ρ a b u) = act (Eab a b) (ι u))
-    (hs : StarK act (LinearMap.range ι) ((casW La : ℚ) : ℝ)) (h0 : ι f ≠ 0)
-    : ∃ R : Submodule ℂ M,
-      ι f ∉ R
-        ∧ ∀ N : Submodule ℂ M,
-          N ≤ genG act (Submodule.span ℂ {ι f}) → (∀ W, ∀ x ∈ N, act W x ∈ N)
-            → N ≠ genG act (Submodule.span ℂ {ι f})
-            → N ≤ R := by
+    (ρ : Ix r s → Ix r s → Module.End ℂ A) (ι : A →ₗ[ℂ] M) (f : A)
+    (hadj : AdjK ρ) (hgl : GlK ρ) (hw : HwK ρ La f)
+    (hι : ∀ a b, sameBlock a b → ∀ u, ι (ρ a b u) = act (Eab a b) (ι u))
+    (hs : StarK act (LinearMap.range ι) ((casW La : ℚ) : ℝ)) (h0 : ι f ≠ 0) :
+    ∃ R : Submodule ℂ M, ι f ∉ R ∧ ∀ N : Submodule ℂ M, N ≤ genG act (Submodule.span ℂ {ι f}) →
+      (∀ W, ∀ x ∈ N, act W x ∈ N) → N ≠ genG act (Submodule.span ℂ {ι f}) → N ≤ R := by
   classical
   have hsym : ∀ {a b : Ix r s}, sameBlock a b → sameBlock b a := fun h => sameBlock_symm' h
   set B : Submodule ℂ A := sInf {W | f ∈ W ∧ ∀ a b, posC b a → ∀ x ∈ W, ρ a b x ∈ W} with hB
@@ -206,10 +237,8 @@ theorem local_of
         refine ⟨hBlow a b hab x hx.1, fun c d hcd => ?_⟩
         have hab' : sameBlock a b := hsym ((posC_props_and_sameBlock_trichotomy b a).1 hab)
         have hc := LinearMap.congr_fun (hgl c d a b hcd hab') x
-        have e
-            : ρ c d (ρ a b x)
-              = ρ a b (ρ c d x)
-                + ((if d = a then ρ c b else 0) - (if b = c then ρ a d else 0)) x := by
+        have e : ρ c d (ρ a b x) = ρ a b (ρ c d x) +
+            ((if d = a then ρ c b else 0) - (if b = c then ρ a d else 0)) x := by
           rw [← hc, LinearMap.sub_apply, Module.End.mul_apply, Module.End.mul_apply]
           abel
         rw [e]
@@ -286,8 +315,8 @@ theorem local_of
         ring
     have hab0 : β * α = 0 := by
       have := congrArg (fun z => ⟪w0, z⟫_ℂ) hg
-      simp only [inner_sub_right, inner_smul_right, hort, inner_zero_right, mul_zero, sub_zero]
-        at this
+      simp only [inner_sub_right, inner_smul_right, hort, inner_zero_right, mul_zero,
+        sub_zero] at this
       exact this
     rcases mul_eq_zero.mp hab0 with hb | ha
     · exfalso
@@ -296,9 +325,8 @@ theorem local_of
       exact hfW (hfwv ▸ hw0)
     · have : w0 = 0 := inner_self_eq_zero.mp ha
       rw [this, zero_add] at hfwv
-      have hBW : B ≤ Wᗮ :=
-        hBmin _ (hfwv ▸ hv0) (fun a b hab x hx =>
-          hWpK a b (hsym ((posC_props_and_sameBlock_trichotomy b a).1 hab)) x hx)
+      have hBW : B ≤ Wᗮ := hBmin _ (hfwv ▸ hv0) (fun a b hab x hx =>
+        hWpK a b (hsym ((posC_props_and_sameBlock_trichotomy b a).1 hab)) x hx)
       rw [eq_bot_iff]
       intro x hx
       rw [Submodule.mem_bot]
@@ -309,9 +337,7 @@ theorem local_of
     rw [← sub_eq_zero]
     set X : Ix r s → Module.End ℂ A := fun b => if sameBlock c b then ρ c b * ρ b d else 0 with hX
     set Y : Ix r s → Module.End ℂ A := fun a => if sameBlock a d then ρ a d * ρ c a else 0 with hY
-    have t1
-        : ∀ a b,
-          sameBlock a b → ρ a b * (if a = c then ρ b d else 0) = if a = c then X b else 0 := by
+    have t1 : ∀ a b, sameBlock a b → ρ a b * (if a = c then ρ b d else 0) = if a = c then X b else 0 := by
       intro a b hab
       by_cases h : a = c
       · subst h
@@ -319,9 +345,7 @@ theorem local_of
         dsimp only
         rw [if_pos hab]
       · rw [if_neg h, if_neg h, mul_zero]
-    have t2
-        : ∀ a b,
-          sameBlock a b → ρ a b * (if d = b then ρ c a else 0) = if b = d then Y a else 0 := by
+    have t2 : ∀ a b, sameBlock a b → ρ a b * (if d = b then ρ c a else 0) = if b = d then Y a else 0 := by
       intro a b hab
       by_cases h : b = d
       · subst h
@@ -329,9 +353,7 @@ theorem local_of
         dsimp only
         rw [if_pos hab]
       · rw [if_neg (Ne.symm h), if_neg h, mul_zero]
-    have t3
-        : ∀ a b,
-          sameBlock a b → (if b = c then ρ a d else 0) * ρ b a = if b = c then Y a else 0 := by
+    have t3 : ∀ a b, sameBlock a b → (if b = c then ρ a d else 0) * ρ b a = if b = c then Y a else 0 := by
       intro a b hab
       by_cases h : b = c
       · subst h
@@ -339,9 +361,7 @@ theorem local_of
         dsimp only
         rw [if_pos (sameBlock_trans_real_seminorm_filtration hab hcd)]
       · rw [if_neg h, if_neg h, zero_mul]
-    have t4
-        : ∀ a b,
-          sameBlock a b → (if d = a then ρ c b else 0) * ρ b a = if a = d then X b else 0 := by
+    have t4 : ∀ a b, sameBlock a b → (if d = a then ρ c b else 0) * ρ b a = if a = d then X b else 0 := by
       intro a b hab
       by_cases h : a = d
       · subst h
@@ -381,68 +401,54 @@ theorem local_of
         dsimp only
         rw [if_neg hab]
       · rw [if_neg h]
-    have hterm
-        : ∀ a b,
-          (if sameBlock a b then ρ a b * ρ b a else 0) * ρ c d
-              - ρ c d * (if sameBlock a b then ρ a b * ρ b a else 0)
-            = (if a = c then X b else 0) - (if a = d then X b else 0)
-              + ((if b = c then Y a else 0) - (if b = d then Y a else 0)) := by
+    have hterm : ∀ a b, (if sameBlock a b then ρ a b * ρ b a else 0) * ρ c d -
+        ρ c d * (if sameBlock a b then ρ a b * ρ b a else 0) =
+        (if a = c then X b else 0) - (if a = d then X b else 0) +
+          ((if b = c then Y a else 0) - (if b = d then Y a else 0)) := by
       intro a b
       by_cases hab : sameBlock a b
       · rw [if_pos hab]
-        have e
-            : ρ a b * ρ b a * ρ c d - ρ c d * (ρ a b * ρ b a)
-              = ρ a b * (ρ b a * ρ c d - ρ c d * ρ b a)
-                + (ρ a b * ρ c d - ρ c d * ρ a b) * ρ b a := by
+        have e : ρ a b * ρ b a * ρ c d - ρ c d * (ρ a b * ρ b a) =
+            ρ a b * (ρ b a * ρ c d - ρ c d * ρ b a) + (ρ a b * ρ c d - ρ c d * ρ a b) * ρ b a := by
           noncomm_ring
-        rw [e, hgl b a c d (hsym hab) hcd, hgl a b c d hab hcd, mul_sub, sub_mul, t1 a b hab,
-          t2 a b hab, t3 a b hab, t4 a b hab]
+        rw [e, hgl b a c d (hsym hab) hcd, hgl a b c d hab hcd, mul_sub, sub_mul,
+          t1 a b hab, t2 a b hab, t3 a b hab, t4 a b hab]
         abel
       · rw [if_neg hab, n1 a b hab, n2 a b hab, n3 a b hab, n4 a b hab]
         simp
-    calc
-      casK ρ * ρ c d - ρ c d * casK ρ
-          = ∑ a, ∑ b, ((if a = c then X b else 0) -
-            (if a = d then X b else 0) + ((if b = c then Y a else 0) - (if b = d then Y a else 0))) :=
-        by simp only [casK, Finset.sum_mul, Finset.mul_sum, ← Finset.sum_sub_distrib, hterm]
+    calc casK ρ * ρ c d - ρ c d * casK ρ = ∑ a, ∑ b, ((if a = c then X b else 0) -
+          (if a = d then X b else 0) + ((if b = c then Y a else 0) - (if b = d then Y a else 0))) := by
+          simp only [casK, Finset.sum_mul, Finset.mul_sum, ← Finset.sum_sub_distrib, hterm]
       _ = 0 := by
-        simp only [Finset.sum_add_distrib, Finset.sum_sub_distrib]
-        rw [Finset.sum_comm (f := fun a b => if a = c then X b else 0),
-          Finset.sum_comm (f := fun a b => if a = d then X b else 0)]
-        simp only [Finset.sum_ite_eq', Finset.mem_univ, if_true, sub_self, add_zero]
+          simp only [Finset.sum_add_distrib, Finset.sum_sub_distrib]
+          rw [Finset.sum_comm (f := fun a b => if a = c then X b else 0),
+            Finset.sum_comm (f := fun a b => if a = d then X b else 0)]
+          simp only [Finset.sum_ite_eq', Finset.mem_univ, if_true, sub_self, add_zero]
   have hfe : casK ρ f = ((c0 : ℝ) : ℂ) • f := by
-    have hterm
-        : ∀ a b,
-          (if sameBlock a b then ρ a b * ρ b a else 0) f
-            = (((if a = b then La a ^ 2 else 0) + (if posC a b then La a - La b else 0) : ℚ) : ℂ)
-              • f := by
+    have hterm : ∀ a b, (if sameBlock a b then ρ a b * ρ b a else 0) f =
+        (((if a = b then La a ^ 2 else 0) + (if posC a b then La a - La b else 0) : ℚ) : ℂ) • f := by
       intro a b
       by_cases hsb : sameBlock a b
       · rw [if_pos hsb, Module.End.mul_apply]
         rcases (posC_props_and_sameBlock_trichotomy a b).2.2.2 hsb with rfl | h | h
-        · rw [hw.1 a, map_smul, hw.1 a, smul_smul, if_pos rfl,
-            if_neg (fun h' => (posC_props_and_sameBlock_trichotomy a a).2.1 h' rfl)]
+        · rw [hw.1 a, map_smul, hw.1 a, smul_smul, if_pos rfl, if_neg (fun h' => (posC_props_and_sameBlock_trichotomy a a).2.1 h' rfl)]
           push_cast
           ring_nf
         · have hc := LinearMap.congr_fun (hgl a b b a hsb (hsym hsb)) f
           simp only [LinearMap.sub_apply, Module.End.mul_apply, hw.2 a b h, map_zero, sub_zero,
-              if_pos rfl, hw.1]
-            at hc
+            if_pos rfl, hw.1] at hc
           rw [hc, if_neg ((posC_props_and_sameBlock_trichotomy a b).2.1 h), if_pos h]
           rw [if_pos trivial, if_pos trivial, hw.1 a, hw.1 b]
           push_cast
           rw [zero_add, sub_smul]
-        · rw [hw.2 b a h, map_zero,
-            if_neg (fun h' => (posC_props_and_sameBlock_trichotomy b a).2.1 h h'.symm),
+        · rw [hw.2 b a h, map_zero, if_neg (fun h' => (posC_props_and_sameBlock_trichotomy b a).2.1 h h'.symm),
             if_neg ((posC_props_and_sameBlock_trichotomy b a).2.2.1 h)]
           simp
-      · rw [if_neg hsb,
-          if_neg (fun (h' : a = b) => hsb (h' ▸ sameBlock_refl_real_seminorm_filtration a)),
+      · rw [if_neg hsb, if_neg (fun (h' : a = b) => hsb (h' ▸ sameBlock_refl_real_seminorm_filtration a)),
           if_neg (fun h' => hsb ((posC_props_and_sameBlock_trichotomy a b).1 h'))]
         simp
-    have hq
-        : (∑ a, ∑ b, ((if a = b then La a ^ 2 else 0) + (if posC a b then La a - La b else 0) : ℚ))
-          = casW La := by
+    have hq : (∑ a, ∑ b, ((if a = b then La a ^ 2 else 0) + (if posC a b then La a - La b else 0) : ℚ))
+        = casW La := by
       simp only [casW, Finset.sum_add_distrib, Finset.sum_ite_eq, Finset.mem_univ, if_true]
     simp only [casK, LinearMap.sum_apply, hterm]
     simp_rw [← Finset.sum_smul]
@@ -458,14 +464,12 @@ theorem local_of
       · intro a b hab x hx
         have hsb : sameBlock a b := hsym ((posC_props_and_sameBlock_trichotomy b a).1 hab)
         rw [LinearMap.mem_ker, LinearMap.sub_apply, LinearMap.smul_apply, Module.End.one_apply,
-            sub_eq_zero]
-          at hx ⊢
+          sub_eq_zero] at hx ⊢
         rw [← Module.End.mul_apply, hcomm a b hsb, Module.End.mul_apply, hx, map_smul]
     intro u hu
     have := hle hu
     rw [LinearMap.mem_ker, LinearMap.sub_apply, LinearMap.smul_apply, Module.End.one_apply,
-        sub_eq_zero]
-      at this
+      sub_eq_zero] at this
     exact this
   let ρ0 : Ix r s → Ix r s → Module.End ℂ B := fun a b =>
     if h : sameBlock a b then (ρ a b).restrict (fun x hx => hBK a b h x hx) else 0
@@ -525,21 +529,20 @@ theorem local_of
       refine hi y hy ?_
       rw [LinearMap.sub_apply, LinearMap.smul_apply, Module.End.one_apply] at this
       exact this
-  let R : Submodule ℂ M := {
-    carrier := {x | ∃ q : Polynomial ℂ, q.eval ((c0 : ℝ) : ℂ) ≠ 0 ∧ Polynomial.aeval C q x = 0}
-    add_mem' := by
-      rintro x y ⟨p, hp, hpx⟩ ⟨q, hq, hqy⟩
-      refine ⟨p * q, by rw [Polynomial.eval_mul]; exact mul_ne_zero hp hq, ?_⟩
-      have h1 : Polynomial.aeval C (p * q) x = 0 := by
-        rw [mul_comm, map_mul, Module.End.mul_apply, hpx, map_zero]
-      have h2 : Polynomial.aeval C (p * q) y = 0 := by
-        rw [map_mul, Module.End.mul_apply, hqy, map_zero]
-      rw [map_add (f := _), h1, h2, add_zero]
-    zero_mem' := ⟨1, by simp, by simp⟩
-    smul_mem' := by
-      rintro a x ⟨q, hq, hqx⟩
-      exact ⟨q, hq, by rw [map_smul, hqx, smul_zero]⟩
-  }
+  let R : Submodule ℂ M :=
+    { carrier := {x | ∃ q : Polynomial ℂ, q.eval ((c0 : ℝ) : ℂ) ≠ 0 ∧ Polynomial.aeval C q x = 0}
+      add_mem' := by
+        rintro x y ⟨p, hp, hpx⟩ ⟨q, hq, hqy⟩
+        refine ⟨p * q, by rw [Polynomial.eval_mul]; exact mul_ne_zero hp hq, ?_⟩
+        have h1 : Polynomial.aeval C (p * q) x = 0 := by
+          rw [mul_comm, map_mul, Module.End.mul_apply, hpx, map_zero]
+        have h2 : Polynomial.aeval C (p * q) y = 0 := by
+          rw [map_mul, Module.End.mul_apply, hqy, map_zero]
+        rw [map_add (f := _), h1, h2, add_zero]
+      zero_mem' := ⟨1, by simp, by simp⟩
+      smul_mem' := by
+        rintro a x ⟨q, hq, hqx⟩
+        exact ⟨q, hq, by rw [map_smul, hqx, smul_zero]⟩ }
   have hfR : ι f ∉ R := by
     rintro ⟨q, hq, hqf⟩
     have hev : Module.End.HasEigenvector C ((c0 : ℝ) : ℂ) (ι f) :=
@@ -552,10 +555,8 @@ theorem local_of
   have hF'C : ∀ y ∈ F ⊓ N, C y ∈ F ⊓ N := fun y hy => ⟨casK_mem hFK hy.1, hCst N hNst y hy.2⟩
   haveI : FiniteDimensional ℂ (F ⊓ N : Submodule ℂ M) := Submodule.finiteDimensional_of_le inf_le_left
   set Cf : Module.End ℂ (F ⊓ N : Submodule ℂ M) := C.restrict hF'C with hCf
-  have hres
-      : ∀ (P : Polynomial ℂ) (v : (F ⊓ N : Submodule ℂ M)),
-        ((Polynomial.aeval Cf P v : (F ⊓ N : Submodule ℂ M)) : M)
-          = Polynomial.aeval C P (v : M) := by
+  have hres : ∀ (P : Polynomial ℂ) (v : (F ⊓ N : Submodule ℂ M)),
+      ((Polynomial.aeval Cf P v : (F ⊓ N : Submodule ℂ M)) : M) = Polynomial.aeval C P (v : M) := by
     intro P
     induction P using Polynomial.induction_on' with
     | add p q hp hq =>
@@ -581,8 +582,8 @@ theorem local_of
       rw [show x = (xF : M) from rfl, ← hres _ xF, minpoly.aeval]
       rfl
     rw [hpq, map_mul, Module.End.mul_apply] at h2
-    simpa [map_pow, map_sub, Polynomial.aeval_X, Polynomial.aeval_C, Algebra.algebraMap_eq_smul_one]
-      using h2
+    simpa [map_pow, map_sub, Polynomial.aeval_X, Polynomial.aeval_C,
+      Algebra.algebraMap_eq_smul_one] using h2
   have hyL : y ∈ L := hind k y (hGL (hNG hyN)) hyk
   have hy0 : y = 0 := by
     by_contra hyne
@@ -593,14 +594,11 @@ theorem local_of
       show ι (ρ a b u) ∈ N
       rw [hι a b hab]
       exact hNst _ _ hu.1
-    have hvW : (v : A) ∈ N.comap ι ⊓ B := ⟨
-      by
-        show ι v ∈ N
-        have e0 : ι0 v = ι v := rfl
-        rw [← e0, hv]
-        exact hyN,
-      v.2
-    ⟩
+    have hvW : (v : A) ∈ N.comap ι ⊓ B := ⟨by
+      show ι v ∈ N
+      have e0 : ι0 v = ι v := rfl
+      rw [← e0, hv]
+      exact hyN, v.2⟩
     have hfW : f ∈ N.comap ι ⊓ B := by
       by_contra hfW
       have hbot := hirr _ inf_le_right hWK hfW
@@ -618,10 +616,9 @@ theorem local_of
 
 end Gen
 
-def mainProdAct
-    {r s : ℕ} {T T' : Type} [AddCommGroup T] [Module ℂ T] [AddCommGroup T'] [Module ℂ T']
-    (act : Mat r s →ₗ[ℂ] Module.End ℂ T) (act' : Mat r s →ₗ[ℂ] Module.End ℂ T')
-    : Mat r s →ₗ[ℂ] Module.End ℂ (T × T') where
+def mainProdAct {r s : ℕ} {T T' : Type} [AddCommGroup T] [Module ℂ T] [AddCommGroup T'] [Module ℂ T']
+    (act : Mat r s →ₗ[ℂ] Module.End ℂ T) (act' : Mat r s →ₗ[ℂ] Module.End ℂ T') :
+    Mat r s →ₗ[ℂ] Module.End ℂ (T × T') where
   toFun W := (act W).prodMap (act' W)
   map_add' W W' := by
     refine LinearMap.ext fun x => ?_
@@ -630,10 +627,8 @@ def mainProdAct
     refine LinearMap.ext fun x => ?_
     simp
 
-theorem ne_zero_of_gen
-    {r s : ℕ} {T : Type} [AddCommGroup T] [Module ℂ T] [Nontrivial T]
-    (act : Mat r s →ₗ[ℂ] Module.End ℂ T) (v : T) (h : genG act (Submodule.span ℂ {v}) = ⊤)
-    : v ≠ 0 := by
+theorem ne_zero_of_gen {r s : ℕ} {T : Type} [AddCommGroup T] [Module ℂ T] [Nontrivial T]
+    (act : Mat r s →ₗ[ℂ] Module.End ℂ T) (v : T) (h : genG act (Submodule.span ℂ {v}) = ⊤) : v ≠ 0 := by
   rintro rfl
   have : genG act (Submodule.span ℂ {(0 : T)}) ≤ ⊥ := by
     refine genG_le' (by simp) fun W x hx => ?_
@@ -642,16 +637,13 @@ theorem ne_zero_of_gen
   rw [h] at this
   exact top_ne_bot (le_bot_iff.1 this)
 
-theorem common_quot
-    {r s : ℕ} (La : Ix r s → ℚ)
-    (T T' : Type) [AddCommGroup T] [Module ℂ T] [AddCommGroup T'] [Module ℂ T']
-    (act : Mat r s →ₗ[ℂ] Module.End ℂ T) (act' : Mat r s →ₗ[ℂ] Module.End ℂ T')
-    (h : Side La T act) (h' : Side La T' act')
-    : ∃ (Pi : Type) (_ : AddCommGroup Pi) (_ : Module ℂ Pi) (actP : Mat r s → Module.End ℂ Pi)
-        (π : T →ₗ[ℂ] Pi) (π' : T' →ₗ[ℂ] Pi),
-      Function.Surjective π ∧ Function.Surjective π' ∧ (∀ W x, π (act W x) = actP W (π x))
-        ∧ (∀ W x, π' (act' W x) = actP W (π' x)) ∧ Nontrivial Pi
-        ∧ ∀ N : Submodule ℂ Pi, (∀ W, ∀ x ∈ N, actP W x ∈ N) → N = ⊥ ∨ N = ⊤ := by
+theorem common_quot {r s : ℕ} (La : Ix r s → ℚ) (T T' : Type) [AddCommGroup T] [Module ℂ T]
+    [AddCommGroup T'] [Module ℂ T'] (act : Mat r s →ₗ[ℂ] Module.End ℂ T) (act' : Mat r s →ₗ[ℂ] Module.End ℂ T')
+    (h : Side La T act) (h' : Side La T' act') :
+    ∃ (Pi : Type) (_ : AddCommGroup Pi) (_ : Module ℂ Pi) (actP : Mat r s → Module.End ℂ Pi)
+      (π : T →ₗ[ℂ] Pi) (π' : T' →ₗ[ℂ] Pi), Function.Surjective π ∧ Function.Surjective π' ∧
+      (∀ W x, π (act W x) = actP W (π x)) ∧ (∀ W x, π' (act' W x) = actP W (π' x)) ∧ Nontrivial Pi ∧
+      ∀ N : Submodule ℂ Pi, (∀ W, ∀ x ∈ N, actP W x ∈ N) → N = ⊥ ∨ N = ⊤ := by
   classical
   obtain ⟨hL, hT, A, iA1, iA2, iA3, ρ, ι, f, hadj, hgl, hw, hι, hgen, hs⟩ := h
   obtain ⟨hL', hT', A', iB1, iB2, iB3, ρ', ι', f', hadj', hgl', hw', hι', hgen', hs'⟩ := h'
@@ -710,26 +702,15 @@ theorem common_quot
   have hcas : ∀ x : T × T', casK (units P) x = (casK (units act) x.1, casK (units act') x.2) := by
     intro x
     simp only [casK, units, LinearMap.sum_apply]
-    refine Prod.ext ?_ ?_ <;> simp only [Prod.fst_sum, Prod.snd_sum]
-      <;> refine Finset.sum_congr rfl fun a _ => Finset.sum_congr rfl fun b _ => ?_ <;> split_ifs
-      <;> rfl
+    refine Prod.ext ?_ ?_ <;> simp only [Prod.fst_sum, Prod.snd_sum] <;>
+      refine Finset.sum_congr rfl fun a _ => Finset.sum_congr rfl fun b _ => ?_ <;> split_ifs <;> rfl
   have hs₂ : StarK P (LinearMap.range ι₂) ((casW La : ℚ) : ℝ) := by
     intro t ht x hx hC
-    have m1
-        : Submodule.map (LinearMap.fst ℂ T T')
-            (Submodule.span ℂ
-              {y : T × T' | ∃ a b, ¬ sameBlock a b ∧ ∃ v ∈ LinearMap.range ι₂, y = P (Eab a b) v})
-          ≤ Submodule.span ℂ
-            {y : T | ∃ a b, ¬ sameBlock a b ∧ ∃ v ∈ LinearMap.range ι, y = act (Eab a b) v} := by
+    have m1 : Submodule.map (LinearMap.fst ℂ T T') (Submodule.span ℂ {y : T × T' | ∃ a b, ¬ sameBlock a b ∧ ∃ v ∈ LinearMap.range ι₂, y = P (Eab a b) v}) ≤ Submodule.span ℂ {y : T | ∃ a b, ¬ sameBlock a b ∧ ∃ v ∈ LinearMap.range ι, y = act (Eab a b) v} := by
       rw [Submodule.map_span, Submodule.span_le]
       rintro _ ⟨y, ⟨a, b, hab, v, ⟨u, rfl⟩, rfl⟩, rfl⟩
       exact Submodule.subset_span ⟨a, b, hab, ι u.ofLp.1, ⟨_, rfl⟩, rfl⟩
-    have m2
-        : Submodule.map (LinearMap.snd ℂ T T')
-            (Submodule.span ℂ
-              {y : T × T' | ∃ a b, ¬ sameBlock a b ∧ ∃ v ∈ LinearMap.range ι₂, y = P (Eab a b) v})
-          ≤ Submodule.span ℂ
-            {y : T' | ∃ a b, ¬ sameBlock a b ∧ ∃ v ∈ LinearMap.range ι', y = act' (Eab a b) v} := by
+    have m2 : Submodule.map (LinearMap.snd ℂ T T') (Submodule.span ℂ {y : T × T' | ∃ a b, ¬ sameBlock a b ∧ ∃ v ∈ LinearMap.range ι₂, y = P (Eab a b) v}) ≤ Submodule.span ℂ {y : T' | ∃ a b, ¬ sameBlock a b ∧ ∃ v ∈ LinearMap.range ι', y = act' (Eab a b) v} := by
       rw [Submodule.map_span, Submodule.span_le]
       rintro _ ⟨y, ⟨a, b, hab, v, ⟨u, rfl⟩, rfl⟩, rfl⟩
       exact Submodule.subset_span ⟨a, b, hab, ι' u.ofLp.2, ⟨_, rfl⟩, rfl⟩
@@ -763,12 +744,8 @@ theorem common_quot
       exact ⟨⟨_, hfG⟩, by simp [φ', hι₂, f₂]⟩
     · rintro W _ ⟨g, rfl⟩
       exact ⟨actM W g, rfl⟩
-  refine quot_of_local actM
-    (fun W => act W)
-    (fun W => act' W)
-    (R.comap G.subtype) ?_ ?_ φ φ' hφ hφ'
-    (fun W x => rfl)
-    (fun W x => rfl)
+  refine quot_of_local actM (fun W => act W) (fun W => act' W) (R.comap G.subtype) ?_ ?_ φ φ' hφ hφ'
+    (fun W x => rfl) (fun W x => rfl)
   · intro htop
     exact hfR (show (⟨_, hfG⟩ : G) ∈ R.comap G.subtype from htop ▸ Submodule.mem_top)
   · intro N hNst hNtop

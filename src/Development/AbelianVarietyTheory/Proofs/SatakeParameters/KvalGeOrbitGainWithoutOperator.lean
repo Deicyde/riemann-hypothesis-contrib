@@ -1,15 +1,55 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.Definitions.GaloisGeometry.StdBases
 public import Development.AbelianVarietyTheory.Definitions.GaloisGeometry.BeData
-public import Formalism.LocalRingCardinality.CoeNeZeroOfNotMem
 public import Formalism.LocalToGlobal.TorsionIntegrality.GaussSumParity.StatementB
-public import Formalism.LocalToGlobal.TorsionIntegrality.GaussSumParity.TransportFirstLevel
-public import Formalism.LocalToGlobal.TorsionIntegrality.GaussSumParity.KurComplete
-public import Formalism.SharpRestriction.Divisibility.JetPolynomialLogs.OneLetterJetKernel
-public import Formalism.ThetaLogCoordinates.UniformThetaSubstitution.FinalS
+public import Formalism.ThetaLogCoordinates.UniformThetaSubstitution.StatementE
+public import Formalism.ThetaLogCoordinates.UniformThetaSubstitution.StatementG
 public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.ExistsIntegralOrbitSeriesStatement
+public import Formalism.LocalToGlobal.TorsionIntegrality.GaussSumParity.KurComplete
+public import Formalism.LocalToGlobal.TorsionIntegrality.GaussSumParity.TransportFirstLevel
+import Formalism.SharpRestriction.Divisibility.JetPolynomialLogs.OneLetterJetKernel
+import Formalism.ThetaLogCoordinates.UniformThetaSubstitution.FrobeniusLiftNorms.LogarithmEquivalence
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Int
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
+import Formalism.SharpRestriction.GlobalSchurBounds.GeneralLinearActions.IsDiscriminantTwelfthRootOfIdealLattice
 
 @[expose] public section
 
@@ -77,8 +117,8 @@ theorem constantCoeff_sumE
     (be : MvPowerSeries (Fin 2) K) (h : MvPowerSeries.constantCoeff be = 0)
     : MvPowerSeries.constantCoeff (sumE (ι := ι) (N0 := N0) (N1 := N1) be) = 0 := by
   unfold sumE
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+
+  rw [map_sum]
   refine Finset.sum_eq_zero fun e _ => ?_
   refine MvPowerSeries.constantCoeff_subst_eq_zero ?_ ?_ h
   · exact MvPowerSeries.hasSubst_of_constantCoeff_zero (fun a => by simp)

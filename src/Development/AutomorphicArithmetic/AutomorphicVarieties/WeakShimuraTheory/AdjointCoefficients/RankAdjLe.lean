@@ -1,38 +1,84 @@
 module
 
 public import Development.AutomorphicArithmetic.AutomorphicVarieties.WeakShimuraTheory.AdjointMemSp4
+import Development.AutomorphicArithmetic.AutomorphicVarieties.SymplecticGSp4.SgnMulSelf
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.LinearAlgebra.Matrix.FiniteDimensional
+public import Mathlib.LinearAlgebra.Matrix.Rank
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.AdicCompletion.Noetherian
+import Mathlib.RingTheory.Coalgebra.IsFrobenius
+import Mathlib.RingTheory.Etale.Weakly
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.HopfAlgebra.Basic
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.TotallySplit
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+public import Mathlib.LinearAlgebra.FreeModule.Finite.Matrix
 
 @[expose] public section
 
-open IsLocalRing UpperTheory.V UpperTheory.V.Alg UpperTheory.V.GradeZeroInterpolatingElement
-  UpperTheory.V.Ws
+open IsLocalRing UpperTheory.V UpperTheory.V.Alg UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws
 
 namespace UpperTheory.V.Ws.X1
 
 private theorem rank_adj_le {k : Type} [Field k] (X : M4 k) : (adj X).rank ≤ X.rank := by
-  have e
-      : adj X
-        = Matrix.diagonal (fun i => (sgn i : k)) * ((Matrix.transpose X).submatrix Fin.rev Fin.rev)
-          * Matrix.diagonal (fun i => (sgn i : k)) := by
+  have e : adj X = Matrix.diagonal (fun i => (sgn i : k)) * ((Matrix.transpose X).submatrix Fin.rev Fin.rev) * Matrix.diagonal (fun i => (sgn i : k)) := by
     ext i j
-    rw [adj_apply, Matrix.mul_diagonal, Matrix.diagonal_mul, Matrix.submatrix_apply,
-      Matrix.transpose_apply, zsmul_eq_mul]
+    rw [adj_apply, Matrix.mul_diagonal, Matrix.diagonal_mul, Matrix.submatrix_apply, Matrix.transpose_apply, zsmul_eq_mul]
     push_cast
     ring
   rw [e]
-  calc
-    _ ≤ (Matrix.diagonal (fun i => (sgn i : k))
-        * ((Matrix.transpose X).submatrix Fin.rev Fin.rev)).rank :=
-      Matrix.rank_mul_le_left _ _
+  calc _ ≤ (Matrix.diagonal (fun i => (sgn i : k)) * ((Matrix.transpose X).submatrix Fin.rev Fin.rev)).rank := Matrix.rank_mul_le_left _ _
     _ ≤ ((Matrix.transpose X).submatrix Fin.rev Fin.rev).rank := Matrix.rank_mul_le_right _ _
     _ = X.rank := by
       rw [← Matrix.rank_transpose X]
       exact Matrix.rank_submatrix (Matrix.transpose X) Fin.revPerm Fin.revPerm
 
-private noncomputable def cmp {k : Type} [Field k] (p : M4 k)
-    : M4 k →ₗ[k] (LinearMap.range p.mulVecLin →ₗ[k] LinearMap.range p.mulVecLin) where
+private noncomputable def cmp {k : Type} [Field k] (p : M4 k) :
+    M4 k →ₗ[k] (LinearMap.range p.mulVecLin →ₗ[k] LinearMap.range p.mulVecLin) where
   toFun X := p.mulVecLin.rangeRestrict ∘ₗ X.mulVecLin ∘ₗ (LinearMap.range p.mulVecLin).subtype
-  map_add' X Y := by rw [Matrix.mulVecLin_add, LinearMap.add_comp, LinearMap.comp_add]
+  map_add' X Y := by
+    rw [Matrix.mulVecLin_add, LinearMap.add_comp, LinearMap.comp_add]
   map_smul' a X := by
     ext v i
     simp [Matrix.smul_mulVec, Matrix.mulVec_smul]
@@ -47,11 +93,8 @@ private theorem cmp_zero {k : Type} [Field k] (p X : M4 k) (h : cmp p X = 0) : p
 
 end UpperTheory.V.Ws.X1
 
-theorem UpperTheory.V.Ws.X1.ccDim
-    : ∀ {k Γ : Type} [Field k] [Group Γ] (r : Γ →* M4 k) (h : ∀ g, ∃ x, IsGSp x (r g)),
-      (2 : k) ≠ 0
-        → ∀ s : Γ,
-          s * s = 1 → IsGSp (-1) (r s) → Module.finrank k (LinearMap.ker (adSp r h s - 1)) ≤ 4 := by
+theorem UpperTheory.V.Ws.X1.ccDim :
+    ∀ {k Γ : Type} [Field k] [Group Γ] (r : Γ →* M4 k) (h : ∀ g, ∃ x, IsGSp x (r g)), (2 : k) ≠ 0 → ∀ s : Γ, s * s = 1 → IsGSp (-1) (r s) → Module.finrank k (LinearMap.ker (adSp r h s - 1)) ≤ 4 := by
   intro k Γ _ _ r h h2 s hss hs
   set g := r s with hgdef
   have adj_mul := (grp k).1
@@ -63,9 +106,7 @@ theorem UpperTheory.V.Ws.X1.ccDim
   have hsi : s⁻¹ = s := (eq_inv_of_mul_eq_one_left hss).symm
   have hadj : adj g = -g := by
     have e : adj g * g = (-1 : k) • 1 := hs
-    calc
-      adj g
-        = adj g * g * g := by rw [Matrix.mul_assoc, hg2, Matrix.mul_one]
+    calc adj g = adj g * g * g := by rw [Matrix.mul_assoc, hg2, Matrix.mul_one]
       _ = -g := by rw [e]; simp
   set c : k := (2 : k)⁻¹ with hc
   have hc2 : c * 2 = 1 := inv_mul_cancel₀ h2
@@ -75,7 +116,8 @@ theorem UpperTheory.V.Ws.X1.ccDim
     rw [hp, hq, ← smul_add]
     have e : (1 + g) + (1 - g) = (2 : k) • (1 : M4 k) := by rw [two_smul]; abel
     rw [e, smul_smul, hc2, one_smul]
-  have hadjp : adj p = q := by rw [hp, hq, adj_smul, adj_add, adj_one, hadj, sub_eq_add_neg]
+  have hadjp : adj p = q := by
+    rw [hp, hq, adj_smul, adj_add, adj_one, hadj, sub_eq_add_neg]
   have hadjq : adj q = p := by rw [← hadjp, adj_adj]
   have hpq0 : p * q = 0 := by
     have e : (1 + g) * (1 - g) = 0 := by
@@ -91,13 +133,12 @@ theorem UpperTheory.V.Ws.X1.ccDim
     have h1' : p.rank ≤ q.rank := by rw [← hadjq]; exact rank_adj_le q
     have hle : LinearMap.range q.mulVecLin ≤ LinearMap.ker p.mulVecLin := by
       rintro _ ⟨w, rfl⟩
-      rw [LinearMap.mem_ker, Matrix.mulVecLin_apply, Matrix.mulVecLin_apply, Matrix.mulVec_mulVec,
-        hpq0, Matrix.zero_mulVec]
+      rw [LinearMap.mem_ker, Matrix.mulVecLin_apply, Matrix.mulVecLin_apply, Matrix.mulVec_mulVec, hpq0, Matrix.zero_mulVec]
     have hmono := Submodule.finrank_mono hle
     have hsum := LinearMap.finrank_range_add_finrank_ker p.mulVecLin
     rw [Module.finrank_fin_fun] at hsum
-    have eq1 : q.rank = Module.finrank k (LinearMap.range q.mulVecLin) := rfl
-    have eq2 : p.rank = Module.finrank k (LinearMap.range p.mulVecLin) := rfl
+    have eq1 : q.rank = Module.finrank k (LinearMap.range q.mulVecLin) := (Matrix.finrank_range_mulVecLin q).symm
+    have eq2 : p.rank = Module.finrank k (LinearMap.range p.mulVecLin) := (Matrix.finrank_range_mulVecLin p).symm
     omega
   let K := LinearMap.ker (adSp r h s - 1)
   let ψ : K →ₗ[k] (LinearMap.range p.mulVecLin →ₗ[k] LinearMap.range p.mulVecLin) :=
@@ -113,14 +154,11 @@ theorem UpperTheory.V.Ws.X1.ccDim
       rw [adSp_val, hsi] at e2
       exact e2
     have hcomm : g * Y = Y * g := by
-      calc
-        g * Y
-          = g * Y * (g * g) := by rw [hg2, Matrix.mul_one]
+      calc g * Y = g * Y * (g * g) := by rw [hg2, Matrix.mul_one]
         _ = (g * Y * g) * g := by simp only [Matrix.mul_assoc]
         _ = Y * g := by rw [hfix]
     have hpY : p * Y = Y * p := by
-      rw [hp, smul_mul_assoc, mul_smul_comm, add_mul, mul_add, Matrix.one_mul, Matrix.mul_one,
-        hcomm]
+      rw [hp, smul_mul_assoc, mul_smul_comm, add_mul, mul_add, Matrix.one_mul, Matrix.mul_one, hcomm]
     have hz : p * Y * p = 0 := cmp_zero p Y hY
     have hYp : Y * p = 0 := by
       rw [hpY, Matrix.mul_assoc, hpp] at hz
@@ -137,16 +175,13 @@ theorem UpperTheory.V.Ws.X1.ccDim
       rw [Matrix.sub_mul, Matrix.one_mul] at hqY
       exact hqY
     have hY0 : Y = 0 := by
-      calc
-        Y = Y * (p + q) := by rw [hpq, Matrix.mul_one]
+      calc Y = Y * (p + q) := by rw [hpq, Matrix.mul_one]
         _ = 0 := by rw [Matrix.mul_add, hYp, hYq, add_zero]
     apply Subtype.ext
     apply Subtype.ext
     exact hY0
-  calc
-    Module.finrank k K
-        ≤ Module.finrank k (LinearMap.range p.mulVecLin →ₗ[k] LinearMap.range p.mulVecLin) :=
-      LinearMap.finrank_le_finrank_of_injective hinj
-    _ = p.rank * p.rank := by rw [Module.finrank_linearMap]; rfl
+  calc Module.finrank k K ≤ Module.finrank k (LinearMap.range p.mulVecLin →ₗ[k] LinearMap.range p.mulVecLin) :=
+        LinearMap.finrank_le_finrank_of_injective hinj
+    _ = p.rank * p.rank := by rw [Module.finrank_linearMap, Matrix.finrank_range_mulVecLin p]
     _ ≤ 2 * 2 := Nat.mul_le_mul hrk hrk
     _ = 4 := rfl

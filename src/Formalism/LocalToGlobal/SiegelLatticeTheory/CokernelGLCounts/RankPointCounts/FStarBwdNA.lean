@@ -1,10 +1,48 @@
 module
 
-public import Mathlib
+public import Formalism.SharpRestriction.CuspSpanNormBounds.IsPrimitiveSub
+public import Formalism.HermitianLattices.HermitianLatticesProofs.DualLattice
 public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.BetaUniqueness.Lemmas
 public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.ScalarPairOrthogonal.XLeOrthXplus
-public import Formalism.HermitianLattices.HermitianLatticesProofs.DualLattice
-public import Formalism.PeriodIntegrals.OrbitalBoundsConclusion.WittExtensionTheorem
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -36,15 +74,14 @@ theorem intO {a : E} (h : IsIntegral ℤ a) : ∃ o : 𝓞 E, (o : E) = a := ⟨
 
 variable {S}
 
-theorem int_smul_mem {Λ : Submodule (𝓞 E) S.V} {c : E} (hc : IsIntegral ℤ c) {x : S.V} (hx : x ∈ Λ)
-    : c • x ∈ Λ := by
+theorem int_smul_mem {Λ : Submodule (𝓞 E) S.V} {c : E} (hc : IsIntegral ℤ c) {x : S.V} (hx : x ∈ Λ) :
+    c • x ∈ Λ := by
   obtain ⟨o, rfl⟩ := intO hc
   rw [← oSmul]
   exact Λ.smul_mem o hx
 
-theorem sd_int {Λ : Submodule (𝓞 E) S.V} (h : SD S Λ) {x y : S.V} (hx : x ∈ Λ) (hy : y ∈ Λ)
-    : IsIntegral ℤ (S.hT y x) :=
-  (h x).1 hx y hy
+theorem sd_int {Λ : Submodule (𝓞 E) S.V} (h : SD S Λ) {x y : S.V} (hx : x ∈ Λ) (hy : y ∈ Λ) :
+    IsIntegral ℤ (S.hT y x) := (h x).1 hx y hy
 
 variable (S)
 
@@ -56,32 +93,27 @@ theorem riesz (F : S.V →ₗ[E] E) : ∃ w, ∀ v, S.hT w v = F v := by
   have key : S.hT (∑ j, star (F (b j)) • bs j) = F := by
     apply b.ext
     intro i
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, LinearMap.sum_apply]
-    simp only [LinearMap.map_smulₛₗ, LinearMap.smul_apply, starRingEnd_apply, star_star,
-      smul_eq_mul]
+
+    rw [map_sum, LinearMap.sum_apply]
+    simp only [LinearMap.map_smulₛₗ, LinearMap.smul_apply, starRingEnd_apply, star_star, smul_eq_mul]
     rw [Finset.sum_eq_single i]
     · rw [hsw S (b i) (bs i), hbs i i]; simp
     · intro j _ hj
-      rw [hsw S (b i) (bs j), hbs i j, if_neg (Ne.symm hj)]
-      simp
+      rw [hsw S (b i) (bs j), hbs i j, if_neg (Ne.symm hj)]; simp
     · simp
   rw [key]
 
-theorem mem_of_orth_orth (X : Submodule E S.V) {w : S.V} (hw : ∀ u ∈ orth S X, S.hT w u = 0)
-    : w ∈ X := by
-  have hle : X ≤ orth S (orth S X) := fun x hx =>
-    (PI.UnitaryGroupMassFormula.BetaLUniq.mem_orth S).2 fun u hu => by
-      rw [hsw S x u, (PI.UnitaryGroupMassFormula.BetaLUniq.mem_orth S).1 hu x hx, star_zero]
+theorem mem_of_orth_orth (X : Submodule E S.V) {w : S.V} (hw : ∀ u ∈ orth S X, S.hT w u = 0) : w ∈ X := by
+  have hle : X ≤ orth S (orth S X) := fun x hx => (PI.UnitaryGroupMassFormula.BetaLUniq.mem_orth S).2 fun u hu => by
+    rw [hsw S x u, (PI.UnitaryGroupMassFormula.BetaLUniq.mem_orth S).1 hu x hx, star_zero]
   have h1 := PI.UnitaryGroupMassFormula.BetaLUniq.finrank_orth_add S X
   have h2 := PI.UnitaryGroupMassFormula.BetaLUniq.finrank_orth_add S (orth S X)
   have heq : X = orth S (orth S X) := Submodule.eq_of_le_of_finrank_eq hle (by omega)
   rw [heq]
-  exact (PI.UnitaryGroupMassFormula.BetaLUniq.mem_orth S).2 fun u hu => by
-    rw [hsw S w u, hw u hu, star_zero]
+  exact (PI.UnitaryGroupMassFormula.BetaLUniq.mem_orth S).2 fun u hu => by rw [hsw S w u, hw u hu, star_zero]
 
-theorem proj_quot (P : Submodule (𝓞 E) S.V) (hP : P.FG) (Z : Submodule E S.V)
-    : Module.Projective (𝓞 E) (P ⧸ (Z.restrictScalars (𝓞 E)).comap P.subtype) := by
+theorem proj_quot (P : Submodule (𝓞 E) S.V) (hP : P.FG) (Z : Submodule E S.V) :
+    Module.Projective (𝓞 E) (P ⧸ (Z.restrictScalars (𝓞 E)).comap P.subtype) := by
   set K := (Z.restrictScalars (𝓞 E)).comap P.subtype with hK
   have : Module.Finite (𝓞 E) P := Module.Finite.iff_fg.2 hP
   have htor : Submodule.torsion (𝓞 E) (P ⧸ K) = ⊥ := by
@@ -91,14 +123,12 @@ theorem proj_quot (P : Submodule (𝓞 E) S.V) (hP : P.FG) (Z : Submodule E S.V)
     obtain ⟨x, rfl⟩ := K.mkQ_surjective q
     rw [Submodule.mem_bot, Submodule.mkQ_apply, Submodule.Quotient.mk_eq_zero]
     rw [Submonoid.smul_def, Submodule.mkQ_apply, ← Submodule.Quotient.mk_smul,
-        Submodule.Quotient.mk_eq_zero]
-      at ha
+      Submodule.Quotient.mk_eq_zero] at ha
     have ha0 : ((a : 𝓞 E) : E) ≠ 0 := coe_ne_zero (nonZeroDivisors.coe_ne_zero a)
     have h1 : ((a : 𝓞 E) : E) • (x : S.V) ∈ Z := by
       have := ha
       simp only [hK, Submodule.mem_comap, Submodule.coe_subtype, Submodule.coe_smul,
-          Submodule.restrictScalars_mem]
-        at this
+        Submodule.restrictScalars_mem] at this
       rwa [oSmul] at this
     have h2 := Z.smul_mem ((a : 𝓞 E) : E)⁻¹ h1
     rw [smul_smul, inv_mul_cancel₀ ha0, one_smul] at h2
@@ -107,16 +137,14 @@ theorem proj_quot (P : Submodule (𝓞 E) S.V) (hP : P.FG) (Z : Submodule E S.V)
   have : Module.FinitePresentation (𝓞 E) (P ⧸ K) := Module.finitePresentation_of_finite _ _
   exact Module.Flat.projective_of_finitePresentation
 
-theorem glift
-    (P Q : Submodule (𝓞 E) S.V) (hP : P.FG)
-    (Y Z : Submodule E S.V) (hPZ : ∀ x ∈ P, x ∈ Z → x ∈ Q) (hs : ∀ x ∈ P, ∃ y ∈ Q, y - x ∈ Y)
-    : ∃ δ : P →ₗ[𝓞 E] S.V,
-      (∀ x, δ x ∈ Y) ∧ (∀ x : P, (x : S.V) ∈ Z → δ x = 0) ∧ (∀ x : P, (x : S.V) + δ x ∈ Q) := by
+theorem glift (P Q : Submodule (𝓞 E) S.V) (hP : P.FG) (Y Z : Submodule E S.V)
+    (hPZ : ∀ x ∈ P, x ∈ Z → x ∈ Q) (hs : ∀ x ∈ P, ∃ y ∈ Q, y - x ∈ Y) :
+    ∃ δ : P →ₗ[𝓞 E] S.V, (∀ x, δ x ∈ Y) ∧ (∀ x : P, (x : S.V) ∈ Z → δ x = 0) ∧
+      (∀ x : P, (x : S.V) + δ x ∈ Q) := by
   classical
   set K := (Z.restrictScalars (𝓞 E)).comap P.subtype with hK
   have := proj_quot S P hP Z
-  let dif : (P × Q) →ₗ[𝓞 E] S.V :=
-    Q.subtype ∘ₗ LinearMap.snd _ _ _ - P.subtype ∘ₗ LinearMap.fst _ _ _
+  let dif : (P × Q) →ₗ[𝓞 E] S.V := Q.subtype ∘ₗ LinearMap.snd _ _ _ - P.subtype ∘ₗ LinearMap.fst _ _ _
   let R : Submodule (𝓞 E) (P × Q) := (Y.restrictScalars (𝓞 E)).comap dif
   let g : R →ₗ[𝓞 E] (P ⧸ K) := K.mkQ ∘ₗ LinearMap.fst _ _ _ ∘ₗ R.subtype
   have hg : Function.Surjective g := by
@@ -142,17 +170,16 @@ theorem glift
     have h2 : ((x : S.V) - ((t : P × Q).1 : S.V)) ∈ Q := by
       refine hPZ _ (P.sub_mem x.2 (t : P × Q).1.2) ?_
       simpa [hK] using h1
-    have h3
-        : (x : S.V) + (dif ∘ₗ R.subtype ∘ₗ s ∘ₗ K.mkQ) x
-          = ((t : P × Q).2 : S.V) + ((x : S.V) - ((t : P × Q).1 : S.V)) := by
+    have h3 : (x : S.V) + (dif ∘ₗ R.subtype ∘ₗ s ∘ₗ K.mkQ) x =
+        ((t : P × Q).2 : S.V) + ((x : S.V) - ((t : P × Q).1 : S.V)) := by
       simp only [LinearMap.coe_comp, Function.comp_apply, ← ht, dif, LinearMap.sub_apply,
         Submodule.coe_subtype, LinearMap.snd_apply, LinearMap.fst_apply]
       abel
     rw [h3]
     exact Q.add_mem (t : P × Q).2.2 h2
 
-theorem retract (P : Submodule (𝓞 E) S.V) (hP : P.FG) (Z : Submodule E S.V)
-    : ∃ π : P →ₗ[𝓞 E] S.V, (∀ x, π x ∈ P ∧ π x ∈ Z) ∧ ∀ x : P, (x : S.V) ∈ Z → π x = x := by
+theorem retract (P : Submodule (𝓞 E) S.V) (hP : P.FG) (Z : Submodule E S.V) :
+    ∃ π : P →ₗ[𝓞 E] S.V, (∀ x, π x ∈ P ∧ π x ∈ Z) ∧ ∀ x : P, (x : S.V) ∈ Z → π x = x := by
   classical
   set K := (Z.restrictScalars (𝓞 E)).comap P.subtype with hK
   have := proj_quot S P hP Z

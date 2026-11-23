@@ -1,7 +1,53 @@
 module
 
-public import Mathlib
 public import GroundTheory.HeightsAndTheta.Heights.DiscreteValuationNumbers.StatementsSpanBundleTrdegGe
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+public import Mathlib.LinearAlgebra.Matrix.Rank
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Coalgebra.IsFrobenius
+import Mathlib.RingTheory.HopfAlgebra.Basic
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
+public import Mathlib.RingTheory.AlgebraicIndependent.TranscendenceBasis
 
 @[expose] public section
 
@@ -13,21 +59,19 @@ open MvPolynomial
 
 noncomputable section
 
-theorem SpanBundleTrdegGe.algebraicIndependent_linComb
-    {Ω Φ : Type*} [Field Ω] [Field Φ] [Algebra Ω Φ]
-    {i : ℕ}
-    (s : Fin i → Φ) (hs : AlgebraicIndependent Ω s) (A : Matrix (Fin i) (Fin i) Ω) (hA : IsUnit A)
-    : AlgebraicIndependent Ω (fun r => ∑ j, s j * algebraMap Ω Φ (A r j)) := by
+theorem SpanBundleTrdegGe.algebraicIndependent_linComb {Ω Φ : Type*} [Field Ω] [Field Φ] [Algebra Ω Φ]
+    {i : ℕ} (s : Fin i → Φ) (hs : AlgebraicIndependent Ω s) (A : Matrix (Fin i) (Fin i) Ω)
+    (hA : IsUnit A) : AlgebraicIndependent Ω (fun r => ∑ j, s j * algebraMap Ω Φ (A r j)) := by
   classical
-  let L : Matrix (Fin i) (Fin i) Ω → MvPolynomial (Fin i) Ω →ₐ[Ω] MvPolynomial (Fin i) Ω := fun B =>
-    aeval fun r => ∑ j, C (B r j) * X j
+  let L : Matrix (Fin i) (Fin i) Ω → MvPolynomial (Fin i) Ω →ₐ[Ω] MvPolynomial (Fin i) Ω :=
+    fun B => aeval fun r => ∑ j, C (B r j) * X j
   have hcomp : ∀ B B', (L B').comp (L B) = L (B * B') := by
     intro B B'
     apply MvPolynomial.algHom_ext
     intro r
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [L, AlgHom.comp_apply, aeval_X, map_sum, map_mul, aeval_C, algebraMap_eq,
-        Matrix.mul_apply, Finset.mul_sum, Finset.sum_mul, mul_assoc]
+
+    simp only [L, AlgHom.comp_apply, aeval_X, map_sum, map_mul, aeval_C, algebraMap_eq,
+    Matrix.mul_apply, Finset.mul_sum, Finset.sum_mul, mul_assoc]
     exact Finset.sum_comm
   have hid : L 1 = AlgHom.id Ω _ := by
     apply MvPolynomial.algHom_ext
@@ -38,50 +82,40 @@ theorem SpanBundleTrdegGe.algebraicIndependent_linComb
     intro r
     simp [L, mul_comm]
   have hAinv : A * A⁻¹ = 1 := Matrix.mul_nonsing_inv A ((Matrix.isUnit_iff_isUnit_det A).1 hA)
-  have hinj : Function.Injective (L A) :=
-    Function.LeftInverse.injective (g := L A⁻¹) fun p => by
-      rw [← AlgHom.comp_apply, hcomp, hAinv, hid, AlgHom.id_apply]
+  have hinj : Function.Injective (L A) := Function.LeftInverse.injective (g := L A⁻¹) fun p => by
+    rw [← AlgHom.comp_apply, hcomp, hAinv, hid, AlgHom.id_apply]
   rw [algebraicIndependent_iff_injective_aeval, heq]
   exact (algebraicIndependent_iff_injective_aeval.1 hs).comp hinj
 
-theorem SpanBundleTrdegGe.injective_aeval_mul_X
-    {Ω Φ : Type*} [Field Ω] [Field Φ] [Algebra Ω Φ]
-    {i : ℕ} (σ : Fin i → Φ) (hσ : AlgebraicIndependent Ω σ)
-    : Function.Injective
-      (aeval (fun r => Polynomial.C (σ r) * Polynomial.X)
-        : MvPolynomial (Fin i) Ω →ₐ[Ω] Polynomial Φ) := by
+theorem SpanBundleTrdegGe.injective_aeval_mul_X {Ω Φ : Type*} [Field Ω] [Field Φ] [Algebra Ω Φ] {i : ℕ}
+    (σ : Fin i → Φ) (hσ : AlgebraicIndependent Ω σ) :
+    Function.Injective (aeval (fun r => Polynomial.C (σ r) * Polynomial.X) :
+      MvPolynomial (Fin i) Ω →ₐ[Ω] Polynomial Φ) := by
   let H : MvPolynomial (Fin i) Ω →ₐ[Ω] Polynomial (MvPolynomial (Fin i) Ω) :=
     aeval fun r => Polynomial.C (X r) * Polynomial.X
   have hH : Function.Injective H := by
-    have h1
-        : ((Polynomial.aeval (1 : MvPolynomial (Fin i) Ω)).restrictScalars Ω).comp H
-          = AlgHom.id Ω _ := by
+    have h1 : ((Polynomial.aeval (1 : MvPolynomial (Fin i) Ω)).restrictScalars Ω).comp H =
+        AlgHom.id Ω _ := by
       apply MvPolynomial.algHom_ext
       intro r
       simp [H]
-    exact Function.LeftInverse.injective
-      (g := (Polynomial.aeval (1 : MvPolynomial (Fin i) Ω)).restrictScalars Ω)
+    exact Function.LeftInverse.injective (g := (Polynomial.aeval (1 : MvPolynomial (Fin i) Ω)).restrictScalars Ω)
       fun p => by rw [← AlgHom.comp_apply, h1, AlgHom.id_apply]
-  have heq
-      : (aeval (fun r => Polynomial.C (σ r) * Polynomial.X)
-          : MvPolynomial (Fin i) Ω →ₐ[Ω] Polynomial Φ)
-        = (Polynomial.mapAlgHom (aeval σ)).comp H := by
+  have heq : (aeval (fun r => Polynomial.C (σ r) * Polynomial.X) :
+      MvPolynomial (Fin i) Ω →ₐ[Ω] Polynomial Φ) = (Polynomial.mapAlgHom (aeval σ)).comp H := by
     apply MvPolynomial.algHom_ext
     intro r
     simp [H]
   rw [heq]
   exact (Polynomial.map_injective _ (algebraicIndependent_iff_injective_aeval.1 hσ)).comp hH
 
-theorem SpanBundleTrdegGe.exists_injective_cone
-    {Ω Φ : Type*} [Field Ω] [Field Φ] [Algebra Ω Φ]
-    (K : Type*)
-    {i : ℕ} (σ : Fin i → Φ) (hσ : AlgebraicIndependent Ω σ)
-    : ∃ Ψ : MvPolynomial (Fin i) (MvPolynomial K Ω) →+* MvPolynomial (Option K) Φ,
-      Function.Injective Ψ ∧ (∀ p, Ψ (C p) = rename some (map (algebraMap Ω Φ) p))
-        ∧ ∀ r, Ψ (X r) = C (σ r) * X none := by
+theorem SpanBundleTrdegGe.exists_injective_cone {Ω Φ : Type*} [Field Ω] [Field Φ] [Algebra Ω Φ]
+    (K : Type*) {i : ℕ} (σ : Fin i → Φ) (hσ : AlgebraicIndependent Ω σ) :
+    ∃ Ψ : MvPolynomial (Fin i) (MvPolynomial K Ω) →+* MvPolynomial (Option K) Φ, Function.Injective Ψ ∧
+      (∀ p, Ψ (C p) = rename some (map (algebraMap Ω Φ) p)) ∧ ∀ r, Ψ (X r) = C (σ r) * X none := by
   let θ : MvPolynomial (Fin i) Ω →+* Polynomial Φ :=
-    (aeval (fun r => Polynomial.C (σ r) * Polynomial.X)
-      : MvPolynomial (Fin i) Ω →ₐ[Ω] Polynomial Φ).toRingHom
+    (aeval (fun r => Polynomial.C (σ r) * Polynomial.X) :
+      MvPolynomial (Fin i) Ω →ₐ[Ω] Polynomial Φ).toRingHom
   have hθ : Function.Injective θ := SpanBundleTrdegGe.injective_aeval_mul_X σ hσ
   let e := (optionEquivRight Φ K).symm
   have heC : ∀ a : Φ, e (C (Polynomial.C a)) = C a := fun a =>
@@ -90,26 +124,18 @@ theorem SpanBundleTrdegGe.exists_injective_cone
     (AlgEquiv.symm_apply_eq _).2 (optionEquivRight_X_some Φ K k).symm
   have heN : e (C Polynomial.X) = X none :=
     (AlgEquiv.symm_apply_eq _).2 (optionEquivRight_X_none Φ K).symm
-  refine ⟨
-    e.toRingEquiv.toRingHom.comp ((map θ).comp (commAlgEquiv Ω (Fin i) K).toRingEquiv.toRingHom),
-    e.injective.comp ((map_injective θ hθ).comp (commAlgEquiv Ω (Fin i) K).injective),
-    ?_,
-    ?_
-  ⟩
+  refine ⟨e.toRingEquiv.toRingHom.comp ((map θ).comp (commAlgEquiv Ω (Fin i) K).toRingEquiv.toRingHom),
+    e.injective.comp ((map_injective θ hθ).comp (commAlgEquiv Ω (Fin i) K).injective), ?_, ?_⟩
   · intro p
     induction p using MvPolynomial.induction_on with
     | C a =>
       have h1 : θ (C a) = Polynomial.C (algebraMap Ω Φ a) := by simp [θ]
       simp [h1, heC]
-    | add p q hp hq =>
-      simp only [map_add (f := _), hp, hq]
+    | add p q hp hq => simp only [map_add (f := _), hp, hq]
     | mul_X p k hp =>
       rw [C_mul, map_mul, hp, map_mul, map_mul]
-      have h2
-          : (e.toRingEquiv.toRingHom.comp ((map θ).comp
-                (commAlgEquiv Ω (Fin i) K).toRingEquiv.toRingHom))
-              (C (X k))
-            = X (some k) := by
+      have h2 : (e.toRingEquiv.toRingHom.comp ((map θ).comp (commAlgEquiv Ω (Fin i) K).toRingEquiv.toRingHom))
+          (C (X k)) = X (some k) := by
         simp [heX]
       rw [h2, map_X, rename_X]
   · intro r
@@ -125,8 +151,8 @@ theorem SpanBundleTrdegGe.proof : SpanBundleTrdegGe.Statement := by
   have : IsScalarTower F Ω Φ := IsScalarTower.of_algebraMap_eq fun _ => rfl
   set z := projCoord y (Pi.basisFun Ω (Fin i))
     (fun l => LinearMap.proj l ∘ₗ (Matrix.of G).mulVecLin) s with hz
-  change Algebra.trdeg F (MRing ι F ⧸ pointIdeal F y) + i
-    ≤ Algebra.trdeg F (MRing (bundleIdx ι M) F ⧸ pointIdeal F z)
+  change Algebra.trdeg F (MRing ι F ⧸ pointIdeal F y) + i ≤
+    Algebra.trdeg F (MRing (bundleIdx ι M) F ⧸ pointIdeal F z)
   have hzn : ∀ m, z ⟨none, m⟩ = ∑ j, s j * algebraMap Ω Φ (G m j) := by
     intro m
     simp [hz, projCoord, Matrix.col]
@@ -146,7 +172,8 @@ theorem SpanBundleTrdegGe.proof : SpanBundleTrdegGe.Statement := by
     refine ⟨a ∘ e, Matrix.linearIndependent_rows_iff_isUnit.1 ?_⟩
     exact hli.comp e e.injective
   set σ : Fin i → Φ := fun r => ∑ j, s j * algebraMap Ω Φ (G (l r) j) with hσdef
-  have hσ : AlgebraicIndependent Ω σ := SpanBundleTrdegGe.algebraicIndependent_linComb s hs _ hl
+  have hσ : AlgebraicIndependent Ω σ :=
+    SpanBundleTrdegGe.algebraicIndependent_linComb s hs _ hl
 
   have : (pointIdeal F y).IsPrime := RingHom.ker_isPrime _
   have : (pointIdeal F z).IsPrime := RingHom.ker_isPrime _
@@ -186,8 +213,7 @@ theorem SpanBundleTrdegGe.proof : SpanBundleTrdegGe.Statement := by
       simp only [qz, qy]
       exact hE1 g
     | add p q hp hq =>
-      rw [map_add Θ, map_add qz, (map qy.toRingHom : MvPolynomial (Fin i) Ay →+* _).map_add,
-        map_add Ψ, hp, hq]
+      rw [map_add Θ, map_add qz, (map qy.toRingHom : MvPolynomial (Fin i) Ay →+* _).map_add, map_add Ψ, hp, hq]
     | mul_X p r hp =>
       simp only [map_mul, hp, map_X, hΨX]
       congr 1

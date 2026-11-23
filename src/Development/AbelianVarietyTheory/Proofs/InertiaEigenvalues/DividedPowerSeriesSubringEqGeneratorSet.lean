@@ -1,12 +1,52 @@
 module
 
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.NatCastNeZeroPs
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.IsPotential
 
 @[expose] public section
 
-open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc
-  Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism GlobalTheory.BK
-  GlobalTheory.BKReal GlobalTheory.BKGal GlobalTheory.Per Filter GlobalTheory.CrysPrism
+open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism GlobalTheory.BK GlobalTheory.BKReal GlobalTheory.BKGal GlobalTheory.Per Filter GlobalTheory.CrysPrism
 open scoped Formalism.Per
 
 noncomputable section
@@ -15,12 +55,8 @@ namespace GlobalTheory.CrysPrism
 
 section SdClosed
 
-variable
-  {l : ℕ} [hl : Fact l.Prime]
-  {a : ℕ} [NeZero a]
-  {O K : Type} [CommRing O] [Algebra ℤ_[l] O] [NormedField K] [IsUltrametricDist K] [Algebra O K]
-  [IsUnitBall O K]
-  (t : Wq l a →ₐ[ℤ_[l]] O) (e : ℕ)
+variable {l : ℕ} [hl : Fact l.Prime] {a : ℕ} [NeZero a] {O K : Type} [CommRing O] [Algebra ℤ_[l] O]
+  [NormedField K] [IsUltrametricDist K] [Algebra O K] [IsUnitBall O K] (t : Wq l a →ₐ[ℤ_[l]] O) (e : ℕ)
 
 theorem lTo0_atTop {w : ℕ → Wq l a} : LTo0 l w ↔ ∀ r : ℕ, ∃ N, ∀ n ≥ N, (l : Wq l a) ^ r ∣ w n := by
   simp only [LTo0, Nat.cofinite_eq_atTop, eventually_atTop]
@@ -42,31 +78,26 @@ theorem sdSet_neg {F : ZMod a → K⟦X⟧} (hF : F ∈ SdSet t K e) : -F ∈ Sd
   · simpa using hn
   · simp [hF τ n]
 
-theorem sdSet_add {F G : ZMod a → K⟦X⟧} (hF : F ∈ SdSet t K e) (hG : G ∈ SdSet t K e)
-    : F + G ∈ SdSet t K e := by
+theorem sdSet_add {F G : ZMod a → K⟦X⟧} (hF : F ∈ SdSet t K e) (hG : G ∈ SdSet t K e) :
+    F + G ∈ SdSet t K e := by
   obtain ⟨w, hw, hF⟩ := hF
   obtain ⟨w', hw', hG⟩ := hG
   refine ⟨w + w', fun r => ((hw r).and (hw' r)).mono fun n hn => ?_, fun τ n => ?_⟩
   · exact dvd_add hn.1 hn.2
   · simp [mul_add, hF τ n, hG τ n]
 
-theorem fact_div_dvd (e i j : ℕ)
-    : (i / e).factorial * (j / e).factorial ∣ ((i + j) / e).factorial :=
+theorem fact_div_dvd (e i j : ℕ) : (i / e).factorial * (j / e).factorial ∣ ((i + j) / e).factorial :=
   (Nat.factorial_mul_factorial_dvd_factorial_add _ _).trans
     (Nat.factorial_dvd_factorial (Nat.add_div_le_add_div i j e))
 
-theorem sdSet_mul {F G : ZMod a → K⟦X⟧} (hF : F ∈ SdSet t K e) (hG : G ∈ SdSet t K e)
-    : F * G ∈ SdSet t K e := by
+theorem sdSet_mul {F G : ZMod a → K⟦X⟧} (hF : F ∈ SdSet t K e) (hG : G ∈ SdSet t K e) :
+    F * G ∈ SdSet t K e := by
   obtain ⟨w, hw, hF⟩ := hF
   obtain ⟨w', hw', hG⟩ := hG
   let q : ℕ → ℕ → ℕ := fun i j => ((i + j) / e).factorial / ((i / e).factorial * (j / e).factorial)
-  have hq : ∀ i j, ((i + j) / e).factorial = q i j * ((i / e).factorial * (j / e).factorial) :=
-    fun i j => (Nat.div_mul_cancel (fact_div_dvd e i j)).symm
-  refine ⟨
-    fun n => ∑ p ∈ Finset.HasAntidiagonal.antidiagonal n, q p.1 p.2 • (w p.1 * w' p.2),
-    ?_,
-    fun τ n => ?_
-  ⟩
+  have hq : ∀ i j, ((i + j) / e).factorial = q i j * ((i / e).factorial * (j / e).factorial) := fun i j =>
+    (Nat.div_mul_cancel (fact_div_dvd e i j)).symm
+  refine ⟨fun n => ∑ p ∈ Finset.HasAntidiagonal.antidiagonal n, q p.1 p.2 • (w p.1 * w' p.2), ?_, fun τ n => ?_⟩
   · rw [lTo0_atTop] at hw hw' ⊢
     intro r
     obtain ⟨N, hN⟩ := hw r
@@ -78,36 +109,28 @@ theorem sdSet_mul {F G : ZMod a → K⟦X⟧} (hF : F ∈ SdSet t K e) (hG : G �
     by_cases h1 : N ≤ p.1
     · exact (hN _ h1).mul_right _
     · exact (hN' _ (by omega)).mul_left _
-  set_option synthInstance.maxHeartbeats 100000 in
+
   · rw [Pi.mul_apply, coeff_mul, Finset.mul_sum, map_sum, map_sum]
     refine Finset.sum_congr rfl fun p hp => ?_
     rw [Finset.HasAntidiagonal.mem_antidiagonal] at hp
-    rw [map_nsmul, map_nsmul, nsmul_eq_mul, map_mul, map_mul, ← hF τ p.1, ← hG τ p.2, ← hp,
-      hq p.1 p.2]
+    rw [map_nsmul, map_nsmul, nsmul_eq_mul, map_mul, map_mul, ← hF τ p.1, ← hG τ p.2, ← hp, hq p.1 p.2]
     push_cast
     ring
 
 theorem sd_sub_sdSet : ∀ F ∈ Sd t K e, F ∈ SdSet t K e := by
-  let S : Subring (ZMod a → K⟦X⟧) := {
-    carrier := SdSet t K e
-    zero_mem' := sdSet_zero t e
-    one_mem' := sdSet_one t e
-    add_mem' := fun hF hG => sdSet_add t e hF hG
-    mul_mem' := fun hF hG => sdSet_mul t e hF hG
-    neg_mem' := fun hF => sdSet_neg t e hF
-  }
+  let S : Subring (ZMod a → K⟦X⟧) :=
+    { carrier := SdSet t K e
+      zero_mem' := sdSet_zero t e
+      one_mem' := sdSet_one t e
+      add_mem' := fun hF hG => sdSet_add t e hF hG
+      mul_mem' := fun hF hG => sdSet_mul t e hF hG
+      neg_mem' := fun hF => sdSet_neg t e hF }
   intro F hF
   exact (Subring.closure_le.2 (fun x hx => hx) : Sd t K e ≤ S) hF
 
 end SdClosed
 
-theorem sdSet_closed
-    : ∀ (l : ℕ) [Fact l.Prime] (a e : ℕ) [NeZero a] [NeZero e] (O K : Type) [CommRing O]
-        [Algebra ℤ_[l] O] [Module.Free ℤ_[l] O] [Module.Finite ℤ_[l] O] [NormedField K]
-        [IsUltrametricDist K] [Algebra O K] [IsUnitBall O K] [NormedAlgebra ℚ_[l] K]
-        (t : Wq l a →ₐ[ℤ_[l]] O),
-      ∀ F ∈ Sd t K e,
-        F ∈ SdSet t K e := by
+theorem sdSet_closed : ∀ (l : ℕ) [Fact l.Prime] (a e : ℕ) [NeZero a] [NeZero e] (O K : Type) [CommRing O] [Algebra ℤ_[l] O] [Module.Free ℤ_[l] O] [Module.Finite ℤ_[l] O] [NormedField K] [IsUltrametricDist K] [Algebra O K] [IsUnitBall O K] [NormedAlgebra ℚ_[l] K] (t : Wq l a →ₐ[ℤ_[l]] O), ∀ F ∈ Sd t K e, F ∈ SdSet t K e := by
   intro l _ a e _ _ O K _ _ _ _ _ _ _ _ _ t
   exact sd_sub_sdSet t e
 

@@ -1,19 +1,51 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.FRatioSelf
-public import Development.AbelianVarietyTheory.Definitions.Divisors.IsAffCoverSpec
 public import Development.AbelianVarietyTheory.Definitions.Divisors.ComparisonMemCechHodgeFiltration
-public import Development.AbelianVarietyTheory.Proofs.AbelianSchemeLawProofs.RingKrullDimLeOfQuasiFinite
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.AbProj
-public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.ExistsCotangentBasis
-public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.AlgebraMapBasicOpen
+public import Development.AbelianVarietyTheory.Definitions.Divisors.DetJacMatCoordsEqTransitionJacobianDet
 public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.FRatioLinear
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Development.AbelianVarietyTheory.Definitions.Divisors.CupPair
 
 @[expose] public section
 
-open CategoryTheory AlgebraicGeometry ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory
-  GlobalTheory.CechDR GlobalTheory.PD
+open CategoryTheory AlgebraicGeometry ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory GlobalTheory.CechDR GlobalTheory.PD
 
 set_option autoImplicit false
 
@@ -33,13 +65,12 @@ theorem lin_mem (c : Fin (N + 1) → ℂ) : lin c ∈ ProjSpace.grading ℂ N 1 
   unfold lin
   exact Submodule.sum_mem _ fun l _ => Submodule.smul_mem _ _ (ProjSpace.X_mem ℂ N l)
 
-theorem exists_X_notMem (z : PSpace ℂ N)
-    : ∃ l, (MvPolynomial.X l : MvPolynomial (Fin (N + 1)) ℂ) ∉ z.asHomogeneousIdeal.toIdeal := by
+theorem exists_X_notMem (z : PSpace ℂ N) :
+    ∃ l, (MvPolynomial.X l : MvPolynomial (Fin (N + 1)) ℂ) ∉ z.asHomogeneousIdeal.toIdeal := by
   by_contra h
   push_neg at h
-  have hle
-      : Ideal.span (Set.range (MvPolynomial.X : Fin (N + 1) → MvPolynomial (Fin (N + 1)) ℂ))
-        ≤ z.asHomogeneousIdeal.toIdeal := by
+  have hle : Ideal.span (Set.range (MvPolynomial.X : Fin (N + 1) → MvPolynomial (Fin (N + 1)) ℂ)) ≤
+      z.asHomogeneousIdeal.toIdeal := by
     rw [Ideal.span_le]
     rintro _ ⟨l, rfl⟩
     exact h l
@@ -47,8 +78,8 @@ theorem exists_X_notMem (z : PSpace ℂ N)
   intro x hx
   exact hle (ProjSpace.irrelevant_le_span_X ℂ N hx)
 
-theorem exists_finite_gen {Y : Scheme.{0}} [NoetherianSpace Y] (Z : Set Y) (hZ : IsClosed Z)
-    : ∃ T : Set Y, T.Finite ∧ T ⊆ Z ∧ ∀ x ∈ Z, ∃ t ∈ T, t ⤳ x := by
+theorem exists_finite_gen {Y : Scheme.{0}} [NoetherianSpace Y] (Z : Set Y) (hZ : IsClosed Z) :
+    ∃ T : Set Y, T.Finite ∧ T ⊆ Z ∧ ∀ x ∈ Z, ∃ t ∈ T, t ⤳ x := by
   obtain ⟨S, hSf, hSc, hSi, rfl⟩ := NoetherianSpace.exists_finite_set_isClosed_irreducible hZ
   haveI : Finite S := hSf.to_subtype
   refine ⟨Set.range fun s : S => (hSi s.1 s.2).genericPoint, Set.finite_range _, ?_, ?_⟩
@@ -57,25 +88,22 @@ theorem exists_finite_gen {Y : Scheme.{0}} [NoetherianSpace Y] (Z : Set Y) (hZ :
   · rintro x ⟨s, hs, hx⟩
     exact ⟨_, ⟨⟨s, hs⟩, rfl⟩, ((hSi s hs).isGenericPoint_genericPoint (hSc s hs)).specializes hx⟩
 
-theorem coheight_step
-    {Y : Scheme.{0}} {t x : Y} (h : t ⤳ x) (W : Set Y) (hW : IsOpen W) (ht : t ∈ W) (hx : x ∉ W)
-    : Order.coheight t + 1 ≤ Order.coheight x := by
+theorem coheight_step {Y : Scheme.{0}} {t x : Y} (h : t ⤳ x) (W : Set Y) (hW : IsOpen W) (ht : t ∈ W)
+    (hx : x ∉ W) : Order.coheight t + 1 ≤ Order.coheight x := by
   apply Order.coheight_add_one_le
   exact lt_iff_le_not_ge.2 ⟨h, fun h' => hx (Specializes.mem_open h' hW ht)⟩
 
 section Cot
 
-variable
-  {X : Scheme.{0}} {p : X ⟶ Sp ℂ} (ι : X ⟶ PSpace ℂ N)
-  (g₀ : MvPolynomial (Fin (N + 1)) ℂ) (hg₀ : g₀ ∈ ProjSpace.grading ℂ N 1)
-  {y : CxPts p (RingHom.id ℂ)} (hy : y ∈ CxPts.ptsIn p (RingHom.id ℂ) (fOpen ι g₀))
+variable {X : Scheme.{0}} {p : X ⟶ Sp ℂ} (ι : X ⟶ PSpace ℂ N) (g₀ : MvPolynomial (Fin (N + 1)) ℂ)
+  (hg₀ : g₀ ∈ ProjSpace.grading ℂ N 1) {y : CxPts p (RingHom.id ℂ)}
+  (hy : y ∈ CxPts.ptsIn p (RingHom.id ℂ) (fOpen ι g₀))
 
 def ev₀ : Sec p (fOpen ι g₀) →+* ℂ := CxPts.evHom hy
 
 def sqQ : Submodule ℂ (Sec p (fOpen ι g₀)) := ((RingHom.ker (ev₀ ι g₀ hy)) ^ 2).restrictScalars ℂ
 
-def rr (l : Fin (N + 1)) : Sec p (fOpen ι g₀) :=
-  fRatio ι (MvPolynomial.X l) g₀ (ProjSpace.X_mem ℂ N l) hg₀
+def rr (l : Fin (N + 1)) : Sec p (fOpen ι g₀) := fRatio ι (MvPolynomial.X l) g₀ (ProjSpace.X_mem ℂ N l) hg₀
 
 def fr (c : Fin (N + 1) → ℂ) : Sec p (fOpen ι g₀) := fRatio ι (lin c) g₀ (lin_mem c) hg₀
 
@@ -86,41 +114,41 @@ def Lm : (Fin (N + 1) → ℂ) →ₗ[ℂ] Sec p (fOpen ι g₀) ⧸ sqQ ι g₀
   (sqQ ι g₀ hy).mkQ ∘ₗ Fintype.linearCombination ℂ (vv ι g₀ hg₀ hy)
 
 theorem ev₀_algebraMap (z : ℂ) : ev₀ ι g₀ hy (algebraMap ℂ (Sec p (fOpen ι g₀)) z) = z := by
-  first | exact (CxPts.ev_eq hy _).symm.trans (CxPts.ev_algX hy z) | exact CxPts.ev_algX hy z
+  first
+  | exact (CxPts.ev_eq hy _).symm.trans (CxPts.ev_algX hy z)
+  | exact CxPts.ev_algX hy z
 
 theorem ev₀_smul (z : ℂ) (a : Sec p (fOpen ι g₀)) : ev₀ ι g₀ hy (z • a) = z * ev₀ ι g₀ hy a := by
   rw [Algebra.smul_def, map_mul, ev₀_algebraMap]
 
-theorem mkQ_eq_mkQ (a b : Sec p (fOpen ι g₀))
-    : (sqQ ι g₀ hy).mkQ a = (sqQ ι g₀ hy).mkQ b ↔ a - b ∈ RingHom.ker (ev₀ ι g₀ hy) ^ 2 := by
+theorem mkQ_eq_mkQ (a b : Sec p (fOpen ι g₀)) :
+    (sqQ ι g₀ hy).mkQ a = (sqQ ι g₀ hy).mkQ b ↔ a - b ∈ RingHom.ker (ev₀ ι g₀ hy) ^ 2 := by
   rw [Submodule.mkQ_apply, Submodule.mkQ_apply, Submodule.Quotient.eq]
   exact Iff.rfl
 
-theorem Lm_apply' (c : Fin (N + 1) → ℂ)
-    : Lm ι g₀ hg₀ hy c = (sqQ ι g₀ hy).mkQ (∑ l, c l • vv ι g₀ hg₀ hy l) := by
+theorem Lm_apply' (c : Fin (N + 1) → ℂ) :
+    Lm ι g₀ hg₀ hy c = (sqQ ι g₀ hy).mkQ (∑ l, c l • vv ι g₀ hg₀ hy l) := by
   simp only [Lm, LinearMap.coe_comp, Function.comp_apply, Fintype.linearCombination_apply]
 
-theorem Lm_apply (hp : ι ≫ PSpace.str ℂ N = p) (c : Fin (N + 1) → ℂ)
-    : Lm ι g₀ hg₀ hy c
-      = (sqQ ι g₀ hy).mkQ
-        (fr ι g₀ hg₀ c - algebraMap ℂ (Sec p (fOpen ι g₀)) (ev₀ ι g₀ hy (fr ι g₀ hg₀ c))) := by
+theorem Lm_apply (hp : ι ≫ PSpace.str ℂ N = p) (c : Fin (N + 1) → ℂ) :
+    Lm ι g₀ hg₀ hy c = (sqQ ι g₀ hy).mkQ
+      (fr ι g₀ hg₀ c - algebraMap ℂ (Sec p (fOpen ι g₀)) (ev₀ ι g₀ hy (fr ι g₀ hg₀ c))) := by
   rw [Lm_apply']
   have hfr : fr ι g₀ hg₀ c = ∑ l, c l • rr ι g₀ hg₀ l :=
     fRatio_linear X p N ι hp g₀ hg₀ c (lin_mem c)
   rw [hfr]
   congr 1
-  set_option synthInstance.maxHeartbeats 100000 in
+
   simp only [vv, smul_sub, Finset.sum_sub_distrib, map_sum, ev₀_smul, map_mul, Algebra.smul_def,
-    ev₀_algebraMap, mul_sub]
+  ev₀_algebraMap, mul_sub]
 
 end Cot
 
 section Range
 
-variable
-  {X : Scheme.{0}} {p : X ⟶ Sp ℂ} (ι : X ⟶ PSpace ℂ N)
-  (g₀ : MvPolynomial (Fin (N + 1)) ℂ) (hg₀ : g₀ ∈ ProjSpace.grading ℂ N 1)
-  {y : CxPts p (RingHom.id ℂ)} (hy : y ∈ CxPts.ptsIn p (RingHom.id ℂ) (fOpen ι g₀))
+variable {X : Scheme.{0}} {p : X ⟶ Sp ℂ} (ι : X ⟶ PSpace ℂ N) (g₀ : MvPolynomial (Fin (N + 1)) ℂ)
+  (hg₀ : g₀ ∈ ProjSpace.grading ℂ N 1) {y : CxPts p (RingHom.id ℂ)}
+  (hy : y ∈ CxPts.ptsIn p (RingHom.id ℂ) (fOpen ι g₀))
 
 end Range
 

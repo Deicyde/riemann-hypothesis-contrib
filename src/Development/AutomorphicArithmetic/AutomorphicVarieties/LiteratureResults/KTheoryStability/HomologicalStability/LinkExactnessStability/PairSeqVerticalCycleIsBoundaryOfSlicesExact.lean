@@ -1,7 +1,46 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Definitions.GlobalTwisting.LinkExactAff
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Lemma
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -46,11 +85,9 @@ lemma vbd_mapDomain {V W : Type} (l : List V) (c : List W →₀ ℤ) :
 
 end GlobalTheory.SeqCx.ColDecomp
 
+
 open GlobalTheory.SeqCx.ColDecomp in
-theorem GlobalTheory.SeqCx.vertical_exact_of_columns
-    : ∀ (V W : Type) (D : Set (List V × List W)) (a b : ℕ),
-      (∀ l : List V, l.length = a → (∃ w, (l, w) ∈ D) → ExactAt {w | (l, w) ∈ D} b)
-        → ∀ x ∈ chains2 D a b, vbd V W x = 0 → ∃ y ∈ chains2 D a (b + 1), vbd V W y = x := by
+theorem GlobalTheory.SeqCx.vertical_exact_of_columns : ∀ (V W : Type) (D : Set (List V × List W)) (a b : ℕ), (∀ l : List V, l.length = a → (∃ w, (l, w) ∈ D) → ExactAt {w | (l, w) ∈ D} b) → ∀ x ∈ chains2 D a b, vbd V W x = 0 → ∃ y ∈ chains2 D a (b + 1), vbd V W y = x := by
   classical
   intro V W D a b hex x hx hvx
   set T : Finset (List V) := x.support.image Prod.fst with hT
@@ -66,8 +103,8 @@ theorem GlobalTheory.SeqCx.vertical_exact_of_columns
       exact h (Finset.mem_image.2 ⟨(l, w), Finsupp.mem_support_iff.2 hne, rfl⟩)
   have hvdec : vbd V W x = ∑ l ∈ T, Finsupp.mapDomain (fun w => (l, w)) (bd W (g l)) := by
     conv_lhs => rw [hdec]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     exact Finset.sum_congr rfl (fun l _ => vbd_mapDomain l (g l))
   have hcyc : ∀ l ∈ T, bd W (g l) = 0 := by
     intro l hl
@@ -101,15 +138,13 @@ theorem GlobalTheory.SeqCx.vertical_exact_of_columns
     rw [chains, Finsupp.mem_supported] at hyl
     have := hyl (Finset.mem_coe.2 hw)
     exact ⟨this.1, (hpre l hl).1, this.2⟩
-  set_option synthInstance.maxHeartbeats 100000 in
+
   · rw [map_sum, hdec]
     exact Finset.sum_congr rfl (fun l hl => by rw [vbd_mapDomain, hybd l hl])
 
 section
 open GlobalTheory.SeqCx
-theorem _root_.GlobalTheory.T.pairSeqVerticalCycle_is_boundary_of_slices_exact
-    : ∀ (V W : Type) (D : Set (List V × List W)) (a b : ℕ),
-      (∀ l : List V, l.length = a → (∃ w, (l, w) ∈ D) → ExactAt {w | (l, w) ∈ D} b)
-        → ∀ x ∈ chains2 D a b, vbd V W x = 0 → ∃ y ∈ chains2 D a (b + 1), vbd V W y = x := by
-  first | exact @GlobalTheory.SeqCx.vertical_exact_of_columns
+theorem _root_.GlobalTheory.T.pairSeqVerticalCycle_is_boundary_of_slices_exact : ∀ (V W : Type) (D : Set (List V × List W)) (a b : ℕ), (∀ l : List V, l.length = a → (∃ w, (l, w) ∈ D) → ExactAt {w | (l, w) ∈ D} b) → ∀ x ∈ chains2 D a b, vbd V W x = 0 → ∃ y ∈ chains2 D a (b + 1), vbd V W y = x := by
+  first
+  | exact @GlobalTheory.SeqCx.vertical_exact_of_columns
 end

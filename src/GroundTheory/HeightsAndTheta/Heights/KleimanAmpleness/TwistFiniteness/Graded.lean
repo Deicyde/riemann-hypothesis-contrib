@@ -1,7 +1,48 @@
 module
 
-public import Mathlib
 public import GroundTheory.HeightsAndTheta.Heights.KleimanAmpleness.TwistFiniteness.PsiOfIsHomogeneous
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -23,37 +64,32 @@ variable (x : Fin (N + 1) → Ω) (η : Fin (r + 1) → Ω) (S : Type u) [CommRi
 def projT (c : ℤ) : LA Ω →ₗ[Ω] LA Ω :=
   GradedAlgebra.proj (gradeBy Ω (AddMonoidHom.fst ℤ ℤ) : ℤ → Submodule Ω (LA Ω)) c
 
-theorem projT_apply (c : ℤ) (a : LA Ω)
-    : projT c a
-      = (DirectSum.decompose (gradeBy Ω (AddMonoidHom.fst ℤ ℤ) : ℤ → Submodule Ω (LA Ω)) a c
-        : LA Ω) :=
+theorem projT_apply (c : ℤ) (a : LA Ω) :
+    projT c a = (DirectSum.decompose (gradeBy Ω (AddMonoidHom.fst ℤ ℤ) : ℤ → Submodule Ω (LA Ω)) a c :
+      LA Ω) :=
   GradedAlgebra.proj_apply _ _ _
 
 theorem projT_mem (c : ℤ) (a : LA Ω) : projT c a ∈ tgr c := by
   rw [projT_apply]; exact Subtype.property _
 
-theorem projT_of_mem {a : LA Ω} {d : ℤ} (ha : a ∈ tgr d) (c : ℤ)
-    : projT c a = if d = c then a else 0 := by
+theorem projT_of_mem {a : LA Ω} {d : ℤ} (ha : a ∈ tgr d) (c : ℤ) :
+    projT c a = if d = c then a else 0 := by
   rw [projT_apply]
   split_ifs with h
   · subst h; exact DirectSum.decompose_of_mem_same _ ha
   · exact DirectSum.decompose_of_mem_ne _ ha h
 
-theorem projT_mul_of_mem {a : LA Ω} {d : ℤ} (ha : a ∈ tgr d) (b : LA Ω) (c : ℤ)
-    : projT c (a * b) = a * projT (c - d) b := by
-  have :=
-    DirectSum.coe_decompose_mul_add_of_left_mem
-      (gradeBy Ω (AddMonoidHom.fst ℤ ℤ) : ℤ → Submodule Ω (LA Ω)) (j := c - d) ha (b := b)
+theorem projT_mul_of_mem {a : LA Ω} {d : ℤ} (ha : a ∈ tgr d) (b : LA Ω) (c : ℤ) :
+    projT c (a * b) = a * projT (c - d) b := by
+  have := DirectSum.coe_decompose_mul_add_of_left_mem
+    (gradeBy Ω (AddMonoidHom.fst ℤ ℤ) : ℤ → Submodule Ω (LA Ω)) (j := c - d) ha (b := b)
   rw [add_sub_cancel] at this
   rw [projT_apply, projT_apply]
   exact this
 
 theorem exists_sum_projT (a : LA Ω) : ∃ F : Finset ℤ, ∑ c ∈ F, projT c a = a := by
   classical
-  refine ⟨
-    (DirectSum.decompose (gradeBy Ω (AddMonoidHom.fst ℤ ℤ) : ℤ → Submodule Ω (LA Ω)) a).support,
-    ?_
-  ⟩
+  refine ⟨(DirectSum.decompose (gradeBy Ω (AddMonoidHom.fst ℤ ℤ) : ℤ → Submodule Ω (LA Ω)) a).support, ?_⟩
   simp only [projT_apply]
   exact DirectSum.sum_support_decompose _ a
 
@@ -66,8 +102,8 @@ def TMod : Submodule (Poly (Sy S r) N) (Amb x η) := Submodule.span _ (Set.range
 instance TMod.finite : Module.Finite (Poly (Sy S r) N) (TMod x η S n0 d0 g0) :=
   Module.Finite.span_of_finite _ (Set.finite_range _)
 
-theorem projT_mem_TMod {m : Amb x η} (hm : m ∈ TMod x η S n0 d0 g0) (c : ℤ)
-    : (toA x η).symm (projT c (toA x η m)) ∈ TMod x η S n0 d0 g0 := by
+theorem projT_mem_TMod {m : Amb x η} (hm : m ∈ TMod x η S n0 d0 g0) (c : ℤ) :
+    (toA x η).symm (projT c (toA x η m)) ∈ TMod x η S n0 d0 g0 := by
   induction hm using Submodule.span_induction generalizing c with
   | mem m hm =>
     obtain ⟨j, rfl⟩ := hm
@@ -75,19 +111,15 @@ theorem projT_mem_TMod {m : Amb x η} (hm : m ∈ TMod x η S n0 d0 g0) (c : ℤ
     split_ifs
     · exact Submodule.subset_span ⟨j, rfl⟩
     · rw [map_zero]; exact zero_mem _
-  | zero =>
-    rw [map_zero, map_zero, map_zero]; exact zero_mem _
-  | add a b _ _ ha hb =>
-    rw [map_add (f := _), map_add (f := _), map_add (f := _)]; exact add_mem (ha c) (hb c)
+  | zero => rw [map_zero, map_zero, map_zero]; exact zero_mem _
+  | add a b _ _ ha hb => rw [map_add (f := _), map_add (f := _), map_add (f := _)]; exact add_mem (ha c) (hb c)
   | smul p m _ hm =>
-    have hsum
-        : toA x η (p • m)
-          = ∑ d ∈ Finset.range (p.totalDegree + 1),
-            phi x η S (homogeneousComponent d p) * toA x η m := by
-      set_option synthInstance.maxHeartbeats 100000 in
+    have hsum : toA x η (p • m) = ∑ d ∈ Finset.range (p.totalDegree + 1),
+        phi x η S (homogeneousComponent d p) * toA x η m := by
+
       rw [toA_smulP, ← Finset.sum_mul, ← map_sum, sum_homogeneousComponent]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hsum, map_sum, map_sum]
+
+    rw [hsum, map_sum, map_sum]
     refine Submodule.sum_mem _ fun d _ => ?_
     rw [projT_mul_of_mem (phi_mem_tgr x η S (homogeneousComponent_isHomogeneous d p))]
     have h := Submodule.smul_mem _ (homogeneousComponent d p) (hm (c - d))
@@ -103,8 +135,7 @@ def pieceM (c : ℤ) : Submodule (Sy S r) (TMod x η S n0 d0 g0) where
     exact add_mem ha hb
   zero_mem' := by
     change toA x η ((0 : TMod x η S n0 d0 g0) : Amb x η) ∈ tgr c
-    rw [Submodule.coe_zero, map_zero]
-    exact zero_mem _
+    rw [Submodule.coe_zero, map_zero]; exact zero_mem _
   smul_mem' s m hm := by
     change toA x η ((s • m : TMod x η S n0 d0 g0) : Amb x η) ∈ tgr c
     rw [Submodule.coe_smul_of_tower, toA_smulSy]
@@ -113,36 +144,30 @@ def pieceM (c : ℤ) : Submodule (Sy S r) (TMod x η S n0 d0 g0) where
 theorem isInternal_pieceM : DirectSum.IsInternal (pieceM x η S n0 d0 g0) := by
   classical
   let 𝒜 := (gradeBy Ω (AddMonoidHom.fst ℤ ℤ) : ℤ → Submodule Ω (LA Ω))
-  let pc : ∀ c, pieceM x η S n0 d0 g0 c →+ 𝒜 c := fun c => {
-    toFun := fun m => ⟨toA x η ((m : TMod x η S n0 d0 g0) : Amb x η), m.2⟩
-    map_zero' := by ext; simp
-    map_add' := by intro a b; ext; simp
-  }
+  let pc : ∀ c, pieceM x η S n0 d0 g0 c →+ 𝒜 c := fun c =>
+    { toFun := fun m => ⟨toA x η ((m : TMod x η S n0 d0 g0) : Amb x η), m.2⟩
+      map_zero' := by ext; simp
+      map_add' := by intro a b; ext; simp }
   let Φ : (DirectSum ℤ fun c => pieceM x η S n0 d0 g0 c) →+ DirectSum ℤ fun c => 𝒜 c :=
     DFinsupp.mapRange.addMonoidHom pc
-  have hΦ
-      : ∀ v,
-        DirectSum.coeAddMonoidHom 𝒜 (Φ v)
-          = toA x η
-            ((DirectSum.coeAddMonoidHom (pieceM x η S n0 d0 g0) v : TMod x η S n0 d0 g0)
-              : Amb x η) := by
+  have hΦ : ∀ v, DirectSum.coeAddMonoidHom 𝒜 (Φ v) =
+      toA x η ((DirectSum.coeAddMonoidHom (pieceM x η S n0 d0 g0) v : TMod x η S n0 d0 g0) : Amb x η) := by
     intro v
     induction v using DirectSum.induction_on with
     | zero => simp
     | of c m =>
       rw [DirectSum.coeAddMonoidHom_of]
-      have : Φ (DirectSum.of (fun c => ↥(pieceM x η S n0 d0 g0 c)) c m)
-          = DirectSum.of (fun c => ↥(𝒜 c)) c (pc c m) :=
+      have : Φ (DirectSum.of (fun c => ↥(pieceM x η S n0 d0 g0 c)) c m) =
+          DirectSum.of (fun c => ↥(𝒜 c)) c (pc c m) :=
         DFinsupp.mapRange_single (hf := fun c => map_zero (pc c))
       rw [this, DirectSum.coeAddMonoidHom_of]
       rfl
     | add a b ha hb => simp only [map_add (f := _), ha, hb, Submodule.coe_add]
   constructor
   · intro v w hvw
-    have h1 : Φ v = Φ w :=
-      (gradeBy.isInternal (R := Ω) (AddMonoidHom.fst ℤ ℤ)).1 (by
-        change DirectSum.coeAddMonoidHom 𝒜 (Φ v) = DirectSum.coeAddMonoidHom 𝒜 (Φ w)
-        rw [hΦ, hΦ, hvw])
+    have h1 : Φ v = Φ w := (gradeBy.isInternal (R := Ω) (AddMonoidHom.fst ℤ ℤ)).1 (by
+      change DirectSum.coeAddMonoidHom 𝒜 (Φ v) = DirectSum.coeAddMonoidHom 𝒜 (Φ w)
+      rw [hΦ, hΦ, hvw])
     refine DFinsupp.ext fun c => ?_
     have h2 := DFunLike.congr_fun h1 c
     have h3 : pc c (v c) = pc c (w c) := by
@@ -153,20 +178,16 @@ theorem isInternal_pieceM : DirectSum.IsInternal (pieceM x η S n0 d0 g0) := by
     exact Subtype.ext (Subtype.ext ((toA x η).injective h4))
   · intro m
     obtain ⟨F, hF⟩ := exists_sum_projT (toA x η (m : Amb x η))
-    refine ⟨
-      ∑ c ∈ F, DirectSum.of (fun c => pieceM x η S n0 d0 g0 c) c
-        ⟨⟨(toA x η).symm (projT c (toA x η (m : Amb x η))), projT_mem_TMod x η S n0 d0 g0 m.2 c⟩, by
-          change toA x η ((toA x η).symm _) ∈ tgr c
-          rw [AddEquiv.apply_symm_apply]; exact projT_mem c _⟩,
-      ?_
-    ⟩
+    refine ⟨∑ c ∈ F, DirectSum.of (fun c => pieceM x η S n0 d0 g0 c) c
+      ⟨⟨(toA x η).symm (projT c (toA x η (m : Amb x η))), projT_mem_TMod x η S n0 d0 g0 m.2 c⟩, by
+        change toA x η ((toA x η).symm _) ∈ tgr c
+        rw [AddEquiv.apply_symm_apply]; exact projT_mem c _⟩, ?_⟩
     apply Subtype.ext
     apply (toA x η).injective
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [DirectSum.coeAddMonoidHom_of, Submodule.coe_sum, map_sum,
-        AddEquiv.apply_symm_apply]
+
+    rw [map_sum]
+
+    simp only [DirectSum.coeAddMonoidHom_of, Submodule.coe_sum, map_sum, AddEquiv.apply_symm_apply]
     exact hF
 
 def tgraded : GradedPMod (Sy S r) N (TMod x η S n0 d0 g0) where

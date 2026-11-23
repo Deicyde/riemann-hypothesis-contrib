@@ -1,9 +1,59 @@
 module
 
-public import Mathlib
-public import Formalism.LocalToGlobal.Columns.AlgebraMapMemMaximalIdealPowIff
-public import Formalism.SharpRestriction.LevelLetterCocycles.DataN
-public import Formalism.LocalToGlobal.NormalizedHeckeFactors.CoverAlg
+public import Mathlib.NumberTheory.NumberField.Basic
+public import Mathlib.RingTheory.DiscreteValuationRing.Basic
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Presheaf
+import Formalism.LocalToGlobal.NormalizedHeckeFactors.CoverAlg
+import Formalism.SharpRestriction.LevelLetterCocycles.DataNLoc
+public import Mathlib.RingTheory.FractionalIdeal.Basic
+public import Mathlib.RingTheory.FractionalIdeal.Inverse
 
 @[expose] public section
 
@@ -20,21 +70,17 @@ end GlobalTheory.LatticeInterBaseChange
 namespace GlobalTheory.LatticeInterBaseChange
 
 open NumberField IsDedekindDomain Module in
-private theorem exists_functional_comp_eq
-    {K F : Type} [Field K] [Field F]
-    (e : K →+* F)
+private theorem exists_functional_comp_eq {K F : Type} [Field K] [Field F] (e : K →+* F)
     {V V' : Type} [AddCommGroup V] [Module K V] [AddCommGroup V'] [Module F V']
-    (iV : V →ₛₗ[e] V')
-    {ι : Type} (b : Basis ι K V) (hli : LinearIndependent F (fun a => iV (b a)))
-    (φ : V →ₗ[K] K)
-    : ∃ ψ : V' →ₗ[F] F, ∀ v, ψ (iV v) = e (φ v) := by
+    (iV : V →ₛₗ[e] V') {ι : Type} (b : Basis ι K V)
+    (hli : LinearIndependent F (fun a => iV (b a))) (φ : V →ₗ[K] K) :
+    ∃ ψ : V' →ₗ[F] F, ∀ v, ψ (iV v) = e (φ v) := by
   obtain ⟨g, hg⟩ := LinearMap.exists_extend ((Basis.span hli).constr F (fun a => e (φ (b a))))
   let f₁ : V →ₛₗ[e] F := g.comp iV
-  let f₂ : V →ₛₗ[e] F := {
-    toFun := fun v => e (φ v)
-    map_add' := fun v w => by simp
-    map_smul' := fun t v => by simp
-  }
+  let f₂ : V →ₛₗ[e] F :=
+    { toFun := fun v => e (φ v)
+      map_add' := fun v w => by simp
+      map_smul' := fun t v => by simp }
   have hf : f₁ = f₂ := by
     refine b.ext fun a => ?_
     have h := LinearMap.congr_fun hg (Basis.span hli a)
@@ -43,10 +89,10 @@ private theorem exists_functional_comp_eq
   exact ⟨g, fun v => LinearMap.congr_fun hf v⟩
 
 open NumberField IsDedekindDomain Module in
-private theorem exists_integral_inverse_coefficients
-    {K : Type} [Field K] [NumberField K] {n : ℕ} (c : Fin n → K)
-    : ∃ β : Fin n → K,
-      (∀ j k, ∃ r : 𝓞 K, (r : K) = β j * c k) ∧ ∀ k, c k * ∑ j, β j * c j = c k := by
+private theorem exists_integral_inverse_coefficients {K : Type} [Field K] [NumberField K] {n : ℕ}
+    (c : Fin n → K) :
+    ∃ β : Fin n → K, (∀ j k, ∃ r : 𝓞 K, (r : K) = β j * c k) ∧
+      ∀ k, c k * ∑ j, β j * c j = c k := by
   classical
   by_cases hc : ∀ k, c k = 0
   · exact ⟨0, fun j k => ⟨0, by simp⟩, fun k => by simp [hc k]⟩
@@ -60,22 +106,16 @@ private theorem exists_integral_inverse_coefficients
   have hI : I ≠ 0 := by
     intro h
     exact hk₀ ((FractionalIdeal.spanFinset_eq_zero.1 h) k₀ (Finset.mem_univ _))
-  have h1
-      : (1 : K)
-        ∈ (I : Submodule (𝓞 K) K)
-          * ((I⁻¹ : FractionalIdeal (nonZeroDivisors (𝓞 K)) K) : Submodule (𝓞 K) K) := by
+  have h1 : (1 : K) ∈ (I : Submodule (𝓞 K) K) *
+      ((I⁻¹ : FractionalIdeal (nonZeroDivisors (𝓞 K)) K) : Submodule (𝓞 K) K) := by
     rw [← FractionalIdeal.coe_mul, mul_inv_cancel₀ hI]
     exact (FractionalIdeal.mem_one_iff _).2 ⟨1, map_one _⟩
-  have key
-      : ∃ β : Fin n → K,
-        (∀ j, β j ∈ ((I⁻¹ : FractionalIdeal (nonZeroDivisors (𝓞 K)) K) : Submodule (𝓞 K) K))
-          ∧ (1 : K) = ∑ j, β j * c j := by
-    refine Submodule.mul_induction_on
-      (C := fun z =>
-        ∃ β : Fin n → K,
-          (∀ j, β j ∈ ((I⁻¹ : FractionalIdeal (nonZeroDivisors (𝓞 K)) K) : Submodule (𝓞 K) K))
-            ∧ z = ∑ j, β j * c j)
-      h1 ?_ ?_
+  have key : ∃ β : Fin n → K,
+      (∀ j, β j ∈ ((I⁻¹ : FractionalIdeal (nonZeroDivisors (𝓞 K)) K) : Submodule (𝓞 K) K)) ∧
+        (1 : K) = ∑ j, β j * c j := by
+    refine Submodule.mul_induction_on (C := fun z => ∃ β : Fin n → K,
+      (∀ j, β j ∈ ((I⁻¹ : FractionalIdeal (nonZeroDivisors (𝓞 K)) K) : Submodule (𝓞 K) K)) ∧
+        z = ∑ j, β j * c j) h1 ?_ ?_
     · intro m hm y hy
       rw [hIc, Submodule.mem_span_range_iff_exists_fun] at hm
       obtain ⟨r, rfl⟩ := hm
@@ -85,33 +125,26 @@ private theorem exists_integral_inverse_coefficients
       simp only [Algebra.smul_def]
       ring
     · rintro x y ⟨β, hβ, rfl⟩ ⟨β', hβ', rfl⟩
-      exact ⟨
-        β + β',
-        fun j => add_mem (hβ j) (hβ' j),
-        by simp only [Pi.add_apply, add_mul, Finset.sum_add_distrib]
-      ⟩
+      exact ⟨β + β', fun j => add_mem (hβ j) (hβ' j),
+        by simp only [Pi.add_apply, add_mul, Finset.sum_add_distrib]⟩
   obtain ⟨β, hβI, hβ1⟩ := key
   refine ⟨β, fun j k => ?_, fun k => by rw [← hβ1, mul_one]⟩
   have hck : c k ∈ I := by
     rw [← FractionalIdeal.mem_coe, hIc]
     exact Submodule.subset_span ⟨k, rfl⟩
-  obtain ⟨r, hr⟩ :=
-    (FractionalIdeal.mem_one_iff _).1
-      ((FractionalIdeal.mem_inv_iff hI).1 (FractionalIdeal.mem_coe.1 (hβI j)) (c k) hck)
+  obtain ⟨r, hr⟩ := (FractionalIdeal.mem_one_iff _).1
+    ((FractionalIdeal.mem_inv_iff hI).1 (FractionalIdeal.mem_coe.1 (hβI j)) (c k) hck)
   exact ⟨r, hr⟩
 
 open NumberField IsDedekindDomain Module in
-private theorem mem_span_image_inf_ker
-    {K F R : Type} [Field K] [NumberField K] [Field F] [CommRing R] [Algebra R F]
-    (e : K →+* F)
-    {V V' : Type} [AddCommGroup V] [Module K V] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V]
-    [AddCommGroup V'] [Module F V'] [Module R V'] [IsScalarTower R F V']
-    (iV : V →ₛₗ[e] V')
-    (he : ∀ a : 𝓞 K, e (a : K) ∈ (algebraMap R F).range)
-    (φ : V →ₗ[K] K) (ψ : V' →ₗ[F] F) (hψ : ∀ v, ψ (iV v) = e (φ v))
-    (A : Submodule (𝓞 K) V)
-    {x : V'} (hx : x ∈ Submodule.span R (iV '' (A : Set V))) (h0 : ψ x = 0)
-    : x ∈ Submodule.span R
+private theorem mem_span_image_inf_ker {K F R : Type} [Field K] [NumberField K] [Field F]
+    [CommRing R] [Algebra R F] (e : K →+* F) {V V' : Type} [AddCommGroup V] [Module K V]
+    [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V] [AddCommGroup V'] [Module F V'] [Module R V']
+    [IsScalarTower R F V'] (iV : V →ₛₗ[e] V')
+    (he : ∀ a : 𝓞 K, e (a : K) ∈ (algebraMap R F).range) (φ : V →ₗ[K] K) (ψ : V' →ₗ[F] F)
+    (hψ : ∀ v, ψ (iV v) = e (φ v)) (A : Submodule (𝓞 K) V) {x : V'}
+    (hx : x ∈ Submodule.span R (iV '' (A : Set V))) (h0 : ψ x = 0) :
+    x ∈ Submodule.span R
       (iV '' ((A ⊓ (LinearMap.ker φ).restrictScalars (𝓞 K) : Submodule (𝓞 K) V) : Set V)) := by
   obtain ⟨n, r, g, hxg⟩ := Submodule.mem_span_set'.1 hx
   choose a ha hag using fun i => (g i).2
@@ -128,27 +161,25 @@ private theorem mem_span_image_inf_ker
     intro k
     have h := hβ k
     rw [Finset.mul_sum] at h
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [w, map_sub, map_sum, hρs, map_smul, smul_eq_mul]
+
+    simp only [w, map_sub, map_sum, hρs, map_smul, smul_eq_mul]
     rw [sub_eq_zero]
     conv_lhs => rw [← h]
     exact Finset.sum_congr rfl fun j _ => by ring
   have key : ∑ k, algebraMap R F (r k) * e (φ (a k)) = 0 := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← h0, ← hxg, map_sum]
+
+    rw [← h0, ← hxg, map_sum]
     refine Finset.sum_congr rfl fun k _ => ?_
     rw [← hag k, ← algebraMap_smul F (r k) (iV (a k)), LinearMap.map_smul, smul_eq_mul, hψ]
   have hiw : ∀ k, iV (w k) = iV (a k) - ∑ j, (e (β j) * e (φ (a k))) • iV (a j) := by
     intro k
-    set_option synthInstance.maxHeartbeats 100000 in
+
     simp only [w, map_sub, map_sum, hρs, LinearMap.map_smulₛₗ, map_mul]
   have hx' : x = ∑ k, r k • iV (w k) := by
     simp only [hiw, smul_sub, Finset.sum_sub_distrib, Finset.smul_sum]
     have h2 : ∑ k, ∑ j, r k • (e (β j) * e (φ (a k))) • iV (a j) = 0 := by
-      have h3
-          : ∀ k j,
-            r k • (e (β j) * e (φ (a k))) • iV (a j)
-              = (e (β j) * (algebraMap R F (r k) * e (φ (a k)))) • iV (a j) := by
+      have h3 : ∀ k j, r k • (e (β j) * e (φ (a k))) • iV (a j) =
+          (e (β j) * (algebraMap R F (r k) * e (φ (a k)))) • iV (a j) := by
         intro k j
         rw [← algebraMap_smul F (r k), smul_smul]
         congr 1
@@ -160,31 +191,18 @@ private theorem mem_span_image_inf_ker
     rw [h2, sub_zero, ← hxg]
     exact Finset.sum_congr rfl fun k _ => by rw [hag k]
   rw [hx']
-  exact Submodule.sum_mem _ fun k _ =>
-    Submodule.smul_mem _ _
-      (Submodule.subset_span ⟨w k, Submodule.mem_inf.2 ⟨hwA k, LinearMap.mem_ker.2 (hwφ k)⟩, rfl⟩)
+  exact Submodule.sum_mem _ fun k _ => Submodule.smul_mem _ _
+    (Submodule.subset_span ⟨w k, Submodule.mem_inf.2 ⟨hwA k, LinearMap.mem_ker.2 (hwφ k)⟩, rfl⟩)
+
 
 open NumberField IsDedekindDomain Module in
-theorem _root_.GlobalTheory.LatticeInterBaseChange.span_inf_baseChange
-    : ∀ (K : Type) [Field K] [NumberField K] (O : Type) [CommRing O] [IsDomain O]
-        [IsDiscreteValuationRing O] (e : K →+* FractionRing O) (V V' : Type) [AddCommGroup V]
-        [Module K V] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V] [FiniteDimensional K V]
-        [AddCommGroup V'] [Module (FractionRing O) V'] [Module O V']
-        [IsScalarTower O (FractionRing O) V'] (iV : V →ₛₗ[e] V') (ι : Type) (b : Basis ι K V),
-      LinearIndependent (FractionRing O) (fun a => iV (b a))
-        → (∀ a : 𝓞 K, e (a : K) ∈ (algebraMap O (FractionRing O)).range)
-        → ∀ (A : Submodule (𝓞 K) V) (U : Submodule K V),
-          Submodule.span O (iV '' ((A ⊓ U.restrictScalars (𝓞 K) : Submodule (𝓞 K) V) : Set V))
-            = Submodule.span O (iV '' (A : Set V))
-              ⊓ (Submodule.span (FractionRing O) (iV '' (U : Set V))).restrictScalars O := by
+theorem _root_.GlobalTheory.LatticeInterBaseChange.span_inf_baseChange : ∀ (K : Type) [Field K] [NumberField K] (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] (e : K →+* FractionRing O) (V V' : Type) [AddCommGroup V] [Module K V] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V] [FiniteDimensional K V] [AddCommGroup V'] [Module (FractionRing O) V'] [Module O V'] [IsScalarTower O (FractionRing O) V'] (iV : V →ₛₗ[e] V') (ι : Type) (b : Basis ι K V), LinearIndependent (FractionRing O) (fun a => iV (b a)) → (∀ a : 𝓞 K, e (a : K) ∈ (algebraMap O (FractionRing O)).range) → ∀ (A : Submodule (𝓞 K) V) (U : Submodule K V), Submodule.span O (iV '' ((A ⊓ U.restrictScalars (𝓞 K) : Submodule (𝓞 K) V) : Set V)) = Submodule.span O (iV '' (A : Set V)) ⊓ (Submodule.span (FractionRing O) (iV '' (U : Set V))).restrictScalars O := by
   intro K _ _ O _ _ _ e V V' _ _ _ _ _ _ _ _ _ iV ι b hli he A U
   apply le_antisymm
   · rw [Submodule.span_le]
     rintro _ ⟨v, hv, rfl⟩
-    exact Submodule.mem_inf.2 ⟨
-      Submodule.subset_span ⟨v, (Submodule.mem_inf.1 hv).1, rfl⟩,
-      Submodule.subset_span ⟨v, (Submodule.mem_inf.1 hv).2, rfl⟩
-    ⟩
+    exact Submodule.mem_inf.2 ⟨Submodule.subset_span ⟨v, (Submodule.mem_inf.1 hv).1, rfl⟩,
+      Submodule.subset_span ⟨v, (Submodule.mem_inf.1 hv).2, rfl⟩⟩
   · intro x hx
     obtain ⟨hxA, hxU⟩ := Submodule.mem_inf.1 hx
     classical
@@ -207,13 +225,10 @@ theorem _root_.GlobalTheory.LatticeInterBaseChange.span_inf_baseChange
         rintro _ ⟨v, hv, rfl⟩
         rw [SetLike.mem_coe, LinearMap.mem_ker, hψ, (hU v).1 hv j, map_zero]
       exact hle hxU
-    have claim
-        : ∀ s : Finset (Fin (Module.finrank K (V ⧸ U))), ∀ (A' : Submodule (𝓞 K) V) (y : V'),
-          y ∈ Submodule.span O (iV '' (A' : Set V)) → (∀ j ∈ s, ψ j y = 0)
-            → y ∈ Submodule.span O
-              (iV
-                '' ((A' ⊓ ⨅ j ∈ s, (LinearMap.ker (f j)).restrictScalars (𝓞 K) : Submodule (𝓞 K) V)
-                  : Set V)) := by
+    have claim : ∀ s : Finset (Fin (Module.finrank K (V ⧸ U))), ∀ (A' : Submodule (𝓞 K) V) (y : V'),
+        y ∈ Submodule.span O (iV '' (A' : Set V)) → (∀ j ∈ s, ψ j y = 0) →
+        y ∈ Submodule.span O (iV '' ((A' ⊓ ⨅ j ∈ s, (LinearMap.ker (f j)).restrictScalars (𝓞 K) :
+          Submodule (𝓞 K) V) : Set V)) := by
       intro s
       induction s using Finset.induction_on with
       | empty =>
@@ -221,15 +236,13 @@ theorem _root_.GlobalTheory.LatticeInterBaseChange.span_inf_baseChange
         simpa using hy
       | insert j s hj ih =>
         intro A' y hy h0
-        have h1 :=
-          mem_span_image_inf_ker e iV he (f j) (ψ j) (hψ j) A' hy
-            (h0 j (Finset.mem_insert_self j s))
+        have h1 := mem_span_image_inf_ker e iV he (f j) (ψ j) (hψ j) A' hy
+          (h0 j (Finset.mem_insert_self j s))
         have h2 := ih _ y h1 fun i hi => h0 i (Finset.mem_insert_of_mem hi)
         refine Submodule.span_mono (Set.image_mono ?_) h2
         intro v hv
         simp only [SetLike.mem_coe, Submodule.mem_inf, Submodule.mem_iInf,
-            Submodule.restrictScalars_mem, LinearMap.mem_ker, Finset.mem_insert]
-          at hv ⊢
+          Submodule.restrictScalars_mem, LinearMap.mem_ker, Finset.mem_insert] at hv ⊢
         refine ⟨hv.1.1, fun i hi => ?_⟩
         rcases hi with rfl | hi
         · exact hv.1.2
@@ -238,8 +251,7 @@ theorem _root_.GlobalTheory.LatticeInterBaseChange.span_inf_baseChange
     refine Submodule.span_mono (Set.image_mono ?_) hfin
     intro v hv
     simp only [SetLike.mem_coe, Submodule.mem_inf, Submodule.mem_iInf,
-        Submodule.restrictScalars_mem, LinearMap.mem_ker, Finset.mem_univ, forall_const]
-      at hv ⊢
+      Submodule.restrictScalars_mem, LinearMap.mem_ker, Finset.mem_univ, forall_const] at hv ⊢
     exact ⟨hv.1, (hU v).2 hv.2⟩
 
 end GlobalTheory.LatticeInterBaseChange

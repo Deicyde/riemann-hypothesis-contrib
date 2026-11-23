@@ -1,10 +1,49 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.PublishedTheorems.PublishedFoundations.FiniteIntertwining
-public import Formalism.BranchSandwichDivisors.DivFromPassageAndNorm
-public import Formalism.LocalToGlobal.Columns.PolyFn
+public import Formalism.GradedWeylDivisibility.FockSpaceTableaux.LHwinLemmas
+public import Mathlib.RepresentationTheory.Irreducible
 public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.RowActCoefPolyAndUnitaryDense
+public import Formalism.BranchSandwichDivisors.BranchIsometryProofs.BranchScale
+import Formalism.GradedWeylDivisibility.FinalB
+import Formalism.GradedWeylDivisibility.FockSpaceTableaux.FockQRowDivAdj
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Int
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -14,24 +53,19 @@ open scoped DirectSum
 
 namespace GlobalTheory.Branching
 
-theorem rowAct_mem_of_unitary_stable
-    {n k : ℕ} (M : Submodule ℂ (MvPolynomial (Fin n × Fin k) ℂ))
+theorem rowAct_mem_of_unitary_stable {n k : ℕ} (M : Submodule ℂ (MvPolynomial (Fin n × Fin k) ℂ))
     (hM : ∀ u ∈ Matrix.unitaryGroup (Fin n) ℂ, ∀ f ∈ M, rowAct ℂ u f ∈ M)
-    (g : Matrix (Fin n) (Fin n) ℂ) (f : MvPolynomial (Fin n × Fin k) ℂ) (hf : f ∈ M)
-    : rowAct ℂ g f ∈ M := by
+    (g : Matrix (Fin n) (Fin n) ℂ) (f : MvPolynomial (Fin n × Fin k) ℂ) (hf : f ∈ M) : rowAct ℂ g f ∈ M := by
   rw [← Subspace.forall_mem_dualAnnihilator_apply_eq_zero_iff]
   intro l hl
   obtain ⟨P, hP⟩ := exists_poly_rowAct_coef n k f l
-  have h0 : P = 0 :=
-    eq_zero_of_vanish_unitaryGroup n P fun u hu => by
-      rw [← hP]
-      exact (Submodule.mem_dualAnnihilator l).1 hl _ (hM u hu f hf)
+  have h0 : P = 0 := eq_zero_of_vanish_unitaryGroup n P fun u hu => by
+    rw [← hP]
+    exact (Submodule.mem_dualAnnihilator l).1 hl _ (hM u hu f hf)
   rw [hP, h0, map_zero]
 
-theorem rowDivClosed_of_rowAct_stable
-    {n k : ℕ} (M : Submodule ℂ (MvPolynomial (Fin n × Fin k) ℂ))
-    (hM : ∀ (g : Matrix (Fin n) (Fin n) ℂ), ∀ f ∈ M, rowAct ℂ g f ∈ M)
-    : RowDivClosed M := by
+theorem rowDivClosed_of_rowAct_stable {n k : ℕ} (M : Submodule ℂ (MvPolynomial (Fin n × Fin k) ℂ))
+    (hM : ∀ (g : Matrix (Fin n) (Fin n) ℂ), ∀ f ∈ M, rowAct ℂ g f ∈ M) : RowDivClosed M := by
   intro a b j p hp
   rw [← Subspace.forall_mem_dualAnnihilator_apply_eq_zero_iff]
   intro l hl
@@ -44,32 +78,25 @@ theorem rowDivClosed_of_rowAct_stable
     intro c
     simp only [hP, Polynomial.eval_finsetSum, Polynomial.eval_monomial, Polynomial.eval_zero]
     have e := (Submodule.mem_dualAnnihilator l).1 hl _ (hM (lfockq_mat a b c) p hp)
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← lfockq_eval_rowGen, lfockq_eval_C _ N h1, map_sum] at e
+
+    rw [← lfockq_eval_rowGen, lfockq_eval_C _ N h1, map_sum] at e
     rw [← e]
     refine Finset.sum_congr rfl fun i _ => ?_
     rw [← smul_eq_C_mul, map_smul, smul_eq_mul, mul_comm]
     rfl
   have := congrArg (fun p => _root_.AddMonoidAlgebra.coeff (M := ℕ) p j) hP0
-  simp only [hP, Polynomial.finsetSum_coeff, Polynomial.coeff_monomial, Finsupp.single_apply,
-      Finset.sum_ite_eq', if_pos hk, Polynomial.coeff_zero]
-    at this
+  simp only [hP, Polynomial.finsetSum_coeff, Polynomial.coeff_monomial, Finsupp.single_apply, Finset.sum_ite_eq',
+    if_pos hk, Polynomial.coeff_zero] at this
   exact this
 
-theorem height_rowDiv_le
-    {n k : ℕ}
-    (H : ℤ)
-    (a b : Fin n) (j : ℕ)
-    (f : MvPolynomial (Fin n × Fin k) ℂ) (hf : ∀ d ∈ f.support, Finsupp.weight (lhwinHt n k) d ≤ H)
-    : ∀ d ∈ (rowDiv ℂ a b j f).support,
-      Finsupp.weight (lhwinHt n k) d ≤ H + j * ((a.val : ℤ) - b.val) := by
+theorem height_rowDiv_le {n k : ℕ} (H : ℤ) (a b : Fin n) (j : ℕ) (f : MvPolynomial (Fin n × Fin k) ℂ)
+    (hf : ∀ d ∈ f.support, Finsupp.weight (lhwinHt n k) d ≤ H) :
+    ∀ d ∈ (rowDiv ℂ a b j f).support, Finsupp.weight (lhwinHt n k) d ≤ H + j * ((a.val : ℤ) - b.val) := by
   intro e he
-  have hs
-      : rowDiv ℂ a b j f
-        = ∑ d ∈ f.support, (rowGen ℂ a b (monomial d (AddMonoidAlgebra.coeff f d))).coeff j := by
+  have hs : rowDiv ℂ a b j f = ∑ d ∈ f.support, (rowGen ℂ a b (monomial d (AddMonoidAlgebra.coeff f d))).coeff j := by
     unfold rowDiv
     conv_lhs => rw [f.as_sum]
-    set_option synthInstance.maxHeartbeats 100000 in
+
     rw [map_sum, Polynomial.finsetSum_coeff]
   rw [mem_support_iff, hs, coeff_sum] at he
   obtain ⟨d, hd, hne⟩ := Finset.exists_ne_zero_of_sum_ne_zero he
@@ -77,15 +104,13 @@ theorem height_rowDiv_le
   have h2 := hf d hd
   omega
 
-theorem exists_killed_of_rowDivClosed
-    {n k : ℕ} (M : Submodule ℂ (MvPolynomial (Fin n × Fin k) ℂ)) (hM : RowDivClosed M) (hne : M ≠ ⊥)
-    : ∃ v ∈ M, v ≠ 0 ∧ ∀ a b : Fin n, a < b → ∀ j : ℕ, 1 ≤ j → rowDiv ℂ a b j v = 0 := by
+theorem exists_killed_of_rowDivClosed {n k : ℕ} (M : Submodule ℂ (MvPolynomial (Fin n × Fin k) ℂ))
+    (hM : RowDivClosed M) (hne : M ≠ ⊥) :
+    ∃ v ∈ M, v ≠ 0 ∧ ∀ a b : Fin n, a < b → ∀ j : ℕ, 1 ≤ j → rowDiv ℂ a b j v = 0 := by
   classical
-  have hex
-      : ∃ N : ℕ, ∃ v ∈ M, v ≠ 0 ∧ ∀ d ∈ v.support, Finsupp.weight (lhwinHt n k) d ≤ (N : ℤ) := by
+  have hex : ∃ N : ℕ, ∃ v ∈ M, v ≠ 0 ∧ ∀ d ∈ v.support, Finsupp.weight (lhwinHt n k) d ≤ (N : ℤ) := by
     obtain ⟨f, hfM, hf0⟩ := Submodule.exists_mem_ne_zero_of_ne_bot hne
-    refine
-      ⟨f.support.sup fun d => (Finsupp.weight (lhwinHt n k) d).toNat, f, hfM, hf0, fun d hd => ?_⟩
+    refine ⟨f.support.sup fun d => (Finsupp.weight (lhwinHt n k) d).toNat, f, hfM, hf0, fun d hd => ?_⟩
     have := Finset.le_sup (f := fun d => (Finsupp.weight (lhwinHt n k) d).toNat) hd
     have h2 : ((Finsupp.weight (lhwinHt n k) d).toNat : ℤ) ≤ _ := Int.ofNat_le.2 this
     exact (Int.self_le_toNat _).trans h2
@@ -99,24 +124,23 @@ theorem exists_killed_of_rowDivClosed
   have hk' : (1 : ℤ) ≤ j := by exact_mod_cast hj
   have hlt : ((Nat.find hex : ℕ) : ℤ) + j * ((a.val : ℤ) - b.val) < (Nat.find hex : ℕ) := by
     nlinarith
-  have hmin :=
-    Nat.find_min hex (m := (((Nat.find hex : ℕ) : ℤ) + j * ((a.val : ℤ) - b.val)).toNat) (by omega)
+  have hmin := Nat.find_min hex (m := (((Nat.find hex : ℕ) : ℤ) + j * ((a.val : ℤ) - b.val)).toNat)
+    (by omega)
   apply hmin
   refine ⟨_, hM a b j v hvM, hne', ?_⟩
   rw [Int.toNat_of_nonneg hnn]
   exact hH
 
-theorem dualWeyl_le_of_rowDivClosed
-    {r n : ℕ} (hn : n ≤ r) (ν : Fin n → ℕ) (hν : Antitone ν)
-    (M : Submodule ℂ (MvPolynomial (Fin r × Fin n) ℂ)) (hle : M ≤ dualWeyl ℂ r n ν)
-    (hM : RowDivClosed M) (hne : M ≠ ⊥)
-    : dualWeyl ℂ r n ν ≤ M := by
+theorem dualWeyl_le_of_rowDivClosed {r n : ℕ} (hn : n ≤ r) (ν : Fin n → ℕ) (hν : Antitone ν)
+    (M : Submodule ℂ (MvPolynomial (Fin r × Fin n) ℂ)) (hle : M ≤ dualWeyl ℂ r n ν) (hM : RowDivClosed M)
+    (hne : M ≠ ⊥) : dualWeyl ℂ r n ν ≤ M := by
   obtain ⟨v, hvM, hv0, hkill⟩ := exists_killed_of_rowDivClosed M hM hne
   obtain ⟨c, hc⟩ := hwLine ℂ r n hn ν hν v (hle hvM) hkill
   have hc0 : c ≠ 0 := by
     rintro rfl
     exact hv0 (by simpa using hc)
-  have e : hw ℂ hn ν = c⁻¹ • v := by rw [hc, smul_smul, inv_mul_cancel₀ hc0, one_smul]
+  have e : hw ℂ hn ν = c⁻¹ • v := by
+    rw [hc, smul_smul, inv_mul_cancel₀ hc0, one_smul]
   have hhw : hw ℂ hn ν ∈ M := e ▸ M.smul_mem _ hvM
   refine (Formalism.BranchingDeterminantCap.bs_dual_le_weyl hn ν hν).trans ?_
   unfold weyl
@@ -126,8 +150,8 @@ theorem dualWeyl_le_of_rowDivClosed
   | nil => exact hhw
   | cons x w ih => exact hM _ _ _ _ ih
 
-theorem isIrreducible_smallRep_unitary (n : ℕ) (mu : DomWeight n)
-    : (smallRep (unitaryIncl n) mu).IsIrreducible := by
+theorem isIrreducible_smallRep_unitary (n : ℕ) (mu : DomWeight n) :
+    (smallRep (unitaryIncl n) mu).IsIrreducible := by
   have hnt : Nontrivial (Subrepresentation (smallRep (unitaryIncl n) mu)) :=
     ⟨⊥, ⊤, fun e => bot_ne_top (congrArg Subrepresentation.toSubmodule e)⟩
   refine ⟨fun S => ?_⟩
@@ -140,19 +164,15 @@ theorem isIrreducible_smallRep_unitary (n : ℕ) (mu : DomWeight n)
     let t : Matrix.unitaryGroup (Fin n) ℂ := Matrix.UnitaryGroup.transpose ⟨u, hu⟩
     have h1 : (smallRep (unitaryIncl n) mu t f : MvPolynomial (Fin n × Fin n) ℂ) ∈ M :=
       ⟨_, S.apply_mem_toSubmodule t hf, rfl⟩
-    have h2
-        : (smallRep (unitaryIncl n) mu t f : MvPolynomial (Fin n × Fin n) ℂ)
-          = detPow ℂ n (unitaryIncl n t) mu.detShift • rowAct ℂ u f :=
-      rfl
+    have h2 : (smallRep (unitaryIncl n) mu t f : MvPolynomial (Fin n × Fin n) ℂ) =
+        detPow ℂ n (unitaryIncl n t) mu.detShift • rowAct ℂ u f := rfl
     rw [h2] at h1
     exact (M.smul_mem_iff (Units.ne_zero _)).1 h1
   have hcl := rowDivClosed_of_rowAct_stable M (rowAct_mem_of_unitary_stable M hU)
-  have hne : M ≠ ⊥ := fun e =>
-    hS (Submodule.map_injective_of_injective (nablaSq ℂ n mu).injective_subtype
-      (e.trans (Submodule.map_bot _).symm))
-  have hle :=
-    dualWeyl_le_of_rowDivClosed le_rfl mu.natW (factNatW n mu).1 M
-      (Submodule.map_subtype_le (nablaSq ℂ n mu) _) hcl hne
+  have hne : M ≠ ⊥ := fun e => hS (Submodule.map_injective_of_injective (nablaSq ℂ n mu).injective_subtype
+    (e.trans (Submodule.map_bot _).symm))
+  have hle := dualWeyl_le_of_rowDivClosed le_rfl mu.natW (factNatW n mu).1 M
+    (Submodule.map_subtype_le (nablaSq ℂ n mu) _) hcl hne
   refine eq_top_iff.2 fun f _ => ?_
   obtain ⟨g, hg, e⟩ := hle f.2
   rwa [← Subtype.ext e]

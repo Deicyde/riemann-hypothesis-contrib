@@ -1,14 +1,57 @@
 module
 
 public import Development.AutomorphicArithmetic.AutomorphicVarieties.SymplecticGSp4.EntryMem
-public import Development.AutomorphicArithmetic.AutomorphicVarieties.CommutativeAlgebra.Graded
+import Development.AutomorphicArithmetic.AutomorphicVarieties.CommutativeAlgebra.Graded
 public import Development.AutomorphicArithmetic.AutomorphicVarieties.CommutativeAlgebra.PartSpan
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Int
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.TotallySplit
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Lemma
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing
-  UpperTheory.V UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV
-  UpperTheory.V.GradeZeroInterpolatingElement
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing UpperTheory.V UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement
 
 section PartA
 open MvPowerSeries
@@ -65,10 +108,8 @@ private lemma mem_A (W : WPres O (ℤ × ℤ) R) {A : Subalgebra O R} (hA : ∀ 
   subst hj
   exact Submodule.mem_iSup_of_mem j2 hf
 
-private theorem wcomp_eq_self_of_mem_wtPart
-    {σ X : Type} [AddCommGroup X]
-    {wt : σ → X} {j : X} {f : MvPowerSeries σ O} (hf : f ∈ wtPart O wt j)
-    : wcomp O wt j f = f := by
+private theorem wcomp_eq_self_of_mem_wtPart {σ X : Type} [AddCommGroup X] {wt : σ → X} {j : X}
+    {f : MvPowerSeries σ O} (hf : f ∈ wtPart O wt j) : wcomp O wt j f = f := by
   have hf' : ∀ n, Finsupp.weight wt n ≠ j → MvPowerSeries.coeff n f = 0 := hf
   ext n
   rw [coeff_wcomp]
@@ -77,11 +118,8 @@ private theorem wcomp_eq_self_of_mem_wtPart
   · rw [if_neg h1]
     exact (hf' n h1).symm
 
-private theorem wcomp_of_ne_eq_zero_of_mem_wtPart
-    {σ X : Type} [AddCommGroup X]
-    {wt : σ → X} {j : X} {f : MvPowerSeries σ O} (hf : f ∈ wtPart O wt j)
-    {j' : X} (hj : j' ≠ j)
-    : wcomp O wt j' f = 0 := by
+private theorem wcomp_of_ne_eq_zero_of_mem_wtPart {σ X : Type} [AddCommGroup X] {wt : σ → X} {j : X}
+    {f : MvPowerSeries σ O} (hf : f ∈ wtPart O wt j) {j' : X} (hj : j' ≠ j) : wcomp O wt j' f = 0 := by
   have hf' : ∀ n, Finsupp.weight wt n ≠ j → MvPowerSeries.coeff n f = 0 := hf
   ext n
   rw [coeff_wcomp, map_zero]
@@ -171,8 +209,8 @@ private lemma pow_le (W : WPres O (ℤ × ℤ) R) (h : W.HasOrigin) {A : Subalge
       exact lt_of_lt_of_le (by exact_mod_cast hlt) hf
     · rfl
   obtain ⟨b, hb, hbe⟩ := hμ (wcomp O W.wt j f) hsupp
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [hbe, map_sum]
+
+  rw [hbe, map_sum]
   refine Submodule.sum_mem _ fun m hm => ?_
   have hmS := hμS hm
   have hmpart : W.π (monomial m 1) ∈ W.part j := by
@@ -365,37 +403,31 @@ end PartA
 section PartB
 open MvPowerSeries
 
-variable
-  {O A X τ : Type} [CommRing O] [IsDomain O] [CommRing A] [Algebra O A] [AddCommGroup X]
-  {𝒜 : X → Submodule O A} {x : A →ₐ[O] O} {wt : τ → X}
-  {φ : A →ₐ[O] MvPowerSeries τ (FractionRing O)}
+variable {O A X τ : Type} [CommRing O] [IsDomain O] [CommRing A] [Algebra O A] [AddCommGroup X]
+  {𝒜 : X → Submodule O A} {x : A →ₐ[O] O} {wt : τ → X} {φ : A →ₐ[O] MvPowerSeries τ (FractionRing O)}
 
-private noncomputable def crLin (φ : A →ₐ[O] MvPowerSeries τ (FractionRing O)) (i : τ)
-    : A →ₗ[O] FractionRing O :=
+private noncomputable def crLin (φ : A →ₐ[O] MvPowerSeries τ (FractionRing O)) (i : τ) :
+    A →ₗ[O] FractionRing O :=
   ((MvPowerSeries.coeff (Finsupp.single i 1)).restrictScalars O) ∘ₗ φ.toLinearMap
 
-private theorem crLin_apply (φ : A →ₐ[O] MvPowerSeries τ (FractionRing O)) (i : τ) (f : A)
-    : crLin φ i f = MvPowerSeries.coeff (Finsupp.single i 1) (φ f) :=
-  rfl
+private theorem crLin_apply (φ : A →ₐ[O] MvPowerSeries τ (FractionRing O)) (i : τ) (f : A) :
+    crLin φ i f = MvPowerSeries.coeff (Finsupp.single i 1) (φ f) := rfl
 
-private theorem coeff_single_one_mul_eq_zero_of_constantCoeff_zero
-    {E κ : Type} [CommRing E]
-    (p q : MvPowerSeries κ E)
-    (i : κ) (hp : constantCoeff p = 0) (hq : constantCoeff q = 0)
-    : coeff (Finsupp.single i 1) (p * q) = 0 := by
+private theorem coeff_single_one_mul_eq_zero_of_constantCoeff_zero {E κ : Type} [CommRing E] (p q : MvPowerSeries κ E) (i : κ)
+    (hp : constantCoeff p = 0) (hq : constantCoeff q = 0) : coeff (Finsupp.single i 1) (p * q) = 0 := by
   classical
   rw [coeff_mul]
   refine Finset.sum_eq_zero fun y hy => ?_
   have hy' := Finset.HasAntidiagonal.mem_antidiagonal.mp hy
-  have hd : y.1.degree + y.2.degree = 1 := by rw [← map_add (f := _), hy', Finsupp.degree_single]
+  have hd : y.1.degree + y.2.degree = 1 := by
+    rw [← map_add (f := _), hy', Finsupp.degree_single]
   rcases Nat.eq_zero_or_pos y.1.degree with h0 | h0
   · rw [(Finsupp.degree_eq_zero_iff _).mp h0, coeff_zero_eq_constantCoeff_apply, hp, zero_mul]
   · have h1 : y.2.degree = 0 := by omega
     rw [(Finsupp.degree_eq_zero_iff _).mp h1, coeff_zero_eq_constantCoeff_apply, hq, mul_zero]
 
-private theorem crLin_sq
-    (h : ∀ f, constantCoeff (φ f) = algebraMap O (FractionRing O) (x f)) (i : τ)
-    : ∀ f ∈ RingHom.ker x ^ 2, crLin φ i f = 0 := by
+private theorem crLin_sq (h : ∀ f, constantCoeff (φ f) = algebraMap O (FractionRing O) (x f)) (i : τ) :
+    ∀ f ∈ RingHom.ker x ^ 2, crLin φ i f = 0 := by
   intro f hf
   rw [sq] at hf
   refine Submodule.mul_induction_on hf ?_ ?_
@@ -407,68 +439,54 @@ private theorem crLin_sq
   · intro a b ha hb
     rw [map_add (f := _), ha, hb, add_zero]
 
-private theorem crLin_wt
-    (h : IsChart 𝒜 x wt φ) (i : τ) {j : X} (hij : wt i ≠ j) {f : A} (hf : f ∈ 𝒜 j)
-    : crLin φ i f = 0 := by
+private theorem crLin_wt (h : IsChart 𝒜 x wt φ) (i : τ) {j : X} (hij : wt i ≠ j)
+    {f : A} (hf : f ∈ 𝒜 j) : crLin φ i f = 0 := by
   have h' : ∀ n, Finsupp.weight wt n ≠ j → coeff n (φ f) = 0 := h.graded j f hf
   rw [crLin_apply]
   apply h'
   rw [Finsupp.weight_single, one_smul]
   exact hij
 
-private theorem crLin_const (φ : A →ₐ[O] MvPowerSeries τ (FractionRing O)) (i : τ) (c : O)
-    : crLin φ i (algebraMap O A c) = 0 := by
+private theorem crLin_const (φ : A →ₐ[O] MvPowerSeries τ (FractionRing O)) (i : τ) (c : O) :
+    crLin φ i (algebraMap O A c) = 0 := by
   classical
   rw [crLin_apply, AlgHom.commutes, MvPowerSeries.algebraMap_apply, MvPowerSeries.coeff_C,
     if_neg (Finsupp.single_ne_zero.mpr one_ne_zero)]
 
-private theorem cr_fixed (h : IsChart 𝒜 x wt φ) {j : X} (hj : j ≠ 0) {f : A} (hf : f ∈ 𝒜 j)
-    : x f = 0 := by
+private theorem cr_fixed (h : IsChart 𝒜 x wt φ) {j : X} (hj : j ≠ 0) {f : A} (hf : f ∈ 𝒜 j) : x f = 0 := by
   have h1' : ∀ n, Finsupp.weight wt n ≠ j → coeff n (φ f) = 0 := h.graded j f hf
   have h2 := h.const f
   rw [← coeff_zero_eq_constantCoeff_apply, h1' 0 (by rw [map_zero]; exact fun e => hj e.symm)] at h2
   exact (IsFractionRing.injective O (FractionRing O)) (h2.symm.trans (map_zero _).symm)
 
-private theorem crLin_proj
-    [DecidableEq X] [GradedAlgebra 𝒜]
-    (h : IsChart 𝒜 x wt φ)
-    (i : τ)
-    {j : X} (hij : wt i = j)
-    (f : A)
-    : crLin φ i (DirectSum.decompose 𝒜 f j) = crLin φ i f := by
+private theorem crLin_proj [DecidableEq X] [GradedAlgebra 𝒜] (h : IsChart 𝒜 x wt φ) (i : τ) {j : X}
+    (hij : wt i = j) (f : A) : crLin φ i (DirectSum.decompose 𝒜 f j) = crLin φ i f := by
   classical
   symm
   conv_lhs => rw [← DirectSum.sum_support_decompose 𝒜 f]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+
+  rw [map_sum]
   refine Finset.sum_eq_single j
-    (fun j' _ hj' => crLin_wt h i (by rw [hij]; exact fun e => hj' e.symm) (SetLike.coe_mem _))
-    ?_
+    (fun j' _ hj' => crLin_wt h i (by rw [hij]; exact fun e => hj' e.symm) (SetLike.coe_mem _)) ?_
   intro hj
   rw [DFinsupp.notMem_support_iff.mp hj]
   simp
 
-private theorem cr_comp [DecidableEq X] [GradedAlgebra 𝒜] (h : IsChart 𝒜 x wt φ) (j : X) (f : A)
-    : ∃ g : A, g ∈ 𝒜 j ∧ x g = 0 ∧ ∀ i, wt i = j → crLin φ i g = crLin φ i f := by
+private theorem cr_comp [DecidableEq X] [GradedAlgebra 𝒜] (h : IsChart 𝒜 x wt φ) (j : X) (f : A) :
+    ∃ g : A, g ∈ 𝒜 j ∧ x g = 0 ∧ ∀ i, wt i = j → crLin φ i g = crLin φ i f := by
   classical
   by_cases hj : j = 0
   · subst hj
-    refine
-      ⟨(DirectSum.decompose 𝒜 f 0 : A) - algebraMap O A (x (DirectSum.decompose 𝒜 f 0)), ?_, ?_, ?_⟩
+    refine ⟨(DirectSum.decompose 𝒜 f 0 : A) - algebraMap O A (x (DirectSum.decompose 𝒜 f 0)), ?_, ?_, ?_⟩
     · exact sub_mem (SetLike.coe_mem _) (SetLike.algebraMap_mem_graded 𝒜 _)
     · simp
     · intro i hi
       rw [map_sub, crLin_const, sub_zero, crLin_proj h i hi]
-  · exact ⟨
-      DirectSum.decompose 𝒜 f j,
-      SetLike.coe_mem _,
-      cr_fixed h hj (SetLike.coe_mem _),
-      fun i hi => crLin_proj h i hi f
-    ⟩
+  · exact ⟨DirectSum.decompose 𝒜 f j, SetLike.coe_mem _, cr_fixed h hj (SetLike.coe_mem _),
+      fun i hi => crLin_proj h i hi f⟩
 
-private theorem homog_gens [DecidableEq X] [GradedAlgebra 𝒜] (h : IsChart 𝒜 x wt φ)
-    : ∃ g : τ → A, ∀ i,
-      g i ∈ 𝒜 (wt i) ∧ x (g i) = 0 ∧ crLin φ i (g i) ≠ 0 ∧ ∀ i', i' ≠ i → crLin φ i' (g i) = 0 := by
+private theorem homog_gens [DecidableEq X] [GradedAlgebra 𝒜] (h : IsChart 𝒜 x wt φ) :
+    ∃ g : τ → A, ∀ i, g i ∈ 𝒜 (wt i) ∧ x (g i) = 0 ∧ crLin φ i (g i) ≠ 0 ∧ ∀ i', i' ≠ i → crLin φ i' (g i) = 0 := by
   classical
   choose f hf1 hf2 using h.onto
   refine ⟨fun i => (cr_comp h (wt i) (f i)).choose, fun i => ?_⟩
@@ -481,96 +499,74 @@ private theorem homog_gens [DecidableEq X] [GradedAlgebra 𝒜] (h : IsChart �
       exact hf2 i i' hi'
     · exact crLin_wt h i' hw hg1
 
-private theorem clear_den [Fintype τ] (u : τ → FractionRing O)
-    : ∃ c : O, c ≠ 0 ∧ ∃ a : τ → O, ∀ k, algebraMap O (FractionRing O) (a k) = c • u k := by
+private theorem clear_den [Fintype τ] (u : τ → FractionRing O) :
+    ∃ c : O, c ≠ 0 ∧ ∃ a : τ → O, ∀ k, algebraMap O (FractionRing O) (a k) = c • u k := by
   obtain ⟨b, hb⟩ := IsLocalization.exist_integer_multiples_of_finite (nonZeroDivisors O) u
   have hb' : ∀ k, ∃ a : O, algebraMap O (FractionRing O) a = (b : O) • u k := fun k => hb k
   choose a ha using hb'
   exact ⟨b, nonZeroDivisors.ne_zero b.2, a, ha⟩
 
-private theorem expand
-    [Fintype τ]
-    (h : IsChart 𝒜 x wt φ)
-    {g : τ → A}
-    (hg : ∀ i,
-      g i ∈ 𝒜 (wt i) ∧ x (g i) = 0 ∧ crLin φ i (g i) ≠ 0 ∧ ∀ i', i' ≠ i → crLin φ i' (g i) = 0)
-    {j : X} {p : A} (hp : p ∈ 𝒜 j) (hp0 : x p = 0)
-    : ∃ c : O,
-      c ≠ 0
-        ∧ ∃ a : τ → O, (∀ k, wt k ≠ j → a k = 0) ∧ c • p - ∑ k, a k • g k ∈ RingHom.ker x ^ 2 := by
+private theorem expand [Fintype τ] (h : IsChart 𝒜 x wt φ) {g : τ → A}
+    (hg : ∀ i, g i ∈ 𝒜 (wt i) ∧ x (g i) = 0 ∧ crLin φ i (g i) ≠ 0 ∧ ∀ i', i' ≠ i → crLin φ i' (g i) = 0)
+    {j : X} {p : A} (hp : p ∈ 𝒜 j) (hp0 : x p = 0) :
+    ∃ c : O, c ≠ 0 ∧ ∃ a : τ → O, (∀ k, wt k ≠ j → a k = 0) ∧ c • p - ∑ k, a k • g k ∈ RingHom.ker x ^ 2 := by
   classical
-  obtain ⟨c, hc, a, ha⟩ :=
-    clear_den (fun k => if wt k = j then crLin φ k p / crLin φ k (g k) else 0)
+  obtain ⟨c, hc, a, ha⟩ := clear_den (fun k => if wt k = j then crLin φ k p / crLin φ k (g k) else 0)
   have ha0 : ∀ k, wt k ≠ j → a k = 0 := by
     intro k hk
     have := ha k
     rw [if_neg hk, smul_zero] at this
     exact IsFractionRing.injective O (FractionRing O) (this.trans (map_zero _).symm)
   have hxq : x (c • p - ∑ k, a k • g k) = 0 := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sub, map_sum, map_smul, hp0, smul_zero, zero_sub, neg_eq_zero]
+
+    rw [map_sub, map_sum, map_smul, hp0, smul_zero, zero_sub, neg_eq_zero]
     exact Finset.sum_eq_zero fun k _ => by rw [map_smul, (hg k).2.1, smul_zero]
   have hcr : ∀ i, coeff (Finsupp.single i 1) (φ (c • p - ∑ k, a k • g k)) = 0 := by
     intro i
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← crLin_apply, map_sub, map_sum, map_smul,
-        Finset.sum_eq_single i
-          (fun k _ hk => by rw [map_smul, (hg k).2.2.2 i (fun e => hk e.symm), smul_zero])
-          (fun hi => absurd (Finset.mem_univ i) hi),
-        map_smul]
+
+    rw [← crLin_apply, map_sub, map_sum, map_smul,
+    Finset.sum_eq_single i (fun k _ hk => by rw [map_smul, (hg k).2.2.2 i (fun e => hk e.symm), smul_zero])
+      (fun hi => absurd (Finset.mem_univ i) hi), map_smul]
     by_cases hi : wt i = j
     · have := ha i
       rw [if_pos hi] at this
       rw [Algebra.smul_def (a i), this, smul_mul_assoc, div_mul_cancel₀ _ (hg i).2.2.1, sub_self]
     · rw [crLin_wt h i hi hp, ha0 i hi, smul_zero, zero_smul, sub_self]
   obtain ⟨c', hc', hq2⟩ := h.inj _ hxq hcr
-  refine ⟨
-    c' * c,
-    mul_ne_zero hc' hc,
-    fun k => c' * a k,
-    fun k hk => show c' * a k = 0 by rw [ha0 k hk, mul_zero],
-    ?_
-  ⟩
+  refine ⟨c' * c, mul_ne_zero hc' hc, fun k => c' * a k, fun k hk => show c' * a k = 0 by rw [ha0 k hk, mul_zero], ?_⟩
   convert hq2 using 1
   rw [smul_sub, Finset.smul_sum, mul_smul]
   congr 1
   exact Finset.sum_congr rfl fun k _ => by rw [mul_smul]
 
-private theorem chart_of_span
-    [Fintype τ]
-    (h1 : ∀ j, ∀ f ∈ 𝒜 j, φ f ∈ wtPart (FractionRing O) wt j)
-    (h2 : ∀ f, constantCoeff (φ f) = algebraMap O (FractionRing O) (x f))
-    (G : τ → A) (hinj : ∀ v : τ → FractionRing O, (∀ j, ∑ k, v k * crLin φ j (G k) = 0) → v = 0)
-    (hspan
-      : ∀ f, x f = 0 → ∃ c : O, c ≠ 0 ∧ ∃ a : τ → O, c • f - ∑ k, a k • G k ∈ RingHom.ker x ^ 2)
-    : IsChart 𝒜 x wt φ := by
+private theorem chart_of_span [Fintype τ] (h1 : ∀ j, ∀ f ∈ 𝒜 j, φ f ∈ wtPart (FractionRing O) wt j)
+    (h2 : ∀ f, constantCoeff (φ f) = algebraMap O (FractionRing O) (x f)) (G : τ → A)
+    (hinj : ∀ v : τ → FractionRing O, (∀ j, ∑ k, v k * crLin φ j (G k) = 0) → v = 0)
+    (hspan : ∀ f, x f = 0 → ∃ c : O, c ≠ 0 ∧ ∃ a : τ → O, c • f - ∑ k, a k • G k ∈ RingHom.ker x ^ 2) :
+    IsChart 𝒜 x wt φ := by
   classical
   refine ⟨h1, h2, ?_, ?_⟩
   · intro i
     let Mx : Matrix τ τ (FractionRing O) := fun j k => crLin φ j (G k)
     have hinj' : Function.Injective Mx.mulVec := by
       intro v w hvw
-      have hvw' : v - w = 0 :=
-        hinj (v - w) (fun j => by
-          have e := congrFun hvw j
-          simp only [Matrix.mulVec, dotProduct] at e
-          rw [← sub_eq_zero, ← Finset.sum_sub_distrib] at e
-          rw [← e]
-          refine Finset.sum_congr rfl fun k _ => ?_
-          simp only [Mx, Pi.sub_apply]
-          ring)
+      have hvw' : v - w = 0 := hinj (v - w) (fun j => by
+        have e := congrFun hvw j
+        simp only [Matrix.mulVec, dotProduct] at e
+        rw [← sub_eq_zero, ← Finset.sum_sub_distrib] at e
+        rw [← e]
+        refine Finset.sum_congr rfl fun k _ => ?_
+        simp only [Mx, Pi.sub_apply]
+        ring)
       exact sub_eq_zero.mp hvw'
     have hsurj : Function.Surjective Mx.mulVec :=
       Matrix.mulVec_surjective_iff_isUnit.mpr (Matrix.mulVec_injective_iff_isUnit.mp hinj')
     obtain ⟨v, hv⟩ := hsurj (Pi.single i 1)
     obtain ⟨c, hc, a, ha⟩ := clear_den v
-    have key
-        : ∀ j,
-          coeff (Finsupp.single j 1) (φ (∑ k, a k • G k))
-            = c • (Pi.single i 1 : τ → FractionRing O) j := by
+    have key : ∀ j, coeff (Finsupp.single j 1) (φ (∑ k, a k • G k)) = c • (Pi.single i 1 : τ → FractionRing O) j := by
       intro j
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [← crLin_apply, map_sum]
+
+      rw [← crLin_apply, map_sum]
       have e := congrFun hv j
       simp only [Matrix.mulVec, dotProduct] at e
       rw [← e, Finset.smul_sum]
@@ -584,36 +580,31 @@ private theorem chart_of_span
     · rw [key, Pi.single_eq_of_ne hi', smul_zero]
   · intro f hf hcr
     obtain ⟨c, hc, a, hsq⟩ := hspan f hf
-    have ha : (fun k => algebraMap O (FractionRing O) (a k)) = 0 :=
-      hinj _ (fun j => by
-        have e := crLin_sq h2 j _ hsq
-        set_option synthInstance.maxHeartbeats 100000 in
-          rw [map_sub, map_smul, crLin_apply, hcr j, smul_zero, zero_sub, neg_eq_zero, map_sum] at e
-        rw [← e]
-        refine Finset.sum_congr rfl fun k _ => ?_
-        rw [map_smul, Algebra.smul_def])
+    have ha : (fun k => algebraMap O (FractionRing O) (a k)) = 0 := hinj _ (fun j => by
+      have e := crLin_sq h2 j _ hsq
+
+      rw [map_sub, map_smul, crLin_apply, hcr j, smul_zero, zero_sub, neg_eq_zero, map_sum] at e
+      rw [← e]
+      refine Finset.sum_congr rfl fun k _ => ?_
+      rw [map_smul, Algebra.smul_def])
     have ha' : ∀ k, a k = 0 := fun k =>
       IsFractionRing.injective O (FractionRing O) ((congrFun ha k).trans (map_zero _).symm)
     exact ⟨c, hc, by simpa [ha'] using hsq⟩
 
 omit [IsDomain O] in
-private theorem restrict
-    {E τ' : Type} [CommRing E] [Algebra O E]
-    (φ : A →ₐ[O] MvPowerSeries τ E) (ι : (τ' →₀ ℕ) →+ (τ →₀ ℕ))
-    (hι : Function.Injective ι) (hφ : ∀ f m, m ∉ Set.range ι → coeff m (φ f) = 0)
-    : ∃ ψ : A →ₐ[O] MvPowerSeries τ' E, ∀ f n, coeff n (ψ f) = coeff (ι n) (φ f) := by
+private theorem restrict {E τ' : Type} [CommRing E] [Algebra O E] (φ : A →ₐ[O] MvPowerSeries τ E)
+    (ι : (τ' →₀ ℕ) →+ (τ →₀ ℕ)) (hι : Function.Injective ι)
+    (hφ : ∀ f m, m ∉ Set.range ι → coeff m (φ f) = 0) :
+    ∃ ψ : A →ₐ[O] MvPowerSeries τ' E, ∀ f n, coeff n (ψ f) = coeff (ι n) (φ f) := by
   classical
-  have hmap
-      : ∀ f g : A, ∀ n,
-        coeff (ι n) (φ f * φ g)
-          = ∑ p ∈ Finset.HasAntidiagonal.antidiagonal n, coeff (ι p.1) (φ f) * coeff (ι p.2) (φ g) := by
+  have hmap : ∀ f g : A, ∀ n, coeff (ι n) (φ f * φ g) =
+      ∑ p ∈ Finset.HasAntidiagonal.antidiagonal n, coeff (ι p.1) (φ f) * coeff (ι p.2) (φ g) := by
     intro f g n
     rw [coeff_mul]
     symm
-    have e
-        : ∑ p ∈ Finset.HasAntidiagonal.antidiagonal n, coeff (ι p.1) (φ f) * coeff (ι p.2) (φ g)
-          = ∑ q ∈ (Finset.HasAntidiagonal.antidiagonal n).map (Function.Embedding.prodMap ⟨ι, hι⟩ ⟨ι, hι⟩),
-              coeff q.1 (φ f) * coeff q.2 (φ g) := by
+    have e : ∑ p ∈ Finset.HasAntidiagonal.antidiagonal n, coeff (ι p.1) (φ f) * coeff (ι p.2) (φ g) =
+        ∑ q ∈ (Finset.HasAntidiagonal.antidiagonal n).map (Function.Embedding.prodMap ⟨ι, hι⟩ ⟨ι, hι⟩),
+          coeff q.1 (φ f) * coeff q.2 (φ g) := by
       rw [Finset.sum_map]
       rfl
     rw [e]
@@ -622,8 +613,7 @@ private theorem restrict
       rw [Finset.mem_map] at hq
       obtain ⟨p, hp, rfl⟩ := hq
       rw [Finset.HasAntidiagonal.mem_antidiagonal] at hp ⊢
-      simp only [Function.Embedding.coe_prodMap, Function.Embedding.coeFn_mk, Prod.map_fst,
-        Prod.map_snd]
+      simp only [Function.Embedding.coe_prodMap, Function.Embedding.coeFn_mk, Prod.map_fst, Prod.map_snd]
       rw [← map_add (f := _), hp]
     · intro q hq hq'
       rw [Finset.HasAntidiagonal.mem_antidiagonal] at hq
@@ -638,22 +628,20 @@ private theorem restrict
           · rw [Finset.HasAntidiagonal.mem_antidiagonal]
             apply hι
             rw [map_add (f := _), ha, hb, hq]
-          · simp only [Function.Embedding.coe_prodMap, Function.Embedding.coeFn_mk, Prod.map, ha,
-              hb]
+          · simp only [Function.Embedding.coe_prodMap, Function.Embedding.coeFn_mk, Prod.map, ha, hb]
         · rw [hφ g _ hq2, mul_zero]
       · rw [hφ f _ hq1, zero_mul]
-  let L : A →ₗ[O] MvPowerSeries τ' E := {
-    toFun := fun f n => coeff (ι n) (φ f)
-    map_add' := fun f g => by
-      ext n
-      change coeff (ι n) (φ (f + g)) = coeff (ι n) (φ f) + coeff (ι n) (φ g)
-      rw [map_add (f := _), map_add (f := _)]
-    map_smul' := fun c f => by
-      ext n
-      change coeff (ι n) (φ (c • f)) = c • coeff (ι n) (φ f)
-      rw [map_smul]
-      rfl
-  }
+  let L : A →ₗ[O] MvPowerSeries τ' E :=
+    { toFun := fun f n => coeff (ι n) (φ f)
+      map_add' := fun f g => by
+        ext n
+        change coeff (ι n) (φ (f + g)) = coeff (ι n) (φ f) + coeff (ι n) (φ g)
+        rw [map_add (f := _), map_add (f := _)]
+      map_smul' := fun c f => by
+        ext n
+        change coeff (ι n) (φ (c • f)) = c • coeff (ι n) (φ f)
+        rw [map_smul]
+        rfl }
   refine ⟨AlgHom.ofLinearMap L ?_ ?_, fun f n => rfl⟩
   · ext n
     change coeff (ι n) (φ 1) = coeff n 1
@@ -668,8 +656,7 @@ private theorem restrict
     rw [map_mul, hmap, coeff_mul]
     rfl
 
-private theorem exists_eq_single_one_of_degree_eq_one {κ : Type} {v : κ →₀ ℕ} (hv : v.degree = 1)
-    : ∃ t, v = Finsupp.single t 1 := by
+private theorem exists_eq_single_one_of_degree_eq_one {κ : Type} {v : κ →₀ ℕ} (hv : v.degree = 1) : ∃ t, v = Finsupp.single t 1 := by
   classical
   have hv0 : v ≠ 0 := by
     rintro rfl
@@ -692,14 +679,11 @@ private theorem exists_eq_single_one_of_degree_eq_one {κ : Type} {v : κ →₀
   refine ⟨t, ?_⟩
   rw [hsum, (Finsupp.degree_eq_zero_iff _).mp hdeg, add_zero]
 
-private theorem coeff_two
-    {E : Type} [CommRing E] [IsDomain E] [DecidableEq τ]
-    (p q : MvPowerSeries τ E)
-    (k b j : τ)
+private theorem coeff_two {E : Type} [CommRing E] [IsDomain E] [DecidableEq τ] (p q : MvPowerSeries τ E) (k b j : τ)
     (hp0 : coeff 0 p = 0) (hq0 : coeff 0 q = 0) (hp : ∀ i, i ≠ k → coeff (Finsupp.single i 1) p = 0)
-    (hq : ∀ i, i ≠ b → coeff (Finsupp.single i 1) q = 0)
-    : coeff (Finsupp.single j 1 + Finsupp.single b 1) (p * q)
-      = if j = k then coeff (Finsupp.single k 1) p * coeff (Finsupp.single b 1) q else 0 := by
+    (hq : ∀ i, i ≠ b → coeff (Finsupp.single i 1) q = 0) :
+    coeff (Finsupp.single j 1 + Finsupp.single b 1) (p * q) =
+      if j = k then coeff (Finsupp.single k 1) p * coeff (Finsupp.single b 1) q else 0 := by
   rw [coeff_mul, Finset.sum_eq_single (Finsupp.single j 1, Finsupp.single b 1)]
   · by_cases hjk : j = k
     · rw [if_pos hjk, hjk]
@@ -724,42 +708,33 @@ private theorem coeff_two
       exact Prod.ext e1 ht
     rw [ht, hq t htb, mul_zero]
   · intro hmem
-    exact absurd
-      (Finset.HasAntidiagonal.mem_antidiagonal (A := τ →₀ ℕ)
-          (n := Finsupp.single j 1 + Finsupp.single b 1)
-          (a := (Finsupp.single j 1, Finsupp.single b 1))
-        |>.mpr rfl)
-      hmem
+    exact absurd (Finset.HasAntidiagonal.mem_antidiagonal (A := τ →₀ ℕ) (n := Finsupp.single j 1 + Finsupp.single b 1)
+      (a := (Finsupp.single j 1, Finsupp.single b 1)) |>.mpr rfl) hmem
 
 end PartB
 
 section PartC
 open MvPowerSeries
 
-private theorem iota
-    {τ : Type} [Fintype τ] [DecidableEq τ]
-    (wt : τ → ℤ × ℤ) (b : τ) (hb : (wt b).1 = -1) (hτ : ∀ i, i ≠ b → (wt i).1 = 0 ∨ (wt i).1 = 1)
-    : ∃ ι : ({i // i ≠ b} →₀ ℕ) →+ (τ →₀ ℕ),
-      Function.Injective ι
-        ∧ (∀ i,
-          ι (Finsupp.single i 1)
-            = Finsupp.single i.1 1 + if (wt i.1).1 = 1 then Finsupp.single b 1 else 0)
-        ∧ (∀ n,
-          Finsupp.weight wt (ι n)
-            = (0, Finsupp.weight (fun i : {i // i ≠ b} => (wt i.1).2 + (wt i.1).1 * (wt b).2) n))
-        ∧ ∀ m, (Finsupp.weight wt m).1 = 0 → m ∈ Set.range ι := by
+private theorem iota {τ : Type} [Fintype τ] [DecidableEq τ] (wt : τ → ℤ × ℤ) (b : τ) (hb : (wt b).1 = -1)
+    (hτ : ∀ i, i ≠ b → (wt i).1 = 0 ∨ (wt i).1 = 1) :
+    ∃ ι : ({i // i ≠ b} →₀ ℕ) →+ (τ →₀ ℕ), Function.Injective ι ∧
+      (∀ i, ι (Finsupp.single i 1) = Finsupp.single i.1 1 + if (wt i.1).1 = 1 then Finsupp.single b 1 else 0) ∧
+      (∀ n, Finsupp.weight wt (ι n) =
+        (0, Finsupp.weight (fun i : {i // i ≠ b} => (wt i.1).2 + (wt i.1).1 * (wt b).2) n)) ∧
+      ∀ m, (Finsupp.weight wt m).1 = 0 → m ∈ Set.range ι := by
   classical
   let v : {i // i ≠ b} → (τ →₀ ℕ) := fun i =>
     Finsupp.single i.1 1 + if (wt i.1).1 = 1 then Finsupp.single b 1 else 0
   let ι : ({i // i ≠ b} →₀ ℕ) →+ (τ →₀ ℕ) := Finsupp.liftAddHom fun i => multiplesHom (τ →₀ ℕ) (v i)
   have hιsk : ∀ i k, ι (Finsupp.single i k) = k • v i := fun i k => by
     simp only [ι, Finsupp.liftAddHom_apply_single, multiplesHom_apply]
-  have hιapp
-      : ∀ n t,
-        ι n t = if h : t = b then ∑ i, (if (wt i.1).1 = 1 then n i else 0) else n ⟨t, h⟩ := by
+  have hιapp : ∀ n t, ι n t =
+      if h : t = b then ∑ i, (if (wt i.1).1 = 1 then n i else 0) else n ⟨t, h⟩ := by
     intro n t
     induction n using Finsupp.induction_linear with
-    | zero => simp
+    | zero =>
+      simp
     | add f g hf hg =>
       rw [map_add (f := _), Finsupp.add_apply, hf, hg]
       split_ifs
@@ -791,14 +766,12 @@ private theorem iota
   · intro i
     rw [hιsk, one_smul]
   · intro n
-    have hw
-        : (Finsupp.weight wt).comp ι
-          = (AddMonoidHom.inr ℤ ℤ).comp
-            (Finsupp.weight fun i : {i // i ≠ b} => (wt i.1).2 + (wt i.1).1 * (wt b).2) := by
+    have hw : (Finsupp.weight wt).comp ι =
+        (AddMonoidHom.inr ℤ ℤ).comp (Finsupp.weight fun i : {i // i ≠ b} => (wt i.1).2 + (wt i.1).1 * (wt b).2) := by
       ext i
       all_goals
-        simp only [AddMonoidHom.coe_comp, Function.comp_apply, Finsupp.singleAddHom_apply, hιsk,
-          one_smul, Finsupp.weight_single, AddMonoidHom.inr_apply, v, map_add]
+        simp only [AddMonoidHom.coe_comp, Function.comp_apply, Finsupp.singleAddHom_apply, hιsk, one_smul,
+          Finsupp.weight_single, AddMonoidHom.inr_apply, v, map_add]
         rcases hτ i.1 i.2 with h | h <;> simp [h, hb, Finsupp.weight_single]
     exact DFunLike.congr_fun hw n
   · intro m hm
@@ -810,9 +783,8 @@ private theorem iota
       rw [Finsupp.weight_eq_sum, Fintype.sum_eq_add_sum_subtype_ne _ t] at hm
       simp only [Prod.fst_add, Prod.smul_fst, Prod.fst_sum, smul_eq_mul, hb] at hm
       simp only [Finsupp.coe_equivFunOnFinite_symm]
-      have key
-          : ∑ x : {i // i ≠ t}, m x.1 • (wt x.1).1
-            = ((∑ x : {i // i ≠ t}, if (wt x.1).1 = 1 then m x.1 else 0 : ℕ) : ℤ) := by
+      have key : ∑ x : {i // i ≠ t}, m x.1 • (wt x.1).1 =
+          ((∑ x : {i // i ≠ t}, if (wt x.1).1 = 1 then m x.1 else 0 : ℕ) : ℤ) := by
         push_cast
         refine Finset.sum_congr rfl fun x _ => ?_
         rcases hτ x.1 x.2 with h | h <;> simp [h]
@@ -820,11 +792,9 @@ private theorem iota
       omega
     · simp
 
-private theorem exists_ne_zero_smul_mem_of_mem_span'
-    {τ E : Type} [CommRing E]
-    (p q : MvPowerSeries τ E) (hp : MvPowerSeries.coeff 0 p = 0) (hq : MvPowerSeries.coeff 0 q = 0)
-    (j : τ)
-    : MvPowerSeries.coeff (Finsupp.single j 1) (p * q) = 0 := by
+private theorem exists_ne_zero_smul_mem_of_mem_span' {τ E : Type} [CommRing E] (p q : MvPowerSeries τ E)
+    (hp : MvPowerSeries.coeff 0 p = 0) (hq : MvPowerSeries.coeff 0 q = 0) (j : τ) :
+    MvPowerSeries.coeff (Finsupp.single j 1) (p * q) = 0 := by
   classical
   rw [MvPowerSeries.coeff_mul]
   apply Finset.sum_eq_zero
@@ -860,45 +830,31 @@ private theorem exists_ne_zero_smul_mem_of_mem_span'
     subst this
     simp [hq]
 
-private theorem main
-    {O R τ : Type} [CommRing O] [IsDomain O] [CommRing R] [Algebra O R] [Fintype τ] [DecidableEq τ]
-    (W : WPres O (ℤ × ℤ) R)
-    (h : W.HasOrigin) (hw : ∀ i, (W.wt i).1 = -1 ∨ (W.wt i).1 = 0 ∨ (W.wt i).1 = 1)
-    (A : Subalgebra O R) (hA : ∀ f, f ∈ A ↔ f ∈ ⨆ n : ℤ, W.part (0, n))
-    (wt : τ → ℤ × ℤ) (φ : W.A →ₐ[O] MvPowerSeries τ (FractionRing O))
-    (H : IsChart W.gr ((W.origin h).comp W.A.val) wt φ)
-    (b : τ) (hb : (wt b).1 = -1) (hτ : ∀ i, i ≠ b → (wt i).1 = 0 ∨ (wt i).1 = 1)
-    : ∃ ψ : A →ₐ[O] MvPowerSeries {i // i ≠ b} (FractionRing O),
-      IsChart
-        (fun n : ℤ => (W.part (0, n)).comap A.val.toLinearMap)
-        ((W.origin h).comp A.val)
-        (fun i => (wt i.1).2 + (wt i.1).1 * (wt b).2)
-        ψ := by
+private theorem main {O R τ : Type} [CommRing O] [IsDomain O] [CommRing R] [Algebra O R] [Fintype τ] [DecidableEq τ]
+    (W : WPres O (ℤ × ℤ) R) (h : W.HasOrigin)
+    (hw : ∀ i, (W.wt i).1 = -1 ∨ (W.wt i).1 = 0 ∨ (W.wt i).1 = 1) (A : Subalgebra O R)
+    (hA : ∀ f, f ∈ A ↔ f ∈ ⨆ n : ℤ, W.part (0, n)) (wt : τ → ℤ × ℤ)
+    (φ : W.A →ₐ[O] MvPowerSeries τ (FractionRing O)) (H : IsChart W.gr ((W.origin h).comp W.A.val) wt φ)
+    (b : τ) (hb : (wt b).1 = -1) (hτ : ∀ i, i ≠ b → (wt i).1 = 0 ∨ (wt i).1 = 1) :
+    ∃ ψ : A →ₐ[O] MvPowerSeries {i // i ≠ b} (FractionRing O),
+      IsChart (fun n : ℤ => (W.part (0, n)).comap A.val.toLinearMap) ((W.origin h).comp A.val)
+        (fun i => (wt i.1).2 + (wt i.1).1 * (wt b).2) ψ := by
   classical
   have hAW : ∀ f, f ∈ A → f ∈ W.A := by
     intro f hf
-    exact Submodule.iSup_induction _
-      (motive := fun z => z ∈ W.A)
-      ((hA f).mp hf)
-      (fun n z hz => W.part_le_A hz)
-      (zero_mem _)
-      (fun _ _ => add_mem)
+    exact Submodule.iSup_induction _ (motive := fun z => z ∈ W.A) ((hA f).mp hf)
+      (fun n z hz => W.part_le_A hz) (zero_mem _) (fun _ _ => add_mem)
   let incl : A →ₐ[O] W.A := Subalgebra.inclusion (fun f hf => hAW f hf)
   let φ' : A →ₐ[O] MvPowerSeries τ (FractionRing O) := φ.comp incl
   obtain ⟨ι, hιinj, hιs, hιw, hιr⟩ := iota wt b hb hτ
-  have hgr
-      : ∀ (f : A) (n : ℤ), (f : R) ∈ W.part (0, n) → φ' f ∈ wtPart (FractionRing O) wt (0, n) :=
-    fun f n hf => H.graded (0, n) (incl f) hf
+  have hgr : ∀ (f : A) (n : ℤ), (f : R) ∈ W.part (0, n) →
+      φ' f ∈ wtPart (FractionRing O) wt (0, n) := fun f n hf => H.graded (0, n) (incl f) hf
   have hsupp : ∀ (f : A), ∀ m ∉ Set.range ι, MvPowerSeries.coeff m (φ' f) = 0 := by
     rintro ⟨f, hf⟩ m hm
     refine Submodule.iSup_induction' _
-      (motive := fun z hz => MvPowerSeries.coeff m (φ' ⟨z, (hA z).mpr hz⟩) = 0)
-      ?_ ?_ ?_ ((hA f).mp hf)
+      (motive := fun z hz => MvPowerSeries.coeff m (φ' ⟨z, (hA z).mpr hz⟩) = 0) ?_ ?_ ?_ ((hA f).mp hf)
     · intro n z hz
-      have hw
-          : ∀ n',
-            Finsupp.weight wt n' ≠ ((0 : ℤ), n)
-              → MvPowerSeries.coeff n' (φ' ⟨z, (hA z).mpr (Submodule.mem_iSup_of_mem n hz)⟩) = 0 :=
+      have hw : ∀ n', Finsupp.weight wt n' ≠ ((0 : ℤ), n) → MvPowerSeries.coeff n' (φ' ⟨z, (hA z).mpr (Submodule.mem_iSup_of_mem n hz)⟩) = 0 :=
         hgr ⟨z, _⟩ n hz
       by_contra hne
       apply hm
@@ -918,24 +874,20 @@ private theorem main
   have gbA : ∀ i, (wt i).1 = 1 → ((g i : R) * (g b : R)) ∈ A := fun i hi =>
     mem_A W hA (j := wt i + wt b) (by simp [hi, hb]) (SetLike.mul_mem_graded (hg i).1 (hg b).1)
   let G : {i // i ≠ b} → A := fun i =>
-    if hi : (wt i.1).1 = 0 then
-      ⟨g i.1, gA i.1 hi⟩
-    else
-      ⟨(g i.1 : R) * (g b : R), gbA i.1 (hτ1 i.1 i.2 hi)⟩
+    if hi : (wt i.1).1 = 0 then ⟨g i.1, gA i.1 hi⟩ else ⟨(g i.1 : R) * (g b : R), gbA i.1 (hτ1 i.1 i.2 hi)⟩
   have hinclG : ∀ i, incl (G i) = if (wt i.1).1 = 0 then g i.1 else g i.1 * g b := by
     intro i
     apply Subtype.ext
     simp only [G]
     split_ifs <;> rfl
-  have hcr
-      : ∀ j k, crLin ψ j (G k) = MvPowerSeries.coeff (ι (Finsupp.single j 1)) (φ (incl (G k))) := by
+  have hcr : ∀ j k, crLin ψ j (G k) =
+      MvPowerSeries.coeff (ι (Finsupp.single j 1)) (φ (incl (G k))) := by
     intro j k
     rw [crLin_apply, hψ]
     rfl
   have hφ0 : ∀ i, MvPowerSeries.coeff 0 (φ (g i)) = 0 := fun i => by
     rw [MvPowerSeries.coeff_zero_eq_constantCoeff_apply, H.const, (hg i).2.1, map_zero]
-  have hlin
-      : ∀ i i', i' ≠ i → MvPowerSeries.coeff (Finsupp.single i' 1) (φ (g i)) = 0 := fun i i' h => by
+  have hlin : ∀ i i', i' ≠ i → MvPowerSeries.coeff (Finsupp.single i' 1) (φ (g i)) = 0 := fun i i' h => by
     rw [← crLin_apply]
     exact (hg i).2.2.2 i' h
   have hdiag : ∀ i, MvPowerSeries.coeff (Finsupp.single i 1) (φ (g i)) ≠ 0 := fun i => by
@@ -944,8 +896,7 @@ private theorem main
   refine chart_of_span ?_ ?_ G ?_ ?_
   · intro n f hf n' hn'
     rw [hψ]
-    have hw : ∀ m, Finsupp.weight wt m ≠ ((0 : ℤ), n) → MvPowerSeries.coeff m (φ' f) = 0 :=
-      hgr f n hf
+    have hw : ∀ m, Finsupp.weight wt m ≠ ((0 : ℤ), n) → MvPowerSeries.coeff m (φ' f) = 0 := hgr f n hf
     apply hw
     rw [hιw]
     intro h'
@@ -975,8 +926,7 @@ private theorem main
       have := hv j
       rw [Finset.sum_eq_single j] at this
       · rw [hcr, hιs, if_pos hj, hinclG, if_neg hj0, map_mul,
-            coeff_two _ _ j.1 b j.1 (hφ0 _) (hφ0 _) (hlin j.1) (hlin b), if_pos rfl]
-          at this
+          coeff_two _ _ j.1 b j.1 (hφ0 _) (hφ0 _) (hlin j.1) (hlin b), if_pos rfl] at this
         exact (mul_eq_zero.mp this).resolve_right (mul_ne_zero (hdiag _) (hdiag _))
       · intro k _ hkj
         rw [hcr, hιs, if_pos hj, hinclG]
@@ -1001,25 +951,24 @@ private theorem main
         intro z hz
         exact hz
       exact hle (Ideal.mem_map_of_mem _ hy)
-    let Lsp : Submodule O A :=
-      Submodule.span O (Set.range G) ⊔ (RingHom.ker ((W.origin h).comp A.val) ^ 2).restrictScalars O
+    let Lsp : Submodule O A := Submodule.span O (Set.range G) ⊔
+      (RingHom.ker ((W.origin h).comp A.val) ^ 2).restrictScalars O
     let L : Submodule O R := Lsp.map A.val.toLinearMap
-    let N : Submodule O R := {
-      carrier := {y | ∃ c : O, c ≠ 0 ∧ c • y ∈ L}
-      add_mem' := by
-        rintro y₁ y₂ ⟨c₁, hc₁, h₁⟩ ⟨c₂, hc₂, h₂⟩
-        refine ⟨c₁ * c₂, mul_ne_zero hc₁ hc₂, ?_⟩
-        have e : (c₁ * c₂) • (y₁ + y₂) = c₂ • c₁ • y₁ + c₁ • c₂ • y₂ := by
-          rw [smul_add, smul_smul, smul_smul, mul_comm c₂ c₁]
-        rw [e]
-        exact L.add_mem (L.smul_mem _ h₁) (L.smul_mem _ h₂)
-      zero_mem' := ⟨1, one_ne_zero, by rw [smul_zero]; exact L.zero_mem⟩
-      smul_mem' := by
-        rintro r y ⟨c, hc, h'⟩
-        refine ⟨c, hc, ?_⟩
-        rw [smul_comm]
-        exact L.smul_mem _ h'
-    }
+    let N : Submodule O R :=
+      { carrier := {y | ∃ c : O, c ≠ 0 ∧ c • y ∈ L}
+        add_mem' := by
+          rintro y₁ y₂ ⟨c₁, hc₁, h₁⟩ ⟨c₂, hc₂, h₂⟩
+          refine ⟨c₁ * c₂, mul_ne_zero hc₁ hc₂, ?_⟩
+          have e : (c₁ * c₂) • (y₁ + y₂) = c₂ • c₁ • y₁ + c₁ • c₂ • y₂ := by
+            rw [smul_add, smul_smul, smul_smul, mul_comm c₂ c₁]
+          rw [e]
+          exact L.add_mem (L.smul_mem _ h₁) (L.smul_mem _ h₂)
+        zero_mem' := ⟨1, one_ne_zero, by rw [smul_zero]; exact L.zero_mem⟩
+        smul_mem' := by
+          rintro r y ⟨c, hc, h'⟩
+          refine ⟨c, hc, ?_⟩
+          rw [smul_comm]
+          exact L.smul_mem _ h' }
     have hN : ∀ a ∈ A, ∀ b' ∈ A, W.origin h a = 0 → W.origin h b' = 0 → a * b' ∈ N := by
       intro a ha b' hb' ha0 hb0
       refine ⟨1, one_ne_zero, ?_⟩
@@ -1034,8 +983,8 @@ private theorem main
     let Γ : τ → R := fun k => if (wt k).1 = 0 then (g k : R) else (g k : R) * (g b : R)
     have hΓ : ∀ a : τ → O, a b = 0 → ∑ k, a k • Γ k = A.val (∑ i : {i // i ≠ b}, a i.1 • G i) := by
       intro a hab
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [Fintype.sum_eq_add_sum_subtype_ne _ b, hab, zero_smul, zero_add, map_sum]
+
+      rw [Fintype.sum_eq_add_sum_subtype_ne _ b, hab, zero_smul, zero_add, map_sum]
       refine Finset.sum_congr rfl fun i _ => ?_
       rw [map_smul]
       congr 1
@@ -1053,18 +1002,14 @@ private theorem main
       show W.origin h (W.π (MvPowerSeries.X s)) = 0
       rw [WPres.origin_π, MvPowerSeries.constantCoeff_X]
     have hgK : ∀ k, g k ∈ K := fun k => (hg k).2.1
-    have hh1
-        : ∀ s,
-          (W.wt s).1 = 0
-            → ∃ c : O, c ≠ 0 ∧ ∃ y ∈ N, y ∈ A ∧ c • W.z s - y ∈ RingHom.ker (W.origin h) ^ 2 := by
+    have hh1 : ∀ s, (W.wt s).1 = 0 → ∃ c : O, c ≠ 0 ∧ ∃ y ∈ N, y ∈ A ∧
+        c • W.z s - y ∈ RingHom.ker (W.origin h) ^ 2 := by
       intro s hs
-      obtain ⟨c, hc, a, ha, hm⟩ :=
-        _root_.expand H hg (j := W.wt s) (p := W.zA s) (W.z_mem s) (hzs0 s)
-      have hab : a b = 0 :=
-        ha b (fun e => by
-          have := congrArg Prod.fst e
-          rw [hb, hs] at this
-          norm_num at this)
+      obtain ⟨c, hc, a, ha, hm⟩ := _root_.expand H hg (j := W.wt s) (p := W.zA s) (W.z_mem s) (hzs0 s)
+      have hab : a b = 0 := ha b (fun e => by
+        have := congrArg Prod.fst e
+        rw [hb, hs] at this
+        norm_num at this)
       have hsum : ∑ k, a k • (g k : R) = ∑ k, a k • Γ k := by
         refine Finset.sum_congr rfl fun k _ => ?_
         by_cases hk : a k = 0
@@ -1078,44 +1023,37 @@ private theorem main
       refine ⟨c, hc, _, hN', hA', ?_⟩
       rw [← hsum]
       have e : W.A.val (c • W.zA s - ∑ k, a k • g k) = c • W.z s - ∑ k, a k • (g k : R) := by
-        set_option synthInstance.maxHeartbeats 100000 in
-          rw [map_sub, map_smul, map_sum]
+
+        rw [map_sub, map_smul, map_sum]
         simp only [map_smul]
         rfl
       rw [← e]
       exact hK 2 _ hm
-    have hh2
-        : ∀ s t,
-          (W.wt s).1 = 1 → (W.wt t).1 = -1
-            → ∃ c : O,
-              c ≠ 0 ∧ ∃ y ∈ N, y ∈ A ∧ c • (W.z s * W.z t) - y ∈ RingHom.ker (W.origin h) ^ 3 := by
+    have hh2 : ∀ s t, (W.wt s).1 = 1 → (W.wt t).1 = -1 → ∃ c : O, c ≠ 0 ∧ ∃ y ∈ N, y ∈ A ∧
+        c • (W.z s * W.z t) - y ∈ RingHom.ker (W.origin h) ^ 3 := by
       intro s t hs ht
       obtain ⟨c₁, hc₁, a₁, ha₁, hm₁⟩ :=
         _root_.expand H hg (j := W.wt s) (p := W.zA s) (W.z_mem s) (hzs0 s)
       obtain ⟨c₂, hc₂, a₂, ha₂, hm₂⟩ :=
         _root_.expand H hg (j := W.wt t) (p := W.zA t) (W.z_mem t) (hzs0 t)
-      have hb1 : a₁ b = 0 :=
-        ha₁ b (fun e => by
-          have := congrArg Prod.fst e
-          rw [hb, hs] at this
-          norm_num at this)
-      have ha₂b : ∀ k, k ≠ b → a₂ k = 0 := fun k hk =>
-        ha₂ k (fun e => by
-          have := congrArg Prod.fst e
-          rw [ht] at this
-          rcases hτ k hk with h' | h' <;> rw [h'] at this <;> norm_num at this)
+      have hb1 : a₁ b = 0 := ha₁ b (fun e => by
+        have := congrArg Prod.fst e
+        rw [hb, hs] at this
+        norm_num at this)
+      have ha₂b : ∀ k, k ≠ b → a₂ k = 0 := fun k hk => ha₂ k (fun e => by
+        have := congrArg Prod.fst e
+        rw [ht] at this
+        rcases hτ k hk with h' | h' <;> rw [h'] at this <;> norm_num at this)
       have hsum2 : ∑ k, a₂ k • g k = a₂ b • g b :=
         Fintype.sum_eq_single b (fun k hk => by rw [ha₂b k hk, zero_smul])
       rw [hsum2] at hm₂
       have huK : (∑ k, a₁ k • g k) ∈ K :=
         Submodule.sum_mem _ fun k _ => Submodule.smul_of_tower_mem _ _ (hgK k)
       have hvK : a₂ b • g b ∈ K := Submodule.smul_of_tower_mem _ _ (hgK b)
-      have hid
-          : (c₁ • W.zA s) * (c₂ • W.zA t) - (∑ k, a₁ k • g k) * (a₂ b • g b)
-            = (c₁ • W.zA s - ∑ k, a₁ k • g k) * (c₂ • W.zA t - a₂ b • g b)
-              + (c₁ • W.zA s - ∑ k, a₁ k • g k) * (a₂ b • g b)
-              + (∑ k, a₁ k • g k) * (c₂ • W.zA t - a₂ b • g b) := by
-        ring
+      have hid : (c₁ • W.zA s) * (c₂ • W.zA t) - (∑ k, a₁ k • g k) * (a₂ b • g b) =
+          (c₁ • W.zA s - ∑ k, a₁ k • g k) * (c₂ • W.zA t - a₂ b • g b) +
+            (c₁ • W.zA s - ∑ k, a₁ k • g k) * (a₂ b • g b) +
+              (∑ k, a₁ k • g k) * (c₂ • W.zA t - a₂ b • g b) := by ring
       have hm3 : (c₁ • W.zA s) * (c₂ • W.zA t) - (∑ k, a₁ k • g k) * (a₂ b • g b) ∈ K ^ 3 := by
         rw [hid]
         refine add_mem (add_mem ?_ ?_) ?_
@@ -1129,8 +1067,8 @@ private theorem main
       let a : τ → O := fun k => a₁ k * a₂ b
       have hab : a b = 0 := by simp [a, hb1]
       have hsum : W.A.val ((∑ k, a₁ k • g k) * (a₂ b • g b)) = ∑ k, a k • Γ k := by
-        set_option synthInstance.maxHeartbeats 100000 in
-          rw [map_mul, map_sum, Finset.sum_mul]
+
+        rw [map_mul, map_sum, Finset.sum_mul]
         refine Finset.sum_congr rfl fun k _ => ?_
         by_cases hk : a₁ k = 0
         · simp [a, hk]
@@ -1144,9 +1082,8 @@ private theorem main
       obtain ⟨hN', hA'⟩ := hΓN a hab
       refine ⟨c₁ * c₂, mul_ne_zero hc₁ hc₂, _, hN', hA', ?_⟩
       rw [← hsum]
-      have e
-          : W.A.val ((c₁ • W.zA s) * (c₂ • W.zA t) - (∑ k, a₁ k • g k) * (a₂ b • g b))
-            = (c₁ * c₂) • (W.z s * W.z t) - W.A.val ((∑ k, a₁ k • g k) * (a₂ b • g b)) := by
+      have e : W.A.val ((c₁ • W.zA s) * (c₂ • W.zA t) - (∑ k, a₁ k • g k) * (a₂ b • g b)) =
+          (c₁ * c₂) • (W.z s * W.z t) - W.A.val ((∑ k, a₁ k • g k) * (a₂ b • g b)) := by
         rw [map_sub, map_mul (W.A.val) (c₁ • W.zA s), map_smul, map_smul, smul_mul_smul_comm]
         rfl
       rw [← e]
@@ -1163,14 +1100,10 @@ private theorem main
 
 end PartC
 
-private theorem count
-    {τ : Type} [Fintype τ] [DecidableEq τ]
-    (wt : τ → ℤ × ℤ) (r r' m : ℕ) (hn : ∀ j, Nat.card {i // wt i = j} = tDims r r' m j)
-    : ∃ b : τ,
-      (wt b).1 = -1 ∧ (∀ i, i ≠ b → (wt i).1 = 0 ∨ (wt i).1 = 1)
-        ∧ ∀ j,
-          Nat.card {i : {i // i ≠ b} // (wt i.1).2 + (wt i.1).1 * (wt b).2 = j}
-            = mDims r 0 r' 0 m j := by
+private theorem count {τ : Type} [Fintype τ] [DecidableEq τ] (wt : τ → ℤ × ℤ) (r r' m : ℕ)
+    (hn : ∀ j, Nat.card {i // wt i = j} = tDims r r' m j) :
+    ∃ b : τ, (wt b).1 = -1 ∧ (∀ i, i ≠ b → (wt i).1 = 0 ∨ (wt i).1 = 1) ∧
+      ∀ j, Nat.card {i : {i // i ≠ b} // (wt i.1).2 + (wt i.1).1 * (wt b).2 = j} = mDims r 0 r' 0 m j := by
   classical
   have hc : ∀ j, Fintype.card {i // wt i = j} = tDims r r' m j := fun j => by
     rw [← Nat.card_eq_fintype_card]
@@ -1196,17 +1129,11 @@ private theorem count
     · left; simp [h, wPs]
     · left; simp [h]
   · intro j
-    rw [Nat.card_eq_fintype_card,
-      Fintype.card_congr (Equiv.subtypeSubtypeEquivSubtypeInter
-        (fun i => i ≠ b)
-        (fun i => (wt i).2 + (wt i).1 * (wt b).2 = j)),
-      Fintype.card_subtype]
+    rw [Nat.card_eq_fintype_card, Fintype.card_congr (Equiv.subtypeSubtypeEquivSubtypeInter
+      (fun i => i ≠ b) (fun i => (wt i).2 + (wt i).1 * (wt b).2 = j)), Fintype.card_subtype]
     rw [hb]
-    have hterm
-        : ∀ w : ℤ × ℤ,
-          ((Finset.univ.filter fun i => i ≠ b ∧ (wt i).2 + (wt i).1 * wBe.2 = j).filter fun a =>
-              wt a = w).card
-            = if w ≠ wBe ∧ w.2 + w.1 = j then tDims r r' m w else 0 := by
+    have hterm : ∀ w : ℤ × ℤ, ((Finset.univ.filter fun i => i ≠ b ∧ (wt i).2 + (wt i).1 * wBe.2 = j).filter
+        fun a => wt a = w).card = if w ≠ wBe ∧ w.2 + w.1 = j then tDims r r' m w else 0 := by
       intro w
       have hw1 : wBe.2 = 1 := rfl
       split_ifs with hw
@@ -1254,10 +1181,8 @@ private theorem count
     unfold mDims
     split_ifs <;> omega
 
-theorem UpperTheory.V.GradeZeroInterpolatingElement.aSmooth
-    : ∀ {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {l : ℕ} [Fact l.Prime] {c : Coef l}
-        (D : Raw Ω c),
-      D.Good → ∀ M : Model D, SmoothPt M.gr M.x0 (mDims M.r 0 M.r' 0 M.m) := by
+theorem UpperTheory.V.GradeZeroInterpolatingElement.aSmooth :
+    ∀ {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {l : ℕ} [Fact l.Prime] {c : Coef l} (D : Raw Ω c), D.Good → ∀ M : Model D, SmoothPt M.gr M.x0 (mDims M.r 0 M.r' 0 M.m) := by
   intro Ω _ _ _ l _ c D _ M
   obtain ⟨τ, hτ, wt, φ, H, hn⟩ := M.smooth
   classical
@@ -1266,8 +1191,7 @@ theorem UpperTheory.V.GradeZeroInterpolatingElement.aSmooth
     intro i
     have := M.wt_mem i
     simp only [wts, oddRoots, wAl, wBe, wTh, wPs, Finset.mem_union, Finset.mem_insert,
-        Finset.mem_singleton]
-      at this
+      Finset.mem_singleton] at this
     rcases this with ((h | h | h | h | h | h) | h | h | h) <;> rw [h] <;> simp
   obtain ⟨ψ, hψ⟩ := main M.W M.org hw M.A (fun f => Iff.rfl) wt φ H b hb hτb
   exact ⟨{i // i ≠ b}, inferInstance, _, ψ, hψ, hcount⟩

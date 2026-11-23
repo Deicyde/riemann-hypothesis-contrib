@@ -1,11 +1,55 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ValRingLocRing
 public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.TranslateMemCoefLatFn
-public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.OmPureTensorOOfFinite
-public import Development.AbelianVarietyTheory.Proofs.CuspFormEvaluations.ExistsNatCastSmulCoeffIsIntegral
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.IsHomogeneousOfRowDeg
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Development.AbelianVarietyTheory.Definitions.Divisors.PerCEmb
+import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.IntFormsSubset
+import Development.AbelianVarietyTheory.Definitions.SpanningFamilies.DatEqZero
+public import Development.AbelianVarietyTheory.Definitions.SpanningFamilies.IMemSiegel
+import Development.AbelianVarietyTheory.Definitions.SpanningFamilies.IsStabForm
+public import Development.AbelianVarietyTheory.Definitions.SpanningFamilies.IsSystem
+import Development.AbelianVarietyTheory.Definitions.ThetaValues.PolyDerivSmulLetter
+import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.IsInertTop
+import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ValRingLocRing
+import Formalism.LocalToGlobal.IndefiniteReal.ExistsChosenExtremalVector
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.FundamentalDomains.OnbPerp
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.SymplecticGenerators.StTransl
 
 @[expose] public section
 
@@ -21,7 +65,7 @@ open Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH
 open GlobalTheory.SingleDatum GlobalTheory.CoverRead
 open scoped TensorProduct Classical
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
-set_option synthInstance.maxHeartbeats 400000
+
 open GlobalTheory.LevelSeries
 
 namespace GlobalTheory.FockCoefInt
@@ -38,7 +82,7 @@ def coeffSub (O : Subring ℂ) (σ : Type) : Subring (MvPolynomial σ ℂ) where
     · exact O.zero_mem
   add_mem' {a b} ha hb mo := by rw [MvPolynomial.coeff_add]; exact O.add_mem (ha mo) (hb mo)
   zero_mem' mo := by rw [AddMonoidAlgebra.coeff_zero]; exact O.zero_mem
-  neg_mem' {a} ha mo := by rw [coeff_neg]; exact O.neg_mem (ha mo)
+  neg_mem' {a} ha mo := by rw [MvPolynomial.coeff_neg]; exact O.neg_mem (ha mo)
 
 theorem C_mem_coeffSub {O : Subring ℂ} {σ : Type} {c : ℂ} (hc : c ∈ O)
     : (C c : MvPolynomial σ ℂ) ∈ coeffSub O σ := by
@@ -54,8 +98,8 @@ theorem C_pow_mul_aeval_mem
     (d : ℕ) (P : MvPolynomial σ ℂ) (hP : P.IsHomogeneous d) (hc : P ∈ coeffSub O σ)
     : C (z ^ d) * aeval g P ∈ coeffSub O σ := by
   rw [P.as_sum]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum, Finset.mul_sum]
+
+  rw [map_sum, Finset.mul_sum]
   refine Subring.sum_mem _ fun mo hmo => ?_
   have hdeg : ∑ v ∈ mo.support, mo v = d := by
     have := hP (mem_support_iff.mp hmo)

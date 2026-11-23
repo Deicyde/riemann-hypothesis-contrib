@@ -1,21 +1,52 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.Definitions.LatticeFrames.SplitPart
-public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.CongAt
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.BaseFieldsDefiniteLaws
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CharacterSumLocalConstantThird
+public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.LatAtLattice
 public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.IntegralPowerExpansion
-public import Formalism.LocalToGlobal.Columns.ChainInst
+import Formalism.LocalRingCardinality.SpanPowerMembership.LocAtA
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Coalgebra.CoassocSimps
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Development.AbelianVarietyTheory.Definitions.LatticeFrames.FiniteDimensionalMram
+import Development.AbelianVarietyTheory.Definitions.LatticeFrames.MidChart
+import Development.AbelianVarietyTheory.Definitions.TwistedInnerProducts.WittSmallGroupEmbeddingMemPointwiseStabilizerIso
+import Formalism.LocalToGlobal.IndefiniteReal.LinksDefs
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH
-  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
-  Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links
-  Formalism.L2.Forms Formalism.L2.Ker Formalism.UG
-open NumberField IsDedekindDomain Matrix MeasureTheory GlobalTheory.Mem GlobalTheory.Mem.Col2
-  GlobalTheory.MixPer GlobalTheory.Core.Rk GlobalTheory.AdForm
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.Forms Formalism.L2.Ker Formalism.UG
+open NumberField IsDedekindDomain Matrix MeasureTheory GlobalTheory.Mem GlobalTheory.Mem.Col2 GlobalTheory.MixPer GlobalTheory.Core.Rk GlobalTheory.AdForm
 open scoped TensorProduct Classical
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -35,30 +66,28 @@ variable {v} {a b c : Type}
 
 theorem SmallM.int {M : Matrix a b K} (h : SmallM v M) : IntM v M := fun i j => (h i j).le
 
-theorem IntM.add {M N : Matrix a b K} (h : IntM v M) (h' : IntM v N) : IntM v (M + N) := fun i j =>
-  v.map_add_le (h i j) (h' i j)
+theorem IntM.add {M N : Matrix a b K} (h : IntM v M) (h' : IntM v N) : IntM v (M + N) :=
+  fun i j => v.map_add_le (h i j) (h' i j)
 
-theorem IntM.sub {M N : Matrix a b K} (h : IntM v M) (h' : IntM v N) : IntM v (M - N) := fun i j =>
-  v.map_sub_le (h i j) (h' i j)
+theorem IntM.sub {M N : Matrix a b K} (h : IntM v M) (h' : IntM v N) : IntM v (M - N) :=
+  fun i j => v.map_sub_le (h i j) (h' i j)
 
 theorem SmallM.sub {M N : Matrix a b K} (h : SmallM v M) (h' : SmallM v N) : SmallM v (M - N) :=
   fun i j => v.map_sub_lt (h i j) (h' i j)
 
-theorem IntM.mul [Fintype b] {M : Matrix a b K} {N : Matrix b c K} (h : IntM v M) (h' : IntM v N)
-    : IntM v (M * N) := fun i j => by
-  rw [Matrix.mul_apply]
-  exact v.map_sum_le fun l _ => by rw [map_mul]; exact mul_le_one' (h i l) (h' l j)
+theorem IntM.mul [Fintype b] {M : Matrix a b K} {N : Matrix b c K} (h : IntM v M) (h' : IntM v N) : IntM v (M * N) :=
+  fun i j => by
+    rw [Matrix.mul_apply]
+    exact v.map_sum_le fun l _ => by rw [map_mul]; exact mul_le_one' (h i l) (h' l j)
 
-theorem SmallM.mul_int
-    [Fintype b] {M : Matrix a b K} {N : Matrix b c K} (h : SmallM v M) (h' : IntM v N)
-    : SmallM v (M * N) := fun i j => by
+theorem SmallM.mul_int [Fintype b] {M : Matrix a b K} {N : Matrix b c K} (h : SmallM v M) (h' : IntM v N) :
+    SmallM v (M * N) := fun i j => by
   rw [Matrix.mul_apply]
   exact v.map_sum_lt one_ne_zero fun l _ => by
     rw [map_mul]; exact lt_of_le_of_lt (mul_le_of_le_one_right' (h' l j)) (h i l)
 
-theorem IntM.mul_small
-    [Fintype b] {M : Matrix a b K} {N : Matrix b c K} (h : IntM v M) (h' : SmallM v N)
-    : SmallM v (M * N) := fun i j => by
+theorem IntM.mul_small [Fintype b] {M : Matrix a b K} {N : Matrix b c K} (h : IntM v M) (h' : SmallM v N) :
+    SmallM v (M * N) := fun i j => by
   rw [Matrix.mul_apply]
   exact v.map_sum_lt one_ne_zero fun l _ => by
     rw [map_mul]; exact lt_of_le_of_lt (mul_le_of_le_one_left' (h i l)) (h' l j)
@@ -70,14 +99,10 @@ theorem intM_one [DecidableEq a] : IntM v (1 : Matrix a a K) := fun i j => by
 theorem intM_of_near [DecidableEq a] {A : Matrix a a K} (h : SmallM v (A - 1)) : IntM v A := by
   simpa using h.int.add intM_one
 
-theorem intM_of_mul_left
-    [Fintype a] [DecidableEq a]
-    {A : Matrix a a K} (h : SmallM v (A - 1))
-    {Y : Matrix a b K} (hY : IntM v (A * Y))
-    : IntM v Y := by
+theorem intM_of_mul_left [Fintype a] [DecidableEq a] {A : Matrix a a K} (h : SmallM v (A - 1)) {Y : Matrix a b K}
+    (hY : IntM v (A * Y)) : IntM v Y := by
   intro i j
-  obtain ⟨l, -, hl⟩ :=
-    Finset.exists_max_image Finset.univ (fun l => v (Y l j)) ⟨i, Finset.mem_univ _⟩
+  obtain ⟨l, -, hl⟩ := Finset.exists_max_image Finset.univ (fun l => v (Y l j)) ⟨i, Finset.mem_univ _⟩
   refine (hl i (Finset.mem_univ _)).trans ?_
   by_contra hn
   push_neg at hn
@@ -94,11 +119,8 @@ theorem intM_of_mul_left
   rw [← e] at h2
   exact lt_irrefl _ h2
 
-theorem intM_of_mul_right
-    [Fintype a] [DecidableEq a]
-    {A : Matrix a a K} (h : SmallM v (A - 1))
-    {Y : Matrix b a K} (hY : IntM v (Y * A))
-    : IntM v Y := by
+theorem intM_of_mul_right [Fintype a] [DecidableEq a] {A : Matrix a a K} (h : SmallM v (A - 1)) {Y : Matrix b a K}
+    (hY : IntM v (Y * A)) : IntM v Y := by
   have h1 : SmallM v (Aᵀ - 1) := fun i j => by
     have := h j i
     simpa [Matrix.one_apply, eq_comm] using this
@@ -107,15 +129,12 @@ theorem intM_of_mul_right
     exact hY j i
   exact fun i j => intM_of_mul_left h1 h2 j i
 
-theorem two_sided
-    [Fintype a] [DecidableEq a] [Fintype b] [DecidableEq b]
-    {A : Matrix a a K} {C : Matrix b b K} (hA : SmallM v (A - 1)) (hC : SmallM v (C - 1))
-    {Y Z : Matrix a b K} (e : A * Y = Z * C)
-    : (IntM v Y ↔ IntM v Z) ∧ (IntM v Y → SmallM v (Y - Z)) := by
-  have h1 : IntM v Y ↔ IntM v Z := ⟨
-    fun h => intM_of_mul_right hC (e ▸ (intM_of_near hA).mul h),
-    fun h => intM_of_mul_left hA (e ▸ h.mul (intM_of_near hC))
-  ⟩
+theorem two_sided [Fintype a] [DecidableEq a] [Fintype b] [DecidableEq b] {A : Matrix a a K} {C : Matrix b b K}
+    (hA : SmallM v (A - 1)) (hC : SmallM v (C - 1)) {Y Z : Matrix a b K} (e : A * Y = Z * C) :
+    (IntM v Y ↔ IntM v Z) ∧ (IntM v Y → SmallM v (Y - Z)) := by
+  have h1 : IntM v Y ↔ IntM v Z :=
+    ⟨fun h => intM_of_mul_right hC (e ▸ (intM_of_near hA).mul h),
+      fun h => intM_of_mul_left hA (e ▸ h.mul (intM_of_near hC))⟩
   refine ⟨h1, fun h => ?_⟩
   have e2 : Y - Z = Z * (C - 1) - (A - 1) * Y := by
     rw [Matrix.mul_sub, Matrix.sub_mul, Matrix.mul_one, Matrix.one_mul, e]
@@ -131,50 +150,46 @@ open Formalism.L2.Col Formalism.L2.DIV GlobalTheory.TopStep
 
 variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] [StarRing E]
 
-def ratM (P : HeightOneSpectrum (𝓞 E)) {a b : ℕ} (x : HomE E a b)
-    : Matrix (Fin b) (Fin a) (P.adicCompletion E) :=
+def ratM (P : HeightOneSpectrum (𝓞 E)) {a b : ℕ} (x : HomE E a b) : Matrix (Fin b) (Fin a) (P.adicCompletion E) :=
   (LinearMap.toMatrix' x).map (algebraMap E (P.adicCompletion E))
 
+
 variable (F) in
-def locM (P : HeightOneSpectrum (𝓞 E)) {n : ℕ} (g : GL (Fin n) (AfE F E))
-    : Matrix (Fin n) (Fin n) (P.adicCompletion E) :=
+def locM (P : HeightOneSpectrum (𝓞 E)) {n : ℕ} (g : GL (Fin n) (AfE F E)) : Matrix (Fin n) (Fin n) (P.adicCompletion E) :=
   (g : Matrix (Fin n) (Fin n) (AfE F E)).map (adAt F P)
 
 omit [StarRing E] in
-theorem ratM_comp (P : HeightOneSpectrum (𝓞 E)) {a b c : ℕ} (x : HomE E b c) (y : HomE E a b)
-    : ratM P (x ∘ₗ y) = ratM P x * ratM P y := by
+theorem ratM_comp (P : HeightOneSpectrum (𝓞 E)) {a b c : ℕ} (x : HomE E b c) (y : HomE E a b) :
+    ratM P (x ∘ₗ y) = ratM P x * ratM P y := by
   unfold ratM
   rw [LinearMap.toMatrix'_comp, Matrix.map_mul]
 
 omit [StarRing E] in
-theorem locM_mul (P : HeightOneSpectrum (𝓞 E)) {n : ℕ} (g h : GL (Fin n) (AfE F E))
-    : locM F P (g * h) = locM F P g * locM F P h := by
+theorem locM_mul (P : HeightOneSpectrum (𝓞 E)) {n : ℕ} (g h : GL (Fin n) (AfE F E)) :
+    locM F P (g * h) = locM F P g * locM F P h := by
   unfold locM
   rw [Units.val_mul, Matrix.map_mul]
 
 omit [StarRing E] in
-theorem locM_one (P : HeightOneSpectrum (𝓞 E)) {n : ℕ}
-    : locM F P (1 : GL (Fin n) (AfE F E)) = 1 := by
+theorem locM_one (P : HeightOneSpectrum (𝓞 E)) {n : ℕ} : locM F P (1 : GL (Fin n) (AfE F E)) = 1 := by
   unfold locM
   rw [Units.val_one, Matrix.map_one _ (map_zero _) (map_one _)]
 
 omit [StarRing E] in
-theorem ratM_apply (P : HeightOneSpectrum (𝓞 E)) {a b : ℕ} (x : HomE E a b) (i : Fin b) (j : Fin a)
-    : ratM P x i j = algebraMap E _ (x (Pi.single j 1) i) := by
+theorem ratM_apply (P : HeightOneSpectrum (𝓞 E)) {a b : ℕ} (x : HomE E a b) (i : Fin b) (j : Fin a) :
+    ratM P x i j = algebraMap E _ (x (Pi.single j 1) i) := by
   simp [ratM, LinearMap.toMatrix'_apply]
 
 omit [StarRing E] in
-theorem intM_ratM (P : HeightOneSpectrum (𝓞 E)) {a b : ℕ} (x : HomE E a b)
-    : IntM Valued.v (ratM P x) ↔ ∀ j i, IntAt P (x (Pi.single j 1) i) := by
+theorem intM_ratM (P : HeightOneSpectrum (𝓞 E)) {a b : ℕ} (x : HomE E a b) :
+    IntM Valued.v (ratM P x) ↔ ∀ j i, IntAt P (x (Pi.single j 1) i) := by
   unfold IntM
   simp only [ratM_apply, valued_algebraMap, GlobalTheory.Proof.IntegralPowerExpansion.intAt_iff_val]
   exact forall_comm
 
 omit [StarRing E] in
-theorem intAt_div_of_val
-    {P : HeightOneSpectrum (𝓞 E)} (hq : ((qOf P : ℕ) : 𝓞 E) ∉ P.asIdeal ^ 2)
-    {a : E} (h : P.valuation E a < 1)
-    : IntAt P (a / (qOf P : E)) := by
+theorem intAt_div_of_val {P : HeightOneSpectrum (𝓞 E)} (hq : ((qOf P : ℕ) : 𝓞 E) ∉ P.asIdeal ^ 2) {a : E}
+    (h : P.valuation E a < 1) : IntAt P (a / (qOf P : E)) := by
   have ha : IntAt P a := (GlobalTheory.Proof.IntegralPowerExpansion.intAt_iff_val P a).2 h.le
   refine intAt_div_of_redP hq ha ?_
   obtain ⟨r, s, hs, e⟩ := ha
@@ -188,19 +203,17 @@ theorem intAt_div_of_val
   have := P.isPrime
   exact (mul_eq_zero.1 h1).resolve_left fun h0 => hs (Ideal.Quotient.eq_zero_iff_mem.1 h0)
 
-theorem single_std {n : ℕ} (P : HeightOneSpectrum (𝓞 E)) (j : Fin n)
-    : (Pi.single j 1 : Sp E n) ∈ stdAt E n P :=
+theorem single_std {n : ℕ} (P : HeightOneSpectrum (𝓞 E)) (j : Fin n) : (Pi.single j 1 : Sp E n) ∈ stdAt E n P :=
   mem_stdAt.2 fun i => by
     rw [Pi.single_apply]
     split_ifs
     · exact intAt_one
     · exact intAt_zero
 
-variable
-  {hc : Formalism.BasicNotions.CMData F E} {n : ℕ} {ST SG Q : Finset (HeightOneSpectrum (𝓞 E))}
+variable {hc : Formalism.BasicNotions.CMData F E} {n : ℕ} {ST SG Q : Finset (HeightOneSpectrum (𝓞 E))}
 
-theorem frame_near {g : GL (Fin n) (AfE F E)} {p : DecoF E n ST SG Q} (h : IsPtOf hc g p) (w : SG)
-    : SmallM Valued.v (locM F w.1 g⁻¹ * ratM w.1 (p.deco.1.liftFr w).toLinearMap - 1) := by
+theorem frame_near {g : GL (Fin n) (AfE F E)} {p : DecoF E n ST SG Q} (h : IsPtOf hc g p) (w : SG) :
+    SmallM Valued.v (locM F w.1 g⁻¹ * ratM w.1 (p.deco.1.liftFr w).toLinearMap - 1) := by
   intro i j
   obtain ⟨h1, h2⟩ := liftFr_spec p.deco.2 w
   have hz := (h1 _).2 (single_std w.1 j)
@@ -210,11 +223,8 @@ theorem frame_near {g : GL (Fin n) (AfE F E)} {p : DecoF E n ST SG Q} (h : IsPtO
   obtain ⟨s, hs0, hsz⟩ : ∃ s ∈ w.1.asIdeal.primeCompl, s • z ∈ p.deco.1.N := id hz
   obtain ⟨r, hr, hv⟩ := h.be w _ hsz i
   rw [hs s z hz, hb] at hr
-  have hδ
-      : ∃ d : 𝓞 E,
-        redV w.1 (Pi.single j 1 : Sp E n) i = Ideal.Quotient.mk _ d
-          ∧ (1 : Matrix (Fin n) (Fin n) (w.1.adicCompletion E)) i j
-            = algebraMap E _ (algebraMap (𝓞 E) E d) := by
+  have hδ : ∃ d : 𝓞 E, redV w.1 (Pi.single j 1 : Sp E n) i = Ideal.Quotient.mk _ d ∧
+      (1 : Matrix (Fin n) (Fin n) (w.1.adicCompletion E)) i j = algebraMap E _ (algebraMap (𝓞 E) E d) := by
     unfold redV
     rw [Pi.single_apply, Matrix.one_apply]
     split_ifs
@@ -222,38 +232,29 @@ theorem frame_near {g : GL (Fin n) (AfE F E)} {p : DecoF E n ST SG Q} (h : IsPtO
     · exact ⟨0, by rw [reduction_zero, map_zero], by simp⟩
   obtain ⟨d, hd, hd'⟩ := hδ
   rw [Pi.smul_apply, hd, smul_eq_mul, ← map_mul] at hr
-  have hr'
-      : Valued.v (algebraMap E (w.1.adicCompletion E) (algebraMap (𝓞 E) E (r - s * d))) < 1 := by
+  have hr' : Valued.v (algebraMap E (w.1.adicCompletion E) (algebraMap (𝓞 E) E (r - s * d))) < 1 := by
     rw [valued_algebraMap, HeightOneSpectrum.valuation_lt_one_iff_mem]
     exact Ideal.Quotient.eq.1 hr
   have hs1 : Valued.v (algebraMap E (w.1.adicCompletion E) (algebraMap (𝓞 E) E s)) = 1 := by
     rw [valued_algebraMap]
     refine le_antisymm (w.1.valuation_le_one s) (not_lt.1 fun hlt => hs0 ?_)
     exact (HeightOneSpectrum.valuation_lt_one_iff_mem (K := E) w.1 s).1 hlt
-  have e
-      : adAt F w.1 (Col2.pullV g (s • z) i)
-        = algebraMap E (w.1.adicCompletion E) (algebraMap (𝓞 E) E s)
-          * (locM F w.1 g⁻¹ * ratM w.1 (p.deco.1.liftFr w).toLinearMap : Matrix (Fin n) (Fin n) _) i
-            j := by
+  have e : adAt F w.1 (Col2.pullV g (s • z) i) = algebraMap E (w.1.adicCompletion E) (algebraMap (𝓞 E) E s) *
+      (locM F w.1 g⁻¹ * ratM w.1 (p.deco.1.liftFr w).toLinearMap : Matrix (Fin n) (Fin n) _) i j := by
     rw [Matrix.mul_apply, Finset.mul_sum]
     unfold Col2.pullV
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [Matrix.mulVec, dotProduct, map_sum]
+
+    rw [Matrix.mulVec, dotProduct, map_sum]
     refine Finset.sum_congr rfl fun l _ => ?_
     rw [map_mul, adAt_inclE, ratM_apply, Pi.smul_apply, Algebra.smul_def, map_mul]
     change locM F w.1 g⁻¹ i l * _ = _ * (_ * algebraMap E _ (z l))
     ring
   have h3 := Valuation.map_add_lt _ hv hr'
-  rw [e, map_sub, map_sub, map_mul, map_mul, sub_add_sub_cancel, ← mul_sub, map_mul, hs1, one_mul,
-      ← hd']
-    at h3
+  rw [e, map_sub, map_sub, map_mul, map_mul, sub_add_sub_cancel, ← mul_sub, map_mul, hs1, one_mul, ← hd'] at h3
   exact h3
 
-theorem locM_int
-    {g : GL (Fin n) (AfE F E)} {p : DecoF E n ST SG Q}
-    (h : IsPtOf hc g p) (hN : p.deco.1.N = Formalism.L2.Col.stdLat E n)
-    (w : SG)
-    : IntM Valued.v (locM F w.1 g) ∧ IntM Valued.v (locM F w.1 g⁻¹) := by
+theorem locM_int {g : GL (Fin n) (AfE F E)} {p : DecoF E n ST SG Q} (h : IsPtOf hc g p) (hN : p.deco.1.N = Formalism.L2.Col.stdLat E n) (w : SG) :
+    IntM Valued.v (locM F w.1 g) ∧ IntM Valued.v (locM F w.1 g⁻¹) := by
   have h0 := frame_near h w
   have h1 : ∀ x, p.deco.1.liftFr w x ∈ stdAt E n w.1 ↔ x ∈ stdAt E n w.1 := fun x => by
     have := (liftFr_spec p.deco.2 w).1 x
@@ -262,58 +263,43 @@ theorem locM_int
   have hf : IntM Valued.v (ratM w.1 f.toLinearMap) :=
     (intM_ratM _ _).2 fun j => mem_stdAt.1 ((h1 _).2 (single_std w.1 j))
   have hf' : IntM Valued.v (ratM w.1 f.symm.toLinearMap) :=
-    (intM_ratM _ _).2 fun j =>
-      mem_stdAt.1 ((h1 _).1
-        (by rw [LinearEquiv.coe_coe, LinearEquiv.apply_symm_apply]; exact single_std w.1 j))
+    (intM_ratM _ _).2 fun j => mem_stdAt.1 ((h1 _).1 (by
+      rw [LinearEquiv.coe_coe, LinearEquiv.apply_symm_apply]; exact single_std w.1 j))
   constructor
   · refine intM_of_mul_right h0 ?_
     rwa [← Matrix.mul_assoc, ← locM_mul, mul_inv_cancel, locM_one, Matrix.one_mul]
   · have := (intM_of_near h0).mul hf'
-    rwa [Matrix.mul_assoc, ← ratM_comp, LinearEquiv.comp_coe, LinearEquiv.symm_trans_self,
-        LinearEquiv.refl_toLinearMap, ratM, LinearMap.toMatrix'_id,
-        Matrix.map_one _ (map_zero _) (map_one _), Matrix.mul_one]
-      at this
+    rwa [Matrix.mul_assoc, ← ratM_comp, LinearEquiv.comp_coe, LinearEquiv.symm_trans_self, LinearEquiv.refl_toLinearMap,
+      ratM, LinearMap.toMatrix'_id, Matrix.map_one _ (map_zero _) (map_one _), Matrix.mul_one] at this
 
-theorem read_cong
-    {a b : ℕ} {ST' : Finset (HeightOneSpectrum (𝓞 E))} {k y : GL (Fin a) (AfE F E)}
-    {k' y' : GL (Fin b) (AfE F E)} {p q : DecoF E a ST SG Q} {p' q' : DecoF E b ST' SG Q}
-    (hp : IsPtOf hc k p) (hN : p.deco.1.N = Formalism.L2.Col.stdLat E a) (hp' : IsPtOf hc k' p')
-    (hN' : p'.deco.1.N = Formalism.L2.Col.stdLat E b) (hq : IsPtOf hc (y * k) q)
-    (hq' : IsPtOf hc (y' * k') q')
-    (w : SG) (x x₀ : HomE E a b)
-    (hx : SmallM Valued.v (locM F w.1 y'⁻¹ * ratM w.1 x * locM F w.1 y - ratM w.1 x₀))
-    : (IntM Valued.v (ratM w.1 (inFr (p.deco.1.liftFr w) (p'.deco.1.liftFr w) x₀))
-        ↔ IntM Valued.v (ratM w.1 (inFr (q.deco.1.liftFr w) (q'.deco.1.liftFr w) x)))
-      ∧ (IntM Valued.v (ratM w.1 (inFr (p.deco.1.liftFr w) (p'.deco.1.liftFr w) x₀))
-        → SmallM Valued.v
-          (ratM w.1 (inFr (p.deco.1.liftFr w) (p'.deco.1.liftFr w) x₀)
-            - ratM w.1 (inFr (q.deco.1.liftFr w) (q'.deco.1.liftFr w) x))) := by
-  have key
-      : ∀ (g : GL (Fin a) (AfE F E)) (g' : GL (Fin b) (AfE F E)) (f : Sp E a ≃ₗ[E] Sp E a)
-          (f' : Sp E b ≃ₗ[E] Sp E b) (z : HomE E a b),
-        (locM F w.1 g'⁻¹ * ratM w.1 f'.toLinearMap) * ratM w.1 (inFr f f' z)
-          = (locM F w.1 g'⁻¹ * ratM w.1 z * locM F w.1 g)
-            * (locM F w.1 g⁻¹ * ratM w.1 f.toLinearMap) := by
+theorem read_cong {a b : ℕ} {ST' : Finset (HeightOneSpectrum (𝓞 E))} {k y : GL (Fin a) (AfE F E)} {k' y' : GL (Fin b) (AfE F E)}
+    {p q : DecoF E a ST SG Q} {p' q' : DecoF E b ST' SG Q} (hp : IsPtOf hc k p) (hN : p.deco.1.N = Formalism.L2.Col.stdLat E a)
+    (hp' : IsPtOf hc k' p') (hN' : p'.deco.1.N = Formalism.L2.Col.stdLat E b) (hq : IsPtOf hc (y * k) q) (hq' : IsPtOf hc (y' * k') q') (w : SG)
+    (x x₀ : HomE E a b) (hx : SmallM Valued.v (locM F w.1 y'⁻¹ * ratM w.1 x * locM F w.1 y - ratM w.1 x₀)) :
+    (IntM Valued.v (ratM w.1 (inFr (p.deco.1.liftFr w) (p'.deco.1.liftFr w) x₀)) ↔
+      IntM Valued.v (ratM w.1 (inFr (q.deco.1.liftFr w) (q'.deco.1.liftFr w) x))) ∧
+    (IntM Valued.v (ratM w.1 (inFr (p.deco.1.liftFr w) (p'.deco.1.liftFr w) x₀)) →
+      SmallM Valued.v (ratM w.1 (inFr (p.deco.1.liftFr w) (p'.deco.1.liftFr w) x₀) -
+        ratM w.1 (inFr (q.deco.1.liftFr w) (q'.deco.1.liftFr w) x))) := by
+  have key : ∀ (g : GL (Fin a) (AfE F E)) (g' : GL (Fin b) (AfE F E)) (f : Sp E a ≃ₗ[E] Sp E a) (f' : Sp E b ≃ₗ[E] Sp E b)
+      (z : HomE E a b), (locM F w.1 g'⁻¹ * ratM w.1 f'.toLinearMap) * ratM w.1 (inFr f f' z) =
+        (locM F w.1 g'⁻¹ * ratM w.1 z * locM F w.1 g) * (locM F w.1 g⁻¹ * ratM w.1 f.toLinearMap) := by
     intro g g' f f' z
     have e : f'.toLinearMap ∘ₗ inFr f f' z = z ∘ₗ f.toLinearMap := by
       ext v l
       simp [inFr]
-    rw [Matrix.mul_assoc, ← ratM_comp, e, ratM_comp, Matrix.mul_assoc _ (locM F w.1 g),
-      ← Matrix.mul_assoc (locM F w.1 g), ← locM_mul, mul_inv_cancel, locM_one, Matrix.one_mul,
-      Matrix.mul_assoc]
+    rw [Matrix.mul_assoc, ← ratM_comp, e, ratM_comp, Matrix.mul_assoc _ (locM F w.1 g), ← Matrix.mul_assoc (locM F w.1 g),
+      ← locM_mul, mul_inv_cancel, locM_one, Matrix.one_mul, Matrix.mul_assoc]
   obtain ⟨a1, a2⟩ := two_sided (frame_near hp' w) (frame_near hp w) (key _ _ _ _ x₀)
   obtain ⟨b1, b2⟩ := two_sided (frame_near hq' w) (frame_near hq w) (key _ _ _ _ x)
   have hD := ((locM_int hp' hN' w).2.mul_small hx).mul_int (locM_int hp hN w).1
-  have e
-      : locM F w.1 k'⁻¹ * (locM F w.1 y'⁻¹ * ratM w.1 x * locM F w.1 y - ratM w.1 x₀) * locM F w.1 k
-        = locM F w.1 (y' * k')⁻¹ * ratM w.1 x * locM F w.1 (y * k)
-          - locM F w.1 k'⁻¹ * ratM w.1 x₀ * locM F w.1 k := by
+  have e : locM F w.1 k'⁻¹ * (locM F w.1 y'⁻¹ * ratM w.1 x * locM F w.1 y - ratM w.1 x₀) * locM F w.1 k =
+      locM F w.1 (y' * k')⁻¹ * ratM w.1 x * locM F w.1 (y * k) - locM F w.1 k'⁻¹ * ratM w.1 x₀ * locM F w.1 k := by
     rw [_root_.mul_inv_rev, locM_mul, locM_mul, Matrix.mul_sub, Matrix.sub_mul]
     simp only [Matrix.mul_assoc]
   rw [e] at hD
-  have c1
-      : IntM Valued.v (locM F w.1 k'⁻¹ * ratM w.1 x₀ * locM F w.1 k)
-        ↔ IntM Valued.v (locM F w.1 (y' * k')⁻¹ * ratM w.1 x * locM F w.1 (y * k)) :=
+  have c1 : IntM Valued.v (locM F w.1 k'⁻¹ * ratM w.1 x₀ * locM F w.1 k) ↔
+      IntM Valued.v (locM F w.1 (y' * k')⁻¹ * ratM w.1 x * locM F w.1 (y * k)) :=
     ⟨fun h => by simpa using hD.int.add h, fun h => by simpa using h.sub hD.int⟩
   have c2 := a1.trans (c1.trans b1.symm)
   refine ⟨c2, fun h => ?_⟩
@@ -327,18 +313,13 @@ section Top
 
 open Formalism.L2.Col Formalism.L2.DIV GlobalTheory.TopStep
 
-variable
-  {X : Fields} {Pr : Primes X} {R : Ranks} {Ch : Chars X Pr R.m}
-  {sel : HeightOneSpectrum (𝓞 X.F) → HeightOneSpectrum (𝓞 X.E)} {S : Set ℕ} {mu : Tup X.F X.E X.K S}
-  {cst : LocCst X (rowSG Pr sel mu)} {m2 : ℕ}
+variable {X : Fields} {Pr : Primes X} {R : Ranks} {Ch : Chars X Pr R.m}
+  {sel : HeightOneSpectrum (𝓞 X.F) → HeightOneSpectrum (𝓞 X.E)} {S : Set ℕ}
+  {mu : Tup X.F X.E X.K S} {cst : LocCst X (rowSG Pr sel mu)} {m2 : ℕ}
 
-theorem locTop_shift
-    (hc : cst.Ok)
-    {P : rowSG Pr sel mu} (hP : P.1 ∈ Pr.vGs)
-    (y : HomE X.E (R.N (m2 + 1)) (R.N R.m))
-    {a b : Sp X.E (R.N (m2 + 1))}
-    (ha : ∀ i, IntAt P.1 ((qOf P.1 : X.E) * a i)) (hb : ∀ i, IntAt P.1 (b i - a i))
-    : locTop Ch sel mu cst m2 P y b = locTop Ch sel mu cst m2 P y a := by
+theorem locTop_shift (hc : cst.Ok) {P : rowSG Pr sel mu} (hP : P.1 ∈ Pr.vGs)
+    (y : HomE X.E (R.N (m2 + 1)) (R.N R.m)) {a b : Sp X.E (R.N (m2 + 1))} (ha : ∀ i, IntAt P.1 ((qOf P.1 : X.E) * a i))
+    (hb : ∀ i, IntAt P.1 (b i - a i)) : locTop Ch sel mu cst m2 P y b = locTop Ch sel mu cst m2 P y a := by
   unfold locTop
   congr 1
   generalize atNL X.E (R.N R.m) (R.N R.m - 1) ∘ₗ y = η
@@ -347,7 +328,7 @@ theorem locTop_shift
   split_ifs with h
   · have ev : ∀ z : Sp X.E (R.N (m2 + 1)), η z = ∑ j, z j * η (Pi.single j 1) := fun z => by
       conv_lhs => rw [pi_eq_sum_univ' z]
-      set_option synthInstance.maxHeartbeats 100000 in
+
       simp [map_sum]
     have he : IntAt P.1 ((epsSg : ℤ) : X.E) := intCast_mem (intRing P.1) _
     have hd : IntAt P.1 ((epsSg : X.E) * η (b - a)) := by
@@ -355,9 +336,8 @@ theorem locTop_shift
       exact he.mul (intAt_sum _ fun j _ => (hb j).mul (h j))
     have hz' : IntAt P.1 ((qOf P.1 : X.E) ^ cst.D P * ((epsSg : X.E) * η a)) := by
       obtain ⟨D, hD⟩ : ∃ D, cst.D P = D + 1 := ⟨cst.D P - 1, by have := hc.D_pos P; omega⟩
-      have :=
-        (intAt_pow (intAt_nat (P := P.1) (qOf P.1)) D).mul
-          (he.mul (intAt_sum Finset.univ fun j _ => (ha j).mul (h j)))
+      have := (intAt_pow (intAt_nat (P := P.1) (qOf P.1)) D).mul
+        (he.mul (intAt_sum Finset.univ fun j _ => (ha j).mul (h j)))
       convert this using 1
       rw [hD, ev, pow_succ, Finset.mul_sum, Finset.mul_sum, Finset.mul_sum, Finset.mul_sum]
       exact Finset.sum_congr rfl fun j _ => by ring
@@ -366,13 +346,9 @@ theorem locTop_shift
     exact this
   · rfl
 
-theorem rep_sub_int
-    {u : Pr.Word} {j : ℕ}
-    (h : j + 1 = R.m) (p q : PtAt R sel mu cst u j) (e : cosetIn q = cosetIn p)
-    {P : rowSG Pr sel mu} (hP : P.1 ∈ Pr.vGs)
-    (i : Fin (R.N j))
-    : IntAt P.1
-      ((frsF sel mu p.1.1 P).symm (repY p.1.2) i - (frsF sel mu q.1.1 P).symm (repY q.1.2) i) := by
+theorem rep_sub_int {u : Pr.Word} {j : ℕ} (h : j + 1 = R.m) (p q : PtAt R sel mu cst u j) (e : cosetIn q = cosetIn p)
+    {P : rowSG Pr sel mu} (hP : P.1 ∈ Pr.vGs) (i : Fin (R.N j)) :
+    IntAt P.1 ((frsF sel mu p.1.1 P).symm (repY p.1.2) i - (frsF sel mu q.1.1 P).symm (repY q.1.2) i) := by
   have h1 : (frsF sel mu p.1.1 P).symm (repY p.1.2) ∈ cosetIn p P :=
     ⟨_, p.repY_mem h, by rw [sub_self, smul_zero]; exact zero_mem _⟩
   rw [← e] at h1
@@ -391,22 +367,17 @@ theorem rep_sub_int
   rw [sub_add_sub_cancel] at h7
   exact mem_stdAt.1 h7 i
 
-theorem locTop_of_cong
-    (hm : R.m = m2 + 2) (hc : cst.Ok)
-    {P : rowSG Pr sel mu} (hP : P.1 ∈ Pr.vGs) (hq : ((qOf P.1 : ℕ) : 𝓞 X.E) ∉ P.1.asIdeal ^ 2)
-    {j : ℕ} (h : R.N j = R.N R.m) (y z : HomE X.E (R.N (m2 + 1)) (R.N j))
+theorem locTop_of_cong (hm : R.m = m2 + 2) (hc : cst.Ok) {P : rowSG Pr sel mu} (hP : P.1 ∈ Pr.vGs)
+    (hq : ((qOf P.1 : ℕ) : 𝓞 X.E) ∉ P.1.asIdeal ^ 2) {j : ℕ} (h : R.N j = R.N R.m) (y z : HomE X.E (R.N (m2 + 1)) (R.N j))
     {a : Sp X.E (R.N (m2 + 1))} (ha : ∀ i, IntAt P.1 ((qOf P.1 : X.E) * a i))
-    (H : (IntM Valued.v (ratM P.1 y) ↔ IntM Valued.v (ratM P.1 z))
-      ∧ (IntM Valued.v (ratM P.1 y) → SmallM Valued.v (ratM P.1 y - ratM P.1 z)))
-    : locTop Ch sel mu cst m2 P (castSp X.E h ∘ₗ y) a
-      = locTop Ch sel mu cst m2 P (castSp X.E h ∘ₗ z) a := by
-  have supp
-      : ∀ w : HomE X.E (R.N (m2 + 1)) (R.N j),
-        locTop Ch sel mu cst m2 P (castSp X.E h ∘ₗ w) a ≠ 0 → IntM Valued.v (ratM P.1 w) :=
-    fun w hw => (intM_ratM _ _).2 fun s i => mem_stdAt.1 (locTop_supp hm hP hw s) (Fin.cast h i)
+    (H : (IntM Valued.v (ratM P.1 y) ↔ IntM Valued.v (ratM P.1 z)) ∧
+      (IntM Valued.v (ratM P.1 y) → SmallM Valued.v (ratM P.1 y - ratM P.1 z))) :
+    locTop Ch sel mu cst m2 P (castSp X.E h ∘ₗ y) a = locTop Ch sel mu cst m2 P (castSp X.E h ∘ₗ z) a := by
+  have supp : ∀ w : HomE X.E (R.N (m2 + 1)) (R.N j), locTop Ch sel mu cst m2 P (castSp X.E h ∘ₗ w) a ≠ 0 →
+      IntM Valued.v (ratM P.1 w) := fun w hw =>
+    (intM_ratM _ _).2 fun s i => mem_stdAt.1 (locTop_supp hm hP hw s) (Fin.cast h i)
   by_cases hy : IntM Valued.v (ratM P.1 y)
-  · refine locTop_congr hm hc hP ha fun s l =>
-      ⟨(intM_ratM _ _).1 hy s _, (intM_ratM _ _).1 (H.1.1 hy) s _, ?_⟩
+  · refine locTop_congr hm hc hP ha fun s l => ⟨(intM_ratM _ _).1 hy s _, (intM_ratM _ _).1 (H.1.1 hy) s _, ?_⟩
     refine intAt_div_of_val hq ?_
     have := H.2 hy (Fin.cast h.symm l) s
     rwa [Matrix.sub_apply, ratM_apply, ratM_apply, ← map_sub, valued_algebraMap] at this

@@ -1,15 +1,59 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.NStageTrivialCharacterCoeffEq
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.NcardPrimesOverOfStabilizer
-public import Development.AbelianVarietyTheory.Proofs.HomogeneousIdeals.DedekindZetaEqSumRealEisenstein
-public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.NonemptyRingHomComplexOfLeContinuum
 public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsTameGenAtOfValuationSubring
-public import Formalism.FrobeniusOrbits.FrobeniusOrbitsProofs.SplitK
-public import Formalism.FrobeniusOrbits.FrobeniusOrbitsProofs.DiscrB
-public import Formalism.CyclotomicNorms.NonsquarefreeBounds.NonsquarefreeMonicBoundHolds
+public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.NonemptyRingHomComplexOfLeContinuum
+public import Development.AbelianVarietyTheory.Proofs.HomogeneousIdeals.DedekindZetaEqSumRealEisenstein
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsRingHomOfIsIntegral
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.NcardPrimesOverOfStabilizer
+public import Formalism.CyclotomicNorms.NonsquarefreeBounds.NonsquarefreeMonicBoundHolds
+import Formalism.FrobeniusOrbits.FrobeniusOrbitsProofs.SplitK
+import Formalism.TameInertiaTowers.CentralOrderTwo.OddEqOneOfSubOneMem
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Rat
+import Mathlib.Algebra.Order.Star.Real
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Connected.Separation
+import Mathlib.Topology.MetricSpace.Ultra.TotallySeparated
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
@@ -57,7 +101,6 @@ theorem isAlgebraic_rat
 
 variable {R : Ranks}
 
-set_option synthInstance.maxHeartbeats 400000 in
 theorem exists_isCMConjOm (H : Host R) (Ω : Type) [Field Ω] [Algebra H.E Ω] [IsAlgClosure H.E Ω]
     : ∃ c : Ω ≃+* Ω, IsCMConjOm H.E Ω c := by
   have : CharZero Ω := charZero_of_injective_algebraMap (algebraMap H.E Ω).injective
@@ -315,7 +358,6 @@ theorem monic_unip {K : Type} [CommRing K] [Nontrivial K] (n : ℕ)
   have h' : (X - 1 : K[X]).natDegree = 1 := by simpa using natDegree_X_sub_C (1 : K)
   exact ⟨h.pow n, by rw [h.natDegree_pow, h', mul_one]⟩
 
-set_option synthInstance.maxHeartbeats 400000 in
 def nData
     (H : Host R) (what₂ : Rows.Data R) (hsha : ∀ p e, what₂.shaLen p e = shaTrue H p e)
     (hs : ∀ k, (placesOver H.E (H.g k)).ncard = Module.finrank ℚ H.E)
@@ -428,7 +470,6 @@ abbrev UnrFam (H : Host R) (a : ℕ) : Type :=
 def negOneFam (H : Host R) : UnrFam H 1 :=
   ⟨(fun _ => ⟨{-1}, by simp⟩, fun _ => {0}), fun _ => rfl, fun _ => rfl⟩
 
-set_option synthInstance.maxHeartbeats 400000 in
 def nAut
     (N : NData R H what₂) [IsEmpty N.Loc]
     (pl : ∀ k, N.PlG k → PlE H) (h1 : ∀ k v, pl k v ∈ placesOver H.E (H.g k))
@@ -602,7 +643,6 @@ section Twist
 
 variable [NumberField what₂.LL] [StarRing what₂.LL] (LL0 : IntermediateField ℚ what₂.LL)
 
-set_option synthInstance.maxHeartbeats 400000 in
 def nTw (N : NData R H what₂) [IsEmpty N.Loc] : NTw R H what₂ LL0 N where
   cc := (exists_isCMConjOm H N.Om).choose
   cc_cm := (exists_isCMConjOm H N.Om).choose_spec
@@ -723,7 +763,6 @@ def nTw (N : NData R H what₂) [IsEmpty N.Loc] : NTw R H what₂ LL0 N where
 
 variable {LL0}
 
-set_option synthInstance.maxHeartbeats 400000 in
 def nExp {N : NData R H what₂} (tw : NTw R H what₂ LL0 N) [IsEmpty tw.Tw]
     : NExp R H what₂ LL0 N tw where
   U := ⊥
@@ -773,7 +812,6 @@ def nExp {N : NData R H what₂} (tw : NTw R H what₂ LL0 N) [IsEmpty tw.Tw]
   eH := fun i => isEmptyElim i
   eH_idem := fun i => isEmptyElim i
 
-set_option synthInstance.maxHeartbeats 400000 in
 def nTh
     {N : NData R H what₂} {tw : NTw R H what₂ LL0 N} [IsEmpty tw.Tw] (ex : NExp R H what₂ LL0 N tw)
     : NTh R H what₂ LL0 N tw ex where
@@ -873,7 +911,6 @@ def cenTriv (Γ : Type) [Group Γ] (V : Type) [AddCommGroup V] [Module ℂ V]
     : Subalgebra.center ℂ (MonoidAlgebra ℂ Γ) →ₐ[ℂ] Module.End ℂ V :=
   (MonoidAlgebra.lift ℂ (Module.End ℂ V) Γ 1).comp (Subalgebra.val _)
 
-set_option synthInstance.maxHeartbeats 400000 in
 def nTypes
     (N : NData R H what₂) [IsEmpty N.Loc]
     (pl : ∀ k, N.PlG k → PlE H) (h1 : ∀ k v, pl k v ∈ placesOver H.E (H.g k))

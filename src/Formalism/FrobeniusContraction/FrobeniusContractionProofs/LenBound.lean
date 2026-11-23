@@ -1,6 +1,49 @@
 module
 
+import Development.AbelianVarietyTheory.Proofs.SatakeParameters.LengthQuotientSpanPowLeMulLength
 public import Formalism.FrobeniusContraction.Statement
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.Order.CompletePartialOrder
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -10,14 +53,11 @@ namespace Formalism.WachCohomologyFacts.PLenBound
 
 variable {O : Type} [CommRing O]
 
-theorem length_le_of_span
-    {P : Type} [AddCommGroup P] [Module O P]
-    {ι : Type} [Fintype ι]
-    (v : ι → P) (a : O) (hspan : Submodule.span O (Set.range v) = ⊤) (hv : ∀ i, a • v i = 0)
-    : Module.length O P ≤ (Fintype.card ι : ℕ∞) * Module.length O (O ⧸ Ideal.span {a}) := by
+theorem length_le_of_span {P : Type} [AddCommGroup P] [Module O P] {ι : Type} [Fintype ι]
+    (v : ι → P) (a : O) (hspan : Submodule.span O (Set.range v) = ⊤) (hv : ∀ i, a • v i = 0) :
+    Module.length O P ≤ (Fintype.card ι : ℕ∞) * Module.length O (O ⧸ Ideal.span {a}) := by
   classical
-  have hker
-      : ∀ i, Ideal.span {a} ≤ LinearMap.ker (LinearMap.toSpanSingleton O P (v i)) := fun i => by
+  have hker : ∀ i, Ideal.span {a} ≤ LinearMap.ker (LinearMap.toSpanSingleton O P (v i)) := fun i => by
     refine Ideal.span_le.2 (Set.singleton_subset_iff.2 ?_)
     show LinearMap.toSpanSingleton O P (v i) a = 0
     rw [LinearMap.toSpanSingleton_apply]
@@ -40,60 +80,14 @@ theorem length_le_of_span
     rw [← LinearMap.range_eq_top, eq_top_iff, ← hspan, Submodule.span_le]
     rintro _ ⟨i, rfl⟩
     exact ⟨_, hg i⟩
-  calc
-    Module.length O P
-      ≤ Module.length O (ι → O ⧸ Ideal.span {a}) := Module.length_le_of_surjective g hsurj
+  calc Module.length O P ≤ Module.length O (ι → O ⧸ Ideal.span {a}) :=
+        Module.length_le_of_surjective g hsurj
     _ = (Fintype.card ι : ℕ∞) * Module.length O (O ⧸ Ideal.span {a}) := by
-      rw [Module.length_pi, ENat.card_eq_coe_fintype_card]
+        rw [Module.length_pi, ENat.card_eq_coe_fintype_card]
 
-theorem length_quot_pow_le (a : O) (e : ℕ)
-    : Module.length O (O ⧸ Ideal.span {a ^ e})
-      ≤ (e : ℕ∞) * Module.length O (O ⧸ Ideal.span {a}) := by
-  induction e with
-  | zero =>
-    rw [pow_zero, Ideal.span_singleton_one, Nat.cast_zero, zero_mul]
-    haveI : Subsingleton (O ⧸ (⊤ : Ideal O)) := ⟨fun x y => by
-      obtain ⟨x, rfl⟩ := Submodule.Quotient.mk_surjective _ x
-      obtain ⟨y, rfl⟩ := Submodule.Quotient.mk_surjective _ y
-      exact (Submodule.Quotient.eq _).2 Submodule.mem_top⟩
-    exact le_of_eq (Module.length_eq_zero)
-  | succ e ih =>
-    have hle : Ideal.span {a ^ (e + 1)} ≤ Ideal.span {a ^ e} :=
-      Ideal.span_singleton_le_span_singleton.2 (pow_dvd_pow a (Nat.le_succ e))
-    have hex :=
-      Module.length_eq_add_of_exact (LinearMap.ker (Submodule.factor hle)).subtype
-        (Submodule.factor hle) (Submodule.injective_subtype _) (Submodule.factor_surjective hle)
-        (LinearMap.exact_subtype_ker_map _)
-    let f0 : O →ₗ[O] O ⧸ Ideal.span {a ^ (e + 1)} :=
-      (Ideal.span {a ^ (e + 1)}).mkQ ∘ₗ LinearMap.mulLeft O (a ^ e)
-    have hf0 : Ideal.span {a} ≤ LinearMap.ker f0 := by
-      refine Ideal.span_le.2 (Set.singleton_subset_iff.2 ?_)
-      show (Ideal.span {a ^ (e + 1)}).mkQ (a ^ e * a) = 0
-      rw [Submodule.mkQ_apply, Submodule.Quotient.mk_eq_zero, ← pow_succ]
-      exact Ideal.subset_span rfl
-    let f := (Ideal.span {a}).liftQ f0 hf0
-    have hfk : ∀ x, f x ∈ LinearMap.ker (Submodule.factor hle) := by
-      intro x
-      obtain ⟨y, rfl⟩ := Submodule.Quotient.mk_surjective _ x
-      rw [LinearMap.mem_ker]
-      show (Submodule.Quotient.mk (a ^ e * y) : O ⧸ Ideal.span {a ^ e}) = 0
-      rw [Submodule.Quotient.mk_eq_zero]
-      exact Ideal.mem_span_singleton'.2 ⟨y, mul_comm _ _⟩
-    let f' : O ⧸ Ideal.span {a} →ₗ[O] LinearMap.ker (Submodule.factor hle) :=
-      LinearMap.codRestrict _ f hfk
-    have hf'surj : Function.Surjective f' := by
-      rintro ⟨z, hz⟩
-      obtain ⟨y, rfl⟩ := Submodule.Quotient.mk_surjective _ z
-      have hy : y ∈ Ideal.span {a ^ e} := by
-        rw [LinearMap.mem_ker] at hz
-        exact (Submodule.Quotient.mk_eq_zero _).1 hz
-      obtain ⟨c, rfl⟩ := Ideal.mem_span_singleton'.1 hy
-      refine ⟨Submodule.Quotient.mk c, Subtype.ext ?_⟩
-      show (Submodule.Quotient.mk (a ^ e * c) : O ⧸ Ideal.span {a ^ (e + 1)}) = Submodule.Quotient.mk (c * a ^ e)
-      rw [mul_comm]
-    have hk := Module.length_le_of_surjective f' hf'surj
-    rw [hex, Nat.cast_succ, add_mul, one_mul]
-    exact (add_le_add hk ih).trans (le_of_eq (add_comm _ _))
+theorem length_quot_pow_le (a : O) (e : ℕ) :
+    Module.length O (O ⧸ Ideal.span {a ^ e}) ≤ (e : ℕ∞) * Module.length O (O ⧸ Ideal.span {a}) := by
+  apply GlobalTheory.length_quotient_span_pow_le <;> assumption
 
 end PLenBound
 
@@ -104,9 +98,8 @@ theorem quotientLengthBound_holds : Formalism.WachCohomologyFacts.LenBound := by
   have hsZ : ∀ x ∈ s, x ∈ Z := fun x hx => hZ ▸ Submodule.mem_sup_left (Submodule.subset_span hx)
   let v : s → ↥Z ⧸ I.comap Z.subtype := fun x => Submodule.Quotient.mk ⟨x.1, hsZ x.1 x.2⟩
   have hspan : Submodule.span O (Set.range v) = ⊤ := by
-    have hle'
-        : Submodule.span O (s : Set M) ⊔ Bc
-          ≤ ((Submodule.span O (Set.range v)).comap (I.comap Z.subtype).mkQ).map Z.subtype := by
+    have hle' : Submodule.span O (s : Set M) ⊔ Bc ≤
+        ((Submodule.span O (Set.range v)).comap (I.comap Z.subtype).mkQ).map Z.subtype := by
       rw [sup_le_iff, Submodule.span_le]
       constructor
       · intro x hx
@@ -116,8 +109,7 @@ theorem quotientLengthBound_holds : Formalism.WachCohomologyFacts.LenBound := by
         have hbZ : b ∈ Z := hZ ▸ Submodule.mem_sup_right hb
         refine ⟨⟨b, hbZ⟩, ?_, rfl⟩
         show Submodule.Quotient.mk _ ∈ Submodule.span O (Set.range v)
-        rw [(Submodule.Quotient.mk_eq_zero _).2
-          (show (⟨b, hbZ⟩ : Z) ∈ I.comap Z.subtype from hBI hb)]
+        rw [(Submodule.Quotient.mk_eq_zero _).2 (show (⟨b, hbZ⟩ : Z) ∈ I.comap Z.subtype from hBI hb)]
         exact Submodule.zero_mem _
     have hle := hZ.symm.le.trans hle'
     rw [eq_top_iff]
@@ -138,8 +130,7 @@ theorem quotientLengthBound_holds : Formalism.WachCohomologyFacts.LenBound := by
   have hcard : (Fintype.card s : ℕ∞) ≤ g := by
     rw [Fintype.card_coe]
     exact_mod_cast hs
-  calc
-    Module.length O (↥Z ⧸ I.comap Z.subtype)
+  calc Module.length O (↥Z ⧸ I.comap Z.subtype)
       ≤ (Fintype.card s : ℕ∞) * Module.length O (O ⧸ Ideal.span {(ℓ : O) ^ e}) := h1
     _ ≤ (g : ℕ∞) * ((e : ℕ∞) * Module.length O (O ⧸ Ideal.span {(ℓ : O)})) := mul_le_mul' hcard h2
     _ = (g : ℕ∞) * (e : ℕ∞) * Module.length O (O ⧸ Ideal.span {(ℓ : O)}) := by rw [mul_assoc]

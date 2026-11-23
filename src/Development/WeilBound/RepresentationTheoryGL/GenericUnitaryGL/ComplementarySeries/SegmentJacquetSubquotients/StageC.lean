@@ -1,15 +1,58 @@
 module
 
-public import Mathlib
 public import Development.WeilBound.RepresentationTheoryGL.GenericUnitaryGL.ComplementarySeries.SegmentJacquetSubquotients.SegRepOf
+public import Development.WeilBound.CoreStatements.TemperedRepresentationTheory.ZelevinskyJacquet.LSegJacquet
+import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.AlgebraMapIntertwiningMapBijectiveOfIsSmooth
+import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.IsSubquotientOfEquiv
+import Development.AbelianVarietyTheory.Proofs.SatakeParameters.ExistsIrreducibleSubquotientTwoBlockConstituents
+public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.AdjacentQuotientOfTwoSegment
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.DerivativeCuspidalPairLength
+import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.IsSmoothIterPhi
+import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.JacquetMultiplicitySubquotientLe
+import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.JacquetQuotientEigenvector
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ProdMapInjective
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ProductIrreducibleAppendEquivStatement
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.AdjacentQuotientOfTwoSegment
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.IsSmoothIterPhi
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.JacquetQuotientEigenvector
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.AlgebraMapIntertwiningMapBijectiveOfIsSmooth
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsEquivProdIrrTw
+import Development.WeilBound.RepresentationTheoryGL.GenericUnitaryGL.ComplementarySeries.SegmentJacquetSubquotients.SrMult
+import GroundTheory.LocalFields.PadicLogSeries
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -153,7 +196,6 @@ variable
   [AddCommGroup U] [Module ℂ U] [AddCommGroup U'] [Module ℂ U'] [AddCommGroup W] [Module ℂ W]
   [AddCommGroup W'] [Module ℂ W'] [AddCommGroup Y] [Module ℂ Y] [AddCommGroup Y'] [Module ℂ Y']
 
-set_option synthInstance.maxHeartbeats 400000 in
 theorem embR
     (σ : Representation ℂ (GL (Fin r) k) U) (ρ : Representation ℂ (GL (Fin t) k) W)
     (ρ' : Representation ℂ (GL (Fin t) k) W') (P : Representation ℂ (GL (Fin (r + t)) k) Y)
@@ -164,7 +206,6 @@ theorem embR
   have h3 : Emb (prod₂ σ ρ) (prod₂ σ ρ') := prod₂_map_injective_right r t σ ρ ρ' f hf
   exact ((Emb.of' e).trans h3).trans (Emb.of e')
 
-set_option synthInstance.maxHeartbeats 400000 in
 theorem embL
     (σ : Representation ℂ (GL (Fin r) k) U) (σ' : Representation ℂ (GL (Fin r) k) U')
     (ρ : Representation ℂ (GL (Fin t) k) W) (P : Representation ℂ (GL (Fin (r + t)) k) Y)
@@ -178,7 +219,6 @@ theorem embL
 
 end Two
 
-set_option synthInstance.maxHeartbeats 400000 in
 theorem emb_right
     {p q q' r t : ℕ} (A : Fin p → IrrGL (k := k)) (y : Fin q → IrrGL (k := k))
     (y' : Fin q' → IrrGL (k := k)) (hA : ∑ a, (A a).1 = r) (hy : ∑ a, (y a).1 = t)
@@ -189,7 +229,6 @@ theorem emb_right
     (GlobalTheory.T.product_irreducible_append_equiv k p q r t A y hA hy h1)
     (GlobalTheory.T.product_irreducible_append_equiv k p q' r t A y' hA hy' h2)
 
-set_option synthInstance.maxHeartbeats 400000 in
 theorem emb_left
     {p p' q r t : ℕ} (y : Fin p → IrrGL (k := k)) (y' : Fin p' → IrrGL (k := k))
     (B : Fin q → IrrGL (k := k)) (hy : ∑ a, (y a).1 = r) (hy' : ∑ a, (y' a).1 = r)
@@ -200,7 +239,6 @@ theorem emb_left
     (GlobalTheory.T.product_irreducible_append_equiv k p q r t y B hy hB h1)
     (GlobalTheory.T.product_irreducible_append_equiv k p' q r t y' B hy' hB h2)
 
-set_option synthInstance.maxHeartbeats 400000 in
 theorem comb
     {n c N : ℕ} (xx : Fin n → IrrGL (k := k)) (hdx : ∑ a, (xx a).1 = N) (iz : Fin n)
     (z : IrrGL (k := k)) (hz : xx iz = z)
@@ -227,7 +265,6 @@ theorem comb
       (s' iz) (hrow iz) y hyc (key iz)
   exact ⟨f, hf⟩
 
-set_option synthInstance.maxHeartbeats 400000 in
 theorem classMain
     {i q N : ℕ} (t : Fin (i + 2 + q) → IrrGL (k := k)) (ht : ∑ a, (t a).1 = N)
     (pr : Fin 2 → IrrGL (k := k)) (hpr : ∀ j, pr j = t (Fin.castAdd q (Fin.natAdd i j)))
@@ -270,8 +307,6 @@ theorem classMain
   ⟩
   exact emb_left _ _ B h1 h2 rfl (emb_right A _ pr rfl hzs hs e0 h1 h2) h3 ht
 
-set_option synthInstance.maxHeartbeats 400000 in
-set_option maxHeartbeats 1000000 in
 theorem exists_alt_ter
     {d : ℕ} (σ : IrrRep (GL (Fin d) k))
     {U : Type} [AddCommGroup U] [Module ℂ U]
@@ -298,8 +333,6 @@ theorem exists_alt_ter
       (IrrGL.equivOf τ hsS hiS).symm).trans a3.some⟩
   ⟩
 
-set_option synthInstance.maxHeartbeats 400000 in
-set_option maxHeartbeats 1000000 in
 theorem exists_unit_one_add_generator
     (h2 : PositivityTheory.Pf1.SegRepC.SegTwo)
     {d : ℕ} (hd : 0 < d) (σ : IrrRep (GL (Fin d) k)) (hσ : IsCuspidal σ.ρ)
@@ -313,8 +346,6 @@ theorem exists_unit_one_add_generator
     (GlobalTheory.CompanionTheory.JacExp.isSmooth_sub (isSmooth_parInd _ _) S) hiS hs
     ((Emb.sub S).trans (Emb.of (consec_equiv σ 2 hs))) eS
 
-set_option synthInstance.maxHeartbeats 400000 in
-set_option maxHeartbeats 1000000 in
 theorem one_le_jm
     {d l : ℕ} (σ : IrrRep (GL (Fin d) k))
     {U X : Type} [AddCommGroup U] [Module ℂ U] [AddCommGroup X] [Module ℂ X]
@@ -335,8 +366,8 @@ theorem one_le_jm
 end StageC
 
 open StageC in
-set_option synthInstance.maxHeartbeats 400000 in
-set_option maxHeartbeats 1000000 in
+
+
 theorem stageP : StageP := by
   intro k _ _ _ _ _ h2 d l hd _ σ hσ i hi
   obtain ⟨q, rfl⟩ : ∃ q, l = i + 2 + q := ⟨l - (i + 2), by omega⟩

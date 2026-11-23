@@ -1,11 +1,54 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Definitions.AdelicHermitianForms.IsHermForm
-public import Development.AbelianVarietyTheory.BlockTheory.AdelicCMFields.SupportedAtSplit
+public import Formalism.PeriodIntegrals.UJClassFin
+public import Mathlib.Analysis.CStarAlgebra.Classes
 public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.NefEffectiveCones.ExistsNsmulMulVecMemHat
-public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.ExistsAdeleRingTensorEquivInfiniteProdFinite
-public import Formalism.PeriodIntegrals.OrbitalBoundsConclusion.UJClassFin
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+public import Mathlib.Analysis.Matrix.Order
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+public import Mathlib.Analysis.Matrix.Hermitian
 
 @[expose] public section
 
@@ -14,9 +57,8 @@ open scoped TensorProduct Matrix ComplexOrder MatrixOrder
 
 namespace CompanionTheory.Rg.FlCls
 
-theorem denseRange_of_not_isReal
-    {K : Type} [Field K] (σ : K →+* ℂ) (h : ¬ ComplexEmbedding.IsReal σ)
-    : DenseRange σ := by
+theorem denseRange_of_not_isReal {K : Type} [Field K] (σ : K →+* ℂ)
+    (h : ¬ ComplexEmbedding.IsReal σ) : DenseRange σ := by
   have hc : IsClosed (σ.fieldRange.topologicalClosure : Set ℂ) :=
     Subfield.isClosed_topologicalClosure _
   rcases Complex.subfield_eq_of_closed hc with h1 | h1
@@ -34,10 +76,11 @@ theorem denseRange_of_not_isReal
       exact this
     exact dense_iff_closure_eq.2 this
 
-theorem hasSignature_of_posDef {n : ℕ} {J : Matrix (Fin n) (Fin n) ℂ} (h : J.PosDef)
-    : PI.UJClassFin.HasSignature J n 0 := by
+theorem hasSignature_of_posDef {n : ℕ} {J : Matrix (Fin n) (Fin n) ℂ} (h : J.PosDef) :
+    PI.UJClassFin.HasSignature J n 0 := by
   let e : Fin n ≃ Fin n ⊕ Fin 0 := (Equiv.sumEmpty (Fin n) (Fin 0)).symm
-  have h1 : (J.reindex e e).PosDef := by simpa using h.submatrix (e := e.symm) e.symm.injective
+  have h1 : (J.reindex e e).PosDef := by
+    simpa using h.submatrix (e := e.symm) e.symm.injective
   have hJ : PI.UJClassFin.Jpq n 0 = 1 := by
     ext i j
     rcases i with i | i
@@ -54,26 +97,24 @@ theorem hasSignature_of_posDef {n : ℕ} {J : Matrix (Fin n) (Fin n) ℂ} (h : J
     exact isUnit_of_mul_isUnit_left this
   obtain ⟨U, hU⟩ := hu
   refine ⟨e, U⁻¹, ?_⟩
-  have hc
-      : PI.UJClassFin.cT (starRingEnd ℂ) ((U⁻¹ : GL (Fin n ⊕ Fin 0) ℂ) : Matrix _ _ ℂ)
-        = star ((U⁻¹ : GL (Fin n ⊕ Fin 0) ℂ) : Matrix (Fin n ⊕ Fin 0) (Fin n ⊕ Fin 0) ℂ) := by
+  have hc : PI.UJClassFin.cT (starRingEnd ℂ) ((U⁻¹ : GL (Fin n ⊕ Fin 0) ℂ) : Matrix _ _ ℂ) =
+      star ((U⁻¹ : GL (Fin n ⊕ Fin 0) ℂ) : Matrix (Fin n ⊕ Fin 0) (Fin n ⊕ Fin 0) ℂ) := by
     ext i j; rfl
-  have hA2 : A = star (U : Matrix (Fin n ⊕ Fin 0) (Fin n ⊕ Fin 0) ℂ) * U := by rw [hU, hS, hSS]
+  have hA2 : A = star (U : Matrix (Fin n ⊕ Fin 0) (Fin n ⊕ Fin 0) ℂ) * U := by
+    rw [hU, hS, hSS]
   rw [hJ, hc, ← hA, hA2, ← mul_assoc, ← star_mul, mul_assoc, Units.mul_inv, star_one, one_mul]
 
 variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {n : ℕ}
 
-theorem hasSignature
-    (c : E ≃ₐ[F] E) (G : Matrix (Fin n) (Fin n) E) (hG : IsHermForm c G)
-    (hc : ∀ (σ : E →+* ℂ) (x : E), σ (c x) = starRingEnd ℂ (σ x))
-    (τ : E →+* ℂ) (h : ∀ x : Fin n → E, x ≠ 0 → 0 < (τ (hermE c G x x)).re)
-    : PI.UJClassFin.HasSignature (Gᵀ.map τ) n 0 := by
+theorem hasSignature (c : E ≃ₐ[F] E) (G : Matrix (Fin n) (Fin n) E) (hG : IsHermForm c G)
+    (hc : ∀ (σ : E →+* ℂ) (x : E), σ (c x) = starRingEnd ℂ (σ x)) (τ : E →+* ℂ)
+    (h : ∀ x : Fin n → E, x ≠ 0 → 0 < (τ (hermE c G x x)).re) :
+    PI.UJClassFin.HasSignature (Gᵀ.map τ) n 0 := by
   refine hasSignature_of_posDef (J := Gᵀ.map τ) ?_
   have hH : (Gᵀ.map τ).IsHermitian := by
     ext i k
     simp only [Matrix.conjTranspose_apply, Matrix.map_apply, Matrix.transpose_apply]
-    rw [← hG.2.2.1 i k, hc]
-    rfl
+    rw [← hG.2.2.1 i k, hc]; rfl
   have hd : DenseRange τ := by
     refine denseRange_of_not_isReal τ fun hr => hG.2.1 ?_
     ext x
@@ -82,17 +123,15 @@ theorem hasSignature
     exact RingHom.congr_fun (ComplexEmbedding.isReal_iff.1 hr) x
   have hdn : DenseRange fun (l : Fin n → E) => (fun i => τ (l i)) :=
     DenseRange.piMap (fun _ : Fin n => hd)
-  have hco
-      : ∀ l : Fin n → E,
-        τ (hermE c G l l) = star (fun i => τ (l i)) ⬝ᵥ (Gᵀ.map τ).mulVec (fun i => τ (l i)) := by
+  have hco : ∀ l : Fin n → E, τ (hermE c G l l) =
+      star (fun i => τ (l i)) ⬝ᵥ (Gᵀ.map τ).mulVec (fun i => τ (l i)) := by
     intro l
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [hermE, map_sum, map_mul, hc, dotProduct, Matrix.mulVec, Matrix.map_apply,
-        Matrix.transpose_apply, Pi.star_apply, Finset.mul_sum]
+
+    simp only [hermE, map_sum, map_mul, hc, dotProduct, Matrix.mulVec, Matrix.map_apply,
+    Matrix.transpose_apply, Pi.star_apply, Finset.mul_sum]
     rw [Finset.sum_comm]
     refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
-    rw [starRingEnd_apply]
-    ring
+    rw [starRingEnd_apply]; ring
   have hpsd : (Gᵀ.map τ).PosSemidef := by
     refine Matrix.PosSemidef.of_dotProduct_mulVec_nonneg hH fun x => ?_
     rw [Complex.nonneg_iff]
@@ -113,45 +152,41 @@ theorem hasSignature
   rw [← Matrix.det_transpose, RingHom.map_det, map_zero]
   exact h0
 
-theorem exists_denom (L : Submodule (𝓞 E) (Fin n → E)) (hL : L.FG)
-    : ∃ c : 𝓞 F, c ≠ 0 ∧ ∀ x ∈ (L : Set (Fin n → E)), ∀ i, IsIntegral ℤ ((c : F) • x i) := by
+theorem exists_denom (L : Submodule (𝓞 E) (Fin n → E)) (hL : L.FG) :
+    ∃ c : 𝓞 F, c ≠ 0 ∧ ∀ x ∈ (L : Set (Fin n → E)), ∀ i, IsIntegral ℤ ((c : F) • x i) := by
   classical
   obtain ⟨s, hs⟩ := hL
   choose f hf r hr using GlobalTheory.CompanionTheory.HatBound.exists_nat_mul_integer E
-  have hpos : 0 < ∏ x ∈ s, ∏ i, f (x i) :=
-    Finset.prod_pos fun x _ => Finset.prod_pos fun i _ => hf _
+  have hpos : 0 < ∏ x ∈ s, ∏ i, f (x i) := Finset.prod_pos fun x _ => Finset.prod_pos fun i _ => hf _
   set m := ∏ x ∈ s, ∏ i, f (x i) with hm
   refine ⟨m, Nat.cast_ne_zero.2 hpos.ne', fun x hx i => ?_⟩
-  have e : ((m : 𝓞 F) : F) • x i = (m : E) * x i := by rw [Algebra.smul_def]; simp
+  have e : ((m : 𝓞 F) : F) • x i = (m : E) * x i := by
+    rw [Algebra.smul_def]; simp
   rw [e]
   clear e
   rw [← hs] at hx
   induction hx using Submodule.span_induction with
   | mem x hx =>
-    obtain ⟨k, hk⟩ : f (x i) ∣ m :=
-      (Finset.dvd_prod_of_mem (fun i => f (x i)) (Finset.mem_univ i)).trans
-        (Finset.dvd_prod_of_mem (fun x : Fin n → E => ∏ i, f (x i)) hx)
+    obtain ⟨k, hk⟩ : f (x i) ∣ m := (Finset.dvd_prod_of_mem (fun i => f (x i)) (Finset.mem_univ i)).trans
+      (Finset.dvd_prod_of_mem (fun x : Fin n → E => ∏ i, f (x i)) hx)
     have : (m : E) * x i = ((k * r (x i) : 𝓞 E) : E) := by
-      have h7 : ((k * r (x i) : 𝓞 E) : E) = (k : E) * (f (x i) * x i) := by rw [← hr (x i)]; simp
-      rw [h7, hk]
-      push_cast
-      ring
+      have h7 : ((k * r (x i) : 𝓞 E) : E) = (k : E) * (f (x i) * x i) := by
+        rw [← hr (x i)]; simp
+      rw [h7, hk]; push_cast; ring
     rw [this]
     exact (k * r (x i) : 𝓞 E).isIntegral_coe
-  | zero =>
-    simpa using isIntegral_zero
-  | add x y _ _ hx hy =>
-    rw [Pi.add_apply, mul_add]; exact hx.add hy
+  | zero => simpa using isIntegral_zero
+  | add x y _ _ hx hy => rw [Pi.add_apply, mul_add]; exact hx.add hy
   | smul a x _ hx =>
     have : (m : E) * (a • x) i = (a : E) * ((m : E) * x i) := by
       rw [Pi.smul_apply, Algebra.smul_def]; ring
     rw [this]
     exact a.isIntegral_coe.mul hx
 
-theorem exists_single_mem
-    (L : Submodule (𝓞 E) (Fin n → E)) (hL : Submodule.span E (L : Set (Fin n → E)) = ⊤)
-    : ∃ c : 𝓞 F,
-      c ≠ 0 ∧ ∀ i, ∀ e : E, IsIntegral ℤ e → Pi.single i ((c : F) • e) ∈ (L : Set (Fin n → E)) := by
+theorem exists_single_mem (L : Submodule (𝓞 E) (Fin n → E))
+    (hL : Submodule.span E (L : Set (Fin n → E)) = ⊤) :
+    ∃ c : 𝓞 F, c ≠ 0 ∧ ∀ i, ∀ e : E, IsIntegral ℤ e →
+      Pi.single i ((c : F) • e) ∈ (L : Set (Fin n → E)) := by
   classical
   choose f hf hf' using fun i : Fin n => GlobalTheory.CompanionTheory.HatBound.exists_nsmul_mem_lattice L hL (Pi.single i 1)
   have hpos : 0 < ∏ i, f i := Finset.prod_pos fun i _ => hf _
@@ -159,15 +194,13 @@ theorem exists_single_mem
   refine ⟨m, Nat.cast_ne_zero.2 hpos.ne', fun i e he => ?_⟩
   obtain ⟨k, hk⟩ : f i ∣ m := Finset.dvd_prod_of_mem f (Finset.mem_univ i)
   have h1 := L.smul_mem (⟨e, he⟩ : 𝓞 E) (nsmul_mem (hf' i) k)
-  have e2
-      : (Pi.single i (((m : 𝓞 F) : F) • e) : Fin n → E)
-        = (⟨e, he⟩ : 𝓞 E) • k • f i • (Pi.single i (1 : E) : Fin n → E) := by
+  have e2 : (Pi.single i (((m : 𝓞 F) : F) • e) : Fin n → E) =
+      (⟨e, he⟩ : 𝓞 E) • k • f i • (Pi.single i (1 : E) : Fin n → E) := by
     funext j
     change _ = e * (k • f i • (Pi.single i (1 : E) : Fin n → E) j)
     by_cases h : j = i
     · subst h
-      simp [hk, Algebra.smul_def]
-      ring
+      simp [hk, Algebra.smul_def]; ring
     · simp [h]
   rw [e2]
   exact h1

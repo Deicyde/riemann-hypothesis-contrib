@@ -1,8 +1,54 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.CoherentCohomologyProofs.FstHomCompSqzOfLeibniz
-public import ReciprocityTheory.DualLattices.EvCotStatement
+public import ReciprocityTheory.DualLattices.TowerZeroSurjective
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Lemma
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
@@ -161,9 +207,9 @@ lemma map_sqMap_tg (B : BX R₀) {ι : Type} [Fintype ι] (w : ι → B.gg) (m :
     (u : M →ₗ[(O : Type)] M') :
     B.map (sqMap u) (B.tg (sqProj O M) (sqProj_sqZero O M) (∑ k, w k ⊗ₜ[R₀] sqKer (m k))) =
       B.tg (sqProj O M') (sqProj_sqZero O M') (∑ k, w k ⊗ₜ[R₀] sqKer (u (m k))) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [← B.tg_nat (sqProj O M) (sqProj O M') (sqProj_sqZero O M) (sqProj_sqZero O M') (sqMap u)
-    (fun _ h => h), map_sum]
+
+  rw [← B.tg_nat (sqProj O M) (sqProj O M') (sqProj_sqZero O M) (sqProj_sqZero O M') (sqMap u)
+  (fun _ h => h), map_sum]
   rfl
 
 end Alg
@@ -206,16 +252,16 @@ lemma sum_lieBasis (l : Fin g → O) :
   have h : l = ∑ k, l k • (Pi.single k 1 : Fin g → O) := by
     ext j; simp [Finset.sum_apply, Pi.single_apply]
   conv_rhs => rw [h]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [← Submodule.mkQ_apply, map_sum]
+
+  rw [← Submodule.mkQ_apply, map_sum]
   rfl
 
 lemma lie_ext {u u' : LieDualModP p O g →ₗ[O] M}
     (h : ∀ k, u (lieBasis O p g k) = u' (lieBasis O p g k)) : u = u' := by
   refine LinearMap.ext fun x => ?_
   obtain ⟨l, rfl⟩ := Submodule.Quotient.mk_surjective _ x
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [← sum_lieBasis, map_sum, map_sum]
+
+  rw [← sum_lieBasis, map_sum, map_sum]
   simp only [map_smul, h]
 
 end Lie
@@ -296,16 +342,16 @@ lemma tg_act {E : Type} [CommRing E] (Ac : OAct B O p E) (a : E) (gb : Module.Ba
   have hx' : x = ∑ k, (⟨B.tg (sqProj O M) (sqProj_sqZero O M) (gb k ⊗ₜ[R₀] sqKer (m k)),
       tg_torP B p _ _ _ _ (hk k)⟩ : torP B p (sqAlg O M)) := by
     refine Subtype.ext ?_
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hx, AddSubmonoidClass.coe_finsetSum, tgPt, map_sum]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [hx', map_sum, AddSubmonoidClass.coe_finsetSum]
+
+    rw [hx, AddSubmonoidClass.coe_finsetSum, tgPt, map_sum]
+
+  rw [hx', map_sum, AddSubmonoidClass.coe_finsetSum]
   simp only [Ac.act_tg a (sqIncl O M) (sqProj O M) (sqProj_sqZero O M) _ _ (hk _)]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [← map_sum, tgPt]
+
+  rw [← map_sum, tgPt]
   congr 1
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, TensorProduct.tmul_sum, ← smul_sqKer, ← TensorProduct.smul_tmul]
+
+  simp only [map_sum, TensorProduct.tmul_sum, ← smul_sqKer, ← TensorProduct.smul_tmul]
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun k _ => ?_
   rw [← TensorProduct.sum_tmul, gb.sum_repr]
@@ -456,8 +502,8 @@ theorem universal_derivation
     have hρ : (D.H.ρL a)ᵀ *ᵥ l = ∑ k, l k • D.H.ρL a k := by
       ext j
       simp [Matrix.mulVec, dotProduct, Finset.sum_apply, mul_comm]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hρ, ← Submodule.mkQ_apply, map_sum]
+
+    rw [hρ, ← Submodule.mkQ_apply, map_sum]
     rfl
 
 end GlobalTheory.CotUniv

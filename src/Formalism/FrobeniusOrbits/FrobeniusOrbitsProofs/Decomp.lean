@@ -1,10 +1,57 @@
 module
 
-public import Mathlib
 public import Formalism.FrobeniusOrbits.Statement
-public import Formalism.FrobeniusOrbits.FrobeniusOrbitsProofs.Galois
 public import Formalism.FrobeniusOrbits.FrobeniusOrbitsProofs.CoprimeTwoPow
+public import Formalism.FrobeniusOrbits.FrobeniusOrbitsProofs.Galois
+public import Formalism.TameInertiaTowers.CentralOrderTwo.OddEqOneOfSubOneMem
 public import Formalism.TameInertiaTowers.TowerFieldFoundations
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.PicardGroup
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -19,12 +66,10 @@ open Formalism.TwoAdicCyclotomicDecomposition Formalism.FrobeniusOrbits.Galois
 
 namespace Decomp
 
-theorem frob_pow_mk
-    {M : Type} [Field M] [NumberField M]
-    (p : ℕ) (Q : Ideal (𝓞 M)) [Q.LiesOver (span {(p : ℤ)})]
-    (F : Gal(M/ℚ)) (hF : IsArithFrobAt ℤ F Q)
-    (k : ℕ) (x : 𝓞 M)
-    : Ideal.Quotient.mk Q ((F ^ k) • x) = (Ideal.Quotient.mk Q x) ^ (p ^ k) := by
+theorem frob_pow_mk {M : Type} [Field M] [NumberField M] (p : ℕ)
+    (Q : Ideal (𝓞 M)) [Q.LiesOver (span {(p : ℤ)})] (F : Gal(M/ℚ))
+    (hF : IsArithFrobAt ℤ F Q) (k : ℕ) (x : 𝓞 M) :
+    Ideal.Quotient.mk Q ((F ^ k) • x) = (Ideal.Quotient.mk Q x) ^ (p ^ k) := by
   have hn : Nat.card (ℤ ⧸ Q.under ℤ) = p := by
     rw [← (Ideal.LiesOver.over : span {(p : ℤ)} = Q.under ℤ),
       Nat.card_congr (Int.quotientSpanNatEquivZMod p).toEquiv, Nat.card_zmod]
@@ -36,12 +81,10 @@ theorem frob_pow_mk
   | zero => simp
   | succ k ih => rw [pow_succ' F k, mul_smul, key, ih, ← pow_mul, ← pow_succ p k]
 
-theorem stab_frob_pow
-    {M : Type} [Field M] [NumberField M]
-    (p : ℕ) [Fact p.Prime]
-    (Q : Ideal (𝓞 M)) [Q.IsPrime] [Q.LiesOver (span {(p : ℤ)})]
-    (F σ : Gal(M/ℚ)) (hF : IsArithFrobAt ℤ F Q) (hσ : σ ∈ MulAction.stabilizer Gal(M/ℚ) Q)
-    : ∃ k : ℕ, ∀ x : 𝓞 M, σ • x - (F ^ k) • x ∈ Q := by
+theorem stab_frob_pow {M : Type} [Field M] [NumberField M] (p : ℕ) [Fact p.Prime]
+    (Q : Ideal (𝓞 M)) [Q.IsPrime] [Q.LiesOver (span {(p : ℤ)})] (F σ : Gal(M/ℚ))
+    (hF : IsArithFrobAt ℤ F Q) (hσ : σ ∈ MulAction.stabilizer Gal(M/ℚ) Q) :
+    ∃ k : ℕ, ∀ x : 𝓞 M, σ • x - (F ^ k) • x ∈ Q := by
   have hp : p.Prime := Fact.out
   haveI : NeZero p := ⟨hp.ne_zero⟩
   have hund : span {(p : ℤ)} = Q.under ℤ := Ideal.LiesOver.over
@@ -73,17 +116,15 @@ theorem stab_frob_pow
     exact hy
   let sb : (𝓞 M ⧸ Q) →+* (𝓞 M ⧸ Q) :=
     Ideal.quotientMap Q (MulSemiringAction.toRingHom _ (𝓞 M) σ) hσQ
-  let sa : (𝓞 M ⧸ Q) →ₐ[ZMod p] (𝓞 M ⧸ Q) := {
-    sb with
-    commutes' := fun c => by
-      change sb (algebraMap (ZMod p) _ c) = algebraMap (ZMod p) _ c
-      rw [← ZMod.natCast_zmod_val c, map_natCast, map_natCast]
-  }
+  let sa : (𝓞 M ⧸ Q) →ₐ[ZMod p] (𝓞 M ⧸ Q) :=
+    { sb with
+      commutes' := fun c => by
+        change sb (algebraMap (ZMod p) _ c) = algebraMap (ZMod p) _ c
+        rw [← ZMod.natCast_zmod_val c, map_natCast, map_natCast] }
   obtain ⟨⟨n, hlt⟩, hn⟩ := (FiniteField.bijective_frobeniusAlgHom_pow (ZMod p) (𝓞 M ⧸ Q)).2 sa
   have hn' : FiniteField.frobeniusAlgHom (ZMod p) (𝓞 M ⧸ Q) ^ n = sa := hn
-  have key
-      : ∀ m : ℕ, ∀ y : 𝓞 M ⧸ Q,
-        (FiniteField.frobeniusAlgHom (ZMod p) (𝓞 M ⧸ Q) ^ m) y = y ^ (p ^ m) := by
+  have key : ∀ m : ℕ, ∀ y : 𝓞 M ⧸ Q,
+      (FiniteField.frobeniusAlgHom (ZMod p) (𝓞 M ⧸ Q) ^ m) y = y ^ (p ^ m) := by
     intro m
     induction m with
     | zero => intro y; simp
@@ -96,30 +137,23 @@ theorem stab_frob_pow
   have h1 : sa (Ideal.Quotient.mk Q x) = Ideal.Quotient.mk Q (σ • x) := rfl
   rw [← h1, ← hn', key, frob_pow_mk p Q F hF n x]
 
-theorem stab_eq_inertia_mul
-    {M : Type} [Field M] [NumberField M]
-    (p : ℕ) [Fact p.Prime]
-    (Q : Ideal (𝓞 M)) [Q.IsPrime] [Q.LiesOver (span {(p : ℤ)})]
-    (F σ : Gal(M/ℚ)) (hF : IsArithFrobAt ℤ F Q) (hσ : σ ∈ MulAction.stabilizer Gal(M/ℚ) Q)
-    : ∃ k : ℕ, ∃ ρ : Gal(M/ℚ), (∀ x : 𝓞 M, ρ • x - x ∈ Q) ∧ σ = ρ * F ^ k := by
+theorem stab_eq_inertia_mul {M : Type} [Field M] [NumberField M] (p : ℕ) [Fact p.Prime]
+    (Q : Ideal (𝓞 M)) [Q.IsPrime] [Q.LiesOver (span {(p : ℤ)})] (F σ : Gal(M/ℚ))
+    (hF : IsArithFrobAt ℤ F Q) (hσ : σ ∈ MulAction.stabilizer Gal(M/ℚ) Q) :
+    ∃ k : ℕ, ∃ ρ : Gal(M/ℚ), (∀ x : 𝓞 M, ρ • x - x ∈ Q) ∧ σ = ρ * F ^ k := by
   obtain ⟨k, hk⟩ := stab_frob_pow p Q F σ hF hσ
   refine ⟨k, σ * (F ^ k)⁻¹, fun x => ?_, by simp⟩
   have hx := hk ((F ^ k)⁻¹ • x)
   rwa [smul_inv_smul, ← mul_smul] at hx
 
-theorem mem_stab_of
-    {G S : Type*} [Group G] [CommRing S] [MulSemiringAction G S]
-    (g : G) (I : Ideal S) (h : ∀ z : S, g • z ∈ I ↔ z ∈ I)
-    : g ∈ MulAction.stabilizer G I := by
+theorem mem_stab_of {G S : Type*} [Group G] [CommRing S] [MulSemiringAction G S] (g : G)
+    (I : Ideal S) (h : ∀ z : S, g • z ∈ I ↔ z ∈ I) : g ∈ MulAction.stabilizer G I := by
   rw [MulAction.mem_stabilizer_iff]
   ext z
   rw [Ideal.mem_pointwise_smul_iff_inv_smul_mem, ← h (g⁻¹ • z), smul_inv_smul]
 
-theorem smul_mem_iff_of_stab
-    {G S : Type*} [Group G] [CommRing S] [MulSemiringAction G S]
-    (g : G) (I : Ideal S) (hg : g ∈ MulAction.stabilizer G I)
-    (z : S)
-    : g • z ∈ I ↔ z ∈ I := by
+theorem smul_mem_iff_of_stab {G S : Type*} [Group G] [CommRing S] [MulSemiringAction G S]
+    (g : G) (I : Ideal S) (hg : g ∈ MulAction.stabilizer G I) (z : S) : g • z ∈ I ↔ z ∈ I := by
   rw [MulAction.mem_stabilizer_iff] at hg
   conv_lhs => rw [← hg]
   rw [Ideal.mem_pointwise_smul_iff_inv_smul_mem, inv_smul_smul]
@@ -128,35 +162,31 @@ section Host
 
 variable {e q d : ℕ} {L : Type} [Field L] [NumberField L] {ζ a b : L}
 
-theorem restrict_smul
-    (σ : hostE ζ a b ≃ₐ[ℚ] hostE ζ a b) (τ : Gal(L/ℚ))
-    (hστ : ∀ x : hostE ζ a b, ((σ x : hostE ζ a b) : L) = τ x)
-    (x : 𝓞 (hostE ζ a b))
-    : algebraMap (𝓞 (hostE ζ a b)) (𝓞 L) (σ • x) = τ • algebraMap (𝓞 (hostE ζ a b)) (𝓞 L) x := by
+theorem restrict_smul (σ : hostE ζ a b ≃ₐ[ℚ] hostE ζ a b) (τ : Gal(L/ℚ))
+    (hστ : ∀ x : hostE ζ a b, ((σ x : hostE ζ a b) : L) = τ x) (x : 𝓞 (hostE ζ a b)) :
+    algebraMap (𝓞 (hostE ζ a b)) (𝓞 L) (σ • x) = τ • algebraMap (𝓞 (hostE ζ a b)) (𝓞 L) x := by
   ext
-  first | exact hστ x | simpa using hστ x
+  first
+    | exact hστ x
 
-theorem mem_P_iff
-    (P : Ideal (𝓞 (hostE ζ a b))) (Q : Ideal (𝓞 L)) [Q.LiesOver P] (x : 𝓞 (hostE ζ a b))
-    : x ∈ P ↔ algebraMap (𝓞 (hostE ζ a b)) (𝓞 L) x ∈ Q := by
+theorem mem_P_iff (P : Ideal (𝓞 (hostE ζ a b))) (Q : Ideal (𝓞 L)) [Q.LiesOver P]
+    (x : 𝓞 (hostE ζ a b)) : x ∈ P ↔ algebraMap (𝓞 (hostE ζ a b)) (𝓞 L) x ∈ Q := by
   rw [(Ideal.LiesOver.over : P = Q.under (𝓞 (hostE ζ a b)))] <;> exact Ideal.mem_comap
 
-theorem stab_restrict
-    (P : Ideal (𝓞 (hostE ζ a b))) (Q : Ideal (𝓞 L)) [Q.LiesOver P]
+theorem stab_restrict (P : Ideal (𝓞 (hostE ζ a b))) (Q : Ideal (𝓞 L)) [Q.LiesOver P]
     (σ : hostE ζ a b ≃ₐ[ℚ] hostE ζ a b) (τ : Gal(L/ℚ))
     (hστ : ∀ x : hostE ζ a b, ((σ x : hostE ζ a b) : L) = τ x)
-    (hτ : τ ∈ MulAction.stabilizer Gal(L/ℚ) Q)
-    : σ ∈ MulAction.stabilizer (hostE ζ a b ≃ₐ[ℚ] hostE ζ a b) P := by
+    (hτ : τ ∈ MulAction.stabilizer Gal(L/ℚ) Q) :
+    σ ∈ MulAction.stabilizer (hostE ζ a b ≃ₐ[ℚ] hostE ζ a b) P := by
   apply mem_stab_of
   intro z
   rw [mem_P_iff P Q, mem_P_iff P Q, restrict_smul σ τ hστ, smul_mem_iff_of_stab τ Q hτ]
 
-theorem frob_restrict
-    (p : ℕ) (Q : Ideal (𝓞 L)) [Q.LiesOver (span {(p : ℤ)})]
+theorem frob_restrict (p : ℕ) (Q : Ideal (𝓞 L)) [Q.LiesOver (span {(p : ℤ)})]
     (P : Ideal (𝓞 (hostE ζ a b))) [Q.LiesOver P] [P.LiesOver (span {(p : ℤ)})]
     (σ : hostE ζ a b ≃ₐ[ℚ] hostE ζ a b) (τ : Gal(L/ℚ))
-    (hστ : ∀ x : hostE ζ a b, ((σ x : hostE ζ a b) : L) = τ x) (hτ : IsArithFrobAt ℤ τ Q)
-    : IsArithFrobAt ℤ σ P := by
+    (hστ : ∀ x : hostE ζ a b, ((σ x : hostE ζ a b) : L) = τ x) (hτ : IsArithFrobAt ℤ τ Q) :
+    IsArithFrobAt ℤ σ P := by
   have hPQ : P.under ℤ = Q.under ℤ :=
     (Ideal.LiesOver.over : span {(p : ℤ)} = P.under ℤ).symm.trans
       (Ideal.LiesOver.over : span {(p : ℤ)} = Q.under ℤ)
@@ -173,13 +203,10 @@ theorem hcl_neg_one' (e : ℕ) : hcl e (-1) = 1 := by
   rw [QuotientGroup.eq_one_iff]
   exact Subgroup.mem_zpowers _
 
-theorem hPart_inertia
-    (hqd : HypOdd q d) (h : IsLayer (e + 2) q d ζ a b)
-    (p : ℕ) (hp : p.Prime) (hp2 : p ≠ 2)
-    (Q : Ideal (𝓞 L)) [Q.IsPrime] [Q.LiesOver (span {(p : ℤ)})]
-    (P : Ideal (𝓞 (hostE ζ a b))) [Q.LiesOver P]
-    (ρ : hostE ζ a b ≃ₐ[ℚ] hostE ζ a b) (hρ : ∀ x : 𝓞 (hostE ζ a b), ρ • x - x ∈ P)
-    : (galE e ζ a b ρ).2 = 1 := by
+theorem hPart_inertia (hqd : HypOdd q d) (h : IsLayer (e + 2) q d ζ a b) (p : ℕ) (hp : p.Prime)
+    (hp2 : p ≠ 2) (Q : Ideal (𝓞 L)) [Q.IsPrime] [Q.LiesOver (span {(p : ℤ)})]
+    (P : Ideal (𝓞 (hostE ζ a b))) [Q.LiesOver P] (ρ : hostE ζ a b ≃ₐ[ℚ] hostE ζ a b)
+    (hρ : ∀ x : 𝓞 (hostE ζ a b), ρ • x - x ∈ P) : (galE e ζ a b ρ).2 = 1 := by
   show hPart e ζ a b ρ = 1
   unfold hPart
   split_ifs with hex
@@ -202,24 +229,23 @@ theorem hPart_inertia
   have hζiint : IsIntegral ℤ ζ⁻¹ := by
     rw [hinv]
     exact hζint.pow _
-  have hθint : IsIntegral ℤ (thE ζ a b) := (isIntegral_algebraMap_iff).mp (hζint.add hζiint)
+  have hθint : IsIntegral ℤ (thE ζ a b) :=
+    (isIntegral_algebraMap_iff ).mp (hζint.add hζiint)
   obtain ⟨zz, hzz⟩ : ∃ z : 𝓞 L, (z : L) = ζ := ⟨⟨ζ, hζint⟩, rfl⟩
   obtain ⟨tt, htt⟩ : ∃ t : 𝓞 (hostE ζ a b), (t : hostE ζ a b) = thE ζ a b := ⟨⟨_, hθint⟩, rfl⟩
   have hth : ((thE ζ a b : hostE ζ a b) : L) = ζ + ζ⁻¹ := rfl
   have hmemQ : algebraMap (𝓞 (hostE ζ a b)) (𝓞 L) (ρ • tt - tt) ∈ Q := (mem_P_iff P Q _).mp (hρ tt)
-  have heq
-      : algebraMap (𝓞 (hostE ζ a b)) (𝓞 L) (ρ • tt - tt)
-        = zz ^ n + zz ^ ((2 ^ (e + 2) - 1) * n) - zz - zz ^ (2 ^ (e + 2) - 1) := by
+  have heq : algebraMap (𝓞 (hostE ζ a b)) (𝓞 L) (ρ • tt - tt) =
+      zz ^ n + zz ^ ((2 ^ (e + 2) - 1) * n) - zz - zz ^ (2 ^ (e + 2) - 1) := by
     ext1
-    have e1
-        : ((algebraMap (𝓞 (hostE ζ a b)) (𝓞 L) (ρ • tt - tt) : 𝓞 L) : L)
-          = ((ρ (tt : hostE ζ a b) : hostE ζ a b) : L) - ((tt : hostE ζ a b) : L) := by
-      first | rfl | simp
-    have e2
-        : ((zz ^ n + zz ^ ((2 ^ (e + 2) - 1) * n) - zz - zz ^ (2 ^ (e + 2) - 1) : 𝓞 L) : L)
-          = (zz : L) ^ n + (zz : L) ^ ((2 ^ (e + 2) - 1) * n) - (zz : L)
-            - (zz : L) ^ (2 ^ (e + 2) - 1) := by
-      first | rfl | simp
+    have e1 : ((algebraMap (𝓞 (hostE ζ a b)) (𝓞 L) (ρ • tt - tt) : 𝓞 L) : L) =
+        ((ρ (tt : hostE ζ a b) : hostE ζ a b) : L) - ((tt : hostE ζ a b) : L) := by
+      first
+        | rfl
+    have e2 : ((zz ^ n + zz ^ ((2 ^ (e + 2) - 1) * n) - zz - zz ^ (2 ^ (e + 2) - 1) : 𝓞 L) : L) =
+        (zz : L) ^ n + (zz : L) ^ ((2 ^ (e + 2) - 1) * n) - (zz : L) - (zz : L) ^ (2 ^ (e + 2) - 1) := by
+      first
+        | rfl
     rw [e1, e2, htt, hth, hu, hzz, pow_mul, ← hinv]
     ring
   obtain ⟨zq, hzq⟩ : ∃ w, Ideal.Quotient.mk Q zz = w := ⟨_, rfl⟩
@@ -230,7 +256,9 @@ theorem hPart_inertia
     linear_combination h0
   have hzzN : zz ^ (2 ^ (e + 2)) = 1 := by
     ext1
-    have e3 : ((zz ^ (2 ^ (e + 2)) : 𝓞 L) : L) = (zz : L) ^ (2 ^ (e + 2)) := by first | rfl | simp
+    have e3 : ((zz ^ (2 ^ (e + 2)) : 𝓞 L) : L) = (zz : L) ^ (2 ^ (e + 2)) := by
+      first
+        | rfl
     rw [e3, hzz, hζN]
     all_goals first | rfl | simp
   have hneg : ζ ^ (2 ^ (e + 1)) = -1 := by
@@ -247,7 +275,9 @@ theorem hPart_inertia
     · exact h1
   have hzzneg : zz ^ (2 ^ (e + 1)) = -1 := by
     ext1
-    have e4 : ((zz ^ (2 ^ (e + 1)) : 𝓞 L) : L) = (zz : L) ^ (2 ^ (e + 1)) := by first | rfl | simp
+    have e4 : ((zz ^ (2 ^ (e + 1)) : 𝓞 L) : L) = (zz : L) ^ (2 ^ (e + 1)) := by
+      first
+        | rfl
     rw [e4, hzz, hneg]
     all_goals first | rfl | simp
   have h2notQ : (2 : 𝓞 L) ∉ Q := by
@@ -258,7 +288,8 @@ theorem hPart_inertia
     rcases Nat.prime_two.eq_one_or_self_of_dvd p h6 with h3 | h3
     · exact hp.one_lt.ne' h3
     · exact hp2 h3
-  have hfin : zq ^ (2 ^ (e + 2)) = 1 := by rw [← hzq, ← map_pow, hzzN, map_one]
+  have hfin : zq ^ (2 ^ (e + 2)) = 1 := by
+    rw [← hzq, ← map_pow, hzzN, map_one]
   have hnot : ¬ zq ^ (2 ^ (e + 1)) = 1 := by
     intro h1
     rw [← hzq, ← map_pow, hzzneg, map_neg, map_one] at h1
@@ -268,8 +299,10 @@ theorem hPart_inertia
     rw [h7, h1, sub_self]
   have horder : orderOf zq = 2 ^ (e + 2) := orderOf_eq_prime_pow hnot hfin
   have hpz : IsPrimitiveRoot zq (2 ^ (e + 2)) := horder ▸ IsPrimitiveRoot.orderOf zq
-  have hCD : zq * zq ^ (2 ^ (e + 2) - 1) = 1 := by rw [← pow_succ', Nat.sub_add_cancel hN1, hfin]
-  have hAB : zq ^ n * zq ^ ((2 ^ (e + 2) - 1) * n) = 1 := by rw [pow_mul, ← mul_pow, hCD, one_pow]
+  have hCD : zq * zq ^ (2 ^ (e + 2) - 1) = 1 := by
+    rw [← pow_succ', Nat.sub_add_cancel hN1, hfin]
+  have hAB : zq ^ n * zq ^ ((2 ^ (e + 2) - 1) * n) = 1 := by
+    rw [pow_mul, ← mul_pow, hCD, one_pow]
   have hkey : (zq ^ n * zq - 1) * (zq ^ n * zq ^ (2 ^ (e + 2) - 1) - 1) = 0 := by
     linear_combination (zq ^ n) * hrel - hAB + (zq ^ n) ^ 2 * hCD
   rcases mul_eq_zero.mp hkey with h1 | h1
@@ -305,16 +338,15 @@ section Two
 
 variable {e q d : ℕ} {L : Type} [Field L] [NumberField L] {ζ a b : L}
 
-theorem two_mem {M : Type} [Field M] [NumberField M] (P : Ideal (𝓞 M)) [P.LiesOver (span {(2 : ℤ)})]
-    : (2 : 𝓞 M) ∈ P := by
+theorem two_mem {M : Type} [Field M] [NumberField M] (P : Ideal (𝓞 M))
+    [P.LiesOver (span {(2 : ℤ)})] : (2 : 𝓞 M) ∈ P := by
   have h2 : (2 : ℤ) ∈ P.under ℤ := by
     rw [← (Ideal.LiesOver.over : span {(2 : ℤ)} = P.under ℤ)]
     exact Ideal.mem_span_singleton_self 2
   simpa using Ideal.mem_comap.mp h2
 
-theorem omega_integral
-    {F : Type} [Field F] [NumberField F] {r : ℕ} (hr4 : r % 4 = 3) {X : F} (hX : X ^ 2 = -(r : F))
-    : IsIntegral ℤ ((1 + X) / 2) := by
+theorem omega_integral {F : Type} [Field F] [NumberField F] {r : ℕ} (hr4 : r % 4 = 3) {X : F}
+    (hX : X ^ 2 = -(r : F)) : IsIntegral ℤ ((1 + X) / 2) := by
   obtain ⟨m, hm⟩ : ∃ m : ℕ, r + 1 = 4 * m := ⟨(r + 1) / 4, by omega⟩
   have hm' : (r : F) + 1 = 4 * (m : F) := by exact_mod_cast hm
   refine ⟨Polynomial.X ^ 2 - Polynomial.X + Polynomial.C (m : ℤ), ?_, ?_⟩
@@ -322,25 +354,26 @@ theorem omega_integral
   · simp
     linear_combination (1 / 4 : F) * hX - (1 / 4 : F) * hm'
 
-theorem aE_sq_eq_neg_q (h : IsLayer (e + 2) q d ζ a b)
-    : aE ζ a b ^ 2 = ((-(q : ℤ) : ℤ) : hostE ζ a b) := by
+theorem aE_sq_eq_neg_q (h : IsLayer (e + 2) q d ζ a b) :
+    aE ζ a b ^ 2 = ((-(q : ℤ) : ℤ) : hostE ζ a b) := by
   apply Subtype.ext
   simp [aE, h.2.1]
 
-theorem bE_sq' (h : IsLayer (e + 2) q d ζ a b) : bE ζ a b ^ 2 = ((-(d : ℤ) : ℤ) : hostE ζ a b) := by
+theorem bE_sq' (h : IsLayer (e + 2) q d ζ a b) :
+    bE ζ a b ^ 2 = ((-(d : ℤ) : ℤ) : hostE ζ a b) := by
   apply Subtype.ext
   simp [bE, h.2.2.1]
 
-theorem stab_two_sgn
-    (hqd : HypOdd q d) (hd16 : d % 16 = 7) (h : IsLayer (e + 2) q d ζ a b)
+theorem stab_two_sgn (hqd : HypOdd q d) (hd16 : d % 16 = 7) (h : IsLayer (e + 2) q d ζ a b)
     (P : Ideal (𝓞 (hostE ζ a b))) [P.IsPrime] [P.LiesOver (span {(2 : ℤ)})]
     (σ : hostE ζ a b ≃ₐ[ℚ] hostE ζ a b)
-    (hσ : σ ∈ MulAction.stabilizer (hostE ζ a b ≃ₐ[ℚ] hostE ζ a b) P)
-    : (galE e ζ a b σ).1.2 = 1 := by
+    (hσ : σ ∈ MulAction.stabilizer (hostE ζ a b ≃ₐ[ℚ] hostE ζ a b) P) :
+    (galE e ζ a b σ).1.2 = 1 := by
   have hbsq : bE ζ a b ^ 2 = -((d : ℕ) : hostE ζ a b) := by simpa using bE_sq' h
   have hfix : σ (bE ζ a b) = bE ζ a b := by
     by_contra hne
-    have hsq : (σ (bE ζ a b)) ^ 2 = (bE ζ a b) ^ 2 := by rw [← map_pow, hbsq, map_neg, map_natCast]
+    have hsq : (σ (bE ζ a b)) ^ 2 = (bE ζ a b) ^ 2 := by
+      rw [← map_pow, hbsq, map_neg, map_natCast]
     have hσb : σ (bE ζ a b) = -(bE ζ a b) := by
       have hm0 : (σ (bE ζ a b) - bE ζ a b) * (σ (bE ζ a b) + bE ζ a b) = 0 := by
         linear_combination hsq
@@ -354,14 +387,16 @@ theorem stab_two_sgn
     have hm : (d : hostE ζ a b) + 1 = 8 * (m2 : hostE ζ a b) := by exact_mod_cast hm2
     have hprod : ω * (1 - ω) = 2 * (m2 : 𝓞 (hostE ζ a b)) := by
       ext1
-      have e3
-          : ((ω * (1 - ω) : 𝓞 (hostE ζ a b)) : hostE ζ a b)
-            = (ω : hostE ζ a b) * (1 - (ω : hostE ζ a b)) := by
-        first | rfl | push_cast; rfl | simp
-      have e4
-          : ((2 * (m2 : 𝓞 (hostE ζ a b)) : 𝓞 (hostE ζ a b)) : hostE ζ a b)
-            = 2 * (m2 : hostE ζ a b) := by
-        first | rfl | push_cast; rfl | simp
+      have e3 : ((ω * (1 - ω) : 𝓞 (hostE ζ a b)) : hostE ζ a b) =
+          (ω : hostE ζ a b) * (1 - (ω : hostE ζ a b)) := by
+        first
+          | rfl
+          | push_cast; rfl
+      have e4 : ((2 * (m2 : 𝓞 (hostE ζ a b)) : 𝓞 (hostE ζ a b)) : hostE ζ a b) =
+          2 * (m2 : hostE ζ a b) := by
+        first
+          | rfl
+          | push_cast; rfl
       rw [e3, e4, hωv]
       have hb2 : bE ζ a b ^ 2 = 1 - 8 * (m2 : hostE ζ a b) := by
         rw [hbsq, ← hm]
@@ -370,9 +405,12 @@ theorem stab_two_sgn
     have hsw : σ • ω = 1 - ω := by
       ext
       have e1 : ((σ • ω : 𝓞 (hostE ζ a b)) : hostE ζ a b) = σ (ω : hostE ζ a b) := by
-        first | rfl | simp
+        first
+          | rfl
       have e2 : ((1 - ω : 𝓞 (hostE ζ a b)) : hostE ζ a b) = 1 - (ω : hostE ζ a b) := by
-        first | rfl | push_cast; rfl | simp
+        first
+          | rfl
+          | push_cast; rfl
       rw [e1, e2, hωv, map_div₀, map_add (f := _), map_one, hσb, map_ofNat]
       ring
     have hsmul : ∀ z, σ • z ∈ P ↔ z ∈ P := smul_mem_iff_of_stab σ P hσ
@@ -385,7 +423,8 @@ theorem stab_two_sgn
       · refine ⟨?_, h1⟩
         have h3 := (hsmul (1 - ω)).mpr h1
         rwa [smul_sub, smul_one, hsw, sub_sub_cancel] at h3
-    have h1P : (1 : 𝓞 (hostE ζ a b)) ∈ P := by simpa using P.add_mem hboth.1 hboth.2
+    have h1P : (1 : 𝓞 (hostE ζ a b)) ∈ P := by
+      simpa using P.add_mem hboth.1 hboth.2
     exact (inferInstance : P.IsPrime).ne_top ((Ideal.eq_top_iff_one P).mpr h1P)
   show sgn σ (bE ζ a b) = 1
   unfold sgn
@@ -412,18 +451,18 @@ theorem hostDecomp : HostDecomp := by
   have := hEgal
   let gE : (hostE ζ a b ≃ₐ[ℚ] hostE ζ a b) →* GG e := MonoidHom.mk' (galE e ζ a b) hmulE
   let gL : Gal(L/ℚ) →* GalL (e + 2) := MonoidHom.mk' (galMap h.1 a b) hmulL
-  have hpowE
-      : ∀ (x : hostE ζ a b ≃ₐ[ℚ] hostE ζ a b) (k : ℕ), galE e ζ a b (x ^ k) = galE e ζ a b x ^ k :=
-    fun x k => map_pow gE x k
-  have hpowL : ∀ (x : Gal(L/ℚ)) (k : ℕ), galMap h.1 a b (x ^ k) = galMap h.1 a b x ^ k := fun x k =>
-    map_pow gL x k
+  have hpowE : ∀ (x : hostE ζ a b ≃ₐ[ℚ] hostE ζ a b) (k : ℕ),
+      galE e ζ a b (x ^ k) = galE e ζ a b x ^ k := fun x k => map_pow gE x k
+  have hpowL : ∀ (x : Gal(L/ℚ)) (k : ℕ), galMap h.1 a b (x ^ k) = galMap h.1 a b x ^ k :=
+    fun x k => map_pow gL x k
   have ha : a ^ 2 = ((-(q : ℤ) : ℤ) : L) := by rw [h.2.1]; push_cast; rfl
   have hb : b ^ 2 = ((-(d : ℤ) : ℤ) : L) := by rw [h.2.2.1]; push_cast; rfl
   have hqnd : ¬ q ∣ d := fun hdv => hqd' ((Nat.prime_dvd_prime_iff_eq hq hd).mp hdv)
   have hdnq : ¬ d ∣ q := fun hdv => hqd' ((Nat.prime_dvd_prime_iff_eq hd hq).mp hdv).symm
   have hIT := layerInertiaTame (e + 2) q d (by omega) hqd L ζ a b h
   refine ⟨fun P _ _ => ?_, fun P _ _ => ?_, fun P _ _ => ?_⟩
-  · obtain ⟨⟨Q, hQp, hQl⟩⟩ : Nonempty (P.primesOver (𝓞 L)) := inferInstance
+  ·
+    obtain ⟨⟨Q, hQp, hQl⟩⟩ : Nonempty (P.primesOver (𝓞 L)) := inferInstance
     have : Q.LiesOver (span {(2 : ℤ)}) := Ideal.LiesOver.trans Q P (span {(2 : ℤ)})
     rw [mem_Psi_iff]
     refine ⟨stab_two_sgn hqd hd16 h P σ, fun hs => ?_⟩
@@ -436,7 +475,8 @@ theorem hostDecomp : HostDecomp := by
     simp only [MonoidHom.coe_comp, Function.comp_apply, MonoidHom.coe_snd]
     rw [← h1]
     exact hs
-  · have : Fact q.Prime := ⟨hq⟩
+  ·
+    have : Fact q.Prime := ⟨hq⟩
     obtain ⟨⟨Q, hQp, hQl⟩⟩ : Nonempty (P.primesOver (𝓞 L)) := inferInstance
     have : Q.LiesOver (span {(q : ℤ)}) := Ideal.LiesOver.trans Q P (span {(q : ℤ)})
     have : Finite (𝓞 L ⧸ Q) := by
@@ -447,12 +487,10 @@ theorem hostDecomp : HostDecomp := by
     obtain ⟨F, hF⟩ := IsArithFrobAt.exists_of_isInvariant ℤ Gal(L/ℚ) Q
     obtain ⟨σF, hσF⟩ := exists_restrict hqd h F
     have hFE : IsArithFrobAt ℤ σF P := frob_restrict q Q P σF F hσF hF
-    have hF1 : (galMap h.1 a b F).1 = uq :=
-      Units.ext ((odd_cyc_frob h.1 q hq2 Q F hF).trans huq.symm)
+    have hF1 : (galMap h.1 a b F).1 = uq := Units.ext ((odd_cyc_frob h.1 q hq2 Q F hF).trans huq.symm)
     have hF3 : (galMap h.1 a b F).2.2 = 1 := by
-      have :=
-        odd_frob_sgn q hq2 Q F hF b _ hb
-          (by rw [dvd_neg]; intro h'; exact hqnd (by exact_mod_cast h'))
+      have := odd_frob_sgn q hq2 Q F hF b _ hb
+        (by rw [dvd_neg]; intro h'; exact hqnd (by exact_mod_cast h'))
       rw [hjac] at this
       exact Units.ext this
     have hgF : galE e ζ a b σF = (((galMap h.1 a b F).2.1, 1), hcl e uq) := by
@@ -476,13 +514,11 @@ theorem hostDecomp : HostDecomp := by
         · left; rfl
         · right; rfl
       have hτ : ι * F ^ k ∈ MulAction.stabilizer Gal(L/ℚ) Q :=
-        Subgroup.mul_mem _
-          (Ideal.inertia_le_stabilizer (M := Gal(L/ℚ)) Q (AddSubgroup.mem_inertia.mpr hιI))
-          (Subgroup.pow_mem _ hF.mem_stabilizer k)
+        Subgroup.mul_mem _ (Ideal.inertia_le_stabilizer (M := Gal(L/ℚ)) Q
+          (AddSubgroup.mem_inertia.mpr hιI)) (Subgroup.pow_mem _ hF.mem_stabilizer k)
       obtain ⟨σ', hσ'⟩ := exists_restrict hqd h (ι * F ^ k)
-      have hgm
-          : galMap h.1 a b (ι * F ^ k)
-            = ((galMap h.1 a b F).1 ^ k, s' * (galMap h.1 a b F).2.1 ^ k, 1) := by
+      have hgm : galMap h.1 a b (ι * F ^ k) =
+          ((galMap h.1 a b F).1 ^ k, s' * (galMap h.1 a b F).2.1 ^ k, 1) := by
         rw [hmulL, hpowL, hι]
         refine Prod.ext ?_ (Prod.ext ?_ ?_) <;> simp [hF3]
       have hσσ : σ' = σ := by
@@ -494,7 +530,8 @@ theorem hostDecomp : HostDecomp := by
         · rw [hk]; exact QuotientGroup.mk_pow _ uq k
       rw [← hσσ]
       exact stab_restrict P Q σ' _ hσ' hτ
-  · have : Fact d.Prime := ⟨hd⟩
+  ·
+    have : Fact d.Prime := ⟨hd⟩
     obtain ⟨⟨Q, hQp, hQl⟩⟩ : Nonempty (P.primesOver (𝓞 L)) := inferInstance
     have : Q.LiesOver (span {(d : ℤ)}) := Ideal.LiesOver.trans Q P (span {(d : ℤ)})
     have : Finite (𝓞 L ⧸ Q) := by
@@ -505,12 +542,10 @@ theorem hostDecomp : HostDecomp := by
     obtain ⟨F, hF⟩ := IsArithFrobAt.exists_of_isInvariant ℤ Gal(L/ℚ) Q
     obtain ⟨σF, hσF⟩ := exists_restrict hqd h F
     have hFE : IsArithFrobAt ℤ σF P := frob_restrict d Q P σF F hσF hF
-    have hF1 : (galMap h.1 a b F).1 = ud :=
-      Units.ext ((odd_cyc_frob h.1 d hd2 Q F hF).trans hud.symm)
+    have hF1 : (galMap h.1 a b F).1 = ud := Units.ext ((odd_cyc_frob h.1 d hd2 Q F hF).trans hud.symm)
     have hF2 : (galMap h.1 a b F).2.1 = -1 := by
-      have :=
-        odd_frob_sgn d hd2 Q F hF a _ ha
-          (by rw [dvd_neg]; intro h'; exact hdnq (by exact_mod_cast h'))
+      have := odd_frob_sgn d hd2 Q F hF a _ ha
+        (by rw [dvd_neg]; intro h'; exact hdnq (by exact_mod_cast h'))
       rw [hrec] at this
       exact Units.ext this
     have hgF : galE e ζ a b σF = ((-1, (galMap h.1 a b F).2.2), hcl e ud) := by
@@ -534,13 +569,11 @@ theorem hostDecomp : HostDecomp := by
         · left; rfl
         · right; rfl
       have hτ : ι * F ^ k ∈ MulAction.stabilizer Gal(L/ℚ) Q :=
-        Subgroup.mul_mem _
-          (Ideal.inertia_le_stabilizer (M := Gal(L/ℚ)) Q (AddSubgroup.mem_inertia.mpr hιI))
-          (Subgroup.pow_mem _ hF.mem_stabilizer k)
+        Subgroup.mul_mem _ (Ideal.inertia_le_stabilizer (M := Gal(L/ℚ)) Q
+          (AddSubgroup.mem_inertia.mpr hιI)) (Subgroup.pow_mem _ hF.mem_stabilizer k)
       obtain ⟨σ', hσ'⟩ := exists_restrict hqd h (ι * F ^ k)
-      have hgm
-          : galMap h.1 a b (ι * F ^ k)
-            = ((galMap h.1 a b F).1 ^ k, (-1) ^ k, t' * (galMap h.1 a b F).2.2 ^ k) := by
+      have hgm : galMap h.1 a b (ι * F ^ k) =
+          ((galMap h.1 a b F).1 ^ k, (-1) ^ k, t' * (galMap h.1 a b F).2.2 ^ k) := by
         rw [hmulL, hpowL, hι]
         refine Prod.ext ?_ (Prod.ext ?_ ?_) <;> simp [hF2]
       have hσσ : σ' = σ := by
@@ -565,13 +598,14 @@ theorem hostDecompConj : HostDecompConj := by
     Nat.Coprime.pow_right _ ((Nat.coprime_primes hyp.1 Nat.prime_two).mpr (by omega))
   have hcd : Nat.Coprime d (2 ^ (e + 2)) :=
     Nat.Coprime.pow_right _ ((Nat.coprime_primes hyp.2.1 Nat.prime_two).mpr (by omega))
-  have HD :=
-    hostDecomp e q d hyp L ζ a b h (ZMod.unitOfCoprime q hcq) (ZMod.unitOfCoprime d hcd)
-      (ZMod.coe_unitOfCoprime q hcq) (ZMod.coe_unitOfCoprime d hcd) σ
+  have HD := hostDecomp e q d hyp L ζ a b h (ZMod.unitOfCoprime q hcq) (ZMod.unitOfCoprime d hcd)
+    (ZMod.coe_unitOfCoprime q hcq) (ZMod.coe_unitOfCoprime d hcd) σ
   rw [hσ] at HD
   have hnotPsi : cc e ∉ Psi e := by
     intro hmem
-    have h3 : chD e (cc e) = -1 := by first | rfl | simp [chD, cc, c0]
+    have h3 : chD e (cc e) = -1 := by
+      first
+        | rfl
     exact hm1 (h3.symm.trans (MonoidHom.mem_ker.mp hmem))
   rcases hp with rfl | rfl | ⟨rfl, he2⟩
   · haveI : P.LiesOver (span {(2 : ℤ)}) := by
@@ -595,9 +629,8 @@ theorem hostDecompConj : HostDecompConj := by
       exact hk2.symm
     rw [QuotientGroup.eq_one_iff, Subgroup.mem_zpowers_iff] at hk3
     obtain ⟨i, hi⟩ := hk3
-    have hpm
-        : (ZMod.unitOfCoprime p hcd ^ (2 * j + 1) : (ZMod (2 ^ (e + 2)))ˣ) = 1
-          ∨ (ZMod.unitOfCoprime p hcd ^ (2 * j + 1) : (ZMod (2 ^ (e + 2)))ˣ) = -1 := by
+    have hpm : (ZMod.unitOfCoprime p hcd ^ (2 * j + 1) : (ZMod (2 ^ (e + 2)))ˣ) = 1 ∨
+        (ZMod.unitOfCoprime p hcd ^ (2 * j + 1) : (ZMod (2 ^ (e + 2)))ˣ) = -1 := by
       rw [← hi]
       rcases Int.even_or_odd i with hev | hod
       · left
@@ -611,11 +644,10 @@ theorem hostDecompConj : HostDecompConj := by
       rw [← ZMod.natCast_mod, hd16]
       all_goals first | rfl | decide
     have h49 : (7 : ZMod 16) ^ 2 = 1 := by decide
-    have h7 : (7 : ZMod 16) ^ (2 * j + 1) = 7 := by rw [pow_succ, pow_mul, h49, one_pow, one_mul]
-    have hval
-        : ZMod.castHom h16 (ZMod 16)
-            ((ZMod.unitOfCoprime p hcd ^ (2 * j + 1) : (ZMod (2 ^ (e + 2)))ˣ) : ZMod (2 ^ (e + 2)))
-          = 7 := by
+    have h7 : (7 : ZMod 16) ^ (2 * j + 1) = 7 := by
+      rw [pow_succ, pow_mul, h49, one_pow, one_mul]
+    have hval : ZMod.castHom h16 (ZMod 16)
+        ((ZMod.unitOfCoprime p hcd ^ (2 * j + 1) : (ZMod (2 ^ (e + 2)))ˣ) : ZMod (2 ^ (e + 2))) = 7 := by
       rw [Units.val_pow_eq_pow_val, ZMod.coe_unitOfCoprime, map_pow, map_natCast, hd7, h7]
     rcases hpm with h1 | h1
     · rw [h1, Units.val_one, map_one] at hval

@@ -1,7 +1,54 @@
 module
 
-public import Mathlib
+public import GroundTheory.HeightsAndTheta.Heights.ArithmeticBezout.Statements
 public import GroundTheory.HeightsAndTheta.Heights.ArithmeticBezout.RenameProdMapMul
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.MvPolynomial.IrreducibleQuadratic
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -17,10 +64,11 @@ section Factor
 
 variable {R σ : Type*} [CommRing R] {w : σ → ℕ}
 
-def weightSet (w : σ → ℕ) (p : MvPolynomial σ R) : Finset ℕ := p.support.image (Finsupp.weight w)
+def weightSet (w : σ → ℕ) (p : MvPolynomial σ R) : Finset ℕ :=
+  p.support.image (Finsupp.weight w)
 
-theorem sum_weightSet_component (p : MvPolynomial σ R)
-    : ∑ a ∈ weightSet w p, weightedHomogeneousComponent w a p = p := by
+theorem sum_weightSet_component (p : MvPolynomial σ R) :
+    ∑ a ∈ weightSet w p, weightedHomogeneousComponent w a p = p := by
   classical
   ext d
   rw [coeff_sum]
@@ -32,13 +80,13 @@ theorem sum_weightSet_component (p : MvPolynomial σ R)
     apply h
     exact Finset.mem_image.mpr ⟨d, mem_support_iff.mpr (Ne.symm hne), rfl⟩
 
-theorem mem_weightSet {p : MvPolynomial σ R} {a : ℕ}
-    : a ∈ weightSet w p ↔ ∃ d ∈ p.support, Finsupp.weight w d = a := by
+theorem mem_weightSet {p : MvPolynomial σ R} {a : ℕ} :
+    a ∈ weightSet w p ↔ ∃ d ∈ p.support, Finsupp.weight w d = a := by
   unfold weightSet
   exact Finset.mem_image
 
-theorem component_ne_zero_of_mem {p : MvPolynomial σ R} {a : ℕ} (ha : a ∈ weightSet w p)
-    : weightedHomogeneousComponent w a p ≠ 0 := by
+theorem component_ne_zero_of_mem {p : MvPolynomial σ R} {a : ℕ} (ha : a ∈ weightSet w p) :
+    weightedHomogeneousComponent w a p ≠ 0 := by
   classical
   obtain ⟨d, hd, rfl⟩ := mem_weightSet.mp ha
   intro h
@@ -47,28 +95,23 @@ theorem component_ne_zero_of_mem {p : MvPolynomial σ R} {a : ℕ} (ha : a ∈ w
   change p.coeff d = 0 at this
   exact mem_support_iff.mp hd this
 
-theorem component_mul_of_unique
-    (p q : MvPolynomial σ R) (a b : ℕ)
-    (h : ∀ a' ∈ weightSet w p, ∀ b' ∈ weightSet w q, a' + b' = a + b → a' = a ∧ b' = b)
-    : weightedHomogeneousComponent w (a + b) (p * q)
-      = weightedHomogeneousComponent w a p * weightedHomogeneousComponent w b q := by
+theorem component_mul_of_unique (p q : MvPolynomial σ R) (a b : ℕ)
+    (h : ∀ a' ∈ weightSet w p, ∀ b' ∈ weightSet w q, a' + b' = a + b → a' = a ∧ b' = b) :
+    weightedHomogeneousComponent w (a + b) (p * q) =
+      weightedHomogeneousComponent w a p * weightedHomogeneousComponent w b q := by
   classical
   conv_lhs => rw [← sum_weightSet_component (w := w) p, ← sum_weightSet_component (w := w) q,
     Finset.sum_mul_sum]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
-  have hterm
-      : ∀ a' ∈ weightSet w p, ∀ b' ∈ weightSet w q,
-        weightedHomogeneousComponent w (a + b)
-            (weightedHomogeneousComponent w a' p * weightedHomogeneousComponent w b' q)
-          = if a' = a ∧ b' = b then
-              weightedHomogeneousComponent w a p * weightedHomogeneousComponent w b q
-            else
-              0 := by
+
+  rw [map_sum]
+  have hterm : ∀ a' ∈ weightSet w p, ∀ b' ∈ weightSet w q,
+      weightedHomogeneousComponent w (a + b)
+        (weightedHomogeneousComponent w a' p * weightedHomogeneousComponent w b' q) =
+      if a' = a ∧ b' = b then weightedHomogeneousComponent w a p * weightedHomogeneousComponent w b q
+        else 0 := by
     intro a' ha' b' hb'
-    have hh :=
-      (weightedHomogeneousComponent_isWeightedHomogeneous (w := w) a' p).mul
-        (weightedHomogeneousComponent_isWeightedHomogeneous (w := w) b' q)
+    have hh := (weightedHomogeneousComponent_isWeightedHomogeneous (w := w) a' p).mul
+      (weightedHomogeneousComponent_isWeightedHomogeneous (w := w) b' q)
     by_cases hs : a' + b' = a + b
     · obtain ⟨rfl, rfl⟩ := h a' ha' b' hb' hs
       rw [if_pos ⟨rfl, rfl⟩, hh.weightedHomogeneousComponent_same]
@@ -76,8 +119,8 @@ theorem component_mul_of_unique
       rw [if_neg]
       rintro ⟨rfl, rfl⟩
       exact hs rfl
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [Finset.sum_congr rfl fun a' ha' => map_sum _ _ _]
+
+  rw [Finset.sum_congr rfl fun a' ha' => map_sum _ _ _]
   rw [Finset.sum_congr rfl fun a' ha' => Finset.sum_congr rfl fun b' hb' => hterm a' ha' b' hb']
   by_cases ha : a ∈ weightSet w p
   · by_cases hb : b ∈ weightSet w q
@@ -97,13 +140,15 @@ theorem component_mul_of_unique
         intro d hd hdb
         exact hb (mem_weightSet.mpr ⟨d, hd, hdb⟩)
       rw [this, mul_zero]
-      exact Finset.sum_eq_zero fun a' _ => Finset.sum_eq_zero fun b' _ => by split_ifs <;> simp
+      exact Finset.sum_eq_zero fun a' _ => Finset.sum_eq_zero fun b' _ => by
+        split_ifs <;> simp
   · have : weightedHomogeneousComponent w a p = 0 := by
       apply weightedHomogeneousComponent_eq_zero'
       intro d hd hda
       exact ha (mem_weightSet.mpr ⟨d, hd, hda⟩)
     rw [this, zero_mul]
-    exact Finset.sum_eq_zero fun a' _ => Finset.sum_eq_zero fun b' _ => by split_ifs <;> simp
+    exact Finset.sum_eq_zero fun a' _ => Finset.sum_eq_zero fun b' _ => by
+      split_ifs <;> simp
 
 theorem weightSet_nonempty {p : MvPolynomial σ R} (hp : p ≠ 0) : (weightSet w p).Nonempty := by
   classical
@@ -112,10 +157,9 @@ theorem weightSet_nonempty {p : MvPolynomial σ R} (hp : p ≠ 0) : (weightSet w
 
 variable [IsDomain R]
 
-theorem isWeightedHomogeneous_of_mul_left
-    {p q : MvPolynomial σ R} {m : ℕ}
-    (hpq : IsWeightedHomogeneous w (p * q) m) (hp : p ≠ 0) (hq : q ≠ 0)
-    : ∃ a, IsWeightedHomogeneous w p a := by
+theorem isWeightedHomogeneous_of_mul_left {p q : MvPolynomial σ R} {m : ℕ}
+    (hpq : IsWeightedHomogeneous w (p * q) m) (hp : p ≠ 0) (hq : q ≠ 0) :
+    ∃ a, IsWeightedHomogeneous w p a := by
   classical
   have hPn := weightSet_nonempty (w := w) hp
   have hQn := weightSet_nonempty (w := w) hq
@@ -148,8 +192,7 @@ theorem isWeightedHomogeneous_of_mul_left
   have hA : a₀ ≤ A := Finset.min'_le _ _ (Finset.max'_mem _ _)
   have hB : b₀ ≤ B := Finset.min'_le _ _ (Finset.max'_mem _ _)
   refine ⟨A, fun d hd => ?_⟩
-  have hmem : Finsupp.weight w d ∈ weightSet w p :=
-    mem_weightSet.mpr ⟨d, mem_support_iff.mpr hd, rfl⟩
+  have hmem : Finsupp.weight w d ∈ weightSet w p := mem_weightSet.mpr ⟨d, mem_support_iff.mpr hd, rfl⟩
   have h1 := Finset.le_max' _ _ hmem
   have h2 := Finset.min'_le _ _ hmem
   show Finsupp.weight w d = A
@@ -163,8 +206,8 @@ variable {k n : ℕ}
 
 def inGroup (i : Fin k) : Fin k × Fin n → ℕ := fun ij => if ij.1 = i then 1 else 0
 
-theorem weight_groupWeight_apply (d : Fin k × Fin n →₀ ℕ) (i : Fin k)
-    : Finsupp.weight (groupWeight k n) d i = Finsupp.weight (inGroup (n := n) i) d := by
+theorem weight_groupWeight_apply (d : Fin k × Fin n →₀ ℕ) (i : Fin k) :
+    Finsupp.weight (groupWeight k n) d i = Finsupp.weight (inGroup (n := n) i) d := by
   classical
   rw [Finsupp.weight_apply, Finsupp.weight_apply, Finsupp.sum, Finsupp.sum, Finset.sum_apply]
   refine Finset.sum_congr rfl fun ij _ => ?_
@@ -175,8 +218,8 @@ theorem weight_groupWeight_apply (d : Fin k × Fin n →₀ ℕ) (i : Fin k)
 
 variable {R : Type*} [CommRing R]
 
-theorem isMultiHomog_iff (δ : ℕ) (f : MvPolynomial (Fin k × Fin n) R)
-    : IsMultiHomog δ f ↔ ∀ i : Fin k, IsWeightedHomogeneous (inGroup i) f δ := by
+theorem isMultiHomog_iff (δ : ℕ) (f : MvPolynomial (Fin k × Fin n) R) :
+    IsMultiHomog δ f ↔ ∀ i : Fin k, IsWeightedHomogeneous (inGroup i) f δ := by
   constructor
   · intro h i d hd
     rw [← weight_groupWeight_apply, h hd]
@@ -184,11 +227,9 @@ theorem isMultiHomog_iff (δ : ℕ) (f : MvPolynomial (Fin k × Fin n) R)
     funext i
     rw [weight_groupWeight_apply, h i hd]
 
-theorem isWeightedHomogeneous_rename
-    {σ τ : Type*} {e : σ → τ} (he : Function.Injective e)
-    {w : σ → ℕ} {w' : τ → ℕ} (hw : ∀ x, w' (e x) = w x)
-    {p : MvPolynomial σ R} {a : ℕ} (hp : IsWeightedHomogeneous w p a)
-    : IsWeightedHomogeneous w' (rename e p) a := by
+theorem isWeightedHomogeneous_rename {σ τ : Type*} {e : σ → τ} (he : Function.Injective e)
+    {w : σ → ℕ} {w' : τ → ℕ} (hw : ∀ x, w' (e x) = w x) {p : MvPolynomial σ R} {a : ℕ}
+    (hp : IsWeightedHomogeneous w p a) : IsWeightedHomogeneous w' (rename e p) a := by
   classical
   intro d hd
   have hd' : d ∈ (rename e p).support := mem_support_iff.mpr hd
@@ -202,18 +243,14 @@ theorem isWeightedHomogeneous_rename
 
 variable {F : Type} [Field F]
 
-theorem IsChowForm.degrees_eq
-    {I : Ideal (MvPolynomial (Fin n) F)} {g : MvPolynomial (Fin k × Fin n) F}
-    (hg : IsChowForm I k g)
-    {a : Fin k → ℕ} (ha : ∀ i, IsWeightedHomogeneous (inGroup i) g (a i))
-    (i j : Fin k)
-    : a i = a j := by
+theorem IsChowForm.degrees_eq {I : Ideal (MvPolynomial (Fin n) F)} {g : MvPolynomial (Fin k × Fin n) F}
+    (hg : IsChowForm I k g) {a : Fin k → ℕ} (ha : ∀ i, IsWeightedHomogeneous (inGroup i) g (a i))
+    (i j : Fin k) : a i = a j := by
   obtain ⟨c, hc2, hc⟩ := chowFormSwap F n k I g hg (Equiv.swap i j)
   have hc0 : c ≠ 0 := by rintro rfl; simp at hc2
   have h1 : IsWeightedHomogeneous (inGroup j) (rename (Prod.map (Equiv.swap i j) id) g) (a i) := by
     refine isWeightedHomogeneous_rename ((Equiv.swap i j).injective.prodMap Function.injective_id)
-      (fun x => ?_)
-      (ha i)
+      (fun x => ?_) (ha i)
     simp only [inGroup, Prod.map_fst]
     by_cases h : x.1 = i
     · rw [if_pos h, if_pos (by rw [h, Equiv.swap_apply_left])]
@@ -232,25 +269,19 @@ section Cycle
 
 variable {k n : ℕ} {F : Type} [Field F]
 
-theorem isWeightedHomogeneous_inGroup_of_dvd
-    {f g : MvPolynomial (Fin k × Fin n) F} {δ : ℕ}
-    (hf : IsMultiHomog δ f) (hf0 : f ≠ 0) (hgf : g ∣ f)
-    (i : Fin k)
-    : ∃ a, IsWeightedHomogeneous (inGroup i) g a := by
+theorem isWeightedHomogeneous_inGroup_of_dvd {f g : MvPolynomial (Fin k × Fin n) F} {δ : ℕ}
+    (hf : IsMultiHomog δ f) (hf0 : f ≠ 0) (hgf : g ∣ f) (i : Fin k) :
+    ∃ a, IsWeightedHomogeneous (inGroup i) g a := by
   obtain ⟨r, rfl⟩ := hgf
   exact isWeightedHomogeneous_of_mul_left ((isMultiHomog_iff δ _).mp hf i) (left_ne_zero_of_mul hf0)
     (right_ne_zero_of_mul hf0)
 
-theorem exists_degrees_of_chowFormCycle
-    (hk : 0 < k)
-    (Z : ProjCycle F n)
-    (c : F)
+theorem exists_degrees_of_chowFormCycle (hk : 0 < k) (Z : ProjCycle F n) (c : F)
     (g : Ideal (MvPolynomial (Fin n) F) → MvPolynomial (Fin k × Fin n) F)
-    (hg : ∀ W ∈ Z.support, IsChowForm W k (g W))
-    {δ : ℕ} (hf : IsMultiHomog δ (C c * ∏ W ∈ Z.support, g W ^ Z W))
-    (hf0 : C c * ∏ W ∈ Z.support, g W ^ Z W ≠ 0)
-    : ∃ δW : Ideal (MvPolynomial (Fin n) F) → ℕ,
-      (∀ W ∈ Z.support, IsMultiHomog (δW W) (g W)) ∧ ∑ W ∈ Z.support, Z W * δW W = δ := by
+    (hg : ∀ W ∈ Z.support, IsChowForm W k (g W)) {δ : ℕ}
+    (hf : IsMultiHomog δ (C c * ∏ W ∈ Z.support, g W ^ Z W)) (hf0 : C c * ∏ W ∈ Z.support, g W ^ Z W ≠ 0) :
+    ∃ δW : Ideal (MvPolynomial (Fin n) F) → ℕ, (∀ W ∈ Z.support, IsMultiHomog (δW W) (g W)) ∧
+      ∑ W ∈ Z.support, Z W * δW W = δ := by
   classical
   have hdeg : ∀ W ∈ Z.support, ∃ d, IsMultiHomog d (g W) := by
     intro W hW

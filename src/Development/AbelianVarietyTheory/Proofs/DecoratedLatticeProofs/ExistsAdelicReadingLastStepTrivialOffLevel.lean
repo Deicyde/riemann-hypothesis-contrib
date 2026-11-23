@@ -1,22 +1,67 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.Definitions.LatticeFrames.SplitPart
-public import Development.AbelianVarietyTheory.PublishedTheorems.TwistedTraceFormula.NotIsCompactUnivFv
 public import Development.AbelianVarietyTheory.Definitions.LatticeFrames.LevChiEqOne
-public import Development.AbelianVarietyTheory.Definitions.LatticeFrames.XiEqXiOffMul
-public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.ChartsReadingStepMoveBasePointsOneOffLevelPrime
 public import Development.AbelianVarietyTheory.Definitions.GaloisGeometry.MemMoveLevUloc
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.AdmissibleBasePointUnitaryNormalisesLevelStatement
-public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.UnitaryGroupAdelicClassesViaFiniteAdelicPart
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsIsDetRoot
-public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.MoveCompactLevelInvariant
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.RepresentativeImagePointOfLift
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ResidueEqZeroIff
 public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.NotTopPtOne
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.TwistPrimesAwayLevelAndTypePrimes
+public import Development.AbelianVarietyTheory.Definitions.LatticeFrames.ChartNonempty
+public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.MoveCompactLevelInvariant
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.AdmissibleBasePointUnitaryNormalisesLevelStatement
+import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.BaseFieldsDefiniteLaws
+import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.BaseFieldsPrimesOk
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ChartLevelTwistTrivialLocalMove
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsIsDetRoot
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsUnitaryAdelicTwistDiagonalAtPrimes
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsUnitaryDiagonalBasePointLevelPrime
-public import Development.AbelianVarietyTheory.Definitions.LatticeFrames.ChartNonempty
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.InclMulInvMul
+import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.LevOkTwists
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.PointOverXHasAdelicPointBlockExtendMul
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.RepresentativeImagePointOfLift
+import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.TrueColumnSpacesStandardInFrameCoords
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.TwistPrimesAwayLevelAndTypePrimes
+public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.ChartsReadingStepMoveBasePointsOneOffLevelPrime
+public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.UnitaryGroupAdelicClassesViaFiniteAdelicPart
+import Formalism.LocalToGlobal.Columns.RecLevelLocP
+import Formalism.LocalToGlobal.Columns.RecLevelStep
+import Formalism.LocalToGlobal.Columns.RowFormsAdelic
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Development.AbelianVarietyTheory.Definitions.LatticeFrames.FiniteDimensionalMram
 
 @[expose] public section
 
@@ -126,7 +171,6 @@ theorem exists_basePt_on
 
 end Gen
 
-set_option maxHeartbeats 1000000 in
 theorem exists_mv
     {I : TC B X} (hI : I.Ok)
     (hP : TC.Pins B X)
@@ -374,7 +418,6 @@ theorem isRed_one_of_inv
 
 end Red
 
-set_option maxHeartbeats 1000000 in
 theorem isRed_one_of_topPt
     (I : TC B X) (hI : I.Ok)
     (hP : TC.Pins B X)
@@ -501,7 +544,6 @@ def mvEl
   else
     1
 
-set_option maxHeartbeats 2000000 in
 theorem mvEl_spec
     (hI : I.Ok) (hP : TC.Pins B X)
     (A : TwDat I l Z u a Ch) (hA : A.Is)
@@ -609,7 +651,6 @@ theorem mvW_spec
   rw [e]
   exact mvLift_spec hI hP A hA i hi β
 
-set_option maxHeartbeats 2000000 in
 def moved (hI : I.Ok) (hP : TC.Pins B X) (A : TwDat I l Z u a Ch) (hA : A.Is)
     : TwDat I l Z u a Ch where
   bad := A.bad
@@ -681,7 +722,6 @@ section Main
 variable
   {I : TC B X} {l : I.Laws} {Z : TC.Later B (I.cols l)} {u : B.Word} {a : I.ι} {Ch : ℕ → Type}
 
-set_option maxHeartbeats 4000000 in
 theorem moved_is (hI : I.Ok) (hP : TC.Pins B X) (A : TwDat I l Z u a Ch) (hA : A.Is)
     : (moved hI hP A hA).Is := by
   have hPr := l.pr
@@ -836,7 +876,6 @@ theorem moved_is (hI : I.Ok) (hP : TC.Pins B X) (A : TwDat I l Z u a Ch) (hA : A
   · obtain ⟨n, hn, h⟩ := hA.fin i hi β
     exact ⟨n, hn, fun κ => h ⟨(mvEl hI hP A hA i hi β).1 * κ.1 * (mvEl hI hP A hA i hi β).1⁻¹, κ.2⟩⟩
 
-set_option maxHeartbeats 4000000 in
 theorem exists_twDat_top_trivial
     : ∀ {B : Base} {X : PreX B.toPre} (I : TC B X),
       I.Ok → TC.Pins B X

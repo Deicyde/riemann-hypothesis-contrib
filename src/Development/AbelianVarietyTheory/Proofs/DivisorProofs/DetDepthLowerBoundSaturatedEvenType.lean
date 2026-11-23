@@ -1,26 +1,67 @@
 module
 
-public import Mathlib
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.WeightedSumBounds.TypicalCurveStructureConstants
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.WeightedSumBounds.RootStatement
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.WeightedSumBounds.FactorialWeightedSumBound
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.WeightedSumBounds.OmBStatement
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.WeightedSumBounds.WtSubOneLe
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.WeightedSumBounds.EqZeroOfVecMulTmat
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.WeightedSumBounds.PtBasisMapGood
-public import ReciprocityTheory.ReductiveGroups.DiscreteSeries.FormalDegree.CauchyBinet
 public import Development.AbelianVarietyTheory.Definitions.Foundations.IsSatFrame
-public import Development.AbelianVarietyTheory.Proofs.UnramifiedDepth.TypicalBasisCoordinates
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FormalGroupDeterminantPowDepthBasisChangeInvariaStatement
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.DifferentialOperatorDepthIntegralCoordinatesStatement
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.LeFormalGroupDeterminantPowDepthOfRadiiStatement
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.DividedPowerContentValuationDetPowBoundsStatement
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.LogFGLDepthStagesLowAStatement
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsSolutionOrdGeRadius
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.LowCountAllBoundsStatement
+public import Mathlib.Analysis.SpecialFunctions.Log.Base
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.AdaptedBasis
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.TypicalCurvesTangentAndBases
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CoeffPowEqZeroOfDegreeLt
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.DifferentialOperatorDepthIntegralCoordinatesStatement
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.DividedPowerContentValuationDetPowBoundsStatement
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsSolutionOrdGeRadius
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FormalGroupDeterminantPowDepthBasisChangeInvariaStatement
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.LeFormalGroupDeterminantPowDepthOfRadiiStatement
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.LogFGLDepthStagesLowAStatement
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.LowCountAllBoundsStatement
+import Development.AbelianVarietyTheory.Proofs.DivisorProofs.TypicalCurvesTangentAndBases
+import Development.AbelianVarietyTheory.Proofs.UnramifiedDepth.TypicalBasisCoordinates
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Real
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.WeightedSumBounds.TangentEqLcZero
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.WeightedSumBounds.WtSubOneLe
+public import ReciprocityTheory.ReductiveGroups.DiscreteSeries.FormalDegree.CauchyBinet
 
 @[expose] public section
 
@@ -56,8 +97,8 @@ theorem coeff_lin {M : ℕ} (x : Fin M → C) (α : Fin M →₀ ℕ)
     : coeff α (∑ m, x m • (X m : MvPowerSeries (Fin M) C))
       = ∑ m, if α = Finsupp.single m 1 then x m else 0 := by
   classical
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+
+  rw [map_sum]
   refine Finset.sum_congr rfl fun m _ => ?_
   rw [coeff_smul, coeff_X]
   split_ifs <;> simp
@@ -140,8 +181,8 @@ theorem lgSum_change
         coeff α (lgSum p c t b)
           = ∑ n ∈ Finset.range (Finsupp.degree α + 1), ∑ a, c a n b * coeff α (t a ^ (p ^ n)) :=
     fun _ _ => rfl
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum, hc]
+
+  rw [map_sum, hc]
   simp only [coeff_smul, hc, h, Finset.mul_sum, Finset.sum_mul]
   rw [Finset.sum_comm (s := Finset.univ)]
   refine Finset.sum_congr rfl fun n _ => ?_

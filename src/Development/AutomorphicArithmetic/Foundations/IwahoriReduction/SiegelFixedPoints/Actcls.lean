@@ -1,11 +1,48 @@
 module
 
 public import Development.AutomorphicArithmetic.Foundations.IwahoriReduction.SiegelFixedPoints.IsThBIff
-public import Development.AbelianVarietyTheory.Definitions.Foundations.IsLamOfLSmulIff
-public import Development.AbelianVarietyTheory.Definitions.Foundations.IsLamFROfIsLamF
 public import Development.AbelianVarietyTheory.Definitions.Foundations.ActWBOfInvariant
-public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ThetaLatticeDiamondAction
+public import Development.AbelianVarietyTheory.Definitions.Foundations.LiftSLMapMulInvMem
 public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.IsCuspFunctionalValueModPrimePowDiamondIndepende
+public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ThetaLatticeDiamondAction
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
@@ -176,8 +213,8 @@ private theorem sum_congr_conj
       : ∑ γ ∈ S, X.act l ((g * g₀ * liftSL M γ : SL(2, ℤ)) : Matrix (Fin 2) (Fin 2) ℤ) f
         = ∑ γ ∈ S, X.act l ((g * g₀ * liftSL M (e γ) : SL(2, ℤ)) : Matrix (Fin 2) (Fin 2) ℤ) f :=
     (Finset.sum_equiv e hmem (fun _ _ => rfl)).symm
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [hsum, map_sum, ← Finset.sum_sub_distrib]
+
+  rw [hsum, map_sum, ← Finset.sum_sub_distrib]
   refine Submodule.sum_mem _ (fun γ _ => ?_)
   rw [act_act_SL]
   apply hf
@@ -266,8 +303,8 @@ theorem UpperTheory.Kd.L.actcls
       act_congr_sf X l hdiv (w + 2 - 2) hwk hmm
     have hkey : X.act l (g₀ : Matrix (Fin 2) (Fin 2) ℤ) A - A' ∈ evF X l n := by
       simp only [hAe, hA'e, clsBmu]
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum, ← Finset.sum_sub_distrib]
+
+      rw [map_sum, ← Finset.sum_sub_distrib]
       refine Submodule.sum_mem _ (fun r₀ _ => ?_)
       exact sum_congr_conj X l _
         (fun γ => by simp only [Finset.mem_filter, Finset.mem_univ, true_and])

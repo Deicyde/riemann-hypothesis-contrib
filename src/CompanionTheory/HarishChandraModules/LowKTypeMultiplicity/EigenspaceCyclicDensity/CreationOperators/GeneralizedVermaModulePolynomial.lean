@@ -1,8 +1,54 @@
 module
 
 public import CompanionTheory.HarishChandraModules.LowKTypeMultiplicity.EigenspaceCyclicDensity.LowKMultOneP
+public import Mathlib.Algebra.MvPolynomial.PDeriv
 public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.StableLattices.KummerLiftedCocycleImageEqPicardClass
-public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.StableLattices.WordMonomial
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
+import CompanionTheory.SpectralGeometry.LocalGlobalProofs.StableLattices.WordMonomial
 
 @[expose] public section
 
@@ -16,11 +62,11 @@ namespace CompanionTheory.D.LK
 open Formalism.REAL GlobalTheory.CompanionTheory.DSVerma GlobalTheory.CompanionTheory.DSCover
 open CompanionTheory.D.DSIC (KRel NC)
 
-theorem deg_pderiv {σ : Type} (i : σ) (f : MvPolynomial σ ℂ) (k : ℕ) (h : f.totalDegree ≤ k + 1)
-    : (pderiv i f).totalDegree ≤ k := by
+theorem deg_pderiv {σ : Type} (i : σ) (f : MvPolynomial σ ℂ) (k : ℕ) (h : f.totalDegree ≤ k + 1) :
+    (pderiv i f).totalDegree ≤ k := by
   classical
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [f.as_sum, map_sum]
+
+  rw [f.as_sum, map_sum]
   refine totalDegree_finsetSum_le fun s hs => ?_
   rw [pderiv_monomial]
   by_cases h0 : s i = 0
@@ -37,29 +83,23 @@ theorem deg_pderiv {σ : Type} (i : σ) (f : MvPolynomial σ ℂ) (k : ℕ) (h :
     change (s - Finsupp.single i 1).degree ≤ k
     omega
 
-theorem pderiv_deg_zero {σ : Type} (i : σ) (f : MvPolynomial σ ℂ) (h : f.totalDegree ≤ 0)
-    : pderiv i f = 0 := by
+theorem pderiv_deg_zero {σ : Type} (i : σ) (f : MvPolynomial σ ℂ) (h : f.totalDegree ≤ 0) : pderiv i f = 0 := by
   rw [totalDegree_eq_zero_iff_eq_C.1 (Nat.le_zero.1 h), pderiv_C]
 
-theorem deg_X_mul {σ : Type} (j : σ) (f : MvPolynomial σ ℂ)
-    : (X j * f).totalDegree ≤ f.totalDegree + 1 :=
+theorem deg_X_mul {σ : Type} (j : σ) (f : MvPolynomial σ ℂ) : (X j * f).totalDegree ≤ f.totalDegree + 1 :=
   (totalDegree_mul _ _).trans (by rw [totalDegree_X]; omega)
 
-theorem deg_X_pderiv {σ : Type} (j i : σ) (f : MvPolynomial σ ℂ)
-    : (X j * pderiv i f).totalDegree ≤ f.totalDegree := by
+theorem deg_X_pderiv {σ : Type} (j i : σ) (f : MvPolynomial σ ℂ) : (X j * pderiv i f).totalDegree ≤ f.totalDegree := by
   cases h : f.totalDegree with
   | zero => simp [pderiv_deg_zero i f h.le]
   | succ k => exact (deg_X_mul _ _).trans (Nat.succ_le_succ (deg_pderiv i f k h.le))
 
 theorem generalized_verma_module_polynomial : Verma2 := by
   intro n ε
-  let u : Fin n → Fin n → Module.End ℂ (MvPolynomial (NC ε) ℂ) := fun a c =>
-    (if a = c then 1 else 0) - dd ε a c
-  let v : Fin n → Fin n → Module.End ℂ (MvPolynomial (NC ε) ℂ) := fun a c =>
-    (if a = c then 1 else 0) + dd ε a c
-  have hδ
-      : ∀ (a c : Fin n) (T : Module.End ℂ (MvPolynomial (NC ε) ℂ)),
-        Commute (if a = c then 1 else 0) T := by
+  let u : Fin n → Fin n → Module.End ℂ (MvPolynomial (NC ε) ℂ) := fun a c => (if a = c then 1 else 0) - dd ε a c
+  let v : Fin n → Fin n → Module.End ℂ (MvPolynomial (NC ε) ℂ) := fun a c => (if a = c then 1 else 0) + dd ε a c
+  have hδ : ∀ (a c : Fin n) (T : Module.End ℂ (MvPolynomial (NC ε) ℂ)),
+      Commute (if a = c then 1 else 0) T := by
     intro a c T
     split_ifs <;> simp
   refine ⟨fun c d => ∑ i : NC ε, yy i * (u i.1.1 c * v d i.1.2), ?_, ?_, ?_, ?_⟩
@@ -106,13 +146,11 @@ theorem generalized_verma_module_polynomial : Verma2 := by
       all_goals simp
     · simp
   · intro a b f
-    set_option synthInstance.maxHeartbeats 100000 in
+
     simp [yy, LinearMap.sum_apply, map_sum]
 
   · intro c d f h
-    have hd
-        : ∀ (i : NC ε) (a b : Fin n),
-          (X i * dd ε a b f).totalDegree ≤ f.totalDegree := fun i a b => by
+    have hd : ∀ (i : NC ε) (a b : Fin n), (X i * dd ε a b f).totalDegree ≤ f.totalDegree := fun i a b => by
       unfold dd
       split_ifs
       · exact deg_X_pderiv _ _ f
@@ -124,25 +162,21 @@ theorem generalized_verma_module_polynomial : Verma2 := by
     cases hc : ε c
     · have e1 : i.1.1 ≠ c := fun e => by rw [e, hc] at i1; exact Bool.noConfusion i1
       have e2 : dd ε d i.1.2 = 0 := dif_neg (by simp [← h, hc])
-      simp only [u, v, if_neg e1, e2, yy, Module.End.mul_apply, add_zero, zero_sub,
-        LinearMap.neg_apply, LinearMap.mulLeft_apply]
+      simp only [u, v, if_neg e1, e2, yy, Module.End.mul_apply, add_zero, zero_sub, LinearMap.neg_apply,
+        LinearMap.mulLeft_apply]
       split_ifs
       · rw [mul_neg, totalDegree_neg]; exact hd _ _ _
       · simp
     · have e1 : d ≠ i.1.2 := fun e => by rw [← e, ← h, hc] at i2; exact Bool.noConfusion i2
       have e2 : dd ε i.1.1 c = 0 := dif_neg (by simp [hc])
-      simp only [u, v, if_neg e1, e2, yy, Module.End.mul_apply, zero_add, sub_zero,
-        LinearMap.mulLeft_apply]
+      simp only [u, v, if_neg e1, e2, yy, Module.End.mul_apply, zero_add, sub_zero, LinearMap.mulLeft_apply]
       split_ifs
       · exact hd _ _ _
       · simp
 
-theorem kRel_tens
-    {n : ℕ} {ε : Fin n → Bool} {V Z : Type}
-    [AddCommGroup V] [Module ℂ V] [AddCommGroup Z] [Module ℂ Z]
-    {E : Fin n → Fin n → Module.End ℂ V} {M : Fin n → Fin n → Module.End ℂ Z}
-    (hE : KRel ε E) (hM : GlRel M)
-    : KRel ε fun a b => ((E a b).rTensor Z + (M a b).lTensor V : Module.End ℂ (V ⊗[ℂ] Z)) := by
+theorem kRel_tens {n : ℕ} {ε : Fin n → Bool} {V Z : Type} [AddCommGroup V] [Module ℂ V] [AddCommGroup Z] [Module ℂ Z]
+    {E : Fin n → Fin n → Module.End ℂ V} {M : Fin n → Fin n → Module.End ℂ Z} (hE : KRel ε E) (hM : GlRel M) :
+    KRel ε fun a b => ((E a b).rTensor Z + (M a b).lTensor V : Module.End ℂ (V ⊗[ℂ] Z)) := by
   intro a b c d h1 h2
   apply TensorProduct.ext'
   intro v z
@@ -150,8 +184,8 @@ theorem kRel_tens
   have e2 := LinearMap.congr_fun (hM a b c d) z
   simp only [LinearMap.sub_apply, Module.End.mul_apply] at e1 e2
   simp only [LinearMap.sub_apply, Module.End.mul_apply, LinearMap.add_apply, LinearMap.rTensor_tmul,
-    LinearMap.lTensor_tmul, map_add, sub_eq_iff_eq_add.1 e1, sub_eq_iff_eq_add.1 e2,
-    TensorProduct.add_tmul, TensorProduct.tmul_add, TensorProduct.sub_tmul, TensorProduct.tmul_sub]
+    LinearMap.lTensor_tmul, map_add, sub_eq_iff_eq_add.1 e1, sub_eq_iff_eq_add.1 e2, TensorProduct.add_tmul,
+    TensorProduct.tmul_add, TensorProduct.sub_tmul, TensorProduct.tmul_sub]
   split_ifs <;> simp <;> abel
 
 theorem free_module_induction : FreeStep := by
@@ -166,14 +200,10 @@ theorem free_module_induction : FreeStep := by
     if h : ε i.1.1 = true ∧ ε i.1.2 = false then yy (⟨i.1, h⟩ : NC ε) else 0
   let S : ℕ → Set (Z ⊗[ℂ] P) := fun k =>
     {t | ∃ k₁ z f, z ∈ Fil k₁ ∧ k₁ + f.totalDegree ≤ k ∧ t = z ⊗ₜ f}
-  have hin
-      : ∀ {k k₁ : ℕ} {z : Z} {f : P},
-        z ∈ Fil k₁ → k₁ + f.totalDegree ≤ k → z ⊗ₜ[ℂ] f ∈ Submodule.span ℂ (S k) := fun hz hf =>
-    Submodule.subset_span ⟨_, _, _, hz, hf, rfl⟩
-  have hmap
-      : ∀ (T : Module.End ℂ (Z ⊗[ℂ] P)) (k : ℕ) (Q : Submodule ℂ (Z ⊗[ℂ] P)),
-        (∀ k₁ z f, z ∈ Fil k₁ → k₁ + f.totalDegree ≤ k → T (z ⊗ₜ f) ∈ Q)
-          → ∀ t ∈ Submodule.span ℂ (S k), T t ∈ Q := by
+  have hin : ∀ {k k₁ : ℕ} {z : Z} {f : P}, z ∈ Fil k₁ → k₁ + f.totalDegree ≤ k →
+      z ⊗ₜ[ℂ] f ∈ Submodule.span ℂ (S k) := fun hz hf => Submodule.subset_span ⟨_, _, _, hz, hf, rfl⟩
+  have hmap : ∀ (T : Module.End ℂ (Z ⊗[ℂ] P)) (k : ℕ) (Q : Submodule ℂ (Z ⊗[ℂ] P)),
+      (∀ k₁ z f, z ∈ Fil k₁ → k₁ + f.totalDegree ≤ k → T (z ⊗ₜ f) ∈ Q) → ∀ t ∈ Submodule.span ℂ (S k), T t ∈ Q := by
     intro T k Q h
     refine fun t ht => (Submodule.span_le (p := Q.comap T)).2 ?_ ht
     rintro _ ⟨k₁, z, f, hz, hf, rfl⟩
@@ -183,8 +213,7 @@ theorem free_module_induction : FreeStep := by
     split_ifs
     · exact deg_X_mul _ _
     · simp
-  have hddl
-      : ∀ a b (f : P) k, f.totalDegree ≤ k + 1 → (dd ε a b f).totalDegree ≤ k := fun a b f k h => by
+  have hddl : ∀ a b (f : P) k, f.totalDegree ≤ k + 1 → (dd ε a b f).totalDegree ≤ k := fun a b f k h => by
     unfold dd
     split_ifs
     · exact deg_pderiv _ _ _ h
@@ -194,29 +223,13 @@ theorem free_module_induction : FreeStep := by
     split_ifs
     · exact pderiv_deg_zero _ _ h
     · simp
-  refine ⟨
-    Z ⊗[ℂ] P,
-    inferInstance,
-    inferInstance,
-    fun c e => (M c e).rTensor P + (M' c e).lTensor Z,
-    χ ∘ₗ (TensorProduct.rid ℂ Z).toLinearMap ∘ₗ cc.lTensor Z,
-    z₀ ⊗ₜ 1,
+  refine ⟨Z ⊗[ℂ] P, inferInstance, inferInstance, fun c e => (M c e).rTensor P + (M' c e).lTensor Z,
+    χ ∘ₗ (TensorProduct.rid ℂ Z).toLinearMap ∘ₗ cc.lTensor Z, z₀ ⊗ₜ 1,
     fun i => (a i).rTensor P + (y i).lTensor Z,
     fun i => if (i.1.1 : ℕ) < m then (d i).rTensor P else (dd ε i.1.1 i.1.2).lTensor Z,
     fun k => Submodule.span ℂ (S k),
-    fun a b c e => kRel_tens (ε := allT n) (fun a b c d _ _ => hM a b c d) hM' a b c e rfl rfl,
-    by simp [hcc, h1],
-    fun c e t => ?_,
-    ?_,
-    ?_,
-    ?_,
-    ?_,
-    ?_,
-    ?_,
-    ?_,
-    ?_,
-    ?_
-  ⟩
+    fun a b c e => kRel_tens (ε := allT n) (fun a b c d _ _ => hM a b c d) hM' a b c e rfl rfl, by simp [hcc, h1],
+    fun c e t => ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_⟩
   · induction t using TensorProduct.induction_on with
     | zero => simp
     | tmul v f => simp [hcc, hc, h0]
@@ -235,8 +248,8 @@ theorem free_module_induction : FreeStep := by
       obtain ⟨q', hq2⟩ := hq j
       rw [hq1, hq2, hq2, hq1, mul_left_comm]
     simp only [Module.End.mul_apply] at e1
-    simp only [Module.End.mul_apply, LinearMap.add_apply, LinearMap.rTensor_tmul,
-      LinearMap.lTensor_tmul, map_add (f := _), e1, e2]
+    simp only [Module.End.mul_apply, LinearMap.add_apply, LinearMap.rTensor_tmul, LinearMap.lTensor_tmul, map_add (f := _),
+      e1, e2]
     abel
   · intro i j
     apply TensorProduct.ext'
@@ -251,9 +264,8 @@ theorem free_module_induction : FreeStep := by
     by_cases h : (i.1.1 : ℕ) < m
     · have e1 := LinearMap.congr_fun (hF.da i j h) z
       simp only [LinearMap.sub_apply, Module.End.mul_apply] at e1
-      simp only [if_pos h, LinearMap.sub_apply, Module.End.mul_apply, LinearMap.add_apply,
-        LinearMap.rTensor_tmul, LinearMap.lTensor_tmul, map_add, sub_eq_iff_eq_add.1 e1,
-        TensorProduct.add_tmul]
+      simp only [if_pos h, LinearMap.sub_apply, Module.End.mul_apply, LinearMap.add_apply, LinearMap.rTensor_tmul,
+        LinearMap.lTensor_tmul, map_add, sub_eq_iff_eq_add.1 e1, TensorProduct.add_tmul]
       split_ifs <;> simp
     · have e1 : dd ε i.1.1 i.1.2 (y j f) - y j (dd ε i.1.1 i.1.2 f) = if i = j then f else 0 := by
         simp only [y]
@@ -269,13 +281,10 @@ theorem free_module_induction : FreeStep := by
           · simp
           · rintro rfl
             have := i.2
-            exact hj ⟨
-              by simp only [ε, decide_eq_true_eq]; omega,
-              by simp only [ε, decide_eq_false_iff_not]; rw [Fin.lt_def] at this; omega
-            ⟩
-      simp only [if_neg h, LinearMap.sub_apply, Module.End.mul_apply, LinearMap.add_apply,
-        LinearMap.rTensor_tmul, LinearMap.lTensor_tmul, map_add, sub_eq_iff_eq_add.1 e1,
-        TensorProduct.tmul_add]
+            exact hj ⟨by simp only [ε, decide_eq_true_eq]; omega,
+              by simp only [ε, decide_eq_false_iff_not]; rw [Fin.lt_def] at this; omega⟩
+      simp only [if_neg h, LinearMap.sub_apply, Module.End.mul_apply, LinearMap.add_apply, LinearMap.rTensor_tmul,
+        LinearMap.lTensor_tmul, map_add, sub_eq_iff_eq_add.1 e1, TensorProduct.tmul_add]
       split_ifs <;> simp
   · intro k l hkl
     refine Submodule.span_mono ?_
@@ -283,8 +292,7 @@ theorem free_module_induction : FreeStep := by
     exact ⟨k₁, z, f, hz, hf.trans hkl, rfl⟩
   · intro t
     have hm : ∀ {k l}, k ≤ l → Submodule.span ℂ (S k) ≤ Submodule.span ℂ (S l) := fun hkl =>
-      Submodule.span_mono (by
-        rintro _ ⟨k₁, z, f, hz, hf, rfl⟩; exact ⟨k₁, z, f, hz, hf.trans hkl, rfl⟩)
+      Submodule.span_mono (by rintro _ ⟨k₁, z, f, hz, hf, rfl⟩; exact ⟨k₁, z, f, hz, hf.trans hkl, rfl⟩)
     induction t using TensorProduct.induction_on with
     | zero => exact ⟨0, Submodule.zero_mem _⟩
     | tmul z f =>
@@ -299,22 +307,16 @@ theorem free_module_induction : FreeStep := by
     rw [LinearMap.add_apply, LinearMap.rTensor_tmul, LinearMap.lTensor_tmul]
     exact Submodule.add_mem _ (hin (hF.a_mem i _ z hz) (by omega)) (hin hz (by omega))
   · intro i k
-    refine hmap
-      (((M i.1.1 i.1.2).rTensor P + (M' i.1.1 i.1.2).lTensor Z)
-        - ((a i).rTensor P + (y i).lTensor Z))
-      k _ fun k₁ z f hz hf => ?_
-    have e
-        : (((M i.1.1 i.1.2).rTensor P + (M' i.1.1 i.1.2).lTensor Z)
-                - ((a i).rTensor P + (y i).lTensor Z)
-              : Module.End ℂ (Z ⊗[ℂ] P))
-            (z ⊗ₜ f)
-          = (M i.1.1 i.1.2 z - a i z) ⊗ₜ f + z ⊗ₜ (M' i.1.1 i.1.2 f - y i f) := by
-      simp only [LinearMap.sub_apply, LinearMap.add_apply, LinearMap.rTensor_tmul,
-        LinearMap.lTensor_tmul, TensorProduct.sub_tmul, TensorProduct.tmul_sub]
+    refine hmap (((M i.1.1 i.1.2).rTensor P + (M' i.1.1 i.1.2).lTensor Z) - ((a i).rTensor P + (y i).lTensor Z)) k _
+      fun k₁ z f hz hf => ?_
+    have e : (((M i.1.1 i.1.2).rTensor P + (M' i.1.1 i.1.2).lTensor Z) - ((a i).rTensor P + (y i).lTensor Z) :
+        Module.End ℂ (Z ⊗[ℂ] P)) (z ⊗ₜ f) =
+        (M i.1.1 i.1.2 z - a i z) ⊗ₜ f + z ⊗ₜ (M' i.1.1 i.1.2 f - y i f) := by
+      simp only [LinearMap.sub_apply, LinearMap.add_apply, LinearMap.rTensor_tmul, LinearMap.lTensor_tmul,
+        TensorProduct.sub_tmul, TensorProduct.tmul_sub]
       abel
     rw [e]
-    refine Submodule.add_mem _ (hin (hF.r_mem i _ z hz) hf)
-      (hin hz (le_trans (Nat.add_le_add_left ?_ _) hf))
+    refine Submodule.add_mem _ (hin (hF.r_mem i _ z hz) hf) (hin hz (le_trans (Nat.add_le_add_left ?_ _) hf))
     simp only [y]
     split_ifs with h
     · rw [hX ⟨i.1, h⟩]; simp [yy]
@@ -327,9 +329,7 @@ theorem free_module_induction : FreeStep := by
   · refine fun i k => hmap _ _ _ fun k₁ z f hz hf => ?_
     split_ifs
     · cases k₁ with
-      | zero =>
-        rw [LinearMap.rTensor_tmul, hF.d_zero i z hz, TensorProduct.zero_tmul]
-        exact Submodule.zero_mem _
+      | zero => rw [LinearMap.rTensor_tmul, hF.d_zero i z hz, TensorProduct.zero_tmul]; exact Submodule.zero_mem _
       | succ k₁ => rw [LinearMap.rTensor_tmul]; exact hin (hF.d_mem i _ z hz) (by omega)
     · rw [LinearMap.lTensor_tmul]
       cases hf' : f.totalDegree with
@@ -344,29 +344,10 @@ theorem free_module_induction : FreeStep := by
 theorem free_all (n m : ℕ) : Free n m := by
   induction m with
   | zero =>
-    exact ⟨
-      ℂ,
-      inferInstance,
-      inferInstance,
-      0,
-      LinearMap.id,
-      1,
-      0,
-      0,
-      fun _ => ⊤,
-      fun _ _ _ _ => by simp,
-      rfl,
-      by simp,
-      fun _ _ => Commute.refl _,
-      fun _ _ => Commute.refl _,
-      fun _ _ h => absurd h (Nat.not_lt_zero _),
-      fun _ _ _ => le_rfl,
-      fun _ => ⟨0, trivial⟩,
-      fun _ _ _ _ => trivial,
-      fun _ _ _ _ => trivial,
-      fun _ _ _ _ => trivial,
-      fun _ _ _ => rfl
-    ⟩
+    exact ⟨ℂ, inferInstance, inferInstance, 0, LinearMap.id, 1, 0, 0, fun _ => ⊤, fun _ _ _ _ => by simp, rfl,
+      by simp, fun _ _ => Commute.refl _, fun _ _ => Commute.refl _, fun _ _ h => absurd h (Nat.not_lt_zero _),
+      fun _ _ _ => le_rfl, fun _ => ⟨0, trivial⟩, fun _ _ _ _ => trivial, fun _ _ _ _ => trivial,
+      fun _ _ _ _ => trivial, fun _ _ _ => rfl⟩
   | succ m ih => exact free_module_induction n m ih
 
 theorem cover2_of (hA : AcycAbs) : Cover2 := by
@@ -375,30 +356,18 @@ theorem cover2_of (hA : AcycAbs) : Cover2 := by
   let S : ℕ → Set (V ⊗[ℂ] Z) := fun k => {t | ∃ v z, z ∈ Fil k ∧ t = v ⊗ₜ z}
   have hin : ∀ {k : ℕ} (v : V) {z : Z}, z ∈ Fil k → v ⊗ₜ[ℂ] z ∈ Submodule.span ℂ (S k) :=
     fun v _ hz => Submodule.subset_span ⟨_, _, hz, rfl⟩
-  have hmap
-      : ∀ (T : Module.End ℂ (V ⊗[ℂ] Z)) (k : ℕ) (Q : Submodule ℂ (V ⊗[ℂ] Z)),
-        (∀ v z, z ∈ Fil k → T (v ⊗ₜ z) ∈ Q) → ∀ t ∈ Submodule.span ℂ (S k), T t ∈ Q := by
+  have hmap : ∀ (T : Module.End ℂ (V ⊗[ℂ] Z)) (k : ℕ) (Q : Submodule ℂ (V ⊗[ℂ] Z)),
+      (∀ v z, z ∈ Fil k → T (v ⊗ₜ z) ∈ Q) → ∀ t ∈ Submodule.span ℂ (S k), T t ∈ Q := by
     intro T k Q h
     refine fun t ht => (Submodule.span_le (p := Q.comap T)).2 ?_ ht
     rintro _ ⟨v, z, hz, rfl⟩
     exact h v z hz
   have hm : Monotone fun k => Submodule.span ℂ (S k) := fun k l hkl =>
     Submodule.span_mono (by rintro _ ⟨v, z, hz, rfl⟩; exact ⟨v, z, hF.mono hkl hz, rfl⟩)
-  refine ⟨
-    V ⊗[ℂ] Z,
-    inferInstance,
-    inferInstance,
-    fun c e => (E c e).rTensor Z + (M c e).lTensor V,
-    (TensorProduct.rid ℂ V).toLinearMap ∘ₗ χ.lTensor V,
-    kRel_tens hE hM,
-    fun v => ⟨v ⊗ₜ z₀, by simp [h1]⟩,
-    fun c e t => ?_,
-    hA n ε _ _
-      (fun i => (a i).lTensor V)
-      (fun i => (d i).lTensor V)
-      (fun k => Submodule.span ℂ (S k))
-      (kRel_tens hE hM) ⟨?_, ?_, ?_, hm, ?_, ?_, ?_, ?_, ?_⟩
-  ⟩
+  refine ⟨V ⊗[ℂ] Z, inferInstance, inferInstance, fun c e => (E c e).rTensor Z + (M c e).lTensor V,
+    (TensorProduct.rid ℂ V).toLinearMap ∘ₗ χ.lTensor V, kRel_tens hE hM, fun v => ⟨v ⊗ₜ z₀, by simp [h1]⟩,
+    fun c e t => ?_, hA n ε _ _ (fun i => (a i).lTensor V) (fun i => (d i).lTensor V)
+      (fun k => Submodule.span ℂ (S k)) (kRel_tens hE hM) ⟨?_, ?_, ?_, hm, ?_, ?_, ?_, ?_, ?_⟩⟩
   · induction t using TensorProduct.induction_on with
     | zero => simp
     | tmul v f => simp [h0]
@@ -407,8 +376,7 @@ theorem cover2_of (hA : AcycAbs) : Cover2 := by
   · exact fun i j => (hF.d_comm i j).map (Module.End.lTensorAlgHom ℂ Z V)
   · intro i j _
     have := congrArg (Module.End.lTensorAlgHom ℂ Z V) (hF.da i j i.1.1.2)
-    rw [map_sub, map_mul, map_mul, apply_ite (Module.End.lTensorAlgHom ℂ Z V), map_one, map_zero]
-      at this
+    rw [map_sub, map_mul, map_mul, apply_ite (Module.End.lTensorAlgHom ℂ Z V), map_one, map_zero] at this
     exact this
   · intro t
     induction t using TensorProduct.induction_on with
@@ -422,15 +390,11 @@ theorem cover2_of (hA : AcycAbs) : Cover2 := by
       exact ⟨max k l, Submodule.add_mem _ (hm (le_max_left _ _) hk) (hm (le_max_right _ _) hl)⟩
   · exact fun i k => hmap _ k _ fun v z hz => hin v (hF.a_mem i _ z hz)
   · intro i k
-    refine hmap (((E i.1.1 i.1.2).rTensor Z + (M i.1.1 i.1.2).lTensor V) - (a i).lTensor V) k _
-      fun v z hz => ?_
-    have e
-        : (((E i.1.1 i.1.2).rTensor Z + (M i.1.1 i.1.2).lTensor V) - (a i).lTensor V
-              : Module.End ℂ (V ⊗[ℂ] Z))
-            (v ⊗ₜ z)
-          = E i.1.1 i.1.2 v ⊗ₜ z + v ⊗ₜ (M i.1.1 i.1.2 z - a i z) := by
-      simp only [LinearMap.sub_apply, LinearMap.add_apply, LinearMap.rTensor_tmul,
-        LinearMap.lTensor_tmul, TensorProduct.tmul_sub]
+    refine hmap (((E i.1.1 i.1.2).rTensor Z + (M i.1.1 i.1.2).lTensor V) - (a i).lTensor V) k _ fun v z hz => ?_
+    have e : (((E i.1.1 i.1.2).rTensor Z + (M i.1.1 i.1.2).lTensor V) - (a i).lTensor V :
+        Module.End ℂ (V ⊗[ℂ] Z)) (v ⊗ₜ z) = E i.1.1 i.1.2 v ⊗ₜ z + v ⊗ₜ (M i.1.1 i.1.2 z - a i z) := by
+      simp only [LinearMap.sub_apply, LinearMap.add_apply, LinearMap.rTensor_tmul, LinearMap.lTensor_tmul,
+        TensorProduct.tmul_sub]
       abel
     rw [e]
     exact Submodule.add_mem _ (hin _ hz) (hin _ (hF.r_mem i _ z hz))

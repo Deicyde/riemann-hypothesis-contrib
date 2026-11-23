@@ -1,24 +1,40 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.Definitions.GlobalTwisting.GeometricWeakTiesOfStrong
 public import Development.AbelianVarietyTheory.Definitions.HeightFunctions.OntoAlong
-public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.StrictHenselianAcyclic
-public import Development.AbelianVarietyTheory.PublishedTheorems.PublishedFoundations.NonemptyAlgHomOfIsRayOfDvd
-public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.ThetaChr
-public import Development.AbelianVarietyTheory.Definitions.GlobalTwisting.ColumnCompatibleSelection
-public import Formalism.LocalToGlobal.SiegelLatticeTheory.FlagStabilizerTensors.STiesR
-public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.SameDegreeZeroFormsSelf
 public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.DivisionPairOfAdelicFormsFaceColumnsData
-public import Formalism.LocalToGlobal.CarriedPlMap
-public import Formalism.LocalToGlobal.SelSide
-public import Formalism.LocalToGlobal.IndefiniteReal.DoubleCosetOperators.TwistedCharacterValue
-public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.TwArgs
-public import Development.AbelianVarietyTheory.Definitions.GlobalTwisting.DivRows3GIff
-public import Formalism.LocalToGlobal.Divisibility.ColPins
-public import Development.AbelianVarietyTheory.Definitions.Divisors.BaseRankDimension
-public import Development.AbelianVarietyTheory.Definitions.Divisors.RowSideOfCompatibleThetaPair
-public import Formalism.LocalToGlobal.IndefiniteReal.NonzeroIndexPlaceIndepConstants
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Formalism.SharpRestriction.GlobalSchurBounds.TheoremThreeUnderScaleOfGeneral
 
 @[expose] public section
 
@@ -30,7 +46,6 @@ namespace GlobalTheory.PlugPt
 
 open GlobalTheory.Mem.R3 Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Links
 
-set_option maxHeartbeats 4000000 in
 theorem side_mk_eq_upd
     {D : D7} {nch : NChoice D} {G : Type} [Group G] [Fintype G]
     {Pl0 I0 T : Type} {A3 : FamIn3 D.what₂.LL G Pl0 I0 (List ℕ) T D.R.m}
@@ -96,7 +111,6 @@ theorem side_mk_eq_upd
   subst hfi heF
   rfl
 
-set_option maxHeartbeats 4000000 in
 theorem side_eq_upd
     {D : D7} {O : Obj D} (x : R3.TwIn O.ex) (s : Side D O.ex.nch)
     (kap : ℝ) (lam : type_of% s.R.lam3) (err : type_of% s.R.err0) (F : Face3 D s.A3)

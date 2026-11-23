@@ -1,10 +1,65 @@
 module
 
 public import Formalism.ThetaLogCoordinates.FockResolutionOnto.StatementD
-public import Formalism.ThetaLogCoordinates.FockResolutionOnto.FockMonomialProofs.RaisingKeepsEarlyLetters
-public import Formalism.ThetaLogCoordinates.FockResolutionOnto.FockMonomialProofs.Sl2RaisePowSuccLowerApplyEq
+public import Formalism.PolynomialDimension.MultinomialDepth.PartnerM
+import Formalism.MahlerMeasure.MahlerMeasureProofs.LevelAct
 public import Formalism.ThetaLogCoordinates.FockResolutionOnto.FockMonomialProofs.EArith
+public import Formalism.ThetaLogCoordinates.FockResolutionOnto.FockMonomialProofs.FiltrationBotHolds
+import Formalism.ThetaLogCoordinates.FockResolutionOnto.FockMonomialProofs.MulEarlyLettersHolds
+public import Formalism.ThetaLogCoordinates.FockResolutionOnto.FockMonomialProofs.RaisingKeepsEarlyLetters
+import Formalism.ThetaLogCoordinates.FockResolutionOnto.FockMonomialProofs.ResInto
+public import Formalism.ThetaLogCoordinates.FockResolutionOnto.FockMonomialProofs.Sl2RaisePowSuccLowerApplyEq
 public import Formalism.ThetaLogCoordinates.FockResolutionOnto.FockMonomialProofs.TypesLELeYcondC
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Int
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Etale.Weakly
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.TotallySplit
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
+public import Formalism.ThetaLogCoordinates.FockResolutionOnto.FockMonomialProofs.FirstWeightLeOfSupport
 
 @[expose] public section
 
@@ -27,7 +82,7 @@ noncomputable def compL (k : Type) [Field k] {σ : Type} (Pr : (σ →₀ ℕ) �
   map_smul' c x := by
     classical
     ext m
-    simp only [coeff_compP, coeff_smul, RingHom.id_apply]
+    simp only [coeff_compP, MvPolynomial.coeff_smul, RingHom.id_apply]
     split_ifs <;> simp
 
 open Classical in
@@ -182,7 +237,7 @@ theorem WD_cw (γ : Fin r → ℤ) (a : Fin r) (x : MvPolynomial (Fin (K + 1) ×
       = ((γ a : ℤ) : ℚ_[p]) • cw p K γ x := by
   classical
   ext m
-  rw [coeff_X_mul_pderiv', coeff_smul, smul_eq_mul, cw, coeff_compL]
+  rw [coeff_X_mul_pderiv', MvPolynomial.coeff_smul, smul_eq_mul, cw, coeff_compL]
   split_ifs with h
   · rw [← h]; simp [wp, mul_comm]
   · simp
@@ -613,10 +668,10 @@ theorem omega_top
           omega),
         map_zero, map_zero, mul_zero, if_neg (ne_of_gt hab), if_neg (not_lt_of_gt hab)]
       simp
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [omega_formula LL ρ c o x hP hF, map_sub, map_smul, map_sum]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum]
+
+  rw [omega_formula LL ρ c o x hP hF, map_sub, map_smul, map_sum]
+
+  simp only [map_sum]
   rw [Finset.sum_congr rfl (fun a ha => Finset.sum_congr rfl (fun b hb => hterm a ha b hb))]
   simp only [← Finset.sum_smul]
   rw [← sub_smul]
@@ -754,8 +809,8 @@ theorem omega_comm
     rw [h2, map_add (f := _), ← h1]
     split_ifs <;> simp
   unfold Omega
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [LinearMap.sum_apply, LinearMap.sum_apply, map_sum]
+
+  rw [LinearMap.sum_apply, LinearMap.sum_apply, map_sum]
   simp only [LinearMap.comp_apply, hterm]
   rw [Finset.sum_add_distrib, Finset.sum_sub_distrib, Finset.sum_ite_eq, Finset.sum_ite_eq,
     if_pos hs, if_pos ht]

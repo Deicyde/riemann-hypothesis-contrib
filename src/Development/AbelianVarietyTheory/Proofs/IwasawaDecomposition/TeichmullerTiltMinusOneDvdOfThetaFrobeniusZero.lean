@@ -1,10 +1,54 @@
 module
 
-public import Mathlib
-public import Formalism.LocalRingCardinality.AdicCompletionLocal.LocTied
 public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.IsCrisP
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.FontaineThetaEqZeroIffFontaineXiElementDvd
 public import Development.AbelianVarietyTheory.CrystallinePeriods.RingBasics
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.FontaineThetaEqZeroIffFontaineXiElementDvd
+import Mathlib.Algebra.GroupWithZero.Submonoid.CancelMulZero
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Real
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
@@ -15,12 +59,10 @@ noncomputable section
 namespace GlobalTheory.MemLoc.KerAll
 open Ideal
 
-theorem dvd_of_step
-    {A : Type*} [CommRing A]
-    (q a : A) [IsAdicComplete (span {q}) A]
-    (P : A → Prop) (h : ∀ x, P x → ∃ y x', x = a * y + q * x' ∧ P x')
-    (x : A) (hx : P x)
-    : a ∣ x := by
+theorem dvd_of_step {A : Type*} [CommRing A] (q a : A)
+    [IsAdicComplete (span {q}) A] (P : A → Prop)
+    (h : ∀ x, P x → ∃ y x', x = a * y + q * x' ∧ P x') (x : A) (hx : P x) :
+    a ∣ x := by
   classical
   let g : {z // P z} → A × {z // P z} := fun z =>
     ((h z.1 z.2).choose, ⟨(h z.1 z.2).choose_spec.choose, (h z.1 z.2).choose_spec.choose_spec.2⟩)
@@ -44,17 +86,17 @@ theorem dvd_of_step
     | succ n hmn ih =>
       rw [hS, show S n + q ^ n * (g (xs n)).1 - S m = (S n - S m) + q ^ n * (g (xs n)).1 by ring]
       refine add_mem ih (mem_span_singleton.2 (Dvd.dvd.mul_right (pow_dvd_pow q hmn) _))
-  obtain ⟨L, hL⟩ :=
-    (inferInstance : IsPrecomplete (span {q}) A).prec' S (by
-      intro m n hmn
-      simp only [Ideal.span_singleton_pow, smul_eq_mul, Ideal.mul_top, SModEq.sub_mem]
-      rw [← neg_sub]
-      exact neg_mem (hC m n hmn))
+  obtain ⟨L, hL⟩ := (inferInstance : IsPrecomplete (span {q}) A).prec' S (by
+    intro m n hmn
+    simp only [Ideal.span_singleton_pow, smul_eq_mul, Ideal.mul_top, SModEq.sub_mem]
+    rw [← neg_sub]
+    exact neg_mem (hC m n hmn))
   have hxL : x - a * L = 0 := by
     refine (inferInstance : IsHausdorff (span {q}) A).haus' _ (fun n => ?_)
     have hn := hL n
     simp only [Ideal.span_singleton_pow, smul_eq_mul, Ideal.mul_top, SModEq.sub_mem] at hn ⊢
-    rw [sub_zero, show x - a * L = a * (S n - L) + q ^ n * (xs n).1 by linear_combination hY n]
+    rw [sub_zero, show x - a * L = a * (S n - L) + q ^ n * (xs n).1 by
+      linear_combination hY n]
     exact add_mem (mul_mem_left _ _ hn) (mul_mem_right _ _ (mem_span_singleton_self _))
   exact ⟨L, sub_eq_zero.1 hxL⟩
 
@@ -62,9 +104,8 @@ variable {l : ℕ} [hl : Fact l.Prime]
 
 def rt (x : Per.Fl l) (n : ℕ) : Per.Fl l := ((frobeniusEquiv (Per.Fl l) l).symm)^[n] x
 
-theorem rt_succ (x : Per.Fl l) (n : ℕ)
-    : rt x (n + 1) = (frobeniusEquiv (Per.Fl l) l).symm (rt x n) :=
-  Function.iterate_succ_apply' _ _ _
+theorem rt_succ (x : Per.Fl l) (n : ℕ) :
+    rt x (n + 1) = (frobeniusEquiv (Per.Fl l) l).symm (rt x n) := Function.iterate_succ_apply' _ _ _
 
 theorem rt_succ_pow (x : Per.Fl l) (n : ℕ) : rt x (n + 1) ^ l = rt x n := by
   rw [rt_succ, frobeniusEquiv_symm_pow_p]
@@ -76,8 +117,8 @@ theorem rt_pow (x : Per.Fl l) (n : ℕ) : rt x n ^ l ^ n = x := by
 
 theorem rootT_eq (x : Per.Fl l) (n : ℕ) : rootT x n = (rt x n).untilt := rfl
 
-theorem mk_rootT (x : Per.Fl l) (n : ℕ)
-    : Ideal.Quotient.mk (span {(l : Per.OC l)}) (rootT x n) = PreTilt.coeff n x := by
+theorem mk_rootT (x : Per.Fl l) (n : ℕ) :
+    Ideal.Quotient.mk (span {(l : Per.OC l)}) (rootT x n) = PreTilt.coeff n x := by
   rw [rootT, PreTilt.mk_untilt_eq_coeff_zero]
   have := PreTilt.coeff_iterate_frobeniusEquiv_symm 0 n x
   rw [zero_add] at this
@@ -97,9 +138,11 @@ theorem eq_zero_of_untilt {x : Per.Fl l} (h : x.untilt = 0) : x = 0 := by
 
 def nm (x : Per.Fl l) : ℝ := ‖(x.untilt : ℂ_[l])‖
 
-theorem nm_mul (x y : Per.Fl l) : nm (x * y) = nm x * nm y := by simp [nm]
+theorem nm_mul (x y : Per.Fl l) : nm (x * y) = nm x * nm y := by
+  simp [nm]
 
-theorem nm_pow (x : Per.Fl l) (n : ℕ) : nm (x ^ n) = nm x ^ n := by simp [nm]
+theorem nm_pow (x : Per.Fl l) (n : ℕ) : nm (x ^ n) = nm x ^ n := by
+  simp [nm]
 
 theorem nm_nonneg (x : Per.Fl l) : 0 ≤ nm x := norm_nonneg _
 
@@ -123,11 +166,9 @@ theorem dvd_of_nm_le {x c : Per.Fl l} (hx : x ≠ 0) (h : nm c ≤ nm x) : x ∣
       push_cast at a b
       rw [a, b]
       exact h
-    have h2 :=
-      (pow_le_pow_iff_left₀ (norm_nonneg _) (norm_nonneg _) (pow_ne_zero n hl.out.ne_zero)).1 h1
+    have h2 := (pow_le_pow_iff_left₀ (norm_nonneg _) (norm_nonneg _) (pow_ne_zero n hl.out.ne_zero)).1 h1
     have hne : (rootT x n : ℂ_[l]) ≠ 0 := fun h0 => hsne n (Subtype.ext h0)
-    refine
-      ⟨⟨(rootT c n : ℂ_[l]) / rootT x n, (GlobalTheory.RingBasics.mem_OC _).2 ?_⟩, Subtype.ext ?_⟩
+    refine ⟨⟨(rootT c n : ℂ_[l]) / rootT x n, (GlobalTheory.RingBasics.mem_OC _).2 ?_⟩, Subtype.ext ?_⟩
     · rwa [norm_div, div_le_one (norm_pos_iff.2 hne)]
     · push_cast
       field_simp
@@ -137,7 +178,8 @@ theorem dvd_of_nm_le {x c : Per.Fl l} (hx : x ≠ 0) (h : nm c ≤ nm x) : x ∣
     have h2 := rootT_succ_pow c n
     rw [he (n + 1), he n, mul_pow, rootT_succ_pow] at h2
     exact mul_left_cancel₀ (hsne n) h2
-  let d : Per.Fl l := ⟨fun n => Ideal.Quotient.mk _ (e n), fun n => by simp only [← map_pow, hcomp]⟩
+  let d : Per.Fl l := ⟨fun n => Ideal.Quotient.mk _ (e n), fun n => by
+    simp only [← map_pow, hcomp]⟩
   refine ⟨d, Perfection.ext fun n => ?_⟩
   change PreTilt.coeff n c = PreTilt.coeff n (x * d)
   rw [map_mul, ← mk_rootT, ← mk_rootT, he n, map_mul]
@@ -163,8 +205,8 @@ theorem dvd_of_forall {x c : Per.Fl l} (hx : x ≠ 0) (h : ∀ n, x ∣ c * rt x
     exact h2
   linarith
 
-theorem iter_eq (n : ℕ) (a : Per.Ainf l)
-    : (Per.φA l)^[n] a = WittVector.map (iterateFrobenius (Per.Fl l) l n) a := by
+theorem iter_eq (n : ℕ) (a : Per.Ainf l) :
+    (Per.φA l)^[n] a = WittVector.map (iterateFrobenius (Per.Fl l) l n) a := by
   induction n with
   | zero => ext i; simp
   | succ n ih =>
@@ -178,13 +220,12 @@ def ph (n : ℕ) : Per.Ainf l →+* Per.Ainf l := WittVector.map (iterateFrobeni
 theorem ph_tm (n : ℕ) (x : Per.Fl l) : ph n (Per.tm x) = Per.tm (x ^ l ^ n) := by
   simp [ph, WittVector.map_teichmuller, iterateFrobenius_def]
 
-theorem ph_bij (n : ℕ) : Function.Bijective (ph (l := l) n) := ⟨
-  WittVector.map_injective _ (bijective_iterateFrobenius (Per.Fl l) l n).1,
-  WittVector.map_surjective _ (bijective_iterateFrobenius (Per.Fl l) l n).2
-⟩
+theorem ph_bij (n : ℕ) : Function.Bijective (ph (l := l) n) :=
+  ⟨WittVector.map_injective _ (bijective_iterateFrobenius (Per.Fl l) l n).1,
+   WittVector.map_surjective _ (bijective_iterateFrobenius (Per.Fl l) l n).2⟩
 
-theorem xi_rt (e : Per.Fl l) (n : ℕ)
-    : xi (rt e n) = ∑ i ∈ Finset.range l, (Per.tm (rt e (n + 1))) ^ i := by
+theorem xi_rt (e : Per.Fl l) (n : ℕ) :
+    xi (rt e n) = ∑ i ∈ Finset.range l, (Per.tm (rt e (n + 1))) ^ i := by
   rw [xi, rt_succ]
 
 theorem mu_rt (e : Per.Fl l) (n : ℕ) : mu (rt e n) = xi (rt e n) * mu (rt e (n + 1)) := by
@@ -193,25 +234,25 @@ theorem mu_rt (e : Per.Fl l) (n : ℕ) : mu (rt e n) = xi (rt e n) * mu (rt e (n
 theorem ph_xi (e : Per.Fl l) (n : ℕ) : ph n (xi (rt e n)) = xi e := by
   have : rt e (n + 1) ^ l ^ n = (frobeniusEquiv (Per.Fl l) l).symm e := by
     rw [rt_succ, ← map_pow, rt_pow]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [xi_rt, xi, map_sum]
+
+  rw [xi_rt, xi, map_sum]
   simp only [map_pow (ph n), ph_tm, this]
 
-theorem th_ph_xi {e : Per.Fl l} (he : e.untilt = 1) {n m : ℕ} (h : n + 1 ≤ m)
-    : Per.θ l (ph m (xi (rt e n))) = l := by
+theorem th_ph_xi {e : Per.Fl l} (he : e.untilt = 1) {n m : ℕ} (h : n + 1 ≤ m) :
+    Per.θ l (ph m (xi (rt e n))) = l := by
   obtain ⟨k, rfl⟩ := Nat.exists_eq_add_of_le h
-  have : rt e (n + 1) ^ l ^ (n + 1 + k) = e ^ l ^ k := by rw [pow_add, pow_mul, rt_pow]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [xi_rt, map_sum, map_sum]
+  have : rt e (n + 1) ^ l ^ (n + 1 + k) = e ^ l ^ k := by
+    rw [pow_add, pow_mul, rt_pow]
+
+  rw [xi_rt, map_sum, map_sum]
   simp only [map_pow (ph _), ph_tm, this, map_pow (Per.θ l), WittVector.fontaineTheta_teichmuller,
     map_pow PreTilt.untilt, he]
   simp
 
 theorem l_ne : (l : Per.OC l) ≠ 0 := by exact_mod_cast hl.out.ne_zero
 
-theorem factor
-    {e : Per.Fl l} (he : IsEps e) {a : Per.Ainf l} (ha : ∀ n, Per.θ l (ph n a) = 0) (n : ℕ)
-    : ∃ c b, mu e = c * mu (rt e n) ∧ a = c * b ∧ ∀ m, n ≤ m → Per.θ l (ph m c) ≠ 0 := by
+theorem factor {e : Per.Fl l} (he : IsEps e) {a : Per.Ainf l} (ha : ∀ n, Per.θ l (ph n a) = 0) (n : ℕ) :
+    ∃ c b, mu e = c * mu (rt e n) ∧ a = c * b ∧ ∀ m, n ≤ m → Per.θ l (ph m c) ≠ 0 := by
   induction n with
   | zero => exact ⟨1, a, by simp [rt], by simp, by simp⟩
   | succ n ih =>
@@ -224,8 +265,7 @@ theorem factor
     obtain ⟨y, rfl⟩ := (ph_bij n).2 y
     rw [← ph_xi e n, ← map_mul] at hy
     have hb := (ph_bij n).1 hy
-    refine
-      ⟨c * xi (rt e n), y, by rw [h1, mu_rt, mul_assoc], by rw [h2, hb, mul_assoc], fun m hm => ?_⟩
+    refine ⟨c * xi (rt e n), y, by rw [h1, mu_rt, mul_assoc], by rw [h2, hb, mul_assoc], fun m hm => ?_⟩
     rw [map_mul, map_mul, th_ph_xi he.1 hm]
     exact mul_ne_zero (h3 m (by omega)) l_ne
 
@@ -238,8 +278,8 @@ theorem cc_mu (e : Per.Fl l) : WittVector.constantCoeff (mu e) = e - 1 := by
   rw [mu, map_sub, map_one]
   congr 1
 
-theorem step {e : Per.Fl l} (he : IsEps e) (a : Per.Ainf l) (ha : ∀ n, Per.θ l (ph n a) = 0)
-    : ∃ y a', a = mu e * y + (l : Per.Ainf l) * a' ∧ ∀ n, Per.θ l (ph n a') = 0 := by
+theorem step {e : Per.Fl l} (he : IsEps e) (a : Per.Ainf l) (ha : ∀ n, Per.θ l (ph n a) = 0) :
+    ∃ y a', a = mu e * y + (l : Per.Ainf l) * a' ∧ ∀ n, Per.θ l (ph n a') = 0 := by
   have hne : e - 1 ≠ 0 := by
     intro h
     apply he.2
@@ -267,13 +307,9 @@ theorem step {e : Per.Fl l} (he : IsEps e) (a : Per.Ainf l) (ha : ∀ n, Per.θ 
 
 end GlobalTheory.MemLoc.KerAll
 
-theorem GlobalTheory.MemLoc.mu_dvd_of_theta_frob
-    : ∀ (l : ℕ) [Fact l.Prime], ∀ e : Per.Fl l,
-      IsEps e → ∀ a : Per.Ainf l, (∀ n : ℕ, Per.θ l ((Per.φA l)^[n] a) = 0) → mu e ∣ a := by
+theorem GlobalTheory.MemLoc.mu_dvd_of_theta_frob : ∀ (l : ℕ) [Fact l.Prime], ∀ e : Per.Fl l, IsEps e → ∀ a : Per.Ainf l, (∀ n : ℕ, Per.θ l ((Per.φA l)^[n] a) = 0) → mu e ∣ a := by
   intro l _ e he a ha
-  refine KerAll.dvd_of_step (l : Per.Ainf l) (mu e)
-    (fun a => ∀ n, Per.θ l (KerAll.ph n a) = 0)
-    (KerAll.step he) a
-    fun n => ?_
+  refine KerAll.dvd_of_step (l : Per.Ainf l) (mu e) (fun a => ∀ n, Per.θ l (KerAll.ph n a) = 0)
+    (KerAll.step he) a fun n => ?_
   have := ha n
   rwa [KerAll.iter_eq] at this

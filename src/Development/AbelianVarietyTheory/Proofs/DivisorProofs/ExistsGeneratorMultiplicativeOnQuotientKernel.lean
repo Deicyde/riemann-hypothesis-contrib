@@ -148,7 +148,6 @@ end
 
 namespace GlobalTheory.HomMum
 
-set_option maxHeartbeats 1600000 in
 theorem exists_gen_mul_level
     : ∀ {R : Type} [CommRing R] [IsDomain R] {I : Ideal R} {D₁ D₂ : DegData R I}
         {A₁ A₂ : PolAV (Sp (FractionRing R))} {G₁ G₂ : Over (Sp R)} [GrpObj G₁] [IsCommMonObj G₁]

@@ -2,6 +2,45 @@ module
 
 public import Formalism.SharpRestriction.GrowthBounds.BinomialRatio.ExtendedStatementOfParts
 public import Formalism.SharpRestriction.GrowthBounds.RootWeights.ValuationNonnegIffIntegral
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -25,12 +64,9 @@ theorem ramE_two {p : ℕ} {w : O} (hw : Irreducible w) (h2 : w ^ 2 = (p : O)) :
   rw [← h2, IsDiscreteValuationRing.addVal_pow, IsDiscreteValuationRing.addVal_uniformizer hw]
   rfl
 
-theorem vLEO_iff
-    {p : ℕ} {w : O} (hw : Irreducible w) (h2 : w ^ 2 = (p : O)) {x : O} (hx : x ≠ 0) (D : ℝ)
-    : vLEO p x D ↔ (dvrOrderNat x : ℝ) / 2 ≤ D := by
-  have h1
-      : ordW (algebraMap O (KK O) x)
-        = (((dvrOrderNat x : ℤ) - (dvrOrderNat (1 : O) : ℤ) : ℤ) : WithTop ℤ) :=
+theorem vLEO_iff {p : ℕ} {w : O} (hw : Irreducible w) (h2 : w ^ 2 = (p : O)) {x : O} (hx : x ≠ 0) (D : ℝ) :
+    vLEO p x D ↔ (dvrOrderNat x : ℝ) / 2 ≤ D := by
+  have h1 : ordW (algebraMap O (KK O) x) = (((dvrOrderNat x : ℤ) - (dvrOrderNat (1 : O) : ℤ) : ℤ) : WithTop ℤ) :=
     ord_eq_order_sub_of_fraction _ x 1 hx one_ne_zero (by rw [map_one, mul_one])
   have h0 : dvrOrderNat (1 : O) = 0 := by
     unfold dvrOrderNat
@@ -51,20 +87,18 @@ theorem vLEO_iff
   · intro h
     exact ⟨_, rfl, by push_cast; exact h⟩
 
-theorem eq_unit_pow {w : O} (hw : Irreducible w) {x : O} (hx : x ≠ 0)
-    : ∃ u : Oˣ, x = (u : O) * w ^ dvrOrderNat x := by
+theorem eq_unit_pow {w : O} (hw : Irreducible w) {x : O} (hx : x ≠ 0) : ∃ u : Oˣ, x = (u : O) * w ^ dvrOrderNat x := by
   obtain ⟨n, u, rfl⟩ := IsDiscreteValuationRing.eq_unit_mul_pow_irreducible hx hw
   refine ⟨u, ?_⟩
   have hn : dvrOrderNat ((u : O) * w ^ n) = n := by
     unfold dvrOrderNat
     rw [IsDiscreteValuationRing.addVal_mul, IsDiscreteValuationRing.addVal_pow,
-      IsDiscreteValuationRing.addVal_uniformizer hw, IsDiscreteValuationRing.addVal_eq_zero_of_unit,
-      zero_add]
+      IsDiscreteValuationRing.addVal_uniformizer hw, IsDiscreteValuationRing.addVal_eq_zero_of_unit, zero_add]
     simp
   rw [hn]
 
-theorem isUnit_one_add {n : ℕ} {w : O} (hw : Irreducible w) (N : Matrix (Fin n) (Fin n) O)
-    : IsUnit (1 + w • N : Matrix (Fin n) (Fin n) O) := by
+theorem isUnit_one_add {n : ℕ} {w : O} (hw : Irreducible w) (N : Matrix (Fin n) (Fin n) O) :
+    IsUnit (1 + w • N : Matrix (Fin n) (Fin n) O) := by
   rw [Matrix.isUnit_iff_isUnit_det]
   have hw0 : IsLocalRing.residue O w = 0 := by
     rw [IsLocalRing.residue_eq_zero_iff, IsLocalRing.mem_maximalIdeal, mem_nonunits_iff]
@@ -78,18 +112,13 @@ theorem isUnit_one_add {n : ℕ} {w : O} (hw : Irreducible w) (N : Matrix (Fin n
   rw [← IsLocalRing.residue_ne_zero_iff_isUnit, RingHom.map_det, hmap, Matrix.det_one]
   exact one_ne_zero
 
-theorem factors_of_perturb
-    {Kf V V' : Type}
-    [Field Kf] [Algebra O Kf] [AddCommGroup V] [Module O V] [AddCommGroup V'] [Module O V']
-    {p : ℕ} {w : O} (hw : Irreducible w) (h2 : w ^ 2 = (p : O))
-    (be : V → V' → Kf)
-    (A : Submodule O V) (A' : Submodule O V')
-    (n c : ℕ) (D : ℝ) (hD : 4 * D < (c : ℝ))
-    (x : Fin n → V) (y : Fin n → V') (hx : ∀ i, x i ∈ A) (hy : ∀ i, y i ∈ A')
-    (δ : Fin n → O) (hδ : ∀ i, δ i ≠ 0 ∧ vLEO p (δ i) D)
-    (ν : Fin n → Fin n → O)
-    (hT : ∀ i j, be (x i) (y j) = algebraMap O Kf ((if i = j then δ i else 0) + w ^ c * ν i j))
-    : FactorsLE p be A A' n D := by
+theorem factors_of_perturb {Kf V V' : Type} [Field Kf] [Algebra O Kf] [AddCommGroup V] [Module O V]
+    [AddCommGroup V'] [Module O V'] {p : ℕ} {w : O} (hw : Irreducible w) (h2 : w ^ 2 = (p : O))
+    (be : V → V' → Kf) (A : Submodule O V) (A' : Submodule O V') (n c : ℕ) (D : ℝ) (hD : 4 * D < (c : ℝ))
+    (x : Fin n → V) (y : Fin n → V') (hx : ∀ i, x i ∈ A) (hy : ∀ i, y i ∈ A') (δ : Fin n → O)
+    (hδ : ∀ i, δ i ≠ 0 ∧ vLEO p (δ i) D) (ν : Fin n → Fin n → O)
+    (hT : ∀ i j, be (x i) (y j) = algebraMap O Kf ((if i = j then δ i else 0) + w ^ c * ν i j)) :
+    FactorsLE p be A A' n D := by
   rcases Nat.eq_zero_or_pos n with hn | hn
   · exact Or.inl hn
   right
@@ -105,12 +134,10 @@ theorem factors_of_perturb
     have : (k i : ℝ) < c := by linarith
     exact_mod_cast this
   obtain ⟨i0, -, hi0⟩ := Finset.exists_max_image Finset.univ k ⟨⟨0, hn⟩, Finset.mem_univ _⟩
-  obtain ⟨N, hNdef⟩
-      : ∃ N : Matrix (Fin n) (Fin n) O, ∀ i j,
-        N i j = (((u i)⁻¹ : Oˣ) : O) * w ^ (c - k i - 1) * ν i j :=
+  obtain ⟨N, hNdef⟩ : ∃ N : Matrix (Fin n) (Fin n) O,
+      ∀ i j, N i j = (((u i)⁻¹ : Oˣ) : O) * w ^ (c - k i - 1) * ν i j :=
     ⟨Matrix.of fun i j => (((u i)⁻¹ : Oˣ) : O) * w ^ (c - k i - 1) * ν i j, fun _ _ => rfl⟩
-  obtain ⟨zl, hzdef⟩
-      : ∃ zl : Fin n → O, ∀ l, zl l = (u i0 : O) * (((u l)⁻¹ : Oˣ) : O) * w ^ (k i0 - k l) :=
+  obtain ⟨zl, hzdef⟩ : ∃ zl : Fin n → O, ∀ l, zl l = (u i0 : O) * (((u l)⁻¹ : Oˣ) : O) * w ^ (k i0 - k l) :=
     ⟨_, fun _ => rfl⟩
   obtain ⟨Q, hQ⟩ : ∃ Q : Matrix (Fin n) (Fin n) O, (1 + w • N) * Q = 1 := by
     obtain ⟨U, hU⟩ := isUnit_one_add hw N
@@ -119,7 +146,8 @@ theorem factors_of_perturb
     intro l
     have hle : k l ≤ k i0 := hi0 l (Finset.mem_univ _)
     rw [hu' l, hu' i0, hzdef]
-    have hb : w ^ k i0 = w ^ k l * w ^ (k i0 - k l) := by rw [← pow_add, Nat.add_sub_cancel' hle]
+    have hb : w ^ k i0 = w ^ k l * w ^ (k i0 - k l) := by
+      rw [← pow_add, Nat.add_sub_cancel' hle]
     rw [hb]
     have hu1 : (u l : O) * (((u l)⁻¹ : Oˣ) : O) = 1 := Units.mul_inv (u l)
     linear_combination (u i0 : O) * w ^ k l * w ^ (k i0 - k l) * hu1
@@ -135,57 +163,44 @@ theorem factors_of_perturb
     linear_combination (w ^ k i * w * w ^ (c - k i - 1) * ν i j) * hu1
   have hB : ∀ i l, (if i = l then δ i else 0) + w ^ c * ν i l = δ i * (1 + w • N) i l := by
     intro i l
-    rw [Matrix.add_apply, Matrix.smul_apply, smul_eq_mul, mul_add, hD1 i l, Matrix.one_apply,
-      mul_ite, mul_one, mul_zero]
+    rw [Matrix.add_apply, Matrix.smul_apply, smul_eq_mul, mul_add, hD1 i l, Matrix.one_apply, mul_ite, mul_one,
+      mul_zero]
   refine ⟨δ i0, Q * Matrix.diagonal zl, (hδ i0).1, (hδ i0).2, fun i j => ?_⟩
-  have hBM
-      : ∑ l, δ i * (1 + w • N) i l * (Q * Matrix.diagonal zl) l j = if i = j then δ i0 else 0 := by
-    have hmul
-        : ∑ l, (1 + w • N) i l * (Q * Matrix.diagonal zl) l j
-          = ((1 + w • N) * (Q * Matrix.diagonal zl)) i j := by
+  have hBM : ∑ l, δ i * (1 + w • N) i l * (Q * Matrix.diagonal zl) l j = if i = j then δ i0 else 0 := by
+    have hmul : ∑ l, (1 + w • N) i l * (Q * Matrix.diagonal zl) l j =
+        ((1 + w • N) * (Q * Matrix.diagonal zl)) i j := by
       rw [Matrix.mul_apply]
     simp_rw [mul_assoc (δ i)]
     rw [← Finset.mul_sum, hmul, ← Matrix.mul_assoc, hQ, Matrix.one_mul, Matrix.diagonal_apply]
     split_ifs with hij
     · exact hzl i
     · exact mul_zero _
-  calc
-    ∑ l, be (x i) (y l) * algebraMap O Kf ((Q * Matrix.diagonal zl) l j)
-        = algebraMap O Kf (∑ l, δ i * (1 + w • N) i l * (Q * Matrix.diagonal zl) l j) := by
-      set_option synthInstance.maxHeartbeats 100000 in
+  calc ∑ l, be (x i) (y l) * algebraMap O Kf ((Q * Matrix.diagonal zl) l j)
+      = algebraMap O Kf (∑ l, δ i * (1 + w • N) i l * (Q * Matrix.diagonal zl) l j) := by
+
         rw [map_sum]
-      refine Finset.sum_congr rfl fun l _ => ?_
-      rw [hT, hB]
-      simp only [map_mul]
+        refine Finset.sum_congr rfl fun l _ => ?_
+        rw [hT, hB]
+        simp only [map_mul]
     _ = if i = j then algebraMap O Kf (δ i0) else 0 := by
-      rw [hBM]
-      split_ifs <;> simp
+        rw [hBM]
+        split_ifs <;> simp
 
 end Perturb
 
-theorem liftAt_of
-    {C0 CYb Cde Ck CD Cb CE1 CE2 Cm Ct Cc : ℝ} (h : LiftVecAt C0 CYb Cde Ck CD Cb CE1 CE2 Cm Ct Cc)
-    : LiftAt C0 CYb Cde Ck CD Cb CE1 CE2 Cm Ct Cc := by
+theorem liftAt_of {C0 CYb Cde Ck CD Cb CE1 CE2 Cm Ct Cc : ℝ}
+    (h : LiftVecAt C0 CYb Cde Ck CD Cb CE1 CE2 Cm Ct Cc) : LiftAt C0 CYb Cde Ck CD Cb CE1 CE2 Cm Ct Cc := by
   intro X _ W Qq O Kf _ _ _ _ _ _ _ _ _ _ ι σ jO w hS hH hC Dj g hD0 hBD hc e he
   obtain ⟨F, G, δ, hF, hG, hδ, hT⟩ := h X W Qq O Kf ι σ jO w hS hH hC Dj g hD0 hBD hc e he
   choose ν hν using hT
   let eI : Fin (∏ j, g j) ≃ (∀ j, Fin (g j)) := (Fintype.equivFinOfCardEq (by simp)).symm
-  refine factors_of_perturb hS.2.1 hS.1.w_sq _ _ _ _ X.c _ hc
-    (fun a => F (eI a))
-    (fun a => G (eI a))
-    (fun a => hF _)
-    (fun a => hG _)
-    (fun a => δ (eI a))
-    (fun a => hδ _)
-    (fun a b => ν (eI a) (eI b))
-    ?_
+  refine factors_of_perturb hS.2.1 hS.1.w_sq _ _ _ _ X.c _ hc (fun a => F (eI a)) (fun a => G (eI a))
+    (fun a => hF _) (fun a => hG _) (fun a => δ (eI a)) (fun a => hδ _) (fun a b => ν (eI a) (eI b)) ?_
   intro a b
   rw [hν]
   simp only [Equiv.apply_eq_iff_eq]
 
 theorem restLift_of (h : RestLiftVec) : RestLift :=
-  TransportedAlt.mono
-    (fun _ _ _ _ _ _ _ _ _ _ ⟨Ct0, h0, hCt⟩ => ⟨Ct0, h0, fun Ct h' => liftAt_of (hCt Ct h')⟩)
-    h
+  TransportedAlt.mono (fun _ _ _ _ _ _ _ _ _ _ ⟨Ct0, h0, hCt⟩ => ⟨Ct0, h0, fun Ct h' => liftAt_of (hCt Ct h')⟩) h
 
 end Formalism.MainNotions.ColumnSystems.Pf

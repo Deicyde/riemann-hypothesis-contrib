@@ -1,10 +1,52 @@
 module
 
 public import ReciprocityTheory.ReductiveGroups.DiscreteSeries.CasimirCoefficients.IsClosedKset
-public import ReciprocityTheory.ReductiveGroups.DiscreteSeries.CasimirCoefficients.HaarPolar
-public import ReciprocityTheory.ReductiveGroups.DiscreteSeries.CasimirCoefficients.PhiDecayCore
-public import ReciprocityTheory.ReductiveGroups.DiscreteSeries.CasimirCoefficients.LholClmEventually
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+public import Mathlib.MeasureTheory.Function.L2Space
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
+public import ReciprocityTheory.ReductiveGroups.DiscreteSeries.CasimirCoefficients.ExpInPPosDef
 public import ReciprocityTheory.ReductiveGroups.DiscreteSeries.CasimirCoefficients.IntegrA
+public import ReciprocityTheory.ReductiveGroups.DiscreteSeries.CasimirCoefficients.IntegrableOfDecayVG
+public import ReciprocityTheory.ReductiveGroups.DiscreteSeries.CasimirCoefficients.LholClmEventually
+public import ReciprocityTheory.ReductiveGroups.DiscreteSeries.CasimirCoefficients.PhiDecayCore
+public import ReciprocityTheory.ReductiveGroups.DiscreteSeries.CasimirCoefficients.HaarPolar
 
 @[expose] public section
 
@@ -23,18 +65,13 @@ variable {n : ℕ}
 
 variable {ε : Fin n → Bool} {lam : Fin n → ℝ}
 
-theorem psiM_integrable
-    (T : KType ε (lowK ε lam))
-    (μ : Fin n → ℤ) (hμ : IsMu lam μ)
-    (hlam : IsHCParam lam)
-    {h : ℝ} (hgap : GapAtLeast ε lam h)
-    (hq : 1 ≤ q0 ε)
-    (ν : Measure (UJ ε)) [ν.IsHaarMeasure]
-    : (16 * (n : ℝ) * q0 ε < h → Integrable (fun g : UJ ε => PsiM T μ (toM g)) ν)
-      ∧ (8 * (n : ℝ) * q0 ε < h → MemLp (fun g : UJ ε => PsiM T μ (toM g)) 2 ν)
-      ∧ (∀ s : ℝ,
-        0 ≤ s → 8 * (n : ℝ) * q0 ε + 4 * s * Real.sqrt (2 * q0 ε) < h
-          → Integrable (fun g : UJ ε => ‖PsiM T μ (toM g)‖ ^ 2 * hs (toM g) ^ (s / 2)) ν) := by
+theorem psiM_integrable (T : KType ε (lowK ε lam)) (μ : Fin n → ℤ) (hμ : IsMu lam μ)
+    (hlam : IsHCParam lam) {h : ℝ} (hgap : GapAtLeast ε lam h) (hq : 1 ≤ q0 ε)
+    (ν : Measure (UJ ε)) [ν.IsHaarMeasure] :
+    (16 * (n : ℝ) * q0 ε < h → Integrable (fun g : UJ ε => PsiM T μ (toM g)) ν) ∧
+    (8 * (n : ℝ) * q0 ε < h → MemLp (fun g : UJ ε => PsiM T μ (toM g)) 2 ν) ∧
+    (∀ s : ℝ, 0 ≤ s → 8 * (n : ℝ) * q0 ε + 4 * s * Real.sqrt (2 * q0 ε) < h →
+      Integrable (fun g : UJ ε => ‖PsiM T μ (toM g)‖ ^ 2 * hs (toM g) ^ (s / 2)) ν) := by
   have hq1 : (1 : ℝ) ≤ q0 ε := by exact_mod_cast hq
   set c : ℝ := Real.sqrt (2 * q0 ε) with hcdef
   have hc1 : 1 ≤ c := Real.one_le_sqrt.mpr (by linarith)
@@ -45,14 +82,10 @@ theorem psiM_integrable
   have hfc : Continuous f :=
     (psiM_continuousOn T μ hμ).comp_continuous (continuous_toM ε) (fun g => g.2)
 
-  have key
-      : 0 ≤ h
-        → ∀ (k : KG ε) (X : Matrix (Fin n) (Fin n) ℂ),
-          inP ε X
-            → ‖f (toUJ ε (toMK k * NormedSpace.exp X))‖
-                ≤ Real.exp (h / (32 * c ^ 2)) * Real.exp (-(h / (8 * c)) * Real.sqrt (hs X))
-              ∧ hs (toM (toUJ ε (toMK k * NormedSpace.exp X)))
-                ≤ n * Real.exp (2 * Real.sqrt (hs X)) := by
+  have key : 0 ≤ h → ∀ (k : KG ε) (X : Matrix (Fin n) (Fin n) ℂ), inP ε X →
+      ‖f (toUJ ε (toMK k * NormedSpace.exp X))‖ ≤
+        Real.exp (h / (32 * c ^ 2)) * Real.exp (-(h / (8 * c)) * Real.sqrt (hs X)) ∧
+      hs (toM (toUJ ε (toMK k * NormedSpace.exp X))) ≤ n * Real.exp (2 * Real.sqrt (hs X)) := by
     intro hh k X hX
     have hm : toM (toUJ ε (toMK k * NormedSpace.exp X)) = toMK k * NormedSpace.exp X :=
       toM_toUJ (inUJ_kexp k hX)
@@ -64,7 +97,8 @@ theorem psiM_integrable
     · rw [hm, hs_kmulVG]
       exact hs_exp_leVG X
   refine ⟨fun hth => ?_, fun hth => ?_, fun s hs0 hth => ?_⟩
-  · have hh : 0 ≤ h := by
+  ·
+    have hh : 0 ≤ h := by
       have : 0 ≤ 16 * (n : ℝ) * q0 ε := by positivity
       linarith
     refine integrable_of_polar hq ν f hfc (M := Real.exp (h / (32 * c ^ 2)))
@@ -72,43 +106,39 @@ theorem psiM_integrable
     · rw [sub_pos, lt_div_iff₀ (by positivity)]
       nlinarith
     · intro k X hX
-      have e
-          : -(h / (8 * c) - n * c + n * c) * Real.sqrt (hs X)
-            = -(h / (8 * c)) * Real.sqrt (hs X) := by
+      have e : -(h / (8 * c) - n * c + n * c) * Real.sqrt (hs X) = -(h / (8 * c)) * Real.sqrt (hs X) := by
         ring
       rw [e]
       exact (key hh k X hX).1
-  · have hh : 0 ≤ h := by
+  ·
+    have hh : 0 ≤ h := by
       have : 0 ≤ 8 * (n : ℝ) * q0 ε := by positivity
       linarith
     refine (memLp_two_iff_integrable_sq_norm hfc.aestronglyMeasurable).mpr ?_
-    refine integrable_of_polar hq ν
-      (fun g => ‖f g‖ ^ 2)
-      (hfc.norm.pow 2) (M := Real.exp (h / (32 * c ^ 2)) ^ 2) (δ := h / (4 * c) - n * c)
-      (by positivity) ?_ ?_
+    refine integrable_of_polar hq ν (fun g => ‖f g‖ ^ 2) (hfc.norm.pow 2)
+      (M := Real.exp (h / (32 * c ^ 2)) ^ 2) (δ := h / (4 * c) - n * c) (by positivity) ?_ ?_
     · rw [sub_pos, lt_div_iff₀ (by positivity)]
       nlinarith
     · intro k X hX
       have hb := (key hh k X hX).1
       rw [Real.norm_eq_abs, abs_of_nonneg (by positivity)]
-      calc
-        ‖f (toUJ ε (toMK k * NormedSpace.exp X))‖ ^ 2
-            ≤ (Real.exp (h / (32 * c ^ 2)) * Real.exp (-(h / (8 * c)) * Real.sqrt (hs X))) ^ 2 :=
-          pow_le_pow_left₀ (norm_nonneg _) hb 2
-        _ = Real.exp (h / (32 * c ^ 2)) ^ 2
-            * Real.exp (-(h / (4 * c) - n * c + n * c) * Real.sqrt (hs X)) := by
-          rw [mul_pow, ← Real.exp_nat_mul (-(h / (8 * c)) * Real.sqrt (hs X)) 2]
-          congr 2
-          field_simp
-          ring
-  · have hh : 0 ≤ h := by
+      calc ‖f (toUJ ε (toMK k * NormedSpace.exp X))‖ ^ 2
+          ≤ (Real.exp (h / (32 * c ^ 2)) * Real.exp (-(h / (8 * c)) * Real.sqrt (hs X))) ^ 2 :=
+            pow_le_pow_left₀ (norm_nonneg _) hb 2
+        _ = Real.exp (h / (32 * c ^ 2)) ^ 2 *
+              Real.exp (-(h / (4 * c) - n * c + n * c) * Real.sqrt (hs X)) := by
+            rw [mul_pow, ← Real.exp_natCast_mul 2 (-(h / (8 * c)) * Real.sqrt (hs X))]
+            congr 2
+            field_simp
+            ring
+  ·
+    have hh : 0 ≤ h := by
       have : 0 ≤ 8 * (n : ℝ) * q0 ε + 4 * s * c := by positivity
       linarith
     have hs2 : 0 ≤ s / 2 := by linarith
     have hcw : Continuous fun g : UJ ε => hs (toM g) ^ (s / 2) :=
       (hs_contVG.comp (continuous_toM ε)).rpow_const (fun _ => Or.inr hs2)
-    refine integrable_of_polar hq ν
-      (fun g => ‖f g‖ ^ 2 * hs (toM g) ^ (s / 2))
+    refine integrable_of_polar hq ν (fun g => ‖f g‖ ^ 2 * hs (toM g) ^ (s / 2))
       ((hfc.norm.pow 2).mul hcw) (M := Real.exp (h / (32 * c ^ 2)) ^ 2 * (n : ℝ) ^ (s / 2))
       (δ := h / (4 * c) - s - n * c) (by positivity) ?_ ?_
     · have e : h / (4 * c) - s - n * c = (h - (8 * n * q0 ε + 4 * s * c)) / (4 * c) := by
@@ -124,31 +154,28 @@ theorem psiM_integrable
       have hw0 : 0 ≤ hs (toM g) ^ (s / 2) := Real.rpow_nonneg (hs_nonnegVG _) _
       rw [Real.norm_eq_abs, abs_of_nonneg (mul_nonneg (by positivity) hw0)]
       have hw' : hs (toM g) ^ (s / 2) ≤ (n : ℝ) ^ (s / 2) * Real.exp (s * r) := by
-        calc
-          hs (toM g) ^ (s / 2)
-            ≤ ((n : ℝ) * Real.exp (2 * r)) ^ (s / 2) := Real.rpow_le_rpow (hs_nonnegVG _) hw hs2
+        calc hs (toM g) ^ (s / 2) ≤ ((n : ℝ) * Real.exp (2 * r)) ^ (s / 2) :=
+              Real.rpow_le_rpow (hs_nonnegVG _) hw hs2
           _ = (n : ℝ) ^ (s / 2) * Real.exp (s * r) := by
-            rw [Real.mul_rpow hn0 (Real.exp_pos _).le, ← Real.exp_mul]
-            congr 2
-            ring
+              rw [Real.mul_rpow hn0 (Real.exp_pos _).le, ← Real.exp_mul]
+              congr 2
+              ring
       have hf2 : ‖f g‖ ^ 2 ≤ Real.exp (h / (32 * c ^ 2)) ^ 2 * Real.exp (-(h / (4 * c)) * r) := by
-        calc
-          ‖f g‖ ^ 2 ≤ (Real.exp (h / (32 * c ^ 2)) * Real.exp (-(h / (8 * c)) * r)) ^ 2 :=
-            pow_le_pow_left₀ (norm_nonneg _) hb 2
+        calc ‖f g‖ ^ 2 ≤ (Real.exp (h / (32 * c ^ 2)) * Real.exp (-(h / (8 * c)) * r)) ^ 2 :=
+              pow_le_pow_left₀ (norm_nonneg _) hb 2
           _ = _ := by
-            rw [mul_pow, ← Real.exp_nat_mul (-(h / (8 * c)) * r) 2]
-            congr 2
-            field_simp
+              rw [mul_pow, ← Real.exp_natCast_mul 2 (-(h / (8 * c)) * r)]
+              congr 2
+              field_simp
+              ring
+      calc ‖f g‖ ^ 2 * hs (toM g) ^ (s / 2)
+          ≤ (Real.exp (h / (32 * c ^ 2)) ^ 2 * Real.exp (-(h / (4 * c)) * r)) *
+              ((n : ℝ) ^ (s / 2) * Real.exp (s * r)) :=
+            mul_le_mul hf2 hw' hw0 (by positivity)
+        _ = Real.exp (h / (32 * c ^ 2)) ^ 2 * (n : ℝ) ^ (s / 2) *
+              Real.exp (-(h / (4 * c) - s - n * c + n * c) * r) := by
+            rw [show -(h / (4 * c) - s - n * c + n * c) * r = -(h / (4 * c)) * r + s * r by ring,
+              Real.exp_add]
             ring
-      calc
-        ‖f g‖ ^ 2 * hs (toM g) ^ (s / 2)
-            ≤ (Real.exp (h / (32 * c ^ 2)) ^ 2 * Real.exp (-(h / (4 * c)) * r))
-              * ((n : ℝ) ^ (s / 2) * Real.exp (s * r)) :=
-          mul_le_mul hf2 hw' hw0 (by positivity)
-        _ = Real.exp (h / (32 * c ^ 2)) ^ 2 * (n : ℝ) ^ (s / 2)
-            * Real.exp (-(h / (4 * c) - s - n * c + n * c) * r) := by
-          rw [show -(h / (4 * c) - s - n * c + n * c) * r = -(h / (4 * c)) * r + s * r by ring,
-            Real.exp_add]
-          ring
 
 end ReciprocityTheory.ChartRestriction.DS.S7

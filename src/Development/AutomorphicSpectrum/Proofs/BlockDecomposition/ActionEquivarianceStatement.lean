@@ -1,8 +1,53 @@
 module
 
-public import Mathlib
 public import Development.WeilBound.RepresentationTheoryGL.DiscreteSeries.DiscreteSeriesCovers.EquivariantSections.EquivSection
+public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.AdjointInverseTranslate.CoefLeftAAv
 public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.AdjointInverseTranslate.ConjugatedGeneratorGlRelation
+import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.AdjointInverseTranslate.SmoothLinear
+import Formalism.RealPlaceAnalysis.RealPlaceTaylor.IntegrableComplexContinuousBoundedSupport
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Lemma
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
+import ReciprocityTheory.ReductiveGroups.DiscreteSeries.DiscreteSeriesExistence.DatumA
+public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.AdjointInverseTranslate.AnaHpartUnique
 
 @[expose] public section
 
@@ -12,8 +57,7 @@ open Finset Matrix MeasureTheory
 
 namespace GlobalTheory.CompanionTheory.ActEquivK
 
-open ReciprocityTheory.ChartRestriction.DS ReciprocityTheory.ChartRestriction.DS.S7
-  PositivityTheory.RgDs.K
+open ReciprocityTheory.ChartRestriction.DS ReciprocityTheory.ChartRestriction.DS.S7 PositivityTheory.RgDs.K
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
@@ -179,8 +223,8 @@ theorem actEquiv : ActEquiv := by
   have hk : Formalism.REAL.inUJ ε (toMK k) := (mir_inUJ_iff ε _).2 k.1.2
   have hJ : ∀ v, Formalism.REAL.SmoothOnG ε (jfun Ψ T.w v) := fun v =>
     pdA_smooth_clm (pdA_coef T.w v) (f := Ψ) hP.2.2.1
-  have hJk
-      : ∀ v y, Formalism.REAL.inUJ ε y → jfun Ψ T.w v (y * toMK k) = jfun Ψ T.w (T.op k v) y := by
+  have hJk : ∀ v y, Formalism.REAL.inUJ ε y →
+      jfun Ψ T.w v (y * toMK k) = jfun Ψ T.w (T.op k v) y := by
     intro v y hy
     show inner ℂ T.w (Ψ (y * toMK k) v) = inner ℂ T.w (Ψ y (T.op k v))
     have h1 := hP.1 1 k y ((mir_inUJ_iff ε _).1 hy)
@@ -191,27 +235,22 @@ theorem actEquiv : ActEquiv := by
   rw [rightRegular_toL2 ε _ (show toMK k ∈ UJset ε from k.1.2)]
   refine toL2_congr_of_forall_inUJ_eq fun g hg' => ?_
   have hg : Formalism.REAL.inUJ ε g := (mir_inUJ_iff ε _).2 hg'
-  have hL
-      : ∀ x : Wd n m,
-        Formalism.REAL.Eword ε (ofW x) (fun y => inner ℂ T.w (Ψ y (a x))) (g * toMK k)
-          = ∑ w : Fin x.1 → Fin n × Fin n, (∏ i, adC (toMK k) (x.2 i) (w i)) *
-              Formalism.REAL.Eword ε (List.ofFn w) (jfun Ψ T.w (T.op k (a x))) g := by
+  have hL : ∀ x : Wd n m, Formalism.REAL.Eword ε (ofW x) (fun y => inner ℂ T.w (Ψ y (a x))) (g * toMK k) =
+      ∑ w : Fin x.1 → Fin n × Fin n, (∏ i, adC (toMK k) (x.2 i) (w i)) *
+        Formalism.REAL.Eword ε (List.ofFn w) (jfun Ψ T.w (T.op k (a x))) g := by
     intro x
     refine (eword_mul_right (hJ (a x)) hk x.1 x.2 g hg).trans (Finset.sum_congr rfl fun w _ => ?_)
     rw [eword_local (List.ofFn w) (f' := jfun Ψ T.w (T.op k (a x))) (fun y hy => hJk _ y hy) hg]
-  have hR
-      : ∀ x : Wd n m,
-        Formalism.REAL.Eword ε (ofW x) (fun y => inner ℂ T.w (Ψ y (rhoA T m k a x))) g
-          = ∑ w : Fin x.1 → Fin n × Fin n, (∏ i, adC (toMK k) (w i) (x.2 i)) *
-              Formalism.REAL.Eword ε (ofW x) (jfun Ψ T.w (T.op k (a ⟨x.1, w⟩))) g := by
+  have hR : ∀ x : Wd n m, Formalism.REAL.Eword ε (ofW x)
+        (fun y => inner ℂ T.w (Ψ y (rhoA T m k a x))) g =
+      ∑ w : Fin x.1 → Fin n × Fin n, (∏ i, adC (toMK k) (w i) (x.2 i)) *
+        Formalism.REAL.Eword ε (ofW x) (jfun Ψ T.w (T.op k (a ⟨x.1, w⟩))) g := by
     intro x
-    have e
-        : (fun y => inner ℂ T.w (Ψ y (rhoA T m k a x)))
-          = fun y =>
-            ∑ w ∈ (Finset.univ : Finset (Fin x.1 → Fin n × Fin n)), (∏ i, adC (toMK k) (w i) (x.2 i)) *
-              jfun Ψ T.w (T.op k (a ⟨x.1, w⟩)) y := by
+    have e : (fun y => inner ℂ T.w (Ψ y (rhoA T m k a x))) = fun y =>
+        ∑ w ∈ (Finset.univ : Finset (Fin x.1 → Fin n × Fin n)), (∏ i, adC (toMK k) (w i) (x.2 i)) *
+          jfun Ψ T.w (T.op k (a ⟨x.1, w⟩)) y := by
       funext y
-      set_option synthInstance.maxHeartbeats 100000 in
+
       simp only [rhoA, map_sum, map_smul, inner_sum, inner_smul_right, jfun]
     rw [e]
     exact eword_sum _ _ _ (fun w => hJ _) _ hg
@@ -221,10 +260,8 @@ theorem actEquiv : ActEquiv := by
   simp only [hL, hR]
   rw [Fintype.sum_sigma, Fintype.sum_sigma]
   refine Finset.sum_congr rfl fun l _ => ?_
-  exact Finset.sum_comm (s := (Finset.univ : Finset (Fin (l : ℕ) → Fin n × Fin n)))
-    (t := Finset.univ)
-    (f := fun y w =>
-      (∏ i, adC (toMK k) (y i) (w i))
-        * Formalism.REAL.Eword ε (List.ofFn w) (jfun Ψ T.w (T.op k (a ⟨l, y⟩))) g)
+  exact Finset.sum_comm (s := (Finset.univ : Finset (Fin (l : ℕ) → Fin n × Fin n))) (t := Finset.univ)
+    (f := fun y w => (∏ i, adC (toMK k) (y i) (w i)) *
+      Formalism.REAL.Eword ε (List.ofFn w) (jfun Ψ T.w (T.op k (a ⟨l, y⟩))) g)
 
 end GlobalTheory.CompanionTheory.ActEquivK

@@ -1,30 +1,54 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.BoundAtTwoAndThreeForFamily
-public import Formalism.SharpRestriction.GlobalTheoremInputs
-public import Formalism.SharpRestriction.LevelLetterCocycles.JointConditionsZpowers.JointConditionTameBound
-public import Formalism.SharpRestriction.LevelLetterCocycles.JointConditionsZpowers.CrysOnCond
-public import Formalism.SharpRestriction.LevelLetterCocycles.WachCoordinates
-public import Formalism.SharpRestriction.LevelLetterCocycles.RamifiedCoefficientChains
-public import Formalism.SharpRestriction.LevelLetterCocycles.ArcLiftingSetup
-public import Development.AbelianVarietyTheory.BlockTheory.NonGaloisCusps.BaseSizes
-public import Formalism.SharpRestriction.LevelLetterCocycles.JointConditionsZpowers.BaseLen
-public import Formalism.LocalRingCardinality.Lemmas
+public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.DecompositionInvariantsCondition
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.LengthInvariantsLtTop
+import Formalism.SharpRestriction.LevelLetterCocycles.JointConditionsZpowers.BaseLen
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
+import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.BoundAtTwoThreeFamily
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism Formalism.ConjugateSelfDual ReciprocityTheory.Gal
-  Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions Formalism.MainNotions.N
-  Formalism.WeaklyAdmissibleFiltrations GlobalTheory.NLink
+open NumberField IsDedekindDomain Formalism Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions Formalism.MainNotions.N Formalism.WeaklyAdmissibleFiltrations GlobalTheory.NLink
 
 noncomputable section
 
 namespace GlobalTheory.LengthH0Bound
 
-theorem toNat_div_le (A B : ℕ∞) (r c : ℕ) (h : A ≤ (r : ℕ∞) * (c : ℕ∞) * B)
-    : ((A.toNat : ℚ) / (B.toNat : ℚ)) ≤ (r : ℚ) * c := by
+theorem toNat_div_le (A B : ℕ∞) (r c : ℕ) (h : A ≤ (r : ℕ∞) * (c : ℕ∞) * B) :
+    ((A.toNat : ℚ) / (B.toNat : ℚ)) ≤ (r : ℚ) * c := by
   rcases eq_or_ne B ⊤ with hB | hB
   · rw [hB, ENat.toNat_top, Nat.cast_zero, div_zero]; positivity
   obtain ⟨b, rfl⟩ := ENat.ne_top_iff_exists.mp hB
@@ -37,46 +61,41 @@ theorem toNat_div_le (A B : ℕ∞) (r c : ℕ) (h : A ≤ (r : ℕ∞) * (c : �
   rw [div_le_iff₀ (by exact_mod_cast hb)]
   exact_mod_cast hle
 
-theorem lenUnit_le_of_kill
-    {O : Type} [CommRing O] [IsDomain O]
-    (k p c : ℕ) (hp : algebraMap O (FractionRing O) (p : O) ≠ 0) (W : Submodule O (KOG O k))
-    (hW : ∀ x ∈ W, (p : O) ^ c • x = 0)
-    : lenUnit (O := O) p ↥W ≤ (k : ℚ) * c := by
-  have hlen :=
-    length_le_of_killed (LL := FractionRing O) (stdG O (FractionRing O) k) _
-      (GlobalTheory.FiniteTwistInvariants.stdG_eq_span k) (p : O) hp c W hW
+theorem lenUnit_le_of_kill {O : Type} [CommRing O] [IsDomain O] (k p c : ℕ)
+    (hp : algebraMap O (FractionRing O) (p : O) ≠ 0) (W : Submodule O (KOG O k))
+    (hW : ∀ x ∈ W, (p : O) ^ c • x = 0) :
+    lenUnit (O := O) p ↥W ≤ (k : ℚ) * c := by
+  have hlen := length_le_of_killed (LL := FractionRing O) (stdG O (FractionRing O) k) _
+    (GlobalTheory.FiniteTwistInvariants.stdG_eq_span k) (p : O) hp c W hW
   exact toNat_div_le _ _ k c hlen
 
 section Bridge
 
-variable
-  {l : ℕ} [Fact l.Prime]
-  {E Ω : Type} [Field E] [Field Ω] [Algebra E Ω]
-  {Gw : Subgroup (Ω ≃ₐ[E] Ω)} {O : Type}
-  [CommRing O] [IsDomain O] [Algebra ℤ_[l] O] [TopologicalSpace O]
+variable {l : ℕ} [Fact l.Prime] {E Ω : Type} [Field E] [Field Ω] [Algebra E Ω]
+  {Gw : Subgroup (Ω ≃ₐ[E] Ω)} {O : Type} [CommRing O] [IsDomain O] [Algebra ℤ_[l] O] [TopologicalSpace O]
   (Bw : LocBridge l E Ω Gw O)
 
-theorem locM_entry {k : ℕ} (M : ↥Gw →* Matrix (Fin k) (Fin k) O) (g : ↥(GK Bw.Kw)) (i j : Fin k)
-    : Br.locM Bw M g i j = Br.toLLK Bw (algebraMap O (FractionRing O) (M (Br.ι Bw g) i j)) := by
+theorem locM_entry {k : ℕ} (M : ↥Gw →* Matrix (Fin k) (Fin k) O)
+    (g : ↥(GK Bw.Kw)) (i j : Fin k) :
+    Br.locM Bw M g i j = Br.toLLK Bw (algebraMap O (FractionRing O) (M (Br.ι Bw g) i j)) := by
   rw [Br.toLLK_alg]; rfl
 
-theorem vecS_mulVec'
-    {k : ℕ} (M : ↥Gw →* Matrix (Fin k) (Fin k) O) (g : ↥(GK Bw.Kw)) (u : Fin k → FractionRing O)
-    : Br.vecS Bw k ((mapM (algebraMap O (FractionRing O)) M (Br.ι Bw g)).mulVec u)
-      = (Br.locM Bw M g).mulVec (Br.vecS Bw k u) := by
+theorem vecS_mulVec' {k : ℕ} (M : ↥Gw →* Matrix (Fin k) (Fin k) O)
+    (g : ↥(GK Bw.Kw)) (u : Fin k → FractionRing O) :
+    Br.vecS Bw k ((mapM (algebraMap O (FractionRing O)) M (Br.ι Bw g)).mulVec u) =
+      (Br.locM Bw M g).mulVec (Br.vecS Bw k u) := by
   funext i
-  change Br.toLLK Bw (∑ j, algebraMap O (FractionRing O) (M (Br.ι Bw g) i j) * u j)
-    = ∑ j, Br.locM Bw M g i j * Br.toLLK Bw (u j)
-  set_option synthInstance.maxHeartbeats 100000 in
+  change Br.toLLK Bw (∑ j, algebraMap O (FractionRing O) (M (Br.ι Bw g) i j) * u j) =
+    ∑ j, Br.locM Bw M g i j * Br.toLLK Bw (u j)
+
   simp only [map_sum, map_mul, locM_entry]
 
-set_option synthInstance.maxHeartbeats 400000 in
+
+
 theorem phi_eq_zero {k : ℕ} (z : KOG O k) (hz : Br.phi Bw k z = 0) : z = 0 := by
   obtain ⟨y, rfl⟩ := Submodule.Quotient.mk_surjective _ z
-  change (Submodule.Quotient.mk (Br.vecS Bw k y)
-        : (Fin k → Br.LLw Bw) ⧸ stdG (Br.Ow Bw) (Br.LLw Bw) k)
-      = 0
-    at hz
+  change (Submodule.Quotient.mk (Br.vecS Bw k y) :
+    (Fin k → Br.LLw Bw) ⧸ stdG (Br.Ow Bw) (Br.LLw Bw) k) = 0 at hz
   rw [Submodule.Quotient.mk_eq_zero] at hz
   obtain ⟨b, hb⟩ := hz
   rw [Submodule.Quotient.mk_eq_zero]
@@ -87,29 +106,25 @@ theorem phi_eq_zero {k : ℕ} (z : KOG O k) (hz : Br.phi Bw k z = 0) : z = 0 := 
   rw [Br.toLLK_alg, RingEquiv.apply_symm_apply]
   exact hbj
 
-set_option synthInstance.maxHeartbeats 400000 in
-theorem actD_phi
-    {Γ : Type} [Group Γ]
-    {k : ℕ} (M : Γ →* Matrix (Fin k) (Fin k) O)
-    (f : ↥Gw →* Γ) (gK : ↥(GK Bw.Kw)) (x : KOG O k)
-    : actD (Br.lat Bw (M.comp f)) gK (Br.phi Bw k x)
-      = Br.phi Bw k ((WKG M).comp f (Br.ι Bw gK) x) := by
+
+
+theorem actD_phi {Γ : Type} [Group Γ] {k : ℕ} (M : Γ →* Matrix (Fin k) (Fin k) O) (f : ↥Gw →* Γ)
+    (gK : ↥(GK Bw.Kw)) (x : KOG O k) :
+    actD (Br.lat Bw (M.comp f)) gK (Br.phi Bw k x) = Br.phi Bw k ((WKG M).comp f (Br.ι Bw gK) x) := by
   obtain ⟨y, rfl⟩ := Submodule.Quotient.mk_surjective _ x
   have h := vecS_mulVec' Bw (M.comp f) gK y
-  change (Submodule.Quotient.mk (((Br.locM Bw (M.comp f)) gK).mulVec (Br.vecS Bw k y))
-      : (Fin k → Br.LLw Bw) ⧸ stdG (Br.Ow Bw) (Br.LLw Bw) k)
-    = Submodule.Quotient.mk (Br.vecS Bw k
+  change (Submodule.Quotient.mk (((Br.locM Bw (M.comp f)) gK).mulVec (Br.vecS Bw k y)) :
+      (Fin k → Br.LLw Bw) ⧸ stdG (Br.Ow Bw) (Br.LLw Bw) k) =
+    Submodule.Quotient.mk (Br.vecS Bw k
       (((mapM (algebraMap O (FractionRing O)) (M.comp f)) (Br.ι Bw gK)).mulVec y))
   rw [h]
 
+
 set_option synthInstance.maxHeartbeats 400000 in
-theorem inv_killed
-    {Γ : Type} [Group Γ]
-    {k : ℕ} (M : Γ →* Matrix (Fin k) (Fin k) O)
-    (f : ↥Gw →* Γ) (p c : ℕ)
+theorem inv_killed {Γ : Type} [Group Γ] {k : ℕ} (M : Γ →* Matrix (Fin k) (Fin k) O) (f : ↥Gw →* Γ) (p c : ℕ)
     (h : ∀ y : (Fin k → Br.LLw Bw) ⧸ stdG (Br.Ow Bw) (Br.LLw Bw) k,
-      (∀ gK, actD (Br.lat Bw (M.comp f)) gK y = y) → ((p : Br.Ow Bw) ^ c) • y = 0)
-    : ∀ x ∈ Representation.invariants ((WKG M).comp f), (p : O) ^ c • x = 0 := by
+      (∀ gK, actD (Br.lat Bw (M.comp f)) gK y = y) → ((p : Br.Ow Bw) ^ c) • y = 0) :
+    ∀ x ∈ Representation.invariants ((WKG M).comp f), (p : O) ^ c • x = 0 := by
   intro x hx
   have hfix : ∀ gK, actD (Br.lat Bw (M.comp f)) gK (Br.phi Bw k x) = Br.phi Bw k x := by
     intro gK
@@ -119,6 +134,7 @@ theorem inv_killed
   rw [LinearMap.map_smulₛₗ]
   simp only [map_pow, map_natCast]
   exact hk
+
 
 include Bw in
 theorem natCast_ne_zero : algebraMap O (FractionRing O) ((l : ℕ) : O) ≠ 0 := by
@@ -133,31 +149,22 @@ theorem natCast_ne_zero : algebraMap O (FractionRing O) ((l : ℕ) : O) ≠ 0 :=
 
 end Bridge
 
-set_option synthInstance.maxHeartbeats 400000 in
-theorem main
-    : ∀ (D : D7) (HW : HWOf D.loc) (i : D.nd.Loc)
-        (ρ : D.nd.X i → (GE D.nd →* GL (Fin D.R.r) (D.nd.O i))) (π : D.nd.X i)
-        (u : HeightOneSpectrum (𝓞 D.host.E)) (hu : u ∈ placesOver D.host.E (D.nd.l i)) (s : ℕ)
-        (hs : Good (D.nbr i u hu).Kw s (D.nbr i u hu).LL)
-        (hc : ∀ v,
-          Continuous fun g =>
-            matRep (Br.locM (D.nbr i u hu) ((WpO D.nd i ρ π).comp (decS D.nd u))) g v)
-        (c : ℕ),
-      let S :=
-        LocalSituation.sit D.loc HW (D.nd.l i) (D.locA (D.nd.l i)) (D.nbr i u hu).Kw s
-          (D.nbr i u hu).LL hs
-      ∀ T : LocLat S.G S.Qp S.LL S.O,
-        T = GlobalTheory.HubX.wLat D i ρ π u hu hc
-          → (∀ x : T.V ⧸ T.L.T,
-            (∀ g, actD T.L g x = x) → ((LocalSituation.ell S : S.O) ^ c) • x = 0)
-          → (Br.h0W i u ρ π : ℝ) ≤ (D.R.r : ℝ) * c := by
+
+
+theorem main : ∀ (D : D7) (HW : HWOf D.loc) (i : D.nd.Loc) (ρ : D.nd.X i → (GE D.nd →* GL (Fin D.R.r) (D.nd.O i))) (π : D.nd.X i)
+    (u : HeightOneSpectrum (𝓞 D.host.E)) (hu : u ∈ placesOver D.host.E (D.nd.l i)) (s : ℕ)
+    (hs : Good (D.nbr i u hu).Kw s (D.nbr i u hu).LL)
+    (hc : ∀ v, Continuous fun g => matRep (Br.locM (D.nbr i u hu) ((WpO D.nd i ρ π).comp (decS D.nd u))) g v) (c : ℕ),
+    let S := LocalSituation.sit D.loc HW (D.nd.l i) (D.locA (D.nd.l i)) (D.nbr i u hu).Kw s (D.nbr i u hu).LL hs;
+    ∀ T : LocLat S.G S.Qp S.LL S.O, T = GlobalTheory.HubX.wLat D i ρ π u hu hc →
+    (∀ x : T.V ⧸ T.L.T, (∀ g, actD T.L g x = x) → ((LocalSituation.ell S : S.O) ^ c) • x = 0) →
+    (Br.h0W i u ρ π : ℝ) ≤ (D.R.r : ℝ) * c := by
   intro D HW i ρ π u hu s hs hc c S T hT hkill
   subst hT
   have hp : LocalSituation.ell S = D.nd.l i := (D.loc (D.nd.l i)).PD_p _
-  have hK :=
-    inv_killed (D.nbr i u hu) (WpO D.nd i ρ π) (decS D.nd u) (D.nd.l i) c (fun y hy => by
-      have := hkill y hy
-      rwa [hp] at this)
+  have hK := inv_killed (D.nbr i u hu) (WpO D.nd i ρ π) (decS D.nd u) (D.nd.l i) c (fun y hy => by
+    have := hkill y hy
+    rwa [hp] at this)
   have hq := lenUnit_le_of_kill D.R.r (D.nd.l i) c (natCast_ne_zero (D.nbr i u hu)) _ hK
   exact_mod_cast hq
 

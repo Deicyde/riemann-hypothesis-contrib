@@ -1,6 +1,48 @@
 module
 
 public import ReciprocityTheory.DualLattices.TensorSpan
+public import Mathlib.LinearAlgebra.Matrix.NonsingularInverse
+public import Mathlib.RingTheory.Valuation.Integers
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -13,9 +55,8 @@ namespace ReciprocityTheory.PGsh.L2
 variable {C : Type} [Field C] {R : Type} [CommRing R] [Algebra R C]
 variable {X : Type} [Fintype X] [DecidableEq X]
 
-theorem mem_spanCols_iff (B : Matrix X X C) (f : X → C)
-    : f ∈ Submodule.span R (Set.range fun j x => B x j)
-      ↔ ∃ w ∈ intFun (C := C) R X, f = B *ᵥ w := by
+theorem mem_spanCols_iff (B : Matrix X X C) (f : X → C) :
+    f ∈ Submodule.span R (Set.range fun j x => B x j) ↔ ∃ w ∈ intFun (C := C) R X, f = B *ᵥ w := by
   rw [Submodule.mem_span_range_iff_exists_fun]
   constructor
   · rintro ⟨c, rfl⟩
@@ -28,8 +69,8 @@ theorem mem_spanCols_iff (B : Matrix X X C) (f : X → C)
     ext x
     simp [Matrix.mulVec, dotProduct, Finset.sum_apply, Algebra.smul_def, hc, mul_comm]
 
-theorem mem_spanCols_iff_inv (B : Matrix X X C) (hB : IsUnit B.det) (f : X → C)
-    : f ∈ Submodule.span R (Set.range fun j x => B x j) ↔ B⁻¹ *ᵥ f ∈ intFun (C := C) R X := by
+theorem mem_spanCols_iff_inv (B : Matrix X X C) (hB : IsUnit B.det) (f : X → C) :
+    f ∈ Submodule.span R (Set.range fun j x => B x j) ↔ B⁻¹ *ᵥ f ∈ intFun (C := C) R X := by
   rw [mem_spanCols_iff]
   constructor
   · rintro ⟨w, hw, rfl⟩
@@ -37,9 +78,8 @@ theorem mem_spanCols_iff_inv (B : Matrix X X C) (hB : IsUnit B.det) (f : X → C
   · intro h
     exact ⟨_, h, by rw [Matrix.mulVec_mulVec, Matrix.mul_nonsing_inv _ hB, Matrix.one_mulVec]⟩
 
-theorem mem_dualLat_spanCols_iff (B : Matrix X X C) (u : X → C)
-    : u ∈ dualLat (Submodule.span R (Set.range fun j x => B x j))
-      ↔ u ᵥ* B ∈ intFun (C := C) R X := by
+theorem mem_dualLat_spanCols_iff (B : Matrix X X C) (u : X → C) :
+    u ∈ dualLat (Submodule.span R (Set.range fun j x => B x j)) ↔ u ᵥ* B ∈ intFun (C := C) R X := by
   constructor
   · intro h j
     obtain ⟨r, hr⟩ := h _ (Submodule.subset_span ⟨j, rfl⟩)
@@ -49,16 +89,16 @@ theorem mem_dualLat_spanCols_iff (B : Matrix X X C) (u : X → C)
     choose r hr using h
     choose s hs using hw
     refine ⟨∑ j, r j * s j, ?_⟩
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_mul, hr, hs, Matrix.vecMul, dotProduct, Matrix.mulVec, Finset.mul_sum,
-        Finset.sum_mul]
+
+    simp only [map_sum, map_mul, hr, hs, Matrix.vecMul, dotProduct, Matrix.mulVec,
+    Finset.mul_sum, Finset.sum_mul]
     rw [Finset.sum_comm]
     refine Finset.sum_congr rfl fun a _ => Finset.sum_congr rfl fun j _ => ?_
     ring
 
-theorem dualLat_spanCols (B : Matrix X X C) (hB : IsUnit B.det)
-    : dualLat (Submodule.span R (Set.range fun j x => B x j))
-      = Submodule.span R (Set.range fun j x => (B⁻¹)ᵀ x j) := by
+theorem dualLat_spanCols (B : Matrix X X C) (hB : IsUnit B.det) :
+    dualLat (Submodule.span R (Set.range fun j x => B x j)) =
+      Submodule.span R (Set.range fun j x => (B⁻¹)ᵀ x j) := by
   have hBT : IsUnit (B⁻¹)ᵀ.det := by
     rw [Matrix.det_transpose]
     exact Matrix.isUnit_nonsing_inv_det _ hB
@@ -66,35 +106,29 @@ theorem dualLat_spanCols (B : Matrix X X C) (hB : IsUnit B.det)
   rw [mem_dualLat_spanCols_iff, mem_spanCols_iff_inv _ hBT, ← Matrix.transpose_nonsing_inv,
     Matrix.nonsing_inv_nonsing_inv _ hB, Matrix.mulVec_transpose]
 
-theorem dualLat_dualLat_spanCols (B : Matrix X X C) (hB : IsUnit B.det)
-    : dualLat (dualLat (Submodule.span R (Set.range fun j x => B x j)))
-      = Submodule.span R (Set.range fun j x => B x j) := by
+theorem dualLat_dualLat_spanCols (B : Matrix X X C) (hB : IsUnit B.det) :
+    dualLat (dualLat (Submodule.span R (Set.range fun j x => B x j))) =
+      Submodule.span R (Set.range fun j x => B x j) := by
   have hBT : IsUnit (B⁻¹)ᵀ.det := by
     rw [Matrix.det_transpose]
     exact Matrix.isUnit_nonsing_inv_det _ hB
   rw [dualLat_spanCols B hB, dualLat_spanCols _ hBT, ← Matrix.transpose_nonsing_inv,
     Matrix.nonsing_inv_nonsing_inv _ hB, Matrix.transpose_transpose]
 
-theorem valuation_det_le_one
-    (v : Valuation C NNReal) (hv : v.Integers R)
-    (P : Matrix X X C) (hP : ∀ x j, ∃ r : R, algebraMap R C r = P x j)
-    : v P.det ≤ 1 := by
+theorem valuation_det_le_one (v : Valuation C NNReal) (hv : v.Integers R) (P : Matrix X X C)
+    (hP : ∀ x j, ∃ r : R, algebraMap R C r = P x j) : v P.det ≤ 1 := by
   choose r hr using hP
   have : P = (Matrix.of r).map (algebraMap R C) := by ext x j; simp [hr]
   rw [this, ← RingHom.mapMatrix_apply, ← RingHom.map_det]
   exact hv.map_le_one _
 
-theorem valuation_det_eq_of_span_eq
-    (v : Valuation C NNReal) (hv : v.Integers R)
+theorem valuation_det_eq_of_span_eq (v : Valuation C NNReal) (hv : v.Integers R)
     (B B' : Matrix X X C)
-    (h : Submodule.span R (Set.range fun j x => B x j)
-      = Submodule.span R (Set.range fun j x => B' x j))
-    : v B.det = v B'.det := by
-  have key
-      : ∀ (B B' : Matrix X X C),
-        Submodule.span R (Set.range fun j x => B x j)
-            ≤ Submodule.span R (Set.range fun j x => B' x j)
-          → v B.det ≤ v B'.det := by
+    (h : Submodule.span R (Set.range fun j x => B x j) =
+      Submodule.span R (Set.range fun j x => B' x j)) : v B.det = v B'.det := by
+  have key : ∀ (B B' : Matrix X X C),
+      Submodule.span R (Set.range fun j x => B x j) ≤
+        Submodule.span R (Set.range fun j x => B' x j) → v B.det ≤ v B'.det := by
     intro B B' hle
     have hcol : ∀ j, ∃ w ∈ intFun (C := C) R X, (fun x => B x j) = B' *ᵥ w := fun j =>
       (mem_spanCols_iff B' _).1 (hle (Submodule.subset_span ⟨j, rfl⟩))

@@ -1,9 +1,52 @@
 module
 
-public import Mathlib
 public import GroundTheory.PAdicHodge.BCrisNewtonLift
 public import GroundTheory.PAdicHodge.FactorizationFactorialLe
-public import GroundTheory.PAdicHodge.KerTheta
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Int
+import Mathlib.Algebra.Order.Star.Real
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.Order.Interval.Finset.Box
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -26,42 +69,40 @@ local notation "K♭" => FractionRing 𝒪♭
 local notation "𝔸" => Localization.Away (p : AInf K p)
 local notation "θ" => fontaineTheta 𝒪 p
 
-theorem norm_zcoeff_incl_le_one (x : AInf K p) (n : ℤ)
-    : ‖(teichLift K p).zcoeff (incl K p x) n‖ ≤ 1 := by
+theorem norm_zcoeff_incl_le_one (x : AInf K p) (n : ℤ) :
+    ‖(teichLift K p).zcoeff (incl K p x) n‖ ≤ 1 := by
   unfold TeichLift.zcoeff
   split_ifs
   · exact norm_coeff_incl_le_one x _
   · simp
 
-theorem convergesAt_zcoeff_incl (x : AInf K p) {ρ : ℝ} (hρ0 : 0 < ρ) (hρ1 : ρ < 1)
-    : ConvergesAt ((teichLift K p).zcoeff (incl K p x)) ρ := by
+theorem convergesAt_zcoeff_incl (x : AInf K p) {ρ : ℝ} (hρ0 : 0 < ρ) (hρ1 : ρ < 1) :
+    ConvergesAt ((teichLift K p).zcoeff (incl K p x)) ρ := by
   refine convergesAt_of_eventually hρ0 ((teichLift K p).zcoeff_neg_exists _) fun ε hε => ?_
   obtain ⟨N, hN⟩ := exists_pow_lt_of_lt_one hε hρ1
   refine ⟨N, fun n hn => ?_⟩
-  calc
-    ‖(teichLift K p).zcoeff (incl K p x) n‖ * ρ ^ n ≤ 1 * ρ ^ (N : ℤ) :=
-      mul_le_mul (norm_zcoeff_incl_le_one x n) (zpow_le_zpow_right_of_le_one₀ hρ0 hρ1.le hn)
-        (zpow_pos hρ0 n).le zero_le_one
+  calc ‖(teichLift K p).zcoeff (incl K p x) n‖ * ρ ^ n ≤ 1 * ρ ^ (N : ℤ) :=
+        mul_le_mul (norm_zcoeff_incl_le_one x n) (zpow_le_zpow_right_of_le_one₀ hρ0 hρ1.le hn)
+          (zpow_pos hρ0 n).le zero_le_one
     _ ≤ ε := by rw [one_mul, zpow_natCast]; exact hN.le
 
-theorem exists_toB_mul (z : 𝔸)
-    : ∃ (M : ℕ) (x : AInf K p),
-      toB K p z * algebraMap _ (teichLift K p).B (teichLift K p).π ^ M
-        = algebraMap _ (teichLift K p).B (incl K p x) := by
+theorem exists_toB_mul (z : 𝔸) : ∃ (M : ℕ) (x : AInf K p),
+    toB K p z * algebraMap _ (teichLift K p).B (teichLift K p).π ^ M =
+      algebraMap _ (teichLift K p).B (incl K p x) := by
   obtain ⟨M, x, hx⟩ := IsLocalization.Away.surj (p : AInf K p) z
   refine ⟨M, x, ?_⟩
   have h := congrArg (toB K p) hx
   rw [map_mul, map_pow, toB_algebraMap, toB_algebraMap, map_natCast, map_natCast] at h
-  rw [show algebraMap (WittVector p K♭) (teichLift K p).B (teichLift K p).π
-      = (p : (teichLift K p).B) from
+  rw [show algebraMap (WittVector p K♭) (teichLift K p).B (teichLift K p).π = (p : (teichLift K p).B) from
     map_natCast _ p]
   exact h
 
-theorem convergesAt_toB (z : 𝔸) {ρ : ℝ} (hρ0 : 0 < ρ) (hρ1 : ρ < 1)
-    : ConvergesAt ((teichLift K p).coeffB (toB K p z)) ρ := by
+theorem convergesAt_toB (z : 𝔸) {ρ : ℝ} (hρ0 : 0 < ρ) (hρ1 : ρ < 1) :
+    ConvergesAt ((teichLift K p).coeffB (toB K p z)) ρ := by
   obtain ⟨M, x, h⟩ := exists_toB_mul z
   rw [TeichLift.coeffB_eq _ h]
   exact convergesAt_shift hρ0 (convergesAt_zcoeff_incl x hρ0 hρ1) M
+
 
 variable (K p) in
 def gn (ρ : ℝ) (z : 𝔸) : ℝ := gaussNorm ((teichLift K p).coeffB (toB K p z)) ρ
@@ -70,15 +111,15 @@ variable {ρ : ℝ}
 
 theorem gn_nonneg (hρ0 : 0 < ρ) (z : 𝔸) : 0 ≤ gn K p ρ z := gaussNorm_nonneg hρ0
 
-theorem gn_mul (hρ0 : 0 < ρ) (hρ1 : ρ < 1) (z w : 𝔸)
-    : gn K p ρ (z * w) = gn K p ρ z * gn K p ρ w := by
+theorem gn_mul (hρ0 : 0 < ρ) (hρ1 : ρ < 1) (z w : 𝔸) :
+    gn K p ρ (z * w) = gn K p ρ z * gn K p ρ w := by
   unfold gn
   rw [map_mul]
   exact ((teichLift K p).convergesAt_coeffB_mul hρ0 hρ1 (convergesAt_toB z hρ0 hρ1)
     (convergesAt_toB w hρ0 hρ1)).2
 
-theorem gn_add_le (hρ0 : 0 < ρ) (hρ1 : ρ < 1) (z w : 𝔸)
-    : gn K p ρ (z + w) ≤ max (gn K p ρ z) (gn K p ρ w) := by
+theorem gn_add_le (hρ0 : 0 < ρ) (hρ1 : ρ < 1) (z w : 𝔸) :
+    gn K p ρ (z + w) ≤ max (gn K p ρ z) (gn K p ρ w) := by
   unfold gn
   rw [map_add (f := _)]
   exact ((teichLift K p).convergesAt_coeffB_add hρ0 hρ1 (convergesAt_toB z hρ0 hρ1)
@@ -89,8 +130,8 @@ theorem gn_neg (hρ0 : 0 < ρ) (hρ1 : ρ < 1) (z : 𝔸) : gn K p ρ (-z) = gn 
   rw [map_neg]
   exact ((teichLift K p).convergesAt_coeffB_neg hρ0 hρ1 (convergesAt_toB z hρ0 hρ1)).2
 
-theorem gn_sub_le (hρ0 : 0 < ρ) (hρ1 : ρ < 1) (z w : 𝔸)
-    : gn K p ρ (z - w) ≤ max (gn K p ρ z) (gn K p ρ w) := by
+theorem gn_sub_le (hρ0 : 0 < ρ) (hρ1 : ρ < 1) (z w : 𝔸) :
+    gn K p ρ (z - w) ≤ max (gn K p ρ z) (gn K p ρ w) := by
   rw [sub_eq_add_neg, ← gn_neg hρ0 hρ1 w]
   exact gn_add_le hρ0 hρ1 z (-w)
 
@@ -115,8 +156,8 @@ theorem gn_zero : gn K p ρ (0 : 𝔸) = 0 := by
     TeichLift.coeffB_algebraMap, ((teichLift K p).zcoeff_eq_zero_iff 0).2 rfl]
   simp [gaussNorm]
 
-theorem gn_algebraMap (x : AInf K p)
-    : gn K p ρ (algebraMap (AInf K p) 𝔸 x) = gaussNorm ((teichLift K p).zcoeff (incl K p x)) ρ := by
+theorem gn_algebraMap (x : AInf K p) :
+    gn K p ρ (algebraMap (AInf K p) 𝔸 x) = gaussNorm ((teichLift K p).zcoeff (incl K p x)) ρ := by
   unfold gn
   rw [coeffB_toB_algebraMap]
 
@@ -133,7 +174,8 @@ theorem gn_pos (hρ0 : 0 < ρ) (hρ1 : ρ < 1) {z : 𝔸} (hz : z ≠ 0) : 0 < g
   rw [TeichLift.coeffB_eq _ h, gaussNorm_shift hρ0]
   exact mul_pos (gaussNorm_pos hρ0 hc hx') (zpow_pos hρ0 _)
 
-theorem gaussNorm_single_one (hρ0 : 0 < ρ) : gaussNorm (Pi.single (1 : ℤ) (1 : K♭)) ρ = ρ := by
+theorem gaussNorm_single_one (hρ0 : 0 < ρ) :
+    gaussNorm (Pi.single (1 : ℤ) (1 : K♭)) ρ = ρ := by
   refine le_antisymm (gaussNorm_le fun n => ?_) ?_
   · by_cases hn : n = 1
     · subst hn; simp
@@ -143,19 +185,21 @@ theorem gaussNorm_single_one (hρ0 : 0 < ρ) : gaussNorm (Pi.single (1 : ℤ) (1
 
 theorem gn_natCast_p (hρ0 : 0 < ρ) : gn K p ρ (p : 𝔸) = ρ := by
   rw [← map_natCast (algebraMap (AInf K p) 𝔸) p, gn_algebraMap, map_natCast,
-    show (p : WittVector p K♭) = (teichLift K p).π ^ 1 by rw [pow_one]; rfl, TeichLift.zcoeff_π_pow]
+    show (p : WittVector p K♭) = (teichLift K p).π ^ 1 by rw [pow_one]; rfl,
+    TeichLift.zcoeff_π_pow]
   exact_mod_cast gaussNorm_single_one hρ0
 
-theorem gn_algebraMap_le_one (hρ0 : 0 < ρ) (hρ1 : ρ ≤ 1) (x : AInf K p)
-    : gn K p ρ (algebraMap (AInf K p) 𝔸 x) ≤ 1 := by
+theorem gn_algebraMap_le_one (hρ0 : 0 < ρ) (hρ1 : ρ ≤ 1) (x : AInf K p) :
+    gn K p ρ (algebraMap (AInf K p) 𝔸 x) ≤ 1 := by
   rw [gn_algebraMap]
   refine gaussNorm_le fun n => ?_
   by_cases hn : 0 ≤ n
-  · exact mul_le_one₀ (norm_zcoeff_incl_le_one x n) (zpow_nonneg hρ0.le n) (zpow_le_one₀ hρ0 hρ1 hn)
+  · exact mul_le_one₀ (norm_zcoeff_incl_le_one x n) (zpow_nonneg hρ0.le n)
+      (zpow_le_one₀ hρ0 hρ1 hn)
   · rw [(teichLift K p).zcoeff_of_neg _ (not_le.1 hn), norm_zero, zero_mul]; exact zero_le_one
 
-theorem gn_unit (hρ0 : 0 < ρ) (hρ1 : ρ < 1) {x : AInf K p} (hx : IsUnit x)
-    : gn K p ρ (algebraMap (AInf K p) 𝔸 x) = 1 := by
+theorem gn_unit (hρ0 : 0 < ρ) (hρ1 : ρ < 1) {x : AInf K p} (hx : IsUnit x) :
+    gn K p ρ (algebraMap (AInf K p) 𝔸 x) = 1 := by
   obtain ⟨u, rfl⟩ := hx
   have h1 := gn_algebraMap_le_one (K := K) hρ0 hρ1.le (u : AInf K p)
   have h2 := gn_algebraMap_le_one (K := K) hρ0 hρ1.le (↑u⁻¹ : AInf K p)
@@ -164,8 +208,8 @@ theorem gn_unit (hρ0 : 0 < ρ) (hρ1 : ρ < 1) {x : AInf K p} (hx : IsUnit x)
   nlinarith [gn_nonneg (K := K) hρ0 (algebraMap (AInf K p) 𝔸 u),
     gn_nonneg (K := K) hρ0 (algebraMap (AInf K p) 𝔸 ↑u⁻¹)]
 
-theorem gn_natCast (hρ0 : 0 < ρ) (hρ1 : ρ < 1) {m : ℕ} (hm : m ≠ 0)
-    : gn K p ρ (m : 𝔸) = ρ ^ (m.factorization p) := by
+theorem gn_natCast (hρ0 : 0 < ρ) (hρ1 : ρ < 1) {m : ℕ} (hm : m ≠ 0) :
+    gn K p ρ (m : 𝔸) = ρ ^ (m.factorization p) := by
   have e : (m : 𝔸) = (p : 𝔸) ^ (m.factorization p) * ((ordCompl[p] m : ℕ) : 𝔸) := by
     rw [← Nat.cast_pow, ← Nat.cast_mul, Nat.ordProj_mul_ordCompl_eq_self]
   rw [e, gn_mul hρ0 hρ1, gn_pow hρ0 hρ1, gn_natCast_p hρ0,
@@ -173,8 +217,8 @@ theorem gn_natCast (hρ0 : 0 < ρ) (hρ1 : ρ < 1) {m : ℕ} (hm : m ≠ 0)
     gn_unit hρ0 hρ1 (WittVector.isUnit_natCast_of_coprime ((Nat.coprime_ordCompl hp.out hm).symm)),
     mul_one]
 
-theorem norm_coeff_zero_le_of_mem_ker {x : AInf K p} (hx : x ∈ RingHom.ker θ)
-    : ‖x.coeff 0‖ ≤ ‖(p : K)‖ := by
+theorem norm_coeff_zero_le_of_mem_ker {x : AInf K p} (hx : x ∈ RingHom.ker θ) :
+    ‖x.coeff 0‖ ≤ ‖(p : K)‖ := by
   obtain ⟨v, hv⟩ := exists_eq_teichmuller_add_mul_p x
   have h := congrArg θ hv
   rw [RingHom.mem_ker.1 hx, map_add (f := _), map_mul, map_natCast, fontaineTheta_teichmuller] at h
@@ -185,37 +229,32 @@ theorem norm_coeff_zero_le_of_mem_ker {x : AInf K p} (hx : x ∈ RingHom.ker θ)
   rw [preTilt_norm_def, h', norm_mul, norm_neg]
   exact mul_le_of_le_one_left (norm_nonneg _) (mem_normInteger.1 (θ v).2)
 
-theorem zcoeff_incl_natCast (x : AInf K p) (n : ℕ)
-    : (teichLift K p).zcoeff (incl K p x) n = algebraMap 𝒪♭ K♭ (tcoeff x n) := by
+theorem zcoeff_incl_natCast (x : AInf K p) (n : ℕ) :
+    (teichLift K p).zcoeff (incl K p x) n = algebraMap 𝒪♭ K♭ (tcoeff x n) := by
   simp [TeichLift.zcoeff, coeff_incl]
 
-theorem zcoeff_incl_zero (x : AInf K p)
-    : (teichLift K p).zcoeff (incl K p x) 0 = algebraMap 𝒪♭ K♭ (x.coeff 0) := by
+theorem zcoeff_incl_zero (x : AInf K p) :
+    (teichLift K p).zcoeff (incl K p x) 0 = algebraMap 𝒪♭ K♭ (x.coeff 0) := by
   have := zcoeff_incl_natCast x 0
   rwa [tcoeff_zero, Nat.cast_zero] at this
 
-theorem gn_ker_le
-    (hp0 : ‖(p : K)‖ ≤ ρ) (hρ0 : 0 < ρ) (hρ1 : ρ < 1) {x : AInf K p} (hx : x ∈ RingHom.ker θ)
-    : gn K p ρ (algebraMap (AInf K p) 𝔸 x) ≤ ρ := by
+theorem gn_ker_le (hp0 : ‖(p : K)‖ ≤ ρ) (hρ0 : 0 < ρ) (hρ1 : ρ < 1) {x : AInf K p}
+    (hx : x ∈ RingHom.ker θ) : gn K p ρ (algebraMap (AInf K p) 𝔸 x) ≤ ρ := by
   rw [gn_algebraMap]
   refine gaussNorm_le fun n => ?_
   rcases lt_trichotomy n 0 with hn | rfl | hn
   · rw [(teichLift K p).zcoeff_of_neg _ hn, norm_zero, zero_mul]; exact hρ0.le
   · rw [zcoeff_incl_zero, norm_algebraMap_preTilt, zpow_zero, mul_one]
     exact (norm_coeff_zero_le_of_mem_ker hx).trans hp0
-  · calc
-      _ ≤ 1 * ρ ^ n :=
-        mul_le_mul_of_nonneg_right (norm_zcoeff_incl_le_one x n) (zpow_nonneg hρ0.le n)
+  · calc _ ≤ 1 * ρ ^ n :=
+          mul_le_mul_of_nonneg_right (norm_zcoeff_incl_le_one x n) (zpow_nonneg hρ0.le n)
       _ ≤ ρ := by
-        rw [one_mul]
-        exact (zpow_le_zpow_right_of_le_one₀ hρ0 hρ1.le (show (1 : ℤ) ≤ n by omega)).trans_eq
-          (zpow_one ρ)
+          rw [one_mul]
+          exact (zpow_le_zpow_right_of_le_one₀ hρ0 hρ1.le (show (1 : ℤ) ≤ n by omega)).trans_eq
+            (zpow_one ρ)
 
-theorem gn_dpow_le
-    (hp0 : ‖(p : K)‖ ≤ ρ) (hρ0 : 0 < ρ) (hρ1 : ρ < 1)
-    {x : AInf K p} (hx : x ∈ RingHom.ker θ)
-    (n : ℕ)
-    : gn K p ρ (ACris.dpow n x) ≤ 1 := by
+theorem gn_dpow_le (hp0 : ‖(p : K)‖ ≤ ρ) (hρ0 : 0 < ρ) (hρ1 : ρ < 1) {x : AInf K p}
+    (hx : x ∈ RingHom.ker θ) (n : ℕ) : gn K p ρ (ACris.dpow n x) ≤ 1 := by
   have h := congrArg (gn K p ρ) (ACris.factorial_mul_dpow n x)
   rw [gn_mul hρ0 hρ1, gn_pow hρ0 hρ1, gn_natCast hρ0 hρ1 (Nat.factorial_ne_zero n)] at h
   have hv := ACris.factorization_factorial_le (p := p) n
@@ -228,20 +267,16 @@ theorem gn_dpow_le
   have := mul_lt_mul_of_pos_left hc hpos
   linarith
 
-theorem gn_acrisZero_le_one
-    (hp0 : ‖(p : K)‖ ≤ ρ) (hρ0 : 0 < ρ) (hρ1 : ρ < 1) {z : 𝔸} (hz : z ∈ ACris.ACrisZero K p)
-    : gn K p ρ z ≤ 1 := by
-  have hz' : z ∈ Algebra.adjoin (AInf K p) {y | ∃ n : ℕ, ∃ x ∈ RingHom.ker θ, ACris.dpow n x = y} :=
-    hz
+theorem gn_acrisZero_le_one (hp0 : ‖(p : K)‖ ≤ ρ) (hρ0 : 0 < ρ) (hρ1 : ρ < 1) {z : 𝔸}
+    (hz : z ∈ ACris.ACrisZero K p) : gn K p ρ z ≤ 1 := by
+  have hz' : z ∈ Algebra.adjoin (AInf K p) {y | ∃ n : ℕ, ∃ x ∈ RingHom.ker θ, ACris.dpow n x = y} := hz
   clear hz
   induction hz' using Algebra.adjoin_induction with
   | mem x hx =>
     obtain ⟨n, y, hy, rfl⟩ := hx
     exact gn_dpow_le hp0 hρ0 hρ1 hy n
-  | algebraMap r =>
-    exact gn_algebraMap_le_one hρ0 hρ1.le r
-  | add x y _ _ hx hy =>
-    exact (gn_add_le hρ0 hρ1 x y).trans (max_le hx hy)
+  | algebraMap r => exact gn_algebraMap_le_one hρ0 hρ1.le r
+  | add x y _ _ hx hy => exact (gn_add_le hρ0 hρ1 x y).trans (max_le hx hy)
   | mul x y _ _ hx hy =>
     rw [gn_mul hρ0 hρ1]
     exact mul_le_one₀ hx (gn_nonneg hρ0 _) hy
@@ -252,27 +287,21 @@ theorem norm_p_pos : 0 < ‖(p : K)‖ := norm_pos_iff.2 (Nat.cast_ne_zero.2 hp.
 
 theorem norm_p_lt_one : ‖(p : K)‖ < 1 := IsPerfectoidField.norm_natCast_lt_one
 
-theorem norm_theta_le (x : AInf K p)
-    : ‖((θ x : 𝒪) : K)‖ ≤ gn K p ‖(p : K)‖ (algebraMap (AInf K p) 𝔸 x) := by
+theorem norm_theta_le (x : AInf K p) :
+    ‖((θ x : 𝒪) : K)‖ ≤ gn K p ‖(p : K)‖ (algebraMap (AInf K p) 𝔸 x) := by
   set r₀ := ‖(p : K)‖ with hr₀
   set G := gn K p r₀ (algebraMap (AInf K p) 𝔸 x) with hG
   have hr0 : 0 < r₀ := norm_p_pos
   have hr1 : r₀ < 1 := norm_p_lt_one
   have key : ∀ n : ℕ, ‖((θ x : 𝒪) : K)‖ ≤ max G (r₀ ^ (n + 1)) := by
     intro n
-    obtain ⟨d, hd⟩ :=
-      (WittVector.eq_teichmullerSeries_iff (tcoeff x) x).1
-        (WittVector.teichmullerSeries_coeff_eq x).symm n
-    have hθ
-        : ((θ x : 𝒪) : K)
-          = ∑ i ∈ Finset.Iic n,
-              ((PreTilt.untilt (tcoeff x i) : 𝒪) : K) * (p : K) ^ i
-            + (p : K) ^ (n + 1) * ((θ d : 𝒪) : K) := by
+    obtain ⟨d, hd⟩ := (WittVector.eq_teichmullerSeries_iff (tcoeff x) x).1
+      (WittVector.teichmullerSeries_coeff_eq x).symm n
+    have hθ : ((θ x : 𝒪) : K) = ∑ i ∈ Finset.Iic n,
+        ((PreTilt.untilt (tcoeff x i) : 𝒪) : K) * (p : K) ^ i + (p : K) ^ (n + 1) * ((θ d : 𝒪) : K) := by
       have e := congrArg (fun y => ((θ y : 𝒪) : K)) (eq_add_of_sub_eq hd)
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [map_add (f := _), map_sum, map_mul, map_pow, map_natCast,
-            fontaineTheta_teichmuller]
-          at e
+
+      simp only [map_add (f := _), map_sum, map_mul, map_pow, map_natCast, fontaineTheta_teichmuller] at e
       push_cast at e
       rw [e, add_comm]
     rw [hθ]
@@ -292,18 +321,16 @@ theorem norm_theta_le (x : AInf K p)
     (pow_le_pow_of_le_one hr0.le hr1.le (Nat.le_succ n)).trans_lt hn
   exact lt_irrefl _ ((key n).trans_lt (max_lt hlt h2))
 
-theorem exists_eq_pow_mul_add_xi_mul
-    {ξ : AInf K p} (hξ : RingHom.ker θ = Ideal.span {ξ})
-    {k : ℕ} {y : AInf K p} (hy : gn K p ‖(p : K)‖ (algebraMap (AInf K p) 𝔸 y) ≤ ‖(p : K)‖ ^ k)
-    : ∃ w z : AInf K p, y = (p : AInf K p) ^ k * w + ξ * z := by
+theorem exists_eq_pow_mul_add_xi_mul {ξ : AInf K p} (hξ : RingHom.ker θ = Ideal.span {ξ}) {k : ℕ}
+    {y : AInf K p} (hy : gn K p ‖(p : K)‖ (algebraMap (AInf K p) 𝔸 y) ≤ ‖(p : K)‖ ^ k) :
+    ∃ w z : AInf K p, y = (p : AInf K p) ^ k * w + ξ * z := by
   have hθ := (norm_theta_le y).trans hy
   have hpk : ((p : K) ^ k) ≠ 0 := pow_ne_zero _ (Nat.cast_ne_zero.2 hp.out.ne_zero)
   set c : K := ((θ y : 𝒪) : K) / (p : K) ^ k with hc_def
   have hc : ‖c‖ ≤ 1 := by
     rw [hc_def, norm_div, norm_pow, div_le_one (pow_pos norm_p_pos k)]
     exact hθ
-  obtain ⟨w, hw⟩ :=
-    IsPerfectoidField.surjective_fontaineTheta (K := K) (p := p) ⟨c, mem_normInteger.2 hc⟩
+  obtain ⟨w, hw⟩ := IsPerfectoidField.surjective_fontaineTheta (K := K) (p := p) ⟨c, mem_normInteger.2 hc⟩
   have hker : y - (p : AInf K p) ^ k * w ∈ RingHom.ker θ := by
     rw [RingHom.mem_ker, map_sub, map_mul, map_pow, map_natCast, hw]
     apply Subtype.ext
@@ -315,13 +342,10 @@ theorem exists_eq_pow_mul_add_xi_mul
   obtain ⟨z, hz⟩ := Ideal.mem_span_singleton'.1 hker
   exact ⟨w, z, by rw [mul_comm ξ, hz]; ring⟩
 
-theorem exists_eq_pow_mul_add_xi_pow_mul
-    {ξ : AInf K p} (hξ : RingHom.ker θ = Ideal.span {ξ})
-    (hξr : ‖(p : K)‖ ≤ gn K p ‖(p : K)‖ (algebraMap (AInf K p) 𝔸 ξ))
-    (m : ℕ)
-    : ∀ (k : ℕ) (y : AInf K p),
-      gn K p ‖(p : K)‖ (algebraMap (AInf K p) 𝔸 y) ≤ ‖(p : K)‖ ^ (k + m)
-        → ∃ w z : AInf K p, y = (p : AInf K p) ^ k * w + ξ ^ (m + 1) * z := by
+theorem exists_eq_pow_mul_add_xi_pow_mul {ξ : AInf K p} (hξ : RingHom.ker θ = Ideal.span {ξ})
+    (hξr : ‖(p : K)‖ ≤ gn K p ‖(p : K)‖ (algebraMap (AInf K p) 𝔸 ξ)) (m : ℕ) :
+    ∀ (k : ℕ) (y : AInf K p), gn K p ‖(p : K)‖ (algebraMap (AInf K p) 𝔸 y) ≤ ‖(p : K)‖ ^ (k + m) →
+      ∃ w z : AInf K p, y = (p : AInf K p) ^ k * w + ξ ^ (m + 1) * z := by
   set r₀ := ‖(p : K)‖ with hr₀
   have hr0 : 0 < r₀ := norm_p_pos
   have hr1 : r₀ < 1 := norm_p_lt_one
@@ -342,8 +366,7 @@ theorem exists_eq_pow_mul_add_xi_pow_mul
     have hy₁ : gn K p r₀ (algebraMap _ 𝔸 y₁) ≤ r₀ ^ (k + m) := by
       have h1 := mul_le_mul_of_nonneg_right hξr (gn_nonneg hr0 (algebraMap _ 𝔸 y₁))
       have h2 : r₀ * gn K p r₀ (algebraMap _ 𝔸 y₁) ≤ r₀ * r₀ ^ (k + m) := by
-        calc
-          _ ≤ _ := h1
+        calc _ ≤ _ := h1
           _ ≤ r₀ ^ (k + (m + 1)) := hb
           _ = r₀ * r₀ ^ (k + m) := by ring
       exact le_of_mul_le_mul_left h2 hr0

@@ -1,6 +1,55 @@
 module
 
-public import ReciprocityTheory.ReducedBases.LatticeReduction
+public import ReciprocityTheory.ReducedBases.GsInnerBOfLt
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Ring.IsFormallyReal
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+public import Mathlib.LinearAlgebra.Dimension.OrzechProperty
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Lemma
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
@@ -117,8 +166,8 @@ private lemma exists_basis_sub_sum_lower {E : Type*} [NormedAddCommGroup E] [Inn
   set v : Fin d → (Fin d → ℤ) := fun i => e0 i - ∑ l, W i l • e0 l with hv
   have hfv : (fun i => f (v i)) = fun i => f (e0 i) - ∑ l, (W i l : ℝ) • f (e0 l) := by
     funext i
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [hv, map_sub, map_sum, map_zsmul, Int.cast_smul_eq_zsmul]
+
+    simp only [hv, map_sub, map_sum, map_zsmul, Int.cast_smul_eq_zsmul]
   have hspR : span ℝ (Set.range (fun i => f (v i))) = span ℝ (Set.range (fun i => f (e0 i))) := by
     rw [hfv, ← Set.image_univ, ← Set.image_univ]
     exact (span_tri (fun i => f (e0 i)) (fun i l => (W i l : ℝ)) (fun i l h => by simp [hW i l h])
@@ -151,8 +200,8 @@ private lemma exists_basis_size_reduce_column {E : Type*} [NormedAddCommGroup E]
       ∑ l, ((if l = j ∧ j < i then round (mu b i j) else 0 : ℤ) : ℝ) • b l := by
     funext i
     rw [he1 i]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sub, map_sum, map_zsmul, Int.cast_smul_eq_zsmul, hb]
+
+    simp only [map_sub, map_sum, map_zsmul, Int.cast_smul_eq_zsmul, hb]
   have hsum : ∀ i, ∑ l, ((if l = j ∧ j < i then round (mu b i j) else 0 : ℤ) : ℝ) • b l
       = ((if j < i then round (mu b i j) else 0 : ℤ) : ℝ) • b j := by
     intro i

@@ -1,8 +1,52 @@
 module
 
-public import Mathlib
 public import Formalism.LocalToGlobal.SiegelLatticeTheory.ClosedLocalOrbits.GaugeLatticeShifts.PointMatrixPhases
 public import Formalism.LocalToGlobal.SiegelLatticeTheory.ClosedLocalOrbits.GaugeLatticeShifts.FormRegularity
+import Formalism.LocalToGlobal.SiegelLatticeTheory.ClosedLocalOrbits.GaugeLatticeShifts.HermitianBlockSpans
+import Formalism.LocalToGlobal.SiegelLatticeTheory.ClosedLocalOrbits.GaugeLatticeShifts.HermitianSumFrames
+public import Formalism.LocalToGlobal.SiegelLatticeTheory.ClosedLocalOrbits.GaugeLatticeShifts.InfCut
+import Formalism.LocalToGlobal.SiegelLatticeTheory.ClosedLocalOrbits.GaugeLatticeShifts.TraceEqSumPlaces
+import Formalism.SharpRestriction.CuspSpanNormBounds.BruhatCellsKronecker.CellBru
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -14,8 +58,7 @@ open Matrix
 
 namespace Formalism.L2.SG.RealObj.RealPhaseFrames
 
-open Formalism.L2.SG.RealObj Formalism.L2.SG.HidaSetting Formalism.L2.SG.RealObj.HermitianBlockSpans
-  Formalism.L2.SG.RealObj.RootCoordinateFrames Formalism.L2.SG.Pf.PointMatrixPhases
+open Formalism.L2.SG.RealObj Formalism.L2.SG.HidaSetting Formalism.L2.SG.RealObj.HermitianBlockSpans Formalism.L2.SG.RealObj.RootCoordinateFrames Formalism.L2.SG.Pf.PointMatrixPhases
 
 section Frame
 
@@ -27,23 +70,19 @@ theorem hJ_add_r (x y y' : Fin n → ℂ) : hJ ε x (y + y') = hJ ε x y + hJ ε
 theorem hJ_smul_r (c : ℂ) (x y : Fin n → ℂ) : hJ ε x (c • y) = c * hJ ε x y := by
   unfold hJ; rw [Matrix.mulVec_smul, dotProduct_smul, smul_eq_mul]
 
-theorem expand_e
-    (e fd : Fin r → Fin n → ℂ) (hfe : ∀ a b, hJ ε (fd a) (e b) = if a = b then 1 else 0)
-    {k : ℕ} {y : Fin n → ℂ} (hy : y ∈ spanLt e k)
-    : (∀ b : Fin r, k ≤ b.1 → hJ ε (fd b) y = 0) ∧ y = ∑ b, hJ ε (fd b) y • e b := by
+theorem expand_e (e fd : Fin r → Fin n → ℂ) (hfe : ∀ a b, hJ ε (fd a) (e b) = if a = b then 1 else 0) {k : ℕ}
+    {y : Fin n → ℂ} (hy : y ∈ spanLt e k) :
+    (∀ b : Fin r, k ≤ b.1 → hJ ε (fd b) y = 0) ∧ y = ∑ b, hJ ε (fd b) y • e b := by
   unfold spanLt at hy
   induction hy using Submodule.span_induction with
   | mem x hx =>
     obtain ⟨b0, hb0, rfl⟩ := hx
     refine ⟨fun b hb => ?_, ?_⟩
     · rw [hfe, if_neg]
-      intro h
-      subst h
-      exact absurd hb0 (by simp only [Set.mem_setOf_eq]; omega)
+      intro h; subst h; exact absurd hb0 (by simp only [Set.mem_setOf_eq]; omega)
     · simp only [hfe, ite_smul, one_smul, zero_smul]
       simp
-  | zero =>
-    refine ⟨fun b _ => ?_, ?_⟩ <;> simp [hJ]
+  | zero => refine ⟨fun b _ => ?_, ?_⟩ <;> simp [hJ]
   | add a c _ _ ha hc =>
     refine ⟨fun b hb => by rw [hJ_add_r, ha.1 b hb, hc.1 b hb, add_zero], ?_⟩
     conv_lhs => rw [ha.2, hc.2]
@@ -53,19 +92,14 @@ theorem expand_e
     conv_lhs => rw [ha.2]
     simp only [hJ_smul_r, Finset.smul_sum, smul_smul]
 
-def frameMat (e fd : Fin r → Fin n → ℂ) (z : Fin n → ℂ) (g : Matrix (Fin n) (Fin n) ℂ)
-    : Matrix (Fin (r + 1)) (Fin (r + 1)) ℂ := fun a c =>
-  Fin.lastCases (if a = Fin.last r then 1 else 0)
-    (fun b => (if a = b.castSucc then 1 else 0) + hJ ε (fd b) ((g - 1) *ᵥ fam e z a))
-    c
+def frameMat (e fd : Fin r → Fin n → ℂ) (z : Fin n → ℂ) (g : Matrix (Fin n) (Fin n) ℂ) :
+    Matrix (Fin (r + 1)) (Fin (r + 1)) ℂ :=
+  fun a c => Fin.lastCases (if a = Fin.last r then 1 else 0)
+    (fun b => (if a = b.castSucc then 1 else 0) + hJ ε (fd b) ((g - 1) *ᵥ fam e z a)) c
 
-theorem frameMat_spec
-    (e fd : Fin r → Fin n → ℂ)
-    (z : Fin n → ℂ)
-    (hfe : ∀ a b, hJ ε (fd a) (e b) = if a = b then 1 else 0)
-    (g : Matrix (Fin n) (Fin n) ℂ) (hg : InS e z g)
-    : IsLoUni (frameMat ε e fd z g)
-      ∧ ∀ a, g *ᵥ fam e z a = ∑ c, frameMat ε e fd z g a c • fam e z c := by
+theorem frameMat_spec (e fd : Fin r → Fin n → ℂ) (z : Fin n → ℂ)
+    (hfe : ∀ a b, hJ ε (fd a) (e b) = if a = b then 1 else 0) (g : Matrix (Fin n) (Fin n) ℂ) (hg : InS e z g) :
+    IsLoUni (frameMat ε e fd z g) ∧ ∀ a, g *ᵥ fam e z a = ∑ c, frameMat ε e fd z g a c • fam e z c := by
   have hsp_cs : ∀ b : Fin r, (g - 1) *ᵥ fam e z b.castSucc ∈ spanLt e b.1 := fun b => by
     simp only [fam, Fin.snoc_castSucc]; exact hg.1 b
   have hsp_l : (g - 1) *ᵥ fam e z (Fin.last r) ∈ spanLt e r := by
@@ -95,8 +129,8 @@ theorem frameMat_spec
   · have e0 : g *ᵥ fam e z a = fam e z a + (g - 1) *ᵥ fam e z a := by
       rw [Matrix.sub_mulVec, Matrix.one_mulVec]; abel
     rw [e0, Fin.sum_univ_castSucc]
-    simp only [frameMat, Fin.lastCases_castSucc, Fin.lastCases_last, add_smul,
-      Finset.sum_add_distrib, ite_smul, one_smul, zero_smul]
+    simp only [frameMat, Fin.lastCases_castSucc, Fin.lastCases_last, add_smul, Finset.sum_add_distrib, ite_smul,
+      one_smul, zero_smul]
     induction a using Fin.lastCases with
     | last =>
       have hx := (expand_e ε e fd hfe hsp_l).2
@@ -120,16 +154,16 @@ section Sums
 
 variable {r : ℕ}
 
-theorem sgLoF_eq {K : Type} [Field K] (M : Matrix (Fin (r + 1)) (Fin (r + 1)) K)
-    : sgLoF M = ∑ a : Fin r, M a.succ a.castSucc := by
+theorem sgLoF_eq {K : Type} [Field K] (M : Matrix (Fin (r + 1)) (Fin (r + 1)) K) :
+    sgLoF M = ∑ a : Fin r, M a.succ a.castSucc := by
   unfold sgLoF
   rw [Fin.sum_univ_castSucc, dite_eq_right (by simp), add_zero]
   refine Finset.sum_congr rfl fun a _ => ?_
   rw [dite_eq_left (by simp)]
   rfl
 
-theorem sgUpF_eq {K : Type} [Field K] (M : Matrix (Fin (r + 1)) (Fin (r + 1)) K)
-    : sgUpF M = ∑ a : Fin r, M a.castSucc a.succ := by
+theorem sgUpF_eq {K : Type} [Field K] (M : Matrix (Fin (r + 1)) (Fin (r + 1)) K) :
+    sgUpF M = ∑ a : Fin r, M a.castSucc a.succ := by
   unfold sgUpF
   rw [Fin.sum_univ_castSucc, dite_eq_right (by simp), add_zero]
   refine Finset.sum_congr rfl fun a _ => ?_
@@ -150,16 +184,14 @@ theorem sgUpF_one {K : Type} [Field K] {N : ℕ} : sgUpF (1 : Matrix (Fin N) (Fi
   · exact Matrix.one_apply_ne (fun e => by have := congrArg Fin.val e; simp at this)
   · rfl
 
-theorem isLoUni_one {K : Type} [Field K] {N : ℕ}
-    : IsLoUni (1 : Matrix (Fin N) (Fin N) K) := fun i j =>
+theorem isLoUni_one {K : Type} [Field K] {N : ℕ} : IsLoUni (1 : Matrix (Fin N) (Fin N) K) := fun i j =>
   ⟨fun h => Matrix.one_apply_ne (ne_of_lt h), fun h => by subst h; exact Matrix.one_apply_eq i⟩
 
-theorem isUpUni_one {K : Type} [Field K] {N : ℕ}
-    : IsUpUni (1 : Matrix (Fin N) (Fin N) K) := fun i j =>
+theorem isUpUni_one {K : Type} [Field K] {N : ℕ} : IsUpUni (1 : Matrix (Fin N) (Fin N) K) := fun i j =>
   ⟨fun h => Matrix.one_apply_ne (ne_of_lt h).symm, fun h => by subst h; exact Matrix.one_apply_eq i⟩
 
-theorem isUpUni_sgnT {P : Matrix (Fin (r + 1)) (Fin (r + 1)) ℂ} (h : IsLoUni P)
-    : IsUpUni (FormRegularity.sgn r * Pᵀ * FormRegularity.sgn r) := by
+theorem isUpUni_sgnT {P : Matrix (Fin (r + 1)) (Fin (r + 1)) ℂ} (h : IsLoUni P) :
+    IsUpUni (FormRegularity.sgn r * Pᵀ * FormRegularity.sgn r) := by
   intro i j
   simp only [FormRegularity.sgn, Matrix.mul_diagonal, Matrix.diagonal_mul, Matrix.transpose_apply]
   refine ⟨fun hij => ?_, fun hij => ?_⟩
@@ -176,31 +208,28 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 variable {D : D7} (X : Formalism.L2.SG.HidaSetting.HidaSetting D)
 
-theorem sgLoF_map (L : Formalism.L2.SG.PairVal.MatR D) (ψ : D.host.E →+* ℂ)
-    : sgLoF (L.map ψ) = ψ (Formalism.L2.SG.PairVal.sgLo L) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [sgLoF_eq, FormRegularity.sgLo_eq, map_sum]
+theorem sgLoF_map (L : Formalism.L2.SG.PairVal.MatR D) (ψ : D.host.E →+* ℂ) :
+    sgLoF (L.map ψ) = ψ (Formalism.L2.SG.PairVal.sgLo L) := by
+
+  rw [sgLoF_eq, FormRegularity.sgLo_eq, map_sum]
   rfl
 
-theorem sgUpF_map (U : Formalism.L2.SG.PairVal.MatR D) (ψ : D.host.E →+* ℂ)
-    : sgUpF (U.map ψ) = ψ (Formalism.L2.SG.PairVal.sgUp U) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [sgUpF_eq, FormRegularity.sgUp_eq, map_sum]
+theorem sgUpF_map (U : Formalism.L2.SG.PairVal.MatR D) (ψ : D.host.E →+* ℂ) :
+    sgUpF (U.map ψ) = ψ (Formalism.L2.SG.PairVal.sgUp U) := by
+
+  rw [sgUpF_eq, FormRegularity.sgUp_eq, map_sum]
   rfl
 
-theorem place_id
-    (u u' : D.what₂.Word)
-    {γ γw g g' : X.B.I.Ginf} (hg : g ∈ X.SinfU u) (hg' : g' ∈ X.SinfU u') (hdec : γ = g * γw * g'⁻¹)
-    (w : Point D.host.E (D.R.rS + 1)) (hPt : IsPtRep X u u' w γw)
+theorem place_id (u u' : D.what₂.Word) {γ γw g g' : X.B.I.Ginf} (hg : g ∈ X.SinfU u) (hg' : g' ∈ X.SinfU u')
+    (hdec : γ = g * γw * g'⁻¹) (w : Point D.host.E (D.R.rS + 1)) (hPt : IsPtRep X u u' w γw)
     (L U : Formalism.L2.SG.PairVal.MatR D) (hL : IsLoUni L) (hU : IsUpUni U)
     (hZ : ∀ v, ZhatO (ZX X u u' 1 γ v) = (L * ptMat w * U).map (fun x => X.B.I.φ v (X.ιE.symm x)))
-    (v : InfinitePlace X.B.I.F)
-    : ∑ a, star (rootCoord (X.B.I.ε v) (fun a => rv X.B.I v (X.eR a)) (fun a => rv X.B.I v (X.fR a))
-          (rv X.B.I v (X.zR u)) (uMat (g v)) a)
-        - ∑ a, rootCoord (X.B.I.ε v) (fun a => rv X.B.I v (X.eR a)) (fun a => rv X.B.I v (X.fR a))
-            (rv X.B.I v (X.zR u')) (uMat (g' v)) a
-      = -(X.B.I.φ v
-        (X.ιE.symm (Formalism.L2.SG.PairVal.sgLo L + Formalism.L2.SG.PairVal.sgUp U))) := by
+    (v : InfinitePlace X.B.I.F) :
+    ∑ a, star (rootCoord (X.B.I.ε v) (fun a => rv X.B.I v (X.eR a)) (fun a => rv X.B.I v (X.fR a))
+        (rv X.B.I v (X.zR u)) (uMat (g v)) a) -
+      ∑ a, rootCoord (X.B.I.ε v) (fun a => rv X.B.I v (X.eR a)) (fun a => rv X.B.I v (X.fR a))
+        (rv X.B.I v (X.zR u')) (uMat (g' v)) a =
+      -(X.B.I.φ v (X.ιE.symm (Formalism.L2.SG.PairVal.sgLo L + Formalism.L2.SG.PairVal.sgUp U))) := by
   set ε := X.B.I.ε v
   set e : Fin D.R.rS → Fin X.B.I.n → ℂ := fun a => rv X.B.I v (X.eR a)
   set f : Fin D.R.rS → Fin X.B.I.n → ℂ := fun a => rv X.B.I v (X.fR a)
@@ -214,17 +243,11 @@ theorem place_id
   set Pg := frameMat ε e f z (uMat (g v)) with hPgdef
   set Pg' := frameMat ε e f z' (uMat (g' v)) with hPg'def
   have hrc : ∀ a, rootCoord ε e f z (uMat (g v)) a = Pg a.succ a.castSucc := fun a =>
-    HermitianSumRootCoordinateFrames.RootCoordFrame_holds _ _ ε e f z hfe
-      (fun a => (hfr.2.2.2.2.1 a).2)
-      _ _ sPg a
+    HermitianSumRootCoordinateFrames.RootCoordFrame_holds _ _ ε e f z hfe (fun a => (hfr.2.2.2.2.1 a).2) _ _ sPg a
   have hrc' : ∀ a, rootCoord ε e f z' (uMat (g' v)) a = Pg' a.succ a.castSucc := fun a =>
-    HermitianSumRootCoordinateFrames.RootCoordFrame_holds _ _ ε e f z' hfe
-      (fun a => (hfr'.2.2.2.2.1 a).2)
-      _ _ sPg' a
-  have h4 :=
-    HermitianSumRootCoordinateFrames.ZhatNAct_holds _ _ ε (fam e z) (fam e z') (uMat (g v))
-      (uMat (g⁻¹ v)) (uMat (g' v)) (uMat (γ v)) Pg Pg'
-      (Formalism.L2.SG.RealObj.InfCut.uMat_inv_mul' (g v)) (hJ_map _ (g v).2) sPg sPg'
+    HermitianSumRootCoordinateFrames.RootCoordFrame_holds _ _ ε e f z' hfe (fun a => (hfr'.2.2.2.2.1 a).2) _ _ sPg' a
+  have h4 := HermitianSumRootCoordinateFrames.ZhatNAct_holds _ _ ε (fam e z) (fam e z') (uMat (g v)) (uMat (g⁻¹ v)) (uMat (g' v))
+    (uMat (γ v)) Pg Pg' (Formalism.L2.SG.RealObj.InfCut.uMat_inv_mul' (g v)) (hJ_map _ (g v).2) sPg sPg'
   have hγw : γw = g⁻¹ * γ * g' := by rw [hdec]; group
   have hu : uMat (g⁻¹ v) * uMat (γ v) * uMat (g' v) = uMat (γw v) := by
     rw [hγw]; simp only [uMat, Pi.mul_apply, Subgroup.coe_mul, Units.val_mul]
@@ -238,56 +261,37 @@ theorem place_id
   have hz' : Zγ * FormRegularity.sgn D.R.rS = L.map ψ * ptMat (mapPt ψ w) * U.map ψ := by
     rw [ptMat_mapPt, ← Matrix.map_mul, ← Matrix.map_mul]
     exact hz
-  have hw'
-      : (Pg.map star * L.map ψ) * ptMat (mapPt ψ w)
-          * (U.map ψ * (FormRegularity.sgn D.R.rS * Pg'ᵀ * FormRegularity.sgn D.R.rS))
-        = 1 * ptMat (mapPt ψ w) * 1 := by
+  have hw' : (Pg.map star * L.map ψ) * ptMat (mapPt ψ w) * (U.map ψ * (FormRegularity.sgn D.R.rS * Pg'ᵀ * FormRegularity.sgn D.R.rS)) =
+      1 * ptMat (mapPt ψ w) * 1 := by
     rw [Matrix.one_mul, Matrix.mul_one]
     have hC : ptMat (mapPt ψ w) = ptC X v w := ptMat_mapPt ψ w
     conv_rhs => rw [hC, ← hw]
-    calc
-      (Pg.map star * L.map ψ) * ptMat (mapPt ψ w)
-            * (U.map ψ * (FormRegularity.sgn D.R.rS * Pg'ᵀ * FormRegularity.sgn D.R.rS))
-          = Pg.map star * (L.map ψ * ptMat (mapPt ψ w) * U.map ψ)
-            * (FormRegularity.sgn D.R.rS * Pg'ᵀ * FormRegularity.sgn D.R.rS) := by
-        simp only [Matrix.mul_assoc]
-      _ = Pg.map star * (Zγ * FormRegularity.sgn D.R.rS)
-          * (FormRegularity.sgn D.R.rS * Pg'ᵀ * FormRegularity.sgn D.R.rS) := by
-        rw [hz']
+    calc (Pg.map star * L.map ψ) * ptMat (mapPt ψ w) * (U.map ψ * (FormRegularity.sgn D.R.rS * Pg'ᵀ * FormRegularity.sgn D.R.rS))
+        = Pg.map star * (L.map ψ * ptMat (mapPt ψ w) * U.map ψ) * (FormRegularity.sgn D.R.rS * Pg'ᵀ * FormRegularity.sgn D.R.rS) := by
+          simp only [Matrix.mul_assoc]
+      _ = Pg.map star * (Zγ * FormRegularity.sgn D.R.rS) * (FormRegularity.sgn D.R.rS * Pg'ᵀ * FormRegularity.sgn D.R.rS) := by rw [hz']
       _ = Pg.map star * Zγ * Pg'ᵀ * FormRegularity.sgn D.R.rS := by
-        calc
-          _ = Pg.map star * Zγ * (FormRegularity.sgn D.R.rS * FormRegularity.sgn D.R.rS) * Pg'ᵀ
-              * FormRegularity.sgn D.R.rS := by
-            simp only [Matrix.mul_assoc]
-          _ = _ := by rw [FormRegularity.sgn_sq, Matrix.mul_one]
-  have hLo :=
-    Formalism.MainNotions.BridgeLemma.bru_lo_mul (FormRegularity.isLoUni_star hPg)
-      (FormRegularity.isLoUni_map ψ hL)
-  have hUp :=
-    Formalism.MainNotions.BridgeLemma.bru_up_mul (FormRegularity.isUpUni_map ψ hU)
-      (isUpUni_sgnT hPg')
+          calc _ = Pg.map star * Zγ * (FormRegularity.sgn D.R.rS * FormRegularity.sgn D.R.rS) * Pg'ᵀ * FormRegularity.sgn D.R.rS := by
+                simp only [Matrix.mul_assoc]
+            _ = _ := by rw [FormRegularity.sgn_sq, Matrix.mul_one]
+  have hLo := Formalism.MainNotions.BridgeLemma.bru_lo_mul (FormRegularity.isLoUni_star hPg) (FormRegularity.isLoUni_map ψ hL)
+  have hUp := Formalism.MainNotions.BridgeLemma.bru_up_mul (FormRegularity.isUpUni_map ψ hU) (isUpUni_sgnT hPg')
   have hds := decompSimpleF (mapPt ψ w) hLo hUp isLoUni_one isUpUni_one hw'
   rw [sgLoF_mul (FormRegularity.isLoUni_star hPg) (FormRegularity.isLoUni_map ψ hL),
-      sgUpF_mul (FormRegularity.isUpUni_map ψ hU) (isUpUni_sgnT hPg'), sgLoF_one, sgUpF_one,
-      sgLoF_map, sgUpF_map]
-    at hds
+    sgUpF_mul (FormRegularity.isUpUni_map ψ hU) (isUpUni_sgnT hPg'), sgLoF_one, sgUpF_one, sgLoF_map, sgUpF_map] at hds
   have e1 : sgLoF (Pg.map star) = ∑ a, star (rootCoord ε e f z (uMat (g v)) a) := by
     rw [sgLoF_eq]
     refine Finset.sum_congr rfl fun a _ => ?_
     rw [Matrix.map_apply, hrc]
-  have e2
-      : sgUpF (FormRegularity.sgn D.R.rS * Pg'ᵀ * FormRegularity.sgn D.R.rS)
-        = - ∑ a, rootCoord ε e f z' (uMat (g' v)) a := by
+  have e2 : sgUpF (FormRegularity.sgn D.R.rS * Pg'ᵀ * FormRegularity.sgn D.R.rS) = -∑ a, rootCoord ε e f z' (uMat (g' v)) a := by
     rw [sgUpF_eq, ← Finset.sum_neg_distrib]
     refine Finset.sum_congr rfl fun a _ => ?_
     simp only [FormRegularity.sgn, Matrix.mul_diagonal, Matrix.diagonal_mul, Matrix.transpose_apply]
     rw [hrc']
     linear_combination (Pg' a.succ a.castSucc) * FormRegularity.sgn_adj a
   rw [e1, e2] at hds
-  have hψy
-      : ψ (Formalism.L2.SG.PairVal.sgLo L) + ψ (Formalism.L2.SG.PairVal.sgUp U)
-        = X.B.I.φ v
-          (X.ιE.symm (Formalism.L2.SG.PairVal.sgLo L + Formalism.L2.SG.PairVal.sgUp U)) := by
+  have hψy : ψ (Formalism.L2.SG.PairVal.sgLo L) + ψ (Formalism.L2.SG.PairVal.sgUp U) =
+      X.B.I.φ v (X.ιE.symm (Formalism.L2.SG.PairVal.sgLo L + Formalism.L2.SG.PairVal.sgUp U)) := by
     rw [← map_add (f := _)]; rfl
   linear_combination hds - hψy
 
@@ -299,17 +303,14 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 variable {D : D7} (X : Formalism.L2.SG.HidaSetting.HidaSetting D)
 
-theorem realPhase
-    (u u' : D.what₂.Word)
-    {γ γw g g' : X.B.I.Ginf} (hg : g ∈ X.SinfU u) (hg' : g' ∈ X.SinfU u') (hdec : γ = g * γw * g'⁻¹)
-    (w : Point D.host.E (D.R.rS + 1)) (hPt : IsPtRep X u u' w γw)
+theorem realPhase (u u' : D.what₂.Word) {γ γw g g' : X.B.I.Ginf} (hg : g ∈ X.SinfU u) (hg' : g' ∈ X.SinfU u')
+    (hdec : γ = g * γw * g'⁻¹) (w : Point D.host.E (D.R.rS + 1)) (hPt : IsPtRep X u u' w γw)
     (L U : Formalism.L2.SG.PairVal.MatR D) (hL : IsLoUni L) (hU : IsUpUni U)
-    (hZ : ∀ v, ZhatO (ZX X u u' 1 γ v) = (L * ptMat w * U).map (fun x => X.B.I.φ v (X.ιE.symm x)))
-    : X.psiInfU u g * conj (X.psiInfU u' g') = Formalism.L2.SG.PairVal.phasePair (gS D) L U := by
+    (hZ : ∀ v, ZhatO (ZX X u u' 1 γ v) = (L * ptMat w * U).map (fun x => X.B.I.φ v (X.ιE.symm x))) :
+    X.psiInfU u g * conj (X.psiInfU u' g') = Formalism.L2.SG.PairVal.phasePair (gS D) L U := by
   have hgS : X.B.g = gS D := X.g_eq
   set y := Formalism.L2.SG.PairVal.sgLo L + Formalism.L2.SG.PairVal.sgUp U with hy
-  rw [Formalism.L2.SG.Pf.phasePair_eq, ← FormRegularity.psiInf_neg,
-    ← RingEquiv.apply_symm_apply X.ιE (-y),
+  rw [Formalism.L2.SG.Pf.phasePair_eq, ← FormRegularity.psiInf_neg, ← RingEquiv.apply_symm_apply X.ιE (-y),
     ← PlaceEmbeddingTraceSums.TraceSum_holds D X (gS D) (X.ιE.symm (-y))]
   unfold HidaSetting.psiInfU psiInf psiR
   rw [hgS, map_prod (starRingEnd ℂ), ← Finset.prod_mul_distrib]
@@ -322,31 +323,24 @@ theorem realPhase
   set A' := ∑ a, rootCoord (X.B.I.ε v) (fun a => rv X.B.I v (X.eR a)) (fun a => rv X.B.I v (X.fR a))
     (rv X.B.I v (X.zR u')) (uMat (g' v)) a with hA'
   set Y := X.B.I.φ v (X.ιE.symm y) with hY
-  have hsA
-      : (∑ a, star (rootCoord (X.B.I.ε v) (fun a => rv X.B.I v (X.eR a)) (fun a => rv X.B.I v (X.fR a))
-          (rv X.B.I v (X.zR u)) (uMat (g v)) a))
-        = star A := by
-    rw [hA, star_sum]
+  have hsA : (∑ a, star (rootCoord (X.B.I.ε v) (fun a => rv X.B.I v (X.eR a)) (fun a => rv X.B.I v (X.fR a))
+      (rv X.B.I v (X.zR u)) (uMat (g v)) a)) = star A := by rw [hA, star_sum]
   rw [hsA] at hp
   have hp' := congrArg (starRingEnd ℂ) hp
   simp only [map_sub, map_neg, Complex.star_def, Complex.conj_conj] at hp'
-  have e1
-      : ∑ a, (rootCoord (X.B.I.ε v) (fun a => rv X.B.I v (X.eR a)) (fun a => rv X.B.I v (X.fR a))
-          (rv X.B.I v (X.zR u)) (uMat (g v)) a + star (rootCoord (X.B.I.ε v) (fun a => rv X.B.I v (X.eR a))
-          (fun a => rv X.B.I v (X.fR a)) (rv X.B.I v (X.zR u)) (uMat (g v)) a))
-        = A + star A := by
+  have e1 : ∑ a, (rootCoord (X.B.I.ε v) (fun a => rv X.B.I v (X.eR a)) (fun a => rv X.B.I v (X.fR a))
+      (rv X.B.I v (X.zR u)) (uMat (g v)) a + star (rootCoord (X.B.I.ε v) (fun a => rv X.B.I v (X.eR a))
+      (fun a => rv X.B.I v (X.fR a)) (rv X.B.I v (X.zR u)) (uMat (g v)) a)) = A + star A := by
     rw [Finset.sum_add_distrib, hA, star_sum]
-  have e2
-      : ∑ a, (rootCoord (X.B.I.ε v) (fun a => rv X.B.I v (X.eR a)) (fun a => rv X.B.I v (X.fR a))
-          (rv X.B.I v (X.zR u')) (uMat (g' v)) a + star (rootCoord (X.B.I.ε v) (fun a => rv X.B.I v (X.eR a))
-          (fun a => rv X.B.I v (X.fR a)) (rv X.B.I v (X.zR u')) (uMat (g' v)) a))
-        = A' + star A' := by
+  have e2 : ∑ a, (rootCoord (X.B.I.ε v) (fun a => rv X.B.I v (X.eR a)) (fun a => rv X.B.I v (X.fR a))
+      (rv X.B.I v (X.zR u')) (uMat (g' v)) a + star (rootCoord (X.B.I.ε v) (fun a => rv X.B.I v (X.eR a))
+      (fun a => rv X.B.I v (X.fR a)) (rv X.B.I v (X.zR u')) (uMat (g' v)) a)) = A' + star A' := by
     rw [Finset.sum_add_distrib, hA', star_sum]
   rw [e1, e2]
   simp only [map_neg]
   rw [← hY]
-  simp only [map_mul, map_div₀, map_add (f := _), map_ofNat, Complex.conj_ofReal, Complex.conj_I,
-    map_natCast, Complex.star_def, Complex.conj_conj, map_neg]
+  simp only [map_mul, map_div₀, map_add (f := _), map_ofNat, Complex.conj_ofReal, Complex.conj_I, map_natCast,
+    Complex.star_def, Complex.conj_conj, map_neg]
   rw [Complex.star_def] at hp
   simp only [div_eq_mul_inv]
   linear_combination (2 * (Real.pi : ℂ) * Complex.I * ((gS D : ℕ) : ℂ)⁻¹) * (hp + hp')

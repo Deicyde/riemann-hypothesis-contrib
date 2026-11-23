@@ -1,27 +1,54 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.GrothendieckDeformation
-public import Development.AbelianVarietyTheory.Definitions.Divisors.CuspIso
-public import Development.AbelianVarietyTheory.Definitions.Divisors.WellChosen
 public import Development.AbelianVarietyTheory.Definitions.Divisors.P22
-public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.IsLogCanonicalMultipleCanonical
-public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.GeometricallyConnectedOfIsIsoRestrict
-public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.DenseInterior
-public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.CrysToDRBijective
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsBaseFrame
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.NonemptyKodairaSpencerIdentificationOffBoundary
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsLogKSSymPairBasisStatement
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsLieEigenBasisNearBoundaryFlagSpacePointStatement
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsBigCellChartFrameEigenbasisStatement
+public import Development.AbelianVarietyTheory.Definitions.Divisors.NonemptyCuspFrame
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.EtaleBigCellCoordinatesFlagSpaceStatement
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsCoordinatesLogVectorFieldsDeterminantStatement
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsTopFormFrameBaseCoordinatesAddVariablesEtaleStatement
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ReducedEquationPullbackEtaleOverAffineSpaceStatement
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.KodairaSpencerComparisonStatement
+import Development.AbelianVarietyTheory.Proofs.DivisorProofs.EvRFrMapOfIsReduced
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsBigCellChartFrameEigenbasisStatement
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsBigCellFramedPointsTriangularFrameChangeStatement
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.VerticalTangentFrameJacobianDetOneStatement
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsCoordinatesLogVectorFieldsDeterminantStatement
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsLieEigenBasisNearBoundaryFlagSpacePointStatement
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsLogKSSymPairBasisStatement
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsKSIffKsRel
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsTopFormFrameBaseCoordinatesAddVariablesEtaleStatement
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.KodairaSpencerComparisonStatement
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.LogKodairaSpencerDetEqConstMulHorizontalStatement
+import Development.AbelianVarietyTheory.Proofs.DivisorProofs.PrimeSpectrumDualNumberEq
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ReducedEquationPullbackEtaleOverAffineSpaceStatement
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.VerticalTangentFrameJacobianDetOneStatement
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
 
 @[expose] public section
 
@@ -154,7 +181,6 @@ theorem map_diagUnit
   congr 1
   exact eq_inv_of_mul_eq_one_left (Units.ext (ht q.1 q.2))
 
-set_option maxHeartbeats 1600000 in
 theorem exists_pole
     (hP : GlobalTheory.CovTop.Hypotheses₂)
     (TF : TorFlag Xo c) (Z : Comp Xo c)
@@ -324,7 +350,6 @@ open GlobalTheory.HermTools GlobalTheory.Adelic GlobalTheory.CovTop
 open GlobalTheory.FlagTan (dimFlag)
 open GlobalTheory.HSApp
 
-set_option maxHeartbeats 800000 in
 theorem simple_pole
     : GlobalTheory.CovTop.Hypotheses₂ → GlobalTheory.Published.GrothendieckDeformation
       → ∀ (E : Type) [Field E] [NumberField E] [IsCMField E]

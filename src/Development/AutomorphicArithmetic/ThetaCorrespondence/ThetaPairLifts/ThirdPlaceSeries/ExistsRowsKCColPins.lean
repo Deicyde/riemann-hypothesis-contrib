@@ -1,16 +1,53 @@
 module
 
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsRowsOfHeqData
-public import Development.AutomorphicArithmetic.ThetaCorrespondence.ThetaPairLifts.ThirdPlaceSeries.CohomologicalCsdTempered
-public import Development.AutomorphicArithmetic.ThetaCorrespondence.ThetaPairLifts.ThirdPlaceSeries.LinkedFamiliesKernelFrame
-public import Development.AutomorphicArithmetic.ThetaCorrespondence.ThetaPairLifts.ThirdPlaceSeries.SquareIntegrableColumnsTied
 public import Development.AutomorphicArithmetic.ThetaCorrespondence.ThetaPairLifts.ThirdPlaceSeries.DIVColPins
 public import Development.AutomorphicArithmetic.ThetaCorrespondence.ThetaPairLifts.ThirdPlaceSeries.ServTIff
-public import Development.AutomorphicArithmetic.ThetaCorrespondence.ThetaPairLifts.ThirdPlaceSeries.DIVRecBridgeSel
+public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.MovedReadingSameMapsBaseReadingAgrees
+public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.ThetaChr
+public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.TwArgs
+public import Development.AbelianVarietyTheory.Definitions.LatticeFrames.ColMatchAll
+public import Formalism.LocalToGlobal.Divisibility.MemberDIV
+import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.BaseFieldsPrimesOk
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ChKerCCongr
+import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.EvaluationDatumOkBaseTuple
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.PlaceModelImp
 
 @[expose] public section
 
-set_option synthInstance.maxHeartbeats 200000
+
 
 section
 noncomputable section
@@ -143,7 +180,6 @@ theorem colPins_colK'
   }
 end Pins
 end Main
-set_option maxHeartbeats 1000000 in
 theorem exists_rowsKC_colPins_alt
     : ∀ {B : Base} {X : PreX B.toPre} (I : TC B X) (h : I.Ok) (hp : TC.Pins B X) (l : I.Laws)
         (Z : TC.Later B (I.cols l)) (ht : I.IsTw) (hJ : ColIn.JetsIn I) (hX : B.fields.Ok)
@@ -230,7 +266,6 @@ namespace GlobalTheory.Mem.R3.SelC
 variable
   {K : Ctx} {B : Base} {f : Fr B.toPre} {T : TwDat B} {w : ColW B f T}
   {Z : w.Lt} {Wt : Set B.places.Pl}
-set_option maxHeartbeats 1000000 in
 theorem jA_row_alt
     {p0 : BaseLevelRowSide (w.D Z)} (t : RowsT K w Z Wt p0) (r : RXs t)
     (pin : ColPin w)
@@ -262,7 +297,6 @@ variable
   {Gi : Formalism.MainNotions.G.Inst (w.st Z).toD7 L}
   {Gl : Formalism.MainNotions.G.LatInst (w.st Z).toD7} {Kc : Formalism.MainNotions.G.Consts}
   {Yd : DivX (w.st Z).toD7} {cX : ExtraC} {ex : Extra (w.st Z).toD7 L hT Gi Gl Kc Yd cX}
-set_option maxHeartbeats 1000000 in
 theorem exists_readC_wU_eq_id
     (t : RowsT K w Z Wt ex.p0) (r : RXs t)
     (pin : ColPin w) (k : Formalism.L2.Ker.KerEntTied ex) (Sp Zsc)
@@ -306,7 +340,6 @@ theorem exists_readC_wU_eq_id
       r.eMt0 r.eMtTw _ _ _ Zs u a ha x _ (hn u x) F z hz
   exact key (t.r.Y.tup s) s ((congrArg w.I.tup (t.r.tup_ix s)).trans (tup_ixOf w.I s)) (t.r.Y.jA s)
     (r.jA_use s) _ F
-set_option maxHeartbeats 400000 in
 theorem args_pinned_heq_zsOf_mem_eq (t : RowsT K w Z Wt ex.p0) (a : TwArgs ex t)
     : (a.x.G = Gc B w.px ∧ HEq a.x.grp (inferInstance : Group (Gc B w.px)) ∧ a.x.Pl0 = PlS B w.px
         ∧ a.x.I0 = PlI B w.px ∧ a.x.T = TupU w.I (usedOf w.I T Wt)
@@ -326,7 +359,6 @@ theorem args_pinned_heq_zsOf_mem_eq (t : RowsT K w Z Wt ex.p0) (a : TwArgs ex t)
       zsOf ((t.r.z.R.updS t.r.z.R.kap a.lam).withErr a.err) (reFace t.r.z.F a.Dc a.Sp a.Zsc),
       hpack.2.2
     ⟩
-set_option maxHeartbeats 400000 in
 theorem exists_square_integrable_columns_of_data
     (t : RowsT K w Z Wt ex.p0) (pin : ColPin w)
     (S : _root_.Formalism.L2.TiedDataSKAlt ex) (hS : TC.StdKer w.I w.l Z S.ker)
@@ -391,7 +423,6 @@ theorem exists_square_integrable_columns_of_data
   · exact (c6)
   · exact (c1)
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
-set_option maxHeartbeats 1000000 in
 theorem square_integrable_columns_of_witnesses
     : ∀ (𝒮 : Slots) (K : Ctx) (q : WPt 𝒮 K) (t : Formalism.L2.Ker.KerEntTied q.O.ex),
       KPin q t → Nonempty (RXs q.x.what₂)

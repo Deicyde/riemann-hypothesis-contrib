@@ -1,7 +1,54 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Definitions.MembershipCriteria.LaEqSqrtSmulLam
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.CStarAlgebra.Classes
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+public import Mathlib.Algebra.Module.BigOperators
+public import Mathlib.LinearAlgebra.Finsupp.LinearCombination
 
 @[expose] public section
 
@@ -24,45 +71,42 @@ theorem c_swap (x y : X) : S.c x y * S.c y x = 1 := by
   rw [S.c_add_left, S.c_add_right, S.c_add_right, S.c_self, S.c_self] at h
   linear_combination h
 
-theorem rho_comm (x y : X) (v : M) : S.rho x (S.rho y v) = S.c x y ^ 2 • S.rho y (S.rho x v) := by
+theorem rho_comm (x y : X) (v : M) :
+    S.rho x (S.rho y v) = S.c x y ^ 2 • S.rho y (S.rho x v) := by
   rw [S.rho_rho, S.rho_rho, smul_smul, add_comm y x]
   congr 1
   linear_combination (-S.c x y) * c_swap S x y
 
-theorem eigen
-    {al : X → ℂ} {Γ : AddSubgroup X} {φ : M} (hs : IsSemi S al Γ) (hl : Law S al Γ φ)
-    {γ : X} (hγ : γ ∈ Γ)
-    (x : X)
-    : al γ • S.rho γ (S.rho x φ) = S.c γ x ^ 2 • S.rho x φ := by
-  have ha : al γ ≠ 0 := by rcases hs.1 γ hγ with h | h <;> rw [h] <;> norm_num
+theorem eigen {al : X → ℂ} {Γ : AddSubgroup X} {φ : M} (hs : IsSemi S al Γ) (hl : Law S al Γ φ)
+    {γ : X} (hγ : γ ∈ Γ) (x : X) :
+    al γ • S.rho γ (S.rho x φ) = S.c γ x ^ 2 • S.rho x φ := by
+  have ha : al γ ≠ 0 := by
+    rcases hs.1 γ hγ with h | h <;> rw [h] <;> norm_num
   rw [rho_comm, hl γ hγ, map_smul, smul_smul, smul_smul]
   congr 1
   field_simp
 
-theorem mem_of_sum
-    {al : X → ℂ} {Γ : AddSubgroup X} {φ : M}
-    (hd : SelfDual S Γ) (hs : IsSemi S al Γ) (hl : Law S al Γ φ)
-    (N : Submodule ℂ M) (hN : ∀ x, ∀ v ∈ N, S.rho x v ∈ N)
-    (s : Finset X)
-    : ∀ a : X → ℂ, (∑ x ∈ s, a x • S.rho x φ) ∈ N → (∑ x ∈ s, a x • S.rho x φ) ≠ 0 → φ ∈ N := by
+theorem mem_of_sum {al : X → ℂ} {Γ : AddSubgroup X} {φ : M} (hd : SelfDual S Γ)
+    (hs : IsSemi S al Γ) (hl : Law S al Γ φ) (N : Submodule ℂ M)
+    (hN : ∀ x, ∀ v ∈ N, S.rho x v ∈ N) (s : Finset X) :
+    ∀ a : X → ℂ, (∑ x ∈ s, a x • S.rho x φ) ∈ N → (∑ x ∈ s, a x • S.rho x φ) ≠ 0 → φ ∈ N := by
   classical
   induction s using Finset.strongInduction with
   | H s ih =>
     intro a hm hne
-    have key
-        : ∀ γ ∈ Γ, ∀ x₀ ∈ s,
-          al γ • S.rho γ (∑ x ∈ s, a x • S.rho x φ) - S.c γ x₀ ^ 2 • (∑ x ∈ s, a x • S.rho x φ)
-            = ∑ x ∈ s.erase x₀, (a x * (S.c γ x ^ 2 - S.c γ x₀ ^ 2)) • S.rho x φ := by
+    have key : ∀ γ ∈ Γ, ∀ x₀ ∈ s,
+        al γ • S.rho γ (∑ x ∈ s, a x • S.rho x φ) - S.c γ x₀ ^ 2 • (∑ x ∈ s, a x • S.rho x φ)
+          = ∑ x ∈ s.erase x₀, (a x * (S.c γ x ^ 2 - S.c γ x₀ ^ 2)) • S.rho x φ := by
       intro γ hγ x₀ _
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [Finset.sum_erase _ (by simp), map_sum, Finset.smul_sum, Finset.smul_sum,
-          ← Finset.sum_sub_distrib]
+
+      rw [Finset.sum_erase _ (by simp), map_sum, Finset.smul_sum, Finset.smul_sum,
+      ← Finset.sum_sub_distrib]
       refine Finset.sum_congr rfl fun x _ => ?_
       rw [map_smul, smul_comm (al γ), eigen S hs hl hγ, smul_smul, smul_smul, ← sub_smul]
       congr 1
       ring
-    by_cases h
-      : ∃ γ ∈ Γ, ∃ x₀ ∈ s, (∑ x ∈ s.erase x₀, (a x * (S.c γ x ^ 2 - S.c γ x₀ ^ 2)) • S.rho x φ) ≠ 0
+    by_cases h : ∃ γ ∈ Γ, ∃ x₀ ∈ s,
+        (∑ x ∈ s.erase x₀, (a x * (S.c γ x ^ 2 - S.c γ x₀ ^ 2)) • S.rho x φ) ≠ 0
     · obtain ⟨γ, hγ, x₀, hx₀, h⟩ := h
       refine ih (s.erase x₀) (Finset.erase_ssubset hx₀) _ ?_ h
       rw [← key γ hγ x₀ hx₀]
@@ -89,9 +133,8 @@ theorem mem_of_sum
         have h1 := S.rho_rho x₀ (x - x₀) φ
         rw [hl _ (hΓ x hx), map_smul, add_sub_cancel] at h1
         rw [mul_smul, h1, smul_smul, inv_mul_cancel₀ (c_ne S _ _), one_smul]
-      have hv
-          : (∑ x ∈ s, a x • S.rho x φ)
-            = (∑ x ∈ s, a x * ((S.c x₀ (x - x₀))⁻¹ * (al (x - x₀))⁻¹)) • S.rho x₀ φ := by
+      have hv : (∑ x ∈ s, a x • S.rho x φ)
+          = (∑ x ∈ s, a x * ((S.c x₀ (x - x₀))⁻¹ * (al (x - x₀))⁻¹)) • S.rho x₀ φ := by
         rw [Finset.sum_smul]
         refine Finset.sum_congr rfl fun x hxs => ?_
         rw [hx x hxs, smul_smul]
@@ -101,19 +144,19 @@ theorem mem_of_sum
       rw [S.rho_rho, neg_add_cancel, S.rho_zero] at h1
       exact (N.smul_mem_iff (c_ne S _ _)).1 h1
 
-theorem irreducible
-    : ∀ {X M : Type} [AddCommGroup X] [AddCommGroup M] [Module ℂ M] (S : Sys X M) (al : X → ℂ)
-        (Γ : AddSubgroup X) (φ : M),
-      SelfDual S Γ → IsSemi S al Γ → Law S al Γ φ → Cyclic S φ
-        → (∀ N : Submodule ℂ M, (∀ x, ∀ v ∈ N, S.rho x v ∈ N) → N = ⊥ ∨ N = ⊤)
-          ∧ ∀ v : M, v ≠ 0 → Cyclic S v := by
+theorem irreducible : ∀ {X M : Type} [AddCommGroup X] [AddCommGroup M] [Module ℂ M] (S : Sys X M)
+    (al : X → ℂ) (Γ : AddSubgroup X) (φ : M), SelfDual S Γ → IsSemi S al Γ → Law S al Γ φ →
+    Cyclic S φ →
+    (∀ N : Submodule ℂ M, (∀ x, ∀ v ∈ N, S.rho x v ∈ N) → N = ⊥ ∨ N = ⊤) ∧
+      ∀ v : M, v ≠ 0 → Cyclic S v := by
   intro X M _ _ _ S al Γ φ hd hs hl hc
   have main : ∀ N : Submodule ℂ M, (∀ x, ∀ v ∈ N, S.rho x v ∈ N) → N = ⊥ ∨ N = ⊤ := by
     intro N hN
     rw [or_iff_not_imp_left]
     intro hb
     obtain ⟨v, hv, hv0⟩ := Submodule.exists_mem_ne_zero_of_ne_bot hb
-    have hmem : v ∈ Submodule.span ℂ (Set.range fun x => S.rho x φ) := by rw [hc]; trivial
+    have hmem : v ∈ Submodule.span ℂ (Set.range fun x => S.rho x φ) := by
+      rw [hc]; trivial
     obtain ⟨f, hf⟩ := Finsupp.mem_span_range_iff_exists_finsupp.1 hmem
     have hφ : φ ∈ N := by
       refine mem_of_sum S hd hs hl N hN f.support f ?_ ?_
@@ -124,9 +167,8 @@ theorem irreducible
     rintro _ ⟨x, rfl⟩
     exact hN x φ hφ
   refine ⟨main, fun v hv => ?_⟩
-  have hinv
-      : ∀ x, ∀ w ∈ Submodule.span ℂ (Set.range fun x => S.rho x v),
-        S.rho x w ∈ Submodule.span ℂ (Set.range fun x => S.rho x v) := by
+  have hinv : ∀ x, ∀ w ∈ Submodule.span ℂ (Set.range fun x => S.rho x v),
+      S.rho x w ∈ Submodule.span ℂ (Set.range fun x => S.rho x v) := by
     intro x w hw
     induction hw using Submodule.span_induction with
     | mem w hw =>

@@ -1,18 +1,57 @@
 module
 
-public import Mathlib
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.UniformisationConclusion
-public import Development.AbelianVarietyTheory.Definitions.AbelianSchemeLaws.FirstCohomologyVanishesSpecOfIsLocalRing
 public import Development.AbelianVarietyTheory.Definitions.Degenerations.OfDerivationFnOn
-public import Development.AbelianVarietyTheory.Definitions.Degenerations.PlOrdSomeOfAssociated
-public import Development.AbelianVarietyTheory.Statements.SemistableTorsion.SemistableFin
-public import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.ExistsUniqueModelHasJacobianOrder
-public import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.ProdIrrAndWeakNeron
 public import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.ExistsEqDivOfIsPullback
-public import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.ExistsVf
 public import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.ExistsStalkDerivationOfIsPullback
+public import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.ExistsUniqueModelHasJacobianOrder
+public import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.ExistsVf
 public import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.LeOfZpowMulUnitEq
-public meta import Lean.Elab.Command
+public import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.ProdIrrAndWeakNeron
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.AlgebraicGeometry.Modules.Sheaf
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
 
 @[expose] public section
 
@@ -359,8 +398,8 @@ theorem ord_prod : ∀ (R K : Type) [CommRing R] [IsDomain R] [IsLocalRing R] [F
         simp only [T, Sum.elim_inl, Sum.elim_inr, Pi.zero_apply, map_zero, zero_mul, Finset.sum_const_zero,
           add_zero, app_appLE ep]
         rcases i with i | i
-        set_option synthInstance.maxHeartbeats 100000 in
-          · simp only [Sum.elim_inl, a₁ i _ _ _ _, hr, map_sum, map_mul]
+
+        · simp only [Sum.elim_inl, a₁ i _ _ _ _, hr, map_sum, map_mul]
         · simp only [Sum.elim_inr, b₂ i _ _ _ _]
           simp [VF.zero]
       · obtain ⟨r, hr⟩ := inSpan_of_cramer (φ := (N.j.app V').hom) (d := fun i => (D' i).D (N.j ⁻¹ᵁ V'))
@@ -372,8 +411,8 @@ theorem ord_prod : ∀ (R K : Type) [CommRing R] [IsDomain R] [IsLocalRing R] [F
         rcases i with i | i
         · simp only [Sum.elim_inl, a₂ i _ _ _ _]
           simp [VF.zero]
-        set_option synthInstance.maxHeartbeats 100000 in
-          · simp only [Sum.elim_inr, b₁ i _ _ _ _, hr, map_sum, map_mul]
+
+        · simp only [Sum.elim_inr, b₁ i _ _ _ _, hr, map_sum, map_mul]
     obtain ⟨ρ, hρ⟩ := det_of_inSpan (φ := ((M.prod N).j.app W').hom)
       (d := fun i => (Sum.elim E₁ E₂ i).D ((M.prod N).j ⁻¹ᵁ W')) (T := T) (τ := τ₁) fun j => by
         obtain ⟨a, ha, b, hb, hu, e⟩ := hg (τ₁ j)

@@ -1,7 +1,53 @@
 module
 
-public import Mathlib
+public import GroundTheory.ArithmeticGeometry.SchemeCohomology.ProjectiveCohomology.QcohLocal
+public import Mathlib.AlgebraicGeometry.Morphisms.ClosedImmersion
+public import Mathlib.Tactic.ENatToNat
 public import GroundTheory.ArithmeticGeometry.SchemeCohomology.ProjectiveCohomology.Generation
+public import GroundTheory.ArithmeticGeometry.SchemeCohomology.ProjectiveCohomology.ModulesAbExact
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.AlgebraicGeometry.Morphisms.Finite
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.CategoryTheory.Sites.EpiMono
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Lemma
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.TypeStar
 
 @[expose] public section
 
@@ -28,13 +74,10 @@ lemma smul_pushforward (F : X.Modules) {U : Y.Opens} (r : Γ(Y, U))
     (m : Γ((Scheme.Modules.pushforward i).obj F, U)) :
     r • m = (i.app U r • (show Γ(F, i ⁻¹ᵁ U) from m) : Γ(F, i ⁻¹ᵁ U)) := rfl
 
-theorem isQuasicoherent_pushforward_of_isAffineHom
-    [IsAffineHom i] (F : X.Modules) [F.IsQuasicoherent]
-    : ((Scheme.Modules.pushforward i).obj F).IsQuasicoherent := by
-  refine isQuasicoherent_of_affineCover _
-    (fun V : Y.affineOpens => (V : Y.Opens))
-    (fun V => V.2)
-    (iSup_affineOpens_eq_top Y) ?_ ?_
+theorem isQuasicoherent_pushforward_of_isAffineHom [IsAffineHom i] (F : X.Modules)
+    [F.IsQuasicoherent] : ((Scheme.Modules.pushforward i).obj F).IsQuasicoherent := by
+  refine isQuasicoherent_of_affineCover _ (fun V : Y.affineOpens => (V : Y.Opens))
+    (fun V => V.2) (iSup_affineOpens_eq_top Y) ?_ ?_
   · intro V f
     have hV' : IsAffineOpen (i ⁻¹ᵁ (V : Y.Opens)) := V.2.preimage i
     have hb : i ⁻¹ᵁ Y.basicOpen f = X.basicOpen (i.app V f) := Scheme.preimage_basicOpen i f
@@ -54,33 +97,27 @@ theorem isQuasicoherent_pushforward_of_isAffineHom
       resF F ((Opens.map i.base).monotone (Y.basicOpen_le f)) m = 0 →
         ∃ e : ℕ, i.app V (f ^ e) • m = 0
     intro m hm
-    obtain ⟨e, he⟩ :=
-      qcoh_exists_pow_smul_eq_zero F hV' (i.app V f) m (by
-        have h2 := congrArg (resF F hb.ge) hm
-        rw [resF_resF, map_zero] at h2
-        exact h2)
+    obtain ⟨e, he⟩ := qcoh_exists_pow_smul_eq_zero F hV' (i.app V f) m (by
+      have h2 := congrArg (resF F hb.ge) hm
+      rw [resF_resF, map_zero] at h2
+      exact h2)
     exact ⟨e, by rw [map_pow]; exact he⟩
 
-theorem isCoherent_pushforward_of_isClosedImmersion
-    [IsClosedImmersion i] {F : X.Modules} (hF : IsCoherent F)
-    : IsCoherent ((Scheme.Modules.pushforward i).obj F) := by
+theorem isCoherent_pushforward_of_isClosedImmersion [IsClosedImmersion i] {F : X.Modules}
+    (hF : IsCoherent F) : IsCoherent ((Scheme.Modules.pushforward i).obj F) := by
   have := hF.1
   have := isQuasicoherent_pushforward_of_isAffineHom i F
-  refine isCoherent_of_affineCover _
-    (fun V : Y.affineOpens => (V : Y.Opens))
-    (fun V => V.2)
-    (iSup_affineOpens_eq_top Y)
-    (fun V => ?_)
+  refine isCoherent_of_affineCover _ (fun V : Y.affineOpens => (V : Y.Opens)) (fun V => V.2)
+    (iSup_affineOpens_eq_top Y) (fun V => ?_)
   have hfin := hF.2 _ (V.2.preimage i)
   obtain ⟨S, hS⟩ := hfin.fg_top
   have hsurj := Scheme.Hom.app_surjective i V V.2
   let S' : Finset Γ((Scheme.Modules.pushforward i).obj F, V) := S
   refine ⟨⟨S', ?_⟩⟩
-  have key
-      : ∀ x : Γ(F, i ⁻¹ᵁ (V : Y.Opens)),
-        x ∈ Submodule.span Γ(X, i ⁻¹ᵁ (V : Y.Opens)) (S : Set Γ(F, i ⁻¹ᵁ (V : Y.Opens)))
-          → (show Γ((Scheme.Modules.pushforward i).obj F, V) from x)
-            ∈ Submodule.span Γ(Y, V) (S' : Set Γ((Scheme.Modules.pushforward i).obj F, V)) := by
+  have key : ∀ x : Γ(F, i ⁻¹ᵁ (V : Y.Opens)),
+      x ∈ Submodule.span Γ(X, i ⁻¹ᵁ (V : Y.Opens)) (S : Set Γ(F, i ⁻¹ᵁ (V : Y.Opens))) →
+      (show Γ((Scheme.Modules.pushforward i).obj F, V) from x) ∈
+        Submodule.span Γ(Y, V) (S' : Set Γ((Scheme.Modules.pushforward i).obj F, V)) := by
     intro x hx
     induction hx using Submodule.span_induction with
     | mem x hx => exact Submodule.subset_span hx
@@ -126,13 +163,10 @@ lemma sections_val_eq_resF (F : Y.Modules) (s : F.sections) (W : Y.Opens) :
     (show Γ(F, W) from s.val (op W)) = resF F (le_top : W ≤ ⊤) (show Γ(F, ⊤) from s.val (op ⊤)) :=
   (s.property (homOfLE (le_top : W ≤ ⊤)).op).symm
 
-theorem span_eq_top_of_generatingSections
-    (G : Y.Modules) [G.IsQuasicoherent]
-    (σ : G.GeneratingSections) [σ.IsFiniteType]
-    {V : Y.Opens} (hV : IsAffineOpen V)
-    : Submodule.span Γ(Y, V)
-        (Set.range fun k => resF G (le_top : V ≤ ⊤) (show Γ(G, ⊤) from (σ.s k).val (op ⊤)))
-      = ⊤ := by
+theorem span_eq_top_of_generatingSections (G : Y.Modules) [G.IsQuasicoherent]
+    (σ : G.GeneratingSections) [σ.IsFiniteType] {V : Y.Opens} (hV : IsAffineOpen V) :
+    Submodule.span Γ(Y, V) (Set.range fun k => resF G (le_top : V ≤ ⊤)
+      (show Γ(G, ⊤) from (σ.s k).val (op ⊤))) = ⊤ := by
   classical
   have : Finite σ.I := (inferInstance : σ.IsFiniteType).finite
   have := Fintype.ofFinite σ.I
@@ -142,8 +176,8 @@ theorem span_eq_top_of_generatingSections
   have hπ : Epi π := ⟨fun g h e => σ.epi.left_cancellation g h e⟩
   have hab : Epi (modulesAbMap π) := epi_modulesAbMap π
   have hls := (Sheaf.isLocallySurjective_iff_epi' (φ := modulesAbMap π)).2 hab
-  have hloc
-      : ∀ g : Γ(G, V), ∀ y ∈ V, ∃ f : Γ(Y, V), y ∈ Y.basicOpen f ∧ ∃ a : ℕ, f ^ a • g ∈ N := by
+  have hloc : ∀ g : Γ(G, V), ∀ y ∈ V, ∃ f : Γ(Y, V), y ∈ Y.basicOpen f ∧
+      ∃ a : ℕ, f ^ a • g ∈ N := by
     intro g y hy
     have hmem := Presheaf.IsLocallySurjective.imageSieve_mem (self := hls) (U := V) g
     rw [Opens.mem_grothendieckTopology] at hmem
@@ -151,9 +185,8 @@ theorem span_eq_top_of_generatingSections
     obtain ⟨f, hfW, hyf⟩ := hV.exists_basicOpen_le (V := W) ⟨y, hyW⟩ hy
     have hDV : Y.basicOpen f ≤ V := Y.basicOpen_le f
     set x : σ.I → Γ(G, ⊤) := fun k => (show Γ(G, ⊤) from (σ.s k).val (op ⊤)) with hx
-    obtain ⟨c, hc⟩ :=
-      free_section_eq_sum (Y := Y) (Y.basicOpen f)
-        (resF (freeM Y σ.I) hfW (show Γ(freeM Y σ.I, W) from z))
+    obtain ⟨c, hc⟩ := free_section_eq_sum (Y := Y) (Y.basicOpen f)
+      (resF (freeM Y σ.I) hfW (show Γ(freeM Y σ.I, W) from z))
 
     have hg : resF G hDV g = ∑ k, c k • resF G (le_top : Y.basicOpen f ≤ ⊤) (x k) := by
       have h1 : resF G hfW (π.app W z) = π.app (Y.basicOpen f) (resF (freeM Y σ.I) hfW z) :=
@@ -161,12 +194,10 @@ theorem span_eq_top_of_generatingSections
       have h2 : π.app W z = resF G iW.le g := hz
       rw [h2, resF_resF, hc] at h1
       rw [h1]
-      change (π.val.app (op (Y.basicOpen f)))
-          (∑ k, (SheafOfModules.ιFree k).val.app
-            (op (Y.basicOpen f)) (c k))
-        = _
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum]
+      change (π.val.app (op (Y.basicOpen f))) (∑ k, (SheafOfModules.ιFree k).val.app
+        (op (Y.basicOpen f)) (c k)) = _
+
+      rw [map_sum]
       refine Finset.sum_congr rfl fun k _ => ?_
       rw [freeHomEquiv_symm_app_ιFree, sections_val_eq_resF]
 
@@ -174,8 +205,8 @@ theorem span_eq_top_of_generatingSections
     have := hV.isLocalization_basicOpen f
     choose n b hb using fun k => IsLocalization.Away.surj f (c k)
     let a := ∑ k, n k
-    have hna : ∀ k, n k ≤ a := fun k =>
-      Finset.single_le_sum (fun _ _ => Nat.zero_le _) (Finset.mem_univ k)
+    have hna : ∀ k, n k ≤ a := fun k => Finset.single_le_sum (fun _ _ => Nat.zero_le _)
+      (Finset.mem_univ k)
     let b' : σ.I → Γ(Y, V) := fun k => b k * f ^ (a - n k)
     have hb' : ∀ k, resO hDV (b' k) = resO hDV f ^ a * c k := by
       intro k
@@ -185,9 +216,9 @@ theorem span_eq_top_of_generatingSections
       rw [mul_assoc, ← pow_add, Nat.add_sub_cancel' (hna k), mul_comm]
     let δ : Γ(G, V) := f ^ a • g - ∑ k, b' k • resF G (le_top : V ≤ ⊤) (x k)
     have hδ : resF G hDV δ = 0 := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [δ, map_sub, map_sum, resF_smul, resF_resF, hg, Finset.smul_sum, smul_smul,
-          map_pow, hb']
+
+      simp only [δ, map_sub, map_sum, resF_smul, resF_resF, hg, Finset.smul_sum, smul_smul,
+      map_pow, hb']
       rw [sub_self]
     obtain ⟨e, he⟩ := qcoh_exists_pow_smul_eq_zero G hV f δ hδ
     refine ⟨f, hyf, e + a, ?_⟩
@@ -211,35 +242,27 @@ theorem span_eq_top_of_generatingSections
   have h1 : (1 : Γ(Y, V)) ∈ N.colon {g} := hI ▸ Submodule.mem_top
   simpa using Submodule.mem_colon_singleton.1 h1
 
-theorem exists_generatingSections_of_pushforward_of_isAffineHom
-    {X : Scheme.{u}} (i : X ⟶ Y) [IsAffineHom i]
-    (M : X.Modules) [M.IsQuasicoherent]
-    (h : ∃ σ : ((Scheme.Modules.pushforward i).obj M).GeneratingSections, σ.IsFiniteType)
-    : ∃ σ : M.GeneratingSections, σ.IsFiniteType := by
+theorem exists_generatingSections_of_pushforward_of_isAffineHom {X : Scheme.{u}} (i : X ⟶ Y)
+    [IsAffineHom i] (M : X.Modules) [M.IsQuasicoherent]
+    (h : ∃ σ : ((Scheme.Modules.pushforward i).obj M).GeneratingSections, σ.IsFiniteType) :
+    ∃ σ : M.GeneratingSections, σ.IsFiniteType := by
   obtain ⟨σ, hσ⟩ := h
   have : Finite σ.I := hσ.finite
   have := isQuasicoherent_pushforward_of_isAffineHom i M
-  refine exists_generatingSections M
-    (fun U : Y.affineOpens => i ⁻¹ᵁ (U : Y.Opens))
-    (fun U => U.2.preimage i)
-    ?_ (κ := σ.I)
-    (fun k => (show Γ(M, ⊤) from (σ.s k).val (op ⊤)))
-    (fun U => ?_)
+  refine exists_generatingSections M (fun U : Y.affineOpens => i ⁻¹ᵁ (U : Y.Opens))
+    (fun U => U.2.preimage i) ?_ (κ := σ.I)
+    (fun k => (show Γ(M, ⊤) from (σ.s k).val (op ⊤))) (fun U => ?_)
   · rw [← Scheme.Hom.preimage_iSup, iSup_affineOpens_eq_top]
     rfl
   · have hY := span_eq_top_of_generatingSections _ σ U.2
     rw [eq_top_iff]
     intro m _
-    have key
-        : ∀ z : Γ((Scheme.Modules.pushforward i).obj M, U),
-          z ∈ Submodule.span Γ(Y, U)
-              (Set.range fun k =>
-                resF ((Scheme.Modules.pushforward i).obj M) (le_top : (U : Y.Opens) ≤ ⊤)
-                  (show Γ((Scheme.Modules.pushforward i).obj M, ⊤) from (σ.s k).val (op ⊤)))
-            → (show Γ(M, i ⁻¹ᵁ (U : Y.Opens)) from z) ∈ Submodule.span Γ(X, i ⁻¹ᵁ (U : Y.Opens))
-              (Set.range fun k =>
-                resF M (le_top : i ⁻¹ᵁ (U : Y.Opens) ≤ ⊤)
-                  (show Γ(M, ⊤) from (σ.s k).val (op ⊤))) := by
+    have key : ∀ z : Γ((Scheme.Modules.pushforward i).obj M, U), z ∈ Submodule.span Γ(Y, U)
+        (Set.range fun k => resF ((Scheme.Modules.pushforward i).obj M) (le_top : (U : Y.Opens) ≤ ⊤)
+          (show Γ((Scheme.Modules.pushforward i).obj M, ⊤) from (σ.s k).val (op ⊤))) →
+        (show Γ(M, i ⁻¹ᵁ (U : Y.Opens)) from z) ∈ Submodule.span Γ(X, i ⁻¹ᵁ (U : Y.Opens))
+          (Set.range fun k => resF M (le_top : i ⁻¹ᵁ (U : Y.Opens) ≤ ⊤)
+            (show Γ(M, ⊤) from (σ.s k).val (op ⊤))) := by
       intro z hz
       induction hz using Submodule.span_induction with
       | mem x hx =>

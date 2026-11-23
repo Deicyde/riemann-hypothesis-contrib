@@ -1,6 +1,49 @@
 module
 
+public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.LocalMassType.SatSplit
+public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.LocalMassType.StepW
+public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.LocalMassType.WCoreDef
+public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.LocalMassType.ColumnAdditionFixesTranspose
 public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.LocalMassType.SplitDecomp
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -8,14 +51,12 @@ noncomputable section
 
 namespace PI.LocMassTypW
 
-open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub
-  Formalism.L2.SG.LocVol NumberField IsDedekindDomain Matrix
+open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub Formalism.L2.SG.LocVol NumberField IsDedekindDomain Matrix
 open scoped TensorProduct
 
 section LocF
 
-variable
-  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
   (v : HeightOneSpectrum (𝓞 F))
 
 theorem dV_ne_zero : dV v ≠ 0 := by
@@ -30,26 +71,22 @@ theorem alp_ne_zero (r : ℕ) (a : Fin (r + 1)) : alp v r a ≠ 0 := by
   · exact pow_ne_zero _ (inv_ne_zero (dV_ne_zero v))
   · exact one_ne_zero
 
-theorem locF_injective {n r : ℕ} {X X' : TupV (E := E) v n (r + 1)} (h : locF v X = locF v X')
-    : X = X' := by
+theorem locF_injective {n r : ℕ} {X X' : TupV (E := E) v n (r + 1)} (h : locF v X = locF v X') :
+    X = X' := by
   funext a
   have ha := congrFun h a
   simp only [locF] at ha
   have hinv : sc (E := E) v (alp v r a)⁻¹ * sc (E := E) v (alp v r a) = 1 := by
     rw [← sc_mul, inv_mul_cancel₀ (alp_ne_zero v r a), sc_one]
-  calc
-    X a
-      = (sc (E := E) v (alp v r a)⁻¹ * sc (E := E) v (alp v r a)) • X a := by rw [hinv, one_smul]
-    _ = (sc (E := E) v (alp v r a)⁻¹ * sc (E := E) v (alp v r a)) • X' a := by
-      rw [mul_smul, ha, ← mul_smul]
+  calc X a = (sc (E := E) v (alp v r a)⁻¹ * sc (E := E) v (alp v r a)) • X a := by rw [hinv, one_smul]
+    _ = (sc (E := E) v (alp v r a)⁻¹ * sc (E := E) v (alp v r a)) • X' a := by rw [mul_smul, ha, ← mul_smul]
     _ = X' a := by rw [hinv, one_smul]
 
 end LocF
 
 section Coords
 
-variable
-  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
   (v : HeightOneSpectrum (𝓞 F))
 
 def IntV {n : ℕ} (x : Fin n → Fv F v ⊗[F] E) : Prop := ∀ i, x i ∈ OEv (E := E) v
@@ -60,16 +97,12 @@ def mkS (e : Fv F v ⊗[F] E) (a b : Fv F v) : Fv F v ⊗[F] E :=
 variable {v}
 variable {e : Fv F v ⊗[F] E} {π₁ π₂ : Fv F v ⊗[F] E →+* Fv F v}
 
-theorem fst_proj_split_element
-    (hπe1 : π₁ e = 1) (hsc : ∀ c : Fv F v, π₁ (sc (E := E) v c) = c ∧ π₂ (sc (E := E) v c) = c)
-    (a b : Fv F v)
-    : π₁ (mkS v e a b) = a := by
+theorem fst_proj_split_element (hπe1 : π₁ e = 1) (hsc : ∀ c : Fv F v, π₁ (sc (E := E) v c) = c ∧ π₂ (sc (E := E) v c) = c)
+    (a b : Fv F v) : π₁ (mkS v e a b) = a := by
   simp [mkS, map_add (f := _), map_mul, map_sub, (hsc _).1, hπe1]
 
-theorem snd_proj_split_element
-    (hπe2 : π₂ e = 0) (hsc : ∀ c : Fv F v, π₁ (sc (E := E) v c) = c ∧ π₂ (sc (E := E) v c) = c)
-    (a b : Fv F v)
-    : π₂ (mkS v e a b) = b := by
+theorem snd_proj_split_element (hπe2 : π₂ e = 0) (hsc : ∀ c : Fv F v, π₁ (sc (E := E) v c) = c ∧ π₂ (sc (E := E) v c) = c)
+    (a b : Fv F v) : π₂ (mkS v e a b) = b := by
   simp [mkS, map_add (f := _), map_mul, map_sub, (hsc _).2, hπe2]
 
 end Coords
@@ -89,54 +122,43 @@ structure SD (σ : E →ₐ[F] E) (v : HeightOneSpectrum (𝓞 F)) where
   hsc : ∀ c : Fv F v, π₁ (sc (E := E) v c) = c ∧ π₂ (sc (E := E) v c) = c
   hσ1 : ∀ x, π₁ (sigR (Fv F v) σ x) = π₂ x
   hσ2 : ∀ x, π₂ (sigR (Fv F v) σ x) = π₁ x
-  hO
-    : ∀ x,
-      x ∈ OEv (E := E) v ↔ π₁ x ∈ v.adicCompletionIntegers F ∧ π₂ x ∈ v.adicCompletionIntegers F
+  hO : ∀ x, x ∈ OEv (E := E) v ↔ π₁ x ∈ v.adicCompletionIntegers F ∧ π₂ x ∈ v.adicCompletionIntegers F
 
 variable {σ : E →ₐ[F] E} {v : HeightOneSpectrum (𝓞 F)} (D : SD σ v)
 
 theorem SD.ext {x y : Fv F v ⊗[F] E} (hx : D.π₁ x = D.π₁ y) (hy : D.π₂ x = D.π₂ y) : x = y :=
   split_ext v D.h1 D.h2 hx hy
 
-theorem SD.extV
-    {n : ℕ} {x y : Fin n → Fv F v ⊗[F] E}
-    (hx : ∀ i, D.π₁ (x i) = D.π₁ (y i)) (hy : ∀ i, D.π₂ (x i) = D.π₂ (y i))
-    : x = y := by
+theorem SD.extV {n : ℕ} {x y : Fin n → Fv F v ⊗[F] E} (hx : ∀ i, D.π₁ (x i) = D.π₁ (y i))
+    (hy : ∀ i, D.π₂ (x i) = D.π₂ (y i)) : x = y := by
   funext i; exact D.ext (hx i) (hy i)
 
-def SD.kS {n : ℕ} (k₁ k₂ : Matrix (Fin n) (Fin n) (Fv F v))
-    : Matrix (Fin n) (Fin n) (Fv F v ⊗[F] E) :=
+def SD.kS {n : ℕ} (k₁ k₂ : Matrix (Fin n) (Fin n) (Fv F v)) : Matrix (Fin n) (Fin n) (Fv F v ⊗[F] E) :=
   Matrix.of fun i j => mkS v D.e (k₁ i j) (k₂ i j)
 
-theorem SD.fst_proj_split_matrix_entry
-    {n : ℕ} (k₁ k₂ : Matrix (Fin n) (Fin n) (Fv F v)) (i j : Fin n)
-    : D.π₁ (D.kS k₁ k₂ i j) = k₁ i j :=
-  fst_proj_split_element D.he1 D.hsc _ _
+theorem SD.fst_proj_split_matrix_entry {n : ℕ} (k₁ k₂ : Matrix (Fin n) (Fin n) (Fv F v)) (i j : Fin n) :
+    D.π₁ (D.kS k₁ k₂ i j) = k₁ i j := fst_proj_split_element D.he1 D.hsc _ _
 
-theorem SD.snd_proj_split_matrix_entry
-    {n : ℕ} (k₁ k₂ : Matrix (Fin n) (Fin n) (Fv F v)) (i j : Fin n)
-    : D.π₂ (D.kS k₁ k₂ i j) = k₂ i j :=
-  snd_proj_split_element D.he2 D.hsc _ _
+theorem SD.snd_proj_split_matrix_entry {n : ℕ} (k₁ k₂ : Matrix (Fin n) (Fin n) (Fv F v)) (i j : Fin n) :
+    D.π₂ (D.kS k₁ k₂ i j) = k₂ i j := snd_proj_split_element D.he2 D.hsc _ _
 
-theorem SD.fst_proj_split_matrix_mulVec
-    {n : ℕ} (k₁ k₂ : Matrix (Fin n) (Fin n) (Fv F v)) (x : Fin n → Fv F v ⊗[F] E) (i : Fin n)
-    : D.π₁ ((D.kS k₁ k₂ *ᵥ x) i) = (k₁ *ᵥ fun j => D.π₁ (x j)) i := by
-  set_option synthInstance.maxHeartbeats 100000 in
+theorem SD.fst_proj_split_matrix_mulVec {n : ℕ} (k₁ k₂ : Matrix (Fin n) (Fin n) (Fv F v)) (x : Fin n → Fv F v ⊗[F] E)
+    (i : Fin n) : D.π₁ ((D.kS k₁ k₂ *ᵥ x) i) = (k₁ *ᵥ fun j => D.π₁ (x j)) i := by
+
   simp only [mulVec, dotProduct, map_sum, map_mul, SD.fst_proj_split_matrix_entry]
 
-theorem SD.snd_proj_split_matrix_mulVec
-    {n : ℕ} (k₁ k₂ : Matrix (Fin n) (Fin n) (Fv F v)) (x : Fin n → Fv F v ⊗[F] E) (i : Fin n)
-    : D.π₂ ((D.kS k₁ k₂ *ᵥ x) i) = (k₂ *ᵥ fun j => D.π₂ (x j)) i := by
-  set_option synthInstance.maxHeartbeats 100000 in
+theorem SD.snd_proj_split_matrix_mulVec {n : ℕ} (k₁ k₂ : Matrix (Fin n) (Fin n) (Fv F v)) (x : Fin n → Fv F v ⊗[F] E)
+    (i : Fin n) : D.π₂ ((D.kS k₁ k₂ *ᵥ x) i) = (k₂ *ᵥ fun j => D.π₂ (x j)) i := by
+
   simp only [mulVec, dotProduct, map_sum, map_mul, SD.snd_proj_split_matrix_entry]
 
-theorem SD.kS_mul {n : ℕ} (k₁ k₂ l₁ l₂ : Matrix (Fin n) (Fin n) (Fv F v))
-    : D.kS k₁ k₂ * D.kS l₁ l₂ = D.kS (k₁ * l₁) (k₂ * l₂) := by
+theorem SD.kS_mul {n : ℕ} (k₁ k₂ l₁ l₂ : Matrix (Fin n) (Fin n) (Fv F v)) :
+    D.kS k₁ k₂ * D.kS l₁ l₂ = D.kS (k₁ * l₁) (k₂ * l₂) := by
   ext i j
   apply D.ext
-  set_option synthInstance.maxHeartbeats 100000 in
-    · simp only [Matrix.mul_apply, map_sum, map_mul, SD.fst_proj_split_matrix_entry]
-  set_option synthInstance.maxHeartbeats 100000 in
+
+  · simp only [Matrix.mul_apply, map_sum, map_mul, SD.fst_proj_split_matrix_entry]
+
   · simp only [Matrix.mul_apply, map_sum, map_mul, SD.snd_proj_split_matrix_entry]
 
 theorem SD.kS_one {n : ℕ} : D.kS (1 : Matrix (Fin n) (Fin n) (Fv F v)) 1 = 1 := by
@@ -148,25 +170,23 @@ theorem SD.kS_one {n : ℕ} : D.kS (1 : Matrix (Fin n) (Fin n) (Fv F v)) 1 = 1 :
 def stdH (σ : E →ₐ[F] E) {n : ℕ} (x y : Fin n → Fv F v ⊗[F] E) : Fv F v ⊗[F] E :=
   ∑ i, sigR (Fv F v) σ (x i) * y i
 
-theorem SD.fst_proj_standard_hermitian_form {n : ℕ} (x y : Fin n → Fv F v ⊗[F] E)
-    : D.π₁ (stdH σ x y) = (fun i => D.π₂ (x i)) ⬝ᵥ (fun i => D.π₁ (y i)) := by
-  set_option synthInstance.maxHeartbeats 100000 in
+theorem SD.fst_proj_standard_hermitian_form {n : ℕ} (x y : Fin n → Fv F v ⊗[F] E) :
+    D.π₁ (stdH σ x y) = (fun i => D.π₂ (x i)) ⬝ᵥ (fun i => D.π₁ (y i)) := by
+
   simp only [stdH, map_sum, map_mul, D.hσ1, dotProduct]
 
-theorem SD.snd_proj_standard_hermitian_form {n : ℕ} (x y : Fin n → Fv F v ⊗[F] E)
-    : D.π₂ (stdH σ x y) = (fun i => D.π₁ (x i)) ⬝ᵥ (fun i => D.π₂ (y i)) := by
-  set_option synthInstance.maxHeartbeats 100000 in
+theorem SD.snd_proj_standard_hermitian_form {n : ℕ} (x y : Fin n → Fv F v ⊗[F] E) :
+    D.π₂ (stdH σ x y) = (fun i => D.π₁ (x i)) ⬝ᵥ (fun i => D.π₂ (y i)) := by
+
   simp only [stdH, map_sum, map_mul, D.hσ2, dotProduct]
 
-theorem dot_mulVec_mulVec
-    {K : Type} [CommRing K] {n : ℕ} (M N : Matrix (Fin n) (Fin n) K) (u w : Fin n → K)
-    : (M *ᵥ u) ⬝ᵥ (N *ᵥ w) = u ⬝ᵥ ((Mᵀ * N) *ᵥ w) := by
+theorem dot_mulVec_mulVec {K : Type} [CommRing K] {n : ℕ} (M N : Matrix (Fin n) (Fin n) K)
+    (u w : Fin n → K) : (M *ᵥ u) ⬝ᵥ (N *ᵥ w) = u ⬝ᵥ ((Mᵀ * N) *ᵥ w) := by
   rw [dotProduct_comm, dotProduct_mulVec, ← mulVec_transpose, dotProduct_comm, mulVec_mulVec]
 
-theorem SD.stdH_kS
-    {n : ℕ} (k₁ k₂ : Matrix (Fin n) (Fin n) (Fv F v)) (h21 : k₂ᵀ * k₁ = 1) (h12 : k₁ᵀ * k₂ = 1)
-    (x y : Fin n → Fv F v ⊗[F] E)
-    : stdH σ (D.kS k₁ k₂ *ᵥ x) (D.kS k₁ k₂ *ᵥ y) = stdH σ x y := by
+theorem SD.stdH_kS {n : ℕ} (k₁ k₂ : Matrix (Fin n) (Fin n) (Fv F v)) (h21 : k₂ᵀ * k₁ = 1)
+    (h12 : k₁ᵀ * k₂ = 1) (x y : Fin n → Fv F v ⊗[F] E) :
+    stdH σ (D.kS k₁ k₂ *ᵥ x) (D.kS k₁ k₂ *ᵥ y) = stdH σ x y := by
   apply D.ext
   · rw [SD.fst_proj_standard_hermitian_form, SD.fst_proj_standard_hermitian_form]
     have e1 : (fun i => D.π₂ ((D.kS k₁ k₂ *ᵥ x) i)) = k₂ *ᵥ (fun j => D.π₂ (x j)) := by
@@ -181,13 +201,9 @@ theorem SD.stdH_kS
       funext i; exact D.snd_proj_split_matrix_mulVec k₁ k₂ y i
     rw [e1, e2, dot_mulVec_mulVec, h12, one_mulVec]
 
-theorem SD.intV_kS
-    {n : ℕ} (k₁ k₂ : Matrix (Fin n) (Fin n) (v.adicCompletionIntegers F))
-    {x : Fin n → Fv F v ⊗[F] E} (hx : IntV v x)
-    : IntV v
-      (D.kS (k₁.map (v.adicCompletionIntegers F).subtype)
-          (k₂.map (v.adicCompletionIntegers F).subtype)
-        *ᵥ x) := by
+theorem SD.intV_kS {n : ℕ} (k₁ k₂ : Matrix (Fin n) (Fin n) (v.adicCompletionIntegers F))
+    {x : Fin n → Fv F v ⊗[F] E} (hx : IntV v x) :
+    IntV v (D.kS (k₁.map (v.adicCompletionIntegers F).subtype) (k₂.map (v.adicCompletionIntegers F).subtype) *ᵥ x) := by
   intro i
   rw [D.hO]
   constructor
@@ -204,54 +220,42 @@ section Main
 
 variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
 
-theorem SD.sat₁
-    {σ : E →ₐ[F] E} {v : HeightOneSpectrum (𝓞 F)} (D : SD σ v)
-    {n m : ℕ} (Zc : Fin m → Fin n → Fv F v ⊗[F] E)
-    (hprim : ∀ c : Fin m → Fv F v ⊗[F] E, IntV v (∑ a, c a • Zc a) → ∀ a, c a ∈ OEv (E := E) v)
-    (t : Fin m → Fv F v)
-    (ht : ∀ i, ((Matrix.of fun i a => D.π₁ (Zc a i)) *ᵥ t) i ∈ v.adicCompletionIntegers F)
-    : ∀ j, t j ∈ v.adicCompletionIntegers F := by
+theorem SD.sat₁ {σ : E →ₐ[F] E} {v : HeightOneSpectrum (𝓞 F)} (D : SD σ v) {n m : ℕ}
+    (Zc : Fin m → Fin n → Fv F v ⊗[F] E) (hprim : ∀ c : Fin m → Fv F v ⊗[F] E,
+      IntV v (∑ a, c a • Zc a) → ∀ a, c a ∈ OEv (E := E) v) (t : Fin m → Fv F v)
+    (ht : ∀ i, ((Matrix.of fun i a => D.π₁ (Zc a i)) *ᵥ t) i ∈ v.adicCompletionIntegers F) :
+    ∀ j, t j ∈ v.adicCompletionIntegers F := by
   intro j
-  have hc :=
-    hprim
-      (fun a => sc (E := E) v (t a) * D.e)
-      (by
-        intro i
-        rw [D.hO]
-        set_option synthInstance.maxHeartbeats 100000 in
-          simp only [Finset.sum_apply, Pi.smul_apply, smul_eq_mul, map_sum, map_mul, (D.hsc _).1,
-            (D.hsc _).2, D.he1, D.he2, mul_one, mul_zero, zero_mul, Finset.sum_const_zero]
-        refine ⟨?_, Subring.zero_mem _⟩
-        have := ht i
-        simp only [mulVec, dotProduct, Matrix.of_apply] at this
-        simpa [mul_comm] using this)
-      j
+  have hc := hprim (fun a => sc (E := E) v (t a) * D.e) (by
+    intro i
+    rw [D.hO]
+
+    simp only [Finset.sum_apply, Pi.smul_apply, smul_eq_mul, map_sum, map_mul, (D.hsc _).1,
+    (D.hsc _).2, D.he1, D.he2, mul_one, mul_zero, zero_mul, Finset.sum_const_zero]
+    refine ⟨?_, Subring.zero_mem _⟩
+    have := ht i
+    simp only [mulVec, dotProduct, Matrix.of_apply] at this
+    simpa [mul_comm] using this) j
   have := ((D.hO _).1 hc).1
   simpa [map_mul, (D.hsc _).1, D.he1] using this
 
-theorem SD.sat₂
-    {σ : E →ₐ[F] E} {v : HeightOneSpectrum (𝓞 F)} (D : SD σ v)
-    {n m : ℕ} (Zc : Fin m → Fin n → Fv F v ⊗[F] E)
-    (hprim : ∀ c : Fin m → Fv F v ⊗[F] E, IntV v (∑ a, c a • Zc a) → ∀ a, c a ∈ OEv (E := E) v)
-    (t : Fin m → Fv F v)
-    (ht : ∀ i, ((Matrix.of fun i a => D.π₂ (Zc a i)) *ᵥ t) i ∈ v.adicCompletionIntegers F)
-    : ∀ j, t j ∈ v.adicCompletionIntegers F := by
+theorem SD.sat₂ {σ : E →ₐ[F] E} {v : HeightOneSpectrum (𝓞 F)} (D : SD σ v) {n m : ℕ}
+    (Zc : Fin m → Fin n → Fv F v ⊗[F] E) (hprim : ∀ c : Fin m → Fv F v ⊗[F] E,
+      IntV v (∑ a, c a • Zc a) → ∀ a, c a ∈ OEv (E := E) v) (t : Fin m → Fv F v)
+    (ht : ∀ i, ((Matrix.of fun i a => D.π₂ (Zc a i)) *ᵥ t) i ∈ v.adicCompletionIntegers F) :
+    ∀ j, t j ∈ v.adicCompletionIntegers F := by
   intro j
-  have hc :=
-    hprim
-      (fun a => sc (E := E) v (t a) * (1 - D.e))
-      (by
-        intro i
-        rw [D.hO]
-        set_option synthInstance.maxHeartbeats 100000 in
-          simp only [Finset.sum_apply, Pi.smul_apply, smul_eq_mul, map_sum, map_mul, map_sub,
-            map_one, (D.hsc _).1, (D.hsc _).2, D.he1, D.he2, sub_self, sub_zero, mul_one, mul_zero,
-            zero_mul, Finset.sum_const_zero]
-        refine ⟨Subring.zero_mem _, ?_⟩
-        have := ht i
-        simp only [mulVec, dotProduct, Matrix.of_apply] at this
-        simpa [mul_comm] using this)
-      j
+  have hc := hprim (fun a => sc (E := E) v (t a) * (1 - D.e)) (by
+    intro i
+    rw [D.hO]
+
+    simp only [Finset.sum_apply, Pi.smul_apply, smul_eq_mul, map_sum, map_mul, map_sub, map_one,
+    (D.hsc _).1, (D.hsc _).2, D.he1, D.he2, sub_self, sub_zero, mul_one, mul_zero, zero_mul,
+    Finset.sum_const_zero]
+    refine ⟨Subring.zero_mem _, ?_⟩
+    have := ht i
+    simp only [mulVec, dotProduct, Matrix.of_apply] at this
+    simpa [mul_comm] using this) j
   have := ((D.hO _).1 hc).2
   simpa [map_mul, map_sub, (D.hsc _).2, D.he2] using this
 
@@ -261,20 +265,18 @@ section Core
 
 variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
 
-theorem stepW_core
-    {σ : E →ₐ[F] E} {n : ℕ} {J : Matrix (Fin n) (Fin n) E} {v : HeightOneSpectrum (𝓞 F)} {r : ℕ}
-    {P : Frame E n r} {Λ : Set (Fin n → E)} (D : SD σ v) (Q : GL (Fin n) (Fv F v ⊗[F] E))
-    (hQΛ : ∀ y,
-      y ∈ latLoc (E := E) v Λ
-        ↔ ∃ x : Fin n → Fv F v ⊗[F] E,
-          (∀ i, x i ∈ OEv (E := E) v) ∧ y = (Q : Matrix (Fin n) (Fin n) (Fv F v ⊗[F] E)) *ᵥ x)
+theorem stepW_core {σ : E →ₐ[F] E} {n : ℕ} {J : Matrix (Fin n) (Fin n) E} {v : HeightOneSpectrum (𝓞 F)}
+    {r : ℕ} {P : Frame E n r} {Λ : Set (Fin n → E)} (D : SD σ v) (Q : GL (Fin n) (Fv F v ⊗[F] E))
+    (hQΛ : ∀ y, y ∈ latLoc (E := E) v Λ ↔
+      ∃ x : Fin n → Fv F v ⊗[F] E, (∀ i, x i ∈ OEv (E := E) v) ∧
+        y = (Q : Matrix (Fin n) (Fin n) (Fv F v ⊗[F] E)) *ᵥ x)
     (hQh : ∀ x y : Fin n → Fv F v ⊗[F] E,
       hR (Fv F v) σ J ((Q : Matrix (Fin n) (Fin n) (Fv F v ⊗[F] E)) *ᵥ x)
-          ((Q : Matrix (Fin n) (Fin n) (Fv F v ⊗[F] E)) *ᵥ y)
-        = ∑ i, sigR (Fv F v) σ (x i) * y i)
-    (hSat : SatSplit) (hC : WCore) (hPr : IsPrim v Λ (locF v (ratTup (F := F) (Fv F v) (F0 P))))
-    (h : HA (Fv F v) σ J) (hPrh : IsPrim v Λ (locF v (h • ratTup (F := F) (Fv F v) (F0 P))))
-    : ∃ k ∈ Formalism.L2.SG.TypedSets.Kv σ J Λ v,
+        ((Q : Matrix (Fin n) (Fin n) (Fv F v ⊗[F] E)) *ᵥ y) = ∑ i, sigR (Fv F v) σ (x i) * y i)
+    (hSat : SatSplit) (hC : WCore)
+    (hPr : IsPrim v Λ (locF v (ratTup (F := F) (Fv F v) (F0 P)))) (h : HA (Fv F v) σ J)
+    (hPrh : IsPrim v Λ (locF v (h • ratTup (F := F) (Fv F v) (F0 P)))) :
+    ∃ k ∈ Formalism.L2.SG.TypedSets.Kv σ J Λ v,
       k • ratTup (F := F) (Fv F v) (F0 P) = h • ratTup (F := F) (Fv F v) (F0 P) := by
   classical
   set Qm : Matrix (Fin n) (Fin n) (Fv F v ⊗[F] E) := (Q : Matrix (Fin n) (Fin n) (Fv F v ⊗[F] E)) with hQm
@@ -295,29 +297,23 @@ theorem stepW_core
   have hYdef : locF v (h • X0r) = h • Y0 := locF_smul σ J v h X0r
   rw [hYdef] at hPrh
 
-  have hunit
-      : ∀ x y,
-        hR (Fv F v) σ J ((HA.mat (Fv F v) σ J h : Matrix (Fin n) (Fin n) _) *ᵥ x)
-            ((HA.mat (Fv F v) σ J h : Matrix (Fin n) (Fin n) _) *ᵥ y)
-          = hR (Fv F v) σ J x y := by
+  have hunit : ∀ x y, hR (Fv F v) σ J ((HA.mat (Fv F v) σ J h : Matrix (Fin n) (Fin n) _) *ᵥ x)
+      ((HA.mat (Fv F v) σ J h : Matrix (Fin n) (Fin n) _) *ᵥ y) = hR (Fv F v) σ J x y := by
     intro x y
     have hmem := (show HR (Fv F v) σ J from h).2
     show Formalism.UG.hform _ _ _ _ = Formalism.UG.hform _ _ _ _
     rw [hform_mulVec]
     congr 1
 
-  have primT
-      : ∀ W : Fin (r + 1) → Fin n → Fv F v ⊗[F] E,
-        IsPrim v Λ W
-          → ∀ c : Fin (r + 1) → Fv F v ⊗[F] E,
-            IntV v (∑ a, c a • (Qi *ᵥ W a)) → ∀ a, c a ∈ OEv (E := E) v := by
+  have primT : ∀ W : Fin (r + 1) → Fin n → Fv F v ⊗[F] E, IsPrim v Λ W →
+      ∀ c : Fin (r + 1) → Fv F v ⊗[F] E, IntV v (∑ a, c a • (Qi *ᵥ W a)) → ∀ a, c a ∈ OEv (E := E) v := by
     intro W hW c hc
     apply hW.2 c
     rw [memΛ]
     have : Qi *ᵥ (∑ a, c a • W a) = ∑ a, c a • (Qi *ᵥ W a) := by
       show Matrix.mulVecLin Qi (∑ a, c a • W a) = _
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum]
+
+      rw [map_sum]
       simp only [map_smul, Matrix.mulVecLin_apply]
     rwa [this]
   set Z0 : Fin (r + 1) → Fin n → Fv F v ⊗[F] E := fun a => Qi *ᵥ Y0 a with hZ0def
@@ -356,15 +352,13 @@ theorem stepW_core
     push_cast
     simp only [dotProduct] at this
     exact this.symm
-  obtain ⟨k1, hk1u, hk1A, hk1B⟩ :=
-    hC (v.adicCompletionIntegers F) n (r + 1) A0 A1 B0 B1 hA0 hA1 hB0 hB1 hgram
+  obtain ⟨k1, hk1u, hk1A, hk1B⟩ := hC (v.adicCompletionIntegers F) n (r + 1) A0 A1 B0 B1 hA0 hA1 hB0 hB1 hgram
   have hdet : IsUnit k1.det := (Matrix.isUnit_iff_isUnit_det k1).1 hk1u
   have hki : k1 * k1⁻¹ = 1 := Matrix.mul_nonsing_inv k1 hdet
   have hik : k1⁻¹ * k1 = 1 := Matrix.nonsing_inv_mul k1 hdet
   set f := (v.adicCompletionIntegers F).subtype with hf
-  have mo
-      : ∀ {M N : Matrix (Fin n) (Fin n) (v.adicCompletionIntegers F)},
-        M * N = 1 → M.map f * N.map f = 1 := by
+  have mo : ∀ {M N : Matrix (Fin n) (Fin n) (v.adicCompletionIntegers F)}, M * N = 1 →
+      M.map f * N.map f = 1 := by
     intro M N hMN
     rw [← Matrix.map_mul, hMN, Matrix.map_one f (map_zero f) (map_one f)]
   have e1 : (k1⁻¹)ᵀᵀ * k1 = 1 := by rw [transpose_transpose, hik]
@@ -374,7 +368,8 @@ theorem stepW_core
     fun M => (Matrix.transpose_map).symm
   set kstd := D.kS (k1.map f) ((k1⁻¹)ᵀ.map f) with hkstd
   set kstd' := D.kS (k1⁻¹.map f) (k1ᵀ.map f) with hkstd'
-  have hkk : kstd * kstd' = 1 := by rw [hkstd, hkstd', SD.kS_mul, mo hki, mo e3, SD.kS_one]
+  have hkk : kstd * kstd' = 1 := by
+    rw [hkstd, hkstd', SD.kS_mul, mo hki, mo e3, SD.kS_one]
   have hk'k : kstd' * kstd = 1 := mul_eq_one_comm.mp hkk
 
   have hkU : ∀ x y, stdH σ (kstd *ᵥ x) (kstd *ᵥ y) = stdH σ x y := by
@@ -398,16 +393,17 @@ theorem stepW_core
     · intro i
       rw [hkstd, SD.fst_proj_split_matrix_mulVec]
       have := congrArg (fun M => f (M i a)) hk1A
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [Matrix.mul_apply, map_sum, map_mul] at this
+
+      simp only [Matrix.mul_apply, map_sum, map_mul] at this
       simp only [mulVec, dotProduct, Matrix.map_apply]
       exact this
     · intro i
-      have hB : (k1⁻¹)ᵀ * B0 = B1 := by rw [← hk1B, ← Matrix.mul_assoc, e3, Matrix.one_mul]
+      have hB : (k1⁻¹)ᵀ * B0 = B1 := by
+        rw [← hk1B, ← Matrix.mul_assoc, e3, Matrix.one_mul]
       rw [hkstd, SD.snd_proj_split_matrix_mulVec]
       have := congrArg (fun M => f (M i a)) hB
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [Matrix.mul_apply, map_sum, map_mul] at this
+
+      simp only [Matrix.mul_apply, map_sum, map_mul] at this
       simp only [mulVec, dotProduct, Matrix.map_apply]
       exact this
 
@@ -415,9 +411,8 @@ theorem stepW_core
   set kMi := Qm * kstd' * Qi with hkMi
   have hkMM : kM * kMi = 1 := by
     rw [hkM, hkMi]
-    calc
-      Qm * kstd * Qi * (Qm * kstd' * Qi)
-        = Qm * (kstd * (Qi * Qm) * kstd') * Qi := by simp only [Matrix.mul_assoc]
+    calc Qm * kstd * Qi * (Qm * kstd' * Qi) = Qm * (kstd * (Qi * Qm) * kstd') * Qi := by
+          simp only [Matrix.mul_assoc]
       _ = 1 := by rw [hQiQ, Matrix.mul_one, hkk, Matrix.mul_one, hQQi]
   have hkMM' : kMi * kM = 1 := mul_eq_one_comm.mp hkMM
   let kG : GL (Fin n) (Fv F v ⊗[F] E) := ⟨kM, kMi, hkMM, hkMM'⟩

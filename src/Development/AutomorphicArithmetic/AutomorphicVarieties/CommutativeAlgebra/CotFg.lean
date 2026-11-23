@@ -2,6 +2,51 @@ module
 
 public import Development.AutomorphicArithmetic.AutomorphicVarieties.CommutativeAlgebra.Graded
 public import Development.AutomorphicArithmetic.AutomorphicVarieties.CommutativeAlgebra.PartSpan
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Lemma
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+public import Mathlib.RingTheory.Ideal.BigOperators
 
 @[expose] public section
 
@@ -41,8 +86,8 @@ private lemma sq_mem [Module.Free ℤ X] [Module.Finite ℤ X] (W : WPres O X R)
   obtain ⟨b, hb, hbs⟩ := hs g hg
   have h3 : y = ∑ m ∈ μ, (⟨W.π (b m), W.part_le_A ⟨_, hb m, rfl⟩⟩ : W.A) * m.prod fun i k => W.zA i ^ k := by
     apply Subtype.ext
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← hy, hbs, map_sum]
+
+    rw [← hy, hbs, map_sum]
     simp [π_monomial, Finsupp.prod, WPres.zA]
   rw [h3]
   exact Ideal.sum_mem _ fun m hm => Ideal.mul_mem_left _ _
@@ -50,11 +95,8 @@ private lemma sq_mem [Module.Free ℤ X] [Module.Finite ℤ X] (W : WPres O X R)
 
 end
 
-theorem UpperTheory.V.Alg.cot_fg
-    : ∀ (O X R : Type) [CommRing O] [IsDomain O] [AddCommGroup X] [DecidableEq X] [CommRing R]
-        [Algebra O R] (W : WPres O X R) (h : W.HasOrigin) [Module.Free ℤ X] [Module.Finite ℤ X]
-        (j : X),
-      cotLat (W.originA h) W.gr j = cotSpan (W.originA h) fun s : {s // W.wt s = j} => W.zA s := by
+theorem UpperTheory.V.Alg.cot_fg :
+    ∀ (O X R : Type) [CommRing O] [IsDomain O] [AddCommGroup X] [DecidableEq X] [CommRing R] [Algebra O R] (W : WPres O X R) (h : W.HasOrigin) [Module.Free ℤ X] [Module.Finite ℤ X] (j : X), cotLat (W.originA h) W.gr j = cotSpan (W.originA h) fun s : {s // W.wt s = j} => W.zA s := by
   intro O X R _ _ _ _ _ _ W h _ _ j
   classical
   refine le_antisymm ?_ ?_
@@ -63,15 +105,12 @@ theorem UpperTheory.V.Alg.cot_fg
     have h0 : constantCoeff f = 0 := by
       rw [← W.origin_π h, hfx']
       exact hx
-    have key
-        : x - ∑ s : {s // W.wt s = j}, coeff (Finsupp.single s.1 1) f • W.zA s
-          ∈ RingHom.ker (W.originA h) ^ 2 := by
-      refine sq_mem W h j
-        (f - ∑ s : {s // W.wt s = j}, coeff (Finsupp.single s.1 1) f • MvPowerSeries.X s.1)
-        (fun m hm => ?_)
-        _ (by simp [hfx', WPres.zA, WPres.z])
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sub, map_sum]
+    have key : x - ∑ s : {s // W.wt s = j}, coeff (Finsupp.single s.1 1) f • W.zA s ∈
+        RingHom.ker (W.originA h) ^ 2 := by
+      refine sq_mem W h j (f - ∑ s : {s // W.wt s = j}, coeff (Finsupp.single s.1 1) f • MvPowerSeries.X s.1)
+        (fun m hm => ?_) _ (by simp [hfx', WPres.zA, WPres.z])
+
+      rw [map_sub, map_sum]
       simp only [map_smul, coeff_X, smul_eq_mul, mul_ite, mul_one, mul_zero]
       by_cases hw : Finsupp.weight W.wt m = j
       · rcases deg_lt_two m (not_le.1 fun h2 => hm ⟨hw, h2⟩) with rfl | ⟨s, rfl⟩
@@ -89,13 +128,11 @@ theorem UpperTheory.V.Alg.cot_fg
         rw [if_neg]
         rintro rfl
         exact hw (by simpa [Finsupp.weight_single] using s.2)
-    have h2
-        : (satSq (W.originA h)).mkQ x
-          = (satSq (W.originA h)).mkQ
-            (∑ s : {s // W.wt s = j}, coeff (Finsupp.single s.1 1) f • W.zA s) :=
+    have h2 : (satSq (W.originA h)).mkQ x = (satSq (W.originA h)).mkQ
+        (∑ s : {s // W.wt s = j}, coeff (Finsupp.single s.1 1) f • W.zA s) :=
       (Submodule.Quotient.eq _).2 ⟨1, one_ne_zero, by rwa [one_smul]⟩
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [h2, map_sum]
+
+    rw [h2, map_sum]
     refine Submodule.sum_mem _ fun s _ => ?_
     rw [map_smul]
     exact Submodule.smul_mem _ _ (Submodule.subset_span ⟨s, rfl⟩)

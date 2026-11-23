@@ -1,10 +1,51 @@
 module
 
-public import Development.WeilBound.CoreStatements.AutomorphicKernels.SiegelWeilFormula.AuxiliaryPrimeFunction
+public import Mathlib
 public import Development.WeilBound.CoreStatements.AutomorphicKernels.SiegelWeilFormula.FourierCompactness.SigmaSigmaOfGood
-public import Development.WeilBound.CoreStatements.AutomorphicKernels.SiegelWeilFormula.CayleyTransform.CompFinFinOne
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.LintegralAdelicThetaSumSqParsevalSecondVariable
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.MaximalCompactOneParameterLinesOfLieLines
+public import Development.WeilBound.CoreStatements.AutomorphicKernels.SiegelWeilFormula.CayleyTransform.CompFinFinOne
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -13,48 +54,40 @@ set_option linter.unusedSectionVars false
 noncomputable section
 
 open scoped TensorProduct NNReal Matrix Classical
-open NumberField IsDedekindDomain MeasureTheory Filter Topology
-  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
-open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
-  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK.Dbl
-  PositivityTheory.Rg.Sw
+open NumberField IsDedekindDomain MeasureTheory Filter Topology Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK.Dbl PositivityTheory.Rg.Sw
 
 namespace PositivityTheory.SiegelWeilFormula.Tauto
 
-variable
-  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E}
+variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E}
 
 open PositivityTheory.SiegelWeilFormula.kfour PositivityTheory.SiegelWeilFormula.Place
 
-theorem trace_inclR (e : E)
-    : Algebra.trace (AF F) (AE F E) (inclR (F := F) (AF F) e)
-      = algebraMap F (AF F) (Algebra.trace F E e) := by
+theorem trace_inclR (e : E) :
+    Algebra.trace (AF F) (AE F E) (inclR (F := F) (AF F) e) = algebraMap F (AF F) (Algebra.trace F E e) := by
   show Algebra.trace (AF F) (AF F ⊗[F] E) ((1 : AF F) ⊗ₜ[F] e) = _
-  rw [Algebra.trace_apply, Algebra.trace_apply, ← Algebra.baseChange_lmul,
-    LinearMap.trace_baseChange]
+  rw [Algebra.trace_apply, Algebra.trace_apply, ← Algebra.baseChange_lmul, LinearMap.trace_baseChange]
 
-theorem piInf_inclR' {w : InfinitePlace F} (τ : EmbOver E w) (e : E)
-    : piInf τ (inclR (F := F) (AF F) e) = τ.1 e := by
-  rw [show inclR (F := F) (AF F) e = (1 : AF F) ⊗ₜ[F] e from rfl,
-    GlobalTheory.RealLift.KLineProof.piInf_tmul, map_one, map_one, one_mul]
+theorem piInf_inclR' {w : InfinitePlace F} (τ : EmbOver E w) (e : E) : piInf τ (inclR (F := F) (AF F) e) = τ.1 e := by
+  rw [show inclR (F := F) (AF F) e = (1 : AF F) ⊗ₜ[F] e from rfl, GlobalTheory.RealLift.KLineProof.piInf_tmul, map_one, map_one,
+    one_mul]
 
-theorem incM_mul'' {α β γ : Type} [Fintype β] (X : Matrix α β E) (Z : Matrix β γ E)
-    : incM F (X * Z) = incM F X * incM F Z := by
+theorem incM_mul'' {α β γ : Type} [Fintype β] (X : Matrix α β E) (Z : Matrix β γ E) :
+    incM F (X * Z) = incM F X * incM F Z := by
   ext i j
-  set_option synthInstance.maxHeartbeats 100000 in
+
   simp [incM, Matrix.mul_apply, map_sum]
 
 theorem incM_map {α β : Type} (X : Matrix α β E) : incM F (X.map σ) = (incM F X).map (cA σ) := by
   ext i j
   simp [incM, cA_inclR']
 
-theorem trace_incM {k : ℕ} (X : Matrix (Fin k) (Fin k) E)
-    : (incM F X).trace = inclR (F := F) (AF F) X.trace := by
-  set_option synthInstance.maxHeartbeats 100000 in
+theorem trace_incM {k : ℕ} (X : Matrix (Fin k) (Fin k) E) : (incM F X).trace = inclR (F := F) (AF F) X.trace := by
+
   simp [incM, Matrix.trace, map_sum]
 
-theorem frame_sign (d : SD σ)
-    : ∃ ε : ℤˣ, FrameEq σ d.Y d.b ε ∧ ∀ i j, d.A.J j i = -(((ε : ℤ) : E)) * σ (d.A.J i j) := by
+theorem frame_sign (d : SD σ) : ∃ ε : ℤˣ, FrameEq σ d.Y d.b ε ∧
+    ∀ i j, d.A.J j i = -(((ε : ℤ) : E)) * σ (d.A.J i j) := by
   obtain ⟨⟨ε, hε⟩, -⟩ := d.ok.frame
   have hσ := sigma_sigma_of_good d.ok.good
   refine ⟨ε, hε, ?_⟩
@@ -68,21 +101,16 @@ theorem frame_sign (d : SD σ)
       · simp [dbl]
       · simp [dbl]
       · simp [dbl, hY' i j]
-    have hM
-        : (d.b.1ᵀ * dbl d.Y.J * d.b.1.map σ)ᵀ = e • (d.b.1ᵀ * dbl d.Y.J * d.b.1.map σ).map σ := by
-      have e1
-          : (d.b.1ᵀ * dbl d.Y.J * d.b.1.map σ).map σ
-            = (d.b.1.map σ)ᵀ * (dbl d.Y.J).map σ * d.b.1 := by
-        have h1
-            : ∀ {p q r : Type} [Fintype q] (P : Matrix p q E) (Q : Matrix q r E),
-              (P * Q).map σ = P.map σ * Q.map σ := fun P Q =>
-          Matrix.map_mul (f := σ.toRingHom)
+    have hM : (d.b.1ᵀ * dbl d.Y.J * d.b.1.map σ)ᵀ = e • (d.b.1ᵀ * dbl d.Y.J * d.b.1.map σ).map σ := by
+      have e1 : (d.b.1ᵀ * dbl d.Y.J * d.b.1.map σ).map σ = (d.b.1.map σ)ᵀ * (dbl d.Y.J).map σ * d.b.1 := by
+        have h1 : ∀ {p q r : Type} [Fintype q] (P : Matrix p q E) (Q : Matrix q r E), (P * Q).map σ = P.map σ * Q.map σ :=
+          fun P Q => Matrix.map_mul (f := σ.toRingHom)
         have h2 : (d.b.1.map σ).map σ = d.b.1 := by
           rw [Matrix.map_map]
           exact Matrix.ext fun i j => hσ _
         rw [h1, h1, h2, Matrix.transpose_map]
-      rw [e1, Matrix.transpose_mul, Matrix.transpose_mul, Matrix.transpose_transpose, hD,
-        Matrix.smul_mul, Matrix.mul_smul, Matrix.mul_assoc]
+      rw [e1, Matrix.transpose_mul, Matrix.transpose_mul, Matrix.transpose_transpose, hD, Matrix.smul_mul, Matrix.mul_smul,
+        Matrix.mul_assoc]
     rw [hε] at hM
     have hn : 0 < d.n := d.ok.hn
     have := congrFun (congrFun hM (Sum.inl ⟨0, hn⟩)) (Sum.inr ⟨0, hn⟩)
@@ -97,31 +125,25 @@ theorem frame_sign (d : SD σ)
     rw [e, hA.skew j i]
     ring
 
-theorem gram_cond
-    (d : SD σ) (ε : ℤˣ) (hε : ∀ i j, d.A.J j i = -(((ε : ℤ) : E)) * σ (d.A.J i j))
-    (X : Matrix (Fin d.m) (Fin d.n) (AE F E))
-    : d.gram X X ∈ nCond σ d.n ε := by
+theorem gram_cond (d : SD σ) (ε : ℤˣ) (hε : ∀ i j, d.A.J j i = -(((ε : ℤ) : E)) * σ (d.A.J i j))
+    (X : Matrix (Fin d.m) (Fin d.n) (AE F E)) : d.gram X X ∈ nCond σ d.n ε := by
   have hσ := sigma_sigma_of_good d.ok.good
   have hJ : (incM F d.A.J)ᵀ = -((((ε : ℤ) : AE F E)) • (incM F d.A.J).map (cA σ)) := by
     ext i j
-    simp only [Matrix.transpose_apply, incM, Matrix.map_apply, Matrix.neg_apply, Matrix.smul_apply,
-      smul_eq_mul, cA_inclR']
+    simp only [Matrix.transpose_apply, incM, Matrix.map_apply, Matrix.neg_apply, Matrix.smul_apply, smul_eq_mul,
+      cA_inclR']
     rw [hε i j, map_mul, map_neg, inclR_int, neg_mul]
   show (Xᵀ * incM F d.A.J * X.map (cA σ))ᵀ = -((((ε : ℤ) : AE F E)) • (Xᵀ * incM F d.A.J * X.map (cA σ)).map (cA σ))
-  have h1
-      : ∀ {p q r : Type} [Fintype q] (P : Matrix p q (AE F E)) (Q : Matrix q r (AE F E)),
-        (P * Q).map (cA σ) = P.map (cA σ) * Q.map (cA σ) := fun P Q =>
-    Matrix.map_mul (f := (cA σ).toRingHom)
+  have h1 : ∀ {p q r : Type} [Fintype q] (P : Matrix p q (AE F E)) (Q : Matrix q r (AE F E)),
+      (P * Q).map (cA σ) = P.map (cA σ) * Q.map (cA σ) := fun P Q => Matrix.map_mul (f := (cA σ).toRingHom)
   have h2 : (X.map (cA σ)).map (cA σ) = X := by
     rw [Matrix.map_map]
     exact Matrix.ext fun i j => cA_cA' σ hσ _
-  rw [h1, h1, h2, Matrix.transpose_map, Matrix.transpose_mul, Matrix.transpose_mul,
-    Matrix.transpose_transpose, hJ, Matrix.neg_mul, Matrix.mul_neg, Matrix.smul_mul,
-    Matrix.mul_smul, Matrix.mul_assoc]
+  rw [h1, h1, h2, Matrix.transpose_map, Matrix.transpose_mul, Matrix.transpose_mul, Matrix.transpose_transpose, hJ,
+    Matrix.neg_mul, Matrix.mul_neg, Matrix.smul_mul, Matrix.mul_smul, Matrix.mul_assoc]
 
-theorem smul_cond
-    {n : ℕ} (ε : ℤˣ) (c : AF F) {G : Matrix (Fin n) (Fin n) (AE F E)} (hG : G ∈ nCond σ n ε)
-    : c • G ∈ nCond σ n ε := by
+theorem smul_cond {n : ℕ} (ε : ℤˣ) (c : AF F) {G : Matrix (Fin n) (Fin n) (AE F E)} (hG : G ∈ nCond σ n ε) :
+    c • G ∈ nCond σ n ε := by
   have hG' : Gᵀ = -((((ε : ℤ) : AE F E)) • G.map (cA σ)) := hG
   show (c • G)ᵀ = -((((ε : ℤ) : AE F E)) • (c • G).map (cA σ))
   have e : (c • G).map (cA σ) = c • G.map (cA σ) := by
@@ -133,41 +155,31 @@ theorem half_eq : inclR (F := F) (AF F) (2⁻¹ : E) = algebraMap (AF F) (AE F E
   have h1 := half_two (F := F) (E := E)
   have h2 : algebraMap (AF F) (AE F E) (⅟(2 : AF F)) * 2 = 1 := by
     rw [← map_ofNat (algebraMap (AF F) (AE F E)) 2, ← map_mul, invOf_mul_self, map_one]
-  calc
-    inclR (F := F) (AF F) (2⁻¹ : E)
-        = inclR (F := F) (AF F) (2⁻¹ : E) * (2 * algebraMap (AF F) (AE F E) (⅟(2 : AF F))) := by
-      rw [mul_comm 2, h2, mul_one]
+  calc inclR (F := F) (AF F) (2⁻¹ : E) = inclR (F := F) (AF F) (2⁻¹ : E) * (2 * algebraMap (AF F) (AE F E) (⅟(2 : AF F))) := by
+        rw [mul_comm 2, h2, mul_one]
     _ = _ := by rw [← mul_assoc, h1, one_mul]
 
-theorem gram_incM (d : SD σ) (X : Matrix (Fin d.m) (Fin d.n) E)
-    : d.gram (incM F X) (incM F X) = incM F (Xᵀ * d.A.J * X.map σ) := by
+theorem gram_incM (d : SD σ) (X : Matrix (Fin d.m) (Fin d.n) E) :
+    d.gram (incM F X) (incM F X) = incM F (Xᵀ * d.A.J * X.map σ) := by
   show (incM F X)ᵀ * incM F d.A.J * (incM F X).map (cA σ) = _
   rw [incM_mul'', incM_mul'', incM_map]
   rfl
 
-theorem gram_mem (d : SD σ) (X : Matrix (Fin d.m) (Fin d.n) E) (T : nF σ d.Y d.b)
-    : ⅟(2 : AF F) • d.gram (incM F X) (incM F X) + T.1.1 ∈ nA σ d.Y d.b
-      ∧ ∃ S₀ : Matrix (Fin d.n) (Fin d.n) E,
-        ⅟(2 : AF F) • d.gram (incM F X) (incM F X) + T.1.1 = incM F S₀ := by
+theorem gram_mem (d : SD σ) (X : Matrix (Fin d.m) (Fin d.n) E) (T : nF σ d.Y d.b) :
+    ⅟(2 : AF F) • d.gram (incM F X) (incM F X) + T.1.1 ∈ nA σ d.Y d.b ∧
+      ∃ S₀ : Matrix (Fin d.n) (Fin d.n) E, ⅟(2 : AF F) • d.gram (incM F X) (incM F X) + T.1.1 = incM F S₀ := by
   obtain ⟨ε, hb, hε⟩ := frame_sign d
   have hσ := sigma_sigma_of_good d.ok.good
   obtain ⟨T₀, hT₀⟩ := (mem_nF_iff T.1).1 T.2
-  refine ⟨
-    (mem_nA_iff hσ hb _).2
-      (add_mem (smul_cond ε _ (gram_cond d ε hε _)) ((mem_nA_iff hσ hb _).1 T.1.2)),
-    (2⁻¹ : E) • (Xᵀ * d.A.J * X.map σ) + T₀,
-    ?_
-  ⟩
+  refine ⟨(mem_nA_iff hσ hb _).2 (add_mem (smul_cond ε _ (gram_cond d ε hε _)) ((mem_nA_iff hσ hb _).1 T.1.2)),
+    (2⁻¹ : E) • (Xᵀ * d.A.J * X.map σ) + T₀, ?_⟩
   rw [gram_incM, hT₀]
   ext i j
-  simp only [incM, Matrix.add_apply, Matrix.smul_apply, Matrix.map_apply, smul_eq_mul,
-    map_add (f := _), map_mul]
+  simp only [incM, Matrix.add_apply, Matrix.smul_apply, Matrix.map_apply, smul_eq_mul, map_add (f := _), map_mul]
   rw [Algebra.smul_def, ← half_eq]
 
-theorem exists_twist
-    (d : SD σ) (ε : ℤˣ) (S₀ : Matrix (Fin d.n) (Fin d.n) E)
-    (hS : incM F S₀ ∈ nCond σ d.n ε) (h0 : S₀ ≠ 0)
-    : ∃ β₀ ∈ nCond σ d.n ε, d.B.ψ (-(d.tt (incM F S₀ * β₀))) ≠ 1 := by
+theorem exists_twist (d : SD σ) (ε : ℤˣ) (S₀ : Matrix (Fin d.n) (Fin d.n) E) (hS : incM F S₀ ∈ nCond σ d.n ε)
+    (h0 : S₀ ≠ 0) : ∃ β₀ ∈ nCond σ d.n ε, d.B.ψ (-(d.tt (incM F S₀ * β₀))) ≠ 1 := by
   have hcm := d.cm
   have hS' : (incM F S₀)ᵀ = -((((ε : ℤ) : AE F E)) • (incM F S₀).map (cA σ)) := hS
   obtain ⟨i₀, j₀, hij⟩ : ∃ i j, S₀ i j ≠ 0 := by
@@ -178,37 +190,31 @@ theorem exists_twist
   set Sw : Matrix (Fin d.n) (Fin d.n) ℂ := (incM F S₀).map (piInf (τ w)) with hSw
   have hSwT : ∀ i j, Sw j i = -(((ε : ℤ) : ℂ)) * star (Sw i j) := fun i j => by
     have := congrArg (fun M => (M.map (piInf (τ w))) i j) hS'
-    simp only [Matrix.map_apply, Matrix.transpose_apply, Matrix.neg_apply, Matrix.smul_apply,
-        smul_eq_mul, map_neg, map_mul, map_intCast, piInf_cA hcm]
-      at this
+    simp only [Matrix.map_apply, Matrix.transpose_apply, Matrix.neg_apply, Matrix.smul_apply, smul_eq_mul, map_neg,
+      map_mul, map_intCast, piInf_cA hcm] at this
     simpa [hSw] using this
   set q : ℂ := piInf (τ w) ((incM F S₀ * incM F S₀).trace) with hq
   have hqe : q = -(((ε : ℤ) : ℂ)) * ∑ i, ∑ j, ((Complex.normSq (Sw i j) : ℝ) : ℂ) := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hq, Matrix.trace, map_sum, Finset.mul_sum]
+
+    rw [hq, Matrix.trace, map_sum, Finset.mul_sum]
     refine Finset.sum_congr rfl fun i _ => ?_
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [Matrix.diag_apply, Matrix.mul_apply, map_sum, Finset.mul_sum]
+
+    rw [Matrix.diag_apply, Matrix.mul_apply, map_sum, Finset.mul_sum]
     refine Finset.sum_congr rfl fun j _ => ?_
     rw [map_mul]
     change Sw i j * Sw j i = _
     rw [hSwT i j, Complex.normSq_eq_conj_mul_self, Complex.star_def]
     ring
   have hN : 0 < ∑ i, ∑ j, Complex.normSq (Sw i j) := by
-    refine lt_of_lt_of_le ?_
-      (Finset.single_le_sum
-        (f := fun i => ∑ j, Complex.normSq (Sw i j))
-        (fun i _ => Finset.sum_nonneg fun j _ => Complex.normSq_nonneg _)
-        (Finset.mem_univ i₀))
-    refine lt_of_lt_of_le ?_
-      (Finset.single_le_sum
-        (f := fun j => Complex.normSq (Sw i₀ j))
-        (fun j _ => Complex.normSq_nonneg _)
-        (Finset.mem_univ j₀))
+    refine lt_of_lt_of_le ?_ (Finset.single_le_sum (f := fun i => ∑ j, Complex.normSq (Sw i j))
+      (fun i _ => Finset.sum_nonneg fun j _ => Complex.normSq_nonneg _) (Finset.mem_univ i₀))
+    refine lt_of_lt_of_le ?_ (Finset.single_le_sum (f := fun j => Complex.normSq (Sw i₀ j))
+      (fun j _ => Complex.normSq_nonneg _) (Finset.mem_univ j₀))
     refine Complex.normSq_pos.2 ?_
     simp only [hSw, Matrix.map_apply, incM, piInf_inclR']
     exact (map_ne_zero _).2 hij
-  have hε1 : (((ε : ℤ) : ℝ)) ≠ 0 := by rcases Int.units_eq_one_or ε with h | h <;> simp [h]
+  have hε1 : (((ε : ℤ) : ℝ)) ≠ 0 := by
+    rcases Int.units_eq_one_or ε with h | h <;> simp [h]
   have hqre : q.re = -(((ε : ℤ) : ℝ)) * ∑ i, ∑ j, Complex.normSq (Sw i j) := by
     rw [hqe]
     simp [Complex.mul_re, ← Complex.ofReal_sum]
@@ -241,28 +247,23 @@ theorem exists_twist
     rw [e1, psi_trace_at d.std hcm τ w z hf hw]
     have hzw : (piInf (τ w) z).re = 1 / 4 := by
       rw [hz, map_neg, map_mul, hc, hs1, ← hq]
-      simp only [hx, if_pos rfl, Complex.neg_re, Complex.mul_re, Complex.ofReal_re,
-        Complex.ofReal_im, zero_mul, sub_zero]
+      simp only [hx, if_pos rfl, Complex.neg_re, Complex.mul_re, Complex.ofReal_re, Complex.ofReal_im, zero_mul, sub_zero]
       rw [hr]
       field_simp
     rw [hzw]
     intro h
     have h2 : Complex.exp (-(2 * Real.pi * Complex.I) * (((2 * (1 / 4 : ℝ)) : ℝ) : ℂ)) = -1 := by
       rw [show (2 * (1 / 4 : ℝ)) = 1 / 2 by norm_num]
-      rw [show -(2 * Real.pi * Complex.I) * (((1 / 2 : ℝ)) : ℂ) = -(Real.pi * Complex.I) by
-        push_cast; ring]
+      rw [show -(2 * Real.pi * Complex.I) * (((1 / 2 : ℝ)) : ℂ) = -(Real.pi * Complex.I) by push_cast; ring]
       rw [Complex.exp_neg, Complex.exp_pi_mul_I]
       norm_num
     rw [h2] at h
     norm_num at h
 
-theorem orth
-    (d : SD σ)
-    {nb : nA σ d.Y d.b → d.G} {lam : Measure (nA σ d.Y d.b)} {𝓖 : Set (nA σ d.Y d.b)}
-    (hc : CoefData (σ := σ) (Y := d.Y) d.b nb lam 𝓖)
-    (S : Matrix (Fin d.n) (Fin d.n) (AE F E))
-    (hS : S ∈ nA σ d.Y d.b) (hr : ∃ S₀ : Matrix (Fin d.n) (Fin d.n) E, S = incM F S₀)
-    : ∫ β in 𝓖, d.B.ψ (-(d.tt (S * β.1))) ∂lam = if S = 0 then 1 else 0 := by
+theorem orth (d : SD σ) {nb : nA σ d.Y d.b → d.G} {lam : Measure (nA σ d.Y d.b)} {𝓖 : Set (nA σ d.Y d.b)}
+    (hc : CoefData (σ := σ) (Y := d.Y) d.b nb lam 𝓖) (S : Matrix (Fin d.n) (Fin d.n) (AE F E))
+    (hS : S ∈ nA σ d.Y d.b) (hr : ∃ S₀ : Matrix (Fin d.n) (Fin d.n) E, S = incM F S₀) :
+    ∫ β in 𝓖, d.B.ψ (-(d.tt (S * β.1))) ∂lam = if S = 0 then 1 else 0 := by
   classical
   obtain ⟨ε, hb, -⟩ := frame_sign d
   have hσ := sigma_sigma_of_good d.ok.good
@@ -272,8 +273,7 @@ theorem orth
   obtain ⟨S₀, rfl⟩ := hr
   split_ifs with h0
   · have hone : ∀ β : nA σ d.Y d.b, d.B.ψ (-(d.tt (incM F S₀ * β.1))) = 1 := fun β => by
-      rw [h0, Matrix.zero_mul, SD.tt, Matrix.trace_zero, map_zero, neg_zero,
-        AddChar.map_zero_eq_one]
+      rw [h0, Matrix.zero_mul, SD.tt, Matrix.trace_zero, map_zero, neg_zero, AddChar.map_zero_eq_one]
     simp_rw [hone]
     rw [setIntegral_const]
     simp [Measure.real, h1]
@@ -281,8 +281,8 @@ theorem orth
     obtain ⟨β₀, hβ₀, hne⟩ := exists_twist d ε S₀ ((mem_nA_iff hσ hb _).1 hS) hS0
     let h : nA σ d.Y d.b → ℂ := fun β => d.B.ψ (-(d.tt (incM F S₀ * β.1)))
     have hadd : ∀ β β' : nA σ d.Y d.b, h (β + β') = h β * h β' := fun β β' => by
-      simp only [h, AddSubgroup.coe_add, Matrix.mul_add, SD.tt, Matrix.trace_add, map_add (f := _),
-        neg_add, AddChar.map_add_eq_mul]
+      simp only [h, AddSubgroup.coe_add, Matrix.mul_add, SD.tt, Matrix.trace_add, map_add (f := _), neg_add,
+        AddChar.map_add_eq_mul]
     have hper : ∀ g ∈ nF σ d.Y d.b, ∀ y, h (g + y) = h y := fun g hg y => by
       obtain ⟨T₀, hT₀⟩ := (mem_nF_iff g).1 hg
       rw [hadd]
@@ -291,9 +291,7 @@ theorem orth
         exact d.std.2.1 _
       rw [hg1, one_mul]
     exact GlobalTheory.ThetaParsevalInner.setIntegral_eq_zero_of_twist lam (nF σ d.Y d.b) hfd hper
-      (c := ⟨β₀, (mem_nA_iff hσ hb _).2 hβ₀⟩)
-      (fun y => hadd _ y)
-      hne
+      (c := ⟨β₀, (mem_nA_iff hσ hb _).2 hβ₀⟩) (fun y => hadd _ y) hne
 
 end PositivityTheory.SiegelWeilFormula.Tauto
 

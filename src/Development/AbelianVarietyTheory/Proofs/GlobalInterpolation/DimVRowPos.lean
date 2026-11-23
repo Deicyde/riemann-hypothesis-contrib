@@ -1,27 +1,65 @@
 module
 
-public import Mathlib
-public import Formalism.SharpRestriction.GlobalSchurBounds.ThickPlacesCorollaryOfAnyTranslate
-public import Formalism.SharpRestriction.InertJacobiLevels.AsmIface
-public import Formalism.LocalToGlobal.GlobalTheory.IsResidueClassZero
-public import Formalism.SharpRestriction.GrowthBounds.SmallOrderPrimes
-public import Formalism.LocalRingCardinality.HostCls
 public import Development.AbelianVarietyTheory.Definitions.GlobalTwisting.PairRowIffQdRows
-public import Development.AbelianVarietyTheory.Definitions.GlobalTwisting.DisjointExceptional
-public import Development.AbelianVarietyTheory.Definitions.GlobalTwisting.ThinScalesIffHostBound
-public import Development.AbelianVarietyTheory.Definitions.GlobalTwisting.LogCondLeThree
-public import Development.AbelianVarietyTheory.Definitions.GlobalTwisting.AuxiliaryPrimeMemAvoidedPrimes
-public import Development.AbelianVarietyTheory.Definitions.GlobalTwisting.SetUnipotentTranslate
-public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.ScalePolynomialQuantitiesComparison
+public import Development.AbelianVarietyTheory.Definitions.Foundations.RootOfUnityEightQMemCoeffGaloisSubfield
+public import Formalism.LogVandermondeBounds.LogRatioLowerBound
+public import Formalism.SharpRestriction.GlobalSchurBounds.StandardLattice
 public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.ExplicitRanksBasicBoundsLargeScale
-public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.HostBoundsTwoMulRpowLogSqLe
 public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.GoodTopCountLeConstMulLog
+public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.ScalePolynomialQuantitiesComparison
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.HostCmData
+public import Formalism.GL3MeanSquares.HookFormulaTorsion.DimensionMassJointBound
+import Formalism.LocalRingCardinality.HostCls
+import Formalism.LocalRingCardinality.RankBoundMonotoneInDimension
+import Formalism.LogVandermondeBounds.LogVandermondeProofs.CardStabilizerVector
+public import Formalism.SharpRestriction.GlobalSchurBounds.ThickPlacesCorollaryOfAnyTranslate
+import Formalism.SharpRestriction.RamificationFrobenius.TotientGaloisClasses.HostFacts
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Rat
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Development.AbelianVarietyTheory.Definitions.GlobalTwisting.SetUnipotentTranslate
+public import Formalism.HermitianLattices.HermitianLatticesProofs.MassTelescope
+import Formalism.LocalToGlobal.GlobalTheory.IsResidueClassZero
+import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.ExistsExplicitParameters
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.Inhab
-  Formalism.L2.GlobalTheoryTheory GlobalTheory.EX GlobalTheory.EX.OB GlobalTheory.Mem NumberField
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.Inhab Formalism.L2.GlobalTheoryTheory GlobalTheory.EX GlobalTheory.EX.OB GlobalTheory.Mem NumberField
 
 noncomputable section
 
@@ -29,8 +67,7 @@ namespace GlobalTheory.EX.WinLow
 
 open Formalism.MainNotions.StandardLattice Finset
 
-theorem host_cm {R : Ranks} (H : Host R)
-    : letI := H.cmStar; Formalism.HermitianLatticesTheory.IsCMUnram H.E :=
+theorem host_cm {R : Ranks} (H : Host R) : letI := H.cmStar; Formalism.HermitianLatticesTheory.IsCMUnram H.E :=
   letI := H.cmStar
   (host_cmData R H).cmUnram
 
@@ -71,50 +108,37 @@ theorem pi_le_v {R : Ranks} (H : Host R) : Real.pi ≤ H.v := by
   unfold Host.v
   linarith
 
-theorem mass_pos
-    (K : Type) [Field K] [NumberField K] [StarRing K]
-    (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (M : ℕ)
-    : 0 < Formalism.HermitianLatticesTheory.mass (stdForm K M) (stdLat K M) := by
+theorem mass_pos (K : Type) [Field K] [NumberField K] [StarRing K] (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (M : ℕ) :
+    0 < Formalism.HermitianLatticesTheory.mass (stdForm K M) (stdLat K M) := by
   rw [standard_form_eq_telescope_form, standard_lattice_eq_telescope_lattice]
   exact Formalism.HermitianLatticesTheory.massTelescope_std_pos K hK M
 
-theorem mass_tel
-    (h2b : SiegelMassRatioCM)
-    (K : Type) [Field K] [NumberField K] [StarRing K]
-    (hK : Formalism.HermitianLatticesTheory.IsCMUnram K)
-    (k : ℕ) (hk : 2 ≤ k)
-    (n : ℕ)
-    : Formalism.HermitianLatticesTheory.mass (stdForm K (k + n)) (stdLat K (k + n))
-      = Formalism.HermitianLatticesTheory.mass (stdForm K k) (stdLat K k)
-        * ∏ M ∈ Ico (k + 1) (k + n + 1), Formalism.HermitianLatticesTheory.massRatioRightSide K M := by
+theorem mass_tel (h2b : SiegelMassRatioCM) (K : Type) [Field K] [NumberField K] [StarRing K] (hK : Formalism.HermitianLatticesTheory.IsCMUnram K)
+    (k : ℕ) (hk : 2 ≤ k) (n : ℕ) :
+    Formalism.HermitianLatticesTheory.mass (stdForm K (k + n)) (stdLat K (k + n)) =
+      Formalism.HermitianLatticesTheory.mass (stdForm K k) (stdLat K k) * ∏ M ∈ Ico (k + 1) (k + n + 1), Formalism.HermitianLatticesTheory.massRatioRightSide K M := by
   induction n with
   | zero => simp
   | succ n ih =>
-    have h
-        : Formalism.HermitianLatticesTheory.mass (stdForm K (k + n + 1)) (stdLat K (k + n + 1))
-            / Formalism.HermitianLatticesTheory.mass (stdForm K (k + n)) (stdLat K (k + n))
-          = _ :=
-      h2b K hK (k + n + 1) (by omega)
+    have h : Formalism.HermitianLatticesTheory.mass (stdForm K (k + n + 1)) (stdLat K (k + n + 1)) /
+        Formalism.HermitianLatticesTheory.mass (stdForm K (k + n)) (stdLat K (k + n)) = _ := h2b K hK (k + n + 1) (by omega)
     rw [div_eq_iff (mass_pos K hK _).ne', ih] at h
-    have hI
-        : ∏ M ∈ Ico (k + 1) (k + (n + 1) + 1), Formalism.HermitianLatticesTheory.massRatioRightSide K M
-          = (∏ M ∈ Ico (k + 1) (k + n + 1), Formalism.HermitianLatticesTheory.massRatioRightSide K M)
-            * Formalism.HermitianLatticesTheory.massRatioRightSide K (k + n + 1) :=
+    have hI : ∏ M ∈ Ico (k + 1) (k + (n + 1) + 1), Formalism.HermitianLatticesTheory.massRatioRightSide K M =
+        (∏ M ∈ Ico (k + 1) (k + n + 1), Formalism.HermitianLatticesTheory.massRatioRightSide K M) * Formalism.HermitianLatticesTheory.massRatioRightSide K (k + n + 1) :=
       Finset.prod_Ico_succ_top (by omega : k + 1 ≤ k + n + 1) _
     rw [hI]
     refine h.trans ?_
     ring
 
-theorem idx_place (R : Ranks) (g : ℕ) (hp : g.Prime) (hg : 3 ≤ g)
-    : (g : ℝ) ^ (R.k * (R.k + 1) / 2) / 2 ≤ idxColLoc g R.k
-      ∧ idxColLoc g R.k ≤ (g : ℝ) ^ (R.k * (R.k + 1) / 2)
-      ∧ (g : ℝ) ^ ((R.r ^ 2 + 3 * R.k + 1 + 2 * R.rS) / 2) / 2 ≤ idxRowLoc g R.k R.m
-      ∧ idxRowLoc g R.k R.m ≤ (g : ℝ) ^ ((R.r ^ 2 + 3 * R.k + 1 + 2 * R.rS) / 2) := by
+theorem idx_place (R : Ranks) (g : ℕ) (hp : g.Prime) (hg : 3 ≤ g) :
+    (g : ℝ) ^ (R.k * (R.k + 1) / 2) / 2 ≤ idxColLoc g R.k ∧
+    idxColLoc g R.k ≤ (g : ℝ) ^ (R.k * (R.k + 1) / 2) ∧
+    (g : ℝ) ^ ((R.r ^ 2 + 3 * R.k + 1 + 2 * R.rS) / 2) / 2 ≤ idxRowLoc g R.k R.m ∧
+    idxRowLoc g R.k R.m ≤ (g : ℝ) ^ ((R.r ^ 2 + 3 * R.k + 1 + 2 * R.rS) / 2) := by
   have : Fact g.Prime := ⟨hp⟩
   have hc : Fintype.card (ZMod g) = g := ZMod.card _
   obtain ⟨⟨θ, hθ1, hθ2, h1⟩, ⟨θ', hθ1', hθ2', h2⟩⟩ :=
-    Formalism.HermitianLattices.GenusMassVolumes.local_index_formula (ZMod g) R.k R.m R.two_le_m
-      R.m_even (by rw [hc]; exact hg)
+    Formalism.HermitianLattices.GenusMassVolumes.local_index_formula (ZMod g) R.k R.m R.two_le_m R.m_even (by rw [hc]; exact hg)
   rw [hc] at h1 h2
   have hgpos : (0 : ℝ) < (g : ℝ) := by exact_mod_cast hp.pos
   have e1 : idxColLoc g R.k = (g : ℝ) ^ (R.k * (R.k + 1) / 2) * θ := by
@@ -123,10 +147,8 @@ theorem idx_place (R : Ranks) (g : ℕ) (hp : g.Prime) (hg : 3 ≤ g)
     rw [card_GL_subtype_eq_card_matrix _ det_eq_one_of_unitriangular]
     have := Formalism.LogVandermondeBounds.StandardLattice.cardUnitriangular (ZMod g) R.k
     rw [hc] at this
-    have h3
-        : Nat.card {A : Matrix (Fin R.k) (Fin R.k) (ZMod g) // IsUnitri A}
-          = g ^ (R.k * (R.k - 1) / 2) :=
-      this
+    have h3 : Nat.card {A : Matrix (Fin R.k) (Fin R.k) (ZMod g) // IsUnitri A} =
+        g ^ (R.k * (R.k - 1) / 2) := this
     rw [h3, Nat.card_eq_fintype_card]
     push_cast
     rfl
@@ -142,13 +164,12 @@ theorem idx_place (R : Ranks) (g : ℕ) (hp : g.Prime) (hg : 3 ≤ g)
   rw [e1, e2]
   refine ⟨by nlinarith, by nlinarith, by nlinarith, by nlinarith⟩
 
-theorem idx_ratio (R : Ranks) (g : Fin 2 → ℕ) (hp : ∀ i, (g i).Prime) (hg : ∀ i, 3 ≤ g i)
-    : 0 < idxColLoc (g 0) R.k ^ R.f * idxColLoc (g 1) R.k ^ R.f
-      ∧ 0 < idxRowLoc (g 0) R.k R.m ^ R.f * idxRowLoc (g 1) R.k R.m ^ R.f
-      ∧ ((2 : ℝ) ^ (2 * R.f))⁻¹
-          * ((g 0 : ℝ) * (g 1 : ℝ)) ^ ((R.f : ℝ) * R.m * (2 * R.k + R.m - 1) / 2)
-        ≤ (idxRowLoc (g 0) R.k R.m ^ R.f * idxRowLoc (g 1) R.k R.m ^ R.f)
-          / (idxColLoc (g 0) R.k ^ R.f * idxColLoc (g 1) R.k ^ R.f) := by
+theorem idx_ratio (R : Ranks) (g : Fin 2 → ℕ) (hp : ∀ i, (g i).Prime) (hg : ∀ i, 3 ≤ g i) :
+    0 < idxColLoc (g 0) R.k ^ R.f * idxColLoc (g 1) R.k ^ R.f ∧
+    0 < idxRowLoc (g 0) R.k R.m ^ R.f * idxRowLoc (g 1) R.k R.m ^ R.f ∧
+    ((2 : ℝ) ^ (2 * R.f))⁻¹ * ((g 0 : ℝ) * (g 1 : ℝ)) ^ ((R.f : ℝ) * R.m * (2 * R.k + R.m - 1) / 2) ≤
+      (idxRowLoc (g 0) R.k R.m ^ R.f * idxRowLoc (g 1) R.k R.m ^ R.f) /
+        (idxColLoc (g 0) R.k ^ R.f * idxColLoc (g 1) R.k ^ R.f) := by
   have h4a := fun i => idx_place R (g i) (hp i) (hg i)
   have hgp : ∀ i, (0 : ℝ) < (g i : ℝ) := fun i => by exact_mod_cast (hp i).pos
   have hg1 : ∀ i, (1 : ℝ) ≤ (g i : ℝ) := fun i => by exact_mod_cast (hp i).one_lt.le
@@ -157,62 +178,52 @@ theorem idx_ratio (R : Ranks) (g : Fin 2 → ℕ) (hp : ∀ i, (g i).Prime) (hg 
   have hr : ∀ i, 0 < idxRowLoc (g i) R.k R.m := fun i =>
     lt_of_lt_of_le (by have := hgp i; positivity) (h4a i).2.2.1
   refine ⟨by have := hc 0; have := hc 1; positivity, by have := hr 0; have := hr 1; positivity, ?_⟩
-  have key :=
-    Formalism.HermitianLattices.GenusMassVolumes.index_ratio_bound R.f R.k R.m (g 0 : ℝ) (g 1 : ℝ)
-      (idxColLoc (g 0) R.k ^ R.f * idxColLoc (g 1) R.k ^ R.f)
-      (idxRowLoc (g 0) R.k R.m ^ R.f * idxRowLoc (g 1) R.k R.m ^ R.f)
-      (fun i _ => idxColLoc (g i) R.k / (g i : ℝ) ^ (R.k * (R.k + 1) / 2))
-      (fun i _ => idxRowLoc (g i) R.k R.m / (g i : ℝ) ^ ((R.r ^ 2 + 3 * R.k + 1 + 2 * R.rS) / 2))
-      R.two_le_m R.m_even (hg1 0) (hg1 1)
-      (by
-        intro i _
-        obtain ⟨a1, a2, a3, a4⟩ := h4a i
-        have p1 : (0 : ℝ) < (g i : ℝ) ^ (R.k * (R.k + 1) / 2) := pow_pos (hgp i) _
-        have p2 : (0 : ℝ) < (g i : ℝ) ^ ((R.r ^ 2 + 3 * R.k + 1 + 2 * R.rS) / 2) :=
-          pow_pos (hgp i) _
-        refine ⟨?_, ?_, ?_, ?_⟩
-        · rw [le_div_iff₀ p1]; linarith
-        · rw [div_le_one p1]; exact a2
-        · rw [le_div_iff₀ p2]; linarith
-        · rw [div_le_one p2]; exact a4)
+  have key := Formalism.HermitianLattices.GenusMassVolumes.index_ratio_bound R.f R.k R.m (g 0 : ℝ) (g 1 : ℝ)
+    (idxColLoc (g 0) R.k ^ R.f * idxColLoc (g 1) R.k ^ R.f)
+    (idxRowLoc (g 0) R.k R.m ^ R.f * idxRowLoc (g 1) R.k R.m ^ R.f)
+    (fun i _ => idxColLoc (g i) R.k / (g i : ℝ) ^ (R.k * (R.k + 1) / 2))
+    (fun i _ => idxRowLoc (g i) R.k R.m / (g i : ℝ) ^ ((R.r ^ 2 + 3 * R.k + 1 + 2 * R.rS) / 2))
+    R.two_le_m R.m_even (hg1 0) (hg1 1)
+    (by
+      intro i _
+      obtain ⟨a1, a2, a3, a4⟩ := h4a i
+      have p1 : (0 : ℝ) < (g i : ℝ) ^ (R.k * (R.k + 1) / 2) := pow_pos (hgp i) _
+      have p2 : (0 : ℝ) < (g i : ℝ) ^ ((R.r ^ 2 + 3 * R.k + 1 + 2 * R.rS) / 2) := pow_pos (hgp i) _
+      refine ⟨?_, ?_, ?_, ?_⟩
+      · rw [le_div_iff₀ p1]; linarith
+      · rw [div_le_one p1]; exact a2
+      · rw [le_div_iff₀ p2]; linarith
+      · rw [div_le_one p2]; exact a4)
   refine (key ?_ ?_).1
   · rw [Fin.prod_univ_two]
     simp only [Finset.prod_const, Finset.card_range, Matrix.cons_val_zero, Matrix.cons_val_one]
     rw [mul_div_cancel₀ _ (pow_pos (hgp 0) _).ne', mul_div_cancel₀ _ (pow_pos (hgp 1) _).ne']
   · rw [Fin.prod_univ_two]
     simp only [Finset.prod_const, Finset.card_range, Matrix.cons_val_zero, Matrix.cons_val_one]
-    have e0
-        : (g 0 : ℝ) ^ (((R.k + R.m - 1) ^ 2 + 3 * R.k + 1 + 2 * (R.m / 2 - 1)) / 2)
-            * (idxRowLoc (g 0) R.k R.m / (g 0 : ℝ) ^ ((R.r ^ 2 + 3 * R.k + 1 + 2 * R.rS) / 2))
-          = idxRowLoc (g 0) R.k R.m :=
-      mul_div_cancel₀ (idxRowLoc (g 0) R.k R.m)
-        (pow_pos (hgp 0) ((R.r ^ 2 + 3 * R.k + 1 + 2 * R.rS) / 2)).ne'
-    have e1
-        : (g 1 : ℝ) ^ (((R.k + R.m - 1) ^ 2 + 3 * R.k + 1 + 2 * (R.m / 2 - 1)) / 2)
-            * (idxRowLoc (g 1) R.k R.m / (g 1 : ℝ) ^ ((R.r ^ 2 + 3 * R.k + 1 + 2 * R.rS) / 2))
-          = idxRowLoc (g 1) R.k R.m :=
-      mul_div_cancel₀ (idxRowLoc (g 1) R.k R.m)
-        (pow_pos (hgp 1) ((R.r ^ 2 + 3 * R.k + 1 + 2 * R.rS) / 2)).ne'
+    have e0 : (g 0 : ℝ) ^ (((R.k + R.m - 1) ^ 2 + 3 * R.k + 1 + 2 * (R.m / 2 - 1)) / 2) *
+        (idxRowLoc (g 0) R.k R.m / (g 0 : ℝ) ^ ((R.r ^ 2 + 3 * R.k + 1 + 2 * R.rS) / 2)) =
+        idxRowLoc (g 0) R.k R.m := mul_div_cancel₀ (idxRowLoc (g 0) R.k R.m)
+      (pow_pos (hgp 0) ((R.r ^ 2 + 3 * R.k + 1 + 2 * R.rS) / 2)).ne'
+    have e1 : (g 1 : ℝ) ^ (((R.k + R.m - 1) ^ 2 + 3 * R.k + 1 + 2 * (R.m / 2 - 1)) / 2) *
+        (idxRowLoc (g 1) R.k R.m / (g 1 : ℝ) ^ ((R.r ^ 2 + 3 * R.k + 1 + 2 * R.rS) / 2)) =
+        idxRowLoc (g 1) R.k R.m := mul_div_cancel₀ (idxRowLoc (g 1) R.k R.m)
+      (pow_pos (hgp 1) ((R.r ^ 2 + 3 * R.k + 1 + 2 * R.rS) / 2)).ne'
     rw [e0, e1]
 
 def seqOf {n : ℕ} (x : Fin n → ℚ) (i : ℕ) : ℝ := if h : i < n then ((x ⟨i, h⟩ : ℚ) : ℝ) else 0
 
-theorem seqOf_lt {n : ℕ} (x : Fin n → ℚ) {i : ℕ} (h : i < n) : seqOf x i = ((x ⟨i, h⟩ : ℚ) : ℝ) :=
-  dif_pos h
+theorem seqOf_lt {n : ℕ} (x : Fin n → ℚ) {i : ℕ} (h : i < n) : seqOf x i = ((x ⟨i, h⟩ : ℚ) : ℝ) := dif_pos h
 
-theorem dimV_col {n : ℕ} (x : Fin n → ℚ)
-    : dimV (fun i => ((x i : ℚ) : ℝ))
-      = Formalism.LogVandermondeBounds.StandardLattice.dimVN (seqOf x) n := by
+theorem dimV_col {n : ℕ} (x : Fin n → ℚ) :
+    dimV (fun i => ((x i : ℚ) : ℝ)) = Formalism.LogVandermondeBounds.StandardLattice.dimVN (seqOf x) n := by
   rw [← dim_weyl_fin_eq_nat]
   congr 1
   funext i
   rw [seqOf_lt x i.2]
 
-theorem dimV_row {k m : ℕ} (v : Fin (k - 1) → ℚ) (b : Fin m → ℚ)
-    : dimV (Fin.append (fun i => ((v i : ℚ) : ℝ)) (fun j => -((b j : ℚ) : ℝ)))
-      = Formalism.LogVandermondeBounds.StandardLattice.dimVN
-        (Formalism.LogVandermondeBounds.StandardLattice.rowPar k (seqOf v) (seqOf b))
-        (k - 1 + m) := by
+theorem dimV_row {k m : ℕ} (v : Fin (k - 1) → ℚ) (b : Fin m → ℚ) :
+    dimV (Fin.append (fun i => ((v i : ℚ) : ℝ)) (fun j => -((b j : ℚ) : ℝ))) =
+      Formalism.LogVandermondeBounds.StandardLattice.dimVN (Formalism.LogVandermondeBounds.StandardLattice.rowPar k (seqOf v) (seqOf b)) (k - 1 + m) := by
   rw [← dim_weyl_fin_eq_nat]
   congr 1
   funext a
@@ -226,8 +237,8 @@ theorem dimV_row {k m : ℕ} (v : Fin (k - 1) → ℚ) (b : Fin m → ℚ)
     unfold Formalism.LogVandermondeBounds.StandardLattice.rowPar
     rw [Fin.append_right, hj, if_neg (by omega), Nat.add_sub_cancel_left, seqOf_lt b j.2]
 
-theorem dimV_row_pos {R : Ranks} (p : HCParam R)
-    : 0 < dimV (Fin.append (fun i => ((p.v i : ℚ) : ℝ)) (fun j => -((p.b j : ℚ) : ℝ))) := by
+theorem dimV_row_pos {R : Ranks} (p : HCParam R) :
+    0 < dimV (Fin.append (fun i => ((p.v i : ℚ) : ℝ)) (fun j => -((p.b j : ℚ) : ℝ))) := by
   have hk := R.m_add_three_le_k
   have hm := R.two_le_m
   have hv : StrictAnti (fun i => ((p.v i : ℚ) : ℝ)) := by
@@ -252,9 +263,7 @@ theorem dimV_row_pos {R : Ranks} (p : HCParam R)
   refine dim_weyl_pos_of_strictAnti _ (strictAnti_fin_append _ _ hv hb fun i j => ?_)
   have h0 := p.u_last_gt (by omega) (by omega)
   have h1 := p.v_gt_u ⟨R.k - 2, by omega⟩
-  have e
-      : (⟨(⟨R.k - 2, by omega⟩ : Fin (R.k - 1)).1 + 1, by simp; omega⟩ : Fin R.k)
-        = ⟨R.k - 1, by omega⟩ := by
+  have e : (⟨(⟨R.k - 2, by omega⟩ : Fin (R.k - 1)).1 + 1, by simp; omega⟩ : Fin R.k) = ⟨R.k - 1, by omega⟩ := by
     ext; simp; omega
   rw [e] at h1
   have h2 : ((p.v ⟨R.k - 2, by omega⟩ : ℚ) : ℝ) ≤ ((p.v i : ℚ) : ℝ) :=
@@ -273,8 +282,7 @@ theorem f_pos (R : Ranks) : 0 < R.f := by
 def placeNo {R : Ranks} (H : Host R) (n : ℕ) : Tau R :=
   (Fintype.equivFinOfCardEq (card_Tau H)).symm ⟨n % R.f, Nat.mod_lt _ (f_pos R)⟩
 
-theorem prod_places {R : Ranks} (H : Host R) (F : Tau R → ℝ)
-    : ∏ ρ, F ρ = ∏ n ∈ range R.f, F (placeNo H n) := by
+theorem prod_places {R : Ranks} (H : Host R) (F : Tau R → ℝ) : ∏ ρ, F ρ = ∏ n ∈ range R.f, F (placeNo H n) := by
   rw [← Fin.prod_univ_eq_prod_range (fun n => F (placeNo H n)) R.f,
     ← Equiv.prod_comp (Fintype.equivFinOfCardEq (card_Tau H)).symm F]
   refine Finset.prod_congr rfl fun i _ => ?_
@@ -282,20 +290,16 @@ theorem prod_places {R : Ranks} (H : Host R) (F : Tau R → ℝ)
   congr 2
   exact Fin.ext (Nat.mod_eq_of_lt i.2).symm
 
-theorem place_data
-    {R : Ranks} (p : HCParam R)
-    (x Δ a B h0 b1 : ℝ) (hx : 1 ≤ x) (hΔ : 1 ≤ Δ) (hh : 0 ≤ h0)
+theorem place_data {R : Ranks} (p : HCParam R) (x Δ a B h0 b1 : ℝ) (hx : 1 ≤ x) (hΔ : 1 ≤ Δ) (hh : 0 ≤ h0)
     (hv : ∀ i : Fin (R.k - 1), ((p.v i : ℚ) : ℝ) = ((R.k - 2 - i.1 : ℕ) : ℝ) * (4 * Δ))
     (hu : ∀ (h : 0 < R.k) (h' : R.k - 1 < R.k),
-      (((p.u ⟨0, h⟩ : ℚ) : ℝ) ≤ 2 * a ∧ -a ≤ ((p.u ⟨R.k - 1, h'⟩ : ℚ) : ℝ))
-        ∨ (((p.u ⟨0, h⟩ : ℚ) : ℝ) = ((R.k - 2 : ℕ) : ℝ) * (4 * Δ) + R.k * (4 * Δ) + 1 / 2
-          ∧ ((p.u ⟨R.k - 1, h'⟩ : ℚ) : ℝ) = -1 / 2))
-    (hb : ∀ j : Fin R.m,
-      ((p.b j : ℚ) : ℝ) = b1 + j.1 * h0 ∧ ((p.e j : ℚ) : ℝ) = ((p.b j : ℚ) : ℝ) + h0 / 2)
-    (hlo : x * (R.k * (4 * Δ) + h0) ≤ b1) (hup : b1 + R.m * h0 ≤ 2 * B)
-    : Formalism.LogVandermondeBounds.StandardLattice.PlaceData x Δ a B R.k R.m (seqOf p.u)
-        (seqOf p.v) (seqOf p.b) (seqOf p.e)
-      ∧ ∀ j < R.m, 1 ≤ seqOf p.e j := by
+      (((p.u ⟨0, h⟩ : ℚ) : ℝ) ≤ 2 * a ∧ -a ≤ ((p.u ⟨R.k - 1, h'⟩ : ℚ) : ℝ)) ∨
+      (((p.u ⟨0, h⟩ : ℚ) : ℝ) = ((R.k - 2 : ℕ) : ℝ) * (4 * Δ) + R.k * (4 * Δ) + 1 / 2 ∧
+        ((p.u ⟨R.k - 1, h'⟩ : ℚ) : ℝ) = -1 / 2))
+    (hb : ∀ j : Fin R.m, ((p.b j : ℚ) : ℝ) = b1 + j.1 * h0 ∧ ((p.e j : ℚ) : ℝ) = ((p.b j : ℚ) : ℝ) + h0 / 2)
+    (hlo : x * (R.k * (4 * Δ) + h0) ≤ b1) (hup : b1 + R.m * h0 ≤ 2 * B) :
+    Formalism.LogVandermondeBounds.StandardLattice.PlaceData x Δ a B R.k R.m (seqOf p.u) (seqOf p.v) (seqOf p.b) (seqOf p.e) ∧
+      ∀ j < R.m, 1 ≤ seqOf p.e j := by
   have hk := R.m_add_three_le_k
   have hm := R.two_le_m
   have hx0 : 0 < x := by linarith
@@ -303,8 +307,7 @@ theorem place_data
   have hkΔ : 1 ≤ (R.k : ℝ) * (4 * Δ) := by nlinarith
   have ht : (0 : ℚ) ≤ R.t := by positivity
   have hbj : ∀ j : Fin R.m, b1 ≤ ((p.b j : ℚ) : ℝ) := fun j => by
-    rw [(hb j).1]
-    have : (0 : ℝ) ≤ j.1 * h0 := by positivity
+    rw [(hb j).1]; have : (0 : ℝ) ≤ j.1 * h0 := by positivity
     linarith
   have e1 : x * (R.k * (4 * Δ)) ≤ b1 := by nlinarith
   have e2 : x * h0 ≤ b1 := by nlinarith
@@ -318,8 +321,7 @@ theorem place_data
     have : ((R.k - 2 - i : ℕ) : ℝ) = ((R.k - 2 - (i + 1) : ℕ) : ℝ) + 1 := by
       exact_mod_cast (by omega : R.k - 2 - i = R.k - 2 - (i + 1) + 1)
     simp only
-    rw [this]
-    ring
+    rw [this]; ring
   · intro i hi
     have h1 := p.u_gt_v ⟨i, hi⟩
     have h2 := p.v_gt_u ⟨i, hi⟩
@@ -363,15 +365,12 @@ theorem place_data
     have := hbj ⟨j, hj⟩
     nlinarith
 
-theorem scale_sizes (eps cD ch : ℝ) (h0 : 0 < eps) (h1 : eps < 1 / 52) (hcD : 0 ≤ cD) (hch : 0 ≤ ch)
-    : ∃ x0 : ℝ, ∀ (s : Scale) (R : Ranks),
-      s.eps = eps → x0 ≤ s.x → RankVal s R
-        → s.x * (R.k * (4 * (Delv s cD : ℝ)) + (h0v s ch : ℝ)) ≤ s.w'' R.n ∧ s.w'' R.n ≤ s.b'
-          ∧ 0 ≤ s.b' ∧ 3 * s.b' ≤ s.b ∧ R.m * (h0v s ch : ℝ) + 2 ≤ s.b ∧ (R.k : ℝ) ≤ s.b
-          ∧ 2 * s.b ≤ s.a ∧ (R.k : ℝ) ≤ s.x ^ (5 : ℝ) := by
+theorem scale_sizes (eps cD ch : ℝ) (h0 : 0 < eps) (h1 : eps < 1 / 52) (hcD : 0 ≤ cD) (hch : 0 ≤ ch) :
+    ∃ x0 : ℝ, ∀ (s : Scale) (R : Ranks), s.eps = eps → x0 ≤ s.x → RankVal s R →
+      s.x * (R.k * (4 * (Delv s cD : ℝ)) + (h0v s ch : ℝ)) ≤ s.w'' R.n ∧ s.w'' R.n ≤ s.b' ∧ 0 ≤ s.b' ∧ 3 * s.b' ≤ s.b ∧
+      R.m * (h0v s ch : ℝ) + 2 ≤ s.b ∧ (R.k : ℝ) ≤ s.b ∧ 2 * s.b ≤ s.a ∧ (R.k : ℝ) ≤ s.x ^ (5 : ℝ) := by
   obtain ⟨x1, hx1⟩ := rank_basic_bounds eps h0 h1
-  obtain ⟨x2, hx2⟩ :=
-    GlobalTheory.scale_poly_comparison eps (5 + cD + ch + 2) (1 / 2) h0 (by norm_num)
+  obtain ⟨x2, hx2⟩ := GlobalTheory.scale_poly_comparison eps (5 + cD + ch + 2) (1 / 2) h0 (by norm_num)
   refine ⟨max 12 (max x1 x2), fun s R he hx hR => ?_⟩
   simp only [max_le_iff] at hx
   obtain ⟨h12, hxa, hxb⟩ := hx
@@ -380,11 +379,8 @@ theorem scale_sizes (eps cD ch : ℝ) (h0 : 0 < eps) (h1 : eps < 1 / 52) (hcD : 
   have hx1' := s.one_lt_alt
   have hxp : 0 < s.x := by linarith
   have hn1 : 1 ≤ R.n := Formalism.HC.Frame.ord_pos _
-  have hnf : (R.n : ℝ) ≤ R.f := by
-    unfold Ranks.f
-    push_cast
-    have : (0 : ℝ) ≤ R.n := by positivity
-    linarith
+  have hnf : (R.n : ℝ) ≤ R.f := by unfold Ranks.f; push_cast; have : (0 : ℝ) ≤ R.n := by positivity
+                                   linarith
   obtain ⟨c6, c7, -⟩ := c6 R.n hn1 (hnf.trans hf)
   have hk : (R.k : ℝ) ≤ s.x ^ (5 : ℝ) := le_trans (by exact_mod_cast hkr) hr
   have hb1 : 1 ≤ s.b := Real.one_le_exp (Real.rpow_nonneg hxp.le _)
@@ -397,13 +393,10 @@ theorem scale_sizes (eps cD ch : ℝ) (h0 : 0 < eps) (h1 : eps < 1 / 52) (hcD : 
   have o3 : 1 ≤ s.x ^ ch := Real.one_le_rpow hx1'.le hch
   have hD : (Delv s cD : ℝ) ≤ 2 * s.x ^ cD := by
     have := (Nat.ceil_lt_add_one (show 0 ≤ s.x ^ cD by positivity)).le
-    unfold Delv
-    linarith
+    unfold Delv; linarith
   have hH : (h0v s ch : ℝ) ≤ 4 * s.x ^ ch := by
     have := (Nat.ceil_lt_add_one (show 0 ≤ s.x ^ ch by positivity)).le
-    unfold h0v
-    push_cast
-    linarith
+    unfold h0v; push_cast; linarith
   have hy : s.x ^ (5 + cD + ch + 2) = s.x ^ (5 : ℝ) * s.x ^ cD * s.x ^ ch * (s.x * s.x) := by
     rw [Real.rpow_add hxp, Real.rpow_add hxp, Real.rpow_add hxp, Real.rpow_two, sq]
   rw [hy] at c4 c6
@@ -421,65 +414,17 @@ theorem scale_sizes (eps cD ch : ℝ) (h0 : 0 < eps) (h1 : eps < 1 / 52) (hcD : 
   have hw : z * (s.x * s.x) ≤ s.w'' R.n := (le_mul_of_one_le_left (by positivity) hb2).trans c6
   have h3 : 3 * s.b' ≤ s.b := by nlinarith
   have hzx : z ≤ s.x * z := le_mul_of_one_le_left (by linarith) hx1'.le
-  have hmh : (R.m : ℝ) * (h0v s ch : ℝ) ≤ s.x * (4 * z) :=
-    mul_le_mul hm (by linarith) (by positivity) hxp.le
+  have hmh : (R.m : ℝ) * (h0v s ch : ℝ) ≤ s.x * (4 * z) := mul_le_mul hm (by linarith) (by positivity) hxp.le
   refine ⟨?_, c7, hb', h3, by linarith, by linarith, ?_, hk⟩
   · have : (R.k * (4 * (Delv s cD : ℝ)) + (h0v s ch : ℝ)) ≤ 12 * z := by linarith
     have := mul_le_mul_of_nonneg_left this hxp.le
     linarith
   · unfold Scale.a; nlinarith
 
-theorem bottom_len (eps : ℝ) (K : G.Consts) (h0 : 0 < eps) (h1 : eps < 1 / 52) (hK : 1 ≤ K.La)
-    : ∃ x0 : ℝ, ∀ (s : Scale) (R : Ranks),
-      s.eps = eps → x0 ≤ s.x → RankVal s R
-        → 2 * (R.n : ℝ) * s.delta1 * s.x ^ s.eps * G.La K s * s.b' / (R.k : ℝ) ≤ s.b' := by
-  obtain ⟨CN, x1, hx1⟩ := GlobalTheory.topCount_and_lambda_bounds eps h0 h1
-  refine ⟨max x1 (32 * K.La * CN ^ 2), fun s R he hx hR => ?_⟩
-  obtain ⟨-, -, hLa⟩ := hx1 s he (le_trans (le_max_left _ _) hx)
-  obtain ⟨hLa1, hLa2⟩ := hLa K hK
-  have hx2 : 32 * K.La * CN ^ 2 ≤ s.x := le_trans (le_max_right _ _) hx
-  obtain ⟨⟨-, hn⟩, -, ⟨hk, -⟩, -⟩ := hR
-  have hx1' : 1 < s.x := s.one_lt_alt
-  have hxp : 0 < s.x := by linarith
-  have hb : 0 < s.b' := by
-    unfold Scale.b' Scale.a Scale.b Scale.X'
-    positivity
-  have hkp : (0 : ℝ) < R.k := lt_of_lt_of_le (Real.rpow_pos_of_pos hxp _) hk
-  have hd0 : 0 < s.delta1 := Real.rpow_pos_of_pos hxp _
-  have hd1 : s.delta1 ≤ 1 :=
-    Real.rpow_le_one_of_one_le_of_nonpos hx1'.le (by have := s.eps_pos; linarith)
-  have hy : 0 < s.x ^ s.eps := Real.rpow_pos_of_pos hxp _
-  have hlog0 : 0 ≤ Real.log s.x := Real.log_nonneg hx1'.le
-  have hlog : Real.log s.x ^ 2 ≤ 4 * s.x := by
-    have h := Real.log_le_rpow_div hxp.le (show (0 : ℝ) < 1 / 2 by norm_num)
-    have h2 : (s.x ^ (1 / 2 : ℝ)) ^ 2 = s.x := by
-      rw [← Real.rpow_natCast, ← Real.rpow_mul hxp.le]; norm_num
-    calc
-      Real.log s.x ^ 2
-        ≤ (s.x ^ (1 / 2 : ℝ) / (1 / 2)) ^ 2 := pow_le_pow_left₀ hlog0 h 2
-      _ = 4 * (s.x ^ (1 / 2 : ℝ)) ^ 2 := by ring
-      _ = 4 * s.x := by rw [h2]
-  have hKC : 0 ≤ K.La * CN ^ 2 := by positivity
-  have hLa3 : G.La K s ≤ s.x ^ (2 : ℝ) / 4 * s.x ^ s.eps := by
-    refine hLa2.trans ?_
-    rw [Real.rpow_two]
-    have : K.La * CN ^ 2 * Real.log s.x ^ 2 ≤ s.x / 32 * (4 * s.x) :=
-      mul_le_mul (by linarith) hlog (by positivity) (by positivity)
-    nlinarith
-  have hLa0 : 0 ≤ G.La K s := hy.le.trans hLa1
-  have hmain : 2 * (R.n : ℝ) * s.delta1 * s.x ^ s.eps * G.La K s ≤ R.k := by
-    calc
-      2 * (R.n : ℝ) * s.delta1 * s.x ^ s.eps * G.La K s
-          ≤ 2 * (2 * s.x ^ (2 + 8 * s.eps)) * 1 * s.x ^ s.eps
-            * (s.x ^ (2 : ℝ) / 4 * s.x ^ s.eps) := by
-        gcongr
-      _ = s.x ^ (2 + 8 * s.eps) * s.x ^ s.eps * s.x ^ (2 : ℝ) * s.x ^ s.eps := by ring
-      _ = s.x ^ (2 + 8 * s.eps + s.eps + 2 + s.eps) := by
-        rw [← Real.rpow_add hxp, ← Real.rpow_add hxp, ← Real.rpow_add hxp]
-      _ ≤ s.x ^ (9 / 2 + 10 * s.eps) := Real.rpow_le_rpow_of_exponent_le hx1'.le (by linarith)
-      _ ≤ R.k := hk
-  rw [div_le_iff₀ hkp]
-  nlinarith
+theorem bottom_len (eps : ℝ) (K : G.Consts) (h0 : 0 < eps) (h1 : eps < 1 / 52) (hK : 1 ≤ K.La) :
+    ∃ x0 : ℝ, ∀ (s : Scale) (R : Ranks), s.eps = eps → x0 ≤ s.x → RankVal s R →
+      2 * (R.n : ℝ) * s.delta1 * s.x ^ s.eps * G.La K s * s.b' / (R.k : ℝ) ≤ s.b' := by
+  apply _root_.GlobalTheory.EX.bottom_window_le <;> assumption
 
 end GlobalTheory.EX.WinLow
 

@@ -1,20 +1,57 @@
 module
 
-public import Mathlib
 public import Development.WeilBound.RepresentationTheoryGL.GenericUnitaryGL.LeibnizOrders.LeibnizOrd
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.AvgVanish
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.TwistedJacquetClosedOpenSequenceStatement
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.MirabolicCellStructureDataStatement
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.EvaluationMapsLinearStatement
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ClosedEvaluationEquivariantStatement
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.OpenEvaluationEquivariantStatement
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ClosedEvaluationInducedStatement
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.OpenEvaluationInducedStatement
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ClosedEvaluationSurjectiveStatement
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.OpenEvaluationSurjectiveStatement
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ClosedEvaluationVanishingOnOpenStatement
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.AverageVanishesClosedCellStatement
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.AverageVanishesOpenCellStatement
+public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ClosedEvaluationEquivariantStatement
+public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ClosedEvaluationInducedStatement
+public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ClosedEvaluationSurjectiveStatement
+public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ClosedEvaluationVanishingOnOpenStatement
+import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.EvaluationMapsLinearStatement
+public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.MirabolicCellStructureDataStatement
+public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.OpenEvaluationEquivariantStatement
+public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.OpenEvaluationInducedStatement
+public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.OpenEvaluationSurjectiveStatement
+public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.TwistedJacquetClosedOpenSequenceStatement
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -108,13 +145,12 @@ def RC (τ : MRep k (i + 1)) (σ : GRep k (t + 1)) : MRep k ((i + 1) + t) := ⟨
 def RO (ψ : AddChar k Circle) (τ : MRep k (i + 1)) (σ : GRep k (t + 1)) : MRep k (i + (t + 1)) :=
   ⟨cIndSpace (HPG k i (t + 1)) (sigO τ σ ψ), cInd (HPG k i (t + 1)) (sigO τ σ ψ)⟩
 
-set_option maxHeartbeats 1000000 in
+
 theorem xr_eq (τ : MRep k (i + 1)) (σ : GRep k (t + 1)) : XR τ σ = XR' τ σ := rfl
 
-set_option maxHeartbeats 1000000 in
+
 theorem rc_eq (τ : MRep k (i + 1)) (σ : GRep k (t + 1)) : prodGPn (psiN τ) (gres σ) = RC τ σ := rfl
 
-set_option maxHeartbeats 1000000 in
 theorem ro_eq (ψ : AddChar k Circle) (τ : MRep k (i + 1)) (σ : GRep k (t + 1))
     : prodPGn (phiN ψ τ) σ = RO ψ τ σ :=
   rfl
@@ -232,7 +268,6 @@ theorem aC_eCl
   funext x
   exact eC_translate ψ f x m
 
-set_option maxHeartbeats 1000000 in
 theorem phiPG_core
     (ψ : AddChar k Circle) (hψ : Continuous ψ)
     (i t : ℕ) (τ : MRep k (i + 1)) (σ : GRep k (t + 1)) (hτ : IsSmooth τ.ρ) (hσ : IsSmooth σ.ρ)

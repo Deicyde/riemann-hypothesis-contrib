@@ -1,6 +1,50 @@
 module
 
 public import Development.WeilBound.RepresentationTheoryGL.UnitaryDualProof.TwistedPieces.IntegralParts.HaarFourierSupport.DistribHaarCharAdU
+public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsBoxInvariantSnd
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsLocallyConstantAddChar
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -14,22 +58,20 @@ namespace PositivityTheory.RgUd.TP.Nil.Four
 
 open PositivityTheory.RgUd.T PositivityTheory.RgUd.T.Nil PositivityTheory.RgUd.TP
 
-variable
-  {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
-  {n : ℕ} (τ : Matrix (Fin n) (Fin n) k →ₗ[k] k) (Z : Subalgebra k (Matrix (Fin n) (Fin n) k))
+variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] {n : ℕ}
+  (τ : Matrix (Fin n) (Fin n) k →ₗ[k] k) (Z : Subalgebra k (Matrix (Fin n) (Fin n) k))
 
-theorem tau_sum (x : Matrix (Fin n) (Fin n) k)
-    : τ x = ∑ i, ∑ j, x i j * τ (Matrix.single i j 1) := by
+theorem tau_sum (x : Matrix (Fin n) (Fin n) k) : τ x = ∑ i, ∑ j, x i j * τ (Matrix.single i j 1) := by
   have e : ∀ i j, Matrix.single i j (x i j) = x i j • Matrix.single i j (1 : k) := fun i j => by
     rw [Matrix.smul_single, smul_eq_mul, mul_one]
   conv_lhs => rw [Matrix.matrix_eq_sum_single x]
-  set_option synthInstance.maxHeartbeats 100000 in
+
   simp only [e, map_sum, map_smul, smul_eq_mul]
 
 theorem continuous_tau : Continuous τ := by
   rw [show (⇑τ) = fun x => ∑ i, ∑ j, x i j * τ (Matrix.single i j 1) from funext (tau_sum τ)]
-  exact continuous_finsetSum _ fun i _ =>
-    continuous_finsetSum _ fun j _ => (continuous_id.matrix_elem i j).mul continuous_const
+  exact continuous_finsetSum _ fun i _ => continuous_finsetSum _ fun j _ =>
+    (continuous_id.matrix_elem i j).mul continuous_const
 
 def Dl : Matrix (Fin n) (Fin n) k →ₗ[k] (Fin (dd Z) → k) where
   toFun := D τ Z
@@ -66,8 +108,7 @@ def Hb : Sp k n ≃ₜ TT τ Z × (Fin (dd Z) → k) where
     have hPy : Pr τ Z (y + E Z ((G τ Z)⁻¹ *ᵥ w)) = E Z ((G τ Z)⁻¹ *ᵥ w) := by
       rw [Pr_add, Pr_of_D hy', Pr_E h, zero_add]
     have hDx : D τ Z (y + E Z ((G τ Z)⁻¹ *ᵥ w)) = w := by
-      rw [D_add, hy', zero_add, D_E, mulVec_mulVec, mul_nonsing_inv _ (Ne.isUnit (G_det h)),
-        one_mulVec]
+      rw [D_add, hy', zero_add, D_E, mulVec_mulVec, mul_nonsing_inv _ (Ne.isUnit (G_det h)), one_mulVec]
     refine Prod.ext (Prod.ext (Subtype.ext ?_) rfl) hDx
     show y + E Z ((G τ Z)⁻¹ *ᵥ w) - Pr τ Z (y + E Z ((G τ Z)⁻¹ *ᵥ w)) = y
     rw [hPy, add_sub_cancel_right]
@@ -92,31 +133,26 @@ def Gm : (Fin (dd Z) → k) ≃ₜ (Fin (dd Z) → k) where
   continuous_toFun := continuous_const.matrix_mulVec continuous_id
   continuous_invFun := continuous_const.matrix_mulVec continuous_id
 
-def F1 : TT τ Z × (Fin (dd Z) → k) ≃ₜ Sp k n :=
-  ((Homeomorph.refl (TT τ Z)).prodCongr (Gm h)).trans (Hb h).symm
+def F1 : TT τ Z × (Fin (dd Z) → k) ≃ₜ Sp k n := ((Homeomorph.refl (TT τ Z)).prodCongr (Gm h)).trans (Hb h).symm
 
-theorem real_test_function_apply (q : TT τ Z × (Fin (dd Z) → k))
-    : F1 h q = (q.1.1.1 + E Z q.2, q.1.2) := by
+theorem real_test_function_apply (q : TT τ Z × (Fin (dd Z) → k)) : F1 h q = (q.1.1.1 + E Z q.2, q.1.2) := by
   show (q.1.1.1 + E Z ((G τ Z)⁻¹ *ᵥ (G τ Z *ᵥ q.2)), q.1.2) = _
   rw [mulVec_mulVec, nonsing_inv_mul _ (Ne.isUnit (G_det h)), one_mulVec]
 
-theorem partial_fourier_first_coordinates (q : TT τ Z × (Fin (dd Z) → k))
-    : Hb h (F1 h q) = (q.1, G τ Z *ᵥ q.2) := by
+theorem partial_fourier_first_coordinates (q : TT τ Z × (Fin (dd Z) → k)) : Hb h (F1 h q) = (q.1, G τ Z *ᵥ q.2) := by
   simp only [F1, Homeomorph.trans_apply, Homeomorph.apply_symm_apply]
   rfl
 
 def Gu : GL (Fin (dd Z)) k := Matrix.nonsingInvUnit (G τ Z) (Ne.isUnit (G_det h))
 
-variable
-  [MeasurableSpace k] [BorelSpace k] (ψ : AddChar k Circle) (ν : Measure k) [ν.IsAddHaarMeasure]
+variable [MeasurableSpace k] [BorelSpace k] (ψ : AddChar k Circle) (ν : Measure k) [ν.IsAddHaarMeasure]
 
-theorem pf_G (F : TT τ Z × (Fin (dd Z) → k) → ℂ) (z : TT τ Z × (Fin (dd Z) → k))
-    : ∫ u, F (z.1, G τ Z *ᵥ u) * (ψ (u ⬝ᵥ z.2) : ℂ) ∂(Measure.pi fun _ => ν)
-      = ((distribHaarChar k (Matrix.GeneralLinearGroup.det (Gu h)) : ℝ) : ℂ)⁻¹
-        * GlobalTheory.SplitDict.pf ψ (Measure.pi fun _ => ν) F (z.1, (G τ Z)⁻¹ *ᵥ z.2) := by
-  have key :=
-    GlobalTheory.WeilM.integral_comp_mulVec ν (Gu h)
-      (fun w => F (z.1, w) * (ψ (((G τ Z)⁻¹ *ᵥ w) ⬝ᵥ z.2) : ℂ))
+theorem pf_G (F : TT τ Z × (Fin (dd Z) → k) → ℂ) (z : TT τ Z × (Fin (dd Z) → k)) :
+    ∫ u, F (z.1, G τ Z *ᵥ u) * (ψ (u ⬝ᵥ z.2) : ℂ) ∂(Measure.pi fun _ => ν) =
+      ((distribHaarChar k (Matrix.GeneralLinearGroup.det (Gu h)) : ℝ) : ℂ)⁻¹ *
+        GlobalTheory.SplitDict.pf ψ (Measure.pi fun _ => ν) F (z.1, (G τ Z)⁻¹ *ᵥ z.2) := by
+  have key := GlobalTheory.WeilM.integral_comp_mulVec ν (Gu h)
+    (fun w => F (z.1, w) * (ψ (((G τ Z)⁻¹ *ᵥ w) ⬝ᵥ z.2) : ℂ))
   have hc : ((distribHaarChar k (Matrix.GeneralLinearGroup.det (Gu h)) : ℝ) : ℂ) ≠ 0 := by
     exact_mod_cast (distribHaarChar_pos).ne'
   have e1 : ∀ u, (Gu h).val *ᵥ u = G τ Z *ᵥ u := fun u => rfl
@@ -124,8 +160,7 @@ theorem pf_G (F : TT τ Z × (Fin (dd Z) → k) → ℂ) (z : TT τ Z × (Fin (d
     rw [mulVec_mulVec, nonsing_inv_mul _ (Ne.isUnit (G_det h)), one_mulVec]
   simp only [e1, e2] at key
   have e3 : ∀ w, ((G τ Z)⁻¹ *ᵥ w) ⬝ᵥ z.2 = w ⬝ᵥ ((G τ Z)⁻¹ *ᵥ z.2) := fun w => by
-    rw [dotProduct_comm, dotProduct_mulVec, ← mulVec_transpose, transpose_nonsing_inv, G_symm h,
-      dotProduct_comm]
+    rw [dotProduct_comm, dotProduct_mulVec, ← mulVec_transpose, transpose_nonsing_inv, G_symm h, dotProduct_comm]
   simp only [e3] at key
   rw [eq_inv_mul_iff_mul_eq₀ hc, key]
   rfl

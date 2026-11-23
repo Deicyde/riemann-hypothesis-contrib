@@ -2,6 +2,55 @@ module
 
 public import Formalism.GaussJetBounds.StatementJ
 public import Formalism.GaussJetBounds.GaussJetProofs.ThmAOp
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.MvPolynomial.IrreducibleQuadratic
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Lemma
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
@@ -69,8 +118,8 @@ lemma jetPair_C_mul_right (c : K) (P : MvPolynomial ι K) (F : MvPowerSeries ι 
 
 lemma jetPair_sum_right {α : Type*} (s : Finset α) (P : MvPolynomial ι K)
     (F : α → MvPowerSeries ι K) : jetPair P (∑ a ∈ s, F a) = ∑ a ∈ s, jetPair P (F a) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [jetPair, map_sum, Finset.mul_sum]
+
+  simp only [jetPair, map_sum, Finset.mul_sum]
   exact Finset.sum_comm
 
 lemma jetPair_C_left (c : K) (F : MvPowerSeries ι K) :
@@ -211,8 +260,8 @@ lemma jetPair_poly (A : ι → ι' → K) (P : MvPolynomial ι K) :
     have hsum : ∀ (f : ι' → MvPolynomial ι K),
         ((∑ j, f j : MvPolynomial ι K) : MvPowerSeries ι K) = ∑ j, (f j : MvPowerSeries ι K) := by
       intro f
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [← MvPolynomial.coeToMvPowerSeries.ringHom_apply, map_sum]
+
+      rw [← MvPolynomial.coeToMvPowerSeries.ringHom_apply, map_sum]
       simp only [MvPolynomial.coeToMvPowerSeries.ringHom_apply]
     rw [jetPair_mul_X, mvPowerSeries_pderiv_coe_eq_coe_pderiv, pderiv_aeval_linP, hsum, jetPair_sum_right]
     rw [map_mul, MvPolynomial.aeval_X]
@@ -243,8 +292,8 @@ theorem jet_pair_linearity : JetPairLin.{u} := by
   have ha0 : ∀ j, MvPowerSeries.constantCoeff (a j) = 0 := fun j => by simp [ha]
   have hs : MvPowerSeries.HasSubst a := MvPowerSeries.hasSubst_of_constantCoeff_zero ha0
   have hcoe : ∀ j, a j = ((linP A j : MvPolynomial ι K) : MvPowerSeries ι K) := fun j => by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [ha, linP, ← MvPolynomial.coeToMvPowerSeries.ringHom_apply, map_sum]
+
+    rw [ha, linP, ← MvPolynomial.coeToMvPowerSeries.ringHom_apply, map_sum]
     simp
   have hmon
       : ∀ μ : ι' →₀ ℕ,
@@ -308,11 +357,11 @@ lemma subst_linSub {K : Type u} [Field K] {d N0 N1 : ℕ} {ι ι' : Type} [Finty
     | (rw [← MvPowerSeries.coe_substAlgHom ha]
        exact (MvPowerSeries.substAlgHom ha).commutes c)
   unfold linSub
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [← MvPowerSeries.coe_substAlgHom ha, map_sum]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_mul, MvPowerSeries.coe_substAlgHom, hC, MvPowerSeries.subst_X ha, h, map_sum,
-    Finset.mul_sum, Finset.sum_mul]
+
+  rw [← MvPowerSeries.coe_substAlgHom ha, map_sum]
+
+  simp only [map_mul, MvPowerSeries.coe_substAlgHom, hC, MvPowerSeries.subst_X ha, h, map_sum,
+  Finset.mul_sum, Finset.sum_mul]
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl (fun i _ => Finset.sum_congr rfl (fun y _ => ?_))
   ring
@@ -456,8 +505,8 @@ theorem thmAGen : ThmAGen.{u} := by
     have h1 := hbe.2.2.1 0 (by rwa [MvPowerSeries.coeff_zero_eq_constantCoeff_apply])
     simp [degE] at h1
   have hB : MvPowerSeries.constantCoeff (bSum (frameM (N1 := N1) x) be) = 0 := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [bSum, map_sum]
+
+    simp only [bSum, map_sum]
     refine Finset.sum_eq_zero (fun ab _ => ?_)
     rw [cc_subst_lemma, hbe0]
     intro s
@@ -486,8 +535,8 @@ theorem thmAGen : ThmAGen.{u} := by
       exact hlin z
     · rw [← MvPowerSeries.coe_substAlgHom hsub, map_smul]
       congr 1
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [bSum, map_sum]
+
+      simp only [bSum, map_sum]
       refine Finset.sum_congr rfl (fun ab _ => ?_)
       rw [MvPowerSeries.coe_substAlgHom, MvPowerSeries.subst_comp_subst_apply (hL ab.1 ab.2) hsub]
       congr 1

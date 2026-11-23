@@ -1,8 +1,54 @@
 module
 
-public import Mathlib
 public import Formalism.FrobeniusOrbits.Statement
-public import Formalism.TameInertiaTowers.TowerFieldFoundations
+public import Formalism.TameInertiaTowers.CentralOrderTwo.Galois
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Int
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Lemma
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
@@ -114,7 +160,6 @@ lemma order_le (e : ℕ) (x : HGrp e) (j : ℕ) : orderOf x ≤ 2 ^ j ↔ x ^ (2
     have h0 : orderOf x ∣ Nat.card (HGrp e) := by
       first
         | exact orderOf_dvd_natCard x
-        | exact orderOf_dvd_card
     rwa [card_H] at h0
   constructor
   · intro h
@@ -126,8 +171,6 @@ lemma order_le (e : ℕ) (x : HGrp e) (j : ℕ) : orderOf x ≤ 2 ^ j ↔ x ^ (2
       have hlt : 2 ^ j < 2 ^ i := by
         first
           | exact Nat.pow_lt_pow_right (by norm_num) hc
-          | exact pow_lt_pow_right₀ (by norm_num) hc
-          | exact Nat.pow_lt_pow_of_lt (by norm_num) hc
       exact absurd h (not_le.mpr hlt)
     rw [← orderOf_dvd_iff_pow_eq_one, hi]
     exact Nat.pow_dvd_pow 2 hij
@@ -138,7 +181,6 @@ lemma order_le_card (e : ℕ) (x : HGrp e) : orderOf x ≤ 2 ^ e := by
   have h0 : orderOf x ∣ Nat.card (HGrp e) := by
     first
       | exact orderOf_dvd_natCard x
-      | exact orderOf_dvd_card
   rw [card_H] at h0
   exact Nat.le_of_dvd (by positivity) h0
 
@@ -177,14 +219,14 @@ end Group
 
 open Formalism.FrobeniusOrbits.Group
 
-theorem hostExample : HostExample := ⟨by norm_num [HostHyp], fun e => layerExists (e + 2) 11 7⟩
+theorem hostExample : HostExample :=
+  ⟨by norm_num [HostHyp], fun e => layerExists (e + 2) 11 7⟩
 
 private lemma orderOf_hcl_u5_eq_two_pow (e : ℕ) : orderOf (hcl e (u5 (e + 2))) = 2 ^ e := by
   have hd : orderOf (hcl e (u5 (e + 2))) ∣ 2 ^ e := by
     have h0 : orderOf (hcl e (u5 (e + 2))) ∣ Nat.card (HGrp e) := by
       first
       | exact orderOf_dvd_natCard _
-      | exact orderOf_dvd_card
     rwa [card_H] at h0
   obtain ⟨i, hie, hi⟩ := (Nat.dvd_prime_pow Nat.prime_two).1 hd
   rw [hi]
@@ -209,23 +251,25 @@ private lemma orderOf_hcl_u5_eq_two_pow (e : ℕ) : orderOf (hcl e (u5 (e + 2)))
       have h8 := (ind 5 h5 3 (by norm_num) j).1 (Or.inl (by rw [e3]; exact h'))
       first
         | norm_num at h8
-        | omega
     · have h' := congrArg Units.val h
       rw [Units.val_pow_eq_pow_val, hv, Units.val_neg, Units.val_one, ← Int.cast_pow, cast_eq_neg_one] at h'
       push_cast at h'
       have h8 := (ind 5 h5 3 (by norm_num) j).1 (Or.inr (by rw [e3]; exact h'))
       first
         | norm_num at h8
-        | omega
   · rw [show i = e by omega]
 
 theorem hostGroup : HostGroup := by
   unfold HostGroup
   intro e
   have hne : (-1 : ℤˣ) ≠ 1 := by
-    first | decide | (intro h; have h' := congrArg Units.val h; norm_num at h')
+    first
+      | decide
+      | (intro h; have h' := congrArg Units.val h; norm_num at h')
   have hU : Nat.card ℤˣ = 2 := by
-    first | (rw [Nat.card_eq_fintype_card]; rfl) | (rw [Nat.card_eq_fintype_card]; decide) | simp
+    first
+      | (rw [Nat.card_eq_fintype_card]; rfl)
+      | (rw [Nat.card_eq_fintype_card]; decide)
   have hfin : Finite (HGrp e) := Nat.finite_of_card_ne_zero (by rw [card_H]; positivity)
   have h5 := orderOf_hcl_u5_eq_two_pow e
   unfold GG Psi cc sg chD G0 c0
@@ -235,8 +279,8 @@ theorem hostGroup : HostGroup := by
   · have hs : Function.Surjective ((MonoidHom.snd ℤˣ ℤˣ).comp (MonoidHom.fst (ℤˣ × ℤˣ) (HGrp e))) :=
       fun b => ⟨((1, b), 1), rfl⟩
     first
-    | (rw [Subgroup.index_ker, Set.range_eq_univ.2 hs, Nat.card_univ, hU])
-    | (rw [Subgroup.index_ker, MonoidHom.range_eq_top.2 hs, Subgroup.card_top, hU])
+      | (rw [Subgroup.index_ker, Set.range_eq_univ.2 hs, Nat.card_univ, hU])
+      | (rw [Subgroup.index_ker, MonoidHom.range_eq_top.2 hs, Subgroup.card_top, hU])
   · intro h
     rw [MonoidHom.mem_ker] at h
     exact hne h
@@ -250,20 +294,22 @@ theorem hostGroup : HostGroup := by
   · have hg : hcl e (u5 (e + 2)) ^ (2 ^ e) = 1 := by
       rw [← h5]
       exact pow_orderOf_eq_one _
-    let f0 : ℤ →+ Additive (HGrp e) :=
-      zmultiplesHom (Additive (HGrp e)) (Additive.ofMul (hcl e (u5 (e + 2))))
+    let f0 : ℤ →+ Additive (HGrp e) := zmultiplesHom (Additive (HGrp e)) (Additive.ofMul (hcl e (u5 (e + 2))))
     have hf0 : f0 ((2 ^ e : ℕ) : ℤ) = 0 := by
       show ((2 ^ e : ℕ) : ℤ) • Additive.ofMul (hcl e (u5 (e + 2))) = 0
       first
-      | (rw [← ofMul_zpow, zpow_natCast, hg, ofMul_one])
-      | (rw [natCast_zsmul, ← ofMul_pow, hg, ofMul_one])
-      | simp [← ofMul_zpow, hg]
+        | (rw [← ofMul_zpow, zpow_natCast, hg, ofMul_one])
+        | (rw [natCast_zsmul, ← ofMul_pow, hg, ofMul_one])
     let f1 : ZMod (2 ^ e) →+ Additive (HGrp e) := ZMod.lift (2 ^ e) ⟨f0, hf0⟩
-    let f : Multiplicative (ZMod (2 ^ e)) →* HGrp e := {
-      toFun := fun x => Additive.toMul (f1 (Multiplicative.toAdd x))
-      map_one' := by first | simp | rfl
-      map_mul' := fun x y => by first | simp | (rw [toAdd_mul, map_add (f := _), toMul_add])
-    }
+    let f : Multiplicative (ZMod (2 ^ e)) →* HGrp e :=
+      { toFun := fun x => Additive.toMul (f1 (Multiplicative.toAdd x))
+        map_one' := by
+          first
+            | simp
+        map_mul' := fun x y => by
+          first
+            | simp
+            | (rw [toAdd_mul, map_add (f := _), toMul_add]) }
     have hf1 : f (Multiplicative.ofAdd 1) = hcl e (u5 (e + 2)) := by
       show Additive.toMul (f1 1) = hcl e (u5 (e + 2))
       have h1 : (1 : ZMod (2 ^ e)) = ((1 : ℤ) : ZMod (2 ^ e)) := by simp
@@ -284,15 +330,15 @@ theorem hostGroup : HostGroup := by
       rw [ZMod.lift_coe]
       show Additive.toMul (k • Additive.ofMul (hcl e (u5 (e + 2)))) = y
       rw [← hk]
-      first | rfl | simp [← ofMul_zpow]
+      first
+        | rfl
     have hbij : Function.Bijective f := by
       haveI : NeZero (2 ^ e) := ⟨by positivity⟩
       have hc : Nat.card (Multiplicative (ZMod (2 ^ e))) ≤ Nat.card (HGrp e) := by
         change Nat.card (ZMod (2 ^ e)) ≤ Nat.card (HGrp e)
         rw [Nat.card_zmod, card_H]
       first
-      | exact hsurj.bijective_of_nat_card_le hc
-      | exact (Function.Surjective.bijective_of_nat_card_le hsurj hc)
+        | exact hsurj.bijective_of_nat_card_le hc
     exact ⟨MulEquiv.ofBijective f hbij, hf1⟩
 
 theorem hostOrders : HostOrders := by
@@ -317,7 +363,9 @@ theorem hostOrders : HostOrders := by
       exact ind l hl M (by omega) j
   · unfold GG cc G0 c0
     have hne : (-1 : ℤˣ) ≠ 1 := by
-      first | decide | (intro h; have h' := congrArg Units.val h; norm_num at h')
+      first
+        | decide
+        | (intro h; have h' := congrArg Units.val h; norm_num at h')
     intro g
     constructor
     · rw [Subgroup.mem_zpowers_iff]
@@ -344,7 +392,8 @@ theorem hostOrders : HostOrders := by
         have hd : (orderOf g.2 : ℤ) ∣ k := orderOf_dvd_iff_zpow_eq_one.2 hk3
         have hd2 : orderOf g.2 ∣ 2 ^ e := by
           have h0 : orderOf g.2 ∣ Nat.card (HGrp e) := by
-            first | exact orderOf_dvd_natCard _ | exact orderOf_dvd_card
+            first
+              | exact orderOf_dvd_natCard _
           rwa [card_H] at h0
         obtain ⟨i, -, hi⟩ := (Nat.dvd_prime_pow Nat.prime_two).1 hd2
         have hi0 : i = 0 := by

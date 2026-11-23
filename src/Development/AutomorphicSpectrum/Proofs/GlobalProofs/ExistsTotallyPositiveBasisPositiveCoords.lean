@@ -1,44 +1,71 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.SiegelKlingenDeligneRibet
 public import Development.AutomorphicSpectrum.Proofs.GlobalProofs.AbelContinuation
-public import Development.AutomorphicSpectrum.Proofs.GlobalProofs.CongSubgroup
-public import Development.AutomorphicSpectrum.Proofs.GlobalProofs.TotallyRealFieldDenseEmbeddingsStatement
 public import Development.AutomorphicSpectrum.Proofs.GlobalProofs.CardRealEmbeddingsEqFinrankStatement
 public import Development.AutomorphicSpectrum.Proofs.GlobalProofs.NearIdentityMatrixPositiveSolutionStatement
+public import Development.AutomorphicSpectrum.Proofs.GlobalProofs.TotallyRealFieldDenseEmbeddingsStatement
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
+import Development.AutomorphicSpectrum.Proofs.GlobalProofs.CongSubgroup
 
 @[expose] public section
 
-open NumberField NumberField.Units NumberField.Units.dirichletUnitTheorem
-  GlobalTheory.CompanionTheory.Hypotheses₂.Shintani
-  GlobalTheory.CompanionTheory.Hypotheses₂.Shintani.Cones
+open NumberField NumberField.Units NumberField.Units.dirichletUnitTheorem GlobalTheory.CompanionTheory.Hypotheses₂.Shintani GlobalTheory.CompanionTheory.Hypotheses₂.Shintani.Cones
 
 namespace GlobalTheory.CompanionTheory.Hypotheses₂.Shintani.Gens
 
-theorem map_sum_ratSmul {F κ : Type} [Field F] [Fintype κ] (σ : F →+* ℝ) (q : κ → ℚ) (v : κ → F)
-    : σ (∑ i, q i • v i) = ∑ i, σ (v i) * (q i : ℝ) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+theorem map_sum_ratSmul {F κ : Type} [Field F] [Fintype κ] (σ : F →+* ℝ) (q : κ → ℚ) (v : κ → F) :
+    σ (∑ i, q i • v i) = ∑ i, σ (v i) * (q i : ℝ) := by
+
+  rw [map_sum]
   refine Finset.sum_congr rfl fun i _ => ?_
   rw [Rat.smul_def, map_mul, map_ratCast, mul_comm]
 
-theorem exists_totPos_basis
-    : ∀ (F : Type) [Field F] [NumberField F] [IsTotallyReal F] (M : ℝ),
-      ∃ (κ : Type) (_ : Fintype κ) (b : Module.Basis κ ℚ F),
-        (∀ i, TotPos F (b i))
-          ∧ ∀ x : F, TotPos F x → (∀ σ τ : F →+* ℝ, σ x ≤ M * τ x) → ∀ i, 0 < b.repr x i := by
+theorem exists_totPos_basis : ∀ (F : Type) [Field F] [NumberField F] [IsTotallyReal F] (M : ℝ),
+    ∃ (κ : Type) (_ : Fintype κ) (b : Module.Basis κ ℚ F), (∀ i, TotPos F (b i)) ∧
+      ∀ x : F, TotPos F x → (∀ σ τ : F →+* ℝ, σ x ≤ M * τ x) → ∀ i, 0 < b.repr x i := by
   intro F _ _ _ M
   classical
   obtain ⟨hfin, hcard⟩ := GlobalTheory.T.card_real_embeddings_eq_finrank F
   letI : Fintype (F →+* ℝ) := Fintype.ofFinite _
   obtain ⟨ε, hε, hW⟩ := GlobalTheory.T.near_identity_matrix_positive_solution (κ := F →+* ℝ) M
-  have hex
-      : ∀ i : F →+* ℝ, ∃ v : F, ∀ σ : F →+* ℝ,
-        |σ v - ((if σ = i then 1 else 0) + ε / 2)| < ε / 2 := fun i =>
-    GlobalTheory.T.totally_real_field_dense_embeddings F
-      (fun σ => (if σ = i then 1 else 0) + ε / 2)
-      (ε / 2) (by positivity)
+  have hex : ∀ i : F →+* ℝ, ∃ v : F, ∀ σ : F →+* ℝ,
+      |σ v - ((if σ = i then 1 else 0) + ε / 2)| < ε / 2 :=
+    fun i => GlobalTheory.T.totally_real_field_dense_embeddings F (fun σ => (if σ = i then 1 else 0) + ε / 2) (ε / 2) (by positivity)
   choose v hv using hex
   have hclose : ∀ σ i : F →+* ℝ, |σ (v i) - if σ = i then 1 else 0| < ε := by
     intro σ i
@@ -53,8 +80,8 @@ theorem exists_totPos_basis
   have hli : LinearIndependent ℚ v := by
     rw [Fintype.linearIndependent_iff]
     intro q hq i
-    have hz : (fun i => (q i : ℝ)) = 0 :=
-      h1 _ fun σ => by rw [← map_sum_ratSmul σ q v, hq, map_zero]
+    have hz : (fun i => (q i : ℝ)) = 0 := h1 _ fun σ => by
+      rw [← map_sum_ratSmul σ q v, hq, map_zero]
     have hi : (q i : ℝ) = 0 := congrFun hz i
     exact_mod_cast hi
   have hcardκ : Fintype.card (F →+* ℝ) = Module.finrank ℚ F := by
@@ -64,7 +91,8 @@ theorem exists_totPos_basis
     rw [hcardκ]
     exact Module.finrank_pos
   let b := basisOfLinearIndependentOfCardEqFinrank hli hcardκ
-  have hb : ∀ i, b i = v i := fun i => by simp [b, coe_basisOfLinearIndependentOfCardEqFinrank]
+  have hb : ∀ i, b i = v i := fun i => by
+    simp [b, coe_basisOfLinearIndependentOfCardEqFinrank]
   refine ⟨F →+* ℝ, inferInstance, b, fun i σ => ?_, fun x hx hM i => ?_⟩
   · rw [hb]; exact hpos σ i
   · have hrep : ∀ σ : F →+* ℝ, σ x = ∑ i, σ (v i) * ((b.repr x i : ℚ) : ℝ) := by
@@ -73,12 +101,9 @@ theorem exists_totPos_basis
       congr 1
       conv_lhs => rw [← b.sum_repr x]
       exact Finset.sum_congr rfl fun j _ => by rw [hb]
-    have hc :=
-      h2
-        (fun i => ((b.repr x i : ℚ) : ℝ))
-        (fun σ => by rw [← hrep σ]; exact hx σ)
-        (fun σ τ => by rw [← hrep σ, ← hrep τ]; exact hM σ τ)
-        i
+    have hc := h2 (fun i => ((b.repr x i : ℚ) : ℝ))
+      (fun σ => by rw [← hrep σ]; exact hx σ)
+      (fun σ τ => by rw [← hrep σ, ← hrep τ]; exact hM σ τ) i
     exact_mod_cast hc
 
 end GlobalTheory.CompanionTheory.Hypotheses₂.Shintani.Gens

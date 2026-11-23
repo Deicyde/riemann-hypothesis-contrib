@@ -1,14 +1,46 @@
 module
 
-public import Mathlib
 public import Formalism.LocalToGlobal.IndefiniteReal.FWExist
-public import Formalism.LocalToGlobal.IndefiniteReal.RhoGeo
-public import Formalism.LocalToGlobal.ProjectiveLattices.CuspFormsFiniteDimensionalOf
-public import Formalism.LocalToGlobal.ProjectiveLattices.ThProps
-public import Formalism.LocalToGlobal.ProjectiveLattices.FreeBridge
+public import Formalism.LocalToGlobal.IndefiniteReal.OneMapEq
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.LUnifOfRhoGeoEquivAll
-public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.FiniteGroupActionPreservesPrincipalFlagMultiplic
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.EvalInjective
+public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.FiniteGroupActionPreservesPrincipalFlagMultiplic
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
 
 @[expose] public section
 
@@ -30,7 +62,6 @@ section Model
 
 variable {Ks : Type} [Field Ks] [NumberField Ks] [Algebra Ks D.what₂.LL] (R : RealDat D A Ks)
 
-set_option maxHeartbeats 1000000 in
 theorem exists_lift_act
     {i : Fin D.R.m}
     (σ : D.what₂.LL →+* ℂ)
@@ -45,7 +76,6 @@ theorem exists_lift_act
   rw [dite_eq_left hk]
   simp only [hchi, inv_one, one_mul]
 
-set_option maxHeartbeats 1000000 in
 theorem exists_act_eq
     (hθ : IsInfFam R.θ) (he : R.models_HW)
     (i : Fin D.R.m) (σ : D.what₂.LL →+* ℂ)
@@ -58,7 +88,6 @@ theorem exists_act_eq
   rw [← (he i σ).2.1] at h2
   exact h2
 
-set_option maxHeartbeats 1000000 in
 theorem equiv_of_values
     (hθ : IsInfFam R.θ) (he : R.models_HW)
     {i : Fin D.R.m} {σ : D.what₂.LL →+* ℂ} {v : (R.MW i σ).Vec} (hv : IsUnitV v)
@@ -93,7 +122,6 @@ theorem chiTop_eq {i : Fin D.R.m} (h1 : ∀ g, ∃ a, D.what₂.embLL a = (chiC 
 
 end Model
 
-set_option maxHeartbeats 1000000 in
 theorem reading_equiv_of_not_good
     : ∀ {D : D7} {G : Type} [Group G] [Fintype G] {Pl0 T0 : Type}
         {A : FamIn D.what₂.LL G Pl0 T0 D.R.m} (T : CoreJ D) [Algebra T.Q.c.F D.what₂.LL]

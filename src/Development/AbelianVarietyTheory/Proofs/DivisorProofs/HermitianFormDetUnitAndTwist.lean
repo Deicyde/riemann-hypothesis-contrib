@@ -1,19 +1,57 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.Definitions.Divisors.IsUnifAt
 public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.UnitLemmaGroup
+public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.ContinuousConjFin
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.SigBasisApply
+public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsContinuousPadic
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsAevalEqOfSeparable
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.SesqAsym
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.AntidiagTwistedNorm
 public import Development.AutomorphicArithmetic.IntegralCasts.CapelliIdentities.PhiMulSelf
 public import Development.AutomorphicArithmetic.IntegralCasts.CapelliIdentities.PhiMulTranspose
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.SigBasisApply
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.LinearAlgebra.Charpoly.ToMatrix
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Development.AbelianVarietyTheory.Definitions.Divisors.SimpleTwistedTraceFormulaStable
+import Development.AbelianVarietyTheory.PublishedTheorems.GaloisCohomology₂.BaseChangeDefiniteUnitary
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep
-  Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT
+open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT
 open scoped Classical TensorProduct
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 noncomputable section
@@ -22,43 +60,38 @@ namespace GlobalTheory.GramTwistNorm
 
 open GlobalTheory.UnitLemma
 
-theorem phi_map (a : ℕ) {R : Type} [CommRing R] (c : R →+* R)
-    : (GlobalTheory.Tw.Phi a R).map c = GlobalTheory.Tw.Phi a R := by
+theorem phi_map (a : ℕ) {R : Type} [CommRing R] (c : R →+* R) :
+    (GlobalTheory.Tw.Phi a R).map c = GlobalTheory.Tw.Phi a R := by
   ext i j
   simp only [Matrix.map_apply, GlobalTheory.Tw.Phi, Matrix.of_apply]
   split_ifs <;> simp
 
-theorem phi_mul_self (a : ℕ) {R : Type} [CommRing R]
-    : GlobalTheory.Tw.Phi a R * GlobalTheory.Tw.Phi a R
-      = ((-1 : R) ^ (a - 1)) • (1 : Matrix (Fin a) (Fin a) R) :=
+theorem phi_mul_self (a : ℕ) {R : Type} [CommRing R] :
+    GlobalTheory.Tw.Phi a R * GlobalTheory.Tw.Phi a R = ((-1 : R) ^ (a - 1)) • (1 : Matrix (Fin a) (Fin a) R) :=
   _root_.UpperTheory.Reformulated.B.Yzd3.phi_mul_self a
 
-theorem phi_mul_transpose (a : ℕ) {R : Type} [CommRing R]
-    : GlobalTheory.Tw.Phi a R * (GlobalTheory.Tw.Phi a R)ᵀ = 1 :=
+theorem phi_mul_transpose (a : ℕ) {R : Type} [CommRing R] :
+    GlobalTheory.Tw.Phi a R * (GlobalTheory.Tw.Phi a R)ᵀ = 1 :=
   _root_.UpperTheory.Reformulated.B.Yzd2.phi_mul_transpose a
 
-theorem herm_sum_left
-    {K : UQ} (B : InvAlg K) (β : B.A)
-    {ι : Type} (s : Finset ι) (v : ι → K.E) (x : ι → B.A)
-    (z : B.A)
-    : B.herm β (∑ i ∈ s, v i • x i) z = ∑ i ∈ s, v i * B.herm β (x i) z := by
-  set_option synthInstance.maxHeartbeats 100000 in
+theorem herm_sum_left {K : UQ} (B : InvAlg K) (β : B.A) {ι : Type} (s : Finset ι) (v : ι → K.E)
+    (x : ι → B.A) (z : B.A) :
+    B.herm β (∑ i ∈ s, v i • x i) z = ∑ i ∈ s, v i * B.herm β (x i) z := by
+
   simp only [InvAlg.herm, Finset.mul_sum, Finset.sum_mul, map_sum, mul_smul_comm, smul_mul_assoc,
-    map_smul, smul_eq_mul]
+  map_smul, smul_eq_mul]
 
-theorem herm_sum_right
-    {K : UQ} (B : InvAlg K) (β y : B.A) {ι : Type} (s : Finset ι) (r : ι → K.E) (x : ι → B.A)
-    : B.herm β y (∑ i ∈ s, r i • x i) = ∑ i ∈ s, K.c (r i) * B.herm β y (x i) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [InvAlg.herm, map_sum, Finset.mul_sum]
+theorem herm_sum_right {K : UQ} (B : InvAlg K) (β y : B.A) {ι : Type} (s : Finset ι) (r : ι → K.E)
+    (x : ι → B.A) :
+    B.herm β y (∑ i ∈ s, r i • x i) = ∑ i ∈ s, K.c (r i) * B.herm β y (x i) := by
+
+  simp only [InvAlg.herm, map_sum, Finset.mul_sum]
   refine Finset.sum_congr rfl fun i _ => ?_
-  rw [Algebra.smul_def, RingEquiv.map_mul B.σ, B.σ_alg, ← Algebra.smul_def, mul_smul_comm, map_smul,
-    smul_eq_mul]
+  rw [Algebra.smul_def, RingEquiv.map_mul B.σ, B.σ_alg, ← Algebra.smul_def, mul_smul_comm, map_smul, smul_eq_mul]
 
-theorem gram_det_ne_zero
-    {K : UQ} (B : InvAlg K) (hsep : B.P.Separable) (β : B.Aˣ)
-    {a : ℕ} (b : Module.Basis (Fin a) K.E B.A)
-    : (Matrix.of fun i j => B.herm β (b i) (b j)).det ≠ 0 := by
+theorem gram_det_ne_zero {K : UQ} (B : InvAlg K) (hsep : B.P.Separable) (β : B.Aˣ) {a : ℕ}
+    (b : Module.Basis (Fin a) K.E B.A) :
+    (Matrix.of fun i j => B.herm β (b i) (b j)).det ≠ 0 := by
   intro h0
   obtain ⟨v, hv0, hv⟩ := Matrix.exists_vecMul_eq_zero_iff.2 h0
   set y := ∑ i, v i • b i with hy
@@ -85,32 +118,15 @@ theorem gram_det_ne_zero
     exact this
   exact hy0 ((Units.mul_right_eq_zero β).1 hβy)
 
-theorem gram_map_conj
-    {K : UQ} (B : InvAlg K)
-    (L : Type) [Field L]
-    (e : K.E ≃+* L) (c : L →+* L) (hec : ∀ x, e (K.c x) = c (e x))
-    (a : ℕ) (β : B.A) (hβ : B.σ β = β * ((-1) ^ (a - 1) * B.g))
-    (b : Module.Basis (Fin a) K.E B.A)
-    : ((Matrix.of fun i j => B.herm β (b i) (b j)).map e).map c
-      = ((-1 : L) ^ (a - 1))
-        • (((Matrix.of fun i j => B.herm β (b i) (b j)).map e)ᵀ
-          * (LinearMap.toMatrix b b (LinearMap.mulLeft K.E B.g)).map e) :=
+theorem gram_map_conj {K : UQ} (B : InvAlg K) (L : Type) [Field L] (e : K.E ≃+* L) (c : L →+* L)
+    (hec : ∀ x, e (K.c x) = c (e x)) (a : ℕ) (β : B.A)
+    (hβ : B.σ β = β * ((-1) ^ (a - 1) * B.g)) (b : Module.Basis (Fin a) K.E B.A) :
+    ((Matrix.of fun i j => B.herm β (b i) (b j)).map e).map c =
+      ((-1 : L) ^ (a - 1)) • (((Matrix.of fun i j => B.herm β (b i) (b j)).map e)ᵀ *
+        (LinearMap.toMatrix b b (LinearMap.mulLeft K.E B.g)).map e) :=
   _root_.GlobalTheory.ScalarSigmaBasis.main B L e c hec a β hβ b
 
-theorem gram_twisted_norm_charpoly
-    : ∀ (K : GlobalTheory.UnitLemma.UQ) (B : GlobalTheory.UnitLemma.InvAlg K) (L : Type) [Field L]
-        (e : K.E ≃+* L) (c : L →+* L),
-      (∀ x, e (K.c x) = c (e x)) → (∀ x, c (c x) = x)
-        → ∀ (a : ℕ) (Q : L[X]),
-          B.P = Q.map e.symm.toRingHom → Q.Separable → Q.natDegree = a
-            → ∀ β : B.Aˣ,
-              B.σ (β : B.A) = β * ((-1) ^ (a - 1) * B.g)
-                → ∀ b : Module.Basis (Fin a) K.E B.A,
-                  IsUnit (Matrix.of fun i j => e (B.herm β (b i) (b j))).det
-                    ∧ ∀ δ : GL (Fin a) L,
-                      ((δ.val * GlobalTheory.Tw.Phi a L)⁻¹)ᵀ
-                          = (Matrix.of fun i j => e (B.herm β (b i) (b j)))
-                        → (δ * thetaGL a c δ).val.charpoly = Q := by
+theorem gram_twisted_norm_charpoly : ∀ (K : GlobalTheory.UnitLemma.UQ) (B : GlobalTheory.UnitLemma.InvAlg K) (L : Type) [Field L] (e : K.E ≃+* L) (c : L →+* L), (∀ x, e (K.c x) = c (e x)) → (∀ x, c (c x) = x) → ∀ (a : ℕ) (Q : L[X]), B.P = Q.map e.symm.toRingHom → Q.Separable → Q.natDegree = a → ∀ β : B.Aˣ, B.σ (β : B.A) = β * ((-1) ^ (a - 1) * B.g) → ∀ b : Module.Basis (Fin a) K.E B.A, IsUnit (Matrix.of fun i j => e (B.herm β (b i) (b j))).det ∧ ∀ δ : GL (Fin a) L, ((δ.val * GlobalTheory.Tw.Phi a L)⁻¹)ᵀ = (Matrix.of fun i j => e (B.herm β (b i) (b j))) → (δ * thetaGL a c δ).val.charpoly = Q := by
   intro K B L _ e c hec hcc a Q hPQ hQs hQd β hβ b
   set S : Matrix (Fin a) (Fin a) K.E := Matrix.of fun i j => B.herm β (b i) (b j) with hS
   have hG : (Matrix.of fun i j => e (B.herm β (b i) (b j))) = S.map e := rfl
@@ -131,9 +147,7 @@ theorem gram_twisted_norm_charpoly
       have h1 : (δ.val * Φ)⁻¹ = Gᵀ := by rw [← hδ, Matrix.transpose_transpose]
       have hΦinv : Φ⁻¹ = Φᵀ := Matrix.inv_eq_right_inv (phi_mul_transpose a)
       rw [Matrix.mul_inv_rev, hΦinv, ← Matrix.coe_units_inv] at h1
-      calc
-        (δ⁻¹).val
-          = Φ * Φᵀ * (δ⁻¹).val := by rw [hΦ, phi_mul_transpose, Matrix.one_mul]
+      calc (δ⁻¹).val = Φ * Φᵀ * (δ⁻¹).val := by rw [hΦ, phi_mul_transpose, Matrix.one_mul]
         _ = Φ * Gᵀ := by rw [Matrix.mul_assoc, h1]
     have hθ : (thetaGL a c δ).val = Φ * ((δ⁻¹).val.map c)ᵀ * Φᵀ := rfl
     have hΦΦ : Φᵀ * Φᵀ = ((-1 : L) ^ (a - 1)) • (1 : Matrix (Fin a) (Fin a) L) := by
@@ -142,21 +156,19 @@ theorem gram_twisted_norm_charpoly
     have key : (δ * thetaGL a c δ).val = P := by
       rw [Units.val_mul, hθ, hinv, Matrix.map_mul, hΦ, phi_map, ← hΦ, Matrix.transpose_mul,
         Matrix.transpose_map, Matrix.transpose_transpose, hGc]
-      calc
-        δ.val * (Φ * ((-1 : L) ^ (a - 1) • (Gᵀ * P) * Φᵀ) * Φᵀ)
-            = ((-1 : L) ^ (a - 1)) • ((δ.val * Φ * Gᵀ) * P * (Φᵀ * Φᵀ)) := by
-          simp only [Matrix.mul_smul, Matrix.smul_mul, Matrix.mul_assoc]
+      calc δ.val * (Φ * ((-1 : L) ^ (a - 1) • (Gᵀ * P) * Φᵀ) * Φᵀ)
+          = ((-1 : L) ^ (a - 1)) • ((δ.val * Φ * Gᵀ) * P * (Φᵀ * Φᵀ)) := by
+            simp only [Matrix.mul_smul, Matrix.smul_mul, Matrix.mul_assoc]
         _ = P := by
-          rw [hδΦ, hΦΦ, Matrix.one_mul, Matrix.mul_smul, Matrix.mul_one, smul_smul, ← mul_pow,
-            neg_one_mul, neg_neg, one_pow, one_smul]
-    rw [key, hP,
-      show (LinearMap.toMatrix b b (LinearMap.mulLeft K.E B.g)).map e
-          = (LinearMap.toMatrix b b (LinearMap.mulLeft K.E B.g)).map (e : K.E →+* L) from
-        rfl,
+            rw [hδΦ, hΦΦ, Matrix.one_mul, Matrix.mul_smul, Matrix.mul_one, smul_smul, ← mul_pow,
+              neg_one_mul, neg_neg, one_pow, one_smul]
+    rw [key, hP, show (LinearMap.toMatrix b b (LinearMap.mulLeft K.E B.g)).map e =
+      (LinearMap.toMatrix b b (LinearMap.mulLeft K.E B.g)).map (e : K.E →+* L) from rfl,
       Matrix.charpoly_map, LinearMap.charpoly_toMatrix]
     change B.P.map (e : K.E →+* L) = Q
     rw [hPQ, Polynomial.map_map]
-    have : (e : K.E →+* L).comp e.symm.toRingHom = RingHom.id L := by ext x; simp
+    have : (e : K.E →+* L).comp e.symm.toRingHom = RingHom.id L := by
+      ext x; simp
     rw [this, Polynomial.map_id]
 
 end GlobalTheory.GramTwistNorm

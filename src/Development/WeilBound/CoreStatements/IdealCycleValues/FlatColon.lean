@@ -1,6 +1,59 @@
 module
 
-public import Mathlib
+public import Mathlib.RingTheory.Flat.Basic
+public import Mathlib.RingTheory.Ideal.Colon
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.MvPolynomial.IrreducibleQuadratic
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
+public import Mathlib.LinearAlgebra.Basis.VectorSpace
+public import Mathlib.RingTheory.Flat.EquationalCriterion
+public import Mathlib.RingTheory.Flat.Stability
+public import Mathlib.RingTheory.Ideal.BigOperators
 
 @[expose] public section
 
@@ -8,11 +61,9 @@ namespace BaseChangeColon.BC
 
 open MvPolynomial
 
-theorem flat_colon
-    {R R' : Type*} [CommRing R] [CommRing R'] [Algebra R R'] [Module.Flat R R']
-    (I : Ideal R) (x : R)
-    : (I.map (algebraMap R R')).colon {algebraMap R R' x}
-      = (I.colon {x}).map (algebraMap R R') := by
+theorem flat_colon {R R' : Type*} [CommRing R] [CommRing R'] [Algebra R R'] [Module.Flat R R']
+    (I : Ideal R) (x : R) :
+    (I.map (algebraMap R R')).colon {algebraMap R R' x} = (I.colon {x}).map (algebraMap R R') := by
   apply le_antisymm
   · intro g hg
     rw [Submodule.mem_colon_singleton, smul_eq_mul] at hg
@@ -24,11 +75,8 @@ theorem flat_colon
       rw [mul_comm, ← ht, add_neg_eq_zero]
       refine Finset.sum_congr rfl fun i _ => ?_
       rw [hj', smul_eq_mul, mul_comm]
-    obtain ⟨k, a, y, h1, h2⟩ :=
-      Module.Flat.isTrivialRelation_of_sum_smul_eq_zero (R := R) (M := R')
-        (f := fun o : Option (Fin n) => o.elim x fun i => - j i)
-        (x := fun o => o.elim g c)
-        hrel
+    obtain ⟨k, a, y, h1, h2⟩ := Module.Flat.isTrivialRelation_of_sum_smul_eq_zero (R := R) (M := R')
+      (f := fun o : Option (Fin n) => o.elim x fun i => -j i) (x := fun o => o.elim g c) hrel
     have hg' : g = ∑ l, a none l • y l := h1 none
     rw [hg']
     refine Ideal.sum_mem _ fun l _ => ?_
@@ -48,24 +96,22 @@ theorem flat_colon
 
 attribute [local instance] MvPolynomial.algebraMvPolynomial
 
-theorem map_colon
-    {O O' σ : Type} [CommRing O] [CommRing O'] [Algebra O O'] [Module.Flat O O']
-    (I : Ideal (MvPolynomial σ O)) (x : MvPolynomial σ O)
-    : (I.map (MvPolynomial.map (algebraMap O O'))).colon {MvPolynomial.map (algebraMap O O') x}
-      = (I.colon {x}).map (MvPolynomial.map (algebraMap O O')) := by
-  have hb := (inferInstance : Algebra.IsPushout O (MvPolynomial σ O) O' (MvPolynomial σ O')).out
+theorem map_colon {O O' σ : Type} [CommRing O] [CommRing O'] [Algebra O O'] [Module.Flat O O']
+    (I : Ideal (MvPolynomial σ O)) (x : MvPolynomial σ O) :
+    (I.map (MvPolynomial.map (algebraMap O O'))).colon {MvPolynomial.map (algebraMap O O') x} =
+      (I.colon {x}).map (MvPolynomial.map (algebraMap O O')) := by
+  have hb := (inferInstance :
+    Algebra.IsPushout O (MvPolynomial σ O) O' (MvPolynomial σ O')).out
   haveI : Module.Flat (MvPolynomial σ O) (MvPolynomial σ O') :=
     Module.Flat.isBaseChange O (MvPolynomial σ O) O' (MvPolynomial σ O') hb
   exact flat_colon (R' := MvPolynomial σ O') I x
 
-theorem ram_colon
-    {O O' σ : Type} [CommRing O] [CommRing O'] [IsDomain O'] [Algebra O O']
-    (ϖ : O) (hm : (Ideal.span {ϖ}).IsMaximal)
-    (ϖ' : O') (h0 : ϖ' ≠ 0)
-    (u : O'ˣ) (e k : ℕ) (he : algebraMap O O' ϖ = u * ϖ' ^ e) (hk : k < e)
-    (J : Ideal (MvPolynomial σ O)) (hJ : C ϖ ∈ J)
-    (g : MvPolynomial σ O') (hg : C ϖ' ^ k * g ∈ J.map (MvPolynomial.map (algebraMap O O')))
-    : g ∈ J.map (MvPolynomial.map (algebraMap O O')) ⊔ Ideal.span {C ϖ'} := by
+theorem ram_colon {O O' σ : Type} [CommRing O] [CommRing O'] [IsDomain O'] [Algebra O O'] (ϖ : O)
+    (hm : (Ideal.span {ϖ}).IsMaximal) (ϖ' : O') (h0 : ϖ' ≠ 0) (u : O'ˣ) (e k : ℕ)
+    (he : algebraMap O O' ϖ = u * ϖ' ^ e) (hk : k < e) (J : Ideal (MvPolynomial σ O))
+    (hJ : C ϖ ∈ J) (g : MvPolynomial σ O')
+    (hg : C ϖ' ^ k * g ∈ J.map (MvPolynomial.map (algebraMap O O'))) :
+    g ∈ J.map (MvPolynomial.map (algebraMap O O')) ⊔ Ideal.span {C ϖ'} := by
   classical
   set J' := J.map (MvPolynomial.map (algebraMap O O')) with hJ'
   set m : Ideal O := Ideal.span {ϖ} with hmdef
@@ -78,7 +124,8 @@ theorem ram_colon
     IsScalarTower.of_algebraMap_eq fun _ => rfl
   obtain ⟨ι, ⟨b⟩⟩ : ∃ ι : Type, Nonempty (Module.Basis ι (O ⧸ m) (MvPolynomial σ O ⧸ J)) :=
     ⟨_, ⟨Module.Basis.ofVectorSpace _ _⟩⟩
-  have hb := (inferInstance : Algebra.IsPushout O O' (MvPolynomial σ O) (MvPolynomial σ O')).out
+  have hb := (inferInstance :
+    Algebra.IsPushout O O' (MvPolynomial σ O) (MvPolynomial σ O')).out
   set m' : Ideal O' := Ideal.span {algebraMap O O' ϖ} with hm'
   have hle' : m ≤ m'.comap (Algebra.ofId O O') := by
     rw [hmdef, Ideal.span_le, Set.singleton_subset_iff]
@@ -109,13 +156,12 @@ theorem ram_colon
     | smul a x _ hx => intro h; rw [smul_eq_mul, ← mul_assoc, hx]
   choose B hB using fun i => Ideal.Quotient.mk_surjective (I := J) (b i)
   let U : Submodule O' (MvPolynomial σ O') :=
-    Submodule.span O' (Set.range fun i => MvPolynomial.map (algebraMap O O') (B i))
-      ⊔ J'.restrictScalars O'
+    Submodule.span O' (Set.range fun i => MvPolynomial.map (algebraMap O O') (B i)) ⊔
+      J'.restrictScalars O'
   have hJU : ∀ s ∈ J, MvPolynomial.map (algebraMap O O') s ∈ U := fun s hs =>
     Submodule.mem_sup_right (Ideal.mem_map_of_mem _ hs)
-  have hU1
-      : ∀ x ∈ Submodule.span (O ⧸ m) (Set.range b), ∀ s,
-        Ideal.Quotient.mk J s = x → MvPolynomial.map (algebraMap O O') s ∈ U := by
+  have hU1 : ∀ x ∈ Submodule.span (O ⧸ m) (Set.range b), ∀ s, Ideal.Quotient.mk J s = x →
+      MvPolynomial.map (algebraMap O O') s ∈ U := by
     intro x hx
     induction hx using Submodule.span_induction with
     | mem x hx =>
@@ -125,8 +171,7 @@ theorem ram_colon
       have h2 : MvPolynomial.map (algebraMap O O') (B i) ∈ U :=
         Submodule.mem_sup_left (Submodule.subset_span ⟨i, rfl⟩)
       simpa using U.add_mem h1 h2
-    | zero =>
-      exact fun s hs => hJU s (Ideal.Quotient.eq_zero_iff_mem.1 hs)
+    | zero => exact fun s hs => hJU s (Ideal.Quotient.eq_zero_iff_mem.1 hs)
     | add x y _ _ hx hy =>
       intro s hs
       obtain ⟨s1, rfl⟩ := Ideal.Quotient.mk_surjective x
@@ -155,10 +200,9 @@ theorem ram_colon
   refine Ideal.add_mem _ (Ideal.mem_sup_right ?_) (Ideal.mem_sup_left hw)
   refine Ideal.sum_mem _ fun i hi => ?_
   have h1 := hkill i _ hg
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [← C_pow, ← smul_eq_C_mul, map_smul, map_add (f := _), hkill i w hw, add_zero, Finsupp.sum,
-        map_sum, Finset.sum_eq_single i]
-      at h1
+
+  rw [← C_pow, ← smul_eq_C_mul, map_smul, map_add (f := _), hkill i w hw, add_zero, Finsupp.sum, map_sum,
+  Finset.sum_eq_single i] at h1
   · rw [map_smul, hΛ, hlam, hB] at h1
     have h2 : Ideal.Quotient.mk m' (ϖ' ^ k * c i) = 0 := by
       rw [← h1]
@@ -168,8 +212,7 @@ theorem ram_colon
     obtain ⟨r, rfl⟩ := Nat.exists_eq_add_of_lt hk
     have h3 : c i = ϖ' * (z * u * ϖ' ^ r) := by
       apply mul_left_cancel₀ (pow_ne_zero k h0)
-      rw [← hz]
-      ring
+      rw [← hz]; ring
     change c i • _ ∈ _
     rw [h3, smul_eq_C_mul, C_mul, mul_assoc]
     exact Ideal.mul_mem_right _ _ (Ideal.mem_span_singleton_self _)

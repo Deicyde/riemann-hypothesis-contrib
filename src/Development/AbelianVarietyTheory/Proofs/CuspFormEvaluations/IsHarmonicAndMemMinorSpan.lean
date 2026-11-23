@@ -1,10 +1,61 @@
 module
 
-public import Mathlib
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.FundamentalDomains.FlowCoefficientBounds
-public import Development.AbelianVarietyTheory.Proofs.CovolumeBounds.IsHarmonicProdOfDisjointColumns
 public import Development.AbelianVarietyTheory.Proofs.CuspFormEvaluations.MatRmulUnipMulHeadProj
+public import Development.AbelianVarietyTheory.Proofs.CuspFormEvaluations.HasSumPolyDerivMulProdAddMatrix
+public import Development.AbelianVarietyTheory.Proofs.CuspFormEvaluations.PolyDerivVanishesOfTranslationInvariance
+import Development.AbelianVarietyTheory.Proofs.CovolumeBounds.DifferentiableOnOfTendstoLocallyUniformlyOn
+public import Development.AbelianVarietyTheory.Proofs.CovolumeBounds.DualRestrictSurjectiveOfIsTorsionFreeQuotient
+import Development.AbelianVarietyTheory.Proofs.CuspFormEvaluations.DifferentiableOnDetHMat
 public import Development.AbelianVarietyTheory.Proofs.CuspFormEvaluations.ExistsSymplecticCoordinatesAdapted
+import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.DetOfTriangular
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Ring.IsFormallyReal
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Coalgebra.IsFrobenius
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.TotallySplit
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.FundamentalDomains.LminorSubmatrixCastSucc
+import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
@@ -226,8 +277,8 @@ theorem dot_cuspMat (u : Fin g → ℝ) (τ : X.Ψ)
         = ((∑ j, (u j : ℂ) * cuspLin X bas ξ τ j)
           * conj (∑ j, (u j : ℂ) * cuspLin X bas ξ τ j)).re := by
     rw [mul_conj, normSq_eq_norm_sq, ofReal_re]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [cuspNu, h, map_sum, Finset.sum_mul_sum, re_sum, ← mul_assoc, Finset.mul_sum, dotProduct]
+
+  rw [cuspNu, h, map_sum, Finset.sum_mul_sum, re_sum, ← mul_assoc, Finset.mul_sum, dotProduct]
   refine Finset.sum_congr rfl fun j _ => ?_
   rw [re_sum, mulVec, dotProduct, Finset.mul_sum, Finset.mul_sum]
   refine Finset.sum_congr rfl fun k _ => ?_
@@ -674,8 +725,8 @@ theorem IsAdapted.flowCoeff_eq_zero
   rw [Finset.sum_apply, Finset.sum_eq_zero_iff_of_nonneg fun k _ => cuspNu_nonneg X bas ξ _ τ] at hm
   have h1 (k) := (cuspNu_eq_zero_iff X bas ξ _ τ).1 (hm k (Finset.mem_univ _))
   have h2 (k) := congrArg conj (h1 k)
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, map_mul, conj_ofReal, map_zero] at h2
+
+  simp only [map_sum, map_mul, conj_ofReal, map_zero] at h2
   push_cast at h1 h2
   refine mul_eq_zero_of_right _ ?_
   rcases hc with ⟨i, hi, hc⟩ | ⟨i, hi, hc⟩

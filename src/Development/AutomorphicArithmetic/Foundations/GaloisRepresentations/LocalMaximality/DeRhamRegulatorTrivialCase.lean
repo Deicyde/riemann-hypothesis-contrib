@@ -1,9 +1,59 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentations.LocalMaximality.DualForm
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.StandardAffineOpenRingPolynomialEquivStatement
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.MemStandardOpenCoordinateRingIffLocalizationCharStatement
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.StandardAffineOpenRingPolynomialEquivStatement
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Henselian
+public import Mathlib.RingTheory.MvPolynomial.Ideal
+import Mathlib.RingTheory.MvPolynomial.IrreducibleQuadratic
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Lemma
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
@@ -116,8 +166,8 @@ private lemma poly_reg {A : Type} [CommRing A] {d : ℕ} (y : Fin d → A) (k : 
     intro φ a b hab q hq
     obtain ⟨c, hc, rfl⟩ := (mem_span_image_iff' a _ q).1 hq
     refine (mem_span_image_iff' b _ _).2 ⟨fun l => φ (c l), fun l hl => by simp [hc l hl], ?_⟩
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp [map_sum, hab]
+
+    simp [map_sum, hab]
   have h1 := himg σ _ _ hσ _ h
   rw [map_mul, hσ] at h1
   have h2 := X_mul_mem {l | l < k} k (by simp) _ h1
@@ -148,8 +198,8 @@ private lemma reg_abs {S P : Type} [CommRing S] [Algebra ℂ S] [CommRing P] {d 
     rw [hq, hc0 l hl]; simp
   have heq : g k * p = ∑ l, g l * q l := by
     apply hφ
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_mul, map_sum, hp, hq]
+
+    simp only [map_mul, map_sum, hp, hq]
     have hkm : φ (g k) * m = ∑ l, φ (g l) * c l := by simpa using hc
     calc φ (g k) * ((s : S) ^ N * m) = (s : S) ^ N * (φ (g k) * m) := by ring
       _ = _ := by rw [hkm, Finset.mul_sum]; exact Finset.sum_congr rfl fun l _ => by ring
@@ -162,8 +212,8 @@ private lemma reg_abs {S P : Type} [CommRing S] [Algebra ℂ S] [CommRing P] {d 
     rw [← mul_pow, Units.inv_mul, one_pow]
   calc m = ((s⁻¹ : Sˣ) : S) ^ N * ((s : S) ^ N * m) := by rw [← mul_assoc, hsN, one_mul]
     _ = _ := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [← hp, hq', map_sum, Finset.mul_sum]
+
+      rw [← hp, hq', map_sum, Finset.mul_sum]
       exact Finset.sum_congr rfl fun l _ => by rw [map_mul]; ring
 
 private lemma exists_phi {F : Type} [Field F] [Algebra ℂ F] {d : ℕ} (x : Fin (d + 1) → Fˣ) (h : IsPd ℂ (xv x))

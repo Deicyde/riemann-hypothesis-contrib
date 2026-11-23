@@ -1,9 +1,47 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.Definitions.Divisors.CentreAtOfIsAt
-public import Development.AbelianVarietyTheory.Definitions.Divisors.ExistsIsLogMult
+public import Development.AbelianVarietyTheory.Definitions.Divisors.IsUnitMkOfFormallyUnramified
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsJacobianSectionIsUnitGermOfLocalIso
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.TypeStar
+import Development.AbelianVarietyTheory.Definitions.Divisors.CentreAtOfIsAt
+import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.IsLogCanonicalMultipleCanonical
 
 @[expose] public section
 
@@ -13,39 +51,34 @@ noncomputable section
 
 open scoped TensorProduct
 open CategoryTheory AlgebraicGeometry TopologicalSpace Filter
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
-  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.AnForm.R
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.AnForm.R
 open ReciprocityTheory.ChartRestriction.G.Out (nonzeroLocus)
 open ReciprocityTheory.ChartRestriction.G.DVR.FlatBC (algX)
-open GlobalTheory GlobalTheory.CechPic GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.QCoh
-  GlobalTheory.Discrepancy GlobalTheory.PairStep
+open GlobalTheory GlobalTheory.CechPic GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.QCoh GlobalTheory.Discrepancy GlobalTheory.PairStep
 
 namespace GlobalTheory.CotIndep
 
 open IsLocalRing TensorProduct
 
-theorem tmul_D_eq_zero_of_mem_sq
-    (k P : Type*) [CommRing k] [CommRing P] [IsLocalRing P] [Algebra k P]
-    {x : P} (hx : x ∈ maximalIdeal P ^ 2)
-    : (1 : ResidueField P) ⊗ₜ[P] KaehlerDifferential.D k P x = 0 := by
+theorem tmul_D_eq_zero_of_mem_sq (k P : Type*) [CommRing k] [CommRing P] [IsLocalRing P]
+    [Algebra k P] {x : P} (hx : x ∈ maximalIdeal P ^ 2) :
+    (1 : ResidueField P) ⊗ₜ[P] KaehlerDifferential.D k P x = 0 := by
   have hker : RingHom.ker (algebraMap P (ResidueField P)) = maximalIdeal P := ker_residue
   have hx' : x ∈ RingHom.ker (algebraMap P (ResidueField P)) := by
     rw [hker]; exact Ideal.pow_le_self two_ne_zero hx
   have h0 : (RingHom.ker (algebraMap P (ResidueField P))).toCotangent ⟨x, hx'⟩ = 0 := by
     rw [Ideal.toCotangent_eq_zero]
     change x ∈ _ ^ 2
-    rw [hker]
-    exact hx
+    rw [hker]; exact hx
   have := congrArg (KaehlerDifferential.kerCotangentToTensor k P (ResidueField P)) h0
   rwa [KaehlerDifferential.kerCotangentToTensor_toCotangent, map_zero] at this
 
-theorem linearIndependent_toCotangent
-    {k A P : Type*} [CommRing k] [CommRing A] [CommRing P] [IsLocalRing P]
-    (α : k →+* A)
-    (ρ : A →+* P) (hρ : letI := ρ.toAlgebra; Algebra.FormallyEtale A P)
-    {n : ℕ} (z : Fin n → A) (hω : IsFreeGen A (dForm α z)) (J : Finset (Fin n))
-    (hz : ∀ j : J, ρ (z j) ∈ maximalIdeal P)
-    : LinearIndependent (ResidueField P)
+theorem linearIndependent_toCotangent {k A P : Type*} [CommRing k] [CommRing A] [CommRing P]
+    [IsLocalRing P] (α : k →+* A) (ρ : A →+* P)
+    (hρ : letI := ρ.toAlgebra; Algebra.FormallyEtale A P) {n : ℕ} (z : Fin n → A)
+    (hω : IsFreeGen A (dForm α z)) (J : Finset (Fin n))
+    (hz : ∀ j : J, ρ (z j) ∈ maximalIdeal P) :
+    LinearIndependent (ResidueField P)
       (fun j : J => ((maximalIdeal P).toCotangent ⟨ρ (z j), hz j⟩ : CotangentSpace P)) := by
   classical
   have h1 : IsFreeGen P (dForm (ρ.comp α) fun i => ρ (z i)) := by
@@ -54,9 +87,8 @@ theorem linearIndependent_toCotangent
   letI := (ρ.comp α).toAlgebra
   set κ := ResidueField P
   let φ : Omega (ρ.comp α) →ₗ[P] κ ⊗[P] Omega (ρ.comp α) := TensorProduct.mk P κ _ 1
-  have h2 :=
-    h1.of_isBaseChange (isBaseChange_exteriorPower
-      (TensorProduct.isBaseChange P (Omega (ρ.comp α)) κ) n)
+  have h2 := h1.of_isBaseChange
+    (isBaseChange_exteriorPower (TensorProduct.isBaseChange P (Omega (ρ.comp α)) κ) n)
   rw [dForm_eq, exteriorPowerMapOver_ιMulti] at h2
   have h3 : exteriorPower.ιMulti κ n (fun i => φ (dFun (ρ.comp α) (ρ (z i)))) ≠ 0 := by
     intro h0
@@ -70,11 +102,10 @@ theorem linearIndependent_toCotangent
   intro g hg i
   choose b hb using fun j => residue_surjective (R := P) (g j)
   have hsq : ∑ j : J, b j * ρ (z j) ∈ maximalIdeal P ^ 2 := by
-    have e
-        : ∑ j : J, g j • ((maximalIdeal P).toCotangent ⟨ρ (z j), hz j⟩ : CotangentSpace P)
-          = (maximalIdeal P).toCotangent (∑ j : J, b j • (⟨ρ (z j), hz j⟩ : maximalIdeal P)) := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum]
+    have e : ∑ j : J, g j • ((maximalIdeal P).toCotangent ⟨ρ (z j), hz j⟩ : CotangentSpace P) =
+        (maximalIdeal P).toCotangent (∑ j : J, b j • (⟨ρ (z j), hz j⟩ : maximalIdeal P)) := by
+
+      rw [map_sum]
       refine Finset.sum_congr rfl fun j _ => ?_
       rw [map_smul, ← hb j, ← ResidueField.algebraMap_eq, algebraMap_smul]
     rw [e, Ideal.toCotangent_eq_zero] at hg
@@ -83,8 +114,8 @@ theorem linearIndependent_toCotangent
   have htk : ∀ j : J, algebraMap P κ (ρ (z j)) = 0 := fun j => by
     rw [ResidueField.algebraMap_eq]; exact (residue_eq_zero_iff _).2 (hz j)
   refine h5 g ?_ i
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [← h0, map_sum, tmul_sum]
+
+  rw [← h0, map_sum, tmul_sum]
   refine Finset.sum_congr rfl fun j _ => ?_
   rw [Derivation.leibniz, tmul_add, ← smul_tmul, ← smul_tmul, Algebra.smul_def, mul_one,
     Algebra.smul_def, mul_one, htk, zero_tmul, add_zero, ← hb j, ← ResidueField.algebraMap_eq]
@@ -95,18 +126,7 @@ end GlobalTheory.CotIndep
 
 namespace GlobalTheory.CotIndep
 
-theorem linearIndependent_cotangent_of_isFrame
-    : ∀ (Y : Scheme.{0}) [IsIntegral Y] [IsLocallyNoetherian Y] (q : Y ⟶ Sp ℂ) (n : ℕ)
-        [SmoothOfRelativeDimension n q],
-      ∀ (U : Y.Opens) (z : Fin n → Γ(Y, U)),
-        IsFrame (dOn q z)
-          → ∀ (y : Y) (hy : y ∈ U) (J : Finset (Fin n))
-              (hz : ∀ j : J,
-                Y.presheaf.germ U y hy (z j) ∈ IsLocalRing.maximalIdeal (Y.presheaf.stalk y)),
-            LinearIndependent (IsLocalRing.ResidueField (Y.presheaf.stalk y)) (fun j : J =>
-              ((IsLocalRing.maximalIdeal (Y.presheaf.stalk y)).toCotangent
-                  ⟨(fun j : J => Y.presheaf.germ U y hy (z j)) j, hz j⟩
-                : IsLocalRing.CotangentSpace (Y.presheaf.stalk y))) := by
+theorem linearIndependent_cotangent_of_isFrame : ∀ (Y : Scheme.{0}) [IsIntegral Y] [IsLocallyNoetherian Y] (q : Y ⟶ Sp ℂ) (n : ℕ) [SmoothOfRelativeDimension n q], ∀ (U : Y.Opens) (z : Fin n → Γ(Y, U)), IsFrame (dOn q z) → ∀ (y : Y) (hy : y ∈ U) (J : Finset (Fin n)) (hz : ∀ j : J, Y.presheaf.germ U y hy (z j) ∈ IsLocalRing.maximalIdeal (Y.presheaf.stalk y)), LinearIndependent (IsLocalRing.ResidueField (Y.presheaf.stalk y)) (fun j : J => ((IsLocalRing.maximalIdeal (Y.presheaf.stalk y)).toCotangent ⟨(fun j : J => Y.presheaf.germ U y hy (z j)) j, hz j⟩ : IsLocalRing.CotangentSpace (Y.presheaf.stalk y))) := by
   intro Y _ _ q n _ U z hf y hy J hz
   exact linearIndependent_toCotangent (algX q U) (Y.presheaf.germ U y hy).hom
     (MorJac.formallyEtale_germ hf.affine y hy) z hf.gen J hz

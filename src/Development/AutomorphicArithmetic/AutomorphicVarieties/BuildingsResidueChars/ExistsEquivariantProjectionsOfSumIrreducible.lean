@@ -1,21 +1,65 @@
 module
 
-public import Mathlib
+public import Mathlib.Basic.Complex.Basic
+public import Mathlib.Order.CompletePartialOrder
+public import Mathlib.RepresentationTheory.Basic
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+public import Mathlib.RepresentationTheory.Submodule
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
+public import Mathlib.RingTheory.SimpleModule.Basic
 
 @[expose] public section
 
 open scoped MonoidAlgebra
 
-private theorem ss_proj
-    {R V : Type} [Ring R] [AddCommGroup V] [Module R V] [IsSemisimpleModule R V] (s : Finset V)
-    : ∃ (κ : Type) (_ : Fintype κ) (S : κ → Submodule R V) (P : κ → V →ₗ[R] V),
+private theorem ss_proj {R V : Type} [Ring R] [AddCommGroup V] [Module R V]
+    [IsSemisimpleModule R V] (s : Finset V) :
+    ∃ (κ : Type) (_ : Fintype κ) (S : κ → Submodule R V) (P : κ → V →ₗ[R] V),
       (∀ i, IsAtom (S i)) ∧ (∀ i w, P i w ∈ S i) ∧ ∀ w ∈ s, ∑ i, P i w = w := by
   classical
   obtain ⟨t, e, -, ht⟩ := IsSemisimpleModule.exists_linearEquiv_dfinsupp R V
   let K : Finset t := s.biUnion fun w => (e w).support
   let Q : t → V →ₗ[R] V := fun m =>
-    e.symm.toLinearMap ∘ₗ DFinsupp.lsingle (R := R) (M := fun m : t => m.1) m
-      ∘ₗ DFinsupp.lapply (R := R) (M := fun m : t => m.1) m ∘ₗ e.toLinearMap
+    e.symm.toLinearMap ∘ₗ DFinsupp.lsingle (R := R) (M := fun m : t => m.1) m ∘ₗ
+      DFinsupp.lapply (R := R) (M := fun m : t => m.1) m ∘ₗ e.toLinearMap
   let j : (m : t) → (m.1 →ₗ[R] V) := fun m =>
     e.symm.toLinearMap ∘ₗ DFinsupp.lsingle (R := R) (M := fun m : t => m.1) m
   have hj : ∀ m, Function.Injective (j m) := fun m =>
@@ -30,8 +74,8 @@ private theorem ss_proj
   · intro w hw
     rw [Finset.sum_coe_sort K (fun i => Q i w)]
     apply e.injective
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     have h1 : ∀ i, e (Q i w) = DFinsupp.single i (e w i) := fun i => by simp [Q]
     simp_rw [h1]
     ext1 m
@@ -49,8 +93,8 @@ private theorem ss_proj
 section
 variable {H W : Type} [Group H] [AddCommGroup W] [Module ℂ W] (ρ : Representation ℂ H W)
 
-private noncomputable def toSub (U : Submodule ℂ W) (hU : ∀ g, ∀ u ∈ U, ρ g u ∈ U)
-    : Submodule ℂ[H] ρ.asModule where
+private noncomputable def toSub (U : Submodule ℂ W) (hU : ∀ g, ∀ u ∈ U, ρ g u ∈ U) :
+    Submodule ℂ[H] ρ.asModule where
   carrier := {x | ρ.asModuleEquiv x ∈ U}
   add_mem' := fun {a b} ha hb => by
     simp only [Set.mem_ofPred_eq, map_add (f := _)] at *
@@ -61,29 +105,27 @@ private noncomputable def toSub (U : Submodule ℂ W) (hU : ∀ g, ∀ u ∈ U, 
     rw [Representation.asModuleEquiv_map_smul]
     exact ρ.asAlgebraHom_mem_of_forall_mem U hU _ hx c
 
-private theorem mem_toSub (U : Submodule ℂ W) (hU : ∀ g, ∀ u ∈ U, ρ g u ∈ U) (x : ρ.asModule)
-    : x ∈ toSub ρ U hU ↔ ρ.asModuleEquiv x ∈ U :=
-  Iff.rfl
+private theorem mem_toSub (U : Submodule ℂ W) (hU : ∀ g, ∀ u ∈ U, ρ g u ∈ U) (x : ρ.asModule) :
+    x ∈ toSub ρ U hU ↔ ρ.asModuleEquiv x ∈ U := Iff.rfl
 
 private noncomputable def fromSub (N : Submodule ℂ[H] ρ.asModule) : Submodule ℂ W :=
   (N.restrictScalars ℂ).comap ρ.asModuleEquiv.symm.toLinearMap
 
-private theorem mem_fromSub (N : Submodule ℂ[H] ρ.asModule) (x : W)
-    : x ∈ fromSub ρ N ↔ ρ.asModuleEquiv.symm x ∈ N :=
-  Iff.rfl
+private theorem mem_fromSub (N : Submodule ℂ[H] ρ.asModule) (x : W) :
+    x ∈ fromSub ρ N ↔ ρ.asModuleEquiv.symm x ∈ N := Iff.rfl
 
-private theorem fromSub_inv (N : Submodule ℂ[H] ρ.asModule) (g : H) (u : W) (hu : u ∈ fromSub ρ N)
-    : ρ g u ∈ fromSub ρ N := by
+private theorem fromSub_inv (N : Submodule ℂ[H] ρ.asModule) (g : H) (u : W)
+    (hu : u ∈ fromSub ρ N) : ρ g u ∈ fromSub ρ N := by
   rw [mem_fromSub] at *
   rw [Representation.asModuleEquiv_symm_map_rho]
   exact N.smul_mem _ hu
 
-private theorem from_to (U : Submodule ℂ W) (hU : ∀ g, ∀ u ∈ U, ρ g u ∈ U)
-    : fromSub ρ (toSub ρ U hU) = U := by
+private theorem from_to (U : Submodule ℂ W) (hU : ∀ g, ∀ u ∈ U, ρ g u ∈ U) :
+    fromSub ρ (toSub ρ U hU) = U := by
   ext x; simp [mem_fromSub, mem_toSub]
 
-private theorem from_le_iff (A B : Submodule ℂ[H] ρ.asModule)
-    : fromSub ρ A ≤ fromSub ρ B ↔ A ≤ B := by
+private theorem from_le_iff (A B : Submodule ℂ[H] ρ.asModule) :
+    fromSub ρ A ≤ fromSub ρ B ↔ A ≤ B := by
   constructor
   · intro h x hx
     have := @h (ρ.asModuleEquiv x) (by simpa [mem_fromSub] using hx)
@@ -91,16 +133,16 @@ private theorem from_le_iff (A B : Submodule ℂ[H] ρ.asModule)
   · intro h x hx
     exact h hx
 
-private theorem from_inj {A B : Submodule ℂ[H] ρ.asModule} (h : fromSub ρ A = fromSub ρ B)
-    : A = B :=
+private theorem from_inj {A B : Submodule ℂ[H] ρ.asModule} (h : fromSub ρ A = fromSub ρ B) :
+    A = B :=
   le_antisymm ((from_le_iff ρ A B).mp h.le) ((from_le_iff ρ B A).mp h.ge)
 
-private theorem from_bot : fromSub ρ ⊥ = ⊥ := by ext x; simp [mem_fromSub]
+private theorem from_bot : fromSub ρ ⊥ = ⊥ := by
+  ext x; simp [mem_fromSub]
 
-private theorem atom_iff (A : Submodule ℂ[H] ρ.asModule)
-    : IsAtom A
-      ↔ fromSub ρ A ≠ ⊥
-        ∧ ∀ N ≤ fromSub ρ A, (∀ g, ∀ u ∈ N, ρ g u ∈ N) → N = ⊥ ∨ N = fromSub ρ A := by
+private theorem atom_iff (A : Submodule ℂ[H] ρ.asModule) :
+    IsAtom A ↔ fromSub ρ A ≠ ⊥ ∧
+      ∀ N ≤ fromSub ρ A, (∀ g, ∀ u ∈ N, ρ g u ∈ N) → N = ⊥ ∨ N = fromSub ρ A := by
   constructor
   · intro hA
     refine ⟨fun h => hA.1 (from_inj ρ (h.trans (from_bot ρ).symm)), fun N hN hi => ?_⟩
@@ -116,28 +158,17 @@ private theorem atom_iff (A : Submodule ℂ[H] ρ.asModule)
 
 end
 
-theorem UpperTheory.exists_equivariant_projections_of_sum_irreducible
-    : ∀ (H W : Type) [Group H] [AddCommGroup W] [Module ℂ W] (ρ : Representation ℂ H W),
-      (∀ x : W,
-          x ∈ ⨆ U : {U : Submodule ℂ W // U ≠ ⊥ ∧ (∀ g, ∀ u ∈ U, ρ g u ∈ U) ∧ ∀ N ≤ U, (∀ g, ∀ u ∈ N, ρ g u ∈ N) → N = ⊥ ∨ N = U}, U.1)
-        → ∀ M : Submodule ℂ W,
-          FiniteDimensional ℂ M
-            → ∃ (κ : Type) (_ : Fintype κ) (U : κ → Submodule ℂ W) (P : κ → W →ₗ[ℂ] W),
-              (∀ i,
-                  U i ≠ ⊥ ∧ (∀ g, ∀ u ∈ U i, ρ g u ∈ U i)
-                    ∧ ∀ N ≤ U i, (∀ g, ∀ u ∈ N, ρ g u ∈ N) → N = ⊥ ∨ N = U i)
-                ∧ (∀ i w, P i w ∈ U i) ∧ (∀ i g w, P i (ρ g w) = ρ g (P i w))
-                ∧ ∀ w ∈ M, ∑ i, P i w = w := by
+theorem UpperTheory.exists_equivariant_projections_of_sum_irreducible :
+    ∀ (H W : Type) [Group H] [AddCommGroup W] [Module ℂ W] (ρ : Representation ℂ H W), (∀ x : W, x ∈ ⨆ U : {U : Submodule ℂ W // U ≠ ⊥ ∧ (∀ g, ∀ u ∈ U, ρ g u ∈ U) ∧ ∀ N ≤ U, (∀ g, ∀ u ∈ N, ρ g u ∈ N) → N = ⊥ ∨ N = U}, U.1) → ∀ M : Submodule ℂ W, FiniteDimensional ℂ M → ∃ (κ : Type) (_ : Fintype κ) (U : κ → Submodule ℂ W) (P : κ → W →ₗ[ℂ] W), (∀ i, U i ≠ ⊥ ∧ (∀ g, ∀ u ∈ U i, ρ g u ∈ U i) ∧ ∀ N ≤ U i, (∀ g, ∀ u ∈ N, ρ g u ∈ N) → N = ⊥ ∨ N = U i) ∧ (∀ i w, P i w ∈ U i) ∧ (∀ i g w, P i (ρ g w) = ρ g (P i w)) ∧ ∀ w ∈ M, ∑ i, P i w = w := by
   intro H W _ _ _ ρ hsum M hM
   classical
   have : IsSemisimpleModule ℂ[H] ρ.asModule := by
     apply IsSemisimpleModule.of_sSup_simples_eq_top
     rw [eq_top_iff]
     intro y _
-    have hle
-        : (⨆ U : {U : Submodule ℂ W // U ≠ ⊥ ∧ (∀ g, ∀ u ∈ U, ρ g u ∈ U) ∧
-            ∀ N ≤ U, (∀ g, ∀ u ∈ N, ρ g u ∈ N) → N = ⊥ ∨ N = U}, U.1)
-          ≤ fromSub ρ (sSup {m : Submodule ℂ[H] ρ.asModule | IsSimpleModule ℂ[H] m}) := by
+    have hle : (⨆ U : {U : Submodule ℂ W // U ≠ ⊥ ∧ (∀ g, ∀ u ∈ U, ρ g u ∈ U) ∧
+        ∀ N ≤ U, (∀ g, ∀ u ∈ N, ρ g u ∈ N) → N = ⊥ ∨ N = U}, U.1) ≤
+        fromSub ρ (sSup {m : Submodule ℂ[H] ρ.asModule | IsSimpleModule ℂ[H] m}) := by
       refine iSup_le ?_
       rintro ⟨U, h0, hi, hU⟩
       show U ≤ _
@@ -170,7 +201,7 @@ theorem UpperTheory.exists_equivariant_projections_of_sum_irreducible
     induction hw using Submodule.span_induction with
     | mem x hx =>
       simp_rw [hQ]
-      set_option synthInstance.maxHeartbeats 100000 in
+
       rw [← map_sum, hsum' _ (Finset.mem_image_of_mem _ hx), LinearEquiv.apply_symm_apply]
     | zero => simp
     | add x y _ _ hx hy => simp_rw [map_add (f := _)]; rw [Finset.sum_add_distrib, hx, hy]

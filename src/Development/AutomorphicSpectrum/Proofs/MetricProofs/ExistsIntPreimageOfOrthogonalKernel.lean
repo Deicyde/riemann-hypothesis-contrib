@@ -1,25 +1,71 @@
 module
 
-public import Mathlib
-public import Development.AutomorphicSpectrum.Definitions.MetricPeriods.IsEigFrames
-public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.BdryChart
-public import ReciprocityTheory.AnalyticForms.PlurisubharmonicFunctions.IsPshLocallyIntegrableStatement
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.LogPeriodLimit
-public import Development.AutomorphicSpectrum.Proofs.MetricProofs.ExistsIsChart
-public import Development.AutomorphicSpectrum.Proofs.MetricProofs.IsotropicSublatticeCovolumePositiveStatement
-public import Development.AutomorphicSpectrum.Proofs.MetricProofs.RiemannLatticeEigenProjectionStatement
+public import Mathlib.Algebra.Ring.Rat
+public import Mathlib.Data.Matrix.Mul
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
+import Development.AutomorphicSpectrum.Definitions.MetricPeriods.ExistsIntSmulIsAdicIntegralInTensorBasis
+import Development.AutomorphicSpectrum.Proofs.AlgebraProofs.SymplecticUnipotentShape
+import Development.AutomorphicSpectrum.Proofs.GeometryProofs.LogPeriodLimit
+import Development.AutomorphicSpectrum.Proofs.MetricProofs.ExistsIsChart
+import GroundTheory.HeightsAndTheta.Heights.HodgeLowerBound.CoordinateIdeals.FubiniLevi
+import GroundTheory.HeightsAndTheta.Heights.Regularisation.StPuncturedExpOrder
+public import Mathlib.Algebra.Module.Submodule.Range
+public import Mathlib.LinearAlgebra.Dual.Defs
+public import Mathlib.LinearAlgebra.Dual.Lemmas
 
 @[expose] public section
 
-open NumberField Matrix Filter Topology GlobalTheory.CompanionTheory.Ar
-  GlobalTheory.CompanionTheory.Ar.Cusp GroundTheory.Heights₂.Heights.LowerBoundFree
-  GroundTheory.Heights₂.Heights.Regular
+open NumberField Matrix Filter Topology GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Cusp GroundTheory.Heights₂.Heights.LowerBoundFree GroundTheory.Heights₂.Heights.Regular
 open GlobalTheory.CompanionTheory.Ar.RiemannLimit GlobalTheory.CompanionTheory.Ar.Cusp.BoundaryLimit
 
 namespace GlobalTheory.CompanionTheory.Ar.IntegralKernel
 
-theorem exists_clear_denominators {g : ℕ} (w : Fin g → ℚ)
-    : ∃ (D : ℤ) (v : Fin g → ℤ), D ≠ 0 ∧ ∀ i, (v i : ℚ) = (D : ℚ) * w i := by
+theorem exists_clear_denominators {g : ℕ} (w : Fin g → ℚ) :
+    ∃ (D : ℤ) (v : Fin g → ℤ), D ≠ 0 ∧ ∀ i, (v i : ℚ) = (D : ℚ) * w i := by
   classical
   have hdvd : ∀ i, ∃ k : ℤ, (∏ j, ((w j).den : ℤ)) = ((w i).den : ℤ) * k := fun i =>
     Finset.dvd_prod_of_mem (fun j => ((w j).den : ℤ)) (Finset.mem_univ i)
@@ -33,14 +79,13 @@ theorem exists_clear_denominators {g : ℕ} (w : Fin g → ℚ)
     rw [← h]
     ring
 
-theorem cast_mulVec {g : ℕ} (S : Matrix (Fin g) (Fin g) ℤ) (v : Fin g → ℤ) (i : Fin g)
-    : (((S *ᵥ v) i : ℤ) : ℚ) = ((S.map (Int.cast : ℤ → ℚ)) *ᵥ (fun j => (v j : ℚ))) i := by
+theorem cast_mulVec {g : ℕ} (S : Matrix (Fin g) (Fin g) ℤ) (v : Fin g → ℤ) (i : Fin g) :
+    (((S *ᵥ v) i : ℤ) : ℚ) = ((S.map (Int.cast : ℤ → ℚ)) *ᵥ (fun j => (v j : ℚ))) i := by
   simp [Matrix.mulVec, dotProduct]
 
-theorem exists_smul_eq_mulVec
-    (g : ℕ) (S : Matrix (Fin g) (Fin g) ℤ) (hS : Sᵀ = S) (u : Fin g → ℤ)
-    (hu : ∀ v : Fin g → ℤ, S *ᵥ v = 0 → u ⬝ᵥ v = 0)
-    : ∃ (N : ℤ) (c : Fin g → ℤ), N ≠ 0 ∧ N • u = S *ᵥ c := by
+theorem exists_smul_eq_mulVec (g : ℕ) (S : Matrix (Fin g) (Fin g) ℤ) (hS : Sᵀ = S)
+    (u : Fin g → ℤ) (hu : ∀ v : Fin g → ℤ, S *ᵥ v = 0 → u ⬝ᵥ v = 0) :
+    ∃ (N : ℤ) (c : Fin g → ℤ), N ≠ 0 ∧ N • u = S *ᵥ c := by
   classical
   let Sq : Matrix (Fin g) (Fin g) ℚ := S.map (Int.cast : ℤ → ℚ)
   let uq : Fin g → ℚ := fun i => (u i : ℚ)
@@ -53,7 +98,8 @@ theorem exists_smul_eq_mulVec
   have hker : ∀ w : Fin g → ℚ, Sq *ᵥ w = 0 → uq ⬝ᵥ w = 0 := by
     intro w hw
     obtain ⟨D, v, hD, hv⟩ := exists_clear_denominators w
-    have hvq : (fun j => (v j : ℚ)) = (D : ℚ) • w := by funext j; simp [hv j]
+    have hvq : (fun j => (v j : ℚ)) = (D : ℚ) • w := by
+      funext j; simp [hv j]
     have hSv : S *ᵥ v = 0 := by
       funext i
       have h1 := cast_mulVec S v i
@@ -61,8 +107,7 @@ theorem exists_smul_eq_mulVec
       have h2 : (((S *ᵥ v) i : ℤ) : ℚ) = 0 := by
         rw [h1]
         change ((D : ℚ) • (Sq *ᵥ w)) i = 0
-        rw [hw]
-        simp
+        rw [hw]; simp
       exact_mod_cast h2
     have h0 := hu v hSv
     have h1 : ((u ⬝ᵥ v : ℤ) : ℚ) = (D : ℚ) * (uq ⬝ᵥ w) := by
@@ -72,11 +117,10 @@ theorem exists_smul_eq_mulVec
     have hDq : (D : ℚ) ≠ 0 := by exact_mod_cast hD
     simpa [hDq] using h1.symm
   let f : (Fin g → ℚ) →ₗ[ℚ] (Fin g → ℚ) := Sq.mulVecLin
-  let φ : Module.Dual ℚ (Fin g → ℚ) := {
-    toFun := fun w => uq ⬝ᵥ w
-    map_add' := fun a b => dotProduct_add uq a b
-    map_smul' := fun r a => by simp [dotProduct_smul]
-  }
+  let φ : Module.Dual ℚ (Fin g → ℚ) :=
+    { toFun := fun w => uq ⬝ᵥ w
+      map_add' := fun a b => dotProduct_add uq a b
+      map_smul' := fun r a => by simp [dotProduct_smul] }
   have hφ : φ ∈ LinearMap.range f.dualMap := by
     rw [LinearMap.range_dualMap_eq_dualAnnihilator_ker]
     rw [Submodule.mem_dualAnnihilator]
@@ -87,21 +131,23 @@ theorem exists_smul_eq_mulVec
   have hψc : ∀ w, ψ w = c ⬝ᵥ w := by
     intro w
     conv_lhs => rw [pi_eq_sum_univ' w]
-    set_option synthInstance.maxHeartbeats 100000 in
+
     simp [map_sum, c, dotProduct, mul_comm]
   have hu_eq : uq = Sq *ᵥ c := by
     funext i
     have h1 : φ (Pi.single i 1) = uq i := by
       change uq ⬝ᵥ Pi.single i 1 = uq i
       simp
-    have h2 : φ (Pi.single i 1) = ψ (Sq *ᵥ Pi.single i 1) := by rw [← hψ]; rfl
+    have h2 : φ (Pi.single i 1) = ψ (Sq *ᵥ Pi.single i 1) := by
+      rw [← hψ]; rfl
     rw [← h1, h2, hψc, Matrix.dotProduct_mulVec, ← Matrix.mulVec_transpose, hSq]
     simp
   obtain ⟨D, v, hD, hv⟩ := exists_clear_denominators c
   refine ⟨D, v, hD, ?_⟩
   funext i
   have h1 := cast_mulVec S v i
-  have hvq : (fun j => (v j : ℚ)) = (D : ℚ) • c := by funext j; simp [hv j]
+  have hvq : (fun j => (v j : ℚ)) = (D : ℚ) • c := by
+    funext j; simp [hv j]
   rw [hvq, Matrix.mulVec_smul] at h1
   have h2 : (((D • u) i : ℤ) : ℚ) = (((S *ᵥ v) i : ℤ) : ℚ) := by
     rw [h1]

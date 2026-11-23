@@ -1,7 +1,12 @@
 module
 
+public import Formalism.SharpRestriction.LevelLetterCocycles.RepresentationCongruences.ConstantLeRpowOfThreeLe
 public import Formalism.SharpRestriction.LevelLetterCocycles.RepresentationCongruences.ConstantCoeffResidueUXPow
-public import Mathlib.Analysis.SpecialFunctions.Log.Base
+import Formalism.SharpRestriction.LevelLetterCocycles.RepresentationCongruences.FormalSeriesValueAtTwoPointsGenericPoints
+import Mathlib.RingTheory.PowerSeries.NoZeroDivisors
+import Mathlib.Tactic.NormNum.GCD
+import Mathlib.Tactic.Positivity.Finset
+import Mathlib.Tactic.TypeStar
 
 @[expose] public section
 
@@ -116,7 +121,6 @@ theorem realA
     nlinarith [mul_nonneg (show (0 : ℝ) ≤ L - 11 by linarith) hS, mul_nonneg (show (0 : ℝ) ≤ L - 11 by linarith) hhh,
       mul_nonneg (show (0 : ℝ) ≤ L - 11 by linarith) hlg, mul_nonneg (show (0 : ℝ) ≤ L - 11 by linarith) hBq]
 
-set_option maxHeartbeats 800000 in
 theorem exists_s1_bound_choice
     (l b w S η b₀ b₁ w' : ℕ) (hl : 11 ≤ l)
     (Sg : ℝ)

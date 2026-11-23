@@ -1,20 +1,71 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.Definitions.Divisors.PrimitiveStructureSheafDegTwoVanish
-public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.AbelianUnobstructed
-public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.AbelianHodgeDeRham
-public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.BijectiveCechDeRhamComparisonDegreeOne
+public import Mathlib.RingTheory.Smooth.Basic
+public import Mathlib.RingTheory.Smooth.StandardSmooth
 public import Development.AbelianVarietyTheory.Proofs.CoherentCohomologyProofs.ExistsWitnessesOfFormallySmoothQuotient
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.SmoothPresentationRelationsCombinationNormalStatement
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.CategoryTheory.Monoidal.Cartesian.Over
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.MvPolynomial.IrreducibleQuadratic
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Development.AbelianVarietyTheory.Definitions.Divisors.CommAlgFunctorCoboundaryZeroMemCocyclesOne
+import Development.AbelianVarietyTheory.Definitions.Divisors.OneFormMapEqKaehlerDifferentialMap
+import Development.AbelianVarietyTheory.Definitions.Divisors.PrimitiveStructureSheafDegTwoVanish
+import Development.AbelianVarietyTheory.Definitions.Divisors.Pullback1MemHodgeFiltration
+import Development.AbelianVarietyTheory.Definitions.Divisors.SurjectiveOfIsPullbackSqZero
+import Mathlib.Topology.Sheaves.Presheaf
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.CocycleRightZeroThd
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.SemiabelianSchemes.CubicalStructures.CubeSymmetricSwapFirst
 
 @[expose] public section
 
-open CategoryTheory AlgebraicGeometry KaehlerDifferential MonoidalCategory CartesianMonoidalCategory
-  MonObj
+open CategoryTheory AlgebraicGeometry KaehlerDifferential MonoidalCategory CartesianMonoidalCategory MonObj
 open scoped TensorProduct
-open ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
-  GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.CechDR GlobalTheory.LiftSys GlobalTheory.Obs
+open ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.CechDR GlobalTheory.LiftSys GlobalTheory.Obs
 attribute [local instance] Over.cartesianMonoidalCategory
 
 noncomputable section
@@ -25,55 +76,46 @@ open MvPolynomial
 
 variable {R₀ : Type} [CommRing R₀] {n r : ℕ}
 
-def tang
-    (g : Fin r → MvPolynomial (Fin n) R₀) (a : Fin n → Fin r → MvPolynomial (Fin n) R₀)
-    (i l : Fin n)
-    : MvPolynomial (Fin n) R₀ :=
+def tang (g : Fin r → MvPolynomial (Fin n) R₀) (a : Fin n → Fin r → MvPolynomial (Fin n) R₀)
+    (i l : Fin n) : MvPolynomial (Fin n) R₀ :=
   (if i = l then 1 else 0) + ∑ k, a i k * pderiv l (g k)
 
-def rel
-    (g : Fin r → MvPolynomial (Fin n) R₀) (a : Fin n → Fin r → MvPolynomial (Fin n) R₀) (i : Fin n)
-    : MvPolynomial (Fin n ⊕ Fin n) R₀ :=
-  rename Sum.inr (∑ k, a i k * g k)
-    + ∑ l, rename Sum.inr (tang g a i l) * (X (Sum.inl l) - X (Sum.inr l))
+def rel (g : Fin r → MvPolynomial (Fin n) R₀) (a : Fin n → Fin r → MvPolynomial (Fin n) R₀)
+    (i : Fin n) : MvPolynomial (Fin n ⊕ Fin n) R₀ :=
+  rename Sum.inr (∑ k, a i k * g k) +
+    ∑ l, rename Sum.inr (tang g a i l) * (X (Sum.inl l) - X (Sum.inr l))
 
-theorem aeval_pderiv_rel
-    (g : Fin r → MvPolynomial (Fin n) R₀)
-    (a : Fin n → Fin r → MvPolynomial (Fin n) R₀)
-    {B : Type} [CommRing B] [Algebra R₀ B]
-    (xb : Fin n → B) (hg : ∀ k, aeval xb (g k) = 0)
-    (i j : Fin n)
-    : aeval (Sum.elim xb xb) (pderiv (Sum.inr i) (rel g a j)) = -(if i = j then 1 else 0) := by
+theorem aeval_pderiv_rel (g : Fin r → MvPolynomial (Fin n) R₀)
+    (a : Fin n → Fin r → MvPolynomial (Fin n) R₀) {B : Type} [CommRing B] [Algebra R₀ B]
+    (xb : Fin n → B) (hg : ∀ k, aeval xb (g k) = 0) (i j : Fin n) :
+    aeval (Sum.elim xb xb) (pderiv (Sum.inr i) (rel g a j)) = -(if i = j then 1 else 0) := by
   classical
   simp [rel, Derivation.leibniz, pderiv_rename Sum.inr_injective, pderiv_X, Pi.single_apply,
     aeval_rename, Function.comp_def, hg, tang, Finset.sum_add_distrib, mul_add, add_mul]
   exact if_congr eq_comm rfl rfl
 
-theorem sum_pderiv_mul_tang
-    (g : Fin r → MvPolynomial (Fin n) R₀) (a : Fin n → Fin r → MvPolynomial (Fin n) R₀) (j : Fin r)
-    (l : Fin n)
-    : ∑ i, pderiv i (g j) * tang g a i l
-      = pderiv l (g j) + ∑ i, pderiv i (g j) * ∑ k, a i k * pderiv l (g k) := by
+theorem sum_pderiv_mul_tang (g : Fin r → MvPolynomial (Fin n) R₀)
+    (a : Fin n → Fin r → MvPolynomial (Fin n) R₀) (j : Fin r) (l : Fin n) :
+    ∑ i, pderiv i (g j) * tang g a i l =
+      pderiv l (g j) + ∑ i, pderiv i (g j) * ∑ k, a i k * pderiv l (g k) := by
   classical
   simp [tang, mul_add, Finset.sum_add_distrib]
 
-theorem core
-    (g : Fin r → MvPolynomial (Fin n) R₀) (a : Fin n → Fin r → MvPolynomial (Fin n) R₀)
+theorem core (g : Fin r → MvPolynomial (Fin n) R₀) (a : Fin n → Fin r → MvPolynomial (Fin n) R₀)
     (h1 : ∀ j, g j + ∑ i, pderiv i (g j) * ∑ k, a i k * g k ∈ Ideal.span (Set.range g) ^ 2)
-    (h2 : ∀ j m,
-      pderiv m (g j) + ∑ i, pderiv i (g j) * ∑ k, a i k * pderiv m (g k) ∈ Ideal.span (Set.range g))
-    : ∃ (C₀ : Type) (_ : CommRing C₀) (_ : Algebra R₀ C₀)
-        (i : (MvPolynomial (Fin n) R₀ ⧸ Ideal.span (Set.range g)) →ₐ[R₀] C₀)
-        (r : C₀ →ₐ[R₀] (MvPolynomial (Fin n) R₀ ⧸ Ideal.span (Set.range g))),
+    (h2 : ∀ j m, pderiv m (g j) + ∑ i, pderiv i (g j) * ∑ k, a i k * pderiv m (g k) ∈
+      Ideal.span (Set.range g)) :
+    ∃ (C₀ : Type) (_ : CommRing C₀) (_ : Algebra R₀ C₀)
+      (i : (MvPolynomial (Fin n) R₀ ⧸ Ideal.span (Set.range g)) →ₐ[R₀] C₀)
+      (r : C₀ →ₐ[R₀] (MvPolynomial (Fin n) R₀ ⧸ Ideal.span (Set.range g))),
       Algebra.IsStandardSmooth R₀ C₀ ∧ ∀ x, r (i x) = x := by
   classical
   set J : Ideal (MvPolynomial (Fin n) R₀) := Ideal.span (Set.range g) with hJ
   set K : Ideal (MvPolynomial (Fin n ⊕ Fin n) R₀) := Ideal.span (Set.range (rel g a)) with hK
   let xb : Fin n → MvPolynomial (Fin n) R₀ ⧸ J := fun l => Ideal.Quotient.mk J (X l)
   have hxb : ∀ p, aeval xb p = Ideal.Quotient.mk J p := fun p =>
-    AlgHom.congr_fun
-      (MvPolynomial.algHom_ext (f := aeval xb) (g := Ideal.Quotient.mkₐ R₀ J) fun l => by simp [xb])
-      p
+    AlgHom.congr_fun (MvPolynomial.algHom_ext (f := aeval xb) (g := Ideal.Quotient.mkₐ R₀ J)
+      fun l => by simp [xb]) p
   have hg0 : ∀ k, Ideal.Quotient.mk J (g k) = 0 := fun k =>
     Ideal.Quotient.eq_zero_iff_mem.2 (Ideal.subset_span ⟨k, rfl⟩)
   let r₀' : MvPolynomial (Fin n ⊕ Fin n) R₀ →ₐ[R₀] MvPolynomial (Fin n) R₀ ⧸ J :=
@@ -83,9 +125,9 @@ theorem core
   have hs0 : ∀ l, r₀' (X (Sum.inl l) - X (Sum.inr l)) = 0 := fun l => by simp [r₀']
   have hrel : ∀ i, r₀' (rel g a i) = 0 := by
     intro i
-    set_option synthInstance.maxHeartbeats 100000 in
+
     simp only [rel, map_add (f := _), map_sum, map_mul, hren, hs0, mul_zero, Finset.sum_const_zero,
-      add_zero, hg0]
+    add_zero, hg0]
   have hKle : K ≤ RingHom.ker r₀' := Ideal.span_le.2 (by rintro _ ⟨i, rfl⟩; exact hrel i)
   let r₀ : (MvPolynomial (Fin n ⊕ Fin n) R₀ ⧸ K) →ₐ[R₀] MvPolynomial (Fin n) R₀ ⧸ J :=
     Ideal.Quotient.liftₐ K r₀' (fun x hx => hKle hx)
@@ -97,7 +139,8 @@ theorem core
   have hr₀alg : ∀ p, r₀ (algebraMap P.Ring _ p) = r₀' p := by
     intro p
     rw [Algebra.Generators.algebraMap_apply]
-    have : r₀.comp (aeval P.val) = r₀' := MvPolynomial.algHom_ext fun v => by simp [hval, hr₀]
+    have : r₀.comp (aeval P.val) = r₀' :=
+      MvPolynomial.algHom_ext fun v => by simp [hval, hr₀]
     exact AlgHom.congr_fun this p
   have hjac : IsUnit (r₀ P.jacobian) := by
     rw [P.jacobian_eq_jacobiMatrix_det, hr₀alg]
@@ -144,33 +187,27 @@ theorem core
     have : Ideal.Quotient.mk K (rel g a i) = 0 :=
       Ideal.Quotient.eq_zero_iff_mem.2 (Ideal.subset_span ⟨i, rfl⟩)
     rw [← this]
-    set_option synthInstance.maxHeartbeats 100000 in
+
     simp only [rel, map_add (f := _), map_sum, map_mul, hφ, s]
   have key : ∀ j, G j ∈ L * JD := by
     intro j
-    have e1
-        : φ (g j + ∑ i, pderiv i (g j) * ∑ k, a i k * g k)
-          = G j + ∑ i, φ (pderiv i (g j)) * φ (∑ k, a i k * g k) := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_add (f := _), map_sum]
+    have e1 : φ (g j + ∑ i, pderiv i (g j) * ∑ k, a i k * g k) =
+        G j + ∑ i, φ (pderiv i (g j)) * φ (∑ k, a i k * g k) := by
+
+      rw [map_add (f := _), map_sum]
       simp only [map_mul, G]
-    have hs
-        : ∑ i, φ (pderiv i (g j)) * φ (∑ k, a i k * g k)
-            + ∑ i, φ (pderiv i (g j)) * ∑ l, φ (tang g a i l) * s l
-          = 0 := by
+    have hs : ∑ i, φ (pderiv i (g j)) * φ (∑ k, a i k * g k) +
+        ∑ i, φ (pderiv i (g j)) * ∑ l, φ (tang g a i l) * s l = 0 := by
       rw [← Finset.sum_add_distrib]
       exact Finset.sum_eq_zero fun i _ => by rw [← mul_add, hrelD i, mul_zero]
-    have e3
-        : ∑ l, s l * φ (∑ i, pderiv i (g j) * tang g a i l)
-          = ∑ i, φ (pderiv i (g j)) * ∑ l, φ (tang g a i l) * s l := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [map_sum, map_mul, Finset.mul_sum]
+    have e3 : ∑ l, s l * φ (∑ i, pderiv i (g j) * tang g a i l) =
+        ∑ i, φ (pderiv i (g j)) * ∑ l, φ (tang g a i l) * s l := by
+
+      simp only [map_sum, map_mul, Finset.mul_sum]
       rw [Finset.sum_comm]
       exact Finset.sum_congr rfl fun _ _ => Finset.sum_congr rfl fun _ _ => by ring
-    have eq
-        : G j
-          = φ (g j + ∑ i, pderiv i (g j) * ∑ k, a i k * g k)
-            + ∑ l, s l * φ (∑ i, pderiv i (g j) * tang g a i l) := by
+    have eq : G j = φ (g j + ∑ i, pderiv i (g j) * ∑ k, a i k * g k) +
+        ∑ l, s l * φ (∑ i, pderiv i (g j) * tang g a i l) := by
       rw [e3]
       linear_combination -e1 - hs
     rw [eq]
@@ -183,12 +220,10 @@ theorem core
     · refine Ideal.mul_mem_mul (Ideal.mem_sup_right (Ideal.subset_span ⟨l, rfl⟩)) ?_
       rw [sum_pderiv_mul_tang, ← hJD]
       exact Ideal.mem_map_of_mem φ (h2 j l)
-  obtain ⟨e, he1, he⟩ :=
-    Submodule.exists_sub_one_mem_and_smul_eq_zero_of_fg_of_le_smul L JD
-      (Submodule.fg_span (Set.finite_range G))
-      (by
-        rw [Ideal.smul_eq_mul]
-        exact Ideal.span_le.2 (by rintro _ ⟨j, rfl⟩; exact key j))
+  obtain ⟨e, he1, he⟩ := Submodule.exists_sub_one_mem_and_smul_eq_zero_of_fg_of_le_smul L JD
+    (Submodule.fg_span (Set.finite_range G)) (by
+      rw [Ideal.smul_eq_mul]
+      exact Ideal.span_le.2 (by rintro _ ⟨j, rfl⟩; exact key j))
   have hL : L ≤ RingHom.ker r₀ := by
     refine sup_le (Ideal.span_le.2 ?_) (Ideal.span_le.2 ?_)
     · rintro _ ⟨k, rfl⟩
@@ -206,8 +241,7 @@ theorem core
     Algebra.IsStandardSmooth.localization_away (algebraMap D T1 e)
   have hC : Algebra.IsStandardSmooth R₀ C₀ := Algebra.IsStandardSmooth.trans R₀ T1 C₀
   let r₂ : C₀ →ₐ[R₀] MvPolynomial (Fin n) R₀ ⧸ J :=
-    IsLocalization.Away.liftAlgHom (algebraMap D T1 e) (f := r₁)
-      (by rw [hr₁, hre]; exact isUnit_one)
+    IsLocalization.Away.liftAlgHom (algebraMap D T1 e) (f := r₁) (by rw [hr₁, hre]; exact isUnit_one)
   have hr₂ : ∀ y, r₂ (algebraMap T1 C₀ y) = r₁ y := fun y => by
     rw [IsLocalization.Away.liftAlgHom_apply]
     exact IsLocalization.Away.lift_eq _ _ _
@@ -218,22 +252,19 @@ theorem core
     have h0 : e * G k = 0 := he (G k) (Ideal.subset_span ⟨k, rfl⟩)
     have : ψ e * ψ (G k) = 0 := by rw [← map_mul, h0, map_zero]
     exact (hψe.mul_right_eq_zero).1 this
-  have hJle
-      : J
-        ≤ RingHom.ker (ψ.comp ((Ideal.Quotient.mkₐ R₀ K).comp
-          (rename Sum.inr : _ →ₐ[R₀] MvPolynomial (Fin n ⊕ Fin n) R₀))) :=
+  have hJle : J ≤ RingHom.ker (ψ.comp ((Ideal.Quotient.mkₐ R₀ K).comp
+      (rename Sum.inr : _ →ₐ[R₀] MvPolynomial (Fin n ⊕ Fin n) R₀))) :=
     Ideal.span_le.2 (by rintro _ ⟨k, rfl⟩; exact hψG k)
-  let i : (MvPolynomial (Fin n) R₀ ⧸ J) →ₐ[R₀] C₀ := Ideal.Quotient.liftₐ J _ (fun x hx => hJle hx)
+  let i : (MvPolynomial (Fin n) R₀ ⧸ J) →ₐ[R₀] C₀ :=
+    Ideal.Quotient.liftₐ J _ (fun x hx => hJle hx)
   refine ⟨C₀, inferInstance, inferInstance, i, r₂, hC, fun x => ?_⟩
   obtain ⟨p, rfl⟩ := Ideal.Quotient.mk_surjective x
   change r₂ (algebraMap T1 C₀ (algebraMap D T1 (Ideal.Quotient.mk K (rename Sum.inr p)))) = _
   rw [hr₂, hr₁, hr₀, hren]
 
-theorem exists_retract_isStandardSmooth
-    : ∀ (R₀ B₀ : Type) [CommRing R₀] [CommRing B₀] [Algebra R₀ B₀],
-      Algebra.Smooth R₀ B₀
-        → ∃ (C₀ : Type) (_ : CommRing C₀) (_ : Algebra R₀ C₀) (i : B₀ →ₐ[R₀] C₀) (r : C₀ →ₐ[R₀] B₀),
-          Algebra.IsStandardSmooth R₀ C₀ ∧ ∀ x, r (i x) = x := by
+theorem exists_retract_isStandardSmooth : ∀ (R₀ B₀ : Type) [CommRing R₀] [CommRing B₀] [Algebra R₀ B₀],
+    Algebra.Smooth R₀ B₀ → ∃ (C₀ : Type) (_ : CommRing C₀) (_ : Algebra R₀ C₀) (i : B₀ →ₐ[R₀] C₀)
+      (r : C₀ →ₐ[R₀] B₀), Algebra.IsStandardSmooth R₀ C₀ ∧ ∀ x, r (i x) = x := by
   intro R₀ B₀ _ _ _ hsm
   obtain ⟨n, f, hf, hfg⟩ := Algebra.FinitePresentation.out (R := R₀) (A := B₀)
   obtain ⟨r, g, hg⟩ := Submodule.fg_iff_exists_fin_generating_family.1 hfg

@@ -1,9 +1,66 @@
 module
 
+public import Mathlib.RingTheory.Ideal.Height
+public import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+public import Mathlib.RingTheory.Ideal.KrullsHeightTheorem
+public import Mathlib.RingTheory.KrullDimension.Polynomial
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Polynomial
+import Mathlib.RingTheory.TotallySplit
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
+public import ReciprocityTheory.CommutativeAlgebra.CohenMacaulay.IsCMOfIsRegularLocalRing
+public import ReciprocityTheory.CommutativeAlgebra.CohenMacaulay.LocDim
+public import ReciprocityTheory.CommutativeAlgebra.SaturatedChains.RingKrullDimLocalizationQuotientEqHeight
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.InterDivSuppAA
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.InterDivSuppAC
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.InterGoodA
-public import ReciprocityTheory.CommutativeAlgebra.CohenMacaulay.IsCMOfIsRegularLocalRing
-public import ReciprocityTheory.CommutativeAlgebra.SaturatedChains.RingKrullDimLocalizationQuotientEqHeight
+public import Mathlib.Algebra.Algebra.ZMod
+public import Mathlib.RingTheory.KrullDimension.PID
+public import ReciprocityTheory.CommutativeAlgebra.ChainConnInDim
 
 @[expose] public section
 
@@ -27,7 +84,6 @@ theorem height_eq_of_isMaximal_of_intCast_eq_zero
   have hdvd : (p : ℤ) ∣ n := by
     first
     | exact (CharP.intCast_eq_zero_iff B p n).mp hnB
-    | exact (CharP.int_cast_eq_zero_iff B p n).mp hnB
   have hp0 : p ≠ 0 := by
     rintro rfl
     simp at hdvd
@@ -102,8 +158,6 @@ theorem height_int_of_isMaximal (M : Ideal ℤ) (hM : M.IsMaximal) : M.height = 
       have hmax : z.asIdeal.IsMaximal := by
         first
         | exact z.isPrime.isMaximal hne
-        | exact Ring.DimensionLEOne.maximalOfPrime hne z.isPrime
-        | exact Ideal.IsPrime.to_maximal_ideal z.isPrime hne
       exact (ne_of_lt hz') (hmax.eq_of_le hM.ne_top (le_of_lt hz'))
     intro w _
     show z.asIdeal ≤ w.asIdeal
@@ -121,13 +175,6 @@ theorem height_int_of_isMaximal (M : Ideal ℤ) (hM : M.IsMaximal) : M.height = 
         refine iSup₂_le fun z hz => ?_
         rw [Order.height_eq_zero.mpr (hmin z hz)]
         simp
-      )
-    | (
-        show Order.height _ ≤ ((1 : ℕ) : ℕ∞)
-        rw [Order.height_le_coe_iff]
-        intro z hz
-        rw [Order.height_eq_zero.mpr (hmin z hz)]
-        exact zero_lt_one
       )
   · first
     | exact Order.one_le_height_iff.mpr hx
@@ -353,16 +400,9 @@ theorem height_eq_of_isMaximal_int
     have hq : Algebra.FiniteType ℤ (MvPolynomial σ ℤ ⧸ P) := by
       first
       | infer_instance
-      | exact Algebra.FiniteType.of_surjective inferInstance (Ideal.Quotient.mkₐ ℤ P)
-          (Ideal.Quotient.mkₐ_surjective ℤ P)
     refine @height_eq_of_isMaximal_of_intCast_eq_zero _ _ _ ?_ n hn0 ?_ M N hM hN
     · first
       | exact hq
-      | (
-          convert hq using 1 <;> first
-            | exact Subsingleton.elim _ _
-            | exact Algebra.algebra_ext _ _ fun r => (eq_intCast _ r).trans (eq_intCast _ r).symm
-        )
     have e1 : (MvPolynomial.C n : MvPolynomial σ ℤ) = (n : MvPolynomial σ ℤ) :=
       eq_intCast MvPolynomial.C n
     have e2 : ((n : ℤ) : MvPolynomial σ ℤ ⧸ P) = Ideal.Quotient.mk P (n : MvPolynomial σ ℤ) :=

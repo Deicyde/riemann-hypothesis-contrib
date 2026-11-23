@@ -1,5 +1,51 @@
 module
 
+public import Mathlib.Analysis.InnerProductSpace.PiL2
+public import ReciprocityTheory.ReductiveGroups.DiscreteSeries.BochnerInequality.Permute
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
+public import ReciprocityTheory.ReductiveGroups.DiscreteSeries.BochnerInequality.InnerCrossOpEigEqZero
+public import ReciprocityTheory.ReductiveGroups.DiscreteSeries.BochnerInequality.NcVOneDecomp
 public import ReciprocityTheory.ReductiveGroups.DiscreteSeries.BochnerInequality.SltEqZeroOfCompact
 
 @[expose] public section
@@ -14,18 +60,14 @@ variable {n : ℕ}
 
 section Slot
 
-variable
-  {M : Type*} [NormedAddCommGroup M] [InnerProductSpace ℂ M]
-  {ε : Fin n → Bool} {E : Fin n → Fin n → Module.End ℂ M} {V : Submodule ℂ M} {lam : Fin n → ℝ}
+variable {M : Type*} [NormedAddCommGroup M] [InnerProductSpace ℂ M] {ε : Fin n → Bool}
+  {E : Fin n → Fin n → Module.End ℂ M} {V : Submodule ℂ M} {lam : Fin n → ℝ}
 
-theorem position_perp
-    (hE : IsGlRep E) (hU : IsInfUnitary ε E) (hV : IsKIrrHW ε E (lowK ε lam) V)
-    (hmono : StrictAnti lam)
-    {h : ℝ} (hh : GapAtLeast ε lam h) (hbig : (n : ℝ) * (pOf ε : ℝ) * (qOf ε : ℝ) + 1 < h)
-    {k : ℕ} (i : Fin k)
-    {P : Big n k M}
-    (hP : P ∈ ncV ε V k) (hperp : ∀ F ∈ ncV ε V k, (∀ κ, slice i κ F ∈ Wm ε E V) → inner ℂ F P = 0)
-    : ∀ κ, slice i κ P ∈ Wp ε E V := by
+theorem position_perp (hE : IsGlRep E) (hU : IsInfUnitary ε E) (hV : IsKIrrHW ε E (lowK ε lam) V)
+    (hmono : StrictAnti lam) {h : ℝ} (hh : GapAtLeast ε lam h)
+    (hbig : (n : ℝ) * (pOf ε : ℝ) * (qOf ε : ℝ) + 1 < h) {k : ℕ} (i : Fin k) {P : Big n k M} (hP : P ∈ ncV ε V k)
+    (hperp : ∀ F ∈ ncV ε V k, (∀ κ, slice i κ F ∈ Wm ε E V) → inner ℂ F P = 0) :
+    ∀ κ, slice i κ P ∈ Wp ε E V := by
   intro κ
   rw [slice_eq_slt]
   set r := (slRest i κ).2 with hr
@@ -53,8 +95,8 @@ theorem position_perp
     have h2 := hkey
     rw [hx0, inner_zero_right] at h2
     simpa using h2.symm
-  let F : Big n k M :=
-    WithLp.toLp 2 (fun κ' => if (slRest i κ').2 = r then xm (fun _ => (slRest i κ').1) else 0)
+  let F : Big n k M := WithLp.toLp 2 (fun κ' =>
+    if (slRest i κ').2 = r then xm (fun _ => (slRest i κ').1) else 0)
   have hFapp : ∀ κ', F κ' = if (slRest i κ').2 = r then xm (fun _ => (slRest i κ').1) else 0 :=
     fun κ' => rfl
   have hsltF : ∀ r', slt i r' F = if r' = r then xm else 0 := by
@@ -98,22 +140,18 @@ theorem position_perp
     simp only [hsltF]
     rw [Finset.sum_eq_single r (fun b _ hb => by simp [hb]) (by simp)]
     simp
-  have hF0 :=
-    hperp F hFmem (fun κ' => by
-      rw [slice_eq_slt, hsltF]
-      split_ifs
-      · exact hxm
-      · exact zero_mem _)
+  have hF0 := hperp F hFmem (fun κ' => by
+    rw [slice_eq_slt, hsltF]
+    split_ifs
+    · exact hxm
+    · exact zero_mem _)
   rw [hinner, hkey] at hF0
   simpa using hF0
 
-theorem crossOp_position_bound
-    (hE : IsGlRep E) (hU : IsInfUnitary ε E) (hV : IsKIrrHW ε E (lowK ε lam) V)
-    (hmono : StrictAnti lam)
-    {h : ℝ} (hh : GapAtLeast ε lam h) (hbig : (n : ℝ) * (pOf ε : ℝ) * (qOf ε : ℝ) + 1 < h)
-    {k : ℕ} (i : Fin k)
-    {P : Big n k M} (hP : ∀ κ, slice i κ P ∈ Wp ε E V)
-    : 2 * (h - n + 1) * ‖P‖ ^ 2 ≤ 2 * RCLike.re (inner ℂ (crossOp ε E k i P) P) := by
+theorem crossOp_position_bound (hE : IsGlRep E) (hU : IsInfUnitary ε E) (hV : IsKIrrHW ε E (lowK ε lam) V)
+    (hmono : StrictAnti lam) {h : ℝ} (hh : GapAtLeast ε lam h)
+    (hbig : (n : ℝ) * (pOf ε : ℝ) * (qOf ε : ℝ) + 1 < h) {k : ℕ} (i : Fin k) {P : Big n k M} (hP : ∀ κ, slice i κ P ∈ Wp ε E V) :
+    2 * (h - n + 1) * ‖P‖ ^ 2 ≤ 2 * RCLike.re (inner ℂ (crossOp ε E k i P) P) := by
   have hr : ∀ r, slt i r P ∈ Wp ε E V := by
     intro r
     by_cases hne : IsEmpty (Fin n × Fin n)
@@ -127,11 +165,10 @@ theorem crossOp_position_bound
     have h1 : (inner ℂ P P : ℂ) = ∑ r, inner ℂ (slt i r P) (slt i r P) := slt_inner_eq_sum i P P
     simp only [inner_self_eq_norm_sq_to_K] at h1
     exact_mod_cast h1
-  have hc
-      : RCLike.re (inner ℂ (crossOp ε E k i P) P)
-        = ∑ r, RCLike.re (inner ℂ (crossOp ε E 1 0 (slt i r P)) (slt i r P)) := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [slt_inner_eq_sum i, map_sum]
+  have hc : RCLike.re (inner ℂ (crossOp ε E k i P) P) =
+      ∑ r, RCLike.re (inner ℂ (crossOp ε E 1 0 (slt i r P)) (slt i r P)) := by
+
+    rw [slt_inner_eq_sum i, map_sum]
     simp only [slt_crossOp]
   rw [hn, hc, Finset.mul_sum, Finset.mul_sum]
   exact Finset.sum_le_sum fun r _ => Wp_bound hE hU hV hmono hh hbig (hr r)

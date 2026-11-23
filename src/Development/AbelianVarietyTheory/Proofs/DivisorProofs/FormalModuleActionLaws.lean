@@ -1,27 +1,65 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsEtLevOver
-public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.RangeSubsetOfGeom
+public import Development.AbelianVarietyTheory.Definitions.Divisors.IsEtPlace
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.EpsZeroPtEpsScalePt
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+public import Mathlib.LinearAlgebra.FreeModule.IdealQuotient
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Lemma
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CompEqOneOfTransl
+public import Mathlib.Algebra.Algebra.ZMod
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
-  NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
-  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Hecke
-  GlobalTheory.UPel.HT.EtLev
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Hecke GlobalTheory.UPel.HT.EtLev
 
 noncomputable section
 
 namespace GlobalTheory.UPel.HT.EtLev.TanKill
 
-theorem exists_mem_pow_forall_ne_zero
-    : ∀ (p : ℕ) [Fact p.Prime] (D : Datum p) (R : Type) [CommRing R] (b : Base D R)
-        (w0 : Ideal (𝓞 D.F)) (r : ℕ),
-      IsEtPlace b w0
-        → ∀ (k : Type) [Field k] (β : R →+* k), ∃ c ∈ w0 ^ r, ∀ i, β (b.t i c) ≠ 0 := by
+theorem exists_mem_pow_forall_ne_zero : ∀ (p : ℕ) [Fact p.Prime] (D : Datum p) (R : Type) [CommRing R] (b : Base D R) (w0 : Ideal (𝓞 D.F)) (r : ℕ), IsEtPlace b w0 → ∀ (k : Type) [Field k] (β : R →+* k), ∃ c ∈ w0 ^ r, ∀ i, β (b.t i c) ≠ 0 := by
   intro p _ D R _ b w0 r hw k _ β
   classical
   by_contra hcon
@@ -30,15 +68,12 @@ theorem exists_mem_pow_forall_ne_zero
   · obtain ⟨i, -⟩ := hcon 0 (zero_mem _)
     exact (Fin.elim0 (ha ▸ i))
   let i0 : Fin D.a := ⟨0, ha⟩
-  have hsub
-      : ((w0 ^ r : Ideal (𝓞 D.F)) : Set (𝓞 D.F))
-        ⊆ ⋃ i ∈ ((Finset.univ : Finset (Fin D.a)) : Set (Fin D.a)), (RingHom.ker (β.comp (b.t i)) : Set (𝓞 D.F)) :=
-    by
-      intro c hc
-      obtain ⟨i, hi⟩ := hcon c hc
-      exact Set.mem_biUnion (Finset.mem_coe.mpr (Finset.mem_univ i)) (RingHom.mem_ker.mpr hi)
-  obtain ⟨i, -, hi⟩ :=
-    (Ideal.subset_union_prime i0 i0 (fun i _ _ _ => RingHom.ker_isPrime _)).mp hsub
+  have hsub : ((w0 ^ r : Ideal (𝓞 D.F)) : Set (𝓞 D.F)) ⊆
+      ⋃ i ∈ ((Finset.univ : Finset (Fin D.a)) : Set (Fin D.a)), (RingHom.ker (β.comp (b.t i)) : Set (𝓞 D.F)) := by
+    intro c hc
+    obtain ⟨i, hi⟩ := hcon c hc
+    exact Set.mem_biUnion (Finset.mem_coe.mpr (Finset.mem_univ i)) (RingHom.mem_ker.mpr hi)
+  obtain ⟨i, -, hi⟩ := (Ideal.subset_union_prime i0 i0 (fun i _ _ _ => RingHom.ker_isPrime _)).mp hsub
   have hi' : w0 ≤ RingHom.ker (β.comp (b.t i)) := (RingHom.ker_isPrime _).le_of_pow_le hi
   have hle : Ideal.span ((b.t i) '' (w0 : Set (𝓞 D.F))) ≤ RingHom.ker β := by
     refine Ideal.span_le.mpr ?_
@@ -47,13 +82,7 @@ theorem exists_mem_pow_forall_ne_zero
   rw [hw.2.2.1 i, top_le_iff] at hle
   exact RingHom.ker_ne_top β hle
 
-theorem exists_mem_pow_add_eq_one
-    : ∀ (p : ℕ) [Fact p.Prime] (D : Datum p) (R : Type) [CommRing R] (b : Base D R)
-        (w0 : Ideal (𝓞 D.F)) (r : ℕ),
-      IsEtPlace b w0
-        → ∀ (k : Type) [Field k] [IsAlgClosed k] [CharP k p] (β : R →+* k) (r2 : ℤ),
-          (r2 : k) = (D.tr : k) - β b.ρ
-            → ∃ c ∈ w0 ^ r, ∃ e f : 𝓞 D.F, c + e * (D.ω - (r2 : 𝓞 D.F)) + f * (p : 𝓞 D.F) = 1 := by
+theorem exists_mem_pow_add_eq_one : ∀ (p : ℕ) [Fact p.Prime] (D : Datum p) (R : Type) [CommRing R] (b : Base D R) (w0 : Ideal (𝓞 D.F)) (r : ℕ), IsEtPlace b w0 → ∀ (k : Type) [Field k] [IsAlgClosed k] [CharP k p] (β : R →+* k) (r2 : ℤ), (r2 : k) = (D.tr : k) - β b.ρ → ∃ c ∈ w0 ^ r, ∃ e f : 𝓞 D.F, c + e * (D.ω - (r2 : 𝓞 D.F)) + f * (p : 𝓞 D.F) = 1 := by
   intro p _ D R _ b w0 r hw k _ _ _ β r2 hr2
   haveI : w0.IsMaximal := hw.1
   letI : Field (𝓞 D.F ⧸ w0) := Ideal.Quotient.field w0
@@ -97,35 +126,30 @@ theorem exists_mem_pow_add_eq_one
   have hJr : w0 ^ r ⊔ J = ⊤ := by
     have h := Ideal.isCoprime_iff_sup_eq.mpr hJ
     exact Ideal.isCoprime_iff_sup_eq.mp h.pow_left
-  obtain ⟨c, hc, j, hj, hcj⟩ :=
-    Submodule.mem_sup.mp (hJr ▸ Submodule.mem_top : (1 : 𝓞 D.F) ∈ w0 ^ r ⊔ J)
+  obtain ⟨c, hc, j, hj, hcj⟩ := Submodule.mem_sup.mp (hJr ▸ Submodule.mem_top : (1 : 𝓞 D.F) ∈ w0 ^ r ⊔ J)
   obtain ⟨e, f, hef⟩ := Ideal.mem_span_pair.mp hj
   exact ⟨c, hc, e, f, by rw [add_assoc, hef, hcj]⟩
 
 variable {k V : Type} [Field k] [AddCommGroup V] [Module k V]
 
-theorem sum_eq_zero_of_eigen (T : Module.End k V) {I : Type} [DecidableEq I] (s : Finset I)
-    : ∀ (w : I → V) (l : I → k),
-      (∀ i ∈ s, T (w i) = l i • w i) → (∀ i ∈ s, l i ≠ 0) → T (∑ i ∈ s, w i) = 0
-        → ∑ i ∈ s, w i = 0 := by
+theorem sum_eq_zero_of_eigen (T : Module.End k V) {I : Type} [DecidableEq I] (s : Finset I) :
+    ∀ (w : I → V) (l : I → k), (∀ i ∈ s, T (w i) = l i • w i) → (∀ i ∈ s, l i ≠ 0) →
+      T (∑ i ∈ s, w i) = 0 → ∑ i ∈ s, w i = 0 := by
   induction s using Finset.induction_on with
   | empty => intros; simp
   | insert j s hj ih =>
     intro w l hw hl hT
     rw [Finset.sum_insert hj] at hT ⊢
     have e : ∑ i ∈ s, (l i - l j) • w i = T (w j + ∑ i ∈ s, w i) - l j • (w j + ∑ i ∈ s, w i) := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_add (f := _), map_sum, hw j (Finset.mem_insert_self j s), smul_add, Finset.smul_sum,
-          Finset.sum_congr rfl (fun i hi => hw i (Finset.mem_insert_of_mem hi))]
+
+      rw [map_add (f := _), map_sum, hw j (Finset.mem_insert_self j s), smul_add, Finset.smul_sum,
+      Finset.sum_congr rfl (fun i hi => hw i (Finset.mem_insert_of_mem hi))]
       simp only [sub_smul, Finset.sum_sub_distrib]
       abel
-    have key :=
-      ih
-        (fun i => (l i - l j) • w i)
-        l
-        (fun i hi => by rw [map_smul, hw i (Finset.mem_insert_of_mem hi), smul_comm])
-        (fun i hi => hl i (Finset.mem_insert_of_mem hi))
-        (by rw [e, map_sub, map_smul, hT, map_zero, smul_zero, sub_zero])
+    have key := ih (fun i => (l i - l j) • w i) l
+      (fun i hi => by rw [map_smul, hw i (Finset.mem_insert_of_mem hi), smul_comm])
+      (fun i hi => hl i (Finset.mem_insert_of_mem hi))
+      (by rw [e, map_sub, map_smul, hT, map_zero, smul_zero, sub_zero])
     rw [key, hT, zero_sub, eq_comm, neg_eq_zero] at e
     exact (smul_eq_zero.mp e).resolve_left (hl j (Finset.mem_insert_self j s))
 
@@ -141,21 +165,10 @@ lemma L_int {O : Type} [Ring O] (L : O →+* Module.End k V) (n : ℤ) (u : V) :
 lemma L_nat {O : Type} [Ring O] (L : O →+* Module.End k V) (n : ℕ) (u : V) : L (n : O) u = (n : k) • u := by
   rw [map_natCast, Module.End.natCast_apply, Nat.cast_smul_eq_nsmul]
 
-theorem core
-    {p : ℕ} [Fact p.Prime]
-    (D : Datum p)
-    {R : Type} [CommRing R]
-    (b : Base D R)
-    (w0 : Ideal (𝓞 D.F))
-    (r : ℕ)
-    (hw : IsEtPlace b w0)
-    [IsAlgClosed k]
-    (β : R →+* k) (L : 𝓞 D.F →+* Module.End k V)
-    (hlie : ∀ v,
-      L D.ω v = β b.ρ • v
-        → ∃ w : Fin D.a → V, (∀ i c, L c (w i) = β (b.t i c) • w i) ∧ v = ∑ i, w i)
-    (v : V) (hv : ∀ c ∈ w0 ^ r, L c v = 0)
-    : v = 0 := by
+theorem core {p : ℕ} [Fact p.Prime] (D : Datum p) {R : Type} [CommRing R] (b : Base D R) (w0 : Ideal (𝓞 D.F)) (r : ℕ)
+    (hw : IsEtPlace b w0) [IsAlgClosed k] (β : R →+* k) (L : 𝓞 D.F →+* Module.End k V)
+    (hlie : ∀ v, L D.ω v = β b.ρ • v → ∃ w : Fin D.a → V, (∀ i c, L c (w i) = β (b.t i c) • w i) ∧ v = ∑ i, w i)
+    (v : V) (hv : ∀ c ∈ w0 ^ r, L c v = 0) : v = 0 := by
   by_cases hp : (p : k) = 0
   swap
   · have h := hv _ (Ideal.pow_mem_pow hw.2.1 r)
@@ -173,9 +186,8 @@ theorem core
   have hq : ∀ u, Tω (Tω u) = (D.tr : k) • Tω u - (D.nm : k) • u := by
     intro u
     have h := congrArg (fun f => f u) (congrArg L hquad)
-    simp only [map_add (f := _), map_sub, map_mul, map_zero, Module.End.mul_apply,
-        LinearMap.add_apply, LinearMap.sub_apply, LinearMap.zero_apply, L_int]
-      at h
+    simp only [map_add (f := _), map_sub, map_mul, map_zero, Module.End.mul_apply, LinearMap.add_apply, LinearMap.sub_apply,
+      LinearMap.zero_apply, L_int] at h
     rw [← hTω] at h
     rw [← sub_eq_zero, ← h]
     abel
@@ -190,10 +202,8 @@ theorem core
     have hd : ((D.tr ^ 2 - 4 * D.nm : ℤ) : k) = 0 := by
       have : ((D.tr ^ 2 - 4 * D.nm : ℤ) : k) = (ρ1 - ρ2) ^ 2 := by
         push_cast
-        rw [← hsum, ← hprod]
-        ring
-      rw [this, h0]
-      ring
+        rw [← hsum, ← hprod]; ring
+      rw [this, h0]; ring
     exact D.disc_p ((CharP.intCast_eq_zero_iff k p _).mp hd)
   have hcomm : ∀ c u, L c (Tω u) = Tω (L c u) := by
     intro c u
@@ -224,13 +234,9 @@ theorem core
     obtain ⟨c, hc, hne⟩ := exists_mem_pow_forall_ne_zero p D R b w0 r hw k β
     obtain ⟨w, hwe, hweq⟩ := hlie v1 e1
     rw [hweq]
-    refine sum_eq_zero_of_eigen (L c) Finset.univ w
-      (fun i => β (b.t i c))
-      (fun i _ => hwe i c)
-      (fun i _ => hne i)
-      ?_
-    rw [← hweq]
-    exact k1 c hc
+    refine sum_eq_zero_of_eigen (L c) Finset.univ w (fun i => β (b.t i c)) (fun i _ => hwe i c)
+      (fun i _ => hne i) ?_
+    rw [← hweq]; exact k1 c hc
   have z2 : v2 = 0 := by
     obtain ⟨r0, hr0⟩ := D.split
     have hr0k : ((r0 : k) - ρ1) * ((r0 : k) - ρ2) = 0 := by
@@ -241,12 +247,10 @@ theorem core
       rcases mul_eq_zero.mp hr0k with h | h
       · exact ⟨D.tr - r0, by push_cast; rw [hρ2]; linear_combination -h⟩
       · exact ⟨r0, by linear_combination h⟩
-    obtain ⟨c, hc, e, f, hcef⟩ :=
-      exists_mem_pow_add_eq_one p D R b w0 r hw k β r2 (by rw [hr2, hρ2, hρ1])
+    obtain ⟨c, hc, e, f, hcef⟩ := exists_mem_pow_add_eq_one p D R b w0 r hw k β r2 (by rw [hr2, hρ2, hρ1])
     have h := congrArg (fun g => g v2) (congrArg L hcef)
-    simp only [map_add (f := _), map_mul, map_sub, map_one, Module.End.mul_apply,
-        LinearMap.add_apply, LinearMap.sub_apply, Module.End.one_apply, L_int, L_nat, k2 c hc]
-      at h
+    simp only [map_add (f := _), map_mul, map_sub, map_one, Module.End.mul_apply, LinearMap.add_apply, LinearMap.sub_apply,
+      Module.End.one_apply, L_int, L_nat, k2 c hc] at h
     simp only [zero_add, add_zero] at h
     rw [← hTω, e2, hr2, map_smul, sub_self, hp, zero_smul, map_zero, add_zero] at h
     exact h.symm
@@ -258,36 +262,21 @@ namespace GlobalTheory.UPel.HT.EtLev.TanKill
 
 open GlobalTheory.TanPtMod
 
-theorem tan_eq_one_of_etPlace
-    : ∀ (p : ℕ) [Fact p.Prime] (D : Datum p) (R : Type) [CommRing R] (b : Base D R) (N : ℕ)
-        (w0 : Ideal (𝓞 D.F)) (r : ℕ),
-      IsEtPlace b w0
-        → ∀ (S : Scheme.{0}) (s : S ⟶ Sp R) (o : Obj b N s) (k : Type) [Field k] [IsAlgClosed k]
-            (x : Sp k ⟶ S) (v : epsPtR x ⟶ o.A),
-          spMap (TrivSqZeroExt.fstHom k k k).toRingHom ≫ v.left = (1 : Over.mk x ⟶ o.A).left
-            → (∀ c ∈ w0 ^ r, v ≫ o.act.act (algebraMap (𝓞 D.F) D.O c) = 1)
-            → v = 1 := by
+theorem tan_eq_one_of_etPlace : ∀ (p : ℕ) [Fact p.Prime] (D : Datum p) (R : Type) [CommRing R] (b : Base D R) (N : ℕ) (w0 : Ideal (𝓞 D.F)) (r : ℕ), IsEtPlace b w0 → ∀ (S : Scheme.{0}) (s : S ⟶ Sp R) (o : Obj b N s) (k : Type) [Field k] [IsAlgClosed k] (x : Sp k ⟶ S) (v : epsPtR x ⟶ o.A), spMap (TrivSqZeroExt.fstHom k k k).toRingHom ≫ v.left = (1 : Over.mk x ⟶ o.A).left → (∀ c ∈ w0 ^ r, v ≫ o.act.act (algebraMap (𝓞 D.F) D.O c) = 1) → v = 1 := by
   intro p _ D R _ b N w0 r hw S s o k _ _ x v hv0 hv
   set β : R →+* k := (Spec.preimage (x ≫ s)).hom with hβ
   have hx : x ≫ s = spMap β := (Spec.map_preimage (x ≫ s)).symm
   let L : 𝓞 D.F →+* Module.End k (Tan x o.A) := (actEnd o.act).comp (algebraMap (𝓞 D.F) D.O)
-  have hL : ∀ c (u : Tan x o.A), (L c u).hom = u.hom ≫ o.act.act (algebraMap (𝓞 D.F) D.O c) :=
-    fun _ _ => rfl
-  have hlie
-      : ∀ u : Tan x o.A,
-        L D.ω u = β b.ρ • u
-          → ∃ w : Fin D.a → Tan x o.A, (∀ i c, L c (w i) = β (b.t i c) • w i) ∧ u = ∑ i, w i := by
+  have hL : ∀ c (u : Tan x o.A), (L c u).hom = u.hom ≫ o.act.act (algebraMap (𝓞 D.F) D.O c) := fun _ _ => rfl
+  have hlie : ∀ u : Tan x o.A, L D.ω u = β b.ρ • u →
+      ∃ w : Fin D.a → Tan x o.A, (∀ i c, L c (w i) = β (b.t i c) • w i) ∧ u = ∑ i, w i := by
     intro u hu
-    obtain ⟨w, hw1, hw2⟩ :=
-      o.lie k β x hx u.hom ⟨
-        (mem_tanSub_iff x o.A _).mp u.hom_mem,
-        by
-          have := congrArg (fun t : Tan x o.A => t.hom.left) hu
-          simpa [hL, GrpTangentPt.epsScalePt_left] using this
-      ⟩
+    obtain ⟨w, hw1, hw2⟩ := o.lie k β x hx u.hom
+      ⟨(mem_tanSub_iff x o.A _).mp u.hom_mem, by
+        have := congrArg (fun t : Tan x o.A => t.hom.left) hu
+        simpa [hL, GrpTangentPt.epsScalePt_left] using this⟩
     have hmem : ∀ i, w i ∈ tanSub x o.A := fun i => (mem_tanSub_iff x o.A _).mpr (hw1 i 0).1
-    refine
-      ⟨fun i => Tan.mk (w i) (hmem i), fun i c => Tan.ext (Over.OverMorphism.ext ((hw1 i c).2)), ?_⟩
+    refine ⟨fun i => Tan.mk (w i) (hmem i), fun i c => Tan.ext (Over.OverMorphism.ext ((hw1 i c).2)), ?_⟩
     refine Tan.ext ?_
     rw [Tan.hom_sum, hw2, List.prod_ofFn]
     rfl

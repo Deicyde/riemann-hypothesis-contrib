@@ -1,69 +1,120 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.TateUnramifiedOfTorsionUnramified
-public import Development.AbelianVarietyTheory.Definitions.Degenerations.OfDerivationFnOn
-public import Development.AbelianVarietyTheory.Proofs.CovolumeBounds.IsProjOverMorphismRestrictOfRelAmple
-public import Development.AbelianVarietyTheory.Definitions.ThetaMetrics.TwistingSheafOneChartEqPreimageStandardChart
-public import Development.AbelianVarietyTheory.Definitions.ThetaMetrics.IsRegularFnIffOfIsAffineOpen
-public import Development.AbelianVarietyTheory.Definitions.QuasicoherentCohomology.BijectiveSmulChartSec
-public import Development.AbelianVarietyTheory.Definitions.AbelianSchemeLaws.FirstCohomologyVanishesSpecOfIsLocalRing
+public import Mathlib.LinearAlgebra.Matrix.Determinant.Basic
+public import Mathlib.RingTheory.DiscreteValuationRing.Basic
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.StableLatticeDescentUnramified
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.CategoryTheory.Monoidal.Cartesian.Over
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Coalgebra.IsFrobenius
+import Mathlib.RingTheory.Etale.Weakly
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.HopfAlgebra.Basic
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.TotallySplit
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Topology.Sheaves.Init
+import Development.AbelianVarietyTheory.Definitions.Divisors.MapSmulOfIsHausdorff
+import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.TateUnramifiedOfTorsionUnramified
+import Development.AbelianVarietyTheory.PublishedTheorems.RelativeAmpleness.RelAmpleAndKTrivIff
+public import Mathlib.LinearAlgebra.Dimension.Constructions
+public import Mathlib.LinearAlgebra.FreeModule.PID
+public import Mathlib.LinearAlgebra.Matrix.Adjugate
+public import Mathlib.LinearAlgebra.Matrix.NonsingularInverse
+import Mathlib.Topology.Sheaves.Presheaf
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.CocycleRightZeroThd
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.DiscreteValuationRings.QuadTie
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.SemiabelianSchemes.CubicalStructures.CubeSymmetricSwapFirst
 
 @[expose] public section
 
 open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
 open scoped CategoryTheory.Obj CategoryTheory.MonObj Pointwise
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
-  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory.HTLat GlobalTheory.Published GlobalTheory.Published.AbVarRed IsLocalRing
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.MatrixDescent
 
-theorem exists_restrict
-    (R K W K' : Type) [CommRing R] [Field K] [Algebra R K] [CommRing W] [Field K'] [Algebra W K']
-    [Algebra R W] [Algebra K K'] [Algebra R K'] [IsScalarTower R W K'] [IsScalarTower R K K']
-    (hinj : Function.Injective (algebraMap W K'))
-    (σ : K' ≃ₐ[K] K') (h1 : ∀ x : W, ∃ y : W, σ (algebraMap W K' x) = algebraMap W K' y)
-    (h2 : ∀ x : W, ∃ y : W, σ.symm (algebraMap W K' x) = algebraMap W K' y)
-    : ∃ τ : W ≃ₐ[R] W, ∀ x : W, algebraMap W K' (τ x) = σ (algebraMap W K' x) := by
+theorem exists_restrict (R K W K' : Type) [CommRing R] [Field K] [Algebra R K] [CommRing W]
+    [Field K'] [Algebra W K'] [Algebra R W] [Algebra K K'] [Algebra R K'] [IsScalarTower R W K']
+    [IsScalarTower R K K'] (hinj : Function.Injective (algebraMap W K')) (σ : K' ≃ₐ[K] K')
+    (h1 : ∀ x : W, ∃ y : W, σ (algebraMap W K' x) = algebraMap W K' y)
+    (h2 : ∀ x : W, ∃ y : W, σ.symm (algebraMap W K' x) = algebraMap W K' y) :
+    ∃ τ : W ≃ₐ[R] W, ∀ x : W, algebraMap W K' (τ x) = σ (algebraMap W K' x) := by
   choose f hf using h1
   choose f' hf' using h2
-  have hl : Function.LeftInverse f' f := by intro x; apply hinj; rw [← hf', ← hf]; simp
-  have hr : Function.RightInverse f' f := by intro x; apply hinj; rw [← hf, ← hf']; simp
+  have hl : Function.LeftInverse f' f := by
+    intro x; apply hinj; rw [← hf', ← hf]; simp
+  have hr : Function.RightInverse f' f := by
+    intro x; apply hinj; rw [← hf, ← hf']; simp
   have hm : ∀ x y, f (x * y) = f x * f y := by
     intro x y; apply hinj; rw [map_mul, ← hf, ← hf, ← hf, map_mul, map_mul]
   have ha : ∀ x y, f (x + y) = f x + f y := by
-    intro x y
-    apply hinj
-    rw [map_add (f := _), ← hf, ← hf, ← hf, map_add (f := _), map_add (f := _)]
+    intro x y; apply hinj; rw [map_add (f := _), ← hf, ← hf, ← hf, map_add (f := _), map_add (f := _)]
   have hc : ∀ r : R, f (algebraMap R W r) = algebraMap R W r := by
-    intro r
-    apply hinj
-    rw [← hf, ← IsScalarTower.algebraMap_apply, IsScalarTower.algebraMap_apply R K K',
-      AlgEquiv.commutes]
-  let τ : W ≃ₐ[R] W := {
-    toFun := f
-    invFun := f'
-    left_inv := hl
-    right_inv := hr
-    map_mul' := hm
-    map_add' := ha
-    commutes' := hc
-  }
+    intro r; apply hinj; rw [← hf, ← IsScalarTower.algebraMap_apply,
+      IsScalarTower.algebraMap_apply R K K', AlgEquiv.commutes]
+  let τ : W ≃ₐ[R] W :=
+    { toFun := f
+      invFun := f'
+      left_inv := hl
+      right_inv := hr
+      map_mul' := hm
+      map_add' := ha
+      commutes' := hc }
   exact ⟨τ, fun x => (hf x).symm⟩
 
-theorem vecMul_mem_span
-    {W : Type} [CommRing W] {n : ℕ} (g : Matrix (Fin n) (Fin n) W) (v : Fin n → W)
-    : Matrix.vecMul v g ∈ Submodule.span W (Set.range g) := by
+theorem vecMul_mem_span {W : Type} [CommRing W] {n : ℕ} (g : Matrix (Fin n) (Fin n) W)
+    (v : Fin n → W) : Matrix.vecMul v g ∈ Submodule.span W (Set.range g) := by
   have : Matrix.vecMul v g ∈ LinearMap.range g.vecMulLinear := ⟨v, rfl⟩
   rw [range_vecMulLinear] at this
   exact this
 
-theorem mem_span_iff_vecMul
-    {W : Type} [CommRing W] {n : ℕ} (g : Matrix (Fin n) (Fin n) W) (v : Fin n → W)
-    : v ∈ Submodule.span W (Set.range g) ↔ ∃ a, Matrix.vecMul a g = v := by
+theorem mem_span_iff_vecMul {W : Type} [CommRing W] {n : ℕ} (g : Matrix (Fin n) (Fin n) W)
+    (v : Fin n → W) : v ∈ Submodule.span W (Set.range g) ↔ ∃ a, Matrix.vecMul a g = v := by
   constructor
   · intro hv
     have : v ∈ LinearMap.range g.vecMulLinear := by rw [range_vecMulLinear]; exact hv
@@ -71,25 +122,20 @@ theorem mem_span_iff_vecMul
     exact ⟨a, ha⟩
   · rintro ⟨a, rfl⟩; exact vecMul_mem_span g a
 
-theorem rational_rows
-    (R W : Type)
-    [CommRing R] [IsDomain R] [IsDiscreteValuationRing R] [CommRing W] [IsDomain W] [Algebra R W]
-    (hinj : Function.Injective (algebraMap R W))
-    (n : ℕ) (g : Matrix (Fin n) (Fin n) W) (hg : g.det ≠ 0)
-    (d : R)
-    (hd : d ≠ 0) (hdN : ∀ w : Fin n → W, algebraMap R W d • w ∈ Submodule.span W (Set.range g))
-    (hspan : Submodule.span W (Set.range g)
-      = Submodule.span W
-        {v | v ∈ Submodule.span W (Set.range g) ∧ ∀ i, v i ∈ Set.range (algebraMap R W)})
-    : ∃ (A : Matrix (Fin n) (Fin n) R) (h : Matrix (Fin n) (Fin n) W),
+theorem rational_rows (R W : Type) [CommRing R] [IsDomain R] [IsDiscreteValuationRing R]
+    [CommRing W] [IsDomain W] [Algebra R W] (hinj : Function.Injective (algebraMap R W))
+    (n : ℕ) (g : Matrix (Fin n) (Fin n) W) (hg : g.det ≠ 0) (d : R) (hd : d ≠ 0)
+    (hdN : ∀ w : Fin n → W, algebraMap R W d • w ∈ Submodule.span W (Set.range g))
+    (hspan : Submodule.span W (Set.range g) = Submodule.span W
+      {v | v ∈ Submodule.span W (Set.range g) ∧ ∀ i, v i ∈ Set.range (algebraMap R W)}) :
+    ∃ (A : Matrix (Fin n) (Fin n) R) (h : Matrix (Fin n) (Fin n) W),
       IsUnit h.det ∧ A.map (algebraMap R W) = h * g := by
   classical
   set N := Submodule.span W (Set.range g) with hNdef
-  let φ : (Fin n → R) →ₗ[R] (Fin n → W) := {
-    toFun := fun a i => algebraMap R W (a i)
-    map_add' := by intro a b; funext i; simp
-    map_smul' := by intro c a; funext i; simp [Algebra.smul_def]
-  }
+  let φ : (Fin n → R) →ₗ[R] (Fin n → W) :=
+    { toFun := fun a i => algebraMap R W (a i)
+      map_add' := by intro a b; funext i; simp
+      map_smul' := by intro c a; funext i; simp [Algebra.smul_def] }
   have hφ : ∀ a i, φ a i = algebraMap R W (a i) := fun _ _ => rfl
 
   let N₀ : Submodule R (Fin n → R) := (N.restrictScalars R).comap φ
@@ -127,8 +173,8 @@ theorem rational_rows
   have hN₀B : ∀ x : N₀, φ x ∈ Submodule.span W (Set.range B) := by
     intro x
     have hx := congrArg Subtype.val (b'.sum_repr x)
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← hx, Submodule.coe_sum, map_sum]
+
+    rw [← hx, Submodule.coe_sum, map_sum]
     refine Submodule.sum_mem _ fun i _ => ?_
     rw [Submodule.coe_smul, map_smul, ← hBφ]
     exact Submodule.smul_of_tower_mem _ _ (Submodule.subset_span ⟨i, rfl⟩)
@@ -160,22 +206,20 @@ end GlobalTheory.MatrixDescent
 
 namespace GlobalTheory
 
+
 open GlobalTheory.MatrixDescent in
-theorem matrix_descent_unramified
-    (R K W K' : Type) [CommRing R] [IsDomain R] [IsDiscreteValuationRing R] [Field K] [Algebra R K]
-    [IsFractionRing R K] [CommRing W] [IsDomain W] [IsDiscreteValuationRing W] [Field K']
-    [Algebra W K'] [IsFractionRing W K'] [Algebra R W] [Algebra K K'] [Algebra R K']
-    [IsScalarTower R W K'] [IsScalarTower R K K']
-    (hm : (maximalIdeal R).map (algebraMap R W) = maximalIdeal W)
-    (D : Set (K' ≃ₐ[K] K'))
+theorem matrix_descent_unramified (R K W K' : Type) [CommRing R] [IsDomain R]
+    [IsDiscreteValuationRing R] [Field K] [Algebra R K] [IsFractionRing R K] [CommRing W]
+    [IsDomain W] [IsDiscreteValuationRing W] [Field K'] [Algebra W K'] [IsFractionRing W K']
+    [Algebra R W] [Algebra K K'] [Algebra R K'] [IsScalarTower R W K'] [IsScalarTower R K K']
+    (hm : (maximalIdeal R).map (algebraMap R W) = maximalIdeal W) (D : Set (K' ≃ₐ[K] K'))
     (hD1 : ∀ σ ∈ D, ∀ x : W, ∃ y : W, σ (algebraMap W K' x) = algebraMap W K' y)
     (hD2 : ∀ σ ∈ D, ∀ x : W, ∃ y : W, σ.symm (algebraMap W K' x) = algebraMap W K' y)
-    (hres : ∀ x : W,
-      (∀ σ ∈ D, ∀ y : W, σ (algebraMap W K' x) = algebraMap W K' y → y - x ∈ maximalIdeal W)
-        → ∃ r : R, x - algebraMap R W r ∈ maximalIdeal W)
+    (hres : ∀ x : W, (∀ σ ∈ D, ∀ y : W, σ (algebraMap W K' x) = algebraMap W K' y →
+      y - x ∈ maximalIdeal W) → ∃ r : R, x - algebraMap R W r ∈ maximalIdeal W)
     (n : ℕ) (g : Matrix (Fin n) (Fin n) K') (hg : IsUnit g.det)
-    (hstab : ∀ σ ∈ D, ∃ h : Matrix (Fin n) (Fin n) W, g.map σ = h.map (algebraMap W K') * g)
-    : ∃ (h : Matrix (Fin n) (Fin n) W) (k : Matrix (Fin n) (Fin n) K),
+    (hstab : ∀ σ ∈ D, ∃ h : Matrix (Fin n) (Fin n) W, g.map σ = h.map (algebraMap W K') * g) :
+    ∃ (h : Matrix (Fin n) (Fin n) W) (k : Matrix (Fin n) (Fin n) K),
       IsUnit h.det ∧ k.map (algebraMap K K') = h.map (algebraMap W K') * g := by
   set iW := algebraMap W K' with hiW
   have hinjW : Function.Injective iW := IsFractionRing.injective W K'
@@ -196,9 +240,8 @@ theorem matrix_descent_unramified
   have hirr : Irreducible (algebraMap R W ϖ) :=
     (IsDiscreteValuationRing.irreducible_iff_uniformizer _).mpr hmax
 
-  obtain ⟨b, hb⟩ :=
-    IsLocalization.exist_integer_multiples (M := nonZeroDivisors W)
-      (Finset.univ : Finset (Fin n × Fin n)) (fun p => g p.1 p.2)
+  obtain ⟨b, hb⟩ := IsLocalization.exist_integer_multiples (M := nonZeroDivisors W)
+    (Finset.univ : Finset (Fin n × Fin n)) (fun p => g p.1 p.2)
   have hb0 : (b : W) ≠ 0 := nonZeroDivisors.coe_ne_zero b
   obtain ⟨k, u, hu⟩ := IsDiscreteValuationRing.associated_pow_irreducible hb0 hirr
   set c : R := ϖ ^ k with hcdef
@@ -217,7 +260,8 @@ theorem matrix_descent_unramified
     intro h0
     have : iW (Matrix.of g').det = (algebraMap R K' c) ^ n * g.det := by
       rw [RingHom.map_det]
-      have e : iW.mapMatrix (Matrix.of g') = algebraMap R K' c • g := by ext i j; simp [hg']
+      have e : iW.mapMatrix (Matrix.of g') = algebraMap R K' c • g := by
+        ext i j; simp [hg']
       rw [e, Matrix.det_smul, Fintype.card_fin]
     rw [h0, map_zero] at this
     exact (mul_ne_zero (pow_ne_zero n hcK'0) hg.ne_zero) this.symm
@@ -228,12 +272,10 @@ theorem matrix_descent_unramified
   obtain ⟨r, v, hv⟩ := IsDiscreteValuationRing.associated_pow_irreducible hdet' hirr
   have hdN : ∀ w : Fin n → W, algebraMap R W (ϖ ^ r) • w ∈ N := by
     intro w
-    have e
-        : algebraMap R W (ϖ ^ r) • w = Matrix.vecMul ((v : W) • Matrix.vecMul w G.adjugate) G := by
+    have e : algebraMap R W (ϖ ^ r) • w = Matrix.vecMul ((v : W) • Matrix.vecMul w G.adjugate) G := by
       rw [Matrix.smul_vecMul, Matrix.vecMul_vecMul, Matrix.adjugate_mul, Matrix.vecMul_smul,
         Matrix.vecMul_one, smul_smul, map_pow, ← hv, mul_comm]
-    rw [e]
-    exact vecMul_mem_span G _
+    rw [e]; exact vecMul_mem_span G _
   have hlat : (maximalIdeal W) ^ r • (⊤ : Submodule W (Fin n → W)) ≤ N := by
     rw [Submodule.smul_le]
     intro x hx w _
@@ -245,40 +287,35 @@ theorem matrix_descent_unramified
   have hτ : ∀ σ ∈ D, ∃ τ : W ≃ₐ[R] W, ∀ x : W, iW (τ x) = σ (iW x) := fun σ hσ =>
     exists_restrict R K W K' hinjW σ (hD1 σ hσ) (hD2 σ hσ)
   set D' : Set (W ≃ₐ[R] W) := {τ | ∃ σ ∈ D, ∀ x : W, iW (τ x) = σ (iW x)} with hD'def
-  have hres'
-      : ∀ x : W,
-        (∀ τ ∈ D', τ x - x ∈ maximalIdeal W) → ∃ r : R, x - algebraMap R W r ∈ maximalIdeal W := by
+  have hres' : ∀ x : W, (∀ τ ∈ D', τ x - x ∈ maximalIdeal W) →
+      ∃ r : R, x - algebraMap R W r ∈ maximalIdeal W := by
     intro x hx
     apply hres x
     intro σ hσ y hy
     obtain ⟨τ, hτσ⟩ := hτ σ hσ
     have : τ x = y := hinjW (by rw [hτσ, hy])
-    rw [← this]
-    exact hx τ ⟨σ, hσ, hτσ⟩
+    rw [← this]; exact hx τ ⟨σ, hσ, hτσ⟩
   have hstab' : ∀ τ ∈ D', ∀ w ∈ N, (fun i => τ (w i)) ∈ N := by
     rintro τ ⟨σ, hσ, hτσ⟩ w hw
     obtain ⟨h, hh⟩ := hstab σ hσ
     have hGτ : G.map τ = h * G := by
       ext i j
       apply hinjW
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [Matrix.map_apply, hτσ, hGmap, map_mul, Matrix.mul_apply, map_sum]
+
+      rw [Matrix.map_apply, hτσ, hGmap, map_mul, Matrix.mul_apply, map_sum]
       have := congrFun (congrFun hh i) j
       rw [Matrix.map_apply, Matrix.mul_apply] at this
       rw [this, hRK'', AlgEquiv.commutes, ← hRK'', Finset.mul_sum]
       refine Finset.sum_congr rfl fun l _ => ?_
-      rw [map_mul, hGmap, Matrix.map_apply]
-      ring
+      rw [map_mul, hGmap, Matrix.map_apply]; ring
     obtain ⟨a, rfl⟩ := (mem_span_iff_vecMul G w).mp hw
-    have e
-        : (fun i => τ (Matrix.vecMul a G i))
-          = Matrix.vecMul (Matrix.vecMul (fun i => τ (a i)) h) G := by
+    have e : (fun i => τ (Matrix.vecMul a G i)) =
+        Matrix.vecMul (Matrix.vecMul (fun i => τ (a i)) h) G := by
       rw [Matrix.vecMul_vecMul, ← hGτ]
       funext i
-      set_option synthInstance.maxHeartbeats 100000 in
+
       simp [Matrix.vecMul, dotProduct, map_sum]
-    rw [e]
-    exact vecMul_mem_span G _
+    rw [e]; exact vecMul_mem_span G _
   have hspan := stable_lattice_descent_unramified R W hm D' hres' n r N hlat hstab'
   obtain ⟨A, h, hhu, hA⟩ :=
     rational_rows R W hinjR n G hdet' (ϖ ^ r) (pow_ne_zero r hϖ.ne_zero) hdN hspan
@@ -287,11 +324,10 @@ theorem matrix_descent_unramified
   have e1 := congrFun (congrFun hA i) j
   rw [Matrix.map_apply, Matrix.mul_apply] at e1
   have e2 : algebraMap R K' (A i j) = algebraMap R K' c * (h.map iW * g) i j := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hRK', e1, map_sum, Matrix.mul_apply, Finset.mul_sum]
+
+    rw [hRK', e1, map_sum, Matrix.mul_apply, Finset.mul_sum]
     refine Finset.sum_congr rfl fun l _ => ?_
-    rw [map_mul, hGmap, Matrix.map_apply]
-    ring
+    rw [map_mul, hGmap, Matrix.map_apply]; ring
   rw [Matrix.map_apply, Matrix.smul_apply, Matrix.map_apply, smul_eq_mul, map_mul, map_inv₀,
     ← hRK'', ← hRK'', e2]
   field_simp

@@ -1,24 +1,55 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.Definitions.Divisors.CechFam
-public import Development.AbelianVarietyTheory.Definitions.Divisors.IsLifted
-public import Development.AbelianVarietyTheory.Definitions.Divisors.IsEtCoord
-public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.KawamataViehweg
-public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.IsLogCanonicalMultipleCanonical
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsAffineOpenPreimageOfIsPullback
-public import Development.AbelianVarietyTheory.Definitions.QuasicoherentCohomology.FiniteCohPushforwardIffOfIsClosedImmersion
-public import Development.AbelianVarietyTheory.Proofs.CoherentCohomologyProofs.CechModulesFunctorShortExactOfIsAffineOpen
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsSubsingletonCohTwistTensLbPow
-public import Development.WeilBound.CoreStatements.PublishedTheorems.NadelVanishingPairs.NadelVanishingLemmas.LogFormsEqChartForms
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.MemChartFormsIff
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.LogCoordinateWedgeLinearIndependentSpanEqTop
+public import Development.AbelianVarietyTheory.Definitions.Divisors.IsEulerContraction
+import Mathlib.Algebra.Module.StablyFree.Basic
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Development.AbelianVarietyTheory.Definitions.Divisors.IsEtCoord
 
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace Limits
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
-  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory GlobalTheory.CechPic GlobalTheory.Cartier GlobalTheory.LogDR GlobalTheory.LogPair
 
 set_option autoImplicit false
@@ -27,12 +58,11 @@ namespace GlobalTheory.LogDR
 open TopForm
 variable {k K : Type} [CommRing k] [Field K]
 
-def absDer (α : k →+* K) (hk : Function.Surjective (Int.castRingHom k))
-    : letI := α.toAlgebra; letI : Module k Ω[K⁄ℤ] := Module.compHom _ α; Derivation k K Ω[K⁄ℤ] :=
+def absDer (α : k →+* K) (hk : Function.Surjective (Int.castRingHom k)) :
+    letI := α.toAlgebra; letI : Module k Ω[K⁄ℤ] := Module.compHom _ α; Derivation k K Ω[K⁄ℤ] :=
   letI := α.toAlgebra
   letI : Module k Ω[K⁄ℤ] := Module.compHom _ α
-  {
-    toFun := KaehlerDifferential.D ℤ K
+  { toFun := KaehlerDifferential.D ℤ K
     map_add' := map_add _
     map_smul' := fun c a => by
       obtain ⟨n, rfl⟩ := hk c
@@ -41,34 +71,32 @@ def absDer (α : k →+* K) (hk : Function.Surjective (Int.castRingHom k))
       rw [this, Derivation.map_algebraMap, smul_zero, add_zero, RingHom.id_apply]
       exact congrArg (· • KaehlerDifferential.D ℤ K a) this.symm
     map_one_eq_zero' := Derivation.map_one_eq_zero _
-    leibniz' := fun a b => Derivation.leibniz _ a b
-  }
+    leibniz' := fun a b => Derivation.leibniz _ a b }
 
-theorem intCast_surj (p : ℕ) : Function.Surjective (Int.castRingHom (ZMod p)) := fun a =>
-  ZMod.intCast_surjective a
+theorem intCast_surj (p : ℕ) : Function.Surjective (Int.castRingHom (ZMod p)) :=
+  fun a => ZMod.intCast_surjective a
 
-def omegaToAbs (α : k →+* K) (hk : Function.Surjective (Int.castRingHom k))
-    : Omega α →ₗ[K] Ω[K⁄ℤ] :=
+def omegaToAbs (α : k →+* K) (hk : Function.Surjective (Int.castRingHom k)) :
+    Omega α →ₗ[K] Ω[K⁄ℤ] :=
   letI := α.toAlgebra
   letI : Module k Ω[K⁄ℤ] := Module.compHom _ α
   letI tw : IsScalarTower k K Ω[K⁄ℤ] := ⟨fun c a m => mul_smul (α c) a m⟩
   @Derivation.liftKaehlerDifferential k K _ _ _ _ _ _ _ tw (absDer α hk)
 
-@[simp]
-theorem omegaToAbs_dFun (α : k →+* K) (hk : Function.Surjective (Int.castRingHom k)) (f : K)
-    : omegaToAbs α hk (dFun α f) = dK f := by
+@[simp] theorem omegaToAbs_dFun (α : k →+* K) (hk : Function.Surjective (Int.castRingHom k)) (f : K) :
+    omegaToAbs α hk (dFun α f) = dK f := by
   letI := α.toAlgebra
   letI : Module k Ω[K⁄ℤ] := Module.compHom _ α
   letI tw : IsScalarTower k K Ω[K⁄ℤ] := ⟨fun c a m => mul_smul (α c) a m⟩
   exact @Derivation.liftKaehlerDifferential_comp_D k K _ _ _ _ _ _ _ tw (absDer α hk) f
 
-def formsToLam (α : k →+* K) (hk : Function.Surjective (Int.castRingHom k)) (D : ℕ)
-    : Forms α D →ₗ[K] abelian₂ K :=
+def formsToLam (α : k →+* K) (hk : Function.Surjective (Int.castRingHom k)) (D : ℕ) :
+    Forms α D →ₗ[K] abelian₂ K :=
   (⋀[K]^D Ω[K⁄ℤ]).subtype ∘ₗ exteriorPower.map D (omegaToAbs α hk)
 
-theorem formsToLam_dForm
-    (α : k →+* K) (hk : Function.Surjective (Int.castRingHom k)) {D : ℕ} (f : Fin D → K)
-    : formsToLam α hk D (dForm α f) = ExteriorAlgebra.ιMulti K D fun i => dK (f i) := by
+theorem formsToLam_dForm (α : k →+* K) (hk : Function.Surjective (Int.castRingHom k)) {D : ℕ}
+    (f : Fin D → K) :
+    formsToLam α hk D (dForm α f) = ExteriorAlgebra.ιMulti K D fun i => dK (f i) := by
   simp only [formsToLam, dForm, dWedge, LinearMap.comp_apply, exteriorPower.map_apply_ιMulti,
     Submodule.subtype_apply, exteriorPower.ιMulti_apply_coe, Function.comp_def]
   congr 1
@@ -80,14 +108,9 @@ end GlobalTheory.LogDR
 namespace GlobalTheory.LogDR
 open TopForm GlobalTheory.Cartier.CartierDiv
 
-theorem isEqn_sum_of_isSncOn
-    {X : Scheme.{0}} [IsIntegral X]
-    {C : Type} [Fintype C]
-    (E : C → CartierDiv X)
-    (U : X.Opens)
-    {n : ℕ} (x : Fin n → X.functionFieldˣ) (J : Finset (Fin n)) (h : IsSncOn E U x J)
-    (y : X) (hy : y ∈ U)
-    : (∑ c, E c).IsEqn y (∏ j ∈ J, x j) := by
+theorem isEqn_sum_of_isSncOn {X : Scheme.{0}} [IsIntegral X] {C : Type} [Fintype C] (E : C → CartierDiv X)
+    (U : X.Opens) {n : ℕ} (x : Fin n → X.functionFieldˣ) (J : Finset (Fin n)) (h : IsSncOn E U x J)
+    (y : X) (hy : y ∈ U) : (∑ c, E c).IsEqn y (∏ j ∈ J, x j) := by
   classical
   obtain ⟨e, he_inj, hJ, hE⟩ := h
   have key : ∀ S : Finset C, (∑ c ∈ S, E c).IsEqn y (∏ c ∈ S, (e c).elim 1 x) := by
@@ -123,30 +146,20 @@ namespace GlobalTheory.LogDR
 open TopForm GlobalTheory.Cartier.CartierDiv
 open ReciprocityTheory.ChartRestriction.G.DVR.FlatBC (algX)
 
-theorem det_mem_subring
-    {K : Type} [Field K]
-    (A : Subring K)
-    {n : ℕ} (c : Matrix (Fin n) (Fin n) K) (hc : ∀ i k, c i k ∈ A)
-    : c.det ∈ A := by
+theorem det_mem_subring {K : Type} [Field K] (A : Subring K) {n : ℕ} (c : Matrix (Fin n) (Fin n) K)
+    (hc : ∀ i k, c i k ∈ A) : c.det ∈ A := by
   rw [Matrix.det_apply]
   refine A.sum_mem fun σ _ => ?_
   rw [Units.smul_def]
   exact A.zsmul_mem (A.prod_mem fun i _ => hc _ _) _
 
-private theorem forms_mem_lemma
-    {k A : Type} [CommRing k] [CommRing A]
-    (α : k →+* A) (d : ℕ) (P : Submodule A (Forms α d))
-    (hgen : ∀ f : Fin d → A, dForm α f ∈ P) (ω : Forms α d)
-    : ω ∈ P := by
+private theorem forms_mem_lemma {k A : Type} [CommRing k] [CommRing A] (α : k →+* A) (d : ℕ)
+    (P : Submodule A (Forms α d)) (hgen : ∀ f : Fin d → A, dForm α f ∈ P) (ω : Forms α d) : ω ∈ P := by
   letI := α.toAlgebra
   have hω : ω ∈ Submodule.span A (Set.range (exteriorPower.ιMulti A d)) := by
     rw [exteriorPower.ιMulti_span]; trivial
-  refine Submodule.span_induction
-    (fun x hx => ?_)
-    P.zero_mem
-    (fun _ _ _ _ => P.add_mem)
-    (fun a _ _ => P.smul_mem a)
-    hω
+  refine Submodule.span_induction (fun x hx => ?_) P.zero_mem (fun _ _ _ _ => P.add_mem)
+    (fun a _ _ => P.smul_mem a) hω
   obtain ⟨w, rfl⟩ := hx
   have hw : ∀ i, ∃ c : A →₀ A, (c.sum fun a r => r • KaehlerDifferential.D k A a) = w i := fun i =>
     (Finsupp.mem_span_range_iff_exists_finsupp).1
@@ -160,35 +173,26 @@ private theorem forms_mem_lemma
   rw [MultilinearMap.map_smul_univ, AlternatingMap.coe_multilinearMap]
   exact P.smul_mem _ (hgen r)
 
-private theorem ιMulti_eq_det_lemma_2
-    {K : Type} [Field K] {n : ℕ} (x : Fin n → Kˣ) (hx : IsCoord x) (v : Fin n → Ω[K⁄ℤ])
-    : ExteriorAlgebra.ιMulti K n v
-      = (Module.Basis.mk hx.1 (le_of_eq hx.2.symm)).det v
-        • ExteriorAlgebra.ιMulti K n (fun j => dK (x j : K)) := by
+private theorem ιMulti_eq_det_lemma_2 {K : Type} [Field K] {n : ℕ} (x : Fin n → Kˣ) (hx : IsCoord x)
+    (v : Fin n → Ω[K⁄ℤ]) :
+    ExteriorAlgebra.ιMulti K n v = (Module.Basis.mk hx.1 (le_of_eq hx.2.symm)).det v •
+      ExteriorAlgebra.ιMulti K n (fun j => dK (x j : K)) := by
   classical
   set b := Module.Basis.mk hx.1 (le_of_eq hx.2.symm) with hbdef
   have hb : (fun j => dK (x j : K)) = ⇑b := (Module.Basis.coe_mk _ _).symm
   rw [hb, ← sub_eq_zero, ← Module.forall_dual_apply_eq_zero_iff K]
   intro φ
-  have h1 :=
-    congrArg
-      (fun g => g v)
-      (AlternatingMap.eq_smul_basis_det b (φ.compAlternatingMap (ExteriorAlgebra.ιMulti K n)))
+  have h1 := congrArg (fun g => g v)
+    (AlternatingMap.eq_smul_basis_det b (φ.compAlternatingMap (ExteriorAlgebra.ιMulti K n)))
   simp only [AlternatingMap.smul_apply, LinearMap.compAlternatingMap_apply, smul_eq_mul] at h1
   rw [map_sub, map_smul, h1, smul_eq_mul, mul_comm, sub_self]
 
-theorem formOf_eq_regAt_smul
-    (p : ℕ) [Fact p.Prime]
-    {X : Scheme.{0}} [IsIntegral X]
-    (f : X ⟶ Sp (ZMod p))
-    (d : ℕ)
-    {U : X.Opens} (ω : FormsOn f d U)
-    (y : X) (hy : y ∈ U)
-    (x : Fin d → X.functionFieldˣ) (hx : AlgChart (locRing y) x)
-    : ∃ u : X.functionField,
-      RegAt y u
-        ∧ formsToLam (constFn f) (intCast_surj p) d (formOf U (gen_mem hy) ω)
-          = u • ExteriorAlgebra.ιMulti _ d fun j => dK (x j : X.functionField) := by
+theorem formOf_eq_regAt_smul (p : ℕ) [Fact p.Prime] {X : Scheme.{0}} [IsIntegral X] (f : X ⟶ Sp (ZMod p))
+    (d : ℕ) {U : X.Opens} (ω : FormsOn f d U) (y : X) (hy : y ∈ U) (x : Fin d → X.functionFieldˣ)
+    (hx : AlgChart (locRing y) x) :
+    ∃ u : X.functionField, RegAt y u ∧
+      formsToLam (constFn f) (intCast_surj p) d (formOf U (gen_mem hy) ω) =
+        u • ExteriorAlgebra.ιMulti _ d fun j => dK (x j : X.functionField) := by
   classical
   have hxc := hx.coord
   set b := Module.Basis.mk hxc.1 (le_of_eq hxc.2.symm) with hbdef
@@ -202,19 +206,17 @@ theorem formOf_eq_regAt_smul
     rw [hs, Module.Basis.repr_sum_self]
     exact hc j
   let W := ExteriorAlgebra.ιMulti X.functionField d (fun j => dK (x j : X.functionField))
-  let P : Submodule (Γ(X, U)) (FormsOn f d U) := {
-    carrier :=
-      {ω | ∃ u, RegAt y u ∧
+  let P : Submodule (Γ(X, U)) (FormsOn f d U) :=
+    { carrier := {ω | ∃ u, RegAt y u ∧
         formsToLam (constFn f) (intCast_surj p) d (formOf U (gen_mem hy) ω) = u • W}
-    add_mem' := by
-      rintro a c ⟨u1, h1, e1⟩ ⟨u2, h2, e2⟩
-      exact ⟨u1 + u2, h1.add h2, by rw [map_add (f := _), map_add (f := _), e1, e2, add_smul]⟩
-    zero_mem' := ⟨0, regAt_zero y, by rw [map_zero, map_zero, zero_smul]⟩
-    smul_mem' := by
-      rintro a c ⟨u, hu, e⟩
-      refine ⟨fnOf U (gen_mem hy) a * u, (regAt_fnOf hy _ a).mul hu, ?_⟩
-      rw [LinearMap.map_smulₛₗ, map_smul, e, mul_smul]
-  }
+      add_mem' := by
+        rintro a c ⟨u1, h1, e1⟩ ⟨u2, h2, e2⟩
+        exact ⟨u1 + u2, h1.add h2, by rw [map_add (f := _), map_add (f := _), e1, e2, add_smul]⟩
+      zero_mem' := ⟨0, regAt_zero y, by rw [map_zero, map_zero, zero_smul]⟩
+      smul_mem' := by
+        rintro a c ⟨u, hu, e⟩
+        refine ⟨fnOf U (gen_mem hy) a * u, (regAt_fnOf hy _ a).mul hu, ?_⟩
+        rw [LinearMap.map_smulₛₗ, map_smul, e, mul_smul] }
   have hgen : ∀ g : Fin d → Γ(X, U), dForm (algX f U) g ∈ P := by
     intro g
     refine ⟨b.det (fun j => dK (fnOf U (gen_mem hy) (g j))), ?_, ?_⟩
@@ -226,18 +228,12 @@ theorem formOf_eq_regAt_smul
       exact ιMulti_eq_det_lemma_2 x hxc _
   exact forms_mem_lemma (algX f U) d P hgen ω
 
-theorem coordForm_eq_regAt_smul
-    (p : ℕ) [Fact p.Prime]
-    {X : Scheme.{0}} [IsIntegral X]
-    (f : X ⟶ Sp (ZMod p))
-    (d : ℕ)
-    {U : X.Opens} (ω : FormsOn f d U) (hω : IsFrame ω)
-    (y : X) (hy : y ∈ U)
-    (x : Fin d → X.functionFieldˣ) (hx : ∀ j, RegAt y (x j : X.functionField))
-    : ∃ v : X.functionField,
-      RegAt y v
-        ∧ ExteriorAlgebra.ιMulti _ d (fun j => dK (x j : X.functionField))
-          = v • formsToLam (constFn f) (intCast_surj p) d (formOf U (gen_mem hy) ω) := by
+theorem coordForm_eq_regAt_smul (p : ℕ) [Fact p.Prime] {X : Scheme.{0}} [IsIntegral X] (f : X ⟶ Sp (ZMod p))
+    (d : ℕ) {U : X.Opens} (ω : FormsOn f d U) (hω : IsFrame ω) (y : X) (hy : y ∈ U)
+    (x : Fin d → X.functionFieldˣ) (hx : ∀ j, RegAt y (x j : X.functionField)) :
+    ∃ v : X.functionField, RegAt y v ∧
+      ExteriorAlgebra.ιMulti _ d (fun j => dK (x j : X.functionField)) =
+        v • formsToLam (constFn f) (intCast_surj p) d (formOf U (gen_mem hy) ω) := by
   classical
   choose Uj hyj aj haj using fun j => RegAt.exists_fnOf (hx j)
   have hS : (U : Set X) ∩ ⋂ j, (Uj j : Set X) ∈ nhds y :=
@@ -255,15 +251,13 @@ theorem coordForm_eq_regAt_smul
     exact haj j
   obtain ⟨c, hc⟩ := hω.exists_coeff hWU (dForm (algX f W) fun j => resG X (hWj j) (aj j))
   have hc' := hc W hWa le_rfl
-  have e1
-      : formOf W hg (resForm le_rfl (dForm (algX f W) fun j => resG X (hWj j) (aj j)))
-        = formOf W hg (dForm (algX f W) fun j => resG X (hWj j) (aj j)) :=
+  have e1 : formOf W hg (resForm le_rfl (dForm (algX f W) fun j => resG X (hWj j) (aj j))) =
+      formOf W hg (dForm (algX f W) fun j => resG X (hWj j) (aj j)) :=
     formOf_resForm le_rfl hg _
   have e2 : formOf W hg (resForm hWU ω) = formOf U (gen_mem hy) ω := formOf_resForm hWU hg ω
-  have e3
-      : formsToLam (constFn f) (intCast_surj p) d
-          (formOf W hg (dForm (algX f W) fun j => resG X (hWj j) (aj j)))
-        = ExteriorAlgebra.ιMulti _ d (fun j => dK (x j : X.functionField)) := by
+  have e3 : formsToLam (constFn f) (intCast_surj p) d
+      (formOf W hg (dForm (algX f W) fun j => resG X (hWj j) (aj j))) =
+      ExteriorAlgebra.ιMulti _ d (fun j => dK (x j : X.functionField)) := by
     simp only [formOf, formMap_dForm, formsToLam_dForm]
     congr 1
     funext j
@@ -276,8 +270,8 @@ end GlobalTheory.LogDR
 namespace GlobalTheory.LogDR
 open TopForm GlobalTheory.Cartier.CartierDiv
 
-theorem ιMulti_coord_ne_zero {K : Type} [Field K] {n : ℕ} (x : Fin n → Kˣ) (hx : IsCoord x)
-    : ExteriorAlgebra.ιMulti K n (fun j => dK (x j : K)) ≠ 0 := by
+theorem ιMulti_coord_ne_zero {K : Type} [Field K] {n : ℕ} (x : Fin n → Kˣ) (hx : IsCoord x) :
+    ExteriorAlgebra.ιMulti K n (fun j => dK (x j : K)) ≠ 0 := by
   classical
   obtain ⟨hli, hsp⟩ := hx
   let b := Module.Basis.mk hli (le_of_eq hsp.symm)
@@ -287,9 +281,8 @@ theorem ιMulti_coord_ne_zero {K : Type} [Field K] {n : ℕ} (x : Fin n → Kˣ)
   have he : ∀ e : Fin n ↪o Fin n, ⇑e = id := by
     intro e
     have h1 := Finset.orderEmbOfFin_unique' hc (f := e) (fun _ => Finset.mem_univ _)
-    have h2 :=
-      Finset.orderEmbOfFin_unique' hc (f := (OrderIso.refl (Fin n)).toOrderEmbedding)
-        (fun _ => Finset.mem_univ _)
+    have h2 := Finset.orderEmbOfFin_unique' hc
+      (f := (OrderIso.refl (Fin n)).toOrderEmbedding) (fun _ => Finset.mem_univ _)
     rw [h1, ← h2]
     rfl
   let s : Set.powersetCard (Fin n) n := ⟨Finset.univ, by simp⟩
@@ -298,16 +291,12 @@ theorem ιMulti_coord_ne_zero {K : Type} [Field K] {n : ℕ} (x : Fin n → Kˣ)
   rw [exteriorPower.ιMulti_family, he, Function.comp_id, ← hb]
   exact Subtype.ext (by simpa using h0)
 
-theorem exists_baseForm_eq
-    (p : ℕ) [Fact p.Prime]
-    (X : Scheme.{0}) [IsIntegral X]
-    (f : X ⟶ Sp (ZMod p)) (d : ℕ) [SmoothOfRelativeDimension d f]
-    (y : X) (x : Fin d → X.functionFieldˣ) (hx : AlgChart (locRing y) x)
-    : ∃ (g : X.functionFieldˣ) (u : X.functionField),
-      (canonical f d).IsEqn y g ∧ UnitAt y u
-        ∧ formsToLam (constFn f) (intCast_surj p) d (baseForm f d)
-          = ((g : X.functionField) * u)
-            • ExteriorAlgebra.ιMulti _ d fun j => dK (x j : X.functionField) := by
+theorem exists_baseForm_eq (p : ℕ) [Fact p.Prime] (X : Scheme.{0}) [IsIntegral X] (f : X ⟶ Sp (ZMod p))
+    (d : ℕ) [SmoothOfRelativeDimension d f] (y : X) (x : Fin d → X.functionFieldˣ)
+    (hx : AlgChart (locRing y) x) :
+    ∃ (g : X.functionFieldˣ) (u : X.functionField), (canonical f d).IsEqn y g ∧ UnitAt y u ∧
+      formsToLam (constFn f) (intCast_surj p) d (baseForm f d) =
+        ((g : X.functionField) * u) • ExteriorAlgebra.ιMulti _ d fun j => dK (x j : X.functionField) := by
   classical
   set L := CanonLB.all f d with hL
   have hcov : y ∈ ⨆ i, L.bundle.U i := by
@@ -317,15 +306,13 @@ theorem exists_baseForm_eq
   have hω : IsFrame (L.om i) := L.isFrame i
   have hgU : genericPoint X ∈ L.bundle.U i := gen_mem hi
   obtain ⟨u0, hu0, e0⟩ := formOf_eq_regAt_smul p f d (L.om i) y hi x hx
-  obtain ⟨v, hv, ev⟩ :=
-    coordForm_eq_regAt_smul p f d (L.om i) hω y hi x (fun j => mem_locRing.1 (hx.mem j))
+  obtain ⟨v, hv, ev⟩ := coordForm_eq_regAt_smul p f d (L.om i) hω y hi x
+    (fun j => mem_locRing.1 (hx.mem j))
   have hW : ExteriorAlgebra.ιMulti X.functionField d (fun j => dK (x j : X.functionField)) ≠ 0 :=
     ιMulti_coord_ne_zero x hx.coord
   have hvu : v * u0 = 1 := by
-    have h0
-        : (v * u0 - 1)
-            • ExteriorAlgebra.ιMulti X.functionField d (fun j => dK (x j : X.functionField))
-          = 0 := by
+    have h0 : (v * u0 - 1) •
+        ExteriorAlgebra.ιMulti X.functionField d (fun j => dK (x j : X.functionField)) = 0 := by
       rw [sub_smul, mul_smul, ← e0, ← ev, one_smul, sub_self]
     exact sub_eq_zero.1 ((smul_eq_zero.1 h0).resolve_right hW)
   have hu0ne : u0 ≠ 0 := by
@@ -340,47 +327,34 @@ theorem exists_baseForm_eq
   set t := fnOf (baseOpen f d ⊓ L.bundle.U i) (by exact ⟨gen_mem_baseOpen f d, hgU⟩)
     (↑(hB.ratio hω) : Γ(X, baseOpen f d ⊓ L.bundle.U i)) with ht
   have htne : t ≠ 0 := ((hB.ratio hω).isUnit.map _).ne_zero
-  have hbf
-      : baseForm f d
-        = ((Units.mk0 t⁻¹ (inv_ne_zero htne) : X.functionFieldˣ) : X.functionField)
-          • formOf (L.bundle.U i) hgU (L.om i) := by
+  have hbf : baseForm f d = ((Units.mk0 t⁻¹ (inv_ne_zero htne) : X.functionFieldˣ) : X.functionField) •
+      formOf (L.bundle.U i) hgU (L.om i) := by
     rw [Units.val_mk0, hr, smul_smul, inv_mul_cancel₀ htne, one_smul]
     rfl
-  refine ⟨
-    Units.mk0 t⁻¹ (inv_ne_zero htne),
-    u0,
-    isDivOfForm_canonical f d _ (L.om i) hω y hi _ hbf,
-    hUu0,
-    ?_
-  ⟩
+  refine ⟨Units.mk0 t⁻¹ (inv_ne_zero htne), u0,
+    isDivOfForm_canonical f d _ (L.om i) hω y hi _ hbf, hUu0, ?_⟩
   rw [hbf, map_smul, e0, smul_smul]
 
-private theorem dlog_mul_lemma_3 {K : Type} [Field K] (g h : Kˣ)
-    : dlog (g * h) = dlog g + dlog h := by
+private theorem dlog_mul_lemma_3 {K : Type} [Field K] (g h : Kˣ) : dlog (g * h) = dlog g + dlog h := by
   have hg := g.ne_zero
   have hh := h.ne_zero
-  simp only [dlog, dK, Units.val_mul, Units.val_inv_eq_inv_val, Derivation.leibniz, smul_add,
-    smul_smul]
+  simp only [dlog, dK, Units.val_mul, Units.val_inv_eq_inv_val, Derivation.leibniz, smul_add, smul_smul]
   rw [show ((g : K) * h)⁻¹ * g = (h : K)⁻¹ by field_simp,
     show ((g : K) * h)⁻¹ * h = (g : K)⁻¹ by field_simp, add_comm]
 
-private theorem dlog_prod_lemma_4
-    {K : Type} [Field K] {n : ℕ} (u : Kˣ) (x : Fin n → Kˣ) (J : Finset (Fin n)) (m : Fin n → ℤ)
-    : dlog (u * ∏ j ∈ J, x j ^ m j) = dlog u + ∑ j ∈ J, m j • dlog (x j) := by
-  let φ : Kˣ →* Multiplicative Ω[K⁄ℤ] := {
-    toFun := fun g => Multiplicative.ofAdd (dlog g)
-    map_one' := by simp [dlog, dK]
-    map_mul' := fun g h => by rw [dlog_mul_lemma_3]; rfl
-  }
+private theorem dlog_prod_lemma_4 {K : Type} [Field K] {n : ℕ} (u : Kˣ) (x : Fin n → Kˣ) (J : Finset (Fin n))
+    (m : Fin n → ℤ) : dlog (u * ∏ j ∈ J, x j ^ m j) = dlog u + ∑ j ∈ J, m j • dlog (x j) := by
+  let φ : Kˣ →* Multiplicative Ω[K⁄ℤ] :=
+    { toFun := fun g => Multiplicative.ofAdd (dlog g)
+      map_one' := by simp [dlog, dK]
+      map_mul' := fun g h => by rw [dlog_mul_lemma_3]; rfl }
   have h := congrArg Multiplicative.toAdd (map_mul φ u (∏ j ∈ J, x j ^ m j))
   rw [map_prod] at h
   simpa only [map_zpow, toAdd_mul, toAdd_prod, toAdd_zpow, MonoidHom.coe_mk, OneHom.coe_mk,
-      toAdd_ofAdd, φ]
-    using h
+    toAdd_ofAdd, φ] using h
 
-private theorem unit_or_succ_lemma_5
-    {X : Scheme} [IsIntegral X] {y : X} {f : X.functionField} (hf : RegAt y f)
-    : UnitAt y f ∨ UnitAt y (f + 1) := by
+private theorem unit_or_succ_lemma_5 {X : Scheme} [IsIntegral X] {y : X} {f : X.functionField}
+    (hf : RegAt y f) : UnitAt y f ∨ UnitAt y (f + 1) := by
   by_contra h
   push_neg at h
   have h1 : ZeroAt y f := zeroAt_iff.2 ⟨hf, h.1⟩
@@ -392,23 +366,14 @@ private theorem unit_or_succ_lemma_5
   rw [h4] at h3
   exact (zeroAt_iff.1 h3).2 (unitAt_one y)
 
-private theorem logAt_top_lemma_6
-    {X : Scheme.{0}} [IsIntegral X]
-    (Z : Set X)
-    (G : CartierDiv X)
-    (y : X)
+private theorem logAt_top_lemma_6 {X : Scheme.{0}} [IsIntegral X] (Z : Set X) (G : CartierDiv X) (y : X)
     {n : ℕ} (x : Fin n → X.functionFieldˣ) (J : Finset (Fin n)) (hch : AlgChart (locRing y) x)
-    (hlog : ∀ g : X.functionFieldˣ,
-      LogUnit Z y g
-        ↔ ∃ (u : X.functionFieldˣ) (m : Fin n → ℤ), UnitAt y ↑u ∧ g = u * ∏ j ∈ J, x j ^ m j)
-    (gG : X.functionFieldˣ) (hG : G.IsEqn y gG)
-    (η : abelian₂ X.functionField)
-    : η ∈ logAt Z G n y
-      ↔ ∃ a : X.functionField,
-        RegAt y (a * gG)
-          ∧ η
-            = (a * (∏ j ∈ J, (x j : X.functionField))⁻¹)
-              • ExteriorAlgebra.ιMulti _ n (fun j => dK (x j : X.functionField)) := by
+    (hlog : ∀ g : X.functionFieldˣ, LogUnit Z y g ↔
+      ∃ (u : X.functionFieldˣ) (m : Fin n → ℤ), UnitAt y ↑u ∧ g = u * ∏ j ∈ J, x j ^ m j)
+    (gG : X.functionFieldˣ) (hG : G.IsEqn y gG) (η : abelian₂ X.functionField) :
+    η ∈ logAt Z G n y ↔ ∃ a : X.functionField, RegAt y (a * gG) ∧
+      η = (a * (∏ j ∈ J, (x j : X.functionField))⁻¹) •
+        ExteriorAlgebra.ιMulti _ n (fun j => dK (x j : X.functionField)) := by
   classical
   have hxc := hch.coord
   set b := Module.Basis.mk hxc.1 (le_of_eq hxc.2.symm) with hbdef
@@ -433,17 +398,14 @@ private theorem logAt_top_lemma_6
       simp only [hbi]
     rw [hs, Module.Basis.repr_sum_self]
     exact hc j
-  have hcoord
-      : ∀ g : X.functionFieldˣ, LogUnit Z y g → ∀ i, s i * b.repr (dlog g) i ∈ locRing y := by
+  have hcoord : ∀ g : X.functionFieldˣ, LogUnit Z y g → ∀ i, s i * b.repr (dlog g) i ∈ locRing y := by
     intro g hg i
     obtain ⟨u, m, hu, rfl⟩ := (hlog g).1 hg
     rw [dlog_prod_lemma_4]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_add (f := _), map_sum, Finsupp.add_apply, Finsupp.finsetSum_apply, mul_add,
-        Finset.mul_sum]
+
+    simp only [map_add (f := _), map_sum, Finsupp.add_apply, Finsupp.finsetSum_apply, mul_add, Finset.mul_sum]
     refine add_mem ?_ (sum_mem fun j hj => ?_)
-    · rw [show dlog u = ((u⁻¹ : X.functionFieldˣ) : X.functionField) • dK (u : X.functionField) from
-          rfl,
+    · rw [show dlog u = ((u⁻¹ : X.functionFieldˣ) : X.functionField) • dK (u : X.functionField) from rfl,
         map_smul, Finsupp.smul_apply, smul_eq_mul]
       refine mul_mem (hsA i) (mul_mem ?_ (hrep _ (mem_locRing.2 hu.regAt) i))
       rw [Units.val_inv_eq_inv_val]
@@ -453,8 +415,7 @@ private theorem logAt_top_lemma_6
       have hdx : dlog (x j) = ((x j : X.functionField))⁻¹ • b j := by
         rw [hbi]
         simp [dlog, Units.val_inv_eq_inv_val]
-      rw [hdx, map_smul, Module.Basis.repr_self, Finsupp.smul_apply, Finsupp.single_apply,
-        smul_eq_mul]
+      rw [hdx, map_smul, Module.Basis.repr_self, Finsupp.smul_apply, Finsupp.single_apply, smul_eq_mul]
       by_cases hij : j = i
       · subst hij
         simp only [s, hj, if_true, mul_one]
@@ -464,20 +425,16 @@ private theorem logAt_top_lemma_6
         exact zero_mem _
   constructor
   · intro hη
-    let S : AddSubgroup (abelian₂ X.functionField) := {
-      carrier := {η | ∃ a : X.functionField, RegAt y (a * gG) ∧ η = (a * e⁻¹) • W}
-      add_mem' := by
-        rintro _ _ ⟨a1, h1, rfl⟩ ⟨a2, h2, rfl⟩
-        exact ⟨a1 + a2, by rw [add_mul]; exact h1.add h2, by rw [add_mul, add_smul]⟩
-      zero_mem' := ⟨0, by rw [zero_mul]; exact regAt_zero y, by rw [zero_mul, zero_smul]⟩
-      neg_mem' := by
-        rintro _ ⟨a, h, rfl⟩
-        exact ⟨
-          -a,
-          by rw [neg_mul]; exact mem_locRing.1 (neg_mem (mem_locRing.2 h)),
-          by rw [neg_mul, neg_smul]
-        ⟩
-    }
+    let S : AddSubgroup (abelian₂ X.functionField) :=
+      { carrier := {η | ∃ a : X.functionField, RegAt y (a * gG) ∧ η = (a * e⁻¹) • W}
+        add_mem' := by
+          rintro _ _ ⟨a1, h1, rfl⟩ ⟨a2, h2, rfl⟩
+          exact ⟨a1 + a2, by rw [add_mul]; exact h1.add h2, by rw [add_mul, add_smul]⟩
+        zero_mem' := ⟨0, by rw [zero_mul]; exact regAt_zero y, by rw [zero_mul, zero_smul]⟩
+        neg_mem' := by
+          rintro _ ⟨a, h, rfl⟩
+          exact ⟨-a, by rw [neg_mul]; exact mem_locRing.1 (neg_mem (mem_locRing.2 h)),
+            by rw [neg_mul, neg_smul]⟩ }
     have hle : logAt Z G n y ≤ S := by
       rw [logAt, spanForms, AddSubgroup.closure_le]
       rintro _ ⟨c, hc, v, hv, rfl⟩
@@ -496,37 +453,27 @@ private theorem logAt_top_lemma_6
     exact hle hη
   · rintro ⟨a, ha, rfl⟩
     have hreg : ∀ i, RegAt y (x i : X.functionField) := fun i => mem_locRing.1 (hch.mem i)
-    have hq
-        : ∀ i, ∃ q : X.functionFieldˣ,
-          LogUnit Z y q ∧ dK (q : X.functionField) = dK (x i : X.functionField)
-            ∧ (q : X.functionField) = s i * (if i ∈ J then 1 else (q : X.functionField))
-            ∧ RegAt y (if i ∈ J then 1 else (q : X.functionField)) := by
+    have hq : ∀ i, ∃ q : X.functionFieldˣ, LogUnit Z y q ∧
+        dK (q : X.functionField) = dK (x i : X.functionField) ∧
+        (q : X.functionField) = s i * (if i ∈ J then 1 else (q : X.functionField)) ∧
+        RegAt y (if i ∈ J then 1 else (q : X.functionField)) := by
       intro i
       by_cases hi : i ∈ J
       · refine ⟨x i, (hlog _).2 ⟨1, Pi.single i 1, unitAt_one y, ?_⟩, rfl, by simp [s, hi], ?_⟩
-        · rw [one_mul,
-            Finset.prod_eq_single i
-              (fun j _ hji => by simp [Pi.single_apply, hji])
-              (fun h => absurd hi h)]
+        · rw [one_mul, Finset.prod_eq_single i (fun j _ hji => by simp [Pi.single_apply, hji])
+            (fun h => absurd hi h)]
           simp
         · simpa [hi] using (unitAt_one y).regAt
       · rcases unit_or_succ_lemma_5 (hreg i) with h | h
-        · exact
-            ⟨x i, (hlog _).2 ⟨x i, 0, h, by simp⟩, rfl, by simp [s, hi], by simpa [hi] using hreg i⟩
+        · exact ⟨x i, (hlog _).2 ⟨x i, 0, h, by simp⟩, rfl, by simp [s, hi], by simpa [hi] using hreg i⟩
         · have hne : (x i : X.functionField) + 1 ≠ 0 := h.ne_zero
-          refine ⟨
-            Units.mk0 _ hne,
-            (hlog _).2 ⟨Units.mk0 _ hne, 0, by simpa using h, by simp⟩,
-            ?_,
-            by simp [s, hi],
-            ?_
-          ⟩
+          refine ⟨Units.mk0 _ hne, (hlog _).2 ⟨Units.mk0 _ hne, 0, by simpa using h, by simp⟩, ?_,
+            by simp [s, hi], ?_⟩
           · simp [dK]
           · simpa [hi] using h.regAt
     choose q hqlog hqd hqs hqr using hq
     let v : Fin n → Ω[X.functionField⁄ℤ] := fun i => dlog (q i)
-    have hv
-        : ExteriorAlgebra.ιMulti X.functionField n v = (∏ i, ((q i : X.functionField))⁻¹) • W := by
+    have hv : ExteriorAlgebra.ιMulti X.functionField n v = (∏ i, ((q i : X.functionField))⁻¹) • W := by
       have hv' : v = fun i => ((q i : X.functionField))⁻¹ • dK (x i : X.functionField) := by
         funext i
         simp only [v, dlog, Units.val_inv_eq_inv_val, hqd]
@@ -535,8 +482,7 @@ private theorem logAt_top_lemma_6
     have hqprod : ∏ i, (q i : X.functionField) = e * ∏ i, r i := by
       rw [← hs_prod, ← Finset.prod_mul_distrib]
       exact Finset.prod_congr rfl fun i _ => hqs i
-    have hqne : ∏ i, (q i : X.functionField) ≠ 0 :=
-      Finset.prod_ne_zero_iff.2 fun i _ => (q i).ne_zero
+    have hqne : ∏ i, (q i : X.functionField) ≠ 0 := Finset.prod_ne_zero_iff.2 fun i _ => (q i).ne_zero
     have hrne : ∏ i, r i ≠ 0 := by
       intro h0
       apply hqne
@@ -554,16 +500,7 @@ private theorem logAt_top_lemma_6
     rw [Finset.prod_inv_distrib, hqprod]
     field_simp
 
-theorem logAt_top_eq_canonical
-    : ∀ (p : ℕ) [Fact p.Prime] (X : Scheme.{0}) [IsIntegral X] (f : X ⟶ Sp (ZMod p)) (d : ℕ)
-        [SmoothOfRelativeDimension d f] {C : Type} [Fintype C] (E : C → CartierDiv X) {ι : Type}
-        (𝒜 : SncAtlas E d ι),
-      ∃ ω₀ : abelian₂ X.functionField,
-        ω₀ ≠ 0
-          ∧ ∀ (G : CartierDiv X) (y : X) (η : abelian₂ X.functionField),
-            η ∈ logAt (suppAll E) G d y
-              ↔ ∃ c : X.functionField,
-                (canonical f d + ∑ c, E c + G).RegularAt y c ∧ η = c • ω₀ := by
+theorem logAt_top_eq_canonical : ∀ (p : ℕ) [Fact p.Prime] (X : Scheme.{0}) [IsIntegral X] (f : X ⟶ Sp (ZMod p)) (d : ℕ) [SmoothOfRelativeDimension d f] {C : Type} [Fintype C] (E : C → CartierDiv X) {ι : Type} (𝒜 : SncAtlas E d ι), ∃ ω₀ : abelian₂ X.functionField, ω₀ ≠ 0 ∧ ∀ (G : CartierDiv X) (y : X) (η : abelian₂ X.functionField), η ∈ logAt (suppAll E) G d y ↔ ∃ c : X.functionField, (canonical f d + ∑ c, E c + G).RegularAt y c ∧ η = c • ω₀ := by
   intro p _ X _ f d _ C _ E ι 𝒜
   classical
   refine ⟨formsToLam (constFn f) (intCast_surj p) d (baseForm f d), ?_, ?_⟩
@@ -585,8 +522,7 @@ theorem logAt_top_eq_canonical
     have hE := isEqn_sum_of_isSncOn E (𝒜.U i) (𝒜.x i) (𝒜.J i) (𝒜.snc i) y hi
     obtain ⟨gG, hG⟩ := CartierDiv.exists_isEqn G y
     have hT := (hgK.add hE).add hG
-    rw [logAt_top_lemma_6 (suppAll E) G y (𝒜.x i) (𝒜.J i) hch ((𝒜.chart i).logUnit y hi) gG hG η,
-      hω]
+    rw [logAt_top_lemma_6 (suppAll E) G y (𝒜.x i) (𝒜.J i) hch ((𝒜.chart i).logUnit y hi) gG hG η, hω]
     have hune : (u : X.functionField) ≠ 0 := hu.ne_zero
     have hgne : (gK : X.functionField) ≠ 0 := gK.ne_zero
     have hene : (∏ j ∈ 𝒜.J i, ((𝒜.x i j : X.functionField))) ≠ 0 :=
@@ -594,15 +530,10 @@ theorem logAt_top_eq_canonical
     simp only [hT.regularAt_iff, Units.val_mul, Units.coe_prod]
     constructor
     · rintro ⟨a, ha, rfl⟩
-      refine ⟨
-        a * (∏ j ∈ 𝒜.J i, ((𝒜.x i j : X.functionField)))⁻¹ * ((gK : X.functionField) * u)⁻¹,
-        ?_,
-        ?_
-      ⟩
-      · have hh
-            : a * (∏ j ∈ 𝒜.J i, ((𝒜.x i j : X.functionField)))⁻¹ * ((gK : X.functionField) * u)⁻¹
-                * ((gK : X.functionField) * (∏ j ∈ 𝒜.J i, ((𝒜.x i j : X.functionField))) * gG)
-              = (a * gG) * (u : X.functionField)⁻¹ := by
+      refine ⟨a * (∏ j ∈ 𝒜.J i, ((𝒜.x i j : X.functionField)))⁻¹ * ((gK : X.functionField) * u)⁻¹, ?_, ?_⟩
+      · have hh : a * (∏ j ∈ 𝒜.J i, ((𝒜.x i j : X.functionField)))⁻¹ * ((gK : X.functionField) * u)⁻¹ *
+            ((gK : X.functionField) * (∏ j ∈ 𝒜.J i, ((𝒜.x i j : X.functionField))) * gG) =
+            (a * gG) * (u : X.functionField)⁻¹ := by
           field_simp
         rw [hh]
         exact ha.mul hu.inv.regAt
@@ -611,10 +542,8 @@ theorem logAt_top_eq_canonical
         field_simp
     · rintro ⟨c, hc, rfl⟩
       refine ⟨c * gK * u * (∏ j ∈ 𝒜.J i, ((𝒜.x i j : X.functionField))), ?_, ?_⟩
-      · have hh
-            : c * gK * u * (∏ j ∈ 𝒜.J i, ((𝒜.x i j : X.functionField))) * gG
-              = (c * ((gK : X.functionField) * (∏ j ∈ 𝒜.J i, ((𝒜.x i j : X.functionField))) * gG))
-                * u := by
+      · have hh : c * gK * u * (∏ j ∈ 𝒜.J i, ((𝒜.x i j : X.functionField))) * gG =
+            (c * ((gK : X.functionField) * (∏ j ∈ 𝒜.J i, ((𝒜.x i j : X.functionField))) * gG)) * u := by
           ring
         rw [hh]
         exact hc.mul hu.regAt

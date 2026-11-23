@@ -1,13 +1,61 @@
 module
 
-public import Mathlib
-public import CompanionTheory.SpectralGeometry.CountingDefinitions.AdelicEulerProducts.IsEulerProd
 public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.CoordinateHaarMeasure
-public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.TensorLocallyCompactRing
 public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.CompletionIsLocalRing
-public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.InfiniteAdelesLocalRingTotallyReal
 public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.ExistsUnipotentInvariantCompactlySupportedWeightStatement
+import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.InfiniteAdelesLocalRingTotallyReal
 public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.SelfdualMeasureTransportEquivStatement
+import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.TensorLocallyCompactRing
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.CategoryTheory.Countable
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
@@ -94,13 +142,13 @@ theorem gramB_det
       intro k
       have := congrFun hv0 k
       simp only [Matrix.mulVec, dotProduct, gramB, Pi.zero_apply] at this
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [hw, map_sum, Finset.mul_sum, map_sum, ← this]
+
+      rw [hw, map_sum, Finset.mul_sum, map_sum, ← this]
       refine Finset.sum_congr rfl fun l _ => ?_
       rw [map_smul, mul_smul_comm, map_smul, smul_eq_mul, mul_comm]
     have hx := b.sum_repr x
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← hx, Finset.sum_mul, map_sum]
+
+    rw [← hx, Finset.sum_mul, map_sum]
     refine Finset.sum_eq_zero fun k _ => ?_
     rw [smul_mul_assoc, map_smul, hk, smul_zero]
   have hs : σ w = 0 :=
@@ -196,18 +244,18 @@ theorem off_diag
     simp [hC, Algebra.TensorProduct.basis_apply]
   have hy : sigR R σ y = ∑ l, C.repr y l • ((1 : R) ⊗ₜ[F] σ (b l)) := by
     conv_lhs => rw [← C.sum_repr y]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     refine Finset.sum_congr rfl fun l _ => ?_
     rw [hC, Algebra.TensorProduct.basis_apply, TensorProduct.smul_tmul', TensorProduct.smul_tmul',
       HaarCoord.sigR_tmul]
   rw [hy]
   conv_lhs => rw [hx]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [Finset.sum_mul, map_sum]
+
+  rw [Finset.sum_mul, map_sum]
   refine Finset.sum_congr rfl fun k _ => ?_
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [smul_mul_assoc, map_smul, smul_eq_mul, Finset.mul_sum, map_sum]
+
+  rw [smul_mul_assoc, map_smul, smul_eq_mul, Finset.mul_sum, map_sum]
   congr 1
   refine Finset.sum_congr rfl fun l _ => ?_
   rw [mul_smul_comm, map_smul, Algebra.TensorProduct.tmul_mul_tmul, one_mul, trace_tmul, one_mul,
@@ -234,8 +282,8 @@ theorem pair_eq
           = sigR R σ ((T : Matrix (Fin n) (Fin n) (R ⊗[F] E)) a c) := fun a c =>
     (T.2 c a).symm
   unfold pairHerm
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [sum_square, map_add (f := _), mul_add, map_sum, map_sum, Finset.mul_sum, Finset.mul_sum]
+
+  rw [sum_square, map_add (f := _), mul_add, map_sum, map_sum, Finset.mul_sum, Finset.mul_sum]
   simp only [dotProduct, Fintype.sum_sum_type, Fintype.sum_prod_type, formB_mulVec_inl,
     formB_mulVec_inr]
   congr 1

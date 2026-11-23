@@ -1,8 +1,47 @@
 module
 
-public import Mathlib
-public import Formalism.LocalRingCardinality.AdicCompletionLocal.LocTied
 public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.IsCrisP
+import Development.AutomorphicArithmetic.IntegralCasts.CrystallinePeriods.Kernel
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -15,19 +54,22 @@ variable {l : ℕ} [Fact l.Prime]
 theorem isDomain_Fl : IsDomain (Per.Fl l) :=
   PreTilt.isDomain ℂ_[l] Valued.v (Per.OC l) (PadicComplexInt.integers l) l
 
-theorem coeff_pow_pow (x : Per.Fl l) (k : ℕ) : PreTilt.coeff k (x ^ l ^ k) = PreTilt.coeff 0 x := by
+theorem coeff_pow_pow (x : Per.Fl l) (k : ℕ) :
+    PreTilt.coeff k (x ^ l ^ k) = PreTilt.coeff 0 x := by
   induction k generalizing x with
   | zero => simp
-  | succ k ih => rw [pow_succ, pow_mul, map_pow, PreTilt.coeff_pow_p, ih]
+  | succ k ih =>
+    rw [pow_succ, pow_mul, map_pow, PreTilt.coeff_pow_p, ih]
 
-theorem xi_coeff_zero (e : Per.Fl l)
-    : (xi e).coeff 0 = ∑ i ∈ Finset.range l, ((frobeniusEquiv (Per.Fl l) l).symm e) ^ i := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [← WittVector.constantCoeff_apply, xi, map_sum]
+theorem xi_coeff_zero (e : Per.Fl l) :
+    (xi e).coeff 0 = ∑ i ∈ Finset.range l, ((frobeniusEquiv (Per.Fl l) l).symm e) ^ i := by
+
+  rw [← WittVector.constantCoeff_apply, xi, map_sum]
   refine Finset.sum_congr rfl fun i _ => ?_
   rw [map_pow, WittVector.constantCoeff_apply, WittVector.teichmuller_coeff_zero]
 
-theorem root_pow (e : Per.Fl l) : ((frobeniusEquiv (Per.Fl l) l).symm e) ^ l = e := by simp
+theorem root_pow (e : Per.Fl l) : ((frobeniusEquiv (Per.Fl l) l).symm e) ^ l = e := by
+  simp
 
 theorem xi_coeff_zero_ne {e : Per.Fl l} (he : IsEps e) : (xi e).coeff 0 ≠ 0 := by
   intro h
@@ -35,9 +77,8 @@ theorem xi_coeff_zero_ne {e : Per.Fl l} (he : IsEps e) : (xi e).coeff 0 ≠ 0 :=
   rw [← xi_coeff_zero, h, zero_mul, root_pow, eq_comm, sub_eq_zero] at h1
   exact he.2 (by rw [h1, map_one, map_one])
 
-theorem eq_zero_of_dvd
-    {e : Per.Fl l} (he : IsEps e) (b : Per.Fl l) (hb : ∀ n : ℕ, ((xi e).coeff 0) ^ n ∣ b)
-    : b = 0 := by
+theorem eq_zero_of_dvd {e : Per.Fl l} (he : IsEps e) (b : Per.Fl l)
+    (hb : ∀ n : ℕ, ((xi e).coeff 0) ^ n ∣ b) : b = 0 := by
   set u := (frobeniusEquiv (Per.Fl l) l).symm e with hu
   have hy : (u - 1) ∣ (xi e).coeff 0 := by
     rw [xi_coeff_zero, ← hu]
@@ -53,45 +94,38 @@ theorem eq_zero_of_dvd
   change PreTilt.coeff k b = PreTilt.coeff k 0
   rw [hc, map_mul, pow_mul, coeff_pow_pow, h0, zero_mul, map_zero]
 
-theorem xi_sat
-    {e : Per.Fl l} (he : IsEps e) (n : ℕ) (a : Per.Ainf l) (h : xi e ^ n ∣ (l : Per.Ainf l) * a)
-    : xi e ^ n ∣ a := by
+theorem xi_sat {e : Per.Fl l} (he : IsEps e) (n : ℕ) (a : Per.Ainf l)
+    (h : xi e ^ n ∣ (l : Per.Ainf l) * a) : xi e ^ n ∣ a := by
   have := isDomain_Fl (l := l)
   obtain ⟨c, hc⟩ := h
   have h1 := congrArg WittVector.constantCoeff hc
   rw [map_mul, map_mul, map_natCast, CharP.cast_eq_zero, zero_mul, map_pow,
-      WittVector.constantCoeff_apply, WittVector.constantCoeff_apply]
-    at h1
+    WittVector.constantCoeff_apply, WittVector.constantCoeff_apply] at h1
   have h2 : c.coeff 0 = 0 :=
     (mul_eq_zero.1 h1.symm).resolve_left (pow_ne_zero _ (xi_coeff_zero_ne he))
-  obtain ⟨d, rfl⟩ :=
-    Ideal.mem_span_singleton.1 ((WittVector.mem_span_p_iff_coeff_zero_eq_zero c).2 h2)
+  obtain ⟨d, rfl⟩ := Ideal.mem_span_singleton.1
+    ((WittVector.mem_span_p_iff_coeff_zero_eq_zero c).2 h2)
   refine ⟨d, mul_left_cancel₀ (WittVector.p_nonzero l (Per.Fl l)) ?_⟩
-  rw [hc]
-  ring
+  rw [hc]; ring
 
 end GlobalTheory.MemLoc.XiHaus
 
 namespace GlobalTheory.MemLoc
 
 open XiHaus in
-theorem eq_zero_of_forall_xi_pow_dvd
-    (l : ℕ) [Fact l.Prime]
-    (e : Per.Fl l) (he : IsEps e)
-    (a : Per.Ainf l) (ha : ∀ n : ℕ, xi e ^ n ∣ a)
-    : a = 0 := by
+theorem eq_zero_of_forall_xi_pow_dvd (l : ℕ) [Fact l.Prime] (e : Per.Fl l) (he : IsEps e)
+    (a : Per.Ainf l) (ha : ∀ n : ℕ, xi e ^ n ∣ a) : a = 0 := by
   have key : ∀ (k : ℕ) (a : Per.Ainf l), (∀ n : ℕ, xi e ^ n ∣ a) → (l : Per.Ainf l) ^ k ∣ a := by
     intro k
     induction k with
     | zero => intro a _; simp
     | succ k ih =>
       intro a ha
-      have h0 : a.coeff 0 = 0 :=
-        eq_zero_of_dvd he _ fun n => by
-          have := map_dvd WittVector.constantCoeff (ha n)
-          rwa [map_pow, WittVector.constantCoeff_apply, WittVector.constantCoeff_apply] at this
-      obtain ⟨d, rfl⟩ :=
-        Ideal.mem_span_singleton.1 ((WittVector.mem_span_p_iff_coeff_zero_eq_zero a).2 h0)
+      have h0 : a.coeff 0 = 0 := eq_zero_of_dvd he _ fun n => by
+        have := map_dvd WittVector.constantCoeff (ha n)
+        rwa [map_pow, WittVector.constantCoeff_apply, WittVector.constantCoeff_apply] at this
+      obtain ⟨d, rfl⟩ := Ideal.mem_span_singleton.1
+        ((WittVector.mem_span_p_iff_coeff_zero_eq_zero a).2 h0)
       rw [pow_succ']
       exact mul_dvd_mul_left _ (ih d fun n => xi_sat he n d (ha n))
   refine IsHausdorff.haus (I := Ideal.span {(l : Per.Ainf l)}) inferInstance a fun k => ?_

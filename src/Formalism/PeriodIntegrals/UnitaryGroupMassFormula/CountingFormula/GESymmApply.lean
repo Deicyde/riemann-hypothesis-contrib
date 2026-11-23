@@ -1,20 +1,58 @@
 module
 
-public import Mathlib
+public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.CountingFormula.ZMemPerp
 public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.CountingFormula.RowLatticeMassHolds
+import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.ScalarPairOrthogonal.XLeOrthXplus
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Coalgebra.IsFrobenius
+import Mathlib.RingTheory.HopfAlgebra.Basic
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
-open NumberField Module Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.BasicNotions
-  Formalism.L2.SG.CntLocal
+open NumberField Module Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.BasicNotions Formalism.L2.SG.CntLocal
 open Classical
 
 noncomputable section
 
 namespace PI.UnitaryGroupMassFormula.CntFormula.RowsMassW.RowWeightPf
 
-open PI.UnitaryGroupMassFormula.CntFormula.RowsMassW
-  PI.UnitaryGroupMassFormula.CntFormula.RowsMassW.RowMPf
+open PI.UnitaryGroupMassFormula.CntFormula.RowsMassW PI.UnitaryGroupMassFormula.CntFormula.RowsMassW.RowMPf
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -45,9 +83,9 @@ theorem hWb_eq_of (x y : WbQ D F0) (h : ∀ a, hWb D F0 a x = hWb D F0 a y) : x 
   refine sub_eq_zero.1 (hWb_sepR D F0 (x - y) (fun a => ?_))
   rw [map_sub, h a, sub_self]
 
-theorem exists_u (sE : WbQ D F0 →ₗ[D.host.E] perpS (VS D) F0.X)
-    : ∃ u : (VS D).V →ₗ[D.host.E] WbQ D F0, ∀ a v,
-      hWb D F0 a (u v) = (VS D).hT (sE a : (VS D).V) v := by
+theorem exists_u (sE : WbQ D F0 →ₗ[D.host.E] perpS (VS D) F0.X) :
+    ∃ u : (VS D).V →ₗ[D.host.E] WbQ D F0,
+      ∀ a v, hWb D F0 a (u v) = (VS D).hT (sE a : (VS D).V) v := by
   classical
   let b := Module.finBasis D.host.E (WbQ D F0)
   let M : WbQ D F0 →ₗ[D.host.E] (Fin (Module.finrank D.host.E (WbQ D F0)) → D.host.E) :=
@@ -59,15 +97,13 @@ theorem exists_u (sE : WbQ D F0 →ₗ[D.host.E] perpS (VS D) F0.X)
     apply hWb_sepR D F0 y
     intro a
     rw [← b.sum_repr a]
-    set_option synthInstance.maxHeartbeats 100000 in
+
     simp only [map_sum, LinearMap.sum_apply, LinearMap.map_smulₛₗ, LinearMap.smul_apply, hy',
-      smul_zero, Finset.sum_const_zero]
+    smul_zero, Finset.sum_const_zero]
   have hMsurj : Function.Surjective M :=
     (LinearMap.injective_iff_surjective_of_finrank_eq_finrank (by simp)).1 hMinj
-  obtain ⟨Me, hMe⟩
-      : ∃ Me : WbQ D F0 ≃ₗ[D.host.E] (Fin (Module.finrank D.host.E (WbQ D F0)) → D.host.E), ∀ x,
-        Me x = M x :=
-    ⟨LinearEquiv.ofBijective M ⟨hMinj, hMsurj⟩, fun x => rfl⟩
+  obtain ⟨Me, hMe⟩ : ∃ Me : WbQ D F0 ≃ₗ[D.host.E] (Fin (Module.finrank D.host.E (WbQ D F0)) → D.host.E),
+      ∀ x, Me x = M x := ⟨LinearEquiv.ofBijective M ⟨hMinj, hMsurj⟩, fun x => rfl⟩
   let g : (VS D).V →ₗ[D.host.E] (Fin (Module.finrank D.host.E (WbQ D F0)) → D.host.E) :=
     LinearMap.pi (fun i => (VS D).hT (sE (b i) : (VS D).V))
   refine ⟨Me.symm.toLinearMap ∘ₗ g, fun a v => ?_⟩
@@ -78,9 +114,9 @@ theorem exists_u (sE : WbQ D F0 →ₗ[D.host.E] perpS (VS D) F0.X)
     exact (congrFun h i).symm
   simp only [LinearMap.comp_apply, LinearEquiv.coe_coe]
   rw [← b.sum_repr a]
-  set_option synthInstance.maxHeartbeats 100000 in
+
   simp only [map_sum, LinearMap.sum_apply, Submodule.coe_sum, LinearMap.map_smulₛₗ,
-    LinearMap.smul_apply, map_smul, Submodule.coe_smul, key]
+  LinearMap.smul_apply, map_smul, Submodule.coe_smul, key]
 
 end Form
 
@@ -88,67 +124,54 @@ section Gamma
 
 variable (D : D7) {T : D.host.E} (F0 : FlagG (VS D) D.R.rS T)
 
-def gF
-    (sE : WbQ D F0 →ₗ[D.host.E] perpS (VS D) F0.X) (u : (VS D).V →ₗ[D.host.E] WbQ D F0)
-    (σ : WbQ D F0 ≃ₗ[D.host.E] WbQ D F0)
-    : (VS D).V →ₗ[D.host.E] (VS D).V :=
-  LinearMap.id
-    + (perpS (VS D) F0.X).subtype ∘ₗ sE ∘ₗ ((σ : WbQ D F0 →ₗ[D.host.E] WbQ D F0) - LinearMap.id)
-      ∘ₗ u
+def gF (sE : WbQ D F0 →ₗ[D.host.E] perpS (VS D) F0.X) (u : (VS D).V →ₗ[D.host.E] WbQ D F0)
+    (σ : WbQ D F0 ≃ₗ[D.host.E] WbQ D F0) : (VS D).V →ₗ[D.host.E] (VS D).V :=
+  LinearMap.id + (perpS (VS D) F0.X).subtype ∘ₗ sE ∘ₗ
+    ((σ : WbQ D F0 →ₗ[D.host.E] WbQ D F0) - LinearMap.id) ∘ₗ u
 
 variable {D F0}
 variable {sE : WbQ D F0 →ₗ[D.host.E] perpS (VS D) F0.X} {u : (VS D).V →ₗ[D.host.E] WbQ D F0}
 
-theorem gF_apply (σ : WbQ D F0 ≃ₗ[D.host.E] WbQ D F0) (v : (VS D).V)
-    : gF D F0 sE u σ v = v + (sE (σ (u v) - u v) : (VS D).V) := by
+theorem gF_apply (σ : WbQ D F0 ≃ₗ[D.host.E] WbQ D F0) (v : (VS D).V) :
+    gF D F0 sE u σ v = v + (sE (σ (u v) - u v) : (VS D).V) := by
   rfl
 
-theorem u_perp
-    (hsE : ∀ a, (Submodule.Quotient.mk (sE a) : WbQ D F0) = a)
-    (hu : ∀ a v, hWb D F0 a (u v) = (VS D).hT (sE a : (VS D).V) v) (y : perpS (VS D) F0.X)
-    : u y = Submodule.Quotient.mk y := by
+theorem u_perp (hsE : ∀ a, (Submodule.Quotient.mk (sE a) : WbQ D F0) = a)
+    (hu : ∀ a v, hWb D F0 a (u v) = (VS D).hT (sE a : (VS D).V) v) (y : perpS (VS D) F0.X) :
+    u y = Submodule.Quotient.mk y := by
   apply hWb_eq_of D F0
   intro a
   rw [hu]
   conv_rhs => rw [← hsE a]
   rw [hWb_mk]
 
-theorem u_sE
-    (hsE : ∀ a, (Submodule.Quotient.mk (sE a) : WbQ D F0) = a)
-    (hu : ∀ a v, hWb D F0 a (u v) = (VS D).hT (sE a : (VS D).V) v) (b : WbQ D F0)
-    : u (sE b : (VS D).V) = b := by
+theorem u_sE (hsE : ∀ a, (Submodule.Quotient.mk (sE a) : WbQ D F0) = a)
+    (hu : ∀ a v, hWb D F0 a (u v) = (VS D).hT (sE a : (VS D).V) v) (b : WbQ D F0) :
+    u (sE b : (VS D).V) = b := by
   rw [u_perp hsE hu (sE b), hsE b]
 
-theorem u_X
-    (hu : ∀ a v, hWb D F0 a (u v) = (VS D).hT (sE a : (VS D).V) v) {x : (VS D).V} (hx : x ∈ F0.X)
-    : u x = 0 := by
+theorem u_X (hu : ∀ a v, hWb D F0 a (u v) = (VS D).hT (sE a : (VS D).V) v) {x : (VS D).V} (hx : x ∈ F0.X) :
+    u x = 0 := by
   apply hWb_sepR D F0
   intro a
   rw [hu]
   exact hT_perp_X D F0 (sE a).2 hx
 
-theorem u_gF
-    (hsE : ∀ a, (Submodule.Quotient.mk (sE a) : WbQ D F0) = a)
-    (hu : ∀ a v, hWb D F0 a (u v) = (VS D).hT (sE a : (VS D).V) v)
-    (σ : WbQ D F0 ≃ₗ[D.host.E] WbQ D F0) (v : (VS D).V)
-    : u (gF D F0 sE u σ v) = σ (u v) := by
+theorem u_gF (hsE : ∀ a, (Submodule.Quotient.mk (sE a) : WbQ D F0) = a)
+    (hu : ∀ a v, hWb D F0 a (u v) = (VS D).hT (sE a : (VS D).V) v) (σ : WbQ D F0 ≃ₗ[D.host.E] WbQ D F0)
+    (v : (VS D).V) : u (gF D F0 sE u σ v) = σ (u v) := by
   rw [gF_apply, map_add (f := _), u_sE hsE hu]
   abel
 
-theorem gF_symm
-    (hsE : ∀ a, (Submodule.Quotient.mk (sE a) : WbQ D F0) = a)
-    (hu : ∀ a v, hWb D F0 a (u v) = (VS D).hT (sE a : (VS D).V) v)
-    (σ : WbQ D F0 ≃ₗ[D.host.E] WbQ D F0) (v : (VS D).V)
-    : gF D F0 sE u σ.symm (gF D F0 sE u σ v) = v := by
-  rw [gF_apply σ.symm (gF D F0 sE u σ v), u_gF hsE hu σ v, LinearEquiv.symm_apply_apply,
-    gF_apply σ v, show u v - σ (u v) = -(σ (u v) - u v) by abel, map_neg, Submodule.coe_neg,
-    add_neg_cancel_right]
+theorem gF_symm (hsE : ∀ a, (Submodule.Quotient.mk (sE a) : WbQ D F0) = a)
+    (hu : ∀ a v, hWb D F0 a (u v) = (VS D).hT (sE a : (VS D).V) v) (σ : WbQ D F0 ≃ₗ[D.host.E] WbQ D F0)
+    (v : (VS D).V) : gF D F0 sE u σ.symm (gF D F0 sE u σ v) = v := by
+  rw [gF_apply σ.symm (gF D F0 sE u σ v), u_gF hsE hu σ v, LinearEquiv.symm_apply_apply, gF_apply σ v,
+    show u v - σ (u v) = -(σ (u v) - u v) by abel, map_neg, Submodule.coe_neg, add_neg_cancel_right]
 
-def gE
-    (hsE : ∀ a, (Submodule.Quotient.mk (sE a) : WbQ D F0) = a)
-    (hu : ∀ a v, hWb D F0 a (u v) = (VS D).hT (sE a : (VS D).V) v)
-    (σ : WbQ D F0 ≃ₗ[D.host.E] WbQ D F0)
-    : (VS D).V ≃ₗ[D.host.E] (VS D).V :=
+def gE (hsE : ∀ a, (Submodule.Quotient.mk (sE a) : WbQ D F0) = a)
+    (hu : ∀ a v, hWb D F0 a (u v) = (VS D).hT (sE a : (VS D).V) v) (σ : WbQ D F0 ≃ₗ[D.host.E] WbQ D F0) :
+    (VS D).V ≃ₗ[D.host.E] (VS D).V :=
   LinearEquiv.ofLinear (gF D F0 sE u σ) (gF D F0 sE u σ.symm)
     (by
       ext v
@@ -158,19 +181,14 @@ def gE
       ext v
       exact gF_symm hsE hu σ v)
 
-theorem gE_symm_apply
-    (hsE : ∀ a, (Submodule.Quotient.mk (sE a) : WbQ D F0) = a)
-    (hu : ∀ a v, hWb D F0 a (u v) = (VS D).hT (sE a : (VS D).V) v)
-    (σ : WbQ D F0 ≃ₗ[D.host.E] WbQ D F0) (v : (VS D).V)
-    : (gE hsE hu σ).symm v = gF D F0 sE u σ.symm v :=
-  rfl
+theorem gE_symm_apply (hsE : ∀ a, (Submodule.Quotient.mk (sE a) : WbQ D F0) = a)
+    (hu : ∀ a v, hWb D F0 a (u v) = (VS D).hT (sE a : (VS D).V) v) (σ : WbQ D F0 ≃ₗ[D.host.E] WbQ D F0)
+    (v : (VS D).V) : (gE hsE hu σ).symm v = gF D F0 sE u σ.symm v := rfl
 
-theorem gF_isom
-    (hsE : ∀ a, (Submodule.Quotient.mk (sE a) : WbQ D F0) = a)
-    (hu : ∀ a v, hWb D F0 a (u v) = (VS D).hT (sE a : (VS D).V) v)
-    (σ : WbQ D F0 ≃ₗ[D.host.E] WbQ D F0) (hσ : ∀ x y, hWb D F0 (σ x) (σ y) = hWb D F0 x y)
-    (v w : (VS D).V)
-    : (VS D).hT (gF D F0 sE u σ v) (gF D F0 sE u σ w) = (VS D).hT v w := by
+theorem gF_isom (hsE : ∀ a, (Submodule.Quotient.mk (sE a) : WbQ D F0) = a)
+    (hu : ∀ a v, hWb D F0 a (u v) = (VS D).hT (sE a : (VS D).V) v) (σ : WbQ D F0 ≃ₗ[D.host.E] WbQ D F0)
+    (hσ : ∀ x y, hWb D F0 (σ x) (σ y) = hWb D F0 x y) (v w : (VS D).V) :
+    (VS D).hT (gF D F0 sE u σ v) (gF D F0 sE u σ w) = (VS D).hT v w := by
   rw [gF_apply, gF_apply]
   have h1 : ∀ c x, (VS D).hT x (sE c : (VS D).V) = hWb D F0 (u x) c := by
     intro c x

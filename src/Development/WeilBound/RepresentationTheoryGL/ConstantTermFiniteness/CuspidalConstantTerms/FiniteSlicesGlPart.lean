@@ -1,29 +1,69 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.GlobalProofs.FiniteDimensionalOfSlices
-public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.LeviBlockCentreFinite
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsBlockEmb
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsBlockEmb
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.BlockEmbNormalises
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.MaxCompactBlockLeviSecond
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CuspFormBlockEmbLeftInvariant
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ContinuousOfIsBlockEmb
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.KinfFinite
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CuspBlockConstantTermVanishing
-public import Development.WeilBound.RepresentationTheoryGL.ConstantTermFiniteness.CuspidalConstantTerms.IsCuspidalCompBlockEmb
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.MulVecInv
-public import Development.WeilBound.RepresentationTheoryGL.ConstantTermFiniteness.CuspidalConstantTerms.EnvRepAllInjective
+public import Development.WeilBound.CoreStatements.TemperedRepresentationTheory.AffineGLForms.GenSpace
 public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.ExistsMaxCompactRealPointsOfOrthonormalFramesStatement
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.UnitaryLieOneParameterIsRealOneParamSubgroupAdelStatement
 public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.FrameFamilyCompactRepresentation
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.InvariantOfLieOneLEqZero
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ContinuousOfIsBlockEmb
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CuspBlockConstantTermVanishing
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CuspFormBlockEmbLeftInvariant
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsBlockEmb
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsAutOfMemAutForms
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.KinfFinite
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.MaxCompactBlockLeviSecond
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.MulVecInv
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.UnitaryLieOneParameterIsRealOneParamSubgroupAdelStatement
+import Development.AbelianVarietyTheory.Proofs.HeightProofs.AdelicUnitaryRealPointsStructureRealPlacesStatement
+import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.CmDataIsCMExtAndGramIsHermND
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.CofiniteOfCapelliMonicStatement
-public import Development.WeilBound.HeckeVectors.SmoothVectors.ContinuousUnits.LocInCompT
+public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.InvariantOfLieOneLEqZero
+public import Development.AutomorphicSpectrum.Proofs.GlobalProofs.DerEndMemLeftInv
 public import Development.AutomorphicSpectrum.Proofs.GlobalProofs.IsBlockPointStatement
 public import Development.AutomorphicSpectrum.Proofs.GlobalProofs.UnitaryAdelicUnipotentLiftStatement
-public import Development.AutomorphicSpectrum.Proofs.GlobalProofs.DerEndMemLeftInv
-public import GroundTheory.PAdicHodge.NormalizedTrace
+public import Development.WeilBound.HeckeVectors.SmoothVectors.ContinuousUnits.LocInCompT
+public import Development.WeilBound.RepresentationTheoryGL.ConstantTermFiniteness.CuspidalConstantTerms.EnvRepAllInjective
+public import Development.WeilBound.RepresentationTheoryGL.ConstantTermFiniteness.CuspidalConstantTerms.IsCuspidalCompBlockEmb
+import Formalism.LocalRingCardinality.SpanPowerMembership.ExampleLayerExistsGenerators
+import Formalism.LocalToGlobal.IndefiniteReal.FinitePlaces.IdemElt
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Etale.Weakly
+import Mathlib.RingTheory.Finiteness.ModuleFinitePresentation
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.TotallySplit
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
 
 @[expose] public section
 
@@ -152,8 +192,8 @@ theorem isContRep_repOf
     have h2 : ev f = ∑ p : P, f.1 p.1 • (Pi.single p 1 : P → ℂ) := by
       funext p
       simp [ev, Finset.sum_apply, Pi.single_apply]
-    set_option synthInstance.maxHeartbeats 100000 in
-      conv_lhs => rw [h1, h2, map_sum, map_sum]
+
+    conv_lhs => rw [h1, h2, map_sum, map_sum]
     refine Finset.sum_congr rfl fun p _ => ?_
     rw [map_smul, map_smul, smul_eq_mul, mul_comm]
   have : (fun g => ℓ (repOf S hS α g w))

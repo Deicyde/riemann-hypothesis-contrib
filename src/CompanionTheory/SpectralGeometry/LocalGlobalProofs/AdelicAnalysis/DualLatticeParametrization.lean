@@ -1,44 +1,83 @@
 module
 
-public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.SumRhoEqTrace
+public import Mathlib.NumberTheory.NumberField.InfinitePlace.Basic
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import CompanionTheory.SpectralGeometry.CountingDefinitions.AdelicEulerProducts.CountData
+import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.SumRhoEqTrace
 
 @[expose] public section
 
-open NumberField IsDedekindDomain MeasureTheory Matrix Topology GlobalTheory.CompanionTheory.SW.Core
-  GlobalTheory.CompanionTheory.SW.ThW
+open NumberField IsDedekindDomain MeasureTheory Matrix Topology GlobalTheory.CompanionTheory.SW.Core GlobalTheory.CompanionTheory.SW.ThW
 open scoped ENNReal NNReal MatrixGroups Kronecker
 
 namespace GlobalTheory.CompanionTheory.SW.ThW.DualLattice
 
-noncomputable def ratBasis
-    {F : Type} [Field F] [NumberField F] {κ : Type} [Fintype κ] (b : Module.Basis κ ℤ (𝓞 F))
-    : Module.Basis κ ℚ F :=
+noncomputable def ratBasis {F : Type} [Field F] [NumberField F] {κ : Type} [Fintype κ]
+    (b : Module.Basis κ ℤ (𝓞 F)) : Module.Basis κ ℚ F :=
   b.localizationLocalization ℚ (nonZeroDivisors ℤ) F
 
-theorem ratBasis_apply
-    {F : Type} [Field F] [NumberField F] {κ : Type} [Fintype κ] (b : Module.Basis κ ℤ (𝓞 F)) (v : κ)
-    : ratBasis b v = (b v : F) := by
+theorem ratBasis_apply {F : Type} [Field F] [NumberField F] {κ : Type} [Fintype κ]
+    (b : Module.Basis κ ℤ (𝓞 F)) (v : κ) : ratBasis b v = (b v : F) := by
   simp [ratBasis, Module.Basis.localizationLocalization_apply]
 
-theorem exists_trace_dual
-    {F : Type} [Field F] [NumberField F]
-    {κ : Type} [Fintype κ] [DecidableEq κ]
-    (b : Module.Basis κ ℤ (𝓞 F))
-    : ∃ d : κ → F, ∀ v u, Algebra.trace ℚ F ((b v : F) * d u) = if v = u then 1 else 0 := by
+theorem exists_trace_dual {F : Type} [Field F] [NumberField F] {κ : Type} [Fintype κ]
+    [DecidableEq κ] (b : Module.Basis κ ℤ (𝓞 F)) :
+    ∃ d : κ → F, ∀ v u, Algebra.trace ℚ F ((b v : F) * d u) = if v = u then 1 else 0 := by
   classical
   have hnd := traceForm_nondegenerate ℚ F
   refine ⟨fun u => (Algebra.traceForm ℚ F).dualBasis hnd (ratBasis b) u, fun v u => ?_⟩
-  have h :=
-    LinearMap.BilinForm.apply_dualBasis_left (B := Algebra.traceForm ℚ F) hnd (ratBasis b) u v
+  have h := LinearMap.BilinForm.apply_dualBasis_left (B := Algebra.traceForm ℚ F) hnd
+    (ratBasis b) u v
   rw [Algebra.traceForm_apply, ratBasis_apply, mul_comm] at h
   exact h
 
-theorem eq_of_trace_eq
-    {F : Type} [Field F] [NumberField F]
-    {κ : Type} [Fintype κ]
-    (b : Module.Basis κ ℤ (𝓞 F))
-    {x y : F} (h : ∀ v, Algebra.trace ℚ F ((b v : F) * x) = Algebra.trace ℚ F ((b v : F) * y))
-    : x = y := by
+theorem eq_of_trace_eq {F : Type} [Field F] [NumberField F] {κ : Type} [Fintype κ]
+    (b : Module.Basis κ ℤ (𝓞 F)) {x y : F}
+    (h : ∀ v, Algebra.trace ℚ F ((b v : F) * x) = Algebra.trace ℚ F ((b v : F) * y)) :
+    x = y := by
   have hnd := traceForm_nondegenerate ℚ F
   rw [← sub_eq_zero]
   apply hnd.2 _
@@ -49,18 +88,13 @@ theorem eq_of_trace_eq
       sub_self, LinearMap.zero_apply]
   exact LinearMap.congr_fun hL z
 
-theorem exists_dual_param
-    (F : Type) [Field F] [NumberField F]
-    (ι : Type) [Fintype ι] [DecidableEq ι]
-    (B : Matrix ι ι F)
-    (b : Module.Basis (InfinitePlace F) ℤ (𝓞 F))
-    (N : ℕ)
-    (hB : B.det ≠ 0) (hN : 0 < N)
-    : ∃ e : (ι × InfinitePlace F → ℤ) → ι → F,
-      (∀ n i v, (N : ℚ) * Algebra.trace ℚ F ((b v : F) * (B *ᵥ e n) i) = n (i, v))
-        ∧ ∀ y : ι → F,
-          (∀ i v, ∃ m : ℤ, (N : ℚ) * Algebra.trace ℚ F ((b v : F) * (B *ᵥ y) i) = m)
-            → ∃ n, e n = y := by
+theorem exists_dual_param (F : Type) [Field F] [NumberField F] (ι : Type) [Fintype ι]
+    [DecidableEq ι] (B : Matrix ι ι F) (b : Module.Basis (InfinitePlace F) ℤ (𝓞 F)) (N : ℕ)
+    (hB : B.det ≠ 0) (hN : 0 < N) :
+    ∃ e : (ι × InfinitePlace F → ℤ) → ι → F,
+      (∀ n i v, (N : ℚ) * Algebra.trace ℚ F ((b v : F) * (B *ᵥ e n) i) = n (i, v)) ∧
+      ∀ y : ι → F, (∀ i v, ∃ m : ℤ,
+        (N : ℚ) * Algebra.trace ℚ F ((b v : F) * (B *ᵥ y) i) = m) → ∃ n, e n = y := by
   classical
   obtain ⟨d, hd⟩ := exists_trace_dual b
   have hNq : (N : ℚ) ≠ 0 := by exact_mod_cast hN.ne'
@@ -69,18 +103,15 @@ theorem exists_dual_param
     rw [Matrix.mulVec_mulVec, Matrix.mul_nonsing_inv B hu, Matrix.one_mulVec]
   have hinj : ∀ y : ι → F, B⁻¹ *ᵥ (B *ᵥ y) = y := fun y => by
     rw [Matrix.mulVec_mulVec, Matrix.nonsing_inv_mul B hu, Matrix.one_mulVec]
-  obtain ⟨c, hc⟩
-      : ∃ c : (ι × InfinitePlace F → ℤ) → ι → F, ∀ n i v,
-        (N : ℚ) * Algebra.trace ℚ F ((b v : F) * c n i) = n (i, v) := by
+  obtain ⟨c, hc⟩ : ∃ c : (ι × InfinitePlace F → ℤ) → ι → F,
+      ∀ n i v, (N : ℚ) * Algebra.trace ℚ F ((b v : F) * c n i) = n (i, v) := by
     refine ⟨fun n i => ∑ u, algebraMap ℚ F ((n (i, u) : ℚ) / N) * d u, fun n i v => ?_⟩
     have : Algebra.trace ℚ F ((b v : F) * ∑ u, algebraMap ℚ F ((n (i, u) : ℚ) / N) * d u)
         = (n (i, v) : ℚ) / N := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [Finset.mul_sum, map_sum]
-      have hterm
-          : ∀ u,
-            Algebra.trace ℚ F ((b v : F) * (algebraMap ℚ F ((n (i, u) : ℚ) / N) * d u))
-              = ((n (i, u) : ℚ) / N) * (if v = u then 1 else 0) := by
+
+      simp only [Finset.mul_sum, map_sum]
+      have hterm : ∀ u, Algebra.trace ℚ F ((b v : F) * (algebraMap ℚ F ((n (i, u) : ℚ) / N) * d u))
+          = ((n (i, u) : ℚ) / N) * (if v = u then 1 else 0) := by
         intro u
         rw [mul_left_comm, ← Algebra.smul_def, map_smul, hd, smul_eq_mul]
       rw [Finset.sum_congr rfl fun u _ => hterm u]

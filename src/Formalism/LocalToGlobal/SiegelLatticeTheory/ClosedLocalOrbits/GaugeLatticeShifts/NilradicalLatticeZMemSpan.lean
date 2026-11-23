@@ -1,20 +1,62 @@
 module
 
-public import Mathlib
 public import Formalism.LocalToGlobal.SiegelLatticeTheory.ClosedLocalOrbits.GaugeLatticeShifts.Vanish
 public import Formalism.LocalToGlobal.SiegelLatticeTheory.HaarTransversals.UnitaryHaarProducts.HermitianETransportInvariant
 public import Formalism.LocalToGlobal.SiegelLatticeTheory.HaarTransversals.UnitaryHaarProducts.ConcreteLevelAdelicSubset
 public import Formalism.LocalToGlobal.SiegelLatticeTheory.HaarTransversals.UnitaryHaarProducts.RegUnitary
-public import Formalism.SharpRestriction.CuspSpanNormBounds.UnimodularSchurMeasures.RrgCountableField
-public import Formalism.SatakeDualWeyl.KpqSubgroupCompact
+import Formalism.SatakeDualWeyl.KpqSubgroupCompact
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Coalgebra.IsFrobenius
+import Mathlib.RingTheory.HopfAlgebra.Basic
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
 noncomputable section
 
 open scoped Classical ComplexConjugate TensorProduct
-open MeasureTheory NumberField Formalism.BasicNotions Formalism.MainNotions.S
-  Formalism.MainNotions.S.Lat Formalism.L2.SG.HidaSetting Formalism.L2.SG.TermOp
+open MeasureTheory NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.L2.SG.HidaSetting Formalism.L2.SG.TermOp
 open Matrix
 
 set_option linter.dupNamespace false
@@ -25,12 +67,9 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 section Transfer
 
-theorem tr_span
-    {E R M₁ M₂ : Type*}
-    [Field E] [CommRing R] [AddCommGroup M₁] [Module E M₁] [AddCommGroup M₂] [Module R M₂]
-    (j : E →+* R) (ι : M₁ →+ M₂) (hs : ∀ (c : E) x, ι (c • x) = j c • ι x)
-    {S : Set M₁} {x : M₁} (hx : x ∈ Submodule.span E S)
-    : ι x ∈ Submodule.span R (ι '' S) := by
+theorem tr_span {E R M₁ M₂ : Type*} [Field E] [CommRing R] [AddCommGroup M₁] [Module E M₁] [AddCommGroup M₂]
+    [Module R M₂] (j : E →+* R) (ι : M₁ →+ M₂) (hs : ∀ (c : E) x, ι (c • x) = j c • ι x) {S : Set M₁}
+    {x : M₁} (hx : x ∈ Submodule.span E S) : ι x ∈ Submodule.span R (ι '' S) := by
   induction hx using Submodule.span_induction with
   | mem y hy => exact Submodule.subset_span ⟨y, hy, rfl⟩
   | zero => rw [map_zero]; exact zero_mem _
@@ -39,54 +78,47 @@ theorem tr_span
 
 variable {E R : Type*} [Field E] [CommRing R] {n r : ℕ}
 
-theorem tr_sub
-    (ι : (Fin n → E) →+ (Fin n → R)) (M : Matrix (Fin n) (Fin n) E) (G : Matrix (Fin n) (Fin n) R)
-    (hG : ∀ x, G *ᵥ ι x = ι (M *ᵥ x))
-    (x : Fin n → E)
-    : (G - 1) *ᵥ ι x = ι ((M - 1) *ᵥ x) := by
+theorem tr_sub (ι : (Fin n → E) →+ (Fin n → R)) (M : Matrix (Fin n) (Fin n) E) (G : Matrix (Fin n) (Fin n) R)
+    (hG : ∀ x, G *ᵥ ι x = ι (M *ᵥ x)) (x : Fin n → E) : (G - 1) *ᵥ ι x = ι ((M - 1) *ᵥ x) := by
   rw [Matrix.sub_mulVec, Matrix.sub_mulVec, Matrix.one_mulVec, Matrix.one_mulVec, hG, map_sub]
 
-theorem tr_flag
-    (j : E →+* R) (ι : (Fin n → E) →+ (Fin n → R)) (hs : ∀ (c : E) x, ι (c • x) = j c • ι x)
+theorem tr_flag (j : E →+* R) (ι : (Fin n → E) →+ (Fin n → R)) (hs : ∀ (c : E) x, ι (c • x) = j c • ι x)
     (M : Matrix (Fin n) (Fin n) E) (G : Matrix (Fin n) (Fin n) R) (hG : ∀ x, G *ᵥ ι x = ι (M *ᵥ x))
     (e : Fin r → Fin n → E) (S : Set (Fin r)) (x : Fin n → E)
-    (hx : (M - 1) *ᵥ x ∈ Submodule.span E (e '' S))
-    : (G - 1) *ᵥ ι x ∈ Submodule.span R ((fun b => ι (e b)) '' S) := by
+    (hx : (M - 1) *ᵥ x ∈ Submodule.span E (e '' S)) :
+    (G - 1) *ᵥ ι x ∈ Submodule.span R ((fun b => ι (e b)) '' S) := by
   rw [tr_sub ι M G hG]
   have := tr_span j ι hs hx
   rwa [Set.image_image] at this
 
-theorem tr_orth
-    (j : E →+* R) (ι : (Fin n → E) →+ (Fin n → R)) (hs : ∀ (c : E) x, ι (c • x) = j c • ι x)
+theorem tr_orth (j : E →+* R) (ι : (Fin n → E) →+ (Fin n → R)) (hs : ∀ (c : E) x, ι (c • x) = j c • ι x)
     (hspan : ∀ y : Fin n → R, ∃ c : Fin n → R, ∃ w : Fin n → Fin n → E, y = ∑ i, c i • ι (w i))
     (hE : (Fin n → E) → (Fin n → E) →ₗ[E] E) (B : (Fin n → R) → (Fin n → R) →ₗ[R] R)
     (hB : ∀ x y, B (ι x) (ι y) = j (hE x y))
     (e f : Fin r → Fin n → E) (hef : ∀ a b, hE (e b) (f a) = if a = b then 1 else 0)
     (M : Matrix (Fin n) (Fin n) E) (G : Matrix (Fin n) (Fin n) R) (hG : ∀ x, G *ᵥ ι x = ι (M *ᵥ x))
     (hM : ∀ w, (∀ a, hE (e a) w = 0) → (M - 1) *ᵥ w ∈ Submodule.span E (Set.range e))
-    (y : Fin n → R) (hy : ∀ a, B (ι (e a)) y = 0)
-    : (G - 1) *ᵥ y ∈ Submodule.span R (Set.range fun a => ι (e a)) := by
+    (y : Fin n → R) (hy : ∀ a, B (ι (e a)) y = 0) :
+    (G - 1) *ᵥ y ∈ Submodule.span R (Set.range fun a => ι (e a)) := by
   obtain ⟨c, w, rfl⟩ := hspan y
   set w' : Fin n → Fin n → E := fun i => w i - ∑ a, hE (e a) (w i) • f a with hw'def
   have hw' : ∀ i b, hE (e b) (w' i) = 0 := by
     intro i b
-    set_option synthInstance.maxHeartbeats 100000 in
+
     simp only [hw'def, map_sub, map_sum, map_smul, hef, smul_eq_mul, mul_ite, mul_one, mul_zero,
-      Finset.sum_ite_eq', Finset.mem_univ, if_true, sub_self]
+    Finset.sum_ite_eq', Finset.mem_univ, if_true, sub_self]
   have hdec : ∀ i, ι (w i) = ι (w' i) + ∑ a, j (hE (e a) (w i)) • ι (f a) := by
     intro i
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [hw'def, map_sub, map_sum, hs]
+
+    simp only [hw'def, map_sub, map_sum, hs]
     abel
   have hB0 : ∀ a, ∑ i, c i * j (hE (e a) (w i)) = 0 := by
     intro a
     have := hy a
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum] at this
+
+    rw [map_sum] at this
     simpa [map_smul, hB] using this
-  have hsum
-      : ∑ i, c i • ι (w i)
-        = ∑ i, c i • ι (w' i) + ∑ a, (∑ i, c i * j (hE (e a) (w i))) • ι (f a) := by
+  have hsum : ∑ i, c i • ι (w i) = ∑ i, c i • ι (w' i) + ∑ a, (∑ i, c i * j (hE (e a) (w i))) • ι (f a) := by
     simp only [hdec, smul_add, Finset.sum_add_distrib, Finset.smul_sum, smul_smul, Finset.sum_smul]
     congr 1
     exact Finset.sum_comm
@@ -103,8 +135,8 @@ end Transfer
 
 section Maps
 
-def hfL {A : Type} [CommRing A] {m : ℕ} (σ : A →+* A) (J : Matrix (Fin m) (Fin m) A) (x : Fin m → A)
-    : (Fin m → A) →ₗ[A] A where
+def hfL {A : Type} [CommRing A] {m : ℕ} (σ : A →+* A) (J : Matrix (Fin m) (Fin m) A) (x : Fin m → A) :
+    (Fin m → A) →ₗ[A] A where
   toFun y := Formalism.UG.hform σ J x y
   map_add' y y' := by simp only [Formalism.UG.hform, Pi.add_apply, mul_add, Finset.sum_add_distrib]
   map_smul' c y := by
@@ -112,10 +144,8 @@ def hfL {A : Type} [CommRing A] {m : ℕ} (σ : A →+* A) (J : Matrix (Fin m) (
     refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun k _ => ?_
     ring
 
-theorem hfL_apply
-    {A : Type} [CommRing A] {m : ℕ} (σ : A →+* A) (J : Matrix (Fin m) (Fin m) A) (x y : Fin m → A)
-    : hfL σ J x y = Formalism.UG.hform σ J x y :=
-  rfl
+theorem hfL_apply {A : Type} [CommRing A] {m : ℕ} (σ : A →+* A) (J : Matrix (Fin m) (Fin m) A) (x y : Fin m → A) :
+    hfL σ J x y = Formalism.UG.hform σ J x y := rfl
 
 def hJL {m : ℕ} (ε : Fin m → Bool) (x : Fin m → ℂ) : (Fin m → ℂ) →ₗ[ℂ] ℂ where
   toFun y := hJ ε x y
@@ -141,8 +171,8 @@ def rvHom (v : InfinitePlace I.F) : (Fin I.n → I.E) →+ (Fin I.n → ℂ) whe
 
 theorem rvHom_apply (v : InfinitePlace I.F) (x : Fin I.n → I.E) : rvHom I v x = rv I v x := rfl
 
-theorem rv_smul' (v : InfinitePlace I.F) (c : I.E) (x : Fin I.n → I.E)
-    : rvHom I v (c • x) = I.φ v c • rvHom I v x := by
+theorem rv_smul' (v : InfinitePlace I.F) (c : I.E) (x : Fin I.n → I.E) :
+    rvHom I v (c • x) = I.φ v c • rvHom I v x := by
   rw [rvHom_apply, rvHom_apply]
   unfold rv
   rw [← Matrix.mulVec_smul]
@@ -150,14 +180,12 @@ theorem rv_smul' (v : InfinitePlace I.F) (c : I.E) (x : Fin I.n → I.E)
   funext i
   simpa only [Pi.smul_apply, smul_eq_mul] using (I.φ v).map_mul c (x i)
 
-theorem rv_span' (v : InfinitePlace I.F) (y : Fin I.n → ℂ)
-    : ∃ c : Fin I.n → ℂ, ∃ w : Fin I.n → Fin I.n → I.E, y = ∑ i, c i • rvHom I v (w i) := by
+theorem rv_span' (v : InfinitePlace I.F) (y : Fin I.n → ℂ) :
+    ∃ c : Fin I.n → ℂ, ∃ w : Fin I.n → Fin I.n → I.E, y = ∑ i, c i • rvHom I v (w i) := by
   have hPu : IsUnit (I.P v).det := (Matrix.isUnit_iff_isUnit_det _).1 (I.P_unit v)
   refine ⟨I.P v *ᵥ y, fun i k => if i = k then 1 else 0, ?_⟩
-  have h1
-      : ∀ i,
-        rvHom I v (fun k => if i = k then (1 : I.E) else 0)
-          = (I.P v)⁻¹ *ᵥ (fun k => if i = k then (1 : ℂ) else 0) := by
+  have h1 : ∀ i, rvHom I v (fun k => if i = k then (1 : I.E) else 0) =
+      (I.P v)⁻¹ *ᵥ (fun k => if i = k then (1 : ℂ) else 0) := by
     intro i
     rw [rvHom_apply]
     unfold rv
@@ -175,19 +203,16 @@ def inclHom : (Fin I.n → I.E) →+ VA I where
 
 theorem inclHom_apply (x : Fin I.n → I.E) : inclHom I x = incl I x := rfl
 
-theorem incl_smul' (c : I.E) (x : Fin I.n → I.E)
-    : inclHom I (c • x) = Formalism.UG.inclE (F := I.F) (Af I.F) c • inclHom I x := by
+theorem incl_smul' (c : I.E) (x : Fin I.n → I.E) :
+    inclHom I (c • x) = Formalism.UG.inclE (F := I.F) (Af I.F) c • inclHom I x := by
   funext i
   simp [inclHom, incl]
 
-theorem incl_span' (y : VA I)
-    : ∃ c : Fin I.n → I.E ⊗[I.F] Af I.F, ∃ w : Fin I.n → Fin I.n → I.E,
-      y = ∑ i, c i • inclHom I (w i) := by
+theorem incl_span' (y : VA I) :
+    ∃ c : Fin I.n → I.E ⊗[I.F] Af I.F, ∃ w : Fin I.n → Fin I.n → I.E, y = ∑ i, c i • inclHom I (w i) := by
   refine ⟨y, fun i k => if i = k then 1 else 0, ?_⟩
-  have h1
-      : ∀ i,
-        inclHom I (fun k => if i = k then (1 : I.E) else 0)
-          = fun k => if i = k then (1 : I.E ⊗[I.F] Af I.F) else 0 := by
+  have h1 : ∀ i, inclHom I (fun k => if i = k then (1 : I.E) else 0) =
+      fun k => if i = k then (1 : I.E ⊗[I.F] Af I.F) else 0 := by
     intro i
     funext k
     rw [inclHom_apply]
@@ -212,12 +237,12 @@ def crdHom : (VS D).V →+ (Fin X.B.I.n → X.B.I.E) where
   map_zero' := crd_zero X
   map_add' := crd_add X
 
-theorem crd_span' {S : Set (VS D).V} {v : (VS D).V} (hv : v ∈ Submodule.span D.host.E S)
-    : X.crd v ∈ Submodule.span X.B.I.E (X.crd '' S) :=
+theorem crd_span' {S : Set (VS D).V} {v : (VS D).V} (hv : v ∈ Submodule.span D.host.E S) :
+    X.crd v ∈ Submodule.span X.B.I.E (X.crd '' S) :=
   tr_span X.ιE.symm.toRingHom (crdHom X) (fun c x => crd_smul X c x) hv
 
-theorem hef_crd (a b : Fin D.R.rS)
-    : hfL (starRingEnd X.B.I.E) X.B.I.J (X.eR b) (X.fR a) = if a = b then 1 else 0 := by
+theorem hef_crd (a b : Fin D.R.rS) :
+    hfL (starRingEnd X.B.I.E) X.B.I.J (X.eR b) (X.fR a) = if a = b then 1 else 0 := by
   have h := Formalism.L2.SG.PoincareInHH.Cut.hform_crd X (X.eX b) (X.fY a)
   rw [X.ef] at h
   rw [hfL_apply]
@@ -230,8 +255,8 @@ theorem hef_crd (a b : Fin D.R.rS)
 
 variable {u : D.what₂.Word}
 
-theorem orth_of_e {v : (VS D).V} (h : ∀ a, (VS D).hT (X.eX a) v = 0)
-    : v ∈ orth (VS D) (Xsp (lf D (X.Fu u))) := by
+theorem orth_of_e {v : (VS D).V} (h : ∀ a, (VS D).hT (X.eX a) v = 0) :
+    v ∈ orth (VS D) (Xsp (lf D (X.Fu u))) := by
   rw [mem_orth_iff]
   intro w hw
   have hw' : w ∈ Submodule.span D.host.E (Set.range X.eX) := by
@@ -244,26 +269,24 @@ theorem orth_of_e {v : (VS D).V} (h : ∀ a, (VS D).hT (X.eX a) v = 0)
   | add a b _ _ ha hb => rw [map_add (f := _), LinearMap.add_apply, ha, hb, add_zero]
   | smul c a _ ha => rw [LinearMap.map_smulₛₗ, LinearMap.smul_apply, ha, smul_zero]
 
-variable
-  {Λ : Submodule (𝓞 D.host.E) (VS D).V} {n : (VS D).V ≃ₗ[D.host.E] (VS D).V}
-  (hn : n ∈ NLam Λ (lf D (X.Fu u)))
-  {M : Matrix (Fin X.B.I.n) (Fin X.B.I.n) X.B.I.E} (h3 : ∀ y, X.crd (n y) = M *ᵥ X.crd y)
+variable {Λ : Submodule (𝓞 D.host.E) (VS D).V} {n : (VS D).V ≃ₗ[D.host.E] (VS D).V}
+  (hn : n ∈ NLam Λ (lf D (X.Fu u))) {M : Matrix (Fin X.B.I.n) (Fin X.B.I.n) X.B.I.E}
+  (h3 : ∀ y, X.crd (n y) = M *ᵥ X.crd y)
 
 include h3 in
 theorem mcrd (v : (VS D).V) : (M - 1) *ᵥ X.crd v = X.crd (n v - v) := by
   rw [Matrix.sub_mulVec, Matrix.one_mulVec, ← h3, crd_sub']
 
+
 include hn h3 in
-theorem nlam_e (a : Fin D.R.rS)
-    : (M - 1) *ᵥ X.eR a ∈ Submodule.span X.B.I.E (X.eR '' {b | b.1 < a.1}) := by
+theorem nlam_e (a : Fin D.R.rS) : (M - 1) *ᵥ X.eR a ∈ Submodule.span X.B.I.E (X.eR '' {b | b.1 < a.1}) := by
   have hx : X.eX a ∈ Xflag (lf D (X.Fu u)) (a.1 + 1) := by
     show X.eX a ∈ Submodule.span D.host.E ((X.Fu u).e '' {i | i.1 < a.1 + 1})
     rw [X.Fu_e]
     exact Submodule.subset_span ⟨a, Nat.lt_succ_self _, rfl⟩
   have h1 : n (X.eX a) - X.eX a ∈ Submodule.span D.host.E (X.eX '' {i | i.1 < a.1}) := by
     have := hn.2.1 a.1 _ hx
-    have e : Xflag (lf D (X.Fu u)) a.1 = Submodule.span D.host.E ((X.Fu u).e '' {i | i.1 < a.1}) :=
-      rfl
+    have e : Xflag (lf D (X.Fu u)) a.1 = Submodule.span D.host.E ((X.Fu u).e '' {i | i.1 < a.1}) := rfl
     rwa [e, X.Fu_e] at this
   have := crd_span' X h1
   rw [Set.image_image] at this
@@ -271,9 +294,9 @@ theorem nlam_e (a : Fin D.R.rS)
   rw [mcrd X h3]
   exact this
 
+
 include hn h3 in
-theorem nilradical_lattice_z_mem_span
-    : (M - 1) *ᵥ X.zR u ∈ Submodule.span X.B.I.E (Set.range X.eR) := by
+theorem nilradical_lattice_z_mem_span : (M - 1) *ᵥ X.zR u ∈ Submodule.span X.B.I.E (Set.range X.eR) := by
   have ho := orth_of_e X (u := u) (v := X.zu u) fun a => (X.zu_orth u a).1
   have h1 := hn.2.2 _ ho
   have e : Xsp (lf D (X.Fu u)) = Submodule.span D.host.E (Set.range (X.Fu u).e) := rfl
@@ -284,10 +307,11 @@ theorem nilradical_lattice_z_mem_span
   rw [mcrd X h3]
   exact this
 
+
 include hn h3 in
-theorem nlam_orth
-    (w : Fin X.B.I.n → X.B.I.E) (hw : ∀ a, hfL (starRingEnd X.B.I.E) X.B.I.J (X.eR a) w = 0)
-    : (M - 1) *ᵥ w ∈ Submodule.span X.B.I.E (Set.range X.eR) := by
+theorem nlam_orth (w : Fin X.B.I.n → X.B.I.E)
+    (hw : ∀ a, hfL (starRingEnd X.B.I.E) X.B.I.J (X.eR a) w = 0) :
+    (M - 1) *ᵥ w ∈ Submodule.span X.B.I.E (Set.range X.eR) := by
   have ho : toV X w ∈ orth (VS D) (Xsp (lf D (X.Fu u))) := by
     refine orth_of_e X fun a => ?_
     have h := iota_hE X (X.eR a) w
@@ -326,18 +350,15 @@ theorem nLamNinf_holds : Formalism.L2.SG.TermOp.Vanish.NLamNinf := by
     exact rv_mulVec X v _ y
   refine ⟨⟨fun a => ?_, ?_⟩, fun y hy => ?_⟩
   · exact tr_flag (X.B.I.φ v) (rvHom X.B.I v) (rv_smul' X.B.I v) _ _ hG X.eR _ _ (nlam_e X hn h3 a)
-  · have :=
-      tr_flag (X.B.I.φ v) (rvHom X.B.I v) (rv_smul' X.B.I v) _ _ hG X.eR Set.univ _
-        (by rw [Set.image_univ]; exact nilradical_lattice_z_mem_span X hn h3)
+  · have := tr_flag (X.B.I.φ v) (rvHom X.B.I v) (rv_smul' X.B.I v) _ _ hG X.eR Set.univ _
+      (by rw [Set.image_univ]; exact nilradical_lattice_z_mem_span X hn h3)
     unfold spanLt
     rw [← range_eq_image_lt]
     rwa [Set.image_univ] at this
-  · have :=
-      tr_orth (X.B.I.φ v) (rvHom X.B.I v) (rv_smul' X.B.I v) (rv_span' X.B.I v)
-        (fun x => hfL (starRingEnd X.B.I.E) X.B.I.J x)
-        (fun x => hJL (X.B.I.ε v) x)
-        (fun x y => by rw [hJL_apply, hfL_apply, rvHom_apply, rvHom_apply]; exact hJ_rv X v x y)
-        X.eR X.fR (hef_crd X) _ _ hG (nlam_orth X hn h3) y hy
+  · have := tr_orth (X.B.I.φ v) (rvHom X.B.I v) (rv_smul' X.B.I v) (rv_span' X.B.I v)
+      (fun x => hfL (starRingEnd X.B.I.E) X.B.I.J x) (fun x => hJL (X.B.I.ε v) x)
+      (fun x y => by rw [hJL_apply, hfL_apply, rvHom_apply, rvHom_apply]; exact hJ_rv X v x y)
+      X.eR X.fR (hef_crd X) _ _ hG (nlam_orth X hn h3) y hy
     unfold spanLt
     rw [← range_eq_image_lt]
     exact this
@@ -351,13 +372,11 @@ theorem nLamNfin_holds : Formalism.L2.SG.TermOp.Vanish.NLamNfin := by
     exact incl_mulVec X _ y
   refine ⟨fun a => ?_, ?_, fun y hy => ?_⟩
   · exact tr_flag _ (inclHom X.B.I) (incl_smul' X.B.I) _ _ hG X.eR _ _ (nlam_e X hn h3 a)
-  · have :=
-      tr_flag _ (inclHom X.B.I) (incl_smul' X.B.I) _ _ hG X.eR Set.univ _
-        (by rw [Set.image_univ]; exact nilradical_lattice_z_mem_span X hn h3)
+  · have := tr_flag _ (inclHom X.B.I) (incl_smul' X.B.I) _ _ hG X.eR Set.univ _
+      (by rw [Set.image_univ]; exact nilradical_lattice_z_mem_span X hn h3)
     rwa [Set.image_univ] at this
   · exact tr_orth _ (inclHom X.B.I) (incl_smul' X.B.I) (incl_span' X.B.I)
-      (fun x => hfL (starRingEnd X.B.I.E) X.B.I.J x)
-      (fun x => Formalism.L2.SG.PoincareInHH.Cut.hAlin X x)
+      (fun x => hfL (starRingEnd X.B.I.E) X.B.I.J x) (fun x => Formalism.L2.SG.PoincareInHH.Cut.hAlin X x)
       (fun x y => by
         rw [hfL_apply, inclHom_apply, inclHom_apply]
         exact Formalism.L2.SG.PoincareInHH.Cut.hA_incl X x y)
@@ -368,9 +387,8 @@ theorem ginfUnimod_holds : Formalism.L2.SG.TermOp.Vanish.GinfUnimod := fun I => 
 theorem roDiscreteC_holds : Formalism.L2.SG.TermOp.Vanish.RODiscreteC := by
   intro D X Y u u' t
   have h := ROsub_discrete X (X.Fu u) (X.Fu u') t.lam t.lam' ((Y.rowsOK u).1 _ t.mem).1.1 t.lin
-  have e
-      : Formalism.L2.SG.TermOp.Vanish.ROsub X (X.Fu u) (X.Fu u') t.lam t.lam' t.lin
-        = ROsub X (X.Fu u) (X.Fu u') t.lam t.lam' t.lin := by
+  have e : Formalism.L2.SG.TermOp.Vanish.ROsub X (X.Fu u) (X.Fu u') t.lam t.lam' t.lin =
+      ROsub X (X.Fu u) (X.Fu u') t.lam t.lam' t.lin := by
     ext; rfl
   rw [e]
   exact h
@@ -381,12 +399,9 @@ section Psi
 
 variable {n r : ℕ}
 
-theorem hJ_spL
-    (ε : Fin n → Bool) (e f : Fin r → Fin n → ℂ)
-    (hfe : ∀ a b, hJ ε (f a) (e b) = if b = a then 1 else 0)
-    (a : Fin r)
-    {y : Fin n → ℂ} (hy : y ∈ spanLt e a.1)
-    : hJ ε (f a) y = 0 := by
+theorem hJ_spL (ε : Fin n → Bool) (e f : Fin r → Fin n → ℂ)
+    (hfe : ∀ a b, hJ ε (f a) (e b) = if b = a then 1 else 0) (a : Fin r) {y : Fin n → ℂ}
+    (hy : y ∈ spanLt e a.1) : hJ ε (f a) y = 0 := by
   have : spanLt e a.1 ≤ LinearMap.ker (hJL ε (f a)) := by
     refine Submodule.span_le.2 ?_
     rintro _ ⟨b, hb, rfl⟩
@@ -397,26 +412,19 @@ theorem hJ_spL
     exact lt_irrefl a.1 hb
   exact this hy
 
-theorem fl_step
-    {e : Fin r → Fin n → ℂ} {g : Matrix (Fin n) (Fin n) ℂ}
-    (hg : ∀ a : Fin r, (g - 1) *ᵥ e a ∈ spanLt e a.1)
-    (k : ℕ)
-    {y : Fin n → ℂ} (hy : y ∈ spanLt e (k + 1))
-    : (g - 1) *ᵥ y ∈ spanLt e k := by
+theorem fl_step {e : Fin r → Fin n → ℂ} {g : Matrix (Fin n) (Fin n) ℂ}
+    (hg : ∀ a : Fin r, (g - 1) *ᵥ e a ∈ spanLt e a.1) (k : ℕ) {y : Fin n → ℂ} (hy : y ∈ spanLt e (k + 1)) :
+    (g - 1) *ᵥ y ∈ spanLt e k := by
   have : spanLt e (k + 1) ≤ (spanLt e k).comap (Matrix.mulVecLin (g - 1)) := by
     refine Submodule.span_le.2 ?_
     rintro _ ⟨b, hb, rfl⟩
     exact spL_mono e (Nat.lt_succ_iff.1 hb) (hg b)
   exact this hy
 
-theorem rootCoord_mul
-    (ε : Fin n → Bool)
-    (e f : Fin r → Fin n → ℂ)
-    (z : Fin n → ℂ)
+theorem rootCoord_mul (ε : Fin n → Bool) (e f : Fin r → Fin n → ℂ) (z : Fin n → ℂ)
     (hfe : ∀ a b, hJ ε (f a) (e b) = if b = a then 1 else 0) (hfz : ∀ a, hJ ε (f a) z = 0)
-    {g h : Matrix (Fin n) (Fin n) ℂ} (hg : InS e z g) (hh : InS e z h)
-    (a : Fin r)
-    : rootCoord ε e f z (g * h) a = rootCoord ε e f z g a + rootCoord ε e f z h a := by
+    {g h : Matrix (Fin n) (Fin n) ℂ} (hg : InS e z g) (hh : InS e z h) (a : Fin r) :
+    rootCoord ε e f z (g * h) a = rootCoord ε e f z g a + rootCoord ε e f z h a := by
   unfold rootCoord
   have hx0 : hJ ε (f a) (nxt e z a) = 0 := by
     unfold nxt
@@ -436,30 +444,22 @@ theorem rootCoord_mul
   have hgd := fl_step hg.1 a.1 hd
   have e2 : h *ᵥ nxt e z a = nxt e z a + (h - 1) *ᵥ nxt e z a := by
     rw [Matrix.sub_mulVec, Matrix.one_mulVec]; abel
-  have e1
-      : (g * h) *ᵥ nxt e z a
-        = g *ᵥ nxt e z a + (h - 1) *ᵥ nxt e z a + (g - 1) *ᵥ ((h - 1) *ᵥ nxt e z a) := by
-    rw [← Matrix.mulVec_mulVec, e2, Matrix.mulVec_add, Matrix.sub_mulVec g 1, Matrix.one_mulVec]
-    abel
+  have e1 : (g * h) *ᵥ nxt e z a = g *ᵥ nxt e z a + (h - 1) *ᵥ nxt e z a +
+      (g - 1) *ᵥ ((h - 1) *ᵥ nxt e z a) := by
+    rw [← Matrix.mulVec_mulVec, e2, Matrix.mulVec_add, Matrix.sub_mulVec g 1, Matrix.one_mulVec]; abel
   rw [e1, e2, L, L, L, hx0, hJ_spL ε e f hfe a hgd]
   ring
 
-theorem psiR_mul
-    (ε : Fin n → Bool)
-    (gg : ℕ)
-    (e f : Fin r → Fin n → ℂ)
-    (z : Fin n → ℂ)
+theorem psiR_mul (ε : Fin n → Bool) (gg : ℕ) (e f : Fin r → Fin n → ℂ) (z : Fin n → ℂ)
     (hfe : ∀ a b, hJ ε (f a) (e b) = if b = a then 1 else 0) (hfz : ∀ a, hJ ε (f a) z = 0)
-    {g h : Matrix (Fin n) (Fin n) ℂ} (hg : InS e z g) (hh : InS e z h)
-    : psiR ε gg e f z (g * h) = psiR ε gg e f z g * psiR ε gg e f z h := by
+    {g h : Matrix (Fin n) (Fin n) ℂ} (hg : InS e z g) (hh : InS e z h) :
+    psiR ε gg e f z (g * h) = psiR ε gg e f z g * psiR ε gg e f z h := by
   unfold psiR
   rw [← Complex.exp_add]
   congr 1
-  have hs
-      : ∀ a,
-        rootCoord ε e f z (g * h) a + star (rootCoord ε e f z (g * h) a)
-          = (rootCoord ε e f z g a + star (rootCoord ε e f z g a))
-            + (rootCoord ε e f z h a + star (rootCoord ε e f z h a)) := by
+  have hs : ∀ a, rootCoord ε e f z (g * h) a + star (rootCoord ε e f z (g * h) a) =
+      (rootCoord ε e f z g a + star (rootCoord ε e f z g a)) +
+        (rootCoord ε e f z h a + star (rootCoord ε e f z h a)) := by
     intro a
     rw [rootCoord_mul ε e f z hfe hfz hg hh a, star_add]
     ring
@@ -489,34 +489,30 @@ section Closed
 
 variable {n r : ℕ}
 
-theorem isClosed_InN (ε : Fin n → Bool) (e : Fin r → Fin n → ℂ) (z : Fin n → ℂ)
-    : IsClosed {g : Matrix (Fin n) (Fin n) ℂ | InN ε e z g} := by
-  have hW
-      : ∀ (W : Submodule ℂ (Fin n → ℂ)) (y : Fin n → ℂ),
-        IsClosed {g : Matrix (Fin n) (Fin n) ℂ | (g - 1) *ᵥ y ∈ W} := fun W y =>
+theorem isClosed_InN (ε : Fin n → Bool) (e : Fin r → Fin n → ℂ) (z : Fin n → ℂ) :
+    IsClosed {g : Matrix (Fin n) (Fin n) ℂ | InN ε e z g} := by
+  have hW : ∀ (W : Submodule ℂ (Fin n → ℂ)) (y : Fin n → ℂ),
+      IsClosed {g : Matrix (Fin n) (Fin n) ℂ | (g - 1) *ᵥ y ∈ W} := fun W y =>
     (Submodule.closed_of_finiteDimensional W).preimage
       ((continuous_id.sub continuous_const).matrix_mulVec continuous_const)
-  have : {g : Matrix (Fin n) (Fin n) ℂ | InN ε e z g}
-      = ((⋂ a, {g : Matrix (Fin n) (Fin n) ℂ | (g - 1) *ᵥ e a ∈ spanLt e a.1})
-          ∩ {g | (g - 1) *ᵥ z ∈ spanLt e r})
-        ∩ ⋂ y, ⋂ (_ : ∀ a, hJ ε (e a) y = 0), {g | (g - 1) *ᵥ y ∈ spanLt e r} := by
+  have : {g : Matrix (Fin n) (Fin n) ℂ | InN ε e z g} =
+      ((⋂ a, {g : Matrix (Fin n) (Fin n) ℂ | (g - 1) *ᵥ e a ∈ spanLt e a.1}) ∩
+        {g | (g - 1) *ᵥ z ∈ spanLt e r}) ∩
+        ⋂ y, ⋂ (_ : ∀ a, hJ ε (e a) y = 0), {g | (g - 1) *ᵥ y ∈ spanLt e r} := by
     ext g
     simp only [InN, InS, Set.mem_setOf_eq, Set.mem_inter_iff, Set.mem_iInter]
   rw [this]
   exact ((isClosed_iInter fun a => hW _ _).inter (hW _ _)).inter
     (isClosed_iInter fun y => isClosed_iInter fun _ => hW _ _)
 
-theorem ninf_closed (I : AutInst) (e : Fin r → Fin I.n → I.E) (z : Fin I.n → I.E)
-    : IsClosed (Ninf I e z) := by
-  have : Ninf I e z
-      = ⋂ v, (fun s : I.Ginf => uMat (s v)) ⁻¹'
-        {g | InN (I.ε v) (fun a => rv I v (e a)) (rv I v z) g} := by
+theorem ninf_closed (I : AutInst) (e : Fin r → Fin I.n → I.E) (z : Fin I.n → I.E) : IsClosed (Ninf I e z) := by
+  have : Ninf I e z = ⋂ v, (fun s : I.Ginf => uMat (s v)) ⁻¹'
+      {g | InN (I.ε v) (fun a => rv I v (e a)) (rv I v z) g} := by
     ext s
     simp only [Ninf, Set.mem_setOf_eq, Set.mem_iInter, Set.mem_preimage]
   rw [this]
-  exact isClosed_iInter fun v =>
-    (isClosed_InN _ _ _).preimage
-      (Units.continuous_val.comp (continuous_subtype_val.comp (continuous_apply v)))
+  exact isClosed_iInter fun v => (isClosed_InN _ _ _).preimage
+    (Units.continuous_val.comp (continuous_subtype_val.comp (continuous_apply v)))
 
 end Closed
 
@@ -524,20 +520,15 @@ end Vanish2
 
 theorem psiInfChar_holds : Formalism.L2.SG.TermOp.Vanish.PsiInfChar := by
   intro D X u
-  have hfe
-      : ∀ v a b,
-        hJ (X.B.I.ε v) (rv X.B.I v (X.fR a)) (rv X.B.I v (X.eR b)) = if b = a then 1 else 0 := by
+  have hfe : ∀ v a b, hJ (X.B.I.ε v) (rv X.B.I v (X.fR a)) (rv X.B.I v (X.eR b)) = if b = a then 1 else 0 := by
     intro v a b
     rw [hJ_rv, hE_f_e]
     split_ifs <;> simp
   have hfz : ∀ v a, hJ (X.B.I.ε v) (rv X.B.I v (X.fR a)) (rv X.B.I v (X.zR u)) = 0 := by
     intro v a
     rw [hJ_rv, hermitian_f_z_zero, map_zero]
-  refine ⟨
-    (NinfSub X.eR (X.zR u)).one_mem,
-    fun s hs t ht => ⟨(NinfSub X.eR (X.zR u)).mul_mem hs ht, ?_⟩,
-    fun s hs => (NinfSub X.eR (X.zR u)).inv_mem hs
-  ⟩
+  refine ⟨(NinfSub X.eR (X.zR u)).one_mem, fun s hs t ht =>
+    ⟨(NinfSub X.eR (X.zR u)).mul_mem hs ht, ?_⟩, fun s hs => (NinfSub X.eR (X.zR u)).inv_mem hs⟩
   unfold HidaSetting.psiInfU psiInf
   rw [← Finset.prod_mul_distrib]
   refine Finset.prod_congr rfl fun v _ => ?_
@@ -562,44 +553,37 @@ variable {D : D7} (X : HidaSetting D)
 def matOf (n : (VS D).V ≃ₗ[D.host.E] (VS D).V) : Matrix (Fin X.B.I.n) (Fin X.B.I.n) X.B.I.E :=
   (LinearMap.toMatrix X.bas X.bas (n : (VS D).V →ₗ[D.host.E] (VS D).V)).map X.ιE.symm
 
-theorem crd_matOf (n : (VS D).V ≃ₗ[D.host.E] (VS D).V) (y : (VS D).V)
-    : X.crd (n y) = matOf X n *ᵥ X.crd y := by
+theorem crd_matOf (n : (VS D).V ≃ₗ[D.host.E] (VS D).V) (y : (VS D).V) :
+    X.crd (n y) = matOf X n *ᵥ X.crd y := by
   have h := LinearMap.toMatrix_mulVec_repr X.bas X.bas (n : (VS D).V →ₗ[D.host.E] (VS D).V) y
   funext i
   show X.ιE.symm (X.bas.repr (n y) i) = _
   rw [LinearEquiv.coe_coe] at h
   rw [← h]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [matOf, Matrix.mulVec, dotProduct, map_sum, map_mul, Matrix.map_apply]
+
+  simp only [matOf, Matrix.mulVec, dotProduct, map_sum, map_mul, Matrix.map_apply]
   rfl
 
-theorem matOf_comp
-    (n m : (VS D).V ≃ₗ[D.host.E] (VS D).V) (l : Fin X.B.I.n → X.B.I.E) (h : ∀ y, n (m y) = y)
-    : (matOf X n * matOf X m) *ᵥ l = l := by
+theorem matOf_comp (n m : (VS D).V ≃ₗ[D.host.E] (VS D).V) (l : Fin X.B.I.n → X.B.I.E)
+    (h : ∀ y, n (m y) = y) : (matOf X n * matOf X m) *ᵥ l = l := by
   obtain ⟨y, rfl⟩ := crd_surj X l
   rw [← Matrix.mulVec_mulVec, ← crd_matOf, ← crd_matOf, h]
 
 theorem matOf_mul_inv (n : (VS D).V ≃ₗ[D.host.E] (VS D).V) : matOf X n * matOf X n⁻¹ = 1 :=
-  mat_eq_one_of_fix X.B.I Submodule.span_univ fun l _ =>
-    matOf_comp X n n⁻¹ l fun y => by
-      show (n * n⁻¹) y = y
-      rw [mul_inv_cancel]
-      rfl
+  mat_eq_one_of_fix X.B.I Submodule.span_univ fun l _ => matOf_comp X n n⁻¹ l fun y => by
+    show (n * n⁻¹) y = y
+    rw [mul_inv_cancel]; rfl
 
 theorem matOf_inv_mul (n : (VS D).V ≃ₗ[D.host.E] (VS D).V) : matOf X n⁻¹ * matOf X n = 1 :=
-  mat_eq_one_of_fix X.B.I Submodule.span_univ fun l _ =>
-    matOf_comp X n⁻¹ n l fun y => by
-      show (n⁻¹ * n) y = y
-      rw [inv_mul_cancel]
-      rfl
+  mat_eq_one_of_fix X.B.I Submodule.span_univ fun l _ => matOf_comp X n⁻¹ n l fun y => by
+    show (n⁻¹ * n) y = y
+    rw [inv_mul_cancel]; rfl
 
 end RatPtSec
 
-theorem unitary_of_hform
-    {A : Type} [CommRing A]
-    {m : ℕ} (σ : A →+* A) (J M : Matrix (Fin m) (Fin m) A)
-    (h : ∀ x y, Formalism.UG.hform σ J (M *ᵥ x) (M *ᵥ y) = Formalism.UG.hform σ J x y)
-    : Formalism.UG.cT σ M * J * M = J := by
+theorem unitary_of_hform {A : Type} [CommRing A] {m : ℕ} (σ : A →+* A) (J M : Matrix (Fin m) (Fin m) A)
+    (h : ∀ x y, Formalism.UG.hform σ J (M *ᵥ x) (M *ᵥ y) = Formalism.UG.hform σ J x y) :
+    Formalism.UG.cT σ M * J * M = J := by
   ext i j
   have hR : Formalism.UG.hform σ J (Pi.single i 1) (Pi.single j 1) = J i j := by
     unfold Formalism.UG.hform
@@ -609,92 +593,66 @@ theorem unitary_of_hform
     · simp
     · intro b _ hb; simp [hb]
     · simp
-  have hL
-      : Formalism.UG.hform σ J (M *ᵥ Pi.single i 1) (M *ᵥ Pi.single j 1)
-        = (Formalism.UG.cT σ M * J * M) i j := by
-    simp only [Matrix.mulVec_single_one, Formalism.UG.hform, Matrix.mul_apply, Formalism.UG.cT,
-      Matrix.transpose_apply, Matrix.map_apply, Matrix.col_apply, Finset.sum_mul]
+  have hL : Formalism.UG.hform σ J (M *ᵥ Pi.single i 1) (M *ᵥ Pi.single j 1) = (Formalism.UG.cT σ M * J * M) i j := by
+    simp only [Matrix.mulVec_single_one, Formalism.UG.hform, Matrix.mul_apply, Formalism.UG.cT, Matrix.transpose_apply,
+      Matrix.map_apply, Matrix.col_apply, Finset.sum_mul]
     exact Finset.sum_comm
   rw [← hL, h, hR]
 
-def rtReal'
-    (I : AutInst) (γ : GL (Fin I.n) I.E)
-    (hγ : γ ∈ Formalism.UG.UJ (starRingEnd I.E) I.J) (v : InfinitePlace I.F)
-    : Formalism.REAL.UJ (I.ε v) := ⟨
-  ⟨
-    (I.P v)⁻¹ * (γ : Matrix (Fin I.n) (Fin I.n) I.E).map (I.φ v) * I.P v,
+def rtReal' (I : AutInst) (γ : GL (Fin I.n) I.E) (hγ : γ ∈ Formalism.UG.UJ (starRingEnd I.E) I.J)
+    (v : InfinitePlace I.F) : Formalism.REAL.UJ (I.ε v) :=
+  ⟨⟨(I.P v)⁻¹ * (γ : Matrix (Fin I.n) (Fin I.n) I.E).map (I.φ v) * I.P v,
     (I.P v)⁻¹ * ((γ⁻¹ : GL (Fin I.n) I.E) : Matrix (Fin I.n) (Fin I.n) I.E).map (I.φ v) * I.P v,
     by
-      have e1
-          : (γ : Matrix (Fin I.n) (Fin I.n) I.E).map (I.φ v)
-              * ((γ⁻¹ : GL (Fin I.n) I.E) : Matrix (Fin I.n) (Fin I.n) I.E).map (I.φ v)
-            = 1 := by
+      have e1 : (γ : Matrix (Fin I.n) (Fin I.n) I.E).map (I.φ v) *
+          ((γ⁻¹ : GL (Fin I.n) I.E) : Matrix (Fin I.n) (Fin I.n) I.E).map (I.φ v) = 1 := by
         rw [← Matrix.map_mul, ← Units.val_mul, mul_inv_cancel, Units.val_one,
           Matrix.map_one _ (map_zero _) (map_one _)]
-      calc
-        (I.P v)⁻¹ * (γ : Matrix (Fin I.n) (Fin I.n) I.E).map (I.φ v) * I.P v
-              * ((I.P v)⁻¹ * ((γ⁻¹ : GL (Fin I.n) I.E) : Matrix (Fin I.n) (Fin I.n) I.E).map (I.φ v)
-                * I.P v)
-            = (I.P v)⁻¹
-              * ((γ : Matrix (Fin I.n) (Fin I.n) I.E).map (I.φ v) * (I.P v * (I.P v)⁻¹)
-                * ((γ⁻¹ : GL (Fin I.n) I.E) : Matrix (Fin I.n) (Fin I.n) I.E).map (I.φ v))
-              * I.P v := by
-          simp only [Matrix.mul_assoc]
+      calc (I.P v)⁻¹ * (γ : Matrix (Fin I.n) (Fin I.n) I.E).map (I.φ v) * I.P v *
+            ((I.P v)⁻¹ * ((γ⁻¹ : GL (Fin I.n) I.E) : Matrix (Fin I.n) (Fin I.n) I.E).map (I.φ v) * I.P v)
+          = (I.P v)⁻¹ * ((γ : Matrix (Fin I.n) (Fin I.n) I.E).map (I.φ v) * (I.P v * (I.P v)⁻¹) *
+            ((γ⁻¹ : GL (Fin I.n) I.E) : Matrix (Fin I.n) (Fin I.n) I.E).map (I.φ v)) * I.P v := by
+            simp only [Matrix.mul_assoc]
         _ = 1 := by
-          rw [Formalism.MainNotions.LeviCoordinates.rrg_P_mul_inv, Matrix.mul_one, e1,
-            Matrix.mul_one, Formalism.MainNotions.LeviCoordinates.rrg_P_inv_mul],
+            rw [Formalism.MainNotions.LeviCoordinates.rrg_P_mul_inv, Matrix.mul_one, e1, Matrix.mul_one,
+              Formalism.MainNotions.LeviCoordinates.rrg_P_inv_mul],
     by
-      have e1
-          : ((γ⁻¹ : GL (Fin I.n) I.E) : Matrix (Fin I.n) (Fin I.n) I.E).map (I.φ v)
-              * (γ : Matrix (Fin I.n) (Fin I.n) I.E).map (I.φ v)
-            = 1 := by
+      have e1 : ((γ⁻¹ : GL (Fin I.n) I.E) : Matrix (Fin I.n) (Fin I.n) I.E).map (I.φ v) *
+          (γ : Matrix (Fin I.n) (Fin I.n) I.E).map (I.φ v) = 1 := by
         rw [← Matrix.map_mul, ← Units.val_mul, inv_mul_cancel, Units.val_one,
           Matrix.map_one _ (map_zero _) (map_one _)]
-      calc
-        (I.P v)⁻¹ * ((γ⁻¹ : GL (Fin I.n) I.E) : Matrix (Fin I.n) (Fin I.n) I.E).map (I.φ v) * I.P v
-              * ((I.P v)⁻¹ * (γ : Matrix (Fin I.n) (Fin I.n) I.E).map (I.φ v) * I.P v)
-            = (I.P v)⁻¹
-              * (((γ⁻¹ : GL (Fin I.n) I.E) : Matrix (Fin I.n) (Fin I.n) I.E).map (I.φ v)
-                * (I.P v * (I.P v)⁻¹) * (γ : Matrix (Fin I.n) (Fin I.n) I.E).map (I.φ v))
-              * I.P v := by
-          simp only [Matrix.mul_assoc]
+      calc (I.P v)⁻¹ * ((γ⁻¹ : GL (Fin I.n) I.E) : Matrix (Fin I.n) (Fin I.n) I.E).map (I.φ v) * I.P v *
+            ((I.P v)⁻¹ * (γ : Matrix (Fin I.n) (Fin I.n) I.E).map (I.φ v) * I.P v)
+          = (I.P v)⁻¹ * (((γ⁻¹ : GL (Fin I.n) I.E) : Matrix (Fin I.n) (Fin I.n) I.E).map (I.φ v) *
+            (I.P v * (I.P v)⁻¹) * (γ : Matrix (Fin I.n) (Fin I.n) I.E).map (I.φ v)) * I.P v := by
+            simp only [Matrix.mul_assoc]
         _ = 1 := by
-          rw [Formalism.MainNotions.LeviCoordinates.rrg_P_mul_inv, Matrix.mul_one, e1,
-            Matrix.mul_one, Formalism.MainNotions.LeviCoordinates.rrg_P_inv_mul]
-  ⟩,
+            rw [Formalism.MainNotions.LeviCoordinates.rrg_P_mul_inv, Matrix.mul_one, e1, Matrix.mul_one,
+              Formalism.MainNotions.LeviCoordinates.rrg_P_inv_mul]⟩,
   by
-    have hγ'
-        : Formalism.UG.cT (starRingEnd I.E) (γ : Matrix (Fin I.n) (Fin I.n) I.E) * I.J
-            * (γ : Matrix (Fin I.n) (Fin I.n) I.E)
-          = I.J :=
-      hγ
-    have hc
-        : (Formalism.UG.cT (starRingEnd I.E) (γ : Matrix (Fin I.n) (Fin I.n) I.E)).map (I.φ v)
-          = ((γ : Matrix (Fin I.n) (Fin I.n) I.E).map (I.φ v))ᴴ := by
+    have hγ' : Formalism.UG.cT (starRingEnd I.E) (γ : Matrix (Fin I.n) (Fin I.n) I.E) * I.J *
+        (γ : Matrix (Fin I.n) (Fin I.n) I.E) = I.J := hγ
+    have hc : (Formalism.UG.cT (starRingEnd I.E) (γ : Matrix (Fin I.n) (Fin I.n) I.E)).map (I.φ v) =
+        ((γ : Matrix (Fin I.n) (Fin I.n) I.E).map (I.φ v))ᴴ := by
       ext i j
-      simp only [Formalism.UG.cT, Matrix.map_apply, Matrix.transpose_apply,
-        Matrix.conjTranspose_apply, starRingEnd_apply]
+      simp only [Formalism.UG.cT, Matrix.map_apply, Matrix.transpose_apply, Matrix.conjTranspose_apply,
+        starRingEnd_apply]
       exact I.cm.cmUnram.2.1 (I.φ v) _
-    have hu
-        : ((γ : Matrix (Fin I.n) (Fin I.n) I.E).map (I.φ v))ᴴ * I.J.map (I.φ v)
-            * (γ : Matrix (Fin I.n) (Fin I.n) I.E).map (I.φ v)
-          = I.J.map (I.φ v) := by
+    have hu : ((γ : Matrix (Fin I.n) (Fin I.n) I.E).map (I.φ v))ᴴ * I.J.map (I.φ v) *
+        (γ : Matrix (Fin I.n) (Fin I.n) I.E).map (I.φ v) = I.J.map (I.φ v) := by
       rw [← hc, ← Matrix.map_mul, ← Matrix.map_mul, hγ']
     have hPP : ((I.P v)⁻¹)ᴴ * (I.P v)ᴴ = 1 := by
-      rw [← Matrix.conjTranspose_mul, Formalism.MainNotions.LeviCoordinates.rrg_P_mul_inv,
-        Matrix.conjTranspose_one]
+      rw [← Matrix.conjTranspose_mul, Formalism.MainNotions.LeviCoordinates.rrg_P_mul_inv, Matrix.conjTranspose_one]
     show ((I.P v)⁻¹ * (γ : Matrix (Fin I.n) (Fin I.n) I.E).map (I.φ v) * I.P v)ᴴ *
         Formalism.REAL.Jm (I.ε v) * ((I.P v)⁻¹ * (γ : Matrix (Fin I.n) (Fin I.n) I.E).map (I.φ v) * I.P v) =
         Formalism.REAL.Jm (I.ε v)
     rw [← I.P_spec v]
     simp only [Matrix.conjTranspose_mul, Matrix.mul_assoc]
     rw [← Matrix.mul_assoc ((I.P v)⁻¹)ᴴ (I.P v)ᴴ, hPP, Matrix.one_mul,
-      ← Matrix.mul_assoc (I.P v) (I.P v)⁻¹, Formalism.MainNotions.LeviCoordinates.rrg_P_mul_inv,
-      Matrix.one_mul]
+      ← Matrix.mul_assoc (I.P v) (I.P v)⁻¹, Formalism.MainNotions.LeviCoordinates.rrg_P_mul_inv, Matrix.one_mul]
     congr 1
     simp only [← Matrix.mul_assoc]
-    rw [hu]
-⟩
+    rw [hu]⟩
 
 end Vanish2
 
@@ -709,9 +667,8 @@ theorem ratPt_holds : Formalism.L2.SG.TermOp.Vanish.RatPt := by
     rw [← crd_matOf, ← crd_matOf]
     apply X.ιE.injective
     rw [Formalism.L2.SG.PoincareInHH.Cut.hform_crd, Formalism.L2.SG.PoincareInHH.Cut.hform_crd, hn]
-  have hf
-      : Formalism.UG.bc (Formalism.UG.inclE (F := X.B.I.F) (Af X.B.I.F)) γ
-        ∈ Formalism.UG.UPts X.B.I.cm.sig X.B.I.J (Af X.B.I.F) :=
+  have hf : Formalism.UG.bc (Formalism.UG.inclE (F := X.B.I.F) (Af X.B.I.F)) γ ∈
+      Formalism.UG.UPts X.B.I.cm.sig X.B.I.J (Af X.B.I.F) :=
     Formalism.UG.Final.RatPtsLe X.B.I.F X.B.I.E (Fin X.B.I.n) X.B.I.cm.sig X.B.I.J (Af X.B.I.F)
       (Subgroup.mem_map_of_mem _ hγ)
   exact ⟨(fun v => rtReal' X.B.I γ hγ v, ⟨_, hf⟩), γ, hγ, fun v => rfl, rfl, crd_matOf X n⟩
@@ -720,22 +677,18 @@ section Final
 
 open Formalism.L2.SG.TermOp.Vanish
 
-theorem psiProd_all
-    : ∀ (D : D7) (X : HidaSetting D) (u : D.what₂.Word),
-      Formalism.L2.SG.PoincareInHH.Cut.PsiProd X u := fun _ X u =>
-  psiProd_holds X u
+theorem psiProd_all : ∀ (D : D7) (X : HidaSetting D) (u : D.what₂.Word), Formalism.L2.SG.PoincareInHH.Cut.PsiProd X u :=
+  fun _ X u => psiProd_holds X u
 
 theorem ooFundIndepC_of_chi (hC : ChiTrivialC) : Formalism.L2.SG.Full.OOFundIndepC :=
   ooFundIndepC_of nLamNinf_holds hC
 
-theorem ampWellDefC_of_chi (hK : NilradicalConjLevel) (hC : ChiTrivialC)
-    : Formalism.L2.SG.Full.AmpWellDefC :=
+theorem ampWellDefC_of_chi (hK : NilradicalConjLevel) (hC : ChiTrivialC) : Formalism.L2.SG.Full.AmpWellDefC :=
   ampWellDefC_of ratPt_holds nLamNinf_holds nLamNfin_holds hC hK psiProd_all
 
-theorem lemmaVC_of_chi (hA : AvgCore) (hC : ChiTrivialC) (h3 : RCocompactC) (h4 : NonRelCharC)
-    : Formalism.L2.SG.Full.LemmaVC :=
-  lemmaVC_of hA ginfUnimod_holds nLamNinf_holds hC psiInfChar_holds rClosedC_holds roDiscreteC_holds
-    h3 h4
+theorem lemmaVC_of_chi (hA : AvgCore) (hC : ChiTrivialC) (h3 : RCocompactC) (h4 : NonRelCharC) :
+    Formalism.L2.SG.Full.LemmaVC :=
+  lemmaVC_of hA ginfUnimod_holds nLamNinf_holds hC psiInfChar_holds rClosedC_holds roDiscreteC_holds h3 h4
 
 end Final
 

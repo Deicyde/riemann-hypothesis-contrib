@@ -1,7 +1,43 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.BlockTheory.DivisorBase.WeilTensorModels
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -10,23 +46,16 @@ open scoped Matrix
 
 namespace GlobalTheory
 
-theorem selfDual_inv_gram_integral
-    (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-    (σ : E →ₐ[F] E)
-    (n : ℕ) (J : Matrix (Fin n) (Fin n) E) (L : Submodule (𝓞 E) (Fin n → E))
+theorem selfDual_inv_gram_integral (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+    (σ : E →ₐ[F] E) (n : ℕ) (J : Matrix (Fin n) (Fin n) E) (L : Submodule (𝓞 E) (Fin n → E))
     (w : HeightOneSpectrum (𝓞 E))
-    (hL : ∀ y,
-      y ∈ L
-        ↔ ∀ x ∈ L, ∀ o : 𝓞 E,
-          IsIntegral ℤ
-            (Algebra.trace ℚ E
-              ((o : E) * GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.form σ J y x)))
+    (hL : ∀ y, y ∈ L ↔ ∀ x ∈ L, ∀ o : 𝓞 E,
+      IsIntegral ℤ (Algebra.trace ℚ E ((o : E) * GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.form σ J y x)))
     (X : Matrix (Fin n) (Fin n) E) (hX : IsUnit X.det) (hG : IsUnit (Xᵀ * J * X.map σ).det)
-    (hval : ∀ x ∈ L, ∀ i, w.valuation E ((X⁻¹ *ᵥ x) i) ≤ 1)
-    (s : 𝓞 E) (hs : s ∉ w.asIdeal) (hsr : ∀ x ∈ L, ∀ i, ∃ r : 𝓞 E, (s : E) * σ ((X⁻¹ *ᵥ x) i) = r)
-    (e : E) (he : ∀ o : 𝓞 E, IsIntegral ℤ (Algebra.trace ℚ E ((o : E) * e)))
-    (i k : Fin n)
-    : w.valuation E (e * (Xᵀ * J * X.map σ)⁻¹ i k) ≤ 1 := by
+    (hval : ∀ x ∈ L, ∀ i, w.valuation E ((X⁻¹ *ᵥ x) i) ≤ 1) (s : 𝓞 E) (hs : s ∉ w.asIdeal)
+    (hsr : ∀ x ∈ L, ∀ i, ∃ r : 𝓞 E, (s : E) * σ ((X⁻¹ *ᵥ x) i) = r)
+    (e : E) (he : ∀ o : 𝓞 E, IsIntegral ℤ (Algebra.trace ℚ E ((o : E) * e))) (i k : Fin n) :
+    w.valuation E (e * (Xᵀ * J * X.map σ)⁻¹ i k) ≤ 1 := by
   set G := Xᵀ * J * X.map σ with hGdef
   set a : Fin n → E := fun j => e * G⁻¹ i j with ha
   have haG : a ᵥ* G = fun j => if j = i then e else 0 := by
@@ -38,25 +67,20 @@ theorem selfDual_inv_gram_integral
     rcases eq_or_ne i j with rfl | h
     · simp
     · simp [h, Ne.symm h]
-  have key
-      : ∀ c : Fin n → E,
-        GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.form σ J (X *ᵥ a) (X *ᵥ c)
-          = e * σ (c i) := by
+  have key : ∀ c : Fin n → E, GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.form σ J (X *ᵥ a) (X *ᵥ c) = e * σ (c i) := by
     intro c
     unfold GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.form
     have h1 : (fun j => σ ((X *ᵥ c) j)) = X.map σ *ᵥ (fun j => σ (c j)) := by
       funext j
-      set_option synthInstance.maxHeartbeats 100000 in
+
       simp [Matrix.mulVec, dotProduct, map_sum, map_mul]
     rw [h1, Matrix.mulVec_mulVec, ← Matrix.vecMul_transpose, ← Matrix.dotProduct_mulVec,
       Matrix.mulVec_mulVec, ← Matrix.mul_assoc, Matrix.dotProduct_mulVec, haG]
     simp [dotProduct]
   have hXX : X⁻¹ * X = 1 := Matrix.nonsing_inv_mul X hX
   have hXX' : X * X⁻¹ = 1 := Matrix.mul_nonsing_inv X hX
-  have hform_smul
-      : ∀ (t : E) (u v : Fin n → E),
-        GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.form σ J (t • u) v
-          = t * GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.form σ J u v := by
+  have hform_smul : ∀ (t : E) (u v : Fin n → E),
+      GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.form σ J (t • u) v = t * GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.form σ J u v := by
     intro t u v
     unfold GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.form
     rw [smul_dotProduct, smul_eq_mul]
@@ -64,13 +88,14 @@ theorem selfDual_inv_gram_integral
   have hyL : y ∈ L := by
     refine (hL y).2 fun x hx o => ?_
     obtain ⟨r, hr⟩ := hsr x hx i
-    have hx' : X *ᵥ (X⁻¹ *ᵥ x) = x := by rw [Matrix.mulVec_mulVec, hXX', Matrix.one_mulVec]
-    have h3
-        : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.form σ J y x = e * (r : E) := by
+    have hx' : X *ᵥ (X⁻¹ *ᵥ x) = x := by
+      rw [Matrix.mulVec_mulVec, hXX', Matrix.one_mulVec]
+    have h3 : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.form σ J y x = e * (r : E) := by
       rw [hy, hform_smul, ← hx', key, ← hr]
       ring
     rw [h3]
-    have h4 : (o : E) * (e * (r : E)) = ((o * r : 𝓞 E) : E) * e := by push_cast; ring
+    have h4 : (o : E) * (e * (r : E)) = ((o * r : 𝓞 E) : E) * e := by
+      push_cast; ring
     rw [h4]
     exact he (o * r)
   have h5 := hval y hyL k

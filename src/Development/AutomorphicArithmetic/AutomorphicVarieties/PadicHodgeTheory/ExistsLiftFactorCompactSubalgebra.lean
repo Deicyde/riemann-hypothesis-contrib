@@ -1,44 +1,77 @@
 module
 
-public import Development.AutomorphicArithmetic.AutomorphicVarieties.PadicHodgeTheory.IsFirstOrderDeformationOfRZero
-public import Development.AutomorphicArithmetic.AutomorphicVarieties.PadicHodgeTheory.PtCont
+public import Development.AutomorphicArithmetic.AutomorphicVarieties.CommutativeAlgebra.ResMapBijective
+public import Development.AutomorphicArithmetic.AutomorphicVarieties.PadicHodgeTheory.LocalPublishedTheorems
 public import Development.AutomorphicArithmetic.AutomorphicVarieties.CommutativeAlgebra.CoFinite
 public import Development.AutomorphicArithmetic.AutomorphicVarieties.CommutativeAlgebra.CoQuot
+public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibrary.SelmerTransport.DvrFacts
+public import Development.AutomorphicArithmetic.AutomorphicVarieties.PadicHodgeTheory.PtCont
+import Mathlib.Algebra.Module.StablyFree.Basic
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.Padics.LocalField
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.AdicCompletion.Noetherian
+import Mathlib.RingTheory.Coalgebra.IsFrobenius
+import Mathlib.RingTheory.HopfAlgebra.Basic
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Development.AutomorphicArithmetic.AutomorphicVarieties.HeightAndVanishing.DirichletPrimeToLPartMulLPowerPart
+import Development.AutomorphicArithmetic.AutomorphicVarieties.SymplecticGSp4.MapRepApply
 
 @[expose] public section
 
-open Formalism.ConjugateSelfDual ReciprocityTheory.Gal Module UpperTheory.V.Loc UpperTheory.V.Alg
-  UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.HV UpperTheory.V.Base IsLocalRing
+open Formalism.ConjugateSelfDual ReciprocityTheory.Gal Module UpperTheory.V.Loc UpperTheory.V.Alg UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.HV UpperTheory.V.Base IsLocalRing
 
-private theorem continuous_linear_functional_comp
-    {l : ℕ} [Fact l.Prime]
-    {X V : Type} [TopologicalSpace X] [AddCommGroup V] [Module ℚ_[l] V]
-    (φ : V →ₗ[ℚ_[l]] ℚ_[l])
-    (f : X → V) (hf : QCont l f)
-    : Continuous fun x => φ (f x) := by
+private theorem continuous_linear_functional_comp {l : ℕ} [Fact l.Prime] {X V : Type} [TopologicalSpace X] [AddCommGroup V] [Module ℚ_[l] V]
+    (φ : V →ₗ[ℚ_[l]] ℚ_[l]) (f : X → V) (hf : QCont l f) : Continuous fun x => φ (f x) := by
   letI : TopologicalSpace V := moduleTopology ℚ_[l] V
   haveI : IsModuleTopology ℚ_[l] V := ⟨rfl⟩
   exact (IsModuleTopology.continuous_of_linearMap φ).comp hf
 
-private theorem continuous_bounded_lattice
-    {l : ℕ} [Fact l.Prime]
-    {X V : Type} [TopologicalSpace X] [CompactSpace X] [AddCommGroup V] [Module ℚ_[l] V]
-    [Module.Finite ℚ_[l] V] [Module ℤ_[l] V] [IsScalarTower ℤ_[l] ℚ_[l] V]
-    (f : X → V) (hf : QCont l f)
-    : ∃ M : Submodule ℤ_[l] V, M.FG ∧ ∀ g, f g ∈ M := by
+private theorem continuous_bounded_lattice {l : ℕ} [Fact l.Prime] {X V : Type} [TopologicalSpace X] [CompactSpace X] [AddCommGroup V]
+    [Module ℚ_[l] V] [Module.Finite ℚ_[l] V] [Module ℤ_[l] V] [IsScalarTower ℤ_[l] ℚ_[l] V]
+    (f : X → V) (hf : QCont l f) : ∃ M : Submodule ℤ_[l] V, M.FG ∧ ∀ g, f g ∈ M := by
   let e := Module.finBasis ℚ_[l] V
-  have h1 : Continuous fun g => fun i => e.coord i (f g) :=
-    continuous_pi fun i => continuous_linear_functional_comp _ f hf
+  have h1 : Continuous fun g => fun i => e.coord i (f g) := continuous_pi fun i => continuous_linear_functional_comp _ f hf
   obtain ⟨C, hC⟩ := (isCompact_range h1).isBounded.exists_norm_le
   obtain ⟨c, hc0, hc⟩ : ∃ c : ℚ_[l], c ≠ 0 ∧ C ≤ ‖c‖ := by
     obtain ⟨c, hc⟩ := NormedField.exists_lt_norm ℚ_[l] (max C 0)
-    exact
-      ⟨c, norm_pos_iff.1 (lt_of_le_of_lt (le_max_right _ _) hc), ((le_max_left _ _).trans hc.le)⟩
-  refine ⟨
-    Submodule.span ℤ_[l] (Set.range fun i => c • e i),
-    Submodule.fg_span (Set.finite_range _),
-    fun g => ?_
-  ⟩
+    exact ⟨c, norm_pos_iff.1 (lt_of_le_of_lt (le_max_right _ _) hc), ((le_max_left _ _).trans hc.le)⟩
+  refine ⟨Submodule.span ℤ_[l] (Set.range fun i => c • e i), Submodule.fg_span (Set.finite_range _), fun g => ?_⟩
   rw [← e.sum_repr (f g)]
   refine sum_mem fun i _ => ?_
   have h2 : ‖e.repr (f g) i / c‖ ≤ 1 := by
@@ -52,34 +85,25 @@ private theorem continuous_bounded_lattice
   rw [h3]
   exact Submodule.smul_mem _ _ (Submodule.subset_span ⟨i, rfl⟩)
 
-private theorem eventually_congruent_mod_l_pow
-    {l : ℕ} [Fact l.Prime]
-    {X V M : Type} [TopologicalSpace X] [AddCommGroup V] [Module ℚ_[l] V] [Module ℤ_[l] V]
-    [IsScalarTower ℤ_[l] ℚ_[l] V] [AddCommGroup M] [Module ℤ_[l] M] [Module.Finite ℤ_[l] M]
-    (j : M →ₗ[ℤ_[l]] V) (hj : Function.Injective j)
-    (f : X → M) (hf : QCont l fun g => j (f g))
-    (N : ℕ) (g₀ : X)
-    : ∀ᶠ g in nhds g₀, ∃ m : M, f g - f g₀ = (l : ℤ_[l]) ^ N • m := by
+private theorem eventually_congruent_mod_l_pow {l : ℕ} [Fact l.Prime] {X V M : Type} [TopologicalSpace X] [AddCommGroup V]
+    [Module ℚ_[l] V] [Module ℤ_[l] V] [IsScalarTower ℤ_[l] ℚ_[l] V] [AddCommGroup M] [Module ℤ_[l] M]
+    [Module.Finite ℤ_[l] M] (j : M →ₗ[ℤ_[l]] V) (hj : Function.Injective j)
+    (f : X → M) (hf : QCont l fun g => j (f g)) (N : ℕ) (g₀ : X) :
+    ∀ᶠ g in nhds g₀, ∃ m : M, f g - f g₀ = (l : ℤ_[l]) ^ N • m := by
   haveI : Module.IsTorsionFree ℤ_[l] V := Module.IsTorsionFree.trans_faithfulSMul ℤ_[l] ℚ_[l] V
   haveI : Module.IsTorsionFree ℤ_[l] M := Function.Injective.moduleIsTorsionFree j hj (map_smul j)
   let b := Module.finBasis ℤ_[l] M
   have h1 : LinearIndependent ℚ_[l] (j ∘ b) :=
-    (LinearIndependent.iff_fractionRing ℤ_[l] ℚ_[l]).1
-      (b.linearIndependent.map' j (LinearMap.ker_eq_bot.2 hj))
-  obtain ⟨ψ, hψ⟩ :=
-    (Finsupp.linearCombination ℚ_[l] (j ∘ b)).exists_leftInverse_of_injective
-      (LinearMap.ker_eq_bot.2 h1)
+    (LinearIndependent.iff_fractionRing ℤ_[l] ℚ_[l]).1 (b.linearIndependent.map' j (LinearMap.ker_eq_bot.2 hj))
+  obtain ⟨ψ, hψ⟩ := (Finsupp.linearCombination ℚ_[l] (j ∘ b)).exists_leftInverse_of_injective
+    (LinearMap.ker_eq_bot.2 h1)
   have h2 : ∀ m i, ψ (j m) i = (b.repr m i : ℚ_[l]) := by
     intro m i
-    have h3
-        : j m
-          = Finsupp.linearCombination ℚ_[l] (j ∘ b)
-            ((Finsupp.linearEquivFunOnFinite ℚ_[l] ℚ_[l] _).symm fun i =>
-              algebraMap ℤ_[l] ℚ_[l] (b.repr m i)) := by
-      rw [Finsupp.linearCombination_eq_fintype_linearCombination_apply,
-        Fintype.linearCombination_apply]
-      set_option synthInstance.maxHeartbeats 100000 in
-        conv_lhs => rw [← b.sum_repr m, map_sum]
+    have h3 : j m = Finsupp.linearCombination ℚ_[l] (j ∘ b)
+        ((Finsupp.linearEquivFunOnFinite ℚ_[l] ℚ_[l] _).symm fun i => algebraMap ℤ_[l] ℚ_[l] (b.repr m i)) := by
+      rw [Finsupp.linearCombination_eq_fintype_linearCombination_apply, Fintype.linearCombination_apply]
+
+      conv_lhs => rw [← b.sum_repr m, map_sum]
       refine Finset.sum_congr rfl fun i _ => ?_
       rw [map_smul, algebraMap_smul]
       rfl
@@ -87,8 +111,7 @@ private theorem eventually_congruent_mod_l_pow
     rfl
   have h4 : ∀ i, ∀ᶠ g in nhds g₀, ‖b.repr (f g - f g₀) i‖ ≤ (l : ℝ) ^ (-N : ℤ) := by
     intro i
-    have h5 : Continuous fun g => ψ (j (f g)) i :=
-      continuous_linear_functional_comp ((Finsupp.lapply i).comp ψ) _ hf
+    have h5 : Continuous fun g => ψ (j (f g)) i := continuous_linear_functional_comp ((Finsupp.lapply i).comp ψ) _ hf
     have hp : (0 : ℝ) < (l : ℝ) ^ (-N : ℤ) := zpow_pos (Nat.cast_pos.2 (Fact.out : l.Prime).pos) _
     filter_upwards [Metric.tendsto_nhds.1 (h5.tendsto g₀) _ hp] with g hg
     rw [dist_eq_norm, h2, h2] at hg
@@ -100,22 +123,16 @@ private theorem eventually_congruent_mod_l_pow
   rw [← b.sum_repr (f g - f g₀), Finset.smul_sum]
   exact Finset.sum_congr rfl fun i _ => by rw [hc, mul_smul]
 
-private theorem isIntegral_of_nilpotent_kernel
-    {O B E : Type} [CommRing O] [CommRing B] [CommRing E] [Algebra O B] [Algebra O E]
-    (π : B →ₐ[O] E) (hπ : ∀ a, π a = 0 → IsNilpotent a)
-    (a : B) (ha : IsIntegral O (π a))
-    : IsIntegral O a := by
+private theorem isIntegral_of_nilpotent_kernel {O B E : Type} [CommRing O] [CommRing B] [CommRing E] [Algebra O B] [Algebra O E]
+    (π : B →ₐ[O] E) (hπ : ∀ a, π a = 0 → IsNilpotent a) (a : B) (ha : IsIntegral O (π a)) : IsIntegral O a := by
   obtain ⟨p, hp, hpe⟩ := ha
   rw [← Polynomial.aeval_def, Polynomial.aeval_algHom_apply] at hpe
   obtain ⟨n, hn⟩ := hπ _ hpe
   exact ⟨p ^ n, hp.pow n, by rw [← Polynomial.aeval_def, map_pow, hn]⟩
 
-private theorem isUnit_of_nilpotent_kernel
-    {O C A : Type}
-    [CommRing O] [CommRing C] [CommRing A] [Algebra O C] [Algebra O A] [Algebra.IsIntegral O A]
-    (π : C →ₐ[O] A) (hπ : ∀ a, π a = 0 → IsNilpotent a)
-    (a : C) (ha : IsUnit (π a))
-    : IsUnit a := by
+private theorem isUnit_of_nilpotent_kernel {O C A : Type} [CommRing O] [CommRing C] [CommRing A] [Algebra O C] [Algebra O A]
+    [Algebra.IsIntegral O A] (π : C →ₐ[O] A) (hπ : ∀ a, π a = 0 → IsNilpotent a) (a : C) (ha : IsUnit (π a)) :
+    IsUnit a := by
   obtain ⟨u, hu⟩ := ha
   obtain ⟨p, hp, hpe⟩ := Algebra.IsIntegral.isIntegral (R := O) ((u⁻¹ : Aˣ) : A)
   letI : Invertible ((u⁻¹ : Aˣ) : A) := Units.invertible _
@@ -125,17 +142,12 @@ private theorem isUnit_of_nilpotent_kernel
     conv_lhs => rw [← Polynomial.X_mul_divX_add p.reverse]
     rw [Polynomial.coeff_zero_reverse, hp.leadingCoeff]
   have h5 := (hπ _ h1).isUnit_sub_one
-  rw [h4, map_add (f := _), map_mul, Polynomial.aeval_X, Polynomial.aeval_C, map_one,
-      add_sub_cancel_right]
-    at h5
+  rw [h4, map_add (f := _), map_mul, Polynomial.aeval_X, Polynomial.aeval_C, map_one, add_sub_cancel_right] at h5
   exact isUnit_of_mul_isUnit_left h5
 
-private theorem complete_of_nilpotent_kernel_finite
-    {O C A : Type} [CommRing O] [IsLocalRing O] [IsNoetherianRing O]
-    [IsAdicComplete (maximalIdeal O) O] [CommRing C] [CommRing A] [Algebra O C] [Algebra O A]
-    [IsCO O A] [Algebra.IsIntegral O A] [Module.Finite O C]
-    (π : C →ₐ[O] A) (hπ : ∀ a, π a = 0 → IsNilpotent a)
-    : IsCO O C := by
+private theorem complete_of_nilpotent_kernel_finite {O C A : Type} [CommRing O] [IsLocalRing O] [IsNoetherianRing O]
+    [IsAdicComplete (maximalIdeal O) O] [CommRing C] [CommRing A] [Algebra O C] [Algebra O A] [IsCO O A]
+    [Algebra.IsIntegral O A] [Module.Finite O C] (π : C →ₐ[O] A) (hπ : ∀ a, π a = 0 → IsNilpotent a) : IsCO O C := by
   haveI : Nontrivial C := π.toRingHom.domain_nontrivial
   haveI : IsLocalRing C := IsLocalRing.of_isUnit_or_isUnit_one_sub_self fun a => by
     rcases IsLocalRing.isUnit_or_isUnit_one_sub_self (π a) with h | h
@@ -147,23 +159,9 @@ private theorem complete_of_nilpotent_kernel_finite
   have := h.map π
   rwa [map_sub, AlgHom.commutes] at this
 
-theorem UpperTheory.V.Loc.exists_lift_factor_compact_subalgebra
-    : ∀ {l : ℕ} [Fact l.Prime] {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
-        [CharZero O] [Algebra ℤ_[l] O] [Module.Finite ℤ_[l] O] [IsAdicComplete (maximalIdeal O) O]
-        {Γ ι : Type} [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ] [CompactSpace Γ]
-        [Fintype ι] [DecidableEq ι] (rbar : Γ →* Matrix ι ι (ResidueField O)) (R : Type)
-        [CommRing R] [Algebra O R] [IsCO O R] (ρ : Lift O rbar R) (E : Type) [Field E]
-        [Algebra ℚ_[l] E] [Module.Finite ℚ_[l] E] [Algebra O E] [Algebra ℤ_[l] E]
-        [IsScalarTower ℤ_[l] O E] [IsScalarTower ℤ_[l] ℚ_[l] E] (B : Type) [CommRing B]
-        [Algebra ℚ_[l] B] [Module.Finite ℚ_[l] B] [Algebra O B] [Algebra ℤ_[l] B]
-        [IsScalarTower ℤ_[l] O B] [IsScalarTower ℤ_[l] ℚ_[l] B] [Algebra E B] [IsScalarTower O E B]
-        [IsScalarTower ℚ_[l] E B] (π : B →ₐ[E] E) (hπ : ∀ a, π a = 0 → IsNilpotent a)
-        (x : R →ₐ[O] E) (r : Γ →* Matrix ι ι B),
-      (∀ g a b, π (r g a b) = x (ρ.hom g a b)) → (∀ a b, QCont l fun g => r g a b)
-        → ∃ (C : Subalgebra O B) (_ : IsCO O ↥C) (ρ' : Lift O rbar ↥C), ∀ g a b,
-          (ρ'.hom g a b : B) = r g a b := by
-  intro l _ O _ _ _ _ _ _ _ Γ ι _ _ _ _ _ _ rbar R _ _ _ ρ E _ _ _ _ _ _ _ B _ _ _ _ _ _ _ _ _ _ π
-    hπ x r hr hc
+theorem UpperTheory.V.Loc.exists_lift_factor_compact_subalgebra :
+    ∀ {l : ℕ} [Fact l.Prime] {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [CharZero O] [Algebra ℤ_[l] O] [Module.Finite ℤ_[l] O] [IsAdicComplete (maximalIdeal O) O] {Γ ι : Type} [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ] [CompactSpace Γ] [Fintype ι] [DecidableEq ι] (rbar : Γ →* Matrix ι ι (ResidueField O)) (R : Type) [CommRing R] [Algebra O R] [IsCO O R] (ρ : Lift O rbar R) (E : Type) [Field E] [Algebra ℚ_[l] E] [Module.Finite ℚ_[l] E] [Algebra O E] [Algebra ℤ_[l] E] [IsScalarTower ℤ_[l] O E] [IsScalarTower ℤ_[l] ℚ_[l] E] (B : Type) [CommRing B] [Algebra ℚ_[l] B] [Module.Finite ℚ_[l] B] [Algebra O B] [Algebra ℤ_[l] B] [IsScalarTower ℤ_[l] O B] [IsScalarTower ℤ_[l] ℚ_[l] B] [Algebra E B] [IsScalarTower O E B] [IsScalarTower ℚ_[l] E B] (π : B →ₐ[E] E) (hπ : ∀ a, π a = 0 → IsNilpotent a) (x : R →ₐ[O] E) (r : Γ →* Matrix ι ι B), (∀ g a b, π (r g a b) = x (ρ.hom g a b)) → (∀ a b, QCont l fun g => r g a b) → ∃ (C : Subalgebra O B) (_ : IsCO O ↥C) (ρ' : Lift O rbar ↥C), ∀ g a b, (ρ'.hom g a b : B) = r g a b := by
+  intro l _ O _ _ _ _ _ _ _ Γ ι _ _ _ _ _ _ rbar R _ _ _ ρ E _ _ _ _ _ _ _ B _ _ _ _ _ _ _ _ _ _ π hπ x r hr hc
   classical
   have hint : ∀ a, IsIntegral O (x a) := fun a =>
     (((ptCont (l := l) R E x).2 (Field.toIsField E)).1 a).tower_top
@@ -173,9 +171,8 @@ theorem UpperTheory.V.Loc.exists_lift_factor_compact_subalgebra
   have hSC : ∀ g a b, r g a b ∈ C := fun g a b => Algebra.subset_adjoin ⟨(g, a, b), rfl⟩
   have hCx : ∀ c ∈ C, πO c ∈ x.range := fun c hc =>
     (Algebra.adjoin_le (S := x.range.comap πO) (by
-        rintro _ ⟨⟨g, a, b⟩, rfl⟩
-        exact ⟨ρ.hom g a b, (hr g a b).symm⟩))
-      hc
+      rintro _ ⟨⟨g, a, b⟩, rfl⟩
+      exact ⟨ρ.hom g a b, (hr g a b).symm⟩)) hc
   haveI hfin : Module.Finite O C := by
     choose M hM hMr using fun p : ι × ι => continuous_bounded_lattice _ (hc p.1 p.2)
     have h1 : (Submodule.span ℤ_[l] S).FG := by
@@ -200,15 +197,14 @@ theorem UpperTheory.V.Loc.exists_lift_factor_compact_subalgebra
   haveI hCO : IsCO O C := complete_of_nilpotent_kernel_finite p fun a ha => by
     obtain ⟨n, hn⟩ := hπ a (congrArg Subtype.val ha)
     exact ⟨n, Subtype.ext (by simpa using hn)⟩
-  let r' : Γ →* Matrix ι ι C := {
-    toFun := fun g => Matrix.of fun a b => ⟨r g a b, hSC g a b⟩
-    map_one' := by
-      ext a b
-      simp [Matrix.one_apply, apply_ite Subtype.val]
-    map_mul' := fun g h => by
-      ext a b
-      simp [Matrix.mul_apply]
-  }
+  let r' : Γ →* Matrix ι ι C :=
+    { toFun := fun g => Matrix.of fun a b => ⟨r g a b, hSC g a b⟩
+      map_one' := by
+        ext a b
+        simp [Matrix.one_apply, apply_ite Subtype.val]
+      map_mul' := fun g h => by
+        ext a b
+        simp [Matrix.mul_apply] }
   refine ⟨C, hCO, ⟨r', fun a b N => ?_, fun g a b => ?_⟩, fun g a b => rfl⟩
   · letI : Algebra ℤ_[l] C := ((algebraMap O C).comp (algebraMap ℤ_[l] O)).toAlgebra
     haveI : IsScalarTower ℤ_[l] O C := IsScalarTower.of_algebraMap_eq fun _ => rfl

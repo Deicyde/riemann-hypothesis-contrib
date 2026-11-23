@@ -1,7 +1,52 @@
 module
 
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.Rationality.QuotSt
+public import Formalism.FilteredPoleLength.ReducedBasisBounds.ReductionQuotient
 public import Formalism.FilteredPoleLength.LocalDescentLevels.MemSpanBasisFun
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.Order.CompletePartialOrder
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -11,9 +56,8 @@ namespace TieQL
 
 open Module
 
-variable
-  {O Q : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [AddCommGroup Q] [Module O Q]
-  {ρ : ℕ}
+variable {O Q : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+  [AddCommGroup Q] [Module O Q] {ρ : ℕ}
 
 noncomputable def coordK (b : Basis (Fin ρ) O Q) : Q →ₗ[O] (Fin ρ → FractionRing O) where
   toFun q k := algebraMap O (FractionRing O) (b.repr q k)
@@ -28,40 +72,39 @@ theorem coordK_injective (b : Basis (Fin ρ) O Q) : Function.Injective (coordK b
   simp only [coordK, LinearMap.coe_mk, AddHom.coe_mk] at hk
   exact IsFractionRing.injective O (FractionRing O) hk
 
-noncomputable def matA (b : Basis (Fin ρ) O Q) (c : Fin ρ → (Q →ₗ[O] O))
-    : Matrix (Fin ρ) (Fin ρ) O :=
+noncomputable def matA (b : Basis (Fin ρ) O Q) (c : Fin ρ → (Q →ₗ[O] O)) :
+    Matrix (Fin ρ) (Fin ρ) O :=
   Matrix.of fun i k => c i (b k)
 
-theorem c_eq_sum (b : Basis (Fin ρ) O Q) (c : Fin ρ → (Q →ₗ[O] O)) (i : Fin ρ) (q : Q)
-    : c i q = ∑ k, matA b c i k * b.repr q k := by
+theorem c_eq_sum (b : Basis (Fin ρ) O Q) (c : Fin ρ → (Q →ₗ[O] O)) (i : Fin ρ) (q : Q) :
+    c i q = ∑ k, matA b c i k * b.repr q k := by
   conv_lhs => rw [← b.sum_repr q]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+
+  rw [map_sum]
   refine Finset.sum_congr rfl fun k _ => ?_
   rw [map_smul, smul_eq_mul, mul_comm]
   rfl
 
-noncomputable def cK (b : Basis (Fin ρ) O Q) (c : Fin ρ → (Q →ₗ[O] O))
-    : (Fin ρ → FractionRing O) →ₗ[FractionRing O] (Fin ρ → FractionRing O) :=
+noncomputable def cK (b : Basis (Fin ρ) O Q) (c : Fin ρ → (Q →ₗ[O] O)) :
+    (Fin ρ → FractionRing O) →ₗ[FractionRing O] (Fin ρ → FractionRing O) :=
   Matrix.toLin' ((matA b c).map (algebraMap O (FractionRing O)))
 
-theorem cK_coordK (b : Basis (Fin ρ) O Q) (c : Fin ρ → (Q →ₗ[O] O)) (q : Q) (i : Fin ρ)
-    : cK b c (coordK b q) i = algebraMap O (FractionRing O) (c i q) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [c_eq_sum b c i q, map_sum]
+theorem cK_coordK (b : Basis (Fin ρ) O Q) (c : Fin ρ → (Q →ₗ[O] O)) (q : Q) (i : Fin ρ) :
+    cK b c (coordK b q) i = algebraMap O (FractionRing O) (c i q) := by
+
+  rw [c_eq_sum b c i q, map_sum]
   simp only [cK, Matrix.toLin'_apply, Matrix.mulVec, dotProduct, Matrix.map_apply, coordK,
     LinearMap.coe_mk, AddHom.coe_mk, map_mul]
 
-theorem det_mul_eq (b : Basis (Fin ρ) O Q) (c : Fin ρ → (Q →ₗ[O] O)) (th : Fin ρ → Q)
-    : (Matrix.of fun i j => c i (th j)) = matA b c * Matrix.of fun k j => b.repr (th j) k := by
+theorem det_mul_eq (b : Basis (Fin ρ) O Q) (c : Fin ρ → (Q →ₗ[O] O)) (th : Fin ρ → Q) :
+    (Matrix.of fun i j => c i (th j)) = matA b c * Matrix.of fun k j => b.repr (th j) k := by
   ext i j
   rw [Matrix.of_apply, Matrix.mul_apply, c_eq_sum b c i (th j)]
   rfl
 
-theorem inf_ker_eq_bot
-    (b : Basis (Fin ρ) O Q)
-    (c : Fin ρ → (Q →ₗ[O] O)) (th : Fin ρ → Q) (hdet : (Matrix.of fun i j => c i (th j)).det ≠ 0)
-    : LinearMap.range (coordK b) ⊓ (LinearMap.ker (cK b c)).restrictScalars O = ⊥ := by
+theorem inf_ker_eq_bot (b : Basis (Fin ρ) O Q) (c : Fin ρ → (Q →ₗ[O] O)) (th : Fin ρ → Q)
+    (hdet : (Matrix.of fun i j => c i (th j)).det ≠ 0) :
+    LinearMap.range (coordK b) ⊓ (LinearMap.ker (cK b c)).restrictScalars O = ⊥ := by
   rw [Submodule.eq_bot_iff]
   intro v hv
   rw [Submodule.mem_inf, LinearMap.mem_range] at hv
@@ -90,39 +133,31 @@ theorem inf_ker_eq_bot
 end TieQL
 
 open TieQL in
-theorem quotLocal_of_quotientLength (h : Formalism.LatticeBaseChangeAlt.QuotientLength)
-    : ReciprocityTheory.ChartRestriction.G.FreeQuotientRank.QuotLocalStatement := by
+theorem quotLocal_of_quotientLength (h : Formalism.LatticeBaseChangeAlt.QuotientLength) :
+    ReciprocityTheory.ChartRestriction.G.FreeQuotientRank.QuotLocalStatement := by
   intro O Q _ _ _ _ _ ρ hb c th hdet
   obtain ⟨b⟩ := hb
   obtain ⟨ϖ, hϖ⟩ := IsDiscreteValuationRing.exists_irreducible O
-  have hmat
-      : (Matrix.of fun i j => cK b c (coordK b (th j)) i)
-        = (Matrix.of fun i j => c i (th j)).map (algebraMap O (FractionRing O)) := by
+  have hmat : (Matrix.of fun i j => cK b c (coordK b (th j)) i) =
+      (Matrix.of fun i j => c i (th j)).map (algebraMap O (FractionRing O)) := by
     ext i j
     simp only [Matrix.of_apply, Matrix.map_apply, cK_coordK]
-  have hdetK
-      : algebraMap O (FractionRing O) (Matrix.of fun i j => c i (th j)).det
-        = (Matrix.of fun i j => cK b c (coordK b (th j)) i).det
-          * algebraMap O (FractionRing O) 1 := by
+  have hdetK : algebraMap O (FractionRing O) (Matrix.of fun i j => c i (th j)).det =
+      (Matrix.of fun i j => cK b c (coordK b (th j)) i).det * algebraMap O (FractionRing O) 1 := by
     rw [map_one, mul_one, hmat, RingHom.map_det]
     rfl
-  obtain ⟨m, hm, hle⟩ :=
-    h O (FractionRing O) (Fin ρ → FractionRing O) ϖ hϖ ρ (cK b c) (LinearMap.ker (cK b c)) le_rfl
-      (LinearMap.range (coordK b)) 0 0
-      (fun j => coordK b (th j))
-      (by
-        rintro x ⟨q, rfl⟩ i
-        exact ⟨c i q, by simp [cK_coordK]⟩)
-      (by intro j; simp) _ 1 hdet one_ne_zero hdetK
-  let eQ : Q ≃ₗ[O] LinearMap.range (coordK b) :=
-    LinearEquiv.ofInjective (coordK b) (coordK_injective b)
-  have hT
-      : ((LinearMap.range (coordK b) ⊓ (LinearMap.ker (cK b c)).restrictScalars O)
-            ⊔ Submodule.span O
-              (Set.range fun j =>
-                (algebraMap O (FractionRing O) ϖ) ^ (0 : ℕ) • coordK b (th j))).comap
-          (LinearMap.range (coordK b)).subtype
-        = (Submodule.span O (Set.range th)).map (eQ : Q →ₗ[O] LinearMap.range (coordK b)) := by
+  obtain ⟨m, hm, hle⟩ := h O (FractionRing O) (Fin ρ → FractionRing O) ϖ hϖ ρ (cK b c)
+    (LinearMap.ker (cK b c)) le_rfl (LinearMap.range (coordK b)) 0 0 (fun j => coordK b (th j))
+    (by
+      rintro x ⟨q, rfl⟩ i
+      exact ⟨c i q, by simp [cK_coordK]⟩)
+    (by intro j; simp)
+    _ 1 hdet one_ne_zero hdetK
+  let eQ : Q ≃ₗ[O] LinearMap.range (coordK b) := LinearEquiv.ofInjective (coordK b) (coordK_injective b)
+  have hT : ((LinearMap.range (coordK b) ⊓ (LinearMap.ker (cK b c)).restrictScalars O) ⊔
+      Submodule.span O (Set.range fun j => (algebraMap O (FractionRing O) ϖ) ^ (0 : ℕ) • coordK b (th j))).comap
+        (LinearMap.range (coordK b)).subtype =
+      (Submodule.span O (Set.range th)).map (eQ : Q →ₗ[O] LinearMap.range (coordK b)) := by
     rw [inf_ker_eq_bot b c th hdet, bot_sup_eq]
     simp only [pow_zero, one_smul]
     ext ⟨v, hv⟩
@@ -146,17 +181,13 @@ theorem quotLocal_of_quotientLength (h : Formalism.LatticeBaseChangeAlt.Quotient
       rw [Submodule.map_span, ← Set.range_comp] at h4
       exact h4
   have e := Submodule.Quotient.equiv (Submodule.span O (Set.range th)) _ eQ hT.symm
-  have hm'
-      : m ≤ (IsDiscreteValuationRing.addVal O (Matrix.of fun i j => c i (th j)).det).toNat := by
+  have hm' : m ≤ (IsDiscreteValuationRing.addVal O (Matrix.of fun i j => c i (th j)).det).toNat := by
     simp at hle
     exact_mod_cast hle
-  calc
-    Module.length O (Q ⧸ Submodule.span O (Set.range th))
-      = (m : ℕ∞) := e.length_eq.trans hm
+  calc Module.length O (Q ⧸ Submodule.span O (Set.range th)) = (m : ℕ∞) := e.length_eq.trans hm
     _ ≤ _ := (Nat.cast_le.mpr hm').trans (ENat.coe_toNat_le_self _)
 
-theorem quotLocal_holds
-    : ReciprocityTheory.ChartRestriction.G.FreeQuotientRank.QuotLocalStatement := by
+theorem quotLocal_holds : ReciprocityTheory.ChartRestriction.G.FreeQuotientRank.QuotLocalStatement := by
   exact quotLocal_of_quotientLength Formalism.LatticeBaseChangeAlt.quotientLength
 
 end Formalism.L2.Pj.QAt

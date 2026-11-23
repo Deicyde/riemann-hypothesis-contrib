@@ -1,14 +1,60 @@
 module
 
-public import Mathlib
-public import Development.AutomorphicSpectrum.Proofs.DivisibilityProofs.PureEqPureA
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.SchwartzHeisLine
+public import CompanionTheory.SpectralGeometry.CountingDefinitions.AdelicEulerProducts.CountData
 public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.FiniteAdeleTopology
-public import Development.AutomorphicSpectrum.Proofs.AdelicProofs.SchurTranslationsCharacters
 public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.WeilRepresentationQuadraticDatum
-public import Development.AutomorphicSpectrum.Proofs.MembershipProofs.BoundMulTranslate
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.StandardAddCharSymplecticLocalLatticeEqOne
+public import Development.AutomorphicSpectrum.Proofs.AdelicProofs.SchurTranslationsCharacters
+public import Development.AutomorphicSpectrum.Proofs.MembershipProofs.BoundMulTranslate
 public import Development.WeilBound.ThetaLifts.SchwartzMoments.SchwartzDqTendsto
+import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.AdelicLocalCompactness.AdeleLC
+import Mathlib.Algebra.Order.Archimedean.Real.Hom
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+public import Mathlib.Analysis.Normed.Module.HahnBanach
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.LocallyConstant.Algebra
+import Mathlib.Topology.Sheaves.Init
+import Development.AutomorphicSpectrum.Proofs.DivisibilityProofs.PureEqPureA
 
 @[expose] public section
 
@@ -661,14 +707,14 @@ def iot (p : κ → Af F) : κ → AF F := fun i => pairA F 0 (p i)
 theorem dot_iot (x : κ → AF F) (q : κ → Af F)
     : x ⬝ᵥ iot q = pairA F 0 ((fun i => sndA F (x i)) ⬝ᵥ q) := by
   have h1 : fstAd (x ⬝ᵥ iot q) = 0 := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [dotProduct, map_sum]
+
+    simp only [dotProduct, map_sum]
     refine Finset.sum_eq_zero fun i _ => ?_
     show (x i).1 * 0 = 0
     rw [mul_zero]
   have h2 : sndA F (x ⬝ᵥ iot q) = (fun i => sndA F (x i)) ⬝ᵥ q := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [dotProduct, map_sum]
+
+    simp only [dotProduct, map_sum]
     rfl
   exact Prod.ext h1 h2
 

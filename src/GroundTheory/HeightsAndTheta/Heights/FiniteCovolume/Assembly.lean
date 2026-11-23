@@ -1,6 +1,27 @@
 module
 
-public import Mathlib
+public import GroundTheory.HeightsAndTheta.Heights.FiniteCovolume.Imports
+public import GroundTheory.HeightsAndTheta.Heights.FiniteCovolume.StArchCovolumeBound
+public import GroundTheory.HeightsAndTheta.Heights.FiniteCovolume.StBoundedInverseCompact
+public import GroundTheory.HeightsAndTheta.Heights.FiniteCovolume.StComplementLattice
+public import GroundTheory.HeightsAndTheta.Heights.FiniteCovolume.StGramDetermines
+public import GroundTheory.HeightsAndTheta.Heights.FiniteCovolume.StLenCauchySchwarz
+public import GroundTheory.HeightsAndTheta.Heights.FiniteCovolume.StLineNormalForm
+public import GroundTheory.HeightsAndTheta.Heights.FiniteCovolume.StMajorantTransport
+public import GroundTheory.HeightsAndTheta.Heights.FiniteCovolume.StReducedBasisBound
+public import GroundTheory.HeightsAndTheta.Heights.FiniteCovolume.StatementsAdaptedReduction
+public import GroundTheory.HeightsAndTheta.Heights.FiniteCovolume.StatementsAdelicLattices
+public import GroundTheory.HeightsAndTheta.Heights.FiniteCovolume.StatementsComplementExtension
+public import GroundTheory.HeightsAndTheta.Heights.FiniteCovolume.StatementsDoubleCoset
+public import GroundTheory.HeightsAndTheta.Heights.FiniteCovolume.StatementsHaarParabolicCoordinates
+public import GroundTheory.HeightsAndTheta.Heights.FiniteCovolume.StatementsHyperbolicPairs
+public import GroundTheory.HeightsAndTheta.Heights.FiniteCovolume.StatementsLineIndex
+public import GroundTheory.HeightsAndTheta.Heights.FiniteCovolume.StatementsStabilizerCovolume
+public import GroundTheory.HeightsAndTheta.Heights.FiniteCovolume.StatementsTorusIntegral
+public import GroundTheory.HeightsAndTheta.Heights.FiniteCovolume.StatementsUnfoldAlongSubgroup
+public import GroundTheory.HeightsAndTheta.Heights.FiniteCovolume.StatementsVectorOrbits
+public import Mathlib.Algebra.Module.StablyFree.Basic
+public import Mathlib.Topology.Algebra.Group.Units
 public import GroundTheory.HeightsAndTheta.Heights.FiniteCovolume.PAdaptedReduction
 public import GroundTheory.HeightsAndTheta.Heights.FiniteCovolume.PAdelicCovolumeFinite
 public import GroundTheory.HeightsAndTheta.Heights.FiniteCovolume.PArchInvariant
@@ -11,7 +32,6 @@ public import GroundTheory.HeightsAndTheta.Heights.FiniteCovolume.PBoundedIndexS
 public import GroundTheory.HeightsAndTheta.Heights.FiniteCovolume.PBoundedInverseCompact
 public import GroundTheory.HeightsAndTheta.Heights.FiniteCovolume.PCoeffLatticeBasis
 public import GroundTheory.HeightsAndTheta.Heights.FiniteCovolume.PComplementForm
-public import GroundTheory.HeightsAndTheta.Heights.FiniteCovolume.PCongruenceUnitsFiniteIndex
 public import GroundTheory.HeightsAndTheta.Heights.FiniteCovolume.PDiscreteFundamentalDomain
 public import GroundTheory.HeightsAndTheta.Heights.FiniteCovolume.PEigenReflection
 public import GroundTheory.HeightsAndTheta.Heights.FiniteCovolume.PEigenReflectionMaps
@@ -20,7 +40,6 @@ public import GroundTheory.HeightsAndTheta.Heights.FiniteCovolume.PGramAtData
 public import GroundTheory.HeightsAndTheta.Heights.FiniteCovolume.PGramDetermines
 public import GroundTheory.HeightsAndTheta.Heights.FiniteCovolume.PHermAtPlace
 public import GroundTheory.HeightsAndTheta.Heights.FiniteCovolume.PHyperbolicPairTransitive
-public import GroundTheory.HeightsAndTheta.Heights.FiniteCovolume.PIdealClassesFinite
 public import GroundTheory.HeightsAndTheta.Heights.FiniteCovolume.PIndexLeDet
 public import GroundTheory.HeightsAndTheta.Heights.FiniteCovolume.PIntegerSmallAtPlaces
 public import GroundTheory.HeightsAndTheta.Heights.FiniteCovolume.PIntegralFamilyBound
@@ -29,33 +48,73 @@ public import GroundTheory.HeightsAndTheta.Heights.FiniteCovolume.PIsotropicSpli
 public import GroundTheory.HeightsAndTheta.Heights.FiniteCovolume.PKTransitive
 public import GroundTheory.HeightsAndTheta.Heights.FiniteCovolume.PLatticeOrbitsFinite
 public import GroundTheory.HeightsAndTheta.Heights.FiniteCovolume.PLenCauchySchwarz
-public import GroundTheory.HeightsAndTheta.Heights.FiniteCovolume.PLenSq
+import GroundTheory.HeightsAndTheta.Heights.FiniteCovolume.PLenSq
 public import GroundTheory.HeightsAndTheta.Heights.FiniteCovolume.PLineCoeffsFG
 public import GroundTheory.HeightsAndTheta.Heights.FiniteCovolume.PLineIndexCoeffs
 public import GroundTheory.HeightsAndTheta.Heights.FiniteCovolume.PLineIndexNeZero
 public import GroundTheory.HeightsAndTheta.Heights.FiniteCovolume.PLinePairOrbitsFinite
 public import GroundTheory.HeightsAndTheta.Heights.FiniteCovolume.PMahlerCompactness
-public import GroundTheory.HeightsAndTheta.Heights.FiniteCovolume.PMajorantBound
+import GroundTheory.HeightsAndTheta.Heights.FiniteCovolume.PMajorantBound
 public import GroundTheory.HeightsAndTheta.Heights.FiniteCovolume.PMajorantExists
 public import GroundTheory.HeightsAndTheta.Heights.FiniteCovolume.PMinkowskiVolumeForm
 public import GroundTheory.HeightsAndTheta.Heights.FiniteCovolume.PParabolicDecomposition
 public import GroundTheory.HeightsAndTheta.Heights.FiniteCovolume.PPhaseOnMinus
 public import GroundTheory.HeightsAndTheta.Heights.FiniteCovolume.PScalingLaw
-public import GroundTheory.HeightsAndTheta.Heights.FiniteCovolume.PShortestVectorIndex
 public import GroundTheory.HeightsAndTheta.Heights.FiniteCovolume.PShortVectorIsotropic
+public import GroundTheory.HeightsAndTheta.Heights.FiniteCovolume.PShortestVectorIndex
 public import GroundTheory.HeightsAndTheta.Heights.FiniteCovolume.PTorusIntegralHomogeneous
+public import GroundTheory.HeightsAndTheta.Heights.FiniteCovolume.PUnfoldOrbit
 public import GroundTheory.HeightsAndTheta.Heights.FiniteCovolume.PUnfoldingIntegral
 public import GroundTheory.HeightsAndTheta.Heights.FiniteCovolume.PUnfoldingTorus
-public import GroundTheory.HeightsAndTheta.Heights.FiniteCovolume.PUnfoldOrbit
-public import GroundTheory.HeightsAndTheta.Heights.FiniteCovolume.PVecAtNeZero
+import GroundTheory.HeightsAndTheta.Heights.FiniteCovolume.PVecAtNeZero
 public import GroundTheory.HeightsAndTheta.Heights.FiniteCovolume.PVectorOrbitsFinite
 public import GroundTheory.HeightsAndTheta.Heights.FiniteCovolume.PVolumeFormIntComb
+public import GroundTheory.HeightsAndTheta.Heights.FiniteCovolume.PWeightPos
 public import GroundTheory.HeightsAndTheta.Heights.FiniteCovolume.PWeightedIndexBound
 public import GroundTheory.HeightsAndTheta.Heights.FiniteCovolume.PWeightedLenSmul
 public import GroundTheory.HeightsAndTheta.Heights.FiniteCovolume.PWeightedNormSq
 public import GroundTheory.HeightsAndTheta.Heights.FiniteCovolume.PWeightedSpaceDim
-public import GroundTheory.HeightsAndTheta.Heights.FiniteCovolume.PWeightPos
 public import GroundTheory.HeightsAndTheta.Heights.FiniteCovolume.PWittPartner
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 

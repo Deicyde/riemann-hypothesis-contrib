@@ -1,6 +1,44 @@
 module
 
 public import Formalism.LocalToGlobal.ProjectiveLattices.ThClassPins
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
 
 @[expose] public section
 
@@ -10,56 +48,42 @@ noncomputable section
 
 namespace Formalism.L2.Pj
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
-  NumberField
-open ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
-  ReciprocityTheory.ChartRestriction.G.FD
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.L2.Theta
-  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
+open ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.L2.Theta Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
 
 section Abstract
 
 variable {K : Type} [Field K] {ιB : Type}
 variable (pts : ∀ (S : Type) [CommRing S] [Algebra K S], Type)
-variable
-  (mapR : ∀ {S T : Type} [CommRing S] [Algebra K S] [CommRing T] [Algebra K T],
-    (S →ₐ[K] T) → pts S → pts T → Prop)
+variable (mapR : ∀ {S T : Type} [CommRing S] [Algebra K S] [CommRing T] [Algebra K T],
+  (S →ₐ[K] T) → pts S → pts T → Prop)
 
 def MapTransId : Prop :=
   ∀ (S T : Type) [CommRing S] [Algebra K S] [CommRing T] [Algebra K T] (φ : S →ₐ[K] T) (y : pts S)
-      (z w : pts T),
-    mapR φ y z → mapR (AlgHom.id K T) z w → mapR φ y w
+    (z w : pts T), mapR φ y z → mapR (AlgHom.id K T) z w → mapR φ y w
 
 variable {pts mapR}
 variable {borR : ∀ {S : Type} [CommRing S] [Algebra K S], (ιB → Sˣ) → pts S → pts S → Prop}
-variable
-  {G : Type} [Group G] {actR : ∀ {S : Type} [CommRing S] [Algebra K S], G → pts S → pts S → Prop}
+variable {G : Type} [Group G] {actR : ∀ {S : Type} [CommRing S] [Algebra K S], G → pts S → pts S → Prop}
 
-theorem fromTest_of_id
-    (hTr : MapTransId pts mapR)
-    {S : Type} [CommRing S] [Algebra K S]
-    {z w : pts S} (h : mapR (AlgHom.id K S) z w) (hz : FromTest pts mapR z)
-    : FromTest pts mapR w := by
+theorem fromTest_of_id (hTr : MapTransId pts mapR) {S : Type} [CommRing S] [Algebra K S] {z w : pts S}
+    (h : mapR (AlgHom.id K S) z w) (hz : FromTest pts mapR z) : FromTest pts mapR w := by
   obtain ⟨p, φ, y', hy⟩ := hz
   exact ⟨p, φ, y', hTr _ _ φ y' z w hy h⟩
 
-private theorem evalAt_eq_lemma
-    (hWD : EvalWD pts mapR)
-    {f : Rules pts} (hf : IsNatural pts mapR f)
-    {S : Type} [CommRing S] [Algebra K S]
-    {w : pts S} (p : TRing K) (φ : p.R →ₐ[K] S) (y : pts p.R) (hy : mapR φ y w)
-    : evalAt pts mapR f w = φ (f p y) := by
+private theorem evalAt_eq_lemma (hWD : EvalWD pts mapR) {f : Rules pts} (hf : IsNatural pts mapR f) {S : Type}
+    [CommRing S] [Algebra K S] {w : pts S} (p : TRing K) (φ : p.R →ₐ[K] S) (y : pts p.R) (hy : mapR φ y w) :
+    evalAt pts mapR f w = φ (f p y) := by
   have hF : FromTest pts mapR w := ⟨p, φ, y, hy⟩
   unfold evalAt
   rw [dif_pos hF]
   exact hWD f hf S _ _ _ _ _ _ w hF.choose_spec.choose_spec.choose_spec hy
 
-theorem evalAt_congr_id
-    (hWD : EvalWD pts mapR) (hTr : MapTransId pts mapR)
-    {f : Rules pts} (hf : IsNatural pts mapR f)
-    {S : Type} [CommRing S] [Algebra K S]
-    {z w : pts S} (h₁ : mapR (AlgHom.id K S) z w) (h₂ : mapR (AlgHom.id K S) w z)
-    : evalAt pts mapR f z = evalAt pts mapR f w := by
+theorem evalAt_congr_id (hWD : EvalWD pts mapR) (hTr : MapTransId pts mapR) {f : Rules pts}
+    (hf : IsNatural pts mapR f) {S : Type} [CommRing S] [Algebra K S] {z w : pts S}
+    (h₁ : mapR (AlgHom.id K S) z w) (h₂ : mapR (AlgHom.id K S) w z) :
+    evalAt pts mapR f z = evalAt pts mapR f w := by
   by_cases hz : FromTest pts mapR z
   · obtain ⟨p, φ, y, hy⟩ := hz
     rw [evalAt_eq_lemma hWD hf p φ y hy, evalAt_eq_lemma hWD hf p φ y (hTr _ _ φ y z w hy h₁)]
@@ -67,15 +91,11 @@ theorem evalAt_congr_id
     unfold evalAt
     rw [dif_neg hz, dif_neg hw]
 
-theorem evalAt_actL
-    (hL : ActLaws pts mapR borR actR) (hWD : EvalWD pts mapR) (hTr : MapTransId pts mapR) (g : G)
-    {f : Rules pts} (hf : IsNatural pts mapR f)
-    {S : Type} [CommRing S] [Algebra K S]
-    (y : pts S)
-    : evalAt pts mapR (actL pts actR g f) y = evalAt pts mapR f (mvPt pts actR g y) := by
-  have hm
-      : ∀ (g' : G) {S : Type} [CommRing S] [Algebra K S] (y : pts S),
-        actR g' y (mvPt pts actR g' y) := by
+theorem evalAt_actL (hL : ActLaws pts mapR borR actR) (hWD : EvalWD pts mapR)
+    (hTr : MapTransId pts mapR) (g : G) {f : Rules pts} (hf : IsNatural pts mapR f) {S : Type}
+    [CommRing S] [Algebra K S] (y : pts S) :
+    evalAt pts mapR (actL pts actR g f) y = evalAt pts mapR f (mvPt pts actR g y) := by
+  have hm : ∀ (g' : G) {S : Type} [CommRing S] [Algebra K S] (y : pts S), actR g' y (mvPt pts actR g' y) := by
     intro g' S _ _ y
     unfold mvPt
     rw [dif_pos (hL.total g' S y)]
@@ -91,7 +111,9 @@ theorem evalAt_actL
       apply hF
       have h1 := hL.nat g⁻¹ _ _ _ _ _ _ _ hz (hm g⁻¹ z0) (hm g⁻¹ (mvPt pts actR g y))
       have h2 := hL.mul g g⁻¹ _ _ _ _ (hm g y) (hm g⁻¹ (mvPt pts actR g y))
-      first | rw [mul_inv_cancel] at h2 | rw [mul_right_inv] at h2
+      first
+        | rw [mul_inv_cancel] at h2
+        | rw [mul_right_inv] at h2
       have h3 := hL.func 1 _ _ _ _ h2 (hL.one _ y)
       exact ⟨p, φ, _, hTr _ _ φ _ _ _ h1 h3⟩
     unfold evalAt
@@ -101,19 +123,15 @@ end Abstract
 
 section Frames
 
-variable
-  {E : Type} [Field E] [NumberField E] [IsCMField E]
-  {H : Host E} {Dw : Datum H} {l : Level H} {Xo : Moduli Dw l}
+variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {Dw : Datum H} {l : Level H}
+  {Xo : Moduli Dw l}
 
-theorem ppx_le
-    {S T : Type} [CommRing S] [CommRing T]
-    {x : Sp S ⟶ Xo.X} {x' : Sp T ⟶ Xo.X} (pm : Gx x' ⟶ Gx x)
+theorem ppx_le {S T : Type} [CommRing S] [CommRing T] {x : Sp S ⟶ Xo.X} {x' : Sp T ⟶ Xo.X}
+    (pm : Gx x' ⟶ Gx x)
     (hs : pm ≫ (snd (Over.mk x) Xo.univ.t.G).left = (snd (Over.mk x') Xo.univ.t.G).left)
-    (i : Fin 1 → Xo.univ.t.PP.L.ι)
-    : (PPx x').U i ≤ pm ⁻¹ᵁ (PPx x).U i := by
+    (i : Fin 1 → Xo.univ.t.PP.L.ι) : (PPx x').U i ≤ pm ⁻¹ᵁ (PPx x).U i := by
   intro p hp
-  have hp'
-      : ∀ k, p ∈ (snd (Over.mk x') Xo.univ.t.G).left.base ⁻¹' (Xo.univ.t.PP.L.U (i k) : Set _) :=
+  have hp' : ∀ k, p ∈ (snd (Over.mk x') Xo.univ.t.G).left.base ⁻¹' (Xo.univ.t.PP.L.U (i k) : Set _) :=
     Set.mem_iInter.1 hp
   have e := congrArg (fun f : Gx x' ⟶ Xo.univ.t.G.left => f.base p) hs
   show pm.base p ∈ ⋂ k, (snd (Over.mk x) Xo.univ.t.G).left.base ⁻¹' (Xo.univ.t.PP.L.U (i k) : Set _)
@@ -122,8 +140,8 @@ theorem ppx_le
   rw [e]
   exact hp' k
 
-theorem spMap_algHom_id (K : Type) [Field K] (T : Type) [CommRing T] [Algebra K T]
-    : spMap (AlgHom.id K T).toRingHom = 𝟙 _ := by
+theorem spMap_algHom_id (K : Type) [Field K] (T : Type) [CommRing T] [Algebra K T] :
+    spMap (AlgHom.id K T).toRingHom = 𝟙 _ := by
   unfold spMap
   have h : CommRingCat.ofHom (AlgHom.id K T).toRingHom = 𝟙 (CommRingCat.of T) := rfl
   rw [h, Spec.map_id]
@@ -133,8 +151,8 @@ theorem dualMap_id (T : Type) [CommRing T] : dualMap (RingHom.id T) = RingHom.id
   refine RingHom.ext fun x => ?_
   exact TrivSqZeroExt.inl_fst_add_inr_snd_eq x
 
-theorem frMap_trans_id {c : Coeff l}
-    : MapTransId (K := c.F) (fun S _ _ => FrPt Xo c S) (fun φ y z => FrMap φ y z) := by
+theorem frMap_trans_id {c : Coeff l} :
+    MapTransId (K := c.F) (fun S _ _ => FrPt Xo c S) (fun φ y z => FrMap φ y z) := by
   intro S T _ _ _ _ φ y z w hyz hzw
   obtain ⟨hx1, hu1, pm1, hs1, hf1, hsec1⟩ := hyz
   obtain ⟨hx2, hu2, pm2, hs2, hf2, hsec2⟩ := hzw
@@ -143,10 +161,7 @@ theorem frMap_trans_id {c : Coeff l}
     have hd : dualMap (AlgHom.id c.F T).toRingHom = RingHom.id _ := dualMap_id T
     rw [hd]
     unfold spMap
-    have h0
-        : CommRingCat.ofHom (RingHom.id (TrivSqZeroExt T T))
-          = 𝟙 (CommRingCat.of (TrivSqZeroExt T T)) :=
-      rfl
+    have h0 : CommRingCat.ofHom (RingHom.id (TrivSqZeroExt T T)) = 𝟙 (CommRingCat.of (TrivSqZeroExt T T)) := rfl
     rw [h0, Spec.map_id]
     try rfl
   refine ⟨?_, ?_, pm2 ≫ pm1, ?_, ?_, ?_⟩
@@ -155,22 +170,23 @@ theorem frMap_trans_id {c : Coeff l}
     rw [hu2, e2, Category.id_comp, hu1]
   · rw [Category.assoc, hs1, hs2]
   · rw [Category.assoc, hf1, ← Category.assoc, hf2, Category.assoc, e1]
-    first | erw [Category.id_comp] | simp | rfl
+    first
+      | erw [Category.id_comp]
+      | simp
+      | rfl
   · intro i h
     have h2 := ppx_le pm2 hs2 i
     have h1 := ppx_le pm1 hs1 i
     rw [← hsec2 i h2, ← hsec1 i h1]
     first
-    | rw [← Scheme.appLE_comp_appLE pm2 pm1 _ _ _ h1 h2]; rfl
-    | rw [← Scheme.Hom.appLE_comp_appLE pm2 pm1 _ _ _ h1 h2]; rfl
+      | rw [← Scheme.appLE_comp_appLE pm2 pm1 _ _ _ h1 h2]; rfl
+      | rw [← Scheme.Hom.appLE_comp_appLE pm2 pm1 _ _ _ h1 h2]; rfl
 
-theorem levActR_res
-    {c c' : Coeff l} (hle : c.F ≤ c'.F)
-    {G : Type} (lev : G → (Dw.La →ₗ[𝓞 E] Dw.La) × (Dw.La →ₗ[𝓞 E] Dw.La)) (g : G)
-    {S : Type} [CommRing S] [Algebra c.F S] [Algebra c'.F S]
-    (h : AlgOver c c' hle S)
-    {y y' : FrPt Xo c' S} (hy : levActR (Xo := Xo) (c := c') lev g y y')
-    : levActR (Xo := Xo) (c := c) lev g (y.res hle h) (y'.res hle h) := by
+theorem levActR_res {c c' : Coeff l} (hle : c.F ≤ c'.F) {G : Type}
+    (lev : G → (Dw.La →ₗ[𝓞 E] Dw.La) × (Dw.La →ₗ[𝓞 E] Dw.La)) (g : G) {S : Type} [CommRing S]
+    [Algebra c.F S] [Algebra c'.F S] (h : AlgOver c c' hle S) {y y' : FrPt Xo c' S}
+    (hy : levActR (Xo := Xo) (c := c') lev g y y') :
+    levActR (Xo := Xo) (c := c) lev g (y.res hle h) (y'.res hle h) := by
   obtain ⟨ρ, ν, hi, hl, hm⟩ := hy
   exact ⟨ρ, ν, hi, hl, hm⟩
 
@@ -178,21 +194,18 @@ end Frames
 
 section ActBC
 
-variable
-  {D : D7} {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host D.host.E} {Dw : Datum H}
-  {l : Level H} {Xo : Moduli Dw l} {c c' : Coeff l} (hle : c.F ≤ c'.F)
+variable {D : D7} {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host D.host.E} {Dw : Datum H} {l : Level H}
+  {Xo : Moduli Dw l} {c c' : Coeff l} (hle : c.F ≤ c'.F)
 
-theorem actBC_of
-    {G : Type} [Group G]
+theorem actBC_of {G : Type} [Group G]
     (lev : G → (Dw.La →ₗ[𝓞 D.host.E] Dw.La) × (Dw.La →ₗ[𝓞 D.host.E] Dw.La))
     (hWD : EvalWD (K := c.F) (fun S _ _ => FrPt Xo c S) (fun φ y z => FrMap φ y z))
     (hWD' : EvalWD (K := c'.F) (fun S _ _ => FrPt Xo c' S) (fun φ y z => FrMap φ y z))
-    (hL : ActLev (Xo := Xo) c lev) (hL' : ActLev (Xo := Xo) c' lev)
-    : ActBC hle (actLev (Xo := Xo) c lev) (actLev (Xo := Xo) c' lev) := by
+    (hL : ActLev (Xo := Xo) c lev) (hL' : ActLev (Xo := Xo) c' lev) :
+    ActBC hle (actLev (Xo := Xo) c lev) (actLev (Xo := Xo) c' lev) := by
   intro a n g m as fs f' hf' hfs hBC S _ _ _ h y
   obtain ⟨hn', -⟩ := hf'
-  have hn
-      : ∀ i, IsNatural (K := c.F) (fun S _ _ => FrPt Xo c S) (fun φ y z => FrMap φ y z) (fs i) := by
+  have hn : ∀ i, IsNatural (K := c.F) (fun S _ _ => FrPt Xo c S) (fun φ y z => FrMap φ y z) (fs i) := by
     intro i
     obtain ⟨hni, -⟩ := hfs i
     exact hni
@@ -203,22 +216,16 @@ theorem actBC_of
   refine Finset.sum_congr rfl fun i _ => ?_
   rw [evalAt_actL hL hWD hTr g (hn i)]
   congr 1
-  have A0 : levActR (Xo := Xo) (c := c') lev g y
-      (mvPt (K := c'.F)
-        (fun S _ _ => FrPt Xo c' S)
-        (fun {S : Type} [CommRing S] [Algebra c'.F S] (g' : G) (y y' : FrPt Xo c' S) =>
-          levActR (Xo := Xo) (c := c') lev g' y y')
-        g y) := by
+  have A0 : levActR (Xo := Xo) (c := c') lev g y (mvPt (K := c'.F) (fun S _ _ => FrPt Xo c' S)
+      (fun {S : Type} [CommRing S] [Algebra c'.F S] (g' : G) (y y' : FrPt Xo c' S) =>
+        levActR (Xo := Xo) (c := c') lev g' y y') g y) := by
     unfold mvPt
     rw [dif_pos (hL'.total g S y)]
     exact (hL'.total g S y).choose_spec
   have A := levActR_res hle lev g h A0
-  have B : levActR (Xo := Xo) (c := c) lev g (y.res hle h)
-      (mvPt (K := c.F)
-        (fun S _ _ => FrPt Xo c S)
-        (fun {S : Type} [CommRing S] [Algebra c.F S] (g' : G) (y y' : FrPt Xo c S) =>
-          levActR (Xo := Xo) (c := c) lev g' y y')
-        g (y.res hle h)) := by
+  have B : levActR (Xo := Xo) (c := c) lev g (y.res hle h) (mvPt (K := c.F) (fun S _ _ => FrPt Xo c S)
+      (fun {S : Type} [CommRing S] [Algebra c.F S] (g' : G) (y y' : FrPt Xo c S) =>
+        levActR (Xo := Xo) (c := c) lev g' y y') g (y.res hle h)) := by
     unfold mvPt
     rw [dif_pos (hL.total g S (y.res hle h))]
     exact (hL.total g S (y.res hle h)).choose_spec
@@ -228,36 +235,30 @@ end ActBC
 
 section Cusp
 
-variable
-  {E : Type} [Field E] [NumberField E] [IsCMField E]
-  {H : Host E} {Dw : Datum H} {l : Level H} {Xo : Moduli Dw l} {c c' : Coeff l} (hle : c.F ≤ c'.F)
-  {r : ℕ}
+variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {Dw : Datum H} {l : Level H}
+  {Xo : Moduli Dw l} {c c' : Coeff l} (hle : c.F ≤ c'.F) {r : ℕ}
+
 
 variable (Xo) in
 def SecBC : Prop :=
   ∀ (a : (E →+* ℂ) × ℕ → ℕ) (n : ℕ), ∀ f' ∈ sec Xo c' a n,
-    ∃ (m : ℕ) (as : Fin m → c'.F) (fs : Fin m → Rul Xo c),
-      (∀ i, fs i ∈ sec Xo c a n) ∧ IsBC hle f' as fs
+    ∃ (m : ℕ) (as : Fin m → c'.F) (fs : Fin m → Rul Xo c), (∀ i, fs i ∈ sec Xo c a n) ∧ IsBC hle f' as fs
 
-theorem evR_sum_smul
-    {S : Type} [CommRing S] [Algebra c.F S]
-    (y : FrPt Xo c S)
-    {m : ℕ} (t : Fin m → c.F) (g : Fin m → Rul Xo c)
-    : evR Xo c (∑ i, t i • g i) y = ∑ i, algebraMap c.F S (t i) * evR Xo c (g i) y := by
+theorem evR_sum_smul {S : Type} [CommRing S] [Algebra c.F S] (y : FrPt Xo c S) {m : ℕ} (t : Fin m → c.F)
+    (g : Fin m → Rul Xo c) :
+    evR Xo c (∑ i, t i • g i) y = ∑ i, algebraMap c.F S (t i) * evR Xo c (g i) y := by
   unfold evR
   by_cases h : FromTest (K := c.F) (fun S _ _ => FrPt Xo c S) (fun φ y z => FrMap φ y z) y
   · simp only [evalAt, dif_pos h]
-    set_option synthInstance.maxHeartbeats 100000 in
+
     simp [Finset.sum_apply, map_sum, Algebra.smul_def]
   · simp only [evalAt, dif_neg h]
     simp
 
-theorem isBC_regroup
-    [Algebra c.F c'.F]
-    (halg : algebraMap c.F c'.F = incF c c' hle)
-    {m d : ℕ} {f' : Rul Xo c'} {as : Fin m → c'.F} {gs : Fin m → Rul Xo c}
-    (hBC : IsBC hle f' as gs) (B : Module.Basis (Fin d) c.F c'.F)
-    : IsBC hle f' (fun j => B j) (fun j => ∑ i, (B.repr (as i) j) • gs i) := by
+theorem isBC_regroup [Algebra c.F c'.F] (halg : algebraMap c.F c'.F = incF c c' hle) {m d : ℕ}
+    {f' : Rul Xo c'} {as : Fin m → c'.F} {gs : Fin m → Rul Xo c} (hBC : IsBC hle f' as gs)
+    (B : Module.Basis (Fin d) c.F c'.F) :
+    IsBC hle f' (fun j => B j) (fun j => ∑ i, (B.repr (as i) j) • gs i) := by
   intro S _ _ _ h y
   have h' : ∀ a : c.F, algebraMap c'.F S (incF c c' hle a) = algebraMap c.F S a := h
   rw [hBC S h y]
@@ -265,17 +266,16 @@ theorem isBC_regroup
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun i _ => ?_
   conv_lhs => rw [← B.sum_repr (as i)]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum, Finset.sum_mul]
+
+  rw [map_sum, Finset.sum_mul]
   refine Finset.sum_congr rfl fun j _ => ?_
   rw [Algebra.smul_def, halg, map_mul]
   ring
 
 open Classical in
-theorem rdU_unfBC
-    (U : ∀ σ : c.F →+* ℂ, Unf Xo c σ r) (σ' : c'.F →+* ℂ)
-    {m : ℕ} {f' : Rul Xo c'} {as : Fin m → c'.F} {fs : Fin m → Rul Xo c} (hBC : IsBC hle f' as fs)
-    : rdU (unfBC hle U σ') f' = ∑ i, σ' (as i) • rdU (U (σ'.comp (incF c c' hle))) (fs i) := by
+theorem rdU_unfBC (U : ∀ σ : c.F →+* ℂ, Unf Xo c σ r) (σ' : c'.F →+* ℂ) {m : ℕ} {f' : Rul Xo c'}
+    {as : Fin m → c'.F} {fs : Fin m → Rul Xo c} (hBC : IsBC hle f' as fs) :
+    rdU (unfBC hle U σ') f' = ∑ i, σ' (as i) • rdU (U (σ'.comp (incF c c' hle))) (fs i) := by
   refine funext fun (k : (U (σ'.comp (incF c c' hle))).Comp) =>
     funext fun (x : Frame ((U (σ'.comp (incF c c' hle))).X k).Ψ r) => ?_
   rw [Finset.sum_apply, Finset.sum_apply]
@@ -289,17 +289,17 @@ theorem rdU_unfBC
     exact @hBC (CAt σ') _ ((σ'.comp (incF c c' hle)).toAlgebra) σ'.toAlgebra (fun _ => rfl) _
   · simp only [dif_neg hx, mul_zero, Finset.sum_const_zero]
 
-theorem laU_unfBC
-    (U : ∀ σ : c.F →+* ℂ, Unf Xo c σ r) (σ' : c'.F →+* ℂ) (a : (E →+* ℂ) × ℕ → ℕ) (n : ℕ)
-    : laU (unfBC hle U σ') a n = laU (U (σ'.comp (incF c c' hle))) a n := by
+theorem laU_unfBC (U : ∀ σ : c.F →+* ℂ, Unf Xo c σ r) (σ' : c'.F →+* ℂ) (a : (E →+* ℂ) × ℕ → ℕ) (n : ℕ) :
+    laU (unfBC hle U σ') a n = laU (U (σ'.comp (incF c c' hle))) a n := by
   rfl
 
-theorem goodEmb_ext
-    {σ : c.F →+* ℂ} (hσ : GoodEmb c σ) {σ' : c'.F →+* ℂ} (h : σ'.comp (incF c c' hle) = σ)
-    : GoodEmb c' σ' := by
+theorem goodEmb_ext {σ : c.F →+* ℂ} (hσ : GoodEmb c σ) {σ' : c'.F →+* ℂ}
+    (h : σ'.comp (incF c c' hle) = σ) : GoodEmb c' σ' := by
   unfold GoodEmb at hσ ⊢
   rw [← hσ, ← h]
-  first | rfl | simp [incF]
+  first
+    | rfl
+    | simp [incF]
 
 theorem cuspBC_of (U : ∀ σ : c.F →+* ℂ, Unf Xo c σ r) (hS : SecBC Xo hle) : CuspBC hle U := by
   classical
@@ -319,34 +319,29 @@ theorem cuspBC_of (U : ∀ σ : c.F →+* ℂ, Unf Xo c σ r) (hS : SecBC Xo hle
   rw [mem_cusp]
   refine ⟨Submodule.sum_mem _ fun i _ => Submodule.smul_mem _ _ (hgs i), fun σ hσ => ?_⟩
   letI : Algebra c.F ℂ := σ.toAlgebra
-  have key
-      : ∀ τ : c'.F →ₐ[c.F] ℂ, ∑ i, τ (B i) • rdU (U σ) (hs i) ∈ holSub (U σ).X (laU (U σ) a n) := by
+  have key : ∀ τ : c'.F →ₐ[c.F] ℂ,
+      ∑ i, τ (B i) • rdU (U σ) (hs i) ∈ holSub (U σ).X (laU (U σ) a n) := by
     intro τ
     have hτ : τ.toRingHom.comp (incF c c' hle) = σ := RingHom.ext fun x => τ.commutes x
-    have hm
-        : ∑ i, τ.toRingHom (B i) • rdU (U (τ.toRingHom.comp (incF c c' hle))) (hs i)
-          ∈ holSub (U (τ.toRingHom.comp (incF c c' hle))).X
-            (laU (U (τ.toRingHom.comp (incF c c' hle))) a n) := by
+    have hm : ∑ i, τ.toRingHom (B i) • rdU (U (τ.toRingHom.comp (incF c c' hle))) (hs i) ∈
+        holSub (U (τ.toRingHom.comp (incF c c' hle))).X (laU (U (τ.toRingHom.comp (incF c c' hle))) a n) := by
       have := hcusp τ.toRingHom (goodEmb_ext hle hσ hτ)
       rw [rdU_unfBC hle U τ.toRingHom hBC', laU_unfBC] at this
       exact this
     rw [hτ] at hm
     exact hm
   let Bd := (Algebra.traceForm c.F c'.F).dualBasis (traceForm_nondegenerate c.F c'.F) B
-  have hinv
-      : rdU (U σ) (hs j) = ∑ τ : c'.F →ₐ[c.F] ℂ, τ (Bd j) • ∑ i, τ (B i) • rdU (U σ) (hs i) := by
-    have e1
-        : ∀ τ : c'.F →ₐ[c.F] ℂ,
-          τ (Bd j) • ∑ i, τ (B i) • rdU (U σ) (hs i) = ∑ i, τ (Bd j * B i) • rdU (U σ) (hs i) := by
+  have hinv : rdU (U σ) (hs j) =
+      ∑ τ : c'.F →ₐ[c.F] ℂ, τ (Bd j) • ∑ i, τ (B i) • rdU (U σ) (hs i) := by
+    have e1 : ∀ τ : c'.F →ₐ[c.F] ℂ, τ (Bd j) • ∑ i, τ (B i) • rdU (U σ) (hs i) =
+        ∑ i, τ (Bd j * B i) • rdU (U σ) (hs i) := by
       intro τ
       rw [Finset.smul_sum]
       refine Finset.sum_congr rfl fun i _ => ?_
       rw [smul_smul, map_mul]
     rw [Finset.sum_congr rfl fun τ _ => e1 τ, Finset.sum_comm]
-    have e2
-        : ∀ i,
-          ∑ τ : c'.F →ₐ[c.F] ℂ, τ (Bd j * B i) • rdU (U σ) (hs i)
-            = (if i = j then (1 : ℂ) else 0) • rdU (U σ) (hs i) := by
+    have e2 : ∀ i, ∑ τ : c'.F →ₐ[c.F] ℂ, τ (Bd j * B i) • rdU (U σ) (hs i) =
+        (if i = j then (1 : ℂ) else 0) • rdU (U σ) (hs i) := by
       intro i
       rw [← Finset.sum_smul, ← trace_eq_sum_embeddings (K := c.F) (L := c'.F) (E := ℂ),
         ← Algebra.traceForm_apply, LinearMap.BilinForm.apply_dualBasis_left]

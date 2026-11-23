@@ -1,20 +1,59 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.ExistsBasisLatticeNear
+public import Development.AbelianVarietyTheory.Definitions.Degenerations.ArithBase
+public import Development.AbelianVarietyTheory.Definitions.Degenerations.Ser
 public import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.AddHomExtSingle
 public import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.ExistsAdaptedBasisTestLattice
-public import Development.AbelianVarietyTheory.Definitions.Degenerations.BaseFacts
-public import Development.AbelianVarietyTheory.Definitions.Degenerations.IsAffineSplitTorusLeft
-public import Development.AbelianVarietyTheory.Definitions.Degenerations.CompanionTheory
-public import Development.AbelianVarietyTheory.Statements.SemistableTorsion.UTorsSt
+import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.ExistsBasisLatticeNear
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Real
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
 
 @[expose] public section
 
 open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
 open scoped CategoryTheory.Obj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
-  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
 attribute [local instance] Over.cartesianMonoidalCategory
 open ReciprocityTheory.ChartRestriction.G.Out GlobalTheory.ZH Classical
 attribute [local instance] SplitExt.free SplitExt.finite MvPolynomial.gradedAlgebra
@@ -25,92 +64,70 @@ section Abstract
 
 variable {p : ℕ} [Fact p.Prime] {J : Type} [Fintype J]
 
-theorem norm_sum_lt
-    {I : Type} [Fintype I] (f : I → PadicAlgCl p) {ε : ℝ} (hε : 0 < ε) (h : ∀ i, ‖f i‖ < ε)
-    : ‖∑ i, f i‖ < ε := by
-  refine Finset.sum_induction f
-    (fun x => ‖x‖ < ε)
-    (fun a b ha hb => ?_)
-    (by simpa using hε)
-    fun i _ => h i
+theorem norm_sum_lt {I : Type} [Fintype I] (f : I → PadicAlgCl p) {ε : ℝ} (hε : 0 < ε) (h : ∀ i, ‖f i‖ < ε) :
+    ‖∑ i, f i‖ < ε := by
+  refine Finset.sum_induction f (fun x => ‖x‖ < ε) (fun a b ha hb => ?_) (by simpa using hε) fun i _ => h i
   exact (IsUltrametricDist.norm_add_le_max a b).trans_lt (max_lt ha hb)
 
-theorem map_mulVec'
-    {R R' : Type} [CommRing R] [CommRing R'] (f : R →+* R') (A : Matrix J J R) (w : J → R)
-    : (A.map f).mulVec (fun j => f (w j)) = fun j => f (A.mulVec w j) := by
+theorem map_mulVec' {R R' : Type} [CommRing R] [CommRing R'] (f : R →+* R') (A : Matrix J J R) (w : J → R) :
+    (A.map f).mulVec (fun j => f (w j)) = fun j => f (A.mulVec w j) := by
   funext j
   simp [Matrix.mulVec, dotProduct]
 
-theorem norm_mul_le_of_irreducible
-    {I : Type}
-    (P : Matrix J J (OO p)) (hP : P * P = P)
-    (s : Set I) (A : I → Matrix J J (OO p)) (hcomm : ∀ h ∈ s, P * A h = A h * P)
+theorem norm_mul_le_of_irreducible {I : Type} (P : Matrix J J (OO p)) (hP : P * P = P) (s : Set I)
+    (A : I → Matrix J J (OO p)) (hcomm : ∀ h ∈ s, P * A h = A h * P)
     (hirr : ∀ W : Submodule (kb p) (J → kb p),
-      (∀ v ∈ W, (P.map (IsLocalRing.residue (OO p))).mulVec v = v)
-        → (∀ h ∈ s, ∀ v ∈ W, ((A h).map (IsLocalRing.residue (OO p))).mulVec v ∈ W)
-        → W = ⊥ ∨ ∀ v, (P.map (IsLocalRing.residue (OO p))).mulVec v = v → v ∈ W)
+      (∀ v ∈ W, (P.map (IsLocalRing.residue (OO p))).mulVec v = v) →
+      (∀ h ∈ s, ∀ v ∈ W, ((A h).map (IsLocalRing.residue (OO p))).mulVec v ∈ W) →
+      W = ⊥ ∨ ∀ v, (P.map (IsLocalRing.residue (OO p))).mulVec v = v → v ∈ W)
     (M : Submodule (OO p) (J → PadicAlgCl p))
     (hM : ∀ h ∈ s, ∀ e ∈ M, ((A h).map (OO p).subtype).mulVec e ∈ M)
-    (x : J → PadicAlgCl p) (δ ε : ℝ)
-    (hε : 0 < ε) (hx : ∀ e ∈ M, ‖e ⬝ᵥ x‖ ≤ δ) (hle : ∀ i, ‖∑ j, (P j i : PadicAlgCl p) * x j‖ ≤ ε)
-    (i₁ : J) (hge : ε ≤ ‖∑ j, (P j i₁ : PadicAlgCl p) * x j‖)
-    (v : J → PadicAlgCl p) (hv : v ∈ M) (hPv : (P.map (OO p).subtype).mulVec v = v)
-    (j : J)
-    : ‖v j‖ * ε ≤ δ := by
+    (x : J → PadicAlgCl p) (δ ε : ℝ) (hε : 0 < ε) (hx : ∀ e ∈ M, ‖e ⬝ᵥ x‖ ≤ δ)
+    (hle : ∀ i, ‖∑ j, (P j i : PadicAlgCl p) * x j‖ ≤ ε) (i₁ : J) (hge : ε ≤ ‖∑ j, (P j i₁ : PadicAlgCl p) * x j‖)
+    (v : J → PadicAlgCl p) (hv : v ∈ M) (hPv : (P.map (OO p).subtype).mulVec v = v) (j : J) :
+    ‖v j‖ * ε ≤ δ := by
   obtain ⟨i₀, -, hi₀⟩ := Finset.exists_max_image Finset.univ (fun j => ‖v j‖) ⟨j, Finset.mem_univ _⟩
   refine (mul_le_mul_of_nonneg_right (hi₀ j (Finset.mem_univ _)) hε.le).trans ?_
   by_cases h0 : v i₀ = 0
   · simpa [h0] using hx 0 M.zero_mem
   have hpos : 0 < ‖v i₀‖ := norm_pos_iff.2 h0
   let r := IsLocalRing.residue (OO p)
-  let W : Submodule (kb p) (J → kb p) := {
-    carrier :=
-      {z | ∃ w : J → OO p, P.mulVec w = w ∧ v i₀ • (fun j => (w j : PadicAlgCl p)) ∈ M ∧
+  let W : Submodule (kb p) (J → kb p) :=
+    { carrier := {z | ∃ w : J → OO p, P.mulVec w = w ∧ v i₀ • (fun j => (w j : PadicAlgCl p)) ∈ M ∧
         z = fun j => r (w j)}
-    add_mem' := by
-      rintro _ _ ⟨w, h1, h2, rfl⟩ ⟨w', h1', h2', rfl⟩
-      refine ⟨w + w', by rw [Matrix.mulVec_add, h1, h1'], ?_, funext fun j => by simp⟩
-      convert M.add_mem h2 h2' using 1
-      funext j
-      simp [mul_add]
-    zero_mem' := ⟨
-      0,
-      by simp,
-      by
+      add_mem' := by
+        rintro _ _ ⟨w, h1, h2, rfl⟩ ⟨w', h1', h2', rfl⟩
+        refine ⟨w + w', by rw [Matrix.mulVec_add, h1, h1'], ?_, funext fun j => by simp⟩
+        convert M.add_mem h2 h2' using 1
+        funext j
+        simp [mul_add]
+      zero_mem' := ⟨0, by simp, by
         convert M.zero_mem using 1
         funext j
-        simp,
-      funext fun j => by simp
-    ⟩
-    smul_mem' := by
-      rintro c _ ⟨w, h1, h2, rfl⟩
-      obtain ⟨a, rfl⟩ := IsLocalRing.residue_surjective c
-      refine ⟨a • w, by rw [Matrix.mulVec_smul, h1], ?_, funext fun j => by simp [r]⟩
-      convert M.smul_mem a h2 using 1
-      funext j
-      change v i₀ * ((a : PadicAlgCl p) * w j) = (a : PadicAlgCl p) * (v i₀ * w j)
-      ring
-  }
-  have hW :=
-    hirr W
-      (by
-        rintro _ ⟨w, h1, -, rfl⟩
-        rw [map_mulVec', h1])
-      (by
-        rintro h hh _ ⟨w, h1, h2, rfl⟩
-        refine ⟨(A h).mulVec w, ?_, ?_, map_mulVec' _ _ _⟩
-        · rw [Matrix.mulVec_mulVec, hcomm h hh, ← Matrix.mulVec_mulVec, h1]
-        · have h3 := hM h hh _ h2
-          rw [Matrix.mulVec_smul] at h3
-          have h4 := map_mulVec' (OO p).subtype (A h) w
-          simp only [ValuationSubring.coe_subtype] at h4 h3
-          rwa [h4] at h3)
-  let w₀ : J → OO p := fun j => ⟨
-    v j / v i₀,
-    (mem_OO_iff _).2 (by
-      rw [norm_div, div_le_one hpos]
-      exact hi₀ j (Finset.mem_univ _))
-  ⟩
+        simp, funext fun j => by simp⟩
+      smul_mem' := by
+        rintro c _ ⟨w, h1, h2, rfl⟩
+        obtain ⟨a, rfl⟩ := IsLocalRing.residue_surjective c
+        refine ⟨a • w, by rw [Matrix.mulVec_smul, h1], ?_, funext fun j => by simp [r]⟩
+        convert M.smul_mem a h2 using 1
+        funext j
+        change v i₀ * ((a : PadicAlgCl p) * w j) = (a : PadicAlgCl p) * (v i₀ * w j)
+        ring }
+  have hW := hirr W (by
+      rintro _ ⟨w, h1, -, rfl⟩
+      rw [map_mulVec', h1])
+    (by
+      rintro h hh _ ⟨w, h1, h2, rfl⟩
+      refine ⟨(A h).mulVec w, ?_, ?_, map_mulVec' _ _ _⟩
+      · rw [Matrix.mulVec_mulVec, hcomm h hh, ← Matrix.mulVec_mulVec, h1]
+      · have h3 := hM h hh _ h2
+        rw [Matrix.mulVec_smul] at h3
+        have h4 := map_mulVec' (OO p).subtype (A h) w
+        simp only [ValuationSubring.coe_subtype] at h4 h3
+        rwa [h4] at h3)
+  let w₀ : J → OO p := fun j => ⟨v j / v i₀, (mem_OO_iff _).2 (by
+    rw [norm_div, div_le_one hpos]
+    exact hi₀ j (Finset.mem_univ _))⟩
   have hw₀ : v i₀ • (fun j => (w₀ j : PadicAlgCl p)) = v := by
     funext j
     change v i₀ * (v j / v i₀) = v j
@@ -139,9 +156,8 @@ theorem norm_mul_le_of_irreducible
     have h6 := congrFun h1 j
     simp only [Matrix.mulVec, dotProduct] at h5 h6
     simp only [mul_sub, Finset.sum_sub_distrib, h5, h6]
-  have hsum
-      : ∑ j, ((P j i₁ - w j : OO p) : PadicAlgCl p) * x j
-        = ∑ i, ((P i i₁ - w i : OO p) : PadicAlgCl p) * ∑ j, (P j i : PadicAlgCl p) * x j := by
+  have hsum : ∑ j, ((P j i₁ - w j : OO p) : PadicAlgCl p) * x j =
+      ∑ i, ((P i i₁ - w i : OO p) : PadicAlgCl p) * ∑ j, (P j i : PadicAlgCl p) * x j := by
     simp only [Finset.mul_sum]
     rw [Finset.sum_comm]
     refine Finset.sum_congr rfl fun j _ => ?_
@@ -154,9 +170,8 @@ theorem norm_mul_le_of_irreducible
     refine norm_sum_lt _ hε fun i => ?_
     rw [norm_mul]
     exact (mul_le_mul_of_nonneg_left (hle i) (norm_nonneg _)).trans_lt (by nlinarith [hz i])
-  have hdec
-      : ∑ j, (P j i₁ : PadicAlgCl p) * x j
-        = ∑ j, ((P j i₁ - w j : OO p) : PadicAlgCl p) * x j + ∑ j, (w j : PadicAlgCl p) * x j := by
+  have hdec : ∑ j, (P j i₁ : PadicAlgCl p) * x j =
+      ∑ j, ((P j i₁ - w j : OO p) : PadicAlgCl p) * x j + ∑ j, (w j : PadicAlgCl p) * x j := by
     rw [← Finset.sum_add_distrib]
     refine Finset.sum_congr rfl fun j _ => ?_
     push_cast
@@ -177,16 +192,14 @@ section System
 
 variable {o Ω : Type} [CommRing o] [Field Ω] [Algebra o Ω] {S : ThetaSys o Ω}
 
-theorem proj_mul_comm (T : AddSubgroup S.Gam) (c : T →+ ZMod S.N) (h : S.Gam) (hh : h ∈ S.perp T)
-    : S.proj T c * S.ρ h = S.ρ h * S.proj T c := by
+theorem proj_mul_comm (T : AddSubgroup S.Gam) (c : T →+ ZMod S.N) (h : S.Gam) (hh : h ∈ S.perp T) :
+    S.proj T c * S.ρ h = S.ρ h * S.proj T c := by
   have := Fintype.ofFinite T
-  rw [ThetaSys.proj, finsum_eq_sum_of_fintype, smul_mul_assoc, mul_smul_comm, Finset.sum_mul,
-    Finset.mul_sum]
+  rw [ThetaSys.proj, finsum_eq_sum_of_fintype, smul_mul_assoc, mul_smul_comm, Finset.sum_mul, Finset.mul_sum]
   congr 1
   refine Finset.sum_congr rfl fun t _ => ?_
   have h1 : eStd S.g _ h t = 0 := hh t t.2
-  rw [mul_smul_comm, smul_mul_assoc,
-    S.ρ_add _ _ (by rw [Weights.eStd_swap, h1, neg_zero, smul_zero]),
+  rw [mul_smul_comm, smul_mul_assoc, S.ρ_add _ _ (by rw [Weights.eStd_swap, h1, neg_zero, smul_zero]),
     S.ρ_add _ _ (by rw [h1, smul_zero]), add_comm]
 
 variable {p : ℕ} [Fact p.Prime] (y₀ : S.R →+* PadicAlgCl p)
@@ -200,33 +213,25 @@ def bdd (H : AddSubgroup S.Gam) (δ : ℝ) (hδ : 0 ≤ δ) : Submodule (OO p) (
   smul_mem' := fun c e he a ha => by
     change ‖((c : PadicAlgCl p) • e) ⬝ᵥ _‖ ≤ δ
     rw [smul_dotProduct, smul_eq_mul, norm_mul]
-    exact (mul_le_mul_of_nonneg_right ((mem_OO_iff _).1 c.2) (norm_nonneg _)).trans
-      (by simpa using he a ha)
+    exact (mul_le_mul_of_nonneg_right ((mem_OO_iff _).1 c.2) (norm_nonneg _)).trans (by simpa using he a ha)
 
-theorem bdd_stable
-    (φ : o →+* OO p) (hφ : ∀ a, (φ a : PadicAlgCl p) = y₀ (algebraMap o S.R a))
-    (hev : ∀ a h : S.Gam, ∃ e : ℕ, ∀ i,
-      ∑ n, algebraMap o Ω (S.ρ a n i) * S.ev h n = algebraMap o Ω (S.ζ ^ e) * S.ev (h + S.r • a) i)
-    (H : AddSubgroup S.Gam)
-    (δ : ℝ) (hδ : 0 ≤ δ)
-    (h : S.Gam) (hh : h ∈ H)
-    (e : S.J → PadicAlgCl p) (he : e ∈ bdd y₀ H δ hδ)
-    : (((S.ρ h).map φ).map (OO p).subtype).mulVec e ∈ bdd y₀ H δ hδ := by
+theorem bdd_stable (φ : o →+* OO p) (hφ : ∀ a, (φ a : PadicAlgCl p) = y₀ (algebraMap o S.R a))
+    (hev : ∀ a h : S.Gam, ∃ e : ℕ, ∀ i, ∑ n, algebraMap o Ω (S.ρ a n i) * S.ev h n =
+      algebraMap o Ω (S.ζ ^ e) * S.ev (h + S.r • a) i)
+    (H : AddSubgroup S.Gam) (δ : ℝ) (hδ : 0 ≤ δ) (h : S.Gam) (hh : h ∈ H) (e : S.J → PadicAlgCl p)
+    (he : e ∈ bdd y₀ H δ hδ) : (((S.ρ h).map φ).map (OO p).subtype).mulVec e ∈ bdd y₀ H δ hδ := by
   intro a ha
   obtain ⟨k, hk⟩ := hev h a
-  have h1
-      : ∀ i,
-        ∑ n, (φ (S.ρ h n i) : PadicAlgCl p) * y₀ ⟨S.ev a n, S.ev_mem a n⟩
-          = (φ (S.ζ ^ k) : PadicAlgCl p) * y₀ ⟨S.ev (a + S.r • h) i, S.ev_mem _ i⟩ := fun i => by
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [hφ, ← map_mul, ← map_sum]
+  have h1 : ∀ i, ∑ n, (φ (S.ρ h n i) : PadicAlgCl p) * y₀ ⟨S.ev a n, S.ev_mem a n⟩ =
+      (φ (S.ζ ^ k) : PadicAlgCl p) * y₀ ⟨S.ev (a + S.r • h) i, S.ev_mem _ i⟩ := fun i => by
+
+    simp only [hφ, ← map_mul, ← map_sum]
     congr 1
     apply Subtype.ext
     simp only [AddSubmonoidClass.coe_finsetSum, MulMemClass.coe_mul]
     exact hk i
-  have h2
-      : (((S.ρ h).map φ).map (OO p).subtype).mulVec e ⬝ᵥ (fun i => y₀ ⟨S.ev a i, S.ev_mem a i⟩)
-        = (φ (S.ζ ^ k) • e) ⬝ᵥ (fun i => y₀ ⟨S.ev (a + S.r • h) i, S.ev_mem _ i⟩) := by
+  have h2 : (((S.ρ h).map φ).map (OO p).subtype).mulVec e ⬝ᵥ (fun i => y₀ ⟨S.ev a i, S.ev_mem a i⟩) =
+      (φ (S.ζ ^ k) • e) ⬝ᵥ (fun i => y₀ ⟨S.ev (a + S.r • h) i, S.ev_mem _ i⟩) := by
     simp only [Matrix.mulVec, dotProduct, Finset.sum_mul]
     rw [Finset.sum_comm]
     refine Finset.sum_congr rfl fun i _ => ?_
@@ -238,23 +243,19 @@ theorem bdd_stable
   rw [h2]
   exact (bdd y₀ H δ hδ).smul_mem _ he _ (H.add_mem ha (H.nsmul_mem hh _))
 
-theorem proj_stable
-    (φ : o →+* OO p)
-    (T : AddSubgroup S.Gam) (c : T →+ ZMod S.N)
+theorem proj_stable (φ : o →+* OO p) (T : AddSubgroup S.Gam) (c : T →+ ZMod S.N)
     (M : Submodule (OO p) (S.J → PadicAlgCl p))
-    (hM : ∀ t ∈ T, ∀ e ∈ M, (((S.ρ t).map φ).map (OO p).subtype).mulVec e ∈ M)
-    (e : S.J → PadicAlgCl p) (he : e ∈ M)
-    : (((S.proj T c).map φ).map (OO p).subtype).mulVec e ∈ M := by
+    (hM : ∀ t ∈ T, ∀ e ∈ M, (((S.ρ t).map φ).map (OO p).subtype).mulVec e ∈ M) (e : S.J → PadicAlgCl p)
+    (he : e ∈ M) : (((S.proj T c).map φ).map (OO p).subtype).mulVec e ∈ M := by
   have := Fintype.ofFinite T
-  have h1
-      : (((S.proj T c).map φ).map (OO p).subtype).mulVec e
-        = ∑ t : T, φ (Ring.inverse (Nat.card T : o) * S.ζN ^ (-(c t)).val) •
-            (((S.ρ t).map φ).map (OO p).subtype).mulVec e := by
+  have h1 : (((S.proj T c).map φ).map (OO p).subtype).mulVec e =
+      ∑ t : T, φ (Ring.inverse (Nat.card T : o) * S.ζN ^ (-(c t)).val) •
+        (((S.ρ t).map φ).map (OO p).subtype).mulVec e := by
     funext j
     rw [ThetaSys.proj, finsum_eq_sum_of_fintype, Finset.sum_apply]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [Matrix.mulVec, dotProduct, Matrix.map_apply, Matrix.smul_apply, Matrix.sum_apply,
-        smul_eq_mul, Finset.mul_sum, map_sum, Finset.sum_mul, Pi.smul_apply, Finset.smul_sum]
+
+    simp only [Matrix.mulVec, dotProduct, Matrix.map_apply, Matrix.smul_apply, Matrix.sum_apply, smul_eq_mul,
+    Finset.mul_sum, map_sum, Finset.sum_mul, Pi.smul_apply, Finset.smul_sum]
     rw [Finset.sum_comm]
     refine Finset.sum_congr rfl fun t _ => Finset.sum_congr rfl fun i _ => ?_
     change _ = (OO p).subtype _ * _
@@ -265,43 +266,34 @@ theorem proj_stable
 
 variable {y₀} (τ : S.Test p y₀)
 
-theorem exists_le_norm
-    (hint : ∀ a : o, ‖y₀ (algebraMap o S.R a)‖ ≤ 1)
-    {α : τ.X} (hα : ∀ v₀, τ.q α ≤ τ.q (α + S.N • v₀))
-    : ∃ t ∈ S.perp τ.yy.ker, ∃ i,
-      τ.δ * Real.exp (-(τ.q α / S.N))
-        ≤ ‖∑ j, y₀ (algebraMap o S.R (S.proj _ (τ.wt α) j i)) * y₀ ⟨S.ev t j, S.ev_mem t j⟩‖ := by
+theorem exists_le_norm (hint : ∀ a : o, ‖y₀ (algebraMap o S.R a)‖ ≤ 1) {α : τ.X}
+    (hα : ∀ v₀, τ.q α ≤ τ.q (α + S.N • v₀)) : ∃ t ∈ S.perp τ.yy.ker, ∃ i, τ.δ * Real.exp (-(τ.q α / S.N)) ≤
+      ‖∑ j, y₀ (algebraMap o S.R (S.proj _ (τ.wt α) j i)) * y₀ ⟨S.ev t j, S.ev_mem t j⟩‖ := by
   by_contra! h0
   obtain ⟨k, hk, h⟩ := τ.eq α hα
   have := Fintype.ofFinite (S.perp τ.yy.ker)
-  have h1
-      : (⟨_, hk⟩ : S.R)
-        = ∑ t : S.perp τ.yy.ker, algebraMap o S.R (S.ζ ^ (k.2 t).val) *
-          ∑ j, algebraMap o S.R (S.proj _ (τ.wt α) j k.1) * ⟨S.ev t j, S.ev_mem t j⟩ := by
+  have h1 : (⟨_, hk⟩ : S.R) = ∑ t : S.perp τ.yy.ker, algebraMap o S.R (S.ζ ^ (k.2 t).val) *
+      ∑ j, algebraMap o S.R (S.proj _ (τ.wt α) j k.1) * ⟨S.ev t j, S.ev_mem t j⟩ := by
     apply Subtype.ext
-    simp only [ThetaSys.FF, finsum_eq_sum_of_fintype, AddSubmonoidClass.coe_finsetSum,
-      MulMemClass.coe_mul]
+    simp only [ThetaSys.FF, finsum_eq_sum_of_fintype, AddSubmonoidClass.coe_finsetSum, MulMemClass.coe_mul]
     rfl
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [h1, map_sum] at h
+
+  rw [h1, map_sum] at h
   refine (norm_sum_lt _ (mul_pos τ.δ_pos (Real.exp_pos _)) fun t => ?_).ne h
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_mul, norm_mul, map_sum]
+
+  rw [map_mul, norm_mul, map_sum]
   simp only [map_mul]
   exact (mul_le_mul_of_nonneg_right (hint _) (norm_nonneg _)).trans_lt (by simpa using h0 t t.2 k.1)
 
-theorem E_eq_bdd
-    [ArithBase o Ω]
-    (φ : o →+* OO p) (hφ : ∀ a, (φ a : PadicAlgCl p) = y₀ (algebraMap o S.R a))
-    (hev : ∀ a h : S.Gam, ∃ e : ℕ, ∀ i,
-      ∑ n, algebraMap o Ω (S.ρ a n i) * S.ev h n = algebraMap o Ω (S.ζ ^ e) * S.ev (h + S.r • a) i)
+theorem E_eq_bdd [ArithBase o Ω] (φ : o →+* OO p) (hφ : ∀ a, (φ a : PadicAlgCl p) = y₀ (algebraMap o S.R a))
+    (hev : ∀ a h : S.Gam, ∃ e : ℕ, ∀ i, ∑ n, algebraMap o Ω (S.ρ a n i) * S.ev h n =
+      algebraMap o Ω (S.ζ ^ e) * S.ev (h + S.r • a) i)
     (hirr : ∀ (c : S.perp τ.yy.ker →+ ZMod S.N) (W : Submodule (kb p) (S.J → kb p)),
-      (∀ v ∈ W, ((S.proj _ c).map fun a => IsLocalRing.residue (OO p) (φ a)).mulVec v = v)
-        → (∀ h ∈ S.perp (S.perp τ.yy.ker), ∀ v ∈ W,
-          ((S.ρ h).map fun a => IsLocalRing.residue (OO p) (φ a)).mulVec v ∈ W)
-        → W = ⊥
-          ∨ ∀ v, ((S.proj _ c).map fun a => IsLocalRing.residue (OO p) (φ a)).mulVec v = v → v ∈ W)
-    : τ.E = bdd y₀ τ.yy.ker τ.δ τ.δ_pos.le := by
+      (∀ v ∈ W, ((S.proj _ c).map fun a => IsLocalRing.residue (OO p) (φ a)).mulVec v = v) →
+      (∀ h ∈ S.perp (S.perp τ.yy.ker), ∀ v ∈ W,
+        ((S.ρ h).map fun a => IsLocalRing.residue (OO p) (φ a)).mulVec v ∈ W) →
+      W = ⊥ ∨ ∀ v, ((S.proj _ c).map fun a => IsLocalRing.residue (OO p) (φ a)).mulVec v = v → v ∈ W) :
+    τ.E = bdd y₀ τ.yy.ker τ.δ τ.δ_pos.le := by
   have hint : ∀ a : o, ‖y₀ (algebraMap o S.R a)‖ ≤ 1 := fun a => hφ a ▸ (mem_OO_iff _).1 (φ a).2
   have : IsDomain o := (ArithBase.inj (o := o) (Ω := Ω)).isDomain
   have := FreeNear.finite_char S (S.perp τ.yy.ker)
@@ -318,33 +310,27 @@ theorem E_eq_bdd
   have hst := bdd_stable y₀ φ hφ hev τ.yy.ker τ.δ τ.δ_pos.le
   let ψ : o →+* PadicAlgCl p := (OO p).subtype.comp φ
   have he' : e = ∑ c : S.perp τ.yy.ker →+ ZMod S.N, (ψ.mapMatrix (S.proj _ c)).mulVec e := by
-    set_option synthInstance.maxHeartbeats 100000 in
+
     rw [← Matrix.sum_mulVec, ← map_sum, hsum, map_one, Matrix.one_mulVec]
   rw [he']
   refine Submodule.sum_mem _ fun c _ => ?_
   obtain ⟨α, hα, rfl⟩ := (test_weights o Ω S p y₀ τ).1 c
   have hPP : S.proj _ (τ.wt α) * S.proj _ (τ.wt α) = S.proj _ (τ.wt α) := by rw [hmul, if_pos rfl]
-  have hfix
-      : (ψ.mapMatrix (S.proj _ (τ.wt α))).mulVec ((ψ.mapMatrix (S.proj _ (τ.wt α))).mulVec e)
-        = (ψ.mapMatrix (S.proj _ (τ.wt α))).mulVec e := by
+  have hfix : (ψ.mapMatrix (S.proj _ (τ.wt α))).mulVec ((ψ.mapMatrix (S.proj _ (τ.wt α))).mulVec e) =
+      (ψ.mapMatrix (S.proj _ (τ.wt α))).mulVec e := by
     rw [Matrix.mulVec_mulVec, ← map_mul, hPP]
   have hv : (ψ.mapMatrix (S.proj _ (τ.wt α))).mulVec e ∈ bdd y₀ τ.yy.ker τ.δ τ.δ_pos.le :=
     proj_stable φ _ _ _ (fun t ht => hst t (hTH ht)) e he
   generalize (ψ.mapMatrix (S.proj _ (τ.wt α))).mulVec e = v at hfix hv
   obtain ⟨t, ht, i₁, hi₁⟩ := exists_le_norm τ hint hα
-  have key :=
-    norm_mul_le_of_irreducible (φ.mapMatrix (S.proj _ (τ.wt α))) (by rw [← map_mul, hPP])
-      (S.perp (S.perp τ.yy.ker) : Set S.Gam)
-      (fun h => φ.mapMatrix (S.ρ h))
-      (fun h hh => by rw [← map_mul, ← map_mul, proj_mul_comm _ _ h hh])
-      (hirr _) (bdd y₀ τ.yy.ker τ.δ τ.δ_pos.le)
-      (fun h hh => hst h (hpp.le hh))
-      (fun j => y₀ ⟨S.ev t j, S.ev_mem t j⟩)
-      τ.δ (τ.δ * Real.exp (-(τ.q α / S.N))) (mul_pos τ.δ_pos (Real.exp_pos _))
-      (fun e he => he t (hTH ht))
-      (fun i => by
-        simpa only [RingHom.mapMatrix_apply, Matrix.map_apply, hφ] using τ.le α hα t (hTH ht) i)
-      i₁ (by simpa only [RingHom.mapMatrix_apply, Matrix.map_apply, hφ] using hi₁) v hv hfix
+  have key := norm_mul_le_of_irreducible (φ.mapMatrix (S.proj _ (τ.wt α))) (by rw [← map_mul, hPP])
+    (S.perp (S.perp τ.yy.ker) : Set S.Gam) (fun h => φ.mapMatrix (S.ρ h))
+    (fun h hh => by rw [← map_mul, ← map_mul, proj_mul_comm _ _ h hh]) (hirr _)
+    (bdd y₀ τ.yy.ker τ.δ τ.δ_pos.le) (fun h hh => hst h (hpp.le hh))
+    (fun j => y₀ ⟨S.ev t j, S.ev_mem t j⟩) τ.δ (τ.δ * Real.exp (-(τ.q α / S.N)))
+    (mul_pos τ.δ_pos (Real.exp_pos _)) (fun e he => he t (hTH ht))
+    (fun i => by simpa only [RingHom.mapMatrix_apply, Matrix.map_apply, hφ] using τ.le α hα t (hTH ht) i) i₁
+    (by simpa only [RingHom.mapMatrix_apply, Matrix.map_apply, hφ] using hi₁) v hv hfix
   have hv' : v = ∑ i, fun j => v i * y₀ (algebraMap o S.R (S.proj _ (τ.wt α) j i)) := by
     funext j
     rw [Finset.sum_apply, ← congrFun hfix j]
@@ -355,8 +341,7 @@ theorem E_eq_bdd
   refine Submodule.sum_mem _ fun i _ => Submodule.subset_span ⟨α, v i, i, hα, ?_, rfl⟩
   have h1 := key i
   rw [mul_left_comm, mul_le_iff_le_one_right τ.δ_pos, Real.exp_neg, ← div_eq_mul_inv,
-      div_le_one (Real.exp_pos _)]
-    at h1
+    div_le_one (Real.exp_pos _)] at h1
   exact h1
 
 end System

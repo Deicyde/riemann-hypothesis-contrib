@@ -1,6 +1,46 @@
 module
 
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.SquareIntegrability.L2NormFundamentalDomain
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.SquareIntegrability.PolyDerivMonomialOne
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.SquareIntegrability.SplitSt
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -24,18 +64,17 @@ def sgnT (T : Choice bs) : ℂ := ∏ j, ∏ r, ((Equiv.Perm.sign (T j r) : ℤ)
 def letter (T : Choice bs) (t : Slot bs) : Letter n dim :=
   ((bs t.1).col t.2.2, ⟨(bs t.1).τ, Fin.castLE (bs t.1).hi (T t.1 t.2.1 t.2.2)⟩)
 
-theorem block_poly_expand (B : Block E n dim)
-    : B.poly
-      = ∑ p : Fin B.c → Equiv.Perm (Fin B.i),
-        (∏ r, ((Equiv.Perm.sign (p r) : ℤ) : MvPolynomial (Letter n dim) ℂ)) *
-          ∏ r, ∏ b, X (B.col b, ⟨B.τ, Fin.castLE B.hi (p r b)⟩) := by
+theorem block_poly_expand (B : Block E n dim) :
+    B.poly = ∑ p : Fin B.c → Equiv.Perm (Fin B.i),
+      (∏ r, ((Equiv.Perm.sign (p r) : ℤ) : MvPolynomial (Letter n dim) ℂ)) *
+        ∏ r, ∏ b, X (B.col b, ⟨B.τ, Fin.castLE B.hi (p r b)⟩) := by
   rw [Block.poly, Matrix.det_apply', ← Fin.prod_const, Finset.prod_univ_sum, Fintype.piFinset_univ]
   refine Finset.sum_congr rfl fun p _ => ?_
   rw [← Finset.prod_mul_distrib]
   rfl
 
-theorem determinantPoly_expand
-    : P1 bs = ∑ T : Choice bs, sgnT bs T • ∏ t : Slot bs, X (letter bs T t) := by
+theorem determinantPoly_expand :
+    P1 bs = ∑ T : Choice bs, sgnT bs T • ∏ t : Slot bs, X (letter bs T t) := by
   rw [P1]
   simp only [block_poly_expand]
   rw [Finset.prod_univ_sum, Fintype.piFinset_univ]
@@ -53,47 +92,46 @@ end Expand
 section PD
 variable (X : PT E) (bs : Fin nb → Block E n X.dim)
 
-open Classical in
-def lst (T : Choice bs) : List (Fin n × Vsp X.dim) := by
-  classical
-  exact (Multiset.map (letter bs T) Finset.univ.val).toList.map
-    (fun l => (l.1, EuclideanSpace.single l.2 (1 : ℂ)))
 
-theorem prod_X_letter (T : Choice bs)
-    : (∏ t : Slot bs, MvPolynomial.X (letter bs T t) : MvPolynomial (Letter n X.dim) ℂ)
-      = monomial (∑ t : Slot bs, Finsupp.single (letter bs T t) 1) 1 := by
+open Classical in
+def lst (T : Choice bs) : List (Fin n × Vsp X.dim) :=
+  by
+    classical
+    exact (Multiset.map (letter bs T) Finset.univ.val).toList.map
+      (fun l => (l.1, EuclideanSpace.single l.2 (1 : ℂ)))
+
+theorem prod_X_letter (T : Choice bs) :
+    (∏ t : Slot bs, MvPolynomial.X (letter bs T t) : MvPolynomial (Letter n X.dim) ℂ) =
+      monomial (∑ t : Slot bs, Finsupp.single (letter bs T t) 1) 1 := by
   rw [MvPolynomial.monomial_sum_one]
   rfl
 
-theorem toMultiset_letters (T : Choice bs)
-    : Finsupp.toMultiset (∑ t : Slot bs, Finsupp.single (letter bs T t) 1)
-      = Multiset.map (letter bs T) Finset.univ.val := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+theorem toMultiset_letters (T : Choice bs) :
+    Finsupp.toMultiset (∑ t : Slot bs, Finsupp.single (letter bs T t) 1) =
+      Multiset.map (letter bs T) Finset.univ.val := by
+
+  rw [map_sum]
   simp only [Finsupp.toMultiset_single, one_nsmul]
   rw [Finset.sum_eq_multiset_sum]
-  have h
-      : ∀ (s : Multiset (Slot bs)),
-        (s.map fun t => ({letter bs T t} : Multiset (Letter n X.dim))).sum
-          = s.map (letter bs T) := by
+  have h : ∀ (s : Multiset (Slot bs)),
+      (s.map fun t => ({letter bs T t} : Multiset (Letter n X.dim))).sum = s.map (letter bs T) := by
     intro s
     induction s using Multiset.induction_on with
     | empty => simp
     | cons a s ih => simp [ih]
   exact h _
 
-theorem polyDeriv_determinantPoly_tensor
-    (s : Fin n → (Fin 1 → Vsp X.dim) → ℂ) (hs : ∀ k, ContDiff ℂ (⊤ : ℕ∞) (s k))
-    : polyDeriv (P1 bs) dir (tens X s) 0
-      = ∑ T : Choice bs, sgnT bs T * ∏ k, d1 (s k) (colL (lst X bs T) k).length
-          (fun j => (colL (lst X bs T) k).get j) := by
+theorem polyDeriv_determinantPoly_tensor (s : Fin n → (Fin 1 → Vsp X.dim) → ℂ)
+    (hs : ∀ k, ContDiff ℂ (⊤ : ℕ∞) (s k)) :
+    polyDeriv (P1 bs) dir (tens X s) 0 =
+      ∑ T : Choice bs, sgnT bs T * ∏ k, d1 (s k) (colL (lst X bs T) k).length
+        (fun j => (colL (lst X bs T) k).get j) := by
   rw [determinantPoly_expand, jof_polyDeriv_sum]
   refine Finset.sum_congr rfl fun T _ => ?_
   rw [polyDeriv_smul, prod_X_letter, polyDeriv_monomial_one, pdTerm_eq_itD, toMultiset_letters]
   congr 1
-  have hl
-      : (Multiset.map (letter bs T) Finset.univ.val).toList.map dir
-        = (lst X bs T).map (fun p => Pi.single p.1 p.2) := by
+  have hl : (Multiset.map (letter bs T) Finset.univ.val).toList.map dir =
+      (lst X bs T).map (fun p => Pi.single p.1 p.2) := by
     rw [lst, List.map_map]
     rfl
   rw [hl]
@@ -104,6 +142,7 @@ theorem polyDeriv_determinantPoly_tensor
   refine Finset.prod_congr rfl fun k _ => ?_
   rw [Pi.zero_apply, itD_col (hs k)]
   rfl
+
 
 end PD
 

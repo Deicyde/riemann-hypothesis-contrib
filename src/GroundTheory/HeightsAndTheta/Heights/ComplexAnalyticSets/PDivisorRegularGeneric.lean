@@ -1,8 +1,49 @@
 module
 
-public import Mathlib
 public import GroundTheory.HeightsAndTheta.Heights.ComplexAnalyticSets.StDivisorRegularGeneric
+public import GroundTheory.HeightsAndTheta.Heights.ElementarySymmetric.StFrameGraphGeneric
 public import GroundTheory.HeightsAndTheta.Heights.ComplexAnalyticSets.RingKrullDimQuotientMinimalPrimeAddOne
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+public import Mathlib.Topology.Algebra.MvPolynomial
+import Mathlib.Topology.Sheaves.Init
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArithmeticIntersection.MultihomogeneousIdeals.CycDim
 
 @[expose] public section
 
@@ -14,8 +55,7 @@ open MvPolynomial Filter Topology ComplexSets
 
 noncomputable section
 
-theorem DivisorRegularGeneric.proof (hG : FrameGraphGeneric.Statement)
-    : DivisorRegularGeneric.Statement := by
+theorem DivisorRegularGeneric.proof (hG : FrameGraphGeneric.Statement) : DivisorRegularGeneric.Statement := by
   classical
   intro n d J u hJ hdim hu
   set L : Ideal (MvPolynomial (Fin n) ℂ) := J ⊔ Ideal.span {linForm u} with hL
@@ -23,15 +63,14 @@ theorem DivisorRegularGeneric.proof (hG : FrameGraphGeneric.Statement)
   set T := hfinM.toFinset with hT
   have hmemT : ∀ W, W ∈ T ↔ W ∈ L.minimalPrimes := fun W => hfinM.mem_toFinset
   have hevL : ∀ x : Fin n → ℂ, eval x (linForm u) = linEval u x := fun x => by
-    set_option synthInstance.maxHeartbeats 100000 in
+
     simp [linForm, linEval, map_sum]
 
   have hdimW : ∀ W ∈ L.minimalPrimes, ringKrullDim (MvPolynomial (Fin n) ℂ ⧸ W) = (d : ℕ) := by
     intro W hW
-    have key :=
-      ringKrullDim_quotient_minimalPrime_add_one hu hW (fun h => by
-        rw [hdim] at h
-        exact ENat.natCast_ne_top _ (WithBot.coe_injective h))
+    have key := ringKrullDim_quotient_minimalPrime_add_one hu hW (fun h => by
+      rw [hdim] at h
+      exact ENat.natCast_ne_top _ (WithBot.coe_injective h))
     rw [hdim] at key
     exact ReciprocityTheory.ChartRestriction.G.AI.I1.cyc_withBot_eq_of_add_one key
   choose! hh hhW hhchart using fun W (hW : W ∈ L.minimalPrimes) =>
@@ -48,8 +87,7 @@ theorem DivisorRegularGeneric.proof (hG : FrameGraphGeneric.Statement)
     intro W hW hmem
     have : W.IsPrime := hW.1.1
     obtain ⟨V, hV, hgV⟩ := Ideal.IsPrime.prod_mem_iff.mp hmem
-    exact hggW W hW V ((hmemT V).mp (Finset.mem_of_mem_erase hV)) (Finset.ne_of_mem_erase hV).symm
-      hgV
+    exact hggW W hW V ((hmemT V).mp (Finset.mem_of_mem_erase hV)) (Finset.ne_of_mem_erase hV).symm hgV
   have heV : ∀ W ∈ L.minimalPrimes, ∀ V ∈ L.minimalPrimes, W ≠ V → e W ∈ V := by
     intro W hW V hV hne
     have : V.IsPrime := hV.1.1
@@ -71,10 +109,8 @@ theorem DivisorRegularGeneric.proof (hG : FrameGraphGeneric.Statement)
 
   have hcomp : ∀ x ∈ zeroSet J, linEval u x = 0 → ∃ W ∈ L.minimalPrimes, x ∈ zeroSet W := by
     intro x hxJ hxu
-    have hxL : L ≤ RingHom.ker (eval x) :=
-      sup_le
-        (fun p hp => RingHom.mem_ker.mpr (hxJ p hp))
-        (Ideal.span_le.mpr (by simpa [hevL] using hxu))
+    have hxL : L ≤ RingHom.ker (eval x) := sup_le (fun p hp => RingHom.mem_ker.mpr (hxJ p hp))
+      (Ideal.span_le.mpr (by simpa [hevL] using hxu))
     have : (RingHom.ker (eval x)).IsPrime := RingHom.ker_isPrime _
     obtain ⟨W, hW, hWx⟩ := Ideal.exists_minimalPrimes_le hxL
     exact ⟨W, hW, fun p hp => RingHom.mem_ker.mp (hWx hp)⟩

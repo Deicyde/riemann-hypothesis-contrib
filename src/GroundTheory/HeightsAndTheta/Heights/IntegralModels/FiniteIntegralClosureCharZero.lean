@@ -1,7 +1,57 @@
 module
 
-public import Mathlib
+import Development.AbelianVarietyTheory.Proofs.FoundationProofs.IsDiscreteValuationRingIntegralClosurePadicInt
+public import Mathlib.RingTheory.Jacobson.Ring
 public import GroundTheory.HeightsAndTheta.Heights.IntegralModels.FiniteIntegralClosureLocal
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Coalgebra.IsFrobenius
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.HopfAlgebra.Basic
+public import Mathlib.RingTheory.NoetherNormalization
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
+public import Mathlib.Algebra.Algebra.ZMod
 
 @[expose] public section
 
@@ -30,35 +80,16 @@ theorem isJacobsonRing_int : IsJacobsonRing ℤ := by
   · have : P.IsMaximal := IsPrime.to_maximal_ideal h0
     exact Ideal.jacobson_eq_self_of_isMaximal
 
-theorem exists_prime_mem_of_isMaximal
-    (A : Type*) [CommRing A] [Algebra.FiniteType ℤ A] (𝔪 : Ideal A) [𝔪.IsMaximal]
-    : ∃ p : ℕ, p.Prime ∧ (p : A) ∈ 𝔪 := by
-  let _ := Ideal.Quotient.field 𝔪
-  have := isJacobsonRing_int
-  have : Algebra.FiniteType ℤ (A ⧸ 𝔪) := inferInstance
-  have : Module.Finite ℤ (A ⧸ 𝔪) := finite_of_finite_type_of_isJacobsonRing ℤ (A ⧸ 𝔪)
-  obtain ⟨p, hp⟩ := CharP.exists (A ⧸ 𝔪)
-  rcases CharP.char_is_prime_or_zero (A ⧸ 𝔪) p with hp' | rfl
-  · refine ⟨p, hp', ?_⟩
-    rw [← Ideal.Quotient.eq_zero_iff_mem, map_natCast]
-    exact CharP.cast_eq_zero _ p
-  · exfalso
-    have : CharZero (A ⧸ 𝔪) := CharP.charP_to_charZero (A ⧸ 𝔪)
-    have hmax := Ideal.isMaximal_under_of_isIntegral_of_isMaximal (R := ℤ) (⊥ : Ideal (A ⧸ 𝔪))
-    have hbot : (⊥ : Ideal (A ⧸ 𝔪)).comap (algebraMap ℤ (A ⧸ 𝔪)) = ⊥ := by
-      rw [← RingHom.ker_eq_comap_bot, RingHom.ker_eq_bot_iff_eq_zero]
-      intro n hn
-      exact_mod_cast (show ((n : ℤ) : A ⧸ 𝔪) = 0 by simpa using hn)
-    change ((⊥ : Ideal (A ⧸ 𝔪)).comap (algebraMap ℤ (A ⧸ 𝔪))).IsMaximal at hmax
-    rw [hbot] at hmax
-    exact Int.not_isField (Ring.isField_iff_maximal_bot.mpr hmax)
+theorem exists_prime_mem_of_isMaximal (A : Type*) [CommRing A] [Algebra.FiniteType ℤ A]
+    (𝔪 : Ideal A) [𝔪.IsMaximal] : ∃ p : ℕ, p.Prime ∧ (p : A) ∈ 𝔪 := by
+  apply GlobalTheory.exists_prime_natCast_mem_of_finiteType_int <;> assumption
 
 theorem exists_pow_smul_mem_of_isMaximal
     (A : Type*) [CommRing A] [IsDomain A] [CharZero A] [Algebra.FiniteType ℤ A]
     (K : Type*) [Field K] [Algebra A K] [IsFractionRing A K]
-    (𝔪 : Ideal A) [𝔪.IsMaximal]
-    : ∃ r ∉ 𝔪, ∃ N : Submodule A (integralClosure A K),
-      N.FG ∧ ∀ x : integralClosure A K, ∃ n : ℕ, r ^ n • x ∈ N := by
+    (𝔪 : Ideal A) [𝔪.IsMaximal] :
+    ∃ r ∉ 𝔪, ∃ N : Submodule A (integralClosure A K), N.FG ∧
+      ∀ x : integralClosure A K, ∃ n : ℕ, r ^ n • x ∈ N := by
   classical
   obtain ⟨p, hp, hp𝔪⟩ := exists_prime_mem_of_isMaximal A 𝔪
   have : Fact p.Prime := ⟨hp⟩
@@ -66,16 +97,15 @@ theorem exists_pow_smul_mem_of_isMaximal
   have hI𝔪 : I ≤ 𝔪 := (Ideal.span_singleton_le_iff_mem _).mpr hp𝔪
   have : Nontrivial (A ⧸ I) :=
     Ideal.Quotient.nontrivial_iff.mpr (ne_top_of_le_ne_top (Ideal.IsMaximal.ne_top ‹_›) hI𝔪)
-  have : CharP (A ⧸ I) p :=
-    (CharP.charP_iff_prime_eq_zero hp).mpr (by
-      rw [← map_natCast (Ideal.Quotient.mk I), Ideal.Quotient.eq_zero_iff_mem]
-      exact Ideal.subset_span rfl)
+  have : CharP (A ⧸ I) p := (CharP.charP_iff_prime_eq_zero hp).mpr (by
+    rw [← map_natCast (Ideal.Quotient.mk I), Ideal.Quotient.eq_zero_iff_mem]
+    exact Ideal.subset_span rfl)
   let _ : Algebra (ZMod p) (A ⧸ I) := ZMod.algebra (A ⧸ I) p
   have : Algebra.FiniteType (ZMod p) (A ⧸ I) :=
     Algebra.FiniteType.of_restrictScalars_finiteType ℤ (ZMod p) (A ⧸ I)
   obtain ⟨d, g, hginj, hgfin⟩ := exists_finite_inj_algHom_of_fg (ZMod p) (A ⧸ I)
-  have hy : ∀ i, ∃ y : A, Ideal.Quotient.mk I y = g (MvPolynomial.X i) := fun i =>
-    Ideal.Quotient.mk_surjective _
+  have hy : ∀ i, ∃ y : A, Ideal.Quotient.mk I y = g (MvPolynomial.X i) :=
+    fun i => Ideal.Quotient.mk_surjective _
   choose y hy using hy
   set C := MvPolynomial (Fin d) ℤ
   let φ : C →ₐ[ℤ] A := MvPolynomial.aeval y
@@ -83,12 +113,10 @@ theorem exists_pow_smul_mem_of_isMaximal
   have hkey : ∀ F : C, Ideal.Quotient.mk I (φ F) = g (red F) := by
     intro F
     have : (Ideal.Quotient.mk I).comp φ.toRingHom = g.toRingHom.comp red :=
-      MvPolynomial.ringHom_ext
-        (fun n => by simp [φ, red])
-        (fun i => by
-          change Ideal.Quotient.mk I (MvPolynomial.aeval y (MvPolynomial.X i))
-            = g (MvPolynomial.map _ (MvPolynomial.X i))
-          rw [MvPolynomial.aeval_X, MvPolynomial.map_X, hy])
+      MvPolynomial.ringHom_ext (fun n => by simp [φ, red]) (fun i => by
+        change Ideal.Quotient.mk I (MvPolynomial.aeval y (MvPolynomial.X i)) =
+          g (MvPolynomial.map _ (MvPolynomial.X i))
+        rw [MvPolynomial.aeval_X, MvPolynomial.map_X, hy])
     exact congrArg (fun f => f F) this
   have hp0 : (p : A) ≠ 0 := Nat.cast_ne_zero.mpr hp.ne_zero
   have hstep : ∀ F : C, φ F = 0 → ∃ G, F = MvPolynomial.C (p : ℤ) * G ∧ φ G = 0 := by
@@ -110,19 +138,16 @@ theorem exists_pow_smul_mem_of_isMaximal
       obtain ⟨H, rfl⟩ := ih G hG
       exact ⟨H, by rw [pow_succ, map_mul, mul_assoc, mul_left_comm]⟩
   have hφinj : Function.Injective φ := by
-    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
-      rw [injective_iff_map_eq_zero]
+    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
     intro F hF
     ext m
     rw [MvPolynomial.coeff_zero]
     by_contra hc
     obtain ⟨G, hG⟩ := hpow (AddMonoidAlgebra.coeff F m).natAbs F hF
-    have hdvd : (p : ℤ) ^ (AddMonoidAlgebra.coeff F m).natAbs ∣ AddMonoidAlgebra.coeff F m := ⟨
-      AddMonoidAlgebra.coeff G m,
-      by
+    have hdvd : (p : ℤ) ^ (AddMonoidAlgebra.coeff F m).natAbs ∣ AddMonoidAlgebra.coeff F m :=
+      ⟨AddMonoidAlgebra.coeff G m, by
         conv_lhs => rw [hG]
-        rw [MvPolynomial.coeff_C_mul]
-    ⟩
+        rw [MvPolynomial.coeff_C_mul]⟩
     have h1 := Int.natAbs_dvd_natAbs.mpr hdvd
     rw [Int.natAbs_pow, Int.natAbs_natCast] at h1
     have h2 := Nat.le_of_dvd (Int.natAbs_pos.mpr hc) h1
@@ -173,15 +198,16 @@ theorem exists_pow_smul_mem_of_isMaximal
 
 theorem finite_integralClosure_fractionRing_of_charZero
     (A : Type*) [CommRing A] [IsDomain A] [CharZero A] [Algebra.FiniteType ℤ A]
-    (K : Type*) [Field K] [Algebra A K] [IsFractionRing A K]
-    : Module.Finite A (integralClosure A K) :=
+    (K : Type*) [Field K] [Algebra A K] [IsFractionRing A K] :
+    Module.Finite A (integralClosure A K) :=
   module_finite_of_forall_isMaximal fun 𝔪 _ => exists_pow_smul_mem_of_isMaximal A K 𝔪
 
 theorem finite_integralClosure_of_charZero
     (A : Type*) [CommRing A] [IsDomain A] [CharZero A] [Algebra.FiniteType ℤ A]
     (K : Type*) [Field K] [Algebra A K] [IsFractionRing A K]
-    (L : Type*) [Field L] [Algebra K L] [FiniteDimensional K L] [Algebra A L] [IsScalarTower A K L]
-    : Module.Finite A (integralClosure A L) := by
+    (L : Type*) [Field L] [Algebra K L] [FiniteDimensional K L] [Algebra A L]
+    [IsScalarTower A K L] :
+    Module.Finite A (integralClosure A L) := by
   have : Module.Finite A (integralClosure A K) :=
     finite_integralClosure_fractionRing_of_charZero A K
   set A' := integralClosure A K
@@ -196,9 +222,8 @@ theorem finite_integralClosure_of_charZero
   have : Module.Finite A' (integralClosure A' L) :=
     IsIntegralClosure.finite A' K L (integralClosure A' L)
   have : Module.Finite A (integralClosure A' L) := Module.Finite.trans A' _
-  have hle
-      : (integralClosure A L).toSubmodule ≤ (integralClosure A' L).toSubmodule.restrictScalars A :=
-    fun y hy => hy.tower_top
+  have hle : (integralClosure A L).toSubmodule ≤
+      (integralClosure A' L).toSubmodule.restrictScalars A := fun y hy => hy.tower_top
   have : IsNoetherian A ((integralClosure A' L).toSubmodule.restrictScalars A) :=
     isNoetherian_of_isNoetherianRing_of_finite A (integralClosure A' L)
   have : IsNoetherian A (integralClosure A L).toSubmodule := isNoetherian_of_le hle

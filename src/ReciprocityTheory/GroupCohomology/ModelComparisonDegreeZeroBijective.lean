@@ -1,7 +1,53 @@
 module
 
-public import ReciprocityTheory.GroupCohomology.MemZpowersQuot
+public import ReciprocityTheory.GroupCohomology.ContinuousContractNth
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Connected.Separation
+import Mathlib.Topology.Separation.CompletelyRegular
+import Mathlib.Topology.Sheaves.Init
 public import ReciprocityTheory.GroupCohomology.FiniteLevel
+public import ReciprocityTheory.GroupCohomology.MemZpowersQuot
+public import Mathlib.Topology.Algebra.OpenSubgroup
 
 @[expose] public section
 
@@ -14,8 +60,7 @@ open scoped Pointwise
 
 universe u
 
-variable
-  {R : Type u} [CommRing R] {G : Type u} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
+variable {R : Type u} [CommRing R] {G : Type u} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
 
 def stab (M : TRep R G) (m : M.V) : Subgroup G where
   carrier := {a | M.rho a m = m}
@@ -31,25 +76,21 @@ def stab (M : TRep R G) (m : M.V) : Subgroup G where
 theorem stab_isOpen (M : TRep R G) [DiscreteTopology M.V] (m : M.V) : IsOpen (stab M m : Set G) :=
   Subgroup.isOpen_of_mem_nhds _ (FiniteLevelCohomology.stab_mem_nhds M m)
 
-theorem rho_comm (M : TRep R G) (hc : ∀ a b : G, a * b = b * a) (a b : G) (x : M.V)
-    : M.rho a (M.rho b x) = M.rho b (M.rho a x) := by
+theorem rho_comm (M : TRep R G) (hc : ∀ a b : G, a * b = b * a) (a b : G) (x : M.V) :
+    M.rho a (M.rho b x) = M.rho b (M.rho a x) := by
   rw [← Module.End.mul_apply, ← map_mul, hc, map_mul, Module.End.mul_apply]
 
-theorem cocycle_eq_of_apply
-    (M : TRep R G) [DiscreteTopology M.V]
-    {s : G} (hs : Dense (Subgroup.zpowers s : Set G))
-    (c : G → M.V) (hc : c ∈ Z1 M.rho)
-    (m : M.V) (hm : c s = M.rho s m - m)
-    (g : G)
-    : c g = M.rho g m - m := by
+theorem cocycle_eq_of_apply (M : TRep R G) [DiscreteTopology M.V] {s : G}
+    (hs : Dense (Subgroup.zpowers s : Set G)) (c : G → M.V) (hc : c ∈ Z1 M.rho) (m : M.V)
+    (hm : c s = M.rho s m - m) (g : G) : c g = M.rho g m - m := by
   have hcont : Continuous fun a : G => M.rho a m :=
     M.cont.comp (f := fun a : G => (a, m)) (continuous_id.prodMk continuous_const)
-  have hcl : IsClosed {a : G | c a = M.rho a m - m} := isClosed_eq hc.1 (hcont.sub continuous_const)
+  have hcl : IsClosed {a : G | c a = M.rho a m - m} :=
+    isClosed_eq hc.1 (hcont.sub continuous_const)
   have step : ∀ a : G, c (a * s) - (M.rho (a * s) m - m) = c a - (M.rho a m - m) := by
     intro a
     rw [hc.2, hm, map_mul, Module.End.mul_apply]
-    simp only [map_sub]
-    abel
+    simp only [map_sub]; abel
   have hz : ∀ i : ℤ, c (s ^ i) = M.rho (s ^ i) m - m := by
     have h0 : c (s ^ (0 : ℤ)) - (M.rho (s ^ (0 : ℤ)) m - m) = 0 := by
       have e := hc.2 1 1
@@ -84,24 +125,20 @@ open scoped Pointwise
 
 universe u
 
-variable
-  {R : Type u} [CommRing R] {G : Type u} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
+variable {R : Type u} [CommRing R] {G : Type u} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
 
-def psum (M : TRep R G) (s : G) (m : M.V) (j : ℕ) : M.V := ∑ i ∈ Finset.range j, M.rho (s ^ i) m
+def psum (M : TRep R G) (s : G) (m : M.V) (j : ℕ) : M.V :=
+  ∑ i ∈ Finset.range j, M.rho (s ^ i) m
 
-theorem psum_add (M : TRep R G) (s : G) (m : M.V) (i j : ℕ)
-    : psum M s m (i + j) = psum M s m i + M.rho (s ^ i) (psum M s m j) := by
-  set_option synthInstance.maxHeartbeats 100000 in
+theorem psum_add (M : TRep R G) (s : G) (m : M.V) (i j : ℕ) :
+    psum M s m (i + j) = psum M s m i + M.rho (s ^ i) (psum M s m j) := by
+
   simp only [psum, Finset.sum_range_add, map_sum, pow_add, map_mul, Module.End.mul_apply]
 
-theorem exists_cocycle
-    [CompactSpace G]
-    (M : TRep R G) [DiscreteTopology M.V]
-    {s : G}
+theorem exists_cocycle [CompactSpace G] (M : TRep R G) [DiscreteTopology M.V] {s : G}
     (hc : ∀ a b : G, a * b = b * a) (hs : Dense (Subgroup.zpowers s : Set G))
     (hidx : ∀ k : ℕ, 0 < k → ∃ W : Subgroup G, IsOpen (W : Set G) ∧ W.index = k)
-    (m : M.V) (hk : ∃ k : ℕ, 0 < k ∧ k • m = 0)
-    : ∃ c ∈ Z1 M.rho, c s = m := by
+    (m : M.V) (hk : ∃ k : ℕ, 0 < k ∧ k • m = 0) : ∃ c ∈ Z1 M.rho, c s = m := by
   obtain ⟨k, hk0, hkm⟩ := hk
   set V := stab M m
   have hVo := stab_isOpen M m
@@ -118,8 +155,8 @@ theorem exists_cocycle
 
   have hfixV : ∀ v ∈ V, ∀ j, M.rho v (psum M s m j) = psum M s m j := by
     intro v hv j
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [psum, map_sum]
+
+    simp only [psum, map_sum]
     refine Finset.sum_congr rfl fun i _ => ?_
     rw [rho_comm M hc]
     rw [show M.rho v m = m from hv]
@@ -136,9 +173,7 @@ theorem exists_cocycle
     intro j; rw [psum_add, hN, map_zero, add_zero]
   have hper : ∀ j, psum M s m (j + W.index) = psum M s m j := by
     obtain ⟨t, ht⟩ := hdvd
-    intro j
-    rw [ht]
-    exact per_mul _ _ hperN j t
+    intro j; rw [ht]; exact per_mul _ _ hperN j t
   have hex := exists_pow hc hs hWo
   refine ⟨desc W hex (psum M s m), ⟨desc_continuous hc hs hWo hex _ hper, fun g h => ?_⟩, ?_⟩
   · have hg := Classical.choose_spec (hex g)
@@ -147,14 +182,11 @@ theorem exists_cocycle
     set j := Classical.choose (hex h)
     have hgh : (g * h)⁻¹ * s ^ (i + j) ∈ W := by
       have e : (g * h)⁻¹ * s ^ (i + j) = (g⁻¹ * s ^ i) * (h⁻¹ * s ^ j) := by
-        calc
-          (g * h)⁻¹ * s ^ (i + j)
-            = h⁻¹ * (g⁻¹ * s ^ i) * s ^ j := by rw [mul_inv_rev, pow_add]; group
+        calc (g * h)⁻¹ * s ^ (i + j) = h⁻¹ * (g⁻¹ * s ^ i) * s ^ j := by
+              rw [mul_inv_rev, pow_add]; group
           _ = (g⁻¹ * s ^ i) * (h⁻¹ * s ^ j) := by rw [hc h⁻¹ (g⁻¹ * s ^ i), mul_assoc]
-      rw [e]
-      exact W.mul_mem hg hh
-    have e1 : desc W hex (psum M s m) (g * h) = psum M s m (i + j) :=
-      desc_eq hc hs hWo hex _ hper hgh
+      rw [e]; exact W.mul_mem hg hh
+    have e1 : desc W hex (psum M s m) (g * h) = psum M s m (i + j) := desc_eq hc hs hWo hex _ hper hgh
     have e2 : desc W hex (psum M s m) g = psum M s m i := rfl
     have e3 : desc W hex (psum M s m) h = psum M s m j := rfl
     rw [e1, e2, e3, psum_add]
@@ -162,9 +194,9 @@ theorem exists_cocycle
     have hgeq : g = s ^ i * (g⁻¹ * s ^ i)⁻¹ := by group
     conv_rhs => rw [hgeq, map_mul, Module.End.mul_apply]
     rw [hfixV _ (hWV (W.inv_mem hg))]
-  · have : desc W hex (psum M s m) s = psum M s m 1 := desc_eq hc hs hWo hex _ hper (by simp)
-    rw [this]
-    simp [psum]
+  · have : desc W hex (psum M s m) s = psum M s m 1 :=
+      desc_eq hc hs hWo hex _ hper (by simp)
+    rw [this]; simp [psum]
 
 end ProcyclicCohomology
 
@@ -178,18 +210,14 @@ open ReciprocityTheory.Gal Function
 
 universe u
 
-variable
-  {R : Type u} [CommRing R] {G : Type u} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
+variable {R : Type u} [CommRing R] {G : Type u} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
 
-theorem model_comparison_degree_zero_bijective
-    [CompactSpace G]
-    (M : TRep R G) [DiscreteTopology M.V]
-    {s : G}
+theorem model_comparison_degree_zero_bijective [CompactSpace G] (M : TRep R G) [DiscreteTopology M.V] {s : G}
     (hc : ∀ a b : G, a * b = b * a) (hs : Dense (Subgroup.zpowers s : Set G))
     (hidx : ∀ k : ℕ, 0 < k → ∃ W : Subgroup G, IsOpen (W : Set G) ∧ W.index = k)
-    (htor : ∀ m : M.V, ∃ k : ℕ, 0 < k ∧ k • m = 0)
-    : ∃ e : H1 M.rho ≃ₗ[R] M.V ⧸ LinearMap.range (M.rho s - LinearMap.id), ∀ c : Z1 M.rho,
-      e (Submodule.Quotient.mk c) = Submodule.Quotient.mk (c.1 s) := by
+    (htor : ∀ m : M.V, ∃ k : ℕ, 0 < k ∧ k • m = 0) :
+    ∃ e : H1 M.rho ≃ₗ[R] M.V ⧸ LinearMap.range (M.rho s - LinearMap.id),
+      ∀ c : Z1 M.rho, e (Submodule.Quotient.mk c) = Submodule.Quotient.mk (c.1 s) := by
   set P := LinearMap.range (M.rho s - LinearMap.id)
   let f : Z1 M.rho →ₗ[R] M.V ⧸ P := P.mkQ ∘ₗ ((LinearMap.proj s) ∘ₗ (Z1 M.rho).subtype)
   have hf : ∀ c : Z1 M.rho, f c = Submodule.Quotient.mk (c.1 s) := fun c => rfl
@@ -199,19 +227,17 @@ theorem model_comparison_degree_zero_bijective
     rw [LinearMap.mem_ker, hf, Submodule.Quotient.mk_eq_zero]
     exact ⟨m, by simpa using (hm s).symm⟩
   let φ := ((B1 M.rho).comap (Z1 M.rho).subtype).liftQ f hker
-  have hφ : ∀ c : Z1 M.rho, φ (Submodule.Quotient.mk c) = Submodule.Quotient.mk (c.1 s) := fun c =>
-    rfl
+  have hφ : ∀ c : Z1 M.rho, φ (Submodule.Quotient.mk c) = Submodule.Quotient.mk (c.1 s) :=
+    fun c => rfl
   have hinj : Injective φ := by
     rw [← LinearMap.ker_eq_bot, LinearMap.ker_eq_bot']
     intro x hx
     obtain ⟨c, rfl⟩ := Submodule.Quotient.mk_surjective _ x
     rw [hφ, Submodule.Quotient.mk_eq_zero] at hx
     obtain ⟨m, hm⟩ := hx
-    rw [Submodule.Quotient.mk_eq_zero, Submodule.mem_comap, Submodule.coe_subtype,
-      mem_coboundaries1]
+    rw [Submodule.Quotient.mk_eq_zero, Submodule.mem_comap, Submodule.coe_subtype, mem_coboundaries1]
     refine ⟨m, cocycle_eq_of_apply M hs c.1 c.2 m ?_⟩
-    rw [← hm]
-    simp
+    rw [← hm]; simp
   have hsurj : Surjective φ := by
     intro y
     obtain ⟨m, rfl⟩ := Submodule.Quotient.mk_surjective _ y

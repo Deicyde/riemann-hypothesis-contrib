@@ -1,9 +1,55 @@
 module
 
-public import Formalism.AdmissibleDesigns.RowDROfWpIso
-public import Formalism.AdmissibleDesigns.RhoContOf
 public import Formalism.AdmissibleDesigns.RowTopOf
+public import Formalism.AdmissibleDesigns.BKaClause
+public import Formalism.AdmissibleDesigns.MemImageOfTensorSum
+public import Formalism.SharpRestriction.LevelLetterCocycles.EmbeddingTypes
+import Formalism.AdmissibleDesigns.EKSymmCont
+public import Formalism.AdmissibleDesigns.ExistsUnrDec
 public import Formalism.AdmissibleDesigns.LocRepTriv
+public import Formalism.AdmissibleDesigns.RhoContOf
+public import Formalism.AdmissibleDesigns.RowDROfWpIso
+import Formalism.WeaklyAdmissibleFiltrations.CrystallineStableLifts.Galois
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Formalism.WachLatticeTwists.SplitClassesAll.Statement
 
 @[expose] public section
 
@@ -165,8 +211,6 @@ variable
     (epsU D.nd i) g0 eB e₁ s Dd)
   (hc : TruncatedSeriesCountingIdentities.FamilyContinuous (D := D) i r)
 
-set_option maxHeartbeats 4000000 in
-set_option synthInstance.maxHeartbeats 400000 in
 theorem rowDR_of_fontaine
     (hF : TruncatedSeriesCountingIdentities.FontaineAtPlacesOverL i)
     (hG2 : TruncatedSeriesCountingIdentities.admG2 i r ρ π)
@@ -180,8 +224,6 @@ variable
   (hT : Dd.Top (D.nd.T i) (RepresentationBoundsCohomology.one_le_letterBlockLength D.R))
   (hrk : ((Dd.ρk 0 Dd.e₁).map (algebraMap (D.nd.O i) (FractionRing (D.nd.O i)))).rank = 1)
 
-set_option maxHeartbeats 4000000 in
-set_option synthInstance.maxHeartbeats 400000 in
 def RowTieIn : Prop :=
   haveI := Topo.rTop_addGroup_RD i r π g0 eB e₁ s Dd hD
   KRow.RowSub (ρ₁ := rho1 i Dd) i dc r ∧ KRow.RowOrb (ρ₁ := rho1 i Dd) i dc
@@ -194,8 +236,6 @@ def RowTieIn : Prop :=
       (DatS i r π dc g0 eB e₁ s Dd hD hc) (T₁ := FirstSummandSubmodule (D.nd.O i) Dd.e₁)
     ∧ ∀ n ∈ rowsN i dc, KHf.OrbC i dc (n := n) (DatS i r π dc g0 eB e₁ s Dd hD hc n).ρT'
 
-set_option maxHeartbeats 4000000 in
-set_option synthInstance.maxHeartbeats 400000 in
 theorem row_match_from_comparison (h : RowTieIn i r ρ π dc g0 eB e₁ s Dd hD hc)
     : Sel.RowTie i dc r ρ π (rowLenS i r π dc g0 eB e₁ s Dd hD hc hT hrk) := by
   haveI := Topo.rTop_addGroup_RD i r π g0 eB e₁ s Dd hD

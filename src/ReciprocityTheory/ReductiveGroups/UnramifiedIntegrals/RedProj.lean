@@ -1,7 +1,49 @@
 module
 
-public import Mathlib
+public import ReciprocityTheory.ReductiveGroups.UnramifiedIntegrals.RedDefs
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
 public import ReciprocityTheory.ReductiveGroups.UnramifiedIntegrals.RedProjA
+import Formalism.LocalToGlobal.TorsionIntegrality.EisensteinTranslationProducts.SemiChar
 
 @[expose] public section
 
@@ -21,18 +63,18 @@ def serMap (ψ : E →+ E) (S : PowerSeries E) : PowerSeries E :=
 def polMap (ψ : E →+ E) (m : ℕ) (Q : E[X]) : E[X] :=
   ∑ i ∈ Finset.range (m + 1), monomial i (ψ (Q.coeff i))
 
-theorem coeff_serMap (ψ : E →+ E) (S : PowerSeries E) (n : ℕ)
-    : PowerSeries.coeff n (serMap ψ S) = ψ (PowerSeries.coeff n S) := by
+theorem coeff_serMap (ψ : E →+ E) (S : PowerSeries E) (n : ℕ) :
+    PowerSeries.coeff n (serMap ψ S) = ψ (PowerSeries.coeff n S) := by
   simp [serMap]
 
-theorem serMap_sum (ψ : E →+ E) {ι : Type} (s : Finset ι) (f : ι → PowerSeries E)
-    : serMap ψ (∑ i ∈ s, f i) = ∑ i ∈ s, serMap ψ (f i) := by
+theorem serMap_sum (ψ : E →+ E) {ι : Type} (s : Finset ι) (f : ι → PowerSeries E) :
+    serMap ψ (∑ i ∈ s, f i) = ∑ i ∈ s, serMap ψ (f i) := by
   ext n
-  set_option synthInstance.maxHeartbeats 100000 in
+
   simp [coeff_serMap, map_sum]
 
-theorem coeff_polMap (ψ : E →+ E) (m : ℕ) (Q : E[X]) (i : ℕ)
-    : (polMap ψ m Q).coeff i = if i ≤ m then ψ (Q.coeff i) else 0 := by
+theorem coeff_polMap (ψ : E →+ E) (m : ℕ) (Q : E[X]) (i : ℕ) :
+    (polMap ψ m Q).coeff i = if i ≤ m then ψ (Q.coeff i) else 0 := by
   simp only [polMap, finsetSum_coeff, coeff_monomial_apply]
   rw [Finset.sum_ite_eq' (Finset.range (m + 1)) i]
   simp
@@ -44,10 +86,8 @@ theorem natDegree_polMap_le (ψ : E →+ E) (m : ℕ) (Q : E[X]) : (polMap ψ m 
 
 variable (k : Subfield E)
 
-theorem coeff_mem_mul
-    {S T : PowerSeries E}
-    (hS : ∀ n, PowerSeries.coeff n S ∈ k) (hT : ∀ n, PowerSeries.coeff n T ∈ k)
-    : ∀ n, PowerSeries.coeff n (S * T) ∈ k := by
+theorem coeff_mem_mul {S T : PowerSeries E} (hS : ∀ n, PowerSeries.coeff n S ∈ k)
+    (hT : ∀ n, PowerSeries.coeff n T ∈ k) : ∀ n, PowerSeries.coeff n (S * T) ∈ k := by
   intro n
   rw [PowerSeries.coeff_mul]
   exact sum_mem fun p _ => mul_mem (hS _) (hT _)
@@ -59,8 +99,8 @@ theorem coeff_mem_one : ∀ n, PowerSeries.coeff n (1 : PowerSeries E) ∈ k := 
   · exact one_mem k
   · exact zero_mem k
 
-theorem coeff_mem_pow {S : PowerSeries E} (hS : ∀ n, PowerSeries.coeff n S ∈ k) (i : ℕ)
-    : ∀ n, PowerSeries.coeff n (S ^ i) ∈ k := by
+theorem coeff_mem_pow {S : PowerSeries E} (hS : ∀ n, PowerSeries.coeff n S ∈ k) (i : ℕ) :
+    ∀ n, PowerSeries.coeff n (S ^ i) ∈ k := by
   induction i with
   | zero => simpa using coeff_mem_one k
   | succ i ih => rw [pow_succ]; exact coeff_mem_mul k ih hS
@@ -74,14 +114,12 @@ theorem coeff_mem_X : ∀ n, PowerSeries.coeff n (PowerSeries.X : PowerSeries E)
 
 variable {k}
 
-theorem serMap_mul
-    (ψ : E →+ E) (hψ : ∀ c ∈ k, ∀ x, ψ (c * x) = c * ψ x)
-    {W : PowerSeries E} (hW : ∀ n, PowerSeries.coeff n W ∈ k)
-    (S : PowerSeries E)
-    : serMap ψ (W * S) = W * serMap ψ S := by
+theorem serMap_mul (ψ : E →+ E) (hψ : ∀ c ∈ k, ∀ x, ψ (c * x) = c * ψ x) {W : PowerSeries E}
+    (hW : ∀ n, PowerSeries.coeff n W ∈ k) (S : PowerSeries E) :
+    serMap ψ (W * S) = W * serMap ψ S := by
   ext n
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [coeff_serMap, PowerSeries.coeff_mul, PowerSeries.coeff_mul, map_sum]
+
+  rw [coeff_serMap, PowerSeries.coeff_mul, PowerSeries.coeff_mul, map_sum]
   refine Finset.sum_congr rfl fun p _ => ?_
   rw [hψ _ (hW _), coeff_serMap]
 
@@ -92,11 +130,9 @@ theorem serMap_C (ψ : E →+ E) (q : E) : serMap ψ (PowerSeries.C q) = PowerSe
   · rfl
   · exact map_zero ψ
 
-theorem serMap_homS
-    (ψ : E →+ E) (hψ : ∀ c ∈ k, ∀ x, ψ (c * x) = c * ψ x)
-    {U : PowerSeries E} (hU : ∀ n, PowerSeries.coeff n U ∈ k)
-    (m : ℕ) (Q : E[X])
-    : serMap ψ (homS U m Q) = homS U m (polMap ψ m Q) := by
+theorem serMap_homS (ψ : E →+ E) (hψ : ∀ c ∈ k, ∀ x, ψ (c * x) = c * ψ x) {U : PowerSeries E}
+    (hU : ∀ n, PowerSeries.coeff n U ∈ k) (m : ℕ) (Q : E[X]) :
+    serMap ψ (homS U m Q) = homS U m (polMap ψ m Q) := by
   unfold homS
   rw [serMap_sum]
   refine Finset.sum_congr rfl fun i hi => ?_
@@ -106,11 +142,10 @@ theorem serMap_homS
   rw [coeff_polMap, if_pos hi', mul_assoc, mul_assoc, mul_comm (PowerSeries.C (Q.coeff i)),
     serMap_mul ψ hψ hW, serMap_C, mul_comm]
 
-theorem exists_proj (k : Subfield E)
-    : ∃ ψ : E →+ E, (∀ c ∈ k, ∀ x, ψ (c * x) = c * ψ x) ∧ (∀ x, ψ x ∈ k) ∧ ψ 1 = 1 := by
-  obtain ⟨g, hg⟩ :=
-    LinearMap.exists_leftInverse_of_injective (Algebra.linearMap k E)
-      (LinearMap.ker_eq_bot.mpr (algebraMap k E).injective)
+theorem exists_proj (k : Subfield E) : ∃ ψ : E →+ E, (∀ c ∈ k, ∀ x, ψ (c * x) = c * ψ x) ∧
+    (∀ x, ψ x ∈ k) ∧ ψ 1 = 1 := by
+  obtain ⟨g, hg⟩ := LinearMap.exists_leftInverse_of_injective (Algebra.linearMap k E)
+    (LinearMap.ker_eq_bot.mpr (algebraMap k E).injective)
   refine ⟨(k.subtype : k →+ E).comp g.toAddMonoidHom, ?_, ?_, ?_⟩
   · intro c hc x
     have := g.map_smul (⟨c, hc⟩ : k) x
@@ -126,14 +161,11 @@ theorem exists_proj (k : Subfield E)
 
 end Proj
 
-theorem proj_trick
-    {E : Type} [Field E]
-    (k : Subfield E) (U V : PowerSeries E) (hU : ∀ n, PowerSeries.coeff n U ∈ k)
-    (hV : ∀ n, PowerSeries.coeff n V ∈ k) (hU0 : PowerSeries.constantCoeff U = 1)
-    (A B : E[X]) (N : ℕ) (hA : A.natDegree ≤ N + 1)
+theorem proj_trick {E : Type} [Field E] (k : Subfield E) (U V : PowerSeries E)
+    (hU : ∀ n, PowerSeries.coeff n U ∈ k) (hV : ∀ n, PowerSeries.coeff n V ∈ k)
+    (hU0 : PowerSeries.constantCoeff U = 1) (A B : E[X]) (N : ℕ) (hA : A.natDegree ≤ N + 1)
     (hB : B.Monic) (hBd : B.natDegree = N) (hc : IsCoprime A B)
-    (h : V * homS U N B = homS U (N + 1) A)
-    : ∀ i, B.coeff i ∈ k := by
+    (h : V * homS U N B = homS U (N + 1) A) : ∀ i, B.coeff i ∈ k := by
   obtain ⟨ψ, hψ, hψk, hψ1⟩ := exists_proj k
   set A' := polMap ψ (N + 1) A with hA'
   set B' := polMap ψ N B with hB'
@@ -145,9 +177,9 @@ theorem proj_trick
     rw [hB', coeff_polMap, if_pos le_rfl, ← hBd, hB.coeff_natDegree, hψ1]
   have hB'deg : B'.natDegree = N := by
     refine le_antisymm hB'd (le_natDegree_of_ne_zero ?_)
-    rw [hBN]
-    exact one_ne_zero
-  have hB'm : B'.Monic := by rw [Monic, leadingCoeff, hB'deg, hBN]
+    rw [hBN]; exact one_ne_zero
+  have hB'm : B'.Monic := by
+    rw [Monic, leadingCoeff, hB'deg, hBN]
   have hcross : A * B' = A' * B := by
     have h0 : homS U (N + 1 + N) (A * B' - A' * B) = 0 := by
       rw [homS_sub, homS_mul U _ _ _ _ hA hB'd, homS_mul U _ _ _ _ hA'd hBd.le, ← h, ← h']
@@ -161,7 +193,8 @@ theorem proj_trick
     refine hc.symm.dvd_of_dvd_mul_left ?_
     rw [hcross]
     exact dvd_mul_left _ _
-  have heq : B = B' := (eq_of_monic_of_dvd_of_natDegree_le hB hB'm hdvd (by rw [hB'deg, hBd])).symm
+  have heq : B = B' :=
+    (eq_of_monic_of_dvd_of_natDegree_le hB hB'm hdvd (by rw [hB'deg, hBd])).symm
   intro i
   rw [heq, hB', coeff_polMap]
   split_ifs

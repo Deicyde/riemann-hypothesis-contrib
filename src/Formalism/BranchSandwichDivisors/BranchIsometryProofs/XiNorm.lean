@@ -1,13 +1,62 @@
 module
 
-public import Mathlib
 public import Formalism.BranchSandwichDivisors.StatementW
-public import Formalism.RealPlaceAnalysis.RealPlaceTaylor.ProdFactorialSupportSubSingle
-public import Formalism.GradedWeylDivisibility.FockSpaceTableaux.LFocksLemmas
-public import Formalism.GradedWeylDivisibility.FockSpaceTableaux.LFockbLemmas
-public import Formalism.GradedWeylDivisibility.FockSpaceTableaux.LBidetMinor
+public import Formalism.GradedWeylDivisibility.FockSpaceTableaux.LNondomLemmas
 public import Formalism.GradedWeylDivisibility.FockSpaceTableaux.LBidetLemmas
-public import Formalism.GradedWeylDivisibility.FockSpaceTableaux.DualWeylNonDom
+public import Formalism.GradedWeylDivisibility.FockSpaceTableaux.LBidetMinor
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Real
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Etale.Weakly
+import Mathlib.RingTheory.Finiteness.ModuleFinitePresentation
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.TotallySplit
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Lemma
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
@@ -28,15 +77,12 @@ lemma xn_det_supported {σ m : Type*} [Fintype m] [DecidableEq m] (s : Set σ)
   refine sum_mem fun τ _ => mul_mem ?_ (prod_mem fun i _ => h _ _)
   first
   | exact intCast_mem _ _
-  | exact Subalgebra.intCast_mem _ _
-  | (rw [← map_intCast (algebraMap ℂ (MvPolynomial σ ℂ))]; exact Subalgebra.algebraMap_mem _ _)
 
 lemma xn_pderiv_supported {σ : Type*} (s : Set σ) (v : σ) (hv : v ∉ s) (f : MvPolynomial σ ℂ)
     (hf : f ∈ supported ℂ s) : pderiv v f = 0 := by
   rw [MvPolynomial.mem_supported] at hf
   first
   | exact MvPolynomial.pderiv_eq_zero_of_notMem_vars fun hv' => hv (hf hv')
-  | exact MvPolynomial.pderiv_eq_zero_of_not_mem_vars fun hv' => hv (hf hv')
 
 lemma xn_minor_zero {s : ℕ} (I : Fin s → Fin r) (hs : s ≤ n) (h : ¬ Function.Injective I) :
     initMinor ℂ I hs = 0 := by
@@ -78,7 +124,6 @@ lemma xn_cof_supported (ι : κ → Fin r) {p : ℕ} (hp : p + 1 ≤ n) (a : Fin
   rw [Matrix.of_apply]
   first
   | exact (MvPolynomial.X_mem_supported (R := ℂ)).2 ⟨i, rfl⟩
-  | exact MvPolynomial.X_mem_supported.mpr ⟨i, rfl⟩
 
 lemma xn_part1 (ι : κ → Fin r) (hι : Function.Injective ι) {p : ℕ} (hp : p + 1 ≤ n) (a : Fin p → κ)
     (b : κ) :
@@ -95,8 +140,8 @@ lemma xn_part1 (ι : κ → Fin r) (hι : Function.Injective ι) {p : ℕ} (hp :
         {v : Fin r × Fin n | ∃ i, v.1 = ι (a i)} := by
       rintro ⟨i, hi⟩
       exact hb (Finset.mem_image.2 ⟨i, Finset.mem_univ _, (hι hi).symm⟩)
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [xn_lap ι hp a b, map_sum, Finset.sum_eq_single (Fin.last p), ← xn_cof_last ι hp a]
+
+    rw [xn_lap ι hp a b, map_sum, Finset.sum_eq_single (Fin.last p), ← xn_cof_last ι hp a]
     · rw [Derivation.leibniz, xn_pderiv_supported _ _ hns _ (xn_cof_supported ι hp a _), smul_zero,
         zero_add, MvPolynomial.pderiv_X, smul_eq_mul]
       simp [Pi.single_apply, Fin.ext_iff]
@@ -199,9 +244,6 @@ lemma xn_minor_perm (ι : κ → Fin r) {p : ℕ} (hp : p ≤ n) (a : Fin p → 
   unfold initMinor xnSg
   first
   | (rw [map_intCast, ← Matrix.det_permute]; rfl)
-  | (rw [map_intCast]
-     exact Matrix.det_permute π (Matrix.of fun x y : Fin p =>
-       (X ((ι ∘ a) x, Fin.castLE hp y) : MvPolynomial (Fin r × Fin n) ℂ)))
 
 private lemma prod_factorial_single_add_eq_mul' (v : Fin r × Fin n) (m : (Fin r × Fin n) →₀ ℕ) :
     (∏ k ∈ (Finsupp.single v 1 + m).support,
@@ -422,9 +464,6 @@ lemma xnN_nonneg {σ : Type*} (f : MvPolynomial σ ℂ) : 0 ≤ xnN f := by
     | (simp only [Complex.mul_re, Complex.star_def, Complex.conj_re, Complex.conj_im,
         Complex.natCast_re, Complex.natCast_im, Complex.mul_im]
        nlinarith [sq_nonneg c.re, sq_nonneg c.im])
-    | (rw [Complex.star_def, Complex.mul_conj, ← Complex.ofReal_natCast, ← Complex.ofReal_mul,
-        Complex.ofReal_re]
-       exact mul_nonneg (Complex.normSq_nonneg _) hN)
   unfold xnN fockF
   rw [Complex.re_sum]
   exact Finset.sum_nonneg fun m _ => key _ _
@@ -436,7 +475,6 @@ lemma xnN_sg {σ : Type*} {p : ℕ} (π : Equiv.Perm (Fin p)) (f : MvPolynomial 
   rw [MvPolynomial.C_mul']
   first
   | rw [MvPolynomial.support_smul_eq hc]
-  | rw [Finsupp.support_smul_eq hc]
   congr 1
   refine Finset.sum_congr rfl fun m _ => ?_
   rw [MvPolynomial.coeff_smul, smul_eq_mul, star_mul', xnSg_star]
@@ -455,8 +493,6 @@ lemma xn_SR (ι : κ → Fin r) (hι : Function.Injective ι) (m : ℕ → ℕ)
   rw [← Complex.re_sum, h]
   first
   | (rw [← Complex.ofReal_natCast, Complex.re_ofReal_mul, Complex.re_ofReal_mul])
-  | (simp [Complex.mul_re])
-  | (simp [Complex.mul_re]; ring)
 
 lemma xn_sum_perm (ι : κ → Fin r) (f : MvPolynomial (Fin r × Fin n) ℂ) (p : ℕ) (hp : p ≤ n)
     (J : Fin p → κ) (hJ : Function.Injective J) :
@@ -610,8 +646,8 @@ lemma xn_hW {μ : Fin n → ℕ} {f : MvPolynomial (Fin r × Fin n) ℂ} (hf : f
       ring
   conv_lhs => rw [f.as_sum]
   conv_rhs => rw [f.as_sum]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum, Finset.mul_sum]
+
+  rw [map_sum, Finset.mul_sum]
   refine Finset.sum_congr rfl fun d hd => ?_
   rw [hmono, hwh (MvPolynomial.mem_support_iff.1 hd)]
 
@@ -812,7 +848,6 @@ lemma xnInv_step {k : ℕ} {μ : ℕ → ℕ} {x h : MvPolynomial (Fin r × Fin 
     rw [Matrix.of_apply]
     first
     | exact (MvPolynomial.X_mem_supported (R := ℂ)).2 (show (Fin.castLE hkr i).val < k from i.isLt)
-    | exact MvPolynomial.X_mem_supported.mpr (show (Fin.castLE hkr i).val < k from i.isLt)
   · rw [hLeq]
     calc xnN (initMinor ℂ J hk * x) ≤ xnC r μ k * xnN x := hU
       _ ≤ xnC r μ k * (xnW r μ * xnN h) := mul_le_mul_of_nonneg_left H.le hC
@@ -864,7 +899,6 @@ lemma xn_rowsB_inj {n : ℕ} (i : Fin n) : Function.Injective (rowsB i) := by
     | (have h' := congrArg Fin.val h
        simp only [Fin.val_last, Fin.val_mk] at h'
        omega)
-    | omega
 
 lemma xn_interlace {n : ℕ} (lam sg : Fin n → ℕ) (hI : Interlace (lamZ lam) (fun i => (sg i : ℤ)))
     (i : Fin n) : nuNext lam i ≤ sg i ∧ sg i ≤ lam i := by

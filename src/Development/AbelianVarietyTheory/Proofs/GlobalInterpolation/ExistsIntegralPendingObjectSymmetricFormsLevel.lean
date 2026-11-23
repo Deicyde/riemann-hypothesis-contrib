@@ -1,20 +1,61 @@
 module
 
-public import Mathlib
 public import Formalism.LocalToGlobal.HilbertRowConditions.RowPin
-public import Formalism.LocalToGlobal.KernelLattices.InterlaceAll
-public import Formalism.SharpRestriction.GlobalSchurBounds.ProductFirstZerothParts
-public import Formalism.SharpRestriction.GlobalSchurBounds.FiniteModelOfAdmissibleTransports
-public import Formalism.LocalToGlobal.GlobalTheory.BlockActions.NfAllSmulReB
-public import Formalism.LocalToGlobal.GlobalTheory.BlockActions.ExistsOnOfPosDef
-public import Formalism.LocalToGlobal.GlobalTheory.BlockActions.MulLatMulLat
-public import Formalism.LocalToGlobal.Columns.TiedValBwG
-public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.FnOfMapInjective
+public import Formalism.LocalToGlobal.Columns.TiedValLatG
+public import Formalism.LocalToGlobal.GlobalTheory.BlockActions.ArchimedeanSignatureMatchingOfTrivialBranchingSymm
 public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.ClassLatticeSelfDual
-public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.ExistsIsLocBasisClsP
+public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.FnOfMapInjective
 public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.CoMTSOfGaInv
-public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.PtCoMemIntSpan
+public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.ExistsIsLocBasisClsP
 public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.ExistsPtEmbOfCoordInt
+public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.PtCoMemIntSpan
+import Formalism.LocalToGlobal.Columns.CoefficientsModP.PairBDual
+import Formalism.LocalToGlobal.Columns.CoefficientsModP.TauLatticeLatticeHolds
+public import Formalism.LocalToGlobal.Columns.TiedValBwG
+public import Formalism.LocalToGlobal.GlobalTheory.BlockActions.ExistsOnOfPosDef
+import Formalism.LocalToGlobal.GlobalTheory.BlockActions.HformSmulRightB
+public import Formalism.LocalToGlobal.GlobalTheory.BlockActions.MulLatMulLat
+public import Formalism.LocalToGlobal.GlobalTheory.BlockActions.NfAllSmulReB
+public import Formalism.LocalToGlobal.GlobalTheory.BlockActions.RestrictionSymmetric
+import Formalism.SharpRestriction.GrowthBounds.ChartRank.HypLat
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -117,7 +158,6 @@ section Dual
 
 open Matrix Formalism.L2.GlobalTheoryTheory.Br Formalism.UG
 
-set_option maxHeartbeats 1000000 in
 theorem mem_dual_tilde_iff
     {D : D7} {u : D.what₂.Word} {Ch : ℕ → Type} {chOf : ∀ i, (D.mem u).C.cls i → Ch i}
     (Tf : FormsTiedSym D u Ch chOf) (c : (D.fm u).clsP) (a : Fin (D.R.N D.R.m - 1) → D.host.E)
@@ -168,7 +208,6 @@ theorem mem_dual_tilde_iff
     refine add_mem (hSD.1 ha x hx) (mul_mem ?_ ht)
     exact ⟨⟨_, r.2.map (sigD D : D.host.E →+* D.host.E).toIntAlgHom⟩, rfl⟩
 
-set_option maxHeartbeats 1000000 in
 theorem exists_isLocBasis_dual
     (D : D7) (u : D.what₂.Word)
     (Ch : ℕ → Type) (chOf : ∀ i, (D.mem u).C.cls i → Ch i) (Tf : FormsTiedSym D u Ch chOf)
@@ -298,7 +337,6 @@ theorem local_of_mem_delAtr
   exact
     ⟨_, vl_map_mem_intSpan Pl pw hval s w lam lam' hn (hF (pw w) _ hbas), vl_coord emb s J lam B F⟩
 
-set_option maxHeartbeats 1000000 in
 theorem mem_SP_of_coord_integral
     (D : D7) (u : D.what₂.Word)
     (Ch : ℕ → Type) (chOf : ∀ i, (D.mem u).C.cls i → Ch i) (Tf : FormsTiedSym D u Ch chOf)
@@ -409,7 +447,6 @@ theorem root_mem_intW
   rw [h1] at this
   exact lt_irrefl _ this
 
-set_option maxHeartbeats 4000000 in
 theorem exists_integralPendingObject_symmetricFormsLevel
     : ∀ (D : D7) (u : D.what₂.Word) (Ch : ℕ → Type) (chOf : ∀ i, (D.mem u).C.cls i → Ch i)
         (Tf : FormsTiedSym D u Ch chOf),

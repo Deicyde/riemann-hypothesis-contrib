@@ -1,11 +1,52 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.Statements.PlaceShiftStatements.PointsNonemptyUnitaryGaussian
-public import Development.AutomorphicArithmetic.RealSpanData.RealData
+public import Development.AbelianVarietyTheory.Definitions.Divisors.HasDivPlace
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.BijectiveRealTensorToProdMatrixAlgebrasInfPlaces
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.SimilitudePairGramInvCongruent
 public import Development.AutomorphicArithmetic.IntegralCasts.CapelliIdentities.PzIffPos
+import Mathlib.Algebra.Order.Archimedean.Real.Hom
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Int
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Std.Tactic.BVDecide.Normalize.Prop
+import Development.AbelianVarietyTheory.Definitions.Divisors.ExistsDimEqOne
+import Development.AbelianVarietyTheory.Definitions.Divisors.IsHolPeriods
+import Development.AbelianVarietyTheory.Definitions.Divisors.PointsNonemptyUnitaryRankOne
+import Development.AutomorphicArithmetic.RealSpanData.RealData
 
 @[expose] public section
 
@@ -100,8 +141,8 @@ private theorem actOn_inj
     rw [Finsupp.zero_apply, map_zero]
     refine LinearMap.ext fun v => ?_
     have h1 : actOn rep ℝ (c.sum fun i n => B i ⊗ₜ[ℚ] n) ((1 : ℝ) ⊗ₜ[ℚ] v) = 0 := by rw [hx]; rfl
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [Finsupp.sum, map_sum, LinearMap.sum_apply] at h1
+
+    rw [Finsupp.sum, map_sum, LinearMap.sum_apply] at h1
     simp only [actOn_tmul, _root_.mul_one] at h1
     have h2 : ((c.mapRange (fun y => rep y v) (by simp)).sum fun i n => B i ⊗ₜ[ℚ] n) = 0 := by
       rw [Finsupp.sum_mapRange_index (by simp)]

@@ -2,6 +2,51 @@ module
 
 public import Development.AutomorphicArithmetic.CommutativeAlgebra.EtaleCohomology.VanishOfExact
 public import Development.AutomorphicArithmetic.CommutativeAlgebra.EtaleCohomology.FaceSnocCastSucc
+import Mathlib.Algebra.Homology.ShortComplex.Ab
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.CategoryTheory.Abelian.FunctorCategory
+import Mathlib.CategoryTheory.Limits.Shapes.Countable
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -16,9 +61,8 @@ namespace UpperTheory.Ru.crystallineComparison.Th
 
 variable {C : Type 1} [Category.{0} C]
 
-theorem exact_of_app
-    (S : ShortComplex (Coef C)) (h : ∀ B, Function.Exact (S.f.app B).hom (S.g.app B).hom)
-    : S.Exact := by
+theorem exact_of_app (S : ShortComplex (Coef C))
+    (h : ∀ B, Function.Exact (S.f.app B).hom (S.g.app B).hom) : S.Exact := by
   rw [ShortComplex.exact_iff_isZero_homology]
   refine CategoryTheory.Functor.isZero _ fun B => ?_
   have h1 : (S.map ((evaluation C AddCommGrpCat.{1}).obj B)).Exact :=
@@ -28,67 +72,50 @@ theorem exact_of_app
 
 variable {P : C ⥤ Type}
 
-def snG {m : ℕ} {B : C} (g : Gen P m B) (z : P.obj B) (h : (P.map g.2) (g.1.obj (Fin.last m)).2 = z)
-    : Gen P (m + 1) B :=
+def snG {m : ℕ} {B : C} (g : Gen P m B) (z : P.obj B) (h : (P.map g.2) (g.1.obj (Fin.last m)).2 = z) : Gen P (m + 1) B :=
   let a : g.1.obj (Fin.last m) ⟶ P.elementsMk B z := Functor.Elements.homMk g.2 h
   ⟨snoc g.1 a, (snε g.1 a).1⟩
 
-theorem snG_eq
-    {m : ℕ} {B : C} (g : Gen P m B) {z : P.obj B} (h : (P.map g.2) (g.1.obj (Fin.last m)).2 = z)
-    : snG g z h = snG g _ rfl := by
+theorem snG_eq {m : ℕ} {B : C} (g : Gen P m B) {z : P.obj B} (h : (P.map g.2) (g.1.obj (Fin.last m)).2 = z) :
+    snG g z h = snG g _ rfl := by
   subst h; rfl
 
 def sn {m : ℕ} {B : C} (g : Gen P m B) : Gen P (m + 1) B := snG g _ rfl
 
-theorem gFace_snG_last
-    {m : ℕ} {B : C} (g : Gen P m B) (z : P.obj B) (h : (P.map g.2) (g.1.obj (Fin.last m)).2 = z)
-    : gFace P (Fin.last (m + 1)) (snG g z h) = g :=
-  congrArg
-    (fun p : (Σ t : ComposableArrows P.Elements m, t.obj (Fin.last m) ⟶ P.elementsMk B z) =>
-      (⟨p.1, p.2.1⟩ : Gen P m B))
-    (gen_snoc_last g.1 (X := P.elementsMk B z) (Functor.Elements.homMk g.2 h))
+theorem gFace_snG_last {m : ℕ} {B : C} (g : Gen P m B) (z : P.obj B) (h : (P.map g.2) (g.1.obj (Fin.last m)).2 = z) :
+    gFace P (Fin.last (m + 1)) (snG g z h) = g :=
+  congrArg (fun p : (Σ t : ComposableArrows P.Elements m, t.obj (Fin.last m) ⟶ P.elementsMk B z) =>
+    (⟨p.1, p.2.1⟩ : Gen P m B)) (gen_snoc_last g.1 (X := P.elementsMk B z) (Functor.Elements.homMk g.2 h))
 
-theorem gFace_snG_castSucc
-    {m : ℕ} {B : C}
-    (g : Gen P (m + 1) B) (z : P.obj B) (h : (P.map g.2) (g.1.obj (Fin.last (m + 1))).2 = z)
-    (i : Fin (m + 2)) (h' : (P.map (gFace P i g).2) ((gFace P i g).1.obj (Fin.last m)).2 = z)
-    : gFace P i.castSucc (snG g z h) = snG (gFace P i g) z h' :=
-  congrArg
-    (fun p
-        : (Σ t : ComposableArrows P.Elements (m + 1),
-          t.obj (Fin.last (m + 1)) ⟶ P.elementsMk B z) =>
-      (⟨p.1, p.2.1⟩ : Gen P (m + 1) B))
-    (gen_snoc_castSucc g.1 (X := P.elementsMk B z) (Functor.Elements.homMk g.2 h) i)
+theorem gFace_snG_castSucc {m : ℕ} {B : C} (g : Gen P (m + 1) B) (z : P.obj B) (h : (P.map g.2) (g.1.obj (Fin.last (m + 1))).2 = z)
+    (i : Fin (m + 2)) (h' : (P.map (gFace P i g).2) ((gFace P i g).1.obj (Fin.last m)).2 = z) :
+    gFace P i.castSucc (snG g z h) = snG (gFace P i g) z h' :=
+  congrArg (fun p : (Σ t : ComposableArrows P.Elements (m + 1), t.obj (Fin.last (m + 1)) ⟶ P.elementsMk B z) =>
+    (⟨p.1, p.2.1⟩ : Gen P (m + 1) B)) (gen_snoc_castSucc g.1 (X := P.elementsMk B z) (Functor.Elements.homMk g.2 h) i)
 
-theorem gFace_sn_last {m : ℕ} {B : C} (g : Gen P m B) : gFace P (Fin.last (m + 1)) (sn g) = g :=
-  gFace_snG_last g _ rfl
+theorem gFace_sn_last {m : ℕ} {B : C} (g : Gen P m B) : gFace P (Fin.last (m + 1)) (sn g) = g := gFace_snG_last g _ rfl
 
-theorem gFace_sn_castSucc {m : ℕ} {B : C} (g : Gen P (m + 1) B) (i : Fin (m + 2))
-    : gFace P i.castSucc (sn g) = sn (gFace P i g) := by
-  have h'
-      : (P.map (gFace P i g).2) ((gFace P i g).1.obj (Fin.last m)).2
-        = (P.map g.2) (g.1.obj (Fin.last (m + 1))).2 := by
+theorem gFace_sn_castSucc {m : ℕ} {B : C} (g : Gen P (m + 1) B) (i : Fin (m + 2)) :
+    gFace P i.castSucc (sn g) = sn (gFace P i g) := by
+  have h' : (P.map (gFace P i g).2) ((gFace P i g).1.obj (Fin.last m)).2 = (P.map g.2) (g.1.obj (Fin.last (m + 1))).2 := by
     have e := (toLast i g.1).2
     change (P.map ((toLast i g.1).1 ≫ g.2)) _ = _
     rw [P.map_comp]
     exact congrArg (P.map g.2) e
   exact (gFace_snG_castSucc g _ rfl i h').trans (snG_eq _ h')
 
-def hh (B : C) (m : ℕ) : (L P m).obj B →+ (L P (m + 1)).obj B :=
-  (FreeAbelianGroup.map sn : FreeAbelianGroup (Gen P m B) →+ _)
+def hh (B : C) (m : ℕ) : (L P m).obj B →+ (L P (m + 1)).obj B := (FreeAddCommGroup.map sn : FreeAddCommGroup (Gen P m B) →+ _)
 
-theorem hh_of (B : C) (m : ℕ) (g : Gen P m B)
-    : hh B m (FreeAbelianGroup.of g) = FreeAbelianGroup.of (sn g) :=
-  FreeAbelianGroup.map_of_apply _
+theorem hh_of (B : C) (m : ℕ) (g : Gen P m B) : hh B m (FreeAddCommGroup.of g) = FreeAddCommGroup.of (sn g) :=
+  FreeAddCommGroup.map_of_apply _
 
-def ofL {k : ℕ} {B : C} (g : Gen P k B) : (L P k).obj B := FreeAbelianGroup.of g
+def ofL {k : ℕ} {B : C} (g : Gen P k B) : (L P k).obj B := FreeAddCommGroup.of g
 
-theorem d_hh_of (B : C) (k : ℕ) (g : Gen P (k + 1) B)
-    : ((dL P (k + 1)).app B).hom (hh B (k + 1) (ofL g))
-      = hh B k (((dL P k).app B).hom (ofL g)) + (-1 : ℤ) ^ (k + 2) • ofL g := by
+theorem d_hh_of (B : C) (k : ℕ) (g : Gen P (k + 1) B) :
+    ((dL P (k + 1)).app B).hom (hh B (k + 1) (ofL g)) = hh B k (((dL P k).app B).hom (ofL g)) + (-1 : ℤ) ^ (k + 2) • ofL g := by
   unfold ofL
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [hh_of, dL_of, dL_of, Fin.sum_univ_castSucc, map_sum]
+
+  rw [hh_of, dL_of, dL_of, Fin.sum_univ_castSucc, map_sum]
   congr 1
   · refine Finset.sum_congr rfl fun i _ => ?_
     rw [map_zsmul, hh_of, gFace_sn_castSucc]
@@ -96,14 +123,10 @@ theorem d_hh_of (B : C) (k : ℕ) (g : Gen P (k + 1) B)
   · rw [gFace_sn_last]
     rfl
 
-theorem d_hh (B : C) (k : ℕ) (y : (L P (k + 1)).obj B)
-    : ((dL P (k + 1)).app B).hom (hh B (k + 1) y)
-      = hh B k (((dL P k).app B).hom y) + (-1 : ℤ) ^ (k + 2) • y := by
-  have key
-      : AddCommGrpCat.ofHom (((dL P (k + 1)).app B).hom.comp (hh B (k + 1)))
-        = AddCommGrpCat.ofHom
-          ((hh B k).comp ((dL P k).app B).hom
-            + (-1 : ℤ) ^ (k + 2) • AddMonoidHom.id ((L P (k + 1)).obj B)) := by
+theorem d_hh (B : C) (k : ℕ) (y : (L P (k + 1)).obj B) :
+    ((dL P (k + 1)).app B).hom (hh B (k + 1) y) = hh B k (((dL P k).app B).hom y) + (-1 : ℤ) ^ (k + 2) • y := by
+  have key : AddCommGrpCat.ofHom (((dL P (k + 1)).app B).hom.comp (hh B (k + 1))) =
+      AddCommGrpCat.ofHom ((hh B k).comp ((dL P k).app B).hom + (-1 : ℤ) ^ (k + 2) • AddMonoidHom.id ((L P (k + 1)).obj B)) := by
     exact fa_ext fun g => d_hh_of B k g
   exact congrArg (fun f => f.hom y) key
 
@@ -119,8 +142,7 @@ theorem exact_dL (k : ℕ) : (ShortComplex.mk (dL P (k + 1)) (dL P k) (dL_dL k))
   · rintro ⟨x, rfl⟩
     exact congrArg (fun f => f.hom x) (congrArg (fun f => f.app B) (dL_dL (P := P) k))
 
-theorem vanish (P : C ⥤ Type) (K : Coef C) (hK : Injective K) (j : ℕ)
-    : Subsingleton (TH P K (j + 1)) :=
+theorem vanish (P : C ⥤ Type) (K : Coef C) (hK : Injective K) (j : ℕ) : Subsingleton (TH P K (j + 1)) :=
   vanish_of_exact exact_dL K hK j
 
 end UpperTheory.Ru.crystallineComparison.Th

@@ -1,34 +1,70 @@
 module
 
-public import Mathlib
-public import Formalism.SharpRestriction.LevelLetterCocycles.TwGood
-public import Formalism.SharpRestriction.ParamsHeightRankConstant
+public import Formalism.SharpRestriction.LevelLetterCocycles.IntegralHeckeForms
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsCharDescent
+public import Formalism.LocalRingCardinality.DataNChoice
+import Mathlib.Algebra.Module.StablyFree.Basic
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
 noncomputable section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
-  Formalism.BasicNotions Formalism.MainNotions
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.MainNotions
 open scoped TensorProduct
 
 namespace GlobalTheory.TwistChoice
 
 section Semilinear
 
-theorem exists_equiv_map_lattice
-    {O K U U' : Type} [CommRing O] [IsDomain O] [IsPrincipalIdealRing O] [Field K] [Algebra O K]
-    [IsFractionRing O K] [AddCommGroup U] [Module K U] [Module O U] [IsScalarTower O K U]
+theorem exists_equiv_map_lattice {O K U U' : Type} [CommRing O] [IsDomain O] [IsPrincipalIdealRing O] [Field K]
+    [Algebra O K] [IsFractionRing O K] [AddCommGroup U] [Module K U] [Module O U] [IsScalarTower O K U]
     [AddCommGroup U'] [Module K U'] [Module O U'] [IsScalarTower O K U']
     (A : Submodule O U) (B : Submodule O U') [A.IsFullLattice K] [B.IsFullLattice K]
-    (h : Module.finrank K U = Module.finrank K U')
-    : ∃ g : U ≃ₗ[K] U', A.map (g.toLinearMap.restrictScalars O) = B := by
-  have key
-      : ∀ {V : Type} [AddCommGroup V] [Module K V] [Module O V] [IsScalarTower O K V]
-          (C : Submodule O V) [C.IsFullLattice K],
-        ∃ c : Module.Basis (Fin (Module.finrank K V)) K V,
-          Submodule.span O (Set.range c) = C := by
+    (h : Module.finrank K U = Module.finrank K U') :
+    ∃ g : U ≃ₗ[K] U', A.map (g.toLinearMap.restrictScalars O) = B := by
+  have key : ∀ {V : Type} [AddCommGroup V] [Module K V] [Module O V] [IsScalarTower O K V] (C : Submodule O V)
+      [C.IsFullLattice K], ∃ c : Module.Basis (Fin (Module.finrank K V)) K V, Submodule.span O (Set.range c) = C := by
     intro V _ _ _ _ C _
     haveI := Submodule.IsLattice.free K C
     haveI := Submodule.IsLattice.finite K C
@@ -52,26 +88,20 @@ theorem exists_equiv_map_lattice
   funext i
   exact Module.Basis.equiv_apply _ _ _ _
 
-theorem exists_semilinear
-    {L V O K U : Type} [Field L] [AddCommGroup V] [Module L V] [Module.Finite L V] [CommRing O]
-    [IsDomain O] [IsPrincipalIdealRing O] [Field K] [Algebra O K] [IsFractionRing O K]
-    [AddCommGroup U] [Module K U] [Module O U] [IsScalarTower O K U]
-    (e : L →+* K)
-    (S : Set V) (hS : S.Finite) (hspan : Submodule.span L S = ⊤)
-    (B : Submodule O U) [B.IsFullLattice K]
-    (h : Module.finrank L V = Module.finrank K U)
-    : ∃ f : V →ₛₗ[e] U,
-      (∀ (ι : Type) (b : Module.Basis ι L V),
-          LinearIndependent K (fun i => f (b i))
-            ∧ Submodule.span K (Set.range fun i => f (b i)) = ⊤)
-        ∧ Submodule.span O (f '' S) = B := by
+theorem exists_semilinear {L V O K U : Type} [Field L] [AddCommGroup V] [Module L V] [Module.Finite L V]
+    [CommRing O] [IsDomain O] [IsPrincipalIdealRing O] [Field K] [Algebra O K] [IsFractionRing O K]
+    [AddCommGroup U] [Module K U] [Module O U] [IsScalarTower O K U] (e : L →+* K)
+    (S : Set V) (hS : S.Finite) (hspan : Submodule.span L S = ⊤) (B : Submodule O U) [B.IsFullLattice K]
+    (h : Module.finrank L V = Module.finrank K U) :
+    ∃ f : V →ₛₗ[e] U,
+      (∀ (ι : Type) (b : Module.Basis ι L V), LinearIndependent K (fun i => f (b i)) ∧
+        Submodule.span K (Set.range fun i => f (b i)) = ⊤) ∧ Submodule.span O (f '' S) = B := by
   classical
   let b₀ := Module.finBasis L V
-  let f₀ : V →ₛₗ[e] (Fin (Module.finrank L V) → K) := {
-    toFun := fun x i => e (b₀.repr x i)
-    map_add' := fun x y => by funext i; simp
-    map_smul' := fun c x => by funext i; simp
-  }
+  let f₀ : V →ₛₗ[e] (Fin (Module.finrank L V) → K) :=
+    { toFun := fun x i => e (b₀.repr x i)
+      map_add' := fun x y => by funext i; simp
+      map_smul' := fun c x => by funext i; simp }
   have hf₀ : ∀ T : Set V, Submodule.span L T = ⊤ → Submodule.span K (f₀ '' T) = ⊤ := by
     intro T hT
     have h1 : ∀ x, f₀ x ∈ Submodule.span K (f₀ '' T) := fun x => by
@@ -98,29 +128,20 @@ theorem exists_semilinear
   · haveI : Finite ι := Module.Finite.finite_basis b
     haveI := Fintype.ofFinite ι
     have h1 : Submodule.span K (Set.range fun i => (g.toLinearMap.comp f₀) (b i)) = ⊤ := by
-      have h2
-          : (Set.range fun i => (g.toLinearMap.comp f₀) (b i))
-            = g.toLinearMap '' (f₀ '' Set.range b) := by
+      have h2 : (Set.range fun i => (g.toLinearMap.comp f₀) (b i)) = g.toLinearMap '' (f₀ '' Set.range b) := by
         rw [← Set.range_comp, ← Set.range_comp]; rfl
       rw [h2, ← Submodule.map_span, hf₀ _ b.span_eq, Submodule.map_top]
       exact g.range
-    exact ⟨
-      linearIndependent_of_top_le_span_of_card_eq_finrank h1.ge
-        (by rw [← h, Module.finrank_eq_card_basis b]),
-      h1
-    ⟩
+    exact ⟨linearIndependent_of_top_le_span_of_card_eq_finrank h1.ge
+      (by rw [← h, Module.finrank_eq_card_basis b]), h1⟩
   · rw [← hg, Submodule.map_span, Set.image_image]
     rfl
 
-theorem form_gen
-    {L V M ι : Type}
-    [Field L] [AddCommGroup V] [Module L V] [AddCommGroup M] [Module ℂ M] [FiniteDimensional ℂ M]
-    {σ : L →+* ℂ} (j : V →ₛₗ[σ] M)
-    (b : Module.Basis ι L V)
-    (hb
-      : LinearIndependent ℂ (fun i => j (b i)) ∧ Submodule.span ℂ (Set.range fun i => j (b i)) = ⊤)
-    (T : Finset M) (hT : Submodule.span ℂ (T : Set M) = ⊤) (hsub : ∀ x ∈ T, x ∈ Set.range j)
-    : Module.Finite L V ∧ {x | j x ∈ T}.Finite ∧ Submodule.span L {x | j x ∈ T} = ⊤ := by
+theorem form_gen {L V M ι : Type} [Field L] [AddCommGroup V] [Module L V] [AddCommGroup M] [Module ℂ M]
+    [FiniteDimensional ℂ M] {σ : L →+* ℂ} (j : V →ₛₗ[σ] M) (b : Module.Basis ι L V)
+    (hb : LinearIndependent ℂ (fun i => j (b i)) ∧ Submodule.span ℂ (Set.range fun i => j (b i)) = ⊤)
+    (T : Finset M) (hT : Submodule.span ℂ (T : Set M) = ⊤) (hsub : ∀ x ∈ T, x ∈ Set.range j) :
+    Module.Finite L V ∧ {x | j x ∈ T}.Finite ∧ Submodule.span L {x | j x ∈ T} = ⊤ := by
   haveI : Finite ι := hb.1.finite
   haveI := Fintype.ofFinite ι
   let B : Module.Basis ι ℂ M := Module.Basis.mk hb.1 hb.2.ge
@@ -129,9 +150,8 @@ theorem form_gen
     refine ⟨B.constr ℂ fun i => σ (l (b i)), fun x => ?_⟩
     conv_lhs => rw [← b.sum_repr x]
     conv_rhs => rw [← b.sum_repr x]
-    set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, LinearMap.map_smulₛₗ, ← hB, Module.Basis.constr_basis, smul_eq_mul, map_mul,
-      RingHom.id_apply]
+
+    simp only [map_sum, LinearMap.map_smulₛₗ, ← hB, Module.Basis.constr_basis, smul_eq_mul, map_mul, RingHom.id_apply]
   have hinj : Function.Injective j := fun x y hxy => by
     refine b.ext_elem fun i => σ.injective ?_
     obtain ⟨l', hl'⟩ := key (b.coord i)
@@ -153,20 +173,17 @@ theorem form_gen
   rw [← hl', h1]
   simp
 
-theorem baseChange_lattice
-    {A B V : Type} [CommRing A] [IsDomain A] [CommRing B] [IsDomain B] [Algebra A B]
-    (hinj : Function.Injective (algebraMap A B))
-    [AddCommGroup V] [Module (FractionRing A) V] [Module A V] [IsScalarTower A (FractionRing A) V]
-    (Λ : Submodule A V) (hfg : Λ.FG) (hspan : Submodule.span (FractionRing A) (Λ : Set V) = ⊤)
-    : Module.finrank (FractionRing B) (FractionRing B ⊗[A] V) = Module.finrank (FractionRing A) V
-      ∧ (Submodule.span B ((TensorProduct.mk A (FractionRing B) V 1) '' (Λ : Set V))).IsFullLattice
-        (FractionRing B) := by
+theorem baseChange_lattice {A B V : Type} [CommRing A] [IsDomain A] [CommRing B] [IsDomain B] [Algebra A B]
+    (hinj : Function.Injective (algebraMap A B)) [AddCommGroup V] [Module (FractionRing A) V] [Module A V]
+    [IsScalarTower A (FractionRing A) V] (Λ : Submodule A V) (hfg : Λ.FG)
+    (hspan : Submodule.span (FractionRing A) (Λ : Set V) = ⊤) :
+    Module.finrank (FractionRing B) (FractionRing B ⊗[A] V) = Module.finrank (FractionRing A) V ∧
+      (Submodule.span B ((TensorProduct.mk A (FractionRing B) V 1) '' (Λ : Set V))).IsFullLattice (FractionRing B) := by
   haveI : FaithfulSMul A B := (faithfulSMul_iff_algebraMap_injective A B).2 hinj
   letI : Algebra (FractionRing A) (FractionRing B) := FractionRing.liftAlgebra A (FractionRing B)
   haveI : IsScalarTower A (FractionRing A) (FractionRing B) := FractionRing.isScalarTower_liftAlgebra A (FractionRing B)
   refine ⟨?_, { toIsLattice := Submodule.IsLattice.of_fg _ ?_, span_eq_top := ?_ }⟩
-  · rw [← (TensorProduct.AlgebraTensorModule.cancelBaseChange A (FractionRing A) (FractionRing B)
-        (FractionRing B) V).finrank_eq,
+  · rw [← (TensorProduct.AlgebraTensorModule.cancelBaseChange A (FractionRing A) (FractionRing B) (FractionRing B) V).finrank_eq,
       Module.finrank_baseChange, (NChoice.fracEquiv A V).finrank_eq]
   · obtain ⟨T, rfl⟩ := hfg
     rw [← Submodule.map_coe, ← Submodule.span_image, Submodule.span_span_of_tower]
@@ -178,19 +195,14 @@ theorem baseChange_lattice
     | zero => exact Submodule.zero_mem _
     | add y z hy hz => exact Submodule.add_mem _ hy hz
     | tmul a v =>
-      obtain ⟨d, hd⟩ :=
-        multiple_mem_span_of_mem_localization_span (nonZeroDivisors A) (FractionRing A) (Λ : Set V)
-          v (hspan ▸ Submodule.mem_top)
+      obtain ⟨d, hd⟩ := multiple_mem_span_of_mem_localization_span (nonZeroDivisors A) (FractionRing A) (Λ : Set V) v
+        (hspan ▸ Submodule.mem_top)
       rw [Submodule.span_eq] at hd
       have hd0 : algebraMap A (FractionRing B) d ≠ 0 :=
-        (map_ne_zero_iff _ (FaithfulSMul.algebraMap_injective A (FractionRing B))).2
-          (nonZeroDivisors.coe_ne_zero d)
-      have h1
-          : a ⊗ₜ[A] v
-            = (a * (algebraMap A (FractionRing B) d)⁻¹)
-              • ((1 : FractionRing B) ⊗ₜ[A] ((d : A) • v)) := by
-        rw [← TensorProduct.smul_tmul, TensorProduct.smul_tmul', Algebra.smul_def (d : A), mul_one,
-          smul_eq_mul, mul_assoc, inv_mul_cancel₀ hd0, mul_one]
+        (map_ne_zero_iff _ (FaithfulSMul.algebraMap_injective A (FractionRing B))).2 (nonZeroDivisors.coe_ne_zero d)
+      have h1 : a ⊗ₜ[A] v = (a * (algebraMap A (FractionRing B) d)⁻¹) • ((1 : FractionRing B) ⊗ₜ[A] ((d : A) • v)) := by
+        rw [← TensorProduct.smul_tmul, TensorProduct.smul_tmul', Algebra.smul_def (d : A), mul_one, smul_eq_mul,
+          mul_assoc, inv_mul_cancel₀ hd0, mul_one]
       rw [h1]
       exact Submodule.smul_mem _ _ (Submodule.subset_span ⟨_, hd, rfl⟩)
 
@@ -198,28 +210,15 @@ end Semilinear
 
 section Series
 
-variable
-  {D : D7} {N : NData D.R D.host D.what₂} {X : NTw D.R D.host D.what₂ D.LL0 N}
+variable {D : D7} {N : NData D.R D.host D.what₂} {X : NTw D.R D.host D.what₂ D.LL0 N}
   (Y : NExp D.R D.host D.what₂ D.LL0 N X) (E : IntegralHeckeForms.ExpDat Y)
 
-theorem twOK_one (i : X.Tw) (k : ℕ)
-    : IntegralHeckeForms.TwOK i k ∅ (1 : G D.host.E N.Om →* (X.Ok i k)ˣ) := by
-  refine ⟨
-    by simp,
-    by simp,
-    by rw [MonoidHom.ker_one, Subgroup.coe_top]; exact isOpen_univ,
-    fun g g' _ => by simp,
-    fun g => Subgroup.one_mem _,
-    fun v A _ => by simp,
-    fun v _ A _ σ _ => rfl
-  ⟩
+theorem twOK_one (i : X.Tw) (k : ℕ) : IntegralHeckeForms.TwOK i k ∅ (1 : G D.host.E N.Om →* (X.Ok i k)ˣ) := by
+  refine ⟨by simp, by simp, by rw [MonoidHom.ker_one, Subgroup.coe_top]; exact isOpen_univ, fun g g' _ => by simp, fun g => Subgroup.one_mem _, fun v A _ => by simp,
+    fun v _ A _ σ _ => rfl⟩
 
-theorem th_fg
-    (h : IntegralHeckeForms.admT4 Y E)
-    (i : X.Tw) (hi : X.NonzeroIndexPlace i)
-    (j : ℕ) (hj : j ∈ Finset.Icc 1 D.R.m)
-    (b : Bool)
-    : (IntegralHeckeForms.Th Y i j b (IntegralHeckeForms.SgJ Y E i j b)).FG := by
+theorem th_fg (h : IntegralHeckeForms.admT4 Y E) (i : X.Tw) (hi : X.NonzeroIndexPlace i) (j : ℕ) (hj : j ∈ Finset.Icc 1 D.R.m) (b : Bool) :
+    (IntegralHeckeForms.Th Y i j b (IntegralHeckeForms.SgJ Y E i j b)).FG := by
   have h1 := h i hi j hj b 0 ∅ 1 (twOK_one i 0) _ subset_rfl
   haveI := X.Ok_fin i 0
   haveI : FaithfulSMul (X.O i) (X.Ok i 0) := (faithfulSMul_iff_algebraMap_injective _ _).2 (X.Ok_inj i 0)
@@ -227,42 +226,33 @@ theorem th_fg
   have h2 : (((Y.MtLat i j b 0 ∅ 1).map (Y.thP i j b 0 ∅ 1)).restrictScalars (X.O i)).FG :=
     ((Y.MtLat_fg i j b 0 ∅ 1).map _).restrictScalars
   let m := TensorProduct.mk (X.O i) (X.Ok i 0) (Y.Fm i j b) 1
-  refine Submodule.fg_of_fg_map_injective m (Module.FaithfullyFlat.tensorProduct_mk_injective _)
-    (h2.of_le ?_)
+  refine Submodule.fg_of_fg_map_injective m (Module.FaithfullyFlat.tensorProduct_mk_injective _) (h2.of_le ?_)
   rw [IntegralHeckeForms.Th, Submodule.map_span, Submodule.span_le]
   rintro _ ⟨_, ⟨a, ha, rfl⟩, rfl⟩
   refine h1 (Submodule.subset_span (Set.mem_iUnion₂.2 ⟨a, ha, ?_⟩))
   rw [Y.thPsi_one]
   rfl
 
-theorem exists_basisOf
-    (i : X.Tw) (j : ℕ) (b : Bool)
-    (Sg : Set (Y.Dat i j b)) (h : (IntegralHeckeForms.Th Y i j b Sg).FG)
-    : ∃ S : Finset (Y.Dat i j b), IntegralHeckeForms.BasisOf Y i j b Sg S := by
+theorem exists_basisOf (i : X.Tw) (j : ℕ) (b : Bool) (Sg : Set (Y.Dat i j b)) (h : (IntegralHeckeForms.Th Y i j b Sg).FG) :
+    ∃ S : Finset (Y.Dat i j b), IntegralHeckeForms.BasisOf Y i j b Sg S := by
   classical
-  have hr
-      : Submodule.span (X.O i)
-          (Set.range fun a : Sg => IntegralHeckeForms.AO Y i j b (Y.th i j b a))
-        = (IntegralHeckeForms.Th Y i j b Sg).map (IntegralHeckeForms.AO Y i j b) := by
+  have hr : Submodule.span (X.O i) (Set.range fun a : Sg => IntegralHeckeForms.AO Y i j b (Y.th i j b a)) =
+      (IntegralHeckeForms.Th Y i j b Sg).map (IntegralHeckeForms.AO Y i j b) := by
     rw [IntegralHeckeForms.Th, Submodule.map_span, Set.image_image, Set.image_eq_range]
-  obtain ⟨S, h1, h2⟩ :=
-    exists_subbasis (X.O i) (Y.Fm i j b) Sg
-      (fun a => IntegralHeckeForms.AO Y i j b (Y.th i j b a))
-      (fun c w hc hw => by
-        rw [← algebraMap_smul (FractionRing (X.O i)) c w, smul_eq_zero] at hw
-        exact hw.resolve_left ((map_ne_zero_iff _ (IsFractionRing.injective _ _)).2 hc))
-      (hr ▸ h.map _)
+  obtain ⟨S, h1, h2⟩ := exists_subbasis (X.O i) (Y.Fm i j b) Sg (fun a => IntegralHeckeForms.AO Y i j b (Y.th i j b a))
+    (fun c w hc hw => by
+      rw [← algebraMap_smul (FractionRing (X.O i)) c w, smul_eq_zero] at hw
+      exact hw.resolve_left ((map_ne_zero_iff _ (IsFractionRing.injective _ _)).2 hc))
+    (hr ▸ h.map _)
   refine ⟨S.map (Function.Embedding.subtype _), ?_, ?_, ?_⟩
   · intro a ha
     obtain ⟨a', -, rfl⟩ := Finset.mem_map.1 ha
     exact a'.2
   · let e : S ≃ (S.map (Function.Embedding.subtype (· ∈ Sg)) : Finset _) :=
-      Equiv.ofBijective (fun a => ⟨a.1.1, Finset.mem_map.2 ⟨a.1, a.2, rfl⟩⟩) ⟨
-        fun a a' h => Subtype.ext (Subtype.ext (Subtype.mk.inj h)),
-        fun ⟨y, hy⟩ => by
+      Equiv.ofBijective (fun a => ⟨a.1.1, Finset.mem_map.2 ⟨a.1, a.2, rfl⟩⟩)
+        ⟨fun a a' h => Subtype.ext (Subtype.ext (Subtype.mk.inj h)), fun ⟨y, hy⟩ => by
           obtain ⟨a, ha, rfl⟩ := Finset.mem_map.1 hy
-          exact ⟨⟨a, ha⟩, rfl⟩
-      ⟩
+          exact ⟨⟨a, ha⟩, rfl⟩⟩
     exact (linearIndependent_equiv e).1 h1
   · rw [← hr, ← h2, Finset.coe_map, Set.image_image]
     rfl

@@ -1,7 +1,41 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.SumMulEqZeroOfSumToReal
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
 
 @[expose] public section
 
@@ -9,12 +43,8 @@ open GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan
 
 namespace GlobalTheory.PolFan
 
-theorem isPartOfBasis_of_injective
-    {L L' : Type} [AddCommGroup L] [AddCommGroup L']
-    {m : ℕ}
-    (f : L →ₗ[ℤ] L') (hf : Function.Injective f)
-    {v : Fin m → L} (h : IsPartOfBasis fun i => f (v i))
-    : IsPartOfBasis v := by
+theorem isPartOfBasis_of_injective {L L' : Type} [AddCommGroup L] [AddCommGroup L'] {m : ℕ} (f : L →ₗ[ℤ] L')
+    (hf : Function.Injective f) {v : Fin m → L} (h : IsPartOfBasis fun i => f (v i)) : IsPartOfBasis v := by
   classical
   obtain ⟨ψ, hψ⟩ := h.exists_dual
   obtain ⟨n', b, -⟩ := h
@@ -23,7 +53,7 @@ theorem isPartOfBasis_of_injective
   have hs : ∀ c, s c = ∑ i, c i • v i := fun c => by simp [s, LinearMap.sum_apply]
   have hπ : ∀ c, π (s c) = c := fun c => by
     ext j
-    set_option synthInstance.maxHeartbeats 100000 in
+
     simp [π, hs, map_sum, hψ]
   let K := LinearMap.ker π
   obtain ⟨n, bK'⟩ := Submodule.basisOfPid b (K.map f)
@@ -46,11 +76,10 @@ theorem isPartOfBasis_of_injective
     simp [hs, Pi.single_apply]
   simpa using h1
 
-theorem isCone_of_pull
-    : ∀ (O : Type) [CommRing O] (bar : O → O) (φ : InvFun O) (X X₁ : Type) [AddCommGroup X]
-        [Module O X] [Module.Finite O X] [AddCommGroup X₁] [Module O X₁] [Module.Finite O X₁]
-        (r : X →ₗ[O] X₁) (m : ℕ) (γ : Fin m → LinearMap.BilinForm ℤ X₁),
-      Function.Surjective r → IsCone bar φ (fun i => pull r (γ i)) → IsCone bar φ γ := by
+theorem isCone_of_pull : ∀ (O : Type) [CommRing O] (bar : O → O) (φ : InvFun O) (X X₁ : Type) [AddCommGroup X] [Module O X]
+    [Module.Finite O X] [AddCommGroup X₁] [Module O X₁] [Module.Finite O X₁] (r : X →ₗ[O] X₁) (m : ℕ)
+    (γ : Fin m → LinearMap.BilinForm ℤ X₁), Function.Surjective r → IsCone bar φ (fun i => pull r (γ i)) →
+    IsCone bar φ γ := by
   intro O _ bar φ X X₁ _ _ _ _ _ _ r m γ hr h
   have hmem : ∀ i, γ i ∈ balForms bar X₁ := fun i => by
     refine ⟨fun y z => ?_, fun a y z => ?_⟩
@@ -65,13 +94,8 @@ theorem isCone_of_pull
       obtain ⟨a, rfl⟩ := hr a
       obtain ⟨b, rfl⟩ := hr b
       exact LinearMap.congr_fun₂ (congrArg Subtype.val e) a b)
-  refine ⟨
-    hmem,
-    fun i y => ?_,
-    isPartOfBasis_of_injective (pullBal bar r) hinj h.basis,
-    (linearOn_pull_iff hr).1 h.linear,
-    IsStrict.of_pull hr h.strict
-  ⟩
+  refine ⟨hmem, fun i y => ?_, isPartOfBasis_of_injective (pullBal bar r) hinj h.basis,
+    (linearOn_pull_iff hr).1 h.linear, IsStrict.of_pull hr h.strict⟩
   obtain ⟨y, rfl⟩ := hr y
   exact h.nonneg i y
 

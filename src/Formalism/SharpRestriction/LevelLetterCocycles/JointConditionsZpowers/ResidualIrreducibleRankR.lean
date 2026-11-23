@@ -1,7 +1,49 @@
 module
 
-public import Formalism.SharpRestriction.LevelLetterCocycles.BlochKatoPhases
-public import Formalism.SharpRestriction.LevelLetterCocycles.SumRepresentations
+import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsConjInertiaTameCharOtherPlace
+public import Formalism.LocalRingCardinality.RhoDetPrimeEqMuTildeMulChiPow
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
@@ -15,9 +57,9 @@ open NumberField IsDedekindDomain
 
 open scoped Pointwise
 
-theorem res_T_indep (D : D7) (a : D.nd.Loc) (f : D.nd.T a) (x x' : D.nd.X a)
-    : IsLocalRing.residue (D.nd.O a) ((f : D.nd.X a → D.nd.O a) x)
-      = IsLocalRing.residue (D.nd.O a) ((f : D.nd.X a → D.nd.O a) x') := by
+theorem res_T_indep (D : D7) (a : D.nd.Loc) (f : D.nd.T a) (x x' : D.nd.X a) :
+    IsLocalRing.residue (D.nd.O a) ((f : D.nd.X a → D.nd.O a) x) =
+      IsLocalRing.residue (D.nd.O a) ((f : D.nd.X a → D.nd.O a) x') := by
   have := D.nd.T_local a
   let ev : D.nd.X a → (D.nd.T a →+* IsLocalRing.ResidueField (D.nd.O a)) := fun y =>
     (IsLocalRing.residue (D.nd.O a)).comp
@@ -28,27 +70,25 @@ theorem res_T_indep (D : D7) (a : D.nd.Loc) (f : D.nd.T a) (x x' : D.nd.X a)
     exact ⟨algebraMap (D.nd.O a) (D.nd.T a) c', rfl⟩
   have hker : ∀ y, RingHom.ker (ev y) = IsLocalRing.maximalIdeal (D.nd.T a) := fun y =>
     IsLocalRing.eq_maximalIdeal (RingHom.ker_isMaximal_of_surjective (ev y) (hsurj y))
-  have h1
-      : f - algebraMap (D.nd.O a) (D.nd.T a) ((f : D.nd.X a → D.nd.O a) x)
-        ∈ RingHom.ker (ev x) := by
+  have h1 : f - algebraMap (D.nd.O a) (D.nd.T a) ((f : D.nd.X a → D.nd.O a) x) ∈ RingHom.ker (ev x) := by
     rw [RingHom.mem_ker, (ev x).map_sub]
     exact sub_self _
   rw [hker x, ← hker x', RingHom.mem_ker, (ev x').map_sub, sub_eq_zero] at h1
   exact h1.symm
 
-theorem heckePol_res (D : D7) (a : D.nd.Loc) (x x' : D.nd.X a) (w : PlE D.host)
-    : (heckePol D.nd a x w).map (IsLocalRing.residue (D.nd.O a))
-      = (heckePol D.nd a x' w).map (IsLocalRing.residue (D.nd.O a)) := by
+theorem heckePol_res (D : D7) (a : D.nd.Loc) (x x' : D.nd.X a) (w : PlE D.host) :
+    (heckePol D.nd a x w).map (IsLocalRing.residue (D.nd.O a)) =
+      (heckePol D.nd a x' w).map (IsLocalRing.residue (D.nd.O a)) := by
   unfold heckePol
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [Polynomial.map_add (f := _), Polynomial.map_pow, Polynomial.map_X,
-      Polynomial.map_sum, Polynomial.map_mul, Polynomial.map_C, map_mul]
+
+  simp only [Polynomial.map_add (f := _), Polynomial.map_pow, Polynomial.map_X, Polynomial.map_sum,
+  Polynomial.map_mul, Polynomial.map_C, map_mul]
   congr 1
   refine Finset.sum_congr rfl fun k _ => ?_
   rw [res_T_indep D a (D.nd.hT a w k) x x']
 
-theorem isOpen_res_fiber (D : D7) (a : D.nd.Loc) (c : IsLocalRing.ResidueField (D.nd.O a))
-    : IsOpen {y : D.nd.O a | IsLocalRing.residue (D.nd.O a) y = c} := by
+theorem isOpen_res_fiber (D : D7) (a : D.nd.Loc) (c : IsLocalRing.ResidueField (D.nd.O a)) :
+    IsOpen {y : D.nd.O a | IsLocalRing.residue (D.nd.O a) y = c} := by
   have hm : IsOpen ((IsLocalRing.maximalIdeal (D.nd.O a) : Ideal _) : Set (D.nd.O a)) := by
     have := (isAdic_iff.mp (D.nd.O_adic a)).1 1
     rwa [pow_one] at this
@@ -66,62 +106,47 @@ section Defs
 variable {R : Ranks} {H : Host R} {what₂ : Rows.Data R} (N : NData R H what₂)
 
 def IsRhoOf (a : N.Loc) (x : N.X a) (ρ : G H.E N.Om →* GL (Fin R.r) (N.O a)) : Prop :=
-  Continuous (fun g => ((ρ g : GL (Fin R.r) (N.O a)) : Matrix (Fin R.r) (Fin R.r) (N.O a)))
-    ∧ IsSSRep (mapRep (algebraMap (N.O a) (Kf N a)) ρ)
-    ∧ ∀ w,
-      SplitOut N a w
-        → ∀ (B : ValuationSubring N.Om) (σ : G H.E N.Om),
-          IsPlaceOver (F := H.E) B w → IsFrob (F := H.E) B (normV w) σ
-            → ((ρ σ : GL _ _) : Matrix (Fin R.r) (Fin R.r) (N.O a)).charpoly
-                * ∏ c ∈ Finset.Icc 1 R.t, (X - C ((N.chi a c σ : (N.O a)ˣ) : N.O a))
-              = heckePol N a x w
+  Continuous (fun g => ((ρ g : GL (Fin R.r) (N.O a)) : Matrix (Fin R.r) (Fin R.r) (N.O a))) ∧
+  IsSSRep (mapRep (algebraMap (N.O a) (Kf N a)) ρ) ∧
+  ∀ w, SplitOut N a w → ∀ (B : ValuationSubring N.Om) (σ : G H.E N.Om),
+    IsPlaceOver (F := H.E) B w → IsFrob (F := H.E) B (normV w) σ →
+    ((ρ σ : GL _ _) : Matrix (Fin R.r) (Fin R.r) (N.O a)).charpoly *
+      ∏ c ∈ Finset.Icc 1 R.t, (X - C ((N.chi a c σ : (N.O a)ˣ) : N.O a)) = heckePol N a x w
 
 end Defs
 
 def ResidualIrreducibleRankR (D : D7) : Prop :=
-  ∀ a,
-    HG D.nd D.naut a
-      → ∀ rb,
-        IsRhoBar D.nd a rb
-          → Formalism.CyclotomicNorms.IrredOn (mapRep (D.naut.kFbar a) rb) ⊤
-            ∧ ∀ k,
-              D.nd.l a ≠ D.host.g k
-                → ∀ v ∈ placesOver D.host.E (D.host.g k),
-                  ¬ (((rb (D.nd.gam0 a v) : GL _ _)
-                      : Matrix (Fin D.R.r) (Fin D.R.r) _).charpoly).IsRoot
-                    (IsLocalRing.residue (D.nd.O a) (chi1 D.nd a (D.nd.gam0 a v)))
+  ∀ a, HG D.nd D.naut a → ∀ rb, IsRhoBar D.nd a rb →
+    Formalism.CyclotomicNorms.IrredOn (mapRep (D.naut.kFbar a) rb) ⊤ ∧
+    ∀ k, D.nd.l a ≠ D.host.g k → ∀ v ∈ placesOver D.host.E (D.host.g k),
+      ¬ (((rb (D.nd.gam0 a v) : GL _ _) : Matrix (Fin D.R.r) (Fin D.R.r) _).charpoly).IsRoot
+        (IsLocalRing.residue (D.nd.O a) (chi1 D.nd a (D.nd.gam0 a v)))
 
 def LitBurnside (Γ : Type) [Group Γ] : Prop :=
-  ∀ (ℓ : ℕ) [Fact ℓ.Prime] (a : ℕ) (ρ : Γ →* GL (Fin a) (Formalism.CyclotomicNorms.Fbar ℓ)),
-    Formalism.CyclotomicNorms.IrredOn ρ ⊤
-      → Submodule.span (Formalism.CyclotomicNorms.Fbar ℓ)
-          (Set.range fun g =>
-            ((ρ g : GL _ _) : Matrix (Fin a) (Fin a) (Formalism.CyclotomicNorms.Fbar ℓ)))
-        = ⊤
+  ∀ (ℓ : ℕ) [Fact ℓ.Prime] (a : ℕ) (ρ : Γ →* GL (Fin a) (Formalism.CyclotomicNorms.Fbar ℓ)), Formalism.CyclotomicNorms.IrredOn ρ ⊤ →
+    Submodule.span (Formalism.CyclotomicNorms.Fbar ℓ)
+      (Set.range fun g => ((ρ g : GL _ _) : Matrix (Fin a) (Fin a) (Formalism.CyclotomicNorms.Fbar ℓ))) = ⊤
 
-theorem isRhoBar_of_isRhoOf
-    (D : D7) (a : D.nd.Loc) (x : D.nd.X a) (ρ : G D.host.E D.nd.Om →* GL (Fin D.R.r) (D.nd.O a))
-    (h : IsRhoOf D.nd a x ρ)
-    : IsRhoBar D.nd a (redRep D.nd a ρ) := by
+theorem isRhoBar_of_isRhoOf (D : D7) (a : D.nd.Loc) (x : D.nd.X a)
+    (ρ : G D.host.E D.nd.Om →* GL (Fin D.R.r) (D.nd.O a)) (h : IsRhoOf D.nd a x ρ) :
+    IsRhoBar D.nd a (redRep D.nd a ρ) := by
   refine ⟨?_, ?_⟩
-  · have e
-        : ((redRep D.nd a ρ).ker : Set (G D.host.E D.nd.Om))
-          = (fun g => ((ρ g : GL _ _) : Matrix (Fin D.R.r) (Fin D.R.r) (D.nd.O a)))
-            ⁻¹' (⋂ p : Fin D.R.r × Fin D.R.r, {M | IsLocalRing.residue (D.nd.O a) (M p.1 p.2) =
-                  (1 : Matrix (Fin D.R.r) (Fin D.R.r) (IsLocalRing.ResidueField (D.nd.O a))) p.1 p.2}) :=
-      by
-        ext g
-        simp only [SetLike.mem_coe, MonoidHom.mem_ker, Set.mem_preimage, Set.mem_iInter,
-          Set.mem_ofPred_eq, Prod.forall]
-        constructor
-        · intro hg i j
-          have :=
-            congrArg (fun u : GL (Fin D.R.r) (IsLocalRing.ResidueField (D.nd.O a)) => u.val i j) hg
-          exact this
-        · intro hg
-          apply Units.ext
-          ext i j
-          exact hg i j
+  · have e : ((redRep D.nd a ρ).ker : Set (G D.host.E D.nd.Om)) =
+        (fun g => ((ρ g : GL _ _) : Matrix (Fin D.R.r) (Fin D.R.r) (D.nd.O a))) ⁻¹'
+          (⋂ p : Fin D.R.r × Fin D.R.r, {M | IsLocalRing.residue (D.nd.O a) (M p.1 p.2) =
+            (1 : Matrix (Fin D.R.r) (Fin D.R.r) (IsLocalRing.ResidueField (D.nd.O a))) p.1 p.2}) := by
+      ext g
+      simp only [SetLike.mem_coe, MonoidHom.mem_ker, Set.mem_preimage, Set.mem_iInter,
+        Set.mem_ofPred_eq, Prod.forall]
+      constructor
+      · intro hg i j
+        have := congrArg (fun u : GL (Fin D.R.r) (IsLocalRing.ResidueField (D.nd.O a)) =>
+          u.val i j) hg
+        exact this
+      · intro hg
+        apply Units.ext
+        ext i j
+        exact hg i j
     rw [e]
     refine IsOpen.preimage h.1 (isOpen_iInter_of_finite fun p => ?_)
     have hc : Continuous fun M : Matrix (Fin D.R.r) (Fin D.R.r) (D.nd.O a) => M p.1 p.2 :=
@@ -134,25 +159,24 @@ theorem isRhoBar_of_isRhoOf
     · refine Finset.prod_congr rfl fun c _ => ?_
       simp
 
-theorem span_descent
-    {k L : Type} [Field k] [Field L]
-    (φ : k →+* L)
-    {n : ℕ} {ι : Type}
-    (S : ι → Matrix (Fin n) (Fin n) k) (h : Submodule.span L (Set.range fun i => (S i).map φ) = ⊤)
-    : Submodule.span k (Set.range S) = ⊤ := by
+theorem span_descent {k L : Type} [Field k] [Field L] (φ : k →+* L) {n : ℕ} {ι : Type}
+    (S : ι → Matrix (Fin n) (Fin n) k)
+    (h : Submodule.span L (Set.range fun i => (S i).map φ) = ⊤) :
+    Submodule.span k (Set.range S) = ⊤ := by
   by_contra hne
   obtain ⟨f, hf0, hf⟩ := Submodule.exists_le_ker_of_lt_top _ (lt_top_iff_ne_top.mpr hne)
   let c : Fin n → Fin n → k := fun i j => f (Matrix.single i j 1)
   have hfc : ∀ M : Matrix (Fin n) (Fin n) k, f M = ∑ i, ∑ j, M i j * c i j := by
     intro M
     conv_lhs => rw [Matrix.matrix_eq_sum_single M]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum]
+
+    simp only [map_sum]
     refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
     have : Matrix.single i j (M i j) = M i j • Matrix.single i j (1 : k) := by
       rw [Matrix.smul_single, smul_eq_mul, mul_one]
     rw [this, map_smul, smul_eq_mul]
-  let F : Matrix (Fin n) (Fin n) L →ₗ[L] L := ∑ i, ∑ j, (φ (c i j)) • Matrix.entryLinearMap L L i j
+  let F : Matrix (Fin n) (Fin n) L →ₗ[L] L :=
+    ∑ i, ∑ j, (φ (c i j)) • Matrix.entryLinearMap L L i j
   have hF : ∀ M : Matrix (Fin n) (Fin n) L, F M = ∑ i, ∑ j, φ (c i j) * M i j := by
     intro M
     simp [F, LinearMap.sum_apply]
@@ -164,8 +188,8 @@ theorem span_descent
     show F ((S i).map φ) = 0
     rw [hF]
     have := congrArg φ h0
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_mul, map_zero] at this
+
+    simp only [map_sum, map_mul, map_zero] at this
     rw [← this]
     refine Finset.sum_congr rfl fun p _ => Finset.sum_congr rfl fun q _ => ?_
     rw [Matrix.map_apply, mul_comm]
@@ -192,41 +216,13 @@ theorem span_descent
     exact (map_eq_zero_iff φ φ.injective).mp this.symm
   simp [hc]
 
-theorem conj_mem_Ine_smul
-    {F Ω : Type} [Field F] [NumberField F] [Field Ω] [Algebra F Ω]
-    (A : ValuationSubring Ω) (τ σ : G F Ω) (hσ : σ ∈ Ine (F := F) A)
-    : τ * σ * τ⁻¹ ∈ Ine (F := F) (τ • A) := by
-  have hmem : ∀ x : Ω, x ∈ τ • A ↔ (τ⁻¹ : G F Ω) x ∈ A := by
-    intro x
-    rw [← ValuationSubring.smul_mem_pointwise_smul_iff (g := τ⁻¹), inv_smul_smul]
-    rfl
-  have hlt : ∀ y : Ω, (τ • A).valuation y < 1 ↔ A.valuation ((τ⁻¹ : G F Ω) y) < 1 := by
-    intro y
-    rw [valuation_lt_one_iff', valuation_lt_one_iff', hmem, hmem, map_inv₀,
-      map_eq_zero_iff _ (τ⁻¹ : G F Ω).injective]
-  refine ⟨?_, fun x hx => ?_⟩
-  · show (τ * σ * τ⁻¹) • (τ • A) = τ • A
-    rw [mul_smul, mul_smul, inv_smul_smul]
-    congr 1
-    exact hσ.1
-  · rw [hlt]
-    have hx' : A.valuation ((τ⁻¹ : G F Ω) x) ≤ 1 := by
-      rw [A.valuation_le_one_iff, ← hmem]
-      exact ((τ • A).valuation_le_one_iff x).mp hx
-    have e : (τ⁻¹ : G F Ω) ((τ * σ * τ⁻¹) x - x) = σ ((τ⁻¹ : G F Ω) x) - (τ⁻¹ : G F Ω) x := by
-      rw [map_sub]
-      congr 1
-      show (τ⁻¹ * (τ * σ * τ⁻¹)) x = _
-      rw [← mul_assoc, ← mul_assoc, inv_mul_cancel, one_mul]
-      rfl
-    rw [e]
-    exact hσ.2 _ hx'
+theorem conj_mem_Ine_smul {F Ω : Type} [Field F] [NumberField F] [Field Ω] [Algebra F Ω]
+    (A : ValuationSubring Ω) (τ σ : G F Ω) (hσ : σ ∈ Ine (F := F) A) :
+    τ * σ * τ⁻¹ ∈ Ine (F := F) (τ • A) := by
+  apply GlobalTheory.TameMove.conj_mem_Ine_smul <;> assumption
 
-theorem placesOver_disj
-    (E : Type) [Field E] [NumberField E]
-    {p q : ℕ} (hp : p.Prime) (hq : q.Prime) (hpq : p ≠ q)
-    (v : HeightOneSpectrum (𝓞 E)) (h1 : v ∈ placesOver E p)
-    : v ∉ placesOver E q := by
+theorem placesOver_disj (E : Type) [Field E] [NumberField E] {p q : ℕ} (hp : p.Prime) (hq : q.Prime)
+    (hpq : p ≠ q) (v : HeightOneSpectrum (𝓞 E)) (h1 : v ∈ placesOver E p) : v ∉ placesOver E q := by
   intro h2
   have hco : Nat.Coprime p q := (Nat.coprime_primes hp hq).mpr hpq
   have h1' : ((p : ℤ) : 𝓞 E) ∈ v.asIdeal := by
@@ -238,9 +234,7 @@ theorem placesOver_disj
   have hb : (1 : 𝓞 E) ∈ v.asIdeal := by
     have hg := Nat.gcd_eq_gcd_ab p q
     rw [hco.gcd_eq_one] at hg
-    have : (1 : 𝓞 E)
-        = ((p : ℤ) : 𝓞 E) * ((Nat.gcdA p q : ℤ) : 𝓞 E)
-          + ((q : ℤ) : 𝓞 E) * ((Nat.gcdB p q : ℤ) : 𝓞 E) := by
+    have : (1 : 𝓞 E) = ((p : ℤ) : 𝓞 E) * ((Nat.gcdA p q : ℤ) : 𝓞 E) + ((q : ℤ) : 𝓞 E) * ((Nat.gcdB p q : ℤ) : 𝓞 E) := by
       have := congrArg (fun z : ℤ => (z : 𝓞 E)) hg
       push_cast at this
       simpa using this

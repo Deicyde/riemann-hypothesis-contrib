@@ -1,7 +1,50 @@
 module
 
-public import Formalism.HermitianCurvature.HermitianCurvatureProofs.ThirdPolynomialExpansion
+public import Formalism.HermitianCurvature.OperatorsCommuteTranslations
 public import Formalism.HermitianCurvature.HermitianCurvatureProofs.LemmaDDeterminantIdentity
+public import Formalism.HermitianCurvature.HermitianCurvatureProofs.ThirdPolynomialExpansion
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -23,22 +66,14 @@ theorem smul_mem' (I : Ideal A) (c : ℂ) {x : A} (hx : x ∈ I) : c • x ∈ I
   rw [Algebra.smul_def]
   exact I.mul_mem_left _ hx
 
-theorem peel_core
-    {m : ℕ}
-    (I : Ideal A)
-    {ι : Type} [Fintype ι]
-    (η : ι → ℂ)
-    (Q : Fin (m + 1) → A)
+theorem peel_core {m : ℕ} (I : Ideal A) {ι : Type} [Fintype ι] (η : ι → ℂ) (Q : Fin (m + 1) → A)
     (T : Fin (m + 1) → ι → A) (κ : ℂ)
-    (hT : ∀ l, (∑ w, η w • T l w) - algebraMap ℂ A (if l = Fin.last m then κ else 0) ∈ I)
-    : (∑ w, η w • ∑ l : Fin (m + 1), ((((-1 : ℤ) ^ (m + (l : ℕ)) : ℤ) : A)) * (Q l * T l w))
-        - κ • Q (Fin.last m)
-      ∈ I := by
-  have key
-      : (∑ w, η w • ∑ l : Fin (m + 1), ((((-1 : ℤ) ^ (m + (l : ℕ)) : ℤ) : A)) * (Q l * T l w))
-          - κ • Q (Fin.last m)
-        = ∑ l : Fin (m + 1), ((((-1 : ℤ) ^ (m + (l : ℕ)) : ℤ) : A)) *
-          (Q l * ((∑ w, η w • T l w) - algebraMap ℂ A (if l = Fin.last m then κ else 0))) := by
+    (hT : ∀ l, (∑ w, η w • T l w) - algebraMap ℂ A (if l = Fin.last m then κ else 0) ∈ I) :
+    (∑ w, η w • ∑ l : Fin (m + 1), ((((-1 : ℤ) ^ (m + (l : ℕ)) : ℤ) : A)) * (Q l * T l w)) -
+      κ • Q (Fin.last m) ∈ I := by
+  have key : (∑ w, η w • ∑ l : Fin (m + 1), ((((-1 : ℤ) ^ (m + (l : ℕ)) : ℤ) : A)) * (Q l * T l w)) -
+      κ • Q (Fin.last m) = ∑ l : Fin (m + 1), ((((-1 : ℤ) ^ (m + (l : ℕ)) : ℤ) : A)) *
+        (Q l * ((∑ w, η w • T l w) - algebraMap ℂ A (if l = Fin.last m then κ else 0))) := by
     simp only [mul_sub, Finset.sum_sub_distrib, Finset.mul_sum, mul_smul_comm, Finset.smul_sum]
     congr 1
     · exact Finset.sum_comm
@@ -51,51 +86,29 @@ theorem peel_core
   rw [key]
   exact Submodule.sum_mem _ fun l _ => I.mul_mem_left _ (I.mul_mem_left _ (hT l))
 
-theorem peel_col
-    {n m : ℕ}
-    (I : Ideal A) (E : Fin n → Fin n → A)
-    {ι : Type} [Fintype ι]
-    (η : ι → ℂ) (a : Fin (m + 1) → Fin n)
-    (b0 : Fin m → Fin n)
-    (bw : ι → Fin n) (u κ : ℂ)
-    (hT : ∀ l,
-      (∑ w, η w • Tm E (u - (m : ℂ)) (a l) (bw w))
-          - algebraMap ℂ A (if l = Fin.last m then κ else 0)
-        ∈ I)
-    : (∑ w, η w • qminor E a (Fin.snoc (α := fun _ => Fin n) b0 (bw w)) u)
-        - κ • qminor E (a ∘ Fin.castSucc) b0 u
-      ∈ I := by
-  have hexp
-      : ∀ w,
-        qminor E a (Fin.snoc (α := fun _ => Fin n) b0 (bw w)) u
-          = ∑ l : Fin (m + 1), ((((-1 : ℤ) ^ (m + (l : ℕ)) : ℤ) : A)) *
-              (qminor E (a ∘ l.succAbove) b0 u * Tm E (u - (m : ℂ)) (a l) (bw w)) := by
+theorem peel_col {n m : ℕ} (I : Ideal A) (E : Fin n → Fin n → A) {ι : Type} [Fintype ι] (η : ι → ℂ)
+    (a : Fin (m + 1) → Fin n) (b0 : Fin m → Fin n) (bw : ι → Fin n) (u κ : ℂ)
+    (hT : ∀ l, (∑ w, η w • Tm E (u - (m : ℂ)) (a l) (bw w)) - algebraMap ℂ A (if l = Fin.last m then κ else 0) ∈ I) :
+    (∑ w, η w • qminor E a (Fin.snoc (α := fun _ => Fin n) b0 (bw w)) u) - κ • qminor E (a ∘ Fin.castSucc) b0 u ∈ I := by
+  have hexp : ∀ w, qminor E a (Fin.snoc (α := fun _ => Fin n) b0 (bw w)) u =
+      ∑ l : Fin (m + 1), ((((-1 : ℤ) ^ (m + (l : ℕ)) : ℤ) : A)) *
+        (qminor E (a ∘ l.succAbove) b0 u * Tm E (u - (m : ℂ)) (a l) (bw w)) := by
     intro w
-    rw [Formalism.FourierDecayAlt.P.expansion_last_column A n m E a
-      (Fin.snoc (α := fun _ => Fin n) b0 (bw w)) u]
-    congr 1
-    ext l
-    have h1
-        : (Fin.snoc (α := fun _ => Fin n) b0 (bw w) : Fin (m + 1) → Fin n) ∘ Fin.castSucc = b0 := by
+    rw [Formalism.FourierDecayAlt.P.expansion_last_column A n m E a (Fin.snoc (α := fun _ => Fin n) b0 (bw w)) u]
+    congr 1; ext l
+    have h1 : (Fin.snoc (α := fun _ => Fin n) b0 (bw w) : Fin (m + 1) → Fin n) ∘ Fin.castSucc = b0 := by
       funext x; simp [Fin.snoc_castSucc]
     rw [h1, Fin.snoc_last]
   simp_rw [hexp]
-  have :=
-    peel_core I η
-      (fun l => qminor E (a ∘ l.succAbove) b0 u)
-      (fun l w => Tm E (u - (m : ℂ)) (a l) (bw w))
-      κ hT
+  have := peel_core I η (fun l => qminor E (a ∘ l.succAbove) b0 u) (fun l w => Tm E (u - (m : ℂ)) (a l) (bw w)) κ hT
   simpa [Fin.succAbove_last] using this
 
-theorem hT_of
-    (I : Ideal A)
-    {ι : Type} [Fintype ι]
-    (η : ι → ℂ) (X : ι → A) (d : ι → ℂ) (c : ℂ)
-    (hX : ∀ w, X w - algebraMap ℂ A (d w) ∈ I) (hc : ∑ w, η w * d w = c)
-    : (∑ w, η w • X w) - algebraMap ℂ A c ∈ I := by
+theorem hT_of (I : Ideal A) {ι : Type} [Fintype ι] (η : ι → ℂ) (X : ι → A) (d : ι → ℂ) (c : ℂ)
+    (hX : ∀ w, X w - algebraMap ℂ A (d w) ∈ I) (hc : ∑ w, η w * d w = c) :
+    (∑ w, η w • X w) - algebraMap ℂ A c ∈ I := by
   have e : (∑ w, η w • X w) - algebraMap ℂ A c = ∑ w, η w • (X w - algebraMap ℂ A (d w)) := by
     rw [← hc]
-    set_option synthInstance.maxHeartbeats 100000 in
+
     simp only [smul_sub, Finset.sum_sub_distrib, map_sum, map_mul, Algebra.smul_def, mul_sub]
   rw [e]
   exact Submodule.sum_mem _ fun w _ => smul_mem' I _ (hX w)
@@ -105,50 +118,31 @@ end peel
 def pe (k r p : ℕ) : Fin (2 * r + k + 1) := ⟨min p (2 * r + k), by omega⟩
 def ps (k r p : ℕ) : Fin (2 * r + k + 1) := ⟨2 * r + k - p, by omega⟩
 
-@[simp]
-theorem pe_val (k r p : ℕ) : (pe k r p).val = min p (2 * r + k) := rfl
-@[simp]
-theorem ps_val (k r p : ℕ) : (ps k r p).val = 2 * r + k - p := rfl
+@[simp] theorem pe_val (k r p : ℕ) : (pe k r p).val = min p (2 * r + k) := rfl
+@[simp] theorem ps_val (k r p : ℕ) : (ps k r p).val = 2 * r + k - p := rfl
 
-theorem mem_gen
-    {A : Type} [Ring A] [Algebra ℂ A]
-    {k r : ℕ} {z' : Fin (2 * r + k + 1) → ℂ} {E : Fin (2 * r + k + 1) → Fin (2 * r + k + 1) → A}
-    {p q : Fin (2 * r + k + 1)} (h : InNp k r p q)
-    : E p q - algebraMap ℂ A (dpsiP k r z' p q) ∈ Ideal.span (rgen k r z' E) :=
-  Ideal.subset_span ⟨p, q, h, rfl⟩
+theorem mem_gen {A : Type} [Ring A] [Algebra ℂ A] {k r : ℕ} {z' : Fin (2 * r + k + 1) → ℂ}
+    {E : Fin (2 * r + k + 1) → Fin (2 * r + k + 1) → A} {p q : Fin (2 * r + k + 1)} (h : InNp k r p q) :
+    E p q - algebraMap ℂ A (dpsiP k r z' p q) ∈ Ideal.span (rgen k r z' E) := Ideal.subset_span ⟨p, q, h, rfl⟩
 
-theorem tm_offdiag
-    {A : Type} [Ring A] [Algebra ℂ A]
-    {n : ℕ} (E : Fin n → Fin n → A)
-    (u : ℂ)
-    {p q : Fin n} (h : p ≠ q)
-    : Tm E u p q = E p q := by
+theorem tm_offdiag {A : Type} [Ring A] [Algebra ℂ A] {n : ℕ} (E : Fin n → Fin n → A) (u : ℂ) {p q : Fin n}
+    (h : p ≠ q) : Tm E u p q = E p q := by
   simp [Tm, h]
 
 theorem last_iff {m : ℕ} (l : Fin (m + 1)) : l = Fin.last m ↔ l.val = m := by
   rw [Fin.ext_iff, Fin.val_last]
 
-theorem first_peeling_minor_mem_ideal
-    {A : Type} [Ring A] [Algebra ℂ A]
-    (k r : ℕ) (z' : Fin (2 * r + k + 1) → ℂ) (E : Fin (2 * r + k + 1) → Fin (2 * r + k + 1) → A)
-    (u : ℂ)
-    : ∀ (m i : ℕ),
-      i ≤ m → m + 1 ≤ r
-        → qminor E
-              (fun l : Fin m => pe k r l.val)
-              (fun l : Fin m => pe k r (if l.val < i then l.val else l.val + 1))
-              u
-            - qminor E (fun l : Fin i => pe k r l.val) (fun l : Fin i => pe k r l.val) u
-          ∈ Ideal.span (rgen k r z' E) := by
+theorem first_peeling_minor_mem_ideal {A : Type} [Ring A] [Algebra ℂ A] (k r : ℕ) (z' : Fin (2 * r + k + 1) → ℂ)
+    (E : Fin (2 * r + k + 1) → Fin (2 * r + k + 1) → A) (u : ℂ) : ∀ (m i : ℕ), i ≤ m → m + 1 ≤ r →
+    qminor E (fun l : Fin m => pe k r l.val) (fun l : Fin m => pe k r (if l.val < i then l.val else l.val + 1)) u -
+      qminor E (fun l : Fin i => pe k r l.val) (fun l : Fin i => pe k r l.val) u ∈ Ideal.span (rgen k r z' E) := by
   intro m
   induction m with
   | zero =>
     intro i hi _
     have hi0 : i = 0 := by omega
     subst hi0
-    have e
-        : (fun l : Fin 0 => pe k r (if l.val < 0 then l.val else l.val + 1))
-          = fun l : Fin 0 => pe k r l.val :=
+    have e : (fun l : Fin 0 => pe k r (if l.val < 0 then l.val else l.val + 1)) = fun l : Fin 0 => pe k r l.val :=
       funext fun l => l.elim0
     rw [e, sub_self]
     exact Submodule.zero_mem _
@@ -156,27 +150,17 @@ theorem first_peeling_minor_mem_ideal
     intro i hi hr
     rcases Nat.lt_or_ge i (m + 1) with hlt | hge
     · have hih := ih i (by omega) (by omega)
-      have hstep
-          : qminor E
-                (fun l : Fin (m + 1) => pe k r l.val)
-                (fun l : Fin (m + 1) => pe k r (if l.val < i then l.val else l.val + 1))
-                u
-              - qminor E
-                (fun l : Fin m => pe k r l.val)
-                (fun l : Fin m => pe k r (if l.val < i then l.val else l.val + 1))
-                u
-            ∈ Ideal.span (rgen k r z' E) := by
-        have hc :=
-          peel_core (Ideal.span (rgen k r z' E)) (ι := Unit)
-            (fun _ => (1 : ℂ))
-            (fun l : Fin (m + 1) =>
-              qminor E ((fun l : Fin (m + 1) => pe k r l.val) ∘ l.succAbove)
-                (fun l : Fin m => pe k r (if l.val < i then l.val else l.val + 1))
-                u)
-            (fun l _ => Tm E (u - (m : ℂ)) (pe k r l.val) (pe k r (m + 1)))
-            1 ?_
+      have hstep : qminor E (fun l : Fin (m + 1) => pe k r l.val)
+            (fun l : Fin (m + 1) => pe k r (if l.val < i then l.val else l.val + 1)) u -
+          qminor E (fun l : Fin m => pe k r l.val)
+            (fun l : Fin m => pe k r (if l.val < i then l.val else l.val + 1)) u ∈
+            Ideal.span (rgen k r z' E) := by
+        have hc := peel_core (Ideal.span (rgen k r z' E)) (ι := Unit) (fun _ => (1 : ℂ))
+          (fun l : Fin (m + 1) => qminor E ((fun l : Fin (m + 1) => pe k r l.val) ∘ l.succAbove)
+              (fun l : Fin m => pe k r (if l.val < i then l.val else l.val + 1)) u)
+          (fun l _ => Tm E (u - (m : ℂ)) (pe k r l.val) (pe k r (m + 1))) 1 ?_
         · rw [Formalism.FourierDecayAlt.P.expansion_last_column A (2 * r + k + 1) m E]
-          have hm : ¬(m < i) := by omega
+          have hm : ¬ (m < i) := by omega
           simpa [Fin.succAbove_last, Fin.val_last, hm, Function.comp_def, Fin.coe_castSucc] using hc
         · intro l
           have hl := l.isLt
@@ -201,9 +185,8 @@ theorem first_peeling_minor_mem_ideal
       rwa [sub_add_sub_cancel] at hsum
     · have hi1 : i = m + 1 := by omega
       subst hi1
-      have e
-          : (fun l : Fin (m + 1) => pe k r (if l.val < m + 1 then l.val else l.val + 1))
-            = fun l : Fin (m + 1) => pe k r l.val := by
+      have e : (fun l : Fin (m + 1) => pe k r (if l.val < m + 1 then l.val else l.val + 1)) =
+          fun l : Fin (m + 1) => pe k r l.val := by
         funext l
         rw [if_pos l.isLt]
       rw [e, sub_self]
@@ -218,9 +201,8 @@ theorem first_peeling_identity : PeelingOmittedColumn := by
     simp only [xR, Formalism.QuantumDeterminants.eI, Fin.coe_castLE, pe_val]
     have := l.isLt
     omega
-  have e2
-      : (fun l : Fin m => xR k r (m + 1) hm (i.succAbove l))
-        = fun l : Fin m => pe k r (if l.val < i.val then l.val else l.val + 1) := by
+  have e2 : (fun l : Fin m => xR k r (m + 1) hm (i.succAbove l)) =
+      fun l : Fin m => pe k r (if l.val < i.val then l.val else l.val + 1) := by
     funext l
     apply Fin.ext
     simp only [xR, Formalism.QuantumDeterminants.eI, Fin.coe_castLE, pe_val, succAbove_val]

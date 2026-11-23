@@ -1,16 +1,67 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsFrPtOfClosedPoint
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsPreimmersionFst
+public import Development.AbelianVarietyTheory.Counterexamples.HeightSurvey.MatchingNotVacuous
+public import Development.AbelianVarietyTheory.Definitions.Divisors.IsLocalRingTrivSqZeroExt
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ChartStatementHolds
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.LocalPointFactorsOpenImmersion
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsLevelChangeMap
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ModulipointLiftToFinerLevelCompleteDVR
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsFrPtOfClosedPoint
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsGoodLevelMultipleSameAdelicPart
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsIntFrExtension
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsLevelChangeMap
+import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IntegralFrameExtensionExists
+import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IntegralPointModelOverDvr
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.LocalPointFactorsOpenImmersion
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ModulipointLiftToFinerLevelCompleteDVR
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.TangentFrameBaseChange
+public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsCoversOfHalves
+import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ChartFlagBaseHolds
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsAffineTangentBasisLocally
+import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.LocalSystemBasesNonempty
+import Development.AbelianVarietyTheory.Proofs.ModuliProofs.CompactifiedModuliPartOne
+import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ExistsModuliSchemePolarizedAbelianLevel
+import Development.AbelianVarietyTheory.Proofs.RingsOfIntegers.ExistsCdvrFiniteExtension
 public import Development.AbelianVarietyTheory.Proofs.RingsOfIntegers.IntegralFramedPointBaseChangeStable
-public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.CompactifiedModuliPartOne
-public import Development.AbelianVarietyTheory.Definitions.Divisors.NormNegCmConstantEqAtAllEmbeddings
-public import Formalism.LocalToGlobal.ProjectiveLattices.ExtPtUnique
+public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.ModuliPointIntegralFrameAfterFiniteExtension
+import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.SemiAbelianDvrExtensionsIsoCompatible
+import Formalism.LocalToGlobal.ProjectiveLattices.CompSplitPfD
+import Formalism.LocalToGlobal.ProjectiveLattices.ExtPtUnique
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.AbProj
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDescent.ChartPullbacks.CubePullbacks.CubePull
 
 @[expose] public section
 
@@ -101,7 +152,6 @@ theorem comp_eq_of_lift
   rfl
 
 open GlobalTheory.LocM.BaseMdl in
-set_option maxHeartbeats 1000000 in
 theorem exists_isCoord
     {R : Type} [CommRing R]
     {ξ : Sp R ⟶ Y.X} {g : ℕ} {e : Fin g → (Sp (DualNumber R) ⟶ Y.t.G.left)}
@@ -234,7 +284,6 @@ theorem exists_lift_frPt
     exact hqZ
 
 include ν in
-set_option maxHeartbeats 1000000 in
 theorem exists_intFr_lift
     (T : CDVR) (io : c.F →+* T.Fr) (yt : Sp T.V ⟶ Y.X) (yy : Sp T.Fr ⟶ Xo'.XF c')
     (z : letI := io.toAlgebra; FrPt Xo c T.Fr) (hz : yy ≫ Y.j = spMap (algebraMap T.V T.Fr) ≫ yt)
@@ -274,7 +323,6 @@ theorem exists_intFr_lift
   · rw [GlobalTheory.AllWt.ptF, GlobalTheory.AllWt.ptF, pullback.lift_snd, pullback.lift_snd]
 
 open GlobalTheory.LocM.BaseMdl in
-set_option maxHeartbeats 1000000 in
 theorem exists_change
     {R : Type} [CommRing R]
     {ξ : Sp R ⟶ Y.X} {g : ℕ} {e : Fin g → (Sp (DualNumber R) ⟶ Y.t.G.left)}
@@ -396,7 +444,6 @@ theorem value_map
   linear_combination (ι (M₁.submatrix id I).det * (C₂'.submatrix J id).det) * k1
 
 open GlobalTheory.ModelFrameCompare MonObj in
-set_option maxHeartbeats 1000000 in
 theorem images_eigenBasis
     (σ : E →+* ℂ)
     (T : CDVR) (io : c.F →+* T.Fr) (y₀ : IntFr Xo c T io) (xV : Sp T.V ⟶ Y.X)
@@ -498,7 +545,6 @@ theorem images_eigenBasis
     exact h5
 
 open GlobalTheory.LocM.BaseMdl in
-set_option maxHeartbeats 1000000 in
 theorem coord_integral
     {R : Type} [CommRing R]
     {ξ : Sp R ⟶ Y.X} {g : ℕ} {e : Fin g → (Sp (DualNumber R) ⟶ Y.t.G.left)}
@@ -713,7 +759,6 @@ theorem exists_local
   exact (DFunLike.congr_fun hι₀ a).symm
 
 include ν in
-set_option maxHeartbeats 1000000 in
 theorem chart_bound
     {hle : c.F ≤ c'.F}
     (hr
@@ -927,7 +972,6 @@ theorem chart_bound
   ring
 
 omit Y r ν in
-set_option maxHeartbeats 1000000 in
 theorem exists_denom
     (hpq : 1 ≤ Dw.p + Dw.q) (hA : l.A = 1)
     (Z : Comp Xo c)

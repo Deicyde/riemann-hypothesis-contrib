@@ -1,13 +1,59 @@
 module
 
-public import Mathlib
 public import GroundTheory.HeightsAndTheta.Heights.HilbertSamuel.StatementsTwoBlockModuleFinite
-public import GroundTheory.HeightsAndTheta.Heights.HilbertSamuel.PTwoBlockCycleExpand
 public import GroundTheory.HeightsAndTheta.Heights.HilbertSamuel.PCoordArithOfFnField
-public import GroundTheory.HeightsAndTheta.Heights.HilbertSamuel.PTwoBlockFnField
+public import GroundTheory.HeightsAndTheta.Heights.HilbertSamuel.PTwoBlockCycleExpand
+import GroundTheory.HeightsAndTheta.Heights.HilbertSamuel.PTwoBlockFnField
+import GroundTheory.HeightsAndTheta.Heights.HilbertSamuel.StatementsArith
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.Order.CompletePartialOrder
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArakelovGeometry.IsHomogeneousGrL
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArakelovGeometry.TwoLeKrullDimOfRelevantPrime
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.InterRed
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.InterRed
 
 @[expose] public section
 
@@ -15,8 +61,7 @@ set_option maxSynthPendingDepth 1
 
 namespace GroundTheory.Heights₂.Heights.HilbertSamuel
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
-  ReciprocityTheory.ChartRestriction.G.ArakelovGeometry
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.ArakelovGeometry
 
 noncomputable section
 
@@ -26,37 +71,35 @@ namespace TwoBlockModuleFinite
 
 variable {Ω : Type} [Field Ω] [CharZero Ω] {κ : Type} [Fintype κ]
 
-theorem cone_X (x x' : Ix κ → Ω) (p : Σ k, FinTwoTypeFamily κ k)
-    : mConeMap (pair x x') (X p : MRing (FinTwoTypeFamily κ))
-      = MvPolynomial.C (pair x x' p) * X p.1 :=
+theorem cone_X (x x' : Ix κ → Ω) (p : Σ k, FinTwoTypeFamily κ k) :
+    mConeMap (pair x x') (X p : MRing (FinTwoTypeFamily κ)) = MvPolynomial.C (pair x x' p) * X p.1 :=
   aeval_X _ _
 
-theorem cone_num (x x' : Ix κ → Ω) (l : Ix κ → ℤ)
-    : mConeMap (pair x x') (twoBlockNum l) = MvPolynomial.C (∑ j, (l j : Ω) * x' j) * X 1 := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [twoBlockNum, map_sum, map_mul, Finset.sum_mul]
+theorem cone_num (x x' : Ix κ → Ω) (l : Ix κ → ℤ) :
+    mConeMap (pair x x') (twoBlockNum l) = MvPolynomial.C (∑ j, (l j : Ω) * x' j) * X 1 := by
+
+  simp only [twoBlockNum, map_sum, map_mul, Finset.sum_mul]
   refine Finset.sum_congr rfl fun j _ => ?_
   obtain ⟨⟨⟩, j⟩ := j
   rw [cone_X]
   simp [mConeMap, pair, mul_assoc]
 
-theorem coneMap_firstBlock_linearForm (x x' : Ix κ → Ω) (n : Ix κ → ℤ)
-    : mConeMap (pair x x')
-        (∑ i : Ix κ, MvPolynomial.C (n i) * (X ⟨0, i.2⟩ : MRing (FinTwoTypeFamily κ)))
-      = MvPolynomial.C (∑ i, (n i : Ω) * x i) * X 0 := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, map_mul, Finset.sum_mul]
+theorem coneMap_firstBlock_linearForm (x x' : Ix κ → Ω) (n : Ix κ → ℤ) :
+    mConeMap (pair x x') (∑ i : Ix κ, MvPolynomial.C (n i) * (X ⟨0, i.2⟩ : MRing (FinTwoTypeFamily κ))) =
+      MvPolynomial.C (∑ i, (n i : Ω) * x i) * X 0 := by
+
+  simp only [map_sum, map_mul, Finset.sum_mul]
   refine Finset.sum_congr rfl fun i _ => ?_
   obtain ⟨⟨⟩, i⟩ := i
   rw [cone_X]
   simp [mConeMap, pair, mul_assoc]
 
-theorem mem_twoBlockIdeal (x x' : Ix κ → Ω) (f : MRing (FinTwoTypeFamily κ))
-    : f ∈ twoBlockIdeal x x' ↔ mConeMap (pair x x') f = 0 :=
+theorem mem_twoBlockIdeal (x x' : Ix κ → Ω) (f : MRing (FinTwoTypeFamily κ)) :
+    f ∈ twoBlockIdeal x x' ↔ mConeMap (pair x x') f = 0 :=
   RingHom.mem_ker
 
-theorem le_of_add_one_le' {a : WithBot ℕ∞} {n : ℕ} (h : a + 1 ≤ ((n + 1 : ℕ) : WithBot ℕ∞))
-    : a ≤ ((n : ℕ) : WithBot ℕ∞) := by
+theorem le_of_add_one_le' {a : WithBot ℕ∞} {n : ℕ} (h : a + 1 ≤ ((n + 1 : ℕ) : WithBot ℕ∞)) :
+    a ≤ ((n : ℕ) : WithBot ℕ∞) := by
   induction a using WithBot.recBotCoe with
   | bot => exact bot_le
   | coe b =>
@@ -71,6 +114,7 @@ theorem le_of_add_one_le' {a : WithBot ℕ∞} {n : ℕ} (h : a + 1 ≤ ((n + 1 
       exact_mod_cast (by omega : m ≤ n)
 
 end TwoBlockModuleFinite
+
 
 open TwoBlockModuleFinite in
 theorem TwoBlockModuleFinite.proof : TwoBlockModuleFinite.Statement := by
@@ -98,14 +142,12 @@ theorem TwoBlockModuleFinite.proof : TwoBlockModuleFinite.Statement := by
       (fun k => by
         fin_cases k
         · exact ⟨c, by simpa [pair] using hxc0⟩
-        · exact ⟨i₁, by simpa [pair] using hi₁⟩)
-      hFp.symm hxA
+        · exact ⟨i₁, by simpa [pair] using hi₁⟩) hFp.symm hxA
   obtain ⟨S, hS, hPS⟩ := hpA.2.1.2.1
 
   have hL : ∀ i : κ, ∃ L : Ix κ → ℤ, x ⟨(), i⟩ = ∑ j, (L j : Ω) * x' j := by
     intro i
-    have hmem : x ⟨(), i⟩ ∈ Submodule.span ℤ (Set.range x') :=
-      hspan (Submodule.subset_span ⟨_, rfl⟩)
+    have hmem : x ⟨(), i⟩ ∈ Submodule.span ℤ (Set.range x') := hspan (Submodule.subset_span ⟨_, rfl⟩)
     obtain ⟨L, hL⟩ := (Submodule.mem_span_range_iff_exists_fun ℤ).mp hmem
     exact ⟨L, by rw [← hL]; simp [zsmul_eq_mul]⟩
   choose L hL using hL
@@ -139,33 +181,27 @@ theorem TwoBlockModuleFinite.proof : TwoBlockModuleFinite.Statement := by
     Ideal.mem_sup_right (Ideal.subset_span ⟨i, rfl⟩)
   have hlx : ∑ j, (l j : Ω) * x' j = x ⟨(), c⟩ := hxc.symm
   refine ⟨?_, ?_, ?_, ⟨N, hN0, ?_⟩, ?_⟩
-  · refine ⟨S ∪ Set.range fun j : κ => twoBlockDen c * X ⟨1, j⟩, ?_, ?_⟩
+  ·
+    refine ⟨S ∪ Set.range fun j : κ => twoBlockDen c * X ⟨1, j⟩, ?_, ?_⟩
     · rintro f (hf | ⟨j, rfl⟩)
       · exact hS f hf
-      · exact ⟨
-          _,
-          ReciprocityTheory.ChartRestriction.G.ArakelovGeometry.isMultiHomog_mul
-            (TwoBlockCycleExpand.isMultiHomog_twoBlockDen c)
-            (ReciprocityTheory.ChartRestriction.G.Geo.isMultiHomog_X _)
-        ⟩
+      · exact ⟨_, ReciprocityTheory.ChartRestriction.G.ArakelovGeometry.isMultiHomog_mul (TwoBlockCycleExpand.isMultiHomog_twoBlockDen c)
+          (ReciprocityTheory.ChartRestriction.G.Geo.isMultiHomog_X _)⟩
     · rw [twoBlockMOuter, hPS, Ideal.span_union]
-  · refine ⟨S ∪ Set.range fun i : κ => twoBlockNum l * X ⟨0, i⟩, ?_, ?_⟩
+  ·
+    refine ⟨S ∪ Set.range fun i : κ => twoBlockNum l * X ⟨0, i⟩, ?_, ?_⟩
     · rintro f (hf | ⟨i, rfl⟩)
       · exact hS f hf
-      · exact ⟨
-          _,
-          ReciprocityTheory.ChartRestriction.G.ArakelovGeometry.isMultiHomog_mul
-            (TwoBlockCycleExpand.isMultiHomog_twoBlockNum l)
-            (ReciprocityTheory.ChartRestriction.G.Geo.isMultiHomog_X _)
-        ⟩
+      · exact ⟨_, ReciprocityTheory.ChartRestriction.G.ArakelovGeometry.isMultiHomog_mul (TwoBlockCycleExpand.isMultiHomog_twoBlockNum l)
+          (ReciprocityTheory.ChartRestriction.G.Geo.isMultiHomog_X _)⟩
     · rw [twoBlockMInner, hPS, Ideal.span_union]
-  · rw [twoBlockMInner, sup_le_iff]
+  ·
+    rw [twoBlockMInner, sup_le_iff]
     refine ⟨hPO, Ideal.span_le.mpr ?_⟩
     rintro _ ⟨i, rfl⟩
-    have hd
-        : twoBlockNum l * X ⟨0, i⟩ - twoBlockDen c * twoBlockNum (L i) ∈ twoBlockIdeal x x' := by
-      rw [mem_twoBlockIdeal, map_sub, map_mul, map_mul, cone_num, cone_num, twoBlockDen, cone_X,
-        cone_X, hlx, ← hL i]
+    have hd : twoBlockNum l * X ⟨0, i⟩ - twoBlockDen c * twoBlockNum (L i) ∈ twoBlockIdeal x x' := by
+      rw [mem_twoBlockIdeal, map_sub, map_mul, map_mul, cone_num, cone_num, twoBlockDen, cone_X, cone_X, hlx,
+        ← hL i]
       simp [pair]
       ring
     have hs : twoBlockDen c * twoBlockNum (L i) ∈ twoBlockMOuter x x' c := by
@@ -175,7 +211,8 @@ theorem TwoBlockModuleFinite.proof : TwoBlockModuleFinite.Statement := by
         exact Ideal.mul_mem_left _ _ (hgO j.2)
     have h := Ideal.add_mem _ (hPO hd) hs
     rwa [sub_add_cancel] at h
-  · intro f hf
+  ·
+    intro f hf
     rw [twoBlockMOuter, Submodule.mem_sup] at hf
     obtain ⟨p, hp, s, hs, rfl⟩ := hf
     rw [mul_add]
@@ -183,34 +220,30 @@ theorem TwoBlockModuleFinite.proof : TwoBlockModuleFinite.Statement := by
     induction hs using Submodule.span_induction with
     | mem g hg =>
       obtain ⟨j, rfl⟩ := hg
-      have hd
-          : (N : MRing (FinTwoTypeFamily κ)) * (twoBlockDen c * X ⟨1, j⟩)
-              - twoBlockNum l
-                * ∑ i : Ix κ, MvPolynomial.C (n ⟨(), j⟩ i) * (X ⟨0, i.2⟩ : MRing (FinTwoTypeFamily κ))
-            ∈ twoBlockIdeal x x' := by
-        rw [mem_twoBlockIdeal, map_sub, map_mul, map_mul, map_mul, map_natCast, cone_num,
-          coneMap_firstBlock_linearForm, twoBlockDen, cone_X, cone_X, hlx, ← hNx' j]
+      have hd : (N : MRing (FinTwoTypeFamily κ)) * (twoBlockDen c * X ⟨1, j⟩) -
+          twoBlockNum l * ∑ i : Ix κ, MvPolynomial.C (n ⟨(), j⟩ i) * (X ⟨0, i.2⟩ : MRing (FinTwoTypeFamily κ)) ∈
+            twoBlockIdeal x x' := by
+        rw [mem_twoBlockIdeal, map_sub, map_mul, map_mul, map_mul, map_natCast, cone_num, coneMap_firstBlock_linearForm, twoBlockDen, cone_X,
+          cone_X, hlx, ← hNx' j]
         simp [pair]
         ring
-      have hs
-          : twoBlockNum l
-              * ∑ i : Ix κ, MvPolynomial.C (n ⟨(), j⟩ i) * (X ⟨0, i.2⟩ : MRing (FinTwoTypeFamily κ))
-            ∈ twoBlockMInner x x' l := by
+      have hs : twoBlockNum l * ∑ i : Ix κ, MvPolynomial.C (n ⟨(), j⟩ i) * (X ⟨0, i.2⟩ : MRing (FinTwoTypeFamily κ)) ∈
+          twoBlockMInner x x' l := by
         rw [Finset.mul_sum]
         exact Ideal.sum_mem _ fun i _ => by
           rw [mul_left_comm]
           exact Ideal.mul_mem_left _ _ (hgI i.2)
       have h := Ideal.add_mem _ (hPI hd) hs
       rwa [sub_add_cancel] at h
-    | zero =>
-      simp
+    | zero => simp
     | add a b _ _ ha hb =>
       rw [mul_add]
       exact Ideal.add_mem _ ha hb
     | smul r a _ ha =>
       rw [smul_eq_mul, mul_left_comm]
       exact Ideal.mul_mem_left _ _ ha
-  · intro W hW hIW _
+  ·
+    intro W hW hIW _
     have : (twoBlockIdeal x x').IsPrime := hpA.2.1.1
     have := hW
     have hlt : twoBlockIdeal x x' < W := by

@@ -1,10 +1,56 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ThetaPartD
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsBoundUnitary
+public import Development.AbelianVarietyTheory.BlockTheory.SiegelEisenstein.GramMatrixAdjoint
+public import Development.WeilBound.CoreStatements.TemperedRepresentationTheory.WeilSiegelTheta.BigCellDefs
+import Development.AbelianVarietyTheory.Counterexamples.HeightSurvey.StarPurelyImaginaryEqNeg
+public import Development.AbelianVarietyTheory.Proofs.AdelicLatticeProofs.FinTensMemLatO
+public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.RationalAdelicMatricesSelfAnnihilator
 public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.SecondOnCommonRangeOfSecond
+import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.SelfDualOfCovolumeOneStatement
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ContinuousHermPart
+import Formalism.LocalToGlobal.IndefiniteReal.FinitePlaces.IdemElt
+import Formalism.LocalToGlobal.IndefiniteReal.LevelTypeEquivalence.GinfCSecondCountable
+import Formalism.LocalToGlobal.ProjectiveLattices.HalfOneAddSqrtNegIsIntegral
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.PicardGroup
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
 
 @[expose] public section
 
@@ -136,8 +182,8 @@ theorem pairing_tup (V : HSp D) (ψ : AddChar (AF D.host.F) ℂ) (x y : Mx D V.r
     GlobalTheory.IndefiniteRowSideFullHecke.GramMatrixBlocks.trA
   rw [GlobalTheory.SiegelWeilLitCompare.gramQ_eq]
   congr 1
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [BR, Matrix.trace, Matrix.diag, map_sum]
+
+  simp only [BR, Matrix.trace, Matrix.diag, map_sum]
   refine Finset.sum_congr rfl fun a _ => ?_
   rw [← hR_tup]
   rfl
@@ -199,8 +245,8 @@ theorem trF_adj (a b : Mx D r r) : trF (adj a) (adj b) = trF a b := by
   have h : Matrix.trace (adj a * adj b) = cA D (Matrix.trace (b * a)) := by
     have e : adj a * adj b = adj (b * a) := (adj_mul b a).symm
     rw [e]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [Matrix.trace, map_sum]
+
+    simp only [Matrix.trace, map_sum]
     rfl
   unfold trF
   rw [h, GlobalTheory.DualPairCheck.trace_cA, Matrix.trace_mul_comm]
@@ -276,8 +322,6 @@ theorem pairH_annih {ψ : AddChar (AF D.host.F) ℂ} (hψ : IsCharAF D.host.F ψ
       exact trF_adj _ _
     rw [e, half_add_self]
 
-set_option maxHeartbeats 1000000 in
-set_option synthInstance.maxHeartbeats 400000 in
 theorem sdHerm_map
     {ψ : AddChar (AF D.host.F) ℂ} (hψ : IsCharAF D.host.F ψ)
     {lam : Measure (hermA D r)} {𝓖 : Set (hermA D r)} (hl : IsCovolOneH lam 𝓖)
@@ -320,8 +364,6 @@ theorem sdHerm_map
 
 end Herm
 
-set_option maxHeartbeats 1000000 in
-set_option synthInstance.maxHeartbeats 400000 in
 theorem whit_eq_coefN
     : ∀ (D : D7) (r : ℕ) (V : HSp D) (ψ : AddChar (AF D.host.F) ℂ),
       IsCharAF D.host.F ψ

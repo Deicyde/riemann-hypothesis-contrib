@@ -1,6 +1,45 @@
 module
 
 public import Formalism.SharpRestriction.GrowthBounds.ChartComparison.LocGoodLocJ
+public import Formalism.SharpRestriction.GrowthBounds.ChartComparison.StepIn
+import Formalism.LocalToGlobal.GroupLattices.ComparisonMaps.ClsOrb
+import Formalism.LocalToGlobal.GroupLattices.LevelCharts.FiniteClassSetOfFiniteIndex
+import Formalism.LocalToGlobal.GroupLattices.TiedFamilies.TiePtRec
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -37,7 +76,6 @@ def SameUlocJ
     : Prop :=
   ∀ v, S.Uloc v = (Uloc v).map (reGL (rankN D (i + 1) hi) _).toMonoidHom
 
-set_option maxHeartbeats 2000000 in
 def HypTJ : Prop :=
   ∀ (w' : HeightOneSpectrum (𝓞 D.host.F))
       (h : ((D.what₂.places.resChar w : ℕ) : 𝓞 D.host.F) ∈ w'.asIdeal)
@@ -59,7 +97,6 @@ def HypTJ : Prop :=
           ∈ w'.adicCompletionIntegers D.host.F)
       → x ∈ Uloc w'
 
-set_option maxHeartbeats 4000000 in
 theorem locHyp_locJ (hU : SameUlocJ hi S Uloc) (hB : FrRatJ t B) (hT : HypTJ t)
     : LocHyp S (locJ hi t B) := by
   refine locHyp_of (rankN D (i + 1) hi) (locJ hi t B) S (D.sp.X (i + 1)).gram
@@ -70,7 +107,6 @@ theorem locHyp_locJ (hU : SameUlocJ hi S Uloc) (hB : FrRatJ t B) (hT : HypTJ t)
   · rw [hfr]; exact h1
   · rw [hfr]; exact h2
 
-set_option maxHeartbeats 4000000 in
 theorem comp_locJ
     (hU : SameUlocJ hi S Uloc)
     (x : UPts (sigD D) (gramN D (i + 1) hi) (FiniteAdeleRing (𝓞 D.host.F) D.host.F))
@@ -107,7 +143,6 @@ theorem gam_away (c : cmp) (γ : (Lv.levS i (em c)).Γ)
       ∈ awayG D.sp.cm.sig (D.sp.X (i + 1)).gram Uloc (D.what₂.places.resChar w) :=
   (mem_map_conj _ _ _).1 ((t.gamI_range c _).1 ⟨γ, rfl⟩)
 
-set_option maxHeartbeats 4000000 in
 theorem gam_re (c : cmp) (γ : ((gatCh (gatJ Lv (i + 1)) em).lev c).Γ)
     : ((locJ hi t B).yG c)⁻¹
         * bc (inclE (F := D.host.F) (FiniteAdeleRing (𝓞 D.host.F) D.host.F))
@@ -120,7 +155,6 @@ theorem gam_re (c : cmp) (γ : ((gatCh (gatJ Lv (i + 1)) em).lev c).Γ)
   rw [map_mul, map_mul, map_inv, ← bc_reGL]
   rfl
 
-set_option maxHeartbeats 4000000 in
 theorem gam_locJ (hU : SameUlocJ hi S Uloc) (c : cmp) (γ : ((gatCh (gatJ Lv (i + 1)) em).lev c).Γ)
     : ((locJ hi t B).yG c)⁻¹
           * bc (inclE (F := D.host.F) (FiniteAdeleRing (𝓞 D.host.F) D.host.F))
@@ -165,7 +199,6 @@ def UnitCharacterChartCompatibility
               * e r
             = 1
 
-set_option maxHeartbeats 4000000 in
 theorem chi_locJ
     (e : D.what₂.LL →+* (D.gat u w hg).Kf)
     (heps : eps = 1) (hψ : UnitCharacterChartCompatibility hi S e ψ)
@@ -195,7 +228,6 @@ variable
   {C : ColumnChain D.R D.what₂.Tau (D.hcW u)} {A : ColumnsAtT D.R C} {P : PeriodMap D.R C}
   (M : MemberForms D.what₂.LL D.what₂.embLL D.what₂.places D.what₂.Tau (D.hcW u) C A P)
 
-set_option maxHeartbeats 1000000 in
 structure FormsIn (j : ℕ) (hj : j ≤ D.R.m) where
   T : ℕ
   bad : Set (HeightOneSpectrum (𝓞 D.host.F))
@@ -209,7 +241,6 @@ structure FormsIn (j : ℕ) (hj : j ≤ D.R.m) where
   val : ValuationCompatibleChart M eY okW chOf K
   tw : ∀ β, DetTw (K β).lev (embT D) (cTw D j)
 
-set_option maxHeartbeats 1000000 in
 structure LocIn
     (X : Formalism.L2.Herm.Herm0 D)
     (u : D.what₂.Word) (w : D.what₂.places.Pl)
@@ -236,7 +267,6 @@ attribute [instance] LocIn.fin
 
 variable {M}
 
-set_option maxHeartbeats 2000000 in
 def stepInOf
     (Fo : FormsIn M (i + 1) hi) (Lc : LocIn X u w hg Lv i Fo.Ch)
     (pos : (Σ v : Fin (Fl.Pj (i + 1)).nV, Fin ((Fl.Pj (i + 1)).n' v)) ≃ D.what₂.Tau)
@@ -257,7 +287,6 @@ def stepInOf
   loc := fun β => locJ hi (Lc.t β) Lc.B
   pos := pos
 
-set_option maxHeartbeats 2000000 in
 structure LocTies
     (Fo : FormsIn M (i + 1) hi) (Lc : LocIn X u w hg Lv i Fo.Ch)
     (pos : (Σ v : Fin (Fl.Pj (i + 1)).nV, Fin ((Fl.Pj (i + 1)).n' v)) ≃ D.what₂.Tau)
@@ -280,7 +309,6 @@ structure LocTies
   chiRat : ChiRatAll (Fo.K β).lev D.what₂.embLL
   chRat : ∀ cl, ∃ r : D.what₂.LL, D.what₂.embLL r = ((Fo.tw β).ch ((Fo.K β).y cl) : ℂ)
 
-set_option maxHeartbeats 8000000 in
 theorem core_of
     {Fo : FormsIn M (i + 1) hi} {Lc : LocIn X u w hg Lv i Fo.Ch}
     {pos : (Σ v : Fin (Fl.Pj (i + 1)).nV, Fin ((Fl.Pj (i + 1)).n' v)) ≃ D.what₂.Tau}

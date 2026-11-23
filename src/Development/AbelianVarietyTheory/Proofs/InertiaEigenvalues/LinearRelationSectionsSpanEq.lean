@@ -1,11 +1,46 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.IntFormsSubset
-public import Development.AbelianVarietyTheory.Definitions.HeightFunctions.XiValIffXiAt
-public import Development.AbelianVarietyTheory.Definitions.ExistenceOfLattices.CoeSelfDualLatticeInFrameCoordinatesEq
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.RdIndepOfLawsM
-public import Formalism.LocalToGlobal.ProjectiveLattices.CuspMulOf
+public import Formalism.LocalToGlobal.ProjectiveLattices.CuspFDOf
+public import Formalism.LocalToGlobal.ProjectiveLattices.FamilyUniformisationBasePointOrthogonalBis
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Development.AbelianVarietyTheory.Definitions.ExistenceOfLattices.CoeSelfDualLatticeInFrameCoordinatesEq
+import Development.AbelianVarietyTheory.Definitions.ExistenceOfLattices.PermutesRefl
+import Development.AbelianVarietyTheory.Definitions.HeightFunctions.XiValIffXiAt
+import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.IntFormsSubset
 
 @[expose] public section
 
@@ -44,8 +79,8 @@ theorem mem_span_of_sum_mul
   have hsol : ∀ m j, ∑ k, β k m * α k j = 0 := by
     intro m j
     have hs : ∑ m, (∑ k, β k m * α k j) • (ζ m : ℂ) = 0 := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp_rw [hsm, map_sum, map_mul, Finset.sum_mul]
+
+      simp_rw [hsm, map_sum, map_mul, Finset.sum_mul]
       rw [Finset.sum_comm, ← hz j]
       refine Finset.sum_congr rfl fun k _ => ?_
       rw [hzexp k, Finset.sum_mul]
@@ -89,8 +124,8 @@ theorem mem_span_of_sum_smul
   have hz' : ∀ p : ι × Fin (Module.finrank F V'), ∑ k, z k * σ (α k p) = 0 := by
     rintro ⟨i, m⟩
     have h := hz i
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp_rw [hAexp, map_sum, map_smulₛₗ, Finset.smul_sum, smul_smul] at h
+
+    simp_rw [hAexp, map_sum, map_smulₛₗ, Finset.smul_sum, smul_smul] at h
     rw [Finset.sum_comm] at h
     simp_rw [← Finset.sum_smul] at h
     exact (Fintype.linearIndependent_iff.1 hrli) _ h m

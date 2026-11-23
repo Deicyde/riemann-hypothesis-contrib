@@ -1,8 +1,49 @@
 module
 
-public import Mathlib
 public import Formalism.SharpRestriction.LevelLetterCocycles.UniformizerMemDeltaInvariants
+public import Formalism.JumpKernelCokernel.JumpShiftProofs.TorsKerSum
 public import Formalism.JumpKernelCokernel.LengthTheoremsWithEarlier
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Real
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Coalgebra.IsFrobenius
+import Mathlib.RingTheory.HopfAlgebra.Basic
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.TotallySplit
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -10,77 +51,56 @@ noncomputable section
 
 namespace Formalism.MainNotions.RamifiedCoefficientChains.S9.DetD
 
-open Module Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc
-  Formalism.MainNotions.RamifiedCoefficientChains Formalism.MainNotions.RamifiedCoefficientChains.S9
-  Formalism.MainNotions.RamifiedCoefficientChains.S9.LD
+open Module Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.RamifiedCoefficientChains Formalism.MainNotions.RamifiedCoefficientChains.S9 Formalism.MainNotions.RamifiedCoefficientChains.S9.LD
 
-variable
-  {G : Type} [Group G] [TopologicalSpace G]
-  {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K] [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K]
-  [IsScalarTower Qp K₀ K]
-  {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
-  [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
-  [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
-  {PD : PeriodData G Qp K₀ K B BdR} {LL O : Type}
-  [Field LL] [Algebra Qp LL] [TopologicalSpace LL] [CommRing O] [Algebra O LL]
-  {v : AddValuation LL (WithTop ℚ)} {n : ℕ} [NeZero n]
-  (W : LocWach PD LL O v n)
+variable {G : Type} [Group G] [TopologicalSpace G] {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K]
+    [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K] [IsScalarTower Qp K₀ K]
+    {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
+    [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
+    [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
+    {PD : PeriodData G Qp K₀ K B BdR} {LL O : Type} [Field LL] [Algebra Qp LL] [TopologicalSpace LL]
+    [CommRing O] [Algebra O LL] {v : AddValuation LL (WithTop ℚ)} {n : ℕ} [NeZero n]
+    (W : LocWach PD LL O v n)
 
 def π0N (T : LocLat G Qp LL O) (i : ZMod n) : Submodule O ↥(NDl W T i) :=
   ((NDl W T i).map (W.π₀ • (LinearMap.id : W.DD T →ₗ[O] W.DD T))).comap (NDl W T i).subtype
 
-def IsRed (T : LocLat G Qp LL O) (i : ZMod n) {r : ℕ} (red : ↥(NDl W T i) →ₗ[O] (Fin r → O))
-    : Prop :=
+def IsRed (T : LocLat G Qp LL O) (i : ZMod n) {r : ℕ} (red : ↥(NDl W T i) →ₗ[O] (Fin r → O)) : Prop :=
   Function.Surjective red ∧ LinearMap.ker red = π0N W T i
 
-theorem length_coker_le
-    {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
-    {r : ℕ} (QQ : Matrix (Fin r) (Fin r) O)
-    (l : O) (hl : l ≠ 0)
-    (V : ℕ) (hd : QQ.det ∣ l ^ V)
-    : Module.length O ((Fin r → O) ⧸ LinearMap.range (Matrix.toLin' QQ))
-      ≤ (V : ℕ∞) * Module.length O (O ⧸ Ideal.span {l}) := by
+theorem length_coker_le {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] {r : ℕ}
+    (QQ : Matrix (Fin r) (Fin r) O) (l : O) (hl : l ≠ 0) (V : ℕ) (hd : QQ.det ∣ l ^ V) :
+    Module.length O ((Fin r → O) ⧸ LinearMap.range (Matrix.toLin' QQ)) ≤
+      (V : ℕ∞) * Module.length O (O ⧸ Ideal.span {l}) := by
   classical
   have hdet0 : QQ.det ≠ 0 := by
     intro h0
     rw [h0, zero_dvd_iff] at hd
     exact pow_ne_zero V hl hd
-  have hL :=
-    Formalism.KernelCokernelLengths.length_theorems_all_hold.1 O (Fin r → O) (Matrix.toLin' QQ)
-      (by rwa [LinearMap.det_toLin'])
-  rw [hL, LinearMap.det_toLin',
-    ← Formalism.KernelCokernelLengths.TorsionKernelSumLemmas.len_pow l hl V]
+  have hL := Formalism.KernelCokernelLengths.length_theorems_all_hold.1 O (Fin r → O) (Matrix.toLin' QQ) (by rwa [LinearMap.det_toLin'])
+  rw [hL, LinearMap.det_toLin', ← Formalism.KernelCokernelLengths.TorsionKernelSumLemmas.len_pow l hl V]
   have hle : Ideal.span {l ^ V} ≤ Ideal.span {QQ.det} := Ideal.span_singleton_le_span_singleton.2 hd
   first
-  | exact Module.length_le_of_surjective (Submodule.factor hle) (Submodule.factor_surjective hle)
-  | exact Module.length_le_of_surjective (Ideal.Quotient.factorₐ O hle).toLinearMap
-      (Ideal.Quotient.factor_surjective hle)
+    | exact Module.length_le_of_surjective (Submodule.factor hle) (Submodule.factor_surjective hle)
+    | exact Module.length_le_of_surjective (Ideal.Quotient.factorₐ O hle).toLinearMap
+        (Ideal.Quotient.factor_surjective hle)
 
-theorem lemmaDN_core
-    {d : ℕ} {T₁ T₂ : LocLat G Qp LL O} {F : LatHom T₁.L T₂.L} {b : ZMod n → ℕ} {S η m : ℕ}
-    (hS : SetCS W d T₁ T₂ F b S η m)
-    (i : ZMod n)
-    {r : ℕ} (red : ↥(NDl W T₂ i) →ₗ[O] (Fin r → O)) (hsurj : Function.Surjective red)
-    (hker : LinearMap.ker red = π0N W T₂ i)
-    {m' : ℕ} (hm' : m' ≤ m) (g : Fin m' → W.DD T₂) (hgN : ∀ j, g j ∈ NDl W T₂ i)
-    (cols : Fin r → ↥(NDl W T₂ i))
-    (hcols : ∀ k,
-      ((cols k : ↥(NDl W T₂ i)) : W.DD T₂) ∈ QhP W T₂ i (b i + S)
-        ∨ ∃ j, ((cols k : ↥(NDl W T₂ i)) : W.DD T₂) = g j)
+theorem lemmaDN_core {d : ℕ} {T₁ T₂ : LocLat G Qp LL O} {F : LatHom T₁.L T₂.L} {b : ZMod n → ℕ} {S η m : ℕ}
+    (hS : SetCS W d T₁ T₂ F b S η m) (i : ZMod n) {r : ℕ} (red : ↥(NDl W T₂ i) →ₗ[O] (Fin r → O))
+    (hsurj : Function.Surjective red) (hker : LinearMap.ker red = π0N W T₂ i) {m' : ℕ} (hm' : m' ≤ m)
+    (g : Fin m' → W.DD T₂) (hgN : ∀ j, g j ∈ NDl W T₂ i) (cols : Fin r → ↥(NDl W T₂ i))
+    (hcols : ∀ k, ((cols k : ↥(NDl W T₂ i)) : W.DD T₂) ∈ QhP W T₂ i (b i + S) ∨
+      ∃ j, ((cols k : ↥(NDl W T₂ i)) : W.DD T₂) = g j)
     (V : ℕ) (hV : V ≤ finrank LL T₂.V * S + 2 * ⌊cD PD.p (hpar n b S + η)⌋₊ * m)
-    (hdet : (Matrix.of fun l k => red (cols k) l).det ∣ ((PD.p : ℕ) : O) ^ V)
-    : ∃ s : Finset (W.DD T₂),
-      s.card ≤ m ∧ (↑s : Set (W.DD T₂)) ⊆ NDl W T₂ i
-        ∧ ∃ L kO : ℕ,
-          Module.length O
-                (↥(NDl W T₂ i) ⧸
-                  ((NDl W T₂ i).map (W.π₀ • (LinearMap.id : W.DD T₂ →ₗ[O] W.DD T₂)) ⊔
-                    (PhiPullΔ W T₂ i).map
-                      ((Formalism.MainNotions.LiftingTheory.qp W ^ (b i + S)) • (LinearMap.id : W.DD T₂ →ₗ[O] W.DD T₂)) ⊔
-                    Submodule.span O (↑s : Set (W.DD T₂))).comap (NDl W T₂ i).subtype)
-              ≤ (L : ℕ∞)
-            ∧ lenOl PD (O := O) = kO
-            ∧ (L : ℝ) ≤ lenC (finrank LL T₂.V) m PD.p (hpar n b S + η) S * kO := by
+    (hdet : (Matrix.of fun l k => red (cols k) l).det ∣ ((PD.p : ℕ) : O) ^ V) :
+    ∃ s : Finset (W.DD T₂), s.card ≤ m ∧ (↑s : Set (W.DD T₂)) ⊆ NDl W T₂ i ∧
+      ∃ L kO : ℕ, Module.length O (↥(NDl W T₂ i) ⧸
+          ((NDl W T₂ i).map (W.π₀ • (LinearMap.id : W.DD T₂ →ₗ[O] W.DD T₂)) ⊔
+            (PhiPullΔ W T₂ i).map
+              ((Formalism.MainNotions.LiftingTheory.qp W ^ (b i + S)) • (LinearMap.id : W.DD T₂ →ₗ[O] W.DD T₂)) ⊔
+            Submodule.span O (↑s : Set (W.DD T₂))).comap (NDl W T₂ i).subtype) ≤ (L : ℕ∞) ∧
+        lenOl PD (O := O) = kO ∧
+        (L : ℝ) ≤ lenC (finrank LL T₂.V) m PD.p (hpar n b S + η) S * kO := by
   classical
   obtain ⟨hdom, hdvr, -⟩ := hS.2.2.2.1
   haveI := hdom
@@ -98,15 +118,15 @@ theorem lemmaDN_core
   obtain ⟨k, u, hu⟩ := IsDiscreteValuationRing.eq_unit_mul_pow_irreducible hp0 hϖ
   have hm : IsLocalRing.maximalIdeal O = Ideal.span {ϖ} := by
     first
-    | exact hϖ.maximalIdeal_eq
-    | exact (IsDiscreteValuationRing.irreducible_iff_uniformizer ϖ).1 hϖ
+      | exact hϖ.maximalIdeal_eq
+      | exact (IsDiscreteValuationRing.irreducible_iff_uniformizer ϖ).1 hϖ
   have hlen1 : Module.length O (O ⧸ Ideal.span {ϖ}) = 1 := by
     rw [← hm]
     first
-    | exact Module.length_eq_one_iff.2 (isSimpleModule_iff_isCoatom.2
-        (IsLocalRing.maximalIdeal.isMaximal O).out)
-    | exact Module.length_eq_one_iff.2 (isSimpleModule_iff_isCoatom.2 (Ideal.isMaximal_def.1
-        (IsLocalRing.maximalIdeal.isMaximal O)))
+      | exact Module.length_eq_one_iff.2
+          (isSimpleModule_iff_isCoatom.2 (IsLocalRing.maximalIdeal.isMaximal O).out)
+      | exact Module.length_eq_one_iff.2
+          (isSimpleModule_iff_isCoatom.2 (Ideal.isMaximal_def.1 (IsLocalRing.maximalIdeal.isMaximal O)))
   have hlenp : Module.length O (O ⧸ Ideal.span {((PD.p : ℕ) : O)}) = (k : ℕ∞) := by
     rw [hu, Ideal.span_singleton_mul_left_unit u.isUnit,
       Formalism.KernelCokernelLengths.TorsionKernelSumLemmas.len_pow ϖ hϖ.ne_zero k, hlen1, mul_one]
@@ -140,32 +160,31 @@ theorem lemmaDN_core
       rw [LinearMap.mem_ker]
       have hv : Matrix.toLin' QQ v = red (∑ k', v k' • cols k') := by
         ext l'
-        set_option synthInstance.maxHeartbeats 100000 in
+
         simp [Matrix.toLin'_apply, Matrix.mulVec, dotProduct, map_sum, map_smul, QQ, mul_comm]
-      have he
-          : e.symm (red (∑ k', v k' • cols k')) = Submodule.Quotient.mk (∑ k', v k' • cols k') := by
+      have he : e.symm (red (∑ k', v k' • cols k')) =
+          Submodule.Quotient.mk (∑ k', v k' • cols k') := by
         rw [LinearEquiv.symm_apply_eq]
-        first | rfl | exact (LinearMap.quotKerEquivOfSurjective_apply_mk red hsurj _).symm
+        first
+          | rfl
+          | exact (LinearMap.quotKerEquivOfSurjective_apply_mk red hsurj _).symm
       simp only [f, LinearMap.coe_comp, Function.comp_apply, LinearEquiv.coe_coe, hv, he,
         Submodule.factor_mk, Submodule.Quotient.mk_eq_zero]
       first
-      | rw [Submodule.factor_mk, Submodule.Quotient.mk_eq_zero]
-      | (
-          change Submodule.Quotient.mk (p := X) (∑ k', v k' • cols k') = 0
-          rw [Submodule.Quotient.mk_eq_zero]
-        )
+        | rw [Submodule.factor_mk, Submodule.Quotient.mk_eq_zero]
+        | (change Submodule.Quotient.mk (p := X) (∑ k', v k' • cols k') = 0
+           rw [Submodule.Quotient.mk_eq_zero])
       exact Submodule.sum_mem _ fun k' _ => Submodule.smul_mem _ _ (hcolX k')
     let g' := (LinearMap.range (Matrix.toLin' QQ)).liftQ f hrange
     have hg' : Function.Surjective g' := by
       intro z
       obtain ⟨y, rfl⟩ := hf z
       exact ⟨Submodule.Quotient.mk y, rfl⟩
-    calc
-      Module.length O (↥(NDl W T₂ i) ⧸ X)
-          ≤ Module.length O ((Fin r → O) ⧸ LinearMap.range (Matrix.toLin' QQ)) :=
-        Module.length_le_of_surjective g' hg'
+    calc Module.length O (↥(NDl W T₂ i) ⧸ X)
+        ≤ Module.length O ((Fin r → O) ⧸ LinearMap.range (Matrix.toLin' QQ)) :=
+          Module.length_le_of_surjective g' hg'
       _ ≤ (V : ℕ∞) * Module.length O (O ⧸ Ideal.span {((PD.p : ℕ) : O)}) :=
-        length_coker_le QQ _ hp0 V hdet
+          length_coker_le QQ _ hp0 V hdet
       _ = ((V * k : ℕ) : ℕ∞) := by rw [hlenp, Nat.cast_mul]
   · unfold Formalism.WeaklyAdmissibleFiltrations.lenOl
     exact hlenp
@@ -177,10 +196,7 @@ theorem lemmaDN_core
       have := div_nonneg h2 h1.le
       linarith
     have hfl := Nat.floor_le hcD
-    have hV'
-        : (V : ℝ)
-          ≤ (finrank LL T₂.V : ℝ) * S
-            + 2 * m * Formalism.MainNotions.RamifiedCoefficientChains.cD PD.p (hpar n b S + η) := by
+    have hV' : (V : ℝ) ≤ (finrank LL T₂.V : ℝ) * S + 2 * m * Formalism.MainNotions.RamifiedCoefficientChains.cD PD.p (hpar n b S + η) := by
       have h := (Nat.cast_le (α := ℝ)).2 hV
       push_cast at h
       have hm0 : (0 : ℝ) ≤ m := Nat.cast_nonneg m
@@ -191,17 +207,14 @@ theorem lemmaDN_core
 
 def DetColsE : Prop :=
   ∀ (d : ℕ) (T₁ T₂ : LocLat G Qp LL O) (F : LatHom T₁.L T₂.L) (b : ZMod n → ℕ) (S η m : ℕ),
-    SetCS W d T₁ T₂ F b S η m
-      → ∀ i ∈ evens n d,
-        ∃ (r : ℕ) (red : ↥(NDl W T₂ i) →ₗ[O] (Fin r → O)) (_ : IsRed W T₂ i red) (m' : ℕ)
-            (_ : m' ≤ m) (g : Fin m' → W.DD T₂) (_ : ∀ j, g j ∈ NDl W T₂ i)
-            (cols : Fin r → ↥(NDl W T₂ i)),
-          (∀ k,
-              ((cols k : ↥(NDl W T₂ i)) : W.DD T₂) ∈ QhP W T₂ i (b i + S)
-                ∨ ∃ j, ((cols k : ↥(NDl W T₂ i)) : W.DD T₂) = g j)
-            ∧ ∃ V : ℕ,
-              V ≤ finrank LL T₂.V * S + 2 * ⌊cD PD.p (hpar n b S + η)⌋₊ * m
-                ∧ (Matrix.of fun l k => red (cols k) l).det ∣ ((PD.p : ℕ) : O) ^ V
+    SetCS W d T₁ T₂ F b S η m → ∀ i ∈ evens n d,
+      ∃ (r : ℕ) (red : ↥(NDl W T₂ i) →ₗ[O] (Fin r → O)) (_ : IsRed W T₂ i red)
+        (m' : ℕ) (_ : m' ≤ m) (g : Fin m' → W.DD T₂) (_ : ∀ j, g j ∈ NDl W T₂ i)
+        (cols : Fin r → ↥(NDl W T₂ i)),
+        (∀ k, ((cols k : ↥(NDl W T₂ i)) : W.DD T₂) ∈ QhP W T₂ i (b i + S) ∨
+          ∃ j, ((cols k : ↥(NDl W T₂ i)) : W.DD T₂) = g j) ∧
+        ∃ V : ℕ, V ≤ finrank LL T₂.V * S + 2 * ⌊cD PD.p (hpar n b S + η)⌋₊ * m ∧
+          (Matrix.of fun l k => red (cols k) l).det ∣ ((PD.p : ℕ) : O) ^ V
 
 theorem lemmaDN_of_detE (h : DetColsE W) : LemmaDN W := by
   intro d T₁ T₂ F b S η m hS i hi

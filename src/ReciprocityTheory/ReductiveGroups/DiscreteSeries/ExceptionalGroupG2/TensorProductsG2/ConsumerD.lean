@@ -1,15 +1,59 @@
 module
 
-public import ReciprocityTheory.ReductiveGroups.DiscreteSeries.TensorRepresentations.ConsumerC
-public import ReciprocityTheory.ReductiveGroups.DiscreteSeries.ExceptionalGroupG2.TensorProductsG2.ConsumerA
-public import ReciprocityTheory.ReductiveGroups.DiscreteSeries.DiscreteSeriesExistence.PuniqSmoothAddSmul
-public import ReciprocityTheory.ReductiveGroups.DiscreteSeries.DiscreteSeriesExistence.Compact
-public import ReciprocityTheory.ReductiveGroups.DiscreteSeries.CasimirCoefficients.ExpInPPosDef
 public import Formalism.PeriodIntegrals.ZuckTensor
-public import ReciprocityTheory.ReductiveGroups.DiscreteSeries.ExceptionalGroupG2.StdGap
-public import ReciprocityTheory.ReductiveGroups.DiscreteSeries.ExceptionalGroupG2.ExistenceG2.AnyDec
-public import ReciprocityTheory.ReductiveGroups.DiscreteSeries.ExceptionalGroupG2.ExistenceG2.DataGenSubIrred
-public import ReciprocityTheory.ReductiveGroups.DiscreteSeries.ExceptionalGroupG2.ExistenceG2.HasGelfandCharSigLam
+public import ReciprocityTheory.ReductiveGroups.DiscreteSeries.ExceptionalGroupG2.TensorProductsG2.CoefOfEmb
+public import ReciprocityTheory.ReductiveGroups.DiscreteSeries.HighestWeights.PieriRules.ExpEntryHasDerivAt
+public import ReciprocityTheory.ReductiveGroups.DiscreteSeries.HighestWeights.PieriRules.StdExpEntryHasDerivAt
+public import ReciprocityTheory.ReductiveGroups.DiscreteSeries.HighestWeights.PieriRules.TensRepA
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
+public import ReciprocityTheory.ReductiveGroups.DiscreteSeries.CasimirCoefficients.ExpInPPosDef
+public import ReciprocityTheory.ReductiveGroups.DiscreteSeries.DiscreteSeriesExistence.Compact
+public import ReciprocityTheory.ReductiveGroups.DiscreteSeries.DiscreteSeriesExistence.EquivSigLamOfIsDS
+import ReciprocityTheory.ReductiveGroups.DiscreteSeries.DiscreteSeriesExistence.PuniqSmoothAddSmul
+public import ReciprocityTheory.ReductiveGroups.DiscreteSeries.ExceptionalGroupG2.TensorProductsG2.ConsumerA
+import ReciprocityTheory.ReductiveGroups.DiscreteSeries.HighestWeights.Exists
+import ReciprocityTheory.ReductiveGroups.DiscreteSeries.HighestWeights.PieriRules.CartanKType
+public import ReciprocityTheory.ReductiveGroups.DiscreteSeries.TensorRepresentations.ConsumerC
+import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
@@ -21,21 +65,15 @@ namespace ReciprocityTheory.ChartRestriction.DS.G2
 
 variable {n : ℕ}
 
-theorem cns_shift_int (dual : Bool) {μ : Fin n → ℝ} (hμ : S7.IsHCParam μ) (s : Fin n)
-    : ∀ a, ∃ m : ℤ, shiftF dual μ s a - ((n : ℝ) - 1) / 2 = m := by
+theorem cns_shift_int (dual : Bool) {μ : Fin n → ℝ} (hμ : S7.IsHCParam μ) (s : Fin n) :
+    ∀ a, ∃ m : ℤ, shiftF dual μ s a - ((n : ℝ) - 1) / 2 = m := by
   intro a
   obtain ⟨m, hm⟩ := hμ.2 a
   by_cases has : a = s
   · subst has
     cases dual
-    · exact ⟨
-        m + 1,
-        by simp only [shiftF, cond_false, Pi.add_apply, Pi.single_eq_same]; push_cast; linarith
-      ⟩
-    · exact ⟨
-        m - 1,
-        by simp only [shiftF, cond_true, Pi.sub_apply, Pi.single_eq_same]; push_cast; linarith
-      ⟩
+    · exact ⟨m + 1, by simp only [shiftF, cond_false, Pi.add_apply, Pi.single_eq_same]; push_cast; linarith⟩
+    · exact ⟨m - 1, by simp only [shiftF, cond_true, Pi.sub_apply, Pi.single_eq_same]; push_cast; linarith⟩
   · refine ⟨m, ?_⟩
     cases dual
     · simp only [shiftF, cond_false, Pi.add_apply, Pi.single_eq_of_ne has]
@@ -43,20 +81,20 @@ theorem cns_shift_int (dual : Bool) {μ : Fin n → ℝ} (hμ : S7.IsHCParam μ)
     · simp only [shiftF, cond_true, Pi.sub_apply, Pi.single_eq_of_ne has]
       linarith
 
-theorem cns_lowK_shiftV (ε : Fin n → Bool) (μ : Fin n → ℝ) (s : Fin n)
-    : lowK ε (shiftF false μ s) = lowK ε μ + HW.stdWt n s := by
+theorem cns_lowK_shiftV (ε : Fin n → Bool) (μ : Fin n → ℝ) (s : Fin n) :
+    lowK ε (shiftF false μ s) = lowK ε μ + HW.stdWt n s := by
   funext a
   simp only [lowK, shiftF, cond_false, HW.stdWt, Pi.add_apply, Pi.sub_apply]
   ring
 
-theorem cns_lowK_shiftVd (ε : Fin n → Bool) (μ : Fin n → ℝ) (s : Fin n)
-    : lowK ε (shiftF true μ s) = lowK ε μ + HW.dualWt n s := by
+theorem cns_lowK_shiftVd (ε : Fin n → Bool) (μ : Fin n → ℝ) (s : Fin n) :
+    lowK ε (shiftF true μ s) = lowK ε μ + HW.dualWt n s := by
   funext a
   simp only [lowK, shiftF, cond_true, HW.dualWt, Pi.add_apply, Pi.sub_apply, Pi.neg_apply]
   ring
 
-private theorem gap_lemma {ν : Fin n → ℝ} (h : S7.IsHCParam ν)
-    : ∀ d : ℕ, ∀ a b : Fin n, b.val = a.val + d → (d : ℝ) ≤ ν a - ν b := by
+private theorem gap_lemma {ν : Fin n → ℝ} (h : S7.IsHCParam ν) :
+    ∀ d : ℕ, ∀ a b : Fin n, b.val = a.val + d → (d : ℝ) ≤ ν a - ν b := by
   intro d
   induction d with
   | zero =>
@@ -82,33 +120,27 @@ private theorem gap_lemma {ν : Fin n → ℝ} (h : S7.IsHCParam ν)
     push_cast
     linarith
 
-private theorem lowK_diff_lemma_2 (ε : Fin n → Bool) (ν : Fin n → ℝ) (a b : Fin n)
-    : lowK ε ν b - lowK ε ν a
-      = ν b - ν a
-        + (∑ c : Fin n,
-            (((if b < c ∧ ε c ≠ ε b then 1 else 0 : ℝ) - (if c < b ∧ ε c ≠ ε b then 1 else 0)) -
-              ((if b < c ∧ ε c = ε b then 1 else 0 : ℝ) - (if c < b ∧ ε c = ε b then 1 else 0)) -
-            (((if a < c ∧ ε c ≠ ε a then 1 else 0 : ℝ) - (if c < a ∧ ε c ≠ ε a then 1 else 0)) -
-              ((if a < c ∧ ε c = ε a then 1 else 0 : ℝ) - (if c < a ∧ ε c = ε a then 1 else 0)))))
-          / 2 := by
-  simp only [lowK, rhoN, rhoC, Pi.add_apply, Pi.sub_apply, Finset.card_filter,
-    Finset.sum_sub_distrib]
+private theorem lowK_diff_lemma_2 (ε : Fin n → Bool) (ν : Fin n → ℝ) (a b : Fin n) :
+    lowK ε ν b - lowK ε ν a = ν b - ν a + (∑ c : Fin n,
+      (((if b < c ∧ ε c ≠ ε b then 1 else 0 : ℝ) - (if c < b ∧ ε c ≠ ε b then 1 else 0)) -
+        ((if b < c ∧ ε c = ε b then 1 else 0 : ℝ) - (if c < b ∧ ε c = ε b then 1 else 0)) -
+      (((if a < c ∧ ε c ≠ ε a then 1 else 0 : ℝ) - (if c < a ∧ ε c ≠ ε a then 1 else 0)) -
+        ((if a < c ∧ ε c = ε a then 1 else 0 : ℝ) - (if c < a ∧ ε c = ε a then 1 else 0))))) / 2 := by
+  simp only [lowK, rhoN, rhoC, Pi.add_apply, Pi.sub_apply, Finset.card_filter, Finset.sum_sub_distrib]
   push_cast
   ring
 
-private theorem term_lemma_3
-    {ε : Fin n → Bool} {a b : Fin n} (he : ε a = ε b) (hab : a < b) (c : Fin n)
-    : (((if b < c ∧ ε c ≠ ε b then 1 else 0 : ℝ) - (if c < b ∧ ε c ≠ ε b then 1 else 0))
-          - ((if b < c ∧ ε c = ε b then 1 else 0 : ℝ) - (if c < b ∧ ε c = ε b then 1 else 0))
-          - (((if a < c ∧ ε c ≠ ε a then 1 else 0 : ℝ) - (if c < a ∧ ε c ≠ ε a then 1 else 0))
-            - ((if a < c ∧ ε c = ε a then 1 else 0 : ℝ) - (if c < a ∧ ε c = ε a then 1 else 0))))
-        ≤ ((if a < c ∧ c ≤ b then 1 else 0 : ℝ) + (if a ≤ c ∧ c < b then 1 else 0))
-      ∧ (ε c = ε a
-        → (((if b < c ∧ ε c ≠ ε b then 1 else 0 : ℝ) - (if c < b ∧ ε c ≠ ε b then 1 else 0))
-            - ((if b < c ∧ ε c = ε b then 1 else 0 : ℝ) - (if c < b ∧ ε c = ε b then 1 else 0))
-            - (((if a < c ∧ ε c ≠ ε a then 1 else 0 : ℝ) - (if c < a ∧ ε c ≠ ε a then 1 else 0))
-              - ((if a < c ∧ ε c = ε a then 1 else 0 : ℝ) - (if c < a ∧ ε c = ε a then 1 else 0))))
-          = ((if a < c ∧ c ≤ b then 1 else 0 : ℝ) + (if a ≤ c ∧ c < b then 1 else 0))) := by
+private theorem term_lemma_3 {ε : Fin n → Bool} {a b : Fin n} (he : ε a = ε b) (hab : a < b) (c : Fin n) :
+    (((if b < c ∧ ε c ≠ ε b then 1 else 0 : ℝ) - (if c < b ∧ ε c ≠ ε b then 1 else 0)) -
+        ((if b < c ∧ ε c = ε b then 1 else 0 : ℝ) - (if c < b ∧ ε c = ε b then 1 else 0)) -
+      (((if a < c ∧ ε c ≠ ε a then 1 else 0 : ℝ) - (if c < a ∧ ε c ≠ ε a then 1 else 0)) -
+        ((if a < c ∧ ε c = ε a then 1 else 0 : ℝ) - (if c < a ∧ ε c = ε a then 1 else 0)))) ≤
+      ((if a < c ∧ c ≤ b then 1 else 0 : ℝ) + (if a ≤ c ∧ c < b then 1 else 0)) ∧
+    (ε c = ε a → (((if b < c ∧ ε c ≠ ε b then 1 else 0 : ℝ) - (if c < b ∧ ε c ≠ ε b then 1 else 0)) -
+        ((if b < c ∧ ε c = ε b then 1 else 0 : ℝ) - (if c < b ∧ ε c = ε b then 1 else 0)) -
+      (((if a < c ∧ ε c ≠ ε a then 1 else 0 : ℝ) - (if c < a ∧ ε c ≠ ε a then 1 else 0)) -
+        ((if a < c ∧ ε c = ε a then 1 else 0 : ℝ) - (if c < a ∧ ε c = ε a then 1 else 0)))) =
+      ((if a < c ∧ c ≤ b then 1 else 0 : ℝ) + (if a ≤ c ∧ c < b then 1 else 0))) := by
   rw [Fin.lt_iff_val_lt_val] at hab
   by_cases e : ε c = ε a
   · have e' : ε c = ε b := e.trans he
@@ -123,9 +155,8 @@ private theorem term_lemma_3
       Fin.lt_iff_val_lt_val, Fin.le_iff_val_le_val]
     split_ifs <;> first | (exfalso; omega) | norm_num
 
-private theorem sumR_lemma_4 {a b : Fin n} (hab : a < b)
-    : ∑ c : Fin n, ((if a < c ∧ c ≤ b then 1 else 0 : ℝ) + (if a ≤ c ∧ c < b then 1 else 0))
-      = 2 * ((b.val - a.val : ℕ) : ℝ) := by
+private theorem sumR_lemma_4 {a b : Fin n} (hab : a < b) :
+    ∑ c : Fin n, ((if a < c ∧ c ≤ b then 1 else 0 : ℝ) + (if a ≤ c ∧ c < b then 1 else 0)) = 2 * ((b.val - a.val : ℕ) : ℝ) := by
   rw [Finset.sum_add_distrib, Finset.sum_boole, Finset.sum_boole]
   have h1 : (Finset.univ.filter fun c : Fin n => a < c ∧ c ≤ b) = Finset.Ioc a b := by
     ext
@@ -136,15 +167,12 @@ private theorem sumR_lemma_4 {a b : Fin n} (hab : a < b)
   rw [h1, h2, Fin.card_Ioc, Fin.card_Ico]
   ring
 
-theorem cns_hc_of_dom
-    {ε : Fin n → Bool} (he : ∀ a b, ε a = ε b)
-    {ν : Fin n → ℝ} (hint : ∀ a, ∃ m : ℤ, ν a - ((n : ℝ) - 1) / 2 = m) (hdom : HW.KDom ε (lowK ε ν))
-    : S7.IsHCParam ν := by
+theorem cns_hc_of_dom {ε : Fin n → Bool} (he : ∀ a b, ε a = ε b) {ν : Fin n → ℝ}
+    (hint : ∀ a, ∃ m : ℤ, ν a - ((n : ℝ) - 1) / 2 = m) (hdom : HW.KDom ε (lowK ε ν)) : S7.IsHCParam ν := by
   classical
   refine ⟨fun a b hab => ?_, hint⟩
   have hd := lowK_diff_lemma_2 ε ν a b
-  have hs :=
-    Finset.sum_congr rfl fun c (_ : c ∈ Finset.univ) => (term_lemma_3 (he a b) hab c).2 (he c a)
+  have hs := Finset.sum_congr rfl fun c (_ : c ∈ Finset.univ) => (term_lemma_3 (he a b) hab c).2 (he c a)
   rw [sumR_lemma_4 hab] at hs
   have hk := hdom a b hab (he a b)
   have hba : (1 : ℝ) ≤ ((b.val - a.val : ℕ) : ℝ) := by
@@ -152,8 +180,7 @@ theorem cns_hc_of_dom
     exact_mod_cast (by omega : 1 ≤ b.val - a.val)
   linarith
 
-theorem cns_dom_of_hc {ε : Fin n → Bool} {ν : Fin n → ℝ} (h : S7.IsHCParam ν)
-    : HW.KDom ε (lowK ε ν) := by
+theorem cns_dom_of_hc {ε : Fin n → Bool} {ν : Fin n → ℝ} (h : S7.IsHCParam ν) : HW.KDom ε (lowK ε ν) := by
   classical
   intro a b hab he
   have hd := lowK_diff_lemma_2 ε ν a b
@@ -162,21 +189,14 @@ theorem cns_dom_of_hc {ε : Fin n → Bool} {ν : Fin n → ℝ} (h : S7.IsHCPar
   have hg := gap_lemma h (b.val - a.val) a b (by have := Fin.lt_iff_val_lt_val.mp hab; omega)
   linarith
 
-theorem cns_kfin_fd
-    {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H] [FiniteDimensional ℂ H]
-    {ε : Fin n → Bool}
-    (σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)) (v : H)
-    : PI.UpqRep.IsKFin ε σ v :=
-  ⟨⊤, inferInstance, Submodule.mem_top, fun _ _ _ _ => Submodule.mem_top⟩
+theorem cns_kfin_fd {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H] [FiniteDimensional ℂ H]
+    {ε : Fin n → Bool} (σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)) (v : H) : PI.UpqRep.IsKFin ε σ v := ⟨⊤, inferInstance, Submodule.mem_top, fun _ _ _ _ => Submodule.mem_top⟩
 
-theorem cns_orth_sum
-    {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℂ E]
-    {ι : Type*} (Sm : Finset ι)
-    {V : ι → Type*} [∀ i, NormedAddCommGroup (V i)] [∀ i, InnerProductSpace ℂ (V i)]
-    (j : ∀ i, V i →ₗ[ℂ] E) (hI : ∀ i ∈ Sm, ∀ v w, inner ℂ (j i v) (j i w) = inner ℂ v w)
-    (hO : ∀ i ∈ Sm, ∀ i' ∈ Sm, i ≠ i' → ∀ v v', inner ℂ (j i v) (j i' v') = 0)
-    (b c : ∀ i, V i)
-    : inner ℂ (∑ i ∈ Sm, j i (b i)) (∑ i ∈ Sm, j i (c i)) = ∑ i ∈ Sm, inner ℂ (b i) (c i) := by
+theorem cns_orth_sum {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℂ E] {ι : Type*} (Sm : Finset ι)
+    {V : ι → Type*} [∀ i, NormedAddCommGroup (V i)] [∀ i, InnerProductSpace ℂ (V i)] (j : ∀ i, V i →ₗ[ℂ] E)
+    (hI : ∀ i ∈ Sm, ∀ v w, inner ℂ (j i v) (j i w) = inner ℂ v w)
+    (hO : ∀ i ∈ Sm, ∀ i' ∈ Sm, i ≠ i' → ∀ v v', inner ℂ (j i v) (j i' v') = 0) (b c : ∀ i, V i) :
+    inner ℂ (∑ i ∈ Sm, j i (b i)) (∑ i ∈ Sm, j i (c i)) = ∑ i ∈ Sm, inner ℂ (b i) (c i) := by
   rw [sum_inner]
   refine Finset.sum_congr rfl fun i hi => ?_
   rw [inner_sum, Finset.sum_eq_single i]
@@ -186,11 +206,10 @@ theorem cns_orth_sum
   · intro h
     exact absurd hi h
 
-theorem cns_key_std
-    {ε : Fin n → Bool} {Λ : Fin n → ℝ}
-    (T : S7.KType ε Λ) (k : S7.KG ε) (F G : PiLp 2 (fun _ : Fin n => T.V))
-    : inner ℂ G (HW.tensOp T (HW.stdRho ε) k F)
-      = ∑ c, inner ℂ (G c) (tensGrp false (fun _ => T.op k) (S7.toMK k) (fun d => F d) c) := by
+theorem cns_key_std {ε : Fin n → Bool} {Λ : Fin n → ℝ} (T : S7.KType ε Λ) (k : S7.KG ε)
+    (F G : PiLp 2 (fun _ : Fin n => T.V)) :
+    inner ℂ G (HW.tensOp T (HW.stdRho ε) k F) =
+      ∑ c, inner ℂ (G c) (tensGrp false (fun _ => T.op k) (S7.toMK k) (fun d => F d) c) := by
   rw [PiLp.inner_apply]
   refine Finset.sum_congr rfl fun c _ => ?_
   congr 1
@@ -198,16 +217,15 @@ theorem cns_key_std
   simp [Pi.single_apply]
   rfl
 
-theorem cns_inv_entry {ε : Fin n → Bool} (k : S7.KG ε) (c d : Fin n)
-    : (S7.toMK k)⁻¹ d c = star (S7.toMK k c d) := by
+theorem cns_inv_entry {ε : Fin n → Bool} (k : S7.KG ε) (c d : Fin n) :
+    (S7.toMK k)⁻¹ d c = star (S7.toMK k c d) := by
   have hu : S7.toMK k ∈ unitary (Matrix (Fin n) (Fin n) ℂ) := k.2.1
   rw [Matrix.inv_eq_left_inv (Unitary.star_mul_self_of_mem hu), Matrix.star_apply]
 
-theorem cns_key_dual
-    {ε : Fin n → Bool} {Λ : Fin n → ℝ}
-    (T : S7.KType ε Λ) (k : S7.KG ε) (F G : PiLp 2 (fun _ : Fin n => T.V))
-    : inner ℂ G (HW.tensOp T (HW.rhoDual ε) k F)
-      = ∑ c, inner ℂ (G c) (tensGrp true (fun _ => T.op k) (S7.toMK k) (fun d => F d) c) := by
+theorem cns_key_dual {ε : Fin n → Bool} {Λ : Fin n → ℝ} (T : S7.KType ε Λ) (k : S7.KG ε)
+    (F G : PiLp 2 (fun _ : Fin n => T.V)) :
+    inner ℂ G (HW.tensOp T (HW.rhoDual ε) k F) =
+      ∑ c, inner ℂ (G c) (tensGrp true (fun _ => T.op k) (S7.toMK k) (fun d => F d) c) := by
   rw [PiLp.inner_apply]
   refine Finset.sum_congr rfl fun c _ => ?_
   congr 1
@@ -217,25 +235,19 @@ theorem cns_key_dual
   rw [cns_inv_entry]
   rfl
 
-theorem cns_zuck_cpt
-    {ε : Fin n → Bool} (hpq : pOf ε = 0 ∨ qOf ε = 0)
-    {μ : Fin n → ℝ} {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
-    {σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)}
-    (hμ : PI.UpqRep.IsHCParam μ) (hd : PI.UpqRep.IsDS ε μ σ)
-    : ∃ X : PI.ZuckTensor.TensorDS n ε μ H σ, ∀ s,
-      s ∈ X.Sm ↔ PI.UpqRep.IsHCParam (μ + Pi.single s 1) := by
+theorem cns_zuck_cpt {ε : Fin n → Bool} (hpq : pOf ε = 0 ∨ qOf ε = 0) {μ : Fin n → ℝ} {H : Type}
+    [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H] {σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)}
+    (hμ : PI.UpqRep.IsHCParam μ) (hd : PI.UpqRep.IsDS ε μ σ) :
+    ∃ X : PI.ZuckTensor.TensorDS n ε μ H σ, ∀ s, s ∈ X.Sm ↔ PI.UpqRep.IsHCParam (μ + Pi.single s 1) := by
   classical
   have he := cmpt_eps_eq hpq
   have hμ' : S7.IsHCParam μ := hμ
   obtain ⟨T⟩ := HW.kType_exists ε μ hμ'
   obtain ⟨-, -, U0, hU0⟩ := compact_isDS_unique hpq hμ' hd T
   haveI : FiniteDimensional ℂ H := LinearEquiv.finiteDimensional U0.toLinearEquiv
-  have hdat
-      : ∀ s, ∃ lam' : Fin n → ℝ, ∃ T' : S7.KType ε (lowK ε lam'),
-        ∃ σ' : Matrix (Fin n) (Fin n) ℂ → (T'.V →L[ℂ] T'.V),
-          S7.IsHCParam lam' ∧ Formalism.MainNotions.S.IsDS ε lam' σ'
-            ∧ (∀ k, σ' (S7.toMK k) = T'.op k)
-            ∧ (S7.IsHCParam (shiftF false μ s) → lam' = shiftF false μ s) := by
+  have hdat : ∀ s, ∃ lam' : Fin n → ℝ, ∃ T' : S7.KType ε (lowK ε lam'),
+      ∃ σ' : Matrix (Fin n) (Fin n) ℂ → (T'.V →L[ℂ] T'.V), S7.IsHCParam lam' ∧ Formalism.MainNotions.S.IsDS ε lam' σ' ∧
+        (∀ k, σ' (S7.toMK k) = T'.op k) ∧ (S7.IsHCParam (shiftF false μ s) → lam' = shiftF false μ s) := by
     intro s
     by_cases hs : S7.IsHCParam (shiftF false μ s)
     · obtain ⟨T'⟩ := HW.kType_exists ε _ hs
@@ -245,37 +257,20 @@ theorem cns_zuck_cpt
       exact ⟨μ, T, σ', hμ', h1, h3, fun h => absurd h hs⟩
   choose lamS Ts σs hHC hDS hσT hsh using hdat
   obtain ⟨hP1, hP2, hP3⟩ := HW.pieriStd n ε (lowK ε μ) T
-  have hSm
-      : ∀ s,
-        s ∈ univ.filter (fun s => S7.IsHCParam (shiftF false μ s))
-          ↔ HW.KDom ε (lowK ε μ + HW.stdWt n s) := by
+  have hSm : ∀ s, s ∈ univ.filter (fun s => S7.IsHCParam (shiftF false μ s)) ↔
+      HW.KDom ε (lowK ε μ + HW.stdWt n s) := by
     intro s
     rw [mem_filter, ← cns_lowK_shiftV]
-    exact ⟨
-      fun h => cns_dom_of_hc h.2,
-      fun h => ⟨mem_univ _, cns_hc_of_dom he (cns_shift_int false hμ' s) h⟩
-    ⟩
-  have hΛs
-      : ∀ s ∈ univ.filter (fun s => S7.IsHCParam (shiftF false μ s)),
-        lowK ε (lamS s) = lowK ε μ + HW.stdWt n s := fun s hs => by
+    exact ⟨fun h => cns_dom_of_hc h.2, fun h => ⟨mem_univ _, cns_hc_of_dom he (cns_shift_int false hμ' s) h⟩⟩
+  have hΛs : ∀ s ∈ univ.filter (fun s => S7.IsHCParam (shiftF false μ s)),
+      lowK ε (lamS s) = lowK ε μ + HW.stdWt n s := fun s hs => by
     rw [hsh s (mem_filter.1 hs).2, cns_lowK_shiftV]
-  obtain ⟨j, hjI, hjE, hjO, hjS⟩ :=
-    cns_cpt_dec T (HW.stdRho ε) LinearMap.id (HW.stdRho_cont ε) (HW.stdRho_hasDeriv ε) (HW.stdWt n)
-      (HW.stdWt_injective n) hP1 hP2 hP3 _ hSm
-      (fun s => lowK ε (lamS s))
-      hΛs Ts
-  refine ⟨
-    {
-      Sm := univ.filter (fun s => S7.IsHCParam (shiftF false μ s))
-      Hs := fun s => (Ts s).V
-      σs := σs
-      ds := ?_
-      inequiv := ?_
-      toSum := ?_
-      ofSum := ?_
-    },
-    ?_
-  ⟩
+  obtain ⟨j, hjI, hjE, hjO, hjS⟩ := cns_cpt_dec T (HW.stdRho ε) LinearMap.id (HW.stdRho_cont ε)
+    (HW.stdRho_hasDeriv ε) (HW.stdWt n) (HW.stdWt_injective n) hP1 hP2 hP3 _ hSm (fun s => lowK ε (lamS s)) hΛs Ts
+  refine ⟨{ Sm := univ.filter (fun s => S7.IsHCParam (shiftF false μ s))
+            Hs := fun s => (Ts s).V
+            σs := σs
+            ds := ?_, inequiv := ?_, toSum := ?_, ofSum := ?_ }, ?_⟩
   · intro s hs
     have hs' := (mem_filter.1 hs).2
     refine ⟨hs', ?_⟩
@@ -293,51 +288,32 @@ theorem cns_zuck_cpt
     have e2 : lamS s = lamS s' := by
       funext a
       have := congrFun e a
-      simp only [Formalism.QuantumDeterminants.lowK, PI.UpqRep.lowK, lowK, Pi.add_apply,
-          Pi.sub_apply]
-        at this
+      simp only [Formalism.QuantumDeterminants.lowK, PI.UpqRep.lowK, lowK, Pi.add_apply, Pi.sub_apply] at this
       linarith
     rw [hsh s (mem_filter.1 hs).2, hsh s' (mem_filter.1 hs').2] at e2
     exact cns_shift_inj false μ e2
   · intro v w x y hv hw
     obtain ⟨a, ha⟩ := hjS (WithLp.toLp 2 (fun d => x d • U0.symm v))
     obtain ⟨b, hb⟩ := hjS (WithLp.toLp 2 (fun c => y c • U0.symm w))
-    refine ⟨
-      {s // s ∈ univ.filter (fun s => S7.IsHCParam (shiftF false μ s))},
-      Finset.Subtype.fintype _,
-      fun i => i.1,
-      fun i => a i.1,
-      fun i => b i.1,
-      fun i => ⟨i.2, cns_kfin_fd _ _, cns_kfin_fd _ _⟩,
-      fun g hg => ?_
-    ⟩
+    refine ⟨{s // s ∈ univ.filter (fun s => S7.IsHCParam (shiftF false μ s))}, Finset.Subtype.fintype _, fun i => i.1,
+      fun i => a i.1, fun i => b i.1, fun i => ⟨i.2, cns_kfin_fd _ _, cns_kfin_fd _ _⟩, fun g hg => ?_⟩
     obtain ⟨k, rfl⟩ := S7.exists_toMK (cmpt_inUJ_Kset he hg)
     simp only [hσT]
     rw [← U0.apply_symm_apply v, ← U0.apply_symm_apply w, ← hU0, LinearIsometryEquiv.inner_map_map,
       cns_coefV (fun _ => T.op k) (S7.toMK k) (U0.symm v) (U0.symm w) x y]
-    have h1 :=
-      cns_key_std T k (WithLp.toLp 2 (fun d => x d • U0.symm v))
-        (WithLp.toLp 2 (fun c => y c • U0.symm w))
+    have h1 := cns_key_std T k (WithLp.toLp 2 (fun d => x d • U0.symm v)) (WithLp.toLp 2 (fun c => y c • U0.symm w))
     simp only [PiLp.toLp_apply] at h1
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← h1, ha, hb, map_sum,
-        show
-            (∑ s ∈ univ.filter (fun s => S7.IsHCParam (shiftF false μ s)), HW.tensOp T (HW.stdRho ε) k (j s (a s)))
-              = ∑ s ∈ univ.filter (fun s => S7.IsHCParam (shiftF false μ s)), j s ((Ts s).op k (a s)) from
-          Finset.sum_congr rfl fun s hs => (hjE s hs k (a s)).symm,
-        cns_orth_sum _ j hjI hjO b (fun s => (Ts s).op k (a s)), ← Finset.sum_coe_sort]
+
+    rw [← h1, ha, hb, map_sum,
+    show (∑ s ∈ univ.filter (fun s => S7.IsHCParam (shiftF false μ s)), HW.tensOp T (HW.stdRho ε) k (j s (a s))) =
+      ∑ s ∈ univ.filter (fun s => S7.IsHCParam (shiftF false μ s)), j s ((Ts s).op k (a s)) from
+      Finset.sum_congr rfl fun s hs => (hjE s hs k (a s)).symm,
+    cns_orth_sum _ j hjI hjO b (fun s => (Ts s).op k (a s)), ← Finset.sum_coe_sort]
     all_goals rfl
   · intro s hs v w hv hw
-    refine ⟨
-      Fin n × Fin n,
-      inferInstance,
-      fun p => U0 ((j s v) p.2),
-      fun p => U0 ((j s w) p.1),
-      fun p => Pi.single p.2 1,
-      fun p => Pi.single p.1 1,
-      fun p => ⟨cns_kfin_fd _ _, cns_kfin_fd _ _⟩,
-      fun g hg => ?_
-    ⟩
+    refine ⟨Fin n × Fin n, inferInstance, fun p => U0 ((j s v) p.2), fun p => U0 ((j s w) p.1),
+      fun p => Pi.single p.2 1, fun p => Pi.single p.1 1, fun p => ⟨cns_kfin_fd _ _, cns_kfin_fd _ _⟩,
+      fun g hg => ?_⟩
     obtain ⟨k, rfl⟩ := S7.exists_toMK (cmpt_inUJ_Kset he hg)
     dsimp only
     rw [hσT, ← hjI s hs, hjE s hs, cns_key_std, cns_expandV]
@@ -346,25 +322,19 @@ theorem cns_zuck_cpt
   · intro s
     exact ⟨fun hs => (mem_filter.1 hs).2, fun hs => mem_filter.2 ⟨mem_univ _, hs⟩⟩
 
-theorem cns_zuckd_cpt
-    {ε : Fin n → Bool} (hpq : pOf ε = 0 ∨ qOf ε = 0)
-    {μ : Fin n → ℝ} {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
-    {σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)}
-    (hμ : PI.UpqRep.IsHCParam μ) (hd : PI.UpqRep.IsDS ε μ σ)
-    : ∃ X : PI.ZuckTensor.TensorDSd n ε μ H σ, ∀ s,
-      s ∈ X.Sm ↔ PI.UpqRep.IsHCParam (μ - Pi.single s 1) := by
+theorem cns_zuckd_cpt {ε : Fin n → Bool} (hpq : pOf ε = 0 ∨ qOf ε = 0) {μ : Fin n → ℝ} {H : Type}
+    [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H] {σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)}
+    (hμ : PI.UpqRep.IsHCParam μ) (hd : PI.UpqRep.IsDS ε μ σ) :
+    ∃ X : PI.ZuckTensor.TensorDSd n ε μ H σ, ∀ s, s ∈ X.Sm ↔ PI.UpqRep.IsHCParam (μ - Pi.single s 1) := by
   classical
   have he := cmpt_eps_eq hpq
   have hμ' : S7.IsHCParam μ := hμ
   obtain ⟨T⟩ := HW.kType_exists ε μ hμ'
   obtain ⟨-, -, U0, hU0⟩ := compact_isDS_unique hpq hμ' hd T
   haveI : FiniteDimensional ℂ H := LinearEquiv.finiteDimensional U0.toLinearEquiv
-  have hdat
-      : ∀ s, ∃ lam' : Fin n → ℝ, ∃ T' : S7.KType ε (lowK ε lam'),
-        ∃ σ' : Matrix (Fin n) (Fin n) ℂ → (T'.V →L[ℂ] T'.V),
-          S7.IsHCParam lam' ∧ Formalism.MainNotions.S.IsDS ε lam' σ'
-            ∧ (∀ k, σ' (S7.toMK k) = T'.op k)
-            ∧ (S7.IsHCParam (shiftF true μ s) → lam' = shiftF true μ s) := by
+  have hdat : ∀ s, ∃ lam' : Fin n → ℝ, ∃ T' : S7.KType ε (lowK ε lam'),
+      ∃ σ' : Matrix (Fin n) (Fin n) ℂ → (T'.V →L[ℂ] T'.V), S7.IsHCParam lam' ∧ Formalism.MainNotions.S.IsDS ε lam' σ' ∧
+        (∀ k, σ' (S7.toMK k) = T'.op k) ∧ (S7.IsHCParam (shiftF true μ s) → lam' = shiftF true μ s) := by
     intro s
     by_cases hs : S7.IsHCParam (shiftF true μ s)
     · obtain ⟨T'⟩ := HW.kType_exists ε _ hs
@@ -375,37 +345,20 @@ theorem cns_zuckd_cpt
   choose lamS Ts σs hHC hDS hσT hsh using hdat
   obtain ⟨hP1, hP2, hP3⟩ := HW.pieriDual n ε (lowK ε μ) T
   rw [← HW.dualD_units] at hP1 hP2 hP3
-  have hSm
-      : ∀ s,
-        s ∈ univ.filter (fun s => S7.IsHCParam (shiftF true μ s))
-          ↔ HW.KDom ε (lowK ε μ + HW.dualWt n s) := by
+  have hSm : ∀ s, s ∈ univ.filter (fun s => S7.IsHCParam (shiftF true μ s)) ↔
+      HW.KDom ε (lowK ε μ + HW.dualWt n s) := by
     intro s
     rw [mem_filter, ← cns_lowK_shiftVd]
-    exact ⟨
-      fun h => cns_dom_of_hc h.2,
-      fun h => ⟨mem_univ _, cns_hc_of_dom he (cns_shift_int true hμ' s) h⟩
-    ⟩
-  have hΛs
-      : ∀ s ∈ univ.filter (fun s => S7.IsHCParam (shiftF true μ s)),
-        lowK ε (lamS s) = lowK ε μ + HW.dualWt n s := fun s hs => by
+    exact ⟨fun h => cns_dom_of_hc h.2, fun h => ⟨mem_univ _, cns_hc_of_dom he (cns_shift_int true hμ' s) h⟩⟩
+  have hΛs : ∀ s ∈ univ.filter (fun s => S7.IsHCParam (shiftF true μ s)),
+      lowK ε (lamS s) = lowK ε μ + HW.dualWt n s := fun s hs => by
     rw [hsh s (mem_filter.1 hs).2, cns_lowK_shiftVd]
-  obtain ⟨j, hjI, hjE, hjO, hjS⟩ :=
-    cns_cpt_dec T (HW.rhoDual ε) HW.dualD (HW.continuous_rhoDual ε) (HW.hasDeriv_rhoDual ε)
-      (HW.dualWt n) HW.dualWt_injective hP1 hP2 hP3 _ hSm
-      (fun s => lowK ε (lamS s))
-      hΛs Ts
-  refine ⟨
-    {
-      Sm := univ.filter (fun s => S7.IsHCParam (shiftF true μ s))
-      Hs := fun s => (Ts s).V
-      σs := σs
-      ds := ?_
-      inequiv := ?_
-      toSum := ?_
-      ofSum := ?_
-    },
-    ?_
-  ⟩
+  obtain ⟨j, hjI, hjE, hjO, hjS⟩ := cns_cpt_dec T (HW.rhoDual ε) HW.dualD (HW.continuous_rhoDual ε)
+    (HW.hasDeriv_rhoDual ε) (HW.dualWt n) HW.dualWt_injective hP1 hP2 hP3 _ hSm (fun s => lowK ε (lamS s)) hΛs Ts
+  refine ⟨{ Sm := univ.filter (fun s => S7.IsHCParam (shiftF true μ s))
+            Hs := fun s => (Ts s).V
+            σs := σs
+            ds := ?_, inequiv := ?_, toSum := ?_, ofSum := ?_ }, ?_⟩
   · intro s hs
     have hs' := (mem_filter.1 hs).2
     refine ⟨hs', ?_⟩
@@ -423,51 +376,33 @@ theorem cns_zuckd_cpt
     have e2 : lamS s = lamS s' := by
       funext a
       have := congrFun e a
-      simp only [Formalism.QuantumDeterminants.lowK, PI.UpqRep.lowK, lowK, Pi.add_apply,
-          Pi.sub_apply]
-        at this
+      simp only [Formalism.QuantumDeterminants.lowK, PI.UpqRep.lowK, lowK, Pi.add_apply, Pi.sub_apply] at this
       linarith
     rw [hsh s (mem_filter.1 hs).2, hsh s' (mem_filter.1 hs').2] at e2
     exact cns_shift_inj true μ e2
   · intro v w x y hv hw
     obtain ⟨a, ha⟩ := hjS (WithLp.toLp 2 (fun d => star (y d) • U0.symm v))
     obtain ⟨b, hb⟩ := hjS (WithLp.toLp 2 (fun c => star (x c) • U0.symm w))
-    refine ⟨
-      {s // s ∈ univ.filter (fun s => S7.IsHCParam (shiftF true μ s))},
-      Finset.Subtype.fintype _,
-      fun i => i.1,
-      fun i => a i.1,
-      fun i => b i.1,
-      fun i => ⟨i.2, cns_kfin_fd _ _, cns_kfin_fd _ _⟩,
-      fun g hg => ?_
-    ⟩
+    refine ⟨{s // s ∈ univ.filter (fun s => S7.IsHCParam (shiftF true μ s))}, Finset.Subtype.fintype _, fun i => i.1,
+      fun i => a i.1, fun i => b i.1, fun i => ⟨i.2, cns_kfin_fd _ _, cns_kfin_fd _ _⟩, fun g hg => ?_⟩
     obtain ⟨k, rfl⟩ := S7.exists_toMK (cmpt_inUJ_Kset he hg)
     simp only [hσT]
     rw [← U0.apply_symm_apply v, ← U0.apply_symm_apply w, ← hU0, LinearIsometryEquiv.inner_map_map,
       cns_coefVd (fun _ => T.op k) (S7.toMK k) (U0.symm v) (U0.symm w) x y]
-    have h1 :=
-      cns_key_dual T k (WithLp.toLp 2 (fun d => star (y d) • U0.symm v))
-        (WithLp.toLp 2 (fun c => star (x c) • U0.symm w))
+    have h1 := cns_key_dual T k (WithLp.toLp 2 (fun d => star (y d) • U0.symm v))
+      (WithLp.toLp 2 (fun c => star (x c) • U0.symm w))
     simp only [PiLp.toLp_apply] at h1
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← h1, ha, hb, map_sum,
-        show
-            (∑ s ∈ univ.filter (fun s => S7.IsHCParam (shiftF true μ s)), HW.tensOp T (HW.rhoDual ε) k (j s (a s)))
-              = ∑ s ∈ univ.filter (fun s => S7.IsHCParam (shiftF true μ s)), j s ((Ts s).op k (a s)) from
-          Finset.sum_congr rfl fun s hs => (hjE s hs k (a s)).symm,
-        cns_orth_sum _ j hjI hjO b (fun s => (Ts s).op k (a s)), ← Finset.sum_coe_sort]
+
+    rw [← h1, ha, hb, map_sum,
+    show (∑ s ∈ univ.filter (fun s => S7.IsHCParam (shiftF true μ s)), HW.tensOp T (HW.rhoDual ε) k (j s (a s))) =
+      ∑ s ∈ univ.filter (fun s => S7.IsHCParam (shiftF true μ s)), j s ((Ts s).op k (a s)) from
+      Finset.sum_congr rfl fun s hs => (hjE s hs k (a s)).symm,
+    cns_orth_sum _ j hjI hjO b (fun s => (Ts s).op k (a s)), ← Finset.sum_coe_sort]
     all_goals rfl
   · intro s hs v w hv hw
-    refine ⟨
-      Fin n × Fin n,
-      inferInstance,
-      fun p => U0 ((j s v) p.2),
-      fun p => U0 ((j s w) p.1),
-      fun p => Pi.single p.1 1,
-      fun p => Pi.single p.2 1,
-      fun p => ⟨cns_kfin_fd _ _, cns_kfin_fd _ _⟩,
-      fun g hg => ?_
-    ⟩
+    refine ⟨Fin n × Fin n, inferInstance, fun p => U0 ((j s v) p.2), fun p => U0 ((j s w) p.1),
+      fun p => Pi.single p.1 1, fun p => Pi.single p.2 1, fun p => ⟨cns_kfin_fd _ _, cns_kfin_fd _ _⟩,
+      fun g hg => ?_⟩
     obtain ⟨k, rfl⟩ := S7.exists_toMK (cmpt_inUJ_Kset he hg)
     dsimp only
     rw [hσT, ← hjI s hs, hjE s hs, cns_key_dual, cns_expandVd]

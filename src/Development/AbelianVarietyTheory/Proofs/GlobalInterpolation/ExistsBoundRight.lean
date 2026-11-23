@@ -1,8 +1,55 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.LogDerivLFunctionStrip
+import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.ExplicitFormula.GoodHeight
+public import Mathlib.Analysis.Analytic.Order
+public import Mathlib.Analysis.CStarAlgebra.Classes
+public import Mathlib.NumberTheory.LSeries.DirichletContinuation
 public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.ImportsMore
+public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.LogDerivLFunctionStrip
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Real
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+public import Mathlib.NumberTheory.LSeries.Nonvanishing
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -10,21 +57,22 @@ open Complex DirichletCharacter ArithmeticFunction MeasureTheory Filter Topology
 
 namespace GlobalTheory.GoodHeight
 
-theorem exists_far (S : Finset ℝ) (T : ℝ)
-    : ∃ T' : ℝ, T ≤ T' ∧ T' ≤ T + 1 ∧ ∀ x ∈ S, 1 / (2 * ((S.card : ℝ) + 1)) ≤ |x - T'| := by
+theorem exists_far (S : Finset ℝ) (T : ℝ) : ∃ T' : ℝ, T ≤ T' ∧ T' ≤ T + 1 ∧
+    ∀ x ∈ S, 1 / (2 * ((S.card : ℝ) + 1)) ≤ |x - T'| := by
   classical
   by_contra hcon
   push Not at hcon
   have hn : (0 : ℝ) < (S.card : ℝ) + 1 := by positivity
-  have key
-      : ∀ k ∈ Finset.range (S.card + 1), ∃ x ∈ S,
-        |x - (T + (k : ℝ) / ((S.card : ℝ) + 1))| < 1 / (2 * ((S.card : ℝ) + 1)) := by
+  have key : ∀ k ∈ Finset.range (S.card + 1), ∃ x ∈ S,
+      |x - (T + (k : ℝ) / ((S.card : ℝ) + 1))| < 1 / (2 * ((S.card : ℝ) + 1)) := by
     intro k hk
-    have hk' : (k : ℝ) ≤ S.card := by exact_mod_cast Nat.lt_succ_iff.mp (Finset.mem_range.mp hk)
+    have hk' : (k : ℝ) ≤ S.card := by
+      exact_mod_cast Nat.lt_succ_iff.mp (Finset.mem_range.mp hk)
     apply hcon
     · have : 0 ≤ (k : ℝ) / ((S.card : ℝ) + 1) := by positivity
       linarith
-    · have : (k : ℝ) / ((S.card : ℝ) + 1) ≤ 1 := by rw [div_le_one hn]; linarith
+    · have : (k : ℝ) / ((S.card : ℝ) + 1) ≤ 1 := by
+        rw [div_le_one hn]; linarith
       linarith
   choose! g hgS hg using key
   obtain ⟨a, ha, b, hb, hab, heq⟩ :=
@@ -33,58 +81,30 @@ theorem exists_far (S : Finset ℝ) (T : ℝ)
   have h1 := hg a ha
   have h2 := hg b hb
   rw [heq] at h1
-  have hclose
-      : |(a : ℝ) / ((S.card : ℝ) + 1) - (b : ℝ) / ((S.card : ℝ) + 1)| < 1 / ((S.card : ℝ) + 1) := by
-    calc
-      |(a : ℝ) / ((S.card : ℝ) + 1) - (b : ℝ) / ((S.card : ℝ) + 1)|
-          = |(g b - (T + (b : ℝ) / ((S.card : ℝ) + 1))) - (g b - (T + (a : ℝ) / ((S.card : ℝ) + 1)))| :=
-        by congr 1; ring
+  have hclose : |(a : ℝ) / ((S.card : ℝ) + 1) - (b : ℝ) / ((S.card : ℝ) + 1)|
+      < 1 / ((S.card : ℝ) + 1) := by
+    calc |(a : ℝ) / ((S.card : ℝ) + 1) - (b : ℝ) / ((S.card : ℝ) + 1)|
+        = |(g b - (T + (b : ℝ) / ((S.card : ℝ) + 1))) - (g b - (T + (a : ℝ) / ((S.card : ℝ) + 1)))| := by
+          congr 1; ring
       _ ≤ |g b - (T + (b : ℝ) / ((S.card : ℝ) + 1))| + |g b - (T + (a : ℝ) / ((S.card : ℝ) + 1))| :=
-        abs_sub _ _
+          abs_sub _ _
       _ < 1 / (2 * ((S.card : ℝ) + 1)) + 1 / (2 * ((S.card : ℝ) + 1)) := add_lt_add h2 h1
       _ = 1 / ((S.card : ℝ) + 1) := by field_simp; ring
   rw [← sub_div, abs_div, abs_of_pos hn, div_lt_div_iff_of_pos_right hn] at hclose
   have hsep : (1 : ℝ) ≤ |(a : ℝ) - b| := by
     rcases lt_or_gt_of_ne hab with h | h
     · have : (a : ℝ) + 1 ≤ b := by exact_mod_cast h
-      rw [abs_sub_comm, abs_of_nonneg (by linarith)]
-      linarith
+      rw [abs_sub_comm, abs_of_nonneg (by linarith)]; linarith
     · have : (b : ℝ) + 1 ≤ a := by exact_mod_cast h
-      rw [abs_of_nonneg (by linarith)]
-      linarith
+      rw [abs_of_nonneg (by linarith)]; linarith
   linarith
 
-theorem one_le_order
-    {q : ℕ} [NeZero q] (χ : DirichletCharacter ℂ q) {w : ℂ} (h1 : w ≠ 1) (hw : LFunction χ w = 0)
-    : 1 ≤ analyticOrderNatAt (LFunction χ) w := by
-  have hU : IsPreconnected ({1}ᶜ : Set ℂ) :=
-    (isConnected_compl_singleton_of_one_lt_rank (by rw [Complex.rank_real_complex]; norm_num)
-      1).isPreconnected
-  have han : AnalyticOnNhd ℂ (LFunction χ) ({1}ᶜ : Set ℂ) := by
-    intro z hz
-    have hd : DifferentiableOn ℂ (LFunction χ) ({1}ᶜ : Set ℂ) := fun u hu =>
-      (differentiableAt_LFunction χ u (.inl hu)).differentiableWithinAt
-    exact hd.analyticAt (isOpen_compl_singleton.mem_nhds hz)
-  have h2 : (2 : ℂ) ∈ ({1}ᶜ : Set ℂ) := by norm_num
-  have hw1 : w ∈ ({1}ᶜ : Set ℂ) := h1
-  have hne2 : analyticOrderAt (LFunction χ) 2 ≠ ⊤ := by
-    rw [(han 2 h2).analyticOrderAt_eq_zero.mpr
-      (LFunction_ne_zero_of_one_le_re χ (.inr (by norm_num)) (by norm_num))]
-    exact ENat.zero_ne_top
-  have hnetop := han.analyticOrderAt_ne_top_of_isPreconnected hU h2 hw1 hne2
-  have hne0 : analyticOrderAt (LFunction χ) w ≠ 0 := (han w hw1).analyticOrderAt_ne_zero.mpr hw
-  unfold analyticOrderNatAt
-  obtain ⟨n, hn⟩ := ENat.ne_top_iff_exists.mp hnetop
-  rw [← hn] at hne0 ⊢
-  simp only [ENat.toNat_natCast]
-  have : n ≠ 0 := by rintro rfl; exact hne0 rfl
-  omega
+theorem one_le_order {q : ℕ} [NeZero q] (χ : DirichletCharacter ℂ q) {w : ℂ} (h1 : w ≠ 1)
+    (hw : LFunction χ w = 0) : 1 ≤ analyticOrderNatAt (LFunction χ) w := by
+  apply PI.EF.one_le_mult <;> assumption
 
-theorem exists_bound_right
-    : ∃ B : ℝ,
-      0 ≤ B
-        ∧ ∀ (N : ℕ) [NeZero N] (χ : DirichletCharacter ℂ N) (s : ℂ),
-          2 ≤ s.re → ‖deriv (LFunction χ) s / LFunction χ s‖ ≤ B := by
+theorem exists_bound_right : ∃ B : ℝ, 0 ≤ B ∧ ∀ (N : ℕ) [NeZero N] (χ : DirichletCharacter ℂ N)
+    (s : ℂ), 2 ≤ s.re → ‖deriv (LFunction χ) s / LFunction χ s‖ ≤ B := by
   refine ⟨∑' n, ‖LSeries.term (fun n => (Λ n : ℂ)) 2 n‖, tsum_nonneg (fun _ => norm_nonneg _), ?_⟩
   intro N _ χ s hs
   have hs1 : 1 < s.re := by linarith
@@ -102,20 +122,13 @@ theorem exists_bound_right
     exact mul_le_of_le_one_left (norm_nonneg _) (χ.norm_le_one _)
   · exact summable_norm_iff.mpr (LSeriesSummable_twist_vonMangoldt χ hs1)
 
-theorem local_formula
-    : ∃ C : ℝ,
-      0 < C
-        ∧ ∀ (N : ℕ) [NeZero N] (χ : DirichletCharacter ℂ N),
-          χ.IsPrimitive
-            → ∀ s : ℂ,
-              -1 ≤ s.re → s.re ≤ 2 → 2 ≤ |s.im| → LFunction χ s ≠ 0
-                → ∃ Z : Finset ℂ,
-                  (∀ w, w ∈ Z ↔ ‖w - (2 + s.im * I)‖ ≤ 7 / 2 ∧ w ≠ 1 ∧ LFunction χ w = 0)
-                    ∧ ∑ w ∈ Z, (analyticOrderNatAt (LFunction χ) w : ℝ)
-                      ≤ C * Real.log (N * (|s.im| + 2))
-                    ∧ ‖deriv (LFunction χ) s / LFunction χ s
-                        - ∑ w ∈ Z, (analyticOrderNatAt (LFunction χ) w : ℂ) / (s - w)‖
-                      ≤ C * Real.log (N * (|s.im| + 2)) := by
+theorem local_formula : ∃ C : ℝ, 0 < C ∧ ∀ (N : ℕ) [NeZero N] (χ : DirichletCharacter ℂ N),
+    χ.IsPrimitive → ∀ s : ℂ, -1 ≤ s.re → s.re ≤ 2 → 2 ≤ |s.im| → LFunction χ s ≠ 0 →
+    ∃ Z : Finset ℂ, (∀ w, w ∈ Z ↔ ‖w - (2 + s.im * I)‖ ≤ 7/2 ∧ w ≠ 1 ∧ LFunction χ w = 0) ∧
+      ∑ w ∈ Z, (analyticOrderNatAt (LFunction χ) w : ℝ) ≤ C * Real.log (N * (|s.im| + 2)) ∧
+      ‖deriv (LFunction χ) s / LFunction χ s
+        - ∑ w ∈ Z, (analyticOrderNatAt (LFunction χ) w : ℂ) / (s - w)‖
+        ≤ C * Real.log (N * (|s.im| + 2)) := by
   obtain ⟨C₁, hC₁, h₁⟩ := GlobalTheory.LWide.logDeriv_LFunction_strip
   obtain ⟨C₂, hC₂, h₂⟩ := GlobalTheory.ZetaWide.main
   refine ⟨C₁ + C₂ + 1, by positivity, ?_⟩
@@ -144,16 +157,14 @@ theorem local_formula
         have h : 2 ≤ ‖s - 1‖ := le_trans ht (by simpa using Complex.abs_im_le_norm (s - 1))
         rw [norm_div, norm_one]
         exact one_div_le_one_div_of_le (by norm_num) h
-      calc
-        ‖deriv riemannZeta s / riemannZeta s
-         - ∑ w ∈ hfin.toFinset, (analyticOrderNatAt riemannZeta w : ℂ) / (s - w)‖
-            = ‖(deriv riemannZeta s / riemannZeta s + 1 / (s - 1)
-              - ∑ w ∈ hfin.toFinset, (analyticOrderNatAt riemannZeta w : ℂ) / (s - w)) - 1 / (s - 1)‖ :=
-          by congr 1; ring
-        _ ≤ ‖deriv riemannZeta s / riemannZeta s + 1 / (s - 1)
+      calc ‖deriv riemannZeta s / riemannZeta s
             - ∑ w ∈ hfin.toFinset, (analyticOrderNatAt riemannZeta w : ℂ) / (s - w)‖
-            + ‖1 / (s - 1)‖ :=
-          norm_sub_le _ _
+          = ‖(deriv riemannZeta s / riemannZeta s + 1 / (s - 1)
+            - ∑ w ∈ hfin.toFinset, (analyticOrderNatAt riemannZeta w : ℂ) / (s - w)) - 1 / (s - 1)‖ := by
+            congr 1; ring
+        _ ≤ ‖deriv riemannZeta s / riemannZeta s + 1 / (s - 1)
+            - ∑ w ∈ hfin.toFinset, (analyticOrderNatAt riemannZeta w : ℂ) / (s - w)‖ + ‖1 / (s - 1)‖ :=
+            norm_sub_le _ _
         _ ≤ C₂ * Real.log (|s.im| + 2) + 1 / 2 := add_le_add hbound hinv
         _ ≤ (C₁ + C₂ + 1) * Real.log (|s.im| + 2) := by nlinarith
   · obtain ⟨hfin, hcount, hbound⟩ := h₁ N χ hχ s hs1 hs2 hLs
@@ -168,19 +179,7 @@ theorem local_formula
     · nlinarith
     · nlinarith
 
-theorem exists_height
-    : ∃ C : ℝ,
-      0 < C
-        ∧ ∀ (N : ℕ) [NeZero N] (χ : DirichletCharacter ℂ N),
-          χ.IsPrimitive
-            → ∀ T : ℝ,
-              2 ≤ T
-                → ∃ T' : ℝ,
-                  T ≤ T' ∧ T' ≤ T + 1
-                    ∧ ∀ s : ℂ,
-                      -(1 / 2 : ℝ) ≤ s.re → s.re ≤ 3 → |s.im| = T'
-                        → LFunction χ s ≠ 0
-                          ∧ ‖deriv (LFunction χ) s / LFunction χ s‖ ≤ C * Real.log (N * T) ^ 2 := by
+theorem exists_height : ∃ C : ℝ, 0 < C ∧ ∀ (N : ℕ) [NeZero N] (χ : DirichletCharacter ℂ N), χ.IsPrimitive → ∀ T : ℝ, 2 ≤ T → ∃ T' : ℝ, T ≤ T' ∧ T' ≤ T + 1 ∧ ∀ s : ℂ, -(1/2 : ℝ) ≤ s.re → s.re ≤ 3 → |s.im| = T' → LFunction χ s ≠ 0 ∧ ‖deriv (LFunction χ) s / LFunction χ s‖ ≤ C * Real.log (N * T) ^ 2 := by
   obtain ⟨C, hC, hloc⟩ := local_formula
   obtain ⟨B, hB, hright⟩ := exists_bound_right
   refine ⟨6 * (3 * C) + 8 * (3 * C) ^ 2 + 4 * B + 1, by positivity, ?_⟩
@@ -202,22 +201,18 @@ theorem exists_height
       nlinarith [mul_le_mul_of_nonneg_left h4 (by linarith : (0 : ℝ) ≤ N * T),
         mul_nonneg (by linarith : (0 : ℝ) ≤ N) (by linarith : (0 : ℝ) ≤ T + 1 - |y|),
         mul_nonneg (by linarith : (0 : ℝ) ≤ N) (by linarith : (0 : ℝ) ≤ T - 1)]
-    calc
-      Real.log (N * (|y| + 2))
-        ≤ Real.log (((N : ℝ) * T) ^ 3) := Real.log_le_log hpos hle
+    calc Real.log (N * (|y| + 2)) ≤ Real.log (((N : ℝ) * T) ^ 3) := Real.log_le_log hpos hle
       _ = 3 * L := by rw [Real.log_pow]; push_cast; ring
-  have hnorm
-      : ∀ (w : ℂ) (y : ℝ),
-        ‖w - (2 + (y : ℂ) * I)‖ ≤ 7 / 2 ↔ (w.re - 2) ^ 2 + (w.im - y) ^ 2 ≤ 49 / 4 := by
+  have hnorm : ∀ (w : ℂ) (y : ℝ),
+      ‖w - (2 + (y : ℂ) * I)‖ ≤ 7 / 2 ↔ (w.re - 2) ^ 2 + (w.im - y) ^ 2 ≤ 49 / 4 := by
     intro w y
     have e1 : (w - (2 + (y : ℂ) * I)).re = w.re - 2 := by simp
     have e2 : (w - (2 + (y : ℂ) * I)).im = w.im - y := by simp
     rw [← sq_le_sq₀ (norm_nonneg _) (by norm_num), Complex.sq_norm, Complex.normSq_apply, e1, e2]
     constructor <;> intro h <;> nlinarith
-  have hcover
-      : ∀ (y₀ y : ℝ) (w : ℂ),
-        y₀ ≤ y → y ≤ y₀ + 1 → -1 ≤ w.re → w.re < 1 → ‖w - (2 + (y : ℂ) * I)‖ ≤ 7 / 2
-          → ‖w - (2 + (y₀ : ℂ) * I)‖ ≤ 7 / 2 ∨ ‖w - (2 + ((y₀ + 1 : ℝ) : ℂ) * I)‖ ≤ 7 / 2 := by
+  have hcover : ∀ (y₀ y : ℝ) (w : ℂ), y₀ ≤ y → y ≤ y₀ + 1 → -1 ≤ w.re → w.re < 1 →
+      ‖w - (2 + (y : ℂ) * I)‖ ≤ 7 / 2 →
+      ‖w - (2 + (y₀ : ℂ) * I)‖ ≤ 7 / 2 ∨ ‖w - (2 + ((y₀ + 1 : ℝ) : ℂ) * I)‖ ≤ 7 / 2 := by
     intro y₀ y w h1 h2 h3 h4 h5
     rw [hnorm] at h5
     rw [hnorm, hnorm]
@@ -235,12 +230,9 @@ theorem exists_height
       · push Not at hv'
         nlinarith [mul_nonneg (by linarith : (0 : ℝ) ≤ y₀ + 1 - y)
           (by linarith : (0 : ℝ) ≤ 2 * w.im - y - y₀ - 1)]
-  have hZ
-      : ∀ y : ℝ,
-        2 ≤ |y|
-          → ∃ Z : Finset ℂ,
-            (∀ w, w ∈ Z ↔ ‖w - (2 + (y : ℂ) * I)‖ ≤ 7 / 2 ∧ w ≠ 1 ∧ LFunction χ w = 0)
-              ∧ (Z.card : ℝ) ≤ C * Real.log (N * (|y| + 2)) := by
+  have hZ : ∀ y : ℝ, 2 ≤ |y| → ∃ Z : Finset ℂ,
+      (∀ w, w ∈ Z ↔ ‖w - (2 + (y : ℂ) * I)‖ ≤ 7 / 2 ∧ w ≠ 1 ∧ LFunction χ w = 0) ∧
+      (Z.card : ℝ) ≤ C * Real.log (N * (|y| + 2)) := by
     intro y hy
     have hne : (2 : ℂ) + (y : ℂ) * I ≠ 1 := by
       intro h
@@ -249,8 +241,8 @@ theorem exists_height
     have hL2 : LFunction χ (2 + (y : ℂ) * I) ≠ 0 :=
       LFunction_ne_zero_of_one_le_re χ (.inr hne) (by norm_num)
     have him : (2 + (y : ℂ) * I).im = y := by simp
-    obtain ⟨Z, hZm, hZc, -⟩ :=
-      hloc N χ hprim (2 + (y : ℂ) * I) (by norm_num) (by norm_num) (by rw [him]; exact hy) hL2
+    obtain ⟨Z, hZm, hZc, -⟩ := hloc N χ hprim (2 + (y : ℂ) * I) (by norm_num) (by norm_num)
+      (by rw [him]; exact hy) hL2
     rw [him] at hZm hZc
     refine ⟨Z, hZm, le_trans ?_ hZc⟩
     rw [Finset.card_eq_sum_ones, Nat.cast_sum]
@@ -261,9 +253,8 @@ theorem exists_height
   obtain ⟨Z₂, hZ2m, hZ2c⟩ := hZ (T + 1) (by rw [abs_of_pos (by linarith)]; linarith)
   obtain ⟨Z₃, hZ3m, hZ3c⟩ := hZ (-T - 1) (by rw [abs_of_neg (by linarith)]; linarith)
   obtain ⟨Z₄, hZ4m, hZ4c⟩ := hZ (-T - 1 + 1) (by rw [abs_of_neg (by linarith)]; linarith)
-  have hcardle
-      : ∀ (Z : Finset ℂ) (y : ℝ),
-        |y| ≤ T + 1 → (Z.card : ℝ) ≤ C * Real.log (N * (|y| + 2)) → (Z.card : ℝ) ≤ 3 * C * L := by
+  have hcardle : ∀ (Z : Finset ℂ) (y : ℝ), |y| ≤ T + 1 →
+      (Z.card : ℝ) ≤ C * Real.log (N * (|y| + 2)) → (Z.card : ℝ) ≤ 3 * C * L := by
     intro Z y hy h
     have := mul_le_mul_of_nonneg_left (hlog3 y hy) hC.le
     linarith
@@ -273,9 +264,8 @@ theorem exists_height
   have hc4 := hcardle Z₄ (-T - 1 + 1) (by rw [abs_of_neg (by linarith)]; linarith) hZ4c
   set S : Finset ℝ := (Z₁ ∪ Z₂).image Complex.im ∪ (Z₃ ∪ Z₄).image (fun w => -w.im) with hS
   have hScard : S.card ≤ Z₁.card + Z₂.card + (Z₃.card + Z₄.card) := by
-    calc
-      S.card ≤ ((Z₁ ∪ Z₂).image Complex.im).card + ((Z₃ ∪ Z₄).image fun w => -w.im).card :=
-        Finset.card_union_le _ _
+    calc S.card ≤ ((Z₁ ∪ Z₂).image Complex.im).card + ((Z₃ ∪ Z₄).image fun w => -w.im).card :=
+          Finset.card_union_le _ _
       _ ≤ (Z₁ ∪ Z₂).card + (Z₃ ∪ Z₄).card := add_le_add Finset.card_image_le Finset.card_image_le
       _ ≤ _ := add_le_add (Finset.card_union_le _ _) (Finset.card_union_le _ _)
   have hSb : (S.card : ℝ) ≤ 4 * (3 * C * L) := by
@@ -289,12 +279,8 @@ theorem exists_height
     apply one_div_le_one_div_of_le (by norm_num)
     have : (0 : ℝ) ≤ S.card := Nat.cast_nonneg _
     linarith
-  have hfar'
-      : ∀ s : ℂ,
-        |s.im| = T'
-          → ∀ w : ℂ,
-            LFunction χ w = 0 → w ≠ 1 → -1 ≤ w.re → ‖w - (2 + (s.im : ℂ) * I)‖ ≤ 7 / 2
-              → δ ≤ |w.im - s.im| := by
+  have hfar' : ∀ s : ℂ, |s.im| = T' → ∀ w : ℂ, LFunction χ w = 0 → w ≠ 1 → -1 ≤ w.re →
+      ‖w - (2 + (s.im : ℂ) * I)‖ ≤ 7 / 2 → δ ≤ |w.im - s.im| := by
     intro s hsim w hw0 hw1 hwre hwd
     have hwre1 : w.re < 1 := by
       by_contra h
@@ -303,25 +289,22 @@ theorem exists_height
     rcases (abs_eq (by linarith : (0 : ℝ) ≤ T')).mp hsim with h | h
     · rw [h] at hwd ⊢
       rcases hcover T T' w hT1 hT2 hwre hwre1 hwd with h' | h'
-      · have hm : w.im ∈ S :=
-          Finset.mem_union_left _
-            (Finset.mem_image.mpr ⟨w, Finset.mem_union_left _ ((hZ1m w).2 ⟨h', hw1, hw0⟩), rfl⟩)
+      · have hm : w.im ∈ S := Finset.mem_union_left _
+          (Finset.mem_image.mpr ⟨w, Finset.mem_union_left _ ((hZ1m w).2 ⟨h', hw1, hw0⟩), rfl⟩)
         exact hfar _ hm
-      · have hm : w.im ∈ S :=
-          Finset.mem_union_left _
-            (Finset.mem_image.mpr ⟨w, Finset.mem_union_right _ ((hZ2m w).2 ⟨h', hw1, hw0⟩), rfl⟩)
+      · have hm : w.im ∈ S := Finset.mem_union_left _
+          (Finset.mem_image.mpr ⟨w, Finset.mem_union_right _ ((hZ2m w).2 ⟨h', hw1, hw0⟩), rfl⟩)
         exact hfar _ hm
     · rw [h] at hwd ⊢
-      have hdist : |-w.im - T'| = |w.im - -T'| := by rw [← abs_neg]; congr 1; ring
+      have hdist : |-w.im - T'| = |w.im - -T'| := by
+        rw [← abs_neg]; congr 1; ring
       rcases hcover (-T - 1) (-T') w (by linarith) (by linarith) hwre hwre1 hwd with h' | h'
-      · have hm : -w.im ∈ S :=
-          Finset.mem_union_right _
-            (Finset.mem_image.mpr ⟨w, Finset.mem_union_left _ ((hZ3m w).2 ⟨h', hw1, hw0⟩), rfl⟩)
+      · have hm : -w.im ∈ S := Finset.mem_union_right _
+          (Finset.mem_image.mpr ⟨w, Finset.mem_union_left _ ((hZ3m w).2 ⟨h', hw1, hw0⟩), rfl⟩)
         rw [← hdist]
         exact hfar _ hm
-      · have hm : -w.im ∈ S :=
-          Finset.mem_union_right _
-            (Finset.mem_image.mpr ⟨w, Finset.mem_union_right _ ((hZ4m w).2 ⟨h', hw1, hw0⟩), rfl⟩)
+      · have hm : -w.im ∈ S := Finset.mem_union_right _
+          (Finset.mem_image.mpr ⟨w, Finset.mem_union_right _ ((hZ4m w).2 ⟨h', hw1, hw0⟩), rfl⟩)
         rw [← hdist]
         exact hfar _ hm
   clear_value δ S L
@@ -352,27 +335,22 @@ theorem exists_height
     have e4 : 0 ≤ L ^ 2 := sq_nonneg L
     nlinarith
   · push Not at hre
-    obtain ⟨Z, hZm, hZc, hdiff⟩ :=
-      hloc N χ hprim s (by linarith) hre.le (by rw [hsim]; linarith) hLs
+    obtain ⟨Z, hZm, hZc, hdiff⟩ := hloc N χ hprim s (by linarith) hre.le (by rw [hsim]; linarith) hLs
     have hlogs : Real.log (N * (|s.im| + 2)) ≤ 3 * L := hlog3 _ (by rw [hsim]; linarith)
     have hsep : ∀ w ∈ Z, δ ≤ ‖s - w‖ := by
       intro w hw
       obtain ⟨hwd, hw1, hw0⟩ := (hZm w).1 hw
       by_cases hwre : -1 ≤ w.re
-      · calc
-          δ ≤ |w.im - s.im| := hfar' s hsim w hw0 hw1 hwre hwd
+      · calc δ ≤ |w.im - s.im| := hfar' s hsim w hw0 hw1 hwre hwd
           _ = |(s - w).im| := by rw [Complex.sub_im, abs_sub_comm]
           _ ≤ ‖s - w‖ := Complex.abs_im_le_norm _
       · push Not at hwre
-        calc
-          δ ≤ 1 / 2 := hδle
+        calc δ ≤ 1 / 2 := hδle
           _ ≤ |(s - w).re| := by rw [Complex.sub_re, abs_of_pos (by linarith)]; linarith
           _ ≤ ‖s - w‖ := Complex.abs_re_le_norm _
-    have hsumle
-        : ‖∑ w ∈ Z, (analyticOrderNatAt (LFunction χ) w : ℂ) / (s - w)‖
-          ≤ (∑ w ∈ Z, (analyticOrderNatAt (LFunction χ) w : ℝ)) * (2 * ((S.card : ℝ) + 1)) := by
-      calc
-        ‖∑ w ∈ Z, (analyticOrderNatAt (LFunction χ) w : ℂ) / (s - w)‖
+    have hsumle : ‖∑ w ∈ Z, (analyticOrderNatAt (LFunction χ) w : ℂ) / (s - w)‖
+        ≤ (∑ w ∈ Z, (analyticOrderNatAt (LFunction χ) w : ℝ)) * (2 * ((S.card : ℝ) + 1)) := by
+      calc ‖∑ w ∈ Z, (analyticOrderNatAt (LFunction χ) w : ℂ) / (s - w)‖
           ≤ ∑ w ∈ Z, ‖(analyticOrderNatAt (LFunction χ) w : ℂ) / (s - w)‖ := norm_sum_le _ _
         _ ≤ ∑ w ∈ Z, (analyticOrderNatAt (LFunction χ) w : ℝ) / δ := by
           apply Finset.sum_le_sum
@@ -383,31 +361,26 @@ theorem exists_height
     have hordsum : (∑ w ∈ Z, (analyticOrderNatAt (LFunction χ) w : ℝ)) ≤ 3 * C * L := by
       have := mul_le_mul_of_nonneg_left hlogs hC.le
       linarith
-    have hD
-        : ‖deriv (LFunction χ) s / LFunction χ s
-            - ∑ w ∈ Z, (analyticOrderNatAt (LFunction χ) w : ℂ) / (s - w)‖
-          ≤ 3 * C * L := by
+    have hD : ‖deriv (LFunction χ) s / LFunction χ s
+        - ∑ w ∈ Z, (analyticOrderNatAt (LFunction χ) w : ℂ) / (s - w)‖ ≤ 3 * C * L := by
       have := mul_le_mul_of_nonneg_left hlogs hC.le
       linarith
-    have hsum2
-        : ‖∑ w ∈ Z, (analyticOrderNatAt (LFunction χ) w : ℂ) / (s - w)‖
-          ≤ 3 * C * L * (2 * (4 * (3 * C * L) + 1)) := by
-      have hb : 2 * ((S.card : ℝ) + 1) ≤ 2 * (4 * (3 * C * L) + 1) := by linarith only [hSb]
-      have hb0 : (0 : ℝ) ≤ 2 * ((S.card : ℝ) + 1) := by
-        have : (0 : ℝ) ≤ S.card := Nat.cast_nonneg _
-        linarith only [this]
-      exact le_trans hsumle (mul_le_mul hordsum hb hb0 hKL)
-    have htri
-        : ‖deriv (LFunction χ) s / LFunction χ s‖
-          ≤ ‖deriv (LFunction χ) s / LFunction χ s
-              - ∑ w ∈ Z, (analyticOrderNatAt (LFunction χ) w : ℂ) / (s - w)‖
-            + ‖∑ w ∈ Z, (analyticOrderNatAt (LFunction χ) w : ℂ) / (s - w)‖ := by
-      calc
-        ‖deriv (LFunction χ) s / LFunction χ s‖
-            = ‖(deriv (LFunction χ) s / LFunction χ s
-              - ∑ w ∈ Z, (analyticOrderNatAt (LFunction χ) w : ℂ) / (s - w))
-              + ∑ w ∈ Z, (analyticOrderNatAt (LFunction χ) w : ℂ) / (s - w)‖ := by
-          rw [sub_add_cancel]
+    have hsum2 : ‖∑ w ∈ Z, (analyticOrderNatAt (LFunction χ) w : ℂ) / (s - w)‖
+        ≤ 3 * C * L * (2 * (4 * (3 * C * L) + 1)) :=
+      by
+        have hb : 2 * ((S.card : ℝ) + 1) ≤ 2 * (4 * (3 * C * L) + 1) := by linarith only [hSb]
+        have hb0 : (0 : ℝ) ≤ 2 * ((S.card : ℝ) + 1) := by
+          have : (0 : ℝ) ≤ S.card := Nat.cast_nonneg _
+          linarith only [this]
+        exact le_trans hsumle (mul_le_mul hordsum hb hb0 hKL)
+    have htri : ‖deriv (LFunction χ) s / LFunction χ s‖
+        ≤ ‖deriv (LFunction χ) s / LFunction χ s
+            - ∑ w ∈ Z, (analyticOrderNatAt (LFunction χ) w : ℂ) / (s - w)‖
+          + ‖∑ w ∈ Z, (analyticOrderNatAt (LFunction χ) w : ℂ) / (s - w)‖ := by
+      calc ‖deriv (LFunction χ) s / LFunction χ s‖
+          = ‖(deriv (LFunction χ) s / LFunction χ s
+            - ∑ w ∈ Z, (analyticOrderNatAt (LFunction χ) w : ℂ) / (s - w))
+            + ∑ w ∈ Z, (analyticOrderNatAt (LFunction χ) w : ℂ) / (s - w)‖ := by rw [sub_add_cancel]
         _ ≤ _ := norm_add_le _ _
     have g1 : 0 ≤ C * (L * (2 * L - 1)) :=
       mul_nonneg hC.le (mul_nonneg hL0 (by linarith only [hLhalf]))

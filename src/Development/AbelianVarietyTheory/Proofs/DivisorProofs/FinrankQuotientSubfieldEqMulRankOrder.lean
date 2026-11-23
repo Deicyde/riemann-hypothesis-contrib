@@ -1,6 +1,44 @@
 module
 
 public import Development.AbelianVarietyTheory.Definitions.Divisors.IsRatioOfWeight
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
 
 @[expose] public section
 
@@ -8,16 +46,10 @@ open GlobalTheory.HSAmp
 
 namespace GlobalTheory.HSAmp
 
-theorem finrank_ratF_eq_mul_rank
-    (k K : Type) [CommRing k] [IsDomain k] [Module.Finite ℤ k] [Field K] [CharZero K]
-    (ι : k →+* K)
-    (D : ℕ) (x : Fin (D + 1) → K)
-    (hι : Function.Injective ι) (hy : AlgebraicIndependent ℤ (fun j : Fin D => x j.succ / x 0))
-    : Module.finrank (ratF x) K
-        = Module.finrank
-            (Subfield.closure (Set.range ι ∪ Set.range fun j : Fin D => x j.succ / x 0)) K
-          * Module.finrank ℤ k
-      ∧ Function.Injective (MvPolynomial.eval₂Hom ι fun j : Fin D => x j.succ / x 0) := by
+theorem finrank_ratF_eq_mul_rank (k K : Type) [CommRing k] [IsDomain k] [Module.Finite ℤ k] [Field K] [CharZero K]
+    (ι : k →+* K) (D : ℕ) (x : Fin (D + 1) → K) (hι : Function.Injective ι)
+    (hy : AlgebraicIndependent ℤ (fun j : Fin D => x j.succ / x 0)) :
+    Module.finrank (ratF x) K = Module.finrank (Subfield.closure (Set.range ι ∪ Set.range fun j : Fin D => x j.succ / x 0)) K * Module.finrank ℤ k ∧ Function.Injective (MvPolynomial.eval₂Hom ι fun j : Fin D => x j.succ / x 0) := by
   classical
   set y : Fin D → K := fun j => x j.succ / x 0 with hydef
   letI : Algebra k K := ι.toAlgebra
@@ -56,13 +88,10 @@ theorem finrank_ratF_eq_mul_rank
     have hsum : ∑ i, Q * (g i : K) * ι (b i) = 0 := by
       simp_rw [mul_assoc, ← Finset.mul_sum, hg', mul_zero]
     have hcomp : ι.comp (Int.castRingHom k) = Int.castRingHom K := RingHom.ext_int _ _
-    have hev
-        : MvPolynomial.eval₂Hom ι y
-            (∑ i, MvPolynomial.C (b i) * MvPolynomial.map (Int.castRingHom k) (P i))
-          = 0 := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [map_sum, map_mul, MvPolynomial.eval₂Hom_C, MvPolynomial.eval₂Hom_map_hom, hcomp,
-          hP]
+    have hev : MvPolynomial.eval₂Hom ι y
+        (∑ i, MvPolynomial.C (b i) * MvPolynomial.map (Int.castRingHom k) (P i)) = 0 := by
+
+      simp only [map_sum, map_mul, MvPolynomial.eval₂Hom_C, MvPolynomial.eval₂Hom_map_hom, hcomp, hP]
       refine Eq.trans (Finset.sum_congr rfl fun i _ => ?_) hsum
       ring
     have hP0 := hinj (hev.trans (map_zero _).symm)
@@ -71,11 +100,9 @@ theorem finrank_ratF_eq_mul_rank
       ext m
       have hm := congrArg (AddMonoidAlgebra.coeff · m) hP0
       simp only [MvPolynomial.coeff_sum, MvPolynomial.coeff_C_mul, MvPolynomial.coeff_map,
-          MvPolynomial.coeff_zero, Finsupp.zero_apply, eq_intCast]
-        at hm
+        MvPolynomial.coeff_zero, Finsupp.zero_apply, eq_intCast] at hm
       have hm' : ∑ j, AddMonoidAlgebra.coeff (P j) m • b j = 0 := by
-        rw [← hm]
-        refine Finset.sum_congr rfl fun j _ => ?_
+        rw [← hm]; refine Finset.sum_congr rfl fun j _ => ?_
         rw [zsmul_eq_mul, mul_comm]
       rw [MvPolynomial.coeff_zero]
       exact Fintype.linearIndependent_iff.1 b.linearIndependent _ hm' i
@@ -88,8 +115,7 @@ theorem finrank_ratF_eq_mul_rank
     rintro _ ⟨a, rfl⟩
     have h1 : IsIntegral ℤ (ι a) := (Algebra.IsIntegral.isIntegral (R := ℤ) a).map ι.toIntAlgHom
     exact (h1.tower_top (A := F)).isAlgebraic
-  have hEsub
-      : Subalgebra.toSubmodule E.toSubalgebra = Submodule.span F (Set.range fun i => ι (b i)) := by
+  have hEsub : Subalgebra.toSubmodule E.toSubalgebra = Submodule.span F (Set.range fun i => ι (b i)) := by
     apply le_antisymm
     · rw [IntermediateField.adjoin_toSubalgebra_of_isAlgebraic halg, Algebra.adjoin_eq_span]
       refine Submodule.span_le.2 ?_
@@ -99,8 +125,8 @@ theorem finrank_ratF_eq_mul_rank
       obtain ⟨a, rfl⟩ := hcl hz
       have hsr := b.sum_repr a
       change ι a ∈ _
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [← hsr, map_sum]
+
+      rw [← hsr, map_sum]
       refine Submodule.sum_mem _ fun i _ => ?_
       rw [map_zsmul]
       exact zsmul_mem (Submodule.subset_span (Set.mem_range_self (f := fun i => ι (b i)) i)) _

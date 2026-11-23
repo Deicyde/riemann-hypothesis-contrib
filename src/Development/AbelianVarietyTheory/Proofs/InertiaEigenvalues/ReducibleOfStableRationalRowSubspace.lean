@@ -1,81 +1,106 @@
 module
 
-public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.TwistStep
+public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.AdmSt
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations
-  GlobalTheory.Pst GlobalTheory.PMon TensorProduct
+open Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations GlobalTheory.Pst GlobalTheory.PMon TensorProduct
 open scoped Formalism.Per
 
 noncomputable section
 
 namespace GlobalTheory.PMon
 
-theorem vecMul_repr_rows
-    {E : Type} [Field E]
-    {n : Type} [Fintype n] [DecidableEq n]
-    (b : Module.Basis n E (n → E)) (v : n → E)
-    : Matrix.vecMul v (Matrix.of fun k j => b.repr (Pi.single k 1) j) = b.repr v := by
+theorem vecMul_repr_rows {E : Type} [Field E] {n : Type} [Fintype n] [DecidableEq n]
+    (b : Module.Basis n E (n → E)) (v : n → E) :
+    Matrix.vecMul v (Matrix.of fun k j => b.repr (Pi.single k 1) j) = b.repr v := by
   ext j
   conv_rhs => rw [← Finset.univ_sum_single v]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [Matrix.vecMul, dotProduct, Matrix.of_apply, map_sum, Finsupp.coe_finsetSum,
-      Finset.sum_apply]
+
+  simp only [Matrix.vecMul, dotProduct, Matrix.of_apply, map_sum, Finsupp.coe_finsetSum, Finset.sum_apply]
   refine Finset.sum_congr rfl fun k _ => ?_
   rw [show (Pi.single k (v k) : n → E) = v k • Pi.single k 1 by
     ext i; by_cases h : i = k <;> simp [h]]
   simp
 
-theorem vecMul_rows_repr
-    {E : Type} [Field E]
-    {n : Type} [Fintype n] [DecidableEq n]
-    (b : Module.Basis n E (n → E)) (v : n → E)
-    : Matrix.vecMul (b.repr v) (Matrix.of fun i j => b i j) = v := by
+theorem vecMul_rows_repr {E : Type} [Field E] {n : Type} [Fintype n] [DecidableEq n]
+    (b : Module.Basis n E (n → E)) (v : n → E) :
+    Matrix.vecMul (b.repr v) (Matrix.of fun i j => b i j) = v := by
   ext j
   conv_rhs => rw [← b.sum_repr v]
   simp [Matrix.vecMul, dotProduct, Finset.sum_apply]
 
+
 set_option synthInstance.maxHeartbeats 400000 in
 set_option maxHeartbeats 1000000 in
-theorem splits_of_stable_rat_subspace
-    : ∀ (l : ℕ) [Fact l.Prime] (n : Type) [Fintype n] [DecidableEq n] (K : FinExt l) (r : ℕ)
-        (ρ : ↥(GK K) →* GL n ↥(MaximalUnramifiedExtension l)),
-      IsRat r ρ
-        → ∀ W : AddSubgroup (n → ↥(MaximalUnramifiedExtension l)),
-          (∀ c ∈ W, ∀ i, fr l r (c i) = c i)
-            → (∀ e : ↥(MaximalUnramifiedExtension l), fr l r e = e → ∀ c ∈ W, e • c ∈ W)
-            → (∀ g, ∀ c ∈ W, Matrix.vecMul c (ρ g : Matrix n n ↥(MaximalUnramifiedExtension l)) ∈ W)
-            → W ≠ ⊥ → (∃ c : n → ↥(MaximalUnramifiedExtension l), (∀ i, fr l r (c i) = c i) ∧ c ∉ W)
-            → Splits r ρ := by
+theorem splits_of_stable_rat_subspace : ∀ (l : ℕ) [Fact l.Prime] (n : Type) [Fintype n] [DecidableEq n] (K : FinExt l) (r : ℕ) (ρ : ↥(GK K) →* GL n ↥(MaximalUnramifiedExtension l)), IsRat r ρ → ∀ W : AddSubgroup (n → ↥(MaximalUnramifiedExtension l)), (∀ c ∈ W, ∀ i, fr l r (c i) = c i) → (∀ e : ↥(MaximalUnramifiedExtension l), fr l r e = e → ∀ c ∈ W, e • c ∈ W) → (∀ g, ∀ c ∈ W, Matrix.vecMul c (ρ g : Matrix n n ↥(MaximalUnramifiedExtension l)) ∈ W) → W ≠ ⊥ → (∃ c : n → ↥(MaximalUnramifiedExtension l), (∀ i, fr l r (c i) = c i) ∧ c ∉ W) → Splits r ρ := by
   classical
   intro l _ n _ _ K r ρ hρ W hWE hWsm hWst hW0 hWtop
   let E : Subfield ↥(MaximalUnramifiedExtension l) := RingHom.eqLocusField (fr l r) (RingHom.id _)
   let ι : E →+* ↥(MaximalUnramifiedExtension l) := E.subtype
   have hE : ∀ x : E, fr l r (x : ↥(MaximalUnramifiedExtension l)) = x := fun x => x.2
-  let cv : (n → E) → (n → ↥(MaximalUnramifiedExtension l)) := fun c i =>
-    (c i : ↥(MaximalUnramifiedExtension l))
-  let W' : Submodule E (n → E) := {
-    carrier := {c | cv c ∈ W}
-    add_mem' := fun {c d} hc hd => by
-      show cv (c + d) ∈ W
-      rw [show cv (c + d) = cv c + cv d from funext fun i => by simp [cv]]
-      exact W.add_mem hc hd
-    zero_mem' := by
-      show cv 0 ∈ W
-      rw [show cv 0 = 0 from funext fun i => by simp [cv]]
-      exact W.zero_mem
-    smul_mem' := fun e c hc => by
-      show cv (e • c) ∈ W
-      rw [show cv (e • c) = (e : ↥(MaximalUnramifiedExtension l)) • cv c from
-        funext fun i => by simp [cv, smul_eq_mul]]
-      exact hWsm (e : ↥(MaximalUnramifiedExtension l)) (hE e) _ hc
-  }
+  let cv : (n → E) → (n → ↥(MaximalUnramifiedExtension l)) := fun c i => (c i : ↥(MaximalUnramifiedExtension l))
+  let W' : Submodule E (n → E) :=
+    { carrier := {c | cv c ∈ W}
+      add_mem' := fun {c d} hc hd => by
+        show cv (c + d) ∈ W
+        rw [show cv (c + d) = cv c + cv d from funext fun i => by simp [cv]]
+        exact W.add_mem hc hd
+      zero_mem' := by
+        show cv 0 ∈ W
+        rw [show cv 0 = 0 from funext fun i => by simp [cv]]
+        exact W.zero_mem
+      smul_mem' := fun e c hc => by
+        show cv (e • c) ∈ W
+        rw [show cv (e • c) = (e : ↥(MaximalUnramifiedExtension l)) • cv c from funext fun i => by simp [cv, smul_eq_mul]]
+        exact hWsm (e : ↥(MaximalUnramifiedExtension l)) (hE e) _ hc }
   have memW' : ∀ c, c ∈ W' ↔ cv c ∈ W := fun c => Iff.rfl
-  have lift
-      : ∀ c : n → ↥(MaximalUnramifiedExtension l),
-        (∀ i, fr l r (c i) = c i) → ∃ c' : n → E, cv c' = c := fun c hc =>
-    ⟨fun i => ⟨c i, hc i⟩, rfl⟩
+  have lift : ∀ c : n → ↥(MaximalUnramifiedExtension l), (∀ i, fr l r (c i) = c i) → ∃ c' : n → E, cv c' = c :=
+    fun c hc => ⟨fun i => ⟨c i, hc i⟩, rfl⟩
   have hW'0 : W' ≠ ⊥ := by
     obtain ⟨c, hcW, hc0⟩ : ∃ c ∈ W, c ≠ 0 := by
       by_contra h
@@ -139,25 +164,17 @@ theorem splits_of_stable_rat_subspace
     show ((Matrix.GeneralLinearGroup.map ι qE)⁻¹ : GL n ↥(MaximalUnramifiedExtension l)).val = _
     rw [← map_inv]
     rfl
-  have hpinv
-      : ((p⁻¹ : GL n ↥(MaximalUnramifiedExtension l)) : Matrix n n ↥(MaximalUnramifiedExtension l))
-        = M.map ι := by
+  have hpinv : ((p⁻¹ : GL n ↥(MaximalUnramifiedExtension l)) : Matrix n n ↥(MaximalUnramifiedExtension l)) = M.map ι := by
     show ((Matrix.GeneralLinearGroup.map ι qE)⁻¹⁻¹ : GL n ↥(MaximalUnramifiedExtension l)).val = _
     rw [inv_inv]
     rfl
-  let R : ↥(GK K) → Matrix n n E := fun g =>
-    Matrix.of fun i j =>
-      (⟨(ρ g : Matrix n n ↥(MaximalUnramifiedExtension l)) i j, hρ.rat g i j⟩ : E)
-  have hR
-      : ∀ g,
-        ((ρ g : GL n ↥(MaximalUnramifiedExtension l)) : Matrix n n ↥(MaximalUnramifiedExtension l))
-          = (R g).map ι := fun g => by
+  let R : ↥(GK K) → Matrix n n E := fun g => Matrix.of fun i j => (⟨(ρ g : Matrix n n ↥(MaximalUnramifiedExtension l)) i j, hρ.rat g i j⟩ : E)
+  have hR : ∀ g, ((ρ g : GL n ↥(MaximalUnramifiedExtension l)) : Matrix n n ↥(MaximalUnramifiedExtension l)) = (R g).map ι := fun g => by
     ext i j; rfl
   refine ⟨s, p, hsne, hsuniv, fun i j => ?_, fun g i j hi hj => ?_⟩
   · rw [hp]
     exact hE (N i j)
-  · rw [Units.val_mul, Units.val_mul, hpinv, hR, hp, ← Matrix.map_mul, ← Matrix.map_mul,
-      Matrix.map_apply]
+  · rw [Units.val_mul, Units.val_mul, hpinv, hR, hp, ← Matrix.map_mul, ← Matrix.map_mul, Matrix.map_apply]
     suffices h : (M * R g * N) i j = 0 by rw [h, map_zero]
     show Matrix.vecMul (Matrix.vecMul (b i) (R g)) N j = 0
     rw [vecMul_repr_rows]

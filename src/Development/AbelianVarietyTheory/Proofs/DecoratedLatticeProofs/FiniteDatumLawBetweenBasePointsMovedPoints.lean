@@ -1,15 +1,59 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.Definitions.LatticeFrames.SplitPart
-public import Development.AbelianVarietyTheory.PublishedTheorems.TwistedTraceFormula.NotIsCompactUnivFv
 public import Development.AbelianVarietyTheory.Definitions.LatticeFrames.LevChiEqOne
-public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.ChainMoveCharactersEqRhoUpToBase
+public import Formalism.LocalToGlobal.Columns.Adelic
+public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.StepZeroTwistReferenceTupleEqId
+public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.ExistsAdeleEquivFin
+public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.MemIffOfCarries
 public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.PolOfFnOfOne
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.LocalMoveClassRepIffLocalConditions
+import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.KmapOfOkOfVecP
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsIsDetRootFinPartOne
+import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.BaseFieldsPrimesOk
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.CouplingCosetInFramesPreimageUnderLift
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.DetMulConjDet
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsIsPtOfOfRat
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ValuedCompAtDetIdl
+import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.FinAfMemIntUIff
+import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.LevOkTwists
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.LocalMoveClassRepIffLocalConditions
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ValDetSubOneLt
+import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ValuedCompAtDetIdl
+import Formalism.LocalToGlobal.UnitaryNorms.CharUniq
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Development.AbelianVarietyTheory.Definitions.LatticeFrames.FiniteDimensionalMram
 
 @[expose] public section
 
@@ -123,7 +167,6 @@ open Formalism.L2.DIV Formalism.L2.Col
 attribute [local instance] GlobalTheory.Mem.Col2.starE
 variable {B : Base} {X : PreX B.toPre} {I : TC B X}
 
-set_option maxHeartbeats 1000000 in
 theorem exists_move_of_reads
     (hI : I.Ok)
     {u : B.Word} {a : I.ι} {i : ℕ} {Ch : Type} {chOf : (I.stp u a i).Cl → Ch}
@@ -172,7 +215,6 @@ variable
   {l : I.Laws} {Z : TC.Later B (I.cols l)} {u : B.Word} {a : I.ι} {Ch : ℕ → Type}
   {A : TwDat I l Z u a Ch}
 
-set_option maxHeartbeats 1000000 in
 theorem exists_move
     (hI : I.Ok) (hA : A.Is)
     (j : ℕ) (hj : j ≤ B.R.m) (β : Ch j) (κ : A.U j β)
@@ -212,7 +254,6 @@ theorem exists_move
       exact mem_ratAt_of M (by rw [h0] at hM; exact hM))
     (A.p0 j (A.chOf j c)) ((hA.base j hj _).1.of_extTo (ColIn.Q_subset_SQ I a) hd) hc
 
-set_option maxHeartbeats 1000000 in
 theorem chr_root_eq
     (hI : I.Ok) (hA : A.Is) (j : Fin B.R.m)
     (k : ℕ) (hk : k ≤ B.R.m) (g : GA (I.rec7 l Z) ((I.rec7 l Z).sp.X k)) (hg : g ∈ GfC _)
@@ -253,7 +294,6 @@ theorem chr_root_eq
     tildeQ_mk _ _ hfac]
   rfl
 
-set_option maxHeartbeats 1000000 in
 theorem chr_root_eq_prod
     (hI : I.Ok) (hA : A.Is) (j : Fin B.R.m)
     (k : ℕ) (hk : k ≤ B.R.m) (β : Ch k) (κ : A.U k β) (κ₀ : TC.GA B (B.R.N k))
@@ -305,7 +345,6 @@ theorem chr_root_eq_prod
 
 end Main
 
-set_option maxHeartbeats 2000000 in
 theorem moved_law
     : ∀ {B : Base} {X : PreX B.toPre} (I : TC B X),
       I.Ok → TC.Pins B X

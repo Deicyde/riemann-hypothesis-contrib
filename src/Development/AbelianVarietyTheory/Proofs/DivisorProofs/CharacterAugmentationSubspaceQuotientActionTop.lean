@@ -1,7 +1,56 @@
 module
 
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.QActMSubAlgebraMap
-public import Development.AbelianVarietyTheory.Definitions.Divisors.KottwitzDimSignatureOneOne
+public import Mathlib.Algebra.MonoidAlgebra.Basic
+public import Mathlib.LinearAlgebra.FiniteDimensional.Defs
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.LinearAlgebra.Matrix.FiniteDimensional
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
+import Development.AbelianVarietyTheory.Definitions.Divisors.InfUniv
+import Development.AbelianVarietyTheory.Definitions.Divisors.KottwitzDimSignatureOneOne
+public import Mathlib.LinearAlgebra.Dimension.Constructions
 
 @[expose] public section
 
@@ -11,81 +60,66 @@ noncomputable section
 
 namespace GlobalTheory.HTRho.CRTSplit
 
-variable
-  {k O C V : Type*} [Field k] [Ring O] [CommRing C] [Algebra C O] [AddCommGroup V] [Module k V]
+variable {k O C V : Type*} [Field k] [Ring O] [CommRing C] [Algebra C O] [AddCommGroup V] [Module k V]
 
 abbrev actC (τ : O →+* Module.End k V) : MonoidAlgebra k C →ₐ[k] Module.End k V :=
   MonoidAlgebra.lift k (Module.End k V) C (τ.comp (algebraMap C O)).toMonoidHom
 
-abbrev chiC (χ : C →+* k) : MonoidAlgebra k C →ₐ[k] k := MonoidAlgebra.lift k k C χ.toMonoidHom
+abbrev chiC (χ : C →+* k) : MonoidAlgebra k C →ₐ[k] k :=
+  MonoidAlgebra.lift k k C χ.toMonoidHom
 
-theorem actC_apply (τ : O →+* Module.End k V) (f : MonoidAlgebra k C) (v : V)
-    : actC τ f v = ∑ c ∈ f.coeff.support, f.coeff c • τ (algebraMap C O c) v := by
+theorem actC_apply (τ : O →+* Module.End k V) (f : MonoidAlgebra k C) (v : V) :
+    actC τ f v = ∑ c ∈ f.coeff.support, f.coeff c • τ (algebraMap C O c) v := by
   rw [actC, MonoidAlgebra.lift_apply, Finsupp.sum, LinearMap.sum_apply]
   rfl
 
-theorem chiC_apply (χ : C →+* k) (f : MonoidAlgebra k C)
-    : chiC χ f = ∑ c ∈ f.coeff.support, f.coeff c * χ c := by
+theorem chiC_apply (χ : C →+* k) (f : MonoidAlgebra k C) :
+    chiC χ f = ∑ c ∈ f.coeff.support, f.coeff c * χ c := by
   rw [chiC, MonoidAlgebra.lift_apply, Finsupp.sum]
   rfl
 
-theorem actC_of (τ : O →+* Module.End k V) (c : C)
-    : actC τ (MonoidAlgebra.of k C c) = τ (algebraMap C O c) := by
+theorem actC_of (τ : O →+* Module.End k V) (c : C) :
+    actC τ (MonoidAlgebra.of k C c) = τ (algebraMap C O c) := by
   rw [actC, MonoidAlgebra.lift_of]; rfl
 
 theorem chiC_of (χ : C →+* k) (c : C) : chiC χ (MonoidAlgebra.of k C c) = χ c := by
   rw [chiC, MonoidAlgebra.lift_of]; rfl
 
-theorem actC_eq_zero
-    {Idx : Type*} (τ : O →+* Module.End k V) (χ : Idx → C →+* k) (hJ : jSub τ χ ⊤ = ⊥)
-    (f : MonoidAlgebra k C) (hf : ∀ i, chiC (χ i) f = 0)
-    (v : V)
-    : actC τ f v = 0 := by
+theorem actC_eq_zero {Idx : Type*} (τ : O →+* Module.End k V) (χ : Idx → C →+* k)
+    (hJ : jSub τ χ ⊤ = ⊥) (f : MonoidAlgebra k C) (hf : ∀ i, chiC (χ i) f = 0) (v : V) :
+    actC τ f v = 0 := by
   have hmem : actC τ f v ∈ jSub τ χ ⊤ := by
     apply Submodule.subset_span
-    refine ⟨
-      f.coeff.support.card,
-      fun l => f.coeff (f.coeff.support.equivFin.symm l),
-      fun l => (f.coeff.support.equivFin.symm l : C),
-      v,
-      trivial,
-      fun i => ?_,
-      ?_
-    ⟩
-    · have h1 :=
-        Equiv.sum_comp f.coeff.support.equivFin.symm (fun x : f.coeff.support => f.coeff x * χ i x)
+    refine ⟨f.coeff.support.card, fun l => f.coeff (f.coeff.support.equivFin.symm l),
+      fun l => (f.coeff.support.equivFin.symm l : C), v, trivial, fun i => ?_, ?_⟩
+    · have h1 := Equiv.sum_comp f.coeff.support.equivFin.symm
+        (fun x : f.coeff.support => f.coeff x * χ i x)
       beta_reduce at h1
       rw [h1, Finset.sum_coe_sort f.coeff.support (fun x => f.coeff x * χ i x), ← chiC_apply, hf i]
-    · have h1 :=
-        Equiv.sum_comp f.coeff.support.equivFin.symm
-          (fun x : f.coeff.support => f.coeff x • τ (algebraMap C O x) v)
+    · have h1 := Equiv.sum_comp f.coeff.support.equivFin.symm
+        (fun x : f.coeff.support => f.coeff x • τ (algebraMap C O x) v)
       beta_reduce at h1
       rw [h1, Finset.sum_coe_sort f.coeff.support (fun x => f.coeff x • τ (algebraMap C O x) v),
         actC_apply]
   rw [hJ] at hmem
   simpa using hmem
 
-theorem actC_mem_mSub
-    (τ : O →+* Module.End k V) (χ : C →+* k) (f : MonoidAlgebra k C) (hf : chiC χ f = 0) (x : V)
-    : actC τ f x ∈ mSub τ χ ⊤ := by
+theorem actC_mem_mSub (τ : O →+* Module.End k V) (χ : C →+* k) (f : MonoidAlgebra k C)
+    (hf : chiC χ f = 0) (x : V) : actC τ f x ∈ mSub τ χ ⊤ := by
   have h : actC τ f x = ∑ c ∈ f.coeff.support, f.coeff c • (τ (algebraMap C O c) x - χ c • x) := by
     simp only [smul_sub, Finset.sum_sub_distrib, smul_smul]
     rw [actC_apply, ← Finset.sum_smul, ← chiC_apply, hf, zero_smul, sub_zero]
   rw [h]
-  exact Submodule.sum_mem _ fun c _ =>
-    Submodule.smul_mem _ _ (Submodule.subset_span ⟨c, x, trivial, rfl⟩)
+  exact Submodule.sum_mem _ fun c _ => Submodule.smul_mem _ _ (Submodule.subset_span ⟨c, x, trivial, rfl⟩)
 
-theorem actC_mSub_eq_zero
-    {Idx : Type*} (τ : O →+* Module.End k V) (χ : Idx → C →+* k) (hJ : jSub τ χ ⊤ = ⊥)
-    (i : Idx) (e : MonoidAlgebra k C) (he : ∀ l, l ≠ i → chiC (χ l) e = 0)
-    (y : V) (hy : y ∈ mSub τ (χ i) ⊤)
-    : actC τ e y = 0 := by
+theorem actC_mSub_eq_zero {Idx : Type*} (τ : O →+* Module.End k V) (χ : Idx → C →+* k)
+    (hJ : jSub τ χ ⊤ = ⊥) (i : Idx) (e : MonoidAlgebra k C) (he : ∀ l, l ≠ i → chiC (χ l) e = 0)
+    (y : V) (hy : y ∈ mSub τ (χ i) ⊤) : actC τ e y = 0 := by
   induction hy using Submodule.span_induction with
   | mem z hz =>
     obtain ⟨c, x, -, rfl⟩ := hz
-    have h2
-        : τ (algebraMap C O c) x - χ i c • x
-          = actC τ (MonoidAlgebra.of k C c - algebraMap k _ (χ i c)) x := by
+    have h2 : τ (algebraMap C O c) x - χ i c • x =
+        actC τ (MonoidAlgebra.of k C c - algebraMap k _ (χ i c)) x := by
       rw [map_sub, AlgHom.commutes, actC_of, LinearMap.sub_apply, Module.algebraMap_end_apply]
     rw [h2, ← Module.End.mul_apply, ← map_mul]
     refine actC_eq_zero τ χ hJ _ (fun l => ?_) x
@@ -101,16 +135,14 @@ theorem actC_mSub_eq_zero
 
 end GlobalTheory.HTRho.CRTSplit
 
+
 open GlobalTheory.HTRho.CRTSplit in
-theorem GlobalTheory.HTRho.finrank_homO_eq_sum_quot
-    : ∀ {k O C Idx W V : Type*} [Field k] [Ring O] [CommRing C] [Algebra C O] [Fintype Idx]
-        [AddCommGroup W] [Module k W] [FiniteDimensional k W] [AddCommGroup V] [Module k V]
-        [FiniteDimensional k V] (σW : O →+* Module.End k W) (τ : O →+* Module.End k V)
-        (χ : Idx → C →+* k),
-      Function.Injective χ → jSub τ χ ⊤ = ⊥
-        → finrank k (homO σW τ)
-          = ∑ i, finrank k (homO σW (qAct τ (mSub τ (χ i) ⊤)
-            (mSub_stable τ (χ i) ⊤ (fun _ _ _ => trivial)))) := by
+theorem GlobalTheory.HTRho.finrank_homO_eq_sum_quot : ∀ {k O C Idx W V : Type*} [Field k] [Ring O] [CommRing C] [Algebra C O]
+    [Fintype Idx] [AddCommGroup W] [Module k W] [FiniteDimensional k W] [AddCommGroup V] [Module k V]
+    [FiniteDimensional k V] (σW : O →+* Module.End k W) (τ : O →+* Module.End k V) (χ : Idx → C →+* k),
+    Function.Injective χ → jSub τ χ ⊤ = ⊥ →
+    finrank k (homO σW τ) = ∑ i, finrank k (homO σW (qAct τ (mSub τ (χ i) ⊤)
+      (mSub_stable τ (χ i) ⊤ (fun _ _ _ => trivial)))) := by
   intro k O C Idx W V _ _ _ _ _ _ _ _ _ _ _ σW τ χ hχ hJ
   classical
   have hb : ∀ i j, ∃ b : MonoidAlgebra k C, i ≠ j → chiC (χ i) b = 1 ∧ chiC (χ j) b = 0 := by
@@ -119,8 +151,7 @@ theorem GlobalTheory.HTRho.finrank_homO_eq_sum_quot
     · exact ⟨0, fun h => (h hij).elim⟩
     obtain ⟨c, hc⟩ := DFunLike.ne_iff.mp (hχ.ne hij)
     have hc' : χ i c - χ j c ≠ 0 := sub_ne_zero.mpr hc
-    refine
-      ⟨(χ i c - χ j c)⁻¹ • (MonoidAlgebra.of k C c - algebraMap k _ (χ j c)), fun _ => ⟨?_, ?_⟩⟩
+    refine ⟨(χ i c - χ j c)⁻¹ • (MonoidAlgebra.of k C c - algebraMap k _ (χ j c)), fun _ => ⟨?_, ?_⟩⟩
     · rw [map_smul, map_sub, AlgHom.commutes, chiC_of, Algebra.algebraMap_self, RingHom.id_apply,
         smul_eq_mul, inv_mul_cancel₀ hc']
     · rw [map_smul, map_sub, AlgHom.commutes, chiC_of, Algebra.algebraMap_self, RingHom.id_apply,
@@ -132,16 +163,14 @@ theorem GlobalTheory.HTRho.finrank_homO_eq_sum_quot
     simp only [e, map_prod]
     split_ifs with hl
     · subst hl; exact Finset.prod_eq_one fun j hj => (hb l j (Finset.ne_of_mem_erase hj).symm).1
-    · exact Finset.prod_eq_zero (Finset.mem_erase.mpr ⟨hl, Finset.mem_univ l⟩)
-        (hb i l (Ne.symm hl)).2
+    · exact Finset.prod_eq_zero (Finset.mem_erase.mpr ⟨hl, Finset.mem_univ l⟩) (hb i l (Ne.symm hl)).2
   have hsum : ∀ v : V, v = ∑ i, actC τ (e i) v := by
     intro v
     have h0 : actC τ (1 - ∑ i, e i) v = 0 :=
       actC_eq_zero τ χ hJ _ (fun l => by simp [map_sub, map_sum, he]) v
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sub, map_one, map_sum, LinearMap.sub_apply, Module.End.one_apply, LinearMap.sum_apply,
-          sub_eq_zero]
-        at h0
+
+    rw [map_sub, map_one, map_sum, LinearMap.sub_apply, Module.End.one_apply, LinearMap.sum_apply,
+    sub_eq_zero] at h0
     exact h0
   let Φ : V →ₗ[k] ((i : Idx) → V ⧸ mSub τ (χ i) ⊤) := LinearMap.pi fun i => (mSub τ (χ i) ⊤).mkQ
   have hΦ : Function.Bijective Φ := by
@@ -158,27 +187,19 @@ theorem GlobalTheory.HTRho.finrank_homO_eq_sum_quot
       choose w hw using fun i => Submodule.Quotient.mk_surjective (mSub τ (χ i) ⊤) (q i)
       refine ⟨∑ j, actC τ (e j) (w j), funext fun i => ?_⟩
       simp only [Φ, LinearMap.pi_apply, Submodule.mkQ_apply]
-      rw [← hw i, Submodule.Quotient.eq, ← Finset.add_sum_erase _ _ (Finset.mem_univ i),
-        add_sub_right_comm]
-      refine add_mem ?_
-        (Submodule.sum_mem _ fun j hj =>
-          actC_mem_mSub τ (χ i) _ (by rw [he, if_neg (Finset.ne_of_mem_erase hj).symm]) (w j))
-      have h3 :=
-        actC_mem_mSub τ (χ i) (e i - 1) (by rw [map_sub, he, if_pos rfl, map_one, sub_self]) (w i)
+      rw [← hw i, Submodule.Quotient.eq, ← Finset.add_sum_erase _ _ (Finset.mem_univ i), add_sub_right_comm]
+      refine add_mem ?_ (Submodule.sum_mem _ fun j hj => actC_mem_mSub τ (χ i) _
+        (by rw [he, if_neg (Finset.ne_of_mem_erase hj).symm]) (w j))
+      have h3 := actC_mem_mSub τ (χ i) (e i - 1) (by rw [map_sub, he, if_pos rfl, map_one, sub_self]) (w i)
       simpa [map_sub] using h3
   let Φe := LinearEquiv.ofBijective Φ hΦ
-  let Ψ
-      : homO σW τ →ₗ[k] ((i : Idx) → homO σW (qAct τ (mSub τ (χ i) ⊤)
-        (mSub_stable τ (χ i) ⊤ (fun _ _ _ => trivial)))) :=
-    LinearMap.pi fun i => {
-      toFun := fun T => ⟨
-        (mSub τ (χ i) ⊤).mkQ ∘ₗ T.1,
-        (mem_homO _ _ _).mpr fun a x => by
-          rw [LinearMap.comp_apply, LinearMap.comp_apply, (mem_homO _ _ _).mp T.2 a x, qAct_mk]
-      ⟩
-      map_add' := fun S T => by ext; simp
-      map_smul' := fun c T => by ext; simp
-    }
+  let Ψ : homO σW τ →ₗ[k] ((i : Idx) → homO σW (qAct τ (mSub τ (χ i) ⊤)
+      (mSub_stable τ (χ i) ⊤ (fun _ _ _ => trivial)))) :=
+    LinearMap.pi fun i =>
+      { toFun := fun T => ⟨(mSub τ (χ i) ⊤).mkQ ∘ₗ T.1, (mem_homO _ _ _).mpr fun a x => by
+            rw [LinearMap.comp_apply, LinearMap.comp_apply, (mem_homO _ _ _).mp T.2 a x, qAct_mk]⟩
+        map_add' := fun S T => by ext; simp
+        map_smul' := fun c T => by ext; simp }
   have hΨ : Function.Bijective Ψ := by
     constructor
     · intro S T h

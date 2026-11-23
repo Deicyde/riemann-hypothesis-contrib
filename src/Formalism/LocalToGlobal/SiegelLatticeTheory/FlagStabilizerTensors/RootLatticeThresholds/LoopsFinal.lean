@@ -1,25 +1,52 @@
 module
 
-public import Mathlib
 public import Formalism.LocalToGlobal.SiegelLatticeTheory.FlagStabilizerTensors.LoopTieOfInhab
-public import Formalism.LocalToGlobal.SiegelLatticeTheory.FlagStabilizerTensors.RootLatticeThresholds.WRowPinHolds
+public import Formalism.SharpRestriction.CuspSpanNormBounds.CayleyDegreeNondegeneracy.RowsTie
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
 public import Formalism.LocalToGlobal.SiegelLatticeTheory.FlagStabilizerTensors.RootLatticeThresholds.SubMemOfIndQ
-public import Formalism.SharpRestriction.CuspSpanNormBounds.CayleyDegreeNondegeneracy.RowsFinal
-public import Formalism.SharpRestriction.CuspSpanNormBounds.BruhatCellsKronecker.OwnEvIntro
-public import Formalism.SharpRestriction.CuspSpanNormBounds.PExtra
-public import Formalism.SharpRestriction.CuspSpanNormBounds.MassAndBranchingHypotheses
-public import Formalism.SharpRestriction.CuspSpanNormBounds.AmplitudeAndVolumeBounds
-public import Formalism.PeriodIntegrals.OrbitalBoundsConclusion.BetaLUniq
 
 @[expose] public section
 
 noncomputable section
 
 open scoped Classical
-open MeasureTheory NumberField Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.S
-  Formalism.MainNotions.S.Lat Formalism.MainNotions.S.Cnt Formalism.L2.SG.HidaSetting
-  Formalism.L2.SG.Full Formalism.L2.SG.PackageTie2 Formalism.L2.SG.TermTieOf
-  Formalism.L2.SG.LoopTieOf
+open MeasureTheory NumberField Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.MainNotions.S.Cnt Formalism.L2.SG.HidaSetting
+  Formalism.L2.SG.Full Formalism.L2.SG.PackageTie2 Formalism.L2.SG.TermTieOf Formalism.L2.SG.LoopTieOf
 
 namespace Formalism.L2.SG.LoopsFinal
 
@@ -29,8 +56,7 @@ section admitted
 
 variable {eps : ℝ} (Fm : FamP eps) (C1 : ℝ)
 
-variable
-  (At : ∀ x, Fm.x1 < x → ∀ i : Fm.Ix x, TermTie (Fm.D x i))
+variable (At : ∀ x, Fm.x1 < x → ∀ i : Fm.Ix x, TermTie (Fm.D x i))
   (Yt : ∀ x (hx : Fm.x1 < x) (i : Fm.Ix x) (u u' : (Fm.D x i).what₂.Word),
     LoopTie (Fm.D x i) (Fm.L x i) (At x hx i) u u' C1)
 
@@ -38,9 +64,8 @@ end admitted
 
 section AtOne
 
-variable
-  {D : D7} {X : HidaSetting D} {Y : Full X} {hF : FinX Y}
-  (W : WittDat X) (hI : SIso D.s (sOf hF)) (H : TieHyp W hI) (A : AmpDat X) (hV : PvalForm W hI A)
+variable {D : D7} {X : HidaSetting D} {Y : Full X} {hF : FinX Y} (W : WittDat X) (hI : SIso D.s (sOf hF))
+  (H : TieHyp W hI) (A : AmpDat X) (hV : PvalForm W hI A)
 
 theorem jtPin_of (hA : AmpFibreConst Y) : JtPin hF hI (termTieOf W hI H A hV) := by
   intro u u' t s hs
@@ -53,31 +78,26 @@ theorem jtPin_of (hA : AmpFibreConst Y) : JtPin hF hI (termTieOf W hI H A hV) :=
   rw [e]
 
 def FrameChangeAt : Prop :=
-  ∀ (u u' : D.what₂.Word) (t : D.s.Term u u')
-      (ξ : Matrix (Fin (D.R.rS + 1)) (Fin (D.R.rS + 1)) (𝓞 D.host.E)),
-    (∀ a b, b < a → ξ a b = 0) → (∀ a, ξ a a = 1)
-      → ∃ m ∈ NLam (lamOf W hI t) (fl'Of W hI t), ∀ b,
-        m (frame (fl'Of W hI t) b) = frameAct (frame (fl'Of W hI t)) ξ b
+  ∀ (u u' : D.what₂.Word) (t : D.s.Term u u') (ξ : Matrix (Fin (D.R.rS + 1)) (Fin (D.R.rS + 1)) (𝓞 D.host.E)),
+    (∀ a b, b < a → ξ a b = 0) → (∀ a, ξ a a = 1) →
+      ∃ m ∈ NLam (lamOf W hI t) (fl'Of W hI t), ∀ b, m (frame (fl'Of W hI t) b) = frameAct (frame (fl'Of W hI t)) ξ b
 
-theorem frameEqvInj_of (hFC : FrameChangeAt W hI) (u u' : D.what₂.Word)
-    : FrameEqvInj (termTieOf W hI H A hV) (u' := u') (FlagOfWord W u) := by
+theorem frameEqvInj_of (hFC : FrameChangeAt W hI) (u u' : D.what₂.Word) :
+    FrameEqvInj (termTieOf W hI H A hV) (u' := u') (FlagOfWord W u) := by
   intro t t' hL hE
   obtain ⟨n, hn, ξ, hl, hd, hfr⟩ := hE
   obtain ⟨m, hm, hmf⟩ := hFC u u' t ξ hl hd
   refine term_injC W hI t t' hL ⟨n, hn, m, hm, fun b => ?_⟩
-  have e1 : frame (fl'Of W hI t') b = frameAct (fun a => n (frame (fl'Of W hI t) a)) ξ b :=
-    congrFun hfr b
+  have e1 : frame (fl'Of W hI t') b = frameAct (fun a => n (frame (fl'Of W hI t) a)) ξ b := congrFun hfr b
   rw [e1, hmf b]
-  set_option synthInstance.maxHeartbeats 100000 in
+
   simp only [frameAct, map_sum, map_smul]
 
 end AtOne
 
 section Ev
 
-variable
-  {eps : ℝ} (Fm : FamP eps)
-  (C1 : ℝ) (At : ∀ x, Fm.x1 < x → ∀ i : Fm.Ix x, TermTie (Fm.D x i))
+variable {eps : ℝ} (Fm : FamP eps) (C1 : ℝ) (At : ∀ x, Fm.x1 < x → ∀ i : Fm.Ix x, TermTie (Fm.D x i))
   (Yt : ∀ x (hx : Fm.x1 < x) (i : Fm.Ix x) (u u' : (Fm.D x i).what₂.Word),
     LoopTie (Fm.D x i) (Fm.L x i) (At x hx i) u u' C1)
   (Cc : ∀ x (hx : Fm.x1 < x) (i : Fm.Ix x), ConcAt (Fm.D x i) (At x hx i))
@@ -88,13 +108,12 @@ section Summ
 
 variable {D : D7} {X : HidaSetting D} {Y : Full X} {hF : FinX Y} {hI : SIso D.s (sOf hF)}
 
+
 end Summ
 
 section Fam
 
-variable
-  {eps : ℝ} (Fm : FamP eps)
-  (C1 : ℝ)
+variable {eps : ℝ} (Fm : FamP eps) (C1 : ℝ)
   (X : ∀ x, Fm.x1 < x → ∀ i : Fm.Ix x, HidaSetting (Fm.D x i))
   (Y : ∀ x (hx : Fm.x1 < x) (i : Fm.Ix x), Full (X x hx i))
   (hF : ∀ x (hx : Fm.x1 < x) (i : Fm.Ix x), FinX (Y x hx i))
@@ -104,18 +123,15 @@ variable
   (A : ∀ x (hx : Fm.x1 < x) (i : Fm.Ix x), AmpDat (X x hx i))
   (hV : ∀ x (hx : Fm.x1 < x) (i : Fm.Ix x), PvalForm (W x hx i) (hI x hx i) (A x hx i))
 
-def AtF : ∀ x, Fm.x1 < x → ∀ i : Fm.Ix x, TermTie (Fm.D x i) := fun x hx i =>
-  termTieOf (W x hx i) (hI x hx i) (H x hx i) (A x hx i) (hV x hx i)
+def AtF : ∀ x, Fm.x1 < x → ∀ i : Fm.Ix x, TermTie (Fm.D x i) :=
+  fun x hx i => termTieOf (W x hx i) (hI x hx i) (H x hx i) (A x hx i) (hV x hx i)
 
-variable
-  (hFC : ∀ x (hx : Fm.x1 < x) (i : Fm.Ix x), FrameChangeAt (W x hx i) (hI x hx i))
-  (B : ∀ x (_ : Fm.x1 < x) (i : Fm.Ix x) (u u' : (Fm.D x i).what₂.Word),
-    LoopLocDat (Fm.D x i) (Fm.L x i) u u' C1)
+variable (hFC : ∀ x (hx : Fm.x1 < x) (i : Fm.Ix x), FrameChangeAt (W x hx i) (hI x hx i))
+  (B : ∀ x (_ : Fm.x1 < x) (i : Fm.Ix x) (u u' : (Fm.D x i).what₂.Word), LoopLocDat (Fm.D x i) (Fm.L x i) u u' C1)
   (M : ∀ x (hx : Fm.x1 < x) (i : Fm.Ix x) (u u' : (Fm.D x i).what₂.Word),
     LoopTermDat (Fm.D x i) (Fm.L x i) (AtF Fm X Y hF hI W H A hV x hx i) u u' C1 (B x hx i u u'))
 
-variable
-  (hAF : ∀ x (hx : Fm.x1 < x) (i : Fm.Ix x), AmpFibreConst (Y x hx i))
+variable (hAF : ∀ x (hx : Fm.x1 < x) (i : Fm.Ix x), AmpFibreConst (Y x hx i))
   (hRF : ∀ x (hx : Fm.x1 < x) (i : Fm.Ix x), Formalism.L2.SG.Pf.FibreCounting.RowFree (Y x hx i))
   (gam : ∀ x (hx : Fm.x1 < x) (i : Fm.Ix x), GamPin (Y x hx i))
 
@@ -124,29 +140,24 @@ end Fam
 section Closed
 
 def NormTieC : Prop :=
-  ∀ (D : D7) (X : HidaSetting D) (Y : Full X) (hF : FinX Y) (hI : SIso D.s (sOf hF)) (W : WittDat X)
-      (H : TieHyp W hI) (A : AmpDat X) (hV : PvalForm W hI A) (u u' : D.what₂.Word),
+  ∀ (D : D7) (X : HidaSetting D) (Y : Full X) (hF : FinX Y) (hI : SIso D.s (sOf hF)) (W : WittDat X) (H : TieHyp W hI)
+    (A : AmpDat X) (hV : PvalForm W hI A) (u u' : D.what₂.Word),
     BridgeLemma₂.wordPairNormRelation (termTieOf W hI H A hV) u u'
 
 def GramDeterminantCount : Prop :=
-  ∀ (D : D7) (X : HidaSetting D) (Y : Full X) (hF : FinX Y) (hI : SIso D.s (sOf hF)) (W : WittDat X)
-      (H : TieHyp W hI) (A : AmpDat X) (hV : PvalForm W hI A) (u u' : D.what₂.Word),
-    @Formalism.MainNotions.BridgeLemma.LatticeDeterminantFactorization D (termTieOf W hI H A hV) u
-      u'
+  ∀ (D : D7) (X : HidaSetting D) (Y : Full X) (hF : FinX Y) (hI : SIso D.s (sOf hF)) (W : WittDat X) (H : TieHyp W hI)
+    (A : AmpDat X) (hV : PvalForm W hI A) (u u' : D.what₂.Word),
+    @Formalism.MainNotions.BridgeLemma.LatticeDeterminantFactorization D (termTieOf W hI H A hV) u u'
 
 def EntryLatC : Prop :=
-  ∀ (D : D7) (X : HidaSetting D) (Y : Full X) (hF : FinX Y) (hI : SIso D.s (sOf hF)) (W : WittDat X)
-      (H : TieHyp W hI) (A : AmpDat X) (hV : PvalForm W hI A) (u u' : D.what₂.Word),
+  ∀ (D : D7) (X : HidaSetting D) (Y : Full X) (hF : FinX Y) (hI : SIso D.s (sOf hF)) (W : WittDat X) (H : TieHyp W hI)
+    (A : AmpDat X) (hV : PvalForm W hI A) (u u' : D.what₂.Word),
     BridgeLemma₂.wordPairEntriesInLattice (termTieOf W hI H A hV) u u'
 
 def FrameChangeC : Prop :=
-  ∀ (D : D7) (X : HidaSetting D) (Y : Full X) (hF : FinX Y) (hI : SIso D.s (sOf hF))
-      (W : WittDat X),
-    FrameChangeAt W hI
+  ∀ (D : D7) (X : HidaSetting D) (Y : Full X) (hF : FinX Y) (hI : SIso D.s (sOf hF)) (W : WittDat X), FrameChangeAt W hI
 
-variable
-  {eps : ℝ} (Fm : FamP eps)
-  (C1 : ℝ)
+variable {eps : ℝ} (Fm : FamP eps) (C1 : ℝ)
   (X : ∀ x, Fm.x1 < x → ∀ i : Fm.Ix x, HidaSetting (Fm.D x i))
   (Y : ∀ x (hx : Fm.x1 < x) (i : Fm.Ix x), Full (X x hx i))
   (hF : ∀ x (hx : Fm.x1 < x) (i : Fm.Ix x), FinX (Y x hx i))

@@ -1,7 +1,63 @@
 module
 
+import Formalism.FlagUnipotentLattices.MinkowskiFactorialBounds.BlockMinorSumCounterexample
 public import Formalism.FlagUnipotentLattices.UnipotentStabiliserCharacterisation
-public import Formalism.FormalDegreeBessel.FinalG
+public import Formalism.FormalDegreeBessel.StatementG
+public import Mathlib.Analysis.Fourier.FourierTransform
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Real
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+public import Mathlib.Analysis.Fourier.Inversion
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+public import Mathlib.MeasureTheory.Constructions.HaarToSphere
+public import Mathlib.MeasureTheory.Measure.Lebesgue.VolumeOfBalls
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Lemma
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
+import Formalism.FormalDegreeBessel.FormalDegreeRatio.UnitaryWeylNormalHolds
+import Mathlib.Algebra.Group.ForwardDiff
 
 @[expose] public section
 
@@ -107,36 +163,7 @@ lemma integrableOn_Ioi_truncated_power_moment {K L : ℝ} (hK : 2 < K) (hL : 0 <
   exact Integrable.const_mul (integrableOn_Ioi_rpow_of_lt (by linarith) hL) _
 
 lemma gl_e3Integral : Formalism.HermitianLatticeCounting.ExpansionTerms.CutoffIntegralFormula := by
-  intro K L hK hL
-  have hK0 : 0 ≤ K := by linarith
-  have hU : Set.Ioi (0 : ℝ) = Set.Ioc 0 L ∪ Set.Ioi L := (Set.Ioc_union_Ioi_eq_Ioi hL.le).symm
-  constructor
-  · rw [gl_radial_integrable (fun y => TruncationCutoff K L y), hU]
-    exact (integrableOn_Ioc_truncated_power_moment hK0).union (integrableOn_Ioi_truncated_power_moment hK hL)
-  · rw [gl_radial_integral (fun y => TruncationCutoff K L y), hU,
-      setIntegral_union (Set.Ioc_disjoint_Ioi le_rfl) measurableSet_Ioi (integrableOn_Ioc_truncated_power_moment hK0)
-        (integrableOn_Ioi_truncated_power_moment hK hL),
-      setIntegral_congr_fun measurableSet_Ioc (fun y hy => gl_cut_le hK0 hy.1 hy.2),
-      setIntegral_congr_fun measurableSet_Ioi (fun y hy => gl_cut_gt hK0 hL hy),
-      integral_const_mul, integral_Ioi_rpow_of_lt (by linarith : 1 - K < -1) hL,
-      ← intervalIntegral.integral_of_le hL.le, integral_id]
-    have e : L ^ K * L ^ (1 - K + 1) = L ^ 2 := by
-      rw [← Real.rpow_add hL, ← Real.rpow_natCast]
-      congr 1
-      push_cast
-      ring
-    have hK2 : K - 2 ≠ 0 := by linarith [hK]
-    have hK3 : 1 - K + 1 ≠ 0 := by
-      intro h
-      apply hK2
-      linarith
-    have e2 : L ^ K * (-L ^ (1 - K + 1) / (1 - K + 1)) = L ^ 2 / (K - 2) := by
-      rw [← e]
-      field_simp
-      ring
-    rw [e2]
-    field_simp
-    ring
+  apply Formalism.HermitianLatticeCounting.P.cutoff_integral_formula <;> assumption
 
 theorem sup_bound_of_truncated_integral
     : Formalism.HermitianLatticeCounting.ExpansionTerms.LemSSupBound :=
@@ -596,11 +623,11 @@ lemma gi_adj_last {R : Type*} [CommRing R] (r : ℕ) (M : Matrix (Fin (r + 1)) (
 lemma gi_sesq_sum {V ι : Type*} [AddCommGroup V] [Module ℂ V] [Fintype ι] (h : V →ₗ[ℂ] V →ₗ⋆[ℂ] ℂ)
     (c : ι → ℂ) (y : ι → V) :
     h (∑ a, c a • y a) (∑ b, c b • y b) = ∑ b, ∑ a, c a * conj (c b) * h (y a) (y b) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+
+  rw [map_sum]
   refine Finset.sum_congr rfl fun b _ => ?_
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum, LinearMap.sum_apply]
+
+  rw [map_sum, LinearMap.sum_apply]
   refine Finset.sum_congr rfl fun a _ => ?_
   rw [map_smulₛₗ, map_smul, LinearMap.smul_apply]
   simp only [smul_eq_mul]
@@ -643,8 +670,8 @@ theorem dual_vector_norm_sq
 
   have p1 : h x' (f' L) = M.det := by
     have : h x' (f' L) = (M.adjugate * M) L L := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [hx', Matrix.mul_apply, map_sum, LinearMap.sum_apply]
+
+      rw [hx', Matrix.mul_apply, map_sum, LinearMap.sum_apply]
       refine Finset.sum_congr rfl fun a _ => ?_
       rw [map_smul, LinearMap.smul_apply, smul_eq_mul]
       rfl

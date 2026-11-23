@@ -1,10 +1,47 @@
 module
 
-public import Formalism.LocalToGlobal.ProjectiveLattices.RecPJThAllNeBot
-public import Formalism.LocalToGlobal.ProjectiveLattices.ChartDirectionsIntegral
-public import Formalism.LocalToGlobal.ProjectiveLattices.PlaceBelow
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.TaylorDiscriminants.ConnectionKillsSeries
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.TaylorDiscriminants.ChartChg
+public import Formalism.LocalToGlobal.ProjectiveLattices.IsThRule
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Real
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
 
 @[expose] public section
 
@@ -24,12 +61,11 @@ variable {E : Type} [Field E] [NumberField E] [IsCMField E] (H : Host E)
 theorem imaginary_root_conj : conj H.rt0 = -H.rt0 := by
   rcases H with ⟨d, -, hp, -, -, -, -, -, -, -, r, hr⟩
   show conj r = -r
-  have hdpos : (0 : ℝ) < d := by exact_mod_cast hp.pos
+  have hdpos : (0:ℝ) < d := by exact_mod_cast hp.pos
   have h1 := congrArg Complex.re hr
   have h2 := congrArg Complex.im hr
   simp only [pow_two, Complex.mul_re, Complex.mul_im, Complex.neg_re, Complex.neg_im,
-      Complex.natCast_re, Complex.natCast_im, neg_zero]
-    at h1 h2
+    Complex.natCast_re, Complex.natCast_im, neg_zero] at h1 h2
   have hre : r.re = 0 := by
     rcases mul_eq_zero.mp (show r.re * r.im = 0 by linarith) with h | h
     · exact h
@@ -52,8 +88,7 @@ theorem emb_rt (τ : E →+* ℂ) : τ (H.rt : E) = H.rt0 ∨ τ (H.rt : E) = -H
     rw [H.sqrt_neg_disc_sq, ← map_pow, hE]
     simp
   have h' : (τ (H.rt : E) - H.rt0) * (τ (H.rt : E) + H.rt0) = 0 := by
-    have e : (τ (H.rt : E) - H.rt0) * (τ (H.rt : E) + H.rt0) = τ (H.rt : E) ^ 2 - H.rt0 ^ 2 := by
-      ring
+    have e : (τ (H.rt : E) - H.rt0) * (τ (H.rt : E) + H.rt0) = τ (H.rt : E) ^ 2 - H.rt0 ^ 2 := by ring
     rw [e, h, sub_self]
   rcases mul_eq_zero.1 h' with h1 | h1
   · exact Or.inl (sub_eq_zero.1 h1)
@@ -67,7 +102,7 @@ theorem inPsi_or (τ : E →+* ℂ) : InPsi H τ ∨ InPsi H (ComplexEmbedding.c
   · right
     rw [h, map_neg, imaginary_root_conj, neg_neg]
 
-theorem not_inPsi_both (τ : E →+* ℂ) : ¬(InPsi H τ ∧ InPsi H (ComplexEmbedding.conjugate τ)) := by
+theorem not_inPsi_both (τ : E →+* ℂ) : ¬ (InPsi H τ ∧ InPsi H (ComplexEmbedding.conjugate τ)) := by
   rintro ⟨h1, h2⟩
   unfold InPsi at h1 h2
   rw [ComplexEmbedding.conjugate_coe_eq, h1, imaginary_root_conj] at h2
@@ -111,11 +146,10 @@ def lEq : Letter T r n ≃ (Σ σ : T, Fin (r σ)) × Fin n where
   left_inv _ := rfl
   right_inv _ := rfl
 
-theorem sum_rename
-    {k : Type} [CommRing k]
-    (P : MvPolynomial (Letter T r n) k) (G : ((Σ σ : T, Fin (r σ)) × Fin n →₀ ℕ) → k)
-    : ∑ mo ∈ (rename (lEq (T := T) (r := r) (n := n)) P).support, (rename lEq P).coeff mo * G mo
-      = ∑ mo ∈ P.support, P.coeff mo * G (Finsupp.mapDomain lEq mo) := by
+theorem sum_rename {k : Type} [CommRing k] (P : MvPolynomial (Letter T r n) k)
+    (G : ((Σ σ : T, Fin (r σ)) × Fin n →₀ ℕ) → k) :
+    ∑ mo ∈ (rename (lEq (T := T) (r := r) (n := n)) P).support, (rename lEq P).coeff mo * G mo =
+      ∑ mo ∈ P.support, P.coeff mo * G (Finsupp.mapDomain lEq mo) := by
   classical
   rw [support_rename_of_injective lEq.injective, Finset.sum_image]
   · refine Finset.sum_congr rfl fun mo _ => ?_
@@ -123,11 +157,9 @@ theorem sum_rename
   · intro x _ y _ h
     exact Finsupp.mapDomain_injective lEq.injective h
 
-theorem coeff_rename_mem
-    {k : Type} [CommRing k]
-    (S : Subring k) (P : MvPolynomial (Letter T r n) k) (hP : ∀ m, P.coeff m ∈ S)
-    (mo : (Σ σ : T, Fin (r σ)) × Fin n →₀ ℕ)
-    : (rename (lEq (T := T) (r := r) (n := n)) P).coeff mo ∈ S := by
+theorem coeff_rename_mem {k : Type} [CommRing k] (S : Subring k) (P : MvPolynomial (Letter T r n) k)
+    (hP : ∀ m, P.coeff m ∈ S) (mo : (Σ σ : T, Fin (r σ)) × Fin n →₀ ℕ) :
+    (rename (lEq (T := T) (r := r) (n := n)) P).coeff mo ∈ S := by
   classical
   by_cases h : mo ∈ (rename (lEq (T := T) (r := r) (n := n)) P).support
   · rw [support_rename_of_injective lEq.injective, Finset.mem_image] at h
@@ -137,37 +169,26 @@ theorem coeff_rename_mem
   · rw [notMem_support_iff.1 h]
     exact S.zero_mem
 
-theorem harm_rename
-    [Fintype T]
-    {k : Type} [Field k]
-    (cc : T → T) (isX : T → Prop) (P : MvPolynomial (Letter T r n) k)
-    (hP : P ∈ harmK r n k cc isX (fun _ => 1))
-    (τ : T) (hτ : isX τ) (i : Fin (r τ)) (i' : Fin (r (cc τ)))
-    : ∑ b : Fin n, pderiv (((⟨τ, i⟩ : Σ σ : T, Fin (r σ))), b)
-        (pderiv (((⟨cc τ, i'⟩ : Σ σ : T, Fin (r σ))), b) (rename (lEq (T := T) (r := r) (n := n)) P))
-      = 0 := by
+theorem harm_rename [Fintype T] {k : Type} [Field k] (cc : T → T) (isX : T → Prop)
+    (P : MvPolynomial (Letter T r n) k) (hP : P ∈ harmK r n k cc isX (fun _ => 1)) (τ : T) (hτ : isX τ)
+    (i : Fin (r τ)) (i' : Fin (r (cc τ))) :
+    ∑ b : Fin n, pderiv (((⟨τ, i⟩ : Σ σ : T, Fin (r σ))), b)
+      (pderiv (((⟨cc τ, i'⟩ : Σ σ : T, Fin (r σ))), b) (rename (lEq (T := T) (r := r) (n := n)) P)) = 0 := by
   classical
   have h := hP
   simp only [harmK, Submodule.mem_iInf, LinearMap.mem_ker] at h
   have h2 := h τ hτ i i'
   simp only [lap, Matrix.one_apply, ite_smul, one_smul, zero_smul, Finset.sum_ite_eq,
-      Finset.mem_univ, if_true]
-    at h2
-  have h3
-      : ∑ x : Fin n, pderiv (⟨τ, i, x⟩ : Letter T r n) (pderiv (⟨cc τ, i', x⟩ : Letter T r n) P)
-        = 0 := by
+    Finset.mem_univ, if_true] at h2
+  have h3 : ∑ x : Fin n, pderiv (⟨τ, i, x⟩ : Letter T r n) (pderiv (⟨cc τ, i', x⟩ : Letter T r n) P) = 0 := by
     simpa [LinearMap.sum_apply] using h2
-  have e
-      : ∀ b : Fin n,
-        pderiv (((⟨τ, i⟩ : Σ σ : T, Fin (r σ))), b)
-            (pderiv (((⟨cc τ, i'⟩ : Σ σ : T, Fin (r σ))), b)
-              (rename (lEq (T := T) (r := r) (n := n)) P))
-          = rename lEq
-            (pderiv (⟨τ, i, b⟩ : Letter T r n) (pderiv (⟨cc τ, i', b⟩ : Letter T r n) P)) := by
+  have e : ∀ b : Fin n, pderiv (((⟨τ, i⟩ : Σ σ : T, Fin (r σ))), b)
+      (pderiv (((⟨cc τ, i'⟩ : Σ σ : T, Fin (r σ))), b) (rename (lEq (T := T) (r := r) (n := n)) P)) =
+      rename lEq (pderiv (⟨τ, i, b⟩ : Letter T r n) (pderiv (⟨cc τ, i', b⟩ : Letter T r n) P)) := by
     intro b
     show pderiv (lEq ⟨τ, i, b⟩) (pderiv (lEq ⟨cc τ, i', b⟩) (rename lEq P)) = _
     rw [pderiv_rename lEq.injective, pderiv_rename lEq.injective]
-  set_option synthInstance.maxHeartbeats 100000 in
+
   simp only [e, ← map_sum, h3, map_zero]
 
 end Letters

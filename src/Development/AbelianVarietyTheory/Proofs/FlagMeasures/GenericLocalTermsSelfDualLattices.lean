@@ -1,15 +1,60 @@
 module
 
-public import Mathlib
-public import Formalism.SharpRestriction.CuspSpanNormBounds.IsTermOver
-public import Development.AbelianVarietyTheory.Definitions.Foundations.IsHermND
-public import Development.AbelianVarietyTheory.Definitions.SemilocalFrames.ComplementReferenceCompactSubgroup
 public import Development.AbelianVarietyTheory.Definitions.SemilocalFrames.GgNone
-public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.HermitianDatumOfTermReadOnLattice
-public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.HermitianMovePreservesFrameLatticeLevels
 public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.FrameMoveCharacterNeOne
+public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.HermitianDatumOfTermReadOnLattice
+import Development.AbelianVarietyTheory.Proofs.FlagMeasures.HermitianDoubleCosetTermBasicFacts
+public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.HermitianMovePreservesFrameLatticeLevels
+import Development.AbelianVarietyTheory.Proofs.FlagMeasures.NotField
 public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.SelfDualLatticeUnipotentTranslateStandard
+import Development.AbelianVarietyTheory.Proofs.FlagMeasures.SpanToZero
+public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.TermOverFrameCoordinates
 public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.TermsCorrespond
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
+import Formalism.SharpRestriction.CuspSpanNormBounds.Point
 
 @[expose] public section
 
@@ -27,8 +72,8 @@ variable {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] [MeasurableS
 variable {M : Model F E} {V : Type} [AddCommGroup V] [Module E V] {H : HermSp M V} {r k : ℕ}
 variable {P : LocNG.FPair H r} {S : Frames M.L r k}
 
-theorem isSD_lat (c : Coord P S) (Λ : Submodule M.L.O V) (h : H.IsSelfDual Λ)
-    : IsSD M.L S.Hm (c.lat Λ) := by
+theorem isSD_lat (c : Coord P S) (Λ : Submodule M.L.O V) (h : H.IsSelfDual Λ) :
+    IsSD M.L S.Hm (c.lat Λ) := by
   obtain ⟨hfg, hsp, hd⟩ := h
   have e : ∀ x y, hf M.L S.Hm (c.e y) (c.e x) = H.h y x := fun x y => c.h_eq y x
   refine ⟨⟨hfg.map _, ?_⟩, fun y => ?_⟩
@@ -58,63 +103,38 @@ theorem theta_mem (M : Model F E) : algebraMap F E (LocNG.theta M) ∈ M.L.O := 
     rw [h1, M.L.O_def]
     exact (isIntegral_algebraMap (R := 𝒪[F]) (A := F) (x := g.q)).algebraMap
 
-theorem mem_span_of_Mof
-    (S : Frames M.L r k)
-    {g g' : Fin (r + 1) → S.V} (hli : LinearIndependent E (Sum.elim g g'))
-    {x : S.V} (hx : x ∈ S.Mof g g')
-    : (x ∈ Submodule.span E (Set.range g) → x ∈ Submodule.span M.L.O (Set.range g))
-      ∧ (x ∈ Submodule.span E (Set.range g') → x ∈ Submodule.span M.L.O (Set.range g')) := by
+theorem mem_span_of_Mof (S : Frames M.L r k) {g g' : Fin (r + 1) → S.V}
+    (hli : LinearIndependent E (Sum.elim g g')) {x : S.V} (hx : x ∈ S.Mof g g') :
+    (x ∈ Submodule.span E (Set.range g) → x ∈ Submodule.span M.L.O (Set.range g)) ∧
+      (x ∈ Submodule.span E (Set.range g') → x ∈ Submodule.span M.L.O (Set.range g')) := by
   obtain ⟨al, al', e, hal⟩ := (MoveSame.mem_Mof S g g' x).1 hx
   constructor
   · intro h
     obtain ⟨α, hα⟩ := (Submodule.mem_span_range_iff_exists_fun E).1 h
-    have h2
-        : ∑ i, al i • g i + ∑ i, al' i • g' i
-          = ∑ i, α i • g i + ∑ i, (0 : Fin (r + 1) → E) i • g' i := by
+    have h2 : ∑ i, al i • g i + ∑ i, al' i • g' i =
+        ∑ i, α i • g i + ∑ i, (0 : Fin (r + 1) → E) i • g' i := by
       rw [← e, hα]; simp
     obtain ⟨h3, h4⟩ := MoveChar.uniq S hli h2
     subst h3 h4
     rw [e]
     simp only [Pi.zero_apply, zero_smul, Finset.sum_const_zero, add_zero]
-    exact FrameLift.sum_mem_O S al g
-      (fun i => by simpa using (hal i).2)
+    exact FrameLift.sum_mem_O S al g (fun i => by simpa using (hal i).2)
       (fun i => Submodule.subset_span ⟨i, rfl⟩)
   · intro h
     obtain ⟨α, hα⟩ := (Submodule.mem_span_range_iff_exists_fun E).1 h
-    have h2
-        : ∑ i, al i • g i + ∑ i, al' i • g' i
-          = ∑ i, (0 : Fin (r + 1) → E) i • g i + ∑ i, α i • g' i := by
+    have h2 : ∑ i, al i • g i + ∑ i, al' i • g' i =
+        ∑ i, (0 : Fin (r + 1) → E) i • g i + ∑ i, α i • g' i := by
       rw [← e, hα]; simp
     obtain ⟨h3, h4⟩ := MoveChar.uniq S hli h2
     subst h3 h4
     rw [e]
     simp only [Pi.zero_apply, zero_smul, Finset.sum_const_zero, zero_add]
-    exact FrameLift.sum_mem_O S al' g'
-      (fun i => by simpa using (hal i).2)
+    exact FrameLift.sum_mem_O S al' g' (fun i => by simpa using (hal i).2)
       (fun i => Submodule.subset_span ⟨i, rfl⟩)
 
 end SlopeTestRemainingChoices
 
-theorem generic_terms
-    : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] {E : Type} [CommRing E]
-        [Algebra F E] [TopologicalSpace E] [MeasurableSpace E] (M : Model F E),
-      M.OK
-        → ∀ {V : Type} [AddCommGroup V] [Module E V] (H : HermSp M V) (r k : ℕ)
-            (P : LocNG.FPair H r),
-          Module.finrank E V = k + 2 * r + 1 → P.RelG (LocNG.theta M)
-            → ∀ (f f' : Fin (r + 1) → V),
-              (∃ n ∈ P.A.N, f = fun b => n (P.A.f b)) → (∃ n' ∈ P.B.N, f' = fun b => n' (P.B.f b))
-                → ∀ Λ : Submodule M.L.O V,
-                  ((H.IsSelfDual Λ ∧ Λ.FG
-                        ∧ (∀ i, H.MMfam (⟨Λ, f, f', P.A.T, P.B.T⟩ : Term V M r) i ∈ Λ)
-                        ∧ ¬ LocNG.BBne (H := H) (⟨Λ, f, f', P.A.T, P.B.T⟩ : Term V M r))
-                      ↔ ∃ d : LocNG.Datum P,
-                        LocNG.IsTermOver P d (⟨Λ, f, f', P.A.T, P.B.T⟩ : Term V M r)
-                          ∧ ¬ LocNG.BBne (H := H) (⟨Λ, f, f', P.A.T, P.B.T⟩ : Term V M r))
-                    ∧ ∀ d d' : LocNG.Datum P,
-                      LocNG.IsTermOver P d (⟨Λ, f, f', P.A.T, P.B.T⟩ : Term V M r)
-                        → LocNG.IsTermOver P d' (⟨Λ, f, f', P.A.T, P.B.T⟩ : Term V M r)
-                        → d = d' := by
+theorem generic_terms : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] [MeasurableSpace E] (M : Model F E), M.OK → ∀ {V : Type} [AddCommGroup V] [Module E V] (H : HermSp M V) (r k : ℕ) (P : LocNG.FPair H r), Module.finrank E V = k + 2 * r + 1 → P.RelG (LocNG.theta M) → ∀ (f f' : Fin (r + 1) → V), (∃ n ∈ P.A.N, f = fun b => n (P.A.f b)) → (∃ n' ∈ P.B.N, f' = fun b => n' (P.B.f b)) → ∀ Λ : Submodule M.L.O V, ((H.IsSelfDual Λ ∧ Λ.FG ∧ (∀ i, H.MMfam (⟨Λ, f, f', P.A.T, P.B.T⟩ : Term V M r) i ∈ Λ) ∧ ¬ LocNG.BBne (H := H) (⟨Λ, f, f', P.A.T, P.B.T⟩ : Term V M r)) ↔ ∃ d : LocNG.Datum P, LocNG.IsTermOver P d (⟨Λ, f, f', P.A.T, P.B.T⟩ : Term V M r) ∧ ¬ LocNG.BBne (H := H) (⟨Λ, f, f', P.A.T, P.B.T⟩ : Term V M r)) ∧ ∀ d d' : LocNG.Datum P, LocNG.IsTermOver P d (⟨Λ, f, f', P.A.T, P.B.T⟩ : Term V M r) → LocNG.IsTermOver P d' (⟨Λ, f, f', P.A.T, P.B.T⟩ : Term V M r) → d = d' := by
   intro F _ _ _ E _ _ _ _ M hM V _ _ H r k P hrk hP f f' hf hf' Λ
   letI := hM.loc
   haveI := hM.char0
@@ -124,7 +144,8 @@ theorem generic_terms
   have hθ : LocNG.theta M ≠ 0 := by rw [hth]; exact CoordTermWt.th_ne S
   refine ⟨⟨fun hL => ?_, fun hR => ?_⟩, fun d d' hd hd' => ?_⟩
   rotate_left
-  · obtain ⟨d, hd, hbb⟩ := hR
+  ·
+    obtain ⟨d, hd, hbb⟩ := hR
     obtain ⟨hT, -, -⟩ := hTL.1 d _ hd
     obtain ⟨hsd, hfr, hfr', -, -, hadm⟩ := hT
     refine ⟨hsd, hsd.1, ?_, hbb⟩
@@ -136,10 +157,10 @@ theorem generic_terms
     · have h1 : LocNG.theta M = (g.q : F) := by simp [LocNG.theta, hs]
       obtain ⟨y, hy, e⟩ := (CoordTerm.mem_smulLat (H := H) _ Λ _).1 ((hadm g hs).2.2 b)
       show algebraMap F E (LocNG.theta M)⁻¹ • (f' b - f b) ∈ Λ
-      rw [show f' b - f b = _ from e, smul_smul, ← map_mul, ← h1, inv_mul_cancel₀ hθ, map_one,
-        one_smul]
+      rw [show f' b - f b = _ from e, smul_smul, ← map_mul, ← h1, inv_mul_cancel₀ hθ, map_one, one_smul]
       exact hy
-  · exact hTL.2 d d' _ _ hd hd' rfl rfl (fun _ _ => rfl)
+  ·
+    exact hTL.2 d d' _ _ hd hd' rfl rfl (fun _ _ => rfl)
   · obtain ⟨hsd, -, hmm, hbb⟩ := hL
     obtain ⟨n0, hn0, rfl⟩ := hf
     obtain ⟨n0', hn0', rfl⟩ := hf'
@@ -150,18 +171,14 @@ theorem generic_terms
       simp [S.gram', Fin.castSucc_ne_last]
     have hN : c.grp n0 ∈ S.N := (hNA n0).1 hn0
     have hN' : c.grp n0' ∈ S.N' := (hNB n0').1 hn0'
-    have hNf : ∀ b, c.grp n0 (S.f b) = c.e (n0 (P.A.f b)) := fun b => by
-      rw [c.f_eq, CoordTerm.grp_e]
+    have hNf : ∀ b, c.grp n0 (S.f b) = c.e (n0 (P.A.f b)) := fun b => by rw [c.f_eq, CoordTerm.grp_e]
     have hNf' : ∀ b, c.grp n0' (S.f' b) = c.e (n0' (P.B.f b)) := fun b => by
       rw [c.f'_eq, CoordTerm.grp_e]
     set t : Term V M r := ⟨Λ, fun b => n0 (P.A.f b), fun b => n0' (P.B.f b), P.A.T, P.B.T⟩ with ht
     obtain ⟨hfm, hdm⟩ := (CoordTermWt.fam_mem (H := H) t Λ).1 hmm
     have hfm' : ∀ b, n0' (P.B.f b) ∈ Λ := fun b => by
-      have h1
-          : n0' (P.B.f b)
-            = n0 (P.A.f b)
-              + algebraMap F E (LocNG.theta M)
-                • (algebraMap F E (LocNG.theta M)⁻¹ • (t.f' b - t.f b)) := by
+      have h1 : n0' (P.B.f b) = n0 (P.A.f b) +
+          algebraMap F E (LocNG.theta M) • (algebraMap F E (LocNG.theta M)⁻¹ • (t.f' b - t.f b)) := by
         rw [smul_smul, ← map_mul, mul_inv_cancel₀ hθ, map_one, one_smul]
         simp [ht]
       rw [h1]
@@ -169,10 +186,8 @@ theorem generic_terms
     have hli := MoveSame.indep S hN hN'
     have hsdc := isSD_lat c Λ hsd
 
-    have hMc
-        : ∀ y ∈ Λ,
-          y ∈ Submodule.span E (Set.range (H.MMfam t))
-            → c.e y ∈ S.Mof (fun b => c.grp n0 (S.f b)) (fun b => c.grp n0' (S.f' b)) := by
+    have hMc : ∀ y ∈ Λ, y ∈ Submodule.span E (Set.range (H.MMfam t)) →
+        c.e y ∈ S.Mof (fun b => c.grp n0 (S.f b)) (fun b => c.grp n0' (S.f' b)) := by
       intro y hy hyE
       have hyO : y ∈ Submodule.span M.L.O (Set.range (H.MMfam t)) := by
         by_contra h
@@ -181,13 +196,10 @@ theorem generic_terms
       have e2 : (fun b => c.grp n0' (S.f' b)) = fun b => c.e (t.f' b) := funext hNf'
       rw [e1, e2, ← CoordTermWt.lat_span c t]
       exact (CoordTerm.mem_lat c _ y).2 hyO
-    have hfE :=
-      ((CoordTermWt.fam_mem (H := H) t (Submodule.span E (Set.range (H.MMfam t)))).1
-        (fun i => Submodule.subset_span ⟨i, rfl⟩))
-    have htr
-        : ∀ x,
-          (x ∈ c.lat Λ ∧ x ∈ S.spanTo S.f (r + 1))
-            ↔ x ∈ Submodule.span M.L.O (Set.range fun b => c.grp n0 (S.f b)) := by
+    have hfE := ((CoordTermWt.fam_mem (H := H) t (Submodule.span E (Set.range (H.MMfam t)))).1
+      (fun i => Submodule.subset_span ⟨i, rfl⟩))
+    have htr : ∀ x, (x ∈ c.lat Λ ∧ x ∈ S.spanTo S.f (r + 1)) ↔
+        x ∈ Submodule.span M.L.O (Set.range fun b => c.grp n0 (S.f b)) := by
       intro x
       constructor
       · rintro ⟨hx, hxs⟩
@@ -197,14 +209,14 @@ theorem generic_terms
         obtain ⟨α, hα⟩ := (Submodule.mem_span_range_iff_exists_fun E).1 hx'
         have hxα : x = ∑ i, α i • c.grp n0 (S.f i) := by
           have := congrArg (c.grp n0) hα
-          set_option synthInstance.maxHeartbeats 100000 in
+
           simpa [map_sum, map_smul] using this.symm
         obtain ⟨y, rfl⟩ := c.e.surjective x
         have hy : y ∈ Λ := (CoordTerm.mem_lat c Λ y).1 hx
         have hyα : y = ∑ i, α i • t.f i := by
           apply c.e.injective
-          set_option synthInstance.maxHeartbeats 100000 in
-            rw [hxα, map_sum]
+
+          rw [hxα, map_sum]
           simp only [map_smul, hNf]
           rfl
         have hyE : y ∈ Submodule.span E (Set.range (H.MMfam t)) := by
@@ -219,17 +231,14 @@ theorem generic_terms
           show c.grp n0 (S.f b) ∈ c.lat Λ
           rw [hNf, CoordTerm.mem_lat]
           exact hfm b
-        · have h1
-              : Submodule.span M.L.O (Set.range fun b => c.grp n0 (S.f b))
-                ≤ (S.spanTo S.f (r + 1)).restrictScalars M.L.O := by
+        · have h1 : Submodule.span M.L.O (Set.range fun b => c.grp n0 (S.f b)) ≤
+              (S.spanTo S.f (r + 1)).restrictScalars M.L.O := by
             refine Submodule.span_le.2 ?_
             rintro _ ⟨b, rfl⟩
             exact TermBasic.map_mem hg hN (r + 1) (TermBasic.self_mem S S.f b.2)
           exact h1 hx
-    have htr'
-        : ∀ x,
-          (x ∈ c.lat Λ ∧ x ∈ S.spanTo S.f' (r + 1))
-            ↔ x ∈ Submodule.span M.L.O (Set.range fun b => c.grp n0' (S.f' b)) := by
+    have htr' : ∀ x, (x ∈ c.lat Λ ∧ x ∈ S.spanTo S.f' (r + 1)) ↔
+        x ∈ Submodule.span M.L.O (Set.range fun b => c.grp n0' (S.f' b)) := by
       intro x
       constructor
       · rintro ⟨hx, hxs⟩
@@ -239,24 +248,21 @@ theorem generic_terms
         obtain ⟨α, hα⟩ := (Submodule.mem_span_range_iff_exists_fun E).1 hx'
         have hxα : x = ∑ i, α i • c.grp n0' (S.f' i) := by
           have := congrArg (c.grp n0') hα
-          set_option synthInstance.maxHeartbeats 100000 in
+
           simpa [map_sum, map_smul] using this.symm
         obtain ⟨y, rfl⟩ := c.e.surjective x
         have hy : y ∈ Λ := (CoordTerm.mem_lat c Λ y).1 hx
         have hyα : y = ∑ i, α i • t.f' i := by
           apply c.e.injective
-          set_option synthInstance.maxHeartbeats 100000 in
-            rw [hxα, map_sum]
+
+          rw [hxα, map_sum]
           simp only [map_smul, hNf']
           rfl
         have hyE : y ∈ Submodule.span E (Set.range (H.MMfam t)) := by
           rw [hyα]
           refine Submodule.sum_mem _ fun i _ => Submodule.smul_mem _ _ ?_
-          have h1
-              : t.f' i
-                = t.f i
-                  + algebraMap F E (LocNG.theta M)
-                    • (algebraMap F E (LocNG.theta M)⁻¹ • (t.f' i - t.f i)) := by
+          have h1 : t.f' i = t.f i +
+              algebraMap F E (LocNG.theta M) • (algebraMap F E (LocNG.theta M)⁻¹ • (t.f' i - t.f i)) := by
             rw [smul_smul, ← map_mul, mul_inv_cancel₀ hθ, map_one, one_smul]
             abel
           rw [h1]
@@ -270,9 +276,8 @@ theorem generic_terms
           show c.grp n0' (S.f' b) ∈ c.lat Λ
           rw [hNf', CoordTerm.mem_lat]
           exact hfm' b
-        · have h1
-              : Submodule.span M.L.O (Set.range fun b => c.grp n0' (S.f' b))
-                ≤ (S.spanTo S.f' (r + 1)).restrictScalars M.L.O := by
+        · have h1 : Submodule.span M.L.O (Set.range fun b => c.grp n0' (S.f' b)) ≤
+              (S.spanTo S.f' (r + 1)).restrictScalars M.L.O := by
             refine Submodule.span_le.2 ?_
             rintro _ ⟨b, rfl⟩
             exact TermBasic.map_mem hg' hN' (r + 1) (TermBasic.self_mem S S.f' b.2)
@@ -293,11 +298,11 @@ theorem generic_terms
       exact hW
     obtain ⟨hto, -⟩ := (CoordTerm.isTermW_iff M hM H r k P S c d _ _ Λ).2 hW2
     have e3 : (fun b => (c.grp.symm n₁) (P.A.f b)) = fun b => n0 (P.A.f b) :=
-      funext fun b =>
-        c.e.injective (by rw [← CoordTerm.grp_e, MulEquiv.apply_symm_apply, ← c.f_eq, hn₁f, hNf])
+      funext fun b => c.e.injective (by
+        rw [← CoordTerm.grp_e, MulEquiv.apply_symm_apply, ← c.f_eq, hn₁f, hNf])
     have e4 : (fun b => (c.grp.symm n₁') (P.B.f b)) = fun b => n0' (P.B.f b) :=
-      funext fun b =>
-        c.e.injective (by rw [← CoordTerm.grp_e, MulEquiv.apply_symm_apply, ← c.f'_eq, hn₁f', hNf'])
+      funext fun b => c.e.injective (by
+        rw [← CoordTerm.grp_e, MulEquiv.apply_symm_apply, ← c.f'_eq, hn₁f', hNf'])
     rw [e3, e4] at hto
     exact ⟨d, hto, hbb⟩
 

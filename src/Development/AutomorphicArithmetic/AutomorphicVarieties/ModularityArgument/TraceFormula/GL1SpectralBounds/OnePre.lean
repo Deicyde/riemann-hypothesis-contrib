@@ -1,17 +1,53 @@
 module
 
 public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityArgument.TraceFormula.GL1SpectralBounds.CuspOrTwoAlt
-public import Development.AutomorphicArithmetic.AutomorphicVarieties.AutomorphicForms.TemperedLocalComponents.FormsFiniteGL
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsIrreducibleFixed
+import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsIsLocCompAndIsLocLoc
+public import Development.AutomorphicArithmetic.AutomorphicVarieties.AutomorphicForms.TemperedLocalComponents.FormsFiniteGL
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Development.WeilBound.RepresentationTheoryGL.ArchimedeanBaseChange.ArchimedeanBaseChangeProof.FixedVectorVanishing.FixedEqZeroOfMemISup
 
 @[expose] public section
 
 open NumberField IsDedekindDomain
-open GlobalTheory.CuspRep GlobalTheory.UnitaryBC GlobalTheory.DiscSpec PositivityTheory.Rg.Rs
-  PositivityTheory.Rg.BcB PositivityTheory.Rg.BcB.F UpperTheory.V.Z.Tf.GOne
+open GlobalTheory.CuspRep GlobalTheory.UnitaryBC GlobalTheory.DiscSpec PositivityTheory.Rg.Rs PositivityTheory.Rg.BcB PositivityTheory.Rg.BcB.F UpperTheory.V.Z.Tf.GOne
 
-private theorem add_le_of_strictAnti {n : ℕ} {t : Fin n → ℤ} (ht : StrictAnti t) (d : ℕ)
-    : ∀ a b : Fin n, (b : ℕ) = a + d → t b + d ≤ t a := by
+private theorem add_le_of_strictAnti {n : ℕ} {t : Fin n → ℤ} (ht : StrictAnti t) (d : ℕ) :
+    ∀ a b : Fin n, (b : ℕ) = a + d → t b + d ≤ t a := by
   induction d with
   | zero =>
     intro a b h
@@ -25,10 +61,8 @@ private theorem add_le_of_strictAnti {n : ℕ} {t : Fin n → ℤ} (ht : StrictA
     push_cast
     omega
 
-private theorem exists_weight
-    {n : ℕ} (m : Multiset ℂ) (hc : Multiset.card m = n) (hn : m.Nodup)
-    (hz : ∀ z ∈ m, ∃ k : ℤ, z = (k : ℂ) + ((n : ℂ) - 1) / 2)
-    : ∃ lam : Formalism.BasicNotions.DomWeight n, m = infOfWeight lam := by
+private theorem exists_weight {n : ℕ} (m : Multiset ℂ) (hc : Multiset.card m = n) (hn : m.Nodup)
+    (hz : ∀ z ∈ m, ∃ k : ℤ, z = (k : ℂ) + ((n : ℂ) - 1) / 2) : ∃ lam : Formalism.BasicNotions.DomWeight n, m = infOfWeight lam := by
   classical
   choose! f hf using hz
   let s : Finset ℤ := m.toFinset.image f
@@ -61,28 +95,15 @@ private theorem exists_weight
     push_cast
     ring
 
-theorem UpperTheory.V.Z.Tf.GOne.onePre : OnePre := by
+theorem UpperTheory.V.Z.Tf.GOne.onePre :
+    OnePre := by
   intro E _ _ _ n hn π hr hd
   have hl : ∀ w, ∃ σ, IsLocCompGL π.V w σ := fun w =>
-    (GlobalTheory.CuspRep.LocEx.exists_isLocComp UpperTheory.V.Af.formsFiniteGL E n π w).imp
-      fun σ h => ((cuspSub_iff π).2.1 w σ).2 h.1
+    (GlobalTheory.CuspRep.LocEx.exists_isLocComp UpperTheory.V.Af.formsFiniteGL E n π w).imp fun σ h =>
+      ((cuspSub_iff π).2.1 w σ).2 h.1
   choose σ hσ using hl
-  refine ⟨
-    ⟨
-      1,
-      fun _ => n,
-      by simp,
-      fun _ => π.V,
-      fun _ w => σ w,
-      fun _ τ => (CG.mk π).infChar τ,
-      fun _ => hn,
-      fun _ => hd,
-      fun _ w => hσ w,
-      fun _ τ => ?_
-    ⟩,
-    ⟨rfl, fun _ => ⟨rfl, rfl⟩⟩,
-    fun τ => ?_
-  ⟩
+  refine ⟨⟨1, fun _ => n, by simp, fun _ => π.V, fun _ w => σ w, fun _ τ => (CG.mk π).infChar τ,
+    fun _ => hn, fun _ => hd, fun _ w => hσ w, fun _ τ => ?_⟩, ⟨rfl, fun _ => ⟨rfl, (by exact eq_of_heq (eqRec_heq_iff.mpr HEq.rfl))⟩⟩, fun τ => ?_⟩
   · exact ((cuspSub_iff π).2.2 τ _).2 (GlobalTheory.CuspRep.ParLaws.hasInfChar_infChar (CG.mk π) τ)
   · obtain ⟨h1, h2⟩ := hr τ
     obtain ⟨lam, hlam⟩ := exists_weight _ ((CG.mk π).card_infChar τ) h1 h2

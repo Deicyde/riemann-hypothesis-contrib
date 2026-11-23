@@ -1,7 +1,49 @@
 module
 
-public import Mathlib
 public import GroundTheory.HeightsAndTheta.Heights.ChowForms.ImportsBis
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -15,30 +57,27 @@ noncomputable section
 
 namespace ChartIncDomain
 
-theorem aeval_smul_of_isHomogeneous
-    {R S σ : Type*} [CommRing R] [CommRing S] [Algebra R S]
-    {p : MvPolynomial σ R} {d : ℕ} (hp : p.IsHomogeneous d)
-    (c : S) (x : σ → S)
-    : aeval (c • x) p = c ^ d * aeval x p := by
+theorem aeval_smul_of_isHomogeneous {R S σ : Type*} [CommRing R] [CommRing S] [Algebra R S]
+    {p : MvPolynomial σ R} {d : ℕ} (hp : p.IsHomogeneous d) (c : S) (x : σ → S) :
+    aeval (c • x) p = c ^ d * aeval x p := by
   classical
   rw [aeval_def, aeval_def, eval₂_eq, eval₂_eq, Finset.mul_sum]
   refine Finset.sum_congr rfl fun s hs => ?_
   have hs' : ∑ i ∈ s.support, s i = d := by
     have := hp (mem_support_iff.mp hs)
     simpa [Finsupp.weight_apply, Finsupp.sum] using this
-  simp only [Pi.smul_apply, smul_eq_mul, mul_pow, Finset.prod_mul_distrib,
-    Finset.prod_pow_eq_pow_sum, hs']
+  simp only [Pi.smul_apply, smul_eq_mul, mul_pow, Finset.prod_mul_distrib, Finset.prod_pow_eq_pow_sum, hs']
   ring
 
-theorem isHomogeneous_linForm {F : Type*} [CommRing F] {n : ℕ} (t : Fin n → F)
-    : (linForm t).IsHomogeneous 1 :=
+theorem isHomogeneous_linForm {F : Type*} [CommRing F] {n : ℕ} (t : Fin n → F) :
+    (linForm t).IsHomogeneous 1 :=
   IsHomogeneous.sum _ _ _ fun _ _ => (isHomogeneous_X _ _).C_mul _
 
 variable {F : Type} [Field F] {n : ℕ}
 
-theorem aeval_genPt (I : Ideal (MvPolynomial (Fin n) F)) [I.IsPrime] (g : MvPolynomial (Fin n) F)
-    : aeval (genPt I) g
-      = algebraMap (MvPolynomial (Fin n) F ⧸ I) (FractionRing (MvPolynomial (Fin n) F ⧸ I))
+theorem aeval_genPt (I : Ideal (MvPolynomial (Fin n) F)) [I.IsPrime] (g : MvPolynomial (Fin n) F) :
+    aeval (genPt I) g =
+      algebraMap (MvPolynomial (Fin n) F ⧸ I) (FractionRing (MvPolynomial (Fin n) F ⧸ I))
         (Ideal.Quotient.mk I g) := by
   induction g using MvPolynomial.induction_on with
   | C a =>
@@ -48,13 +87,12 @@ theorem aeval_genPt (I : Ideal (MvPolynomial (Fin n) F)) [I.IsPrime] (g : MvPoly
     rw [map_add (aeval (genPt I)), (Ideal.Quotient.mk I).map_add, RingHom.map_add, hp, hq]
   | mul_X p j hp => simp only [map_mul, hp, aeval_X, genPt]
 
-theorem ker_aeval_eta
-    (I : Ideal (MvPolynomial (Fin n) F)) (t : Fin n → F) (hI : IsProjPrime I) (ht : linForm t ∉ I)
-    : letI : I.IsPrime := hI.isPrime
-      RingHom.ker
-          (aeval ((aeval (genPt I) (linForm t))⁻¹ • genPt I)
-            : MvPolynomial (Fin n) F →ₐ[F] FractionRing (MvPolynomial (Fin n) F ⧸ I))
-        = I ⊔ Ideal.span {linForm t - 1} := by
+theorem ker_aeval_eta (I : Ideal (MvPolynomial (Fin n) F)) (t : Fin n → F) (hI : IsProjPrime I)
+    (ht : linForm t ∉ I) :
+    letI : I.IsPrime := hI.isPrime;
+    RingHom.ker (aeval ((aeval (genPt I) (linForm t))⁻¹ • genPt I) :
+        MvPolynomial (Fin n) F →ₐ[F] FractionRing (MvPolynomial (Fin n) F ⧸ I)) =
+      I ⊔ Ideal.span {linForm t - 1} := by
   have := hI.isPrime
   set ξ := genPt I
   set τ := aeval ξ (linForm t)
@@ -62,28 +100,23 @@ theorem ker_aeval_eta
     rw [show τ = _ from aeval_genPt I (linForm t), Ne, IsFractionRing.to_map_eq_zero_iff,
       Ideal.Quotient.eq_zero_iff_mem]
     exact ht
-  have hhom
-      : ∀ (p : MvPolynomial (Fin n) F) (d : ℕ),
-        p.IsHomogeneous d → aeval (τ⁻¹ • ξ) p = τ⁻¹ ^ d * aeval ξ p := fun p d hp =>
-    aeval_smul_of_isHomogeneous hp _ _
-  have hcomp
-      : ∀ (g : MvPolynomial (Fin n) F),
-        aeval (τ⁻¹ • ξ) g
-          = ∑ d ∈ Finset.range (g.totalDegree + 1), τ⁻¹ ^ d * aeval ξ (homogeneousComponent d g) :=
-    by
-      intro g
-      conv_lhs => rw [← sum_homogeneousComponent g]
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum]
-      exact Finset.sum_congr rfl fun d _ => hhom _ _ (homogeneousComponent_isHomogeneous d g)
+  have hhom : ∀ (p : MvPolynomial (Fin n) F) (d : ℕ), p.IsHomogeneous d →
+      aeval (τ⁻¹ • ξ) p = τ⁻¹ ^ d * aeval ξ p := fun p d hp => aeval_smul_of_isHomogeneous hp _ _
+  have hcomp : ∀ (g : MvPolynomial (Fin n) F), aeval (τ⁻¹ • ξ) g =
+      ∑ d ∈ Finset.range (g.totalDegree + 1), τ⁻¹ ^ d * aeval ξ (homogeneousComponent d g) := by
+    intro g
+    conv_lhs => rw [← sum_homogeneousComponent g]
+
+    rw [map_sum]
+    exact Finset.sum_congr rfl fun d _ => hhom _ _ (homogeneousComponent_isHomogeneous d g)
   apply le_antisymm
   · intro g hg
     rw [RingHom.mem_ker] at hg
     set D := g.totalDegree
     set G := ∑ d ∈ Finset.range (D + 1), homogeneousComponent d g * linForm t ^ (D - d)
     have hGξ : aeval ξ G = τ ^ D * aeval (τ⁻¹ • ξ) g := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [hcomp, Finset.mul_sum, map_sum]
+
+      rw [hcomp, Finset.mul_sum, map_sum]
       refine Finset.sum_congr rfl fun d hd => ?_
       have hdD : d ≤ D := Nat.lt_succ_iff.mp (Finset.mem_range.mp hd)
       rw [map_mul, map_pow, ← mul_assoc, mul_comm (aeval ξ _)]
@@ -102,9 +135,9 @@ theorem ker_aeval_eta
       rw [← sub_eq_zero, ← map_one (Ideal.Quotient.mk J), ← map_sub, Ideal.Quotient.eq_zero_iff_mem]
       exact Ideal.mem_sup_right (Ideal.mem_span_singleton_self _)
     have hG : Ideal.Quotient.mk J G = Ideal.Quotient.mk J g := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [G, map_sum, map_mul, map_pow, h1, one_pow, mul_one]
-      set_option synthInstance.maxHeartbeats 100000 in
+
+      simp only [G, map_sum, map_mul, map_pow, h1, one_pow, mul_one]
+
       rw [← map_sum, sum_homogeneousComponent]
     rw [← Ideal.Quotient.eq_zero_iff_mem, ← hG, Ideal.Quotient.eq_zero_iff_mem]
     exact Ideal.mem_sup_left hGI
@@ -117,8 +150,7 @@ theorem ker_aeval_eta
       rw [aeval_genPt, (Ideal.Quotient.eq_zero_iff_mem).mpr (hI.isHomog g hg d), map_zero, mul_zero]
     · rw [Ideal.span_le, Set.singleton_subset_iff, SetLike.mem_coe, RingHom.mem_ker]
       change aeval (τ⁻¹ • ξ) (linForm t - 1) = 0
-      rw [map_sub, map_one, hhom _ 1 (isHomogeneous_linForm t), pow_one, inv_mul_cancel₀ hτ,
-        sub_self]
+      rw [map_sub, map_one, hhom _ 1 (isHomogeneous_linForm t), pow_one, inv_mul_cancel₀ hτ, sub_self]
 
 theorem proof : ChartIncDomain.Statement := by
   intro F _ n e I t hI ht
@@ -157,16 +189,14 @@ theorem proof : ChartIncDomain.Statement := by
     · rw [Ideal.span_le]
       rintro _ ⟨i, rfl⟩
       rw [SetLike.mem_coe, RingHom.mem_ker]
-      have hC
-          : ∑ l, C (c l) * C (ζ l)
-            = (1 : MvPolynomial (Fin e × Fin n) (MvPolynomial (Fin n) F ⧸ J)) := by
+      have hC : ∑ l, C (c l) * C (ζ l) = (1 : MvPolynomial (Fin e × Fin n) (MvPolynomial (Fin n) F ⧸ J)) := by
         set_option synthInstance.maxHeartbeats 100000 in
           rw [← C_1, ← hc, map_sum]
         simp only [C_mul]
       set_option synthInstance.maxHeartbeats 100000 in
         simp only [map_sum, map_mul, hγ, coe_eval₂Hom, eval₂_X, Sum.elim_inl, Sum.elim_inr]
-      simp only [genSubst, sub_mul, Finset.sum_sub_distrib, mul_assoc, ← Finset.mul_sum, hC,
-        mul_one, sub_self]
+      simp only [genSubst, sub_mul, Finset.sum_sub_distrib, mul_assoc, ← Finset.mul_sum, hC, mul_one,
+        sub_self]
 
   set γbar : MvPolynomial (Fin n ⊕ Fin e × Fin n) F ⧸ chartIncIdeal I t e →+* MvPolynomial (Fin e × Fin n) (MvPolynomial (Fin n) F ⧸ J) :=
     Ideal.Quotient.lift (chartIncIdeal I t e) γ (fun a ha => RingHom.mem_ker.mp (hker ha)) with hγbar
@@ -188,16 +218,14 @@ theorem proof : ChartIncDomain.Statement := by
       simp [hβ, hγ, hq, hχ]
     · rintro (m | im)
       · simp [hβ, hγ, hζ, hq, hχ]
-      · have h0
-            : Ideal.Quotient.mk (chartIncIdeal I t e) (∑ l, X (Sum.inr (im.1, l)) * X (Sum.inl l))
-              = 0 := by
+      · have h0 : Ideal.Quotient.mk (chartIncIdeal I t e)
+            (∑ l, X (Sum.inr (im.1, l)) * X (Sum.inl l)) = 0 := by
           rw [Ideal.Quotient.eq_zero_iff_mem]
           exact Ideal.mem_sup_right (Ideal.subset_span ⟨im.1, rfl⟩)
         set_option synthInstance.maxHeartbeats 100000 in
           simp only [map_sum, map_mul] at h0
         simp [hβ, hγ, hζ, hc', hq, hχ, genSubst, h0]
-  have hleft
-      : ∀ x : MvPolynomial (Fin n ⊕ Fin e × Fin n) F ⧸ chartIncIdeal I t e, β (γbar x) = x := by
+  have hleft : ∀ x : MvPolynomial (Fin n ⊕ Fin e × Fin n) F ⧸ chartIncIdeal I t e, β (γbar x) = x := by
     intro x
     obtain ⟨g, rfl⟩ := Ideal.Quotient.mk_surjective (I := chartIncIdeal I t e) x
     rw [hγbar, Ideal.Quotient.lift_mk]

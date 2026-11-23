@@ -1,6 +1,53 @@
 module
 
+import Formalism.GradedWeylDivisibility.FockSpaceTableaux.LCpeelLemmas
 public import Formalism.GradedWeylDivisibility.StatementC
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Lemma
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
@@ -19,54 +66,23 @@ private lemma pairW_apply {r n : ℕ} (l j : Fin n) (v : Fin r × Fin n) (b : Fi
   unfold pairW
   split_ifs <;> simp_all [Finsupp.single_apply]
 
-theorem lcplead_weight_apply
-    {r n : ℕ} (l j : Fin n) (hlj : l ≠ j) (d : Fin r × Fin n →₀ ℕ) (b : Fin r) (t : Fin n)
-    : Finsupp.weight (pairW l j) d (b, t)
-      = if t = l then
-          d (b, l) + d (b, j)
-        else if t = j then
-          0
-        else
-          d (b, t) := by
-  classical
-  rw [Finsupp.weight_apply, Finsupp.sum_fintype _ _ (by simp), Finsupp.finsetSum_apply]
-  simp only [Finsupp.smul_apply, pairW_apply, smul_eq_mul]
-  split_ifs with h1 h2
-  · subst h1
-    rw [Fintype.sum_eq_add (b, t) (b, j) (by simp [hlj])]
-    · simp [hlj]
-    · rintro ⟨a, s⟩ ⟨ha1, ha2⟩
-      by_cases hs : s = j <;> simp_all [Prod.ext_iff]
-  · subst h2
-    refine Finset.sum_eq_zero fun x _ => ?_
-    obtain ⟨a, s⟩ := x
-    by_cases hs : s = t <;> simp_all [Prod.ext_iff]
-  · rw [Fintype.sum_eq_single (b, t)]
-    · simp [h2]
-    · rintro ⟨a, s⟩ hx
-      have h1' : l ≠ t := Ne.symm h1
-      by_cases hs : s = j <;> simp_all [Prod.ext_iff]
+theorem lcplead_weight_apply {r n : ℕ} (l j : Fin n) (hlj : l ≠ j) (d : Fin r × Fin n →₀ ℕ)
+    (b : Fin r) (t : Fin n) :
+    Finsupp.weight (pairW l j) d (b, t) =
+      if t = l then d (b, l) + d (b, j) else if t = j then 0 else d (b, t) := by
+  apply Formalism.GradedWeylDivisibility.lcpeel_weight_apply <;> assumption
 
 section
 variable {B : Type*} [CommRing B] {r n : ℕ} {l j : Fin n}
 
-theorem lcplead_hom_row
-    (hlj : l ≠ j)
-    {ω : Fin r × Fin n →₀ ℕ} {g : MvPolynomial (Fin r × Fin n) B}
-    (hg : IsWeightedHomogeneous (pairW l j) g ω)
-    {m : Fin r × Fin n →₀ ℕ} (hm : m ∈ g.support)
-    (b : Fin r)
-    : m (b, l) + m (b, j) = ω (b, l) := by
+theorem lcplead_hom_row (hlj : l ≠ j) {ω : Fin r × Fin n →₀ ℕ} {g : MvPolynomial (Fin r × Fin n) B}
+    (hg : IsWeightedHomogeneous (pairW l j) g ω) {m : Fin r × Fin n →₀ ℕ} (hm : m ∈ g.support)
+    (b : Fin r) : m (b, l) + m (b, j) = ω (b, l) := by
   rw [← hg (mem_support_iff.mp hm), lcplead_weight_apply l j hlj m b l, if_pos rfl]
 
-theorem lcplead_hom_off
-    (hlj : l ≠ j)
-    {ω : Fin r × Fin n →₀ ℕ} {g : MvPolynomial (Fin r × Fin n) B}
-    (hg : IsWeightedHomogeneous (pairW l j) g ω)
-    {m : Fin r × Fin n →₀ ℕ} (hm : m ∈ g.support)
-    (b : Fin r)
-    (t : Fin n) (htl : t ≠ l) (htj : t ≠ j)
-    : m (b, t) = ω (b, t) := by
+theorem lcplead_hom_off (hlj : l ≠ j) {ω : Fin r × Fin n →₀ ℕ} {g : MvPolynomial (Fin r × Fin n) B}
+    (hg : IsWeightedHomogeneous (pairW l j) g ω) {m : Fin r × Fin n →₀ ℕ} (hm : m ∈ g.support)
+    (b : Fin r) (t : Fin n) (htl : t ≠ l) (htj : t ≠ j) : m (b, t) = ω (b, t) := by
   rw [← hg (mem_support_iff.mp hm), lcplead_weight_apply l j hlj m b t, if_neg htl, if_neg htj]
 
 private lemma support_eq_of_pairW_homogeneous_of_erase_eq (hlj : l ≠ j) (a0 : Fin r) {ω : Fin r × Fin n →₀ ℕ}
@@ -84,13 +100,10 @@ private lemma support_eq_of_pairW_homogeneous_of_erase_eq (hlj : l ≠ j) (a0 : 
   have := congrArg (fun f => f v) h2
   simpa [Finsupp.erase_ne hv1, Finsupp.erase_ne hv2] using this
 
-theorem lcplead_coeff_peel
-    (hlj : l ≠ j) (a0 : Fin r)
-    {ω : Fin r × Fin n →₀ ℕ} {g : MvPolynomial (Fin r × Fin n) B}
-    (hg : IsWeightedHomogeneous (pairW l j) g ω)
-    {m : Fin r × Fin n →₀ ℕ} (hm : m ∈ g.support)
-    : AddMonoidAlgebra.coeff (peel l j a0 (m (a0, l)) g) ((m.erase (a0, l)).erase (a0, j))
-      = AddMonoidAlgebra.coeff g m := by
+theorem lcplead_coeff_peel (hlj : l ≠ j) (a0 : Fin r) {ω : Fin r × Fin n →₀ ℕ}
+    {g : MvPolynomial (Fin r × Fin n) B}
+    (hg : IsWeightedHomogeneous (pairW l j) g ω) {m : Fin r × Fin n →₀ ℕ} (hm : m ∈ g.support) :
+    AddMonoidAlgebra.coeff (peel l j a0 (m (a0, l)) g) ((m.erase (a0, l)).erase (a0, j)) = AddMonoidAlgebra.coeff g m := by
   classical
   unfold peel
   rw [coeff_sum]
@@ -105,25 +118,20 @@ theorem lcplead_coeff_peel
   · intro hnot
     exact (hnot (Finset.mem_filter.mpr ⟨hm, rfl⟩)).elim
 
-theorem lcplead_mem_support_peel
-    (a0 : Fin r) (k : ℕ)
-    {g : MvPolynomial (Fin r × Fin n) B} {p : Fin r × Fin n →₀ ℕ}
-    (hp : p ∈ (peel l j a0 k g).support)
-    : ∃ m ∈ g.support, m (a0, l) = k ∧ p = (m.erase (a0, l)).erase (a0, j) := by
+theorem lcplead_mem_support_peel (a0 : Fin r) (k : ℕ) {g : MvPolynomial (Fin r × Fin n) B}
+    {p : Fin r × Fin n →₀ ℕ} (hp : p ∈ (peel l j a0 k g).support) :
+    ∃ m ∈ g.support, m (a0, l) = k ∧ p = (m.erase (a0, l)).erase (a0, j) := by
   classical
   unfold peel at hp
   obtain ⟨m, hm, hpm⟩ := Finset.mem_biUnion.mp (MvPolynomial.support_sum hp)
   rw [Finset.mem_filter] at hm
   exact ⟨m, hm.1, hm.2, Finset.mem_singleton.mp (support_monomial_subset hpm)⟩
 
-theorem lcplead_recon
-    (hlj : l ≠ j) (a0 : Fin r)
-    {ω : Fin r × Fin n →₀ ℕ} {g : MvPolynomial (Fin r × Fin n) B}
-    (hg : IsWeightedHomogeneous (pairW l j) g ω)
-    {m : Fin r × Fin n →₀ ℕ} (hm : m ∈ g.support)
-    : m
-      = Finsupp.single (a0, l) (m (a0, l)) + Finsupp.single (a0, j) (ω (a0, l) - m (a0, l))
-        + (m.erase (a0, l)).erase (a0, j) := by
+theorem lcplead_recon (hlj : l ≠ j) (a0 : Fin r) {ω : Fin r × Fin n →₀ ℕ}
+    {g : MvPolynomial (Fin r × Fin n) B}
+    (hg : IsWeightedHomogeneous (pairW l j) g ω) {m : Fin r × Fin n →₀ ℕ} (hm : m ∈ g.support) :
+    m = Finsupp.single (a0, l) (m (a0, l)) + Finsupp.single (a0, j) (ω (a0, l) - m (a0, l)) +
+      (m.erase (a0, l)).erase (a0, j) := by
   have h := lcplead_hom_row hlj hg hm a0
   have hne : ((a0, l) : Fin r × Fin n) ≠ (a0, j) := by simp [hlj]
   ext v
@@ -136,13 +144,12 @@ theorem lcplead_recon
 
 end
 
-theorem lcplead_cmIdx_val {r n : ℕ} (b : Fin r) (t : Fin n)
-    : ((cmIdx r n (b, t) : Fin (n * r)) : ℕ) = b + r * t := by
+theorem lcplead_cmIdx_val {r n : ℕ} (b : Fin r) (t : Fin n) :
+    ((cmIdx r n (b, t) : Fin (n * r)) : ℕ) = b + r * t := by
   simp [cmIdx, finProdFinEquiv]
 
-theorem lcplead_cmIdx_lt
-    {r n : ℕ} {b a0 : Fin r} {t l : Fin n} (h : cmIdx r n (b, t) < cmIdx r n (a0, l))
-    : t < l ∨ (t = l ∧ b < a0) := by
+theorem lcplead_cmIdx_lt {r n : ℕ} {b a0 : Fin r} {t l : Fin n}
+    (h : cmIdx r n (b, t) < cmIdx r n (a0, l)) : t < l ∨ (t = l ∧ b < a0) := by
   have h' : (b : ℕ) + r * t < a0 + r * l := by
     have := Fin.lt_def.mp h
     rwa [lcplead_cmIdx_val, lcplead_cmIdx_val] at this

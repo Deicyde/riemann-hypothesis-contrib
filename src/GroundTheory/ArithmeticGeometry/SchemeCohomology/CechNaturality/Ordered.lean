@@ -1,8 +1,48 @@
 module
 
-public import Mathlib
 public import GroundTheory.ArithmeticGeometry.SchemeCohomology.CechLeray
 public import GroundTheory.ArithmeticGeometry.SchemeCohomology.CechNaturality.Chains
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Lemma
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
 
 @[expose] public section
 
@@ -35,16 +75,15 @@ lemma rangeIn_subset_leSet {m n : ℕ} (i : Fin (n + 1) → ι) :
     rangeIn (n := m) (Set.range i) ⊆ leSet U i :=
   fun _ hj => mem_leSet.2 (inter_le_of_range U (mem_rangeIn.1 hj))
 
-noncomputable def cval {m n : ℕ} (σ : Cochain P U m) (i : Fin (n + 1) → ι) (j : Fin (m + 1) → ι)
-    : P.obj (op (inter U i)) :=
-  open Classical in
-  if h : inter U i ≤ inter U j then res P h (σ j) else 0
+noncomputable def cval {m n : ℕ} (σ : Cochain P U m) (i : Fin (n + 1) → ι) (j : Fin (m + 1) → ι) :
+    P.obj (op (inter U i)) :=
+  open Classical in if h : inter U i ≤ inter U j then res P h (σ j) else 0
 
 lemma cval_of_le {m n : ℕ} (σ : Cochain P U m) (i : Fin (n + 1) → ι) (j : Fin (m + 1) → ι)
     (h : inter U i ≤ inter U j) : cval P U σ i j = res P h (σ j) := dif_pos h
 
-noncomputable def cev {m n : ℕ} (σ : Cochain P U m) (i : Fin (n + 1) → ι)
-    : Chain ι m →+ P.obj (op (inter U i)) :=
+noncomputable def cev {m n : ℕ} (σ : Cochain P U m) (i : Fin (n + 1) → ι) :
+    Chain ι m →+ P.obj (op (inter U i)) :=
   Finsupp.liftAddHom fun j => zmultiplesHom _ (cval P U σ i j)
 
 lemma cev_single {m n : ℕ} (σ : Cochain P U m) (i : Fin (n + 1) → ι) (j : Fin (m + 1) → ι) (z : ℤ) :
@@ -82,17 +121,17 @@ lemma cev_d {m n : ℕ} (σ : Cochain P U m) (i : Fin (n + 1) → ι) {c : Chain
     (hc : c ∈ Finsupp.supported ℤ ℤ (leSet U i)) :
     cev P U (d P U m σ) i c = cev P U σ i (bd m c) := by
   refine eq_of_supported (cev P U (d P U m σ) i) ((cev P U σ i).comp (bd m)) (fun j hj z => ?_) hc
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [AddMonoidHom.comp_apply, cev_single, cval_of_le P U _ i j (mem_leSet.1 hj), d_apply, map_sum,
-    Finset.smul_sum, bd_single, map_sum]
+
+  rw [AddMonoidHom.comp_apply, cev_single, cval_of_le P U _ i j (mem_leSet.1 hj), d_apply, map_sum,
+  Finset.smul_sum, bd_single, map_sum]
   refine Finset.sum_congr rfl fun k _ => ?_
   simp only [map_zsmul, res_res, cev_single]
   rw [cval_of_le P U σ i _ ((mem_leSet.1 hj).trans (inter_le_comp U j k.succAbove)), smul_comm]
 
 lemma lin_bd_single {m n : ℕ} (f : (Fin (m + 1) → ι) → Chain ι n) (i : Fin (m + 2) → ι) :
     lin f (bd m (Finsupp.single i 1)) = ∑ k : Fin (m + 2), ((-1 : ℤ) ^ (k : ℕ)) • f (i ∘ k.succAbove) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [bd_single, map_sum]
+
+  rw [bd_single, map_sum]
   refine Finset.sum_congr rfl fun k _ => ?_
   rw [map_zsmul, lin_single, one_smul]
 
@@ -112,9 +151,8 @@ section Ordered
 variable [LinearOrder ι]
 
 noncomputable def od (n : ℕ) : OCochain P U n →+ OCochain P U (n + 1) where
-  toFun τ i :=
-    ∑ k : Fin (n + 2), ((-1 : ℤ) ^ (k : ℕ)) •
-      res P (inter_le_comp U i.1 k.succAbove) (τ ⟨i.1 ∘ k.succAbove, i.2.comp (Fin.strictMono_succAbove k)⟩)
+  toFun τ i := ∑ k : Fin (n + 2), ((-1 : ℤ) ^ (k : ℕ)) •
+    res P (inter_le_comp U i.1 k.succAbove) (τ ⟨i.1 ∘ k.succAbove, i.2.comp (Fin.strictMono_succAbove k)⟩)
   map_zero' := funext fun i => by simp
   map_add' τ τ' := funext fun i => by simp [Finset.sum_add_distrib, smul_add]
 
@@ -144,8 +182,8 @@ lemma ordIn_subset_oleSet {m n : ℕ} (i : Fin (n + 1) → ι) :
     ordIn (n := m) (Set.range i) ⊆ oleSet U i :=
   fun _ hj => mem_oleSet.2 ⟨(mem_ordIn.1 hj).1, inter_le_of_range U (mem_ordIn.1 hj).2⟩
 
-noncomputable def cvalO {m n : ℕ} (τ : OCochain P U m) (i : Fin (n + 1) → ι) (j : Fin (m + 1) → ι)
-    : P.obj (op (inter U i)) :=
+noncomputable def cvalO {m n : ℕ} (τ : OCochain P U m) (i : Fin (n + 1) → ι) (j : Fin (m + 1) → ι) :
+    P.obj (op (inter U i)) :=
   open Classical in
   if h : StrictMono j ∧ inter U i ≤ inter U j then res P h.2 (τ ⟨j, h.1⟩) else 0
 
@@ -153,8 +191,8 @@ lemma cvalO_of {m n : ℕ} (τ : OCochain P U m) (i : Fin (n + 1) → ι) (j : F
     (hj : StrictMono j) (h : inter U i ≤ inter U j) : cvalO P U τ i j = res P h (τ ⟨j, hj⟩) :=
   dif_pos ⟨hj, h⟩
 
-noncomputable def cevO {m n : ℕ} (τ : OCochain P U m) (i : Fin (n + 1) → ι)
-    : Chain ι m →+ P.obj (op (inter U i)) :=
+noncomputable def cevO {m n : ℕ} (τ : OCochain P U m) (i : Fin (n + 1) → ι) :
+    Chain ι m →+ P.obj (op (inter U i)) :=
   Finsupp.liftAddHom fun j => zmultiplesHom _ (cvalO P U τ i j)
 
 lemma cevO_single {m n : ℕ} (τ : OCochain P U m) (i : Fin (n + 1) → ι) (j : Fin (m + 1) → ι)
@@ -193,9 +231,9 @@ lemma cevO_od {m n : ℕ} (τ : OCochain P U m) (i : Fin (n + 1) → ι) {c : Ch
   refine eq_of_supported (cevO P U (od P U m τ) i) ((cevO P U τ i).comp (bd m))
     (fun j hj z => ?_) hc
   obtain ⟨hjm, hjle⟩ := mem_oleSet.1 hj
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [AddMonoidHom.comp_apply, cevO_single, cvalO_of P U _ i j hjm hjle, od_apply, map_sum,
-    Finset.smul_sum, bd_single, map_sum]
+
+  rw [AddMonoidHom.comp_apply, cevO_single, cvalO_of P U _ i j hjm hjle, od_apply, map_sum,
+  Finset.smul_sum, bd_single, map_sum]
   refine Finset.sum_congr rfl fun k _ => ?_
   simp only [map_zsmul, res_res, cevO_single]
   rw [cvalO_of P U τ i _ (hjm.comp (Fin.strictMono_succAbove k))
@@ -227,15 +265,13 @@ theorem toOrd_fromOrd (n : ℕ) (τ : OCochain P U n) : toOrd P U n (fromOrd P U
   rw [rho_of_strictMono n i.1 i.2, cevO_single, one_smul, cvalO_of P U τ i.1 i.1 i.2 le_rfl,
     res_refl]
 
-theorem d_fromOrd (n : ℕ) (τ : OCochain P U n)
-    : d P U n (fromOrd P U n τ) = fromOrd P U (n + 1) (od P U n τ) := by
-  let rec bd_rho
-      : ∀ (n : ℕ) (i : Fin (n + 2) → ι),
-        bd n (rho (n + 1) i) = lin (rho n) (bd n (Finsupp.single i 1))
+theorem d_fromOrd (n : ℕ) (τ : OCochain P U n) :
+    d P U n (fromOrd P U n τ) = fromOrd P U (n + 1) (od P U n τ) := by
+  let rec bd_rho : ∀ (n : ℕ) (i : Fin (n + 2) → ι),
+      bd n (rho (n + 1) i) = lin (rho n) (bd n (Finsupp.single i 1))
     | 0, i => by
-      have hx
-          : lin (rho (ι := ι) 0) (bd 0 (Finsupp.single i 1))
-            ∈ Finsupp.supported ℤ ℤ (ordFrom (minIdx i)) := by
+      have hx : lin (rho (ι := ι) 0) (bd 0 (Finsupp.single i 1)) ∈
+          Finsupp.supported ℤ ℤ (ordFrom (minIdx i)) := by
         rw [lin_rho_zero]
         refine Finsupp.supported_mono ?_ (bd_mem_rangeIn (n := 0) (single_mem_rangeIn i 1))
         intro j hj
@@ -259,23 +295,21 @@ theorem d_fromOrd (n : ℕ) (τ : OCochain P U n)
         refine Finsupp.supported_mono (ordIn_subset_ordFrom i) ?_
         refine map_mem_supported _ (fun j hj z => ?_) (bd_mem_rangeIn (single_mem_rangeIn i 1))
         rw [lin_single]
-        exact Submodule.smul_mem _ z
-          (Finsupp.supported_mono
-            (fun k hk =>
-              mem_ordIn.2 ⟨(mem_ordIn.1 hk).1, (mem_ordIn.1 hk).2.trans (mem_rangeIn.1 hj)⟩)
-            (rho_mem (n + 1) j))
+        exact Submodule.smul_mem _ z (Finsupp.supported_mono
+          (fun k hk => mem_ordIn.2 ⟨(mem_ordIn.1 hk).1, (mem_ordIn.1 hk).2.trans (mem_rangeIn.1 hj)⟩)
+          (rho_mem (n + 1) j))
       have hbx : bd n x = 0 := by rw [hxdef, hlin, bd_bd, map_zero]
       have key := bd_ocone_add_ocone_bd n (minIdx i) hx
       rw [hbx, map_zero, add_zero] at key
       change bd (n + 1) (ocone (minIdx i) x) = x
       exact key
   funext i
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [d_apply, fromOrd_apply, cevO_od P U τ i (rho_mem_oleSet U (n + 1) i), bd_rho, lin_bd_single,
-      map_sum]
+
+  rw [d_apply, fromOrd_apply, cevO_od P U τ i (rho_mem_oleSet U (n + 1) i), bd_rho, lin_bd_single,
+  map_sum]
   refine Finset.sum_congr rfl fun k _ => ?_
-  rw [map_zsmul, fromOrd_apply,
-    res_cevO P U τ (inter_le_comp U i k.succAbove) (rho_mem_oleSet U n _)]
+  rw [map_zsmul, fromOrd_apply, res_cevO P U τ (inter_le_comp U i k.succAbove)
+    (rho_mem_oleSet U n _)]
 
 lemma fromOrd_toOrd_zero (σ : Cochain P U 0) : fromOrd P U 0 (toOrd P U 0 σ) = σ := by
   funext i
@@ -283,16 +317,14 @@ lemma fromOrd_toOrd_zero (σ : Cochain P U 0) : fromOrd P U 0 (toOrd P U 0 σ) =
   rw [cevO_single, one_smul, cvalO_of P U _ i i (strictMono_of_fin_one i) le_rfl, res_refl]
   rfl
 
-theorem d_hstar_add (n : ℕ) (σ : Cochain P U (n + 1))
-    : d P U n (hstar P U n σ) + hstar P U (n + 1) (d P U (n + 1) σ)
-      = σ - fromOrd P U (n + 1) (toOrd P U (n + 1) σ) := by
-  let rec bd_rho
-      : ∀ (n : ℕ) (i : Fin (n + 2) → ι),
-        bd n (rho (n + 1) i) = lin (rho n) (bd n (Finsupp.single i 1))
+theorem d_hstar_add (n : ℕ) (σ : Cochain P U (n + 1)) :
+    d P U n (hstar P U n σ) + hstar P U (n + 1) (d P U (n + 1) σ) =
+      σ - fromOrd P U (n + 1) (toOrd P U (n + 1) σ) := by
+  let rec bd_rho : ∀ (n : ℕ) (i : Fin (n + 2) → ι),
+      bd n (rho (n + 1) i) = lin (rho n) (bd n (Finsupp.single i 1))
     | 0, i => by
-      have hx
-          : lin (rho (ι := ι) 0) (bd 0 (Finsupp.single i 1))
-            ∈ Finsupp.supported ℤ ℤ (ordFrom (minIdx i)) := by
+      have hx : lin (rho (ι := ι) 0) (bd 0 (Finsupp.single i 1)) ∈
+          Finsupp.supported ℤ ℤ (ordFrom (minIdx i)) := by
         rw [lin_rho_zero]
         refine Finsupp.supported_mono ?_ (bd_mem_rangeIn (n := 0) (single_mem_rangeIn i 1))
         intro j hj
@@ -316,20 +348,17 @@ theorem d_hstar_add (n : ℕ) (σ : Cochain P U (n + 1))
         refine Finsupp.supported_mono (ordIn_subset_ordFrom i) ?_
         refine map_mem_supported _ (fun j hj z => ?_) (bd_mem_rangeIn (single_mem_rangeIn i 1))
         rw [lin_single]
-        exact Submodule.smul_mem _ z
-          (Finsupp.supported_mono
-            (fun k hk =>
-              mem_ordIn.2 ⟨(mem_ordIn.1 hk).1, (mem_ordIn.1 hk).2.trans (mem_rangeIn.1 hj)⟩)
-            (rho_mem (n + 1) j))
+        exact Submodule.smul_mem _ z (Finsupp.supported_mono
+          (fun k hk => mem_ordIn.2 ⟨(mem_ordIn.1 hk).1, (mem_ordIn.1 hk).2.trans (mem_rangeIn.1 hj)⟩)
+          (rho_mem (n + 1) j))
       have hbx : bd n x = 0 := by rw [hxdef, hlin, bd_bd, map_zero]
       have key := bd_ocone_add_ocone_bd n (minIdx i) hx
       rw [hbx, map_zero, add_zero] at key
       change bd (n + 1) (ocone (minIdx i) x) = x
       exact key
-  let rec boundary_homotopy
-      : ∀ (n : ℕ) (i : Fin (n + 2) → ι),
-        bd (n + 1) (hmt (n + 1) i) + lin (hmt n) (bd n (Finsupp.single i 1))
-          = Finsupp.single i 1 - rho (n + 1) i
+  let rec boundary_homotopy : ∀ (n : ℕ) (i : Fin (n + 2) → ι),
+      bd (n + 1) (hmt (n + 1) i) + lin (hmt n) (bd n (Finsupp.single i 1)) =
+        Finsupp.single i 1 - rho (n + 1) i
     | n, i => by
       set y := Finsupp.single i 1 - rho (n + 1) i - lin (hmt n) (bd n (Finsupp.single i 1))
         with hydef
@@ -339,14 +368,11 @@ theorem d_hstar_add (n : ℕ) (σ : Cochain P U (n + 1))
         | zero => rw [lin_hmt_zero, lin_rho_zero, map_zero, sub_self, sub_zero]
         | succ n =>
           have ih := boundary_homotopy n
-          have hlin
-              : ∀ c : Chain ι (n + 1),
-                bd (n + 1) (lin (hmt (n + 1)) c)
-                  = c - lin (rho (n + 1)) c - lin (hmt n) (bd n c) := by
+          have hlin : ∀ c : Chain ι (n + 1), bd (n + 1) (lin (hmt (n + 1)) c) =
+              c - lin (rho (n + 1)) c - lin (hmt n) (bd n c) := by
             intro c
-            have : (bd (n + 1)).comp (lin (hmt (ι := ι) (n + 1)))
-                = AddMonoidHom.id _ - lin (rho (ι := ι) (n + 1))
-                  - (lin (hmt (ι := ι) n)).comp (bd n) := by
+            have : (bd (n + 1)).comp (lin (hmt (ι := ι) (n + 1))) =
+                AddMonoidHom.id _ - lin (rho (ι := ι) (n + 1)) - (lin (hmt (ι := ι) n)).comp (bd n) := by
               refine Finsupp.addHom_ext fun j z => ?_
               simp only [AddMonoidHom.comp_apply, AddMonoidHom.sub_apply, AddMonoidHom.id_apply,
                 lin_single, map_zsmul]
@@ -362,14 +388,12 @@ theorem d_hstar_add (n : ℕ) (σ : Cochain P U (n + 1))
   funext i
   have hm : hmt (n + 1) i ∈ Finsupp.supported ℤ ℤ (leSet U i) :=
     Finsupp.supported_mono (rangeIn_subset_leSet U i) (hmt_mem (n + 1) i)
-  have hsum
-      : d P U n (hstar P U n σ) i = cev P U σ i (lin (hmt n) (bd n (Finsupp.single i 1))) := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [d_apply, lin_bd_single, map_sum]
+  have hsum : d P U n (hstar P U n σ) i = cev P U σ i (lin (hmt n) (bd n (Finsupp.single i 1))) := by
+
+    rw [d_apply, lin_bd_single, map_sum]
     refine Finset.sum_congr rfl fun k _ => ?_
-    rw [map_zsmul, hstar_apply,
-      res_cev P U σ (inter_le_comp U i k.succAbove)
-        (Finsupp.supported_mono (rangeIn_subset_leSet U _) (hmt_mem n _))]
+    rw [map_zsmul, hstar_apply, res_cev P U σ (inter_le_comp U i k.succAbove)
+      (Finsupp.supported_mono (rangeIn_subset_leSet U _) (hmt_mem n _))]
   rw [Pi.add_apply, Pi.sub_apply, hsum, hstar_apply, cev_d P U σ i hm, fromOrd_apply,
     cevO_toOrd P U σ i (rho_mem_oleSet U (n + 1) i), ← map_add,
     add_comm (lin (hmt n) (bd n (Finsupp.single i 1))), boundary_homotopy, map_sub, cev_self]
@@ -384,17 +408,16 @@ abbrev ocechH (n : ℕ) : Type (max w u) :=
   ococycles P U n ⧸ (ocoboundaries P U n).addSubgroupOf (ococycles P U n)
 
 noncomputable def toOrdCocycles (n : ℕ) : cocycles P U n →+ ococycles P U n :=
-  AddMonoidHom.codRestrict ((toOrd P U n).comp (cocycles P U n).subtype) (ococycles P U n) fun σ =>
-    AddMonoidHom.mem_ker.2 (by
+  AddMonoidHom.codRestrict ((toOrd P U n).comp (cocycles P U n).subtype) (ococycles P U n)
+    fun σ => AddMonoidHom.mem_ker.2 (by
       change od P U n (toOrd P U n σ.1) = 0
       rw [toOrd_d, (mem_cocycles σ.1).1 σ.2, map_zero])
 
 noncomputable def fromOrdCocycles (n : ℕ) : ococycles P U n →+ cocycles P U n :=
   AddMonoidHom.codRestrict ((fromOrd P U n).comp (ococycles P U n).subtype) (cocycles P U n)
-    fun τ =>
-      (mem_cocycles _).2 (by
-        change d P U n (fromOrd P U n τ.1) = 0
-        rw [d_fromOrd, AddMonoidHom.mem_ker.1 τ.2, map_zero])
+    fun τ => (mem_cocycles _).2 (by
+      change d P U n (fromOrd P U n τ.1) = 0
+      rw [d_fromOrd, AddMonoidHom.mem_ker.1 τ.2, map_zero])
 
 noncomputable def toOrdH (n : ℕ) : cechH P U n →+ ocechH P U n :=
   QuotientAddGroup.map _ _ (toOrdCocycles P U n) (by
@@ -474,18 +497,17 @@ lemma isEmpty_strictMono [Finite ι] {n : ℕ} (hn : Nat.card ι ≤ n) :
 
 end Ordered
 
-theorem cechH_subsingleton [Finite ι] {n : ℕ} (hn : Nat.card ι ≤ n)
-    : Subsingleton (cechH P U n) := by
+theorem cechH_subsingleton [Finite ι] {n : ℕ} (hn : Nat.card ι ≤ n) :
+    Subsingleton (cechH P U n) := by
   let : LinearOrder ι := LinearOrder.lift' (Finite.equivFin ι) (Finite.equivFin ι).injective
   have := isEmpty_strictMono (ι := ι) hn
-  have : Subsingleton (ocechH P U n) :=
-    ⟨fun a b => by
-      induction a using QuotientAddGroup.induction_on with
-      | H a =>
-        induction b using QuotientAddGroup.induction_on with
-        | H b =>
-          congr 1
-          exact Subtype.ext (Subsingleton.elim _ _)⟩
+  have : Subsingleton (ocechH P U n) := ⟨fun a b => by
+    induction a using QuotientAddGroup.induction_on with
+    | H a =>
+      induction b using QuotientAddGroup.induction_on with
+      | H b =>
+        congr 1
+        exact Subtype.ext (Subsingleton.elim _ _)⟩
   exact (cechHOrderedEquiv P U n).injective.subsingleton
 
 end GroundTheory.Arith.SchemeCoh

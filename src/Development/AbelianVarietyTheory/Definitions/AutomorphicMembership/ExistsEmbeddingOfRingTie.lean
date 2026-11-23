@@ -1,19 +1,54 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.TieEmbeddingCastLevelTie
-public import Formalism.LocalToGlobal.GroupLattices.TiedFamilies.TieAll
-public import Formalism.LocalToGlobal.GroupLattices.TiedFamilies.TieFin
-public import Formalism.LocalToGlobal.GroupLattices.TiedFamilies.GTiedFOfIsRecCEv
-public import Formalism.LocalToGlobal.GroupLattices.TiedFamilies.TiePsiC
 public import Formalism.LocalToGlobal.GroupLattices.TiedFamilies.BlockRationalityField
+public import Formalism.LocalToGlobal.GroupLattices.TiedFamilies.ChiMemSubfield
+public import Formalism.LocalToGlobal.GroupLattices.TiedFamilies.CmpHyp0P
+public import Formalism.LocalToGlobal.GroupLattices.TiedFamilies.FullTiedCBase
+public import Formalism.LocalToGlobal.GroupLattices.TiedFamilies.TiePsi
+public import Formalism.LocalToGlobal.GroupLattices.TiedFamilies.SelfDualAtColLevel
+public import Formalism.LocalToGlobal.GroupLattices.TiedFamilies.TieAll
+import Formalism.LocalToGlobal.GroupLattices.TiedFamilies.TieExC
+public import Formalism.LocalToGlobal.GroupLattices.TiedFamilies.TieIwLevTieOf
+public import Formalism.LocalToGlobal.GroupLattices.TiedFamilies.TiePsiC
 public import Formalism.PeriodIntegrals.OrbitalBoundsConclusion.BlockRatReal
-public import Formalism.SharpRestriction.GrowthBounds.IntegralWeylLatticeSpan.WeylLatticeDescentHolds
 public import Formalism.SharpRestriction.GrowthBounds.IntegralWeylLatticeSpan.ColSpanMulUnit
 public import Formalism.SharpRestriction.GrowthBounds.IntegralWeylLatticeSpan.SelfDualCongr
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.CharZeroOfSetting
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsLocIdOfCompletions
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.AddCharIsIntegral
+public import Formalism.SharpRestriction.GrowthBounds.IntegralWeylLatticeSpan.WeylLatticeDescentHolds
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -72,7 +107,6 @@ variable
       = lamV (lam u w hg) (D.what₂.embLL z))
   (hPos : ∀ u w hg, (packC D Lc I ψ u w hg).posOK (iK u w hg) (lam u w hg))
 
-set_option maxHeartbeats 32000000 in
 include hK hPos in
 theorem comparison_statements
     (hJ : ∀ u, Joint0 H0.lev0 u (T u))

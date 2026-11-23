@@ -1,8 +1,53 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Definitions.Divisors.GalMapMul
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsAlgClosedFractionRingOfMonicPolynomialsHaveRoo
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Etale.Weakly
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.SimpleRing.Principal
+public import Mathlib.RingTheory.Smooth.IntegralClosure
+import Mathlib.RingTheory.TotallySplit
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
 
 @[expose] public section
 
@@ -10,9 +55,8 @@ noncomputable section
 
 open TensorProduct Polynomial
 
-private theorem isIntegrallyClosed_of_AIC
-    (T : Type) [CommRing T] [IsDomain T] (hT : GlobalTheory.EtC.AIC T)
-    : IsIntegrallyClosed T := by
+private theorem isIntegrallyClosed_of_AIC (T : Type) [CommRing T] [IsDomain T]
+    (hT : GlobalTheory.EtC.AIC T) : IsIntegrallyClosed T := by
   rw [isIntegrallyClosed_iff (FractionRing T)]
   intro x hx
   obtain ⟨p, hp, hpx⟩ := hx
@@ -34,20 +78,16 @@ private theorem isIntegrallyClosed_of_AIC
         exact (sub_eq_zero.1 h1).symm
       · exact ih q.natDegree (by omega) q hqm h1 rfl
 
-private theorem exists_of_idem
-    (T C : Type)
-    [CommRing T] [IsDomain T] [IsIntegrallyClosed T] [CommRing C] [Algebra T C] [Algebra.Etale T C]
-    (z : C ⊗[T] FractionRing T) (hz : z * z = z)
-    : ∃ s : C, algebraMap C (C ⊗[T] FractionRing T) s = z := by
+private theorem exists_of_idem (T C : Type) [CommRing T] [IsDomain T] [IsIntegrallyClosed T]
+    [CommRing C] [Algebra T C] [Algebra.Etale T C] (z : C ⊗[T] FractionRing T) (hz : z * z = z) :
+    ∃ s : C, algebraMap C (C ⊗[T] FractionRing T) s = z := by
   have hint : IsIntegral C z := by
     refine ⟨X ^ 2 - X, monic_X_pow_sub (n := 2) (lt_of_le_of_lt degree_X_le (by norm_num)), ?_⟩
     simp [eval₂_sub, pow_two, hz]
-  obtain ⟨t, ht⟩ :=
-    (TensorProduct.toIntegralClosure_bijective_of_smooth (R := T) (S := C) (B := FractionRing T)).2
-      ⟨z, hint⟩
-  have ht'
-      : Algebra.TensorProduct.map (AlgHom.id C C) (integralClosure T (FractionRing T)).val t = z :=
-    congrArg Subtype.val ht
+  obtain ⟨t, ht⟩ := (TensorProduct.toIntegralClosure_bijective_of_smooth (R := T) (S := C)
+    (B := FractionRing T)).2 ⟨z, hint⟩
+  have ht' : Algebra.TensorProduct.map (AlgHom.id C C)
+      (integralClosure T (FractionRing T)).val t = z := congrArg Subtype.val ht
   rw [← ht']
   clear ht ht'
   induction t with
@@ -62,24 +102,23 @@ private theorem exists_of_idem
       Algebra.TensorProduct.algebraMap_apply, Algebra.algebraMap_self, RingHom.id_apply]
     rw [Algebra.algebraMap_eq_smul_one, smul_tmul]
 
-private theorem core
-    (T C : Type)
-    [CommRing T] [IsDomain T] [IsIntegrallyClosed T] [CommRing C] [Algebra T C] [Algebra.Etale T C]
-    {n : ℕ} (g : C ⊗[T] FractionRing T ≃+* (Fin n → FractionRing T))
-    : ∃ (e : Fin n → C),
-      CompleteOrthogonalIdempotents e ∧ ∀ j, IsDomain (Localization.Away (e j)) := by
+private theorem core (T C : Type) [CommRing T] [IsDomain T] [IsIntegrallyClosed T]
+    [CommRing C] [Algebra T C] [Algebra.Etale T C] {n : ℕ}
+    (g : C ⊗[T] FractionRing T ≃+* (Fin n → FractionRing T)) :
+    ∃ (e : Fin n → C), CompleteOrthogonalIdempotents e ∧
+      ∀ j, IsDomain (Localization.Away (e j)) := by
   classical
-  let G : C →+* (Fin n → FractionRing T) := g.toRingHom.comp (algebraMap C (C ⊗[T] FractionRing T))
+  let G : C →+* (Fin n → FractionRing T) :=
+    g.toRingHom.comp (algebraMap C (C ⊗[T] FractionRing T))
   have hι : Function.Injective (algebraMap C (C ⊗[T] FractionRing T)) :=
     Algebra.TensorProduct.includeLeft_injective (S := T)
       (IsFractionRing.injective T (FractionRing T))
   have hG : Function.Injective G := g.injective.comp hι
   have hex : ∀ j : Fin n, ∃ s : C, G s = Pi.single j 1 := by
     intro j
-    obtain ⟨s, hs⟩ :=
-      exists_of_idem T C (g.symm (Pi.single j 1)) (by
-        apply g.injective
-        rw [map_mul, g.apply_symm_apply, ← Pi.single_mul, one_mul])
+    obtain ⟨s, hs⟩ := exists_of_idem T C (g.symm (Pi.single j 1)) (by
+      apply g.injective
+      rw [map_mul, g.apply_symm_apply, ← Pi.single_mul, one_mul])
     exact ⟨s, by simp [G, hs]⟩
   choose c hc using hex
   have hcoi : CompleteOrthogonalIdempotents c := by
@@ -90,7 +129,7 @@ private theorem core
       by_cases h : k = i
       · subst h; simp [Pi.single_eq_of_ne hij]
       · simp [Pi.single_eq_of_ne h]
-    set_option synthInstance.maxHeartbeats 100000 in
+
     · rw [map_sum, map_one]
       simp only [hc]
       exact Finset.univ_sum_single 1
@@ -107,8 +146,7 @@ private theorem core
     (IsIdempotentElem.iff_eq_one_of_isUnit (IsLocalization.Away.algebraMap_isUnit (c j))).1
       (hidem.map _)
   have hinj : Function.Injective ψ := by
-    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
-      rw [injective_iff_map_eq_zero]
+    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
     intro a ha
     obtain ⟨x, rfl⟩ := hsurj a
     rw [hψ] at ha
@@ -124,11 +162,9 @@ private theorem core
     rwa [map_mul, hone, mul_one, map_zero] at this
   exact hinj.isDomain ψ
 
-theorem UpperTheory.exists_orthogonalIdempotents_isDomain_of_etale
-    : ∀ (T C : Type) [CommRing T] [IsDomain T] [CommRing C] [Algebra T C] [Algebra.Etale T C],
-      GlobalTheory.EtC.AIC T
-        → ∃ (n : ℕ) (e : Fin n → C),
-          CompleteOrthogonalIdempotents e ∧ ∀ j, IsDomain (Localization.Away (e j)) := by
+theorem UpperTheory.exists_orthogonalIdempotents_isDomain_of_etale :
+    ∀ (T C : Type) [CommRing T] [IsDomain T] [CommRing C] [Algebra T C] [Algebra.Etale T C], GlobalTheory.EtC.AIC T →
+      ∃ (n : ℕ) (e : Fin n → C), CompleteOrthogonalIdempotents e ∧ ∀ j, IsDomain (Localization.Away (e j)) := by
   intro T C _ _ _ _ _ hT
   haveI := GlobalTheory.isAlgClosed_fractionRing_of_AIC T hT
   haveI := isIntegrallyClosed_of_AIC T hT

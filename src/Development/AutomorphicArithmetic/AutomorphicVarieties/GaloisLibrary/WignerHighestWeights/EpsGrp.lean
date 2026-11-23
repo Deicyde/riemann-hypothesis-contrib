@@ -1,7 +1,48 @@
 module
 
 public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibrary.WignerHighestWeights.IsAlgIsoRefl
-public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.DualInfinitesimalCharacterRegular
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
@@ -13,29 +54,23 @@ private def outL {n : ℕ} (w : Fin n → ℂ) : (Fin n → ℂ) →ₗ[ℂ] Mat
   map_add' u u' := by ext; simp [vecMulVec_apply, add_mul]
   map_smul' c u := by ext; simp [vecMulVec_apply, mul_assoc]
 
-private theorem eps_left_mul_eq_det_smul
-    {M : Type} [AddCommGroup M] [Module ℂ M]
-    {n : ℕ} (μ : (Π _ : Fin n, Matrix (Fin n) (Fin n) ℂ) →ₘₗ[ℂ] M) (g : Matrix (Fin n) (Fin n) ℂ)
-    : eps (fun x => μ fun i => g * x i) = g.det • eps μ := by
+private theorem eps_left_mul_eq_det_smul {M : Type} [AddCommGroup M] [Module ℂ M] {n : ℕ}
+    (μ : (Π _ : Fin n, Matrix (Fin n) (Fin n) ℂ) →ₘₗ[ℂ] M) (g : Matrix (Fin n) (Fin n) ℂ) :
+    eps (fun x => μ fun i => g * x i) = g.det • eps μ := by
   have hs : ∀ a b : Fin n, g * single a b (1 : ℂ) = ∑ c, g c a • single c b (1 : ℂ) := by
     intro a b
     ext i j
     by_cases hbj : b = j <;> simp [Matrix.mul_apply, Matrix.single_apply, Matrix.sum_apply, hbj]
-  have hdet
-      : ∀ c : Fin n → Fin n,
-        ∑ σ : Equiv.Perm (Fin n),
-            ((Equiv.Perm.sign σ : ℤ) : ℂ) * ∏ k, g (c k) (σ k)
-          = (g.submatrix c id).det := by
+  have hdet : ∀ c : Fin n → Fin n, ∑ σ : Equiv.Perm (Fin n),
+      ((Equiv.Perm.sign σ : ℤ) : ℂ) * ∏ k, g (c k) (σ k) = (g.submatrix c id).det := by
     intro c
     rw [← Matrix.det_transpose, Matrix.det_apply']
     rfl
-  have hsum
-      : ∀ w : (Fin n → Fin n) → M,
-        ∑ c, (g.submatrix c id).det • w c
-          = ∑ α : Equiv.Perm (Fin n), (((Equiv.Perm.sign α : ℤ) : ℂ) * g.det) • w α := by
+  have hsum : ∀ w : (Fin n → Fin n) → M, ∑ c, (g.submatrix c id).det • w c =
+      ∑ α : Equiv.Perm (Fin n), (((Equiv.Perm.sign α : ℤ) : ℂ) * g.det) • w α := by
     intro w
-    rw [← Finset.sum_subset (Finset.subset_univ (Finset.univ.image (fun α : Equiv.Perm (Fin n) =>
-      (⇑α : Fin n → Fin n))))]
+    rw [← Finset.sum_subset (Finset.subset_univ
+      (Finset.univ.image (fun α : Equiv.Perm (Fin n) => (⇑α : Fin n → Fin n))))]
     · rw [Finset.sum_image (fun α _ β _ h => Equiv.coe_fn_injective h)]
       refine Finset.sum_congr rfl fun α _ => ?_
       rw [Matrix.det_permute]
@@ -50,24 +85,18 @@ private theorem eps_left_mul_eq_det_smul
       rw [Matrix.det_zero_of_row_eq hne (by ext k; simp [hij]), zero_smul]
   simp only [eps, Finset.smul_sum]
   refine Finset.sum_congr rfl fun τ _ => ?_
-  have hμ
-      : ∀ σ : Equiv.Perm (Fin n),
-        μ (fun i => g * units σ τ i)
-          = ∑ c : Fin n → Fin n, (∏ k, g (c k) (σ k)) • μ (fun k => single (c k) (τ k) (1 : ℂ)) :=
-    by
-      intro σ
-      simp only [units, hs]
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [MultilinearMap.map_sum]
-      refine Finset.sum_congr rfl fun c _ => ?_
-      simp only [MultilinearMap.map_smul_univ, RingHom.id_apply]
-  have hc
-      : ∀ c : Fin n → Fin n,
-        ∑ σ : Equiv.Perm (Fin n),
-            ((Equiv.Perm.sign τ : ℤ) * (Equiv.Perm.sign σ : ℤ)) • (∏ k, g (c k) (σ k)) •
-              μ (fun k => single (c k) (τ k) (1 : ℂ))
-          = ((Equiv.Perm.sign τ : ℤ) : ℂ)
-            • ((g.submatrix c id).det • μ (fun k => single (c k) (τ k) (1 : ℂ))) := by
+  have hμ : ∀ σ : Equiv.Perm (Fin n), μ (fun i => g * units σ τ i) =
+      ∑ c : Fin n → Fin n, (∏ k, g (c k) (σ k)) • μ (fun k => single (c k) (τ k) (1 : ℂ)) := by
+    intro σ
+    simp only [units, hs]
+
+    rw [MultilinearMap.map_sum]
+    refine Finset.sum_congr rfl fun c _ => ?_
+    simp only [MultilinearMap.map_smul_univ, RingHom.id_apply]
+  have hc : ∀ c : Fin n → Fin n, ∑ σ : Equiv.Perm (Fin n),
+      ((Equiv.Perm.sign τ : ℤ) * (Equiv.Perm.sign σ : ℤ)) • (∏ k, g (c k) (σ k)) •
+        μ (fun k => single (c k) (τ k) (1 : ℂ)) =
+      ((Equiv.Perm.sign τ : ℤ) : ℂ) • ((g.submatrix c id).det • μ (fun k => single (c k) (τ k) (1 : ℂ))) := by
     intro c
     simp only [← Int.cast_smul_eq_zsmul ℂ, smul_smul, ← Finset.sum_smul]
     congr 1
@@ -76,21 +105,18 @@ private theorem eps_left_mul_eq_det_smul
     push_cast
     ring
   simp only [hμ, Finset.smul_sum]
-  rw [Finset.sum_comm, Finset.sum_congr rfl fun c _ => hc c, ← Finset.smul_sum, hsum,
-    Finset.smul_sum]
+  rw [Finset.sum_comm, Finset.sum_congr rfl fun c _ => hc c, ← Finset.smul_sum, hsum, Finset.smul_sum]
   refine Finset.sum_congr rfl fun σ _ => ?_
   simp only [← Int.cast_smul_eq_zsmul ℂ, smul_smul]
   congr 1
   push_cast
   ring
 
-theorem UpperTheory.V.AlgRepEndIrreducible.epsGrp
-    : ∀ (M : Type) [AddCommGroup M] [Module ℂ M] (n : ℕ)
-        (μ : (Π _ : Fin n, Matrix (Fin n) (Fin n) ℂ) →ₘₗ[ℂ] M) (g g' : Matrix (Fin n) (Fin n) ℂ),
-      g' * g = 1 → eps (fun x => μ fun i => g * x i * g') = eps μ := by
+theorem UpperTheory.V.AlgRepEndIrreducible.epsGrp :
+    ∀ (M : Type) [AddCommGroup M] [Module ℂ M] (n : ℕ) (μ : (Π _ : Fin n, Matrix (Fin n) (Fin n) ℂ) →ₘₗ[ℂ] M) (g g' : Matrix (Fin n) (Fin n) ℂ), g' * g = 1 →
+      eps (fun x => μ fun i => g * x i * g') = eps μ := by
   intro M _ _ n μ g g' h
-  have hT
-      : ∀ ν : (Fin n → Matrix (Fin n) (Fin n) ℂ) → M, eps (fun x => ν fun i => (x i)ᵀ) = eps ν := by
+  have hT : ∀ ν : (Fin n → Matrix (Fin n) (Fin n) ℂ) → M, eps (fun x => ν fun i => (x i)ᵀ) = eps ν := by
     intro ν
     simp only [eps, units, Matrix.transpose_single]
     rw [Finset.sum_comm]
@@ -100,8 +126,8 @@ theorem UpperTheory.V.AlgRepEndIrreducible.epsGrp
   have e1 : eps (fun x => μ fun i => g * x i * g') = g.det • eps (fun x => μ fun i => x i * g') :=
     eps_left_mul_eq_det_smul (μ.compLinearMap (fun _ => LinearMap.mulRight ℂ g')) g
   have e2 : eps (fun x => μ fun i => (g'ᵀ * x i)ᵀ) = g'ᵀ.det • eps (fun x => μ fun i => (x i)ᵀ) :=
-    eps_left_mul_eq_det_smul
-      (μ.compLinearMap (fun _ => (Matrix.transposeLinearEquiv (Fin n) (Fin n) ℂ ℂ).toLinearMap)) g'ᵀ
+    eps_left_mul_eq_det_smul (μ.compLinearMap
+      (fun _ => (Matrix.transposeLinearEquiv (Fin n) (Fin n) ℂ ℂ).toLinearMap)) g'ᵀ
   simp only [Matrix.transpose_mul, Matrix.transpose_transpose, Matrix.det_transpose, hT] at e2
   have e3 : eps (fun x => μ fun i => x i * g') = g'.det • eps μ := by
     rw [← hT (fun x => μ fun i => x i * g')]

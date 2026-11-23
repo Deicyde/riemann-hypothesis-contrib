@@ -1,20 +1,54 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Definitions.Divisors.IsUnimodMod
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsSmulEqSumVecMulVecSpanningFamilyStatement
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Int
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
 
 @[expose] public section
 
-open IsLocalRing GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.Poinc
-  Matrix
+open IsLocalRing GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.Poinc Matrix
 
 namespace GlobalTheory.Poinc
 
-theorem posDef_map_int_of_pos
-    {n : ℕ}
-    (L : Matrix (Fin n) (Fin n) ℤ) (hs : L.IsSymm) (hp : ∀ ξ : Fin n → ℤ, ξ ≠ 0 → 0 < ξ ⬝ᵥ (L *ᵥ ξ))
-    : (L.map (Int.cast : ℤ → ℝ)).PosDef := by
+theorem posDef_map_int_of_pos {n : ℕ} (L : Matrix (Fin n) (Fin n) ℤ) (hs : L.IsSymm)
+    (hp : ∀ ξ : Fin n → ℤ, ξ ≠ 0 → 0 < ξ ⬝ᵥ (L *ᵥ ξ)) : (L.map (Int.cast : ℤ → ℝ)).PosDef := by
   set M := L.map (Int.cast : ℤ → ℝ) with hM
   have hH : M.IsHermitian := by
     refine Matrix.IsHermitian.ext fun i j => ?_
@@ -25,9 +59,7 @@ theorem posDef_map_int_of_pos
     have := hp v hv
     rw [hLv, dotProduct_zero] at this
     exact lt_irrefl _ this
-  have hint
-      : ∀ z : Fin n → ℤ,
-        (fun i => (z i : ℝ)) ⬝ᵥ (M *ᵥ fun i => (z i : ℝ)) = ((z ⬝ᵥ (L *ᵥ z) : ℤ) : ℝ) := by
+  have hint : ∀ z : Fin n → ℤ, (fun i => (z i : ℝ)) ⬝ᵥ (M *ᵥ fun i => (z i : ℝ)) = ((z ⬝ᵥ (L *ᵥ z) : ℤ) : ℝ) := by
     intro z
     simp [M, dotProduct, mulVec]
   have hrat : ∀ t : Fin n → ℚ, 0 ≤ (fun i => (t i : ℝ)) ⬝ᵥ (M *ᵥ fun i => (t i : ℝ)) := by
@@ -55,8 +87,7 @@ theorem posDef_map_int_of_pos
     rw [star_trivial]
     have hcl : IsClosed {y : Fin n → ℝ | 0 ≤ y ⬝ᵥ (M *ᵥ y)} :=
       isClosed_le continuous_const
-        (Continuous.dotProduct continuous_id
-          (Continuous.matrix_mulVec continuous_const continuous_id))
+        (Continuous.dotProduct continuous_id (Continuous.matrix_mulVec continuous_const continuous_id))
     exact (DenseRange.piMap fun _ => Rat.denseRange_cast).induction_on y hcl fun t => hrat t
   have hdetM : M.det = (L.det : ℝ) := by
     rw [hM]
@@ -72,39 +103,31 @@ end GlobalTheory.Poinc
 
 namespace GlobalTheory.Poinc
 
-theorem exists_supports_int
-    : ∀ (φ : InvFun ℤ) (X : Type) [AddCommGroup X] [Module.Free ℤ X] [Module.Finite ℤ X],
-      IsPolFanOn id φ X
-        → ∀ (r : ℕ) (γ : Fin r → LinearMap.BilinForm ℤ X),
-          IsCone id φ γ → ∃ (d m : ℕ) (a : Fin m → X), 1 ≤ d ∧ Supports id φ d γ a := by
+theorem exists_supports_int : ∀ (φ : InvFun ℤ) (X : Type) [AddCommGroup X] [Module.Free ℤ X] [Module.Finite ℤ X],
+    IsPolFanOn id φ X → ∀ (r : ℕ) (γ : Fin r → LinearMap.BilinForm ℤ X), IsCone id φ γ →
+      ∃ (d m : ℕ) (a : Fin m → X), 1 ≤ d ∧ Supports id φ d γ a := by
   intro φ X _ _ _ hφ r γ hγ
   classical
   have hstrict := hγ.strict
   unfold IsStrict at hstrict
   obtain ⟨N, ℓ, hN, h1, h2, h3⟩ := hstrict
   let b := Module.finBasis ℤ X
-  let S
-      : Fin (Module.finrank ℤ X) → Fin (Module.finrank ℤ X) → LinearMap.BilinForm ℤ X := fun i j =>
-    (LinearMap.mul ℤ ℤ).compl₁₂ (b.coord i) (b.coord j)
-      + (LinearMap.mul ℤ ℤ).compl₁₂ (b.coord j) (b.coord i)
+  let S : Fin (Module.finrank ℤ X) → Fin (Module.finrank ℤ X) → LinearMap.BilinForm ℤ X := fun i j =>
+    (LinearMap.mul ℤ ℤ).compl₁₂ (b.coord i) (b.coord j) + (LinearMap.mul ℤ ℤ).compl₁₂ (b.coord j) (b.coord i)
   have hS : ∀ i j x y, S i j x y = b.repr x i * b.repr y j + b.repr x j * b.repr y i := by
     intro i j x y; simp [S]
-  let L : Matrix (Fin (Module.finrank ℤ X)) (Fin (Module.finrank ℤ X)) ℤ :=
-    Matrix.of fun i j => ℓ (S i j)
+  let L : Matrix (Fin (Module.finrank ℤ X)) (Fin (Module.finrank ℤ X)) ℤ := Matrix.of fun i j => ℓ (S i j)
   have hL : ∀ i j, L i j = ℓ (S i j) := fun _ _ => rfl
-  have hexp
-      : ∀ (β : LinearMap.BilinForm ℤ X) x y,
-        β x y = ∑ i, ∑ j, b.repr x i * b.repr y j * β (b i) (b j) := by
+  have hexp : ∀ (β : LinearMap.BilinForm ℤ X) x y,
+      β x y = ∑ i, ∑ j, b.repr x i * b.repr y j * β (b i) (b j) := by
     intro β x y
     conv_lhs => rw [← b.sum_repr x, ← b.sum_repr y]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_smul, LinearMap.sum_apply, LinearMap.smul_apply, smul_eq_mul,
-        Finset.mul_sum]
+
+    simp only [map_sum, map_smul, LinearMap.sum_apply, LinearMap.smul_apply, smul_eq_mul, Finset.mul_sum]
     rw [Finset.sum_comm]
     exact Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => by ring
-  have hA
-      : ∀ β : LinearMap.BilinForm ℤ X,
-        (∀ y z, β y z = β z y) → ∑ i, ∑ j, β (b i) (b j) * L i j = 2 * ℓ β := by
+  have hA : ∀ β : LinearMap.BilinForm ℤ X, (∀ y z, β y z = β z y) →
+      ∑ i, ∑ j, β (b i) (b j) * L i j = 2 * ℓ β := by
     intro β hβ
     have hsum : ∑ i, ∑ j, β (b i) (b j) • S i j = (2 : ℤ) • β := by
       refine LinearMap.ext₂ fun x y => ?_
@@ -115,8 +138,8 @@ theorem exists_supports_int
       rw [← Finset.sum_add_distrib]
       exact Finset.sum_congr rfl fun j _ => by ring
     have := congrArg ℓ hsum
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_smul, smul_eq_mul] at this
+
+    simp only [map_sum, map_smul, smul_eq_mul] at this
     simpa only [hL] using this
   have hsym : L.IsSymm := Matrix.IsSymm.ext fun i j => by simp only [hL, S, add_comm]
   have hpos : ∀ ξ : Fin (Module.finrank ℤ X) → ℤ, ξ ≠ 0 → 0 < ξ ⬝ᵥ (L *ᵥ ξ) := by
@@ -146,46 +169,39 @@ theorem exists_supports_int
       exact Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => by ring
     rw [e, h5]
     omega
-  obtain ⟨D, m, a, hD, hspan, hsum⟩ :=
-    GlobalTheory.T.exists_smul_eq_sum_vecMulVec_spanning_family _ L
-      (posDef_map_int_of_pos L hsym hpos)
+  obtain ⟨D, m, a, hD, hspan, hsum⟩ := GlobalTheory.T.exists_smul_eq_sum_vecMulVec_spanning_family _ L (posDef_map_int_of_pos L hsym hpos)
   let x : Fin m → X := fun k => b.equivFun.symm (a k)
   have hx : ∀ k i, b.repr (x k) i = a k i := fun k i => by
     show b.equivFun (b.equivFun.symm (a k)) i = a k i
     rw [b.equivFun.apply_symm_apply]
-  have hB
-      : ∀ β : LinearMap.BilinForm ℤ X,
-        (∀ y z, β y z = β z y) → ∑ k, β (x k) (x k) = 2 * D * ℓ β := by
+  have hB : ∀ β : LinearMap.BilinForm ℤ X, (∀ y z, β y z = β z y) →
+      ∑ k, β (x k) (x k) = 2 * D * ℓ β := by
     intro β hβ
     have hsum' : ∀ i j, (D : ℤ) * L i j = ∑ k, a k i * a k j := by
       intro i j
       have := congrFun (congrFun hsum i) j
       simpa [Matrix.sum_apply, Matrix.vecMulVec_apply] using this
-    calc
-      ∑ k, β (x k) (x k) = ∑ k, ∑ i, ∑ j, a k i * a k j * β (b i) (b j) :=
-        Finset.sum_congr rfl fun k _ => by rw [hexp β]; simp only [hx]
+    calc ∑ k, β (x k) (x k) = ∑ k, ∑ i, ∑ j, a k i * a k j * β (b i) (b j) :=
+          Finset.sum_congr rfl fun k _ => by rw [hexp β]; simp only [hx]
       _ = ∑ i, ∑ j, β (b i) (b j) * ((D : ℤ) * L i j) := by
-        rw [Finset.sum_comm]
-        refine Finset.sum_congr rfl fun i _ => ?_
-        rw [Finset.sum_comm]
-        refine Finset.sum_congr rfl fun j _ => ?_
-        rw [hsum' i j, Finset.mul_sum]
-        exact Finset.sum_congr rfl fun k _ => by ring
+          rw [Finset.sum_comm]
+          refine Finset.sum_congr rfl fun i _ => ?_
+          rw [Finset.sum_comm]
+          refine Finset.sum_congr rfl fun j _ => ?_
+          rw [hsum' i j, Finset.mul_sum]
+          exact Finset.sum_congr rfl fun k _ => by ring
       _ = D * (2 * ℓ β) := by
-        rw [← hA β hβ, Finset.mul_sum]
-        refine Finset.sum_congr rfl fun i _ => ?_
-        rw [Finset.mul_sum]
-        exact Finset.sum_congr rfl fun j _ => by ring
+          rw [← hA β hβ, Finset.mul_sum]
+          refine Finset.sum_congr rfl fun i _ => ?_
+          rw [Finset.mul_sum]
+          exact Finset.sum_congr rfl fun j _ => by ring
       _ = 2 * D * ℓ β := by ring
   have hspanX : Submodule.span ℤ (Set.range x) = ⊤ := by
-    have e
-        : Set.range x
-          = (b.equivFun.symm.toLinearMap : (Fin (Module.finrank ℤ X) → ℤ) →ₗ[ℤ] X) '' Set.range a :=
+    have e : Set.range x = (b.equivFun.symm.toLinearMap : (Fin (Module.finrank ℤ X) → ℤ) →ₗ[ℤ] X) '' Set.range a :=
       Set.range_comp _ _
     rw [e, Submodule.span_image, hspan, Submodule.map_top, LinearEquiv.range]
-  have hD0 : (0 : ℝ) < 2 * D := by
-    have : (1 : ℝ) ≤ D := by exact_mod_cast hD
-    linarith
+  have hD0 : (0 : ℝ) < 2 * D := by have : (1 : ℝ) ≤ D := by exact_mod_cast hD
+                                   linarith
   refine ⟨2 * D * N, m, x, Nat.one_le_iff_ne_zero.2 (by positivity), ⟨hspanX, ?_, ?_, ?_⟩⟩
   · intro β hβ hp
     rw [hB β (mem_balForms_int.1 hβ)]

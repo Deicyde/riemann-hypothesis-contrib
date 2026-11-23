@@ -1,22 +1,60 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.Definitions.Foundations.NormSumPairRankZeroOfCurveCoordNorm
-public import Formalism.PairingDivisors.StatementH
-public import Formalism.LocalRingCardinality.RankBoundMonotoneInDimension
-public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsPeriodPairIdealCurveLatticeStatement
+import Development.AbelianVarietyTheory.Proofs.FoundationProofs.OfDualFamilies
+public import Formalism.SharpRestriction.GlobalSchurBounds.StandardLatticesGL3
 public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsIntegerMapEqHalfOneAddSqrtStatement
-public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.LatticeCovolumePosAndSelfDualStatement
-public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsTraceDualFamilyInverseHalfDifferentStatement
+public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsPeriodPairIdealCurveLatticeStatement
 public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsTraceDualFamilyHomLatticeStatement
+public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsTraceDualFamilyInverseHalfDifferentStatement
 public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.HermitianPairingRationalValuesStatement
+public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.LatticeCovolumePosAndSelfDualStatement
 public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ThetaFunctionSelfDualExistsEqSmulStatement
+import Formalism.LocalRingCardinality.RankBoundMonotoneInDimension
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Development.AbelianVarietyTheory.Definitions.Foundations.NormSumPairRankZeroOfCurveCoordNorm
 
 @[expose] public section
 
-open NumberField Classical Formalism.BasicNotions Formalism.MainNotions
-  Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.StandardLatticesGL3
-  GlobalTheory.NormSum
+open NumberField Classical Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.StandardLatticesGL3 GlobalTheory.NormSum
 open scoped BigOperators
 
 noncomputable section
@@ -37,8 +75,8 @@ theorem sq_smul_left (c : ℂ) (z w : VC D N N') : sq (c • z) w = c * sq z w :
 
 theorem sq_smul_right (c : ℂ) (z w : VC D N N') : sq z (c • w) = sq z w * (starRingEnd ℂ) c := by
   simp only [sq, Finset.sum_mul, Pi.smul_apply, smul_eq_mul, map_mul]
-  refine Finset.sum_congr rfl fun _ _ =>
-    Finset.sum_congr rfl fun _ _ => Finset.sum_congr rfl fun _ _ => by ring
+  refine Finset.sum_congr rfl fun _ _ => Finset.sum_congr rfl fun _ _ =>
+    Finset.sum_congr rfl fun _ _ => by ring
 
 theorem sq_add_left (z z' w : VC D N N') : sq (z + z') w = sq z w + sq z' w := by
   simp [sq, add_mul, Finset.sum_add_distrib]
@@ -46,9 +84,9 @@ theorem sq_add_left (z z' w : VC D N N') : sq (z + z') w = sq z w + sq z' w := b
 theorem sq_add_right (z w w' : VC D N N') : sq z (w + w') = sq z w + sq z w' := by
   simp [sq, mul_add, Finset.sum_add_distrib]
 
-theorem sq_neg_left (z w : VC D N N') : sq (-z) w = - sq z w := by simp [sq]
+theorem sq_neg_left (z w : VC D N N') : sq (-z) w = -sq z w := by simp [sq]
 
-theorem sq_neg_right (z w : VC D N N') : sq z (-w) = - sq z w := by simp [sq]
+theorem sq_neg_right (z w : VC D N N') : sq z (-w) = -sq z w := by simp [sq]
 
 theorem sq_zero_left (w : VC D N N') : sq 0 w = 0 := by simp [sq]
 
@@ -62,33 +100,32 @@ theorem continuous_sq (w : VC D N N') : Continuous fun z : VC D N N' => sq z w :
 
 variable (cc : Ideal (𝓞 D.host.K)) (δ : ℂ)
 
-theorem embV_apply (x : Matrix (Fin N') (Fin N) D.host.E) (τ i j)
-    : embV D (tor0 D cc δ) x τ i j = embT D τ (x i j) :=
-  rfl
+theorem embV_apply (x : Matrix (Fin N') (Fin N) D.host.E) (τ i j) :
+    embV D (tor0 D cc δ) x τ i j = embT D τ (x i j) := rfl
 
-theorem sq_embV (hG : admG1 D) (x y : Matrix (Fin N') (Fin N) D.host.E)
-    : sq (embV D (tor0 D cc δ) x) (embV D (tor0 D cc δ) y)
-      = D.host.φ₀ ((hYY D x y : D.host.K) : D.host.E) := by
+theorem sq_embV (hG : admG1 D) (x y : Matrix (Fin N') (Fin N) D.host.E) :
+    sq (embV D (tor0 D cc δ) x) (embV D (tor0 D cc δ) y) =
+      D.host.φ₀ ((hYY D x y : D.host.K) : D.host.E) := by
   rw [hYY, ← hG.2]
   refine Finset.sum_congr rfl fun τ _ => ?_
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, map_mul, embV_apply]
+
+  simp only [map_sum, map_mul, embV_apply]
   refine Finset.sum_congr rfl fun _ _ => Finset.sum_congr rfl fun _ _ => ?_
   exact congrArg _ (D.host.conjE_apply (embT D τ) _).symm
 
-theorem embV_smul (hG : admG1 D) (a : D.host.K) (x : Matrix (Fin N') (Fin N) D.host.E)
-    : embV D (tor0 D cc δ) (a • x) = D.host.φ₀ (a : D.host.E) • embV D (tor0 D cc δ) x := by
+theorem embV_smul (hG : admG1 D) (a : D.host.K) (x : Matrix (Fin N') (Fin N) D.host.E) :
+    embV D (tor0 D cc δ) (a • x) = D.host.φ₀ (a : D.host.E) • embV D (tor0 D cc δ) x := by
   funext τ i j
   simp only [embV_apply, Pi.smul_apply, Matrix.smul_apply, smul_eq_mul, ← hG.1 τ a, ← map_mul]
   rfl
 
-theorem embV_sum {ι : Type} (s : Finset ι) (x : ι → Matrix (Fin N') (Fin N) D.host.E)
-    : embV D (tor0 D cc δ) (∑ i ∈ s, x i) = ∑ i ∈ s, embV D (tor0 D cc δ) (x i) := by
+theorem embV_sum {ι : Type} (s : Finset ι) (x : ι → Matrix (Fin N') (Fin N) D.host.E) :
+    embV D (tor0 D cc δ) (∑ i ∈ s, x i) = ∑ i ∈ s, embV D (tor0 D cc δ) (x i) := by
   funext τ i j
   simp [embV_apply, Matrix.sum_apply, Finset.sum_apply]
 
-theorem span_embT (D : D7)
-    : Submodule.span ℂ (Set.range fun (t : D.host.E) (τ : D.what₂.Tau) => embT D τ t) = ⊤ := by
+theorem span_embT (D : D7) :
+    Submodule.span ℂ (Set.range fun (t : D.host.E) (τ : D.what₂.Tau) => embT D τ t) = ⊤ := by
   have hinj : Function.Injective fun τ : D.what₂.Tau => (embT D τ : D.host.E →* ℂ) := by
     intro τ τ' h
     have h1 : embT D τ = embT D τ' := RingHom.ext fun x => DFunLike.congr_fun h x
@@ -96,60 +133,13 @@ theorem span_embT (D : D7)
   have hli := (linearIndependent_monoidHom D.host.E ℂ).comp _ hinj
   exact span_flip_eq_top_iff_linearIndependent.2 hli
 
-theorem expand
-    (hG : admG1 D)
-    {r : ℕ}
-    (y y' : Fin r → Matrix (Fin N') (Fin N) D.host.E) (h : ∀ x, x = ∑ i, hYY D x (y' i) • y i)
-    (z : VC D N N')
-    : z = ∑ i, sq z (embV D (tor0 D cc δ) (y' i)) • embV D (tor0 D cc δ) (y i) := by
-  let P : Submodule ℂ (VC D N N') := {
-    carrier := {z | z = ∑ i, sq z (embV D (tor0 D cc δ) (y' i)) • embV D (tor0 D cc δ) (y i)}
-    add_mem' := fun {a b} ha hb => by
-      simp only [Set.mem_setOf_eq, sq_add_left, add_smul, Finset.sum_add_distrib] at *
-      rw [← ha, ← hb]
-    zero_mem' := by simp [sq_zero_left]
-    smul_mem' := fun c a ha => by
-      simp only [Set.mem_setOf_eq, sq_smul_left, mul_smul, ← Finset.smul_sum] at *
-      rw [← ha]
-  }
-  have hP : ∀ x, embV D (tor0 D cc δ) x ∈ P := fun x => by
-    change _ = _
-    conv_lhs => rw [h x]
-    simp only [embV_sum, embV_smul cc δ hG, sq_embV cc δ hG]
-  have hc
-      : ∀ a b (c : D.what₂.Tau → ℂ),
-        (fun τ i j => if a = i ∧ b = j then c τ else 0 : VC D N N') ∈ P := by
-    intro a b c
-    have hc : c ∈ Submodule.span ℂ (Set.range fun (t : D.host.E) (τ : D.what₂.Tau) => embT D τ t) :=
-      span_embT D ▸ Submodule.mem_top
-    induction hc using Submodule.span_induction with
-    | mem x hx =>
-      obtain ⟨t, rfl⟩ := hx
-      convert hP (Matrix.single a b t) using 1
-      funext τ i j
-      rw [embV_apply, Matrix.single_apply]
-      split_ifs <;> simp
-    | zero =>
-      convert P.zero_mem using 1; funext τ i j; simp
-    | add x x' _ _ hx hx' =>
-      convert P.add_mem hx hx' using 1
-      funext τ i j
-      simp only [Pi.add_apply]
-      split_ifs <;> simp
-    | smul t x _ hx =>
-      convert P.smul_mem t hx using 1
-      funext τ i j
-      simp only [Pi.smul_apply]
-      split_ifs <;> simp
-  have hz : z = ∑ a, ∑ b, (fun τ i j => if a = i ∧ b = j then z τ a b else 0 : VC D N N') := by
-    funext τ i j
-    simp [Finset.sum_apply, ite_and]
-  change z ∈ P
-  rw [hz]
-  exact P.sum_mem fun a _ => P.sum_mem fun b _ => hc a b _
+theorem expand (hG : admG1 D) {r : ℕ} (y y' : Fin r → Matrix (Fin N') (Fin N) D.host.E)
+    (h : ∀ x, x = ∑ i, hYY D x (y' i) • y i) (z : VC D N N') :
+    z = ∑ i, sq z (embV D (tor0 D cc δ) (y' i)) • embV D (tor0 D cc δ) (y i) := by
+  apply _root_.GlobalTheory.ConjNorm.Line.expand <;> assumption
 
-theorem lam_mul (a : 𝓞 D.host.K) {w : ℂ} (hw : w ∈ lamOf D cc δ)
-    : D.host.φ₀ ((a : D.host.K) : D.host.E) * w ∈ lamOf D cc δ := by
+theorem lam_mul (a : 𝓞 D.host.K) {w : ℂ} (hw : w ∈ lamOf D cc δ) :
+    D.host.φ₀ ((a : D.host.K) : D.host.E) * w ∈ lamOf D cc δ := by
   induction hw using AddSubgroup.closure_induction with
   | mem w hw =>
     obtain ⟨c, hc, rfl⟩ := hw
@@ -160,21 +150,14 @@ theorem lam_mul (a : 𝓞 D.host.K) {w : ℂ} (hw : w ∈ lamOf D cc δ)
   | add x y _ _ hx hy => rw [mul_add]; exact add_mem hx hy
   | neg x _ hx => rw [mul_neg]; exact neg_mem hx
 
-theorem of_dual_families
-    (hG : admG1 D) (hC : Crv D cc δ)
+theorem of_dual_families (hG : admG1 D) (hC : Crv D cc δ)
     (S : Set (Matrix (Fin N') (Fin N) D.host.E))
     (hS : ∀ x ∈ S, ∀ y ∈ S, hYY D x y ∈ (algebraMap (𝓞 D.host.K) D.host.K).range)
     {r : ℕ} (y y' : Fin r → Matrix (Fin N') (Fin N) D.host.E) (hy : ∀ i, y i ∈ S)
-    (hy' : ∀ i, y' i ∈ S) (h : ∀ x, x = ∑ i, hYY D x (y' i) • y i)
-    (A : AddSubgroup (VC D N N'))
-    (hA : A = AddSubgroup.closure {z | ∃ w ∈ lamOf D cc δ, ∃ x ∈ S, z = w • embV D (tor0 D cc δ) x})
-    : (∀ F ∈ ThSp D (tor0 D cc δ) A, ∀ G ∈ ThSp D (tor0 D cc δ) A, G ≠ 0 → ∃ c : ℂ, F = c • G)
-      ∧ (∀ x ∈ A, ∀ F,
-        Wd D (tor0 D cc δ) x F = fun z => al D (tor0 D cc δ) x * U D (tor0 D cc δ) x F z)
-      ∧ (∀ x ∈ A, ∀ y ∈ A, ∃ m : ℤ, (Hf D (tor0 D cc δ) x y).im = m)
-      ∧ (∀ x, (∀ y ∈ A, ∃ m : ℤ, (Hf D (tor0 D cc δ) x y).im = m) → x ∈ A) ∧ A.FG
-      ∧ Submodule.span ℝ (A : Set (VC D N N')) = ⊤
-      ∧ ∀ x ∈ A, ∃ m : ℤ, qH D (tor0 D cc δ) x = m := by
+    (hy' : ∀ i, y' i ∈ S) (h : ∀ x, x = ∑ i, hYY D x (y' i) • y i) (A : AddSubgroup (VC D N N'))
+    (hA : A = AddSubgroup.closure
+      {z | ∃ w ∈ lamOf D cc δ, ∃ x ∈ S, z = w • embV D (tor0 D cc δ) x}) :
+    (∀ F ∈ ThSp D (tor0 D cc δ) A, ∀ G ∈ ThSp D (tor0 D cc δ) A, G ≠ 0 → ∃ c : ℂ, F = c • G) ∧ (∀ x ∈ A, ∀ F, Wd D (tor0 D cc δ) x F = fun z => al D (tor0 D cc δ) x * U D (tor0 D cc δ) x F z) ∧ (∀ x ∈ A, ∀ y ∈ A, ∃ m : ℤ, (Hf D (tor0 D cc δ) x y).im = m) ∧ (∀ x, (∀ y ∈ A, ∃ m : ℤ, (Hf D (tor0 D cc δ) x y).im = m) → x ∈ A) ∧ A.FG ∧ Submodule.span ℝ (A : Set (VC D N N')) = ⊤ ∧ ∀ x ∈ A, ∃ m : ℤ, qH D (tor0 D cc δ) x = m := by
   obtain ⟨L, hL⟩ := GlobalTheory.T.exists_periodPair_idealCurveLattice D cc δ hC
   obtain ⟨hpos, hdual⟩ := GlobalTheory.T.latticeCovolume_pos_and_selfDual L _ hL
   have hLam : (tor0 D cc δ).abelian₂ = lamOf D cc δ := rfl
@@ -201,8 +184,7 @@ theorem of_dual_families
       obtain ⟨w, hw, x, hx, rfl⟩ := hu
       rw [sq_smul_right]
       exact (hdual _).1 (hsq z hz x hx) w hw
-    | zero =>
-      exact ⟨0, by simp [sq_zero_right]⟩
+    | zero => exact ⟨0, by simp [sq_zero_right]⟩
     | add a b _ _ ha hb =>
       obtain ⟨m, hm⟩ := ha
       obtain ⟨n, hn⟩ := hb
@@ -211,22 +193,20 @@ theorem of_dual_families
       obtain ⟨m, hm⟩ := ha
       exact ⟨-m, by rw [sq_neg_right, Complex.neg_im, neg_div, hm, Int.cast_neg]⟩
   have hexp := expand cc δ hG y y' h
-  have hmem
-      : ∀ z, (∀ i, sq z (embV D (tor0 D cc δ) (y' i)) ∈ lamOf D cc δ) → z ∈ A := fun z hz => by
-    rw [hexp z]
-    exact sum_mem fun i _ => hgen _ (hz i) _ (hy i)
+  have hmem : ∀ z, (∀ i, sq z (embV D (tor0 D cc δ) (y' i)) ∈ lamOf D cc δ) → z ∈ A :=
+    fun z hz => by
+      rw [hexp z]
+      exact sum_mem fun i _ => hgen _ (hz i) _ (hy i)
   have hsd : ∀ x, (∀ y ∈ A, ∃ m : ℤ, (Hf D (tor0 D cc δ) x y).im = m) → x ∈ A := fun z hz =>
-    hmem z fun i =>
-      (hdual _).2 fun w hw => by
-        have := hz _ (hgen w hw _ (hy' i))
-        rwa [im_Hf, hLam, sq_smul_right] at this
+    hmem z fun i => (hdual _).2 fun w hw => by
+      have := hz _ (hgen w hw _ (hy' i))
+      rwa [im_Hf, hLam, sq_smul_right] at this
   have hq : ∀ x ∈ A, ∃ m : ℤ, qH D (tor0 D cc δ) x = m := by
     intro x hx
     obtain ⟨a, ha⟩ := GlobalTheory.T.exists_integer_map_eq_halfOneAddSqrt D
-    have hx' : w0 D • x ∈ A :=
-      hmem _ fun i => by
-        rw [sq_smul_left, ← ha]
-        exact lam_mul cc δ a (hsq x hx _ (hy' i))
+    have hx' : w0 D • x ∈ A := hmem _ fun i => by
+      rw [sq_smul_left, ← ha]
+      exact lam_mul cc δ a (hsq x hx _ (hy' i))
     obtain ⟨m, hm⟩ := hint _ hx' x hx
     refine ⟨m, ?_⟩
     rw [← hm, im_Hf, sq_smul_left, qH, Hf_eq, Complex.div_ofReal_re, Complex.mul_im, sq_self_im]
@@ -236,24 +216,16 @@ theorem of_dual_families
     haveI : DiscreteTopology L.lattice := inferInstance
     let f : A → Fin r → L.lattice := fun z i =>
       ⟨sq z.1 (embV D (tor0 D cc δ) (y' i)), (hL _).1 (hsq z.1 z.2 _ (hy' i))⟩
-    have hf : Continuous f :=
-      continuous_pi fun i => Continuous.subtype_mk ((continuous_sq _).comp continuous_subtype_val) _
+    have hf : Continuous f := continuous_pi fun i =>
+      Continuous.subtype_mk ((continuous_sq _).comp continuous_subtype_val) _
     refine DiscreteTopology.of_continuous_injective hf fun z u hzu => Subtype.ext ?_
     rw [hexp z.1, hexp u.1]
     refine Finset.sum_congr rfl fun i _ => ?_
     rw [show sq z.1 _ = sq u.1 _ from congrArg Subtype.val (congrFun hzu i)]
   have h1 : L.ω₁ ∈ lamOf D cc δ := (hL _).2 L.ω₁_mem_lattice
   have h2 : L.ω₂ ∈ lamOf D cc δ := (hL _).2 L.ω₂_mem_lattice
-  refine ⟨
-    GlobalTheory.T.thetaFunction_selfDual_exists_eq_smul D _ N N' A hpos hdisc fun x =>
-      ⟨hint x, hsd x⟩,
-    fun x hx F => ?_,
-    hint,
-    hsd,
-    ?_,
-    ?_,
-    hq
-  ⟩
+  refine ⟨GlobalTheory.T.thetaFunction_selfDual_exists_eq_smul D _ N N' A hpos hdisc fun x => ⟨hint x, hsd x⟩, fun x hx F => ?_, hint, hsd,
+    ?_, ?_, hq⟩
   · obtain ⟨m, hm⟩ := hq x hx
     funext z
     have hm' : Real.sqrt D.host.d / 2 * (Hf D (tor0 D cc δ) x x).re = m := hm
@@ -262,12 +234,9 @@ theorem of_dual_families
     push_cast
     ring
   · rw [AddSubgroup.fg_iff]
-    refine ⟨
-      Set.range (fun i => L.ω₁ • embV D (tor0 D cc δ) (y i))
-        ∪ Set.range (fun i => L.ω₂ • embV D (tor0 D cc δ) (y i)),
-      le_antisymm ?_ fun z hz => ?_,
-      (Set.finite_range _).union (Set.finite_range _)
-    ⟩
+    refine ⟨Set.range (fun i => L.ω₁ • embV D (tor0 D cc δ) (y i)) ∪
+      Set.range (fun i => L.ω₂ • embV D (tor0 D cc δ) (y i)), le_antisymm ?_ fun z hz => ?_,
+      (Set.finite_range _).union (Set.finite_range _)⟩
     · rw [AddSubgroup.closure_le]
       rintro _ (⟨i, rfl⟩ | ⟨i, rfl⟩)
       · exact hgen _ h1 _ (hy i)
@@ -288,74 +257,20 @@ theorem of_dual_families
     exact add_mem (Submodule.smul_mem _ _ (Submodule.subset_span (hgen _ h1 _ (hy i))))
       (Submodule.smul_mem _ _ (Submodule.subset_span (hgen _ h2 _ (hy i))))
 
-theorem hYY_smul (a : D.host.K) (x y : Matrix (Fin N') (Fin N) D.host.E)
-    : hYY D (a • x) y = a * hYY D x y := by
+theorem hYY_smul (a : D.host.K) (x y : Matrix (Fin N') (Fin N) D.host.E) :
+    hYY D (a • x) y = a * hYY D x y := by
   rw [hYY, hYY, ← smul_eq_mul, ← map_smul]
   simp [Finset.smul_sum]
 
-theorem hYY_add (x x' y : Matrix (Fin N') (Fin N) D.host.E)
-    : hYY D (x + x') y = hYY D x y + hYY D x' y := by
+theorem hYY_add (x x' y : Matrix (Fin N') (Fin N) D.host.E) :
+    hYY D (x + x') y = hYY D x y + hYY D x' y := by
   simp [hYY, add_mul, Finset.sum_add_distrib]
 
-theorem onB_expand
-    {r : ℕ} {b : Fin r → Matrix (Fin N') (Fin N) D.host.E} (hb : OnB D b)
-    (x : Matrix (Fin N') (Fin N) D.host.E)
-    : x = ∑ i, hYY D x (b i) • b i := by
-  have hx : x ∈ Submodule.span D.host.K (Set.range b) := hb.2 ▸ Submodule.mem_top
-  induction hx using Submodule.span_induction with
-  | mem x hx =>
-    obtain ⟨j, rfl⟩ := hx
-    simp [hb.1 j, ite_smul]
-  | zero =>
-    simp [hYY]
-  | add x x' _ _ hx hx' =>
-    simp only [hYY_add, add_smul, Finset.sum_add_distrib]
-    rw [← hx, ← hx']
-  | smul a x _ hx =>
-    simp only [hYY_smul, mul_smul, ← Finset.smul_sum]
-    rw [← hx]
+theorem onB_expand {r : ℕ} {b : Fin r → Matrix (Fin N') (Fin N) D.host.E} (hb : OnB D b)
+    (x : Matrix (Fin N') (Fin N) D.host.E) : x = ∑ i, hYY D x (b i) • b i := by
+  apply _root_.GlobalTheory.ConjNorm.Line.onB_expand <;> assumption
 
-theorem theta_line
-    : ∀ (D : D7),
-      admG1 D
-        → ∀ (cc : Ideal (𝓞 D.host.K)) (δ : ℂ),
-          Crv D cc δ
-            → ∀ (N N' : ℕ) (A : AddSubgroup (VC D N N')),
-              KLat D (tor0 D cc δ) A
-                → (∀ F ∈ ThSp D (tor0 D cc δ) A, ∀ G ∈ ThSp D (tor0 D cc δ) A,
-                    G ≠ 0 → ∃ c : ℂ, F = c • G)
-                  ∧ (∀ x ∈ A, ∀ F,
-                    Wd D (tor0 D cc δ) x F
-                      = fun z => al D (tor0 D cc δ) x * U D (tor0 D cc δ) x F z)
-                  ∧ (∀ x ∈ A, ∀ y ∈ A, ∃ m : ℤ, (Hf D (tor0 D cc δ) x y).im = m)
-                  ∧ (∀ x, (∀ y ∈ A, ∃ m : ℤ, (Hf D (tor0 D cc δ) x y).im = m) → x ∈ A) ∧ A.FG
-                  ∧ Submodule.span ℝ (A : Set (VC D N N')) = ⊤
-                  ∧ ∀ x ∈ A, ∃ m : ℤ, qH D (tor0 D cc δ) x = m := by
-  intro D hG cc δ hC N N' A hA
-  rcases hA with ⟨r, b, hb, rfl⟩ | ⟨L, L', hL, hL', rfl⟩
-  · refine of_dual_families cc δ hG hC (Set.range b) ?_ b b
-      (fun i => ⟨i, rfl⟩)
-      (fun i => ⟨i, rfl⟩)
-      (onB_expand hb) _ ?_
-    · rintro _ ⟨i, rfl⟩ _ ⟨j, rfl⟩
-      rw [hb.1 i j]
-      split_ifs
-      exacts [one_mem _, zero_mem _]
-    · unfold LaB
-      congr 1
-      ext z
-      simp [tor0]
-  · obtain ⟨r, y, y', hy, hy', h⟩ :=
-      GlobalTheory.T.exists_traceDual_family_homLattice D
-        (GlobalTheory.T.exists_traceDual_family_inverseHalfDifferent D) N N' L L' hL hL'
-    have hint := GlobalTheory.T.hermitian_pairing_integral_values D N N' L L' hL hL'
-    have hA
-        : La D (tor0 D cc δ) L L'
-          = AddSubgroup.closure
-            {z | ∃ w ∈ lamOf D cc δ, ∃ x ∈ {x | x ∈ YYl D L L'}, z = w • embV D (tor0 D cc δ) x} :=
-      rfl
-    exact of_dual_families cc δ hG hC {x | x ∈ YYl D L L'}
-      (fun x hx y hy => hint x hx y hy)
-      y y' hy hy' h _ hA
+theorem theta_line : ∀ (D : D7), admG1 D → ∀ (cc : Ideal (𝓞 D.host.K)) (δ : ℂ), Crv D cc δ → ∀ (N N' : ℕ) (A : AddSubgroup (VC D N N')), KLat D (tor0 D cc δ) A → (∀ F ∈ ThSp D (tor0 D cc δ) A, ∀ G ∈ ThSp D (tor0 D cc δ) A, G ≠ 0 → ∃ c : ℂ, F = c • G) ∧ (∀ x ∈ A, ∀ F, Wd D (tor0 D cc δ) x F = fun z => al D (tor0 D cc δ) x * U D (tor0 D cc δ) x F z) ∧ (∀ x ∈ A, ∀ y ∈ A, ∃ m : ℤ, (Hf D (tor0 D cc δ) x y).im = m) ∧ (∀ x, (∀ y ∈ A, ∃ m : ℤ, (Hf D (tor0 D cc δ) x y).im = m) → x ∈ A) ∧ A.FG ∧ Submodule.span ℝ (A : Set (VC D N N')) = ⊤ ∧ ∀ x ∈ A, ∃ m : ℤ, qH D (tor0 D cc δ) x = m := by
+  apply _root_.GlobalTheory.ConjNorm.Line.theta_line <;> assumption
 
 end GlobalTheory.ThetaLine

@@ -1,12 +1,58 @@
 module
 
-public import Mathlib
 public import GroundTheory.HeightsAndTheta.Heights.HilbertSamuel.StatementsRatNoetherFrame
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.InterGoodA
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.InterGoodB
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.InterGoodE
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArakelovGeometry.StepTStB
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Rat
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Henselian
+public import Mathlib.RingTheory.KrullDimension.Field
+public import Mathlib.RingTheory.KrullDimension.Polynomial
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
 public import ReciprocityTheory.AnalyticForms.RegularLocalRings.IntToRat
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArakelovGeometry.StepTStB
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.InterGoodA
 
 @[expose] public section
 
@@ -14,8 +60,7 @@ set_option maxSynthPendingDepth 1
 
 namespace GroundTheory.Heights₂.Heights.HilbertSamuel
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
-  ReciprocityTheory.ChartRestriction.G.ArakelovGeometry
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.ArakelovGeometry
 
 noncomputable section
 
@@ -25,8 +70,8 @@ section Normalization
 
 variable {k : Type*} [Field k] {R : Type*} [CommRing R] [Algebra k R] {J : Type*} [Fintype J]
 
-theorem exists_intOver_start (v : J → R)
-    : ∃ r, ∃ L : Fin r → J → k, ∀ t, IntOver k (forms v L) (v t) := by
+theorem exists_intOver_start (v : J → R) :
+    ∃ r, ∃ L : Fin r → J → k, ∀ t, IntOver k (forms v L) (v t) := by
   classical
   let e := Fintype.equivFin J
   refine ⟨Fintype.card J, fun j s => if s = e.symm j then 1 else 0, fun t => ?_⟩
@@ -34,16 +79,15 @@ theorem exists_intOver_start (v : J → R)
     funext j
     simp [forms, ite_smul]
   rw [hf]
-  have : v t = (aeval (fun j => v (e.symm j)) : MvPolynomial (Fin _) k →ₐ[k] R) (X (e t)) := by simp
+  have : v t = (aeval (fun j => v (e.symm j)) : MvPolynomial (Fin _) k →ₐ[k] R) (X (e t)) := by
+    simp
   rw [this]
   exact RingHom.isIntegralElem_map _
 
-theorem algebraicIndependent_of_minimal
-    [Infinite k] (hinj : Function.Injective (algebraMap k R)) (v : J → R)
-    : ∀ (r : ℕ) (L : Fin r → J → k),
-      (∀ t, IntOver k (forms v L) (v t))
-        → (∀ r' < r, ∀ L' : Fin r' → J → k, ¬ ∀ t, IntOver k (forms v L') (v t))
-        → AlgebraicIndependent k (forms v L) := by
+theorem algebraicIndependent_of_minimal [Infinite k] (hinj : Function.Injective (algebraMap k R))
+    (v : J → R) : ∀ (r : ℕ) (L : Fin r → J → k), (∀ t, IntOver k (forms v L) (v t)) →
+      (∀ r' < r, ∀ L' : Fin r' → J → k, ¬ ∀ t, IntOver k (forms v L') (v t)) →
+      AlgebraicIndependent k (forms v L) := by
   intro r
   cases r with
   | zero => exact fun _ _ _ => algebraicIndependent_empty_type_iff.mpr hinj
@@ -54,28 +98,20 @@ theorem algebraicIndependent_of_minimal
     by_contra hF0
     obtain ⟨lam, h0⟩ := exists_isIntegralElem_linear (forms v L) F hF0 hF
     refine hmin r (Nat.lt_succ_self r) (fun i s => L i.succ s - lam i * L 0 s) fun t => ?_
-    have hf
-        : forms v (fun i s => L i.succ s - lam i * L 0 s)
-          = fun i => forms v L i.succ - lam i • forms v L 0 := by
+    have hf : forms v (fun i s => L i.succ s - lam i * L 0 s) =
+        fun i => forms v L i.succ - lam i • forms v L 0 := by
       funext i
       simp [forms, sub_smul, mul_smul, Finset.sum_sub_distrib, Finset.smul_sum]
     rw [hf]
     exact intOver_trans (forms v L) lam h0 (hL t)
 
-theorem exists_indep_normalization
-    [Infinite k] (hinj : Function.Injective (algebraMap k R)) (v : J → R)
-    : ∃ r, ∃ L : Fin r → J → k,
-      AlgebraicIndependent k (forms v L) ∧ ∀ t, IntOver k (forms v L) (v t) := by
+theorem exists_indep_normalization [Infinite k] (hinj : Function.Injective (algebraMap k R)) (v : J → R) :
+    ∃ r, ∃ L : Fin r → J → k, AlgebraicIndependent k (forms v L) ∧ ∀ t, IntOver k (forms v L) (v t) := by
   classical
   have hex := exists_intOver_start (k := k) v
   obtain ⟨L, hL⟩ := Nat.find_spec hex
-  exact ⟨
-    _,
-    L,
-    algebraicIndependent_of_minimal hinj v _ L hL fun r' hr' L' hL' =>
-      Nat.find_min hex hr' ⟨L', hL'⟩,
-    hL
-  ⟩
+  exact ⟨_, L, algebraicIndependent_of_minimal hinj v _ L hL
+    fun r' hr' L' hL' => Nat.find_min hex hr' ⟨L', hL'⟩, hL⟩
 
 end Normalization
 
@@ -83,24 +119,24 @@ section Cone
 
 variable {Ω : Type} [Field Ω] [CharZero Ω] {J : Type}
 
-theorem sum_smul_cone [Fintype J] (x : J → Ω) (c : J → ℚ)
-    : ∑ t, c t • (Polynomial.C (x t) * Polynomial.X)
-      = Polynomial.C (∑ t, (c t : Ω) * x t) * Polynomial.X := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum, Finset.sum_mul]
+theorem sum_smul_cone [Fintype J] (x : J → Ω) (c : J → ℚ) :
+    ∑ t, c t • (Polynomial.C (x t) * Polynomial.X) =
+      Polynomial.C (∑ t, (c t : Ω) * x t) * Polynomial.X := by
+
+  rw [map_sum, Finset.sum_mul]
   refine Finset.sum_congr rfl fun t _ => ?_
   rw [Algebra.smul_def, Polynomial.algebraMap_apply, ← mul_assoc, ← map_mul]
   simp
 
-theorem coneMap_map_int (x : J → Ω) (f : MvPolynomial J ℤ)
-    : coneMap ℚ x (MvPolynomial.map (Int.castRingHom ℚ) f) = coneMap ℤ x f := by
+theorem coneMap_map_int (x : J → Ω) (f : MvPolynomial J ℤ) :
+    coneMap ℚ x (MvPolynomial.map (Int.castRingHom ℚ) f) = coneMap ℤ x f := by
   induction f using MvPolynomial.induction_on with
   | C a => simp [coneMap]
   | add p q hp hq => simp only [map_add (f := _), hp, hq]
   | mul_X p i hp => simp only [map_mul, map_X, hp]; simp [coneMap]
 
-theorem ker_coneMap_rat (x : J → Ω)
-    : RingHom.ker (coneMap ℚ x) = (coordIdeal ℤ x).map (MvPolynomial.map (Int.castRingHom ℚ)) := by
+theorem ker_coneMap_rat (x : J → Ω) :
+    RingHom.ker (coneMap ℚ x) = (coordIdeal ℤ x).map (MvPolynomial.map (Int.castRingHom ℚ)) := by
   apply le_antisymm
   · intro f hf
     obtain ⟨N, hN, g, hg⟩ := exists_int_mul_eq_qmap f
@@ -108,9 +144,8 @@ theorem ker_coneMap_rat (x : J → Ω)
       rw [coordIdeal, RingHom.mem_ker, ← coneMap_map_int]
       change coneMap ℚ x (qmap g) = 0
       rw [← hg, map_mul, RingHom.mem_ker.mp hf, mul_zero]
-    have hmem
-        : (N : MvPolynomial J ℚ) * f
-          ∈ (coordIdeal ℤ x).map (MvPolynomial.map (Int.castRingHom ℚ)) := by
+    have hmem : (N : MvPolynomial J ℚ) * f ∈
+        (coordIdeal ℤ x).map (MvPolynomial.map (Int.castRingHom ℚ)) := by
       rw [hg]
       exact Ideal.mem_map_of_mem _ hg0
     have hu : IsUnit (N : MvPolynomial J ℚ) := by
@@ -124,8 +159,8 @@ theorem ker_coneMap_rat (x : J → Ω)
     rw [Ideal.mem_comap, RingHom.mem_ker, coneMap_map_int]
     exact RingHom.mem_ker.mp hg
 
-theorem withBot_eq_of_add_one {a : WithBot ℕ∞} {n : ℕ} (h : a + 1 = ((n + 1 : ℕ) : WithBot ℕ∞))
-    : a = (n : WithBot ℕ∞) := by
+theorem withBot_eq_of_add_one {a : WithBot ℕ∞} {n : ℕ} (h : a + 1 = ((n + 1 : ℕ) : WithBot ℕ∞)) :
+    a = (n : WithBot ℕ∞) := by
   cases a with
   | bot =>
     rw [WithBot.bot_add] at h
@@ -134,8 +169,7 @@ theorem withBot_eq_of_add_one {a : WithBot ℕ∞} {n : ℕ} (h : a + 1 = ((n + 
     cases b with
     | top =>
       exfalso
-      have h2 : ((⊤ + 1 : ℕ∞) : WithBot ℕ∞) = (((n + 1 : ℕ) : ℕ∞) : WithBot ℕ∞) := by
-        exact_mod_cast h
+      have h2 : ((⊤ + 1 : ℕ∞) : WithBot ℕ∞) = (((n + 1 : ℕ) : ℕ∞) : WithBot ℕ∞) := by exact_mod_cast h
       have h3 : (⊤ + 1 : ℕ∞) = ((n + 1 : ℕ) : ℕ∞) := WithBot.coe_injective h2
       have h4 : ((n : ℕ∞) + 1) ≠ ⊤ := by exact_mod_cast ENat.natCast_ne_top (n + 1)
       exact h4 h3.symm
@@ -146,10 +180,9 @@ theorem withBot_eq_of_add_one {a : WithBot ℕ∞} {n : ℕ} (h : a + 1 = ((n + 
       subst h3
       rfl
 
-theorem ringKrullDim_coneRing_rat
-    {κ : Type} [Fintype κ]
-    (x : Ix κ → Ω) (D : ℕ) (h : IsArithVar (ι := GlobalTheory κ) (coordIdeal ℤ x) (D + 1))
-    : ringKrullDim (coneMap ℚ x).range = ((D + 1 : ℕ) : WithBot ℕ∞) := by
+theorem ringKrullDim_coneRing_rat {κ : Type} [Fintype κ] (x : Ix κ → Ω) (D : ℕ)
+    (h : IsArithVar (ι := GlobalTheory κ) (coordIdeal ℤ x) (D + 1)) :
+    ringKrullDim (coneMap ℚ x).range = ((D + 1 : ℕ) : WithBot ℕ∞) := by
   obtain ⟨-, ⟨hprime, -, -⟩, hH, hdim⟩ := h
   have : (coordIdeal ℤ x).IsPrime := hprime
   have hch : ∀ m : ℤ, (C m : MvPolynomial (Ix κ) ℤ) ∈ coordIdeal ℤ x → m = 0 := by
@@ -160,22 +193,19 @@ theorem ringKrullDim_coneRing_rat
   obtain ⟨-, -, hd⟩ := ReciprocityTheory.AnForm.R.extQ_spec (coordIdeal ℤ x) hch
   rw [Fintype.card_unit] at hdim
   rw [hdim] at hd
-  have e1 :=
-    ((Ideal.quotEquivOfEq (ker_coneMap_rat x)).symm).trans
-      (Ideal.quotientKerEquivRange (coneMap ℚ x)).toRingEquiv
+  have e1 := ((Ideal.quotEquivOfEq (ker_coneMap_rat x)).symm).trans
+    (Ideal.quotientKerEquivRange (coneMap ℚ x)).toRingEquiv
   rw [← ringKrullDim_eq_of_ringEquiv e1]
   exact withBot_eq_of_add_one hd
 
-theorem ringKrullDim_mvPolynomial_rat (r : ℕ)
-    : ringKrullDim (MvPolynomial (Fin r) ℚ) = (r : WithBot ℕ∞) := by
+theorem ringKrullDim_mvPolynomial_rat (r : ℕ) :
+    ringKrullDim (MvPolynomial (Fin r) ℚ) = (r : WithBot ℕ∞) := by
   rw [MvPolynomial.ringKrullDim_of_isNoetherianRing_of_finite, ringKrullDim_eq_zero_of_field,
     Nat.card_eq_fintype_card, Fintype.card_fin, zero_add]
 
-theorem intOver_coneMap
-    (x : J → Ω)
-    {r : ℕ} (w : Fin r → Polynomial Ω) (hint : ∀ t, IntOver ℚ w (Polynomial.C (x t) * Polynomial.X))
-    (q : MvPolynomial J ℚ)
-    : IntOver ℚ w (coneMap ℚ x q) := by
+theorem intOver_coneMap (x : J → Ω) {r : ℕ} (w : Fin r → Polynomial Ω)
+    (hint : ∀ t, IntOver ℚ w (Polynomial.C (x t) * Polynomial.X)) (q : MvPolynomial J ℚ) :
+    IntOver ℚ w (coneMap ℚ x q) := by
   induction q using MvPolynomial.induction_on with
   | C a =>
     have h1 : coneMap ℚ x (C a) = (aeval w : MvPolynomial (Fin r) ℚ →ₐ[ℚ] Polynomial Ω) (C a) := by
@@ -192,15 +222,12 @@ theorem intOver_coneMap
     rw [h1]
     exact hint i
 
-theorem rank_eq
-    {κ : Type} [Fintype κ]
-    (x : Ix κ → Ω) (D : ℕ) (h : IsArithVar (ι := GlobalTheory κ) (coordIdeal ℤ x) (D + 1))
-    {r : ℕ} (L : Fin r → Ix κ → ℚ)
+theorem rank_eq {κ : Type} [Fintype κ] (x : Ix κ → Ω) (D : ℕ)
+    (h : IsArithVar (ι := GlobalTheory κ) (coordIdeal ℤ x) (D + 1)) {r : ℕ} (L : Fin r → Ix κ → ℚ)
     (hind : AlgebraicIndependent ℚ (forms (fun j => Polynomial.C (x j) * Polynomial.X) L))
-    (hint : ∀ t,
-      IntOver ℚ (forms (fun j => Polynomial.C (x j) * Polynomial.X) L)
-        (Polynomial.C (x t) * Polynomial.X))
-    : r = D + 1 := by
+    (hint : ∀ t, IntOver ℚ (forms (fun j => Polynomial.C (x j) * Polynomial.X) L)
+      (Polynomial.C (x t) * Polynomial.X)) :
+    r = D + 1 := by
   set w := forms (fun j => Polynomial.C (x j) * Polynomial.X) L with hw
   let ψ : MvPolynomial (Fin r) ℚ →ₐ[ℚ] MvPolynomial (Ix κ) ℚ := aeval fun k => ∑ t, L k t • X t
   let g : MvPolynomial (Fin r) ℚ →ₐ[ℚ] (coneMap ℚ x).range := (coneMap ℚ x).rangeRestrict.comp ψ
@@ -216,10 +243,9 @@ theorem rank_eq
   have hinj : Function.Injective g := by
     intro a b hab
     exact hind (by rw [← hvalx, ← hvalx, hab])
-  have hcomp
-      : ((coneMap ℚ x).range.val : (coneMap ℚ x).range →+* Polynomial Ω).comp
-          (g : MvPolynomial (Fin r) ℚ →+* (coneMap ℚ x).range)
-        = (aeval w : MvPolynomial (Fin r) ℚ →ₐ[ℚ] Polynomial Ω) :=
+  have hcomp : ((coneMap ℚ x).range.val : (coneMap ℚ x).range →+* Polynomial Ω).comp
+      (g : MvPolynomial (Fin r) ℚ →+* (coneMap ℚ x).range) =
+      (aeval w : MvPolynomial (Fin r) ℚ →ₐ[ℚ] Polynomial Ω) :=
     RingHom.ext fun p => hvalx p
   have hintg : (g : MvPolynomial (Fin r) ℚ →+* (coneMap ℚ x).range).IsIntegral := by
     intro s
@@ -242,15 +268,14 @@ theorem rank_eq
   have h3 : ((D + 1 : ℕ) : WithBot ℕ∞) = (r : WithBot ℕ∞) := le_antisymm h2 h1
   exact_mod_cast h3.symm
 
-theorem exists_completion [Fintype J] {n : ℕ} (L : Fin n → J → ℚ) (hL : LinearIndependent ℚ L)
-    : ∃ (B : Matrix J J ℚ) (e : Fin n → J),
-      Function.Injective e ∧ IsInvMat B ∧ ∀ k, B (e k) = L k := by
+theorem exists_completion [Fintype J] {n : ℕ} (L : Fin n → J → ℚ) (hL : LinearIndependent ℚ L) :
+    ∃ (B : Matrix J J ℚ) (e : Fin n → J), Function.Injective e ∧ IsInvMat B ∧ ∀ k, B (e k) = L k := by
   classical
   have hs := hL.linearIndepOn_id
   let b := Module.Basis.extend hs
   let σ := b.indexEquiv (Pi.basisFun ℚ J)
-  have hsub : ∀ k, L k ∈ hs.extend (Set.subset_univ _) := fun k =>
-    Module.Basis.subset_extend hs (Set.mem_range_self k)
+  have hsub : ∀ k, L k ∈ hs.extend (Set.subset_univ _) :=
+    fun k => Module.Basis.subset_extend hs (Set.mem_range_self k)
   let B : Matrix J J ℚ := Matrix.of fun i => ((σ.symm i : hs.extend (Set.subset_univ _)) : J → ℚ)
   have hBrow : LinearIndependent ℚ (fun i => B i) := by
     have h1 := b.linearIndependent.comp σ.symm σ.symm.injective
@@ -258,13 +283,9 @@ theorem exists_completion [Fintype J] {n : ℕ} (L : Fin n → J → ℚ) (hL : 
     exact h1
   have hdet : IsUnit B.det :=
     (Matrix.isUnit_iff_isUnit_det B).mp (Matrix.linearIndependent_row_iff_isUnit.mp hBrow)
-  refine ⟨
-    B,
-    fun k => σ ⟨L k, hsub k⟩,
+  refine ⟨B, fun k => σ ⟨L k, hsub k⟩,
     fun a c hac => hL.injective (congrArg Subtype.val (σ.injective hac)),
-    ⟨B⁻¹, fun v => ⟨?_, ?_⟩⟩,
-    fun k => ?_
-  ⟩
+    ⟨B⁻¹, fun v => ⟨?_, ?_⟩⟩, fun k => ?_⟩
   · rw [Matrix.mulVec_mulVec, Matrix.mul_nonsing_inv _ hdet, Matrix.one_mulVec]
   · rw [Matrix.mulVec_mulVec, Matrix.nonsing_inv_mul _ hdet, Matrix.one_mulVec]
   · change ((σ.symm (σ ⟨L k, hsub k⟩) : hs.extend (Set.subset_univ _)) : J → ℚ) = L k
@@ -275,17 +296,15 @@ end Cone
 theorem proof : RatNoetherFrame.Statement := by
   intro D Ω _ _ κ _ x hx
   classical
-  obtain ⟨r, L, hind, hint⟩ :=
-    exists_indep_normalization (k := ℚ) (R := Polynomial Ω) (algebraMap ℚ (Polynomial Ω)).injective
-      (fun j : Ix κ => Polynomial.C (x j) * Polynomial.X)
+  obtain ⟨r, L, hind, hint⟩ := exists_indep_normalization (k := ℚ) (R := Polynomial Ω)
+    (algebraMap ℚ (Polynomial Ω)).injective (fun j : Ix κ => Polynomial.C (x j) * Polynomial.X)
   obtain rfl := rank_eq x D hx L hind hint
   set v : Ix κ → Polynomial Ω := fun j => Polynomial.C (x j) * Polynomial.X with hv
   have hlin : LinearIndependent ℚ L := by
-    let φ : (Ix κ → ℚ) →ₗ[ℚ] Polynomial Ω := {
-      toFun := fun c => ∑ t, c t • v t
-      map_add' := fun a b => by simp [add_smul, Finset.sum_add_distrib]
-      map_smul' := fun a c => by simp [Finset.smul_sum, smul_smul]
-    }
+    let φ : (Ix κ → ℚ) →ₗ[ℚ] Polynomial Ω :=
+      { toFun := fun c => ∑ t, c t • v t
+        map_add' := fun a b => by simp [add_smul, Finset.sum_add_distrib]
+        map_smul' := fun a c => by simp [Finset.smul_sum, smul_smul] }
     exact LinearIndependent.of_comp φ hind.linearIndependent
   obtain ⟨B, e, he, hB, hBe⟩ := exists_completion L hlin
   have hy : (fun k => Polynomial.C ((matAct B x ∘ e) k) * Polynomial.X) = forms v L := by
@@ -302,7 +321,8 @@ theorem proof : RatNoetherFrame.Statement := by
     have h3 : MvPolynomial.map (Int.castRingHom ℚ) p = 0 := hind (by rw [h2, map_zero])
     exact qmap_injective (by rw [qmap, h3, map_zero])
   · set A : MvPolynomial (Fin (D + 1)) ℚ →ₐ[ℚ] Polynomial Ω := aeval (forms v L) with hA
-    have hS : coneRing ℚ (matAct B x ∘ e) = A.range := by rw [coneRing, coneMap, hy]
+    have hS : coneRing ℚ (matAct B x ∘ e) = A.range := by
+      rw [coneRing, coneMap, hy]
     rw [hS]
     have hvi : ∀ t, IsIntegral A.range (v t) := by
       intro t
@@ -315,7 +335,8 @@ theorem proof : RatNoetherFrame.Statement := by
     refine IsIntegral.sum _ fun j _ => ?_
     rw [Algebra.smul_def]
     refine IsIntegral.mul ?_ (hvi j)
-    have hm : algebraMap ℚ (Polynomial Ω) (B i j) ∈ A.range := Subalgebra.algebraMap_mem _ _
+    have hm : algebraMap ℚ (Polynomial Ω) (B i j) ∈ A.range :=
+      Subalgebra.algebraMap_mem _ _
     exact isIntegral_algebraMap (R := A.range) (A := Polynomial Ω) (x := ⟨_, hm⟩)
 
 end RatNoetherFrame

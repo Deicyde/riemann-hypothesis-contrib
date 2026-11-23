@@ -1,20 +1,62 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.IsHodgeLine
+public import Development.AbelianVarietyTheory.Proofs.AbelianSchemeLawProofs.ExistsUniqueWeilIs
+public import Development.AutomorphicArithmetic.IntegralCasts.CapelliIdentities.RegularUnitPoints
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.HodgeCptInteriorGenericStatement
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.IsExcisionNbhdAway
-public import Development.AbelianVarietyTheory.Proofs.AbelianSchemeLawProofs.ExistsUniqueWeilIs
+import Mathlib.Algebra.AffineMonoid.Basic
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.AlgebraicGeometry.Modules.Sheaf
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.RosVal
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.SemiabelianSchemes.PrecompleteBases.PsbLb
-public import Development.AutomorphicArithmetic.IntegralCasts.CapelliIdentities.RegularUnitPoints
+import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
-  NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo
-  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
-  GlobalTheory.CompanionTheory.Ar
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CompanionTheory.Ar
 
 set_option backward.isDefEq.respectTransparency false
 
@@ -30,26 +72,22 @@ attribute [local instance] Over.cartesianMonoidalCategory
 
 variable {S : Scheme.{0}} {A : Over S} [GrpObj A] {L : LB A.left} {k : ℤ}
 
-theorem exists_theta_one (hL : L.IsLB) (T : Over S)
-    : ∃ θ : ThetaGrp A L k T,
-      θ.pt = 1
-        ∧ ∀ (Z : Over S) (t : Z ⟶ T) (a : Z ⟶ A) (z : Z.left) (J),
-          Good L z J → thetaVal θ t a z J = 1 := by
+theorem exists_theta_one (hL : L.IsLB) (T : Over S) :
+    ∃ θ : ThetaGrp A L k T, θ.pt = 1 ∧ ∀ (Z : Over S) (t : Z ⟶ T) (a : Z ⟶ A) (z : Z.left) (J), Good L z J →
+      thetaVal θ t a z J = 1 := by
   have e : (translPt A (1 : T ⟶ A)) = snd T A := by
     show (fst T A ≫ (1 : T ⟶ A)) * snd T A = snd T A
     rw [comp_one, _root_.one_mul]
-  obtain ⟨u, hu, hv⟩ :=
-    exists_gen hL (K := PEmpty) (K' := Fin 2) (φ := PEmpty.elim) (ε := PEmpty.elim)
-      (φ' := ![(snd T A).left, (translPt A (1 : T ⟶ A)).left]) (ε' := ![k, -k])
-      (fun U _ h => by
-        rw [Fin.prod_univ_two, e]
-        simp)
-      (LB.oneGen L) (LB.isGen_oneGen L)
+  obtain ⟨u, hu, hv⟩ := exists_gen hL (K := PEmpty) (K' := Fin 2) (φ := PEmpty.elim) (ε := PEmpty.elim)
+    (φ' := ![(snd T A).left, (translPt A (1 : T ⟶ A)).left]) (ε' := ![k, -k])
+    (fun U _ h => by
+      rw [Fin.prod_univ_two, e]
+      simp)
+    (LB.oneGen L) (LB.isGen_oneGen L)
   exact ⟨⟨1, u, hu⟩, rfl, fun Z t a z J hJ => (hv _ _ z J hJ).trans (val_one _)⟩
 
-theorem weilIs_one_left
-    (hL : L.IsLB) {T : Over S} {y : T ⟶ A} {c : Γ(T.left, ⊤)ˣ} (H : WeilIs A L k 1 y c)
-    : c = 1 := by
+theorem weilIs_one_left (hL : L.IsLB) {T : Over S} {y : T ⟶ A} {c : Γ(T.left, ⊤)ˣ}
+    (H : WeilIs A L k 1 y c) : c = 1 := by
   refine unit_ext fun p _ => ?_
   obtain ⟨V, hp, ⟨_, θy, _, hy⟩, hc⟩ := H p
   obtain ⟨θ, h1, hθ⟩ := exists_theta_one (k := k) (A := A) hL (overRes V)
@@ -59,9 +97,8 @@ theorem weilIs_one_left
   choose J hJ using fun ψ : (overRes V).left ⟶ A.left => exists_chart hL (ψ z)
   have hJ' : Good L z J := hJ
   have h2 := hC (overRes V) (𝟙 _) 1 z J hJ'
-  rw [commVal, hθ _ _ _ _ _ hJ', hθ _ _ _ _ _ hJ', h1, comp_one, _root_.one_mul, _root_.one_mul,
-      _root_.mul_one, mul_inv_cancel]
-    at h2
+  rw [commVal, hθ _ _ _ _ _ hJ', hθ _ _ _ _ _ hJ', h1, comp_one, _root_.one_mul, _root_.one_mul, _root_.mul_one,
+    mul_inv_cancel] at h2
   have g : gm (V.ι) z ⊤ c = gm (V.ι) z ⊤ 1 := by
     rw [map_one]
     refine Eq.trans ?_ h2.symm
@@ -75,42 +112,29 @@ section Ring
 
 variable {X : Scheme.{0}} {Ω : Type} [Field Ω] {ξ : Spec (CommRingCat.of Ω) ⟶ X} {q : Cpt ξ}
 
-theorem unitAt_natCast (h : ∀ r : ℕ, r.Prime → ¬ InFibre ξ r q) (n : ℕ) (hn : n ≠ 0)
-    : unitAt ξ q (n : Ω) :=
+theorem unitAt_natCast (h : ∀ r : ℕ, r.Prime → ¬ InFibre ξ r q) (n : ℕ) (hn : n ≠ 0) : unitAt ξ q (n : Ω) :=
   _root_.UpperTheory.Reformulated.B.RegularUnitPoints.main h n hn
 
-theorem inv_mem_regAt
-    [CharZero Ω]
-    (h : ∀ n : ℕ, n ≠ 0 → unitAt ξ q (n : Ω))
-    {x : Ω} (hx : x ∈ regAt ξ q) (hi : IsIntegral ℤ x)
-    : x⁻¹ ∈ regAt ξ q := by
-  let A : Subalgebra ℚ Ω := {
-    (regAt ξ q).toSubsemiring with
-    algebraMap_mem' := fun r => by
-      show algebraMap ℚ Ω r ∈ regAt ξ q
-      rw [eq_ratCast, Rat.cast_def, div_eq_mul_inv]
-      exact mul_mem (intCast_mem _ _) (h _ r.den_nz).2.2
-  }
+theorem inv_mem_regAt [CharZero Ω] (h : ∀ n : ℕ, n ≠ 0 → unitAt ξ q (n : Ω)) {x : Ω} (hx : x ∈ regAt ξ q)
+    (hi : IsIntegral ℤ x) : x⁻¹ ∈ regAt ξ q := by
+  let A : Subalgebra ℚ Ω :=
+    { (regAt ξ q).toSubsemiring with
+      algebraMap_mem' := fun r => by
+        show algebraMap ℚ Ω r ∈ regAt ξ q
+        rw [eq_ratCast, Rat.cast_def, div_eq_mul_inv]
+        exact mul_mem (intCast_mem _ _) (h _ r.den_nz).2.2 }
   exact Subalgebra.inv_mem_of_algebraic A (x := ⟨x, hx⟩) (hi.tower_top (A := ℚ)).isAlgebraic
 
 end Ring
 
 section Stable
 
-variable
-  {X : Scheme.{0}} {Ω : Type} [Field Ω]
-  {G : Over X} [GrpObj G]
-  {ξ : Spec (CommRingCat.of Ω) ⟶ X} {E : Type} [AddCommGroup E] [Module Ω E]
+variable {X : Scheme.{0}} {Ω : Type} [Field Ω] {G : Over X} [GrpObj G] {ξ : Spec (CommRingCat.of Ω) ⟶ X}
+  {E : Type} [AddCommGroup E] [Module Ω E]
 
-theorem lat_stable
-    (M : LieModel G ξ E)
-    {O : Type} [CommRing O]
-    (act : ReciprocityTheory.ChartRestriction.G.Geo.Tor.OAct O G) (ρ : O →+* Module.End Ω E)
-    (h : M.IsActOf act.act ρ)
-    (q : Cpt ξ)
-    (a : O)
-    {e : E} (he : e ∈ M.lat q)
-    : ρ a e ∈ M.lat q := by
+theorem lat_stable (M : LieModel G ξ E) {O : Type} [CommRing O] (act : ReciprocityTheory.ChartRestriction.G.Geo.Tor.OAct O G)
+    (ρ : O →+* Module.End Ω E) (h : M.IsActOf act.act ρ) (q : Cpt ξ) (a : O) {e : E} (he : e ∈ M.lat q) :
+    ρ a e ∈ M.lat q := by
   obtain ⟨v, hv⟩ := (M.mem_lat_iff q e).1 he
   refine (M.mem_lat_iff q _).2 ⟨v ≫ act.act a, ?_⟩
   unfold LieModel.Extends at hv ⊢
@@ -129,25 +153,16 @@ section Linear
 
 variable {Ω E : Type} [Field Ω] [AddCommGroup E] [Module Ω E] {R : Subring Ω}
 
-theorem mem_eigSp_apply
-    {O : Type} [CommRing O]
-    {ρ : O →+* Module.End Ω E} {σ : O →+* Ω} {e : E} (he : e ∈ eigSp ρ σ)
-    (a : O)
-    : ρ a e = σ a • e := by
+theorem mem_eigSp_apply {O : Type} [CommRing O] {ρ : O →+* Module.End Ω E} {σ : O →+* Ω} {e : E}
+    (he : e ∈ eigSp ρ σ) (a : O) : ρ a e = σ a • e := by
   have := (Submodule.mem_iInf _).1 he a
   simpa [sub_eq_zero] using this
 
-theorem mem_of_sum_mem
-    (P : Submodule R E)
-    {O : Type} [CommRing O]
-    (ρ : O →+* Module.End Ω E)
-    {I : Type} [DecidableEq I]
-    (σ : I → (O →+* Ω))
-    (hst : ∀ a, ∀ e ∈ P, ρ a e ∈ P) (hreg : ∀ s a, σ s a ∈ R)
-    (hsep : ∀ s t, s ≠ t → ∃ a, σ s a ≠ σ t a ∧ (σ s a - σ t a)⁻¹ ∈ R) (A : Finset I)
-    : ∀ f : I → E, (∀ s ∈ A, f s ∈ eigSp ρ (σ s)) → (∑ s ∈ A, f s) ∈ P → ∀ s ∈ A, f s ∈ P := by
-  have smul_mem' : ∀ (c : Ω), c ∈ R → ∀ e ∈ P, c • e ∈ P := fun c hc e he =>
-    P.smul_mem (⟨c, hc⟩ : R) he
+theorem mem_of_sum_mem (P : Submodule R E) {O : Type} [CommRing O] (ρ : O →+* Module.End Ω E) {I : Type}
+    [DecidableEq I] (σ : I → (O →+* Ω)) (hst : ∀ a, ∀ e ∈ P, ρ a e ∈ P) (hreg : ∀ s a, σ s a ∈ R)
+    (hsep : ∀ s t, s ≠ t → ∃ a, σ s a ≠ σ t a ∧ (σ s a - σ t a)⁻¹ ∈ R) (A : Finset I) :
+    ∀ f : I → E, (∀ s ∈ A, f s ∈ eigSp ρ (σ s)) → (∑ s ∈ A, f s) ∈ P → ∀ s ∈ A, f s ∈ P := by
+  have smul_mem' : ∀ (c : Ω), c ∈ R → ∀ e ∈ P, c • e ∈ P := fun c hc e he => P.smul_mem (⟨c, hc⟩ : R) he
   induction A using Finset.induction_on with
   | empty => simp
   | insert t A ht ih =>
@@ -158,23 +173,18 @@ theorem mem_of_sum_mem
       have hne : s ≠ t := fun e => ht (e ▸ hs)
       obtain ⟨a, ha, hinv⟩ := hsep s t hne
       have hg : (∑ u ∈ A, (σ u a - σ t a) • f u) ∈ P := by
-        have e
-            : (∑ u ∈ A, (σ u a - σ t a) • f u)
-              = ρ a (f t + ∑ u ∈ A, f u) - σ t a • (f t + ∑ u ∈ A, f u) := by
-          set_option synthInstance.maxHeartbeats 100000 in
-            rw [map_add (f := _), map_sum, mem_eigSp_apply (hf t (Finset.mem_insert_self _ _)) a,
-              smul_add, Finset.smul_sum]
+        have e : (∑ u ∈ A, (σ u a - σ t a) • f u) =
+            ρ a (f t + ∑ u ∈ A, f u) - σ t a • (f t + ∑ u ∈ A, f u) := by
+
+          rw [map_add (f := _), map_sum, mem_eigSp_apply (hf t (Finset.mem_insert_self _ _)) a, smul_add, Finset.smul_sum]
           simp only [sub_smul, Finset.sum_sub_distrib]
           rw [Finset.sum_congr rfl fun u hu =>
             (mem_eigSp_apply (hf u (Finset.mem_insert_of_mem hu)) a).symm]
           abel
         rw [e]
         exact P.sub_mem (hst a _ hsum) (smul_mem' _ (hreg t a) _ hsum)
-      have h1 :=
-        ih
-          (fun u => (σ u a - σ t a) • f u)
-          (fun u hu => (eigSp ρ (σ u)).smul_mem _ (hf u (Finset.mem_insert_of_mem hu)))
-          hg s hs
+      have h1 := ih (fun u => (σ u a - σ t a) • f u)
+        (fun u hu => (eigSp ρ (σ u)).smul_mem _ (hf u (Finset.mem_insert_of_mem hu))) hg s hs
       have h2 := smul_mem' _ hinv _ h1
       simpa [smul_smul, inv_mul_cancel₀ (sub_ne_zero.2 ha)] using h2
     intro s hs
@@ -183,16 +193,12 @@ theorem mem_of_sum_mem
       simpa using this
     · exact key s hs
 
-theorem mem_iSup_of_dual
-    {I : Type} [Fintype I] [DecidableEq I]
-    (V : I → Submodule Ω E) (hind : iSupIndep V) (htop : ⨆ s, V s = ⊤)
-    (r : I → ℕ) (b : ∀ s, Fin (r s) → E)
-    (hli : ∀ s, LinearIndependent Ω (b s)) (hsp : ∀ s, Submodule.span Ω (Set.range (b s)) = V s)
-    (P : I → Submodule R E) (hP : ∀ s, P s = Submodule.span R (Set.range (b s)))
-    (x : E) (hx : ∀ w : Module.Dual Ω E, (∀ s, ∀ e ∈ P s, w e ∈ R) → w x ∈ R)
-    : x ∈ ⨆ s, P s := by
-  have hint : DirectSum.IsInternal V :=
-    DirectSum.isInternal_submodule_of_iSupIndep_of_iSup_eq_top hind htop
+theorem mem_iSup_of_dual {I : Type} [Fintype I] [DecidableEq I] (V : I → Submodule Ω E) (hind : iSupIndep V)
+    (htop : ⨆ s, V s = ⊤) (r : I → ℕ) (b : ∀ s, Fin (r s) → E) (hli : ∀ s, LinearIndependent Ω (b s))
+    (hsp : ∀ s, Submodule.span Ω (Set.range (b s)) = V s) (P : I → Submodule R E)
+    (hP : ∀ s, P s = Submodule.span R (Set.range (b s))) (x : E)
+    (hx : ∀ w : Module.Dual Ω E, (∀ s, ∀ e ∈ P s, w e ∈ R) → w x ∈ R) : x ∈ ⨆ s, P s := by
+  have hint : DirectSum.IsInternal V := DirectSum.isInternal_submodule_of_iSupIndep_of_iSup_eq_top hind htop
   let B : ∀ s, Module.Basis (Fin (r s)) Ω (V s) := fun s =>
     (Module.Basis.span (hli s)).map (LinearEquiv.ofEq _ _ (hsp s))
   let C := hint.collectedBasis B
@@ -209,10 +215,8 @@ theorem mem_iSup_of_dual
       split_ifs
       · exact one_mem _
       · exact zero_mem _
-    | zero =>
-      simpa using zero_mem R
-    | add y z _ _ hy hz =>
-      simpa using add_mem hy hz
+    | zero => simpa using zero_mem R
+    | add y z _ _ hy hz => simpa using add_mem hy hz
     | smul c y _ hy =>
       have : C.coord j (c • y) = (c : Ω) * C.coord j y := by
         show C.coord j ((c : Ω) • y) = _
@@ -233,21 +237,16 @@ section HT
 
 attribute [local instance] Over.cartesianMonoidalCategory
 
-variable
-  {X : Scheme.{0}} {Ω : Type} [Field Ω]
-  {G : Over X} [GrpObj G]
-  {ξ : Spec (CommRingCat.of Ω) ⟶ X} {E : Type} [AddCommGroup E] [Module Ω E]
+variable {X : Scheme.{0}} {Ω : Type} [Field Ω] {G : Over X} [GrpObj G] {ξ : Spec (CommRingCat.of Ω) ⟶ X}
+  {E : Type} [AddCommGroup E] [Module Ω E]
 
-theorem htOm_eq_omLat
-    (M : LieModel G ξ E) {L : LB G.left} (hL : L.IsLB) (n : ℕ) (q : Cpt ξ) (hn : unitAt ξ q (n : Ω))
-    : M.htOm L n q = M.omLat q := by
-  refine le_antisymm (M.htOm_le L n q) fun w hw =>
-    Submodule.subset_span ⟨1, one_pow n, hw, ⊤, 1, trivial, ?_, ?_⟩
+theorem htOm_eq_omLat (M : LieModel G ξ E) {L : LB G.left} (hL : L.IsLB) (n : ℕ) (q : Cpt ξ)
+    (hn : unitAt ξ q (n : Ω)) : M.htOm L n q = M.omLat q := by
+  refine le_antisymm (M.htOm_le L n q) fun w hw => Submodule.subset_span ⟨1, one_pow n, hw, ⊤, 1, trivial, ?_, ?_⟩
   · intro k _ _ i xk g c h hx _ hW
     have hx1 : xk = 1 := by
       refine Over.OverMorphism.ext (hx.trans ?_)
-      exact congrArg
-        (fun f => f.left)
+      exact congrArg (fun f => f.left)
         (comp_one (M := G) (Over.homMk (spMap i) rfl : Over.mk (spMap i ≫ ξ) ⟶ Over.mk ξ))
     subst hx1
     have hc : unitOn c = 1 := weilIs_one_left hL hW
@@ -265,26 +264,19 @@ theorem htOm_eq_omLat
     rw [mul_inv_cancel_left₀ hn.1]
     simp [secVal]
 
-variable
-  (M : LieModel G ξ E)
-  {L : LB G.left} {n : ℕ} {O : Type} [CommRing O]
-  (ρ : O →+* Module.End Ω E) (σ : O →+* Ω)
-  {q : Cpt ξ}
+variable (M : LieModel G ξ E) {L : LB G.left} {n : ℕ} {O : Type} [CommRing O] (ρ : O →+* Module.End Ω E)
+  (σ : O →+* Ω) {q : Cpt ξ}
 
-theorem htDual_eq_eigLat
-    (hL : L.IsLB) (hn : unitAt ξ q (n : Ω))
-    (hbi : ∀ x, (∀ w ∈ M.omLat q, w x ∈ regAt ξ q) → x ∈ M.lat q)
-    : M.htDual L n ρ σ q = M.eigLat ρ σ q := by
+theorem htDual_eq_eigLat (hL : L.IsLB) (hn : unitAt ξ q (n : Ω))
+    (hbi : ∀ x, (∀ w ∈ M.omLat q, w x ∈ regAt ξ q) → x ∈ M.lat q) :
+    M.htDual L n ρ σ q = M.eigLat ρ σ q := by
   refine le_antisymm (fun e he => ?_) (M.eigLat_le_htDual L n ρ σ q)
   rw [LieModel.mem_htDual_iff, htOm_eq_omLat M hL n q hn] at he
   exact ⟨hbi e he.2, he.1⟩
 
-theorem htW_eq_eigLat
-    (hd : M.htDual L n ρ σ q = M.eigLat ρ σ q) (hσ : ∀ d, σ d ∈ regAt ξ q)
-    (𝔡 : Ideal O) (N : ℕ) (hN : (N : O) ∈ 𝔡) (hu : unitAt ξ q (N : Ω))
-    : M.htW L n ρ σ 𝔡 q = M.eigLat ρ σ q := by
-  refine le_antisymm (Submodule.span_le.2 fun e he => ?_) fun e he =>
-    Submodule.subset_span ⟨he.2, fun d _ => ?_⟩
+theorem htW_eq_eigLat (hd : M.htDual L n ρ σ q = M.eigLat ρ σ q) (hσ : ∀ d, σ d ∈ regAt ξ q) (𝔡 : Ideal O)
+    (N : ℕ) (hN : (N : O) ∈ 𝔡) (hu : unitAt ξ q (N : Ω)) : M.htW L n ρ σ 𝔡 q = M.eigLat ρ σ q := by
+  refine le_antisymm (Submodule.span_le.2 fun e he => ?_) fun e he => Submodule.subset_span ⟨he.2, fun d _ => ?_⟩
   · have h1 := he.2 _ hN
     rw [hd, map_natCast] at h1
     have h2 : (N : Ω)⁻¹ • (N : Ω) • e ∈ M.lat q := (M.lat q).smul_mem (⟨_, hu.2.2⟩ : regAt ξ q) h1.1
@@ -295,20 +287,10 @@ theorem htW_eq_eigLat
 
 end HT
 
-theorem lattices_of_char_zero
-    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H) (l : Level H)
-        (Xo : Moduli D l) (c : Coeff l) (O : Type) [CommRing O] (β : O →+* c.F) (Y : Model Xo c β)
-        (S : Finset ℕ) (Ω : Type) [Field Ω] (K : Type) [Fintype K] (J : K → Type)
-        [∀ k, Fintype (J k)] (y : (Σ k, J k) → Ω) (𝔐 : HodgeCpt Y S y),
-      Function.Injective β
-        → ∀ q : Cpt 𝔐.ξ,
-          (∀ r : ℕ, r.Prime → ¬ InFibre 𝔐.ξ r q)
-            → (∀ s, 𝔐.V s q = 𝔐.dR s q) ∧ (∀ p : ℕ, p.Prime → ∀ s, 𝔐.HT p s q = 𝔐.dR s q)
-              ∧ 𝔐.M.lat q = ⨆ s, 𝔐.dR s q := by
+theorem lattices_of_char_zero : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H) (l : Level H) (Xo : Moduli D l) (c : Coeff l) (O : Type) [CommRing O] (β : O →+* c.F) (Y : Model Xo c β) (S : Finset ℕ) (Ω : Type) [Field Ω] (K : Type) [Fintype K] (J : K → Type) [∀ k, Fintype (J k)] (y : (Σ k, J k) → Ω) (𝔐 : HodgeCpt Y S y), Function.Injective β → ∀ q : Cpt 𝔐.ξ, (∀ r : ℕ, r.Prime → ¬ InFibre 𝔐.ξ r q) → (∀ s, 𝔐.V s q = 𝔐.dR s q) ∧ (∀ p : ℕ, p.Prime → ∀ s, 𝔐.HT p s q = 𝔐.dR s q) ∧ 𝔐.M.lat q = ⨆ s, 𝔐.dR s q := by
   intro E _ _ _ H D l Xo c O _ β Y S Ω _ K _ J _ y 𝔐 hβ q hq
   classical
-  obtain ⟨-, -, hchar, hinj, -, htop, hind, hreg⟩ :=
-    GlobalTheory.T.hodge_cpt_interior_generic E H D l Xo c O β Y S Ω K J y 𝔐 hβ
+  obtain ⟨-, -, hchar, hinj, -, htop, hind, hreg⟩ := GlobalTheory.T.hodge_cpt_interior_generic E H D l Xo c O β Y S Ω K J y 𝔐 hβ
   haveI := hchar
   haveI : Fintype (CMType H ⊕ CMType H) := Fintype.ofFinite _
   have hnat := unitAt_natCast (q := q) hq
@@ -316,44 +298,30 @@ theorem lattices_of_char_zero
     Lat.patch_of_not S _ _ fun p hp => hq p (𝔐.S_prime p hp)
   have hint : ∀ (s : CMType H ⊕ CMType H) a, IsIntegral ℤ (𝔐.emb s a) := fun s a =>
     (Algebra.IsIntegral.isIntegral (R := ℤ) a).map (𝔐.emb s).toIntAlgHom
-  have hsep
-      : ∀ s t, s ≠ t → ∃ a, 𝔐.emb s a ≠ 𝔐.emb t a ∧ (𝔐.emb s a - 𝔐.emb t a)⁻¹ ∈ regAt 𝔐.ξ q := by
+  have hsep : ∀ s t, s ≠ t → ∃ a, 𝔐.emb s a ≠ 𝔐.emb t a ∧ (𝔐.emb s a - 𝔐.emb t a)⁻¹ ∈ regAt 𝔐.ξ q := by
     intro s t hst
     obtain ⟨a, ha⟩ := DFunLike.ne_iff.1 (fun e => hst (hinj e))
-    exact
-      ⟨a, ha, inv_mem_regAt hnat (sub_mem (hreg s a q) (hreg t a q)) ((hint s a).sub (hint t a))⟩
+    exact ⟨a, ha, inv_mem_regAt hnat (sub_mem (hreg s a q) (hreg t a q)) ((hint s a).sub (hint t a))⟩
   have hlat : 𝔐.M.lat q = ⨆ s, 𝔐.dR s q := by
     refine le_antisymm (fun e he => ?_) (iSup_le fun s => inf_le_left)
     have he' : e ∈ ⨆ s, 𝔐.Vgen s := by rw [htop]; trivial
     obtain ⟨f, hf, rfl⟩ := (Submodule.mem_iSup_iff_exists_finsupp _ _).1 he'
     rw [Finsupp.sum_fintype _ _ fun _ => rfl] at he ⊢
-    have h1 :=
-      mem_of_sum_mem (𝔐.M.lat q) 𝔐.ρ 𝔐.emb
-        (fun a e he => lat_stable 𝔐.M 𝔐.t.act 𝔐.ρ 𝔐.act q a he)
-        (fun s a => hreg s a q)
-        hsep Finset.univ f
-        (fun s _ => hf s)
-        he
+    have h1 := mem_of_sum_mem (𝔐.M.lat q) 𝔐.ρ 𝔐.emb
+      (fun a e he => lat_stable 𝔐.M 𝔐.t.act 𝔐.ρ 𝔐.act q a he) (fun s a => hreg s a q) hsep Finset.univ f
+      (fun s _ => hf s) he
     exact Submodule.sum_mem _ fun s _ =>
       Submodule.mem_iSup_of_mem s ⟨h1 s (Finset.mem_univ s), hf s⟩
   have hbi : ∀ x, (∀ w ∈ 𝔐.M.omLat q, w x ∈ regAt 𝔐.ξ q) → x ∈ 𝔐.M.lat q := by
     intro x hx
     choose U hU b hb hfr using fun s => 𝔐.vb s q trivial
     rw [hlat]
-    refine mem_iSup_of_dual 𝔐.Vgen hind htop (labelRk D) b
-      (fun s => (hfr s q trivial (hU s)).1)
-      hb
-      (fun s => 𝔐.dR s q)
-      (fun s => (hV s).symm.trans (hfr s q trivial (hU s)).2)
-      x
-      fun w hw =>
-        hx w
-          (show ∀ e ∈ 𝔐.M.lat q, w e ∈ regAt 𝔐.ξ q from fun e he => by
-            rw [hlat] at he
-            exact Submodule.iSup_induction _
-              (motive := fun e => w e ∈ regAt 𝔐.ξ q)
-              he hw (by simpa using zero_mem _)
-              (fun a b ha hb => by simpa using add_mem ha hb))
+    refine mem_iSup_of_dual 𝔐.Vgen hind htop (labelRk D) b (fun s => (hfr s q trivial (hU s)).1) hb
+      (fun s => 𝔐.dR s q) (fun s => (hV s).symm.trans (hfr s q trivial (hU s)).2) x fun w hw =>
+        hx w (show ∀ e ∈ 𝔐.M.lat q, w e ∈ regAt 𝔐.ξ q from fun e he => by
+          rw [hlat] at he
+          exact Submodule.iSup_induction _ (motive := fun e => w e ∈ regAt 𝔐.ξ q) he hw
+            (by simpa using zero_mem _) (fun a b ha hb => by simpa using add_mem ha hb))
   refine ⟨hV, fun p hp s => ?_, hlat⟩
   have hn : unitAt 𝔐.ξ q ((p ^ 𝔐.R p : ℕ) : Ω) := hnat _ (pow_ne_zero _ hp.ne_zero)
   have hd : ∀ s, 𝔐.M.htDual 𝔐.t.PP.L (p ^ 𝔐.R p) 𝔐.ρ (𝔐.emb s) q = 𝔐.dR s q := fun s =>
@@ -361,10 +329,8 @@ theorem lattices_of_char_zero
   cases s with
   | inl τ =>
     have hbot : differentIdeal ℤ (𝓞 E) ≠ ⊥ := differentIdeal_ne_bot
-    exact htW_eq_eigLat 𝔐.M 𝔐.ρ _ (hd _)
-      (fun d => hreg _ d q)
-      _ (Ideal.absNorm (differentIdeal ℤ (𝓞 E))) (Ideal.absNorm_mem _)
-      (hnat _ (by simpa [Ideal.absNorm_eq_zero_iff] using hbot))
+    exact htW_eq_eigLat 𝔐.M 𝔐.ρ _ (hd _) (fun d => hreg _ d q) _ (Ideal.absNorm (differentIdeal ℤ (𝓞 E)))
+      (Ideal.absNorm_mem _) (hnat _ (by simpa [Ideal.absNorm_eq_zero_iff] using hbot))
   | inr τ => exact hd _
 
 end GlobalTheory.CompanionTheory.Ar.HodgeChar0

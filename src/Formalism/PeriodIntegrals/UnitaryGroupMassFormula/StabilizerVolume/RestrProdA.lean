@@ -1,8 +1,50 @@
 module
 
-public import Mathlib
 public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.StabilizerVolume.RestrProdSt
-public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.StabilizerVolume.PosNear
+import Aesop.Main
+import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.StabilizerVolume.PosNear
+import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.StabilizerVolume.TensTop
+import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.StabilizerVolume.TopoAF
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -10,17 +52,15 @@ noncomputable section
 
 namespace PI.VolStabS.RestrProdA
 
-open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub NumberField
-  IsDedekindDomain MeasureTheory PI.VolFromSW
+open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub NumberField IsDedekindDomain MeasureTheory PI.VolFromSW
 open scoped TensorProduct
 
-theorem hasProd_compl_of_ne_zero
-    {β : Type} {f : β → ℂ} {p : ℂ} (h : HasProd f p) (S : Finset β) (hS : ∀ b ∈ S, f b ≠ 0)
-    : HasProd ({b | b ∉ S}.mulIndicator f) (p * ∏ b ∈ S, (f b)⁻¹) := by
+theorem hasProd_compl_of_ne_zero {β : Type} {f : β → ℂ} {p : ℂ} (h : HasProd f p) (S : Finset β)
+    (hS : ∀ b ∈ S, f b ≠ 0) :
+    HasProd ({b | b ∉ S}.mulIndicator f) (p * ∏ b ∈ S, (f b)⁻¹) := by
   classical
-  have h2
-      : HasProd (fun b => if b ∈ S then (f b)⁻¹ else 1) (∏ b ∈ S, (if b ∈ S then (f b)⁻¹ else 1)) :=
-    hasProd_prod_of_ne_finset_one fun b hb => if_neg hb
+  have h2 : HasProd (fun b => if b ∈ S then (f b)⁻¹ else 1)
+      (∏ b ∈ S, (if b ∈ S then (f b)⁻¹ else 1)) := hasProd_prod_of_ne_finset_one fun b hb => if_neg hb
   have e : ∏ b ∈ S, (if b ∈ S then (f b)⁻¹ else 1) = ∏ b ∈ S, (f b)⁻¹ :=
     Finset.prod_congr rfl fun b hb => if_pos hb
   rw [e] at h2
@@ -30,34 +70,33 @@ theorem hasProd_compl_of_ne_zero
   · simp [Set.mulIndicator, hb, hS b hb]
   · simp [Set.mulIndicator, hb]
 
-theorem hasProd_ofReal_of_complex
-    {β : Type} {f : β → ℝ} (hf : ∀ b, 0 ≤ f b) {q : ℂ} (h : HasProd (fun b => (f b : ℂ)) q)
-    : HasProd (fun b => ENNReal.ofReal (f b)) (ENNReal.ofReal q.re) := by
+theorem hasProd_ofReal_of_complex {β : Type} {f : β → ℝ} (hf : ∀ b, 0 ≤ f b) {q : ℂ}
+    (h : HasProd (fun b => (f b : ℂ)) q) :
+    HasProd (fun b => ENNReal.ofReal (f b)) (ENNReal.ofReal q.re) := by
   unfold HasProd at h ⊢
   have h1 := ((ENNReal.continuous_ofReal.comp Complex.continuous_re).tendsto q).comp h
   refine h1.congr fun s => ?_
   simp only [Function.comp_apply, ← Complex.ofReal_prod, Complex.ofReal_re]
   exact ENNReal.ofReal_prod_of_nonneg fun b _ => hf b
 
-theorem rpTail_gen
-    {F E : Type} [Field F] [NumberField F] [Field E] [Algebra F E] [FiniteDimensional F E]
-    {a M d : ℕ} (b : Module.Basis (Fin d) F E)
+theorem rpTail_gen {F E : Type} [Field F] [NumberField F] [Field E] [Algebra F E]
+    [FiniteDimensional F E] {a M d : ℕ} (b : Module.Basis (Fin d) F E)
     (m : ∀ v : HeightOneSpectrum (𝓞 F), Measure (Fin a → Fin M → Fv F v ⊗[F] E))
     (hSB : ∀ v (Φ : (Fin a → Fin M → Fv F v ⊗[F] E) → ℂ), IsSB Φ → Integrable Φ (m v))
     (hmult : ∀ (Φf : (Fin a → Fin M → Af F ⊗[F] E) → ℂ)
-        (Φv : ∀ v : HeightOneSpectrum (𝓞 F), (Fin a → Fin M → Fv F v ⊗[F] E) → ℂ),
-      IsPureFin b Φf Φv → Multipliable (fun v => ∫ X, Φv v X ∂(m v)))
-    : (∃ v, ∀ Φ : (Fin a → Fin M → Fv F v ⊗[F] E) → ℂ, IsSB Φ → ∫ X, Φ X ∂(m v) = 0)
-      ∨ ∀ S : Finset (HeightOneSpectrum (𝓞 F)), ∃ c : ENNReal,
-        c ≠ ⊤ ∧ HasProd (fun v : {v // v ∉ S} => m v.1 (latV b v.1)) c := by
+      (Φv : ∀ v : HeightOneSpectrum (𝓞 F), (Fin a → Fin M → Fv F v ⊗[F] E) → ℂ),
+      IsPureFin b Φf Φv → Multipliable (fun v => ∫ X, Φv v X ∂(m v))) :
+    (∃ v, ∀ Φ : (Fin a → Fin M → Fv F v ⊗[F] E) → ℂ, IsSB Φ → ∫ X, Φ X ∂(m v) = 0) ∨
+    ∀ S : Finset (HeightOneSpectrum (𝓞 F)), ∃ c : ENNReal, c ≠ ⊤ ∧
+      HasProd (fun v : {v // v ∉ S} => m v.1 (latV b v.1)) c := by
   classical
   by_cases h0 : ∃ v, ∀ Φ : (Fin a → Fin M → Fv F v ⊗[F] E) → ℂ, IsSB Φ → ∫ X, Φ X ∂(m v) = 0
   · exact Or.inl h0
   refine Or.inr fun S => ?_
   push_neg at h0
   choose g hgSB hg0 using h0
-  let Φv : ∀ v : HeightOneSpectrum (𝓞 F), (Fin a → Fin M → Fv F v ⊗[F] E) → ℂ := fun v =>
-    if v ∈ S then g v else (latV b v).indicator 1
+  let Φv : ∀ v : HeightOneSpectrum (𝓞 F), (Fin a → Fin M → Fv F v ⊗[F] E) → ℂ :=
+    fun v => if v ∈ S then g v else (latV b v).indicator 1
   have hpure : IsPureFin b (fun Y => ∏ᶠ v, Φv v (projV v Y)) Φv := by
     refine ⟨fun v => ?_, ?_, fun Y => rfl⟩
     · by_cases hv : v ∈ S
@@ -76,9 +115,8 @@ theorem rpTail_gen
     have h := hSB v _ (PositiveNearLattice.isSB_latV b v a M)
     rw [integrable_indicator_iff (hL v)] at h
     exact (((integrableOn_const_iff (C := (1 : ℂ))).1 h).resolve_left (by simp)).ne
-  have e
-      : {v | v ∉ S}.mulIndicator (fun v => ∫ X, Φv v X ∂(m v))
-        = fun v => (({v | v ∉ S}.mulIndicator (fun v => (m v (latV b v)).toReal) v : ℝ) : ℂ) := by
+  have e : {v | v ∉ S}.mulIndicator (fun v => ∫ X, Φv v X ∂(m v)) =
+      fun v => (({v | v ∉ S}.mulIndicator (fun v => (m v (latV b v)).toReal) v : ℝ) : ℂ) := by
     funext v
     by_cases hv : v ∈ S
     · simp [Set.mulIndicator, hv]
@@ -86,11 +124,10 @@ theorem rpTail_gen
       rw [integral_indicator (hL v)]
       simp [Measure.real]
   rw [e] at h1
-  have h2 :=
-    hasProd_ofReal_of_complex (fun v => by by_cases hv : v ∈ S <;> simp [Set.mulIndicator, hv]) h1
-  have e2
-      : (fun v => ENNReal.ofReal ({v | v ∉ S}.mulIndicator (fun v => (m v (latV b v)).toReal) v))
-        = {v | v ∉ S}.mulIndicator (fun v => m v (latV b v)) := by
+  have h2 := hasProd_ofReal_of_complex (fun v => by
+    by_cases hv : v ∈ S <;> simp [Set.mulIndicator, hv]) h1
+  have e2 : (fun v => ENNReal.ofReal ({v | v ∉ S}.mulIndicator
+      (fun v => (m v (latV b v)).toReal) v)) = {v | v ∉ S}.mulIndicator (fun v => m v (latV b v)) := by
     funext v
     by_cases hv : v ∈ S
     · simp [Set.mulIndicator, hv]
@@ -98,23 +135,21 @@ theorem rpTail_gen
   rw [e2] at h2
   exact ⟨_, ENNReal.ofReal_ne_top, (hasProd_subtype_iff_mulIndicator (s := {v | v ∉ S})).2 h2⟩
 
-theorem repr_change
-    {F E : Type} [Field F] [Field E] [Algebra F E]
-    {d d' : ℕ}
-    (R : Type) [CommRing R] [Algebra F R]
-    (b : Module.Basis (Fin d) F E) (b' : Module.Basis (Fin d') F E) (y : R ⊗[F] E) (k' : Fin d')
-    : (Algebra.TensorProduct.basis R b').repr y k'
-      = ∑ k, (Algebra.TensorProduct.basis R b).repr y k * algebraMap F R (b'.repr (b k) k') := by
+theorem repr_change {F E : Type} [Field F] [Field E] [Algebra F E] {d d' : ℕ}
+    (R : Type) [CommRing R] [Algebra F R] (b : Module.Basis (Fin d) F E)
+    (b' : Module.Basis (Fin d') F E) (y : R ⊗[F] E) (k' : Fin d') :
+    (Algebra.TensorProduct.basis R b').repr y k' =
+      ∑ k, (Algebra.TensorProduct.basis R b).repr y k * algebraMap F R (b'.repr (b k) k') := by
   have hE : ∀ e : E, b'.repr e k' = ∑ k, b.repr e k * b'.repr (b k) k' := fun e => by
     conv_lhs => rw [← b.sum_repr e]
-    set_option synthInstance.maxHeartbeats 100000 in
+
     simp only [map_sum, map_smul, Finset.sum_apply', Finsupp.smul_apply, smul_eq_mul]
   induction y using TensorProduct.induction_on with
   | zero => simp
   | tmul r e =>
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [Algebra.TensorProduct.basis_repr_tmul, Finsupp.smul_apply, Finsupp.mapRange_apply, hE,
-        map_sum, smul_eq_mul, Finset.mul_sum]
+
+    rw [Algebra.TensorProduct.basis_repr_tmul, Finsupp.smul_apply, Finsupp.mapRange_apply, hE,
+    map_sum, smul_eq_mul, Finset.mul_sum]
     refine Finset.sum_congr rfl fun k _ => ?_
     rw [Algebra.TensorProduct.basis_repr_tmul, Finsupp.smul_apply, Finsupp.mapRange_apply,
       smul_eq_mul, map_mul, mul_assoc]
@@ -125,18 +160,14 @@ theorem repr_change
 
 theorem latCofin_holds : LatCofin := by
   intro F E _ _ _ _ a M d d' b b'
-  have key
-      : ∀ x : F,
-        ∀ᶠ v in Filter.cofinite,
-          algebraMap F (Fv F v) x ∈ (v.adicCompletionIntegers F : Set (Fv F v)) := fun x =>
+  have key : ∀ x : F, ∀ᶠ v in Filter.cofinite,
+      algebraMap F (Fv F v) x ∈ (v.adicCompletionIntegers F : Set (Fv F v)) := fun x =>
     (algebraMap F (FiniteAdeleRing (𝓞 F) F) x).2
-  have h1
-      : ∀ᶠ v in Filter.cofinite, ∀ k k', algebraMap F (Fv F v) (b'.repr (b k) k') ∈
-        (v.adicCompletionIntegers F : Set (Fv F v)) :=
+  have h1 : ∀ᶠ v in Filter.cofinite, ∀ k k', algebraMap F (Fv F v) (b'.repr (b k) k') ∈
+      (v.adicCompletionIntegers F : Set (Fv F v)) :=
     Filter.eventually_all.2 fun k => Filter.eventually_all.2 fun k' => key _
-  have h2
-      : ∀ᶠ v in Filter.cofinite, ∀ k' k, algebraMap F (Fv F v) (b.repr (b' k') k) ∈
-        (v.adicCompletionIntegers F : Set (Fv F v)) :=
+  have h2 : ∀ᶠ v in Filter.cofinite, ∀ k' k, algebraMap F (Fv F v) (b.repr (b' k') k) ∈
+      (v.adicCompletionIntegers F : Set (Fv F v)) :=
     Filter.eventually_all.2 fun k' => Filter.eventually_all.2 fun k => key _
   filter_upwards [h1, h2] with v hv1 hv2
   ext Y

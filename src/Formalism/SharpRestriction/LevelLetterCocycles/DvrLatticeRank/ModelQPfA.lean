@@ -1,6 +1,46 @@
 module
 
-public import Formalism.SharpRestriction.LevelLetterCocycles.ExpansionFormAll
+public import Formalism.SharpRestriction.LevelLetterCocycles.ModelKStep
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Coalgebra.CoassocSimps
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -8,33 +48,27 @@ noncomputable section
 
 namespace Formalism.MainNotions.N.Ln34.MQ
 
-open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc Module
-  Formalism.MainNotions.ElementDenominator
-  Formalism.MainNotions.ElementDenominator.CongruenceModules TensorProduct
+open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc Module Formalism.MainNotions.ElementDenominator Formalism.MainNotions.ElementDenominator.CongruenceModules TensorProduct
 
-variable
-  {G : Type} [Group G] [TopologicalSpace G]
-  {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K] [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K]
-  [IsScalarTower Qp K₀ K]
-  {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
-  [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
-  [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
-  {PD : PeriodData G Qp K₀ K B BdR} {LL O : Type}
-  [Field LL] [Algebra Qp LL] [TopologicalSpace LL] [CommRing O] [Algebra O LL]
-  {v : AddValuation LL (WithTop ℚ)} {n : ℕ} (W : LocWach PD LL O v n)
-  (T : LocLat G Qp LL O)
+variable {G : Type} [Group G] [TopologicalSpace G] {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K]
+    [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K] [IsScalarTower Qp K₀ K]
+    {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
+    [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
+    [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
+    {PD : PeriodData G Qp K₀ K B BdR} {LL O : Type} [Field LL] [Algebra Qp LL] [TopologicalSpace LL]
+    [CommRing O] [Algebra O LL] {v : AddValuation LL (WithTop ℚ)} {n : ℕ}
+    (W : LocWach PD LL O v n) (T : LocLat G Qp LL O)
 
 def smulE (π' : LetA O n) (c : ZMod n) (e : W.EE) : LA W T π' c →ₗ[O] LA W T π' c :=
   TensorProduct.map (LinearMap.mulLeft O e) LinearMap.id
 
 variable {W T}
 
-theorem smulLA_eq (π' : LetA O n) (c : ZMod n) (a : LetA O n)
-    : smulLA W T π' c a = smulE W T π' c (algebraMap (LetA O n) W.EE a) :=
-  rfl
+theorem smulLA_eq (π' : LetA O n) (c : ZMod n) (a : LetA O n) :
+    smulLA W T π' c a = smulE W T π' c (algebraMap (LetA O n) W.EE a) := rfl
 
-theorem smulE_mul (π' : LetA O n) (c : ZMod n) (e f : W.EE) (x : LA W T π' c)
-    : smulE W T π' c (e * f) x = smulE W T π' c e (smulE W T π' c f x) := by
+theorem smulE_mul (π' : LetA O n) (c : ZMod n) (e f : W.EE) (x : LA W T π' c) :
+    smulE W T π' c (e * f) x = smulE W T π' c e (smulE W T π' c f x) := by
   induction x using TensorProduct.induction_on with
   | zero => simp
   | tmul y l => simp [smulE, mul_assoc]
@@ -46,40 +80,37 @@ theorem smulE_one (π' : LetA O n) (c : ZMod n) (x : LA W T π' c) : smulE W T �
   | tmul y l => simp [smulE]
   | add x y hx hy => rw [map_add (f := _), hx, hy]
 
-theorem smulE_comm (π' : LetA O n) (c : ZMod n) (e f : W.EE) (x : LA W T π' c)
-    : smulE W T π' c e (smulE W T π' c f x) = smulE W T π' c f (smulE W T π' c e x) := by
+theorem smulE_comm (π' : LetA O n) (c : ZMod n) (e f : W.EE) (x : LA W T π' c) :
+    smulE W T π' c e (smulE W T π' c f x) = smulE W T π' c f (smulE W T π' c e x) := by
   rw [← smulE_mul, ← smulE_mul, mul_comm]
 
-theorem smulE_unit (π' : LetA O n) (c : ZMod n) (u : W.EEˣ) (x : LA W T π' c)
-    : smulE W T π' c (u : W.EE) (smulE W T π' c ((u⁻¹ : W.EEˣ) : W.EE) x) = x := by
+theorem smulE_unit (π' : LetA O n) (c : ZMod n) (u : W.EEˣ) (x : LA W T π' c) :
+    smulE W T π' c (u : W.EE) (smulE W T π' c ((u⁻¹ : W.EEˣ) : W.EE) x) = x := by
   rw [← smulE_mul, Units.mul_inv, smulE_one]
 
-theorem smulE_unit' (π' : LetA O n) (c : ZMod n) (u : W.EEˣ) (x : LA W T π' c)
-    : smulE W T π' c ((u⁻¹ : W.EEˣ) : W.EE) (smulE W T π' c (u : W.EE) x) = x := by
+theorem smulE_unit' (π' : LetA O n) (c : ZMod n) (u : W.EEˣ) (x : LA W T π' c) :
+    smulE W T π' c ((u⁻¹ : W.EEˣ) : W.EE) (smulE W T π' c (u : W.EE) x) = x := by
   rw [← smulE_mul, Units.inv_mul, smulE_one]
 
-theorem toLA_tmul (π' : LetA O n) (c : ZMod n) (S : Submodule O (LcQ W T π' c)) (a : ↥W.AΔ) (l : ↥S)
-    : toLA W T π' c S (a ⊗ₜ l)
-      = algebraMap (LetA O n) W.EE ((letE c : LetA O n) * a) ⊗ₜ (l : LcQ W T π' c) := by
+theorem toLA_tmul (π' : LetA O n) (c : ZMod n) (S : Submodule O (LcQ W T π' c)) (a : ↥W.AΔ) (l : ↥S) :
+    toLA W T π' c S (a ⊗ₜ l) = algebraMap (LetA O n) W.EE ((letE c : LetA O n) * a) ⊗ₜ (l : LcQ W T π' c) := by
   simp [toLA]
 
-theorem smulE_tmul (π' : LetA O n) (c : ZMod n) (e f : W.EE) (l : LcQ W T π' c)
-    : smulE W T π' c e (f ⊗ₜ l) = (e * f) ⊗ₜ l := by
+theorem smulE_tmul (π' : LetA O n) (c : ZMod n) (e f : W.EE) (l : LcQ W T π' c) :
+    smulE W T π' c e (f ⊗ₜ l) = (e * f) ⊗ₜ l := by
   simp [smulE]
 
-set_option maxHeartbeats 1000000 in
-theorem finite_of
-    (Pt : ZMod n → LL → (K →ₐ[Qp] LL) → Prop)
-    (π' Eπ : LetA O n) (h' : ℕ) (c : ZMod n) (hEu : IsUnit (algebraMap (LetA O n) W.EE Eπ))
-    (h4
-      : (LinearMap.range (toLA W T π' c ⊤)).map (smulLA W T π' c (Eπ ^ h')) ≤ NL W T Pt π' Eπ h' c)
+
+
+theorem finite_of (Pt : ZMod n → LL → (K →ₐ[Qp] LL) → Prop) (π' Eπ : LetA O n) (h' : ℕ) (c : ZMod n)
+    (hEu : IsUnit (algebraMap (LetA O n) W.EE Eπ))
+    (h4 : (LinearMap.range (toLA W T π' c ⊤)).map (smulLA W T π' c (Eπ ^ h')) ≤ NL W T Pt π' Eπ h' c)
     (hLfin : Module.Finite O (LcQ W T π' c))
     (D : ℕ) (S : Fin D → ↥W.AΔ)
     (hdiv : ∀ a : ↥W.AΔ, ∃ (co : Fin D → O) (s : ↥W.AΔ),
-      (letE c : LetA O n) * a
-        = (letE c : LetA O n) * (∑ r, algebraMap O (LetA O n) (co r) * (S r : LetA O n))
-          + (letE c : LetA O n) * (π' * Eπ ^ (2 * h') * s))
-    : Module.Finite O (QL W T Pt π' Eπ h' c) := by
+      (letE c : LetA O n) * a = (letE c : LetA O n) * (∑ r, algebraMap O (LetA O n) (co r) * (S r : LetA O n)) +
+        (letE c : LetA O n) * (π' * Eπ ^ (2 * h') * s)) :
+    Module.Finite O (QL W T Pt π' Eπ h' c) := by
   classical
   haveI := hLfin
   obtain ⟨m, gL, hgL⟩ := Module.Finite.exists_fin (R := O) (M := LcQ W T π' c)
@@ -112,15 +143,13 @@ theorem finite_of
       · refine Submodule.mem_sup_left ?_
         have hl : (l : LcQ W T π' c) ∈ Submodule.span O (Set.range gL) := by rw [hgL]; trivial
         obtain ⟨o, ho⟩ := (Submodule.mem_span_range_iff_exists_fun O).1 hl
-        set_option synthInstance.maxHeartbeats 100000 in
-          rw [← ho, Finset.mul_sum, map_sum, TensorProduct.tmul_sum]
+
+        rw [← ho, Finset.mul_sum, map_sum, TensorProduct.tmul_sum]
         refine Submodule.sum_mem _ fun j _ => ?_
         rw [TensorProduct.tmul_smul, TensorProduct.sum_tmul]
         refine Submodule.smul_mem _ _ (Submodule.sum_mem _ fun r hr => ?_)
-        have e1
-            : algebraMap (LetA O n) W.EE
-                ((letE c : LetA O n) * (algebraMap O (LetA O n) (co r) * (S r : LetA O n)))
-              = co r • algebraMap (LetA O n) W.EE ((letE c : LetA O n) * (S r : LetA O n)) := by
+        have e1 : algebraMap (LetA O n) W.EE ((letE c : LetA O n) * (algebraMap O (LetA O n) (co r) * (S r : LetA O n))) =
+            co r • algebraMap (LetA O n) W.EE ((letE c : LetA O n) * (S r : LetA O n)) := by
           rw [Algebra.smul_def, IsScalarTower.algebraMap_apply O (LetA O n) W.EE, ← map_mul]
           congr 1
           ring
@@ -150,31 +179,29 @@ theorem finite_of
 
   obtain ⟨cf, hcf⟩ := (Submodule.mem_span_range_iff_exists_fun O).1 hy
   have hyL1 : smulE W T π' c Ei y ∈ LamLA W T π' Eπ h' c ⊤ := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← hcf, map_sum]
+
+    rw [← hcf, map_sum]
     exact Submodule.sum_mem _ fun p _ => by rw [map_smul]; exact Submodule.smul_mem _ _ (hmem p)
   have hyeq : (⟨_, hyL1⟩ : ↥(LamLA W T π' Eπ h' c ⊤)) = ∑ p, cf p • ⟨_, hmem p⟩ := by
     apply Subtype.ext
     rw [Submodule.coe_sum]
     simp only [Submodule.coe_smul]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← hcf, map_sum]
+
+    rw [← hcf, map_sum]
     exact Finset.sum_congr rfl fun p _ => map_smul _ _ _
-  have hyL2
-      : mkQ ⟨_, hyL1⟩ ∈ Submodule.span O
-        ((Finset.univ.image fun p => mkQ ⟨_, hmem p⟩ : Finset _) : Set (QL W T Pt π' Eπ h' c)) := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hyeq, map_sum]
+  have hyL2 : mkQ ⟨_, hyL1⟩ ∈ Submodule.span O ((Finset.univ.image fun p => mkQ ⟨_, hmem p⟩ : Finset _) :
+      Set (QL W T Pt π' Eπ h' c)) := by
+
+    rw [hyeq, map_sum]
     exact Submodule.sum_mem _ fun p _ => by
       rw [map_smul]
-      exact Submodule.smul_mem _ _
-        (Submodule.subset_span (Finset.mem_coe.2 (Finset.mem_image.2 ⟨p, Finset.mem_univ _, rfl⟩)))
+      exact Submodule.smul_mem _ _ (Submodule.subset_span
+        (Finset.mem_coe.2 (Finset.mem_image.2 ⟨p, Finset.mem_univ _, rfl⟩)))
 
   have hxe : x = smulE W T π' c Ei y + smulE W T π' c Ei z := by
     rw [← map_add (f := _), hyz, hEinv']
-  have hsc
-      : Ei * algebraMap (LetA O n) W.EE (π' * Eπ ^ (2 * h'))
-        = algebraMap (LetA O n) W.EE (π' ^ 1) * algebraMap (LetA O n) W.EE (Eπ ^ h') := by
+  have hsc : Ei * algebraMap (LetA O n) W.EE (π' * Eπ ^ (2 * h')) =
+      algebraMap (LetA O n) W.EE (π' ^ 1) * algebraMap (LetA O n) W.EE (Eπ ^ h') := by
     have hvv : (((u ^ h')⁻¹ : W.EEˣ) : W.EE) * ((u ^ h' : W.EEˣ) : W.EE) = 1 := Units.inv_mul _
     rw [pow_one, map_mul, show 2 * h' = h' + h' by ring, pow_add, map_mul, hEpow, hEi, inv_pow]
     linear_combination (algebraMap (LetA O n) W.EE π' * ((u ^ h' : W.EEˣ) : W.EE)) * hvv
@@ -193,20 +220,15 @@ theorem finite_of
   rw [hsplit, map_add (f := _), hz0, add_zero]
   exact hyL2
 
-theorem tf_of
-    (Pt : ZMod n → LL → (K →ₐ[Qp] LL) → Prop) (π' Eπ : LetA O n) (h' : ℕ) (c : ZMod n)
+theorem tf_of (Pt : ZMod n → LL → (K →ₐ[Qp] LL) → Prop) (π' Eπ : LetA O n) (h' : ℕ) (c : ZMod n)
     (hπu : IsUnit (algebraMap (LetA O n) W.EE π'))
     (h1 : NL W T Pt π' Eπ h' c ≤ LamLA W T π' Eπ h' c ⊤)
-    (h5 : ∀ x ∈ LamLA W T π' Eπ h' c ⊤, ∀ k : ℕ,
-      ((PD.p : ℕ) : O) ^ k • x ∈ NL W T Pt π' Eπ h' c → x ∈ NL W T Pt π' Eπ h' c)
-    (hsat : ∀ a : O,
-      a ≠ 0
-        → ∀ z : LA W T π' c,
-          smulLA W T π' c π' z ∈ LinearMap.range (toLA W T π' c ⊤)
-            → a • z ∈ LinearMap.range (toLA W T π' c ⊤)
-            → z ∈ LinearMap.range (toLA W T π' c ⊤))
-    (hℓ : ∀ a : O, a ≠ 0 → ∃ (k : ℕ) (b : O), ((PD.p : ℕ) : O) ^ k = b * a)
-    : ∀ (a : O) (q : QL W T Pt π' Eπ h' c), a ≠ 0 → a • q = 0 → q = 0 := by
+    (h5 : ∀ x ∈ LamLA W T π' Eπ h' c ⊤, ∀ k : ℕ, ((PD.p : ℕ) : O) ^ k • x ∈ NL W T Pt π' Eπ h' c →
+      x ∈ NL W T Pt π' Eπ h' c)
+    (hsat : ∀ a : O, a ≠ 0 → ∀ z : LA W T π' c, smulLA W T π' c π' z ∈ LinearMap.range (toLA W T π' c ⊤) →
+      a • z ∈ LinearMap.range (toLA W T π' c ⊤) → z ∈ LinearMap.range (toLA W T π' c ⊤))
+    (hℓ : ∀ a : O, a ≠ 0 → ∃ (k : ℕ) (b : O), ((PD.p : ℕ) : O) ^ k = b * a) :
+    ∀ (a : O) (q : QL W T Pt π' Eπ h' c), a ≠ 0 → a • q = 0 → q = 0 := by
   intro a q ha haq
   obtain ⟨⟨x, hx⟩, rfl⟩ := Submodule.mkQ_surjective _ q
   rw [← map_smul] at haq
@@ -237,13 +259,11 @@ theorem tf_of
   rw [pow_one, hzx]
   rfl
 
-theorem range_iff
-    {ι : Type} [Fintype ι] [DecidableEq ι]
-    (π' : LetA O n) (c : ZMod n) (bL : Basis ι O (LcQ W T π' c)) (z : LA W T π' c)
-    : z ∈ LinearMap.range (toLA W T π' c ⊤)
-      ↔ ∀ i, ∃ g ∈ W.AΔ,
-        TensorProduct.equivFinsuppOfBasisRight bL z i
-          = algebraMap (LetA O n) W.EE ((letE c : LetA O n) * g) := by
+theorem range_iff {ι : Type} [Fintype ι] [DecidableEq ι] (π' : LetA O n) (c : ZMod n) (bL : Basis ι O (LcQ W T π' c))
+    (z : LA W T π' c) :
+    z ∈ LinearMap.range (toLA W T π' c ⊤) ↔
+      ∀ i, ∃ g ∈ W.AΔ, TensorProduct.equivFinsuppOfBasisRight bL z i =
+        algebraMap (LetA O n) W.EE ((letE c : LetA O n) * g) := by
   classical
   constructor
   · rintro ⟨τ, rfl⟩
@@ -257,58 +277,36 @@ theorem range_iff
       rw [map_add (f := _), map_add (f := _), Finsupp.add_apply, e, e', mul_add, map_add (f := _)]
     | tmul a l =>
       intro i
-      refine
-        ⟨algebraMap O (LetA O n) (bL.repr l i) * a, mul_mem (Subalgebra.algebraMap_mem _ _) a.2, ?_⟩
+      refine ⟨algebraMap O (LetA O n) (bL.repr l i) * a, mul_mem (Subalgebra.algebraMap_mem _ _) a.2, ?_⟩
       rw [toLA_tmul, TensorProduct.equivFinsuppOfBasisRight_apply_tmul, Finsupp.mapRange_apply,
         Algebra.smul_def, IsScalarTower.algebraMap_apply O (LetA O n) W.EE, ← map_mul]
       congr 1
       ring
   · intro h
     choose g hg e using h
-    have hz
-        : z
-          = (TensorProduct.equivFinsuppOfBasisRight bL).symm
-            (TensorProduct.equivFinsuppOfBasisRight bL z) := by
-      simp
-    rw [hz, TensorProduct.equivFinsuppOfBasisRight_symm_apply,
-      Finsupp.sum_fintype _ _ (fun i => by simp)]
-    refine Submodule.sum_mem _ fun i _ =>
-      ⟨(⟨g i, hg i⟩ : ↥W.AΔ) ⊗ₜ (⟨bL i, trivial⟩ : ↥(⊤ : Submodule O (LcQ W T π' c))), ?_⟩
+    have hz : z = (TensorProduct.equivFinsuppOfBasisRight bL).symm (TensorProduct.equivFinsuppOfBasisRight bL z) := by simp
+    rw [hz, TensorProduct.equivFinsuppOfBasisRight_symm_apply, Finsupp.sum_fintype _ _ (fun i => by simp)]
+    refine Submodule.sum_mem _ fun i _ => ⟨(⟨g i, hg i⟩ : ↥W.AΔ) ⊗ₜ (⟨bL i, trivial⟩ : ↥(⊤ : Submodule O (LcQ W T π' c))), ?_⟩
     rw [toLA_tmul, e i]
 
-theorem coord_smulE
-    {ι : Type} [Fintype ι] [DecidableEq ι]
-    (π' : LetA O n) (c : ZMod n) (bL : Basis ι O (LcQ W T π' c))
-    (e : W.EE) (z : LA W T π' c) (i : ι)
-    : TensorProduct.equivFinsuppOfBasisRight bL (smulE W T π' c e z) i
-      = e * TensorProduct.equivFinsuppOfBasisRight bL z i := by
+theorem coord_smulE {ι : Type} [Fintype ι] [DecidableEq ι] (π' : LetA O n) (c : ZMod n) (bL : Basis ι O (LcQ W T π' c))
+    (e : W.EE) (z : LA W T π' c) (i : ι) :
+    TensorProduct.equivFinsuppOfBasisRight bL (smulE W T π' c e z) i =
+      e * TensorProduct.equivFinsuppOfBasisRight bL z i := by
   induction z using TensorProduct.induction_on with
   | zero => simp
-  | add x y hx hy =>
-    rw [map_add (f := _), map_add (f := _), Finsupp.add_apply, hx, hy, map_add (f := _),
-      Finsupp.add_apply, mul_add]
+  | add x y hx hy => rw [map_add (f := _), map_add (f := _), Finsupp.add_apply, hx, hy, map_add (f := _), Finsupp.add_apply, mul_add]
   | tmul m l =>
-    rw [smulE_tmul, TensorProduct.equivFinsuppOfBasisRight_apply_tmul,
-      TensorProduct.equivFinsuppOfBasisRight_apply_tmul, Finsupp.mapRange_apply,
-      Finsupp.mapRange_apply, mul_smul_comm]
+    rw [smulE_tmul, TensorProduct.equivFinsuppOfBasisRight_apply_tmul, TensorProduct.equivFinsuppOfBasisRight_apply_tmul,
+      Finsupp.mapRange_apply, Finsupp.mapRange_apply, mul_smul_comm]
 
-theorem sat_of
-    {ι : Type} [Fintype ι] [DecidableEq ι]
-    (π' : LetA O n) (c : ZMod n) (bL : Basis ι O (LcQ W T π' c))
-    (hlet : ∀ a : O,
-      a ≠ 0
-        → ∀ u : W.EE,
-          (∃ g ∈ W.AΔ,
-              algebraMap (LetA O n) W.EE π' * u
-                = algebraMap (LetA O n) W.EE ((letE c : LetA O n) * g))
-            → (∃ g ∈ W.AΔ, a • u = algebraMap (LetA O n) W.EE ((letE c : LetA O n) * g))
-            → ∃ g ∈ W.AΔ, u = algebraMap (LetA O n) W.EE ((letE c : LetA O n) * g))
-    : ∀ a : O,
-      a ≠ 0
-        → ∀ z : LA W T π' c,
-          smulLA W T π' c π' z ∈ LinearMap.range (toLA W T π' c ⊤)
-            → a • z ∈ LinearMap.range (toLA W T π' c ⊤)
-            → z ∈ LinearMap.range (toLA W T π' c ⊤) := by
+theorem sat_of {ι : Type} [Fintype ι] [DecidableEq ι] (π' : LetA O n) (c : ZMod n) (bL : Basis ι O (LcQ W T π' c))
+    (hlet : ∀ a : O, a ≠ 0 → ∀ u : W.EE,
+      (∃ g ∈ W.AΔ, algebraMap (LetA O n) W.EE π' * u = algebraMap (LetA O n) W.EE ((letE c : LetA O n) * g)) →
+      (∃ g ∈ W.AΔ, a • u = algebraMap (LetA O n) W.EE ((letE c : LetA O n) * g)) →
+      ∃ g ∈ W.AΔ, u = algebraMap (LetA O n) W.EE ((letE c : LetA O n) * g)) :
+    ∀ a : O, a ≠ 0 → ∀ z : LA W T π' c, smulLA W T π' c π' z ∈ LinearMap.range (toLA W T π' c ⊤) →
+      a • z ∈ LinearMap.range (toLA W T π' c ⊤) → z ∈ LinearMap.range (toLA W T π' c ⊤) := by
   intro a ha z h1 h2
   rw [range_iff π' c bL] at h1 h2 ⊢
   intro i

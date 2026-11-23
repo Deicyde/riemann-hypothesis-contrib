@@ -1,17 +1,69 @@
 module
 
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArakelovVolumes.UpperBounds.KronHolPsiStatementHolds
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.FundamentalDomains.BoundedSectionAlgebra
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArakelovVolumes.UpperBounds.WeightFunctionOnFrames
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Int
+import Mathlib.Algebra.Order.Star.Real
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Lemma
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArakelovVolumes.ArakelovInstances.PointwiseNormInvarianceHolds
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArakelovVolumes.UpperBounds.DivStartPf
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArakelovVolumes.UpperBounds.ExtFStatementPfB
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArakelovVolumes.UpperBounds.ExhaustFStatementPfE
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArakelovVolumes.UpperBounds.ExtFStatementPfB
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArakelovVolumes.UpperBounds.KaUnfoldPfA
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArakelovVolumes.UpperBounds.KronHolPsiStatementHolds
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArakelovVolumes.UpperBounds.LUStatementPf
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArakelovVolumes.UpperBounds.PoinStatementPf
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArakelovVolumes.UpperBounds.PoinStatementPfA
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.FundamentalDomains.FlowCoefficientBounds
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.FundamentalDomains.FourierCoefficientDomain
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.FundamentalDomains.OrthogonalFrameDomain
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.FundamentalDomains.OrthonormalFlagTranslateHolds
 
 @[expose] public section
 
 namespace ReciprocityTheory.ChartRestriction.G.AR.Up
 
-open NumberField ReciprocityTheory.ChartRestriction.G.FD
-  ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.L2DbarEstimates MeasureTheory
-  Topology Metric
+open NumberField ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.L2DbarEstimates MeasureTheory Topology Metric
 open scoped ENNReal
 
 noncomputable section
@@ -22,29 +74,16 @@ namespace DivUpPf
 
 variable {r : ℕ} (X : Data E r)
 
-theorem bchar_add (la la' : Wt X.Ψ r) {b : Frame X.Ψ r} (hb : b ∈ Bor X.Ψ r)
-    : bchar (la + la') b = bchar la b * bchar la' b := by
-  unfold bchar
-  rw [← Finset.prod_mul_distrib]
-  refine Finset.prod_congr rfl fun τ _ => ?_
-  rw [← Finset.prod_mul_distrib]
-  refine Finset.prod_congr rfl fun i _ => ?_
-  obtain ⟨hdet, htri⟩ := hb τ
-  have hd : (mat b τ).det = ∏ j, mat b τ j j :=
-    Matrix.det_of_upperTriangular (fun a c h => htri a c h)
-  have hne : b τ i i ≠ 0 := by
-    intro h0
-    apply hdet
-    rw [hd]
-    exact Finset.prod_eq_zero (Finset.mem_univ i) h0
-  exact zpow_add₀ hne _ _
+theorem bchar_add (la la' : Wt X.Ψ r) {b : Frame X.Ψ r} (hb : b ∈ Bor X.Ψ r) :
+    bchar (la + la') b = bchar la b * bchar la' b := by
+  apply ReciprocityTheory.ChartRestriction.G.FD.BoundedSectionAlgebra.bchar_add <;> assumption
 
 private lemma exp_neg_neg_two_mul_log (P : ℝ) (hP : 0 < P) : Real.exp (-(-2 * Real.log P)) = P ^ 2 := by
   rw [show -(-2 * Real.log P) = Real.log P + Real.log P by ring, Real.exp_add, Real.exp_log hP]
   ring
 
-theorem exp_phla (la : Wt X.Ψ r) {x : Frame X.Ψ r} (hx : x ∈ X.dom)
-    : Real.exp (- phla X la x) = X.nfac la x ^ 2 := by
+theorem exp_phla (la : Wt X.Ψ r) {x : Frame X.Ψ r} (hx : x ∈ X.dom) :
+    Real.exp (-phla X la x) = X.nfac la x ^ 2 := by
   unfold Data.dom GG at hx
   have hd : ∀ τ (i : Fin (r + 1)), dmin X.Gm x τ i ≠ 0 := by
     intro τ i h0
@@ -52,53 +91,49 @@ theorem exp_phla (la : Wt X.Ψ r) {x : Frame X.Ψ r} (hx : x ∈ X.dom)
     rw [h0, Complex.zero_re, mul_zero] at h1
     exact lt_irrefl _ h1
   unfold phla Data.nfac
-  exact exp_neg_neg_two_mul_log _
-    (Finset.prod_pos fun τ _ =>
-      Finset.prod_pos fun i _ =>
-        Real.rpow_pos_of_pos (norm_pos_iff.2 (div_ne_zero (hd τ _) (hd τ _))) _)
+  exact exp_neg_neg_two_mul_log _ (Finset.prod_pos fun τ _ => Finset.prod_pos fun i _ =>
+    Real.rpow_pos_of_pos (norm_pos_iff.2 (div_ne_zero (hd τ _) (hd τ _))) _)
 
 theorem nfac_meas (la : Wt X.Ψ r) : Measurable (X.nfac la) := by
   have hc : ∀ (τ : X.Ψ) (i : Fin (r + 1)), Continuous fun x : Frame X.Ψ r => dmin X.Gm x τ i := by
     intro τ i
     first
-    | (unfold dmin lminor gram mat hermC col; fun_prop)
-    | (unfold dmin lminor gram mat hermC col; continuity)
-    | (unfold dmin lminor gram mat hermC col; exact Nat.zero)
+      | (unfold dmin lminor gram mat hermC col; fun_prop)
+      | (unfold dmin lminor gram mat hermC col; continuity)
+      | (unfold dmin lminor gram mat hermC col; exact Nat.zero)
   unfold Data.nfac
   refine Finset.measurable_prod _ fun τ _ => Finset.measurable_prod _ fun i _ => ?_
   exact (((hc τ _).measurable.div (hc τ _).measurable).norm).pow_const _
 
-theorem metricW_exp (la : Wt X.Ψ r)
-    : IsMetricW X la (fun x => ENNReal.ofReal (Real.exp (- phla X la x))) := by
+theorem metricW_exp (la : Wt X.Ψ r) :
+    IsMetricW X la (fun x => ENNReal.ofReal (Real.exp (-phla X la x))) := by
   refine ⟨?_, fun x hx b hb => ?_, fun γ hγ x hx => ?_⟩
   · unfold phla
-    exact ENNReal.measurable_ofReal.comp (Real.measurable_exp.comp ((measurable_const.mul
-      (Real.measurable_log.comp (nfac_meas X la))).neg))
+    exact ENNReal.measurable_ofReal.comp (Real.measurable_exp.comp
+      ((measurable_const.mul (Real.measurable_log.comp (nfac_meas X la))).neg))
   · have hxb := OrthogonalFrameDomain.rmul_mem_dom X hx hb
     have hbc : bchar la b ≠ 0 := by
       unfold bchar
-      exact Finset.prod_ne_zero_iff.mpr fun τ _ =>
-        Finset.prod_ne_zero_iff.mpr fun i _ => zpow_ne_zero _ (FrameDegreeData.bdiag_ne X hb τ i)
+      exact Finset.prod_ne_zero_iff.mpr fun τ _ => Finset.prod_ne_zero_iff.mpr fun i _ =>
+        zpow_ne_zero _ (FrameDegreeData.bdiag_ne X hb τ i)
     have hn := FlowCoefficientBounds.nfac_pos X hx la
     simp only
-    rw [exp_phla X la hxb, exp_phla X la hx, normFactor_rightBorel_holds r X la x hx b hb, mul_pow,
-      inv_pow, ← ENNReal.ofReal_div_of_pos (by positivity)]
+    rw [exp_phla X la hxb, exp_phla X la hx, normFactor_rightBorel_holds r X la x hx b hb, mul_pow, inv_pow,
+      ← ENNReal.ofReal_div_of_pos (by positivity)]
     congr 1
     field_simp
   · simp only [phla]
     rw [normFactor_leftAction_holds r X la γ hγ x hx]
 
-theorem wLower_exp (la : Wt X.Ψ r)
-    : WLower X la (fun x => ENNReal.ofReal (Real.exp (- phla X la x))) := by
+theorem wLower_exp (la : Wt X.Ψ r) :
+    WLower X la (fun x => ENNReal.ofReal (Real.exp (-phla X la x))) := by
   unfold WLower
   exact ⟨1, one_pos, fun x _ => le_of_eq (by rw [one_mul])⟩
 
-theorem mono_sec {Xa : ArchInM X} (Fl : FlatM X Xa) (α : Fin (nd X) → ℕ)
-    : X.IsSec ((∑ k, α k) • Xa.L) (monoM X Fl.s α) := by
-  have h :=
-    DivSt.sec_prod X Finset.univ
-      (fun k => α k • Xa.L)
-      (fun k _ => DivSt.sec_pow X (Fl.s_van k).1.1.1 (α k))
+theorem mono_sec {Xa : ArchInM X} (Fl : FlatM X Xa) (α : Fin (nd X) → ℕ) :
+    X.IsSec ((∑ k, α k) • Xa.L) (monoM X Fl.s α) := by
+  have h := DivSt.sec_prod X Finset.univ (fun k => α k • Xa.L)
+    (fun k _ => DivSt.sec_pow X (Fl.s_van k).1.1.1 (α k))
   rw [Finset.sum_smul]
   exact h
 
@@ -106,10 +141,8 @@ end DivUpPf
 
 open DivUpPf
 
-theorem divCore_up_of
-    (hOW : OntoWeightStatement (E := E)) (hUD : UpDivStatement (E := E))
-    (hStart : DivStartStatement (E := E))
-    : DivCoreStatement (E := E) := by
+theorem divCore_up_of (hOW : OntoWeightStatement (E := E)) (hUD : UpDivStatement (E := E))
+    (hStart : DivStartStatement (E := E)) : DivCoreStatement (E := E) := by
   intro r X Xa Fl hPD hFin hm hL hcF hcFp hcka hfd δ t ht hval x0 hx0 FF hFF f hf hint cc hv
   obtain ⟨hgb, hgi⟩ := hStart r X Xa Fl hPD hFin δ t ht x0 hx0 FF hFF f hf hint cc
   have hgSS := hcka _ hgb
@@ -117,23 +150,19 @@ theorem divCore_up_of
   obtain ⟨Ps, g1, hWm, hWl, hg1d, hg1ne, hPs, hWPs, hlevi, hstart⟩ :=
     hOW r X Xa Fl hPD hFin bb m' hbb hm' hmarg hL x0 hx0 FF hFF
   have hIn := hstart _ hgSS hgi hv
-  have hfd'
-      : ∃ (K : ℕ) (g : Fin K → Frame X.Ψ r → ℂ), ∀ f' ∈ X.SS (Xa.Fp + Xa.T • Xa.L),
-        InFF X x0 (WSk X Xa Fl) FF f' → ∃ c : Fin K → ℂ, ∀ x ∈ X.dom, f' x = ∑ i, c i * g i x := by
+  have hfd' : ∃ (K : ℕ) (g : Fin K → Frame X.Ψ r → ℂ), ∀ f' ∈ X.SS (Xa.Fp + Xa.T • Xa.L),
+      InFF X x0 (WSk X Xa Fl) FF f' → ∃ c : Fin K → ℂ, ∀ x ∈ X.dom, f' x = ∑ i, c i * g i x := by
     obtain ⟨K, gg, hK⟩ := hfd
     exact ⟨K, gg, fun f' hf' _ => hK f' hf'⟩
-  obtain ⟨F, P, hFd, hFA, hPeq, hPF, hpoin⟩ :=
-    ontoStatement_holds r X x0 hx0 hPD (Xa.Fp + Xa.T • Xa.L) (WSk X Xa Fl) Ps g1 bb m' hWm hWl hbb
-      hm' hg1d hg1ne hPs hWPs hlevi hcka FF hFF hfd' _ hgSS hIn
+  obtain ⟨F, P, hFd, hFA, hPeq, hPF, hpoin⟩ := ontoStatement_holds r X x0 hx0 hPD
+    (Xa.Fp + Xa.T • Xa.L) (WSk X Xa Fl) Ps g1 bb m' hWm hWl hbb hm' hg1d hg1ne hPs hWPs hlevi hcka
+    FF hFF hfd' _ hgSS hIn
   obtain ⟨H, hH, hFH⟩ := hUD r X Xa Fl hPD hFin bb m' hbb hm' hmarg hL x0 hx0 F hFd hFA
   have hbb0 : 0 < bb := lt_of_le_of_lt (by positivity) hbb
 
-  have hL2
-      : ∀ α ∈ Finset.Nat.antidiagonalTuple (nd X) (Xa.T - nd X), ∀ C : Set (Frame X.Ψ r),
-        IsCompact C → C ⊆ X.dom
-          → ∫⁻ z in sat X x0 C, ENNReal.ofReal (‖H α z‖ ^ 2 *
-              Real.exp (-phla X (Xa.Fp + nd X • Xa.L) (cpt X x0 z))) ∂muF X x0
-            < ⊤ := by
+  have hL2 : ∀ α ∈ Finset.Nat.antidiagonalTuple (nd X) (Xa.T - nd X), ∀ C : Set (Frame X.Ψ r),
+      IsCompact C → C ⊆ X.dom → ∫⁻ z in sat X x0 C, ENNReal.ofReal (‖H α z‖ ^ 2 *
+        Real.exp (-phla X (Xa.Fp + nd X • Xa.L) (cpt X x0 z))) ∂muF X x0 < ⊤ := by
     intro α hα C _ _
     refine lt_of_le_of_lt (setLIntegral_le_lintegral _ _) (lt_of_le_of_lt ?_ (hH α hα).2)
     refine lintegral_mono_ae ?_
@@ -149,25 +178,20 @@ theorem divCore_up_of
     extFStatement_holds r X x0 hx0 (Xa.Fp + nd X • Xa.L) (H α) (hH α hα).1 (hL2 α hα)
   choose! Pα hPαB hPαF using hext
   have hpo := fun α (hα : α ∈ Finset.Nat.antidiagonalTuple (nd X) (Xa.T - nd X)) =>
-    poin_holds r X x0 hx0 hPD (Xa.Fp + nd X • Xa.L) (weightFunctionOnFrames X Xa) bb
-      (metricW_exp X _) (wLower_exp X _) hbb (H α) (Pα α) (hH α hα).1 (hH α hα).2 (hPαB α hα)
-      (hPαF α hα)
+    poin_holds r X x0 hx0 hPD (Xa.Fp + nd X • Xa.L) (weightFunctionOnFrames X Xa) bb (metricW_exp X _) (wLower_exp X _) hbb
+      (H α) (Pα α) (hH α hα).1 (hH α hα).2 (hPαB α hα) (hPαF α hα)
   have hnT : nd X ≤ Xa.T := by
     have h1 := Xa.T_ge
     have h2 := Xa.n_ge
     nlinarith
   have hw : Xa.Fp + Xa.T • Xa.L = (Xa.Fp + nd X • Xa.L) + (Xa.T - nd X) • Xa.L := by
     rw [add_assoc, ← add_nsmul, Nat.add_sub_cancel' hnT]
-  have hmono
-      : ∀ α ∈ Finset.Nat.antidiagonalTuple (nd X) (Xa.T - nd X),
-        X.IsSec ((Xa.T - nd X) • Xa.L) (monoM X Fl.s α) := fun α hα => by
+  have hmono : ∀ α ∈ Finset.Nat.antidiagonalTuple (nd X) (Xa.T - nd X),
+      X.IsSec ((Xa.T - nd X) • Xa.L) (monoM X Fl.s α) := fun α hα => by
     have := mono_sec X Fl α
     rwa [Finset.Nat.mem_antidiagonalTuple.mp hα] at this
-  obtain ⟨Q, hQ⟩
-      : ∃ Q : Frame X.Ψ r → ℂ,
-        Q = fun x =>
-          ∑ α ∈ Finset.Nat.antidiagonalTuple (nd X) (Xa.T - nd X), monoM X Fl.s α x * Pα α x :=
-    ⟨_, rfl⟩
+  obtain ⟨Q, hQ⟩ : ∃ Q : Frame X.Ψ r → ℂ, Q = fun x =>
+      ∑ α ∈ Finset.Nat.antidiagonalTuple (nd X) (Xa.T - nd X), monoM X Fl.s α x * Pα α x := ⟨_, rfl⟩
 
   have hPQ : ∀ x ∈ X.dom, P x = Q x := by
     obtain ⟨Δ, zOf, bOf, hΔd, hdense, -, -, hsplit, -⟩ := lu_holds r X x0 hx0
@@ -195,8 +219,7 @@ theorem divCore_up_of
       rw [dist_comm]
       exact lt_of_lt_of_le (Metric.mem_ball.mp hy) (min_le_left _ _)
     intro x hx
-    exact
-      Set.EqOn.of_subset_closure heq hPeq.1.continuousOn hQd.continuousOn (fun y hy => hy.1) hcl hx
+    exact Set.EqOn.of_subset_closure heq hPeq.1.continuousOn hQd.continuousOn (fun y hy => hy.1) hcl hx
   refine ⟨fun α => poin X (Xa.Fp + nd X • Xa.L) (Pα α), fun α hα => (hpo α hα).2.1, fun x hx => ?_⟩
   rw [← hpoin x hx]
   have h2 : poin X (Xa.Fp + Xa.T • Xa.L) P x = poin X (Xa.Fp + Xa.T • Xa.L) Q x := by

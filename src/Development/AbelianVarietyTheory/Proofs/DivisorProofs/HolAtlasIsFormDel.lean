@@ -1,14 +1,52 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.IsTypeIsRealConst
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ClosedFormsMulClosed
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.DelAtEqSumDOne
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.HolomorphicDelOperatorAtSumSmulLeibnizStatement
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.HolomorphicDifferentialOneFormCompHolomorphicStatement
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.DifferentiableAtReprPullbackHolomorphicFderivStatement
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.HolomorphicDelPullbackFderivFormEqZeroStatement
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.DelLocReprContDiffOnTargetStatement
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.DifferentiableAtReprPullbackHolomorphicFderivStatement
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.HolomorphicDelOperatorAtSumSmulLeibnizStatement
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.HolomorphicDelPullbackFderivFormEqZeroStatement
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.HolomorphicDifferentialOneFormCompHolomorphicStatement
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Calculus.ContDiff.WithLp
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import ReciprocityTheory.L2DbarEstimates.ChartDerivatives.HoloSmooth
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.DelAtEqSumDOne
 
 @[expose] public section
 
@@ -28,37 +66,27 @@ open GlobalTheory.CxForm
 
 variable {n : ℕ}
 
-theorem delAt_pull_comp
-    {φ : V n → V n} {v : V n} (hφ : ContDiffAt ℂ 2 φ v)
-    {β : V n → Alt n} (hβ : ∀ S, DifferentiableAt ℝ (fun u => (bas n).repr (β u) S) (φ v))
-    : delAt (fun w => pull (fderiv ℂ φ w) (β (φ w))) v = pull (fderiv ℂ φ v) (delAt β (φ v)) := by
+theorem delAt_pull_comp {φ : V n → V n} {v : V n} (hφ : ContDiffAt ℂ 2 φ v) {β : V n → Alt n}
+    (hβ : ∀ S, DifferentiableAt ℝ (fun u => (bas n).repr (β u) S) (φ v)) :
+    delAt (fun w => pull (fderiv ℂ φ w) (β (φ w))) v = pull (fderiv ℂ φ v) (delAt β (φ v)) := by
   have hφ1 : DifferentiableAt ℂ φ v := hφ.differentiableAt two_ne_zero
-  have e
-      : (fun w => pull (fderiv ℂ φ w) (β (φ w)))
-        = fun w => ∑ T, (bas n).repr (β (φ w)) T • pull (fderiv ℂ φ w) (bas n T) :=
-    funext fun w => by
-      conv_lhs => rw [← (bas n).sum_repr (β (φ w))]
-      set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_smul]
-  rw [e,
-    GlobalTheory.T.holomorphicDelOperatorAt_sum_smul_leibniz
-      (fun T w => (bas n).repr (β (φ w)) T)
-      (fun T w => pull (fderiv ℂ φ w) (bas n T))
-      (fun T => (hβ T).comp v (hφ1.restrictScalars ℝ))
-      (fun T S => GlobalTheory.T.differentiableAt_repr_pullback_holomorphic_fderiv hφ (bas n T) S)]
+  have e : (fun w => pull (fderiv ℂ φ w) (β (φ w))) =
+      fun w => ∑ T, (bas n).repr (β (φ w)) T • pull (fderiv ℂ φ w) (bas n T) := funext fun w => by
+    conv_lhs => rw [← (bas n).sum_repr (β (φ w))]
+
+    simp only [map_sum, map_smul]
+  rw [e, GlobalTheory.T.holomorphicDelOperatorAt_sum_smul_leibniz (fun T w => (bas n).repr (β (φ w)) T) (fun T w => pull (fderiv ℂ φ w) (bas n T))
+    (fun T => (hβ T).comp v (hφ1.restrictScalars ℝ)) (fun T S => GlobalTheory.T.differentiableAt_repr_pullback_holomorphic_fderiv hφ (bas n T) S)]
   simp only [GlobalTheory.T.holomorphicDel_pullback_fderiv_form_eq_zero hφ, smul_zero, add_zero]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [delAt_eq_sum_dOne β (φ v), map_sum]
+
+  rw [delAt_eq_sum_dOne β (φ v), map_sum]
   refine Finset.sum_congr rfl fun T _ => ?_
-  rw [map_mul,
-    GlobalTheory.T.holomorphicDifferentialOneForm_comp_holomorphic
-      (c := fun u => (bas n).repr (β u) T)
-      (hβ T) hφ1]
+  rw [map_mul, GlobalTheory.T.holomorphicDifferentialOneForm_comp_holomorphic (c := fun u => (bas n).repr (β u) T) (hβ T) hφ1]
 
 variable {M : Type} [TopologicalSpace M] {A : HolAtlas M n}
 
-theorem del_compat {α : A.Fld} (hα : A.IsForm α) (x x' : A.Pt) (h : x.pt = x'.pt)
-    : A.del α x = pull (fderiv ℂ (x'.ch ∘ x.ch.symm) x.crd) (A.del α x') := by
+theorem del_compat {α : A.Fld} (hα : A.IsForm α) (x x' : A.Pt) (h : x.pt = x'.pt) :
+    A.del α x = pull (fderiv ℂ (x'.ch ∘ x.ch.symm) x.crd) (A.del α x') := by
   set φ : V n → V n := x'.ch ∘ x.ch.symm with hφdef
   have hW : IsOpen (x.ch.target ∩ x.ch.symm ⁻¹' x'.ch.source) :=
     x.ch.isOpen_inter_preimage_symm x'.ch.open_source
@@ -66,10 +94,9 @@ theorem del_compat {α : A.Fld} (hα : A.IsForm α) (x x' : A.Pt) (h : x.pt = x'
     ⟨x.ch.map_source x.2, by simp only [mem_preimage, x.ch.left_inv x.2, h]; exact x'.2⟩
   have hφ : ContDiffAt ℂ 2 φ x.crd := by
     have hd : DifferentiableOn ℂ φ (x.ch.target ∩ x.ch.symm ⁻¹' x'.ch.source) := A.holo x.1.1 x'.1.1
-    have hs : ContDiffOn ℂ ∞ φ (x.ch.target ∩ x.ch.symm ⁻¹' x'.ch.source) :=
-      (contDiffOn_piLp 2).2 fun c =>
-        ReciprocityTheory.L2DbarEstimates.contDiffOn_of_differentiableOn n _ _ hW
-          ((EuclideanSpace.proj c : V n →L[ℂ] ℂ).differentiable.comp_differentiableOn hd)
+    have hs : ContDiffOn ℂ ∞ φ (x.ch.target ∩ x.ch.symm ⁻¹' x'.ch.source) := (contDiffOn_piLp 2).2 fun c =>
+      ReciprocityTheory.L2DbarEstimates.contDiffOn_of_differentiableOn n _ _ hW
+        ((EuclideanSpace.proj c : V n →L[ℂ] ℂ).differentiable.comp_differentiableOn hd)
     exact (hs.contDiffAt (hW.mem_nhds hv)).of_le (WithTop.coe_le_coe.2 le_top)
   have hφv : φ x.crd = x'.crd := by
     change x'.ch (x.ch.symm (x.ch x.pt)) = x'.ch x'.pt
@@ -86,12 +113,10 @@ theorem del_compat {α : A.Fld} (hα : A.IsForm α) (x x' : A.Pt) (h : x.pt = x'
     rw [hp, ← A.loc_crd α p']
     rfl
   show delAt (A.loc α x.1.1) x.crd = pull (fderiv ℂ φ x.crd) (delAt (A.loc α x'.1.1) x'.crd)
-  rw [delAt_congr hloc, delAt_pull_comp hφ (fun S => hφv ▸ FormMul.differentiableAt_coef hα x' S),
-    hφv]
+  rw [delAt_congr hloc, delAt_pull_comp hφ (fun S => hφv ▸ FormMul.differentiableAt_coef hα x' S), hφv]
 
-theorem isForm_del
-    : ∀ {M : Type} [TopologicalSpace M] {n : ℕ} (A : GlobalTheory.CxForm.HolAtlas M n) (α : A.Fld),
-      A.IsForm α → A.IsForm (A.del α) := fun A α hα =>
-  ⟨GlobalTheory.T.del_loc_repr_contDiffOn_target A α hα, fun x x' h => del_compat hα x x' h⟩
+theorem isForm_del : ∀ {M : Type} [TopologicalSpace M] {n : ℕ} (A : GlobalTheory.CxForm.HolAtlas M n) (α : A.Fld),
+    A.IsForm α → A.IsForm (A.del α) :=
+  fun A α hα => ⟨GlobalTheory.T.del_loc_repr_contDiffOn_target A α hα, fun x x' h => del_compat hα x x' h⟩
 
 end GlobalTheory.CxForm.DelForm

@@ -1,19 +1,82 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.JEvExists
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.CoefMapNormEquivariantBasisOfPre
+public import Formalism.SharpRestriction.Divisibility.GeneratorPowers.ThExprUniqOfChartIndep2
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.LevelMapExtension
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.IsHomogeneousOfRowDeg
+public import Development.AbelianVarietyTheory.Definitions.Divisors.ConstantUniqueOfEqProduct
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ActLevMemCuspA
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ConstRelIffTwistFactorAt
+import Development.AbelianVarietyTheory.Proofs.DivisorProofs.DictionaryComponentFrameMarkingUniformisation
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.GenReadsOfUnfBC
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.GramNegTransposeDiag
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsLatOfInt
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsSelfDualCHLat
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.LevAgreesOfIsLift
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.OscillatorModelValuesFifth
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.OscillatorModelValuesFirst
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.OscillatorModelValuesSecond
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.OscillatorModelValuesSixth
-public import Development.AbelianVarietyTheory.Definitions.Divisors.GenReads
-public import Formalism.SharpRestriction.Divisibility.GeneratorPowers.ThExprUniqOfChartIndep2
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.PureTensorOInjective
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.SmulMemLatGHat
+import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ThAHeisEntireLinearInjective
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.UnfoldingFrameDeltaChange
+import Development.AbelianVarietyTheory.Proofs.DivisorProofs.WeilRepLatticeStabilizerVacuumEqDetCharSmulStatement
+import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsCoversOfHalves
+import Development.AbelianVarietyTheory.Proofs.FoundationProofs.FinCongMemLevEnv
+public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.IntValuationEqOfMem
+import Development.AbelianVarietyTheory.Proofs.GenericRegularity.NumericalConsequencesOfPins
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.CoefMapNormEquivariantBasisOfPre
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsLevelAtEachIndex
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsLevelOfLinearMap
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ClsAt
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.OscillatorModelValuesFifth
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.DictionaryComponentFrameMarkingUniformisation
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.LevelFormCompatBaseEmbedding
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.LevelMapExtension
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.UnitCOfCXiAt
+import Development.AbelianVarietyTheory.Proofs.SiegelThetaTransformation.DualHalfLevelMarkingExistsAndMatch
+public import Development.AbelianVarietyTheory.Proofs.SiegelThetaTransformation.ExistsCuspIsThClsDUnique
+import Development.AbelianVarietyTheory.Proofs.TwistedOperators.LevelGroupActionEqZeroOfNoLift
+import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.CompletedLatticeEqAdelicCompletionAndGram
+import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.ExistsAlgebraMapOfSigRFixed
+import Formalism.LocalToGlobal.ProjectiveLattices.SpMapAlgHomId
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Etale.Weakly
+import Mathlib.RingTheory.Finiteness.ModuleFinitePresentation
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.TotallySplit
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Development.AbelianVarietyTheory.Proofs.SiegelThetaTransformation.ValuesAlgIffValuesUnitOfNe
 
 @[expose] public section
 
@@ -188,7 +251,6 @@ theorem om_lift_vac_ofPre
   unfold Formalism.L2.Theta.mt at h
   rwa [← Units.val_mul, ← map_mul, inv_mul_cancel, map_one, Units.val_one, Matrix.one_mul] at h
 
-set_option maxHeartbeats 1000000 in
 theorem equivAt_of_ccIs_ofPre
     : Formalism.MainNotions.ModuliIntegralCharts.H1.ChartIndepSt2
       → ∀ (D : D7) (G : Type) [Group G] [Fintype G] (Pl0 T0 : Type)
@@ -298,7 +360,6 @@ open Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH
   Formalism.IndefR.FWT Formalism.L2.Pj
 open scoped TensorProduct Classical ComplexConjugate
 
-set_option maxHeartbeats 1600000 in
 theorem GlobalTheory.ClassSumRule.exists_cusp_isThClsD_ofPre
     : Formalism.MainNotions.ModuliIntegralCharts.H1.ChartIndepSt2
       → ∀ (D : D7) (G : Type) [Group G] [Fintype G] (Pl0 T0 : Type)
@@ -386,7 +447,6 @@ open scoped TensorProduct Classical ComplexConjugate
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 namespace GlobalTheory.AdTh
 
-set_option maxHeartbeats 1000000 in
 theorem oneMapRow_of_serOf_ofPre
     : ∀ (D : D7) (G : Type) [Group G] [Fintype G] (Pl0 T0 : Type)
         (A : Formalism.L2.DIV.FamIn D.what₂.LL G Pl0 T0 D.R.m) (T : CoreJ D)
@@ -610,7 +670,6 @@ variable
   {v₀ : ∀ (i : Fin D.R.m) (σ : D.what₂.LL →+* ℂ), (R.MW i σ).Vec} {i : Fin D.R.m} {Tp : Type}
   {tup : Tp → T0}
 
-set_option maxHeartbeats 2000000 in
 theorem ad_value_ofPre
     (hC : GlobalTheory.RealGeo.PreChar R) (hT : TieIn T R κ v₀)
     (O : OMDat T.toCore R i Tp tup)
@@ -719,7 +778,6 @@ theorem ad_value_ofPre
   simp only [cmpConst, map_mul, map_inv₀, map_natCast]
   ring
 
-set_option maxHeartbeats 2000000 in
 theorem exact_identity_ofPre
     (hC : GlobalTheory.RealGeo.PreChar R) (hT : TieIn T R κ v₀)
     (O : OMDat T.toCore R i Tp tup)

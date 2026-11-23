@@ -1,34 +1,63 @@
 module
 
-public import Mathlib
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ExistsUMOfMem
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.MemTwKerIffAverage
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.UnipotentTopMemParabolicStatement
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.LeviBlockMemParabolicStatement
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ParabolicUnipotentLeviDecompStatement
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.MulVecMidBlockDecompStatement
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ContinuousLeviUnipotentProjStatement
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.SmoothIntegralLinearChangeStatement
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.IwasawaDecompParabolicMaximalCompactStatement
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.SumOverCompactCosetsJacquetKernelStatement
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ExistsInducedSectionSupportedOpenStatement
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.FibreFunctionLocallyConstantCompactStatement
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.IsCompactCosetSet
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.EqZeroOfEigOfMemTwKer
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.SmoothTopRepresentationStatement
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.SmoothFibreActionStatement
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ExistsLatticePeriodicityStatement
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.LocallyConstantCosetIndicatorSumStatement
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.IntegralCosetIndicatorSumStatement
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.HaarMeasureCosetNeZeroStatement
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.CosetFunctionTranslateJacquetKernelStatement
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.CosetFunctionJacquetKernelStatement
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ClosureKernelMemJacquetKernelStatement
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.FiniteJacquetKernelCommonLatticeStatement
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.JacquetKernelLatticeConjCompactStatement
+public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ContinuousLeviUnipotentProjStatement
+public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.CosetFunctionJacquetKernelStatement
+public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.CosetFunctionTranslateJacquetKernelStatement
+public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ExistsLatticePeriodicityStatement
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.FibreFunctionUnipotentActionStatement
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.FiniteFibreFunctionsCompactStatement
+public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.FiniteJacquetKernelCommonLatticeStatement
+public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.HaarMeasureCosetNeZeroStatement
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.InducedVanishingOnCompactStatement
+public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.IntegralCosetIndicatorSumStatement
+import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.IsSmoothSmInd
+public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.JacquetKernelLatticeConjCompactStatement
+public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.LocallyConstantCosetIndicatorSumStatement
+public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.MemTwKerIffAverage
+public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.SmoothFibreActionStatement
+public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.SmoothTopRepresentationStatement
+public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.SumOverCompactCosetsJacquetKernelStatement
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -122,8 +151,8 @@ theorem exists_sum_eq_zero_abs
   refine ⟨T.image Subtype.val, hTn.image _, ?_⟩
   rw [Finset.sum_image (fun a _ b _ h => Subtype.ext h)]
   refine hinj _ fun κ hκ => ?_
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+
+  rw [map_sum]
   have hsmooth : IsSmooth (MonoidHom.comp ρ (mulH κ)) := fun v =>
     (hρ v).preimage (continuous_mulH κ)
   have key :=
@@ -208,7 +237,6 @@ end
 
 end GlobalTheory.CompanionTheory.BZPsiPG.FibKer
 
-set_option maxHeartbeats 1000000 in
 theorem GlobalTheory.CompanionTheory.BZPsiPG.FibKer.mem_twKer_of_fibInt_eq_zero
     : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
         (i t : ℕ) {V W : Type} [AddCommGroup V] [Module ℂ V] [AddCommGroup W] [Module ℂ W]

@@ -1,7 +1,50 @@
 module
 
-public import ReciprocityTheory.GroupCohomology.CupConnRightStatement
 public import ReciprocityTheory.GroupCohomology.HomogExistsStatement
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -27,8 +70,8 @@ theorem Hom.H_congr (φ ψ : Hom A B) (h : ∀ n x, φ.f n x = ψ.f n x) (n : �
   congr 1
   exact Subtype.ext (h n z)
 
-theorem Hom.H_comp (φ : Hom A B) (ψ : Hom B C) (n : ℕ) (y : A.H n)
-    : (ψ.comp φ).H n y = ψ.H n (φ.H n y) := by
+theorem Hom.H_comp (φ : Hom A B) (ψ : Hom B C) (n : ℕ) (y : A.H n) :
+    (ψ.comp φ).H n y = ψ.H n (φ.H n y) := by
   refine Submodule.Quotient.induction_on _ y fun z => ?_
   rfl
 
@@ -36,8 +79,8 @@ theorem Hom.H_id (n : ℕ) (y : A.H n) : (Hom.id A).H n y = y := by
   refine Submodule.Quotient.induction_on _ y fun z => ?_
   rfl
 
-theorem Hom.H_nsmul (φ : Hom A A) (k : ℕ) (n : ℕ) (h : ∀ x, φ.f n x = k • x) (y : A.H n)
-    : φ.H n y = k • y := by
+theorem Hom.H_nsmul (φ : Hom A A) (k : ℕ) (n : ℕ) (h : ∀ x, φ.f n x = k • x) (y : A.H n) :
+    φ.H n y = k • y := by
   refine Submodule.Quotient.induction_on _ y fun z => ?_
   show Submodule.Quotient.mk (φ.Z n z) = k • Submodule.Quotient.mk z
   rw [← Submodule.Quotient.mk_smul]
@@ -50,8 +93,8 @@ section Retr
 
 variable {G : Type u} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] (U : Subgroup G)
 
-theorem mkR_eq {a b : G}
-    : Quotient.mk (QuotientGroup.rightRel U) a = Quotient.mk _ b ↔ b * a⁻¹ ∈ U := by
+theorem mkR_eq {a b : G} :
+    Quotient.mk (QuotientGroup.rightRel U) a = Quotient.mk _ b ↔ b * a⁻¹ ∈ U := by
   rw [Quotient.eq, QuotientGroup.rightRel_apply]
 
 theorem rep_mul (x : U) (g : G) : rep U ((x : G) * g) = rep U g := by
@@ -89,20 +132,17 @@ theorem continuous_retr (hU : IsOpen (U : Set G)) : Continuous (retr U) :=
 instance finite_rightRel [U.FiniteIndex] : Finite (Quotient (QuotientGroup.rightRel U)) :=
   Finite.of_equiv _ (QuotientGroup.quotientRightRelEquivQuotientLeftRel U).symm
 
-theorem card_rightRel [U.FiniteIndex] [Fintype (Quotient (QuotientGroup.rightRel U))]
-    : Fintype.card (Quotient (QuotientGroup.rightRel U)) = U.index := by
+theorem card_rightRel [U.FiniteIndex] [Fintype (Quotient (QuotientGroup.rightRel U))] :
+    Fintype.card (Quotient (QuotientGroup.rightRel U)) = U.index := by
   rw [Subgroup.index, ← Nat.card_eq_fintype_card]
   exact Nat.card_congr (QuotientGroup.quotientRightRelEquivQuotientLeftRel U)
 
-def cosetMul (g : G) (c : Quotient (QuotientGroup.rightRel U))
-    : Quotient (QuotientGroup.rightRel U) :=
+def cosetMul (g : G) (c : Quotient (QuotientGroup.rightRel U)) : Quotient (QuotientGroup.rightRel U) :=
   Quotient.mk _ (c.out * g)
 
 theorem cosetMul_bij (g : G) : Bijective (cosetMul U g) := by
-  have key
-      : ∀ y : G,
-        Quotient.mk (QuotientGroup.rightRel U) ((Quotient.mk (QuotientGroup.rightRel U) y).out * g)
-          = Quotient.mk _ (y * g) := by
+  have key : ∀ y : G, Quotient.mk (QuotientGroup.rightRel U)
+      ((Quotient.mk (QuotientGroup.rightRel U) y).out * g) = Quotient.mk _ (y * g) := by
     intro y
     rw [mkR_eq]
     have h1 : (Quotient.mk (QuotientGroup.rightRel U) y).out = rep U y := rfl
@@ -121,8 +161,8 @@ theorem cosetMul_bij (g : G) : Bijective (cosetMul U g) := by
     unfold cosetMul
     rw [key, mul_assoc, inv_mul_cancel, mul_one, Quotient.out_eq]
 
-theorem out_mul (g : G) (c : Quotient (QuotientGroup.rightRel U))
-    : c.out * g = (retr U (c.out * g) : G) * (cosetMul U g c).out := by
+theorem out_mul (g : G) (c : Quotient (QuotientGroup.rightRel U)) :
+    c.out * g = (retr U (c.out * g) : G) * (cosetMul U g c).out := by
   show c.out * g = (c.out * g) * (rep U (c.out * g))⁻¹ * (Quotient.mk _ (c.out * g)).out
   unfold rep
   group
@@ -131,50 +171,40 @@ end Retr
 
 section Norm
 
-variable
-  {R : Type u} [CommRing R]
-  {G : Type u} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
-  (M : TRep R G)
-  (U : Subgroup G) [U.FiniteIndex]
+variable {R : Type u} [CommRing R] {G : Type u} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
+  (M : TRep R G) (U : Subgroup G) [U.FiniteIndex]
 
 def normF (n : ℕ) (F : (Fin (n + 1) → G) → M.V) (x : Fin (n + 1) → G) : M.V :=
   ∑ᶠ c : Quotient (QuotientGroup.rightRel U), M.rho c.out⁻¹ (F fun i => c.out * x i)
 
-theorem normF_eq
-    [Fintype (Quotient (QuotientGroup.rightRel U))]
-    (n : ℕ) (F : (Fin (n + 1) → G) → M.V) (x : Fin (n + 1) → G)
-    : normF M U n F x
-      = ∑ c : Quotient (QuotientGroup.rightRel U), M.rho c.out⁻¹ (F fun i => c.out * x i) := by
+theorem normF_eq [Fintype (Quotient (QuotientGroup.rightRel U))] (n : ℕ) (F : (Fin (n + 1) → G) → M.V)
+    (x : Fin (n + 1) → G) :
+    normF M U n F x = ∑ c : Quotient (QuotientGroup.rightRel U), M.rho c.out⁻¹ (F fun i => c.out * x i) := by
   unfold normF
   exact finsum_eq_sum_of_fintype _
 
 theorem continuous_rho (s : G) : Continuous (M.rho s) :=
   M.cont.comp (continuous_const.prodMk continuous_id)
 
-theorem normF_mem (n : ℕ) (F : (Fin (n + 1) → G) → M.V) (hF : F ∈ hcoch (M.resSub U) G n)
-    : normF M U n F ∈ hcoch M G n := by
+theorem normF_mem (n : ℕ) (F : (Fin (n + 1) → G) → M.V) (hF : F ∈ hcoch (M.resSub U) G n) :
+    normF M U n F ∈ hcoch M G n := by
   classical
   haveI : Fintype (Quotient (QuotientGroup.rightRel U)) := Fintype.ofFinite _
   refine ⟨?_, fun g x => ?_⟩
-  · have : normF M U n F
-        = fun x =>
-          ∑ c : Quotient (QuotientGroup.rightRel U),
-            M.rho c.out⁻¹ (F fun i => c.out * x i) :=
-      funext (normF_eq M U n F)
+  · have : normF M U n F = fun x => ∑ c : Quotient (QuotientGroup.rightRel U),
+        M.rho c.out⁻¹ (F fun i => c.out * x i) := funext (normF_eq M U n F)
     rw [this]
     refine continuous_finsetSum _ fun c _ => (continuous_rho M _).comp (hF.1.comp ?_)
     exact continuous_pi fun i => continuous_const.mul (continuous_apply i)
-  set_option synthInstance.maxHeartbeats 100000 in
+
   · rw [normF_eq, normF_eq, map_sum]
-    have key
-        : ∀ c : Quotient (QuotientGroup.rightRel U),
-          M.rho c.out⁻¹ (F fun i => c.out * (g • x i))
-            = M.rho g (M.rho (cosetMul U g c).out⁻¹ (F fun i => (cosetMul U g c).out * x i)) := by
+    have key : ∀ c : Quotient (QuotientGroup.rightRel U),
+        M.rho c.out⁻¹ (F fun i => c.out * (g • x i)) =
+        M.rho g (M.rho (cosetMul U g c).out⁻¹ (F fun i => (cosetMul U g c).out * x i)) := by
       intro c
       have e := out_mul U g c
-      have h1
-          : (fun i => c.out * (g • x i))
-            = fun i => retr U (c.out * g) • ((cosetMul U g c).out * x i) := by
+      have h1 : (fun i => c.out * (g • x i)) =
+          fun i => retr U (c.out * g) • ((cosetMul U g c).out * x i) := by
         funext i
         show c.out * (g * x i) = (retr U (c.out * g) : G) * ((cosetMul U g c).out * x i)
         rw [← mul_assoc, ← mul_assoc, ← e]
@@ -188,24 +218,24 @@ theorem normF_mem (n : ℕ) (F : (Fin (n + 1) → G) → M.V) (hF : F ∈ hcoch 
     simp only [key]
     exact Fintype.sum_bijective _ (cosetMul_bij U g) _ _ fun _ => rfl
 
-theorem normF_hd (n : ℕ) (F : (Fin (n + 1) → G) → M.V)
-    : normF M U (n + 1) (hd n F) = hd n (normF M U n F) := by
+theorem normF_hd (n : ℕ) (F : (Fin (n + 1) → G) → M.V) :
+    normF M U (n + 1) (hd n F) = hd n (normF M U n F) := by
   classical
   haveI : Fintype (Quotient (QuotientGroup.rightRel U)) := Fintype.ofFinite _
   funext x
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [normF_eq, hd, map_sum, map_zsmul, Finset.smul_sum]
+
+  simp only [normF_eq, hd, map_sum, map_zsmul, Finset.smul_sum]
   exact Finset.sum_comm
 
-theorem normF_add (n : ℕ) (F F' : (Fin (n + 1) → G) → M.V)
-    : normF M U n (F + F') = normF M U n F + normF M U n F' := by
+theorem normF_add (n : ℕ) (F F' : (Fin (n + 1) → G) → M.V) :
+    normF M U n (F + F') = normF M U n F + normF M U n F' := by
   classical
   haveI : Fintype (Quotient (QuotientGroup.rightRel U)) := Fintype.ofFinite _
   funext x
   simp only [Pi.add_apply, normF_eq, map_add (f := _), Finset.sum_add_distrib]
 
-theorem normF_smul (n : ℕ) (r : R) (F : (Fin (n + 1) → G) → M.V)
-    : normF M U n (r • F) = r • normF M U n F := by
+theorem normF_smul (n : ℕ) (r : R) (F : (Fin (n + 1) → G) → M.V) :
+    normF M U n (r • F) = r • normF M U n F := by
   classical
   haveI : Fintype (Quotient (QuotientGroup.rightRel U)) := Fintype.ofFinite _
   funext x
@@ -226,10 +256,8 @@ def normL (n : ℕ) : hcoch (M.resSub U) G n →ₗ[R] hcoch M G n where
 
 variable {M U}
 
-def normCx
-    (A : Cx R) (eA : ∀ n, A.X n ≃ₗ[R] hcoch (M.resSub U) G n) (hA : IsHomog (M.resSub U) G A eA)
-    (eG : ∀ n, M.coch.X n ≃ₗ[R] hcoch M G n) (hG : IsHomog M G M.coch eG)
-    : Hom A M.coch where
+def normCx (A : Cx R) (eA : ∀ n, A.X n ≃ₗ[R] hcoch (M.resSub U) G n) (hA : IsHomog (M.resSub U) G A eA)
+    (eG : ∀ n, M.coch.X n ≃ₗ[R] hcoch M G n) (hG : IsHomog M G M.coch eG) : Hom A M.coch where
   f n := ((eG n).symm.toLinearMap.comp (normL M U n)).comp (eA n).toLinearMap
   comm n F := by
     apply (eG (n + 1)).injective
@@ -237,14 +265,11 @@ def normCx
     rw [hG]
     simp only [LinearMap.comp_apply, LinearEquiv.coe_coe, LinearEquiv.apply_symm_apply]
     show normF M U (n + 1) (eA (n + 1) (A.d n F)).1 = hd n (normF M U n (eA n F).1)
-    rw [hA]
-    exact normF_hd M U n _
+    rw [hA]; exact normF_hd M U n _
 
-theorem normCx_spec
-    (A : Cx R) (eA : ∀ n, A.X n ≃ₗ[R] hcoch (M.resSub U) G n) (hA : IsHomog (M.resSub U) G A eA)
-    (eG : ∀ n, M.coch.X n ≃ₗ[R] hcoch M G n) (hG : IsHomog M G M.coch eG)
-    (n : ℕ) (F : A.X n)
-    : (eG n ((normCx A eA hA eG hG).f n F)).1 = normF M U n (eA n F).1 := by
+theorem normCx_spec (A : Cx R) (eA : ∀ n, A.X n ≃ₗ[R] hcoch (M.resSub U) G n)
+    (hA : IsHomog (M.resSub U) G A eA) (eG : ∀ n, M.coch.X n ≃ₗ[R] hcoch M G n) (hG : IsHomog M G M.coch eG)
+    (n : ℕ) (F : A.X n) : (eG n ((normCx A eA hA eG hG).f n F)).1 = normF M U n (eA n F).1 := by
   show (eG n ((eG n).symm (normL M U n (eA n F)))).1 = _
   rw [LinearEquiv.apply_symm_apply]
   rfl
@@ -253,9 +278,7 @@ end Norm
 
 section Incl
 
-variable
-  {R : Type u} [CommRing R]
-  {G : Type u} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
+variable {R : Type u} [CommRing R] {G : Type u} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
   {M : TRep R G} {U : Subgroup G}
 
 def inclL (n : ℕ) : hcoch M G n →ₗ[R] hcoch (M.resSub U) G n where
@@ -263,10 +286,8 @@ def inclL (n : ℕ) : hcoch M G n →ₗ[R] hcoch (M.resSub U) G n where
   map_add' _ _ := rfl
   map_smul' _ _ := rfl
 
-def inclCx
-    (A : Cx R) (eA : ∀ n, A.X n ≃ₗ[R] hcoch (M.resSub U) G n) (hA : IsHomog (M.resSub U) G A eA)
-    (eG : ∀ n, M.coch.X n ≃ₗ[R] hcoch M G n) (hG : IsHomog M G M.coch eG)
-    : Hom M.coch A where
+def inclCx (A : Cx R) (eA : ∀ n, A.X n ≃ₗ[R] hcoch (M.resSub U) G n) (hA : IsHomog (M.resSub U) G A eA)
+    (eG : ∀ n, M.coch.X n ≃ₗ[R] hcoch M G n) (hG : IsHomog M G M.coch eG) : Hom M.coch A where
   f n := ((eA n).symm.toLinearMap.comp (inclL n)).comp (eG n).toLinearMap
   comm n F := by
     apply (eA (n + 1)).injective
@@ -274,14 +295,11 @@ def inclCx
     rw [hA]
     simp only [LinearMap.comp_apply, LinearEquiv.coe_coe, LinearEquiv.apply_symm_apply]
     show (eG (n + 1) (M.coch.d n F)).1 = _
-    rw [hG]
-    rfl
+    rw [hG]; rfl
 
-theorem inclCx_spec
-    (A : Cx R) (eA : ∀ n, A.X n ≃ₗ[R] hcoch (M.resSub U) G n) (hA : IsHomog (M.resSub U) G A eA)
-    (eG : ∀ n, M.coch.X n ≃ₗ[R] hcoch M G n) (hG : IsHomog M G M.coch eG)
-    (n : ℕ) (F : M.coch.X n)
-    : (eA n ((inclCx A eA hA eG hG).f n F)).1 = (eG n F).1 := by
+theorem inclCx_spec (A : Cx R) (eA : ∀ n, A.X n ≃ₗ[R] hcoch (M.resSub U) G n)
+    (hA : IsHomog (M.resSub U) G A eA) (eG : ∀ n, M.coch.X n ≃ₗ[R] hcoch M G n) (hG : IsHomog M G M.coch eG)
+    (n : ℕ) (F : M.coch.X n) : (eA n ((inclCx A eA hA eG hG).f n F)).1 = (eG n F).1 := by
   show (eA n ((eA n).symm (inclL n (eG n F)))).1 = _
   rw [LinearEquiv.apply_symm_apply]
   rfl
@@ -290,8 +308,7 @@ end Incl
 
 section Conj
 
-variable
-  {R : Type u} [CommRing R] {G : Type u} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
+variable {R : Type u} [CommRing R] {G : Type u} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
 
 end Conj
 end

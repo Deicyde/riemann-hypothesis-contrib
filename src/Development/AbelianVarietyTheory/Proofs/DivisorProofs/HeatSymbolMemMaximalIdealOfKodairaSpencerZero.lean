@@ -1,17 +1,51 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Definitions.Divisors.HasDefect
-public import Development.AbelianVarietyTheory.Definitions.Divisors.HasRigidChart
-public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.ToroidalCompactificationBis
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.KodairaSpencerChangeOfTangentFrame
-public import Development.AbelianVarietyTheory.Proofs.ThetaShiftProofs.ExistsUniqueIsPointOfDualNumber
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.KodairaSpencerOfCommutingHeatOperatorsRaynaudStatement
+public import Development.AbelianVarietyTheory.Definitions.Divisors.IsProperToroidalModelStructureMap
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsTanAtGTv
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsBasisOfIntFrame
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.UniformisedTangentBasisOfRaynaudBasisStatement
-public import Development.AbelianVarietyTheory.Proofs.RingsOfIntegers.MvPowerSeriesSubstConstTermsLocalAlgHomSpec
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.KodairaSpencerChangeOfTangentFrame
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.KodairaSpencerMatrixUniqueOverChartAbelianLocusStatement
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.KodairaSpencerOfCommutingHeatOperatorsRaynaudStatement
+import Development.AbelianVarietyTheory.Proofs.DivisorProofs.UniformisedTangentBasisOfRaynaudBasisStatement
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsBasisOfIntFrame
+public import Development.AbelianVarietyTheory.Proofs.RingsOfIntegers.MvPowerSeriesSubstConstTermsLocalAlgHomSpec
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.MvPowerSeries.Equiv
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.IsBlockMetricDiagForm
+import Development.AbelianVarietyTheory.Definitions.Divisors.HasRigidChart
 
 @[expose] public section
 
@@ -124,7 +158,6 @@ theorem exists_basis_isKS_symbol
     exact GlobalTheory.T.kodairaSpencer_of_commuting_heat_operators_raynaud E H (ChartRing k m d) t
       P m (bdParam k m d) gam hmon hne hab Y n vY dd hdd v' hv' D' h hb hdef
 
-set_option maxHeartbeats 1600000 in
 theorem symbol_mem_maximalIdeal
     : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (k : Type) [Field k]
         [CharZero k] (m d : ℕ) (t : SAB H (Sp (ChartRing k m d)))
@@ -189,11 +222,11 @@ theorem symbol_mem_maximalIdeal
   have e :=
     congrArg (fun M => (Scheme.ΓSpecIso (CommRingCat.of (ChartRing k m d))).hom.hom (M a b)) heq
   simp only [Matrix.map_apply, Iso.inv_hom_id_apply] at e
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [← e, Matrix.mul_apply, map_sum]
+
+  rw [← e, Matrix.mul_apply, map_sum]
   refine Ideal.sum_mem _ fun c _ => ?_
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_mul, Matrix.mul_apply, map_sum, Finset.sum_mul]
+
+  rw [map_mul, Matrix.mul_apply, map_sum, Finset.sum_mul]
   refine Ideal.sum_mem _ fun e' _ => ?_
   rw [map_mul]
   exact Ideal.mul_mem_right _ _ (Ideal.mul_mem_left _ _ (hm e' c))

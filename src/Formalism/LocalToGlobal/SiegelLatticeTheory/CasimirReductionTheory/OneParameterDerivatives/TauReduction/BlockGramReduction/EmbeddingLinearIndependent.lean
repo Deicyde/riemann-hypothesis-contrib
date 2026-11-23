@@ -1,6 +1,52 @@
 module
 
-public import Formalism.LocalToGlobal.SiegelLatticeTheory.CasimirReductionTheory.OneParameterDerivatives.TauReduction.LatticeVectorsBoundedBelow
+public import Formalism.SharpRestriction.CuspSpanNormBounds.GlobAut
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+public import Mathlib.Analysis.Matrix.Order
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
+import Formalism.LocalToGlobal.SiegelLatticeTheory.CasimirReductionTheory.OneParameterDerivatives.TauReduction.Imports
 
 @[expose] public section
 
@@ -15,8 +61,8 @@ namespace Formalism.L2.SG.Pf.Tau
 
 open Size Formalism.MainNotions.S
 
-theorem complex_embedding_cases (I : AutInst) (σ : I.E →+* ℂ)
-    : ∃ v, σ = I.φ v ∨ σ = (starRingEnd ℂ).comp (I.φ v) := by
+theorem complex_embedding_cases (I : AutInst) (σ : I.E →+* ℂ) :
+    ∃ v, σ = I.φ v ∨ σ = (starRingEnd ℂ).comp (I.φ v) := by
   classical
   haveI := I.cm.totReal
   let ψ : I.F →+* ℂ := σ.comp (algebraMap I.F I.E)
@@ -65,9 +111,9 @@ theorem complex_embedding_cases (I : AutInst) (σ : I.E →+* ℂ)
     rw [map_add (f := _), map_add (f := _), map_add (f := _)] at h
     linear_combination h - ha'
 
-theorem embedding_linear_independent (I : AutInst)
-    : LinearIndependent ℝ (fun i : Free.ChooseBasisIndex ℤ (𝓞 I.E) => fun v : InfinitePlace I.F =>
-      I.φ v (integralBasis I.E i)) := by
+theorem embedding_linear_independent (I : AutInst) :
+    LinearIndependent ℝ (fun i : Free.ChooseBasisIndex ℤ (𝓞 I.E) =>
+      fun v : InfinitePlace I.F => I.φ v (integralBasis I.E i)) := by
   classical
   rw [Fintype.linearIndependent_iff]
   intro g hg
@@ -88,19 +134,17 @@ theorem embedding_linear_independent (I : AutInst)
       rw [hv]
       exact this
     · have := congrArg (starRingEnd ℂ) (congrFun hg v)
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [Finset.sum_apply, Pi.smul_apply, Pi.zero_apply, Complex.real_smul, map_sum,
-            map_mul, Complex.conj_ofReal, map_zero]
-          at this
+
+      simp only [Finset.sum_apply, Pi.smul_apply, Pi.zero_apply, Complex.real_smul, map_sum, map_mul,
+      Complex.conj_ofReal, map_zero] at this
       rw [hv]
       simp only [RingHom.coe_comp, Function.comp_apply]
       exact this
-  have hvec
-      : (fun i => (g i : ℂ)) ᵥ* Algebra.embeddingsMatrixReindex ℚ ℂ (integralBasis I.E) e = 0 := by
+  have hvec : (fun i => (g i : ℂ)) ᵥ* Algebra.embeddingsMatrixReindex ℚ ℂ (integralBasis I.E) e = 0 := by
     funext j
     simp only [Matrix.vecMul, dotProduct, Algebra.embeddingsMatrixReindex, Algebra.embeddingsMatrix,
-      Matrix.reindex_apply, Matrix.submatrix_apply, Equiv.refl_symm, Equiv.refl_apply,
-      Equiv.symm_symm, Matrix.of_apply, Pi.zero_apply]
+      Matrix.reindex_apply, Matrix.submatrix_apply, Equiv.refl_symm, Equiv.refl_apply, Equiv.symm_symm,
+      Matrix.of_apply, Pi.zero_apply]
     exact hall (e j).toRingHom
   have h0 := Matrix.eq_zero_of_vecMul_eq_zero hdet hvec
   intro i
@@ -116,8 +160,7 @@ theorem card_infinite_places (I : AutInst) : Fintype.card (InfinitePlace I.F) = 
     NumberField.IsTotallyReal.nrComplexPlaces_eq_zero, add_zero, h]
   rfl
 
-theorem card_integral_basis (I : AutInst)
-    : Fintype.card (Free.ChooseBasisIndex ℤ (𝓞 I.E)) = 2 * I.f := by
+theorem card_integral_basis (I : AutInst) : Fintype.card (Free.ChooseBasisIndex ℤ (𝓞 I.E)) = 2 * I.f := by
   rw [← Module.finrank_eq_card_chooseBasisIndex, NumberField.RingOfIntegers.rank,
     ← Module.finrank_mul_finrank ℚ I.F I.E, I.cm.deg2]
   show Module.finrank ℚ I.F * 2 = 2 * Module.finrank ℚ I.F
@@ -128,25 +171,24 @@ theorem finrank_places_complex (I : AutInst) : finrank ℝ (InfinitePlace I.F �
     card_infinite_places, smul_eq_mul]
   ring
 
-def embeddingBasis (I : AutInst)
-    : Basis (Free.ChooseBasisIndex ℤ (𝓞 I.E)) ℝ (InfinitePlace I.F → ℂ) :=
+def embeddingBasis (I : AutInst) : Basis (Free.ChooseBasisIndex ℤ (𝓞 I.E)) ℝ (InfinitePlace I.F → ℂ) :=
   basisOfLinearIndependentOfCardEqFinrank (embedding_linear_independent I)
     (by rw [card_integral_basis, finrank_places_complex])
 
-theorem embeddingBasis_apply (I : AutInst) (i : Free.ChooseBasisIndex ℤ (𝓞 I.E))
-    : embeddingBasis I i = fun v => I.φ v (integralBasis I.E i) := by
+theorem embeddingBasis_apply (I : AutInst) (i : Free.ChooseBasisIndex ℤ (𝓞 I.E)) :
+    embeddingBasis I i = fun v => I.φ v (integralBasis I.E i) := by
   unfold embeddingBasis
   rw [coe_basisOfLinearIndependentOfCardEqFinrank]
 
-def complexToEuclidean {ι : Type} [Fintype ι] [DecidableEq ι] {d : ℕ} (e : Fin 2 × ι ≃ Fin d)
-    : (ι → ℂ) ≃ₗ[ℝ] EuclideanSpace ℝ (Fin d) :=
+def complexToEuclidean {ι : Type} [Fintype ι] [DecidableEq ι] {d : ℕ} (e : Fin 2 × ι ≃ Fin d) :
+    (ι → ℂ) ≃ₗ[ℝ] EuclideanSpace ℝ (Fin d) :=
   ((Complex.basisOneI.smulTower (Pi.basisFun ℂ ι)).reindex e).equivFun.trans
     (EuclideanSpace.equiv (Fin d) ℝ).toLinearEquiv.symm
 
+
 open scoped MatrixOrder in
-theorem gram_factor_invertible
-    {n j : ℕ} (C : Matrix (Fin n) (Fin j) ℂ) (hC : Function.Injective C.mulVec)
-    : ∃ R : Matrix (Fin j) (Fin j) ℂ, Cᴴ * C = Rᴴ * R ∧ R.det ≠ 0 := by
+theorem gram_factor_invertible {n j : ℕ} (C : Matrix (Fin n) (Fin j) ℂ) (hC : Function.Injective C.mulVec) :
+    ∃ R : Matrix (Fin j) (Fin j) ℂ, Cᴴ * C = Rᴴ * R ∧ R.det ≠ 0 := by
   have hpd : (Cᴴ * C).PosDef := Matrix.PosDef.conjTranspose_mul_self C hC
   have h0 : 0 ≤ Cᴴ * C := Matrix.nonneg_iff_posSemidef.mpr hpd.posSemidef
   refine ⟨CFC.sqrt (Cᴴ * C), ?_, ?_⟩
@@ -159,13 +201,11 @@ theorem gram_factor_invertible
     rw [← CFC.sqrt_mul_sqrt_self _ h0, Matrix.det_mul, hdet, zero_mul] at hd
     exact hd rfl
 
-theorem norm_sq_eq_of_gram_eq
-    {n j : ℕ} (C : Matrix (Fin n) (Fin j) ℂ) (R : Matrix (Fin j) (Fin j) ℂ) (h : Cᴴ * C = Rᴴ * R)
-    (z : Fin j → ℂ)
-    : ∑ i, ‖(C *ᵥ z) i‖ ^ 2 = ∑ k, ‖(R *ᵥ z) k‖ ^ 2 := by
-  have key
-      : ∀ {m : Type} [Fintype m] (M : Matrix m (Fin j) ℂ),
-        ((∑ i, ‖(M *ᵥ z) i‖ ^ 2 : ℝ) : ℂ) = star z ⬝ᵥ ((Mᴴ * M) *ᵥ z) := by
+theorem norm_sq_eq_of_gram_eq {n j : ℕ} (C : Matrix (Fin n) (Fin j) ℂ) (R : Matrix (Fin j) (Fin j) ℂ)
+    (h : Cᴴ * C = Rᴴ * R) (z : Fin j → ℂ) :
+    ∑ i, ‖(C *ᵥ z) i‖ ^ 2 = ∑ k, ‖(R *ᵥ z) k‖ ^ 2 := by
+  have key : ∀ {m : Type} [Fintype m] (M : Matrix m (Fin j) ℂ),
+      ((∑ i, ‖(M *ᵥ z) i‖ ^ 2 : ℝ) : ℂ) = star z ⬝ᵥ ((Mᴴ * M) *ᵥ z) := by
     intro m _ M
     rw [← Matrix.mulVec_mulVec, Matrix.dotProduct_mulVec, ← Matrix.star_mulVec]
     simp only [dotProduct, Pi.star_apply, Complex.ofReal_sum, Complex.ofReal_pow]

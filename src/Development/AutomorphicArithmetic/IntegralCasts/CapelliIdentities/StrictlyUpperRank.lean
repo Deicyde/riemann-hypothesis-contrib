@@ -1,49 +1,65 @@
 module
 
-public import Mathlib
+public import Mathlib.Analysis.RCLike.Basic
+public import Mathlib.Data.Matrix.Mul
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
-noncomputable def UpperTheory.Reformulated.B.StrictlyUpperRank.IsStrictUpper.{u_1, u_2}
-    : {𝕜 : Type u_1} → [RCLike 𝕜] → {n : Type u_2} → [LinearOrder n] → Matrix n n 𝕜 → Prop :=
-  fun {𝕜 : Type u_1} [inst : RCLike 𝕜] {n : Type u_2} [inst_1 : LinearOrder n] (X : Matrix n n 𝕜) ↦
-    ∀ (i j : n),
-      @LE.le n
-          (@Preorder.toLE n
-            (@PartialOrder.toPreorder n
-              (@SemilatticeInf.toPartialOrder n
-                (@Lattice.toSemilatticeInf n
-                  (@DistribLattice.toLattice n (@instDistribLatticeOfLinearOrder n inst_1))))))
-          j i
-        → @Eq 𝕜 (X i j)
-          (@OfNat.ofNat 𝕜 (nat_lit 0)
-            (@Zero.toOfNat0 𝕜
-              (@MulZeroClass.toZero 𝕜
-                (@instMulZeroClassOfSemiring 𝕜
-                  (@DivisionSemiring.toSemiring 𝕜
-                    (@Semifield.toDivisionSemiring 𝕜
-                      (@Field.toSemifield 𝕜
-                        (@NormedField.toField 𝕜
-                          (@DenselyNormedField.toNormedField 𝕜
-                            (@RCLike.toDenselyNormedField 𝕜 inst))))))))))
+noncomputable def UpperTheory.Reformulated.B.StrictlyUpperRank.IsStrictUpper.{u_1, u_2} :
+    {𝕜 : Type u_1} → [RCLike 𝕜] → {n : Type u_2} → [LinearOrder n] → Matrix n n 𝕜 → Prop :=
+  fun {𝕜} [RCLike 𝕜] {n} [LinearOrder n] X ↦
+    ∀ (i j : n), j ≤ i → X i j = 0
 
-noncomputable def UpperTheory.Reformulated.B.StrictlyUpperRank.rankBelow.{u_2}
-    : {n : Type u_2} → [Fintype n] → [LinearOrder n] → n
-      → Nat := fun {n : Type u_2} [Fintype n] [inst_1 : LinearOrder n] (i : n) ↦
-  @Finset.card n
-    {x : n |
-      @LT.lt n
-        (@Preorder.toLT n
-          (@PartialOrder.toPreorder n
-            (@SemilatticeInf.toPartialOrder n
-              (@Lattice.toSemilatticeInf n (@DistribLattice.toLattice n (@instDistribLatticeOfLinearOrder n inst_1))))))
-        x i}
+noncomputable def UpperTheory.Reformulated.B.StrictlyUpperRank.rankBelow.{u_2} :
+    {n : Type u_2} → [Fintype n] → [LinearOrder n] → n → ℕ :=
+  fun {n} [Fintype n] [LinearOrder n] i ↦
+    ({x : n | x < i} : Finset n).card
 
-theorem UpperTheory.Reformulated.B.StrictlyUpperRank.rank_add_le_of_pow_ne_zero.{u_1, u_2}
-    : ∀ {𝕜 : Type u_1} [inst : RCLike 𝕜] {n : Type u_2} [inst_1 : Fintype n]
-        [inst_2 : LinearOrder n] {X : Matrix n n 𝕜},
-      @UpperTheory.Reformulated.B.StrictlyUpperRank.IsStrictUpper 𝕜 inst n inst_2 X
-        → ∀ (k : Nat) (i j : n),
+theorem UpperTheory.Reformulated.B.StrictlyUpperRank.rank_add_le_of_pow_ne_zero.{u_1, u_2} :
+    ∀ {𝕜 : Type u_1} [inst : RCLike 𝕜] {n : Type u_2} [inst_1 : Fintype n] [inst_2 : LinearOrder n] {X : Matrix n n 𝕜},
+      @UpperTheory.Reformulated.B.StrictlyUpperRank.IsStrictUpper 𝕜 inst n inst_2 X →
+        ∀ (k : Nat) (i j : n),
           @Ne 𝕜
               (@HPow.hPow (Matrix n n 𝕜) Nat (Matrix n n 𝕜)
                 (@instHPow (Matrix n n 𝕜) Nat
@@ -55,8 +71,7 @@ theorem UpperTheory.Reformulated.B.StrictlyUpperRank.rank_add_le_of_pow_ne_zero.
                             (@Semifield.toDivisionSemiring 𝕜
                               (@Field.toSemifield 𝕜
                                 (@NormedField.toField 𝕜
-                                  (@DenselyNormedField.toNormedField 𝕜
-                                    (@RCLike.toDenselyNormedField 𝕜 inst))))))
+                                  (@DenselyNormedField.toNormedField 𝕜 (@RCLike.toDenselyNormedField 𝕜 inst))))))
                           inst_1 fun (a b : n) ↦ @LinearOrder.toDecidableEq n inst_2 a b)))))
                 X k i j)
               (@OfNat.ofNat 𝕜 (nat_lit 0)
@@ -67,11 +82,9 @@ theorem UpperTheory.Reformulated.B.StrictlyUpperRank.rank_add_le_of_pow_ne_zero.
                         (@Semifield.toDivisionSemiring 𝕜
                           (@Field.toSemifield 𝕜
                             (@NormedField.toField 𝕜
-                              (@DenselyNormedField.toNormedField 𝕜
-                                (@RCLike.toDenselyNormedField 𝕜 inst))))))))))
-            → @LE.le Nat instLENat
-              (@HAdd.hAdd Nat Nat Nat (@instHAdd Nat instAddNat)
-                (@UpperTheory.Reformulated.B.StrictlyUpperRank.rankBelow n inst_1 inst_2 i) k)
+                              (@DenselyNormedField.toNormedField 𝕜 (@RCLike.toDenselyNormedField 𝕜 inst)))))))))) →
+            @LE.le Nat instLENat
+              (@HAdd.hAdd Nat Nat Nat (@instHAdd Nat instAddNat) (@UpperTheory.Reformulated.B.StrictlyUpperRank.rankBelow n inst_1 inst_2 i) k)
               (@UpperTheory.Reformulated.B.StrictlyUpperRank.rankBelow n inst_1 inst_2 j) := by
   intro 𝕜 _ n _ _ X hX k
   induction k with
@@ -90,9 +103,7 @@ theorem UpperTheory.Reformulated.B.StrictlyUpperRank.rank_add_le_of_pow_ne_zero.
     have hlj : l < j := by
       by_contra hle
       exact right_ne_zero_of_mul hl (hX l j (not_lt.mp hle))
-    have h2
-        : UpperTheory.Reformulated.B.StrictlyUpperRank.rankBelow l
-          < UpperTheory.Reformulated.B.StrictlyUpperRank.rankBelow j := by
+    have h2 : UpperTheory.Reformulated.B.StrictlyUpperRank.rankBelow l < UpperTheory.Reformulated.B.StrictlyUpperRank.rankBelow j := by
       unfold UpperTheory.Reformulated.B.StrictlyUpperRank.rankBelow
       apply Finset.card_lt_card
       refine ⟨fun x hx => ?_, fun hsub => ?_⟩

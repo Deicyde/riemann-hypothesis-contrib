@@ -1,21 +1,61 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.Definitions.SemilocalFrames.AtBase
+public import Development.AbelianVarietyTheory.Definitions.SemilocalFrames.GgNone
 public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.BasisOfIsCompl
-public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.SpanToLePerp
-public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.MemPerpSpan
-public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.HermitianDoubleCosetTermBasicFacts
-public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.NotField
-public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.SpanToZero
-public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.HermitianFrameCoordinatesTransportInnerLattices
 public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.FramePairCoordinatesTransportInnerLattices
-public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.TermOverFrameCoordinates
+public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.HermitianDoubleCosetTermBasicFacts
+public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.HermitianFrameCoordinatesTransportInnerLattices
+import Development.AbelianVarietyTheory.Proofs.FlagMeasures.MemPerpSpan
+public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.NotField
+public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.SpanToLePerp
+import Development.AbelianVarietyTheory.Proofs.FlagMeasures.SpanToZero
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
+import Development.AbelianVarietyTheory.Definitions.SemilocalFrames.AtBase
+import Formalism.SharpRestriction.CuspSpanNormBounds.Point
 
 @[expose] public section
 
-open ValuativeRel Formalism.MainNotions.S Formalism.MainNotions.S.Loc Formalism.MainNotions.S.LocNG
-  GlobalTheory.LocOver
+open ValuativeRel Formalism.MainNotions.S Formalism.MainNotions.S.Loc Formalism.MainNotions.S.LocNG GlobalTheory.LocOver
 open scoped Classical Pointwise
 
 noncomputable section
@@ -28,17 +68,14 @@ section Mat
 
 variable {E : Type} [CommRing E] {m : ℕ}
 
-theorem minor_tri
-    (A B Z : Matrix (Fin m) (Fin m) E) (hA : ∀ i j, i < j → A i j = 0) (hA1 : ∀ i, A i i = 1)
-    (hB : ∀ i j, j < i → B i j = 0) (hB1 : ∀ i, B i i = 1)
-    {l : ℕ} (hl : l ≤ m)
-    : ((A * Z * B).submatrix (Fin.castLE hl) (Fin.castLE hl)).det
-      = (Z.submatrix (Fin.castLE hl) (Fin.castLE hl)).det := by
+theorem minor_tri (A B Z : Matrix (Fin m) (Fin m) E) (hA : ∀ i j, i < j → A i j = 0) (hA1 : ∀ i, A i i = 1)
+    (hB : ∀ i j, j < i → B i j = 0) (hB1 : ∀ i, B i i = 1) {l : ℕ} (hl : l ≤ m) :
+    ((A * Z * B).submatrix (Fin.castLE hl) (Fin.castLE hl)).det =
+      (Z.submatrix (Fin.castLE hl) (Fin.castLE hl)).det := by
   set e := Fin.castLE hl with he
-  have hsub
-      : ∀ (X Y : Matrix (Fin m) (Fin m) E),
-        (∀ (i j : Fin l) (p : Fin m), l ≤ (p : ℕ) → X (e i) p * Y p (e j) = 0)
-          → (X * Y).submatrix e e = X.submatrix e e * Y.submatrix e e := by
+  have hsub : ∀ (X Y : Matrix (Fin m) (Fin m) E),
+      (∀ (i j : Fin l) (p : Fin m), l ≤ (p : ℕ) → X (e i) p * Y p (e j) = 0) →
+      (X * Y).submatrix e e = X.submatrix e e * Y.submatrix e e := by
     intro X Y hXY
     ext i j
     simp only [Matrix.submatrix_apply, Matrix.mul_apply]
@@ -56,8 +93,8 @@ theorem minor_tri
       (fun i j hij => hA _ _ (by exact OrderDual.toDual_lt_toDual.1 hij))]
     simp [hA1]
   have hdB : (B.submatrix e e).det = 1 := by
-    rw [Matrix.det_of_upperTriangular (show (B.submatrix e e).BlockTriangular id from fun i j hij =>
-      hB _ _ (by exact hij))]
+    rw [Matrix.det_of_upperTriangular
+      (show (B.submatrix e e).BlockTriangular id from fun i j hij => hB _ _ (by exact hij))]
     simp [hB1]
   rw [hsub (A * Z) B (fun i j p hp => by
       rw [hB p (e j) (Fin.lt_iff_val_lt_val.2 (lt_of_lt_of_le j.2 hp)), mul_zero]),
@@ -75,8 +112,8 @@ theorem cj_mem {x : E} (hx : x ∈ M.L.O) : M.L.cj x ∈ M.L.O := by
   rw [M.L.O_def] at hx ⊢
   exact hx.map M.L.cj
 
-theorem h_sum_left {ι : Type} (s : Finset ι) (u : ι → V) (y : V)
-    : H.h (∑ i ∈ s, u i) y = ∑ i ∈ s, H.h (u i) y := by
+theorem h_sum_left {ι : Type} (s : Finset ι) (u : ι → V) (y : V) :
+    H.h (∑ i ∈ s, u i) y = ∑ i ∈ s, H.h (u i) y := by
   classical
   refine Finset.induction_on s ?_ ?_
   · rw [Finset.sum_empty]
@@ -84,17 +121,16 @@ theorem h_sum_left {ι : Type} (s : Finset ι) (u : ι → V) (y : V)
   · intro a s ha ih
     rw [Finset.sum_insert ha, Finset.sum_insert ha, H.h_add_left, ih]
 
-theorem h_right_sum {ι : Type} [Fintype ι] (a : ι → E) (u : ι → V) (x : V)
-    : H.h x (∑ i, a i • u i) = ∑ i, M.L.cj (a i) * H.h x (u i) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [H.h_herm, h_sum_left, map_sum]
+theorem h_right_sum {ι : Type} [Fintype ι] (a : ι → E) (u : ι → V) (x : V) :
+    H.h x (∑ i, a i • u i) = ∑ i, M.L.cj (a i) * H.h x (u i) := by
+
+  rw [H.h_herm, h_sum_left, map_sum]
   refine Finset.sum_congr rfl fun i _ => ?_
   rw [H.h_smul_left, map_mul, ← H.h_herm]
 
-theorem zhat_change
-    (f f' g g' : Fin (r + 1) → V) (s s' : Matrix (Fin (r + 1)) (Fin (r + 1)) E)
-    (hg : ∀ j, g j = ∑ i, s i j • f i) (hg' : ∀ j, g' j = ∑ i, s' i j • f' i)
-    : H.Zhat g g' = (Matrix.of fun a c => M.L.cj (s c a)) * H.Zhat f f' * s' := by
+theorem zhat_change (f f' g g' : Fin (r + 1) → V) (s s' : Matrix (Fin (r + 1)) (Fin (r + 1)) E)
+    (hg : ∀ j, g j = ∑ i, s i j • f i) (hg' : ∀ j, g' j = ∑ i, s' i j • f' i) :
+    H.Zhat g g' = (Matrix.of fun a c => M.L.cj (s c a)) * H.Zhat f f' * s' := by
   ext a b
   simp only [HermSp.Zhat, Matrix.mul_apply, Matrix.of_apply, hg, hg']
   rw [h_sum_left]
@@ -102,22 +138,18 @@ theorem zhat_change
   refine Finset.sum_congr rfl fun j _ => Finset.sum_congr rfl fun i _ => ?_
   ring
 
-theorem dl_change
-    (f f' g g' : Fin (r + 1) → V) (s s' : Matrix (Fin (r + 1)) (Fin (r + 1)) E)
+theorem dl_change (f f' g g' : Fin (r + 1) → V) (s s' : Matrix (Fin (r + 1)) (Fin (r + 1)) E)
     (h0 : ∀ i j, j < i → s i j = 0) (h1 : ∀ i, s i i = 1) (h0' : ∀ i j, j < i → s' i j = 0)
-    (h1' : ∀ i, s' i i = 1) (hg : ∀ j, g j = ∑ i, s i j • f i)
-    (hg' : ∀ j, g' j = ∑ i, s' i j • f' i)
-    (l : ℕ)
-    : H.Dl g g' l = H.Dl f f' l := by
+    (h1' : ∀ i, s' i i = 1) (hg : ∀ j, g j = ∑ i, s i j • f i) (hg' : ∀ j, g' j = ∑ i, s' i j • f' i)
+    (l : ℕ) : H.Dl g g' l = H.Dl f f' l := by
   unfold HermSp.Dl
   split_ifs with hl
   · rw [zhat_change f f' g g' s s' hg hg']
     exact minor_tri _ _ _ (fun i j hij => by simp [h0 j i hij]) (fun i => by simp [h1]) h0' h1' hl
   · rfl
 
-private theorem e_mem_lat_iff
-    {P : FPair H r} {S : Frames M.L r k} (c : Coord P S) (Λ : Submodule M.L.O V) (v : V)
-    : c.e v ∈ c.lat Λ ↔ v ∈ Λ := by
+private theorem e_mem_lat_iff {P : FPair H r} {S : Frames M.L r k} (c : Coord P S) (Λ : Submodule M.L.O V) (v : V) :
+    c.e v ∈ c.lat Λ ↔ v ∈ Λ := by
   constructor
   · intro h
     obtain ⟨w, hw, hwv⟩ := Submodule.mem_map.1 h
@@ -129,13 +161,13 @@ section Coordinates
 
 variable {P : FPair H r} {S : Frames M.L r k} (c : Coord P S)
 
+
 include c in
 theorem selfDual_of (Λ : Submodule M.L.O V) (h : IsSD M.L S.Hm (c.lat Λ)) : H.IsSelfDual Λ := by
   obtain ⟨⟨hfg, hsp⟩, hd⟩ := h
   have hmem : ∀ v, c.e v ∈ c.lat Λ ↔ v ∈ Λ := e_mem_lat_iff c Λ
   refine ⟨?_, ?_, ?_⟩
-  · exact Submodule.fg_of_fg_map_injective ((c.e : V →ₗ[E] S.V).restrictScalars M.L.O) c.e.injective
-      hfg
+  · exact Submodule.fg_of_fg_map_injective ((c.e : V →ₗ[E] S.V).restrictScalars M.L.O) c.e.injective hfg
   · apply Submodule.map_injective_of_injective (f := (c.e : V →ₗ[E] S.V)) c.e.injective
     rw [Submodule.map_top, LinearEquiv.range, ← Submodule.span_image]
     exact hsp
@@ -155,9 +187,8 @@ theorem selfDual_of (Λ : Submodule M.L.O V) (h : IsSD M.L S.Hm (c.lat Λ)) : H.
       rw [h2, H.h_herm]
       exact cj_mem (hx y hy)
 
-private theorem e_mem_inn_iff_exists_mkW_mem
-    (c : Coord P S) (f : Fin (r + 1) → V) (L : Submodule M.L.O (H.Wb f)) (v : V)
-    : c.e v ∈ c.inn f L ↔ ∃ hv : v ∈ H.perp (H.X f), H.mkW f ⟨v, hv⟩ ∈ L := by
+private theorem e_mem_inn_iff_exists_mkW_mem (c : Coord P S) (f : Fin (r + 1) → V) (L : Submodule M.L.O (H.Wb f)) (v : V) :
+    c.e v ∈ c.inn f L ↔ ∃ hv : v ∈ H.perp (H.X f), H.mkW f ⟨v, hv⟩ ∈ L := by
   rw [Coord.inn, e_mem_lat_iff]
   constructor
   · intro h
@@ -166,21 +197,16 @@ private theorem e_mem_inn_iff_exists_mkW_mem
   · rintro ⟨hv, hL⟩
     exact Submodule.mem_map.2 ⟨⟨v, hv⟩, hL, rfl⟩
 
-theorem lset_of
-    (f : Fin (r + 1) → V) (g : Fin (r + 1) → S.V)
-    (gs : Fin r → S.V)
+theorem lset_of (f : Fin (r + 1) → V) (g : Fin (r + 1) → S.V) (gs : Fin r → S.V)
     (hX : ∀ x, x ∈ H.X f ↔ c.e x ∈ S.spanTo g r)
     (hp : ∀ x, x ∈ H.perp (H.X f) ↔ c.e x ∈ perp M.L S.Hm (S.spanTo g r))
-    (L : Submodule M.L.O (H.Wb f)) (Λ : Submodule M.L.O V) (n : V ≃ₗ[E] V)
-    (hn : c.grp n ∈ S.Nof g) (e : c.lat Λ = c.grp n • S.stdLat g gs (c.inn f L))
-    (h3 : ∀ x,
-      x ∈ c.inn f L
-        ↔ ∃ y ∈ S.stdLat g gs (c.inn f L), y ∈ perp M.L S.Hm (S.spanTo g r) ∧ y - x ∈ S.spanTo g r)
-    : (L : Set (H.Wb f)) = H.Lset Λ f := by
-  have key
-      : ∀ x : V,
-        c.e x ∈ c.inn f L
-          ↔ ∃ y ∈ c.lat Λ, y ∈ perp M.L S.Hm (S.spanTo g r) ∧ y - c.e x ∈ S.spanTo g r := by
+    (L : Submodule M.L.O (H.Wb f)) (Λ : Submodule M.L.O V) (n : V ≃ₗ[E] V) (hn : c.grp n ∈ S.Nof g)
+    (e : c.lat Λ = c.grp n • S.stdLat g gs (c.inn f L))
+    (h3 : ∀ x, x ∈ c.inn f L ↔ ∃ y ∈ S.stdLat g gs (c.inn f L),
+      y ∈ perp M.L S.Hm (S.spanTo g r) ∧ y - x ∈ S.spanTo g r) :
+    (L : Set (H.Wb f)) = H.Lset Λ f := by
+  have key : ∀ x : V, c.e x ∈ c.inn f L ↔
+      ∃ y ∈ c.lat Λ, y ∈ perp M.L S.Hm (S.spanTo g r) ∧ y - c.e x ∈ S.spanTo g r := by
     intro x
     rw [h3, e]
     exact TermBasic.inner_smul S hn (c.e x)
@@ -201,38 +227,33 @@ theorem lset_of
     obtain ⟨_, hL⟩ := (e_mem_inn_iff_exists_mkW_mem c f L x).1 hx
     exact hL
 
-private theorem mem_isomG_of_mem_Nof_frames
-    {S : Frames M.L r k} (g : Fin (r + 1) → S.V) {m : S.GLV} (hm : m ∈ S.Nof g)
-    : m ∈ isomG M.L S.Hm := by
+private theorem mem_isomG_of_mem_Nof_frames {S : Frames M.L r k} (g : Fin (r + 1) → S.V) {m : S.GLV} (hm : m ∈ S.Nof g) :
+    m ∈ isomG M.L S.Hm := by
   simp only [Frames.Nof, Subgroup.mem_inf] at hm
   exact hm.1.1
 
-theorem isom_of (g : Fin (r + 1) → S.V) {n : V ≃ₗ[E] V} (hn : c.grp n ∈ S.Nof g) (x y : V)
-    : H.h (n x) (n y) = H.h x y := by
+theorem isom_of (g : Fin (r + 1) → S.V) {n : V ≃ₗ[E] V} (hn : c.grp n ∈ S.Nof g) (x y : V) :
+    H.h (n x) (n y) = H.h x y := by
   have hI : c.grp n ∈ isomG M.L S.Hm := mem_isomG_of_mem_Nof_frames g hn
-  have h1 :=
-    (show ∀ a b, hf M.L S.Hm (c.grp n a) (c.grp n b) = hf M.L S.Hm a b from hI) (c.e x) (c.e y)
+  have h1 := (show ∀ a b, hf M.L S.Hm (c.grp n a) (c.grp n b) = hf M.L S.Hm a b from hI) (c.e x) (c.e y)
   rw [CoordUnip.grp_apply, CoordUnip.grp_apply] at h1
   have h2 : hf M.L S.Hm (c.e (n x)) (c.e (n y)) = H.h (n x) (n y) := c.h_eq (n x) (n y)
   have h3 : hf M.L S.Hm (c.e x) (c.e y) = H.h x y := c.h_eq x y
   rw [← h2, ← h3]
   exact h1
 
-theorem frame_of
-    (Fr : FrameD H r) (g : Fin (r + 1) → S.V) (hgf : ∀ a, g a = c.e (Fr.f a))
+theorem frame_of (Fr : FrameD H r) (g : Fin (r + 1) → S.V) (hgf : ∀ a, g a = c.e (Fr.f a))
     (hg : ∀ a (j : Fin r), hf M.L S.Hm (g a) (g j.castSucc) = 0) (hli : LinearIndependent E g)
-    (n : V ≃ₗ[E] V) (hn : c.grp n ∈ S.Nof g)
-    (Λ : Submodule M.L.O V)
-    (htr : ∀ x,
-      (x ∈ c.lat Λ ∧ x ∈ S.spanTo g (r + 1))
-        ↔ x ∈ Submodule.span M.L.O ((fun b => c.grp n (g b)) '' {i | (i : ℕ) < r + 1}))
-    (hT : Fr.T ∈ 𝒪[F]) (hT0 : Fr.T ≠ 0)
-    : H.IsFrame Λ r (fun b => n (Fr.f b)) Fr.T := by
+    (n : V ≃ₗ[E] V) (hn : c.grp n ∈ S.Nof g) (Λ : Submodule M.L.O V)
+    (htr : ∀ x, (x ∈ c.lat Λ ∧ x ∈ S.spanTo g (r + 1)) ↔
+      x ∈ Submodule.span M.L.O ((fun b => c.grp n (g b)) '' {i | (i : ℕ) < r + 1}))
+    (hT : Fr.T ∈ 𝒪[F]) (hT0 : Fr.T ≠ 0) : H.IsFrame Λ r (fun b => n (Fr.f b)) Fr.T := by
   have hfr : ∀ b, c.grp n (g b) = c.e (n (Fr.f b)) := fun b => by rw [hgf, CoordUnip.grp_apply]
   unfold HermSp.IsFrame HermSp.Prim
   refine ⟨⟨?_, ?_, ?_⟩, ?_, ?_, hT, hT0⟩
   · intro a
-    have ha : c.e (n (Fr.f a)) ∈ c.lat Λ := ((htr _).2 (Submodule.subset_span ⟨a, a.2, hfr a⟩)).1
+    have ha : c.e (n (Fr.f a)) ∈ c.lat Λ :=
+      ((htr _).2 (Submodule.subset_span ⟨a, a.2, hfr a⟩)).1
     exact (e_mem_lat_iff c Λ _).1 ha
   · have hli' : LinearIndependent E Fr.f := by
       have h1 : LinearIndependent E ((c.e : V →ₗ[E] S.V) ∘ Fr.f) := by
@@ -250,8 +271,8 @@ theorem frame_of
       rw [← hfr b]
       exact (TermBasic.map_mem_iff hg hn (r + 1) (g b)).2 (TermBasic.self_mem S g b.2)
     have h2 := (htr (c.e x)).1 ⟨(e_mem_lat_iff c Λ x).2 hx, hxS⟩
-    have h3 :=
-      Submodule.apply_mem_span_image_of_mem_span ((c.e.symm : S.V →ₗ[E] V).restrictScalars M.L.O) h2
+    have h3 := Submodule.apply_mem_span_image_of_mem_span
+      ((c.e.symm : S.V →ₗ[E] V).restrictScalars M.L.O) h2
     have h4 : ((c.e.symm : S.V →ₗ[E] V).restrictScalars M.L.O) (c.e x) = x := c.e.symm_apply_apply x
     rw [h4] at h3
     refine Submodule.span_mono ?_ h3
@@ -265,21 +286,20 @@ theorem frame_of
     rw [isom_of c g hn]
     exact Fr.h_zz
 
+
 include c in
-theorem change_of
-    (Fr : FrameD H r) (g : Fin (r + 1) → S.V) (hgf : ∀ a, g a = c.e (Fr.f a))
+theorem change_of (Fr : FrameD H r) (g : Fin (r + 1) → S.V) (hgf : ∀ a, g a = c.e (Fr.f a))
     (n : V ≃ₗ[E] V) (s : Matrix (Fin (r + 1)) (Fin (r + 1)) E)
-    (hs : ∀ j, c.grp n (g j) = ∑ i, s i j • g i)
-    (j : Fin (r + 1))
-    : n (Fr.f j) = ∑ i, s i j • Fr.f i := by
+    (hs : ∀ j, c.grp n (g j) = ∑ i, s i j • g i) (j : Fin (r + 1)) :
+    n (Fr.f j) = ∑ i, s i j • Fr.f i := by
   apply c.e.injective
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [← CoordUnip.grp_apply c n (Fr.f j), ← hgf j, hs j, map_sum]
+
+  rw [← CoordUnip.grp_apply c n (Fr.f j), ← hgf j, hs j, map_sum]
   refine Finset.sum_congr rfl fun i _ => ?_
   rw [map_smul, hgf i]
 
-private theorem lat_img_eq_grp_smul_lat (c : Coord P S) (m : V ≃ₗ[E] V) (Λ : Submodule M.L.O V)
-    : c.lat (img m Λ) = c.grp m • c.lat Λ := by
+private theorem lat_img_eq_grp_smul_lat (c : Coord P S) (m : V ≃ₗ[E] V) (Λ : Submodule M.L.O V) :
+    c.lat (img m Λ) = c.grp m • c.lat Λ := by
   ext x
   rw [TermBasic.mem_smul]
   constructor
@@ -292,11 +312,10 @@ private theorem lat_img_eq_grp_smul_lat (c : Coord P S) (m : V ≃ₗ[E] V) (Λ 
     refine Submodule.mem_map.2 ⟨m z, Submodule.mem_map.2 ⟨z, hz, rfl⟩, ?_⟩
     exact (CoordUnip.grp_apply c m z).symm
 
-theorem term_over
-    (hM : M.OK) (c : Coord P S) (hP : P.RelG (theta M))
-    (d : Datum P) (t : Term V M r) (ht : IsTermOver P d t)
-    : H.IsTerm t ∧ (d.L : Set (H.Wb P.A.f)) = H.Lset t.abelian₂ P.A.f
-      ∧ (d.L' : Set (H.Wb P.B.f)) = H.Lset t.abelian₂ P.B.f := by
+theorem term_over (hM : M.OK) (c : Coord P S) (hP : P.RelG (theta M)) (d : Datum P) (t : Term V M r)
+    (ht : IsTermOver P d t) :
+    H.IsTerm t ∧ (d.L : Set (H.Wb P.A.f)) = H.Lset t.abelian₂ P.A.f ∧
+      (d.L' : Set (H.Wb P.B.f)) = H.Lset t.abelian₂ P.B.f := by
   haveI := hM.loc
   haveI := hM.char0
   unfold LocNG.FPair.RelG at hP
@@ -327,28 +346,22 @@ theorem term_over
     exact if_neg fun h => (Fin.castSucc_lt_last j).ne h.2
   have hfrA : H.IsFrame t.abelian₂ r t.f t.T := by
     rw [hfA, hT]
-    exact frame_of c P.A S.f c.f_eq hgA (by simpa using hli.comp Sum.inl Sum.inl_injective) n hnS
-      t.abelian₂
-      (fun x => by rw [hlatA]; exact TermBasic.trace_smul hgA hnS (spA.2.1 (r + 1) le_rfl) x)
-      hTA hA0
+    exact frame_of c P.A S.f c.f_eq hgA (by simpa using hli.comp Sum.inl Sum.inl_injective) n hnS t.abelian₂
+      (fun x => by rw [hlatA]; exact TermBasic.trace_smul hgA hnS (spA.2.1 (r + 1) le_rfl) x) hTA hA0
   have hfrB : H.IsFrame t.abelian₂ r t.f' t.T' := by
     rw [hfB, hT']
-    exact frame_of c P.B S.f' c.f'_eq hgB (by simpa using hli.comp Sum.inr Sum.inr_injective) n'
-      hnS' t.abelian₂
-      (fun x => by rw [hlatB]; exact TermBasic.trace_smul hgB hnS' (spB.2.1 (r + 1) le_rfl) x)
-      hTB hB0
+    exact frame_of c P.B S.f' c.f'_eq hgB (by simpa using hli.comp Sum.inr Sum.inr_injective) n' hnS' t.abelian₂
+      (fun x => by rw [hlatB]; exact TermBasic.trace_smul hgB hnS' (spB.2.1 (r + 1) le_rfl) x) hTB hB0
   obtain ⟨s, ⟨hs0, hs1⟩, hs⟩ := FrameOnto.exists_matrix S S.f S.T S.gram (c.grp n) hnS
   obtain ⟨s', ⟨hs0', hs1'⟩, hs'⟩ := FrameOnto.exists_matrix S S.f' S.T' S.gram' (c.grp n') hnS'
   have hDl : ∀ l, H.Dl t.f t.f' l = H.Dl P.A.f P.B.f l := fun l =>
     dl_change P.A.f P.B.f t.f t.f' s s' hs0 hs1 hs0' hs1'
       (fun j => by rw [hfA]; exact change_of c P.A S.f c.f_eq n s hs j)
-      (fun j => by rw [hfB]; exact change_of c P.B S.f' c.f'_eq n' s' hs' j)
-      l
+      (fun j => by rw [hfB]; exact change_of c P.B S.f' c.f'_eq n' s' hs' j) l
   refine ⟨?_, ?_, ?_⟩
   · unfold HermSp.IsTerm
     refine ⟨?_, hfrA, hfrB, ?_, ?_, ?_⟩
-    · exact selfDual_of c t.abelian₂
-        (by rw [hlatA]; exact TermBasic.isSD_smul S (mem_isomG_of_mem_Nof_frames S.f hnS) spA.1)
+    · exact selfDual_of c t.abelian₂ (by rw [hlatA]; exact TermBasic.isSD_smul S (mem_isomG_of_mem_Nof_frames S.f hnS) spA.1)
     · rw [hDl]
       exact hD
     · rw [show H.Gdet t.f t.f' t.T t.T' = H.Gdet P.A.f P.B.f P.A.T P.B.T by
@@ -361,33 +374,12 @@ theorem term_over
         exact hu
       · rw [hT, hT']
         exact hc
-  · exact lset_of c P.A.f S.f S.es tr.2.2.2.2.2.1 tr.2.2.2.2.2.2.2.1 d.L t.abelian₂ n hnS hlatA
-      spA.2.2
-  · exact lset_of c P.B.f S.f' S.es' tr.2.2.2.2.2.2.1 tr.2.2.2.2.2.2.2.2 d.L' t.abelian₂ n' hnS'
-      hlatB spB.2.2
+  · exact lset_of c P.A.f S.f S.es tr.2.2.2.2.2.1 tr.2.2.2.2.2.2.2.1 d.L t.abelian₂ n hnS hlatA spA.2.2
+  · exact lset_of c P.B.f S.f' S.es' tr.2.2.2.2.2.2.1 tr.2.2.2.2.2.2.2.2 d.L' t.abelian₂ n' hnS' hlatB spB.2.2
 
 end Coordinates
 
-theorem datum_of_lattice
-    : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] {E : Type} [CommRing E]
-        [Algebra F E] [TopologicalSpace E] [MeasurableSpace E] (M : Model F E),
-      M.OK
-        → ∀ {V : Type} [AddCommGroup V] [Module E V] (H : HermSp M V) (r : ℕ),
-          ∀ (k : ℕ) (P : FPair H r),
-            Module.finrank E V = k + 2 * r + 1 → P.RelG (theta M)
-              → (∀ (d : Datum P) (t : Term V M r),
-                  IsTermOver P d t
-                    → H.IsTerm t ∧ (d.L : Set (H.Wb P.A.f)) = H.Lset t.abelian₂ P.A.f
-                      ∧ (d.L' : Set (H.Wb P.B.f)) = H.Lset t.abelian₂ P.B.f)
-                ∧ ∀ (d d' : Datum P) (t t' : Term V M r),
-                  IsTermOver P d t → IsTermOver P d' t'
-                    → H.Lset t.abelian₂ P.A.f = H.Lset t'.abelian₂ P.A.f
-                    → H.Lset t.abelian₂ P.B.f = H.Lset t'.abelian₂ P.B.f
-                    → (∀ g,
-                      M.split = some g
-                        → H.iotaGraph g ⟨t.abelian₂, P.A.f, P.B.f, t.T, t.T'⟩
-                          = H.iotaGraph g ⟨t'.abelian₂, P.A.f, P.B.f, t'.T, t'.T'⟩)
-                    → d = d' := by
+theorem datum_of_lattice : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] [MeasurableSpace E] (M : Model F E), M.OK → ∀ {V : Type} [AddCommGroup V] [Module E V] (H : HermSp M V) (r : ℕ), ∀ (k : ℕ) (P : FPair H r), Module.finrank E V = k + 2 * r + 1 → P.RelG (theta M) → (∀ (d : Datum P) (t : Term V M r), IsTermOver P d t → H.IsTerm t ∧ (d.L : Set (H.Wb P.A.f)) = H.Lset t.abelian₂ P.A.f ∧ (d.L' : Set (H.Wb P.B.f)) = H.Lset t.abelian₂ P.B.f) ∧ ∀ (d d' : Datum P) (t t' : Term V M r), IsTermOver P d t → IsTermOver P d' t' → H.Lset t.abelian₂ P.A.f = H.Lset t'.abelian₂ P.A.f → H.Lset t.abelian₂ P.B.f = H.Lset t'.abelian₂ P.B.f → (∀ g, M.split = some g → H.iotaGraph g ⟨t.abelian₂, P.A.f, P.B.f, t.T, t.T'⟩ = H.iotaGraph g ⟨t'.abelian₂, P.A.f, P.B.f, t'.T, t'.T'⟩) → d = d' := by
   intro F _ _ _ E _ _ _ _ M hM V _ _ H r k P hdim hP
   obtain ⟨S, ⟨c⟩⟩ := CoordExist.exists_coord M hM H r k P hdim hP
   refine ⟨fun d t ht => term_over hM c hP d t ht, ?_⟩

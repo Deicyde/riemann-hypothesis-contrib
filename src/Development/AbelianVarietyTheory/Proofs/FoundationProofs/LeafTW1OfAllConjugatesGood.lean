@@ -1,15 +1,55 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Definitions.Foundations.ThetaSeriesTies
 public import Development.AbelianVarietyTheory.BlockTheory.NonGaloisCusps.PlaceBelowAllPowers
+public import Formalism.SharpRestriction.LevelLetterCocycles.TwGood
+public import Development.AbelianVarietyTheory.BlockTheory.TorsionBlocks.ToricLatticeDenominators
+public import Development.AbelianVarietyTheory.Definitions.QuasicoherentCohomology.LengthCommensurableMapIffOfInjective
+public import Development.AbelianVarietyTheory.Proofs.CoherentCohomologyProofs.LengthBaseChangeQuotientOfMapMaximalIdeal
+public import Development.AbelianVarietyTheory.Proofs.CoherentCohomologyProofs.LengthCommensurableIffOfLeOfLe
 public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.GoodPartMemBasisSeries
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.LenRBaseChangeSubquotient
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.LengthCommensurableOfIsLatIn
 public import Formalism.LocalToGlobal.Columns.LocWLemmas
-public import Formalism.SharpRestriction.LevelLetterCocycles.TwGood
-public import Formalism.MirabolicMackeyTheory.MirabolicMackeyProofs.RamBasic
 public import Formalism.LocalToGlobal.Divisibility.LiftLatLemmas
+import Formalism.MirabolicMackeyTheory.MirabolicMackeyProofs.RamBasic
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
 
 @[expose] public section
 
@@ -124,8 +164,8 @@ theorem relLength_read
     obtain ⟨c, hc, s, hs⟩ := hnorm t
     have h1 : ∑ a, algebraMap O' (FractionRing O') (s a) • rd (b a) = 0 := by
       have := congrArg g hs
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [← algebraMap_smul O' c, map_smul, ht, smul_zero, map_sum] at this
+
+      rw [← algebraMap_smul O' c, map_smul, ht, smul_zero, map_sum] at this
       simpa only [hg, algebraMap_smul] using this.symm
     have h2 : ∀ a, s a = 0 := fun a =>
       (map_eq_zero_iff _ (IsFractionRing.injective O' (FractionRing O'))).1

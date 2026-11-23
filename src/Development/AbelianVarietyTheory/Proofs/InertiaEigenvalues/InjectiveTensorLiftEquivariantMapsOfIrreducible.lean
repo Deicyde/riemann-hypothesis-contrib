@@ -1,11 +1,52 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.SubsingletonJacquetOfPerm
-public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.IsIrreducibleIffOfLinearEquiv
-public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.InSupportOfIsSubquotient
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.AlgebraMapIntertwiningMapBijectiveOfIsSmooth
-public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.UnitaryAdmissibleMatrixCoefficient
+public import Mathlib.Basic.Complex.Basic
+public import Mathlib.RepresentationTheory.Irreducible
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
+import Development.AbelianVarietyTheory.Definitions.Foundations.MatrixMeasurableSpace
+import Development.AbelianVarietyTheory.Definitions.Foundations.SmoothPartStable
+import Development.AbelianVarietyTheory.Definitions.TwistedInnerProducts.LeviEmbMemNormalizerLower
 
 @[expose] public section
 
@@ -14,14 +55,12 @@ open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil ValuativeRel Top
 namespace GlobalTheory.SmGL.EvalInj
 
 open ValuativeRel Topology in
-private theorem eq_zero_of_sum_intertwining_apply_eq_zero
-    {H X Y : Type} [Group H] [AddCommGroup X] [Module ℂ X] [AddCommGroup Y] [Module ℂ Y]
-    (τ : Representation ℂ H X)
-    (ρ : Representation ℂ H Y)
-    (hρ : ρ.IsIrreducible) (hschur : ∀ T : ρ.IntertwiningMap ρ, ∃ c : ℂ, ∀ v, T v = c • v)
-    : ∀ (m : ℕ) (φ : Fin m → (Y →ₗ[ℂ] X)),
-      LinearIndependent ℂ φ → (∀ i g v, φ i (ρ g v) = τ g (φ i v))
-        → ∀ y : Fin m → Y, ∑ i, φ i (y i) = 0 → y = 0 := by
+private theorem eq_zero_of_sum_intertwining_apply_eq_zero {H X Y : Type} [Group H] [AddCommGroup X]
+    [Module ℂ X] [AddCommGroup Y] [Module ℂ Y] (τ : Representation ℂ H X)
+    (ρ : Representation ℂ H Y) (hρ : ρ.IsIrreducible)
+    (hschur : ∀ T : ρ.IntertwiningMap ρ, ∃ c : ℂ, ∀ v, T v = c • v) :
+    ∀ (m : ℕ) (φ : Fin m → (Y →ₗ[ℂ] X)), LinearIndependent ℂ φ →
+      (∀ i g v, φ i (ρ g v) = τ g (φ i v)) → ∀ y : Fin m → Y, ∑ i, φ i (y i) = 0 → y = 0 := by
   intro m
   induction m with
   | zero => intro φ _ _ y _; exact Subsingleton.elim _ _
@@ -34,7 +73,7 @@ private theorem eq_zero_of_sum_intertwining_apply_eq_zero
       intro g w hw
       rw [LinearMap.mem_ker, hΦ] at hw ⊢
       simp_rw [hφ]
-      set_option synthInstance.maxHeartbeats 100000 in
+
       rw [← map_sum, hw, map_zero]
     let p : S →ₗ[ℂ] Y := (LinearMap.proj (Fin.last m)).comp S.subtype
     have hp : Function.Injective p := by
@@ -45,23 +84,16 @@ private theorem eq_zero_of_sum_intertwining_apply_eq_zero
         have hw' := w.2
         rw [LinearMap.mem_ker, hΦ, Fin.sum_univ_castSucc, hw0, map_zero, add_zero] at hw'
         exact hw'
-      have hzero :=
-        ih
-          (fun i => φ (Fin.castSucc i))
-          (hli.comp _ (Fin.castSucc_injective m))
-          (fun i => hφ _)
-          _ hsum
+      have hzero := ih (fun i => φ (Fin.castSucc i)) (hli.comp _ (Fin.castSucc_injective m))
+        (fun i => hφ _) _ hsum
       apply Subtype.ext
       funext i
       refine Fin.lastCases ?_ (fun j => ?_) i
       · exact hw0
       · exact congrFun hzero j
-    let R : Subrepresentation ρ := ⟨
-      LinearMap.range p,
-      by
-        rintro g _ ⟨w, rfl⟩
-        exact ⟨⟨fun i => ρ g ((w : Fin (m + 1) → Y) i), hSinv g w w.2⟩, rfl⟩
-    ⟩
+    let R : Subrepresentation ρ := ⟨LinearMap.range p, by
+      rintro g _ ⟨w, rfl⟩
+      exact ⟨⟨fun i => ρ g ((w : Fin (m + 1) → Y) i), hSinv g w w.2⟩, rfl⟩⟩
     have hyS : y ∈ S := by rw [LinearMap.mem_ker, hΦ]; exact hy
     haveI := hρ
     rcases IsSimpleOrder.eq_bot_or_eq_top R with hR | hR
@@ -76,22 +108,18 @@ private theorem eq_zero_of_sum_intertwining_apply_eq_zero
       let e := LinearEquiv.ofBijective p ⟨hp, LinearMap.range_eq_top.mp hrange⟩
       have hlast : ∀ v, (e.symm v : Fin (m + 1) → Y) (Fin.last m) = v := fun v =>
         e.apply_symm_apply v
-      have he
-          : ∀ g v,
-            e.symm (ρ g v)
-              = ⟨fun i => ρ g ((e.symm v : Fin (m + 1) → Y) i), hSinv g _ (e.symm v).2⟩ := by
+      have he : ∀ g v, e.symm (ρ g v) =
+          ⟨fun i => ρ g ((e.symm v : Fin (m + 1) → Y) i), hSinv g _ (e.symm v).2⟩ := by
         intro g v
         apply e.injective
         rw [LinearEquiv.apply_symm_apply]
         show ρ g v = ρ g ((e.symm v : Fin (m + 1) → Y) (Fin.last m))
         rw [hlast]
-      let T : Fin m → ρ.IntertwiningMap ρ := fun j => ⟨
-        (LinearMap.proj (Fin.castSucc j)).comp (S.subtype.comp e.symm.toLinearMap),
-        by
+      let T : Fin m → ρ.IntertwiningMap ρ := fun j =>
+        ⟨(LinearMap.proj (Fin.castSucc j)).comp (S.subtype.comp e.symm.toLinearMap), by
           intro g
           ext v
-          simp [he]
-      ⟩
+          simp [he]⟩
       choose c hc using fun j => hschur (T j)
       have hT : ∀ j v, (e.symm v : Fin (m + 1) → Y) (Fin.castSucc j) = c j • v := fun j v => hc j v
       have hzero : ∑ i, (Fin.snoc (α := fun _ => ℂ) c 1 i) • φ i = 0 := by
@@ -103,17 +131,16 @@ private theorem eq_zero_of_sum_intertwining_apply_eq_zero
       have h1 := (Fintype.linearIndependent_iff.mp hli) _ hzero (Fin.last m)
       simp at h1
 
+
 open ValuativeRel Topology in
-theorem _root_.GlobalTheory.SmGL.EvalInj.lift_subtype_injective
-    : ∀ (H X Y : Type) [Group H] [AddCommGroup X] [Module ℂ X] [AddCommGroup Y] [Module ℂ Y]
-        (τ : Representation ℂ H X) (ρ : Representation ℂ H Y),
-      ρ.IsIrreducible → (∀ T : ρ.IntertwiningMap ρ, ∃ c : ℂ, ∀ v, T v = c • v)
-        → ∀ (M : Submodule ℂ (Y →ₗ[ℂ] X)),
-          (∀ φ ∈ M, ∀ g v, φ (ρ g v) = τ g (φ v))
-            → Function.Injective (TensorProduct.lift M.subtype) := by
+theorem _root_.GlobalTheory.SmGL.EvalInj.lift_subtype_injective :
+    ∀ (H X Y : Type) [Group H] [AddCommGroup X] [Module ℂ X] [AddCommGroup Y] [Module ℂ Y]
+      (τ : Representation ℂ H X) (ρ : Representation ℂ H Y), ρ.IsIrreducible →
+      (∀ T : ρ.IntertwiningMap ρ, ∃ c : ℂ, ∀ v, T v = c • v) →
+      ∀ (M : Submodule ℂ (Y →ₗ[ℂ] X)), (∀ φ ∈ M, ∀ g v, φ (ρ g v) = τ g (φ v)) →
+      Function.Injective (TensorProduct.lift M.subtype) := by
   intro H X Y _ _ _ _ _ τ ρ hρ hschur M hM
-  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
-    rw [injective_iff_map_eq_zero]
+  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
   intro t ht
   obtain ⟨M', hfin, hsub⟩ :=
     TensorProduct.exists_finite_submodule_left_of_setFinite {t} (Set.finite_singleton t)
@@ -133,12 +160,10 @@ theorem _root_.GlobalTheory.SmGL.EvalInj.lift_subtype_injective
       (Submodule.ker_subtype _)
   have hsum : ∑ i, φ i (y i) = 0 := by
     rw [ht₀] at ht
-    set_option synthInstance.maxHeartbeats 100000 in
+
     simpa [map_sum, φ] using ht
-  have hy0 :=
-    eq_zero_of_sum_intertwining_apply_eq_zero τ ρ hρ hschur _ φ hli
-      (fun i g v => hM _ (b i : M).2 g v)
-      y hsum
+  have hy0 := eq_zero_of_sum_intertwining_apply_eq_zero τ ρ hρ hschur _ φ hli
+    (fun i g v => hM _ (b i : M).2 g v) y hsum
   rw [ht₀, hy0]
   simp
 

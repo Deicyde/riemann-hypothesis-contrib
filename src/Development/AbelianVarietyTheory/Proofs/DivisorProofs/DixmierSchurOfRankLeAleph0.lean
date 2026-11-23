@@ -1,6 +1,55 @@
 module
 
-public import Mathlib
+public import Mathlib.Algebra.Polynomial.AlgebraMap
+public import Mathlib.Basic.Complex.Basic
+public import Mathlib.LinearAlgebra.Dimension.Basic
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.CStarAlgebra.Classes
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+public import Mathlib.FieldTheory.IsAlgClosed.Spectrum
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
+public import Mathlib.Algebra.Algebra.Spectrum.Basic
+public import Mathlib.Analysis.Complex.Cardinality
 
 @[expose] public section
 
@@ -8,11 +57,9 @@ open Polynomial
 
 namespace GlobalTheory
 
-theorem isUnit_aeval_of_forall_isUnit_sub
-    {A : Type*} [Ring A] [Algebra ℂ A]
-    (T : A) (h : ∀ c : ℂ, IsUnit (T - algebraMap ℂ A c))
-    (q : ℂ[X]) (hq : q ≠ 0)
-    : IsUnit (aeval T q) := by
+theorem isUnit_aeval_of_forall_isUnit_sub {A : Type*} [Ring A] [Algebra ℂ A] (T : A)
+    (h : ∀ c : ℂ, IsUnit (T - algebraMap ℂ A c)) (q : ℂ[X]) (hq : q ≠ 0) :
+    IsUnit (aeval T q) := by
   have hs : spectrum ℂ T = ∅ := by
     ext c
     simp only [Set.mem_empty_iff_false, iff_false, spectrum.notMem_iff]
@@ -27,26 +74,23 @@ theorem isUnit_aeval_of_forall_isUnit_sub
     rw [h2, aeval_C]
     exact (IsUnit.mk0 _ h3).map _
 
-theorem linearIndependent_of_sub_apply_eq
-    {V : Type*} [AddCommGroup V] [Module ℂ V]
+theorem linearIndependent_of_sub_apply_eq {V : Type*} [AddCommGroup V] [Module ℂ V]
     (T : Module.End ℂ V) (h : ∀ c : ℂ, IsUnit (T - algebraMap ℂ (Module.End ℂ V) c))
-    (v : V) (hv : v ≠ 0)
-    (w : ℂ → V) (hw : ∀ c, (T - algebraMap ℂ (Module.End ℂ V) c) (w c) = v)
-    : LinearIndependent ℂ w := by
+    (v : V) (hv : v ≠ 0) (w : ℂ → V)
+    (hw : ∀ c, (T - algebraMap ℂ (Module.End ℂ V) c) (w c) = v) :
+    LinearIndependent ℂ w := by
   classical
   rw [linearIndependent_iff']
   intro s g hg i hi
   set q : ℂ[X] := ∑ k ∈ s, C (g k) * ∏ j ∈ s.erase k, (X - C j) with hqdef
   have hq0 : aeval T q v = 0 := by
-    have h1
-        : ∀ k ∈ s,
-          aeval T (C (g k) * ∏ j ∈ s.erase k, (X - C j)) v
-            = aeval T (∏ j ∈ s, (X - C j : ℂ[X])) (g k • w k) := by
+    have h1 : ∀ k ∈ s, aeval T (C (g k) * ∏ j ∈ s.erase k, (X - C j)) v
+        = aeval T (∏ j ∈ s, (X - C j : ℂ[X])) (g k • w k) := by
       intro k hk
       rw [← Finset.prod_erase_mul s _ hk, ← hw k, map_mul, map_mul, aeval_C, map_sub, aeval_X,
-        aeval_C, Module.End.mul_apply, Module.End.mul_apply, Module.algebraMap_end_apply, map_smul,
-        map_smul]
-    set_option synthInstance.maxHeartbeats 100000 in
+        aeval_C, Module.End.mul_apply, Module.End.mul_apply, Module.algebraMap_end_apply,
+        map_smul, map_smul]
+
     rw [hqdef, map_sum, LinearMap.sum_apply, Finset.sum_congr rfl h1, ← map_sum, hg, map_zero]
   have hq : q = 0 := by
     by_contra hne
@@ -57,19 +101,18 @@ theorem linearIndependent_of_sub_apply_eq
     rw [hqdef, Polynomial.eval_finsetSum, Finset.sum_eq_single i]
     · simp [eval_prod]
     · intro k _ hki
-      rw [eval_mul, eval_prod,
-        Finset.prod_eq_zero (i := i) (Finset.mem_erase.2 ⟨hki.symm, hi⟩) (by simp), mul_zero]
+      rw [eval_mul, eval_prod, Finset.prod_eq_zero (i := i) (Finset.mem_erase.2 ⟨hki.symm, hi⟩)
+        (by simp), mul_zero]
     · intro h; exact absurd hi h
   rw [hq, eval_zero] at h2
   refine (mul_eq_zero.1 h2.symm).resolve_right ?_
   exact Finset.prod_ne_zero_iff.2 fun j hj => sub_ne_zero.2 (Finset.mem_erase.1 hj).1.symm
 
-theorem dixmier_schur_of_rank_le_aleph0
-    : ∀ (V ι : Type) [AddCommGroup V] [Module ℂ V] (ρ : ι → Module.End ℂ V) (T : Module.End ℂ V),
-      Nontrivial V → Module.rank ℂ V ≤ Cardinal.aleph0
-        → (∀ N : Submodule ℂ V, (∀ i, ∀ x ∈ N, ρ i x ∈ N) → N = ⊥ ∨ N = ⊤)
-        → (∀ i, T * ρ i = ρ i * T)
-        → ∃ c : ℂ, T = c • 1 := by
+theorem dixmier_schur_of_rank_le_aleph0 :
+    ∀ (V ι : Type) [AddCommGroup V] [Module ℂ V] (ρ : ι → Module.End ℂ V) (T : Module.End ℂ V),
+      Nontrivial V → Module.rank ℂ V ≤ Cardinal.aleph0 →
+      (∀ N : Submodule ℂ V, (∀ i, ∀ x ∈ N, ρ i x ∈ N) → N = ⊥ ∨ N = ⊤) →
+      (∀ i, T * ρ i = ρ i * T) → ∃ c : ℂ, T = c • 1 := by
   intro V ι _ _ ρ T hV hrank hirr hcomm
   by_contra hne
   push_neg at hne

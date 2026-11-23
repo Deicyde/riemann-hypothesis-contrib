@@ -1,7 +1,61 @@
 module
 
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.HeightTheory.RegVert
+public import Mathlib.RingTheory.DiscreteValuationRing.Basic
+public import Mathlib.RingTheory.Flat.Basic
+public import Mathlib.RingTheory.Ideal.Height
+public import Mathlib.RingTheory.IntegralClosure.IntegrallyClosed
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.Order.CompletePartialOrder
+import Mathlib.RingTheory.Etale.Weakly
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.TotallySplit
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.HeightTheory.RegAVpt
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.HeightTheory.RegVert
+public import Mathlib.Algebra.Module.Torsion.Basic
+public import Mathlib.RingTheory.Flat.Stability
+public import Mathlib.RingTheory.Flat.TorsionFree
+public import Mathlib.RingTheory.Localization.Away.AdjoinRoot
 
 @[expose] public section
 
@@ -9,18 +63,17 @@ namespace Formalism.L2.Pj.RegA
 
 open IsLocalRing ReciprocityTheory.ChartRestriction.G.T0
 
-theorem reg_vertical_e
-    {O A : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
-    [IsAdicComplete (maximalIdeal O) O] [CharZero O] [CommRing A] [IsDomain A] [Algebra O A]
-    [Algebra.FiniteType O A] [Module.Flat O A] [IsIntegrallyClosed A]
-    (f : FractionRing A) (e : A) (he : e ≠ 0)
+theorem reg_vertical_e {O A : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+    [IsAdicComplete (maximalIdeal O) O] [CharZero O]
+    [CommRing A] [IsDomain A] [Algebra O A] [Algebra.FiniteType O A] [Module.Flat O A]
+    [IsIntegrallyClosed A] (f : FractionRing A) (e : A) (he : e ≠ 0)
     (hf : ∀ (V : Type) [CommRing V] [IsDomain V] [IsDiscreteValuationRing V] [Algebra O V]
-        [Module.Finite O V] (φ : A →ₐ[O] V) (a b : A),
-      f * algebraMap A (FractionRing A) b = algebraMap A (FractionRing A) a → φ b ≠ 0 → φ e ≠ 0
-        → ∃ v : V, φ a = v * φ b)
-    (P : Ideal A) [P.IsPrime]
-    (hP : P.height = 1) (hv : Ideal.map (algebraMap O A) (maximalIdeal O) ≤ P)
-    : ∃ a s : A, s ∉ P ∧ f * algebraMap A (FractionRing A) s = algebraMap A (FractionRing A) a := by
+      [Module.Finite O V] (φ : A →ₐ[O] V) (a b : A),
+      f * algebraMap A (FractionRing A) b = algebraMap A (FractionRing A) a → φ b ≠ 0 → φ e ≠ 0 →
+      ∃ v : V, φ a = v * φ b)
+    (P : Ideal A) [P.IsPrime] (hP : P.height = 1)
+    (hv : Ideal.map (algebraMap O A) (maximalIdeal O) ≤ P) :
+    ∃ a s : A, s ∉ P ∧ f * algebraMap A (FractionRing A) s = algebraMap A (FractionRing A) a := by
   classical
   haveI hAN : IsNoetherianRing A := by
     first
@@ -47,16 +100,11 @@ theorem reg_vertical_e
   have hPc : P.primeCompl ≤ nonZeroDivisors A := by
     first
     | exact Ideal.primeCompl_le_nonZeroDivisors P
-    | exact le_nonZeroDivisors_of_noZeroDivisors (fun h => (show (0 : A) ∉ P from h) P.zero_mem)
-  have hK
-      : ∀ x y : A,
-        algebraMap A (Localization.AtPrime P) x = algebraMap A (Localization.AtPrime P) y → x = y :=
+  have hK : ∀ x y : A, algebraMap A (Localization.AtPrime P) x =
+      algebraMap A (Localization.AtPrime P) y → x = y :=
     fun x y h => IsLocalization.injective (Localization.AtPrime P) hPc h
-  have hfin
-      : ∀ x s : A,
-        s ∉ P → (b : A) * x = a * s
-          → ∃ a s : A,
-            s ∉ P ∧ f * algebraMap A (FractionRing A) s = algebraMap A (FractionRing A) a := by
+  have hfin : ∀ x s : A, s ∉ P → (b : A) * x = a * s →
+      ∃ a s : A, s ∉ P ∧ f * algebraMap A (FractionRing A) s = algebraMap A (FractionRing A) a := by
     intro x s hs h
     refine ⟨x, s, hs, ?_⟩
     have h' := congrArg (algebraMap A (FractionRing A)) h
@@ -64,17 +112,13 @@ theorem reg_vertical_e
     apply mul_left_cancel₀ hbK
     linear_combination (algebraMap A (FractionRing A) s) * hab' - h'
   haveI hVal : ValuationRing (Localization.AtPrime P) := regVert_valuationRing P hP
-  have hmaxL
-      : maximalIdeal (Localization.AtPrime P) = P.map (algebraMap A (Localization.AtPrime P)) := by
+  have hmaxL : maximalIdeal (Localization.AtPrime P) =
+      P.map (algebraMap A (Localization.AtPrime P)) := by
     first
     | exact Localization.AtPrime.map_eq_maximalIdeal.symm
-    | exact (Localization.AtPrime.map_eq_maximalIdeal (I := P)).symm
-    | exact (IsLocalization.AtPrime.map_eq_maximalIdeal P (Localization.AtPrime P)).symm
-  have hcase1
-      : ∀ c : Localization.AtPrime P,
-        algebraMap A (Localization.AtPrime P) b * c = algebraMap A (Localization.AtPrime P) a
-          → ∃ a s : A,
-            s ∉ P ∧ f * algebraMap A (FractionRing A) s = algebraMap A (FractionRing A) a := by
+  have hcase1 : ∀ c : Localization.AtPrime P,
+      algebraMap A (Localization.AtPrime P) b * c = algebraMap A (Localization.AtPrime P) a →
+      ∃ a s : A, s ∉ P ∧ f * algebraMap A (FractionRing A) s = algebraMap A (FractionRing A) a := by
     intro c hc
     obtain ⟨⟨x, s⟩, rfl⟩ := IsLocalization.mk'_surjective P.primeCompl c
     have hspec := IsLocalization.mk'_spec (Localization.AtPrime P) x s
@@ -83,15 +127,11 @@ theorem reg_vertical_e
     rw [map_mul, map_mul]
     linear_combination (algebraMap A (Localization.AtPrime P) s) * hc -
       (algebraMap A (Localization.AtPrime P) b) * hspec
-  have hcond
-      : ∃ c : Localization.AtPrime P,
-        algebraMap A (Localization.AtPrime P) b * c = algebraMap A (Localization.AtPrime P) a
-          ∨ algebraMap A (Localization.AtPrime P) a * c
-            = algebraMap A (Localization.AtPrime P) b := by
+  have hcond : ∃ c : Localization.AtPrime P,
+      algebraMap A (Localization.AtPrime P) b * c = algebraMap A (Localization.AtPrime P) a ∨
+      algebraMap A (Localization.AtPrime P) a * c = algebraMap A (Localization.AtPrime P) b := by
     first
     | exact ValuationRing.cond _ _
-    | exact PreValuationRing.cond _ _
-    | exact ValuationRing.cond' _ _
   obtain ⟨c, hc | hc⟩ := hcond
   · exact hcase1 c hc
   by_cases hcu : IsUnit c
@@ -107,7 +147,6 @@ theorem reg_vertical_e
     have h1 : IsUnit (algebraMap A (Localization.AtPrime P) d) := by
       first
       | exact IsLocalization.map_units (M := P.primeCompl) (Localization.AtPrime P) ⟨d, hdP⟩
-      | exact IsLocalization.map_units (Localization.AtPrime P) (⟨d, hdP⟩ : P.primeCompl)
     rw [← hspec] at h1
     exact isUnit_of_mul_isUnit_left h1
   have had : a * d = (b : A) * t := by
@@ -115,9 +154,8 @@ theorem reg_vertical_e
     rw [map_mul, map_mul]
     linear_combination (algebraMap A (Localization.AtPrime P) t) * hc -
       (algebraMap A (Localization.AtPrime P) a) * hspec
-  have hrad
-      : maximalIdeal (Localization.AtPrime P)
-        ≤ (Ideal.span {algebraMap A (Localization.AtPrime P) (algebraMap O A ϖ)}).radical := by
+  have hrad : maximalIdeal (Localization.AtPrime P) ≤
+      (Ideal.span {algebraMap A (Localization.AtPrime P) (algebraMap O A ϖ)}).radical := by
     rw [Ideal.radical_eq_sInf]
     refine le_sInf ?_
     rintro Q ⟨hJQ, hQ⟩
@@ -130,7 +168,6 @@ theorem reg_vertical_e
       have hu : IsUnit (algebraMap A (Localization.AtPrime P) x) := by
         first
         | exact IsLocalization.map_units (M := P.primeCompl) (Localization.AtPrime P) ⟨x, hxP⟩
-        | exact IsLocalization.map_units (Localization.AtPrime P) (⟨x, hxP⟩ : P.primeCompl)
       exact hQ.ne_top (Ideal.eq_top_of_isUnit_mem _ (Ideal.mem_comap.mp hx) hu)
     have hQ0 : Q.comap (algebraMap A (Localization.AtPrime P)) ≠ ⊥ := by
       intro h
@@ -140,28 +177,22 @@ theorem reg_vertical_e
       exact hϖA0 h2
     have hQeq : Q.comap (algebraMap A (Localization.AtPrime P)) = P :=
       regVert_eq_of_le_height_one hQ0 hQ0P hP
-    have hmc
-        : Ideal.map (algebraMap A (Localization.AtPrime P))
-            (Q.comap (algebraMap A (Localization.AtPrime P)))
-          = Q := by
+    have hmc : Ideal.map (algebraMap A (Localization.AtPrime P))
+        (Q.comap (algebraMap A (Localization.AtPrime P))) = Q := by
       first
       | exact IsLocalization.map_under P.primeCompl (Localization.AtPrime P) Q
-      | exact IsLocalization.map_comap (M := P.primeCompl) Q
     rw [hQeq] at hmc
     exact (hmaxL.trans hmc).le
   haveI hLN : IsNoetherianRing (Localization.AtPrime P) := by
     first
     | infer_instance
-    | exact IsLocalization.isNoetherianRing P.primeCompl (Localization.AtPrime P) hAN
   have hfg : (maximalIdeal (Localization.AtPrime P)).FG := by
-    first | exact IsNoetherian.noetherian _ | exact (isNoetherianRing_iff.mp hLN).noetherian _
-  obtain ⟨n, hn⟩
-      : ∃ n : ℕ,
-        maximalIdeal (Localization.AtPrime P) ^ n
-          ≤ Ideal.span {algebraMap A (Localization.AtPrime P) (algebraMap O A ϖ)} := by
+    first
+    | exact IsNoetherian.noetherian _
+  obtain ⟨n, hn⟩ : ∃ n : ℕ, maximalIdeal (Localization.AtPrime P) ^ n ≤
+      Ideal.span {algebraMap A (Localization.AtPrime P) (algebraMap O A ϖ)} := by
     first
     | exact Ideal.exists_pow_le_of_le_radical_of_fg hrad hfg
-    | exact Ideal.exists_pow_le_of_le_radical_of_fg_radical hrad hfg
   have hdm : algebraMap A (Localization.AtPrime P) d ∈ maximalIdeal (Localization.AtPrime P) := by
     rw [hmaxL]
     exact Ideal.mem_map_of_mem _ hdP
@@ -195,7 +226,6 @@ theorem reg_vertical_e
     haveI : Module.Flat A (Localization.Away s) := by
       first
       | infer_instance
-      | exact IsLocalization.flat (Localization.Away s) (Submonoid.powers s)
     first
     | exact Module.Flat.trans O A (Localization.Away s)
     | infer_instance
@@ -230,14 +260,12 @@ theorem reg_vertical_e
     rw [map_mul, map_mul, h, mul_zero]
   obtain ⟨v, hv'⟩ :=
     hf V (φ.comp (IsScalarTower.toAlgHom O A (Localization.Away s))) a b hab' hφb hφe
-  have hv2
-      : φ (algebraMap A (Localization.Away s) a) = v * φ (algebraMap A (Localization.Away s) b) :=
-    hv'
+  have hv2 : φ (algebraMap A (Localization.Away s) a) =
+      v * φ (algebraMap A (Localization.Away s) b) := hv'
   have hsU : IsUnit (algebraMap A (Localization.Away s) s) :=
     IsLocalization.Away.algebraMap_isUnit s
-  have hts
-      : algebraMap A (Localization.Away s) s
-        = algebraMap A (Localization.Away s) t * algebraMap A (Localization.Away s) u := by
+  have hts : algebraMap A (Localization.Away s) s =
+      algebraMap A (Localization.Away s) t * algebraMap A (Localization.Away s) u := by
     rw [← map_mul]
     exact congrArg _ hs_def
   rw [hts] at hsU
@@ -247,18 +275,17 @@ theorem reg_vertical_e
     (isUnit_of_mul_isUnit_right hsU).map φ
   have hadV := congrArg (fun x => φ (algebraMap A (Localization.Away s) x)) had
   simp only [map_mul] at hadV
-  have h3
-      : v * φ (algebraMap A (Localization.Away s) d)
-        = φ (algebraMap A (Localization.Away s) t) := by
+  have h3 : v * φ (algebraMap A (Localization.Away s) d) =
+      φ (algebraMap A (Localization.Away s) t) := by
     apply mul_left_cancel₀ hφb
     linear_combination hadV - (φ (algebraMap A (Localization.Away s) d)) * hv2
   rw [← h3] at htU
-  have hdU : IsUnit (φ (algebraMap A (Localization.Away s) d)) := isUnit_of_mul_isUnit_right htU
+  have hdU : IsUnit (φ (algebraMap A (Localization.Away s) d)) :=
+    isUnit_of_mul_isUnit_right htU
   have hzuV := congrArg (fun x => φ (algebraMap A (Localization.Away s) x)) hzu
   simp only [map_mul, map_pow] at hzuV
-  have h4 : IsUnit
-      (φ (algebraMap A (Localization.Away s) z)
-        * φ (algebraMap A (Localization.Away s) (algebraMap O A ϖ))) := by
+  have h4 : IsUnit (φ (algebraMap A (Localization.Away s) z) *
+      φ (algebraMap A (Localization.Away s) (algebraMap O A ϖ))) := by
     rw [hzuV]
     exact (hdU.pow n).mul huU
   have hϖU := isUnit_of_mul_isUnit_right h4
@@ -269,14 +296,11 @@ theorem reg_vertical_e
   haveI : Algebra.IsIntegral O V := by
     first
     | infer_instance
-    | exact Algebra.IsIntegral.of_finite O V
   have hmaxV : (maximalIdeal V).comap (algebraMap O V) = maximalIdeal O := by
     haveI hmx : ((maximalIdeal V).comap (algebraMap O V)).IsMaximal := by
       first
       | exact Ideal.isMaximal_comap_of_isIntegral_of_isMaximal (algebraMap _ _) (RingHom.Finite.to_isIntegral (RingHom.finite_algebraMap.mpr inferInstance)) (maximalIdeal V)
-      | exact Ideal.isMaximal_comap_of_isIntegral_of_isMaximal (R := O) (algebraMap _ _) (RingHom.Finite.to_isIntegral (RingHom.finite_algebraMap.mpr inferInstance)) (maximalIdeal V)
       | infer_instance
-      | exact Ideal.IsMaximal.under O (maximalIdeal V)
     exact IsLocalRing.eq_maximalIdeal hmx
   have hmem : ϖ ∈ (maximalIdeal V).comap (algebraMap O V) := by
     rw [hmaxV]

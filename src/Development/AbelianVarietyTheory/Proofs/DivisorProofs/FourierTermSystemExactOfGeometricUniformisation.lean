@@ -1,21 +1,53 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Definitions.Divisors.HasTraitsOnOfHasTraitsP
-public import ReciprocityTheory.AnalyticForms.RegularLocalRings.FinalTheorems
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ThetaSystemClassSumsValuesOfFunctions
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ThetaLabelsSurjectiveHomLatticeModLevelStatement
+public import Development.AbelianVarietyTheory.Definitions.Degenerations.NormNatCastPadicAlgClOfCoprime
+import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.ExistsAdaptedBasisTestLattice
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.MemDividingLabelsIffClassZeroStatement
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ThetaConstantsTranslateEqTwistedSumsStatement
+import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ThetaLabelsSurjectiveHomLatticeModLevelStatement
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ThetaSystemClassSumsValuesOfFunctions
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
-  IsLocalRing
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
-  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.ZM
-  GlobalTheory.SiegelTor GlobalTheory.TorRef GlobalTheory.PolDeg
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj IsLocalRing
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.ZM GlobalTheory.SiegelTor GlobalTheory.TorRef GlobalTheory.PolDeg
 open scoped CategoryTheory.Obj
 open ReciprocityTheory.AnForm.R GlobalTheory.ZH GlobalTheory.Poinc GlobalTheory.Poinc.Sep
 attribute [local instance] Over.cartesianMonoidalCategory
@@ -24,8 +56,8 @@ open GlobalTheory.UT ReciprocityTheory.ChartRestriction.G.DVR
 noncomputable section
 namespace GlobalTheory.GSep.ExactSums
 
-theorem congMod_pi_iff {X : Type} [AddCommGroup X] {s : ℕ} (N : ℕ) (a b : Fin s → X)
-    : CongMod N a b ↔ ∀ v, CongMod N (a v) (b v) := by
+theorem congMod_pi_iff {X : Type} [AddCommGroup X] {s : ℕ} (N : ℕ) (a b : Fin s → X) :
+    CongMod N a b ↔ ∀ v, CongMod N (a v) (b v) := by
   constructor
   · rintro ⟨w, hw⟩ v
     exact ⟨w v, by rw [hw]; rfl⟩
@@ -33,21 +65,16 @@ theorem congMod_pi_iff {X : Type} [AddCommGroup X] {s : ℕ} (N : ℕ) (a b : Fi
     choose w hw using h
     exact ⟨w, funext fun v => by rw [hw v]; rfl⟩
 
-theorem labels
-    {o Ω : Type} [CommRing o] [Field Ω] [Algebra o Ω]
-    (S : ThetaSys o Ω) (H : AddSubgroup S.Gam)
-    {X : Type} [AddCommGroup X]
-    (YY : S.Gam → X → Prop) (h1 : ∀ a, ∃ mu, YY a mu) (h2 : ∀ mu, ∃ a, YY a mu)
+theorem labels {o Ω : Type} [CommRing o] [Field Ω] [Algebra o Ω] (S : ThetaSys o Ω) (H : AddSubgroup S.Gam)
+    {X : Type} [AddCommGroup X] (YY : S.Gam → X → Prop)
+    (h1 : ∀ a, ∃ mu, YY a mu) (h2 : ∀ mu, ∃ a, YY a mu)
     (h3 : ∀ a mu mu', YY a mu → (YY a mu' ↔ CongMod (S.r * S.N) mu' mu))
-    (h4 : ∀ a a' mu mu', YY a mu → YY a' mu' → YY (a + a') (mu + mu')) (hH : ∀ a, a ∈ H ↔ YY a 0)
-    : ∃ l : X → S.Gam,
-      (∀ mu, YY (l mu) mu)
-        ∧ (∀ τ ∈ S.perp H, ∀ a mu, YY a mu → eStd S.g _ τ a = eStd S.g _ τ (l mu))
-        ∧ ∀ mu κ,
-          (∀ τ ∈ S.perp H, eStd S.g _ τ (l mu) = eStd S.g _ τ (l κ))
-            ↔ CongMod (S.r * S.N) mu κ := by
-  obtain ⟨l, hl⟩ : ∃ l : X → S.Gam, ∀ mu, YY (l mu) mu :=
-    ⟨fun mu => (h2 mu).choose, fun mu => (h2 mu).choose_spec⟩
+    (h4 : ∀ a a' mu mu', YY a mu → YY a' mu' → YY (a + a') (mu + mu'))
+    (hH : ∀ a, a ∈ H ↔ YY a 0) :
+    ∃ l : X → S.Gam, (∀ mu, YY (l mu) mu) ∧
+      (∀ τ ∈ S.perp H, ∀ a mu, YY a mu → eStd S.g _ τ a = eStd S.g _ τ (l mu)) ∧
+      ∀ mu κ, (∀ τ ∈ S.perp H, eStd S.g _ τ (l mu) = eStd S.g _ τ (l κ)) ↔ CongMod (S.r * S.N) mu κ := by
+  obtain ⟨l, hl⟩ : ∃ l : X → S.Gam, ∀ mu, YY (l mu) mu := ⟨fun mu => (h2 mu).choose, fun mu => (h2 mu).choose_spec⟩
   have sub : ∀ a a' mu, YY a mu → YY a' mu → a - a' ∈ H := by
     intro a a' mu ha ha'
     obtain ⟨b, hb⟩ := h2 (-mu)
@@ -76,26 +103,18 @@ theorem labels
     exact ⟨-w, by rw [hw, smul_neg, add_neg_cancel_right]⟩
   · exact (D1 τ hτ (l κ) mu ((h3 _ _ _ (hl κ)).2 h)).symm
 
+
 open Classical GlobalTheory.Poinc.Sep.ExactSums in
-theorem exact_of_isGeo
-    : ∀ (O : Type) [CommRing O] (bar : O → O) (q s : ℕ) (W : Matrix (Fin s) (Fin s) ℤ)
-        (X₁ : GlobalTheory.GSep.GSet) (z₁ : X₁.M.Z) (act : O → (X₁.ρ.P.A ⟶ X₁.ρ.P.A))
-        (x₀ : X₁.S.Gam) (Φ : VPre bar q W (X₁.M.Z.presheaf.stalk z₁)) (lab : Φ.Q → X₁.S.Gam),
-      GlobalTheory.GSep.IsGeo X₁ z₁ act x₀ Φ lab → Φ.Exact (X₁.S.r * X₁.S.N) := by
+theorem exact_of_isGeo : ∀ (O : Type) [CommRing O] (bar : O → O) (q s : ℕ) (W : Matrix (Fin s) (Fin s) ℤ) (X₁ : GlobalTheory.GSep.GSet) (z₁ : X₁.M.Z) (act : O → (X₁.ρ.P.A ⟶ X₁.ρ.P.A)) (x₀ : X₁.S.Gam) (Φ : VPre bar q W (X₁.M.Z.presheaf.stalk z₁)) (lab : Φ.Q → X₁.S.Gam), GlobalTheory.GSep.IsGeo X₁ z₁ act x₀ Φ lab → Φ.Exact (X₁.S.r * X₁.S.N) := by
   intro O _ bar q s W X₁ z₁ act x₀ Φ lab hG
   obtain ⟨hdiv, hlab, hmem⟩ := hG
-  obtain ⟨sg, eps, hlink⟩ :=
-    GlobalTheory.T.thetaConstants_translate_eq_twisted_sums O X₁ z₁ act x₀ hdiv
+  obtain ⟨sg, eps, hlink⟩ := GlobalTheory.T.thetaConstants_translate_eq_twisted_sums O X₁ z₁ act x₀ hdiv
   intro y κ c
   obtain ⟨𝔪, hT⟩ := hmem y
   haveI : NeZero (X₁.S.r * X₁.S.N) := ⟨Nat.mul_ne_zero (by have := X₁.S.r_pos; omega) (by have := X₁.S.N_ge; omega)⟩
   haveI : IsDomain X₁.o₁ := X₁.ar.ded.toIsDomain
-  obtain ⟨yy1, yy2, yy3, yy4⟩ :=
-    GlobalTheory.T.thetaLabels_surjective_hom_lattice_mod_level O X₁ z₁ act (Φ.V y) (Φ.ev y)
-      (Fin s → Φ.X y) _ _ 𝔪
-  have hH :=
-    GlobalTheory.T.mem_dividingLabels_iff_class_zero O X₁ z₁ act x₀ hdiv (Φ.V y) (Φ.ev y)
-      (Fin s → Φ.X y) _ _ 𝔪
+  obtain ⟨yy1, yy2, yy3, yy4⟩ := GlobalTheory.T.thetaLabels_surjective_hom_lattice_mod_level O X₁ z₁ act (Φ.V y) (Φ.ev y) (Fin s → Φ.X y) _ _ 𝔪
+  have hH := GlobalTheory.T.mem_dividingLabels_iff_class_zero O X₁ z₁ act x₀ hdiv (Φ.V y) (Φ.ev y) (Fin s → Φ.X y) _ _ 𝔪
   obtain ⟨l, -, hlY, hlC⟩ := labels X₁.S (X₁.S.HH X₁.M z₁) 𝔪.YY yy1 yy2 yy3 yy4 hH
 
   let φ : X₁.o₁ →+* X₁.M.Z.presheaf.stalk z₁ :=
@@ -115,22 +134,15 @@ theorem exact_of_isGeo
     exact isPrimitiveRoot_map' ((Φ.ev y).comp φ) hunitV.ne_zero h0
 
   let TT := X₁.S.TT X₁.M z₁
-  have hmemO
-      : ∀ τ : TT,
-        algebraMap X₁.o₁ X₁.Ω₁ (X₁.S.ζ ^ eps (lab c) τ) * X₁.S.th (lab c + τ) / X₁.S.th x₀
-          ∈ X₁.M.O z₁ := fun τ => by
-    rw [mul_div_assoc]; exact mul_mem (Subalgebra.algebraMap_mem _ _) (hdiv.2 _)
+  have hmemO : ∀ τ : TT, algebraMap X₁.o₁ X₁.Ω₁ (X₁.S.ζ ^ eps (lab c) τ) * X₁.S.th (lab c + τ) / X₁.S.th x₀ ∈ X₁.M.O z₁ :=
+    fun τ => by rw [mul_div_assoc]; exact mul_mem (Subalgebra.algebraMap_mem _ _) (hdiv.2 _)
   let hτ : TT → X₁.M.Z.presheaf.stalk z₁ := fun τ => (X₁.M.stalkEquiv z₁).symm ⟨_, hmemO τ⟩
-  have hhτ
-      : ∀ τ : TT,
-        X₁.M.stalkHom z₁ (hτ τ)
-          = algebraMap X₁.o₁ X₁.Ω₁ (X₁.S.ζ ^ eps (lab c) τ) * X₁.S.th (lab c + τ) / X₁.S.th x₀ :=
-    fun τ => hsh _
+  have hhτ : ∀ τ : TT, X₁.M.stalkHom z₁ (hτ τ) =
+      algebraMap X₁.o₁ X₁.Ω₁ (X₁.S.ζ ^ eps (lab c) τ) * X₁.S.th (lab c + τ) / X₁.S.th x₀ := fun τ => hsh _
 
   have hcard : IsUnit ((Fintype.card TT : ℕ) : X₁.o₁) := by
     have h1 : Fintype.card TT ∣ Fintype.card X₁.S.Gam := by
-      rw [← Nat.card_eq_fintype_card, ← Nat.card_eq_fintype_card]
-      exact AddSubgroup.card_addSubgroup_dvd_card _
+      rw [← Nat.card_eq_fintype_card, ← Nat.card_eq_fintype_card]; exact AddSubgroup.card_addSubgroup_dvd_card _
     have h2 : IsUnit ((Fintype.card X₁.S.Gam : ℕ) : X₁.o₁) := by
       rw [Fintype.card_fun, ZMod.card, Nat.cast_pow]; exact X₁.S.unit.pow _
     exact isUnit_of_dvd_unit (Nat.cast_dvd_cast h1) h2
@@ -139,43 +151,27 @@ theorem exact_of_isGeo
   have hd : Φ.ev y d * (Fintype.card TT : Φ.V y) = 1 := by
     rw [← map_natCast (Φ.ev y), ← map_mul, ← map_natCast φ, ← hu, Units.inv_mul, map_one]
 
-  let w : (Fin s → Φ.X y) → TT → ZMod (X₁.S.r * X₁.S.N) := fun mu τ =>
-    (sg : ℤ) • eStd X₁.S.g _ (τ : X₁.S.Gam) (l mu)
+  let w : (Fin s → Φ.X y) → TT → ZMod (X₁.S.r * X₁.S.N) := fun mu τ => (sg : ℤ) • eStd X₁.S.g _ (τ : X₁.S.Gam) (l mu)
   have hw : ∀ mu τ τ', w mu (τ + τ') = w mu τ + w mu τ' := fun mu τ τ' => by
     simp only [w, AddSubgroup.coe_add, eStd_add_left, smul_add]
   have hsg : ∀ a b : ZMod (X₁.S.r * X₁.S.N), (sg : ℤ) • a = (sg : ℤ) • b → a = b := fun a b h => by
     have := congrArg (fun t => (sg : ℤ) • t) h
     have e : ((sg : ℤ) * sg) = 1 := by rcases Int.units_eq_one_or sg with h | h <;> simp [h]
     simpa only [smul_smul, e, one_smul] using this
-  have hwκ
-      : ∀ mu, (∀ τ, w mu τ = w κ τ) ↔ ∀ v, CongMod (X₁.S.r * X₁.S.N) (mu v) (κ v) := fun mu => by
+  have hwκ : ∀ mu, (∀ τ, w mu τ = w κ τ) ↔ ∀ v, CongMod (X₁.S.r * X₁.S.N) (mu v) (κ v) := fun mu => by
     rw [← congMod_pi_iff, ← hlC mu κ]
     exact ⟨fun h τ hτ' => hsg _ _ (h ⟨τ, hτ'⟩), fun h τ => by simp only [w, h τ τ.2]⟩
   have hlab' : ∀ c, lab c ∈ X₁.S.HH X₁.M z₁ := fun c => by
     rw [← SetLike.mem_coe, ← hlab]; exact Set.mem_range_self c
-  have hsum
-      : ∀ τ : TT,
-        SumI (maximalIdeal (Φ.V y))
-          (fun mu => Φ.ev y zt ^ (w mu τ).val * Φ.term y mu c)
-          (Φ.ev y (hτ τ)) := fun τ =>
-    hlink (Φ.V y) (Φ.ev y) (Fin s → Φ.X y) _ _ 𝔪 Φ.Q lab hlab' (Φ.term y) hT c τ τ.2 zt (hτ τ) hzt
-      (hhτ τ)
-      (fun mu => w mu τ)
-      (fun a mu hY => by simp only [w, hlY τ τ.2 a mu hY])
-  let f : (Fin s → Φ.X y) → Φ.V y := fun mu =>
-    if ∀ v, CongMod (X₁.S.r * X₁.S.N) (mu v) (κ v) then Φ.term y mu c else 0
-  have hf :=
-    sumI_fourier (maximalIdeal (Φ.V y)) hω (Φ.ev y d) hd w hw κ
-      (fun mu => Φ.term y mu c)
-      (fun τ => Φ.ev y (hτ τ))
-      hsum f
-      (fun mu h => if_pos ((hwκ mu).1 h))
-      (fun mu h => if_neg fun h' => h ((hwκ mu).2 h'))
-  refine ⟨
-    d * ∑ τ : TT, zt ^ (-(w κ τ)).val * hτ τ,
-    isClassSum_of_sumI Φ y _ κ c (RingHom.id _) _ f (fun mu h => if_pos h) (fun mu h => if_neg h) ?_
-  ⟩
-  set_option synthInstance.maxHeartbeats 100000 in
+  have hsum : ∀ τ : TT, SumI (maximalIdeal (Φ.V y)) (fun mu => Φ.ev y zt ^ (w mu τ).val * Φ.term y mu c) (Φ.ev y (hτ τ)) :=
+    fun τ => hlink (Φ.V y) (Φ.ev y) (Fin s → Φ.X y) _ _ 𝔪 Φ.Q lab hlab' (Φ.term y) hT c τ τ.2 zt (hτ τ) hzt
+      (hhτ τ) (fun mu => w mu τ) (fun a mu hY => by simp only [w, hlY τ τ.2 a mu hY])
+  let f : (Fin s → Φ.X y) → Φ.V y := fun mu => if ∀ v, CongMod (X₁.S.r * X₁.S.N) (mu v) (κ v) then Φ.term y mu c else 0
+  have hf := sumI_fourier (maximalIdeal (Φ.V y)) hω (Φ.ev y d) hd w hw κ (fun mu => Φ.term y mu c) (fun τ => Φ.ev y (hτ τ))
+    hsum f (fun mu h => if_pos ((hwκ mu).1 h)) (fun mu h => if_neg fun h' => h ((hwκ mu).2 h'))
+  refine ⟨d * ∑ τ : TT, zt ^ (-(w κ τ)).val * hτ τ, isClassSum_of_sumI Φ y _ κ c (RingHom.id _) _ f
+    (fun mu h => if_pos h) (fun mu h => if_neg h) ?_⟩
+
   simpa only [map_mul, map_sum, map_pow] using hf
 
 end GlobalTheory.GSep.ExactSums

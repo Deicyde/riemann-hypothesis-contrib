@@ -1,9 +1,47 @@
 module
 
-public import Mathlib
 public import GroundTheory.HeightsAndTheta.Heights.HilbertSamuel.StatementsProjFrameGenPtTransc
-public import GroundTheory.HeightsAndTheta.Heights.HilbertSamuel.ProjFrameGraphChart
 public import GroundTheory.HeightsAndTheta.Heights.HilbertSamuel.PProjFrameFibrePt
+import GroundTheory.HeightsAndTheta.Heights.HilbertSamuel.ProjFrameGraphChart
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArakelovGeometry.StepTStB
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.LemSec
 
 @[expose] public section
@@ -12,9 +50,7 @@ set_option maxSynthPendingDepth 1
 
 namespace GroundTheory.Heights₂.Heights.HilbertSamuel
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
-  ReciprocityTheory.ChartRestriction.G.ArakelovGeometry ReciprocityTheory.ChartRestriction.G.AI.I1
-  ReciprocityTheory.ChartRestriction.G.AI.I4
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.ArakelovGeometry ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I4
 
 noncomputable section
 
@@ -28,41 +64,31 @@ theorem proof : ProjFrameGenPtTransc.Statement := by
   have := coordIdeal_isPrime ℤ x
   rw [transcendental_iff]
   intro q hq
-  have hc
-      : ∀ n, ∃ g : MvPolynomial (Ix κ) ℤ,
-        aeval (fun p : Ix κ => G.x' (aV D p.2)) g = ((q.coeff n : _) : G.Φ') := by
+  have hc : ∀ n, ∃ g : MvPolynomial (Ix κ) ℤ,
+      aeval (fun p : Ix κ => G.x' (aV D p.2)) g = ((q.coeff n : _) : G.Φ') := by
     intro n
-    have h
-        : ((q.coeff n : _) : G.Φ')
-          ∈ (aeval (fun p : Ix κ => G.x' ⟨Sum.inl p.1, p.2⟩)
-            : MvPolynomial (Ix κ) ℤ →ₐ[ℤ] G.Φ').range := by
+    have h : ((q.coeff n : _) : G.Φ') ∈
+        (aeval (fun p : Ix κ => G.x' ⟨Sum.inl p.1, p.2⟩) : MvPolynomial (Ix κ) ℤ →ₐ[ℤ] G.Φ').range := by
       rw [← Algebra.adjoin_range_eq_range_aeval]
       exact (q.coeff n).2
     obtain ⟨g, hg⟩ := h
     exact ⟨g, hg⟩
   choose g hg using hc
-  have hFΓ
-      : (∑ n ∈ q.support, rename (fun p : Ix κ => aV D p.2) (g n) * X (bV κ 0) ^ n)
-        ∈ graphP x e := by
+  have hFΓ : (∑ n ∈ q.support, rename (fun p : Ix κ => aV D p.2) (g n) * X (bV κ 0) ^ n) ∈ graphP x e := by
     have key : ∀ F, aeval G.x' F = 0 → F ∈ graphP x e := fun F h => by
       rw [graphP, ← G.genericFibre_ker_target, RingHom.mem_ker]; exact h
     refine key _ ?_
     rw [Polynomial.aeval_def, Polynomial.eval₂_eq_sum, Polynomial.sum_def] at hq
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← hq, map_sum]
+
+    rw [← hq, map_sum]
     refine Finset.sum_congr rfl fun n _ => ?_
     rw [map_mul, map_pow, aeval_X, aeval_rename]
     exact congrArg (· * _) (hg n)
-  replace hFΓ
-      : graphMap (coordIdeal ℤ x)
-          (linForm (ι := GlobalTheory κ) (ι₂ := GlobalTheory (Fin (D + 1))) (projMat e))
-          (∑ n ∈ q.support, rename (fun p : Ix κ => aV D p.2) (g n) * X (bV κ 0) ^ n)
-        = 0 :=
-    hFΓ
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum] at hFΓ
-  simp only [map_mul, map_pow, graphMap_rename_inl, graphMap_inr, ProjFrameGraph.linForm_projMat]
-    at hFΓ
+  replace hFΓ : graphMap (coordIdeal ℤ x) (linForm (ι := GlobalTheory κ) (ι₂ := GlobalTheory (Fin (D + 1))) (projMat e))
+      (∑ n ∈ q.support, rename (fun p : Ix κ => aV D p.2) (g n) * X (bV κ 0) ^ n) = 0 := hFΓ
+
+  rw [map_sum] at hFΓ
+  simp only [map_mul, map_pow, graphMap_rename_inl, graphMap_inr, ProjFrameGraph.linForm_projMat] at hFΓ
   simp only [mul_pow, ← mul_assoc, ← C_pow, ← C_mul] at hFΓ
   have hX : Ideal.Quotient.mk (coordIdeal ℤ x) (X (e 0)) ≠ 0 := by
     rw [Ne, Ideal.Quotient.eq_zero_iff_mem, X_mem_coordIdeal_iff]

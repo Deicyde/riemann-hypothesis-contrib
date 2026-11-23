@@ -1,8 +1,59 @@
 module
 
-public import Mathlib
+import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FormalGroupDeterminantPowDepthEqZeroOfLtPrime
 public import Formalism.LocalToGlobal.CharacterGerms.BiadditiveInSingleVariables
-public import Development.AbelianVarietyTheory.Proofs.UnramifiedDepth.LegendreAndCapelli
+public import Mathlib.CategoryTheory.Category.Basic
+public import Mathlib.RingTheory.MvPolynomial.Homogeneous
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.MvPolynomial.IrreducibleQuadratic
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Presheaf
+import Std.Tactic.BVDecide.Normalize.Prop
+public import Mathlib.NumberTheory.Padics.PadicVal.Basic
 
 @[expose] public section
 
@@ -16,18 +67,17 @@ section General
 variable {C : Type} [Field C] {σ : Type}
 
 def Low (α : σ →₀ ℕ) (g : MvPowerSeries σ C) : Prop :=
-  MvPowerSeries.coeff α g = 1
-    ∧ ∀ m : σ →₀ ℕ, m.degree ≤ α.degree → m ≠ α → MvPowerSeries.coeff m g = 0
+  MvPowerSeries.coeff α g = 1 ∧
+    ∀ m : σ →₀ ℕ, m.degree ≤ α.degree → m ≠ α → MvPowerSeries.coeff m g = 0
 
 theorem low_one : Low (0 : σ →₀ ℕ) (1 : MvPowerSeries σ C) := by
   classical
   refine ⟨by simp, fun m _ hm => ?_⟩
   rw [MvPowerSeries.coeff_one, if_neg hm]
 
-theorem Low.term
-    {α β : σ →₀ ℕ} {g h : MvPowerSeries σ C} (hg : Low α g) (hh : Low β h)
-    (a b : σ →₀ ℕ) (hd : a.degree + b.degree ≤ α.degree + β.degree) (hne : (a, b) ≠ (α, β))
-    : MvPowerSeries.coeff a g * MvPowerSeries.coeff b h = 0 := by
+theorem Low.term {α β : σ →₀ ℕ} {g h : MvPowerSeries σ C} (hg : Low α g) (hh : Low β h)
+    (a b : σ →₀ ℕ) (hd : a.degree + b.degree ≤ α.degree + β.degree) (hne : (a, b) ≠ (α, β)) :
+    MvPowerSeries.coeff a g * MvPowerSeries.coeff b h = 0 := by
   classical
   by_cases ha : a.degree ≤ α.degree ∧ a ≠ α
   · rw [hg.2 a ha.1 ha.2, zero_mul]
@@ -48,8 +98,8 @@ theorem Low.term
     · have : ¬ b.degree ≤ β.degree := fun h => hb' (hb h)
       omega
 
-theorem Low.mul {α β : σ →₀ ℕ} {g h : MvPowerSeries σ C} (hg : Low α g) (hh : Low β h)
-    : Low (α + β) (g * h) := by
+theorem Low.mul {α β : σ →₀ ℕ} {g h : MvPowerSeries σ C} (hg : Low α g) (hh : Low β h) :
+    Low (α + β) (g * h) := by
   classical
   refine ⟨?_, ?_⟩
   · rw [MvPowerSeries.coeff_mul, Finset.sum_eq_single (α, β)]
@@ -77,10 +127,8 @@ theorem Low.mul {α β : σ →₀ ℕ} {g h : MvPowerSeries σ C} (hg : Low α 
       rw [Prod.mk.injEq] at h
       rw [← hq, h.1, h.2]
 
-theorem low_prod
-    {ι : Type}
-    (s : Finset ι) (α : ι → σ →₀ ℕ) (g : ι → MvPowerSeries σ C) (h : ∀ i ∈ s, Low (α i) (g i))
-    : Low (∑ i ∈ s, α i) (∏ i ∈ s, g i) := by
+theorem low_prod {ι : Type} (s : Finset ι) (α : ι → σ →₀ ℕ) (g : ι → MvPowerSeries σ C)
+    (h : ∀ i ∈ s, Low (α i) (g i)) : Low (∑ i ∈ s, α i) (∏ i ∈ s, g i) := by
   classical
   induction s using Finset.induction_on with
   | empty => simpa using (low_one : Low (0 : σ →₀ ℕ) (1 : MvPowerSeries σ C))
@@ -88,8 +136,8 @@ theorem low_prod
     rw [Finset.sum_insert hi, Finset.prod_insert hi]
     exact (h i (Finset.mem_insert_self i s)).mul (ih fun k hk => h k (Finset.mem_insert_of_mem hk))
 
-theorem Low.pow {α : σ →₀ ℕ} {g : MvPowerSeries σ C} (hg : Low α g) (n : ℕ)
-    : Low (n • α) (g ^ n) := by
+theorem Low.pow {α : σ →₀ ℕ} {g : MvPowerSeries σ C} (hg : Low α g) (n : ℕ) :
+    Low (n • α) (g ^ n) := by
   classical
   induction n with
   | zero => simpa using (low_one : Low (0 : σ →₀ ℕ) (1 : MvPowerSeries σ C))
@@ -97,8 +145,8 @@ theorem Low.pow {α : σ →₀ ℕ} {g : MvPowerSeries σ C} (hg : Low α g) (n
     rw [succ_nsmul, pow_succ]
     exact ih.mul hg
 
-theorem low_tangent {t : σ → MvPowerSeries σ C} (ht : TangentId t) (x : σ) (n : ℕ)
-    : Low (Finsupp.single x n) (t x ^ n) := by
+theorem low_tangent {t : σ → MvPowerSeries σ C} (ht : TangentId t) (x : σ) (n : ℕ) :
+    Low (Finsupp.single x n) (t x ^ n) := by
   classical
   have h1 : Low (Finsupp.single x 1) (t x) := by
     refine ⟨?_, ?_⟩
@@ -112,17 +160,15 @@ theorem low_tangent {t : σ → MvPowerSeries σ C} (ht : TangentId t) (x : σ) 
 def kill (p : σ → Prop) [DecidablePred p] : MvPolynomial σ C →ₐ[C] MvPolynomial σ C :=
   MvPolynomial.aeval fun x => if p x then MvPolynomial.X x else 0
 
-theorem coeff_kill
-    (p : σ → Prop) [DecidablePred p] (m : σ →₀ ℕ) (hm : ∀ x ∈ m.support, p x) (P : MvPolynomial σ C)
-    : AddMonoidAlgebra.coeff (kill p P) m = AddMonoidAlgebra.coeff P m := by
+theorem coeff_kill (p : σ → Prop) [DecidablePred p] (m : σ →₀ ℕ) (hm : ∀ x ∈ m.support, p x)
+    (P : MvPolynomial σ C) : AddMonoidAlgebra.coeff (kill p P) m = AddMonoidAlgebra.coeff P m := by
   classical
   refine MvPolynomial.induction_on' P (fun u a => ?_) (fun P Q hP hQ => ?_)
   · unfold kill
     rw [MvPolynomial.aeval_monomial]
     by_cases hu : ∀ x ∈ u.support, p x
-    · have h
-          : (u.prod fun i k => (if p i then MvPolynomial.X i else 0 : MvPolynomial σ C) ^ k)
-            = u.prod fun i k => MvPolynomial.X i ^ k := by
+    · have h : (u.prod fun i k => (if p i then MvPolynomial.X i else 0 : MvPolynomial σ C) ^ k) =
+          u.prod fun i k => MvPolynomial.X i ^ k := by
         apply Finset.prod_congr rfl
         intro x hx
         dsimp only
@@ -130,9 +176,7 @@ theorem coeff_kill
       rw [h, MvPolynomial.algebraMap_eq, ← MvPolynomial.monomial_eq]
     · push_neg at hu
       obtain ⟨x, hx, hpx⟩ := hu
-      have hz
-          : (u.prod fun i k => (if p i then MvPolynomial.X i else 0 : MvPolynomial σ C) ^ k)
-            = 0 := by
+      have hz : (u.prod fun i k => (if p i then MvPolynomial.X i else 0 : MvPolynomial σ C) ^ k) = 0 := by
         rw [Finsupp.prod]
         apply Finset.prod_eq_zero hx
         rw [if_neg hpx]
@@ -154,8 +198,8 @@ theorem lead_one : Lead p (0 : σ →₀ ℕ) (1 : MvPolynomial σ C) := by
   classical
   refine ⟨by simp, by simpa using MvPolynomial.isHomogeneous_one σ C, by simp⟩
 
-theorem Lead.mul {α β : σ →₀ ℕ} {P Q : MvPolynomial σ C} (hP : Lead p α P) (hQ : Lead p β Q)
-    : Lead p (α + β) (P * Q) := by
+theorem Lead.mul {α β : σ →₀ ℕ} {P Q : MvPolynomial σ C} (hP : Lead p α P) (hQ : Lead p β Q) :
+    Lead p (α + β) (P * Q) := by
   classical
   obtain ⟨hkP, hhP, hsP⟩ := hP
   obtain ⟨hkQ, hhQ, hsQ⟩ := hQ
@@ -168,10 +212,8 @@ theorem Lead.mul {α β : σ →₀ ℕ} {P Q : MvPolynomial σ C} (hP : Lead p 
     · exact hsP x h
     · exact hsQ x h
 
-theorem lead_prod
-    {ι : Type}
-    (s : Finset ι) (α : ι → σ →₀ ℕ) (P : ι → MvPolynomial σ C) (h : ∀ i ∈ s, Lead p (α i) (P i))
-    : Lead p (∑ i ∈ s, α i) (∏ i ∈ s, P i) := by
+theorem lead_prod {ι : Type} (s : Finset ι) (α : ι → σ →₀ ℕ) (P : ι → MvPolynomial σ C)
+    (h : ∀ i ∈ s, Lead p (α i) (P i)) : Lead p (∑ i ∈ s, α i) (∏ i ∈ s, P i) := by
   classical
   induction s using Finset.induction_on with
   | empty => simpa using (lead_one (p := p) : Lead p (0 : σ →₀ ℕ) (1 : MvPolynomial σ C))
@@ -179,8 +221,8 @@ theorem lead_prod
     rw [Finset.sum_insert hi, Finset.prod_insert hi]
     exact (h i (Finset.mem_insert_self i s)).mul (ih fun k hk => h k (Finset.mem_insert_of_mem hk))
 
-theorem Lead.pow {α : σ →₀ ℕ} {P : MvPolynomial σ C} (hP : Lead p α P) (n : ℕ)
-    : Lead p (n • α) (P ^ n) := by
+theorem Lead.pow {α : σ →₀ ℕ} {P : MvPolynomial σ C} (hP : Lead p α P) (n : ℕ) :
+    Lead p (n • α) (P ^ n) := by
   classical
   induction n with
   | zero => simpa using (lead_one (p := p) : Lead p (0 : σ →₀ ℕ) (1 : MvPolynomial σ C))
@@ -188,9 +230,8 @@ theorem Lead.pow {α : σ →₀ ℕ} {P : MvPolynomial σ C} (hP : Lead p α P)
     rw [succ_nsmul, pow_succ]
     exact ih.mul hP
 
-theorem jet_eq
-    {α : σ →₀ ℕ} {P : MvPolynomial σ C} {g : MvPowerSeries σ C} (hP : Lead p α P) (hg : Low α g)
-    : jetAt0 P g = (mfact α : C) := by
+theorem jet_eq {α : σ →₀ ℕ} {P : MvPolynomial σ C} {g : MvPowerSeries σ C} (hP : Lead p α P)
+    (hg : Low α g) : jetAt0 P g = (mfact α : C) := by
   classical
   obtain ⟨hk, hh, hs⟩ := hP
   obtain ⟨h1, h0⟩ := hg
@@ -208,19 +249,17 @@ theorem jet_eq
   · intro hα
     exact absurd (MvPolynomial.mem_support_iff.2 (by rw [hcoef]; exact one_ne_zero)) hα
 
-theorem lead_det {k : ℕ} (w : Fin k → Fin k → σ) (hw : ∀ b c, p (w b c) ↔ b = c)
-    : Lead p (∑ b, Finsupp.single (w b b) 1)
+theorem lead_det {k : ℕ} (w : Fin k → Fin k → σ) (hw : ∀ b c, p (w b c) ↔ b = c) :
+    Lead p (∑ b, Finsupp.single (w b b) 1)
       (Matrix.of fun b c : Fin k => (MvPolynomial.X (w b c) : MvPolynomial σ C)).det := by
   classical
   refine ⟨?_, ?_, ?_⟩
   · rw [AlgHom.map_det]
-    have hM
-        : (kill p).mapMatrix
-            (Matrix.of fun b c : Fin k => (MvPolynomial.X (w b c) : MvPolynomial σ C))
-          = Matrix.diagonal fun b => MvPolynomial.X (w b b) := by
+    have hM : (kill p).mapMatrix (Matrix.of fun b c : Fin k => (MvPolynomial.X (w b c) : MvPolynomial σ C)) =
+        Matrix.diagonal fun b => MvPolynomial.X (w b b) := by
       ext b c
-      simp only [AlgHom.mapMatrix_apply, Matrix.map_apply, Matrix.of_apply, Matrix.diagonal_apply,
-        kill, MvPolynomial.aeval_X]
+      simp only [AlgHom.mapMatrix_apply, Matrix.map_apply, Matrix.of_apply, Matrix.diagonal_apply, kill,
+        MvPolynomial.aeval_X]
       by_cases hbc : b = c
       · subst hbc
         simp [(hw b b).2 rfl]
@@ -228,22 +267,17 @@ theorem lead_det {k : ℕ} (w : Fin k → Fin k → σ) (hw : ∀ b c, p (w b c)
     rw [hM, Matrix.det_diagonal, MvPolynomial.monomial_sum_one]
     rfl
   · have hdeg : (∑ b : Fin k, Finsupp.single (w b b) 1).degree = k := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum]
+
+      rw [map_sum]
       simp [Finsupp.degree_single]
     rw [hdeg, Matrix.det_apply]
     apply MvPolynomial.IsHomogeneous.sum
     intro s _
-    have hprod : MvPolynomial.IsHomogeneous
-        (∏ i, (Matrix.of fun b c : Fin k =>
-          (MvPolynomial.X (w b c) : MvPolynomial σ C)) (s i) i)
-        k := by
-      have h :=
-        MvPolynomial.IsHomogeneous.prod Finset.univ
-          (fun i =>
-            (Matrix.of fun b c : Fin k => (MvPolynomial.X (w b c) : MvPolynomial σ C)) (s i) i)
-          (fun _ => 1)
-          (fun i _ => MvPolynomial.isHomogeneous_X _ _)
+    have hprod : MvPolynomial.IsHomogeneous (∏ i, (Matrix.of fun b c : Fin k =>
+        (MvPolynomial.X (w b c) : MvPolynomial σ C)) (s i) i) k := by
+      have h := MvPolynomial.IsHomogeneous.prod Finset.univ
+        (fun i => (Matrix.of fun b c : Fin k => (MvPolynomial.X (w b c) : MvPolynomial σ C)) (s i) i)
+        (fun _ => 1) (fun i _ => MvPolynomial.isHomogeneous_X _ _)
       simpa using h
     rcases Int.units_eq_one_or (Equiv.Perm.sign s) with h | h
     · rw [h, one_smul]
@@ -277,8 +311,8 @@ theorem monAl_eq_zero (e : ℕ → ℕ) {ρ : ℕ} (h : ¬ ρ < N') : monAl N N'
   unfold monAl
   rw [Finset.Icc_eq_empty (by omega), Finset.sum_empty]
 
-theorem monAl_eq (e : ℕ → ℕ) (ρ : ℕ)
-    : monAl N N' e ρ = ∑ k ∈ Finset.Icc 1 (min N N'), if ρ < k then e k else 0 := by
+theorem monAl_eq (e : ℕ → ℕ) (ρ : ℕ) :
+    monAl N N' e ρ = ∑ k ∈ Finset.Icc 1 (min N N'), if ρ < k then e k else 0 := by
   classical
   unfold monAl
   rw [← Finset.sum_filter]
@@ -287,8 +321,8 @@ theorem monAl_eq (e : ℕ → ℕ) (ρ : ℕ)
   simp only [Finset.mem_Icc, Finset.mem_filter]
   omega
 
-theorem sum_range_ite {M : Type} [AddCommMonoid M] {k : ℕ} (hk : k ≤ N) (F : ℕ → M)
-    : ∑ ρ ∈ Finset.range N, (if ρ < k then F ρ else 0) = ∑ ρ ∈ Finset.range k, F ρ := by
+theorem sum_range_ite {M : Type} [AddCommMonoid M] {k : ℕ} (hk : k ≤ N) (F : ℕ → M) :
+    ∑ ρ ∈ Finset.range N, (if ρ < k then F ρ else 0) = ∑ ρ ∈ Finset.range k, F ρ := by
   classical
   rw [← Finset.sum_filter]
   congr 1
@@ -296,15 +330,13 @@ theorem sum_range_ite {M : Type} [AddCommMonoid M] {k : ℕ} (hk : k ≤ N) (F :
   simp only [Finset.mem_filter, Finset.mem_range]
   omega
 
-theorem dg_monAl (j : Fin N × Fin N' → σ) (e : ℕ → ℕ)
-    : dg j (monAl N N' e)
-      = ∑ k ∈ Finset.Icc 1 (min N N'), e k • ∑ ρ ∈ Finset.range k, dgOne j ρ 1 := by
+theorem dg_monAl (j : Fin N × Fin N' → σ) (e : ℕ → ℕ) :
+    dg j (monAl N N' e) =
+      ∑ k ∈ Finset.Icc 1 (min N N'), e k • ∑ ρ ∈ Finset.range k, dgOne j ρ 1 := by
   classical
   unfold dg
-  have h
-      : ∀ ρ,
-        dgOne j ρ (monAl N N' e ρ)
-          = ∑ k ∈ Finset.Icc 1 (min N N'), if ρ < k then e k • dgOne j ρ 1 else 0 := by
+  have h : ∀ ρ, dgOne j ρ (monAl N N' e ρ) =
+      ∑ k ∈ Finset.Icc 1 (min N N'), if ρ < k then e k • dgOne j ρ 1 else 0 := by
     intro ρ
     rw [dgOne_eq_smul, monAl_eq, Finset.sum_smul]
     apply Finset.sum_congr rfl
@@ -325,14 +357,13 @@ theorem sum_monAl (e : ℕ → ℕ) : ∑ ρ : Fin N, monAl N N' e ρ.val = monD
   apply Finset.sum_congr rfl
   intro k hk
   rw [Finset.mem_Icc] at hk
-  rw [sum_range_ite (by omega : k ≤ N) (fun _ => e k), Finset.sum_const, Finset.card_range,
-    smul_eq_mul]
+  rw [sum_range_ite (by omega : k ≤ N) (fun _ => e k), Finset.sum_const, Finset.card_range, smul_eq_mul]
 
 variable {p : σ → Prop} [DecidablePred p]
 
-theorem lead_minor
-    (j : Fin N × Fin N' → σ) (hj : ∀ b c, p (j (b, c)) ↔ b.val = c.val) {k : ℕ} (hk : k ≤ min N N')
-    : Lead p (∑ ρ ∈ Finset.range k, dgOne j ρ 1) (MvPolynomial.rename j (minorK C N N' k)) := by
+theorem lead_minor (j : Fin N × Fin N' → σ) (hj : ∀ b c, p (j (b, c)) ↔ b.val = c.val) {k : ℕ}
+    (hk : k ≤ min N N') :
+    Lead p (∑ ρ ∈ Finset.range k, dgOne j ρ 1) (MvPolynomial.rename j (minorK C N N' k)) := by
   classical
   have h1 : k ≤ N := le_trans hk (min_le_left _ _)
   have h2 : k ≤ N' := le_trans hk (min_le_right _ _)
@@ -340,18 +371,15 @@ theorem lead_minor
     intro b c
     rw [hj, Fin.val_castLE, Fin.val_castLE, Fin.val_inj]
   have hL := lead_det (C := C) (p := p) (fun b c : Fin k => j (Fin.castLE h1 b, Fin.castLE h2 c)) hw
-  have hpoly
-      : MvPolynomial.rename j (minorK C N N' k)
-        = (Matrix.of fun b c : Fin k =>
-          (MvPolynomial.X (j (Fin.castLE h1 b, Fin.castLE h2 c)) : MvPolynomial σ C)).det := by
+  have hpoly : MvPolynomial.rename j (minorK C N N' k) = (Matrix.of fun b c : Fin k =>
+      (MvPolynomial.X (j (Fin.castLE h1 b, Fin.castLE h2 c)) : MvPolynomial σ C)).det := by
     unfold minorK
     rw [dite_eq_left ⟨h1, h2⟩, AlgHom.map_det]
     congr 1
     ext b c
     simp [MvPolynomial.rename_X]
-  have hexp
-      : ∑ ρ ∈ Finset.range k, dgOne j ρ 1
-        = ∑ b : Fin k, Finsupp.single (j (Fin.castLE h1 b, Fin.castLE h2 b)) 1 := by
+  have hexp : ∑ ρ ∈ Finset.range k, dgOne j ρ 1 =
+      ∑ b : Fin k, Finsupp.single (j (Fin.castLE h1 b, Fin.castLE h2 b)) 1 := by
     rw [← Fin.sum_univ_eq_sum_range (fun ρ => dgOne j ρ 1) k]
     apply Finset.sum_congr rfl
     intro b _
@@ -361,8 +389,9 @@ theorem lead_minor
   rw [hpoly, hexp]
   exact hL
 
-theorem lead_monP (j : Fin N × Fin N' → σ) (hj : ∀ b c, p (j (b, c)) ↔ b.val = c.val) (e : ℕ → ℕ)
-    : Lead p (dg j (monAl N N' e)) (MvPolynomial.rename j (monP C N N' e)) := by
+theorem lead_monP (j : Fin N × Fin N' → σ) (hj : ∀ b c, p (j (b, c)) ↔ b.val = c.val)
+    (e : ℕ → ℕ) :
+    Lead p (dg j (monAl N N' e)) (MvPolynomial.rename j (monP C N N' e)) := by
   classical
   unfold monP
   rw [map_prod]
@@ -372,8 +401,8 @@ theorem lead_monP (j : Fin N × Fin N' → σ) (hj : ∀ b c, p (j (b, c)) ↔ b
   intro k hk
   exact (lead_minor j hj (Finset.mem_Icc.1 hk).2).pow (e k)
 
-theorem low_monG (j : Fin N × Fin N' → σ) {t : σ → MvPowerSeries σ C} (ht : TangentId t) (e : ℕ → ℕ)
-    : Low (dg j (monAl N N' e)) (monG N N' e fun x => t (j x)) := by
+theorem low_monG (j : Fin N × Fin N' → σ) {t : σ → MvPowerSeries σ C} (ht : TangentId t)
+    (e : ℕ → ℕ) : Low (dg j (monAl N N' e)) (monG N N' e fun x => t (j x)) := by
   classical
   unfold monG dg
   rw [← Fin.sum_univ_eq_sum_range (fun ρ => dgOne j ρ (monAl N N' e ρ)) N]
@@ -386,9 +415,8 @@ theorem low_monG (j : Fin N × Fin N' → σ) {t : σ → MvPowerSeries σ C} (h
   · rw [dite_eq_right h, dite_eq_right (fun hh => h hh.2)]
     exact low_one
 
-theorem dg_apply
-    (j : Fin N × Fin N' → σ) (hj : Function.Injective j) (f : ℕ → ℕ) (b : Fin N) (c : Fin N')
-    : dg j f (j (b, c)) = if b.val = c.val then f b.val else 0 := by
+theorem dg_apply (j : Fin N × Fin N' → σ) (hj : Function.Injective j) (f : ℕ → ℕ)
+    (b : Fin N) (c : Fin N') : dg j f (j (b, c)) = if b.val = c.val then f b.val else 0 := by
   classical
   unfold dg
   rw [Finsupp.finsetSum_apply, Finset.sum_eq_single b.val]
@@ -414,8 +442,8 @@ theorem dg_apply
   · intro hb
     exact absurd (Finset.mem_range.2 b.isLt) hb
 
-theorem dg_apply_of_notMem (j : Fin N × Fin N' → σ) (f : ℕ → ℕ) (x : σ) (hx : ∀ y, x ≠ j y)
-    : dg j f x = 0 := by
+theorem dg_apply_of_notMem (j : Fin N × Fin N' → σ) (f : ℕ → ℕ) (x : σ) (hx : ∀ y, x ≠ j y) :
+    dg j f x = 0 := by
   classical
   unfold dg
   rw [Finsupp.finsetSum_apply]
@@ -439,51 +467,22 @@ theorem val_nat_nonneg (n : ℕ) : 0 ≤ v (n : C) := by
     push_cast
     exact le_trans (le_min ih (AddValuation.map_one v).ge) (AddValuation.map_add v _ _)
 
-theorem val_coprime {l : ℕ} (hl : l.Prime) (hv : v (l : C) = 1) {n : ℕ} (hn : ¬ l ∣ n)
-    : v (n : C) = 0 := by
-  classical
-  have hpos := val_nat_nonneg v n
-  have hcop : Nat.Coprime n l := ((Nat.Prime.coprime_iff_not_dvd hl).2 hn).symm
-  obtain ⟨a, -, ha⟩ := Nat.exists_mul_mod_eq_one_of_coprime hcop hl.one_lt
-  have hq : n * a = l * (n * a / l) + 1 := by
-    have h := Nat.div_add_mod (n * a) l
-    rw [ha] at h
-    exact h.symm
-  have h01 : (0 : WithTop ℝ) < 1 := by exact_mod_cast (zero_lt_one : (0 : ℝ) < 1)
-  by_contra hne
-  have hlt : 0 < v (n : C) := lt_of_le_of_ne hpos (Ne.symm hne)
-  have h1 : 0 < v ((n : C) * a) := by
-    rw [AddValuation.map_mul]
-    exact lt_of_lt_of_le hlt (le_add_of_nonneg_right (val_nat_nonneg v a))
-  have h2 : 0 < v ((l : C) * ((n * a / l : ℕ) : C)) := by
-    rw [AddValuation.map_mul, hv]
-    exact lt_of_lt_of_le h01 (le_add_of_nonneg_right (val_nat_nonneg v _))
-  have hC : (1 : C) = (n : C) * a - (l : C) * ((n * a / l : ℕ) : C) := by
-    have h := congrArg (fun x : ℕ => (x : C)) hq
-    simp only [Nat.cast_add, Nat.cast_mul, Nat.cast_one] at h
-    rw [h]
-    ring
-  have h3 := AddValuation.map_sub v ((n : C) * a) ((l : C) * ((n * a / l : ℕ) : C))
-  rw [← hC, AddValuation.map_one] at h3
-  exact absurd h3 (not_le.2 (lt_min h1 h2))
+theorem val_coprime {l : ℕ} (hl : l.Prime) (hv : v (l : C) = 1) {n : ℕ} (hn : ¬ l ∣ n) :
+    v (n : C) = 0 := by
+  apply GlobalTheory.FGDepth.val_natCast_eq_zero <;> assumption
 
-theorem val_nat {l : ℕ} (hl : l.Prime) (hv : v (l : C) = 1) {n : ℕ} (hn : n ≠ 0)
-    : v (n : C) = (((padicValNat l n : ℕ) : ℝ) : WithTop ℝ) := by
+theorem val_nat {l : ℕ} (hl : l.Prime) (hv : v (l : C) = 1) {n : ℕ} (hn : n ≠ 0) :
+    v (n : C) = (((padicValNat l n : ℕ) : ℝ) : WithTop ℝ) := by
   classical
   obtain ⟨e, m, hm, rfl⟩ := Nat.exists_eq_pow_mul_and_not_dvd hn l hl.ne_one
   have hm0 : m ≠ 0 := by
     rintro rfl
     exact hm (dvd_zero l)
   have hfact := Fact.mk hl
-  rw [(show ∀ {p a b : ℕ} [_root_.Fact (_root_.Nat.Prime p)],
-          a ≠ 0 → b ≠ 0
-            → _root_.padicValNat p (a * b) = _root_.padicValNat p a + _root_.padicValNat p b from by
-        simpa only [← _root_.Nat.padicValNat_def] using @_root_.Nat.multiplicity_mul)
-      (pow_ne_zero _ hl.ne_zero) hm0,
-    Nat.padicValNat_def, padicValNat.prime_pow, Nat.padicValNat_def,
-    padicValNat.eq_zero_of_not_dvd hm, add_zero, Nat.cast_mul, Nat.cast_pow, AddValuation.map_mul,
-    AddValuation.map_pow, hv, val_coprime v hl hv hm, add_zero, ← WithTop.coe_one,
-    ← WithTop.coe_nsmul, nsmul_eq_mul, mul_one]
+  rw [(show ∀ {p a b : ℕ} [_root_.Fact (_root_.Nat.Prime p)], a ≠ 0 → b ≠ 0 → _root_.padicValNat p (a * b) = _root_.padicValNat p a + _root_.padicValNat p b from by simpa only [← _root_.Nat.padicValNat_def] using @_root_.Nat.multiplicity_mul) (pow_ne_zero _ hl.ne_zero) hm0, Nat.padicValNat_def, padicValNat.prime_pow,
+    Nat.padicValNat_def, padicValNat.eq_zero_of_not_dvd hm, add_zero, Nat.cast_mul, Nat.cast_pow, AddValuation.map_mul,
+    AddValuation.map_pow, hv, val_coprime v hl hv hm, add_zero, ← WithTop.coe_one, ← WithTop.coe_nsmul,
+    nsmul_eq_mul, mul_one]
 
 end Valuation
 

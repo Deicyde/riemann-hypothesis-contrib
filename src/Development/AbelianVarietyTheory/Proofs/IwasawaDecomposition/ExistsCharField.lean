@@ -1,20 +1,55 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.JEvExists
-public import Formalism.LocalToGlobal.UnitaryNorms.CharTied
-public import Formalism.LocalRingCardinality.DataKap
-public import Formalism.LocalToGlobal.ProjectiveLattices.HasDataCondition
-public import Formalism.LocalToGlobal.ProjectiveLattices.RecCond
-public import Formalism.LocalToGlobal.ProjectiveLattices.ParCanon
-public import Formalism.LocalToGlobal.ProjectiveLattices.ExistsParameterConditions
-public import Formalism.SharpRestriction.Divisibility.GeneratorPowers.ThExprUniqOfChartIndep2
-public import Development.AbelianVarietyTheory.PublishedTheorems.AutomorphicForms₂.DsExistsOfDiscreteSeriesExists
-public import Development.AbelianVarietyTheory.PublishedTheorems.AutomorphicForms₂.ExistsNormLeHeightPow
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsOmegaField
+public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsCoversOfHalves
+public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsRepsOfFiniteIndex
+public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.IntValuationEqOfMem
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsCoeffExtRationalFormsValuesField
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsGaloisGe
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsHarmonicCoefficientMapAtWeightsStatement
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsLevelAtEachIndex
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.LevelCoefficientCompatibility
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsNumberFieldHeckeCharacterSqrtNormValuesStatement
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsOmegaField
+import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.InverseSelfDualFrameStandardSpaceIntegralStatement
+import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.LawOfSquaresSelfDualSplitLatticeStatement
+import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.LevelCoefficientCompatibility
+import Development.AbelianVarietyTheory.Proofs.TwistedOperators.ParahoricLevelLiftsExistStatement
+import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.ExistsFirstOfSecond
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.LinearAlgebra.FreeModule.IdealQuotient
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
 
 @[expose] public section
 
@@ -57,7 +92,6 @@ variable
   {Ks : Type} [Field Ks] [NumberField Ks] [Algebra Ks D.what₂.LL]
   (R : RealDat D A Ks) (i : Fin D.R.m)
 
-set_option maxHeartbeats 1000000 in
 theorem exists_phi
     (hR : GlobalTheory.RealGeo.PreChar R) (hV : VStd D i) (t : T0)
     {La : Type} [AddCommGroup La] [Module (𝓞 D.host.E) La]
@@ -101,7 +135,6 @@ theorem exists_phi
     exists_datum (Vc D i) (Wc D i) hV.1 _ hβ (R.βW i) e ι hi J PP (hJ PP hPP) x _ fun b =>
       (Submodule.Quotient.eq _).1 (Quotient.out_eq _)
 
-set_option maxHeartbeats 1000000 in
 theorem exists_thAd
     (hR : R.IsModels)
     (t : T0)
@@ -126,7 +159,6 @@ theorem exists_thAd
   simp only [dif_pos hx]
   rw [huniq _ _ _ hx.choose_spec hy]
 
-set_option maxHeartbeats 1600000 in
 theorem exists_coef
     (hF : R.IsFam) (hM : R.IsModels)
     (K' : Type) [Field K']
@@ -223,7 +255,6 @@ theorem actLev_of_levIs
 end Level
 
 open GlobalTheory.RealGeo in
-set_option maxHeartbeats 2000000 in
 theorem exists_pins
     : ∀ (D : D7) (G : Type) [Group G] [Fintype G] (Pl0 T0 : Type)
         (A : FamIn D.what₂.LL G Pl0 T0 D.R.m) (T : CoreJ D) [Algebra T.Q.c.F D.what₂.LL]

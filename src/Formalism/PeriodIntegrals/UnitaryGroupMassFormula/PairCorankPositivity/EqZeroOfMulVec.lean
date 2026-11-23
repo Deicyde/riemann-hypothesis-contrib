@@ -1,7 +1,51 @@
 module
 
-public import Mathlib
-public import Formalism.PeriodIntegrals.PairCorankPos
+import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.CountNonIntegrality.NGCong
+public import Formalism.SharpRestriction.CuspSpanNormBounds.BlockEnds
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Etale.Weakly
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.TotallySplit
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.Monotonicity.Lemmas
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Presheaf
+import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
@@ -16,33 +60,16 @@ open scoped Matrix
 
 variable {E : Type} [Field E] [NumberField E] [StarRing E]
 
-theorem hT_swap (S : HSpace E) (x y : S.V) : S.hT y x = star (S.hT x y) := by
-  rw [← S.herm.eq x y, starRingEnd_apply]
+theorem hT_swap (S : HSpace E) (x y : S.V) : S.hT y x = star (S.hT x y) :=
+  (S.herm.eq x y).symm
 
-theorem gram_fvec {S : HSpace E} {r : ℕ} {T : E} (F : FlagG S r T) (c i : Fin (r + 1))
-    : S.hT (F.fvec c) (F.fvec i) = if c = Fin.last r ∧ i = Fin.last r then -T else 0 := by
-  induction c using Fin.lastCases with
-  | last =>
-    induction i using Fin.lastCases with
-    | last => simp [FlagG.fvec, F.z_norm]
-    | cast j =>
-      have h1 : Fin.castSucc j ≠ Fin.last r := Fin.castSucc_ne_last j
-      simp only [FlagG.fvec, Fin.snoc_last, Fin.snoc_castSucc, h1, and_false, if_false]
-      rw [hT_swap, F.z_orth j, star_zero]
-  | cast j =>
-    have h1 : Fin.castSucc j ≠ Fin.last r := Fin.castSucc_ne_last j
-    induction i using Fin.lastCases with
-    | last =>
-      simp only [FlagG.fvec, Fin.snoc_last, Fin.snoc_castSucc, h1, false_and, if_false]
-      exact F.z_orth j
-    | cast l =>
-      simp only [FlagG.fvec, Fin.snoc_castSucc, h1, false_and, if_false]
-      exact F.e_iso j l
+theorem gram_fvec {S : HSpace E} {r : ℕ} {T : E} (F : FlagG S r T) (c i : Fin (r + 1)) :
+    S.hT (F.fvec c) (F.fvec i) = if c = Fin.last r ∧ i = Fin.last r then -T else 0 := by
+  apply PI.CntNotIntW.flag_gram <;> assumption
 
-theorem det_mul_last
-    {r : ℕ} (A : Matrix (Fin (r + 1)) (Fin (r + 1)) E) (v : Fin (r + 1) → E)
-    (c : E) (h : ∀ i, (A *ᵥ v) i = if i = Fin.last r then c else 0)
-    : A.det * v (Fin.last r) = (A.submatrix Fin.castSucc Fin.castSucc).det * c := by
+theorem det_mul_last {r : ℕ} (A : Matrix (Fin (r + 1)) (Fin (r + 1)) E) (v : Fin (r + 1) → E) (c : E)
+    (h : ∀ i, (A *ᵥ v) i = if i = Fin.last r then c else 0) :
+    A.det * v (Fin.last r) = (A.submatrix Fin.castSucc Fin.castSucc).det * c := by
   have key : A.adjugate *ᵥ (A *ᵥ v) = A.det • v := by
     rw [Matrix.mulVec_mulVec, Matrix.adjugate_mul]
     ext i
@@ -51,15 +78,12 @@ theorem det_mul_last
   have hv : A *ᵥ v = fun i => if i = Fin.last r then c else 0 := funext h
   rw [hv] at k2
   simp only [Matrix.mulVec, dotProduct, mul_ite, mul_zero, Finset.sum_ite_eq', Finset.mem_univ,
-      if_true, Pi.smul_apply, smul_eq_mul]
-    at k2
+    if_true, Pi.smul_apply, smul_eq_mul] at k2
   rw [← k2, Matrix.adjugate_fin_succ_eq_det_submatrix, Fin.succAbove_last, Fin.val_last,
     Even.neg_one_pow ⟨r, rfl⟩, one_mul]
 
-theorem eq_zero_of_mulVec
-    {n : Type} [Fintype n] [DecidableEq n]
-    (A : Matrix n n E) (v : n → E) (hA : A.det ≠ 0) (h : A *ᵥ v = 0)
-    : v = 0 := by
+theorem eq_zero_of_mulVec {n : Type} [Fintype n] [DecidableEq n] (A : Matrix n n E) (v : n → E)
+    (hA : A.det ≠ 0) (h : A *ᵥ v = 0) : v = 0 := by
   have key : A.adjugate *ᵥ (A *ᵥ v) = A.det • v := by
     rw [Matrix.mulVec_mulVec, Matrix.adjugate_mul]
     ext i
@@ -67,19 +91,18 @@ theorem eq_zero_of_mulVec
   rw [h, Matrix.mulVec_zero] at key
   exact (smul_eq_zero.1 key.symm).resolve_left hA
 
-theorem Dl_top {S : HSpace E} {r : ℕ} {T T' : E} (F : FlagG S r T) (F' : FlagG S r T')
-    : Dl F F' (r + 1) = (Zhat F F').det := by
+theorem Dl_top {S : HSpace E} {r : ℕ} {T T' : E} (F : FlagG S r T) (F' : FlagG S r T') :
+    Dl F F' (r + 1) = (Zhat F F').det := by
   simp only [Dl, leadMinorE, le_refl, dif_pos]
   rfl
 
-theorem Dl_r {S : HSpace E} {r : ℕ} {T T' : E} (F : FlagG S r T) (F' : FlagG S r T')
-    : Dl F F' r = ((Zhat F F').submatrix Fin.castSucc Fin.castSucc).det := by
+theorem Dl_r {S : HSpace E} {r : ℕ} {T T' : E} (F : FlagG S r T) (F' : FlagG S r T') :
+    Dl F F' r = ((Zhat F F').submatrix Fin.castSucc Fin.castSucc).det := by
   simp only [Dl, leadMinorE, dif_pos (Nat.le_succ r)]
   rfl
 
-theorem linIndep
-    {S : HSpace E} {r : ℕ} {T T' : E} (F : FlagG S r T) (F' : FlagG S r T') (hG : Gflag F F' ≠ 0)
-    : LinearIndependent E (Sum.elim F.fvec F'.fvec) := by
+theorem linIndep {S : HSpace E} {r : ℕ} {T T' : E} (F : FlagG S r T) (F' : FlagG S r T')
+    (hG : Gflag F F' ≠ 0) : LinearIndependent E (Sum.elim F.fvec F'.fvec) := by
   rw [Fintype.linearIndependent_iff]
   intro g hg
   set a : Fin (r + 1) → E := fun i => g (Sum.inl i) with ha_def
@@ -92,13 +115,11 @@ theorem linIndep
   have hZb : ∀ c, (Z *ᵥ b) c = if c = Fin.last r then T * a (Fin.last r) else 0 := by
     intro c
     have h0 := congrArg (S.hT (F.fvec c)) hsum
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_add (f := _), map_sum, LinearMap.map_smulₛₗ, RingHom.id_apply, map_zero,
-          smul_eq_mul, gram_fvec]
-        at h0
-    have e1
-        : ∑ i, a i * (if c = Fin.last r ∧ i = Fin.last r then -T else 0)
-          = if c = Fin.last r then -T * a (Fin.last r) else 0 := by
+
+    simp only [map_add (f := _), map_sum, LinearMap.map_smulₛₗ, RingHom.id_apply, map_zero,
+    smul_eq_mul, gram_fvec] at h0
+    have e1 : ∑ i, a i * (if c = Fin.last r ∧ i = Fin.last r then -T else 0) =
+        if c = Fin.last r then -T * a (Fin.last r) else 0 := by
       by_cases hc : c = Fin.last r
       · simp [hc, mul_comm]
       · simp [hc]
@@ -115,13 +136,11 @@ theorem linIndep
   have hZa : ∀ d, (Z.conjTranspose *ᵥ a) d = if d = Fin.last r then T' * b (Fin.last r) else 0 := by
     intro d
     have h0 := congrArg (S.hT (F'.fvec d)) hsum
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_add (f := _), map_sum, LinearMap.map_smulₛₗ, RingHom.id_apply, map_zero,
-          smul_eq_mul, gram_fvec]
-        at h0
-    have e1
-        : ∑ j, b j * (if d = Fin.last r ∧ j = Fin.last r then -T' else 0)
-          = if d = Fin.last r then -T' * b (Fin.last r) else 0 := by
+
+    simp only [map_add (f := _), map_sum, LinearMap.map_smulₛₗ, RingHom.id_apply, map_zero,
+    smul_eq_mul, gram_fvec] at h0
+    have e1 : ∑ j, b j * (if d = Fin.last r ∧ j = Fin.last r then -T' else 0) =
+        if d = Fin.last r then -T' * b (Fin.last r) else 0 := by
       by_cases hd : d = Fin.last r
       · simp [hd, mul_comm]
       · simp [hd]
@@ -143,8 +162,8 @@ theorem linIndep
   have c1 : D * b (Fin.last r) = Dr * (T * a (Fin.last r)) := det_mul_last Z b _ hZb
   have c2 : star D * a (Fin.last r) = star Dr * (T' * b (Fin.last r)) := by
     have := det_mul_last Z.conjTranspose a _ hZa
-    rwa [Matrix.det_conjTranspose, ← Matrix.conjTranspose_submatrix, Matrix.det_conjTranspose] at
-      this
+    rwa [Matrix.det_conjTranspose, ← Matrix.conjTranspose_submatrix,
+      Matrix.det_conjTranspose] at this
 
   have hlast : a (Fin.last r) = 0 ∧ b (Fin.last r) = 0 := by
     by_contra hne
@@ -172,16 +191,17 @@ theorem linIndep
         · exact absurd h (mul_ne_zero ha hb)
         · exact h
 
-  have hZb0 : Z *ᵥ b = 0 := by funext c; rw [hZb c, hlast.1, mul_zero]; simp
+  have hZb0 : Z *ᵥ b = 0 := by
+    funext c; rw [hZb c, hlast.1, mul_zero]; simp
   have hb0 : b = 0 := by
     by_cases hD0 : D = 0
-    · have hDr0 : Dr ≠ 0 := by intro h; apply hG; rw [hD0, h]; ring
+    · have hDr0 : Dr ≠ 0 := by
+        intro h; apply hG; rw [hD0, h]; ring
       have hsub : (Z.submatrix Fin.castSucc Fin.castSucc) *ᵥ (fun i => b (Fin.castSucc i)) = 0 := by
         funext i
         have := congrFun hZb0 (Fin.castSucc i)
         simp only [Matrix.mulVec, dotProduct, Fin.sum_univ_castSucc, hlast.2, mul_zero, add_zero,
-            Pi.zero_apply]
-          at this
+          Pi.zero_apply] at this
         simpa [Matrix.mulVec, dotProduct] using this
       have h' := eq_zero_of_mulVec _ _ hDr0 hsub
       funext i
@@ -194,17 +214,16 @@ theorem linIndep
     have h1 := hsum
     rw [hb0] at h1
     simp only [Pi.zero_apply, zero_smul, Finset.sum_const_zero, add_zero, Fin.sum_univ_castSucc,
-        hlast.1, FlagG.fvec, Fin.snoc_castSucc, Fin.snoc_last]
-      at h1
+      hlast.1, FlagG.fvec, Fin.snoc_castSucc, Fin.snoc_last] at h1
     simpa using h1
-  have hA : ∀ i : Fin r, a (Fin.castSucc i) = 0 := Fintype.linearIndependent_iff.1 F.e_indep _ hsumA
+  have hA : ∀ i : Fin r, a (Fin.castSucc i) = 0 :=
+    Fintype.linearIndependent_iff.1 F.e_indep _ hsumA
   rintro (i | j)
   · show a i = 0
     induction i using Fin.lastCases with
     | last => exact hlast.1
     | cast j => exact hA j
   · show b j = 0
-    rw [hb0]
-    rfl
+    rw [hb0]; rfl
 
 end PI.PairCorankPos.W

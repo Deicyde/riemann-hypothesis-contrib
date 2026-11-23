@@ -1,13 +1,60 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.Definitions.SemilocalFrames.AtBase
+public import Formalism.SharpRestriction.CuspSpanNormBounds.IsTermOver
 public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.IsPrincipalIdealRingOfHenselian
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Coalgebra.IsFrobenius
+import Mathlib.RingTheory.HopfAlgebra.Basic
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Development.AbelianVarietyTheory.Definitions.SemilocalFrames.AtBase
+import Formalism.SharpRestriction.CuspSpanNormBounds.Point
 
 @[expose] public section
 
-open ValuativeRel Formalism.MainNotions.S Formalism.MainNotions.S.Loc Formalism.MainNotions.S.LocNG
-  GlobalTheory.LocOver
+open ValuativeRel Formalism.MainNotions.S Formalism.MainNotions.S.Loc Formalism.MainNotions.S.LocNG GlobalTheory.LocOver
 open scoped Classical
 
 noncomputable section
@@ -16,20 +63,18 @@ namespace GlobalTheory.StdLatInner
 
 section Herm
 
-variable
-  {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F]
+variable {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F]
   {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] [MeasurableSpace E]
-  {M : Model F E} {V : Type} [AddCommGroup V] [Module E V]
-  (H : HermSp M V)
+  {M : Model F E} {V : Type} [AddCommGroup V] [Module E V] (H : HermSp M V)
 
-theorem h_sum_left {ι : Type} (s : Finset ι) (g : ι → V) (y : V)
-    : H.h (∑ i ∈ s, g i) y = ∑ i ∈ s, H.h (g i) y :=
+theorem h_sum_left {ι : Type} (s : Finset ι) (g : ι → V) (y : V) :
+    H.h (∑ i ∈ s, g i) y = ∑ i ∈ s, H.h (g i) y :=
   map_sum (AddMonoidHom.mk' (fun x => H.h x y) (fun x x' => H.h_add_left x x' y)) g s
 
-theorem h_sum_right {ι : Type} (s : Finset ι) (g : ι → V) (x : V)
-    : H.h x (∑ i ∈ s, g i) = ∑ i ∈ s, H.h x (g i) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [H.h_herm (∑ i ∈ s, g i) x, h_sum_left, map_sum]
+theorem h_sum_right {ι : Type} (s : Finset ι) (g : ι → V) (x : V) :
+    H.h x (∑ i ∈ s, g i) = ∑ i ∈ s, H.h x (g i) := by
+
+  rw [H.h_herm (∑ i ∈ s, g i) x, h_sum_left, map_sum]
   exact Finset.sum_congr rfl fun i _ => (H.h_herm (g i) x).symm
 
 theorem h_smul_right (a : E) (x y : V) : H.h x (a • y) = M.L.cj a * H.h x y := by
@@ -38,8 +83,7 @@ theorem h_smul_right (a : E) (x y : V) : H.h x (a • y) = M.L.cj a * H.h x y :=
 theorem h_sub_left (x x' y : V) : H.h (x - x') y = H.h x y - H.h x' y := by
   have := H.h_add_left (x - x') x' y
   rw [sub_add_cancel] at this
-  rw [this]
-  ring
+  rw [this]; ring
 
 theorem h_sub_right (x y y' : V) : H.h x (y - y') = H.h x y - H.h x y' := by
   rw [H.h_herm (y - y') x, h_sub_left, map_sub, ← H.h_herm, ← H.h_herm]
@@ -47,8 +91,8 @@ theorem h_sub_right (x y y' : V) : H.h x (y - y') = H.h x y - H.h x y' := by
 theorem h_add_right (x y y' : V) : H.h x (y + y') = H.h x y + H.h x y' := by
   rw [H.h_herm (y + y') x, H.h_add_left, map_add (f := _), ← H.h_herm, ← H.h_herm]
 
-theorem mem_perp_X {r : ℕ} (f : Fin (r + 1) → V) (v : V)
-    : v ∈ H.perp (H.X f) ↔ ∀ a : Fin r, H.h v (f a.castSucc) = 0 := by
+theorem mem_perp_X {r : ℕ} (f : Fin (r + 1) → V) (v : V) :
+    v ∈ H.perp (H.X f) ↔ ∀ a : Fin r, H.h v (f a.castSucc) = 0 := by
   constructor
   · intro hv a
     exact hv _ (Submodule.subset_span ⟨a, rfl⟩)
@@ -57,8 +101,8 @@ theorem mem_perp_X {r : ℕ} (f : Fin (r + 1) → V) (v : V)
     rw [h_sum_right]
     exact Finset.sum_eq_zero fun a _ => by rw [h_smul_right, hv a, mul_zero]
 
-theorem mkW_eq {r : ℕ} (f : Fin (r + 1) → V) (x x' : ↥(H.perp (H.X f)))
-    : H.mkW f x = H.mkW f x' ↔ (x : V) - x' ∈ H.X f := by
+theorem mkW_eq {r : ℕ} (f : Fin (r + 1) → V) (x x' : ↥(H.perp (H.X f))) :
+    H.mkW f x = H.mkW f x' ↔ (x : V) - x' ∈ H.X f := by
   simp only [HermSp.mkW, Submodule.mkQ_apply]
   rw [Submodule.Quotient.eq]
   simp
@@ -71,17 +115,7 @@ noncomputable section
 
 namespace GlobalTheory.StdLatInner
 
-theorem exists_inner
-    : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] {E : Type} [CommRing E]
-        [Algebra F E] [TopologicalSpace E] [MeasurableSpace E] (M : Model F E),
-      M.OK
-        → ∀ {V : Type} [AddCommGroup V] [Module E V] (H : HermSp M V) (r : ℕ) (Fr : FrameD H r)
-            (Λ : Submodule M.L.O V),
-          H.IsSelfDual Λ → H.IsFrame Λ r Fr.f Fr.T
-            → ∀ y : Fin r → V,
-              (∀ a, y a ∈ Λ) → (∀ a b, H.h (y a) (Fr.f b) = if b = a.castSucc then 1 else 0)
-                → ∃ L : Submodule M.L.O (H.Wb Fr.f),
-                  (L : Set (H.Wb Fr.f)) = H.Lset Λ Fr.f ∧ Fr.IsInner L := by
+theorem exists_inner : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] [MeasurableSpace E] (M : Model F E), M.OK → ∀ {V : Type} [AddCommGroup V] [Module E V] (H : HermSp M V) (r : ℕ) (Fr : FrameD H r) (Λ : Submodule M.L.O V), H.IsSelfDual Λ → H.IsFrame Λ r Fr.f Fr.T → ∀ y : Fin r → V, (∀ a, y a ∈ Λ) → (∀ a b, H.h (y a) (Fr.f b) = if b = a.castSucc then 1 else 0) → ∃ L : Submodule M.L.O (H.Wb Fr.f), (L : Set (H.Wb Fr.f)) = H.Lset Λ Fr.f ∧ Fr.IsInner L := by
   intro F _ _ _ E _ _ _ _ M hM V _ _ H r Fr Λ hSD hFr yv hyΛ hy
   letI := hM.loc
   haveI := hM.char0
@@ -90,7 +124,8 @@ theorem exists_inner
   have hXiso : H.X Fr.f ≤ H.perp (H.X Fr.f) := by
     refine Submodule.span_le.2 ?_
     rintro _ ⟨a, rfl⟩
-    exact (mem_perp_X H Fr.f _).2 fun b => Fr.h_iso _ _ (Or.inl (Fin.castSucc_ne_last a))
+    exact (mem_perp_X H Fr.f _).2 fun b =>
+      Fr.h_iso _ _ (Or.inl (Fin.castSucc_ne_last a))
   have hXperp : ∀ ξ ∈ H.X Fr.f, ∀ v ∈ H.perp (H.X Fr.f), H.h ξ v = 0 := by
     intro ξ hξ v hv
     rw [H.h_herm v ξ, hv ξ hξ, map_zero]
@@ -109,10 +144,8 @@ theorem exists_inner
   let P : Submodule M.L.O ↥(H.perp (H.X Fr.f)) :=
     Λ.comap ((H.perp (H.X Fr.f)).subtype.restrictScalars M.L.O)
   let g := (H.mkW Fr.f).restrictScalars M.L.O
-  have hmemL
-      : ∀ w : ↥(H.perp (H.X Fr.f)),
-        H.mkW Fr.f w ∈ P.map g
-          ↔ ∃ x : ↥(H.perp (H.X Fr.f)), (x : V) ∈ Λ ∧ (w : V) - x ∈ H.X Fr.f := by
+  have hmemL : ∀ w : ↥(H.perp (H.X Fr.f)), H.mkW Fr.f w ∈ P.map g ↔
+      ∃ x : ↥(H.perp (H.X Fr.f)), (x : V) ∈ Λ ∧ (w : V) - x ∈ H.X Fr.f := by
     intro w
     constructor
     · rintro ⟨x, hx, he⟩
@@ -142,10 +175,8 @@ theorem exists_inner
     · intro hx w hw
       obtain ⟨x', hx'Λ, hxx'⟩ := (hmemL x).1 hx
       obtain ⟨w', hw'Λ, hww'⟩ := (hmemL w).1 hw
-      have hsplit
-          : H.h x w
-            = H.h x' w' + H.h x' ((w : V) - w') + H.h ((x : V) - x') w'
-              + H.h ((x : V) - x') ((w : V) - w') := by
+      have hsplit : H.h x w = H.h x' w' + H.h x' ((w : V) - w') + H.h ((x : V) - x') w'
+          + H.h ((x : V) - x') ((w : V) - w') := by
         simp only [h_sub_left, h_sub_right]; ring
       rw [hsplit, x'.2 _ hww', hXperp _ hxx' _ w'.2, hXperp _ hxx' _ (hXiso hww')]
       simpa using hO _ hx'Λ _ hw'Λ
@@ -156,8 +187,7 @@ theorem exists_inner
       have hx₁y : ∀ j, H.h x₁ (yv j) = 0 := by
         intro j
         rw [hx₁, h_sub_left, h_sum_left]
-        have : ∀ i ∈ Finset.univ,
-            H.h (c i • Fr.f i.castSucc) (yv j) = if i = j then c i else 0 := by
+        have : ∀ i ∈ Finset.univ, H.h (c i • Fr.f i.castSucc) (yv j) = if i = j then c i else 0 := by
           intro i _
           rw [H.h_smul_left, H.h_herm (yv j), hyf j i]
           split_ifs <;> simp
@@ -167,13 +197,12 @@ theorem exists_inner
         refine (hSD.2.2 x₁).2 fun u hu => ?_
         set a : Fin r → E := fun j => H.h u (Fr.f j.castSucc) with ha
         set u' : V := u - ∑ j, a j • yv j with hu'
-        have hu'Λ : u' ∈ Λ :=
-          Λ.sub_mem hu (Λ.sum_mem fun j _ => hsmulΛ _ (hO _ hu _ (hFr.1.1 _)) _ (hyΛ j))
+        have hu'Λ : u' ∈ Λ := Λ.sub_mem hu (Λ.sum_mem fun j _ =>
+          hsmulΛ _ (hO _ hu _ (hFr.1.1 _)) _ (hyΛ j))
         have hu'p : u' ∈ H.perp (H.X Fr.f) := by
           refine (mem_perp_X H Fr.f u').2 fun b => ?_
           rw [hu', h_sub_left, h_sum_left]
-          have : ∀ j ∈ Finset.univ,
-              H.h (a j • yv j) (Fr.f b.castSucc) = if b = j then a j else 0 := by
+          have : ∀ j ∈ Finset.univ, H.h (a j • yv j) (Fr.f b.castSucc) = if b = j then a j else 0 := by
             intro j _
             rw [H.h_smul_left, hyf j b]
             split_ifs <;> simp
@@ -183,7 +212,8 @@ theorem exists_inner
         have h1 : H.h x₁ u = H.h x₁ u' := by
           rw [hu_eq, h_add_right, h_sum_right]
           simp [h_smul_right, hx₁y]
-        have h2 : H.h x₁ u' = H.h x u' := by rw [hx₁, h_sub_left, hXperp _ (hsX c) _ hu'p, sub_zero]
+        have h2 : H.h x₁ u' = H.h x u' := by
+          rw [hx₁, h_sub_left, hXperp _ (hsX c) _ hu'p, sub_zero]
         rw [h1, h2]
         refine hx ⟨u', hu'p⟩ ((hmemL _).2 ⟨⟨u', hu'p⟩, hu'Λ, by simp⟩)
       refine (hmemL x).2 ⟨⟨x₁, hx₁p⟩, hx₁Λ, ?_⟩
@@ -226,13 +256,13 @@ theorem exists_inner
       have : ∀ i : Fin r, H.h (d i.castSucc • Fr.f i.castSucc) Fr.z = 0 := by
         intro i
         rw [Subring.smul_def, H.h_smul_left]
-        rw [show Fr.z = Fr.f (Fin.last r) from rfl, Fr.h_iso _ _ (Or.inl (Fin.castSucc_ne_last i)),
-          mul_zero]
+        rw [show Fr.z = Fr.f (Fin.last r) from rfl, Fr.h_iso _ _ (Or.inl (Fin.castSucc_ne_last i)), mul_zero]
       simp only [this, Finset.sum_const_zero, zero_add]
       rw [Subring.smul_def, H.h_smul_left]
       exact congrArg _ Fr.h_zz
     rw [hwz, ← mul_assoc] at hcw
-    have hcd : (c : E) * d (Fin.last r) = 1 := by exact (hTu.mul_left_inj).1 (by rw [hcw, one_mul])
+    have hcd : (c : E) * d (Fin.last r) = 1 := by
+      exact (hTu.mul_left_inj).1 (by rw [hcw, one_mul])
     exact IsUnit.of_mul_eq_one (d (Fin.last r)) (Subtype.ext (by simpa using hcd))
 
 end GlobalTheory.StdLatInner

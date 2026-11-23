@@ -1,6 +1,52 @@
 module
 
-public import Mathlib
+public import Mathlib.Basic.Complex.Basic
+public import Mathlib.RepresentationTheory.Basic
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+public import Mathlib.LinearAlgebra.Dimension.OrzechProperty
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -47,8 +93,8 @@ theorem exists_semilinear_extension_rep
     intro F
     have hF : F ∈ Submodule.span K (Set.range b) := by rw [hbs]; trivial
     obtain ⟨a, rfl⟩ := (Submodule.mem_span_range_iff_exists_fun K).1 hF
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum]
+
+    simp only [map_sum]
     refine Finset.sum_congr rfl fun k _ => ?_
     rw [map_smul, map_smulₛₗ R, ← hB, ← algebraMap_smul LL (a k) (B k), map_smulₛₗ f, hσ, hfB]
   have hsp : ⊤ ≤ Submodule.span ℂ (Set.range fun k => R (b k)) := by
@@ -64,8 +110,8 @@ theorem exists_semilinear_extension_rep
     intro g w
     conv_lhs => rw [← B.sum_repr w]
     conv_rhs => rw [← B.sum_repr w]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum]
+
+    simp only [map_sum]
     refine Finset.sum_congr rfl fun k _ => ?_
     rw [map_smulₛₗ f, map_smul, map_smul, map_smulₛₗ f, ← hC]
     simp [r]
@@ -81,8 +127,8 @@ theorem exists_semilinear_extension_rep
       rw [Submodule.span_le]
       rintro _ ⟨k, rfl⟩
       change R (b k) ∈ _
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [← hfB, ← (Pi.basisFun LL (Fin n)).sum_repr (B k), map_sum]
+
+      rw [← hfB, ← (Pi.basisFun LL (Fin n)).sum_repr (B k), map_sum]
       refine Submodule.sum_mem _ fun j _ => ?_
       rw [map_smulₛₗ f, Pi.basisFun_apply]
       exact Submodule.smul_mem _ _ (Submodule.subset_span ⟨j, rfl⟩)

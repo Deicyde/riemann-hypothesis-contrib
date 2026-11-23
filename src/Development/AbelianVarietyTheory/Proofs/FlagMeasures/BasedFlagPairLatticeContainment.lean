@@ -1,16 +1,53 @@
 module
 
-public import Mathlib
-public import Formalism.LocalToGlobal.SiegelLatticeTheory.CokernelGLCounts.NGData
-public import Formalism.LocalToGlobal.SiegelLatticeTheory.ClosedLocalOrbits.TermLoc
 public import Development.AbelianVarietyTheory.Definitions.SemilocalFrames.LocClosed
-public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.HermitianLatticeLocalGlobalPrinciple
-public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.LocalOrbitLatticesInfFrameSpanEq
-public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.TotallyPositiveOrthogonalOfTwoFlagExtendedSpacesStatement
-public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.OrthogonalDecompositionLocalNondegenerateStatement
+public import Development.AbelianVarietyTheory.Definitions.SemilocalFrames.PlacesOf
 public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.CompletionLatticeInfOrthEqOrthPartStatement
 public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.ExistsNatSmulMemOfMemSpan
 public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.InnerPreimageEqOfLocalInnerLatticeEq
+import Development.AbelianVarietyTheory.Proofs.FlagMeasures.IsIntegralOfQuad
+public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.LocalOrbitLatticesInfFrameSpanEq
+public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.OrthogonalDecompositionLocalNondegenerateStatement
+public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.TotallyPositiveOrthogonalOfTwoFlagExtendedSpacesStatement
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -295,7 +332,6 @@ namespace GlobalTheory.CompScale
 
 variable {D : D7}
 
-set_option maxHeartbeats 2000000 in
 theorem dual_part
     : ∀ (D : D7) (X : HidaSetting D) (Y : Full X) (u u' : D.what₂.Word),
       ∀ (F : LFlag (D.sp.Y 0) D.R.rS (((D.mem u).A.T : ℕ) : D.host.E))
@@ -361,8 +397,8 @@ theorem dual_part
       intro j
       have := congrFun hα j
       simp only [Matrix.vecMul, dotProduct, Pi.zero_apply, B] at this
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum]
+
+      rw [map_sum]
       simpa [map_smul, smul_eq_mul, mul_comm] using this
     have hxW : (∑ i, α i • (i : (VS D).V)) ∈ orth (VS D) U :=
       Submodule.sum_mem _ fun i _ => Submodule.smul_mem _ _ (hvW i)
@@ -371,8 +407,8 @@ theorem dual_part
           (∀ j : b, (VS D).hT (j : (VS D).V) x' = 0)
             → (VS D).hT (∑ i, α i • (i : (VS D).V)) x' = 0 := by
       intro x' hx'
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum, LinearMap.sum_apply]
+
+      rw [map_sum, LinearMap.sum_apply]
       refine Finset.sum_eq_zero fun i _ => ?_
       rw [LinearMap.map_smulₛₗ, LinearMap.smul_apply, hx' i, smul_zero]
     have h0' := hdef _ hxW (hxx _ hj)
@@ -412,8 +448,8 @@ theorem dual_part
     have ha' : a ∈ Submodule.span D.host.E (Set.range (fun i : b => (i : (VS D).V))) := by
       rwa [Subtype.range_coe]
     obtain ⟨α, rfl⟩ := (Submodule.mem_span_range_iff_exists_fun D.host.E).1 ha'
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     exact Submodule.sum_mem _ fun i _ => by
       rw [baseChange_smul₂]; exact Submodule.smul_mem _ _ (Submodule.subset_span ⟨i, rfl⟩)
   have htop : ∀ z : Vp D p, z ∈ Sb ⊔ SU := by

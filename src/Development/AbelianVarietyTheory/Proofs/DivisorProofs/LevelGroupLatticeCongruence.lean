@@ -1,10 +1,62 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.BlockTheory.DivisorBase.UniformLevelMultiplicity
-public import Development.AbelianVarietyTheory.BlockTheory.DivisorBase.LevelLiftConditions
+public import Development.AbelianVarietyTheory.Definitions.ExistenceOfLattices.Hat1
+public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.AdelicCompletionFractionalIdealProperties
 public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.CramerMemAdelicCompletionOfElementSet
-public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.AdelicElementLatticeFullAndCompletion
+import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.ExistsSmulMemOfMemSpanFraction
+import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.MemAdelicCompletionPseudoBasisIff
+public import Formalism.LocalRingCardinality.DataHost
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
+import Formalism.LocalRingCardinality.DataTheta
+import Formalism.LocalToGlobal.BesselHermitianTheta.NoncompactGapAtLeastRange
+import Formalism.LocalToGlobal.IndefiniteReal.ScalarOnPartsFull
+import Formalism.LocalToGlobal.ProjectiveLattices.ErealAddIInf
+import Formalism.SharpRestriction.CuspSpanNormBounds.Point
+import Formalism.SharpRestriction.GlobalSchurBounds.GeneralLinearActions.GenusMassVolumes
+public import Mathlib.RingTheory.DedekindDomain.Factorization
 
 @[expose] public section
 
@@ -30,8 +82,8 @@ theorem det_quot_eq
   have hexp : ∀ v, q v = ∑ i, Ideal.Quotient.mk I (φ v i) • q (a i) := by
     intro v
     simp only [hsm]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← map_sum]
+
+    rw [← map_sum]
     exact ((Submodule.Quotient.eq _).2 (h2 v)).symm
   have hφ : ∀ v ∈ I • (⊤ : Submodule R M), ∀ i, φ v i ∈ I := by
     intro v hv i
@@ -43,8 +95,8 @@ theorem det_quot_eq
     intro g hg i
     choose r hr using fun j => Ideal.Quotient.mk_surjective (g j)
     have h3 : q (∑ j, r j • a j) = 0 := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum, ← hg]
+
+      rw [map_sum, ← hg]
       exact Finset.sum_congr rfl fun j _ => by rw [← hr j, hsm]
     have h4 := hφ _ ((Submodule.Quotient.mk_eq_zero _).1 h3) i
     rw [← hr i, Ideal.Quotient.eq_zero_iff_mem]
@@ -221,8 +273,8 @@ theorem det_sub_mem_completedIdeal_of_level
     choose w hw using fun j => hsingle j _ ((hL _).1 (hιL v) j)
     have : (∑ i, φ v i • a i) - v = - ∑ i, m i • w i := by
       apply hinj
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sub, map_neg, map_sum, map_sum]
+
+      rw [map_sub, map_neg, map_sum, map_sum]
       conv_lhs => rw [← e.sum_repr (ι v)]
       rw [← Finset.sum_sub_distrib, ← Finset.sum_neg_distrib]
       refine Finset.sum_congr rfl fun i _ => ?_

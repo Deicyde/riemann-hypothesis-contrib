@@ -1,7 +1,50 @@
 module
 
-public import Mathlib
-public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.RootOnFund
+import Development.WeilBound.CoreStatements.HodgeTatePoints.MlLift
+public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.IsHodgeLine
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+public import Mathlib.AlgebraicGeometry.Morphisms.UniversallyInjective
+import Mathlib.AlgebraicGeometry.QuasiAffine
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.CategoryTheory.Limits.Shapes.Countable
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Coalgebra.IsFrobenius
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.SetTheory.ZFC.PSet
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.AbProj
 
 @[expose] public section
@@ -11,37 +54,30 @@ noncomputable section
 namespace GlobalTheory.CompanionTheory.Ar.GenOpen
 
 open AlgebraicGeometry CategoryTheory Limits NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo
-  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.CompanionTheory.Ar
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.CompanionTheory.Ar
 open scoped TensorProduct
 
-theorem mem_range_of_tmul_eq
-    {L Ω : Type} [Field L] [Field Ω] [Algebra L Ω] (x : Ω) (h : x ⊗ₜ[L] (1 : Ω) = (1 : Ω) ⊗ₜ[L] x)
-    : x ∈ (algebraMap L Ω).range := by
-  obtain ⟨g, hg⟩ :=
-    LinearMap.exists_leftInverse_of_injective (Algebra.linearMap L Ω)
-      (LinearMap.ker_eq_bot.2 (algebraMap L Ω).injective)
+theorem mem_range_of_tmul_eq {L Ω : Type} [Field L] [Field Ω] [Algebra L Ω] (x : Ω)
+    (h : x ⊗ₜ[L] (1 : Ω) = (1 : Ω) ⊗ₜ[L] x) : x ∈ (algebraMap L Ω).range := by
+  obtain ⟨g, hg⟩ := LinearMap.exists_leftInverse_of_injective (Algebra.linearMap L Ω)
+    (LinearMap.ker_eq_bot.2 (algebraMap L Ω).injective)
   have hg1 : g 1 = 1 := by
     have := LinearMap.congr_fun hg 1
     simpa using this
   let m : Ω ⊗[L] Ω →ₗ[L] Ω := TensorProduct.lid L Ω ∘ₗ TensorProduct.map g LinearMap.id
   have e := congrArg m h
-  simp only [m, LinearMap.comp_apply, TensorProduct.map_tmul, TensorProduct.lid_tmul,
-      LinearMap.id_apply, hg1, one_smul, LinearEquiv.coe_coe]
-    at e
+  simp only [m, LinearMap.comp_apply, TensorProduct.map_tmul, TensorProduct.lid_tmul, LinearMap.id_apply, hg1,
+    one_smul, LinearEquiv.coe_coe] at e
   exact ⟨g x, by rw [Algebra.algebraMap_eq_smul_one]; exact e⟩
 
-theorem factor_of_epi
-    {O F Ω₀ Ω : Type} [CommRing O] [Field F] [Field Ω₀] [Field Ω]
-    (β : O →+* F) (hβ : Epi (CommRingCat.ofHom β))
-    (a : O →+* Ω₀) (fn : Ω₀ →+* Ω) (cst : F →+* Ω) (h : fn.comp a = cst.comp β)
-    : ∃ a' : F →+* Ω₀, a'.comp β = a := by
+theorem factor_of_epi {O F Ω₀ Ω : Type} [CommRing O] [Field F] [Field Ω₀] [Field Ω]
+    (β : O →+* F) (hβ : Epi (CommRingCat.ofHom β)) (a : O →+* Ω₀) (fn : Ω₀ →+* Ω) (cst : F →+* Ω)
+    (h : fn.comp a = cst.comp β) : ∃ a' : F →+* Ω₀, a'.comp β = a := by
   let _ := fn.toAlgebra
-  have e
-      : CommRingCat.ofHom β ≫ CommRingCat.ofHom
-          ((Algebra.TensorProduct.includeLeftRingHom : Ω →+* Ω ⊗[Ω₀] Ω).comp cst)
-        = CommRingCat.ofHom β ≫ CommRingCat.ofHom
-          ((Algebra.TensorProduct.includeRight : Ω →ₐ[Ω₀] Ω ⊗[Ω₀] Ω).toRingHom.comp cst) := by
+  have e : CommRingCat.ofHom β ≫
+      CommRingCat.ofHom ((Algebra.TensorProduct.includeLeftRingHom : Ω →+* Ω ⊗[Ω₀] Ω).comp cst) =
+      CommRingCat.ofHom β ≫
+      CommRingCat.ofHom ((Algebra.TensorProduct.includeRight : Ω →ₐ[Ω₀] Ω ⊗[Ω₀] Ω).toRingHom.comp cst) := by
     ext o
     have ho : cst (β o) = algebraMap Ω₀ Ω (a o) := by
       rw [RingHom.algebraMap_toAlgebra]; exact (RingHom.congr_fun h o).symm
@@ -56,27 +92,19 @@ theorem factor_of_epi
     exact ⟨w, by rw [← hw, RingHom.algebraMap_toAlgebra]⟩
   choose g hg using key
   have inj := fn.injective
-  refine ⟨
-    {
-      toFun := g
-      map_one' := inj (by rw [hg, map_one, map_one])
-      map_mul' := fun x y => inj (by rw [hg, map_mul, map_mul, hg, hg])
-      map_zero' := inj (by rw [hg, map_zero, map_zero])
-      map_add' := fun x y => inj (by rw [hg, map_add (f := _), map_add (f := _), hg, hg])
-    },
-    ?_
-  ⟩
+  refine ⟨{ toFun := g
+            map_one' := inj (by rw [hg, map_one, map_one])
+            map_mul' := fun x y => inj (by rw [hg, map_mul, map_mul, hg, hg])
+            map_zero' := inj (by rw [hg, map_zero, map_zero])
+            map_add' := fun x y => inj (by rw [hg, map_add (f := _), map_add (f := _), hg, hg]) }, ?_⟩
   ext o
   apply inj
   change fn (g (β o)) = fn (a o)
   rw [hg]
   exact (RingHom.congr_fun h o).symm
 
-theorem eq_genPt_of_specializes
-    {X : Scheme.{0}} {Ω : Type} [Field Ω]
-    (ξ : Spec (CommRingCat.of Ω) ⟶ X) (h : IsCptGen ξ)
-    (y : X) (hy : y ⤳ genPt ξ)
-    : y = genPt ξ := by
+theorem eq_genPt_of_specializes {X : Scheme.{0}} {Ω : Type} [Field Ω] (ξ : Spec (CommRingCat.of Ω) ⟶ X)
+    (h : IsCptGen ξ) (y : X) (hy : y ⤳ genPt ξ) : y = genPt ξ := by
   have hf : IsField (X.presheaf.stalk (genPt ξ)) :=
     (RingEquiv.ofBijective _ h.bij).toMulEquiv.isField (Field.toIsField Ω)
   have : y ∈ Set.range (X.fromSpecStalk (genPt ξ)) := by rwa [Scheme.range_fromSpecStalk]
@@ -86,51 +114,12 @@ theorem eq_genPt_of_specializes
     Subsingleton.elim (α := PrimeSpectrum _) _ _
   rw [this, Scheme.fromSpecStalk_closedPoint]
 
-theorem mem_of_dense_of_noGen
-    {P : Type} [TopologicalSpace P] [TopologicalSpace.NoetherianSpace P] [QuasiSober P]
-    {U : Set P} (hU : IsOpen U) (hd : Dense U)
-    {y : P} (hy : ∀ y', y' ⤳ y → y' = y)
-    : y ∈ U := by
-  classical
-  have hCi : IsIrreducible (irreducibleComponent y) := isIrreducible_irreducibleComponent
-  have hCc : IsClosed (irreducibleComponent y) := isClosed_irreducibleComponent
-  have hgen := hCi.isGenericPoint_genericPoint_closure
-  rw [hCc.closure_eq] at hgen
-  have hη : hCi.genericPoint = y := hy _ (hgen.specializes mem_irreducibleComponent)
-  rw [hη] at hgen
-  have hmax := irreducibleComponent_mem_irreducibleComponents y
-  set D : Set P := ⋃₀ (irreducibleComponents P \ {irreducibleComponent y}) with hD
-  have hDc : IsClosed D := by
-    rw [hD, Set.sUnion_eq_biUnion]
-    exact Set.Finite.isClosed_biUnion
-      (TopologicalSpace.NoetherianSpace.finite_irreducibleComponents.subset Set.sdiff_subset)
-      fun C hC => isClosed_of_mem_irreducibleComponents C hC.1
-  have hyD : y ∉ D := by
-    rintro ⟨C, ⟨hC, hne⟩, hyC⟩
-    have hle : irreducibleComponent y ⊆ C := by
-      rw [← hgen.def]
-      exact (isClosed_of_mem_irreducibleComponents C hC).closure_subset_iff.2 (by simpa using hyC)
-    exact hne (le_antisymm (hmax.2 hC.1 hle) hle)
-  obtain ⟨u, huD, huU⟩ := hd.inter_open_nonempty Dᶜ hDc.isOpen_compl ⟨y, hyD⟩
-  have huC : u ∈ irreducibleComponent y := by
-    by_contra hne
-    refine huD ⟨
-      irreducibleComponent u,
-      ⟨irreducibleComponent_mem_irreducibleComponents u, ?_⟩,
-      mem_irreducibleComponent
-    ⟩
-    intro e
-    exact hne (by
-      have : u ∈ irreducibleComponent u := mem_irreducibleComponent
-      rw [Set.mem_singleton_iff.1 e] at this
-      exact this)
-  exact (hgen.specializes huC).mem_open hU huU
+theorem mem_of_dense_of_noGen {P : Type} [TopologicalSpace P] [TopologicalSpace.NoetherianSpace P] [QuasiSober P]
+    {U : Set P} (hU : IsOpen U) (hd : Dense U) {y : P} (hy : ∀ y', y' ⤳ y → y' = y) : y ∈ U := by
+  apply PositivityTheory.HtPt.Ml.mem_of_dense_of_max <;> assumption
 
-theorem noetherianSpace_baseChange
-    {X : Scheme.{0}} {O F : Type} [CommRing O] [Field F]
-    {s : X ⟶ Sp O} (hs : IsProjOver s)
-    (β : O →+* F)
-    : TopologicalSpace.NoetherianSpace ↥(pullback s (spMap β)) := by
+theorem noetherianSpace_baseChange {X : Scheme.{0}} {O F : Type} [CommRing O] [Field F] {s : X ⟶ Sp O}
+    (hs : IsProjOver s) (β : O →+* F) : TopologicalSpace.NoetherianSpace ↥(pullback s (spMap β)) := by
   obtain ⟨N, i, hi, rfl⟩ := hs
   have := isProper_str O N
   have : IsProper (i ≫ PSpace.str O N) := inferInstance
@@ -143,12 +132,10 @@ theorem noetherianSpace_baseChange
   have : IsNoetherian (pullback (i ≫ PSpace.str O N) (spMap β)) := {}
   infer_instance
 
-theorem gen_open
-    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H) (l : Level H)
-        (Xo : Moduli D l) (c : Coeff l) (O : Type) [CommRing O] (β : O →+* c.F) (Y : Model Xo c β)
-        (S : Finset ℕ) (Ω : Type) [Field Ω] (K : Type) [Fintype K] (J : K → Type)
-        (y : (Σ k, J k) → Ω) (A : HodgeCpt Y S y),
-      Mono (spMap β) → ∃ x : Sp A.Ω₀ ⟶ Xo.XF c, A.ξ₀ = x ≫ Y.j := by
+theorem gen_open : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H) (l : Level H)
+    (Xo : Moduli D l) (c : Coeff l) (O : Type) [CommRing O] (β : O →+* c.F) (Y : Model Xo c β) (S : Finset ℕ)
+    (Ω : Type) [Field Ω] (K : Type) [Fintype K] (J : K → Type) (y : (Σ k, J k) → Ω) (A : HodgeCpt Y S y),
+    Mono (spMap β) → ∃ x : Sp A.Ω₀ ⟶ Xo.XF c, A.ξ₀ = x ≫ Y.j := by
   intro E _ _ _ H D l Xo c O _ β Y S Ω _ K _ J y A hmono
   have hepi : Epi (CommRingCat.ofHom β) := by
     have h1 : Mono (Scheme.Spec.map (CommRingCat.ofHom β).op) := hmono
@@ -161,17 +148,15 @@ theorem gen_open
     have h1 : spMap (A.fn.comp a) = spMap (A.cst.comp β) := by
       rw [← A.cst_over]
       have hd : A.ξ ≫ A.f = spMap A.fn ≫ A.ξ₀ := A.fn_over
-      calc
-        spMap (A.fn.comp a)
-          = spMap A.fn ≫ spMap a := by simp only [spMap, ← Spec.map_comp]; rfl
+      calc spMap (A.fn.comp a) = spMap A.fn ≫ spMap a := by
+            simp only [spMap, ← Spec.map_comp]; rfl
         _ = A.ξ ≫ A.f ≫ Y.s := by rw [ha, ← Category.assoc, ← hd, Category.assoc]
     have h2 := Spec.map_injective h1
     exact congrArg CommRingCat.Hom.hom h2
   obtain ⟨a', ha'⟩ := factor_of_epi β hepi a A.fn A.cst hfa
   have hsq : A.ξ₀ ≫ Y.s = spMap a' ≫ spMap β := by
     rw [← ha, ← ha']
-    simp only [spMap, ← Spec.map_comp]
-    rfl
+    simp only [spMap, ← Spec.map_comp]; rfl
   let z : Sp A.Ω₀ ⟶ pullback Y.s (spMap β) := pullback.lift A.ξ₀ (spMap a') hsq
   have hz : z ≫ pullback.fst _ _ = A.ξ₀ := pullback.lift_fst _ _ _
   let y0 : ↥(pullback Y.s (spMap β)) := z (IsLocalRing.closedPoint A.Ω₀)
@@ -181,8 +166,7 @@ theorem gen_open
     rfl
   have hmax : ∀ y', y' ⤳ y0 → y' = y0 := by
     intro y' hy
-    have h1 : pullback.fst Y.s (spMap β) y' ⤳ genPt A.ξ₀ :=
-      hfst ▸ hy.map (pullback.fst Y.s (spMap β)).continuous
+    have h1 : pullback.fst Y.s (spMap β) y' ⤳ genPt A.ξ₀ := hfst ▸ hy.map (pullback.fst Y.s (spMap β)).continuous
     have h2 := eq_genPt_of_specializes A.ξ₀ A.gen₀ _ h1
     exact (pullback.fst Y.s (spMap β)).injective (h2.trans hfst.symm)
   have := noetherianSpace_baseChange Y.proj β

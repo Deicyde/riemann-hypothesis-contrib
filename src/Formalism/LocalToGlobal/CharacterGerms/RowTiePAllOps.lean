@@ -1,7 +1,53 @@
 module
 
 public import Formalism.LocalToGlobal.CharacterGerms.RowTiePAllSet
+public import Formalism.LocalToGlobal.CharacterGerms.NegMem
+public import Formalism.LocalToGlobal.CharacterGerms.RowTiePPTAvg
+public import Mathlib.RingTheory.PowerSeries.Substitution
+import Formalism.LocalToGlobal.CharacterGerms.ConstMemTypeSetOfNonneg
 public import Formalism.LocalToGlobal.CharacterGerms.RowTiePLimTy
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+public import Formalism.LocalToGlobal.CharacterGerms.CoeffSubstEqSum
 
 @[expose] public section
 
@@ -18,36 +64,20 @@ variable {C : Type} [Field C]
 
 namespace RawChart
 
-variable
-  {d : ℕ} {I : Fin 2 → Type} [∀ g, Fintype (I g)] {κ : Type} [Fintype κ] (X : RawChart C d I κ)
+variable {d : ℕ} {I : Fin 2 → Type} [∀ g, Fintype (I g)] {κ : Type} [Fintype κ] (X : RawChart C d I κ)
 
-theorem allSet_add
-    (V : VF C)
-    (g : Fin 2)
-    (hA : X.AddCvSt V) (hu : ∀ g c i, V.Ge 0 (X.u g c i))
-    {L L' : ℕ → I g ⊕ JJ I g → C}
-    : L ∈ X.AllSet V g → L' ∈ X.AllSet V g → L + L' ∈ X.AllSet V g := by
+theorem allSet_add (V : VF C) (g : Fin 2) (hA : X.AddCvSt V) (hu : ∀ g c i, V.Ge 0 (X.u g c i))
+    {L L' : ℕ → I g ⊕ JJ I g → C} : L ∈ X.AllSet V g → L' ∈ X.AllSet V g → L + L' ∈ X.AllSet V g := by
   intro hx hy
   obtain ⟨γ, lam, hγ, hlam, h1, h2⟩ := hx
   obtain ⟨γ', lam', hγ', hlam', h1', h2'⟩ := hy
   obtain ⟨γ'', hγ'', hL, hS⟩ := hA γ γ' hγ hγ'
-  have hty
-      : ∀ n,
-        PowerSeries.mk (fun m => (L + L') m n)
-          = PowerSeries.mk (fun m => L m n) + PowerSeries.mk (fun m => L' m n) := fun n => by
+  have hty : ∀ n, PowerSeries.mk (fun m => (L + L') m n) =
+      PowerSeries.mk (fun m => L m n) + PowerSeries.mk (fun m => L' m n) := fun n => by
     ext m
     simp [PowerSeries.coeff_mk]
-  refine ⟨
-    γ'',
-    fun q =>
-      lam q + lam' q
-        + (alongCv γ'' (X.sg (X.u (1 - g) q)) - alongCv γ (X.sg (X.u (1 - g) q))
-          - alongCv γ' (X.sg (X.u (1 - g) q))),
-    hγ'',
-    ?_,
-    ?_,
-    ?_
-  ⟩
+  refine ⟨γ'', fun q => lam q + lam' q + (alongCv γ'' (X.sg (X.u (1 - g) q)) - alongCv γ (X.sg (X.u (1 - g) q)) -
+    alongCv γ' (X.sg (X.u (1 - g) q))), hγ'', ?_, ?_, ?_⟩
   · intro q
     obtain ⟨c0, cI⟩ := hS (X.u (1 - g) q) (hu (1 - g) q)
     refine ⟨?_, fun n => ?_⟩
@@ -60,20 +90,12 @@ theorem allSet_add
     refine Finset.sum_congr rfl fun c _ => ?_
     rw [hty, smul_add]
   · intro q
-    have hs
-        : ∀ c : I g,
-          (if X.ty g c = X.ty (1 - g) q then
-             X.sg1 (X.u g c) (X.u (1 - g) q) • PowerSeries.mk (fun m => (L + L') m (Sum.inl c))
-           else
-             0)
-            = (if X.ty g c = X.ty (1 - g) q then
-                 X.sg1 (X.u g c) (X.u (1 - g) q) • PowerSeries.mk (fun m => L m (Sum.inl c))
-               else
-                 0)
-              + (if X.ty g c = X.ty (1 - g) q then
-                   X.sg1 (X.u g c) (X.u (1 - g) q) • PowerSeries.mk (fun m => L' m (Sum.inl c))
-                 else
-                   0) := by
+    have hs : ∀ c : I g, (if X.ty g c = X.ty (1 - g) q then
+          X.sg1 (X.u g c) (X.u (1 - g) q) • PowerSeries.mk (fun m => (L + L') m (Sum.inl c)) else 0) =
+        (if X.ty g c = X.ty (1 - g) q then
+          X.sg1 (X.u g c) (X.u (1 - g) q) • PowerSeries.mk (fun m => L m (Sum.inl c)) else 0) +
+        (if X.ty g c = X.ty (1 - g) q then
+          X.sg1 (X.u g c) (X.u (1 - g) q) • PowerSeries.mk (fun m => L' m (Sum.inl c)) else 0) := by
       intro c
       rw [hty]
       split_ifs
@@ -83,49 +105,36 @@ theorem allSet_add
     rw [Finset.sum_add_distrib, hty, h2 q, h2' q]
     abel
 
-theorem allSet_repar
-    {V : VF C} {g : Fin 2}
-    (τ : PowerSeries C) (hτ : PowerSeries.constantCoeff τ = 0)
-    (hint : ∀ f : PowerSeries C,
-      (∀ n, V.Ge 0 (PowerSeries.coeff n f))
-        → ∀ n, V.Ge 0 (PowerSeries.coeff n (PowerSeries.subst τ f)))
+theorem allSet_repar {V : VF C} {g : Fin 2} (τ : PowerSeries C) (hτ : PowerSeries.constantCoeff τ = 0)
+    (hint : ∀ f : PowerSeries C, (∀ n, V.Ge 0 (PowerSeries.coeff n f)) →
+      ∀ n, V.Ge 0 (PowerSeries.coeff n (PowerSeries.subst τ f)))
     {x x' : ℕ → I g ⊕ JJ I g → C} (hx : x ∈ X.AllSet V g)
-    (hxx
-      : ∀ n, PowerSeries.mk (fun m => x' m n) = PowerSeries.subst τ (PowerSeries.mk fun m => x m n))
-    : x' ∈ X.AllSet V g := by
+    (hxx : ∀ n, PowerSeries.mk (fun m => x' m n) = PowerSeries.subst τ (PowerSeries.mk fun m => x m n)) :
+    x' ∈ X.AllSet V g := by
   obtain ⟨γ, lam, hγ, hlam, h1, h2⟩ := hx
   have hS := PowerSeries.HasSubst.of_constantCoeff_zero' hτ
-  have hcv
-      : ∀ {σ : Type} (δ : σ → PowerSeries C),
-        IsCv V δ → IsCv V fun i => PowerSeries.subst τ (δ i) := by
+  have hcv : ∀ {σ : Type} (δ : σ → PowerSeries C), IsCv V δ → IsCv V fun i => PowerSeries.subst τ (δ i) := by
     intro σ δ hδ i
     refine ⟨?_, hint _ (hδ i).2⟩
     exact constantCoeff_subst_zero (σ := Unit) (fun _ => hτ) (hδ i).1
-  refine ⟨
-    fun i => PowerSeries.subst τ (γ i),
-    fun q => PowerSeries.subst τ (lam q),
-    hcv γ hγ,
-    hcv lam hlam,
-    ?_,
-    ?_
-  ⟩
+  refine ⟨fun i => PowerSeries.subst τ (γ i), fun q => PowerSeries.subst τ (lam q), hcv γ hγ, hcv lam hlam, ?_, ?_⟩
   · intro i
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [alongCv_repar (fun i => (hγ i).1) hτ, h1 i, ← PowerSeries.coe_substAlgHom hS, map_sum]
+
+    rw [alongCv_repar (fun i => (hγ i).1) hτ, h1 i, ← PowerSeries.coe_substAlgHom hS, map_sum]
     refine Finset.sum_congr rfl fun c _ => ?_
     rw [map_smul, PowerSeries.coe_substAlgHom hS, hxx]
   · intro q
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [alongCv_repar (fun i => (hγ i).1) hτ, hxx, h2 q, ← PowerSeries.coe_substAlgHom hS,
-        map_add (f := _), map_sub, map_sum]
+
+    rw [alongCv_repar (fun i => (hγ i).1) hτ, hxx, h2 q, ← PowerSeries.coe_substAlgHom hS, map_add (f := _), map_sub,
+    map_sum]
     congr 1
     refine Finset.sum_congr rfl fun c _ => ?_
     split_ifs
     · rw [map_smul, PowerSeries.coe_substAlgHom hS, hxx]
     · rw [map_zero]
 
-theorem allSet_teich (V : VF C) (g : Fin 2) (c : C) (hc : V.Ge 0 c) {L : ℕ → I g ⊕ JJ I g → C}
-    : L ∈ X.AllSet V g → (fun n k => c ^ n * L n k) ∈ X.AllSet V g := by
+theorem allSet_teich (V : VF C) (g : Fin 2) (c : C) (hc : V.Ge 0 c) {L : ℕ → I g ⊕ JJ I g → C} :
+    L ∈ X.AllSet V g → (fun n k => c ^ n * L n k) ∈ X.AllSet V g := by
   intro hL
   refine X.allSet_repar (c • PowerSeries.X) (by simp) ?_ hL ?_
   · intro f hf n
@@ -136,25 +145,21 @@ theorem allSet_teich (V : VF C) (g : Fin 2) (c : C) (hc : V.Ge 0 c) {L : ℕ →
     ext m
     rw [PowerSeries.coeff_rescale, PowerSeries.coeff_mk, PowerSeries.coeff_mk]
 
-theorem allSet_lim
-    (hlg0 : ∀ i, MvPowerSeries.constantCoeff (X.lg i) = 0)
+theorem allSet_lim (hlg0 : ∀ i, MvPowerSeries.constantCoeff (X.lg i) = 0)
     (hex0 : ∀ i, MvPowerSeries.constantCoeff (X.ex i) = 0)
     (hlgex : ∀ i, MvPowerSeries.subst X.ex (X.lg i) = MvPowerSeries.X i)
     (hexlg : ∀ i, MvPowerSeries.subst X.lg (X.ex i) = MvPowerSeries.X i)
-    {V : VF C} {g : Fin 2} {L : ℕ → ℕ → I g ⊕ JJ I g → C} {L' : ℕ → I g ⊕ JJ I g → C}
-    : (∀ k, L k ∈ X.AllSet V g) → VLim V L L' → L' ∈ X.AllSet V g := by
+    {V : VF C} {g : Fin 2} {L : ℕ → ℕ → I g ⊕ JJ I g → C} {L' : ℕ → I g ⊕ JJ I g → C} :
+    (∀ k, L k ∈ X.AllSet V g) → VLim V L L' → L' ∈ X.AllSet V g := by
   intro hx hlim
   choose γ lam hγ hlam hL hM using hx
-  have hmk
-      : ∀ n : I g ⊕ JJ I g,
-        TendsS V (fun k => PowerSeries.mk (fun m => L k m n)) (PowerSeries.mk (fun m => L' m n)) :=
+  have hmk : ∀ n : I g ⊕ JJ I g,
+      TendsS V (fun k => PowerSeries.mk (fun m => L k m n)) (PowerSeries.mk (fun m => L' m n)) :=
     fun n μ K => hlim K (μ ()) n
-  let Lk : ℕ → κ → PowerSeries C := fun k j =>
-    ∑ c : I g, X.u g c j • PowerSeries.mk (fun m => L k m (Sum.inl c))
-  let L1 : κ → PowerSeries C := fun j =>
-    ∑ c : I g, X.u g c j • PowerSeries.mk (fun m => L' m (Sum.inl c))
-  have hLt : ∀ j, TendsS V (fun k => Lk k j) (L1 j) := fun j =>
-    LimTy.tendsS_sum _ fun c _ => LimTy.tendsS_smul _ (hmk (Sum.inl c))
+  let Lk : ℕ → κ → PowerSeries C := fun k j => ∑ c : I g, X.u g c j • PowerSeries.mk (fun m => L k m (Sum.inl c))
+  let L1 : κ → PowerSeries C := fun j => ∑ c : I g, X.u g c j • PowerSeries.mk (fun m => L' m (Sum.inl c))
+  have hLt : ∀ j, TendsS V (fun k => Lk k j) (L1 j) :=
+    fun j => LimTy.tendsS_sum _ fun c _ => LimTy.tendsS_smul _ (hmk (Sum.inl c))
   have hγc : ∀ k i, MvPowerSeries.constantCoeff (γ k i) = 0 := fun k i => (hγ k i).1
   have hLkc : ∀ k j, MvPowerSeries.constantCoeff (Lk k j) = 0 := fun k j => by
     show MvPowerSeries.constantCoeff (∑ c : I g, X.u g c j • PowerSeries.mk (fun m => L k m (Sum.inl c))) = 0
@@ -177,8 +182,7 @@ theorem allSet_lim
   let γ' : κ → PowerSeries C := fun i => MvPowerSeries.subst L1 (X.ex i)
   have hγt : ∀ i, TendsS V (fun k => γ k i) (γ' i) := by
     intro i
-    have e : (fun k => γ k i) = fun k => MvPowerSeries.subst (Lk k) (X.ex i) :=
-      funext fun k => hγeq k i
+    have e : (fun k => γ k i) = fun k => MvPowerSeries.subst (Lk k) (X.ex i) := funext fun k => hγeq k i
     rw [e]
     exact TendsS.subst (f := fun _ => X.ex i) hLkc hL1c hLt (TendsS.const _)
   have hγ' : IsCv V γ' := LimTy.isCv_lim hγt hγ
@@ -189,27 +193,22 @@ theorem allSet_lim
     show MvPowerSeries.subst (fun j => MvPowerSeries.subst L1 (X.ex j)) (X.lg i) = L1 i
     rw [← MvPowerSeries.subst_comp_subst_apply hexS hL1S, hlgex, MvPowerSeries.subst_X hL1S]
   let lam' : JJ I g → PowerSeries C := fun q =>
-    PowerSeries.mk (fun m => L' m (Sum.inr q)) + alongCv γ' (X.sg (X.u (1 - g) q))
-      - ∑ c : I g, if X.ty g c = X.ty (1 - g) q then
-          X.sg1 (X.u g c) (X.u (1 - g) q) • PowerSeries.mk (fun m => L' m (Sum.inl c)) else 0
-  have hlamk
-      : ∀ k q,
-        lam k q
-          = PowerSeries.mk (fun m => L k m (Sum.inr q)) + alongCv (γ k) (X.sg (X.u (1 - g) q))
-            - ∑ c : I g, if X.ty g c = X.ty (1 - g) q then
-                X.sg1 (X.u g c) (X.u (1 - g) q) • PowerSeries.mk (fun m => L k m (Sum.inl c)) else 0 :=
-    by
-      intro k q
-      rw [hM k q]
-      ring
+    PowerSeries.mk (fun m => L' m (Sum.inr q)) + alongCv γ' (X.sg (X.u (1 - g) q)) -
+      ∑ c : I g, if X.ty g c = X.ty (1 - g) q then
+        X.sg1 (X.u g c) (X.u (1 - g) q) • PowerSeries.mk (fun m => L' m (Sum.inl c)) else 0
+  have hlamk : ∀ k q, lam k q = PowerSeries.mk (fun m => L k m (Sum.inr q)) +
+      alongCv (γ k) (X.sg (X.u (1 - g) q)) -
+      ∑ c : I g, if X.ty g c = X.ty (1 - g) q then
+        X.sg1 (X.u g c) (X.u (1 - g) q) • PowerSeries.mk (fun m => L k m (Sum.inl c)) else 0 := by
+    intro k q
+    rw [hM k q]
+    ring
   have hlamt : ∀ q, TendsS V (fun k => lam k q) (lam' q) := by
     intro q
-    have e
-        : (fun k => lam k q)
-          = fun k =>
-            PowerSeries.mk (fun m => L k m (Sum.inr q)) + alongCv (γ k) (X.sg (X.u (1 - g) q))
-              - ∑ c : I g, if X.ty g c = X.ty (1 - g) q then
-                  X.sg1 (X.u g c) (X.u (1 - g) q) • PowerSeries.mk (fun m => L k m (Sum.inl c)) else 0 :=
+    have e : (fun k => lam k q) = fun k => PowerSeries.mk (fun m => L k m (Sum.inr q)) +
+        alongCv (γ k) (X.sg (X.u (1 - g) q)) -
+        ∑ c : I g, if X.ty g c = X.ty (1 - g) q then
+          X.sg1 (X.u g c) (X.u (1 - g) q) • PowerSeries.mk (fun m => L k m (Sum.inl c)) else 0 :=
       funext fun k => hlamk k q
     rw [e]
     refine ((hmk (Sum.inr q)).add ?_).sub

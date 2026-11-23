@@ -1,6 +1,55 @@
 module
 
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.FundamentalDomains.FourierCoefficientMatrices
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Real
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Lemma
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.FundamentalDomains.EmbeddingHermitianPairs
 
 @[expose] public section
 
@@ -109,8 +158,6 @@ lemma LZ_sum {N : ℕ} {ω : Fin N → X.Ψ → Fin 2 → Fin 2 → ℂ} (hω : 
   have key : ∀ j, (n j : ℂ) • ω j = n j • ω j := fun j => by
     first
     | exact Int.cast_smul_eq_zsmul ℂ (n j) (ω j)
-    | exact Int.cast_smul_eq_zsmul (n j) (ω j)
-    | simp
   rw [Finset.sum_congr rfl fun j _ => key j]
   exact (LZsub X g).sum_mem fun j _ => (LZsub X g).zsmul_mem (hω j) (n j)
 
@@ -120,12 +167,6 @@ def Lc : Submodule ℤ (X.Ψ → Fin 2 → Fin 2 → ℝ) :=
 lemma mem_Lc {y : X.Ψ → Fin 2 → Fin 2 → ℝ} : y ∈ Lc X g ↔ ∃ b ∈ X.LZ g, kap b = y := by
   first
   | exact Iff.rfl
-  | constructor
-    · intro h
-      obtain ⟨b, hb, e⟩ := AddSubgroup.mem_map.mp (AddSubgroup.mem_toIntSubmodule.mp h)
-      exact ⟨b, hb, e⟩
-    · rintro ⟨b, hb, e⟩
-      exact AddSubgroup.mem_toIntSubmodule.mpr (AddSubgroup.mem_map.mpr ⟨b, hb, e⟩)
 
 lemma finite_small (hg : 0 < g) : {y | y ∈ Lc X g ∧ ‖y‖ < 1}.Finite := by
   have hS := NumberField.Embeddings.finite_of_norm_le E ℂ 4
@@ -245,19 +286,14 @@ lemma span_fixed_integral_real_parts : Submodule.span ℝ {p : X.Ψ → ℝ | �
     intro y
     first
     | exact NumberField.IsCMField.complexConj_apply_apply E y
-    | exact NumberField.IsCMField.complexConj_apply_apply y
-    | simp [cc]
   have hvan : ∀ x : 𝓞 E, ∑ τ : X.Ψ, (τ.1 (x : E)).re * lam τ = 0 := by
     intro x
     have hx : IsIntegral ℤ (x : E) := by
       first
       | exact x.isIntegral_coe
-      | exact NumberField.RingOfIntegers.isIntegral_coe x
-      | exact x.2
     have hcx : IsIntegral ℤ (cc (x : E)) := by
       first
       | exact hx.map ((IsCMField.complexConj E).toRingEquiv.toRingHom.toIntAlgHom)
-      | exact hx.map ((IsCMField.complexConj E).toAlgHom.restrictScalars ℤ)
     have hr : cc ((x : E) + cc (x : E)) = (x : E) + cc (x : E) := by
       rw [show cc ((x : E) + cc (x : E)) = cc (x : E) + cc (cc (x : E)) from map_add _ _ _, hinv,
         add_comm]
@@ -286,7 +322,6 @@ lemma span_fixed_integral_real_parts : Submodule.span ℝ {p : X.Ψ → ℝ | �
     first
     | exact ComplexEmbedding.conjugate_conjugate φ
     | exact star_star φ
-    | (ext y; simp [ComplexEmbedding.conjugate_coe_eq])
   have hFinj : Function.Injective
       (Sum.elim (fun τ : X.Ψ => τ.1) (fun τ : X.Ψ => ComplexEmbedding.conjugate τ.1)) := by
     rintro (τ | τ) (τ' | τ') h

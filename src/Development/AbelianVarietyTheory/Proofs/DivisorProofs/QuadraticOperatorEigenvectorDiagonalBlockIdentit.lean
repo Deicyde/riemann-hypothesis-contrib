@@ -1,6 +1,41 @@
 module
 
 public import Development.AbelianVarietyTheory.Definitions.Divisors.ActAtApply
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -9,14 +44,7 @@ open Formalism.BasicNotions.TH GlobalTheory.FockAlg GlobalTheory.RealLift Global
 
 namespace GlobalTheory.HoweR
 
-theorem qop_quadratic_on_eigenvector
-    : ∀ (ι M : Type) [Fintype ι] [DecidableEq ι] [AddCommGroup M] [Module ℂ M] (s : ι → Bool)
-        (F : ι → ι → Module.End ℂ M),
-      ∀ (α β x : ℂ) (y : ι → M),
-        (∀ a b, qop F α β a b = 0) → (∀ a, s a = false → y a = 0)
-          → (∀ a, s a = true → ∑ b, F a b (y b) = x • y a)
-          → (∀ j, s j = false → ∑ b, F j b (y b) = 0)
-          → ∀ a, (x ^ 2 - α * x - β) • y a = 0 := by
+theorem qop_quadratic_on_eigenvector : ∀ (ι M : Type) [Fintype ι] [DecidableEq ι] [AddCommGroup M] [Module ℂ M] (s : ι → Bool) (F : ι → ι → Module.End ℂ M), ∀ (α β x : ℂ) (y : ι → M), (∀ a b, qop F α β a b = 0) → (∀ a, s a = false → y a = 0) → (∀ a, s a = true → ∑ b, F a b (y b) = x • y a) → (∀ j, s j = false → ∑ b, F j b (y b) = 0) → ∀ a, (x ^ 2 - α * x - β) • y a = 0 := by
   intro ι M _ _ _ _ s F α β x y hq hs ht hf a
   have hall : ∀ c, ∑ b, F c b (y b) = x • y c := by
     intro c
@@ -26,20 +54,16 @@ theorem qop_quadratic_on_eigenvector
   cases ha : s a
   · rw [hs a ha, smul_zero]
   · have key : ∑ b, qop F α β a b (y b) = 0 := by simp [hq]
-    have pt
-        : ∀ b,
-          qop F α β a b (y b)
-            = ∑ c, F a c (F c b (y b)) - α • F a b (y b) - (if a = b then β • y b else 0) := by
+    have pt : ∀ b, qop F α β a b (y b)
+        = ∑ c, F a c (F c b (y b)) - α • F a b (y b) - (if a = b then β • y b else 0) := by
       intro b
-      simp only [qop, LinearMap.sub_apply, LinearMap.smul_apply, LinearMap.sum_apply,
-        Module.End.mul_apply]
+      simp only [qop, LinearMap.sub_apply, LinearMap.smul_apply, LinearMap.sum_apply, Module.End.mul_apply]
       split_ifs <;> simp
-    have expand
-        : ∑ b, qop F α β a b (y b)
-          = ∑ c, F a c (∑ b, F c b (y b)) - α • ∑ b, F a b (y b) - β • y a := by
+    have expand : ∑ b, qop F α β a b (y b)
+        = ∑ c, F a c (∑ b, F c b (y b)) - α • ∑ b, F a b (y b) - β • y a := by
       rw [Finset.sum_congr rfl (fun b _ => pt b), Finset.sum_sub_distrib, Finset.sum_sub_distrib,
         Finset.sum_comm, Finset.sum_ite_eq, ← Finset.smul_sum]
-      set_option synthInstance.maxHeartbeats 100000 in
+
       simp [map_sum]
     rw [expand, ht a ha] at key
     simp only [hall, map_smul] at key

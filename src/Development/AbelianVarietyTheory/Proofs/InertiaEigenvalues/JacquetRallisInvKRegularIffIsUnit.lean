@@ -1,7 +1,55 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.IsTestRep
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Coalgebra.IsFrobenius
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.HopfAlgebra.Basic
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 public import ReciprocityTheory.L2DbarEstimates.PlurisubharmonicCharts.UniNilp
 
 @[expose] public section
@@ -15,9 +63,8 @@ namespace GlobalTheory.JR.EtInv
 section Gen
 variable {F K : Type} [Field F] [CommRing K] [Algebra F K] [Module.Finite F K]
 
-theorem eq_zero_of_trace_mul
-    [CharZero F] [IsReduced K] (a : K) (h : ∀ x : K, Algebra.trace F K (x * a) = 0)
-    : a = 0 := by
+theorem eq_zero_of_trace_mul [CharZero F] [IsReduced K] (a : K)
+    (h : ∀ x : K, Algebra.trace F K (x * a) = 0) : a = 0 := by
   classical
   let b := Module.finBasis F K
   have hn : IsNilpotent (Algebra.leftMulMatrix b a) := by
@@ -33,10 +80,10 @@ theorem eq_zero_of_trace_mul
 
 variable {r : ℕ} {τ : K}
 
-theorem trace_mul_eq_sum (bb : Module.Basis (Fin r) F K) (hb : ∀ i, bb i = τ ^ (i : ℕ)) (x a : K)
-    : Algebra.trace F K (x * a) = ∑ j, bb.repr x j * Algebra.trace F K (τ ^ (j : ℕ) * a) := by
+theorem trace_mul_eq_sum (bb : Module.Basis (Fin r) F K) (hb : ∀ i, bb i = τ ^ (i : ℕ)) (x a : K) :
+    Algebra.trace F K (x * a) = ∑ j, bb.repr x j * Algebra.trace F K (τ ^ (j : ℕ) * a) := by
   conv_lhs => rw [← bb.sum_repr x]
-  set_option synthInstance.maxHeartbeats 100000 in
+
   simp [Finset.sum_mul, smul_mul_assoc, map_sum, hb]
 
 end Gen
@@ -44,10 +91,8 @@ end Gen
 section Comp
 variable {F K : Type} [Field F] [CommRing K] [Algebra F K] {r : ℕ} {τ : K} {p : Fin r → F}
 
-theorem leftMulMatrix_eq_companion
-    (bb : Module.Basis (Fin r) F K) (hb : ∀ i, bb i = τ ^ (i : ℕ))
-    (hr : τ ^ r + ∑ i, p i • τ ^ (i : ℕ) = 0)
-    : Algebra.leftMulMatrix bb τ = companion p := by
+theorem leftMulMatrix_eq_companion (bb : Module.Basis (Fin r) F K) (hb : ∀ i, bb i = τ ^ (i : ℕ))
+    (hr : τ ^ r + ∑ i, p i • τ ^ (i : ℕ) = 0) : Algebra.leftMulMatrix bb τ = companion p := by
   classical
   ext i j
   rw [Algebra.leftMulMatrix_eq_repr_mul, hb, ← pow_succ']
@@ -64,11 +109,9 @@ theorem leftMulMatrix_eq_companion
     · rw [if_pos (Fin.ext hi.symm), if_pos hi]
     · rw [if_neg (fun h => hi (by rw [← h])), if_neg hi]
 
-theorem companion_pow_mulVec
-    (bb : Module.Basis (Fin r) F K) (hb : ∀ i, bb i = τ ^ (i : ℕ))
-    (hr : τ ^ r + ∑ i, p i • τ ^ (i : ℕ) = 0) (n : ℕ)
-    : (companion p ^ n) *ᵥ (fun i : Fin r => if (i : ℕ) = 0 then (1 : F) else 0)
-      = ⇑(bb.repr (τ ^ n)) := by
+theorem companion_pow_mulVec (bb : Module.Basis (Fin r) F K) (hb : ∀ i, bb i = τ ^ (i : ℕ))
+    (hr : τ ^ r + ∑ i, p i • τ ^ (i : ℕ) = 0) (n : ℕ) :
+    (companion p ^ n) *ᵥ (fun i : Fin r => if (i : ℕ) = 0 then (1 : F) else 0) = ⇑(bb.repr (τ ^ n)) := by
   classical
   induction n with
   | zero =>
@@ -87,26 +130,24 @@ theorem companion_pow_mulVec
 
 end Comp
 
-theorem invK_regular_iff_isUnit
-    : ∀ (F E : Type) [NontriviallyNormedField F] [NontriviallyNormedField E] [NormedAlgebra F E]
-        [StarRing E] [Unram F E] (A : Et F E) (r : ℕ) (τ : A.K) (p : Fin r → F) (lam : F),
-      A.IsGen τ p
-        → Function.Bijective (fun (a : A.K) (i : Fin r) => Algebra.trace F A.K (τ ^ (i : ℕ) * a))
-          ∧ ∀ a : A.K,
-            (∀ i : ℕ, mom (sec (A.invK τ p lam a)) i = Algebra.trace F A.K (τ ^ i * a))
-              ∧ (Delta (A.invK τ p lam a) ≠ 0 ↔ IsUnit a) := by
+theorem invK_regular_iff_isUnit :
+    ∀ (F E : Type) [NontriviallyNormedField F] [NontriviallyNormedField E] [NormedAlgebra F E] [StarRing E]
+      [Unram F E] (A : Et F E) (r : ℕ) (τ : A.K) (p : Fin r → F) (lam : F), A.IsGen τ p →
+      Function.Bijective (fun (a : A.K) (i : Fin r) => Algebra.trace F A.K (τ ^ (i : ℕ) * a)) ∧
+      ∀ a : A.K, (∀ i : ℕ, mom (sec (A.invK τ p lam a)) i = Algebra.trace F A.K (τ ^ i * a)) ∧
+        (Delta (A.invK τ p lam a) ≠ 0 ↔ IsUnit a) := by
   intro F E _ _ _ _ hU A r τ p lam hg
   classical
   haveI : CharZero F := hU.charZero
   obtain ⟨hli, hfr, hr⟩ := hg
   let bb : Module.Basis (Fin r) F A.K :=
     basisOfLinearIndependentOfCardEqFinrank' _ hli (by rw [hfr, Fintype.card_fin])
-  have hb : ∀ i, bb i = τ ^ (i : ℕ) := fun i => by simp [bb]
-  let Ψ : A.K →ₗ[F] (Fin r → F) := {
-    toFun := fun a i => Algebra.trace F A.K (τ ^ (i : ℕ) * a)
-    map_add' := fun a a' => by funext i; simp [mul_add]
-    map_smul' := fun c a => by funext i; simp [mul_smul_comm]
-  }
+  have hb : ∀ i, bb i = τ ^ (i : ℕ) := fun i => by
+    simp [bb]
+  let Ψ : A.K →ₗ[F] (Fin r → F) :=
+    { toFun := fun a i => Algebra.trace F A.K (τ ^ (i : ℕ) * a)
+      map_add' := fun a a' => by funext i; simp [mul_add]
+      map_smul' := fun c a => by funext i; simp [mul_smul_comm] }
   have hΨ : ∀ a, Ψ a = fun i : Fin r => Algebra.trace F A.K (τ ^ (i : ℕ) * a) := fun _ => rfl
   have hinj : Function.Injective Ψ := by
     rw [← LinearMap.ker_eq_bot, LinearMap.ker_eq_bot']
@@ -121,8 +162,7 @@ theorem invK_regular_iff_isUnit
   have hbij : Function.Bijective Ψ := by
     refine ⟨hinj, ?_⟩
     exact (LinearMap.injective_iff_surjective_of_finrank_eq_finrank (by simp [hfr])).1 hinj
-  have hmom
-      : ∀ a : A.K, ∀ i : ℕ, mom (sec (A.invK τ p lam a)) i = Algebra.trace F A.K (τ ^ i * a) := by
+  have hmom : ∀ a : A.K, ∀ i : ℕ, mom (sec (A.invK τ p lam a)) i = Algebra.trace F A.K (τ ^ i * a) := by
     intro a i
     simp only [mom, sec, Et.invK]
     rw [companion_pow_mulVec bb hb hr i, trace_mul_eq_sum bb hb (τ ^ i) a, dotProduct]
@@ -132,16 +172,12 @@ theorem invK_regular_iff_isUnit
   have hH : ∀ v : Fin r → F, hankel (A.invK τ p lam a) *ᵥ v = Ψ (a * bb.equivFun.symm v) := by
     intro v
     funext i
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [hankel, Matrix.mulVec, dotProduct, Matrix.of_apply, hmom, hΨ,
-        Module.Basis.equivFun_symm_apply, hb, Finset.mul_sum, map_sum, mul_smul_comm, map_smul,
-        smul_eq_mul]
+
+    simp only [hankel, Matrix.mulVec, dotProduct, Matrix.of_apply, hmom, hΨ,
+    Module.Basis.equivFun_symm_apply, hb, Finset.mul_sum, map_sum, mul_smul_comm, map_smul, smul_eq_mul]
     refine Finset.sum_congr rfl fun j _ => ?_
-    rw [pow_add]
-    ring_nf
-  have hcomp
-      : Function.Injective (hankel (A.invK τ p lam a)).mulVec
-        ↔ Function.Injective (fun y : A.K => a * y) := by
+    rw [pow_add]; ring_nf
+  have hcomp : Function.Injective (hankel (A.invK τ p lam a)).mulVec ↔ Function.Injective (fun y : A.K => a * y) := by
     constructor
     · intro h y y' hyy
       have := h (a₁ := bb.equivFun y) (a₂ := bb.equivFun y') (by rw [hH, hH]; simp [hyy])
@@ -149,11 +185,11 @@ theorem invK_regular_iff_isUnit
     · intro h v v' hvv
       rw [hH, hH] at hvv
       exact bb.equivFun.symm.injective (h (hinj hvv))
-  rw [Delta, ← isUnit_iff_ne_zero, ← Matrix.isUnit_iff_isUnit_det,
-    ← Matrix.mulVec_injective_iff_isUnit, hcomp]
+  rw [Delta, ← isUnit_iff_ne_zero, ← Matrix.isUnit_iff_isUnit_det, ← Matrix.mulVec_injective_iff_isUnit, hcomp]
   constructor
   · intro h
-    have hs : Function.Surjective (Algebra.lmul F A.K a) := LinearMap.injective_iff_surjective.1 h
+    have hs : Function.Surjective (Algebra.lmul F A.K a) :=
+      LinearMap.injective_iff_surjective.1 h
     obtain ⟨y, hy⟩ := hs 1
     exact ⟨⟨a, y, hy, by rw [mul_comm]; exact hy⟩, rfl⟩
   · intro h

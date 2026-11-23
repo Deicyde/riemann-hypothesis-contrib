@@ -1,7 +1,50 @@
 module
 
 public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityArgument.ClassCounting.LemmaKOfSteps
+public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.AbsNormPrimeIffInertiaDegEqOneAndFiniteRamified
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ChebotarevDegreeOne
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+public import Mathlib.FieldTheory.KummerExtension
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.Valuation.Integral
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -9,11 +52,8 @@ open NumberField IsDedekindDomain Formalism.ConjugateSelfDual UpperTheory.V.ZK
 
 namespace LateralTheory.Q.SDetectCut
 
-theorem root_eq_one
-    {R : Type} [CommRing R] [IsDomain R]
-    (P : Ideal R) (q : ℕ) (η : R) (hη : η ^ q = 1) (h1 : η - 1 ∈ P)
-    (hq : (q : R) ∉ P)
-    : η = 1 := by
+theorem root_eq_one {R : Type} [CommRing R] [IsDomain R] (P : Ideal R) (q : ℕ) (η : R) (hη : η ^ q = 1)
+    (h1 : η - 1 ∈ P) (hq : (q : R) ∉ P) : η = 1 := by
   by_contra hne
   apply hq
   have h0 : ∑ i ∈ Finset.range q, η ^ i = 0 := by
@@ -24,42 +64,34 @@ theorem root_eq_one
     rw [← map_one (Ideal.Quotient.mk P), Ideal.Quotient.eq]
     exact h1
   have h3 := congrArg (Ideal.Quotient.mk P) h0
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, map_pow, h2, one_pow, Finset.sum_const, Finset.card_range, nsmul_eq_mul,
-        mul_one, map_zero]
-      at h3
+
+  simp only [map_sum, map_pow, h2, one_pow, Finset.sum_const, Finset.card_range, nsmul_eq_mul, mul_one,
+  map_zero] at h3
   rw [← Ideal.Quotient.eq_zero_iff_mem, map_natCast]
   exact h3
 
-theorem surj_of_prime {A k : Type} [CommRing A] [CommRing k] (f : A →+* k) (hp : (Nat.card k).Prime)
-    : Function.Surjective f := by
+theorem surj_of_prime {A k : Type} [CommRing A] [CommRing k] (f : A →+* k) (hp : (Nat.card k).Prime) :
+    Function.Surjective f := by
   intro y
   have : Fact (Nat.card k).Prime := ⟨hp⟩
   have : Finite k := Nat.finite_of_card_ne_zero hp.ne_zero
   have : Nontrivial k := Finite.one_lt_card_iff_nontrivial.1 hp.one_lt
-  obtain ⟨n, hn⟩ :=
-    mem_zmultiples_of_prime_card (G := k) (p := Nat.card k) rfl (g := 1) (g' := y) one_ne_zero
+  obtain ⟨n, hn⟩ := mem_zmultiples_of_prime_card (G := k) (p := Nat.card k) rfl (g := 1) (g' := y) one_ne_zero
   exact ⟨n, by simpa using hn⟩
 
 variable {F Ω : Type} [Field F] [NumberField F] [Field Ω] [Algebra F Ω]
 
 omit [NumberField F] in
 theorem val_le (B : ValuationSubring Ω) (x : 𝓞 F) : B.valuation (algebraMap F Ω (x : F)) ≤ 1 := by
-  have hz : IsIntegral ℤ (algebraMap F Ω (x : F)) :=
-    x.isIntegral_coe.map (algebraMap F Ω).toIntAlgHom
+  have hz : IsIntegral ℤ (algebraMap F Ω (x : F)) := x.isIntegral_coe.map (algebraMap F Ω).toIntAlgHom
   exact (Valuation.integer.integers B.valuation).mem_of_integral hz.tower_top
 
+
 omit [NumberField F] in
-theorem frob_fix
-    {v : HeightOneSpectrum (𝓞 F)} {B : ValuationSubring Ω} (hB : IsPlaceOver B v)
-    {N : ℕ} (hN : N ≠ 0)
-    {σ : G F Ω} (hσ : IsFrob B N σ)
-    {q : ℕ} (hq0 : q ≠ 0) (hq : (q : 𝓞 F) ∉ v.asIdeal)
-    {ζ : 𝓞 F} (hζ : IsPrimitiveRoot ζ q)
-    {β : F} {x : Ω} (hx : x ^ q = algebraMap F Ω β)
-    {a b t : 𝓞 F}
-    (hb : b ∉ v.asIdeal) (ht : t ∉ v.asIdeal) (hab : β * b = a) (hc : a - t ^ q * b ∈ v.asIdeal)
-    : σ x = x := by
+theorem frob_fix {v : HeightOneSpectrum (𝓞 F)} {B : ValuationSubring Ω} (hB : IsPlaceOver B v) {N : ℕ} (hN : N ≠ 0)
+    {σ : G F Ω} (hσ : IsFrob B N σ) {q : ℕ} (hq0 : q ≠ 0) (hq : (q : 𝓞 F) ∉ v.asIdeal) {ζ : 𝓞 F}
+    (hζ : IsPrimitiveRoot ζ q) {β : F} {x : Ω} (hx : x ^ q = algebraMap F Ω β) {a b t : 𝓞 F}
+    (hb : b ∉ v.asIdeal) (ht : t ∉ v.asIdeal) (hab : β * b = a) (hc : a - t ^ q * b ∈ v.asIdeal) : σ x = x := by
   have : NeZero q := ⟨hq0⟩
   let ι : 𝓞 F →+* Ω := (algebraMap F Ω).comp (algebraMap (𝓞 F) F)
   have hι : ∀ y : 𝓞 F, ι y = algebraMap F Ω (y : F) := fun _ => rfl
@@ -75,12 +107,9 @@ theorem frob_fix
     exact this
   obtain ⟨i, hi⟩ : ∃ i : ℕ, B.valuation (x - ι (ζ ^ i * t)) < 1 := by
     by_contra! h
-    have e :=
-      congrArg (Polynomial.eval x)
-        (X_pow_sub_C_eq_prod hζ' (Nat.pos_of_ne_zero hq0) (rfl : ι t ^ q = ι t ^ q))
+    have e := congrArg (Polynomial.eval x) (X_pow_sub_C_eq_prod hζ' (Nat.pos_of_ne_zero hq0) (rfl : ι t ^ q = ι t ^ q))
     simp only [Polynomial.eval_sub, Polynomial.eval_pow, Polynomial.eval_X, Polynomial.eval_C,
-        Polynomial.eval_prod]
-      at e
+      Polynomial.eval_prod] at e
     rw [e, map_prod] at h1
     refine absurd h1 (not_lt.2 (Finset.one_le_prod' fun i _ => ?_))
     have := h i
@@ -99,7 +128,8 @@ theorem frob_fix
     rw [map_pow]
     exact pow_lt_one' hi hN
   have h3 : B.valuation (σ x - x) < 1 := by
-    have e : σ x - x = σ (x - ι c) - (x - ι c) := by rw [map_sub, hι, AlgEquiv.commutes]; ring
+    have e : σ x - x = σ (x - ι c) - (x - ι c) := by
+      rw [map_sub, hι, AlgEquiv.commutes]; ring
     rw [e]
     exact Valuation.map_sub_lt _ h2 hi
   have hx0 : x ≠ 0 := by
@@ -113,8 +143,7 @@ theorem frob_fix
     rw [← hB, ← hι]
     have e : σ x - x = ι (ζ ^ j - 1) * x := by rw [h5, map_sub, map_one]; ring
     rwa [e, map_mul, hxv, mul_one] at h3
-  have h7 : ζ ^ j = 1 :=
-    root_eq_one v.asIdeal q _ (by rw [← pow_mul, mul_comm, pow_mul, hζ.pow_eq_one, one_pow]) h6 hq
+  have h7 : ζ ^ j = 1 := root_eq_one v.asIdeal q _ (by rw [← pow_mul, mul_comm, pow_mul, hζ.pow_eq_one, one_pow]) h6 hq
   rw [h5, h7, map_one, one_mul]
 
 theorem goal : SDetect := by
@@ -130,32 +159,28 @@ theorem goal : SDetect := by
   have hfix : ∀ g : Ω ≃ₐ[F] Ω, g x = x := by
     intro g
     have hV : IsOpen {σ : G F Ω | σ x = g x} := by
-      have h1 : IsOpen (MulAction.stabilizer (Ω ≃ₐ[F] Ω) x : Set (Ω ≃ₐ[F] Ω)) :=
-        stabilizer_isOpen_of_isIntegral x
+      have h1 : IsOpen (MulAction.stabilizer (Ω ≃ₐ[F] Ω) x : Set (Ω ≃ₐ[F] Ω)) := stabilizer_isOpen_of_isIntegral x
       have h2 := h1.preimage (continuous_const_mul g⁻¹)
       convert h2 using 1
       ext σ
-      simp only [Set.mem_ofPred_eq, Set.mem_preimage, SetLike.mem_coe, MulAction.mem_stabilizer_iff,
-        mul_smul, inv_smul_eq_iff]
+      simp only [Set.mem_ofPred_eq, Set.mem_preimage, SetLike.mem_coe, MulAction.mem_stabilizer_iff, mul_smul,
+        inv_smul_eq_iff]
       rfl
     obtain ⟨σ, hσV, v, hv, hd, B, hB, hσ⟩ :=
-      (GlobalTheory.Published.ChebotarevDegreeOne.dense (F := F) (Ω := Ω)
-        GlobalTheory.Published.chebotarevDegreeOne' hS).inter_open_nonempty _ hV ⟨g, rfl⟩
+      (GlobalTheory.Published.ChebotarevDegreeOne.dense (F := F) (Ω := Ω) GlobalTheory.Published.chebotarevDegreeOne'
+        hS).inter_open_nonempty _ hV ⟨g, rfl⟩
     have hp : (Nat.card (𝓞 F ⧸ v.asIdeal)).Prime := by
       have := ((GlobalTheory.absNorm_prime_iff_inertiaDeg_eq_one_and_finite_ramified F).1 v).2 hd
       rwa [Ideal.absNorm_apply, Submodule.cardQuot_apply] at this
     have := v.isMaximal
-    obtain ⟨s, a, b', hb', hab, hr⟩ :=
-      H v (fun h => hv (Ideal.mul_mem_right _ _ h)) (surj_of_prime _ hp)
+    obtain ⟨s, a, b', hb', hab, hr⟩ := H v (fun h => hv (Ideal.mul_mem_right _ _ h)) (surj_of_prime _ hp)
     let := Ideal.Quotient.field v.asIdeal
     obtain ⟨t, ht⟩ := Ideal.Quotient.mk_surjective (s : 𝓞 F ⧸ v.asIdeal)
     rw [← hσV]
-    refine frob_fix hB hp.ne_zero hσ hq0
-      (fun h => hv (Ideal.mul_mem_left _ _ h))
+    refine frob_fix hB hp.ne_zero hσ hq0 (fun h => hv (Ideal.mul_mem_left _ _ h))
       (IsPrimitiveRoot.coe_units_iff.2 hζ) hx (a := a) (b := b') (t := t)
       (fun h => hb' (Ideal.Quotient.eq_zero_iff_mem.2 h))
-      (fun h => s.ne_zero (ht ▸ Ideal.Quotient.eq_zero_iff_mem.2 h))
-      hab ?_
+      (fun h => s.ne_zero (ht ▸ Ideal.Quotient.eq_zero_iff_mem.2 h)) hab ?_
     rw [← Ideal.Quotient.eq, map_mul, map_pow, ht, hr, Units.val_pow_eq_pow_val]
   obtain ⟨δ, hδ⟩ := (InfiniteGalois.mem_range_algebraMap_iff_fixed x).2 hfix
   have hd : (β : F) = δ ^ q := (algebraMap F Ω).injective (by rw [map_pow, hδ, hx])

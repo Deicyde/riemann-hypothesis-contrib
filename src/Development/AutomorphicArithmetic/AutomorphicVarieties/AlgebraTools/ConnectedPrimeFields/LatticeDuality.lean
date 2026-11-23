@@ -1,19 +1,68 @@
 module
 
-public import Mathlib
-public import ReciprocityTheory.CommutativeAlgebra.ChainConnInDim
-public import ReciprocityTheory.CommutativeAlgebra.SaturatedChains.IsSaturatedChain
-public import Development.AutomorphicArithmetic.AutomorphicVarieties.AlgebraTools.ConnectedPrimeFields.IsWeaklyRegularPairModOneLeft
+public import Mathlib.LinearAlgebra.Dual.Defs
+public import Mathlib.RingTheory.Finiteness.Defs
+import Mathlib.Algebra.Module.StablyFree.Basic
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Coalgebra.IsFrobenius
+import Mathlib.RingTheory.HopfAlgebra.Basic
+import Mathlib.RingTheory.PicardGroup
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Development.AutomorphicArithmetic.AutomorphicVarieties.AlgebraTools.ConnectedPrimeFields.IsWeaklyRegularPairModOneLeft
+public import Mathlib.Algebra.BigOperators.Ring.Finset
+public import Mathlib.Data.Fintype.BigOperators
+public import Mathlib.LinearAlgebra.Dual.Lemmas
+public import Mathlib.RingTheory.Localization.FractionRing
+public import Mathlib.RingTheory.Localization.Integer
 
 @[expose] public section
 
 open IsLocalRing UpperTheory.V.AlgebraTools.Conn
 
-theorem UpperTheory.V.AlgebraTools.Conn.bidual
-    : ∀ {A M : Type} [CommRing A] [IsDomain A] [AddCommGroup M] [Module A M] [Module.Finite A M]
-        (a : Module.Dual A (Module.Dual A M)),
-      ∃ (d : A) (r : M),
-        d ≠ 0 ∧ ∀ l : Module.Dual A M, l r = d * a l := by
+theorem UpperTheory.V.AlgebraTools.Conn.bidual :
+    ∀ {A M : Type} [CommRing A] [IsDomain A] [AddCommGroup M] [Module A M] [Module.Finite A M]
+      (a : Module.Dual A (Module.Dual A M)), ∃ (d : A) (r : M), d ≠ 0 ∧ ∀ l : Module.Dual A M, l r = d * a l := by
   intro A M _ _ _ _ _ a
   classical
   obtain ⟨S, hS⟩ := (Module.Finite.fg_top : (⊤ : Submodule A M).FG)
@@ -30,9 +79,8 @@ theorem UpperTheory.V.AlgebraTools.Conn.bidual
     intro o
     cases o <;> simp [ψ]
   let v : Option S → K := fun j => if none = j then 1 else 0
-  have key
-      : ∀ w ∈ Submodule.span K (Set.range ψ), ∃ s : A,
-        s ≠ 0 ∧ ∃ l, ∀ o, algebraMap A K s * w o = ψ l o := by
+  have key : ∀ w ∈ Submodule.span K (Set.range ψ),
+      ∃ s : A, s ≠ 0 ∧ ∃ l, ∀ o, algebraMap A K s * w o = ψ l o := by
     intro w hw
     induction hw using Submodule.span_induction with
     | mem x hx =>
@@ -79,8 +127,7 @@ theorem UpperTheory.V.AlgebraTools.Conn.bidual
   let c : Option S → K := fun o => f (fun j => if o = j then 1 else 0)
   obtain ⟨Dn, hDc⟩ := IsLocalization.exist_integer_multiples_of_finite (nonZeroDivisors A) c
   choose b hb using hDc
-  have hD0 : algebraMap A K (Dn : A) ≠ 0 :=
-    IsFractionRing.to_map_ne_zero_of_mem_nonZeroDivisors Dn.2
+  have hD0 : algebraMap A K (Dn : A) ≠ 0 := IsFractionRing.to_map_ne_zero_of_mem_nonZeroDivisors Dn.2
   have hmain : ∀ l : Module.Dual A M, b none * a l + ∑ i : S, b (some i) * l i = 0 := by
     intro l
     have e : ∑ o, ψ l o * c o = 0 := by
@@ -89,19 +136,18 @@ theorem UpperTheory.V.AlgebraTools.Conn.bidual
       simpa [c, smul_eq_mul] using h
     apply IsFractionRing.injective A K
     rw [map_zero]
-    calc
-      algebraMap A K (b none * a l + ∑ i : S, b (some i) * l i)
-          = algebraMap A K (Dn : A) * ∑ o, ψ l o * c o := by
-        set_option synthInstance.maxHeartbeats 100000 in
+    calc algebraMap A K (b none * a l + ∑ i : S, b (some i) * l i)
+        = algebraMap A K (Dn : A) * ∑ o, ψ l o * c o := by
+
           rw [Fintype.sum_option, mul_add, Finset.mul_sum, map_add (f := _), map_mul, map_sum]
-        congr 1
-        · rw [hb, Algebra.smul_def]
-          simp only [ψ, Option.elim_none]
-          ring
-        · refine Finset.sum_congr rfl (fun i _ => ?_)
-          rw [map_mul, hb, Algebra.smul_def]
-          simp only [ψ, Option.elim_some]
-          ring
+          congr 1
+          · rw [hb, Algebra.smul_def]
+            simp only [ψ, Option.elim_none]
+            ring
+          · refine Finset.sum_congr rfl (fun i _ => ?_)
+            rw [map_mul, hb, Algebra.smul_def]
+            simp only [ψ, Option.elim_some]
+            ring
       _ = 0 := by rw [e, mul_zero]
   refine ⟨b none, -(∑ i : S, b (some i) • (i : M)), ?_, ?_⟩
   · intro h0
@@ -110,7 +156,7 @@ theorem UpperTheory.V.AlgebraTools.Conn.bidual
     exact hf ((mul_eq_zero.mp h.symm).resolve_left hD0)
   · intro l
     have h := hmain l
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_neg, map_sum]
+
+    rw [map_neg, map_sum]
     simp only [map_smul, smul_eq_mul]
     linear_combination -h

@@ -1,7 +1,45 @@
 module
 
-public import Mathlib
-public import CompanionTheory.SpectralGeometry.CountingDefinitions.VoronoiMeans.VorFunEvalEqFineMean
+public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.SumMulEqZeroOfSumToReal
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import CompanionTheory.SpectralGeometry.CountingDefinitions.VoronoiMeans.VorFunEvalEqFineMean
+import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.HomExtNormalSt
+import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.IsStrictIff
 
 @[expose] public section
 
@@ -9,21 +47,17 @@ set_option autoImplicit false
 
 noncomputable section
 
-open NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.Toroidal
-  GlobalTheory.LocM GlobalTheory.TorRef GlobalTheory.PolFan GlobalTheory.PolCell
-  GlobalTheory.CompanionTheory.Ar.Fan
+open NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.TorRef GlobalTheory.PolFan GlobalTheory.PolCell GlobalTheory.CompanionTheory.Ar.Fan
 
 namespace GlobalTheory.CompanionTheory.Ar.Fan
 
-theorem free_int_of_projective
-    (O : Type) [CommRing O] [IsDomain O] [CharZero O] [Module.Finite ℤ O]
-    (Y : Type) [AddCommGroup Y] [Module O Y] [Module.Finite O Y] [Module.Projective O Y]
-    : Module.Finite ℤ Y ∧ Module.Free ℤ Y := by
+theorem free_int_of_projective (O : Type) [CommRing O] [IsDomain O] [CharZero O] [Module.Finite ℤ O]
+    (Y : Type) [AddCommGroup Y] [Module O Y] [Module.Finite O Y] [Module.Projective O Y] :
+    Module.Finite ℤ Y ∧ Module.Free ℤ Y := by
   have hfin : Module.Finite ℤ Y := Module.Finite.trans O Y
   obtain ⟨s, hs⟩ := Module.projective_def'.1 (inferInstance : Module.Projective O Y)
-  have hinj : Function.Injective s :=
-    Function.LeftInverse.injective (g := Finsupp.linearCombination O id)
-      (fun y => by simpa using LinearMap.congr_fun hs y)
+  have hinj : Function.Injective s := Function.LeftInverse.injective (g := Finsupp.linearCombination O id) (fun y => by
+    simpa using LinearMap.congr_fun hs y)
   have htf : Module.IsTorsionFree ℤ Y := by
     refine Module.IsTorsionFree.of_smul_eq_zero ?_
     intro n y h
@@ -38,72 +72,54 @@ theorem free_int_of_projective
     exact (mul_ne_zero (Int.cast_ne_zero.2 hc.1) ha) h3
   exact ⟨hfin, Module.free_of_finite_type_torsion_free'⟩
 
-theorem sum_nonneg_of_isPosDef
-    {Y ι : Type} [AddCommGroup Y] [Fintype ι]
-    (b : Module.Basis ι ℤ Y)
-    {B : Y →ₗ[ℤ] Y →ₗ[ℤ] ℝ} (h : IsPosDef B)
-    {n : ℕ} (y : Fin n → Y) (c : Fin n → ℝ)
-    : 0 ≤ ∑ i, ∑ j, c i * c j * B (y i) (y j) := by
-  have hy
-      : ∀ i j,
-        B (y i) (y j)
-          = ∑ k, ∑ l, (b.repr (y i) k : ℝ) * (b.repr (y j) l : ℝ) * B (b k) (b l) := fun i j => by
+theorem sum_nonneg_of_isPosDef {Y ι : Type} [AddCommGroup Y] [Fintype ι] (b : Module.Basis ι ℤ Y)
+    {B : Y →ₗ[ℤ] Y →ₗ[ℤ] ℝ} (h : IsPosDef B) {n : ℕ} (y : Fin n → Y) (c : Fin n → ℝ) :
+    0 ≤ ∑ i, ∑ j, c i * c j * B (y i) (y j) := by
+  have hy : ∀ i j, B (y i) (y j) = ∑ k, ∑ l, (b.repr (y i) k : ℝ) * (b.repr (y j) l : ℝ) * B (b k) (b l) := fun i j => by
     conv_lhs => rw [← b.sum_repr (y i), ← b.sum_repr (y j)]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_smul, LinearMap.sum_apply, LinearMap.smul_apply, zsmul_eq_mul,
-        Finset.mul_sum]
+
+    simp only [map_sum, map_smul, LinearMap.sum_apply, LinearMap.smul_apply, zsmul_eq_mul, Finset.mul_sum]
     rw [Finset.sum_comm]
     refine Finset.sum_congr rfl fun k _ => Finset.sum_congr rfl fun l _ => by ring
-  have key
-      : ∑ i, ∑ j, c i * c j * B (y i) (y j)
-        = ∑ k, ∑ l, (∑ i, c i * (b.repr (y i) k : ℝ)) *
-          (∑ i, c i * (b.repr (y i) l : ℝ)) * B (b k) (b l) := by
+  have key : ∑ i, ∑ j, c i * c j * B (y i) (y j) = ∑ k, ∑ l, (∑ i, c i * (b.repr (y i) k : ℝ)) *
+      (∑ i, c i * (b.repr (y i) l : ℝ)) * B (b k) (b l) := by
     symm
     simp only [hy, Finset.mul_sum, Finset.sum_mul]
-    calc
-      _ = ∑ k, ∑ l, ∑ i, ∑ j, c i * c j * ((b.repr (y i) k : ℝ) * (b.repr (y j) l : ℝ) * B (b k) (b l)) :=
-        Finset.sum_congr rfl fun k _ =>
-          Finset.sum_congr rfl fun l _ => by
+    calc _ = ∑ k, ∑ l, ∑ i, ∑ j, c i * c j * ((b.repr (y i) k : ℝ) * (b.repr (y j) l : ℝ) * B (b k) (b l)) :=
+          Finset.sum_congr rfl fun k _ => Finset.sum_congr rfl fun l _ => by
             rw [Finset.sum_comm]
             exact Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => by ring
       _ = ∑ k, ∑ i, ∑ j, ∑ l, c i * c j * ((b.repr (y i) k : ℝ) * (b.repr (y j) l : ℝ) * B (b k) (b l)) :=
-        Finset.sum_congr rfl fun k _ => by
+          Finset.sum_congr rfl fun k _ => by
+            rw [Finset.sum_comm]
+            exact Finset.sum_congr rfl fun i _ => Finset.sum_comm
+      _ = _ := by
           rw [Finset.sum_comm]
           exact Finset.sum_congr rfl fun i _ => Finset.sum_comm
-      _ = _ := by
-        rw [Finset.sum_comm]
-        exact Finset.sum_congr rfl fun i _ => Finset.sum_comm
   rw [key]
   by_cases hd : (fun k => ∑ i, c i * (b.repr (y i) k : ℝ)) = 0
   · have hd' : ∀ k, ∑ i, c i * (b.repr (y i) k : ℝ) = 0 := fun k => congrFun hd k
     simp [hd']
   · exact ((isPosDef_iff_basis b B).1 h _ hd).le
 
-theorem sum_nonneg_of_mem_psdCone
-    (O : Type) [CommRing O] [IsDomain O] [CharZero O] [Module.Finite ℤ O]
-    {bar : O → O} {X : Type} [AddCommGroup X] [Module O X] [Module.Finite O X]
-    {B : X →ₗ[ℤ] X →ₗ[ℤ] ℝ} (hB : B ∈ psdCone (bar := bar) (X := X))
-    {n : ℕ} (x : Fin n → X) (c : Fin n → ℝ)
-    : 0 ≤ ∑ i, ∑ j, c i * c j * B (x i) (x j) := by
+theorem sum_nonneg_of_mem_psdCone (O : Type) [CommRing O] [IsDomain O] [CharZero O] [Module.Finite ℤ O] {bar : O → O}
+    {X : Type} [AddCommGroup X] [Module O X] [Module.Finite O X] {B : X →ₗ[ℤ] X →ₗ[ℤ] ℝ} (hB : B ∈ psdCone (bar := bar) (X := X))
+    {n : ℕ} (x : Fin n → X) (c : Fin n → ℝ) : 0 ≤ ∑ i, ∑ j, c i * c j * B (x i) (x j) := by
   obtain ⟨X₁, _, _, _, r, B₁, hr, -, h1, h2⟩ := hB
   have : Module.Finite O X₁ := Module.Finite.of_surjective r hr
   obtain ⟨_, _⟩ := free_int_of_projective O X₁
   simp only [h2]
   exact sum_nonneg_of_isPosDef (Module.Free.chooseBasis ℤ X₁) h1 (fun i => r (x i)) c
 
-theorem isPosDef_add_and_mem_psdCone
-    (O : Type) [CommRing O] [IsDedekindDomain O] [CharZero O] [Module.Finite ℤ O]
-    (bar : O → O)
-    (X : Type) [AddCommGroup X] [Module O X] [Module.Finite O X] [Module.Projective O X]
-    (B B₀ : X →ₗ[ℤ] X →ₗ[ℤ] ℝ)
-    (hB : B ∈ psdCone (bar := bar) (X := X)) (hB₀ : B₀ ∈ realForms bar X) (h₀ : IsPosDef B₀)
-    : IsPosDef (B + B₀) ∧ B + B₀ ∈ psdCone (bar := bar) (X := X) := by
+theorem isPosDef_add_and_mem_psdCone (O : Type) [CommRing O] [IsDedekindDomain O] [CharZero O] [Module.Finite ℤ O]
+    (bar : O → O) (X : Type) [AddCommGroup X] [Module O X] [Module.Finite O X] [Module.Projective O X]
+    (B B₀ : X →ₗ[ℤ] X →ₗ[ℤ] ℝ) (hB : B ∈ psdCone (bar := bar) (X := X)) (hB₀ : B₀ ∈ realForms bar X) (h₀ : IsPosDef B₀) :
+    IsPosDef (B + B₀) ∧ B + B₀ ∈ psdCone (bar := bar) (X := X) := by
   have hpos : IsPosDef (B + B₀) := fun n x hx c hc => by
     have h1 := sum_nonneg_of_mem_psdCone O hB x c
     have h2 := h₀ n x hx c hc
-    have h3
-        : ∑ i, ∑ j, c i * c j * (B + B₀) (x i) (x j)
-          = ∑ i, ∑ j, c i * c j * B (x i) (x j) + ∑ i, ∑ j, c i * c j * B₀ (x i) (x j) := by
+    have h3 : ∑ i, ∑ j, c i * c j * (B + B₀) (x i) (x j) =
+        ∑ i, ∑ j, c i * c j * B (x i) (x j) + ∑ i, ∑ j, c i * c j * B₀ (x i) (x j) := by
       simp only [LinearMap.add_apply, mul_add, Finset.sum_add_distrib]
     rw [h3]
     exact add_pos_of_nonneg_of_pos h1 h2

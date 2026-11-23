@@ -1,9 +1,62 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.UnitLemmaGroup
+import Development.WeilBound.ThetaLifts.LocalTheory.ConeShifts.ExistsPowIdem
 public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.LinearDescent
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.HeightTheory.FiniteAlgebraLocalCompletion
+import Mathlib.Algebra.GroupWithZero.Submonoid.CancelMulZero
+import Mathlib.Algebra.Module.StablyFree.Basic
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+public import Mathlib.RingTheory.AdicCompletion.AsTensorProduct
+import Mathlib.RingTheory.AdicCompletion.Noetherian
+public import Mathlib.RingTheory.Henselian
+public import Mathlib.RingTheory.Ideal.Norm.RelNorm
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+public import Mathlib.FieldTheory.Finite.Basic
+public import Mathlib.RingTheory.DedekindDomain.IntegralClosure
 
 @[expose] public section
 
@@ -11,11 +64,8 @@ open Polynomial
 
 namespace GlobalTheory.LocalFiniteOddFixed
 
-theorem precomplete_of_finite
-    (O : Type) [CommRing O]
-    (I : Ideal O) [IsPrecomplete I O]
-    (M : Type) [AddCommGroup M] [Module O M] [Module.Finite O M]
-    : IsPrecomplete I M := by
+theorem precomplete_of_finite (O : Type) [CommRing O] (I : Ideal O) [IsPrecomplete I O]
+    (M : Type) [AddCommGroup M] [Module O M] [Module.Finite O M] : IsPrecomplete I M := by
   rw [← AdicCompletion.of_surjective_iff]
   intro z
   obtain ⟨t, rfl⟩ := AdicCompletion.ofTensorProduct_surjective_of_finite I M z
@@ -31,34 +81,13 @@ theorem precomplete_of_finite
     obtain ⟨y, hy⟩ := hb
     exact ⟨x + y, by rw [map_add (f := _), map_add (f := _), hx, hy]⟩
 
-theorem exists_pow_idem (M : Type) [Monoid M] [Finite M] (x : M)
-    : ∃ n : ℕ, 0 < n ∧ x ^ n * x ^ n = x ^ n := by
-  have key : ∀ i j : ℕ, i < j → x ^ i = x ^ j → ∃ n : ℕ, 0 < n ∧ x ^ n * x ^ n = x ^ n := by
-    intro i j hij h
-    obtain ⟨d, rfl⟩ := Nat.exists_eq_add_of_lt hij
-    have h1 : ∀ k : ℕ, x ^ (i + k * (d + 1)) = x ^ i := by
-      intro k
-      induction k with
-      | zero => simp
-      | succ k ih =>
-        have : i + (k + 1) * (d + 1) = (i + d + 1) + k * (d + 1) := by ring
-        rw [this, pow_add, ← h, ← pow_add, ih]
-    refine ⟨(i + 1) * (d + 1), by positivity, ?_⟩
-    have e1 : (i + 1) * (d + 1) = i + (i * d + d + 1) := by ring
-    have e2
-        : (i + 1) * (d + 1) + (i + 1) * (d + 1) = (i + (i + 1) * (d + 1)) + (i * d + d + 1) := by
-      ring
-    rw [← pow_add, e2, pow_add, h1, ← pow_add, ← e1]
-  obtain ⟨i, j, hne, h⟩ := Finite.exists_ne_map_eq_of_infinite (fun n : ℕ => x ^ n)
-  rcases lt_or_gt_of_ne hne with hlt | hlt
-  · exact key i j hlt h
-  · exact key j i hlt h.symm
+theorem exists_pow_idem (M : Type) [Monoid M] [Finite M] (x : M) :
+    ∃ n : ℕ, 0 < n ∧ x ^ n * x ^ n = x ^ n := by
+  apply PositivityTheory.ThKG.Loc.Cone.Vf.exists_pow_idem <;> assumption
 
-theorem isLocalRing_of_finite
-    (O : Type) [CommRing O] [IsLocalRing O] [IsNoetherianRing O]
+theorem isLocalRing_of_finite (O : Type) [CommRing O] [IsLocalRing O] [IsNoetherianRing O]
     [IsAdicComplete (IsLocalRing.maximalIdeal O) O] [Finite (IsLocalRing.ResidueField O)]
-    (R : Type) [CommRing R] [IsDomain R] [Algebra O R] [Module.Finite O R]
-    : IsLocalRing R := by
+    (R : Type) [CommRing R] [IsDomain R] [Algebra O R] [Module.Finite O R] : IsLocalRing R := by
   set J : Ideal R := (IsLocalRing.maximalIdeal O).map (algebraMap O R) with hJ
   haveI : IsPrecomplete (IsLocalRing.maximalIdeal O) R := precomplete_of_finite O _ R
   haveI : IsAdicComplete (IsLocalRing.maximalIdeal O) R := {}
@@ -74,20 +103,19 @@ theorem isLocalRing_of_finite
   refine IsLocalRing.of_isUnit_or_isUnit_one_sub_self fun x => ?_
   obtain ⟨n, hn, h⟩ := exists_pow_idem (R ⧸ J) (Ideal.Quotient.mk J x)
   have hm : (X ^ 2 - X : R[X]).Monic := by monicity!
-  obtain ⟨e, he, hex⟩ :=
-    hH.is_henselian (X ^ 2 - X) hm (x ^ n)
-      (by
-        rw [← Ideal.Quotient.eq_zero_iff_mem]
-        simp only [eval_sub, eval_pow, eval_X, map_sub, map_pow]
-        rw [sq, h, sub_self])
-      (by
-        have : Ideal.Quotient.mk J (eval (x ^ n) (derivative (X ^ 2 - X : R[X])))
-            = 2 * (Ideal.Quotient.mk J x) ^ n - 1 := by
-          simp
-          ring
-        rw [this]
-        refine IsUnit.of_mul_eq_one (2 * (Ideal.Quotient.mk J x) ^ n - 1) ?_
-        linear_combination 4 * h)
+  obtain ⟨e, he, hex⟩ := hH.is_henselian (X ^ 2 - X) hm (x ^ n)
+    (by
+      rw [← Ideal.Quotient.eq_zero_iff_mem]
+      simp only [eval_sub, eval_pow, eval_X, map_sub, map_pow]
+      rw [sq, h, sub_self])
+    (by
+      have : Ideal.Quotient.mk J (eval (x ^ n) (derivative (X ^ 2 - X : R[X])))
+          = 2 * (Ideal.Quotient.mk J x) ^ n - 1 := by
+        simp
+        ring
+      rw [this]
+      refine IsUnit.of_mul_eq_one (2 * (Ideal.Quotient.mk J x) ^ n - 1) ?_
+      linear_combination 4 * h)
   have he' : e * (e - 1) = 0 := by
     have : e ^ 2 - e = 0 := by simpa using he
     linear_combination this
@@ -105,12 +133,9 @@ theorem isLocalRing_of_finite
     rw [this] at hu
     exact (isUnit_pow_iff hn.ne').1 hu
 
-theorem odd_of_involution
-    (k : Type) [Field k] [Finite k]
-    (τ : k →+* k) (hτ : ∀ x, τ (τ x) = x)
-    (q f : ℕ) (hc : Nat.card k = (q ^ 2) ^ f)
-    (a : k) (ha : a ^ (q ^ 2) = a) (hta : τ a ≠ a)
-    : Odd f := by
+theorem odd_of_involution (k : Type) [Field k] [Finite k] (τ : k →+* k) (hτ : ∀ x, τ (τ x) = x)
+    (q f : ℕ) (hc : Nat.card k = (q ^ 2) ^ f) (a : k) (ha : a ^ (q ^ 2) = a) (hta : τ a ≠ a) :
+    Odd f := by
   classical
   let F : Subfield k := RingHom.eqLocusField τ (RingHom.id k)
   have hF : ∀ x, x ∈ F ↔ τ x = x := fun x => Iff.rfl
@@ -121,9 +146,8 @@ theorem odd_of_involution
     · rintro ⟨⟨u, hu⟩, ⟨v, hv⟩⟩ ⟨⟨u', hu'⟩, ⟨v', hv'⟩⟩ h
       have h1 : u + v * a = u' + v' * a := h
       have h2 := congrArg τ h1
-      rw [map_add (f := _), map_add (f := _), map_mul, map_mul, (hF _).1 hu, (hF _).1 hv,
-          (hF _).1 hu', (hF _).1 hv']
-        at h2
+      rw [map_add (f := _), map_add (f := _), map_mul, map_mul, (hF _).1 hu, (hF _).1 hv, (hF _).1 hu',
+        (hF _).1 hv'] at h2
       have h3 : (v - v') * (a - τ a) = 0 := by linear_combination h1 - h2
       have h4 : v = v' := sub_eq_zero.1 ((mul_eq_zero.1 h3).resolve_right hδ)
       subst h4
@@ -159,7 +183,8 @@ theorem odd_of_involution
   haveI : Fintype F := Fintype.ofFinite F
   have hcF : Fintype.card F = q ^ f := by rw [← hcard, Nat.card_eq_fintype_card]
   have h1s : 1 < q ^ f := by rw [← hcF]; exact Fintype.one_lt_card
-  have haF : a ∉ (F : Set k).toFinset := by rw [Set.mem_toFinset]; exact fun h => hta ((hF a).1 h)
+  have haF : a ∉ (F : Set k).toFinset := by
+    rw [Set.mem_toFinset]; exact fun h => hta ((hF a).1 h)
   have hne : (X ^ (q ^ f) - X : k[X]) ≠ 0 := Polynomial.X_pow_sub_X_ne_zero (R := k) h1s
   have hzero : (X ^ (q ^ f) - X : k[X]) = 0 := by
     refine Polynomial.eq_zero_of_natDegree_lt_card_of_eval_eq_zero' _
@@ -172,7 +197,8 @@ theorem odd_of_involution
         rw [hcF] at this
         simp only [eval_sub, eval_pow, eval_X]
         exact sub_eq_zero.2 this
-    · rw [Polynomial.natDegree_X_pow_sub_X h1s, Finset.card_insert_of_notMem haF, Set.toFinset_card]
+    · rw [Polynomial.natDegree_X_pow_sub_X h1s, Finset.card_insert_of_notMem haF,
+        Set.toFinset_card]
       have : Fintype.card (F : Set k) = q ^ f := by
         rw [← hcard, Nat.card_eq_fintype_card]; exact Fintype.card_congr (Equiv.refl _)
       omega
@@ -180,11 +206,9 @@ theorem odd_of_involution
 
 open GlobalTheory.UnitLemma
 
-theorem val_of_span_eq
-    (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
-    {E : Type} [Field E] [Algebra O E] [IsFractionRing O E]
-    (x : O) (n : ℕ) (h : Ideal.span {x} = IsLocalRing.maximalIdeal O ^ n)
-    : val O (algebraMap O E x) = n := by
+theorem val_of_span_eq (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] {E : Type}
+    [Field E] [Algebra O E] [IsFractionRing O E] (x : O) (n : ℕ)
+    (h : Ideal.span {x} = IsLocalRing.maximalIdeal O ^ n) : val O (algebraMap O E x) = n := by
   obtain ⟨p, hp⟩ := IsDiscreteValuationRing.exists_irreducible O
   have hm : IsLocalRing.maximalIdeal O = Ideal.span {p} := hp.maximalIdeal_eq
   rw [hm, Ideal.span_singleton_pow, Ideal.span_singleton_eq_span_singleton] at h
@@ -199,8 +223,8 @@ theorem val_of_span_eq
   rw [h3, ← hu, map_mul, map_pow, h1, h2, mul_one, ← WithZero.exp_nsmul, WithZero.log_exp]
   simp
 
-theorem exists_conj_int (K : UQ)
-    : ∃ c : K.O →+* K.O, ∀ x, algebraMap K.O K.E (c x) = K.c (algebraMap K.O K.E x) := by
+theorem exists_conj_int (K : UQ) :
+    ∃ c : K.O →+* K.O, ∀ x, algebraMap K.O K.E (c x) = K.c (algebraMap K.O K.E x) := by
   choose c hc using K.c_int
   have inj := IsFractionRing.injective K.O K.E
   refine ⟨⟨⟨⟨c, inj ?_⟩, fun x y => inj ?_⟩, inj ?_, fun x y => inj ?_⟩, fun x => (hc x).symm⟩
@@ -209,12 +233,10 @@ theorem exists_conj_int (K : UQ)
   · simp only [← hc]; simp
   · simp only [map_add (f := _), ← hc]
 
-theorem exists_fixed_odd
-    (K : UQ) (L : Type)
-    [Field L] [Algebra K.E L] [Algebra K.O L] [IsScalarTower K.O K.E L] [Module.Finite K.E L]
-    (τ : L →+* L)
-    (hτ : ∀ x, τ (τ x) = x) (hc : ∀ e : K.E, τ (algebraMap K.E L e) = algebraMap K.E L (K.c e))
-    : ∃ y : L, y ≠ 0 ∧ τ y = y ∧ K.eta (Algebra.norm K.E y) = -1 := by
+theorem exists_fixed_odd (K : UQ) (L : Type) [Field L] [Algebra K.E L] [Algebra K.O L]
+    [IsScalarTower K.O K.E L] [Module.Finite K.E L] (τ : L →+* L) (hτ : ∀ x, τ (τ x) = x)
+    (hc : ∀ e : K.E, τ (algebraMap K.E L e) = algebraMap K.E L (K.c e)) :
+    ∃ y : L, y ≠ 0 ∧ τ y = y ∧ K.eta (Algebra.norm K.E y) = -1 := by
   obtain ⟨c, hcO⟩ := exists_conj_int K
   have hτO : ∀ x : K.O, τ (algebraMap K.O L x) = algebraMap K.O L (c x) := by
     intro x
@@ -233,7 +255,8 @@ theorem exists_fixed_odd
   haveI : FaithfulSMul K.O R := (faithfulSMul_iff_algebraMap_injective _ _).2 injR
   haveI : Module.IsTorsionFree K.O R := inferInstance
   have hnf : ¬ IsField R := fun h =>
-    IsDiscreteValuationRing.not_isField K.O ((Algebra.IsIntegral.isField_iff_isField injR).2 h)
+    IsDiscreteValuationRing.not_isField K.O
+      ((Algebra.IsIntegral.isField_iff_isField injR).2 h)
   haveI : IsDiscreteValuationRing R :=
     ((IsDiscreteValuationRing.TFAE R hnf).out 3 1).1 ‹IsDedekindDomain R›
   have hint : ∀ x : R, τ (x : L) ∈ R := by
@@ -242,8 +265,8 @@ theorem exists_fixed_odd
   let t : R →+* R := RingHom.codRestrict (τ.comp (algebraMap R L)) R hint
   have ht : ∀ x : R, ((t x : R) : L) = τ x := fun x => rfl
   have htt : ∀ x, t (t x) = x := fun x => Subtype.ext (by rw [ht, ht, hτ])
-  have htO : ∀ x : K.O, t (algebraMap K.O R x) = algebraMap K.O R (c x) := fun x =>
-    Subtype.ext (hτO x)
+  have htO : ∀ x : K.O, t (algebraMap K.O R x) = algebraMap K.O R (c x) :=
+    fun x => Subtype.ext (hτO x)
   haveI : IsLocalHom t := ⟨fun x hx => by simpa [htt] using hx.map t⟩
   haveI : IsLocalHom (algebraMap K.O R) := inferInstance
   obtain ⟨a, b, hab, hnm⟩ := K.c_res
@@ -261,10 +284,8 @@ theorem exists_fixed_odd
       rw [← hm]
       exact map_nonunit t p ((IsLocalRing.mem_maximalIdeal _).2 hp.not_isUnit)
     obtain ⟨u, hu⟩ := Ideal.mem_span_singleton'.1 hpm
-    have key
-        : ∀ s : R,
-          s + t s * u ∉ IsLocalRing.maximalIdeal R
-            → ∃ p : R, t p = p ∧ IsLocalRing.maximalIdeal R = Ideal.span {p} := by
+    have key : ∀ s : R, s + t s * u ∉ IsLocalRing.maximalIdeal R →
+        ∃ p : R, t p = p ∧ IsLocalRing.maximalIdeal R = Ideal.span {p} := by
       intro s hs
       refine ⟨s * p + t (s * p), by rw [map_add (f := _), htt, add_comm], ?_⟩
       have : s * p + t (s * p) = (s + t s * u) * p := by rw [map_mul, ← hu]; ring
@@ -302,8 +323,8 @@ theorem exists_fixed_odd
     rw [hf', ← K.card_res]
     exact Module.natCard_eq_pow_finrank
   have hodd : Odd f := by
-    refine odd_of_involution (IsLocalRing.ResidueField R) (IsLocalRing.ResidueField.map t) ?_ K.q f
-      hcard (IsLocalRing.residue R (algebraMap K.O R a)) ?_ ?_
+    refine odd_of_involution (IsLocalRing.ResidueField R) (IsLocalRing.ResidueField.map t) ?_
+      K.q f hcard (IsLocalRing.residue R (algebraMap K.O R a)) ?_ ?_
     · intro x
       obtain ⟨x, rfl⟩ := IsLocalRing.residue_surjective x
       rw [IsLocalRing.ResidueField.map_residue, IsLocalRing.ResidueField.map_residue, htt]
@@ -319,18 +340,15 @@ theorem exists_fixed_odd
   unfold UQ.eta
   rw [hval, zpow_natCast, hodd.neg_one_pow]
 
-theorem norm_prod'
-    (E A B : Type) [Field E] [CommRing A] [CommRing B] [Algebra E A] [Algebra E B]
-    [Module.Finite E A] [Module.Finite E B]
-    (a : A) (b : B)
-    : Algebra.norm E ((a, b) : A × B) = Algebra.norm E a * Algebra.norm E b := by
+theorem norm_prod' (E A B : Type) [Field E] [CommRing A] [CommRing B] [Algebra E A] [Algebra E B]
+    [Module.Finite E A] [Module.Finite E B] (a : A) (b : B) :
+    Algebra.norm E ((a, b) : A × B) = Algebra.norm E a * Algebra.norm E b := by
   rw [Algebra.norm_apply, Algebra.norm_apply, Algebra.norm_apply, ← LinearMap.det_prodMap]
   congr 1
 
-theorem exists_plus_eta_norm
-    (K : UQ) (B : InvAlg K) (f : B.A) (hf : IsIdempotentElem f) (hf0 : f ≠ 0)
-    (hfield : ∀ y : B.A, f * y ≠ 0 → ∃ z : B.A, f * y * z = f) (hσ : B.σ f = f)
-    : ∃ y : B.A, B.Plus y ∧ y * (1 - f) = 1 - f ∧ K.eta (Algebra.norm K.E y) = -1 := by
+theorem exists_plus_eta_norm (K : UQ) (B : InvAlg K) (f : B.A) (hf : IsIdempotentElem f)
+    (hf0 : f ≠ 0) (hfield : ∀ y : B.A, f * y ≠ 0 → ∃ z : B.A, f * y * z = f) (hσ : B.σ f = f) :
+    ∃ y : B.A, B.Plus y ∧ y * (1 - f) = 1 - f ∧ K.eta (Algebra.norm K.E y) = -1 := by
   have hff : f * f = f := hf
   let I : Ideal B.A := Ideal.span {1 - f}
   have hI : ∀ y, y ∈ I ↔ f * y = 0 := by
@@ -357,17 +375,16 @@ theorem exists_plus_eta_norm
     exact this
   let τ : B.A ⧸ I →+* B.A ⧸ I := Ideal.quotientMap I (B.σ : B.A →+* B.A) hle
   have hτ : ∀ x, τ (Ideal.Quotient.mk I x) = Ideal.Quotient.mk I (B.σ x) := fun x => rfl
-  obtain ⟨y, hy0, hyτ, hyN⟩ :=
-    exists_fixed_odd K (B.A ⧸ I) τ
-      (by
-        intro x
-        obtain ⟨x, rfl⟩ := Ideal.Quotient.mk_surjective x
-        rw [hτ, hτ, B.σ_σ])
-      (by
-        intro e
-        change τ (Ideal.Quotient.mk I (algebraMap K.E B.A e)) = _
-        rw [hτ, B.σ_alg]
-        rfl)
+  obtain ⟨y, hy0, hyτ, hyN⟩ := exists_fixed_odd K (B.A ⧸ I) τ
+    (by
+      intro x
+      obtain ⟨x, rfl⟩ := Ideal.Quotient.mk_surjective x
+      rw [hτ, hτ, B.σ_σ])
+    (by
+      intro e
+      change τ (Ideal.Quotient.mk I (algebraMap K.E B.A e)) = _
+      rw [hτ, B.σ_alg]
+      rfl)
   obtain ⟨y, rfl⟩ := Ideal.Quotient.mk_surjective y
   have hy1 : f * y ≠ 0 := fun h => hy0 (Ideal.Quotient.eq_zero_iff_mem.2 ((hI y).2 h))
   obtain ⟨z, hz⟩ := hfield y hy1
@@ -380,9 +397,8 @@ theorem exists_plus_eta_norm
   · rw [map_add (f := _), map_mul, map_sub, map_one, hσ]
     linear_combination hy2
   · linear_combination (1 - y) * hff
-  · let e :=
-      AlgEquiv.prodQuotientOfIsIdempotentElem K.E (e := 1 - f) (f := f) hf.one_sub hf (by ring)
-        (by linear_combination -hff)
+  · let e := AlgEquiv.prodQuotientOfIsIdempotentElem K.E (e := 1 - f) (f := f) hf.one_sub hf
+      (by ring) (by linear_combination -hff)
     have he : e (f * y + (1 - f)) = (Ideal.Quotient.mk I y, 1) := by
       refine Prod.ext ?_ ?_
       · change Ideal.Quotient.mk I _ = Ideal.Quotient.mk I y

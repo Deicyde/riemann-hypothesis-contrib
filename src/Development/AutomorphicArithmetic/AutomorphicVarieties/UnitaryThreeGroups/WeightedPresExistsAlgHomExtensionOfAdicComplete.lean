@@ -1,10 +1,52 @@
 module
 
-public import Development.AutomorphicArithmetic.AutomorphicVarieties.UnitaryThreeGroups.MopBase
+public import Development.AutomorphicArithmetic.AutomorphicVarieties.CommutativeAlgebra.ResMapBijective
+public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsUniqueFixedPointOfAdicContraction
 public import Development.AutomorphicArithmetic.AutomorphicVarieties.CommutativeAlgebra.PartSpan
-public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsUniqueAlgEquivOfCompatibleQuotient
-public import Development.AbelianVarietyTheory.Proofs.HomogeneousIdeals.ExistsAbsoluteValueOfIsDiscreteValuationRing
-public import Development.AbelianVarietyTheory.Proofs.FormalGroupCharts.MvPowerSeriesEvalOfPowMem
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Development.AutomorphicArithmetic.AutomorphicVarieties.HeightAndVanishing.DirichletPrimeToLPartMulLPowerPart
+import Development.AutomorphicArithmetic.AutomorphicVarieties.UnitaryThreeGroups.MopBase
+import Development.AutomorphicArithmetic.AutomorphicVarieties.UnitaryThreeGroups.UnitaryThreeReflectionRight
 
 @[expose] public section
 
@@ -44,8 +86,8 @@ private theorem pf_approx
   have hd' : Finsupp.degree d < n := by exact_mod_cast hd
   have hmem : Finsupp.weight wt d ∈ T.image (Finsupp.weight wt) :=
     Finset.mem_image_of_mem _ (hT d hd')
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sub, map_sum]
+
+  rw [map_sub, map_sum]
   simp only [coeff_wcomp]
   rw [Finset.sum_ite_eq, if_pos hmem, sub_self]
 
@@ -60,8 +102,8 @@ private theorem pf_vanish
   obtain ⟨s, hs⟩ := pf_approx wt F n
   have h1 := GlobalTheory.algHom_mem_pow_of_le_order φ hφ hs
   have h2 : φ (∑ j ∈ s, wcomp O wt j F) = 0 := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     exact Finset.sum_eq_zero fun j _ => h j
   rw [map_sub, h2, sub_zero] at h1
   rwa [sub_zero]
@@ -102,8 +144,8 @@ private theorem pf_step
       apply Subtype.ext
       rw [hx, hFb]
       show _ = W.A.val _
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum, map_sum]
+
+      rw [map_sum, map_sum]
       refine Finset.sum_congr rfl fun m _ => ?_
       rw [map_mul, map_mul]
       show _ = W.π (b m) * ((m.prod fun s k => W.zA s ^ k : W.A) : R)
@@ -118,8 +160,8 @@ private theorem pf_step
       rw [h1, pf_prod W.wt t (fun s => ξ (W.zA s)) m, hS m (hμS (Finset.mem_coe.mpr hm)),
         map_finsuppProd]
       simp only [map_pow]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hx', map_sum ι, map_sum ξ, Finset.mul_sum]
+
+    rw [hx', map_sum ι, map_sum ξ, Finset.mul_sum]
     refine Finset.sum_congr rfl fun m hm => ?_
     rw [map_mul ι, map_mul ξ, hc m, hgm m hm]
     ring

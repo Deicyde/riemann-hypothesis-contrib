@@ -1,10 +1,52 @@
 module
 
-public import Mathlib
 public import Development.WeilBound.CoreStatements.AutomorphicKernels.SiegelWeilFormula.UnramifiedWhittaker.CProps
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.SeriesEqDens
+public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ResAlgSplitTwo
+import Aesop.Main
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.LatticeVolumeUnramifiedStatement
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.LevelCharactersUnramifiedStatement
+public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.SeriesEqDens
+import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.UnramifiedQuotientCardStatement
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -12,25 +54,20 @@ noncomputable section
 
 namespace GlobalTheory.CompanionTheory.GunrJt
 
-open HeckeCharacterZeroLocus.SiegelWeilU NumberField IsDedekindDomain MeasureTheory
-  PositivityTheory.PfSWUS.Loc PositivityTheory.SiegelWeilFormula.Gen
-  PositivityTheory.SiegelWeilFormula.Gunr Filter
+open HeckeCharacterZeroLocus.SiegelWeilU NumberField IsDedekindDomain MeasureTheory PositivityTheory.PfSWUS.Loc PositivityTheory.SiegelWeilFormula.Gen PositivityTheory.SiegelWeilFormula.Gunr Filter
 open scoped TensorProduct
 
-theorem integral_of_factor
-    {V P Q : Type} [AddCommGroup V] [MeasurableSpace V] [MeasurableAdd V]
-    (μ : Measure V) [μ.IsAddLeftInvariant] [AddCommGroup P] [AddCommGroup Q] [Fintype Q]
-    (ι : P →+ V) (hι : Function.Injective ι)
+theorem integral_of_factor {V P Q : Type} [AddCommGroup V] [MeasurableSpace V] [MeasurableAdd V] (μ : Measure V)
+    [μ.IsAddLeftInvariant] [AddCommGroup P] [AddCommGroup Q] [Fintype Q] (ι : P →+ V) (hι : Function.Injective ι)
     (r : P →+ Q) (hr : Function.Surjective r) (hH : MeasurableSet (ι '' {x | r x = 0}))
-    (hvol : μ (Set.range ι) = 1)
-    (f : V → ℂ) (g : Q → ℂ) (hf : ∀ x, f (ι x) = g (r x))
-    (hf0 : ∀ y, y ∉ Set.range ι → f y = 0)
-    : ∫ y, f y ∂μ = ((Fintype.card Q : ℂ))⁻¹ * ∑ c, g c := by
+    (hvol : μ (Set.range ι) = 1) (f : V → ℂ) (g : Q → ℂ) (hf : ∀ x, f (ι x) = g (r x))
+    (hf0 : ∀ y, y ∉ Set.range ι → f y = 0) :
+    ∫ y, f y ∂μ = ((Fintype.card Q : ℂ))⁻¹ * ∑ c, g c := by
   classical
   set H : Set V := ι '' {x | r x = 0} with hHdef
   choose s hs using hr
   let Pc : Q → Set V := fun c => ι '' {x | r x = c}
-  have hPc : ∀ c, Pc c = (fun y => - ι (s c) + y) ⁻¹' H := by
+  have hPc : ∀ c, Pc c = (fun y => -ι (s c) + y) ⁻¹' H := by
     intro c
     ext y
     constructor
@@ -44,7 +81,7 @@ theorem integral_of_factor
       refine ⟨x + s c, ?_, ?_⟩
       · have hx' : r x = 0 := hx
         simp [hx', hs]
-      · have hxy' : ι x = - ι (s c) + y := hxy
+      · have hxy' : ι x = -ι (s c) + y := hxy
         rw [map_add (f := _), hxy']
         abel
   have hPm : ∀ c, MeasurableSet (Pc c) := fun c => by
@@ -108,59 +145,54 @@ theorem integral_of_factor
   push_cast
   rfl
 
-def redHom {R : Type} [CommRing R] (ϖ : R) (k a b : ℕ)
-    : Matrix (Fin a) (Fin b) R →+ Matrix (Fin a) (Fin b) (R ⧸ lev ϖ k) where
+def redHom {R : Type} [CommRing R] (ϖ : R) (k a b : ℕ) :
+    Matrix (Fin a) (Fin b) R →+ Matrix (Fin a) (Fin b) (R ⧸ lev ϖ k) where
   toFun := red ϖ k
   map_zero' := by ext; simp [red]
   map_add' x y := by ext; simp [red]
 
-theorem redHom_surjective {R : Type} [CommRing R] (ϖ : R) (k a b : ℕ)
-    : Function.Surjective (redHom ϖ k a b) := by
+theorem redHom_surjective {R : Type} [CommRing R] (ϖ : R) (k a b : ℕ) : Function.Surjective (redHom ϖ k a b) := by
   intro y
   choose f hf using fun i j => Ideal.Quotient.mk_surjective (y i j)
   exact ⟨Matrix.of f, by ext i j; exact hf i j⟩
 
 variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
 
-def emb {v : HeightOneSpectrum (𝓞 F)} (S : Subring (Fv F v ⊗[F] E)) (M n : ℕ)
-    : Matrix (Fin M) (Fin n) S →+ (Fin n → Fin M → Fv F v ⊗[F] E) where
+def emb {v : HeightOneSpectrum (𝓞 F)} (S : Subring (Fv F v ⊗[F] E)) (M n : ℕ) :
+    Matrix (Fin M) (Fin n) S →+ (Fin n → Fin M → Fv F v ⊗[F] E) where
   toFun x := fun a i => (x i a : Fv F v ⊗[F] E)
   map_zero' := by funext a i; simp
   map_add' x y := by funext a i; simp
 
-theorem emb_injective {v : HeightOneSpectrum (𝓞 F)} (S : Subring (Fv F v ⊗[F] E)) (M n : ℕ)
-    : Function.Injective (emb S M n) := by
+theorem emb_injective {v : HeightOneSpectrum (𝓞 F)} (S : Subring (Fv F v ⊗[F] E)) (M n : ℕ) :
+    Function.Injective (emb S M n) := by
   intro x y h
   ext i a
   exact congrFun (congrFun h a) i
 
-variable
-  {σ : E →ₐ[F] E} {M n d : ℕ} {J : Matrix (Fin M) (Fin M) E} {T : Matrix (Fin n) (Fin n) E}
-  {bs : Module.Basis (Fin d) F E} {v : HeightOneSpectrum (𝓞 F)} {ψv : Fv F v → ℂ}
-  {S : Subring (Fv F v ⊗[F] E)} {σS : S →+* S} {ϖ : Fv F v} {ε : ℤ}
+variable {σ : E →ₐ[F] E} {M n d : ℕ} {J : Matrix (Fin M) (Fin M) E} {T : Matrix (Fin n) (Fin n) E}
+  {bs : Module.Basis (Fin d) F E} {v : HeightOneSpectrum (𝓞 F)} {ψv : Fv F v → ℂ} {S : Subring (Fv F v ⊗[F] E)}
+  {σS : S →+* S} {ϖ : Fv F v} {ε : ℤ}
 
-theorem mem_S_iff (hG : GoodLoc σ J T bs v ψv S σS ϖ ε) (z : Fv F v ⊗[F] E)
-    : z ∈ S
-      ↔ ∀ j, (Algebra.TensorProduct.basis (Fv F v) bs).repr z j ∈ v.adicCompletionIntegers F := by
+theorem mem_S_iff (hG : GoodLoc σ J T bs v ψv S σS ϖ ε) (z : Fv F v ⊗[F] E) :
+    z ∈ S ↔ ∀ j, (Algebra.TensorProduct.basis (Fv F v) bs).repr z j ∈ v.adicCompletionIntegers F := by
   have : z ∈ (S : Set (Fv F v ⊗[F] E)) ↔ z ∈ Rv bs v := by rw [hG.carrier]
   exact this
 
-theorem isOpen_scaled (hG : GoodLoc σ J T bs v ψv S σS ϖ ε) (c : Fv F v)
-    : IsOpen {z : Fv F v ⊗[F] E | c • z ∈ S} := by
+theorem isOpen_scaled (hG : GoodLoc σ J T bs v ψv S σS ϖ ε) (c : Fv F v) :
+    IsOpen {z : Fv F v ⊗[F] E | c • z ∈ S} := by
   haveI : IsModuleTopology (Fv F v) (Fv F v ⊗[F] E) := ⟨rfl⟩
   have hO : IsOpen (v.adicCompletionIntegers F : Set (Fv F v)) := Valued.isOpen_valuationSubring _
-  have e
-      : {z : Fv F v ⊗[F] E | c • z ∈ S}
-        = ⋂ j, (fun z => c * (Algebra.TensorProduct.basis (Fv F v) bs).coord j z) ⁻¹' (v.adicCompletionIntegers F : Set (Fv F v)) :=
-    by
-      ext z
-      simp [mem_S_iff hG]
+  have e : {z : Fv F v ⊗[F] E | c • z ∈ S} =
+      ⋂ j, (fun z => c * (Algebra.TensorProduct.basis (Fv F v) bs).coord j z) ⁻¹' (v.adicCompletionIntegers F : Set (Fv F v)) := by
+    ext z
+    simp [mem_S_iff hG]
   rw [e]
   refine isOpen_iInter_of_finite fun j => hO.preimage ?_
   exact continuous_const.mul (IsModuleTopology.continuous_of_linearMap _)
 
-theorem range_emb (hG : GoodLoc σ J T bs v ψv S σS ϖ ε)
-    : Set.range (emb S M n) = (latV bs v : Set (Fin n → Fin M → Fv F v ⊗[F] E)) := by
+theorem range_emb (hG : GoodLoc σ J T bs v ψv S σS ϖ ε) :
+    Set.range (emb S M n) = (latV bs v : Set (Fin n → Fin M → Fv F v ⊗[F] E)) := by
   ext Y
   constructor
   · rintro ⟨x, rfl⟩ a i
@@ -170,13 +202,13 @@ theorem range_emb (hG : GoodLoc σ J T bs v ψv S σS ϖ ε)
     funext a i
     rfl
 
-theorem coe_pow_mul (hG : GoodLoc σ J T bs v ψv S σS ϖ ε) (k : ℕ) (c : S)
-    : ((c * hG.pS ^ k : S) : Fv F v ⊗[F] E) = (ϖ ^ k) • (c : Fv F v ⊗[F] E) := by
+theorem coe_pow_mul (hG : GoodLoc σ J T bs v ψv S σS ϖ ε) (k : ℕ) (c : S) :
+    ((c * hG.pS ^ k : S) : Fv F v ⊗[F] E) = (ϖ ^ k) • (c : Fv F v ⊗[F] E) := by
   rw [Subring.coe_mul, Subring.coe_pow, Algebra.smul_def, map_pow, mul_comm]
   rfl
 
-theorem image_ker (hG : GoodLoc σ J T bs v ψv S σS ϖ ε) (k : ℕ)
-    : emb S M n '' {x | redHom hG.pS k M n x = 0} = {Y | ∀ a i, (ϖ ^ k)⁻¹ • Y a i ∈ S} := by
+theorem image_ker (hG : GoodLoc σ J T bs v ψv S σS ϖ ε) (k : ℕ) :
+    emb S M n '' {x | redHom hG.pS k M n x = 0} = {Y | ∀ a i, (ϖ ^ k)⁻¹ • Y a i ∈ S} := by
   have hϖ : ϖ ^ k ≠ 0 := pow_ne_zero _ hG.unif_ne
   ext Y
   constructor
@@ -196,72 +228,56 @@ theorem image_ker (hG : GoodLoc σ J T bs v ψv S σS ϖ ε) (k : ℕ)
       show (ϖ ^ k) • ((ϖ ^ k)⁻¹ • Y a i) = Y a i
       rw [smul_smul, mul_inv_cancel₀ hϖ, one_smul]
 
-theorem measurable_image_ker (hG : GoodLoc σ J T bs v ψv S σS ϖ ε) (k : ℕ)
-    : MeasurableSet (emb S M n '' {x | redHom hG.pS k M n x = 0}) := by
+theorem measurable_image_ker (hG : GoodLoc σ J T bs v ψv S σS ϖ ε) (k : ℕ) :
+    MeasurableSet (emb S M n '' {x | redHom hG.pS k M n x = 0}) := by
   rw [image_ker hG k]
-  have e
-      : {Y : Fin n → Fin M → Fv F v ⊗[F] E | ∀ a i, (ϖ ^ k)⁻¹ • Y a i ∈ S}
-        = ⋂ a, ⋂ i, (fun Y : Fin n → Fin M → Fv F v ⊗[F] E => Y a i) ⁻¹' {z | (ϖ ^ k)⁻¹ • z ∈ S} :=
-    by
-      ext Y
-      simp
+  have e : {Y : Fin n → Fin M → Fv F v ⊗[F] E | ∀ a i, (ϖ ^ k)⁻¹ • Y a i ∈ S} =
+      ⋂ a, ⋂ i, (fun Y : Fin n → Fin M → Fv F v ⊗[F] E => Y a i) ⁻¹' {z | (ϖ ^ k)⁻¹ • z ∈ S} := by
+    ext Y
+    simp
   rw [e]
   haveI : BorelSpace (Fv F v ⊗[F] E) := ⟨rfl⟩
   refine MeasurableSet.iInter fun a => MeasurableSet.iInter fun i => ?_
   exact ((measurable_pi_apply i).comp (measurable_pi_apply a)) (isOpen_scaled hG _).measurableSet
 
 open GlobalTheory.CompanionTheory.UnrDens in
-theorem trace_red
-    (hG : GoodLoc σ J T bs v ψv S σS ϖ ε) (k : ℕ) (X : Matrix (Fin n) (Fin n) S)
-    (x : Matrix (Fin M) (Fin n) S)
-    : Matrix.trace
-        (red hG.pS k X
-          * (PositivityTheory.PfSWUS.Loc.cT (barσ σS hG.pS hG.quad.fix_ϖ k) (red hG.pS k x)
-            * red hG.pS k (matS S J hG.J_int) * red hG.pS k x))
-      = Ideal.Quotient.mk (lev hG.pS k)
-        (Matrix.trace (X * (PositivityTheory.PfSWUS.Loc.cT σS x * matS S J hG.J_int * x))) := by
-  have e
-      : PositivityTheory.PfSWUS.Loc.cT (barσ σS hG.pS hG.quad.fix_ϖ k) (red hG.pS k x)
-        = red hG.pS k (PositivityTheory.PfSWUS.Loc.cT σS x) := by
+theorem trace_red (hG : GoodLoc σ J T bs v ψv S σS ϖ ε) (k : ℕ) (X : Matrix (Fin n) (Fin n) S)
+    (x : Matrix (Fin M) (Fin n) S) :
+    Matrix.trace (red hG.pS k X * (PositivityTheory.PfSWUS.Loc.cT (barσ σS hG.pS hG.quad.fix_ϖ k) (red hG.pS k x) *
+        red hG.pS k (matS S J hG.J_int) * red hG.pS k x)) =
+      Ideal.Quotient.mk (lev hG.pS k) (Matrix.trace (X * (PositivityTheory.PfSWUS.Loc.cT σS x * matS S J hG.J_int * x))) := by
+  have e : PositivityTheory.PfSWUS.Loc.cT (barσ σS hG.pS hG.quad.fix_ϖ k) (red hG.pS k x) = red hG.pS k (PositivityTheory.PfSWUS.Loc.cT σS x) := by
     ext i j
     rfl
-  have hm
-      : ∀ {a b c : ℕ} (A : Matrix (Fin a) (Fin b) S) (B : Matrix (Fin b) (Fin c) S),
-        red hG.pS k A * red hG.pS k B = red hG.pS k (A * B) := fun A B => by
+  have hm : ∀ {a b c : ℕ} (A : Matrix (Fin a) (Fin b) S) (B : Matrix (Fin b) (Fin c) S),
+      red hG.pS k A * red hG.pS k B = red hG.pS k (A * B) := fun A B => by
     simp only [red]
     exact (Matrix.map_mul (f := Ideal.Quotient.mk (lev hG.pS k))).symm
   rw [e, hm, hm, hm]
-  set_option synthInstance.maxHeartbeats 100000 in
+
   simp only [Matrix.trace, Matrix.diag_apply, red, Matrix.map_apply, map_sum]
 
-theorem gram_emb (hG : GoodLoc σ J T bs v ψv S σS ϖ ε) (x : Matrix (Fin M) (Fin n) S) (c a : Fin n)
-    : gramR (Fv F v) σ J (emb S M n x) c a
-      = ((PositivityTheory.PfSWUS.Loc.cT σS x * matS S J hG.J_int * x) c a : S) := by
-  simp only [gramR, hR, hform, JR, Matrix.mul_apply, PositivityTheory.PfSWUS.Loc.cT,
-    Matrix.transpose_apply, Matrix.map_apply, emb, matS, Matrix.of_apply, AddMonoidHom.coe_mk,
-    ZeroHom.coe_mk, AddSubmonoidClass.coe_finsetSum, Subring.coe_mul, hG.sig, Finset.sum_mul]
+theorem gram_emb (hG : GoodLoc σ J T bs v ψv S σS ϖ ε) (x : Matrix (Fin M) (Fin n) S) (c a : Fin n) :
+    gramR (Fv F v) σ J (emb S M n x) c a =
+      ((PositivityTheory.PfSWUS.Loc.cT σS x * matS S J hG.J_int * x) c a : S) := by
+  simp only [gramR, hR, hform, JR, Matrix.mul_apply, PositivityTheory.PfSWUS.Loc.cT, Matrix.transpose_apply, Matrix.map_apply, emb, matS,
+    Matrix.of_apply, AddMonoidHom.coe_mk, ZeroHom.coe_mk, AddSubmonoidClass.coe_finsetSum, Subring.coe_mul, hG.sig,
+    Finset.sum_mul]
   exact Finset.sum_comm
 
-theorem psi_gram
-    (hG : GoodLoc σ J T bs v ψv S σS ϖ ε) (k : ℕ)
-    (X : Matrix (Fin n) (Fin n) S) (hX : PositivityTheory.PfSWUS.Loc.cT σS X = X)
-    (x : Matrix (Fin M) (Fin n) S)
-    : ψv (trPair (Fv F v) (hG.hermLev k X hX : Matrix (Fin n) (Fin n) (Fv F v ⊗[F] E))
-        (gramR (Fv F v) σ J (emb S M n x)))
-      = hG.psiLev (one_mem _) k
-        (Ideal.Quotient.mk (lev hG.pS k)
-          (Matrix.trace (X * (PositivityTheory.PfSWUS.Loc.cT σS x * matS S J hG.J_int * x)))) := by
+theorem psi_gram (hG : GoodLoc σ J T bs v ψv S σS ϖ ε) (k : ℕ) (X : Matrix (Fin n) (Fin n) S)
+    (hX : PositivityTheory.PfSWUS.Loc.cT σS X = X) (x : Matrix (Fin M) (Fin n) S) :
+    ψv (trPair (Fv F v) (hG.hermLev k X hX : Matrix (Fin n) (Fin n) (Fv F v ⊗[F] E)) (gramR (Fv F v) σ J (emb S M n x))) =
+      hG.psiLev (one_mem _) k
+        (Ideal.Quotient.mk (lev hG.pS k) (Matrix.trace (X * (PositivityTheory.PfSWUS.Loc.cT σS x * matS S J hG.J_int * x)))) := by
   rw [GoodLoc.psiLev_mk]
   unfold psiF
   congr 1
-  have e2
-      : (∑ a, ∑ c, (hG.hermLev k X hX : Matrix (Fin n) (Fin n) (Fv F v ⊗[F] E)) a c *
-          gramR (Fv F v) σ J (emb S M n x) c a)
-        = (ϖ ^ k)⁻¹
-          • ((Matrix.trace (X * (PositivityTheory.PfSWUS.Loc.cT σS x * matS S J hG.J_int * x)) : S)
-            : Fv F v ⊗[F] E) := by
-    simp only [gram_emb hG, Matrix.trace, Matrix.diag_apply, Matrix.mul_apply (M := X),
-      AddSubmonoidClass.coe_finsetSum, Subring.coe_mul, Finset.smul_sum]
+  have e2 : (∑ a, ∑ c, (hG.hermLev k X hX : Matrix (Fin n) (Fin n) (Fv F v ⊗[F] E)) a c *
+        gramR (Fv F v) σ J (emb S M n x) c a) =
+      (ϖ ^ k)⁻¹ • ((Matrix.trace (X * (PositivityTheory.PfSWUS.Loc.cT σS x * matS S J hG.J_int * x)) : S) : Fv F v ⊗[F] E) := by
+    simp only [gram_emb hG, Matrix.trace, Matrix.diag_apply, Matrix.mul_apply (M := X), AddSubmonoidClass.coe_finsetSum,
+      Subring.coe_mul, Finset.smul_sum]
     refine Finset.sum_congr rfl fun a _ => Finset.sum_congr rfl fun c _ => ?_
     show ((ϖ ^ k)⁻¹ • (X a c : Fv F v ⊗[F] E)) * _ = _
     rw [smul_mul_assoc]
@@ -273,50 +289,39 @@ theorem psi_gram
 
 theorem jtLev : JtLev := by
   intro F E _ _ _ _ _ σ M n d J T bs v ψv S σS ϖ ε hG μv hμ k X hX
-  have hvol : μv (latV bs v) = 1 :=
-    GlobalTheory.T.lattice_volume_unramified F E σ M n d J T bs v ψv S σS ϖ ε hG μv hμ
+  have hvol : μv (latV bs v) = 1 := GlobalTheory.T.lattice_volume_unramified F E σ M n d J T bs v ψv S σS ϖ ε hG μv hμ
   have hlev : IsLevelChars σS hG.pS (hG.psiLev (one_mem _)) :=
-    GlobalTheory.T.level_characters_unramified F E σ M n d J T bs v ψv S σS ϖ ε hG 1 (one_mem _)
-      norm_one
+    GlobalTheory.T.level_characters_unramified F E σ M n d J T bs v ψv S σS ϖ ε hG 1 (one_mem _) norm_one
   have hR : IsUnrQuad S σS hG.pS (Ideal.absNorm v.asIdeal) ε := hG.quad
-  have hfin : ∀ k, Finite (S ⧸ lev hG.pS k) := fun k =>
-    Nat.finite_of_card_ne_zero (by
-      rw [GlobalTheory.T.unramified_quotient_card S σS hG.pS _ ε hR k]
-      have := hR.one_lt
-      exact pow_ne_zero _ (by omega))
+  have hfin : ∀ k, Finite (S ⧸ lev hG.pS k) := fun k => Nat.finite_of_card_ne_zero (by
+    rw [GlobalTheory.T.unramified_quotient_card S σS hG.pS _ ε hR k]
+    have := hR.one_lt
+    exact pow_ne_zero _ (by omega))
   letI : ∀ k, Fintype (S ⧸ lev hG.pS k) := fun k => Fintype.ofFinite _
-  have hε : (ε : ℂ) ^ 2 = 1 := by rcases hR.eps with ⟨rfl, -⟩ | ⟨rfl, -⟩ <;> simp
+  have hε : (ε : ℂ) ^ 2 = 1 := by
+    rcases hR.eps with ⟨rfl, -⟩ | ⟨rfl, -⟩ <;> simp
   haveI : BorelSpace (Fv F v ⊗[F] E) := ⟨rfl⟩
   haveI : IsModuleTopology (Fv F v) (Fv F v ⊗[F] E) := ⟨rfl⟩
   haveI : ContinuousAdd (Fv F v ⊗[F] E) := IsModuleTopology.toContinuousAdd (Fv F v) _
   haveI : μv.IsAddHaarMeasure := hμ.1
   have hB : red hG.pS k X ∈ hermMod σS hG.pS n k := ⟨X, hX, rfl⟩
   have hS : IsUnimod σS (matS S J hG.J_int) := hG.J_unimod
-  have hgauss :=
-    GlobalTheory.CompanionTheory.SiegLoc.gauss_full hR hlev hε k (matS S J hG.J_int) hS
-      (red hG.pS k X) hB
-  have hint :=
-    integral_of_factor μv (emb S M n) (emb_injective S M n) (redHom hG.pS k M n)
-      (redHom_surjective hG.pS k M n) (measurable_image_ker hG k) (by rw [range_emb hG]; exact hvol)
-      (fun Y =>
-        (latV bs v).indicator 1 Y * ψv (trPair (Fv F v)
-          (hG.hermLev k X hX : Matrix (Fin n) (Fin n) (Fv F v ⊗[F] E)) (gramR (Fv F v) σ J Y)))
-      (fun x =>
-        hG.psiLev (one_mem _) k
-          (Matrix.trace
-            (red hG.pS k X
-              * (PositivityTheory.PfSWUS.Loc.cT
-                  (GlobalTheory.CompanionTheory.UnrDens.barσ σS hG.pS hR.fix_ϖ k) x
-                * red hG.pS k (matS S J hG.J_int) * x))))
-      (fun x => by
-        have hm : emb S M n x ∈ (latV bs v : Set (Fin n → Fin M → Fv F v ⊗[F] E)) := by
-          rw [← range_emb hG]; exact ⟨x, rfl⟩
-        rw [Set.indicator_of_mem hm, Pi.one_apply, one_mul, psi_gram hG k X hX x]
-        congr 1
-        exact (trace_red hG k X x).symm)
-      (fun Y hY => by
-        rw [range_emb hG] at hY
-        rw [Set.indicator_of_notMem hY, zero_mul])
+  have hgauss := GlobalTheory.CompanionTheory.SiegLoc.gauss_full hR hlev hε k (matS S J hG.J_int) hS (red hG.pS k X) hB
+  have hint := integral_of_factor μv (emb S M n) (emb_injective S M n) (redHom hG.pS k M n)
+    (redHom_surjective hG.pS k M n) (measurable_image_ker hG k) (by rw [range_emb hG]; exact hvol)
+    (fun Y => (latV bs v).indicator 1 Y * ψv (trPair (Fv F v)
+      (hG.hermLev k X hX : Matrix (Fin n) (Fin n) (Fv F v ⊗[F] E)) (gramR (Fv F v) σ J Y)))
+    (fun x => hG.psiLev (one_mem _) k (Matrix.trace (red hG.pS k X *
+      (PositivityTheory.PfSWUS.Loc.cT (GlobalTheory.CompanionTheory.UnrDens.barσ σS hG.pS hR.fix_ϖ k) x * red hG.pS k (matS S J hG.J_int) * x))))
+    (fun x => by
+      have hm : emb S M n x ∈ (latV bs v : Set (Fin n → Fin M → Fv F v ⊗[F] E)) := by
+        rw [← range_emb hG]; exact ⟨x, rfl⟩
+      rw [Set.indicator_of_mem hm, Pi.one_apply, one_mul, psi_gram hG k X hX x]
+      congr 1
+      exact (trace_red hG k X x).symm)
+    (fun Y hY => by
+      rw [range_emb hG] at hY
+      rw [Set.indicator_of_notMem hY, zero_mul])
   have hc0 : (Fintype.card (Matrix (Fin M) (Fin n) (S ⧸ lev hG.pS k)) : ℂ) ≠ 0 := by
     exact_mod_cast (Fintype.card_ne_zero (α := Matrix (Fin M) (Fin n) (S ⧸ lev hG.pS k)))
   unfold jtR

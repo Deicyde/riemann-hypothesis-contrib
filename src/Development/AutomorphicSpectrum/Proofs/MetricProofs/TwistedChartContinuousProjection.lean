@@ -1,55 +1,66 @@
 module
 
-public import Mathlib
+import ReciprocityTheory.AnalyticForms.PotentialTheory.Partition
 public import Development.AutomorphicSpectrum.Proofs.MetricProofs.IsLocSec
-public import Development.AutomorphicSpectrum.Proofs.MetricProofs.MinorIJMap
 public import Development.AutomorphicSpectrum.Proofs.MetricProofs.CompatibleChartProductProjectionTwistedStatement
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
+import Development.AutomorphicSpectrum.Proofs.MetricProofs.ExistsBlkCover
 
 @[expose] public section
 
-open MvPolynomial MeasureTheory Filter Topology Matrix ReciprocityTheory.AnForm
-  ReciprocityTheory.AnForm.M ReciprocityTheory.AnForm.P ReciprocityTheory.ChartRestriction.G.Geo
-  ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I2
-  ReciprocityTheory.ChartRestriction.G.AI.I4 GlobalTheory.CompanionTheory.Ar.PB
-  GroundTheory.Heights₂.Heights GroundTheory.Heights₂.Heights.LowerBoundFree
+open MvPolynomial MeasureTheory Filter Topology Matrix ReciprocityTheory.AnForm ReciprocityTheory.AnForm.M ReciprocityTheory.AnForm.P ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I2 ReciprocityTheory.ChartRestriction.G.AI.I4 GlobalTheory.CompanionTheory.Ar.PB GroundTheory.Heights₂.Heights GroundTheory.Heights₂.Heights.LowerBoundFree
 open scoped ComplexOrder Classical
-open GlobalTheory.CompanionTheory.Ar.PB.WSq GlobalTheory.CompanionTheory.Ar.PB.WSq.Sec
-  GlobalTheory.CompanionTheory.Ar.PB.CovMap.LocImg
+open GlobalTheory.CompanionTheory.Ar.PB.WSq GlobalTheory.CompanionTheory.Ar.PB.WSq.Sec GlobalTheory.CompanionTheory.Ar.PB.CovMap.LocImg
 
 noncomputable section
 
 namespace GlobalTheory.CompanionTheory.Ar.PB.WSq.Sec.SncProd
 
-theorem compat_restr
-    {e : ℕ} {X : Type} [TopologicalSpace X]
-    (A : FinHolAtlas e X) (ψ : OpenPartialHomeomorph X (Fin e → ℂ)) (h : IsCompatChart A ψ)
-    (V : Set X) (hV : IsOpen V)
-    : IsCompatChart A (ψ.restrOpen V hV) := by
-  intro j
-  refine ⟨?_, ?_⟩
-  · refine (h j).1.mono ?_
-    rintro z ⟨hz, hs⟩
-    refine ⟨hz, ?_⟩
-    have : (A.chart j).symm z ∈ ψ.source ∩ V := by
-      simpa [OpenPartialHomeomorph.restrOpen_source] using hs
-    exact this.1
-  · have hsymm : ((ψ.restrOpen V hV).symm : (Fin e → ℂ) → X) = ψ.symm := rfl
-    rw [hsymm]
-    refine (h j).2.mono ?_
-    rintro z ⟨hz, hs⟩
-    refine ⟨?_, hs⟩
-    have h1 : ψ.symm z ∈ ψ.source ∩ V := by
-      have := (ψ.restrOpen V hV).map_target hz
-      rwa [OpenPartialHomeomorph.restrOpen_source] at this
-    have h2 : ψ (ψ.symm z) = z := (ψ.restrOpen V hV).right_inv hz
-    rw [← h2]
-    exact ψ.map_source h1.1
+theorem compat_restr {e : ℕ} {X : Type} [TopologicalSpace X] (A : FinHolAtlas e X)
+    (ψ : OpenPartialHomeomorph X (Fin e → ℂ)) (h : IsCompatChart A ψ) (V : Set X) (hV : IsOpen V) :
+    IsCompatChart A (ψ.restrOpen V hV) := by
+  apply ReciprocityTheory.AnForm.M.pa_compat_restr <;> assumption
 
-theorem holoOn_comp
-    {e n : ℕ} {X Z : Type} [TopologicalSpace X] [TopologicalSpace Z]
-    (A : FinHolAtlas e X) (B : FinHolAtlas n Z) (pr : X → Z) (hp : HoloMap A B pr)
-    (S : Set Z) (g : Z → ℂ) (hg : B.HoloOn S g)
-    : A.HoloOn (pr ⁻¹' S) (fun y => g (pr y)) := by
+theorem holoOn_comp {e n : ℕ} {X Z : Type} [TopologicalSpace X] [TopologicalSpace Z] (A : FinHolAtlas e X)
+    (B : FinHolAtlas n Z) (pr : X → Z) (hp : HoloMap A B pr) (S : Set Z) (g : Z → ℂ) (hg : B.HoloOn S g) :
+    A.HoloOn (pr ⁻¹' S) (fun y => g (pr y)) := by
   rintro j z ⟨hzt, hzS⟩
   obtain ⟨k, hk⟩ := B.cover (pr ((A.chart j).symm z))
   have h1 : AnalyticAt ℂ (B.chart k ∘ pr ∘ (A.chart j).symm) z := hp.2 j k z ⟨hzt, hk⟩
@@ -67,18 +78,11 @@ theorem holoOn_comp
     (B.chart k).left_inv hw
   simp [this]
 
-theorem snoc_inj
-    {r n e : ℕ} (σb : Fin r → Option (Fin n)) (s : Fin n ↪ Fin e) (i₀ : Fin e) (hne : ∀ i, s i ≠ i₀)
-    (hσ : ∀ k k' i, σb k = some i → σb k' = some i → k = k') (k k' : Fin (r + 1)) (i : Fin e)
-    (h : (Fin.snoc (α := fun _ => Option (Fin e)) (fun k => (σb k).map s) (some i₀)
-          : Fin (r + 1) → Option (Fin e))
-        k
-      = some i)
-    (h' : (Fin.snoc (α := fun _ => Option (Fin e)) (fun k => (σb k).map s) (some i₀)
-          : Fin (r + 1) → Option (Fin e))
-        k'
-      = some i)
-    : k = k' := by
+theorem snoc_inj {r n e : ℕ} (σb : Fin r → Option (Fin n)) (s : Fin n ↪ Fin e) (i₀ : Fin e)
+    (hne : ∀ i, s i ≠ i₀) (hσ : ∀ k k' i, σb k = some i → σb k' = some i → k = k') (k k' : Fin (r + 1)) (i : Fin e)
+    (h : (Fin.snoc (α := fun _ => Option (Fin e)) (fun k => (σb k).map s) (some i₀) : Fin (r + 1) → Option (Fin e)) k = some i)
+    (h' : (Fin.snoc (α := fun _ => Option (Fin e)) (fun k => (σb k).map s) (some i₀) : Fin (r + 1) → Option (Fin e)) k' = some i) :
+    k = k' := by
   induction k using Fin.lastCases with
   | last =>
     induction k' using Fin.lastCases with
@@ -105,52 +109,25 @@ theorem mul_rearrange (A B a b c : ℂ) (h : A = B) : a * A * (b * c) = a * b * 
   subst h
   ring
 
-theorem main
-    : ∀ (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fintype (ι k)] (Φ : Type) [Field Φ]
-        (y : (Σ k, ι k) → Φ) (Ψ : Type) [Fintype Ψ] [DecidableEq Ψ] (N j : ℕ)
-        (M : FlagModel y Ψ N j) (n e : ℕ) (BM : BaseMetric M n) (τ : Ψ) (a : Fin N) (k₀ : K)
-        (ca cb : Fin N) (RW : AnLogRes (mCoordIdeal (M.wCo (τ, a) k₀ ca cb RatFunc.X)) ⊤ e)
-        (pr : RW.X → BM.Rb.X) (hc : Continuous pr)
-        (ψ : RW.X → OpenPartialHomeomorph RW.X (Fin e → ℂ)) (kb : RW.X → Fin BM.Rb.A.n)
-        (σ : RW.X → Fin n ↪ Fin e) (i₀ : RW.X → Fin e) (V : RW.X → Set RW.X) (u : RW.X → RW.X → ℂ)
-        (hL : ∀ x, IsLocSec M BM.Rb τ a k₀ ca cb RW pr x (ψ x) (kb x) (σ x) (i₀ x) (V x) (u x)),
-      HoloMap RW.A BM.Rb.A pr
-        → ∀ c : ℝ,
-          IsSNC RW.A
-            (BM.L.pullback pr hc
-              + secPot RW (potA M τ a k₀) V (fun x => (hL x).2.1) (fun x => (hL x).2.2.1) c)
-            (fun x y => BM.s (pr x) (pr y) * diagSec ψ i₀ u x y)
-            (Fin.snoc BM.m 1) (Fin.snoc (fun k => pr ⁻¹' BM.W k) (diagSet k₀ RW)) := by
+theorem main : ∀ (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fintype (ι k)] (Φ : Type) [Field Φ] (y : (Σ k, ι k) → Φ) (Ψ : Type) [Fintype Ψ] [DecidableEq Ψ] (N j : ℕ) (M : FlagModel y Ψ N j) (n e : ℕ) (BM : BaseMetric M n) (τ : Ψ) (a : Fin N) (k₀ : K) (ca cb : Fin N) (RW : AnLogRes (mCoordIdeal (M.wCo (τ, a) k₀ ca cb RatFunc.X)) ⊤ e) (pr : RW.X → BM.Rb.X) (hc : Continuous pr) (ψ : RW.X → OpenPartialHomeomorph RW.X (Fin e → ℂ)) (kb : RW.X → Fin BM.Rb.A.n) (σ : RW.X → Fin n ↪ Fin e) (i₀ : RW.X → Fin e) (V : RW.X → Set RW.X) (u : RW.X → RW.X → ℂ) (hL : ∀ x, IsLocSec M BM.Rb τ a k₀ ca cb RW pr x (ψ x) (kb x) (σ x) (i₀ x) (V x) (u x)), HoloMap RW.A BM.Rb.A pr → ∀ c : ℝ, IsSNC RW.A (BM.L.pullback pr hc + secPot RW (potA M τ a k₀) V (fun x => (hL x).2.1) (fun x => (hL x).2.2.1) c) (fun x y => BM.s (pr x) (pr y) * diagSec ψ i₀ u x y) (Fin.snoc BM.m 1) (Fin.snoc (fun k => pr ⁻¹' BM.W k) (diagSet k₀ RW)) := by
   intro K _ ι _ Φ _ y Ψ _ _ N j M n e BM τ a k₀ ca cb RW pr hc ψ kb σ i₀ V u hL hp c x
   obtain ⟨⟨F, H, hW⟩, hVo, hxV, hVs, hVU, huh, hu0, hdiag, -⟩ := hL x
   obtain ⟨hcomp, -, hne, hbase, -, -⟩ := hW
   obtain ⟨ψb, hψbc, hxb, hψbU, σb, hσi, hσW, ub, hubh, hub0, hs⟩ := BM.snc (pr x)
   obtain ⟨ψ', hψ'c, hsrc, hk1, hk2⟩ :=
-    GlobalTheory.T.compatible_chart_product_projection_twisted e n RW.X BM.Rb.X RW.A BM.Rb.A pr
-      (ψ x) (kb x) (σ x) ψb hcomp hψbc hbase
+    GlobalTheory.T.compatible_chart_product_projection_twisted e n RW.X BM.Rb.X RW.A BM.Rb.A pr (ψ x) (kb x) (σ x) ψb hcomp hψbc hbase
   have hsrc'' : (ψ'.restrOpen (V x) hVo).source = ψ'.source ∩ V x := ψ'.restrOpen_source (V x) hVo
   have hcoe : ∀ y, (ψ'.restrOpen (V x) hVo) y = ψ' y := fun y => rfl
-  have hmem
-      : ∀ y ∈ (ψ'.restrOpen (V x) hVo).source, y ∈ ψ'.source ∧ y ∈ V x ∧ pr y ∈ ψb.source := by
+  have hmem : ∀ y ∈ (ψ'.restrOpen (V x) hVo).source, y ∈ ψ'.source ∧ y ∈ V x ∧ pr y ∈ ψb.source := by
     intro y hy
     rw [hsrc''] at hy
     refine ⟨hy.1, hy.2, ?_⟩
     have := hy.1
     rw [hsrc] at this
     exact this.2
-  refine ⟨
-    ψ'.restrOpen (V x) hVo,
-    compat_restr _ _ hψ'c _ hVo,
-    ?_,
-    ?_,
+  refine ⟨ψ'.restrOpen (V x) hVo, compat_restr _ _ hψ'c _ hVo, ?_, ?_,
     Fin.snoc (α := fun _ => Option (Fin e)) (fun k => (σb k).map (σ x)) (some (i₀ x)),
-    snoc_inj σb (σ x) (i₀ x) hne hσi,
-    ?_,
-    fun y => ub (pr y) * u x y,
-    ?_,
-    ?_,
-    ?_
-  ⟩
+    snoc_inj σb (σ x) (i₀ x) hne hσi, ?_, fun y => ub (pr y) * u x y, ?_, ?_, ?_⟩
   · rw [hsrc'', hsrc]
     exact ⟨⟨hVs hxV, hxb⟩, hxV⟩
   · intro y hy
@@ -160,8 +137,7 @@ theorem main
     induction k using Fin.lastCases with
     | last =>
       ext y
-      simp only [Fin.snoc_last, Set.mem_inter_iff, Set.mem_setOf_eq, Option.some.injEq,
-        exists_eq_left']
+      simp only [Fin.snoc_last, Set.mem_inter_iff, Set.mem_setOf_eq, Option.some.injEq, exists_eq_left']
       constructor
       · rintro ⟨hd, hy⟩
         obtain ⟨hy', hyV, -⟩ := hmem y hy

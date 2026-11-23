@@ -1,13 +1,57 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.Statements.CuspFrameWeights.SameKindIsometric
+import Development.AbelianVarietyTheory.Proofs.FlagMeasures.LieAlgebraOfIsCutOutByRealMatrixAlgebra
 public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.ExistsLimitOfChart
+public import Development.AbelianVarietyTheory.Definitions.SemilocalFrames.DefClassNum
+import Development.AbelianVarietyTheory.Proofs.FoundationProofs.NonemptyCompactDualHaar
+import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ContinuousMatExp
+import Formalism.RealPlaceAnalysis.FinalF
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.LocallyConvex.AbsConvexOpen
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Algebra.Group.Units
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
-open MeasureTheory NumberField Matrix Finset Formalism.MainNotions.S GlobalTheory.Count
-  GlobalTheory.FlagMeas
+open MeasureTheory NumberField Matrix Finset Formalism.MainNotions.S GlobalTheory.Count GlobalTheory.FlagMeas
 open Filter Topology Metric Formalism.REAL
 
 noncomputable section
@@ -18,31 +62,13 @@ open GlobalTheory.GaugeConst
 
 variable {n : ℕ}
 
-theorem exp_sub_one_mem
-    (A : Submodule ℝ (Matrix (Fin n) (Fin n) ℂ)) (hA : ∀ X ∈ A, ∀ Y ∈ A, X * Y ∈ A)
-    {X : Matrix (Fin n) (Fin n) ℂ} (hX : X ∈ A)
-    : NormedSpace.exp X - 1 ∈ A := by
-  letI : NormedAddCommGroup (Matrix (Fin n) (Fin n) ℂ) := Matrix.frobeniusNormedAddCommGroup
-  letI : NormedRing (Matrix (Fin n) (Fin n) ℂ) := Matrix.frobeniusNormedRing
-  letI : NormedAlgebra ℝ (Matrix (Fin n) (Fin n) ℂ) := Matrix.frobeniusNormedAlgebra
-  haveI : CompleteSpace (Matrix (Fin n) (Fin n) ℂ) := FiniteDimensional.complete ℝ _
-  have h := NormedSpace.exp_series_hasSum_exp' (𝕂 := ℝ) X
-  have h1 := (hasSum_nat_add_iff' 1).2 h
-  simp only [Finset.range_one, Finset.sum_singleton, Nat.factorial_zero, Nat.cast_one, inv_one,
-      pow_zero, one_smul]
-    at h1
-  have hp : ∀ k : ℕ, X ^ (k + 1) ∈ A := by
-    intro k
-    induction k with
-    | zero => simpa using hX
-    | succ k ih => rw [pow_succ]; exact hA _ ih _ hX
-  exact A.closed_of_finiteDimensional.mem_of_tendsto h1.tendsto_sum_nat
-    (Eventually.of_forall fun m => A.sum_mem fun k _ => A.smul_mem _ (hp k))
+theorem exp_sub_one_mem (A : Submodule ℝ (Matrix (Fin n) (Fin n) ℂ))
+    (hA : ∀ X ∈ A, ∀ Y ∈ A, X * Y ∈ A) {X : Matrix (Fin n) (Fin n) ℂ} (hX : X ∈ A) :
+    NormedSpace.exp X - 1 ∈ A := by
+  apply GlobalTheory.IwTangent.exp_sub_one_mem <;> assumption
 
-def algSub
-    (ε : Fin n → Bool)
-    (A : Submodule ℝ (Matrix (Fin n) (Fin n) ℂ)) (hA : ∀ X ∈ A, ∀ Y ∈ A, X * Y ∈ A)
-    : Subgroup (UJ ε) where
+def algSub (ε : Fin n → Bool) (A : Submodule ℝ (Matrix (Fin n) (Fin n) ℂ))
+    (hA : ∀ X ∈ A, ∀ Y ∈ A, X * Y ∈ A) : Subgroup (UJ ε) where
   carrier := {g | uMat g - 1 ∈ A}
   one_mem' := by
     change (1 : Matrix (Fin n) (Fin n) ℂ) - 1 ∈ A
@@ -77,70 +103,56 @@ def algSub
     rw [← neg_sub, ← h2]
     exact A.neg_mem x.2
 
-theorem isClosed_algSub
-    (ε : Fin n → Bool)
-    (A : Submodule ℝ (Matrix (Fin n) (Fin n) ℂ)) (hA : ∀ X ∈ A, ∀ Y ∈ A, X * Y ∈ A)
-    : IsClosed (algSub ε A hA : Set (UJ ε)) :=
+theorem isClosed_algSub (ε : Fin n → Bool) (A : Submodule ℝ (Matrix (Fin n) (Fin n) ℂ))
+    (hA : ∀ X ∈ A, ∀ Y ∈ A, X * Y ∈ A) : IsClosed (algSub ε A hA : Set (UJ ε)) :=
   A.closed_of_finiteDimensional.preimage ((continuous_uMat ε).sub continuous_const)
 
-theorem exists_preimage
-    {M : Type} [NormedAddCommGroup M] [NormedSpace ℝ M] [FiniteDimensional ℝ M]
-    (A : Submodule ℝ M)
-    {f : M → M}
-    (hf : HasStrictFDerivAt f (ContinuousLinearMap.id ℝ M) 0) (h0 : f 0 = 0) (hA : ∀ X ∈ A, f X ∈ A)
-    {W : Set M} (hW : W ∈ 𝓝 (0 : M))
-    : ∀ᶠ a : A in 𝓝 0, ∃ Y ∈ A, Y ∈ W ∧ f Y = a.1 := by
+theorem exists_preimage {M : Type} [NormedAddCommGroup M] [NormedSpace ℝ M] [FiniteDimensional ℝ M]
+    (A : Submodule ℝ M) {f : M → M} (hf : HasStrictFDerivAt f (ContinuousLinearMap.id ℝ M) 0)
+    (h0 : f 0 = 0) (hA : ∀ X ∈ A, f X ∈ A) {W : Set M} (hW : W ∈ 𝓝 (0 : M)) :
+    ∀ᶠ a : A in 𝓝 0, ∃ Y ∈ A, Y ∈ W ∧ f Y = a.1 := by
   obtain ⟨p, hp⟩ := A.subtype.exists_leftInverse_of_injective A.ker_subtype
   have hp' : ∀ x : A, p x.1 = x := fun x => LinearMap.congr_fun hp x
   haveI : CompleteSpace A := FiniteDimensional.complete ℝ _
   have h1 : HasStrictFDerivAt (fun x : A => f x.1) A.subtypeL 0 :=
     HasStrictFDerivAt.comp (0 : A) (g := f) (f := Subtype.val) hf A.subtypeL.hasStrictFDerivAt
   have h2 := (LinearMap.toContinuousLinearMap p).hasStrictFDerivAt.comp (0 : A) h1
-  have h3
-      : (LinearMap.toContinuousLinearMap p).comp A.subtypeL
-        = (ContinuousLinearEquiv.refl ℝ A : A →L[ℝ] A) := by
+  have h3 : (LinearMap.toContinuousLinearMap p).comp A.subtypeL =
+      (ContinuousLinearEquiv.refl ℝ A : A →L[ℝ] A) := by
     ext1 x; exact hp' x
   rw [h3] at h2
   have h4 := h2.map_nhds_eq_of_equiv
   simp only [Submodule.coe_zero, h0, map_zero] at h4
   rw [← h4]
-  have h6 : Subtype.val ⁻¹' W ∈ 𝓝 (0 : A) :=
-    continuous_subtype_val.continuousAt.preimage_mem_nhds hW
+  have h6 : Subtype.val ⁻¹' W ∈ 𝓝 (0 : A) := continuous_subtype_val.continuousAt.preimage_mem_nhds hW
   refine mem_of_superset (image_mem_map h6) ?_
   rintro _ ⟨Y, hY, rfl⟩
   exact ⟨Y.1, Y.2, hY, (congrArg Subtype.val (hp' ⟨_, hA _ Y.2⟩)).symm⟩
 
+
 open scoped Matrix.Norms.Frobenius in
-theorem exists_log
-    (A : Submodule ℝ (Matrix (Fin n) (Fin n) ℂ)) (hA : ∀ X ∈ A, ∀ Y ∈ A, X * Y ∈ A)
-    {W : Set (Matrix (Fin n) (Fin n) ℂ)} (hW : W ∈ 𝓝 (0 : Matrix (Fin n) (Fin n) ℂ))
-    : ∀ᶠ a : A in 𝓝 0, ∃ Y ∈ A, Y ∈ W ∧ NormedSpace.exp Y - 1 = a.1 := by
+theorem exists_log (A : Submodule ℝ (Matrix (Fin n) (Fin n) ℂ))
+    (hA : ∀ X ∈ A, ∀ Y ∈ A, X * Y ∈ A) {W : Set (Matrix (Fin n) (Fin n) ℂ)}
+    (hW : W ∈ 𝓝 (0 : Matrix (Fin n) (Fin n) ℂ)) :
+    ∀ᶠ a : A in 𝓝 0, ∃ Y ∈ A, Y ∈ W ∧ NormedSpace.exp Y - 1 = a.1 := by
   letI := Matrix.linftyOpNormedRing (n := Fin n) (α := ℂ)
   letI := Matrix.linftyOpNormedAlgebra (n := Fin n) (R := ℝ) (α := ℂ)
-  exact exists_preimage (M := Matrix (Fin n) (Fin n) ℂ) A
-    (f := fun Y => NormedSpace.exp Y - 1)
+  exact exists_preimage (M := Matrix (Fin n) (Fin n) ℂ) A (f := fun Y => NormedSpace.exp Y - 1)
     (HasStrictFDerivAt.sub_const (f := NormedSpace.exp) 1 CompactDualExists.exp_strict)
     (sub_eq_zero.2 (NormedSpace.exp_zero (𝔸 := Matrix (Fin n) (Fin n) ℂ)))
-    (fun _ hX => exp_sub_one_mem A hA hX)
-    hW
+    (fun _ hX => exp_sub_one_mem A hA hX) hW
 
-def expSub
-    (ε : Fin n → Bool) (A : Submodule ℝ (Matrix (Fin n) (Fin n) ℂ))
-    (hA : ∀ X ∈ A, ∀ Y ∈ A, X * Y ∈ A) (X : ↥(A ⊓ lieJ ε))
-    : algSub ε A hA :=
+def expSub (ε : Fin n → Bool) (A : Submodule ℝ (Matrix (Fin n) (Fin n) ℂ))
+    (hA : ∀ X ∈ A, ∀ Y ∈ A, X * Y ∈ A) (X : ↥(A ⊓ lieJ ε)) : algSub ε A hA :=
   ⟨expJ ε ⟨X.1, X.2.2⟩, exp_sub_one_mem A hA X.2.1⟩
 
-theorem continuous_expSub
-    (ε : Fin n → Bool)
-    (A : Submodule ℝ (Matrix (Fin n) (Fin n) ℂ)) (hA : ∀ X ∈ A, ∀ Y ∈ A, X * Y ∈ A)
-    : Continuous (expSub ε A hA) :=
+theorem continuous_expSub (ε : Fin n → Bool) (A : Submodule ℝ (Matrix (Fin n) (Fin n) ℂ))
+    (hA : ∀ X ∈ A, ∀ Y ∈ A, X * Y ∈ A) : Continuous (expSub ε A hA) :=
   ((continuous_expJ ε).comp (continuous_subtype_val.subtype_mk _)).subtype_mk _
 
-theorem expSub_image_mem_nhds
-    (ε : Fin n → Bool)
-    (A : Submodule ℝ (Matrix (Fin n) (Fin n) ℂ)) (hA : ∀ X ∈ A, ∀ Y ∈ A, X * Y ∈ A)
-    {U : Set ↥(A ⊓ lieJ ε)} (hU : U ∈ 𝓝 (0 : ↥(A ⊓ lieJ ε)))
-    : expSub ε A hA '' U ∈ 𝓝 (1 : algSub ε A hA) := by
+theorem expSub_image_mem_nhds (ε : Fin n → Bool) (A : Submodule ℝ (Matrix (Fin n) (Fin n) ℂ))
+    (hA : ∀ X ∈ A, ∀ Y ∈ A, X * Y ∈ A) {U : Set ↥(A ⊓ lieJ ε)} (hU : U ∈ 𝓝 (0 : ↥(A ⊓ lieJ ε))) :
+    expSub ε A hA '' U ∈ 𝓝 (1 : algSub ε A hA) := by
   obtain ⟨e, he, h0⟩ := UpqExpChart.exists_chart (n := Fin n)
   have hinj : Set.InjOn NormedSpace.exp e.source := he ▸ e.injOn
   have hs := e.open_source.mem_nhds h0
@@ -161,74 +173,58 @@ theorem expSub_image_mem_nhds
   have h6 : X.1 = Y := hinj hX.2 hY (h4.trans h5.symm)
   exact ⟨⟨X.1, h6 ▸ hYA, X.2⟩, hTU hX.1, Subtype.ext hXg⟩
 
-theorem finrank_eq
-    (ε : Fin n → Bool) (A : Submodule ℝ (Matrix (Fin n) (Fin n) ℂ))
-    {d : ℕ} (E : Fin d → Matrix (Fin n) (Fin n) ℂ)
+theorem finrank_eq (ε : Fin n → Bool) (A : Submodule ℝ (Matrix (Fin n) (Fin n) ℂ)) {d : ℕ}
+    (E : Fin d → Matrix (Fin n) (Fin n) ℂ)
     (hE : ∀ i k, ((E i * (E k)ᴴ).trace).re = if i = k then 1 else 0)
-    (hs : ∀ X, (X ∈ A ∧ inG ε X) ↔ X ∈ Submodule.span ℝ (Set.range E))
-    : Module.finrank ℝ ↥(A ⊓ lieJ ε) = d := by
+    (hs : ∀ X, (X ∈ A ∧ inG ε X) ↔ X ∈ Submodule.span ℝ (Set.range E)) :
+    Module.finrank ℝ ↥(A ⊓ lieJ ε) = d := by
   have h1 : A ⊓ lieJ ε = Submodule.span ℝ (Set.range E) := Submodule.ext hs
   have h2 : LinearIndependent ℝ E := by
     rw [Fintype.linearIndependent_iff]
     intro c hc k
     have h := congrArg (fun Z => ((Z * (E k)ᴴ).trace).re) hc
     simp only [Matrix.sum_mul, Matrix.smul_mul, Matrix.trace_sum, Matrix.trace_smul, Complex.re_sum,
-        Complex.smul_re, hE]
-      at h
+      Complex.smul_re, hE] at h
     simpa using h
   rw [h1, finrank_span_eq_card h2, Fintype.card_fin]
 
+
 open scoped Matrix.Norms.Frobenius in
-theorem exists_limit
-    (ε : Fin n → Bool) (A : Submodule ℝ (Matrix (Fin n) (Fin n) ℂ))
-    (hA : ∀ X ∈ A, ∀ Y ∈ A, X * Y ∈ A) (μ : Measure (algSub ε A hA)) [μ.IsHaarMeasure]
-    : ∃ c : ℝ,
-      0 < c ∧ Tendsto
-        (fun r : ℝ =>
-          (μ {g | Real.sqrt (Formalism.REAL.hs (uMat g.1 - 1)) ≤ r}).toReal
-            / r ^ Module.finrank ℝ ↥(A ⊓ lieJ ε))
-        (𝓝[>] 0) (𝓝 c) := by
+theorem exists_limit (ε : Fin n → Bool) (A : Submodule ℝ (Matrix (Fin n) (Fin n) ℂ))
+    (hA : ∀ X ∈ A, ∀ Y ∈ A, X * Y ∈ A) (μ : Measure (algSub ε A hA)) [μ.IsHaarMeasure] :
+    ∃ c : ℝ, 0 < c ∧ Tendsto
+      (fun r : ℝ => (μ {g | Real.sqrt (Formalism.REAL.hs (uMat g.1 - 1)) ≤ r}).toReal /
+        r ^ Module.finrank ℝ ↥(A ⊓ lieJ ε)) (𝓝[>] 0) (𝓝 c) := by
   letI : NormedAddCommGroup (Matrix (Fin n) (Fin n) ℂ) := Matrix.frobeniusNormedAddCommGroup
   letI : NormedRing (Matrix (Fin n) (Fin n) ℂ) := Matrix.frobeniusNormedRing
   letI : NormedAlgebra ℝ (Matrix (Fin n) (Fin n) ℂ) := Matrix.frobeniusNormedAlgebra
-  let L₀
-      : Matrix (Fin n) (Fin n) ℂ →ₗ[ℝ] (Matrix (Fin n) (Fin n) ℂ →L[ℝ] Matrix (Fin n) (Fin n) ℂ) :=
+  let L₀ : Matrix (Fin n) (Fin n) ℂ →ₗ[ℝ] (Matrix (Fin n) (Fin n) ℂ →L[ℝ] Matrix (Fin n) (Fin n) ℂ) :=
     LinearMap.toContinuousLinearMap.toLinearMap ∘ₗ LinearMap.mul ℝ _
   have hL₀ : Continuous L₀ := L₀.continuous_of_finiteDimensional
-  have h :=
-    exists_limit_of_chart ↥(A ⊓ lieJ ε) (Matrix (Fin n) (Fin n) ℂ) (algSub ε A hA) μ (expSub ε A hA)
-      (fun g => uMat g.1)
-      (A ⊓ lieJ ε).subtypeₗᵢ
-      (fun g => L₀ (uMat g.1))
-      (continuous_expSub ε A hA)
-      (by
-        apply Subtype.ext
-        apply uMat_injective ε
-        change NormedSpace.exp 0 = 1
-        exact NormedSpace.exp_zero (𝔸 := Matrix (Fin n) (Fin n) ℂ))
-      (by
-        change
-          HasStrictFDerivAt (fun x : ↥(A ⊓ lieJ ε) => NormedSpace.exp x.1) (A ⊓ lieJ ε).subtypeL 0
-        exact CompactDualExists.exp_strict.comp (0 : ↥(A ⊓ lieJ ε))
-          (A ⊓ lieJ ε).subtypeL.hasStrictFDerivAt)
-      (hL₀.comp ((continuous_uMat ε).comp continuous_subtype_val)).continuousAt
-      (by
-        change (L₀ 1) = ContinuousLinearMap.id ℝ (Matrix (Fin n) (Fin n) ℂ)
-        ext X
-        simp [L₀])
-      (fun g h => rfl)
-      (fun r hr => expSub_image_mem_nhds ε A hA (ball_mem_nhds 0 hr))
-      ((uJEmb n ε).1.isInducing.comp IsInducing.subtypeVal)
+  have h := exists_limit_of_chart ↥(A ⊓ lieJ ε) (Matrix (Fin n) (Fin n) ℂ) (algSub ε A hA) μ
+    (expSub ε A hA) (fun g => uMat g.1)
+    (A ⊓ lieJ ε).subtypeₗᵢ (fun g => L₀ (uMat g.1)) (continuous_expSub ε A hA)
+    (by
+      apply Subtype.ext
+      apply uMat_injective ε
+      change NormedSpace.exp 0 = 1
+      exact NormedSpace.exp_zero (𝔸 := Matrix (Fin n) (Fin n) ℂ))
+    (by
+      change HasStrictFDerivAt (fun x : ↥(A ⊓ lieJ ε) => NormedSpace.exp x.1)
+        (A ⊓ lieJ ε).subtypeL 0
+      exact CompactDualExists.exp_strict.comp
+        (0 : ↥(A ⊓ lieJ ε)) (A ⊓ lieJ ε).subtypeL.hasStrictFDerivAt)
+    (hL₀.comp ((continuous_uMat ε).comp continuous_subtype_val)).continuousAt
+    (by
+      change (L₀ 1) = ContinuousLinearMap.id ℝ (Matrix (Fin n) (Fin n) ℂ)
+      ext X
+      simp [L₀]) (fun g h => rfl)
+    (fun r hr => expSub_image_mem_nhds ε A hA (ball_mem_nhds 0 hr))
+    ((uJEmb n ε).1.isInducing.comp IsInducing.subtypeVal)
   simp only [sqrt_hs]
   exact h
 
-theorem exists_isGaugeSub
-    : ∀ (n : ℕ) (ε : Fin n → Bool) (A : Submodule ℝ (Matrix (Fin n) (Fin n) ℂ)) (d : ℕ)
-        (E : Fin d → Matrix (Fin n) (Fin n) ℂ),
-      (∀ X ∈ A, ∀ Y ∈ A, X * Y ∈ A) → (∀ i k, ((E i * (E k)ᴴ).trace).re = if i = k then 1 else 0)
-        → (∀ X, (X ∈ A ∧ Formalism.REAL.inG ε X) ↔ X ∈ Submodule.span ℝ (Set.range E))
-        → ∃ μ : Measure (Formalism.REAL.UJ ε),
-          SigmaFinite μ ∧ IsGaugeSub {g | uMat g - 1 ∈ A} d μ := by
+theorem exists_isGaugeSub : ∀ (n : ℕ) (ε : Fin n → Bool) (A : Submodule ℝ (Matrix (Fin n) (Fin n) ℂ)) (d : ℕ) (E : Fin d → Matrix (Fin n) (Fin n) ℂ), (∀ X ∈ A, ∀ Y ∈ A, X * Y ∈ A) → (∀ i k, ((E i * (E k)ᴴ).trace).re = if i = k then 1 else 0) → (∀ X, (X ∈ A ∧ Formalism.REAL.inG ε X) ↔ X ∈ Submodule.span ℝ (Set.range E)) → ∃ μ : Measure (Formalism.REAL.UJ ε), SigmaFinite μ ∧ IsGaugeSub {g | uMat g - 1 ∈ A} d μ := by
   intro n ε A d E hA hE hs
   have hcl := isClosed_algSub ε A hA
   haveI : LocallyCompactSpace (algSub ε A hA) := hcl.isClosedEmbedding_subtypeVal.locallyCompactSpace

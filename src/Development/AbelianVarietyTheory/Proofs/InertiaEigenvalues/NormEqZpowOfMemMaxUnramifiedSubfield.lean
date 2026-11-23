@@ -1,8 +1,58 @@
 module
 
-public import Mathlib
+import Formalism.SharpRestriction.LevelLetterCocycles.ProdOneSubPrimitiveRoots
 public import Formalism.SharpRestriction.LevelLetterCocycles.DataNLoc
-public import Development.AbelianVarietyTheory.Definitions.Foundations.HTBasis
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Real
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.GroupTheory.Nilpotent
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.Padics.ProperSpace
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Lemma
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Connected.Separation
+import Mathlib.Topology.MetricSpace.Ultra.TotallySeparated
+import Mathlib.Topology.Sheaves.Init
+import Development.AbelianVarietyTheory.Definitions.Foundations.HTBasis
 
 @[expose] public section
 
@@ -73,8 +123,8 @@ theorem isClosed_rootRing {m : ℕ} (hm : 0 < m) : IsClosed (rootRing l m : Set 
     refine continuous_finsetSum _ (fun i _ => ?_)
     simp only [Algebra.smul_def]
     exact (hc.comp (continuous_apply i)).mul continuous_const
-  have heq
-      : (rootRing l m : Set (Om l)) = Set.range (fun c : T → ℤ_[l] => ∑ i, c i • (i : Om l)) := by
+  have heq : (rootRing l m : Set (Om l)) =
+      Set.range (fun c : T → ℤ_[l] => ∑ i, c i • (i : Om l)) := by
     rw [rootRing_eq_span_roots_of_unity, hS]
     ext x
     simp only [SetLike.mem_coe, Submodule.mem_span_range_iff_exists_fun, Set.mem_range]
@@ -96,20 +146,18 @@ private lemma pow_prime_pow_totient_eq_self_of_pow_eq_one {m : ℕ} (hl : ¬ l �
     conv_lhs => rw [← Nat.mod_add_div n m, pow_add, pow_mul, hx, one_pow, mul_one]
   rw [key, hmod, ← key, pow_one]
 
-theorem pow_sub_mem {m : ℕ} (hl : ¬ l ∣ m) {y : Om l} (hy : y ∈ rootRing l m)
-    : ∃ z ∈ rootRing l m, y ^ (l ^ m.totient) = y + l * z := by
+theorem pow_sub_mem {m : ℕ} (hl : ¬ l ∣ m) {y : Om l} (hy : y ∈ rootRing l m) :
+    ∃ z ∈ rootRing l m, y ^ (l ^ m.totient) = y + l * z := by
   have hp : l.Prime := Fact.out
-  suffices H
-      : ∃ z : rootRing l m,
-        (⟨y, hy⟩ : rootRing l m) ^ (l ^ m.totient) = ⟨y, hy⟩ + (l : rootRing l m) * z by
+  suffices H : ∃ z : rootRing l m,
+      (⟨y, hy⟩ : rootRing l m) ^ (l ^ m.totient) = ⟨y, hy⟩ + (l : rootRing l m) * z by
     obtain ⟨z, hz⟩ := H
     refine ⟨z, z.2, ?_⟩
     have := congrArg Subtype.val hz
     simpa using this
   refine Algebra.adjoin_induction
-    (p := fun y hy =>
-      ∃ z : rootRing l m,
-        (⟨y, hy⟩ : rootRing l m) ^ (l ^ m.totient) = ⟨y, hy⟩ + (l : rootRing l m) * z)
+    (p := fun y hy => ∃ z : rootRing l m,
+      (⟨y, hy⟩ : rootRing l m) ^ (l ^ m.totient) = ⟨y, hy⟩ + (l : rootRing l m) * z)
     ?_ ?_ ?_ ?_ hy
   · intro x hx
     refine ⟨0, Subtype.ext ?_⟩
@@ -132,9 +180,8 @@ theorem pow_sub_mem {m : ℕ} (hl : ¬ l ∣ m) {y : Om l} (hy : y ∈ rootRing 
     rw [mul_pow, h1, h2]
     ring
 
-theorem exists_eq_mul
-    {m : ℕ} (hm : 0 < m) (hl : ¬ l ∣ m) {y : Om l} (hy : y ∈ rootRing l m) (h1 : ‖y‖ < 1)
-    : ∃ z ∈ rootRing l m, y = l * z := by
+theorem exists_eq_mul {m : ℕ} (hm : 0 < m) (hl : ¬ l ∣ m) {y : Om l} (hy : y ∈ rootRing l m)
+    (h1 : ‖y‖ < 1) : ∃ z ∈ rootRing l m, y = l * z := by
   have hp : l.Prime := Fact.out
   have hN1 : 1 < l ^ m.totient := Nat.one_lt_pow (Nat.totient_pos.2 hm).ne' hp.one_lt
   have hl0 : (l : Om l) ≠ 0 := Nat.cast_ne_zero.2 hp.ne_zero
@@ -155,25 +202,23 @@ theorem exists_eq_mul
       rw [hwe, sub_add_cancel_left, mul_neg, inv_mul_cancel_left₀ hl0]
     rw [e]
     exact neg_mem hw
-  have ht : Filter.Tendsto
-      (fun j : ℕ => (l : Om l)⁻¹ * (y - y ^ ((l ^ m.totient) ^ j)))
+  have ht : Filter.Tendsto (fun j : ℕ => (l : Om l)⁻¹ * (y - y ^ ((l ^ m.totient) ^ j)))
       Filter.atTop (nhds ((l : Om l)⁻¹ * (y - 0))) := by
     have h0 : Filter.Tendsto (fun j : ℕ => y ^ ((l ^ m.totient) ^ j)) Filter.atTop (nhds 0) :=
-      (tendsto_pow_atTop_nhds_zero_of_norm_lt_one h1).comp (tendsto_pow_atTop_atTop_of_one_lt hN1)
+      (tendsto_pow_atTop_nhds_zero_of_norm_lt_one h1).comp
+        (tendsto_pow_atTop_atTop_of_one_lt hN1)
     exact (tendsto_const_nhds.sub h0).const_mul _
   have hz := (isClosed_rootRing hm).mem_of_tendsto ht (Filter.Eventually.of_forall hmem)
   rw [sub_zero] at hz
   exact ⟨(l : Om l)⁻¹ * y, hz, (mul_inv_cancel_left₀ hl0 y).symm⟩
 
-theorem norm_rootRing
-    {m : ℕ} (hm : 0 < m) (hl : ¬ l ∣ m) {y : Om l} (hy : y ∈ rootRing l m) (h0 : y ≠ 0)
-    : ∃ n : ℤ, ‖y‖ = (l : ℝ) ^ n := by
+theorem norm_rootRing {m : ℕ} (hm : 0 < m) (hl : ¬ l ∣ m) {y : Om l} (hy : y ∈ rootRing l m)
+    (h0 : y ≠ 0) : ∃ n : ℤ, ‖y‖ = (l : ℝ) ^ n := by
   have hp : l.Prime := Fact.out
   have hl1 : (1 : ℝ) < l := by exact_mod_cast hp.one_lt
   have hl0 : (0 : ℝ) < l := by linarith
-  have key
-      : ∀ k : ℕ, ∀ y ∈ rootRing l m,
-        y ≠ 0 → (l : ℝ) ^ (-(k : ℤ)) ≤ ‖y‖ → ∃ n : ℤ, ‖y‖ = (l : ℝ) ^ n := by
+  have key : ∀ k : ℕ, ∀ y ∈ rootRing l m, y ≠ 0 → (l : ℝ) ^ (-(k : ℤ)) ≤ ‖y‖ →
+      ∃ n : ℤ, ‖y‖ = (l : ℝ) ^ n := by
     intro k
     induction k with
     | zero =>
@@ -187,8 +232,8 @@ theorem norm_rootRing
       · obtain ⟨z, hz, rfl⟩ := exists_eq_mul hm hl hy hlt
         have hz0 : z ≠ 0 := by rintro rfl; simp at hy0
         rw [norm_mul, norm_l] at hle ⊢
-        rw [show (-((k + 1 : ℕ) : ℤ)) = -(k : ℤ) - 1 by push_cast; ring, zpow_sub_one₀ hl0.ne']
-          at hle
+        rw [show (-((k + 1 : ℕ) : ℤ)) = -(k : ℤ) - 1 by push_cast; ring,
+          zpow_sub_one₀ hl0.ne'] at hle
         have hk : (l : ℝ) ^ (-(k : ℤ)) ≤ ‖z‖ :=
           le_of_mul_le_mul_left (by rwa [mul_comm] at hle) (inv_pos.2 hl0)
         obtain ⟨n, hn⟩ := ih z hz hz0 hk
@@ -199,15 +244,12 @@ theorem norm_rootRing
     exact ⟨k, by rw [zpow_neg, zpow_natCast, ← inv_pow]; exact hk.le⟩
   exact key k y hy h0 hk
 
-theorem exists_mul_mem {x : Om l} (hx : x ∈ MaximalUnramifiedExtension l)
-    : ∃ m : ℕ,
-      0 < m ∧ ¬ l ∣ m ∧ ∃ c : ℤ_[l], c ≠ 0 ∧ algebraMap ℤ_[l] (Om l) c * x ∈ rootRing l m := by
+theorem exists_mul_mem {x : Om l} (hx : x ∈ MaximalUnramifiedExtension l) :
+    ∃ m : ℕ, 0 < m ∧ ¬ l ∣ m ∧ ∃ c : ℤ_[l], c ≠ 0 ∧ algebraMap ℤ_[l] (Om l) c * x ∈ rootRing l m := by
   have hp : l.Prime := Fact.out
   unfold MaximalUnramifiedExtension at hx
-  rw [← IntermediateField.mem_toSubalgebra,
-      IntermediateField.adjoin_toSubalgebra_of_isAlgebraic (fun y _ =>
-        Algebra.IsAlgebraic.isAlgebraic y)]
-    at hx
+  rw [← IntermediateField.mem_toSubalgebra, IntermediateField.adjoin_toSubalgebra_of_isAlgebraic
+    (fun y _ => Algebra.IsAlgebraic.isAlgebraic y)] at hx
   induction hx using Algebra.adjoin_induction with
   | mem y hy =>
     obtain ⟨m, hm, hlm, hym⟩ := hy
@@ -242,18 +284,11 @@ theorem exists_mul_mem {x : Om l} (hx : x ∈ MaximalUnramifiedExtension l)
   | add x y _ _ hx hy =>
     obtain ⟨m1, hm1, hl1, c1, hc1, h1⟩ := hx
     obtain ⟨m2, hm2, hl2, c2, hc2, h2⟩ := hy
-    refine ⟨
-      m1 * m2,
-      Nat.mul_pos hm1 hm2,
-      fun h => (hp.dvd_mul.1 h).elim hl1 hl2,
-      c1 * c2,
-      mul_ne_zero hc1 hc2,
-      ?_
-    ⟩
-    have e
-        : algebraMap ℤ_[l] (Om l) (c1 * c2) * (x + y)
-          = algebraMap ℤ_[l] (Om l) c2 * (algebraMap ℤ_[l] (Om l) c1 * x)
-            + algebraMap ℤ_[l] (Om l) c1 * (algebraMap ℤ_[l] (Om l) c2 * y) := by
+    refine ⟨m1 * m2, Nat.mul_pos hm1 hm2, fun h => (hp.dvd_mul.1 h).elim hl1 hl2, c1 * c2,
+      mul_ne_zero hc1 hc2, ?_⟩
+    have e : algebraMap ℤ_[l] (Om l) (c1 * c2) * (x + y) =
+        algebraMap ℤ_[l] (Om l) c2 * (algebraMap ℤ_[l] (Om l) c1 * x) +
+          algebraMap ℤ_[l] (Om l) c1 * (algebraMap ℤ_[l] (Om l) c2 * y) := by
       rw [map_mul]
       ring
     rw [e]
@@ -262,47 +297,21 @@ theorem exists_mul_mem {x : Om l} (hx : x ∈ MaximalUnramifiedExtension l)
   | mul x y _ _ hx hy =>
     obtain ⟨m1, hm1, hl1, c1, hc1, h1⟩ := hx
     obtain ⟨m2, hm2, hl2, c2, hc2, h2⟩ := hy
-    refine ⟨
-      m1 * m2,
-      Nat.mul_pos hm1 hm2,
-      fun h => (hp.dvd_mul.1 h).elim hl1 hl2,
-      c1 * c2,
-      mul_ne_zero hc1 hc2,
-      ?_
-    ⟩
-    have e
-        : algebraMap ℤ_[l] (Om l) (c1 * c2) * (x * y)
-          = (algebraMap ℤ_[l] (Om l) c1 * x) * (algebraMap ℤ_[l] (Om l) c2 * y) := by
+    refine ⟨m1 * m2, Nat.mul_pos hm1 hm2, fun h => (hp.dvd_mul.1 h).elim hl1 hl2, c1 * c2,
+      mul_ne_zero hc1 hc2, ?_⟩
+    have e : algebraMap ℤ_[l] (Om l) (c1 * c2) * (x * y) =
+        (algebraMap ℤ_[l] (Om l) c1 * x) * (algebraMap ℤ_[l] (Om l) c2 * y) := by
       rw [map_mul]
       ring
     rw [e]
     exact mul_mem (rootRing_mono (dvd_mul_right m1 m2) h1) (rootRing_mono (dvd_mul_left m2 m1) h2)
 
-theorem norm_of_mem_Kur {x : Om l} (hx : x ∈ MaximalUnramifiedExtension l) (h0 : x ≠ 0)
-    : ∃ n : ℤ, ‖x‖ = (l : ℝ) ^ n := by
-  have hp : l.Prime := Fact.out
-  obtain ⟨m, hm, hlm, c, hc, hmem⟩ := exists_mul_mem hx
-  have hcx : algebraMap ℤ_[l] (Om l) c * x ≠ 0 := by
-    refine mul_ne_zero ?_ h0
-    rw [← norm_ne_zero_iff, norm_algebraMap_int]
-    exact norm_ne_zero_iff.2 hc
-  obtain ⟨n, hn⟩ := norm_rootRing hm hlm hmem hcx
-  rw [norm_mul, norm_algebraMap_int] at hn
-  have hc' : (c : ℚ_[l]) ≠ 0 := fun h => hc (PadicInt.ext (h.trans PadicInt.coe_zero.symm))
-  have hcv : ‖c‖ = (l : ℝ) ^ (-(c : ℚ_[l]).valuation) := by
-    rw [PadicInt.norm_def]
-    exact Padic.norm_eq_zpow_neg_valuation hc'
-  have hl0 : (l : ℝ) ≠ 0 := by exact_mod_cast hp.ne_zero
-  rw [hcv] at hn
-  refine ⟨n + (c : ℚ_[l]).valuation, ?_⟩
-  calc
-    ‖x‖ = (l : ℝ) ^ ((c : ℚ_[l]).valuation) * ((l : ℝ) ^ (-(c : ℚ_[l]).valuation) * ‖x‖) := by
-      rw [← mul_assoc, ← zpow_add₀ hl0, add_neg_cancel, zpow_zero, one_mul]
-    _ = (l : ℝ) ^ (n + (c : ℚ_[l]).valuation) := by rw [hn, zpow_add₀ hl0, mul_comm]
+theorem norm_of_mem_Kur {x : Om l} (hx : x ∈ MaximalUnramifiedExtension l) (h0 : x ≠ 0) :
+    ∃ n : ℤ, ‖x‖ = (l : ℝ) ^ n := by
+  apply Formalism.MainNotions.N.PreambleDegrees.Loc.norm_Kur_zpow <;> assumption
 
-theorem norm_of_mem_unramified_subfield
-    : ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l) (x : Om l),
-      x ∈ K0 K → x ≠ 0 → ∃ n : ℤ, ‖x‖ = (l : ℝ) ^ n := by
+theorem norm_of_mem_unramified_subfield : ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l) (x : Om l),
+    x ∈ K0 K → x ≠ 0 → ∃ n : ℤ, ‖x‖ = (l : ℝ) ^ n := by
   intro l _ K x hx h0
   unfold K0 at hx
   exact norm_of_mem_Kur hx.2 h0

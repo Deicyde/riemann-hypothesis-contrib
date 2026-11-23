@@ -1,9 +1,48 @@
 module
 
-public import Mathlib
-public import Formalism.LocalToGlobal.SiegelLatticeTheory.CokernelGLCounts.RankPointCounts.DualFamilyCounting.RowParseval
+public import Formalism.LocalToGlobal.SiegelLatticeTheory.HaarTransversals.HidaSetting
 public import Formalism.LocalToGlobal.SiegelLatticeTheory.CokernelGLCounts.RankPointCounts.DualFamilyCounting.InWLeft
 public import Formalism.LocalToGlobal.SiegelLatticeTheory.CokernelGLCounts.RankPointCounts.DualFamilyCounting.NcRealXPS
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Coalgebra.IsFrobenius
+import Mathlib.RingTheory.HopfAlgebra.Basic
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.TotallySplit
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -23,17 +62,14 @@ variable {D : D7} (X : HidaSetting D)
 def Wb : Submodule D.host.E (VS D).V :=
   ⨅ c, LinearMap.ker ((VS D).hT (X.eX c)) ⊓ LinearMap.ker ((VS D).hT (X.fY c))
 
-theorem mem_Wb {y : (VS D).V}
-    : y ∈ Wb X ↔ ∀ c, (VS D).hT (X.eX c) y = 0 ∧ (VS D).hT (X.fY c) y = 0 := by
+theorem mem_Wb {y : (VS D).V} : y ∈ Wb X ↔ ∀ c, (VS D).hT (X.eX c) y = 0 ∧ (VS D).hT (X.fY c) y = 0 := by
   simp [Wb, Submodule.mem_iInf, LinearMap.mem_ker]
 
 def phi : (VS D).V →ₗ[D.host.E] (Fin D.R.rS → D.host.E) × (Fin D.R.rS → D.host.E) :=
-  LinearMap.prod (LinearMap.pi fun c => (VS D).hT (X.eX c))
-    (LinearMap.pi fun c => (VS D).hT (X.fY c))
+  LinearMap.prod (LinearMap.pi fun c => (VS D).hT (X.eX c)) (LinearMap.pi fun c => (VS D).hT (X.fY c))
 
-theorem phi_apply (y : (VS D).V)
-    : phi X y = (fun c => (VS D).hT (X.eX c) y, fun c => (VS D).hT (X.fY c) y) :=
-  rfl
+theorem phi_apply (y : (VS D).V) :
+    phi X y = (fun c => (VS D).hT (X.eX c) y, fun c => (VS D).hT (X.fY c) y) := rfl
 
 theorem ker_phi : LinearMap.ker (phi X) = Wb X := by
   ext y
@@ -50,19 +86,17 @@ theorem range_phi : LinearMap.range (phi X) = ⊤ := by
   refine ⟨∑ a, p a • X.fY a + ∑ a, q a • X.eX a, ?_⟩
   rw [phi_apply]
   refine Prod.ext (funext fun c => ?_) (funext fun c => ?_)
-  set_option synthInstance.maxHeartbeats 100000 in
-    · simp [map_sum, map_smul, X.ef, X.ee, Finset.sum_ite_eq]
-  set_option synthInstance.maxHeartbeats 100000 in
+
+  · simp [map_sum, map_smul, X.ef, X.ee, Finset.sum_ite_eq]
+
   · simp [map_sum, map_smul, X.ff, Ex.h_fe, Finset.sum_ite_eq]
 
-theorem finrank_V (X : HidaSetting D)
-    : Module.finrank D.host.E (VS D).V = 2 * D.R.rS + D.R.k + 1 := by
+theorem finrank_V (X : HidaSetting D) : Module.finrank D.host.E (VS D).V = 2 * D.R.rS + D.R.k + 1 := by
   rw [Module.finrank_eq_card_basis X.bas, Fintype.card_fin, nX X]
 
 theorem finrank_Wb : Module.finrank D.host.E (Wb X) = D.R.k + 1 := by
   have h := LinearMap.finrank_range_add_finrank_ker (phi X)
-  rw [range_phi, ker_phi, finrank_top, Module.finrank_prod, Module.finrank_fin_fun, finrank_V X]
-    at h
+  rw [range_phi, ker_phi, finrank_top, Module.finrank_prod, Module.finrank_fin_fun, finrank_V X] at h
   omega
 
 theorem span_Lb_le : Submodule.span D.host.E (X.Lb : Set (VS D).V) ≤ Wb X := by
@@ -79,24 +113,20 @@ theorem span_Lb : Submodule.span D.host.E (X.Lb : Set (VS D).V) = Wb X := by
     let x : Fin X.B.I.n → X.B.I.E := fun i => X.ιE.symm (X.bas.repr y i)
     have hx : x ∈ Submodule.span X.B.I.E (X.B.I.L : Set (Fin X.B.I.n → X.B.I.E)) := by
       rw [X.B.I.L_span]; trivial
-    have hm
-        : ∀ x ∈ Submodule.span X.B.I.E (X.B.I.L : Set (Fin X.B.I.n → X.B.I.E)),
-          (∑ i, X.ιE (x i) • X.bas i) ∈ Submodule.span D.host.E ((VS D).L0 : Set (VS D).V) := by
+    have hm : ∀ x ∈ Submodule.span X.B.I.E (X.B.I.L : Set (Fin X.B.I.n → X.B.I.E)),
+        (∑ i, X.ιE (x i) • X.bas i) ∈ Submodule.span D.host.E ((VS D).L0 : Set (VS D).V) := by
       intro x hx
       induction hx using Submodule.span_induction with
       | mem x hx => exact Submodule.subset_span ((X.L_eq x).1 hx)
       | zero => simp
-      | add x y hx hy ihx ihy =>
-        simpa [map_add, add_smul, Finset.sum_add_distrib] using Submodule.add_mem _ ihx ihy
-      | smul a x hx ih =>
-        simpa [map_mul, mul_smul, Finset.smul_sum] using Submodule.smul_mem _ (X.ιE a) ih
+      | add x y hx hy ihx ihy => simpa [map_add, add_smul, Finset.sum_add_distrib] using Submodule.add_mem _ ihx ihy
+      | smul a x hx ih => simpa [map_mul, mul_smul, Finset.smul_sum] using Submodule.smul_mem _ (X.ιE a) ih
     have := hm x hx
     simpa only [x, RingEquiv.apply_symm_apply, X.bas.sum_repr] using this
   have hyL : y ∈ Submodule.span D.host.E ((VS D).L0 : Set (VS D).V) := by rw [htop]; trivial
-  have hle
-      : Submodule.span D.host.E ((VS D).L0 : Set (VS D).V)
-        ≤ Submodule.span D.host.E (Set.range X.eX) ⊔ Submodule.span D.host.E (X.Lb : Set (VS D).V)
-          ⊔ Submodule.span D.host.E (Set.range X.fY) := by
+  have hle : Submodule.span D.host.E ((VS D).L0 : Set (VS D).V) ≤
+      Submodule.span D.host.E (Set.range X.eX) ⊔ Submodule.span D.host.E (X.Lb : Set (VS D).V) ⊔
+        Submodule.span D.host.E (Set.range X.fY) := by
     rw [Submodule.span_le]
     intro z hz
     set T := Submodule.span D.host.E (Set.range X.eX) ⊔ Submodule.span D.host.E (X.Lb : Set (VS D).V) ⊔
@@ -107,8 +137,8 @@ theorem span_Lb : Submodule.span D.host.E (X.Lb : Set (VS D).V) = Wb X := by
       · unfold latSpanS
         rw [Submodule.span_le]
         rintro _ ⟨a, x, -, rfl⟩
-        exact Submodule.mem_sup_left (Submodule.mem_sup_left (Submodule.smul_mem _ x
-          (Submodule.subset_span ⟨a, rfl⟩)))
+        exact Submodule.mem_sup_left (Submodule.mem_sup_left
+          (Submodule.smul_mem _ x (Submodule.subset_span ⟨a, rfl⟩)))
       · intro l hl
         exact Submodule.mem_sup_left (Submodule.mem_sup_right (Submodule.subset_span hl))
       · unfold latSpanS
@@ -120,26 +150,23 @@ theorem span_Lb : Submodule.span D.host.E (X.Lb : Set (VS D).V) = Wb X := by
   obtain ⟨y1, hy1, l, hl, rfl⟩ := Submodule.mem_sup.1 hy12
   obtain ⟨α, rfl⟩ := (Submodule.mem_span_range_iff_exists_fun D.host.E).1 hy1
   obtain ⟨β, rfl⟩ := (Submodule.mem_span_range_iff_exists_fun D.host.E).1 hy3
-  have hlW : ∀ c, (VS D).hT (X.eX c) l = 0 ∧ (VS D).hT (X.fY c) l = 0 :=
-    (mem_Wb X).1 (span_Lb_le X hl)
+  have hlW : ∀ c, (VS D).hT (X.eX c) l = 0 ∧ (VS D).hT (X.fY c) l = 0 := (mem_Wb X).1 (span_Lb_le X hl)
   have hα : ∀ c, α c = 0 := by
     intro c
     have := (hy' c).2
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp [map_add (f := _), map_sum, map_smul, Ex.h_fe, X.ff, (hlW c).2, Finset.sum_ite_eq]
-        at this
+
+    simp [map_add (f := _), map_sum, map_smul, Ex.h_fe, X.ff, (hlW c).2, Finset.sum_ite_eq] at this
     exact this
   have hβ : ∀ c, β c = 0 := by
     intro c
     have := (hy' c).1
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp [map_add (f := _), map_sum, map_smul, X.ef, X.ee, (hlW c).1, Finset.sum_ite_eq] at this
+
+    simp [map_add (f := _), map_sum, map_smul, X.ef, X.ee, (hlW c).1, Finset.sum_ite_eq] at this
     exact this
   simp only [hα, hβ, zero_smul, Finset.sum_const_zero, zero_add, add_zero]
   exact hl
 
-theorem finrank_span_Lb
-    : Module.finrank D.host.E (Submodule.span D.host.E (X.Lb : Set (VS D).V)) = D.R.k + 1 := by
+theorem finrank_span_Lb : Module.finrank D.host.E (Submodule.span D.host.E (X.Lb : Set (VS D).V)) = D.R.k + 1 := by
   rw [span_Lb, finrank_Wb]
 
 end Formalism.L2.SG.Pf.NcReal.JX.CovB.CovolumeSpans

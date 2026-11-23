@@ -1,21 +1,53 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.LatAtLattice
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.RowTypeMulOnSymmetricLevelAtTypePrime
 public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.LambdaCharSymMulInvEqOne
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.IsAdmissibleIntegralBasisChangeOne
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ValuedLtOfMem
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.BaseFieldsPrimesOk
-public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.ExistsMoveRight
-public import Formalism.LocalToGlobal.Columns.RecLevelLocP
-public import Formalism.LocalToGlobal.Columns.RecLevelCls
+public import Formalism.LocalToGlobal.HermitianForms.TiedSym
+public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.UnipotentCharacterArgumentMulStabilizer
+public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.IntAtNatCast
+import Formalism.LocalToGlobal.Columns.AdelicLemmas
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
+import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.IsDiscriminantTwelfthRootOfIdealLatticeIffDelta1
+import Development.AbelianVarietyTheory.Definitions.Foundations.ValuedAlgebraMapEqOne
+import Formalism.LocalToGlobal.KernelLattices.XiIndCClass
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Col
-  Formalism.L2.DIV Formalism.L2.Ker Formalism.UG Formalism.L2.Forms GlobalTheory.Mem
-  GlobalTheory.Mem.Chr GlobalTheory.Mem.Col2 Matrix
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Col Formalism.L2.DIV Formalism.L2.Ker Formalism.UG Formalism.L2.Forms GlobalTheory.Mem GlobalTheory.Mem.Chr GlobalTheory.Mem.Col2 Matrix
 open scoped TensorProduct
 
 noncomputable section
@@ -24,21 +56,15 @@ namespace GlobalTheory.Proof.LastStepChar
 
 open Loc LocE GlobalTheory.SymLevelInv
 
-theorem sum_sd
-    {κ : Type} [AddCommMonoid κ]
-    {n a k : ℕ} (hk : 1 ≤ k) (hka : k < a) (ha : a ≤ n) (N : Matrix (Fin n) (Fin n) κ)
-    (f : ℕ → ℕ → κ) (hf : ∀ x y (hx : x < n) (hy : y < n), N ⟨x, hx⟩ ⟨y, hy⟩ = f x y)
-    : (∑ x : Fin n, ∑ y : Fin n, if (x : ℕ) + 1 = y ∧ (y : ℕ) < a ∧ (y : ℕ) ≠ k then N x y else 0)
-      = ∑ i ∈ Finset.range (k - 1), f i (i + 1)
-        + ∑ i ∈ Finset.range (a - k - 1), f (k + i) (k + i + 1) := by
-  have h1
-      : ∀ x : Fin n,
-        (∑ y : Fin n, if (x : ℕ) + 1 = y ∧ (y : ℕ) < a ∧ (y : ℕ) ≠ k then N x y else 0)
-          = if (x : ℕ) + 1 < a ∧ (x : ℕ) + 1 ≠ k then f x (x + 1) else 0 := by
+theorem sum_sd {κ : Type} [AddCommMonoid κ] {n a k : ℕ} (hk : 1 ≤ k) (hka : k < a) (ha : a ≤ n)
+    (N : Matrix (Fin n) (Fin n) κ) (f : ℕ → ℕ → κ) (hf : ∀ x y (hx : x < n) (hy : y < n), N ⟨x, hx⟩ ⟨y, hy⟩ = f x y) :
+    (∑ x : Fin n, ∑ y : Fin n, if (x : ℕ) + 1 = y ∧ (y : ℕ) < a ∧ (y : ℕ) ≠ k then N x y else 0) =
+      ∑ i ∈ Finset.range (k - 1), f i (i + 1) + ∑ i ∈ Finset.range (a - k - 1), f (k + i) (k + i + 1) := by
+  have h1 : ∀ x : Fin n, (∑ y : Fin n, if (x : ℕ) + 1 = y ∧ (y : ℕ) < a ∧ (y : ℕ) ≠ k then N x y else 0) =
+      if (x : ℕ) + 1 < a ∧ (x : ℕ) + 1 ≠ k then f x (x + 1) else 0 := by
     intro x
     by_cases hx : (x : ℕ) + 1 < a ∧ (x : ℕ) + 1 ≠ k
-    · rw [if_pos hx, Finset.sum_eq_single (⟨x.1 + 1, by omega⟩ : Fin n), if_pos ⟨rfl, hx.1, hx.2⟩,
-        hf]
+    · rw [if_pos hx, Finset.sum_eq_single (⟨x.1 + 1, by omega⟩ : Fin n), if_pos ⟨rfl, hx.1, hx.2⟩, hf]
       · intro y _ hy
         exact if_neg fun h => hy (Fin.ext h.1.symm)
       · intro h
@@ -66,13 +92,10 @@ section Loc
 
 variable {E : Type} [Field E] [NumberField E] [StarRing E] {P : HeightOneSpectrum (𝓞 E)}
 
-theorem red_mat
-    {n : ℕ} (g : Sp E n ≃ₗ[E] Sp E n) (r : Sp E (n + 0) ≃ₗ[E] Sp E (n + 0))
-    (hrg : ∀ x, r (Loc.inX E n 0 x) = Loc.inX E n 0 (g x))
-    (M : Matrix (Fin n) (Fin n) (𝓞 E ⧸ P.asIdeal))
-    (hred : ∀ x ∈ stdAt E n P, redV P (g x) = M.mulVec (redV P x))
-    (p p' : ℕ) (hp : p < n) (hp' : p' < n)
-    : redP P (mat r p p') = M ⟨p, hp⟩ ⟨p', hp'⟩ := by
+theorem red_mat {n : ℕ} (g : Sp E n ≃ₗ[E] Sp E n) (r : Sp E (n + 0) ≃ₗ[E] Sp E (n + 0))
+    (hrg : ∀ x, r (Loc.inX E n 0 x) = Loc.inX E n 0 (g x)) (M : Matrix (Fin n) (Fin n) (𝓞 E ⧸ P.asIdeal))
+    (hred : ∀ x ∈ stdAt E n P, redV P (g x) = M.mulVec (redV P x)) (p p' : ℕ) (hp : p < n) (hp' : p' < n) :
+    redP P (mat r p p') = M ⟨p, hp⟩ ⟨p', hp'⟩ := by
   have he : Loc.eN E (n + 0) p' = Loc.inX E n 0 (Loc.eN E n p') := by
     funext l
     rw [GlobalTheory.QNormal.inX_apply, dif_pos (show (l : ℕ) < n from l.2)]
@@ -86,36 +109,28 @@ theorem red_mat
   have h5 := congrFun (hred _ (GlobalTheory.GO.ChRoot.eN_mem (i := p'))) ⟨p, hp⟩
   rw [hv, Matrix.mulVec_single_one] at h5
   unfold mat
-  rw [he, hrg, Loc.atN, dif_pos (show p < n + 0 from hp), GlobalTheory.QNormal.inX_apply,
-    dif_pos hp]
+  rw [he, hrg, Loc.atN, dif_pos (show p < n + 0 from hp), GlobalTheory.QNormal.inX_apply, dif_pos hp]
   exact h5
 
-theorem lam_loc
-    {K : Type} [Field K]
-    (ψ₀ : AddChar (𝓞 E ⧸ P.asIdeal) K) (χ₀ : ℕ → (𝓞 E ⧸ P.asIdeal)ˣ →* Kˣ)
-    {κ : Type} [Field κ]
-    (e : (𝓞 E ⧸ P.asIdeal) ≃+* κ) (σ : K →+* ℂ) (ψ : AddChar κ ℂ) (χ : ℕ → MulChar κ ℂ)
+theorem lam_loc {K : Type} [Field K] (ψ₀ : AddChar (𝓞 E ⧸ P.asIdeal) K) (χ₀ : ℕ → (𝓞 E ⧸ P.asIdeal)ˣ →* Kˣ)
+    {κ : Type} [Field κ] (e : (𝓞 E ⧸ P.asIdeal) ≃+* κ) (σ : K →+* ℂ) (ψ : AddChar κ ℂ) (χ : ℕ → MulChar κ ℂ)
     {k rS r t nb n c : ℕ} (hc : c = 0) (hr : r = k + 2 * rS + 1) (hk : 1 ≤ k) (hn : r + nb * t ≤ n)
-    (hψ : ∀ a, ψ (e a) = σ (ψ₀ a))
-    (hχ : ∀ i, i < nb → ∀ a : (𝓞 E ⧸ P.asIdeal)ˣ, χ i (e a) = σ ((χ₀ i a : Kˣ) : K))
-    (g : Sp E n ≃ₗ[E] Sp E n) (h : Sp E (n + c) ≃ₗ[E] Sp E (n + c))
-    (hh : h ∈ JGsym P (qOf P) k rS r t n c) (hhg : ∀ x, h (Loc.inX E n c x) = Loc.inX E n c (g x))
-    (M : Matrix (Fin n) (Fin n) (𝓞 E ⧸ P.asIdeal))
-    (hred : ∀ x ∈ stdAt E n P, redV P (g x) = M.mulVec (redV P x))
-    : σ (lamGBS (qOf P) ψ₀ χ₀ k r t nb n c h.toLinearMap)
-      = Formalism.L2.Forms.lamSym ψ χ k rS t nb (M.map e) := by
+    (hψ : ∀ a, ψ (e a) = σ (ψ₀ a)) (hχ : ∀ i, i < nb → ∀ a : (𝓞 E ⧸ P.asIdeal)ˣ, χ i (e a) = σ ((χ₀ i a : Kˣ) : K))
+    (g : Sp E n ≃ₗ[E] Sp E n) (h : Sp E (n + c) ≃ₗ[E] Sp E (n + c)) (hh : h ∈ JGsym P (qOf P) k rS r t n c)
+    (hhg : ∀ x, h (Loc.inX E n c x) = Loc.inX E n c (g x)) (M : Matrix (Fin n) (Fin n) (𝓞 E ⧸ P.asIdeal))
+    (hred : ∀ x ∈ stdAt E n P, redV P (g x) = M.mulVec (redV P x)) :
+    σ (lamGBS (qOf P) ψ₀ χ₀ k r t nb n c h.toLinearMap) = Formalism.L2.Forms.lamSym ψ χ k rS t nb (M.map e) := by
   subst hc hr
   have hM := red_mat g h hhg M hred
   have hrn : k + 2 * rS + 1 ≤ n := le_trans (Nat.le_add_right _ _) hn
   unfold lamGBS lamGvS Formalism.L2.Forms.lamSym Formalism.L2.Forms.lamJ Formalism.L2.Forms.rSym
   rw [map_mul]
   congr 1
-  set_option synthInstance.maxHeartbeats 100000 in
-    · rw [redP_superdiag (by omega) hrn hh, ← hψ, map_add (f := _), map_sum, map_sum]
-      congr 1
-      refine
-        (sum_sd hk (by omega) hrn _ (fun x y => e (redP P (mat h x y))) fun x y hx hy => ?_).symm
-      rw [Matrix.map_apply, hM x y hx hy]
+
+  · rw [redP_superdiag (by omega) hrn hh, ← hψ, map_add (f := _), map_sum, map_sum]
+    congr 1
+    refine (sum_sd hk (by omega) hrn _ (fun x y => e (redP P (mat h x y))) fun x y hx hy => ?_).symm
+    rw [Matrix.map_apply, hM x y hx hy]
   · rw [map_prod]
     refine Finset.prod_congr rfl fun i hi => ?_
     rw [Finset.mem_range] at hi
@@ -123,16 +138,13 @@ theorem lam_loc
       have : (i + 1) * t ≤ nb * t := Nat.mul_le_mul_right t hi
       rw [add_mul, one_mul] at this
       omega
-    have hb
-        : Formalism.L2.Forms.blkMat (k + 2 * rS + 1) t i (M.map e)
-          = e.toRingHom.mapMatrix (Matrix.of fun s s' : Fin t =>
-            redP P (mat h (k + 2 * rS + 1 + i * t + s.1) (k + 2 * rS + 1 + i * t + s'.1))) := by
+    have hb : Formalism.L2.Forms.blkMat (k + 2 * rS + 1) t i (M.map e) =
+        e.toRingHom.mapMatrix (Matrix.of fun s s' : Fin t => redP P (mat h (k + 2 * rS + 1 + i * t + s.1) (k + 2 * rS + 1 + i * t + s'.1))) := by
       ext s s'
       have := s.2
       have := s'.2
       unfold Formalism.L2.Forms.blkMat Formalism.L2.Forms.entN
-      rw [dif_pos ⟨by omega, by omega⟩, Matrix.map_apply, RingHom.mapMatrix_apply, Matrix.map_apply,
-        Matrix.of_apply,
+      rw [dif_pos ⟨by omega, by omega⟩, Matrix.map_apply, RingHom.mapMatrix_apply, Matrix.map_apply, Matrix.of_apply,
         hM (k + 2 * rS + 1 + i * t + s.1) (k + 2 * rS + 1 + i * t + s'.1) (by omega) (by omega)]
       rfl
     rw [hb, ← RingHom.map_det]
@@ -148,23 +160,7 @@ end Loc
 
 end GlobalTheory.Proof.LastStepChar
 
-theorem GlobalTheory.Proof.LastStepChar.chr_last
-    : ∀ {X : Fields} {Pr : Primes X} {R : Ranks} (Ch : Chars X Pr R.m)
-        (sel : HeightOneSpectrum (𝓞 X.F) → HeightOneSpectrum (𝓞 X.E)) {S : Set ℕ}
-        (mu : Tup X.F X.E X.K S) (cst : LocCst X (rowSG Pr sel mu))
-        (L : ChIdx X Pr R (QE sel (mu : Chr X.F X.E X.K))) (G : ChGlob X R.m) (m2 : ℕ),
-      X.Ok → Pr.Ok → IsSel X sel → L.Ok Ch sel mu cst G m2 → cst.sharp = true
-        → ∀ (j : ℕ),
-          j + 1 = R.m
-            → ∀ (b : L.β j) (w : {w // w ∈ Pr.vGs}) (κ : Type) [Field κ]
-                (e : (𝓞 X.E ⧸ w.1.asIdeal) ≃+* κ) (σ : X.K →+* ℂ) (ψ : AddChar κ ℂ)
-                (χ : ℕ → MulChar κ ℂ),
-              (∀ c, ψ (e c) = σ (Ch.psi0 w c))
-                → (∀ (s : Fin R.m) (c : (𝓞 X.E ⧸ w.1.asIdeal)ˣ),
-                  χ s.1 (e c) = σ ((Ch.chi s w c : X.Kˣ) : X.K))
-                → ∀ M : (L.levG j b w).H,
-                  σ (((L.levG j b w).lam M : X.Kˣ) : X.K)
-                    = lamSym ψ χ R.k (rSD R) R.t j (M.1.1.map e) := by
+theorem GlobalTheory.Proof.LastStepChar.chr_last : ∀ {X : Fields} {Pr : Primes X} {R : Ranks} (Ch : Chars X Pr R.m) (sel : HeightOneSpectrum (𝓞 X.F) → HeightOneSpectrum (𝓞 X.E)) {S : Set ℕ} (mu : Tup X.F X.E X.K S) (cst : LocCst X (rowSG Pr sel mu)) (L : ChIdx X Pr R (QE sel (mu : Chr X.F X.E X.K))) (G : ChGlob X R.m) (m2 : ℕ), X.Ok → Pr.Ok → IsSel X sel → L.Ok Ch sel mu cst G m2 → cst.sharp = true → ∀ (j : ℕ), j + 1 = R.m → ∀ (b : L.β j) (w : {w // w ∈ Pr.vGs}) (κ : Type) [Field κ] (e : (𝓞 X.E ⧸ w.1.asIdeal) ≃+* κ) (σ : X.K →+* ℂ) (ψ : AddChar κ ℂ) (χ : ℕ → MulChar κ ℂ), (∀ c, ψ (e c) = σ (Ch.psi0 w c)) → (∀ (s : Fin R.m) (c : (𝓞 X.E ⧸ w.1.asIdeal)ˣ), χ s.1 (e c) = σ ((Ch.chi s w c : X.Kˣ) : X.K)) → ∀ M : (L.levG j b w).H, σ (((L.levG j b w).lam M : X.Kˣ) : X.K) = lamSym ψ χ R.k (rSD R) R.t j (M.1.1.map e) := by
   intro X Pr R Ch sel S mu cst L G m2 hX hPr hsel hL hsh j hj b w κ _ e σ ψ χ hψ hχ M
   have hm := hL.hm
   obtain rfl : j = m2 + 1 := by omega
@@ -197,10 +193,7 @@ theorem GlobalTheory.Proof.LastStepChar.chr_last
     unfold Ranks.r Ranks.N
     rw [mul_add, mul_one]
     omega
-  refine lam_loc (psi0P Ch w.1) (chiP Ch w.1) e σ ψ χ hc hr (by omega) hn
-    (fun a => ?_)
-    (fun i hi a => ?_)
-    g r hJ0 hrg M.1.1 hred
+  refine lam_loc (psi0P Ch w.1) (chiP Ch w.1) e σ ψ χ hc hr (by omega) hn (fun a => ?_) (fun i hi a => ?_) g r hJ0 hrg M.1.1 hred
   · rw [hψ]
     unfold psi0P
     rw [dif_pos w.2]

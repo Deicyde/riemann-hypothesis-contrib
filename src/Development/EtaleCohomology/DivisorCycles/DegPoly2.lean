@@ -1,6 +1,54 @@
 module
 
-public import Development.EtaleCohomology.DivisorCycles.CycleCount
+public import Development.EtaleCohomology.DivisorCycles.OpenCoset
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Coalgebra.IsFrobenius
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.HopfAlgebra.Basic
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -8,14 +56,14 @@ open Matrix
 
 namespace LateralTheory.DivDb.DegPoly₂
 
-theorem exists_minor
-    {F ι : Type*} [Field F] [Fintype ι] {k : ℕ} (v : Fin k → ι → F) (hv : LinearIndependent F v)
-    : ∃ l : Fin k → ι, (Matrix.of fun a b => v b (l a)).det ≠ 0 := by
+theorem exists_minor {F ι : Type*} [Field F] [Fintype ι] {k : ℕ} (v : Fin k → ι → F)
+    (hv : LinearIndependent F v) :
+    ∃ l : Fin k → ι, (Matrix.of fun a b => v b (l a)).det ≠ 0 := by
   classical
   let r : ι → Fin k → F := fun i b => v b i
   let V : Matrix ι (Fin k) F := Matrix.of r
   have h1 : V.rank = k := by
-    rw [Matrix.rank_eq_finrank_span_cols]
+    rw [← Matrix.rank_eq_finrank_span_cols]
     have : V.col = v := by funext b i; rfl
     rw [this, finrank_span_eq_card hv, Fintype.card_fin]
   have h2 : Submodule.span F (Set.range r) = ⊤ := by
@@ -29,7 +77,8 @@ theorem exists_minor
   let bs := Module.Basis.mk hli (by rw [hsp])
   have : Finite κ := Module.Finite.finite_basis bs
   haveI : Fintype κ := Fintype.ofFinite κ
-  have hc : Fintype.card κ = k := by rw [← Module.finrank_eq_card_basis bs, Module.finrank_fin_fun]
+  have hc : Fintype.card κ = k := by
+    rw [← Module.finrank_eq_card_basis bs, Module.finrank_fin_fun]
   let e : Fin k ≃ κ := (Fintype.equivFinOfCardEq hc).symm
   refine ⟨a ∘ e, ?_⟩
   have hrows : LinearIndependent F (Matrix.of fun a' b => v b ((a ∘ e) a')).row :=
@@ -37,8 +86,8 @@ theorem exists_minor
   rw [Matrix.linearIndependent_rows_iff_isUnit, Matrix.isUnit_iff_isUnit_det] at hrows
   exact hrows.ne_zero
 
-theorem not_li_iff {F ι : Type*} [Field F] [Fintype ι] {k : ℕ} (v : Fin k → ι → F)
-    : ¬ LinearIndependent F v ↔ ∀ l : Fin k → ι, (Matrix.of fun a b => v b (l a)).det = 0 := by
+theorem not_li_iff {F ι : Type*} [Field F] [Fintype ι] {k : ℕ} (v : Fin k → ι → F) :
+    ¬ LinearIndependent F v ↔ ∀ l : Fin k → ι, (Matrix.of fun a b => v b (l a)).det = 0 := by
   classical
   constructor
   · intro h l
@@ -56,23 +105,19 @@ theorem not_li_iff {F ι : Type*} [Field F] [Fintype ι] {k : ℕ} (v : Fin k �
     obtain ⟨l, hl⟩ := exists_minor v hv
     exact hl (h l)
 
-theorem deg_iff_not_li {F : Type} [Field F] {N n : ℕ} (x : Mat F N)
-    : Deg n x
-      ↔ ¬ LinearIndependent F
-        (fun (b : Fin (n + 1)) (p : Fin N × Fin N) => (x ^ (b : ℕ)) p.1 p.2) := by
+theorem deg_iff_not_li {F : Type} [Field F] {N n : ℕ} (x : Mat F N) :
+    Deg n x ↔ ¬ LinearIndependent F (fun (b : Fin (n+1)) (p : Fin N × Fin N) => (x ^ (b : ℕ)) p.1 p.2) := by
   classical
   rw [Fintype.not_linearIndependent_iff]
   constructor
   · rintro ⟨q, hq0, hqd, hqx⟩
     refine ⟨fun b => q.coeff b, ?_, ?_⟩
     · have h1 : q = ∑ i ∈ Finset.range (n+1), Polynomial.monomial i (q.coeff i) :=
-        q.as_sum_range' (n + 1) (by omega)
+        q.as_sum_range' (n+1) (by omega)
       have h2 : Polynomial.aeval x q = ∑ b : Fin (n+1), q.coeff b • x ^ (b : ℕ) := by
         conv_lhs => rw [h1]
-        set_option synthInstance.maxHeartbeats 100000 in
-          rw [map_sum,
-            ← Fin.sum_univ_eq_sum_range (fun i =>
-              Polynomial.aeval x (Polynomial.monomial i (q.coeff i)))]
+
+        rw [map_sum, ← Fin.sum_univ_eq_sum_range (fun i => Polynomial.aeval x (Polynomial.monomial i (q.coeff i)))]
         refine Finset.sum_congr rfl (fun b _ => ?_)
         rw [Polynomial.aeval_monomial, Algebra.smul_def]
       rw [h2] at hqx
@@ -91,8 +136,7 @@ theorem deg_iff_not_li {F : Type} [Field F] {N n : ℕ} (x : Mat F N)
     · intro h0
       apply hi
       have := congrArg (fun q => _root_.AddMonoidAlgebra.coeff (M := ℕ) q (i : ℕ)) h0
-      simp only [Polynomial.finsetSum_coeff, Polynomial.coeff_monomial, Polynomial.coeff_zero]
-        at this
+      simp only [Polynomial.finsetSum_coeff, Polynomial.coeff_monomial, Polynomial.coeff_zero] at this
       rw [Finset.sum_eq_single i] at this
       · simpa using this
       · intro b _ hb
@@ -101,7 +145,7 @@ theorem deg_iff_not_li {F : Type} [Field F] {N n : ℕ} (x : Mat F N)
     · apply Polynomial.natDegree_sum_le_of_forall_le
       intro b _
       exact (Polynomial.natDegree_monomial_le _).trans (by omega)
-    set_option synthInstance.maxHeartbeats 100000 in
+
     · rw [map_sum]
       ext j k
       have := congrFun hg (j, k)
@@ -115,19 +159,17 @@ noncomputable def gen (C : Type) [Field C] (N : ℕ) : Mat (MP C N) N :=
   Matrix.of fun i j => MvPolynomial.X (i, j)
 
 noncomputable def fam (C : Type) [Field C] (N n : ℕ) : Set (MP C N) :=
-  Set.range fun l : Fin (n + 1) → Fin N × Fin N =>
-    (Matrix.of fun a b : Fin (n + 1) => (gen C N ^ (b : ℕ)) (l a).1 (l a).2).det
+  Set.range fun l : Fin (n+1) → Fin N × Fin N =>
+    (Matrix.of fun a b : Fin (n+1) => (gen C N ^ (b : ℕ)) (l a).1 (l a).2).det
 
-theorem eval_fam
-    {C : Type} [Field C]
-    {N n : ℕ} {F : Type} [Field F] [Algebra C F]
-    (x : Mat F N) (l : Fin (n + 1) → Fin N × Fin N)
-    : MvPolynomial.aeval
-        (fun p : Fin N × Fin N => x p.1 p.2)
-        ((Matrix.of fun a b : Fin (n + 1) => (gen C N ^ (b : ℕ)) (l a).1 (l a).2).det)
-      = (Matrix.of fun a b : Fin (n + 1) => (x ^ (b : ℕ)) (l a).1 (l a).2).det := by
+theorem eval_fam {C : Type} [Field C] {N n : ℕ} {F : Type} [Field F] [Algebra C F] (x : Mat F N)
+    (l : Fin (n+1) → Fin N × Fin N) :
+    MvPolynomial.aeval (fun p : Fin N × Fin N => x p.1 p.2)
+      ((Matrix.of fun a b : Fin (n+1) => (gen C N ^ (b : ℕ)) (l a).1 (l a).2).det) =
+    (Matrix.of fun a b : Fin (n+1) => (x ^ (b : ℕ)) (l a).1 (l a).2).det := by
   set φ := MvPolynomial.aeval (R := C) (fun p : Fin N × Fin N => x p.1 p.2)
-  have hG : φ.mapMatrix (gen C N) = x := by ext i j; simp [gen, φ, AlgHom.mapMatrix_apply]
+  have hG : φ.mapMatrix (gen C N) = x := by
+    ext i j; simp [gen, φ, AlgHom.mapMatrix_apply]
   have hpow : ∀ b : ℕ, φ.mapMatrix (gen C N ^ b) = x ^ b := fun b => by rw [map_pow, hG]
   rw [AlgHom.map_det]
   congr 1
@@ -142,10 +184,8 @@ theorem DegPoly_of : DegPoly := by
   rw [deg_iff_not_li, not_li_iff]
   constructor
   · rintro h f ⟨l, rfl⟩
-    rw [eval_fam]
-    exact h l
+    rw [eval_fam]; exact h l
   · intro h l
-    rw [← eval_fam (C := C)]
-    exact h _ ⟨l, rfl⟩
+    rw [← eval_fam (C := C)]; exact h _ ⟨l, rfl⟩
 
 end LateralTheory.DivDb.DegPoly₂

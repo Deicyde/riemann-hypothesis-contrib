@@ -1,6 +1,51 @@
 module
 
+public import ReciprocityTheory.DualLattices.CokernelLengthComparisonOf
+public import ReciprocityTheory.DualLattices.SmallLevelClassSet
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Lemma
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 public import ReciprocityTheory.DualLattices.InvolutionPermApplyZero
+import ReciprocityTheory.DualLattices.StdJForm
 
 @[expose] public section
 
@@ -12,31 +57,28 @@ namespace ReciprocityTheory.PGsh.Up
 
 open ReciprocityTheory.PGsh.L2
 
-variable
-  {p : ℕ} [Fact p.Prime]
-  {g : ℕ} {C : Type} [Field C]
-  {v : Valuation C NNReal} {R : Type} [CommRing R] [Algebra R C] [Algebra ℤ_[p] R]
-  {O : Type} [CommRing O] [Algebra ℤ_[p] O]
+variable {p : ℕ} [Fact p.Prime] {g : ℕ} {C : Type} [Field C] {v : Valuation C NNReal} {R : Type}
+  [CommRing R] [Algebra R C] [Algebra ℤ_[p] R] {O : Type} [CommRing O] [Algebra ℤ_[p] O]
   {σ : O ≃ₐ[ℤ_[p]] O} {cp : R}
 
-theorem btP_facts
-    (hS : HodgeTateSetting p v R O σ cp)
-    (H : HodgeTateDatum p g v R O σ cp)
-    {m : ℕ} (e : Fin m → O) (π : Equiv.Perm (Fin m))
-    (horth : ∀ i j, e i * e j = if i = j then e i else 0) (hσ : ∀ i, σ (e i) = e (π i))
-    (hsT : (∑ i, H.ρ (e i)) + H.P = 1) (hPT : ∀ i, H.ρ (e i) * H.P = 0)
-    (hsL : (∑ i, H.ρL (e i)) + H.PL = 1) (hPL : ∀ i, H.ρL (e i) * H.PL = 0)
-    : (btP H e)ᵀ * H.Ht - H.Htᵀ * btP H e = cp • H.E.map (algebraMap ℤ_[p] R)
-      ∧ (∀ i, btP H e * (H.ρ (e i)).map (algebraMap ℤ_[p] R) = H.ρL (e i) * btP H e)
-      ∧ btP H e * H.P.map (algebraMap ℤ_[p] R) = H.PL * btP H e := by
+theorem btP_facts (hS : HodgeTateSetting p v R O σ cp) (H : HodgeTateDatum p g v R O σ cp) {m : ℕ} (e : Fin m → O)
+    (π : Equiv.Perm (Fin m)) (horth : ∀ i j, e i * e j = if i = j then e i else 0)
+    (hσ : ∀ i, σ (e i) = e (π i)) (hsT : (∑ i, H.ρ (e i)) + H.P = 1)
+    (hPT : ∀ i, H.ρ (e i) * H.P = 0) (hsL : (∑ i, H.ρL (e i)) + H.PL = 1)
+    (hPL : ∀ i, H.ρL (e i) * H.PL = 0) :
+    (btP H e)ᵀ * H.Ht - H.Htᵀ * btP H e = cp • H.E.map (algebraMap ℤ_[p] R) ∧
+    (∀ i, btP H e * (H.ρ (e i)).map (algebraMap ℤ_[p] R) = H.ρL (e i) * btP H e) ∧
+    btP H e * H.P.map (algebraMap ℤ_[p] R) = H.PL * btP H e := by
   classical
   set F := (algebraMap ℤ_[p] R).mapMatrix (m := Ix g) with hF
   have hFa : ∀ M : Matrix (Ix g) (Ix g) ℤ_[p], M.map (algebraMap ℤ_[p] R) = F M := fun M => rfl
   have hFt : ∀ M : Matrix (Ix g) (Ix g) ℤ_[p], (F M)ᵀ = F Mᵀ := fun M => rfl
   let π2 := pi2 e π hσ
   have hπ2 : ∀ k, π2 (π2 k) = k := involutionPerm_involutive e π hσ horth hS.invol
-  let εT : Fin (m + 1) → Matrix (Ix g) (Ix g) R := Fin.lastCases (F H.P) (fun i => F (H.ρ (e i)))
-  let εL : Fin (m + 1) → Matrix (Fin g) (Fin g) R := Fin.lastCases H.PL (fun i => H.ρL (e i))
+  let εT : Fin (m + 1) → Matrix (Ix g) (Ix g) R :=
+    Fin.lastCases (F H.P) (fun i => F (H.ρ (e i)))
+  let εL : Fin (m + 1) → Matrix (Fin g) (Fin g) R :=
+    Fin.lastCases H.PL (fun i => H.ρL (e i))
   let π' : Equiv.Perm (Fin (m + 1)) := finSuccEquivLast.symm.permCongr (Equiv.optionCongr π2)
   have hTc : ∀ i : Fin m, εT i.castSucc = F (H.ρ (e i)) := fun i => by simp [εT]
   have hTl : εT (Fin.last m) = F H.P := by simp [εT]
@@ -65,7 +107,7 @@ theorem btP_facts
   have h3 : ∑ i, εT i = 1 := by
     rw [Fin.sum_univ_castSucc]
     simp only [hTc, hTl]
-    set_option synthInstance.maxHeartbeats 100000 in
+
     rw [← map_sum F (fun i => H.ρ (e i)), ← map_add (f := _), hsT, map_one]
   have h4 : ∀ i j, εL i * εL j = if i = j then εL i else 0 := by
     intro i j
@@ -86,16 +128,14 @@ theorem btP_facts
     refine Fin.lastCases ?_ (fun i => ?_) i
     · rw [hTl, hπl, hLl, ← hFa, H.Ht_equivariant.2]
     · rw [hTc, hπc, hLc, ← hFa, H.Ht_equivariant.1, involutionPerm_sigma e π hσ i]
-  have h7
-      : ∀ i, (εT i)ᵀ * H.E.map (algebraMap ℤ_[p] R) = H.E.map (algebraMap ℤ_[p] R) * εT (π' i) := by
+  have h7 : ∀ i, (εT i)ᵀ * H.E.map (algebraMap ℤ_[p] R) =
+      H.E.map (algebraMap ℤ_[p] R) * εT (π' i) := by
     intro i
     refine Fin.lastCases ?_ (fun i => ?_) i
     · rw [hTl, hπl, hTl, hFa, hFt, ← map_mul, ← map_mul, H.projectors.2.2.1]
-    · rw [hTc, hπc, hTc, hFa, hFt, ← map_mul, ← map_mul, H.E_equivariant,
-        involutionPerm_sigma e π hσ i]
-  have hu :=
-    u1 R g (m + 1) H.Ht H.Bt (H.E.map (algebraMap ℤ_[p] R)) cp εT εL π' h1 h2 h3 h4 h5 h6 h7
-      H.form_eq_alt
+    · rw [hTc, hπc, hTc, hFa, hFt, ← map_mul, ← map_mul, H.E_equivariant, involutionPerm_sigma e π hσ i]
+  have hu := u1 R g (m + 1) H.Ht H.Bt (H.E.map (algebraMap ℤ_[p] R)) cp εT εL π' h1 h2 h3 h4 h5
+    h6 h7 H.form_eq_alt
   have hB : (∑ i, εL i * H.Bt * εT i) = btP H e := by
     rw [Fin.sum_univ_castSucc]
     simp only [hLc, hLl, hTc, hTl, btP, hFa]
@@ -117,14 +157,12 @@ private lemma stdJ_form4 {D : Type} [CommRing D] {g : ℕ}
   refine Finset.sum_congr rfl fun a _ => ?_
   simp [Matrix.mul_apply, stdJ, Fintype.sum_sum_type, Matrix.one_apply] <;> ring
 
-theorem phiP_J
-    (hS : HodgeTateSetting p v R O σ cp)
-    (H : HodgeTateDatum p g v R O σ cp)
-    {m : ℕ} (e : Fin m → O) (π : Equiv.Perm (Fin m))
-    (horth : ∀ i j, e i * e j = if i = j then e i else 0) (hσ : ∀ i, σ (e i) = e (π i))
-    (hsT : (∑ i, H.ρ (e i)) + H.P = 1) (hPT : ∀ i, H.ρ (e i) * H.P = 0)
-    (hsL : (∑ i, H.ρL (e i)) + H.PL = 1) (hPL : ∀ i, H.ρL (e i) * H.PL = 0)
-    : (phiP H e)ᵀ * stdJ R g * phiP H e = cp • H.E.map (algebraMap ℤ_[p] R) := by
+theorem phiP_J (hS : HodgeTateSetting p v R O σ cp) (H : HodgeTateDatum p g v R O σ cp) {m : ℕ} (e : Fin m → O)
+    (π : Equiv.Perm (Fin m)) (horth : ∀ i j, e i * e j = if i = j then e i else 0)
+    (hσ : ∀ i, σ (e i) = e (π i)) (hsT : (∑ i, H.ρ (e i)) + H.P = 1)
+    (hPT : ∀ i, H.ρ (e i) * H.P = 0) (hsL : (∑ i, H.ρL (e i)) + H.PL = 1)
+    (hPL : ∀ i, H.ρL (e i) * H.PL = 0) :
+    (phiP H e)ᵀ * stdJ R g * phiP H e = cp • H.E.map (algebraMap ℤ_[p] R) := by
   obtain ⟨h1, -, -⟩ := btP_facts hS H e π horth hσ hsT hPT hsL hPL
   ext i j
   rw [stdJ_form4, ← h1, Matrix.sub_apply, Matrix.mul_apply, Matrix.mul_apply,

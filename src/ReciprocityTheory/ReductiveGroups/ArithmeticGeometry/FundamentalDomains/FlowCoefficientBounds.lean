@@ -1,7 +1,50 @@
 module
 
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.FundamentalDomains.FlowIsotropicPairs
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.FundamentalDomains.M3bNormHolds
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.FundamentalDomains.IsotropicOutsideLine
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Lemma
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -12,8 +55,8 @@ open scoped ComplexConjugate
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {r : ℕ} (X : Data E r)
 
-theorem dmin_ne {x : Frame X.Ψ r} (hx : x ∈ X.dom) (τ : X.Ψ) (i : Fin (r + 1))
-    : dmin X.Gm x τ i ≠ 0 := by
+theorem dmin_ne {x : Frame X.Ψ r} (hx : x ∈ X.dom) (τ : X.Ψ) (i : Fin (r + 1)) :
+    dmin X.Gm x τ i ≠ 0 := by
   intro h
   have h1 := (hx τ).2 i
   rw [h] at h1
@@ -39,10 +82,10 @@ private lemma sum_sum_sub_isotropic_shift_eq_of_conj_eq_neg {r : ℕ} (g : Fin r
   set A := ∑ p, ∑ q, v p * g p q * conj (z q) with hA
   set B := ∑ p, ∑ q, w p * g p q * conj (z q) with hB
   have hB' : conj B = ∑ a, ∑ b, z a * g a b * conj (w b) := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hB, map_sum]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp_rw [map_sum, map_mul, Complex.conj_conj, hg]
+
+    rw [hB, map_sum]
+
+    simp_rw [map_sum, map_mul, Complex.conj_conj, hg]
     rw [Finset.sum_comm]
     exact Finset.sum_congr rfl fun a _ => Finset.sum_congr rfl fun b _ => by ring
   have expand : ∀ a b, (v a - α * A * z a) * g a b * conj (w b - α * B * z b) =
@@ -55,24 +98,19 @@ private lemma sum_sum_sub_isotropic_shift_eq_of_conj_eq_neg {r : ℕ} (g : Fin r
   rw [← hA, ← hB', hz]
   ring
 
-theorem flow_real
-    {ξ : Fin r → E} (hξ : X.IsIso ξ)
-    {x : Frame X.Ψ r} (hx : x ∈ X.dom)
-    (s : X.Ψ → ℝ) (la : Wt X.Ψ r)
-    : X.flow ξ (fun τ => (s τ : ℂ)) x ∈ X.dom
-      ∧ X.nfac la (X.flow ξ (fun τ => (s τ : ℂ)) x) = X.nfac la x := by
-  have hflow
-      : ∀ τ : X.Ψ,
-        gram τ.1 X.Gm (mat (X.flow ξ (fun τ => (s τ : ℂ)) x) τ) = gram τ.1 X.Gm (mat x τ)
-          ∧ (X.flowMat ξ τ (s τ)).det = 1 := by
+theorem flow_real {ξ : Fin r → E} (hξ : X.IsIso ξ) {x : Frame X.Ψ r} (hx : x ∈ X.dom)
+    (s : X.Ψ → ℝ) (la : Wt X.Ψ r) :
+    X.flow ξ (fun τ => (s τ : ℂ)) x ∈ X.dom ∧
+      X.nfac la (X.flow ξ (fun τ => (s τ : ℂ)) x) = X.nfac la x := by
+  have hflow : ∀ τ : X.Ψ, gram τ.1 X.Gm (mat (X.flow ξ (fun τ => (s τ : ℂ)) x) τ) =
+      gram τ.1 X.Gm (mat x τ) ∧ (X.flowMat ξ τ (s τ)).det = 1 := by
     intro τ
     have hg : ∀ p q, conj (τ.1 (X.Gm p q)) = τ.1 (X.Gm q p) := fun p q => by
       rw [← X.Gm_herm p q, cc, IsCMField.complexEmbedding_complexConj]
     have hz : ∑ a, ∑ b, τ.1 (ξ a) * τ.1 (X.Gm a b) * conj (τ.1 (ξ b)) = 0 := by
       have h0 := congrArg τ.1 hξ.2.1
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [herm, map_sum, map_mul, map_zero, cc, IsCMField.complexEmbedding_complexConj]
-          at h0
+
+      simp only [herm, map_sum, map_mul, map_zero, cc, IsCMField.complexEmbedding_complexConj] at h0
       exact h0
     have hα : conj (I * (X.c τ : ℂ) * (s τ : ℂ)) = -(I * (X.c τ : ℂ) * (s τ : ℂ)) := by
       rw [map_mul, map_mul, Complex.conj_I, Complex.conj_ofReal, Complex.conj_ofReal]
@@ -81,44 +119,26 @@ theorem flow_real
     · ext a b
       show hermC τ.1 X.Gm (col (X.flowMat ξ τ (s τ) * mat x τ) a) (col (X.flowMat ξ τ (s τ) * mat x τ) b) =
         hermC τ.1 X.Gm (col (mat x τ) a) (col (mat x τ) b)
-      have hcol
-          : ∀ c : Fin r,
-            col (X.flowMat ξ τ (s τ) * mat x τ) c
-              = fun p =>
-                col (mat x τ) c p
-                  - (I * (X.c τ : ℂ) * (s τ : ℂ))
-                    * (∑ p', ∑ q, col (mat x τ) c p' * τ.1 (X.Gm p' q) * conj (τ.1 (ξ q)))
-                    * τ.1 (ξ p) := by
+      have hcol : ∀ c : Fin r, col (X.flowMat ξ τ (s τ) * mat x τ) c = fun p => col (mat x τ) c p -
+          (I * (X.c τ : ℂ) * (s τ : ℂ)) * (∑ p', ∑ q, col (mat x τ) c p' * τ.1 (X.Gm p' q) * conj (τ.1 (ξ q))) * τ.1 (ξ p) := by
         intro c
         funext p
-        simp only [col, Data.flowMat, Matrix.mul_apply, Matrix.of_apply, sub_mul,
-          Finset.sum_sub_distrib, ite_mul, one_mul, zero_mul, Finset.sum_ite_eq, Finset.mem_univ,
-          reduceIte]
+        simp only [col, Data.flowMat, Matrix.mul_apply, Matrix.of_apply, sub_mul, Finset.sum_sub_distrib,
+          ite_mul, one_mul, zero_mul, Finset.sum_ite_eq, Finset.mem_univ, reduceIte]
         congr 1
         simp only [Finset.mul_sum, Finset.sum_mul]
         exact Finset.sum_congr rfl fun l _ => Finset.sum_congr rfl fun k _ => by ring
       unfold hermC
       rw [hcol a, hcol b]
-      exact sum_sum_sub_isotropic_shift_eq_of_conj_eq_neg
-        (fun p q => τ.1 (X.Gm p q))
-        hg
-        (fun q => τ.1 (ξ q))
-        (col (mat x τ) a) (col (mat x τ) b) (I * (X.c τ : ℂ) * (s τ : ℂ)) hα hz
-    · have hT
-          : X.flowMat ξ τ (s τ)
-            = 1
-              + Matrix.replicateCol (Fin 1) (fun a => -((I * (X.c τ : ℂ) * (s τ : ℂ)) * τ.1 (ξ a)))
-                * Matrix.replicateRow (Fin 1)
-                  (fun b => ∑ k, τ.1 (X.Gm b k) * conj (τ.1 (ξ k))) := by
+      exact sum_sum_sub_isotropic_shift_eq_of_conj_eq_neg (fun p q => τ.1 (X.Gm p q)) hg (fun q => τ.1 (ξ q)) (col (mat x τ) a)
+        (col (mat x τ) b) (I * (X.c τ : ℂ) * (s τ : ℂ)) hα hz
+    · have hT : X.flowMat ξ τ (s τ) = 1 + Matrix.replicateCol (Fin 1) (fun a => -((I * (X.c τ : ℂ) * (s τ : ℂ)) * τ.1 (ξ a))) *
+          Matrix.replicateRow (Fin 1) (fun b => ∑ k, τ.1 (X.Gm b k) * conj (τ.1 (ξ k))) := by
         ext a b
         simp [Data.flowMat, Matrix.mul_apply, Matrix.one_apply] <;> ring
-      have h5
-          : ∑ b, (∑ k, τ.1 (X.Gm b k) * conj (τ.1 (ξ k))) * -((I * (X.c τ : ℂ) * (s τ : ℂ)) * τ.1 (ξ b))
-            = 0 := by
-        have h6
-            : ∑ b, (∑ k, τ.1 (X.Gm b k) * conj (τ.1 (ξ k))) * -((I * (X.c τ : ℂ) * (s τ : ℂ)) * τ.1 (ξ b))
-              = -(I * (X.c τ : ℂ) * (s τ : ℂ))
-                * ∑ b, ∑ k, τ.1 (ξ b) * τ.1 (X.Gm b k) * conj (τ.1 (ξ k)) := by
+      have h5 : ∑ b, (∑ k, τ.1 (X.Gm b k) * conj (τ.1 (ξ k))) * -((I * (X.c τ : ℂ) * (s τ : ℂ)) * τ.1 (ξ b)) = 0 := by
+        have h6 : ∑ b, (∑ k, τ.1 (X.Gm b k) * conj (τ.1 (ξ k))) * -((I * (X.c τ : ℂ) * (s τ : ℂ)) * τ.1 (ξ b)) =
+            -(I * (X.c τ : ℂ) * (s τ : ℂ)) * ∑ b, ∑ k, τ.1 (ξ b) * τ.1 (X.Gm b k) * conj (τ.1 (ξ k)) := by
           rw [Finset.mul_sum]
           refine Finset.sum_congr rfl fun b _ => ?_
           rw [Finset.sum_mul, Finset.mul_sum]
@@ -145,12 +165,9 @@ theorem flow_real
   · unfold Data.nfac
     simp only [hdmin]
 
-theorem fj_bound
-    (la : Wt X.Ψ r) (P : Frame X.Ψ r → ℂ) (C : ℝ) (hP : ∀ y ∈ X.dom, X.pnorm la P y ≤ C)
-    {ξ : Fin r → E} (hξ : X.IsIso ξ)
-    (ν : X.Ψ → ℝ)
-    {x : Frame X.Ψ r} (hx : x ∈ X.dom)
-    : X.pnorm la (X.fj la ξ ν P) x ≤ C := by
+theorem fj_bound (la : Wt X.Ψ r) (P : Frame X.Ψ r → ℂ) (C : ℝ)
+    (hP : ∀ y ∈ X.dom, X.pnorm la P y ≤ C) {ξ : Fin r → E} (hξ : X.IsIso ξ) (ν : X.Ψ → ℝ)
+    {x : Frame X.Ψ r} (hx : x ∈ X.dom) : X.pnorm la (X.fj la ξ ν P) x ≤ C := by
   have hpos := nfac_pos X hx la
   change ‖X.fj la ξ ν P x‖ * X.nfac la x ≤ C
   have hC : 0 ≤ C := le_trans (by unfold Data.pnorm; positivity) (hP x hx)
@@ -158,11 +175,8 @@ theorem fj_bound
   split_ifs with h1 h2
   · obtain ⟨-, -, hD0, hDt⟩ := h2.choose_spec
     rw [← le_div_iff₀ hpos, norm_mul]
-    have hpt
-        : ∀ s : X.Ψ → ℝ,
-          ‖P (X.flow ξ (fun τ => (s τ : ℂ)) x) *
-              cexp (-(4 * Real.pi * I) * ∑ τ, (ν τ : ℂ) * s τ)‖
-            ≤ C / X.nfac la x := by
+    have hpt : ∀ s : X.Ψ → ℝ, ‖P (X.flow ξ (fun τ => (s τ : ℂ)) x) *
+        cexp (-(4 * Real.pi * I) * ∑ τ, (ν τ : ℂ) * s τ)‖ ≤ C / X.nfac la x := by
       intro s
       obtain ⟨hd, hn⟩ := flow_real X hξ hx s la
       rw [norm_mul, norm_cexp_I _ (by rw [Complex.im_sum]; simp), mul_one, le_div_iff₀ hpos, ← hn]
@@ -185,38 +199,30 @@ theorem herm_of_LZ {g : ℕ} {b : X.Ψ → Fin 2 → Fin 2 → ℂ} (hb : b ∈ 
   simp only [Data.embH]
   rw [← hβ i k, cc, IsCMField.complexEmbedding_complexConj]
 
-theorem herm_sum
-    {n : ℕ} (ω : Fin n → X.Ψ → Fin 2 → Fin 2 → ℂ) (hω : ∀ j, IsHermFam (ω j)) (t : Fin n → ℝ)
-    : IsHermFam (∑ j, (t j : ℂ) • ω j) := by
+theorem herm_sum {n : ℕ} (ω : Fin n → X.Ψ → Fin 2 → Fin 2 → ℂ) (hω : ∀ j, IsHermFam (ω j))
+    (t : Fin n → ℝ) : IsHermFam (∑ j, (t j : ℂ) • ω j) := by
   intro τ i k
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [Finset.sum_apply, Pi.smul_apply, smul_eq_mul, map_sum, map_mul, Complex.conj_ofReal]
+
+  simp only [Finset.sum_apply, Pi.smul_apply, smul_eq_mul, map_sum, map_mul, Complex.conj_ofReal]
   exact Finset.sum_congr rfl fun j _ => by rw [hω j τ i k]
 
-theorem fz_bound
-    (u : Fin 2 → Fin r → E)
-    (g : ℕ) (χ : X.Ψ → Fin 2 → Fin 2 → ℂ)
-    (G : Frame X.Ψ r → ℂ) (la : Wt X.Ψ r)
-    {y : Frame X.Ψ r} (hy : y ∈ X.dom)
-    (M : ℝ) (hM : 0 ≤ M) (hb : ∀ b, IsHermFam b → ‖G (X.Zb u b y)‖ * X.nfac la y ≤ M)
-    : X.pnorm la (X.fz u g χ G) y ≤ M := by
+theorem fz_bound (u : Fin 2 → Fin r → E) (g : ℕ) (χ : X.Ψ → Fin 2 → Fin 2 → ℂ)
+    (G : Frame X.Ψ r → ℂ) (la : Wt X.Ψ r) {y : Frame X.Ψ r} (hy : y ∈ X.dom) (M : ℝ) (hM : 0 ≤ M)
+    (hb : ∀ b, IsHermFam b → ‖G (X.Zb u b y)‖ * X.nfac la y ≤ M) :
+    X.pnorm la (X.fz u g χ G) y ≤ M := by
   have hpos := nfac_pos X hy la
   change ‖X.fz u g χ G y‖ * X.nfac la y ≤ M
   unfold Data.fz
   split_ifs with h1 h2
   · rw [← le_div_iff₀ hpos]
-    have hpt
-        : ∀ t : Fin (4 * Fintype.card X.Ψ) → ℝ,
-          ‖G (X.Zb u (∑ j, (t j : ℂ) • h2.choose j) y) *
-              cexp (-(4 * Real.pi * I) * X.pairR χ (∑ j, (t j : ℂ) • h2.choose j))‖
-            ≤ M / X.nfac la y := by
+    have hpt : ∀ t : Fin (4 * Fintype.card X.Ψ) → ℝ, ‖G (X.Zb u (∑ j, (t j : ℂ) • h2.choose j) y) *
+        cexp (-(4 * Real.pi * I) * X.pairR χ (∑ j, (t j : ℂ) • h2.choose j))‖ ≤ M / X.nfac la y := by
       intro t
       have hherm : IsHermFam (∑ j, (t j : ℂ) • h2.choose j) :=
         herm_sum X _ (fun j => herm_of_LZ X (h2.choose_spec.1 j)) t
       rw [norm_mul, norm_cexp_I _ (Complex.ofReal_im _), mul_one, le_div_iff₀ hpos]
       exact hb _ hherm
-    have hvol
-        : volume (Set.pi Set.univ fun _ : Fin (4 * Fintype.card X.Ψ) => Set.Icc (0 : ℝ) 1) = 1 := by
+    have hvol : volume (Set.pi Set.univ fun _ : Fin (4 * Fintype.card X.Ψ) => Set.Icc (0 : ℝ) 1) = 1 := by
       rw [volume_pi_pi]
       simp [Real.volume_Icc]
     haveI : IsFiniteMeasure (volume.restrict

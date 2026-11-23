@@ -2,22 +2,66 @@ module
 
 public import Development.AutomorphicArithmetic.AutomorphicVarieties.PatchingModules.ClosureConjugation.GrAlg
 public import Development.AutomorphicArithmetic.AutomorphicVarieties.AlgebraTools.AlghomOfUnits
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.SimpleModule.WedderburnArtin
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
+import Development.AutomorphicArithmetic.AutomorphicVarieties.CommutativeAlgebraHeight.IsLocalHom
 
 @[expose] public section
 
-open IsLocalRing Matrix UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.AlgebraTools
-  UpperTheory.V.CA UpperTheory.V.Pa Polynomial
+open IsLocalRing Matrix UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.AlgebraTools UpperTheory.V.CA UpperTheory.V.Pa Polynomial
 open scoped TensorProduct
 
-theorem UpperTheory.V.Pa.gr_ss
-    : ∀ {B E F : Type} [CommRing B] [IsLocalRing B] [Ring E] [Algebra B E] [Field F] [Algebra B F]
-        {n : ℕ} {a : ℕ} {T : TrInv B E} {r : E →ₐ[B] Matrix (Fin n) (Fin n) F} {ep : Fin n → E}
-        (g : GrAlg T n a r ep) (κ : Type) [Field κ] [Algebra B κ] (s : B),
-      algebraMap B κ s ≠ 0 → s ∈ Module.annihilator B g.N → IsSemisimpleRing (κ ⊗[B] E) := by
+theorem UpperTheory.V.Pa.gr_ss :
+    ∀ {B E F : Type} [CommRing B] [IsLocalRing B] [Ring E] [Algebra B E] [Field F] [Algebra B F] {n : ℕ} {a : ℕ} {T : TrInv B E} {r : E →ₐ[B] Matrix (Fin n) (Fin n) F} {ep : Fin n → E} (g : GrAlg T n a r ep) (κ : Type) [Field κ] [Algebra B κ] (s : B), algebraMap B κ s ≠ 0 → s ∈ Module.annihilator B g.N → IsSemisimpleRing (κ ⊗[B] E) := by
   intro B E F _ _ _ _ _ _ n a T r ep g κ _ _ s hs hann
   classical
-  let M : Fin n → Fin n → Matrix (Fin n) (Fin n) g.AA := fun i k =>
-    Matrix.single i k (if ((i : ℕ) < a ↔ (k : ℕ) < a) then 1 else 0)
+  let M : Fin n → Fin n → Matrix (Fin n) (Fin n) g.AA :=
+    fun i k => Matrix.single i k (if ((i : ℕ) < a ↔ (k : ℕ) < a) then 1 else 0)
   have hM : ∀ i k, ∃ x : E, g.φ x = M i k := by
     intro i k
     rw [← Set.mem_range, g.range]
@@ -35,9 +79,8 @@ theorem UpperTheory.V.Pa.gr_ss
       · exact zero_mem _
       · exact zero_mem _
   choose e he using hM
-  have hmul
-      : ∀ i k l : Fin n,
-        ((i : ℕ) < a ↔ (k : ℕ) < a) → ((k : ℕ) < a ↔ (l : ℕ) < a) → e i k * e k l = e i l := by
+  have hmul : ∀ i k l : Fin n, ((i : ℕ) < a ↔ (k : ℕ) < a) → ((k : ℕ) < a ↔ (l : ℕ) < a) →
+      e i k * e k l = e i l := by
     intro i k l hik hkl
     apply g.φ_inj
     rw [map_mul, he, he, he]
@@ -55,8 +98,8 @@ theorem UpperTheory.V.Pa.gr_ss
     simp only [M, if_neg hik, Matrix.single_zero]
   have hsum : ∑ i, e i i = 1 := by
     apply g.φ_inj
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, map_one]
+
+    rw [map_sum, map_one]
     simp only [he, M, iff_self, if_true]
     ext p q
     rw [Matrix.sum_apply]
@@ -68,8 +111,7 @@ theorem UpperTheory.V.Pa.gr_ss
       exact Finset.sum_eq_zero (fun x _ => if_neg (fun h => hpq (h.1.symm.trans h.2)))
   have hdec : ∀ y : E, ∃ b : Fin n → Fin n → B, s • y = ∑ i, ∑ k, b i k • e i k := by
     intro y
-    have hent
-        : ∀ i k, ∃ c : B, s • g.φ y i k = c • (if ((i : ℕ) < a ↔ (k : ℕ) < a) then 1 else 0) := by
+    have hent : ∀ i k, ∃ c : B, s • g.φ y i k = c • (if ((i : ℕ) < a ↔ (k : ℕ) < a) then 1 else 0) := by
       intro i k
       obtain ⟨h1, h2⟩ := (g.range (g.φ y)).mp ⟨y, rfl⟩ i k
       by_cases hik : ((i : ℕ) < a ↔ (k : ℕ) < a)
@@ -82,15 +124,13 @@ theorem UpperTheory.V.Pa.gr_ss
         simpa using congrArg Subtype.val this
     choose c hc using hent
     refine ⟨c, g.φ_inj ?_⟩
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_smul, map_sum]
+
+    rw [map_smul, map_sum]
     ext p q
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_smul, he, M, Matrix.smul_apply, Matrix.sum_apply, Matrix.single_apply]
-    rw [hc,
-      Finset.sum_eq_single p
-        (fun i _ hi => Finset.sum_eq_zero (fun k _ => by rw [if_neg (fun h => hi h.1), smul_zero]))
-        (by simp),
+
+    simp only [map_sum, map_smul, he, M, Matrix.smul_apply, Matrix.sum_apply, Matrix.single_apply]
+    rw [hc, Finset.sum_eq_single p (fun i _ hi => Finset.sum_eq_zero (fun k _ => by
+        rw [if_neg (fun h => hi h.1), smul_zero])) (by simp),
       Finset.sum_eq_single q (fun k _ hk => by rw [if_neg (fun h => hk h.2), smul_zero]) (by simp)]
     simp
   let bf : Fin n → Bool := fun i => decide ((i : ℕ) < a)
@@ -103,21 +143,20 @@ theorem UpperTheory.V.Pa.gr_ss
     obtain ⟨i, hi⟩ := Set.rangeFactorization_surjective t
     exact ⟨⟨i, hi⟩⟩
   let ee : (t : Set.range bf) → d t → d t → κ ⊗[B] E := fun t i k => (1 : κ) ⊗ₜ[B] e i.1 k.1
-  obtain ⟨j, hj⟩ :=
-    alghom_of_units (K := κ) (E := κ ⊗[B] E) d ee
-      (fun t i k l => by
-        simp only [ee, Algebra.TensorProduct.tmul_mul_tmul, one_mul]
-        rw [hmul _ _ _ ((hcl _ _).mp (i.2.trans k.2.symm)) ((hcl _ _).mp (k.2.trans l.2.symm))])
-      (fun t i k l m hkl => by
-        simp only [ee, Algebra.TensorProduct.tmul_mul_tmul, one_mul]
-        rw [hzero _ _ _ _ (fun h => hkl (Subtype.ext h)), TensorProduct.tmul_zero])
-      (fun t u i k l m htu => by
-        simp only [ee, Algebra.TensorProduct.tmul_mul_tmul, one_mul]
-        rw [hzero _ _ _ _ (fun h => htu (by rw [← k.2, ← l.2, h])), TensorProduct.tmul_zero])
-      (by
-        simp only [ee]
-        rw [Fintype.sum_fiberwise cl (fun i => (1 : κ) ⊗ₜ[B] e i i), ← TensorProduct.tmul_sum, hsum,
-          Algebra.TensorProduct.one_def])
+  obtain ⟨j, hj⟩ := alghom_of_units (K := κ) (E := κ ⊗[B] E) d ee
+    (fun t i k l => by
+      simp only [ee, Algebra.TensorProduct.tmul_mul_tmul, one_mul]
+      rw [hmul _ _ _ ((hcl _ _).mp (i.2.trans k.2.symm)) ((hcl _ _).mp (k.2.trans l.2.symm))])
+    (fun t i k l m hkl => by
+      simp only [ee, Algebra.TensorProduct.tmul_mul_tmul, one_mul]
+      rw [hzero _ _ _ _ (fun h => hkl (Subtype.ext h)), TensorProduct.tmul_zero])
+    (fun t u i k l m htu => by
+      simp only [ee, Algebra.TensorProduct.tmul_mul_tmul, one_mul]
+      rw [hzero _ _ _ _ (fun h => htu (by rw [← k.2, ← l.2, h])), TensorProduct.tmul_zero])
+    (by
+      simp only [ee]
+      rw [Fintype.sum_fiberwise cl (fun i => (1 : κ) ⊗ₜ[B] e i i), ← TensorProduct.tmul_sum, hsum,
+        Algebra.TensorProduct.one_def])
   have hgen : ∀ i k : Fin n, (1 : κ) ⊗ₜ[B] e i k ∈ j.range := by
     intro i k
     by_cases hik : ((i : ℕ) < a ↔ (k : ℕ) < a)

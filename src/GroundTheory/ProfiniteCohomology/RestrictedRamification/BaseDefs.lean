@@ -1,13 +1,57 @@
 module
 
-public import Mathlib
-public import GroundTheory.ProfiniteCohomology.RestrictedRamification.Brauer
 public import GroundTheory.ProfiniteCohomology.RestrictedRamification.BaseChangeMackey
-public import GroundTheory.ProfiniteCohomology.GlobalClassFormation.SumInvariants
-public import GroundTheory.ProfiniteCohomology.GlobalClassFormation.RealPlaces
 public import GroundTheory.ProfiniteCohomology.CompactSupportCohomology
 public import GroundTheory.ProfiniteCohomology.PoincareDuality.Torsion
+public import GroundTheory.GlobalFields.CompletionAtPlace.Integers
+public import GroundTheory.ProfiniteCohomology.GlobalClassFormation.EqZeroOfBrauerLocalApplyEqZero
+public import GroundTheory.ProfiniteCohomology.RestrictedRamification.BrauerDefs
+public import GroundTheory.ProfiniteCohomology.RestrictedRamification.BrauerLocalDefs
+public import Mathlib.NumberTheory.NumberField.InfinitePlace.TotallyRealComplex
 public import GroundTheory.ProfiniteCohomology.CohomologicalDimension.SubsingletonCohomologyOfPrimaryOfFinite
+import GroundTheory.ProfiniteCohomology.CupProducts.Cocycles
+public import GroundTheory.ProfiniteCohomology.GlobalClassFormation.RealPlaces
+public import GroundTheory.ProfiniteCohomology.GlobalClassFormation.SumInvariants
+public import GroundTheory.ProfiniteCohomology.RestrictedRamification.Brauer
+import GroundTheory.ProfiniteCohomology.RestrictedRamification.BrauerSplit
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.TypeStar
 
 @[expose] public section
 
@@ -23,28 +67,23 @@ noncomputable section
 
 section ULiftCompare
 
-variable
-  {G H : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [Group H] [TopologicalSpace H]
-  [IsTopologicalGroup H]
-  (φ : H →* G) (hφ : Continuous φ)
-  {A B : Rep.{0} (ULift.{0} ℤ) G} [IsDiscreteRep A] [IsDiscreteRep B]
-  {C : Rep.{0} ℤ H}
-  [IsDiscreteRep C] [IsDiscreteRep (Rep.res φ A)] [IsDiscreteRep (uliftIntToIntRep (Rep.res φ A))]
+variable {G H : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [Group H] [TopologicalSpace H]
+  [IsTopologicalGroup H] (φ : H →* G) (hφ : Continuous φ) {A B : Rep.{0} (ULift.{0} ℤ) G} [IsDiscreteRep A]
+  [IsDiscreteRep B] {C : Rep.{0} ℤ H} [IsDiscreteRep C] [IsDiscreteRep (Rep.res φ A)]
+  [IsDiscreteRep (uliftIntToIntRep (Rep.res φ A))]
 
-theorem cohomologyMap_uliftInt_cohomologyMapAlong
-    {A' : Rep.{0} (ULift.{0} ℤ) G} [IsDiscreteRep A']
-    (g₁ : A ⟶ A') (g₂ : A' ⟶ B) (f₁ : uliftIntToIntRep (Rep.res φ A) ⟶ C)
-    (f₂ : Rep.res φ (uliftIntToIntRep B) ⟶ C) (hf : ∀ a : A, f₁.hom a = f₂.hom (g₂.hom (g₁.hom a)))
-    (m : ℕ) (x : cohomology A m)
-    : (cohomologyMap f₁ m).hom
-        (cohomologyULiftIntAddEquiv _ m ((cohomologyMapAlong φ hφ (𝟙 (Rep.res φ A)) m).hom x))
-      = (cohomologyMapAlong φ hφ f₂ m).hom
-        (cohomologyULiftIntAddEquiv _ m
-          ((cohomologyMap g₂ m).hom ((cohomologyMap g₁ m).hom x))) := by
+theorem cohomologyMap_uliftInt_cohomologyMapAlong {A' : Rep.{0} (ULift.{0} ℤ) G} [IsDiscreteRep A']
+    (g₁ : A ⟶ A') (g₂ : A' ⟶ B)
+    (f₁ : uliftIntToIntRep (Rep.res φ A) ⟶ C) (f₂ : Rep.res φ (uliftIntToIntRep B) ⟶ C)
+    (hf : ∀ a : A, f₁.hom a = f₂.hom (g₂.hom (g₁.hom a))) (m : ℕ) (x : cohomology A m) :
+    (cohomologyMap f₁ m).hom (cohomologyULiftIntAddEquiv _ m
+        ((cohomologyMapAlong φ hφ (𝟙 (Rep.res φ A)) m).hom x)) =
+      (cohomologyMapAlong φ hφ f₂ m).hom (cohomologyULiftIntAddEquiv _ m
+        ((cohomologyMap g₂ m).hom ((cohomologyMap g₁ m).hom x))) := by
   obtain ⟨z, rfl⟩ := cohomologyπ_surjective A m x
-  rw [cohomologyMapAlong_cohomologyπ, cohomologyULiftIntAddEquiv_cohomologyπ',
-    cohomologyMap_cohomologyπ, cohomologyMap_cohomologyπ, cohomologyMap_cohomologyπ,
-    cohomologyULiftIntAddEquiv_cohomologyπ', cohomologyMapAlong_cohomologyπ]
+  rw [cohomologyMapAlong_cohomologyπ, cohomologyULiftIntAddEquiv_cohomologyπ', cohomologyMap_cohomologyπ,
+    cohomologyMap_cohomologyπ, cohomologyMap_cohomologyπ, cohomologyULiftIntAddEquiv_cohomologyπ',
+    cohomologyMapAlong_cohomologyπ]
   congr 1
   apply cocycles_ext
   rw [cochainOf_cocycleι_cyclesMap, cochainOf_cocycleι_cocyclesULiftInt,
@@ -57,28 +96,21 @@ end ULiftCompare
 
 section Descend
 
-variable
-  {R G Q M : Type*} [Ring R] {_ : AddCommGroup G} {_ : AddCommGroup Q} [AddCommGroup M]
+variable {R G Q M : Type*} [Ring R] {_ : AddCommGroup G} {_ : AddCommGroup Q} [AddCommGroup M]
   {_ : Module R G} {_ : Module R Q}
 
-noncomputable def descendAlong
-    (f : G →ₗ[R] Q) (hf : Function.Surjective f) (φ : G →+ M) (h : f.toAddMonoidHom.ker ≤ φ.ker)
-    : Q →+ M :=
+noncomputable def descendAlong (f : G →ₗ[R] Q) (hf : Function.Surjective f) (φ : G →+ M)
+    (h : f.toAddMonoidHom.ker ≤ φ.ker) : Q →+ M :=
   (QuotientAddGroup.lift _ φ h).comp
     (QuotientAddGroup.quotientKerEquivOfSurjective f.toAddMonoidHom hf).symm.toAddMonoidHom
 
-theorem descendAlong_apply
-    (f : G →ₗ[R] Q) (hf : Function.Surjective f)
-    (φ : G →+ M) (h : f.toAddMonoidHom.ker ≤ φ.ker)
-    (g : G)
-    : descendAlong f hf φ h (f g) = φ g := by
-  have e
-      : (QuotientAddGroup.quotientKerEquivOfSurjective f.toAddMonoidHom hf).symm (f g)
-        = (g : G ⧸ f.toAddMonoidHom.ker) :=
+theorem descendAlong_apply (f : G →ₗ[R] Q) (hf : Function.Surjective f) (φ : G →+ M)
+    (h : f.toAddMonoidHom.ker ≤ φ.ker) (g : G) : descendAlong f hf φ h (f g) = φ g := by
+  have e : (QuotientAddGroup.quotientKerEquivOfSurjective f.toAddMonoidHom hf).symm (f g) =
+      (g : G ⧸ f.toAddMonoidHom.ker) :=
     (AddEquiv.symm_apply_eq _).2 rfl
   change QuotientAddGroup.lift _ φ h
-      ((QuotientAddGroup.quotientKerEquivOfSurjective f.toAddMonoidHom hf).symm (f g))
-    = φ g
+    ((QuotientAddGroup.quotientKerEquivOfSurjective f.toAddMonoidHom hf).symm (f g)) = φ g
   rw [e]
   rfl
 
@@ -94,45 +126,39 @@ abbrev gsRoots (n : ℕ) : Rep.{0} (ULift.{0} ℤ) (galUnramifiedOutside K.1 ℚ
 instance isDiscreteRep_gsRoots (n : ℕ) : IsDiscreteRep (gsRoots S n) :=
   isDiscreteRep_galRootsOfUnity n
 
-variable
-  (ιs : ∀ v : S, ℚ̄ →ₐ[K.1] AlgebraicClosure ((v : HeightOneSpectrum (𝓞 K.1)).adicCompletion K.1))
+variable (ιs : ∀ v : S, ℚ̄ →ₐ[K.1] AlgebraicClosure ((v : HeightOneSpectrum (𝓞 K.1)).adicCompletion K.1))
   (n : ℕ)
 
-instance isDiscreteRep_res_gsRoots (v : S)
-    : IsDiscreteRep (Rep.res (gsFinFamily S ιs v).toMonoidHom (gsRoots S n)) :=
+instance isDiscreteRep_res_gsRoots (v : S) :
+    IsDiscreteRep (Rep.res (gsFinFamily S ιs v).toMonoidHom (gsRoots S n)) :=
   isDiscreteRep_res_toMonoidHom (gsFinFamily S ιs v) (gsRoots S n)
 
-instance isDiscreteRep_uliftIntToIntRep_res_gsRoots (v : S)
-    : IsDiscreteRep (uliftIntToIntRep (Rep.res (gsFinFamily S ιs v).toMonoidHom (gsRoots S n))) :=
+instance isDiscreteRep_uliftIntToIntRep_res_gsRoots (v : S) :
+    IsDiscreteRep (uliftIntToIntRep (Rep.res (gsFinFamily S ιs v).toMonoidHom (gsRoots S n))) :=
   ⟨fun a => isOpen_stabilizer (Rep.res (gsFinFamily S ιs v).toMonoidHom (gsRoots S n)) a⟩
 
-def rootsLocalMorZ (v : S)
-    : uliftIntToIntRep (Rep.res (gsFinFamily S ιs v).toMonoidHom (gsRoots S n))
-      ⟶ galUnitsZ ((v : HeightOneSpectrum (𝓞 K.1)).adicCompletion K.1)
+def rootsLocalMorZ (v : S) :
+    uliftIntToIntRep (Rep.res (gsFinFamily S ιs v).toMonoidHom (gsRoots S n)) ⟶
+      galUnitsZ ((v : HeightOneSpectrum (𝓞 K.1)).adicCompletion K.1)
         (AlgebraicClosure ((v : HeightOneSpectrum (𝓞 K.1)).adicCompletion K.1)) :=
-  Rep.ofHom ⟨
-    (MonoidHom.toAdditive
+  Rep.ofHom ⟨(MonoidHom.toAdditive
       ((Units.map ((ιs v).comp (maxUnramifiedOutside K.1 ℚ̄ S).val).toRingHom.toMonoidHom).comp
         (rootsOfUnity n (maxUnramifiedOutside K.1 ℚ̄ S)).subtype)).toIntLinearMap,
-    fun σ =>
-      LinearMap.ext fun ζ =>
-        congrArg Additive.ofMul
-          (Units.ext (gsFinFamily_apply S ιs v σ
-            (((Additive.toMul ζ : rootsOfUnity n _) : (maxUnramifiedOutside K.1 ℚ̄ S)ˣ)
-              : maxUnramifiedOutside K.1 ℚ̄ S)))
-  ⟩
+    fun σ => LinearMap.ext fun ζ => congrArg Additive.ofMul
+      (Units.ext (gsFinFamily_apply S ιs v σ
+        (((Additive.toMul ζ : rootsOfUnity n _) : (maxUnramifiedOutside K.1 ℚ̄ S)ˣ) :
+          maxUnramifiedOutside K.1 ℚ̄ S)))⟩
 
 @[simp]
-theorem rootsLocalMorZ_hom_apply
-    (v : S) (ζ : Additive (rootsOfUnity n (maxUnramifiedOutside K.1 ℚ̄ S)))
-    : ((Additive.toMul ((rootsLocalMorZ S ιs n v).hom ζ)
-          : (AlgebraicClosure ((v : HeightOneSpectrum (𝓞 K.1)).adicCompletion K.1))ˣ)
-        : AlgebraicClosure ((v : HeightOneSpectrum (𝓞 K.1)).adicCompletion K.1))
-      = ιs v (((Additive.toMul ζ : rootsOfUnity n _) : (maxUnramifiedOutside K.1 ℚ̄ S)ˣ) : ℚ̄) :=
+theorem rootsLocalMorZ_hom_apply (v : S) (ζ : Additive (rootsOfUnity n (maxUnramifiedOutside K.1 ℚ̄ S))) :
+    ((Additive.toMul ((rootsLocalMorZ S ιs n v).hom ζ) :
+        (AlgebraicClosure ((v : HeightOneSpectrum (𝓞 K.1)).adicCompletion K.1))ˣ) :
+      AlgebraicClosure ((v : HeightOneSpectrum (𝓞 K.1)).adicCompletion K.1)) =
+      ιs v (((Additive.toMul ζ : rootsOfUnity n _) : (maxUnramifiedOutside K.1 ℚ̄ S)ˣ) : ℚ̄) :=
   rfl
 
-def gsLocalInvRootsQZ (v : S)
-    : cohomology (Rep.res (gsFinFamily S ιs v).toMonoidHom (gsRoots S n)) 2 →+ QZ :=
+def gsLocalInvRootsQZ (v : S) :
+    cohomology (Rep.res (gsFinFamily S ιs v).toMonoidHom (gsRoots S n)) 2 →+ QZ :=
   (brauerInvZOfIsSepClosure ((v : HeightOneSpectrum (𝓞 K.1)).adicCompletion K.1)
       (AlgebraicClosure ((v : HeightOneSpectrum (𝓞 K.1)).adicCompletion K.1))).comp
     ((cohomologyMap (rootsLocalMorZ S ιs n v) 2).hom.toAddMonoidHom.comp
@@ -144,82 +170,80 @@ theorem nsmul_gsRoots (ζ : gsRoots S n) : n • ζ = 0 := by
   change ((Additive.toMul ζ : rootsOfUnity n _) : (maxUnramifiedOutside K.1 ℚ̄ S)ˣ) ^ n = 1
   exact (mem_rootsOfUnity n _).1 (Additive.toMul ζ).2
 
-theorem nsmul_gsLocalInvRootsQZ
-    (v : S) (y : cohomology (Rep.res (gsFinFamily S ιs v).toMonoidHom (gsRoots S n)) 2)
-    : n • gsLocalInvRootsQZ S ιs n v y = 0 := by
-  have h : n • y = 0 :=
-    nsmul_cohomology_eq_zero (Rep.res (gsFinFamily S ιs v).toMonoidHom (gsRoots S n))
-      (fun ζ => nsmul_gsRoots S n ζ)
-      2 y
+theorem nsmul_gsLocalInvRootsQZ (v : S)
+    (y : cohomology (Rep.res (gsFinFamily S ιs v).toMonoidHom (gsRoots S n)) 2) :
+    n • gsLocalInvRootsQZ S ιs n v y = 0 := by
+  have h : n • y = 0 := nsmul_cohomology_eq_zero (Rep.res (gsFinFamily S ιs v).toMonoidHom (gsRoots S n))
+    (fun ζ => nsmul_gsRoots S n ζ) 2 y
   exact (map_nsmul (gsLocalInvRootsQZ S ιs n v) n y).symm.trans
     ((congrArg (gsLocalInvRootsQZ S ιs n v) h).trans (map_zero _))
 
 variable [NeZero n]
 
-def gsLocalInvRoots (v : S)
-    : cohomology (Rep.res (gsFinFamily S ιs v).toMonoidHom (gsRoots S n)) 2 →+ ZMod n :=
+def gsLocalInvRoots (v : S) :
+    cohomology (Rep.res (gsFinFamily S ιs v).toMonoidHom (gsRoots S n)) 2 →+ ZMod n :=
   zmodOfQZ (gsLocalInvRootsQZ S ιs n v) (nsmul_gsLocalInvRootsQZ S ιs n v)
 
-theorem zmodToQZ_gsLocalInvRoots
-    (v : S) (y : cohomology (Rep.res (gsFinFamily S ιs v).toMonoidHom (gsRoots S n)) 2)
-    : zmodToQZ n (gsLocalInvRoots S ιs n v y) = gsLocalInvRootsQZ S ιs n v y :=
+theorem zmodToQZ_gsLocalInvRoots (v : S)
+    (y : cohomology (Rep.res (gsFinFamily S ιs v).toMonoidHom (gsRoots S n)) 2) :
+    zmodToQZ n (gsLocalInvRoots S ιs n v y) = gsLocalInvRootsQZ S ιs n v y :=
   zmodToQZ_zmodOfQZ _ _ y
 
 variable [Fintype S]
 
-def gsSumInvRoots
-    : ModuleCat.of (ULift.{0} ℤ)
-        (∀ v : S, cohomology (Rep.res (gsFinFamily S ιs v).toMonoidHom (gsRoots S n)) 2)
-      →+ ZMod n where
+def gsSumInvRoots :
+    ModuleCat.of (ULift.{0} ℤ) (∀ v : S, cohomology (Rep.res (gsFinFamily S ιs v).toMonoidHom (gsRoots S n)) 2) →+
+      ZMod n where
   toFun ξ := ∑ v : S, gsLocalInvRoots S ιs n v (ξ v)
   map_zero' := Finset.sum_eq_zero fun _ _ => map_zero _
   map_add' _ _ := (Finset.sum_congr rfl fun _ _ => map_add _ _ _).trans Finset.sum_add_distrib
 
 theorem gsSumInvRoots_apply
-    (ξ : ∀ v : S, cohomology (Rep.res (gsFinFamily S ιs v).toMonoidHom (gsRoots S n)) 2)
-    : gsSumInvRoots S ιs n ξ = ∑ v : S, gsLocalInvRoots S ιs n v (ξ v) := by
+    (ξ : ∀ v : S, cohomology (Rep.res (gsFinFamily S ιs v).toMonoidHom (gsRoots S n)) 2) :
+    gsSumInvRoots S ιs n ξ = ∑ v : S, gsLocalInvRoots S ιs n v (ξ v) := by
   rfl
 
 omit [Fintype S] [NeZero n] in
-theorem gsLocalInvRootsQZ_eq (v : S)
-    : gsLocalInvRootsQZ S ιs n v
-      = (brauerInvZOfIsSepClosure ((v : HeightOneSpectrum (𝓞 K.1)).adicCompletion K.1)
-          (AlgebraicClosure ((v : HeightOneSpectrum (𝓞 K.1)).adicCompletion K.1))).comp
+theorem gsLocalInvRootsQZ_eq (v : S) :
+    gsLocalInvRootsQZ S ιs n v =
+      (brauerInvZOfIsSepClosure ((v : HeightOneSpectrum (𝓞 K.1)).adicCompletion K.1)
+        (AlgebraicClosure ((v : HeightOneSpectrum (𝓞 K.1)).adicCompletion K.1))).comp
         ((cohomologyMap (rootsLocalMorZ S ιs n v) 2).hom.toAddMonoidHom.comp
           (cohomologyULiftIntAddEquiv _ 2).toAddMonoidHom) :=
   rfl
 
+
 omit [Fintype S] in
-theorem gsLocalInvRootsQZ_cohomologyMapAlong (v : S) (x : cohomology (gsRoots S n) 2)
-    : gsLocalInvRootsQZ S ιs n v
-        ((cohomologyMapAlong (gsFinFamily S ιs v).toMonoidHom (continuous_toMonoidHom _) (𝟙 _)
-          2).hom x)
-      = brauerInvZOfIsSepClosure ((v : HeightOneSpectrum (𝓞 K.1)).adicCompletion K.1)
-        (AlgebraicClosure ((v : HeightOneSpectrum (𝓞 K.1)).adicCompletion K.1))
-        ((gsLocalRes S (ιs v) 2).hom
-          (cohomologyULiftIntAddEquiv _ 2
-            ((cohomologyMap (sUnitsToUnits S (maxUnramifiedOutside K.1 ℚ̄ S)) 2).hom
-              ((cohomologyMap (rootsOfUnityToSUnits S (maxUnramifiedOutside K.1 ℚ̄ S) n) 2).hom
-                x)))) := by
+theorem gsLocalInvRootsQZ_cohomologyMapAlong (v : S) (x : cohomology (gsRoots S n) 2) :
+    gsLocalInvRootsQZ S ιs n v ((cohomologyMapAlong (gsFinFamily S ιs v).toMonoidHom
+        (continuous_toMonoidHom _) (𝟙 _) 2).hom x) =
+      brauerInvZOfIsSepClosure ((v : HeightOneSpectrum (𝓞 K.1)).adicCompletion K.1)
+        (AlgebraicClosure ((v : HeightOneSpectrum (𝓞 K.1)).adicCompletion K.1)) ((gsLocalRes S (ιs v) 2).hom
+        (cohomologyULiftIntAddEquiv _ 2 ((cohomologyMap (sUnitsToUnits S (maxUnramifiedOutside K.1 ℚ̄ S)) 2).hom
+          ((cohomologyMap (rootsOfUnityToSUnits S (maxUnramifiedOutside K.1 ℚ̄ S) n) 2).hom x)))) := by
   refine (DFunLike.congr_fun (gsLocalInvRootsQZ_eq S ιs n v) _).trans ?_
   refine (AddMonoidHom.comp_apply _ _ _).trans ?_
-  refine congrArg
-    (brauerInvZOfIsSepClosure ((v : HeightOneSpectrum (𝓞 K.1)).adicCompletion K.1)
-      (AlgebraicClosure ((v : HeightOneSpectrum (𝓞 K.1)).adicCompletion K.1)))
-    ?_
+  refine congrArg (brauerInvZOfIsSepClosure ((v : HeightOneSpectrum (𝓞 K.1)).adicCompletion K.1)
+    (AlgebraicClosure ((v : HeightOneSpectrum (𝓞 K.1)).adicCompletion K.1))) ?_
   refine (AddMonoidHom.comp_apply _ _ _).trans ?_
-  exact cohomologyMap_uliftInt_cohomologyMapAlong (gsFinFamily S ιs v).toMonoidHom
-    (continuous_toMonoidHom _) (rootsOfUnityToSUnits S (maxUnramifiedOutside K.1 ℚ̄ S) n)
-    (sUnitsToUnits S (maxUnramifiedOutside K.1 ℚ̄ S)) (rootsLocalMorZ S ιs n v)
-    (embUnitsMorZ S (ιs v))
-    (fun _ => rfl)
-    2 x
+  have hres : gsLocalRes S (ιs v) 2 =
+      cohomologyMapAlong (gsFinFamily S ιs v).toMonoidHom (continuous_toMonoidHom _)
+        (embUnitsMorZ S (ιs v)) 2 := rfl
+  have hmap := cohomologyMap_uliftInt_cohomologyMapAlong (gsFinFamily S ιs v).toMonoidHom
+    (continuous_toMonoidHom _)
+    (rootsOfUnityToSUnits S (maxUnramifiedOutside K.1 ℚ̄ S) n) (sUnitsToUnits S (maxUnramifiedOutside K.1 ℚ̄ S))
+    (rootsLocalMorZ S ιs n v) (embUnitsMorZ S (ιs v)) (fun _ => rfl) 2 x
+  let y := cohomologyULiftIntAddEquiv (galUnits K.1 (maxUnramifiedOutside K.1 ℚ̄ S)) 2
+    ((cohomologyMap (sUnitsToUnits S (maxUnramifiedOutside K.1 ℚ̄ S)) 2).hom
+      ((cohomologyMap (rootsOfUnityToSUnits S (maxUnramifiedOutside K.1 ℚ̄ S) n) 2).hom x))
+  have happly := congrArg (fun f => ModuleCat.Hom.hom f y) hres.symm
+  simp only [LinearMap.toAddMonoidHom_coe, AddEquiv.coe_toAddMonoidHom]
+  with_reducible exact hmap.trans happly
+
 
 omit [Fintype S] [NeZero n] in
-theorem placeInv_inl_eq_zero
-    (hn : Odd n ∨ IsTotallyComplex K.1)
-    (v : InfinitePlace K.1) (y : localGaloisCohomology K 2 (.inl v)) (hy : n • y = 0)
-    : placeInv (.inl v) y = 0 := by
+theorem placeInv_inl_eq_zero (hn : Odd n ∨ IsTotallyComplex K.1) (v : InfinitePlace K.1)
+    (y : localGaloisCohomology K 2 (.inl v)) (hy : n • y = 0) : placeInv (.inl v) y = 0 := by
   rcases hn with ⟨m, rfl⟩ | hc
   · have h2 : 2 • y = 0 := by
       apply placeInv_injective (K := K) (.inl v)
@@ -233,34 +257,31 @@ theorem placeInv_inl_eq_zero
       abel
     rw [hy', hy, h2, smul_zero, sub_zero, map_zero]
   · have := subsingleton_cohomology_two_of_isComplex v (hc.isComplex v)
-    rw [show y = 0 from
-        Subsingleton.elim
-          (α := cohomology (galUnitsZ v.Completion (AlgebraicClosure v.Completion)) 2) y 0,
-      map_zero]
+    rw [show y = 0 from Subsingleton.elim (α := cohomology (galUnitsZ v.Completion
+      (AlgebraicClosure v.Completion)) 2) y 0, map_zero]
+
 
 omit [Fintype S] in
-theorem sumPlaceInv_eq_sum_of_placeInv
-    (T : Finset (Place K.1)) (y : ⨁ w : Place K.1, localGaloisCohomology K 2 w)
-    (hT : ∀ w ∉ T, placeInv w (y w) = 0)
-    : sumPlaceInv K y = ∑ w ∈ T, placeInv w (y w) := by
+theorem sumPlaceInv_eq_sum_of_placeInv (T : Finset (Place K.1)) (y : ⨁ w : Place K.1, localGaloisCohomology K 2 w)
+    (hT : ∀ w ∉ T, placeInv w (y w) = 0) : sumPlaceInv K y = ∑ w ∈ T, placeInv w (y w) := by
   classical
   conv_lhs => rw [← DirectSum.sum_support_of y]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+
+  rw [map_sum]
   simp_rw [sumPlaceInv_of]
-  calc
-    ∑ w ∈ DFinsupp.support y, placeInv w (y w) = ∑ w ∈ DFinsupp.support y ∪ T, placeInv w (y w) :=
-      Finset.sum_subset Finset.subset_union_left fun w _ hw => by
-        rw [DFinsupp.notMem_support_iff.1 hw, map_zero]
+  calc ∑ w ∈ DFinsupp.support y, placeInv w (y w)
+      = ∑ w ∈ DFinsupp.support y ∪ T, placeInv w (y w) :=
+        Finset.sum_subset Finset.subset_union_left fun w _ hw => by
+          rw [DFinsupp.notMem_support_iff.1 hw, map_zero]
     _ = ∑ w ∈ T, placeInv w (y w) :=
-      (Finset.sum_subset Finset.subset_union_right fun w _ hw => hT w hw).symm
+        (Finset.sum_subset Finset.subset_union_right fun w _ hw => hT w hw).symm
+
 
 omit [Fintype S] [NeZero n] in
-theorem placeInv_inr_apply (v : HeightOneSpectrum (𝓞 K.1)) (y : localGaloisCohomology K 2 (.inr v))
-    : placeInv (.inr v) y
-      = brauerInvZOfIsSepClosure (v.adicCompletion K.1) (AlgebraicClosure (v.adicCompletion K.1))
-        y :=
+theorem placeInv_inr_apply (v : HeightOneSpectrum (𝓞 K.1)) (y : localGaloisCohomology K 2 (.inr v)) :
+    placeInv (.inr v) y = brauerInvZOfIsSepClosure (v.adicCompletion K.1) (AlgebraicClosure (v.adicCompletion K.1)) y :=
   rfl
+
 
 open Classical in
 def gsLocalEmbeddings : LocalEmbeddings K where
@@ -268,47 +289,42 @@ def gsLocalEmbeddings : LocalEmbeddings K where
   inf v := (nonempty_localEmbeddings K).some.inf v
 
 omit [Fintype S] [NeZero n] in
-theorem gsLocalEmbeddings_fin (v : S) : (gsLocalEmbeddings S ιs).fin v = ιs v := dif_pos v.2
+theorem gsLocalEmbeddings_fin (v : S) : (gsLocalEmbeddings S ιs).fin v = ιs v :=
+  dif_pos v.2
+
 
 omit [Fintype S] in
-theorem sum_eq_zero_of_zmodToQZ
-    {ι : Type*} [Fintype ι]
-    (F : ι → ZMod n) (G : ι → QZ) (hFG : ∀ v, zmodToQZ n (F v) = G v) (h : ∑ v, G v = 0)
-    : ∑ v, F v = 0 :=
+theorem sum_eq_zero_of_zmodToQZ {ι : Type*} [Fintype ι] (F : ι → ZMod n) (G : ι → QZ)
+    (hFG : ∀ v, zmodToQZ n (F v) = G v) (h : ∑ v, G v = 0) : ∑ v, F v = 0 :=
   zmodToQZ_injective (by rw [map_sum, map_zero, ← h]; exact Finset.sum_congr rfl fun v _ => hFG v)
 
-omit [NeZero n] in
-theorem brauerSumInv_eq_sum_of
-    (ι : LocalEmbeddings K) (z : cohomology (unitsLimitRep K) 2)
-    (hz : ∀ w : Place K.1,
-      (∀ v : S, w ≠ .inr (v : HeightOneSpectrum (𝓞 K.1))) → placeInv w (brauerLocal ι z w) = 0)
-    : brauerSumInv ι z
-      = ∑ v : S, placeInv (.inr (v : HeightOneSpectrum (𝓞 K.1)))
-        (brauerLocal ι z (.inr (v : HeightOneSpectrum (𝓞 K.1)))) := by
-  classical
-  refine (AddMonoidHom.comp_apply _ _ _).trans ?_
-  rw [sumPlaceInv_eq_sum_of_placeInv
-      (Finset.univ.image fun v : S => (Sum.inr (v : HeightOneSpectrum (𝓞 K.1)) : Place K.1)) _
-      fun w hw => hz w fun v hv => hw (Finset.mem_image.2 ⟨v, Finset.mem_univ _, hv.symm⟩),
-    Finset.sum_image (fun v _ w _ h => Subtype.ext (Sum.inr_injective h))]
 
 omit [NeZero n] in
-theorem sum_brauerInvZ_gsLocalRes_sUnits
-    (hn : Odd n ∨ IsTotallyComplex K.1) (y : cohomology (galSUnitsMax K.1 ℚ̄ S) 2) (hy : n • y = 0)
-    : ∑ v : S, brauerInvZOfIsSepClosure ((v : HeightOneSpectrum (𝓞 K.1)).adicCompletion K.1)
-        (AlgebraicClosure ((v : HeightOneSpectrum (𝓞 K.1)).adicCompletion K.1)) ((gsLocalRes S (ιs v) 2).hom
-          (cohomologyULiftIntAddEquiv _ 2
-            ((cohomologyMap (sUnitsToUnits S (maxUnramifiedOutside K.1 ℚ̄ S)) 2).hom y)))
-      = 0 := by
+theorem brauerSumInv_eq_sum_of (ι : LocalEmbeddings K) (z : cohomology (unitsLimitRep K) 2)
+    (hz : ∀ w : Place K.1, (∀ v : S, w ≠ .inr (v : HeightOneSpectrum (𝓞 K.1))) →
+      placeInv w (brauerLocal ι z w) = 0) :
+    brauerSumInv ι z = ∑ v : S, placeInv (.inr (v : HeightOneSpectrum (𝓞 K.1)))
+      (brauerLocal ι z (.inr (v : HeightOneSpectrum (𝓞 K.1)))) := by
+  classical
+  refine (AddMonoidHom.comp_apply _ _ _).trans ?_
+  rw [sumPlaceInv_eq_sum_of_placeInv (Finset.univ.image fun v : S => (Sum.inr (v : HeightOneSpectrum (𝓞 K.1)) : Place K.1))
+      _ fun w hw => hz w fun v hv => hw (Finset.mem_image.2 ⟨v, Finset.mem_univ _, hv.symm⟩),
+    Finset.sum_image (fun v _ w _ h => Subtype.ext (Sum.inr_injective h))]
+
+
+omit [NeZero n] in
+theorem sum_brauerInvZ_gsLocalRes_sUnits (hn : Odd n ∨ IsTotallyComplex K.1)
+    (y : cohomology (galSUnitsMax K.1 ℚ̄ S) 2) (hy : n • y = 0) :
+    ∑ v : S, brauerInvZOfIsSepClosure ((v : HeightOneSpectrum (𝓞 K.1)).adicCompletion K.1)
+      (AlgebraicClosure ((v : HeightOneSpectrum (𝓞 K.1)).adicCompletion K.1)) ((gsLocalRes S (ιs v) 2).hom
+        (cohomologyULiftIntAddEquiv _ 2
+          ((cohomologyMap (sUnitsToUnits S (maxUnramifiedOutside K.1 ℚ̄ S)) 2).hom y))) = 0 := by
   have h1 := brauerSumInv_eq_sum_of S (gsLocalEmbeddings S ιs) (sUnitsBrauer K S y) ?_
-  · refine (Finset.sum_congr rfl fun v _ => ?_).trans
-      (h1.symm.trans (brauerSumInv_eq_zero (gsLocalEmbeddings S ιs) (sUnitsBrauer K S y)))
+  · refine (Finset.sum_congr rfl fun v _ => ?_).trans (h1.symm.trans
+      (brauerSumInv_eq_zero (gsLocalEmbeddings S ιs) (sUnitsBrauer K S y)))
     refine Eq.symm ?_
-    refine (congrArg
-      (fun z =>
-        placeInv (K := K) (.inr (v : HeightOneSpectrum (𝓞 K.1)))
-          (brauerLocal (gsLocalEmbeddings S ιs) z (.inr (v : HeightOneSpectrum (𝓞 K.1)))))
-      (sUnitsBrauer_apply K S y)).trans ?_
+    refine (congrArg (fun z => placeInv (K := K) (.inr (v : HeightOneSpectrum (𝓞 K.1)))
+      (brauerLocal (gsLocalEmbeddings S ιs) z (.inr (v : HeightOneSpectrum (𝓞 K.1))))) (sUnitsBrauer_apply K S y)).trans ?_
     refine (congrArg (placeInv (K := K) (.inr (v : HeightOneSpectrum (𝓞 K.1))))
       (brauerLocal_gsBrauerInfl_inr K S _ _ _)).trans ?_
     refine (placeInv_inr_apply _ _).trans ?_
@@ -316,68 +332,54 @@ theorem sum_brauerInvZ_gsLocalRes_sUnits
   · intro w hw
     rcases w with w | w
     · refine placeInv_inl_eq_zero n hn w _ ?_
-      calc
-        n • brauerLocal (gsLocalEmbeddings S ιs) (sUnitsBrauer K S y) (.inl w)
-            = DFinsupp.evalAddMonoidHom
-              (β := fun w => localGaloisCohomology K 2 w)
-              (Sum.inl w : Place K.1)
+      calc n • brauerLocal (gsLocalEmbeddings S ιs) (sUnitsBrauer K S y) (.inl w)
+          = DFinsupp.evalAddMonoidHom (β := fun w => localGaloisCohomology K 2 w) (Sum.inl w : Place K.1)
               (n • brauerLocal (gsLocalEmbeddings S ιs) (sUnitsBrauer K S y)) :=
-          (map_nsmul
-            (DFinsupp.evalAddMonoidHom
-              (β := fun w => localGaloisCohomology K 2 w)
-              (Sum.inl w : Place K.1))
-            n (brauerLocal (gsLocalEmbeddings S ιs) (sUnitsBrauer K S y))).symm
+            (map_nsmul (DFinsupp.evalAddMonoidHom (β := fun w => localGaloisCohomology K 2 w) (Sum.inl w : Place K.1)) n
+              (brauerLocal (gsLocalEmbeddings S ιs) (sUnitsBrauer K S y))).symm
         _ = 0 := by rw [← map_nsmul, ← map_nsmul, hy, map_zero, map_zero, map_zero]
     · have hwS : w ∉ S := fun h => hw ⟨w, h⟩ rfl
       rw [brauerLocal_sUnitsBrauer_inr K S (gsLocalEmbeddings S ιs) y w hwS, map_zero]
 
-theorem gsSumInvRoots_globalToLocal
-    (hn : Odd n ∨ IsTotallyComplex K.1) (x : cohomology (gsRoots S n) 2)
-    : gsSumInvRoots S ιs n
-        ((globalToLocal (gsFinFamily S ιs) (gsRoots S n) _ (fun _ => 𝟙 _) 2).hom x)
-      = 0 := by
-  refine (gsSumInvRoots_apply S ιs n _).trans
-    (sum_eq_zero_of_zmodToQZ n _ _
-      (fun v =>
-        (zmodToQZ_gsLocalInvRoots S ιs n v _).trans
-          (gsLocalInvRootsQZ_cohomologyMapAlong S ιs n v x))
-      (sum_brauerInvZ_gsLocalRes_sUnits S ιs n hn _ ?_))
+theorem gsSumInvRoots_globalToLocal (hn : Odd n ∨ IsTotallyComplex K.1) (x : cohomology (gsRoots S n) 2) :
+    gsSumInvRoots S ιs n ((globalToLocal (gsFinFamily S ιs) (gsRoots S n) _ (fun _ => 𝟙 _) 2).hom x) = 0 := by
+  refine (gsSumInvRoots_apply S ιs n _).trans (sum_eq_zero_of_zmodToQZ n _ _ (fun v =>
+    (zmodToQZ_gsLocalInvRoots S ιs n v _).trans (gsLocalInvRootsQZ_cohomologyMapAlong S ιs n v x))
+    (sum_brauerInvZ_gsLocalRes_sUnits S ιs n hn _ ?_))
   rw [← map_nsmul, nsmul_cohomology_eq_zero _ (fun ζ => nsmul_gsRoots S n ζ) 2 x, map_zero]
 
+
 omit [Fintype S] [NeZero n] in
-theorem localToCompact_two_surjective (h3 : Subsingleton (cohomology (gsRoots S n) 3))
-    : Function.Surjective
-      (localToCompact (gsFinFamily S ιs) (gsRoots S n) _ (fun _ => 𝟙 _) 2).hom := fun _ =>
+theorem localToCompact_two_surjective (h3 : Subsingleton (cohomology (gsRoots S n) 3)) :
+    Function.Surjective (localToCompact (gsFinFamily S ιs) (gsRoots S n) _ (fun _ => 𝟙 _) 2).hom := fun _ =>
   (ShortComplex.moduleCat_exact_iff_ker_sub_range _).1
     (compactCohomology_exact_compact (gsFinFamily S ιs) (gsRoots S n) _ (fun _ => 𝟙 _) 2)
     (Subsingleton.elim (α := cohomology (gsRoots S n) 3) _ _)
 
-theorem ker_localToCompact_le (hn : Odd n ∨ IsTotallyComplex K.1)
-    : (localToCompact (gsFinFamily S ιs) (gsRoots S n) _ (fun _ => 𝟙 _) 2).hom.toAddMonoidHom.ker
-      ≤ (gsSumInvRoots S ιs n).ker := fun ξ hξ => by
-  have h :=
-    (ShortComplex.moduleCat_exact_iff_ker_sub_range _).1
-      (compactCohomology_exact_local (gsFinFamily S ιs) (gsRoots S n) _ (fun _ => 𝟙 _) 2) hξ
+theorem ker_localToCompact_le (hn : Odd n ∨ IsTotallyComplex K.1) :
+    (localToCompact (gsFinFamily S ιs) (gsRoots S n) _ (fun _ => 𝟙 _) 2).hom.toAddMonoidHom.ker ≤
+      (gsSumInvRoots S ιs n).ker := fun ξ hξ => by
+  have h := (ShortComplex.moduleCat_exact_iff_ker_sub_range _).1
+    (compactCohomology_exact_local (gsFinFamily S ιs) (gsRoots S n) _ (fun _ => 𝟙 _) 2) hξ
   obtain ⟨x, hx⟩ := h
   exact hx ▸ gsSumInvRoots_globalToLocal S ιs n hn x
 
-noncomputable def gsCompactInv
-    (hn : Odd n ∨ IsTotallyComplex K.1) (h3 : Subsingleton (cohomology (gsRoots S n) 3))
-    : compactCohomologyRes (gsFinFamily S ιs) (gsRoots S n) 3 →+ ZMod n :=
+noncomputable def gsCompactInv (hn : Odd n ∨ IsTotallyComplex K.1) (h3 : Subsingleton (cohomology (gsRoots S n) 3)) :
+    compactCohomologyRes (gsFinFamily S ιs) (gsRoots S n) 3 →+ ZMod n :=
   descendAlong (localToCompact (gsFinFamily S ιs) (gsRoots S n) _ (fun _ => 𝟙 _) 2).hom
-    (localToCompact_two_surjective S ιs n h3) (gsSumInvRoots S ιs n)
-    (ker_localToCompact_le S ιs n hn)
+    (localToCompact_two_surjective S ιs n h3) (gsSumInvRoots S ιs n) (ker_localToCompact_le S ιs n hn)
 
-set_option maxHeartbeats 1600000 in
-theorem gsCompactInv_localToCompact
-    (hn : Odd n ∨ IsTotallyComplex K.1) (h3 : Subsingleton (cohomology (gsRoots S n) 3))
-    (ξ : ∀ v : S, cohomology (Rep.res (gsFinFamily S ιs v).toMonoidHom (gsRoots S n)) 2)
-    : gsCompactInv S ιs n hn h3
-        ((localToCompact (gsFinFamily S ιs) (gsRoots S n) _ (fun _ => 𝟙 _) 2).hom ξ)
-      = gsSumInvRoots S ιs n ξ :=
-  descendAlong_apply (localToCompact (gsFinFamily S ιs) (gsRoots S n) _ (fun _ => 𝟙 _) 2).hom
-    (localToCompact_two_surjective S ιs n h3) (gsSumInvRoots S ιs n)
-    (ker_localToCompact_le S ιs n hn) ξ
+
+
+theorem gsCompactInv_localToCompact (hn : Odd n ∨ IsTotallyComplex K.1)
+    (h3 : Subsingleton (cohomology (gsRoots S n) 3))
+    (ξ : ∀ v : S, cohomology (Rep.res (gsFinFamily S ιs v).toMonoidHom (gsRoots S n)) 2) :
+    gsCompactInv S ιs n hn h3 ((localToCompact (gsFinFamily S ιs) (gsRoots S n) _ (fun _ => 𝟙 _) 2).hom ξ) =
+      gsSumInvRoots S ιs n ξ := by
+  delta gsCompactInv
+  have h := descendAlong_apply (localToCompact (gsFinFamily S ιs) (gsRoots S n) _ (fun _ => 𝟙 _) 2).hom
+    (localToCompact_two_surjective S ιs n h3) (gsSumInvRoots S ιs n) (ker_localToCompact_le S ιs n hn) ξ
+  with_reducible exact h
 
 end
 

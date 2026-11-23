@@ -1,15 +1,54 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.Definitions.Foundations.HTLawAt
 public import Development.AbelianVarietyTheory.Statements.CuspidalUnitaryTwists.ZetaUr
-public import Development.AbelianVarietyTheory.Definitions.Foundations.IsLocallyConstantCycMod
+public import Development.AutomorphicArithmetic.AutomorphicVarieties.CommutativeAlgebra.ResMapBijective
+public import Mathlib.RingTheory.AdicCompletion.Noetherian
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Int
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.GroupTheory.Nilpotent
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Development.AbelianVarietyTheory.Definitions.Foundations.IsLocallyConstantCycMod
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
-  Formalism.MainNotions.N GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.HV
-  GlobalTheory.Ord2 GlobalTheory.KZ PowerSeries
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.MainNotions.N GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.HV GlobalTheory.Ord2 GlobalTheory.KZ PowerSeries
 
 noncomputable section
 
@@ -17,32 +56,23 @@ namespace GlobalTheory.QuotInertia
 
 variable {Ω : Type} [Field Ω] [Algebra ℚ Ω] {l : ℕ} [Fact l.Prime]
 
-theorem fix_mu [IsAlgClosure ℚ Ω] (s : G ℚ Ω) (hs : cycBar ℚ Ω l s = 1) (ζ : Ω) (hζ : ζ ^ l = 1)
-    : s ζ = ζ := by
+theorem fix_mu [IsAlgClosure ℚ Ω] (s : G ℚ Ω) (hs : cycBar ℚ Ω l s = 1) (ζ : Ω) (hζ : ζ ^ l = 1) :
+    s ζ = ζ := by
   haveI : IsAlgClosed Ω := IsAlgClosure.isAlgClosed ℚ
   haveI : CharZero Ω := charZero_of_injective_algebraMap (algebraMap ℚ Ω).injective
   have hinj : Function.Injective ((algebraMap ℚ_[l] (Qbar l)).comp PadicInt.Coe.ringHom) :=
     (algebraMap ℚ_[l] (Qbar l)).injective.comp (fun a b h => Subtype.ext h)
   have hz : cycZ ℚ Ω l s = 1 := by
-    apply Units.map_injective
-      (f := ((algebraMap ℚ_[l] (Qbar l)).comp PadicInt.Coe.ringHom).toMonoidHom) hinj
+    apply Units.map_injective (f := ((algebraMap ℚ_[l] (Qbar l)).comp PadicInt.Coe.ringHom).toMonoidHom) hinj
     rw [map_one]
     exact hs
   have hz' : cyclotomicCharacter Ω l (MulSemiringAction.toRingAut (G ℚ Ω) Ω s) = 1 := hz
-  have h :=
-    cyclotomicCharacter.spec l (n := 1) (MulSemiringAction.toRingAut (G ℚ Ω) Ω s) ζ
-      (by rw [pow_one]; exact hζ)
+  have h := cyclotomicCharacter.spec l (n := 1) (MulSemiringAction.toRingAut (G ℚ Ω) Ω s) ζ (by rw [pow_one]; exact hζ)
   change s ζ = _ at h
-  rw [h, hz', Units.val_one, map_one, ZMod.val_one_eq_one_mod,
-    Nat.mod_eq_of_lt (by rw [pow_one]; exact (Fact.out : l.Prime).one_lt), pow_one]
+  rw [h, hz', Units.val_one, map_one, ZMod.val_one_eq_one_mod, Nat.mod_eq_of_lt (by rw [pow_one]; exact (Fact.out : l.Prime).one_lt), pow_one]
 
-theorem fix_sqrt_unit
-    (hl : l ≠ 2)
-    {A : ValuationSubring Ω} (hA : OverL l A)
-    {s : G ℚ Ω} (hs : s ∈ Ine (F := ℚ) A)
-    (N : ℤ) (hN : ¬ (l : ℤ) ∣ N)
-    (β : Ω) (hβ : β ^ 2 = N)
-    : s β = β := by
+theorem fix_sqrt_unit (hl : l ≠ 2) {A : ValuationSubring Ω} (hA : OverL l A) {s : G ℚ Ω}
+    (hs : s ∈ Ine (F := ℚ) A) (N : ℤ) (hN : ¬ (l : ℤ) ∣ N) (β : Ω) (hβ : β ^ 2 = N) : s β = β := by
   have hsq : (s β) ^ 2 = β ^ 2 := by rw [← map_pow, hβ, map_intCast]
   rcases sq_eq_sq_iff_eq_or_eq_neg.mp hsq with h | h
   · exact h
@@ -65,8 +95,7 @@ theorem fix_sqrt_unit
   have h4 : ((4 * N : ℤ) : 𝓞 ℚ) ∈ v.asIdeal := by
     rw [← hv]
     convert h3 using 2
-    simp only [map_intCast, Int.cast_mul, Int.cast_ofNat, map_mul, map_ofNat, algebraMap.coe_mul,
-      map_ratCast]
+    simp only [map_intCast, Int.cast_mul, Int.cast_ofNat, map_mul, map_ofNat, algebraMap.coe_mul, map_ratCast]
   have hp : Prime (l : ℤ) := Nat.prime_iff_prime_int.mp Fact.out
   have hcop : IsCoprime (l : ℤ) (4 * N) := by
     rw [hp.irreducible.coprime_iff_not_dvd]
@@ -83,8 +112,8 @@ theorem fix_sqrt_unit
     exact add_mem (Ideal.mul_mem_left _ _ hl') (Ideal.mul_mem_left _ _ (by simpa using h4))
   exact v.isPrime.ne_top ((Ideal.eq_top_iff_one _).2 h1)
 
-theorem gauss_fix [IsAlgClosure ℚ Ω] (hl : l ≠ 2) (s : G ℚ Ω) (hs : ∀ ζ : Ω, ζ ^ l = 1 → s ζ = ζ)
-    : ∃ (Gs : Ω) (c : ℤ), c ^ 2 = 1 ∧ Gs ^ 2 = ((c * l : ℤ) : Ω) ∧ s Gs = Gs := by
+theorem gauss_fix [IsAlgClosure ℚ Ω] (hl : l ≠ 2) (s : G ℚ Ω) (hs : ∀ ζ : Ω, ζ ^ l = 1 → s ζ = ζ) :
+    ∃ (Gs : Ω) (c : ℤ), c ^ 2 = 1 ∧ Gs ^ 2 = ((c * l : ℤ) : Ω) ∧ s Gs = Gs := by
   haveI : IsAlgClosed Ω := IsAlgClosure.isAlgClosed ℚ
   haveI : CharZero Ω := charZero_of_injective_algebraMap (algebraMap ℚ Ω).injective
   haveI : NeZero l := ⟨(Fact.out : l.Prime).ne_zero⟩
@@ -97,109 +126,88 @@ theorem gauss_fix [IsAlgClosure ℚ Ω] (hl : l ≠ 2) (s : G ℚ Ω) (hs : ∀ 
     (MulChar.ringHomComp_ne_one_iff (Int.cast_injective (α := Ω))).2 (quadraticChar_ne_one hF)
   have hχ2 : χ.IsQuadratic := (quadraticChar_isQuadratic (ZMod l)).comp _
   have hχa : ∀ x, χ x = ((quadraticChar (ZMod l) x : ℤ) : Ω) := fun x => rfl
-  refine ⟨
-    gaussSum χ ψ,
-    quadraticChar (ZMod l) (-1),
-    quadraticChar_sq_one (neg_ne_zero.2 one_ne_zero),
-    ?_,
-    ?_
-  ⟩
+  refine ⟨gaussSum χ ψ, quadraticChar (ZMod l) (-1), quadraticChar_sq_one (neg_ne_zero.2 one_ne_zero), ?_, ?_⟩
   · rw [gaussSum_sq hχ1 hχ2 hψ, hχa, ZMod.card]
     push_cast
     rfl
-  set_option synthInstance.maxHeartbeats 100000 in
+
   · rw [gaussSum, map_sum]
     refine Finset.sum_congr rfl fun x _ => ?_
     rw [map_mul, hχa, map_intCast, hψdef, AddChar.zmodChar_apply, map_pow, hs ζ hζ.pow_eq_one]
 
-theorem fix_sqrt_int
-    [IsAlgClosure ℚ Ω]
-    (hl : l ≠ 2)
-    {A : ValuationSubring Ω} (hA : OverL l A)
-    {s : G ℚ Ω} (hs : s ∈ Ine (F := ℚ) A) (hmu : ∀ ζ : Ω, ζ ^ l = 1 → s ζ = ζ)
-    : ∀ (N : ℤ) (α : Ω), α ^ 2 = N → s α = α := by
+theorem fix_sqrt_int [IsAlgClosure ℚ Ω] (hl : l ≠ 2) {A : ValuationSubring Ω} (hA : OverL l A) {s : G ℚ Ω}
+    (hs : s ∈ Ine (F := ℚ) A) (hmu : ∀ ζ : Ω, ζ ^ l = 1 → s ζ = ζ) :
+    ∀ (N : ℤ) (α : Ω), α ^ 2 = N → s α = α := by
   haveI : CharZero Ω := charZero_of_injective_algebraMap (algebraMap ℚ Ω).injective
   intro N
   induction hn : N.natAbs using Nat.strong_induction_on generalizing N with
   | _ n ih =>
-    intro α hα
-    by_cases h0 : N = 0
-    · subst h0
-      have : α = 0 := pow_eq_zero_iff two_ne_zero |>.1 (by simpa using hα)
-      rw [this, map_zero]
-    by_cases hd : (l : ℤ) ∣ N
-    · obtain ⟨N1, rfl⟩ := hd
-      obtain ⟨Gs, c, hc, hG, hsG⟩ := gauss_fix hl s hmu
-      have hc0 : (c : Ω) ≠ 0 := by
-        rintro h
-        have : c = 0 := by exact_mod_cast h
-        rw [this] at hc
-        norm_num at hc
-      have hl0 : (l : Ω) ≠ 0 := Nat.cast_ne_zero.2 (Fact.out : l.Prime).ne_zero
-      have hG0 : Gs ≠ 0 := by
-        rintro h
-        rw [h] at hG
-        push_cast at hG
-        exact mul_ne_zero hc0 hl0 (by rw [← hG]; ring)
-      have hc' : (c : Ω) ^ 2 = 1 := by exact_mod_cast hc
-      have hβ : (α / Gs) ^ 2 = ((c * N1 : ℤ) : Ω) := by
-        rw [div_pow, hα, hG]
-        push_cast
-        rw [div_eq_iff (mul_ne_zero hc0 hl0)]
-        linear_combination (-(l : Ω) * N1) * hc'
-      have hcabs : c.natAbs = 1 := by
-        have h1 : (c ^ 2).natAbs = 1 := by rw [hc]; rfl
-        rw [Int.natAbs_pow] at h1
-        exact (pow_eq_one_iff.1 h1).resolve_right two_ne_zero
-      have hN1 : N1 ≠ 0 := by rintro rfl; exact h0 (mul_zero _)
-      have hlt : (c * N1).natAbs < n := by
-        rw [← hn, Int.natAbs_mul, Int.natAbs_mul, hcabs, one_mul, Int.natAbs_natCast]
-        have := Int.natAbs_pos.2 hN1
-        have := (Fact.out : l.Prime).one_lt
-        nlinarith
-      have h1 := ih _ hlt (c * N1) rfl (α / Gs) hβ
-      have e : α = α / Gs * Gs := (div_mul_cancel₀ α hG0).symm
-      rw [e, map_mul, h1, hsG]
-    · exact fix_sqrt_unit hl hA hs N hd α hα
+  intro α hα
+  by_cases h0 : N = 0
+  · subst h0
+    have : α = 0 := pow_eq_zero_iff two_ne_zero |>.1 (by simpa using hα)
+    rw [this, map_zero]
+  by_cases hd : (l : ℤ) ∣ N
+  · obtain ⟨N1, rfl⟩ := hd
+    obtain ⟨Gs, c, hc, hG, hsG⟩ := gauss_fix hl s hmu
+    have hc0 : (c : Ω) ≠ 0 := by
+      rintro h
+      have : c = 0 := by exact_mod_cast h
+      rw [this] at hc
+      norm_num at hc
+    have hl0 : (l : Ω) ≠ 0 := Nat.cast_ne_zero.2 (Fact.out : l.Prime).ne_zero
+    have hG0 : Gs ≠ 0 := by
+      rintro h
+      rw [h] at hG
+      push_cast at hG
+      exact mul_ne_zero hc0 hl0 (by rw [← hG]; ring)
+    have hc' : (c : Ω) ^ 2 = 1 := by exact_mod_cast hc
+    have hβ : (α / Gs) ^ 2 = ((c * N1 : ℤ) : Ω) := by
+      rw [div_pow, hα, hG]
+      push_cast
+      rw [div_eq_iff (mul_ne_zero hc0 hl0)]
+      linear_combination (-(l : Ω) * N1) * hc'
+    have hcabs : c.natAbs = 1 := by
+      have h1 : (c ^ 2).natAbs = 1 := by rw [hc]; rfl
+      rw [Int.natAbs_pow] at h1
+      exact (pow_eq_one_iff.1 h1).resolve_right two_ne_zero
+    have hN1 : N1 ≠ 0 := by rintro rfl; exact h0 (mul_zero _)
+    have hlt : (c * N1).natAbs < n := by
+      rw [← hn, Int.natAbs_mul, Int.natAbs_mul, hcabs, one_mul, Int.natAbs_natCast]
+      have := Int.natAbs_pos.2 hN1
+      have := (Fact.out : l.Prime).one_lt
+      nlinarith
+    have h1 := ih _ hlt (c * N1) rfl (α / Gs) hβ
+    have e : α = α / Gs * Gs := (div_mul_cancel₀ α hG0).symm
+    rw [e, map_mul, h1, hsG]
+  · exact fix_sqrt_unit hl hA hs N hd α hα
 
-theorem fix_sqrt_rat
-    [IsAlgClosure ℚ Ω]
-    (hl : l ≠ 2)
-    {A : ValuationSubring Ω} (hA : OverL l A)
-    {s : G ℚ Ω} (hs : s ∈ Ine (F := ℚ) A) (hmu : ∀ ζ : Ω, ζ ^ l = 1 → s ζ = ζ)
-    (α : Ω) (q : ℚ) (hα : α ^ 2 = algebraMap ℚ Ω q)
-    : s α = α := by
+theorem fix_sqrt_rat [IsAlgClosure ℚ Ω] (hl : l ≠ 2) {A : ValuationSubring Ω} (hA : OverL l A) {s : G ℚ Ω}
+    (hs : s ∈ Ine (F := ℚ) A) (hmu : ∀ ζ : Ω, ζ ^ l = 1 → s ζ = ζ) (α : Ω) (q : ℚ)
+    (hα : α ^ 2 = algebraMap ℚ Ω q) : s α = α := by
   haveI : CharZero Ω := charZero_of_injective_algebraMap (algebraMap ℚ Ω).injective
   have hden : (q.den : Ω) ≠ 0 := Nat.cast_ne_zero.2 q.den_nz
   have hq : algebraMap ℚ Ω q * (q.den : Ω) = (q.num : Ω) := by
     rw [← map_natCast (algebraMap ℚ Ω), ← map_mul, Rat.mul_den_eq_num, map_intCast]
-  have h :=
-    fix_sqrt_int hl hA hs hmu (q.num * q.den) (α * q.den) (by
-      rw [mul_pow, hα]
-      push_cast
-      rw [← hq]
-      ring)
+  have h := fix_sqrt_int hl hA hs hmu (q.num * q.den) (α * q.den) (by
+    rw [mul_pow, hα]
+    push_cast
+    rw [← hq]
+    ring)
   rw [map_mul, map_natCast] at h
   exact mul_right_cancel₀ hden h
 
-theorem dt_eq_one
-    [IsAlgClosure ℚ Ω]
-    {W : R2 Ω l} (hcont : Continuous W) (hdet2 : dt W ^ 2 = 1)
-    (s : G ℚ Ω) (hfix : ∀ (α : Ω) (q : ℚ), α ^ 2 = algebraMap ℚ Ω q → s α = α)
-    : dt W s = 1 := by
+theorem dt_eq_one [IsAlgClosure ℚ Ω] {W : R2 Ω l} (hcont : Continuous W) (hdet2 : dt W ^ 2 = 1) (s : G ℚ Ω)
+    (hfix : ∀ (α : Ω) (q : ℚ), α ^ 2 = algebraMap ℚ Ω q → s α = α) : dt W s = 1 := by
   haveI : IsGalois ℚ Ω := IsAlgClosure.isGalois ℚ Ω
   haveI : CharZero Ω := charZero_of_injective_algebraMap (algebraMap ℚ Ω).injective
-  have hval
-      : ∀ g,
-        ((dt W g : (Qbar l)ˣ) : Qbar l)
-          = ((W g : GL (Fin 2) (Qbar l)) : Matrix (Fin 2) (Fin 2) (Qbar l)).det := fun g =>
-    Matrix.GeneralLinearGroup.val_det_apply _
+  have hval : ∀ g, ((dt W g : (Qbar l)ˣ) : Qbar l) = ((W g : GL (Fin 2) (Qbar l)) : Matrix (Fin 2) (Fin 2) (Qbar l)).det :=
+    fun g => Matrix.GeneralLinearGroup.val_det_apply _
   have hc : Continuous fun g : G ℚ Ω => ((dt W g : (Qbar l)ˣ) : Qbar l) := by
     simp only [hval]
     exact (Units.continuous_val.comp hcont).matrix_det
   have hcl : IsClosed ((dt W).ker : Set (G ℚ Ω)) := by
-    have : ((dt W).ker : Set (G ℚ Ω))
-        = (fun g : G ℚ Ω => ((dt W g : (Qbar l)ˣ) : Qbar l)) ⁻¹' {1} := by
+    have : ((dt W).ker : Set (G ℚ Ω)) = (fun g : G ℚ Ω => ((dt W g : (Qbar l)ˣ) : Qbar l)) ⁻¹' {1} := by
       ext g
       simp only [SetLike.mem_coe, MonoidHom.mem_ker, Set.mem_preimage, Set.mem_singleton_iff]
       exact ⟨fun h => by rw [h, Units.val_one], fun h => Units.ext (by rw [h, Units.val_one])⟩
@@ -226,9 +234,8 @@ theorem dt_eq_one
         show g2⁻¹ * g1 ∈ (dt W).ker
         rw [MonoidHom.mem_ker, map_mul, map_inv, h, inv_mul_cancel]
       have h1 := hx _ hm
-      calc
-        g1 x = g2 ((g2⁻¹ * g1) x) := by
-          rw [AlgEquiv.mul_apply, AlgEquiv.aut_inv, AlgEquiv.apply_symm_apply]
+      calc g1 x = g2 ((g2⁻¹ * g1) x) := by
+            rw [AlgEquiv.mul_apply, AlgEquiv.aut_inv, AlgEquiv.apply_symm_apply]
         _ = g2 x := by rw [h1]
     rcases hpm s with h1 | h1
     · exact hx s (show s ∈ (dt W).ker from h1)
@@ -248,9 +255,7 @@ theorem dt_eq_one
         show (s x - x) ^ 2 = (x - s x) ^ 2
         ring
     obtain ⟨q, hq⟩ : ∃ q : ℚ, (x - s x) ^ 2 = algebraMap ℚ Ω q := by
-      have hmem
-          : (x - s x) ^ 2
-            ∈ IntermediateField.fixedField (⊥ : IntermediateField ℚ Ω).fixingSubgroup := by
+      have hmem : (x - s x) ^ 2 ∈ IntermediateField.fixedField (⊥ : IntermediateField ℚ Ω).fixingSubgroup := by
         rw [IntermediateField.mem_fixedField_iff]
         intro f _
         rw [map_pow]
@@ -268,19 +273,16 @@ theorem dt_eq_one
 
 end GlobalTheory.QuotInertia
 
+
 open GlobalTheory.QuotInertia in
-theorem GlobalTheory.quot_eq_one_of_cycBar_eq_one
-    : ∀ (l : ℕ) [Fact l.Prime] (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω]
-        (ι : Qbar l ≃+* ℂ) (e : ℕ) (S : Finset Pl) (A : ValuationSubring Ω) (W : R2 Ω l)
-        (g : Newform (2 * e + 1)),
-      Nf e S A W → SrcUr ι e A W g
-        → ∀ s ∈ Ine (F := ℚ) A, cycBar ℚ Ω l s = 1 → mat W s 1 1 = 1 := by
+theorem GlobalTheory.quot_eq_one_of_cycBar_eq_one : ∀ (l : ℕ) [Fact l.Prime] (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω]
+    (ι : Qbar l ≃+* ℂ) (e : ℕ) (S : Finset Pl) (A : ValuationSubring Ω) (W : R2 Ω l) (g : Newform (2 * e + 1)),
+    Nf e S A W → SrcUr ι e A W g → ∀ s ∈ Ine (F := ℚ) A, cycBar ℚ Ω l s = 1 → mat W s 1 1 = 1 := by
   intro l _ Ω _ _ _ ι e S A W g hNf hSrc s hs hc
   obtain ⟨-, -, χ, hχ, -, hI⟩ := hSrc
   have hmu := fix_mu s hc
   have hχs : χ s = 1 := hχ s hmu
-  have hdt :=
-    dt_eq_one hNf.cont hNf.det2 s (fun α q hq => fix_sqrt_rat hNf.l_odd hNf.atL hs hmu α q hq)
+  have hdt := dt_eq_one hNf.cont hNf.det2 s (fun α q hq => fix_sqrt_rat hNf.l_odd hNf.atL hs hmu α q hq)
   have h := hI s hs
   rw [hc, hχs, hdt] at h
   simpa using h

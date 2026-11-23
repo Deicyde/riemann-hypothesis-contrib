@@ -1,9 +1,60 @@
 module
 
 public import Formalism.HermitianCurvature.BlockKernelPropertiesOfSteps
-public import Formalism.HermitianCurvature.HermitianCurvatureProofs.ColumnOperationTripleForm
+public import Formalism.DoubleCosetMeasures.LowerUnipotentOrbits.IsIntOfLatOfLe
+public import Formalism.DoubleCosetMeasures.LowerUnipotentOrbits.IsOpenIsIntSet
+public import Formalism.DoubleCosetMeasures.LowerUnipotentOrbits.LowUniMulVecELast
 public import Formalism.HermitianCurvature.HermitianCurvatureProofs.CharacterOrthogonalityDual
+public import Formalism.HermitianCurvature.HermitianCurvatureProofs.ColumnOperationTripleForm
 public import Formalism.HermitianCurvature.HermitianCurvatureProofs.KernelQuotientFinite
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.CStarAlgebra.Classes
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
+public import Formalism.DoubleCosetMeasures.LowerUnipotentOrbits.MulInvBlockDiagApplySameBlock
 
 @[expose] public section
 
@@ -332,8 +383,6 @@ theorem isMirabolic_mul {p q : Matrix (Fin n) (Fin n) K} (hp : IsP R k p) (hq : 
   · rw [up_zero hp.1 h1, zero_mul]; exact R.zero_mem
   by_cases h2 : b < l
   · rw [up_zero hq.1 h2, mul_zero]; exact R.zero_mem
-  have h1' : a.val ≤ l.val := Fin.le_def.1 (not_lt.1 h1)
-  have h2' : l.val ≤ b.val := Fin.le_def.1 (not_lt.1 h2)
   rcases hab with h | h
   · exact R.mul_mem (hp.2 a l (Or.inl h)) (hq.2 l b (Or.inl (by omega)))
   · exact R.mul_mem (hp.2 a l (Or.inr (by omega))) (hq.2 l b (Or.inr h))
@@ -715,8 +764,8 @@ theorem cnta_row
       : (Submodule.Quotient.mk ((D *ᵥ abelian₂ R k Z v) j) : KR R)
         = ∑ b : Fin n, cntaCoef R k hD j b.val • lamN R Z b.val v := by
     simp only [Matrix.mulVec, dotProduct]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← Submodule.mkQ_apply, map_sum]
+
+    rw [← Submodule.mkQ_apply, map_sum]
     refine Finset.sum_congr rfl fun b _ => ?_
     rw [Submodule.mkQ_apply, cnta_coef_fin, cnta_Lam_coord]
     by_cases hb : k < b.val
@@ -1033,8 +1082,6 @@ theorem countId
           ∧ InTT R (k + 1) (Z₀ * p) (Z₀' * p') φ ∧ ¬ InTT R k (Z₀ * p) (Z₀' * p') φ}
         ≃ {Ψ : MM R k Z₀ ≃ₗ[R] MM R k Z₀'
           // GB R k Z₀ Z₀' Ψ ∧ Rel R Ψ (latZ R (Z₀ * p)) (latZ R (Z₀' * p'))}) := by
-  have hdZ := cnt_det_mul R k Z₀ p hd hp
-  have hdZ' := cnt_det_mul R k Z₀' p' hd' hp'
   have hn : 0 < n := by omega
   have hLe : abelian₂ R k Z₀ (eLast R) = 0 := by
     ext j

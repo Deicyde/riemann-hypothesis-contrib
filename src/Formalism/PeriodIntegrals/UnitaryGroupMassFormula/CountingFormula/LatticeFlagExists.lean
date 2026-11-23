@@ -1,12 +1,51 @@
 module
 
-public import Mathlib
+public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.CountingFormula.UnimodOneGenus
 public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.CountingFormula.RsMemPerpIff
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
-open NumberField Module Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.BasicNotions
-  Formalism.L2.SG.CntLocal
+open NumberField Module Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.BasicNotions Formalism.L2.SG.CntLocal
 open Classical
 
 noncomputable section
@@ -17,14 +56,12 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 section Flag
 
-variable
-  {D : D7} {T : D.host.E} {F0 : FlagG (VS D) D.R.rS T}
-  {f : Fin D.R.rS → (VS D).V} {M : Submodule (𝓞 D.host.E) (WbQ D F0)}
+variable {D : D7} {T : D.host.E} {F0 : FlagG (VS D) D.R.rS T} {f : Fin D.R.rS → (VS D).V}
+  {M : Submodule (𝓞 D.host.E) (WbQ D F0)}
 
-theorem rs_mem_lamC_perp {v : (VS D).V} (hv : v ∈ perpS (VS D) F0.X)
-    : v ∈ lamC D F0 f M
-      ↔ (Submodule.Quotient.mk (⟨v, hv⟩ : perpS (VS D) F0.X) : WbQ D F0) ∈ M
-        ∧ ∀ a, (VS D).hT (f a) v ∈ aaI D a := by
+theorem rs_mem_lamC_perp {v : (VS D).V} (hv : v ∈ perpS (VS D) F0.X) :
+    v ∈ lamC D F0 f M ↔ (Submodule.Quotient.mk (⟨v, hv⟩ : perpS (VS D) F0.X) : WbQ D F0) ∈ M ∧
+      ∀ a, (VS D).hT (f a) v ∈ aaI D a := by
   have h0 : ∀ a, (VS D).hT (F0.e a) v = 0 := fun a => hv _ (Submodule.subset_span ⟨a, rfl⟩)
   have hvPr : vPr D F0 f v = v := by simp [vPr, h0]
   constructor
@@ -43,15 +80,15 @@ theorem rs_orth_perp {y : (VS D).V} (hy : y ∈ orth (VS D) F0.X) : y ∈ perpS 
   simp only [orth, Submodule.mem_iInf, LinearMap.mem_ker] at hy
   exact fun x hx => hy x hx
 
-theorem rs_z_mem (hf : PartnerOK D F0 f) (hM : IsGlueLat (hWb D F0) (zbar D F0) M)
-    : F0.z ∈ lamC D F0 f M := by
+theorem rs_z_mem (hf : PartnerOK D F0 f) (hM : IsGlueLat (hWb D F0) (zbar D F0) M) :
+    F0.z ∈ lamC D F0 f M := by
   rw [rs_mem_lamC_perp (z_mem_perp D F0)]
   refine ⟨hM.2.2.1, fun a => ?_⟩
   rw [hf.2.2 a]
   exact fi_zero D _
 
-theorem rs_smul_e_mem (hf : PartnerOK D F0 f) {a : Fin D.R.rS} {x : D.host.E} (hx : x ∈ aaI D a)
-    : x • F0.e a ∈ lamC D F0 f M := by
+theorem rs_smul_e_mem (hf : PartnerOK D F0 f) {a : Fin D.R.rS} {x : D.host.E} (hx : x ∈ aaI D a) :
+    x • F0.e a ∈ lamC D F0 f M := by
   have hXe : ∀ y ∈ F0.X, ∀ b, (VS D).hT y (F0.e b) = 0 := by
     intro y hy b
     have hy' : y ∈ Submodule.span D.host.E (Set.range F0.e) := hy
@@ -74,7 +111,9 @@ theorem rs_smul_e_mem (hf : PartnerOK D F0 f) {a : Fin D.R.rS} {x : D.host.E} (h
     rw [h0]
     exact zero_mem _
   · have hs : starRingEnd D.host.E ((VS D).hT (F0.e a) (f b)) = (VS D).hT (f b) (F0.e a) := by
-      first | exact (VS D).herm (F0.e a) (f b) | exact (VS D).herm.eq (F0.e a) (f b)
+      first
+        | exact (VS D).herm (F0.e a) (f b)
+        | exact (VS D).herm.eq (F0.e a) (f b)
     rw [map_smul, ← hs, hf.1 a b, smul_eq_mul]
     split_ifs with hab
     · subst hab
@@ -91,11 +130,10 @@ theorem rs_xlam (hf : PartnerOK D F0 f) : XLam (lamC D F0 f M) (lf D F0) = XS D 
     have hca : ∀ a, c a ∈ aaI D a := by
       intro a
       have h := hα a
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [← hc, map_sum] at h
-      simp only [map_smul, rs_hT_f_e hf, smul_eq_mul, mul_ite, mul_one, mul_zero,
-          Finset.sum_ite_eq', Finset.mem_univ, if_true]
-        at h
+
+      rw [← hc, map_sum] at h
+      simp only [map_smul, rs_hT_f_e hf, smul_eq_mul, mul_ite, mul_one, mul_zero, Finset.sum_ite_eq',
+        Finset.mem_univ, if_true] at h
       exact h
     rw [← hc]
     refine Submodule.sum_mem _ fun a _ => Submodule.subset_span ⟨a, c a, hca a, rfl⟩
@@ -103,10 +141,8 @@ theorem rs_xlam (hf : PartnerOK D F0 f) : XLam (lamC D F0 f M) (lf D F0) = XS D 
     rintro _ ⟨a, x, hx, rfl⟩
     exact ⟨rs_smul_e_mem hf hx, Submodule.smul_mem _ x (rs_e_mem_X D F0 a)⟩
 
-theorem rs_prim
-    (hf : PartnerOK D F0 f) (hM : IsGlueLat (hWb D F0) (zbar D F0) M)
-    (c : D.host.E) (hc : c • F0.z ∈ Lsub (lamC D F0 f M) (lf D F0))
-    : ∃ o : 𝓞 D.host.E, (o : D.host.E) = c := by
+theorem rs_prim (hf : PartnerOK D F0 f) (hM : IsGlueLat (hWb D F0) (zbar D F0) M) (c : D.host.E)
+    (hc : c • F0.z ∈ Lsub (lamC D F0 f M) (lf D F0)) : ∃ o : 𝓞 D.host.E, (o : D.host.E) = c := by
   obtain ⟨y, hy, x, hx, hyx⟩ := Submodule.mem_sup.1 hc.1
   have hyΛ : y ∈ lamC D F0 f M := hy.1
   have hyp : y ∈ perpS (VS D) F0.X := rs_orth_perp hy.2
@@ -118,8 +154,7 @@ theorem rs_prim
     apply Subtype.ext
     simp only [Submodule.coe_smul, Submodule.coe_add]
     exact hyx.symm
-  rw [zbar, ← Submodule.Quotient.mk_smul, hsum, Submodule.Quotient.mk_add, rs_mk_X_zero D F0 hxX,
-    add_zero]
+  rw [zbar, ← Submodule.Quotient.mk_smul, hsum, Submodule.Quotient.mk_add, rs_mk_X_zero D F0 hxX, add_zero]
   exact hyM
 
 def rsLift (w : perpS (VS D) F0.X) : (VS D).V := (w : (VS D).V) - ∑ a, (VS D).hT (f a) w • F0.e a
@@ -138,33 +173,34 @@ theorem rs_lift_perp (w : perpS (VS D) F0.X) : rsLift (f := f) w ∈ perpS (VS D
     | zero => rw [map_zero, LinearMap.zero_apply]
     | add y z _ _ hy hz => rw [map_add (f := _), LinearMap.add_apply, hy, hz, add_zero]
     | smul c y _ hy => rw [LinearMap.map_smulₛₗ, LinearMap.smul_apply, hy, smul_zero]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [rsLift, map_sub, map_sum, map_smul, hxe, smul_zero, Finset.sum_const_zero, sub_zero]
+
+  simp only [rsLift, map_sub, map_sum, map_smul, hxe, smul_zero, Finset.sum_const_zero, sub_zero]
   exact w.2 x hx
 
-theorem rs_lift_mk (w : perpS (VS D) F0.X)
-    : (Submodule.Quotient.mk (⟨rsLift (f := f) w, rs_lift_perp w⟩ : perpS (VS D) F0.X) : WbQ D F0)
-      = Submodule.Quotient.mk w := by
+theorem rs_lift_mk (w : perpS (VS D) F0.X) :
+    (Submodule.Quotient.mk (⟨rsLift (f := f) w, rs_lift_perp w⟩ : perpS (VS D) F0.X) : WbQ D F0) =
+      Submodule.Quotient.mk w := by
   apply (Submodule.Quotient.eq _).mpr
   show (((⟨rsLift (f := f) w, rs_lift_perp w⟩ : perpS (VS D) F0.X) - w : perpS (VS D) F0.X) : (VS D).V) ∈ F0.X
   simp only [Submodule.coe_sub, rsLift, sub_sub_cancel_left]
   exact neg_mem (sum_mem fun a _ => Submodule.smul_mem _ _ (Submodule.subset_span ⟨a, rfl⟩))
 
-theorem rs_hT_f_lift (hf : PartnerOK D F0 f) (w : perpS (VS D) F0.X) (b : Fin D.R.rS)
-    : (VS D).hT (f b) (rsLift (f := f) w) = 0 := by
+theorem rs_hT_f_lift (hf : PartnerOK D F0 f) (w : perpS (VS D) F0.X) (b : Fin D.R.rS) :
+    (VS D).hT (f b) (rsLift (f := f) w) = 0 := by
   have hfe : ∀ a, (VS D).hT (f b) (F0.e a) = if a = b then 1 else 0 := by
     intro a
     have hs : starRingEnd D.host.E ((VS D).hT (F0.e a) (f b)) = (VS D).hT (f b) (F0.e a) := by
-      first | exact (VS D).herm (F0.e a) (f b) | exact (VS D).herm.eq (F0.e a) (f b)
+      first
+        | exact (VS D).herm (F0.e a) (f b)
+        | exact (VS D).herm.eq (F0.e a) (f b)
     rw [← hs, hf.1 a b]
     split_ifs <;> simp
-  set_option synthInstance.maxHeartbeats 100000 in
-  simp only [rsLift, map_sub, map_sum, map_smul, hfe, smul_eq_mul, mul_ite, mul_one, mul_zero,
-    Finset.sum_ite_eq', Finset.mem_univ, if_true, sub_self]
 
-theorem rs_lift_mem
-    (hf : PartnerOK D F0 f) (w : perpS (VS D) F0.X) (hw : (Submodule.Quotient.mk w : WbQ D F0) ∈ M)
-    : rsLift (f := f) w ∈ lamC D F0 f M := by
+  simp only [rsLift, map_sub, map_sum, map_smul, hfe, smul_eq_mul, mul_ite, mul_one, mul_zero,
+  Finset.sum_ite_eq', Finset.mem_univ, if_true, sub_self]
+
+theorem rs_lift_mem (hf : PartnerOK D F0 f) (w : perpS (VS D) F0.X)
+    (hw : (Submodule.Quotient.mk w : WbQ D F0) ∈ M) : rsLift (f := f) w ∈ lamC D F0 f M := by
   rw [rs_mem_lamC_perp (rs_lift_perp w)]
   refine ⟨?_, fun a => ?_⟩
   · rw [rs_lift_mk]

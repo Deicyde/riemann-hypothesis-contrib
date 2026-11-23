@@ -1,6 +1,49 @@
 module
 
+public import Formalism.SharpRestriction.GrowthBounds.MonomialFactorials.BlockBoundUniformiser
 public import Formalism.SharpRestriction.GrowthBounds.MonomialFactorials.MemIntPolIff
+public import Formalism.SharpRestriction.GrowthBounds.MonomialFactorials.PadicIntegersEmbeddingMapPrime
+public import Formalism.SharpRestriction.GrowthBounds.MonomialFactorials.StructureSheafH1BaseChange
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Rat
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.LocalProperties.Reduced
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Presheaf
 
 @[expose] public section
 
@@ -63,8 +106,8 @@ theorem fock_map (ι : ℚ_[p] →+* KK O) {σ : Type} (F G : MvPolynomial σ �
     : fock (map ι F) (map ι G) = ι (Formalism.GM.M.fockK F G) := by
   classical
   unfold fock Formalism.GM.M.fockK
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [support_map_of_injective _ ι.injective, map_sum]
+
+  rw [support_map_of_injective _ ι.injective, map_sum]
   refine Finset.sum_congr rfl fun m _ => ?_
   rw [coeff_map, coeff_map, map_mul, map_mul]
   congr 1
@@ -156,7 +199,7 @@ theorem block_dual_family_bound
       rw [MvPolynomial.as_sum (lam • map ι z)]
       refine Submodule.sum_mem _ fun v hv => Submodule.subset_span ⟨v, _, ?_, rfl⟩
       have hcv : (lam • map ι z).coeff v = lam * ι (z.coeff v) := by
-        rw [coeff_smul, coeff_map, smul_eq_mul]
+        rw [MvPolynomial.coeff_smul, coeff_map, smul_eq_mul]
       have hzv : z.coeff v ≠ 0 := by
         intro h0
         rw [MvPolynomial.mem_support_iff, hcv, h0, map_zero, mul_zero] at hv

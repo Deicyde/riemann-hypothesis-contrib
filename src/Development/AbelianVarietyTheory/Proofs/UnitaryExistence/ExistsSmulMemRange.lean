@@ -1,6 +1,54 @@
 module
 
-public import Mathlib
+public import Mathlib.Basic.Complex.Basic
+public import Mathlib.NumberTheory.NumberField.Basic
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -8,18 +56,15 @@ open NumberField
 
 namespace GlobalTheory.ExistsSmulMemRange
 
-theorem exists_smul_mem_range
-    {E : Type} [Field E] [NumberField E]
-    {Λ : Type} [AddCommGroup Λ] [Module (RingOfIntegers E) Λ]
-    {r : ℕ} (φ : Λ →ₗ[RingOfIntegers E] Fin r → E) (w : Fin r → E)
-    (hw : w ∈ Submodule.span E (Set.range (⇑φ : Λ → Fin r → E)))
-    : ∃ (a : RingOfIntegers E) (x : Λ), a ≠ 0 ∧ φ x = a • w := by
+theorem exists_smul_mem_range {E : Type} [Field E] [NumberField E] {Λ : Type} [AddCommGroup Λ]
+    [Module (RingOfIntegers E) Λ] {r : ℕ} (φ : Λ →ₗ[RingOfIntegers E] Fin r → E)
+    (w : Fin r → E) (hw : w ∈ Submodule.span E (Set.range (⇑φ : Λ → Fin r → E))) :
+    ∃ (a : RingOfIntegers E) (x : Λ), a ≠ 0 ∧ φ x = a • w := by
   induction hw using Submodule.span_induction with
   | mem w hw =>
     obtain ⟨x, rfl⟩ := hw
     exact ⟨1, x, one_ne_zero, (one_smul _ _).symm⟩
-  | zero =>
-    exact ⟨1, 0, one_ne_zero, by simp⟩
+  | zero => exact ⟨1, 0, one_ne_zero, by simp⟩
   | add u v _ _ hu hv =>
     obtain ⟨a, x, ha, hx⟩ := hu
     obtain ⟨b, y, hb, hy⟩ := hv
@@ -29,8 +74,8 @@ theorem exists_smul_mem_range
     obtain ⟨a, x, ha, hx⟩ := hu
     obtain ⟨p, q, hq, rfl⟩ := IsFractionRing.div_surjective (A := RingOfIntegers E) t
     have hq0 : q ≠ 0 := nonZeroDivisors.ne_zero hq
-    have hq1 : algebraMap (RingOfIntegers E) E q ≠ 0 := fun h =>
-      hq0 (IsFractionRing.injective (RingOfIntegers E) E (by simpa using h))
+    have hq1 : algebraMap (RingOfIntegers E) E q ≠ 0 :=
+      fun h => hq0 (IsFractionRing.injective (RingOfIntegers E) E (by simpa using h))
     refine ⟨a * q, p • x, mul_ne_zero ha hq0, ?_⟩
     rw [map_smul, hx]
     funext j
@@ -38,39 +83,36 @@ theorem exists_smul_mem_range
     simp only [Algebra.smul_def, map_mul]
     field_simp
 
-theorem exists_coeffs
-    {E : Type} [Field E] [NumberField E]
-    {Λ : Type} [AddCommGroup Λ] [Module (RingOfIntegers E) Λ]
-    {r : ℕ} (φ : Λ →ₗ[RingOfIntegers E] Fin r → E) (hinj : Function.Injective (⇑φ : Λ → Fin r → E))
+theorem exists_coeffs {E : Type} [Field E] [NumberField E] {Λ : Type} [AddCommGroup Λ]
+    [Module (RingOfIntegers E) Λ] {r : ℕ} (φ : Λ →ₗ[RingOfIntegers E] Fin r → E)
+    (hinj : Function.Injective (⇑φ : Λ → Fin r → E))
     (hspan : Submodule.span E (Set.range (⇑φ : Λ → Fin r → E)) = ⊤)
-    (σ : E →+* ℂ) (f : Λ →+ ℂ) (hf : ∀ (a : RingOfIntegers E) (x : Λ), f (a • x) = σ (↑a : E) * f x)
-    : ∃ (c : Fin r → ℂ), ∀ (v : Λ), f v = ∑ j : Fin r, c j * σ (φ v j) := by
+    (σ : E →+* ℂ) (f : Λ →+ ℂ)
+    (hf : ∀ (a : RingOfIntegers E) (x : Λ), f (a • x) = σ (↑a : E) * f x) :
+    ∃ (c : Fin r → ℂ), ∀ (v : Λ), f v = ∑ j : Fin r, c j * σ (φ v j) := by
   classical
-  have h1
-      : ∀ j : Fin r, ∃ (a : RingOfIntegers E) (x : Λ),
-        a ≠ 0 ∧ φ x = a • (Pi.single j (1 : E) : Fin r → E) := fun j =>
-    exists_smul_mem_range φ _ (by rw [hspan]; trivial)
+  have h1 : ∀ j : Fin r, ∃ (a : RingOfIntegers E) (x : Λ), a ≠ 0 ∧
+      φ x = a • (Pi.single j (1 : E) : Fin r → E) :=
+    fun j => exists_smul_mem_range φ _ (by rw [hspan]; trivial)
   choose a x ha hx using h1
-  have hne : ∀ q : RingOfIntegers E, q ≠ 0 → algebraMap (RingOfIntegers E) E q ≠ 0 := fun q hq0 h =>
-    hq0 (IsFractionRing.injective (RingOfIntegers E) E (by simpa using h))
+  have hne : ∀ q : RingOfIntegers E, q ≠ 0 → algebraMap (RingOfIntegers E) E q ≠ 0 :=
+    fun q hq0 h => hq0 (IsFractionRing.injective (RingOfIntegers E) E (by simpa using h))
   refine ⟨fun j => f (x j) / σ (algebraMap (RingOfIntegers E) E (a j)), fun v => ?_⟩
-  obtain ⟨d, hd⟩ :=
-    IsLocalization.exist_integer_multiples_of_finite (nonZeroDivisors (RingOfIntegers E))
-      (fun j : Fin r => φ v j / algebraMap (RingOfIntegers E) E (a j))
+  obtain ⟨d, hd⟩ := IsLocalization.exist_integer_multiples_of_finite
+    (nonZeroDivisors (RingOfIntegers E))
+    (fun j : Fin r => φ v j / algebraMap (RingOfIntegers E) E (a j))
   choose b hb using hd
   have hd0 : algebraMap (RingOfIntegers E) E (d : RingOfIntegers E) ≠ 0 :=
     hne _ (nonZeroDivisors.ne_zero d.2)
-  have hb'
-      : ∀ j,
-        algebraMap (RingOfIntegers E) E (b j)
-          = algebraMap (RingOfIntegers E) E (d : RingOfIntegers E)
-            * (φ v j / algebraMap (RingOfIntegers E) E (a j)) := by
+  have hb' : ∀ j, algebraMap (RingOfIntegers E) E (b j) =
+      algebraMap (RingOfIntegers E) E (d : RingOfIntegers E) *
+        (φ v j / algebraMap (RingOfIntegers E) E (a j)) := by
     intro j
     rw [hb j, Algebra.smul_def]
   have key : (d : RingOfIntegers E) • v = ∑ j, b j • x j := by
     apply hinj
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_smul, map_sum]
+
+    rw [map_smul, map_sum]
     funext i
     simp only [map_smul, hx, Finset.sum_apply, Pi.smul_apply, Algebra.smul_def, Pi.single_apply]
     rw [Finset.sum_eq_single i]
@@ -82,9 +124,10 @@ theorem exists_coeffs
       simp [hj.symm]
     · simp
   have h2 := congrArg f key
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [hf, map_sum] at h2
-  have hσd : σ (algebraMap (RingOfIntegers E) E (d : RingOfIntegers E)) ≠ 0 := (map_ne_zero σ).2 hd0
+
+  rw [hf, map_sum] at h2
+  have hσd : σ (algebraMap (RingOfIntegers E) E (d : RingOfIntegers E)) ≠ 0 :=
+    (map_ne_zero σ).2 hd0
   apply mul_left_cancel₀ hσd
   refine h2.trans ?_
   rw [Finset.mul_sum]

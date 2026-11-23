@@ -1,90 +1,71 @@
 module
 
-public import Mathlib
-public import Development.AutomorphicSpectrum.PublishedTheorems.Algebra₂.RegularHypothesesAndConclusion
-public import Development.AutomorphicSpectrum.Proofs.AlgebraProofs.HasAffineChartId
+import Development.AbelianVarietyTheory.Proofs.DivisorProofs.RelAmpleDiagonalDescendedBundleGaloisCover
 public import Development.AutomorphicSpectrum.Proofs.AlgebraProofs.FiniteFreeHom
 public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ExistsSecImageNonzeroLocus
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+public import Mathlib.RingTheory.Finiteness.ModuleFinitePresentation
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Development.AutomorphicSpectrum.PublishedTheorems.Algebra₂.RegularHypothesesAndConclusion
 
 @[expose] public section
 
 open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory AlgebraicGeometry Opposite
 open scoped CategoryTheory.MonObj
 attribute [local instance] Over.cartesianMonoidalCategory
-open GlobalTheory.CompanionTheory.FreeQuotProof GlobalTheory.CompanionTheory.Hypotheses₂
-  GlobalTheory.CompanionTheory.Hypotheses₂.FreeQuot
+open GlobalTheory.CompanionTheory.FreeQuotProof GlobalTheory.CompanionTheory.Hypotheses₂ GlobalTheory.CompanionTheory.Hypotheses₂.FreeQuot
 
 namespace GlobalTheory.CompanionTheory.FreeQuotProof.Nbhd
 
 open GlobalTheory.FiniteAmple
 
-theorem exists_finFree_away_of_finitePresentation
-    {A B : Type} [CommRing A] [CommRing B]
-    {φ : A →+* B} (hf : φ.Finite) (hfl : φ.Flat) (hfp : φ.FinitePresentation)
-    (p : PrimeSpectrum A)
-    : ∃ r ∉ p.asIdeal,
-      ∀ {A' B' : Type} [CommRing A'] [CommRing B'] {α : A →+* A'} {β : B →+* B'} {φ' : A' →+* B'},
-        IsPushout (CommRingCat.ofHom φ) (CommRingCat.ofHom α) (CommRingCat.ofHom β)
-            (CommRingCat.ofHom φ')
-          → IsUnit (α r)
-          → FinFree φ' := by
-  letI : Algebra A B := φ.toAlgebra
-  haveI : Module.Finite A B := hf
-  haveI : Module.Flat A B := hfl
-  haveI : Algebra.FinitePresentation A B := hfp
-  haveI : Module.FinitePresentation A B :=
-    Module.FinitePresentation.of_finite_of_finitePresentation A B
-  haveI : Module.Finite (Localization.AtPrime p.asIdeal)
-      (TensorProduct A (Localization.AtPrime p.asIdeal) B) :=
-    Module.Finite.base_change A (Localization.AtPrime p.asIdeal) B
-  haveI : Module.Free (Localization.AtPrime p.asIdeal)
-      (TensorProduct A (Localization.AtPrime p.asIdeal) B) :=
-    Module.free_of_flat_of_isLocalRing
-  haveI : IsLocalizedModule p.asIdeal.primeCompl
-      (TensorProduct.mk A (Localization.AtPrime p.asIdeal) B 1) :=
-    (isLocalizedModule_iff_isBaseChange p.asIdeal.primeCompl (Localization.AtPrime p.asIdeal)
-      _).mpr (TensorProduct.isBaseChange A B (Localization.AtPrime p.asIdeal))
-  obtain ⟨r, hr, hfree, -⟩ :=
-    Module.FinitePresentation.exists_free_localizedModule_powers p.asIdeal.primeCompl
-      (TensorProduct.mk A (Localization.AtPrime p.asIdeal) B 1) (Localization.AtPrime p.asIdeal)
-  refine ⟨r, hr, ?_⟩
-  intro A' B' _ _ α β φ' h hu
-  have hbc
-      : IsBaseChange (Localization.Away r) (LocalizedModule.mkLinearMap (Submonoid.powers r) B) :=
-    (isLocalizedModule_iff_isBaseChange (Submonoid.powers r) (Localization.Away r) _).mp
-      inferInstance
-  haveI : Module.Free (Localization.Away r) (TensorProduct A (Localization.Away r) B) :=
-    Module.Free.of_equiv hbc.equiv.symm
-  letI : Algebra A A' := α.toAlgebra
-  letI : Algebra B B' := β.toAlgebra
-  letI : Algebra A' B' := φ'.toAlgebra
-  letI : Algebra A B' := (φ'.comp α).toAlgebra
-  haveI : IsScalarTower A A' B' := IsScalarTower.of_algebraMap_eq' rfl
-  have hw : β.comp φ = φ'.comp α := by
-    have := congrArg CommRingCat.Hom.hom h.w
-    simpa using this
-  haveI : IsScalarTower A B B' := IsScalarTower.of_algebraMap_eq' hw.symm
-  haveI hpo : Algebra.IsPushout A A' B B' := CommRingCat.isPushout_iff_isPushout.mp h.flip
-  let e2 : TensorProduct A A' B ≃ₗ[A'] B' := hpo.out.equiv
-  letI : Algebra (Localization.Away r) A' := (IsLocalization.Away.lift r hu).toAlgebra
-  haveI : IsScalarTower A (Localization.Away r) A' :=
-    IsScalarTower.of_algebraMap_eq (fun a => (IsLocalization.Away.lift_eq r hu a).symm)
-  let e1
-      : TensorProduct (Localization.Away r) A' (TensorProduct A (Localization.Away r) B)
-        ≃ₗ[A'] TensorProduct A A' B :=
-    TensorProduct.AlgebraTensorModule.cancelBaseChange A (Localization.Away r) A' A' B
-  haveI : Module.Free A'
-      (TensorProduct (Localization.Away r) A' (TensorProduct A (Localization.Away r) B)) :=
-    Module.Free.of_basis (Algebra.TensorProduct.basis A'
-      (Module.Free.chooseBasis (Localization.Away r) (TensorProduct A (Localization.Away r) B)))
-  haveI : Module.Finite A' (TensorProduct A A' B) := Module.Finite.base_change A A' B
-  refine (show φ'.Finite ∧ Module.Free A' B' from ⟨?_, ?_⟩)
-  · exact Module.Finite.equiv e2
-  · exact Module.Free.of_equiv (e1.trans e2)
+theorem exists_finFree_away_of_finitePresentation {A B : Type} [CommRing A] [CommRing B] {φ : A →+* B}
+    (hf : φ.Finite) (hfl : φ.Flat) (hfp : φ.FinitePresentation) (p : PrimeSpectrum A) :
+    ∃ r ∉ p.asIdeal, ∀ {A' B' : Type} [CommRing A'] [CommRing B'] {α : A →+* A'} {β : B →+* B'}
+      {φ' : A' →+* B'},
+      IsPushout (CommRingCat.ofHom φ) (CommRingCat.ofHom α) (CommRingCat.ofHom β)
+        (CommRingCat.ofHom φ') →
+      IsUnit (α r) → FinFree φ' := by
+  apply GlobalTheory.FiniteAmpleFP.exists_finFree_away_fp <;> assumption
 
-theorem finiteFreeHom_comp_isIso
-    {A B C : CommRingCat.{0}} (f : A ⟶ B) (e : B ⟶ C) [IsIso e] (h : FinFree f.hom)
-    : FiniteFreeHom (f ≫ e).hom := by
+theorem finiteFreeHom_comp_isIso {A B C : CommRingCat.{0}} (f : A ⟶ B) (e : B ⟶ C) [IsIso e]
+    (h : FinFree f.hom) : FiniteFreeHom (f ≫ e).hom := by
   obtain ⟨hfin, hfree⟩ := h
   letI : Algebra A B := f.hom.toAlgebra
   letI : Algebra A C := (f ≫ e).hom.toAlgebra
@@ -94,9 +75,9 @@ theorem finiteFreeHom_comp_isIso
   let eA : B ≃ₐ[A] C := AlgEquiv.ofRingEquiv (f := eR) (fun a => rfl)
   exact ⟨Module.Free.of_equiv eA.toLinearEquiv, Module.Finite.equiv eA.toLinearEquiv⟩
 
-theorem exists_affine_finiteFreeHom
-    {Y S : Scheme.{0}} (g : Y ⟶ S) [IsFinite g] [Flat g] [LocallyOfFinitePresentation g] (s : S)
-    : ∃ W : S.Opens, s ∈ W ∧ IsAffineOpen W ∧ FiniteFreeHom (g ∣_ W).appTop.hom := by
+theorem exists_affine_finiteFreeHom {Y S : Scheme.{0}} (g : Y ⟶ S) [IsFinite g] [Flat g]
+    [LocallyOfFinitePresentation g] (s : S) :
+    ∃ W : S.Opens, s ∈ W ∧ IsAffineOpen W ∧ FiniteFreeHom (g ∣_ W).appTop.hom := by
   obtain ⟨V, hV, hsV, -⟩ := exists_isAffineOpen_mem_and_subset (show s ∈ (⊤ : S.Opens) from trivial)
   have hfin : (g.app V).hom.Finite := IsFinite.finite_app g V hV
   have hfl : (g.app V).hom.Flat := by
@@ -104,10 +85,10 @@ theorem exists_affine_finiteFreeHom
     exact HasRingHomProperty.appLE @Flat g ‹_› ⟨V, hV⟩ ⟨_, hV.preimage g⟩ _
   have hfp : (g.app V).hom.FinitePresentation := by
     rw [Scheme.Hom.app_eq_appLE]
-    exact HasRingHomProperty.appLE @LocallyOfFinitePresentation g ‹_› ⟨V, hV⟩ ⟨_, hV.preimage g⟩ _
-  obtain ⟨r, hr, F⟩ :=
-    exists_finFree_away_of_finitePresentation hfin hfl hfp
-      (PrimeSpectrum.comap (S.presheaf.germ V s hsV).hom (IsLocalRing.closedPoint _))
+    exact HasRingHomProperty.appLE @LocallyOfFinitePresentation g ‹_› ⟨V, hV⟩
+      ⟨_, hV.preimage g⟩ _
+  obtain ⟨r, hr, F⟩ := exists_finFree_away_of_finitePresentation hfin hfl hfp
+    (PrimeSpectrum.comap (S.presheaf.germ V s hsV).hom (IsLocalRing.closedPoint _))
   have hsW : s ∈ S.basicOpen r := by
     rw [Scheme.mem_basicOpen _ _ _ hsV]
     by_contra hnu
@@ -126,9 +107,8 @@ theorem exists_affine_finiteFreeHom
   have key' : FinFree (g.app ((Scheme.Hom.opensFunctor (S.basicOpen r).ι).obj ⊤)).hom := by
     rw [Scheme.Opens.ι_image_top]
     exact key
-  have aux
-      : ∀ {A B C : CommRingCat.{0}} (f : A ⟶ B) (p : B = C),
-        FinFree f.hom → FiniteFreeHom (f ≫ eqToHom p).hom := by
+  have aux : ∀ {A B C : CommRingCat.{0}} (f : A ⟶ B) (p : B = C), FinFree f.hom →
+      FiniteFreeHom (f ≫ eqToHom p).hom := by
     intro A B C f p hf
     subst p
     rw [eqToHom_refl]

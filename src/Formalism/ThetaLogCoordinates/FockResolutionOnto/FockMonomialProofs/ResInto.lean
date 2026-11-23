@@ -1,7 +1,57 @@
 module
 
 public import Formalism.ThetaLogCoordinates.FockResolutionOnto.StatementC
+public import Formalism.MahlerMeasure.MahlerMeasureProofs.RemoveS
+public import Formalism.ThetaLogCoordinates.FockResolutionOnto.FockMonomialProofs.InitPartZeroXMul
+import Formalism.MahlerMeasure.MahlerMeasureProofs.MeanGam
 public import Formalism.ThetaLogCoordinates.FockResolutionOnto.FockMonomialProofs.FirstWeightLeOfSupport
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
+public import Formalism.PolynomialDimension.MultinomialDepth.PartnerM
 
 @[expose] public section
 
@@ -76,8 +126,8 @@ theorem resL_glAct
     (x : MvPolynomial (Fin N × Fin r) ℚ_[p])
     : resL p v e (glAct p LL j c d x) = glAct p LL j c d (resL p v e x) := by
   classical
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [glAct, LinearMap.sum_apply, LinearMap.sum_apply, map_sum]
+
+  rw [glAct, LinearMap.sum_apply, LinearMap.sum_apply, map_sum]
   refine Finset.sum_congr rfl fun i _ => ?_
   by_cases hij : (i : ℕ) < j
   · obtain ⟨hc, hd⟩ := h i hij
@@ -163,8 +213,8 @@ theorem pderiv_keep_wt
         {m : Fin (K + 1) × Fin r →₀ ℕ | ((wt LL (K + 1) 0 m : ℤ) : WithTop ℤ) ≤ Mt} := by
   intro x hx
   rw [MvPolynomial.mem_restrictSupport_iff] at hx
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [x.as_sum, map_sum]
+
+  rw [x.as_sum, map_sum]
   refine Submodule.sum_mem _ fun m hm => ?_
   rw [MvPolynomial.pderiv_monomial, MvPolynomial.mem_restrictSupport_iff]
   refine (Finset.coe_subset.2 MvPolynomial.support_monomial_subset).trans ?_
@@ -191,8 +241,8 @@ private theorem pderiv_last_glAct_comm
     : pderiv (Fin.last K, c) (glAct p LL K a b x)
       = glAct p LL K a b (pderiv (Fin.last K, c) x) := by
   classical
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [glAct, LinearMap.sum_apply, LinearMap.sum_apply, map_sum]
+
+  rw [glAct, LinearMap.sum_apply, LinearMap.sum_apply, map_sum]
   refine Finset.sum_congr rfl fun i _ => ?_
   by_cases hij : (i : ℕ) < K
   · have hne : ∀ d : Fin r, ((i, d) : Fin (K + 1) × Fin r) ≠ (Fin.last K, c) := fun d h =>
@@ -282,8 +332,8 @@ theorem pderiv_freeLast
     (x : MvPolynomial (Fin (K + 1) × Fin r) ℚ_[p]) (hx : x ∈ FreeLast p K r) (d : Fin r)
     : pderiv (Fin.last K, d) x = 0 := by
   rw [FreeLast, MvPolynomial.mem_restrictSupport_iff] at hx
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [x.as_sum, map_sum]
+
+  rw [x.as_sum, map_sum]
   apply Finset.sum_eq_zero
   intro m hm
   have h0 : m (Fin.last K, d) = 0 := hx hm d
@@ -294,8 +344,8 @@ private theorem pderiv_mem_freeLast (v : Fin (K + 1) × Fin r)
     : ∀ y ∈ FreeLast p K r, pderiv v y ∈ FreeLast p K r := by
   intro y hy
   rw [FreeLast, MvPolynomial.mem_restrictSupport_iff] at hy
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [y.as_sum, map_sum]
+
+  rw [y.as_sum, map_sum]
   refine Submodule.sum_mem _ fun m hm => ?_
   rw [MvPolynomial.pderiv_monomial, FreeLast, MvPolynomial.mem_restrictSupport_iff]
   refine (Finset.coe_subset.2 MvPolynomial.support_monomial_subset).trans ?_
@@ -416,8 +466,8 @@ private theorem pderiv_last_eulL_eq (c : Fin r) (g : MvPolynomial (Fin (K + 1) �
         (fun d : Fin r => (Fin.last K, d))
         (pderiv (Fin.last K, c) g) := by
   classical
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [Formalism.GM.ProjS.eulL_apply, Formalism.GM.ProjS.eulL_apply, map_sum]
+
+  rw [Formalism.GM.ProjS.eulL_apply, Formalism.GM.ProjS.eulL_apply, map_sum]
   simp only [Derivation.leibniz, MvPolynomial.pderiv_X, smul_eq_mul, Finset.sum_add_distrib]
   refine (add_comm _ _).trans ?_
   congr 1

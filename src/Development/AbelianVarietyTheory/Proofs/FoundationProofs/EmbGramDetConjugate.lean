@@ -1,20 +1,57 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.Definitions.Foundations.IsSelfDualE
-public import Formalism.LocalToGlobal.Columns.CoefficientsModP.PairingNondegenerateHolds
-public import Formalism.LocalToGlobal.Columns.CoefficientsModP.FkPderivBlockEmbNe
-public import Formalism.GradedWeylDivisibility.StatementE
-public import Formalism.HarderNarasimhan.ShiftInvariance
-public import Formalism.QuotientMetricDivisors.ReductionLemmaZero
-public import Formalism.QuotientMetricDivisors.ProdFormula
 public import Formalism.QuotientMetricDivisors.HermitianTwistDivisors.ReductionLemmaSecond
-public import Formalism.LocalToGlobal.IndefiniteForms.IndefiniteTree.RealCubicMeans.LeafBounds.MeanMaxLeaf.LeafMMFree
+public import Formalism.QuotientMetricDivisors.RatHermLcvTwist
+import Formalism.QuotientMetricDivisors.HermitianTwistDivisors.DeterminantCauchySchwarz
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Real
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Matrix.PosDef
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
+import Development.AbelianVarietyTheory.Definitions.Foundations.IsSelfDualE
+import Formalism.LocalToGlobal.Divisibility.CoefMod
+import Formalism.LocalToGlobal.IndefiniteForms.IndefiniteTree.RealCubicMeans.LeafBounds.MeanMaxLeaf.LeafMMFree
+import Formalism.SharpRestriction.LevelLetterCocycles.DataNLoc
 
 @[expose] public section
 
-open NumberField IsDedekindDomain MvPolynomial Formalism.BasicNotions Formalism.L2.DIV
-  Formalism.DivisionValues GlobalTheory.TestLat Formalism.L2.Indef.Tree.ArchimedeanLeafBounds.Cuts
+open NumberField IsDedekindDomain MvPolynomial Formalism.BasicNotions Formalism.L2.DIV Formalism.DivisionValues GlobalTheory.TestLat Formalism.L2.Indef.Tree.ArchimedeanLeafBounds.Cuts
 open scoped Matrix ComplexOrder
 
 noncomputable section
@@ -23,17 +60,16 @@ namespace GlobalTheory.GramMean
 
 variable {K : Type} [Field K] [NumberField K] [StarRing K]
 
-def embGramDet {d j : ℕ} (H : Matrix (Fin d) (Fin d) K) (E : Matrix (Fin d) (Fin j) K) (φ : K →+* ℂ)
-    : ℂ :=
+def embGramDet {d j : ℕ} (H : Matrix (Fin d) (Fin d) K) (E : Matrix (Fin d) (Fin j) K)
+    (φ : K →+* ℂ) : ℂ :=
   ((E.map φ)ᴴ * H.map φ * E.map φ).det
 
 omit [NumberField K] [StarRing K] in
-theorem embGramDet_conjugate
-    {d j : ℕ} (H : Matrix (Fin d) (Fin d) K) (E : Matrix (Fin d) (Fin j) K) (φ : K →+* ℂ)
-    : embGramDet H E (ComplexEmbedding.conjugate φ) = starRingEnd ℂ (embGramDet H E φ) := by
-  have hm
-      : ∀ {a b : ℕ} (M : Matrix (Fin a) (Fin b) K),
-        M.map (ComplexEmbedding.conjugate φ) = (M.map φ).map (starRingEnd ℂ) := by
+theorem embGramDet_conjugate {d j : ℕ} (H : Matrix (Fin d) (Fin d) K)
+    (E : Matrix (Fin d) (Fin j) K) (φ : K →+* ℂ) :
+    embGramDet H E (ComplexEmbedding.conjugate φ) = starRingEnd ℂ (embGramDet H E φ) := by
+  have hm : ∀ {a b : ℕ} (M : Matrix (Fin a) (Fin b) K),
+      M.map (ComplexEmbedding.conjugate φ) = (M.map φ).map (starRingEnd ℂ) := by
     intro a b M
     ext i k
     simp [ComplexEmbedding.conjugate_coe_eq]
@@ -42,19 +78,17 @@ theorem embGramDet_conjugate
   congr 2
 
 omit [NumberField K] [StarRing K] in
-theorem embGramDet_re_mk
-    {d j : ℕ} (H : Matrix (Fin d) (Fin d) K) (E : Matrix (Fin d) (Fin j) K) (φ : K →+* ℂ)
-    : (embGramDet H E (InfinitePlace.mk φ).embedding).re = (embGramDet H E φ).re := by
+theorem embGramDet_re_mk {d j : ℕ} (H : Matrix (Fin d) (Fin d) K)
+    (E : Matrix (Fin d) (Fin j) K) (φ : K →+* ℂ) :
+    (embGramDet H E (InfinitePlace.mk φ).embedding).re = (embGramDet H E φ).re := by
   rcases InfinitePlace.embedding_mk_eq φ with h | h
   · rw [h]
   · rw [h, embGramDet_conjugate, Complex.conj_re]
 
-theorem gram_eq_mul
-    {d j : ℕ} (X : InfinitePlace K → Matrix (Fin d) (Fin d) ℂ)
-    (v : InfinitePlace K) (e : Fin j → Fin d → K)
-    : gram X v e
-      = (((Matrix.of e)ᵀ).map v.embedding)ᴴ * (((X v)⁻¹)ᴴ * (X v)⁻¹)
-        * ((Matrix.of e)ᵀ).map v.embedding := by
+theorem gram_eq_mul {d j : ℕ} (X : InfinitePlace K → Matrix (Fin d) (Fin d) ℂ)
+    (v : InfinitePlace K) (e : Fin j → Fin d → K) :
+    gram X v e = (((Matrix.of e)ᵀ).map v.embedding)ᴴ * (((X v)⁻¹)ᴴ * (X v)⁻¹) *
+      ((Matrix.of e)ᵀ).map v.embedding := by
   ext a c
   simp only [gram, Formalism.HN.gramPl, Matrix.of_apply, majAt_eq, metMat, cv, Matrix.mul_apply,
     Matrix.conjTranspose_apply, Matrix.map_apply, Matrix.transpose_apply, dotProduct, Matrix.mulVec,
@@ -64,48 +98,44 @@ theorem gram_eq_mul
   refine Finset.sum_congr rfl fun x _ => ?_
   ring
 
-theorem map_gramR {d j : ℕ} (H : Matrix (Fin d) (Fin d) K) (e : Fin j → Fin d → K) (φ : K →+* ℂ)
-    : φ (gramR H e)
-      = ((((Matrix.of e)ᵀ).map (Rb.tw φ))ᴴ * H.map φ * ((Matrix.of e)ᵀ).map φ).det := by
+theorem map_gramR {d j : ℕ} (H : Matrix (Fin d) (Fin d) K) (e : Fin j → Fin d → K)
+    (φ : K →+* ℂ) :
+    φ (gramR H e) = ((((Matrix.of e)ᵀ).map (Rb.tw φ))ᴴ * H.map φ *
+      ((Matrix.of e)ᵀ).map φ).det := by
   unfold gramR
   rw [RingHom.map_det, RingHom.mapMatrix_apply]
   congr 1
   ext a b
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [Matrix.map_apply, Matrix.of_apply, Matrix.mul_apply, Matrix.conjTranspose_apply,
-      Matrix.transpose_apply, dotProduct, Matrix.mulVec, Pi.star_apply, map_sum, map_mul,
-      Rb.tw_apply, Finset.mul_sum, Finset.sum_mul]
+
+  simp only [Matrix.map_apply, Matrix.of_apply, Matrix.mul_apply, Matrix.conjTranspose_apply,
+  Matrix.transpose_apply, dotProduct, Matrix.mulVec, Pi.star_apply, map_sum, map_mul,
+  Rb.tw_apply, Finset.mul_sum, Finset.sum_mul]
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun k _ => ?_
   simp only [Complex.star_def, Complex.conj_conj]
   ring
 
-private theorem det_gram_eq_embGramDet
-    {K : Type} [Field K] [NumberField K] [StarRing K]
-    {d j : ℕ} (H : Matrix (Fin d) (Fin d) K) (X : InfinitePlace K → Matrix (Fin d) (Fin d) ℂ)
-    (hX : ∀ v : InfinitePlace K, ((X v)⁻¹)ᴴ * (X v)⁻¹ = H.map v.embedding) (e : Fin j → Fin d → K)
-    (v : InfinitePlace K)
-    : (gram X v e).det = embGramDet H ((Matrix.of e)ᵀ) v.embedding := by
+private theorem det_gram_eq_embGramDet {K : Type} [Field K] [NumberField K] [StarRing K] {d j : ℕ}
+    (H : Matrix (Fin d) (Fin d) K) (X : InfinitePlace K → Matrix (Fin d) (Fin d) ℂ)
+    (hX : ∀ v : InfinitePlace K, ((X v)⁻¹)ᴴ * (X v)⁻¹ = H.map v.embedding)
+    (e : Fin j → Fin d → K) (v : InfinitePlace K) :
+    (gram X v e).det = embGramDet H ((Matrix.of e)ᵀ) v.embedding := by
   rw [gram_eq_mul, hX v]
   rfl
 
-private theorem det_gram_re_nonneg'
-    {K : Type} [Field K] [NumberField K] [StarRing K]
-    {d j : ℕ} (X : InfinitePlace K → Matrix (Fin d) (Fin d) ℂ)
-    (hX : ∀ v : InfinitePlace K, IsUnit (X v).det) (e : Fin j → Fin d → K)
-    (v : InfinitePlace K)
-    : 0 ≤ (gram X v e).det.re := by
+private theorem det_gram_re_nonneg' {K : Type} [Field K] [NumberField K] [StarRing K] {d j : ℕ}
+    (X : InfinitePlace K → Matrix (Fin d) (Fin d) ℂ) (hX : ∀ v : InfinitePlace K, IsUnit (X v).det)
+    (e : Fin j → Fin d → K) (v : InfinitePlace K) : 0 ≤ (gram X v e).det.re := by
   have hP : (((X v)⁻¹)ᴴ * (X v)⁻¹).PosDef := Rb.metMat_posDef X v (hX v)
   have hS := hP.posSemidef.conjTranspose_mul_mul_same (((Matrix.of e)ᵀ).map v.embedding)
   rw [← gram_eq_mul] at hS
   exact (Complex.le_def.mp hS.det_nonneg).1
 
-theorem prod_norm_gramR_le
-    (K : Type) [Field K] [NumberField K] [StarRing K] [_root_.NumberField.IsTotallyComplex K]
+theorem prod_norm_gramR_le (K : Type) [Field K] [NumberField K] [StarRing K] [_root_.NumberField.IsTotallyComplex K]
     (d j : ℕ) (H : Matrix (Fin d) (Fin d) K) (X : InfinitePlace K → Matrix (Fin d) (Fin d) ℂ)
-    (hR : IsRatHerm (cmMax K) H X) (e : Fin j → Fin d → K)
-    : ∏ v : InfinitePlace K, ‖v.embedding (gramR H e)‖
-      ≤ ∏ v : InfinitePlace K, (gram X v e).det.re := by
+    (hR : IsRatHerm (cmMax K) H X) (e : Fin j → Fin d → K) :
+    ∏ v : InfinitePlace K, ‖v.embedding (gramR H e)‖ ≤
+      ∏ v : InfinitePlace K, (gram X v e).det.re := by
   have hU : ∀ v : InfinitePlace K, IsUnit (X v).det := fun v => (hR.2 v).1
   have hX : ∀ v : InfinitePlace K, ((X v)⁻¹)ᴴ * (X v)⁻¹ = H.map v.embedding := fun v => (hR.2 v).2
   have hK0 : IsCMSub (cmMax K) := fun σ a ha => ha σ
@@ -114,10 +144,10 @@ theorem prod_norm_gramR_le
   have hg0 : ∀ v, 0 ≤ g v := fun v => det_gram_re_nonneg' X hU e v
   have hloc : ∀ v : InfinitePlace K, ‖v.embedding (gramR H e)‖ ^ 2 ≤ g (Rb.plc v) * g v := by
     intro v
-    have hPD : (H.map v.embedding).PosDef := by rw [← hX v]; exact Rb.metMat_posDef X v (hU v)
-    have hcs :=
-      determinant_cauchy_schwarz d j (H.map v.embedding) hPD ((E.map (Rb.tw v.embedding))ᴴ)
-        ((E.map v.embedding)ᴴ)
+    have hPD : (H.map v.embedding).PosDef := by
+      rw [← hX v]; exact Rb.metMat_posDef X v (hU v)
+    have hcs := determinant_cauchy_schwarz d j (H.map v.embedding) hPD ((E.map (Rb.tw v.embedding))ᴴ)
+      ((E.map v.embedding)ᴴ)
     rw [Matrix.conjTranspose_conjTranspose, Matrix.conjTranspose_conjTranspose] at hcs
     rw [map_gramR]
     have h1 : g (Rb.plc v) = (embGramDet H E (Rb.tw v.embedding)).re := by
@@ -132,9 +162,8 @@ theorem prod_norm_gramR_le
     exact hcs
   have hperm : ∏ v : InfinitePlace K, g (Rb.plc v) = ∏ v : InfinitePlace K, g v :=
     Equiv.prod_comp (Function.Involutive.toPerm _ (fun v => Rb.plc_plc v)) g
-  have hsq
-      : (∏ v : InfinitePlace K, ‖v.embedding (gramR H e)‖) ^ 2
-        ≤ (∏ v : InfinitePlace K, g v) ^ 2 := by
+  have hsq : (∏ v : InfinitePlace K, ‖v.embedding (gramR H e)‖) ^ 2 ≤
+      (∏ v : InfinitePlace K, g v) ^ 2 := by
     have hsq2 : (∏ v : InfinitePlace K, g v) ^ 2 = ∏ v : InfinitePlace K, (g (Rb.plc v) * g v) := by
       rw [Finset.prod_mul_distrib, hperm, sq]
     rw [← Finset.prod_pow, hsq2]

@@ -1,7 +1,55 @@
 module
 
-public import Mathlib
 public import GroundTheory.HeightsAndTheta.Heights.KleimanAmpleness.GenericPointSectionHypotheses
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Coalgebra.IsFrobenius
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.HopfAlgebra.Basic
+public import Mathlib.RingTheory.KrullDimension.NonZeroDivisors
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.TotallySplit
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -33,15 +81,14 @@ def affPiece (y : Fin (N + 1) → Ω) (j : Fin (N + 1)) (n : ℕ) : Submodule k 
 
 variable {y : Fin (N + 1) → Ω} {j : Fin (N + 1)}
 
-theorem aeval_aff_of_mem_primeOf {f : Poly k N} (hf : f ∈ primeOf (S := k) y)
-    : aeval (aff y j) f = 0 := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [← sum_homogeneousComponent f, map_sum]
+theorem aeval_aff_of_mem_primeOf {f : Poly k N} (hf : f ∈ primeOf (S := k) y) :
+    aeval (aff y j) f = 0 := by
+
+  rw [← sum_homogeneousComponent f, map_sum]
   refine Finset.sum_eq_zero fun d _ => ?_
   rw [aff_def, aeval_div_of_isHomogeneous (homogeneousComponent_isHomogeneous d f),
     (mem_primeOf_of_isHomogeneous y (homogeneousComponent_isHomogeneous d f)).mp
-      (homogeneousComponent_mem_primeOf y hf d),
-    zero_div]
+      (homogeneousComponent_mem_primeOf y hf d), zero_div]
 
 theorem le_zero_of_add_one_le_one {d : WithBot ℕ∞} (h : d + 1 ≤ 1) : d ≤ 0 := by
   induction d using WithBot.recBotCoe with
@@ -56,8 +103,8 @@ theorem le_zero_of_add_one_le_one {d : WithBot ℕ∞} (h : d + 1 ≤ 1) : d ≤
       subst hm
       simp
 
-theorem isField_affRing (hy : IsSubvar (x := y) (primeOf (S := k) y) 0) (hj : y j ≠ 0)
-    : IsField (affRing k y j) := by
+theorem isField_affRing (hy : IsSubvar (x := y) (primeOf (S := k) y) 0) (hj : y j ≠ 0) :
+    IsField (affRing k y j) := by
   let φ : Poly k N →ₐ[k] affRing k y j := (aeval (aff y j)).rangeRestrict
   have hφ : Function.Surjective φ := AlgHom.rangeRestrict_surjective _
   have hker : ∀ f ∈ primeOf (S := k) y, φ.toRingHom f = 0 := fun f hf =>
@@ -73,8 +120,7 @@ theorem isField_affRing (hy : IsSubvar (x := y) (primeOf (S := k) y) 0) (hj : y 
     rw [homogeneousComponent_zero] at h0
     have := (mem_primeOf_of_isHomogeneous y (isHomogeneous_C _ _)).mp h0
     simp at this
-  have hr' : r ∈ nonZeroDivisors (Poly k N ⧸ primeOf (S := k) y) :=
-    mem_nonZeroDivisors_of_ne_zero hr
+  have hr' : r ∈ nonZeroDivisors (Poly k N ⧸ primeOf (S := k) y) := mem_nonZeroDivisors_of_ne_zero hr
   have hψr : ψ r = 0 := by
     apply Subtype.ext
     change aeval (aff y j) (X j - 1 : Poly k N) = 0
@@ -85,9 +131,8 @@ theorem isField_affRing (hy : IsSubvar (x := y) (primeOf (S := k) y) 0) (hj : y 
     rw [map_mul, hψr, mul_zero]
   have hχ : Function.Surjective (Ideal.Quotient.lift (Ideal.span {r}) ψ hrψ) :=
     Ideal.Quotient.lift_surjective_of_surjective _ hrψ hψ
-  have h1
-      : ringKrullDim (affRing k y j)
-        ≤ ringKrullDim ((Poly k N ⧸ primeOf (S := k) y) ⧸ Ideal.span {r}) := by
+  have h1 : ringKrullDim (affRing k y j) ≤
+      ringKrullDim ((Poly k N ⧸ primeOf (S := k) y) ⧸ Ideal.span {r}) := by
     exact ringKrullDim_le_of_surjective _ hχ
   have h2 := ringKrullDim_quotient_succ_le_of_nonZeroDivisor hr'
   rw [hy.dim] at h2
@@ -96,14 +141,15 @@ theorem isField_affRing (hy : IsSubvar (x := y) (primeOf (S := k) y) 0) (hj : y 
   have : Ring.KrullDimLE 0 (affRing k y j) := Ring.krullDimLE_iff.mpr (by simpa using h3)
   exact Ring.KrullDimLE.isField_of_isDomain
 
-theorem funField_eq (hj : y j ≠ 0) (hF : IsField (affRing k y j))
-    : funField (k := k) y = (affRing k y j).toIntermediateField' hF := by
+theorem funField_eq (hj : y j ≠ 0) (hF : IsField (affRing k y j)) :
+    funField (k := k) y = (affRing k y j).toIntermediateField' hF := by
   have haff : ∀ l, aff y j l ∈ (affRing k y j).toIntermediateField' hF := fun l =>
     show aff y j l ∈ affRing k y j from ⟨X l, by simp⟩
   apply le_antisymm
   · rw [funField, IntermediateField.adjoin_le_iff]
     rintro _ ⟨i, l, hi, rfl⟩
-    have : y l / y i = aff y j l * (aff y j i)⁻¹ := by simp only [aff]; field_simp
+    have : y l / y i = aff y j l * (aff y j i)⁻¹ := by
+      simp only [aff]; field_simp
     rw [this]
     exact mul_mem (haff l) (inv_mem (haff i))
   · intro z hz
@@ -113,8 +159,8 @@ theorem funField_eq (hj : y j ≠ 0) (hF : IsField (affRing k y j))
     rintro _ ⟨l, rfl⟩
     exact IntermediateField.subset_adjoin _ _ ⟨j, l, hj, rfl⟩
 
-theorem finiteDimensional_affField (hy : IsSubvar (x := y) (primeOf (S := k) y) 0) (hj : y j ≠ 0)
-    : FiniteDimensional k ((affRing k y j).toIntermediateField' (isField_affRing hy hj)) := by
+theorem finiteDimensional_affField (hy : IsSubvar (x := y) (primeOf (S := k) y) 0) (hj : y j ≠ 0) :
+    FiniteDimensional k ((affRing k y j).toIntermediateField' (isField_affRing hy hj)) := by
   set E := (affRing k y j).toIntermediateField' (isField_affRing hy hj)
   let g : Poly k N →ₐ[k] E :=
     AlgHom.codRestrict (aeval (aff y j) : Poly k N →ₐ[k] Ω) E.toSubalgebra
@@ -128,8 +174,8 @@ theorem finiteDimensional_affField (hy : IsSubvar (x := y) (primeOf (S := k) y) 
 theorem affPiece_le (n : ℕ) : affPiece k y j n ≤ Subalgebra.toSubmodule (affRing k y j) :=
   Submodule.span_le.mpr (by rintro _ ⟨f, _, rfl⟩; exact ⟨f, rfl⟩)
 
-theorem affPiece_mono (hj : y j ≠ 0) {m n : ℕ} (h : m ≤ n)
-    : affPiece k y j m ≤ affPiece k y j n := by
+theorem affPiece_mono (hj : y j ≠ 0) {m n : ℕ} (h : m ≤ n) :
+    affPiece k y j m ≤ affPiece k y j n := by
   refine Submodule.span_le.mpr ?_
   rintro _ ⟨f, hf, rfl⟩
   refine Submodule.subset_span ⟨X j ^ (n - m) * f, ?_, ?_⟩
@@ -137,25 +183,21 @@ theorem affPiece_mono (hj : y j ≠ 0) {m n : ℕ} (h : m ≤ n)
     rwa [Nat.sub_add_cancel h] at this
   · simp [aff, hj]
 
-theorem aeval_mem_affPiece (hj : y j ≠ 0) (f : Poly k N)
-    : aeval (aff y j) f ∈ affPiece k y j f.totalDegree := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [show aeval (aff y j) f
-        = ∑ d ∈ Finset.range (f.totalDegree + 1),
-          aeval (aff y j) (homogeneousComponent d f) by
-      rw [← map_sum, sum_homogeneousComponent]]
+theorem aeval_mem_affPiece (hj : y j ≠ 0) (f : Poly k N) :
+    aeval (aff y j) f ∈ affPiece k y j f.totalDegree := by
+
+  rw [show aeval (aff y j) f = ∑ d ∈ Finset.range (f.totalDegree + 1),
+    aeval (aff y j) (homogeneousComponent d f) by rw [← map_sum, sum_homogeneousComponent]]
   refine Submodule.sum_mem _ fun d hd => ?_
   have hd' : d ≤ f.totalDegree := Nat.lt_succ_iff.mp (Finset.mem_range.mp hd)
-  exact affPiece_mono hj hd'
-    (Submodule.subset_span ⟨_, homogeneousComponent_isHomogeneous d f, rfl⟩)
+  exact affPiece_mono hj hd' (Submodule.subset_span ⟨_, homogeneousComponent_isHomogeneous d f, rfl⟩)
 
-theorem eventually_affPiece_eq (hy : IsSubvar (x := y) (primeOf (S := k) y) 0) (hj : y j ≠ 0)
-    : ∀ᶠ n : ℕ in atTop, affPiece k y j n = Subalgebra.toSubmodule (affRing k y j) := by
+theorem eventually_affPiece_eq (hy : IsSubvar (x := y) (primeOf (S := k) y) 0) (hj : y j ≠ 0) :
+    ∀ᶠ n : ℕ in atTop, affPiece k y j n = Subalgebra.toSubmodule (affRing k y j) := by
   have := finiteDimensional_affField hy hj
   have hfin : (Subalgebra.toSubmodule (affRing k y j)).FG := by
     rw [← Module.Finite.iff_fg]
-    exact inferInstanceAs
-      (Module.Finite k ((affRing k y j).toIntermediateField' (isField_affRing hy hj)))
+    exact inferInstanceAs (Module.Finite k ((affRing k y j).toIntermediateField' (isField_affRing hy hj)))
   obtain ⟨s, hs⟩ := hfin
   have hex : ∀ z ∈ s, ∃ n, z ∈ affPiece k y j n := fun z hz => by
     have : z ∈ affRing k y j := by
@@ -168,14 +210,10 @@ theorem eventually_affPiece_eq (hy : IsSubvar (x := y) (primeOf (S := k) y) 0) (
   intro z hz
   exact affPiece_mono hj ((Finset.le_sup hz).trans hn) (hm z hz)
 
-theorem coordGraded_piece_eq (hj : y j ≠ 0) (n : ℕ)
-    : (coordGraded k y).piece (n : ℤ) = (affPiece k y j n).map (LinearMap.mulLeft k (y j ^ n)) := by
-  rw [show (coordGraded k y).piece (n : ℤ)
-        = Submodule.span k
-          {z | ∃ (f : Poly k N) (e : ℕ),
-            f.IsHomogeneous e ∧ (e : ℤ) = n ∧ z = aeval y f} from
-      rfl,
-    affPiece, Submodule.map_span]
+theorem coordGraded_piece_eq (hj : y j ≠ 0) (n : ℕ) :
+    (coordGraded k y).piece (n : ℤ) = (affPiece k y j n).map (LinearMap.mulLeft k (y j ^ n)) := by
+  rw [show (coordGraded k y).piece (n : ℤ) = Submodule.span k {z | ∃ (f : Poly k N) (e : ℕ),
+    f.IsHomogeneous e ∧ (e : ℤ) = n ∧ z = aeval y f} from rfl, affPiece, Submodule.map_span]
   congr 1
   ext z
   constructor
@@ -190,33 +228,29 @@ theorem coordGraded_piece_eq (hj : y j ≠ 0) (n : ℕ)
     rw [LinearMap.mulLeft_apply, aff_def, aeval_div_of_isHomogeneous hf]
     field_simp
 
-theorem coordGraded_le_secs (n : ℕ)
-    : (coordGraded k y).piece (n : ℤ) ≤ (twistSys k y (n : ℤ)).secs := by
+theorem coordGraded_le_secs (n : ℕ) :
+    (coordGraded k y).piece (n : ℤ) ≤ (twistSys k y (n : ℤ)).secs := by
   refine Submodule.span_le.mpr ?_
   rintro _ ⟨f, e, hf, he, rfl⟩
   refine (Submodule.mem_iInf _).mpr fun I => ?_
-  exact Submodule.subset_span
-    ⟨f, 1, 0, e, one_mem _, hf, isHomogeneous_one _ _, by simp [he], by simp⟩
+  exact Submodule.subset_span ⟨f, 1, 0, e, one_mem _, hf, isHomogeneous_one _ _, by simp [he],
+    by simp⟩
 
 theorem affRing_eq_ampleBase : affRing k y j = ampleBase (S := k) y j := by
   rw [affRing, ampleBase, Algebra.adjoin_range_eq_range_aeval]
   rfl
 
-theorem div_mem_affRing_of_mem_twistMod
-    (hj : y j ≠ 0) (n : ℕ) {z : Ω} (hz : z ∈ twistMod k y (n : ℤ) (singleChart hj))
-    : z / y j ^ n ∈ affRing k y j := by
+theorem div_mem_affRing_of_mem_twistMod (hj : y j ≠ 0) (n : ℕ) {z : Ω}
+    (hz : z ∈ twistMod k y (n : ℤ) (singleChart hj)) : z / y j ^ n ∈ affRing k y j := by
   refine Submodule.span_induction (p := fun z _ => z / y j ^ n ∈ affRing k y j) ?_ ?_ ?_ ?_ hz
   · rintro _ ⟨f, s, e, e', hs, hf, hse, hc, rfl⟩
     have hs' : s ∈ Submonoid.closure {(X j : Poly k N)} := by
-      have : ((fun i => (X i : Poly k N)) '' ((({j} : Finset (Fin (N + 1))) : Set (Fin (N + 1)))))
-          = {X j} := by
-        simp
-      rw [← this]
-      exact hs
+      have : ((fun i => (X i : Poly k N)) '' ((({j} : Finset (Fin (N + 1))) : Set (Fin (N + 1))))) =
+          {X j} := by simp
+      rw [← this]; exact hs
     obtain ⟨m, rfl⟩ := Submonoid.mem_closure_singleton.mp hs'
-    have hme : e = m :=
-      hse.inj_right (isHomogeneous_X_pow j m)
-        (by rw [X_pow_eq_monomial, Ne, monomial_eq_zero]; exact one_ne_zero)
+    have hme : e = m := hse.inj_right (isHomogeneous_X_pow j m) (by
+      rw [X_pow_eq_monomial, Ne, monomial_eq_zero]; exact one_ne_zero)
     subst hme
     have he' : e' = e + n := by omega
     subst he'
@@ -225,8 +259,7 @@ theorem div_mem_affRing_of_mem_twistMod
     rw [aff_def, aeval_div_of_isHomogeneous hf, map_pow, aeval_X, pow_add, div_div]
   · simp
   · intro a b _ _ ha hb
-    rw [add_div]
-    exact add_mem ha hb
+    rw [add_div]; exact add_mem ha hb
   · intro c z _ hz
     rw [chartRing_smul_def, mul_div_assoc]
     refine mul_mem ?_ hz

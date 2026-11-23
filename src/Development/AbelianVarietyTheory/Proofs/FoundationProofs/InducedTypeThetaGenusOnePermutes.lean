@@ -1,16 +1,49 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.Definitions.Foundations.NormSumPairRankZeroOfCurveCoordNorm
-public import Formalism.PairingDivisors.StatementH
+public import Formalism.SharpRestriction.GlobalSchurBounds.StandardLatticesGL3
 public import Formalism.LocalRingCardinality.RankBoundMonotoneInDimension
 public import Formalism.SharpRestriction.GlobalSchurBounds.GlobalRankLatticeProofs.EqOfLeOfAbsNormEq
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
+import Development.AbelianVarietyTheory.Definitions.Foundations.NormSumPairRankZeroOfCurveCoordNorm
 
 @[expose] public section
 
-open NumberField Classical Formalism.BasicNotions Formalism.MainNotions
-  Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.StandardLatticesGL3
-  GlobalTheory.NormSum
+open NumberField Classical Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.StandardLatticesGL3 GlobalTheory.NormSum
 open scoped BigOperators
 
 noncomputable section
@@ -19,23 +52,18 @@ namespace GlobalTheory.InducedType
 
 open Formalism.FrobeniusOrbits Formalism.MainNotions.UnusedSlot33.HK
 
-theorem sigmaOf_mul {R : Ranks} (H : Host R) (g g' : R.GG)
-    : H.sigmaOf (g * g') = H.sigmaOf g * H.sigmaOf g' :=
-  map_mul (H.gal).symm g g'
+theorem sigmaOf_mul {R : Ranks} (H : Host R) (g g' : R.GG) :
+    H.sigmaOf (g * g') = H.sigmaOf g * H.sigmaOf g' := map_mul (H.gal).symm g g'
 
 theorem sigmaOf_one {R : Ranks} (H : Host R) : H.sigmaOf 1 = 1 := map_one (H.gal).symm
 
-theorem emb_apply {R : Ranks} (H : Host R) (g : R.GG) (x : H.E)
-    : H.emb g x = H.φ₀ (H.sigmaOf g x) :=
-  rfl
+theorem emb_apply {R : Ranks} (H : Host R) (g : R.GG) (x : H.E) : H.emb g x = H.φ₀ (H.sigmaOf g x) := rfl
 
-def galK {R : Ranks} (H : Host R) (g : R.Psi) : H.E ≃ₐ[H.K] H.E := {
-  (H.sigmaOf g : H.E ≃+* H.E) with
-  commutes' := fun a => sigmaOf_fix_K H g g.2 a a.2
-}
+def galK {R : Ranks} (H : Host R) (g : R.Psi) : H.E ≃ₐ[H.K] H.E :=
+  { (H.sigmaOf g : H.E ≃+* H.E) with
+    commutes' := fun a => sigmaOf_fix_K H g g.2 a a.2 }
 
-theorem galK_apply {R : Ranks} (H : Host R) (g : R.Psi) (x : H.E) : galK H g x = H.sigmaOf g x :=
-  rfl
+theorem galK_apply {R : Ranks} (H : Host R) (g : R.Psi) (x : H.E) : galK H g x = H.sigmaOf g x := rfl
 
 theorem galK_bijective {R : Ranks} (H : Host R) : Function.Bijective (galK H) := by
   constructor
@@ -59,10 +87,10 @@ theorem sum_eq_trace (D : D7) : TraceMapNormalisation D := fun y => by
   have hE := D.host.hostE_isGalois
   have h := trace_eq_sum_automorphisms (K := D.host.K) (L := D.host.E) y
   change _ = D.host.φ₀ (algebraMap D.host.K D.host.E _)
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [h, map_sum]
-  exact Fintype.sum_bijective (galK D.host ∘ D.eTau) ((galK_bijective D.host).comp D.eTau.bijective)
-    _ _ (fun τ => rfl)
+
+  rw [h, map_sum]
+  exact Fintype.sum_bijective (galK D.host ∘ D.eTau) ((galK_bijective D.host).comp D.eTau.bijective) _ _
+    (fun τ => rfl)
 
 theorem permutes (D : D7) : EmbeddingPermutesTypes D := fun M ρ hK hM => by
   have h0 : ∀ x, D.host.φ₀ x ∈ M := fun x => by
@@ -83,7 +111,7 @@ theorem permutes (D : D7) : EmbeddingPermutesTypes D := fun M ρ hK hM => by
     Equiv.coe_mulLeft, Subgroup.coe_mul, emb_apply, emb_apply, sigmaOf_mul]
   rfl
 
-theorem induced_type : ∀ D : D7, admG1 D ∧ EmbeddingPermutesTypes D := fun D =>
-  ⟨⟨restrict_K D, sum_eq_trace D⟩, permutes D⟩
+theorem induced_type : ∀ D : D7, admG1 D ∧ EmbeddingPermutesTypes D :=
+  fun D => ⟨⟨restrict_K D, sum_eq_trace D⟩, permutes D⟩
 
 end GlobalTheory.InducedType

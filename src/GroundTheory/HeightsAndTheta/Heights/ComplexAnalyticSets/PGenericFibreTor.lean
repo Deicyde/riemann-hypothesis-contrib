@@ -1,8 +1,61 @@
 module
 
-public import Mathlib
 public import GroundTheory.HeightsAndTheta.Heights.ComplexAnalyticSets.StGenericFibreTor
 public import GroundTheory.HeightsAndTheta.Heights.ComplexAnalyticSets.StGenericFreeness
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.CStarAlgebra.Classes
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.MvPolynomial.IrreducibleQuadratic
+import Mathlib.RingTheory.PicardGroup
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.TotallySplit
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
+public import Mathlib.Algebra.Module.LocalizedModule.Int
+public import Mathlib.RingTheory.Flat.Basic
+public import Mathlib.RingTheory.Flat.EquationalCriterion
+public import Mathlib.RingTheory.Flat.Localization
+public import Mathlib.RingTheory.Ideal.BigOperators
 
 @[expose] public section
 
@@ -14,18 +67,13 @@ open MvPolynomial
 
 noncomputable section
 
-theorem GenericFibreTor.mem_of_smul_mem
-    {σ ι : Type*} (t : σ → ℂ) (L : Ideal (MvPolynomial ι (MvPolynomial σ ℂ)))
-    {x : MvPolynomial ι (MvPolynomial σ ℂ)} (hx : x ∈ L)
+theorem GenericFibreTor.mem_of_smul_mem {σ ι : Type*} (t : σ → ℂ)
+    (L : Ideal (MvPolynomial ι (MvPolynomial σ ℂ))) {x : MvPolynomial ι (MvPolynomial σ ℂ)} (hx : x ∈ L)
     {u : MvPolynomial σ ℂ} (hu : eval t u ≠ 0)
-    (h : u • x
-      ∈ (RingHom.ker (eval t : MvPolynomial σ ℂ →+* ℂ)).map
-          (C : MvPolynomial σ ℂ →+* MvPolynomial ι (MvPolynomial σ ℂ))
-        * L)
-    : x
-      ∈ (RingHom.ker (eval t : MvPolynomial σ ℂ →+* ℂ)).map
-          (C : MvPolynomial σ ℂ →+* MvPolynomial ι (MvPolynomial σ ℂ))
-        * L := by
+    (h : u • x ∈ (RingHom.ker (eval t : MvPolynomial σ ℂ →+* ℂ)).map
+      (C : MvPolynomial σ ℂ →+* MvPolynomial ι (MvPolynomial σ ℂ)) * L) :
+    x ∈ (RingHom.ker (eval t : MvPolynomial σ ℂ →+* ℂ)).map
+      (C : MvPolynomial σ ℂ →+* MvPolynomial ι (MvPolynomial σ ℂ)) * L := by
   set J := (RingHom.ker (eval t : MvPolynomial σ ℂ →+* ℂ)).map
       (C : MvPolynomial σ ℂ →+* MvPolynomial ι (MvPolynomial σ ℂ)) * L
   rw [smul_eq_C_mul] at h
@@ -39,13 +87,12 @@ theorem GenericFibreTor.mem_of_smul_mem
       (C : MvPolynomial σ ℂ →+* MvPolynomial ι (MvPolynomial σ ℂ))
   exact (Ideal.unit_mul_mem_iff_mem J hunit).1 h2
 
-theorem GenericFibreTor.proof (hGF : GenericFreeness.Statement.{0, 0, 0})
-    : GenericFibreTor.Statement := by
+theorem GenericFibreTor.proof (hGF : GenericFreeness.Statement.{0, 0, 0}) :
+    GenericFibreTor.Statement := by
   classical
   intro σ _ ι _ L
-  obtain ⟨F, hF0, hfree⟩ :=
-    hGF (MvPolynomial σ ℂ) (MvPolynomial ι (MvPolynomial σ ℂ) ⧸ L)
-      (MvPolynomial ι (MvPolynomial σ ℂ) ⧸ L)
+  obtain ⟨F, hF0, hfree⟩ := hGF (MvPolynomial σ ℂ) (MvPolynomial ι (MvPolynomial σ ℂ) ⧸ L)
+    (MvPolynomial ι (MvPolynomial σ ℂ) ⧸ L)
   refine ⟨F, hF0, fun t ht x hx => ?_⟩
   rw [MvPolynomial.ker_map] at hx ⊢
   obtain ⟨hxL, hxI⟩ := Ideal.mem_inf.1 hx
@@ -53,8 +100,7 @@ theorem GenericFibreTor.proof (hGF : GenericFreeness.Statement.{0, 0, 0})
   have hflat' : Module.Flat (Localization.Away F)
       (LocalizedModule (Submonoid.powers F) (MvPolynomial ι (MvPolynomial σ ℂ) ⧸ L)) :=
     @Module.Flat.of_free _ _ _ _ _ hfree
-  have hflatS : Module.Flat (MvPolynomial σ ℂ) (Localization.Away F) :=
-    IsLocalization.flat _ (Submonoid.powers F)
+  have hflatS : Module.Flat (MvPolynomial σ ℂ) (Localization.Away F) := IsLocalization.flat _ (Submonoid.powers F)
   have : Module.Flat (MvPolynomial σ ℂ)
       (LocalizedModule (Submonoid.powers F) (MvPolynomial ι (MvPolynomial σ ℂ) ⧸ L)) :=
     Module.Flat.trans (MvPolynomial σ ℂ) (Localization.Away F) _
@@ -63,15 +109,14 @@ theorem GenericFibreTor.proof (hGF : GenericFreeness.Statement.{0, 0, 0})
   let a : x.support → MvPolynomial σ ℂ := fun m => AddMonoidAlgebra.coeff x m.1
   let e : x.support → MvPolynomial ι (MvPolynomial σ ℂ) := fun m => monomial m.1 1
   have hsum : ∑ m, a m • e m = x := by
-    calc
-      ∑ m, a m • e m = ∑ m : x.support, monomial m.1 (AddMonoidAlgebra.coeff x m.1) :=
-        Finset.sum_congr rfl fun m _ => by simp [a, e, smul_monomial]
+    calc ∑ m, a m • e m = ∑ m : x.support, monomial m.1 (AddMonoidAlgebra.coeff x m.1) :=
+          Finset.sum_congr rfl fun m _ => by simp [a, e, smul_monomial]
       _ = x := by
-        rw [Finset.sum_coe_sort x.support (fun v => monomial v (AddMonoidAlgebra.coeff x v))]
-        exact (MvPolynomial.as_sum x).symm
+          rw [Finset.sum_coe_sort x.support (fun v => monomial v (AddMonoidAlgebra.coeff x v))]
+          exact (MvPolynomial.as_sum x).symm
   have hrel : ∑ m, a m • g (π (e m)) = 0 := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp_rw [← map_smul, ← map_sum, hsum]
+
+    simp_rw [← map_smul, ← map_sum, hsum]
     simp [g, π, Ideal.Quotient.eq_zero_iff_mem.2 hxL]
   have htriv : Module.IsTrivialRelation a (fun m => g (π (e m))) :=
     Module.Flat.isTrivialRelation_of_sum_smul_eq_zero hrel
@@ -79,14 +124,12 @@ theorem GenericFibreTor.proof (hGF : GenericFreeness.Statement.{0, 0, 0})
   obtain ⟨b, hb⟩ := IsLocalizedModule.exist_integer_multiples_of_finite (Submonoid.powers F) g y
   choose q hq using hb
   choose r hr using fun j => Ideal.Quotient.mk_surjective (q j)
-  have hm
-      : ∀ m, ∃ c : Submonoid.powers F,
-        c • π ((b : MvPolynomial σ ℂ) • e m) = c • π (∑ j, A m j • r j) := by
+  have hm : ∀ m, ∃ c : Submonoid.powers F,
+      c • π ((b : MvPolynomial σ ℂ) • e m) = c • π (∑ j, A m j • r j) := by
     intro m
     apply IsLocalizedModule.exists_of_eq (S := Submonoid.powers F) (f := g)
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_smul, map_smul, show g (π (e m)) = ∑ j, A m j • y j from hy m, Finset.smul_sum,
-        map_sum, map_sum]
+
+    rw [map_smul, map_smul, show g (π (e m)) = ∑ j, A m j • y j from hy m, Finset.smul_sum, map_sum, map_sum]
     refine Finset.sum_congr rfl fun j _ => ?_
     rw [smul_comm, ← hq j, ← hr j, map_smul, map_smul]
     rfl
@@ -98,8 +141,7 @@ theorem GenericFibreTor.proof (hGF : GenericFreeness.Statement.{0, 0, 0})
     rw [← sub_eq_zero, ← smul_sub, ← map_sub, Submonoid.smul_def, ← map_smul] at h1
     have h2 : (c m : MvPolynomial σ ℂ) • ((b : MvPolynomial σ ℂ) • e m - ∑ j, A m j • r j) ∈ L :=
       Ideal.Quotient.eq_zero_iff_mem.1 h1
-    have h3 :=
-      Submodule.smul_of_tower_mem L (∏ m' ∈ Finset.univ.erase m, (c m' : MvPolynomial σ ℂ)) h2
+    have h3 := Submodule.smul_of_tower_mem L (∏ m' ∈ Finset.univ.erase m, (c m' : MvPolynomial σ ℂ)) h2
     convert h3 using 1
     rw [smul_smul, Finset.prod_erase_mul _ _ (Finset.mem_univ m), smul_sub, smul_smul,
       Finset.smul_sum]
@@ -117,11 +159,8 @@ theorem GenericFibreTor.proof (hGF : GenericFreeness.Statement.{0, 0, 0})
     simp_rw [smul_sub, Finset.sum_sub_distrib, hzero, sub_zero, ← hsum, Finset.smul_sum]
     refine Finset.sum_congr rfl fun m _ => ?_
     rw [smul_comm]
-  have hJ
-      : (V * b) • x
-        ∈ (RingHom.ker (eval t : MvPolynomial σ ℂ →+* ℂ)).map
-            (C : MvPolynomial σ ℂ →+* MvPolynomial ι (MvPolynomial σ ℂ))
-          * L := by
+  have hJ : (V * b) • x ∈ (RingHom.ker (eval t : MvPolynomial σ ℂ →+* ℂ)).map
+      (C : MvPolynomial σ ℂ →+* MvPolynomial ι (MvPolynomial σ ℂ)) * L := by
     rw [hkey]
     refine Ideal.sum_mem _ fun m _ => ?_
     rw [smul_eq_C_mul]

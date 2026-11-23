@@ -1,6 +1,52 @@
 module
 
 public import Formalism.CharacterColumnKernels.Statement
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -12,14 +58,11 @@ namespace Formalism.NG
 
 section HomAux
 
-variable
-  {R O M : Type*}
-  [Ring R] [CommRing O] [AddCommGroup M] [Module R M] [Module O M] [SMulCommClass R O M]
-  {m g : Type} [Fintype m] [Fintype g] [DecidableEq g]
+variable {R O M : Type*} [Ring R] [CommRing O] [AddCommGroup M] [Module R M] [Module O M]
+  [SMulCommClass R O M] {m g : Type} [Fintype m] [Fintype g] [DecidableEq g]
 
-theorem relMap_apply' (Θ : Matrix m g R) (v : g → M) (i : m)
-    : relMap O M Θ v i = ∑ j, Θ i j • v j :=
-  rfl
+theorem relMap_apply' (Θ : Matrix m g R) (v : g → M) (i : m) :
+    relMap O M Θ v i = ∑ j, Θ i j • v j := rfl
 
 def combo (v : g → M) : (g → R) →ₗ[R] M where
   toFun w := ∑ j, w j • v j
@@ -38,23 +81,23 @@ theorem single_eq_smul (j : g) (x : R) : (Pi.single j x : g → R) = x • Pi.si
   · subst h; simp
   · simp [h]
 
-theorem sum_row (Θ : Matrix m g R) (i : m) : ∑ j, Θ i j • (Pi.single j (1 : R) : g → R) = Θ i := by
+theorem sum_row (Θ : Matrix m g R) (i : m) :
+    ∑ j, Θ i j • (Pi.single j (1 : R) : g → R) = Θ i := by
   ext k
   simp [Finset.sum_apply, Pi.single_apply]
 
-def toVec (Θ : Matrix m g R) (φ : Coker Θ →ₗ[R] M) : g → M := fun j =>
-  φ ((relSpan Θ).mkQ (Pi.single j (1 : R)))
+def toVec (Θ : Matrix m g R) (φ : Coker Θ →ₗ[R] M) : g → M :=
+  fun j => φ ((relSpan Θ).mkQ (Pi.single j (1 : R)))
 
-theorem toVec_mem (Θ : Matrix m g R) (φ : Coker Θ →ₗ[R] M)
-    : toVec Θ φ ∈ LinearMap.ker (relMap O M Θ) := by
+theorem toVec_mem (Θ : Matrix m g R) (φ : Coker Θ →ₗ[R] M) :
+    toVec Θ φ ∈ LinearMap.ker (relMap O M Θ) := by
   rw [LinearMap.mem_ker]
   funext i
   rw [relMap_apply', Pi.zero_apply]
   simp only [toVec]
-  have h
-      : ∑ j, Θ i j • φ ((relSpan Θ).mkQ (Pi.single j (1 : R)))
-        = φ ((relSpan Θ).mkQ (∑ j, Θ i j • (Pi.single j (1 : R) : g → R))) := by
-    set_option synthInstance.maxHeartbeats 100000 in
+  have h : ∑ j, Θ i j • φ ((relSpan Θ).mkQ (Pi.single j (1 : R))) =
+      φ ((relSpan Θ).mkQ (∑ j, Θ i j • (Pi.single j (1 : R) : g → R))) := by
+
     simp [map_sum, map_smul]
   rw [h, sum_row]
   have hmem : Θ i ∈ relSpan Θ := Submodule.subset_span ⟨i, rfl⟩
@@ -69,15 +112,16 @@ def ofVec (Θ : Matrix m g R) (v : LinearMap.ker (relMap O M Θ)) : Coker Θ →
     rw [relMap_apply'] at h
     exact h)
 
-theorem ofVec_mk (Θ : Matrix m g R) (v : LinearMap.ker (relMap O M Θ)) (w : g → R)
-    : ofVec Θ v (Submodule.Quotient.mk w) = combo (v : g → M) w :=
-  rfl
+theorem ofVec_mk (Θ : Matrix m g R) (v : LinearMap.ker (relMap O M Θ)) (w : g → R) :
+    ofVec Θ v (Submodule.Quotient.mk w) = combo (v : g → M) w := rfl
 
 def homEquiv (Θ : Matrix m g R) : (Coker Θ →ₗ[R] M) ≃ₗ[O] LinearMap.ker (relMap O M Θ) where
   toFun φ := ⟨toVec Θ φ, toVec_mem Θ φ⟩
   invFun v := ofVec Θ v
-  map_add' φ ψ := by apply Subtype.ext; funext j; simp [toVec]
-  map_smul' c φ := by apply Subtype.ext; funext j; simp [toVec]
+  map_add' φ ψ := by
+    apply Subtype.ext; funext j; simp [toVec]
+  map_smul' c φ := by
+    apply Subtype.ext; funext j; simp [toVec]
   left_inv φ := by
     apply Submodule.linearMap_qext
     apply LinearMap.pi_ext
@@ -86,8 +130,7 @@ def homEquiv (Θ : Matrix m g R) : (Coker Θ →ₗ[R] M) ≃ₗ[O] LinearMap.ke
       single_eq_smul j x, Submodule.Quotient.mk_smul, map_smul]
     rfl
   right_inv v := by
-    apply Subtype.ext
-    funext j
+    apply Subtype.ext; funext j
     show ofVec Θ v (Submodule.Quotient.mk (Pi.single j (1 : R))) = (v : g → M) j
     rw [ofVec_mk, combo_single, one_smul]
 

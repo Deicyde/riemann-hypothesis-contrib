@@ -1,9 +1,50 @@
 module
 
-public import Formalism.AdmissibleDesigns.BKaClause
-public import Formalism.SharpRestriction.LevelLetterCocycles.JumpAndLengthOfAdmitted
-public import Formalism.AdmissibleDesigns.ColLx
 public import Formalism.AdmissibleDesigns.UnramifiedInputOfAdmitted
+public import Formalism.AdmissibleDesigns.GlobalIndexTheoremPlacesOfRNAdm
+public import Formalism.AdmissibleDesigns.TheoremFromNormalizedOpenThree
+public import Formalism.AdmissibleDesigns.ColLx
+import Formalism.AdmissibleDesigns.ColumnUnramifiedCharacter
+public import Formalism.AdmissibleDesigns.DesignNormalizedOfAdmitted
+public import Formalism.AdmissibleDesigns.NormalizedRingData
+import Formalism.AdmissibleDesigns.TheoremN5OfNormalizedItems
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -51,8 +92,6 @@ variable
   (hrk : ((Dd.ρk 0 Dd.e₁).map (algebraMap (D.nd.O i) (FractionRing (D.nd.O i)))).rank = 1)
   (lenRow : HeightOneSpectrum (𝓞 D.host.E) → ℚ) (cB : ℕ)
 
-set_option maxHeartbeats 4000000 in
-set_option synthInstance.maxHeartbeats 400000 in
 def ColOpen : Prop :=
   ∃ (κ : ∀ l : Col i dc, Fin (jN i ρ π dc (colIdx i dc l)) → GE D.nd → Lr i Dd)
       (κz : ∀ l : Col i dc,
@@ -142,8 +181,8 @@ def TBOpen : Prop :=
                 (FS i r π dc g0 eB e₁ s Dd hD hc c w).comap (lcH1 (QS.resU i dc Dd c w) ⊓ divBy (FS i r π dc g0 eB e₁ s Dd hD hc c w) (((D.nd.l i : ℕ) : D.nd.O i) ^ cB)).subtype)
             ≤ eON i * (cB : ℕ∞) * ((ReciprocityTheory.Gal.locDeg (plOf i dc w) : ℕ∞) + 1))
 
-set_option maxHeartbeats 4000000 in
-set_option synthInstance.maxHeartbeats 400000 in
+
+
 def ChiOpen : Prop :=
   (∀ c : Fin (D.R.t + 1),
     2 ≤ (c : ℕ)
@@ -153,8 +192,8 @@ def ChiOpen : Prop :=
         (ShaN i ((c : ℕ) - 1)) (FS i r π dc g0 eB e₁ s Dd hD hc c) (QS.Io i) (QS.IS i) (QS.I i dc)
         (QS.γQ i dc) (QS.ζ i dc Dd) (QS.ζO i dc) (QS.nQ i dc))
 
-set_option maxHeartbeats 4000000 in
-set_option synthInstance.maxHeartbeats 400000 in
+
+
 def FirstLocalConditionOpen : Prop :=
   (InChiLoc (blockRestrictedRepresentationType (RepresentationBoundsCohomology.blk D.R) Dd.ρk QS.c1)
     Dd.r Dd.χ Dd.E (decs D.host.E (Aw i dc)) (qsN i dc) (FS i r π dc g0 eB e₁ s Dd hD hc QS.c1)
@@ -191,8 +230,6 @@ theorem row_bound_normalized_lattice
 variable
   (lenRow : HeightOneSpectrum (𝓞 D.host.E) → ℚ) (e' : HeightOneSpectrum (𝓞 D.host.E) → ℕ) (cB : ℕ)
 
-set_option maxHeartbeats 4000000 in
-set_option synthInstance.maxHeartbeats 400000 in
 def OnRing
     (Q : ∀ (g0 : GE D.nd) (eB e₁ s : D.nd.X i → MatN D.nd i)
         (Dd : RingData (D.nd.O i) (D.nd.X i) (Fin D.R.nV) (GE D.nd) D.R.t
@@ -265,8 +302,6 @@ variable
   (hrk : ((Dd.ρk 0 Dd.e₁).map (algebraMap (D.nd.O i) (FractionRing (D.nd.O i)))).rank = 1)
   (lenRow : HeightOneSpectrum (𝓞 D.host.E) → ℚ) (cB : ℕ)
 
-set_option maxHeartbeats 4000000 in
-set_option synthInstance.maxHeartbeats 400000 in
 def RhoOpenA : Prop :=
   (InRhoFixReal2
     (blockRestrictedRepresentationType (RepresentationBoundsCohomology.blk D.R) Dd.ρk 0) Dd.r Dd.χ
@@ -289,8 +324,6 @@ variable
   (e' : HeightOneSpectrum (𝓞 D.host.E) → ℕ)
   (cB : ℕ)
 
-set_option maxHeartbeats 4000000 in
-set_option synthInstance.maxHeartbeats 400000 in
 theorem theorem_n5_of_ring_inputs
     (g1 : TruncatedSeriesCountingIdentities.admG1 i r)
     (g2 : TruncatedSeriesCountingIdentities.admG2 i r ρ π)
@@ -399,8 +432,8 @@ variable
   (e' : HeightOneSpectrum (𝓞 D.host.E) → ℕ)
   (cB : ℕ)
 
-set_option maxHeartbeats 4000000 in
-set_option synthInstance.maxHeartbeats 400000 in
+
+
 def RemainingInputsLastLayer : Prop :=
   OnRing i r ρ π dc lenRow e' cB (fun g0 eB e₁ s Dd _ hD hc hT hrk =>
     RhoOpenA i (Norm.rN i r ρ π) ρ π dc g0 eB e₁ s Dd hD hc hT hrk
@@ -409,8 +442,6 @@ def RemainingInputsLastLayer : Prop :=
       ∧ FirstLocalConditionOpen i (Norm.rN i r ρ π) π dc g0 eB e₁ s Dd hD hc
       ∧ StD.RowTieIn i (Norm.rN i r ρ π) ρ π dc g0 eB e₁ s Dd hD hc)
 
-set_option maxHeartbeats 4000000 in
-set_option synthInstance.maxHeartbeats 400000 in
 theorem theorem_n5_of_open_b
     (g1 : TruncatedSeriesCountingIdentities.admG1 i r)
     (g2 : TruncatedSeriesCountingIdentities.admG2 i r ρ π)

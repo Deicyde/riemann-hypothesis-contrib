@@ -1,8 +1,55 @@
 module
 
+import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsPolyEntriesConjLeftRightMul
 public import ReciprocityTheory.ReductiveGroups.DiscreteSeries.HighestWeights.ModelFun
-public import ReciprocityTheory.ReductiveGroups.DiscreteSeries.CasimirCoefficients.KFacts
-public import ReciprocityTheory.ReductiveGroups.DiscreteSeries.CasimirCoefficients.InhabA
+public import Mathlib.Algebra.MvPolynomial.Monad
+public import Mathlib.RingTheory.MvPolynomial.Basic
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.LinearAlgebra.Matrix.FiniteDimensional
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.MvPolynomial.IrreducibleQuadratic
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -23,8 +70,7 @@ def rtr (ε : Fin n → Bool) (k : KG ε) : (KG ε → ℂ) →ₗ[ℂ] (KG ε �
   map_add' _ _ := rfl
   map_smul' _ _ := rfl
 
-theorem rtr_mul (ε : Fin n → Bool) (k₁ k₂ : KG ε) (f : KG ε → ℂ)
-    : rtr ε (k₁ * k₂) f = rtr ε k₁ (rtr ε k₂ f) := by
+theorem rtr_mul (ε : Fin n → Bool) (k₁ k₂ : KG ε) (f : KG ε → ℂ) : rtr ε (k₁ * k₂) f = rtr ε k₁ (rtr ε k₂ f) := by
   funext x
   show f (x * (k₁ * k₂)) = f (x * k₁ * k₂)
   rw [mul_assoc]
@@ -41,8 +87,8 @@ theorem highest_weight_fn_mem_space (ε : Fin n → Bool) (m : Fin n → ℤ) : 
   have h : rtr ε 1 (f0K ε m) ∈ Vsp ε m := Submodule.subset_span ⟨1, rfl⟩
   rwa [rtr_one] at h
 
-theorem rtr_mem (ε : Fin n → Bool) (m : Fin n → ℤ) (k : KG ε) {f : KG ε → ℂ} (hf : f ∈ Vsp ε m)
-    : rtr ε k f ∈ Vsp ε m := by
+theorem rtr_mem (ε : Fin n → Bool) (m : Fin n → ℤ) (k : KG ε) {f : KG ε → ℂ} (hf : f ∈ Vsp ε m) :
+    rtr ε k f ∈ Vsp ε m := by
   have h : Vsp ε m ≤ (Vsp ε m).comap (rtr ε k) := by
     refine Submodule.span_le.mpr ?_
     rintro _ ⟨k', rfl⟩
@@ -57,8 +103,8 @@ def evalK (ε : Fin n → Bool) : MvPolynomial (Fin n × Fin n) ℂ →ₐ[ℂ] 
 def polyK (ε : Fin n → Bool) (D : ℕ) : Submodule ℂ (KG ε → ℂ) :=
   (MvPolynomial.restrictTotalDegree (Fin n × Fin n) ℂ D).map (evalK ε).toLinearMap
 
-theorem evalK_apply (ε : Fin n → Bool) (Q : MvPolynomial (Fin n × Fin n) ℂ) (x : KG ε)
-    : evalK ε Q x = MvPolynomial.aeval (fun p : Fin n × Fin n => toMK x p.1 p.2) Q := by
+theorem evalK_apply (ε : Fin n → Bool) (Q : MvPolynomial (Fin n × Fin n) ℂ) (x : KG ε) :
+    evalK ε Q x = MvPolynomial.aeval (fun p : Fin n × Fin n => toMK x p.1 p.2) Q := by
   induction Q using MvPolynomial.induction_on
   next a => simp [evalK]
   next p q hp hq => rw [map_add (f := _), map_add (f := _), Pi.add_apply, hp, hq]
@@ -66,13 +112,13 @@ theorem evalK_apply (ε : Fin n → Bool) (Q : MvPolynomial (Fin n × Fin n) ℂ
     rw [map_mul, map_mul, Pi.mul_apply, hp]
     simp [evalK]
 
-def rsub (ε : Fin n → Bool) (k : KG ε) : Fin n × Fin n → MvPolynomial (Fin n × Fin n) ℂ := fun p =>
-  ∑ l, MvPolynomial.X (p.1, l) * MvPolynomial.C (toMK k l p.2)
+def rsub (ε : Fin n → Bool) (k : KG ε) : Fin n × Fin n → MvPolynomial (Fin n × Fin n) ℂ :=
+  fun p => ∑ l, MvPolynomial.X (p.1, l) * MvPolynomial.C (toMK k l p.2)
 
 theorem toMK_mul' (ε : Fin n → Bool) (x k : KG ε) : toMK (x * k) = toMK x * toMK k := rfl
 
-theorem rtr_evalK (ε : Fin n → Bool) (k : KG ε) (Q : MvPolynomial (Fin n × Fin n) ℂ)
-    : rtr ε k (evalK ε Q) = evalK ε (MvPolynomial.bind₁ (rsub ε k) Q) := by
+theorem rtr_evalK (ε : Fin n → Bool) (k : KG ε) (Q : MvPolynomial (Fin n × Fin n) ℂ) :
+    rtr ε k (evalK ε Q) = evalK ε (MvPolynomial.bind₁ (rsub ε k) Q) := by
   funext x
   show evalK ε Q (x * k) = evalK ε (MvPolynomial.bind₁ (rsub ε k) Q) x
   rw [evalK_apply, evalK_apply, MvPolynomial.aeval_bind₁]
@@ -80,37 +126,19 @@ theorem rtr_evalK (ε : Fin n → Bool) (k : KG ε) (Q : MvPolynomial (Fin n × 
   funext p
   simp [rsub, toMK_mul', Matrix.mul_apply]
 
-theorem totalDegree_rsub (ε : Fin n → Bool) (k : KG ε) (p : Fin n × Fin n)
-    : (rsub ε k p).totalDegree ≤ 1 := by
+theorem totalDegree_rsub (ε : Fin n → Bool) (k : KG ε) (p : Fin n × Fin n) :
+    (rsub ε k p).totalDegree ≤ 1 := by
   simp only [rsub]
   refine (MvPolynomial.totalDegree_finsetSum _ _).trans (Finset.sup_le fun l _ => ?_)
   refine (MvPolynomial.totalDegree_mul _ _).trans ?_
   simp [MvPolynomial.totalDegree_X, MvPolynomial.totalDegree_C]
 
-theorem totalDegree_bind₁_le
-    {σ τ : Type*}
-    (g : σ → MvPolynomial τ ℂ) (hg : ∀ i, (g i).totalDegree ≤ 1) (Q : MvPolynomial σ ℂ)
-    : (MvPolynomial.bind₁ g Q).totalDegree ≤ Q.totalDegree := by
-  classical
-  conv_lhs => rw [Q.as_sum]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
-  refine (MvPolynomial.totalDegree_finsetSum _ _).trans (Finset.sup_le fun d hd => ?_)
-  rw [MvPolynomial.bind₁_monomial]
-  refine (MvPolynomial.totalDegree_mul _ _).trans ?_
-  rw [MvPolynomial.totalDegree_C, zero_add]
-  refine (MvPolynomial.totalDegree_finsetProd _ _).trans ?_
-  refine le_trans ?_ (MvPolynomial.le_totalDegree hd)
-  rw [Finsupp.sum]
-  refine Finset.sum_le_sum fun i _ => ?_
-  refine (MvPolynomial.totalDegree_pow _ _).trans ?_
-  calc
-    d i * (g i).totalDegree
-      ≤ d i * 1 := Nat.mul_le_mul_left _ (hg i)
-    _ = d i := mul_one _
+theorem totalDegree_bind₁_le {σ τ : Type*} (g : σ → MvPolynomial τ ℂ) (hg : ∀ i, (g i).totalDegree ≤ 1)
+    (Q : MvPolynomial σ ℂ) : (MvPolynomial.bind₁ g Q).totalDegree ≤ Q.totalDegree := by
+  apply GlobalTheory.PolyEntryMul.totalDegree_bind₁_le_of_le_one <;> assumption
 
-theorem rtr_polyK (ε : Fin n → Bool) (k : KG ε) (Q : MvPolynomial (Fin n × Fin n) ℂ)
-    : rtr ε k (evalK ε Q) ∈ polyK ε Q.totalDegree := by
+theorem rtr_polyK (ε : Fin n → Bool) (k : KG ε) (Q : MvPolynomial (Fin n × Fin n) ℂ) :
+    rtr ε k (evalK ε Q) ∈ polyK ε Q.totalDegree := by
   rw [rtr_evalK]
   exact Submodule.mem_map_of_mem ((MvPolynomial.mem_restrictTotalDegree ..).mpr
     (totalDegree_bind₁_le _ (totalDegree_rsub ε k) Q))
@@ -139,16 +167,15 @@ theorem Vsp_le_polyK (ε : Fin n → Bool) (m : Fin n → ℤ) : ∃ D : ℕ, Vs
   rw [← evalK_f0P]
   exact rtr_polyK ε k (f0P ε m)
 
-theorem finiteDimensional_Vsp (ε : Fin n → Bool) (m : Fin n → ℤ)
-    : FiniteDimensional ℂ (Vsp ε m) := by
+theorem finiteDimensional_Vsp (ε : Fin n → Bool) (m : Fin n → ℤ) : FiniteDimensional ℂ (Vsp ε m) := by
   obtain ⟨D, hD⟩ := Vsp_le_polyK ε m
   haveI : FiniteDimensional ℂ (polyK ε D) := by
     unfold polyK
     infer_instance
   exact Submodule.finiteDimensional_of_le hD
 
-theorem differentiable_aeval_entries (Q : MvPolynomial (Fin n × Fin n) ℂ)
-    : Differentiable ℂ (fun M : Matrix (Fin n) (Fin n) ℂ =>
+theorem differentiable_aeval_entries (Q : MvPolynomial (Fin n × Fin n) ℂ) :
+    Differentiable ℂ (fun M : Matrix (Fin n) (Fin n) ℂ =>
       MvPolynomial.aeval (fun p : Fin n × Fin n => M p.1 p.2) Q) := by
   induction Q using MvPolynomial.induction_on
   next a => simp
@@ -156,42 +183,35 @@ theorem differentiable_aeval_entries (Q : MvPolynomial (Fin n × Fin n) ℂ)
     simp only [map_add (f := _)]
     exact hp.add hq
   next p i hp =>
-    have hX : Differentiable ℂ (fun M : Matrix (Fin n) (Fin n) ℂ => M i.1 i.2) := by fun_prop
+    have hX : Differentiable ℂ (fun M : Matrix (Fin n) (Fin n) ℂ => M i.1 i.2) := by
+      fun_prop
     simp only [map_mul, MvPolynomial.aeval_X]
     exact hp.mul hX
 
-theorem Vsp_holo (ε : Fin n → Bool) (m : Fin n → ℤ) {f : KG ε → ℂ} (hf : f ∈ Vsp ε m)
-    : ∃ F : Matrix (Fin n) (Fin n) ℂ → ℂ, Differentiable ℂ F ∧ ∀ k, f k = F (toMK k) := by
+theorem Vsp_holo (ε : Fin n → Bool) (m : Fin n → ℤ) {f : KG ε → ℂ} (hf : f ∈ Vsp ε m) :
+    ∃ F : Matrix (Fin n) (Fin n) ℂ → ℂ, Differentiable ℂ F ∧ ∀ k, f k = F (toMK k) := by
   obtain ⟨D, hD⟩ := Vsp_le_polyK ε m
-  have h' : f ∈ (MvPolynomial.restrictTotalDegree (Fin n × Fin n) ℂ D).map (evalK ε).toLinearMap :=
-    hD hf
+  have h' : f ∈ (MvPolynomial.restrictTotalDegree (Fin n × Fin n) ℂ D).map (evalK ε).toLinearMap := hD hf
   obtain ⟨Q, -, rfl⟩ := Submodule.mem_map.mp h'
-  exact ⟨
-    fun M => MvPolynomial.aeval (fun p : Fin n × Fin n => M p.1 p.2) Q,
-    differentiable_aeval_entries Q,
-    fun k => evalK_apply ε Q k
-  ⟩
+  exact ⟨fun M => MvPolynomial.aeval (fun p : Fin n × Fin n => M p.1 p.2) Q,
+    differentiable_aeval_entries Q, fun k => evalK_apply ε Q k⟩
 
-theorem continuous_of_mem_Vsp (ε : Fin n → Bool) (m : Fin n → ℤ) {f : KG ε → ℂ} (hf : f ∈ Vsp ε m)
-    : Continuous f := by
+theorem continuous_of_mem_Vsp (ε : Fin n → Bool) (m : Fin n → ℤ) {f : KG ε → ℂ} (hf : f ∈ Vsp ε m) :
+    Continuous f := by
   obtain ⟨F, hF, hfF⟩ := Vsp_holo ε m hf
   have hfe : f = fun k => F (toMK k) := funext hfF
   rw [hfe]
   refine hF.continuous.comp ?_
   fun_prop
 
-theorem hasDerivAt_of_mem_Vsp
-    (ε : Fin n → Bool)
-    (m : Fin n → ℤ)
-    {f : KG ε → ℂ} (hf : f ∈ Vsp ε m)
+theorem hasDerivAt_of_mem_Vsp (ε : Fin n → Bool) (m : Fin n → ℤ) {f : KG ε → ℂ} (hf : f ∈ Vsp ε m)
     {F : Matrix (Fin n) (Fin n) ℂ → ℂ} (hF : Differentiable ℂ F) (hfF : ∀ k, f k = F (toMK k))
-    {X : Matrix (Fin n) (Fin n) ℂ} (hX : inK ε X)
-    (x : KG ε)
-    : HasDerivAt (fun t : ℝ => f (x * kcurve ε X t)) (fderiv ℂ F (toMK x) (toMK x * X)) 0 := by
+    {X : Matrix (Fin n) (Fin n) ℂ} (hX : inK ε X) (x : KG ε) :
+    HasDerivAt (fun t : ℝ => f (x * kcurve ε X t)) (fderiv ℂ F (toMK x) (toMK x * X)) 0 := by
   have hc : HasDerivAt (fun t : ℝ => toMK (kcurve ε X t)) X 0 := by
     have hk : ∀ t : ℝ, toMK (kcurve ε X t) = NormedSpace.exp ((t : ℝ) • X) := fun t => by
-      unfold kcurve
-      rw [dite_eq_left hX, Classical.choose_spec (exists_curve ε hX) t, Complex.coe_smul]
+       unfold kcurve
+       rw [dite_eq_left hX, Classical.choose_spec (exists_curve ε hX) t, Complex.coe_smul]
     simp only [hk]
     letI iR : NormedRing (Matrix (Fin n) (Fin n) ℂ) := Matrix.linftyOpNormedRing
     letI : NormedAlgebra ℂ (Matrix (Fin n) (Fin n) ℂ) := Matrix.linftyOpNormedAlgebra

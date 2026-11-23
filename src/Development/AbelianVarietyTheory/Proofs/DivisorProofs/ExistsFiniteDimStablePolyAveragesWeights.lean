@@ -1,10 +1,52 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.Definitions.Divisors.RangeShape
-public import ReciprocityTheory.ReductiveGroups.DiscreteSeries.DiscreteSeriesExistence.MeasurePreservingMulRight
-public import ReciprocityTheory.ReductiveGroups.DiscreteSeries.DiscreteSeriesExistence.Smooth
+public import Development.AbelianVarietyTheory.Definitions.Divisors.TCoefMInMMul
+public import Formalism.SharpRestriction.CuspSpanNormBounds.RelevantZeroGramTerms
+public import ReciprocityTheory.ReductiveGroups.DiscreteSeries.DefsRep
+import Formalism.RealPlaceAnalysis.RealPlaceTaylor.KoszulLowersPower
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Algebra.Group.Units
+public import Mathlib.Topology.Algebra.MvPolynomial
+import Mathlib.Topology.Sheaves.Init
 public import ReciprocityTheory.ReductiveGroups.DiscreteSeries.DiscreteSeriesExistence.PropsKfin
+import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
@@ -19,56 +61,50 @@ namespace GlobalTheory.PsCo.PolyAvg
 
 variable {n : ℕ}
 
-theorem totalDegree_bind_le
-    {α β : Type} (g : α → MvPolynomial β ℂ) (hg : ∀ i, (g i).totalDegree ≤ 1) (Q : MvPolynomial α ℂ)
-    : (bind₁ g Q).totalDegree ≤ Q.totalDegree := by
+theorem totalDegree_bind_le {α β : Type} (g : α → MvPolynomial β ℂ) (hg : ∀ i, (g i).totalDegree ≤ 1)
+    (Q : MvPolynomial α ℂ) : (bind₁ g Q).totalDegree ≤ Q.totalDegree := by
   classical
-  set_option synthInstance.maxHeartbeats 100000 in
-    conv_lhs => rw [Q.as_sum, map_sum]
+
+  conv_lhs => rw [Q.as_sum, map_sum]
   refine totalDegree_finsetSum_le fun s hs => ?_
   rw [bind₁_monomial]
   refine (totalDegree_mul _ _).trans ?_
   rw [totalDegree_C, zero_add]
   refine (totalDegree_finsetProd _ _).trans ?_
   refine le_trans ?_ (le_totalDegree hs)
-  refine
-    (Finset.sum_le_sum fun i _ => (totalDegree_pow _ _).trans (Nat.mul_le_mul_left _ (hg i))).trans
-      ?_
+  refine (Finset.sum_le_sum fun i _ => (totalDegree_pow _ _).trans
+    (Nat.mul_le_mul_left _ (hg i))).trans ?_
   simp [Finsupp.sum]
 
-theorem exists_translate (a : Mat n) (P : Poly n)
-    : ∃ Q : Poly n, Q.totalDegree ≤ P.totalDegree ∧ ∀ g, ev (a * g) P = ev g Q := by
-  let f : (Fin n × Fin n) ⊕ (Fin n × Fin n) → Poly n :=
-    Sum.elim
-      (fun x => ∑ c, C (a x.1 c) * X (Sum.inl (c, x.2)))
-      (fun x => ∑ c, C (star (a x.1 c)) * X (Sum.inr (c, x.2)))
+theorem exists_translate (a : Mat n) (P : Poly n) :
+    ∃ Q : Poly n, Q.totalDegree ≤ P.totalDegree ∧ ∀ g, ev (a * g) P = ev g Q := by
+  let f : (Fin n × Fin n) ⊕ (Fin n × Fin n) → Poly n := Sum.elim
+    (fun x => ∑ c, C (a x.1 c) * X (Sum.inl (c, x.2))) (fun x => ∑ c, C (star (a x.1 c)) * X (Sum.inr (c, x.2)))
   refine ⟨bind₁ f P, totalDegree_bind_le f ?_ P, fun g => ?_⟩
-  · rintro (x | x)
-      <;> · refine totalDegree_finsetSum_le fun l _ => (totalDegree_mul _ _).trans ?_
-            rw [totalDegree_X, totalDegree_C]
+  · rintro (x | x) <;>
+    · refine totalDegree_finsetSum_le fun l _ => (totalDegree_mul _ _).trans ?_
+      rw [totalDegree_X, totalDegree_C]
   · have h : ev (a * g) = (ev g).comp (bind₁ f : Poly n →ₐ[ℂ] Poly n).toRingHom := by
       refine MvPolynomial.ringHom_ext (fun r => ?_) ?_
       · simp [ev]
-      · rintro (x | x) <;> simp [ev, f, Matrix.mul_apply]
-    rw [h]
-    rfl
+      · rintro (x | x) <;> simp [ev, f, Matrix.mul_apply, bind₁_X_right]
+    rw [h]; rfl
 
 def varWt : (Fin n × Fin n) ⊕ (Fin n × Fin n) → Fin n → ℝ :=
-  Sum.elim (fun x => - Pi.single x.1 1) (fun x => Pi.single x.1 1)
+  Sum.elim (fun x => -Pi.single x.1 1) (fun x => Pi.single x.1 1)
 
-def monWt (s : (Fin n × Fin n) ⊕ (Fin n × Fin n) →₀ ℕ) : Fin n → ℝ := fun a =>
-  ∑ i, (s i : ℝ) * varWt i a
+def monWt (s : (Fin n × Fin n) ⊕ (Fin n × Fin n) →₀ ℕ) : Fin n → ℝ := fun a => ∑ i, (s i : ℝ) * varWt i a
 
-theorem ev_diag_monomial (θ : Fin n → ℝ) (g : Mat n) (s : (Fin n × Fin n) ⊕ (Fin n × Fin n) →₀ ℕ)
-    : ev (Matrix.diagonal (fun a => Complex.exp (-((θ a : ℂ) * Complex.I))) * g) (monomial s 1)
-      = Complex.exp (((∑ a, monWt s a * θ a : ℝ) : ℂ) * Complex.I) * ev g (monomial s 1) := by
+theorem ev_diag_monomial (θ : Fin n → ℝ) (g : Mat n) (s : (Fin n × Fin n) ⊕ (Fin n × Fin n) →₀ ℕ) :
+    ev (Matrix.diagonal (fun a => Complex.exp (-((θ a : ℂ) * Complex.I))) * g) (monomial s 1) =
+      Complex.exp (((∑ a, monWt s a * θ a : ℝ) : ℂ) * Complex.I) * ev g (monomial s 1) := by
   have h1 : (∑ a, monWt s a * θ a : ℝ) = ∑ i, (s i : ℝ) * ∑ a, varWt i a * θ a := by
     simp only [monWt, Finset.sum_mul, Finset.mul_sum, mul_assoc]
     exact Finset.sum_comm
   rw [h1]
   simp only [ev, eval_monomial, one_mul]
-  rw [Finsupp.prod_fintype _ _ (by simp), Finsupp.prod_fintype _ _ (by simp), Complex.ofReal_sum,
-    Finset.sum_mul, Complex.exp_sum, ← Finset.prod_mul_distrib]
+  rw [Finsupp.prod_fintype _ _ (by simp), Finsupp.prod_fintype _ _ (by simp), Complex.ofReal_sum, Finset.sum_mul,
+    Complex.exp_sum, ← Finset.prod_mul_distrib]
   refine Finset.prod_congr rfl fun i _ => ?_
   rw [Complex.ofReal_mul, Complex.ofReal_natCast, mul_assoc, Complex.exp_nat_mul, ← mul_pow]
   congr 1
@@ -89,13 +125,12 @@ theorem toMK_mem (ε : Fin n → Bool) (k : KG ε) : toMK k ∈ UJset ε := (k :
 
 theorem toMK_mul (ε : Fin n → Bool) (a b : KG ε) : toMK (a * b) = toMK a * toMK b := rfl
 
-variable
-  {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
-  {ε : Fin n → Bool} {σ : Mat n → (H →L[ℂ] H)}
+variable {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H] {ε : Fin n → Bool}
+  {σ : Mat n → (H →L[ℂ] H)}
 
 omit [CompleteSpace H] in
-theorem integrable_avg (hσ : IsURepOn (UJset ε) σ) (u : H) (P : Poly n)
-    : Integrable (fun k : KG ε => ev (toMK k) P • σ (toMK k) u) (muK ε) := by
+theorem integrable_avg (hσ : IsURepOn (UJset ε) σ) (u : H) (P : Poly n) :
+    Integrable (fun k : KG ε => ev (toMK k) P • σ (toMK k) u) (muK ε) := by
   have h : Continuous fun k : KG ε => ev (toMK k) P • σ (toMK k) u :=
     ((continuous_ev P).comp (continuous_toMK ε)).smul
       ((hσ.2.2 u).comp_continuous (continuous_toMK ε) (toMK_mem ε))
@@ -110,8 +145,8 @@ def avg (hσ : IsURepOn (UJset ε) σ) (u : H) : Poly n →ₗ[ℂ] H where
     rw [RingHom.id_apply, ← integral_smul]
     simp [ev, smul_eq_C_mul, mul_smul]
 
-theorem apply_avg (hσ : IsURepOn (UJset ε) σ) (u : H) (P : Poly n) (g : KG ε)
-    : σ (toMK g) (avg hσ u P) = ∫ k : KG ε, ev (toMK g⁻¹ * toMK k) P • σ (toMK k) u ∂(muK ε) := by
+theorem apply_avg (hσ : IsURepOn (UJset ε) σ) (u : H) (P : Poly n) (g : KG ε) :
+    σ (toMK g) (avg hσ u P) = ∫ k : KG ε, ev (toMK g⁻¹ * toMK k) P • σ (toMK k) u ∂(muK ε) := by
   change σ (toMK g) (∫ k : KG ε, ev (toMK k) P • σ (toMK k) u ∂(muK ε)) = _
   rw [← ContinuousLinearMap.integral_comp_comm _ (integrable_avg hσ u P),
     ← integral_mul_left_eq_self (fun k : KG ε => ev (toMK g⁻¹ * toMK k) P • σ (toMK k) u) g]
@@ -120,9 +155,8 @@ theorem apply_avg (hσ : IsURepOn (UJset ε) σ) (u : H) (P : Poly n) (g : KG ε
   rw [← toMK_mul, inv_mul_cancel_left, toMK_mul, hσ.1.2 _ (toMK_mem ε g) _ (toMK_mem ε k), map_smul]
   rfl
 
-theorem isWtOn_avg (hσ : IsURepOn (UJset ε) σ) (u : H) (s : (Fin n × Fin n) ⊕ (Fin n × Fin n) →₀ ℕ)
-    : Formalism.MainNotions.S.IsWtOn (Formalism.REAL.Kset ε) σ (monWt s)
-      (avg hσ u (monomial s 1)) := by
+theorem isWtOn_avg (hσ : IsURepOn (UJset ε) σ) (u : H) (s : (Fin n × Fin n) ⊕ (Fin n × Fin n) →₀ ℕ) :
+    Formalism.MainNotions.S.IsWtOn (Formalism.REAL.Kset ε) σ (monWt s) (avg hσ u (monomial s 1)) := by
   intro θ hθ
   rw [← Formalism.REAL.range_toMK] at hθ
   obtain ⟨g, hg⟩ := hθ
@@ -140,22 +174,7 @@ theorem isWtOn_avg (hσ : IsURepOn (UJset ε) σ) (u : H) (s : (Fin n × Fin n) 
   rw [integral_smul]
   rfl
 
-theorem polyAvg
-    : ∀ (n : ℕ) (ε : Fin n → Bool) (d : ℕ), ∃ A : Set (Fin n → ℝ),
-      A.Finite
-        ∧ ∀ (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
-            (σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)),
-          ReciprocityTheory.ChartRestriction.DS.IsURepOn
-              (ReciprocityTheory.ChartRestriction.DS.UJset ε) σ
-            → ∀ u : H, ∃ S : Submodule ℂ H,
-              FiniteDimensional ℂ S ∧ Formalism.MainNotions.S.IsKStableOn ε σ S
-                ∧ (∀ P : GlobalTheory.PsCo.Pc1.Poly n,
-                  P.totalDegree ≤ d
-                    → ∫ k : Formalism.REAL.KG ε, GlobalTheory.PsCo.Pc1.ev (Formalism.REAL.toMK k) P • σ (Formalism.REAL.toMK k) u ∂(Formalism.REAL.muK ε)
-                      ∈ S)
-                ∧ ∀ (μ : Fin n → ℝ) (s : H),
-                  s ∈ S → s ≠ 0 → Formalism.MainNotions.S.IsWtOn (Formalism.REAL.Kset ε) σ μ s
-                    → μ ∈ A := by
+theorem polyAvg : ∀ (n : ℕ) (ε : Fin n → Bool) (d : ℕ), ∃ A : Set (Fin n → ℝ), A.Finite ∧ ∀ (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H] (σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)), ReciprocityTheory.ChartRestriction.DS.IsURepOn (ReciprocityTheory.ChartRestriction.DS.UJset ε) σ → ∀ u : H, ∃ S : Submodule ℂ H, FiniteDimensional ℂ S ∧ Formalism.MainNotions.S.IsKStableOn ε σ S ∧ (∀ P : GlobalTheory.PsCo.Pc1.Poly n, P.totalDegree ≤ d → ∫ k : Formalism.REAL.KG ε, GlobalTheory.PsCo.Pc1.ev (Formalism.REAL.toMK k) P • σ (Formalism.REAL.toMK k) u ∂(Formalism.REAL.muK ε) ∈ S) ∧ ∀ (μ : Fin n → ℝ) (s : H), s ∈ S → s ≠ 0 → Formalism.MainNotions.S.IsWtOn (Formalism.REAL.Kset ε) σ μ s → μ ∈ A := by
   intro n ε d
   refine ⟨monWt '' {s | s.degree ≤ d}, (Finsupp.finite_of_degree_le d).image _, ?_⟩
   intro H _ _ _ σ hσ u
@@ -164,8 +183,7 @@ theorem polyAvg
     rw [← Formalism.REAL.range_toMK] at hg
     obtain ⟨g, rfl⟩ := hg
     obtain ⟨Q, hQ, hQ'⟩ := exists_translate (toMK g⁻¹) P
-    refine
-      ⟨Q, (mem_restrictTotalDegree _ _ _).2 (hQ.trans ((mem_restrictTotalDegree _ _ _).1 hP)), ?_⟩
+    refine ⟨Q, (mem_restrictTotalDegree _ _ _).2 (hQ.trans ((mem_restrictTotalDegree _ _ _).1 hP)), ?_⟩
     simp only
     rw [apply_avg]
     simp only [hQ']
@@ -177,19 +195,16 @@ theorem polyAvg
     apply hv
     have hP' : P.totalDegree ≤ d := (mem_restrictTotalDegree _ _ _).1 hP
     rw [← inner_self_eq_zero (𝕜 := ℂ)]
-    have e
-        : avg hσ u P = ∑ s ∈ P.support, AddMonoidAlgebra.coeff P s • avg hσ u (monomial s 1) := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        conv_lhs => rw [P.as_sum, map_sum]
+    have e : avg hσ u P = ∑ s ∈ P.support, AddMonoidAlgebra.coeff P s • avg hσ u (monomial s 1) := by
+
+      conv_lhs => rw [P.as_sum, map_sum]
       refine Finset.sum_congr rfl fun s _ => ?_
       rw [← map_smul, smul_monomial, smul_eq_mul, mul_one]
     generalize avg hσ u P = v at e hw
-    have : inner ℂ v (∑ s ∈ P.support, AddMonoidAlgebra.coeff P s • avg hσ u (monomial s 1))
-        = 0 := by
+    have : inner ℂ v (∑ s ∈ P.support, AddMonoidAlgebra.coeff P s • avg hσ u (monomial s 1)) = 0 := by
       rw [inner_sum]
       refine Finset.sum_eq_zero fun s hs => ?_
-      rw [inner_smul_right,
-        ReciprocityTheory.ChartRestriction.DS.kfin_wt_orth hσ hw (isWtOn_avg hσ u s), mul_zero]
+      rw [inner_smul_right, ReciprocityTheory.ChartRestriction.DS.kfin_wt_orth hσ hw (isWtOn_avg hσ u s), mul_zero]
       rintro rfl
       exact hμ ⟨s, (le_totalDegree hs).trans hP', rfl⟩
     rwa [← e] at this

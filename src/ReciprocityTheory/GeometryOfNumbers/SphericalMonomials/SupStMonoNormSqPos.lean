@@ -1,7 +1,56 @@
 module
 
+public import Mathlib.Analysis.CStarAlgebra.Classes
+public import Mathlib.Data.Nat.Choose.Multinomial
+public import Mathlib.MeasureTheory.Integral.Bochner.Basic
+public import ReciprocityTheory.GeometryOfNumbers.SphericalMonomials.MonoNormSq
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Real
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import ReciprocityTheory.GeometryOfNumbers.SphericalMonomials.GaussSt
 public import ReciprocityTheory.GeometryOfNumbers.SphericalMonomials.MonomSt
-public import ReciprocityTheory.GeometryOfNumbers.PluriharmonicAnalysis.BergmanDefs
+import ReciprocityTheory.GeometryOfNumbers.SphericalMonomials.MonomStA
+import Std.Tactic.BVDecide.Normalize.Prop
+public import Mathlib.MeasureTheory.Integral.Bochner.ContinuousLinearMap
 
 @[expose] public section
 
@@ -9,15 +58,15 @@ namespace ReciprocityTheory.GeometryOfNumbersTheory
 
 open MeasureTheory
 
-theorem supSt_adt_eq (D n : ℕ)
-    : Finset.Nat.antidiagonalTuple (D + 1) n = Finset.piAntidiag Finset.univ n := by
+theorem supSt_adt_eq (D n : ℕ) :
+    Finset.Nat.antidiagonalTuple (D + 1) n = Finset.piAntidiag Finset.univ n := by
   ext a
   simp [Finset.mem_piAntidiag, Finset.Nat.mem_antidiagonalTuple]
 
-theorem supSt_term {D n : ℕ} (a : Fin (D + 1) → ℕ) (ha : ∑ i, a i = n) (z : Fin (D + 1) → ℂ)
-    : ‖monoC a z‖ ^ 2 / monoNormSq a
-      = ((n + D).choose D : ℝ)
-        * ((Nat.multinomial Finset.univ a : ℕ) * ∏ i, (‖z i‖ ^ 2) ^ a i) := by
+theorem supSt_term {D n : ℕ} (a : Fin (D + 1) → ℕ) (ha : ∑ i, a i = n) (z : Fin (D + 1) → ℂ) :
+    ‖monoC a z‖ ^ 2 / monoNormSq a =
+      ((n + D).choose D : ℝ) * ((Nat.multinomial Finset.univ a : ℕ) *
+        ∏ i, (‖z i‖ ^ 2) ^ a i) := by
   have hnorm : ‖monoC a z‖ ^ 2 = ∏ i, (‖z i‖ ^ 2) ^ a i := by
     simp only [monoC, norm_prod, norm_pow, ← Finset.prod_pow]
     exact Finset.prod_congr rfl fun i _ => by ring
@@ -26,14 +75,11 @@ theorem supSt_term {D n : ℕ} (a : Fin (D + 1) → ℕ) (ha : ∑ i, a i = n) (
     exact_mod_cast this.ne'
   have hspec := Nat.multinomial_spec Finset.univ a
   rw [ha] at hspec
-  have hm
-      : ((Nat.multinomial Finset.univ a : ℕ) : ℝ)
-        = (n.factorial : ℝ) / ((∏ i, (a i).factorial : ℕ) : ℝ) := by
+  have hm : ((Nat.multinomial Finset.univ a : ℕ) : ℝ) =
+      (n.factorial : ℝ) / ((∏ i, (a i).factorial : ℕ) : ℝ) := by
     rw [eq_div_iff hP, mul_comm]
     exact_mod_cast hspec
-  have hc
-      : ((n + D).choose D : ℝ)
-        = ((n + D).factorial : ℝ) / ((n.factorial : ℝ) * (D.factorial : ℝ)) := by
+  have hc : ((n + D).choose D : ℝ) = ((n + D).factorial : ℝ) / ((n.factorial : ℝ) * (D.factorial : ℝ)) := by
     rw [eq_div_iff (by positivity), ← mul_assoc]
     exact_mod_cast Nat.add_choose_mul_factorial_mul_factorial n D
   rw [hnorm, monoNormSq, ha, hm, hc]
@@ -42,27 +88,26 @@ theorem supSt_term {D n : ℕ} (a : Fin (D + 1) → ℕ) (ha : ∑ i, a i = n) (
   have h3 : ((n + D).factorial : ℝ) ≠ 0 := by positivity
   field_simp
 
-theorem sum_mono_sq_div (D n : ℕ) (z : Fin (D + 1) → ℂ)
-    : ∑ a ∈ Finset.Nat.antidiagonalTuple (D + 1) n, ‖monoC a z‖ ^ 2 / monoNormSq a
-      = ((n + D).choose D : ℝ) * sqN z ^ n := by
+theorem sum_mono_sq_div (D n : ℕ) (z : Fin (D + 1) → ℂ) :
+    ∑ a ∈ Finset.Nat.antidiagonalTuple (D + 1) n, ‖monoC a z‖ ^ 2 / monoNormSq a =
+      ((n + D).choose D : ℝ) * sqN z ^ n := by
   rw [Finset.sum_congr rfl (fun a ha => supSt_term a (Finset.Nat.mem_antidiagonalTuple.mp ha) z),
     ← Finset.mul_sum, supSt_adt_eq, sqN, Finset.sum_pow_eq_sum_piAntidiag]
 
-theorem supSt_norm_mono_le {D : ℕ} (a : Fin (D + 1) → ℕ) (z : Fin (D + 1) → ℂ) (h : sqN z = 1)
-    : ‖monoC a z‖ ≤ 1 := by
+theorem supSt_norm_mono_le {D : ℕ} (a : Fin (D + 1) → ℕ) (z : Fin (D + 1) → ℂ) (h : sqN z = 1) :
+    ‖monoC a z‖ ≤ 1 := by
   simp only [monoC, norm_prod, norm_pow]
   apply Finset.prod_le_one₀ (fun i _ => by positivity)
   intro i _
   have h1 : ‖z i‖ ^ 2 ≤ sqN z := by
     unfold sqN
-    exact
-      Finset.single_le_sum (f := fun j => ‖z j‖ ^ 2) (fun j _ => by positivity) (Finset.mem_univ i)
+    exact Finset.single_le_sum (f := fun j => ‖z j‖ ^ 2) (fun j _ => by positivity) (Finset.mem_univ i)
   rw [h] at h1
   have h2 : ‖z i‖ ≤ 1 := by nlinarith [norm_nonneg (z i)]
   exact pow_le_one₀ (norm_nonneg _) h2
 
-theorem supSt_integrable {D : ℕ} (a b : Fin (D + 1) → ℕ)
-    : Integrable (fun z => starRingEnd ℂ (monoC a z) * monoC b z) (sphProb (D + 1)) := by
+theorem supSt_integrable {D : ℕ} (a b : Fin (D + 1) → ℕ) :
+    Integrable (fun z => starRingEnd ℂ (monoC a z) * monoC b z) (sphProb (D + 1)) := by
   have : IsFiniteMeasure (sphProb (D + 1)) := by
     unfold sphProb
     apply Measure.isFiniteMeasure_map
@@ -74,9 +119,9 @@ theorem supSt_integrable {D : ℕ} (a b : Fin (D + 1) → ℕ)
   have h2 := supSt_norm_mono_le b z hz
   nlinarith [norm_nonneg (monoC a z), norm_nonneg (monoC b z)]
 
-theorem supSt_gram {D : ℕ} (a b : Fin (D + 1) → ℕ)
-    : ∫ z, starRingEnd ℂ (monoC a z) * monoC b z ∂(sphProb (D + 1))
-      = if a = b then (monoNormSq a : ℂ) else 0 := by
+theorem supSt_gram {D : ℕ} (a b : Fin (D + 1) → ℕ) :
+    ∫ z, starRingEnd ℂ (monoC a z) * monoC b z ∂(sphProb (D + 1)) =
+      if a = b then (monoNormSq a : ℂ) else 0 := by
   split_ifs with h
   · subst h
     have hz : ∀ z, starRingEnd ℂ (monoC a z) * monoC a z = ((‖monoC a z‖ ^ 2 : ℝ) : ℂ) := by
@@ -88,31 +133,25 @@ theorem supSt_gram {D : ℕ} (a b : Fin (D + 1) → ℕ)
     rw [integral_complex_ofReal, integral_mono_sq_sphProb]
   · exact integral_mono_sphProb_of_ne h
 
-theorem integral_form_sq (D n : ℕ) (c : (Fin (D + 1) → ℕ) → ℂ)
-    : ∫ z, ‖∑ a ∈ Finset.Nat.antidiagonalTuple (D + 1) n, c a * monoC a z‖ ^ 2 ∂(sphProb (D + 1))
-      = ∑ a ∈ Finset.Nat.antidiagonalTuple (D + 1) n, ‖c a‖ ^ 2 * monoNormSq a := by
+theorem integral_form_sq (D n : ℕ) (c : (Fin (D + 1) → ℕ) → ℂ) :
+    ∫ z, ‖∑ a ∈ Finset.Nat.antidiagonalTuple (D + 1) n, c a * monoC a z‖ ^ 2 ∂(sphProb (D + 1)) =
+      ∑ a ∈ Finset.Nat.antidiagonalTuple (D + 1) n, ‖c a‖ ^ 2 * monoNormSq a := by
   set T := Finset.Nat.antidiagonalTuple (D + 1) n
-  have key
-      : ∀ z,
-        ((‖∑ a ∈ T, c a * monoC a z‖ ^ 2 : ℝ) : ℂ)
-          = ∑ a ∈ T, ∑ b ∈ T, (starRingEnd ℂ (c a) * c b) * (starRingEnd ℂ (monoC a z) * monoC b z) :=
-    by
-      intro z
-      push_cast
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [← Complex.conj_mul', map_sum, Finset.sum_mul_sum]
-      refine Finset.sum_congr rfl fun a _ => Finset.sum_congr rfl fun b _ => ?_
-      rw [map_mul]
-      ring
-  have hI
-      : ∫ z, ‖∑ a ∈ T, c a * monoC a z‖ ^ 2 ∂(sphProb (D + 1))
-        = (∫ z, ((‖∑ a ∈ T, c a * monoC a z‖ ^ 2 : ℝ) : ℂ) ∂(sphProb (D + 1))).re := by
+  have key : ∀ z, ((‖∑ a ∈ T, c a * monoC a z‖ ^ 2 : ℝ) : ℂ) =
+      ∑ a ∈ T, ∑ b ∈ T, (starRingEnd ℂ (c a) * c b) * (starRingEnd ℂ (monoC a z) * monoC b z) := by
+    intro z
+    push_cast
+
+    rw [← Complex.conj_mul', map_sum, Finset.sum_mul_sum]
+    refine Finset.sum_congr rfl fun a _ => Finset.sum_congr rfl fun b _ => ?_
+    rw [map_mul]
+    ring
+  have hI : ∫ z, ‖∑ a ∈ T, c a * monoC a z‖ ^ 2 ∂(sphProb (D + 1)) =
+      (∫ z, ((‖∑ a ∈ T, c a * monoC a z‖ ^ 2 : ℝ) : ℂ) ∂(sphProb (D + 1))).re := by
     rw [integral_complex_ofReal, Complex.ofReal_re]
-  have inner
-      : ∀ a ∈ T,
-        ∫ z, ∑ b ∈ T, (starRingEnd ℂ (c a) * c b) *
-            (starRingEnd ℂ (monoC a z) * monoC b z) ∂(sphProb (D + 1))
-          = ((‖c a‖ ^ 2 * monoNormSq a : ℝ) : ℂ) := by
+  have inner : ∀ a ∈ T, ∫ z, ∑ b ∈ T, (starRingEnd ℂ (c a) * c b) *
+      (starRingEnd ℂ (monoC a z) * monoC b z) ∂(sphProb (D + 1)) =
+      ((‖c a‖ ^ 2 * monoNormSq a : ℝ) : ℂ) := by
     intro a ha
     rw [MeasureTheory.integral_finsetSum _ (fun b _ => (supSt_integrable a b).const_mul _)]
     simp_rw [integral_const_mul, supSt_gram]
@@ -122,8 +161,7 @@ theorem integral_form_sq (D n : ℕ) (c : (Fin (D + 1) → ℕ) → ℂ)
     ring
   rw [hI]
   simp_rw [key]
-  rw [MeasureTheory.integral_finsetSum _ (fun a _ =>
-      MeasureTheory.integrable_finsetSum _ (fun b _ => (supSt_integrable a b).const_mul _)),
+  rw [MeasureTheory.integral_finsetSum _ (fun a _ => MeasureTheory.integrable_finsetSum _ (fun b _ => (supSt_integrable a b).const_mul _)),
     Finset.sum_congr rfl inner, ← Complex.ofReal_sum, Complex.ofReal_re]
 
 theorem supSt_monoNormSq_pos {D : ℕ} (a : Fin (D + 1) → ℕ) : 0 < monoNormSq a := by
@@ -132,41 +170,31 @@ theorem supSt_monoNormSq_pos {D : ℕ} (a : Fin (D + 1) → ℕ) : 0 < monoNormS
   have h1 : (0 : ℝ) < ((∏ i, (a i).factorial : ℕ) : ℝ) := by exact_mod_cast this
   positivity
 
-theorem form_sq_le (D n : ℕ) (c : (Fin (D + 1) → ℕ) → ℂ) (z : Fin (D + 1) → ℂ)
-    : ‖∑ a ∈ Finset.Nat.antidiagonalTuple (D + 1) n, c a * monoC a z‖ ^ 2
-      ≤ ((n + D).choose D : ℝ) * sqN z ^ n
-        * ∫ w, ‖∑ a ∈ Finset.Nat.antidiagonalTuple (D + 1) n, c a * monoC a w‖ ^ 2
-            ∂(sphProb (D + 1)) := by
+theorem form_sq_le (D n : ℕ) (c : (Fin (D + 1) → ℕ) → ℂ) (z : Fin (D + 1) → ℂ) :
+    ‖∑ a ∈ Finset.Nat.antidiagonalTuple (D + 1) n, c a * monoC a z‖ ^ 2 ≤
+      ((n + D).choose D : ℝ) * sqN z ^ n *
+        ∫ w, ‖∑ a ∈ Finset.Nat.antidiagonalTuple (D + 1) n, c a * monoC a w‖ ^ 2
+          ∂(sphProb (D + 1)) := by
   set T := Finset.Nat.antidiagonalTuple (D + 1) n
-  have hN : ∀ a : Fin (D + 1) → ℕ, 0 < Real.sqrt (monoNormSq a) := fun a =>
-    Real.sqrt_pos.mpr (supSt_monoNormSq_pos a)
-  have h1
-      : ‖∑ a ∈ T, c a * monoC a z‖
-        ≤ ∑ a ∈ T, (‖c a‖ * Real.sqrt (monoNormSq a)) * (‖monoC a z‖ / Real.sqrt (monoNormSq a)) :=
-    by
-      refine (norm_sum_le _ _).trans (le_of_eq (Finset.sum_congr rfl fun a _ => ?_))
-      rw [norm_mul]
-      field_simp [(hN a).ne']
-  have h2 :=
-    Finset.sum_mul_sq_le_sq_mul_sq T
-      (fun a => ‖c a‖ * Real.sqrt (monoNormSq a))
-      (fun a => ‖monoC a z‖ / Real.sqrt (monoNormSq a))
-  have e1
-      : ∑ a ∈ T, (‖c a‖ * Real.sqrt (monoNormSq a)) ^ 2 = ∑ a ∈ T, ‖c a‖ ^ 2 * monoNormSq a := by
+  have hN : ∀ a : Fin (D + 1) → ℕ, 0 < Real.sqrt (monoNormSq a) := fun a => Real.sqrt_pos.mpr (supSt_monoNormSq_pos a)
+  have h1 : ‖∑ a ∈ T, c a * monoC a z‖ ≤
+      ∑ a ∈ T, (‖c a‖ * Real.sqrt (monoNormSq a)) * (‖monoC a z‖ / Real.sqrt (monoNormSq a)) := by
+    refine (norm_sum_le _ _).trans (le_of_eq (Finset.sum_congr rfl fun a _ => ?_))
+    rw [norm_mul]
+    field_simp [(hN a).ne']
+  have h2 := Finset.sum_mul_sq_le_sq_mul_sq T (fun a => ‖c a‖ * Real.sqrt (monoNormSq a))
+    (fun a => ‖monoC a z‖ / Real.sqrt (monoNormSq a))
+  have e1 : ∑ a ∈ T, (‖c a‖ * Real.sqrt (monoNormSq a)) ^ 2 = ∑ a ∈ T, ‖c a‖ ^ 2 * monoNormSq a := by
     refine Finset.sum_congr rfl fun a _ => ?_
     rw [mul_pow, Real.sq_sqrt (supSt_monoNormSq_pos a).le]
-  have e2
-      : ∑ a ∈ T, (‖monoC a z‖ / Real.sqrt (monoNormSq a)) ^ 2
-        = ∑ a ∈ T, ‖monoC a z‖ ^ 2 / monoNormSq a := by
+  have e2 : ∑ a ∈ T, (‖monoC a z‖ / Real.sqrt (monoNormSq a)) ^ 2 = ∑ a ∈ T, ‖monoC a z‖ ^ 2 / monoNormSq a := by
     refine Finset.sum_congr rfl fun a _ => ?_
     rw [div_pow, Real.sq_sqrt (supSt_monoNormSq_pos a).le]
   rw [e1, e2, sum_mono_sq_div] at h2
   rw [integral_form_sq]
-  calc
-    ‖∑ a ∈ T, c a * monoC a z‖ ^ 2
-        ≤ (∑ a ∈ T, (‖c a‖ * Real.sqrt (monoNormSq a)) * (‖monoC a z‖ / Real.sqrt (monoNormSq a)))
-          ^ 2 :=
-      pow_le_pow_left₀ (norm_nonneg _) h1 2
+  calc ‖∑ a ∈ T, c a * monoC a z‖ ^ 2
+      ≤ (∑ a ∈ T, (‖c a‖ * Real.sqrt (monoNormSq a)) * (‖monoC a z‖ / Real.sqrt (monoNormSq a))) ^ 2 :=
+        pow_le_pow_left₀ (norm_nonneg _) h1 2
     _ ≤ (∑ a ∈ T, ‖c a‖ ^ 2 * monoNormSq a) * (((n + D).choose D : ℝ) * sqN z ^ n) := h2
     _ = ((n + D).choose D : ℝ) * sqN z ^ n * ∑ a ∈ T, ‖c a‖ ^ 2 * monoNormSq a := by ring
 

@@ -1,10 +1,56 @@
 module
 
-public import Mathlib
 public import GroundTheory.HeightsAndTheta.Heights.ComplexAnalyticSets.StPrimitiveFormMinimalFactorPoints
 public import GroundTheory.HeightsAndTheta.Heights.ComplexAnalyticSets.StGermMinimalPolynomialDivides
 public import GroundTheory.HeightsAndTheta.Heights.ComplexAnalyticSets.StFiniteFibreCentredEquation
 public import GroundTheory.HeightsAndTheta.Heights.ComplexAnalyticSets.StPrimitiveFormRemainder
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
+public import Mathlib.Analysis.Analytic.Constructions
 
 @[expose] public section
 
@@ -24,70 +70,60 @@ def anSub {d : ℕ} (y₀ : Fin d → ℂ) : Subring ((Fin d → ℂ) → ℂ) w
   zero_mem' := analyticAt_const
   neg_mem' ha := AnalyticAt.neg ha
 
-theorem coeff_analyticAt
-    {d : ℕ} {y₀ : Fin d → ℂ} {E : Polynomial ((Fin d → ℂ) → ℂ)}
-    (h : E ∈ liftsRing (anSub y₀).subtype)
-    (k : ℕ)
-    : AnalyticAt ℂ (E.coeff k) y₀ := by
+theorem coeff_analyticAt {d : ℕ} {y₀ : Fin d → ℂ} {E : Polynomial ((Fin d → ℂ) → ℂ)}
+    (h : E ∈ liftsRing (anSub y₀).subtype) (k : ℕ) : AnalyticAt ℂ (E.coeff k) y₀ := by
   rw [← lifts_iff_liftsRing, lifts_iff_coeff_lifts] at h
   obtain ⟨f, hf⟩ := h k
   rw [← hf]
   exact f.2
 
-theorem C_mem {d : ℕ} {y₀ : Fin d → ℂ} {f : (Fin d → ℂ) → ℂ} (hf : AnalyticAt ℂ f y₀)
-    : C f ∈ liftsRing (anSub y₀).subtype := by
+theorem C_mem {d : ℕ} {y₀ : Fin d → ℂ} {f : (Fin d → ℂ) → ℂ} (hf : AnalyticAt ℂ f y₀) :
+    C f ∈ liftsRing (anSub y₀).subtype := by
   rw [← lifts_iff_liftsRing]
   exact C_mem_lifts (anSub y₀).subtype ⟨f, hf⟩
 
-theorem X_mem {d : ℕ} (y₀ : Fin d → ℂ)
-    : (X : Polynomial ((Fin d → ℂ) → ℂ)) ∈ liftsRing (anSub y₀).subtype := by
+theorem X_mem {d : ℕ} (y₀ : Fin d → ℂ) : (X : Polynomial ((Fin d → ℂ) → ℂ)) ∈ liftsRing (anSub y₀).subtype := by
   rw [← lifts_iff_liftsRing]
   exact X_mem_lifts _
 
-theorem eval₂_eq_zero_of_dvd
-    {d n : ℕ} {b : Fin n → (Fin d → ℂ) → ℂ} {y : Fin d → ℂ} {E : Polynomial ((Fin d → ℂ) → ℂ)}
-    (hd : (X ^ n + ∑ j, C (b j y) * X ^ (j : ℕ) : Polynomial ℂ)
-      ∣ E.map (Pi.evalRingHom (fun _ : Fin d → ℂ => ℂ) y))
-    {τ : ℂ} (hτ : τ ^ n + ∑ j, b j y * τ ^ (j : ℕ) = 0)
-    : E.eval₂ (Pi.evalRingHom (fun _ : Fin d → ℂ => ℂ) y) τ = 0 := by
+theorem eval₂_eq_zero_of_dvd {d n : ℕ} {b : Fin n → (Fin d → ℂ) → ℂ} {y : Fin d → ℂ}
+    {E : Polynomial ((Fin d → ℂ) → ℂ)}
+    (hd : (X ^ n + ∑ j, C (b j y) * X ^ (j : ℕ) : Polynomial ℂ) ∣ E.map (Pi.evalRingHom (fun _ : Fin d → ℂ => ℂ) y))
+    {τ : ℂ} (hτ : τ ^ n + ∑ j, b j y * τ ^ (j : ℕ) = 0) :
+    E.eval₂ (Pi.evalRingHom (fun _ : Fin d → ℂ => ℂ) y) τ = 0 := by
   obtain ⟨G, hG⟩ := hd
   rw [← eval_map, hG, eval_mul]
   simp [eval_finsetSum, hτ]
 
-theorem cleared_eq {n : ℕ} (c : Fin n → ℂ) (D x : ℂ)
-    : (D * x) ^ n + ∑ j : Fin n, c j * D ^ (n - j) * (D * x) ^ (j : ℕ)
-      = D ^ n * (x ^ n + ∑ j : Fin n, c j * x ^ (j : ℕ)) := by
+theorem cleared_eq {n : ℕ} (c : Fin n → ℂ) (D x : ℂ) :
+    (D * x) ^ n + ∑ j : Fin n, c j * D ^ (n - j) * (D * x) ^ (j : ℕ) =
+      D ^ n * (x ^ n + ∑ j : Fin n, c j * x ^ (j : ℕ)) := by
   rw [mul_add, Finset.mul_sum, mul_pow]
   congr 1
   refine Finset.sum_congr rfl fun j _ => ?_
   rw [mul_pow, ← pow_sub_mul_pow D j.2.le]
   ring
 
-theorem linear_apply_eq_sum
-    {σ : Type} [Fintype σ] [DecidableEq σ]
-    {F : Type} [AddCommGroup F] [Module ℂ F] [TopologicalSpace F]
-    (L : (σ → ℂ) →L[ℂ] F) (v : σ → ℂ)
-    : L v = ∑ i, v i • L (fun j => if i = j then 1 else 0) :=
+theorem linear_apply_eq_sum {σ : Type} [Fintype σ] [DecidableEq σ] {F : Type} [AddCommGroup F] [Module ℂ F]
+    [TopologicalSpace F] (L : (σ → ℂ) →L[ℂ] F) (v : σ → ℂ) :
+    L v = ∑ i, v i • L (fun j => if i = j then 1 else 0) :=
   LinearMap.pi_apply_eq_sum_univ (L : (σ → ℂ) →ₗ[ℂ] F) v
 
-theorem roots_near_centred
-    {E : Type*} [TopologicalSpace E]
-    {n : ℕ} (b : Fin n → E → ℂ)
-    (y₀ : E) (u : ℂ) (hb : ∀ j, ContinuousAt (b j) y₀)
-    (h0 : ∀ T : ℂ, T ^ n + ∑ j, b j y₀ * T ^ (j : ℕ) = (T - u) ^ n)
-    {ε : ℝ} (hε : 0 < ε)
-    : ∀ᶠ y in 𝓝 y₀, ∀ x : ℂ, x ^ n + ∑ j, b j y * x ^ (j : ℕ) = 0 → ‖x - u‖ < ε := by
+theorem roots_near_centred {E : Type*} [TopologicalSpace E] {n : ℕ} (b : Fin n → E → ℂ) (y₀ : E) (u : ℂ)
+    (hb : ∀ j, ContinuousAt (b j) y₀) (h0 : ∀ T : ℂ, T ^ n + ∑ j, b j y₀ * T ^ (j : ℕ) = (T - u) ^ n)
+    {ε : ℝ} (hε : 0 < ε) :
+    ∀ᶠ y in 𝓝 y₀, ∀ x : ℂ, x ^ n + ∑ j, b j y * x ^ (j : ℕ) = 0 → ‖x - u‖ < ε := by
   rcases Nat.eq_zero_or_pos n with hn | hn
   · subst hn
     exact Eventually.of_forall fun y x hx => by simp at hx
   set S : E → ℝ := fun y => ∑ j, ‖b j y‖ with hS
   set B : ℝ := max 1 (S y₀ + 1) with hB
   have hB1 : 1 ≤ B := le_max_left _ _
-  have hSt : Tendsto S (𝓝 y₀) (𝓝 (S y₀)) := tendsto_finsetSum _ fun j _ => (hb j).tendsto.norm
+  have hSt : Tendsto S (𝓝 y₀) (𝓝 (S y₀)) :=
+    tendsto_finsetSum _ fun j _ => (hb j).tendsto.norm
   have hDt : Tendsto (fun y => ∑ j, ‖b j y₀ - b j y‖ * B ^ (j : ℕ)) (𝓝 y₀) (𝓝 0) := by
-    have : Tendsto
-        (fun y => ∑ j, ‖b j y₀ - b j y‖ * B ^ (j : ℕ))
-        (𝓝 y₀) (𝓝 (∑ j : Fin n, ‖b j y₀ - b j y₀‖ * B ^ (j : ℕ))) :=
+    have : Tendsto (fun y => ∑ j, ‖b j y₀ - b j y‖ * B ^ (j : ℕ)) (𝓝 y₀)
+        (𝓝 (∑ j : Fin n, ‖b j y₀ - b j y₀‖ * B ^ (j : ℕ))) :=
       tendsto_finsetSum _ fun j _ => ((tendsto_const_nhds.sub (hb j).tendsto).norm).mul_const _
     simpa using this
   have hεn : (0 : ℝ) < ε ^ n := pow_pos hε n
@@ -97,11 +133,9 @@ theorem roots_near_centred
     by_cases hx1 : ‖x‖ ≤ 1
     · exact hx1.trans hB1
     replace hx1 := lt_of_not_ge hx1
-    have hxn : x ^ n = - ∑ j, b j y * x ^ (j : ℕ) := eq_neg_of_add_eq_zero_left hx
+    have hxn : x ^ n = -∑ j, b j y * x ^ (j : ℕ) := eq_neg_of_add_eq_zero_left hx
     have hle : ‖x‖ ^ n ≤ S y * ‖x‖ ^ (n - 1) := by
-      calc
-        ‖x‖ ^ n
-          = ‖∑ j, b j y * x ^ (j : ℕ)‖ := by rw [← norm_pow, hxn, norm_neg]
+      calc ‖x‖ ^ n = ‖∑ j, b j y * x ^ (j : ℕ)‖ := by rw [← norm_pow, hxn, norm_neg]
         _ ≤ ∑ j, ‖b j y * x ^ (j : ℕ)‖ := norm_sum_le _ _
         _ ≤ ∑ j : Fin n, ‖b j y‖ * ‖x‖ ^ (n - 1) := by
           refine Finset.sum_le_sum fun j _ => ?_
@@ -115,14 +149,12 @@ theorem roots_near_centred
     exact hxS.trans (hSy.le.trans (le_max_right _ _))
   have hid : (x - u) ^ n = ∑ j, (b j y₀ - b j y) * x ^ (j : ℕ) := by
     rw [← h0 x]
-    have : x ^ n = - ∑ j, b j y * x ^ (j : ℕ) := eq_neg_of_add_eq_zero_left hx
+    have : x ^ n = -∑ j, b j y * x ^ (j : ℕ) := eq_neg_of_add_eq_zero_left hx
     rw [this]
     simp only [sub_mul, Finset.sum_sub_distrib]
     ring
   have hle : ‖x - u‖ ^ n ≤ ∑ j, ‖b j y₀ - b j y‖ * B ^ (j : ℕ) := by
-    calc
-      ‖x - u‖ ^ n
-        = ‖∑ j, (b j y₀ - b j y) * x ^ (j : ℕ)‖ := by rw [← norm_pow, hid]
+    calc ‖x - u‖ ^ n = ‖∑ j, (b j y₀ - b j y) * x ^ (j : ℕ)‖ := by rw [← norm_pow, hid]
       _ ≤ ∑ j, ‖(b j y₀ - b j y) * x ^ (j : ℕ)‖ := norm_sum_le _ _
       _ ≤ ∑ j : Fin n, ‖b j y₀ - b j y‖ * B ^ (j : ℕ) := by
         refine Finset.sum_le_sum fun j _ => ?_
@@ -131,10 +163,8 @@ theorem roots_near_centred
   have : ‖x - u‖ ^ n < ε ^ n := hle.trans_lt hDy
   exact lt_of_pow_lt_pow_left₀ n hε.le this
 
-theorem proof
-    (hMin : GermMinimalPolynomialDivides.Statement) (hCen : FiniteFibreCentredEquation.Statement)
-    (hRem : PrimitiveFormRemainder.Statement)
-    : PrimitiveFormMinimalFactorPoints.Statement := by
+theorem proof (hMin : GermMinimalPolynomialDivides.Statement) (hCen : FiniteFibreCentredEquation.Statement)
+    (hRem : PrimitiveFormRemainder.Statement) : PrimitiveFormMinimalFactorPoints.Statement := by
   classical
   intro σ _ Y w d A hX hirr hiso hinj ℓ N a δ q ha hδ hq hδne hp hsep hrel
   obtain ⟨n, b, hb, hmX, hdiv⟩ := hMin σ Y w d A hX hirr hiso hinj ℓ (ℓ.analyticAt w)
@@ -161,35 +191,26 @@ theorem proof
     Q i ^ nW i + ∑ j, C (fun y => cW i j y * δ y ^ (nW i - j)) * Q i ^ (j : ℕ) with hEW
   have hEpc : Ep ∈ liftsRing (anSub (A w)).subtype :=
     Subring.add_mem _ (Subring.pow_mem _ (X_mem _) _)
-      (Subring.sum_mem _ fun j _ =>
-        Subring.mul_mem _ (C_mem (ha j)) (Subring.pow_mem _ (X_mem _) _))
+      (Subring.sum_mem _ fun j _ => Subring.mul_mem _ (C_mem (ha j)) (Subring.pow_mem _ (X_mem _) _))
   have hEAc : ∀ r, EA r ∈ liftsRing (anSub (A w)).subtype := fun r =>
-    Subring.sub_mem _
-      (Subring.sum_mem _ fun i _ => Subring.mul_mem _ (C_mem analyticAt_const) (hQ i))
+    Subring.sub_mem _ (Subring.sum_mem _ fun i _ => Subring.mul_mem _ (C_mem analyticAt_const) (hQ i))
       (C_mem (hδ.mul (hproj r)))
   have hElc : El ∈ liftsRing (anSub (A w)).subtype :=
-    Subring.sub_mem _
-      (Subring.sum_mem _ fun i _ => Subring.mul_mem _ (C_mem analyticAt_const) (hQ i))
+    Subring.sub_mem _ (Subring.sum_mem _ fun i _ => Subring.mul_mem _ (C_mem analyticAt_const) (hQ i))
       (Subring.mul_mem _ (C_mem hδ) (X_mem _))
   have hEWc : ∀ i, EW i ∈ liftsRing (anSub (A w)).subtype := fun i =>
-    Subring.add_mem _ (Subring.pow_mem _ (hQ i) _)
-      (Subring.sum_mem _ fun j _ =>
-        Subring.mul_mem _ (C_mem ((hcW i j).mul (hδ.pow _))) (Subring.pow_mem _ (hQ i) _))
+    Subring.add_mem _ (Subring.pow_mem _ (hQ i) _) (Subring.sum_mem _ fun j _ =>
+      Subring.mul_mem _ (C_mem ((hcW i j).mul (hδ.pow _))) (Subring.pow_mem _ (hQ i) _))
 
   have hEpe : ∀ y t, Ep.eval₂ (ev y) t = t ^ N + ∑ j, a j y * t ^ (j : ℕ) := by
     intro y t; simp [hEp, eval₂_finsetSum, hevC]
-  have hEAe
-      : ∀ r y t,
-        (EA r).eval₂ (ev y) t = ∑ i, A (e i) r * ∑ j, q i j y * t ^ (j : ℕ) - δ y * y r := by
+  have hEAe : ∀ r y t, (EA r).eval₂ (ev y) t = ∑ i, A (e i) r * ∑ j, q i j y * t ^ (j : ℕ) - δ y * y r := by
     intro r y t; simp [hEA, eval₂_finsetSum, hevC, hQe]
   have hEle : ∀ y t, El.eval₂ (ev y) t = ∑ i, ℓ (e i) * ∑ j, q i j y * t ^ (j : ℕ) - δ y * t := by
     intro y t; simp [hEl, eval₂_finsetSum, hevC, hQe]
-  have hEWe
-      : ∀ i y t,
-        (EW i).eval₂ (ev y) t
-          = (∑ j, q i j y * t ^ (j : ℕ)) ^ nW i
-            + ∑ j : Fin (nW i), cW i j y * δ y ^ (nW i - j) * (∑ j, q i j y * t ^ (j : ℕ)) ^ (j : ℕ) :=
-    by intro i y t; simp [hEW, eval₂_finsetSum, hevC, hQe, eval₂_pow]
+  have hEWe : ∀ i y t, (EW i).eval₂ (ev y) t = (∑ j, q i j y * t ^ (j : ℕ)) ^ nW i +
+      ∑ j : Fin (nW i), cW i j y * δ y ^ (nW i - j) * (∑ j, q i j y * t ^ (j : ℕ)) ^ (j : ℕ) := by
+    intro i y t; simp [hEW, eval₂_finsetSum, hevC, hQe, eval₂_pow]
   have hAsum : ∀ (v : σ → ℂ) r, A v r = ∑ i, v i * A (e i) r := by
     intro v r; rw [linear_apply_eq_sum A v]; simp [Finset.sum_apply, he]
   have hlsum : ∀ v : σ → ℂ, ℓ v = ∑ i, v i * ℓ (e i) := by
@@ -199,48 +220,42 @@ theorem proof
     filter_upwards [eventually_all.2 hrel] with z hz hzX i using hz i hzX
   have hWA : ∀ᶠ z in 𝓝 w, z ∈ Y → ∀ i, z i ^ nW i + ∑ j, cW i j (A z) * z i ^ (j : ℕ) = 0 := by
     filter_upwards [eventually_all.2 hWX] with z hz hzX i using hz i hzX
-  have dEp :=
-    hdiv Ep (coeff_analyticAt hEpc) (by filter_upwards [hp] with z hz hzX; rw [hEpe]; exact hz hzX)
-  have dEA := fun r =>
-    hdiv (EA r) (coeff_analyticAt (hEAc r)) (by
-      filter_upwards [hrelA] with z hz hzX
-      rw [hEAe, Finset.sum_congr rfl fun i _ => by rw [← hz hzX i], hAsum z r, Finset.mul_sum,
-        ← Finset.sum_sub_distrib]
-      exact Finset.sum_eq_zero fun i _ => by ring)
-  have dEl :=
-    hdiv El (coeff_analyticAt hElc) (by
-      filter_upwards [hrelA] with z hz hzX
-      rw [hEle, Finset.sum_congr rfl fun i _ => by rw [← hz hzX i]]
-      rw [hlsum z, Finset.mul_sum, ← Finset.sum_sub_distrib]
-      exact Finset.sum_eq_zero fun i _ => by ring)
-  have dEW := fun i =>
-    hdiv (EW i) (coeff_analyticAt (hEWc i)) (by
-      filter_upwards [hrelA, hWA] with z hz hzW hzX
-      rw [hEWe, ← hz hzX i, cleared_eq, hzW hzX i, mul_zero])
-  have dR := fun k =>
-    hdiv (R k) (hR k) (by
-      filter_upwards [hRz k, hrelA, hWA, hVo.mem_nhds hwV] with z h1 hz hzW hzV hzX
-      have hz0 : z ∈ {z | z ∈ V ∧ ∀ i, f i z = 0} := by rw [← hXV]; exact ⟨hzX, hzV⟩
-      rw [← h1 (hzW hzX) (hz hzX), hz0.2 k, mul_zero])
+  have dEp := hdiv Ep (coeff_analyticAt hEpc) (by
+    filter_upwards [hp] with z hz hzX; rw [hEpe]; exact hz hzX)
+  have dEA := fun r => hdiv (EA r) (coeff_analyticAt (hEAc r)) (by
+    filter_upwards [hrelA] with z hz hzX
+    rw [hEAe, Finset.sum_congr rfl fun i _ => by rw [← hz hzX i], hAsum z r, Finset.mul_sum,
+      ← Finset.sum_sub_distrib]
+    exact Finset.sum_eq_zero fun i _ => by ring)
+  have dEl := hdiv El (coeff_analyticAt hElc) (by
+    filter_upwards [hrelA] with z hz hzX
+    rw [hEle, Finset.sum_congr rfl fun i _ => by rw [← hz hzX i]]
+    rw [hlsum z, Finset.mul_sum, ← Finset.sum_sub_distrib]
+    exact Finset.sum_eq_zero fun i _ => by ring)
+  have dEW := fun i => hdiv (EW i) (coeff_analyticAt (hEWc i)) (by
+    filter_upwards [hrelA, hWA] with z hz hzW hzX
+    rw [hEWe, ← hz hzX i, cleared_eq, hzW hzX i, mul_zero])
+  have dR := fun k => hdiv (R k) (hR k) (by
+    filter_upwards [hRz k, hrelA, hWA, hVo.mem_nhds hwV] with z h1 hz hzW hzV hzX
+    have hz0 : z ∈ {z | z ∈ V ∧ ∀ i, f i z = 0} := by rw [← hXV]; exact ⟨hzX, hzV⟩
+    rw [← h1 (hzW hzX) (hz hzX), hz0.2 k, mul_zero])
   refine ⟨n, b, hb, hmX, ?_, ?_⟩
   · filter_upwards [hsep, dEp] with y hs hd hδy
     refine (hs hδy).of_dvd ?_
-    set_option synthInstance.maxHeartbeats 100000 in
+
     simpa [hEp, Polynomial.map_add (f := _), Polynomial.map_sum, hevC] using hd
   intro U hU
-  have hO
-      : ∀ᶠ z in 𝓝 w, z ∈ U ∧ z ∈ V ∧ ∀ k, (∀ i, z i ^ nW i + ∑ j, cW i j (A z) * z i ^ (j : ℕ) = 0) →
-        (∀ i, δ (A z) * z i = ∑ j, q i j (A z) * ℓ z ^ (j : ℕ)) →
-        δ (A z) ^ M k * f k z = (R k).eval₂ (Pi.evalRingHom (fun _ : Fin d → ℂ => ℂ) (A z)) (ℓ z) :=
-    by
-      filter_upwards [hU, hVo.mem_nhds hwV, eventually_all.2 hRz] with z h1 h2 h3 using ⟨h1, h2, h3⟩
+  have hO : ∀ᶠ z in 𝓝 w, z ∈ U ∧ z ∈ V ∧ ∀ k, (∀ i, z i ^ nW i + ∑ j, cW i j (A z) * z i ^ (j : ℕ) = 0) →
+      (∀ i, δ (A z) * z i = ∑ j, q i j (A z) * ℓ z ^ (j : ℕ)) →
+      δ (A z) ^ M k * f k z = (R k).eval₂ (Pi.evalRingHom (fun _ : Fin d → ℂ => ℂ) (A z)) (ℓ z) :=
+    by filter_upwards [hU, hVo.mem_nhds hwV, eventually_all.2 hRz] with z h1 h2 h3 using ⟨h1, h2, h3⟩
   obtain ⟨ε, hε, hball⟩ := Metric.eventually_nhds_iff.1 hO
-  have hnear := fun i =>
-    roots_near_centred (cW i) (A w) (w i) (fun j => (hcW i j).continuousAt) (hcW0 i) hε
+  have hnear := fun i => roots_near_centred (cW i) (A w) (w i) (fun j => (hcW i j).continuousAt) (hcW0 i) hε
   filter_upwards [eventually_all.2 hnear, eventually_all.2 dEA, dEl, eventually_all.2 dEW,
     eventually_all.2 dR] with y hny hAy hly hWy hRy hδy τ hτ
   set φ : σ → ℂ := fun i => (∑ j, q i j y * τ ^ (j : ℕ)) / δ y with hφ
-  have hQφ : ∀ i, ∑ j, q i j y * τ ^ (j : ℕ) = δ y * φ i := fun i => by rw [hφ]; field_simp
+  have hQφ : ∀ i, ∑ j, q i j y * τ ^ (j : ℕ) = δ y * φ i := fun i => by
+    rw [hφ]; field_simp
   have hAφ : A φ = y := by
     funext r
     have h0 := eval₂_eq_zero_of_dvd (hAy r) hτ

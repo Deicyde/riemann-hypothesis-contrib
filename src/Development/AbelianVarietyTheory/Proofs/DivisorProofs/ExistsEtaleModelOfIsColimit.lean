@@ -1,6 +1,59 @@
 module
 
-public import Mathlib
+public import Mathlib.Algebra.Category.Ring.Basic
+public import Mathlib.CategoryTheory.Filtered.Basic
+public import Mathlib.RingTheory.Etale.Basic
+import Mathlib.Algebra.Category.Ring.FilteredColimits
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.Quiver.ReflQuiver
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+public import Mathlib.RingTheory.Extension.Presentation.Core
+import Mathlib.RingTheory.MvPolynomial.IrreducibleQuadratic
+import Mathlib.RingTheory.Radical.NatInt
+public import Mathlib.RingTheory.Smooth.StandardSmoothOfFree
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+public import Mathlib.CategoryTheory.Limits.Preserves.Basic
+public import Mathlib.CategoryTheory.Limits.Types.Colimits
+public import Mathlib.CategoryTheory.Limits.Types.Filtered
+public import Mathlib.RingTheory.Smooth.StandardSmooth
 
 @[expose] public section
 
@@ -10,21 +63,14 @@ namespace GlobalTheory.EtaleDescent
 
 open TensorProduct
 
-theorem exists_etale_model_of_isColimit
-    : ∀ (J : Type) [SmallCategory J] [IsFiltered J] (D : J ⥤ CommRingCat.{0}) (c : Cocone D),
-      IsColimit c
-        → ∀ (A : Type) [CommRing A] [Algebra c.pt A] [Algebra.Etale c.pt A], ∃ (j : J),
-          (letI : Algebra (D.obj j) c.pt := (c.ι.app j).hom.toAlgebra
-           ∃ (Aj : Type) (_ : CommRing Aj) (_ : Algebra (D.obj j) Aj),
-             Algebra.Etale (D.obj j) Aj
-               ∧ Nonempty (TensorProduct (D.obj j) c.pt Aj ≃ₐ[c.pt] A)) := by
+theorem exists_etale_model_of_isColimit :
+    ∀ (J : Type) [SmallCategory J] [IsFiltered J] (D : J ⥤ CommRingCat.{0}) (c : Cocone D), IsColimit c → ∀ (A : Type) [CommRing A] [Algebra c.pt A] [Algebra.Etale c.pt A], ∃ (j : J), (letI : Algebra (D.obj j) c.pt := (c.ι.app j).hom.toAlgebra; ∃ (Aj : Type) (_ : CommRing Aj) (_ : Algebra (D.obj j) Aj), Algebra.Etale (D.obj j) Aj ∧ Nonempty (TensorProduct (D.obj j) c.pt Aj ≃ₐ[c.pt] A)) := by
   intro J _ _ D c hc A _ _ _
   classical
   have hc' := isColimitOfPreserves (forget _) hc
   obtain ⟨ι, σ, _, _, P, hP⟩ :=
     (Algebra.Etale.iff_isStandardSmoothOfRelativeDimension_zero (R := c.pt) (S := A)).mp
-        inferInstance
-      |>.out
+      inferInstance |>.out
 
   obtain ⟨j, hj⟩ : ∃ j, P.coeffs ⊆ Set.range (c.ι.app j).hom := by
     have hfin := P.finite_coeffs
@@ -76,11 +122,8 @@ theorem exists_etale_model_of_isColimit
     change (D.map g).hom (E.coeff m) = 0
     by_cases hm : m ∈ E.support
     · have hw := c'.w (WidePushoutShape.Hom.init ⟨m, hm⟩)
-      have h3
-          : (D.map g).hom (E.coeff m)
-            = (D.map
-              ((WidePushoutShape.wideSpan j k f).map (WidePushoutShape.Hom.init ⟨m, hm⟩)
-                ≫ c'.ι.app (some ⟨m, hm⟩))).hom (E.coeff m) := by
+      have h3 : (D.map g).hom (E.coeff m) = (D.map ((WidePushoutShape.wideSpan j k f).map
+          (WidePushoutShape.Hom.init ⟨m, hm⟩) ≫ c'.ι.app (some ⟨m, hm⟩))).hom (E.coeff m) := by
         rw [hw]
       rw [h3, Functor.map_comp, CommRingCat.hom_comp, RingHom.comp_apply]
       erw [hf ⟨m, hm⟩]
@@ -99,9 +142,7 @@ theorem exists_etale_model_of_isColimit
     (Algebra.TensorProduct.includeRight).comp (Ideal.Quotient.mkₐ _ _)
   have hφrel : ∀ i, φ (P.relationOfHasCoeffs (D.obj j) i) = 0 := by
     intro i
-    change Algebra.TensorProduct.includeRight (Ideal.Quotient.mk _
-        (P.relationOfHasCoeffs (D.obj j) i))
-      = 0
+    change Algebra.TensorProduct.includeRight (Ideal.Quotient.mk _ (P.relationOfHasCoeffs (D.obj j) i)) = 0
     rw [Ideal.Quotient.eq_zero_iff_mem.mpr (Ideal.subset_span (Set.mem_range_self i)), map_zero]
   have hφE : φ E = 0 := by
     rw [MvPolynomial.aeval_unique φ, MvPolynomial.aeval_def,
@@ -112,21 +153,17 @@ theorem exists_etale_model_of_isColimit
   have hQ : IsUnit Q.jacobian := by
     rw [Algebra.PreSubmersivePresentation.baseChange_jacobian, hP₀]
     refine IsUnit.of_mul_eq_one (φ (P.invJacobianOfHasCoeffs (D.obj j))) ?_
-    have h1
-        : P.jacobianOfHasCoeffs (D.obj j) * P.invJacobianOfHasCoeffs (D.obj j)
-          = ∑ i, P.jacobianRelationsOfHasCoeffs (D.obj j) i * P.relationOfHasCoeffs (D.obj j) i - E
-            + 1 := by
+    have h1 : P.jacobianOfHasCoeffs (D.obj j) * P.invJacobianOfHasCoeffs (D.obj j) =
+        ∑ i, P.jacobianRelationsOfHasCoeffs (D.obj j) i * P.relationOfHasCoeffs (D.obj j) i
+          - E + 1 := by
       rw [hEdef]; ring
     have h2 := congr(φ $h1)
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_mul, map_add (f := _), map_sub, map_sum, map_one, hφrel, mul_zero,
-          Finset.sum_const_zero, hφE, sub_zero, zero_add]
-        at h2
+
+    simp only [map_mul, map_add (f := _), map_sub, map_sum, map_one, hφrel, mul_zero,
+    Finset.sum_const_zero, hφE, sub_zero, zero_add] at h2
     exact h2
-  let Q' : Algebra.SubmersivePresentation (D.obj K) (D.obj K ⊗[D.obj j] M) ι σ := {
-    toPreSubmersivePresentation := Q
-    jacobian_isUnit := hQ
-  }
+  let Q' : Algebra.SubmersivePresentation (D.obj K) (D.obj K ⊗[D.obj j] M) ι σ :=
+    { toPreSubmersivePresentation := Q, jacobian_isUnit := hQ }
   haveI : Algebra.IsStandardSmoothOfRelativeDimension 0 (D.obj K) (D.obj K ⊗[D.obj j] M) :=
     Q'.isStandardSmoothOfRelativeDimension (by rw [← hP]; rfl)
   refine ⟨K, D.obj K ⊗[D.obj j] M, inferInstance, inferInstance, inferInstance, ⟨?_⟩⟩

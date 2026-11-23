@@ -1,14 +1,50 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.StdLvPr
-public import Formalism.LocalToGlobal.HermitianForms.TiedTwJSym
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.TrueColumnSpacesStandardInFrameCoordsStatement
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.LevelFunctionalChartLastStepClasses
-public import Formalism.SharpRestriction.GlobalSchurBounds.Joints
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ActsBySameIntegerStatement
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.LevelFunctionalChartLastStepClasses
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.LocalDualEqAddSpanStatement
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.TrueColumnSpacesStandardInFrameCoordsStatement
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.UnitaryCarryDualStatement
+public import Formalism.SharpRestriction.GlobalSchurBounds.Joints
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Coalgebra.CoassocSimps
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
 
 @[expose] public section
 
@@ -150,7 +186,6 @@ theorem functional_of_reindex
   exact ⟨ht' ▸ t.2, congrArg g' (Subtype.ext ht')⟩
 
 open scoped TensorProduct in
-set_option maxHeartbeats 1000000 in
 theorem colLevel_functional
     {R : Ranks} {F E : Type}
     [Field F] [NumberField F] [Field E] [NumberField E] [StarRing E] [Algebra F E]
@@ -253,7 +288,6 @@ theorem colLevel_functional
   rw [tie c z t ht, AddEquiv.trans_apply, hφ]
 
 open scoped TensorProduct in
-set_option maxHeartbeats 1000000 in
 theorem stepZeroLevel_functional_residueField
     {D : D7} (H : Formalism.L2.Herm.HermColsCh D) (F : ∀ u, FormsTiedSym D u (H.Ch u) (H.chOf u))
     (A : ∀ u, Formalism.L2.Herm.AtT D u (H.vT u) (H.Fv u)) (hH : CarH H F) (hT : CarT H F A)
@@ -349,7 +383,6 @@ theorem stepZeroLevel_functional_residueField
     (fun c z => (D.fm u).fv 0 v c ((A u).pr 0 v c z))
     hne hp tie
 
-set_option maxHeartbeats 4000000 in
 theorem intV_coe_eq_inclE_of_T_mem
     : ∀ {B : Base} {X : PreX B.toPre} (I : TC B X),
       I.Ok → TC.Pins B X

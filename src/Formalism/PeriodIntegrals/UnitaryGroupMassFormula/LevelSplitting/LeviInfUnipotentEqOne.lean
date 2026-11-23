@@ -1,9 +1,52 @@
 module
 
-public import Mathlib
 public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.LevelSplitting.LevLSubPerp
 public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.LevelSplitting.NCDefs
+public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.SemidirectVolume.ProjHA
+import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.LevelSplitting.RatVMemSpan
 public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.LevelSplitting.ToMatrixLin
+public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.SemidirectVolume.ModVec
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -11,38 +54,22 @@ noncomputable section
 
 namespace PI.LevelKSplit.W.NCL
 
-open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub
-  PI.LevelKSplit.W.NC PI.VolSemiDirect.W
+open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub PI.LevelKSplit.W.NC PI.VolSemiDirect.W
 open scoped TensorProduct
 
 section R
 
-variable
-  {F E : Type} [Field F] [Field E] [Algebra F E]
-  (R : Type) [CommRing R] [Algebra F R]
-  (σ : E →ₐ[F] E)
-  {M : ℕ} (J : Matrix (Fin M) (Fin M) E)
-  {r : ℕ} (P : Frame E M r)
-  (T : F)
+variable {F E : Type} [Field F] [Field E] [Algebra F E] (R : Type) [CommRing R] [Algebra F R]
+  (σ : E →ₐ[F] E) {M : ℕ} (J : Matrix (Fin M) (Fin M) E) {r : ℕ} (P : Frame E M r) (T : F)
 
 def uT (g : HA R σ J) : Matrix (Fin r) (Fin r) (R ⊗[F] E) :=
-  Matrix.of fun a b =>
-    if a < b then
-      hR R σ J (ratV (F := F) R (P.f a)) (lin R σ J g (ratV (F := F) R (P.e b)))
-    else if a = b then
-      1
-    else
-      0
+  Matrix.of fun a b => if a < b then
+    hR R σ J (ratV (F := F) R (P.f a)) (lin R σ J g (ratV (F := F) R (P.e b)))
+    else if a = b then 1 else 0
 
-theorem uT_apply (g : HA R σ J) (a b : Fin r)
-    : uT R σ J P g a b
-      = if a < b then
-          hR R σ J (ratV (F := F) R (P.f a)) (lin R σ J g (ratV (F := F) R (P.e b)))
-        else if a = b then
-          1
-        else
-          0 :=
-  rfl
+theorem uT_apply (g : HA R σ J) (a b : Fin r) : uT R σ J P g a b = if a < b then
+    hR R σ J (ratV (F := F) R (P.f a)) (lin R σ J g (ratV (F := F) R (P.e b)))
+    else if a = b then 1 else 0 := rfl
 
 theorem det_uT (g : HA R σ J) : (uT R σ J P g).det = 1 := by
   rw [Matrix.det_of_upperTriangular]
@@ -63,15 +90,13 @@ theorem uI_mul_uT (g : HA R σ J) : uI R σ J P g * uT R σ J P g = 1 := by
 def cj (U : Matrix (Fin r) (Fin r) (R ⊗[F] E)) : Matrix (Fin r) (Fin r) (R ⊗[F] E) :=
   Matrix.of fun a b => sigR R σ (U b a)
 
-theorem cj_apply (U : Matrix (Fin r) (Fin r) (R ⊗[F] E)) (a b : Fin r)
-    : cj R σ U a b = sigR R σ (U b a) :=
-  rfl
+theorem cj_apply (U : Matrix (Fin r) (Fin r) (R ⊗[F] E)) (a b : Fin r) :
+    cj R σ U a b = sigR R σ (U b a) := rfl
 
-theorem cj_mul (U V : Matrix (Fin r) (Fin r) (R ⊗[F] E))
-    : cj R σ U * cj R σ V = cj R σ (V * U) := by
+theorem cj_mul (U V : Matrix (Fin r) (Fin r) (R ⊗[F] E)) : cj R σ U * cj R σ V = cj R σ (V * U) := by
   ext a b
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [cj, Matrix.mul_apply, Matrix.of_apply, map_sum, map_mul]
+
+  simp only [cj, Matrix.mul_apply, Matrix.of_apply, map_sum, map_mul]
   exact Finset.sum_congr rfl fun k _ => mul_comm _ _
 
 theorem cj_one : cj R σ (1 : Matrix (Fin r) (Fin r) (R ⊗[F] E)) = 1 := by
@@ -89,38 +114,34 @@ section Hyp
 variable (hσσ : ∀ x, σ (σ x) = x) (hJ : IsHermND σ J) (hP : P.IsStd σ J T)
 include hσσ hJ hP
 
-theorem levTI (g : HA R σ J) (x : Fin M → R ⊗[F] E)
-    : levL (datR R σ J P T) (uT R σ J P g) (cj R σ (uI R σ J P g))
-        (levL (datR R σ J P T) (uI R σ J P g) (cj R σ (uT R σ J P g)) x)
-      = x := by
+theorem levTI (g : HA R σ J) (x : Fin M → R ⊗[F] E) :
+    levL (datR R σ J P T) (uT R σ J P g) (cj R σ (uI R σ J P g))
+      (levL (datR R σ J P T) (uI R σ J P g) (cj R σ (uT R σ J P g)) x) = x := by
   rw [levL_comp (datR_hyp hσσ hJ hP), uT_mul_uI, cj_mul, uT_mul_uI, cj_one,
     levL_one (datR_hyp hσσ hJ hP)]
 
-theorem levIT (g : HA R σ J) (x : Fin M → R ⊗[F] E)
-    : levL (datR R σ J P T) (uI R σ J P g) (cj R σ (uT R σ J P g))
-        (levL (datR R σ J P T) (uT R σ J P g) (cj R σ (uI R σ J P g)) x)
-      = x := by
+theorem levIT (g : HA R σ J) (x : Fin M → R ⊗[F] E) :
+    levL (datR R σ J P T) (uI R σ J P g) (cj R σ (uT R σ J P g))
+      (levL (datR R σ J P T) (uT R σ J P g) (cj R σ (uI R σ J P g)) x) = x := by
   rw [levL_comp (datR_hyp hσσ hJ hP), uI_mul_uT, cj_mul, uI_mul_uT, cj_one,
     levL_one (datR_hyp hσσ hJ hP)]
 
 end Hyp
 
-def levU (hσσ : ∀ x, σ (σ x) = x) (hJ : IsHermND σ J) (hP : P.IsStd σ J T) (g : HA R σ J)
-    : GL (Fin M) (R ⊗[F] E) where
+def levU (hσσ : ∀ x, σ (σ x) = x) (hJ : IsHermND σ J) (hP : P.IsStd σ J T) (g : HA R σ J) :
+    GL (Fin M) (R ⊗[F] E) where
   val := LinearMap.toMatrix' (levL (datR R σ J P T) (uT R σ J P g) (cj R σ (uI R σ J P g)))
   inv := LinearMap.toMatrix' (levL (datR R σ J P T) (uI R σ J P g) (cj R σ (uT R σ J P g)))
   val_inv := by
     rw [← LinearMap.toMatrix'_comp]
     have : (levL (datR R σ J P T) (uT R σ J P g) (cj R σ (uI R σ J P g))).comp
-          (levL (datR R σ J P T) (uI R σ J P g) (cj R σ (uT R σ J P g)))
-        = LinearMap.id :=
+        (levL (datR R σ J P T) (uI R σ J P g) (cj R σ (uT R σ J P g))) = LinearMap.id :=
       LinearMap.ext fun x => levTI hσσ hJ hP g x
     rw [this, LinearMap.toMatrix'_id]
   inv_val := by
     rw [← LinearMap.toMatrix'_comp]
     have : (levL (datR R σ J P T) (uI R σ J P g) (cj R σ (uT R σ J P g))).comp
-          (levL (datR R σ J P T) (uT R σ J P g) (cj R σ (uI R σ J P g)))
-        = LinearMap.id :=
+        (levL (datR R σ J P T) (uT R σ J P g) (cj R σ (uI R σ J P g))) = LinearMap.id :=
       LinearMap.ext fun x => levIT hσσ hJ hP g x
     rw [this, LinearMap.toMatrix'_id]
 
@@ -138,40 +159,37 @@ theorem levU_mem (g : HA R σ J) : levU hσσ hJ hP g ∈ HR R σ J := by
   intro x y
   rw [LinearMap.toMatrix'_mulVec, LinearMap.toMatrix'_mulVec]
   refine levL_uni H _ _ (fun b c => ?_) (fun b c => ?_) x y
-  · calc
-      ∑ a, sigR R σ (uT R σ J P g a b) * cj R σ (uI R σ J P g) a c
-          = sigR R σ ((uI R σ J P g * uT R σ J P g) c b) := by
-        set_option synthInstance.maxHeartbeats 100000 in
+  · calc ∑ a, sigR R σ (uT R σ J P g a b) * cj R σ (uI R σ J P g) a c
+        = sigR R σ ((uI R σ J P g * uT R σ J P g) c b) := by
+
           rw [Matrix.mul_apply, map_sum]
-        refine Finset.sum_congr rfl fun a _ => ?_
-        rw [cj_apply, map_mul, mul_comm]
+          refine Finset.sum_congr rfl fun a _ => ?_
+          rw [cj_apply, map_mul, mul_comm]
       _ = if b = c then 1 else 0 := by
-        rw [uI_mul_uT, Matrix.one_apply]
-        by_cases h : b = c
-        · subst h; simp
-        · simp [h, Ne.symm h]
-  · calc
-      ∑ a, sigR R σ (cj R σ (uI R σ J P g) a b) * uT R σ J P g a c
-          = (uI R σ J P g * uT R σ J P g) b c := by
-        rw [Matrix.mul_apply]
-        refine Finset.sum_congr rfl fun a _ => ?_
-        rw [cj_apply]
-        exact congrArg (· * uT R σ J P g a c) (H.σσ _)
+          rw [uI_mul_uT, Matrix.one_apply]
+          by_cases h : b = c
+          · subst h; simp
+          · simp [h, Ne.symm h]
+  · calc ∑ a, sigR R σ (cj R σ (uI R σ J P g) a b) * uT R σ J P g a c
+        = (uI R σ J P g * uT R σ J P g) b c := by
+          rw [Matrix.mul_apply]
+          refine Finset.sum_congr rfl fun a _ => ?_
+          rw [cj_apply]
+          exact congrArg (· * uT R σ J P g a c) (H.σσ _)
       _ = if b = c then 1 else 0 := by rw [uI_mul_uT, Matrix.one_apply]
 
 end Hyp2
 
-def levG (hσσ : ∀ x, σ (σ x) = x) (hJ : IsHermND σ J) (hP : P.IsStd σ J T) (g : HA R σ J)
-    : HA R σ J :=
+def levG (hσσ : ∀ x, σ (σ x) = x) (hJ : IsHermND σ J) (hP : P.IsStd σ J T) (g : HA R σ J) :
+    HA R σ J :=
   ⟨levU hσσ hJ hP g, levU_mem hσσ hJ hP g⟩
 
 variable (R σ J P)
 
 def Asub : Subgroup (HA R σ J) where
-  carrier :=
-    {g | g ∈ Nsub R σ J P ∧ (∀ w ∈ Wp R σ J P, lin R σ J g w = w) ∧
-      (∀ b, lin R σ J g (ratV (F := F) R (P.f b)) ∈ spanR (F := F) R P.f Set.univ) ∧
-      (∀ b, lin R σ J g⁻¹ (ratV (F := F) R (P.f b)) ∈ spanR (F := F) R P.f Set.univ)}
+  carrier := {g | g ∈ Nsub R σ J P ∧ (∀ w ∈ Wp R σ J P, lin R σ J g w = w) ∧
+    (∀ b, lin R σ J g (ratV (F := F) R (P.f b)) ∈ spanR (F := F) R P.f Set.univ) ∧
+    (∀ b, lin R σ J g⁻¹ (ratV (F := F) R (P.f b)) ∈ spanR (F := F) R P.f Set.univ)}
   one_mem' := by
     refine ⟨(Nsub R σ J P).one_mem, fun w _ => lin_one R σ J w, fun b => ?_, fun b => ?_⟩
     · rw [lin_one]; exact Submodule.subset_span ⟨b, Set.mem_univ _, rfl⟩
@@ -180,15 +198,11 @@ def Asub : Subgroup (HA R σ J) where
     intro g h hg hh
     obtain ⟨hg1, hg2, hg3, hg4⟩ := hg
     obtain ⟨hh1, hh2, hh3, hh4⟩ := hh
-    have key
-        : ∀ (k : HA R σ J),
-          (∀ b, lin R σ J k (ratV (F := F) R (P.f b)) ∈ spanR (F := F) R P.f Set.univ)
-            → ∀ y ∈ spanR (F := F) R P.f Set.univ,
-              lin R σ J k y ∈ spanR (F := F) R P.f Set.univ := by
+    have key : ∀ (k : HA R σ J), (∀ b, lin R σ J k (ratV (F := F) R (P.f b)) ∈
+        spanR (F := F) R P.f Set.univ) → ∀ y ∈ spanR (F := F) R P.f Set.univ,
+        lin R σ J k y ∈ spanR (F := F) R P.f Set.univ := by
       intro k hk y hy
-      have hle
-          : spanR (F := F) R P.f Set.univ
-            ≤ (spanR (F := F) R P.f Set.univ).comap (lin R σ J k) := by
+      have hle : spanR (F := F) R P.f Set.univ ≤ (spanR (F := F) R P.f Set.univ).comap (lin R σ J k) := by
         rw [spanR, Submodule.span_le]
         rintro _ ⟨b, _, rfl⟩
         exact hk b
@@ -207,11 +221,9 @@ def Asub : Subgroup (HA R σ J) where
 
 variable {R σ J P}
 
-theorem spanE_f_zero
-    (H : (datR R σ J P T).Hyp)
-    {s : Set (Fin r)} {x : Fin M → R ⊗[F] E} (hx : x ∈ spanR (F := F) R P.e s)
-    {a : Fin r} (ha : a ∉ s)
-    : (datR R σ J P T).h ((datR R σ J P T).f a) x = 0 := by
+theorem spanE_f_zero (H : (datR R σ J P T).Hyp) {s : Set (Fin r)} {x : Fin M → R ⊗[F] E}
+    (hx : x ∈ spanR (F := F) R P.e s) {a : Fin r} (ha : a ∉ s) :
+    (datR R σ J P T).h ((datR R σ J P T).f a) x = 0 := by
   induction hx using Submodule.span_induction with
   | mem y hy =>
     obtain ⟨c, hc, rfl⟩ := hy
@@ -223,15 +235,14 @@ theorem spanE_f_zero
   | add x y _ _ hx hy => rw [PG.Dat.h_add_right, hx, hy, add_zero]
   | smul c x _ hx => rw [PG.Dat.h_smul_right, hx, mul_zero]
 
-theorem pXv_mem_span (x : Fin M → R ⊗[F] E)
-    : (datR R σ J P T).pXv x ∈ Submodule.span (R ⊗[F] E) (Set.range (datR R σ J P T).f) := by
+theorem pXv_mem_span (x : Fin M → R ⊗[F] E) :
+    (datR R σ J P T).pXv x ∈ Submodule.span (R ⊗[F] E) (Set.range (datR R σ J P T).f) := by
   rw [PG.Dat.pXv_apply]
   exact Submodule.sum_mem _ fun a _ => Submodule.smul_mem _ _ (Submodule.subset_span ⟨a, rfl⟩)
 
-theorem pXv_of_span
-    (H : (datR R σ J P T).Hyp)
-    {x : Fin M → R ⊗[F] E} (hx : x ∈ Submodule.span (R ⊗[F] E) (Set.range (datR R σ J P T).f))
-    : (datR R σ J P T).pXv x = x := by
+theorem pXv_of_span (H : (datR R σ J P T).Hyp) {x : Fin M → R ⊗[F] E}
+    (hx : x ∈ Submodule.span (R ⊗[F] E) (Set.range (datR R σ J P T).f)) :
+    (datR R σ J P T).pXv x = x := by
   induction hx using Submodule.span_induction with
   | mem y hy =>
     obtain ⟨b, rfl⟩ := hy
@@ -241,18 +252,16 @@ theorem pXv_of_span
   | add x y _ _ hx hy => rw [map_add (f := _), hx, hy]
   | smul c x _ hx => rw [map_smul, hx]
 
-theorem pX_mem (x : Fin M → R ⊗[F] E)
-    : (datR R σ J P T).pX x
-      ∈ Submodule.span (R ⊗[F] E) (Set.range fun a => ratV (F := F) R (P.e a)) :=
+theorem pX_mem (x : Fin M → R ⊗[F] E) :
+    (datR R σ J P T).pX x ∈ Submodule.span (R ⊗[F] E) (Set.range fun a => ratV (F := F) R (P.e a)) :=
   PG.Dat.pX_mem_span (D := datR R σ J P T) x
 
-theorem pXv_mem (x : Fin M → R ⊗[F] E)
-    : (datR R σ J P T).pXv x
-      ∈ Submodule.span (R ⊗[F] E) (Set.range fun a => ratV (F := F) R (P.f a)) :=
+theorem pXv_mem (x : Fin M → R ⊗[F] E) :
+    (datR R σ J P T).pXv x ∈ Submodule.span (R ⊗[F] E) (Set.range fun a => ratV (F := F) R (P.f a)) :=
   pXv_mem_span (T := T) x
 
-theorem pV_mem_Wp (H : (datR R σ J P T).Hyp) (x : Fin M → R ⊗[F] E)
-    : pV (datR R σ J P T) x ∈ Wp R σ J P :=
+theorem pV_mem_Wp (H : (datR R σ J P T).Hyp) (x : Fin M → R ⊗[F] E) :
+    pV (datR R σ J P T) x ∈ Wp R σ J P :=
   ⟨fun a => h_e_pV H a x, fun a => h_f_pV H a x⟩
 
 section Hyp3
@@ -260,51 +269,40 @@ section Hyp3
 variable (hσσ : ∀ x, σ (σ x) = x) (hJ : IsHermND σ J) (hP : P.IsStd σ J T)
 include hσσ hJ hP
 
-theorem lin_levG (g : HA R σ J)
-    : lin R σ J (levG hσσ hJ hP g)
-      = levL (datR R σ J P T) (uT R σ J P g) (cj R σ (uI R σ J P g)) := by
+theorem lin_levG (g : HA R σ J) :
+    lin R σ J (levG hσσ hJ hP g) = levL (datR R σ J P T) (uT R σ J P g) (cj R σ (uI R σ J P g)) := by
   first
   | rfl
   | (unfold lin; simp [levG, levU, HA.mat]; exact Matrix.toLin'_toMatrix' _)
-  | (
-      unfold lin
-      simp [levG, levU, HA.mat]
-      exact LinearMap.ext fun x => LinearMap.toMatrix'_mulVec _ x
-    )
+  | (unfold lin; simp [levG, levU, HA.mat]; exact LinearMap.ext fun x => LinearMap.toMatrix'_mulVec _ x)
 
-theorem lin_levG_inv (g : HA R σ J) (x : Fin M → R ⊗[F] E)
-    : lin R σ J (levG hσσ hJ hP g)⁻¹ x
-      = levL (datR R σ J P T) (uI R σ J P g) (cj R σ (uT R σ J P g)) x := by
+theorem lin_levG_inv (g : HA R σ J) (x : Fin M → R ⊗[F] E) :
+    lin R σ J (levG hσσ hJ hP g)⁻¹ x =
+      levL (datR R σ J P T) (uI R σ J P g) (cj R σ (uT R σ J P g)) x := by
   unfold lin
   simp [levG, levU, HA.mat]
   first
   | exact LinearMap.toMatrix'_mulVec _ x
-  | (
-      show (LinearMap.toMatrix' (levL (datR R σ J P T) (uI R σ J P g) (cj R σ (uT R σ J P g)))).mulVec x = _
-      exact LinearMap.toMatrix'_mulVec _ x
-    )
+  | (show (LinearMap.toMatrix' (levL (datR R σ J P T) (uI R σ J P g) (cj R σ (uT R σ J P g)))).mulVec x = _
+     exact LinearMap.toMatrix'_mulVec _ x)
 
 theorem levG_mem (g : HA R σ J) : levG hσσ hJ hP g ∈ Asub R σ J P := by
   have H : (datR R σ J P T).Hyp := datR_hyp hσσ hJ hP
-  have hfs
-      : ∀ (U W : Matrix (Fin r) (Fin r) (R ⊗[F] E)) (b : Fin r),
-        levL (datR R σ J P T) U W (ratV (F := F) R (P.f b))
-          ∈ spanR (F := F) R P.f Set.univ := fun U W b => by
-    show levL (datR R σ J P T) U W ((datR R σ J P T).f b) ∈ _
-    rw [levL_f H]
-    exact Submodule.sum_mem _ fun d _ =>
-      Submodule.smul_mem _ _ (Submodule.subset_span ⟨d, Set.mem_univ _, rfl⟩)
+  have hfs : ∀ (U W : Matrix (Fin r) (Fin r) (R ⊗[F] E)) (b : Fin r),
+      levL (datR R σ J P T) U W (ratV (F := F) R (P.f b)) ∈ spanR (F := F) R P.f Set.univ :=
+    fun U W b => by
+      show levL (datR R σ J P T) U W ((datR R σ J P T).f b) ∈ _
+      rw [levL_f H]
+      exact Submodule.sum_mem _ fun d _ => Submodule.smul_mem _ _
+        (Submodule.subset_span ⟨d, Set.mem_univ _, rfl⟩)
   refine ⟨⟨fun b => ?_, fun v hv => ?_⟩, fun w hw => ?_, fun b => ?_, fun b => ?_⟩
   · rw [lin_levG]
     show levL (datR R σ J P T) _ _ ((datR R σ J P T).e b) - (datR R σ J P T).e b ∈ _
     rw [levL_e H]
-    have e1
-        : ∑ a, uT R σ J P g a b • (datR R σ J P T).e a - (datR R σ J P T).e b
-          = ∑ a, (if a < b then uT R σ J P g a b else 0) • (datR R σ J P T).e a := by
-      have eb
-          : (datR R σ J P T).e b
-            = ∑ a, (if a = b then (1 : R ⊗[F] E) else 0) • (datR R σ J P T).e a := by
-        simp
+    have e1 : ∑ a, uT R σ J P g a b • (datR R σ J P T).e a - (datR R σ J P T).e b =
+        ∑ a, (if a < b then uT R σ J P g a b else 0) • (datR R σ J P T).e a := by
+      have eb : (datR R σ J P T).e b =
+          ∑ a, (if a = b then (1 : R ⊗[F] E) else 0) • (datR R σ J P T).e a := by simp
       rw [eb, ← Finset.sum_sub_distrib]
       refine Finset.sum_congr rfl fun a _ => ?_
       rw [← sub_smul]
@@ -326,24 +324,18 @@ theorem levG_mem (g : HA R σ J) : levG hσσ hJ hP g ∈ Asub R σ J P := by
   · rw [lin_levG]; exact hfs _ _ b
   · rw [lin_levG_inv]; exact hfs _ _ b
 
-theorem levG_e (n : HA R σ J) (hn : n ∈ Nsub R σ J P) (b : Fin r)
-    : lin R σ J (levG hσσ hJ hP n) (ratV (F := F) R (P.e b))
-      = lin R σ J n (ratV (F := F) R (P.e b)) := by
+theorem levG_e (n : HA R σ J) (hn : n ∈ Nsub R σ J P) (b : Fin r) :
+    lin R σ J (levG hσσ hJ hP n) (ratV (F := F) R (P.e b)) = lin R σ J n (ratV (F := F) R (P.e b)) := by
   have H : (datR R σ J P T).Hyp := datR_hyp hσσ hJ hP
   have hn1 : UniC R σ J P.e n := hn.1
-  have hmem
-      : lin R σ J n (ratV (F := F) R (P.e b))
-        ∈ Submodule.span (R ⊗[F] E) (Set.range (datR R σ J P T).e) := by
-    have :=
-      uni_map_le hn1 Set.univ
-        (fun _ _ _ _ => Set.mem_univ _)
-        (Submodule.mem_map_of_mem (Submodule.subset_span ⟨b, Set.mem_univ _, rfl⟩))
+  have hmem : lin R σ J n (ratV (F := F) R (P.e b)) ∈
+      Submodule.span (R ⊗[F] E) (Set.range (datR R σ J P T).e) := by
+    have := uni_map_le hn1 Set.univ (fun _ _ _ _ => Set.mem_univ _)
+      (Submodule.mem_map_of_mem (Submodule.subset_span ⟨b, Set.mem_univ _, rfl⟩))
     rw [PI.LevelKSplit.W.Glob.spanR_univ] at this
     exact this
-  have e1
-      : lin R σ J n (ratV (F := F) R (P.e b))
-        = ∑ a, (datR R σ J P T).h ((datR R σ J P T).f a)
-          (lin R σ J n (ratV (F := F) R (P.e b))) • (datR R σ J P T).e a := by
+  have e1 : lin R σ J n (ratV (F := F) R (P.e b)) = ∑ a, (datR R σ J P T).h ((datR R σ J P T).f a)
+      (lin R σ J n (ratV (F := F) R (P.e b))) • (datR R σ J P T).e a := by
     conv_lhs => rw [← PG.Dat.pX_of_span H hmem]
     exact PG.Dat.pX_apply _ _
   rw [lin_levG]
@@ -356,40 +348,31 @@ theorem levG_e (n : HA R σ J) (hn : n ∈ Nsub R σ J P) (b : Fin r)
   · rw [if_pos h1]; rfl
   · rw [if_neg h1]
     have h0 := spanE_f_zero (T := T) H (hn1 b) (a := a) (fun h => h1 h)
-    have hfe
-        : (datR R σ J P T).h ((datR R σ J P T).f a) (ratV (F := F) R (P.e b))
-          = if a = b then 1 else 0 :=
-      PG.Dat.fe H a b
+    have hfe : (datR R σ J P T).h ((datR R σ J P T).f a) (ratV (F := F) R (P.e b)) =
+        if a = b then 1 else 0 := PG.Dat.fe H a b
     rw [PG.Dat.h_sub_right, hfe, sub_eq_zero] at h0
     exact h0.symm
 
-theorem levG_inv_mul (n : HA R σ J) (hn : n ∈ Nsub R σ J P)
-    : (levG hσσ hJ hP n)⁻¹ * n ∈ LevelUnipotentSubgroup R σ J P := by
-  refine Subgroup.mem_inf.2 ⟨
-    (Nsub R σ J P).mul_mem ((Nsub R σ J P).inv_mem (levG_mem hσσ hJ hP n).1) hn,
-    (mem_stabT R σ J P.e _).2 fun b => ?_
-  ⟩
+theorem levG_inv_mul (n : HA R σ J) (hn : n ∈ Nsub R σ J P) :
+    (levG hσσ hJ hP n)⁻¹ * n ∈ LevelUnipotentSubgroup R σ J P := by
+  refine Subgroup.mem_inf.2 ⟨(Nsub R σ J P).mul_mem ((Nsub R σ J P).inv_mem
+    (levG_mem hσσ hJ hP n).1) hn, (mem_stabT R σ J P.e _).2 fun b => ?_⟩
   rw [lin_mul, ← levG_e hσσ hJ hP n hn b, lin_inv_lin]
 
-theorem levi_inf_unipotent_eq_one
-    (u : HA R σ J) (hu : u ∈ Asub R σ J P) (hu1 : u ∈ LevelUnipotentSubgroup R σ J P)
-    : u = 1 := by
+theorem levi_inf_unipotent_eq_one (u : HA R σ J) (hu : u ∈ Asub R σ J P) (hu1 : u ∈ LevelUnipotentSubgroup R σ J P) : u = 1 := by
   have H : (datR R σ J P T).Hyp := datR_hyp hσσ hJ hP
   obtain ⟨_, hW, hF, _⟩ := hu
   have hS := (mem_stabT R σ J P.e u).1 (Subgroup.mem_inf.1 hu1).2
   have hf : ∀ b, lin R σ J u (ratV (F := F) R (P.f b)) = ratV (F := F) R (P.f b) := by
     intro b
-    have hm
-        : lin R σ J u (ratV (F := F) R (P.f b))
-          ∈ Submodule.span (R ⊗[F] E) (Set.range (datR R σ J P T).f) := by
+    have hm : lin R σ J u (ratV (F := F) R (P.f b)) ∈
+        Submodule.span (R ⊗[F] E) (Set.range (datR R σ J P T).f) := by
       have := hF b
       rw [PI.LevelKSplit.W.Glob.spanR_univ] at this
       exact this
     rw [← pXv_of_span H hm, PG.Dat.pXv_apply]
-    have hc
-        : ∀ d,
-          (datR R σ J P T).h ((datR R σ J P T).e d) (lin R σ J u (ratV (F := F) R (P.f b)))
-            = if d = b then 1 else 0 := fun d => by
+    have hc : ∀ d, (datR R σ J P T).h ((datR R σ J P T).e d) (lin R σ J u (ratV (F := F) R (P.f b))) =
+        if d = b then 1 else 0 := fun d => by
       show hR R σ J (ratV (F := F) R (P.e d)) (lin R σ J u (ratV (F := F) R (P.f b))) = _
       rw [← hS d, hR_lin]
       exact H.ef d b
@@ -406,29 +389,22 @@ theorem levi_inf_unipotent_eq_one
 
 end Hyp3
 
-theorem unipotent_radical_normal
-    (n m : HA R σ J) (hn : n ∈ Nsub R σ J P) (hm : m ∈ LevelUnipotentSubgroup R σ J P)
-    : n * m * n⁻¹ ∈ LevelUnipotentSubgroup R σ J P := by
+theorem unipotent_radical_normal (n m : HA R σ J) (hn : n ∈ Nsub R σ J P) (hm : m ∈ LevelUnipotentSubgroup R σ J P) :
+    n * m * n⁻¹ ∈ LevelUnipotentSubgroup R σ J P := by
   have hm' := Subgroup.mem_inf.1 hm
-  refine Subgroup.mem_inf.2 ⟨
-    (Nsub R σ J P).mul_mem ((Nsub R σ J P).mul_mem hn hm'.1) ((Nsub R σ J P).inv_mem hn),
-    (mem_stabT R σ J P.e _).2 fun b => ?_
-  ⟩
+  refine Subgroup.mem_inf.2 ⟨(Nsub R σ J P).mul_mem ((Nsub R σ J P).mul_mem hn hm'.1)
+    ((Nsub R σ J P).inv_mem hn), (mem_stabT R σ J P.e _).2 fun b => ?_⟩
   have hmS := (mem_stabT R σ J P.e m).1 hm'.2
-  have h1
-      : lin R σ J n⁻¹ (ratV (F := F) R (P.e b))
-        ∈ Submodule.span (R ⊗[F] E) (Set.range fun a => ratV (F := F) R (P.e a)) := by
-    have :=
-      uni_map_le ((Nsub R σ J P).inv_mem hn).1 Set.univ
-        (fun _ _ _ _ => Set.mem_univ _)
-        (Submodule.mem_map_of_mem (Submodule.subset_span ⟨b, Set.mem_univ _, rfl⟩))
+  have h1 : lin R σ J n⁻¹ (ratV (F := F) R (P.e b)) ∈
+      Submodule.span (R ⊗[F] E) (Set.range fun a => ratV (F := F) R (P.e a)) := by
+    have := uni_map_le ((Nsub R σ J P).inv_mem hn).1 Set.univ (fun _ _ _ _ => Set.mem_univ _)
+      (Submodule.mem_map_of_mem (Submodule.subset_span ⟨b, Set.mem_univ _, rfl⟩))
     rw [PI.LevelKSplit.W.Glob.spanR_univ] at this
     exact this
   rw [lin_mul, lin_mul, PI.LevelKSplit.W.Glob.lin_fix_span m P.e hmS _ h1, lin_lin_inv]
 
-theorem H_comm_A
-    (H : (datR R σ J P T).Hyp) (h u : HA R σ J) (hh : h ∈ Hsub R σ J P) (hu : u ∈ Asub R σ J P)
-    : h * u = u * h := by
+theorem H_comm_A (H : (datR R σ J P T).Hyp) (h u : HA R σ J) (hh : h ∈ Hsub R σ J P)
+    (hu : u ∈ Asub R σ J P) : h * u = u * h := by
   obtain ⟨hu1, hW, hF, _⟩ := hu
   have hu1' : UniC R σ J P.e u := hu1.1
   have hhe := PI.LevelKSplit.W.Glob.lin_fix_span h P.e (PI.LevelKSplit.W.Glob.H_fix_e P h hh)
@@ -439,19 +415,16 @@ theorem H_comm_A
     refine ⟨fun a => ?_, fun a => ?_⟩
     · rw [← PI.LevelKSplit.W.Glob.H_fix_e P h hh a, hR_lin]; exact h_e_pV H a x
     · rw [← PI.LevelKSplit.W.Glob.H_fix_f P h hh a, hR_lin]; exact h_f_pV H a x
-  have uE
-      : lin R σ J u ((datR R σ J P T).pX x)
-        ∈ Submodule.span (R ⊗[F] E) (Set.range fun a => ratV (F := F) R (P.e a)) := by
+  have uE : lin R σ J u ((datR R σ J P T).pX x) ∈
+      Submodule.span (R ⊗[F] E) (Set.range fun a => ratV (F := F) R (P.e a)) := by
     have hx : (datR R σ J P T).pX x ∈ spanR (F := F) R P.e Set.univ := by
       rw [PI.LevelKSplit.W.Glob.spanR_univ]; exact pX_mem x
     have := uni_map_le hu1' Set.univ (fun _ _ _ _ => Set.mem_univ _) (Submodule.mem_map_of_mem hx)
     rw [PI.LevelKSplit.W.Glob.spanR_univ] at this
     exact this
-  have uF
-      : lin R σ J u ((datR R σ J P T).pXv x)
-        ∈ Submodule.span (R ⊗[F] E) (Set.range fun a => ratV (F := F) R (P.f a)) := by
-    have hle
-        : spanR (F := F) R P.f Set.univ ≤ (spanR (F := F) R P.f Set.univ).comap (lin R σ J u) := by
+  have uF : lin R σ J u ((datR R σ J P T).pXv x) ∈
+      Submodule.span (R ⊗[F] E) (Set.range fun a => ratV (F := F) R (P.f a)) := by
+    have hle : spanR (F := F) R P.f Set.univ ≤ (spanR (F := F) R P.f Set.univ).comap (lin R σ J u) := by
       rw [spanR, Submodule.span_le]
       rintro _ ⟨b, _, rfl⟩
       exact hF b
@@ -464,7 +437,8 @@ theorem H_comm_A
   conv_lhs => rw [decomp (datR R σ J P T) x]
   conv_rhs => rw [decomp (datR R σ J P T) x]
   simp only [map_add (f := _)]
-  rw [hW _ (pV_mem_Wp H x), hW _ hWx, hhe _ (pX_mem x), hhf _ (pXv_mem x), hhe _ uE, hhf _ uF]
+  rw [hW _ (pV_mem_Wp H x), hW _ hWx, hhe _ (pX_mem x), hhf _ (pXv_mem x),
+    hhe _ uE, hhf _ uF]
 
 end R
 

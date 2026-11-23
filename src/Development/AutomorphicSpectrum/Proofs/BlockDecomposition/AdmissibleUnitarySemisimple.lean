@@ -1,9 +1,52 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.Definitions.TwistedInnerProducts.IsSubquotientDetRepParInd
-public import Development.AbelianVarietyTheory.PublishedTheorems.TwistedTraceFormula.ExistsCellOfIsSubquotient
+public import Development.AbelianVarietyTheory.Definitions.TwistedInnerProducts.IsUnitarisableOfCharIff
 public import Development.AutomorphicArithmetic.IntegralCasts.CapelliIdentities.OrbitFinite
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.CStarAlgebra.Classes
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
@@ -14,10 +57,10 @@ namespace GlobalTheory.CompanionTheory.UnitSemisimple
 
 variable {V : Type} [AddCommGroup V] [Module ℂ V]
 
-theorem exists_proj_finset
-    (B : V →ₗ[ℂ] V →ₗ⋆[ℂ] ℂ) (hp : ∀ v, v ≠ 0 → 0 < (B v v).re) (t : Finset V)
-    : ∀ v : V, ∃ w ∈ Submodule.span ℂ (t : Set V), ∀ s ∈ Submodule.span ℂ (t : Set V),
-      B (v - w) s = 0 := by
+theorem exists_proj_finset (B : V →ₗ[ℂ] V →ₗ⋆[ℂ] ℂ)
+    (hp : ∀ v, v ≠ 0 → 0 < (B v v).re) (t : Finset V) :
+    ∀ v : V, ∃ w ∈ Submodule.span ℂ (t : Set V),
+      ∀ s ∈ Submodule.span ℂ (t : Set V), B (v - w) s = 0 := by
   classical
   induction t using Finset.induction_on with
   | empty =>
@@ -40,12 +83,10 @@ theorem exists_proj_finset
       by_cases hx0 : x = 0
       · simp [hx0]
       · have h0 : B x x ≠ 0 := fun h => by simpa [h] using hp x hx0
-        rw [hcdef]
-        field_simp
+        rw [hcdef]; field_simp
     refine ⟨w₁ + c • x, ?_, ?_⟩
     · refine add_mem (hle hw₁) (Submodule.smul_mem _ _ ?_)
-      rw [hx]
-      exact sub_mem ha (hle ha₁)
+      rw [hx]; exact sub_mem ha (hle ha₁)
     · intro s hs
       rw [Finset.coe_insert] at hs
       obtain ⟨b, z, hz, rfl⟩ := Submodule.mem_span_insert.1 hs
@@ -56,35 +97,30 @@ theorem exists_proj_finset
       have k1 : B u (b • a₁ + z) = 0 := by rw [hu]; exact h₁ _ hz'
       have k2 : B x (b • a₁ + z) = 0 := by rw [hx]; exact h₂ _ hz'
       rw [e1, e2, map_sub, LinearMap.sub_apply, map_smul, LinearMap.smul_apply,
-        (B u).map_add (b • x), (B x).map_add (b • x), k1, k2, LinearMap.map_smulₛₗ,
-        LinearMap.map_smulₛₗ, hc]
+        (B u).map_add (b • x), (B x).map_add (b • x),
+        k1, k2, LinearMap.map_smulₛₗ, LinearMap.map_smulₛₗ, hc]
       simp only [smul_eq_mul, add_zero]
       ring
 
-theorem mem_fixed_iff {G : Type} [Group G] (ρ : Representation ℂ G V) (K : Subgroup G) (v : V)
-    : v ∈ fixed ρ K ↔ ∀ k ∈ K, ρ k v = v := by
+theorem mem_fixed_iff {G : Type} [Group G] (ρ : Representation ℂ G V) (K : Subgroup G) (v : V) :
+    v ∈ fixed ρ K ↔ ∀ k ∈ K, ρ k v = v := by
   constructor
   · intro h k hk
     simpa using h ⟨k, hk⟩
   · intro h k
     simpa using h k k.2
 
-theorem orbit_finite
-    {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
-    (ρ : Representation ℂ G V)
-    (K : Subgroup G) (hK : IsCompact (K : Set G))
-    (w : V) (hS : IsOpen {g : G | ρ g w = w})
-    : {x : V | ∃ k ∈ K, ρ k w = x}.Finite :=
+theorem orbit_finite {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
+    (ρ : Representation ℂ G V) (K : Subgroup G) (hK : IsCompact (K : Set G)) (w : V)
+    (hS : IsOpen {g : G | ρ g w = w}) : {x : V | ∃ k ∈ K, ρ k w = x}.Finite :=
   _root_.UpperTheory.Reformulated.B.Qf32.orbit_finite ρ K hK w hS
 
-theorem orthogonal_of_fixed
-    {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
-    (ρ : Representation ℂ G V) (B : V →ₗ[ℂ] V →ₗ⋆[ℂ] ℂ) (hi : ∀ g v w, B (ρ g v) (ρ g w) = B v w)
-    (K : Subgroup G) (hK : IsCompact (K : Set G))
-    (W : Subrepresentation ρ) (u : V)
-    (hu : ∀ k ∈ K, ρ k u = u) (huW : ∀ s ∈ W.toSubmodule ⊓ fixed ρ K, B u s = 0)
-    (w : V) (hw : w ∈ W.toSubmodule) (hS : IsOpen {g : G | ρ g w = w})
-    : B u w = 0 := by
+theorem orthogonal_of_fixed {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
+    (ρ : Representation ℂ G V) (B : V →ₗ[ℂ] V →ₗ⋆[ℂ] ℂ)
+    (hi : ∀ g v w, B (ρ g v) (ρ g w) = B v w) (K : Subgroup G) (hK : IsCompact (K : Set G))
+    (W : Subrepresentation ρ) (u : V) (hu : ∀ k ∈ K, ρ k u = u)
+    (huW : ∀ s ∈ W.toSubmodule ⊓ fixed ρ K, B u s = 0)
+    (w : V) (hw : w ∈ W.toSubmodule) (hS : IsOpen {g : G | ρ g w = w}) : B u w = 0 := by
   classical
   have hO := orbit_finite ρ K hK w hS
   set O : Finset V := hO.toFinset with hOdef
@@ -105,13 +141,10 @@ theorem orthogonal_of_fixed
   have hsF : ∑ x ∈ O, x ∈ fixed ρ K := by
     rw [mem_fixed_iff]
     intro k hk
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
-    exact Finset.sum_nbij' (ρ k) (ρ k⁻¹)
-      (fun x hx => hst k hk x hx)
-      (fun x hx => hst _ (K.inv_mem hk) x hx)
-      (fun x _ => hinv k hk x)
-      (fun x _ => hinv' k hk x)
+
+    rw [map_sum]
+    exact Finset.sum_nbij' (ρ k) (ρ k⁻¹) (fun x hx => hst k hk x hx)
+      (fun x hx => hst _ (K.inv_mem hk) x hx) (fun x _ => hinv k hk x) (fun x _ => hinv' k hk x)
       (fun x _ => rfl)
   have h0 := huW _ ⟨hsW, hsF⟩
   have hterm : ∀ x ∈ O, B u x = B u w := by
@@ -119,37 +152,27 @@ theorem orthogonal_of_fixed
     obtain ⟨l, hl, rfl⟩ := (hmem x).1 hx
     conv_lhs => rw [← hu l hl]
     exact hi l u w
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum, Finset.sum_congr rfl hterm, Finset.sum_const] at h0
+
+  rw [map_sum, Finset.sum_congr rfl hterm, Finset.sum_const] at h0
   have hne : O.card ≠ 0 := Finset.card_ne_zero.2 ⟨w, (hmem w).2 ⟨1, K.one_mem, by simp⟩⟩
   rw [nsmul_eq_mul] at h0
   exact (mul_eq_zero.1 h0).resolve_left (by exact_mod_cast hne)
 
-def orth
-    {G : Type} [Group G]
-    (ρ : Representation ℂ G V) (B : V →ₗ[ℂ] V →ₗ⋆[ℂ] ℂ) (hi : ∀ g v w, B (ρ g v) (ρ g w) = B v w)
-    (W : Subrepresentation ρ)
-    : Subrepresentation ρ where
-  toSubmodule := {
-    carrier := {v | ∀ w ∈ W.toSubmodule, B v w = 0}
-    add_mem' := fun {a b} ha hb w hw => by simp [ha w hw, hb w hw]
-    zero_mem' := fun w _ => by simp
-    smul_mem' := fun c v hv w hw => by simp [hv w hw]
-  }
+def orth {G : Type} [Group G] (ρ : Representation ℂ G V) (B : V →ₗ[ℂ] V →ₗ⋆[ℂ] ℂ)
+    (hi : ∀ g v w, B (ρ g v) (ρ g w) = B v w) (W : Subrepresentation ρ) : Subrepresentation ρ where
+  toSubmodule :=
+    { carrier := {v | ∀ w ∈ W.toSubmodule, B v w = 0}
+      add_mem' := fun {a b} ha hb w hw => by simp [ha w hw, hb w hw]
+      zero_mem' := fun w _ => by simp
+      smul_mem' := fun c v hv w hw => by simp [hv w hw] }
   apply_mem_toSubmodule := by
     intro g v hv w hw
-    have e : ρ g (ρ g⁻¹ w) = w := by rw [← Module.End.mul_apply, ← map_mul]; simp
+    have e : ρ g (ρ g⁻¹ w) = w := by
+      rw [← Module.End.mul_apply, ← map_mul]; simp
     have := hv _ (W.apply_mem_toSubmodule g⁻¹ hw)
-    rw [← e, hi]
-    exact this
+    rw [← e, hi]; exact this
 
-theorem exists_isCompl
-    : ∀ {G V : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [AddCommGroup V]
-        [Module ℂ V] (ρ : Representation ℂ G V),
-      (∀ U ∈ nhds (1 : G), ∃ K : Subgroup G,
-          IsOpen (K : Set G) ∧ IsCompact (K : Set G) ∧ (K : Set G) ⊆ U)
-        → IsAdmissible ρ → IsUnitarisable ρ
-        → ∀ W : Subrepresentation ρ, ∃ W' : Subrepresentation ρ, IsCompl W W' := by
+theorem exists_isCompl : ∀ {G V : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [AddCommGroup V] [Module ℂ V] (ρ : Representation ℂ G V), (∀ U ∈ nhds (1 : G), ∃ K : Subgroup G, IsOpen (K : Set G) ∧ IsCompact (K : Set G) ∧ (K : Set G) ⊆ U) → IsAdmissible ρ → IsUnitarisable ρ → ∀ W : Subrepresentation ρ, ∃ W' : Subrepresentation ρ, IsCompl W W' := by
   intro G V _ _ _ _ _ ρ hbasis hadm hun W
   obtain ⟨B, hh, hp, hi⟩ := hun
   refine ⟨orth ρ B hi W, IsCompl.of_eq ?_ ?_⟩

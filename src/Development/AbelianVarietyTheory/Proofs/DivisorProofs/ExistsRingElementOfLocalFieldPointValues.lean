@@ -1,56 +1,104 @@
 module
 
-public import Development.AbelianVarietyTheory.Definitions.Divisors.SymTupOne
-public import Development.AbelianVarietyTheory.Statements.TorsionEndomorphisms.EndDeterminedOnTorsion
-public import Mathlib
-public import Development.AbelianVarietyTheory.PublishedTheorems.AutomorphicForms₂.SiegelToroidalIntegral
+public import Mathlib.GroupTheory.MonoidLocalization.Away
+public import Mathlib.RingTheory.Ideal.Prime
+public import Mathlib.RingTheory.OreLocalization.Ring
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+public import Mathlib.CategoryTheory.Monoidal.Cartesian.Over
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
+import Development.AbelianVarietyTheory.Definitions.Divisors.ExistsOverIff
+import Development.AbelianVarietyTheory.Definitions.Divisors.SymTupOne
+import Development.AbelianVarietyTheory.Definitions.ModuliSpaces.GoodClass
+import Development.AbelianVarietyTheory.Proofs.CoherentCohomologyProofs.ExistsAddEquivOfSurjectiveOfKerIff
+import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.DivMemOfForallPowSuccDivPowMem
+public import Mathlib.Algebra.BigOperators.Finsupp.Basic
+public import Mathlib.LinearAlgebra.Finsupp.LinearCombination
+public import Mathlib.RingTheory.Ideal.Maps
+public import Mathlib.RingTheory.Ideal.Quotient.Defs
+public import Mathlib.RingTheory.LocalRing.ResidueField.Ideal
+public import Mathlib.RingTheory.Localization.Away.Basic
+import Mathlib.Topology.Sheaves.Presheaf
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.CocycleRightZeroThd
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDescent.CanonGenIsGen
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.SemiabelianSchemes.CubicalStructures.CubeSymmetricSwapFirst
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.SymplecticGenerators.StTransl
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
-  NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
-  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory GlobalTheory.ZM GlobalTheory.ZH GlobalTheory.UMin GlobalTheory.UPoinc
-  GlobalTheory.Ex.OneGen
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory GlobalTheory.ZM GlobalTheory.ZH GlobalTheory.UMin GlobalTheory.UPoinc GlobalTheory.Ex.OneGen
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory
 
-theorem glue_field_points
-    (R : Type) [CommRing R]
+theorem glue_field_points (R : Type) [CommRing R]
     (P : (K : Type) → [Field K] → (R →+* K) → K → Prop)
     (huniq : ∀ (K : Type) [Field K] (i : R →+* K) (u v : K), P K i u → P K i v → u = v)
-    (hloc : ∀ p : Ideal R,
-      p.IsPrime
-        → ∃ f ∉ p, ∃ c : Localization.Away f,
-          ∀ (K : Type) [Field K] (j : Localization.Away f →+* K),
-            P K (j.comp (algebraMap R (Localization.Away f))) (j c))
-    : ∃ c : R, ∀ (K : Type) [Field K] (i : R →+* K), P K i (i c) := by
+    (hloc : ∀ p : Ideal R, p.IsPrime → ∃ f ∉ p, ∃ c : Localization.Away f,
+      ∀ (K : Type) [Field K] (j : Localization.Away f →+* K),
+        P K (j.comp (algebraMap R (Localization.Away f))) (j c)) :
+    ∃ c : R, ∀ (K : Type) [Field K] (i : R →+* K), P K i (i c) := by
   classical
-  have hloc'
-      : ∀ k : {p : Ideal R // p.IsPrime}, ∃ f ∉ k.1, ∃ c : Localization.Away f,
-        ∀ (K : Type) [Field K] (j : Localization.Away f →+* K),
-          P K (j.comp (algebraMap R (Localization.Away f))) (j c) := fun k =>
-    hloc k.1 k.2
+  have hloc' : ∀ k : {p : Ideal R // p.IsPrime}, ∃ f ∉ k.1, ∃ c : Localization.Away f,
+      ∀ (K : Type) [Field K] (j : Localization.Away f →+* K),
+        P K (j.comp (algebraMap R (Localization.Away f))) (j c) := fun k => hloc k.1 k.2
   choose f hf c hc using hloc'
-  have hsurj
-      : ∀ k : {p : Ideal R // p.IsPrime}, ∃ (a : R) (n : ℕ),
-        c k * algebraMap R _ (f k ^ n) = algebraMap R _ a := by
+  have hsurj : ∀ k : {p : Ideal R // p.IsPrime}, ∃ (a : R) (n : ℕ),
+      c k * algebraMap R _ (f k ^ n) = algebraMap R _ a := by
     intro k
     obtain ⟨n, a, h⟩ := IsLocalization.Away.surj (f k) (c k)
     exact ⟨a, n, by rw [map_pow]; exact h⟩
   choose a n ha using hsurj
 
-  have key
-      : ∀ (K : Type) [Field K] (i : R →+* K) (k : {p : Ideal R // p.IsPrime}),
-        i (f k) ≠ 0 → ∃ v, P K i v ∧ v * i (f k) ^ n k = i (a k) := by
+  have key : ∀ (K : Type) [Field K] (i : R →+* K) (k : {p : Ideal R // p.IsPrime}),
+      i (f k) ≠ 0 → ∃ v, P K i v ∧ v * i (f k) ^ n k = i (a k) := by
     intro K _ i k hk
     let j : Localization.Away (f k) →+* K :=
       IsLocalization.Away.lift (f k) (isUnit_iff_ne_zero.mpr hk)
-    have hj : j.comp (algebraMap R _) = i := by
-      first | exact IsLocalization.Away.lift_comp _ | exact IsLocalization.lift_comp _
+    have hj : j.comp (algebraMap R _) = i := by first | exact IsLocalization.Away.lift_comp _ | exact IsLocalization.lift_comp _
     refine ⟨j (c k), ?_, ?_⟩
     · have := hc k K j
       rwa [hj] at this
@@ -58,9 +106,8 @@ theorem glue_field_points
       rw [map_mul, ← RingHom.comp_apply, ← RingHom.comp_apply, hj, map_pow] at h2
       exact h2
 
-  have hnil
-      : ∀ k l : {p : Ideal R // p.IsPrime},
-        IsNilpotent (f k * f l * (a k * f l ^ n l - a l * f k ^ n k)) := by
+  have hnil : ∀ k l : {p : Ideal R // p.IsPrime},
+      IsNilpotent (f k * f l * (a k * f l ^ n l - a l * f k ^ n k)) := by
     intro k l
     rw [← mem_nilradical, nilradical_eq_sInf, Ideal.mem_sInf]
     intro q hq
@@ -96,24 +143,22 @@ theorem glue_field_points
     rw [← map_mul, ← map_mul, Ideal.Quotient.eq, mem_nilradical]
     have e : g l * α k - g k * α l = f k * f l * (a k * f l ^ n l - a l * f k ^ n k) := by
       simp only [g, α]; ring
-    rw [e]
-    exact hnil k l
-  obtain ⟨c0, hc0⟩ :=
-    Ideal.Quotient.mk_surjective (I := nilradical R) (b.sum fun k r => π r * π (α k))
+    rw [e]; exact hnil k l
+  obtain ⟨c0, hc0⟩ := Ideal.Quotient.mk_surjective (I := nilradical R)
+    (b.sum fun k r => π r * π (α k))
   have hb' : (b.sum fun k r => π r * π (g k)) = 1 := by
     have := congrArg π hb
-    set_option synthInstance.maxHeartbeats 100000 in
+
     simpa [Finsupp.sum, map_sum, smul_eq_mul] using this
   have hglue : ∀ l, IsNilpotent (g l * c0 - α l) := by
     intro l
     rw [← mem_nilradical, ← Ideal.Quotient.eq]
-    calc
-      π (g l * c0) = b.sum (fun k r => π r * π (g k) * π (α l)) := by
-        rw [map_mul]
-        change π (g l) * Ideal.Quotient.mk (nilradical R) c0 = _
-        rw [hc0, Finsupp.mul_sum]
-        refine Finsupp.sum_congr fun k _ => ?_
-        linear_combination π (b k) * hrel k l
+    calc π (g l * c0) = b.sum (fun k r => π r * π (g k) * π (α l)) := by
+          rw [map_mul]
+          change π (g l) * Ideal.Quotient.mk (nilradical R) c0 = _
+          rw [hc0, Finsupp.mul_sum]
+          refine Finsupp.sum_congr fun k _ => ?_
+          linear_combination π (b k) * hrel k l
       _ = π (α l) := by rw [← Finsupp.sum_mul, hb', _root_.one_mul]
   refine ⟨c0, fun K _ i => ?_⟩
   let k : {p : Ideal R // p.IsPrime} := ⟨RingHom.ker i, RingHom.ker_isPrime i⟩
@@ -124,9 +169,7 @@ theorem glue_field_points
     have hp : i (f k) ^ (n k + 1) ≠ 0 := pow_ne_zero _ hik
     apply mul_left_cancel₀ hp
     simp only [g, α, map_sub, map_mul, map_pow, sub_eq_zero] at h0
-    rw [h0, ← hv']
-    ring
-  rw [hcv]
-  exact hv
+    rw [h0, ← hv']; ring
+  rw [hcv]; exact hv
 
 end GlobalTheory

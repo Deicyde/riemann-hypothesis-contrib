@@ -1,13 +1,53 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.PublishedTheorems.TwistedTraceFormula.NotIsCompactUnivFv
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsUnitNormOne
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
+import Development.AbelianVarietyTheory.PublishedTheorems.TwistedTraceFormula.NotIsCompactUnivFv
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
-  GlobalTheory.Published GlobalTheory.PlaneNorm
+open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.Published GlobalTheory.PlaneNorm
 open scoped TensorProduct
 
 noncomputable section
@@ -18,34 +58,30 @@ section Alg
 
 variable {F E : Type} [Field F] [Field E] [Algebra F E]
 
-theorem sigR_inclR' (R : Type) [CommRing R] [Algebra F R] (σ : E →ₐ[F] E) (e : E)
-    : sigR R σ (inclR R e) = inclR R (σ e) := by
+theorem sigR_inclR' (R : Type) [CommRing R] [Algebra F R] (σ : E →ₐ[F] E) (e : E) :
+    sigR R σ (inclR R e) = inclR R (σ e) := by
   simp [sigR, inclR]
 
-theorem hE_sub_smul_left
-    (σ : E →ₐ[F] E) {M : ℕ} (J : Matrix (Fin M) (Fin M) E) (a b y : Fin M → E) (c : E)
-    : hE σ J (a - c • b) y = hE σ J a y - σ c * hE σ J b y := by
+theorem hE_sub_smul_left (σ : E →ₐ[F] E) {M : ℕ} (J : Matrix (Fin M) (Fin M) E) (a b y : Fin M → E) (c : E) :
+    hE σ J (a - c • b) y = hE σ J a y - σ c * hE σ J b y := by
   simp only [hE, Formalism.UG.hform, Pi.sub_apply, Pi.smul_apply, smul_eq_mul, map_sub, map_mul,
     AlgHom.coe_toRingHom, RingHom.coe_coe, sub_mul, Finset.sum_sub_distrib, Finset.mul_sum]
   congr 1
   refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
   ring
 
-theorem hE_sub_smul_right
-    (σ : E →ₐ[F] E) {M : ℕ} (J : Matrix (Fin M) (Fin M) E) (y a b : Fin M → E) (c : E)
-    : hE σ J y (a - c • b) = hE σ J y a - c * hE σ J y b := by
+theorem hE_sub_smul_right (σ : E →ₐ[F] E) {M : ℕ} (J : Matrix (Fin M) (Fin M) E) (y a b : Fin M → E) (c : E) :
+    hE σ J y (a - c • b) = hE σ J y a - c * hE σ J y b := by
   simp only [hE, Formalism.UG.hform, Pi.sub_apply, Pi.smul_apply, smul_eq_mul, mul_sub,
     Finset.sum_sub_distrib, Finset.mul_sum]
   congr 1
   refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
   ring
 
-theorem hE_swap'
-    (σ : E →ₐ[F] E) (hσ : ∀ x, σ (σ x) = x)
-    {M : ℕ} (J : Matrix (Fin M) (Fin M) E) (hJ : IsHermND σ J) (x y : Fin M → E)
-    : hE σ J y x = σ (hE σ J x y) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [hE, Formalism.UG.hform, map_sum, map_mul, AlgHom.coe_toRingHom, RingHom.coe_coe, hσ]
+theorem hE_swap' (σ : E →ₐ[F] E) (hσ : ∀ x, σ (σ x) = x) {M : ℕ} (J : Matrix (Fin M) (Fin M) E)
+    (hJ : IsHermND σ J) (x y : Fin M → E) : hE σ J y x = σ (hE σ J x y) := by
+
+  simp only [hE, Formalism.UG.hform, map_sum, map_mul, AlgHom.coe_toRingHom, RingHom.coe_coe, hσ]
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun a _ => Finset.sum_congr rfl fun b _ => ?_
   rw [hJ.1 b a]
@@ -53,29 +89,13 @@ theorem hE_swap'
 
 end Alg
 
-theorem sigma_sigma'
-    {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-    (σ : E →ₐ[F] E) (h : IsCMExt F E σ)
-    (x : E)
-    : σ (σ x) = x := by
+theorem sigma_sigma' {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+    (σ : E →ₐ[F] E) (h : IsCMExt F E σ) (x : E) : σ (σ x) = x := by
   obtain ⟨τ⟩ : Nonempty (E →+* ℂ) := inferInstance
   apply τ.injective
   rw [h.2.2.2, h.2.2.2, star_star]
 
-theorem reduce
-    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-        (σ : E →ₐ[F] E),
-      IsCMExt F E σ
-        → ∀ (K : Type) [Field K] [Algebra F K] (M : ℕ) (J : Matrix (Fin M) (Fin M) E),
-          IsHermND σ J
-            → ∀ x z : Fin M → E,
-              hE σ J x x ≠ 0 → IsUnitNorm K σ (-(inclR K (gram2E σ J x z)))
-                → hE σ J (z - (hE σ J x z / hE σ J x x) • x) (z - (hE σ J x z / hE σ J x x) • x) ≠ 0
-                  ∧ ∃ t : K ⊗[F] E,
-                    t * sigR K σ t + inclR K
-                        (hE σ J x x / hE σ J (z - (hE σ J x z / hE σ J x x) • x)
-                          (z - (hE σ J x z / hE σ J x x) • x))
-                      = 0 := by
+theorem reduce : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E), IsCMExt F E σ → ∀ (K : Type) [Field K] [Algebra F K] (M : ℕ) (J : Matrix (Fin M) (Fin M) E), IsHermND σ J → ∀ x z : Fin M → E, hE σ J x x ≠ 0 → IsUnitNorm K σ (-(inclR K (gram2E σ J x z))) → hE σ J (z - (hE σ J x z / hE σ J x x) • x) (z - (hE σ J x z / hE σ J x x) • x) ≠ 0 ∧ ∃ t : K ⊗[F] E, t * sigR K σ t + inclR K (hE σ J x x / hE σ J (z - (hE σ J x z / hE σ J x x) • x) (z - (hE σ J x z / hE σ J x x) • x)) = 0 := by
   intro F E _ _ _ _ _ σ hCM K _ _ M J hJ x z hx hN
   have hσ := sigma_sigma' σ hCM
   set a := hE σ J x x with ha
@@ -96,11 +116,13 @@ theorem reduce
   have hG : gram2E σ J x z ≠ 0 := by
     intro h0
     rw [h0, map_zero, neg_zero] at hss
-    have hu : IsUnit (0 : K ⊗[F] E) := by rw [← hss]; exact hs.mul (hs.map (sigR K σ))
+    have hu : IsUnit (0 : K ⊗[F] E) := by
+      rw [← hss]; exact hs.mul (hs.map (sigR K σ))
     have h01 : (0 : K ⊗[F] E) = 1 := isUnit_zero_iff.mp hu
     have : inclR (F := F) K (0 : E) = inclR (F := F) K 1 := by rw [map_zero, map_one, h01]
     exact zero_ne_one (hinj this)
-  have hq0 : q ≠ 0 := by intro h0; apply hG; rw [← hqa, h0, zero_mul]
+  have hq0 : q ≠ 0 := by
+    intro h0; apply hG; rw [← hqa, h0, zero_mul]
   refine ⟨hq0, ?_⟩
 
   set v : K ⊗[F] E := ↑(hs.unit⁻¹) with hv
@@ -111,8 +133,7 @@ theorem reduce
   apply hw.mul_left_eq_zero.mp
   have e1 : inclR K a * v * sigR K σ (inclR K a * v) * (s * sigR K σ s) = inclR K (a * a) := by
     rw [map_mul, sigR_inclR', hsa]
-    calc
-      inclR K a * v * (inclR K a * sigR K σ v) * (s * sigR K σ s)
+    calc inclR K a * v * (inclR K a * sigR K σ v) * (s * sigR K σ s)
         = inclR K a * inclR K a * (v * s) * (sigR K σ v * sigR K σ s) := by ring
       _ = inclR K (a * a) := by rw [h1, h2, map_mul]; ring
   have e2 : inclR K (a / q) * (s * sigR K σ s) = - inclR K (a * a) := by

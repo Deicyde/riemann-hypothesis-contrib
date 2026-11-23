@@ -1,8 +1,53 @@
 module
 
+import Formalism.SharpRestriction.CuspSpanNormBounds.NonemptyParameterModels.AmpTensorDSdNonemptyOfSubsingleton
 public import Formalism.SharpRestriction.CuspSpanNormBounds.RelevantZeroGramTerms
 public import Formalism.FormalDegreeBessel.FormalDegreeRatio.GBasic
 public import Formalism.SharpRestriction.CuspSpanNormBounds.CayleySignature
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Rat
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Lemma
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
@@ -28,24 +73,13 @@ lemma obj_s_star : star invSqrtTwoComplex = invSqrtTwoComplex := by
   unfold invSqrtTwoComplex; exact Complex.conj_ofReal _
 
 def cayleyCoeffFirstDiagonal (k r : ℕ) (i : Fin (2 * r + k + 1)) : ℂ :=
-  if i.val < r then
-    invSqrtTwoComplex
-  else if r + k < i.val then
-    -invSqrtTwoComplex
-  else
-    1
+  if i.val < r then invSqrtTwoComplex else if r + k < i.val then -invSqrtTwoComplex else 1
 
 def cayleyCoeffSecondDiagonal (k r : ℕ) (i : Fin (2 * r + k + 1)) : ℂ :=
-  if i.val < r then
-    invSqrtTwoComplex
-  else if r + k < i.val then
-    invSqrtTwoComplex
-  else
-    0
+  if i.val < r then invSqrtTwoComplex else if r + k < i.val then invSqrtTwoComplex else 0
 
 def obj_PU (k r : ℕ) : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ := fun i j =>
-  (if j = i then cayleyCoeffFirstDiagonal k r i else 0)
-    + (if i = sig k r j then cayleyCoeffSecondDiagonal k r i else 0)
+  (if j = i then cayleyCoeffFirstDiagonal k r i else 0) + (if i = sig k r j then cayleyCoeffSecondDiagonal k r i else 0)
 
 lemma obj_PU_star (k r : ℕ) (i j : Fin (2 * r + k + 1)) : star (obj_PU k r i j) = obj_PU k r i j := by
   unfold obj_PU cayleyCoeffFirstDiagonal cayleyCoeffSecondDiagonal
@@ -117,18 +151,14 @@ lemma obj_PU_cayley (k r : ℕ) : IsCayleyU k r (epsK k r) (obj_PU k r) := by
   refine ⟨⟨?_, by ext i j; exact obj_PJP_apply k r i j⟩, hu⟩
   exact ⟨⟨obj_PU k r, (obj_PU k r)ᴴ, mul_eq_one_comm.1 h1, h1⟩, rfl⟩
 
-theorem obj_cayleyU_of_card
-    (k r : ℕ) (ε : Fin (2 * r + k + 1) → Bool)
-    (hc : (Finset.univ.filter fun i => ε i = true).card = k + r)
-    : ∃ P, IsCayleyU k r ε P := by
+theorem obj_cayleyU_of_card (k r : ℕ) (ε : Fin (2 * r + k + 1) → Bool)
+    (hc : (Finset.univ.filter fun i => ε i = true).card = k + r) : ∃ P, IsCayleyU k r ε P := by
   classical
   have hK : (Finset.univ.filter fun i : Fin (2 * r + k + 1) => epsK k r i = true).card = k + r := by
-    have hf
-        : (Finset.univ.filter fun i : Fin (2 * r + k + 1) => epsK k r i = true)
-          = Finset.univ.filter fun i : Fin (2 * r + k + 1) => (i : ℕ) < r + k := by
+    have hf : (Finset.univ.filter fun i : Fin (2 * r + k + 1) => epsK k r i = true) =
+        Finset.univ.filter fun i : Fin (2 * r + k + 1) => (i : ℕ) < r + k := by
       ext i; simp [epsK]
-    rw [hf, Fin.card_filter_val_lt]
-    omega
+    rw [hf, Fin.card_filter_val_lt]; omega
   have hcard : Fintype.card {i // epsK k r i = true} = Fintype.card {i // ε i = true} := by
     rw [Fintype.card_subtype, Fintype.card_subtype, hK, hc]
   let e0 : {i // epsK k r i = true} ≃ {i // ε i = true} := Fintype.equivOfCardEq hcard
@@ -139,15 +169,12 @@ theorem obj_cayleyU_of_card
     · rw [hl]; exact e0.extendSubtype_mem l hl
     · have := e0.extendSubtype_not_mem l hl
       simp only [Bool.not_eq_true] at this hl
-      rw [hl]
-      exact this
+      rw [hl]; exact this
   obtain ⟨⟨_, hP⟩, hU⟩ := obj_PU_cayley k r
   have hU' : (obj_PU k r)ᴴ * obj_PU k r = 1 := (Matrix.mem_unitaryGroup_iff').1 hU
   let P : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ := fun i j => obj_PU k r (π.symm i) j
-  have hsum
-      : ∀ (d : Fin (2 * r + k + 1) → ℂ) a b,
-        (Pᴴ * diagonal d * P) a b
-          = ((obj_PU k r)ᴴ * diagonal (fun l => d (π l)) * obj_PU k r) a b := by
+  have hsum : ∀ (d : Fin (2 * r + k + 1) → ℂ) a b, (Pᴴ * diagonal d * P) a b =
+      ((obj_PU k r)ᴴ * diagonal (fun l => d (π l)) * obj_PU k r) a b := by
     intro d a b
     rw [Matrix.mul_apply, Matrix.mul_apply]
     simp only [mul_diagonal, conjTranspose_apply]
@@ -163,12 +190,9 @@ theorem obj_cayleyU_of_card
   ext a b
   have hJ : Formalism.REAL.Jm ε = diagonal (fun a => if ε a then (1 : ℂ) else -1) := rfl
   rw [hJ, hsum, ← hP]
-  have hJ'
-      : Formalism.REAL.Jm (epsK k r) = diagonal (fun l => if ε (π l) then (1 : ℂ) else -1) := by
+  have hJ' : Formalism.REAL.Jm (epsK k r) = diagonal (fun l => if ε (π l) then (1 : ℂ) else -1) := by
     show diagonal _ = _
-    congr 1
-    funext l
-    rw [hπ]
+    congr 1; funext l; rw [hπ]
   rw [hJ']
 
 lemma obj_count (k r : ℕ) (hk : 1 ≤ k) :
@@ -189,8 +213,8 @@ lemma obj_card_fin (n : ℕ) (p : ℕ → Prop) [DecidablePred p] :
   rw [Finset.card_filter, Finset.card_filter]
   exact Fin.sum_univ_eq_sum_range (fun i => if p i then 1 else 0) n
 
-theorem obj_epsSH_card (R : Formalism.BasicNotions.Ranks)
-    : (Finset.univ.filter fun i => epsSH R i = true).card = R.k + R.rS := by
+theorem obj_epsSH_card (R : Formalism.BasicNotions.Ranks) :
+    (Finset.univ.filter fun i => epsSH R i = true).card = R.k + R.rS := by
   have hk : 1 ≤ R.k := by have := R.m_add_three_le_k; omega
   rw [← obj_count R.k R.rS hk, ← obj_card_fin]
   congr 1
@@ -198,8 +222,7 @@ theorem obj_epsSH_card (R : Formalism.BasicNotions.Ranks)
   simp only [Finset.mem_filter, Finset.mem_univ, true_and, epsSH, epsS, Fin.val_cast]
   split_ifs with h <;> simp [h]
 
-theorem obj_cayleyU_rows (D : Formalism.BasicNotions.D7)
-    : ∃ P, IsCayleyU D.R.k D.R.rS (epsSH D.R) P :=
+theorem obj_cayleyU_rows (D : Formalism.BasicNotions.D7) : ∃ P, IsCayleyU D.R.k D.R.rS (epsSH D.R) P :=
   obj_cayleyU_of_card _ _ _ (obj_epsSH_card D.R)
 
 lemma obj_lamSH_lo (R : Formalism.BasicNotions.Ranks) (P : Formalism.BasicNotions.HCParam R) (i : Fin (2 * R.rS + R.k + 1)) (h : i.val < R.k - 1) :
@@ -215,72 +238,10 @@ lemma obj_m_eq (R : Formalism.BasicNotions.Ranks) : R.m = 2 * R.rS + 2 := by
   have h2 := R.two_le_m
   simp only [Formalism.BasicNotions.Ranks.rS]; omega
 
-theorem obj_isHCParam_lamSH
-    (R : Formalism.BasicNotions.Ranks) (P : Formalism.BasicNotions.HCParam R)
-    : IsHCParam (lamSH R P) := by
-  have hm := obj_m_eq R
-  have hk3 := R.m_add_three_le_k
-  refine ⟨?_, ?_⟩
-  · rw [Fin.strictAnti_iff_succ_lt]
-    intro i
-    have hi := i.isLt
-    by_cases h1 : i.val + 1 < R.k - 1
-    · rw [obj_lamSH_lo R P i.succ (by simpa using h1), obj_lamSH_lo R P i.castSucc (by simp; omega)]
-      have a := P.u_gt_v ⟨i.val + 1, h1⟩
-      have b := P.v_gt_u ⟨i.val, by omega⟩
-      have c := lt_trans a b
-      simp only [Fin.val_succ, Fin.val_castSucc]
-      exact_mod_cast c
-    · by_cases h2 : i.val < R.k - 1
-      · have e : i.val + 1 = R.k - 1 := by omega
-        rw [obj_lamSH_hi R P i.succ (by simpa using h1) (by simp; omega),
-          obj_lamSH_lo R P i.castSucc (by simpa using h2)]
-        have a := P.u_last_gt (by omega) (by omega)
-        have b := P.v_gt_u ⟨i.val, h2⟩
-        have e1 : (⟨i.val + 1, by omega⟩ : Fin R.k) = ⟨R.k - 1, by omega⟩ := Fin.ext e
-        rw [e1] at b
-        have c := lt_trans a b
-        have e2 : (⟨(i.succ).val - (R.k - 1), by simp; omega⟩ : Fin R.m) = ⟨0, by omega⟩ := by
-          apply Fin.ext; simp; omega
-        rw [e2]
-        simp only [Fin.val_castSucc]
-        exact_mod_cast c
-      · rw [obj_lamSH_hi R P i.succ (by simpa using h1) (by simp; omega),
-          obj_lamSH_hi R P i.castSucc (by simpa using h2) (by simp; omega)]
-        have hj : i.val - (R.k - 1) < R.m := by omega
-        have hj1 : i.val - (R.k - 1) + 1 < R.m := by omega
-        have a := P.gap_be ⟨i.val - (R.k - 1), hj⟩
-        have b := P.gap_eb ⟨i.val - (R.k - 1), hj⟩ hj1
-        have e2
-            : (⟨(i.succ).val - (R.k - 1), by simp; omega⟩ : Fin R.m)
-              = ⟨i.val - (R.k - 1) + 1, hj1⟩ := by
-          apply Fin.ext; simp; omega
-        rw [e2]
-        simp only [Fin.val_castSucc]
-        have t0 : (0 : ℚ) ≤ (R.t : ℚ) := Nat.cast_nonneg _
-        have c : P.b ⟨i.val - (R.k - 1), hj⟩ < P.b ⟨i.val - (R.k - 1) + 1, hj1⟩ := by linarith
-        have c' : (P.b ⟨i.val - (R.k - 1), hj⟩ : ℝ) < (P.b ⟨i.val - (R.k - 1) + 1, hj1⟩ : ℝ) := by
-          exact_mod_cast c
-        linarith
-  · intro a
-    obtain ⟨q, hq⟩ := R.k_even
-    have hn : (((2 * R.rS + R.k + 1 : ℕ) : ℝ) - 1) / 2 = ((R.rS + q : ℕ) : ℝ) := by
-      rw [hq]; push_cast; ring
-    have ha := a.isLt
-    by_cases h : a.val < R.k - 1
-    · obtain ⟨z, hz⟩ := P.v_int ⟨a.val, h⟩
-      refine ⟨z - (R.rS + q : ℕ), ?_⟩
-      rw [obj_lamSH_lo R P a h, hn, hz]
-      push_cast
-      ring
-    · obtain ⟨z, hz⟩ := P.b_int ⟨a.val - (R.k - 1), by omega⟩
-      refine ⟨-z - (R.rS + q : ℕ), ?_⟩
-      rw [obj_lamSH_hi R P a h (by omega), hn, hz]
-      push_cast
-      ring
+theorem obj_isHCParam_lamSH (R : Formalism.BasicNotions.Ranks) (P : Formalism.BasicNotions.HCParam R) : IsHCParam (lamSH R P) := by
+  apply Formalism.MainNotions.S.Inh.amp_isHCParam_lamSH <;> assumption
 
-theorem obj_isHCParam_u (R : Formalism.BasicNotions.Ranks) (P : Formalism.BasicNotions.HCParam R)
-    : IsHCParam (fun i => ((P.u i : ℚ) : ℝ)) := by
+theorem obj_isHCParam_u (R : Formalism.BasicNotions.Ranks) (P : Formalism.BasicNotions.HCParam R) : IsHCParam (fun i => ((P.u i : ℚ) : ℝ)) := by
   have hk3 := R.m_add_three_le_k
   refine ⟨?_, ?_⟩
   · have key : ∀ (i : ℕ) (h : i + 1 < R.k), P.u ⟨i + 1, h⟩ < P.u ⟨i, by omega⟩ := by
@@ -304,23 +265,20 @@ theorem obj_isHCParam_u (R : Formalism.BasicNotions.Ranks) (P : Formalism.BasicN
     obtain ⟨z, hz⟩ := P.u_half a
     refine ⟨z + 1 - q, ?_⟩
     show ((P.u a : ℚ) : ℝ) - ((R.k : ℝ) - 1) / 2 = _
-    rw [hz, hq]
-    push_cast
-    ring
+    rw [hz, hq]; push_cast; ring
+
 
 open Formalism.MainNotions.CayleySignature in
 theorem exists_isCayleyU_eps48 (k r : ℕ) (hk : 1 ≤ k) : ∃ P, IsCayleyU k r (eps48 k r) P := by
   apply obj_cayleyU_of_card
-  have e
-      : (Finset.univ.filter fun i => eps48 k r i = true)
-        = Finset.univ.filter (fun i : Fin (2 * r + k + 1) =>
-          i.val < k - 1 ∨ (i.val - (k - 1)) % 2 = 0) := by
+  have e : (Finset.univ.filter fun i => eps48 k r i = true) =
+      Finset.univ.filter (fun i : Fin (2 * r + k + 1) => i.val < k - 1 ∨ (i.val - (k - 1)) % 2 = 0) := by
     apply Finset.filter_congr
     intro i _
     unfold eps48
     by_cases h : i.val < k - 1 <;> simp [h]
-  rw [e, obj_card_fin (2 * r + k + 1) (fun i => i < k - 1 ∨ (i - (k - 1)) % 2 = 0),
-    obj_count k r hk]
+  rw [e, obj_card_fin (2 * r + k + 1) (fun i => i < k - 1 ∨ (i - (k - 1)) % 2 = 0), obj_count k r hk]
+
 
 end obj
 

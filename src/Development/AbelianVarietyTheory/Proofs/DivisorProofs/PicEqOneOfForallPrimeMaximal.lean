@@ -1,6 +1,51 @@
 module
 
-public import Mathlib
+public import Mathlib.RingTheory.PicardGroup
+public import Mathlib.RingTheory.Spectrum.Prime.Topology
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.Order.CompletePartialOrder
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.TotallySplit
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -11,10 +56,8 @@ namespace GlobalTheory
 variable {R : Type} [CommRing R]
 
 theorem exists_mul_pow_eq_zero_of_forall_isMaximal
-    (hR : ∀ P : Ideal R, P.IsPrime → P.IsMaximal)
-    {p : Ideal R} [hp : p.IsPrime]
-    {a : R} (ha : a ∈ p)
-    : ∃ t ∉ p, ∃ n : ℕ, t * a ^ n = 0 := by
+    (hR : ∀ P : Ideal R, P.IsPrime → P.IsMaximal) {p : Ideal R} [hp : p.IsPrime] {a : R}
+    (ha : a ∈ p) : ∃ t ∉ p, ∃ n : ℕ, t * a ^ n = 0 := by
   by_contra! H
   have hdis : Disjoint ((⊥ : Ideal R) : Set R)
       ((p.primeCompl ⊔ Submonoid.powers a : Submonoid R) : Set R) := by
@@ -29,15 +72,16 @@ theorem exists_mul_pow_eq_zero_of_forall_isMaximal
   have hqp : q ≤ p := by
     intro x hx
     by_contra hxp
-    exact Set.disjoint_left.mp hqd hx (Submonoid.mem_sup_left (show x ∈ p.primeCompl from hxp))
+    exact Set.disjoint_left.mp hqd hx
+      (Submonoid.mem_sup_left (show x ∈ p.primeCompl from hxp))
   have hqp' := (hR q hq).eq_of_le hp.ne_top hqp
-  have haq : a ∉ q := fun h =>
-    Set.disjoint_left.mp hqd h (Submonoid.mem_sup_right (Submonoid.mem_powers a))
+  have haq : a ∉ q := fun h => Set.disjoint_left.mp hqd h
+    (Submonoid.mem_sup_right (Submonoid.mem_powers a))
   exact haq (hqp' ▸ ha)
 
-theorem isClopen_basicOpen_of_forall_isMaximal (hR : ∀ P : Ideal R, P.IsPrime → P.IsMaximal) (a : R)
-    : IsClopen
-      ((basicOpen a : TopologicalSpace.Opens (PrimeSpectrum R)) : Set (PrimeSpectrum R)) := by
+theorem isClopen_basicOpen_of_forall_isMaximal
+    (hR : ∀ P : Ideal R, P.IsPrime → P.IsMaximal) (a : R) :
+    IsClopen ((basicOpen a : TopologicalSpace.Opens (PrimeSpectrum R)) : Set (PrimeSpectrum R)) := by
   refine ⟨?_, (basicOpen a).isOpen⟩
   rw [← isOpen_compl_iff, isOpen_iff_forall_mem_open]
   intro x hx
@@ -53,12 +97,13 @@ theorem isClopen_basicOpen_of_forall_isMaximal (hR : ∀ P : Ideal R, P.IsPrime 
   · exact hya (y.isPrime.mem_of_pow_mem n h)
 
 theorem exists_isIdempotentElem_mul_of_forall_isMaximal
-    (hR : ∀ P : Ideal R, P.IsPrime → P.IsMaximal) (a : R)
-    : ∃ e b : R, IsIdempotentElem e ∧ a * b = e ∧ ∀ p : Ideal R, p.IsPrime → a ∉ p → e ∉ p := by
+    (hR : ∀ P : Ideal R, P.IsPrime → P.IsMaximal) (a : R) :
+    ∃ e b : R, IsIdempotentElem e ∧ a * b = e ∧ ∀ p : Ideal R, p.IsPrime → a ∉ p → e ∉ p := by
   let c : TopologicalSpace.Clopens (PrimeSpectrum R) :=
     ⟨(basicOpen a : Set (PrimeSpectrum R)), isClopen_basicOpen_of_forall_isMaximal hR a⟩
   let e := (isIdempotentElemEquivClopens (R := R)).symm c
-  have he : basicOpen e.1 = basicOpen a := by rw [basicOpen_isIdempotentElemEquivClopens_symm]; rfl
+  have he : basicOpen e.1 = basicOpen a := by
+    rw [basicOpen_isIdempotentElemEquivClopens_symm]; rfl
   obtain ⟨k, hk⟩ := (basicOpen_le_basicOpen_iff _ _).mp he.le
   have hmem : e.1 ∈ Ideal.span {a} := by
     rw [← e.2.pow_succ_eq k, pow_succ']
@@ -70,10 +115,8 @@ theorem exists_isIdempotentElem_mul_of_forall_isMaximal
   exact h1
 
 theorem free_of_invertible_of_forall_isMaximal
-    (hR : ∀ P : Ideal R, P.IsPrime → P.IsMaximal)
-    (M : Type) [AddCommGroup M] [Module R M]
-    (hM : Module.Invertible R M)
-    : Module.Free R M := by
+    (hR : ∀ P : Ideal R, P.IsPrime → P.IsMaximal) (M : Type) [AddCommGroup M] [Module R M]
+    (hM : Module.Invertible R M) : Module.Free R M := by
   classical
   obtain ⟨S, hS⟩ := ((Module.Invertible.linearEquiv R M).symm 1).exists_finset
   replace hS : 1 = ∑ i ∈ S, i.1 i.2 := by
@@ -85,10 +128,8 @@ theorem free_of_invertible_of_forall_isMaximal
   let Q : Module.Dual R M × M → R := fun l => ∏ j ∈ S with j < l, (1 - e j)
   let e' : Module.Dual R M × M → R := fun l => e l * Q l
   have hQi : ∀ l, IsIdempotentElem (Q l) := fun l =>
-    Finset.prod_induction _ IsIdempotentElem
-      (fun _ _ h1 h2 => h1.mul h2)
-      IsIdempotentElem.one
-      (fun j _ => (he j).one_sub)
+    Finset.prod_induction _ IsIdempotentElem (fun _ _ h1 h2 => h1.mul h2)
+      IsIdempotentElem.one (fun j _ => (he j).one_sub)
   have he'i : ∀ l, IsIdempotentElem (e' l) := fun l => (he l).mul (hQi l)
   have hlt : ∀ k ∈ S, ∀ l ∈ S, k < l → e k * e' l = 0 := by
     intro k hk l _ hkl
@@ -109,14 +150,15 @@ theorem free_of_invertible_of_forall_isMaximal
   let x : M := ∑ k ∈ S, e' k • k.2
   let φ : Module.Dual R M := ∑ l ∈ S, (b l * e' l) • l.1
   have hφx : φ x = ∑ l ∈ S, e' l := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [φ, x, LinearMap.sum_apply, LinearMap.smul_apply, map_sum, map_smul, smul_eq_mul,
-        Finset.mul_sum]
+
+    simp only [φ, x, LinearMap.sum_apply, LinearMap.smul_apply, map_sum,
+    map_smul, smul_eq_mul, Finset.mul_sum]
     refine Finset.sum_congr rfl fun l hl => ?_
     rw [Finset.sum_eq_single l]
     · have h1 := (he'i l).eq
       have h2 := hab l
-      have h3 : e' l * e l = e' l := by simp only [e']; linear_combination Q l * (he l).eq
+      have h3 : e' l * e l = e' l := by
+        simp only [e']; linear_combination Q l * (he l).eq
       linear_combination (b l * l.1 l.2) * h1 + e' l * h2 + h3
     · intro k hk hkl
       have := horth l hl k hk (Ne.symm hkl)
@@ -132,22 +174,22 @@ theorem free_of_invertible_of_forall_isMaximal
       exact hm.ne_top ((Ideal.eq_top_iff_one _).mpr (hS ▸ Ideal.sum_mem _ hall))
     have hei := hep i m hm.isPrime him
     have h1 : 1 - e i ∈ m := by
-      have : e i * (1 - e i) ∈ m := by rw [mul_sub, mul_one, (he i).eq, sub_self]; exact m.zero_mem
+      have : e i * (1 - e i) ∈ m := by
+        rw [mul_sub, mul_one, (he i).eq, sub_self]; exact m.zero_mem
       exact (hm.isPrime.mem_or_mem this).resolve_left hei
     have hP : ∏ i ∈ S, (1 - e i) ∈ m := by
       rw [← Finset.mul_prod_erase _ _ hi]; exact m.mul_mem_right _ h1
     exact hm.ne_top ((Ideal.eq_top_iff_one _).mpr (by simpa using m.add_mem hxm hP))
   rw [← hsum, ← hφx] at hunit
-  exact .of_equiv <| .symm <| .ofBijective φ
-    (Module.Invertible.bijective_of_surjective <| LinearMap.range_eq_top.mp <|
-      Ideal.eq_top_of_isUnit_mem _ ⟨x, rfl⟩ hunit)
+  exact .of_equiv <| .symm <| .ofBijective φ (Module.Invertible.bijective_of_surjective <|
+    LinearMap.range_eq_top.mp <| Ideal.eq_top_of_isUnit_mem _ ⟨x, rfl⟩ hunit)
 
-theorem pic_eq_one_of_forall_isMaximal
-    : ∀ (R : Type) [CommRing R],
-      (∀ P : Ideal R, P.IsPrime → P.IsMaximal) → ∀ c : CommRing.Pic R, c = 1 := by
+theorem pic_eq_one_of_forall_isMaximal :
+    ∀ (R : Type) [CommRing R], (∀ P : Ideal R, P.IsPrime → P.IsMaximal) →
+      ∀ c : CommRing.Pic R, c = 1 := by
   intro R _ hR c
-  have : Subsingleton (CommRing.Pic R) :=
-    CommRing.Pic.subsingleton_iff.mpr fun M _ _ hM => free_of_invertible_of_forall_isMaximal hR M hM
+  have : Subsingleton (CommRing.Pic R) := CommRing.Pic.subsingleton_iff.mpr
+    fun M _ _ hM => free_of_invertible_of_forall_isMaximal hR M hM
   exact Subsingleton.elim _ _
 
 end GlobalTheory

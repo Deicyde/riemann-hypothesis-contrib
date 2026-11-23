@@ -1,35 +1,70 @@
 module
 
-public import Mathlib
+import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.ArchimedeanOrbitMeasures.EqOneOfToHAFin
 public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.MassComputations.NVolAllOf
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
 noncomputable section
 
 open MeasureTheory NumberField Set
-open Formalism.BasicNotions Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
-  Formalism.L2.SG.Sub Formalism.L2.SG.Measures Formalism.L2.SG.HidaSetting Formalism.L2.SG.AdBridge
+open Formalism.BasicNotions Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub Formalism.L2.SG.Measures Formalism.L2.SG.HidaSetting Formalism.L2.SG.AdBridge
   Formalism.L2.SG.TypedSets
 open scoped TensorProduct
 
 namespace MassDataMassesW
 
-theorem prod_rect_of_ne_zero
-    {α β : Type*} [MeasurableSpace α] [MeasurableSpace β]
-    (μ : Measure α) (ν : Measure β) (h0 : μ.prod ν ≠ 0)
-    {s : Set α} {t : Set β} (hs : MeasurableSet s) (ht : MeasurableSet t)
-    : μ.prod ν (s ×ˢ t) = μ s * ν t := by
+theorem prod_rect_of_ne_zero {α β : Type*} [MeasurableSpace α] [MeasurableSpace β] (μ : Measure α)
+    (ν : Measure β) (h0 : μ.prod ν ≠ 0) {s : Set α} {t : Set β} (hs : MeasurableSet s)
+    (ht : MeasurableSet t) : μ.prod ν (s ×ˢ t) = μ s * ν t := by
   have hν : SFinite ν := by
     by_contra hν
     exact h0 (Measure.prod_eq_zero_of_not_sfinite hν)
   letI : SFinite ν := hν
   exact Measure.prod_prod s t
 
-theorem tauF_eq_comm {D : D7} (X : HidaSetting D) (y : AF X.B.I.F ⊗[X.B.I.F] X.B.I.E)
-    : tauF X.B.I y
-      = Algebra.TensorProduct.comm X.B.I.F (Af X.B.I.F) X.B.I.E
-        (tensMap (E := X.B.I.E) (sndA X.B.I.F) y) := by
+theorem tauF_eq_comm {D : D7} (X : HidaSetting D) (y : AF X.B.I.F ⊗[X.B.I.F] X.B.I.E) :
+    tauF X.B.I y = Algebra.TensorProduct.comm X.B.I.F (Af X.B.I.F) X.B.I.E
+      (tensMap (E := X.B.I.E) (sndA X.B.I.F) y) := by
   induction y using TensorProduct.induction_on with
   | zero => simp
   | tmul a x =>
@@ -37,56 +72,20 @@ theorem tauF_eq_comm {D : D7} (X : HidaSetting D) (y : AF X.B.I.F ⊗[X.B.I.F] X
     rfl
   | add x y hx hy => simp only [map_add (f := _), hx, hy]
 
-theorem toHA_fin_one {D : D7} (X : HidaSetting D) (hb : AdBridgeIso X.B.I) (s : X.B.I.Ginf)
-    : (splitA X.B.I.cm.sig X.B.I.J (toHA X.B.I hb (s, 1))).2 = 1 := by
-  have hbr := ((toHA_isBridge X.B.I hb) (s, 1)).2
-  apply Subtype.ext
-  apply Units.ext
-  ext i j
-  have e := congrFun (congrFun hbr i) j
-  simp only [ofHAFin, Matrix.map_apply] at e
-  rw [tauF_eq_comm] at e
-  have e2 := congrArg (Algebra.TensorProduct.comm X.B.I.F (Af X.B.I.F) X.B.I.E).symm e
-  rw [AlgEquiv.symm_apply_apply] at e2
-  show tensMap (E := X.B.I.E) (sndA X.B.I.F) _ = _
-  rw [← e2]
-  show _ = (1 : Matrix (Fin X.B.I.n) (Fin X.B.I.n) (Af X.B.I.F ⊗[X.B.I.F] X.B.I.E)) i j
-  simp only [Formalism.MainNotions.S.AutInst.fmat, OneMemClass.coe_one, Units.val_one,
-    Matrix.one_apply]
-  split_ifs <;> simp
+theorem toHA_fin_one {D : D7} (X : HidaSetting D) (hb : AdBridgeIso X.B.I) (s : X.B.I.Ginf) :
+    (splitA X.B.I.cm.sig X.B.I.J (toHA X.B.I hb (s, 1))).2 = 1 := by
+  apply PI.AprimeInfU.toHA_fin_one <;> assumption
 
 section Split
 
 variable {D : D7} (X : HidaSetting D) (hb : AdBridgeIso X.B.I)
 
-theorem eq_one_of_toHA_fin
-    {D : D7} (X : HidaSetting D) (hb : AdBridgeIso X.B.I) (p : X.B.I.GA)
-    (h : (splitA X.B.I.cm.sig X.B.I.J (toHA X.B.I hb p)).2 = 1)
-    : p.2 = 1 := by
-  have hbr := ((toHA_isBridge X.B.I hb) p).2
-  apply Subtype.ext
-  apply Units.ext
-  ext i j
-  have e := congrFun (congrFun hbr i) j
-  simp only [ofHAFin, Matrix.map_apply] at e
-  rw [tauF_eq_comm] at e
-  have h2
-      : tensMap (E := X.B.I.E) (sndA X.B.I.F) (hmat X.B.I (toHA X.B.I hb p) i j)
-        = (1 : Matrix (Fin X.B.I.n) (Fin X.B.I.n) (Af X.B.I.F ⊗[X.B.I.F] X.B.I.E)) i j := by
-    have :=
-      congrArg
-        (fun g : HA (Af X.B.I.F) X.B.I.cm.sig X.B.I.J =>
-          (HA.mat (Af X.B.I.F) X.B.I.cm.sig X.B.I.J g).val i j)
-        h
-    exact this
-  rw [h2] at e
-  rw [Formalism.MainNotions.S.AutInst.fmat] at e
-  show _ = (1 : Matrix (Fin X.B.I.n) (Fin X.B.I.n) (X.B.I.E ⊗[X.B.I.F] Af X.B.I.F)) i j
-  rw [e, Matrix.one_apply, Matrix.one_apply]
-  split_ifs <;> simp
+theorem eq_one_of_toHA_fin {D : D7} (X : HidaSetting D) (hb : AdBridgeIso X.B.I) (p : X.B.I.GA)
+    (h : (splitA X.B.I.cm.sig X.B.I.J (toHA X.B.I hb p)).2 = 1) : p.2 = 1 := by
+  apply PI.AprimeInfU.eq_one_of_toHA_fin <;> assumption
 
-theorem split_unitary_infinite_one (s : X.B.I.Ginf)
-    : splitA X.B.I.cm.sig X.B.I.J (toHA X.B.I hb (s, 1)) = (X.toInf hb s, 1) :=
+theorem split_unitary_infinite_one (s : X.B.I.Ginf) :
+    splitA X.B.I.cm.sig X.B.I.J (toHA X.B.I hb (s, 1)) = (X.toInf hb s, 1) :=
   Prod.ext rfl (toHA_fin_one X hb s)
 
 theorem toInf_injective (hS : SplitIso) : Function.Injective (X.toInf hb) := by
@@ -107,12 +106,10 @@ theorem measurable_toInf_of (hS : SplitIso) : Measurable (X.toInf hb) := by
   haveI : BorelSpace (HA (Ainf X.B.I.F) X.B.I.cm.sig X.B.I.J) := ⟨rfl⟩
   exact (continuous_toInf_of X hb hS).measurable
 
-theorem measurableSet_image_toInf (hS : SplitIso) {FdN : Set X.B.I.Ginf} (hF : MeasurableSet FdN)
-    : MeasurableSet (X.toInf hb '' FdN) := by
+theorem measurableSet_image_toInf (hS : SplitIso) {FdN : Set X.B.I.Ginf} (hF : MeasurableSet FdN) :
+    MeasurableSet (X.toInf hb '' FdN) := by
   obtain ⟨e, he⟩ := hS X.B.I.cm.sig X.B.I.J
-  let Φ
-      : X.B.I.GA
-        ≃ₜ* (HA (Ainf X.B.I.F) X.B.I.cm.sig X.B.I.J × HA (Af X.B.I.F) X.B.I.cm.sig X.B.I.J) :=
+  let Φ : X.B.I.GA ≃ₜ* (HA (Ainf X.B.I.F) X.B.I.cm.sig X.B.I.J × HA (Af X.B.I.F) X.B.I.cm.sig X.B.I.J) :=
     (toHA X.B.I hb).trans e
   have hΦ : ∀ s, Φ (s, 1) = (X.toInf hb s, 1) := fun s => by
     show e (toHA X.B.I hb (s, 1)) = _
@@ -154,16 +151,11 @@ theorem elliptic_centralizer_quotient_compact (hKo : KCompactOpen) : N4 := by
   have hm : Measurable (splitA X.B.I.cm.sig X.B.I.J) :=
     (continuous_fst.comp hc).measurable.prodMk (continuous_snd.comp hc).measurable
   have hTm : MeasurableSet (X.toInf hb '' FdN) := measurableSet_image_toInf X hb hS hF.1
-  have hKm : MeasurableSet (KX X : Set (HA (Af X.B.I.F) X.B.I.cm.sig X.B.I.J)) :=
-    (hKo X).2.measurableSet
-  have hRm : MeasurableSet
-      ((X.toInf hb '' FdN) ×ˢ (KX X : Set (HA (Af X.B.I.F) X.B.I.cm.sig X.B.I.J))) :=
+  have hKm : MeasurableSet (KX X : Set (HA (Af X.B.I.F) X.B.I.cm.sig X.B.I.J)) := (hKo X).2.measurableSet
+  have hRm : MeasurableSet ((X.toInf hb '' FdN) ×ˢ (KX X : Set (HA (Af X.B.I.F) X.B.I.cm.sig X.B.I.J))) :=
     hTm.prod hKm
-  have hFd
-      : FdA X hb u FdN
-        = Subtype.val
-          ⁻¹' (splitA X.B.I.cm.sig X.B.I.J
-            ⁻¹' ((X.toInf hb '' FdN) ×ˢ (KX X : Set (HA (Af X.B.I.F) X.B.I.cm.sig X.B.I.J)))) := by
+  have hFd : FdA X hb u FdN = Subtype.val ⁻¹' (splitA X.B.I.cm.sig X.B.I.J ⁻¹'
+      ((X.toInf hb '' FdN) ×ˢ (KX X : Set (HA (Af X.B.I.F) X.B.I.cm.sig X.B.I.J)))) := by
     ext n
     simp only [FdA, Set.mem_setOf_eq, Set.mem_preimage, Set.mem_prod, Set.mem_image]
     constructor
@@ -178,16 +170,14 @@ theorem elliptic_centralizer_quotient_compact (hKo : KCompactOpen) : N4 := by
     intro h
     have h' := congrArg (fun μ => μ Set.univ) h
     simp only [Measure.map_apply hm MeasurableSet.univ, Set.preimage_univ,
-        Measure.map_apply measurable_subtype_coe MeasurableSet.univ, Measure.coe_zero,
-        Pi.zero_apply]
-      at h'
+      Measure.map_apply measurable_subtype_coe MeasurableSet.univ, Measure.coe_zero, Pi.zero_apply] at h'
     exact (isOpen_univ.measure_ne_zero (X.measW u).μN Set.univ_nonempty) h'
   rw [hFd]
   erw [← Measure.map_apply measurable_subtype_coe (hm hRm)]
   rw [← Measure.map_apply hm hRm]
   change ((amb (X.measW u).μN).map (splitA X.B.I.cm.sig X.B.I.J)) _ = _
   rw [hN, prod_rect_of_ne_zero _ _ h0 hTm hKm, (hTie.2.2.2 u).1,
-    Measure.map_apply (measurable_toInf_of X hb hS) hTm,
-    Set.preimage_image_eq _ (toInf_injective X hb hS), Measure.map_apply measurable_subtype_coe hKm]
+    Measure.map_apply (measurable_toInf_of X hb hS) hTm, Set.preimage_image_eq _ (toInf_injective X hb hS),
+    Measure.map_apply measurable_subtype_coe hKm]
 
 end MassDataMassesW

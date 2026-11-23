@@ -1,23 +1,48 @@
 module
 
-public import Mathlib
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.BaseSettingOfGoodTower
-public import Development.AutomorphicSpectrum.Definitions.DivisibilityTowers.GoodOrigin
 public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.HasBaseDegreeSettingStrict
 public import Development.AutomorphicSpectrum.Statements.GeometryStatements.AgreementPos
-public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.PotentialsBoundedRegSettingEqReference
-public import GroundTheory.HeightsAndTheta.Heights.Regularisation.BoundedStatements
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.InterSt
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDescent.GlobalSectionsRankAlgClosed
 public import Development.AutomorphicSpectrum.Statements.TowerExistence.GoodTowerExistsX
-public import Development.AutomorphicSpectrum.Statements.GeometryStatements.HodgeLatticeFlagBound
-public import Development.AutomorphicSpectrum.Statements.GeometryStatements.TrivFlagOnHodge
-public import Development.AutomorphicSpectrum.Statements.GeometryStatements.FlatDegree
-public import Development.AutomorphicSpectrum.Statements.GeometryStatements.PadicIntegersHenselianFiniteResidue
-public import Development.AutomorphicSpectrum.Statements.GeometryStatements.HodgeComparisonCompatibility
 public import Development.AutomorphicSpectrum.Statements.GeometryStatements.CmpSt
-public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.NumberField
-public import Development.AutomorphicSpectrum.Definitions.DivisibilityTowers.LocalAtPlaces
+public import Development.AutomorphicSpectrum.Statements.GeometryStatements.NineGeoU
+public import Development.AutomorphicSpectrum.Statements.MetricStatements.AgreementIffGuarded
+public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.BaseSettingOfGoodTower
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
 
 @[expose] public section
 
@@ -28,7 +53,6 @@ open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.G
 open GroundTheory.Heights₂.Heights.LowerBoundFree GlobalTheory.CompanionTheory.Ar
   GlobalTheory.CompanionTheory.Ar.Cusp
 open ReciprocityTheory.AnForm (levi)
-set_option maxHeartbeats 1000000 in
 theorem _root_.GlobalTheory.T.base_setting_of_good_tower
     : ∀ Ch Cu : ℝ,
       NineGeoU Ch Cu → Out.WeilSt → PB.AgreementPos → PB.Proportional → Cmp.CmpSt

@@ -1,11 +1,63 @@
 module
 
-public import Mathlib
-public import ReciprocityTheory.DualLattices.DualPairInh
-public import ReciprocityTheory.DualLattices.TowerZeroSurjective
 public import ReciprocityTheory.DualLattices.LinPairStatement
-public import ReciprocityTheory.DualLattices.SubMemOfCompat
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDescent.ChartPullbacks.UniversalCharts.LePreimageOfNil
+public import Mathlib.Data.Matrix.Mul
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+public import Mathlib.CategoryTheory.Monoidal.Cartesian.Over
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Lemma
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+public import ReciprocityTheory.DualLattices.DualPairInh
+import Std.Tactic.BVDecide.Normalize.Prop
+public import Mathlib.Algebra.Polynomial.AlgebraMap
+public import Mathlib.LinearAlgebra.TensorProduct.Basis
+public import Mathlib.RingTheory.Ideal.Quotient.Defs
+public import Mathlib.RingTheory.Ideal.Quotient.Operations
+public import Mathlib.RingTheory.Nilpotent.Basic
+import Mathlib.Topology.Sheaves.Presheaf
+import ReciprocityTheory.DualLattices.CotangentSurjective
+import ReciprocityTheory.DualLattices.FormalChartAtZero
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDescent.ChartPullbacks.UniversalCharts.LePreimageOfNil
 
 @[expose] public section
 
@@ -129,8 +181,8 @@ private lemma endDiff_exists {g : ℕ} {B : BX R₀} {O : LAlg R₀} (gb : Modul
     exact Subtype.ext hη.symm
   have hB : ∑ k, gb k ⊗ₜ[R₀] m k = LinearMap.lTensor B.gg (φ.1.toLinearMap.restrict hf)
       (∑ k, gb k ⊗ₜ[R₀] Dp.ηmap (c l k)) := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     refine Finset.sum_congr rfl fun k _ => ?_
     rw [LinearMap.lTensor_tmul]
     congr 1
@@ -189,11 +241,11 @@ theorem exists_endDifferential_ringHom
       · simp
   have hmul : ∀ a b, d (a * b) = d a * d b := fun a b =>
     endDiff_unique (hd _) Dp _ fun l => by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [((hf _ _).2 a b).2, endDiff_spec (hd b), map_sum, map_sum]
+
+      rw [((hf _ _).2 a b).2, endDiff_spec (hd b), map_sum, map_sum]
       simp only [endDiff_spec (hd a)]
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [← map_sum, Finset.sum_comm]
+
+      rw [← map_sum, Finset.sum_comm]
       simp [Matrix.mul_apply, TensorProduct.tmul_sum]
   have hzero : d 0 = 0 := by
     have := hadd 0 0

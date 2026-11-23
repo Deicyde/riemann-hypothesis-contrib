@@ -1,7 +1,55 @@
 module
 
-public import Mathlib
+public import Mathlib.RingTheory.DiscreteValuationRing.Basic
+public import Mathlib.RingTheory.FiniteType
+public import Mathlib.RingTheory.MvPolynomial.Homogeneous
 public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.RangeAlgebraMapEqIInfDiscreteValuationSubring
+import Mathlib.Algebra.AffineMonoid.UniqueSums
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.MvPolynomial.IrreducibleQuadratic
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.TotallySplit
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Tactic.TypeStar
+import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
@@ -10,42 +58,27 @@ open IsLocalRing
 
 namespace GlobalTheory
 
-theorem coeff_aeval_C_mul_X
-    {K A J : Type*} [CommRing K] [CommRing A] [Algebra K A]
-    (w : J → A) (G : MvPolynomial J K) (d : ℕ)
-    : (MvPolynomial.aeval (fun j => Polynomial.C (w j) * Polynomial.X) G).coeff d
-      = MvPolynomial.aeval w (MvPolynomial.homogeneousComponent d G) := by
+theorem coeff_aeval_C_mul_X {K A J : Type*} [CommRing K] [CommRing A] [Algebra K A] (w : J → A)
+    (G : MvPolynomial J K) (d : ℕ) :
+    (MvPolynomial.aeval (fun j => Polynomial.C (w j) * Polynomial.X) G).coeff d =
+      MvPolynomial.aeval w (MvPolynomial.homogeneousComponent d G) := by
   induction G using MvPolynomial.induction_on' with
   | monomial u a =>
-    have h
-        : MvPolynomial.aeval
-            (fun j => Polynomial.C (w j) * Polynomial.X)
-            (MvPolynomial.monomial u a)
-          = Polynomial.C (MvPolynomial.aeval w (MvPolynomial.monomial u a))
-            * Polynomial.X ^ u.degree := by
+    have h : MvPolynomial.aeval (fun j => Polynomial.C (w j) * Polynomial.X)
+        (MvPolynomial.monomial u a) =
+        Polynomial.C (MvPolynomial.aeval w (MvPolynomial.monomial u a)) *
+          Polynomial.X ^ u.degree := by
       simp only [MvPolynomial.aeval_monomial, Finsupp.prod, mul_pow, Finset.prod_mul_distrib,
         Finset.prod_pow_eq_pow_sum, map_mul, map_prod, map_pow, Polynomial.algebraMap_apply,
         mul_assoc]
       rfl
-    rw [h, Polynomial.coeff_C_mul_X_pow,
-      MvPolynomial.homogeneousComponent_of_mem (MvPolynomial.isHomogeneous_monomial a
-        (rfl : u.degree = u.degree))]
+    rw [h, Polynomial.coeff_C_mul_X_pow, MvPolynomial.homogeneousComponent_of_mem
+      (MvPolynomial.isHomogeneous_monomial a (rfl : u.degree = u.degree))]
     split_ifs <;> simp
   | add p q hp hq => simp only [map_add (f := _), Polynomial.coeff_add, hp, hq]
 
-theorem exists_complete_discreteValuationRing_of_mem_closure_cone
-    : ∀ (K A J : Type) [Field K] [CommRing A] [IsDomain A] [Algebra K A] [Fintype J],
-      Algebra.FiniteType K A
-        → ∀ (w : J → A) (v : J → K),
-          v ≠ 0
-            → (∀ (G : MvPolynomial J K) (d : ℕ),
-              G.IsHomogeneous d → MvPolynomial.aeval w G = 0 → MvPolynomial.eval v G = 0)
-            → ∃ (W : Type) (_ : CommRing W) (_ : IsDomain W) (_ : IsDiscreteValuationRing W)
-                (_ : Algebra K W) (f : A →ₐ[K] FractionRing W) (s : FractionRing W) (w' : J → W),
-              IsAdicComplete (IsLocalRing.maximalIdeal W) W ∧ s ≠ 0
-                ∧ ∀ j,
-                  algebraMap W (FractionRing W) (w' j) = s * f (w j)
-                    ∧ w' j - algebraMap K W (v j) ∈ IsLocalRing.maximalIdeal W := by
+theorem exists_complete_discreteValuationRing_of_mem_closure_cone :
+    ∀ (K A J : Type) [Field K] [CommRing A] [IsDomain A] [Algebra K A] [Fintype J], Algebra.FiniteType K A → ∀ (w : J → A) (v : J → K), v ≠ 0 → (∀ (G : MvPolynomial J K) (d : ℕ), G.IsHomogeneous d → MvPolynomial.aeval w G = 0 → MvPolynomial.eval v G = 0) → ∃ (W : Type) (_ : CommRing W) (_ : IsDomain W) (_ : IsDiscreteValuationRing W) (_ : Algebra K W) (f : A →ₐ[K] FractionRing W) (s : FractionRing W) (w' : J → W), IsAdicComplete (IsLocalRing.maximalIdeal W) W ∧ s ≠ 0 ∧ ∀ j, algebraMap W (FractionRing W) (w' j) = s * f (w j) ∧ w' j - algebraMap K W (v j) ∈ IsLocalRing.maximalIdeal W := by
   intro K A J _ _ _ _ _ hA w v hv hG
   let L := FractionRing (Polynomial A)
   have hinj : Function.Injective (algebraMap (Polynomial A) L) := IsFractionRing.injective _ _
@@ -58,10 +91,9 @@ theorem exists_complete_discreteValuationRing_of_mem_closure_cone
   have hker : RingHom.ker Φ ≤ RingHom.ker (MvPolynomial.eval v) := by
     intro G h
     have h1 : ψ G = 0 := hinj (h.trans (map_zero _).symm)
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [RingHom.mem_ker, ← MvPolynomial.sum_homogeneousComponent G, map_sum]
-    refine Finset.sum_eq_zero fun d _ =>
-      hG _ d (MvPolynomial.homogeneousComponent_isHomogeneous d G) ?_
+
+    rw [RingHom.mem_ker, ← MvPolynomial.sum_homogeneousComponent G, map_sum]
+    refine Finset.sum_eq_zero fun d _ => hG _ d (MvPolynomial.homogeneousComponent_isHomogeneous d G) ?_
     rw [← coeff_aeval_C_mul_X]
     change (ψ G).coeff d = 0
     rw [h1, Polynomial.coeff_zero]
@@ -79,29 +111,20 @@ theorem exists_complete_discreteValuationRing_of_mem_closure_cone
     rw [IsScalarTower.algebraMap_apply K (Polynomial A) L, ← ψ.commutes]
     rfl
   let t : J → L := fun j => Φ (MvPolynomial.X j - MvPolynomial.C (v j))
-  have ht
-      : ∀ j,
-        t j
-          = algebraMap (Polynomial A) L
-            (Polynomial.C (w j) * Polynomial.X - Polynomial.C (algebraMap K A (v j))) := fun j => by
+  have ht : ∀ j, t j = algebraMap (Polynomial A) L
+      (Polynomial.C (w j) * Polynomial.X - Polynomial.C (algebraMap K A (v j))) := fun j => by
     simp [t, Φ, ψ]
-  obtain ⟨V, hV, hKV, -, htV⟩ :=
-    exists_discreteValuationSubring_of_valuationSubring (R := K) U
-      (fun r => hU ⟨_, hC r⟩)
-      Set.finite_empty (Set.finite_range t) (by simp)
-      (by
-        rintro _ ⟨j, rfl⟩
-        exact hU' ⟨
-          _,
-          Ideal.mem_map_of_mem _
-            (show MvPolynomial.X j - MvPolynomial.C (v j) ∈ _ by simp [RingHom.mem_ker]),
-          rfl
-        ⟩)
-      (by
-        obtain ⟨j, hj⟩ := Function.ne_iff.mp hv
-        refine ⟨_, ⟨j, rfl⟩, fun h => hj ?_⟩
-        rw [ht, map_eq_zero_iff _ hinj] at h
-        simpa using congrArg (fun p : Polynomial A => p.coeff 0) h)
+  obtain ⟨V, hV, hKV, -, htV⟩ := exists_discreteValuationSubring_of_valuationSubring (R := K) U
+    (fun r => hU ⟨_, hC r⟩) Set.finite_empty (Set.finite_range t) (by simp)
+    (by
+      rintro _ ⟨j, rfl⟩
+      exact hU' ⟨_, Ideal.mem_map_of_mem _
+        (show MvPolynomial.X j - MvPolynomial.C (v j) ∈ _ by simp [RingHom.mem_ker]), rfl⟩)
+    (by
+      obtain ⟨j, hj⟩ := Function.ne_iff.mp hv
+      refine ⟨_, ⟨j, rfl⟩, fun h => hj ?_⟩
+      rw [ht, map_eq_zero_iff _ hinj] at h
+      simpa using congrArg (fun p : Polynomial A => p.coeff 0) h)
   let W := AdicCompletion (maximalIdeal V) V
   let κ : K →+* V := (algebraMap K L).codRestrict V hKV
   let ι : V →+* W := algebraMap V W
@@ -111,31 +134,20 @@ theorem exists_complete_discreteValuationRing_of_mem_closure_cone
   let g : L →+* FractionRing W := IsFractionRing.lift hι
   have hg : ∀ x : V, g x = algebraMap W (FractionRing W) (ι x) := fun x =>
     IsFractionRing.lift_algebraMap hι x
-  let f : A →ₐ[K] FractionRing W := {
-    g.comp ((algebraMap (Polynomial A) L).comp Polynomial.C) with
-    commutes' := fun r => by
-      rw [IsScalarTower.algebraMap_apply K W (FractionRing W)]
-      exact hg (κ r)
-  }
+  let f : A →ₐ[K] FractionRing W :=
+    { g.comp ((algebraMap (Polynomial A) L).comp Polynomial.C) with
+      commutes' := fun r => by
+        rw [IsScalarTower.algebraMap_apply K W (FractionRing W)]
+        exact hg (κ r) }
   have htm : ∀ j, t j ∈ V := fun j => V.nonunits_subset (htV _ ⟨j, rfl⟩)
-  refine ⟨
-    W,
-    inferInstance,
-    inferInstance,
-    inferInstance,
-    inferInstance,
-    f,
-    g (algebraMap (Polynomial A) L Polynomial.X),
-    fun j => ι (⟨t j, htm j⟩ + κ (v j)),
-    inferInstance,
-    ?_,
-    fun j => ⟨?_, ?_⟩
-  ⟩
+  refine ⟨W, inferInstance, inferInstance, inferInstance, inferInstance, f,
+    g (algebraMap (Polynomial A) L Polynomial.X), fun j => ι (⟨t j, htm j⟩ + κ (v j)),
+    inferInstance, ?_, fun j => ⟨?_, ?_⟩⟩
   · rw [map_ne_zero, map_ne_zero_iff _ hinj]
     exact Polynomial.X_ne_zero
   · rw [← hg]
-    change g (t j + algebraMap (Polynomial A) L (Polynomial.C (algebraMap K A (v j))))
-      = _ * g (algebraMap (Polynomial A) L (Polynomial.C (w j)))
+    change g (t j + algebraMap (Polynomial A) L (Polynomial.C (algebraMap K A (v j)))) =
+      _ * g (algebraMap (Polynomial A) L (Polynomial.C (w j)))
     rw [ht, ← map_add (f := _), sub_add_cancel, mul_comm, map_mul, map_mul]
   · change ι _ - ι (κ (v j)) ∈ _
     rw [← map_sub, add_sub_cancel_right]

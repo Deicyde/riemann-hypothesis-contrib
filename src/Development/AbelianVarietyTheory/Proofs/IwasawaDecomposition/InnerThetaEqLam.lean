@@ -1,18 +1,56 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.StableIffCarrierEq
 public import Development.AbelianVarietyTheory.PublishedTheorems.AutomorphicForms₂.ExistsNormLeHeightPow
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.HasLab
-public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.ExistsSphericalOperatorsRowsNormalEigenspaces
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsSphericalEigensystemOfFiniteTypeWithParts
+public import Formalism.SharpRestriction.Divisibility.LiftErrorLocal
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.SchurConstantsExistOnChainOfCuspRapidDecay
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.EigensystemCarriedByFiniteTypeOfMeetsLevelRows
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsSphericalEigensystemOfFiniteTypeWithParts
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.LiftCuspFormSpaceThetaMapEqDataStatement
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.LiftThetaMapInnerEqLambdaMulRationalVectorsStatement
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.LiftThetaMapOrthogonalKernelEqRationalSpanStatement
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.LiftThetaMapLabelPartPreimageRationalSpanStatement
-public import Formalism.LocalToGlobal.IndefiniteReal.CxLemmas
-public import Formalism.LocalToGlobal.IndefiniteReal.PackageFromPrimitiveStatements
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.LiftThetaMapOrthogonalKernelEqRationalSpanStatement
+import Development.AbelianVarietyTheory.Proofs.SatakeParameters.ExistsSphericalOperatorsRowsNormalEigenspaces
+import Development.AbelianVarietyTheory.Proofs.SatakeParameters.HeckeCharacterisationPlacesPartsOfWeak
+import Formalism.LocalToGlobal.Divisibility.LiftLatLemmas
+import Formalism.LocalToGlobal.IndefiniteReal.CxLemmas
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+public import Development.AbelianVarietyTheory.Definitions.Divisors.InstCMHostS
+public import Development.AbelianVarietyTheory.Definitions.GaloisGeometry.NormalFam
 
 @[expose] public section
 
@@ -43,7 +81,6 @@ theorem adj_eig
     rw [LinearMap.adjoint_inner_left, h, inner_smul_left, Complex.conj_ofReal]
   rw [ha, map_smul]
 
-set_option maxHeartbeats 2000000 in
 theorem eig_parts
     : GlobalTheory.Published.CuspRapidDecay
       → ∀ (D : D7) (G : Type) [Group G] [Fintype G] (Pl0 I0 T : Type)
@@ -89,7 +126,6 @@ theorem eig_parts
         ⟨0, Y.hm⟩ c hc i U hU
     exact ⟨x, by rw [hWc]; exact hx, hxU⟩
 
-set_option maxHeartbeats 2000000 in
 theorem carried
     : GlobalTheory.Published.CuspRapidDecay
       → ∀ (D : D7) (G : Type) [Group G] [Fintype G] (Pl0 I0 T : Type)
@@ -176,7 +212,6 @@ theorem carried
   rw [Submodule.mem_orthogonal_singleton_iff_inner_right] at hself
   exact hx0 (inner_self_eq_zero.1 hself)
 
-set_option maxHeartbeats 2000000 in
 theorem hasLab_exists
     : GlobalTheory.Published.CuspRapidDecay
       → ∀ (D : D7) (G : Type) [Group G] [Fintype G] (Pl0 I0 T : Type)
@@ -218,7 +253,6 @@ theorem hasLab_exists
     rw [← hU'e, hwU]
     rfl
 
-set_option maxHeartbeats 2000000 in
 theorem thetaMap_surjective
     : ∀ (D : D7) (G : Type) [Group G] [Fintype G] (Pl0 I0 T : Type)
         (A3 : FamIn3 D.what₂.LL G Pl0 I0 (List ℕ) T D.R.m) (Ks : Type) [Field Ks] [NumberField Ks]
@@ -259,7 +293,6 @@ theorem thetaMap_surjective
   rw [hθ i t]
   exact congrArg (Z.jW i) ((congrArg (((A3.indefDown (s0Of R F)).θ i t).mulVec) hz').trans hz)
 
-set_option maxHeartbeats 2000000 in
 theorem inner_theta_eq_lam
     : ∀ (D : D7) (G : Type) [Group G] [Fintype G] (Pl0 I0 T : Type)
         (A3 : FamIn3 D.what₂.LL G Pl0 I0 (List ℕ) T D.R.m) (Ks : Type) [Field Ks] [NumberField Ks]
@@ -354,7 +387,6 @@ theorem inner_theta_eq_lam
   | add y z _ _ h1 h2 => rw [map_add (f := _), inner_add_left, inner_add_left, h1, h2, mul_add]
   | smul c y _ h => rw [map_smul, inner_smul_left, inner_smul_left, h]; ring
 
-set_option maxHeartbeats 2000000 in
 theorem eigenvalue_eq_of_label
     : ∀ (D : D7) (G : Type) [Group G] [Fintype G] (Pl0 I0 T : Type)
         (A3 : FamIn3 D.what₂.LL G Pl0 I0 (List ℕ) T D.R.m) (Ks : Type) [Field Ks] [NumberField Ks]

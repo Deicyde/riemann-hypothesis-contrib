@@ -1,24 +1,62 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentations.LocalMaximality.DualForm
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.RegularFormsIsBundleProjectiveCoverStatement
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.StandardOpenCoordinateRingIsFractionRingIsNoetheStatement
+import Development.AbelianVarietyTheory.Proofs.DivisorProofs.StandardOpenCoordinateRingIsFractionRingIsNoetheStatement
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
 
 @[expose] public section
 
-open KaehlerDifferential GlobalTheory.CechDR GlobalTheory.PD GlobalTheory.WH GlobalTheory.W1
-  UpperTheory.Gal.productCup_of_system
+open KaehlerDifferential GlobalTheory.CechDR GlobalTheory.PD GlobalTheory.WH GlobalTheory.W1 UpperTheory.Gal.productCup_of_system
 open scoped TensorProduct
 
-private theorem dual_of_lattice
-    {A F W : Type} [CommRing A] [IsDomain A] [Field F] [Algebra A F] [IsFractionRing A F]
-    [AddCommGroup W] [Module F W] [Module A W] [IsScalarTower A F W]
-    (P : Submodule A W) [Module.Finite A P] [Module.Projective A P]
-    (hP : Submodule.span F (P : Set W) = ⊤)
-    : ∃ (n : ℕ) (v : Fin n → W) (φ : Fin n → W →ₗ[F] F),
-      (∀ k, v k ∈ P) ∧ (∀ k, ∀ p ∈ P, φ k p ∈ (algebraMap A F).range)
-        ∧ ∀ w, w = ∑ k, φ k w • v k := by
+private theorem dual_of_lattice {A F W : Type} [CommRing A] [IsDomain A] [Field F] [Algebra A F] [IsFractionRing A F]
+    [AddCommGroup W] [Module F W] [Module A W] [IsScalarTower A F W] (P : Submodule A W)
+    [Module.Finite A P] [Module.Projective A P] (hP : Submodule.span F (P : Set W) = ⊤) :
+    ∃ (n : ℕ) (v : Fin n → W) (φ : Fin n → W →ₗ[F] F), (∀ k, v k ∈ P) ∧
+      (∀ k, ∀ p ∈ P, φ k p ∈ (algebraMap A F).range) ∧ ∀ w, w = ∑ k, φ k w • v k := by
   classical
   obtain ⟨n, f, g, hf, hg, hfg⟩ := Module.Finite.exists_comp_eq_id_of_projective A P
   let S := nonZeroDivisors A
@@ -32,17 +70,15 @@ private theorem dual_of_lattice
       obtain ⟨s, p, h⟩ := ha
       obtain ⟨t, q, h'⟩ := hb
       refine ⟨s * t, (t : A) • p + (s : A) • q, ?_⟩
-      simp only [Submonoid.coe_mul, smul_add, Submodule.coe_add, Submodule.coe_smul, ← h, ← h',
-        smul_smul]
+      simp only [Submonoid.coe_mul, smul_add, Submodule.coe_add, Submodule.coe_smul, ← h, ← h', smul_smul]
       rw [mul_comm (t : A) (s : A)]
     | smul c a _ ha =>
       obtain ⟨s, p, h⟩ := ha
       obtain ⟨b, t, rfl⟩ := IsLocalization.exists_mk'_eq S c
       refine ⟨s * t, b • p, ?_⟩
-      have ht : algebraMap A F (t : A) * IsLocalization.mk' F b t = algebraMap A F b :=
-        IsLocalization.mk'_spec' F b t
-      rw [Submodule.coe_smul, ← h, Submonoid.coe_mul, mul_comm, mul_smul, smul_comm (s : A),
-        ← algebraMap_smul F (t : A), smul_smul, ht, algebraMap_smul, smul_comm]
+      have ht : algebraMap A F (t : A) * IsLocalization.mk' F b t = algebraMap A F b := IsLocalization.mk'_spec' F b t
+      rw [Submodule.coe_smul, ← h, Submonoid.coe_mul, mul_comm, mul_smul, smul_comm (s : A), ← algebraMap_smul F (t : A),
+        smul_smul, ht, algebraMap_smul, smul_comm]
   have hloc : IsLocalizedModule S P.subtype := by
     refine ⟨fun s => ?_, fun w => ?_, fun {p q} h => ⟨1, ?_⟩⟩
     · have hs : algebraMap A F (s : A) ≠ 0 :=
@@ -76,7 +112,7 @@ private theorem dual_of_lattice
       ext j
       simp [Finset.sum_apply, Pi.single_apply]
     conv_lhs => rw [← h1, h2]
-    set_option synthInstance.maxHeartbeats 100000 in
+
     simp [map_sum, hφ, algebraMap_smul]
   refine ⟨n, fun k => (f (Pi.single k 1) : P), φ, fun k => (f (Pi.single k 1)).2, ?_, ?_⟩
   · rintro k p hp
@@ -88,16 +124,13 @@ private theorem dual_of_lattice
     intro w
     simpa using congrArg (fun u => u w) this
 
-private theorem lat_of_isBundle
-    {F : Type} [Field F] [Algebra ℂ F]
-    {d : ℕ} {x : Fin (d + 1) → F} (hx : IsPd ℂ x)
-    {W V : Type} [AddCommGroup W] [Module F W] [Module ℂ W] [IsScalarTower ℂ F W] [AddCommGroup V]
-    [Module F V] [Module ℂ V] [IsScalarTower ℂ F V]
-    (e : W →ₗ[F] V) (he : Function.Injective e)
-    (L : Finset (Fin (d + 1)) → Submodule ℂ W) (hL : IsBundle ℂ x L)
-    (I : Finset (Fin (d + 1))) (i : Fin (d + 1)) (hi : i ∈ I)
-    (M : Submodule ℂ V) (hM : ∀ m ∈ M, ∃ w, e w = m) (hML : ∀ w, w ∈ L I ↔ e w ∈ M)
-    : Lat (rA ℂ x I) M ∧ ∀ w, e w ∈ Submodule.span F (M : Set V) := by
+private theorem lat_of_isBundle {F : Type} [Field F] [Algebra ℂ F] {d : ℕ} {x : Fin (d + 1) → F} (hx : IsPd ℂ x)
+    {W V : Type} [AddCommGroup W] [Module F W] [Module ℂ W] [IsScalarTower ℂ F W]
+    [AddCommGroup V] [Module F V] [Module ℂ V] [IsScalarTower ℂ F V] (e : W →ₗ[F] V)
+    (he : Function.Injective e) (L : Finset (Fin (d + 1)) → Submodule ℂ W) (hL : IsBundle ℂ x L)
+    (I : Finset (Fin (d + 1))) (i : Fin (d + 1)) (hi : i ∈ I) (M : Submodule ℂ V)
+    (hM : ∀ m ∈ M, ∃ w, e w = m) (hML : ∀ w, w ∈ L I ↔ e w ∈ M) :
+    Lat (rA ℂ x I) M ∧ ∀ w, e w ∈ Submodule.span F (M : Set V) := by
   classical
   haveI : IsFractionRing (rA ℂ x {i}) F := (GlobalTheory.T.standardOpenCoordinateRing_isFractionRing_isNoetherianRing ℂ F d x hx {i} (Finset.singleton_nonempty i)).1
   obtain ⟨s, hs, hsF⟩ := hL.fg i
@@ -124,8 +157,8 @@ private theorem lat_of_isBundle
   have hLsub : ∀ w ∈ L {i}, w ∈ L I := fun w hw => by
     rw [hLI]
     exact Submodule.subset_span hw
-  have hmono : rA ℂ x {i} ≤ rA ℂ x I :=
-    Algebra.adjoin_mono fun y ⟨a, ha, h⟩ => ⟨a, by rw [Finset.mem_singleton.1 ha]; exact hi, h⟩
+  have hmono : rA ℂ x {i} ≤ rA ℂ x I := Algebra.adjoin_mono fun y ⟨a, ha, h⟩ =>
+    ⟨a, by rw [Finset.mem_singleton.1 ha]; exact hi, h⟩
   have hsm : ∀ c ∈ rA ℂ x I, ∀ w ∈ L I, c • w ∈ L I := fun c hc w hw => by
     rw [hLI] at hw ⊢
     exact Submodule.smul_mem (Submodule.span (rA ℂ x I) (L {i} : Set W)) (⟨c, hc⟩ : rA ℂ x I) hw
@@ -139,8 +172,7 @@ private theorem lat_of_isBundle
       obtain ⟨y, hy⟩ := hφ k z (Submodule.subset_span hz)
       rw [← hy]
       exact hmono y.2
-    | zero =>
-      simpa using (rA ℂ x I).zero_mem
+    | zero => simpa using (rA ℂ x I).zero_mem
     | add a b _ _ ha hb =>
       rw [map_add (f := _)]
       exact (rA ℂ x I).add_mem ha hb
@@ -149,18 +181,7 @@ private theorem lat_of_isBundle
         rw [show c • a = (c : F) • a from rfl, map_smul, smul_eq_mul]
       rw [this]
       exact (rA ℂ x I).mul_mem c.2 ha
-  refine ⟨
-    ⟨
-      fun c hc m hm => ?_,
-      n,
-      fun k => e (v k),
-      fun k => φ k ∘ₗ r,
-      fun k => ?_,
-      fun k m hm => ?_,
-      fun m hm => ?_
-    ⟩,
-    fun w => ?_
-  ⟩
+  refine ⟨⟨fun c hc m hm => ?_, n, fun k => e (v k), fun k => φ k ∘ₗ r, fun k => ?_, fun k m hm => ?_, fun m hm => ?_⟩, fun w => ?_⟩
   · obtain ⟨w, rfl⟩ := hM m hm
     rw [← map_smul]
     exact (hML _).1 (hsm c hc w ((hML w).2 hm))
@@ -168,12 +189,11 @@ private theorem lat_of_isBundle
   · obtain ⟨w, rfl⟩ := hM m hm
     simpa [hre] using hval k w ((hML w).2 hm)
   · obtain ⟨w, rfl⟩ := hM m hm
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [LinearMap.comp_apply, hre, ← map_smul, ← map_sum]
+
+    simp only [LinearMap.comp_apply, hre, ← map_smul, ← map_sum]
     exact congrArg e (hid w)
   · have hw : w ∈ Submodule.span F (s : Set W) := hsF ▸ Submodule.mem_top
-    have hsL : ∀ z ∈ s, e z ∈ M := fun z hz =>
-      (hML z).1 (hLsub z (hPL z (by rw [hPs]; exact Submodule.subset_span hz)))
+    have hsL : ∀ z ∈ s, e z ∈ M := fun z hz => (hML z).1 (hLsub z (hPL z (by rw [hPs]; exact Submodule.subset_span hz)))
     have hmap : (Submodule.span F (s : Set W)).map e ≤ Submodule.span F (M : Set V) := by
       rw [Submodule.map_span]
       refine Submodule.span_mono ?_
@@ -181,21 +201,18 @@ private theorem lat_of_isBundle
       exact hsL z hz
     exact hmap ⟨w, hw, rfl⟩
 
-theorem UpperTheory.Gal.productCup_of_system.latOm_of : LatOm := by
+theorem UpperTheory.Gal.productCup_of_system.latOm_of :
+    LatOm := by
   intro F K _ _ _ _ _ _ d x hc a I hI
   obtain ⟨i, hi⟩ := hI
-  have hB :=
-    GlobalTheory.T.regularForms_isBundle_projectiveCover ℂ F K d (xv x) hc a (⋀[K]^a Ω[K⁄ℂ])
-      (⋀[K]^a Ω[K⁄ℂ]).subtype Subtype.val_injective (Submodule.range_subtype _)
+  have hB := GlobalTheory.T.regularForms_isBundle_projectiveCover ℂ F K d (xv x) hc a (⋀[K]^a Ω[K⁄ℂ]) (⋀[K]^a Ω[K⁄ℂ]).subtype
+    Subtype.val_injective (Submodule.range_subtype _)
   have hle : omB ℂ K (rB ℂ K (xv x) I) a ≤ (⋀[K]^a Ω[K⁄ℂ]).restrictScalars ℂ := by
     refine Submodule.span_le.2 ?_
     rintro _ ⟨b, -, v, -, rfl⟩
     refine (⋀[K]^a Ω[K⁄ℂ]).smul_mem b ?_
     rw [← ExteriorAlgebra.ιMulti_span_fixedDegree]
     exact Submodule.subset_span ⟨_, rfl⟩
-  have key :=
-    lat_of_isBundle hc.pd (((⋀[K]^a Ω[K⁄ℂ]).subtype).restrictScalars F) Subtype.val_injective _ hB I
-      i hi (omB ℂ K (rB ℂ K (xv x) I) a)
-      (fun m hm => ⟨⟨m, hle hm⟩, rfl⟩)
-      (fun w => Iff.rfl)
+  have key := lat_of_isBundle hc.pd (((⋀[K]^a Ω[K⁄ℂ]).subtype).restrictScalars F) Subtype.val_injective _ hB I i hi
+    (omB ℂ K (rB ℂ K (xv x) I) a) (fun m hm => ⟨⟨m, hle hm⟩, rfl⟩) (fun w => Iff.rfl)
   exact ⟨key.1, fun w hw => key.2 ⟨w, hw⟩⟩

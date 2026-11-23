@@ -1,14 +1,57 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.RingSpecNormalisedCharacterEq
 public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.TypeOrthOfAvTied
-public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.FiniteDimensionalForms
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.UnitaryCongruenceConjContainsCongruence
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.SmoothAdmissibleUnitaryMemSupIsotypicParts
+public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.IsWildInertiaCyclotomicElement
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ClassSumEqConstMulPeterssonStatement
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.FiniteDoubleCosetsDefiniteUnitaryMaximalLevelStatement
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.AlgWtExistsInvFormStatement
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.FiniteDoubleCosetsDefiniteUnitaryMaximalLevelStatement
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.SmoothAdmissibleUnitaryMemSupIsotypicParts
+import Development.AbelianVarietyTheory.Proofs.SatakeParameters.ExistsFiniteClass
+import Development.AbelianVarietyTheory.Proofs.SatakeParameters.FiniteDimensionalForms
+import Formalism.LocalToGlobal.GaloisLevelStructure.Checks
+import Formalism.LocalToGlobal.IndefiniteReal.CongNatCastEqOneTmul
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Tactic.TypeStar
+import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.NStageTrivialCharacterCoeffEqAlt
+import Formalism.LocalToGlobal.IndefiniteReal.DoubleCosetOperators.Objects
+import Formalism.LocalToGlobal.NormalizedHeckeFactors.TypesDefs
+import Formalism.LocalToGlobal.UnitaryNorms.IsUnitaryNormOf
 
 @[expose] public section
 
@@ -376,8 +419,8 @@ theorem typeSp_decomp
   have hy1 : ∀ i : P, ∀ w ∈ NG.isoTyp a.ρ (S i), B y w = 0 := by
     intro i w hw
     have e : B y w = B (x - p i) w - ∑ j ∈ Finset.univ.erase i, B (p j) w := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [hy, map_sub, map_sum, LinearMap.sub_apply, LinearMap.sum_apply]
+
+      simp only [hy, map_sub, map_sum, LinearMap.sub_apply, LinearMap.sum_apply]
       rw [← Finset.add_sum_erase _ _ (Finset.mem_univ i)]
       ring
     rw [e, hpo i w hw,

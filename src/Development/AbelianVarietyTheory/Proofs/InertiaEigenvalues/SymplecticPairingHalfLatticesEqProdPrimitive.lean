@@ -1,15 +1,50 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.ConjTupRefl
-public import Development.AbelianVarietyTheory.Definitions.Divisors.GenReads
-public import Development.AbelianVarietyTheory.Definitions.ThetaValues.ExistsRootNotMem
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.OneMapOfOfExtends
-public import Formalism.SharpRestriction.Divisibility.GeneratorPowers.ThExprUniqOfChartIndep2
+public import Formalism.LocalToGlobal.IndefiniteReal.DatumVec
+public import Development.AbelianVarietyTheory.Proofs.AdelicLatticeProofs.IsSelfDualCLatFrame
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.AdelicCharacterFactorPrimitiveOnIdempotentSumStatement
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.IntegralIffSelfDualTraceCharacterSplitPlacesStatement
-public import Development.AbelianVarietyTheory.Proofs.AdelicLatticeProofs.IsSelfDualCLatFrame
-public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.ToEAfOrientedHermitianFormEqTraceFrames
+import Development.AbelianVarietyTheory.Proofs.TwistedOperators.ToEAfOrientedHermitianFormEqTraceFrames
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.LinearAlgebra.FreeModule.IdealQuotient
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+public import Mathlib.NumberTheory.LegendreSymbol.Complex
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
+import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.ConjTupRefl
+import Development.AbelianVarietyTheory.Definitions.ThetaValues.ExistsRootNotMem
 
 @[expose] public section
 
@@ -25,7 +60,6 @@ open Classical
 
 namespace GlobalTheory.FlatPairing
 
-set_option synthInstance.maxHeartbeats 400000 in
 theorem trace_mul_int
     {D : D7} {a b : ℕ} (A : Matrix (Fin a) (Fin b) (EAf D)) (B : Matrix (Fin b) (Fin a) (EAf D))
     (hA : IsIntM A) (hB : IsIntM B)
@@ -34,7 +68,6 @@ theorem trace_mul_int
   exact Subring.sum_mem _ fun i _ =>
     Subring.sum_mem _ fun j _ => Subring.mul_mem _ (hA i j) (hB j i)
 
-set_option synthInstance.maxHeartbeats 400000 in
 theorem resS_trace_mul
     {D : D7} (PP : Pl D.host.E)
     {a b : ℕ}
@@ -49,8 +82,8 @@ theorem resS_trace_mul
       simp only [Matrix.trace, Matrix.diag_apply, Matrix.mul_apply, AddSubmonoidClass.coe_finsetSum,
         MulMemClass.coe_mul]
   rw [h1]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, map_mul, Matrix.trace, Matrix.diag_apply, Matrix.mul_apply]
+
+  simp only [map_sum, map_mul, Matrix.trace, Matrix.diag_apply, Matrix.mul_apply]
   refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
   simp only [redM, dif_pos (hA i j), dif_pos (hB j i)]
 
@@ -70,8 +103,6 @@ theorem exists_primitive {E : Type} [Field E] [NumberField E] (PP : Pl E)
   letI : Fintype (𝓞 E ⧸ PP.asIdeal) := Fintype.ofFinite _
   exact ⟨_, AddChar.FiniteField.primitiveChar_to_Complex_isPrimitive (𝓞 E ⧸ PP.asIdeal)⟩
 
-set_option synthInstance.maxHeartbeats 400000 in
-set_option maxHeartbeats 800000 in
 theorem pairing_eq_prod
     : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ) (S T : HSp D)
         (ΛS : Submodule (𝓞 D.host.E) (Fin S.rank → D.host.E))

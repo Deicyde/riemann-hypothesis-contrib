@@ -1,8 +1,48 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.FactTypePrime
+public import Formalism.LocalToGlobal.IndefiniteReal.LinksChar
+public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.FiniteDimensionalModel
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.UnitaryGroupAdelicClassesViaFiniteAdelicPart
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ColLieApply
 
 @[expose] public section
 
@@ -184,7 +224,6 @@ theorem stab_trivial
       (by rw [key]; exact finE_mem_lev hκ hk)
   exact Subtype.ext (AdelCls.rat_inj V γ γ.2 hu)
 
-set_option maxHeartbeats 1000000 in
 private theorem clsA_eq_of_ratF_mul
     {h h' : GA D V} {γ : GQ V} {k : Formalism.IndefR.Bridge.Gf V} (hk : k ∈ (levEnv V β L).J)
     (e : (finHom V).rangeRestrict h'
@@ -237,7 +276,6 @@ theorem exists_form_value
   rintro ⟨γ, q, hq, e⟩
   exact hne (clsA_eq_of_eq hq e)
 
-set_option maxHeartbeats 1000000 in
 private theorem apply_rangeRestrict_mul_eq_of_mem_adForms_of_mem_levS
     {c : CoefA V}
     (hχ : ∀ x, levFn β (flag1L L) x = 1)
@@ -283,7 +321,6 @@ theorem toMap_apply
       = pr (c.ρ g⁻¹ (f ((finHom V).rangeRestrict g))) (PiTensorProduct.tprod ℂ v) :=
   rfl
 
-set_option maxHeartbeats 1000000 in
 private theorem exists_mult_evAt_eq_and_vanish_off_class
     : ∀ (D : D7) (θ : InfFam D) (V : HSp D) (S : D.what₂.Tau → SPar) (M : DSModel V S) (c : CoefA V)
         (pr : c.W →ₗ[ℂ] SmT M →ₗ[ℂ] ℂ) (β : GL (Fin V.rank) (EAf D)) (L : LevDat D.host.E ℂ V.rank),

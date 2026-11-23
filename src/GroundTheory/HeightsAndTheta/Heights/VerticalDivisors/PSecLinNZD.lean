@@ -1,8 +1,48 @@
 module
 
-public import Mathlib
 public import GroundTheory.HeightsAndTheta.Heights.VerticalDivisors.Statements
 public import GroundTheory.HeightsAndTheta.Heights.VerticalDivisors.StatementsSpecFirst
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -14,12 +54,10 @@ open MvPolynomial
 
 noncomputable section
 
-theorem eval_specRest
-    {k E : Type*} [CommRing k] [CommRing E]
-    (φ : k →+* E)
-    {n e : ℕ} (g : MvPolynomial (Fin (e + 1) × Fin n) k) (y : Par e n → E) (u : Fin n → k)
-    : eval (fun j => φ (u j)) (specRest φ g y)
-      = eval₂ φ (fun ij : Fin e × Fin n => y (.inl ij)) (specFirst g u) := by
+theorem eval_specRest {k E : Type*} [CommRing k] [CommRing E] (φ : k →+* E) {n e : ℕ}
+    (g : MvPolynomial (Fin (e + 1) × Fin n) k) (y : Par e n → E) (u : Fin n → k) :
+    eval (fun j => φ (u j)) (specRest φ g y) =
+      eval₂ φ (fun ij : Fin e × Fin n => y (.inl ij)) (specFirst g u) := by
   induction g using MvPolynomial.induction_on with
   | C a => simp [specRest, specFirst]
   | add p q hp hq =>
@@ -32,9 +70,8 @@ theorem eval_specRest
     obtain ⟨i, j⟩ := ij
     cases i using Fin.cases <;> simp [specFirstVar]
 
-theorem SecLinNZD.proof
-    (h1 : ChowNormForm.Statement) (h2 : NormFormEval.Statement) (h3 : SpecFirstNeField.Statement)
-    : SecLinNZD.Statement := by
+theorem SecLinNZD.proof (h1 : ChowNormForm.Statement) (h2 : NormFormEval.Statement)
+    (h3 : SpecFirstNeField.Statement) : SecLinNZD.Statement := by
   intro k E _ _ _ _ n e Q g y u hy hQ hg hu
   set QE := Q.map (MvPolynomial.map (algebraMap k E)) with hQE
   obtain ⟨hfin, c, _, hcg⟩ := h1 k E n e Q g y hy hQ hg
@@ -42,25 +79,24 @@ theorem SecLinNZD.proof
     hy.comp _ Sum.inl_injective
   have hne : eval (fun j => algebraMap k E (u j)) (specRest (algebraMap k E) g y) ≠ 0 := by
     rw [eval_specRest]
-    exact fun h0 =>
-      h3 k n e Q g u hQ hg hu (hy'.eq_zero_of_aeval_eq_zero _ (by rw [aeval_def]; exact h0))
-  have hsum
-      : (∑ j, algebraMap E (SecAlg QE y) (algebraMap k E (u j)) * secCoord QE y j)
-        = secLin QE y (fun j => algebraMap k E (u j)) := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [secLin, linForm, map_sum, map_mul]
+    exact fun h0 => h3 k n e Q g u hQ hg hu
+      (hy'.eq_zero_of_aeval_eq_zero _ (by rw [aeval_def]; exact h0))
+  have hsum : (∑ j, algebraMap E (SecAlg QE y) (algebraMap k E (u j)) * secCoord QE y j) =
+      secLin QE y (fun j => algebraMap k E (u j)) := by
+
+    simp only [secLin, linForm, map_sum, map_mul]
     rfl
   have hnorm : Algebra.norm E (secLin QE y (fun j => algebraMap k E (u j))) ≠ 0 := by
     have h := h2 E (SecAlg QE y) n (secCoord QE y) (fun j => algebraMap k E (u j))
     rw [hsum] at h
     rw [hcg, eval_mul, eval_C, h] at hne
     exact right_ne_zero_of_mul hne
-  have hunit
-      : IsUnit (Algebra.lmul E (SecAlg QE y) (secLin QE y fun j => algebraMap k E (u j))) := by
+  have hunit : IsUnit (Algebra.lmul E (SecAlg QE y) (secLin QE y fun j => algebraMap k E (u j))) := by
     rw [LinearMap.isUnit_iff_isUnit_det]
     exact isUnit_iff_ne_zero.mpr hnorm
   obtain ⟨z, hz⟩ := ((Module.End.isUnit_iff _).mp hunit).2 1
-  have hz' : secLin QE y (fun j => algebraMap k E (u j)) * z = 1 := by simpa using hz
+  have hz' : secLin QE y (fun j => algebraMap k E (u j)) * z = 1 := by
+    simpa using hz
   exact (isUnit_iff_exists_inv.mpr ⟨z, hz'⟩).mem_nonZeroDivisors
 
 end

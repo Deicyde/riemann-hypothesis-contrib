@@ -1,8 +1,51 @@
 module
 
-public import Mathlib
-public import ReciprocityTheory.DualLattices.VEqZeroOfPowEqOne
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.WeightedSumBounds.PtSolveMapFixedIff
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -23,19 +66,17 @@ def ptNs (G : LogFGL v d) : ℕ → Fin d → MvPowerSeries (Fin d) C
 theorem ptNs_const (G : LogFGL v d) : ∀ n a, constantCoeff (ptNs G n a) = 0
   | 0, a => by simp [ptNs]
   | n + 1, a => by
-    have h0
-        : ∀ i,
-          constantCoeff (Sum.elim (fun b => (X b : MvPowerSeries (Fin d) C)) (ptNs G n) i) = 0 := by
+    have h0 : ∀ i, constantCoeff (Sum.elim (fun b => (X b : MvPowerSeries (Fin d) C))
+        (ptNs G n) i) = 0 := by
       rintro (i | i)
       · simp
       · exact ptNs_const G n i
-    change constantCoeff (subst (Sum.elim (fun b => (X b : MvPowerSeries (Fin d) C)) (ptNs G n))
-        (G.F a))
-      = 0
+    change constantCoeff
+      (subst (Sum.elim (fun b => (X b : MvPowerSeries (Fin d) C)) (ptNs G n)) (G.F a)) = 0
     exact constantCoeff_subst_eq_zero (hasSubst_of_constantCoeff_zero h0) h0 (G.F_const a)
 
-theorem ptNs_hasSubst (G : LogFGL v d) (n : ℕ)
-    : HasSubst (Sum.elim (fun b => (X b : MvPowerSeries (Fin d) C)) (ptNs G n)) := by
+theorem ptNs_hasSubst (G : LogFGL v d) (n : ℕ) :
+    HasSubst (Sum.elim (fun b => (X b : MvPowerSeries (Fin d) C)) (ptNs G n)) := by
   exact MvPowerSeries.hasSubst_of_constantCoeff_zero fun i => by
     cases i with
     | inl b => simp
@@ -49,28 +90,25 @@ theorem ptNs_int (G : LogFGL v d) : ∀ n a, ptNs G n a ∈ ptIntSer v (Fin d)
     · exact ptIntSer_X i
     · exact ptNs_int G n i
 
-theorem ptNs_lin (G : LogFGL v d)
-    : ∀ (n : ℕ) (a s : Fin d),
-      coeff (Finsupp.single s 1) (ptNs G n a) = if s = a then (n : C) else 0
+theorem ptNs_lin (G : LogFGL v d) : ∀ (n : ℕ) (a s : Fin d),
+    coeff (Finsupp.single s 1) (ptNs G n a) = if s = a then (n : C) else 0
   | 0, a, s => by simp [ptNs]
   | n + 1, a, s => by
-    have h0
-        : ∀ i,
-          constantCoeff (Sum.elim (fun b => (X b : MvPowerSeries (Fin d) C)) (ptNs G n) i) = 0 := by
+    have h0 : ∀ i, constantCoeff (Sum.elim (fun b => (X b : MvPowerSeries (Fin d) C))
+        (ptNs G n) i) = 0 := by
       rintro (i | i)
       · simp
       · exact ptNs_const G n i
     change coeff (Finsupp.single s 1)
-        (subst (Sum.elim (fun b => (X b : MvPowerSeries (Fin d) C)) (ptNs G n)) (G.F a))
-      = _
+      (subst (Sum.elim (fun b => (X b : MvPowerSeries (Fin d) C)) (ptNs G n)) (G.F a)) = _
     rw [pt_coeff_single_subst (ptNs_hasSubst G n) h0 (G.F_const a) s, Fintype.sum_sum_type]
-    simp only [pt_F_lin, Sum.elim_inl, Sum.elim_inr, pt_coeff_single_X, ptNs_lin G n, Sum.inl.injEq,
-      Sum.inr.injEq, reduceCtorEq, if_false, add_zero, zero_add, ite_mul, one_mul, zero_mul,
-      Finset.sum_ite_eq', Finset.mem_univ, if_true]
+    simp only [pt_F_lin, Sum.elim_inl, Sum.elim_inr, pt_coeff_single_X, ptNs_lin G n,
+      Sum.inl.injEq, Sum.inr.injEq, reduceCtorEq, if_false, add_zero, zero_add,
+      ite_mul, one_mul, zero_mul, Finset.sum_ite_eq', Finset.mem_univ, if_true]
     split_ifs <;> push_cast <;> ring
 
-theorem nsmulF_eq_subst (G : LogFGL v d) {ga : Fin d → PowerSeries C} (hga : HasSubst ga)
-    : ∀ n, G.nsmulF n ga = fun a => subst ga (ptNs G n a)
+theorem nsmulF_eq_subst (G : LogFGL v d) {ga : Fin d → PowerSeries C}
+    (hga : HasSubst ga) : ∀ n, G.nsmulF n ga = fun a => subst ga (ptNs G n a)
   | 0 => by
     funext a
     simp only [LogFGL.nsmulF, ptNs, Pi.zero_apply]
@@ -92,9 +130,8 @@ theorem isCurve_iff_good {ga : Fin d → PowerSeries C} : IsCurve v ga ↔ PTGoo
   · intro h a
     exact ⟨(h a).1, (ptPsIsInt_iff _).mpr (h a).2⟩
 
-private theorem valuation_natCast_eq_zero_of_not_dvd
-    {p : ℕ} (hp : p.Prime) (hvp : v (p : C) = 1) (n : ℕ) (hn : ¬ p ∣ n)
-    : v (n : C) = 0 := by
+private theorem valuation_natCast_eq_zero_of_not_dvd {p : ℕ} (hp : p.Prime) (hvp : v (p : C) = 1) (n : ℕ)
+    (hn : ¬ p ∣ n) : v (n : C) = 0 := by
   have hcop : IsCoprime (p : ℤ) (n : ℤ) :=
     Nat.isCoprime_iff_coprime.mpr ((Nat.Prime.coprime_iff_not_dvd hp).mpr hn)
   obtain ⟨u, w, huw⟩ := hcop
@@ -115,8 +152,8 @@ private theorem valuation_natCast_eq_zero_of_not_dvd
   rw [hC, v.map_one] at h3
   exact absurd h3 (not_le.mpr (lt_min h1 h2))
 
-private theorem exists_eq_single_of_degree_eq_one {σ : Type} (α : σ →₀ ℕ) (h : α.degree = 1)
-    : ∃ s, α = Finsupp.single s 1 := by
+private theorem exists_eq_single_of_degree_eq_one {σ : Type} (α : σ →₀ ℕ) (h : α.degree = 1) :
+    ∃ s, α = Finsupp.single s 1 := by
   have hne : α ≠ 0 := by
     rintro rfl
     simp at h
@@ -134,17 +171,14 @@ private theorem exists_eq_single_of_degree_eq_one {σ : Type} (α : σ →₀ �
     simp [hs1]
   · rw [Finsupp.single_apply, if_neg (Ne.symm hi)]
     by_contra hne'
-    have hmem : i ∈ α.support.erase s := Finset.mem_erase.mpr ⟨hi, Finsupp.mem_support_iff.mpr hne'⟩
+    have hmem : i ∈ α.support.erase s :=
+      Finset.mem_erase.mpr ⟨hi, Finsupp.mem_support_iff.mpr hne'⟩
     have := Finset.single_le_sum (fun j _ => Nat.zero_le (α j)) hmem
     omega
 
-theorem nsmul_coprime_bijective_curves
-    [CharZero C]
-    (G : LogFGL v d)
-    {p : ℕ} (hp : p.Prime) (hvp : v (p : C) = 1)
-    (n : ℕ) (hn : ¬ p ∣ n)
-    (gb : Fin d → PowerSeries C) (hgb : IsCurve v gb)
-    : ∃! ga : Fin d → PowerSeries C, IsCurve v ga ∧ G.nsmulF n ga = gb := by
+theorem nsmul_coprime_bijective_curves [CharZero C] (G : LogFGL v d) {p : ℕ} (hp : p.Prime) (hvp : v (p : C) = 1)
+    (n : ℕ) (hn : ¬ p ∣ n) (gb : Fin d → PowerSeries C) (hgb : IsCurve v gb) :
+    ∃! ga : Fin d → PowerSeries C, IsCurve v ga ∧ G.nsmulF n ga = gb := by
   have hn0' : n ≠ 0 := fun h => hn (h ▸ dvd_zero p)
   have hn0 : (n : C) ≠ 0 := by exact_mod_cast hn0'
   have hvn := valuation_natCast_eq_zero_of_not_dvd hp hvp n hn
@@ -155,8 +189,10 @@ theorem nsmul_coprime_bijective_curves
     rw [← h]
   obtain ⟨M, hM⟩ : ∃ M : Matrix (Fin d) (Fin d) C, M = (n : C) • 1 := ⟨_, rfl⟩
   obtain ⟨N, hN⟩ : ∃ N : Matrix (Fin d) (Fin d) C, N = (n : C)⁻¹ • 1 := ⟨_, rfl⟩
-  have hNM : N * M = 1 := by rw [hN, hM, smul_mul_smul_comm, mul_one, inv_mul_cancel₀ hn0, one_smul]
-  have hMN : M * N = 1 := by rw [hN, hM, smul_mul_smul_comm, mul_one, mul_inv_cancel₀ hn0, one_smul]
+  have hNM : N * M = 1 := by
+    rw [hN, hM, smul_mul_smul_comm, mul_one, inv_mul_cancel₀ hn0, one_smul]
+  have hMN : M * N = 1 := by
+    rw [hN, hM, smul_mul_smul_comm, mul_one, mul_inv_cancel₀ hn0, one_smul]
   have hMab : ∀ a b, M a b = if a = b then (n : C) else 0 := by
     intro a b
     rw [hM, Matrix.smul_apply, Matrix.one_apply, smul_eq_mul]
@@ -173,9 +209,8 @@ theorem nsmul_coprime_bijective_curves
     split_ifs
     · exact natCast_mem (ptIntSub v) n
     · exact (ptIntSub v).zero_mem
-  obtain ⟨K, hK⟩
-      : ∃ K : Fin d → MvPowerSeries (Fin d) C, K = fun b => ptNs G n b - ∑ a, M a b • X a :=
-    ⟨_, rfl⟩
+  obtain ⟨K, hK⟩ : ∃ K : Fin d → MvPowerSeries (Fin d) C,
+      K = fun b => ptNs G n b - ∑ a, M a b • X a := ⟨_, rfl⟩
   have hK0 : ∀ b, constantCoeff (K b) = 0 := by
     intro b
     simp [hK, ptNs_const]
@@ -184,12 +219,8 @@ theorem nsmul_coprime_bijective_curves
     rw [hK]
     exact (ptIntSer v (Fin d)).sub_mem (ptNs_int G n b)
       ((ptIntSer v (Fin d)).sum_mem fun a _ => ptIntSer_smul (hMint a b) (ptIntSer_X a))
-  have hKdeg
-      : ∀ b α,
-        coeff α (K b) ≠ 0
-          → 2 ≤ α.degree
-            ∨ ∀ x y : Fin d → PowerSeries C,
-              PTGood v x → PTGood v y → ∀ s ∈ α.support, x s = y s := by
+  have hKdeg : ∀ b α, coeff α (K b) ≠ 0 → 2 ≤ α.degree ∨
+      ∀ x y : Fin d → PowerSeries C, PTGood v x → PTGood v y → ∀ s ∈ α.support, x s = y s := by
     intro b α hα
     left
     by_contra hlt
@@ -200,14 +231,13 @@ theorem nsmul_coprime_bijective_curves
         hK0 b]
     · obtain ⟨s, rfl⟩ := exists_eq_single_of_degree_eq_one α hd
       rw [hK]
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [map_sub, map_sum, MvPowerSeries.coeff_smul, ptNs_lin, MvPowerSeries.coeff_X,
-          Finsupp.single_left_inj one_ne_zero, hMab, smul_eq_mul, mul_ite, mul_one, mul_zero]
+
+      simp only [map_sub, map_sum, MvPowerSeries.coeff_smul, ptNs_lin, MvPowerSeries.coeff_X,
+      Finsupp.single_left_inj one_ne_zero, hMab, smul_eq_mul, mul_ite, mul_one, mul_zero]
       simp [Finset.sum_ite_eq, Finset.sum_ite_eq', eq_comm]
   have hf : PTGood v gb := isCurve_iff_good.mp hgb
-  have key
-      : ∀ y : Fin d → PowerSeries C,
-        PTGood v y → (G.nsmulF n y = gb ↔ ∀ b, ∑ a, M a b • y a + subst y (K b) = gb b) := by
+  have key : ∀ y : Fin d → PowerSeries C, PTGood v y →
+      (G.nsmulF n y = gb ↔ ∀ b, ∑ a, M a b • y a + subst y (K b) = gb b) := by
     intro y hy
     have hys : HasSubst y := MvPowerSeries.hasSubst_of_constantCoeff_zero fun a => (hy a).1
     rw [nsmulF_eq_subst G hys n]
@@ -217,14 +247,9 @@ theorem nsmul_coprime_bijective_curves
     · intro h
       funext b
       rw [pt_subst_lin_split hys (ptNs G n b) (fun a => M a b), ← h b, hK]
-  obtain ⟨x, ⟨hx, hxeq⟩, huniq⟩ :=
-    pt_solve
-      (A := fun x => x)
-      (K := K) (M := M) (N := N) (f := gb) hNM hMN hNint hf
-      (fun x hx s => (hx s).1)
-      (fun x hx s => (hx s).2)
-      (fun k x y _ _ hxy s e he => hxy s e he)
-      hKdeg hKi hK0
+  obtain ⟨x, ⟨hx, hxeq⟩, huniq⟩ := pt_solve (A := fun x => x) (K := K) (M := M) (N := N) (f := gb)
+    hNM hMN hNint hf (fun x hx s => (hx s).1) (fun x hx s => (hx s).2)
+    (fun k x y _ _ hxy s e he => hxy s e he) hKdeg hKi hK0
   refine ⟨x, ⟨isCurve_iff_good.mpr hx, (key x hx).mpr hxeq⟩, fun y hy => ?_⟩
   have hyg := isCurve_iff_good.mp hy.1
   exact huniq y ⟨hyg, (key y hyg).mp hy.2⟩

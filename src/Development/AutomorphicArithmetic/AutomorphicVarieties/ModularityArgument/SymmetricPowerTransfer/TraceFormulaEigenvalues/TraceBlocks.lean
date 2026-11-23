@@ -1,6 +1,54 @@
 module
 
-public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityArgument.SymmetricPowerTransfer.TraceFormulaEigenvalues.IsGenEig
+public import Mathlib.Basic.Complex.Basic
+public import Mathlib.LinearAlgebra.Trace
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.Order.CompletePartialOrder
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -10,12 +58,9 @@ namespace UpperTheory.V.Z.Sym.Tf
 
 variable {Γ Y V : Type} [Group Γ] [MulAction Γ Y] [AddCommGroup V] [Module ℂ V]
 
-theorem sum_fib
-    {A B : Type}
-    (m : A → B) (F : A → V) (F' : B → V) (c : B → ℕ) (hB : (Function.support F').Finite)
-    (hc : ∀ b, F' b ≠ 0 → c b ≠ 0 ∧ Nat.card {a // m a = b} = c b)
-    (hF : ∀ a, F a = (c (m a) : ℂ)⁻¹ • F' (m a))
-    : (Function.support F).Finite ∧ ∑ᶠ a, F a = ∑ᶠ b, F' b := by
+theorem sum_fib {A B : Type} (m : A → B) (F : A → V) (F' : B → V) (c : B → ℕ) (hB : (Function.support F').Finite)
+    (hc : ∀ b, F' b ≠ 0 → c b ≠ 0 ∧ Nat.card {a // m a = b} = c b) (hF : ∀ a, F a = (c (m a) : ℂ)⁻¹ • F' (m a)) :
+    (Function.support F).Finite ∧ ∑ᶠ a, F a = ∑ᶠ b, F' b := by
   classical
   have hfibfin : ∀ b, F' b ≠ 0 → {a | m a = b}.Finite := by
     intro b hb
@@ -26,7 +71,8 @@ theorem sum_fib
     intro a ha
     refine Set.mem_iUnion₂.mpr ⟨m a, fun h0 => ha ?_, rfl⟩
     rw [hF, h0, smul_zero]
-  have hfin : (Function.support F).Finite := (hB.biUnion fun b hb => hfibfin b hb).subset hsuppF
+  have hfin : (Function.support F).Finite :=
+    (hB.biUnion fun b hb => hfibfin b hb).subset hsuppF
   refine ⟨hfin, ?_⟩
   set s := hfin.toFinset with hs
   set T := hB.toFinset with hT
@@ -43,8 +89,7 @@ theorem sum_fib
   obtain ⟨hcb, hcard⟩ := hc b hb'
   have hset : (↑(s.filter (fun a => m a = b)) : Set A) = {a | m a = b} := by
     ext a
-    simp only [Finset.coe_filter, Set.mem_setOf_eq, s, Set.Finite.mem_toFinset,
-      Function.mem_support]
+    simp only [Finset.coe_filter, Set.mem_setOf_eq, s, Set.Finite.mem_toFinset, Function.mem_support]
     constructor
     · exact fun h => h.2
     · intro h
@@ -61,17 +106,15 @@ theorem sum_fib
     rw [Finset.mem_filter] at ha
     rw [hF, ha.2]
 
-theorem rel_smul (Γ₀ : Subgroup Γ) [Γ₀.Normal] (g : Γ) (y : Y)
-    : Γ₀.relIndex (stabilizer Γ (g • y)) = Γ₀.relIndex (stabilizer Γ y) := by
+theorem rel_smul (Γ₀ : Subgroup Γ) [Γ₀.Normal] (g : Γ) (y : Y) :
+    Γ₀.relIndex (stabilizer Γ (g • y)) = Γ₀.relIndex (stabilizer Γ y) := by
   rw [stabilizer_smul_eq_stabilizer_map_conj]
   conv_lhs => rw [← Subgroup.Normal.map_conj_eq Γ₀ g]
   exact Subgroup.relIndex_map_map_of_injective _ _ (MulAut.conj g).injective
 
-theorem card_fib (H : Subgroup Γ) (b : orbitRel.Quotient H Y)
-    : Nat.card
-        {a : orbitRel.Quotient Γ Y × (Γ ⧸ H)
-          // (Quotient.mk'' (a.2.out⁻¹ • a.1.out) : orbitRel.Quotient H Y) = b}
-      = H.relIndex (stabilizer Γ b.out) := by
+theorem card_fib (H : Subgroup Γ) (b : orbitRel.Quotient H Y) :
+    Nat.card {a : orbitRel.Quotient Γ Y × (Γ ⧸ H) // (Quotient.mk'' (a.2.out⁻¹ • a.1.out) : orbitRel.Quotient H Y) = b} =
+      H.relIndex (stabilizer Γ b.out) := by
   classical
   set y0 := b.out with hy0
   set O0 : orbitRel.Quotient Γ Y := Quotient.mk'' y0 with hO0
@@ -82,22 +125,18 @@ theorem card_fib (H : Subgroup Γ) (b : orbitRel.Quotient H Y)
   have hbq : (Quotient.mk'' y0 : orbitRel.Quotient H Y) = b := Quotient.out_eq' b
   have hinv : ∀ s : stabilizer Γ y0, (s : Γ)⁻¹ • y0 = y0 := fun s =>
     inv_smul_eq_iff.mpr (MulAction.mem_stabilizer_iff.mp s.2).symm
-  have hmem
-      : ∀ s : stabilizer Γ y0,
-        (Quotient.mk'' ((((t * (s : Γ) : Γ) : Γ ⧸ H)).out⁻¹ • O0.out) : orbitRel.Quotient H Y)
-          = b := by
+  have hmem : ∀ s : stabilizer Γ y0,
+      (Quotient.mk'' ((((t * (s : Γ) : Γ) : Γ ⧸ H)).out⁻¹ • O0.out) : orbitRel.Quotient H Y) = b := by
     intro s
     obtain ⟨h, hh⟩ := QuotientGroup.mk_out_eq_mul H (t * (s : Γ))
     rw [hh, ← ht, smul_smul]
     have e1 : (t * (s : Γ) * (h : Γ))⁻¹ * t = (h : Γ)⁻¹ * (s : Γ)⁻¹ := by group
     rw [e1, mul_smul, hinv s, ← hbq]
     exact Quotient.sound' (MulAction.orbitRel_apply.mpr (MulAction.mem_orbit_iff.mpr ⟨h⁻¹, rfl⟩))
-  let Fib :=
-    {a : orbitRel.Quotient Γ Y × (Γ ⧸ H)
-      // (Quotient.mk'' (a.2.out⁻¹ • a.1.out) : orbitRel.Quotient H Y) = b}
+  let Fib := {a : orbitRel.Quotient Γ Y × (Γ ⧸ H) //
+    (Quotient.mk'' (a.2.out⁻¹ • a.1.out) : orbitRel.Quotient H Y) = b}
   let F : stabilizer Γ y0 → Fib := fun s => ⟨(O0, ((t * (s : Γ) : Γ) : Γ ⧸ H)), hmem s⟩
-  have hF
-      : ∀ s1 s2 : stabilizer Γ y0, F s1 = F s2 ↔ s1⁻¹ * s2 ∈ H.subgroupOf (stabilizer Γ y0) := by
+  have hF : ∀ s1 s2 : stabilizer Γ y0, F s1 = F s2 ↔ s1⁻¹ * s2 ∈ H.subgroupOf (stabilizer Γ y0) := by
     intro s1 s2
     rw [Subgroup.mem_subgroupOf]
     have e2 : (t * (s1 : Γ))⁻¹ * (t * (s2 : Γ)) = ((s1⁻¹ * s2 : stabilizer Γ y0) : Γ) := by
@@ -136,8 +175,7 @@ theorem card_fib (H : Subgroup Γ) (b : orbitRel.Quotient H Y)
         QuotientGroup.mk_mul_of_mem _ h.2, QuotientGroup.out_eq']
   rw [Subgroup.relIndex, Subgroup.index]
   refine Nat.card_congr (Equiv.ofBijective
-    (Quotient.lift F fun a b hab => (hF a b).mpr (QuotientGroup.leftRel_apply.mp hab))
-    ⟨?_, ?_⟩).symm
+    (Quotient.lift F fun a b hab => (hF a b).mpr (QuotientGroup.leftRel_apply.mp hab)) ⟨?_, ?_⟩).symm
   · intro x y hxy
     induction x using Quotient.inductionOn'
     induction y using Quotient.inductionOn'
@@ -146,35 +184,27 @@ theorem card_fib (H : Subgroup Γ) (b : orbitRel.Quotient H Y)
     obtain ⟨s, rfl⟩ := hsurj z
     exact ⟨Quotient.mk'' s, rfl⟩
 
-theorem countC
-    (Γ₀ H : Subgroup Γ) [Γ₀.Normal]
-    (h0 : ∀ z ∈ Γ₀, ∀ y : Y, z • y = y) (hH : Γ₀ ≤ H)
-    (hs : ∀ y : Y, Γ₀.relIndex (stabilizer Γ y) ≠ 0)
-    (k : Y → V)
-    (hk : ∀ h ∈ H, ∀ y, k (h • y) = k y) (fin : {b : orbitRel.Quotient H Y | k b.out ≠ 0}.Finite)
-    : (Function.support fun a : orbitRel.Quotient Γ Y × (Γ ⧸ H) =>
-        (Γ₀.relIndex (stabilizer Γ a.1.out) : ℂ)⁻¹ • k (a.2.out⁻¹ • a.1.out)).Finite
-      ∧ ∑ᶠ a : orbitRel.Quotient Γ Y × (Γ ⧸ H), (Γ₀.relIndex (stabilizer Γ a.1.out) : ℂ)⁻¹ • k (a.2.out⁻¹ • a.1.out)
-        = ∑ᶠ b : orbitRel.Quotient H Y, (Γ₀.relIndex (H ⊓ stabilizer Γ b.out) : ℂ)⁻¹ • k b.out := by
-  have hmul
-      : ∀ y : Y,
-        Γ₀.relIndex (H ⊓ stabilizer Γ y) * H.relIndex (stabilizer Γ y)
-          = Γ₀.relIndex (stabilizer Γ y) := by
+theorem countC (Γ₀ H : Subgroup Γ) [Γ₀.Normal] (h0 : ∀ z ∈ Γ₀, ∀ y : Y, z • y = y) (hH : Γ₀ ≤ H)
+    (hs : ∀ y : Y, Γ₀.relIndex (stabilizer Γ y) ≠ 0) (k : Y → V) (hk : ∀ h ∈ H, ∀ y, k (h • y) = k y)
+    (fin : {b : orbitRel.Quotient H Y | k b.out ≠ 0}.Finite) :
+    (Function.support fun a : orbitRel.Quotient Γ Y × (Γ ⧸ H) =>
+      (Γ₀.relIndex (stabilizer Γ a.1.out) : ℂ)⁻¹ • k (a.2.out⁻¹ • a.1.out)).Finite ∧
+    ∑ᶠ a : orbitRel.Quotient Γ Y × (Γ ⧸ H), (Γ₀.relIndex (stabilizer Γ a.1.out) : ℂ)⁻¹ • k (a.2.out⁻¹ • a.1.out) =
+      ∑ᶠ b : orbitRel.Quotient H Y, (Γ₀.relIndex (H ⊓ stabilizer Γ b.out) : ℂ)⁻¹ • k b.out := by
+  have hmul : ∀ y : Y, Γ₀.relIndex (H ⊓ stabilizer Γ y) * H.relIndex (stabilizer Γ y) =
+      Γ₀.relIndex (stabilizer Γ y) := by
     intro y
     rw [Subgroup.relIndex_inf_mul_relIndex, inf_eq_left.mpr hH]
-  have hcne : ∀ y : Y, H.relIndex (stabilizer Γ y) ≠ 0 := fun y h =>
-    hs y (by rw [← hmul y, h, mul_zero])
-  let m : orbitRel.Quotient Γ Y × (Γ ⧸ H) → orbitRel.Quotient H Y := fun a =>
-    Quotient.mk'' (a.2.out⁻¹ • a.1.out)
-  have key
-      : ∀ a : orbitRel.Quotient Γ Y × (Γ ⧸ H),
-        (Γ₀.relIndex (stabilizer Γ a.1.out) : ℂ)⁻¹ • k (a.2.out⁻¹ • a.1.out)
-          = ((H.relIndex (stabilizer Γ (m a).out) : ℕ) : ℂ)⁻¹
-            • ((Γ₀.relIndex (H ⊓ stabilizer Γ (m a).out) : ℂ)⁻¹ • k (m a).out) := by
+  have hcne : ∀ y : Y, H.relIndex (stabilizer Γ y) ≠ 0 := fun y h => hs y (by rw [← hmul y, h, mul_zero])
+  let m : orbitRel.Quotient Γ Y × (Γ ⧸ H) → orbitRel.Quotient H Y :=
+    fun a => Quotient.mk'' (a.2.out⁻¹ • a.1.out)
+  have key : ∀ a : orbitRel.Quotient Γ Y × (Γ ⧸ H),
+      (Γ₀.relIndex (stabilizer Γ a.1.out) : ℂ)⁻¹ • k (a.2.out⁻¹ • a.1.out) =
+      ((H.relIndex (stabilizer Γ (m a).out) : ℕ) : ℂ)⁻¹ •
+        ((Γ₀.relIndex (H ⊓ stabilizer Γ (m a).out) : ℂ)⁻¹ • k (m a).out) := by
     intro a
     obtain ⟨h, hh⟩ : ∃ h : H, (h : Γ) • (a.2.out⁻¹ • a.1.out) = (m a).out := by
-      have h1 : (orbitRel H Y) (m a).out (a.2.out⁻¹ • a.1.out) :=
-        Quotient.exact' (Quotient.out_eq' (m a))
+      have h1 : (orbitRel H Y) (m a).out (a.2.out⁻¹ • a.1.out) := Quotient.exact' (Quotient.out_eq' (m a))
       rw [MulAction.orbitRel_apply, MulAction.mem_orbit_iff] at h1
       exact h1
     have hk' : k (m a).out = k (a.2.out⁻¹ • a.1.out) := by
@@ -191,13 +221,10 @@ theorem countC
   exact sum_fib m
     (fun a => (Γ₀.relIndex (stabilizer Γ a.1.out) : ℂ)⁻¹ • k (a.2.out⁻¹ • a.1.out))
     (fun b => (Γ₀.relIndex (H ⊓ stabilizer Γ b.out) : ℂ)⁻¹ • k b.out)
-    (fun b => H.relIndex (stabilizer Γ b.out))
-    hF'fin
-    (fun b _ => ⟨hcne _, card_fib H b⟩)
-    key
+    (fun b => H.relIndex (stabilizer Γ b.out)) hF'fin (fun b _ => ⟨hcne _, card_fib H b⟩) key
 
-theorem finsum_sig {I : Type} {A : I → Type} (F : (Σ i, A i) → ℂ) (h : (Function.support F).Finite)
-    : ∑ᶠ a, F a = ∑ᶠ i, ∑ᶠ x, F ⟨i, x⟩ := by
+theorem finsum_sig {I : Type} {A : I → Type} (F : (Σ i, A i) → ℂ) (h : (Function.support F).Finite) :
+    ∑ᶠ a, F a = ∑ᶠ i, ∑ᶠ x, F ⟨i, x⟩ := by
   classical
   set s := h.toFinset with hs
   let t := s.image Sigma.fst
@@ -221,28 +248,23 @@ theorem finsum_sig {I : Type} {A : I → Type} (F : (Σ i, A i) → ℂ) (h : (F
       exact hi (by simp [hc])
     exact Finset.mem_coe.mpr (Finset.mem_image.mpr ⟨⟨i, x⟩, by simpa [s] using hx, rfl⟩)
 
-theorem trace_blocks
-    {Q : Type} [Fintype Q] [FiniteDimensional ℂ V]
-    (E : Q → Q → Module.End ℂ V) (L : Module.End ℂ (Q → V)) (h : ∀ w o', L w o' = ∑ o, E o' o (w o))
-    : LinearMap.trace ℂ _ L = ∑ o, LinearMap.trace ℂ V (E o o) := by
+theorem trace_blocks {Q : Type} [Fintype Q] [FiniteDimensional ℂ V] (E : Q → Q → Module.End ℂ V) (L : Module.End ℂ (Q → V))
+    (h : ∀ w o', L w o' = ∑ o, E o' o (w o)) : LinearMap.trace ℂ _ L = ∑ o, LinearMap.trace ℂ V (E o o) := by
   classical
-  have hL
-      : L = ∑ o', ∑ o, LinearMap.single ℂ (fun _ : Q => V) o' ∘ₗ (E o' o ∘ₗ LinearMap.proj o) := by
+  have hL : L = ∑ o', ∑ o, LinearMap.single ℂ (fun _ : Q => V) o' ∘ₗ (E o' o ∘ₗ LinearMap.proj o) := by
     refine LinearMap.ext fun w => funext fun p => ?_
     simp only [h, LinearMap.sum_apply, Finset.sum_apply, LinearMap.comp_apply, LinearMap.coe_proj,
       Function.eval, LinearMap.coe_single, Pi.single_apply]
     rw [Finset.sum_comm]
     simp
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [hL, map_sum]
+
+  rw [hL, map_sum]
   refine Finset.sum_congr rfl fun o' _ => ?_
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
-  have hterm
-      : ∀ o,
-        LinearMap.trace ℂ (Q → V)
-            (LinearMap.single ℂ (fun _ : Q => V) o' ∘ₗ (E o' o ∘ₗ LinearMap.proj o))
-          = if o = o' then LinearMap.trace ℂ V (E o' o) else 0 := by
+
+  rw [map_sum]
+  have hterm : ∀ o, LinearMap.trace ℂ (Q → V)
+      (LinearMap.single ℂ (fun _ : Q => V) o' ∘ₗ (E o' o ∘ₗ LinearMap.proj o)) =
+      if o = o' then LinearMap.trace ℂ V (E o' o) else 0 := by
     intro o
     rw [LinearMap.trace_comp_comm', LinearMap.comp_assoc]
     split_ifs with hoo
@@ -251,31 +273,26 @@ theorem trace_blocks
     · rw [LinearMap.proj_comp_single_ne ℂ _ _ _ hoo, LinearMap.comp_zero, map_zero]
   simp only [hterm, Finset.sum_ite_eq', Finset.mem_univ, if_true]
 
-theorem finsum_triv
-    (Γ₀ : Subgroup Γ) (h0 : ∀ z ∈ Γ₀, ∀ y : Y, z • y = y)
-    (k : Y → V) (hk : (Function.support k).Finite)
-    : {b : orbitRel.Quotient Γ₀ Y | k b.out ≠ 0}.Finite
-      ∧ ∑ᶠ b : orbitRel.Quotient Γ₀ Y, (Γ₀.relIndex (Γ₀ ⊓ stabilizer Γ b.out) : ℂ)⁻¹ • k b.out
-        = ∑ᶠ y, k y := by
+theorem finsum_triv (Γ₀ : Subgroup Γ) (h0 : ∀ z ∈ Γ₀, ∀ y : Y, z • y = y) (k : Y → V) (hk : (Function.support k).Finite) :
+    {b : orbitRel.Quotient Γ₀ Y | k b.out ≠ 0}.Finite ∧
+    ∑ᶠ b : orbitRel.Quotient Γ₀ Y, (Γ₀.relIndex (Γ₀ ⊓ stabilizer Γ b.out) : ℂ)⁻¹ • k b.out = ∑ᶠ y, k y := by
   have hrel : ∀ y y' : Y, (orbitRel Γ₀ Y) y y' → y = y' := by
     intro y y' h
     rw [MulAction.orbitRel_apply, MulAction.mem_orbit_iff] at h
     obtain ⟨g, hg⟩ := h
     rw [← hg, Subgroup.smul_def]
     exact h0 g g.2 y'
-  let e : Y ≃ orbitRel.Quotient Γ₀ Y := {
-    toFun := fun y => Quotient.mk'' y
-    invFun := fun b => b.out
-    left_inv := fun y =>
-      hrel _ _ (Quotient.exact' (Quotient.out_eq' (Quotient.mk'' y : orbitRel.Quotient Γ₀ Y)))
-    right_inv := fun b => Quotient.out_eq' b
-  }
+  let e : Y ≃ orbitRel.Quotient Γ₀ Y :=
+    { toFun := fun y => Quotient.mk'' y
+      invFun := fun b => b.out
+      left_inv := fun y => hrel _ _ (Quotient.exact' (Quotient.out_eq' (Quotient.mk'' y : orbitRel.Quotient Γ₀ Y)))
+      right_inv := fun b => Quotient.out_eq' b }
   refine ⟨?_, ?_⟩
   · refine (hk.image e).subset ?_
     intro b hb
     exact ⟨b.out, hb, Quotient.out_eq' b⟩
-  · have hcoef : ∀ b : orbitRel.Quotient Γ₀ Y, Γ₀.relIndex (Γ₀ ⊓ stabilizer Γ b.out) = 1 := fun b =>
-      Subgroup.relIndex_eq_one.mpr inf_le_left
+  · have hcoef : ∀ b : orbitRel.Quotient Γ₀ Y, Γ₀.relIndex (Γ₀ ⊓ stabilizer Γ b.out) = 1 :=
+      fun b => Subgroup.relIndex_eq_one.mpr inf_le_left
     simp only [hcoef, Nat.cast_one, inv_one, one_smul]
     exact finsum_comp_equiv e.symm (f := k)
 

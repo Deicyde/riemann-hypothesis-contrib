@@ -1,7 +1,48 @@
 module
 
 public import Formalism.HermitianCurvature.HermitianCurvatureProofs.CutNFLeib
-public import Formalism.HermitianCurvature.HermitianCurvatureProofs.TopFirstOfParts
+public import Formalism.HermitianCurvature.HermitianCurvatureProofs.ComponentFamilySettingOfSetting
+public import Formalism.HermitianCurvature.HermitianCurvatureProofs.OpApplyContinuousOn
+import Formalism.HermitianCurvature.HermitianCurvatureProofs.RegularisedPairingViaPhase
+import Formalism.HermitianCurvature.HermitianCurvatureProofs.TheoremPIntegralOfPlaces
+import Formalism.HermitianCurvature.HermitianCurvatureProofs.UnipotentCoordinatesMeasurePreserving
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -11,14 +52,12 @@ open Formalism.FourierDecayAlt Formalism.QuantumDeterminants Filter Topology Mea
 
 noncomputable section
 
-theorem nfVLin_comp_sum
-    {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
-    [InnerProductSpace ℂ Wq]
-    {ι : Type} (s : Finset ι)
-    (a : Wp →L[ℂ] Wp) (b : Wq →L[ℂ] Wq) (c : ι → ℂ) (f : ι → Wq →L[ℂ] Wp)
-    : a.comp ((∑ i ∈ s, c i • f i).comp b) = ∑ i ∈ s, c i • a.comp ((f i).comp b) := by
+theorem nfVLin_comp_sum {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
+    [InnerProductSpace ℂ Wq] {ι : Type} (s : Finset ι) (a : Wp →L[ℂ] Wp) (b : Wq →L[ℂ] Wq) (c : ι → ℂ)
+    (f : ι → Wq →L[ℂ] Wp) :
+    a.comp ((∑ i ∈ s, c i • f i).comp b) = ∑ i ∈ s, c i • a.comp ((f i).comp b) := by
   ext x
-  set_option synthInstance.maxHeartbeats 100000 in
+
   simp [ContinuousLinearMap.sum_apply, map_sum, map_smul]
 
 theorem vector_linearity_holds : NFVLin := by
@@ -34,38 +73,30 @@ theorem vector_linearity_holds : NFVLin := by
     have hZ := h'.choose_spec.2.1
     have hGq := Formalism.FourierDecayAlt.P.ptG_spec k r Bs.z Bs.z' pt h'.choose h.1 hZ
     have hpos : 0 < Gf k r Bs.z Bs.z' h'.choose := hGq ▸ h.2
-    have hGeq : D.ptG (Tz k r Bs.z * Tz k r Bs.z') r pt = Gf k r Bs.z Bs.z' h'.choose := by rw [hGq]
+    have hGeq : D.ptG (Tz k r Bs.z * Tz k r Bs.z') r pt = Gf k r Bs.z Bs.z' h'.choose := by
+      rw [hGq]
     obtain ⟨hmono, hd⟩ := Formalism.FourierDecayAlt.P.Dx2.VV.ptMatN_monoP' pt (r + 1) h.1.2 h.1.1
-    have hrel :=
-      Formalism.FourierDecayAlt.P.relevant_points_holds k r Wp Wq Bs pt h'.choose h.1 hγ hZ
-    have horb : ∀ p, Bs.inSS p → B.sgs p h'.choose ∈ B.GPos Bs := fun p hp => ⟨
-      Formalism.FourierDecayAlt.P.B7.sgs_mem Bs hp hγ,
-      by rw [Formalism.FourierDecayAlt.P.JCx1.needs.gf_sgs Bs hp]; exact hpos
-    ⟩
+    have hrel := Formalism.FourierDecayAlt.P.relevant_points_holds k r Wp Wq Bs pt h'.choose h.1 hγ hZ
+    have horb : ∀ p, Bs.inSS p → B.sgs p h'.choose ∈ B.GPos Bs := fun p hp =>
+      ⟨Formalism.FourierDecayAlt.P.B7.sgs_mem Bs hp hγ, by rw [Formalism.FourierDecayAlt.P.JCx1.needs.gf_sgs Bs hp]; exact hpos⟩
     have hZm := hZ.trans hmono
     obtain ⟨θ, maj, hθ, hmaj, hdom⟩ := hc₃ k r Wp Wq Bs h'.choose _ _ A hγ hd hZm hpos hA
-    have hG : Formalism.FourierDecayAlt.P.Dx2.Rad.Good Bs h'.choose _ _ := ⟨
-      Formalism.FourierDecayAlt.P.Dx2.Rad.exists_rho Bs hγ hpos hd hZm,
-      Formalism.FourierDecayAlt.P.Dx2.Rad.u_inj Bs hγ hpos hd hZm,
-      fun ρ hρ => Formalism.FourierDecayAlt.P.Dx2.Rad.u_lstg Bs hγ hpos hd hZm hρ
-    ⟩
+    have hG : Formalism.FourierDecayAlt.P.Dx2.Rad.Good Bs h'.choose _ _ :=
+      ⟨Formalism.FourierDecayAlt.P.Dx2.Rad.exists_rho Bs hγ hpos hd hZm, Formalism.FourierDecayAlt.P.Dx2.Rad.u_inj Bs hγ hpos hd hZm,
+        fun ρ hρ => Formalism.FourierDecayAlt.P.Dx2.Rad.u_lstg Bs hγ hpos hd hZm hρ⟩
     have hR := Formalism.FourierDecayAlt.P.Dx2.Rad.haar_good Bs hγ hd hG
 
-    have hEq
-        : ∀ G : B.Mat k r → (Wq →L[ℂ] Wp),
-          Integrable (fun p => θ p • D.orbIntegrand Bs h'.choose G p) Bs.μSS
-            → D.orbJ Bs h'.choose (D.muR Bs h'.choose (h.1.2 ▸ D.ptPerm pt)) G
-              = ∫ p, θ p • D.orbIntegrand Bs h'.choose G p ∂Bs.μSS := by
+    have hEq : ∀ G : B.Mat k r → (Wq →L[ℂ] Wp),
+        Integrable (fun p => θ p • D.orbIntegrand Bs h'.choose G p) Bs.μSS →
+        D.orbJ Bs h'.choose (D.muR Bs h'.choose (h.1.2 ▸ D.ptPerm pt)) G =
+          ∫ p, θ p • D.orbIntegrand Bs h'.choose G p ∂Bs.μSS := by
       intro G hi
-      have hex
-          : ∃ θ',
-            D.IsNormCut Bs h'.choose (D.muR Bs h'.choose (h.1.2 ▸ D.ptPerm pt)) θ'
-              ∧ Integrable (fun p => θ' p • D.orbIntegrand Bs h'.choose G p) Bs.μSS :=
-        ⟨θ, hθ, hi⟩
+      have hex : ∃ θ', D.IsNormCut Bs h'.choose (D.muR Bs h'.choose (h.1.2 ▸ D.ptPerm pt)) θ' ∧
+          Integrable (fun p => θ' p • D.orbIntegrand Bs h'.choose G p) Bs.μSS := ⟨θ, hθ, hi⟩
       unfold D.orbJ
       rw [dif_pos hex]
-      exact Formalism.FourierDecayAlt.P.orbital_integral_indep_choice k r Wp Wq Bs h'.choose _ hrel
-        hR G _ θ hex.choose_spec.1 hθ hex.choose_spec.2 hi
+      exact Formalism.FourierDecayAlt.P.orbital_integral_indep_choice k r Wp Wq Bs h'.choose _ hrel hR G _ θ hex.choose_spec.1 hθ
+        hex.choose_spec.2 hi
 
     have hiq : ∀ q, Integrable (fun p => θ p • D.orbIntegrand Bs h'.choose (Hq q) p) Bs.μSS := by
       intro q
@@ -78,27 +109,19 @@ theorem vector_linearity_holds : NFVLin := by
       refine (hC _ hs.1 (by rw [Formalism.FourierDecayAlt.P.JCx1.needs.gf_sgs Bs hp])).trans ?_
       exact mul_le_mul_of_nonneg_right (le_max_left _ _) (Real.rpow_nonneg (Real.sqrt_nonneg _) _)
 
-    have hae
-        : (fun p => θ p • D.orbIntegrand Bs h'.choose H p) =ᵐ[Bs.μSS]
-          fun p => ∑ q, c q (Gf k r Bs.z Bs.z' h'.choose) • (θ p • D.orbIntegrand Bs h'.choose (Hq q) p) :=
-      by
-        filter_upwards [Formalism.FourierDecayAlt.P.B5.ae_inSS Bs] with p hp
-        have hs := horb p hp
-        simp only [D.orbIntegrand, B.rho]
-        rw [hH _ hs, Formalism.FourierDecayAlt.P.JCx1.needs.gf_sgs Bs hp, nfVLin_comp_sum,
-          Finset.smul_sum, Finset.smul_sum]
-        refine Finset.sum_congr rfl fun q _ => ?_
-        rw [smul_comm (B.xiTau Bs (1, 1) p), smul_comm (θ p)]
+    have hae : (fun p => θ p • D.orbIntegrand Bs h'.choose H p) =ᵐ[Bs.μSS]
+        fun p => ∑ q, c q (Gf k r Bs.z Bs.z' h'.choose) • (θ p • D.orbIntegrand Bs h'.choose (Hq q) p) := by
+      filter_upwards [Formalism.FourierDecayAlt.P.B5.ae_inSS Bs] with p hp
+      have hs := horb p hp
+      simp only [D.orbIntegrand, B.rho]
+      rw [hH _ hs, Formalism.FourierDecayAlt.P.JCx1.needs.gf_sgs Bs hp, nfVLin_comp_sum, Finset.smul_sum, Finset.smul_sum]
+      refine Finset.sum_congr rfl fun q _ => ?_
+      rw [smul_comm (B.xiTau Bs (1, 1) p), smul_comm (θ p)]
     have hiH : Integrable (fun p => θ p • D.orbIntegrand Bs h'.choose H p) Bs.μSS :=
-      (integrable_finsetSum _ fun q _ => (hiq q).smul (c q (Gf k r Bs.z Bs.z' h'.choose))).congr
-        hae.symm
-    have hint
-        : ∀ q ∈ (Finset.univ : Finset (Fin (Q + 1))),
-          Integrable
-            (fun a =>
-              c q (Gf k r Bs.z Bs.z' h'.choose) • (θ a • D.orbIntegrand Bs h'.choose (Hq q) a))
-            Bs.μSS := fun q _ =>
-      (hiq q).smul (c q (Gf k r Bs.z Bs.z' h'.choose))
+      (integrable_finsetSum _ fun q _ => (hiq q).smul (c q (Gf k r Bs.z Bs.z' h'.choose))).congr hae.symm
+    have hint : ∀ q ∈ (Finset.univ : Finset (Fin (Q + 1))), Integrable
+        (fun a => c q (Gf k r Bs.z Bs.z' h'.choose) • (θ a • D.orbIntegrand Bs h'.choose (Hq q) a)) Bs.μSS :=
+      fun q _ => (hiq q).smul (c q (Gf k r Bs.z Bs.z' h'.choose))
     rw [hEq H hiH, integral_congr_ae hae, integral_finsetSum Finset.univ hint, hGeq]
     refine Finset.sum_congr rfl fun q _ => ?_
     rw [integral_smul, hEq (Hq q) (hiq q)]

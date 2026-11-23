@@ -1,54 +1,95 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.Definitions.Divisors.SurjectiveOfIsPullbackSqZero
-public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.IsNoetherianRingDualNumber
-public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.AbelianHodgeDeRham
-public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.BijectiveCechDeRhamComparisonDegreeOne
+public import Mathlib.RingTheory.Flat.Basic
+public import Mathlib.RingTheory.Localization.Away.Basic
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+public import Mathlib.CategoryTheory.Monoidal.Cartesian.Over
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Development.AbelianVarietyTheory.Definitions.Divisors.CommAlgFunctorCoboundaryZeroMemCocyclesOne
+import Development.AbelianVarietyTheory.Definitions.Divisors.IsKSValueOneOfRetraction
+import Development.AbelianVarietyTheory.Definitions.Divisors.OneFormMapEqKaehlerDifferentialMap
+import Development.AbelianVarietyTheory.Definitions.Divisors.PrimitiveCrystalHodgeLiftClasses
+import Development.AbelianVarietyTheory.Definitions.Divisors.Pullback1MemHodgeFiltration
+import Development.AbelianVarietyTheory.Definitions.Divisors.SurjectiveOfIsPullbackSqZero
+import Mathlib.RingTheory.DividedPowers.Basic
+public import Mathlib.RingTheory.Flat.EquationalCriterion
+import Mathlib.Topology.Sheaves.Presheaf
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.CocycleRightZeroThd
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.SemiabelianSchemes.CubicalStructures.CubeSymmetricSwapFirst
 
 @[expose] public section
 
-open CategoryTheory AlgebraicGeometry KaehlerDifferential DividedPowers
-  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
-  GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.CechDR GlobalTheory.DeRham GlobalTheory.SqLift
-  GlobalTheory.LiftSys GlobalTheory.Published
+open CategoryTheory AlgebraicGeometry KaehlerDifferential DividedPowers ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.CechDR GlobalTheory.DeRham GlobalTheory.SqLift GlobalTheory.LiftSys GlobalTheory.Published
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.LiftAway
 
-theorem mul_eq_zero_of_mem_map
-    {R S : Type} [CommRing R] [CommRing S] [Algebra R S]
-    {I : Ideal R} (hI : I ^ 2 = 0)
-    {u v : S} (hu : u ∈ I.map (algebraMap R S)) (hv : v ∈ I.map (algebraMap R S))
-    : u * v = 0 := by
+theorem mul_eq_zero_of_mem_map {R S : Type} [CommRing R] [CommRing S] [Algebra R S]
+    {I : Ideal R} (hI : I ^ 2 = 0) {u v : S} (hu : u ∈ I.map (algebraMap R S))
+    (hv : v ∈ I.map (algebraMap R S)) : u * v = 0 := by
   have h := Ideal.mul_mem_mul hu hv
   rw [← Ideal.map_mul, ← pow_two, hI, Ideal.zero_eq_bot, Ideal.map_bot] at h
   exact h
 
-theorem frac_add
-    {B B' : Type} [CommRing B] [CommRing B'] [Algebra B B']
-    {a : B} {y z : B'} (hy : ∃ (n : ℕ) (b : B), y * algebraMap B B' a ^ n = algebraMap B B' b)
-    (hz : ∃ (n : ℕ) (b : B), z * algebraMap B B' a ^ n = algebraMap B B' b)
-    : ∃ (n : ℕ) (b : B), (y + z) * algebraMap B B' a ^ n = algebraMap B B' b := by
+theorem frac_add {B B' : Type} [CommRing B] [CommRing B'] [Algebra B B'] {a : B} {y z : B'}
+    (hy : ∃ (n : ℕ) (b : B), y * algebraMap B B' a ^ n = algebraMap B B' b)
+    (hz : ∃ (n : ℕ) (b : B), z * algebraMap B B' a ^ n = algebraMap B B' b) :
+    ∃ (n : ℕ) (b : B), (y + z) * algebraMap B B' a ^ n = algebraMap B B' b := by
   obtain ⟨n, b, hb⟩ := hy
   obtain ⟨m, c, hc⟩ := hz
   refine ⟨n + m, b * a ^ m + c * a ^ n, ?_⟩
   rw [map_add (f := _), map_mul, map_mul, map_pow, map_pow, ← hb, ← hc]
   ring
 
-theorem isLocalization_away_of_flat_lift
-    (R B B' B₀ B₀' : Type) [CommRing R] [CommRing B] [CommRing B'] [CommRing B₀] [CommRing B₀']
-    [Algebra R B] [Algebra R B'] [Algebra B B'] [IsScalarTower R B B'] [Algebra B₀ B₀']
-    (I : Ideal R) (hI : I ^ 2 = 0)
-    (hflat : Module.Flat R B')
-    (p : B →+* B₀)
-    (p' : B' →+* B₀')
-    (hp : Function.Surjective p) (hp' : Function.Surjective p')
-    (hker : ∀ b, p b = 0 ↔ b ∈ I.map (algebraMap R B))
+theorem isLocalization_away_of_flat_lift (R B B' B₀ B₀' : Type) [CommRing R] [CommRing B]
+    [CommRing B'] [CommRing B₀] [CommRing B₀'] [Algebra R B] [Algebra R B'] [Algebra B B']
+    [IsScalarTower R B B'] [Algebra B₀ B₀'] (I : Ideal R) (hI : I ^ 2 = 0)
+    (hflat : Module.Flat R B') (p : B →+* B₀) (p' : B' →+* B₀') (hp : Function.Surjective p)
+    (hp' : Function.Surjective p') (hker : ∀ b, p b = 0 ↔ b ∈ I.map (algebraMap R B))
     (hker' : ∀ b, p' b = 0 ↔ b ∈ I.map (algebraMap R B'))
-    (hcomm : ∀ b, p' (algebraMap B B' b) = algebraMap B₀ B₀' (p b))
-    (a : B) (hloc : IsLocalization.Away (p a) B₀')
-    : IsLocalization.Away a B' := by
+    (hcomm : ∀ b, p' (algebraMap B B' b) = algebraMap B₀ B₀' (p b)) (a : B)
+    (hloc : IsLocalization.Away (p a) B₀') : IsLocalization.Away a B' := by
   haveI := hloc
   haveI := hflat
   set φ := algebraMap B B' with hφ
@@ -56,7 +97,8 @@ theorem isLocalization_away_of_flat_lift
     rw [Algebra.smul_def, Algebra.smul_def, map_mul, hφ, ← IsScalarTower.algebraMap_apply]
 
   have hunit : IsUnit (φ a) := by
-    have hu : IsUnit (p' (φ a)) := by rw [hcomm]; exact IsLocalization.Away.algebraMap_isUnit (p a)
+    have hu : IsUnit (p' (φ a)) := by
+      rw [hcomm]; exact IsLocalization.Away.algebraMap_isUnit (p a)
     obtain ⟨v, hv⟩ := hp' (↑hu.unit⁻¹ : B₀')
     have hn : φ a * v - 1 ∈ I.map (algebraMap R B') := by
       rw [← hker', map_sub, map_mul, hv, map_one, IsUnit.mul_val_inv, sub_self]
@@ -72,7 +114,8 @@ theorem isLocalization_away_of_flat_lift
     refine ⟨n, b, ?_⟩
     dsimp only at hz
     rw [← hker', map_sub, map_mul, map_pow, hcomm, hcomm, ← map_pow, hz, sub_self]
-  have fracI : ∀ i ∈ I, ∀ y : B', ∃ (n : ℕ) (b : B), algebraMap R B' i * y * φ a ^ n = φ b := by
+  have fracI : ∀ i ∈ I, ∀ y : B', ∃ (n : ℕ) (b : B),
+      algebraMap R B' i * y * φ a ^ n = φ b := by
     intro i hi y
     obtain ⟨n, b, hb⟩ := lift0 y
     refine ⟨n, algebraMap R B i * b, ?_⟩
@@ -116,19 +159,17 @@ theorem isLocalization_away_of_flat_lift
     obtain ⟨k, c, g, rfl⟩ := Submodule.mem_span_set'.mp hxI
     choose i hi hgi using fun j => (g j).2
     have hrel : ∑ j, i j • φ (c j) = 0 := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [← hx, map_sum]
+
+      rw [← hx, map_sum]
       refine Finset.sum_congr rfl fun j _ => ?_
       rw [smul_eq_mul, map_mul, Algebra.smul_def, ← hgi j, hφ,
         IsScalarTower.algebraMap_apply R B B', mul_comm]
-    obtain ⟨l, A, y, hy, hA⟩ :=
-      Module.Flat.isTrivialRelation_of_sum_smul_eq_zero (R := R) (M := B') (f := i)
-        (x := fun j => φ (c j))
-        hrel
+    obtain ⟨l, A, y, hy, hA⟩ := Module.Flat.isTrivialRelation_of_sum_smul_eq_zero
+      (R := R) (M := B') (f := i) (x := fun j => φ (c j)) hrel
     choose m d hd using fun j => surj (y j)
     obtain ⟨M, hMdef⟩ : ∃ M, M = ∑ j, m j := ⟨_, rfl⟩
-    have hMle : ∀ j, m j ≤ M := fun j =>
-      hMdef ▸ Finset.single_le_sum (fun j _ => Nat.zero_le (m j)) (Finset.mem_univ j)
+    have hMle : ∀ j, m j ≤ M := fun j => hMdef ▸
+      Finset.single_le_sum (fun j _ => Nat.zero_le (m j)) (Finset.mem_univ j)
     have hM : ∀ j, y j * φ a ^ M = φ (d j * a ^ (M - m j)) := by
       intro j
       obtain ⟨t, ht⟩ := Nat.exists_eq_add_of_le (hMle j)
@@ -136,42 +177,36 @@ theorem isLocalization_away_of_flat_lift
       ring
     have he : ∀ q, φ (c q * a ^ M - ∑ j, A q j • (d j * a ^ (M - m j))) = 0 := by
       intro q
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sub, map_mul, map_pow, map_sum]
+
+      rw [map_sub, map_mul, map_pow, map_sum]
       simp_rw [hφs, ← hM]
       rw [show φ (c q) = ∑ j, A q j • y j from hy q, Finset.sum_mul]
       simp [smul_mul_assoc]
     choose n' hn' using fun q => kerI _ (he q)
     obtain ⟨N, hNdef⟩ : ∃ N, N = ∑ q, n' q := ⟨_, rfl⟩
-    have hNle : ∀ q, n' q ≤ N := fun q =>
-      hNdef ▸ Finset.single_le_sum (fun q _ => Nat.zero_le (n' q)) (Finset.mem_univ q)
-    have hz
-        : ∀ q,
-          algebraMap R B (i q) * (a ^ N * (c q * a ^ M - ∑ j, A q j • (d j * a ^ (M - m j))))
-            = 0 := by
+    have hNle : ∀ q, n' q ≤ N := fun q => hNdef ▸
+      Finset.single_le_sum (fun q _ => Nat.zero_le (n' q)) (Finset.mem_univ q)
+    have hz : ∀ q, algebraMap R B (i q) *
+        (a ^ N * (c q * a ^ M - ∑ j, A q j • (d j * a ^ (M - m j)))) = 0 := by
       intro q
       obtain ⟨t, ht⟩ := Nat.exists_eq_add_of_le (hNle q)
       rw [ht, pow_add, mul_comm (a ^ n' q), mul_assoc, mul_left_comm,
         mul_eq_zero_of_mem_map hI (Ideal.mem_map_of_mem _ (hi q)) (hn' q), mul_zero]
     refine ⟨N + M, ?_⟩
-    have step
-        : ∀ q,
-          a ^ (N + M) * (c q • (g q : B))
-            = ∑ j, algebraMap R B (i q * A q j) * (a ^ N * (d j * a ^ (M - m j))) := by
+    have step : ∀ q, a ^ (N + M) * (c q • (g q : B)) =
+        ∑ j, algebraMap R B (i q * A q j) * (a ^ N * (d j * a ^ (M - m j))) := by
       intro q
       have h1 := hz q
       rw [← hgi q, smul_eq_mul]
       simp_rw [map_mul, Algebra.smul_def] at h1 ⊢
       rw [mul_sub, mul_sub, sub_eq_zero, Finset.mul_sum, Finset.mul_sum] at h1
-      calc
-        a ^ (N + M) * (c q * algebraMap R B (i q))
+      calc a ^ (N + M) * (c q * algebraMap R B (i q))
           = algebraMap R B (i q) * (a ^ N * (c q * a ^ M)) := by ring
-        _ = ∑ j, algebraMap R B (i q) * (a ^ N * (algebraMap R B (A q j) * (d j * a ^ (M - m j)))) :=
-          h1
+        _ = ∑ j, algebraMap R B (i q) * (a ^ N * (algebraMap R B (A q j) * (d j * a ^ (M - m j)))) := h1
         _ = _ := Finset.sum_congr rfl fun j _ => by ring
     rw [Finset.mul_sum, Finset.sum_congr rfl fun q _ => step q, Finset.sum_comm]
     refine Finset.sum_eq_zero fun j _ => ?_
-    set_option synthInstance.maxHeartbeats 100000 in
+
     rw [← Finset.sum_mul, ← map_sum, hA j, map_zero, zero_mul]
   have kerAll : ∀ x : B, φ x = 0 → ∃ N : ℕ, a ^ N * x = 0 := by
     intro x hx

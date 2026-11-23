@@ -1,7 +1,53 @@
 module
 
-public import Mathlib
 public import ReciprocityTheory.DualLattices.CyclicRecursionStatement
+import Mathlib.Algebra.AffineMonoid.Basic
+import Mathlib.Algebra.AffineMonoid.UniqueSums
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+public import Mathlib.NumberTheory.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Lemma
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -42,8 +88,8 @@ private lemma univ_coeff {ι : Type} (s : Finset ι) :
   refine ⟨h0, ?_⟩
   have hg : ghostComponent 1 (∑ i ∈ s, teichmuller p (X i : MvPolynomial ι ℤ)) =
       ∑ i ∈ s, (X i : MvPolynomial ι ℤ) ^ p := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     refine Finset.sum_congr rfl (fun i _ => ?_)
     rw [ghost_one]
     simp [WittVector.teichmuller_coeff_pos]
@@ -103,38 +149,34 @@ theorem teichSum (p : ℕ) [Fact p.Prime] : TeichSumStatement p := by
   refine ⟨⟨_, (univ_coeff (p := p) s).2⟩, ?_⟩
   intro K _ _ _ X S hS
   refine ⟨?_, ?_⟩
-  · obtain ⟨w, hw⟩ :=
-      exists_witt_eq_teich_add_p_teich_frob_symm_add_p_sq_mul (∑ i ∈ s, teichmuller p (X i))
+  · obtain ⟨w, hw⟩ := exists_witt_eq_teich_add_p_teich_frob_symm_add_p_sq_mul (∑ i ∈ s, teichmuller p (X i))
     have h0 : (∑ i ∈ s, teichmuller p (X i)).coeff 0 = ∑ i ∈ s, X i := by
       rw [coeff_zero_sum]
       simp
-    have hmap
-        : WittVector.map (MvPolynomial.aeval X).toRingHom
-            (∑ i ∈ s, teichmuller p (MvPolynomial.X i : MvPolynomial ι ℤ))
-          = ∑ i ∈ s, teichmuller p (X i) := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum]
+    have hmap : WittVector.map (MvPolynomial.aeval X).toRingHom
+        (∑ i ∈ s, teichmuller p (MvPolynomial.X i : MvPolynomial ι ℤ)) =
+          ∑ i ∈ s, teichmuller p (X i) := by
+
+      rw [map_sum]
       refine Finset.sum_congr rfl (fun i _ => ?_)
       rw [WittVector.map_teichmuller]
       simp
     have hSeq : (∑ i ∈ s, teichmuller p (MvPolynomial.X i : MvPolynomial ι ℤ)).coeff 1 = S := by
-      have hp0 : (p : MvPolynomial ι ℤ) ≠ 0 := by exact_mod_cast (Fact.out : p.Prime).ne_zero
+      have hp0 : (p : MvPolynomial ι ℤ) ≠ 0 := by
+        exact_mod_cast (Fact.out : p.Prime).ne_zero
       exact mul_left_cancel₀ hp0 ((univ_coeff (p := p) s).2.trans hS.symm)
     have h1 : (∑ i ∈ s, teichmuller p (X i)).coeff 1 = MvPolynomial.aeval X S := by
       rw [← hmap, WittVector.map_coeff, hSeq]
       try rfl
-    have hfr
-        : (frobeniusEquiv K p).symm (MvPolynomial.aeval X S)
-          = MvPolynomial.aeval (fun i => (frobeniusEquiv K p).symm (X i)) S :=
+    have hfr : (frobeniusEquiv K p).symm (MvPolynomial.aeval X S) =
+        MvPolynomial.aeval (fun i => (frobeniusEquiv K p).symm (X i)) S :=
       ringHom_aeval ((frobeniusEquiv K p).symm : K →+* K) X S
     refine ⟨w, ?_⟩
     rw [h0, h1, hfr] at hw
     exact hw
   · intro y t
-    have hd
-        : ((p : ℕ) : WittVector p K)
-          ∣ (teichmuller p y + (p : WittVector p K) * t) - teichmuller p y :=
-      ⟨t, by ring⟩
+    have hd : ((p : ℕ) : WittVector p K) ∣ (teichmuller p y + (p : WittVector p K) * t) -
+        teichmuller p y := ⟨t, by ring⟩
     obtain ⟨w, hw⟩ := dvd_sub_pow_of_dvd_sub hd 1
     refine ⟨w, ?_⟩
     simp only [pow_one] at hw

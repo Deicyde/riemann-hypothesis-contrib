@@ -2,22 +2,57 @@ module
 
 public import Formalism.LocalToGlobal.IndefiniteReal.FinitePlaces.PlaceDualASt
 public import Formalism.LocalToGlobal.IndefiniteReal.FinitePlaces.TwoSplitIdem
+public import Formalism.LocalToGlobal.IndefiniteReal.FinitePlaces.CharLem
+public import Formalism.LocalToGlobal.IndefiniteReal.FinitePlaces.IdemUniq
+public import Formalism.LocalToGlobal.IndefiniteReal.FinitePlaces.InfPartSplitIdem
 public import Formalism.LocalToGlobal.IndefiniteReal.FinitePlaces.LatMod
 public import Formalism.LocalToGlobal.IndefiniteReal.FinitePlaces.SplitInt
-public import Formalism.LocalToGlobal.IndefiniteReal.FinitePlaces.CharLem
-public import Formalism.LocalToGlobal.IndefiniteReal.FinitePlaces.InfPartSplitIdem
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH
-  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
-  Formalism.L2.Theta MeasureTheory IsDedekindDomain NumberField Matrix
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta MeasureTheory IsDedekindDomain NumberField Matrix
 open Formalism.IndefR.Datum
 open scoped TensorProduct
 
-set_option synthInstance.maxHeartbeats 160000
+
 
 namespace Formalism.IndefR.Fin.PDA
 
@@ -29,43 +64,38 @@ variable {D : D7}
 
 abbrev fI (D : D7) : AE D := algebraMap (AF D.host.F) (AE D) (pairA D.host.F 0 1)
 
-theorem pairA_mul_one (α : Af D.host.F)
-    : pairA D.host.F 0 α * pairA D.host.F 0 1 = pairA D.host.F 0 α :=
+theorem pairA_mul_one (α : Af D.host.F) : pairA D.host.F 0 α * pairA D.host.F 0 1 = pairA D.host.F 0 α :=
   Prod.ext (by show (0 : Ainf D.host.F) * 0 = 0; rw [mul_zero]) (by show α * 1 = α; rw [mul_one])
 
 theorem splitIdem_mul_fI {e' : AE D} (h : IsSplitIdem D e') : e' * fI D = e' := by
   obtain ⟨h1, h2, v, ε, ⟨α, rfl, -, -⟩, h3⟩ := h
   have he : e' = e' * algebraMap (AF D.host.F) (AE D) (pairA D.host.F 0 α) := by
     rw [← h3, mul_add, h1, h2, add_zero]
-  calc
-    e' * fI D
-      = e' * algebraMap (AF D.host.F) (AE D) (pairA D.host.F 0 α) * fI D := by rw [← he]
+  calc e' * fI D = e' * algebraMap (AF D.host.F) (AE D) (pairA D.host.F 0 α) * fI D := by rw [← he]
     _ = e' * algebraMap (AF D.host.F) (AE D) (pairA D.host.F 0 α * pairA D.host.F 0 1) := by
-      rw [map_mul, mul_assoc]
+        rw [map_mul, mul_assoc]
     _ = e' := by rw [pairA_mul_one, ← he]
 
 theorem splitIdem_cA {e : AE D} (h : IsSplitIdem D e) : IsSplitIdem D (cA D e) := by
   obtain ⟨h1, h2, v, ε, hv, h3⟩ := h
   exact ⟨by rw [← map_mul, h1], by rw [cA_cA, mul_comm, h2], v, ε, hv, by rw [cA_cA, add_comm, h3]⟩
 
-theorem idemSum_mul_fI {e : AE D} {P : Finset (Formalism.L2.DIV.Pl D.host.E)} (he : IsIdemSum e P)
-    : e * fI D = e ∧ cA D e * fI D = cA D e := by
+theorem idemSum_mul_fI {e : AE D} {P : Finset (Formalism.L2.DIV.Pl D.host.E)} (he : IsIdemSum e P) :
+    e * fI D = e ∧ cA D e * fI D = cA D e := by
   obtain ⟨⟨es, hes, rfl⟩, -⟩ := he
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [Finset.sum_mul, map_sum, Finset.sum_mul]
-  exact ⟨
-    Finset.sum_congr rfl fun PP hPP => splitIdem_mul_fI (hes PP hPP).1,
-    Finset.sum_congr rfl fun PP hPP => splitIdem_mul_fI (splitIdem_cA (hes PP hPP).1)
-  ⟩
 
-theorem idemSum_int {P : Finset (Formalism.L2.DIV.Pl D.host.E)} {e : AE D} (he : IsIdemSum e P)
-    : finPart D e ∈ intAE D ∧ finPart D (cA D e) ∈ intAE D := by
+  rw [Finset.sum_mul, map_sum, Finset.sum_mul]
+  exact ⟨Finset.sum_congr rfl fun PP hPP => splitIdem_mul_fI (hes PP hPP).1,
+    Finset.sum_congr rfl fun PP hPP => splitIdem_mul_fI (splitIdem_cA (hes PP hPP).1)⟩
+
+theorem idemSum_int {P : Finset (Formalism.L2.DIV.Pl D.host.E)} {e : AE D} (he : IsIdemSum e P) :
+    finPart D e ∈ intAE D ∧ finPart D (cA D e) ∈ intAE D := by
   obtain ⟨⟨es, hes, rfl⟩, -⟩ := he
   refine ⟨?_, ?_⟩
-  set_option synthInstance.maxHeartbeats 100000 in
-    · rw [map_sum]
-      exact AddSubgroup.sum_mem _ fun PP hPP => splitIdem_int (hes PP hPP).1
-  set_option synthInstance.maxHeartbeats 100000 in
+
+  · rw [map_sum]
+    exact AddSubgroup.sum_mem _ fun PP hPP => splitIdem_int (hes PP hPP).1
+
   · rw [map_sum, map_sum]
     exact AddSubgroup.sum_mem _ fun PP hPP => splitIdem_int (splitIdem_cA (hes PP hPP).1)
 
@@ -78,29 +108,26 @@ theorem infPart_fI : infPart D (fI D) = 0 := by
   show fstA D.host.F (pairA D.host.F 0 1) ⊗ₜ[D.host.F] (AlgHom.id D.host.F D.host.E) 1 = 0
   rw [show fstA D.host.F (pairA D.host.F 0 1) = 0 from rfl, TensorProduct.zero_tmul]
 
-theorem half_infPart {m n : ℕ} {f : AE D} (hf : f * fI D = f) {y : Mx D m n} (hy : IsHalf f y)
-    : y.map (infPart D) = 0 := by
+theorem half_infPart {m n : ℕ} {f : AE D} (hf : f * fI D = f) {y : Mx D m n} (hy : IsHalf f y) :
+    y.map (infPart D) = 0 := by
   ext i j
   rw [Matrix.map_apply, Matrix.zero_apply]
-  calc
-    infPart D (y i j)
-      = infPart D ((f * fI D) * y i j) := by rw [hf, hy i j]
+  calc infPart D (y i j) = infPart D ((f * fI D) * y i j) := by rw [hf, hy i j]
     _ = 0 := by rw [map_mul, map_mul, infPart_fI, mul_zero, zero_mul]
 
 variable (S T : HSp D)
 
-theorem hO_half_right {f : AE D} {y : WO S T} (hy : IsHalf (cA D f) y) (u : WO S T)
-    : hO S T y u = hO S T y (f • u) := by
+theorem hO_half_right {f : AE D} {y : WO S T} (hy : IsHalf (cA D f) y) (u : WO S T) :
+    hO S T y u = hO S T y (f • u) := by
   unfold hO
-  refine Finset.sum_congr rfl fun a _ =>
-    Finset.sum_congr rfl fun b _ =>
-      Finset.sum_congr rfl fun c _ => Finset.sum_congr rfl fun d _ => ?_
+  refine Finset.sum_congr rfl fun a _ => Finset.sum_congr rfl fun b _ => Finset.sum_congr rfl fun c _ =>
+    Finset.sum_congr rfl fun d _ => ?_
   rw [Matrix.smul_apply, smul_eq_mul, map_mul]
   conv_lhs => rw [← hy d a]
   ring
 
-theorem symplO_half_right {f : AE D} {y : WO S T} (hy : IsHalf (cA D f) y) (u : WO S T)
-    : symplO S T y u = symplO S T y (f • u) := by
+theorem symplO_half_right {f : AE D} {y : WO S T} (hy : IsHalf (cA D f) y) (u : WO S T) :
+    symplO S T y u = symplO S T y (f • u) := by
   unfold symplO; rw [hO_half_right S T hy u]
 
 variable {S T}
@@ -116,8 +143,7 @@ theorem placeLatDualIi_of (hL : LatSelfDual D) : PlaceLatDualIi D := by
   · intro hx
     refine (hL4 y hy0).2 fun u hu => ?_
     have hm : e • u ∈ latAll S T ΛS ΛT := latO_smul_mem S T ΛS ΛT hie hu
-    have hh : IsHalf e (e • u) := fun i j => by
-      rw [Matrix.smul_apply, smul_eq_mul, ← mul_assoc, hee]
+    have hh : IsHalf e (e • u) := fun i j => by rw [Matrix.smul_apply, smul_eq_mul, ← mul_assoc, hee]
     have h1 := hx _ hm hh
     rw [symplO_half_right S T hy u, symplO_swap S T (e • u) y, AddChar.map_neg_eq_inv, h1, inv_one]
   · intro hyL x hx hxh
@@ -136,8 +162,7 @@ theorem placeLatDualIii_of (hL : LatSelfDual D) : PlaceLatDualIii D := by
   · intro hy
     refine (hL4 x hx0).2 fun u hu => ?_
     have hm : cA D e • u ∈ latAll S T ΛS ΛT := latO_smul_mem S T ΛS ΛT hic hu
-    have hh : IsHalf (cA D e) (cA D e • u) := fun i j => by
-      rw [Matrix.smul_apply, smul_eq_mul, ← mul_assoc, hcc]
+    have hh : IsHalf (cA D e) (cA D e • u) := fun i j => by rw [Matrix.smul_apply, smul_eq_mul, ← mul_assoc, hcc]
     rw [symplO_half_right S T hxc u]
     exact hy _ hm hh
   · intro hxL y hy _

@@ -1,10 +1,55 @@
 module
 
-public import Mathlib
-public import Development.WeilBound.ThetaLifts.LatticeBasics.IsCompactIntV
-public import Development.AutomorphicSpectrum.Proofs.TwistedProofs.ExtensionEmbeddingEvInfRealAd
+import Development.WeilBound.ThetaLifts.LeviDeterminants.NormIteratedFDerivIdLeOneAdd
+public import Development.AbelianVarietyTheory.BlockTheory.DivisorBase.WeilTensorModels
 public import Development.AutomorphicSpectrum.Proofs.TwistedProofs.EqZeroOfPiInf
 public import Development.AutomorphicSpectrum.Proofs.TwistedProofs.ExistsAdelePiInf
+public import Development.AutomorphicSpectrum.Proofs.TwistedProofs.ExtensionEmbeddingEvInfRealAd
+public import Development.WeilBound.ThetaLifts.LatticeBasics.IsCompactIntV
+import Mathlib.Algebra.Order.Archimedean.Real.Hom
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.LinearAlgebra.Matrix.FiniteDimensional
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.TotallySplit
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -13,10 +58,8 @@ noncomputable section
 namespace GlobalTheory.ThK.Dbl.Dense
 
 open scoped TensorProduct NNReal Matrix SchwartzMap LineDeriv
-open NumberField IsDedekindDomain MeasureTheory Filter Topology
-  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Matrix
-open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
-  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
+open NumberField IsDedekindDomain MeasureTheory Filter Topology Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Matrix
+open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
 
 section Heis
 
@@ -30,8 +73,7 @@ theorem evI_mul (a b : AF F) : evI F (a * b) = evI F a * evI F b :=
 
 theorem evI_zero : evI F 0 = 0 := map_zero (InfiniteAdeleRing.ringEquiv_mixedSpace F)
 
-theorem evI_sum {ι : Type} (s : Finset ι) (g : ι → AF F)
-    : evI F (∑ i ∈ s, g i) = ∑ i ∈ s, evI F (g i) := by
+theorem evI_sum {ι : Type} (s : Finset ι) (g : ι → AF F) : evI F (∑ i ∈ s, g i) = ∑ i ∈ s, evI F (g i) := by
   classical
   induction s using Finset.induction_on with
   | empty => simpa using evI_zero
@@ -45,93 +87,59 @@ def linForm (B : κ → mixedEmbedding.mixedSpace F) : (κ → mixedEmbedding.mi
     (∑ i, (Algebra.trace ℝ (mixedEmbedding.mixedSpace F)) ∘ₗ (LinearMap.mulRight ℝ (B i)) ∘ₗ
       (LinearMap.proj i : (κ → mixedEmbedding.mixedSpace F) →ₗ[ℝ] mixedEmbedding.mixedSpace F))
 
-theorem linForm_apply (B y : κ → mixedEmbedding.mixedSpace F)
-    : linForm B y = Algebra.trace ℝ (mixedEmbedding.mixedSpace F) (∑ i, y i * B i) := by
-  set_option synthInstance.maxHeartbeats 100000 in
+theorem linForm_apply (B y : κ → mixedEmbedding.mixedSpace F) :
+    linForm B y = Algebra.trace ℝ (mixedEmbedding.mixedSpace F) (∑ i, y i * B i) := by
+
   simp [linForm, map_sum, LinearMap.sum_apply]
 
+
 open scoped Classical in
-theorem hasDerivAt_line (f : SInf F κ) (y A : κ → mixedEmbedding.mixedSpace F) (l c : ℝ) (ρ : ℂ)
-    : HasDerivAt
-      (fun t : ℝ =>
-        Complex.exp (-(2 * Real.pi * Complex.I) * ((t * l + t ^ 2 * c : ℝ) : ℂ))
-          * (f (y + t • A) * ρ))
+theorem hasDerivAt_line (f : SInf F κ) (y A : κ → mixedEmbedding.mixedSpace F) (l c : ℝ) (ρ : ℂ) :
+    HasDerivAt (fun t : ℝ => Complex.exp (-(2 * Real.pi * Complex.I) * ((t * l + t ^ 2 * c : ℝ) : ℂ)) * (f (y + t • A) * ρ))
       ((fderiv ℝ f y A + (-(2 * Real.pi * Complex.I) * (l : ℂ)) * f y) * ρ) 0 := by
   have h1 : HasDerivAt (fun t : ℝ => t * l + t ^ 2 * c) l 0 := by
-    have a1 : HasDerivAt (fun t : ℝ => t * l) l 0 := by
-      simpa using (hasDerivAt_id (0 : ℝ)).mul_const l
+    have a1 : HasDerivAt (fun t : ℝ => t * l) l 0 := by simpa using (hasDerivAt_id (0 : ℝ)).mul_const l
     have a2 : HasDerivAt (fun t : ℝ => t ^ 2 * c) 0 0 := by
       simpa using ((hasDerivAt_id (0 : ℝ)).pow 2).mul_const c
     simpa using a1.fun_add a2
-  have h2 : HasDerivAt
-      (fun t : ℝ => Complex.exp (-(2 * Real.pi * Complex.I) * ((t * l + t ^ 2 * c : ℝ) : ℂ)))
+  have h2 : HasDerivAt (fun t : ℝ => Complex.exp (-(2 * Real.pi * Complex.I) * ((t * l + t ^ 2 * c : ℝ) : ℂ)))
       (-(2 * Real.pi * Complex.I) * (l : ℂ)) 0 := by
     have := ((h1.ofReal_comp).const_mul (-(2 * Real.pi * Complex.I))).cexp
     simpa using this
   have h3 : HasDerivAt (fun t : ℝ => y + t • A) A 0 := by
     simpa using ((hasDerivAt_id (0 : ℝ)).smul_const A).const_add y
   have h4 : HasDerivAt (fun t : ℝ => f (y + t • A)) (fderiv ℝ f y A) 0 := by
-    have hf : HasFDerivAt f (fderiv ℝ f y) (y + (0 : ℝ) • A) := by simpa using f.hasFDerivAt y
+    have hf : HasFDerivAt f (fderiv ℝ f y) (y + (0 : ℝ) • A) := by
+      simpa using f.hasFDerivAt y
     exact hf.comp_hasDerivAt (0 : ℝ) h3
   exact (h2.fun_mul (h4.mul_const ρ)).congr_deriv (by simp; ring)
 
+
 open scoped Classical in
-theorem phase_line
-    (ψ : AddChar (AF F) ℂ) (hψ : IsStd ψ) (a b x : κ → AF F) (hb : At (evI F) b) (t : ℝ)
-    : ψ (x ⬝ᵥ (realAd F t • b) + ⅟(2 : AF F) * ((realAd F t • a) ⬝ᵥ (realAd F t • b)))
-      = Complex.exp
-        (-(2 * Real.pi * Complex.I)
-          * ((t * linForm (fun i => evI F (b i)) (fun i => evI F (x i))
-                + t ^ 2 * Algebra.trace ℝ (mixedEmbedding.mixedSpace F)
-                  (evI F ⅟(2 : AF F) * ∑ i, evI F (a i) * evI F (b i))
-              : ℝ)
-            : ℂ)) := by
-  have hz : At (evI F)
-      (x ⬝ᵥ (realAd F t • b) + ⅟(2 : AF F) * ((realAd F t • a) ⬝ᵥ (realAd F t • b))) := by
-    intro s hs
-    have hsb : ∀ i, s * b i = 0 := fun i => by simpa using congrFun (hb s hs) i
-    have e1 : ∀ i, s * (x i * (realAd F t * b i)) = x i * realAd F t * (s * b i) := fun i => by ring
-    have e2
-        : ∀ i,
-          s * (⅟(2 : AF F) * (realAd F t * a i * (realAd F t * b i)))
-            = ⅟(2 : AF F) * (realAd F t * a i * realAd F t) * (s * b i) := fun i => by
-      ring
-    simp only [dotProduct, Pi.smul_apply, smul_eq_mul, mul_add, Finset.mul_sum, e1, e2, hsb,
-      mul_zero, Finset.sum_const_zero, add_zero]
-  rw [hψ.2.2 _ hz]
-  congr 3
-  have ev
-      : evI F (x ⬝ᵥ (realAd F t • b) + ⅟(2 : AF F) * ((realAd F t • a) ⬝ᵥ (realAd F t • b)))
-        = t • (∑ i, evI F (x i) * evI F (b i))
-          + (t ^ 2) • (evI F ⅟(2 : AF F) * ∑ i, evI F (a i) * evI F (b i)) := by
-    simp only [dotProduct, Pi.smul_apply, smul_eq_mul, evI_add, evI_mul, evI_sum, evI_realAd,
-      Algebra.smul_def, map_pow, Finset.mul_sum]
-    congr 1
-    · exact Finset.sum_congr rfl fun i _ => by ring
-    · exact Finset.sum_congr rfl fun i _ => by ring
-  rw [ev, map_add (f := _), map_smul, map_smul, linForm_apply]
-  simp [smul_eq_mul]
+theorem phase_line (ψ : AddChar (AF F) ℂ) (hψ : IsStd ψ) (a b x : κ → AF F) (hb : At (evI F) b) (t : ℝ) :
+    ψ (x ⬝ᵥ (realAd F t • b) + ⅟(2 : AF F) * ((realAd F t • a) ⬝ᵥ (realAd F t • b))) =
+      Complex.exp (-(2 * Real.pi * Complex.I) * ((t * linForm (fun i => evI F (b i)) (fun i => evI F (x i)) +
+        t ^ 2 * Algebra.trace ℝ (mixedEmbedding.mixedSpace F) (evI F ⅟(2 : AF F) * ∑ i, evI F (a i) * evI F (b i)) : ℝ) : ℂ)) := by
+  apply PositivityTheory.ThKF0.Lib.phase_line <;> assumption
 
 def pt (x : κ → mixedEmbedding.mixedSpace F) (y : κ → FiniteAdeleRing (𝓞 F) F) : κ → AF F :=
   fun i => ((InfiniteAdeleRing.ringEquiv_mixedSpace F).symm (x i), y i)
 
-theorem evI_pt (x : κ → mixedEmbedding.mixedSpace F) (y : κ → FiniteAdeleRing (𝓞 F) F)
-    : (fun i => evI F (pt x y i)) = x := by
+theorem evI_pt (x : κ → mixedEmbedding.mixedSpace F) (y : κ → FiniteAdeleRing (𝓞 F) F) :
+    (fun i => evI F (pt x y i)) = x := by
   funext i
   exact (InfiniteAdeleRing.ringEquiv_mixedSpace F).apply_symm_apply _
 
-theorem pureA_pt
-    (f : (κ → mixedEmbedding.mixedSpace F) → ℂ) (g : (κ → FiniteAdeleRing (𝓞 F) F) → ℂ)
-    (x : κ → mixedEmbedding.mixedSpace F) (y : κ → FiniteAdeleRing (𝓞 F) F)
-    : pureA F f g (pt x y) = f x * g y := by
+theorem pureA_pt (f : (κ → mixedEmbedding.mixedSpace F) → ℂ) (g : (κ → FiniteAdeleRing (𝓞 F) F) → ℂ)
+    (x : κ → mixedEmbedding.mixedSpace F) (y : κ → FiniteAdeleRing (𝓞 F) F) :
+    pureA F f g (pt x y) = f x * g y := by
   change f (fun i => evI F (pt x y i)) * g y = _
   rw [evI_pt]
 
 def rOf (g : (κ → FiniteAdeleRing (𝓞 F) F) → ℂ) : (κ → AF F) → ℂ := fun x => g fun i => (x i).2
 
-theorem tens_rOf (f : (κ → mixedEmbedding.mixedSpace F) → ℂ) (g : (κ → FiniteAdeleRing (𝓞 F) F) → ℂ)
-    : tens (evI F) f (rOf g) = pureA F f g :=
-  rfl
+theorem tens_rOf (f : (κ → mixedEmbedding.mixedSpace F) → ℂ) (g : (κ → FiniteAdeleRing (𝓞 F) F) → ℂ) :
+    tens (evI F) f (rOf g) = pureA F f g := rfl
 
 theorem snd_eq_zero {z : κ → AF F} (hz : At (evI F) z) (i : κ) : (z i).2 = 0 := by
   let u : AF F := (0, 1)
@@ -140,8 +148,8 @@ theorem snd_eq_zero {z : κ → AF F} (hz : At (evI F) z) (i : κ) : (z i).2 = 0
   have h' : (1 : Af F) * (z i).2 = 0 := congrArg Prod.snd h
   simpa using h'
 
-theorem rOf_add (g : (κ → FiniteAdeleRing (𝓞 F) F) → ℂ) (x z : κ → AF F) (hz : At (evI F) z)
-    : rOf g (x + z) = rOf g x := by
+theorem rOf_add (g : (κ → FiniteAdeleRing (𝓞 F) F) → ℂ) (x z : κ → AF F) (hz : At (evI F) z) :
+    rOf g (x + z) = rOf g x := by
   have : (fun i => (x + z) i |>.2) = fun i => (x i).2 := by
     funext i
     show (x i).2 + (z i).2 = _
@@ -163,18 +171,17 @@ theorem evI_lift (v : mixedEmbedding.mixedSpace F) : evI F (lift v) = v :=
 theorem lift_add (v v' : mixedEmbedding.mixedSpace F) : lift (v + v') = lift v + lift v' :=
   Prod.ext (map_add _ v v') (add_zero _).symm
 
-theorem lift_zero : lift (0 : mixedEmbedding.mixedSpace F) = 0 := Prod.ext (map_zero _) rfl
+theorem lift_zero : lift (0 : mixedEmbedding.mixedSpace F) = 0 :=
+  Prod.ext (map_zero _) rfl
 
-theorem mul_lift (c : AF F) (v : mixedEmbedding.mixedSpace F)
-    : c * lift v = lift (evI F c * v) := by
+theorem mul_lift (c : AF F) (v : mixedEmbedding.mixedSpace F) : c * lift v = lift (evI F c * v) := by
   refine Prod.ext ?_ (mul_zero _)
   show c.1 * (InfiniteAdeleRing.ringEquiv_mixedSpace F).symm v =
     (InfiniteAdeleRing.ringEquiv_mixedSpace F).symm (evI F c * v)
   rw [map_mul]
   exact congrArg (· * _) (RingEquiv.symm_apply_apply _ _).symm
 
-theorem lift_smul (t : ℝ) (v : mixedEmbedding.mixedSpace F)
-    : lift (t • v) = realAd F t * lift v := by
+theorem lift_smul (t : ℝ) (v : mixedEmbedding.mixedSpace F) : lift (t • v) = realAd F t * lift v := by
   rw [mul_lift, evI_realAd, Algebra.smul_def]
 
 theorem lift_evI {z : AF F} (hz : At (evI F) z) : lift (evI F z) = z := by
@@ -188,31 +195,25 @@ theorem lift_evI {z : AF F} (hz : At (evI F) z) : lift (evI F z) = z := by
 theorem at_lift (v : mixedEmbedding.mixedSpace F) : At (evI F) (lift v) := fun c hc => by
   rw [smul_eq_mul, mul_lift, hc, zero_mul, lift_zero]
 
-theorem at_entry
-    {n d : ℕ} {u : Matrix (Fin n) (Fin d) (AE F E)} (hu : At (evI F) u) (i : Fin n) (j : Fin d)
-    : At (evI F) (u i j) := fun c hc => by
+theorem at_entry {n d : ℕ} {u : Matrix (Fin n) (Fin d) (AE F E)} (hu : At (evI F) u) (i : Fin n) (j : Fin d) :
+    At (evI F) (u i j) := fun c hc => by
   simpa using congrFun (congrFun (hu c hc) i) j
 
-theorem exists_real_structure
-    (σ : E →ₐ[F] E) (h : IsCMExt F E σ)
-    (emb : ∀ w : InfinitePlace F, EmbOver E w)
+theorem exists_real_structure (σ : E →ₐ[F] E) (h : IsCMExt F E σ) (emb : ∀ w : InfinitePlace F, EmbOver E w)
     {n d : ℕ} {κ : Type} [Fintype κ]
     (e : Matrix (Fin n) (Fin d) (AE F E) ≃ₗ[AF F] (κ → AF F) × (κ → AF F))
-    (C : InfinitePlace F → Matrix (Fin n) (Fin d) ℂ →ₗ[ℝ] Matrix (Fin n) (Fin d) ℂ)
-    : ∃ (s : (κ → mixedEmbedding.mixedSpace F) × (κ → mixedEmbedding.mixedSpace F)
-        → Matrix (Fin n) (Fin d) (AE F E))
-        (Jm
-          : ((κ → mixedEmbedding.mixedSpace F) × (κ → mixedEmbedding.mixedSpace F)) →ₗ[ℝ]
-            ((κ → mixedEmbedding.mixedSpace F) × (κ → mixedEmbedding.mixedSpace F))),
-      (∀ p, At (evI F) (s p))
-        ∧ (∀ p, (fun i => evI F ((e (s p)).1 i)) = p.1 ∧ (fun i => evI F ((e (s p)).2 i)) = p.2)
-        ∧ ∀ p w, (s (Jm p)).map (piInf (emb w)) = C w ((s p).map (piInf (emb w))) := by
-  let s
-      : (κ → mixedEmbedding.mixedSpace F) × (κ → mixedEmbedding.mixedSpace F)
-        → Matrix (Fin n) (Fin d) (AE F E) := fun p =>
-    e.symm (fun i => lift (p.1 i), fun i => lift (p.2 i))
-  have es : ∀ p, e (s p) = (fun i => lift (p.1 i), fun i => lift (p.2 i)) := fun p =>
-    e.apply_symm_apply _
+    (C : InfinitePlace F → Matrix (Fin n) (Fin d) ℂ →ₗ[ℝ] Matrix (Fin n) (Fin d) ℂ) :
+    ∃ (s : (κ → mixedEmbedding.mixedSpace F) × (κ → mixedEmbedding.mixedSpace F) →
+          Matrix (Fin n) (Fin d) (AE F E))
+      (Jm : ((κ → mixedEmbedding.mixedSpace F) × (κ → mixedEmbedding.mixedSpace F)) →ₗ[ℝ]
+        ((κ → mixedEmbedding.mixedSpace F) × (κ → mixedEmbedding.mixedSpace F))),
+      (∀ p, At (evI F) (s p)) ∧
+      (∀ p, (fun i => evI F ((e (s p)).1 i)) = p.1 ∧ (fun i => evI F ((e (s p)).2 i)) = p.2) ∧
+      ∀ p w, (s (Jm p)).map (piInf (emb w)) = C w ((s p).map (piInf (emb w))) := by
+  let s : (κ → mixedEmbedding.mixedSpace F) × (κ → mixedEmbedding.mixedSpace F) →
+      Matrix (Fin n) (Fin d) (AE F E) :=
+    fun p => e.symm (fun i => lift (p.1 i), fun i => lift (p.2 i))
+  have es : ∀ p, e (s p) = (fun i => lift (p.1 i), fun i => lift (p.2 i)) := fun p => e.apply_symm_apply _
   have sAdd : ∀ p q, s (p + q) = s p + s q := fun p q => by
     show e.symm _ = e.symm _ + e.symm _
     rw [← map_add (f := _)]
@@ -229,28 +230,25 @@ theorem exists_real_structure
     have : c • ((fun i => lift (p.1 i), fun i => lift (p.2 i)) : (κ → AF F) × (κ → AF F)) = 0 :=
       Prod.ext (funext fun i => at_lift _ c hc) (funext fun i => at_lift _ c hc)
     rw [this, map_zero]
-  let Ψ
-      : ((κ → mixedEmbedding.mixedSpace F) × (κ → mixedEmbedding.mixedSpace F)) →ₗ[ℝ]
-        (InfinitePlace F → Matrix (Fin n) (Fin d) ℂ) := {
-    toFun := fun p w => (s p).map (piInf (emb w))
-    map_add' := fun p q => by
-      funext w
-      rw [sAdd]
-      ext i j
-      simp
-    map_smul' := fun t p => by
-      funext w
-      rw [sSmul]
-      ext i j
-      simp [GlobalTheory.CompanionTheory.RealAdeleComponent.piInf_realAd_smul]
-  }
+  let Ψ : ((κ → mixedEmbedding.mixedSpace F) × (κ → mixedEmbedding.mixedSpace F)) →ₗ[ℝ]
+      (InfinitePlace F → Matrix (Fin n) (Fin d) ℂ) :=
+    { toFun := fun p w => (s p).map (piInf (emb w))
+      map_add' := fun p q => by
+        funext w
+        rw [sAdd]
+        ext i j
+        simp
+      map_smul' := fun t p => by
+        funext w
+        rw [sSmul]
+        ext i j
+        simp [GlobalTheory.CompanionTheory.RealAdeleComponent.piInf_realAd_smul] }
   have hΨ : ∀ p w, Ψ p w = (s p).map (piInf (emb w)) := fun _ _ => rfl
   have inj : Function.Injective Ψ := by
     refine (injective_iff_map_eq_zero Ψ).2 fun p hp => ?_
     have s0 : s p = 0 := by
       ext i j
-      refine GlobalTheory.CompanionTheory.CMAdele.eq_zero_of_piInf σ h emb _ (at_entry (sAt p) i j)
-        fun w => ?_
+      refine GlobalTheory.CompanionTheory.CMAdele.eq_zero_of_piInf σ h emb _ (at_entry (sAt p) i j) fun w => ?_
       have := congrFun (congrFun (congrFun hp w) i) j
       simpa [hΨ] using this
     have e0 := es p
@@ -276,8 +274,7 @@ theorem exists_real_structure
     have su : s (fun i => evI F ((e u).1 i), fun i => evI F ((e u).2 i)) = u := by
       show e.symm _ = u
       rw [LinearEquiv.symm_apply_eq]
-      refine Prod.ext (funext fun i => lift_evI fun c hc => ?_)
-        (funext fun i => lift_evI fun c hc => ?_)
+      refine Prod.ext (funext fun i => lift_evI fun c hc => ?_) (funext fun i => lift_evI fun c hc => ?_)
       · exact congrFun (congrArg Prod.fst (hAt2 c hc)) i
       · exact congrFun (congrArg Prod.snd (hAt2 c hc)) i
     funext w
@@ -285,8 +282,7 @@ theorem exists_real_structure
     ext i j
     exact hxZ (i, j) w
   let Ψe := LinearEquiv.ofBijective Ψ ⟨inj, surj⟩
-  let Cp
-      : (InfinitePlace F → Matrix (Fin n) (Fin d) ℂ) →ₗ[ℝ] (InfinitePlace F → Matrix (Fin n) (Fin d) ℂ) :=
+  let Cp : (InfinitePlace F → Matrix (Fin n) (Fin d) ℂ) →ₗ[ℝ] (InfinitePlace F → Matrix (Fin n) (Fin d) ℂ) :=
     LinearMap.pi fun w => C w ∘ₗ LinearMap.proj w
   refine ⟨s, Ψe.symm.toLinearMap ∘ₗ Cp ∘ₗ Ψ, sAt, fun p => ?_, fun p w => ?_⟩
   · rw [es]
@@ -294,46 +290,32 @@ theorem exists_real_structure
   · have : Ψ ((Ψe.symm.toLinearMap ∘ₗ Cp ∘ₗ Ψ) p) = Cp (Ψ p) := Ψe.apply_symm_apply _
     exact congrFun this w
 
+
 open scoped Classical in
 def dOp {κ : Type} [Fintype κ] (A B : κ → mixedEmbedding.mixedSpace F) (f : SInf F κ) : SInf F κ :=
   ∂_{A} f + (-(2 * Real.pi * Complex.I)) • SchwartzMap.smulLeftCLM ℂ (linForm B) f
 
 open scoped Classical in
-theorem dOp_apply {κ : Type} [Fintype κ] (A B : κ → mixedEmbedding.mixedSpace F) (f : SInf F κ) (y)
-    : dOp A B f y
-      = fderiv ℝ f y A + (-(2 * Real.pi * Complex.I)) * ((linForm B y : ℝ) : ℂ) * f y := by
+theorem dOp_apply {κ : Type} [Fintype κ] (A B : κ → mixedEmbedding.mixedSpace F) (f : SInf F κ) (y) :
+    dOp A B f y = fderiv ℝ f y A + (-(2 * Real.pi * Complex.I)) * ((linForm B y : ℝ) : ℂ) * f y := by
   have hT := (linForm B).hasTemperateGrowth
-  simp only [dOp, SchwartzMap.add_apply, SchwartzMap.smul_apply,
-    SchwartzMap.smulLeftCLM_apply_apply hT, SchwartzMap.lineDerivOp_apply_eq_fderiv]
+  simp only [dOp, SchwartzMap.add_apply, SchwartzMap.smul_apply, SchwartzMap.smulLeftCLM_apply_apply hT,
+    SchwartzMap.lineDerivOp_apply_eq_fderiv]
   simp [mul_assoc]
 
 open scoped Classical in
-theorem hasDerivAt_dOp
-    {κ : Type} [Fintype κ]
-    (ψ : AddChar (AF F) ℂ) (hψ : IsStd ψ)
-    (a b : κ → AF F) (ha : At (evI F) a) (hb : At (evI F) b)
-    (f : SInf F κ) (r) (hr : Rest (evI F) f r)
-    (x)
-    : HasDerivAt
-      (fun t : ℝ => schr ψ (realAd F t • a, realAd F t • b) (tens (evI F) f r) x)
+theorem hasDerivAt_dOp {κ : Type} [Fintype κ] (ψ : AddChar (AF F) ℂ) (hψ : IsStd ψ) (a b : κ → AF F)
+    (ha : At (evI F) a) (hb : At (evI F) b) (f : SInf F κ) (r) (hr : Rest (evI F) f r) (x) :
+    HasDerivAt (fun t : ℝ => schr ψ (realAd F t • a, realAd F t • b) (tens (evI F) f r) x)
       (tens (evI F) (dOp (fun i => evI F (a i)) (fun i => evI F (b i)) f) r x) 0 := by
   have hat : ∀ t : ℝ, At (evI F) (realAd F t • a) := fun t s hs => by
     rw [smul_comm, ha s hs, smul_zero]
-  have key
-      : (fun t : ℝ => schr ψ (realAd F t • a, realAd F t • b) (tens (evI F) f r) x)
-        = fun t : ℝ =>
-          Complex.exp
-              (-(2 * Real.pi * Complex.I)
-                * ((t * linForm (fun i => evI F (b i)) (fun i => evI F (x i))
-                      + t ^ 2 * Algebra.trace ℝ (mixedEmbedding.mixedSpace F)
-                        (evI F ⅟(2 : AF F) * ∑ i, evI F (a i) * evI F (b i))
-                    : ℝ)
-                  : ℂ))
-            * (f ((fun i => evI F (x i)) + t • fun i => evI F (a i)) * r x) := by
+  have key : (fun t : ℝ => schr ψ (realAd F t • a, realAd F t • b) (tens (evI F) f r) x) =
+      fun t : ℝ => Complex.exp (-(2 * Real.pi * Complex.I) * ((t * linForm (fun i => evI F (b i)) (fun i => evI F (x i)) +
+        t ^ 2 * Algebra.trace ℝ (mixedEmbedding.mixedSpace F) (evI F ⅟(2 : AF F) * ∑ i, evI F (a i) * evI F (b i)) : ℝ) : ℂ)) *
+        (f ((fun i => evI F (x i)) + t • fun i => evI F (a i)) * r x) := by
     funext t
-    have e
-        : (fun i => evI F ((x + realAd F t • a) i))
-          = (fun i => evI F (x i)) + t • fun i => evI F (a i) := by
+    have e : (fun i => evI F ((x + realAd F t • a) i)) = (fun i => evI F (x i)) + t • fun i => evI F (a i) := by
       funext i
       simp [evI_add, evI_mul, evI_realAd, Algebra.smul_def]
     simp only [schr, tens]
@@ -344,44 +326,39 @@ theorem hasDerivAt_dOp
 
 open mixedEmbedding
 
-theorem trace_mul_eq_zero (b : mixedSpace F) (h : ∀ y, Algebra.trace ℝ (mixedSpace F) (b * y) = 0)
-    : b = 0 := by
+theorem trace_mul_eq_zero (b : mixedSpace F) (h : ∀ y, Algebra.trace ℝ (mixedSpace F) (b * y) = 0) : b = 0 := by
   classical
   refine (latticeBasis F).ext_elem fun j => ?_
   have := h (mixedEmbedding F ((integralBasis F).traceDual j))
   rw [← (latticeBasis F).sum_repr b] at this
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [Finset.sum_mul, smul_mul_assoc, map_sum, map_smul, latticeBasis_apply, ← map_mul,
-        trace_emb, Module.Basis.trace_mul_traceDual]
-      at this
+
+  simp only [Finset.sum_mul, smul_mul_assoc, map_sum, map_smul, latticeBasis_apply, ← map_mul,
+  trace_emb, Module.Basis.trace_mul_traceDual] at this
   simpa [apply_ite] using this
 
-theorem exists_trace_eq (L : mixedSpace F →ₗ[ℝ] ℝ)
-    : ∃ b : mixedSpace F, ∀ y, L y = Algebra.trace ℝ (mixedSpace F) (y * b) := by
+theorem exists_trace_eq (L : mixedSpace F →ₗ[ℝ] ℝ) :
+    ∃ b : mixedSpace F, ∀ y, L y = Algebra.trace ℝ (mixedSpace F) (y * b) := by
   have hinj : Function.Injective (Algebra.traceForm ℝ (mixedSpace F)) := by
     refine (injective_iff_map_eq_zero _).mpr fun b hb => trace_mul_eq_zero b fun y => ?_
     simpa using LinearMap.congr_fun hb y
-  have hsurj :=
-    (LinearMap.injective_iff_surjective_of_finrank_eq_finrank (Subspace.dual_finrank_eq (K := ℝ)
-      (V := mixedSpace F)).symm).mp hinj
+  have hsurj := (LinearMap.injective_iff_surjective_of_finrank_eq_finrank
+    (Subspace.dual_finrank_eq (K := ℝ) (V := mixedSpace F)).symm).mp hinj
   obtain ⟨b, hb⟩ := hsurj L
   exact ⟨b, fun y => by rw [← hb, Algebra.traceForm_apply, mul_comm]⟩
 
-theorem exists_linForm_eq {κ : Type} [Fintype κ] (l : (κ → mixedSpace F) →ₗ[ℝ] ℝ)
-    : ∃ B : κ → mixedSpace F, ∀ y, l y = linForm B y := by
+theorem exists_linForm_eq {κ : Type} [Fintype κ] (l : (κ → mixedSpace F) →ₗ[ℝ] ℝ) :
+    ∃ B : κ → mixedSpace F, ∀ y, l y = linForm B y := by
   classical
   choose B hB using fun i => exists_trace_eq (F := F) (l ∘ₗ LinearMap.single ℝ (fun _ => mixedSpace F) i)
   refine ⟨B, fun y => ?_⟩
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [linForm_apply, map_sum]
-  set_option synthInstance.maxHeartbeats 100000 in
-    conv_lhs => rw [← Finset.univ_sum_single y, map_sum]
+
+  rw [linForm_apply, map_sum]
+
+  conv_lhs => rw [← Finset.univ_sum_single y, map_sum]
   exact Finset.sum_congr rfl fun i _ => hB i (y i)
 
 def reAd (x : mixedSpace F) : AF F :=
-  LinearMap.inl F (Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Ainf F)
-    (Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Af F)
-    ((InfiniteAdeleRing.ringEquiv_mixedSpace F).symm x)
+  LinearMap.inl F (Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Ainf F) (Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Af F) ((InfiniteAdeleRing.ringEquiv_mixedSpace F).symm x)
 
 theorem evI_reAd (x : mixedSpace F) : evI F (reAd x) = x := RingEquiv.apply_symm_apply _ x
 
@@ -397,14 +374,11 @@ theorem at_reAd {κ : Type} (B : κ → mixedSpace F) : At (evI F) (fun i => reA
 
 end Real
 
-theorem fock_mul_linear
-    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-        (σ : E →ₐ[F] E) (n d : ℕ) (Y : Spc F E n) (Z : Spc F E d) (Mo : Model σ Y Z)
-        (ψ : AddChar (AF F) ℂ) (τ : ∀ w : InfinitePlace F, GlobalTheory.AdelicU.EmbOver E w),
-      IsStd ψ
-        → ∀ (l : (Fin n × Fin d → mixedEmbedding.mixedSpace F) →ₗ[ℝ] ℝ)
-            (f f₁ : SInf F (Fin n × Fin d)),
-          f ∈ Mo.Pol ψ τ → (∀ x, f₁ x = (l x : ℂ) * f x) → f₁ ∈ Mo.Pol ψ τ := by
+theorem fock_mul_linear : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E) (n d : ℕ)
+    (Y : Spc F E n) (Z : Spc F E d) (Mo : Model σ Y Z)
+    (ψ : AddChar (AF F) ℂ) (τ : ∀ w : InfinitePlace F, GlobalTheory.AdelicU.EmbOver E w), IsStd ψ →
+    ∀ (l : (Fin n × Fin d → mixedEmbedding.mixedSpace F) →ₗ[ℝ] ℝ) (f f₁ : SInf F (Fin n × Fin d)),
+      f ∈ Mo.Pol ψ τ → (∀ x, f₁ x = (l x : ℂ) * f x) → f₁ ∈ Mo.Pol ψ τ := by
   intro F E _ _ _ _ _ σ n d Y Z Mo ψ τ hψ l f f₁ hf h₁
   obtain ⟨B, hB⟩ := exists_linForm_eq l
   let b : Fin n × Fin d → AF F := fun i => reAd (B i)
@@ -420,15 +394,10 @@ theorem fock_mul_linear
   have hc : c ≠ 0 := by simp [c, Real.pi_ne_zero]
   have hact : ActsD (evI F) (Mo.heisLine ψ u) f (c • f₁) := by
     intro r hr x
-    have key
-        : (fun t : ℝ => Mo.heisLine ψ u t (tens (evI F) f r) x)
-          = fun t : ℝ =>
-            Complex.exp
-                (-(2 * Real.pi * Complex.I)
-                  * ((t * linForm (fun i => evI F (b i)) (fun i => evI F (x i)) + t ^ 2 * 0 : ℝ)
-                    : ℂ))
-              * (f ((fun i => evI F (x i)) + t • (0 : Fin n × Fin d → mixedEmbedding.mixedSpace F))
-                * r x) := by
+    have key : (fun t : ℝ => Mo.heisLine ψ u t (tens (evI F) f r) x) =
+        fun t : ℝ => Complex.exp (-(2 * Real.pi * Complex.I) *
+          ((t * linForm (fun i => evI F (b i)) (fun i => evI F (x i)) + t ^ 2 * 0 : ℝ) : ℂ)) *
+          (f ((fun i => evI F (x i)) + t • (0 : Fin n × Fin d → mixedEmbedding.mixedSpace F)) * r x) := by
       funext t
       show GlobalTheory.WeilM.schr ψ (Mo.co.e (realAd F t • u)) _ x = _
       rw [map_smul, LinearEquiv.apply_symm_apply]
@@ -449,31 +418,24 @@ theorem fock_mul_linear
 
 section Uniq
 
-variable
-  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-  {σ : E →ₐ[F] E} {n d : ℕ} {X : Spc F E n} {W : Spc F E d}
+variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E}
+  {n d : ℕ} {X : Spc F E n} {W : Spc F E d}
 
 open scoped Classical in
-theorem actsD_unique
-    (M : Model σ X W)
-    {ψ : AddChar (AF F) ℂ} (hψ : IsStd ψ)
-    {u : Matrix (Fin n) (Fin d) (AE F E)} (hu : At (evI F) u)
-    {f f₁ : SInf F (Fin n × Fin d)} (h : ActsD (evI F) (M.heisLine ψ u) f f₁)
-    : f₁ = dOp (fun i => evI F ((M.co.e u).1 i)) (fun i => evI F ((M.co.e u).2 i)) f := by
+theorem actsD_unique (M : Model σ X W) {ψ : AddChar (AF F) ℂ} (hψ : IsStd ψ)
+    {u : Matrix (Fin n) (Fin d) (AE F E)} (hu : At (evI F) u) {f f₁ : SInf F (Fin n × Fin d)}
+    (h : ActsD (evI F) (M.heisLine ψ u) f f₁) :
+    f₁ = dOp (fun i => evI F ((M.co.e u).1 i)) (fun i => evI F ((M.co.e u).2 i)) f := by
   have hg := pf_mem (good_std (F := F) (κ := Fin n × Fin d))
   have h0 : pf (stdF (F := F) (Fin n × Fin d)) 0 = 1 := by
     rw [pf_eq_prod ∅ 0 fun u _ => ⟨rfl, fun i => by simp⟩, Finset.prod_empty]
   ext x
   have hr : Rest (evI F) f (rOf (pf (stdF (Fin n × Fin d)))) :=
     ⟨fun x z hz => rOf_add _ x z hz, Submodule.subset_span ⟨f, _, hg, rfl⟩⟩
-  have hab : ∀ t, evI F t = 0 → t • M.co.e u = 0 := fun t ht => by
-    rw [← map_smul, hu t ht, map_zero]
+  have hab : ∀ t, evI F t = 0 → t • M.co.e u = 0 := fun t ht => by rw [← map_smul, hu t ht, map_zero]
   have h1 := h _ hr (pt x 0)
-  have h2 :=
-    hasDerivAt_dOp ψ hψ _ _
-      (fun t ht => congrArg Prod.fst (hab t ht))
-      (fun t ht => congrArg Prod.snd (hab t ht))
-      f _ hr (pt x 0)
+  have h2 := hasDerivAt_dOp ψ hψ _ _ (fun t ht => congrArg Prod.fst (hab t ht)) (fun t ht => congrArg Prod.snd (hab t ht))
+    f _ hr (pt x 0)
   simp only [Model.heisLine, Darboux.rho, map_smul] at h1
   have := h1.unique h2
   simpa [tens_rOf, pureA_pt, h0] using this

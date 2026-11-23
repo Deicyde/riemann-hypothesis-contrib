@@ -1,7 +1,45 @@
 module
 
-public import Mathlib
 public import GroundTheory.HeightsAndTheta.Heights.ArithmeticBezout.StatementsProjSecDegree
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -29,22 +67,22 @@ theorem projVar_ne_zero (i : Fin (e + 1)) : projVar e i ≠ 0 :=
 theorem algebraMap_C (c : ℂ) : algebraMap ℝt 𝕂 (C c) = algebraMap ℂ 𝕂 c := by
   rw [IsScalarTower.algebraMap_apply ℂ ℝt 𝕂 c, MvPolynomial.algebraMap_eq]
 
-theorem chartForm_projPar
-    : Vertical.chartForm (projPar A)
-      = C (projVar e 0)⁻¹ * (ComplexSets.linPoly A 0).map (algebraMap ℂ 𝕂) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [Vertical.chartForm, linForm, projPar, ComplexSets.linPoly, map_sum, map_mul,
-      MvPolynomial.map_C, MvPolynomial.map_X, Finset.mul_sum]
+theorem chartForm_projPar :
+    Vertical.chartForm (projPar A) =
+      C (projVar e 0)⁻¹ * (ComplexSets.linPoly A 0).map (algebraMap ℂ 𝕂) := by
+
+  simp only [Vertical.chartForm, linForm, projPar, ComplexSets.linPoly, map_sum, map_mul,
+  MvPolynomial.map_C, MvPolynomial.map_X, Finset.mul_sum]
   refine Finset.sum_congr rfl fun j _ => ?_
   rw [← mul_assoc, ← C_mul, div_eq_inv_mul]
 
-theorem secForm_projPar (i : Fin e)
-    : Vertical.secForm (projPar A) i
-      = C (projVar e i.succ) * (ComplexSets.linPoly A 0).map (algebraMap ℂ 𝕂)
-        - C (projVar e 0) * (ComplexSets.linPoly A i.succ).map (algebraMap ℂ 𝕂) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [Vertical.secForm, linForm, projPar, ComplexSets.linPoly, map_sum, map_mul,
-      MvPolynomial.map_C, MvPolynomial.map_X, Finset.mul_sum, ← Finset.sum_sub_distrib]
+theorem secForm_projPar (i : Fin e) :
+    Vertical.secForm (projPar A) i =
+      C (projVar e i.succ) * (ComplexSets.linPoly A 0).map (algebraMap ℂ 𝕂) -
+        C (projVar e 0) * (ComplexSets.linPoly A i.succ).map (algebraMap ℂ 𝕂) := by
+
+  simp only [Vertical.secForm, linForm, projPar, ComplexSets.linPoly, map_sum, map_mul,
+  MvPolynomial.map_C, MvPolynomial.map_X, Finset.mul_sum, ← Finset.sum_sub_distrib]
   refine Finset.sum_congr rfl fun j _ => ?_
   rw [C_sub, C_mul, C_mul]
   ring
@@ -53,18 +91,18 @@ theorem projHom_C (c : ℂ) : ComplexSets.projHom J A (C c) = Ideal.Quotient.mk 
   simp [ComplexSets.projHom, ComplexSets.pullback]
   rfl
 
-theorem projHom_X (i : Fin (e + 1))
-    : ComplexSets.projHom J A (X i) = Ideal.Quotient.mk J (ComplexSets.linPoly A i) := by
+theorem projHom_X (i : Fin (e + 1)) :
+    ComplexSets.projHom J A (X i) = Ideal.Quotient.mk J (ComplexSets.linPoly A i) := by
   simp [ComplexSets.projHom, ComplexSets.pullback]
+
 
 set_option synthInstance.maxHeartbeats 100000 in
 set_option synthInstance.maxHeartbeats 400000 in
 set_option maxHeartbeats 1600000 in
-theorem finrank_eq
-    [Algebra ℝt (MvPolynomial (Fin n) ℂ ⧸ J)]
-    (hφ : ∀ p, algebraMap ℝt (MvPolynomial (Fin n) ℂ ⧸ J) p = ComplexSets.projHom J A p)
-    : Module.finrank 𝕂 (TensorProduct ℝt 𝕂 (MvPolynomial (Fin n) ℂ ⧸ J))
-      = Module.finrank 𝕂
+theorem finrank_eq [Algebra ℝt (MvPolynomial (Fin n) ℂ ⧸ J)]
+    (hφ : ∀ p, algebraMap ℝt (MvPolynomial (Fin n) ℂ ⧸ J) p = ComplexSets.projHom J A p) :
+    Module.finrank 𝕂 (TensorProduct ℝt 𝕂 (MvPolynomial (Fin n) ℂ ⧸ J)) =
+      Module.finrank 𝕂
         (Vertical.SecAlg (J.map (MvPolynomial.map (algebraMap ℂ 𝕂))) (projPar A)) := by
   let I := Vertical.secIdeal (J.map (MvPolynomial.map (algebraMap ℂ 𝕂))) (projPar A)
   let σ : MvPolynomial (Fin n) ℂ →+* MvPolynomial (Fin n) 𝕂 := MvPolynomial.map (algebraMap ℂ 𝕂)
@@ -74,21 +112,16 @@ theorem finrank_eq
 
   have hunit : IsUnit (algebraMap 𝕂 (MvPolynomial (Fin n) 𝕂 ⧸ I) (projVar e 0)) :=
     (IsUnit.mk0 _ (projVar_ne_zero 0)).map _
-  have ha0
-      : Ideal.Quotient.mk I (σ (ComplexSets.linPoly A 0))
-        = algebraMap 𝕂 (MvPolynomial (Fin n) 𝕂 ⧸ I) (projVar e 0) := by
+  have ha0 : Ideal.Quotient.mk I (σ (ComplexSets.linPoly A 0)) =
+      algebraMap 𝕂 (MvPolynomial (Fin n) 𝕂 ⧸ I) (projVar e 0) := by
     have h := hmem _ (Ideal.mem_sup_right (Ideal.mem_span_singleton_self _))
     rw [chartForm_projPar, map_sub, map_mul, map_one, hmkC, sub_eq_zero] at h
-    calc
-      _ = algebraMap 𝕂 _ (projVar e 0)
-          * (algebraMap 𝕂 _ (projVar e 0)⁻¹
-            * Ideal.Quotient.mk I (σ (ComplexSets.linPoly A 0))) := by
-        rw [← mul_assoc, ← map_mul, mul_inv_cancel₀ (projVar_ne_zero _), map_one, one_mul]
+    calc _ = algebraMap 𝕂 _ (projVar e 0) * (algebraMap 𝕂 _ (projVar e 0)⁻¹ *
+          Ideal.Quotient.mk I (σ (ComplexSets.linPoly A 0))) := by
+          rw [← mul_assoc, ← map_mul, mul_inv_cancel₀ (projVar_ne_zero _), map_one, one_mul]
       _ = _ := by rw [h, mul_one]
-  have ha
-      : ∀ i,
-        Ideal.Quotient.mk I (σ (ComplexSets.linPoly A i))
-          = algebraMap 𝕂 (MvPolynomial (Fin n) 𝕂 ⧸ I) (projVar e i) := by
+  have ha : ∀ i, Ideal.Quotient.mk I (σ (ComplexSets.linPoly A i)) =
+      algebraMap 𝕂 (MvPolynomial (Fin n) 𝕂 ⧸ I) (projVar e i) := by
     refine Fin.cases ha0 fun i => ?_
     have h := hmem _ (Ideal.mem_sup_left (Ideal.mem_sup_right (Ideal.subset_span ⟨i, rfl⟩)))
     rw [secForm_projPar, map_sub, map_mul, map_mul, hmkC, hmkC, ha0, sub_eq_zero] at h
@@ -104,18 +137,15 @@ theorem finrank_eq
     · rw [RingHom.comp_apply, hφ, projHom_X, Ideal.Quotient.lift_mk, RingHom.comp_apply, ha,
         IsScalarTower.algebraMap_apply ℝt 𝕂]
       rfl
-  let g : (MvPolynomial (Fin n) ℂ ⧸ J) →ₐ[ℝt] MvPolynomial (Fin n) 𝕂 ⧸ I := {
-    ψ with
-    commutes' := fun r => RingHom.congr_fun hψ r
-  }
+  let g : (MvPolynomial (Fin n) ℂ ⧸ J) →ₐ[ℝt] MvPolynomial (Fin n) 𝕂 ⧸ I :=
+    { ψ with commutes' := fun r => RingHom.congr_fun hψ r }
   let F := AlgHom.liftEquiv ℝt 𝕂 (MvPolynomial (Fin n) ℂ ⧸ J) (MvPolynomial (Fin n) 𝕂 ⧸ I) g
 
   let G₀ : MvPolynomial (Fin n) 𝕂 →ₐ[𝕂] TensorProduct ℝt 𝕂 (MvPolynomial (Fin n) ℂ ⧸ J) :=
     aeval fun j => (1 : 𝕂) ⊗ₜ[ℝt] Ideal.Quotient.mk J (X j)
-  have hG
-      : G₀.toRingHom.comp σ
-        = ((Algebra.TensorProduct.includeRight (R := ℝt) (A := 𝕂)).toRingHom).comp
-          (Ideal.Quotient.mk J) := by
+  have hG : G₀.toRingHom.comp σ =
+      ((Algebra.TensorProduct.includeRight (R := ℝt) (A := 𝕂)).toRingHom).comp
+        (Ideal.Quotient.mk J) := by
     refine MvPolynomial.ringHom_ext (fun c => ?_) (fun j => ?_)
     · simp only [RingHom.comp_apply, AlgHom.toRingHom_eq_coe, AlgHom.coe_toRingHom, σ,
         MvPolynomial.map_C, G₀, aeval_C]
@@ -161,8 +191,8 @@ theorem finrank_eq
         AlgHom.coe_toRingHom, AlgHom.commutes, AlgHom.commutes]
     · simp only [F, G, G₀, g, ψ, σ, RingHom.comp_apply, AlgHom.coe_toRingHom, AlgHom.coe_comp,
         AlgHom.coe_restrictScalars', Function.comp_apply, Algebra.TensorProduct.includeRight_apply,
-        AlgHom.liftEquiv_tmul, one_smul, AlgHom.coe_id, id_eq, AlgHom.coe_mk,
-        Ideal.Quotient.lift_mk, MvPolynomial.map_X]
+        AlgHom.liftEquiv_tmul, one_smul, AlgHom.coe_id, id_eq, AlgHom.coe_mk, Ideal.Quotient.lift_mk,
+        MvPolynomial.map_X]
       change G (Ideal.Quotient.mk I (X j)) = _
       exact aeval_X (R := 𝕂) (fun j => (1 : 𝕂) ⊗ₜ[ℝt] Ideal.Quotient.mk J (X j)) j
   exact (AlgEquiv.ofAlgHom G F h₂ h₁).toLinearEquiv.finrank_eq.symm

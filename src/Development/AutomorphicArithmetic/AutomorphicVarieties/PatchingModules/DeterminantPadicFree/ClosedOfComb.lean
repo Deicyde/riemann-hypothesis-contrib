@@ -1,14 +1,61 @@
 module
 
-public import Development.AutomorphicArithmetic.AutomorphicVarieties.PatchingModules.DeterminantPadicFree.FrameWith
+public import Development.AutomorphicArithmetic.AutomorphicVarieties.WeilGroupCharacters.UniversalOrdinaryDeterminantRing
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.AdicCompletion.Noetherian
+import Mathlib.RingTheory.Coalgebra.IsFrobenius
+import Mathlib.RingTheory.HopfAlgebra.Basic
+import Mathlib.RingTheory.PowerSeries.Ideal
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
+import Development.AutomorphicArithmetic.AutomorphicVarieties.PatchingModules.PairedDualFirstOrderDualMatrixSpace
+public import Mathlib.RingTheory.Filtration
 
 @[expose] public section
 
 open Matrix IsLocalRing UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.Pa
 
-private theorem char_of_padic
-    {l : ℕ} [Fact l.Prime] {K : Type} [Field K] [Finite K] (f : ℤ_[l] →+* K)
-    : (l : K) = 0 := by
+private theorem char_of_padic {l : ℕ} [Fact l.Prime] {K : Type} [Field K] [Finite K] (f : ℤ_[l] →+* K) :
+    (l : K) = 0 := by
   obtain ⟨p, hchar⟩ := CharP.exists K
   have hp : p.Prime := CharP.char_is_prime K p
   have hpl : p = l := by
@@ -26,24 +73,20 @@ private theorem char_of_padic
   subst hpl
   exact CharP.cast_eq_zero K p
 
-private theorem closed_of_comb
-    {A G ι : Type}
-    [CommRing A] [IsDomain A] [IsLocalRing A] [IsNoetherianRing A] [TopologicalSpace G] [Fintype ι]
-    (ρ : ι → G → A) (hρ : ∀ a, AdicCont (maximalIdeal A) (ρ a))
+private theorem closed_of_comb {A G ι : Type} [CommRing A] [IsDomain A] [IsLocalRing A] [IsNoetherianRing A]
+    [TopologicalSpace G] [Fintype ι] (ρ : ι → G → A) (hρ : ∀ a, AdicCont (maximalIdeal A) (ρ a))
     (q : ι → FractionRing A) (ψ : G → A)
-    (h
-      : ∀ g, algebraMap A (FractionRing A) (ψ g) = ∑ a, q a * algebraMap A (FractionRing A) (ρ a g))
-    : IsClosed {g | ψ g = 1} := by
+    (h : ∀ g, algebraMap A (FractionRing A) (ψ g) = ∑ a, q a * algebraMap A (FractionRing A) (ρ a g)) :
+    IsClosed {g | ψ g = 1} := by
   classical
   obtain ⟨b, hb⟩ := IsLocalization.exist_integer_multiples (nonZeroDivisors A) Finset.univ q
   choose c hc using fun a => hb a (Finset.mem_univ a)
   have key : ∀ g, ψ g = 1 ↔ ∑ a, c a * ρ a g - (b : A) = 0 := by
     intro g
-    have h1
-        : algebraMap A (FractionRing A) ((b : A) * ψ g)
-          = algebraMap A (FractionRing A) (∑ a, c a * ρ a g) := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_mul, h g, map_sum, Finset.mul_sum]
+    have h1 : algebraMap A (FractionRing A) ((b : A) * ψ g) =
+        algebraMap A (FractionRing A) (∑ a, c a * ρ a g) := by
+
+      rw [map_mul, h g, map_sum, Finset.mul_sum]
       refine Finset.sum_congr rfl fun a _ => ?_
       rw [map_mul, hc a, Algebra.smul_def, mul_assoc]
     have h2 := IsFractionRing.injective A (FractionRing A) h1
@@ -54,64 +97,48 @@ private theorem closed_of_comb
       rw [h, mul_one]
     · intro h
       exact mul_left_cancel₀ hb0 (h.trans (mul_one _).symm)
-  have hset
-      : {g | ψ g = 1}
-        = ⋂ N : ℕ, {g | Ideal.Quotient.mk (maximalIdeal A ^ N) (∑ a, c a * ρ a g - (b : A)) = 0} :=
-    by
-      ext g
-      simp only [Set.mem_setOf_eq, Set.mem_iInter, Ideal.Quotient.eq_zero_iff_mem, key]
-      constructor
-      · intro h N
-        rw [h]
-        exact Ideal.zero_mem _
-      · intro h
-        have hbot :=
-          Ideal.iInf_pow_eq_bot_of_isLocalRing (maximalIdeal A) (maximalIdeal.isMaximal A).ne_top
-        have hmem : ∑ a, c a * ρ a g - (b : A) ∈ ⨅ i, maximalIdeal A ^ i :=
-          Submodule.mem_iInf _ |>.mpr h
-        rw [hbot] at hmem
-        exact (Submodule.mem_bot A).mp hmem
+  have hset : {g | ψ g = 1} =
+      ⋂ N : ℕ, {g | Ideal.Quotient.mk (maximalIdeal A ^ N) (∑ a, c a * ρ a g - (b : A)) = 0} := by
+    ext g
+    simp only [Set.mem_setOf_eq, Set.mem_iInter, Ideal.Quotient.eq_zero_iff_mem, key]
+    constructor
+    · intro h N
+      rw [h]
+      exact Ideal.zero_mem _
+    · intro h
+      have hbot := Ideal.iInf_pow_eq_bot_of_isLocalRing (maximalIdeal A) (maximalIdeal.isMaximal A).ne_top
+      have hmem : ∑ a, c a * ρ a g - (b : A) ∈ ⨅ i, maximalIdeal A ^ i := Submodule.mem_iInf _ |>.mpr h
+      rw [hbot] at hmem
+      exact (Submodule.mem_bot A).mp hmem
   rw [hset]
   refine isClosed_iInter fun N => ?_
-  have hF
-      : IsLocallyConstant (fun g => fun a => Ideal.Quotient.mk (maximalIdeal A ^ N) (ρ a g)) := by
+  have hF : IsLocallyConstant (fun g => fun a => Ideal.Quotient.mk (maximalIdeal A ^ N) (ρ a g)) := by
     rw [IsLocallyConstant.iff_isOpen_fiber]
     intro y
-    have hy
-        : (fun g => fun a => Ideal.Quotient.mk (maximalIdeal A ^ N) (ρ a g)) ⁻¹' {y}
-          = ⋂ a, {g | Ideal.Quotient.mk (maximalIdeal A ^ N) (ρ a g) = y a} := by
+    have hy : (fun g => fun a => Ideal.Quotient.mk (maximalIdeal A ^ N) (ρ a g)) ⁻¹' {y} =
+        ⋂ a, {g | Ideal.Quotient.mk (maximalIdeal A ^ N) (ρ a g) = y a} := by
       ext g
       simp [funext_iff]
     rw [hy]
     exact isOpen_iInter_of_finite fun a => (hρ a N).isOpen_fiber (y a)
-  have hG :=
-    (hF.comp (fun w =>
-      ∑ a, Ideal.Quotient.mk (maximalIdeal A ^ N) (c a) * w a
-        - Ideal.Quotient.mk (maximalIdeal A ^ N) (b : A))).isClopen_fiber 0
+  have hG := (hF.comp (fun w => ∑ a, Ideal.Quotient.mk (maximalIdeal A ^ N) (c a) * w a -
+    Ideal.Quotient.mk (maximalIdeal A ^ N) (b : A))).isClopen_fiber 0
   convert hG.isClosed using 1
   ext g
-  set_option synthInstance.maxHeartbeats 100000 in
+
   simp [map_sub, map_sum, map_mul]
 
-theorem UpperTheory.V.Pa.Det.psiMu
-    : ∀ {l : ℕ} [Fact l.Prime] {F : GFrame l} {O : Type} [CommRing O] [IsLocalRing O]
-        [Algebra ℤ_[l] O] {n : ℕ} {r : Resid F O n} (x : Point r) (v : F.Vl) (i : Fin n)
-        (g : F.Gv v),
-      g ∈ F.mu v → x.ψ v i g = 1 := by
+theorem UpperTheory.V.Pa.Det.psiMu :
+    ∀ {l : ℕ} [Fact l.Prime] {F : GFrame l} {O : Type} [CommRing O] [IsLocalRing O] [Algebra ℤ_[l] O] {n : ℕ} {r : Resid F O n} (x : Point r) (v : F.Vl) (i : Fin n) (g : F.Gv v), g ∈ F.mu v → x.ψ v i g = 1 := by
   intro l _ F O _ _ _ n r x v i g hg
   have hl : (l : x.K) = 0 := char_of_padic ((algebraMap O x.K).comp (algebraMap ℤ_[l] O))
   haveI : CharP x.K l := (CharP.charP_iff_prime_eq_zero Fact.out).mpr hl
   haveI : CharP (PowerSeries x.K) l :=
     charP_of_injective_algebraMap (algebraMap x.K (PowerSeries x.K)).injective l
   obtain ⟨P, hP⟩ := x.flag v
-  have hclosed
-      : IsClosed {s : F.Gv v | ((x.ψ v i s : (PowerSeries x.K)ˣ) : PowerSeries x.K) = 1} := by
-    refine closed_of_comb (ι := Fin n × Fin n)
-      (fun ab s => (mat x.ρ) (F.φ v s) ab.1 ab.2)
-      ?_
-      (fun ab =>
-        (P : Matrix (Fin n) (Fin n) _) i ab.1
-          * ((P⁻¹ : GL (Fin n) _) : Matrix (Fin n) (Fin n) _) ab.2 i)
+  have hclosed : IsClosed {s : F.Gv v | ((x.ψ v i s : (PowerSeries x.K)ˣ) : PowerSeries x.K) = 1} := by
+    refine closed_of_comb (ι := Fin n × Fin n) (fun ab s => (mat x.ρ) (F.φ v s) ab.1 ab.2) ?_
+      (fun ab => (P : Matrix (Fin n) (Fin n) _) i ab.1 * ((P⁻¹ : GL (Fin n) _) : Matrix (Fin n) (Fin n) _) ab.2 i)
       _ ?_
     · intro ab N
       exact (x.cont ab.1 ab.2 N).comp_continuous (F.φ_cont v)
@@ -119,9 +146,8 @@ theorem UpperTheory.V.Pa.Det.psiMu
       have hs := (hP s).2 i
       simp only [pushCh, MonoidHom.comp_apply, Units.coe_map, MonoidHom.coe_coe] at hs
       rw [← hs]
-      simp only [pushRep, mat, MonoidHom.comp_apply, Units.coeHom_apply, Units.val_mul,
-        Matrix.mul_apply, Finset.sum_mul, Fintype.sum_prod_type,
-        Matrix.GeneralLinearGroup.map_apply]
+      simp only [pushRep, mat, MonoidHom.comp_apply, Units.coeHom_apply, Units.val_mul, Matrix.mul_apply,
+        Finset.sum_mul, Fintype.sum_prod_type, Matrix.GeneralLinearGroup.map_apply]
       rw [Finset.sum_comm]
       refine Finset.sum_congr rfl fun a _ => Finset.sum_congr rfl fun b _ => ?_
       ring
@@ -140,6 +166,5 @@ theorem UpperTheory.V.Pa.Det.psiMu
     exact hker hgk
   have h2 : ((x.ψ v i g : PowerSeries x.K) - 1) ^ l ^ k = 0 := by
     rw [sub_pow_char_pow, one_pow, ← Units.val_pow_eq_pow_val, h1, Units.val_one, sub_self]
-  have h3 : (x.ψ v i g : PowerSeries x.K) - 1 = 0 :=
-    pow_eq_zero_iff (pow_ne_zero _ (Fact.out : l.Prime).ne_zero) |>.mp h2
+  have h3 : (x.ψ v i g : PowerSeries x.K) - 1 = 0 := pow_eq_zero_iff (pow_ne_zero _ (Fact.out : l.Prime).ne_zero) |>.mp h2
   exact Units.ext (sub_eq_zero.mp h3)

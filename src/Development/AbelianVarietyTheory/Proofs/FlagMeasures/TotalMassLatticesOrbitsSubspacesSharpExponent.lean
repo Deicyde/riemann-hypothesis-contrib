@@ -1,10 +1,68 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.Definitions.SemilocalFrames.ChartGen
 public import Development.AbelianVarietyTheory.PublishedTheorems.DiscreteSeriesUnitary₂.MaxMass
+public import Mathlib.Analysis.SpecialFunctions.Log.Base
+public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.DefiniteHermitianIsometricOfSameBadPrimesStatement
+public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.EncardSublatticesOfIndexLeStatement
+import Development.AbelianVarietyTheory.Proofs.FlagMeasures.ExistsMaximalIntegralHermitianLatticeOrthonormalStatement
 public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.FewOrbitsSubspacesHermitianLatticeDiscriminant
+public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.HermitianGenusMassEqOrbitStabilizerMassStatement
+import Development.AbelianVarietyTheory.Proofs.FlagMeasures.HermitianLatticeDiscriminantOrderNeZeroUnimodula
+public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.HermitianLatticeDiscriminantOrderNeZeroUnimodulaStatement
 public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.MassIntegralLatticesDiscriminantOrderLe
+import Development.AbelianVarietyTheory.Proofs.FlagMeasures.MaximalHermitianLatticeLocalStructureDiscriminan
+import Development.AbelianVarietyTheory.Proofs.FlagMeasures.MaximalLatticeLocalFactorProductPosAndLeStatement
+import Development.AbelianVarietyTheory.Proofs.FlagMeasures.MemGenusIffMaximalIntegralHermitianLatticeStatement
+import Development.AbelianVarietyTheory.Proofs.FlagMeasures.OrbitStabilizerMassEqWeightedSumFibresStatement
+import Development.AbelianVarietyTheory.Proofs.FlagMeasures.OrbitWeightedStabilizerSumMonoSubadditiveStatement
+import Development.AbelianVarietyTheory.Proofs.FlagMeasures.WittExtensionTotallyDefiniteHermitianStatement
+import Formalism.HyperbolicPlaceProducts.SubgroupIndexCounts.CountO
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.Finset.Functor
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.Order.CompletePartialOrder
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -82,12 +140,6 @@ theorem count_sets (K : Type) [Field K] [NumberField K] (d : ℕ)
         have hq : qIn P ∣ d := hprod ▸ Finset.dvd_prod_of_mem (fun P => qIn P) hP
         obtain ⟨a, b, -⟩ := hlt _ h2 hq
         have hmem : ((Nat.minFac d : ℕ) : 𝓞 K) ∈ P := by
-          have hP0 : P ≠ ⊥ := by
-            intro h0
-            have : Ideal.absNorm P = 0 := by rw [h0, Ideal.absNorm_bot]
-            rw [hN] at this
-            have := pow_eq_zero_iff (two_ne_zero) |>.1 this
-            omega
           have hdv : Nat.minFac d ∣ Ideal.absNorm P := hN ▸ hpP.trans (dvd_pow_self _ two_ne_zero)
           obtain ⟨Q, hQ, hQu, hQP⟩ := Ideal.exists_isMaximal_dvd_of_dvd_absNorm' hp P hdv
           rw [hmax.eq_of_le hQ.ne_top (Ideal.le_of_dvd hQP)]
@@ -230,7 +282,6 @@ theorem real_eq (d i j : ℕ) (L c : ℝ) (hd : d ≠ 0) (hi : i ≠ 0)
     congr 1
     push_cast
     ring
-  have hdL : (0 : ℝ) < (d : ℝ) ^ L := by positivity
   rw [e, Real.rpow_add hi', Real.rpow_natCast]
   push_cast
   rw [Real.mul_rpow hd'.le hi'.le]
@@ -372,7 +423,6 @@ theorem main
       rw [hge]
       simp
   · set B : ℝ := mass h₁ I₁ * (de : ℝ) ^ j * (de : ℝ) ^ L with hB
-    have hB0 : 0 ≤ B := by positivity
     have key
         : ∀ p ∈ A.filter fun I => ∃ U, Q I U,
           orbMass (isom (hRes h (f p))) (latsDisc (R := 𝓞 K) (hRes h (f p)) (de ^ 2))
@@ -405,9 +455,6 @@ theorem main
           _ ≤ ∑ _d ∈ Finset.Icc 1 de, B := by
             refine Finset.sum_le_sum fun d hd => ?_
             have hd1 := (Finset.mem_Icc.1 hd).1
-            have hpos : (0 : ℝ) < (d : ℝ) ^ L := by
-              have : (0 : ℝ) < d := by exact_mod_cast hd1
-              positivity
             change ∑ _S ∈ T d, B / (d : ℝ) ^ L ≤ B
             rw [Finset.sum_const, nsmul_eq_mul]
             calc

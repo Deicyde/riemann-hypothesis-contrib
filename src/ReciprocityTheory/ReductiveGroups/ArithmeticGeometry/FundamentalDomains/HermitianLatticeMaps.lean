@@ -1,6 +1,47 @@
 module
 
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.FundamentalDomains.RealPlaceEmbeddings
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -13,11 +54,10 @@ open Matrix NumberField Module
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {r : ℕ} (X : Data E r)
 variable {ι : Type} [Fintype ι] [DecidableEq ι]
 
-noncomputable def ty (f : Basis ι ℤ X.Λ)
-    : (ι → ι → E) × (Free.ChooseBasisIndex ℤ (𝓞 E) → ι → ι → ℤ) := (
-  fun i j => herm X.Gm (f i : Fin r → E) (f j : Fin r → E),
-  fun k i j => f.repr (RingOfIntegers.basis E k • f i) j
-)
+noncomputable def ty (f : Basis ι ℤ X.Λ) :
+    (ι → ι → E) × (Free.ChooseBasisIndex ℤ (𝓞 E) → ι → ι → ℤ) :=
+  (fun i j => herm X.Gm (f i : Fin r → E) (f j : Fin r → E),
+    fun k i j => f.repr (RingOfIntegers.basis E k • f i) j)
 
 noncomputable def mulQ (α : E) : (Fin r → E) →ₗ[ℚ] (Fin r → E) :=
   (α • LinearMap.id : (Fin r → E) →ₗ[E] (Fin r → E)).restrictScalars ℚ
@@ -39,29 +79,12 @@ noncomputable def hR (x : Fin r → E) : (Fin r → E) →ₗ[ℚ] E where
       map_ratCast]
     refine Finset.sum_congr rfl fun a _ => Finset.sum_congr rfl fun b _ => by ring
 
-theorem coe_expand (f : Basis ι ℤ X.Λ) (v : X.Λ)
-    : (v : Fin r → E) = ∑ i, f.repr v i • (f i : Fin r → E) := by
+theorem coe_expand (f : Basis ι ℤ X.Λ) (v : X.Λ) :
+    (v : Fin r → E) = ∑ i, f.repr v i • (f i : Fin r → E) := by
   first
-  | (
-      conv_lhs => rw [← f.sum_repr v]
-      rw [Submodule.coe_sum]
-      rfl
-    )
-  | (
-      conv_lhs => rw [← f.sum_repr v]
-      rw [Submodule.coe_sum]
-      exact Finset.sum_congr rfl fun i _ => Submodule.coe_smul_of_tower _ _
-    )
-  | (
-      conv_lhs => rw [← f.sum_repr v]
-      push_cast
-      rfl
-    )
-  | (
-      have e := congrArg (fun w : X.Λ => (w : Fin r → E)) (f.sum_repr v)
-      simp only [Submodule.coe_sum, Submodule.coe_smul_of_tower] at e
-      exact e.symm
-    )
+    | (conv_lhs => rw [← f.sum_repr v]
+       rw [Submodule.coe_sum]
+       rfl)
 
 variable (f f' : Basis ι ℤ X.Λ)
 
@@ -70,18 +93,12 @@ noncomputable def phi : (Fin r → E) →ₗ[ℚ] (Fin r → E) :=
 
 theorem phi_f (i : ι) : phi X f f' (f i : Fin r → E) = f' i := by
   first
-  | (rw [← RealPlaceEmbeddings.qb_apply X f i]; unfold phi; rw [Basis.constr_basis])
-  | (rw [← RealPlaceEmbeddings.qb_apply (X := X) f i]; unfold phi; rw [Basis.constr_basis])
-  | (
-      have e := (RealPlaceEmbeddings.qb X f).constr_basis ℚ (fun j => (f' j : Fin r → E)) i
-      rw [RealPlaceEmbeddings.qb_apply] at e
-      exact e
-    )
+    | (rw [← RealPlaceEmbeddings.qb_apply X f i]; unfold phi; rw [Basis.constr_basis])
 
-theorem phi_zsum (n : ι → ℤ)
-    : phi X f f' (∑ i, n i • (f i : Fin r → E)) = ∑ i, n i • (f' i : Fin r → E) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+theorem phi_zsum (n : ι → ℤ) :
+    phi X f f' (∑ i, n i • (f i : Fin r → E)) = ∑ i, n i • (f' i : Fin r → E) := by
+
+  rw [map_sum]
   refine Finset.sum_congr rfl fun i _ => ?_
   rw [map_zsmul, phi_f]
 
@@ -97,17 +114,17 @@ theorem phi_phi (x : Fin r → E) : phi X f' f (phi X f f' x) = x := by
   exact LinearMap.congr_fun e x
 
 theorem smul_coe (ω : 𝓞 E) (v : X.Λ) : ((ω • v : X.Λ) : Fin r → E) = (ω : E) • (v : Fin r → E) := by
-  first | rfl | (rw [Submodule.coe_smul]; rfl) | (rw [Submodule.coe_smul, Algebra.smul_def]; rfl)
+  first
+    | rfl
 
 variable {f f'}
 
-theorem phi_omega (h : ty X f = ty X f') (k : Free.ChooseBasisIndex ℤ (𝓞 E)) (i : ι)
-    : phi X f f' ((RingOfIntegers.basis E k : E) • (f i : Fin r → E))
-      = (RingOfIntegers.basis E k : E) • (f' i : Fin r → E) := by
+theorem phi_omega (h : ty X f = ty X f') (k : Free.ChooseBasisIndex ℤ (𝓞 E)) (i : ι) :
+    phi X f f' ((RingOfIntegers.basis E k : E) • (f i : Fin r → E)) =
+      (RingOfIntegers.basis E k : E) • (f' i : Fin r → E) := by
   have h2 := congrArg Prod.snd h
-  have hk
-      : ∀ j,
-        f.repr (RingOfIntegers.basis E k • f i) j = f'.repr (RingOfIntegers.basis E k • f' i) j :=
+  have hk : ∀ j, f.repr (RingOfIntegers.basis E k • f i) j =
+      f'.repr (RingOfIntegers.basis E k • f' i) j :=
     fun j => congrFun (congrFun (congrFun h2 k) i) j
   have e1 := coe_expand X f (RingOfIntegers.basis E k • f i)
   have e2 := coe_expand X f' (RingOfIntegers.basis E k • f' i)
@@ -115,30 +132,30 @@ theorem phi_omega (h : ty X f = ty X f') (k : Free.ChooseBasisIndex ℤ (𝓞 E)
   rw [e1, phi_zsum, e2]
   simp only [hk]
 
-theorem phi_smul (h : ty X f = ty X f') (α : E) (v : Fin r → E)
-    : phi X f f' (α • v) = α • phi X f f' v := by
+theorem phi_smul (h : ty X f = ty X f') (α : E) (v : Fin r → E) :
+    phi X f f' (α • v) = α • phi X f f' v := by
   have key : ∀ i, phi X f f' (α • (f i : Fin r → E)) = α • (f' i : Fin r → E) := by
     intro i
     have hα := (NumberField.integralBasis E).sum_repr α
     rw [← hα]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [Finset.sum_smul, map_sum, smul_assoc, map_smul, NumberField.integralBasis_apply]
+
+    simp only [Finset.sum_smul, map_sum, smul_assoc, map_smul, NumberField.integralBasis_apply]
     refine Finset.sum_congr rfl fun k _ => ?_
     congr 1
     exact phi_omega X h k i
   have e : (phi X f f').comp (mulQ α) = (mulQ α).comp (phi X f f') := by
     refine (RealPlaceEmbeddings.qb X f).ext fun i => ?_
-    rw [LinearMap.comp_apply, LinearMap.comp_apply, mulQ_apply, mulQ_apply,
-      RealPlaceEmbeddings.qb_apply, key, phi_f]
+    rw [LinearMap.comp_apply, LinearMap.comp_apply, mulQ_apply, mulQ_apply, RealPlaceEmbeddings.qb_apply, key, phi_f]
   have := LinearMap.congr_fun e v
   rwa [LinearMap.comp_apply, LinearMap.comp_apply, mulQ_apply, mulQ_apply] at this
 
-theorem phi_herm (h : ty X f = ty X f') (x y : Fin r → E)
-    : herm X.Gm (phi X f f' x) (phi X f f' y) = herm X.Gm x y := by
+theorem phi_herm (h : ty X f = ty X f') (x y : Fin r → E) :
+    herm X.Gm (phi X f f' x) (phi X f f' y) = herm X.Gm x y := by
   have h1 := congrArg Prod.fst h
   have hb : ∀ i j, herm X.Gm (f' i : Fin r → E) (f' j) = herm X.Gm (f i : Fin r → E) (f j) :=
     fun i j => (congrFun (congrFun h1 i) j).symm
-  have s1 : ∀ i y, herm X.Gm (phi X f f' (f i)) (phi X f f' y) = herm X.Gm (f i : Fin r → E) y := by
+  have s1 : ∀ i y, herm X.Gm (phi X f f' (f i)) (phi X f f' y) =
+      herm X.Gm (f i : Fin r → E) y := by
     intro i y
     have e : (hR X (phi X f f' (f i))).comp (phi X f f') = hR X (f i) := by
       refine (RealPlaceEmbeddings.qb X f).ext fun j => ?_
@@ -156,15 +173,16 @@ noncomputable def phiE (h : ty X f = ty X f') : (Fin r → E) →ₗ[E] (Fin r �
   map_add' := map_add _
   map_smul' := phi_smul X h
 
-theorem exists_gl (h : ty X f = ty X f')
-    : ∃ γ : GL (Fin r) E,
-      IsUStab X.Gm X.Λ γ ∧ (∀ i, (γ : Matrix (Fin r) (Fin r) E) *ᵥ (f i : Fin r → E) = f' i)
-        ∧ ∀ v,
-          ((γ⁻¹ : GL (Fin r) E) : Matrix (Fin r) (Fin r) E) *ᵥ v
-            = ∑ i, (RealPlaceEmbeddings.qb X f').repr v i • (f i : Fin r → E) := by
+theorem exists_gl (h : ty X f = ty X f') :
+    ∃ γ : GL (Fin r) E, IsUStab X.Gm X.Λ γ ∧
+      (∀ i, (γ : Matrix (Fin r) (Fin r) E) *ᵥ (f i : Fin r → E) = f' i) ∧
+      ∀ v, ((γ⁻¹ : GL (Fin r) E) : Matrix (Fin r) (Fin r) E) *ᵥ v =
+        ∑ i, (RealPlaceEmbeddings.qb X f').repr v i • (f i : Fin r → E) := by
   have h' : ty X f' = ty X f := h.symm
-  have hc : (phiE X h).comp (phiE X h') = LinearMap.id := LinearMap.ext fun v => phi_phi X f' f v
-  have hc' : (phiE X h').comp (phiE X h) = LinearMap.id := LinearMap.ext fun v => phi_phi X f f' v
+  have hc : (phiE X h).comp (phiE X h') = LinearMap.id :=
+    LinearMap.ext fun v => phi_phi X f' f v
+  have hc' : (phiE X h').comp (phiE X h) = LinearMap.id :=
+    LinearMap.ext fun v => phi_phi X f f' v
   have hMM : LinearMap.toMatrix' (phiE X h) * LinearMap.toMatrix' (phiE X h') = 1 := by
     rw [← LinearMap.toMatrix'_comp, hc, LinearMap.toMatrix'_id]
   have hMM' : LinearMap.toMatrix' (phiE X h') * LinearMap.toMatrix' (phiE X h) = 1 := by
@@ -173,12 +191,8 @@ theorem exists_gl (h : ty X f = ty X f')
     LinearMap.toMatrix'_mulVec (phiE X h) v
   have hv' : ∀ v, LinearMap.toMatrix' (phiE X h') *ᵥ v = phi X f' f v := fun v =>
     LinearMap.toMatrix'_mulVec (phiE X h') v
-  refine ⟨
-    ⟨LinearMap.toMatrix' (phiE X h), LinearMap.toMatrix' (phiE X h'), hMM, hMM'⟩,
-    ⟨fun x y => ?_, fun x => ?_⟩,
-    fun i => ?_,
-    fun v => ?_
-  ⟩
+  refine ⟨⟨LinearMap.toMatrix' (phiE X h), LinearMap.toMatrix' (phiE X h'), hMM, hMM'⟩,
+    ⟨fun x y => ?_, fun x => ?_⟩, fun i => ?_, fun v => ?_⟩
   · show herm X.Gm (LinearMap.toMatrix' (phiE X h) *ᵥ x) (LinearMap.toMatrix' (phiE X h) *ᵥ y) = _
     rw [hv, hv, phi_herm X h]
   · show x ∈ X.Λ ↔ LinearMap.toMatrix' (phiE X h) *ᵥ x ∈ X.Λ

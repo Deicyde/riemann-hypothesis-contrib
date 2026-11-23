@@ -1,14 +1,50 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.Definitions.Divisors.OneMemH0WeightZero
 public import Development.AbelianVarietyTheory.PublishedTheorems.TwistedTraceFormula.NotIsCompactUnivFv
-public import GroundTheory.GlobalFields.IdeleGroups.IdeleNorms
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Development.AbelianVarietyTheory.Definitions.Divisors.OneMemH0WeightZero
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
-  GlobalTheory.QSA GlobalTheory.Published
+open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.QSA GlobalTheory.Published
 open Matrix
 open scoped Quaternion Topology TensorProduct
 
@@ -30,14 +66,13 @@ theorem continuous_ci (w : InfinitePlace F) : Continuous (ci (F := F) w) :=
   (continuous_apply w).comp continuous_fst
 
 theorem continuous_cf (v : HeightOneSpectrum (𝓞 F)) : Continuous (cf (F := F) v) :=
-  (RestrictedProduct.continuous_eval
-    (R := fun w : HeightOneSpectrum (𝓞 F) => w.adicCompletion F)
-    (A := fun w : HeightOneSpectrum (𝓞 F) =>
-      (w.adicCompletionIntegers F : Set (w.adicCompletion F)))
-    v).comp continuous_snd
+  (RestrictedProduct.continuous_eval (R := fun w : HeightOneSpectrum (𝓞 F) => w.adicCompletion F)
+    (A := fun w : HeightOneSpectrum (𝓞 F) => (w.adicCompletionIntegers F : Set (w.adicCompletion F))) v).comp
+    continuous_snd
 
 theorem ext_c {a b : AF F} (h1 : ∀ w, ci w a = ci w b) (h2 : ∀ v, cf v a = cf v b) : a = b :=
   Prod.ext (funext h1) (RestrictedProduct.ext _ _ h2)
+
 
 open Classical in
 def sglI (w : InfinitePlace F) (c : w.Completion) : AF F :=
@@ -53,35 +88,29 @@ theorem ci_sglI_self (w : InfinitePlace F) (c : w.Completion) : ci w (sglI w c) 
   classical
   rw [ci_apply]; simp [sglI]
 
-theorem ci_sglI_ne {w u : InfinitePlace F} (h : u ≠ w) (c : w.Completion)
-    : ci u (sglI w c) = 0 := by
+theorem ci_sglI_ne {w u : InfinitePlace F} (h : u ≠ w) (c : w.Completion) : ci u (sglI w c) = 0 := by
   classical
   rw [ci_apply]; simp [sglI, Pi.single_apply, h]
 
-theorem cf_sglI (w : InfinitePlace F) (c : w.Completion) (v : HeightOneSpectrum (𝓞 F))
-    : cf v (sglI w c) = 0 := by
+theorem cf_sglI (w : InfinitePlace F) (c : w.Completion) (v : HeightOneSpectrum (𝓞 F)) :
+    cf v (sglI w c) = 0 := by
   rw [cf_apply]; rfl
 
-theorem ci_sglF (v : HeightOneSpectrum (𝓞 F)) (c : Fv F v) (w : InfinitePlace F)
-    : ci w (sglF v c) = 0 := by
+theorem ci_sglF (v : HeightOneSpectrum (𝓞 F)) (c : Fv F v) (w : InfinitePlace F) :
+    ci w (sglF v c) = 0 := by
   rw [ci_apply]; rfl
 
 theorem cf_sglF_self (v : HeightOneSpectrum (𝓞 F)) (c : Fv F v) : cf v (sglF v c) = c := by
   classical
   show (singleV F v c) v = c
   unfold singleV
-  exact RestrictedProduct.single_eq_same
-    (fun w : HeightOneSpectrum (𝓞 F) => w.adicCompletionIntegers F)
-    v c
+  exact RestrictedProduct.single_eq_same (fun w : HeightOneSpectrum (𝓞 F) => w.adicCompletionIntegers F) v c
 
-theorem cf_sglF_ne {v u : HeightOneSpectrum (𝓞 F)} (h : u ≠ v) (c : Fv F v)
-    : cf u (sglF v c) = 0 := by
+theorem cf_sglF_ne {v u : HeightOneSpectrum (𝓞 F)} (h : u ≠ v) (c : Fv F v) : cf u (sglF v c) = 0 := by
   classical
   show (singleV F v c) u = 0
   unfold singleV
-  exact RestrictedProduct.single_eq_of_ne
-    (fun w : HeightOneSpectrum (𝓞 F) => w.adicCompletionIntegers F)
-    c h
+  exact RestrictedProduct.single_eq_of_ne (fun w : HeightOneSpectrum (𝓞 F) => w.adicCompletionIntegers F) c h
 
 open Classical in
 theorem continuous_sglI (w : InfinitePlace F) : Continuous (sglI (F := F) w) := by
@@ -92,49 +121,43 @@ open Classical in
 theorem continuous_sglF (v : HeightOneSpectrum (𝓞 F)) : Continuous (sglF (F := F) v) := by
   have hS : Filter.cofinite ≤ Filter.principal ({v}ᶜ : Set (HeightOneSpectrum (𝓞 F))) :=
     Filter.le_principal_iff.2 (Set.finite_singleton v).compl_mem_cofinite
-  let f
-      : v.adicCompletion F
-        → Πʳ w : HeightOneSpectrum (𝓞 F),
-          [w.adicCompletion F, w.adicCompletionIntegers F]_[Filter.principal ({v}ᶜ : Set _)] :=
-    fun x => ⟨
-      Pi.single (M := fun w : HeightOneSpectrum (𝓞 F) => w.adicCompletion F) v x,
-      by
-        intro w hw
-        have hw' : w ≠ v := hw
-        simp only [Set.mem_ofPred_eq, Pi.single_eq_of_ne hw', SetLike.mem_coe]
-        exact zero_mem _
-    ⟩
+  let f : v.adicCompletion F → Πʳ w : HeightOneSpectrum (𝓞 F),
+      [w.adicCompletion F, w.adicCompletionIntegers F]_[Filter.principal ({v}ᶜ : Set _)] :=
+    fun x => ⟨Pi.single (M := fun w : HeightOneSpectrum (𝓞 F) => w.adicCompletion F) v x, by
+      intro w hw
+      have hw' : w ≠ v := hw
+      simp only [Set.mem_ofPred_eq, Pi.single_eq_of_ne hw', SetLike.mem_coe]
+      exact zero_mem _⟩
   have hf : Continuous f := RestrictedProduct.continuous_rng_of_principal.2 (continuous_single v)
   exact continuous_const.prodMk ((RestrictedProduct.continuous_inclusion hS).comp hf)
 
-def invS (S₁ : Finset (InfinitePlace F)) (S₂ : Finset (HeightOneSpectrum (𝓞 F))) (y : AF F)
-    : AF F :=
+def invS (S₁ : Finset (InfinitePlace F)) (S₂ : Finset (HeightOneSpectrum (𝓞 F))) (y : AF F) : AF F :=
   (∑ w ∈ S₁, sglI w (ci w y)⁻¹) + ∑ v ∈ S₂, sglF v (cf v y)⁻¹
 
 variable {S₁ : Finset (InfinitePlace F)} {S₂ : Finset (HeightOneSpectrum (𝓞 F))}
 
 open Classical in
-theorem ci_invS (y : AF F) (u : InfinitePlace F)
-    : ci u (invS S₁ S₂ y) = if u ∈ S₁ then (ci u y)⁻¹ else 0 := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [invS, map_add (f := _), map_sum, map_sum]
+theorem ci_invS (y : AF F) (u : InfinitePlace F) :
+    ci u (invS S₁ S₂ y) = if u ∈ S₁ then (ci u y)⁻¹ else 0 := by
+
+  rw [invS, map_add (f := _), map_sum, map_sum]
   simp only [ci_sglF, Finset.sum_const_zero, add_zero]
   split_ifs with hu
   · rw [Finset.sum_eq_single_of_mem u hu (fun w _ hw => ci_sglI_ne (Ne.symm hw) _), ci_sglI_self]
   · exact Finset.sum_eq_zero fun w hw => ci_sglI_ne (fun h : u = w => hu (h ▸ hw)) _
 
 open Classical in
-theorem cf_invS (y : AF F) (u : HeightOneSpectrum (𝓞 F))
-    : cf u (invS S₁ S₂ y) = if u ∈ S₂ then (cf u y)⁻¹ else 0 := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [invS, map_add (f := _), map_sum, map_sum]
+theorem cf_invS (y : AF F) (u : HeightOneSpectrum (𝓞 F)) :
+    cf u (invS S₁ S₂ y) = if u ∈ S₂ then (cf u y)⁻¹ else 0 := by
+
+  rw [invS, map_add (f := _), map_sum, map_sum]
   simp only [cf_sglI, Finset.sum_const_zero, zero_add]
   split_ifs with hu
   · rw [Finset.sum_eq_single_of_mem u hu (fun w _ hw => cf_sglF_ne (Ne.symm hw) _), cf_sglF_self]
   · exact Finset.sum_eq_zero fun w hw => cf_sglF_ne (fun h : u = w => hu (h ▸ hw)) _
 
-theorem invS_mul {ε : AF F} (hε : IsPlacesIdem S₁ S₂ ε) {y z : AF F} (hyz : y * z = 1)
-    : invS S₁ S₂ (ε * y) = ε * z := by
+theorem invS_mul {ε : AF F} (hε : IsPlacesIdem S₁ S₂ ε) {y z : AF F} (hyz : y * z = 1) :
+    invS S₁ S₂ (ε * y) = ε * z := by
   obtain ⟨h1, h2, h3, h4⟩ := hε
   have hi : ∀ w, ci w y * ci w z = 1 := fun w => by rw [← map_mul (ci w), hyz, map_one]
   have hf : ∀ v, cf v y * cf v z = 1 := fun v => by rw [← map_mul (cf v), hyz, map_one]
@@ -150,32 +173,23 @@ theorem invS_mul {ε : AF F} (hε : IsPlacesIdem S₁ S₂ ε) {y z : AF F} (hyz
     · rw [e1, h3 v hv, one_mul, one_mul]; exact inv_eq_of_mul_eq_one_right (hf v)
     · rw [e1, h4 v hv, zero_mul]
 
-theorem continuousAt_invS {y : AF F} (h1 : ∀ w ∈ S₁, ci w y ≠ 0) (h2 : ∀ v ∈ S₂, cf v y ≠ 0)
-    : ContinuousAt (invS S₁ S₂) y := by
+theorem continuousAt_invS {y : AF F} (h1 : ∀ w ∈ S₁, ci w y ≠ 0) (h2 : ∀ v ∈ S₂, cf v y ≠ 0) :
+    ContinuousAt (invS S₁ S₂) y := by
   unfold invS
   refine ContinuousAt.add ?_ ?_
   · exact tendsto_finsetSum S₁ fun w hw =>
-      ((continuous_sglI w).continuousAt.comp
-        ((continuousAt_inv₀ (h1 w hw)).comp (continuous_ci w).continuousAt))
+      ((continuous_sglI w).continuousAt.comp ((continuousAt_inv₀ (h1 w hw)).comp (continuous_ci w).continuousAt))
   · exact tendsto_finsetSum S₂ fun v hv =>
-      ((continuous_sglF v).continuousAt.comp
-        ((continuousAt_inv₀ (h2 v hv)).comp (continuous_cf v).continuousAt))
+      ((continuous_sglF v).continuousAt.comp ((continuousAt_inv₀ (h2 v hv)).comp (continuous_cf v).continuousAt))
 
 end GlobalTheory.InvIdem
 
 namespace GlobalTheory.InvIdem
 
-theorem inv_cont
-    : ∀ (F : Type) [Field F] [NumberField F] (S₁ : Finset (InfinitePlace F))
-        (S₂ : Finset (HeightOneSpectrum (𝓞 F))) (ε : AF F),
-      IsPlacesIdem S₁ S₂ ε
-        → ∀ x : (AF F)ˣ, ∀ U : Set (AF F),
-          U ∈ 𝓝 (ε * ((x⁻¹ : (AF F)ˣ) : AF F))
-            → ∃ V : Set (AF F),
-              V ∈ 𝓝 (ε * (x : AF F))
-                ∧ ∀ t : F,
-                  ε * algebraMap F (AF F) t ∈ V
-                    → (ε ≠ 0 → t ≠ 0) ∧ ε * algebraMap F (AF F) t⁻¹ ∈ U := by
+theorem inv_cont : ∀ (F : Type) [Field F] [NumberField F] (S₁ : Finset (InfinitePlace F))
+    (S₂ : Finset (HeightOneSpectrum (𝓞 F))) (ε : AF F), IsPlacesIdem S₁ S₂ ε → ∀ x : (AF F)ˣ, ∀ U : Set (AF F),
+    U ∈ 𝓝 (ε * ((x⁻¹ : (AF F)ˣ) : AF F)) → ∃ V : Set (AF F), V ∈ 𝓝 (ε * (x : AF F)) ∧
+      ∀ t : F, ε * algebraMap F (AF F) t ∈ V → (ε ≠ 0 → t ≠ 0) ∧ ε * algebraMap F (AF F) t⁻¹ ∈ U := by
   intro F _ _ S₁ S₂ ε hε x U hU
   have hx : invS S₁ S₂ (ε * (x : AF F)) = ε * ((x⁻¹ : (AF F)ˣ) : AF F) := invS_mul hε x.mul_inv
   have hci : ∀ w ∈ S₁, ci w (ε * (x : AF F)) ≠ 0 := by
@@ -193,10 +207,8 @@ theorem inv_cont
   have hV1 : invS S₁ S₂ ⁻¹' U ∈ 𝓝 (ε * (x : AF F)) :=
     (continuousAt_invS hci hcf).preimage_mem_nhds (by rw [hx]; exact hU)
   have hV2 : {y : AF F | (∀ w ∈ S₁, ci w y ≠ 0) ∧ ∀ v ∈ S₂, cf v y ≠ 0} ∈ 𝓝 (ε * (x : AF F)) :=
-    ((Filter.eventually_all_finset S₁).2 fun w hw =>
-        (continuous_ci w).continuousAt.eventually_ne (hci w hw)).and
-      ((Filter.eventually_all_finset S₂).2 fun v hv =>
-        (continuous_cf v).continuousAt.eventually_ne (hcf v hv))
+    ((Filter.eventually_all_finset S₁).2 fun w hw => (continuous_ci w).continuousAt.eventually_ne (hci w hw)).and
+      ((Filter.eventually_all_finset S₂).2 fun v hv => (continuous_cf v).continuousAt.eventually_ne (hcf v hv))
   refine ⟨_, Filter.inter_mem hV1 hV2, fun t ht => ?_⟩
   have htne : ε ≠ 0 → t ≠ 0 := by
     intro hε0 ht0
@@ -216,9 +228,8 @@ theorem inv_cont
     rw [zero_mul] at e
     rwa [zero_mul]
   · have ht0 := htne hε0
-    have e :=
-      invS_mul (y := algebraMap F (AF F) t) (z := algebraMap F (AF F) t⁻¹) hε
-        (by rw [← map_mul, mul_inv_cancel₀ ht0, map_one])
+    have e := invS_mul (y := algebraMap F (AF F) t) (z := algebraMap F (AF F) t⁻¹) hε
+      (by rw [← map_mul, mul_inv_cancel₀ ht0, map_one])
     rw [← e]
     exact ht.1
 

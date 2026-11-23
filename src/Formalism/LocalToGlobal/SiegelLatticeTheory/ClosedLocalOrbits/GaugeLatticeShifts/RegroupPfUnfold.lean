@@ -1,6 +1,52 @@
 module
 
-public import Mathlib
+public import Mathlib.Analysis.CStarAlgebra.Classes
+public import Mathlib.Analysis.InnerProductSpace.Basic
+public import Mathlib.MeasureTheory.Group.FundamentalDomain
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
+import Mathlib.Topology.UniformSpace.Uniformizable
+public import Mathlib.MeasureTheory.Integral.DominatedConvergence
 
 @[expose] public section
 
@@ -15,36 +61,31 @@ section OrbitUnfold
 
 variable {H : Type*} [Group H] [MeasurableSpace H] [MeasurableMul H]
 
-theorem isFund_of_exact
-    (μ : Measure H)
-    (R : Subgroup H) (W : Set H)
-    (hm : MeasurableSet W) (hc : ∀ x, ∃ g ∈ R, g * x ∈ W) (hu : ∀ x ∈ W, ∀ g ∈ R, g * x ∈ W → g = 1)
-    : IsFundamentalDomain R W μ := by
+theorem isFund_of_exact (μ : Measure H) (R : Subgroup H) (W : Set H) (hm : MeasurableSet W)
+    (hc : ∀ x, ∃ g ∈ R, g * x ∈ W) (hu : ∀ x ∈ W, ∀ g ∈ R, g * x ∈ W → g = 1) :
+    IsFundamentalDomain R W μ := by
   refine IsFundamentalDomain.mk' hm.nullMeasurableSet fun x => ?_
   obtain ⟨g, hg, hgx⟩ := hc x
   refine ⟨⟨g, hg⟩, hgx, ?_⟩
   rintro ⟨k, hk⟩ hkx
   have hkx' : k * x ∈ W := hkx
-  have h :=
-    hu (g * x) hgx (k * g⁻¹) (R.mul_mem hk (R.inv_mem hg)) (by rwa [mul_assoc, inv_mul_cancel_left])
+  have h := hu (g * x) hgx (k * g⁻¹) (R.mul_mem hk (R.inv_mem hg))
+    (by rwa [mul_assoc, inv_mul_cancel_left])
   exact Subtype.ext (mul_inv_eq_one.mp h)
 
-theorem orbit_unfold
-    (μ : Measure H) [μ.IsMulLeftInvariant]
-    (N : Subgroup H) [Countable N]
-    {C : Type*} [Countable C]
-    (act : N → C → C) (h1 : ∀ c, act 1 c = c) (hmul : ∀ n m c, act (n * m) c = act n (act m c))
-    (F : C → H → ℂ)
-    (hFm : ∀ c, Measurable (F c)) (hFeq : ∀ (n : N) c y, F (act n c) y = F c ((n : H)⁻¹ * y))
+theorem orbit_unfold (μ : Measure H) [μ.IsMulLeftInvariant]
+    (N : Subgroup H) [Countable N] {C : Type*} [Countable C] (act : N → C → C) (h1 : ∀ c, act 1 c = c)
+    (hmul : ∀ n m c, act (n * m) c = act n (act m c))
+    (F : C → H → ℂ) (hFm : ∀ c, Measurable (F c)) (hFeq : ∀ (n : N) c y, F (act n c) y = F c ((n : H)⁻¹ * y))
     (Ω : Set H) (hΩm : MeasurableSet Ω) (hΩc : ∀ x, ∃ n : N, (n : H) * x ∈ Ω)
     (hΩu : ∀ x ∈ Ω, ∀ n : N, (n : H) * x ∈ Ω → n = 1)
-    {J : Type*} (r : J → C) (hcov : ∀ c, ∃ j n, act n (r j) = c)
-    (huniq : ∀ j j' n, act n (r j) = r j' → j = j') (ΩJ : J → Set H)
-    (hJm : ∀ j, MeasurableSet (ΩJ j)) (hJc : ∀ j x, ∃ n : N, act n (r j) = r j ∧ (n : H) * x ∈ ΩJ j)
+    {J : Type*} (r : J → C) (hcov : ∀ c, ∃ j n, act n (r j) = c) (huniq : ∀ j j' n, act n (r j) = r j' → j = j')
+    (ΩJ : J → Set H) (hJm : ∀ j, MeasurableSet (ΩJ j))
+    (hJc : ∀ j x, ∃ n : N, act n (r j) = r j ∧ (n : H) * x ∈ ΩJ j)
     (hJu : ∀ j, ∀ x ∈ ΩJ j, ∀ n : N, act n (r j) = r j → (n : H) * x ∈ ΩJ j → n = 1)
-    (hint : ∫⁻ y in Ω, ∑' c, ‖F c y‖ₑ ∂μ < ⊤)
-    : IntegrableOn (fun y => ∑' c, F c y) Ω μ
-      ∧ ∫ y in Ω, ∑' c, F c y ∂μ = ∑' j, ∫ y in ΩJ j, F (r j) y ∂μ := by
+    (hint : ∫⁻ y in Ω, ∑' c, ‖F c y‖ₑ ∂μ < ⊤) :
+    IntegrableOn (fun y => ∑' c, F c y) Ω μ ∧
+      ∫ y in Ω, ∑' c, F c y ∂μ = ∑' j, ∫ y in ΩJ j, F (r j) y ∂μ := by
   classical
   have hsm : ∀ (n : N) (y : H), n⁻¹ • y = (n : H)⁻¹ * y := fun n y => by
     first | rfl | simp [Subgroup.smul_def]
@@ -55,11 +96,9 @@ theorem orbit_unfold
   haveI : MeasurableConstSMul N H := by
     first
       | infer_instance
-      | exact ⟨fun n => measurable_const_mul (n : H)⟩
   haveI : SMulInvariantMeasure N H μ := by
     first
       | infer_instance
-      | exact ⟨fun n ⦃s⦄ _ => measure_preimage_mul μ (n : H) s⟩
 
   have hΩ : IsFundamentalDomain N Ω μ := by
     refine isFund_of_exact μ N Ω hΩm (fun x => ?_) (fun x hx g hg hgx => ?_)
@@ -68,17 +107,17 @@ theorem orbit_unfold
     · have := hΩu x hx ⟨g, hg⟩ hgx
       simpa using congrArg Subtype.val this
 
-  have hbij
-      : ∀ y : H,
-        Function.Bijective (fun p : ({p : J × N | p.2⁻¹ • y ∈ ΩJ p.1} : Set (J × N)) =>
-          act (p : J × N).2 (r (p : J × N).1)) := by
+  have hbij : ∀ y : H, Function.Bijective
+      (fun p : ({p : J × N | p.2⁻¹ • y ∈ ΩJ p.1} : Set (J × N)) =>
+        act (p : J × N).2 (r (p : J × N).1)) := by
     intro y
     constructor
     · rintro ⟨⟨j, n⟩, hy⟩ ⟨⟨j', n'⟩, hy'⟩ heq
       have hy1 : n⁻¹ • y ∈ ΩJ j := hy
       have hy2 : n'⁻¹ • y ∈ ΩJ j' := hy'
       have heq' : act n (r j) = act n' (r j') := heq
-      have e1 : act (n'⁻¹ * n) (r j) = r j' := by rw [hmul, heq', ← hmul, inv_mul_cancel, h1]
+      have e1 : act (n'⁻¹ * n) (r j) = r j' := by
+        rw [hmul, heq', ← hmul, inv_mul_cancel, h1]
       obtain rfl : j = j' := huniq j j' _ e1
       have e2 : n'⁻¹ * n = 1 := by
         refine hJu j _ hy1 _ e1 ?_
@@ -101,52 +140,35 @@ theorem orbit_unfold
       refine ⟨⟨(j, n0 * s⁻¹), hmem⟩, ?_⟩
       show act (n0 * s⁻¹) (r j) = c
       have hsi : act s⁻¹ (r j) = r j := by
-        calc
-          act s⁻¹ (r j)
-            = act s⁻¹ (act s (r j)) := by rw [hs1]
+        calc act s⁻¹ (r j) = act s⁻¹ (act s (r j)) := by rw [hs1]
           _ = r j := by rw [← hmul, inv_mul_cancel, h1]
       rw [hmul, hsi, hc]
-  have key
-      : ∀ (y : H) {M : Type} [AddCommMonoid M] [TopologicalSpace M] (G : C → M),
-        ∑' p : J × N, ({p : J × N | p.2⁻¹ • y ∈ ΩJ p.1} : Set (J × N)).indicator
-          (fun p => G (act p.2 (r p.1))) p
-          = ∑' c, G c := by
+  have key : ∀ (y : H) {M : Type} [AddCommMonoid M] [TopologicalSpace M] (G : C → M),
+      ∑' p : J × N, ({p : J × N | p.2⁻¹ • y ∈ ΩJ p.1} : Set (J × N)).indicator
+        (fun p => G (act p.2 (r p.1))) p = ∑' c, G c := by
     intro y M _ _ G
     rw [← tsum_subtype]
     exact (Equiv.ofBijective _ (hbij y)).tsum_eq G
-  obtain ⟨Ψ, hΨdef⟩
-      : ∃ Ψ : J × N → H → ℂ, Ψ = fun p y => (ΩJ p.1).indicator (F (r p.1)) (p.2⁻¹ • y) :=
-    ⟨_, rfl⟩
-  have hΨ
-      : ∀ y p,
-        Ψ p y
-          = ({p : J × N | p.2⁻¹ • y ∈ ΩJ p.1} : Set (J × N)).indicator
-            (fun p => F (act p.2 (r p.1)) y)
-            p := by
+  obtain ⟨Ψ, hΨdef⟩ : ∃ Ψ : J × N → H → ℂ,
+      Ψ = fun p y => (ΩJ p.1).indicator (F (r p.1)) (p.2⁻¹ • y) := ⟨_, rfl⟩
+  have hΨ : ∀ y p, Ψ p y = ({p : J × N | p.2⁻¹ • y ∈ ΩJ p.1} : Set (J × N)).indicator
+      (fun p => F (act p.2 (r p.1)) y) p := by
     intro y p
     subst hΨdef
     by_cases h : p.2⁻¹ • y ∈ ΩJ p.1
     · first
-      | simp only [Set.indicator_apply, Set.mem_setOf_eq, h, ↓ reduceIte, hFeq']
-      | simp [Set.indicator_apply, h, hFeq']
+        | simp only [Set.indicator_apply, Set.mem_setOf_eq, h, ↓reduceIte, hFeq']
     · first
-      | simp only [Set.indicator_apply, Set.mem_setOf_eq, h, ↓ reduceIte]
-      | simp [Set.indicator_apply, h]
-  have hΨe
-      : ∀ y p,
-        ‖Ψ p y‖ₑ
-          = ({p : J × N | p.2⁻¹ • y ∈ ΩJ p.1} : Set (J × N)).indicator
-            (fun p => ‖F (act p.2 (r p.1)) y‖ₑ)
-            p := by
+        | simp only [Set.indicator_apply, Set.mem_setOf_eq, h, ↓reduceIte]
+  have hΨe : ∀ y p, ‖Ψ p y‖ₑ = ({p : J × N | p.2⁻¹ • y ∈ ΩJ p.1} : Set (J × N)).indicator
+      (fun p => ‖F (act p.2 (r p.1)) y‖ₑ) p := by
     intro y p
     rw [hΨ y p]
     by_cases h : p.2⁻¹ • y ∈ ΩJ p.1
     · first
-      | simp only [Set.indicator_apply, Set.mem_setOf_eq, h, ↓ reduceIte]
-      | simp [Set.indicator_apply, h]
+        | simp only [Set.indicator_apply, Set.mem_setOf_eq, h, ↓reduceIte]
     · first
-      | simp only [Set.indicator_apply, Set.mem_setOf_eq, h, ↓ reduceIte, enorm_zero]
-      | simp [Set.indicator_apply, h]
+        | simp only [Set.indicator_apply, Set.mem_setOf_eq, h, ↓reduceIte, enorm_zero]
   have hΨm : ∀ p, Measurable (Ψ p) := by
     intro p
     subst hΨdef
@@ -165,58 +187,55 @@ theorem orbit_unfold
 
   have hIJ : ∀ j, ∫ y in ΩJ j, F (r j) y ∂μ = ∑' n : N, ∫ y in Ω, Ψ (j, n) y ∂μ := by
     intro j
-    have hrow
-        : ∫⁻ x, ‖(ΩJ j).indicator (F (r j)) x‖ₑ ∂μ = ∑' n : N, ∫⁻ x in Ω, ‖Ψ (j, n) x‖ₑ ∂μ := by
+    have hrow : ∫⁻ x, ‖(ΩJ j).indicator (F (r j)) x‖ₑ ∂μ
+        = ∑' n : N, ∫⁻ x in Ω, ‖Ψ (j, n) x‖ₑ ∂μ := by
       refine (hΩ.lintegral_eq_tsum' _).trans ?_
       subst hΨdef
       rfl
     have hlt : ∑' n : N, ∫⁻ x in Ω, ‖Ψ (j, n) x‖ₑ ∂μ < ⊤ := by
       refine lt_of_le_of_lt ?_ (lt_top_iff_ne_top.mpr hTfin)
-      calc
-        ∑' n : N, ∫⁻ x in Ω, ‖Ψ (j, n) x‖ₑ ∂μ ≤ ∑' j' : J, ∑' n : N, ∫⁻ x in Ω, ‖Ψ (j', n) x‖ₑ ∂μ :=
-          ENNReal.le_tsum (f := fun j' => ∑' n : N, ∫⁻ x in Ω, ‖Ψ (j', n) x‖ₑ ∂μ) j
+      calc ∑' n : N, ∫⁻ x in Ω, ‖Ψ (j, n) x‖ₑ ∂μ
+          ≤ ∑' j' : J, ∑' n : N, ∫⁻ x in Ω, ‖Ψ (j', n) x‖ₑ ∂μ :=
+            ENNReal.le_tsum (f := fun j' => ∑' n : N, ∫⁻ x in Ω, ‖Ψ (j', n) x‖ₑ ∂μ) j
         _ = ∑' p : J × N, ∫⁻ x in Ω, ‖Ψ p x‖ₑ ∂μ :=
-          (ENNReal.tsum_prod (f := fun a b => ∫⁻ x in Ω, ‖Ψ (a, b) x‖ₑ ∂μ)).symm
+            (ENNReal.tsum_prod (f := fun a b => ∫⁻ x in Ω, ‖Ψ (a, b) x‖ₑ ∂μ)).symm
     have hfi : Integrable ((ΩJ j).indicator (F (r j))) μ := by
       refine ⟨((hFm (r j)).indicator (hJm j)).aestronglyMeasurable, ?_⟩
       first
-      | (
-          show ∫⁻ x, ‖(ΩJ j).indicator (F (r j)) x‖ₑ ∂μ < ⊤
-          rw [hrow]
-          exact hlt
-        )
-      | (
-          rw [hasFiniteIntegral_iff_enorm, hrow]
-          exact hlt
-        )
-    calc
-      ∫ y in ΩJ j, F (r j) y ∂μ
-        = ∫ x, (ΩJ j).indicator (F (r j)) x ∂μ := (integral_indicator (hJm j)).symm
-      _ = ∑' n : N, ∫ x in Ω, (ΩJ j).indicator (F (r j)) (n⁻¹ • x) ∂μ := hΩ.integral_eq_tsum' _ hfi
+        | (show ∫⁻ x, ‖(ΩJ j).indicator (F (r j)) x‖ₑ ∂μ < ⊤
+           rw [hrow]
+           exact hlt)
+        | (rw [hasFiniteIntegral_iff_enorm, hrow]
+           exact hlt)
+    calc ∫ y in ΩJ j, F (r j) y ∂μ = ∫ x, (ΩJ j).indicator (F (r j)) x ∂μ :=
+          (integral_indicator (hJm j)).symm
+      _ = ∑' n : N, ∫ x in Ω, (ΩJ j).indicator (F (r j)) (n⁻¹ • x) ∂μ :=
+          hΩ.integral_eq_tsum' _ hfi
       _ = ∑' n : N, ∫ y in Ω, Ψ (j, n) y ∂μ := by
-        subst hΨdef
-        rfl
+          subst hΨdef
+          rfl
   have hmain : ∫ y in Ω, ∑' c, F c y ∂μ = ∑' p : J × N, ∫ y in Ω, Ψ p y ∂μ := by
     rw [← integral_tsum (fun p => (hΨm p).aestronglyMeasurable) hTfin]
     first
-    | simp only [sumC]
-    | exact integral_congr_ae (Filter.Eventually.of_forall fun y => (sumC y).symm)
-  have hsplit : ∑' p : J × N, ∫ y in Ω, Ψ p y ∂μ = ∑' j, ∑' n : N, ∫ y in Ω, Ψ (j, n) y ∂μ := by
+      | simp only [sumC]
+  have hsplit : ∑' p : J × N, ∫ y in Ω, Ψ p y ∂μ
+      = ∑' j, ∑' n : N, ∫ y in Ω, Ψ (j, n) y ∂μ := by
     have hasum : Summable fun p : J × N => ∫ y in Ω, Ψ p y ∂μ := by
-      refine Summable.of_norm (Summable.of_nonneg_of_le
-        (fun p => norm_nonneg _)
-        (fun p => ?_)
+      refine Summable.of_norm (Summable.of_nonneg_of_le (fun p => norm_nonneg _) (fun p => ?_)
         (ENNReal.summable_toReal hTfin))
       have h0 := norm_integral_le_lintegral_norm (μ := μ.restrict Ω) (Ψ p)
-      first | simpa only [ofReal_norm_eq_enorm] using h0 | simpa using h0 | exact h0
+      first
+        | simpa only [ofReal_norm_eq_enorm] using h0
     exact ((hasum.hasSum.prod_fiberwise fun j => (hasum.prod_factor j).hasSum).tsum_eq).symm
   refine ⟨?_, ?_⟩
-  · have hEm : Measurable fun y => ∑' c, ‖F c y‖ₑ := Measurable.tsum fun c => (hFm c).enorm
+  · have hEm : Measurable fun y => ∑' c, ‖F c y‖ₑ :=
+      Measurable.tsum fun c => (hFm c).enorm
     have hfin_ae : ∀ᵐ y ∂(μ.restrict Ω), ∑' c, ‖F c y‖ₑ < ⊤ := ae_lt_top hEm hint.ne
     have hsN : ∀ y, ∑' c, ‖F c y‖ₑ < ⊤ → Summable fun c => ‖F c y‖ := by
       intro y hy
       have h0 := ENNReal.summable_toReal hy.ne
-      first | simpa only [toReal_enorm] using h0 | simpa using h0
+      first
+        | simpa only [toReal_enorm] using h0
     have hgint : Integrable (fun y => (∑' c, ‖F c y‖ₑ).toReal) (μ.restrict Ω) :=
       integrable_toReal_of_lintegral_ne_top hEm.aemeasurable hint.ne
     have hbound : ∀ᵐ y ∂(μ.restrict Ω), ‖∑' c, F c y‖ ≤ (∑' c, ‖F c y‖ₑ).toReal := by
@@ -226,20 +245,19 @@ theorem orbit_unfold
       exact norm_tsum_le_tsum_norm (hsN y hy)
     have hgm : AEStronglyMeasurable (fun y => ∑' c, F c y) (μ.restrict Ω) := by
       haveI : Encodable C := Encodable.ofCountable C
-      have hlim
-          : ∀ᵐ y ∂(μ.restrict Ω), Filter.Tendsto (fun s : Finset C => ∑ c ∈ s, F c y)
-            Filter.atTop (nhds (∑' c, F c y)) := by
+      have hlim : ∀ᵐ y ∂(μ.restrict Ω), Filter.Tendsto (fun s : Finset C => ∑ c ∈ s, F c y)
+          Filter.atTop (nhds (∑' c, F c y)) := by
         filter_upwards [hfin_ae] with y hy
         exact (Summable.of_norm (hsN y hy)).hasSum
       have hfs : ∀ s : Finset C, Measurable fun y => ∑ c ∈ s, F c y := fun s => by
-        first | exact Finset.measurable_sum s (fun c _ => hFm c) | fun_prop
+        first
+          | exact Finset.measurable_sum s (fun c _ => hFm c)
+          | fun_prop
       first
-      | exact aestronglyMeasurable_of_tendsto_ae Filter.atTop
-          (fun s => (hfs s).aestronglyMeasurable)
-          hlim
-      | exact (aemeasurable_of_tendsto_metrizable_ae Filter.atTop
-          (fun s => (hfs s).aemeasurable)
-          hlim).aestronglyMeasurable
+        | exact aestronglyMeasurable_of_tendsto_ae Filter.atTop
+            (fun s => (hfs s).aestronglyMeasurable) hlim
+        | exact (aemeasurable_of_tendsto_metrizable_ae Filter.atTop
+            (fun s => (hfs s).aemeasurable) hlim).aestronglyMeasurable
     exact Integrable.mono' hgint hgm hbound
   · rw [hmain, hsplit]
     exact tsum_congr fun j => (hIJ j).symm

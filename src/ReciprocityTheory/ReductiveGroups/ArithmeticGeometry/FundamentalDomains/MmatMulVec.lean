@@ -1,7 +1,50 @@
 module
 
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.FundamentalDomains.ConjugateConjugate
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.FundamentalDomains.SpanColsMul
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.FundamentalDomains.IsotropicOutsideLine
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Lemma
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -33,7 +76,8 @@ theorem tau_kappa0 (τ : X.Ψ) : τ.1 X.κ0 = -(I * X.c τ) := by
   have hnorm : ‖τ.1 X.κ0‖ = X.c τ := by
     simp only [Data.c]
     rcases X.κ0_xi with h | h <;> rw [h] <;> simp [map_mul, map_neg, norm_mul, map_ofNat]
-  have hz : τ.1 X.κ0 = ((τ.1 X.κ0).im : ℂ) * I := by apply Complex.ext <;> simp [hre]
+  have hz : τ.1 X.κ0 = ((τ.1 X.κ0).im : ℂ) * I := by
+    apply Complex.ext <;> simp [hre]
   have habs : ‖τ.1 X.κ0‖ = -(τ.1 X.κ0).im := by
     conv_lhs => rw [hz]
     rw [norm_mul, Complex.norm_I, mul_one, Complex.norm_real, Real.norm_eq_abs, abs_of_neg him]
@@ -42,18 +86,17 @@ theorem tau_kappa0 (τ : X.Ψ) : τ.1 X.κ0 = -(I * X.c τ) := by
   · simp
     linarith
 
-noncomputable def Mmat (u : Fin 2 → Fin r → E) (β : Matrix (Fin 2) (Fin 2) E)
-    : Matrix (Fin r) (Fin r) E :=
-  Matrix.of fun a j =>
-    (if a = j then 1 else 0) + X.κ0 * ∑ i, ∑ k, β i k * u i a * ∑ l, X.Gm j l * cc (u k l)
+noncomputable def Mmat (u : Fin 2 → Fin r → E) (β : Matrix (Fin 2) (Fin 2) E) : Matrix (Fin r) (Fin r) E :=
+  Matrix.of fun a j => (if a = j then 1 else 0) +
+    X.κ0 * ∑ i, ∑ k, β i k * u i a * ∑ l, X.Gm j l * cc (u k l)
 
-theorem Mmat_map (u : Fin 2 → Fin r → E) (β : Matrix (Fin 2) (Fin 2) E) (τ : X.Ψ)
-    : (X.Mmat u β).map τ.1 = X.zmat u (X.embH β) τ := by
+theorem Mmat_map (u : Fin 2 → Fin r → E) (β : Matrix (Fin 2) (Fin 2) E) (τ : X.Ψ) :
+    (X.Mmat u β).map τ.1 = X.zmat u (X.embH β) τ := by
   ext a j
-  by_cases h : a = j <;> set_option synthInstance.maxHeartbeats 100000 in
-    simp [h, Matrix.map_apply, Data.Mmat, Data.zmat, Data.embH, Data.emb, map_add (f := _), map_mul,
-        map_sum, X.tau_kappa0 τ, cc, NumberField.IsCMField.complexEmbedding_complexConj]
-      <;> ring
+  by_cases h : a = j <;>
+
+    simp [h, Matrix.map_apply, Data.Mmat, Data.zmat, Data.embH, Data.emb, map_add (f := _), map_mul, map_sum,
+    X.tau_kappa0 τ, cc, NumberField.IsCMField.complexEmbedding_complexConj] <;> ring
 
 theorem Mmat_zero (u : Fin 2 → Fin r → E) : X.Mmat u 0 = 1 := by
   ext a j
@@ -94,28 +137,23 @@ private lemma herm_smul_right_eq_cc_mul' (G : Matrix (Fin r) (Fin r) E) (c : E) 
   simp only [Pi.smul_apply, smul_eq_mul, cc, map_mul]
   ring
 
-theorem Mmat_mul
-    (u : Fin 2 → Fin r → E) (hu : ∀ i k, herm X.Gm (u i) (u k) = 0)
-    (β β' : Matrix (Fin 2) (Fin 2) E)
-    : X.Mmat u β * X.Mmat u β' = X.Mmat u (β + β') := by
+theorem Mmat_mul (u : Fin 2 → Fin r → E) (hu : ∀ i k, herm X.Gm (u i) (u k) = 0)
+    (β β' : Matrix (Fin 2) (Fin 2) E) : X.Mmat u β * X.Mmat u β' = X.Mmat u (β + β') := by
   refine Matrix.toLin'.injective (LinearMap.ext fun v => ?_)
-  simp only [Matrix.toLin'_apply, ← Matrix.mulVec_mulVec, Mmat_mulVec_eq_add_sum,
-    herm_add_left_fundamental_domains, herm_smul_left_fundamental_domains, Fin.sum_univ_two, hu,
-    mul_zero, add_zero, Matrix.add_apply]
-  first | module | (simp only [add_mul, mul_add, add_smul]; abel)
+  simp only [Matrix.toLin'_apply, ← Matrix.mulVec_mulVec, Mmat_mulVec_eq_add_sum, herm_add_left_fundamental_domains,
+    herm_smul_left_fundamental_domains, Fin.sum_univ_two, hu, mul_zero, add_zero, Matrix.add_apply]
+  first
+    | module
+    | (simp only [add_mul, mul_add, add_smul]; abel)
 
-noncomputable def gam
-    (u : Fin 2 → Fin r → E) (hu : ∀ i k, herm X.Gm (u i) (u k) = 0) (β : Matrix (Fin 2) (Fin 2) E)
-    : GL (Fin r) E := ⟨
-  X.Mmat u β,
-  X.Mmat u (-β),
-  by rw [X.Mmat_mul u hu, add_neg_cancel, Mmat_zero],
-  by rw [X.Mmat_mul u hu, neg_add_cancel, Mmat_zero]
-⟩
+noncomputable def gam (u : Fin 2 → Fin r → E) (hu : ∀ i k, herm X.Gm (u i) (u k) = 0)
+    (β : Matrix (Fin 2) (Fin 2) E) : GL (Fin r) E :=
+  ⟨X.Mmat u β, X.Mmat u (-β), by rw [X.Mmat_mul u hu, add_neg_cancel, Mmat_zero],
+    by rw [X.Mmat_mul u hu, neg_add_cancel, Mmat_zero]⟩
 
 private lemma cc_herm_Gm_eq_herm_swap (x y : Fin r → E) : cc (herm X.Gm x y) = herm X.Gm y x := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [herm, cc, map_sum, map_mul, NumberField.IsCMField.complexConj_apply_apply]
+
+  simp only [herm, cc, map_sum, map_mul, NumberField.IsCMField.complexConj_apply_apply]
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun a _ => Finset.sum_congr rfl fun b _ => ?_
   first
@@ -128,33 +166,28 @@ private lemma cc_herm_Gm_eq_herm_swap (x y : Fin r → E) : cc (herm X.Gm x y) =
        rw [hg]
        ring)
 
-theorem herm_Mmat
-    (u : Fin 2 → Fin r → E) (hu : ∀ i k, herm X.Gm (u i) (u k) = 0)
-    (β : Matrix (Fin 2) (Fin 2) E) (hβ : ∀ i k, cc (β i k) = β k i)
-    (v w : Fin r → E)
-    : herm X.Gm (X.Mmat u β *ᵥ v) (X.Mmat u β *ᵥ w) = herm X.Gm v w := by
+theorem herm_Mmat (u : Fin 2 → Fin r → E) (hu : ∀ i k, herm X.Gm (u i) (u k) = 0)
+    (β : Matrix (Fin 2) (Fin 2) E) (hβ : ∀ i k, cc (β i k) = β k i) (v w : Fin r → E) :
+    herm X.Gm (X.Mmat u β *ᵥ v) (X.Mmat u β *ᵥ w) = herm X.Gm v w := by
   have hk : IsCMField.complexConj E X.κ0 = -X.κ0 := X.cc_kappa0
   have hb' : ∀ i k, IsCMField.complexConj E (β i k) = β k i := hβ
-  have hh : ∀ x y, IsCMField.complexConj E (herm X.Gm x y) = herm X.Gm y x :=
-    cc_herm_Gm_eq_herm_swap X
-  simp only [Mmat_mulVec_eq_add_sum, herm_add_left_fundamental_domains,
-    herm_add_right_fundamental_domains', herm_smul_left_fundamental_domains,
-    herm_smul_right_eq_cc_mul', Fin.sum_univ_two, hu, mul_zero, add_zero, zero_add, cc, map_mul,
-    map_add, hk, hb', hh]
+  have hh : ∀ x y, IsCMField.complexConj E (herm X.Gm x y) = herm X.Gm y x := cc_herm_Gm_eq_herm_swap X
+  simp only [Mmat_mulVec_eq_add_sum, herm_add_left_fundamental_domains, herm_add_right_fundamental_domains', herm_smul_left_fundamental_domains,
+    herm_smul_right_eq_cc_mul', Fin.sum_univ_two, hu, mul_zero, add_zero, zero_add, cc, map_mul, map_add,
+    hk, hb', hh]
   ring
 
-theorem Mmat_mulVec (u : Fin 2 → Fin r → E) (β : Matrix (Fin 2) (Fin 2) E) (v : Fin r → E)
-    : X.Mmat u β *ᵥ v = v + ∑ i, (X.κ0 * ∑ k, β i k * herm X.Gm v (u k)) • u i := by
+theorem Mmat_mulVec (u : Fin 2 → Fin r → E) (β : Matrix (Fin 2) (Fin 2) E) (v : Fin r → E) :
+    X.Mmat u β *ᵥ v = v + ∑ i, (X.κ0 * ∑ k, β i k * herm X.Gm v (u k)) • u i := by
   funext a
   simp only [Matrix.mulVec, dotProduct, Data.Mmat, Matrix.of_apply, add_mul, Finset.sum_add_distrib,
-    ite_mul, one_mul, zero_mul, Finset.sum_ite_eq, Finset.mem_univ, ↓ reduceIte, Pi.add_apply,
+    ite_mul, one_mul, zero_mul, Finset.sum_ite_eq, Finset.mem_univ, ↓reduceIte, Pi.add_apply,
     Finset.sum_apply, Pi.smul_apply, smul_eq_mul, herm, Finset.mul_sum, Finset.sum_mul]
   congr 1
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun i _ => ?_
   rw [Finset.sum_comm]
-  refine Finset.sum_congr rfl fun k _ =>
-    Finset.sum_congr rfl fun j _ => Finset.sum_congr rfl fun l _ => ?_
+  refine Finset.sum_congr rfl fun k _ => Finset.sum_congr rfl fun j _ => Finset.sum_congr rfl fun l _ => ?_
   ring
 
 end Data

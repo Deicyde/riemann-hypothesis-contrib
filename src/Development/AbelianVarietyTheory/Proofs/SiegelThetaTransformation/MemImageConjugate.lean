@@ -1,13 +1,53 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.Definitions.SpanningFamilies.Fischer
-public import Development.AbelianVarietyTheory.Definitions.SpanningFamilies.IsHeatZero
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.FundamentalDomains.Signature
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
-open Matrix Complex NumberField ReciprocityTheory.ChartRestriction.G
-  ReciprocityTheory.ChartRestriction.G.FD
+open Matrix Complex NumberField ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.FD
 open scoped ComplexConjugate Classical
 
 namespace GlobalTheory.Ker.ConjDatum
@@ -20,8 +60,8 @@ open Matrix Complex NumberField in
 open scoped ComplexConjugate Classical in
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {r : ℕ} in
 omit [NumberField E] [IsCMField E] in
-theorem _root_.GlobalTheory.Ker.ConjDatum.conjugate_twice (τ : E →+* ℂ)
-    : ComplexEmbedding.conjugate (ComplexEmbedding.conjugate τ) = τ := by
+theorem _root_.GlobalTheory.Ker.ConjDatum.conjugate_twice (τ : E →+* ℂ) :
+    ComplexEmbedding.conjugate (ComplexEmbedding.conjugate τ) = τ := by
   ext x
   simp [ComplexEmbedding.conjugate_coe_eq]
 
@@ -29,22 +69,19 @@ open Matrix Complex NumberField in
 open scoped ComplexConjugate Classical in
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {r : ℕ} in
 omit [NumberField E] [IsCMField E] in
-theorem _root_.GlobalTheory.Ker.ConjDatum.gram_conjugate
-    (τ : E →+* ℂ) (G : Matrix (Fin r) (Fin r) E) (P : Matrix (Fin r) (Fin r) ℂ)
-    : _root_.ReciprocityTheory.ChartRestriction.G.FD.gram (ComplexEmbedding.conjugate τ) G
-        (P.map (starRingEnd ℂ))
-      = (_root_.ReciprocityTheory.ChartRestriction.G.FD.gram τ G P).map (starRingEnd ℂ) := by
+theorem _root_.GlobalTheory.Ker.ConjDatum.gram_conjugate (τ : E →+* ℂ) (G : Matrix (Fin r) (Fin r) E)
+    (P : Matrix (Fin r) (Fin r) ℂ) :
+    _root_.ReciprocityTheory.ChartRestriction.G.FD.gram (ComplexEmbedding.conjugate τ) G (P.map (starRingEnd ℂ)) =
+      (_root_.ReciprocityTheory.ChartRestriction.G.FD.gram τ G P).map (starRingEnd ℂ) := by
   ext a b
-  set_option synthInstance.maxHeartbeats 100000 in
-  simp [_root_.ReciprocityTheory.ChartRestriction.G.FD.gram,
-    _root_.ReciprocityTheory.ChartRestriction.G.FD.hermC,
-    _root_.ReciprocityTheory.ChartRestriction.G.FD.col, ComplexEmbedding.conjugate_coe_eq, map_sum]
+
+  simp [_root_.ReciprocityTheory.ChartRestriction.G.FD.gram, _root_.ReciprocityTheory.ChartRestriction.G.FD.hermC, _root_.ReciprocityTheory.ChartRestriction.G.FD.col, ComplexEmbedding.conjugate_coe_eq, map_sum]
 
 open Matrix Complex NumberField in
 open scoped ComplexConjugate Classical in
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {r : ℕ} in
-theorem _root_.GlobalTheory.Ker.ConjDatum.det_map_ne {M : Matrix (Fin r) (Fin r) ℂ} (h : M.det ≠ 0)
-    : (M.map (starRingEnd ℂ)).det ≠ 0 := by
+theorem _root_.GlobalTheory.Ker.ConjDatum.det_map_ne {M : Matrix (Fin r) (Fin r) ℂ} (h : M.det ≠ 0) :
+    (M.map (starRingEnd ℂ)).det ≠ 0 := by
   have hdet : (M.map (starRingEnd ℂ)).det = starRingEnd ℂ M.det := by
     rw [RingHom.map_det]
     rfl
@@ -55,8 +92,8 @@ open Matrix Complex NumberField in
 open scoped ComplexConjugate Classical in
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {r : ℕ} in
 omit [NumberField E] [IsCMField E] in
-theorem _root_.GlobalTheory.Ker.ConjDatum.mem_image_conjugate (Ψ : Finset (E →+* ℂ)) (τ : E →+* ℂ)
-    : τ ∈ Ψ.image ComplexEmbedding.conjugate ↔ ComplexEmbedding.conjugate τ ∈ Ψ := by
+theorem _root_.GlobalTheory.Ker.ConjDatum.mem_image_conjugate (Ψ : Finset (E →+* ℂ)) (τ : E →+* ℂ) :
+    τ ∈ Ψ.image ComplexEmbedding.conjugate ↔ ComplexEmbedding.conjugate τ ∈ Ψ := by
   rw [Finset.mem_image]
   constructor
   · rintro ⟨σ, hσ, rfl⟩
@@ -73,49 +110,30 @@ open Matrix Complex NumberField in
 open scoped ComplexConjugate Classical in
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {r : ℕ} in
 omit [NumberField E] [IsCMField E] in
-theorem _root_.GlobalTheory.Ker.ConjDatum.cfr_mem_GG
-    (Ψ : Finset (E →+* ℂ)) (G : Matrix (Fin r) (Fin r) E) (p : ℕ)
-    {x
-      : _root_.ReciprocityTheory.ChartRestriction.G.FD.Frame (Ψ.image ComplexEmbedding.conjugate) r}
-    (hx : x ∈ _root_.ReciprocityTheory.ChartRestriction.G.FD.GG _ G p)
-    : _root_.GlobalTheory.Ker.ConjDatum.cfr Ψ x
-      ∈ _root_.ReciprocityTheory.ChartRestriction.G.FD.GG Ψ G p := by
+theorem _root_.GlobalTheory.Ker.ConjDatum.cfr_mem_GG (Ψ : Finset (E →+* ℂ)) (G : Matrix (Fin r) (Fin r) E)
+    (p : ℕ) {x : _root_.ReciprocityTheory.ChartRestriction.G.FD.Frame (Ψ.image ComplexEmbedding.conjugate) r} (hx : x ∈ _root_.ReciprocityTheory.ChartRestriction.G.FD.GG _ G p) :
+    _root_.GlobalTheory.Ker.ConjDatum.cfr Ψ x ∈ _root_.ReciprocityTheory.ChartRestriction.G.FD.GG Ψ G p := by
   intro τ
   obtain ⟨hdet, hpos⟩ := hx (_root_.GlobalTheory.Ker.ConjDatum.cpl Ψ τ)
-  have hmat
-      : _root_.ReciprocityTheory.ChartRestriction.G.FD.mat
-          (_root_.GlobalTheory.Ker.ConjDatum.cfr Ψ x) τ
-        = (_root_.ReciprocityTheory.ChartRestriction.G.FD.mat x
-          (_root_.GlobalTheory.Ker.ConjDatum.cpl Ψ τ)).map (starRingEnd ℂ) := by
+  have hmat : _root_.ReciprocityTheory.ChartRestriction.G.FD.mat (_root_.GlobalTheory.Ker.ConjDatum.cfr Ψ x) τ =
+      (_root_.ReciprocityTheory.ChartRestriction.G.FD.mat x (_root_.GlobalTheory.Ker.ConjDatum.cpl Ψ τ)).map (starRingEnd ℂ) := by
     ext a b
     rfl
-  have hgram
-      : _root_.ReciprocityTheory.ChartRestriction.G.FD.gram (τ : E →+* ℂ) G
-          (_root_.ReciprocityTheory.ChartRestriction.G.FD.mat
-            (_root_.GlobalTheory.Ker.ConjDatum.cfr Ψ x) τ)
-        = (_root_.ReciprocityTheory.ChartRestriction.G.FD.gram
-          (_root_.GlobalTheory.Ker.ConjDatum.cpl Ψ τ : E →+* ℂ) G
-          (_root_.ReciprocityTheory.ChartRestriction.G.FD.mat x
-            (_root_.GlobalTheory.Ker.ConjDatum.cpl Ψ τ))).map (starRingEnd ℂ) := by
+  have hgram : _root_.ReciprocityTheory.ChartRestriction.G.FD.gram (τ : E →+* ℂ) G (_root_.ReciprocityTheory.ChartRestriction.G.FD.mat (_root_.GlobalTheory.Ker.ConjDatum.cfr Ψ x) τ) =
+      (_root_.ReciprocityTheory.ChartRestriction.G.FD.gram (_root_.GlobalTheory.Ker.ConjDatum.cpl Ψ τ : E →+* ℂ) G
+        (_root_.ReciprocityTheory.ChartRestriction.G.FD.mat x (_root_.GlobalTheory.Ker.ConjDatum.cpl Ψ τ))).map (starRingEnd ℂ) := by
     rw [hmat]
-    have h :=
-      _root_.GlobalTheory.Ker.ConjDatum.gram_conjugate (ComplexEmbedding.conjugate (τ : E →+* ℂ)) G
-        (_root_.ReciprocityTheory.ChartRestriction.G.FD.mat x
-          (_root_.GlobalTheory.Ker.ConjDatum.cpl Ψ τ))
+    have h := _root_.GlobalTheory.Ker.ConjDatum.gram_conjugate (ComplexEmbedding.conjugate (τ : E →+* ℂ)) G
+      (_root_.ReciprocityTheory.ChartRestriction.G.FD.mat x (_root_.GlobalTheory.Ker.ConjDatum.cpl Ψ τ))
     rw [_root_.GlobalTheory.Ker.ConjDatum.conjugate_twice] at h
     exact h
   refine ⟨?_, fun i => ?_⟩
   · rw [hmat]
     exact _root_.GlobalTheory.Ker.ConjDatum.det_map_ne hdet
   · have h := hpos i
-    have hminor
-        : _root_.ReciprocityTheory.ChartRestriction.G.FD.dmin G
-            (_root_.GlobalTheory.Ker.ConjDatum.cfr Ψ x) τ i
-          = starRingEnd ℂ
-            (_root_.ReciprocityTheory.ChartRestriction.G.FD.dmin G x
-              (_root_.GlobalTheory.Ker.ConjDatum.cpl Ψ τ) i) := by
-      simp only [_root_.ReciprocityTheory.ChartRestriction.G.FD.dmin,
-        _root_.ReciprocityTheory.ChartRestriction.G.FD.lminor, hgram, ← Matrix.submatrix_map]
+    have hminor : _root_.ReciprocityTheory.ChartRestriction.G.FD.dmin G (_root_.GlobalTheory.Ker.ConjDatum.cfr Ψ x) τ i =
+        starRingEnd ℂ (_root_.ReciprocityTheory.ChartRestriction.G.FD.dmin G x (_root_.GlobalTheory.Ker.ConjDatum.cpl Ψ τ) i) := by
+      simp only [_root_.ReciprocityTheory.ChartRestriction.G.FD.dmin, _root_.ReciprocityTheory.ChartRestriction.G.FD.lminor, hgram, ← Matrix.submatrix_map]
       rw [RingHom.map_det]
       rfl
     rw [hminor, Complex.conj_re]
@@ -125,21 +143,14 @@ open Matrix Complex NumberField in
 open scoped ComplexConjugate Classical in
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {r : ℕ} in
 omit [NumberField E] [IsCMField E] in
-theorem _root_.GlobalTheory.Ker.ConjDatum.cfr_mem_Bor
-    (Ψ : Finset (E →+* ℂ))
-    {x
-      : _root_.ReciprocityTheory.ChartRestriction.G.FD.Frame (Ψ.image ComplexEmbedding.conjugate) r}
-    (hx : x ∈ _root_.ReciprocityTheory.ChartRestriction.G.FD.Bor _ r)
-    : _root_.GlobalTheory.Ker.ConjDatum.cfr Ψ x
-      ∈ _root_.ReciprocityTheory.ChartRestriction.G.FD.Bor Ψ r := by
+theorem _root_.GlobalTheory.Ker.ConjDatum.cfr_mem_Bor (Ψ : Finset (E →+* ℂ))
+    {x : _root_.ReciprocityTheory.ChartRestriction.G.FD.Frame (Ψ.image ComplexEmbedding.conjugate) r} (hx : x ∈ _root_.ReciprocityTheory.ChartRestriction.G.FD.Bor _ r) :
+    _root_.GlobalTheory.Ker.ConjDatum.cfr Ψ x ∈ _root_.ReciprocityTheory.ChartRestriction.G.FD.Bor Ψ r := by
   intro τ
   obtain ⟨hdet, htri⟩ := hx (_root_.GlobalTheory.Ker.ConjDatum.cpl Ψ τ)
   refine ⟨?_, fun a c hca => ?_⟩
-  · have hmat
-        : _root_.ReciprocityTheory.ChartRestriction.G.FD.mat
-            (_root_.GlobalTheory.Ker.ConjDatum.cfr Ψ x) τ
-          = (_root_.ReciprocityTheory.ChartRestriction.G.FD.mat x
-            (_root_.GlobalTheory.Ker.ConjDatum.cpl Ψ τ)).map (starRingEnd ℂ) := by
+  · have hmat : _root_.ReciprocityTheory.ChartRestriction.G.FD.mat (_root_.GlobalTheory.Ker.ConjDatum.cfr Ψ x) τ =
+        (_root_.ReciprocityTheory.ChartRestriction.G.FD.mat x (_root_.GlobalTheory.Ker.ConjDatum.cpl Ψ τ)).map (starRingEnd ℂ) := by
       ext a b
       rfl
     rw [hmat]
@@ -150,38 +161,26 @@ open Matrix Complex NumberField in
 open scoped ComplexConjugate Classical in
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {r : ℕ} in
 omit [NumberField E] [IsCMField E] in
-theorem _root_.GlobalTheory.Ker.ConjDatum.cfr_rmul
-    (Ψ : Finset (E →+* ℂ))
-    (x b
-      : _root_.ReciprocityTheory.ChartRestriction.G.FD.Frame (Ψ.image ComplexEmbedding.conjugate) r)
-    : _root_.GlobalTheory.Ker.ConjDatum.cfr Ψ
-        (_root_.ReciprocityTheory.ChartRestriction.G.FD.rmul x b)
-      = _root_.ReciprocityTheory.ChartRestriction.G.FD.rmul
-        (_root_.GlobalTheory.Ker.ConjDatum.cfr Ψ x)
-        (_root_.GlobalTheory.Ker.ConjDatum.cfr Ψ b) := by
+theorem _root_.GlobalTheory.Ker.ConjDatum.cfr_rmul (Ψ : Finset (E →+* ℂ))
+    (x b : _root_.ReciprocityTheory.ChartRestriction.G.FD.Frame (Ψ.image ComplexEmbedding.conjugate) r) :
+    _root_.GlobalTheory.Ker.ConjDatum.cfr Ψ (_root_.ReciprocityTheory.ChartRestriction.G.FD.rmul x b) =
+      _root_.ReciprocityTheory.ChartRestriction.G.FD.rmul (_root_.GlobalTheory.Ker.ConjDatum.cfr Ψ x) (_root_.GlobalTheory.Ker.ConjDatum.cfr Ψ b) := by
   funext τ a c
-  set_option synthInstance.maxHeartbeats 100000 in
-  simp [_root_.GlobalTheory.Ker.ConjDatum.cfr, _root_.ReciprocityTheory.ChartRestriction.G.FD.rmul,
-    _root_.ReciprocityTheory.ChartRestriction.G.FD.mat, Matrix.mul_apply, map_sum]
+
+  simp [_root_.GlobalTheory.Ker.ConjDatum.cfr, _root_.ReciprocityTheory.ChartRestriction.G.FD.rmul, _root_.ReciprocityTheory.ChartRestriction.G.FD.mat, Matrix.mul_apply, map_sum]
 
 open Matrix Complex NumberField in
 open scoped ComplexConjugate Classical in
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {r : ℕ} in
 omit [NumberField E] [IsCMField E] in
-theorem _root_.GlobalTheory.Ker.ConjDatum.cfr_lact
-    (Ψ : Finset (E →+* ℂ))
-    (γ : GL (Fin r) E)
-    (x
-      : _root_.ReciprocityTheory.ChartRestriction.G.FD.Frame (Ψ.image ComplexEmbedding.conjugate) r)
-    : _root_.GlobalTheory.Ker.ConjDatum.cfr Ψ
-        (_root_.ReciprocityTheory.ChartRestriction.G.FD.lact γ x)
-      = _root_.ReciprocityTheory.ChartRestriction.G.FD.lact γ
-        (_root_.GlobalTheory.Ker.ConjDatum.cfr Ψ x) := by
+theorem _root_.GlobalTheory.Ker.ConjDatum.cfr_lact (Ψ : Finset (E →+* ℂ)) (γ : GL (Fin r) E)
+    (x : _root_.ReciprocityTheory.ChartRestriction.G.FD.Frame (Ψ.image ComplexEmbedding.conjugate) r) :
+    _root_.GlobalTheory.Ker.ConjDatum.cfr Ψ (_root_.ReciprocityTheory.ChartRestriction.G.FD.lact γ x) =
+      _root_.ReciprocityTheory.ChartRestriction.G.FD.lact γ (_root_.GlobalTheory.Ker.ConjDatum.cfr Ψ x) := by
   funext τ a c
-  set_option synthInstance.maxHeartbeats 100000 in
-  simp [_root_.GlobalTheory.Ker.ConjDatum.cfr, _root_.ReciprocityTheory.ChartRestriction.G.FD.lact,
-    _root_.ReciprocityTheory.ChartRestriction.G.FD.mat, Matrix.mul_apply, map_sum,
-    _root_.GlobalTheory.Ker.ConjDatum.cpl, ComplexEmbedding.conjugate_coe_eq]
+
+  simp [_root_.GlobalTheory.Ker.ConjDatum.cfr, _root_.ReciprocityTheory.ChartRestriction.G.FD.lact, _root_.ReciprocityTheory.ChartRestriction.G.FD.mat, Matrix.mul_apply, map_sum,
+  _root_.GlobalTheory.Ker.ConjDatum.cpl, ComplexEmbedding.conjugate_coe_eq]
 
 def conjData (X : Data E r) : Data E r where
   Ψ := X.Ψ.image ComplexEmbedding.conjugate

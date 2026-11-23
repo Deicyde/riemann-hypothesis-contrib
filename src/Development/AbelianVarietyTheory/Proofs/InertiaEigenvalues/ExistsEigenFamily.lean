@@ -1,17 +1,57 @@
 module
 
-public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.IsTypeGroupBlockLift
+public import Development.AbelianVarietyTheory.Definitions.Foundations.SmoothPartStable
+public import Mathlib.Basic.Complex.Basic
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
 namespace GlobalTheory.EigenFamilyStabilizer
 
-def stab
-    {G V ι : Type} [Group G] [AddCommGroup V] [Module ℂ V]
-    (ρ : Representation ℂ G V)
-    (K : Subgroup G) (θ : G → ℂ) (h1 : θ 1 = 1) (hm : ∀ a ∈ K, ∀ b ∈ K, θ (a * b) = θ a * θ b)
-    (y : ι → V)
-    : Subgroup K where
+def stab {G V ι : Type} [Group G] [AddCommGroup V] [Module ℂ V] (ρ : Representation ℂ G V) (K : Subgroup G) (θ : G → ℂ)
+    (h1 : θ 1 = 1) (hm : ∀ a ∈ K, ∀ b ∈ K, θ (a * b) = θ a * θ b) (y : ι → V) : Subgroup K where
   carrier := {k | θ k = 1 ∧ ∀ i, ρ k (y i) = y i}
   one_mem' := ⟨by simpa using h1, fun i => by simp⟩
   mul_mem' := by
@@ -29,24 +69,7 @@ def stab
       rw [← Module.End.mul_apply, ← map_mul, ← Subgroup.coe_mul, inv_mul_cancel]
       simp
 
-theorem exists_eigen_family
-    : ∀ {G V W ι : Type} [inst : Group G] [inst_1 : TopologicalSpace G] [IsTopologicalGroup G]
-        [inst_3 : AddCommGroup V] [inst_4 : Module ℂ V] [inst_5 : AddCommGroup W]
-        [inst_6 : Module ℂ W] [inst_7 : Fintype ι] {ρ : Representation ℂ G V},
-      GlobalTheory.PRep.IsSmooth ρ
-        → ∀ {K : Subgroup G},
-          IsCompact (↑K : Set G)
-            → ∀ {U : Set G},
-              IsOpen U → (1 : G) ∈ U
-                → ∀ (θ : G → ℂ),
-                  (∀ g ∈ U, g ∈ K → θ g = (1 : ℂ)) → (∀ a ∈ K, ∀ b ∈ K, θ (a * b) = θ a * θ b)
-                    → ∀ (T : ι → V →ₗ[ℂ] W) (y : ι → V),
-                      (∀ k ∈ K,
-                          ∑ i : ι, (T i : V → W) (((ρ : G → V →ₗ[ℂ] V) k : V → V) (y i))
-                            = θ k • ∑ i : ι, (T i : V → W) (y i))
-                        → ∃ (u : ι → V),
-                          (∀ (j : ι), ∀ h ∈ K, ((ρ : G → V →ₗ[ℂ] V) h : V → V) (u j) = θ h • u j)
-                            ∧ ∑ i : ι, (T i : V → W) (u i) = ∑ i : ι, (T i : V → W) (y i) := by
+theorem exists_eigen_family : ∀ {G V W ι : Type} [inst : Group G] [inst_1 : TopologicalSpace G] [IsTopologicalGroup G] [inst_3 : AddCommGroup V] [inst_4 : Module ℂ V] [inst_5 : AddCommGroup W] [inst_6 : Module ℂ W] [inst_7 : Fintype ι] {ρ : Representation ℂ G V}, GlobalTheory.PRep.IsSmooth ρ → ∀ {K : Subgroup G}, IsCompact (↑K : Set G) → ∀ {U : Set G}, IsOpen U → (1 : G) ∈ U → ∀ (θ : G → ℂ), (∀ g ∈ U, g ∈ K → θ g = (1 : ℂ)) → (∀ a ∈ K, ∀ b ∈ K, θ (a * b) = θ a * θ b) → ∀ (T : ι → V →ₗ[ℂ] W) (y : ι → V), (∀ k ∈ K, ∑ i : ι, (T i : V → W) (((ρ : G → V →ₗ[ℂ] V) k : V → V) (y i)) = θ k • ∑ i : ι, (T i : V → W) (y i)) → ∃ (u : ι → V), (∀ (j : ι), ∀ h ∈ K, ((ρ : G → V →ₗ[ℂ] V) h : V → V) (u j) = θ h • u j) ∧ ∑ i : ι, (T i : V → W) (u i) = ∑ i : ι, (T i : V → W) (y i) := by
   intro G V W ι _ _ _ _ _ _ _ _ ρ hρ K hK U hU hU1 θ hθ hm T y hy
   classical
   have h1 : θ 1 = 1 := hθ 1 hU1 K.one_mem
@@ -70,8 +93,8 @@ theorem exists_eigen_family
     intro j k s hs
     have hs' : θ (s⁻¹ : K) = 1 := (H.inv_mem hs).1
     simp only [f]
-    rw [mul_inv_rev, Subgroup.coe_mul, hm _ (s⁻¹).2 _ (k⁻¹).2, hs', one_mul, Subgroup.coe_mul,
-      map_mul, Module.End.mul_apply, hs.2 j]
+    rw [mul_inv_rev, Subgroup.coe_mul, hm _ (s⁻¹).2 _ (k⁻¹).2, hs', one_mul, Subgroup.coe_mul, map_mul,
+      Module.End.mul_apply, hs.2 j]
   let F : ι → K ⧸ H → V := fun j q => f j q.out
   have hF : ∀ j (k : K), F j (k : K ⧸ H) = f j k := by
     intro j k
@@ -90,18 +113,18 @@ theorem exists_eigen_family
       group
   have hN : (Fintype.card (K ⧸ H) : ℂ) ≠ 0 := Nat.cast_ne_zero.2 Fintype.card_ne_zero
   refine ⟨fun j => (Fintype.card (K ⧸ H) : ℂ)⁻¹ • ∑ q, F j q, fun j h hh => ?_, ?_⟩
-  set_option synthInstance.maxHeartbeats 100000 in
-    · rw [map_smul, map_sum, smul_comm]
-      apply congrArg ((Fintype.card (K ⧸ H) : ℂ)⁻¹ • ·)
-      rw [Finset.sum_congr rfl fun q _ => hact j ⟨h, hh⟩ q, ← Finset.smul_sum]
-      exact congrArg (θ h • ·) (Equiv.sum_comp (MulAction.toPerm (⟨h, hh⟩ : K)) (F j))
+
+  · rw [map_smul, map_sum, smul_comm]
+    apply congrArg ((Fintype.card (K ⧸ H) : ℂ)⁻¹ • ·)
+    rw [Finset.sum_congr rfl fun q _ => hact j ⟨h, hh⟩ q, ← Finset.smul_sum]
+    exact congrArg (θ h • ·) (Equiv.sum_comp (MulAction.toPerm (⟨h, hh⟩ : K)) (F j))
   · have hq : ∀ q, ∑ i, T i (F i q) = ∑ i, T i (y i) := by
       intro q
       simp only [F, f, map_smul]
-      rw [← Finset.smul_sum, hy _ q.out.2, smul_smul, ← hm _ (q.out⁻¹).2 _ q.out.2,
-        ← Subgroup.coe_mul, inv_mul_cancel, Subgroup.coe_one, h1, one_smul]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_smul, map_sum, Finset.sum_apply]
+      rw [← Finset.smul_sum, hy _ q.out.2, smul_smul, ← hm _ (q.out⁻¹).2 _ q.out.2, ← Subgroup.coe_mul,
+        inv_mul_cancel, Subgroup.coe_one, h1, one_smul]
+
+    simp only [map_smul, map_sum, Finset.sum_apply]
     rw [← Finset.smul_sum, Finset.sum_comm, Finset.sum_congr rfl fun q _ => hq q, Finset.sum_const,
       Finset.card_univ, ← Nat.cast_smul_eq_nsmul ℂ, smul_smul, inv_mul_cancel₀ hN, one_smul]
 

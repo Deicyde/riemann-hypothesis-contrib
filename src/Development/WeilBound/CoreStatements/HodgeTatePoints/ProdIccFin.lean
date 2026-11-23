@@ -1,13 +1,63 @@
 module
 
-public import Mathlib
-public import ReciprocityTheory.DualLattices.CotangentSurjective
-public import Development.AutomorphicSpectrum.Definitions.CommutativeAlgebra.IsTight
-public import Development.AutomorphicSpectrum.Definitions.CommutativeAlgebra.StepOrderRes
 public import Development.WeilBound.CoreStatements.HodgeTatePoints.RcProj
-public import Development.WeilBound.CoreStatements.HodgeTatePoints.HasLenOfEquiv
-public import ReciprocityTheory.DualLattices.EigenLengthProductStatementHolds
+public import Mathlib.FieldTheory.IsAlgClosed.Basic
 public import Development.AutomorphicSpectrum.Proofs.AlgebraProofs.TeichmullerCharacterOrderGenerates
+public import Development.WeilBound.CoreStatements.HodgeTatePoints.HasLenOfEquiv
+import Development.WeilBound.CoreStatements.HodgeTatePoints.RangeSubtypeEq
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Lemma
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+public import ReciprocityTheory.DualLattices.EigenLengthProductStatementHolds
+public import ReciprocityTheory.DualLattices.ExistsSmulMemOfMemSpan
+import ReciprocityTheory.DualLattices.IsLocalOfIntegers
+public import ReciprocityTheory.DualLattices.MemOfSumSingleEqZero
+import ReciprocityTheory.DualLattices.PowMemCarrier
 
 @[expose] public section
 
@@ -30,8 +80,8 @@ lemma gens_of_len {M : Type} [AddCommGroup M] [Module R M] {m : ℕ} {c : Fin m 
   refine ⟨fun i => e.symm (Pi.single i 1), fun i => ?_, fun x => ⟨fun i => Quotient.out (e x i), ?_⟩⟩
   · rw [← map_smul, single_smul_self, map_zero]
   · apply e.injective
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_smul, LinearEquiv.apply_symm_apply]
+
+    simp only [map_sum, map_smul, LinearEquiv.apply_symm_apply]
     exact eq_sum_single c (e x)
 
 lemma len_mul_le (hv : v.Integers R) {A B D : Type} [AddCommGroup A] [Module R A] [AddCommGroup B]
@@ -289,8 +339,8 @@ theorem om_split
       rw [← hg i]
       refine congrArg Submodule.Quotient.mk (Subtype.ext ?_)
       show projL (σ ^ ((i : ℕ) + 1)) (∑ i, (g i : N → C)) = g i
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum, Finset.sum_eq_single i, projL_self _ (g i).2]
+
+      rw [map_sum, Finset.sum_eq_single i, projL_self _ (g i).2]
       · intro j _ hj
         refine projL_ne (fun h => hj ?_) (g j).2
         rw [pow_succ, pow_succ] at h

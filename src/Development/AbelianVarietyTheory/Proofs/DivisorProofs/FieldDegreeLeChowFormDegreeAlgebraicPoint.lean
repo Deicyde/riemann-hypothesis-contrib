@@ -1,11 +1,50 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Definitions.Divisors.AevalEqZeroOfMemConeIdeal
-public import Development.AbelianVarietyTheory.Definitions.ThetaMetrics.ExistsAlgebraicIndependentGenericPoint
-public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ProjPointIdealMemProjComponentsOfIsProjPureDim
-public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsFormDegreeLeHilbertDegreeEvalNeZero
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ForallAevalLineVanishingIdealIff
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Lemma
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
@@ -23,8 +62,8 @@ private lemma natDegree_aeval_le_totalDegree_of_natDegree_le_one {R S σ : Type}
     (p : MvPolynomial σ R) (s : σ → Polynomial S) (hs : ∀ i, (s i).natDegree ≤ 1) :
     (MvPolynomial.aeval s p).natDegree ≤ p.totalDegree := by
   conv_lhs => rw [p.as_sum]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+
+  rw [map_sum]
   refine Polynomial.natDegree_sum_le_of_forall_le _ _ fun d hd => ?_
   rw [MvPolynomial.aeval_monomial]
   refine Polynomial.natDegree_mul_le.trans ?_
@@ -37,14 +76,12 @@ private lemma natDegree_aeval_le_totalDegree_of_natDegree_le_one {R S σ : Type}
   refine Polynomial.natDegree_pow_le.trans ?_
   simpa using Nat.mul_le_mul_left (d i) (hs i)
 
+
 set_option autoImplicit false in
 open MvPolynomial in
-theorem _root_.GlobalTheory.CompHt.PointLow.finrank_le_of_isChowFormInt
-    : ∀ (K : Type) [Field K] [CharZero K] (N δ : ℕ) (y : Fin N → AlgebraicClosure K) (j : Fin N)
-        (f : MvPolynomial (Fin (0 + 1) × Fin N) K),
-      y j = 1
-        → _root_.GlobalTheory.ChowHt.IsChowFormInt (_root_.GlobalTheory.CompHt.coneIdeal K y) 0 δ f
-        → Module.finrank K (IntermediateField.adjoin K (Set.range y)) ≤ δ := by
+theorem _root_.GlobalTheory.CompHt.PointLow.finrank_le_of_isChowFormInt : ∀ (K : Type) [Field K] [CharZero K] (N δ : ℕ) (y : Fin N → AlgebraicClosure K)
+    (j : Fin N) (f : MvPolynomial (Fin (0 + 1) × Fin N) K), y j = 1 → _root_.GlobalTheory.ChowHt.IsChowFormInt (_root_.GlobalTheory.CompHt.coneIdeal K y) 0 δ f →
+    Module.finrank K (IntermediateField.adjoin K (Set.range y)) ≤ δ := by
   intro K _ _ N δ y j f hyj hf
   classical
   set E := IntermediateField.adjoin K (Set.range y) with hE
@@ -57,8 +94,7 @@ theorem _root_.GlobalTheory.CompHt.PointLow.finrank_le_of_isChowFormInt
     intro σ
     have : yE j = 1 := Subtype.ext hyj
     simp only [pt, this, map_one]
-  have hzero
-      : ∀ σ, ∀ g ∈ _root_.GlobalTheory.CompHt.coneIdeal K y, MvPolynomial.aeval (pt σ) g = 0 := by
+  have hzero : ∀ σ, ∀ g ∈ _root_.GlobalTheory.CompHt.coneIdeal K y, MvPolynomial.aeval (pt σ) g = 0 := by
     intro σ g hg
     have hy := _root_.GlobalTheory.CompHt.aeval_eq_zero_of_mem_coneIdeal hg
     have hE0 : MvPolynomial.aeval yE g = 0 := by
@@ -80,15 +116,13 @@ theorem _root_.GlobalTheory.CompHt.PointLow.finrank_le_of_isChowFormInt
     intro h
     exact hf.ne_zero (MvPolynomial.map_injective _ (algebraMap K (AlgebraicClosure K)).injective
       (by rw [← hfΩ, h, map_zero]))
-  let lin
-      : (E →ₐ[K] AlgebraicClosure K) → (E →ₐ[K] AlgebraicClosure K)
-        → MvPolynomial (Fin (0 + 1) × Fin N) (AlgebraicClosure K) := fun σ τ =>
-    ∑ k, X (0, k) * C (pt σ k - pt τ k)
-  have hlin_eval
-      : ∀ σ τ (a : Fin (0 + 1) × Fin N → AlgebraicClosure K),
-        eval a (lin σ τ) = ∑ k, a (0, k) * pt σ k - ∑ k, a (0, k) * pt τ k := by
+  let lin : (E →ₐ[K] AlgebraicClosure K) → (E →ₐ[K] AlgebraicClosure K) →
+      MvPolynomial (Fin (0 + 1) × Fin N) (AlgebraicClosure K) :=
+    fun σ τ => ∑ k, X (0, k) * C (pt σ k - pt τ k)
+  have hlin_eval : ∀ σ τ (a : Fin (0 + 1) × Fin N → AlgebraicClosure K),
+      eval a (lin σ τ) = ∑ k, a (0, k) * pt σ k - ∑ k, a (0, k) * pt τ k := by
     intro σ τ a
-    set_option synthInstance.maxHeartbeats 100000 in
+
     simp only [lin, map_sum, eval_mul, eval_X, eval_C, ← Finset.sum_sub_distrib, mul_sub]
   set pairs := Finset.univ.filter fun st : (E →ₐ[K] AlgebraicClosure K) × (E →ₐ[K] AlgebraicClosure K) =>
     st.1 ≠ st.2 with hpairs
@@ -102,8 +136,7 @@ theorem _root_.GlobalTheory.CompHt.PointLow.finrank_le_of_isChowFormInt
     have := congrArg (eval (Pi.single (0, k) 1)) h0
     rw [hlin_eval, map_zero] at this
     simp only [Pi.single_apply, Prod.mk.injEq, true_and, ite_mul, one_mul, zero_mul,
-        Finset.sum_ite_eq', Finset.mem_univ, if_true]
-      at this
+      Finset.sum_ite_eq', Finset.mem_univ, if_true] at this
     exact hk (sub_eq_zero.mp this)
   obtain ⟨a, ha⟩ : ∃ a, eval a Q ≠ 0 := by
     by_contra hcon
@@ -116,28 +149,20 @@ theorem _root_.GlobalTheory.CompHt.PointLow.finrank_le_of_isChowFormInt
     by_contra hne
     apply ha
     rw [hQ, eval_mul, map_prod]
-    refine mul_eq_zero_of_right _
-      (Finset.prod_eq_zero (i := (σ, τ)) (Finset.mem_filter.mpr ⟨Finset.mem_univ _, hne⟩) ?_)
+    refine mul_eq_zero_of_right _ (Finset.prod_eq_zero (i := (σ, τ))
+      (Finset.mem_filter.mpr ⟨Finset.mem_univ _, hne⟩) ?_)
     rw [hlin_eval]
     exact sub_eq_zero.mpr h
-  let s : Fin (0 + 1) × Fin N → Polynomial (AlgebraicClosure K) := fun ik =>
-    Polynomial.C (a ik) + if ik.2 = j then Polynomial.X else 0
+  let s : Fin (0 + 1) × Fin N → Polynomial (AlgebraicClosure K) :=
+    fun ik => Polynomial.C (a ik) + if ik.2 = j then Polynomial.X else 0
   set g := MvPolynomial.aeval s f with hg
-  have heval
-      : ∀ t, g.eval t = MvPolynomial.aeval (fun ik => a ik + if ik.2 = j then t else 0) f := by
+  have heval : ∀ t, g.eval t = MvPolynomial.aeval (fun ik => a ik + if ik.2 = j then t else 0) f := by
     intro t
-    have :=
-      MvPolynomial.comp_aeval_apply s
-        ((Polynomial.aeval t).restrictScalars K
-          : Polynomial (AlgebraicClosure K) →ₐ[K] AlgebraicClosure K)
-        f
-    rw [hg, ← Polynomial.coe_aeval_eq_eval,
-      show (Polynomial.aeval t) (MvPolynomial.aeval s f)
-          = ((Polynomial.aeval t).restrictScalars K
-              : Polynomial (AlgebraicClosure K) →ₐ[K] AlgebraicClosure K)
-            (MvPolynomial.aeval s f) from
-        rfl,
-      this]
+    have := MvPolynomial.comp_aeval_apply s
+      ((Polynomial.aeval t).restrictScalars K : Polynomial (AlgebraicClosure K) →ₐ[K] AlgebraicClosure K) f
+    rw [hg, ← Polynomial.coe_aeval_eq_eval, show (Polynomial.aeval t) (MvPolynomial.aeval s f) =
+      ((Polynomial.aeval t).restrictScalars K : Polynomial (AlgebraicClosure K) →ₐ[K] AlgebraicClosure K)
+        (MvPolynomial.aeval s f) from rfl, this]
     refine congrArg (fun v => MvPolynomial.aeval v f) (funext fun ik => ?_)
     simp only [s]
     split_ifs <;> simp
@@ -145,15 +170,13 @@ theorem _root_.GlobalTheory.CompHt.PointLow.finrank_le_of_isChowFormInt
     intro h
     have := heval 0
     rw [h, Polynomial.eval_zero] at this
-    have h2
-        : (fun ik : Fin (0 + 1) × Fin N => a ik + if ik.2 = j then (0 : AlgebraicClosure K) else 0)
-          = a := by
+    have h2 : (fun ik : Fin (0 + 1) × Fin N => a ik + if ik.2 = j then (0 : AlgebraicClosure K) else 0) = a := by
       funext ik; split_ifs <;> simp
     rw [h2] at this
     apply hfa
     rw [hfΩ, MvPolynomial.eval_map, ← MvPolynomial.aeval_def]
     exact this.symm
-  have hroot : ∀ σ, g.eval (- c σ) = 0 := by
+  have hroot : ∀ σ, g.eval (-c σ) = 0 := by
     intro σ
     rw [heval]
     refine (hf.zero_iff _).mpr
@@ -164,23 +187,21 @@ theorem _root_.GlobalTheory.CompHt.PointLow.finrank_le_of_isChowFormInt
     simp [c]
   have hcard : Fintype.card (E →ₐ[K] AlgebraicClosure K) ≤ g.roots.toFinset.card := by
     rw [← Finset.card_univ]
-    refine Finset.card_le_card_of_injOn (fun σ => - c σ) (fun σ _ => ?_) ?_
+    refine Finset.card_le_card_of_injOn (fun σ => -c σ) (fun σ _ => ?_) ?_
     · simp only [Finset.mem_coe, Multiset.mem_toFinset]
       rw [Polynomial.mem_roots hg0]
       exact hroot σ
     · intro σ _ τ _ h
       exact hdist (neg_injective h)
-  have hhom := ((_root_.GlobalTheory.ChowHt.isMultiHomogeneous_iff_block.mp hf.homog).isHomogeneous)
+  have hhom := ((_root_.GlobalTheory.ChowHt.isMultiHomogeneous_iff_block.mp
+    hf.homog).isHomogeneous)
   have htot : f.totalDegree = δ := by
     rw [hhom.totalDegree hf.ne_zero]
     simp
-  calc
-    Fintype.card (E →ₐ[K] AlgebraicClosure K)
-      ≤ g.roots.toFinset.card := hcard
+  calc Fintype.card (E →ₐ[K] AlgebraicClosure K) ≤ g.roots.toFinset.card := hcard
     _ ≤ Multiset.card g.roots := Multiset.toFinset_card_le _
     _ ≤ g.natDegree := Polynomial.card_roots' g
-    _ ≤ f.totalDegree :=
-      natDegree_aeval_le_totalDegree_of_natDegree_le_one f s fun ik => by
+    _ ≤ f.totalDegree := natDegree_aeval_le_totalDegree_of_natDegree_le_one f s fun ik => by
         simp only [s]
         split_ifs
         · exact (Polynomial.natDegree_add_le _ _).trans (by simp)

@@ -1,6 +1,51 @@
 module
 
+import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsPowMulMemAdjoinOfLocalizationAway
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.SubNatCompSubIncl
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.AlgebraicGeometry.Modules.Sheaf
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.Order.CompletePartialOrder
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
 
 @[expose] public section
 
@@ -8,76 +53,26 @@ open AlgebraicGeometry CategoryTheory Limits Opposite GlobalTheory.QcSub
 
 namespace GlobalTheory.QcSub.Local
 
-theorem adjoin_mem_of_away
-    {R A R' A' : Type}
-    [CommRing R] [CommRing A] [CommRing R'] [CommRing A'] [Algebra R A] [Algebra R R']
-    [Algebra R' A'] [Algebra A A'] [Algebra R A'] [IsScalarTower R A A'] [IsScalarTower R R' A']
-    (g : R) [IsLocalization.Away g R'] [IsLocalization.Away (algebraMap R A g) A']
-    (T : Set A) (b : A) (hb : algebraMap A A' b ∈ Algebra.adjoin R' (algebraMap A A' '' T))
-    : ∃ m : ℕ, algebraMap R A g ^ m * b ∈ Algebra.adjoin R T := by
-  classical
-  have hgen : ∀ k : ℕ, algebraMap R A g ^ k ∈ Algebra.adjoin R T := fun k =>
-    pow_mem (Subalgebra.algebraMap_mem _ g) k
-  have hgA : algebraMap A A' (algebraMap R A g) = algebraMap R' A' (algebraMap R R' g) := by
-    rw [← IsScalarTower.algebraMap_apply R A A', ← IsScalarTower.algebraMap_apply R R' A']
-  have key
-      : ∀ x ∈ Algebra.adjoin R' (algebraMap A A' '' T), ∃ m : ℕ, ∃ s ∈ Algebra.adjoin R T,
-        algebraMap A A' (algebraMap R A g) ^ m * x = algebraMap A A' s := by
-    intro x hx
-    induction hx using Algebra.adjoin_induction with
-    | mem x hx =>
-      obtain ⟨t, ht, rfl⟩ := hx
-      exact ⟨0, t, Algebra.subset_adjoin ht, by simp⟩
-    | algebraMap r =>
-      obtain ⟨⟨a, ⟨_, n, rfl⟩⟩, hr⟩ := IsLocalization.surj (Submonoid.powers g) r
-      refine ⟨n, algebraMap R A a, Subalgebra.algebraMap_mem _ a, ?_⟩
-      have h2 := congrArg (algebraMap R' A') hr
-      simp only [map_mul, map_pow] at h2
-      rw [mul_comm, hgA, h2, ← IsScalarTower.algebraMap_apply R R' A',
-        ← IsScalarTower.algebraMap_apply R A A']
-    | add x y _ _ hx hy =>
-      obtain ⟨m1, s1, hs1, e1⟩ := hx
-      obtain ⟨m2, s2, hs2, e2⟩ := hy
-      refine ⟨
-        m1 + m2,
-        algebraMap R A g ^ m2 * s1 + algebraMap R A g ^ m1 * s2,
-        add_mem (mul_mem (hgen _) hs1) (mul_mem (hgen _) hs2),
-        ?_
-      ⟩
-      rw [map_add (f := _), map_mul, map_mul, map_pow, map_pow, ← e1, ← e2]
-      ring
-    | mul x y _ _ hx hy =>
-      obtain ⟨m1, s1, hs1, e1⟩ := hx
-      obtain ⟨m2, s2, hs2, e2⟩ := hy
-      refine ⟨m1 + m2, s1 * s2, mul_mem hs1 hs2, ?_⟩
-      rw [map_mul, ← e1, ← e2]
-      ring
-  obtain ⟨m, s, hs, hms⟩ := key _ hb
-  rw [← map_pow, ← map_mul] at hms
-  obtain ⟨⟨_, k, rfl⟩, hk⟩ :=
-    (IsLocalization.eq_iff_exists (Submonoid.powers (algebraMap R A g)) A').mp hms
-  refine ⟨k + m, ?_⟩
-  have h3 : algebraMap R A g ^ (k + m) * b = algebraMap R A g ^ k * s := by
-    rw [pow_add, mul_assoc]
-    exact hk
-  rw [h3]
-  exact mul_mem (hgen k) hs
+theorem adjoin_mem_of_away {R A R' A' : Type} [CommRing R] [CommRing A] [CommRing R'] [CommRing A']
+    [Algebra R A] [Algebra R R'] [Algebra R' A'] [Algebra A A'] [Algebra R A']
+    [IsScalarTower R A A'] [IsScalarTower R R' A'] (g : R) [IsLocalization.Away g R']
+    [IsLocalization.Away (algebraMap R A g) A'] (T : Set A) (b : A)
+    (hb : algebraMap A A' b ∈ Algebra.adjoin R' (algebraMap A A' '' T)) :
+    ∃ m : ℕ, algebraMap R A g ^ m * b ∈ Algebra.adjoin R T := by
+  apply (config := { allowSynthFailures := true }) GlobalTheory.adjoin_mem_of_away_localization' <;> assumption
 
-theorem mem_gen_of_local
-    (X : Scheme.{0}) (F : X.Opensᵒᵖ ⥤ CommRingCat) (α : X.presheaf ⟶ F)
+theorem mem_gen_of_local (X : Scheme.{0}) (F : X.Opensᵒᵖ ⥤ CommRingCat) (α : X.presheaf ⟶ F)
     (hα : ((Scheme.AffineZariskiSite.toOpensFunctor X).op.whiskerLeft α).Coequifibered)
     (V W : X.Opens) (T : Set (F.obj (op V))) (b : F.obj (op W))
-    (H : ∀ x ∈ W ⊓ V, ∃ D : X.Opens,
-      IsAffineOpen D ∧ x ∈ D
-        ∧ ∃ (hW : D ≤ W) (hV : D ≤ V), (F.map (homOfLE hW).op).hom b ∈ gen F α hV T)
-    (W' : X.Opens) (hW' : IsAffineOpen W') (hW : W' ≤ W) (hV : W' ≤ V)
-    : (F.map (homOfLE hW).op).hom b ∈ gen F α hV T := by
+    (H : ∀ x ∈ W ⊓ V, ∃ D : X.Opens, IsAffineOpen D ∧ x ∈ D ∧ ∃ (hW : D ≤ W) (hV : D ≤ V),
+      (F.map (homOfLE hW).op).hom b ∈ gen F α hV T)
+    (W' : X.Opens) (hW' : IsAffineOpen W') (hW : W' ≤ W) (hV : W' ≤ V) :
+    (F.map (homOfLE hW).op).hom b ∈ gen F α hV T := by
   classical
   let _ : Algebra Γ(X, W') (F.obj (op W')) := (α.app (op W')).hom.toAlgebra
-  have comp
-      : ∀ {U₁ U₂ U₃ : X.Opens} (h₁₂ : U₂ ≤ U₁) (h₂₃ : U₃ ≤ U₂) (y : F.obj (op U₁)),
-        (F.map (homOfLE h₂₃).op).hom ((F.map (homOfLE h₁₂).op).hom y)
-          = (F.map (homOfLE (h₂₃.trans h₁₂)).op).hom y := by
+  have comp : ∀ {U₁ U₂ U₃ : X.Opens} (h₁₂ : U₂ ≤ U₁) (h₂₃ : U₃ ≤ U₂) (y : F.obj (op U₁)),
+      (F.map (homOfLE h₂₃).op).hom ((F.map (homOfLE h₁₂).op).hom y) =
+        (F.map (homOfLE (h₂₃.trans h₁₂)).op).hom y := by
     intro U₁ U₂ U₃ h₁₂ h₂₃ y
     show (F.map (homOfLE h₁₂).op ≫ F.map (homOfLE h₂₃).op).hom y = _
     rw [← F.map_comp]
@@ -91,9 +86,8 @@ theorem mem_gen_of_local
     simp only [I, Submodule.mem_comap, LinearMap.toSpanSingleton_apply, Subalgebra.mem_toSubmodule,
       Algebra.smul_def]
     rfl
-  have key
-      : ∀ (D : X.Opens) (f : Γ(X, W')) (hfD : X.basicOpen f ≤ D) (hDW : D ≤ W) (hDV : D ≤ V),
-        (F.map (homOfLE hDW).op).hom b ∈ gen F α hDV T → f ∈ I.radical := by
+  have key : ∀ (D : X.Opens) (f : Γ(X, W')) (hfD : X.basicOpen f ≤ D) (hDW : D ≤ W) (hDV : D ≤ V),
+      (F.map (homOfLE hDW).op).hom b ∈ gen F α hDV T → f ∈ I.radical := by
     intro D f hfD hDW hDV hbD
     let _ : Algebra Γ(X, X.basicOpen f) (F.obj (op (X.basicOpen f))) :=
       (α.app (op (X.basicOpen f))).hom.toAlgebra
@@ -109,20 +103,17 @@ theorem mem_gen_of_local
         exact h.symm)
     have : IsLocalization.Away f Γ(X, X.basicOpen f) := hW'.isLocalization_basicOpen f
     have : IsLocalization.Away (algebraMap Γ(X, W') (F.obj (op W')) f)
-        (F.obj (op (X.basicOpen f))) :=
-      isLocalizationAway F α hα hW' f
+        (F.obj (op (X.basicOpen f))) := isLocalizationAway F α hα hW' f
     have hres := res_mem_gen_of_mem F α hDV hfD T hbD
     rw [gen_eq_adjoin] at hres
-    have hb''
-        : algebraMap (F.obj (op W')) (F.obj (op (X.basicOpen f))) b' ∈ Algebra.adjoin
-          Γ(X, X.basicOpen f) (algebraMap (F.obj (op W')) (F.obj (op (X.basicOpen f))) '' T') := by
-      have e1
-          : algebraMap (F.obj (op W')) (F.obj (op (X.basicOpen f))) b'
-            = (F.map (homOfLE hfD).op).hom ((F.map (homOfLE hDW).op).hom b) :=
+    have hb'' : algebraMap (F.obj (op W')) (F.obj (op (X.basicOpen f))) b' ∈
+        Algebra.adjoin Γ(X, X.basicOpen f)
+          (algebraMap (F.obj (op W')) (F.obj (op (X.basicOpen f))) '' T') := by
+      have e1 : algebraMap (F.obj (op W')) (F.obj (op (X.basicOpen f))) b' =
+          (F.map (homOfLE hfD).op).hom ((F.map (homOfLE hDW).op).hom b) :=
         (comp hW (X.basicOpen_le f) b).trans (comp hDW hfD b).symm
-      have e2
-          : algebraMap (F.obj (op W')) (F.obj (op (X.basicOpen f))) '' T'
-            = (F.map (homOfLE (hfD.trans hDV)).op).hom '' T := by
+      have e2 : algebraMap (F.obj (op W')) (F.obj (op (X.basicOpen f))) '' T' =
+          (F.map (homOfLE (hfD.trans hDV)).op).hom '' T := by
         simp only [T', Set.image_image]
         exact Set.image_congr (fun y _ => comp hV (X.basicOpen_le f) y)
       rw [e1, e2]

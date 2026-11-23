@@ -1,18 +1,74 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.Statements.PlaceShiftStatements.NormSmall
-public import Development.AbelianVarietyTheory.BlockTheory.DivisorBase.WeilTensorModels
-public import Development.AbelianVarietyTheory.Definitions.Divisors.DiscreteSeriesHermitianUnique
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsFinPt
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ComplTupBijective
-public import Development.AbelianVarietyTheory.Statements.HeckeThetaIntegrals.ThetaIntegralsAgree
-public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.HoweDualityReal
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ProdMinorsMemInv
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.EvalBasePtTopMinors
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ColSubEqDetCharSmulOfMemInv
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.BigMatConjTransposeMul
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ColSubEqDetCharSmulOfMemInv
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FockDetCharInvariantsLeSpanProdMaximalMinors
+import Formalism.LocalRingCardinality.DataHost
+import Formalism.LocalToGlobal.Columns.PolyFn
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Coalgebra.IsFrobenius
+import Mathlib.RingTheory.Etale.Weakly
+import Mathlib.RingTheory.Finiteness.ModuleFinitePresentation
+import Mathlib.RingTheory.HopfAlgebra.Basic
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.TotallySplit
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
+public import Development.AbelianVarietyTheory.BlockTheory.TwistedDiscreteSeries.UnitCharTriangle
+import Development.AbelianVarietyTheory.Definitions.Divisors.CmHostImaginaryGeneratorNeZero
+import Development.AbelianVarietyTheory.Definitions.Divisors.FinitePrimesUnder
+import Development.AbelianVarietyTheory.Definitions.Divisors.FlatTensorVacuum
+public import Development.AbelianVarietyTheory.Definitions.Foundations.NormSumPairRankZeroOfCurveCoordNorm
+import Development.AbelianVarietyTheory.Definitions.TwistedInnerProducts.ExistsMatchOver
+import Formalism.LocalRingCardinality.DataTheta
+import Formalism.LocalToGlobal.IndefiniteForms.IndefiniteTree.RealCubicMeans.LeafBounds.IntegralLeaf.LeafINTFree
+import Formalism.LocalToGlobal.IndefiniteReal.IndefiniteWeightData
+import Formalism.LocalToGlobal.IndefiniteReal.LinksDefs
+import Formalism.LocalToGlobal.IndefiniteReal.LocalNewformFunction
+import Formalism.SharpRestriction.GlobalSchurBounds.GeneralLinearActions.GapAtLeast
+import Formalism.SharpRestriction.GlobalSchurBounds.GeneralLinearActions.GenusMassVolumes
 
 @[expose] public section
 
@@ -127,12 +183,12 @@ theorem rowSub_lowScal_zero_mem
         = ∑ k ∈ Finset.range M, (M : ℂ)⁻¹ • rowSub (fun _ => lowScal d a (ω ^ k)) P := by
     conv_lhs => rw [as_sum P]
     conv_rhs => rw [as_sum P]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, rowSub_lowScal_monomial, Finset.smul_sum]
+
+    simp only [map_sum, rowSub_lowScal_monomial, Finset.smul_sum]
     rw [Finset.sum_comm]
     refine Finset.sum_congr rfl fun s hs => ?_
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [Finset.sum_congr rfl (fun x _ => by rw [smul_monomial]), ← map_sum]
+
+    rw [Finset.sum_congr rfl (fun x _ => by rw [smul_monomial]), ← map_sum]
     congr 1
     have hb : lowDeg s < M := lt_of_le_of_lt (lowDeg_le s) (by have := le_totalDegree hs; omega)
     have hx : ∀ x : ℕ, (ω ^ x) ^ lowDeg s = (ω ^ lowDeg s) ^ x := fun x => by
@@ -210,8 +266,8 @@ theorem exists_fockS_orth
     rw [Submodule.coe_sum] at this
     simp only [Submodule.coe_smul] at this
     exact this.symm
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [hPe, ← Formalism.L2.DIV.fockL_apply, map_sum, LinearMap.sum_apply]
+
+  rw [hPe, ← Formalism.L2.DIV.fockL_apply, map_sum, LinearMap.sum_apply]
   refine Finset.sum_eq_zero fun i _ => ?_
   rw [LinearMap.map_smulₛₗ, LinearMap.smul_apply, Formalism.L2.DIV.fockL_apply, hQi i, smul_zero]
 

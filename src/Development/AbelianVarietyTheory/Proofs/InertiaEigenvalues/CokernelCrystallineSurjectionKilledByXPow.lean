@@ -1,25 +1,67 @@
 module
 
-public import Mathlib
-public import Formalism.SharpRestriction.LevelLetterCocycles.UsedLocalConclusion
 public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.NotFullBot
+public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.MemEurOfTeichmullerSeries
+public import Formalism.SharpRestriction.LevelLetterCocycles.DeltaInvariantLattices
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.CardTorsionMulFinrank
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.DvrComplete
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.NBasisLoc
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.OfShortExact
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.OneNotMemFilOne
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.PhiFree
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.RingsCyclotomic
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.WachInclusionXQFrobenius
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.WachLatticeHeightsFromHodgeJumpsStatement
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.WachNCokernelKilledByPowerStatement
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.NBasisLoc
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.WachInclusionXQFrobenius
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.OneNotMemFilOne
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.RingsCyclotomic
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ValOfPowAssociated
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.XXPowMemOfQQPowMulMemMapPhi
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.PhiFree
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.OfShortExact
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
 noncomputable section
 
-open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc
-  TensorProduct GlobalTheory.NL Formalism.MainNotions.DeltaInvariantLattices
+open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc TensorProduct GlobalTheory.NL Formalism.MainNotions.DeltaInvariantLattices
 
 namespace GlobalTheory.NL.CokerKill
 
@@ -27,18 +69,13 @@ section Algebra
 
 variable {A D : Type} [CommRing A] [AddCommGroup D] [Module A D]
 
-theorem indep_of_commensurable
-    {κ : Type} [Fintype κ]
-    (q : A) (hq : ∀ a, a * q = 0 → a = 0)
-    (b c : κ → D)
-    (hb : LinearIndependent A b) (h1 : ∀ k, ∃ m : ℕ, q ^ m • c k ∈ Submodule.span A (Set.range b))
-    (h2 : ∀ k, ∃ m : ℕ, q ^ m • b k ∈ Submodule.span A (Set.range c))
-    : LinearIndependent A c := by
+theorem indep_of_commensurable {κ : Type} [Fintype κ] (q : A) (hq : ∀ a, a * q = 0 → a = 0)
+    (b c : κ → D) (hb : LinearIndependent A b)
+    (h1 : ∀ k, ∃ m : ℕ, q ^ m • c k ∈ Submodule.span A (Set.range b))
+    (h2 : ∀ k, ∃ m : ℕ, q ^ m • b k ∈ Submodule.span A (Set.range c)) : LinearIndependent A c := by
   classical
-  have unif
-      : ∀ b c : κ → D,
-        (∀ k, ∃ m : ℕ, q ^ m • c k ∈ Submodule.span A (Set.range b))
-          → ∃ (m : ℕ) (M : Matrix κ κ A), ∀ k, q ^ m • c k = ∑ j, M k j • b j := by
+  have unif : ∀ b c : κ → D, (∀ k, ∃ m : ℕ, q ^ m • c k ∈ Submodule.span A (Set.range b)) →
+      ∃ (m : ℕ) (M : Matrix κ κ A), ∀ k, q ^ m • c k = ∑ j, M k j • b j := by
     intro b c h
     choose m hm using h
     have : ∀ k, ∃ u : κ → A, ∑ j, u j • b j = q ^ (Finset.univ.sup m) • c k := fun k => by
@@ -60,8 +97,7 @@ theorem indep_of_commensurable
     ext k i
     have e : ∑ i, ((M' * M) k i - ((q ^ (m + m')) • (1 : Matrix κ κ A)) k i) • b i = 0 := by
       simp only [sub_smul, Finset.sum_sub_distrib, Matrix.smul_apply, Matrix.one_apply, smul_eq_mul,
-        mul_ite, mul_one, mul_zero, ite_smul, zero_smul, Finset.sum_ite_eq, Finset.mem_univ,
-        if_true]
+        mul_ite, mul_one, mul_zero, ite_smul, zero_smul, Finset.sum_ite_eq, Finset.mem_univ, if_true]
       rw [sub_eq_zero, pow_add, mul_smul, hM', Finset.smul_sum]
       simp only [Matrix.mul_apply, Finset.sum_smul]
       rw [Finset.sum_comm]
@@ -89,33 +125,28 @@ theorem indep_of_commensurable
   rw [← h5]
   linear_combination M'.det * h6
 
-variable
-  (φ : A →+* A) (Φ : D →+ D) (hΦ : ∀ a x, Φ (a • x) = φ a • Φ x) {ι : Type} [Fintype ι] (t : ι → A)
+variable (φ : A →+* A) (Φ : D →+ D) (hΦ : ∀ a x, Φ (a • x) = φ a • Φ x) {ι : Type} [Fintype ι]
+  (t : ι → A)
 include hΦ
 
-theorem decomp_unique
-    {κ : Type} [Fintype κ]
-    (ht : ∀ z : ι → A, ∑ j, t j * φ (z j) = 0 → z = 0)
-    (b : κ → D) (hb : LinearIndependent A fun k => Φ (b k))
-    (u : ι → D) (hu : ∀ j, u j ∈ Submodule.span A (Set.range b)) (h : ∑ j, t j • Φ (u j) = 0)
-    (j : ι)
-    : u j = 0 := by
+theorem decomp_unique {κ : Type} [Fintype κ] (ht : ∀ z : ι → A, ∑ j, t j * φ (z j) = 0 → z = 0)
+    (b : κ → D) (hb : LinearIndependent A fun k => Φ (b k)) (u : ι → D)
+    (hu : ∀ j, u j ∈ Submodule.span A (Set.range b)) (h : ∑ j, t j • Φ (u j) = 0) (j : ι) :
+    u j = 0 := by
   choose z hz using fun j => (Submodule.mem_span_range_iff_exists_fun A).1 (hu j)
   rw [Fintype.linearIndependent_iff] at hb
-  have h1 : ∀ k, ∑ j, t j * φ (z j k) = 0 :=
-    hb (fun k => ∑ j, t j * φ (z j k)) (by
-      rw [← h]
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [← hz, map_sum, hΦ, Finset.sum_smul, Finset.smul_sum, mul_smul]
-      exact Finset.sum_comm)
+  have h1 : ∀ k, ∑ j, t j * φ (z j k) = 0 := hb (fun k => ∑ j, t j * φ (z j k)) (by
+    rw [← h]
+
+    simp only [← hz, map_sum, hΦ, Finset.sum_smul, Finset.smul_sum, mul_smul]
+    exact Finset.sum_comm)
   rw [← hz]
   exact Finset.sum_eq_zero fun k _ => by
     rw [show z j k = 0 from congrFun (ht (fun j => z j k) (h1 k)) j, zero_smul]
 
-theorem decomp_exists
-    (ht : ∀ a : A, ∃ z : ι → A, a = ∑ j, t j * φ (z j))
-    (S : Submodule A D) (x : D) (hx : x ∈ Submodule.span A (Φ '' (S : Set D)))
-    : ∃ u : ι → D, (∀ j, u j ∈ S) ∧ x = ∑ j, t j • Φ (u j) := by
+theorem decomp_exists (ht : ∀ a : A, ∃ z : ι → A, a = ∑ j, t j * φ (z j)) (S : Submodule A D)
+    (x : D) (hx : x ∈ Submodule.span A (Φ '' (S : Set D))) :
+    ∃ u : ι → D, (∀ j, u j ∈ S) ∧ x = ∑ j, t j • Φ (u j) := by
   have key : ∀ a : A, ∃ u : ι → D, (∀ j, u j ∈ S) ∧ a • x = ∑ j, t j • Φ (u j) := by
     induction hx using Submodule.span_induction with
     | mem x hx =>
@@ -123,13 +154,13 @@ theorem decomp_exists
       intro a
       obtain ⟨z, rfl⟩ := ht a
       exact ⟨fun j => z j • y, fun j => S.smul_mem _ hy, by simp [hΦ, Finset.sum_smul, mul_smul]⟩
-    | zero =>
-      exact fun a => ⟨0, fun _ => S.zero_mem, by simp⟩
+    | zero => exact fun a => ⟨0, fun _ => S.zero_mem, by simp⟩
     | add x y _ _ hx hy =>
       intro a
       obtain ⟨u, hu, e⟩ := hx a
       obtain ⟨u', hu', e'⟩ := hy a
-      exact ⟨u + u', fun j => S.add_mem (hu j) (hu' j), by simp [e, e', Finset.sum_add_distrib]⟩
+      exact ⟨u + u', fun j => S.add_mem (hu j) (hu' j), by
+        simp [e, e', Finset.sum_add_distrib]⟩
     | smul c x _ hx => intro a; rw [smul_smul]; exact hx _
   simpa using key 1
 
@@ -137,15 +168,12 @@ end Algebra
 
 section Kernel
 
-variable
-  {G : Type} [Group G] [TopologicalSpace G]
-  {Qp LL O : Type}
-  [Field Qp] [Field LL] [Algebra Qp LL] [CommRing O] [Algebra O LL] [TopologicalSpace LL]
+variable {G : Type} [Group G] [TopologicalSpace G] {Qp LL O : Type} [Field Qp] [Field LL]
+    [Algebra Qp LL] [CommRing O] [Algebra O LL] [TopologicalSpace LL]
 
-theorem exists_kernel
-    [IsDomain O] [IsPrincipalIdealRing O] [IsFractionRing O LL]
-    {T₁ T₂ : LocLat G Qp LL O} (π : LatHom T₁.L T₂.L) (hπ : π.Onto)
-    : ∃ (T₀ : LocLat G Qp LL O) (ι : LatHom T₀.L T₁.L), IsSESLat (Qp := Qp) ι π := by
+theorem exists_kernel [IsDomain O] [IsPrincipalIdealRing O] [IsFractionRing O LL]
+    {T₁ T₂ : LocLat G Qp LL O} (π : LatHom T₁.L T₂.L) (hπ : π.Onto) :
+    ∃ (T₀ : LocLat G Qp LL O) (ι : LatHom T₀.L T₁.L), IsSESLat (Qp := Qp) ι π := by
   haveI := T₁.L.free
   haveI : Module.Finite O ↥T₁.L.T := Module.Finite.iff_fg.2 T₁.L.fg
   let V' : Submodule LL T₁.V := LinearMap.ker π.f
@@ -154,11 +182,10 @@ theorem exists_kernel
     rw [π.equiv, show π.f x = 0 from hx, map_zero]
   let ρ' : Representation LL G V' := T₁.ρ.subrepresentation V' hV'
   let S₂ : Submodule O V' := T₁.L.T.comap (V'.subtype.restrictScalars O)
-  let e : S₂ →ₗ[O] T₁.L.T := {
-    toFun := fun x => ⟨x.1.1, x.2⟩
-    map_add' := fun _ _ => rfl
-    map_smul' := fun _ _ => rfl
-  }
+  let e : S₂ →ₗ[O] T₁.L.T :=
+    { toFun := fun x => ⟨x.1.1, x.2⟩
+      map_add' := fun _ _ => rfl
+      map_smul' := fun _ _ => rfl }
   have he : Function.Injective e := fun x y h =>
     Subtype.ext (Subtype.ext (congrArg (fun z : T₁.L.T => (z : T₁.V)) h))
   haveI : Module.Finite O S₂ := Module.Finite.of_injective e he
@@ -176,43 +203,29 @@ theorem exists_kernel
   haveI : ContinuousSMul LL T₁.V := IsModuleTopology.toContinuousSMul LL T₁.V
   obtain ⟨r, hr⟩ := V'.subtype.exists_leftInverse_of_injective V'.ker_subtype
   have hrc : Continuous r := IsModuleTopology.continuous_of_linearMap r
-  let T' : LocLat G Qp LL O := {
-    V := V'
-    ρ := ρ'
-    cont := fun x => by
-      have : (fun g => ρ' g x) = fun g => r (T₁.ρ g x) :=
-        funext fun g => (LinearMap.congr_fun hr (ρ' g x)).symm
-      rw [this]
-      exact hrc.comp (T₁.cont x)
-    L := {
-      T := S₂
-      stable := fun g x hx => T₁.L.stable g _ hx
-      fg := Module.Finite.iff_fg.1 inferInstance
-      free := inferInstance
-      span := by
-        rw [eq_top_iff]
-        intro x _
-        obtain ⟨c, hc0, hc⟩ := hden x
-        have h1 : c • x ∈ Submodule.span LL (S₂ : Set V') := Submodule.subset_span hc
-        have h2 : algebraMap O LL c ≠ 0 := by simpa using hc0
-        rw [← algebraMap_smul LL] at h1
-        exact (Submodule.smul_mem_iff _ h2).1 h1
-    }
-  }
-  refine ⟨
-    T',
-    ⟨
-      V'.subtype,
-      fun _ _ => rfl,
-      IsModuleTopology.continuous_of_linearMap V'.subtype,
-      fun x hx => hx
-    ⟩,
-    V'.injective_subtype,
-    ?_,
-    hπ,
-    fun x => ⟨fun h => ⟨⟨x, h⟩, rfl⟩, ?_⟩,
-    fun y hy => hy
-  ⟩
+  let T' : LocLat G Qp LL O :=
+    { V := V'
+      ρ := ρ'
+      cont := fun x => by
+        have : (fun g => ρ' g x) = fun g => r (T₁.ρ g x) :=
+          funext fun g => (LinearMap.congr_fun hr (ρ' g x)).symm
+        rw [this]
+        exact hrc.comp (T₁.cont x)
+      L :=
+        { T := S₂
+          stable := fun g x hx => T₁.L.stable g _ hx
+          fg := Module.Finite.iff_fg.1 inferInstance
+          free := inferInstance
+          span := by
+            rw [eq_top_iff]
+            intro x _
+            obtain ⟨c, hc0, hc⟩ := hden x
+            have h1 : c • x ∈ Submodule.span LL (S₂ : Set V') := Submodule.subset_span hc
+            have h2 : algebraMap O LL c ≠ 0 := by simpa using hc0
+            rw [← algebraMap_smul LL] at h1
+            exact (Submodule.smul_mem_iff _ h2).1 h1 } }
+  refine ⟨T', ⟨V'.subtype, fun _ _ => rfl, IsModuleTopology.continuous_of_linearMap V'.subtype,
+    fun x hx => hx⟩, V'.injective_subtype, ?_, hπ, fun x => ⟨fun h => ⟨⟨x, h⟩, rfl⟩, ?_⟩, fun y hy => hy⟩
   · rw [← LinearMap.range_eq_top, eq_top_iff, ← T₂.L.span, Submodule.span_le]
     intro y hy
     obtain ⟨x, -, rfl⟩ := hπ y hy
@@ -224,17 +237,14 @@ end Kernel
 
 section Generic
 
-variable
-  {G : Type} [Group G] [TopologicalSpace G]
-  {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K] [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K]
-  [IsScalarTower Qp K₀ K]
-  {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
-  [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
-  [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
-  {PD : PeriodData G Qp K₀ K B BdR} {LL O : Type}
-  [Field LL] [Algebra Qp LL] [CommRing O] [Algebra O LL] [TopologicalSpace LL]
-  {v : AddValuation LL (WithTop ℚ)} {n : ℕ} (W : LocWach PD LL O v n)
-  {T₁ T₂ : LocLat G Qp LL O} (π : LatHom T₁.L T₂.L)
+variable {G : Type} [Group G] [TopologicalSpace G] {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K]
+    [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K] [IsScalarTower Qp K₀ K]
+    {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
+    [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
+    [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
+    {PD : PeriodData G Qp K₀ K B BdR} {LL O : Type} [Field LL] [Algebra Qp LL]
+    [CommRing O] [Algebra O LL] [TopologicalSpace LL] {v : AddValuation LL (WithTop ℚ)} {n : ℕ}
+    (W : LocWach PD LL O v n) {T₁ T₂ : LocLat G Qp LL O} (π : LatHom T₁.L T₂.L)
 
 def ann (i : ZMod n) : Ideal (PowerSeries O) where
   carrier := {g | ∀ y ∈ W.N T₂, (Pi.single i g : LetA O n) • y ∈ (W.N T₁).map (mapA W π)}
@@ -243,19 +253,18 @@ def ann (i : ZMod n) : Ideal (PowerSeries O) where
     rw [Pi.single_add, add_smul]; exact add_mem (ha y hy) (hb y hy)
   smul_mem' := fun c a ha y hy => by
     have : (Pi.single i (c • a) : LetA O n) = (fun _ => c) * Pi.single i a := by
-      funext j
-      by_cases h : j = i
+      funext j; by_cases h : j = i
       · subst h; simp
       · simp [h]
     rw [this, mul_smul]
     exact Submodule.smul_mem _ _ (ha y hy)
 
-theorem φD_smulA (T : LocLat G Qp LL O) (a : LetA O n) (x : W.DD T)
-    : W.φD T (a • x) = W.φA a • W.φD T x := by
+theorem φD_smulA (T : LocLat G Qp LL O) (a : LetA O n) (x : W.DD T) :
+    W.φD T (a • x) = W.φA a • W.φD T x := by
   rw [← algebraMap_smul W.EE a, W.φD_smul, W.φE_ext, algebraMap_smul]; rfl
 
-theorem φA_single (i : ZMod n) (g : PowerSeries O)
-    : W.φA (Pi.single (i - 1) g) = Pi.single i (W.φ₀ g) := by
+theorem φA_single (i : ZMod n) (g : PowerSeries O) :
+    W.φA (Pi.single (i - 1) g) = Pi.single i (W.φ₀ g) := by
   funext j
   change W.φ₀ ((Pi.single (i - 1) g : LetA O n) (j - 1)) = _
   by_cases h : j = i
@@ -263,23 +272,18 @@ theorem φA_single (i : ZMod n) (g : PowerSeries O)
   · rw [Pi.single_eq_of_ne h, Pi.single_eq_of_ne (fun e => h (sub_left_injective e)), map_zero]
 
 omit [CommRing O] in
-theorem single_eq_mul [CommRing O] (i : ZMod n) (a : LetA O n) (g : PowerSeries O)
-    : (Pi.single i (a i * g) : LetA O n) = a * Pi.single i g := by
-  funext j
-  by_cases h : j = i
+theorem single_eq_mul [CommRing O] (i : ZMod n) (a : LetA O n) (g : PowerSeries O) :
+    (Pi.single i (a i * g) : LetA O n) = a * Pi.single i g := by
+  funext j; by_cases h : j = i
   · subst h; simp
   · simp [h]
 
-theorem key_inclusion
-    {ι κ : Type} [Fintype ι] [Fintype κ]
-    (t : ι → PowerSeries O)
+theorem key_inclusion {ι κ : Type} [Fintype ι] [Fintype κ] (t : ι → PowerSeries O)
     (ht : ∀ y : PowerSeries O, ∃! z : ι → PowerSeries O, y = ∑ j, t j * W.φ₀ (z j))
-    (c1 : IsCrys PD T₁.ρ) (c2 : IsCrys PD T₂.ρ) (b : Module.Basis κ (LetA O n) (W.N T₂))
-    (hQ : ∀ a, a * W.Q = 0 → a = 0)
-    (M h : ZMod n → ℕ) (h1 : p5 W T₁ M h) (h2 : p5 W T₂ M h)
-    (H : ℕ) (i : ZMod n) (hH : M i + h i ≤ H)
-    (g : PowerSeries O) (hg : g ∈ ann W π i)
-    : W.Q i ^ H * g ∈ (ann W π (i - 1)).map W.φ₀ := by
+    (c1 : IsCrys PD T₁.ρ) (c2 : IsCrys PD T₂.ρ) (b : Module.Basis κ (LetA O n) (W.N T₂)) (hQ : ∀ a, a * W.Q = 0 → a = 0)
+    (M h : ZMod n → ℕ) (h1 : p5 W T₁ M h) (h2 : p5 W T₂ M h) (H : ℕ) (i : ZMod n)
+    (hH : M i + h i ≤ H) (g : PowerSeries O) (hg : g ∈ ann W π i) :
+    W.Q i ^ H * g ∈ (ann W π (i - 1)).map W.φ₀ := by
   obtain ⟨z, hz, -⟩ := ht (W.Q i ^ H * g)
   rw [hz]
   refine Ideal.sum_mem _ fun j _ => Ideal.mul_mem_left _ _ (Ideal.mem_map_of_mem _ fun y hy => ?_)
@@ -315,32 +319,26 @@ theorem key_inclusion
       rw [← hspan, SetLike.mem_coe, Submodule.mem_span_range_iff_exists_fun] at hx
       obtain ⟨c, rfl⟩ := hx
       change Φ _ ∈ _
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum]
+
+      rw [map_sum]
       refine Submodule.sum_mem _ fun k _ => ?_
       rw [hΦ]
       exact Submodule.smul_mem _ _ (Submodule.subset_span ⟨k, rfl⟩)
   have hw := h2.1 i _ ⟨y, hy, rfl⟩
   obtain ⟨x, hx, hxe⟩ := hg _ hw
   have hx2 := h1.2.1 i _ ⟨x, hx, rfl⟩
-  have hx3
-      : mapA W π (W.Q ^ h i • (letE i : LetA O n) • x)
-        ∈ Submodule.span (LetA O n) (Φ '' ((W.N T₁).map (mapA W π) : Set (W.DD T₂))) := by
-    refine (Submodule.span_le
-      (p :=
-        Submodule.comap (mapA W π)
-          (Submodule.span (LetA O n) (Φ '' ((W.N T₁).map (mapA W π) : Set (W.DD T₂)))))).2 ?_ hx2
+  have hx3 : mapA W π (W.Q ^ h i • (letE i : LetA O n) • x) ∈
+      Submodule.span (LetA O n) (Φ '' ((W.N T₁).map (mapA W π) : Set (W.DD T₂))) := by
+    refine (Submodule.span_le (p := Submodule.comap (mapA W π) (Submodule.span (LetA O n)
+      (Φ '' ((W.N T₁).map (mapA W π) : Set (W.DD T₂)))))).2 ?_ hx2
     rintro _ ⟨_, ⟨u, hu, rfl⟩, rfl⟩
-    exact Submodule.subset_span
-      ⟨_, ⟨_, (W.N T₁).smul_mem (letE (i - 1)) hu, rfl⟩, (W.map_φ π _).symm⟩
+    exact Submodule.subset_span ⟨_, ⟨_, (W.N T₁).smul_mem (letE (i - 1)) hu, rfl⟩,
+      (W.map_φ π _).symm⟩
   obtain ⟨d, rfl⟩ := Nat.exists_eq_add_of_le hH
-  have hx4
-      : W.Q ^ d • mapA W π (W.Q ^ h i • (letE i : LetA O n) • x)
-        = ∑ j, tt j • Φ ((Pi.single (i - 1) (z j) : LetA O n) • y) := by
-    have e1
-        : ∀ j,
-          tt j • Φ ((Pi.single (i - 1) (z j) : LetA O n) • y)
-            = (Pi.single i (t j * W.φ₀ (z j)) : LetA O n) • Φ y := fun j => by
+  have hx4 : W.Q ^ d • mapA W π (W.Q ^ h i • (letE i : LetA O n) • x) =
+      ∑ j, tt j • Φ ((Pi.single (i - 1) (z j) : LetA O n) • y) := by
+    have e1 : ∀ j, tt j • Φ ((Pi.single (i - 1) (z j) : LetA O n) • y) =
+        (Pi.single i (t j * W.φ₀ (z j)) : LetA O n) • Φ y := fun j => by
       rw [hΦ, smul_smul, single_eq_mul i (tt j), ← φA_single]; rfl
     simp only [e1]
     rw [← Finset.sum_smul, map_smul, map_smul, hxe]
@@ -353,8 +351,7 @@ theorem key_inclusion
     funext k
     by_cases hk : k = i
     · subst hk
-      simp only [Finset.sum_apply, Pi.single_eq_same, ← hz, Pi.mul_apply, Pi.pow_apply, letE,
-        map_one]
+      simp only [Finset.sum_apply, Pi.single_eq_same, ← hz, Pi.mul_apply, Pi.pow_apply, letE, map_one]
       ring
     · simp [hk]
   obtain ⟨u, hu, hue⟩ := decomp_exists φ Φ hΦ tt hex _ _ (Submodule.smul_mem _ (W.Q ^ d) hx3)
@@ -362,17 +359,15 @@ theorem key_inclusion
   have hN : ∀ j, u j ∈ W.N T₂ := fun j => by
     obtain ⟨x, hx, e⟩ := hu j
     exact e ▸ W.map_N π c1 c2 x hx
-  have :=
-    decomp_unique φ Φ hΦ tt hun b' hind
-      (fun j => (Pi.single (i - 1) (z j) : LetA O n) • y - u j)
-      (fun j => hspan ▸ sub_mem ((W.N T₂).smul_mem _ hy) (hN j))
-      (by simp only [map_sub, smul_sub, Finset.sum_sub_distrib, hue, sub_self]) j
+  have := decomp_unique φ Φ hΦ tt hun b' hind
+    (fun j => (Pi.single (i - 1) (z j) : LetA O n) • y - u j)
+    (fun j => hspan ▸ sub_mem ((W.N T₂).smul_mem _ hy) (hN j))
+    (by simp only [map_sub, smul_sub, Finset.sum_sub_distrib, hue, sub_self]) j
   rw [sub_eq_zero.1 this]
   exact hu j
 
-theorem kills_of_mem_ann
-    (i : ZMod n) (a : LetA O n) (ha : a i ∈ ann W π i) (y : W.DD T₂) (hy : y ∈ W.Nl T₂ i)
-    : a • y ∈ (W.Nl T₁ i).map (mapA W π) := by
+theorem kills_of_mem_ann (i : ZMod n) (a : LetA O n) (ha : a i ∈ ann W π i) (y : W.DD T₂)
+    (hy : y ∈ W.Nl T₂ i) : a • y ∈ (W.Nl T₁ i).map (mapA W π) := by
   obtain ⟨y, hy, rfl⟩ := hy
   obtain ⟨x, hx, e⟩ := ha y hy
   refine ⟨_, ⟨x, hx, rfl⟩, ?_⟩
@@ -380,22 +375,18 @@ theorem kills_of_mem_ann
   rw [map_smul, e, smul_smul, smul_smul, letE, ← single_eq_mul, ← single_eq_mul]
   simp
 
-theorem kills_of_cyclotomic
-    {l : ℕ} [Fact l.Prime] [IsDomain O] [IsDiscreteValuationRing O]
+theorem kills_of_cyclotomic {l : ℕ} [Fact l.Prime] [IsDomain O] [IsDiscreteValuationRing O]
     [IsAdicComplete (IsLocalRing.maximalIdeal O) O] [Algebra ℤ_[l] O] [NeZero n]
-    (hl0 : (l : O) ≠ 0) (hu : ¬ IsUnit (l : O)) (hp : PD.p = l)
-    {s : ℕ} (hWs : W.s = s)
+    (hl0 : (l : O) ≠ 0) (hu : ¬ IsUnit (l : O)) (hp : PD.p = l) {s : ℕ} (hWs : W.s = s)
     (hφ : W.φ₀ = GlobalTheory.Cyc.phi l O) (hX : ∀ i, W.X i = GlobalTheory.Cyc.XX l O s)
     (hQ : ∀ i, W.Q i = GlobalTheory.Cyc.QQ l O s)
     (hQu : IsUnit (algebraMap (LetA O n) W.EE ((W.φA ^ 0) W.Q)))
-    (hcard : l ≠ 2 → s = 1 → Module.finrank K₀ K ∣ l - 1) (c1 : IsCrys PD T₁.ρ)
-    (c2 : IsCrys PD T₂.ρ)
-    {r : ℕ} (hb : Nonempty (Module.Basis (Fin r) (LetA O n) (W.N T₂)))
-    (M h : ZMod n → ℕ) (h1 : JumpsLet W T₁ M h → p5 W T₁ M h) (h2 : JumpsLet W T₁ M h → p5 W T₂ M h)
-    (hc : ∃ c : ℕ, ∀ z ∈ W.N T₂,
-      (∃ y ∈ W.N T₁, W.map π y = ((l : ℕ) : LetA O n) ^ c • z)
-        ∧ ∃ y ∈ W.N T₁, W.map π y = (letπ : LetA O n) ^ c • z)
-    : wachLengthLatticeMap W π M h := by
+    (hcard : l ≠ 2 → s = 1 → Module.finrank K₀ K ∣ l - 1)
+    (c1 : IsCrys PD T₁.ρ) (c2 : IsCrys PD T₂.ρ) {r : ℕ}
+    (hb : Nonempty (Module.Basis (Fin r) (LetA O n) (W.N T₂))) (M h : ZMod n → ℕ)
+    (h1 : JumpsLet W T₁ M h → p5 W T₁ M h) (h2 : JumpsLet W T₁ M h → p5 W T₂ M h)
+    (hc : ∃ c : ℕ, ∀ z ∈ W.N T₂, (∃ y ∈ W.N T₁, W.map π y = ((l : ℕ) : LetA O n) ^ c • z) ∧
+      ∃ y ∈ W.N T₁, W.map π y = (letπ : LetA O n) ^ c • z) : wachLengthLatticeMap W π M h := by
   intro _ hJ
   replace h1 := h1 hJ
   replace h2 := h2 hJ
@@ -410,19 +401,15 @@ theorem kills_of_cyclotomic
     intro i
     rw [hX]
     refine GlobalTheory.Cyc.XX_pow_mem_of_QQ_pow_mul_mem_map_phi l _ hl0 hu s _ _ c hs1 (ann W π)
-      (fun i y hy => ?_)
-      (fun i g hg => ?_)
-      i
+      (fun i y hy => ?_) (fun i g hg => ?_) i
     · obtain ⟨x, hx, e⟩ := (hc y hy).2
       have e2 : (Pi.single i (PowerSeries.X ^ c) : LetA O n) = Pi.single i 1 * letπ ^ c := by
         rw [mul_comm, ← single_eq_mul, mul_one]; rfl
       rw [e2, mul_smul]
       exact Submodule.smul_mem _ _ ⟨x, hx, e⟩
     · rw [← hQ i, ← hφ]
-      refine key_inclusion W π
-        (fun j : Fin l => (1 + PowerSeries.X) ^ (j : ℕ))
-        ?_ c1 c2 b hQr M h h1 h2 _ i
-        (le_ciSup (f := fun j => M j + h j) (Set.finite_range _).bddAbove i) g hg
+      refine key_inclusion W π (fun j : Fin l => (1 + PowerSeries.X) ^ (j : ℕ)) ?_ c1 c2 b hQr M h
+        h1 h2 _ i (le_ciSup (f := fun j => M j + h j) (Set.finite_range _).bddAbove i) g hg
       rw [hφ]
       exact GlobalTheory.Cyc.phi_free l _ hl0 hu
   refine ⟨fun i y hy => kills_of_mem_ann W π i _ (hmain i) y hy, ?_⟩
@@ -432,7 +419,8 @@ theorem kills_of_cyclotomic
     have := W.s_two (hp.trans e)
     omega
   obtain ⟨s', hs'⟩ := hcard hl (hWs.symm.trans hs)
-  have hXi : W.X i = PowerSeries.X := by rw [LocWach.X, hs]; rfl
+  have hXi : W.X i = PowerSeries.X := by
+    rw [LocWach.X, hs]; rfl
   have h2l := (Fact.out : l.Prime).two_le
   have hm := hmain i
   rw [hXi] at hm
@@ -456,9 +444,9 @@ theorem kills_of_cyclotomic
 
 end Generic
 
-theorem exists_kernel_padic
-    {l : ℕ} [Fact l.Prime] (K LL : FinExt l) (T₁ T₂ : Lt K LL) (π : LatHom T₁.L T₂.L) (hπ : π.Onto)
-    : ∃ (T₀ : Lt K LL) (ι : LatHom T₀.L T₁.L), IsSESLat (Qp := ℚ_[l]) ι π := by
+theorem exists_kernel_padic {l : ℕ} [Fact l.Prime] (K LL : FinExt l) (T₁ T₂ : Lt K LL)
+    (π : LatHom T₁.L T₂.L) (hπ : π.Onto) :
+    ∃ (T₀ : Lt K LL) (ι : LatHom T₀.L T₁.L), IsSESLat (Qp := ℚ_[l]) ι π := by
   obtain ⟨_, -, -⟩ := GlobalTheory.FinExtIntegers.dvr_complete LL
   haveI : IsFractionRing ↥(OL LL) ↥LL.1 :=
     haveI := LL.2
@@ -467,11 +455,9 @@ theorem exists_kernel_padic
 
 end GlobalTheory.NL.CokerKill
 
+
 open GlobalTheory.NL.CokerKill in
-theorem GlobalTheory.NL.CokerKill.X_pow_kills_coker
-    : ∀ (D : Formalism.BasicNotions.D7) (HW : HWOf D.loc) (F : FonOf D.loc D.locA HW)
-        (Cm : CmpOf D.loc D.locA HW F),
-      lem3 D HW F := by
+theorem GlobalTheory.NL.CokerKill.X_pow_kills_coker : ∀ (D : Formalism.BasicNotions.D7) (HW : HWOf D.loc) (F : FonOf D.loc D.locA HW) (Cm : CmpOf D.loc D.locA HW F), lem3 D HW F := by
   intro D HW F Cm l _ K s LL hG T₁ T₂ π M h c1 c2
   obtain ⟨_, hcomp, hu⟩ := GlobalTheory.FinExtIntegers.dvr_complete LL
   obtain ⟨χ, -, hφ, -, hX, hQ, -⟩ := GlobalTheory.NL.CycRing.rings_cyclotomic D HW l K s LL hG
@@ -485,20 +471,16 @@ theorem GlobalTheory.NL.CokerKill.X_pow_kills_coker
   swap
   · exact fun h => absurd h hπ
   obtain ⟨T₀, ι, hses⟩ := exists_kernel_padic K LL T₁ T₂ π hπ
-  have c0 :=
-    (GlobalTheory.Per.CrysSubQuot.crys_sub_quot l _ _ (D.locT l) K LL _ T₀.ρ _ T₁.ρ ι.f ι.equiv).1
-      hses.1 c1
+  have c0 := (GlobalTheory.Per.CrysSubQuot.crys_sub_quot l _ _ (D.locT l) K LL _ T₀.ρ _ T₁.ρ ι.f ι.equiv).1
+    hses.1 c1
   have hj := (GlobalTheory.NL.JumpsSES.jumps_ses_and_one D HW l K s LL hG T₀ T₁ T₂ ι π c1 hses).1
   exact kills_of_cyclotomic _ π (Nat.cast_ne_zero.2 (Fact.out : l.Prime).ne_zero) hu
     ((D.loc l).PD_p K) ((HW l).W_s K s LL hG) hφ hX hQ
     ((GlobalTheory.NL.IoXQ.main D HW F l K s LL hG).2.2.2.2.2.2 0).2
-    (fun hl hs =>
-      Dvd.intro_left _
-        (GlobalTheory.TorsionCard.card_torsion_mul_finrank (D.loc l) K LL ((HW l).W K s LL hG) hl
-          (hs ▸ hG.2.2.1)))
+    (fun hl hs => Dvd.intro_left _ (GlobalTheory.TorsionCard.card_torsion_mul_finrank (D.loc l) K LL
+      ((HW l).W K s LL hG) hl (hs ▸ hG.2.2.1)))
     c1 c2 (GlobalTheory.NL.N_basis D HW F l K s LL hG T₂ c2) M h
     (GlobalTheory.T.wachLattice_heights_from_hodgeJumps D HW F Cm l K s LL hG T₁ M h c1)
-    (fun hJ =>
-      GlobalTheory.T.wachLattice_heights_from_hodgeJumps D HW F Cm l K s LL hG T₂ M h c2
-        fun τ i hτ a ha => hJ τ i hτ a ((hj τ a).2 (Or.inr ha)))
+    (fun hJ => GlobalTheory.T.wachLattice_heights_from_hodgeJumps D HW F Cm l K s LL hG T₂ M h c2 fun τ i hτ a ha =>
+      hJ τ i hτ a ((hj τ a).2 (Or.inr ha)))
     (GlobalTheory.T.wachN_cokernel_killed_by_power D HW F Cm l K s LL hG T₀ T₁ T₂ ι π c0 c1 c2 hses)

@@ -1,23 +1,55 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.Statements.PlaceShiftStatements.NormSmall
-public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.RatInOfUnit
-public import Development.AbelianVarietyTheory.BlockTheory.DivisorBase.WeilTensorModels
-public import Development.AbelianVarietyTheory.Definitions.Divisors.DiscreteSeriesHermitianUnique
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.NegIdxOfIsStd
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.BaseFits
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.PlaneSplit
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.FinrankOrth
-public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.IsLatticeComapSubspaceRingOfIntegers
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsLatticeOfEqSpanFracSmul
+public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.IsLatticeComapSubspaceRingOfIntegers
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.FinrankOrth
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Development.AbelianVarietyTheory.Definitions.Divisors.CmHostImaginaryGeneratorNeZero
+import Development.AbelianVarietyTheory.Definitions.Divisors.FinitePrimesUnder
+import Development.AbelianVarietyTheory.Definitions.Divisors.FlatTensorVacuum
+import Development.AbelianVarietyTheory.Definitions.TwistedInnerProducts.ExistsMatchOver
+import Development.AbelianVarietyTheory.Statements.PlaceShiftStatements.NormSmall
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions
-  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
-  Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.Theta IsDedekindDomain
-  NumberField Finset
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.Theta IsDedekindDomain NumberField Finset
 open Formalism.DivisionValues (vw)
 open Formalism.L2.Host (HChar)
 open GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.FunObj.SqNum GlobalTheory.RowTest
@@ -32,35 +64,28 @@ noncomputable section
 
 namespace GlobalTheory.PlaneCompl
 
-theorem gram_sum {D : D7} (S : HSp D) (a b : Fin S.rank → D.host.E)
-    : ∑ i, ∑ j, star (a i) * S.gram i j * b j
-      = S.hT (S.frame.equivFun.symm a) (S.frame.equivFun.symm b) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [Module.Basis.equivFun_symm_apply, map_sum, LinearMap.sum_apply, LinearMap.map_smulₛₗ,
-      LinearMap.smul_apply, smul_eq_mul, Formalism.BasicNotions.HSpace.gram, starRingEnd_apply]
+theorem gram_sum {D : D7} (S : HSp D) (a b : Fin S.rank → D.host.E) :
+    ∑ i, ∑ j, star (a i) * S.gram i j * b j = S.hT (S.frame.equivFun.symm a) (S.frame.equivFun.symm b) := by
+
+  simp only [Module.Basis.equivFun_symm_apply, map_sum, LinearMap.sum_apply, LinearMap.map_smulₛₗ,
+  LinearMap.smul_apply, smul_eq_mul, Formalism.BasicNotions.HSpace.gram, starRingEnd_apply]
   simp only [Finset.mul_sum, RingHom.id_apply]
   conv_lhs => rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
   ring
 
-theorem exists_compl
-    : ∀ (D : D7) (S : HSp D) (Λ : Submodule (𝓞 D.host.E) (Fin S.rank → D.host.E)) (x y : S.V)
-        (s : (D.host.E →+* ℂ) → ℕ × ℕ),
-      IsSelfDualC S Λ → S.hT x x = 0 → S.hT y y = 0 → S.hT x y = 1
-        → (∀ z,
-          GlobalTheory.SqStepK.InLat S Λ z
-            → GlobalTheory.SqStepK.InLat S Λ (S.hT y z • x)
-              ∧ GlobalTheory.SqStepK.InLat S Λ (S.hT x z • y))
-        → ∃ (S₁ : HSp D) (Λ₁ : Submodule (𝓞 D.host.E) (Fin S₁.rank → D.host.E))
-            (ι : S₁.V →ₗ[D.host.E] S.V),
-          GlobalTheory.SqStepK.PlaneSplit S S₁ Λ Λ₁ ι x y ∧ IsSelfDualC S₁ Λ₁ ∧ S₁.sig = s := by
+theorem exists_compl : ∀ (D : D7) (S : HSp D) (Λ : Submodule (𝓞 D.host.E) (Fin S.rank → D.host.E)) (x y : S.V)
+    (s : (D.host.E →+* ℂ) → ℕ × ℕ), IsSelfDualC S Λ → S.hT x x = 0 → S.hT y y = 0 → S.hT x y = 1 →
+    (∀ z, GlobalTheory.SqStepK.InLat S Λ z → GlobalTheory.SqStepK.InLat S Λ (S.hT y z • x) ∧ GlobalTheory.SqStepK.InLat S Λ (S.hT x z • y)) →
+    ∃ (S₁ : HSp D) (Λ₁ : Submodule (𝓞 D.host.E) (Fin S₁.rank → D.host.E)) (ι : S₁.V →ₗ[D.host.E] S.V),
+      GlobalTheory.SqStepK.PlaneSplit S S₁ Λ Λ₁ ι x y ∧ IsSelfDualC S₁ Λ₁ ∧ S₁.sig = s := by
   intro D S Λ x y s hΛ hxx hyy hxy hsplit
   have hyx : S.hT y x = 1 := by rw [← S.herm.eq x y, hxy, map_one]
   let W : Submodule D.host.E S.V := LinearMap.ker (LinearMap.pi fun j : Fin 2 => S.hT (![x, y] j))
   have hW : ∀ w, w ∈ W ↔ S.hT x w = 0 ∧ S.hT y w = 0 := by
     intro w
-    simp only [W, LinearMap.mem_ker, funext_iff, LinearMap.pi_apply, Fin.forall_fin_two,
-      Matrix.cons_val_zero, Matrix.cons_val_one, Pi.zero_apply, Matrix.head_cons]
+    simp only [W, LinearMap.mem_ker, funext_iff, LinearMap.pi_apply, Fin.forall_fin_two, Matrix.cons_val_zero,
+      Matrix.cons_val_one, Pi.zero_apply, Matrix.head_cons]
   have hdec : ∀ z, z - S.hT y z • x - S.hT x z • y ∈ W := by
     intro z
     rw [hW]
@@ -85,22 +110,16 @@ theorem exists_compl
     intro z
     have e : z = S.hT y z • x + (z - S.hT y z • x - S.hT x z • y) + S.hT x z • y := by abel
     have h0 := hv ⟨_, hdec z⟩
-    rw [e, map_add (f := _), map_add (f := _), LinearMap.add_apply, LinearMap.add_apply,
-      LinearMap.map_smulₛₗ, LinearMap.map_smulₛₗ, LinearMap.smul_apply, LinearMap.smul_apply, hv'.1,
-      hv'.2, h0]
+    rw [e, map_add (f := _), map_add (f := _), LinearMap.add_apply, LinearMap.add_apply, LinearMap.map_smulₛₗ, LinearMap.map_smulₛₗ,
+      LinearMap.smul_apply, LinearMap.smul_apply, hv'.1, hv'.2, h0]
     simp
   let h' : W →ₗ⋆[D.host.E] W →ₗ[D.host.E] D.host.E := S.hT.domRestrict₁₂ W W
   have hs' : h'.IsSymm := ⟨fun a b => S.herm.eq _ _⟩
-  have hnd' : h'.Nondegenerate := ⟨
-    fun a ha => hrad a fun b => by rw [← S.herm.eq]; exact (congrArg _ (ha b)).trans (map_zero _),
-    fun a ha => hrad a ha
-  ⟩
-  let Λ' : Submodule (𝓞 D.host.E) S.V :=
-    Λ.comap
-      ((S.frame.equivFun : S.V →ₗ[D.host.E] (Fin S.rank → D.host.E)).restrictScalars (𝓞 D.host.E))
+  have hnd' : h'.Nondegenerate := ⟨fun a ha => hrad a fun b => by
+    rw [← S.herm.eq]; exact (congrArg _ (ha b)).trans (map_zero _), fun a ha => hrad a ha⟩
+  let Λ' : Submodule (𝓞 D.host.E) S.V := Λ.comap ((S.frame.equivFun : S.V →ₗ[D.host.E] (Fin S.rank → D.host.E)).restrictScalars (𝓞 D.host.E))
   have hΛ'm : ∀ z, z ∈ Λ' ↔ GlobalTheory.SqStepK.InLat S Λ z := fun z => Iff.rfl
-  have hΛ'lat : Submodule.IsLattice D.host.E Λ' :=
-    GlobalTheory.ColRows.isLattice_comap_equiv S.frame.equivFun Λ hΛ.1
+  have hΛ'lat : Submodule.IsLattice D.host.E Λ' := GlobalTheory.ColRows.isLattice_comap_equiv S.frame.equivFun Λ hΛ.1
   have hΛ'd : ∀ z, z ∈ Λ' ↔ ∀ w ∈ Λ', ∃ b : 𝓞 D.host.E, (b : D.host.E) = S.hT w z := by
     intro z
     rw [hΛ'm, GlobalTheory.SqStepK.InLat, hΛ.2]
@@ -109,14 +128,11 @@ theorem exists_compl
       obtain ⟨b, hb⟩ := h _ hw
       exact ⟨b, by rw [hb, gram_sum]; simp⟩
     · intro h a ha
-      obtain ⟨b, hb⟩ :=
-        h (S.frame.equivFun.symm a)
-          (by rw [hΛ'm, GlobalTheory.SqStepK.InLat, LinearEquiv.apply_symm_apply]; exact ha)
+      obtain ⟨b, hb⟩ := h (S.frame.equivFun.symm a) (by rw [hΛ'm, GlobalTheory.SqStepK.InLat, LinearEquiv.apply_symm_apply]; exact ha)
       exact ⟨b, by rw [hb, gram_sum]; simp⟩
   let L0 : Submodule (𝓞 D.host.E) W := Λ'.comap (W.subtype.restrictScalars (𝓞 D.host.E))
   have hL0m : ∀ u : W, u ∈ L0 ↔ (u : S.V) ∈ Λ' := fun u => Iff.rfl
-  have hL0lat : Submodule.IsLattice D.host.E L0 :=
-    GlobalTheory.isLattice_comap_subtype_ringOfIntegers Λ' hΛ'lat W
+  have hL0lat : Submodule.IsLattice D.host.E L0 := GlobalTheory.isLattice_comap_subtype_ringOfIntegers Λ' hΛ'lat W
   have hwz : ∀ z, z ∈ Λ' → z - S.hT y z • x - S.hT x z • y ∈ Λ' := by
     intro z hz
     obtain ⟨hs1, hr1⟩ := hsplit z ((hΛ'm z).1 hz)
@@ -141,46 +157,22 @@ theorem exists_compl
     rw [Submodule.mem_one]
     rfl
 
-  let S₁ : HSp D := {
-    V := W
-    hT := h'
-    herm := hs'
-    nondeg := hnd'
-    rank := Module.finrank D.host.E W
-    rank_eq := rfl
-    frame := Module.finBasis D.host.E W
-    sig := s
-    L0 := L0
-    standardTuple_isLattice := hL0lat
-    baseLattice_isUnimodular := hun
-  }
-  let e₁ : (Fin (Module.finrank D.host.E W) → D.host.E) ≃ₗ[D.host.E] W :=
-    (Module.finBasis D.host.E W).equivFun.symm
+  let S₁ : HSp D :=
+    { V := W, hT := h', herm := hs', nondeg := hnd', rank := Module.finrank D.host.E W, rank_eq := rfl,
+      frame := Module.finBasis D.host.E W, sig := s, L0 := L0, standardTuple_isLattice := hL0lat, baseLattice_isUnimodular := hun }
+  let e₁ : (Fin (Module.finrank D.host.E W) → D.host.E) ≃ₗ[D.host.E] W := (Module.finBasis D.host.E W).equivFun.symm
   let Λ₁ : Submodule (𝓞 D.host.E) (Fin S₁.rank → D.host.E) :=
-    L0.comap
-      ((e₁ : (Fin (Module.finrank D.host.E W) → D.host.E) →ₗ[D.host.E] W).restrictScalars
-        (𝓞 D.host.E))
+    L0.comap ((e₁ : (Fin (Module.finrank D.host.E W) → D.host.E) →ₗ[D.host.E] W).restrictScalars (𝓞 D.host.E))
   have hΛ₁m : ∀ v, v ∈ Λ₁ ↔ e₁ v ∈ L0 := fun v => Iff.rfl
-  have hΛ₁lat : Submodule.IsLattice D.host.E Λ₁ :=
-    GlobalTheory.ColRows.isLattice_comap_equiv e₁ L0 hL0lat
-  have hin
-      : ∀ u : W,
-        GlobalTheory.SqStepK.InLat S₁ Λ₁ u ↔ GlobalTheory.SqStepK.InLat S Λ (W.subtype u) := by
+  have hΛ₁lat : Submodule.IsLattice D.host.E Λ₁ := GlobalTheory.ColRows.isLattice_comap_equiv e₁ L0 hL0lat
+  have hin : ∀ u : W, GlobalTheory.SqStepK.InLat S₁ Λ₁ u ↔ GlobalTheory.SqStepK.InLat S Λ (W.subtype u) := by
     intro u
     change (Module.finBasis D.host.E W).equivFun u ∈ Λ₁ ↔ _
     rw [hΛ₁m]
-    change (Module.finBasis D.host.E W).equivFun.symm ((Module.finBasis D.host.E W).equivFun u) ∈ L0
-      ↔ _
+    change (Module.finBasis D.host.E W).equivFun.symm ((Module.finBasis D.host.E W).equivFun u) ∈ L0 ↔ _
     rw [LinearEquiv.symm_apply_apply, hL0m, hΛ'm]
     rfl
-  refine ⟨
-    S₁,
-    Λ₁,
-    W.subtype,
-    ⟨?_, fun _ _ => rfl, hxx, hyy, hyx, fun u => ⟨((hW u).1 u.2).1, ((hW u).1 u.2).2⟩, hin, ?_⟩,
-    ⟨hΛ₁lat, ?_⟩,
-    rfl
-  ⟩
+  refine ⟨S₁, Λ₁, W.subtype, ⟨?_, fun _ _ => rfl, hxx, hyy, hyx, fun u => ⟨((hW u).1 u.2).1, ((hW u).1 u.2).2⟩, hin, ?_⟩, ⟨hΛ₁lat, ?_⟩, rfl⟩
   · change S.rank = Module.finrank D.host.E W + 2
     omega
   · intro z hz

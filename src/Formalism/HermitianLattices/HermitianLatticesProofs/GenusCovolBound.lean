@@ -1,12 +1,55 @@
 module
 
-public import Mathlib
 public import Formalism.HermitianLattices.GenusCovolBound
-public import Formalism.HermitianLattices.HermitianLatticesProofs.GenusScale
-public import Formalism.HermitianLattices.HermitianLatticesProofs.LocDual
-public import Formalism.HermitianLattices.HermitianLatticesProofs.DualLattice
-public import Formalism.HermitianLattices.HermitianLatticesProofs.IsomAct
+public import Mathlib.NumberTheory.NumberField.Discriminant.Defs
 public import Formalism.FockGram.FockGramProofs.CovolGram
+public import Formalism.HermitianLattices.HermitianLatticesProofs.DualLattice
+public import Formalism.HermitianLattices.HermitianLatticesProofs.GenusBasic
+public import Formalism.HermitianLattices.HermitianLatticesProofs.GenusScale
+import Formalism.HermitianLattices.HermitianLatticesProofs.IsomAct
+public import Formalism.HermitianLattices.HermitianLatticesProofs.LocDual
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Rat
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -18,26 +61,23 @@ namespace Formalism.HermitianLatticesTheory
 
 section PartA
 
-variable
-  {K V : Type} [Field K] [NumberField K] [StarRing K] [AddCommGroup V] [Module K V] [Module (𝓞 K) V]
-  [IsScalarTower (𝓞 K) K V]
+variable {K V : Type} [Field K] [NumberField K] [StarRing K] [AddCommGroup V] [Module K V]
+  [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V]
 
-theorem genusCovolBound_mem_zmap
-    (N : ℕ) (ι : V →+ EuclideanSpace ℝ (Fin N))
-    (M : Submodule (𝓞 K) V) (v : EuclideanSpace ℝ (Fin N))
-    : v ∈ zmap ι M ↔ ∃ x ∈ M, ι x = v := by
+theorem genusCovolBound_mem_zmap (N : ℕ) (ι : V →+ EuclideanSpace ℝ (Fin N))
+    (M : Submodule (𝓞 K) V) (v : EuclideanSpace ℝ (Fin N)) :
+    v ∈ zmap ι M ↔ ∃ x ∈ M, ι x = v := by
   exact Iff.rfl
 
-theorem genusCovolBound_covol_le
-    (h : V →ₗ⋆[K] V →ₗ[K] K) (N : ℕ) (ι : V →+ EuclideanSpace ℝ (Fin N))
+theorem genusCovolBound_covol_le (h : V →ₗ⋆[K] V →ₗ[K] K) (N : ℕ)
+    (ι : V →+ EuclideanSpace ℝ (Fin N))
     (hι : ∀ x y : V, inner ℝ (ι x) (ι y) = ((Algebra.trace ℚ K (h x y) : ℚ) : ℝ))
     (M : Submodule (𝓞 K) V) [DiscreteTopology (zmap ι M)] [IsZLattice ℝ (zmap ι M)]
     (D : ℕ) (hD0 : 0 < D)
-    (hD : ∀ y y' : V,
-      (∀ x ∈ M, ∃ z : ℤ, Algebra.trace ℚ K (h x y) = z)
-        → (∀ x ∈ M, ∃ z : ℤ, Algebra.trace ℚ K (h x y') = z)
-        → ∃ z : ℤ, (D : ℚ) * Algebra.trace ℚ K (h y y') = z)
-    : ZLattice.covolume (zmap ι M) ≤ Real.sqrt ((D : ℝ) ^ N) := by
+    (hD : ∀ y y' : V, (∀ x ∈ M, ∃ z : ℤ, Algebra.trace ℚ K (h x y) = z) →
+       (∀ x ∈ M, ∃ z : ℤ, Algebra.trace ℚ K (h x y') = z) →
+       ∃ z : ℤ, (D : ℚ) * Algebra.trace ℚ K (h y y') = z) :
+    ZLattice.covolume (zmap ι M) ≤ Real.sqrt ((D : ℝ) ^ N) := by
   classical
   set Λ := zmap ι M with hΛdef
 
@@ -77,8 +117,8 @@ theorem genusCovolBound_covol_le
   let y : n → V := fun j => ∑ k, ((Hq k j : ℚ) : K) • x k
   have hy : ∀ j, ι (y j) = w j := by
     intro j
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [y, w, map_sum]
+
+    simp only [y, w, map_sum]
     refine Finset.sum_congr rfl fun k _ => ?_
     rw [map_ratCast_smul ι K ℝ, hxb]
   have hbw : ∀ i j, inner ℝ (b i) (w j) = (((1 : Matrix n n ℚ) i j : ℚ) : ℝ) := by
@@ -99,8 +139,7 @@ theorem genusCovolBound_covol_le
       split_ifs
       · exact ⟨1, by simp⟩
       · exact ⟨0, by simp⟩
-    | zero =>
-      exact ⟨0, by simp⟩
+    | zero => exact ⟨0, by simp⟩
     | add u v _ _ hu hv =>
       obtain ⟨a, ha⟩ := hu
       obtain ⟨c, hc⟩ := hv
@@ -141,8 +180,7 @@ theorem genusCovolBound_covol_le
   have hdetZ : (((Matrix.of Z).det : ℤ) : ℚ) = (D : ℚ) ^ N * (Gq.det)⁻¹ := by
     have := RingHom.map_det (Int.castRingHom ℚ) (Matrix.of Z)
     rw [hZm, Matrix.det_smul, Matrix.det_transpose, Matrix.det_nonsing_inv, hcard,
-        Ring.inverse_eq_inv']
-      at this
+      Ring.inverse_eq_inv'] at this
     simpa using this
   have hpos : (0 : ℚ) < (((Matrix.of Z).det : ℤ) : ℚ) := by rw [hdetZ]; positivity
   have h1 : (1 : ℚ) ≤ (((Matrix.of Z).det : ℤ) : ℚ) := by
@@ -165,14 +203,12 @@ end PartA
 
 section PartB
 
-variable
-  {K V : Type} [Field K] [NumberField K] [StarRing K] [AddCommGroup V] [Module K V] [Module (𝓞 K) V]
-  [IsScalarTower (𝓞 K) K V]
+variable {K V : Type} [Field K] [NumberField K] [StarRing K] [AddCommGroup V] [Module K V]
+  [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V]
 
-theorem genusCovolBound_dualAt_gmap
-    (h : V →ₗ⋆[K] V →ₗ[K] K) (g : V ≃ₗ[K] V) (hg : g ∈ isom h)
-    (p : Ideal (𝓞 K)) (X : Submodule (𝓞 K) V)
-    : dualAt h p (gmap g X) = gmap g (dualAt h p X) := by
+theorem genusCovolBound_dualAt_gmap (h : V →ₗ⋆[K] V →ₗ[K] K) (g : V ≃ₗ[K] V) (hg : g ∈ isom h)
+    (p : Ideal (𝓞 K)) (X : Submodule (𝓞 K) V) :
+    dualAt h p (gmap g X) = gmap g (dualAt h p X) := by
   ext x
   simp only [dualAt, Submodule.mem_iInf, Submodule.mem_comap, LinearMap.coe_restrictScalars,
     isomAct_mem_gmap]
@@ -180,23 +216,19 @@ theorem genusCovolBound_dualAt_gmap
   · intro H z hz
     have := H (g z) (by simpa using hz)
     rwa [show h (g z) x = h z (g.symm x) by
-        conv_lhs => rw [show x = g (g.symm x) by simp]
-        exact hg z (g.symm x)]
-      at this
+      conv_lhs => rw [show x = g (g.symm x) by simp]
+      exact hg z (g.symm x)] at this
   · intro H y hy
     have := H (g.symm y) hy
     rwa [show h (g.symm y) (g.symm x) = h y x by
-        conv_rhs => rw [show y = g (g.symm y) by simp, show x = g (g.symm x) by simp]
-        exact (hg (g.symm y) (g.symm x)).symm]
-      at this
+      conv_rhs => rw [show y = g (g.symm y) by simp, show x = g (g.symm x) by simp]
+      exact (hg (g.symm y) (g.symm x)).symm] at this
 
-theorem genusCovolBound_dual_genus
-    [FiniteDimensional K V]
-    (h : V →ₗ⋆[K] V →ₗ[K] K) (hs : h.IsSymm) (hnd : h.Nondegenerate)
+theorem genusCovolBound_dual_genus [FiniteDimensional K V] (h : V →ₗ⋆[K] V →ₗ[K] K)
+    (hs : h.IsSymm) (hnd : h.Nondegenerate)
     (hstar : ∀ r : 𝓞 K, star (algebraMap (𝓞 K) K r) ∈ Set.range (algebraMap (𝓞 K) K))
-    (L : Submodule (𝓞 K) V) (hL : Submodule.IsLattice K L)
-    (M : Submodule (𝓞 K) V) (hM : M ∈ genus h L)
-    : dual h M ∈ genus h (dual h L) := by
+    (L : Submodule (𝓞 K) V) (hL : Submodule.IsLattice K L) (M : Submodule (𝓞 K) V)
+    (hM : M ∈ genus h L) : dual h M ∈ genus h (dual h L) := by
   obtain ⟨hMl, hMg⟩ := hM
   refine ⟨(dualLattice (𝓞 K) K V h hs hnd hstar M hMl).1, ?_⟩
   intro p hp
@@ -204,16 +236,16 @@ theorem genusCovolBound_dual_genus
   refine ⟨g, hg, ?_⟩
   have hL1 := (locDual (𝓞 K) K V h hs hstar L hL.fg).1 p hp.isPrime
   have hM1 := (locDual (𝓞 K) K V h hs hstar M hMl.fg).1 p hp.isPrime
-  calc
-    gmap g (loc (K := K) p (dual h L))
+  calc gmap g (loc (K := K) p (dual h L))
       = gmap g (dualAt h p (loc (K := K) p L)) := by rw [hL1.1, hL1.2]
-    _ = dualAt h p (gmap g (loc (K := K) p L)) := (genusCovolBound_dualAt_gmap h g hg p _).symm
+    _ = dualAt h p (gmap g (loc (K := K) p L)) :=
+        (genusCovolBound_dualAt_gmap h g hg p _).symm
     _ = dualAt h p (loc (K := K) p M) := by rw [hgL]
     _ = loc (K := K) p (dual h M) := by rw [hM1.2, hM1.1]
 
-theorem genusCovolBound_discr
-    (a : K) (ha : ∀ r : 𝓞 K, ∃ z : ℤ, Algebra.trace ℚ K (a * algebraMap (𝓞 K) K r) = z)
-    : ((NumberField.discr K : ℤ) : K) * a ∈ (1 : Submodule (𝓞 K) K) := by
+theorem genusCovolBound_discr (a : K)
+    (ha : ∀ r : 𝓞 K, ∃ z : ℤ, Algebra.trace ℚ K (a * algebraMap (𝓞 K) K r) = z) :
+    ((NumberField.discr K : ℤ) : K) * a ∈ (1 : Submodule (𝓞 K) K) := by
   classical
   have htr : ∀ r : 𝓞 K, ∃ z : ℤ, Algebra.trace ℚ K (algebraMap (𝓞 K) K r) = z := by
     intro r
@@ -221,9 +253,8 @@ theorem genusCovolBound_discr
       Algebra.isIntegral_trace (RingOfIntegers.isIntegral_coe r)
     obtain ⟨z, hz⟩ := IsIntegrallyClosed.isIntegral_iff.mp hi
     exact ⟨z, by rw [← hz]; simp⟩
-  have hint
-      : ∀ i j, ∃ z : ℤ,
-        Algebra.trace ℚ K (NumberField.integralBasis K i * NumberField.integralBasis K j) = z := by
+  have hint : ∀ i j, ∃ z : ℤ, Algebra.trace ℚ K
+      (NumberField.integralBasis K i * NumberField.integralBasis K j) = z := by
     intro i j
     simpa [NumberField.integralBasis_apply, map_mul] using
       htr (RingOfIntegers.basis K i * RingOfIntegers.basis K j)
@@ -236,17 +267,15 @@ theorem genusCovolBound_discr
   let Tq : Matrix _ _ ℚ := (Int.castRingHom ℚ).mapMatrix (Matrix.of T)
   have hTq : Matrix.mulVec Tq ((NumberField.integralBasis K).repr a) = fun i => (m i : ℚ) := by
     funext i
-    have hs
-        : Algebra.trace ℚ K (a * NumberField.integralBasis K i)
-          = ∑ j, (NumberField.integralBasis K).repr a j *
-              Algebra.trace ℚ K (NumberField.integralBasis K i * NumberField.integralBasis K j) :=
-      by
-        conv_lhs => rw [← (NumberField.integralBasis K).sum_repr a]
-        set_option synthInstance.maxHeartbeats 100000 in
-          rw [Finset.sum_mul, map_sum]
-        refine Finset.sum_congr rfl fun j _ => ?_
-        rw [smul_mul_assoc, LinearMap.map_smul, smul_eq_mul,
-          mul_comm (NumberField.integralBasis K j)]
+    have hs : Algebra.trace ℚ K (a * NumberField.integralBasis K i) =
+        ∑ j, (NumberField.integralBasis K).repr a j *
+          Algebra.trace ℚ K (NumberField.integralBasis K i * NumberField.integralBasis K j) := by
+      conv_lhs => rw [← (NumberField.integralBasis K).sum_repr a]
+
+      rw [Finset.sum_mul, map_sum]
+      refine Finset.sum_congr rfl fun j _ => ?_
+      rw [smul_mul_assoc, LinearMap.map_smul, smul_eq_mul,
+        mul_comm (NumberField.integralBasis K j)]
     rw [← hm' i, hs]
     simp only [Matrix.mulVec, dotProduct, Tq, RingHom.mapMatrix_apply, Matrix.map_apply,
       Matrix.of_apply, eq_intCast]
@@ -258,28 +287,24 @@ theorem genusCovolBound_discr
     ext i j
     simp only [Algebra.traceMatrix_apply, Algebra.traceForm_apply, Tq, RingHom.mapMatrix_apply,
       Matrix.map_apply, Matrix.of_apply, eq_intCast, hT]
-  have hn
-      : ∀ i,
-        ((NumberField.discr K : ℤ) : ℚ) * (NumberField.integralBasis K).repr a i
-          = (Matrix.mulVec (Matrix.of T).adjugate m i : ℤ) := by
+  have hn : ∀ i, ((NumberField.discr K : ℤ) : ℚ) * (NumberField.integralBasis K).repr a i =
+      (Matrix.mulVec (Matrix.of T).adjugate m i : ℤ) := by
     intro i
-    have h2
-        : Matrix.mulVec Tq.adjugate (Matrix.mulVec Tq ((NumberField.integralBasis K).repr a))
-          = Matrix.mulVec Tq.adjugate (fun i => (m i : ℚ)) := by
-      rw [hTq]
-    rw [Matrix.mulVec_mulVec, Matrix.adjugate_mul, Matrix.smul_mulVec, Matrix.one_mulVec] at h2
+    have h2 : Matrix.mulVec Tq.adjugate (Matrix.mulVec Tq ((NumberField.integralBasis K).repr a)) =
+        Matrix.mulVec Tq.adjugate (fun i => (m i : ℚ)) := by rw [hTq]
+    rw [Matrix.mulVec_mulVec, Matrix.adjugate_mul, Matrix.smul_mulVec,
+      Matrix.one_mulVec] at h2
     have h3 := congrFun h2 i
     rw [Pi.smul_apply, smul_eq_mul, ← hdet] at h3
-    rw [h3,
-      show Tq.adjugate = (Int.castRingHom ℚ).mapMatrix (Matrix.of T).adjugate from
-        (RingHom.map_adjugate _ _).symm]
+    rw [h3, show Tq.adjugate = (Int.castRingHom ℚ).mapMatrix (Matrix.of T).adjugate from
+      (RingHom.map_adjugate _ _).symm]
     simp only [Matrix.mulVec, dotProduct, RingHom.mapMatrix_apply, Matrix.map_apply]
     push_cast
     rfl
   rw [Submodule.mem_one]
   refine ⟨∑ i, Matrix.mulVec (Matrix.of T).adjugate m i • RingOfIntegers.basis K i, ?_⟩
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+
+  rw [map_sum]
   conv_rhs => rw [← (NumberField.integralBasis K).sum_repr a, Finset.mul_sum]
   refine Finset.sum_congr rfl fun i _ => ?_
   rw [map_zsmul, zsmul_eq_mul, ← NumberField.integralBasis_apply, Rat.smul_def]
@@ -288,8 +313,8 @@ theorem genusCovolBound_discr
   rw [← this]
   ring
 
-theorem genusCovolBound_trace_int (r : 𝓞 K)
-    : ∃ z : ℤ, Algebra.trace ℚ K (algebraMap (𝓞 K) K r) = z := by
+theorem genusCovolBound_trace_int (r : 𝓞 K) :
+    ∃ z : ℤ, Algebra.trace ℚ K (algebraMap (𝓞 K) K r) = z := by
   have hi : IsIntegral ℤ (Algebra.trace ℚ K (algebraMap (𝓞 K) K r)) :=
     Algebra.isIntegral_trace (RingOfIntegers.isIntegral_coe r)
   obtain ⟨z, hz⟩ := IsIntegrallyClosed.isIntegral_iff.mp hi
@@ -329,8 +354,8 @@ theorem genusCovolBound : GenusCovolBound := by
   refine genusCovolBound_covol_le h N ι hι M (d * δ.natAbs ^ 2)
     (Nat.mul_pos hd0 (pow_pos (Int.natAbs_pos.mpr hδ0) 2)) ?_
 
-  have key
-      : ∀ y : V, (∀ x ∈ M, ∃ z : ℤ, Algebra.trace ℚ K (h x y) = z) → (δ : K) • y ∈ dual h M := by
+  have key : ∀ y : V, (∀ x ∈ M, ∃ z : ℤ, Algebra.trace ℚ K (h x y) = z) →
+      (δ : K) • y ∈ dual h M := by
     intro y hy
     simp only [dual, Formalism.E.hdual, Submodule.mem_iInf, Submodule.mem_comap,
       LinearMap.coe_restrictScalars]
@@ -344,7 +369,8 @@ theorem genusCovolBound : GenusCovolBound := by
     rw [← hz, ← algebraMap_smul K s x, LinearMap.map_smulₛₗ, LinearMap.smul_apply, hs',
       starRingEnd_apply, star_star, smul_eq_mul, mul_comm]
   intro y y' hy hy'
-  have hML₀ : M ∈ genus h L₀ := ⟨hM.1, hgenusEquiv.trans (hgenusEquiv.symm hL₀.2) hM.2⟩
+  have hML₀ : M ∈ genus h L₀ :=
+    ⟨hM.1, hgenusEquiv.trans (hgenusEquiv.symm hL₀.2) hM.2⟩
   have hmem := genusCovolBound_dual_genus h hs hnd hstar L₀ hL₀.1.toIsLattice M hML₀
   have h1 := hd (dual h M) hmem _ (key y hy) _ (key y' hy')
   obtain ⟨w, hw⟩ := Submodule.mem_one.mp h1
@@ -354,9 +380,8 @@ theorem genusCovolBound : GenusCovolBound := by
     rw [LinearMap.map_smulₛₗ₂, LinearMap.map_smul, starRingEnd_apply, star_intCast, smul_eq_mul,
       smul_eq_mul]
   rw [← hz, hw, e2]
-  have e
-      : (d : K) * ((δ : K) * ((δ : K) * h y y'))
-        = algebraMap ℚ K (((d * δ.natAbs ^ 2 : ℕ) : ℚ)) * h y y' := by
+  have e : (d : K) * ((δ : K) * ((δ : K) * h y y')) =
+      algebraMap ℚ K (((d * δ.natAbs ^ 2 : ℕ) : ℚ)) * h y y' := by
     have hna : ((δ.natAbs ^ 2 : ℕ) : ℚ) = (δ : ℚ) ^ 2 := by
       push_cast
       simp [sq_abs]

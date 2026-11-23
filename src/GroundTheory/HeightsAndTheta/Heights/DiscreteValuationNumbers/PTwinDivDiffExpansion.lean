@@ -1,8 +1,51 @@
 module
 
-public import Mathlib
 public import GroundTheory.HeightsAndTheta.Heights.DiscreteValuationNumbers.ImportsBisTer
 public import GroundTheory.HeightsAndTheta.Heights.DiscreteValuationNumbers.ClassListMapDomainPerm
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
@@ -14,10 +57,9 @@ open MvPolynomial
 
 namespace dividedDifferenceExpansion
 
-theorem prod_split {M : Type*} [CommMonoid M] {r : ℕ} (l : Fin r) (f : Fin r → M)
-    : ∏ j, f j
-      = (∏ j ∈ Finset.univ.filter (fun j => j < l), f j) * f l
-        * ∏ j ∈ Finset.univ.filter (fun j => l < j), f j := by
+theorem prod_split {M : Type*} [CommMonoid M] {r : ℕ} (l : Fin r) (f : Fin r → M) :
+    ∏ j, f j = (∏ j ∈ Finset.univ.filter (fun j => j < l), f j) * f l *
+      ∏ j ∈ Finset.univ.filter (fun j => l < j), f j := by
   rw [← Finset.prod_filter_mul_prod_filter_not Finset.univ (fun j => j < l),
     ← Finset.prod_filter_mul_prod_filter_not (Finset.univ.filter fun j => ¬ j < l) (fun j => j = l),
     Finset.filter_filter, Finset.filter_filter, mul_assoc]
@@ -43,80 +85,73 @@ noncomputable def stair {r : ℕ} (μ : Fin r →₀ ℕ) (k : ℕ) : MvPolynomi
 theorem stair_zero {r : ℕ} (μ : Fin r →₀ ℕ) : stair μ 0 = ∏ j, X (Sum.inl j) ^ μ j := by
   simp [stair]
 
-theorem stair_top {r : ℕ} (μ : Fin r →₀ ℕ) : stair μ r = ∏ j, X (Sum.inr j) ^ μ j := by simp [stair]
+theorem stair_top {r : ℕ} (μ : Fin r →₀ ℕ) : stair μ r = ∏ j, X (Sum.inr j) ^ μ j := by
+  simp [stair]
 
-theorem term_eq {r : ℕ} (μ : Fin r →₀ ℕ) (l : Fin r)
-    : (X (Sum.inl l) - X (Sum.inr l) : MvPolynomial (Fin r ⊕ Fin r) ℤ)
-        * ((∏ j ∈ Finset.univ.filter (fun j => j < l), X (Sum.inr j) ^ μ j)
-          * (∑ a ∈ Finset.range (μ l), X (Sum.inl l) ^ a * X (Sum.inr l) ^ (μ l - 1 - a))
-          * ∏ j ∈ Finset.univ.filter (fun j => l < j), X (Sum.inl j) ^ μ j)
-      = stair μ l - stair μ (l + 1) := by
-  have hg
-      : (X (Sum.inl l) - X (Sum.inr l) : MvPolynomial (Fin r ⊕ Fin r) ℤ)
-          * (∑ a ∈ Finset.range (μ l), X (Sum.inl l) ^ a * X (Sum.inr l) ^ (μ l - 1 - a))
-        = X (Sum.inl l) ^ μ l - X (Sum.inr l) ^ μ l := by
+theorem term_eq {r : ℕ} (μ : Fin r →₀ ℕ) (l : Fin r) :
+    (X (Sum.inl l) - X (Sum.inr l) : MvPolynomial (Fin r ⊕ Fin r) ℤ) *
+      ((∏ j ∈ Finset.univ.filter (fun j => j < l), X (Sum.inr j) ^ μ j) *
+        (∑ a ∈ Finset.range (μ l), X (Sum.inl l) ^ a * X (Sum.inr l) ^ (μ l - 1 - a)) *
+        ∏ j ∈ Finset.univ.filter (fun j => l < j), X (Sum.inl j) ^ μ j) =
+      stair μ l - stair μ (l + 1) := by
+  have hg : (X (Sum.inl l) - X (Sum.inr l) : MvPolynomial (Fin r ⊕ Fin r) ℤ) *
+      (∑ a ∈ Finset.range (μ l), X (Sum.inl l) ^ a * X (Sum.inr l) ^ (μ l - 1 - a)) =
+      X (Sum.inl l) ^ μ l - X (Sum.inr l) ^ μ l := by
     rw [mul_comm]
     exact geom_sum₂_mul _ _ _
-  have hlo
-      : ∀ k : ℕ,
-        (l : ℕ) ≤ k
-          → ∏ j ∈ Finset.univ.filter (fun j => j < l),
-                (X (if (j : ℕ) < k then Sum.inr j else Sum.inl j) : MvPolynomial (Fin r ⊕ Fin r) ℤ) ^ μ j
-            = ∏ j ∈ Finset.univ.filter (fun j => j < l), X (Sum.inr j) ^ μ j := by
+  have hlo : ∀ k : ℕ, (l : ℕ) ≤ k →
+      ∏ j ∈ Finset.univ.filter (fun j => j < l),
+          (X (if (j : ℕ) < k then Sum.inr j else Sum.inl j) : MvPolynomial (Fin r ⊕ Fin r) ℤ) ^ μ j =
+        ∏ j ∈ Finset.univ.filter (fun j => j < l), X (Sum.inr j) ^ μ j := by
     intro k hk
     refine Finset.prod_congr rfl fun j hj => ?_
     have hj' : (j : ℕ) < l := Fin.lt_def.mp (Finset.mem_filter.mp hj).2
     rw [if_pos (by omega)]
-  have hhi
-      : ∀ k : ℕ,
-        k ≤ (l : ℕ) + 1
-          → ∏ j ∈ Finset.univ.filter (fun j => l < j),
-                (X (if (j : ℕ) < k then Sum.inr j else Sum.inl j) : MvPolynomial (Fin r ⊕ Fin r) ℤ) ^ μ j
-            = ∏ j ∈ Finset.univ.filter (fun j => l < j), X (Sum.inl j) ^ μ j := by
+  have hhi : ∀ k : ℕ, k ≤ (l : ℕ) + 1 →
+      ∏ j ∈ Finset.univ.filter (fun j => l < j),
+          (X (if (j : ℕ) < k then Sum.inr j else Sum.inl j) : MvPolynomial (Fin r ⊕ Fin r) ℤ) ^ μ j =
+        ∏ j ∈ Finset.univ.filter (fun j => l < j), X (Sum.inl j) ^ μ j := by
     intro k hk
     refine Finset.prod_congr rfl fun j hj => ?_
     have hj' : (l : ℕ) < j := Fin.lt_def.mp (Finset.mem_filter.mp hj).2
     rw [if_neg (by omega)]
   unfold stair
-  rw [prod_split l,
-    prod_split l (fun j =>
-      (X (if (j : ℕ) < (l : ℕ) + 1 then Sum.inr j else Sum.inl j) : MvPolynomial (Fin r ⊕ Fin r) ℤ)
-        ^ μ j),
-    hlo l le_rfl, hlo (l + 1) (by omega), hhi l (by omega), hhi (l + 1) le_rfl,
-    if_neg (lt_irrefl _), if_pos (Nat.lt_succ_self _)]
+  rw [prod_split l, prod_split l (fun j => (X (if (j : ℕ) < (l : ℕ) + 1 then Sum.inr j else Sum.inl j) :
+      MvPolynomial (Fin r ⊕ Fin r) ℤ) ^ μ j), hlo l le_rfl, hlo (l + 1) (by omega),
+    hhi l (by omega), hhi (l + 1) le_rfl, if_neg (lt_irrefl _), if_pos (Nat.lt_succ_self _)]
   linear_combination
     ((∏ j ∈ Finset.univ.filter (fun j => j < l), (X (Sum.inr j) : MvPolynomial (Fin r ⊕ Fin r) ℤ) ^ μ j) *
       ∏ j ∈ Finset.univ.filter (fun j => l < j), X (Sum.inl j) ^ μ j) * hg
 
-theorem sum_term_eq {r : ℕ} (μ : Fin r →₀ ℕ)
-    : ∑ l : Fin r, (X (Sum.inl l) - X (Sum.inr l) : MvPolynomial (Fin r ⊕ Fin r) ℤ) *
-        ((∏ j ∈ Finset.univ.filter (fun j => j < l), X (Sum.inr j) ^ μ j) *
-          (∑ a ∈ Finset.range (μ l), X (Sum.inl l) ^ a * X (Sum.inr l) ^ (μ l - 1 - a)) *
-          ∏ j ∈ Finset.univ.filter (fun j => l < j), X (Sum.inl j) ^ μ j)
-      = ∏ j, X (Sum.inl j) ^ μ j - ∏ j, X (Sum.inr j) ^ μ j := by
+theorem sum_term_eq {r : ℕ} (μ : Fin r →₀ ℕ) :
+    ∑ l : Fin r, (X (Sum.inl l) - X (Sum.inr l) : MvPolynomial (Fin r ⊕ Fin r) ℤ) *
+      ((∏ j ∈ Finset.univ.filter (fun j => j < l), X (Sum.inr j) ^ μ j) *
+        (∑ a ∈ Finset.range (μ l), X (Sum.inl l) ^ a * X (Sum.inr l) ^ (μ l - 1 - a)) *
+        ∏ j ∈ Finset.univ.filter (fun j => l < j), X (Sum.inl j) ^ μ j) =
+      ∏ j, X (Sum.inl j) ^ μ j - ∏ j, X (Sum.inr j) ^ μ j := by
   simp_rw [term_eq]
-  rw [Fin.sum_univ_eq_sum_range (fun i => stair μ i - stair μ (i + 1)) r, Finset.sum_range_sub',
-    stair_zero, stair_top]
+  rw [Fin.sum_univ_eq_sum_range (fun i => stair μ i - stair μ (i + 1)) r,
+    Finset.sum_range_sub', stair_zero, stair_top]
 
-theorem rename_eq_sum {r : ℕ} (f : Fin r → Fin r ⊕ Fin r) (G : MvPolynomial (Fin r) ℤ)
-    : rename f G = ∑ μ ∈ G.support, C (G.coeff μ) * ∏ j, X (f j) ^ μ j := by
+theorem rename_eq_sum {r : ℕ} (f : Fin r → Fin r ⊕ Fin r) (G : MvPolynomial (Fin r) ℤ) :
+    rename f G = ∑ μ ∈ G.support, C (G.coeff μ) * ∏ j, X (f j) ^ μ j := by
   conv_lhs => rw [G.as_sum]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+
+  rw [map_sum]
   refine Finset.sum_congr rfl fun μ _ => ?_
   rw [monomial_eq, Finsupp.prod_fintype _ _ (by simp), map_mul, rename_C, map_prod]
   simp [map_pow, rename_X]
 
-theorem rename_divDiff {r : ℕ} (l : Fin r) (G : MvPolynomial (Fin r) ℤ)
-    : rename finSumFinEquiv.symm (IndefiniteRowSideFullHecke.NumbersDVR.Bundles.divDiff l G)
-      = ∑ μ ∈ G.support, C (G.coeff μ) *
-          ((∏ j ∈ Finset.univ.filter (fun j => j < l), X (Sum.inr j) ^ μ j) *
-            (∑ a ∈ Finset.range (μ l), X (Sum.inl l) ^ a * X (Sum.inr l) ^ (μ l - 1 - a)) *
-            ∏ j ∈ Finset.univ.filter (fun j => l < j), X (Sum.inl j) ^ μ j) := by
+theorem rename_divDiff {r : ℕ} (l : Fin r) (G : MvPolynomial (Fin r) ℤ) :
+    rename finSumFinEquiv.symm (IndefiniteRowSideFullHecke.NumbersDVR.Bundles.divDiff l G) =
+      ∑ μ ∈ G.support, C (G.coeff μ) *
+        ((∏ j ∈ Finset.univ.filter (fun j => j < l), X (Sum.inr j) ^ μ j) *
+          (∑ a ∈ Finset.range (μ l), X (Sum.inl l) ^ a * X (Sum.inr l) ^ (μ l - 1 - a)) *
+          ∏ j ∈ Finset.univ.filter (fun j => l < j), X (Sum.inl j) ^ μ j) := by
   unfold IndefiniteRowSideFullHecke.NumbersDVR.Bundles.divDiff
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, map_mul, map_prod, map_pow, rename_X, rename_C,
-      finSumFinEquiv_symm_apply_castAdd, finSumFinEquiv_symm_apply_natAdd]
+
+  simp only [map_sum, map_mul, map_prod, map_pow, rename_X, rename_C,
+  finSumFinEquiv_symm_apply_castAdd, finSumFinEquiv_symm_apply_natAdd]
   refine Finset.sum_congr rfl fun μ _ => ?_
   ring
 
@@ -124,23 +159,21 @@ theorem proof : dividedDifferenceExpansion.Statement := by
   intro r m G hG
   refine ⟨?_, ?_⟩
   · rw [rename_eq_sum, rename_eq_sum, ← Finset.sum_sub_distrib]
-    calc
-      ∑ μ ∈ G.support, (C (G.coeff μ) * ∏ j, X (Sum.inl j) ^ μ j -
-         C (G.coeff μ) * ∏ j, X (Sum.inr j) ^ μ j)
-          = ∑ μ ∈ G.support, ∑ l : Fin r, C (G.coeff μ) *
-              ((X (Sum.inl l) - X (Sum.inr l) : MvPolynomial (Fin r ⊕ Fin r) ℤ) *
-                ((∏ j ∈ Finset.univ.filter (fun j => j < l), X (Sum.inr j) ^ μ j) *
-                  (∑ a ∈ Finset.range (μ l), X (Sum.inl l) ^ a * X (Sum.inr l) ^ (μ l - 1 - a)) *
-                  ∏ j ∈ Finset.univ.filter (fun j => l < j), X (Sum.inl j) ^ μ j)) :=
-        Finset.sum_congr rfl fun μ _ => by rw [← Finset.mul_sum, sum_term_eq, mul_sub]
+    calc ∑ μ ∈ G.support, (C (G.coeff μ) * ∏ j, X (Sum.inl j) ^ μ j -
+            C (G.coeff μ) * ∏ j, X (Sum.inr j) ^ μ j)
+        = ∑ μ ∈ G.support, ∑ l : Fin r, C (G.coeff μ) *
+            ((X (Sum.inl l) - X (Sum.inr l) : MvPolynomial (Fin r ⊕ Fin r) ℤ) *
+              ((∏ j ∈ Finset.univ.filter (fun j => j < l), X (Sum.inr j) ^ μ j) *
+                (∑ a ∈ Finset.range (μ l), X (Sum.inl l) ^ a * X (Sum.inr l) ^ (μ l - 1 - a)) *
+                ∏ j ∈ Finset.univ.filter (fun j => l < j), X (Sum.inl j) ^ μ j)) :=
+          Finset.sum_congr rfl fun μ _ => by rw [← Finset.mul_sum, sum_term_eq, mul_sub]
       _ = ∑ l : Fin r, ∑ μ ∈ G.support, C (G.coeff μ) *
             ((X (Sum.inl l) - X (Sum.inr l) : MvPolynomial (Fin r ⊕ Fin r) ℤ) *
               ((∏ j ∈ Finset.univ.filter (fun j => j < l), X (Sum.inr j) ^ μ j) *
                 (∑ a ∈ Finset.range (μ l), X (Sum.inl l) ^ a * X (Sum.inr l) ^ (μ l - 1 - a)) *
                 ∏ j ∈ Finset.univ.filter (fun j => l < j), X (Sum.inl j) ^ μ j)) :=
-        Finset.sum_comm
-      _ = _ :=
-        Finset.sum_congr rfl fun l _ => by
+          Finset.sum_comm
+      _ = _ := Finset.sum_congr rfl fun l _ => by
           rw [rename_divDiff, Finset.mul_sum]
           exact Finset.sum_congr rfl fun μ _ => by ring
   · intro l
@@ -156,8 +189,8 @@ theorem proof : dividedDifferenceExpansion.Statement := by
         simp [hl]
       rw [h0, map_zero]
       exact isHomogeneous_zero _ _ _
-    · simpa using
-        (BundleExamples.isHomogeneous_divDiff l hG).rename_isHomogeneous (f := finSumFinEquiv.symm)
+    · simpa using (BundleExamples.isHomogeneous_divDiff l hG).rename_isHomogeneous
+        (f := finSumFinEquiv.symm)
 
 end dividedDifferenceExpansion
 

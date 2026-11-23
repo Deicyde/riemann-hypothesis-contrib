@@ -1,8 +1,49 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Definitions.Divisors.IndEtOfForallFinset
 public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.FlatMapMaximalIdealIsSeparable
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Finiteness.ModuleFinitePresentation
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.TotallySplit
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
 
 @[expose] public section
 
@@ -12,20 +53,17 @@ namespace GlobalTheory.LocalIndEtAIC
 
 open Polynomial IsLocalRing
 
-theorem lift_atComap {W O : Type} [CommRing W] [CommRing O] [IsLocalRing O] (v : W →+* O)
-    : ∃ φ : Localization.AtPrime ((maximalIdeal O).comap v) →+* O, ∀ w,
-      φ (algebraMap W _ w) = v w := by
+theorem lift_atComap {W O : Type} [CommRing W] [CommRing O] [IsLocalRing O] (v : W →+* O) :
+    ∃ φ : Localization.AtPrime ((maximalIdeal O).comap v) →+* O,
+      ∀ w, φ (algebraMap W _ w) = v w := by
   have hu : ∀ y : ((maximalIdeal O).comap v).primeCompl, IsUnit (v y) := fun y => by
     by_contra hy
     exact y.2 hy
   exact ⟨IsLocalization.lift hu, fun w => IsLocalization.lift_eq hu w⟩
 
-theorem isDomain_aic_of_indEt
-    : ∀ (T O : Type) [CommRing T] [CommRing O] [IsLocalRing O] [Algebra T O],
-      IndEt T O
-        → (∀ (E : Type) [CommRing E] [Algebra T E] [Algebra.Etale T E] (P : Ideal E) [P.IsPrime],
-          IsDomain (Localization.AtPrime P) ∧ AIC (Localization.AtPrime P))
-        → IsDomain O ∧ AIC O := by
+theorem isDomain_aic_of_indEt : ∀ (T O : Type) [CommRing T] [CommRing O] [IsLocalRing O] [Algebra T O],
+    IndEt T O → (∀ (E : Type) [CommRing E] [Algebra T E] [Algebra.Etale T E] (P : Ideal E) [P.IsPrime],
+      IsDomain (Localization.AtPrime P) ∧ AIC (Localization.AtPrime P)) → IsDomain O ∧ AIC O := by
   intro T O _ _ _ _ h hE
   have hdom : IsDomain O := by
     refine @NoZeroDivisors.to_isDomain O _ _ ⟨fun {x y} hxy => ?_⟩
@@ -43,18 +81,14 @@ theorem isDomain_aic_of_indEt
       have := DFunLike.congr_fun huv (Ideal.Quotient.mkₐ T I (MvPolynomial.X i))
       exact this.trans (MvPolynomial.aeval_X _ i)
     have h0 : w 0 * w 1 = 0 := by
-      have : Ideal.Quotient.mkₐ T I (MvPolynomial.X 0) * Ideal.Quotient.mkₐ T I (MvPolynomial.X 1)
-          = 0 := by
+      have : Ideal.Quotient.mkₐ T I (MvPolynomial.X 0) * Ideal.Quotient.mkₐ T I (MvPolynomial.X 1) = 0 := by
         rw [← map_mul]
         exact Ideal.Quotient.eq_zero_iff_mem.mpr (Ideal.mem_span_singleton_self _)
       simp only [w, ← map_mul, this, map_zero]
     obtain ⟨φ, hφ⟩ := lift_atComap (v : W →+* O)
     haveI := (hE W ((maximalIdeal O).comap (v : W →+* O))).1
-    have hm
-        : algebraMap W (Localization.AtPrime ((maximalIdeal O).comap (v : W →+* O))) (w 0)
-            * algebraMap W _ (w 1)
-          = 0 := by
-      rw [← map_mul, h0, map_zero]
+    have hm : algebraMap W (Localization.AtPrime ((maximalIdeal O).comap (v : W →+* O))) (w 0) *
+        algebraMap W _ (w 1) = 0 := by rw [← map_mul, h0, map_zero]
     rcases mul_eq_zero.mp hm with h1 | h1
     · left
       have e := hφ (w 0)
@@ -83,9 +117,9 @@ theorem isDomain_aic_of_indEt
   have hp'm : p'.Monic := Polynomial.monic_X_pow_add (Polynomial.degree_sum_fin_lt _)
   have hp' : p'.map (v : W →+* O) = p := by
     conv_rhs => rw [hpm.as_sum]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [p', Polynomial.map_add (f := _), Polynomial.map_pow, Polynomial.map_X,
-        Polynomial.map_sum, Polynomial.map_mul, Polynomial.map_C]
+
+    simp only [p', Polynomial.map_add (f := _), Polynomial.map_pow, Polynomial.map_X, Polynomial.map_sum,
+    Polynomial.map_mul, Polynomial.map_C]
     rw [← Fin.sum_univ_eq_sum_range (fun i => C (p.coeff i) * X ^ i)]
     simp [hc]
     rfl
@@ -98,7 +132,8 @@ theorem isDomain_aic_of_indEt
   haveI := (hE W ((maximalIdeal O).comap (v : W →+* O))).1
   have hL := (hE W ((maximalIdeal O).comap (v : W →+* O))).2
   have hmL : (p'.map (algebraMap W L)).Monic := hp'm.map _
-  have hdL : 0 < (p'.map (algebraMap W L)).natDegree := by rw [hp'm.natDegree_map, hp'd]; exact hdeg
+  have hdL : 0 < (p'.map (algebraMap W L)).natDegree := by
+    rw [hp'm.natDegree_map, hp'd]; exact hdeg
   obtain ⟨r, hr⟩ := hL _ hmL hdL
   refine ⟨φ r, ?_⟩
   have hcomp : φ.comp (algebraMap W L) = (v : W →+* O) := RingHom.ext hφ

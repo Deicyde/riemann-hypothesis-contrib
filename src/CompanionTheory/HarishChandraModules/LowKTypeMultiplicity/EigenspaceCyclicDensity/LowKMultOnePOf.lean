@@ -1,7 +1,51 @@
 module
 
 public import CompanionTheory.HarishChandraModules.LowKTypeMultiplicity.EigenspaceCyclicDensity.LowKMultOneP
-public import Formalism.RealPlaceAnalysis.ThirdArithmeticHolds
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Lemma
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -25,30 +69,22 @@ variable {V : Type} [AddCommGroup V] [Module ℂ V]
 theorem evK_allT (E : Fin n → Fin n → Module.End ℂ V) : evK (allT n) E = ev E := by
   simp only [CompanionTheory.D.LK.evK, CompanionTheory.D.LK.ev, CompanionTheory.D.LK.allT, if_true]
 
-theorem evd_eig
-    (F : Fin n → Module.End ℂ V) (τ : Fin n → ℂ) (x : V) (h : ∀ c, F c x = τ c • x)
-    (b : FreeAlgebra ℂ (Fin n))
-    : evd F b x = FreeAlgebra.lift ℂ τ b • x := by
-  refine FreeAlgebra.induction ℂ (Fin n)
-    (fun r => ?_)
-    (fun c => ?_)
-    (fun a b ha hb => ?_)
-    (fun a b ha hb => ?_)
-    b
+theorem evd_eig (F : Fin n → Module.End ℂ V) (τ : Fin n → ℂ) (x : V) (h : ∀ c, F c x = τ c • x)
+    (b : FreeAlgebra ℂ (Fin n)) : evd F b x = FreeAlgebra.lift ℂ τ b • x := by
+  refine FreeAlgebra.induction ℂ (Fin n) (fun r => ?_) (fun c => ?_) (fun a b ha hb => ?_) (fun a b ha hb => ?_) b
   · simp only [AlgHom.commutes, Module.algebraMap_end_apply]
     rfl
   · simp only [CompanionTheory.D.LK.evd, FreeAlgebra.lift_ι_apply, h]
   · rw [map_mul, Module.End.mul_apply, hb, map_smul, ha, map_mul, smul_smul, mul_comm]
   · rw [map_add (f := _), LinearMap.add_apply, ha, hb, map_add (f := _), add_smul]
 
-theorem mem_cyc {E : Fin n → Fin n → Module.End ℂ V} {v w : V}
-    : w ∈ Cyc E v ↔ ∃ a, ev E a v = w := by
+theorem mem_cyc {E : Fin n → Fin n → Module.End ℂ V} {v w : V} : w ∈ Cyc E v ↔ ∃ a, ev E a v = w := by
   unfold CompanionTheory.D.LK.Cyc
   rw [LinearMap.mem_range]
   exact Iff.rfl
 
-theorem cyc_stab {E : Fin n → Fin n → Module.End ℂ V} {v w : V} (c d : Fin n) (h : w ∈ Cyc E v)
-    : E c d w ∈ Cyc E v := by
+theorem cyc_stab {E : Fin n → Fin n → Module.End ℂ V} {v w : V} (c d : Fin n) (h : w ∈ Cyc E v) :
+    E c d w ∈ Cyc E v := by
   obtain ⟨a, rfl⟩ := mem_cyc.1 h
   refine mem_cyc.2 ⟨FreeAlgebra.ι ℂ (c, d) * a, ?_⟩
   rw [map_mul, Module.End.mul_apply]
@@ -56,15 +92,12 @@ theorem cyc_stab {E : Fin n → Fin n → Module.End ℂ V} {v w : V} (c d : Fin
 
 end
 
-theorem multAlg_of
-    (hL : LowSpan) (hH : HWMap) (hD : Dens) (hI : InvLift) (hC : HCdec) (hG : GenCO) (hT : TopCycle)
-    (hJ : Inj)
-    : MultAlg := by
+theorem multAlg_of (hL : LowSpan) (hH : HWMap) (hD : Dens) (hI : InvLift) (hC : HCdec) (hG : GenCO) (hT : TopCycle)
+    (hJ : Inj) : MultAlg := by
   intro n ε lam V _ _ E hlam hGl hU hLF hIM v w hv0 hv hw hwc
   have hKE : CompanionTheory.D.DSIC.KRel ε E := fun a b c d _ _ => hGl a b c d
   obtain ⟨S, hSfd, hSst, hvS⟩ := hLF v
-  obtain ⟨L, hLS, hvL, hLst, hLirr, -, hLuniq⟩ :=
-    hL n ε V E (lowK ε lam) v S hKE hU hv0 hv hSfd hSst hvS
+  obtain ⟨L, hLS, hvL, hLst, hLirr, -, hLuniq⟩ := hL n ε V E (lowK ε lam) v S hKE hU hv0 hv hSfd hSst hvS
   have hLfd : FiniteDimensional ℂ L := Submodule.finiteDimensional_of_le hLS
   let ET : Fin n → Fin n → Module.End ℂ L := fun a b =>
     if h : ε a = ε b then (E a b).restrict (fun x hx => hLst a b h x hx) else 0
@@ -113,8 +146,7 @@ theorem multAlg_of
       rw [hET a b h, ZeroMemClass.coe_zero]
       exact hv.2 a b hab h
   obtain ⟨S2, hS2fd, hS2st, hwS2⟩ := hLF w
-  obtain ⟨φ, hφv, hφ⟩ :=
-    hH n ε L V ET E (lowK ε lam) v' w S2 kET uET hKE hU hv'0 hv' hw hS2fd hS2st hwS2
+  obtain ⟨φ, hφv, hφ⟩ := hH n ε L V ET E (lowK ε lam) v' w S2 kET uET hKE hU hv'0 hv' hw hS2fd hS2st hwS2
   have hφc : ∀ s : L, φ s ∈ Cyc E v := by
     let L' : Submodule ℂ V := Submodule.map L.subtype ((Cyc E v).comap φ)
     have hL'L : L' ≤ L := by
@@ -142,7 +174,8 @@ theorem multAlg_of
   have hcomm : ∀ c d, ε c = ε d → ∀ s ∈ L, E c d (ev E a s) = ev E a (E c d s) := by
     intro c d h s hs
     have e1 : ev E a s = φ ⟨s, hs⟩ := ha ⟨s, hs⟩
-    have e2 : ev E a (E c d s) = φ (ET c d ⟨s, hs⟩) := by rw [← ha (ET c d ⟨s, hs⟩), hET c d h]
+    have e2 : ev E a (E c d s) = φ (ET c d ⟨s, hs⟩) := by
+      rw [← ha (ET c d ⟨s, hs⟩), hET c d h]
     rw [e1, e2, hφ c d h]
   obtain ⟨a', ha'inv, ha'⟩ := hI n ε V E L a hGl hLst hcomm
   have hwa : ev E a' v = w := by
@@ -151,45 +184,31 @@ theorem multAlg_of
   obtain ⟨b, hb⟩ := hC n a' (fun V' _ _ E' hGl' c => ha'inv V' E' hGl' c c rfl)
   obtain ⟨-, hTop⟩ := hT n ε V E (lowK ε lam) v
   obtain ⟨hbd0, hWt⟩ := hTop hv
-  have hfilt
-      : ∀ A : Finset (CompanionTheory.D.LK.Pos n),
-        Pi.single (M := fun _ => V) (CompanionTheory.D.LK.om ε) v A ≠ 0
-          → A = CompanionTheory.D.LK.om ε := by
+  have hfilt : ∀ A : Finset (CompanionTheory.D.LK.Pos n), Pi.single (M := fun _ => V) (CompanionTheory.D.LK.om ε) v A ≠ 0 → A = CompanionTheory.D.LK.om ε := by
     intro A hA
     by_contra hne
     apply hA
     rw [Pi.single_apply, if_neg hne]
-  have hSup : CompanionTheory.D.LK.Sup (CompanionTheory.D.LK.allT n) ∅
-      (CompanionTheory.D.LK.om ε).card (Pi.single (CompanionTheory.D.LK.om ε) v) := by
+  have hSup : CompanionTheory.D.LK.Sup (CompanionTheory.D.LK.allT n) ∅ (CompanionTheory.D.LK.om ε).card (Pi.single (CompanionTheory.D.LK.om ε) v) := by
     intro A hA
     rw [hfilt A hA]
     refine ⟨Finset.filter_false_of_mem (fun i _ hi => hi rfl), ?_⟩
     rw [Finset.filter_true_of_mem (fun i _ => rfl)]
-  have hRef : CompanionTheory.D.LK.Ref (CompanionTheory.D.LK.allT n) ε
-      (Pi.single (CompanionTheory.D.LK.om ε) v) := by
+  have hRef : CompanionTheory.D.LK.Ref (CompanionTheory.D.LK.allT n) ε (Pi.single (CompanionTheory.D.LK.om ε) v) := by
     intro A hA i hi _
     rw [hfilt A hA] at hi
     exact (Finset.mem_filter.1 hi).2
-  obtain ⟨y, hySup, hy⟩ :=
-    hG n (CompanionTheory.D.LK.allT n) ε a' b
-      (fun _ _ _ => rfl)
-      (fun V' _ _ E' hK' => by
-        have hGl' : GlRel E' := fun a b c d => hK' a b c d rfl rfl
-        rw [evK_allT]
-        exact ⟨fun i hi => ha'inv V' E' hGl' _ _ hi, fun x => hb V' E' hGl' x⟩)
-      V E
-      (fun a b c d _ _ => hGl a b c d)
-      ∅ _ _ hSup hRef hbd0
+  obtain ⟨y, hySup, hy⟩ := hG n (CompanionTheory.D.LK.allT n) ε a' b (fun _ _ _ => rfl)
+    (fun V' _ _ E' hK' => by
+      have hGl' : GlRel E' := fun a b c d => hK' a b c d rfl rfl
+      rw [evK_allT]
+      exact ⟨fun i hi => ha'inv V' E' hGl' _ _ hi, fun x => hb V' E' hGl' x⟩)
+    V E (fun a b c d _ _ => hGl a b c d) ∅ _ _ hSup hRef hbd0
   rw [evK_allT] at hy
-  have hev
-      : CompanionTheory.D.LK.evd (CompanionTheory.D.LK.Ft (CompanionTheory.D.LK.allT n) E) b
-          (Pi.single (CompanionTheory.D.LK.om ε) v)
-        = FreeAlgebra.lift ℂ (fun c => (((lowK ε lam + (2 : ℝ) • rhoC ε) c : ℝ) : ℂ)) b
-          • Pi.single (CompanionTheory.D.LK.om ε) v :=
+  have hev : CompanionTheory.D.LK.evd (CompanionTheory.D.LK.Ft (CompanionTheory.D.LK.allT n) E) b (Pi.single (CompanionTheory.D.LK.om ε) v)
+      = FreeAlgebra.lift ℂ (fun c => (((lowK ε lam + (2 : ℝ) • rhoC ε) c : ℝ) : ℂ)) b • Pi.single (CompanionTheory.D.LK.om ε) v :=
     evd_eig _ _ _ (fun c => hWt c) b
-  have hlift
-      : CompanionTheory.D.LK.lift n (ev E a') (Pi.single (CompanionTheory.D.LK.om ε) v)
-        = Pi.single (CompanionTheory.D.LK.om ε) w := by
+  have hlift : CompanionTheory.D.LK.lift n (ev E a') (Pi.single (CompanionTheory.D.LK.om ε) v) = Pi.single (CompanionTheory.D.LK.om ε) w := by
     funext A
     rw [CompanionTheory.D.LK.lift_apply]
     by_cases hA : A = CompanionTheory.D.LK.om ε
@@ -231,8 +250,7 @@ private lemma commute_E_cas_of_glRel {A : Type} [Ring A] {n : ℕ} (E : Fin n �
   rw [hsplit, T1, T2, T3, T4]
   abel
 
-theorem lowKMultOneP_of (hM : MultAlg) (hE : KModExists) (hD : CycDense) (hO : OrthCyc)
-    : LowKMultOneP := by
+theorem lowKMultOneP_of (hM : MultAlg) (hE : KModExists) (hD : CycDense) (hO : OrthCyc) : LowKMultOneP := by
   intro N ε lam H _ _ σ hHC hDS S S' hS hS'
   obtain ⟨hcomp, -, hUR, hIR, -, -, hmin⟩ := hDS
   haveI := hcomp
@@ -253,15 +271,12 @@ theorem lowKMultOneP_of (hM : MultAlg) (hE : KModExists) (hD : CycDense) (hO : O
     fun w hw hwc => hM N ε lam D E hHC.1 hGl hU hLF hIM v w hv0 hv hw hwc
   have hcv : KHighest ε E (lowK ε lam) (Cas E v) := by
     refine ⟨fun a => ?_, fun a b hab h => ?_⟩
-    · rw [← Module.End.mul_apply, commute_E_cas_of_glRel E hGl a a, Module.End.mul_apply, hv.1 a,
-        map_smul]
-    · rw [← Module.End.mul_apply, commute_E_cas_of_glRel E hGl a b, Module.End.mul_apply,
-        hv.2 a b hab h, map_zero]
+    · rw [← Module.End.mul_apply, commute_E_cas_of_glRel E hGl a a, Module.End.mul_apply, hv.1 a, map_smul]
+    · rw [← Module.End.mul_apply, commute_E_cas_of_glRel E hGl a b, Module.End.mul_apply, hv.2 a b hab h, map_zero]
   have hcc : Cas E v ∈ Cyc E v := by
     refine mem_cyc.2 ⟨∑ a, ∑ b, FreeAlgebra.ι ℂ (a, b) * FreeAlgebra.ι ℂ (b, a), ?_⟩
-    set_option synthInstance.maxHeartbeats 100000 in
-    simp only [CompanionTheory.D.LK.ev, map_sum, map_mul, FreeAlgebra.lift_ι_apply,
-      Formalism.REAL.Cas]
+
+    simp only [CompanionTheory.D.LK.ev, map_sum, map_mul, FreeAlgebra.lift_ι_apply, Formalism.REAL.Cas]
   obtain ⟨c, hc⟩ := hmult _ hcv hcc
   have hdense := hD N ε H σ D E hUR hIR hK v c hv0 hc
   set u : D := inner ℂ v v • v' - inner ℂ v v' • v with hu_def
@@ -269,8 +284,7 @@ theorem lowKMultOneP_of (hM : MultAlg) (hE : KModExists) (hD : CycDense) (hO : O
     refine ⟨fun a => ?_, fun a b hab h => ?_⟩
     · rw [hu_def, map_sub, map_smul, map_smul, hv'.1 a, hv.1 a, smul_sub, smul_smul, smul_smul,
         smul_smul, smul_smul, mul_comm (inner ℂ v v), mul_comm (inner ℂ v v')]
-    · rw [hu_def, map_sub, map_smul, map_smul, hv'.2 a b hab h, hv.2 a b hab h, smul_zero,
-        smul_zero, sub_zero]
+    · rw [hu_def, map_sub, map_smul, map_smul, hv'.2 a b hab h, hv.2 a b hab h, smul_zero, smul_zero, sub_zero]
   have horth0 : inner ℂ v u = 0 := by
     rw [hu_def, inner_sub_right, inner_smul_right, inner_smul_right]
     ring
@@ -291,8 +305,8 @@ theorem lowKMultOneP_of (hM : MultAlg) (hE : KModExists) (hD : CycDense) (hO : O
       rw [mul_smul, ← heq, smul_smul, inv_mul_cancel₀ hvv, one_smul]
     rw [e, Submodule.coe_smul]
     exact S.smul_mem _ hvS
-  have hinf : PI.UpqRep.IsKStableOn ε σ (S ⊓ S') := fun g hg x hx =>
-    ⟨hS.2.1 g hg x hx.1, hS'.2.1 g hg x hx.2⟩
+  have hinf : PI.UpqRep.IsKStableOn ε σ (S ⊓ S') :=
+    fun g hg x hx => ⟨hS.2.1 g hg x hx.1, hS'.2.1 g hg x hx.2⟩
   have hvne : (v : H) ≠ 0 := fun h0 => hv0 (Subtype.ext h0)
   have hv'ne : (v' : H) ≠ 0 := fun h0 => hv'0 (Subtype.ext h0)
   rcases hS.2.2.1 (S ⊓ S') inf_le_left hinf with h | h

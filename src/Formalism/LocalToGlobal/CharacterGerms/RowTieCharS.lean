@@ -1,8 +1,55 @@
 module
 
+public import Formalism.LocalToGlobal.CharacterGerms.MfactMulCoeffMvExpLinF
+public import Formalism.LocalToGlobal.CharacterGerms.RowTieChar
+public import Formalism.LocalToGlobal.CharacterGerms.RowTieSelf
+public import Formalism.DropLevelBounds.ConstantCoeffVanishing.UbintConstantCoeffEqZero
+public import Formalism.LocalToGlobal.CharacterGerms.AbstractGermZeroCondition
 public import Formalism.LocalToGlobal.CharacterGerms.ChartHypothesisOfCharacters
+public import Formalism.LocalToGlobal.CharacterGerms.ConstantCoeffPderivUncurry
+import Formalism.LocalToGlobal.CharacterGerms.ConstantCoeffSinglePointZero
+public import Formalism.LocalToGlobal.CharacterGerms.IntSProd
+import Formalism.LocalToGlobal.CharacterGerms.RowTieCartAdd
+import Formalism.LocalToGlobal.CharacterGerms.SubstSubst
 public import Formalism.LocalToGlobal.CharacterGerms.UncurryLogConstantCoeff
-public import Formalism.LocalToGlobal.CharacterGerms.SelfConjugateRowData
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+public import Formalism.LocalToGlobal.CharacterGerms.GeneralGermZero
 
 @[expose] public section
 
@@ -17,68 +64,53 @@ namespace Formalism.L2.FormalSeriesBounds
 
 open Formalism.IncomingBounds ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ
 
-variable
-  {C : Type} [Field C] [CharZero C]
-  {V : VF C} {O : Type} [CommRing O] [StarRing O]
-  {dd : ℕ} {d : ℕ} {I0 : Type} [Fintype I0]
+variable {C : Type} [Field C] [CharZero C] {V : VF C} {O : Type} [CommRing O] [StarRing O] {dd : ℕ} {d : ℕ}
+  {I0 : Type} [Fintype I0]
 
-def SelfData.yOf
-    {Y : FBChart C V O dd} (p : SelfData Y d I0) (g : Fin 2) (χ : Fin 2 → PS C 1 dd) (x : I0)
-    : C :=
+def SelfData.yOf {Y : FBChart C V O dd} (p : SelfData Y d I0) (g : Fin 2) (χ : Fin 2 → PS C 1 dd) (x : I0) : C :=
   ∑ col, ∑ i, dlogC (χ col) i * (Y.rawSelf p).u g x (col, i)
 
 def CharGermSelfSt : Prop :=
   ∀ (C : Type) [Field C] [CharZero C] (V : VF C) (O : Type) [CommRing O] [StarRing O] (dd : ℕ)
-      (Y : FBChart C V O dd) (d : ℕ) [NeZero d] (I0 : Type) [Fintype I0] (p : SelfData Y d I0)
-      (Hc : ∀ g, (Y.rawSelf p).CartHyp V g) (χ : Fin 2 → PS C 1 dd),
-    (∀ col, Y.IsChar (χ col))
-      → ∀ (g : Fin 2) (S : ∀ g, Sys (RawChart.cart (Hc g)))
-          (t : ∀ _ : Fin 2, I0 → MvPowerSeries I0 C),
-        (∀ g, (S g).IsT (t g))
-          → upG
-              (I := fun _ => I0)
-              g (mvExp (∑ x : I0, p.yOf g χ x • (MvPowerSeries.X x : MvPowerSeries I0 C)))
-            ∈ IntGerm V t
+    (Y : FBChart C V O dd) (d : ℕ) [NeZero d] (I0 : Type) [Fintype I0] (p : SelfData Y d I0)
+    (Hc : ∀ g, (Y.rawSelf p).CartHyp V g) (χ : Fin 2 → PS C 1 dd), (∀ col, Y.IsChar (χ col)) →
+    ∀ (g : Fin 2) (S : ∀ g, Sys (RawChart.cart (Hc g))) (t : ∀ _ : Fin 2, I0 → MvPowerSeries I0 C),
+      (∀ g, (S g).IsT (t g)) →
+      upG (I := fun _ => I0) g (mvExp (∑ x : I0, p.yOf g χ x • (MvPowerSeries.X x : MvPowerSeries I0 C))) ∈ IntGerm V t
 
 namespace ChG
 
 open VP
 
-theorem subst_linU_linF {ι : Type} [Fintype ι] (U : ι → Fin dd → C) (y : Fin dd → C)
-    : MvPowerSeries.subst (fun i => ∑ c, U c i • (MvPowerSeries.X c : MvPowerSeries ι C)) (linF y)
-      = ∑ x : ι, (∑ i, y i * U x i) • (MvPowerSeries.X x : MvPowerSeries ι C) := by
-  have ha
-      : MvPowerSeries.HasSubst (fun i => ∑ c, U c i • (MvPowerSeries.X c : MvPowerSeries ι C)) :=
+theorem subst_linU_linF {ι : Type} [Fintype ι] (U : ι → Fin dd → C) (y : Fin dd → C) :
+    MvPowerSeries.subst (fun i => ∑ c, U c i • (MvPowerSeries.X c : MvPowerSeries ι C)) (linF y) =
+      ∑ x : ι, (∑ i, y i * U x i) • (MvPowerSeries.X x : MvPowerSeries ι C) := by
+  have ha : MvPowerSeries.HasSubst (fun i => ∑ c, U c i • (MvPowerSeries.X c : MvPowerSeries ι C)) :=
     VP.hs (fun i => by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum]
+
+      rw [map_sum]
       refine Finset.sum_eq_zero fun c _ => ?_
       rw [MvPowerSeries.smul_eq_C_mul, map_mul, MvPowerSeries.constantCoeff_X, mul_zero])
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [linF, ← MvPowerSeries.coe_substAlgHom ha, map_sum]
+
+  rw [linF, ← MvPowerSeries.coe_substAlgHom ha, map_sum]
   simp only [map_smul, MvPowerSeries.coe_substAlgHom, MvPowerSeries.subst_X ha]
   simp only [Finset.smul_sum, smul_smul, Finset.sum_smul]
   rw [Finset.sum_comm]
 
-theorem cc_linU {ι κ : Type} [Fintype ι] (U : ι → κ → C) (i : κ)
-    : MvPowerSeries.constantCoeff (∑ c, U c i • (MvPowerSeries.X c : MvPowerSeries ι C)) = 0 := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+theorem cc_linU {ι κ : Type} [Fintype ι] (U : ι → κ → C) (i : κ) :
+    MvPowerSeries.constantCoeff (∑ c, U c i • (MvPowerSeries.X c : MvPowerSeries ι C)) = 0 := by
+
+  rw [map_sum]
   refine Finset.sum_eq_zero fun c _ => ?_
   rw [MvPowerSeries.smul_eq_C_mul, map_mul, MvPowerSeries.constantCoeff_X, mul_zero]
 
 end ChG
 
-theorem SelfData.yOf_int
-    {Y : FBChart C V O dd} (p : SelfData Y d I0)
-    (g : Fin 2)
-    {χ : Fin 2 → PS C 1 dd} (h : ∀ col, Y.IsChar (χ col))
-    (x : I0)
-    : V.Ge 0 (p.yOf g χ x) := by
-  have hsum
-      : ∀ {ι : Type} (s : Finset ι) (f : ι → C),
-        (∀ i ∈ s, V.Ge 0 (f i)) → V.Ge 0 (∑ i ∈ s, f i) := fun s f hf =>
-    Finset.sum_induction f (fun z => V.Ge 0 z) (fun _ _ ha hb => VF.Ge.add ha hb) (VF.Ge.zero 0) hf
+theorem SelfData.yOf_int {Y : FBChart C V O dd} (p : SelfData Y d I0) (g : Fin 2) {χ : Fin 2 → PS C 1 dd}
+    (h : ∀ col, Y.IsChar (χ col)) (x : I0) : V.Ge 0 (p.yOf g χ x) := by
+  have hsum : ∀ {ι : Type} (s : Finset ι) (f : ι → C), (∀ i ∈ s, V.Ge 0 (f i)) → V.Ge 0 (∑ i ∈ s, f i) :=
+    fun s f hf => Finset.sum_induction f (fun z => V.Ge 0 z) (fun _ _ ha hb => VF.Ge.add ha hb)
+      (VF.Ge.zero 0) hf
   have hgm : ∀ a r s, V.Ge 0 (p.gm a r s) := by
     intro a r s
     obtain ⟨M, hM⟩ := p.gm_lim 0
@@ -93,33 +125,19 @@ theorem SelfData.yOf_int
 open ChG VP in
 theorem charGermSelf_holds : CharGermSelfSt := by
   intro C _ _ V O _ _ dd Y d _ I0 _ p Hc χ hχ g S t ht
-  obtain ⟨P, hP0, hPI, -, hPt⟩ :=
-    GeneralGermZero.sysK_P (Y.rawSelf p) (SelfConjugateGermZero.lawS Y)
-      (SelfConjugateGermZero.lawS_const Y) (SelfConjugateGermZero.lawS_int Y)
-      (SelfConjugateGermZero.lgS_add Y p) (SelfConjugateGermZero.lgS_lin Y p)
-      (SelfConjugateGermZero.exS_lg Y p) (Hc g) (S g)
+  obtain ⟨P, hP0, hPI, -, hPt⟩ := GeneralGermZero.sysK_P (Y.rawSelf p) (SelfConjugateGermZero.lawS Y) (SelfConjugateGermZero.lawS_const Y) (SelfConjugateGermZero.lawS_int Y)
+    (SelfConjugateGermZero.lgS_add Y p) (SelfConjugateGermZero.lgS_lin Y p) (SelfConjugateGermZero.exS_lg Y p) (Hc g) (S g)
   have ht0 : ∀ g c, MvPowerSeries.constantCoeff (t g c) = 0 := fun g c => (ht g).1 c
   set U : I0 → Fin 2 × Fin dd → C := fun c' i => (Y.rawSelf p).u g c' i with hU
   set γ0 : MvPowerSeries I0 C := ∏ col : Fin 2, MvPowerSeries.subst (fun i => P (col, i)) (un1 (χ col)) with hγ0
-  have hI : IntS V γ0 :=
-    IntS_prod _ fun col _ =>
-      IntS.subst
-        (fun i => hP0 (col, i))
-        (fun i => hPI (col, i))
-        (integralSeries_uncurry_one (hχ col).1)
-  have hcol
-      : ∀ col : Fin 2,
-        MvPowerSeries.subst (t g) (MvPowerSeries.subst (fun i => P (col, i)) (un1 (χ col)))
-          = mvExp
-            (∑ x : I0, (∑ i, dlogC (χ col) i * U x (col, i)) • (MvPowerSeries.X x : MvPowerSeries I0 C)) := by
+  have hI : IntS V γ0 := IntS_prod _ fun col _ =>
+    IntS.subst (fun i => hP0 (col, i)) (fun i => hPI (col, i)) (integralSeries_uncurry_one (hχ col).1)
+  have hcol : ∀ col : Fin 2, MvPowerSeries.subst (t g) (MvPowerSeries.subst (fun i => P (col, i)) (un1 (χ col))) =
+      mvExp (∑ x : I0, (∑ i, dlogC (χ col) i * U x (col, i)) • (MvPowerSeries.X x : MvPowerSeries I0 C)) := by
     intro col
     rw [subst_subst (fun i => hP0 (col, i)) (ht0 g)]
-    have h1
-        : (fun i => MvPowerSeries.subst (t g) (P (col, i)))
-          = fun i =>
-            MvPowerSeries.subst
-              (fun k : Fin dd => ∑ c', U c' (col, k) • (MvPowerSeries.X c' : MvPowerSeries I0 C))
-              (e Y i) := by
+    have h1 : (fun i => MvPowerSeries.subst (t g) (P (col, i))) = fun i =>
+        MvPowerSeries.subst (fun k : Fin dd => ∑ c', U c' (col, k) • (MvPowerSeries.X c' : MvPowerSeries I0 C)) (e Y i) := by
       funext i
       rw [hPt (t g) (ht g) (col, i)]
       show MvPowerSeries.subst (fun k : Fin 2 × Fin dd => ∑ c', U c' k • (MvPowerSeries.X c' : MvPowerSeries I0 C))
@@ -133,12 +151,10 @@ theorem charGermSelf_holds : CharGermSelfSt := by
     show MvPowerSeries.subst _ (Psi Y (χ col)) = _
     rw [chi_exp Y (hχ col), subst_exp (fun k => cc_linU U (col, k)) (constantCoeff_linF _),
       subst_linU_linF (fun c' k => U c' (col, k))]
-  have key
-      : MvPowerSeries.subst (t g) γ0
-        = mvExp (∑ x : I0, p.yOf g χ x • (MvPowerSeries.X x : MvPowerSeries I0 C)) := by
+  have key : MvPowerSeries.subst (t g) γ0 =
+      mvExp (∑ x : I0, p.yOf g χ x • (MvPowerSeries.X x : MvPowerSeries I0 C)) := by
     rw [hγ0, subst_prod (ht0 g), Finset.prod_congr rfl fun col _ => hcol col,
-      ← Formalism.UnitaryBoundIntegral.ubint_mvExp_sum Finset.univ _
-        (fun col _ => cc_linU (fun x (_ : Unit) => ∑ i, dlogC (χ col) i * U x (col, i)) ()),
+      ← Formalism.UnitaryBoundIntegral.ubint_mvExp_sum Finset.univ _ (fun col _ => cc_linU (fun x (_ : Unit) => ∑ i, dlogC (χ col) i * U x (col, i)) ()),
       Finset.sum_comm]
     congr 1
     refine Finset.sum_congr rfl fun x _ => ?_
@@ -150,11 +166,9 @@ theorem charGermSelf_holds : CharGermSelfSt := by
 
 section Chart
 
-open Formalism.L2.Pj NumberField ReciprocityTheory.ChartRestriction.G
-  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open Formalism.L2.Pj NumberField ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor
 
-variable
-  {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {Dw : Datum H} {l : Level H}
+variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {Dw : Datum H} {l : Level H}
 variable (Xo : Moduli Dw l) (c : Coeff l) [StarRing (𝓞 E)]
 
 end Chart

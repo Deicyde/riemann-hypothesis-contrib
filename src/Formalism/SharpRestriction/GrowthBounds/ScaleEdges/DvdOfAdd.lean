@@ -1,6 +1,59 @@
 module
 
-public import Mathlib
+public import Mathlib.Algebra.Module.Pi
+public import Mathlib.RingTheory.Ideal.Span
+public import Mathlib.RingTheory.LocalRing.Defs
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
+public import Mathlib.Algebra.BigOperators.GroupWithZero.Action
+public import Mathlib.Data.Finsupp.Single
+public import Mathlib.LinearAlgebra.Basis.Defs
+public import Mathlib.LinearAlgebra.FreeModule.PID
+public import Mathlib.RingTheory.Ideal.BigOperators
+public import Mathlib.RingTheory.LocalRing.MaximalIdeal.Basic
 
 @[expose] public section
 
@@ -8,13 +61,9 @@ namespace Formalism.MainNotions.Pf14
 
 open Module
 
-theorem smith_mem
-    {O : Type*} [CommRing O] [IsDomain O] [IsPrincipalIdealRing O] [IsLocalRing O]
-    {I : Type*} [Fintype I]
-    (S : Submodule O (I → O)) (a : O)
-    (h : ∀ φ : I → O, (∃ i, IsUnit (φ i)) → ∃ s ∈ S, (∑ i, φ i * s i) ∣ a)
-    (x : I → O)
-    : a • x ∈ S := by
+theorem smith_mem {O : Type*} [CommRing O] [IsDomain O] [IsPrincipalIdealRing O] [IsLocalRing O]
+    {I : Type*} [Fintype I] (S : Submodule O (I → O)) (a : O)
+    (h : ∀ φ : I → O, (∃ i, IsUnit (φ i)) → ∃ s ∈ S, (∑ i, φ i * s i) ∣ a) (x : I → O) : a • x ∈ S := by
   classical
   obtain ⟨n, snf⟩ := S.smithNormalForm (Pi.basisFun O I)
   have key : ∀ j, a • snf.bM j ∈ S := by
@@ -24,7 +73,7 @@ theorem smith_mem
       intro y
       conv_rhs => rw [show y = ∑ i, y i • Pi.single i (1 : O) by
         ext k; simp [Finset.sum_apply, Pi.single_apply]]
-      set_option synthInstance.maxHeartbeats 100000 in
+
       simp only [map_sum, map_smul, smul_eq_mul, hφdef, mul_comm]
     have hprim : ∃ i, IsUnit (φ i) := by
       by_contra hne
@@ -42,11 +91,10 @@ theorem smith_mem
       have := congrArg Subtype.val (snf.bN.sum_repr ⟨s, hs⟩)
       simp only [Submodule.coe_sum, Submodule.coe_smul, snf.snf] at this
       exact this.symm
-    have hc
-        : snf.bM.coord j s
-          = ∑ k, snf.bN.repr ⟨s, hs⟩ k * snf.a k * (if snf.f k = j then 1 else 0) := by
+    have hc : snf.bM.coord j s =
+        ∑ k, snf.bN.repr ⟨s, hs⟩ k * snf.a k * (if snf.f k = j then 1 else 0) := by
       conv_lhs => rw [hs']
-      set_option synthInstance.maxHeartbeats 100000 in
+
       simp [map_sum, map_smul, Finsupp.single_apply, mul_assoc]
     by_cases hj : ∃ k, snf.f k = j
     · obtain ⟨k0, rfl⟩ := hj
@@ -57,8 +105,7 @@ theorem smith_mem
           simp [snf.f.injective.ne hk]
         · simp
       rw [hc0] at hsd
-      obtain ⟨t, ht⟩ :=
-        (Dvd.intro_left _ rfl : snf.a k0 ∣ snf.bN.repr ⟨s, hs⟩ k0 * snf.a k0).trans hsd
+      obtain ⟨t, ht⟩ := (Dvd.intro_left _ rfl : snf.a k0 ∣ snf.bN.repr ⟨s, hs⟩ k0 * snf.a k0).trans hsd
       rw [ht, mul_comm, mul_smul, ← snf.snf k0]
       exact S.smul_mem t (snf.bN k0).2
     · push_neg at hj
@@ -72,20 +119,19 @@ theorem smith_mem
   rw [smul_comm]
   exact S.smul_mem _ (key j)
 
-theorem dvd_of_add
-    {O : Type*} [CommRing O] [IsLocalRing O]
-    (π : O) (hπ : ¬ IsUnit π)
-    (D : ℕ) (a z : O) (ha : a ∣ π ^ D)
-    : (a + π ^ (D + 1) * z) ∣ π ^ D := by
+theorem dvd_of_add {O : Type*} [CommRing O] [IsLocalRing O] (π : O) (hπ : ¬ IsUnit π) (D : ℕ) (a z : O)
+    (ha : a ∣ π ^ D) : (a + π ^ (D + 1) * z) ∣ π ^ D := by
   obtain ⟨c, hc⟩ := ha
   have hu : IsUnit (1 + π * c * z) := by
     by_contra h1
     have hm : π * c * z ∈ IsLocalRing.maximalIdeal O :=
       Ideal.mul_mem_right _ _ (Ideal.mul_mem_right _ _ ((IsLocalRing.mem_maximalIdeal _).2 hπ))
     have h2 : 1 + π * c * z ∈ IsLocalRing.maximalIdeal O := (IsLocalRing.mem_maximalIdeal _).2 h1
-    have h3 : (1 : O) ∈ IsLocalRing.maximalIdeal O := by simpa using Ideal.sub_mem _ h2 hm
+    have h3 : (1 : O) ∈ IsLocalRing.maximalIdeal O := by
+      simpa using Ideal.sub_mem _ h2 hm
     exact (IsLocalRing.maximalIdeal.isMaximal O).ne_top ((Ideal.eq_top_iff_one _).2 h3)
-  have hx : a + π ^ (D + 1) * z = a * (1 + π * c * z) := by rw [pow_succ, hc]; ring
+  have hx : a + π ^ (D + 1) * z = a * (1 + π * c * z) := by
+    rw [pow_succ, hc]; ring
   rw [hx, hu.mul_right_dvd]
   exact ⟨c, hc⟩
 

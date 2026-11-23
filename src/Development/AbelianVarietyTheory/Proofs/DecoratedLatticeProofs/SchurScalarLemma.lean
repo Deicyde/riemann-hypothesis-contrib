@@ -1,12 +1,57 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.PeriodSingle
-public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.MovedReadingSameMapsBaseReadingAgrees
-public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.ExistsCoefficientVectorReadingRealRepresentation
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.IsDefiniteOfAllPlus
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsCoefDualPair
+public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.BrgStdR
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ColLieApply
+public import Formalism.LocalToGlobal.Columns.PolyFn
+import Development.AbelianVarietyTheory.Proofs.HeightProofs.AtPlaceIffEqAtTau
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.FiniteSmoothIrreducible
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.IsDefiniteOfAllPlus
+public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.TrueChainComplexFormsStabiliserLaw
+import Development.AbelianVarietyTheory.Proofs.TwistedOperators.FiniteDimensionalModel
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.MemClosureUnitary
+import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.AdelicUnitaryEqRealMulFiniteSplit
+import Formalism.LocalToGlobal.Columns.PolyFnLemmas
+import Formalism.LocalToGlobal.Divisibility.CoefModLemmas
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.LinearAlgebra.Eigenspace.Triangularizable
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Development.AbelianVarietyTheory.Definitions.GlobalTwisting.ValidForConstructedPointClassesEventuallyWorking
+import Development.AbelianVarietyTheory.Definitions.LatticeFrames.MiStarOfMid
+import Development.AbelianVarietyTheory.Definitions.LatticeFrames.UnitRatio
 
 @[expose] public section
 
@@ -39,8 +84,8 @@ theorem exists_ext
     : ∃ c' : VV ℂ lam →ₗ[ℂ] W, ∀ w, c' (bcVV σ lam w) = c w := by
   let b := Module.Basis.mk (bcVV_indep σ lam) (bcVV_span σ lam).ge
   refine ⟨b.constr ℂ fun i => c (bVV K lam i), fun w => ?_⟩
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [← (bVV K lam).sum_repr w, map_sum, map_sum, map_sum]
+
+  rw [← (bVV K lam).sum_repr w, map_sum, map_sum, map_sum]
   refine Finset.sum_congr rfl fun i _ => ?_
   have e : bcVV σ lam (bVV K lam i) = b i :=
     (Module.Basis.mk_apply (bcVV_indep σ lam) (bcVV_span σ lam).ge i).symm

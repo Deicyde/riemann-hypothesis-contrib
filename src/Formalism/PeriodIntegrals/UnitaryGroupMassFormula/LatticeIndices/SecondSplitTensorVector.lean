@@ -1,7 +1,48 @@
 module
 
-public import Mathlib
 public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.LatticeIndices.StRedCore
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -11,17 +52,14 @@ namespace MassDataIdxCore
 
 open Matrix
 
-variable
-  {K T : Type} [Field K] [CommRing T] [Algebra K T]
-  (O : ValuationSubring K)
-  {n : Type} [Fintype n] [DecidableEq n]
+variable {K T : Type} [Field K] [CommRing T] [Algebra K T] (O : ValuationSubring K) {n : Type} [Fintype n]
+  [DecidableEq n]
 
 def IntV (v : n → K) : Prop := ∀ i, v i ∈ O
 
 def IntM (M : Matrix n n K) : Prop := ∀ i j, M i j ∈ O
 
-theorem intV_mulVec {M : Matrix n n K} {v : n → K} (hM : IntM O M) (hv : IntV O v)
-    : IntV O (M *ᵥ v) := fun i => by
+theorem intV_mulVec {M : Matrix n n K} {v : n → K} (hM : IntM O M) (hv : IntV O v) : IntV O (M *ᵥ v) := fun i => by
   simp only [Matrix.mulVec, dotProduct]
   exact sum_mem fun j _ => mul_mem (hM i j) (hv j)
 
@@ -38,22 +76,21 @@ def Lat : Set (n → T) :=
   {x | IntV O (((P⁻¹ : GL n K) : Matrix n n K) *ᵥ fun j => t1 θ (x j)) ∧
     IntV O (((P : Matrix n n K)ᵀ * (J.map (t1 θ))ᵀ) *ᵥ fun j => t2 θ (x j))}
 
-theorem firstSplit_mulVec (M : Matrix n n T) (x : n → T)
-    : (fun i => t1 θ ((M *ᵥ x) i)) = M.map (t1 θ) *ᵥ fun j => t1 θ (x j) := by
+theorem firstSplit_mulVec (M : Matrix n n T) (x : n → T) :
+    (fun i => t1 θ ((M *ᵥ x) i)) = M.map (t1 θ) *ᵥ fun j => t1 θ (x j) := by
   funext i
-  set_option synthInstance.maxHeartbeats 100000 in
+
   simp [Matrix.mulVec, dotProduct, map_sum, map_mul]
 
-theorem secondSplit_mulVec (M : Matrix n n T) (x : n → T)
-    : (fun i => t2 θ ((M *ᵥ x) i)) = M.map (t2 θ) *ᵥ fun j => t2 θ (x j) := by
+theorem secondSplit_mulVec (M : Matrix n n T) (x : n → T) :
+    (fun i => t2 θ ((M *ᵥ x) i)) = M.map (t2 θ) *ᵥ fun j => t2 θ (x j) := by
   funext i
-  set_option synthInstance.maxHeartbeats 100000 in
+
   simp [Matrix.mulVec, dotProduct, map_sum, map_mul]
 
 def tv (j : n) : n → T := fun i => θ.symm ((P : Matrix n n K) i j, 0)
 
-theorem firstSplit_tensor_vector (j : n)
-    : (fun i => t1 θ (tv θ P j i)) = fun i => (P : Matrix n n K) i j := by
+theorem firstSplit_tensor_vector (j : n) : (fun i => t1 θ (tv θ P j i)) = fun i => (P : Matrix n n K) i j := by
   funext i
   simp [tv, t1]
 
@@ -78,27 +115,25 @@ theorem tv_mem (j : n) : tv θ P j ∈ Lat O θ J P := by
 def conjPrime₂ (g : GL n T) : Matrix n n K :=
   ((P⁻¹ : GL n K) : Matrix n n K) * (g : Matrix n n T).map (t1 θ) * (P : Matrix n n K)
 
-theorem conjP_int (g : GL n T) (hg : ∀ x, x ∈ Lat O θ J P → (g : Matrix n n T) *ᵥ x ∈ Lat O θ J P)
-    : IntM O (conjPrime₂ θ P g) := by
+theorem conjP_int (g : GL n T) (hg : ∀ x, x ∈ Lat O θ J P → (g : Matrix n n T) *ᵥ x ∈ Lat O θ J P) :
+    IntM O (conjPrime₂ θ P g) := by
   intro i j
   have h := hg _ (tv_mem O θ J P j)
   simp only [Lat, Set.mem_setOf_eq] at h
   have h1 := h.1
   rw [firstSplit_mulVec, firstSplit_tensor_vector, mulVec_col, mulVec_col] at h1
-  have e
-      : conjPrime₂ θ P g i j
-        = (((P⁻¹ : GL n K) : Matrix n n K) * ((g : Matrix n n T).map (t1 θ) * (P : Matrix n n K))) i
-          j := by
+  have e : conjPrime₂ θ P g i j =
+      (((P⁻¹ : GL n K) : Matrix n n K) * ((g : Matrix n n T).map (t1 θ) * (P : Matrix n n K))) i j := by
     rw [conjPrime₂, Matrix.mul_assoc]
   rw [e]
   exact h1 i
 
-theorem conjP_mul (g h : GL n T)
-    : conjPrime₂ θ P (g * h) = conjPrime₂ θ P g * conjPrime₂ θ P h := by
+theorem conjP_mul (g h : GL n T) : conjPrime₂ θ P (g * h) = conjPrime₂ θ P g * conjPrime₂ θ P h := by
   have hP : (P : Matrix n n K) * ((P⁻¹ : GL n K) : Matrix n n K) = 1 := by simp
   simp only [conjPrime₂, Units.val_mul, Matrix.map_mul, Matrix.mul_assoc]
   rw [← Matrix.mul_assoc (P : Matrix n n K) ((P⁻¹ : GL n K) : Matrix n n K), hP, Matrix.one_mul]
 
-theorem conjP_one : conjPrime₂ θ P 1 = 1 := by simp [conjPrime₂]
+theorem conjP_one : conjPrime₂ θ P 1 = 1 := by
+  simp [conjPrime₂]
 
 end MassDataIdxCore

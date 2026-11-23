@@ -1,6 +1,50 @@
 module
 
 public import Development.WeilBound.RepresentationTheoryGL.CasimirAlgebra.TensorRelationsGL.KTypeData
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Real
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
@@ -13,50 +57,39 @@ namespace PositivityTheory.Rg.Cz
 section
 variable {n : ℕ} {Q : Type} [Fintype Q] [DecidableEq Q]
 
-theorem pm_apply' (σ : Equiv.Perm Q) (f : TV n ℂ Q) (I : Q → Fin n)
-    : (pm σ : Module.End ℂ (TV n ℂ Q)) f I = f (I ∘ σ) :=
-  rfl
+theorem pm_apply' (σ : Equiv.Perm Q) (f : TV n ℂ Q) (I : Q → Fin n) :
+    (pm σ : Module.End ℂ (TV n ℂ Q)) f I = f (I ∘ σ) := rfl
 
-theorem pm_pm (σ τ : Equiv.Perm Q) (f : TV n ℂ Q)
-    : (pm σ : Module.End ℂ (TV n ℂ Q)) (pm τ f) = pm (σ * τ) f :=
-  rfl
+theorem pm_pm (σ τ : Equiv.Perm Q) (f : TV n ℂ Q) :
+    (pm σ : Module.End ℂ (TV n ℂ Q)) (pm τ f) = pm (σ * τ) f := rfl
 
-theorem dot_pm_swap (a c : Q) (u v : TV n ℂ Q)
-    : star u ⬝ᵥ (pm (Equiv.swap a c) : Module.End ℂ (TV n ℂ Q)) v
-      = star ((pm (Equiv.swap a c) : Module.End ℂ (TV n ℂ Q)) u) ⬝ᵥ v := by
-  let e : (Q → Fin n) ≃ (Q → Fin n) := {
-    toFun := fun I => I ∘ Equiv.swap a c
-    invFun := fun I => I ∘ Equiv.swap a c
-    left_inv := fun I => by funext x; simp
-    right_inv := fun I => by funext x; simp
-  }
+theorem dot_pm_swap (a c : Q) (u v : TV n ℂ Q) :
+    star u ⬝ᵥ (pm (Equiv.swap a c) : Module.End ℂ (TV n ℂ Q)) v =
+      star ((pm (Equiv.swap a c) : Module.End ℂ (TV n ℂ Q)) u) ⬝ᵥ v := by
+  let e : (Q → Fin n) ≃ (Q → Fin n) :=
+    { toFun := fun I => I ∘ Equiv.swap a c, invFun := fun I => I ∘ Equiv.swap a c,
+      left_inv := fun I => by funext x; simp, right_inv := fun I => by funext x; simp }
   simp only [dotProduct, Pi.star_apply, pm_apply']
   refine Fintype.sum_equiv e _ _ fun I => ?_
   have : (I ∘ Equiv.swap a c) ∘ Equiv.swap a c = I := by funext x; simp
   simp [e, this]
 
-theorem re_swapSum_le'
-    (f : TV n ℂ Q)
-    (B : Finset Q) (p : Q) (hp : p ∉ B)
-    (hf : ∀ q ∈ B, ∀ q' ∈ B, q ≠ q' → pm (Equiv.swap q q') f = -f)
-    : (∑ q ∈ B, star f ⬝ᵥ pm (Equiv.swap p q) f).re ≤ (star f ⬝ᵥ f).re := by
+theorem re_swapSum_le' (f : TV n ℂ Q) (B : Finset Q) (p : Q)
+    (hp : p ∉ B) (hf : ∀ q ∈ B, ∀ q' ∈ B, q ≠ q' → pm (Equiv.swap q q') f = -f) :
+    (∑ q ∈ B, star f ⬝ᵥ pm (Equiv.swap p q) f).re ≤ (star f ⬝ᵥ f).re := by
   set Y : Module.End ℂ (TV n ℂ Q) := ∑ q ∈ B, pm (Equiv.swap p q) with hY
   have hYf : Y f = ∑ q ∈ B, pm (Equiv.swap p q) f := by simp [hY, LinearMap.sum_apply]
   have hsa : ∀ u v : TV n ℂ Q, star u ⬝ᵥ Y v = star (Y u) ⬝ᵥ v := by
     intro u v
     simp only [hY, LinearMap.sum_apply, dotProduct_sum, star_sum, sum_dotProduct, dot_pm_swap]
-  have hq
-      : ∀ q ∈ B,
-        (pm (Equiv.swap p q) : Module.End ℂ (TV n ℂ Q)) (Y f)
-          = f - Y f + pm (Equiv.swap p q) f := by
+  have hq : ∀ q ∈ B, (pm (Equiv.swap p q) : Module.End ℂ (TV n ℂ Q)) (Y f) =
+      f - Y f + pm (Equiv.swap p q) f := by
     intro q hqB
     have hpq : p ≠ q := fun h => hp (h ▸ hqB)
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hYf, ← Finset.add_sum_erase B _ hqB, map_add (f := _), map_sum, pm_pm,
-        Equiv.swap_mul_self]
-    have : ∀ q' ∈ B.erase q,
-        (pm (Equiv.swap p q) : Module.End ℂ (TV n ℂ Q)) (pm (Equiv.swap p q') f)
-          = -(pm (Equiv.swap p q') f) := by
+
+    rw [hYf, ← Finset.add_sum_erase B _ hqB, map_add (f := _), map_sum, pm_pm, Equiv.swap_mul_self]
+    have : ∀ q' ∈ B.erase q, (pm (Equiv.swap p q) : Module.End ℂ (TV n ℂ Q)) (pm (Equiv.swap p q') f) =
+        -(pm (Equiv.swap p q') f) := by
       intro q' hq'
       obtain ⟨hne, hq'B⟩ := Finset.mem_erase.mp hq'
       have hpq' : p ≠ q' := fun h => hp (h ▸ hq'B)

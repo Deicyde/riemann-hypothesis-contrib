@@ -1,23 +1,60 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.ConjTupRefl
-public import Development.AbelianVarietyTheory.Definitions.Divisors.GenReads
-public import Development.AbelianVarietyTheory.Definitions.ThetaValues.ExistsRootNotMem
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.OneMapOfOfExtends
-public import Formalism.SharpRestriction.Divisibility.GeneratorPowers.ThExprUniqOfChartIndep2
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ThetaLiftVectorIsThetaFunctionTwoStepModelStatement
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.MemCompletedLatticeHalfIffFrameMatrixIntegralStatement
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.AdjointFrameMatrixIntegralOfConjugateHalfStatement
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.IdempotentSumSelfDualFramesBoundStatement
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ThetaPairCharactersAtLevel
+public import Development.AbelianVarietyTheory.Definitions.GaloisGeometry.NormalFam
+public import Development.AbelianVarietyTheory.Definitions.TwistedInnerProducts.TupPrimeEmpty
+import Development.AbelianVarietyTheory.BlockTheory.DivisorBase.GoodIdempotentBadPlaces
 public import Development.AbelianVarietyTheory.Definitions.LatticeFrames.UnderEqOfConj
-public import Development.AbelianVarietyTheory.Proofs.AdelicLatticeProofs.ThetaAtEqSumHeisOfFourierSum
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.FrameMatrixIntegralIffUniformiserMultipleOnHalfStatement
+import Development.AbelianVarietyTheory.Proofs.AdelicLatticeProofs.ThetaAtEqSumHeisOfFourierSum
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ThetaPairCharactersAtLevel
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.AdjointFrameMatrixIntegralOfConjugateHalfStatement
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsHalfUniformiserFrameMatrixPrescribedReductStatement
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsNatIntegralFrameOfUniformizerMulStatement
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.SymplecticPairingHalfLatticesEqProdPrimitiveStatement
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.FrameMatrixIntegralIffUniformiserMultipleOnHalfStatement
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.IdempotentSumSelfDualFramesBoundStatement
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.MemCompletedLatticeHalfIffFrameMatrixIntegralStatement
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ResidueTwistFactorEqUnitMulFlatFourierStatement
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.SymplecticPairingHalfLatticesEqProdPrimitiveStatement
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ThetaLiftVectorIsThetaFunctionTwoStepModelStatement
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Development.AbelianVarietyTheory.Definitions.ThetaValues.ExistsRootNotMem
 
 @[expose] public section
 
@@ -127,7 +164,6 @@ theorem isHalf_nsmul {e : AE D} {u : Mx D m n} (hu : IsHalf e u) (k : ℕ) : IsH
   | zero => rw [zero_nsmul]; exact fun i j => mul_zero e
   | succ k ih => rw [succ_nsmul]; exact (isHalf_add_iff hu).2 ih
 
-set_option maxHeartbeats 1000000 in
 theorem isSBHalf_of_sum
     {e : AE D} {Λ : AddSubgroup (Mx D m n)} {Ψ : Mx D m n → ℂ} {Rs : Finset (Mx D m n)}
     {c : Mx D m n → ℂ}
@@ -174,8 +210,8 @@ theorem placeModel_sum
     funext x
     rw [hΨ x, Finset.sum_apply]
     rfl
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [hΨ', map_sum]
+
+  rw [hΨ', map_sum]
   refine Finset.sum_congr rfl fun u hu => ?_
   rw [map_smul, hT.trans _ (GlobalTheory.isSBHalf_halfInd e Λ) u (hR u hu), hvac]
 
@@ -194,8 +230,8 @@ theorem thetaAt_sum
     simp only [Pi.smul_apply, smul_eq_mul]
     ring
   have hvac : Tm (halfInd e Λ) = f₀ := by simpa using hTm.vac
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [hall Tm hTm, hΦ', map_sum]
+
+  rw [hall Tm hTm, hΦ', map_sum]
   refine Finset.sum_congr rfl fun y hy => ?_
   rw [map_smul, hTm.modul _ (GlobalTheory.isSBHalf_halfInd e Λ) y (hY y hy), hvac]
 
@@ -203,7 +239,6 @@ end GlobalTheory.LiftFlatModel
 
 namespace GlobalTheory.LiftFlatModel
 
-set_option maxHeartbeats 2000000 in
 theorem exists_reps_pairing : ∀ (D : D7) (G : Type) [Group G] [Fintype G] (Pl0 T0 : Type) (A : FamIn D.what₂.LL G Pl0 T0 D.R.m) (Ks : Type) [Field Ks] [NumberField Ks] [Algebra Ks D.what₂.LL] (R : RealDat D A Ks) (F : Face D A), GlobalTheory.Hk3.Core R F → QGuard R → ∀ (i : Fin D.R.m) (t : T0), VStd D i → ∀ (eQ : AE D), IsIdemSum eQ (R.Q t) → ∀ ϖ : 𝓞 D.host.E, ϖ ≠ 0 → (∀ PP ∈ R.Q t, ϖ ∈ PP.asIdeal ∧ ϖ ∉ PP.asIdeal ^ 2) → ∃ (ψP : ∀ PP : Pl D.host.E, AddChar (kP PP) ℂ) (Rs : Finset (WO (Vc D i) (Wc D i))), (∀ PP ∈ R.Q t, (ψP PP).IsPrimitive) ∧ (∀ u ∈ Rs, IsHalf eQ u ∧ IsIntM (frMapO (Vc D i) (Wc D i) (R.βV i) (R.βW i) (u.map fun w => incA D (ϖ : D.host.E) * w))) ∧ (∃ k : ℕ, 0 < k ∧ ∀ u ∈ Rs, k • u ∈ latO (Vc D i) (Wc D i) (R.ΛV i) (R.ΛW i) fun _ => True) ∧ (∀ y : ∀ PP : ↥(R.Q t), Matrix (Fin (Wc D i).rank) (Fin (Vc D i).rank) (kP PP.1), ∃! u, u ∈ Rs ∧ ∀ PP : ↥(R.Q t), redM PP.1 (frMapO (Vc D i) (Wc D i) (R.βV i) (R.βW i) (u.map fun w => incA D (ϖ : D.host.E) * w)) = y PP) ∧ (∀ x, IsHalf eQ x → ∀ u ∈ Rs, (x + u ∈ latO (Vc D i) (Wc D i) (R.ΛV i) (R.ΛW i) (fun _ => True) ↔ IsIntM (frMapO (Vc D i) (Wc D i) (R.βV i) (R.βW i) (x.map fun w => incA D (ϖ : D.host.E) * w)) ∧ ∀ PP ∈ R.Q t, redM PP (frMapO (Vc D i) (Wc D i) (R.βV i) (R.βW i) (x.map fun w => incA D (ϖ : D.host.E) * w)) = -redM PP (frMapO (Vc D i) (Wc D i) (R.βV i) (R.βW i) (u.map fun w => incA D (ϖ : D.host.E) * w)))) ∧ (∀ x, IsHalf (cA D eQ) x → (x ∈ latO (Vc D i) (Wc D i) (R.ΛV i) (R.ΛW i) (fun _ => True) ↔ IsIntM (frMapAdj (Vc D i) (Wc D i) (R.βV i) (R.βW i) x))) ∧ (∀ x, IsHalf (cA D eQ) x → IsIntM (frMapAdj (Vc D i) (Wc D i) (R.βV i) (R.βW i) x) → ∀ u ∈ Rs, R.ψ (symplO (Vc D i) (Wc D i) x u) = ∏ PP ∈ (R.Q t).attach, ψP PP.1 (Matrix.trace (redM PP.1 (frMapO (Vc D i) (Wc D i) (R.βV i) (R.βW i) (u.map fun w => incA D (ϖ : D.host.E) * w)) * redM PP.1 (frMapAdj (Vc D i) (Wc D i) (R.βV i) (R.βW i) x)))) := by
   intro D G _ _ Pl0 T0 A Ks _ _ _ R F hC hQG i t hV eQ heQ ϖ hϖ0 hϖ
   obtain ⟨cV, hcV⟩ := hC.lev.βV i
@@ -262,7 +297,6 @@ end GlobalTheory.LiftFlatModel
 
 namespace GlobalTheory.LiftFlatModel
 
-set_option maxHeartbeats 4000000 in
 theorem lift_eq_model_flat
     : ∀ (D : D7) (G : Type) [Group G] [Fintype G] (Pl0 T0 : Type)
         (A : FamIn D.what₂.LL G Pl0 T0 D.R.m) (Ks : Type) [Field Ks] [NumberField Ks]

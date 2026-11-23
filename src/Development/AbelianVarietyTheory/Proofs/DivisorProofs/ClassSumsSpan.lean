@@ -1,28 +1,72 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.OneMapOfOfExtends
+public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.NotIsOfFinOrderUnitQuot
+public import Formalism.LocalToGlobal.ProjectiveLattices.HalfOneAddSqrtNegIsIntegral
+import Development.AbelianVarietyTheory.Proofs.AbelianSchemeLawProofs.LawsFieldsSeparately
+public import Development.AbelianVarietyTheory.Proofs.CuspFormEvaluations.EvaluationLemmaForNablaLevels
+import Development.AbelianVarietyTheory.Proofs.CuspFormEvaluations.ShortThetaValueExistsUniqueNaturalOfLaws
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsMatrixDetNotMem
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsRationalUnitaryMoveSelfDualToSplitStatement
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.HolSub0LeSpanRaw
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.OscillatorModelValuesThird
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.RawSeriesMoveDatum
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.UnfoldingFrameDeltaChange
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.OscillatorModelValuesThird
-public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsRepsOfFiniteIndex
-public import Development.AbelianVarietyTheory.Proofs.SiegelThetaTransformation.AdelicLinearIndependent
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsOmegaField
+import Development.AbelianVarietyTheory.Proofs.FormalGroupCharts.ChartIndependenceUnconditional
+import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsRepsOfFiniteIndex
+public import Development.AbelianVarietyTheory.Proofs.GenericRegularity.NumericalConsequencesOfPins
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.IsHomogeneousOfRowDeg
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.OscillatorModelValuesFirst
-public import Development.AbelianVarietyTheory.Definitions.Divisors.GenReads
-public import Formalism.SharpRestriction.Divisibility.GeneratorPowers.ThExprUniqOfChartIndep2
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.OscillatorModelExtensionSecond
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.OscillatorModelValuesSixth
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.OscillatorModelUnitValues
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsRationalUnitaryMoveSelfDualToSplitStatement
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ThetaKernelTensorValues
+public import Development.AbelianVarietyTheory.Proofs.SiegelThetaTransformation.GamAtOfLawsJ
+import Development.AbelianVarietyTheory.Proofs.SiegelThetaTransformation.PushforwardPreservesHarmonicPolynomialsAndLattic
+import Development.AbelianVarietyTheory.Proofs.UniformizationProofs.AllUniformizationLawsHold
+import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.FramedModuliAlgebraicLawsChartWeightIntegrality
+import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.FramedPointReducedFromTestRing
+public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.ReadingLinearIndependentAndInjective
+public import Formalism.LocalToGlobal.ProjectiveLattices.ReadProofs
+import Formalism.LocalToGlobal.UnitaryNorms.CharUniq
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+public import Development.AbelianVarietyTheory.BlockTheory.JetGauges.ThetaSpanAdjoint
+public import Development.AbelianVarietyTheory.Proofs.AdelicLatticeProofs.MovedOfSplitPl
 
 @[expose] public section
 
 set_option autoImplicit false
-set_option synthInstance.maxHeartbeats 200000
+
 
 noncomputable section
 
@@ -236,7 +280,6 @@ theorem dict_mem (hT : LawsJ T) (O : OMDat T.toCore R i Tp tup) (g : GA D (Wc D 
   obtain ⟨th, hr, -, hd⟩ := hT.dictU _ (inR i) _ (goodEmbedding_baseEmbedding_coreData O)
   exact hd.2.2.2.1 _
 
-set_option maxHeartbeats 1000000 in
 theorem atDict_indep
     (hT : LawsJ T)
     (O : OMDat T.toCore R i Tp tup) (κ : WeightFamilies.Wt D ((i : ℕ) + 1)) (m : ℕ)
@@ -260,8 +303,8 @@ theorem atDict_indep
         (((mem_cusp _ _ _ _ _ _).1 (hb j)).2 _ (goodEmbedding_baseEmbedding_coreData O))
   have hEq := eqv_holSub (unfO O).X _ hmem
   have hz : atDict O (∑ j, w j • rdU (unfO O) (b j)) = 0 := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← hw, map_sum]
+
+    rw [← hw, map_sum]
     exact Finset.sum_congr rfl fun j _ => map_smul _ _ _
   funext k x
   by_cases hx : x ∈ ((unfO O).X k).dom
@@ -278,7 +321,6 @@ theorem atDict_indep
     have : rdU (unfO O) (b j) k x = 0 := dif_neg hx
     rw [this, mul_zero]
 
-set_option maxHeartbeats 1000000 in
 theorem rdU_mem_span_raw
     (hT : LawsJ T)
     (O : OMDat T.toCore R i Tp tup)

@@ -1,9 +1,45 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.BesselCharacterGenericCharacterLaws
 public import Formalism.LocalToGlobal.SiegelLatticeTheory.HaarTransversals.HidaSetting
-public import Formalism.SharpRestriction.CuspSpanNormBounds.BridgeUnipRad
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -16,17 +52,15 @@ namespace GlobalTheory.UnipFin
 
 open Formalism.L2.SG.HidaSetting
 
-theorem mem_span_image_iff
-    {R M ι : Type} [CommRing R] [AddCommGroup M] [Module R M] [Fintype ι]
-    (v : ι → M) (s : Set ι) (w : M)
-    : w ∈ Submodule.span R (v '' s) ↔ ∃ f : ι → R, (∀ i, i ∉ s → f i = 0) ∧ ∑ i, f i • v i = w := by
+theorem mem_span_image_iff {R M ι : Type} [CommRing R] [AddCommGroup M] [Module R M] [Fintype ι]
+    (v : ι → M) (s : Set ι) (w : M) :
+    w ∈ Submodule.span R (v '' s) ↔ ∃ f : ι → R, (∀ i, i ∉ s → f i = 0) ∧ ∑ i, f i • v i = w := by
   rw [Finsupp.mem_span_image_iff_linearCombination]
   constructor
   · rintro ⟨l, hl, rfl⟩
     refine ⟨l, fun i hi => (Finsupp.mem_supported' R l).1 hl i hi, ?_⟩
     rw [Finsupp.linearCombination_apply, Finsupp.sum_fintype]
-    intro i
-    exact zero_smul R _
+    intro i; exact zero_smul R _
   · rintro ⟨f, hf, rfl⟩
     refine ⟨Finsupp.equivFunOnFinite.symm f, (Finsupp.mem_supported' R _).2 fun i hi => hf i hi, ?_⟩
     rw [Finsupp.linearCombination_apply, Finsupp.sum_fintype]
@@ -35,45 +69,36 @@ theorem mem_span_image_iff
 
 variable (I : Formalism.MainNotions.S.AutInst)
 
-theorem sigR_inclE (e : I.E)
-    : Formalism.UG.sigR I.cm.sig (Formalism.MainNotions.S.Af I.F)
-        (Formalism.UG.inclE (F := I.F) (Formalism.MainNotions.S.Af I.F) e)
-      = Formalism.UG.inclE (F := I.F) (Formalism.MainNotions.S.Af I.F) (starRingEnd I.E e) := by
+theorem sigR_inclE (e : I.E) :
+    Formalism.UG.sigR I.cm.sig (Formalism.MainNotions.S.Af I.F) (Formalism.UG.inclE (F := I.F) (Formalism.MainNotions.S.Af I.F) e) =
+      Formalism.UG.inclE (F := I.F) (Formalism.MainNotions.S.Af I.F) (starRingEnd I.E e) := by
   show Algebra.TensorProduct.map I.cm.sig (AlgHom.id I.F (Formalism.MainNotions.S.Af I.F)) (e ⊗ₜ[I.F] (1 : Formalism.MainNotions.S.Af I.F)) = _
   rw [Algebra.TensorProduct.map_tmul]
   rfl
 
-theorem hA_incl_incl (p q : Fin I.n → I.E)
-    : hA I (incl I p) (incl I q)
-      = Formalism.UG.inclE (F := I.F) (Formalism.MainNotions.S.Af I.F)
-        (Formalism.UG.hform (starRingEnd I.E) I.J p q) := by
-  set_option synthInstance.maxHeartbeats 100000 in
+theorem hA_incl_incl (p q : Fin I.n → I.E) :
+    hA I (incl I p) (incl I q) =
+      Formalism.UG.inclE (F := I.F) (Formalism.MainNotions.S.Af I.F) (Formalism.UG.hform (starRingEnd I.E) I.J p q) := by
+
   simp only [hA, Formalism.UG.hform, incl, Matrix.map_apply, map_sum, map_mul, sigR_inclE]
 
 variable {I} {ρ : ℕ} (x : Fin ρ → Fin I.n → I.E) (c : Fin ρ → I.E)
 
-theorem mulVec_flag (v : Fin ρ → I.E ⊗[I.F] Formalism.MainNotions.S.Af I.F)
-    : (Matrix.of fun k a => c a * x a k).map
-          (Formalism.UG.inclE (F := I.F) (Formalism.MainNotions.S.Af I.F))
-        *ᵥ v
-      = ∑ a, (v a * Formalism.UG.inclE (F := I.F) (Formalism.MainNotions.S.Af I.F) (c a)) • incl I (x a) :=
-  by
-    funext k
-    simp only [Matrix.mulVec, dotProduct, Matrix.map_apply, Matrix.of_apply, Finset.sum_apply,
-      Pi.smul_apply, smul_eq_mul, incl, map_mul]
-    exact Finset.sum_congr rfl fun a _ => by ring
+theorem mulVec_flag (v : Fin ρ → I.E ⊗[I.F] Formalism.MainNotions.S.Af I.F) :
+    (Matrix.of fun k a => c a * x a k).map (Formalism.UG.inclE (F := I.F) (Formalism.MainNotions.S.Af I.F)) *ᵥ v =
+      ∑ a, (v a * Formalism.UG.inclE (F := I.F) (Formalism.MainNotions.S.Af I.F) (c a)) • incl I (x a) := by
+  funext k
+  simp only [Matrix.mulVec, dotProduct, Matrix.map_apply, Matrix.of_apply, Finset.sum_apply, Pi.smul_apply,
+    smul_eq_mul, incl, map_mul]
+  exact Finset.sum_congr rfl fun a _ => by ring
 
-theorem mulVec_dual (y : VA I) (a : Fin ρ)
-    : ((Formalism.UG.cT (starRingEnd I.E) (Matrix.of fun k a => c a * x a k) * I.J).map
-            (Formalism.UG.inclE (F := I.F) (Formalism.MainNotions.S.Af I.F))
-          *ᵥ y)
-        a
-      = Formalism.UG.inclE (F := I.F) (Formalism.MainNotions.S.Af I.F) (starRingEnd I.E (c a))
-        * hA I (incl I (x a)) y := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [Matrix.mulVec, dotProduct, Matrix.map_apply, Matrix.mul_apply, Formalism.UG.cT,
-      Matrix.transpose_apply, Matrix.of_apply, map_sum, map_mul, hA, Formalism.UG.hform, incl,
-      sigR_inclE, Finset.mul_sum, Finset.sum_mul]
+theorem mulVec_dual (y : VA I) (a : Fin ρ) :
+    ((Formalism.UG.cT (starRingEnd I.E) (Matrix.of fun k a => c a * x a k) * I.J).map
+      (Formalism.UG.inclE (F := I.F) (Formalism.MainNotions.S.Af I.F)) *ᵥ y) a =
+      Formalism.UG.inclE (F := I.F) (Formalism.MainNotions.S.Af I.F) (starRingEnd I.E (c a)) * hA I (incl I (x a)) y := by
+
+  simp only [Matrix.mulVec, dotProduct, Matrix.map_apply, Matrix.mul_apply, Formalism.UG.cT, Matrix.transpose_apply,
+  Matrix.of_apply, map_sum, map_mul, hA, Formalism.UG.hform, incl, sigR_inclE, Finset.mul_sum, Finset.sum_mul]
   rw [Finset.sum_comm]
   exact Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => by ring
 

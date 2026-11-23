@@ -1,8 +1,55 @@
 module
 
 public import Development.WeilBound.RepresentationTheoryGL.UnitaryDualProof.TwistedPieces.FiniteDimensionalDescent.ClosedOrbitPieces.PieceTop
+public import Development.WeilBound.RepresentationTheoryGL.UnitaryDualProof.TwistedPieces.FiniteDimensionalDescent.ClosedOrbitPieces.FrobeniusSections.MemPw
 public import Development.WeilBound.RepresentationTheoryGL.UnitaryDualProof.TwistedPieces.FiniteDimensionalDescent.ClosedOrbitPieces.FrobeniusSections.Rdata
 public import Development.WeilBound.RepresentationTheoryGL.UnitaryDualProof.TwistedPieces.FiniteDimensionalDescent.ClosedOrbitPieces.FrobeniusSections.RqLift
+import GroundTheory.AutomorphicForms.GLnLocal
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.LinearAlgebra.Matrix.FiniteDimensional
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.TotallySplit
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -12,14 +59,12 @@ open Matrix Polynomial Module
 
 namespace PositivityTheory.RgUd.TP.Desc.Piece.PSect
 
-open PositivityTheory.RgUd.T PositivityTheory.RgUd.TP PositivityTheory.RgUd.TP.Desc
-  PositivityTheory.RgUd.TP.Desc.Piece
+open PositivityTheory.RgUd.T PositivityTheory.RgUd.TP PositivityTheory.RgUd.TP.Desc PositivityTheory.RgUd.TP.Desc.Piece
+
 
 open ValuativeRel in
-theorem twFin
-    (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
-    (p c : ℕ) [Fact p.Prime] [CharP k p]
-    : FiniteDimensional k (Tw k p c) := by
+theorem twFin (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    (p c : ℕ) [Fact p.Prime] [CharP k p] : FiniteDimensional k (Tw k p c) := by
   letI := IsTopologicalAddGroup.rightUniformSpace k
   have := isUniformAddGroup_of_addCommGroup (G := k)
   letI : (Valued.v (R := k)).RankOne :=
@@ -33,24 +78,22 @@ theorem twFin
   have : IsTopologicalAddGroup (Tw k p c) := inferInstanceAs (IsTopologicalAddGroup k)
   have : T2Space (Tw k p c) := inferInstanceAs (T2Space k)
   have : LocallyCompactSpace (Tw k p c) := inferInstanceAs (LocallyCompactSpace k)
-  have : ContinuousSMul k (Tw k p c) :=
-    ⟨by
-      show Continuous fun q : k × k => (iterateFrobenius k p c q.1) * q.2
-      simp only [iterateFrobenius_def]
-      exact (continuous_fst.pow _).mul continuous_snd⟩
+  have : ContinuousSMul k (Tw k p c) := ⟨by
+    show Continuous fun q : k × k => (iterateFrobenius k p c q.1) * q.2
+    simp only [iterateFrobenius_def]
+    exact (continuous_fst.pow _).mul continuous_snd⟩
   exact FiniteDimensional.of_locallyCompactSpace k
 
-theorem pad {M : Type*} [AddCommMonoid M] {q d : ℕ} (hqd : q ≤ d) (f : Fin q → M)
-    : ∑ l : Fin q, f l = ∑ l : Fin d, if h : (l : ℕ) < q then f ⟨l, h⟩ else 0 := by
+theorem pad {M : Type*} [AddCommMonoid M] {q d : ℕ} (hqd : q ≤ d) (f : Fin q → M) :
+    ∑ l : Fin q, f l = ∑ l : Fin d, if h : (l : ℕ) < q then f ⟨l, h⟩ else 0 := by
   rw [Fin.sum_univ_eq_sum_range (fun n => if h : n < q then f ⟨n, h⟩ else 0) d]
-  rw [← Finset.sum_subset (Finset.range_subset_range.2 hqd)
-    (fun n _ hn => by rw [Finset.mem_range] at hn; rw [dif_neg hn])]
+  rw [← Finset.sum_subset (Finset.range_subset_range.2 hqd) (fun n _ hn => by
+    rw [Finset.mem_range] at hn; rw [dif_neg hn])]
   rw [← Fin.sum_univ_eq_sum_range (fun n => if h : n < q then f ⟨n, h⟩ else 0) q]
   exact Finset.sum_congr rfl fun l _ => by rw [dif_pos l.2]
 
-theorem sect
-    (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
-    : Sect k := by
+theorem sect (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] :
+    Sect k := by
   intro p _ _ N q Z hZ hqc hroots hnilb χ hχm hχd
   obtain ⟨c, rfl⟩ := hqc
   haveI := twFin k p c
@@ -76,8 +119,8 @@ theorem sect
   obtain ⟨br, hbr⟩ := rq_rep (A := Z) χ hχm (p ^ c) (max N (p ^ c)) hdN ε
   choose γ0 hγ0 using fun i => hrep (Ideal.Quotient.mk _ (C (Module.finBasis k Z i)))
   obtain ⟨β0, hβ0⟩ := hrep (Ideal.Quotient.mk _ X)
-  let ext : (Fin (p ^ c) → Fin r → k) → Fin (max N (p ^ c)) → Fin r → k := fun g l j =>
-    if h : (l : ℕ) < p ^ c then g ⟨l, h⟩ j else 0
+  let ext : (Fin (p ^ c) → Fin r → k) → Fin (max N (p ^ c)) → Fin r → k :=
+    fun g l j => if h : (l : ℕ) < p ^ c then g ⟨l, h⟩ j else 0
   let E : Fin m → Rq Z χ (p ^ c) := fun t => ∑ j, κ t j • s j
   refine ⟨{
     r := r
@@ -97,8 +140,7 @@ theorem sect
     κ := κ
     dd := fun t => finrank k (Submodule.span k (Set.range fun j => E t * s j))
     K := fun t => LinearMap.ker ((LinearMap.mulLeft k (E t)).comp (Fintype.linearCombination k s))
-    spec := ?_
-  }⟩
+    spec := ?_ }⟩
   · apply le_antisymm
     · intro y hy
       have h := congrArg Subtype.val ((Module.finBasis k Z).sum_repr ⟨y, hy⟩)
@@ -117,12 +159,10 @@ theorem sect
         have e2 : Commute a (x ^ n) := Commute.pow_right (hx a ha) n
         show a * ((b : Matrix (Fin N) (Fin N) k) * x ^ n) = (b : Matrix (Fin N) (Fin N) k) * x ^ n * a
         rw [← mul_assoc, e1, mul_assoc, e2.eq, mul_assoc]
-    obtain ⟨ρ, hρ⟩ :=
-      rq_lift (A := Z) Z.val x (fun a => hx a a.2) χ hχx (p ^ c) (fun P hP => hnilb _ (hB P) hP)
-    have hpe
-        : ∀ g : Fin (max N (p ^ c)) → Z,
-          pe (fun l => (g l : Matrix (Fin N) (Fin N) k)) x
-            = ρ (Ideal.Quotient.mk _ (∑ l : Fin (max N (p ^ c)), C (g l) * X ^ (l : ℕ))) := by
+    obtain ⟨ρ, hρ⟩ := rq_lift (A := Z) Z.val x (fun a => hx a a.2) χ hχx (p ^ c)
+      (fun P hP => hnilb _ (hB P) hP)
+    have hpe : ∀ g : Fin (max N (p ^ c)) → Z, pe (fun l => (g l : Matrix (Fin N) (Fin N) k)) x =
+        ρ (Ideal.Quotient.mk _ (∑ l : Fin (max N (p ^ c)), C (g l) * X ^ (l : ℕ))) := by
       intro g
       rw [hρ, eval₂_finsetSum]
       refine Finset.sum_congr rfl fun l _ => ?_
@@ -132,28 +172,23 @@ theorem sect
       rw [hpe, ← har j]
     have hε' : pe (fun l => (br l : Matrix (Fin N) (Fin N) k)) x = ρ ε := by rw [hpe, ← hbr]
     have hlin : ∀ v : Fin r → k, ∑ j, v j • ρ (s j) = ρ (∑ j, v j • s j) := fun v => by
-      set_option synthInstance.maxHeartbeats 100000 in
+
       rw [map_sum]; simp only [map_smul]
-    have hspan
-        : ∀ y,
-          y ∈ Submodule.span k (Set.range fun j => ρ (s j))
-            → ∃ v : Fin r → k, y = ρ (∑ j, v j • s j) := by
+    have hspan : ∀ y, y ∈ Submodule.span k (Set.range fun j => ρ (s j)) →
+        ∃ v : Fin r → k, y = ρ (∑ j, v j • s j) := by
       intro y hy
       obtain ⟨v, hv⟩ := (Submodule.mem_span_range_iff_exists_fun k).1 hy
       exact ⟨v, by rw [← hv, hlin]⟩
     have hE : ∀ t, ∑ j, κ t j • ρ (s j) = ρ (E t) := fun t => hlin (κ t)
     have hsum' : ∑ t, E t = 1 := hsum
     have hid' : ∀ t, IsIdempotentElem (E t) := hid
-    have hcor
-        : ∀ t (v : Fin r → k),
-          (∑ j, v j • s j) * E t = 0 ∨ ∃ w : Rq Z χ (p ^ c), (∑ j, v j • s j) * E t * w = E t :=
-      hcorner
-    have hre
-        : ∀ g : Fin (p ^ c) → Fin r → k,
-          re (ext g) (fun j => ρ (s j)) (ρ ε) = ρ (∑ l, ∑ j, g l j • (s j * ε ^ (l : ℕ))) := by
+    have hcor : ∀ t (v : Fin r → k), (∑ j, v j • s j) * E t = 0 ∨
+        ∃ w : Rq Z χ (p ^ c), (∑ j, v j • s j) * E t * w = E t := hcorner
+    have hre : ∀ g : Fin (p ^ c) → Fin r → k, re (ext g) (fun j => ρ (s j)) (ρ ε) =
+        ρ (∑ l, ∑ j, g l j • (s j * ε ^ (l : ℕ))) := by
       intro g
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum, pad hdq]
+
+      rw [map_sum, pad hdq]
       unfold re
       refine Finset.sum_congr rfl fun l _ => ?_
       by_cases h : (l : ℕ) < p ^ c
@@ -164,30 +199,15 @@ theorem sect
       · rw [dif_neg h]
         refine Finset.sum_eq_zero fun j _ => ?_
         simp only [ext, dif_neg h, zero_smul]
-    have nilmul
-        : ∀ a b : Matrix (Fin N) (Fin N) k, Commute a b → IsNilpotent a → IsNilpotent (a * b) :=
+    have nilmul : ∀ a b : Matrix (Fin N) (Fin N) k, Commute a b → IsNilpotent a → IsNilpotent (a * b) :=
       fun a b h ⟨n, hn⟩ => ⟨n, by rw [h.mul_pow, hn, zero_mul]⟩
     have hcomm : ∀ a b : Rq Z χ (p ^ c), Commute (ρ a) (ρ b) := fun a b => (Commute.all a b).map ρ
     dsimp only
     simp only [hs, hε']
-    refine ⟨
-      fun j j' => ?_,
-      ?_,
-      fun j j' => ?_,
-      fun j => ?_,
-      ?_,
-      ?_,
-      fun i => ?_,
-      ?_,
-      fun t => ?_,
-      ?_,
-      fun t t' htt => ?_,
-      fun t y hy hyi hye => ?_,
-      fun t => ?_,
-      fun v => ?_
-    ⟩
-    set_option synthInstance.maxHeartbeats 100000 in
-      · rw [← map_mul, h1 j j', map_sum]; simp only [map_smul]
+    refine ⟨fun j j' => ?_, ?_, fun j j' => ?_, fun j => ?_, ?_, ?_, fun i => ?_, ?_, fun t => ?_, ?_,
+      fun t t' htt => ?_, fun t y hy hyi hye => ?_, fun t => ?_, fun v => ?_⟩
+
+    · rw [← map_mul, h1 j j', map_sum]; simp only [map_smul]
     · rw [hlin, hu, map_one]
     · rw [← map_mul, mul_comm, map_mul]
     · rw [← map_mul, mul_comm, map_mul]
@@ -207,15 +227,15 @@ theorem sect
             rw [pow_succ, hn, zero_mul] at this
             exact this.symm
           rw [← (hid' t).eq, ← mul_assoc, map_mul, hE0, mul_zero]
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [← mul_one (∑ j, v j • s j), ← hsum', Finset.mul_sum, map_sum]
+
+      rw [← mul_one (∑ j, v j • s j), ← hsum', Finset.mul_sum, map_sum]
       exact Finset.sum_eq_zero fun t _ => hz0 t
     · rw [hre, ← hγ0 i, hρ, eval₂_C]
       rfl
     · rw [hre, ← hβ0, hρ, eval₂_X]
     · rw [hE]; exact (hid' t).map ρ
-    set_option synthInstance.maxHeartbeats 100000 in
-      · simp only [hE]; rw [← map_sum, hsum', map_one]
+
+    · simp only [hE]; rw [← map_sum, hsum', map_one]
     · rw [hE, hE, ← map_mul, horth t t' htt, map_zero]
     · rw [hE] at hye ⊢
       obtain ⟨v, rfl⟩ := hspan y hy
@@ -224,24 +244,18 @@ theorem sect
       · right
         have e1 : ρ (E t) = ρ (∑ j, v j • s j) * ρ (E t) * ρ w' := by rw [← map_mul, ← map_mul, hw']
         rw [hye] at e1
-        calc
-          ρ (∑ j, v j • s j)
-            = ρ (∑ j, v j • s j) * ρ (E t) := hye.symm
+        calc ρ (∑ j, v j • s j) = ρ (∑ j, v j • s j) * ρ (E t) := hye.symm
           _ = ρ (∑ j, v j • s j) * (ρ (∑ j, v j • s j) * ρ w') := by rw [← e1]
           _ = ρ (∑ j, v j • s j) * ρ w' := by rw [← mul_assoc, hyi.eq]
           _ = ρ (E t) := e1.symm
-    · have hfun
-          : (fun j =>
-              (∑ j', κ t j' • pe (fun l => (ar j' l : Matrix (Fin N) (Fin N) k)) x)
-                * pe (fun l => (ar j l : Matrix (Fin N) (Fin N) k)) x)
-            = fun j => ρ (E t) * ρ (s j) := by
+    · have hfun : (fun j => (∑ j', κ t j' • pe (fun l => (ar j' l : Matrix (Fin N) (Fin N) k)) x) *
+          pe (fun l => (ar j l : Matrix (Fin N) (Fin N) k)) x) = fun j => ρ (E t) * ρ (s j) := by
         funext j; simp only [hs, hE]
       have hE2 : ∑ j, κ t j • pe (fun l => (ar j l : Matrix (Fin N) (Fin N) k)) x = ρ (E t) := by
         simp only [hs, hE]
       rw [hfun, hE2]
-      have hmap
-          : Submodule.span k (Set.range fun j => ρ (E t) * ρ (s j))
-            = (Submodule.span k (Set.range fun j => E t * s j)).map ρ.toLinearMap := by
+      have hmap : Submodule.span k (Set.range fun j => ρ (E t) * ρ (s j)) =
+          (Submodule.span k (Set.range fun j => E t * s j)).map ρ.toLinearMap := by
         rw [Submodule.map_span, ← Set.range_comp]
         congr 1
         ext j
@@ -272,8 +286,8 @@ theorem sect
         · rw [mul_comm]; exact h
         · exact absurd (by rw [← hw', map_mul, map_mul, h0, zero_mul, zero_mul]) hEt
       · intro h
-        set_option synthInstance.maxHeartbeats 100000 in
-          rw [← mul_one (∑ j, v j • s j), ← hsum', Finset.mul_sum, map_sum]
+
+        rw [← mul_one (∑ j, v j • s j), ← hsum', Finset.mul_sum, map_sum]
         refine Finset.sum_eq_zero fun t _ => ?_
         by_cases hEt : ρ (E t) = 0
         · rw [map_mul, hEt, mul_zero]

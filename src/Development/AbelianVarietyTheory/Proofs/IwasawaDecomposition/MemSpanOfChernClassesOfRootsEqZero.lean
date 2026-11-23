@@ -1,13 +1,51 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.RootToFlag
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.SymmetricPolyChernRoots
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.MvPolynomial.Symmetric.FundamentalTheorem
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Std.Tactic.BVDecide.Normalize.Prop
+import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsIsLieBase
+import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.RootToFlag
 
 @[expose] public section
 
-open MvPolynomial NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.GoodMetric
-  GlobalTheory.LieBase GlobalTheory.GrassTop
+open MvPolynomial NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.GoodMetric GlobalTheory.LieBase GlobalTheory.GrassTop
 open Classical
 
 set_option autoImplicit false
@@ -23,36 +61,30 @@ variable (R : Type) [CommRing R] {ι : Type} (m : ι → ℕ)
 def blockEsymm : MvPolynomial (Root m) R →ₐ[R] MvPolynomial (Root m) R :=
   aeval fun x : Root m => rename (Sigma.mk x.1) (esymm (Fin (m x.1)) R (x.2 + 1))
 
-theorem split_blockEsymm [DecidableEq ι] (τ₀ : ι)
-    : (GlobalTheory.BlockSymm.splitEquiv R τ₀).toAlgHom.comp (blockEsymm R m)
-      = ((aeval fun i : Fin (m τ₀) =>
-          esymm (Fin (m τ₀)) (MvPolynomial (Root (fun τ : {τ // τ ≠ τ₀} => m τ.1)) R)
-            (i + 1)).restrictScalars R).comp
+theorem split_blockEsymm [DecidableEq ι] (τ₀ : ι) :
+    (GlobalTheory.BlockSymm.splitEquiv R τ₀).toAlgHom.comp (blockEsymm R m) =
+      ((aeval fun i : Fin (m τ₀) =>
+          esymm (Fin (m τ₀)) (MvPolynomial (Root (fun τ : {τ // τ ≠ τ₀} => m τ.1)) R) (i + 1)).restrictScalars R).comp
         ((mapAlgHom (blockEsymm R (fun τ : {τ // τ ≠ τ₀} => m τ.1))).comp
           (GlobalTheory.BlockSymm.splitEquiv R τ₀).toAlgHom) := by
   ext ⟨τ, i⟩ : 1
   by_cases h : τ = τ₀
   · subst h
     simp only [AlgHom.comp_apply, AlgEquiv.coe_toAlgHom, blockEsymm, aeval_X,
-      GlobalTheory.BlockSymm.splitEquiv_X_self, mapAlgHom_apply, map_X,
-      AlgHom.restrictScalars_apply]
-    have hc
-        : rename (Sigma.mk τ) (esymm (Fin (m τ)) R ((i : ℕ) + 1))
-          = GlobalTheory.BlockSymm.chernRootsOver R m (X (τ, (i : ℕ) + 1)) := by
+      GlobalTheory.BlockSymm.splitEquiv_X_self, mapAlgHom_apply, map_X, AlgHom.restrictScalars_apply]
+    have hc : rename (Sigma.mk τ) (esymm (Fin (m τ)) R ((i : ℕ) + 1)) =
+        GlobalTheory.BlockSymm.chernRootsOver R m (X (τ, (i : ℕ) + 1)) := by
       simp [GlobalTheory.BlockSymm.chernRootsOver]
     rw [hc, ← GlobalTheory.BlockSymm.splitEquiv_symm_esymm, AlgEquiv.apply_symm_apply]
   · simp only [AlgHom.comp_apply, AlgEquiv.coe_toAlgHom, blockEsymm, aeval_X,
-      GlobalTheory.BlockSymm.splitEquiv_X_ne R τ₀ h, mapAlgHom_apply, map_C,
-      AlgHom.restrictScalars_apply, aeval_C]
-    set_option synthInstance.maxHeartbeats 100000 in
+      GlobalTheory.BlockSymm.splitEquiv_X_ne R τ₀ h, mapAlgHom_apply, map_C, AlgHom.restrictScalars_apply, aeval_C]
+
     simp [esymm, map_sum, map_prod, GlobalTheory.BlockSymm.splitEquiv_X_ne R τ₀ h]
 
 end Esymm
 
-theorem blockEsymm_injective (n : ℕ)
-    : ∀ (ι : Type) [Fintype ι],
-      Fintype.card ι = n
-        → ∀ (R : Type) [CommRing R] (m : ι → ℕ), Function.Injective (blockEsymm R m) := by
+theorem blockEsymm_injective (n : ℕ) : ∀ (ι : Type) [Fintype ι], Fintype.card ι = n →
+    ∀ (R : Type) [CommRing R] (m : ι → ℕ), Function.Injective (blockEsymm R m) := by
   induction n with
   | zero =>
     intro ι _ hc R _ m
@@ -66,10 +98,10 @@ theorem blockEsymm_injective (n : ℕ)
     intro ι _ hc R _ m
     classical
     obtain ⟨τ₀⟩ : Nonempty ι := Fintype.card_pos_iff.mp (by omega)
-    have hc' : Fintype.card {τ // τ ≠ τ₀} = n := by simp [Fintype.card_subtype_compl, hc]
+    have hc' : Fintype.card {τ // τ ≠ τ₀} = n := by
+      simp [Fintype.card_subtype_compl, hc]
     let R' := MvPolynomial (Root (fun τ : {τ // τ ≠ τ₀} => m τ.1)) R
-    have h1 : Function.Injective (aeval (R := R') fun i : Fin (m τ₀) =>
-        esymm (Fin (m τ₀)) R' (i + 1)) := by
+    have h1 : Function.Injective (aeval (R := R') fun i : Fin (m τ₀) => esymm (Fin (m τ₀)) R' (i + 1)) := by
       intro p q hpq
       apply esymmAlgHom_fin_injective R' (m := m τ₀) (n := m τ₀) le_rfl
       apply Subtype.ext
@@ -93,12 +125,7 @@ variable {ι : Type} (m : ι → ℕ)
 
 def truncChern : MvPolynomial (ι × ℕ) ℝ →ₐ[ℝ] MvPolynomial (Root m) ℝ :=
   aeval fun x : ι × ℕ =>
-    if x.2 = 0 then
-      1
-    else if h : x.2 - 1 < m x.1 then
-      X (⟨x.1, ⟨x.2 - 1, h⟩⟩ : Root m)
-    else
-      0
+    if x.2 = 0 then 1 else if h : x.2 - 1 < m x.1 then X (⟨x.1, ⟨x.2 - 1, h⟩⟩ : Root m) else 0
 
 def liftChern : MvPolynomial (Root m) ℝ →ₐ[ℝ] MvPolynomial (ι × ℕ) ℝ :=
   aeval fun x : Root m => X (x.1, (x.2 : ℕ) + 1)
@@ -114,13 +141,12 @@ theorem chernRoots_eq_comp : chernRoots m = (blockEsymm ℝ m).comp (truncChern 
       simp [chernRoots, h, esymm, Finset.powersetCard_eq_empty.mpr hc]
 
 def rankIdeal : Ideal (MvPolynomial (ι × ℕ) ℝ) :=
-  Ideal.span
-    ((Set.range fun τ : ι => (X (τ, 0) - 1 : MvPolynomial (ι × ℕ) ℝ))
-      ∪ {P | ∃ (τ : ι) (k : ℕ), m τ < k ∧ P = X (τ, k)})
+  Ideal.span ((Set.range fun τ : ι => (X (τ, 0) - 1 : MvPolynomial (ι × ℕ) ℝ)) ∪
+    {P | ∃ (τ : ι) (k : ℕ), m τ < k ∧ P = X (τ, k)})
 
-theorem mk_liftChern_truncChern
-    : (Ideal.Quotient.mkₐ ℝ (rankIdeal m)).comp ((liftChern m).comp (truncChern m))
-      = Ideal.Quotient.mkₐ ℝ (rankIdeal m) := by
+theorem mk_liftChern_truncChern :
+    (Ideal.Quotient.mkₐ ℝ (rankIdeal m)).comp ((liftChern m).comp (truncChern m)) =
+      Ideal.Quotient.mkₐ ℝ (rankIdeal m) := by
   ext ⟨τ, k⟩ : 1
   simp only [AlgHom.comp_apply, truncChern, aeval_X, Ideal.Quotient.mkₐ_eq_mk]
   rcases k with _ | j
@@ -130,17 +156,13 @@ theorem mk_liftChern_truncChern
     exact Ideal.subset_span (Or.inl ⟨τ, rfl⟩)
   · by_cases h : j < m τ
     · simp [h, liftChern]
-    · simp only [Nat.add_one_ne_zero, if_false, Nat.add_sub_cancel, h, dif_neg, not_false_eq_true,
-        map_zero]
+    · simp only [Nat.add_one_ne_zero, if_false, Nat.add_sub_cancel, h, dif_neg, not_false_eq_true, map_zero]
       rw [eq_comm, Ideal.Quotient.eq_zero_iff_mem]
       exact Ideal.subset_span (Or.inr ⟨τ, j + 1, by omega, rfl⟩)
 
-theorem mem_span_of_chernRoots_eq_zero
-    : ∀ {ι : Type} [Fintype ι] (m : ι → ℕ) (Q : MvPolynomial (ι × ℕ) ℝ),
-      chernRoots m Q = 0
-        → Q ∈ Ideal.span
-          ((Set.range fun τ : ι => (X (τ, 0) - 1 : MvPolynomial (ι × ℕ) ℝ))
-            ∪ {P | ∃ (τ : ι) (k : ℕ), m τ < k ∧ P = X (τ, k)}) := by
+theorem mem_span_of_chernRoots_eq_zero : ∀ {ι : Type} [Fintype ι] (m : ι → ℕ) (Q : MvPolynomial (ι × ℕ) ℝ),
+    chernRoots m Q = 0 → Q ∈ Ideal.span ((Set.range fun τ : ι => (X (τ, 0) - 1 : MvPolynomial (ι × ℕ) ℝ)) ∪
+      {P | ∃ (τ : ι) (k : ℕ), m τ < k ∧ P = X (τ, k)}) := by
   intro ι _ m Q hQ
   have h0 : truncChern m Q = 0 := by
     apply blockEsymm_injective _ ι rfl ℝ m

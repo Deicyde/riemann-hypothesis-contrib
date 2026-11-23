@@ -1,6 +1,46 @@
 module
 
 public import Formalism.WindowSums.Statement
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
+public import Mathlib.RingTheory.Ideal.BigOperators
 
 @[expose] public section
 
@@ -24,22 +64,17 @@ theorem mem_span_iff_of_distinct_exponents : DistinctTerms := by
     obtain ⟨hi₀, hB, hs⟩ := Finset.mem_filter.mp hi₀J
     obtain ⟨a, b, hab⟩ := Ideal.mem_span_pair.mp hmem
     have hcoef := congrArg (PowerSeries.coeff (e i₀)) hab
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_add (f := _), mul_comm a, PowerSeries.coeff_X_pow_mul', if_neg (by omega), zero_add,
-          PowerSeries.coeff_mul_C, map_sum]
-        at hcoef
-    have hterm
-        : ∀ i ∈ I,
-          PowerSeries.coeff (e i₀) (w i * X ^ e i * C (ϖ ^ m i))
-            = (if e i ≤ e i₀ then PowerSeries.coeff (e i₀ - e i) (w i) else 0) * ϖ ^ m i := by
+
+    rw [map_add (f := _), mul_comm a, PowerSeries.coeff_X_pow_mul', if_neg (by omega), zero_add,
+    PowerSeries.coeff_mul_C, map_sum] at hcoef
+    have hterm : ∀ i ∈ I, PowerSeries.coeff (e i₀) (w i * X ^ e i * C (ϖ ^ m i)) =
+        (if e i ≤ e i₀ then PowerSeries.coeff (e i₀ - e i) (w i) else 0) * ϖ ^ m i := by
       intro i _
       rw [PowerSeries.coeff_mul_C, mul_comm (w i), PowerSeries.coeff_X_pow_mul']
-    rw [Finset.sum_congr rfl hterm, ← Finset.add_sum_erase _ _ hi₀, if_pos le_rfl, Nat.sub_self]
-      at hcoef
-    have hrest
-        : ϖ ^ s
-          ∣ ∑ i ∈ I.erase i₀,
-            (if e i ≤ e i₀ then PowerSeries.coeff (e i₀ - e i) (w i) else 0) * ϖ ^ m i := by
+    rw [Finset.sum_congr rfl hterm, ← Finset.add_sum_erase _ _ hi₀, if_pos le_rfl,
+      Nat.sub_self] at hcoef
+    have hrest : ϖ ^ s ∣ ∑ i ∈ I.erase i₀,
+        (if e i ≤ e i₀ then PowerSeries.coeff (e i₀ - e i) (w i) else 0) * ϖ ^ m i := by
       refine Finset.dvd_sum fun i hi => ?_
       obtain ⟨hne, hiI⟩ := Finset.mem_erase.mp hi
       by_cases hle : e i ≤ e i₀
@@ -54,26 +89,27 @@ theorem mem_span_iff_of_distinct_exponents : DistinctTerms := by
       · rw [if_neg hle, zero_mul]
         exact dvd_zero _
     have hdvd : ϖ ^ s ∣ PowerSeries.coeff 0 (w i₀) * ϖ ^ m i₀ := by
-      have h2
-          : PowerSeries.coeff 0 (w i₀) * ϖ ^ m i₀
-            = PowerSeries.coeff (e i₀) b * ϖ ^ s
-              - ∑ i ∈ I.erase i₀,
-                (if e i ≤ e i₀ then PowerSeries.coeff (e i₀ - e i) (w i) else 0) * ϖ ^ m i := by
+      have h2 : PowerSeries.coeff 0 (w i₀) * ϖ ^ m i₀ =
+          PowerSeries.coeff (e i₀) b * ϖ ^ s - ∑ i ∈ I.erase i₀,
+            (if e i ≤ e i₀ then PowerSeries.coeff (e i₀ - e i) (w i) else 0) * ϖ ^ m i := by
         rw [hcoef]; ring
       rw [h2]
       exact dvd_sub (dvd_mul_left _ _) hrest
     have hu : IsUnit (PowerSeries.coeff 0 (w i₀)) := by
       have := (hw i₀ hi₀).map (PowerSeries.constantCoeff (R := O))
       simpa using this
-    have hsplit : ϖ ^ s = ϖ ^ m i₀ * ϖ ^ (s - m i₀) := by rw [← pow_add, Nat.add_sub_cancel' hs.le]
+    have hsplit : ϖ ^ s = ϖ ^ m i₀ * ϖ ^ (s - m i₀) := by
+      rw [← pow_add, Nat.add_sub_cancel' hs.le]
     rw [hsplit, mul_comm (PowerSeries.coeff 0 (w i₀))] at hdvd
     have hd2 := (mul_dvd_mul_iff_left (pow_ne_zero _ hϖ)).mp hdvd
-    have hd3 : ϖ ∣ PowerSeries.coeff 0 (w i₀) := (dvd_pow_self ϖ (by omega)).trans hd2
+    have hd3 : ϖ ∣ PowerSeries.coeff 0 (w i₀) :=
+      (dvd_pow_self ϖ (by omega)).trans hd2
     exact hnu (isUnit_of_dvd_unit hd3 hu)
   · intro h
     refine Ideal.sum_mem _ fun i hi => ?_
     rcases h i hi with hb | hs
-    · have hx : (X : PowerSeries O) ^ B ∈ Ideal.span {(X : PowerSeries O) ^ B, C (ϖ ^ s)} :=
+    · have hx : (X : PowerSeries O) ^ B ∈
+          Ideal.span {(X : PowerSeries O) ^ B, C (ϖ ^ s)} :=
         Ideal.subset_span (Set.mem_insert _ _)
       have heq : w i * X ^ e i * C (ϖ ^ m i) = X ^ B * (w i * X ^ (e i - B) * C (ϖ ^ m i)) := by
         rw [show e i = B + (e i - B) by omega, pow_add]

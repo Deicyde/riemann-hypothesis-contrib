@@ -1,7 +1,49 @@
 module
 
-public import Mathlib
+public import Mathlib.Analysis.SpecialFunctions.Pow.Real
+public import Mathlib.LinearAlgebra.QuadraticForm.Basic
 public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsReducedBasisOfLinearIndependent
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
+public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsBimultiplicativeOfSecondQuotConst
 
 @[expose] public section
 
@@ -9,25 +51,20 @@ open Module
 
 namespace GlobalTheory
 
-theorem eq_zero_of_sum_eq_sum_add_nsmul
-    {X : Type*} [AddCommGroup X]
-    {ι : Type*} (e : Basis ι ℤ X)
-    {C : ℝ} (hC : 0 ≤ C)
-    {N' D k : ℕ} (hN' : 2 * (D : ℝ) * C < N') (hk : k ≤ D) (α β : Fin k → X)
-    (hα : ∀ j i, |(e.repr (α j) i : ℝ)| ≤ C) (hβ : ∀ j i, |(e.repr (β j) i : ℝ)| ≤ C)
-    (w : X) (h : ∑ j, α j = ∑ j, β j + N' • w)
-    : w = 0 := by
+theorem eq_zero_of_sum_eq_sum_add_nsmul {X : Type*} [AddCommGroup X] {ι : Type*}
+    (e : Basis ι ℤ X) {C : ℝ} (hC : 0 ≤ C) {N' D k : ℕ} (hN' : 2 * (D : ℝ) * C < N') (hk : k ≤ D)
+    (α β : Fin k → X) (hα : ∀ j i, |(e.repr (α j) i : ℝ)| ≤ C)
+    (hβ : ∀ j i, |(e.repr (β j) i : ℝ)| ≤ C) (w : X)
+    (h : ∑ j, α j = ∑ j, β j + N' • w) : w = 0 := by
   refine e.repr.injective (Finsupp.ext fun i => ?_)
   have h1 : ∑ j, (e.repr (α j) i : ℝ) = ∑ j, (e.repr (β j) i : ℝ) + N' * (e.repr w i : ℝ) := by
     have := congrArg (fun x => e.repr x i) h
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_add (f := _), map_sum, map_nsmul, Finsupp.coe_add, Pi.add_apply,
-          Finsupp.coe_finsetSum, Finset.sum_apply, Finsupp.coe_smul, Pi.smul_apply, nsmul_eq_mul]
-        at this
+
+    simp only [map_add (f := _), map_sum, map_nsmul, Finsupp.coe_add, Pi.add_apply, Finsupp.coe_finsetSum,
+    Finset.sum_apply, Finsupp.coe_smul, Pi.smul_apply, nsmul_eq_mul] at this
     exact_mod_cast this
-  have bound
-      : ∀ γ : Fin k → X,
-        (∀ j i, |(e.repr (γ j) i : ℝ)| ≤ C) → |∑ j, (e.repr (γ j) i : ℝ)| ≤ D * C := fun γ hγ => by
+  have bound : ∀ γ : Fin k → X, (∀ j i, |(e.repr (γ j) i : ℝ)| ≤ C) →
+      |∑ j, (e.repr (γ j) i : ℝ)| ≤ D * C := fun γ hγ => by
     refine (Finset.abs_sum_le_sum_abs _ _).trans ((Finset.sum_le_sum fun j _ => hγ j i).trans ?_)
     simp only [Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul]
     exact mul_le_mul_of_nonneg_right (by exact_mod_cast hk) hC
@@ -47,18 +84,8 @@ theorem eq_zero_of_sum_eq_sum_add_nsmul
   simp only [map_zero, Finsupp.coe_zero, Pi.zero_apply]
   omega
 
-theorem exists_basis_unique_min_and_sums_separated
-    : ∀ (X : Type) [AddCommGroup X] [Module.Free ℤ X] [Module.Finite ℤ X] (q : QuadraticMap ℤ X ℝ),
-      Filter.Tendsto q Filter.cofinite Filter.atTop
-        → ∀ (d g N N' D : ℕ),
-          finrank ℤ X = d → d ≤ g → 1 + 2 * (g : ℝ) * (2 : ℝ) ^ ((g : ℝ) / 2) < N
-            → 2 * (D : ℝ) * ((g : ℝ) * (3 / 2 : ℝ) ^ g * (2 : ℝ) ^ ((g : ℝ) / 2 - 1)) * N < N'
-            → ∃ e : Basis (Fin d) ℤ X,
-              (∀ (i : Fin d) (μ : X),
-                  μ ≠ 0 → q (e i) < q (e i + N • μ) ∧ q (- e i) < q (- e i + N • μ))
-                ∧ ∀ (k : ℕ) (α β : Fin k → X),
-                  k ≤ D → (∀ j w, q (α j) ≤ q (α j + N • w)) → (∀ j w, q (β j) ≤ q (β j + N • w))
-                    → ∀ w : X, ∑ j, α j = ∑ j, β j + N' • w → w = 0 := by
+theorem exists_basis_unique_min_and_sums_separated :
+    ∀ (X : Type) [AddCommGroup X] [Module.Free ℤ X] [Module.Finite ℤ X] (q : QuadraticMap ℤ X ℝ), Filter.Tendsto q Filter.cofinite Filter.atTop → ∀ (d g N N' D : ℕ), finrank ℤ X = d → d ≤ g → 1 + 2 * (g : ℝ) * (2 : ℝ) ^ ((g : ℝ) / 2) < N → 2 * (D : ℝ) * ((g : ℝ) * (3 / 2 : ℝ) ^ g * (2 : ℝ) ^ ((g : ℝ) / 2 - 1)) * N < N' → ∃ e : Basis (Fin d) ℤ X, (∀ (i : Fin d) (μ : X), μ ≠ 0 → q (e i) < q (e i + N • μ) ∧ q (-e i) < q (-e i + N • μ)) ∧ ∀ (k : ℕ) (α β : Fin k → X), k ≤ D → (∀ j w, q (α j) ≤ q (α j + N • w)) → (∀ j w, q (β j) ≤ q (β j + N • w)) → ∀ w : X, ∑ j, α j = ∑ j, β j + N' • w → w = 0 := by
   intro X _ _ _ q hq d g N N' D hd hg hN hN'
   obtain ⟨e, -, h2, h3⟩ :=
     exists_reduced_basis_unique_min_of_le hd hg q (posDef_realExt_of_tendsto q hq)
@@ -69,15 +96,12 @@ theorem exists_basis_unique_min_and_sums_separated
   refine ⟨e, fun i μ hμ => ?_, fun k α β hk hα hβ w h => ?_⟩
   · have := h3 (N : ℤ) (by push_cast; linarith) i μ hμ
     simpa only [natCast_zsmul] using this
-  · have key
-        : ∀ γ : Fin k → X,
-          (∀ j w, q (γ j) ≤ q (γ j + N • w))
-            → ∀ j i,
-              |(e.repr (γ j) i : ℝ)|
-                ≤ (g : ℝ) * (3 / 2 : ℝ) ^ g * (2 : ℝ) ^ ((g : ℝ) / 2 - 1) * N := fun γ hγ j i => by
+  · have key : ∀ γ : Fin k → X, (∀ j w, q (γ j) ≤ q (γ j + N • w)) → ∀ j i,
+        |(e.repr (γ j) i : ℝ)| ≤
+          (g : ℝ) * (3 / 2 : ℝ) ^ g * (2 : ℝ) ^ ((g : ℝ) / 2 - 1) * N := fun γ hγ j i => by
       have := h2 (N : ℤ) hN1 (γ j) (fun w => by simpa only [natCast_zsmul] using hγ j w) i
       simpa only [Int.cast_natCast] using this
-    exact eq_zero_of_sum_eq_sum_add_nsmul e (by positivity) (by linarith) hk α β (key α hα)
-      (key β hβ) w h
+    exact eq_zero_of_sum_eq_sum_add_nsmul e (by positivity) (by linarith) hk α β
+      (key α hα) (key β hβ) w h
 
 end GlobalTheory

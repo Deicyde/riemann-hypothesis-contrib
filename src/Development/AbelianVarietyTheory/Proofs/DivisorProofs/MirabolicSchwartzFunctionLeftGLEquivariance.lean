@@ -1,5 +1,7 @@
 module
 
+public import Mathlib.Analysis.Matrix.MeasurableSpace
+public import Formalism.DoubleCosetMeasures.StatementZ
 public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsINeZeroKind
 public import Development.AbelianVarietyTheory.PublishedTheorems.TwistedTraceFormula.NotIsCompactUnivFv

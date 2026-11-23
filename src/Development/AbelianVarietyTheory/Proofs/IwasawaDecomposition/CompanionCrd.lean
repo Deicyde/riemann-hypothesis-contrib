@@ -1,72 +1,85 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.FixedVectorEqOfStandardData
-public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.IsTwIffCanonEq
-public import Formalism.LocalToGlobal.KernelLattices.TopPin
-public import Formalism.LocalToGlobal.KernelLattices.InterlaceAll
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.TrueColumnSpacesStandardInFrameCoords
-public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.JetsInIffStepField
-public import Formalism.LocalToGlobal.Columns.BtExistsSmulLeOfFg
+public import Formalism.LocalToGlobal.KernelLattices.KerChTie
 public import Formalism.LocalRingCardinality.SpanPowerMembership.ExampleLayerExistsGenerators
+public import Formalism.LocalToGlobal.Columns.BtExistsSmulLeOfFg
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Col
-  Formalism.L2.DIV Formalism.L2.Ker Formalism.UG Formalism.L2.Forms GlobalTheory.Mem
-  GlobalTheory.Mem.Chr GlobalTheory.Mem.Col2 GlobalTheory.Mem.Col2.TC Matrix
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Col Formalism.L2.DIV Formalism.L2.Ker Formalism.UG Formalism.L2.Forms GlobalTheory.Mem GlobalTheory.Mem.Chr GlobalTheory.Mem.Col2 GlobalTheory.Mem.Col2.TC Matrix
 attribute [local instance] GlobalTheory.Mem.Col2.starE Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.Mem.Col2.MemLat
 
 section Gen
-variable
-  {E : Type} [Field E] [NumberField E] [StarRing E]
-  {n : ℕ} {ST SG : Finset (HeightOneSpectrum (𝓞 E))}
+variable {E : Type} [Field E] [NumberField E] [StarRing E] {n : ℕ} {ST SG : Finset (HeightOneSpectrum (𝓞 E))}
 
-theorem mem_N_iff
-    (d : Deco E n ST SG) (hd : d.Ok)
-    (π : 𝓞 E) (hmem : ∀ P : ST, π ∈ P.1.asIdeal) (hcop : IsCoprime π (cO E π))
-    (x : Sp E n)
-    : x ∈ d.N ↔ ∃ a ∈ d.L, ∃ b ∈ d.Lsh, x = a + cO E π • b := by
+theorem mem_N_iff (d : Deco E n ST SG) (hd : d.Ok) (π : 𝓞 E) (hmem : ∀ P : ST, π ∈ P.1.asIdeal)
+    (hcop : IsCoprime π (cO E π)) (x : Sp E n) :
+    x ∈ d.N ↔ ∃ a ∈ d.L, ∃ b ∈ d.Lsh, x = a + cO E π • b := by
   constructor
   · intro hx
     obtain ⟨s, t, hst⟩ := hcop
-    refine ⟨
-      s • (π • x),
-      d.L.smul_mem s (hd.smul_N_mem_L hmem hx),
-      t • x,
-      d.Lsh.smul_mem t (hd.N_le_Lsh hx),
-      ?_
-    ⟩
+    refine ⟨s • (π • x), d.L.smul_mem s (hd.smul_N_mem_L hmem hx), t • x, d.Lsh.smul_mem t (hd.N_le_Lsh hx), ?_⟩
     rw [smul_smul, smul_smul, ← add_smul, mul_comm (cO E π) t, hst, one_smul]
   · rintro ⟨a, ha, b, hb, rfl⟩
     exact d.N.add_mem (hd.L_le_N ha) (hd.smul_Lsh_mem_N (fun P => by rw [cO_cO]; exact hmem P) hb)
 
-theorem std_of_gram
-    (S : HSpace E)
-    {m : ℕ} (h : S.rank = m) (hg : S.gram.reindex (finCongr h) (finCongr h) = 1)
-    (x y : S.V)
-    : stdH E m (Crd.co S h x) (Crd.co S h y) = S.hT x y := by
+theorem std_of_gram (S : HSpace E) {m : ℕ} (h : S.rank = m) (hg : S.gram.reindex (finCongr h) (finCongr h) = 1) (x y : S.V) :
+    stdH E m (Crd.co S h x) (Crd.co S h y) = S.hT x y := by
   subst h
   have hg' : ∀ a b, S.hT (S.frame a) (S.frame b) = if a = b then 1 else 0 := fun a b => by
     have := congrFun (congrFun hg a) b
     simpa [HSpace.gram, Matrix.one_apply] using this
   conv_rhs => rw [← S.frame.sum_repr x, ← S.frame.sum_repr y]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, LinearMap.map_smulₛₗ₂, LinearMap.map_smul, LinearMap.sum_apply, hg',
-      smul_eq_mul, mul_ite, mul_one, mul_zero]
+
+  simp only [map_sum, LinearMap.map_smulₛₗ₂, LinearMap.map_smul, LinearMap.sum_apply, hg',
+  smul_eq_mul, mul_ite, mul_one, mul_zero]
   simp [stdH, Crd.co, starRingEnd_apply]
 
 omit [NumberField E] in
 theorem hStd_eq_stdH (x y : Fin n → E) : hStd E n x y = stdH E n x y := rfl
 
-theorem mem_dual_crd
-    (S : HSpace E) (co : S.V ≃ₗ[E] (Fin n → E))
-    (hco : ∀ x y, stdH E n (co x) (co y) = S.hT x y) (L : Submodule (𝓞 E) S.V) (b : S.V)
-    : b ∈ Formalism.HermitianLatticesTheory.dual S.hT L
-      ↔ co b ∈ Formalism.HermitianLatticesTheory.dual (hStd E n)
-        (L.map ((co : S.V →ₗ[E] (Fin n → E)).restrictScalars (𝓞 E))) := by
+theorem mem_dual_crd (S : HSpace E) (co : S.V ≃ₗ[E] (Fin n → E)) (hco : ∀ x y, stdH E n (co x) (co y) = S.hT x y)
+    (L : Submodule (𝓞 E) S.V) (b : S.V) :
+    b ∈ Formalism.HermitianLatticesTheory.dual S.hT L ↔ co b ∈ Formalism.HermitianLatticesTheory.dual (hStd E n) (L.map ((co : S.V →ₗ[E] (Fin n → E)).restrictScalars (𝓞 E))) := by
   rw [mem_dual]
   unfold Formalism.HermitianLatticesTheory.dual Formalism.E.hdual
   simp only [Submodule.mem_iInf, Submodule.mem_comap, LinearMap.coe_restrictScalars]
@@ -79,16 +92,11 @@ theorem mem_dual_crd
     have := H (co a) ⟨a, ha, rfl⟩
     simpa [hStd_eq_stdH, hco] using this
 
-theorem companion_crd
-    (S : HSpace E) (co : S.V ≃ₗ[E] (Fin n → E))
-    (hco : ∀ x y, stdH E n (co x) (co y) = S.hT x y) (L : Submodule (𝓞 E) S.V)
-    (d : Deco E n ST SG)
-    (hd : d.Ok) (hL : L.map ((co : S.V →ₗ[E] (Fin n → E)).restrictScalars (𝓞 E)) = d.L)
-    (π : 𝓞 E) (hmem : ∀ P : ST, π ∈ P.1.asIdeal) (hcop : IsCoprime π (cO E π))
-    (y : S.V)
-    : co y ∈ d.N
-      ↔ ∃ a ∈ L, ∃ b ∈ Formalism.HermitianLatticesTheory.dual S.hT L,
-        y = a + star (algebraMap (𝓞 E) E π) • b := by
+theorem companion_crd (S : HSpace E) (co : S.V ≃ₗ[E] (Fin n → E)) (hco : ∀ x y, stdH E n (co x) (co y) = S.hT x y)
+    (L : Submodule (𝓞 E) S.V) (d : Deco E n ST SG) (hd : d.Ok)
+    (hL : L.map ((co : S.V →ₗ[E] (Fin n → E)).restrictScalars (𝓞 E)) = d.L)
+    (π : 𝓞 E) (hmem : ∀ P : ST, π ∈ P.1.asIdeal) (hcop : IsCoprime π (cO E π)) (y : S.V) :
+    co y ∈ d.N ↔ ∃ a ∈ L, ∃ b ∈ Formalism.HermitianLatticesTheory.dual S.hT L, y = a + star (algebraMap (𝓞 E) E π) • b := by
   have hA : ∀ a, a ∈ L ↔ co a ∈ d.L := fun a => by
     rw [← hL]
     exact ⟨fun h => ⟨a, h, rfl⟩, fun ⟨z, hz, e⟩ => co.injective e ▸ hz⟩
@@ -100,13 +108,7 @@ theorem companion_crd
   rw [mem_N_iff d hd π hmem hcop]
   constructor
   · rintro ⟨a', ha', b', hb', e⟩
-    refine ⟨
-      co.symm a',
-      (hA _).2 (by simpa using ha'),
-      co.symm b',
-      (hB _).2 (by simpa using hb'),
-      co.injective ?_
-    ⟩
+    refine ⟨co.symm a', (hA _).2 (by simpa using ha'), co.symm b', (hB _).2 (by simpa using hb'), co.injective ?_⟩
     rw [map_add (f := _), map_smul, co.apply_symm_apply, co.apply_symm_apply, e, hc]
   · rintro ⟨a, ha, b, hb, rfl⟩
     refine ⟨co a, (hA a).1 ha, co b, (hB b).1 hb, ?_⟩
@@ -116,14 +118,9 @@ end Gen
 
 end GlobalTheory.Mem.Col2.MemLat
 
-set_option maxHeartbeats 1600000 in
-theorem GlobalTheory.Mem.Col2.TC.memLatAt_std
-    : ∀ {B : Base} {X : PreX B.toPre} (I : TC B X),
-      I.Ok → TC.Pins B X
-        → ∀ (l : I.Laws) (Z : TC.Later B (I.cols l)) (u : B.Word)
-            (O : GL3Theta.LiftObj (I.rec7 l Z) ((I.rec7 l Z).mem u).C),
-          (∀ i c, (O.lat i c).1 = ((I.stp u I.mu0 i).rep c).1.1.deco.1.N)
-            → MemLatAt O (X.piT u) := by
+
+
+theorem GlobalTheory.Mem.Col2.TC.memLatAt_std : ∀ {B : Base} {X : PreX B.toPre} (I : TC B X), I.Ok → TC.Pins B X → ∀ (l : I.Laws) (Z : TC.Later B (I.cols l)) (u : B.Word) (O : GL3Theta.LiftObj (I.rec7 l Z) ((I.rec7 l Z).mem u).C), (∀ i c, (O.lat i c).1 = ((I.stp u I.mu0 i).rep c).1.1.deco.1.N) → MemLatAt O (X.piT u) := by
   intro B X I hI hP l Z u O hlat
   obtain ⟨-, -, -, hsp⟩ := spaces_in_coordinates I hI hP l Z
   intro i hi
@@ -147,14 +144,8 @@ theorem GlobalTheory.Mem.Col2.TC.memLatAt_std
     have hmem : ∀ P : (B.primes X).vT u, (B.primes X).piT u ∈ P.1.asIdeal := fun P => by
       have := hsep.conj P
       rwa [cO_cO] at this
-    have hLm
-        : ((I.rec7 l Z).clsLat u i c).map
-            ((co
-                : ((I.rec7 l Z).sp.X i).V →ₗ[(I.rec7 l Z).host.E] (Fin ((I.rec7 l Z).R.N i) → (I.rec7 l Z).host.E)).restrictScalars
-              (𝓞 (I.rec7 l Z).host.E))
-          = (((I.stp u I.mu0 i).rep c).1.1.deco).1.L :=
-      hL' c
-    refine (GlobalTheory.Mem.Col2.MemLat.companion_crd _ co hiso _
-      (((I.stp u I.mu0 i).rep c).1.1.deco).1 (((I.stp u I.mu0 i).rep c).1.1.deco).2 hLm
-      ((B.primes X).piT u) hmem (l.pr.piT_cop u) y).trans ?_
+    have hLm : ((I.rec7 l Z).clsLat u i c).map ((co : ((I.rec7 l Z).sp.X i).V →ₗ[(I.rec7 l Z).host.E] (Fin ((I.rec7 l Z).R.N i) → (I.rec7 l Z).host.E)).restrictScalars (𝓞 (I.rec7 l Z).host.E)) =
+        (((I.stp u I.mu0 i).rep c).1.1.deco).1.L := hL' c
+    refine (GlobalTheory.Mem.Col2.MemLat.companion_crd _ co hiso _ (((I.stp u I.mu0 i).rep c).1.1.deco).1 (((I.stp u I.mu0 i).rep c).1.1.deco).2
+      hLm ((B.primes X).piT u) hmem (l.pr.piT_cop u) y).trans ?_
     rw [Formalism.BasicNotions.Examples₂.star_eq_conj]

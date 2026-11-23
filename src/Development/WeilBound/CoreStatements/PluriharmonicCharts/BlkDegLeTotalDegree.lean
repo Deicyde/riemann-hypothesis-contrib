@@ -1,9 +1,45 @@
 module
 
-public import Mathlib
-public import ReciprocityTheory.AnalyticForms.RegularLocalRings.MemConePtsIffChartIdeal
 public import ReciprocityTheory.AnalyticForms.RegularLocalRings.LocTransfer
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.IsIntersectionFamily
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
 
 @[expose] public section
 
@@ -93,10 +129,10 @@ theorem exists_homogenize (p : (k : K) → ι k) (Q : MvPolynomial (Fin (Fintype
     unfold blkDeg at h2
     omega
   · intro z hz
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
-    set_option synthInstance.maxHeartbeats 100000 in
-      conv_rhs => rw [hren, Q'.as_sum, map_sum, Finset.mul_sum]
+
+    rw [map_sum]
+
+    conv_rhs => rw [hren, Q'.as_sum, map_sum, Finset.mul_sum]
     refine Finset.sum_congr rfl fun m hm => ?_
     rw [eval_monomial, eval_monomial, Finsupp.prod_fintype _ _ (fun _ => pow_zero _),
       Finsupp.prod_fintype _ _ (fun _ => pow_zero _)]
@@ -123,8 +159,8 @@ theorem exists_homogenize (p : (k : K) → ι k) (Q : MvPolynomial (Fin (Fintype
       Finset.prod_ne_zero_iff.2 fun k _ => pow_ne_zero _ (hz k)
     field_simp
   · rintro z ⟨k, hk⟩
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     refine Finset.sum_eq_zero fun m hm => ?_
     rw [eval_monomial, Finsupp.prod_fintype _ _ (fun _ => pow_zero _)]
     refine mul_eq_zero_of_right _ (Finset.prod_eq_zero (Finset.mem_univ ⟨k, p k⟩) ?_)

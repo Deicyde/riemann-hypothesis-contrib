@@ -1,8 +1,65 @@
 module
 
+import ReciprocityTheory.ReductiveGroups.DiscreteSeries.MultiplicityOne.JInvCCB
 public import Formalism.HermitianCurvature.StatementB
+public import Mathlib.Analysis.LocallyConvex.AbsConvexOpen
 public import Formalism.FormalDegreeBessel.FormalDegreeRatio.UnitaryWeylNormalHolds
 public import Formalism.RealPlaceAnalysis.RealPlaceTaylor.CartanInvolutionConjTransposeMul
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Real
+import Mathlib.Algebra.Ring.IsFormallyReal
+public import Mathlib.Analysis.Calculus.FDeriv.Symmetric
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.Normed.Algebra.MatrixExponential
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.Order.CompletePartialOrder
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Lemma
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
+public import Mathlib.Analysis.Calculus.Deriv.CompMul
+public import Mathlib.Analysis.Calculus.Deriv.Shift
 
 @[expose] public section
 
@@ -155,26 +212,7 @@ lemma hpk_isUnit : IsUnit (Hpk k r) := by
   exact ⟨⟨Hpk k r, Hpk k r, hpk_sq_lemma, hpk_sq_lemma⟩, rfl⟩
 
 lemma exp_mem {Y : Mat k r} (hY : inLie k r Y) : NormedSpace.exp Y ∈ GV k r := by
-  have hU : IsUnit (Hpk k r) := hpk_isUnit
-  have hHH : Hpk k r * Hpk k r = 1 := by
-    calc Hpk k r * Hpk k r = Hpk k r * (Hpk k r)⁻¹ := by rw [hpk_inv]
-      _ = 1 := Matrix.mul_nonsing_inv _ ((Matrix.isUnit_iff_isUnit_det _).mp hU)
-  have hY' : Yᴴ = Hpk k r * (-Y) * (Hpk k r)⁻¹ := by
-    have h1 : Yᴴ * Hpk k r = -(Hpk k r * Y) := eq_neg_of_add_eq_zero_left hY
-    rw [hpk_inv]
-    calc Yᴴ = Yᴴ * (Hpk k r * Hpk k r) := by rw [hHH, Matrix.mul_one]
-      _ = Yᴴ * Hpk k r * Hpk k r := by rw [Matrix.mul_assoc]
-      _ = Hpk k r * (-Y) * Hpk k r := by rw [h1, _root_.neg_mul, _root_.mul_neg, _root_.neg_mul]
-  show (NormedSpace.exp Y)ᴴ * Hpk k r * NormedSpace.exp Y = Hpk k r
-  rw [← Matrix.exp_conjTranspose, hY', Matrix.exp_conj _ _ hU, hpk_inv]
-  have hE : NormedSpace.exp (-Y) * NormedSpace.exp Y = 1 := by
-    rw [← Matrix.exp_add_of_commute _ _ (Commute.neg_left (Commute.refl Y)),
-      show -Y + Y = (0 : Mat k r) by abel, NormedSpace.exp_zero]
-  calc Hpk k r * NormedSpace.exp (-Y) * Hpk k r * Hpk k r * NormedSpace.exp Y
-      = Hpk k r * (NormedSpace.exp (-Y) * (Hpk k r * Hpk k r) * NormedSpace.exp Y) := by
-        simp only [Matrix.mul_assoc]
-    _ = Hpk k r := by
-        rw [hHH, Matrix.mul_one, hE, Matrix.mul_one]
+  apply ReciprocityTheory.ChartRestriction.DS.Mult1.InvCC.exp_mem <;> assumption
 
 def cv (b : Bool) (X : Mat k r) (t : ℝ) (g : Mat k r) : Mat k r :=
   match b with

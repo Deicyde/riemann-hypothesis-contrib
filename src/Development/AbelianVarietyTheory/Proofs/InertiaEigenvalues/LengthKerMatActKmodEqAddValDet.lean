@@ -1,8 +1,48 @@
 module
 
-public import Mathlib
 public import Formalism.SharpRestriction.LevelLetterCocycles.BlochKatoPhases
-public import Development.AbelianVarietyTheory.Proofs.CoherentCohomologyProofs.LengthCommensurableSpanSpanOfDetNeZero
+public import Development.AbelianVarietyTheory.Proofs.CoherentCohomologyProofs.RelLengthSpanEqAddValDet
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -10,33 +50,30 @@ namespace GlobalTheory
 
 open Formalism.MainNotions.BlochKatoReduction Formalism.BasicNotions
 
-theorem matAct_comp_linear
-    {R M N : Type*} [CommRing R] [AddCommGroup M] [Module R M] [AddCommGroup N] [Module R N]
-    {n : ℕ} (A : Matrix (Fin n) (Fin n) R)
-    (f : M →ₗ[R] N) (v : Fin n → M)
-    : matAct (M := N) A (fun i => f (v i)) = fun i => f (matAct (M := M) A v i) := by
+theorem matAct_comp_linear {R M N : Type*} [CommRing R] [AddCommGroup M] [Module R M]
+    [AddCommGroup N] [Module R N] {n : ℕ} (A : Matrix (Fin n) (Fin n) R) (f : M →ₗ[R] N)
+    (v : Fin n → M) : matAct (M := N) A (fun i => f (v i)) = fun i => f (matAct (M := M) A v i) := by
   funext i
-  set_option synthInstance.maxHeartbeats 100000 in
+
   simp [matAct, map_sum, map_smul]
 
-theorem matAct_self_apply
-    {R : Type*} [CommRing R] {n : ℕ} (A : Matrix (Fin n) (Fin n) R) (v : Fin n → R)
-    : matAct (M := R) A v = A.mulVec v := by
+theorem matAct_self_apply {R : Type*} [CommRing R] {n : ℕ} (A : Matrix (Fin n) (Fin n) R)
+    (v : Fin n → R) : matAct (M := R) A v = A.mulVec v := by
   funext i
   simp [matAct, Matrix.mulVec, dotProduct]
 
-private theorem matAct_fractionRing
-    {O : Type} [CommRing O] [IsDomain O]
-    {n : ℕ} (A : Matrix (Fin n) (Fin n) O) (v : Fin n → FractionRing O)
-    : matAct (M := FractionRing O) A v = (A.map (algebraMap O (FractionRing O))).mulVec v := by
+private theorem matAct_fractionRing {O : Type} [CommRing O] [IsDomain O] {n : ℕ}
+    (A : Matrix (Fin n) (Fin n) O) (v : Fin n → FractionRing O) :
+    matAct (M := FractionRing O) A v = (A.map (algebraMap O (FractionRing O))).mulVec v := by
   funext i
   simp [matAct, Matrix.mulVec, dotProduct, Algebra.smul_def]
 
-theorem matAct_fraction_bijective
-    {O : Type} [CommRing O] [IsDomain O] {n : ℕ} (A : Matrix (Fin n) (Fin n) O) (h : A.det ≠ 0)
-    : Function.Bijective (matAct (M := FractionRing O) A) := by
+theorem matAct_fraction_bijective {O : Type} [CommRing O] [IsDomain O] {n : ℕ}
+    (A : Matrix (Fin n) (Fin n) O) (h : A.det ≠ 0) :
+    Function.Bijective (matAct (M := FractionRing O) A) := by
   set B := A.map (algebraMap O (FractionRing O)) with hB
-  have hd : B.det = algebraMap O (FractionRing O) A.det := by rw [hB, RingHom.map_det]; rfl
+  have hd : B.det = algebraMap O (FractionRing O) A.det := by
+    rw [hB, RingHom.map_det]; rfl
   have hU : IsUnit B := by
     rw [Matrix.isUnit_iff_isUnit_det, hd, isUnit_iff_ne_zero]
     exact (map_ne_zero_iff _ (IsFractionRing.injective O (FractionRing O))).mpr h
@@ -44,11 +81,10 @@ theorem matAct_fraction_bijective
   rw [hf]
   exact ⟨Matrix.mulVec_injective_iff_isUnit.mpr hU, Matrix.mulVec_surjective_iff_isUnit.mpr hU⟩
 
-theorem nonempty_coker_equiv_ker_matAct
-    {O : Type} [CommRing O] [IsDomain O] {n : ℕ} (A : Matrix (Fin n) (Fin n) O) (h : A.det ≠ 0)
-    : Nonempty
-      (((Fin n → O) ⧸ LinearMap.range A.mulVecLin) ≃ₗ[O]
-        LinearMap.ker (matAct (M := KmodO O) A)) := by
+theorem nonempty_coker_equiv_ker_matAct {O : Type} [CommRing O] [IsDomain O] {n : ℕ}
+    (A : Matrix (Fin n) (Fin n) O) (h : A.det ≠ 0) :
+    Nonempty (((Fin n → O) ⧸ LinearMap.range A.mulVecLin) ≃ₗ[O]
+      LinearMap.ker (matAct (M := KmodO O) A)) := by
   classical
   let ι : (Fin n → O) →ₗ[O] (Fin n → FractionRing O) :=
     (Algebra.linearMap O (FractionRing O)).compLeft (Fin n)
@@ -62,8 +98,8 @@ theorem nonempty_coker_equiv_ker_matAct
     have key := matAct_comp_linear A (Algebra.linearMap O (FractionRing O)) y
     rw [matAct_self_apply] at key
     exact key
-  have hAπ : ∀ x, matAct (M := KmodO O) A (π x) = π (matAct (M := FractionRing O) A x) := fun x =>
-    matAct_comp_linear A (LinearMap.range (Algebra.linearMap O (FractionRing O))).mkQ x
+  have hAπ : ∀ x, matAct (M := KmodO O) A (π x) = π (matAct (M := FractionRing O) A x) :=
+    fun x => matAct_comp_linear A (LinearMap.range (Algebra.linearMap O (FractionRing O))).mkQ x
   have hπι : ∀ y, π (ι y) = 0 := by
     intro y
     funext i
@@ -90,14 +126,13 @@ theorem nonempty_coker_equiv_ker_matAct
   have hφ : ∀ y, (φ y : Fin n → KmodO O) = π (e.symm (ι y)) := fun y => rfl
   have hsurj : Function.Surjective φ := by
     rintro ⟨x, hx⟩
-    have hpre : ∀ i, ∃ k : FractionRing O, Submodule.Quotient.mk k = x i := fun i =>
-      Submodule.Quotient.mk_surjective _ (x i)
+    have hpre : ∀ i, ∃ k : FractionRing O, Submodule.Quotient.mk k = x i :=
+      fun i => Submodule.Quotient.mk_surjective _ (x i)
     choose k hk using hpre
     have hπk : π k = x := funext hk
-    obtain ⟨y, hy⟩ :=
-      hlift (matAct (M := FractionRing O) A k) (by
-        rw [← hAπ, hπk]
-        exact hx)
+    obtain ⟨y, hy⟩ := hlift (matAct (M := FractionRing O) A k) (by
+      rw [← hAπ, hπk]
+      exact hx)
     refine ⟨y, Subtype.ext ?_⟩
     rw [hφ, hy, ← he, e.symm_apply_apply, hπk]
   have hkerφ : LinearMap.range A.mulVecLin = LinearMap.ker φ := by
@@ -117,17 +152,17 @@ theorem nonempty_coker_equiv_ker_matAct
       rw [Matrix.mulVecLin_apply, ← hAι, hz, ← he, e.apply_symm_apply]
   exact ⟨(Submodule.quotEquivOfEq _ _ hkerφ).trans (φ.quotKerEquivOfSurjective hsurj)⟩
 
-theorem length_ker_matAct_eq_top
-    {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
-    {n : ℕ} (A : Matrix (Fin n) (Fin n) O) (h : A.det = 0)
-    : Module.length O (LinearMap.ker (matAct (M := KmodO O) A)) = ⊤ := by
+theorem length_ker_matAct_eq_top {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+    {n : ℕ} (A : Matrix (Fin n) (Fin n) O) (h : A.det = 0) :
+    Module.length O (LinearMap.ker (matAct (M := KmodO O) A)) = ⊤ := by
   classical
   by_contra hne
   have hfl := Module.length_ne_top_iff.mp hne
   have : IsNoetherian O (LinearMap.ker (matAct (M := KmodO O) A)) :=
     (isFiniteLength_iff_isNoetherian_isArtinian.mp hfl).1
   set B := A.map (algebraMap O (FractionRing O)) with hB
-  have hd : B.det = 0 := by rw [hB, ← RingHom.mapMatrix_apply, ← RingHom.map_det, h, map_zero]
+  have hd : B.det = 0 := by
+    rw [hB, ← RingHom.mapMatrix_apply, ← RingHom.map_det, h, map_zero]
   obtain ⟨v, hv0, hBv⟩ := Matrix.exists_mulVec_eq_zero_iff.mpr hd
   obtain ⟨i0, hi0⟩ : ∃ i, v i ≠ 0 := by
     by_contra hh
@@ -142,8 +177,8 @@ theorem length_ker_matAct_eq_top
   have hg0mem : ∀ t, g0 t ∈ LinearMap.ker (matAct (M := KmodO O) A) := by
     intro t
     rw [LinearMap.mem_ker, hg0]
-    refine (matAct_comp_linear A (LinearMap.range (Algebra.linearMap O (FractionRing O))).mkQ
-      (t • v)).trans ?_
+    refine (matAct_comp_linear A
+      (LinearMap.range (Algebra.linearMap O (FractionRing O))).mkQ (t • v)).trans ?_
     rw [matAct_fractionRing, ← hB, Matrix.mulVec_smul, hBv, smul_zero]
     funext i
     simp
@@ -158,9 +193,8 @@ theorem length_ker_matAct_eq_top
       field_simp
     rw [ht, map_smul]
     exact Submodule.smul_mem_smul ((IsLocalRing.mem_maximalIdeal _).mpr hϖ.not_isUnit) ⟨_, rfl⟩
-  have hbot :=
-    Submodule.eq_bot_of_le_smul_of_le_jacobson_bot (IsLocalRing.maximalIdeal O) (LinearMap.range g)
-      (IsNoetherian.noetherian _) hle (IsLocalRing.maximalIdeal_le_jacobson ⊥)
+  have hbot := Submodule.eq_bot_of_le_smul_of_le_jacobson_bot (IsLocalRing.maximalIdeal O)
+    (LinearMap.range g) (IsNoetherian.noetherian _) hle (IsLocalRing.maximalIdeal_le_jacobson ⊥)
   set t := (algebraMap O (FractionRing O) ϖ * v i0)⁻¹ with ht
   have hgt : g t = 0 := by
     have hm : g t ∈ LinearMap.range g := ⟨t, rfl⟩
@@ -179,13 +213,11 @@ theorem length_ker_matAct_eq_top
   have hunit : IsUnit ϖ := ⟨⟨ϖ, a, by rw [mul_comm]; exact hmul, hmul⟩, rfl⟩
   exact hϖ.not_isUnit hunit
 
-theorem length_ker_matAct_kmod_eq_addVal_det
-    : ∀ (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] (a : ℕ)
-        (Φ : Matrix (Fin a) (Fin a) O),
-      Module.length O
-          (LinearMap.ker (Formalism.MainNotions.BlochKatoReduction.matAct
-            (M := Formalism.BasicNotions.KmodO O) Φ))
-        = IsDiscreteValuationRing.addVal O Φ.det := by
+theorem length_ker_matAct_kmod_eq_addVal_det :
+    ∀ (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] (a : ℕ)
+      (Φ : Matrix (Fin a) (Fin a) O),
+      Module.length O (LinearMap.ker (Formalism.MainNotions.BlochKatoReduction.matAct (M := Formalism.BasicNotions.KmodO O) Φ)) =
+        IsDiscreteValuationRing.addVal O Φ.det := by
   intro O _ _ _ a Φ
   by_cases h : Φ.det = 0
   · rw [length_ker_matAct_eq_top Φ h, h, IsDiscreteValuationRing.addVal_zero]

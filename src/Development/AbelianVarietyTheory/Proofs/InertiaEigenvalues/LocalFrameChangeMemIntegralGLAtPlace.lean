@@ -1,25 +1,54 @@
 module
 
-public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.LengthPosOfPosDef
-public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.AdjFormula
-public import Formalism.LocalToGlobal.IndefiniteReal.LinksStage
-public import Development.AbelianVarietyTheory.PublishedTheorems.AutomorphicForms₂.ExistsNormLeHeightPow
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ThetaPairingInvariant
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.DatP
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.LatSelfDualOfUnimod
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.MemHatIffOfSelfDual
-public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.LevelHyperspecialTrivialCharacterSplitsOffPlaces
-public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.SupportedSubgroupSplitCommutePrimeIdempotents
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.LevelCharacterEmbeddingCompat
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
+import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.LengthPosOfPosDef
+import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.DatP
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH
-  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
-  Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix
 open Formalism.L2.Theta Formalism.L2.DIV Formalism.L2.Indef
-open Formalism.IndefR.Lev Formalism.IndefR.Mult Formalism.IndefR.Datum Formalism.IndefR.Cx
-  Formalism.IndefR.Links
+open Formalism.IndefR.Lev Formalism.IndefR.Mult Formalism.IndefR.Datum Formalism.IndefR.Cx Formalism.IndefR.Links
 open scoped TensorProduct InnerProductSpace
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.RawLift
@@ -28,12 +57,9 @@ open Classical
 
 namespace GlobalTheory.LocCore
 
-theorem adj_det_integral
-    {K : Type*} [Field K]
-    {Γ : Type*} [LinearOrderedCommGroupWithZero Γ]
-    (v : Valuation K Γ)
-    {n : ℕ} (A : Matrix (Fin n) (Fin n) K) (hA : ∀ i j, v (A i j) ≤ 1)
-    : (∀ i j, v (A.adjugate i j) ≤ 1) ∧ v A.det ≤ 1 := by
+theorem adj_det_integral {K : Type*} [Field K] {Γ : Type*} [LinearOrderedCommGroupWithZero Γ]
+    (v : Valuation K Γ) {n : ℕ} (A : Matrix (Fin n) (Fin n) K) (hA : ∀ i j, v (A i j) ≤ 1) :
+    (∀ i j, v (A.adjugate i j) ≤ 1) ∧ v A.det ≤ 1 := by
   let A' : Matrix (Fin n) (Fin n) v.integer := fun i j => ⟨A i j, hA i j⟩
   have hA' : A'.map v.integer.subtype = A := by ext i j; rfl
   constructor
@@ -47,15 +73,13 @@ theorem adj_det_integral
     rw [← h]
     exact (A'.det).2
 
-theorem solve_integral
-    {K : Type*} [Field K]
-    {Γ : Type*} [LinearOrderedCommGroupWithZero Γ]
-    (v : Valuation K Γ)
-    {n : ℕ} (A B κ : Matrix (Fin n) (Fin n) K) (hAB : A * κ = B) (hA : ∀ i j, v (A i j) ≤ 1)
-    (hB : ∀ i j, v (B i j) ≤ 1) (hdA : v A.det = 1) (hdB : v B.det = 1)
-    : (∀ a b, v (κ a b) ≤ 1) ∧ v κ.det = 1
-      ∧ ((∀ i j, v ((A - 1) i j) < 1) → (∀ i j, v ((B - 1) i j) < 1)
-        → ∀ a b, v ((κ - 1) a b) < 1) := by
+theorem solve_integral {K : Type*} [Field K] {Γ : Type*} [LinearOrderedCommGroupWithZero Γ]
+    (v : Valuation K Γ) {n : ℕ} (A B κ : Matrix (Fin n) (Fin n) K) (hAB : A * κ = B)
+    (hA : ∀ i j, v (A i j) ≤ 1) (hB : ∀ i j, v (B i j) ≤ 1)
+    (hdA : v A.det = 1) (hdB : v B.det = 1) :
+    (∀ a b, v (κ a b) ≤ 1) ∧ v κ.det = 1 ∧
+      ((∀ i j, v ((A - 1) i j) < 1) → (∀ i j, v ((B - 1) i j) < 1) →
+        ∀ a b, v ((κ - 1) a b) < 1) := by
   obtain ⟨hadj, -⟩ := adj_det_integral v A hA
   have key : A.det • κ = A.adjugate * B := by
     rw [← hAB, ← Matrix.mul_assoc, Matrix.adjugate_mul, Matrix.smul_mul, Matrix.one_mul]
@@ -94,18 +118,16 @@ end GlobalTheory.LocCore
 
 namespace GlobalTheory.LocCore
 
-noncomputable def topAt
-    {D : D7} (P : Pl D.host.E)
-    {m n : ℕ} (hmn : n ≤ m) (U : Matrix (Fin m) (Fin n) (Formalism.IndefR.Datum.EAf D))
-    : Matrix (Fin n) (Fin n) (HeightOneSpectrum.adicCompletion D.host.E P) := fun i j =>
-  GlobalTheory.StdFrames.cpt P (U (Fin.castLE hmn i) j)
+noncomputable def topAt {D : D7} (P : Pl D.host.E) {m n : ℕ} (hmn : n ≤ m)
+    (U : Matrix (Fin m) (Fin n) (Formalism.IndefR.Datum.EAf D)) :
+    Matrix (Fin n) (Fin n) (HeightOneSpectrum.adicCompletion D.host.E P) :=
+  fun i j => GlobalTheory.StdFrames.cpt P (U (Fin.castLE hmn i) j)
 
-theorem topAt_facts
-    {D : D7} (P : Pl D.host.E)
-    {m n : ℕ} (hmn : n ≤ m) (U : Matrix (Fin m) (Fin n) (Formalism.IndefR.Datum.EAf D))
-    (hU : IsIntM U) (hdU : IsUnit (topL n (redM P U)).det)
-    : (∀ i j, Valued.v (topAt P hmn U i j) ≤ 1) ∧ Valued.v (topAt P hmn U).det = 1
-      ∧ (topL n (redM P U) = 1 → ∀ i j, Valued.v ((topAt P hmn U - 1) i j) < 1) := by
+theorem topAt_facts {D : D7} (P : Pl D.host.E) {m n : ℕ} (hmn : n ≤ m)
+    (U : Matrix (Fin m) (Fin n) (Formalism.IndefR.Datum.EAf D)) (hU : IsIntM U)
+    (hdU : IsUnit (topL n (redM P U)).det) :
+    (∀ i j, Valued.v (topAt P hmn U i j) ≤ 1) ∧ Valued.v (topAt P hmn U).det = 1 ∧
+      (topL n (redM P U) = 1 → ∀ i j, Valued.v ((topAt P hmn U - 1) i j) < 1) := by
   let S := Formalism.L2.Herm.intAf (↥D.host.F) D.host.E
   let A' : Matrix (Fin n) (Fin n) S := fun i j => ⟨U (Fin.castLE hmn i) j, hU _ _⟩
   let φ : S →+* HeightOneSpectrum.adicCompletion D.host.E P :=
@@ -120,8 +142,8 @@ theorem topAt_facts
     intro i j
     have := (GlobalTheory.StdFrames.mem_OA_iff (U (Fin.castLE hmn i) j)).1 (hU _ _) P
     exact (HeightOneSpectrum.mem_adicCompletionIntegers _ _ _).1 this
-  have hφ : ∀ s : S, resS (↥D.host.F) P s = 0 ↔ Valued.v (φ s) < 1 := fun s =>
-    GlobalTheory.AdIsom.resS_eq_zero_iff_cpt P s
+  have hφ : ∀ s : S, resS (↥D.host.F) P s = 0 ↔ Valued.v (φ s) < 1 :=
+    fun s => GlobalTheory.AdIsom.resS_eq_zero_iff_cpt P s
   refine ⟨hint, ?_, ?_⟩
   · apply le_antisymm ((adj_det_integral Valued.v _ hint).2)
     have h1 : resS (↥D.host.F) P A'.det ≠ 0 := by
@@ -147,19 +169,7 @@ end GlobalTheory.LocCore
 
 namespace GlobalTheory.LocCore
 
-theorem kappa_integral_at
-    : ∀ (D : D7) (P : Pl D.host.E) (m n : ℕ)
-        (U Y : Matrix (Fin m) (Fin n) (Formalism.IndefR.Datum.EAf D))
-        (κ : Matrix (Fin n) (Fin n) (Formalism.IndefR.Datum.EAf D))
-        (c : Formalism.IndefR.Datum.EAf D),
-      GlobalTheory.StdFrames.cpt P c = 1
-        → (HMul.hMul U κ : Matrix (Fin m) (Fin n) (Formalism.IndefR.Datum.EAf D))
-          = c • Y + (1 - c) • U
-        → IsIntM U → IsIntM Y → IsUnit (topL n (redM P U)).det → IsUnit (topL n (redM P Y)).det
-        → (∀ a b, GlobalTheory.StdFrames.cpt P (κ a b) ∈ P.adicCompletionIntegers D.host.E)
-          ∧ Valued.v (GlobalTheory.StdFrames.cpt P κ.det) = 1
-          ∧ (topL n (redM P U) = 1 → topL n (redM P Y) = 1
-            → ∀ a b, Valued.v (GlobalTheory.StdFrames.cpt P ((κ - 1) a b)) < 1) := by
+theorem kappa_integral_at : ∀ (D : D7) (P : Pl D.host.E) (m n : ℕ) (U Y : Matrix (Fin m) (Fin n) (Formalism.IndefR.Datum.EAf D)) (κ : Matrix (Fin n) (Fin n) (Formalism.IndefR.Datum.EAf D)) (c : Formalism.IndefR.Datum.EAf D), GlobalTheory.StdFrames.cpt P c = 1 → (HMul.hMul U κ : Matrix (Fin m) (Fin n) (Formalism.IndefR.Datum.EAf D)) = c • Y + (1 - c) • U → IsIntM U → IsIntM Y → IsUnit (topL n (redM P U)).det → IsUnit (topL n (redM P Y)).det → (∀ a b, GlobalTheory.StdFrames.cpt P (κ a b) ∈ P.adicCompletionIntegers D.host.E) ∧ Valued.v (GlobalTheory.StdFrames.cpt P κ.det) = 1 ∧ (topL n (redM P U) = 1 → topL n (redM P Y) = 1 → ∀ a b, Valued.v (GlobalTheory.StdFrames.cpt P ((κ - 1) a b)) < 1) := by
   intro D P m n U Y κ c hc hUk hU hY hdU hdY
   by_cases hmn : n ≤ m
   swap
@@ -177,10 +187,9 @@ theorem kappa_integral_at
   have hAB : topAt P hmn U * κ.map cp = topAt P hmn Y := by
     refine Matrix.ext fun i j => ?_
     have h := congrArg cp (congrFun (congrFun hUk (Fin.castLE hmn i)) j)
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [Matrix.mul_apply, Matrix.add_apply, Matrix.smul_apply, smul_eq_mul, map_sum,
-          map_mul, map_add, map_sub, map_one, hc, sub_self, zero_mul, add_zero, one_mul]
-        at h
+
+    simp only [Matrix.mul_apply, Matrix.add_apply, Matrix.smul_apply, smul_eq_mul, map_sum,
+    map_mul, map_add, map_sub, map_one, hc, sub_self, zero_mul, add_zero, one_mul] at h
     rw [Matrix.mul_apply]
     simp only [Matrix.map_apply]
     exact h

@@ -1,8 +1,56 @@
 module
 
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.InterBridgeO
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.InterBridgeP
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.InterPC
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+public import Mathlib.RingTheory.Nullstellensatz
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.InterBridgeB
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.InterBridgeP
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.InterFibB
+import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
@@ -78,8 +126,8 @@ theorem exists_homog_of_cone
         eval (fun i => t * v i) (homogeneousComponent m c)
           = t ^ m * eval v (homogeneousComponent m c) := by
     intro m t v
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [homogeneousComponent_apply, map_sum, map_sum, Finset.mul_sum]
+
+    rw [homogeneousComponent_apply, map_sum, map_sum, Finset.mul_sum]
     refine Finset.sum_congr rfl fun d hd => ?_
     rw [Finset.mem_filter] at hd
     have hdeg : ∑ i ∈ d.support, d i = m := by
@@ -95,8 +143,8 @@ theorem exists_homog_of_cone
     have hQ : ∀ t : ℂ, t ≠ 0 → Q.eval t = 0 := by
       intro t ht
       have h0 := hcT _ (hT v hv t ht)
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [← sum_homogeneousComponent c, map_sum] at h0
+
+      rw [← sum_homogeneousComponent c, map_sum] at h0
       simp only [Q, Polynomial.eval_finsetSum, Polynomial.eval_mul, Polynomial.eval_C,
         Polynomial.eval_pow, Polynomial.eval_X]
       rw [← h0]
@@ -223,8 +271,8 @@ theorem normPoly_of (hM : PCMinContractStatement) : NormPolyStatement := by
   have hevalH
       : ∀ z, eval z H = ∑ j ∈ S, eval (Ψ (segre z)) (c j) * eval (segre z) F ^ (j - k0) := by
     intro z
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hHdef, map_sum]
+
+    rw [hHdef, map_sum]
     refine Finset.sum_congr rfl fun j _ => ?_
     rw [map_mul, map_pow, hbind, hF]
   have hmul : ∀ z ∈ mcPts P, eval z (map (Int.castRingHom ℂ) (f' ^ k0)) * eval z H = 0 := by

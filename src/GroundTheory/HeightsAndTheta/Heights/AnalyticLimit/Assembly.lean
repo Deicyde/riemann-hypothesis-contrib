@@ -1,36 +1,53 @@
 module
 
-public import Mathlib
-public import GroundTheory.HeightsAndTheta.Heights.AnalyticLimit.RegularizedMaxC2ExampleRealLine
-public import ReciprocityTheory.AnalyticForms.PotentialTheory.HessCEqZeroOfEventuallyEqZero
-public import GroundTheory.HeightsAndTheta.Heights.AnalyticLimit.Objects
-public import GroundTheory.HeightsAndTheta.Heights.AnalyticLimit.ConvergenceRate
-public import ReciprocityTheory.AnalyticForms.PotentialTheory.HessCIsHermitian
-public import ReciprocityTheory.AnalyticForms.PotentialTheory.ProjectiveLinePartitionContinuousCoe
-public import GroundTheory.HeightsAndTheta.Heights.AnalyticLimit.Telescoping
-public import GroundTheory.HeightsAndTheta.Heights.AnalyticLimit.EnergyStep
-public import GroundTheory.HeightsAndTheta.Heights.Regularisation.Assembly
-public import GroundTheory.HeightsAndTheta.Heights.Regularisation.PPolyMaxLowerBound
-public import GroundTheory.HeightsAndTheta.Heights.Regularisation.PTruncPsh
-public import GroundTheory.HeightsAndTheta.Heights.Regularisation.PTruncTransfer
-public import GroundTheory.HeightsAndTheta.Heights.AnalyticLimit.PBoundingKaehler
-public import GroundTheory.HeightsAndTheta.Heights.AnalyticLimit.TendstoLocallyUniformlyOnOfNhds
-public import GroundTheory.HeightsAndTheta.Heights.Regularisation.IsOpenKappaOpenNeighbourhood
-public import GroundTheory.HeightsAndTheta.Heights.AnalyticLimit.PGreenMassZero
-public import GroundTheory.HeightsAndTheta.Heights.AnalyticLimit.PKaehlerBound
-public import ReciprocityTheory.AnalyticForms.PotentialTheory.PshShiftA
-public import ReciprocityTheory.AnalyticForms.PotentialTheory.DegreeInt
-public import ReciprocityTheory.AnalyticForms.PotentialTheory.Pullback
-public import GroundTheory.HeightsAndTheta.Heights.AnalyticLimit.StatementsPullback
-public import GroundTheory.HeightsAndTheta.Heights.AnalyticLimit.SystemIndependence
-public import GroundTheory.HeightsAndTheta.Heights.AnalyticLimit.StListTailLog
 public import GroundTheory.HeightsAndTheta.Heights.AnalyticLimit.StBoundingKaehler
-public import GroundTheory.HeightsAndTheta.Heights.AnalyticLimit.TailDimZero
+public import GroundTheory.HeightsAndTheta.Heights.AnalyticLimit.GreenMassError
+public import GroundTheory.HeightsAndTheta.Heights.AnalyticLimit.GreenMassReplace
+public import GroundTheory.HeightsAndTheta.Heights.AnalyticLimit.GreenMassStep
+public import GroundTheory.HeightsAndTheta.Heights.AnalyticLimit.GreenMassZero
+public import GroundTheory.HeightsAndTheta.Heights.AnalyticLimit.PBoundingKaehler
+public import GroundTheory.HeightsAndTheta.Heights.AnalyticLimit.PGreenMassZero
 public import GroundTheory.HeightsAndTheta.Heights.AnalyticLimit.UniformIntegrability
-public import GroundTheory.HeightsAndTheta.Heights.HodgeLowerBound.StatementsPushDown
-public import GroundTheory.HeightsAndTheta.Heights.HodgeLowerBound.FlagIndices
-public import GroundTheory.HeightsAndTheta.Heights.Regularisation.PGlueRegularised
-public import GroundTheory.HeightsAndTheta.Heights.HodgeLowerBound.PPushDown
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
+import GroundTheory.HeightsAndTheta.Heights.HodgeLowerBound.FrameDefinitions.PermFinTwoUniv
 
 @[expose] public section
 

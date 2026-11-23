@@ -1,6 +1,53 @@
 module
 
 public import Formalism.GradedWeylDivisibility.StatementE
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Lemma
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
@@ -146,13 +193,12 @@ private lemma coeff_zero_rowAct_eq {r n : ℕ} (h : Matrix (Fin r) (Fin r) ℚ) 
   | add p q hp hq => rw [map_add (f := _), MvPolynomial.coeff_add, MvPolynomial.coeff_add, hp, hq]
   | mul_X p v hp =>
     have hx : constantCoeff (rowAct ℚ h (X v)) = 0 := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [rowAct_X_eq_sum_C_mul_X, map_sum]
+
+      rw [rowAct_X_eq_sum_C_mul_X, map_sum]
       simp
     change constantCoeff (rowAct ℚ h (p * X v)) = constantCoeff (p * X v)
     rw [map_mul, map_mul, hx, map_mul, MvPolynomial.constantCoeff_X, mul_zero, mul_zero]
 
-set_option maxHeartbeats 800000 in
 private lemma pderiv_rowAct_eq_sum_C_mul_rowAct_pderiv {r n : ℕ} (h : Matrix (Fin r) (Fin r) ℚ) (w : Fin r × Fin n)
     (Q : MvPolynomial (Fin r × Fin n) ℚ) :
     pderiv w (rowAct ℚ h Q) = ∑ c : Fin r, C (h c w.1) * rowAct ℚ h (pderiv (c, w.2) Q) := by
@@ -161,8 +207,8 @@ private lemma pderiv_rowAct_eq_sum_C_mul_rowAct_pderiv {r n : ℕ} (h : Matrix (
   | add p q hp hq => simp only [map_add (f := _), hp, hq, mul_add, Finset.sum_add_distrib]
   | mul_X p v hp =>
     have e1 : pderiv w (rowAct ℚ h (X v)) = if v.2 = w.2 then C (h v.1 w.1) else 0 := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [rowAct_X_eq_sum_C_mul_X, map_sum]
+
+      rw [rowAct_X_eq_sum_C_mul_X, map_sum]
       simp only [pderiv_C_mul, pderiv_X, Pi.single_apply]
       by_cases hv : v.2 = w.2
       · rw [if_pos hv, Finset.sum_eq_single w.1]

@@ -1,6 +1,56 @@
 module
 
+public import ReciprocityTheory.SemistableReduction.SphereLogIntegrableStatement
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Real
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.MvPolynomial.IrreducibleQuadratic
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
 public import ReciprocityTheory.SemistableReduction.SphereTorusA
+import Std.Tactic.BVDecide.Normalize.Prop
+public import Mathlib.Algebra.MvPolynomial.Funext
 
 @[expose] public section
 
@@ -13,21 +63,16 @@ open MeasureTheory
 def scaledTorusMean {ι : Type*} [Fintype ι] (r : ι → ℂ) (f : MvPolynomial ι ℂ) : ℝ :=
   ∫ θ, Real.log ‖MvPolynomial.eval (fun j => r j * torusPoint θ j) f‖ ∂(torusProb ι)
 
-theorem scaledTorusMean_one {ι : Type*} [Fintype ι] (f : MvPolynomial ι ℂ)
-    : scaledTorusMean (fun _ => 1) f = torusMean f := by
+theorem scaledTorusMean_one {ι : Type*} [Fintype ι] (f : MvPolynomial ι ℂ) :
+    scaledTorusMean (fun _ => 1) f = torusMean f := by
   unfold scaledTorusMean torusMean
   simp only [one_mul]
 
-theorem eval_update_eq_eval_aeval
-    {ι : Type*} [DecidableEq ι] (w : ι → ℂ) (i : ι) (z : ℂ) (f : MvPolynomial ι ℂ)
-    : MvPolynomial.eval (Function.update w i z) f
-      = (MvPolynomial.aeval
-        (fun j =>
-          if j = i then
-            (Polynomial.X : Polynomial ℂ)
-          else
-            Polynomial.C (w j))
-        f).eval z := by
+theorem eval_update_eq_eval_aeval {ι : Type*} [DecidableEq ι] (w : ι → ℂ) (i : ι) (z : ℂ)
+    (f : MvPolynomial ι ℂ) :
+    MvPolynomial.eval (Function.update w i z) f =
+      (MvPolynomial.aeval (fun j => if j = i then (Polynomial.X : Polynomial ℂ)
+        else Polynomial.C (w j)) f).eval z := by
   induction f using MvPolynomial.induction_on
   · simp
   · simp_all
@@ -39,17 +84,18 @@ theorem eval_update_eq_eval_aeval
     simp
   · simp [h, Function.update_of_ne h]
 
-theorem eval_bind₁_scale {ι : Type*} (r w : ι → ℂ) (f : MvPolynomial ι ℂ)
-    : MvPolynomial.eval w (MvPolynomial.bind₁ (fun j => MvPolynomial.C (r j) * MvPolynomial.X j) f)
-      = MvPolynomial.eval (fun j => r j * w j) f := by
-  induction f using MvPolynomial.induction_on
-  · simp
-  · simp_all
-  · simp_all
+theorem eval_bind₁_scale {ι : Type*} (r w : ι → ℂ) (f : MvPolynomial ι ℂ) :
+    MvPolynomial.eval w
+        (MvPolynomial.bind₁ (fun j => MvPolynomial.C (r j) * MvPolynomial.X j) f) =
+      MvPolynomial.eval (fun j => r j * w j) f := by
+  rw [MvPolynomial.bind₁, MvPolynomial.aeval_def, MvPolynomial.algebraMap_eq,
+    ← MvPolynomial.eval_assoc]
+  refine congrArg (fun v => MvPolynomial.eval v f) (funext fun j => ?_)
+  simp only [Function.comp_apply, map_mul, MvPolynomial.eval_C, MvPolynomial.eval_X]
 
-private theorem bind1_C_mul_X_ne_zero_of_ne_zero
-    {ι : Type} (r : ι → ℂ) (hr : ∀ j, r j ≠ 0) (f : MvPolynomial ι ℂ) (hf : f ≠ 0)
-    : MvPolynomial.bind₁ (fun j => MvPolynomial.C (r j) * MvPolynomial.X j) f ≠ 0 := by
+private theorem bind1_C_mul_X_ne_zero_of_ne_zero {ι : Type} (r : ι → ℂ) (hr : ∀ j, r j ≠ 0)
+    (f : MvPolynomial ι ℂ) (hf : f ≠ 0) :
+    MvPolynomial.bind₁ (fun j => MvPolynomial.C (r j) * MvPolynomial.X j) f ≠ 0 := by
   intro h
   apply hf
   refine MvPolynomial.funext fun v => ?_
@@ -58,30 +104,23 @@ private theorem bind1_C_mul_X_ne_zero_of_ne_zero
   have e : (fun j => r j * (v j / r j)) = v := by
     funext j
     first
-    | exact mul_div_cancel₀ (v j) (hr j)
-    | field_simp [hr j]
-    | (rw [mul_comm]; exact div_mul_cancel₀ (v j) (hr j))
+      | exact mul_div_cancel₀ (v j) (hr j)
+      | field_simp [hr j]
+      | (rw [mul_comm]; exact div_mul_cancel₀ (v j) (hr j))
   rw [e] at hv
   rw [← hv, map_zero]
 
-theorem integrable_scaled
-    {ι : Type} [Fintype ι]
-    (hBasic : TorusMeanBasicStatement)
-    (f : MvPolynomial ι ℂ) (hf : f ≠ 0)
-    (r : ι → ℂ) (hr : ∀ j, r j ≠ 0)
-    : Integrable
-      (fun θ => Real.log ‖MvPolynomial.eval (fun j => r j * torusPoint θ j) f‖)
+theorem integrable_scaled {ι : Type} [Fintype ι] (hBasic : TorusMeanBasicStatement)
+    (f : MvPolynomial ι ℂ) (hf : f ≠ 0) (r : ι → ℂ) (hr : ∀ j, r j ≠ 0) :
+    Integrable (fun θ => Real.log ‖MvPolynomial.eval (fun j => r j * torusPoint θ j) f‖)
       (torusProb ι) := by
   have h := (hBasic ι).1 _ (bind1_C_mul_X_ne_zero_of_ne_zero r hr f hf)
   simpa only [eval_bind₁_scale] using h
 
-theorem scaledTorusMean_le_update
-    {ι : Type} [Fintype ι] [DecidableEq ι]
-    (hBasic : TorusMeanBasicStatement)
-    (f : MvPolynomial ι ℂ) (hf : f ≠ 0)
-    (r : ι → ℂ) (hr : ∀ j, r j ≠ 0)
-    (i : ι) (hri : ‖r i‖ ≤ 1)
-    : scaledTorusMean r f ≤ scaledTorusMean (Function.update r i 1) f := by
+theorem scaledTorusMean_le_update {ι : Type} [Fintype ι] [DecidableEq ι]
+    (hBasic : TorusMeanBasicStatement) (f : MvPolynomial ι ℂ) (hf : f ≠ 0) (r : ι → ℂ)
+    (hr : ∀ j, r j ≠ 0) (i : ι) (hri : ‖r i‖ ≤ 1) :
+    scaledTorusMean r f ≤ scaledTorusMean (Function.update r i 1) f := by
   have hr' : ∀ j, Function.update r i 1 j ≠ 0 := by
     intro j
     by_cases h : j = i
@@ -94,12 +133,9 @@ theorem scaledTorusMean_le_update
   refine integral_mono hI1 hI2 fun x => ?_
   set p : Polynomial ℂ := MvPolynomial.aeval (fun j => if j = i then (Polynomial.X : Polynomial ℂ)
         else Polynomial.C (r j * torusPoint x j)) f
-  have key
-      : ∀ (s : ι → ℂ),
-        (∀ j, j ≠ i → s j = r j)
-          → ∀ t : ℝ,
-            MvPolynomial.eval (fun j => s j * torusPoint (Function.update x i t) j) f
-              = p.eval (s i * Complex.exp (2 * Real.pi * Complex.I * (t : ℂ))) := by
+  have key : ∀ (s : ι → ℂ), (∀ j, j ≠ i → s j = r j) → ∀ t : ℝ,
+      MvPolynomial.eval (fun j => s j * torusPoint (Function.update x i t) j) f =
+        p.eval (s i * Complex.exp (2 * Real.pi * Complex.I * (t : ℂ))) := by
     intro s hs t
     rw [← eval_update_eq_eval_aeval]
     refine congrArg (fun w => MvPolynomial.eval w f) (funext fun j => ?_)
@@ -113,16 +149,13 @@ theorem scaledTorusMean_le_update
   simp only [k1, k2]
   exact integral_log_eval_mul_le p (hr i) hri
 
-theorem scaledTorusMean_le_torusMean
-    {ι : Type} [Fintype ι] [DecidableEq ι]
-    (hBasic : TorusMeanBasicStatement)
-    (f : MvPolynomial ι ℂ) (hf : f ≠ 0)
-    (r : ι → ℂ) (hr : ∀ j, r j ≠ 0) (hr1 : ∀ j, ‖r j‖ ≤ 1)
-    : scaledTorusMean r f ≤ torusMean f := by
+theorem scaledTorusMean_le_torusMean {ι : Type} [Fintype ι] [DecidableEq ι]
+    (hBasic : TorusMeanBasicStatement) (f : MvPolynomial ι ℂ) (hf : f ≠ 0) (r : ι → ℂ)
+    (hr : ∀ j, r j ≠ 0) (hr1 : ∀ j, ‖r j‖ ≤ 1) :
+    scaledTorusMean r f ≤ torusMean f := by
   classical
-  have key
-      : ∀ s : Finset ι,
-        scaledTorusMean r f ≤ scaledTorusMean (fun j => if j ∈ s then (1 : ℂ) else r j) f := by
+  have key : ∀ s : Finset ι, scaledTorusMean r f ≤
+      scaledTorusMean (fun j => if j ∈ s then (1 : ℂ) else r j) f := by
     intro s
     refine Finset.induction_on s ?_ ?_
     · simp
@@ -131,11 +164,11 @@ theorem scaledTorusMean_le_torusMean
       have hr' : ∀ j, (fun j => if j ∈ s then (1 : ℂ) else r j) j ≠ 0 := fun j => by
         dsimp only
         split_ifs <;> simp [hr j]
-      have hra : ‖(fun j => if j ∈ s then (1 : ℂ) else r j) a‖ ≤ 1 := by simp [ha, hr1 a]
+      have hra : ‖(fun j => if j ∈ s then (1 : ℂ) else r j) a‖ ≤ 1 := by
+        simp [ha, hr1 a]
       have hle := scaledTorusMean_le_update hBasic f hf _ hr' a hra
-      have e
-          : Function.update (fun j => if j ∈ s then (1 : ℂ) else r j) a 1
-            = fun j => if j ∈ insert a s then (1 : ℂ) else r j := by
+      have e : Function.update (fun j => if j ∈ s then (1 : ℂ) else r j) a 1 =
+          fun j => if j ∈ insert a s then (1 : ℂ) else r j := by
         funext j
         by_cases hj : j = a
         · subst hj

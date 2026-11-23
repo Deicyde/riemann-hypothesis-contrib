@@ -1,6 +1,43 @@
 module
 
 public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityArgument.LinkedUnramifiedChains.TeichmullerParts.UnramifiedTrivialInertialType
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Lemma
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
 
 @[expose] public section
 
@@ -39,8 +76,8 @@ private lemma indep_fin {τ : Representation ℂ G W'} {ρ : Representation ℂ 
       intro v hv
       exact ih' v (by rw [← hA]; exact hv)
     have hAeq : ∀ g v, A (fun i => τ g (v i)) = ρ g (A v) := fun g v => by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [hA, hA, map_sum]
+
+      rw [hA, hA, map_sum]
       exact Finset.sum_congr rfl fun i _ => hb i.succ g (v i)
     have hsum : b 0 (u 0) + A (fun i => u i.succ) = 0 := by
       rw [hA, ← hu, Fin.sum_univ_succ]
@@ -170,8 +207,8 @@ private lemma evl_inj {τ : Representation ℂ G W'} {ρ : Representation ℂ G 
   have hsum : ∑ i ∈ (e z).support, (B i).1 (e z i) = 0 := by
     rw [← hz]
     conv_rhs => rw [hz']
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [Finsupp.sum, map_sum]
+
+    rw [Finsupp.sum, map_sum]
     exact Finset.sum_congr rfl fun i _ => (evl_tmul τ ρ _ _).symm
   have hli : LinearIndependent ℂ fun i => (B i).1 :=
     B.linearIndependent.map' (intwSub τ ρ).subtype (Submodule.ker_subtype _)

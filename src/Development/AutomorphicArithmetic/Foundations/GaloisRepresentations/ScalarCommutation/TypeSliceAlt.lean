@@ -1,11 +1,51 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentations.ScalarCommutation.TypeSlice
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.DisintegrationDensityExists
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsIrrRepQuotientOfFiniteGen
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.IsCuspidalOfIsSupercuspidal
+import Development.AbelianVarietyTheory.Definitions.Divisors.T2SpaceGeneralLinearGroup
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CuspidalCompactCharacterVanishing
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.DisintegrationDensityExists
+import Development.AbelianVarietyTheory.Proofs.FoundationProofs.PadicIsNonarchimedeanLocalField
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.IsCuspidalOfIsSupercuspidal
+public import Development.AbelianVarietyTheory.PublishedTheorems.TwistedTraceFormula.NontrivialOfIrreducible
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Ring.IsFormallyReal
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
 
 @[expose] public section
 
@@ -18,11 +58,10 @@ open MeasureTheory Matrix GlobalTheory.PRep GlobalTheory.SmGL
 namespace UpperTheory.Gal.Spc
 
 private def lreg (G : Type) [Group G] : Representation ℂ G (G → ℂ) where
-  toFun g := {
-    toFun := fun F x => F (g⁻¹ * x)
-    map_add' := fun _ _ => rfl
-    map_smul' := fun _ _ => rfl
-  }
+  toFun g :=
+    { toFun := fun F x => F (g⁻¹ * x)
+      map_add' := fun _ _ => rfl
+      map_smul' := fun _ _ => rfl }
   map_one' := by
     ext F x
     simp
@@ -30,13 +69,10 @@ private def lreg (G : Type) [Group G] : Representation ℂ G (G → ℂ) where
     ext F x
     simp [mul_assoc]
 
-private theorem lreg_apply {G : Type} [Group G] (g : G) (F : G → ℂ) (x : G)
-    : lreg G g F x = F (g⁻¹ * x) :=
-  rfl
+private theorem lreg_apply {G : Type} [Group G] (g : G) (F : G → ℂ) (x : G) : lreg G g F x = F (g⁻¹ * x) := rfl
 
-private theorem finsum_shift
-    {G : Type} [Group G] (K : Subgroup G) (Φ : G → ℂ) (hΦ : ∀ g, ∀ k ∈ K, Φ (g * k) = Φ g) (z : G)
-    : ∑ᶠ q : G ⧸ K, Φ q.out = ∑ᶠ q : G ⧸ K, Φ (z * q.out) := by
+private theorem finsum_shift {G : Type} [Group G] (K : Subgroup G) (Φ : G → ℂ) (hΦ : ∀ g, ∀ k ∈ K, Φ (g * k) = Φ g) (z : G) :
+    ∑ᶠ q : G ⧸ K, Φ q.out = ∑ᶠ q : G ⧸ K, Φ (z * q.out) := by
   have hc : ∀ g g' : G, (g : G ⧸ K) = g' → Φ g = Φ g' := by
     intro g g' h
     have h1 : g⁻¹ * g' ∈ K := QuotientGroup.eq.1 h
@@ -52,11 +88,9 @@ private theorem finsum_shift
   simp only [h2]
   exact (finsum_comp_equiv (MulAction.toPerm z : Equiv.Perm (G ⧸ K)) (f := fun q => Φ q.out)).symm
 
-private theorem finite_cosets
-    {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
-    (K : Subgroup G) (hK : IsOpen (K : Set G))
-    (F : G → ℂ) (hF : HasCompactSupport F)
-    : (Function.support fun q : G ⧸ K => F q.out).Finite := by
+private theorem finite_cosets {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] (K : Subgroup G)
+    (hK : IsOpen (K : Set G)) (F : G → ℂ) (hF : HasCompactSupport F) :
+    (Function.support fun q : G ⧸ K => F q.out).Finite := by
   haveI : DiscreteTopology (G ⧸ K) := QuotientGroup.discreteTopology hK
   have hcomp : IsCompact ((QuotientGroup.mk : G → G ⧸ K) '' tsupport F) :=
     hF.isCompact.image QuotientGroup.continuous_mk
@@ -66,35 +100,29 @@ private theorem finite_cosets
 
 section Core
 
-variable
-  {G A : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [T2Space G] [MeasurableSpace A]
+variable {G A : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [T2Space G] [MeasurableSpace A]
 
-private def transl (e : G → ℂ) : Subrepresentation (lreg G) := ⟨
-  Submodule.span ℂ (Set.range fun g : G => lreg G g e),
-  by
+private def transl (e : G → ℂ) : Subrepresentation (lreg G) :=
+  ⟨Submodule.span ℂ (Set.range fun g : G => lreg G g e), by
     intro g F hF
     induction hF using Submodule.span_induction with
     | mem x hx =>
       obtain ⟨t, rfl⟩ := hx
       refine Submodule.subset_span ⟨g * t, ?_⟩
       simp only [map_mul, Module.End.mul_apply]
-    | zero =>
-      simp
+    | zero => simp
     | add x y _ _ hx hy =>
       rw [map_add (f := _)]
       exact Submodule.add_mem _ hx hy
     | smul c x _ hx =>
       rw [map_smul]
-      exact Submodule.smul_mem _ c hx
-⟩
+      exact Submodule.smul_mem _ c hx⟩
 
 private theorem mem_transl_self (e : G → ℂ) : e ∈ (transl e).toSubmodule :=
   Submodule.subset_span ⟨1, by simp⟩
 
-private theorem transl_cont
-    {e : G → ℂ} (hc : Continuous e) (hs : HasCompactSupport e)
-    {F : G → ℂ} (hF : F ∈ (transl e).toSubmodule)
-    : Continuous F ∧ HasCompactSupport F := by
+private theorem transl_cont {e : G → ℂ} (hc : Continuous e) (hs : HasCompactSupport e) {F : G → ℂ}
+    (hF : F ∈ (transl e).toSubmodule) : Continuous F ∧ HasCompactSupport F := by
   induction hF using Submodule.span_induction with
   | mem x hx =>
     obtain ⟨t, rfl⟩ := hx
@@ -104,17 +132,15 @@ private theorem transl_cont
   | add x y _ _ hx hy => exact ⟨hx.1.add hy.1, hx.2.add hy.2⟩
   | smul c x _ hx => exact ⟨continuous_const.mul hx.1, hx.2.smul_left⟩
 
-private theorem transl_smooth
-    {e : G → ℂ} (K : Subgroup G) (hK : IsOpen (K : Set G)) (hKe : ∀ k ∈ K, lreg G k e = e)
-    : IsSmooth (transl e).toRepresentation := by
+private theorem transl_smooth {e : G → ℂ} (K : Subgroup G) (hK : IsOpen (K : Set G)) (hKe : ∀ k ∈ K, lreg G k e = e) :
+    IsSmooth (transl e).toRepresentation := by
   refine isSmooth_of_nhds fun F => ?_
   have key : ∀ x ∈ (transl e).toSubmodule, {g : G | lreg G g x = x} ∈ nhds (1 : G) := by
     intro x hx
     induction hx using Submodule.span_induction with
     | mem x hx =>
       obtain ⟨t, rfl⟩ := hx
-      have hcont : Continuous fun g : G => t⁻¹ * g * t :=
-        (continuous_const.mul continuous_id).mul continuous_const
+      have hcont : Continuous fun g : G => t⁻¹ * g * t := (continuous_const.mul continuous_id).mul continuous_const
       have h1 : (fun g : G => t⁻¹ * g * t) ⁻¹' (K : Set G) ∈ nhds (1 : G) :=
         (hK.preimage hcont).mem_nhds (by simp [K.one_mem])
       refine Filter.mem_of_superset h1 fun g hg => ?_
@@ -126,8 +152,7 @@ private theorem transl_smooth
         group
       rw [h3]
       exact congrArg _ h2
-    | zero =>
-      simp
+    | zero => simp
     | add x y _ _ hx hy =>
       refine Filter.mem_of_superset (Filter.inter_mem hx hy) fun g hg => ?_
       show lreg G g (x + y) = x + y
@@ -139,59 +164,44 @@ private theorem transl_smooth
   refine Filter.mem_of_superset (key F.1 F.2) fun g hg => ?_
   exact Subtype.ext hg
 
-private def noTerm
-    (e : G → ℂ) (hc : Continuous e) (hs : HasCompactSupport e)
-    (μ : Measure A) (U : A → G)
-    (hint : ∀ F : G → ℂ,
-      Continuous F → HasCompactSupport F → ∀ z w : G, Integrable (fun X => F (z * U X * w)) μ)
-    : Subrepresentation (lreg G) := ⟨
-  {
-    carrier := {F | F ∈ (transl e).toSubmodule ∧ ∀ x, ∫ X, F (x * U X * 1) ∂μ = 0}
-    add_mem' := by
-      rintro F F' ⟨h1, h2⟩ ⟨h1', h2'⟩
-      refine ⟨Submodule.add_mem _ h1 h1', fun x => ?_⟩
-      have c1 := transl_cont hc hs h1
-      have c2 := transl_cont hc hs h1'
-      simp only [Pi.add_apply]
-      rw [integral_add (hint F c1.1 c1.2 x 1) (hint F' c2.1 c2.2 x 1), h2, h2', add_zero]
-    zero_mem' := ⟨Submodule.zero_mem _, fun x => by simp⟩
-    smul_mem' := by
-      rintro c F ⟨h1, h2⟩
-      refine ⟨Submodule.smul_mem _ c h1, fun x => ?_⟩
-      simp only [Pi.smul_apply, smul_eq_mul]
-      rw [integral_const_mul, h2, mul_zero]
-  },
-  by
+private def noTerm (e : G → ℂ) (hc : Continuous e) (hs : HasCompactSupport e) (μ : Measure A) (U : A → G)
+    (hint : ∀ F : G → ℂ, Continuous F → HasCompactSupport F → ∀ z w : G, Integrable (fun X => F (z * U X * w)) μ) :
+    Subrepresentation (lreg G) :=
+  ⟨{ carrier := {F | F ∈ (transl e).toSubmodule ∧ ∀ x, ∫ X, F (x * U X * 1) ∂μ = 0}
+     add_mem' := by
+       rintro F F' ⟨h1, h2⟩ ⟨h1', h2'⟩
+       refine ⟨Submodule.add_mem _ h1 h1', fun x => ?_⟩
+       have c1 := transl_cont hc hs h1
+       have c2 := transl_cont hc hs h1'
+       simp only [Pi.add_apply]
+       rw [integral_add (hint F c1.1 c1.2 x 1) (hint F' c2.1 c2.2 x 1), h2, h2', add_zero]
+     zero_mem' := ⟨Submodule.zero_mem _, fun x => by simp⟩
+     smul_mem' := by
+       rintro c F ⟨h1, h2⟩
+       refine ⟨Submodule.smul_mem _ c h1, fun x => ?_⟩
+       simp only [Pi.smul_apply, smul_eq_mul]
+       rw [integral_const_mul, h2, mul_zero] }, by
     rintro g F ⟨h1, h2⟩
     refine ⟨(transl e).apply_mem_toSubmodule g h1, fun x => ?_⟩
     have := h2 (g⁻¹ * x)
-    simpa only [lreg_apply, mul_assoc] using this
-⟩
+    simpa only [lreg_apply, mul_assoc] using this⟩
 
 end Core
 
 section Core2
 
-variable
-  {G A : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [T2Space G] [MeasurableSpace A]
+variable {G A : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [T2Space G] [MeasurableSpace A]
 
-private theorem core
-    (μ : Measure A) (U : A → G)
-    (hint : ∀ F : G → ℂ,
-      Continuous F → HasCompactSupport F → ∀ z w : G, Integrable (fun X => F (z * U X * w)) μ)
-    (J : Subgroup G) (hJo : IsOpen (J : Set G)) (hJc : IsCompact (J : Set G)) (χ : J →* ℂˣ)
-    (hχ : IsOpen (χ.ker : Set J))
-    (e : G → ℂ) (he1 : ∀ g (hg : g ∈ J), e g = (((χ ⟨g, hg⟩)⁻¹ : ℂˣ) : ℂ))
-    (he0 : ∀ g, g ∉ J → e g = 0) (hne : ∫ X, e (1 * U X * 1) ∂μ ≠ 0)
-    : ∃ (σ : GlobalTheory.SmGL.IrrRep G) (v : σ.V),
-      v ≠ 0 ∧ (∀ g : J, σ.ρ g v = ((χ g : ℂˣ) : ℂ) • v)
-        ∧ ∀ K₂ : Subgroup G,
-          K₂ ≤ χ.ker.map J.subtype → IsOpen (K₂ : Set G)
-            → ∀ f : G → ℂ,
-              Continuous f → HasCompactSupport f → (∀ g, ∀ k ∈ K₂, f (g * k) = f g)
-                → (∀ z w : G, ∫ X, f (z * U X * w) ∂μ = 0)
-                → ∀ (l : Module.Dual ℂ σ.V) (S : Finset (G ⧸ K₂)),
-                  (∀ q, q ∉ S → f q.out = 0) → ∑ q ∈ S, f q.out * l (σ.ρ q.out v) = 0 := by
+private theorem core (μ : Measure A) (U : A → G)
+    (hint : ∀ F : G → ℂ, Continuous F → HasCompactSupport F → ∀ z w : G, Integrable (fun X => F (z * U X * w)) μ)
+    (J : Subgroup G) (hJo : IsOpen (J : Set G)) (hJc : IsCompact (J : Set G)) (χ : J →* ℂˣ) (hχ : IsOpen (χ.ker : Set J))
+    (e : G → ℂ) (he1 : ∀ g (hg : g ∈ J), e g = (((χ ⟨g, hg⟩)⁻¹ : ℂˣ) : ℂ)) (he0 : ∀ g, g ∉ J → e g = 0)
+    (hne : ∫ X, e (1 * U X * 1) ∂μ ≠ 0) :
+    ∃ (σ : GlobalTheory.SmGL.IrrRep G) (v : σ.V), v ≠ 0 ∧ (∀ g : J, σ.ρ g v = ((χ g : ℂˣ) : ℂ) • v) ∧
+      ∀ K₂ : Subgroup G, K₂ ≤ χ.ker.map J.subtype → IsOpen (K₂ : Set G) → ∀ f : G → ℂ, Continuous f → HasCompactSupport f →
+        (∀ g, ∀ k ∈ K₂, f (g * k) = f g) → (∀ z w : G, ∫ X, f (z * U X * w) ∂μ = 0) →
+        ∀ (l : Module.Dual ℂ σ.V) (S : Finset (G ⧸ K₂)), (∀ q, q ∉ S → f q.out = 0) →
+          ∑ q ∈ S, f q.out * l (σ.ρ q.out v) = 0 := by
   classical
   have hKo : IsOpen ((χ.ker.map J.subtype : Subgroup G) : Set G) := by
     rw [Subgroup.coe_map]
@@ -217,20 +227,15 @@ private theorem core
   have hlc : IsLocallyConstant e := by
     rw [IsLocallyConstant.iff_exists_open]
     intro g
-    refine ⟨
-      (fun x => g⁻¹ * x) ⁻¹' ((χ.ker.map J.subtype : Subgroup G) : Set G),
-      hKo.preimage (continuous_const.mul continuous_id),
-      ?_,
-      ?_
-    ⟩
+    refine ⟨(fun x => g⁻¹ * x) ⁻¹' ((χ.ker.map J.subtype : Subgroup G) : Set G),
+      hKo.preimage (continuous_const.mul continuous_id), ?_, ?_⟩
     · simp only [Set.mem_preimage, inv_mul_cancel, SetLike.mem_coe]
       exact Subgroup.one_mem _
     · intro x hx
       have := hR g _ hx
       rwa [mul_inv_cancel_left] at this
   have hcont : Continuous e := hlc.continuous
-  have hcs : HasCompactSupport e :=
-    HasCompactSupport.intro' hJc (J.isClosed_of_isOpen hJo) (fun g hg => he0 g hg)
+  have hcs : HasCompactSupport e := HasCompactSupport.intro' hJc (J.isClosed_of_isOpen hJo) (fun g hg => he0 g hg)
   have hKe : ∀ k ∈ χ.ker.map J.subtype, lreg G k e = e := by
     rintro _ ⟨y, hy, rfl⟩
     have h1 : χ y = 1 := hy
@@ -243,25 +248,19 @@ private theorem core
   set T := noTerm e hcont hcs μ U hint with hT
   have hSs : IsSmooth S.toRepresentation := transl_smooth _ hKo hKe
   have hQs : IsSmooth (subQuot S T) :=
-    (IsSubquotient.of_surjective (σ := subQuot S T) (ρ := S.toRepresentation)
-      ⟨Submodule.mkQ _, fun _ => rfl⟩ (Submodule.Quotient.mk_surjective _)).isSmooth hSs
+    (IsSubquotient.of_surjective (σ := subQuot S T) (ρ := S.toRepresentation) ⟨Submodule.mkQ _, fun _ => rfl⟩
+      (Submodule.Quotient.mk_surjective _)).isSmooth hSs
   let ê : S.toSubmodule := ⟨e, mem_transl_self e⟩
   let w : S.toSubmodule ⧸ T.toSubmodule.comap S.toSubmodule.subtype := Submodule.Quotient.mk ê
   have hw : w ≠ 0 := by
     intro h0
-    have h1 : ê ∈ T.toSubmodule.comap S.toSubmodule.subtype :=
-      (Submodule.Quotient.mk_eq_zero _).1 h0
+    have h1 : ê ∈ T.toSubmodule.comap S.toSubmodule.subtype := (Submodule.Quotient.mk_eq_zero _).1 h0
     exact hne (h1.2 1)
-  have hgen
-      : Submodule.span ℂ (Set.range fun p : G × ({w} : Finset _) => subQuot S T p.1 (p.2 : _))
-        = ⊤ := by
+  have hgen : Submodule.span ℂ (Set.range fun p : G × ({w} : Finset _) => subQuot S T p.1 (p.2 : _)) = ⊤ := by
     set M := Submodule.span ℂ (Set.range fun p : G × ({w} : Finset _) => subQuot S T p.1 (p.2 : _)) with hM
     have hmem : ∀ g, subQuot S T g w ∈ M := fun g => Submodule.subset_span ⟨(g, ⟨w, by simp⟩), rfl⟩
-    have hall
-        : ∀ (F : G → ℂ) (hF : F ∈ S.toSubmodule),
-          (Submodule.Quotient.mk ⟨F, hF⟩
-              : S.toSubmodule ⧸ T.toSubmodule.comap S.toSubmodule.subtype)
-            ∈ M := by
+    have hall : ∀ (F : G → ℂ) (hF : F ∈ S.toSubmodule),
+        (Submodule.Quotient.mk ⟨F, hF⟩ : S.toSubmodule ⧸ T.toSubmodule.comap S.toSubmodule.subtype) ∈ M := by
       intro F hF
       induction hF using Submodule.span_induction with
       | mem x hx =>
@@ -274,49 +273,36 @@ private theorem core
     obtain ⟨⟨F, hF⟩, rfl⟩ := Submodule.Quotient.mk_surjective _ x
     exact hall F hF
   haveI : Nontrivial (S.toSubmodule ⧸ T.toSubmodule.comap S.toSubmodule.subtype) := ⟨⟨w, 0, hw⟩⟩
-  have exists_quot
-      : ∀ (G V : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [AddCommGroup V]
-          [Module ℂ V] (π : Representation ℂ G V),
-        GlobalTheory.PRep.IsSmooth π → Nontrivial V
-          → ∀ s : Finset V,
-            Submodule.span ℂ (Set.range fun p : G × s => π p.1 (p.2 : V)) = ⊤
-              → ∃ (σ : IrrRep G) (p : V →ₗ[ℂ] σ.V),
-                Function.Surjective p ∧ ∀ g v, p (π g v) = σ.ρ g (p v) := by
+  have exists_quot : ∀ (G V : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [AddCommGroup V] [Module ℂ V] (π : Representation ℂ G V), GlobalTheory.PRep.IsSmooth π → Nontrivial V → ∀ s : Finset V, Submodule.span ℂ (Set.range fun p : G × s => π p.1 (p.2 : V)) = ⊤ → ∃ (σ : IrrRep G) (p : V →ₗ[ℂ] σ.V), Function.Surjective p ∧ ∀ g v, p (π g v) = σ.ρ g (p v) := by
     intro G V _ _ _ _ _ π hπ hV s hs
     classical
-    have htop
-        : ∀ N : Submodule ℂ V,
-          (∀ (g : G), ∀ v ∈ N, π g v ∈ N) → Submodule.span ℂ ((s : Set V)) ≤ N → N = ⊤ := by
+  
+    have htop : ∀ N : Submodule ℂ V, (∀ (g : G), ∀ v ∈ N, π g v ∈ N) →
+        Submodule.span ℂ ((s : Set V)) ≤ N → N = ⊤ := by
       intro N hN hsN
       rw [eq_top_iff, ← hs, Submodule.span_le]
       rintro _ ⟨⟨g, v⟩, rfl⟩
       exact hN g _ (hsN (Submodule.subset_span v.2))
     let S : Set (Submodule ℂ V) := {N | (∀ (g : G), ∀ v ∈ N, π g v ∈ N) ∧ N ≠ ⊤}
-    have hbot : (⊥ : Submodule ℂ V) ∈ S :=
-      ⟨fun g v hv => by rw [Submodule.mem_bot] at hv ⊢; rw [hv, map_zero], bot_ne_top⟩
+    have hbot : (⊥ : Submodule ℂ V) ∈ S := ⟨fun g v hv => by
+      rw [Submodule.mem_bot] at hv ⊢; rw [hv, map_zero], bot_ne_top⟩
     have hcomp := Submodule.finset_span_isCompactElement (R := ℂ) s
-    obtain ⟨N, -, hmax⟩ :=
-      zorn_le_nonempty₀ S
-        (fun c hcS hc y hy => by
-          have hne : c.Nonempty := ⟨y, hy⟩
-          have hd : DirectedOn (· ≤ ·) c := hc.directedOn
-          refine ⟨sSup c, ⟨fun g v hv => ?_, fun htop' => ?_⟩, fun z hz => le_sSup hz⟩
-          · obtain ⟨M, hM, hvM⟩ := (Submodule.mem_sSup_of_directed hne hd).1 hv
-            exact le_sSup hM ((hcS hM).1 g v hvM)
-          · obtain ⟨M, hM, hsM⟩ :=
-              (isCompactElement_iff_le_of_directed_sSup_le _).1 hcomp c hne hd
-                (by rw [htop']; exact le_top)
-            exact (hcS hM).2 (htop M (hcS hM).1 hsM))
-        ⊥ hbot
+    obtain ⟨N, -, hmax⟩ := zorn_le_nonempty₀ S (fun c hcS hc y hy => by
+      have hne : c.Nonempty := ⟨y, hy⟩
+      have hd : DirectedOn (· ≤ ·) c := hc.directedOn
+      refine ⟨sSup c, ⟨fun g v hv => ?_, fun htop' => ?_⟩, fun z hz => le_sSup hz⟩
+      · obtain ⟨M, hM, hvM⟩ := (Submodule.mem_sSup_of_directed hne hd).1 hv
+        exact le_sSup hM ((hcS hM).1 g v hvM)
+      · obtain ⟨M, hM, hsM⟩ := (isCompactElement_iff_le_of_directed_sSup_le _).1 hcomp c hne hd
+          (by rw [htop']; exact le_top)
+        exact (hcS hM).2 (htop M (hcS hM).1 hsM)) ⊥ hbot
     obtain ⟨hNst, hNtop⟩ := hmax.prop
     let T : Subrepresentation π := ⟨N, fun g v hv => hNst g v hv⟩
     have hT : IsCoatom T := by
       refine ⟨fun h => hNtop (congrArg Subrepresentation.toSubmodule h), fun T' hT' => ?_⟩
       by_contra hne
-      have hmem : T'.toSubmodule ∈ S := ⟨
-        fun g v hv => T'.apply_mem_toSubmodule g hv,
-        fun h => hne (Subrepresentation.toSubmodule_injective h)
-      ⟩
+      have hmem : T'.toSubmodule ∈ S := ⟨fun g v hv => T'.apply_mem_toSubmodule g hv,
+        fun h => hne (Subrepresentation.toSubmodule_injective h)⟩
       have heq : T'.toSubmodule = N := le_antisymm (hmax.2 hmem hT'.le) hT'.le
       exact hT'.ne (Subrepresentation.toSubmodule_injective heq.symm)
     have hi := isIrreducible_subQuot hT.covBy_top
@@ -325,18 +311,15 @@ private theorem core
     have hsm : IsSmooth (subQuot ⊤ T) :=
       IsSubquotient.isSmooth ⟨⊤, q, Submodule.Quotient.mk_surjective _⟩ hπ
     let σ : IrrRep G := ⟨_, subQuot ⊤ T, hsm, hi⟩
-    let p : V →ₗ[ℂ] σ.V :=
-      (Submodule.mkQ _) ∘ₗ LinearMap.codRestrict (⊤ : Subrepresentation π).toSubmodule LinearMap.id
-        (fun _ => trivial)
+    let p : V →ₗ[ℂ] σ.V := (Submodule.mkQ _) ∘ₗ LinearMap.codRestrict (⊤ : Subrepresentation π).toSubmodule
+      LinearMap.id (fun _ => trivial)
     refine ⟨σ, p, fun w => ?_, fun g v => rfl⟩
     obtain ⟨⟨v, -⟩, rfl⟩ := Submodule.Quotient.mk_surjective _ w
     exact ⟨v, rfl⟩
   obtain ⟨σ, p, hp, hpi⟩ := exists_quot G _ (subQuot S T) hQs inferInstance {w} hgen
   refine ⟨σ, p w, ?_, ?_, ?_⟩
   · intro h0
-    have hker
-        : Submodule.span ℂ (Set.range fun p : G × ({w} : Finset _) => subQuot S T p.1 (p.2 : _))
-          ≤ LinearMap.ker p := by
+    have hker : Submodule.span ℂ (Set.range fun p : G × ({w} : Finset _) => subQuot S T p.1 (p.2 : _)) ≤ LinearMap.ker p := by
       refine Submodule.span_le.2 ?_
       rintro _ ⟨⟨g, y⟩, rfl⟩
       have hy : (y : _) = w := Finset.mem_singleton.1 y.2
@@ -370,8 +353,7 @@ private theorem core
         have h2 := congrFun (hKe k (hK₂ hk)) (g⁻¹ * z)
         rw [lreg_apply] at h2
         simp only [Φ, hfR g k hk, _root_.mul_inv_rev, mul_assoc, h2]
-      rw [h1, show (∑ q ∈ Sf, f q.out * e (q.out⁻¹ * z)) = ∑ᶠ q : G ⧸ K₂, Φ q.out from ?_,
-        finsum_shift K₂ Φ hΦ z]
+      rw [h1, show (∑ q ∈ Sf, f q.out * e (q.out⁻¹ * z)) = ∑ᶠ q : G ⧸ K₂, Φ q.out from ?_, finsum_shift K₂ Φ hΦ z]
       · rw [finsum_eq_sum_of_support_subset (s := hB.toFinset)]
         · refine Finset.sum_congr rfl fun q _ => ?_
           simp only [Φ, _root_.mul_inv_rev, mul_assoc, inv_mul_cancel, mul_one]
@@ -398,23 +380,22 @@ private theorem core
         have := (hint f hfc hfs x q.out).const_mul (e q.out⁻¹)
         simpa only [mul_one] using this
     have hz : p (Submodule.Quotient.mk Θ) = 0 := by
-      have : (Submodule.Quotient.mk Θ : S.toSubmodule ⧸ T.toSubmodule.comap S.toSubmodule.subtype)
-          = 0 :=
+      have : (Submodule.Quotient.mk Θ : S.toSubmodule ⧸ T.toSubmodule.comap S.toSubmodule.subtype) = 0 :=
         (Submodule.Quotient.mk_eq_zero _).2 hΘ
       rw [this, map_zero]
     have hexp : p (Submodule.Quotient.mk Θ) = ∑ q ∈ Sf, f q.out • σ.ρ q.out (p w) := by
-      have : (Submodule.Quotient.mk Θ : S.toSubmodule ⧸ T.toSubmodule.comap S.toSubmodule.subtype)
-          = ∑ q ∈ Sf, f q.out • subQuot S T q.out w := by
+      have : (Submodule.Quotient.mk Θ : S.toSubmodule ⧸ T.toSubmodule.comap S.toSubmodule.subtype) =
+          ∑ q ∈ Sf, f q.out • subQuot S T q.out w := by
         simp only [Θ]
-        set_option synthInstance.maxHeartbeats 100000 in
-          rw [← Submodule.mkQ_apply, map_sum]
+
+        rw [← Submodule.mkQ_apply, map_sum]
         rfl
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [this, map_sum]
+
+      rw [this, map_sum]
       refine Finset.sum_congr rfl fun q _ => ?_
       rw [map_smul, hpi]
     have := congrArg l (hexp.symm.trans hz)
-    set_option synthInstance.maxHeartbeats 100000 in
+
     simpa only [map_sum, map_smul, smul_eq_mul, map_zero] using this
 
 end Core2
@@ -423,35 +404,25 @@ section Slice
 
 variable {k : Type} [Field k] [TopologicalSpace k] [IsTopologicalRing k] {n a b : ℕ}
 
-private theorem u_zero
-    (ε : Fin n ≃ Fin a ⊕ Fin b) (u : (Fin a → Fin b → k) → GL (Fin n) k)
-    (hu : ∀ X,
-      (u X : Matrix (Fin n) (Fin n) k)
-        = Matrix.reindex ε.symm ε.symm (Matrix.fromBlocks 1 (Matrix.of X) 0 1))
-    : u 0 = 1 := by
+private theorem u_zero (ε : Fin n ≃ Fin a ⊕ Fin b) (u : (Fin a → Fin b → k) → GL (Fin n) k)
+    (hu : ∀ X, (u X : Matrix (Fin n) (Fin n) k) = Matrix.reindex ε.symm ε.symm (Matrix.fromBlocks 1 (Matrix.of X) 0 1)) :
+    u 0 = 1 := by
   apply Units.ext
   rw [hu]
   have h0 : (Matrix.of (0 : Fin a → Fin b → k)) = 0 := rfl
   rw [h0, Matrix.fromBlocks_one]
   simp
 
-private theorem u_neg
-    (ε : Fin n ≃ Fin a ⊕ Fin b) (u : (Fin a → Fin b → k) → GL (Fin n) k)
-    (hu : ∀ X,
-      (u X : Matrix (Fin n) (Fin n) k)
-        = Matrix.reindex ε.symm ε.symm (Matrix.fromBlocks 1 (Matrix.of X) 0 1))
-    (X : Fin a → Fin b → k)
-    : (u X)⁻¹ = u (-X) := by
+private theorem u_neg (ε : Fin n ≃ Fin a ⊕ Fin b) (u : (Fin a → Fin b → k) → GL (Fin n) k)
+    (hu : ∀ X, (u X : Matrix (Fin n) (Fin n) k) = Matrix.reindex ε.symm ε.symm (Matrix.fromBlocks 1 (Matrix.of X) 0 1))
+    (X : Fin a → Fin b → k) : (u X)⁻¹ = u (-X) := by
   have h := GlobalTheory.typeFunction_unip_add ε u hu X (-X)
   rw [neg_add_cancel, u_zero ε u hu] at h
   exact inv_eq_of_mul_eq_one_right h.symm
 
-private theorem u_val_cont
-    (ε : Fin n ≃ Fin a ⊕ Fin b) (u : (Fin a → Fin b → k) → GL (Fin n) k)
-    (hu : ∀ X,
-      (u X : Matrix (Fin n) (Fin n) k)
-        = Matrix.reindex ε.symm ε.symm (Matrix.fromBlocks 1 (Matrix.of X) 0 1))
-    : Continuous fun X => (u X : Matrix (Fin n) (Fin n) k) := by
+private theorem u_val_cont (ε : Fin n ≃ Fin a ⊕ Fin b) (u : (Fin a → Fin b → k) → GL (Fin n) k)
+    (hu : ∀ X, (u X : Matrix (Fin n) (Fin n) k) = Matrix.reindex ε.symm ε.symm (Matrix.fromBlocks 1 (Matrix.of X) 0 1)) :
+    Continuous fun X => (u X : Matrix (Fin n) (Fin n) k) := by
   refine continuous_matrix fun i j => ?_
   simp only [hu, Matrix.reindex_apply, Matrix.submatrix_apply, Equiv.symm_symm]
   rcases ε i with p | p <;> rcases ε j with q | q
@@ -461,31 +432,21 @@ private theorem u_val_cont
   · simpa only [Matrix.fromBlocks_apply₂₁] using continuous_const
   · simpa only [Matrix.fromBlocks_apply₂₂] using continuous_const
 
-private theorem u_cont
-    (ε : Fin n ≃ Fin a ⊕ Fin b) (u : (Fin a → Fin b → k) → GL (Fin n) k)
-    (hu : ∀ X,
-      (u X : Matrix (Fin n) (Fin n) k)
-        = Matrix.reindex ε.symm ε.symm (Matrix.fromBlocks 1 (Matrix.of X) 0 1))
-    : Continuous u := by
+private theorem u_cont (ε : Fin n ≃ Fin a ⊕ Fin b) (u : (Fin a → Fin b → k) → GL (Fin n) k)
+    (hu : ∀ X, (u X : Matrix (Fin n) (Fin n) k) = Matrix.reindex ε.symm ε.symm (Matrix.fromBlocks 1 (Matrix.of X) 0 1)) :
+    Continuous u := by
   refine Units.continuous_iff.2 ⟨u_val_cont ε u hu, ?_⟩
-  have h1
-      : (fun X => (((u X)⁻¹ : GL (Fin n) k) : Matrix (Fin n) (Fin n) k))
-        = (fun X => (u X : Matrix (Fin n) (Fin n) k)) ∘ Neg.neg := by
+  have h1 : (fun X => (((u X)⁻¹ : GL (Fin n) k) : Matrix (Fin n) (Fin n) k)) = (fun X => (u X : Matrix (Fin n) (Fin n) k)) ∘ Neg.neg := by
     funext X
     simp only [Function.comp_apply, u_neg ε u hu]
   exact h1 ▸ (u_val_cont ε u hu).comp continuous_neg
 
-private theorem slice_compact
-    (ε : Fin n ≃ Fin a ⊕ Fin b) (u : (Fin a → Fin b → k) → GL (Fin n) k)
-    (hu : ∀ X,
-      (u X : Matrix (Fin n) (Fin n) k)
-        = Matrix.reindex ε.symm ε.symm (Matrix.fromBlocks 1 (Matrix.of X) 0 1))
-    (h z w : GL (Fin n) k)
-    (C : Set (GL (Fin n) k)) (hC : IsCompact C)
-    : ∃ D : Set (Fin a → Fin b → k), IsCompact D ∧ ∀ X, z * (h⁻¹ * u X * h) * w ∈ C → X ∈ D := by
+private theorem slice_compact (ε : Fin n ≃ Fin a ⊕ Fin b) (u : (Fin a → Fin b → k) → GL (Fin n) k)
+    (hu : ∀ X, (u X : Matrix (Fin n) (Fin n) k) = Matrix.reindex ε.symm ε.symm (Matrix.fromBlocks 1 (Matrix.of X) 0 1))
+    (h z w : GL (Fin n) k) (C : Set (GL (Fin n) k)) (hC : IsCompact C) :
+    ∃ D : Set (Fin a → Fin b → k), IsCompact D ∧ ∀ X, z * (h⁻¹ * u X * h) * w ∈ C → X ∈ D := by
   let ψ : GL (Fin n) k → Fin a → Fin b → k := fun g p q =>
-    ((h * z⁻¹ * g * w⁻¹ * h⁻¹ : GL (Fin n) k) : Matrix (Fin n) (Fin n) k) (ε.symm (Sum.inl p))
-      (ε.symm (Sum.inr q))
+    ((h * z⁻¹ * g * w⁻¹ * h⁻¹ : GL (Fin n) k) : Matrix (Fin n) (Fin n) k) (ε.symm (Sum.inl p)) (ε.symm (Sum.inr q))
   have hψ : Continuous ψ := by
     refine continuous_pi fun p => continuous_pi fun q => ?_
     have h1 : Continuous fun g : GL (Fin n) k => h * z⁻¹ * g * w⁻¹ * h⁻¹ :=
@@ -494,8 +455,8 @@ private theorem slice_compact
   refine ⟨ψ '' C, hC.image hψ, fun X hX => ⟨_, hX, ?_⟩⟩
   funext p q
   have h2 : h * z⁻¹ * (z * (h⁻¹ * u X * h) * w) * w⁻¹ * h⁻¹ = u X := by group
-  simp only [ψ, h2, hu, Matrix.reindex_apply, Matrix.submatrix_apply, Equiv.symm_symm,
-    Equiv.apply_symm_apply, Matrix.fromBlocks_apply₁₂, Matrix.of_apply]
+  simp only [ψ, h2, hu, Matrix.reindex_apply, Matrix.submatrix_apply, Equiv.symm_symm, Equiv.apply_symm_apply,
+    Matrix.fromBlocks_apply₁₂, Matrix.of_apply]
 
 end Slice
 
@@ -510,10 +471,8 @@ theorem typeSlice : TypeSlice := by
   haveI : μ.IsAddHaarMeasure := inferInstanceAs (Measure.addHaar).IsAddHaarMeasure
   let U : (Fin a → Fin b → k) → GL (Fin n) k := fun X => h⁻¹ * u X * h
   have hUc : Continuous U := (continuous_const.mul (u_cont ε u hu)).mul continuous_const
-  have hint
-      : ∀ F : GL (Fin n) k → ℂ,
-        Continuous F → HasCompactSupport F
-          → ∀ z w : GL (Fin n) k, Integrable (fun X => F (z * U X * w)) μ := by
+  have hint : ∀ F : GL (Fin n) k → ℂ, Continuous F → HasCompactSupport F → ∀ z w : GL (Fin n) k,
+      Integrable (fun X => F (z * U X * w)) μ := by
     intro F hFc hFs z w
     have hc : Continuous fun X => F (z * U X * w) :=
       hFc.comp ((continuous_const.mul hUc).mul continuous_const)
@@ -532,8 +491,7 @@ theorem typeSlice : TypeSlice := by
       exact J.one_mem
     have hpos : 0 < μ W := hWo.measure_pos μ ⟨0, h0⟩
     obtain ⟨D, hD, hDX⟩ := slice_compact ε u hu h 1 1 J hJc
-    have hfin : μ W < ⊤ :=
-      lt_of_le_of_lt (measure_mono fun X hX => hDX X (by simpa [U, W] using hX)) hD.measure_lt_top
+    have hfin : μ W < ⊤ := lt_of_le_of_lt (measure_mono fun X hX => hDX X (by simpa [U, W] using hX)) hD.measure_lt_top
     have heq : (fun X => e (1 * U X * 1)) = W.indicator fun _ => (1 : ℂ) := by
       funext X
       by_cases hX : X ∈ W
@@ -574,22 +532,17 @@ theorem typeSlice : TypeSlice := by
     by_contra H
     push_neg at H
     exact hv0 ((Module.forall_dual_apply_eq_zero_iff ℂ v).1 H)
-  obtain ⟨l, hl, hlv⟩ :=
-    GlobalTheory.SuperCusp.exists_smooth_form_eq (N := ⊥) σ.smooth hKo hKc 1
-      ((χ.ker.map J.subtype : Subgroup (GL (Fin n) k)) : Set (GL (Fin n) k))
-      (fun c hc => hc)
-      (fun g hg => ⟨1, Subgroup.one_mem _, g, hg, by simp⟩)
-      (fun c hc => by simpa using hc)
-      hfix l₀
-      (fun x hx y => by rw [Subgroup.mem_bot.1 hx]; simp)
+  obtain ⟨l, hl, hlv⟩ := GlobalTheory.SuperCusp.exists_smooth_form_eq (N := ⊥) σ.smooth hKo hKc 1
+    ((χ.ker.map J.subtype : Subgroup (GL (Fin n) k)) : Set (GL (Fin n) k)) (fun c hc => hc)
+    (fun g hg => ⟨1, Subgroup.one_mem _, g, hg, by simp⟩) (fun c hc => by simpa using hc) hfix l₀
+    (fun x hx y => by rw [Subgroup.mem_bot.1 hx]; simp)
   have hl1 : l v ≠ 0 := by
     have := hlv 0
     simp only [pow_zero, map_one, Module.End.one_apply] at this
     rwa [this]
   let c : GL (Fin n) k → ℂ := fun g =>
     if ValuativeRel.valuation k (g : Matrix (Fin n) (Fin n) k).det = 1 then l (σ.ρ g v) else 0
-  obtain ⟨hlc, hcs, K0, K0o, -, hbi, hz⟩ :=
-    GlobalTheory.CuspCutCoef.isCuspFn_cutCoef k n σ.V σ.ρ hc v l hl c (fun _ => rfl)
+  obtain ⟨hlc, hcs, K0, K0o, -, hbi, hz⟩ := GlobalTheory.CuspCutCoef.isCuspFn_cutCoef k n σ.V σ.ρ hc v l hl c (fun _ => rfl)
   let f : GL (Fin n) k → ℂ := fun g => starRingEnd ℂ (c g)
   have hfc : Continuous f := Complex.continuous_conj.comp hlc.continuous
   have hfs : HasCompactSupport f := hcs.comp_left (map_zero _)
@@ -601,7 +554,8 @@ theorem typeSlice : TypeSlice := by
     intro g y hy
     have := hbi 1 K0.one_mem y hy.2 g
     rwa [one_mul] at this
-  have hfR : ∀ g, ∀ y ∈ K₂, f (g * y) = f g := fun g y hy => by simp only [f, hcR g y hy]
+  have hfR : ∀ g, ∀ y ∈ K₂, f (g * y) = f g := fun g y hy => by
+    simp only [f, hcR g y hy]
   have hfZ : ∀ z w : GL (Fin n) k, ∫ X, f (z * U X * w) ∂μ = 0 := by
     intro z w
     have h1 : ∀ X, z * U X * w = (z * w) * ((h * w)⁻¹ * u X * (h * w)) := fun X => by
@@ -619,8 +573,7 @@ theorem typeSlice : TypeSlice := by
   have hsum := hσ K₂ inf_le_left hK₂o f hfc hfs hfR hfZ l Sf hoff
   have hterm : ∀ q : GL (Fin n) k ⧸ K₂, f q.out * l (σ.ρ q.out v) = ((‖c q.out‖ ^ 2 : ℝ) : ℂ) := by
     intro q
-    by_cases hd
-      : ValuativeRel.valuation k ((q.out : GL (Fin n) k) : Matrix (Fin n) (Fin n) k).det = 1
+    by_cases hd : ValuativeRel.valuation k ((q.out : GL (Fin n) k) : Matrix (Fin n) (Fin n) k).det = 1
     · have hcq : c q.out = l (σ.ρ q.out v) := if_pos hd
       simp only [f]
       rw [hcq, Complex.conj_mul']
@@ -632,23 +585,21 @@ theorem typeSlice : TypeSlice := by
       simp
   simp only [hterm] at hsum
   rw [← Complex.ofReal_sum, Complex.ofReal_eq_zero,
-      Finset.sum_eq_zero_iff_of_nonneg (fun _ _ => by positivity)]
-    at hsum
+    Finset.sum_eq_zero_iff_of_nonneg (fun _ _ => by positivity)] at hsum
   have h1 := hsum q₁ (Finset.mem_insert_self _ _)
   have h2 : c q₁.out = 0 := by
     have := pow_eq_zero_iff (two_ne_zero) |>.1 h1
     exact norm_eq_zero.1 this
   have h3 : c q₁.out = c 1 := by
     have hmem : q₁.out ∈ K₂ := by
-      have : ((q₁.out : GL (Fin n) k) : GL (Fin n) k ⧸ K₂)
-          = ((1 : GL (Fin n) k) : GL (Fin n) k ⧸ K₂) :=
-        QuotientGroup.out_eq' q₁
+      have : ((q₁.out : GL (Fin n) k) : GL (Fin n) k ⧸ K₂) = ((1 : GL (Fin n) k) : GL (Fin n) k ⧸ K₂) := QuotientGroup.out_eq' q₁
       have h5 : (q₁.out)⁻¹ * 1 ∈ K₂ := QuotientGroup.eq.1 this
       rw [mul_one] at h5
       exact K₂.inv_mem_iff.1 h5
     have := hcR 1 _ hmem
     rwa [one_mul] at this
-  have h4 : c 1 = l v := by simp [c]
+  have h4 : c 1 = l v := by
+    simp [c]
   exact hl1 (by rw [← h4, ← h3, h2])
 
 end UpperTheory.Gal.Spc

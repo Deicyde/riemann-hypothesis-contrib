@@ -1,9 +1,50 @@
 module
 
-public import Mathlib
 public import GroundTheory.ProfiniteCohomology.GlobalClassFormation.ABHNPrep
 public import GroundTheory.ProfiniteCohomology.GlobalClassFormation.IdeleInvariants.LocalInf
-public import GroundTheory.ProfiniteCohomology.GlobalClassFormation.RealPlaces
+public import GroundTheory.ProfiniteCohomology.GlobalClassFormation.IdeleInvariants.BrauerInvZOfIsSepClosureIdelesLocalResIdelesResF
+import GroundTheory.ProfiniteCohomology.GlobalClassFormation.IdeleRestriction.Components
+import GroundTheory.ProfiniteCohomology.GlobalClassFormation.IdeleRestriction.IsDiscreteRepResGlobalDecompLimitRep
+import GroundTheory.ProfiniteCohomology.GlobalClassFormation.RealPlaces
+import GroundTheory.ProfiniteCohomology.GlobalClassFormation.Splitting
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
 
 @[expose] public section
 
@@ -22,7 +63,6 @@ variable {K E : FiniteSubfield} [Fact (K ≤ E)] (ι : LocalEmbeddings K) (ιE :
 
 section Places
 
-set_option maxHeartbeats 4000000 in
 theorem placeInv_idelesResField_inr
     (y : cohomology (limitRep K) 2) (v : HeightOneSpectrum (𝓞 K.1)) (w : PlacesOver E.1 v)
     : placeInv (.inr w.1)
@@ -44,7 +84,6 @@ theorem placeInv_idelesResField_inr
     exact brauerInvZOfIsSepClosure_idelesLocalRes_idelesResField v ι' (ιE.fin _) y
   exact key w hι'
 
-set_option maxHeartbeats 4000000 in
 theorem placeInv_idelesResField_inl
     (y : cohomology (limitRep K) 2) (v : InfinitePlace K.1) (w : v.placesOver E.1)
     : placeInv (.inl (w : InfinitePlace E.1))
@@ -114,11 +153,10 @@ theorem sumPlaceInv_eq_sum
     · rw [hS w hw,
         Finset.sum_eq_zero fun b hb => DirectSum.of_eq_of_ne _ _ _ (by rintro rfl; exact hw hb)]
   conv_lhs => rw [hD]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+
+  rw [map_sum]
   exact Finset.sum_congr rfl fun w _ => sumPlaceInv_of w (D w)
 
-set_option maxHeartbeats 4000000 in
 open Classical in
 theorem idelesSumInv_idelesResField_of (u : Place K.1) (t : localGaloisCohomology K 2 u)
     : idelesSumInv ιE
@@ -217,8 +255,8 @@ theorem idelesSumInv_idelesResField (y : cohomology (limitRep K) 2)
   classical
   set Φ := idelesLimitCohomologyEquiv ι (by norm_num : 1 ≤ 2)
   obtain ⟨D, rfl⟩ := Φ.symm.surjective y
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [← DirectSum.sum_support_of D, map_sum, map_sum, map_sum, map_sum, Finset.smul_sum]
+
+  rw [← DirectSum.sum_support_of D, map_sum, map_sum, map_sum, map_sum, Finset.smul_sum]
   exact Finset.sum_congr rfl fun u _ => idelesSumInv_idelesResField_of ι ιE u (D u)
 
 end Sum

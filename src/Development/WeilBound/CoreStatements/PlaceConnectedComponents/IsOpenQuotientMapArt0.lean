@@ -1,20 +1,63 @@
 module
 
-public import Mathlib
+import CompanionTheory.AutomorphicTheory.PlaceSeparation.IsOpenQuotientMapArt0
 public import Development.AbelianVarietyTheory.PublishedTheorems.AutomorphicForms₂.ExistsUniqueHcharOfFiniteOrder
-public import GroundTheory.GlobalFields.GlobalArtinMap.Kernel
-public import GroundTheory.GlobalFields.ClassFieldConsequences.RayClassFieldLocal
-public import GroundTheory.GlobalFields.GlobalReciprocity.Frobenius
-public import GroundTheory.GlobalFields.GlobalReciprocity.LocalSurjective
+public import GroundTheory.GlobalFields.GlobalArtinMap.ArtinMap
+public import Mathlib.RingTheory.PicardGroup
 public import Development.WeilBound.CoreStatements.PlaceConnectedComponents.ArtinA
 public import Development.WeilBound.CoreStatements.PlaceConnectedComponents.ArtinKer
+public import GroundTheory.GlobalFields.ClassFieldConsequences.RayClassFieldLocal
+public import GroundTheory.GlobalFields.GlobalArtinMap.Kernel
+import GroundTheory.GlobalFields.GlobalReciprocity.Frobenius
+import GroundTheory.GlobalFields.GlobalReciprocity.LocalSurjective
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
 
 @[expose] public section
 
 noncomputable section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Neutral.B1
-  Formalism.L2.Host GlobalTheory.HeckeGal
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Neutral.B1 Formalism.L2.Host GlobalTheory.HeckeGal
 open GroundTheory.LocalField GroundTheory.Global GroundTheory.Global.SemiLocal
 
 namespace PositivityTheory.FamInh
@@ -26,14 +69,9 @@ def art0 : Ideles E →* Gab E Ω :=
     ((artinMap E Ω).comp (GroundTheory.Global.IdeleClassGroup.mk E))
 
 theorem isOpenQuotientMap_art0 : IsOpenQuotientMap (art0 E Ω) := by
-  have h1 : IsOpenQuotientMap (GroundTheory.Global.IdeleClassGroup.mk E) :=
-    QuotientGroup.isOpenQuotientMap_mk
-  have h2 : IsOpenQuotientMap
-      (QuotientGroup.mk
-        : GroundTheory.Global.IdeleClassGroup E
-          → GroundTheory.Global.IdeleClassGroup E ⧸
-            Subgroup.connectedComponentOfOne (GroundTheory.Global.IdeleClassGroup E)) :=
-    QuotientGroup.isOpenQuotientMap_mk
+  have h1 : IsOpenQuotientMap (GroundTheory.Global.IdeleClassGroup.mk E) := QuotientGroup.isOpenQuotientMap_mk
+  have h2 : IsOpenQuotientMap (QuotientGroup.mk : GroundTheory.Global.IdeleClassGroup E → GroundTheory.Global.IdeleClassGroup E ⧸
+      Subgroup.connectedComponentOfOne (GroundTheory.Global.IdeleClassGroup E)) := QuotientGroup.isOpenQuotientMap_mk
   have h3 := (artinQuotientEquiv (K := E) (Ω := Ω)).toHomeomorph.isOpenQuotientMap
   have h4 := (topologicalAbelianizationEquiv E Ω).symm.toHomeomorph.isOpenQuotientMap
   exact h4.comp (h3.comp (h2.comp h1))
@@ -47,25 +85,21 @@ theorem ker_art0 : (art0 E Ω).ker = ((diagUnits E).range ⊔ infConn E).topolog
 variable {E Ω}
 
 def res (L : IntermediateField E Ω) [IsAbelianGalois E L] : Gab E Ω →* (L ≃ₐ[E] L) :=
-  (restrictAb L (le_maximalAbelianExtension L)).comp
-    (topologicalAbelianizationEquiv E Ω).toMulEquiv.toMonoidHom
+  (restrictAb L (le_maximalAbelianExtension L)).comp (topologicalAbelianizationEquiv E Ω).toMulEquiv.toMonoidHom
 
-theorem res_toAb (L : IntermediateField E Ω) [IsAbelianGalois E L] (σ : G E Ω)
-    : res L (toAb E Ω σ) = AlgEquiv.restrictNormalHom L σ :=
+theorem res_toAb (L : IntermediateField E Ω) [IsAbelianGalois E L] (σ : G E Ω) :
+    res L (toAb E Ω σ) = AlgEquiv.restrictNormalHom L σ :=
   restrictAb_topologicalAbelianizationEquiv L (le_maximalAbelianExtension L) σ
 
 theorem continuous_res (L : IntermediateField E Ω) [IsAbelianGalois E L] : Continuous (res L) :=
-  (continuous_restrictAb L (le_maximalAbelianExtension L)).comp
-    (topologicalAbelianizationEquiv E Ω).continuous
+  (continuous_restrictAb L (le_maximalAbelianExtension L)).comp (topologicalAbelianizationEquiv E Ω).continuous
 
-theorem localIdele_eq (v : HeightOneSpectrum (𝓞 E)) (x : (v.adicCompletion E)ˣ)
-    : localIdele E v x = IdeleGroup.finiteEmbedding v x :=
-  rfl
+theorem localIdele_eq (v : HeightOneSpectrum (𝓞 E)) (x : (v.adicCompletion E)ˣ) :
+    localIdele E v x = IdeleGroup.finiteEmbedding v x := rfl
 
-theorem res_art0
-    (L : IntermediateField E Ω) [FiniteDimensional E L] [IsAbelianGalois E L]
-    (v : HeightOneSpectrum (𝓞 E)) (x : (v.adicCompletion E)ˣ)
-    : res L (art0 E Ω (localIdele E v x)) = localSymbol L v x := by
+theorem res_art0 (L : IntermediateField E Ω) [FiniteDimensional E L] [IsAbelianGalois E L]
+    (v : HeightOneSpectrum (𝓞 E)) (x : (v.adicCompletion E)ˣ) :
+    res L (art0 E Ω (localIdele E v x)) = localSymbol L v x := by
   rw [← restrictAb_artinMap_finiteEmbedding L v x, localIdele_eq]
   exact congrArg (restrictAb L (le_maximalAbelianExtension L))
     ((topologicalAbelianizationEquiv E Ω).apply_symm_apply _)
@@ -73,61 +107,24 @@ theorem res_art0
 omit [NumberField E] [IsAlgClosure E Ω] in
 theorem continuous_toAb : Continuous (toAb E Ω) := QuotientGroup.continuous_mk
 
-theorem mem_of_forall_res
-    {H : Subgroup (Gab E Ω)} (hH : IsClosed (H : Set (Gab E Ω)))
-    {g : Gab E Ω}
-    (h : ∀ (L : IntermediateField E Ω) [FiniteDimensional E L] [IsAbelianGalois E L],
-      H ≤ (res L).ker → res L g = 1)
-    : g ∈ H := by
-  obtain ⟨σ, rfl⟩ := toAb_surjective g
-  let H' : ClosedSubgroup (Ω ≃ₐ[E] Ω) := ⟨H.comap (toAb E Ω), hH.preimage continuous_toAb⟩
-  have hfix := InfiniteGalois.fixingSubgroup_fixedField H'
-  have : σ ∈ (IntermediateField.fixedField H'.1).fixingSubgroup := by
-    rw [IntermediateField.mem_fixingSubgroup_iff]
-    intro y hy
-    have hab : y ∈ maximalAbelianExtension E Ω := by
-      refine IntermediateField.fixedField_le (fun τ hτ => ?_) hy
-      show toAb E Ω τ ∈ H
-      rw [show toAb E Ω τ = 1 from (QuotientGroup.eq_one_iff τ).2 hτ]
-      exact H.one_mem
-    obtain ⟨L0, _, _, hL0⟩ := exists_finite_abelian_mem hab
-    let L : IntermediateField E Ω := L0 ⊓ IntermediateField.fixedField H'.1
-    have : FiniteDimensional E L :=
-      FiniteDimensional.of_injective
-        (IntermediateField.inclusion (inf_le_left : L ≤ L0)).toLinearMap
-        (IntermediateField.inclusion (inf_le_left : L ≤ L0)).injective
-    have : IsAbelianGalois E L :=
-      IsAbelianGalois.of_algHom (IntermediateField.inclusion (inf_le_left : L ≤ L0))
-    have h1 :=
-      h L fun a ha => by
-        obtain ⟨τ, rfl⟩ := toAb_surjective a
-        rw [MonoidHom.mem_ker, res_toAb, ← MonoidHom.mem_ker, L.restrictNormalHom_ker,
-          IntermediateField.mem_fixingSubgroup_iff]
-        intro z hz
-        exact (IntermediateField.mem_fixedField_iff _ z).1 hz.2 τ ha
-    rw [res_toAb, ← MonoidHom.mem_ker, L.restrictNormalHom_ker,
-        IntermediateField.mem_fixingSubgroup_iff]
-      at h1
-    exact h1 y ⟨hL0, hy⟩
-  rw [hfix] at this
-  exact this
+theorem mem_of_forall_res {H : Subgroup (Gab E Ω)} (hH : IsClosed (H : Set (Gab E Ω))) {g : Gab E Ω}
+    (h : ∀ (L : IntermediateField E Ω) [FiniteDimensional E L] [IsAbelianGalois E L], H ≤ (res L).ker →
+      res L g = 1) : g ∈ H := by
+  apply CompanionTheory.FamInh.mem_of_forall_res <;> assumption
 
-theorem eq_of_forall_res
-    {H H' : Subgroup (Gab E Ω)}
-    (hH : IsClosed (H : Set (Gab E Ω))) (hH' : IsClosed (H' : Set (Gab E Ω)))
+theorem eq_of_forall_res {H H' : Subgroup (Gab E Ω)} (hH : IsClosed (H : Set (Gab E Ω)))
+    (hH' : IsClosed (H' : Set (Gab E Ω)))
     (h : ∀ (L : IntermediateField E Ω) [FiniteDimensional E L] [IsAbelianGalois E L],
-      H ≤ (res L).ker ↔ H' ≤ (res L).ker)
-    : H = H' :=
-  le_antisymm
-    (fun _ hg => mem_of_forall_res hH' fun L _ _ hL => (h L).2 hL hg)
+      H ≤ (res L).ker ↔ H' ≤ (res L).ker) : H = H' :=
+  le_antisymm (fun _ hg => mem_of_forall_res hH' fun L _ _ hL => (h L).2 hL hg)
     (fun _ hg => mem_of_forall_res hH fun L _ _ hL => (h L).1 hL hg)
 
 instance : T2Space (Gab E Ω) := by
   have : T2Space (maximalAbelianExtension E Ω ≃ₐ[E] maximalAbelianExtension E Ω) := krullTopology_t2
   exact (topologicalAbelianizationEquiv E Ω).symm.toHomeomorph.t2Space
 
-theorem isClosed_map_toAb {S : Subgroup (G E Ω)} (hS : IsClosed (S : Set (G E Ω)))
-    : IsClosed ((S.map (toAb E Ω) : Subgroup (Gab E Ω)) : Set (Gab E Ω)) :=
+theorem isClosed_map_toAb {S : Subgroup (G E Ω)} (hS : IsClosed (S : Set (G E Ω))) :
+    IsClosed ((S.map (toAb E Ω) : Subgroup (Gab E Ω)) : Set (Gab E Ω)) :=
   (hS.isCompact.image continuous_toAb).isClosed
 
 theorem isAlgClosure_top (L : IntermediateField E Ω) : IsAlgClosure L Ω :=
@@ -136,10 +133,9 @@ theorem isAlgClosure_top (L : IntermediateField E Ω) : IsAlgClosure L Ω :=
 
 variable {v : HeightOneSpectrum (𝓞 E)} {A : ValuationSubring Ω}
 
-theorem ine_le_ker_iff
-    (L : IntermediateField E Ω) [FiniteDimensional E L] [IsAbelianGalois E L]
-    {w : HeightOneSpectrum (𝓞 L)} (hw : IsPlaceOver A w)
-    : (Ine (F := E) A).map (toAb E Ω) ≤ (res L).ker ↔ w.asIdeal.inertia (L ≃ₐ[E] L) = ⊥ := by
+theorem ine_le_ker_iff (L : IntermediateField E Ω) [FiniteDimensional E L] [IsAbelianGalois E L]
+    {w : HeightOneSpectrum (𝓞 L)} (hw : IsPlaceOver A w) :
+    (Ine (F := E) A).map (toAb E Ω) ≤ (res L).ker ↔ w.asIdeal.inertia (L ≃ₐ[E] L) = ⊥ := by
   have := isAlgClosure_top L
   constructor
   · intro h
@@ -152,13 +148,12 @@ theorem ine_le_ker_iff
     rw [MonoidHom.mem_ker, res_toAb, ← Subgroup.mem_bot, ← h]
     exact res_mem_inertia hw hσ
 
-theorem map_units_eq (hA : IsPlaceOver A v)
-    : (unitFiltrationUnits (v.adicCompletion E) 0).map ((art0 E Ω).comp (localIdele E v))
-      = (Ine (F := E) A).map (toAb E Ω) := by
+theorem map_units_eq (hA : IsPlaceOver A v) :
+    (unitFiltrationUnits (v.adicCompletion E) 0).map ((art0 E Ω).comp (localIdele E v)) =
+      (Ine (F := E) A).map (toAb E Ω) := by
   refine eq_of_forall_res ?_ (isClosed_map_toAb (isClosed_Ine A)) fun L _ _ => ?_
-  · exact ((isCompact_unitFiltrationUnits 0).image
-      ((isOpenQuotientMap_art0 E Ω).continuous.comp
-        (IdeleGroup.continuous_finiteEmbedding v))).isClosed
+  · exact ((isCompact_unitFiltrationUnits 0).image ((isOpenQuotientMap_art0 E Ω).continuous.comp
+      (IdeleGroup.continuous_finiteEmbedding v))).isClosed
   · have := isAlgClosure_top L
     obtain ⟨w, hw, hwv⟩ := exists_place_between (L := L) hA
     rw [ine_le_ker_iff L hw, inertia_eq_bot_iff v w]
@@ -174,28 +169,23 @@ theorem map_units_eq (hA : IsPlaceOver A v)
       have h2 := mem_unitFiltrationUnits_zero_iff_valued.1 (Subgroup.inv_mem _ hx)
       exact (Submonoid.mem_units_iff _ _).2 ⟨h1.le, h2.le⟩
 
-theorem unif_frob
-    (hA : IsPlaceOver A v)
-    {π : (v.adicCompletion E)ˣ} (hπ : ord (π : v.adicCompletion E) = 1)
-    {σ : G E Ω} (hσ : IsFrob (F := E) A (normV v) σ)
-    : (toAb E Ω σ)⁻¹ * art0 E Ω (localIdele E v π) ∈ (Ine (F := E) A).map (toAb E Ω) := by
+theorem unif_frob (hA : IsPlaceOver A v) {π : (v.adicCompletion E)ˣ} (hπ : ord (π : v.adicCompletion E) = 1)
+    {σ : G E Ω} (hσ : IsFrob (F := E) A (normV v) σ) :
+    (toAb E Ω σ)⁻¹ * art0 E Ω (localIdele E v π) ∈ (Ine (F := E) A).map (toAb E Ω) := by
   refine mem_of_forall_res (isClosed_map_toAb (isClosed_Ine A)) fun L _ _ hL => ?_
   have := isAlgClosure_top L
   obtain ⟨w, hw, hwv⟩ := exists_place_between (L := L) hA
   rw [ine_le_ker_iff L hw] at hL
-  rw [map_mul, map_inv, res_toAb, res_art0,
-    localSymbol_eq_arithFrobAt v w ((inertia_eq_bot_iff v w).1 hL) hπ]
-  have h :=
-    (res_isArithFrobAt hw hσ).mul_inv_mem_inertia
-      (IsArithFrobAt.arithFrobAt (𝓞 E) (L ≃ₐ[E] L) w.asIdeal)
+  rw [map_mul, map_inv, res_toAb, res_art0, localSymbol_eq_arithFrobAt v w ((inertia_eq_bot_iff v w).1 hL) hπ]
+  have h := (res_isArithFrobAt hw hσ).mul_inv_mem_inertia
+    (IsArithFrobAt.arithFrobAt (𝓞 E) (L ≃ₐ[E] L) w.asIdeal)
   rw [hL, Subgroup.mem_bot, mul_inv_eq_one] at h
   rw [h, inv_mul_cancel]
 
-theorem closure_range_eq (hA : IsPlaceOver A v)
-    : ((art0 E Ω).comp (localIdele E v)).range.topologicalClosure
-      = (Dec (F := E) A).map (toAb E Ω) := by
-  refine eq_of_forall_res (Subgroup.isClosed_topologicalClosure _)
-    (isClosed_map_toAb (isClosed_Dec A)) fun L _ _ => ?_
+theorem closure_range_eq (hA : IsPlaceOver A v) :
+    ((art0 E Ω).comp (localIdele E v)).range.topologicalClosure = (Dec (F := E) A).map (toAb E Ω) := by
+  refine eq_of_forall_res (Subgroup.isClosed_topologicalClosure _) (isClosed_map_toAb (isClosed_Dec A))
+    fun L _ _ => ?_
   have := isAlgClosure_top L
   obtain ⟨w, hw, hwv⟩ := exists_place_between (L := L) hA
   constructor
@@ -211,28 +201,23 @@ theorem closure_range_eq (hA : IsPlaceOver A v)
     rw [MonoidHom.mem_ker, MonoidHom.comp_apply, res_art0, ← e, ← res_toAb]
     exact h ⟨σ, hσ, rfl⟩
 
-theorem art0_unit_iff (hA : IsPlaceOver A v) (g : Gab E Ω)
-    : (∃ x, IsUnitAt v x ∧ art0 E Ω (localIdele E v x) = g)
-      ↔ g ∈ (Ine (F := E) A).map (toAb E Ω) := by
+theorem art0_unit_iff (hA : IsPlaceOver A v) (g : Gab E Ω) :
+    (∃ x, IsUnitAt v x ∧ art0 E Ω (localIdele E v x) = g) ↔ g ∈ (Ine (F := E) A).map (toAb E Ω) := by
   rw [← map_units_eq hA]
-  exact ⟨
-    fun ⟨x, hx, e⟩ => ⟨x, mem_unitFiltrationUnits_zero_iff_valued.2 hx, e⟩,
-    fun ⟨x, hx, e⟩ => ⟨x, mem_unitFiltrationUnits_zero_iff_valued.1 hx, e⟩
-  ⟩
+  exact ⟨fun ⟨x, hx, e⟩ => ⟨x, mem_unitFiltrationUnits_zero_iff_valued.2 hx, e⟩,
+    fun ⟨x, hx, e⟩ => ⟨x, mem_unitFiltrationUnits_zero_iff_valued.1 hx, e⟩⟩
 
-theorem art0_unif_iff (hA : IsPlaceOver A v) (g : Gab E Ω)
-    : (∃ x, IsUnifAt v x ∧ art0 E Ω (localIdele E v x) = g)
-      ↔ ∃ σ : G E Ω, IsFrob (F := E) A (normV v) σ ∧ toAb E Ω σ = g := by
+theorem art0_unif_iff (hA : IsPlaceOver A v) (g : Gab E Ω) :
+    (∃ x, IsUnifAt v x ∧ art0 E Ω (localIdele E v x) = g) ↔
+      ∃ σ : G E Ω, IsFrob (F := E) A (normV v) σ ∧ toAb E Ω σ = g := by
   obtain ⟨π, hπ, hπv⟩ := exists_ord_eq_one_valued v
   constructor
   · rintro ⟨x, hx, rfl⟩
     obtain ⟨F, hF⟩ := exists_isFrob hA
     have hu : IsUnitAt v (π⁻¹ * x) := by
       unfold IsUnitAt
-      rw [Units.val_mul, map_mul, Units.val_inv_eq_inv_val, map_inv₀, hπv, hx,
-        inv_mul_cancel₀ WithZero.exp_ne_zero]
-    obtain ⟨ι, hι, e⟩ :=
-      Subgroup.mul_mem _ (unif_frob hA hπ hF) ((art0_unit_iff hA _).1 ⟨_, hu, rfl⟩)
+      rw [Units.val_mul, map_mul, Units.val_inv_eq_inv_val, map_inv₀, hπv, hx, inv_mul_cancel₀ WithZero.exp_ne_zero]
+    obtain ⟨ι, hι, e⟩ := Subgroup.mul_mem _ (unif_frob hA hπ hF) ((art0_unit_iff hA _).1 ⟨_, hu, rfl⟩)
     refine ⟨F * ι, isFrob_mul_of_mem_Ine hF hι, ?_⟩
     rw [map_mul, e, map_mul, map_mul, map_inv, map_inv]
     group
@@ -245,8 +230,8 @@ theorem art0_unif_iff (hA : IsPlaceOver A v) (g : Gab E Ω)
       group
 
 theorem isGlobalArtin_inv : IsGlobalArtin (art0 E Ω)⁻¹ := by
-  refine
-    ⟨(Homeomorph.inv (Gab E Ω)).isOpenQuotientMap.comp (isOpenQuotientMap_art0 E Ω), ?_, ?_, ?_, ?_⟩
+  refine ⟨(Homeomorph.inv (Gab E Ω)).isOpenQuotientMap.comp (isOpenQuotientMap_art0 E Ω),
+    ?_, ?_, ?_, ?_⟩
   · rw [← ker_art0 E Ω]
     ext x
     simp only [MonoidHom.mem_ker, MonoidHom.inv_apply, inv_eq_one]

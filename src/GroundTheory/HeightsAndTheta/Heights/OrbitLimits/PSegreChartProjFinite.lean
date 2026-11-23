@@ -1,11 +1,53 @@
 module
 
-public import Mathlib
 public import GroundTheory.HeightsAndTheta.Heights.OrbitLimits.StSegreChartProjFinite
-public import GroundTheory.HeightsAndTheta.Heights.OrbitLimits.PSegreChartDim
-public import GroundTheory.HeightsAndTheta.Heights.ComplexAnalyticSets.PFiniteProjHomInjective
+public import GroundTheory.HeightsAndTheta.Heights.ComplexAnalyticSets.StatementsConeAvoid
 public import GroundTheory.HeightsAndTheta.Heights.ComplexAnalyticSets.PConeAvoidsFinite
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.InterFib
+public import GroundTheory.HeightsAndTheta.Heights.ComplexAnalyticSets.PFiniteProjHomInjective
+public import GroundTheory.HeightsAndTheta.Heights.OrbitLimits.PSegreChartDim
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.InterFib
 
 @[expose] public section
 
@@ -18,30 +60,25 @@ namespace GroundTheory.Heights₂.Heights
 open ReciprocityTheory.ChartRestriction.G.Geo (MRing IsArithVar IsGoodProj mcPts segre segre_rel)
 open ComplexSets MvPolynomial Matrix
 
-theorem homogeneousComponent_mem_leadIdeal
-    {n : ℕ} {J : Ideal (MvPolynomial (Fin n) ℂ)} {f : MvPolynomial (Fin n) ℂ} (hf : f ∈ J)
-    {r : ℕ} (hr : f.totalDegree ≤ r)
-    : homogeneousComponent r f ∈ leadIdeal J := by
+theorem homogeneousComponent_mem_leadIdeal {n : ℕ} {J : Ideal (MvPolynomial (Fin n) ℂ)}
+    {f : MvPolynomial (Fin n) ℂ} (hf : f ∈ J) {r : ℕ} (hr : f.totalDegree ≤ r) :
+    homogeneousComponent r f ∈ leadIdeal J := by
   rcases hr.eq_or_lt with h | h
   · rw [← h]
     exact Ideal.subset_span ⟨f, hf, rfl⟩
   · rw [homogeneousComponent_eq_zero (n := r) (φ := f) h]
     exact zero_mem _
 
-theorem eval_linPoly_eq_mulVec {n d : ℕ} (A : Matrix (Fin d) (Fin n) ℂ) (r : Fin d) (x : Fin n → ℂ)
-    : eval x (linPoly A r) = (A *ᵥ x) r := by
+theorem eval_linPoly_eq_mulVec {n d : ℕ} (A : Matrix (Fin d) (Fin n) ℂ) (r : Fin d) (x : Fin n → ℂ) :
+    eval x (linPoly A r) = (A *ᵥ x) r := by
   simp [linPoly, Matrix.mulVec, dotProduct]
 
-theorem SegreChartProjFinite.pow_mem
-    {K : Type} [Fintype K]
-    {ι : K → Type} [∀ k, Fintype (ι k)]
+theorem SegreChartProjFinite.pow_mem {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)]
     {P : Ideal (MRing ι)} {e m : ℕ} {σ : Fin m ≃ ((k : K) → ι k)} {i : (k : K) → ι k}
     {Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ)}
     (hP : IsArithVar P (e + 1)) (hΨ : IsGoodProj P Ψ) (hΨ0 : ∀ w, Ψ w 0 = w i)
-    {J : Ideal (MvPolynomial (Fin m) ℂ)} (hJ : J ∈ segreChartComponents P σ i)
-    (a : Fin m)
-    : ∃ r : ℕ,
-      (X a ^ r : MvPolynomial (Fin m) ℂ) ∈ leadIdeal J ⊔ linIdeal (chartProjMatrix σ Ψ) := by
+    {J : Ideal (MvPolynomial (Fin m) ℂ)} (hJ : J ∈ segreChartComponents P σ i) (a : Fin m) :
+    ∃ r : ℕ, (X a ^ r : MvPolynomial (Fin m) ℂ) ∈ leadIdeal J ⊔ linIdeal (chartProjMatrix σ Ψ) := by
   classical
   obtain ⟨r, hr, G, hG, hrel⟩ := segre_rel hP.2.1.2.1 Ψ hΨ (σ a)
   set A := chartProjMatrix σ Ψ with hA
@@ -58,9 +95,9 @@ theorem SegreChartProjFinite.pow_mem
     have h := hrel z hz
     rw [Fin.sum_univ_succ, hΨ0, hzi, one_mul] at h
     change eval (fun a => segre z (σ a)) f = 0
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [f, Gx, map_sub, map_add (f := _), map_pow, map_sum, map_mul, eval_X, eval_rename,
-        hw, eval_linPoly_eq_mulVec, hA, chartProjMatrix_mulVec]
+
+    simp only [f, Gx, map_sub, map_add (f := _), map_pow, map_sum, map_mul, eval_X, eval_rename, hw,
+    eval_linPoly_eq_mulVec, hA, chartProjMatrix_mulVec]
     rw [h]
     simp [Equiv.apply_symm_apply, mul_comm]
   have hdeg : f.totalDegree ≤ r := by
@@ -77,19 +114,15 @@ theorem SegreChartProjFinite.pow_mem
       if_pos rfl]
   have h0 : homogeneousComponent r (Gx 0) = 0 :=
     homogeneousComponent_eq_zero (n := r) (φ := Gx 0) (by have := hGx 0; omega)
-  have hcomp
-      : homogeneousComponent r f
-        = X a ^ r - ∑ j : Fin e, homogeneousComponent (r - 1) (Gx j.succ) * linPoly A j := by
-    set_option synthInstance.maxHeartbeats 100000 in
+  have hcomp : homogeneousComponent r f =
+      X a ^ r - ∑ j : Fin e, homogeneousComponent (r - 1) (Gx j.succ) * linPoly A j := by
+
     simp only [f, map_sub, map_add (f := _), map_sum, hX, h0, zero_add,
-      homogeneousComponent_mul_of_isHomogeneous_right _ _ (isHomogeneous_linPoly A _), h1, if_true]
-  have hmem
-      : homogeneousComponent r f
-          + ∑ j : Fin e, homogeneousComponent (r - 1) (Gx j.succ) * linPoly A j
-        ∈ leadIdeal J ⊔ linIdeal A :=
+    homogeneousComponent_mul_of_isHomogeneous_right _ _ (isHomogeneous_linPoly A _), h1, if_true]
+  have hmem : homogeneousComponent r f + ∑ j : Fin e, homogeneousComponent (r - 1) (Gx j.succ) * linPoly A j ∈
+      leadIdeal J ⊔ linIdeal A :=
     add_mem (Ideal.mem_sup_left (homogeneousComponent_mem_leadIdeal hfJ hdeg))
-      (Ideal.mem_sup_right (Ideal.sum_mem _ fun j _ =>
-        Ideal.mul_mem_left _ _ (Ideal.subset_span ⟨j, rfl⟩)))
+      (Ideal.mem_sup_right (Ideal.sum_mem _ fun j _ => Ideal.mul_mem_left _ _ (Ideal.subset_span ⟨j, rfl⟩)))
   rw [hcomp, sub_add_cancel] at hmem
   exact ⟨r, hmem⟩
 
@@ -100,13 +133,9 @@ theorem SegreChartProjFinite.proof : SegreChartProjFinite.Statement := by
       refine Ideal.span_le.2 (Set.range_subset_iff.2 fun a => ?_)
       obtain ⟨r, hr⟩ := SegreChartProjFinite.pow_mem hP hΨ hΨ0 hJ a
       exact ⟨r, hr⟩
-    obtain ⟨N, hN⟩ :=
-      Ideal.exists_pow_le_of_le_radical_of_fg_radical hrad (IsNoetherian.noetherian _)
+    obtain ⟨N, hN⟩ := Ideal.exists_pow_le_of_le_radical_of_fg_radical hrad (IsNoetherian.noetherian _)
     exact ConeAvoidsFinite.proof m e N J _ hN
-  exact ⟨
-    FiniteProjHomInjective.proof m e J _ (mem_segreChartComponents.1 hJ).1.1
-      (SegreChartDim.proof K ι P e m σ i hP J hJ) hfin,
-    hfin
-  ⟩
+  exact ⟨FiniteProjHomInjective.proof m e J _ (mem_segreChartComponents.1 hJ).1.1
+    (SegreChartDim.proof K ι P e m σ i hP J hJ) hfin, hfin⟩
 
 end GroundTheory.Heights₂.Heights

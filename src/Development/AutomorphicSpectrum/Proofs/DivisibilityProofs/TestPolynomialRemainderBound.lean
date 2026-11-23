@@ -1,24 +1,65 @@
 module
 
-public import Mathlib
-public import GroundTheory.HeightsAndTheta.Heights.Antisymmetric.Statements
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.InterSt
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArithmeticIntersection.MultihomogeneousIdeals.ExistsUniqueStatement
 public import Development.AutomorphicSpectrum.Definitions.DivisibilityTowers.HeckeSectionsIsotropicCommutatorPairingPower
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.InterNamed
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArakelovGeometry.KleimanNefness.KleimanSt
-public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.Imports
-public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.RestAt
+public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.IsFlagIntegralOne
 public import Development.AutomorphicSpectrum.Proofs.DivisibilityProofs.FlagDegreePowerSumMulZeroStatement
 public import Development.AutomorphicSpectrum.Proofs.DivisibilityProofs.RemainderTermSummableStatement
 public import Development.AutomorphicSpectrum.Proofs.DivisibilityProofs.TestPolynomialShiftTotalStatement
+public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.Imports
+public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.RestAt
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Ring.IsFormallyReal
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.BitVec
+import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
 noncomputable section
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo Filter Topology
-  GlobalTheory.CompanionTheory.Ar.Top
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo Filter Topology GlobalTheory.CompanionTheory.Ar.Top
 open GroundTheory.Heights₂.Heights.IndefiniteRowSideFullHecke
 
 namespace GlobalTheory.CompanionTheory.Ar.Top.TestRest
@@ -43,22 +84,22 @@ theorem Sg.trans {a b c : R} (h : Sg a b) (h' : Sg b c) : Sg a c := by
   · exact Or.inr rfl
   · exact Or.inl (by ring)
 
-theorem Sg.prod {ι : Type*} (s : Finset ι) (f g : ι → R) (h : ∀ i ∈ s, Sg (f i) (g i))
-    : Sg (∏ i ∈ s, f i) (∏ i ∈ s, g i) := by
+theorem Sg.prod {ι : Type*} (s : Finset ι) (f g : ι → R) (h : ∀ i ∈ s, Sg (f i) (g i)) :
+    Sg (∏ i ∈ s, f i) (∏ i ∈ s, g i) := by
   classical
   induction s using Finset.induction_on with
   | empty => exact Or.inl rfl
   | insert a s ha ih =>
     rw [Finset.prod_insert ha, Finset.prod_insert ha]
-    exact (h a (Finset.mem_insert_self _ _)).mul (ih fun i hi => h i (Finset.mem_insert_of_mem hi))
+    exact (h a (Finset.mem_insert_self _ _)).mul
+      (ih fun i hi => h i (Finset.mem_insert_of_mem hi))
 
 def pairProd {m : ℕ} (v : Fin m → R) : R := ∏ a, ∏ b, if a < b then v b - v a else 1
 
-theorem vandermonde_sg {m : ℕ} (v : Fin m → R)
-    : Sg (GroundTheory.Heights₂.Heights.vandermonde v) (pairProd v) := by
-  have h1
-      : GroundTheory.Heights₂.Heights.vandermonde v
-        = ((Matrix.vandermonde v).submatrix id (Fin.revPerm : Equiv.Perm (Fin m))).det := by
+theorem vandermonde_sg {m : ℕ} (v : Fin m → R) :
+    Sg (GroundTheory.Heights₂.Heights.vandermonde v) (pairProd v) := by
+  have h1 : GroundTheory.Heights₂.Heights.vandermonde v =
+      ((Matrix.vandermonde v).submatrix id (Fin.revPerm : Equiv.Perm (Fin m))).det := by
     unfold GroundTheory.Heights₂.Heights.vandermonde
     congr 1
     ext a b
@@ -79,27 +120,24 @@ theorem vandermonde_sg {m : ℕ} (v : Fin m → R)
   · left; simp [h]
   · right; simp [h]
 
-theorem pairProd_neg {m : ℕ} (v : Fin m → R) : Sg (pairProd fun a => - v a) (pairProd v) := by
+theorem pairProd_neg {m : ℕ} (v : Fin m → R) : Sg (pairProd fun a => -v a) (pairProd v) := by
   refine Sg.prod _ _ _ fun a _ => Sg.prod _ _ _ fun b _ => ?_
   split_ifs
   · right; ring
   · left; rfl
 
-theorem pair_split {j k : ℕ} (x : Fin (j + k) → R)
-    : ∏ ab ∈ Finset.univ.filter (fun ab : Fin (j + k) × Fin (j + k) =>
-          ab.1 < ab.2 ∧ ((ab.1 : ℕ) < j ↔ (ab.2 : ℕ) < j)), (x ab.2 - x ab.1)
-      = pairProd (fun a : Fin j => x (Fin.castAdd k a))
-        * pairProd (fun b : Fin k => x (Fin.natAdd j b)) := by
+theorem pair_split {j k : ℕ} (x : Fin (j + k) → R) :
+    ∏ ab ∈ Finset.univ.filter (fun ab : Fin (j + k) × Fin (j + k) =>
+        ab.1 < ab.2 ∧ ((ab.1 : ℕ) < j ↔ (ab.2 : ℕ) < j)), (x ab.2 - x ab.1) =
+      pairProd (fun a : Fin j => x (Fin.castAdd k a)) *
+        pairProd (fun b : Fin k => x (Fin.natAdd j b)) := by
   rw [Finset.prod_filter, Fintype.prod_prod_type, Fin.prod_univ_add]
   unfold pairProd
   congr 1
   · refine Finset.prod_congr rfl fun a _ => ?_
     rw [Fin.prod_univ_add]
-    have h2
-        : ∀ b : Fin k,
-          ¬((Fin.castAdd k a) < (Fin.natAdd j b)
-            ∧ (((Fin.castAdd k a : Fin (j + k)) : ℕ) < j
-              ↔ ((Fin.natAdd j b : Fin (j + k)) : ℕ) < j)) := by
+    have h2 : ∀ b : Fin k, ¬ ((Fin.castAdd k a) < (Fin.natAdd j b) ∧
+        (((Fin.castAdd k a : Fin (j + k)) : ℕ) < j ↔ ((Fin.natAdd j b : Fin (j + k)) : ℕ) < j)) := by
       rintro b ⟨_, h⟩
       have h' : j + (b : ℕ) < j := h.1 a.isLt
       omega
@@ -113,11 +151,8 @@ theorem pair_split {j k : ℕ} (x : Fin (j + k) → R)
       exact h (show (a : ℕ) < (b : ℕ) from h'.1)
   · refine Finset.prod_congr rfl fun a _ => ?_
     rw [Fin.prod_univ_add]
-    have h2
-        : ∀ b : Fin j,
-          ¬((Fin.natAdd j a) < (Fin.castAdd k b)
-            ∧ (((Fin.natAdd j a : Fin (j + k)) : ℕ) < j
-              ↔ ((Fin.castAdd k b : Fin (j + k)) : ℕ) < j)) := by
+    have h2 : ∀ b : Fin j, ¬ ((Fin.natAdd j a) < (Fin.castAdd k b) ∧
+        (((Fin.natAdd j a : Fin (j + k)) : ℕ) < j ↔ ((Fin.castAdd k b : Fin (j + k)) : ℕ) < j)) := by
       rintro b ⟨_, h⟩
       have h' : j + (a : ℕ) < j := h.2 b.isLt
       omega
@@ -135,15 +170,15 @@ theorem pair_split {j k : ℕ} (x : Fin (j + k) → R)
 
 end Sign
 
-theorem sum_low {M : Type*} [AddCommMonoid M] {j k : ℕ} (g : Fin (j + k) → M)
-    : ∑ i ∈ Finset.univ.filter (fun i : Fin (j + k) => (i : ℕ) < j), g i
-      = ∑ a : Fin j, g (Fin.castAdd k a) := by
+theorem sum_low {M : Type*} [AddCommMonoid M] {j k : ℕ} (g : Fin (j + k) → M) :
+    ∑ i ∈ Finset.univ.filter (fun i : Fin (j + k) => (i : ℕ) < j), g i =
+      ∑ a : Fin j, g (Fin.castAdd k a) := by
   rw [Finset.sum_filter, Fin.sum_univ_add]
   simp
 
-theorem sum_high {M : Type*} [AddCommMonoid M] {j k : ℕ} (g : Fin (j + k) → M)
-    : ∑ i ∈ Finset.univ.filter (fun i : Fin (j + k) => j ≤ (i : ℕ)), g i
-      = ∑ b : Fin k, g (Fin.natAdd j b) := by
+theorem sum_high {M : Type*} [AddCommMonoid M] {j k : ℕ} (g : Fin (j + k) → M) :
+    ∑ i ∈ Finset.univ.filter (fun i : Fin (j + k) => j ≤ (i : ℕ)), g i =
+      ∑ b : Fin k, g (Fin.natAdd j b) := by
   rw [Finset.sum_filter, Fin.sum_univ_add]
   have h1 : ∀ a : Fin j, ¬ j ≤ ((Fin.castAdd k a : Fin (j + k)) : ℕ) := fun a => not_le.2 a.isLt
   rw [Finset.sum_eq_zero (fun a _ => if_neg (h1 a)), zero_add]
@@ -153,25 +188,25 @@ variable {Ψ : Type} [Fintype Ψ] [DecidableEq Ψ]
 
 def degFlL (N : ℕ) : RP Ψ N →ₗ[ℝ] ℝ where
   toFun := degFl
-  map_add' a b := by simp only [degFl, MvPolynomial.coeff_add, mul_add, Finset.sum_add_distrib]
+  map_add' a b := by
+    simp only [degFl, MvPolynomial.coeff_add, mul_add, Finset.sum_add_distrib]
   map_smul' c a := by
-    simp only [degFl, coeff_smul, smul_eq_mul, RingHom.id_apply, Finset.mul_sum]
+    simp only [degFl, MvPolynomial.coeff_smul, smul_eq_mul, RingHom.id_apply, Finset.mul_sum]
     refine Finset.sum_congr rfl fun _ _ => ?_
     ring
 
-theorem permExp_degree (N : ℕ) : (permExp (fun _ => 1) : (Ψ × Fin N) →₀ ℕ).degree = dimFl Ψ N := by
+theorem permExp_degree (N : ℕ) :
+    (permExp (fun _ => 1) : (Ψ × Fin N) →₀ ℕ).degree = dimFl Ψ N := by
   rw [Finsupp.degree_eq_sum, Fintype.sum_prod_type]
-  have h
-      : ∀ τ : Ψ,
-        ∑ i : Fin N, (permExp (fun _ => 1) : (Ψ × Fin N) →₀ ℕ) (τ, i) = N * (N - 1) / 2 := by
+  have h : ∀ τ : Ψ, ∑ i : Fin N, (permExp (fun _ => 1) : (Ψ × Fin N) →₀ ℕ) (τ, i) = N * (N - 1) / 2 := by
     intro τ
     simp only [permExp, Finsupp.equivFunOnFinite_symm_apply_apply, Equiv.Perm.coe_one, id]
     rw [Fin.sum_univ_eq_sum_range (fun i => N - 1 - i) N, Finset.sum_range_reflect (fun i => i) N,
       Finset.sum_range_id]
   simp [h, dimFl]
 
-theorem degFl_permExp (N : ℕ)
-    : degFl (monomial (permExp (fun _ => 1) : (Ψ × Fin N) →₀ ℕ) (1 : ℝ)) = (-1) ^ dimFl Ψ N := by
+theorem degFl_permExp (N : ℕ) :
+    degFl (monomial (permExp (fun _ => 1) : (Ψ × Fin N) →₀ ℕ) (1 : ℝ)) = (-1) ^ dimFl Ψ N := by
   unfold degFl
   rw [Finset.sum_eq_single (fun _ => 1)]
   · simp
@@ -206,35 +241,34 @@ omit [Fintype Ψ] [DecidableEq Ψ] in
 theorem rli_rl (e : Ψ ≃ Fin f) (F : RP Ψ (j + k)) : rli e j k (rl e j k F) = F := by
   unfold rli rl
   rw [rename_rename]
-  have : ((fun x : Fin f × Fin (j + k) => (e.symm x.1, x.2))
-        ∘ fun x : Ψ × Fin (j + k) => (e x.1, x.2))
-      = id := by
+  have : ((fun x : Fin f × Fin (j + k) => (e.symm x.1, x.2)) ∘ fun x : Ψ × Fin (j + k) => (e x.1, x.2)) =
+      id := by
     funext x
     simp
   rw [this, rename_id_apply]
 
 omit [Fintype Ψ] [DecidableEq Ψ] in
-theorem rl_X (e : Ψ ≃ Fin f) (τ : Ψ) (i : Fin (j + k)) : rl e j k (X (τ, i)) = X (e τ, i) := by
+theorem rl_X (e : Ψ ≃ Fin f) (τ : Ψ) (i : Fin (j + k)) :
+    rl e j k (X (τ, i)) = X (e τ, i) := by
   simp [rl]
+
 
 def flagI (e : Ψ ≃ Fin f) (j k : ℕ) : RestTerms.Roots f j k →ₗ[ℝ] ℝ :=
   (degFlL (j + k)).comp (rli e j k).toLinearMap
 
-theorem flagI_apply (e : Ψ ≃ Fin f) (G : RestTerms.Roots f j k)
-    : flagI e j k G = degFl (rli e j k G) :=
-  rfl
+theorem flagI_apply (e : Ψ ≃ Fin f) (G : RestTerms.Roots f j k) :
+    flagI e j k G = degFl (rli e j k G) := rfl
 
 theorem flagI_rl (e : Ψ ≃ Fin f) (F : RP Ψ (j + k)) : flagI e j k (rl e j k F) = degFl F := by
   rw [flagI_apply, rli_rl]
 
 omit [Fintype Ψ] [DecidableEq Ψ] in
-theorem psumAt_eq (e : Ψ ≃ Fin f) (m : ℕ) (τ : Ψ)
-    : RestTerms.psumAt f j k m (e τ) = rl e j k (pk τ m) := by
-  set_option synthInstance.maxHeartbeats 100000 in
+theorem psumAt_eq (e : Ψ ≃ Fin f) (m : ℕ) (τ : Ψ) :
+    RestTerms.psumAt f j k m (e τ) = rl e j k (pk τ m) := by
+
   simp only [RestTerms.psumAt, pk, map_sum, map_pow, rl_X]
 
-theorem isFlag (e : Ψ ≃ Fin f) (hf : Fintype.card Ψ = f)
-    : RestTerms.IsFlagIntegral f j k (flagI e j k) := by
+theorem isFlag (e : Ψ ≃ Fin f) (hf : Fintype.card Ψ = f) : RestTerms.IsFlagIntegral f j k (flagI e j k) := by
   refine ⟨?_, ?_⟩
   · intro m τ G h1 _ _
     obtain ⟨t, rfl⟩ := e.surjective τ
@@ -242,10 +276,8 @@ theorem isFlag (e : Ψ ≃ Fin f) (hf : Fintype.card Ψ = f)
     exact GlobalTheory.T.flag_degree_power_sum_mul_zero Ψ (j + k) t m _ h1
   · subst hf
     refine ⟨rl e j k (monomial (permExp fun _ => 1) 1), ?_, ?_⟩
-    · have h :=
-        (isHomogeneous_monomial (R := ℝ) (1 : ℝ)
-            (permExp_degree (Ψ := Ψ) (j + k))).rename_isHomogeneous
-          (f := fun x : Ψ × Fin (j + k) => (e x.1, x.2))
+    · have h := (isHomogeneous_monomial (R := ℝ) (1 : ℝ) (permExp_degree (Ψ := Ψ) (j + k))).rename_isHomogeneous
+        (f := fun x : Ψ × Fin (j + k) => (e x.1, x.2))
       exact h
     · rw [flagI_rl, degFl_permExp]
       exact pow_ne_zero _ (by norm_num)
@@ -255,46 +287,44 @@ def conv (e : Ψ ≃ Fin f) : Ψ ⊕ Ψ → Fin f × Bool
   | Sum.inr t => (e t, true)
 
 omit [Fintype Ψ] [DecidableEq Ψ] in
-theorem lie_eq (e : Ψ ≃ Fin f) (m : ℕ) (s : Ψ ⊕ Ψ)
-    : RestTerms.lieClass f j k m (conv e s) = rl e j k (pLie j m s) := by
+theorem lie_eq (e : Ψ ≃ Fin f) (m : ℕ) (s : Ψ ⊕ Ψ) :
+    RestTerms.lieClass f j k m (conv e s) = rl e j k (pLie j m s) := by
   cases s with
   | inl t =>
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [conv, RestTerms.lieClass, pLie, pkLow, sum_low, map_sum, map_pow, rl_X]
+
+    simp only [conv, RestTerms.lieClass, pLie, pkLow, sum_low, map_sum, map_pow, rl_X]
     simp
   | inr t =>
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [conv, RestTerms.lieClass, pLie, sum_high, map_sum, map_pow, map_neg, rl_X, if_true]
+
+    simp only [conv, RestTerms.lieClass, pLie, sum_high, map_sum, map_pow, map_neg, rl_X, if_true]
     rw [Finset.mul_sum]
     exact Finset.sum_congr rfl fun b _ => (neg_pow _ m).symm
 
-theorem mu_eq (e : Ψ ≃ Fin f) (bot : Bool) (hbot : bot = decide (k ≤ j))
-    : RestTerms.muClass f j k bot = rl e j k (muSmall j) := by
+theorem mu_eq (e : Ψ ≃ Fin f) (bot : Bool) (hbot : bot = decide (k ≤ j)) :
+    RestTerms.muClass f j k bot = rl e j k (muSmall j) := by
   unfold RestTerms.muClass muSmall
   rw [← Equiv.sum_comp e]
   have hk : j + k - j = k := by omega
   by_cases h : k ≤ j
   · have hb : bot = true := by simp [hbot, h]
     rw [if_pos (by rw [hk]; exact h), hb]
-    set_option synthInstance.maxHeartbeats 100000 in
+
     simp only [RestTerms.smallPsum, if_true, sum_high, map_sum, rl_X, pow_one]
   · have hb : bot = false := by simp [hbot, h]
     rw [if_neg (by rw [hk]; exact h), hb]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [RestTerms.smallPsum, pkLow, sum_low, map_neg, map_sum, rl_X, pow_one]
+
+    simp only [RestTerms.smallPsum, pkLow, sum_low, map_neg, map_sum, rl_X, pow_one]
     simp
 
-theorem fib_sg (e : Ψ ≃ Fin f) (bot : Bool)
-    : Sg (RestTerms.fibClass f j k bot) (rl e j k (fibClass j)) := by
+theorem fib_sg (e : Ψ ≃ Fin f) (bot : Bool) :
+    Sg (RestTerms.fibClass f j k bot) (rl e j k (fibClass j)) := by
   unfold RestTerms.fibClass fibClass
   rw [← Equiv.prod_comp e, map_prod]
   refine Sg.prod _ _ _ fun τ _ => ?_
-  have h
-      : rl e j k
-          (∏ ab ∈ Finset.univ.filter (fun ab : Fin (j + k) × Fin (j + k) =>
-            ab.1 < ab.2 ∧ ((ab.1 : ℕ) < j ↔ (ab.2 : ℕ) < j)), (X (τ, ab.2) - X (τ, ab.1)))
-        = pairProd (fun a : Fin j => (X (e τ, Fin.castAdd k a) : RestTerms.Roots f j k))
-          * pairProd (fun b : Fin k => (X (e τ, Fin.natAdd j b) : RestTerms.Roots f j k)) := by
+  have h : rl e j k (∏ ab ∈ Finset.univ.filter (fun ab : Fin (j + k) × Fin (j + k) =>
+      ab.1 < ab.2 ∧ ((ab.1 : ℕ) < j ↔ (ab.2 : ℕ) < j)), (X (τ, ab.2) - X (τ, ab.1))) =
+      pairProd (fun a : Fin j => (X (e τ, Fin.castAdd k a) : RestTerms.Roots f j k)) *
+        pairProd (fun b : Fin k => (X (e τ, Fin.natAdd j b) : RestTerms.Roots f j k)) := by
     rw [map_prod, ← pair_split (fun i => (X (e τ, i) : RestTerms.Roots f j k))]
     refine Finset.prod_congr rfl fun ab _ => ?_
     rw [map_sub, rl_X, rl_X]
@@ -314,15 +344,11 @@ namespace GlobalTheory.CompanionTheory.Ar.Top.TestRest
 
 variable {Ψ : Type} [Fintype Ψ] [DecidableEq Ψ] {j k : ℕ}
 
-theorem finite_bound
-    [Nonempty Ψ]
-    (hj : 1 ≤ j) (hk : 1 ≤ k) (frob : ℕ → Ψ → ℕ → Ψ ⊕ Ψ)
-    (B₀ : ℕ)
-    (Q : Ψ → ℕ → RP Ψ (j + k))
-    (hB : 4 * Fintype.card Ψ * (j + k) ^ 2 ≤ B₀) (hQ : IsDecomp (testPoly j) Q)
-    (S : Finset ℕ) (hS : ∀ p ∈ S, p.Prime ∧ B₀ < p)
-    : |∑ p ∈ S, ∑ τ, ∑ m ∈ Finset.Icc 1 (j + k), restTerm j p (frob p τ) m (Q τ m)|
-      ≤ 1.6 * (((dimX Ψ (j + k) j : ℝ) + 1) * testDeg Ψ (j + k) j) := by
+theorem finite_bound [Nonempty Ψ] (hj : 1 ≤ j) (hk : 1 ≤ k) (frob : ℕ → Ψ → ℕ → Ψ ⊕ Ψ) (B₀ : ℕ)
+    (Q : Ψ → ℕ → RP Ψ (j + k)) (hB : 4 * Fintype.card Ψ * (j + k) ^ 2 ≤ B₀)
+    (hQ : IsDecomp (testPoly j) Q) (S : Finset ℕ) (hS : ∀ p ∈ S, p.Prime ∧ B₀ < p) :
+    |∑ p ∈ S, ∑ τ, ∑ m ∈ Finset.Icc 1 (j + k), restTerm j p (frob p τ) m (Q τ m)| ≤
+      1.6 * (((dimX Ψ (j + k) j : ℝ) + 1) * testDeg Ψ (j + k) j) := by
   let e : Ψ ≃ Fin (Fintype.card Ψ) := Fintype.equivFin Ψ
   have hf1 : 1 ≤ Fintype.card Ψ := Fintype.card_pos
   let bot : Bool := decide (k ≤ j)
@@ -330,10 +356,8 @@ theorem finite_bound
     refine ⟨fun h => by simpa [bot] using h, fun h => ?_⟩
     have : ¬ k ≤ j := by simpa [bot] using h
     omega
-  obtain ⟨ε, hε, hfib⟩
-      : ∃ ε : ℝ,
-        (ε = 1 ∨ ε = -1)
-          ∧ RestTerms.fibClass (Fintype.card Ψ) j k bot = ε • rl e j k (fibClass j) := by
+  obtain ⟨ε, hε, hfib⟩ : ∃ ε : ℝ, (ε = 1 ∨ ε = -1) ∧
+      RestTerms.fibClass (Fintype.card Ψ) j k bot = ε • rl e j k (fibClass j) := by
     rcases fib_sg (j := j) (k := k) e bot with h | h
     · exact ⟨1, Or.inl rfl, by rw [h, one_smul]⟩
     · exact ⟨-1, Or.inr rfl, by rw [h, neg_smul, one_smul]⟩
@@ -344,160 +368,125 @@ theorem finite_bound
   have hrest : RestTerms.restPoly (Fintype.card Ψ) j k bot = ε • rl e j k (testPoly j) := by
     unfold RestTerms.restPoly testPoly
     rw [hmu, hfib, hn, map_mul, map_pow, mul_smul_comm]
-  have hdeg
-      : RestTerms.degPoly (Fintype.card Ψ) j k bot
-        = ε • rl e j k (muSmall j ^ dimX Ψ (j + k) j * fibClass j) := by
+  have hdeg : RestTerms.degPoly (Fintype.card Ψ) j k bot =
+      ε • rl e j k (muSmall j ^ dimX Ψ (j + k) j * fibClass j) := by
     unfold RestTerms.degPoly
     rw [hmu, hfib, hn, map_mul, map_pow, mul_smul_comm]
-  let Q' : Fin (Fintype.card Ψ) → ℕ → RestTerms.Roots (Fintype.card Ψ) j k := fun τ m =>
-    ε • rl e j k (Q (e.symm τ) m)
+  let Q' : Fin (Fintype.card Ψ) → ℕ → RestTerms.Roots (Fintype.card Ψ) j k :=
+    fun τ m => ε • rl e j k (Q (e.symm τ) m)
   have hdec : RestTerms.IsPsumDecomp (Fintype.card Ψ) j k
       (RestTerms.restPoly (Fintype.card Ψ) j k bot) Q' := by
     refine ⟨fun τ m h1 h2 => ?_, ?_⟩
-    · have h :=
-        (hQ.1 (e.symm τ) m h1 h2).rename_isHomogeneous
-          (f := fun x : Ψ × Fin (j + k) => (e x.1, x.2))
+    · have h := (hQ.1 (e.symm τ) m h1 h2).rename_isHomogeneous
+        (f := fun x : Ψ × Fin (j + k) => (e x.1, x.2))
       have h3 := (isHomogeneous_C (Fin (Fintype.card Ψ) × Fin (j + k)) ε).mul h
       rw [zero_add] at h3
       simp only [Q', smul_eq_C_mul]
       exact h3
     · rw [hrest, hQ.2, (Equiv.sum_comp e _).symm]
-      set_option synthInstance.maxHeartbeats 100000 in
+
       simp only [Q', map_sum, Finset.smul_sum, map_mul, Equiv.symm_apply_apply, psumAt_eq,
-        mul_smul_comm]
-  let σ : ℕ → ℕ → Fin (Fintype.card Ψ) → Fin (Fintype.card Ψ) × Bool := fun p n τ =>
-    conv e (frob p (e.symm τ) (n - 1))
-  have hat
-      : ∀ p,
-        RestTerms.restAt (Fintype.card Ψ) j k (flagI e j k) 1 σ Q' p
-          = ε * ∑ τ, ∑ m ∈ Finset.Icc 1 (j + k), restTerm j p (frob p τ) m (Q τ m) := by
+      mul_smul_comm]
+  let σ : ℕ → ℕ → Fin (Fintype.card Ψ) → Fin (Fintype.card Ψ) × Bool :=
+    fun p n τ => conv e (frob p (e.symm τ) (n - 1))
+  have hat : ∀ p, RestTerms.restAt (Fintype.card Ψ) j k (flagI e j k) 1 σ Q' p =
+      ε * ∑ τ, ∑ m ∈ Finset.Icc 1 (j + k), restTerm j p (frob p τ) m (Q τ m) := by
     intro p
-    have hterm
-        : ∀ (τ : Ψ) (m n : ℕ),
-          RestTerms.restTerm (Fintype.card Ψ) j k (flagI e j k) σ Q' p (e τ) m n
-            = ε
-              * (((p : ℝ) ^ ((n + 1) * m))⁻¹ * m
-                * degFl (pLie j (m - 1) (frob p τ n) * Q τ m)) := by
+    have hterm : ∀ (τ : Ψ) (m n : ℕ), RestTerms.restTerm (Fintype.card Ψ) j k (flagI e j k) σ Q' p (e τ) m n =
+        ε * (((p : ℝ) ^ ((n + 1) * m))⁻¹ * m * degFl (pLie j (m - 1) (frob p τ n) * Q τ m)) := by
       intro τ m n
       unfold RestTerms.restTerm
       simp only [σ, Q', Equiv.symm_apply_apply, Nat.add_sub_cancel, lie_eq, mul_smul_comm,
         ← map_mul, map_smul, flagI_rl, smul_eq_mul]
       ring
-    have hin
-        : ∀ (τ : Ψ) (m : ℕ),
-          ∑' n, RestTerms.restTerm (Fintype.card Ψ) j k (flagI e j k) σ Q' p (e τ) m n
-            = ε
-              * (m
-                * ∑' n : ℕ, ((p : ℝ) ^ m)⁻¹ ^ (n + 1) * degFl (pLie j (m - 1) (frob p τ n) * Q τ m)) :=
-      by
-        intro τ m
-        simp_rw [hterm]
-        rw [tsum_mul_left]
-        congr 1
-        refine Eq.trans (tsum_congr fun n => ?_) (tsum_mul_left (a := (m : ℝ)))
-        rw [inv_pow, ← pow_mul, mul_comm m (n + 1)]
-        ring
-    have hsub
-        : ∀ τ : Ψ,
-          ∑ m ∈ Finset.Icc 1 (j + k), restTerm j p (frob p τ) m (Q τ m)
-            = ∑ m ∈ Finset.Icc 2 (j + k), Real.log p *
-                (m * ∑' n : ℕ, ((p : ℝ) ^ m)⁻¹ ^ (n + 1) * degFl (pLie j (m - 1) (frob p τ n) * Q τ m)) :=
-      by
-        intro τ
-        have h :=
-          Finset.sum_subset (s₁ := Finset.Icc 2 (j + k)) (s₂ := Finset.Icc 1 (j + k))
-            (f := fun m => restTerm j p (frob p τ) m (Q τ m))
-            (fun x hx => by
-              rw [Finset.mem_Icc] at hx ⊢
-              omega)
-            (fun x hx hnx => by
-              rw [Finset.mem_Icc] at hx hnx
-              unfold restTerm
-              rw [if_neg (by omega)])
-        rw [← h]
-        refine Finset.sum_congr rfl fun m hm => ?_
-        rw [Finset.mem_Icc] at hm
-        unfold restTerm
-        rw [if_pos hm.1, mul_assoc]
+    have hin : ∀ (τ : Ψ) (m : ℕ),
+        ∑' n, RestTerms.restTerm (Fintype.card Ψ) j k (flagI e j k) σ Q' p (e τ) m n =
+          ε * (m * ∑' n : ℕ, ((p : ℝ) ^ m)⁻¹ ^ (n + 1) * degFl (pLie j (m - 1) (frob p τ n) * Q τ m)) := by
+      intro τ m
+      simp_rw [hterm]
+      rw [tsum_mul_left]
+      congr 1
+      refine Eq.trans (tsum_congr fun n => ?_) (tsum_mul_left (a := (m : ℝ)))
+      rw [inv_pow, ← pow_mul, mul_comm m (n + 1)]
+      ring
+    have hsub : ∀ τ : Ψ, ∑ m ∈ Finset.Icc 1 (j + k), restTerm j p (frob p τ) m (Q τ m) =
+        ∑ m ∈ Finset.Icc 2 (j + k), Real.log p *
+          (m * ∑' n : ℕ, ((p : ℝ) ^ m)⁻¹ ^ (n + 1) * degFl (pLie j (m - 1) (frob p τ n) * Q τ m)) := by
+      intro τ
+      have h := Finset.sum_subset (s₁ := Finset.Icc 2 (j + k)) (s₂ := Finset.Icc 1 (j + k))
+        (f := fun m => restTerm j p (frob p τ) m (Q τ m))
+        (fun x hx => by
+          rw [Finset.mem_Icc] at hx ⊢
+          omega)
+        (fun x hx hnx => by
+          rw [Finset.mem_Icc] at hx hnx
+          unfold restTerm
+          rw [if_neg (by omega)])
+      rw [← h]
+      refine Finset.sum_congr rfl fun m hm => ?_
+      rw [Finset.mem_Icc] at hm
+      unfold restTerm
+      rw [if_pos hm.1, mul_assoc]
     unfold RestTerms.restAt
     rw [(Equiv.sum_comp e _).symm]
     simp only [hin, hsub, Finset.mul_sum]
     refine Finset.sum_congr rfl fun τ _ => Finset.sum_congr rfl fun m _ => ?_
     ring
-  have htsum
-      : ∀ g : ℕ → ℝ, ∑' p : RestTerms.primesOver (↑S : Set ℕ) (B₀ : ℝ), g p.1 = ∑ p ∈ S, g p := by
+  have htsum : ∀ g : ℕ → ℝ,
+      ∑' p : RestTerms.primesOver (↑S : Set ℕ) (B₀ : ℝ), g p.1 = ∑ p ∈ S, g p := by
     intro g
-    let e2 : RestTerms.primesOver (↑S : Set ℕ) (B₀ : ℝ) ≃ {p // p ∈ S} := {
-      toFun := fun p => ⟨p.1, by simpa using p.2.1⟩
-      invFun := fun p => ⟨p.1, by simpa using p.2, (hS _ p.2).1, by exact_mod_cast (hS _ p.2).2⟩
-      left_inv := fun _ => rfl
-      right_inv := fun _ => rfl
-    }
+    let e2 : RestTerms.primesOver (↑S : Set ℕ) (B₀ : ℝ) ≃ {p // p ∈ S} :=
+      { toFun := fun p => ⟨p.1, by simpa using p.2.1⟩
+        invFun := fun p => ⟨p.1, by simpa using p.2, (hS _ p.2).1, by exact_mod_cast (hS _ p.2).2⟩
+        left_inv := fun _ => rfl
+        right_inv := fun _ => rfl }
     rw [← Finset.tsum_subtype S g]
     exact e2.tsum_eq (fun p => g p.1)
   have hB' : 4 * ((Fintype.card Ψ : ℕ) : ℝ) * ((j + k : ℕ) : ℝ) ^ 2 ≤ (B₀ : ℝ) := by
     exact_mod_cast hB
-  have hmain :=
-    (GroundTheory.Heights₂.Heights.RestTerms.RestBound.imp
-      GroundTheory.Heights₂.Heights.RestTerms.RestBound.full (Fintype.card Ψ) j k hf1 hj hk bot
-      hsmall (flagI e j k) (isFlag e rfl) 1 one_pos (↑S)
-      (fun p hp => (hS p hp).1)
-      (B₀ : ℝ) hB' σ Q' hdec).2
+  have hmain := (GroundTheory.Heights₂.Heights.RestTerms.RestBound.imp
+    GroundTheory.Heights₂.Heights.RestTerms.RestBound.full (Fintype.card Ψ) j k hf1 hj hk bot hsmall
+    (flagI e j k) (isFlag e rfl) 1 one_pos (↑S) (fun p hp => (hS p hp).1) (B₀ : ℝ) hB' σ Q' hdec).2
   rw [htsum (RestTerms.restAt (Fintype.card Ψ) j k (flagI e j k) 1 σ Q')] at hmain
   simp only [hat] at hmain
   have hI : flagI e j k (RestTerms.degPoly (Fintype.card Ψ) j k bot) = ε * testDeg Ψ (j + k) j := by
     rw [hdeg, map_smul, flagI_rl]
     rfl
-  have hpos : 0 < testDeg Ψ (j + k) j :=
-    (GlobalTheory.T.test_polynomial_shift_total Ψ (j + k) j hj (by omega)).2.1
+  have hpos : 0 < testDeg Ψ (j + k) j := (GlobalTheory.T.test_polynomial_shift_total Ψ (j + k) j hj (by omega)).2.1
   have habs : |ε| = 1 := by rcases hε with rfl | rfl <;> simp
-  rw [← Finset.mul_sum, abs_mul, habs, one_mul, hI, abs_mul, habs, one_mul, abs_of_pos hpos, hn]
-    at hmain
-  calc
-    _ ≤ _ := hmain
+  rw [← Finset.mul_sum, abs_mul, habs, one_mul, hI, abs_mul, habs, one_mul, abs_of_pos hpos, hn] at hmain
+  calc _ ≤ _ := hmain
     _ = _ := by ring
 
 end GlobalTheory.CompanionTheory.Ar.Top.TestRest
 
 namespace GlobalTheory.CompanionTheory.Ar.Top
 
-theorem testRest_bound
-    : ∀ (Ψ : Type) [Fintype Ψ] [DecidableEq Ψ] (N : ℕ) (j : ℕ) (bad : Finset ℕ)
-        (frob : ℕ → Ψ → ℕ → Ψ ⊕ Ψ) (B₀ : ℕ) (Q : Ψ → ℕ → RP Ψ N),
-      1 ≤ j → j < N → 4 * Fintype.card Ψ * N ^ 2 ≤ B₀ → IsDecomp (testPoly j) Q
-        → |∑ τ, ∑ k ∈ Finset.Icc 1 N, restSum j bad frob B₀ τ k (Q τ k)|
-          ≤ 1.6 * (((dimX Ψ N j : ℝ) + 1) * testDeg Ψ N j) := by
+theorem testRest_bound : ∀ (Ψ : Type) [Fintype Ψ] [DecidableEq Ψ] (N : ℕ) (j : ℕ) (bad : Finset ℕ) (frob : ℕ → Ψ → ℕ → Ψ ⊕ Ψ) (B₀ : ℕ) (Q : Ψ → ℕ → RP Ψ N), 1 ≤ j → j < N → 4 * Fintype.card Ψ * N ^ 2 ≤ B₀ → IsDecomp (testPoly j) Q → |∑ τ, ∑ k ∈ Finset.Icc 1 N, restSum j bad frob B₀ τ k (Q τ k)| ≤ 1.6 * (((dimX Ψ N j : ℝ) + 1) * testDeg Ψ N j) := by
   intro Ψ _ _ N j bad frob B₀ Q hj hjN hB hQ
   obtain ⟨k, rfl⟩ : ∃ k, N = j + k := ⟨N - j, by omega⟩
   have hk : 1 ≤ k := by omega
-  have hJ : 0 < testDeg Ψ (j + k) j :=
-    (GlobalTheory.T.test_polynomial_shift_total Ψ (j + k) j hj hjN).2.1
+  have hJ : 0 < testDeg Ψ (j + k) j := (GlobalTheory.T.test_polynomial_shift_total Ψ (j + k) j hj hjN).2.1
   rcases isEmpty_or_nonempty Ψ with hΨ | hΨ
   · simp only [Finset.univ_eq_empty, Finset.sum_empty, abs_zero]
     exact mul_nonneg (by norm_num) (mul_nonneg (by positivity) hJ.le)
-  have hlim : Tendsto
-      (fun B : ℕ =>
-        ∑ τ, ∑ m ∈ Finset.Icc 1 (j + k),
-          ∑ p ∈ (Finset.Ioc B₀ B).filter (fun p => p.Prime ∧ p ∉ bad), restTerm j p (frob p τ) m (Q τ m))
+  have hlim : Tendsto (fun B : ℕ => ∑ τ, ∑ m ∈ Finset.Icc 1 (j + k),
+      ∑ p ∈ (Finset.Ioc B₀ B).filter (fun p => p.Prime ∧ p ∉ bad), restTerm j p (frob p τ) m (Q τ m))
       atTop (𝓝 (∑ τ, ∑ m ∈ Finset.Icc 1 (j + k), restSum j bad frob B₀ τ m (Q τ m))) :=
-    tendsto_finsetSum _ fun τ _ =>
-      tendsto_finsetSum _ fun m _ =>
-        (GlobalTheory.T.remainder_term_summable Ψ (j + k) j bad frob τ m (Q τ m)).2 B₀
+    tendsto_finsetSum _ fun τ _ => tendsto_finsetSum _ fun m _ =>
+      (GlobalTheory.T.remainder_term_summable Ψ (j + k) j bad frob τ m (Q τ m)).2 B₀
   refine le_of_tendsto hlim.abs (Eventually.of_forall fun B => ?_)
-  have h :=
-    TestRest.finite_bound hj hk frob B₀ Q hB hQ
-      ((Finset.Ioc B₀ B).filter (fun p => p.Prime ∧ p ∉ bad))
-      (fun p hp => by
-        rw [Finset.mem_filter, Finset.mem_Ioc] at hp
-        exact ⟨hp.2.1, hp.1.1⟩)
-  have h2
-      : ∑ p ∈ (Finset.Ioc B₀ B).filter (fun p => p.Prime ∧ p ∉ bad), ∑ τ,
-          ∑ m ∈ Finset.Icc 1 (j + k), restTerm j p (frob p τ) m (Q τ m)
-        = ∑ τ, ∑ m ∈ Finset.Icc 1 (j + k),
-            ∑ p ∈ (Finset.Ioc B₀ B).filter (fun p => p.Prime ∧ p ∉ bad), restTerm j p (frob p τ) m (Q τ m) :=
-    by
-      rw [Finset.sum_comm]
-      exact Finset.sum_congr rfl fun τ _ => Finset.sum_comm
+  have h := TestRest.finite_bound hj hk frob B₀ Q hB hQ
+    ((Finset.Ioc B₀ B).filter (fun p => p.Prime ∧ p ∉ bad))
+    (fun p hp => by
+      rw [Finset.mem_filter, Finset.mem_Ioc] at hp
+      exact ⟨hp.2.1, hp.1.1⟩)
+  have h2 : ∑ p ∈ (Finset.Ioc B₀ B).filter (fun p => p.Prime ∧ p ∉ bad), ∑ τ,
+      ∑ m ∈ Finset.Icc 1 (j + k), restTerm j p (frob p τ) m (Q τ m) =
+      ∑ τ, ∑ m ∈ Finset.Icc 1 (j + k),
+        ∑ p ∈ (Finset.Ioc B₀ B).filter (fun p => p.Prime ∧ p ∉ bad), restTerm j p (frob p τ) m (Q τ m) := by
+    rw [Finset.sum_comm]
+    exact Finset.sum_congr rfl fun τ _ => Finset.sum_comm
   rwa [h2] at h
 
 end GlobalTheory.CompanionTheory.Ar.Top

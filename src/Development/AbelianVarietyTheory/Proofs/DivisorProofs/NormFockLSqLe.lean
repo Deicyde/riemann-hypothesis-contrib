@@ -1,15 +1,61 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.BlockTheory.DivisorBase.PaddedWittNormSquare
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ColumnInclusionRenaming
+public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.NormLeOfCoord
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FockSubstLe
+public import Development.AbelianVarietyTheory.BlockTheory.DivisorBase.TaylorCoefficientForms
+public import Development.AbelianVarietyTheory.Proofs.CovolumeBounds.DifferentiableOnOfTendstoLocallyUniformlyOn
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.DifferentiableOfUnitCoord
 public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.ExistsMulOfApprox
-public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.NormLeOfCoord
-public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.DualWeylEqSpanColProd
-public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExtremalRowWeight
+import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.SubDSharpInDeg
+import Formalism.LocalToGlobal.Columns.CoefficientsModP.FkPderivBlockEmbNe
 public import Formalism.ThetaSupremumBounds.LiftOperatorBoundOfFockJet
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FockSubstLe
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Real
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Coalgebra.IsFrobenius
+import Mathlib.RingTheory.HopfAlgebra.Basic
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Std.Tactic.BVDecide.Normalize.Prop
+public import Development.AbelianVarietyTheory.BlockTheory.DivisorBase.TensorCoordinateForms
+public import Development.AbelianVarietyTheory.Proofs.CovolumeBounds.LineDerivListEqIteratedFDeriv
 
 @[expose] public section
 
@@ -80,8 +126,8 @@ theorem fock_tensor_le
   rw [Matrix.sub_mulVec, dotProduct_sub, Matrix.smul_mulVec, dotProduct_smul, gram_dot, gram_dot]
     at h1
   have e3 : T (∑ i, c i • ten (f i)) = ∑ i, c i • ten fun τ => F τ (f i τ) := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     exact Finset.sum_congr rfl fun i _ => by rw [map_smul, hT]
   rw [e3]
   have h2 := (Complex.le_def.mp h1).1
@@ -280,8 +326,8 @@ theorem scalar_block
     have : Rc.sum (fun e A => g e • A) = Finsupp.linearCombination ℂ g Rc := by
       rw [Finsupp.linearCombination_apply]
       simp only [smul_eq_mul, mul_comm]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [this, hRc, GlobalTheory.JetPoint.jetMap_eq_sum, map_sum, map_sum]
+
+    rw [this, hRc, GlobalTheory.JetPoint.jetMap_eq_sum, map_sum, map_sum]
     refine Finset.sum_congr rfl fun μ _ => ?_
     rw [Finsupp.linearCombination_single, map_smul, smul_eq_mul, smul_eq_mul, mul_comm]
   have hcast : ∀ τ i, (((ν τ).w i : ℤ) : ℝ) = (((ν τ).w i).toNat : ℝ) := fun τ i => by

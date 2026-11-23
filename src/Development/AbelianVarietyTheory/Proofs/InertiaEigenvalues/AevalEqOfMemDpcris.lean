@@ -180,7 +180,6 @@ theorem prod_dvd_pow
     rw [hya]
     exact Finset.dvd_prod_of_mem (fun a => X - C (v a)) ha
 
-set_option maxHeartbeats 4000000 in
 open Classical in
 theorem main
     : ∀ (D : D7) (P : Pend D),

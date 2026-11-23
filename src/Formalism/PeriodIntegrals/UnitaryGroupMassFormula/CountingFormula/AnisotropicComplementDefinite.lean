@@ -1,13 +1,51 @@
 module
 
-public import Mathlib
 public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.CountingFormula.ZMemPerp
 public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.CountingFormula.CardLeOfNonpos
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
-open NumberField Module Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.BasicNotions
-  Formalism.L2.SG.CntLocal
+open NumberField Module Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.BasicNotions Formalism.L2.SG.CntLocal
 open Classical
 
 noncomputable section
@@ -22,19 +60,20 @@ theorem tn_ne_zero (D : D7) (u : D.what₂.Word) : (Tn u : D.host.E) ≠ 0 := by
 
 theorem tau_negT (D : D7) (u : D.what₂.Word) (φ : D.host.E →+* ℂ) : (φ (-(Tn u))).re < 0 := by
   have hT := (D.mem u).A.T_prime.pos
-  first | simp [Tn, hT] | (unfold Tn; simp; exact hT)
+  first
+    | simp [Tn, hT]
+    | (unfold Tn; simp; exact hT)
 
 theorem rank_VS (D : D7) : (VS D).rank = D.R.k + D.R.rS + (D.R.rS + 1) := by
   unfold VS
   rw [D.sp.Y_rank 0 (Nat.zero_le _)]
   obtain ⟨j, hj⟩ := D.R.m_even
   have h2 := D.R.two_le_m
-  simp only [Formalism.BasicNotions.Ranks.rankY, Formalism.BasicNotions.Ranks.r,
-    Formalism.BasicNotions.Ranks.rS, zero_mul, add_zero]
+  simp only [Formalism.BasicNotions.Ranks.rankY, Formalism.BasicNotions.Ranks.r, Formalism.BasicNotions.Ranks.rS, zero_mul, add_zero]
   omega
 
-theorem wbDef_pos (D : D7) (u : D.what₂.Word) (F0 : FlagG (VS D) D.R.rS (Tn u))
-    : Formalism.HermitianLattices.Ext.L3.IsTotPosDef (hPerp (hWb D F0) (zbar D F0)) := by
+theorem wbDef_pos (D : D7) (u : D.what₂.Word) (F0 : FlagG (VS D) D.R.rS (Tn u)) :
+    Formalism.HermitianLattices.Ext.L3.IsTotPosDef (hPerp (hWb D F0) (zbar D F0)) := by
   rintro ⟨y, hy⟩ hne φ
   induction y using Submodule.Quotient.induction_on with
   | H a => ?_
@@ -49,17 +88,15 @@ theorem wbDef_pos (D : D7) (u : D.what₂.Word) (F0 : FlagG (VS D) D.R.rS (Tn u)
     show Submodule.Quotient.mk a = 0
     rw [Submodule.Quotient.mk_eq_zero]
     exact hmem
-  have hval
-      : hPerp (hWb D F0) (zbar D F0) ⟨Submodule.Quotient.mk a, hy⟩ ⟨Submodule.Quotient.mk a, hy⟩
-        = (VS D).hT a.1 a.1 :=
-    hWb_mk D F0 a a
+  have hval : hPerp (hWb D F0) (zbar D F0) ⟨Submodule.Quotient.mk a, hy⟩ ⟨Submodule.Quotient.mk a, hy⟩ =
+      (VS D).hT a.1 a.1 := hWb_mk D F0 a a
   rw [hval]
   by_contra hle
   push Not at hle
   have hT0 := tn_ne_zero D u
   have hzX : ∀ x ∈ F0.X, (VS D).hT F0.z x = 0 := fun x hx => hT_perp_X D F0 (z_mem_perp D F0) hx
-  let v : Option (Option (Fin D.R.rS)) → (VS D).V := fun o =>
-    Option.casesOn' o a.1 (fun o' => Option.casesOn' o' F0.z F0.e)
+  let v : Option (Option (Fin D.R.rS)) → (VS D).V :=
+    fun o => Option.casesOn' o a.1 (fun o' => Option.casesOn' o' F0.z F0.e)
   have hv : LinearIndependent D.host.E v := by
     show LinearIndependent D.host.E
       (fun o => Option.casesOn' o a.1 (fun o' => Option.casesOn' o' F0.z F0.e) : Option (Option (Fin D.R.rS)) → (VS D).V)
@@ -70,10 +107,9 @@ theorem wbDef_pos (D : D7) (u : D.what₂.Word) (F0 : FlagG (VS D) D.R.rS (Tn u)
       rw [F0.z_norm] at h
       exact hT0 (neg_eq_zero.1 h)
     · intro ha
-      have hle'
-          : Submodule.span D.host.E
-              (Set.range (fun o' : Option (Fin D.R.rS) => Option.casesOn' o' F0.z F0.e))
-            ≤ F0.X ⊔ Submodule.span D.host.E {F0.z} := by
+      have hle' : Submodule.span D.host.E
+          (Set.range (fun o' : Option (Fin D.R.rS) => Option.casesOn' o' F0.z F0.e)) ≤
+          F0.X ⊔ Submodule.span D.host.E {F0.z} := by
         rw [Submodule.span_le]
         rintro _ ⟨o, rfl⟩
         cases o with
@@ -117,14 +153,13 @@ theorem wbDef_pos (D : D7) (u : D.what₂.Word) (F0 : FlagG (VS D) D.R.rS (Tn u)
       show (φ ((VS D).hT (F0.e i) (F0.e i))).re ≤ 0
       rw [F0.e_iso i i]
       simp
-  have hcard :=
-    WbDefH.card_le_of_nonpos (VS D) φ (D.sp.cm.cmUnram.2.1 φ) (D.sp.Y_sig 0 φ) v hv horth hnp
+  have hcard := WbDefH.card_le_of_nonpos (VS D) φ (D.sp.cm.cmUnram.2.1 φ) (D.sp.Y_sig 0 φ) v hv horth hnp
   have hs : (VS D).sig φ = D.R.sigY0 := D.sp.baseSpace_signature_eq φ
   rw [hs] at hcard
   simp [Ranks.sigY0] at hcard
 
-private theorem perpS_eq_ker_pi_hT (D : D7) (u : D.what₂.Word) (F0 : FlagG (VS D) D.R.rS (Tn u))
-    : perpS (VS D) F0.X = LinearMap.ker (LinearMap.pi fun a => (VS D).hT (F0.e a)) := by
+private theorem perpS_eq_ker_pi_hT (D : D7) (u : D.what₂.Word) (F0 : FlagG (VS D) D.R.rS (Tn u)) :
+    perpS (VS D) F0.X = LinearMap.ker (LinearMap.pi fun a => (VS D).hT (F0.e a)) := by
   ext y
   rw [LinearMap.mem_ker]
   constructor
@@ -145,8 +180,8 @@ private theorem perpS_eq_ker_pi_hT (D : D7) (u : D.what₂.Word) (F0 : FlagG (VS
     | add x z _ _ h1 h2 => simp [h1, h2]
     | smul c x _ h1 => simp [h1]
 
-private theorem range_pi_hT_eq_top (D : D7) (u : D.what₂.Word) (F0 : FlagG (VS D) D.R.rS (Tn u))
-    : LinearMap.range (LinearMap.pi fun a => (VS D).hT (F0.e a)) = ⊤ := by
+private theorem range_pi_hT_eq_top (D : D7) (u : D.what₂.Word) (F0 : FlagG (VS D) D.R.rS (Tn u)) :
+    LinearMap.range (LinearMap.pi fun a => (VS D).hT (F0.e a)) = ⊤ := by
   by_contra hne
   obtain ⟨f, hf0, hf⟩ := Submodule.exists_le_ker_of_lt_top _ (lt_top_iff_ne_top.mpr hne)
   have key : ∀ a, f (fun j => if a = j then 1 else 0) = 0 := by
@@ -155,24 +190,22 @@ private theorem range_pi_hT_eq_top (D : D7) (u : D.what₂.Word) (F0 : FlagG (VS
       have h1 : f ((LinearMap.pi fun a => (VS D).hT (F0.e a)) y) = 0 :=
         LinearMap.mem_ker.mp (hf (LinearMap.mem_range_self _ y))
       rw [LinearMap.pi_apply_eq_sum_univ] at h1
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [map_sum, LinearMap.sum_apply, LinearMap.map_smulₛₗ, LinearMap.smul_apply,
-          starRingEnd_apply, star_star, smul_eq_mul]
+
+      simp only [map_sum, LinearMap.sum_apply, LinearMap.map_smulₛₗ,
+      LinearMap.smul_apply, starRingEnd_apply, star_star, smul_eq_mul]
       simpa [LinearMap.pi_apply, smul_eq_mul, mul_comm] using h1
     have h0 := (VS D).nondeg.1 _ hw
     intro a
-    have :=
-      Fintype.linearIndependent_iff.mp F0.e_indep
-        (fun a => star (f (fun j => if a = j then 1 else 0)))
-        h0 a
+    have := Fintype.linearIndependent_iff.mp F0.e_indep
+      (fun a => star (f (fun j => if a = j then 1 else 0))) h0 a
     simpa using this
   apply hf0
   refine LinearMap.ext fun x => ?_
   rw [LinearMap.pi_apply_eq_sum_univ]
   simp [key]
 
-theorem wbDef_dim (D : D7) (u : D.what₂.Word) (F0 : FlagG (VS D) D.R.rS (Tn u))
-    : finrank D.host.E (wPerp (hWb D F0) (zbar D F0)) = D.R.k := by
+theorem wbDef_dim (D : D7) (u : D.what₂.Word) (F0 : FlagG (VS D) D.R.rS (Tn u)) :
+    finrank D.host.E (wPerp (hWb D F0) (zbar D F0)) = D.R.k := by
   unfold wPerp
   have hle : F0.X ≤ perpS (VS D) F0.X := by
     rw [perpS_eq_ker_pi_hT D u F0]
@@ -194,9 +227,8 @@ theorem wbDef_dim (D : D7) (u : D.what₂.Word) (F0 : FlagG (VS D) D.R.rS (Tn u)
     have h2 := (VS D).rank_eq
     rw [rank_VS D] at h2
     omega
-  have hq
-      : finrank D.host.E (WbQ D F0) + finrank D.host.E (nX D F0)
-        = finrank D.host.E (perpS (VS D) F0.X) :=
+  have hq : finrank D.host.E (WbQ D F0) + finrank D.host.E (nX D F0) =
+      finrank D.host.E (perpS (VS D) F0.X) :=
     Submodule.finrank_quotient_add_finrank (nX D F0)
   have hsurj : Function.Surjective (hWb D F0 (zbar D F0)) := by
     intro c

@@ -1,7 +1,47 @@
 module
 
-public import Mathlib
 public import CompanionTheory.AutomorphicTheory.ZuckermanCommutation.ZuckermanFunctors.IsSimpleFam
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -18,17 +58,12 @@ universe u
 
 variable {O : Type u} {N : O → Type} [∀ o, AddCommGroup (N o)] [∀ o, Module ℂ (N o)]
 
-theorem dec_comp
-    {Hom : ∀ a b, (N a →ₗ[ℂ] N b) → Prop} (hc : IsLinCat N Hom)
-    {A B P : Type} [Fintype A] [Fintype B] [Fintype P]
-    (e : P ≃ A × B)
-    {X : O} {Z : A → O} {S : A → B → O} {j : ∀ a, N (Z a) →ₗ[ℂ] N X} {q : ∀ a, N X →ₗ[ℂ] N (Z a)}
-    (h : IsDec Hom X Z j q)
+theorem dec_comp {Hom : ∀ a b, (N a →ₗ[ℂ] N b) → Prop} (hc : IsLinCat N Hom) {A B P : Type} [Fintype A] [Fintype B]
+    [Fintype P] (e : P ≃ A × B) {X : O} {Z : A → O} {S : A → B → O}
+    {j : ∀ a, N (Z a) →ₗ[ℂ] N X} {q : ∀ a, N X →ₗ[ℂ] N (Z a)} (h : IsDec Hom X Z j q)
     {io : ∀ a b, N (S a b) →ₗ[ℂ] N (Z a)} {pr : ∀ a b, N (Z a) →ₗ[ℂ] N (S a b)}
-    (h2 : ∀ a, IsDec Hom (Z a) (S a) (io a) (pr a))
-    : IsDec Hom X
-      (fun p => S (e p).1 (e p).2)
-      (fun p => j (e p).1 ∘ₗ io (e p).1 (e p).2)
+    (h2 : ∀ a, IsDec Hom (Z a) (S a) (io a) (pr a)) :
+    IsDec Hom X (fun p => S (e p).1 (e p).2) (fun p => j (e p).1 ∘ₗ io (e p).1 (e p).2)
       (fun p => pr (e p).1 (e p).2 ∘ₗ q (e p).1) := by
   exact {
     io_hom p := hc.comp _ _ _ _ _ ((h2 _).io_hom _) (h.io_hom _)
@@ -39,7 +74,7 @@ theorem dec_comp
       refine Finset.sum_congr rfl fun a _ => ?_
       ext x
       have := congrArg (fun f => j a (f (q a x))) (h2 a).sum
-      set_option synthInstance.maxHeartbeats 100000 in
+
       simpa [map_sum] using this
     pr_io p := by
       ext x
@@ -70,57 +105,43 @@ end Lin
 
 variable {k r : ℕ}
 
-theorem mAct_reindex
-    {ι ι' V : Type} [Fintype ι] [DecidableEq ι] [AddCommGroup V] [Module ℂ V] (e : ι' → ι)
-    : (mAct ((1 : Matrix ι ι ℂ).submatrix e id) : (ι → V) →ₗ[ℂ] (ι' → V))
-      = LinearMap.funLeft ℂ V e := by
+theorem mAct_reindex {ι ι' V : Type} [Fintype ι] [DecidableEq ι] [AddCommGroup V] [Module ℂ V] (e : ι' → ι) :
+    (mAct ((1 : Matrix ι ι ℂ).submatrix e id) : (ι → V) →ₗ[ℂ] (ι' → V)) = LinearMap.funLeft ℂ V e := by
   refine LinearMap.ext fun x => funext fun c => ?_
   simp [mAct, LinearMap.funLeft_apply, Matrix.one_apply]
 
-theorem hom_reindex
-    (hM : MatHom)
-    (F F' : FRep k r)
-    (U : URep k r)
-    (e : F'.ι ≃ F.ι) (h : ∀ g, F'.ρ g = (F.ρ g).submatrix e e)
-    : IsHom (F, U) (F', U) (LinearMap.funLeft ℂ U.R.smSub e) := by
-  have :=
-    hM k r F F' U ((1 : Matrix F.ι F.ι ℂ).submatrix e id) (fun g _ => by
-      rw [h g, Matrix.submatrix_mul_equiv, Matrix.mul_one]
-      have := Matrix.submatrix_mul_equiv (1 : Matrix F.ι F.ι ℂ) (F.ρ g) e (Equiv.refl _) id
-      simpa using this)
+theorem hom_reindex (hM : MatHom) (F F' : FRep k r) (U : URep k r) (e : F'.ι ≃ F.ι)
+    (h : ∀ g, F'.ρ g = (F.ρ g).submatrix e e) :
+    IsHom (F, U) (F', U) (LinearMap.funLeft ℂ U.R.smSub e) := by
+  have := hM k r F F' U ((1 : Matrix F.ι F.ι ℂ).submatrix e id) (fun g _ => by
+    rw [h g, Matrix.submatrix_mul_equiv, Matrix.mul_one]
+    have := Matrix.submatrix_mul_equiv (1 : Matrix F.ι F.ι ℂ) (F.ρ g) e (Equiv.refl _) id
+    simpa using this)
   rwa [mAct_reindex] at this
 
-theorem hom_cas
-    (hL : HomLie) {X Y : Obj k r} {f : M X →ₗ[ℂ] M Y} (hX : X.1.OK) (hY : Y.1.OK) (hf : IsHom X Y f)
-    : cas Y ∘ₗ f = f ∘ₗ cas X := by
+theorem hom_cas (hL : HomLie) {X Y : Obj k r} {f : M X →ₗ[ℂ] M Y} (hX : X.1.OK) (hY : Y.1.OK) (hf : IsHom X Y f) :
+    cas Y ∘ₗ f = f ∘ₗ cas X := by
   refine LinearMap.ext fun x => ?_
   have h := fun Z y => LinearMap.congr_fun (hL k r X Y f hX hY hf Z) y
   simp only [LinearMap.comp_apply] at h
-  set_option synthInstance.maxHeartbeats 100000 in
+
   simp only [cas, LinearMap.comp_apply, LinearMap.sum_apply, map_sum, mul_apply_eq_comp, h]
 
-theorem dec1
-    (hC : HomCat) (hM : MatHom) (hT : TensHom)
-    (F F' : FRep k r)
-    (U : URep k r)
-    {A : Type} [Fintype A]
-    (T : A → URep k r)
-    {io : ∀ a, M (one (T a)) →ₗ[ℂ] M (F, U)} {pr : ∀ a, M (F, U) →ₗ[ℂ] M (one (T a))}
-    (h : IsDec (N := M) IsHom (F, U) (fun a => one (T a)) io pr)
-    : IsDec (N := M) IsHom (F.tens F', U)
-      (fun a => (F', T a))
+theorem dec1 (hC : HomCat) (hM : MatHom) (hT : TensHom) (F F' : FRep k r) (U : URep k r) {A : Type} [Fintype A]
+    (T : A → URep k r) {io : ∀ a, M (one (T a)) →ₗ[ℂ] M (F, U)} {pr : ∀ a, M (F, U) →ₗ[ℂ] M (one (T a))}
+    (h : IsDec (N := M) IsHom (F, U) (fun a => one (T a)) io pr) :
+    IsDec (N := M) IsHom (F.tens F', U) (fun a => (F', T a))
       (fun a => on1 (io a) ∘ₗ LinearMap.funLeft ℂ _ (Prod.snd : Unit × F'.ι → F'.ι))
       (fun a => LinearMap.funLeft ℂ _ (fun c : F'.ι => ((), c)) ∘ₗ on1 (pr a)) := by
   exact {
-    io_hom a :=
-      (hC k r).comp _ ((triv k r).tens F', T a) _ _ _
-        (hom_reindex hM F' ((triv k r).tens F') (T a) (Equiv.punitProd _)
-          (fun g => by ext c d; simp))
-        (hT k r _ _ F' _ _ _ (h.io_hom a)).1
-    pr_hom a :=
-      (hC k r).comp _ ((triv k r).tens F', T a) _ _ _ (hT k r _ _ F' _ _ _ (h.pr_hom a)).1
-        (hom_reindex hM ((triv k r).tens F') F' (T a) (Equiv.punitProd _).symm
-          (fun g => by ext c d; simp))
+    io_hom a := (hC k r).comp _ ((triv k r).tens F', T a) _ _ _
+      (hom_reindex hM F' ((triv k r).tens F') (T a) (Equiv.punitProd _) (fun g => by
+        ext c d; simp))
+      (hT k r _ _ F' _ _ _ (h.io_hom a)).1
+    pr_hom a := (hC k r).comp _ ((triv k r).tens F', T a) _ _ _
+      (hT k r _ _ F' _ _ _ (h.pr_hom a)).1
+      (hom_reindex hM ((triv k r).tens F') F' (T a) (Equiv.punitProd _).symm (fun g => by
+        ext c d; simp))
     sum := by
       refine LinearMap.ext fun x => funext fun p => ?_
       have := congrFun (LinearMap.congr_fun h.sum (fun c => x (c, p.2))) p.1
@@ -134,27 +155,21 @@ theorem dec1
       exact congrFun (LinearMap.congr_fun (h.pr_io_ne a a' hne) (fun _ => x c)) ()
   }
 
-theorem dec2
-    (hC : HomCat) (hM : MatHom) (hT : TensHom)
-    (F F' : FRep k r)
-    (U : URep k r)
-    {A : Type} [Fintype A]
-    (T : A → URep k r)
-    {io : ∀ a, M (one (T a)) →ₗ[ℂ] M (F', U)} {pr : ∀ a, M (F', U) →ₗ[ℂ] M (one (T a))}
-    (h : IsDec (N := M) IsHom (F', U) (fun a => one (T a)) io pr)
-    : IsDec (N := M) IsHom (F.tens F', U)
-      (fun a => (F, T a))
+theorem dec2 (hC : HomCat) (hM : MatHom) (hT : TensHom) (F F' : FRep k r) (U : URep k r) {A : Type} [Fintype A]
+    (T : A → URep k r) {io : ∀ a, M (one (T a)) →ₗ[ℂ] M (F', U)} {pr : ∀ a, M (F', U) →ₗ[ℂ] M (one (T a))}
+    (h : IsDec (N := M) IsHom (F', U) (fun a => one (T a)) io pr) :
+    IsDec (N := M) IsHom (F.tens F', U) (fun a => (F, T a))
       (fun a => on2 (io a) ∘ₗ LinearMap.funLeft ℂ _ (Prod.fst : F.ι × Unit → F.ι))
       (fun a => LinearMap.funLeft ℂ _ (fun c : F.ι => (c, ())) ∘ₗ on2 (pr a)) := by
   exact {
-    io_hom a :=
-      (hC k r).comp _ (F.tens (triv k r), T a) _ _ _
-        (hom_reindex hM F (F.tens (triv k r)) (T a) (Equiv.prodPUnit _) (fun g => by ext c d; simp))
-        (hT k r _ _ F _ _ _ (h.io_hom a)).2
-    pr_hom a :=
-      (hC k r).comp _ (F.tens (triv k r), T a) _ _ _ (hT k r _ _ F _ _ _ (h.pr_hom a)).2
-        (hom_reindex hM (F.tens (triv k r)) F (T a) (Equiv.prodPUnit _).symm
-          (fun g => by ext c d; simp))
+    io_hom a := (hC k r).comp _ (F.tens (triv k r), T a) _ _ _
+      (hom_reindex hM F (F.tens (triv k r)) (T a) (Equiv.prodPUnit _) (fun g => by
+        ext c d; simp))
+      (hT k r _ _ F _ _ _ (h.io_hom a)).2
+    pr_hom a := (hC k r).comp _ (F.tens (triv k r), T a) _ _ _
+      (hT k r _ _ F _ _ _ (h.pr_hom a)).2
+      (hom_reindex hM (F.tens (triv k r)) F (T a) (Equiv.prodPUnit _).symm (fun g => by
+        ext c d; simp))
     sum := by
       refine LinearMap.ext fun x => funext fun p => ?_
       have := congrFun (LinearMap.congr_fun h.sum (fun c => x (p.1, c))) p.2
@@ -172,27 +187,15 @@ theorem decTens : HomCat → MatHom → TensHom → HomLie → OKTriv → DecTen
   intro hC hM hT hL hO k r F F' U hF hF'
   refine ⟨fun A B _ _ T S c ⟨io, pr, h⟩ h2 hc => ?_, fun A B _ _ T S c ⟨io, pr, h⟩ h2 hc => ?_⟩
   · choose io2 pr2 h2 using h2
-    refine ⟨
-      _,
-      _,
-      dec_comp (hC k r) (Equiv.refl (A × B))
-        (S := fun a b => one (S (a, b)))
-        (dec1 hC hM hT F F' U T h) h2,
-      fun p => ?_
-    ⟩
+    refine ⟨_, _, dec_comp (hC k r) (Equiv.refl (A × B)) (S := fun a b => one (S (a, b)))
+      (dec1 hC hM hT F F' U T h) h2, fun p => ?_⟩
     have h3 := hom_cas hL (X := one (T p.1)) (Y := (F, U)) (hO k r) hF (h.io_hom p.1)
     rw [hc, LinearMap.comp_smul, LinearMap.comp_id] at h3
     refine LinearMap.ext fun x => funext fun s => ?_
     exact congrFun (LinearMap.congr_fun h3 (fun _ => io2 p.1 p.2 x s.2)) s.1
   · choose io2 pr2 h2 using h2
-    refine ⟨
-      _,
-      _,
-      dec_comp (hC k r) (Equiv.prodComm A B)
-        (S := fun b a => one (S (a, b)))
-        (dec2 hC hM hT F F' U T h) h2,
-      fun p => ?_
-    ⟩
+    refine ⟨_, _, dec_comp (hC k r) (Equiv.prodComm A B) (S := fun b a => one (S (a, b)))
+      (dec2 hC hM hT F F' U T h) h2, fun p => ?_⟩
     have h3 := hom_cas hL (X := one (T p.2)) (Y := (F', U)) (hO k r) hF' (h.io_hom p.2)
     rw [hc, LinearMap.comp_smul, LinearMap.comp_id] at h3
     refine LinearMap.ext fun x => funext fun s => ?_

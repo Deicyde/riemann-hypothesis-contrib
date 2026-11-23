@@ -1,6 +1,52 @@
 module
 
+public import Development.WeilBound.RepresentationTheoryGL.UnitaryDualProof.HermitianForms.UnitaryLattices.SmoothColumnLifts.SmoothCol
+public import Development.WeilBound.RepresentationTheoryGL.UnitaryDualProof.HermitianForms.UnitaryLattices.LatticeIndexLifts.SumCharEqZero
 public import Development.WeilBound.RepresentationTheoryGL.UnitaryDualProof.HermitianForms.UnitaryLattices.LatticeIndexLifts.SummandInv
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -15,26 +61,22 @@ namespace PositivityTheory.RgUd.Form.U.Lift2.AvA
 variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
 variable {V : Type} [AddCommGroup V] [Module ℂ V] {n : ℕ}
 
-theorem B_u
-    (B : V →ₗ[ℂ] V →ₗ⋆[ℂ] ℂ) (c : (Fin n → k) → ℂ) (col : (Fin n → k) → V →ₗ[ℂ] V)
-    (T : Finset (Fin n → k)) (v w : V)
-    : B (∑ t ∈ T, c t • col t v) w = ∑ t ∈ T, c t * B (col t v) w := by
-  set_option synthInstance.maxHeartbeats 100000 in
+theorem B_u (B : V →ₗ[ℂ] V →ₗ⋆[ℂ] ℂ) (c : (Fin n → k) → ℂ) (col : (Fin n → k) → V →ₗ[ℂ] V)
+    (T : Finset (Fin n → k)) (v w : V) :
+    B (∑ t ∈ T, c t • col t v) w = ∑ t ∈ T, c t * B (col t v) w := by
+
   simp only [map_sum, LinearMap.sum_apply, LinearMap.map_smul, LinearMap.smul_apply, smul_eq_mul]
 
-theorem gram
-    (φ : AddChar k Circle)
-    (col : (Fin n → k) → V →ₗ[ℂ] V)
+theorem gram (φ : AddChar k Circle) (col : (Fin n → k) → V →ₗ[ℂ] V)
     (hc0 : ∀ v, col 0 v = v) (hca : ∀ x y v, col (x + y) v = col x (col y v))
     (B : V →ₗ[ℂ] V →ₗ⋆[ℂ] ℂ) (hBc : ∀ x v w, B (col x v) (col x w) = B v w)
-    (A H : AddSubgroup (Fin n → k)) (hHA : H ≤ A)
-    (T : Finset (Fin n → k)) (hT : ∀ t ∈ T, t ∈ A) (hu : ∀ a ∈ A, ∃! t, t ∈ T ∧ a - t ∈ H)
-    (v : V) (hv : ∀ a ∈ H, col a v = v)
-    (ξ ζ : Fin n → k) (hξ : ∀ a ∈ H, φ (ξ ⬝ᵥ a) = 1)
-    : B (∑ t ∈ T, (starRingEnd ℂ ((φ (ξ ⬝ᵥ t) : Circle) : ℂ)) • col t v)
+    (A H : AddSubgroup (Fin n → k)) (hHA : H ≤ A) (T : Finset (Fin n → k))
+    (hT : ∀ t ∈ T, t ∈ A) (hu : ∀ a ∈ A, ∃! t, t ∈ T ∧ a - t ∈ H)
+    (v : V) (hv : ∀ a ∈ H, col a v = v) (ξ ζ : Fin n → k) (hξ : ∀ a ∈ H, φ (ξ ⬝ᵥ a) = 1) :
+    B (∑ t ∈ T, (starRingEnd ℂ ((φ (ξ ⬝ᵥ t) : Circle) : ℂ)) • col t v)
         (∑ r ∈ T, (starRingEnd ℂ ((φ (ζ ⬝ᵥ r) : Circle) : ℂ)) • col r v)
-      = (∑ r ∈ T, ((((φ (ξ ⬝ᵥ r))⁻¹ * φ (ζ ⬝ᵥ r) : Circle)) : ℂ))
-        * ∑ t ∈ T, starRingEnd ℂ ((φ (ξ ⬝ᵥ t) : Circle) : ℂ) * B (col t v) v := by
+      = (∑ r ∈ T, ((((φ (ξ ⬝ᵥ r))⁻¹ * φ (ζ ⬝ᵥ r) : Circle)) : ℂ)) *
+          ∑ t ∈ T, starRingEnd ℂ ((φ (ξ ⬝ᵥ t) : Circle) : ℂ) * B (col t v) v := by
   classical
   set f : (Fin n → k) → ℂ := fun x => starRingEnd ℂ ((φ (ξ ⬝ᵥ x) : Circle) : ℂ) * B (col x v) v with hf
   have hfH : ∀ x h, h ∈ H → f (x + h) = f x := by
@@ -46,18 +88,14 @@ theorem gram
     intro t r
     have h1 : col t v = col r (col (t - r) v) := by rw [← hca, add_sub_cancel]
     rw [h1, hBc]
-  have hsplit
-      : ∀ t r,
-        starRingEnd ℂ ((φ (ξ ⬝ᵥ t) : Circle) : ℂ)
-          = starRingEnd ℂ ((φ (ξ ⬝ᵥ (t + -r)) : Circle) : ℂ)
-            * starRingEnd ℂ ((φ (ξ ⬝ᵥ r) : Circle) : ℂ) := by
+  have hsplit : ∀ t r, starRingEnd ℂ ((φ (ξ ⬝ᵥ t) : Circle) : ℂ) =
+      starRingEnd ℂ ((φ (ξ ⬝ᵥ (t + -r)) : Circle) : ℂ) * starRingEnd ℂ ((φ (ξ ⬝ᵥ r) : Circle) : ℂ) := by
     intro t r
-    rw [← map_mul, ← Circle.coe_mul, ← AddChar.map_add_eq_mul, ← dotProduct_add,
-      neg_add_cancel_right]
-  set_option synthInstance.maxHeartbeats 100000 in
-    conv_lhs =>
-      simp only [map_sum, LinearMap.sum_apply, LinearMap.map_smul, LinearMap.smul_apply,
-      LinearMap.map_smulₛₗ, smul_eq_mul, starRingEnd_self_apply, RingHom.id_apply, key, Finset.mul_sum]
+    rw [← map_mul, ← Circle.coe_mul, ← AddChar.map_add_eq_mul, ← dotProduct_add, neg_add_cancel_right]
+
+  conv_lhs =>
+    simp only [map_sum, LinearMap.sum_apply, LinearMap.map_smul, LinearMap.smul_apply,
+    LinearMap.map_smulₛₗ, smul_eq_mul, starRingEnd_self_apply, RingHom.id_apply, key, Finset.mul_sum]
   rw [Finset.sum_mul]
   refine Finset.sum_congr rfl fun r hr => ?_
   rw [← hsh r hr, Finset.mul_sum]
@@ -66,29 +104,24 @@ theorem gram
   simp only [hf, Circle.coe_mul, Circle.coe_inv_eq_conj, sub_eq_add_neg]
   ring
 
-theorem gram_av
-    (φ : AddChar k Circle)
-    (col : (Fin n → k) → V →ₗ[ℂ] V)
+theorem gram_av (φ : AddChar k Circle) (col : (Fin n → k) → V →ₗ[ℂ] V)
     (hc0 : ∀ v, col 0 v = v) (hca : ∀ x y v, col (x + y) v = col x (col y v))
     (B : V →ₗ[ℂ] V →ₗ⋆[ℂ] ℂ) (hBc : ∀ x v w, B (col x v) (col x w) = B v w)
     (A : AddSubgroup (Fin n → k)) (ξ ζ : Fin n → k) (v : V)
-    (p : AddSubgroup (Fin n → k) × Finset (Fin n → k))
-    (hpξ : AD φ col ξ A v p) (hpζ : AD φ col ζ A v p)
-    : B (av φ col ξ A v) (av φ col ζ A v)
-      = ((p.2.card : ℂ)⁻¹ * ∑ r ∈ p.2, ((((φ (ξ ⬝ᵥ r))⁻¹ * φ (ζ ⬝ᵥ r) : Circle)) : ℂ))
-        * B (av φ col ξ A v) v := by
-  have av_eq_local (η : Fin n → k) (hp : AD φ col η A v p)
-      : av φ col η A v
-        = ((p.2.card : ℂ)⁻¹)
-          • ∑ t ∈ p.2,
-            (starRingEnd ℂ ((φ (η ⬝ᵥ t) : Circle) : ℂ)) • col t v := by
+    (p : AddSubgroup (Fin n → k) × Finset (Fin n → k)) (hpξ : AD φ col ξ A v p) (hpζ : AD φ col ζ A v p) :
+    B (av φ col ξ A v) (av φ col ζ A v) =
+      ((p.2.card : ℂ)⁻¹ * ∑ r ∈ p.2, ((((φ (ξ ⬝ᵥ r))⁻¹ * φ (ζ ⬝ᵥ r) : Circle)) : ℂ)) *
+        B (av φ col ξ A v) v := by
+  have av_eq_local (η : Fin n → k) (hp : AD φ col η A v p) :
+      av φ col η A v = ((p.2.card : ℂ)⁻¹) • ∑ t ∈ p.2,
+        (starRingEnd ℂ ((φ (η ⬝ᵥ t) : Circle) : ℂ)) • col t v := by
     have hd : ∃ q, AD φ col η A v q := ⟨p, hp⟩
     unfold av
     rw [dite_eq_left hd]
     obtain ⟨h1, -, h3, h4, h5, h6⟩ := hd.choose_spec
     obtain ⟨g1, -, g3, g4, g5, g6⟩ := hp
-    exact avg_indep A _ _ h1 g1 _ _ h5 h6 g5 g6 _ (summand_inv φ col hca η v _ h3 h4)
-      (summand_inv φ col hca η v _ g3 g4)
+    exact avg_indep A _ _ h1 g1 _ _ h5 h6 g5 g6 _
+      (summand_inv φ col hca η v _ h3 h4) (summand_inv φ col hca η v _ g3 g4)
   rw [av_eq_local ξ hpξ, av_eq_local ζ hpζ]
   obtain ⟨h1, -, h3, h4, h5, h6⟩ := hpξ
   rw [LinearMap.map_smul, LinearMap.smul_apply, LinearMap.map_smulₛₗ,
@@ -96,21 +129,19 @@ theorem gram_av
   simp only [smul_eq_mul, map_inv₀, map_natCast]
   ring
 
-theorem bessel_abs
-    (B : V →ₗ[ℂ] V →ₗ⋆[ℂ] ℂ) (hB : Psd B)
-    {ι : Type*} [DecidableEq ι]
-    (s : Finset ι) (w : ι → V) (v : V)
-    (hw : ∀ i ∈ s, ∀ j ∈ s, B (w i) (w j) = if i = j then B (w i) v else 0)
-    : ∑ i ∈ s, (B (w i) v).re ≤ (B v v).re := by
+theorem bessel_abs (B : V →ₗ[ℂ] V →ₗ⋆[ℂ] ℂ) (hB : Psd B) {ι : Type*} [DecidableEq ι] (s : Finset ι)
+    (w : ι → V) (v : V)
+    (hw : ∀ i ∈ s, ∀ j ∈ s, B (w i) (w j) = if i = j then B (w i) v else 0) :
+    ∑ i ∈ s, (B (w i) v).re ≤ (B v v).re := by
   classical
   have hWW : B (∑ i ∈ s, w i) (∑ i ∈ s, w i) = ∑ i ∈ s, B (w i) v := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, LinearMap.sum_apply]
+
+    simp only [map_sum, LinearMap.sum_apply]
     refine Finset.sum_congr rfl fun i hi => ?_
     rw [Finset.sum_congr rfl fun d hd => hw d hd i hi]
     simp [hi]
   have hWv : B (∑ i ∈ s, w i) v = ∑ i ∈ s, B (w i) v := by
-    set_option synthInstance.maxHeartbeats 100000 in
+
     simp only [map_sum, LinearMap.sum_apply]
   have hvW : B v (∑ i ∈ s, w i) = starRingEnd ℂ (∑ i ∈ s, B (w i) v) := by
     rw [hB.1 (∑ i ∈ s, w i) v, hWv]
@@ -119,15 +150,12 @@ theorem bessel_abs
   rw [← Complex.re_sum]
   linarith
 
-theorem av_bessel'
-    (φ : AddChar k Circle) (hφ : Continuous φ)
-    (col : (Fin n → k) → V →ₗ[ℂ] V) (hc0 : ∀ v, col 0 v = v)
-    (hca : ∀ x y v, col (x + y) v = col x (col y v)) (hsm : ∀ v, IsOpen {x | col x v = v})
+theorem av_bessel' (φ : AddChar k Circle) (hφ : Continuous φ) (col : (Fin n → k) → V →ₗ[ℂ] V)
+    (hc0 : ∀ v, col 0 v = v) (hca : ∀ x y v, col (x + y) v = col x (col y v)) (hsm : ∀ v, IsOpen {x | col x v = v})
     (B : V →ₗ[ℂ] V →ₗ⋆[ℂ] ℂ) (hB : Psd B) (hBc : ∀ x v w, B (col x v) (col x w) = B v w)
-    (A : AddSubgroup (Fin n → k)) (hA : Lat A)
-    (s : Finset (Fin n → k)) (hs : ∀ ξ ∈ s, ∀ ξ' ∈ s, ξ - ξ' ∈ perp φ A → ξ = ξ')
-    (v : V)
-    : ∑ ξ ∈ s, (B (av φ col ξ A v) v).re ≤ (B v v).re := by
+    (A : AddSubgroup (Fin n → k)) (hA : Lat A) (s : Finset (Fin n → k))
+    (hs : ∀ ξ ∈ s, ∀ ξ' ∈ s, ξ - ξ' ∈ perp φ A → ξ = ξ') (v : V) :
+    ∑ ξ ∈ s, (B (av φ col ξ A v) v).re ≤ (B v v).re := by
   classical
   obtain ⟨p, hp⟩ := exists_AD φ hφ col hc0 hca hsm A hA s v
   refine bessel_abs B hB s (fun ξ => av φ col ξ A v) v ?_
@@ -149,11 +177,8 @@ theorem av_bessel'
       intro a ha
       by_contra hna
       apply hne
-      refine sum_circ_eq_zero A p.1 h1 p.2 h5 h6
-        (fun r => (φ (ξ ⬝ᵥ r))⁻¹ * φ (ξ' ⬝ᵥ r))
-        (fun x y => circ_char φ φ ξ ξ' x y)
-        (fun h hh => by simp [h4 h hh, h4' h hh])
-        a ha ?_
+      refine sum_circ_eq_zero A p.1 h1 p.2 h5 h6 (fun r => (φ (ξ ⬝ᵥ r))⁻¹ * φ (ξ' ⬝ᵥ r))
+        (fun x y => circ_char φ φ ξ ξ' x y) (fun h hh => by simp [h4 h hh, h4' h hh]) a ha ?_
       intro hχ
       apply hna
       have e : φ (ξ ⬝ᵥ a) = φ (ξ' ⬝ᵥ a) := inv_mul_eq_one.mp hχ

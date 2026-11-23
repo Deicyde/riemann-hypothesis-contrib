@@ -9,6 +9,7 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.Paraboli
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.SectionLeftInvariantRationalParabolic
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.CoefficientUnipotentLeviInvariance
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ResEtaOfIsWeilSch
+public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.StabilizerOrbitVolume.TopoAF
 
 @[expose] public section
 
@@ -223,7 +224,6 @@ theorem orb_rat
   rw [rat_mul]
   simp only [mm, Matrix.mul_assoc]
 
-set_option synthInstance.maxHeartbeats 400000 in
 theorem hasCompactSupport_rows {η : Fin r → Mx D 1 t → ℂ} (h : ∀ i, HasCompactSupport (η i))
     : HasCompactSupport (fun y : Mx D r t => ∏ i, η i (y.submatrix (fun _ => i) id)) := by
   obtain ⟨i1, i2, i3, i4, i5, -⟩ := GlobalTheory.TowerResNonzero.lattice_ratMx D r t
@@ -361,7 +361,6 @@ theorem gram_extend_by_zero (W : HSp D) (hn : r + t = n) (x : Matrix (Fin W.rank
 
 def ext0H (hn : r + t = n) (b₀ : HermE D r) : HermE D n := dsum hn b₀ ⟨0, by ext i j; simp⟩
 
-set_option synthInstance.maxHeartbeats 400000 in
 theorem fc_levi_mat
     {ψ : AddChar (AF D.host.F) ℂ} (hψ : IsCharAF D.host.F ψ)
     (F : G D n → ℂ) (hinv : LeftInv (GF D n) F)

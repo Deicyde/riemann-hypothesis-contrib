@@ -1,12 +1,50 @@
 module
 
 public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityArgument.TraceFormula.GlobalTraceComparison.AutomorphicRepresentations.SlotBasic
-public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityArgument.TraceFormula.GlobalTraceComparison.TraceAsymptotics.FinprodSplitAlt
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Coalgebra.CoassocSimps
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Lemma
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
 
 @[expose] public section
 
-open UpperTheory.V.Z.Tf.GlobalTraceComparison UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi
-  UpperTheory.Zero.ConvolutionTheory.EB PositivityTheory.Rg.BcB.Desc
+open UpperTheory.V.Z.Tf.GlobalTraceComparison UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi UpperTheory.Zero.ConvolutionTheory.EB PositivityTheory.Rg.BcB.Desc
 
 private lemma lv_eq_sum {G V : Type} [Group G] [AddCommGroup V] [Module ℂ V] (ρ : Representation ℂ G V)
     (K : Subgroup G) (u : G → ℂ) (S : Finset (G ⧸ K)) (hS : ∀ c : G ⧸ K, u c.out ≠ 0 → c ∈ S) :
@@ -19,7 +57,8 @@ private lemma lv_eq_sum {G V : Type} [Group G] [AddCommGroup V] [Module ℂ V] (
   rw [finsum_eq_sum_of_support_subset _ hs]
   rfl
 
-theorem UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi.absStep_pf : AbsStep := by
+theorem UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi.absStep_pf :
+    AbsStep := by
   intro G A V _ _ _ _ ρ K N j q f h h₁ hqj hcomm hjN hqK hh hh₁N hK hfN hfs hh₁s y hy
   classical
   have hyk : ∀ k ∈ K, ρ k y = y := fun k hk => by
@@ -69,7 +108,8 @@ theorem UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi.absStep_pf : AbsStep := by
       rw [← QuotientGroup.out_eq' s, ← QuotientGroup.out_eq' s']
       exact QuotientGroup.eq.2 hs
     subst es
-    have ht2 : t.out⁻¹ * t'.out ∈ K := by simpa [mul_assoc] using hk
+    have ht2 : t.out⁻¹ * t'.out ∈ K := by
+      simpa [mul_assoc] using hk
     have et : t = t' := by
       rw [← QuotientGroup.out_eq' t, ← QuotientGroup.out_eq' t']
       exact QuotientGroup.eq.2 ht2
@@ -95,23 +135,18 @@ theorem UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi.absStep_pf : AbsStep := by
       have c1 : Commute (j (n : A)) x := hcomm _ _ (hx0 g)
       have e : j (a : A ⧸ N).out * (x : G ⧸ K).out = g * (j (n : A) * (k : G)) := by
         have hgx : j a * x = g := by rw [hx]; group
-        rw [hn, hk, map_mul, mul_assoc (j a), ← mul_assoc (j (n : A)), c1.eq, mul_assoc x,
-          ← mul_assoc (j a), hgx]
+        rw [hn, hk, map_mul, mul_assoc (j a), ← mul_assoc (j (n : A)), c1.eq, mul_assoc x, ← mul_assoc (j a), hgx]
       rw [e, QuotientGroup.mk_mul_of_mem _ (K.mul_mem (hjN _ n.2) k.2), hg, QuotientGroup.out_eq']
-  have hout
-      : ∀ p ∈ S₁ ×ˢ S₂,
-        h (φ p).out • ρ (φ p).out y = (f p.1.out * h₁ p.2.out) • ρ (j p.1.out * p.2.out) y := by
+  have hout : ∀ p ∈ S₁ ×ˢ S₂, h (φ p).out • ρ (φ p).out y = (f p.1.out * h₁ p.2.out) • ρ (j p.1.out * p.2.out) y := by
     rintro ⟨s, t⟩ hp
     obtain ⟨k, hk⟩ := QuotientGroup.mk_out_eq_mul K (j s.out * t.out)
     have ht : t ∈ S₂ := (Finset.mem_product.1 hp).2
     show h (((j s.out * t.out : G) : G ⧸ K)).out • ρ (((j s.out * t.out : G) : G ⧸ K)).out y = _
-    rw [hk, hright _ _ k.2, hterm s t ht, map_mul ρ (j s.out * t.out), Module.End.mul_apply,
-      hyk _ k.2]
+    rw [hk, hright _ _ k.2, hterm s t ht, map_mul ρ (j s.out * t.out), Module.End.mul_apply, hyk _ k.2]
   rw [lv_eq_sum ρ K h _ hsupp, lv_eq_sum (ρ.comp j) N f S₁ (fun s hs => (m₁ s).2 hs),
     lv_eq_sum ρ K h₁ S₂ (fun t ht => (m₂ t).2 ht)]
   simp only [LinearMap.sum_apply, LinearMap.smul_apply]
   rw [Finset.sum_image hinj, Finset.sum_congr rfl hout, Finset.sum_product]
   refine Finset.sum_congr rfl fun s _ => ?_
-  set_option synthInstance.maxHeartbeats 100000 in
-  simp only [MonoidHom.comp_apply, map_sum, map_smul, Finset.smul_sum, smul_smul, map_mul,
-    Module.End.mul_apply]
+
+  simp only [MonoidHom.comp_apply, map_sum, map_smul, Finset.smul_sum, smul_smul, map_mul, Module.End.mul_apply]

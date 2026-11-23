@@ -1,11 +1,51 @@
 module
 
-public import Mathlib
 public import Development.WeilBound.RepresentationTheoryGL.GenericUnitaryGL.SegmentDerivatives.DerivSub
-public import Development.WeilBound.CoreStatements.TemperedRepresentationTheory.MirabolicDerivatives.SegmentCuspLines.ProdIrrFiniteLength
-public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.IrreducibleAdmissibleGL
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.DerivativeJacquetHolds
-public import CompanionTheory.AutomorphicTheory.HeckeStandardModules.EqZeroOfCompAt
+import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.LeviIrreducibleTensorDecompositionStatement
+import Development.AutomorphicSpectrum.Proofs.GlobalProofs.JacquetModuleFiniteLength
+import GroundTheory.LocalFields.PadicLogSeries
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -59,7 +99,6 @@ theorem exists_injective_of_tensor
 
 variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
 
-set_option maxHeartbeats 1000000 in
 theorem exists_irr_sub_of_quot
     (hA : GlobalTheory.Published.IrreducibleAdmissibleGL)
     {n t : ℕ} {X D : Type} [AddCommGroup X] [Module ℂ X] [AddCommGroup D] [Module ℂ D]
@@ -131,7 +170,6 @@ theorem exists_irr_sub_of_quot
       (0 : Fin 2) (σ 0).rep.irr (R := R) φ' hφ'rel hφ'ne
   refine ⟨(σ 0).rep, f, hf⟩
 
-set_option maxHeartbeats 1000000 in
 theorem jac_deriv_rel
     (ψ : AddChar k Circle)
     (n j : ℕ)
@@ -173,7 +211,6 @@ theorem jac_deriv_rel
     jac_mk _ π _ v
   rw [h3, map_smul, h2]
 
-set_option maxHeartbeats 1000000 in
 theorem derivSub (hA : GlobalTheory.Published.IrreducibleAdmissibleGL)
     : GlobalTheory.BZSeg.DerivSub k := by
   intro ψ n j V _ _ π hs hf hnt

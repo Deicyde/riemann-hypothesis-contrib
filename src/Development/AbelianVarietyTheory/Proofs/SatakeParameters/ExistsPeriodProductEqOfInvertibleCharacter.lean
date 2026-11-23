@@ -95,8 +95,6 @@ theorem stRep_trivial_one (g : ↥(GK K))
 
 end GlobalTheory.Pst.TwistLetters.Invert
 
-set_option maxHeartbeats 1600000 in
-set_option synthInstance.maxHeartbeats 200000 in
 open GlobalTheory.Pst.TwistLetters.Invert in
 theorem GlobalTheory.Pst.TwistLetters.exists_dmul_eq_of_inv
     : ∀ {l : ℕ} [Fact l.Prime] (P : LocPrime l) {K L : FinExt l} {V : Type} [AddCommGroup V]

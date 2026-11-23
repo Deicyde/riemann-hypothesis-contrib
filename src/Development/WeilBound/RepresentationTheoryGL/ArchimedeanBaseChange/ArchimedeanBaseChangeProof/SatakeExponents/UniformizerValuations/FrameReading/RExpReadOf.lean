@@ -3,20 +3,59 @@ module
 public import Development.WeilBound.RepresentationTheoryGL.ArchimedeanBaseChange.ArchimedeanBaseChangeProof.SatakeExponents.UniformizerValuations.FrameReading.JoinType
 public import Development.WeilBound.RepresentationTheoryGL.ArchimedeanBaseChange.ArchimedeanBaseChangeProof.SatakeExponents.UniformizerValuations.FrameReading.CosetCount
 public import Development.WeilBound.RepresentationTheoryGL.ArchimedeanBaseChange.ArchimedeanBaseChangeProof.SatakeExponents.UniformizerValuations.FrameReading.ExpToSat
-public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.IwahoriTraceOfBorelCasselman
+import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.MkMemAdmissibleAtIffCocycle
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.IsLocallyConstantOrbit
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.HeckeEigenFiniteStatement
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.TensorHeckeStatement
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.TensorEigenStatement
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.TensorEigenRealStatement
+public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.IwahoriTraceOfBorelCasselman
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ContractionFixedStatement
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.SubEigenTailHeckeStatement
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.CosetCountTailStatement
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.TorusExponentTailStatement
-public import Mathlib
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.StandardBlocksExponent
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.DeltaBlocksExponentStatement
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ExponentToSaturationStatement
+public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.HeckeEigenFiniteStatement
+public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.SubEigenTailHeckeStatement
+public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.TensorEigenRealStatement
+public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.TensorEigenStatement
+public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.TensorHeckeStatement
+public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.TorusExponentTailStatement
+import GroundTheory.LocalFields.PadicLogSeries
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
 
 @[expose] public section
 
@@ -28,7 +67,7 @@ open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions
 open scoped Classical TensorProduct
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
-set_option synthInstance.maxHeartbeats 200000
+
 
 namespace PositivityTheory.Rg.BcB.F.Tail
 
@@ -79,7 +118,6 @@ theorem smul_cancel
   rw [e] at h
   exact (smul_right_injective M hne h).symm
 
-set_option maxHeartbeats 1000000 in
 theorem sat_of_eig
     (hSub : PExp.SubEig) (hCC0 : PExp.CosetCount) (hTE : PExp.TorusExp) (hDl : PExp.DlBridge)
     (hES : PExp.ExpToSat)
@@ -157,7 +195,6 @@ theorem sat_of_eig
   obtain ⟨hsph, b, hb, hsum⟩ := hES E w P.c m P.N P.h (fun i => P.σ i w) P' ξ hsub hm ⟨y, hy0, hall⟩
   exact ⟨b, fun i => ⟨hsph i, hb i⟩, hsum⟩
 
-set_option maxHeartbeats 1000000 in
 theorem rExpRead_of
     (h0 : PExp.HkEFin) (h1 : PExp.TensHk) (h2 : PExp.TensEig) (h3 : PExp.TensEigR)
     (h4 : PExp.ContrFix) (hSub : PExp.SubEig) (hCC0 : PExp.CosetCount) (hTE : PExp.TorusExp)

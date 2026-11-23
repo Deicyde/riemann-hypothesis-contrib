@@ -1,14 +1,50 @@
 module
 
-public import Mathlib
-public import Formalism.SharpRestriction.CuspSpanNormBounds.FractionFieldToGenericStalkAlgebraMapEq
-public import Development.AbelianVarietyTheory.Definitions.Foundations.IsHermND
 public import Development.AbelianVarietyTheory.Definitions.SemilocalFrames.ComplementReferenceCompactSubgroup
 public import Development.AbelianVarietyTheory.Definitions.SemilocalFrames.HermLat
 public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.ExistsNondegenerateTupleComplementFixer
-public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.SpanEqMap
 public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.LinearIndependentOfGram
 public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.SelfDualHermitianLatticeMassBoundsStatement
+public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.SpanEqMap
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -22,19 +58,17 @@ variable {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F]
 variable {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E]
 
 omit [TopologicalSpace E] in
-theorem rmul_comp {n m : ℕ} (x : Fin m → Fin n → E) (A B : Matrix (Fin m) (Fin m) E)
-    : rmul (rmul x A) B = rmul x (A * B) := by
+theorem rmul_comp {n m : ℕ} (x : Fin m → Fin n → E) (A B : Matrix (Fin m) (Fin m) E) :
+    rmul (rmul x A) B = rmul x (A * B) := by
   funext j
   simp only [rmul, Finset.smul_sum, smul_smul, Matrix.mul_apply, Finset.sum_smul]
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun l _ => ?_
   rw [mul_comm]
 
-theorem hf_sum_left
-    (L : LocE F E)
-    {n m : ℕ}
-    (Hm : Matrix (Fin n) (Fin n) E) (x : Fin m → Fin n → E) (c : Fin m → E) (y : Fin n → E)
-    : hf L Hm (∑ i, c i • x i) y = ∑ i, c i * hf L Hm (x i) y := by
+theorem hf_sum_left (L : LocE F E) {n m : ℕ} (Hm : Matrix (Fin n) (Fin n) E)
+    (x : Fin m → Fin n → E) (c : Fin m → E) (y : Fin n → E) :
+    hf L Hm (∑ i, c i • x i) y = ∑ i, c i * hf L Hm (x i) y := by
   simp only [hf, Finset.sum_apply, Pi.smul_apply, smul_eq_mul, Finset.sum_mul, Finset.mul_sum]
   symm
   rw [Finset.sum_comm]
@@ -43,13 +77,11 @@ theorem hf_sum_left
   refine Finset.sum_congr rfl fun b _ => Finset.sum_congr rfl fun i _ => ?_
   ring
 
-theorem hf_sum_right
-    (L : LocE F E)
-    {n m : ℕ}
-    (Hm : Matrix (Fin n) (Fin n) E) (x : Fin m → Fin n → E) (c : Fin m → E) (y : Fin n → E)
-    : hf L Hm y (∑ i, c i • x i) = ∑ i, L.cj (c i) * hf L Hm y (x i) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [hf, Finset.sum_apply, Pi.smul_apply, smul_eq_mul, map_sum, map_mul, Finset.mul_sum]
+theorem hf_sum_right (L : LocE F E) {n m : ℕ} (Hm : Matrix (Fin n) (Fin n) E)
+    (x : Fin m → Fin n → E) (c : Fin m → E) (y : Fin n → E) :
+    hf L Hm y (∑ i, c i • x i) = ∑ i, L.cj (c i) * hf L Hm y (x i) := by
+
+  simp only [hf, Finset.sum_apply, Pi.smul_apply, smul_eq_mul, map_sum, map_mul, Finset.mul_sum]
   symm
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun a _ => ?_
@@ -57,10 +89,9 @@ theorem hf_sum_right
   refine Finset.sum_congr rfl fun b _ => Finset.sum_congr rfl fun i _ => ?_
   ring
 
-theorem gram_rmul
-    (L : LocE F E)
-    {n m : ℕ} (Hm : Matrix (Fin n) (Fin n) E) (x : Fin m → Fin n → E) (A : Matrix (Fin m) (Fin m) E)
-    : gramT L Hm (rmul x A) = cT L A * gramT L Hm x * A := by
+theorem gram_rmul (L : LocE F E) {n m : ℕ} (Hm : Matrix (Fin n) (Fin n) E)
+    (x : Fin m → Fin n → E) (A : Matrix (Fin m) (Fin m) E) :
+    gramT L Hm (rmul x A) = cT L A * gramT L Hm x * A := by
   ext a b
   simp only [gramT, rmul, Matrix.of_apply, hf_sum_left, hf_sum_right, Matrix.mul_apply, cT,
     Finset.sum_mul, Finset.mul_sum]
@@ -68,16 +99,17 @@ theorem gram_rmul
   refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
   ring
 
-theorem det_cT (L : LocE F E) {m : ℕ} (A : Matrix (Fin m) (Fin m) E)
-    : (cT L A).det = L.cj A.det := by
-  have h : cT L A = (L.cj.toRingEquiv.toRingHom.mapMatrix A).transpose := by ext i j; rfl
+theorem det_cT (L : LocE F E) {m : ℕ} (A : Matrix (Fin m) (Fin m) E) :
+    (cT L A).det = L.cj A.det := by
+  have h : cT L A = (L.cj.toRingEquiv.toRingHom.mapMatrix A).transpose := by
+    ext i j; rfl
   rw [h, Matrix.det_transpose, ← RingHom.map_det]
   rfl
 
 omit [TopologicalSpace E] in
-theorem span_rmul
-    {n m : ℕ} (x : Fin m → Fin n → E) (B : Matrix (Fin m) (Fin m) E) (hB : IsUnit B.det)
-    : Submodule.span E (Set.range x) ≤ Submodule.span E (Set.range (rmul x B)) := by
+theorem span_rmul {n m : ℕ} (x : Fin m → Fin n → E) (B : Matrix (Fin m) (Fin m) E)
+    (hB : IsUnit B.det) :
+    Submodule.span E (Set.range x) ≤ Submodule.span E (Set.range (rmul x B)) := by
   rw [Submodule.span_le]
   rintro _ ⟨j, rfl⟩
   have h : rmul (rmul x B) B⁻¹ = x := by
@@ -90,32 +122,11 @@ theorem span_rmul
 
 end
 
-theorem mass_trace
-    : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
-        [CharZero F] {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] (L : LocE F E),
-      ∀ (r k : ℕ) (S : Frames L r k),
-        2 * r + 6 ≤ k → (∃ Λ, IsSD L S.Hm Λ)
-          → ∃ κ : ℝ,
-            0 < κ
-              ∧ ∀ C,
-                S.IsCls C
-                  → ∀ p ∈ C, ∀ Mh : Submodule L.O S.V,
-                    S.Mof p.1 p.2 ≤ Mh → (∀ x ∈ Mh, x ∈ S.ME) → (∀ x ∈ Mh, ∀ y ∈ Mh, S.h x y ∈ L.O)
-                      → ENNReal.ofReal
-                            (κ / 2
-                              * (((S.Mof p.1 p.2).toAddSubgroup.relIndex Mh.toAddSubgroup : ℝ)
-                                ^ (k - 1))⁻¹)
-                          ≤ S.massSig Mh
-                        ∧ S.massSig Mh
-                          ≤ ENNReal.ofReal
-                            (2 * κ
-                              * (((S.Mof p.1 p.2).toAddSubgroup.relIndex Mh.toAddSubgroup : ℝ)
-                                ^ (k - 1))⁻¹) := by
+theorem mass_trace : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F] [CharZero F] {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] (L : LocE F E), ∀ (r k : ℕ) (S : Frames L r k), 2 * r + 6 ≤ k → (∃ Λ, IsSD L S.Hm Λ) → ∃ κ : ℝ, 0 < κ ∧ ∀ C, S.IsCls C → ∀ p ∈ C, ∀ Mh : Submodule L.O S.V, S.Mof p.1 p.2 ≤ Mh → (∀ x ∈ Mh, x ∈ S.ME) → (∀ x ∈ Mh, ∀ y ∈ Mh, S.h x y ∈ L.O) → ENNReal.ofReal (κ / 2 * (((S.Mof p.1 p.2).toAddSubgroup.relIndex Mh.toAddSubgroup : ℝ) ^ (k - 1))⁻¹) ≤ S.massSig Mh ∧ S.massSig Mh ≤ ENNReal.ofReal (2 * κ * (((S.Mof p.1 p.2).toAddSubgroup.relIndex Mh.toAddSubgroup : ℝ) ^ (k - 1))⁻¹) := by
   intro F _ _ _ _ _ E _ _ _ L r k S hk ⟨Λs, hΛs⟩
   obtain ⟨x, hx, hME, -, hlat, hmass, hcls⟩ := GlobalTheory.HL.FrameTuple.main L r k S
-  obtain ⟨κ, hκ, hU⟩ :=
-    GlobalTheory.T.selfDual_hermitianLattice_mass_bounds L S.ϖ S.ϖ_irr S.Hm S.herm Λs hΛs
-      (2 * r + 2) x hx (by omega) _ hlat
+  obtain ⟨κ, hκ, hU⟩ := GlobalTheory.T.selfDual_hermitianLattice_mass_bounds L S.ϖ S.ϖ_irr S.Hm S.herm Λs hΛs (2 * r + 2) x hx
+    (by omega) _ hlat
   refine ⟨κ, hκ, fun C hC p hp Mh hle hin hint => ?_⟩
   obtain ⟨y, B, hB, hy, hM⟩ := hcls C hC p hp
   have hBu : IsUnit B.det := IsUnit.of_mul_eq_one _ hB
@@ -123,10 +134,9 @@ theorem mass_trace
   have hyu : IsUnit (gramT L S.Hm y).det := by
     rw [hy, gram_rmul, Matrix.det_mul, Matrix.det_mul, det_cT]
     exact (hBc.mul hx).mul hBu
-  obtain ⟨-, A, hAi, hAu, hMh, hli, hA⟩ :=
-    GlobalTheory.HL.OverBasis.exists_basis_overlattice L S.Hm S.herm (2 * r + 2) y hyu Mh (hM ▸ hle)
-      (fun v hv => by rw [hy]; exact span_rmul x B hBu (hME ▸ hin v hv))
-      hint
+  obtain ⟨-, A, hAi, hAu, hMh, hli, hA⟩ := GlobalTheory.HL.OverBasis.exists_basis_overlattice L S.Hm S.herm
+    (2 * r + 2) y hyu Mh (hM ▸ hle)
+    (fun v hv => by rw [hy]; exact span_rmul x B hBu (hME ▸ hin v hv)) hint
   obtain ⟨hv, hidx⟩ := GlobalTheory.MatrixIndex.index_rmul L S.ϖ S.ϖ_irr _ hli A hAi hAu
   rw [hA, ← hM, ← hMh] at hidx
   have hinv : (A * B⁻¹)⁻¹ = B * A⁻¹ := by
@@ -146,10 +156,9 @@ theorem mass_trace
     refine hint _ ?_ _ ?_ <;> rw [hMh] <;> exact Submodule.subset_span ⟨_, rfl⟩
   have key := hU (A * B⁻¹) hu hI
   rw [hr, ← hMh, hdet, hME, ← hmass] at key
-  have hpow
-      : (resQ S.ϖ : ℝ)
-          ^ (-(vE L S.ϖ (A.det * L.cj A.det) * (((k + 2 * r + 1 : ℕ) : ℤ) - ((2 * r + 2 : ℕ) : ℤ))))
-        = (((S.Mof p.1 p.2).toAddSubgroup.relIndex Mh.toAddSubgroup : ℝ) ^ (k - 1))⁻¹ := by
+  have hpow : (resQ S.ϖ : ℝ) ^ (-(vE L S.ϖ (A.det * L.cj A.det) *
+        (((k + 2 * r + 1 : ℕ) : ℤ) - ((2 * r + 2 : ℕ) : ℤ)))) =
+      (((S.Mof p.1 p.2).toAddSubgroup.relIndex Mh.toAddSubgroup : ℝ) ^ (k - 1))⁻¹ := by
     rw [hidx, zpow_neg]
     congr 1
     have e : (((k + 2 * r + 1 : ℕ) : ℤ) - ((2 * r + 2 : ℕ) : ℤ)) = ((k - 1 : ℕ) : ℤ) := by omega

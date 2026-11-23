@@ -1,7 +1,57 @@
 module
 
-public import Formalism.SharpRestriction.CuspSpanNormBounds.RowsOneGenusOfCyclic
+public import Formalism.SharpRestriction.CuspSpanNormBounds.LocSplitType
 public import Formalism.HermitianLattices.HermitianLatticesProofs.DualLattice
+public import Formalism.HermitianLattices.HermitianLatticesProofs.LocDual
+public import Formalism.SharpRestriction.CuspSpanNormBounds.RowsOneGenusOfCyclic
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Formalism.SharpRestriction.CuspSpanNormBounds.CayleyDegreeNondegeneracy.ForPrimeFlagLattice
+import Formalism.HermitianLattices.HermitianLatticesProofs.UnimodularSpan
 
 @[expose] public section
 
@@ -15,15 +65,12 @@ section Conj
 
 variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [StarRing E] [Algebra F E]
 
-theorem unimodAt_of_unimod
-    {V : Type} [AddCommGroup V] [Module E V] [Module (𝓞 E) V] [IsScalarTower (𝓞 E) E V]
-    (h : V →ₗ⋆[E] V →ₗ[E] E) (L : Submodule (𝓞 E) V)
-    (hlat : Submodule.IsLattice E L) (hu : IsUnimodular h L)
-    (p : Ideal (𝓞 E))
-    : IsUnimodularAt h p L := by
+theorem unimodAt_of_unimod {V : Type} [AddCommGroup V] [Module E V] [Module (𝓞 E) V] [IsScalarTower (𝓞 E) E V]
+    (h : V →ₗ⋆[E] V →ₗ[E] E) (L : Submodule (𝓞 E) V) (hlat : Submodule.IsLattice E L) (hu : IsUnimodular h L)
+    (p : Ideal (𝓞 E)) : IsUnimodularAt h p L := by
   have hinj : Function.Injective (algebraMap (𝓞 E) E) := FaithfulSMul.algebraMap_injective _ _
-  have hst : ∀ r : 𝓞 E, star (algebraMap (𝓞 E) E r) ∈ Set.range (algebraMap (𝓞 E) E) := fun r =>
-    cyc_star_int r
+  have hst : ∀ r : 𝓞 E, star (algebraMap (𝓞 E) E r) ∈ Set.range (algebraMap (𝓞 E) E) :=
+    fun r => cyc_star_int r
   have hfg : L.FG := Submodule.IsLattice.fg (A := E) (self := hlat)
   unfold IsUnimodularAt
   rw [locDual_dualAt_loc h hinj hst]
@@ -33,88 +80,19 @@ theorem unimodAt_of_unimod
   rw [hu] at e1 e2
   exact le_antisymm e2 e1
 
-private theorem rows_riesz (S : Formalism.BasicNotions.HSpace E) (φ : S.V →ₗ[E] E)
-    : ∃ μ : S.V, ∀ v, S.hT μ v = φ v := by
-  classical
-  obtain ⟨bs, hbs⟩ := Formalism.HermitianLatticesTheory.dualLattice_dualBasis S.hT S.nondeg S.frame
-  refine ⟨∑ j, star (φ (S.frame j)) • bs j, fun v => ?_⟩
-  have key : S.hT (∑ j, star (φ (S.frame j)) • bs j) = φ := by
-    apply S.frame.ext
-    intro i
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, LinearMap.sum_apply]
-    have hs
-        : ∀ j,
-          S.hT (star (φ (S.frame j)) • bs j) (S.frame i)
-            = φ (S.frame j) * (if i = j then 1 else 0) := by
-      intro j
-      rw [LinearMap.map_smulₛₗ, LinearMap.smul_apply, smul_eq_mul, starRingEnd_apply, star_star]
-      congr 1
-      rw [← S.herm.eq (S.frame i) (bs j), hbs]
-      split_ifs <;> simp
-    simp only [hs, mul_ite, mul_one, mul_zero, Finset.sum_ite_eq, Finset.mem_univ, if_true]
-  rw [key]
+private theorem rows_span_eq_top_of_unimodular (S : Formalism.BasicNotions.HSpace E) {Λ : Submodule (𝓞 E) S.V}
+    (hL : Λ.FG) (hU : Formalism.HermitianLatticesTheory.IsUnimodular S.hT Λ) :
+    Submodule.span E (Λ : Set S.V) = ⊤ := by
+  exact Formalism.HermitianLatticesTheory.IsUnimodular.span_eq_top hU S.herm hL
 
-private theorem rows_span_eq_top_of_unimodular
-    (S : Formalism.BasicNotions.HSpace E)
-    {Λ : Submodule (𝓞 E) S.V}
-    (hL : Λ.FG) (hU : Formalism.HermitianLatticesTheory.IsUnimodular S.hT Λ)
-    : Submodule.span E (Λ : Set S.V) = ⊤ := by
-  by_contra hspan
-  obtain ⟨φ, hφ₀, hφ⟩ := Submodule.exists_le_ker_of_lt_top _ (lt_top_iff_ne_top.mpr hspan)
-  obtain ⟨μ, hμ⟩ := rows_riesz S φ
-  have hμ₀ : μ ≠ 0 := by
-    intro h
-    apply hφ₀
-    ext y
-    simpa [h] using (hμ y).symm
-  have hline (a : E) : a • μ ∈ Λ := by
-    rw [← hU]
-    change a • μ ∈ Formalism.E.hdual S.hT Λ
-    simp only [Formalism.E.hdual, Submodule.mem_iInf, Submodule.mem_comap,
-      LinearMap.restrictScalars_apply]
-    intro y hy
-    have hy₀ := LinearMap.mem_ker.mp (hφ (Submodule.subset_span hy))
-    simp [← S.herm.eq (a • μ) y, LinearMap.map_smulₛₗ, hμ, hy₀]
-  obtain ⟨ψ, hψ, -⟩ :=
-    Submodule.exists_le_ker_of_notMem (show μ ∉ (⊥ : Submodule E S.V) by simpa using hμ₀)
-  let f := ψ.restrictScalars (𝓞 E)
-  have hmap (x : E) : x ∈ Λ.map f := by
-    refine ⟨(x / ψ μ) • μ, hline _, ?_⟩
-    change ψ ((x / ψ μ) • μ) = x
-    rw [map_smul, smul_eq_mul, div_mul_cancel₀ _ hψ]
-  obtain ⟨d, hd₀, hd⟩ := FractionalIdeal.isFractional_of_fg (S := nonZeroDivisors (𝓞 E)) (hL.map f)
-  have hinj := IsFractionRing.injective (𝓞 E) E
-  have hne {a : 𝓞 E} (ha : a ≠ 0) : algebraMap (𝓞 E) E a ≠ 0 := fun h =>
-    ha (hinj (h.trans (map_zero _).symm))
-  have hinteger (x : E) : IsLocalization.IsInteger (𝓞 E) x := by
-    have hx := hd _ (hmap ((algebraMap (𝓞 E) E d)⁻¹ * x))
-    rwa [Algebra.smul_def, ← mul_assoc, mul_inv_cancel₀ (hne (nonZeroDivisors.ne_zero hd₀)),
-        one_mul]
-      at hx
-  apply RingOfIntegers.not_isField E
-  refine ⟨⟨0, 1, zero_ne_one⟩, mul_comm, ?_⟩
-  intro a ha
-  obtain ⟨b, hb⟩ := hinteger ((algebraMap (𝓞 E) E a)⁻¹)
-  refine ⟨b, hinj ?_⟩
-  rw [map_mul, hb, map_one, mul_inv_cancel₀ (hne ha)]
 
-theorem unimod_mem_genus
-    (hU : LocUnimod) (hc : Formalism.BasicNotions.CMData F E)
-    (S : Formalism.BasicNotions.HSpace E) (L M : Submodule (𝓞 E) S.V) (hL : Submodule.IsLattice E L)
-    (hM : Submodule.IsLattice E M) (huL : IsUnimodular S.hT L) (huM : IsUnimodular S.hT M)
-    : M ∈ genus S.hT L := ⟨
-  { toIsLattice := hM, span_eq_top := rows_span_eq_top_of_unimodular S hM.fg huM },
-  fun p hp =>
-    hU F E hc S L M hL hM p hp (unimodAt_of_unimod S.hT L hL huL p)
-      (unimodAt_of_unimod S.hT M hM huM p)
-⟩
+theorem unimod_mem_genus (hU : LocUnimod) (hc : Formalism.BasicNotions.CMData F E) (S : Formalism.BasicNotions.HSpace E)
+    (L M : Submodule (𝓞 E) S.V) (hL : Submodule.IsLattice E L) (hM : Submodule.IsLattice E M)
+    (huL : IsUnimodular S.hT L) (huM : IsUnimodular S.hT M) : M ∈ genus S.hT L :=
+  ⟨{ toIsLattice := hM, span_eq_top := rows_span_eq_top_of_unimodular S hM.fg huM }, fun p hp => hU F E hc S L M hL hM p hp (unimodAt_of_unimod S.hT L hL huL p) (unimodAt_of_unimod S.hT M hM huM p)⟩
 
-theorem unimodular_mem_genus
-    (hU : LocUnimod) (hc : Formalism.BasicNotions.CMData F E)
-    (S : Formalism.BasicNotions.HSpace E) (M : Submodule (𝓞 E) S.V)
-    (hM : Submodule.IsLattice E M) (huM : IsUnimodular S.hT M)
-    : M ∈ genus S.hT S.L0 :=
+theorem unimodular_mem_genus (hU : LocUnimod) (hc : Formalism.BasicNotions.CMData F E) (S : Formalism.BasicNotions.HSpace E)
+    (M : Submodule (𝓞 E) S.V) (hM : Submodule.IsLattice E M) (huM : IsUnimodular S.hT M) : M ∈ genus S.hT S.L0 :=
   unimod_mem_genus hU hc S S.L0 M S.standardTuple_isLattice hM S.baseLattice_isUnimodular huM
 
 end Conj

@@ -1,11 +1,56 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.SqMap
+public import Development.AutomorphicSpectrum.Definitions.CommutativeAlgebra.GermComp1ZeroPointLeft
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.GeneratorRatioUnitExistsStatement
+public import Formalism.SharpRestriction.Divisibility.GeneratorPowers.FBIdJet
+public import Formalism.SharpRestriction.Divisibility.GeneratorPowers.FBIdSy
 public import Formalism.SharpRestriction.Divisibility.GeneratorPowers.FrRatio
 public import Formalism.SharpRestriction.Divisibility.GeneratorPowers.GermBPrim
-public import Formalism.SharpRestriction.Divisibility.GeneratorPowers.FBIdSy
+import Formalism.SharpRestriction.Divisibility.GeneratorPowers.GermDJet
+import Formalism.SharpRestriction.Divisibility.GeneratorPowers.GermFunPf
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.AlgebraicGeometry.Modules.Sheaf
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.SabPull
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.DiscreteValuationRings.LBPull
+import Development.AutomorphicSpectrum.Definitions.AdelicLattices.FactPrimes
 
 @[expose] public section
 
@@ -91,7 +136,8 @@ theorem bind_fst (P : MvPolynomial (Fin 1 × Fin d) R)
     obtain rfl : a = 0 := Subsingleton.elim _ _
     rfl
   rw [this]
-  simp
+  change MvPolynomial.aeval (MvPolynomial.X : Fin 1 × Fin d → MvPolynomial (Fin 1 × Fin d) R) P = P
+  rw [MvPolynomial.aeval_X_left_apply]
 
 theorem bind_zero {σ τ : Type} (P : MvPolynomial σ R) (h : MvPolynomial.constantCoeff P = 0)
     : (MvPolynomial.bind₁ fun _ : σ => (0 : MvPolynomial τ R)) P = 0 := by
@@ -128,7 +174,10 @@ theorem double_substitution_first_axis
   rw [cc_psIn, hQ, map_zero, sub_zero, psIn, MvPolynomial.aeval_rename]
   fin_cases l
   · simp [Function.comp_def]
-    exact bind_zero _ (by rw [cc_psTrunc, hQ])
+    have h0 : MvPolynomial.constantCoeff (psTrunc m (Qs j)) = 0 := by rw [cc_psTrunc, hQ]
+    first
+      | exact bind_zero _ h0
+      | simp [cc_psTrunc, hQ]
   · simp [Function.comp_def, cc_psTrunc, hQ]
     exact bind_fst _
 
@@ -144,7 +193,10 @@ theorem double_substitution_second_axis
   · simp [Function.comp_def, cc_psTrunc, hQ]
     exact bind_fst _
   · simp [Function.comp_def]
-    exact bind_zero _ (by rw [cc_psTrunc, hQ])
+    have h0 : MvPolynomial.constantCoeff (psTrunc m (Qs j)) = 0 := by rw [cc_psTrunc, hQ]
+    first
+      | exact bind_zero _ h0
+      | simp [cc_psTrunc, hQ]
 
 theorem first_axis_comp_jet_inclusion (m : ℕ)
     : (jAx0 R d m).comp (jetCopy d m (0 : Fin 2))

@@ -1,7 +1,57 @@
 module
 
-public import ReciprocityTheory.CommutativeAlgebra.CohenMacaulay.ExistsIsRegularAppendOfModDepthGE
+public import ReciprocityTheory.CommutativeAlgebra.CohenMacaulay.ModDepthGE
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.Order.CompletePartialOrder
+public import Mathlib.RingTheory.Ideal.AssociatedPrime.Localization
+public import Mathlib.RingTheory.KrullDimension.Regular
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
 public import ReciprocityTheory.CommutativeAlgebra.CohenMacaulay.AssDim
+public import ReciprocityTheory.CommutativeAlgebra.CohenMacaulay.ExistsIsRegularAppendOfModDepthGE
+import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
@@ -76,8 +126,6 @@ private theorem unm_modDepthGE_congr
   refine ⟨rs, hlen, hmem, ?_⟩
   first
   | exact (LinearEquiv.isRegular_congr e rs).mp hreg
-  | exact (e.isRegular_congr rs).mp hreg
-  | exact (LinearEquiv.isRegular_congr' e rs).mp hreg
 
 private theorem unm_isCMMod_congr
     {N : Type*} [AddCommGroup N] [Module R N] (e : M ≃ₗ[R] N) (h : IsCMMod R M)
@@ -93,7 +141,6 @@ private theorem unm_isCMMod_congr
   first
   | (unfold Module.supportDim; rw [hs])
   | (simp only [Module.supportDim, hs])
-  | exact (Module.supportDim_eq_of_equiv e).symm
 
 theorem IsCMMod.ringKrullDim_quotient_eq_supportDim
     (h : IsCMMod R M) {p : Ideal R} (hp : p ∈ associatedPrimes R M)
@@ -107,11 +154,9 @@ theorem IsCMMod.ringKrullDim_quotient_eq_supportDim
         have h0 := IsAssociatedPrime.annihilator_le hp
         rwa [Submodule.annihilator_top] at h0
       )
-    | exact Submodule.annihilator_top (R := R) (M := M) ▸ IsAssociatedPrime.annihilator_le hp
   have hsupp : Module.supportDim R M = ringKrullDim (R ⧸ Module.annihilator R M) := by
     first
     | exact Module.supportDim_eq_ringKrullDim_quotient_annihilator R M
-    | exact Module.supportDim_eq_ringKrullDim_quotient_annihilator
     | (rw [ringKrullDim_quotient]; unfold Module.supportDim; rw [Module.support_eq_zeroLocus])
   apply le_antisymm
   · rw [hsupp]
@@ -133,11 +178,9 @@ theorem IsCMMod.associatedPrimes_eq_minimalPrimes (h : IsCMMod R M)
           have h0 := IsAssociatedPrime.annihilator_le hp
           rwa [Submodule.annihilator_top] at h0
         )
-      | exact Submodule.annihilator_top (R := R) (M := M) ▸ IsAssociatedPrime.annihilator_le hp
     have hsupp : Module.supportDim R M = ringKrullDim (R ⧸ Module.annihilator R M) := by
       first
       | exact Module.supportDim_eq_ringKrullDim_quotient_annihilator R M
-      | exact Module.supportDim_eq_ringKrullDim_quotient_annihilator
       | (rw [ringKrullDim_quotient]; unfold Module.supportDim; rw [Module.support_eq_zeroLocus])
     have hp' : ringKrullDim (R ⧸ p) = (n : WithBot ℕ∞) :=
       (h.ringKrullDim_quotient_eq_supportDim hp).trans hdim
@@ -158,11 +201,6 @@ theorem IsCMMod.associatedPrimes_eq_minimalPrimes (h : IsCMMod R M)
     omega
   · first
     | exact Module.associatedPrimes.minimalPrimes_annihilator_subset_associatedPrimes R M
-    | exact Module.associatedPrimes.minimalPrimes_annihilator_subset_associatedPrimes
-    | exact minimalPrimes_annihilator_subset_associatedPrimes R M
-    | exact minimalPrimes_annihilator_subset_associatedPrimes
-    | exact associatedPrimes.minimalPrimes_annihilator_subset_associatedPrimes R M
-    | exact Module.minimalPrimes_annihilator_subset_associatedPrimes
 
 theorem IsCMMod.quotSMulTop
     (h : IsCMMod R M) {x : R} (hx : x ∈ maximalIdeal R) (reg : IsSMulRegular M x)
@@ -173,8 +211,6 @@ theorem IsCMMod.quotSMulTop
   have hsd : Module.supportDim R (QuotSMulTop x M) + 1 = Module.supportDim R M := by
     first
     | exact Module.supportDim_quotSMulTop_succ_eq_supportDim reg hx
-    | exact Module.supportDim_quotSMulTop_succ_eq_supportDim hx reg
-    | exact supportDim_quotSMulTop_succ_eq_supportDim reg hx
   rw [hdim] at hsd
   obtain ⟨m, rfl, hm⟩ := unm_add_one_eq hsd
   unfold IsCMMod
@@ -194,8 +230,6 @@ theorem IsCMMod.of_quotSMulTop
   have hsd : Module.supportDim R (QuotSMulTop x M) + 1 = Module.supportDim R M := by
     first
     | exact Module.supportDim_quotSMulTop_succ_eq_supportDim reg hx
-    | exact Module.supportDim_quotSMulTop_succ_eq_supportDim hx reg
-    | exact supportDim_quotSMulTop_succ_eq_supportDim reg hx
   unfold IsCMMod
   refine ⟨inferInstance, inferInstance, n + 1, ?_, hdep.of_quotSMulTop hx reg⟩
   first | (rw [← hsd, hdim]; done) | (rw [← hsd, hdim]; norm_cast) | (rw [← hsd, hdim]; simp)
@@ -219,7 +253,6 @@ theorem IsCMMod.isSMulRegular_of_supportDim_quotSMulTop_lt
         have h0 := IsAssociatedPrime.annihilator_le hp
         rwa [Submodule.annihilator_top] at h0
       )
-    | exact Submodule.annihilator_top (R := R) (M := M) ▸ IsAssociatedPrime.annihilator_le hp
   have hsuppQ : (⟨p, hpp⟩ : PrimeSpectrum R) ∈ Module.support R (QuotSMulTop x M) := by
     rw [Module.support_quotSMulTop]
     refine ⟨?_, ?_⟩
@@ -233,7 +266,6 @@ theorem IsCMMod.isSMulRegular_of_supportDim_quotSMulTop_lt
         = ringKrullDim (R ⧸ Module.annihilator R (QuotSMulTop x M)) := by
     first
     | exact Module.supportDim_eq_ringKrullDim_quotient_annihilator R (QuotSMulTop x M)
-    | exact Module.supportDim_eq_ringKrullDim_quotient_annihilator
     | (rw [ringKrullDim_quotient]; unfold Module.supportDim; rw [Module.support_eq_zeroLocus])
   have hle := unm_dim_le_of_le hannQ
   rw [h.ringKrullDim_quotient_eq_supportDim hp, ← hsQ] at hle
@@ -345,8 +377,6 @@ theorem IsCMMod.isRegular_of_supportDim_quotient_le_zero
     have hsd : Module.supportDim R (QuotSMulTop x M) + 1 = Module.supportDim R M := by
       first
       | exact Module.supportDim_quotSMulTop_succ_eq_supportDim reg hx
-      | exact Module.supportDim_quotSMulTop_succ_eq_supportDim hx reg
-      | exact supportDim_quotSMulTop_succ_eq_supportDim reg hx
     have hlenQ : (xs.length : WithBot ℕ∞) = Module.supportDim R (QuotSMulTop x M) := by
       rw [hlen'] at hsd
       have hsd'

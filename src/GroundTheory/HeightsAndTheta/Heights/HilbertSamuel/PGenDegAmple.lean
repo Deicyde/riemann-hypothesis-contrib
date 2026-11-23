@@ -1,11 +1,55 @@
 module
 
-public import Mathlib
 public import GroundTheory.HeightsAndTheta.Heights.HilbertSamuel.StatementsGenDegAmple
 public import GroundTheory.HeightsAndTheta.Heights.HilbertSamuel.StatementsGenericFibreVar
 public import GroundTheory.HeightsAndTheta.Heights.HilbertSamuel.StatementsMultiDegreePositive
+public import GroundTheory.HeightsAndTheta.Heights.HilbertSamuel.StatementsHilbert
+public import GroundTheory.HeightsAndTheta.Heights.FieldsOfNumbers.PDivPrincipalDegree
+public import GroundTheory.HeightsAndTheta.Heights.HeightComparison.IsMultiHomogIdealIff
 public import GroundTheory.HeightsAndTheta.Heights.HilbertSamuel.PGenDegTwist
 public import GroundTheory.HeightsAndTheta.Heights.HilbertSamuel.PIntersectionRecursion
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Int
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -13,8 +57,7 @@ set_option maxSynthPendingDepth 1
 
 namespace GroundTheory.Heights₂.Heights.HilbertSamuel
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
-  ReciprocityTheory.ChartRestriction.G.ArakelovGeometry ReciprocityTheory.ChartRestriction.G.AI.I1
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.ArakelovGeometry ReciprocityTheory.ChartRestriction.G.AI.I1
 
 noncomputable section
 
@@ -22,19 +65,15 @@ namespace GenDegAmple
 
 open GroundTheory.Heights₂.Heights.NumbersDVR
 
-theorem hilbFn_nonneg
-    {F : Type} [Field F]
-    {K : Type} [Fintype K] [DecidableEq K]
-    {ι : K → Type} [∀ k, Fintype (ι k)]
-    (q : Ideal (MRing ι F)) (m : K → ℤ)
-    : 0 ≤ hilbFn q m := by
+theorem hilbFn_nonneg {F : Type} [Field F] {K : Type} [Fintype K] [DecidableEq K] {ι : K → Type}
+    [∀ k, Fintype (ι k)] (q : Ideal (MRing ι F)) (m : K → ℤ) : 0 ≤ hilbFn q m := by
   unfold hilbFn
   split_ifs
   · exact Int.natCast_nonneg _
   · exact le_rfl
 
-theorem eventualValue_nonneg {K : Type} [Fintype K] (f : (K → ℤ) → ℤ) (hf : ∀ m, 0 ≤ f m)
-    : 0 ≤ eventualValue f := by
+theorem eventualValue_nonneg {K : Type} [Fintype K] (f : (K → ℤ) → ℤ) (hf : ∀ m, 0 ≤ f m) :
+    0 ≤ eventualValue f := by
   unfold eventualValue
   split_ifs with h
   · obtain ⟨m, hm⟩ := h.choose_spec.exists
@@ -42,15 +81,10 @@ theorem eventualValue_nonneg {K : Type} [Fintype K] (f : (K → ℤ) → ℤ) (h
     exact hf m
   · exact le_rfl
 
-theorem unit_nonneg
-    {F : Type} [Field F]
-    {K : Type} [Fintype K] [DecidableEq K]
-    {ι : K → Type} [∀ k, Fintype (ι k)]
-    (e : ℕ)
-    : ∀ q : Ideal (MRing ι F),
-      NumbersDVR.IsMultiProjPrime q
-        → ringKrullDim (MRing ι F ⧸ q) = ((e + Fintype.card K : ℕ) : WithBot ℕ∞)
-        → ∀ r : Fin e → K, 0 ≤ intNum F q (fun j => unitDeg (r j)) := by
+theorem unit_nonneg {F : Type} [Field F] {K : Type} [Fintype K] [DecidableEq K] {ι : K → Type}
+    [∀ k, Fintype (ι k)] (e : ℕ) : ∀ q : Ideal (MRing ι F), NumbersDVR.IsMultiProjPrime q →
+    ringKrullDim (MRing ι F ⧸ q) = ((e + Fintype.card K : ℕ) : WithBot ℕ∞) →
+    ∀ r : Fin e → K, 0 ≤ intNum F q (fun j => unitDeg (r j)) := by
   induction e with
   | zero =>
     intro q _ _ r
@@ -61,9 +95,8 @@ theorem unit_nonneg
     intro q hq hd r
     obtain ⟨i, hX⟩ := hq.relevant (r 0)
     have hd' : ringKrullDim (MRing ι F ⧸ q) = ((e + 1 + Fintype.card K : ℕ) : WithBot ℕ∞) := hd
-    have hsplit
-        : (fun j : Fin (e + 1) => unitDeg (r j))
-          = Matrix.vecCons (unitDeg (r 0)) (fun j : Fin e => unitDeg (r j.succ)) := by
+    have hsplit : (fun j : Fin (e + 1) => unitDeg (r j)) =
+        Matrix.vecCons (unitDeg (r 0)) (fun j : Fin e => unitDeg (r j.succ)) := by
       funext j
       refine Fin.cases ?_ (fun j => ?_) j <;> simp
     rw [hsplit, IntersectionRecursion.proof F K ι q e hq hd' (r 0) i hX]
@@ -74,8 +107,8 @@ theorem unit_nonneg
 
 end GenDegAmple
 
-theorem GenDegAmple.proof (hVar : GenericFibreVar.Statement) (hPos : MultiDegreePositive.Statement)
-    : GenDegAmple.Statement := by
+theorem GenDegAmple.proof (hVar : GenericFibreVar.Statement) (hPos : MultiDegreePositive.Statement) :
+    GenDegAmple.Statement := by
   intro K _ ι _ Ω _ y D d hV hd
   classical
   have hPV := hVar K ι Ω y D hV
@@ -97,11 +130,10 @@ theorem GenDegAmple.proof (hVar : GenericFibreVar.Statement) (hPos : MultiDegree
   have hsum : ∀ b : K → ℤ, (fun _ : Fin D => b) = fun _ => ∑ k, b k • unitDeg k := fun b => by
     funext _ k'
     simp [unitDeg, Finset.sum_apply, Pi.single_apply]
-  have expand
-      : ∀ b : K → ℤ,
-        f (fun _ => b) = ∑ r : Fin D → K, (∏ j, b (r j)) * f (fun j => unitDeg (r j)) := fun b => by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hsum b, f.map_sum]
+  have expand : ∀ b : K → ℤ,
+      f (fun _ => b) = ∑ r : Fin D → K, (∏ j, b (r j)) * f (fun j => unitDeg (r j)) := fun b => by
+
+    rw [hsum b, f.map_sum]
     refine Finset.sum_congr rfl fun r _ => ?_
     rw [f.map_smul_univ (fun j => b (r j)) (fun j => unitDeg (r j)), smul_eq_mul]
     simp only [RingHom.id_apply]
@@ -111,9 +143,7 @@ theorem GenDegAmple.proof (hVar : GenericFibreVar.Statement) (hPos : MultiDegree
   simp only [Finset.prod_const_one, one_mul] at hH'
   refine lt_of_lt_of_le hH' (Finset.sum_le_sum fun r _ => ?_)
   have hp : (1 : ℤ) ≤ ∏ j, d (r j) := by
-    calc
-      (1 : ℤ)
-        = ∏ _j : Fin D, (1 : ℤ) := Finset.prod_const_one.symm
+    calc (1 : ℤ) = ∏ _j : Fin D, (1 : ℤ) := Finset.prod_const_one.symm
       _ ≤ ∏ j, d (r j) := Finset.prod_le_prod₀ (fun _ _ => zero_le_one) (fun j _ => hd (r j))
   exact le_mul_of_one_le_left (hN r) hp
 

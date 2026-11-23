@@ -19,6 +19,7 @@ public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.TwoTorsionCa
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.TorusExtensionRankBoundStatement
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.FiniteSurjectiveOpenImageStatement
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.TorusExtensionSplitMapStatement
+public import Development.AbelianVarietyTheory.Definitions.Divisors.SharpOverIff
 
 @[expose] public section
 

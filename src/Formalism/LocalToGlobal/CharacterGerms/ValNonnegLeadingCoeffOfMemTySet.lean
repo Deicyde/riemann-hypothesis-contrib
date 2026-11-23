@@ -1,6 +1,51 @@
 module
 
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.PlaceDivisors.LinearFormDegree.InvFun
+public import Formalism.LocalToGlobal.CharacterGerms.RowTieDefs
 public import Formalism.LocalToGlobal.CharacterGerms.ConstMemTypeSetOfNonneg
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Int
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -15,46 +60,14 @@ open Formalism.IncomingBounds ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ
 
 variable {C : Type} [Field C]
 
-theorem finsupp_deg_one {σ : Type} (e : σ →₀ ℕ) (h : e.degree = 1)
-    : ∃ i, e = Finsupp.single i 1 := by
-  classical
-  have hdeg : ∑ j ∈ e.support, e j = 1 := h
-  have hne : e.support.Nonempty := by
-    rw [Finset.nonempty_iff_ne_empty]
-    intro he
-    rw [he, Finset.sum_empty] at hdeg
-    exact absurd hdeg (by norm_num)
-  obtain ⟨i, hi⟩ := hne
-  have hle : ∀ j ∈ e.support, e j ≤ 1 := fun j hj =>
-    hdeg ▸ Finset.single_le_sum (f := fun k => e k) (fun _ _ => Nat.zero_le _) hj
-  have hei : e i = 1 := by
-    have h1 := hle i hi
-    have h2 := Finsupp.mem_support_iff.mp hi
-    omega
-  refine ⟨i, ?_⟩
-  ext j
-  by_cases hj : j = i
-  · subst hj
-    simp [hei]
-  · rw [Finsupp.single_apply, if_neg (Ne.symm hj)]
-    by_contra hc
-    have hjs : j ∈ e.support := Finsupp.mem_support_iff.mpr hc
-    have h2 : e i + e j ≤ ∑ k ∈ e.support, e k := by
-      rw [← Finset.sum_pair (f := fun k => e k) (Ne.symm hj)]
-      apply Finset.sum_le_sum_of_subset
-      intro x hx
-      rw [Finset.mem_insert, Finset.mem_singleton] at hx
-      rcases hx with rfl | rfl
-      · exact hi
-      · exact hjs
-    omega
+theorem finsupp_deg_one {σ : Type} (e : σ →₀ ℕ) (h : e.degree = 1) : ∃ i, e = Finsupp.single i 1 := by
+  apply ReciprocityTheory.ChartRestriction.G.LF.InvFun.eq_single_of_degree_eq_one <;> assumption
 
-theorem coeff_alongCv_low
-    {σ : Type} [Fintype σ]
-    {γ : σ → PowerSeries C} {n : ℕ} (hn : 1 ≤ n) (hγ : ∀ i, ∀ m < n, PowerSeries.coeff m (γ i) = 0)
-    {f : MvPowerSeries σ C} (hf : MvPowerSeries.constantCoeff f = 0)
-    : PowerSeries.coeff n (alongCv γ f)
-      = ∑ i, MvPowerSeries.coeff (Finsupp.single i 1) f * PowerSeries.coeff n (γ i) := by
+theorem coeff_alongCv_low {σ : Type} [Fintype σ] {γ : σ → PowerSeries C} {n : ℕ} (hn : 1 ≤ n)
+    (hγ : ∀ i, ∀ m < n, PowerSeries.coeff m (γ i) = 0) {f : MvPowerSeries σ C}
+    (hf : MvPowerSeries.constantCoeff f = 0) :
+    PowerSeries.coeff n (alongCv γ f) =
+      ∑ i, MvPowerSeries.coeff (Finsupp.single i 1) f * PowerSeries.coeff n (γ i) := by
   have hγ0 : ∀ i, MvPowerSeries.constantCoeff (γ i) = 0 := fun i => by
     have := hγ i 0 (by omega)
     rwa [PowerSeries.coeff_zero_eq_constantCoeff_apply] at this
@@ -93,9 +106,8 @@ theorem coeff_alongCv_low
       show MvPowerSeries.coeff e f • PowerSeries.coeff n (e.prod fun s m => γ s ^ m) = 0
       rw [hz, smul_zero]
 
-theorem coeff_tyS_lt
-    {l : ℕ} (hl : 2 ≤ l) (a : ℕ → C) (s : ℕ) (ha : ∀ i < s, a i = 0) (m : ℕ) (hm : m < l ^ s)
-    : PowerSeries.coeff m (tyS l a) = 0 := by
+theorem coeff_tyS_lt {l : ℕ} (hl : 2 ≤ l) (a : ℕ → C) (s : ℕ) (ha : ∀ i < s, a i = 0) (m : ℕ) (hm : m < l ^ s) :
+    PowerSeries.coeff m (tyS l a) = 0 := by
   simp only [tyS, PowerSeries.coeff_mk]
   apply Finset.sum_eq_zero
   intro t _
@@ -109,34 +121,24 @@ theorem coeff_tyS_lt
 
 namespace RawChart
 
-variable
-  {d : ℕ} {I : Fin 2 → Type} [∀ g, Fintype (I g)] {κ : Type} [Fintype κ] (X : RawChart C d I κ)
+variable {d : ℕ} {I : Fin 2 → Type} [∀ g, Fintype (I g)] {κ : Type} [Fintype κ] (X : RawChart C d I κ)
 
-theorem val_nonneg_leading_coeff_of_mem_tySet
-    (V : VF C)
-    (g : Fin 2)
-    (hlin : ∀ i (μ : κ →₀ ℕ),
-      μ.degree ≤ 1
-        → MvPowerSeries.coeff μ (X.lg i)
-          = MvPowerSeries.coeff μ (MvPowerSeries.X i : MvPowerSeries κ C))
+theorem val_nonneg_leading_coeff_of_mem_tySet (V : VF C) (g : Fin 2)
+    (hlin : ∀ i (μ : κ →₀ ℕ), μ.degree ≤ 1 →
+      MvPowerSeries.coeff μ (X.lg i) = MvPowerSeries.coeff μ (MvPowerSeries.X i : MvPowerSeries κ C))
     (hh : ∀ e : Fin 2 × κ →₀ ℕ, (∀ s ∈ e.support, s.1 ≠ 0) → MvPowerSeries.coeff e X.h = 0)
-    (hsat : ∃ w : κ → I g → C,
-      (∀ x c, V.Ge 0 (w x c)) ∧ ∀ c c' : I g, ∑ x, X.u g c x * w x c' = if c = c' then 1 else 0)
-    (hmis : ∀ (c : I g) (q : JJ I g),
-      X.ty g c ≠ X.ty (1 - g) q → V.Ge 0 (X.sg1 (X.u g c) (X.u (1 - g) q)))
-    (x : ℕ → I g ⊕ JJ I g → C) (hx : x ∈ X.TySet V g)
-    (s : ℕ) (h0 : ∀ i < s, x i = 0)
-    (n : I g ⊕ JJ I g)
-    : V.Ge 0 (x s n) := by
+    (hsat : ∃ w : κ → I g → C, (∀ x c, V.Ge 0 (w x c)) ∧
+      ∀ c c' : I g, ∑ x, X.u g c x * w x c' = if c = c' then 1 else 0)
+    (hmis : ∀ (c : I g) (q : JJ I g), X.ty g c ≠ X.ty (1 - g) q → V.Ge 0 (X.sg1 (X.u g c) (X.u (1 - g) q)))
+    (x : ℕ → I g ⊕ JJ I g → C) (hx : x ∈ X.TySet V g) (s : ℕ) (h0 : ∀ i < s, x i = 0) (n : I g ⊕ JJ I g) :
+    V.Ge 0 (x s n) := by
   have hl2 := V.l_prime.two_le
   obtain ⟨γ, lam, hγ, hlam, h1, h2⟩ := hx
   obtain ⟨w, hw, huw⟩ := hsat
   have hlg0 : ∀ i, MvPowerSeries.constantCoeff (X.lg i) = 0 := fun i => by
     rw [← MvPowerSeries.coeff_zero_eq_constantCoeff_apply, hlin i 0 (by simp),
       MvPowerSeries.coeff_zero_eq_constantCoeff_apply, MvPowerSeries.constantCoeff_X]
-  have hlg1
-      : ∀ i j,
-        MvPowerSeries.coeff (Finsupp.single j 1) (X.lg i) = if j = i then 1 else 0 := fun i j => by
+  have hlg1 : ∀ i j, MvPowerSeries.coeff (Finsupp.single j 1) (X.lg i) = if j = i then 1 else 0 := fun i j => by
     rw [hlin i _ (by rw [Finsupp.degree_single]), MvPowerSeries.coeff_X]
     by_cases hji : j = i
     · rw [hji, if_pos rfl, if_pos rfl]
@@ -144,19 +146,14 @@ theorem val_nonneg_leading_coeff_of_mem_tySet
       intro h
       exact hji (Finsupp.single_left_injective one_ne_zero h)
   have hpos : 1 ≤ V.l ^ s := Nat.one_le_pow _ _ (by omega)
-  have hlow
-      : ∀ (m : ℕ) (hm1 : 1 ≤ m),
-        (∀ i, ∀ m' < m, PowerSeries.coeff m' (γ i) = 0)
-          → ∀ i,
-            PowerSeries.coeff m (γ i)
-              = ∑ c : I g, X.u g c i * PowerSeries.coeff m (tyS V.l fun s => x s (Sum.inl c)) := by
+  have hlow : ∀ (m : ℕ) (hm1 : 1 ≤ m), (∀ i, ∀ m' < m, PowerSeries.coeff m' (γ i) = 0) → ∀ i,
+      PowerSeries.coeff m (γ i) = ∑ c : I g, X.u g c i * PowerSeries.coeff m (tyS V.l fun s => x s (Sum.inl c)) := by
     intro m hm1 hm i
     have e1 := coeff_alongCv_low hm1 hm (hlg0 i)
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [h1 i, map_sum] at e1
+
+    rw [h1 i, map_sum] at e1
     simp only [hlg1, ite_mul, one_mul, zero_mul, Finset.sum_ite_eq', Finset.mem_univ, if_true,
-        PowerSeries.coeff_smul, smul_eq_mul]
-      at e1
+      PowerSeries.coeff_smul, smul_eq_mul] at e1
     exact e1.symm
   have hord : ∀ m, m < V.l ^ s → ∀ i, PowerSeries.coeff m (γ i) = 0 := by
     intro m
@@ -180,9 +177,7 @@ theorem val_nonneg_leading_coeff_of_mem_tySet
     intro c'
     simp only [hlead, Finset.sum_mul]
     rw [Finset.sum_comm]
-    have : ∀ c : I g,
-        ∑ i, X.u g c i * x s (Sum.inl c) * w i c'
-          = (if c = c' then 1 else 0) * x s (Sum.inl c) := by
+    have : ∀ c : I g, ∑ i, X.u g c i * x s (Sum.inl c) * w i c' = (if c = c' then 1 else 0) * x s (Sum.inl c) := by
       intro c
       rw [← huw c c', Finset.sum_mul]
       refine Finset.sum_congr rfl fun i _ => by ring
@@ -195,27 +190,16 @@ theorem val_nonneg_leading_coeff_of_mem_tySet
   | inl c' => exact hinlInt c'
   | inr q =>
     have e2 := congrArg (PowerSeries.coeff (V.l ^ s)) (h2 q)
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [coeff_tyS_pow hl2, map_add (f := _), map_sub,
-          coeff_alongCv_low hpos hord' (X.constantCoeff_sg hh _), map_sum]
-        at e2
-    have e3
-        : ∑ i, MvPowerSeries.coeff (Finsupp.single i 1) (X.sg (X.u (1 - g) q)) * PowerSeries.coeff (V.l ^ s) (γ i)
-          = ∑ c : I g, X.sg1 (X.u g c) (X.u (1 - g) q) * x s (Sum.inl c) := by
+
+    rw [coeff_tyS_pow hl2, map_add (f := _), map_sub, coeff_alongCv_low hpos hord' (X.constantCoeff_sg hh _), map_sum] at e2
+    have e3 : ∑ i, MvPowerSeries.coeff (Finsupp.single i 1) (X.sg (X.u (1 - g) q)) * PowerSeries.coeff (V.l ^ s) (γ i) =
+        ∑ c : I g, X.sg1 (X.u g c) (X.u (1 - g) q) * x s (Sum.inl c) := by
       simp only [hlead, sg1, Finset.mul_sum, Finset.sum_mul]
       rw [Finset.sum_comm]
       refine Finset.sum_congr rfl fun c _ => Finset.sum_congr rfl fun i _ => by ring
-    have e4
-        : ∀ c : I g,
-          PowerSeries.coeff (V.l ^ s)
-              (if X.ty g c = X.ty (1 - g) q then
-                 X.sg1 (X.u g c) (X.u (1 - g) q) • tyS V.l (fun s => x s (Sum.inl c))
-               else
-                 0)
-            = if X.ty g c = X.ty (1 - g) q then
-                X.sg1 (X.u g c) (X.u (1 - g) q) * x s (Sum.inl c)
-              else
-                0 := by
+    have e4 : ∀ c : I g, PowerSeries.coeff (V.l ^ s) (if X.ty g c = X.ty (1 - g) q then
+          X.sg1 (X.u g c) (X.u (1 - g) q) • tyS V.l (fun s => x s (Sum.inl c)) else 0) =
+        if X.ty g c = X.ty (1 - g) q then X.sg1 (X.u g c) (X.u (1 - g) q) * x s (Sum.inl c) else 0 := by
       intro c
       split_ifs
       · rw [PowerSeries.coeff_smul, coeff_tyS_pow hl2, smul_eq_mul]

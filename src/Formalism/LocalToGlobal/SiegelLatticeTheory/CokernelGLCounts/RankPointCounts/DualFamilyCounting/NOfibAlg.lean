@@ -1,15 +1,55 @@
 module
 
-public import Mathlib
 public import Formalism.LocalToGlobal.SiegelLatticeTheory.CokernelGLCounts.RankPointCounts.DualFamilyCounting.NOfibCut
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
 noncomputable section
 
 open scoped Classical
-open NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat
-  Formalism.L2.SG.HidaSetting Matrix
+open NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.L2.SG.HidaSetting Matrix
 
 namespace Formalism.L2.SG.Pf.NcReal.JX.NOf
 
@@ -27,31 +67,28 @@ theorem hfe (a b : Fin D.R.rS) : (VS D).hT (X.fY a) (X.eX b) = if a = b then 1 e
   · subst h; simp
   · simp [h, Ne.symm h]
 
-theorem hT_sumL {ι : Type*} (s : Finset ι) (c : ι → D.host.E) (y : ι → (VS D).V) (x : (VS D).V)
-    : (VS D).hT (∑ i ∈ s, c i • y i) x = ∑ i ∈ s, star (c i) * (VS D).hT (y i) x := by
-  set_option synthInstance.maxHeartbeats 100000 in
-  simp [map_sum, LinearMap.sum_apply, map_smulₛₗ, LinearMap.smul_apply, smul_eq_mul,
-    starRingEnd_apply]
+theorem hT_sumL {ι : Type*} (s : Finset ι) (c : ι → D.host.E) (y : ι → (VS D).V) (x : (VS D).V) :
+    (VS D).hT (∑ i ∈ s, c i • y i) x = ∑ i ∈ s, star (c i) * (VS D).hT (y i) x := by
 
-theorem hT_sumR {ι : Type*} (s : Finset ι) (c : ι → D.host.E) (y : ι → (VS D).V) (x : (VS D).V)
-    : (VS D).hT x (∑ i ∈ s, c i • y i) = ∑ i ∈ s, c i * (VS D).hT x (y i) := by
-  set_option synthInstance.maxHeartbeats 100000 in
+  simp [map_sum, LinearMap.sum_apply, map_smulₛₗ, LinearMap.smul_apply, smul_eq_mul, starRingEnd_apply]
+
+theorem hT_sumR {ι : Type*} (s : Finset ι) (c : ι → D.host.E) (y : ι → (VS D).V) (x : (VS D).V) :
+    (VS D).hT x (∑ i ∈ s, c i • y i) = ∑ i ∈ s, c i * (VS D).hT x (y i) := by
+
   simp [map_sum, map_smul, smul_eq_mul]
 
-theorem hT_smulL (c : D.host.E) (x y : (VS D).V)
-    : (VS D).hT (c • x) y = star c * (VS D).hT x y := by
+theorem hT_smulL (c : D.host.E) (x y : (VS D).V) : (VS D).hT (c • x) y = star c * (VS D).hT x y := by
   simp [map_smulₛₗ, LinearMap.smul_apply, smul_eq_mul, starRingEnd_apply]
 
-theorem coef_e (S : Set (Fin D.R.rS)) {x : (VS D).V} (hx : x ∈ Submodule.span D.host.E (X.eX '' S))
-    : x = ∑ b, (VS D).hT (X.fY b) x • X.eX b ∧ ∀ b, b ∉ S → (VS D).hT (X.fY b) x = 0 := by
+theorem coef_e (S : Set (Fin D.R.rS)) {x : (VS D).V} (hx : x ∈ Submodule.span D.host.E (X.eX '' S)) :
+    x = ∑ b, (VS D).hT (X.fY b) x • X.eX b ∧ ∀ b, b ∉ S → (VS D).hT (X.fY b) x = 0 := by
   induction hx using Submodule.span_induction with
   | mem y hy =>
     obtain ⟨a, ha, rfl⟩ := hy
     refine ⟨?_, fun b hb => ?_⟩
     · simp only [hfe, ite_smul, one_smul, zero_smul, Finset.sum_ite_eq', Finset.mem_univ, if_true]
     · rw [hfe, if_neg]; rintro rfl; exact hb ha
-  | zero =>
-    simp
+  | zero => simp
   | add x y _ _ hx hy =>
     refine ⟨?_, fun b hb => ?_⟩
     · conv_lhs => rw [hx.1, hy.1]
@@ -63,21 +100,21 @@ theorem coef_e (S : Set (Fin D.R.rS)) {x : (VS D).V} (hx : x ∈ Submodule.span 
       simp only [map_smul, smul_eq_mul, Finset.smul_sum, smul_smul]
     · rw [map_smul, hx.2 b hb, smul_zero]
 
-theorem coef_range {x : (VS D).V} (hx : x ∈ Submodule.span D.host.E (Set.range X.eX))
-    : x = ∑ b, (VS D).hT (X.fY b) x • X.eX b := by
+theorem coef_range {x : (VS D).V} (hx : x ∈ Submodule.span D.host.E (Set.range X.eX)) :
+    x = ∑ b, (VS D).hT (X.fY b) x • X.eX b := by
   rw [← Set.image_univ] at hx
   exact (coef_e X Set.univ hx).1
 
 theorem pW_inW (y : (VS D).V) : InW X (pW X y) := by
   intro c
   constructor
-  · simp only [pW, map_sub, hT_sumR, X.ee, X.ef, mul_zero, Finset.sum_const_zero, sub_zero, mul_ite,
-      mul_one, Finset.sum_ite_eq, Finset.mem_univ, if_true, sub_self]
-  · simp only [pW, map_sub, hT_sumR, X.ff, hfe, mul_zero, Finset.sum_const_zero, sub_zero, mul_ite,
-      mul_one, Finset.sum_ite_eq, Finset.mem_univ, if_true, sub_self]
+  · simp only [pW, map_sub, hT_sumR, X.ee, X.ef, mul_zero, Finset.sum_const_zero, sub_zero, mul_ite, mul_one,
+      Finset.sum_ite_eq, Finset.mem_univ, if_true, sub_self]
+  · simp only [pW, map_sub, hT_sumR, X.ff, hfe, mul_zero, Finset.sum_const_zero, sub_zero, mul_ite, mul_one,
+      Finset.sum_ite_eq, Finset.mem_univ, if_true, sub_self]
 
-theorem decomp (y : (VS D).V)
-    : y = ∑ d, (VS D).hT (X.fY d) y • X.eX d + ∑ d, (VS D).hT (X.eX d) y • X.fY d + pW X y := by
+theorem decomp (y : (VS D).V) :
+    y = ∑ d, (VS D).hT (X.fY d) y • X.eX d + ∑ d, (VS D).hT (X.eX d) y • X.fY d + pW X y := by
   simp only [pW]; abel
 
 theorem pW_of_inW {w : (VS D).V} (hw : InW X w) : pW X w = w := by
@@ -90,13 +127,14 @@ theorem pW_smul (c : D.host.E) (x : (VS D).V) : pW X (c • x) = c • pW X x :=
   simp only [pW, map_smul, smul_eq_mul, mul_smul, ← Finset.smul_sum, smul_sub]
 
 theorem pW_e (a : Fin D.R.rS) : pW X (X.eX a) = 0 := by
-  simp only [pW, X.ee, hfe, ite_smul, one_smul, zero_smul, Finset.sum_ite_eq', Finset.mem_univ,
-    if_true, Finset.sum_const_zero, sub_zero, sub_self]
+  simp only [pW, X.ee, hfe, ite_smul, one_smul, zero_smul, Finset.sum_ite_eq', Finset.mem_univ, if_true,
+    Finset.sum_const_zero, sub_zero, sub_self]
 
 theorem pW_sum_e (c : Fin D.R.rS → D.host.E) : pW X (∑ d, c d • X.eX d) = 0 := by
   induction (Finset.univ : Finset (Fin D.R.rS)) using Finset.induction_on with
   | empty => simp [pW]
-  | insert a s ha ih => rw [Finset.sum_insert ha, pW_add, pW_smul, pW_e, smul_zero, zero_add, ih]
+  | insert a s ha ih =>
+    rw [Finset.sum_insert ha, pW_add, pW_smul, pW_e, smul_zero, zero_add, ih]
 
 theorem hT_w_e {w : (VS D).V} (hw : InW X w) (a : Fin D.R.rS) : (VS D).hT w (X.eX a) = 0 := by
   rw [hsw, (hw a).1, star_zero]
@@ -104,19 +142,15 @@ theorem hT_w_e {w : (VS D).V} (hw : InW X w) (a : Fin D.R.rS) : (VS D).hT w (X.e
 theorem hT_w_f {w : (VS D).V} (hw : InW X w) (a : Fin D.R.rS) : (VS D).hT w (X.fY a) = 0 := by
   rw [hsw, (hw a).2, star_zero]
 
-theorem parseval (y y' : (VS D).V)
-    : (VS D).hT y y'
-      = ∑ d, star ((VS D).hT (X.fY d) y) * (VS D).hT (X.eX d) y'
-        + ∑ d, star ((VS D).hT (X.eX d) y) * (VS D).hT (X.fY d) y'
-        + (VS D).hT (pW X y) (pW X y') := by
+theorem parseval (y y' : (VS D).V) :
+    (VS D).hT y y' = ∑ d, star ((VS D).hT (X.fY d) y) * (VS D).hT (X.eX d) y' +
+      ∑ d, star ((VS D).hT (X.eX d) y) * (VS D).hT (X.fY d) y' + (VS D).hT (pW X y) (pW X y') := by
   have h1 : (VS D).hT (pW X y) y' = (VS D).hT (pW X y) (pW X y') := by
     conv_lhs => rw [decomp X y']
     rw [map_add (f := _), map_add (f := _), hT_sumR, hT_sumR]
-    simp only [hT_w_e X (pW_inW X y), hT_w_f X (pW_inW X y), mul_zero, Finset.sum_const_zero,
-      zero_add]
+    simp only [hT_w_e X (pW_inW X y), hT_w_f X (pW_inW X y), mul_zero, Finset.sum_const_zero, zero_add]
   conv_lhs => rw [decomp X y]
-  rw [map_add (f := _), map_add (f := _), LinearMap.add_apply, LinearMap.add_apply, hT_sumL,
-    hT_sumL, h1]
+  rw [map_add (f := _), map_add (f := _), LinearMap.add_apply, LinearMap.add_apply, hT_sumL, hT_sumL, h1]
 
 section N
 
@@ -124,12 +158,11 @@ variable {X} {u : D.what₂.Word} {n : (VS D).V ≃ₗ[D.host.E] (VS D).V}
 
 theorem iso (hn : NFl X u n) (x y : (VS D).V) : (VS D).hT (n x) (n y) = (VS D).hT x y := hn.1 x y
 
-theorem iso_symm (hn : NFl X u n) (x y : (VS D).V)
-    : (VS D).hT (n.symm x) y = (VS D).hT x (n y) := by
+theorem iso_symm (hn : NFl X u n) (x y : (VS D).V) : (VS D).hT (n.symm x) y = (VS D).hT x (n y) := by
   rw [← iso hn (n.symm x) y, LinearEquiv.apply_symm_apply]
 
-theorem ne_mem (hn : NFl X u n) (a : Fin D.R.rS)
-    : n (X.eX a) - X.eX a ∈ Submodule.span D.host.E (X.eX '' {b | b.1 < a.1}) := by
+theorem ne_mem (hn : NFl X u n) (a : Fin D.R.rS) :
+    n (X.eX a) - X.eX a ∈ Submodule.span D.host.E (X.eX '' {b | b.1 < a.1}) := by
   have hx : X.eX a ∈ Xflag (lf D (X.Fu u)) (a.1 + 1) := by
     change X.eX a ∈ Submodule.span D.host.E ((X.Fu u).e '' {i | i.1 < a.1 + 1})
     rw [X.Fu_e]
@@ -148,13 +181,12 @@ theorem Xq_expand (hn : NFl X u n) (a : Fin D.R.rS) : n (X.eX a) = ∑ b, Xq X n
   simp only [add_smul, Finset.sum_add_distrib, ite_smul, one_smul, zero_smul, Finset.sum_ite_eq',
     Finset.mem_univ, if_true]
 
-theorem Xq_entry (hn : NFl X u n) (b a : Fin D.R.rS)
-    : Xq X n b a = (VS D).hT (X.fY b) (n (X.eX a) - X.eX a) + if b = a then 1 else 0 := by
+theorem Xq_entry (hn : NFl X u n) (b a : Fin D.R.rS) :
+    Xq X n b a = (VS D).hT (X.fY b) (n (X.eX a) - X.eX a) + if b = a then 1 else 0 := by
   rw [map_sub, hfe, sub_add_cancel]; rfl
 
 theorem Xq_lower (hn : NFl X u n) {b a : Fin D.R.rS} (h : a < b) : Xq X n b a = 0 := by
-  rw [Xq_entry hn,
-    (coef_e X _ (ne_mem hn a)).2 b (by simp only [Set.mem_setOf_eq, not_lt]; exact le_of_lt h),
+  rw [Xq_entry hn, (coef_e X _ (ne_mem hn a)).2 b (by simp only [Set.mem_setOf_eq, not_lt]; exact le_of_lt h),
     if_neg (ne_of_gt h), add_zero]
 
 theorem Xq_diag (hn : NFl X u n) (a : Fin D.R.rS) : Xq X n a a = 1 := by
@@ -171,8 +203,8 @@ theorem inW_orth {w : (VS D).V} (hw : InW X w) : w ∈ orth (VS D) (Xsp (lf D (X
   | add x y _ _ hx hy => rw [map_add (f := _), LinearMap.add_apply, hx, hy, add_zero]
   | smul c x _ hx => rw [hT_smulL, hx, mul_zero]
 
-theorem nw (hn : NFl X u n) {w : (VS D).V} (hw : InW X w)
-    : n w = w + ∑ d, (VS D).hT (X.fY d) (n w) • X.eX d := by
+theorem nw (hn : NFl X u n) {w : (VS D).V} (hw : InW X w) :
+    n w = w + ∑ d, (VS D).hT (X.fY d) (n w) • X.eX d := by
   have h1 := hn.2.2 w (inW_orth hw)
   change _ ∈ Submodule.span D.host.E (Set.range (X.Fu u).e) at h1
   rw [X.Fu_e] at h1
@@ -180,11 +212,10 @@ theorem nw (hn : NFl X u n) {w : (VS D).V} (hw : InW X w)
   have e : ∀ d, (VS D).hT (X.fY d) (n w - w) = (VS D).hT (X.fY d) (n w) := fun d => by
     rw [map_sub, (hw d).2, sub_zero]
   simp only [e] at h2
-  rw [← h2]
-  abel
+  rw [← h2]; abel
 
-theorem row (hn : NFl X u n) (b : Fin D.R.rS) {w : (VS D).V} (hw : InW X w)
-    : (VS D).hT (X.fY b) (n w) = (VS D).hT (xq X n b) w := by
+theorem row (hn : NFl X u n) (b : Fin D.R.rS) {w : (VS D).V} (hw : InW X w) :
+    (VS D).hT (X.fY b) (n w) = (VS D).hT (xq X n b) w := by
   rw [← iso_symm hn, parseval X _ w]
   simp only [(hw _).1, (hw _).2, mul_zero, Finset.sum_const_zero, zero_add, pW_of_inW X hw]
   rfl
@@ -197,18 +228,16 @@ theorem XB (hn : NFl X u n) : (Xq X n)ᴴ * Bq (X := X) n = 1 := by
   simp only [Matrix.mul_apply, Matrix.conjTranspose_apply, Bq]
   rw [← hT_sumL, ← Xq_expand hn, iso hn, X.ef, Matrix.one_apply]
 
-theorem ff_rel (hn : NFl X u n) (a c : Fin D.R.rS)
-    : ((Aq X n)ᴴ * Bq (X := X) n + (Bq (X := X) n)ᴴ * Aq X n) a c
-        + (VS D).hT (pW X (n (X.fY a))) (pW X (n (X.fY c)))
-      = 0 := by
+theorem ff_rel (hn : NFl X u n) (a c : Fin D.R.rS) :
+    ((Aq X n)ᴴ * Bq (X := X) n + (Bq (X := X) n)ᴴ * Aq X n) a c +
+      (VS D).hT (pW X (n (X.fY a))) (pW X (n (X.fY c))) = 0 := by
   have h := parseval X (n (X.fY a)) (n (X.fY c))
   rw [iso hn, X.ff] at h
   rw [h, Matrix.add_apply, Matrix.mul_apply, Matrix.mul_apply]
   simp only [Matrix.conjTranspose_apply, Aq, Bq]
 
-theorem omega_rel (hn : NFl X u n) (a : Fin D.R.rS) {w : (VS D).V} (hw : InW X w)
-    : (VS D).hT (pW X (n (X.fY a))) w
-      = - ∑ d, star (Bq (X := X) n d a) * (VS D).hT (xq X n d) w := by
+theorem omega_rel (hn : NFl X u n) (a : Fin D.R.rS) {w : (VS D).V} (hw : InW X w) :
+    (VS D).hT (pW X (n (X.fY a))) w = -∑ d, star (Bq (X := X) n d a) * (VS D).hT (xq X n d) w := by
   have h := parseval X (n (X.fY a)) (n w)
   rw [iso hn] at h
   have he : ∀ d, (VS D).hT (X.eX d) (n w) = 0 := fun d => by
@@ -224,19 +253,17 @@ theorem omega_rel (hn : NFl X u n) (a : Fin D.R.rS) {w : (VS D).V} (hw : InW X w
 
 theorem xq_inW (d : Fin D.R.rS) : InW X (xq X n d) := pW_inW X _
 
-theorem gram_omega (hn : NFl X u n) (a c : Fin D.R.rS)
-    : (VS D).hT (pW X (n (X.fY a))) (pW X (n (X.fY c)))
-      = ((Bq (X := X) n)ᴴ * Gq D (xq X n) * Bq (X := X) n) a c := by
+theorem gram_omega (hn : NFl X u n) (a c : Fin D.R.rS) :
+    (VS D).hT (pW X (n (X.fY a))) (pW X (n (X.fY c))) =
+      ((Bq (X := X) n)ᴴ * Gq D (xq X n) * Bq (X := X) n) a c := by
   rw [omega_rel hn a (pW_inW X (n (X.fY c)))]
-  have h2
-      : ∀ d,
-        (VS D).hT (xq X n d) (pW X (n (X.fY c)))
-          = - ∑ d', Bq (X := X) n d' c * (VS D).hT (xq X n d) (xq X n d') := by
+  have h2 : ∀ d, (VS D).hT (xq X n d) (pW X (n (X.fY c))) =
+      -∑ d', Bq (X := X) n d' c * (VS D).hT (xq X n d) (xq X n d') := by
     intro d
     rw [hsw, omega_rel hn c (xq_inW d)]
     simp only [star_neg, star_sum, star_mul', star_star, ← hsw]
-  simp only [h2, Matrix.mul_apply, Matrix.conjTranspose_apply, Gq, Finset.mul_sum, Finset.sum_mul,
-    mul_neg, Finset.sum_neg_distrib, neg_neg]
+  simp only [h2, Matrix.mul_apply, Matrix.conjTranspose_apply, Gq, Finset.mul_sum, Finset.sum_mul, mul_neg,
+    Finset.sum_neg_distrib, neg_neg]
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun d' _ => Finset.sum_congr rfl fun d _ => by ring
 
@@ -249,6 +276,7 @@ theorem Xq_det (hn : NFl X u n) : (Xq X n).det = 1 := by
 end N
 
 end Alg
+
 
 open Alg in
 theorem dictGram_holds : DictGram := by

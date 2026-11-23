@@ -1,17 +1,66 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.Definitions.Divisors.SurjectiveOfIsPullbackSqZero
-public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.IsNoetherianRingDualNumber
-public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.AbelianHodgeDeRham
-public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.BijectiveCechDeRhamComparisonDegreeOne
+public import Mathlib.Algebra.Module.Projective
+public import Mathlib.RingTheory.Finiteness.Defs
+public import Mathlib.RingTheory.Ideal.Maps
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+public import Mathlib.CategoryTheory.Monoidal.Cartesian.Over
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
+import Development.AbelianVarietyTheory.Definitions.Divisors.CommAlgFunctorCoboundaryZeroMemCocyclesOne
+import Development.AbelianVarietyTheory.Definitions.Divisors.IsKSValueOneOfRetraction
+import Development.AbelianVarietyTheory.Definitions.Divisors.OneFormMapEqKaehlerDifferentialMap
+import Development.AbelianVarietyTheory.Definitions.Divisors.PrimitiveCrystalHodgeLiftClasses
+import Development.AbelianVarietyTheory.Definitions.Divisors.Pullback1MemHodgeFiltration
+import Development.AbelianVarietyTheory.Definitions.Divisors.SurjectiveOfIsPullbackSqZero
+public import Mathlib.LinearAlgebra.Dual.Lemmas
+import Mathlib.RingTheory.DividedPowers.Basic
+import Mathlib.Topology.Sheaves.Presheaf
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.CocycleRightZeroThd
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.SemiabelianSchemes.CubicalStructures.CubeSymmetricSwapFirst
 
 @[expose] public section
 
-open CategoryTheory AlgebraicGeometry KaehlerDifferential DividedPowers
-  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
-  GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.CechDR GlobalTheory.DeRham GlobalTheory.SqLift
-  GlobalTheory.LiftSys GlobalTheory.Published
+open CategoryTheory AlgebraicGeometry KaehlerDifferential DividedPowers ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.CechDR GlobalTheory.DeRham GlobalTheory.SqLift GlobalTheory.LiftSys GlobalTheory.Published
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.DualSummand
@@ -20,16 +69,16 @@ open Module Submodule
 
 variable {R : Type} [CommRing R] {C : Type*} [AddCommGroup C] [Module R C]
 
-theorem isCompl_dualAnnihilator {K N : Submodule R C} (h : IsCompl K N)
-    : IsCompl K.dualAnnihilator N.dualAnnihilator := by
+theorem isCompl_dualAnnihilator {K N : Submodule R C} (h : IsCompl K N) :
+    IsCompl K.dualAnnihilator N.dualAnnihilator := by
   constructor
   · rw [disjoint_iff, eq_bot_iff]
     intro f hf
     rw [mem_inf, mem_dualAnnihilator, mem_dualAnnihilator] at hf
     rw [mem_bot]
     ext c
-    rw [← projection_add_projection_eq_self h c, map_add (f := _),
-      hf.1 _ (projection_apply_mem h c), hf.2 _ (projection_apply_mem h.symm c)]
+    rw [← projection_add_projection_eq_self h c, map_add (f := _), hf.1 _ (projection_apply_mem h c),
+      hf.2 _ (projection_apply_mem h.symm c)]
     simp
   · rw [codisjoint_iff, eq_top_iff]
     intro f _
@@ -46,26 +95,23 @@ theorem isCompl_dualAnnihilator {K N : Submodule R C} (h : IsCompl K N)
       intro n hn
       simp [projection_apply_of_mem_right h hn]
 
-theorem dualAnnihilator_dualCoannihilator_eq
-    [Projective R C] {K N : Submodule R C} (h : IsCompl K N)
-    : K.dualAnnihilator.dualCoannihilator = K := by
+theorem dualAnnihilator_dualCoannihilator_eq [Projective R C] {K N : Submodule R C}
+    (h : IsCompl K N) : K.dualAnnihilator.dualCoannihilator = K := by
   refine le_antisymm (fun c hc => ?_) (le_dualAnnihilator_dualCoannihilator _)
   rw [mem_dualCoannihilator] at hc
   have hn : N.projection K h.symm c = 0 := by
     rw [← forall_dual_apply_eq_zero_iff R]
     intro φ
-    have :=
-      hc (φ ∘ₗ N.projection K h.symm) (by
-        rw [mem_dualAnnihilator]
-        intro k hk
-        simp [projection_apply_of_mem_right h.symm hk])
+    have := hc (φ ∘ₗ N.projection K h.symm) (by
+      rw [mem_dualAnnihilator]
+      intro k hk
+      simp [projection_apply_of_mem_right h.symm hk])
     simpa using this
   rw [← projection_add_projection_eq_self h c, hn, add_zero]
   exact projection_apply_mem h c
 
-theorem mem_smul_top_of_forall_dual
-    [Projective R C] (I : Ideal R) (c : C) (h : ∀ x : Dual R C, x c ∈ I)
-    : c ∈ I • (⊤ : Submodule R C) := by
+theorem mem_smul_top_of_forall_dual [Projective R C] (I : Ideal R) (c : C)
+    (h : ∀ x : Dual R C, x c ∈ I) : c ∈ I • (⊤ : Submodule R C) := by
   obtain ⟨s, hs⟩ := projective_def.mp (inferInstance : Projective R C)
   rw [← hs c, Finsupp.linearCombination_apply, Finsupp.sum]
   refine Submodule.sum_mem _ fun m _ => ?_
@@ -73,21 +119,18 @@ theorem mem_smul_top_of_forall_dual
 
 variable {R₀ : Type} [CommRing R₀] {π : R →+* R₀} {C₀ : Type*} [AddCommGroup C₀] [Module R₀ C₀]
 
-theorem exists_dual_lift
-    [Projective R C] (hπ : Function.Surjective π) (ρ : C →ₛₗ[π] C₀) (y : Dual R₀ C₀)
-    : ∃ x : Dual R C, ∀ c, π (x c) = y (ρ c) := by
+theorem exists_dual_lift [Projective R C] (hπ : Function.Surjective π) (ρ : C →ₛₗ[π] C₀)
+    (y : Dual R₀ C₀) : ∃ x : Dual R C, ∀ c, π (x c) = y (ρ c) := by
   obtain ⟨s, hs⟩ := projective_def.mp (inferInstance : Projective R C)
   refine ⟨Finsupp.linearCombination R (fun m => Function.surjInv hπ (y (ρ m))) ∘ₗ s, fun c => ?_⟩
   conv_rhs => rw [← hs c]
-  set_option synthInstance.maxHeartbeats 100000 in
-  simp only [LinearMap.comp_apply, Finsupp.linearCombination_apply, Finsupp.sum, map_sum,
-    smul_eq_mul, map_mul, Function.surjInv_eq, LinearMap.map_smulₛₗ, id, RingHom.id_apply]
 
-theorem exists_dual_descent
-    {ρ : C →ₛₗ[π] C₀}
-    (hπ : Function.Surjective π) (hρ : Function.Surjective ρ)
-    (hker : ∀ c, ρ c = 0 ↔ c ∈ RingHom.ker π • (⊤ : Submodule R C)) (x : Dual R C)
-    : ∃ y : Dual R₀ C₀, ∀ c, y (ρ c) = π (x c) := by
+  simp only [LinearMap.comp_apply, Finsupp.linearCombination_apply, Finsupp.sum, map_sum,
+  smul_eq_mul, map_mul, Function.surjInv_eq, LinearMap.map_smulₛₗ, id, RingHom.id_apply]
+
+theorem exists_dual_descent {ρ : C →ₛₗ[π] C₀} (hπ : Function.Surjective π)
+    (hρ : Function.Surjective ρ) (hker : ∀ c, ρ c = 0 ↔ c ∈ RingHom.ker π • (⊤ : Submodule R C))
+    (x : Dual R C) : ∃ y : Dual R₀ C₀, ∀ c, y (ρ c) = π (x c) := by
   have hI : RingHom.ker π • (⊤ : Submodule R C) ≤ Submodule.comap x (RingHom.ker π) := by
     rw [Submodule.smul_le]
     intro r hr n _
@@ -95,16 +138,14 @@ theorem exists_dual_descent
     exact Ideal.mul_mem_right _ _ hr
   have hx : ∀ a b, ρ a = ρ b → π (x a) = π (x b) := by
     intro a b hab
-    have h1 : a - b ∈ RingHom.ker π • (⊤ : Submodule R C) :=
-      (hker _).mp (by rw [map_sub, hab, sub_self])
+    have h1 : a - b ∈ RingHom.ker π • (⊤ : Submodule R C) := (hker _).mp (by rw [map_sub, hab, sub_self])
     have h2 := hI h1
     rw [Submodule.mem_comap, map_sub] at h2
     rw [← sub_eq_zero, ← map_sub]
     exact (RingHom.mem_ker).mp h2
   let g := Function.surjInv hρ
   have hg : ∀ v, ρ (g v) = v := Function.surjInv_eq hρ
-  refine
-    ⟨{ toFun := fun v => π (x (g v)), map_add' := ?_, map_smul' := ?_ }, fun c => hx _ _ (hg _)⟩
+  refine ⟨{ toFun := fun v => π (x (g v)), map_add' := ?_, map_smul' := ?_ }, fun c => hx _ _ (hg _)⟩
   · intro a b
     rw [show π (x (g a)) + π (x (g b)) = π (x (g a + g b)) by simp]
     exact hx _ _ (by rw [map_add (f := _), hg, hg, hg])
@@ -123,13 +164,10 @@ open Module Submodule
 variable {R : Type} [CommRing R] {C : Type*} [AddCommGroup C] [Module R C]
 variable {R₀ : Type} [CommRing R₀] {π : R →+* R₀} {C₀ : Type*} [AddCommGroup C₀] [Module R₀ C₀]
 
-theorem eq_zero_of_forall_dual_reduction
-    [Projective R C]
-    {ρ : C →ₛₗ[π] C₀}
+theorem eq_zero_of_forall_dual_reduction [Projective R C] {ρ : C →ₛₗ[π] C₀}
     (hπ : Function.Surjective π) (hρ : Function.Surjective ρ)
     (hker : ∀ c, ρ c = 0 ↔ c ∈ RingHom.ker π • (⊤ : Submodule R C))
-    (v : C₀) (hv : ∀ φ : Dual R₀ C₀, φ v = 0)
-    : v = 0 := by
+    (v : C₀) (hv : ∀ φ : Dual R₀ C₀, φ v = 0) : v = 0 := by
   obtain ⟨c, rfl⟩ := hρ v
   rw [hker]
   refine mem_smul_top_of_forall_dual _ c fun x => ?_
@@ -137,9 +175,9 @@ theorem eq_zero_of_forall_dual_reduction
   rw [RingHom.mem_ker, ← hy]
   exact hv y
 
-theorem exists_eq_dualAnnihilator
-    [Projective R C] [Module.Finite R C] {G H : Submodule R (Dual R C)} (hGH : IsCompl G H)
-    : ∃ K : Submodule R C, (∃ N, IsCompl K N) ∧ G = K.dualAnnihilator := by
+theorem exists_eq_dualAnnihilator [Projective R C] [Module.Finite R C]
+    {G H : Submodule R (Dual R C)} (hGH : IsCompl G H) :
+    ∃ K : Submodule R C, (∃ N, IsCompl K N) ∧ G = K.dualAnnihilator := by
   have hsurj : ∀ ψ : Dual R (Dual R C), ∃ k : C, ∀ φ : Dual R C, φ k = ψ φ := by
     intro ψ
     obtain ⟨k, hk⟩ := (Module.bijective_dual_eval R C).2 ψ
@@ -186,8 +224,7 @@ theorem exists_eq_dualAnnihilator
       have e : H.projection G hGH.symm φ = φ - G.projection H hGH φ := by
         rw [eq_sub_iff_add_eq, add_comm, hsplit φ]
       rw [map_add (f := _), (mem_dualCoannihilator _).mp hl _ (projection_apply_mem hGH.symm φ), e,
-        LinearMap.sub_apply, hφ k hk,
-        (mem_dualCoannihilator _).mp hk _ (projection_apply_mem hGH φ)]
+        LinearMap.sub_apply, hφ k hk, (mem_dualCoannihilator _).mp hk _ (projection_apply_mem hGH φ)]
       simp
     rw [← hsplit φ, h0, add_zero]
     exact projection_apply_mem hGH φ
@@ -198,32 +235,11 @@ namespace GlobalTheory.LiftSys
 
 open Module Submodule GlobalTheory.DualSummand
 
-theorem summand_dual_reduction
-    : ∀ (R R₀ : Type) [CommRing R] [CommRing R₀] (π : R →+* R₀),
-      Function.Surjective π
-        → ∀ (C C₀ : Type 1) [AddCommGroup C] [Module R C] [AddCommGroup C₀] [Module R₀ C₀],
-          Module.Finite R C → Module.Projective R C
-            → ∀ ρ : C →ₛₗ[π] C₀,
-              Function.Surjective ρ → (∀ c, ρ c = 0 ↔ c ∈ RingHom.ker π • (⊤ : Submodule R C))
-                → ∀ F₀ : Submodule R₀ C₀,
-                  (∃ N₀, IsCompl F₀ N₀)
-                    → (∀ K : Submodule R C,
-                        (∃ N, IsCompl K N)
-                          → (∃ N, IsCompl K.dualAnnihilator N)
-                            ∧ K.dualAnnihilator.dualCoannihilator = K
-                            ∧ ((∀ c, c ∈ K ⊔ RingHom.ker π • ⊤ ↔ ρ c ∈ F₀)
-                              ↔ ∀ y : Module.Dual R₀ C₀,
-                                y ∈ F₀.dualAnnihilator
-                                  ↔ ∃ x ∈ K.dualAnnihilator, ∀ c, y (ρ c) = π (x c)))
-                      ∧ ∀ G : Submodule R (Module.Dual R C),
-                        (∃ N, IsCompl G N)
-                          → ∃ K : Submodule R C, (∃ N, IsCompl K N) ∧ G = K.dualAnnihilator := by
+theorem summand_dual_reduction :
+    ∀ (R R₀ : Type) [CommRing R] [CommRing R₀] (π : R →+* R₀), Function.Surjective π → ∀ (C C₀ : Type 1) [AddCommGroup C] [Module R C] [AddCommGroup C₀] [Module R₀ C₀], Module.Finite R C → Module.Projective R C → ∀ ρ : C →ₛₗ[π] C₀, Function.Surjective ρ → (∀ c, ρ c = 0 ↔ c ∈ RingHom.ker π • (⊤ : Submodule R C)) → ∀ F₀ : Submodule R₀ C₀, (∃ N₀, IsCompl F₀ N₀) → (∀ K : Submodule R C, (∃ N, IsCompl K N) → (∃ N, IsCompl K.dualAnnihilator N) ∧ K.dualAnnihilator.dualCoannihilator = K ∧ ((∀ c, c ∈ K ⊔ RingHom.ker π • ⊤ ↔ ρ c ∈ F₀) ↔ ∀ y : Module.Dual R₀ C₀, y ∈ F₀.dualAnnihilator ↔ ∃ x ∈ K.dualAnnihilator, ∀ c, y (ρ c) = π (x c))) ∧ ∀ G : Submodule R (Module.Dual R C), (∃ N, IsCompl G N) → ∃ K : Submodule R C, (∃ N, IsCompl K N) ∧ G = K.dualAnnihilator := by
   intro R R₀ _ _ π hπ C C₀ _ _ _ _ _ _ ρ hρ hker F₀ ⟨N₀, hF⟩
-  refine ⟨
-    fun K ⟨N, hKN⟩ =>
-      ⟨⟨_, isCompl_dualAnnihilator hKN⟩, dualAnnihilator_dualCoannihilator_eq hKN, ?_⟩,
-    fun G ⟨H, hGH⟩ => exists_eq_dualAnnihilator hGH
-  ⟩
+  refine ⟨fun K ⟨N, hKN⟩ => ⟨⟨_, isCompl_dualAnnihilator hKN⟩,
+    dualAnnihilator_dualCoannihilator_eq hKN, ?_⟩, fun G ⟨H, hGH⟩ => exists_eq_dualAnnihilator hGH⟩
   have hsplit : ∀ c, K.projection N hKN c + N.projection K hKN.symm c = c :=
     projection_add_projection_eq_self hKN
   have hNK : ∀ k ∈ K, N.projection K hKN.symm k = 0 := fun k hk =>
@@ -255,11 +271,10 @@ theorem summand_dual_reduction
       rw [map_add (f := _), (hker m).mpr hm, add_zero]
       have hv : N₀.projection F₀ hF.symm (ρ k) = 0 := by
         refine eq_zero_of_forall_dual_reduction hπ hρ hker _ fun φ => ?_
-        obtain ⟨x, hx, hxy⟩ :=
-          (hR (φ ∘ₗ N₀.projection F₀ hF.symm)).mp (by
-            rw [mem_dualAnnihilator]
-            intro f hf
-            simp [projection_apply_of_mem_right hF.symm hf])
+        obtain ⟨x, hx, hxy⟩ := (hR (φ ∘ₗ N₀.projection F₀ hF.symm)).mp (by
+          rw [mem_dualAnnihilator]
+          intro f hf
+          simp [projection_apply_of_mem_right hF.symm hf])
         have := hxy k
         rw [LinearMap.comp_apply] at this
         rw [this, (mem_dualAnnihilator _).mp hx k hk, map_zero]
@@ -270,15 +285,10 @@ theorem summand_dual_reduction
       refine add_mem_sup (projection_apply_mem hKN c) ?_
       refine mem_smul_top_of_forall_dual _ _ fun x₀ => ?_
       obtain ⟨y, hy⟩ := exists_dual_descent hπ hρ hker (x₀ ∘ₗ N.projection K hKN.symm)
-      have hyF : y ∈ F₀.dualAnnihilator :=
-        (hR y).mpr ⟨
-          x₀ ∘ₗ N.projection K hKN.symm,
-          by
-            rw [mem_dualAnnihilator]
-            intro k hk
-            simp [hNK k hk],
-          hy
-        ⟩
+      have hyF : y ∈ F₀.dualAnnihilator := (hR y).mpr ⟨x₀ ∘ₗ N.projection K hKN.symm, by
+        rw [mem_dualAnnihilator]
+        intro k hk
+        simp [hNK k hk], hy⟩
       rw [RingHom.mem_ker, ← LinearMap.comp_apply, ← hy]
       exact (mem_dualAnnihilator _).mp hyF _ hc
 

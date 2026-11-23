@@ -1,7 +1,53 @@
 module
 
-public import Mathlib
 public import GroundTheory.HeightsAndTheta.Heights.OrbitLimits.StatementsBlockTrdeg
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArithmeticIntersection.MixedFieldContraction.GenericFibreKerTarget
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
@@ -11,8 +57,7 @@ noncomputable section
 
 namespace GroundTheory.Heights₂.Heights
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
-  ReciprocityTheory.ChartRestriction.G.AI.I1 Algebra Cardinal
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.AI.I1 Algebra Cardinal
 
 namespace BlockTrdeg
 
@@ -24,9 +69,9 @@ section Denominators
 
 variable {σ : Type} {L : Type} [Field L] [Algebra ℚ L]
 
-theorem exists_nat_mul_mem_range
-    (ψ : MvPolynomial σ ℤ →+* L) {y : L} (hy : y ∈ adjoin ℚ (Set.range fun p ↦ ψ (X p)))
-    : ∃ n : ℕ, n ≠ 0 ∧ (n : L) * y ∈ ψ.range := by
+theorem exists_nat_mul_mem_range (ψ : MvPolynomial σ ℤ →+* L) {y : L}
+    (hy : y ∈ adjoin ℚ (Set.range fun p ↦ ψ (X p))) :
+    ∃ n : ℕ, n ≠ 0 ∧ (n : L) * y ∈ ψ.range := by
   induction hy using Algebra.adjoin_induction with
   | mem x hx =>
     obtain ⟨p, rfl⟩ := hx
@@ -49,10 +94,9 @@ theorem exists_nat_mul_mem_range
     rw [e]
     exact mul_mem hnx hmy
 
-theorem exists_nat_mul_mem_range_finset
-    (ψ : MvPolynomial σ ℤ →+* L) (s : Finset L)
-    (hs : ∀ y ∈ s, y ∈ adjoin ℚ (Set.range fun p ↦ ψ (X p)))
-    : ∃ n : ℕ, n ≠ 0 ∧ ∀ y ∈ s, (n : L) * y ∈ ψ.range := by
+theorem exists_nat_mul_mem_range_finset (ψ : MvPolynomial σ ℤ →+* L) (s : Finset L)
+    (hs : ∀ y ∈ s, y ∈ adjoin ℚ (Set.range fun p ↦ ψ (X p))) :
+    ∃ n : ℕ, n ≠ 0 ∧ ∀ y ∈ s, (n : L) * y ∈ ψ.range := by
   induction s using Finset.induction_on with
   | empty => exact ⟨1, one_ne_zero, by simp⟩
   | @insert a s ha ih =>
@@ -73,11 +117,11 @@ variable {K : Type} {K' : Type} [Fintype K'] {ι : K → Type} {ι' : K' → Typ
 
 abbrev Forgotten (κ : K → K') : Type := {k' : K' // k' ∉ Set.range κ}
 
-def forgetWeight (κ : K → K') : (Σ k', ι' k') → (Forgotten κ → ℕ) := fun q k ↦
-  if q.1 = k.1 then 1 else 0
+def forgetWeight (κ : K → K') : (Σ k', ι' k') → (Forgotten κ → ℕ) :=
+  fun q k ↦ if q.1 = k.1 then 1 else 0
 
-theorem weight_forgetWeight (κ : K → K') (m : (Σ k', ι' k') →₀ ℕ) (k : Forgotten κ)
-    : Finsupp.weight (forgetWeight (ι' := ι') κ) m k = ∑ i, m ⟨k.1, i⟩ := by
+theorem weight_forgetWeight (κ : K → K') (m : (Σ k', ι' k') →₀ ℕ) (k : Forgotten κ) :
+    Finsupp.weight (forgetWeight (ι' := ι') κ) m k = ∑ i, m ⟨k.1, i⟩ := by
   rw [Finsupp.weight_apply, Finsupp.sum_fintype _ _ (by intro; simp), Finset.sum_apply,
     Fintype.sum_sigma, Finset.sum_eq_single k.1]
   · simp [forgetWeight]
@@ -85,8 +129,8 @@ theorem weight_forgetWeight (κ : K → K') (m : (Σ k', ι' k') →₀ ℕ) (k 
     simp [forgetWeight, hb]
   · simp
 
-theorem isHomogeneous_forgetWeight (κ : K → K') {P : Ideal (MRing ι')} (h : IsMultiHomogIdeal P)
-    : P.IsHomogeneous (weightedHomogeneousSubmodule ℤ (forgetWeight (ι' := ι') κ)) := by
+theorem isHomogeneous_forgetWeight (κ : K → K') {P : Ideal (MRing ι')} (h : IsMultiHomogIdeal P) :
+    P.IsHomogeneous (weightedHomogeneousSubmodule ℤ (forgetWeight (ι' := ι') κ)) := by
   obtain ⟨S, hS, rfl⟩ := h
   refine Ideal.homogeneous_span _ S fun x hx ↦ ?_
   obtain ⟨a, ha⟩ := hS x hx
@@ -96,12 +140,11 @@ theorem isHomogeneous_forgetWeight (κ : K → K') {P : Ideal (MRing ι')} (h : 
   rw [weight_forgetWeight]
   exact ha d (mem_support_iff.mpr hd) k.1
 
+
 omit [Fintype K'] [∀ k, Fintype (ι' k)] in
-theorem isWeightedHomogeneous_rename
-    (κ : K → K')
-    {v : (Σ k, ι k) → (Σ k', ι' k')} (hv : ∀ p, (v p).1 ∈ Set.range κ)
-    (g : MvPolynomial (Σ k, ι k) ℤ)
-    : IsWeightedHomogeneous (forgetWeight κ) (rename v g) 0 := by
+theorem isWeightedHomogeneous_rename (κ : K → K') {v : (Σ k, ι k) → (Σ k', ι' k')}
+    (hv : ∀ p, (v p).1 ∈ Set.range κ) (g : MvPolynomial (Σ k, ι k) ℤ) :
+    IsWeightedHomogeneous (forgetWeight κ) (rename v g) 0 := by
   induction g using MvPolynomial.induction_on with
   | C a => rw [rename_C]; exact isWeightedHomogeneous_C _ _
   | add p q hp hq => rw [map_add (f := _)]; exact hp.add hq
@@ -119,15 +162,14 @@ theorem isWeightedHomogeneous_rename
 def forgetMonomial (κ : K → K') (i : ∀ k : Forgotten κ, ι' k.1) (a : Forgotten κ →₀ ℕ) : MRing ι' :=
   ∏ k, X ⟨k.1, i k⟩ ^ a k
 
+
 omit [∀ k, Fintype (ι' k)] in
-theorem isWeightedHomogeneous_forgetMonomial
-    (κ : K → K') (i : ∀ k : Forgotten κ, ι' k.1) (a : Forgotten κ →₀ ℕ)
-    : IsWeightedHomogeneous (forgetWeight κ) (forgetMonomial κ i a) ⇑a := by
-  have :=
-    IsWeightedHomogeneous.prod Finset.univ
-      (fun k ↦ (X ⟨k.1, i k⟩ : MRing ι') ^ a k)
-      (fun k ↦ a k • forgetWeight κ ⟨k.1, i k⟩)
-      fun k _ ↦ (isWeightedHomogeneous_X ℤ (forgetWeight κ) _).pow (a k)
+theorem isWeightedHomogeneous_forgetMonomial (κ : K → K') (i : ∀ k : Forgotten κ, ι' k.1)
+    (a : Forgotten κ →₀ ℕ) :
+    IsWeightedHomogeneous (forgetWeight κ) (forgetMonomial κ i a) ⇑a := by
+  have := IsWeightedHomogeneous.prod Finset.univ (fun k ↦ (X ⟨k.1, i k⟩ : MRing ι') ^ a k)
+    (fun k ↦ a k • forgetWeight κ ⟨k.1, i k⟩)
+    fun k _ ↦ (isWeightedHomogeneous_X ℤ (forgetWeight κ) _).pow (a k)
   unfold forgetMonomial
   convert this using 1
   funext j
@@ -141,44 +183,35 @@ end Grading
 
 section Independence
 
-variable
-  {K : Type} [Fintype K]
-  {ι : K → Type} [∀ k, Fintype (ι k)]
-  {K' : Type} [Fintype K']
-  {ι' : K' → Type} [∀ k, Fintype (ι' k)]
-  {κ : K → K'} {v : (Σ k, ι k) → (Σ k', ι' k')} {P' : Ideal (MRing ι')} {L : Type}
-  [Field L] [Algebra ℚ L]
-  {φ : MRing ι' →+* L}
+variable {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)]
+  {K' : Type} [Fintype K'] {ι' : K' → Type} [∀ k, Fintype (ι' k)]
+  {κ : K → K'} {v : (Σ k, ι k) → (Σ k', ι' k')} {P' : Ideal (MRing ι')}
+  {L : Type} [Field L] [Algebra ℚ L] {φ : MRing ι' →+* L}
+
 
 omit [Fintype K] [∀ k, Fintype (ι k)] in
-theorem algebraicIndependent_forgotten
-    (hv : ∀ p, (v p).1 = κ p.1) (hP : IsMultiHomogIdeal P') (hprime : P'.IsPrime)
-    (hker : RingHom.ker φ = P')
-    (i : ∀ k : Forgotten κ, ι' k.1) (hi : ∀ k, (X ⟨k.1, i k⟩ : MRing ι') ∉ P')
-    (S : Subalgebra ℚ L) (hS : S ≤ adjoin ℚ (Set.range fun p : Σ k, ι k ↦ φ (X (v p))))
-    : AlgebraicIndependent S (fun k : Forgotten κ ↦ φ (X ⟨k.1, i k⟩)) := by
+theorem algebraicIndependent_forgotten (hv : ∀ p, (v p).1 = κ p.1) (hP : IsMultiHomogIdeal P')
+    (hprime : P'.IsPrime) (hker : RingHom.ker φ = P') (i : ∀ k : Forgotten κ, ι' k.1)
+    (hi : ∀ k, (X ⟨k.1, i k⟩ : MRing ι') ∉ P') (S : Subalgebra ℚ L)
+    (hS : S ≤ adjoin ℚ (Set.range fun p : Σ k, ι k ↦ φ (X (v p)))) :
+    AlgebraicIndependent S (fun k : Forgotten κ ↦ φ (X ⟨k.1, i k⟩)) := by
   rw [algebraicIndependent_iff]
   intro p hp
   set ψ : MvPolynomial (Σ k, ι k) ℤ →+* L := φ.comp (rename v).toRingHom with hψ
-  have hA
-      : adjoin ℚ (Set.range fun p : Σ k, ι k ↦ φ (X (v p)))
-        = adjoin ℚ (Set.range fun p ↦ ψ (X p)) := by
+  have hA : adjoin ℚ (Set.range fun p : Σ k, ι k ↦ φ (X (v p))) = adjoin ℚ (Set.range fun p ↦ ψ (X p)) := by
     simp [ψ]
-  obtain ⟨N, hN, hNs⟩ :=
-    exists_nat_mul_mem_range_finset ψ
-      (p.support.image fun a ↦ ((AddMonoidAlgebra.coeff p a : S) : L))
-      (by
-        intro y hy
-        obtain ⟨a, -, rfl⟩ := Finset.mem_image.mp hy
-        rw [← hA]
-        exact hS (AddMonoidAlgebra.coeff p a).2)
+  obtain ⟨N, hN, hNs⟩ := exists_nat_mul_mem_range_finset ψ (p.support.image fun a ↦ ((AddMonoidAlgebra.coeff p a : S) : L)) (by
+    intro y hy
+    obtain ⟨a, -, rfl⟩ := Finset.mem_image.mp hy
+    rw [← hA]
+    exact hS (AddMonoidAlgebra.coeff p a).2)
   choose g hg using fun a : p.support ↦ RingHom.mem_range.mp (hNs _ (Finset.mem_image_of_mem _ a.2))
   set H : MRing ι' := ∑ a : p.support, rename v (g a) * forgetMonomial κ i a.1 with hHdef
   have hH : H ∈ P' := by
     rw [← hker, RingHom.mem_ker]
     have e1 : φ H = (N : L) * aeval (fun k : Forgotten κ ↦ φ (X ⟨k.1, i k⟩)) p := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [hHdef, map_sum, aeval_def, eval₂_eq', Finset.mul_sum, ← Finset.sum_coe_sort p.support]
+
+      rw [hHdef, map_sum, aeval_def, eval₂_eq', Finset.mul_sum, ← Finset.sum_coe_sort p.support]
       refine Finset.sum_congr rfl fun a _ ↦ ?_
       rw [map_mul, show φ (rename v (g a)) = ψ (g a) from rfl, hg a, forgetMonomial, map_prod]
       simp only [map_pow, mul_assoc]
@@ -189,22 +222,18 @@ theorem algebraicIndependent_forgotten
   by_cases ha : a ∈ p.support
   swap
   · exact notMem_support_iff.mp ha
-  have hhom
-      : ∀ b : p.support,
-        IsWeightedHomogeneous (forgetWeight κ) (rename v (g b) * forgetMonomial κ i b.1) ⇑b.1 := by
+  have hhom : ∀ b : p.support, IsWeightedHomogeneous (forgetWeight κ)
+      (rename v (g b) * forgetMonomial κ i b.1) ⇑b.1 := by
     intro b
-    have :=
-      (isWeightedHomogeneous_rename κ (fun p ↦ ⟨p.1, (hv p).symm⟩) (g b)).mul
-        (isWeightedHomogeneous_forgetMonomial κ i b.1)
+    have := (isWeightedHomogeneous_rename κ (fun p ↦ ⟨p.1, (hv p).symm⟩) (g b)).mul
+      (isWeightedHomogeneous_forgetMonomial κ i b.1)
     rwa [zero_add] at this
-  have hcomp :=
-    weightedHomogeneousComponent_mem_of_mem ℤ (forgetWeight κ) (isHomogeneous_forgetWeight κ hP) hH
-      (⇑a)
-  have e2
-      : weightedHomogeneousComponent (forgetWeight κ) (⇑a) H
-        = rename v (g ⟨a, ha⟩) * forgetMonomial κ i a := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hHdef, map_sum, Finset.sum_eq_single ⟨a, ha⟩]
+  have hcomp := weightedHomogeneousComponent_mem_of_mem ℤ (forgetWeight κ)
+    (isHomogeneous_forgetWeight κ hP) hH (⇑a)
+  have e2 : weightedHomogeneousComponent (forgetWeight κ) (⇑a) H =
+      rename v (g ⟨a, ha⟩) * forgetMonomial κ i a := by
+
+    rw [hHdef, map_sum, Finset.sum_eq_single ⟨a, ha⟩]
     · exact (hhom ⟨a, ha⟩).weightedHomogeneousComponent_same
     · intro b _ hb
       exact (hhom b).weightedHomogeneousComponent_ne _
@@ -247,8 +276,7 @@ theorem proof : Statement := by
     rintro (k | j)
     · exact subset_adjoin ⟨_, rfl⟩
     · exact hAB (x j).2
-  have hy : AlgebraicIndependent ℚ (fun j ↦ (⟨_, hmem j⟩ : B)) :=
-    AlgebraicIndependent.of_comp B.val hind
+  have hy : AlgebraicIndependent ℚ (fun j ↦ (⟨_, hmem j⟩ : B)) := AlgebraicIndependent.of_comp B.val hind
   have hle := hy.cardinalMk_le_trdeg
   have hcard : ((Fintype.card K' - Fintype.card K : ℕ) : Cardinal) = #(Forgotten κ) := by
     rw [Cardinal.mk_fintype, Fintype.card_subtype_compl, Set.card_range_of_injective hκ]

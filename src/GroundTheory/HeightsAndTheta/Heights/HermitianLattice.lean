@@ -1,6 +1,55 @@
 module
 
-public import Mathlib
+public import Mathlib.LinearAlgebra.TensorProduct.Pi
+public import Mathlib.NumberTheory.Cyclotomic.Basic
+public import Mathlib.NumberTheory.NumberField.InfinitePlace.Embeddings
+public import Mathlib.RingTheory.Coalgebra.IsFrobenius
+public import Mathlib.RingTheory.HopfAlgebra.Basic
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.CStarAlgebra.Module.Constructions
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -30,14 +79,14 @@ theorem smul_def (a : 𝓞 K) (z : ComplexAt σ) : a • z = ofComplex σ (σ (a
 theorem complex_smul_def (c : ℂ) (z : ComplexAt σ) : c • z = ofComplex σ c * z := rfl
 
 instance : SMulCommClass (𝓞 K) ℂ (ComplexAt σ) where
-  smul_comm a c z := by rw [smul_def, complex_smul_def, complex_smul_def, smul_def, mul_left_comm]
+  smul_comm a c z := by
+    rw [smul_def, complex_smul_def, complex_smul_def, smul_def, mul_left_comm]
 
 def conj : ComplexAt σ →+* ComplexAt (conjugate σ) :=
   (ofComplex (conjugate σ)).toRingHom.comp ((starRingEnd ℂ).comp (ofComplex σ).symm.toRingHom)
 
-theorem conj_ofComplex (z : ℂ)
-    : conj σ (ofComplex σ z) = ofComplex (conjugate σ) (starRingEnd ℂ z) :=
-  rfl
+theorem conj_ofComplex (z : ℂ) :
+    conj σ (ofComplex σ z) = ofComplex (conjugate σ) (starRingEnd ℂ z) := rfl
 
 def conjLinear : ComplexAt σ →ₗ[𝓞 K] ComplexAt (conjugate σ) where
   toFun := conj σ
@@ -70,8 +119,8 @@ variable {σ E}
 @[simp]
 theorem conjMap_tmul (z : ComplexAt σ) (e : E) : conjMap σ E (z ⊗ₜ e) = conj σ z ⊗ₜ e := rfl
 
-theorem conjMap_smul (c : ℂ) (x : Fibre σ E)
-    : conjMap σ E (c • x) = starRingEnd ℂ c • conjMap σ E x := by
+theorem conjMap_smul (c : ℂ) (x : Fibre σ E) :
+    conjMap σ E (c • x) = starRingEnd ℂ c • conjMap σ E x := by
   induction x using TensorProduct.induction_on with
   | zero => simp only [smul_zero, map_zero]
   | tmul z e => rw [smul_tmul', conjMap_tmul, conjMap_tmul, smul_tmul', conj_smul]
@@ -79,34 +128,31 @@ theorem conjMap_smul (c : ℂ) (x : Fibre σ E)
 
 end Fibre
 
-structure HermitianMetric
-    (K : Type*) [Field K] [NumberField K]
-    (E : Type*)
-    [AddCommGroup E] [Module (𝓞 K) E] [Module.Finite (𝓞 K) E] [Module.Projective (𝓞 K) E] where
+structure HermitianMetric (K : Type*) [Field K] [NumberField K] (E : Type*) [AddCommGroup E]
+    [Module (𝓞 K) E] [Module.Finite (𝓞 K) E] [Module.Projective (𝓞 K) E] where
+
   form : ∀ σ : K →+* ℂ, InnerProductSpace.Core ℂ (Fibre σ E)
-  form_conj
-    : ∀ (σ : K →+* ℂ) (x y : Fibre σ E),
-      (form (conjugate σ)).inner (conjMap σ E x) (conjMap σ E y)
-        = starRingEnd ℂ ((form σ).inner x y)
+
+  form_conj : ∀ (σ : K →+* ℂ) (x y : Fibre σ E),
+    (form (conjugate σ)).inner (conjMap σ E x) (conjMap σ E y) = starRingEnd ℂ ((form σ).inner x y)
 
 structure HermitianBundle.{u} (K : Type*) [Field K] [NumberField K] where
+
   carrier : Type u
   [instAddCommGroup : AddCommGroup carrier]
   [instModule : Module (𝓞 K) carrier]
   [instFinite : Module.Finite (𝓞 K) carrier]
   [instProjective : Module.Projective (𝓞 K) carrier]
+
   metric : HermitianMetric K carrier
 
-attribute [instance]
-  HermitianBundle.instAddCommGroup HermitianBundle.instModule HermitianBundle.instFinite
-  HermitianBundle.instProjective
+attribute [instance] HermitianBundle.instAddCommGroup HermitianBundle.instModule
+  HermitianBundle.instFinite HermitianBundle.instProjective
 
 @[instance_reducible]
-def coreOfInjective
-    {𝕜 V W : Type*}
-    [RCLike 𝕜] [AddCommGroup V] [Module 𝕜 V] [NormedAddCommGroup W] [InnerProductSpace 𝕜 W]
-    (f : V →ₗ[𝕜] W) (hf : Function.Injective f)
-    : InnerProductSpace.Core 𝕜 V where
+def coreOfInjective {𝕜 V W : Type*} [RCLike 𝕜] [AddCommGroup V] [Module 𝕜 V]
+    [NormedAddCommGroup W] [InnerProductSpace 𝕜 W] (f : V →ₗ[𝕜] W)
+    (hf : Function.Injective f) : InnerProductSpace.Core 𝕜 V where
   inner x y := inner 𝕜 (f x) (f y)
   conj_inner_symm x y := inner_conj_symm (f x) (f y)
   re_inner_nonneg x := inner_self_nonneg
@@ -114,13 +160,10 @@ def coreOfInjective
   smul_left x y r := by simp only [map_smul, inner_smul_left]
   definite x h := hf (by rw [map_zero]; exact inner_self_eq_zero.mp h)
 
-theorem coreOfInjective_inner
-    {𝕜 V W : Type*}
-    [RCLike 𝕜] [AddCommGroup V] [Module 𝕜 V] [NormedAddCommGroup W] [InnerProductSpace 𝕜 W]
-    (f : V →ₗ[𝕜] W) (hf : Function.Injective f)
-    (x y : V)
-    : (coreOfInjective f hf).inner x y = inner 𝕜 (f x) (f y) :=
-  rfl
+theorem coreOfInjective_inner {𝕜 V W : Type*} [RCLike 𝕜] [AddCommGroup V] [Module 𝕜 V]
+    [NormedAddCommGroup W] [InnerProductSpace 𝕜 W] (f : V →ₗ[𝕜] W)
+    (hf : Function.Injective f) (x y : V) :
+    (coreOfInjective f hf).inner x y = inner 𝕜 (f x) (f y) := rfl
 
 section Examples
 
@@ -133,20 +176,18 @@ def integersCoord (σ : K →+* ℂ) : Fibre σ (𝓞 K) ≃ₗ[ℂ] ℂ :=
 variable {K}
 
 omit [NumberField K] in
-theorem integersCoord_tmul (σ : K →+* ℂ) (z : ComplexAt σ) (a : 𝓞 K)
-    : integersCoord K σ (z ⊗ₜ a) = σ (a : K) * (ofComplex σ).symm z :=
-  rfl
+theorem integersCoord_tmul (σ : K →+* ℂ) (z : ComplexAt σ) (a : 𝓞 K) :
+    integersCoord K σ (z ⊗ₜ a) = σ (a : K) * (ofComplex σ).symm z := rfl
 
 omit [NumberField K] in
-theorem integersCoord_conjMap (σ : K →+* ℂ) (x : Fibre σ (𝓞 K))
-    : integersCoord K (conjugate σ) (conjMap σ (𝓞 K) x) = starRingEnd ℂ (integersCoord K σ x) := by
+theorem integersCoord_conjMap (σ : K →+* ℂ) (x : Fibre σ (𝓞 K)) :
+    integersCoord K (conjugate σ) (conjMap σ (𝓞 K) x) = starRingEnd ℂ (integersCoord K σ x) := by
   induction x using TensorProduct.induction_on with
   | zero => simp only [map_zero]
   | tmul z a =>
     rw [conjMap_tmul, integersCoord_tmul, integersCoord_tmul, map_mul]
     rfl
-  | add x y hx hy =>
-    rw [map_add (f := _), map_add (f := _), hx, hy, map_add (f := _), map_add (f := _)]
+  | add x y hx hy => rw [map_add (f := _), map_add (f := _), hx, hy, map_add (f := _), map_add (f := _)]
 
 variable (K)
 
@@ -156,13 +197,13 @@ def HermitianMetric.integers : HermitianMetric K (𝓞 K) where
     simp only [coreOfInjective_inner, LinearEquiv.coe_coe, integersCoord_conjMap,
       RCLike.inner_apply, map_mul, RingHomCompTriple.comp_apply, RingHom.id_apply]
 
-theorem HermitianMetric.integers_inner (σ : K →+* ℂ) (z w : ComplexAt σ) (a b : 𝓞 K)
-    : ((HermitianMetric.integers K).form σ).inner (z ⊗ₜ a) (w ⊗ₜ b)
-      = starRingEnd ℂ (σ (a : K) * (ofComplex σ).symm z) * (σ (b : K) * (ofComplex σ).symm w) := by
+theorem HermitianMetric.integers_inner (σ : K →+* ℂ) (z w : ComplexAt σ) (a b : 𝓞 K) :
+    ((HermitianMetric.integers K).form σ).inner (z ⊗ₜ a) (w ⊗ₜ b) =
+      starRingEnd ℂ (σ (a : K) * (ofComplex σ).symm z) * (σ (b : K) * (ofComplex σ).symm w) := by
   rw [mul_comm]; rfl
 
-def standardCoord (σ : K →+* ℂ) (ι : Type*) [Fintype ι] [DecidableEq ι]
-    : Fibre σ (ι → 𝓞 K) ≃ₗ[ℂ] EuclideanSpace ℂ ι :=
+def standardCoord (σ : K →+* ℂ) (ι : Type*) [Fintype ι] [DecidableEq ι] :
+    Fibre σ (ι → 𝓞 K) ≃ₗ[ℂ] EuclideanSpace ℂ ι :=
   ((piScalarRight (𝓞 K) (ComplexAt σ) (ComplexAt σ) ι).restrictScalars ℂ).trans
     ((LinearEquiv.piCongrRight fun _ ↦ (ofComplex σ).symm.toLinearEquiv).trans
       (WithLp.linearEquiv 2 ℂ (ι → ℂ)).symm)
@@ -170,39 +211,36 @@ def standardCoord (σ : K →+* ℂ) (ι : Type*) [Fintype ι] [DecidableEq ι]
 variable {K}
 
 omit [NumberField K] in
-theorem standardCoord_tmul
-    (σ : K →+* ℂ) (ι : Type*) [Fintype ι] [DecidableEq ι] (z : ComplexAt σ) (v : ι → 𝓞 K) (i : ι)
-    : standardCoord K σ ι (z ⊗ₜ v) i = σ (v i : K) * (ofComplex σ).symm z :=
-  rfl
+theorem standardCoord_tmul (σ : K →+* ℂ) (ι : Type*) [Fintype ι] [DecidableEq ι]
+    (z : ComplexAt σ) (v : ι → 𝓞 K) (i : ι) :
+    standardCoord K σ ι (z ⊗ₜ v) i = σ (v i : K) * (ofComplex σ).symm z := rfl
 
 omit [NumberField K] in
-theorem standardCoord_conjMap
-    (σ : K →+* ℂ) (ι : Type*) [Fintype ι] [DecidableEq ι] (x : Fibre σ (ι → 𝓞 K)) (i : ι)
-    : standardCoord K (conjugate σ) ι (conjMap σ (ι → 𝓞 K) x) i
-      = starRingEnd ℂ (standardCoord K σ ι x i) := by
+theorem standardCoord_conjMap (σ : K →+* ℂ) (ι : Type*) [Fintype ι] [DecidableEq ι]
+    (x : Fibre σ (ι → 𝓞 K)) (i : ι) :
+    standardCoord K (conjugate σ) ι (conjMap σ (ι → 𝓞 K) x) i =
+      starRingEnd ℂ (standardCoord K σ ι x i) := by
   induction x using TensorProduct.induction_on with
   | zero => simp only [map_zero, PiLp.zero_apply]
   | tmul z v =>
     rw [conjMap_tmul, standardCoord_tmul, standardCoord_tmul, map_mul]
     rfl
-  | add x y hx hy =>
-    rw [map_add (f := _), map_add (f := _), PiLp.add_apply, hx, hy, map_add (f := _),
-      PiLp.add_apply, map_add (f := _)]
+  | add x y hx hy => rw [map_add (f := _), map_add (f := _), PiLp.add_apply, hx, hy, map_add (f := _), PiLp.add_apply, map_add (f := _)]
 
 variable (K)
 
-def HermitianMetric.standard (ι : Type*) [Fintype ι] [DecidableEq ι]
-    : HermitianMetric K (ι → 𝓞 K) where
+def HermitianMetric.standard (ι : Type*) [Fintype ι] [DecidableEq ι] :
+    HermitianMetric K (ι → 𝓞 K) where
   form σ := coreOfInjective (standardCoord K σ ι).toLinearMap (standardCoord K σ ι).injective
   form_conj σ x y := by
-    set_option synthInstance.maxHeartbeats 100000 in
-    simp only [coreOfInjective_inner, LinearEquiv.coe_coe, PiLp.inner_apply, RCLike.inner_apply,
-      standardCoord_conjMap, map_sum, map_mul, Complex.conj_conj]
 
-theorem HermitianMetric.standard_inner
-    (ι : Type*) [Fintype ι] [DecidableEq ι] (σ : K →+* ℂ) (x y : Fibre σ (ι → 𝓞 K))
-    : ((HermitianMetric.standard K ι).form σ).inner x y
-      = ∑ i, starRingEnd ℂ (standardCoord K σ ι x i) * standardCoord K σ ι y i := by
+    simp only [coreOfInjective_inner, LinearEquiv.coe_coe, PiLp.inner_apply, RCLike.inner_apply,
+    standardCoord_conjMap, map_sum, map_mul, Complex.conj_conj]
+
+theorem HermitianMetric.standard_inner (ι : Type*) [Fintype ι] [DecidableEq ι] (σ : K →+* ℂ)
+    (x y : Fibre σ (ι → 𝓞 K)) :
+    ((HermitianMetric.standard K ι).form σ).inner x y =
+      ∑ i, starRingEnd ℂ (standardCoord K σ ι x i) * standardCoord K σ ι y i := by
   change inner ℂ (standardCoord K σ ι x) (standardCoord K σ ι y) = _
   simp only [PiLp.inner_apply, RCLike.inner_apply]
   exact Finset.sum_congr rfl fun i _ ↦ mul_comm _ _
@@ -225,9 +263,9 @@ def gaussianIntegers : HermitianBundle GaussianField := HermitianBundle.integers
 def gaussianStandard (n : ℕ) : HermitianBundle GaussianField :=
   HermitianBundle.standard GaussianField n
 
-theorem HermitianMetric.standard_inner_single
-    (K : Type*) [Field K] [NumberField K] (n : ℕ) (σ : K →+* ℂ) (i : Fin n)
-    : ((HermitianMetric.standard K (Fin n)).form σ).inner (1 ⊗ₜ Pi.single i 1) (1 ⊗ₜ Pi.single i 1)
+theorem HermitianMetric.standard_inner_single (K : Type*) [Field K] [NumberField K] (n : ℕ)
+    (σ : K →+* ℂ) (i : Fin n) :
+    ((HermitianMetric.standard K (Fin n)).form σ).inner (1 ⊗ₜ Pi.single i 1) (1 ⊗ₜ Pi.single i 1)
       = 1 := by
   rw [HermitianMetric.standard_inner, Finset.sum_eq_single i]
   · simp only [standardCoord_tmul, Pi.single_eq_same, map_one]

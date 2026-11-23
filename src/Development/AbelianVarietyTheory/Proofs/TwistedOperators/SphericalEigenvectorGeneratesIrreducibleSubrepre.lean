@@ -1,6 +1,64 @@
 module
 
-public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.ConstMemBddAut
+public import Development.AbelianVarietyTheory.Definitions.Foundations.IsSatVecUOfIsSphericalU
+import Formalism.LocalRingCardinality.DataHost
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
+import Development.AbelianVarietyTheory.Definitions.Divisors.EqOfHasValueAtInfinite
+import Development.AbelianVarietyTheory.Definitions.Foundations.EventuallyNormFinLeOne
+import Development.AbelianVarietyTheory.Definitions.TwistedInnerProducts.RealLowestKTypeCoeffSquareIntegrable
+import Development.AbelianVarietyTheory.Proofs.DivisorProofs.InnerProductFormula
+import Development.AbelianVarietyTheory.Proofs.TwistedOperators.ConstMemBddAut
+import Formalism.LocalToGlobal.BesselHermitianTheta.NoncompactGapAtLeastRange
+import Formalism.LocalToGlobal.Divisibility.CoefMod
+import Formalism.LocalToGlobal.IndefiniteReal.LinksDefs
+public import Formalism.LocalToGlobal.IndefiniteReal.SubgroupCharExtensionOneApply
+public import Formalism.SatakeDualWeyl.StatementG
+import Formalism.SharpRestriction.GlobalSchurBounds.GeneralLinearActions.GapAtLeast
+import Formalism.SharpRestriction.GlobalSchurBounds.GeneralLinearActions.GenusMassVolumes
 
 @[expose] public section
 
@@ -152,8 +210,8 @@ theorem pairing_translate_eq_zero
     rw [hh]
     exact DoubleCoset.mem_doubleCoset.2 ⟨1, K.one_mem, h, h.2, by simp⟩
   have h0 : B y (c • x) = 0 := by simp [hyx]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [← hc', hsum, map_sum, Finset.sum_congr rfl hterm, Finset.sum_const, nsmul_eq_mul] at h0
+
+  rw [← hc', hsum, map_sum, Finset.sum_congr rfl hterm, Finset.sum_const, nsmul_eq_mul] at h0
   have hcard : ((hfin.toFinset.card : ℕ) : ℂ) ≠ 0 :=
     Nat.cast_ne_zero.2 (Finset.card_ne_zero.2 ⟨_, hne⟩)
   exact (mul_eq_zero.1 h0).resolve_left hcard
@@ -279,8 +337,8 @@ theorem mem_of_invariant
     exact hW _ _ hy1W
   have hzf : ∀ k ∈ K, ρ k (∑ u ∈ hfin.toFinset, u) = ∑ u ∈ hfin.toFinset, u := by
     intro k hk
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     refine Finset.sum_nbij' (ρ k) (ρ k⁻¹) ?_ ?_ ?_ ?_ (fun _ _ => rfl)
     · intro u hu
       obtain ⟨l, rfl⟩ := (hF u).1 hu
@@ -306,8 +364,8 @@ theorem mem_of_invariant
       _ = B y₁ x := hB _ _ _
   have hmem : y₁ ∈ hfin.toFinset := (hF _).2 ⟨1, by simp⟩
   have hBz : B (∑ u ∈ hfin.toFinset, u) x ≠ 0 := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, LinearMap.sum_apply, Finset.sum_congr rfl hterm, Finset.sum_const, nsmul_eq_mul]
+
+    rw [map_sum, LinearMap.sum_apply, Finset.sum_congr rfl hterm, Finset.sum_const, nsmul_eq_mul]
     exact mul_ne_zero (Nat.cast_ne_zero.2 (Finset.card_ne_zero.2 ⟨_, hmem⟩)) hy1x
   have hc0 : c ≠ 0 := by
     rintro rfl

@@ -1,24 +1,71 @@
 module
 
 public import Development.AutomorphicArithmetic.AutomorphicVarieties.CommutativeAlgebraHeight.OfDetToDet
-public import Development.AutomorphicArithmetic.AutomorphicVarieties.CommutativeAlgebraHeight.IsLocalHom
-public import Development.AutomorphicArithmetic.AutomorphicVarieties.CommutativeAlgebraHeight.DUnit
-public import Development.AutomorphicArithmetic.AutomorphicVarieties.CommutativeAlgebraHeight.DkerOfKills
 public import Development.AutomorphicArithmetic.AutomorphicVarieties.CommutativeAlgebraHeight.BcChiTmul
 public import Development.AutomorphicArithmetic.AutomorphicVarieties.CommutativeAlgebraHeight.DKillsPoly
-public import Mathlib.RingTheory.Jacobson.Radical
-public import Mathlib.RingTheory.Jacobson.Ring
+public import Development.AutomorphicArithmetic.AutomorphicVarieties.CommutativeAlgebraHeight.DUnit
+public import Development.AutomorphicArithmetic.AutomorphicVarieties.CommutativeAlgebraHeight.DkerOfKills
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.AdicCompletion.Noetherian
+import Mathlib.RingTheory.Coalgebra.IsFrobenius
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.HopfAlgebra.Basic
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.TotallySplit
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Development.AutomorphicArithmetic.AutomorphicVarieties.CommutativeAlgebraHeight.IsLocalHom
 public import Mathlib.Algebra.MvPolynomial.Nilpotent
+public import Mathlib.RingTheory.Jacobson.Ring
 
 @[expose] public section
 
 open TensorProduct IsLocalRing Polynomial UpperTheory.V.W UpperTheory.V.Alg UpperTheory.V.CA
 
-private theorem left_inv_of_jac
-    {A E K : Type}
-    [CommRing A] [Ring E] [Algebra A E] [CommRing K] [Algebra A K] [Module.Finite A K]
-    {m : ℕ} (s : Fin m → K) (z : Fin m → E) (hz : ∀ i, z i ∈ Ring.jacobson E)
-    : ∃ v : K ⊗[A] E, v * (1 + ∑ i, s i ⊗ₜ z i) = 1 := by
+private theorem left_inv_of_jac {A E K : Type} [CommRing A] [Ring E] [Algebra A E] [CommRing K] [Algebra A K]
+    [Module.Finite A K] {m : ℕ} (s : Fin m → K) (z : Fin m → E) (hz : ∀ i, z i ∈ Ring.jacobson E) :
+    ∃ v : K ⊗[A] E, v * (1 + ∑ i, s i ⊗ₜ z i) = 1 := by
   let w : E ⊗[A] K := ∑ i, z i ⊗ₜ s i
   have hw : ∀ y : E ⊗[A] K, y * w ∈ Module.jacobson E (E ⊗[A] K) := by
     intro y
@@ -31,11 +78,10 @@ private theorem left_inv_of_jac
         simp [smul_tmul']
       rw [this]
       exact Submodule.smul_mem_smul (Ideal.mul_mem_left _ _ (hz i)) Submodule.mem_top
-  let f : E ⊗[A] K →ₗ[E] E ⊗[A] K := {
-    toFun := fun y => y * (1 + w)
-    map_add' := fun a b => add_mul _ _ _
-    map_smul' := fun e y => smul_mul_assoc e y _
-  }
+  let f : E ⊗[A] K →ₗ[E] E ⊗[A] K :=
+    { toFun := fun y => y * (1 + w)
+      map_add' := fun a b => add_mul _ _ _
+      map_smul' := fun e y => smul_mul_assoc e y _ }
   have htop : LinearMap.range f = ⊤ := by
     rcases eq_top_or_exists_le_coatom (LinearMap.range f) with h | ⟨N, hN, hle⟩
     · exact h
@@ -50,38 +96,29 @@ private theorem left_inv_of_jac
   have hv' : v * (1 + w) = 1 := hv
   have h := congrArg (Algebra.TensorProduct.comm A E K) hv'
   rw [map_mul, map_one] at h
-  set_option synthInstance.maxHeartbeats 100000 in
+
   simpa [w, map_sum] using h
 
-private theorem kills_of_jac
-    {n : ℕ} {k R : Type} [Field k] [Ring R] [Algebra k R]
-    (D : Det n k R)
-    (x : R) (hx : x ∈ Ring.jacobson R)
-    : D.Kills x := by
+private theorem kills_of_jac {n : ℕ} {k R : Type} [Field k] [Ring R] [Algebra k R] (D : Det n k R) (x : R)
+    (hx : x ∈ Ring.jacobson R) : D.Kills x := by
   refine UpperTheory.V.CA.d_kills_poly D x Set.univ (by simp) fun m h _ => ?_
   set P := D.D (MvPolynomial (Fin m) k) (1 + Det.gen h * (1 ⊗ₜ x)) with hP
-  have key
-      : ∀ (K : Type) [CommRing K] [Algebra k K] (φ : MvPolynomial (Fin m) k →ₐ[k] K),
-        φ P = D.D K (1 + ∑ i, φ (MvPolynomial.X i) ⊗ₜ (h i * x)) := by
+  have key : ∀ (K : Type) [CommRing K] [Algebra k K] (φ : MvPolynomial (Fin m) k →ₐ[k] K),
+      φ P = D.D K (1 + ∑ i, φ (MvPolynomial.X i) ⊗ₜ (h i * x)) := by
     intro K _ _ φ
     rw [hP, ← D.nat]
     congr 1
-    set_option synthInstance.maxHeartbeats 100000 in
+
     simp [Det.gen, map_sum, Finset.sum_mul]
   have hu : IsUnit P := by
     by_contra hnu
     obtain ⟨M, hM, hPM⟩ := exists_max_ideal_of_mem_nonunits hnu
     letI := Ideal.Quotient.field M
     haveI : Module.Finite k (MvPolynomial (Fin m) k ⧸ M) := finite_of_finite_type_of_isJacobsonRing _ _
-    obtain ⟨v, hv⟩ :=
-      left_inv_of_jac (A := k)
-        (fun i => Ideal.Quotient.mkₐ k M (MvPolynomial.X i))
-        (fun i => h i * x)
-        (fun i => Ideal.mul_mem_left _ _ hx)
+    obtain ⟨v, hv⟩ := left_inv_of_jac (A := k) (fun i => Ideal.Quotient.mkₐ k M (MvPolynomial.X i))
+      (fun i => h i * x) (fun i => Ideal.mul_mem_left _ _ hx)
     have h1 := congrArg (D.D _) hv
-    rw [map_mul, map_one, ← key, Ideal.Quotient.mkₐ_eq_mk, Ideal.Quotient.eq_zero_iff_mem.2 hPM,
-        mul_zero]
-      at h1
+    rw [map_mul, map_one, ← key, Ideal.Quotient.mkₐ_eq_mk, Ideal.Quotient.eq_zero_iff_mem.2 hPM, mul_zero] at h1
     exact zero_ne_one h1
   obtain ⟨c, -, hc⟩ := MvPolynomial.isUnit_iff_eq_C_of_isReduced.1 hu
   have h0 := key k (MvPolynomial.aeval fun _ => 0)
@@ -89,12 +126,8 @@ private theorem kills_of_jac
   simp at h0
   simp [h0]
 
-theorem UpperTheory.V.CA.d_rad
-    : ∀ {n : ℕ} {A E : Type} [CommRing A] [IsLocalRing A] [Ring E] [Algebra A E] (D : Det n A E),
-      D.IsCH
-        → ∀ x : E,
-          (1 : ResidueField A) ⊗ₜ[A] x ∈ (D.baseChange (ResidueField A)).ker
-            ↔ x ∈ Ring.jacobson E := by
+theorem UpperTheory.V.CA.d_rad :
+    ∀ {n : ℕ} {A E : Type} [CommRing A] [IsLocalRing A] [Ring E] [Algebra A E] (D : Det n A E), D.IsCH → ∀ x : E, (1 : ResidueField A) ⊗ₜ[A] x ∈ (D.baseChange (ResidueField A)).ker ↔ x ∈ Ring.jacobson E := by
   intro n A E _ _ _ _ D hCH x
   rw [(UpperTheory.V.CA.d_ker _ _).1]
   constructor

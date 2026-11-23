@@ -1,6 +1,49 @@
 module
 
 public import Development.WeilBound.CoreStatements.PadicHodgeComparison.EtaleCohomologyComparison.CechPairings.InstAddCommGroup
+import Development.AbelianVarietyTheory.Proofs.SatakeParameters.FaceFaceApply
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -21,23 +64,20 @@ structure Cos (R : Type) [CommRing R] : Type (w + 1) where
   [ab : ∀ n, AddCommGroup (X n)]
   [md : ∀ n, Module R (X n)]
   δ : ∀ n, Fin (n + 2) → (X n →ₗ[R] X (n + 1))
-  rel
-    : ∀ n (j : Fin (n + 3)) (i : Fin (n + 2)) x,
-      δ (n + 1) (j.succAbove i) (δ n (i.predAbove j) x) = δ (n + 1) j (δ n i x)
+  rel : ∀ n (j : Fin (n + 3)) (i : Fin (n + 2)) x,
+    δ (n + 1) (j.succAbove i) (δ n (i.predAbove j) x) = δ (n + 1) j (δ n i x)
 
 attribute [instance] Cos.ab Cos.md
 
-def Cos.d (K : Cos.{w} R) (n : ℕ) : K.X n →ₗ[R] K.X (n + 1) :=
-  ∑ i : Fin (n + 2), (-1 : ℤ) ^ (i : ℕ) • K.δ n i
+def Cos.d (K : Cos.{w} R) (n : ℕ) : K.X n →ₗ[R] K.X (n + 1) := ∑ i : Fin (n + 2), (-1 : ℤ) ^ (i : ℕ) • K.δ n i
 
-theorem Cos.d_apply (K : Cos.{w} R) (n : ℕ) (x : K.X n)
-    : K.d n x = ∑ i : Fin (n + 2), (-1 : ℤ) ^ (i : ℕ) • K.δ n i x := by
+theorem Cos.d_apply (K : Cos.{w} R) (n : ℕ) (x : K.X n) : K.d n x = ∑ i : Fin (n + 2), (-1 : ℤ) ^ (i : ℕ) • K.δ n i x := by
   simp only [Cos.d, LinearMap.sum_apply, LinearMap.smul_apply]
 
 theorem Cos.dd (K : Cos.{w} R) (n : ℕ) (x : K.X n) : K.d (n + 1) (K.d n x) = 0 := by
   rw [Cos.d_apply, Cos.d_apply]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, map_zsmul, Finset.smul_sum, smul_smul]
+
+  simp only [map_sum, map_zsmul, Finset.smul_sum, smul_smul]
   rw [← Fintype.sum_prod_type']
   refine Finset.sum_involution (fun p _ => (p.1.succAbove p.2, p.2.predAbove p.1)) ?_ ?_ ?_ ?_
   · rintro ⟨j, i⟩ _
@@ -54,9 +94,7 @@ abbrev Cos.cx (K : Cos.{w} R) : Cx.{w} R where
   d := K.d
   dd := K.dd
 
-abbrev Cx.sub
-    (K : Cx.{w} R) (S : ∀ n, Submodule R (K.X n)) (h : ∀ n x, x ∈ S n → K.d n x ∈ S (n + 1))
-    : Cx.{w} R where
+abbrev Cx.sub (K : Cx.{w} R) (S : ∀ n, Submodule R (K.X n)) (h : ∀ n x, x ∈ S n → K.d n x ∈ S (n + 1)) : Cx.{w} R where
   X n := S n
   d n := (K.d n).restrict (h n)
   dd n x := Subtype.ext (K.dd n x.1)
@@ -112,14 +150,12 @@ def D : (∀ p q, K.X p q) →ₗ[R] (∀ p q, K.X p q) where
     funext p q
     rcases p with _ | p <;> rcases q with _ | q <;> simp [Dh, Dv, smul_comm r]
 
-theorem D_apply (x : ∀ p q, K.X p q) (p q : ℕ)
-    : K.D x p q = K.Dh x p q + (-1 : ℤ) ^ p • K.Dv x p q :=
-  rfl
+theorem D_apply (x : ∀ p q, K.X p q) (p q : ℕ) : K.D x p q = K.Dh x p q + (-1 : ℤ) ^ p • K.Dv x p q := rfl
 
 theorem DD (x : ∀ p q, K.X p q) : K.D (K.D x) = 0 := by
   funext p q
-  rcases p with _ | _ | p <;> rcases q with _ | _ | q
-    <;> simp [D_apply, Dh, Dv, K.hh, K.vv, K.hv, pow_succ]
+  rcases p with _ | _ | p <;> rcases q with _ | _ | q <;>
+    simp [D_apply, Dh, Dv, K.hh, K.vv, K.hv, pow_succ]
 
 def T (n : ℕ) : Submodule R (∀ p q, K.X p q) where
   carrier := {x | ∀ p q, p + q ≠ n → x p q = 0}
@@ -151,9 +187,8 @@ theorem sgl_ne {p q p' q' : ℕ} (x : K.X p q) (h : p' ≠ p ∨ q' ≠ q) : K.s
     simp [sgl, Pi.single_eq_of_ne (h.resolve_left fun h => h rfl)]
   · simp [sgl, Pi.single_eq_of_ne hp]
 
-theorem D_sgl (p q : ℕ) (x : K.X p q)
-    : K.D (K.sgl p q x)
-      = K.sgl (p + 1) q (K.dh p q x) + (-1 : ℤ) ^ p • K.sgl p (q + 1) (K.dv p q x) := by
+theorem D_sgl (p q : ℕ) (x : K.X p q) :
+    K.D (K.sgl p q x) = K.sgl (p + 1) q (K.dh p q x) + (-1 : ℤ) ^ p • K.sgl p (q + 1) (K.dv p q x) := by
   have h1 : K.Dh (K.sgl p q x) = K.sgl (p + 1) q (K.dh p q x) := by
     funext a b
     rcases a with _ | a
@@ -193,19 +228,15 @@ variable {K} {A : Cx.{w'} R}
 
 def AugRow.edge (e : AugRow A K) : Cx.Hom A K.tot (RingHom.id R) where
   f n := (K.inj 0 n n (Nat.zero_add n)).comp (e.ε n)
-  comm n x :=
-    Subtype.ext (by
-      change K.D (K.sgl 0 n (e.ε n x)) = K.sgl 0 (n + 1) (e.ε (n + 1) (A.d n x))
-      rw [D_sgl, e.hε, e.comm]
-      simp)
+  comm n x := Subtype.ext (by
+    change K.D (K.sgl 0 n (e.ε n x)) = K.sgl 0 (n + 1) (e.ε (n + 1) (A.d n x))
+    rw [D_sgl, e.hε, e.comm]; simp)
 
 def AugCol.edge (e : AugCol A K) : Cx.Hom A K.tot (RingHom.id R) where
   f n := (K.inj n 0 n rfl).comp (e.η n)
-  comm n x :=
-    Subtype.ext (by
-      change K.D (K.sgl n 0 (e.η n x)) = K.sgl (n + 1) 0 (e.η (n + 1) (A.d n x))
-      rw [D_sgl, e.hη, e.comm]
-      simp)
+  comm n x := Subtype.ext (by
+    change K.D (K.sgl n 0 (e.η n x)) = K.sgl (n + 1) 0 (e.η (n + 1) (A.d n x))
+    rw [D_sgl, e.hη, e.comm]; simp)
 
 variable {R' : Type} [CommRing R']
 
@@ -216,39 +247,29 @@ structure Hom (K : DCx.{w} R) (L : DCx.{w'} R') (σ : R →+* R') where
 
 variable {L : DCx.{w'} R'} {σ : R →+* R'}
 
-def Hom.row (φ : Hom K L σ) (q : ℕ) : Cx.Hom (K.row q) (L.row q) σ :=
-  ⟨fun p => φ.f p q, fun p => φ.ch p q⟩
+def Hom.row (φ : Hom K L σ) (q : ℕ) : Cx.Hom (K.row q) (L.row q) σ := ⟨fun p => φ.f p q, fun p => φ.ch p q⟩
 
-def Hom.col (φ : Hom K L σ) (p : ℕ) : Cx.Hom (K.col p) (L.col p) σ :=
-  ⟨fun q => φ.f p q, fun q => φ.cv p q⟩
+def Hom.col (φ : Hom K L σ) (p : ℕ) : Cx.Hom (K.col p) (L.col p) σ := ⟨fun q => φ.f p q, fun q => φ.cv p q⟩
 
 def Hom.tot (φ : Hom K L σ) : Cx.Hom K.tot L.tot σ where
-  f n := {
-    toFun := fun x => ⟨
-      fun p q => φ.f p q (x.1 p q),
-      fun p q h => by
+  f n :=
+    { toFun := fun x => ⟨fun p q => φ.f p q (x.1 p q), fun p q h => by
         change φ.f p q (x.1 p q) = 0
-        rw [x.2 p q h, map_zero]
-    ⟩
-    map_add' := fun x y => Subtype.ext (funext fun p => funext fun q => map_add (φ.f p q) _ _)
-    map_smul' := fun c x =>
-      Subtype.ext (funext fun p => funext fun q => LinearMap.map_smulₛₗ (φ.f p q) _ _)
-  }
-  comm n x :=
-    Subtype.ext (by
-      funext p q
-      change L.D (fun p q => φ.f p q (x.1 p q)) p q = φ.f p q (K.D x.1 p q)
-      rcases p with _ | p <;> rcases q with _ | q <;> simp [D_apply, Dh, Dv, φ.ch, φ.cv])
+        rw [x.2 p q h, map_zero]⟩
+      map_add' := fun x y => Subtype.ext (funext fun p => funext fun q => map_add (φ.f p q) _ _)
+      map_smul' := fun c x => Subtype.ext (funext fun p => funext fun q => LinearMap.map_smulₛₗ (φ.f p q) _ _) }
+  comm n x := Subtype.ext (by
+    funext p q
+    change L.D (fun p q => φ.f p q (x.1 p q)) p q = φ.f p q (K.D x.1 p q)
+    rcases p with _ | p <;> rcases q with _ | q <;> simp [D_apply, Dh, Dv, φ.ch, φ.cv])
 
 end DCx
 
 structure CosCx (R : Type) [CommRing R] : Type (w + 1) where
   K : ℕ → Cx.{w} R
   δ : ∀ n, Fin (n + 2) → Cx.Hom (K n) (K (n + 1)) (RingHom.id R)
-  rel
-    : ∀ n (j : Fin (n + 3)) (i : Fin (n + 2)) q x,
-      (δ (n + 1) (j.succAbove i)).f q ((δ n (i.predAbove j)).f q x)
-        = (δ (n + 1) j).f q ((δ n i).f q x)
+  rel : ∀ n (j : Fin (n + 3)) (i : Fin (n + 2)) q x,
+    (δ (n + 1) (j.succAbove i)).f q ((δ n (i.predAbove j)).f q x) = (δ (n + 1) j).f q ((δ n i).f q x)
 
 abbrev CosCx.cos (S : CosCx.{w} R) (q : ℕ) : Cos.{w} R where
   X p := (S.K p).X q
@@ -262,26 +283,19 @@ abbrev CosCx.dcx (S : CosCx.{w} R) : DCx.{w} R where
   hh p q := (S.cos q).dd p
   vv p q := (S.K p).dd q
   hv p q x := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [Cos.d_apply, Cos.d_apply, map_sum]
-    exact Finset.sum_congr rfl fun i _ => by
-      rw [map_zsmul]; exact congrArg _ ((S.δ p i).comm q x).symm
+
+    rw [Cos.d_apply, Cos.d_apply, map_sum]
+    exact Finset.sum_congr rfl fun i _ => by rw [map_zsmul]; exact congrArg _ ((S.δ p i).comm q x).symm
 
 structure CxPairing (K : Cx.{w} R) (L : Cx.{w'} R) (M : Cx.{w''} R) where
   μ : ∀ {p q n : ℕ}, p + q = n → (K.X p →ₗ[R] L.X q →ₗ[R] M.X n)
-  leib
-    : ∀ {p q n : ℕ} (h : p + q = n) x y,
-      M.d n (μ h x y)
-        = μ (p := p + 1) (q := q) (by omega) (K.d p x) y
-          + (-1 : ℤ) ^ p • μ (p := p) (q := q + 1) (by omega) x (L.d q y)
+  leib : ∀ {p q n : ℕ} (h : p + q = n) x y, M.d n (μ h x y) =
+    μ (p := p + 1) (q := q) (by omega) (K.d p x) y + (-1 : ℤ) ^ p • μ (p := p) (q := q + 1) (by omega) x (L.d q y)
 
-def CxPairing.cup
-    {K : Cx.{w} R} {L : Cx.{w'} R} {M : Cx.{w''} R} (P : CxPairing K L M)
-    {p q n : ℕ} (h : p + q = n) (x : K.H p) (y : L.H q)
-    : M.H n :=
+def CxPairing.cup {K : Cx.{w} R} {L : Cx.{w'} R} {M : Cx.{w''} R} (P : CxPairing K L M) {p q n : ℕ} (h : p + q = n)
+    (x : K.H p) (y : L.H q) : M.H n :=
   M.cls (P.μ h (Quotient.out x).1 (Quotient.out y).1) (by
     rw [P.leib, show K.d p (Quotient.out x).1 = 0 from (Quotient.out x).2,
-      show L.d q (Quotient.out y).1 = 0 from (Quotient.out y).2]
-    simp)
+      show L.d q (Quotient.out y).1 = 0 from (Quotient.out y).2]; simp)
 
 end CrystallineSemistableComparison

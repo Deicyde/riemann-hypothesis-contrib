@@ -1,7 +1,44 @@
 module
 
-public import Mathlib
 public import Development.WeilBound.CoreStatements.PadicHodgeComparison.EtaleCohomologyComparison.PerfectoidPullbacks.LevelChainValuations.FinDefs
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
 
 @[expose] public section
 
@@ -14,7 +51,7 @@ open CategoryTheory AlgebraicGeometry TensorProduct GlobalTheory.LogCris Divided
 
 namespace CrystallineSemistableComparison.Pb.Kap
 
-set_option maxHeartbeats 1000000
+
 
 variable
   {l : ℕ} [Fact l.Prime]
@@ -169,11 +206,11 @@ theorem kap_abs (hR : R.Facts) (hi : ∀ c, R.i c ∈ R.P) (hS : S.Good) (P : Rh
     obtain ⟨f, hf⟩ := P.ex a hM i m x
     obtain ⟨g, hg⟩ := P.ex a hM j m y
     obtain ⟨hh, hhh⟩ := P.ex a hM (i + j) m z
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hkP a hM (i + j) m z hh hhh, P.cup a hM m x y z f g hh hf hg hhh hc b b' φ, map_sum]
+
+    rw [hkP a hM (i + j) m z hh hhh, P.cup a hM m x y z f g hh hf hg hhh hc b b' φ, map_sum]
     refine Finset.sum_congr rfl fun s _ => ?_
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     refine Finset.sum_congr rfl fun s' _ => ?_
     rw [map_mul, map_mul, hkP a hM i m x f hf, hkP a hM j m y g hg,
       (hS.lev m).toB_K (φ (cupK M.q rfl (b s) (b' s'))) ⟨_, hR.o_mem _⟩ rfl]

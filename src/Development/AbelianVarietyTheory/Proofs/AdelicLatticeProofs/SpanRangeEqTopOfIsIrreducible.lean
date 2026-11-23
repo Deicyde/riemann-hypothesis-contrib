@@ -1,7 +1,51 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.Definitions.AdelicHermitianForms.AdelicPair
+public import Mathlib.Basic.Complex.Basic
+public import Mathlib.RepresentationTheory.Irreducible
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
+import Development.AbelianVarietyTheory.Definitions.AdelicHermitianForms.AdelicPair
 
 @[expose] public section
 
@@ -15,15 +59,13 @@ open scoped MonoidAlgebra
 open Matrix in
 open scoped Kronecker ComplexOrder TensorProduct in
 open scoped MonoidAlgebra in
-private theorem subalgebra_end_eq_whole_of_isSimpleModule
-    {V : Type} [AddCommGroup V] [Module ℂ V] [FiniteDimensional ℂ V]
-    (A : Subalgebra ℂ (Module.End ℂ V)) [IsSimpleModule A V]
-    : A = ⊤ := by
+private theorem subalgebra_end_eq_whole_of_isSimpleModule {V : Type} [AddCommGroup V] [Module ℂ V]
+    [FiniteDimensional ℂ V] (A : Subalgebra ℂ (Module.End ℂ V)) [IsSimpleModule A V] :
+    A = ⊤ := by
   classical
   have schur : ∀ f : V →ₗ[A] V, ∃ c : ℂ, ∀ y, f y = c • y := by
     intro f
-    obtain ⟨c, hc⟩ :=
-      (IsSimpleModule.algebraMap_end_bijective_of_isAlgClosed (A := A) (V := V) ℂ).2 f
+    obtain ⟨c, hc⟩ := (IsSimpleModule.algebraMap_end_bijective_of_isAlgClosed (A := A) (V := V) ℂ).2 f
     exact ⟨c, fun y => by rw [← hc]; rfl⟩
   let b := Module.finBasis ℂ V
   let ι := Fin (Module.finrank ℂ V)
@@ -38,18 +80,17 @@ private theorem subalgebra_end_eq_whole_of_isSimpleModule
     intro T x
     have hsingle : ∀ (i j : ι) (y : V), P (Pi.single j (T y)) i = T (P (Pi.single j y) i) := by
       intro i j y
-      obtain ⟨c, hc⟩ :=
-        schur ((LinearMap.proj i).comp (P.comp (LinearMap.single A (fun _ : ι => V) j)))
+      obtain ⟨c, hc⟩ := schur ((LinearMap.proj i).comp (P.comp (LinearMap.single A (fun _ : ι => V) j)))
       have h1 := hc (T y)
       have h2 := hc y
       simp only [LinearMap.comp_apply, LinearMap.proj_apply, LinearMap.single_apply] at h1 h2
       rw [h1, h2, map_smul]
     funext i
-    set_option synthInstance.maxHeartbeats 100000 in
-      conv_lhs => rw [← Finset.univ_sum_single (fun i => T (x i)), map_sum]
-    set_option synthInstance.maxHeartbeats 100000 in
-      conv_rhs => rw [← Finset.univ_sum_single x, map_sum]
-    set_option synthInstance.maxHeartbeats 100000 in
+
+    conv_lhs => rw [← Finset.univ_sum_single (fun i => T (x i)), map_sum]
+
+    conv_rhs => rw [← Finset.univ_sum_single x, map_sum]
+
     simp only [Finset.sum_apply, map_sum, hsingle]
   ext T
   simp only [Algebra.mem_top, iff_true]
@@ -66,21 +107,19 @@ private theorem subalgebra_end_eq_whole_of_isSimpleModule
   rw [hT]
   exact a.2
 
+
 open Matrix in
 open scoped Kronecker ComplexOrder TensorProduct in
 open scoped MonoidAlgebra in
-theorem _root_.GlobalTheory.ClassFin.span_range_eq_top_of_isIrreducible
-    : ∀ (G : Type) [Group G] (V : Type) [AddCommGroup V] [Module ℂ V] (ρ : Representation ℂ G V)
-        [FiniteDimensional ℂ V],
-      ρ.IsIrreducible → Submodule.span ℂ (Set.range ρ) = ⊤ := by
+theorem _root_.GlobalTheory.ClassFin.span_range_eq_top_of_isIrreducible :
+    ∀ (G : Type) [Group G] (V : Type) [AddCommGroup V] [Module ℂ V] (ρ : Representation ℂ G V) [FiniteDimensional ℂ V], ρ.IsIrreducible → Submodule.span ℂ (Set.range ρ) = ⊤ := by
   intro G _ V _ _ ρ _ h
   let A : Subalgebra ℂ (Module.End ℂ V) := Algebra.adjoin ℂ (Set.range ρ)
   have hρA : ∀ g, ρ g ∈ A := fun g => Algebra.subset_adjoin ⟨g, rfl⟩
   have hspan : Subalgebra.toSubmodule A = Submodule.span ℂ (Set.range ρ) := by
     rw [Algebra.adjoin_eq_span]
     congr 1
-    have : Set.range ρ
-        = ((MonoidHom.mrange ρ : Submonoid (Module.End ℂ V)) : Set (Module.End ℂ V)) :=
+    have : Set.range ρ = ((MonoidHom.mrange ρ : Submonoid (Module.End ℂ V)) : Set (Module.End ℂ V)) :=
       (MonoidHom.coe_mrange ρ).symm
     rw [this, Submonoid.closure_eq]
   let φ : Submodule A V → Subrepresentation ρ := fun M =>

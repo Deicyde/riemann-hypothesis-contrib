@@ -1,8 +1,51 @@
 module
 
-public import Mathlib
+import Formalism.PieriBlockIdeals.PieriColumnMinors.HeckeLFunctionIdealEulerProduct
 public import Formalism.SharpRestriction.LevelLetterCocycles.AdmissibleParameterJ
-public import Formalism.SharpRestriction.LevelLetterCocycles.ExistsInertiaCharpolyFactorOfTameType
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Rat
+import Mathlib.Algebra.Order.Star.Real
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Lemma
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
@@ -768,22 +811,7 @@ lemma jd_card_lt {m j : ℕ} (hj : j ≤ m) :
 
 lemma jd_card_ge {m j : ℕ} (hj : j ≤ m) :
     (Finset.univ.filter (fun a : Fin m => j ≤ a.1)).card = m - j := by
-  have hinj : Function.Injective (fun b : Fin (m - j) => (⟨j + b.1, by omega⟩ : Fin m)) := by
-    intro b b' e
-    have := congrArg Fin.val e
-    simp only at this
-    exact Fin.ext (by omega)
-  have : Finset.univ.filter (fun a : Fin m => j ≤ a.1) =
-      Finset.univ.image (fun b : Fin (m - j) => (⟨j + b.1, by omega⟩ : Fin m)) := by
-    ext a
-    simp only [Finset.mem_filter, Finset.mem_univ, true_and, Finset.mem_image]
-    constructor
-    · intro ha
-      exact ⟨⟨a.1 - j, by omega⟩, Fin.ext (by simp only; omega)⟩
-    · rintro ⟨b, rfl⟩
-      simp only
-      omega
-  rw [this, Finset.card_image_of_injective _ hinj, Finset.card_univ, Fintype.card_fin]
+  apply Formalism.CohomologicalDescent.FrobeniusPeriodChange.card_filter_le_val_eq_sub <;> assumption
 
 lemma jd_ncard {n : ℕ} (f : Fin n → ℚ) (hf : Function.Injective f) (p : Fin n → Prop)
     [DecidablePred p] (S : Set ℚ) (hS : ∀ q, q ∈ S ↔ ∃ a, p a ∧ q = f a) :

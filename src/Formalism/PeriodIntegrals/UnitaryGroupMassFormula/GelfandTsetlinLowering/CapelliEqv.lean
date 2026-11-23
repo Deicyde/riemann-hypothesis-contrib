@@ -1,7 +1,52 @@
 module
 
 public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.GelfandTsetlinLowering.CapelliOps
+public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.GelfandTsetlinLowering.ZScalarVanish
 public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.HighestWeightIrreducible.ConstructionA
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
+import Formalism.LocalRingCardinality.Params
 
 @[expose] public section
 
@@ -11,79 +56,64 @@ namespace PI.WGL
 
 open Formalism.BasicNotions Formalism.GradedWeylDivisibility MvPolynomial
 
-theorem embGL_cc {n : ℕ} (g : GL (Fin n) ℂ) (i j : Fin n)
-    : (embGL ℂ n (n + 1) rfl g : Matrix (Fin (n + 1)) (Fin (n + 1)) ℂ) (Fin.castSucc i)
-        (Fin.castSucc j)
-      = g i j := by
+theorem embGL_cc {n : ℕ} (g : GL (Fin n) ℂ) (i j : Fin n) :
+    (embGL ℂ n (n + 1) rfl g : Matrix (Fin (n + 1)) (Fin (n + 1)) ℂ) (Fin.castSucc i) (Fin.castSucc j) = g i j := by
   simp [embGL, blkHom, Matrix.coe_reindexAlgEquiv, Matrix.reindex_apply, Matrix.submatrix_apply]
 
-theorem embGL_lc {n : ℕ} (g : GL (Fin n) ℂ) (j : Fin n)
-    : (embGL ℂ n (n + 1) rfl g : Matrix (Fin (n + 1)) (Fin (n + 1)) ℂ) (Fin.last n) (Fin.castSucc j)
-      = 0 := by
+theorem embGL_lc {n : ℕ} (g : GL (Fin n) ℂ) (j : Fin n) :
+    (embGL ℂ n (n + 1) rfl g : Matrix (Fin (n + 1)) (Fin (n + 1)) ℂ) (Fin.last n) (Fin.castSucc j) = 0 := by
   simp [embGL, blkHom, Matrix.coe_reindexAlgEquiv, Matrix.reindex_apply, Matrix.submatrix_apply]
 
-theorem embGL_cl {n : ℕ} (g : GL (Fin n) ℂ) (i : Fin n)
-    : (embGL ℂ n (n + 1) rfl g : Matrix (Fin (n + 1)) (Fin (n + 1)) ℂ) (Fin.castSucc i) (Fin.last n)
-      = 0 := by
+theorem embGL_cl {n : ℕ} (g : GL (Fin n) ℂ) (i : Fin n) :
+    (embGL ℂ n (n + 1) rfl g : Matrix (Fin (n + 1)) (Fin (n + 1)) ℂ) (Fin.castSucc i) (Fin.last n) = 0 := by
   simp [embGL, blkHom, Matrix.coe_reindexAlgEquiv, Matrix.reindex_apply, Matrix.submatrix_apply]
 
-theorem embGL_ll {n : ℕ} (g : GL (Fin n) ℂ)
-    : (embGL ℂ n (n + 1) rfl g : Matrix (Fin (n + 1)) (Fin (n + 1)) ℂ) (Fin.last n) (Fin.last n)
-      = 1 := by
+theorem embGL_ll {n : ℕ} (g : GL (Fin n) ℂ) :
+    (embGL ℂ n (n + 1) rfl g : Matrix (Fin (n + 1)) (Fin (n + 1)) ℂ) (Fin.last n) (Fin.last n) = 1 := by
   simp [embGL, blkHom, Matrix.coe_reindexAlgEquiv, Matrix.reindex_apply, Matrix.submatrix_apply]
 
-def lmapPoly
-    {σ τ : Type} (φ : MvPolynomial σ ℂ →ₗ[ℂ] MvPolynomial τ ℂ) (p : Polynomial (MvPolynomial σ ℂ))
-    : Polynomial (MvPolynomial τ ℂ) :=
+def lmapPoly {σ τ : Type} (φ : MvPolynomial σ ℂ →ₗ[ℂ] MvPolynomial τ ℂ) (p : Polynomial (MvPolynomial σ ℂ)) :
+    Polynomial (MvPolynomial τ ℂ) :=
   ∑ k ∈ Finset.range (p.natDegree + 1), Polynomial.C (φ (p.coeff k)) * Polynomial.X ^ k
 
-theorem lmapPoly_coeff
-    {σ τ : Type} (φ : MvPolynomial σ ℂ →ₗ[ℂ] MvPolynomial τ ℂ) (p : Polynomial (MvPolynomial σ ℂ))
-    (k : ℕ)
-    : (lmapPoly φ p).coeff k = φ (p.coeff k) := by
+theorem lmapPoly_coeff {σ τ : Type} (φ : MvPolynomial σ ℂ →ₗ[ℂ] MvPolynomial τ ℂ)
+    (p : Polynomial (MvPolynomial σ ℂ)) (k : ℕ) : (lmapPoly φ p).coeff k = φ (p.coeff k) := by
   simp only [lmapPoly, Polynomial.finsetSum_coeff, Polynomial.coeff_C_mul_X_pow]
   rw [Finset.sum_ite_eq]
   split_ifs with hk
   · rfl
   · rw [Polynomial.coeff_eq_zero_of_natDegree_lt (by simp at hk; omega), map_zero]
 
-theorem lmapPoly_eval
-    {σ τ : Type} (φ : MvPolynomial σ ℂ →ₗ[ℂ] MvPolynomial τ ℂ) (p : Polynomial (MvPolynomial σ ℂ))
-    (t : ℂ)
-    : (lmapPoly φ p).eval (C t) = φ (p.eval (C t)) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [Polynomial.eval_eq_sum_range (p := p), lmapPoly, Polynomial.eval_finsetSum, map_sum]
+theorem lmapPoly_eval {σ τ : Type} (φ : MvPolynomial σ ℂ →ₗ[ℂ] MvPolynomial τ ℂ)
+    (p : Polynomial (MvPolynomial σ ℂ)) (t : ℂ) : (lmapPoly φ p).eval (C t) = φ (p.eval (C t)) := by
+
+  rw [Polynomial.eval_eq_sum_range (p := p), lmapPoly, Polynomial.eval_finsetSum, map_sum]
   refine Finset.sum_congr rfl fun i _ => ?_
-  simp only [Polynomial.eval_mul, Polynomial.eval_C, Polynomial.eval_pow, Polynomial.eval_X,
-    ← C_pow]
+  simp only [Polynomial.eval_mul, Polynomial.eval_C, Polynomial.eval_pow, Polynomial.eval_X, ← C_pow]
   rw [mul_comm (φ _), mul_comm (p.coeff i), ← smul_eq_C_mul, ← smul_eq_C_mul, map_smul]
 
-theorem det_one_add_single {n : ℕ} (a b : Fin n) (t : ℂ)
-    : (1 + Matrix.single a b t).det = if a = b then t + 1 else 1 := by
+theorem det_one_add_single {n : ℕ} (a b : Fin n) (t : ℂ) :
+    (1 + Matrix.single a b t).det = if a = b then t + 1 else 1 := by
   by_cases hab : a = b
   · subst hab
-    have hD
-        : (1 + Matrix.single a a t) = Matrix.diagonal (fun i => if i = a then 1 + t else 1) := by
+    have hD : (1 + Matrix.single a a t) = Matrix.diagonal (fun i => if i = a then 1 + t else 1) := by
       ext i j
       by_cases hij : i = j
-      · subst hij
-        by_cases hia : i = a
+      · subst hij; by_cases hia : i = a
         · subst hia; simp
         · simp [hia, Ne.symm hia]
       · simp [hij, Matrix.single_apply]
-        intro h1 h2
-        exact absurd (h1.symm.trans h2) hij
+        intro h1 h2; exact absurd (h1.symm.trans h2) hij
     rw [hD, Matrix.det_diagonal, Finset.prod_ite_eq']
     simp [add_comm]
   · have := Matrix.det_transvection_of_ne a b hab t
     unfold Matrix.transvection at this
     rw [this, if_neg hab]
 
-theorem embGL_transvec
-    {n : ℕ} (g : GL (Fin n) ℂ) (a b : Fin n)
-    (t : ℂ) (hg : (g : Matrix (Fin n) (Fin n) ℂ) = 1 + Matrix.single a b t)
-    : ((embGL ℂ n (n + 1) rfl g : Matrix (Fin (n + 1)) (Fin (n + 1)) ℂ)).transpose
-      = 1 + Matrix.single b.castSucc a.castSucc t := by
+theorem embGL_transvec {n : ℕ} (g : GL (Fin n) ℂ) (a b : Fin n) (t : ℂ)
+    (hg : (g : Matrix (Fin n) (Fin n) ℂ) = 1 + Matrix.single a b t) :
+    ((embGL ℂ n (n + 1) rfl g : Matrix (Fin (n + 1)) (Fin (n + 1)) ℂ)).transpose =
+      1 + Matrix.single b.castSucc a.castSucc t := by
   ext i j
   induction i using Fin.lastCases with
   | last =>
@@ -99,17 +129,14 @@ theorem embGL_transvec
       rw [Matrix.transpose_apply, embGL_cc, hg]
       simp [Matrix.single_apply, Matrix.one_apply, eq_comm, and_comm]
 
-theorem eqv_pol
-    {n N : ℕ} (h : n + 1 = N) (mu : DomWeight n) (lam : DomWeight N)
-    (φ : MvPolynomial (Fin n × Fin n) ℂ →ₗ[ℂ] MvPolynomial (Fin N × Fin N) ℂ)
-    (hφ : IsEqv h mu lam φ) (a b : Fin n) (s : MvPolynomial (Fin n × Fin n) ℂ)
-    (hs : s ∈ nablaSq ℂ n mu)
-    : φ (pol ℂ a b s) + (if a = b then (mu.detShift : ℂ) • φ s else 0)
-      = pol ℂ (Fin.castLE (by omega) a) (Fin.castLE (by omega) b) (φ s)
-        + (if a = b then (lam.detShift : ℂ) • φ s else 0) := by
+theorem eqv_pol {n N : ℕ} (h : n + 1 = N) (mu : DomWeight n) (lam : DomWeight N)
+    (φ : MvPolynomial (Fin n × Fin n) ℂ →ₗ[ℂ] MvPolynomial (Fin N × Fin N) ℂ) (hφ : IsEqv h mu lam φ)
+    (a b : Fin n) (s : MvPolynomial (Fin n × Fin n) ℂ) (hs : s ∈ nablaSq ℂ n mu) :
+    φ (pol ℂ a b s) + (if a = b then (mu.detShift : ℂ) • φ s else 0) =
+      pol ℂ (Fin.castLE (by omega) a) (Fin.castLE (by omega) b) (φ s) +
+        (if a = b then (lam.detShift : ℂ) • φ s else 0) := by
   subst h
-  have hι : ∀ x : Fin n, Fin.castLE (by omega : n ≤ n + 1) x = Fin.castSucc x := fun x =>
-    Fin.ext rfl
+  have hι : ∀ x : Fin n, Fin.castLE (by omega : n ≤ n + 1) x = Fin.castSucc x := fun x => Fin.ext rfl
   rw [hι a, hι b]
   set d1 := mu.detShift with hd1
   set d2 := lam.detShift with hd2
@@ -123,9 +150,7 @@ theorem eqv_pol
   set Q : Polynomial (MvPolynomial (Fin (n + 1) × Fin (n + 1)) ℂ) :=
     if a = b then Polynomial.X + 1 else 1 with hQ
   set P := Q ^ e1 * lmapPoly φ (rowGen ℂ a b s) - Q ^ e2 * rowGen ℂ a.castSucc b.castSucc (φ s) with hP
-  have key
-      : ∀ t : ℕ,
-        P.eval (C (t : ℂ)) ∈ (⊥ : Submodule ℂ (MvPolynomial (Fin (n + 1) × Fin (n + 1)) ℂ)) := by
+  have key : ∀ t : ℕ, P.eval (C (t : ℂ)) ∈ (⊥ : Submodule ℂ (MvPolynomial (Fin (n + 1) × Fin (n + 1)) ℂ)) := by
     intro t
     rw [Submodule.mem_bot]
     set D : ℂ := if a = b then (t : ℂ) + 1 else 1 with hD
@@ -141,9 +166,7 @@ theorem eqv_pol
       rcases eq_or_ne a b with hab | hab
       · subst hab; simp [hD]
       · simp [hD, hab, Ne.symm hab]
-    have huu
-        : Matrix.GeneralLinearGroup.det (embGL ℂ n (n + 1) rfl g)
-          = Matrix.GeneralLinearGroup.det g :=
+    have huu : Matrix.GeneralLinearGroup.det (embGL ℂ n (n + 1) rfl g) = Matrix.GeneralLinearGroup.det g :=
       Units.ext (hu'.trans hu.symm)
     have heq := hφ.2 g s hs
     unfold sqAct detPow at heq
@@ -152,12 +175,11 @@ theorem eqv_pol
     have heq2 := congrArg (fun x => ((u ^ K : ℂˣ) : ℂ) • x) heq
     simp only [smul_smul, ← Units.val_mul, ← zpow_add] at heq2
     rw [show K + mu.detShift = (e1 : ℤ) by omega, show K + lam.detShift = (e2 : ℤ) by omega,
-        zpow_natCast, zpow_natCast, Units.val_pow_eq_pow_val, Units.val_pow_eq_pow_val, hu]
-      at heq2
-    have hQe : Q.eval (C (t : ℂ)) = C D := by rw [hQ, hD]; split_ifs <;> simp
+      zpow_natCast, zpow_natCast, Units.val_pow_eq_pow_val, Units.val_pow_eq_pow_val, hu] at heq2
+    have hQe : Q.eval (C (t : ℂ)) = C D := by
+      rw [hQ, hD]; split_ifs <;> simp
     rw [hP, Polynomial.eval_sub, Polynomial.eval_mul, Polynomial.eval_mul, Polynomial.eval_pow,
-      Polynomial.eval_pow, hQe, lmapPoly_eval, ← C_pow, ← C_pow, ← smul_eq_C_mul, ← smul_eq_C_mul,
-      heq2, sub_self]
+      Polynomial.eval_pow, hQe, lmapPoly_eval, ← C_pow, ← C_pow, ← smul_eq_C_mul, ← smul_eq_C_mul, heq2, sub_self]
   have h1 := PI.WHw.coeff_mem_of_eval ⊥ P key 1
   rw [Submodule.mem_bot] at h1
   have hL0 : (lmapPoly φ (rowGen ℂ a b s)).coeff 0 = φ s := by
@@ -165,13 +187,10 @@ theorem eqv_pol
   have hL1 : (lmapPoly φ (rowGen ℂ a b s)).coeff 1 = φ (pol ℂ a b s) := by
     rw [lmapPoly_coeff, pol_eq_rowDiv]; rfl
   have hG0 : (rowGen ℂ a.castSucc b.castSucc (φ s)).coeff 0 = φ s := rowGen_coeff_zero ℂ _ _ _
-  have hG1
-      : (rowGen ℂ a.castSucc b.castSucc (φ s)).coeff 1 = pol ℂ a.castSucc b.castSucc (φ s) := by
+  have hG1 : (rowGen ℂ a.castSucc b.castSucc (φ s)).coeff 1 = pol ℂ a.castSucc b.castSucc (φ s) := by
     rw [pol_eq_rowDiv]; rfl
-  have hc1
-      : ∀ (e : ℕ) (F : Polynomial (MvPolynomial (Fin (n + 1) × Fin (n + 1)) ℂ)),
-        (Q ^ e * F).coeff 1
-          = F.coeff 1 + (if a = b then (e : MvPolynomial _ ℂ) * F.coeff 0 else 0) := by
+  have hc1 : ∀ (e : ℕ) (F : Polynomial (MvPolynomial (Fin (n + 1) × Fin (n + 1)) ℂ)),
+      (Q ^ e * F).coeff 1 = F.coeff 1 + (if a = b then (e : MvPolynomial _ ℂ) * F.coeff 0 else 0) := by
     intro e F
     rw [hQ]
     split_ifs with hab

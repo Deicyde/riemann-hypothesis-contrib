@@ -1,9 +1,55 @@
 module
 
-public import Mathlib
+import Development.WeilBound.CoreStatements.HodgeTatePoints.MlLift
 public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.IsHodgeLine
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.EigenspaceDecompositionInternalStatement
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.GenPtSpecializes
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Real
+import Mathlib.AlgebraicGeometry.QuasiAffine
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Coalgebra.IsFrobenius
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.SetTheory.ZFC.PSet
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.AbProj
 
 @[expose] public section
@@ -12,18 +58,12 @@ noncomputable section
 
 namespace GlobalTheory.CompanionTheory.Ar.HodgeBasic
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
-  NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo
-  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
-  GlobalTheory.CompanionTheory.Ar
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CompanionTheory.Ar
 open scoped TensorProduct
 
-theorem mem_abLocus_of_map
-    {X Y : Scheme.{0}} {G : Over X} {G' : Over Y} {f : X ⟶ Y} {φ : G.left ⟶ G'.left}
-    (h : IsPullback φ G.hom G'.hom f)
-    {x : X} (hx : f x ∈ abLocus G')
-    : x ∈ abLocus G := by
+theorem mem_abLocus_of_map {X Y : Scheme.{0}} {G : Over X} {G' : Over Y} {f : X ⟶ Y} {φ : G.left ⟶ G'.left}
+    (h : IsPullback φ G.hom G'.hom f) {x : X} (hx : f x ∈ abLocus G') : x ∈ abLocus G := by
   intro K _ _ t hxt
   obtain ⟨u, rfl⟩ := hxt
   have hp : IsProper (pullback.snd G'.hom (t ≫ f)) := hx K (t ≫ f) ⟨u, by simp⟩
@@ -32,51 +72,12 @@ theorem mem_abLocus_of_map
   rw [← sq.isoPullback_hom_snd]
   infer_instance
 
-theorem mem_of_dense_of_maximal
-    {P : Type} [TopologicalSpace P] [TopologicalSpace.NoetherianSpace P] [QuasiSober P]
-    {U : Set P} (hU : IsOpen U) (hd : Dense U)
-    {y : P} (hy : ∀ y', y' ⤳ y → y' = y)
-    : y ∈ U := by
-  classical
-  have hCi : IsIrreducible (irreducibleComponent y) := isIrreducible_irreducibleComponent
-  have hCc : IsClosed (irreducibleComponent y) := isClosed_irreducibleComponent
-  have hgen := hCi.isGenericPoint_genericPoint_closure
-  rw [hCc.closure_eq] at hgen
-  have hη : hCi.genericPoint = y := hy _ (hgen.specializes mem_irreducibleComponent)
-  rw [hη] at hgen
-  have hmax := irreducibleComponent_mem_irreducibleComponents y
-  set D : Set P := ⋃₀ (irreducibleComponents P \ {irreducibleComponent y}) with hD
-  have hDc : IsClosed D := by
-    rw [hD, Set.sUnion_eq_biUnion]
-    exact Set.Finite.isClosed_biUnion
-      (TopologicalSpace.NoetherianSpace.finite_irreducibleComponents.subset Set.diff_subset)
-      fun C hC => isClosed_of_mem_irreducibleComponents C hC.1
-  have hyD : y ∉ D := by
-    rintro ⟨C, ⟨hC, hne⟩, hyC⟩
-    have hle : irreducibleComponent y ⊆ C := by
-      rw [← hgen.def]
-      exact (isClosed_of_mem_irreducibleComponents C hC).closure_subset_iff.2 (by simpa using hyC)
-    exact hne (le_antisymm (hmax.2 hC.1 hle) hle)
-  obtain ⟨u, huD, huU⟩ := hd.inter_open_nonempty Dᶜ hDc.isOpen_compl ⟨y, hyD⟩
-  have huC : u ∈ irreducibleComponent y := by
-    by_contra hne
-    refine huD ⟨
-      irreducibleComponent u,
-      ⟨irreducibleComponent_mem_irreducibleComponents u, ?_⟩,
-      mem_irreducibleComponent
-    ⟩
-    intro e
-    exact hne (by
-      have : u ∈ irreducibleComponent u := mem_irreducibleComponent
-      rw [Set.mem_singleton_iff.1 e] at this
-      exact this)
-  exact (hgen.specializes huC).mem_open hU huU
+theorem mem_of_dense_of_maximal {P : Type} [TopologicalSpace P] [TopologicalSpace.NoetherianSpace P] [QuasiSober P]
+    {U : Set P} (hU : IsOpen U) (hd : Dense U) {y : P} (hy : ∀ y', y' ⤳ y → y' = y) : y ∈ U := by
+  apply PositivityTheory.HtPt.Ml.mem_of_dense_of_max <;> assumption
 
-theorem noetherianSpace_pullback
-    {X : Scheme.{0}} {O F : Type} [CommRing O] [Field F]
-    {s : X ⟶ Sp O} (hs : IsProjOver s)
-    (β : O →+* F)
-    : TopologicalSpace.NoetherianSpace ↥(pullback s (spMap β)) := by
+theorem noetherianSpace_pullback {X : Scheme.{0}} {O F : Type} [CommRing O] [Field F] {s : X ⟶ Sp O}
+    (hs : IsProjOver s) (β : O →+* F) : TopologicalSpace.NoetherianSpace ↥(pullback s (spMap β)) := by
   obtain ⟨N, i, hi, rfl⟩ := hs
   have := isProper_str O N
   have : IsProper (i ≫ PSpace.str O N) := inferInstance
@@ -89,11 +90,10 @@ theorem noetherianSpace_pullback
   have : IsNoetherian (pullback (i ≫ PSpace.str O N) (spMap β)) := {}
   infer_instance
 
-theorem isIntegral_tensor
-    {O Ω₀ F : Type} [CommRing O] [Field Ω₀] [Field F] [Algebra O Ω₀] [Algebra O F]
+theorem isIntegral_tensor {O Ω₀ F : Type} [CommRing O] [Field Ω₀] [Field F] [Algebra O Ω₀] [Algebra O F]
     (hγ : Function.Injective (algebraMap O Ω₀))
-    (hF : ∀ u : F, ∃ a : O, a ≠ 0 ∧ _root_.IsIntegral O (a • u))
-    : Algebra.IsIntegral Ω₀ (Ω₀ ⊗[O] F) := by
+    (hF : ∀ u : F, ∃ a : O, a ≠ 0 ∧ _root_.IsIntegral O (a • u)) :
+    Algebra.IsIntegral Ω₀ (Ω₀ ⊗[O] F) := by
   have h1 : ∀ u : F, _root_.IsIntegral Ω₀ ((1 : Ω₀) ⊗ₜ[O] u) := by
     intro u
     obtain ⟨a, ha, hi⟩ := hF u
@@ -102,8 +102,8 @@ theorem isIntegral_tensor
     have h3 : _root_.IsIntegral Ω₀ ((1 : Ω₀) ⊗ₜ[O] (a • u)) := h2.tower_top
     have ha' : algebraMap O Ω₀ a ≠ 0 := fun h => ha (hγ (by rw [h, map_zero]))
     have e : (1 : Ω₀) ⊗ₜ[O] u = (algebraMap O Ω₀ a)⁻¹ • ((1 : Ω₀) ⊗ₜ[O] (a • u)) := by
-      rw [TensorProduct.smul_tmul', ← TensorProduct.smul_tmul, smul_eq_mul, _root_.mul_one,
-        Algebra.smul_def, mul_inv_cancel₀ ha']
+      rw [TensorProduct.smul_tmul', ← TensorProduct.smul_tmul, smul_eq_mul, _root_.mul_one, Algebra.smul_def,
+        mul_inv_cancel₀ ha']
     rw [e]
     exact h3.smul _
   refine ⟨fun x => ?_⟩
@@ -116,13 +116,10 @@ theorem isIntegral_tensor
     exact (h1 u).smul a
   | add x y hx hy => exact hx.add hy
 
-theorem exists_integral_multiple_of_injective
-    {O : Type} [CommRing O]
-    {F : IntermediateField ℚ ℂ} [FiniteDimensional ℚ F]
-    (β : O →+* F) (hβ : Function.Injective β)
-    (u : F)
-    : letI := β.toAlgebra
-      ∃ a : O, a ≠ 0 ∧ _root_.IsIntegral O (a • u) := by
+theorem exists_integral_multiple_of_injective {O : Type} [CommRing O] {F : IntermediateField ℚ ℂ}
+    [FiniteDimensional ℚ F] (β : O →+* F) (hβ : Function.Injective β) (u : F) :
+    letI := β.toAlgebra
+    ∃ a : O, a ≠ 0 ∧ _root_.IsIntegral O (a • u) := by
   letI := β.toAlgebra
   have : CharZero O := β.charZero
   have hQ : IsAlgebraic ℚ u := Algebra.IsAlgebraic.isAlgebraic u
@@ -130,38 +127,30 @@ theorem exists_integral_multiple_of_injective
   have hO : IsAlgebraic O u := hZ.extendScalars (Int.cast_injective)
   exact hO.exists_integral_multiple
 
-theorem eq_of_specializes_of_fst
-    {X : Scheme.{0}} {O F Ω₀ : Type} [CommRing O] [Field F] [Field Ω₀]
-    (s : X ⟶ Sp O)
-    (β : O →+* F)
-    (g₀ : O →+* Ω₀) (ξ₀ : Sp Ω₀ ⟶ X) (h₀ : IsCptGen ξ₀) (hs : ξ₀ ≫ s = spMap g₀)
+theorem eq_of_specializes_of_fst {X : Scheme.{0}} {O F Ω₀ : Type} [CommRing O] [Field F] [Field Ω₀] (s : X ⟶ Sp O)
+    (β : O →+* F) (g₀ : O →+* Ω₀) (ξ₀ : Sp Ω₀ ⟶ X) (h₀ : IsCptGen ξ₀) (hs : ξ₀ ≫ s = spMap g₀)
     (hγ : Function.Injective g₀)
     (hF : letI := β.toAlgebra; ∀ u : F, ∃ a : O, a ≠ 0 ∧ _root_.IsIntegral O (a • u))
-    {y y' : ↥(pullback s (spMap β))} (hy : pullback.fst s (spMap β) y = genPt ξ₀) (hyy : y' ⤳ y)
-    : y' = y := by
+    {y y' : ↥(pullback s (spMap β))} (hy : pullback.fst s (spMap β) y = genPt ξ₀) (hyy : y' ⤳ y) : y' = y := by
   letI := β.toAlgebra
   letI := g₀.toAlgebra
   have hy' : pullback.fst s (spMap β) y' = genPt ξ₀ :=
-    GlobalTheory.CompanionTheory.Ar.CptInh.nogen ξ₀ h₀ _
-      (hy ▸ hyy.map (pullback.fst s (spMap β)).continuous)
+    GlobalTheory.CompanionTheory.Ar.CptInh.nogen ξ₀ h₀ _ (hy ▸ hyy.map (pullback.fst s (spMap β)).continuous)
   have hsurj : SurjectiveOnStalks ξ₀ := by
     have : IsIso (Scheme.stalkClosedPointTo ξ₀) := (ConcreteCategory.isIso_iff_bijective _).2 h₀.bij
     rw [← Scheme.Spec_stalkClosedPointTo_fromSpecStalk ξ₀]
     infer_instance
   have hemb := SurjectiveOnStalks.isEmbedding_pullback (pullback.fst s (spMap β)) ξ₀
-  obtain ⟨z, hz, hz₂⟩ :=
-    Scheme.Pullback.exists_preimage_pullback (f := pullback.fst s (spMap β)) (g := ξ₀) y
-      (IsLocalRing.closedPoint Ω₀) hy
-  obtain ⟨z', hz', hz₂'⟩ :=
-    Scheme.Pullback.exists_preimage_pullback (f := pullback.fst s (spMap β)) (g := ξ₀) y'
-      (IsLocalRing.closedPoint Ω₀) hy'
+  obtain ⟨z, hz, hz₂⟩ := Scheme.Pullback.exists_preimage_pullback (f := pullback.fst s (spMap β)) (g := ξ₀) y
+    (IsLocalRing.closedPoint Ω₀) hy
+  obtain ⟨z', hz', hz₂'⟩ := Scheme.Pullback.exists_preimage_pullback (f := pullback.fst s (spMap β)) (g := ξ₀) y'
+    (IsLocalRing.closedPoint Ω₀) hy'
   have hzz : z' ⤳ z := by
     rw [← hemb.isInducing.specializes_iff, specializes_prod]
     simp only [hz, hz', hz₂, hz₂']
     exact ⟨hyy, specializes_rfl⟩
   have sq : IsPullback (pullback.snd (pullback.fst s (spMap β)) ξ₀)
-      (pullback.fst (pullback.fst s (spMap β)) ξ₀ ≫ pullback.snd s (spMap β)) (spMap g₀)
-      (spMap β) := by
+      (pullback.fst (pullback.fst s (spMap β)) ξ₀ ≫ pullback.snd s (spMap β)) (spMap g₀) (spMap β) := by
     rw [← hs]
     exact (IsPullback.of_hasPullback (pullback.fst s (spMap β)) ξ₀).flip.paste_vert
       (IsPullback.of_hasPullback s (spMap β))
@@ -180,50 +169,39 @@ theorem eq_of_specializes_of_fst
     simpa [p, p'] using h
   rw [← hz, ← hz', hzeq]
 
-theorem mem_range_jQ
-    {E : Type} [Field E] [NumberField E] [IsCMField E]
-    {H : Host E} {D : Datum H} {l : Level H} {Xo : Moduli D l} {c : Coeff l} {O : Type} [CommRing O]
-    {β : O →+* c.F} (Y : Model Xo c β) (hβ : Function.Injective β)
-    {Ω₀ : Type} [Field Ω₀]
-    (ξ₀ : Sp Ω₀ ⟶ Y.X) (h₀ : IsCptGen ξ₀)
-    (g₀ : O →+* Ω₀) (hs : ξ₀ ≫ Y.s = spMap g₀) (hg : Function.Injective g₀)
-    (y : ↥(pullback Y.s (spMap β))) (hy : pullback.fst Y.s (spMap β) y = genPt ξ₀)
-    : y ∈ Set.range Y.jQ := by
+theorem mem_range_jQ {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {D : Datum H} {l : Level H}
+    {Xo : Moduli D l} {c : Coeff l} {O : Type} [CommRing O] {β : O →+* c.F} (Y : Model Xo c β)
+    (hβ : Function.Injective β) {Ω₀ : Type} [Field Ω₀] (ξ₀ : Sp Ω₀ ⟶ Y.X) (h₀ : IsCptGen ξ₀) (g₀ : O →+* Ω₀)
+    (hs : ξ₀ ≫ Y.s = spMap g₀) (hg : Function.Injective g₀) (y : ↥(pullback Y.s (spMap β)))
+    (hy : pullback.fst Y.s (spMap β) y = genPt ξ₀) : y ∈ Set.range Y.jQ := by
   have := noetherianSpace_pullback Y.proj β
   have := Y.jQ_open
   have := c.fin
   exact mem_of_dense_of_maximal Y.jQ.isOpenEmbedding.isOpen_range Y.jQ_dense fun y' h' =>
     eq_of_specializes_of_fst Y.s β g₀ ξ₀ h₀ hs hg (exists_integral_multiple_of_injective β hβ) hy h'
 
-theorem mem_regAt_of_isIntegral
-    {X : Scheme.{0}} {Ω : Type} [Field Ω]
-    {ξ : Spec (CommRingCat.of Ω) ⟶ X} (hg : IsCptGen ξ) (all : ∀ q : X, genPt ξ ⤳ q)
-    (hn : IsNormalScheme X) (q : Cpt ξ)
-    {a : Ω} (ha : _root_.IsIntegral ℤ a)
-    : a ∈ regAt ξ q := by
+theorem mem_regAt_of_isIntegral {X : Scheme.{0}} {Ω : Type} [Field Ω] {ξ : Spec (CommRingCat.of Ω) ⟶ X}
+    (hg : IsCptGen ξ) (all : ∀ q : X, genPt ξ ⤳ q) (hn : IsNormalScheme X) (q : Cpt ξ) {a : Ω}
+    (ha : _root_.IsIntegral ℤ a) : a ∈ regAt ξ q := by
   have hgen : IsGenericPoint (genPt ξ) (Set.univ : Set X) :=
     Set.eq_univ_of_forall fun q => specializes_iff_mem_closure.1 (all q)
-  have : IrreducibleSpace X := {
-    isPreirreducible_univ := hgen.isIrreducible.2
-    toNonempty := ⟨genPt ξ⟩
-  }
+  have : IrreducibleSpace X :=
+    { isPreirreducible_univ := hgen.isIrreducible.2, toNonempty := ⟨genPt ξ⟩ }
   have : ∀ x : X, _root_.IsReduced (X.presheaf.stalk x) := fun x => by
     have := (hn x).1
     infer_instance
   have := isReduced_of_isReduced_stalk X
   have : AlgebraicGeometry.IsIntegral X := isIntegral_of_irreducibleSpace_of_isReduced X
   have hgp : genericPoint X = genPt ξ := (genericPoint_spec X).eq hgen
-  have key
-      : ∀ (x : X) (_ : x = genericPoint X) (hs : x ⤳ genericPoint X),
-        IsIso (X.presheaf.stalkSpecializes hs) := by
+  have key : ∀ (x : X) (_ : x = genericPoint X) (hs : x ⤳ genericPoint X),
+      IsIso (X.presheaf.stalkSpecializes hs) := by
     rintro x rfl hs
     have : X.presheaf.stalkSpecializes hs = 𝟙 _ := TopCat.Presheaf.stalkSpecializes_refl _ _
     rw [this]
     infer_instance
   have hsp : genPt ξ ⤳ genericPoint X := hgp ▸ specializes_rfl
   have := key _ hgp.symm hsp
-  let e : X.functionField →+* Ω :=
-    (X.presheaf.stalkSpecializes hsp ≫ Scheme.stalkClosedPointTo ξ).hom
+  let e : X.functionField →+* Ω := (X.presheaf.stalkSpecializes hsp ≫ Scheme.stalkClosedPointTo ξ).hom
   have hs₁ : Function.Surjective (X.presheaf.stalkSpecializes hsp).hom :=
     ((ConcreteCategory.isIso_iff_bijective (X.presheaf.stalkSpecializes hsp)).1 inferInstance).2
   have he : Function.Surjective e := hg.bij.2.comp hs₁
@@ -255,9 +233,8 @@ theorem rt0_conj_neg_ne_zero (H : Host E) : starRingEnd ℂ H.rt0 = -H.rt0 := by
   have h := H.sqrt_neg_disc_sq
   have h1 := congrArg Complex.re h
   have h2 := congrArg Complex.im h
-  simp only [pow_two, Complex.mul_re, Complex.mul_im, Complex.neg_re, Complex.neg_im,
-      Complex.natCast_re, Complex.natCast_im, neg_zero]
-    at h1 h2
+  simp only [pow_two, Complex.mul_re, Complex.mul_im, Complex.neg_re, Complex.neg_im, Complex.natCast_re,
+    Complex.natCast_im, neg_zero] at h1 h2
   have hd : (0 : ℝ) < H.d := Nat.cast_pos.2 H.d_prime.pos
   have hre : H.rt0.re = 0 := by
     by_contra hne
@@ -300,15 +277,15 @@ theorem labelHom_bijective (H : Host E) : Function.Bijective (labelHom H) := by
       · rw [ComplexEmbedding.conjugate_coe_eq, h, map_neg, rt0_conj_neg_ne_zero, neg_neg]
       · exact star_star σ
 
-theorem coe_labelEmb {H : Host E} {l : Level H} (c : Coeff l) (s : CMType H ⊕ CMType H) (a : 𝓞 E)
-    : ((labelEmb c s a : c.F) : ℂ) = labelHom H s (a : E) := by
+theorem coe_labelEmb {H : Host E} {l : Level H} (c : Coeff l) (s : CMType H ⊕ CMType H) (a : 𝓞 E) :
+    ((labelEmb c s a : c.F) : ℂ) = labelHom H s (a : E) := by
   rcases s with τ | τ
   · rfl
   · show τ.1 ((H.bar a : 𝓞 E) : E) = ComplexEmbedding.conjugate τ.1 (a : E)
     rw [H.bar_eq, ComplexEmbedding.conjugate_coe_eq, IsCMField.complexEmbedding_complexConj]
 
-theorem labelEmb_injective {H : Host E} {l : Level H} (c : Coeff l)
-    : Function.Injective (labelEmb (H := H) c) := by
+theorem labelEmb_injective {H : Host E} {l : Level H} (c : Coeff l) :
+    Function.Injective (labelEmb (H := H) c) := by
   intro s s' h
   refine (labelHom_bijective H).1 ?_
   refine IsLocalization.ringHom_ext (nonZeroDivisors (𝓞 E)) (RingHom.ext fun a => ?_)
@@ -321,22 +298,16 @@ end GlobalTheory.CompanionTheory.Ar.HodgeBasic
 
 namespace GlobalTheory.CompanionTheory.Ar
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
-  NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo
-  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
-  GlobalTheory.CompanionTheory.Ar
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CompanionTheory.Ar
 
-theorem HodgeCpt.basic
-    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H) (l : Level H)
-        (Xo : Moduli D l) (c : Coeff l) (O : Type) [CommRing O] (β : O →+* c.F) (Y : Model Xo c β)
-        (S : Finset ℕ) (Ω : Type) [Field Ω] (K : Type) [Fintype K] (J : K → Type)
-        [∀ k, Fintype (J k)] (y : (Σ k, J k) → Ω) (𝔐 : HodgeCpt Y S y),
-      Function.Injective β
-        → 𝔐.Interior 𝔐.ξ ∧ (∃ x : Sp Ω ⟶ Xo.XF c, 𝔐.ξ ≫ 𝔐.f = x ≫ Y.j) ∧ CharZero Ω
-          ∧ Function.Injective 𝔐.emb ∧ (∀ s, Module.finrank Ω (𝔐.Vgen s) = labelRk D s)
-          ∧ (⨆ s, 𝔐.Vgen s) = ⊤ ∧ iSupIndep 𝔐.Vgen
-          ∧ ∀ s a (q : Cpt 𝔐.ξ), 𝔐.emb s a ∈ regAt 𝔐.ξ q := by
+theorem HodgeCpt.basic : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H) (l : Level H)
+    (Xo : Moduli D l) (c : Coeff l) (O : Type) [CommRing O] (β : O →+* c.F) (Y : Model Xo c β) (S : Finset ℕ)
+    (Ω : Type) [Field Ω] (K : Type) [Fintype K] (J : K → Type) [∀ k, Fintype (J k)] (y : (Σ k, J k) → Ω)
+    (𝔐 : HodgeCpt Y S y), Function.Injective β → 𝔐.Interior 𝔐.ξ ∧
+      (∃ x : Sp Ω ⟶ Xo.XF c, 𝔐.ξ ≫ 𝔐.f = x ≫ Y.j) ∧ CharZero Ω ∧ Function.Injective 𝔐.emb ∧
+      (∀ s, Module.finrank Ω (𝔐.Vgen s) = labelRk D s) ∧ (⨆ s, 𝔐.Vgen s) = ⊤ ∧ iSupIndep 𝔐.Vgen ∧
+      ∀ s a (q : Cpt 𝔐.ξ), 𝔐.emb s a ∈ regAt 𝔐.ξ q := by
   intro E _ _ _ H D l Xo c O _ β Y S Ω _ K _ J _ y 𝔐 hβ
   classical
   have hcst : Function.Injective 𝔐.cst := 𝔐.cst.injective
@@ -379,19 +350,9 @@ theorem HodgeCpt.basic
   letI : Fintype (CMType H) := Fintype.ofFinite _
   have hcard : Fintype.card (CMType H ⊕ CMType H) = Module.finrank ℚ E := by
     rw [Fintype.card_of_bijective (HodgeBasic.labelHom_bijective H), Embeddings.card]
-  have hint :=
-    GlobalTheory.T.eigenspace_decomposition_internal Ω 𝔐.Li E 𝔐.ρ (CMType H ⊕ CMType H) 𝔐.emb hinj
-      hcard
-  refine ⟨
-    ?_,
-    ⟨IsOpenImmersion.lift Y.jQ g hran, ?_⟩,
-    hchar,
-    hinj,
-    ?_,
-    hint.submodule_iSup_eq_top,
-    hint.submodule_iSupIndep,
-    ?_
-  ⟩
+  have hint := GlobalTheory.T.eigenspace_decomposition_internal Ω 𝔐.Li E 𝔐.ρ (CMType H ⊕ CMType H) 𝔐.emb hinj hcard
+  refine ⟨?_, ⟨IsOpenImmersion.lift Y.jQ g hran, ?_⟩, hchar, hinj, ?_, hint.submodule_iSup_eq_top,
+    hint.submodule_iSupIndep, ?_⟩
   · refine HodgeBasic.mem_abLocus_of_map 𝔐.m.cart.1 ?_
     have hf : ∀ w : Sp Ω, pullback.fst Y.s (spMap β) (g w) = 𝔐.f (𝔐.ξ w) := by
       intro w

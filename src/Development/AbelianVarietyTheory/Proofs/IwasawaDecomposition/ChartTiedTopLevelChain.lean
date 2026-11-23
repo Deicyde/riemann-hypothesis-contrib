@@ -1,22 +1,60 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.LatAtLattice
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ValuedLtOfMem
+public import Formalism.LocalToGlobal.Columns.RecLevel
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.BaseFieldsPrimesOk
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.TrueColumnSpacesStandardInFrameCoords
-public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.ExistsMoveRight
-public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.ValuationLeOneOfMemZmu
-public import Formalism.LocalToGlobal.Columns.RecLevelLocP
-public import Formalism.LocalToGlobal.Columns.RecLevelStep
-public import Formalism.LocalToGlobal.Columns.RecLevelCls
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.MemIdSOfResSEqZero
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.IsPtOfIffUnitaryDecoration
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.GloRhoZeroOfCompat
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.PrimesOverPlaces
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.SymmetricLevelBoundLe
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.SymmetricFlagBasisVectorEqSingleOfNoExtra
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ChrLast
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.GloRhoZeroOfCompat
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.IsPtOfIffUnitaryDecoration
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.MemIdSOfResSEqZero
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.PrimesOverPlaces
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.SymmetricFlagBasisVectorEqSingleOfNoExtra
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.SymmetricLevelBoundLe
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.TrueColumnSpacesStandardInFrameCoords
+import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ValuedLtOfMem
+public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.ValuationLeOneOfMemZmu
+import Formalism.LocalToGlobal.Columns.RecLevelLocP
+public import Formalism.LocalToGlobal.Columns.RecLevelStep
+public import Mathlib.Algebra.Group.Action.Sigma
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
@@ -322,7 +360,6 @@ theorem reads_pt (c : (I.stp u I.mu0 j).Cl)
       (Finset.eq_empty_iff_forall_notMem.1 I.twistPrimes_reference_tuple_eq_empty P hP).elim)
     (H.pt c)
 
-set_option maxHeartbeats 2000000 in
 theorem read_of_mem (c : (I.stp u I.mu0 j).Cl) (x : U (chOf c)) (hx : x.1 ∈ UAd B.sp.cm (B.R.N j))
     : ∃ (hJ : x.1 ∈ J0 B.sp.cm (B.R.N j) ((B.primes X).vT u))
         (hm : (redG B.sp.cm (B.R.N j) ((B.primes X).vT u) (B.primes X).vGs ⟨x.1, hJ⟩)⁻¹
@@ -376,7 +413,6 @@ variable
   {cst : LocCst X (rowSG Pr sel mu)} {L : ChIdx X Pr R (QE sel (mu : Chr X.F X.E X.K))}
   {Gc : ChGlob X R.m} {m2 : ℕ}
 
-set_option maxHeartbeats 1000000 in
 theorem exists_gLevH
     (hX : X.Ok) (hPr : Pr.Ok) (hsel : IsSel X sel) (hL : L.Ok Ch sel mu cst Gc m2)
     (hsh : cst.sharp = true)
@@ -515,7 +551,6 @@ theorem exists_gLevH
 
 end Level
 
-set_option maxHeartbeats 8000000 in
 theorem stepBefore_oneLevel : ∀ {B : Base} {X : PreX B.toPre} (I : TC B X), I.Ok → TC.Pins B X → ∀ (l : I.Laws) (Z : TC.Later B (I.cols l)), ∀ (u : B.Word) (G : GLoc (I.rec7 l Z).host.F (I.rec7 l Z).host.E (sigD (I.rec7 l Z)) (I.rec7 l Z).host.g) (Ch : Type) (chOf : (I.stp u I.mu0 (B.R.m - 1)).Cl → Ch) (K : ∀ β : Ch, LevelChart (I.rec7 l Z) (B.T u) (badG (I.rec7 l Z)) (B.R.m - 1) (Nat.sub_le _ _) (fun c : {c // chOf c = β} => (I.chain l u I.mu0).stab (B.R.m - 1) c.1) (fun c => latCrd (I.rec7 l Z) (B.R.m - 1) (Nat.sub_le _ _) (I.latAt u I.mu0 (B.R.m - 1) c.1))), I.IdG l Z G → I.ReadsK l Z u I.mu0 (B.R.m - 1) (Nat.sub_le _ _) chOf K → ∃ (J : StepLevel (I.rec7 l Z).host.F (I.rec7 l Z).host.E (sigD (I.rec7 l Z)) (gramN (I.rec7 l Z) (B.R.m - 1) (Nat.sub_le _ _)) (B.T u) B.R.f (badG (I.rec7 l Z))) (lamJ : ∀ (j : Fin 2) (v : HeightOneSpectrum (𝓞 (I.rec7 l Z).host.F)), ((I.rec7 l Z).host.g j : 𝓞 (I.rec7 l Z).host.F) ∈ v.asIdeal → HSym (I.rec7 l Z) (B.R.N (B.R.m - 1)) false v →* ℂˣ) (V : GLevH J G (fun _ v _ => HSym (I.rec7 l Z) (B.R.N (B.R.m - 1)) false v) lamJ) (Yb : Type) (_ : Finite Yb) (_ : MulAction J.U Yb) (yb : Ch → Yb), (∀ j v h, V.fr j v h = 1) ∧ (∀ j v h M, ((lamJ j v h M : ℂˣ) : ℂ) = lamSym (G.psi0 j v h) (G.chiB j v h) B.R.k (rSD B.R) B.R.t (B.R.m - 1) M.1.1) ∧ (∀ y : Yb, ∃! β, ∃ κ : J.U, κ • yb β = y) ∧ ∀ β, (K β).lev.Lb = J.Lb ∧ (K β).lev.U ≤ J.U ∧ (∀ κ : J.U, κ.1 ∈ (K β).lev.U ↔ κ • yb β = yb β) ∧ ∀ (κ : (K β).lev.U) (κ' : J.U), κ.1 = κ'.1 → (K β).lev.chi κ = J.chi κ' := by
   intro B X I hOk hPins l Z u G Ch chOf K hG hR
   classical

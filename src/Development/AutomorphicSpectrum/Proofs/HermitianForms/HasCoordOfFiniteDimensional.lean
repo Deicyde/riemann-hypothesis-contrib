@@ -1,10 +1,61 @@
 module
 
-public import Mathlib
-public import Formalism.UnipotentAdelicQuotients.SiegelWeilUnitaryConvergent
-public import Formalism.UnipotentAdelicQuotients.StdAdditiveCharExists
-public import Development.AutomorphicSpectrum.Proofs.HermitianForms.BijectiveLinearCombinationOfRankAtStalk
+public import Formalism.UnipotentAdelicQuotients.SWXSDefs
 public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.HermitianCharacters.SelfDualLatticeFiltrationCharacter
+public import Development.AutomorphicSpectrum.Proofs.HermitianForms.BijectiveLinearCombinationOfRankAtStalk
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Convex.Contractible
+import Mathlib.Analysis.LocallyConvex.AbsConvexOpen
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Complex.Circle
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Homotopy.Lifting
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -18,68 +69,58 @@ namespace GlobalTheory.CompanionTheory.SelfDualInf
 def HasCoord (V : Type) [AddCommGroup V] [TopologicalSpace V] : Prop :=
   ∃ (N : ℕ) (e : V ≃+ (Fin N → ℝ)), Continuous e ∧ Continuous e.symm
 
-theorem HasCoord.of_equiv
-    {V W : Type} [AddCommGroup V] [TopologicalSpace V] [AddCommGroup W] [TopologicalSpace W]
-    (e : V ≃+ W) (h1 : Continuous e) (h2 : Continuous e.symm)
-    (h : HasCoord W)
-    : HasCoord V := by
+theorem HasCoord.of_equiv {V W : Type} [AddCommGroup V] [TopologicalSpace V] [AddCommGroup W]
+    [TopologicalSpace W] (e : V ≃+ W) (h1 : Continuous e) (h2 : Continuous e.symm)
+    (h : HasCoord W) : HasCoord V := by
   obtain ⟨N, f, g1, g2⟩ := h
   exact ⟨N, e.trans f, g1.comp h1, h2.comp g2⟩
 
-theorem hasCoord_of_finiteDimensional
-    (W : Type) [NormedAddCommGroup W] [NormedSpace ℝ W] [FiniteDimensional ℝ W]
-    : HasCoord W := by
+theorem hasCoord_of_finiteDimensional (W : Type) [NormedAddCommGroup W] [NormedSpace ℝ W]
+    [FiniteDimensional ℝ W] : HasCoord W := by
   let T := (Module.finBasis ℝ W).equivFunL
   exact ⟨_, T.toLinearEquiv.toAddEquiv, T.continuous, T.symm.continuous⟩
 
-theorem HasCoord.pi
-    {V : Type} [AddCommGroup V] [TopologicalSpace V] (h : HasCoord V) (ι : Type) [Fintype ι]
-    : HasCoord (ι → V) := by
+theorem HasCoord.pi {V : Type} [AddCommGroup V] [TopologicalSpace V] (h : HasCoord V)
+    (ι : Type) [Fintype ι] : HasCoord (ι → V) := by
   obtain ⟨N, f, g1, g2⟩ := h
   refine HasCoord.of_equiv (AddEquiv.piCongrRight fun _ : ι => f) ?_ ?_
     (hasCoord_of_finiteDimensional (ι → Fin N → ℝ))
   · exact continuous_pi fun i => g1.comp (continuous_apply i)
   · exact continuous_pi fun i => g2.comp (continuous_apply i)
 
-theorem HasCoord.fixed
-    {V : Type} [AddCommGroup V] [TopologicalSpace V]
-    (h : HasCoord V)
-    (f : V →+ V) (hf : Continuous f)
-    (H : AddSubgroup V) (hH : ∀ x, x ∈ H ↔ f x = x)
-    : HasCoord H := by
+theorem HasCoord.fixed {V : Type} [AddCommGroup V] [TopologicalSpace V] (h : HasCoord V)
+    (f : V →+ V) (hf : Continuous f) (H : AddSubgroup V) (hH : ∀ x, x ∈ H ↔ f x = x) :
+    HasCoord H := by
   obtain ⟨N, e, g1, g2⟩ := h
-  let f' : (Fin N → ℝ) →+ (Fin N → ℝ) := (e.toAddMonoidHom.comp f).comp e.symm.toAddMonoidHom
+  let f' : (Fin N → ℝ) →+ (Fin N → ℝ) :=
+    (e.toAddMonoidHom.comp f).comp e.symm.toAddMonoidHom
   have hf' : Continuous f' := g1.comp (hf.comp g2)
   let K : Submodule ℝ (Fin N → ℝ) :=
     LinearMap.eqLocus (f'.toRealLinearMap hf' : (Fin N → ℝ) →ₗ[ℝ] (Fin N → ℝ)) LinearMap.id
   have hK : ∀ u, u ∈ K ↔ e (f (e.symm u)) = u := fun u => Iff.rfl
-  let T : H ≃+ K := {
-    toFun := fun x => ⟨e x, (hK _).2 (by rw [e.symm_apply_apply, (hH _).1 x.2])⟩
-    invFun := fun u =>
-      ⟨e.symm u, (hH _).2 (by apply e.injective; rw [(hK _).1 u.2, e.apply_symm_apply])⟩
-    left_inv := fun x => Subtype.ext (e.symm_apply_apply _)
-    right_inv := fun u => Subtype.ext (e.apply_symm_apply _)
-    map_add' := fun x y => Subtype.ext (e.map_add _ _)
-  }
+  let T : H ≃+ K :=
+    { toFun := fun x => ⟨e x, (hK _).2 (by rw [e.symm_apply_apply, (hH _).1 x.2])⟩
+      invFun := fun u => ⟨e.symm u, (hH _).2 (by
+        apply e.injective; rw [(hK _).1 u.2, e.apply_symm_apply])⟩
+      left_inv := fun x => Subtype.ext (e.symm_apply_apply _)
+      right_inv := fun u => Subtype.ext (e.apply_symm_apply _)
+      map_add' := fun x y => Subtype.ext (e.map_add _ _) }
   refine HasCoord.of_equiv T ?_ ?_ (hasCoord_of_finiteDimensional K)
   · exact (g1.comp continuous_subtype_val).subtype_mk _
   · exact (g2.comp continuous_subtype_val).subtype_mk _
 
-theorem HasCoord.secondCountable {V : Type} [AddCommGroup V] [TopologicalSpace V] (h : HasCoord V)
-    : SecondCountableTopology V := by
+theorem HasCoord.secondCountable {V : Type} [AddCommGroup V] [TopologicalSpace V]
+    (h : HasCoord V) : SecondCountableTopology V := by
   obtain ⟨N, e, g1, g2⟩ := h
   exact (Homeomorph.mk e.toEquiv g1 g2).secondCountableTopology
 
-theorem HasCoord.char_eq_exp
-    {V : Type} [AddCommGroup V] [TopologicalSpace V]
-    (h : HasCoord V)
-    (χ : V → ℂ) (hc : Continuous χ) (ha : ∀ x y, χ (x + y) = χ x * χ y) (hn : ∀ x, ‖χ x‖ = 1)
-    : ∃ L : V →+ ℝ, Continuous L ∧ ∀ x, χ x = Complex.exp ((L x : ℂ) * Complex.I) := by
+theorem HasCoord.char_eq_exp {V : Type} [AddCommGroup V] [TopologicalSpace V] (h : HasCoord V)
+    (χ : V → ℂ) (hc : Continuous χ) (ha : ∀ x y, χ (x + y) = χ x * χ y) (hn : ∀ x, ‖χ x‖ = 1) :
+    ∃ L : V →+ ℝ, Continuous L ∧ ∀ x, χ x = Complex.exp ((L x : ℂ) * Complex.I) := by
   obtain ⟨N, e, g1, g2⟩ := h
-  let f : C((Fin N → ℝ), Circle) := ⟨
-    fun u => ⟨χ (e.symm u), mem_sphere_zero_iff_norm.2 (hn _)⟩,
-    (hc.comp g2).subtype_mk fun u => mem_sphere_zero_iff_norm.2 (hn _)
-  ⟩
+  let f : C((Fin N → ℝ), Circle) :=
+    ⟨fun u => ⟨χ (e.symm u), mem_sphere_zero_iff_norm.2 (hn _)⟩,
+      (hc.comp g2).subtype_mk fun u => mem_sphere_zero_iff_norm.2 (hn _)⟩
   have hfa : ∀ u v, f (u + v) = f u * f v := fun u v => by
     apply Subtype.ext
     show χ (e.symm (u + v)) = χ (e.symm u) * χ (e.symm v)
@@ -88,18 +129,14 @@ theorem HasCoord.char_eq_exp
     have := hfa 0 0
     rw [add_zero] at this
     exact mul_left_cancel (a := f 0) (by rw [mul_one]; exact this.symm)
-  obtain ⟨G, ⟨hG0, hG⟩, -⟩ :=
-    Circle.isCoveringMap_exp.existsUnique_continuousMap_lifts f 0 0
-      (by rw [hf0]; exact Circle.exp_zero)
+  obtain ⟨G, ⟨hG0, hG⟩, -⟩ := Circle.isCoveringMap_exp.existsUnique_continuousMap_lifts f 0 0
+    (by rw [hf0]; exact Circle.exp_zero)
   have hGx : ∀ u, Circle.exp (G u) = f u := fun u => congrFun hG u
   have hadd : ∀ u v, G (u + v) = G u + G v := by
     intro u v
-    have :=
-      Circle.isCoveringMap_exp.eq_of_comp_eq
-        (g₁ := fun u => G (u + v))
-        (g₂ := fun u => G u + G v)
-        (by fun_prop) (by fun_prop)
-        (by funext u; simp only [Function.comp, Circle.exp_add, hGx, hfa]) 0 (by simp [hG0])
+    have := Circle.isCoveringMap_exp.eq_of_comp_eq (g₁ := fun u => G (u + v))
+      (g₂ := fun u => G u + G v) (by fun_prop) (by fun_prop)
+      (by funext u; simp only [Function.comp, Circle.exp_add, hGx, hfa]) 0 (by simp [hG0])
     exact congrFun this u
   refine ⟨(AddMonoidHom.mk' G hadd).comp e.toAddMonoidHom, G.continuous.comp g1, fun x => ?_⟩
   have := congrArg (fun z : Circle => (z : ℂ)) (hGx (e x))
@@ -109,13 +146,12 @@ theorem HasCoord.char_eq_exp
   show χ x = χ (e.symm (e x))
   rw [e.symm_apply_apply]
 
-theorem HasCoord.exists_selfDual
-    {V : Type} [AddCommGroup V] [TopologicalSpace V] [MeasurableSpace V] [BorelSpace V]
-    (h : HasCoord V)
-    (β : V → V → ℝ) (ha : ∀ x y y', β x (y + y') = β x y + β x y') (hc : ∀ x, Continuous (β x))
-    (hs : ∀ x y, β x y = β y x) (hn : ∀ x, (∀ y, β x y = 0) → x = 0)
-    (χ : V → V → ℂ) (hχ : ∀ x y, χ x y = Complex.exp ((β x y : ℂ) * Complex.I))
-    : ∃ μ : Measure V, SelfDual μ χ := by
+theorem HasCoord.exists_selfDual {V : Type} [AddCommGroup V] [TopologicalSpace V]
+    [MeasurableSpace V] [BorelSpace V] (h : HasCoord V) (β : V → V → ℝ)
+    (ha : ∀ x y y', β x (y + y') = β x y + β x y') (hc : ∀ x, Continuous (β x))
+    (hs : ∀ x y, β x y = β y x) (hn : ∀ x, (∀ y, β x y = 0) → x = 0) (χ : V → V → ℂ)
+    (hχ : ∀ x y, χ x y = Complex.exp ((β x y : ℂ) * Complex.I)) :
+    ∃ μ : Measure V, SelfDual μ χ := by
   obtain ⟨N, e, g1, g2⟩ := h
   let l : V → (Fin N → ℝ) →L[ℝ] ℝ := fun x =>
     ((AddMonoidHom.mk' (β x) (ha x)).comp e.symm.toAddMonoidHom).toRealLinearMap ((hc x).comp g2)
@@ -127,10 +163,11 @@ theorem HasCoord.exists_selfDual
     have h2 : β x y = l x (e y) := by rw [hl, e.symm_apply_apply]
     rw [h2]
     conv_lhs => rw [h1]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_smul, smul_eq_mul]
+
+    simp only [map_sum, map_smul, smul_eq_mul]
     rfl
-  let A : Matrix (Fin N) (Fin N) ℝ := fun i j => β (e.symm (Pi.single i 1)) (e.symm (Pi.single j 1))
+  let A : Matrix (Fin N) (Fin N) ℝ := fun i j =>
+    β (e.symm (Pi.single i 1)) (e.symm (Pi.single j 1))
   have hA : ∀ x y, β x y = dotProduct (e x) (A.mulVec (e y)) := by
     intro x y
     rw [hs, hexp]
@@ -138,31 +175,28 @@ theorem HasCoord.exists_selfDual
     congr 1
     rw [hs, hexp]
     exact Finset.sum_congr rfl fun j _ => mul_comm _ _
-  refine
-    GlobalTheory.CompanionTheory.SelfDualReal.exists_selfDual V N e A χ g1 g2 ?_ ?_ fun x y => by
-      rw [hχ, hA]
+  refine GlobalTheory.CompanionTheory.SelfDualReal.exists_selfDual V N e A χ g1 g2 ?_ ?_ fun x y => by rw [hχ, hA]
   · ext i j; exact hs _ _
   · intro hd
     obtain ⟨v, hv0, hv⟩ := Matrix.exists_mulVec_eq_zero_iff.2 hd
     apply hv0
-    have : e.symm v = 0 := hn _ fun y => by rw [hs, hA, e.apply_symm_apply, hv, dotProduct_zero]
+    have : e.symm v = 0 := hn _ fun y => by
+      rw [hs, hA, e.apply_symm_apply, hv, dotProduct_zero]
     simpa using congrArg e this
 
 section Alg
 
-variable
-  {F E : Type} [Field F] [Field E] [Algebra F E] [FiniteDimensional F E]
-  (R : Type) [CommRing R] [Algebra F R]
-  (σ : E →ₐ[F] E)
+variable {F E : Type} [Field F] [Field E] [Algebra F E] [FiniteDimensional F E]
+  (R : Type) [CommRing R] [Algebra F R] (σ : E →ₐ[F] E)
 
-theorem trace_tmul (r : R) (x : E)
-    : Algebra.trace R (R ⊗[F] E) (r ⊗ₜ[F] x) = r * algebraMap F R (Algebra.trace F E x) := by
-  have h : Algebra.lmul R (R ⊗[F] E) (r ⊗ₜ[F] x) = r • (Algebra.lmul F E x).baseChange R := by
+theorem trace_tmul (r : R) (x : E) : Algebra.trace R (R ⊗[F] E) (r ⊗ₜ[F] x) =
+    r * algebraMap F R (Algebra.trace F E x) := by
+  have h : Algebra.lmul R (R ⊗[F] E) (r ⊗ₜ[F] x) =
+      r • (Algebra.lmul F E x).baseChange R := by
     refine TensorProduct.AlgebraTensorModule.curry_injective ?_
     ext y
     simp [Algebra.TensorProduct.tmul_mul_tmul, TensorProduct.smul_tmul', mul_comm]
-  rw [Algebra.trace_apply, h, map_smul, LinearMap.trace_baseChange, smul_eq_mul,
-    Algebra.trace_apply]
+  rw [Algebra.trace_apply, h, map_smul, LinearMap.trace_baseChange, smul_eq_mul, Algebra.trace_apply]
 
 theorem sigR_tmul (r : R) (x : E) : sigR R σ (r ⊗ₜ[F] x) = r ⊗ₜ[F] σ x := rfl
 
@@ -181,8 +215,8 @@ def sigLin : R ⊗[F] E →ₗ[R] R ⊗[F] E where
   map_add' := map_add _
   map_smul' := sigR_smul R σ
 
-theorem trace_sigR (hσ : ∀ x, σ (σ x) = x) (z : R ⊗[F] E)
-    : Algebra.trace R (R ⊗[F] E) (sigR R σ z) = Algebra.trace R (R ⊗[F] E) z := by
+theorem trace_sigR (hσ : ∀ x, σ (σ x) = x) (z : R ⊗[F] E) :
+    Algebra.trace R (R ⊗[F] E) (sigR R σ z) = Algebra.trace R (R ⊗[F] E) z := by
   induction z with
   | tmul r x =>
     rw [sigR_tmul, trace_tmul, trace_tmul]
@@ -190,9 +224,8 @@ theorem trace_sigR (hσ : ∀ x, σ (σ x) = x) (z : R ⊗[F] E)
     exact Algebra.trace_eq_of_algEquiv (AlgEquiv.ofAlgHom σ σ (AlgHom.ext hσ) (AlgHom.ext hσ)) x
   | add a b ha hb => rw [map_add (f := _), map_add (f := _), map_add (f := _), ha, hb]
 
-theorem trace_nondeg
-    [Algebra.IsSeparable F E] (z : R ⊗[F] E) (h : ∀ u, Algebra.trace R (R ⊗[F] E) (z * u) = 0)
-    : z = 0 := by
+theorem trace_nondeg [Algebra.IsSeparable F E] (z : R ⊗[F] E)
+    (h : ∀ u, Algebra.trace R (R ⊗[F] E) (z * u) = 0) : z = 0 := by
   classical
   let b := Module.finBasis F E
   let B := Algebra.traceForm F E
@@ -206,8 +239,8 @@ theorem trace_nondeg
   have hc : ∀ j, c.repr z j = 0 := by
     intro j
     have h1 := h ((1 : R) ⊗ₜ[F] b' j)
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hz, Finset.sum_mul, map_sum] at h1
+
+    rw [hz, Finset.sum_mul, map_sum] at h1
     simp only [Algebra.TensorProduct.tmul_mul_tmul, mul_one, trace_tmul] at h1
     rw [Finset.sum_eq_single j] at h1
     · have h2 : Algebra.trace F E (b j * b' j) = 1 := by
@@ -228,62 +261,51 @@ end Alg
 
 section Form
 
-variable
-  {F E : Type} [Field F] [Field E] [Algebra F E] [FiniteDimensional F E]
-  (R : Type) [CommRing R] [Algebra F R]
-  (σ : E →ₐ[F] E)
+variable {F E : Type} [Field F] [Field E] [Algebra F E] [FiniteDimensional F E]
+  (R : Type) [CommRing R] [Algebra F R] (σ : E →ₐ[F] E)
 
-theorem sigR_JR {M : ℕ} {J : Matrix (Fin M) (Fin M) E} (hJ : ∀ i j, σ (J j i) = J i j) (i j : Fin M)
-    : sigR R σ (JR R J i j) = JR R J j i := by
+theorem sigR_JR {M : ℕ} {J : Matrix (Fin M) (Fin M) E} (hJ : ∀ i j, σ (J j i) = J i j)
+    (i j : Fin M) : sigR R σ (JR R J i j) = JR R J j i := by
   show sigR R σ ((1 : R) ⊗ₜ[F] J i j) = (1 : R) ⊗ₜ[F] J j i
   rw [sigR_tmul, hJ]
 
-theorem sigR_hR
-    (hσ : ∀ x, σ (σ x) = x)
-    {M : ℕ} {J : Matrix (Fin M) (Fin M) E} (hJ : ∀ i j, σ (J j i) = J i j) (x y : Fin M → R ⊗[F] E)
-    : sigR R σ (hR R σ J x y) = hR R σ J y x := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [hR, hform, map_sum, map_mul, sigR_invol R σ hσ, sigR_JR R σ hJ]
+theorem sigR_hR (hσ : ∀ x, σ (σ x) = x) {M : ℕ} {J : Matrix (Fin M) (Fin M) E}
+    (hJ : ∀ i j, σ (J j i) = J i j) (x y : Fin M → R ⊗[F] E) :
+    sigR R σ (hR R σ J x y) = hR R σ J y x := by
+
+  simp only [hR, hform, map_sum, map_mul, sigR_invol R σ hσ, sigR_JR R σ hJ]
   rw [Finset.sum_comm]
   exact Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => by ring
 
-theorem BR_comm
-    (hσ : ∀ x, σ (σ x) = x)
-    {M n : ℕ} {J : Matrix (Fin M) (Fin M) E}
-    (hJ : ∀ i j, σ (J j i) = J i j) (X Y : Fin n → Fin M → R ⊗[F] E)
-    : BR R σ J X Y = BR R σ J Y X :=
+theorem BR_comm (hσ : ∀ x, σ (σ x) = x) {M n : ℕ} {J : Matrix (Fin M) (Fin M) E}
+    (hJ : ∀ i j, σ (J j i) = J i j) (X Y : Fin n → Fin M → R ⊗[F] E) :
+    BR R σ J X Y = BR R σ J Y X :=
   Finset.sum_congr rfl fun a _ => by rw [← sigR_hR R σ hσ hJ (Y a) (X a), trace_sigR R σ hσ]
 
-theorem BR_add_right {M n : ℕ} (J : Matrix (Fin M) (Fin M) E) (X Y Y' : Fin n → Fin M → R ⊗[F] E)
-    : BR R σ J X (Y + Y') = BR R σ J X Y + BR R σ J X Y' := by
+theorem BR_add_right {M n : ℕ} (J : Matrix (Fin M) (Fin M) E)
+    (X Y Y' : Fin n → Fin M → R ⊗[F] E) :
+    BR R σ J X (Y + Y') = BR R σ J X Y + BR R σ J X Y' := by
   simp only [BR, hR, hform, Pi.add_apply, mul_add, Finset.sum_add_distrib, map_add (f := _)]
 
-theorem trace_nondeg_of
-    [Algebra.IsSeparable F E]
-    (L : R →+ ℝ) (hL : ∀ t, (∀ r, L (r * t) = 0) → t = 0)
-    (z : R ⊗[F] E) (h : ∀ u, L (Algebra.trace R (R ⊗[F] E) (z * u)) = 0)
-    : z = 0 :=
-  trace_nondeg R z fun u =>
-    hL _ fun r => by
-      have := h (r • u)
-      rwa [mul_smul_comm, map_smul, smul_eq_mul] at this
+theorem trace_nondeg_of [Algebra.IsSeparable F E] (L : R →+ ℝ)
+    (hL : ∀ t, (∀ r, L (r * t) = 0) → t = 0) (z : R ⊗[F] E)
+    (h : ∀ u, L (Algebra.trace R (R ⊗[F] E) (z * u)) = 0) : z = 0 :=
+  trace_nondeg R z fun u => hL _ fun r => by
+    have := h (r • u)
+    rwa [mul_smul_comm, map_smul, smul_eq_mul] at this
 
-theorem BR_nondeg
-    [Algebra.IsSeparable F E]
-    (L : R →+ ℝ) (hL : ∀ t, (∀ r, L (r * t) = 0) → t = 0)
-    (hσ : ∀ x, σ (σ x) = x)
-    {M n : ℕ} {J : Matrix (Fin M) (Fin M) E}
-    (hdet : J.det ≠ 0) (X : Fin n → Fin M → R ⊗[F] E) (h : ∀ Y, L (BR R σ J X Y) = 0)
-    : X = 0 := by
+theorem BR_nondeg [Algebra.IsSeparable F E] (L : R →+ ℝ)
+    (hL : ∀ t, (∀ r, L (r * t) = 0) → t = 0) (hσ : ∀ x, σ (σ x) = x) {M n : ℕ}
+    {J : Matrix (Fin M) (Fin M) E} (hdet : J.det ≠ 0) (X : Fin n → Fin M → R ⊗[F] E)
+    (h : ∀ Y, L (BR R σ J X Y) = 0) : X = 0 := by
   classical
   funext a
   let v : Fin M → R ⊗[F] E := fun i => sigR R σ (X a i)
   have hv : ∀ j, ∑ i, v i * JR R J i j = 0 := by
     intro j
     refine trace_nondeg_of R L hL _ fun u => ?_
-    have e
-        : BR R σ J X (Pi.single a (Pi.single j u))
-          = Algebra.trace R (R ⊗[F] E) ((∑ i, v i * JR R J i j) * u) := by
+    have e : BR R σ J X (Pi.single a (Pi.single j u)) =
+        Algebra.trace R (R ⊗[F] E) ((∑ i, v i * JR R J i j) * u) := by
       unfold BR
       rw [Finset.sum_eq_single a]
       · congr 1
@@ -297,13 +319,11 @@ theorem BR_nondeg
     unfold JR
     rw [← Matrix.map_mul, Matrix.mul_nonsing_inv J (isUnit_iff_ne_zero.2 hdet),
       Matrix.map_one _ (map_zero _) (map_one _)]
-  have hv0 : Matrix.vecMul v (JR R J) = 0 :=
-    funext fun j => by simpa [Matrix.vecMul, dotProduct] using hv j
+  have hv0 : Matrix.vecMul v (JR R J) = 0 := funext fun j => by
+    simpa [Matrix.vecMul, dotProduct] using hv j
   have hz : v = 0 := by
-    calc
-      v = Matrix.vecMul v (JR (F := F) R J * JR (F := F) R J⁻¹) := by rw [hinv, Matrix.vecMul_one]
-      _ = Matrix.vecMul (Matrix.vecMul v (JR (F := F) R J)) (JR (F := F) R J⁻¹) :=
-        (Matrix.vecMul_vecMul _ _ _).symm
+    calc v = Matrix.vecMul v (JR (F := F) R J * JR (F := F) R J⁻¹) := by rw [hinv, Matrix.vecMul_one]
+      _ = Matrix.vecMul (Matrix.vecMul v (JR (F := F) R J)) (JR (F := F) R J⁻¹) := (Matrix.vecMul_vecMul _ _ _).symm
       _ = 0 := by rw [hv0, Matrix.zero_vecMul]
   funext i
   have := congrArg (sigR R σ) (congrFun hz i)
@@ -314,32 +334,28 @@ theorem pairHerm_comm (n : ℕ) (S T : HermR R σ n) : pairHerm R σ n S T = pai
   rw [Finset.sum_comm]
   simp only [mul_comm]
 
-theorem pairHerm_add_right (n : ℕ) (S T T' : HermR R σ n)
-    : pairHerm R σ n S (T + T') = pairHerm R σ n S T + pairHerm R σ n S T' := by
+theorem pairHerm_add_right (n : ℕ) (S T T' : HermR R σ n) :
+    pairHerm R σ n S (T + T') = pairHerm R σ n S T + pairHerm R σ n S T' := by
   simp only [pairHerm, AddSubgroup.coe_add, Matrix.add_apply, mul_add, Finset.sum_add_distrib,
     map_add]
 
-def hermUnit (hσ : ∀ x, σ (σ x) = x) (n : ℕ) (a b : Fin n) (u : R ⊗[F] E) : HermR R σ n := ⟨
-  fun i j => (if i = b ∧ j = a then u else 0) + (if i = a ∧ j = b then sigR R σ u else 0),
-  by
+def hermUnit (hσ : ∀ x, σ (σ x) = x) (n : ℕ) (a b : Fin n) (u : R ⊗[F] E) : HermR R σ n :=
+  ⟨fun i j => (if i = b ∧ j = a then u else 0) + (if i = a ∧ j = b then sigR R σ u else 0), by
     intro i j
     have e1 : (j = b ∧ i = a) ↔ (i = a ∧ j = b) := and_comm
     have e2 : (j = a ∧ i = b) ↔ (i = b ∧ j = a) := and_comm
     simp only [map_add (f := _), apply_ite (sigR R σ), map_zero, sigR_invol R σ hσ, e1, e2]
-    rw [add_comm]
-⟩
+    rw [add_comm]⟩
 
-theorem pairHerm_hermUnit
-    [CharZero F] (hσ : ∀ x, σ (σ x) = x) (n : ℕ) (S : HermR R σ n) (a b : Fin n) (u : R ⊗[F] E)
-    : pairHerm R σ n S (hermUnit R σ hσ n a b u)
-      = Algebra.trace R (R ⊗[F] E) ((S : Matrix (Fin n) (Fin n) (R ⊗[F] E)) a b * u) := by
+theorem pairHerm_hermUnit [CharZero F] (hσ : ∀ x, σ (σ x) = x) (n : ℕ) (S : HermR R σ n)
+    (a b : Fin n) (u : R ⊗[F] E) :
+    pairHerm R σ n S (hermUnit R σ hσ n a b u) = Algebra.trace R (R ⊗[F] E)
+      ((S : Matrix (Fin n) (Fin n) (R ⊗[F] E)) a b * u) := by
   set w := (S : Matrix (Fin n) (Fin n) (R ⊗[F] E)) a b * u with hw
   have hs : sigR R σ w = (S : Matrix (Fin n) (Fin n) (R ⊗[F] E)) b a * sigR R σ u := by
     rw [hw, map_mul, S.2 b a]
-  have hsum
-      : (∑ c, ∑ d, (S : Matrix (Fin n) (Fin n) (R ⊗[F] E)) c d *
-          (hermUnit R σ hσ n a b u : Matrix (Fin n) (Fin n) (R ⊗[F] E)) d c)
-        = w + sigR R σ w := by
+  have hsum : (∑ c, ∑ d, (S : Matrix (Fin n) (Fin n) (R ⊗[F] E)) c d *
+      (hermUnit R σ hσ n a b u : Matrix (Fin n) (Fin n) (R ⊗[F] E)) d c) = w + sigR R σ w := by
     rw [hs, hw]
     simp [hermUnit, mul_add, Finset.sum_add_distrib, ite_and, Finset.sum_ite_eq, Finset.sum_ite_eq']
   have h2 : algebraMap F R (1 / 2) * 2 = 1 := by
@@ -348,12 +364,9 @@ theorem pairHerm_hermUnit
   unfold pairHerm
   rw [hsum, map_add (f := _), trace_sigR R σ hσ, ← two_mul, ← mul_assoc, h2, one_mul]
 
-theorem pairHerm_nondeg
-    [CharZero F] [Algebra.IsSeparable F E]
-    (L : R →+ ℝ) (hL : ∀ t, (∀ r, L (r * t) = 0) → t = 0)
-    (hσ : ∀ x, σ (σ x) = x)
-    (n : ℕ) (S : HermR R σ n) (h : ∀ T, L (pairHerm R σ n S T) = 0)
-    : S = 0 := by
+theorem pairHerm_nondeg [CharZero F] [Algebra.IsSeparable F E] (L : R →+ ℝ)
+    (hL : ∀ t, (∀ r, L (r * t) = 0) → t = 0) (hσ : ∀ x, σ (σ x) = x) (n : ℕ) (S : HermR R σ n)
+    (h : ∀ T, L (pairHerm R σ n S T) = 0) : S = 0 := by
   apply Subtype.ext
   funext a b
   refine trace_nondeg_of R L hL _ fun u => ?_
@@ -364,8 +377,7 @@ end Form
 
 section Top
 
-variable
-  {F E : Type} [Field F] [Field E] [Algebra F E] [FiniteDimensional F E]
+variable {F E : Type} [Field F] [Field E] [Algebra F E] [FiniteDimensional F E]
   (R : Type) [CommRing R] [Algebra F R] [TopologicalSpace R] [IsTopologicalRing R]
   (σ : E →ₐ[F] E)
 
@@ -385,25 +397,22 @@ theorem continuous_sigR : Continuous (sigR R σ) :=
   have := isTopologicalRing_tens (F := F) (E := E) R
   IsModuleTopology.continuous_of_linearMap (sigLin R σ)
 
-theorem continuous_BR {M n : ℕ} (J : Matrix (Fin M) (Fin M) E) (X : Fin n → Fin M → R ⊗[F] E)
-    : Continuous (BR R σ J X) := by
+theorem continuous_BR {M n : ℕ} (J : Matrix (Fin M) (Fin M) E)
+    (X : Fin n → Fin M → R ⊗[F] E) : Continuous (BR R σ J X) := by
   have := isTopologicalRing_tens (F := F) (E := E) R
   show Continuous fun Y : Fin n → Fin M → R ⊗[F] E => ∑ a, Algebra.trace R (R ⊗[F] E)
     (∑ i, ∑ j, sigR R σ (X a i) * JR R J i j * Y a j)
-  exact continuous_finsetSum _ fun a _ =>
-    (continuous_trace R).comp
-      (continuous_finsetSum _ fun i _ =>
-        continuous_finsetSum _ fun j _ =>
-          continuous_const.mul ((continuous_apply j).comp (continuous_apply a)))
+  exact continuous_finsetSum _ fun a _ => (continuous_trace R).comp
+    (continuous_finsetSum _ fun i _ => continuous_finsetSum _ fun j _ =>
+      continuous_const.mul ((continuous_apply j).comp (continuous_apply a)))
 
 theorem continuous_pairHerm (n : ℕ) (S : HermR R σ n) : Continuous (pairHerm R σ n S) := by
   have := isTopologicalRing_tens (F := F) (E := E) R
   show Continuous fun T : HermR R σ n => algebraMap F R (1 / 2) * Algebra.trace R (R ⊗[F] E)
     (∑ a, ∑ b, (S : Matrix (Fin n) (Fin n) (R ⊗[F] E)) a b * (T : Matrix (Fin n) (Fin n) _) b a)
   exact continuous_const.mul ((continuous_trace R).comp
-    (continuous_finsetSum _ fun a _ =>
-      continuous_finsetSum _ fun b _ =>
-        continuous_const.mul (continuous_subtype_val.matrix_elem b a)))
+    (continuous_finsetSum _ fun a _ => continuous_finsetSum _ fun b _ =>
+      continuous_const.mul (continuous_subtype_val.matrix_elem b a)))
 
 theorem hasCoord_tens (h : HasCoord R) : HasCoord (R ⊗[F] E) := by
   have := isModuleTopology_tens (F := F) (E := E) R
@@ -412,13 +421,14 @@ theorem hasCoord_tens (h : HasCoord R) : HasCoord (R ⊗[F] E) := by
   exact HasCoord.of_equiv e.toAddEquiv (IsModuleTopology.continuous_of_linearMap e.toLinearMap)
     (IsModuleTopology.continuous_of_linearMap e.symm.toLinearMap) (h.pi _)
 
-theorem hasCoord_herm (h : HasCoord R) (n : ℕ) (hσ : ∀ x, σ (σ x) = x)
-    : HasCoord (HermR R σ n) := by
+theorem hasCoord_herm (h : HasCoord R) (n : ℕ) (hσ : ∀ x, σ (σ x) = x) :
+    HasCoord (HermR R σ n) := by
   have := isTopologicalRing_tens (F := F) (E := E) R
   have hm : HasCoord (Matrix (Fin n) (Fin n) (R ⊗[F] E)) :=
     ((hasCoord_tens R h).pi (Fin n)).pi (Fin n)
   let f : Matrix (Fin n) (Fin n) (R ⊗[F] E) →+ Matrix (Fin n) (Fin n) (R ⊗[F] E) :=
-    AddMonoidHom.mk' (fun S => (S.map (sigR R σ)).transpose) fun S T => by ext i j; simp
+    AddMonoidHom.mk' (fun S => (S.map (sigR R σ)).transpose) fun S T => by
+      ext i j; simp
   have hf : Continuous f := ((continuous_id.matrix_map (continuous_sigR R σ))).matrix_transpose
   refine hm.fixed f hf _ fun S => ⟨fun hS => ?_, fun hS a b => ?_⟩
   · ext a b; exact hS a b
@@ -441,19 +451,18 @@ theorem hasCoord_ainf (hF : IsTotallyReal F) : HasCoord (Ainf F) := by
     (continuous_pi fun w => (h2 w).comp (continuous_apply w))
     (hasCoord_of_finiteDimensional (InfinitePlace F → ℝ))
 
-theorem psiInf_add (ψ : AddChar (AF F) ℂ) (x y : Ainf F)
-    : psiInf F ψ (x + y) = psiInf F ψ x * psiInf F ψ y := by
+theorem psiInf_add (ψ : AddChar (AF F) ℂ) (x y : Ainf F) :
+    psiInf F ψ (x + y) = psiInf F ψ x * psiInf F ψ y := by
   unfold psiInf
   rw [← AddChar.map_add_eq_mul]
   congr 1
   exact Prod.ext rfl (add_zero _).symm
 
-theorem exists_functional (hF : IsTotallyReal F) (ψ : AddChar (AF F) ℂ) (hψ : IsCharAF F ψ)
-    : ∃ L : Ainf F →+ ℝ,
-      Continuous L ∧ (∀ x, psiInf F ψ x = Complex.exp ((L x : ℂ) * Complex.I))
-        ∧ ∀ t, (∀ r, L (r * t) = 0) → t = 0 := by
-  obtain ⟨-, hc, hw⟩ :=
-    GlobalTheory.CompanionTheory.AdeleCharLocal.char_nontrivial_at_every_place F ψ hψ
+theorem exists_functional (hF : IsTotallyReal F) (ψ : AddChar (AF F) ℂ) (hψ : IsCharAF F ψ) :
+    ∃ L : Ainf F →+ ℝ, Continuous L ∧
+      (∀ x, psiInf F ψ x = Complex.exp ((L x : ℂ) * Complex.I)) ∧
+      ∀ t, (∀ r, L (r * t) = 0) → t = 0 := by
+  obtain ⟨-, hc, hw⟩ := GlobalTheory.CompanionTheory.AdeleCharLocal.char_nontrivial_at_every_place F ψ hψ
   obtain ⟨L, hL, hx⟩ := (hasCoord_ainf hF).char_eq_exp _ hc (psiInf_add ψ) fun x => hψ.2.1 _
   refine ⟨L, hL, hx, fun t ht => ?_⟩
   funext w
@@ -475,16 +484,7 @@ theorem exists_functional (hF : IsTotallyReal F) (ψ : AddChar (AF F) ℂ) (hψ 
 
 end Arch
 
-theorem exists_sdW_sdHerm
-    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-        (σ : E →ₐ[F] E),
-      IsCMExt F E σ
-        → ∀ (M : ℕ) (J : Matrix (Fin M) (Fin M) E),
-          IsHermND σ J
-            → ∀ (n : ℕ) (ψ : AddChar (AF F) ℂ),
-              IsCharAF F ψ
-                → (∃ μ, SdW F E σ M J (Ainf F) (psiInf F ψ) n μ)
-                  ∧ ∃ ν, SdHerm F E σ (Ainf F) (psiInf F ψ) n ν := by
+theorem exists_sdW_sdHerm : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E), IsCMExt F E σ → ∀ (M : ℕ) (J : Matrix (Fin M) (Fin M) E), IsHermND σ J → ∀ (n : ℕ) (ψ : AddChar (AF F) ℂ), IsCharAF F ψ → (∃ μ, SdW F E σ M J (Ainf F) (psiInf F ψ) n μ) ∧ ∃ ν, SdHerm F E σ (Ainf F) (psiInf F ψ) n ν := by
   intro F E _ _ _ _ _ σ hCM M J hJ n ψ hψ
   have : FiniteDimensional F E := Module.finite_of_finrank_pos (by rw [hCM.2.2.1]; norm_num)
   have hσ : ∀ x, σ (σ x) = x := by
@@ -499,21 +499,16 @@ theorem exists_sdW_sdHerm
   have : BorelSpace (Ainf F ⊗[F] E) := ⟨rfl⟩
   have : BorelSpace (HermR (Ainf F) σ n) := ⟨rfl⟩
   constructor
-  · exact ((hT.pi (Fin M)).pi (Fin n)).exists_selfDual
-      (fun X Y => L (BR (Ainf F) σ J X Y))
+  · exact ((hT.pi (Fin M)).pi (Fin n)).exists_selfDual (fun X Y => L (BR (Ainf F) σ J X Y))
       (fun X Y Y' => by rw [BR_add_right, map_add (f := _)])
       (fun X => hLc.comp (continuous_BR (Ainf F) σ J X))
       (fun X Y => by rw [BR_comm (Ainf F) σ hσ hJ.1])
-      (fun X h => BR_nondeg (Ainf F) σ L hLn hσ hJ.2 X h)
-      _
-      (fun X Y => hLx _)
+      (fun X h => BR_nondeg (Ainf F) σ L hLn hσ hJ.2 X h) _ (fun X Y => hLx _)
   · exact (hasCoord_herm (Ainf F) σ hA n hσ).exists_selfDual
       (fun S T => L (pairHerm (Ainf F) σ n S T))
       (fun S T T' => by rw [pairHerm_add_right, map_add (f := _)])
       (fun S => hLc.comp (continuous_pairHerm (Ainf F) σ n S))
       (fun S T => by rw [pairHerm_comm])
-      (fun S h => pairHerm_nondeg (Ainf F) σ L hLn hσ n S h)
-      _
-      (fun S T => hLx _)
+      (fun S h => pairHerm_nondeg (Ainf F) σ L hLn hσ n S h) _ (fun S T => hLx _)
 
 end GlobalTheory.CompanionTheory.SelfDualInf

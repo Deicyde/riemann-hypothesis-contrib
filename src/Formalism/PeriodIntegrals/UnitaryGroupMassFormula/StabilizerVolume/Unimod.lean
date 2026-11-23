@@ -1,8 +1,49 @@
 module
 
-public import Mathlib
+import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.StabilizerOrbitVolume.Unimod
 public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.StabilizerVolume.VolStabFromSWS
-public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.AdelicLocalCompactness.T2SpaceTensorProductFiniteExtension
+import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.AdelicLocalCompactness.AdeleLC
+import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.AdelicLocalCompactness.T2SpaceTensorProductFiniteExtension
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -15,25 +56,22 @@ open scoped Pointwise ENNReal NNReal
 
 section Gen
 
-variable
-  {G : Type*} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [LocallyCompactSpace G]
+variable {G : Type*} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [LocallyCompactSpace G]
   [T2Space G] [MeasurableSpace G] [BorelSpace G]
 
-theorem um_eq_smul_of_sigmaCompact
-    [SigmaCompactSpace G]
-    (μ' μ : Measure G) [IsHaarMeasure μ] [IsFiniteMeasureOnCompacts μ'] [IsMulLeftInvariant μ']
-    : μ' = haarScalarFactor μ' μ • μ := by
+theorem um_eq_smul_of_sigmaCompact [SigmaCompactSpace G] (μ' μ : Measure G) [IsHaarMeasure μ]
+    [IsFiniteMeasureOnCompacts μ'] [IsMulLeftInvariant μ'] :
+    μ' = haarScalarFactor μ' μ • μ := by
   ext s hs
-  have hmono : Monotone (fun n => s ∩ compactCovering G n) := fun m n hmn =>
-    inter_subset_inter_right _ (compactCovering_subset G hmn)
+  have hmono : Monotone (fun n => s ∩ compactCovering G n) :=
+    fun m n hmn => inter_subset_inter_right _ (compactCovering_subset G hmn)
   have hU : (⋃ n, s ∩ compactCovering G n) = s := by
     rw [← inter_iUnion, iUnion_compactCovering, inter_univ]
-  have key
-      : ∀ n, μ' (s ∩ compactCovering G n) = haarScalarFactor μ' μ • μ (s ∩ compactCovering G n) :=
-    fun n =>
-      measure_isMulInvariant_eq_smul_of_isCompact_closure_of_measurableSet μ' μ
-        (hs.inter (isCompact_compactCovering G n).isClosed.measurableSet)
-        ((isCompact_compactCovering G n).closure_of_subset inter_subset_right)
+  have key : ∀ n, μ' (s ∩ compactCovering G n) =
+      haarScalarFactor μ' μ • μ (s ∩ compactCovering G n) := fun n =>
+    measure_isMulInvariant_eq_smul_of_isCompact_closure_of_measurableSet μ' μ
+      (hs.inter (isCompact_compactCovering G n).isClosed.measurableSet)
+      ((isCompact_compactCovering G n).closure_of_subset inter_subset_right)
   rw [← hU, hmono.measure_iUnion, Measure.smul_apply, hmono.measure_iUnion]
   simp only [key, ENNReal.smul_def, smul_eq_mul]
   rw [ENNReal.mul_iSup]
@@ -43,7 +81,8 @@ def umD (Γ H : Subgroup G) (x : G) : Set G := {y | ∃ γ ∈ Γ, ∃ h ∈ H, 
 theorem um_self_mem_D (Γ H : Subgroup G) (x : G) : x ∈ umD Γ H x :=
   ⟨1, Γ.one_mem, 1, H.one_mem, by simp⟩
 
-theorem um_D_subset (Γ H : Subgroup G) {x z : G} (hz : z ∈ umD Γ H x) : umD Γ H z ⊆ umD Γ H x := by
+theorem um_D_subset (Γ H : Subgroup G) {x z : G} (hz : z ∈ umD Γ H x) :
+    umD Γ H z ⊆ umD Γ H x := by
   obtain ⟨γ, hγ, h, hh, rfl⟩ := hz
   rintro y ⟨γ', hγ', h', hh', rfl⟩
   exact ⟨γ' * γ, Γ.mul_mem hγ' hγ, h * h', H.mul_mem hh hh', by group⟩
@@ -53,7 +92,8 @@ theorem um_D_eq (Γ H : Subgroup G) {x z : G} (hz : z ∈ umD Γ H x) : umD Γ H
   obtain ⟨γ, hγ, h, hh, rfl⟩ := hz
   exact ⟨γ⁻¹, Γ.inv_mem hγ, h⁻¹, H.inv_mem hh, by group⟩
 
-theorem um_D_open (Γ H : Subgroup G) (hH : IsOpen (H : Set G)) (x : G) : IsOpen (umD Γ H x) := by
+theorem um_D_open (Γ H : Subgroup G) (hH : IsOpen (H : Set G)) (x : G) :
+    IsOpen (umD Γ H x) := by
   have : umD Γ H x = ⋃ γ : Γ, (fun z => (γ : G) * x * z) '' (H : Set G) := by
     ext y
     simp only [umD, mem_ofPred_eq, mem_iUnion, mem_image, SetLike.mem_coe, Subtype.exists,
@@ -79,18 +119,15 @@ theorem um_D_smul (Γ H : Subgroup G) (x : G) (γ : Γ) : γ • umD Γ H x = um
     show (γ : G) * ((γ : G)⁻¹ * γ' * x * h) = _
     group
 
-theorem um_smulInv (Γ : Subgroup G) (μ : Measure G) [IsMulLeftInvariant μ]
-    : SMulInvariantMeasure Γ G μ :=
+theorem um_smulInv (Γ : Subgroup G) (μ : Measure G) [IsMulLeftInvariant μ] :
+    SMulInvariantMeasure Γ G μ :=
   ⟨fun γ s _ => by
     have : (fun x : G => γ • x) = fun x => (γ : G) * x := rfl
     rw [this]
     exact measure_preimage_mul μ γ s⟩
 
-theorem um_sigmaCompact
-    (Γ : Subgroup G) [Countable Γ]
-    (μ : Measure G) [IsHaarMeasure μ]
-    (𝓕 : Set G) (h𝓕 : IsFundamentalDomain Γ 𝓕 μ) (hfin : μ 𝓕 < ⊤)
-    : SigmaCompactSpace G := by
+theorem um_sigmaCompact (Γ : Subgroup G) [Countable Γ] (μ : Measure G) [IsHaarMeasure μ]
+    (𝓕 : Set G) (h𝓕 : IsFundamentalDomain Γ 𝓕 μ) (hfin : μ 𝓕 < ⊤) : SigmaCompactSpace G := by
   have := um_smulInv Γ μ
   obtain ⟨V, hVc, hV1⟩ := exists_compact_mem_nhds (1 : G)
   set W : Set G := V ∪ V⁻¹ with hWdef
@@ -131,14 +168,13 @@ theorem um_sigmaCompact
     refine Set.disjoint_left.2 fun z hz hz' => hne ?_
     exact Subtype.ext ((um_D_eq Γ H hz).symm.trans (um_D_eq Γ H hz'))
   have hctbl : Countable ι := by
-    have :=
-      Measure.countable_meas_pos_of_disjoint_of_meas_iUnion_ne_top₀ μ
-        (As := fun d : ι => (d : Set G) ∩ 𝓕)
-        (fun d => by
-          rcases d with ⟨_, x, rfl⟩
-          exact (um_D_open Γ H hHo x).measurableSet.nullMeasurableSet.inter h𝓕.nullMeasurableSet)
-        hdisj.aedisjoint
-        (ne_top_of_le_ne_top hfin.ne (measure_mono (iUnion_subset fun _ => inter_subset_right)))
+    have := Measure.countable_meas_pos_of_disjoint_of_meas_iUnion_ne_top₀ μ
+      (As := fun d : ι => (d : Set G) ∩ 𝓕)
+      (fun d => by
+        rcases d with ⟨_, x, rfl⟩
+        exact (um_D_open Γ H hHo x).measurableSet.nullMeasurableSet.inter h𝓕.nullMeasurableSet)
+      hdisj.aedisjoint
+      (ne_top_of_le_ne_top hfin.ne (measure_mono (iUnion_subset fun _ => inter_subset_right)))
     have hall : {d : ι | 0 < μ ((d : Set G) ∩ 𝓕)} = univ := eq_univ_of_forall hpos
     rw [hall] at this
     exact countable_univ_iff.1 this
@@ -156,17 +192,14 @@ theorem um_sigmaCompact
   rw [← isSigmaCompact_univ_iff, ← hcov]
   exact isSigmaCompact_iUnion_of_isCompact K hK
 
-theorem um_rightInv
-    (Γ : Subgroup G) [Countable Γ]
-    (μ : Measure G) [IsHaarMeasure μ]
-    (𝓕 : Set G) (h𝓕 : IsFundamentalDomain Γ 𝓕 μ) (hfin : μ 𝓕 < ⊤)
-    : IsMulRightInvariant μ := by
+theorem um_rightInv (Γ : Subgroup G) [Countable Γ] (μ : Measure G) [IsHaarMeasure μ]
+    (𝓕 : Set G) (h𝓕 : IsFundamentalDomain Γ 𝓕 μ) (hfin : μ 𝓕 < ⊤) : IsMulRightInvariant μ := by
   have := um_sigmaCompact Γ μ 𝓕 h𝓕 hfin
   have := um_smulInv Γ μ
   have h0 : μ 𝓕 ≠ 0 := by
     intro h0
-    have :=
-      h𝓕.measure_zero_of_invariant univ (fun g => smul_set_univ) (by rw [univ_inter]; exact h0)
+    have := h𝓕.measure_zero_of_invariant univ (fun g => smul_set_univ)
+      (by rw [univ_inter]; exact h0)
     exact isOpen_univ.measure_ne_zero μ univ_nonempty this
   refine ⟨fun g => ?_⟩
   set c := haarScalarFactor (map (· * g) μ) μ with hcdef
@@ -177,7 +210,8 @@ theorem um_rightInv
     h𝓕.preimage_of_equiv hqmp (e := id) Function.bijective_id
       (fun γ x => by simp [Subgroup.smul_def, mul_assoc])
   have hm : μ ((· * g) ⁻¹' 𝓕) = c * μ 𝓕 := by
-    have : μ ((· * g) ⁻¹' 𝓕) = map (· * g) μ 𝓕 := ((MeasurableEquiv.mulRight g).map_apply 𝓕).symm
+    have : μ ((· * g) ⁻¹' 𝓕) = map (· * g) μ 𝓕 :=
+      ((MeasurableEquiv.mulRight g).map_apply 𝓕).symm
     rw [this, hc, Measure.smul_apply, ENNReal.smul_def, smul_eq_mul]
   have hcoe : (c : ℝ≥0∞) = 1 := by
     have := h𝓕'.measure_eq h𝓕
@@ -191,51 +225,21 @@ end Gen
 
 section Spec
 
-open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes PI.VolFromSW
-  PI.AdicCompletionValuation NumberField
+open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes PI.VolFromSW PI.AdicCompletionValuation NumberField
 open scoped TensorProduct
 
-theorem um_countable_HFinIn
-    (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-    (σ : E →ₐ[F] E)
-    (M : ℕ) (J : Matrix (Fin M) (Fin M) E)
-    : Countable (HFinIn (AF F) σ J) := by
-  have : Countable E := Finsupp.Countable.of_moduleFinite (R := ℚ)
-  have : Countable (Matrix (Fin M) (Fin M) E) := inferInstanceAs (Countable (Fin M → Fin M → E))
-  have : Countable (GL (Fin M) E) :=
-    Function.Injective.countable
-      (f := fun u : GL (Fin M) E => (u : Matrix (Fin M) (Fin M) E))
-      (fun _ _ h => Units.ext h)
-  have hx
-      : ∀ x : HFinIn (AF F) σ J, ∃ u : GL (Fin M) E,
-        Formalism.UG.bc (inclR (AF F)) u = ((x : HR (AF F) σ J) : GL (Fin M) (AF F ⊗[F] E)) := by
-    intro x
-    have h : ((x : HR (AF F) σ J) : GL (Fin M) (AF F ⊗[F] E)) ∈ HFin (AF F) σ J :=
-      Subgroup.mem_subgroupOf.1 x.2
-    unfold HFin at h
-    obtain ⟨u, -, hu⟩ := Subgroup.mem_map.1 h
-    exact ⟨u, hu⟩
-  refine Function.Injective.countable (f := fun x => (hx x).choose) ?_
-  intro x y hxy
-  have h1 := (hx x).choose_spec
-  have h2 := (hx y).choose_spec
-  simp only at hxy
-  rw [hxy] at h1
-  exact Subtype.ext (Subtype.ext (h1.symm.trans h2))
+theorem um_countable_HFinIn (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E]
+    [Algebra F E] (σ : E →ₐ[F] E) (M : ℕ) (J : Matrix (Fin M) (Fin M) E) :
+    Countable (HFinIn (AF F) σ J) := by
+  apply PI.VolStabSW.um_countable_HFinIn <;> assumption
 
-instance t2Space_adelic_unitary
-    (F E : Type)
-    [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] [FiniteDimensional F E]
-    (σ : E →ₐ[F] E)
-    (M : ℕ) (J : Matrix (Fin M) (Fin M) E)
-    : T2Space (HA (AF F) σ J) :=
-  inferInstanceAs (T2Space (HR (AF F) σ J))
+instance t2Space_adelic_unitary (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E]
+    [Algebra F E] [FiniteDimensional F E] (σ : E →ₐ[F] E) (M : ℕ) (J : Matrix (Fin M) (Fin M) E) :
+    T2Space (HA (AF F) σ J) := inferInstanceAs (T2Space (HR (AF F) σ J))
 
-theorem um_sigmaCompact_HA
-    (F E : Type)
-    [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] [FiniteDimensional F E]
-    (σ : E →ₐ[F] E) (M : ℕ) (J : Matrix (Fin M) (Fin M) E) (h : SWa1 F E σ M J)
-    : SigmaCompactSpace (HA (AF F) σ J) := by
+theorem um_sigmaCompact_HA (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E]
+    [Algebra F E] [FiniteDimensional F E] (σ : E →ₐ[F] E) (M : ℕ)
+    (J : Matrix (Fin M) (Fin M) E) (h : SWa1 F E σ M J) : SigmaCompactSpace (HA (AF F) σ J) := by
   obtain ⟨μ, hμ⟩ := h.1
   have : μ.IsHaarMeasure := hμ
   let Γ : Subgroup (HA (AF F) σ J) := HFinIn (AF F) σ J

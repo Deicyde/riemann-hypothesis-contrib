@@ -1,7 +1,52 @@
 module
 
 public import Formalism.LocalToGlobal.TorsionIntegrality.QuadraticSemicharacters.KerPNonzero
-public import Formalism.LocalToGlobal.TorsionIntegrality.QuadraticSemicharacters.CayleyGaussianIntegrals.MatrixFormFourfoldBlock
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -17,8 +62,8 @@ variable {V : Type*} [AddCommGroup V] [Module ℂ V]
 theorem herm_self_real (H : Sesq V) (hH : IsHerm H) (z : V) : (((H z z).re : ℝ) : ℂ) = H z z := by
   exact Complex.conj_eq_iff_re.1 (hH z z).symm
 
-theorem wt_eq_cexp (H : Sesq V) (hH : IsHerm H) (z : V)
-    : (wt H z : ℂ) = Complex.exp (-(Real.pi : ℂ) * H z z) := by
+theorem wt_eq_cexp (H : Sesq V) (hH : IsHerm H) (z : V) :
+    (wt H z : ℂ) = Complex.exp (-(Real.pi : ℂ) * H z z) := by
   rw [wt, Complex.ofReal_exp]
   push_cast
   rw [herm_self_real H hH z]
@@ -34,8 +79,8 @@ theorem kernelTermShift : TermShift := by
     simp only [termT, phiC, gq, opU, kerK, cayC, wt_eq_cexp H hH, LinearEquiv.symm_apply_apply]
     simp only [← Complex.exp_add, mul_assoc]
     congr 2
-    simp only [hA, LinearEquiv.symm_apply_apply, map_sub, map_add (f := _), map_smul,
-      LinearMap.sub_apply, LinearMap.add_apply, LinearMap.smul_apply, hi, smul_eq_mul]
+    simp only [hA, LinearEquiv.symm_apply_apply, map_sub, map_add (f := _), map_smul, LinearMap.sub_apply,
+      LinearMap.add_apply, LinearMap.smul_apply, hi, smul_eq_mul]
     ring
   · obtain ⟨y, rfl⟩ : ∃ y, z = δ y := ⟨δ.symm z, by simp⟩
     rw [gq, Complex.norm_exp]
@@ -51,26 +96,22 @@ theorem formNormEquiv : FormNorm := by
   have hhom : ∀ (r : ℝ) (z : V), (H ((r : ℂ) • z) ((r : ℂ) • z)).re = r ^ 2 * (H z z).re := by
     intro r z
     simp only [map_smul, map_smulₛₗ, LinearMap.smul_apply, smul_eq_mul, Complex.conj_ofReal]
-    rw [Complex.re_ofReal_mul, Complex.re_ofReal_mul]
-    ring
+    rw [Complex.re_ofReal_mul, Complex.re_ofReal_mul]; ring
   let b := Module.finBasis ℂ V
   have hexp : ∀ z, H z z = ∑ i, ∑ j, conj (b.repr z i) * (b.repr z j * H (b j) (b i)) := by
     intro z
     conv_lhs => rw [← b.sum_repr z]
-    set_option synthInstance.maxHeartbeats 100000 in
+
     simp only [map_sum, map_smul, map_smulₛₗ, LinearMap.sum_apply, LinearMap.smul_apply,
-      smul_eq_mul, Finset.mul_sum]
+    smul_eq_mul, Finset.mul_sum]
   have hcont : Continuous fun z : V => (H z z).re := by
-    have hc : ∀ i, Continuous fun z : V => b.repr z i := fun i =>
-      (b.coord i).continuous_of_finiteDimensional
-    have e
-        : (fun z : V => (H z z).re)
-          = fun z => (∑ i, ∑ j, conj (b.repr z i) * (b.repr z j * H (b j) (b i))).re := by
+    have hc : ∀ i, Continuous fun z : V => b.repr z i := fun i => (b.coord i).continuous_of_finiteDimensional
+    have e : (fun z : V => (H z z).re)
+        = fun z => (∑ i, ∑ j, conj (b.repr z i) * (b.repr z j * H (b j) (b i))).re := by
       funext z; rw [hexp z]
     rw [e]
-    exact Complex.continuous_re.comp (continuous_finsetSum _ fun i _ =>
-      continuous_finsetSum _ fun j _ =>
-        (Complex.continuous_conj.comp (hc i)).mul ((hc j).mul continuous_const))
+    exact Complex.continuous_re.comp (continuous_finsetSum _ fun i _ => continuous_finsetSum _ fun j _ =>
+      (Complex.continuous_conj.comp (hc i)).mul ((hc j).mul continuous_const))
   have hunit : ∀ w : V, w ≠ 0 → ((‖w‖⁻¹ : ℝ) : ℂ) • w ∈ Metric.sphere (0 : V) 1 := fun w hw => by
     rw [mem_sphere_zero_iff_norm, norm_smul, Complex.norm_real, norm_inv, norm_norm,
       inv_mul_cancel₀ (norm_ne_zero_iff.2 hw)]
@@ -78,8 +119,7 @@ theorem formNormEquiv : FormNorm := by
   swap
   · push_neg at hV
     refine ⟨1, 1, one_pos, one_pos, fun z => ?_⟩
-    rw [hV z]
-    simp
+    rw [hV z]; simp
   obtain ⟨v, hv⟩ := hV
   have hsph : IsCompact (Metric.sphere (0 : V) 1) := isCompact_sphere 0 1
   have hne : (Metric.sphere (0 : V) 1).Nonempty := ⟨_, hunit v hv⟩
@@ -88,8 +128,7 @@ theorem formNormEquiv : FormNorm := by
   have ha0 : a ≠ 0 := by
     intro h; rw [h, mem_sphere_zero_iff_norm, norm_zero] at ha; exact zero_ne_one ha
   have hcpos : 0 < (H a a).re := hpos a ha0
-  refine
-    ⟨(H a a).re, (H m m).re, hcpos, lt_of_lt_of_le hcpos (isMaxOn_iff.1 hmmax a ha), fun z => ?_⟩
+  refine ⟨(H a a).re, (H m m).re, hcpos, lt_of_lt_of_le hcpos (isMaxOn_iff.1 hmmax a ha), fun z => ?_⟩
   by_cases hz : z = 0
   · subst hz; simp
   have hr : 0 < ‖z‖ := norm_pos_iff.2 hz
@@ -99,13 +138,9 @@ theorem formNormEquiv : FormNorm := by
   have e : (‖z‖⁻¹) ^ 2 * (H z z).re * ‖z‖ ^ 2 = (H z z).re := by field_simp
   have hr2 : 0 ≤ ‖z‖ ^ 2 := by positivity
   constructor
-  · calc
-      (H a a).re * ‖z‖ ^ 2
-        ≤ (‖z‖⁻¹) ^ 2 * (H z z).re * ‖z‖ ^ 2 := mul_le_mul_of_nonneg_right h1 hr2
+  · calc (H a a).re * ‖z‖ ^ 2 ≤ (‖z‖⁻¹) ^ 2 * (H z z).re * ‖z‖ ^ 2 := mul_le_mul_of_nonneg_right h1 hr2
       _ = (H z z).re := e
-  · calc
-      (H z z).re
-        = (‖z‖⁻¹) ^ 2 * (H z z).re * ‖z‖ ^ 2 := e.symm
+  · calc (H z z).re = (‖z‖⁻¹) ^ 2 * (H z z).re * ‖z‖ ^ 2 := e.symm
       _ ≤ (H m m).re * ‖z‖ ^ 2 := mul_le_mul_of_nonneg_right h2 hr2
 
 end Formalism.L2.Th1.H

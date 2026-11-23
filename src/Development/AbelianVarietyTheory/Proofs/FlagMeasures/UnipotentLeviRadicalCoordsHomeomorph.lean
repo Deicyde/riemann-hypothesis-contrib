@@ -1,32 +1,73 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.Definitions.SemilocalFrames.BlockAnti
+public import Development.AbelianVarietyTheory.Definitions.SemilocalFrames.UpperOff
 public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.IsotropicLeviEmbeddingHomomorphismProperties
 public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.IsotropicStabilizerRadicalStructure
-public import Formalism.FormalDegreeBessel.FinalG
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
 noncomputable section
 
-open MeasureTheory Matrix Formalism.QuantumDeterminants Formalism.MainNotions.S GlobalTheory.SgInf
-  GlobalTheory.Amp
+open MeasureTheory Matrix Formalism.QuantumDeterminants Formalism.MainNotions.S GlobalTheory.SgInf GlobalTheory.Amp
 open scoped InnerProductSpace ENNReal
 
 namespace GlobalTheory.Amp.NCoord
 
 variable {k r : ℕ}
 
-private theorem eI_val_flag_measures (a : Fin r) : (eI k r a).val = a.val := by simp [eI]
+private theorem eI_val_flag_measures (a : Fin r) : (eI k r a).val = a.val := by
+  simp [eI]
 
-private theorem wI_val_flag_measures (j : Fin (k + 1)) : (wI k r j).val = r + j.val := by simp [wI]
+private theorem wI_val_flag_measures (j : Fin (k + 1)) : (wI k r j).val = r + j.val := by
+  simp [wI]
 
 private theorem esI_val_flag_measures (a : Fin r) : (esI k r a).val = 2 * r + k - a.val := by
   simp [esI]
 
-theorem idx_cases (i : Fin (2 * r + k + 1))
-    : (∃ a, i = eI k r a) ∨ (∃ j, i = wI k r j) ∨ ∃ a, i = esI k r a := by
+theorem idx_cases (i : Fin (2 * r + k + 1)) :
+    (∃ a, i = eI k r a) ∨ (∃ j, i = wI k r j) ∨ ∃ a, i = esI k r a := by
   obtain ⟨n, hn⟩ := i
   by_cases h1 : n < r
   · left
@@ -38,54 +79,35 @@ theorem idx_cases (i : Fin (2 * r + k + 1))
     · right
       exact ⟨⟨2 * r + k - n, by omega⟩, Fin.ext (by rw [esI_val_flag_measures]; simp only; omega)⟩
 
-theorem sum_three (f : Fin (2 * r + k + 1) → ℂ)
-    : ∑ i, f i = ∑ a, f (eI k r a) + ∑ j, f (wI k r j) + ∑ a, f (esI k r a) := by
-  let e : Fin r ⊕ Fin (k + 1) ⊕ Fin r → Fin (2 * r + k + 1) :=
-    Sum.elim (eI k r) (Sum.elim (wI k r) (esI k r))
-  have hbij : Function.Bijective e := by
-    constructor
-    · rintro (a | a | a) (b | b | b) h
-        <;> simp only [e, Sum.elim_inl, Sum.elim_inr, Fin.ext_iff, eI_val_flag_measures,
-            wI_val_flag_measures, esI_val_flag_measures, Sum.inl.injEq, Sum.inr.injEq, reduceCtorEq]
-          at h ⊢
-        <;> (have := a.2; have := b.2; omega)
-    · intro i
-      rcases idx_cases i with ⟨a, rfl⟩ | ⟨a, rfl⟩ | ⟨a, rfl⟩
-      · exact ⟨Sum.inl a, rfl⟩
-      · exact ⟨Sum.inr (Sum.inl a), rfl⟩
-      · exact ⟨Sum.inr (Sum.inr a), rfl⟩
-  rw [← hbij.sum_comp f, Fintype.sum_sum_type, Fintype.sum_sum_type, add_assoc]
-  rfl
+theorem sum_three (f : Fin (2 * r + k + 1) → ℂ) :
+    ∑ i, f i = ∑ a, f (eI k r a) + ∑ j, f (wI k r j) + ∑ a, f (esI k r a) := by
+  apply GlobalTheory.Amp.Rad.sum3 <;> assumption
 
-theorem H_e (v : Fin (2 * r + k + 1) → ℂ) (a : Fin r)
-    : (Hpk k r *ᵥ v) (eI k r a) = v (esI k r a) := by
+theorem H_e (v : Fin (2 * r + k + 1) → ℂ) (a : Fin r) : (Hpk k r *ᵥ v) (eI k r a) = v (esI k r a) := by
   simp only [mulVec, dotProduct]
   rw [sum_three]
   simp [Rad.H_ee, Rad.H_ew, Rad.H_es]
 
-theorem H_es (v : Fin (2 * r + k + 1) → ℂ) (a : Fin r)
-    : (Hpk k r *ᵥ v) (esI k r a) = v (eI k r a) := by
+theorem H_es (v : Fin (2 * r + k + 1) → ℂ) (a : Fin r) : (Hpk k r *ᵥ v) (esI k r a) = v (eI k r a) := by
   simp only [mulVec, dotProduct]
   rw [sum_three]
   simp [Rad.H_se, Rad.H_sw, Rad.H_ss]
 
-theorem H_w (v : Fin (2 * r + k + 1) → ℂ) (j : Fin (k + 1))
-    : (Hpk k r *ᵥ v) (wI k r j) = (Hb k *ᵥ fun l => v (wI k r l)) j := by
+theorem H_w (v : Fin (2 * r + k + 1) → ℂ) (j : Fin (k + 1)) :
+    (Hpk k r *ᵥ v) (wI k r j) = (Hb k *ᵥ fun l => v (wI k r l)) j := by
   simp only [mulVec, dotProduct]
   rw [sum_three]
   simp [Rad.H_we, Rad.H_ww, Rad.H_ws, Hb, Rad.sg, Matrix.diagonal_apply, ite_mul]
 
-theorem herm_three (v w : Fin (2 * r + k + 1) → ℂ)
-    : herm (Hpk k r) v w
-      = ∑ a, star (w (eI k r a)) * v (esI k r a)
-        + herm (Hb k) (fun l => v (wI k r l)) (fun l => w (wI k r l))
-        + ∑ a, star (w (esI k r a)) * v (eI k r a) := by
+theorem herm_three (v w : Fin (2 * r + k + 1) → ℂ) : herm (Hpk k r) v w =
+    ∑ a, star (w (eI k r a)) * v (esI k r a) + herm (Hb k) (fun l => v (wI k r l)) (fun l => w (wI k r l)) +
+      ∑ a, star (w (esI k r a)) * v (eI k r a) := by
   simp only [herm, dotProduct, Pi.star_apply]
   rw [sum_three]
   simp only [H_e, H_w, H_es]
 
-theorem herm_col {g : Mat k r} (hg : g ∈ GG k r) (i j : Fin (2 * r + k + 1))
-    : herm (Hpk k r) (fun l => g l j) (fun l => g l i) = Hpk k r i j := by
+theorem herm_col {g : Mat k r} (hg : g ∈ GG k r) (i j : Fin (2 * r + k + 1)) :
+    herm (Hpk k r) (fun l => g l j) (fun l => g l i) = Hpk k r i j := by
   have h : gᴴ * Hpk k r * g = Hpk k r := hg
   conv_rhs => rw [← h]
   simp only [herm, dotProduct, mulVec, Matrix.mul_apply, conjTranspose_apply, Pi.star_apply,
@@ -108,19 +130,16 @@ def Bof (p : Mat k r) : Fin r → Fin (k + 1) → ℂ := fun b j => p (wI k r j)
 def Sof (p : Mat k r) : Matrix (Fin r) (Fin r) ℂ := fun a b =>
   p (eI k r a) (esI k r b) + herm (Hb k) (Bof p b) (Bof p a) / 2
 
-theorem Bof_pEl (B : Fin r → Fin (k + 1) → ℂ) (S : Matrix (Fin r) (Fin r) ℂ)
-    : Bof (pEl k r B S) = B := by
+theorem Bof_pEl (B : Fin r → Fin (k + 1) → ℂ) (S : Matrix (Fin r) (Fin r) ℂ) : Bof (pEl k r B S) = B := by
   funext b j
   simp only [Bof, Rad.pEl_ws]
 
-theorem Sof_pEl (B : Fin r → Fin (k + 1) → ℂ) (S : Matrix (Fin r) (Fin r) ℂ)
-    : Sof (pEl k r B S) = S := by
+theorem Sof_pEl (B : Fin r → Fin (k + 1) → ℂ) (S : Matrix (Fin r) (Fin r) ℂ) : Sof (pEl k r B S) = S := by
   funext a b
   simp only [Sof, Bof_pEl, Rad.pEl_es, sub_add_cancel]
 
-private theorem herm_Hpk_bvec_eq_mulVec_apply
-    (v : Fin (2 * r + k + 1) → ℂ) (x : Fin (2 * r + k + 1))
-    : herm (Hpk k r) v (bvec x) = (Hpk k r *ᵥ v) x := by
+private theorem herm_Hpk_bvec_eq_mulVec_apply (v : Fin (2 * r + k + 1) → ℂ) (x : Fin (2 * r + k + 1)) :
+    herm (Hpk k r) v (bvec x) = (Hpk k r *ᵥ v) x := by
   simp only [herm, bvec, dotProduct, Pi.star_apply]
   rw [Finset.sum_eq_single x]
   · simp
@@ -128,24 +147,20 @@ private theorem herm_Hpk_bvec_eq_mulVec_apply
     simp [hl]
   · simp
 
-theorem rad_eq
-    {p : Mat k r} (hp : p ∈ Nset k r) (he : ∀ a i, p i (eI k r a) = if i = eI k r a then 1 else 0)
-    : (Sof p)ᴴ = - Sof p ∧ p = pEl k r (Bof p) (Sof p) := by
+theorem rad_eq {p : Mat k r} (hp : p ∈ Nset k r) (he : ∀ a i, p i (eI k r a) = if i = eI k r a then 1 else 0) :
+    (Sof p)ᴴ = -Sof p ∧ p = pEl k r (Bof p) (Sof p) := by
   obtain ⟨hU, -, hmid⟩ := hp
   have hU' : p ∈ GG k r := hU
   have hcolE : ∀ a, (fun l => p l (eI k r a)) = bvec (eI k r a) := by
     intro a; funext l; rw [he]; simp [bvec, Pi.single_apply]
   have hw : ∀ i j : Fin (k + 1), p (wI k r i) (wI k r j) = if i = j then 1 else 0 := by
     intro i j
-    rw [hmid _ _ (by rw [wI_val_flag_measures]; omega)
-      (by rw [wI_val_flag_measures]; have := j.2; omega) (by rw [wI_val_flag_measures]; omega)]
+    rw [hmid _ _ (by rw [wI_val_flag_measures]; omega) (by rw [wI_val_flag_measures]; have := j.2; omega) (by rw [wI_val_flag_measures]; omega)]
     simp only [Rad.wI_inj]
   have hsw : ∀ (a : Fin r) (j : Fin (k + 1)), p (esI k r a) (wI k r j) = 0 := by
     intro a j
-    rw [hmid _ _ (by rw [wI_val_flag_measures]; omega)
-        (by rw [wI_val_flag_measures]; have := j.2; omega)
-        (by rw [esI_val_flag_measures]; have := a.2; omega),
-      if_neg (Rad.esI_ne_wI _ _)]
+    rw [hmid _ _ (by rw [wI_val_flag_measures]; omega) (by rw [wI_val_flag_measures]; have := j.2; omega)
+      (by rw [esI_val_flag_measures]; have := a.2; omega), if_neg (Rad.esI_ne_wI _ _)]
   have hss : ∀ a b : Fin r, p (esI k r a) (esI k r b) = if a = b then 1 else 0 := by
     intro a b
     have h := herm_col hU' (eI k r a) (esI k r b)
@@ -155,29 +170,24 @@ theorem rad_eq
     intro c a; split_ifs <;> simp
   have hmidw : ∀ j : Fin (k + 1), (fun l => p (wI k r l) (wI k r j)) = bvec j := by
     intro j; funext l; rw [hw]; simp [bvec, Pi.single_apply]
-  have hew
-      : ∀ (b : Fin r) (j : Fin (k + 1)),
-        p (eI k r b) (wI k r j) = -(star (Bof p b j) * Rad.sg k j) := by
+  have hew : ∀ (b : Fin r) (j : Fin (k + 1)),
+      p (eI k r b) (wI k r j) = -(star (Bof p b j) * Rad.sg k j) := by
     intro b j
     have h := herm_col hU' (wI k r j) (esI k r b)
     rw [herm_three, Rad.H_ws, hmidw, ← herm_b_star, Rad.herm_bvec] at h
     simp only [hss, hsw, star_zero, zero_mul, Finset.sum_const_zero, add_zero, mul_ite, mul_one,
-        mul_zero, Finset.sum_ite_eq', Finset.mem_univ, if_true]
-      at h
+      mul_zero, Finset.sum_ite_eq', Finset.mem_univ, if_true] at h
     have h2 := congrArg star h
     simp only [star_add, star_mul', star_star, Rad.star_sg, star_zero] at h2
     simp only [Bof]
     linear_combination h2
-  have hrel
-      : ∀ a b : Fin r,
-        star (p (eI k r b) (esI k r a)) + herm (Hb k) (Bof p b) (Bof p a) + p (eI k r a) (esI k r b)
-          = 0 := by
+  have hrel : ∀ a b : Fin r, star (p (eI k r b) (esI k r a)) + herm (Hb k) (Bof p b) (Bof p a)
+      + p (eI k r a) (esI k r b) = 0 := by
     intro a b
     have h := herm_col hU' (esI k r a) (esI k r b)
     rw [herm_three, Rad.H_ss] at h
     simp only [hss, hst01, mul_ite, ite_mul, mul_one, one_mul, mul_zero, zero_mul,
-        Finset.sum_ite_eq', Finset.mem_univ, if_true]
-      at h
+      Finset.sum_ite_eq', Finset.mem_univ, if_true] at h
     exact h
   refine ⟨?_, ?_⟩
   · ext a b
@@ -188,8 +198,8 @@ theorem rad_eq
     rw [h2]
     linear_combination h
   · ext i j
-    rcases idx_cases i with ⟨a, rfl⟩ | ⟨a, rfl⟩ | ⟨a, rfl⟩
-      <;> rcases idx_cases j with ⟨b, rfl⟩ | ⟨b, rfl⟩ | ⟨b, rfl⟩
+    rcases idx_cases i with ⟨a, rfl⟩ | ⟨a, rfl⟩ | ⟨a, rfl⟩ <;>
+    rcases idx_cases j with ⟨b, rfl⟩ | ⟨b, rfl⟩ | ⟨b, rfl⟩
     · rw [he, Rad.pEl_ee]; simp only [Rad.eI_inj]
     · rw [hew, Rad.pEl_ew]
     · rw [Rad.pEl_es]; simp only [Sof]; ring
@@ -218,8 +228,7 @@ theorem qOf_pOf (q : PPar k r) : qOf (pOf k r q) = q := by
     rw [Sof_pEl]
     simp [skewM]
 
-theorem uEmb_col (u : Matrix (Fin r) (Fin r) ℂ) (a b : Fin r)
-    : uEmb k r u (eI k r a) (eI k r b) = u a b := by
+theorem uEmb_col (u : Matrix (Fin r) (Fin r) ℂ) (a b : Fin r) : uEmb k r u (eI k r a) (eI k r b) = u a b := by
   have h : (eI k r a).val < r ∧ (eI k r b).val < r := by
     rw [eI_val_flag_measures, eI_val_flag_measures]; exact ⟨a.2, b.2⟩
   simp only [uEmb, dif_pos h]
@@ -235,8 +244,7 @@ private theorem det_upper_eq_one (x : UT r → ℂ) : (upper x).det = 1 := by
   refine Finset.prod_eq_one fun a _ => ?_
   simp [upper]
 
-private theorem exists_upper_eq_inv_upper (x : UT r → ℂ)
-    : ∃ y : UT r → ℂ, (upper x)⁻¹ = upper y := by
+private theorem exists_upper_eq_inv_upper (x : UT r → ℂ) : ∃ y : UT r → ℂ, (upper x)⁻¹ = upper y := by
   have hU : IsUnit (upper x).det := by rw [det_upper_eq_one]; exact isUnit_one
   let _ := (upper x).invertibleOfIsUnitDet hU
   have ht := Matrix.blockTriangular_inv_of_blockTriangular (upper_blockTriangular x)
@@ -260,9 +268,8 @@ private theorem exists_upper_eq_inv_upper (x : UT r → ℂ)
   · subst h2; exact hd a
   · exact ht (lt_of_le_of_ne (not_lt.mp h1) (Ne.symm h2))
 
-theorem uEmb_inv_mul (x : UT r → ℂ)
-    : uEmb k r (upper x)⁻¹ * uEmb k r (upper x) = 1 ∧ uEmb k r (upper x) * uEmb k r (upper x)⁻¹ = 1
-      ∧ uEmb k r (upper x)⁻¹ ∈ Nset k r := by
+theorem uEmb_inv_mul (x : UT r → ℂ) : uEmb k r (upper x)⁻¹ * uEmb k r (upper x) = 1 ∧
+    uEmb k r (upper x) * uEmb k r (upper x)⁻¹ = 1 ∧ uEmb k r (upper x)⁻¹ ∈ Nset k r := by
   have hU : IsUnit (upper x).det := by rw [det_upper_eq_one]; exact isUnit_one
   obtain ⟨y, hy⟩ := exists_upper_eq_inv_upper x
   refine ⟨?_, ?_, ?_⟩
@@ -270,10 +277,8 @@ theorem uEmb_inv_mul (x : UT r → ℂ)
   · rw [← UEmb.uEmb_mul, Matrix.mul_nonsing_inv _ hU, UEmb.uEmb_one]
   · rw [hy]; exact UEmb.upper_mem y
 
-private theorem pEl_apply_eI
-    (B : Fin r → Fin (k + 1) → ℂ) (S : Matrix (Fin r) (Fin r) ℂ) (b : Fin r)
-    (c : Fin (2 * r + k + 1))
-    : pEl k r B S c (eI k r b) = if c = eI k r b then 1 else 0 := by
+private theorem pEl_apply_eI (B : Fin r → Fin (k + 1) → ℂ) (S : Matrix (Fin r) (Fin r) ℂ) (b : Fin r)
+    (c : Fin (2 * r + k + 1)) : pEl k r B S c (eI k r b) = if c = eI k r b then 1 else 0 := by
   rcases idx_cases c with ⟨a, rfl⟩ | ⟨a, rfl⟩ | ⟨a, rfl⟩
   · simp only [Rad.pEl_ee, Rad.eI_inj]
   · rw [Rad.pEl_we, if_neg (Rad.wI_ne_eI _ _)]
@@ -283,23 +288,22 @@ theorem cOf_coord (q : (UT r → ℂ) × PPar k r) : cOf (uEmb k r (upper q.1) *
   obtain ⟨s, p⟩ := q
   have hx : xOf (uEmb k r (upper s) * pOf k r p) = s := by
     funext x
-    simp only [xOf, pOf, Matrix.mul_apply, pEl_apply_eI, mul_ite, mul_one, mul_zero,
-      Finset.sum_ite_eq', Finset.mem_univ, if_true, uEmb_col]
+    simp only [xOf, pOf, Matrix.mul_apply, pEl_apply_eI, mul_ite, mul_one, mul_zero, Finset.sum_ite_eq',
+      Finset.mem_univ, if_true, uEmb_col]
     simp only [upper, dif_pos x.2]
   simp only [cOf]
   rw [hx, ← Matrix.mul_assoc, (uEmb_inv_mul s).1, Matrix.one_mul, qOf_pOf]
 
-private theorem uEmb_apply_eI_eq_zero_of_le
-    (u : Matrix (Fin r) (Fin r) ℂ) (b : Fin r) (i : Fin (2 * r + k + 1)) (hi : r ≤ i.val)
-    : uEmb k r u i (eI k r b) = 0 := by
+private theorem uEmb_apply_eI_eq_zero_of_le (u : Matrix (Fin r) (Fin r) ℂ) (b : Fin r) (i : Fin (2 * r + k + 1))
+    (hi : r ≤ i.val) : uEmb k r u i (eI k r b) = 0 := by
   have hb := b.2
-  have h1 : ¬(i.val < r ∧ (eI k r b).val < r) := by rw [eI_val_flag_measures]; omega
-  have h2 : ¬(r + k < i.val ∧ r + k < (eI k r b).val) := by rw [eI_val_flag_measures]; omega
+  have h1 : ¬ (i.val < r ∧ (eI k r b).val < r) := by rw [eI_val_flag_measures]; omega
+  have h2 : ¬ (r + k < i.val ∧ r + k < (eI k r b).val) := by rw [eI_val_flag_measures]; omega
   have h3 : i ≠ eI k r b := by intro h; rw [h, eI_val_flag_measures] at hi; omega
   simp only [uEmb, dif_neg h1, dif_neg h2, if_neg h3]
 
-theorem col_e {n : Mat k r} (hn : n ∈ Nset k r) (b : Fin r)
-    : n *ᵥ bvec (eI k r b) = uEmb k r (upper (xOf n)) *ᵥ bvec (eI k r b) := by
+theorem col_e {n : Mat k r} (hn : n ∈ Nset k r) (b : Fin r) :
+    n *ᵥ bvec (eI k r b) = uEmb k r (upper (xOf n)) *ᵥ bvec (eI k r b) := by
   funext i
   rw [col_eq, col_eq]
   obtain ⟨-, h1, -⟩ := hn
@@ -312,12 +316,11 @@ theorem col_e {n : Mat k r} (hn : n ∈ Nset k r) (b : Fin r)
       simp only [upper, dif_neg hab, Rad.eI_inj]
   · rw [h1 b _ (by rw [wI_val_flag_measures]; have := b.2; omega), if_neg (Rad.wI_ne_eI _ _),
       uEmb_apply_eI_eq_zero_of_le _ _ _ (by rw [wI_val_flag_measures]; omega)]
-  · rw [h1 b _ (by rw [esI_val_flag_measures]; have := b.2; have := a.2; omega),
-      if_neg (Rad.esI_ne_eI _ _),
+  · rw [h1 b _ (by rw [esI_val_flag_measures]; have := b.2; have := a.2; omega), if_neg (Rad.esI_ne_eI _ _),
       uEmb_apply_eI_eq_zero_of_le _ _ _ (by rw [esI_val_flag_measures]; have := a.2; omega)]
 
-private theorem mul_mem_Nset {a b : Mat k r} (ha : a ∈ Nset k r) (hb : b ∈ Nset k r)
-    : a * b ∈ Nset k r := by
+private theorem mul_mem_Nset {a b : Mat k r} (ha : a ∈ Nset k r) (hb : b ∈ Nset k r) :
+    a * b ∈ Nset k r := by
   obtain ⟨ha0, ha1, ha2⟩ := ha
   obtain ⟨hb0, hb1, hb2⟩ := hb
   refine ⟨?_, ?_, ?_⟩
@@ -325,9 +328,7 @@ private theorem mul_mem_Nset {a b : Mat k r} (ha : a ∈ Nset k r) (hb : b ∈ N
     have ha0' : aᴴ * Hpk k r * a = Hpk k r := ha0
     have hb0' : bᴴ * Hpk k r * b = Hpk k r := hb0
     rw [conjTranspose_mul]
-    calc
-      bᴴ * aᴴ * Hpk k r * (a * b)
-        = bᴴ * (aᴴ * Hpk k r * a) * b := by simp only [Matrix.mul_assoc]
+    calc bᴴ * aᴴ * Hpk k r * (a * b) = bᴴ * (aᴴ * Hpk k r * a) * b := by simp only [Matrix.mul_assoc]
       _ = Hpk k r := by rw [ha0', hb0']
   · intro c i hci
     rw [Matrix.mul_apply, Finset.sum_eq_single (eI k r c)]
@@ -356,13 +357,12 @@ private theorem mul_mem_Nset {a b : Mat k r} (ha : a ∈ Nset k r) (hb : b ∈ N
         rw [hx, if_neg (by intro h; rw [h] at hi; omega), zero_mul]
     · simp
 
-theorem exists_coord {n : Mat k r} (hn : n ∈ Nset k r)
-    : ∃ q : (UT r → ℂ) × PPar k r, uEmb k r (upper q.1) * pOf k r q.2 = n := by
+theorem exists_coord {n : Mat k r} (hn : n ∈ Nset k r) :
+    ∃ q : (UT r → ℂ) × PPar k r, uEmb k r (upper q.1) * pOf k r q.2 = n := by
   obtain ⟨hVU, hUV, hV⟩ := uEmb_inv_mul (k := k) (xOf n)
   have hpN : uEmb k r (upper (xOf n))⁻¹ * n ∈ Nset k r := mul_mem_Nset hV hn
-  have he
-      : ∀ (a : Fin r) (i : Fin (2 * r + k + 1)),
-        (uEmb k r (upper (xOf n))⁻¹ * n) i (eI k r a) = if i = eI k r a then 1 else 0 := by
+  have he : ∀ (a : Fin r) (i : Fin (2 * r + k + 1)),
+      (uEmb k r (upper (xOf n))⁻¹ * n) i (eI k r a) = if i = eI k r a then 1 else 0 := by
     intro a i
     have h2 : (uEmb k r (upper (xOf n))⁻¹ * n) *ᵥ bvec (eI k r a) = bvec (eI k r a) := by
       rw [← Matrix.mulVec_mulVec, col_e hn, Matrix.mulVec_mulVec, hVU, Matrix.one_mulVec]
@@ -384,7 +384,8 @@ theorem cont_upper (r : ℕ) : Continuous (upper : (UT r → ℂ) → Matrix (Fi
   · simp only [upper, dif_neg h]
     exact continuous_const
 
-theorem det_upper (x : UT r → ℂ) : (upper x).det = 1 := by exact det_upper_eq_one x
+theorem det_upper (x : UT r → ℂ) : (upper x).det = 1 := by
+  exact det_upper_eq_one x
 
 theorem cont_upper_inv (r : ℕ) : Continuous fun x : UT r → ℂ => (upper x)⁻¹ := by
   have h : (fun x : UT r → ℂ => (upper x)⁻¹) = fun x => (upper x).adjugate := by
@@ -393,11 +394,8 @@ theorem cont_upper_inv (r : ℕ) : Continuous fun x : UT r → ℂ => (upper x)�
   rw [h]
   exact (cont_upper r).matrix_adjugate
 
-private theorem continuous_uEmb_of_continuous_inv
-    {X : Type*} [TopologicalSpace X]
-    (k r : ℕ)
-    {f : X → Matrix (Fin r) (Fin r) ℂ} (hf : Continuous f) (hf' : Continuous fun x => (f x)⁻¹)
-    : Continuous fun x => uEmb k r (f x) := by
+private theorem continuous_uEmb_of_continuous_inv {X : Type*} [TopologicalSpace X] (k r : ℕ) {f : X → Matrix (Fin r) (Fin r) ℂ}
+    (hf : Continuous f) (hf' : Continuous fun x => (f x)⁻¹) : Continuous fun x => uEmb k r (f x) := by
   refine continuous_matrix fun i j => ?_
   by_cases h1 : i.val < r ∧ j.val < r
   · simp only [uEmb, dif_pos h1]
@@ -419,11 +417,8 @@ theorem cont_uEmb_inv (k r : ℕ) : Continuous fun x : UT r → ℂ => uEmb k r 
   rw [h]
   exact cont_upper r
 
-private theorem continuous_skewM_apply
-    {X : Type*} [TopologicalSpace X]
-    {s : X → UT r → ℂ} {t : X → Fin r → ℝ} (hs : Continuous s) (ht : Continuous t)
-    (a b : Fin r)
-    : Continuous fun x => skewM (s x) (t x) a b := by
+private theorem continuous_skewM_apply {X : Type*} [TopologicalSpace X] {s : X → UT r → ℂ} {t : X → Fin r → ℝ}
+    (hs : Continuous s) (ht : Continuous t) (a b : Fin r) : Continuous fun x => skewM (s x) (t x) a b := by
   by_cases h1 : a < b
   · simp only [skewM, dif_pos h1]
     exact (continuous_apply _).comp hs
@@ -433,26 +428,22 @@ private theorem continuous_skewM_apply
   · simp only [skewM, dif_neg h1, dif_neg h2]
     exact (Complex.continuous_ofReal.comp ((continuous_apply a).comp ht)).mul continuous_const
 
-private theorem continuous_herm_Hb
-    {X : Type*} [TopologicalSpace X]
-    {f g : X → Fin (k + 1) → ℂ} (hf : Continuous f) (hg : Continuous g)
-    : Continuous fun x => herm (Hb k) (f x) (g x) := by
+private theorem continuous_herm_Hb {X : Type*} [TopologicalSpace X] {f g : X → Fin (k + 1) → ℂ}
+    (hf : Continuous f) (hg : Continuous g) : Continuous fun x => herm (Hb k) (f x) (g x) := by
   simp only [Rad.herm_Hb]
   exact continuous_finsetSum _ fun j _ =>
     ((continuous_apply j).comp hg).star.mul (continuous_const.mul ((continuous_apply j).comp hf))
 
 theorem cont_pOf (k r : ℕ) : Continuous (pOf k r) := by
   refine continuous_matrix fun i j => ?_
-  have hB : ∀ a, Continuous fun q : PPar k r => q.1 a := fun a =>
-    (continuous_apply a).comp continuous_fst
+  have hB : ∀ a, Continuous fun q : PPar k r => q.1 a := fun a => (continuous_apply a).comp continuous_fst
   have hs : Continuous fun q : PPar k r => q.2.1 := continuous_fst.comp continuous_snd
   have ht : Continuous fun q : PPar k r => q.2.2 := continuous_snd.comp continuous_snd
-  rcases idx_cases i with ⟨a, rfl⟩ | ⟨a, rfl⟩ | ⟨a, rfl⟩
-    <;> rcases idx_cases j with ⟨b, rfl⟩ | ⟨b, rfl⟩ | ⟨b, rfl⟩
-    <;> simp only [pOf, Rad.pEl_ee, Rad.pEl_ew, Rad.pEl_es, Rad.pEl_we, Rad.pEl_ww, Rad.pEl_ws,
-      Rad.pEl_se, Rad.pEl_sw, Rad.pEl_ss]
-  all_goals
-    first
+  rcases idx_cases i with ⟨a, rfl⟩ | ⟨a, rfl⟩ | ⟨a, rfl⟩ <;>
+  rcases idx_cases j with ⟨b, rfl⟩ | ⟨b, rfl⟩ | ⟨b, rfl⟩ <;>
+  simp only [pOf, Rad.pEl_ee, Rad.pEl_ew, Rad.pEl_es, Rad.pEl_we, Rad.pEl_ww, Rad.pEl_ws,
+    Rad.pEl_se, Rad.pEl_sw, Rad.pEl_ss]
+  all_goals first
     | exact continuous_const
     | exact (((continuous_apply b).comp (hB a)).star.mul continuous_const).neg
     | exact (continuous_skewM_apply hs ht a b).sub ((continuous_herm_Hb (hB b) (hB a)).div_const 2)
@@ -467,8 +458,7 @@ theorem cont_qOf (k r : ℕ) : Continuous (qOf : Mat k r → PPar k r) := by
     intro a b
     simp only [Sof]
     exact (continuous_id.matrix_elem _ _).add
-      ((continuous_herm_Hb ((continuous_apply b).comp hB) ((continuous_apply a).comp hB)).div_const
-        2)
+      ((continuous_herm_Hb ((continuous_apply b).comp hB) ((continuous_apply a).comp hB)).div_const 2)
   exact hB.prodMk ((continuous_pi fun x => hS _ _).prodMk
     (continuous_pi fun a => Complex.continuous_im.comp (hS a a)))
 
@@ -483,20 +473,11 @@ theorem cont_cOf (k r : ℕ) : Continuous (cOf : Mat k r → _) := by
 private theorem pOf_mem_Nset (q : PPar k r) : pOf k r q ∈ Nset k r :=
   (((Rad.radical k r).1 q.1 (skewM q.2.1 q.2.2)).2.2.2 (Rad.skewM_skew _ _)).1
 
-theorem coord_homeo
-    : ∀ k r : ℕ,
-      Set.BijOn
-          (fun q : (UT r → ℂ) × PPar k r => uEmb k r (upper q.1) * pOf k r q.2)
-          Set.univ (Nset k r)
-        ∧ Continuous (fun q : (UT r → ℂ) × PPar k r => uEmb k r (upper q.1) * pOf k r q.2)
-        ∧ ∃ c : Mat k r → (UT r → ℂ) × PPar k r,
-          Continuous c
-            ∧ ∀ q : (UT r → ℂ) × PPar k r, c (uEmb k r (upper q.1) * pOf k r q.2) = q := by
+theorem coord_homeo : ∀ k r : ℕ, Set.BijOn (fun q : (UT r → ℂ) × PPar k r => uEmb k r (upper q.1) * pOf k r q.2) Set.univ (Nset k r) ∧ Continuous (fun q : (UT r → ℂ) × PPar k r => uEmb k r (upper q.1) * pOf k r q.2) ∧ ∃ c : Mat k r → (UT r → ℂ) × PPar k r, Continuous c ∧ ∀ q : (UT r → ℂ) × PPar k r, c (uEmb k r (upper q.1) * pOf k r q.2) = q := by
   intro k r
   refine ⟨⟨fun q _ => ?_, fun q _ q' _ h => ?_, fun n hn => ?_⟩, ?_, cOf, cont_cOf k r, cOf_coord⟩
   · exact mul_mem_Nset (UEmb.upper_mem q.1) (pOf_mem_Nset q.2)
-  · calc
-      q = cOf (uEmb k r (upper q.1) * pOf k r q.2) := (cOf_coord q).symm
+  · calc q = cOf (uEmb k r (upper q.1) * pOf k r q.2) := (cOf_coord q).symm
       _ = cOf (uEmb k r (upper q'.1) * pOf k r q'.2) := congrArg cOf h
       _ = q' := cOf_coord q'
   · obtain ⟨q, hq⟩ := exists_coord hn

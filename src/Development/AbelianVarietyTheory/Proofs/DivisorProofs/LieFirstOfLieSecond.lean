@@ -1,9 +1,44 @@
 module
 
-public import Mathlib
+import Development.WeilBound.CoreStatements.GaussianSeminormBounds.RealSeminormFiltration.RLLieH
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsFockMap
-public import Development.AbelianVarietyTheory.Definitions.Divisors.DiscreteSeriesHermitianUnique
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FockDualPairSwapSymmetry
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -11,32 +46,26 @@ open scoped TensorProduct Matrix GlobalTheory.IndefiniteRowSideFullHecke.WeilTen
 
 noncomputable section
 
-open NumberField MvPolynomial Formalism.BasicNotions.TH GlobalTheory.WeilM
-  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.RealLift
+open NumberField MvPolynomial Formalism.BasicNotions.TH GlobalTheory.WeilM GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.RealLift
 
 namespace GlobalTheory.RealLift.LieFirstPf
 
 variable {P Q R S : ℕ}
 
-def swapE (P Q R S : ℕ)
-    : Formalism.BasicNotions.TH.Pol R S P Q ≃ₗ[ℂ] Formalism.BasicNotions.TH.Pol P Q R S :=
+def swapE (P Q R S : ℕ) : Formalism.BasicNotions.TH.Pol R S P Q ≃ₗ[ℂ] Formalism.BasicNotions.TH.Pol P Q R S :=
   (renameEquiv ℂ (Equiv.prodComm (Ix R S) (Ix P Q))).toLinearEquiv
 
-theorem swapE_apply (f : Formalism.BasicNotions.TH.Pol R S P Q)
-    : swapE P Q R S f = rename Prod.swap f :=
-  rfl
+theorem swapE_apply (f : Formalism.BasicNotions.TH.Pol R S P Q) : swapE P Q R S f = rename Prod.swap f := rfl
 
-theorem lineSign_swap (a : Ix P Q) (b : Ix R S)
-    : lineSign (p := R) (q := S) (r := P) (s := Q) b a
-      = lineSign (p := P) (q := Q) (r := R) (s := S) a b := by
+theorem lineSign_swap (a : Ix P Q) (b : Ix R S) :
+    lineSign (p := R) (q := S) (r := P) (s := Q) b a = lineSign (p := P) (q := Q) (r := R) (s := S) a b := by
   rcases a with a | a <;> rcases b with b | b <;> rfl
 
-theorem swapE_heisOp (c : Matrix (Ix R S) (Ix P Q) ℂ) (f : Formalism.BasicNotions.TH.Pol R S P Q)
-    : swapE P Q R S (heisOp c f) = heisOp cᵀ (swapE P Q R S f) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [heisOp, swapE_apply, LinearMap.smul_apply, LinearMap.sum_apply, LinearMap.sub_apply,
-      map_smul, map_sum, map_sub, GlobalTheory.FockSwap.rename_raiB,
-      GlobalTheory.FockSwap.rename_lowB]
+theorem swapE_heisOp (c : Matrix (Ix R S) (Ix P Q) ℂ) (f : Formalism.BasicNotions.TH.Pol R S P Q) :
+    swapE P Q R S (heisOp c f) = heisOp cᵀ (swapE P Q R S f) := by
+
+  simp only [heisOp, swapE_apply, LinearMap.smul_apply, LinearMap.sum_apply, LinearMap.sub_apply,
+  map_smul, map_sum, map_sub, GlobalTheory.FockSwap.rename_raiB, GlobalTheory.FockSwap.rename_lowB]
   congr 1
   refine Fintype.sum_equiv (Equiv.prodComm _ _) _ _ fun l => ?_
   simp [lineSign_swap]
@@ -45,22 +74,17 @@ section Tensor
 
 variable {ι : Type} [Fintype ι] [DecidableEq ι]
 
-def swapT (ι : Type) (P Q R S : ℕ)
-    : (⨂[ℂ] _ : ι, Formalism.BasicNotions.TH.Pol R S P Q) ≃ₗ[ℂ] ⨂[ℂ] _ : ι, Formalism.BasicNotions.TH.Pol P Q R S :=
+def swapT (ι : Type) (P Q R S : ℕ) :
+    (⨂[ℂ] _ : ι, Formalism.BasicNotions.TH.Pol R S P Q) ≃ₗ[ℂ] ⨂[ℂ] _ : ι, Formalism.BasicNotions.TH.Pol P Q R S :=
   PiTensorProduct.congr fun _ => swapE P Q R S
 
-theorem swapT_atPl
-    (w : ι)
-    (L' : Module.End ℂ (Formalism.BasicNotions.TH.Pol R S P Q))
-    (L : Module.End ℂ (Formalism.BasicNotions.TH.Pol P Q R S))
-    (h : ∀ f, swapE P Q R S (L' f) = L (swapE P Q R S f))
-    (T : ⨂[ℂ] _ : ι, Formalism.BasicNotions.TH.Pol R S P Q)
-    : swapT ι P Q R S (atPl w L' T) = atPl w L (swapT ι P Q R S T) := by
-  have e
-      : (swapT ι P Q R S).toLinearMap ∘ₗ atPl w L' = atPl w L ∘ₗ (swapT ι P Q R S).toLinearMap := by
+theorem swapT_atPl (w : ι) (L' : Module.End ℂ (Formalism.BasicNotions.TH.Pol R S P Q)) (L : Module.End ℂ (Formalism.BasicNotions.TH.Pol P Q R S))
+    (h : ∀ f, swapE P Q R S (L' f) = L (swapE P Q R S f)) (T : ⨂[ℂ] _ : ι, Formalism.BasicNotions.TH.Pol R S P Q) :
+    swapT ι P Q R S (atPl w L' T) = atPl w L (swapT ι P Q R S T) := by
+  have e : (swapT ι P Q R S).toLinearMap ∘ₗ atPl w L' = atPl w L ∘ₗ (swapT ι P Q R S).toLinearMap := by
     refine PiTensorProduct.ext (MultilinearMap.ext fun x => ?_)
-    simp only [LinearMap.compMultilinearMap_apply, LinearMap.comp_apply, LinearEquiv.coe_coe, atPl,
-      swapT, PiTensorProduct.map_tprod, PiTensorProduct.congr_tprod]
+    simp only [LinearMap.compMultilinearMap_apply, LinearMap.comp_apply, LinearEquiv.coe_coe, atPl, swapT,
+      PiTensorProduct.map_tprod, PiTensorProduct.congr_tprod]
     congr 1
     funext i
     by_cases hi : i = w
@@ -68,50 +92,18 @@ theorem swapT_atPl
     · simp [Function.update_of_ne hi]
   exact LinearMap.congr_fun e T
 
-theorem swapT_sumPl
-    (L' : ι → Module.End ℂ (Formalism.BasicNotions.TH.Pol R S P Q))
-    (L : ι → Module.End ℂ (Formalism.BasicNotions.TH.Pol P Q R S))
-    (h : ∀ w f, swapE P Q R S (L' w f) = L w (swapE P Q R S f))
-    (T : ⨂[ℂ] _ : ι, Formalism.BasicNotions.TH.Pol R S P Q)
-    : swapT ι P Q R S (sumPl L' T) = sumPl L (swapT ι P Q R S T) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [sumPl, LinearMap.sum_apply, map_sum]
+theorem swapT_sumPl (L' : ι → Module.End ℂ (Formalism.BasicNotions.TH.Pol R S P Q)) (L : ι → Module.End ℂ (Formalism.BasicNotions.TH.Pol P Q R S))
+    (h : ∀ w f, swapE P Q R S (L' w f) = L w (swapE P Q R S f)) (T : ⨂[ℂ] _ : ι, Formalism.BasicNotions.TH.Pol R S P Q) :
+    swapT ι P Q R S (sumPl L' T) = sumPl L (swapT ι P Q R S T) := by
+
+  simp only [sumPl, LinearMap.sum_apply, map_sum]
   exact Finset.sum_congr rfl fun w _ => swapT_atPl w (L' w) (L w) (h w) T
 
 end Tensor
 
+
 open scoped Classical in
 theorem lieFirst_of_lieSecond : LieSecond → LieFirst := by
-  intro h2 F E _ _ _ _ _ σ α β κ _ _ _ _ _ P Q R S ψ τ JA JB d d' a b A C Φ om χ m hCM hψ hfr hΦ hdd
-    hW hm
-  have hfr' : Framed τ JB JA b a C A := ⟨by rw [mul_comm]; exact hfr.1, hfr.2.2, hfr.2.1⟩
-  have hΦ' : IsFockMap ψ τ d' C A (Φ ∘ₗ (swapT (InfinitePlace F) P Q R S).toLinearMap) := by
-    refine ⟨hΦ.1.comp (swapT (InfinitePlace F) P Q R S).injective, fun u hu c hc T => ?_⟩
-    have hu' : At (evI F) uᵀ := fun x hx => by
-      rw [← Matrix.transpose_smul, hu x hx, Matrix.transpose_zero]
-    have hc' : ∀ w, uᵀ.map (piInf (τ w)) = A w * (c w)ᵀ * (C w)ᵀ := fun w => by
-      rw [Matrix.transpose_map, hc w]; simp [Matrix.transpose_mul, Matrix.mul_assoc]
-    have key := hΦ.2 uᵀ hu' (fun w => (c w)ᵀ) hc' (swapT (InfinitePlace F) P Q R S T)
-    have hr : ∀ t : ℝ, d'.rho ψ (realAd F t • u) = d.rho ψ (realAd F t • uᵀ) := fun t => by
-      show schr ψ (d'.e _) = schr ψ (d.e _)
-      rw [← hdd, Matrix.transpose_smul, Matrix.transpose_transpose]
-    simp only [LinearMap.comp_apply, LinearEquiv.coe_coe, hr]
-    rwa [swapT_sumPl
-      (fun w => heisOp (c w))
-      (fun w => heisOp (c w)ᵀ)
-      (fun w f => swapE_heisOp (c w) f)]
-  have hA := h2 F E σ β α κ R S P Q ψ τ JB JA d' b a C A _ om χ m hCM hψ hfr' hΦ' hW hm
-  intro γ hγ Y hY T
-  have key := hA γ hγ Y hY ((swapT (InfinitePlace F) P Q R S).symm T)
-  simp only [LinearMap.comp_apply, LinearEquiv.coe_coe, LinearEquiv.apply_symm_apply] at key
-  rwa [swapT_sumPl
-        (fun w => fockAct2 R S P Q (Y w) + (((m w : ℂ) / 2) * (Y w).trace) • 1)
-        (fun w => fockAct1 P Q R S (Y w) + (((m w : ℂ) / 2) * (Y w).trace) • 1)
-        (fun w f => by
-          simp only [LinearMap.add_apply, LinearMap.smul_apply, Module.End.one_apply,
-            map_add (f := _), map_smul, swapE_apply,
-            (GlobalTheory.FockSwap.swap_symmetry R S P Q).2.1]),
-      LinearEquiv.apply_symm_apply]
-    at key
+  apply PositivityTheory.RL.lieFirst <;> assumption
 
 end GlobalTheory.RealLift.LieFirstPf

@@ -1,9 +1,59 @@
 module
 
-public import Mathlib
 public import Formalism.HermitianLattices.DefsCS
 public import Formalism.HermitianLattices.HermitianLatticesProofs.ThetaSummable
 public import Lemmata.GeneralBFactSecondSide.Imports
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Int
+import Mathlib.Algebra.Order.Star.Real
+import Mathlib.Algebra.Ring.IsFormallyReal
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Lemma
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -35,8 +85,8 @@ lemma traceReal_den (a : K) :
   refine ⟨y, hy0, ⟨y • a, hy a (by simp)⟩, ?_⟩
   simp [zsmul_eq_mul]
 
-variable
-  [Module (NumberField.RingOfIntegers K) V] [IsScalarTower (NumberField.RingOfIntegers K) K V]
+variable [Module (NumberField.RingOfIntegers K) V]
+  [IsScalarTower (NumberField.RingOfIntegers K) K V]
 
 lemma traceReal_mult (M : Submodule (NumberField.RingOfIntegers K) V) (hM : Submodule.IsFullLattice K M)
     (x : V) : ∃ n : ℤ, n ≠ 0 ∧ n • x ∈ M := by
@@ -107,33 +157,29 @@ lemma traceReal_lower (h : V →ₗ⋆[K] V →ₗ[K] K)
 
 variable [FiniteDimensional K V]
 
-theorem traceReal_main
-    (h : V →ₗ⋆[K] V →ₗ[K] K) (hS : h.IsSymm) (hpos : ∀ x : V, x ≠ 0 → 0 < Algebra.trace ℚ K (h x x))
-    : ∃ (N : ℕ) (ι : V →+ EuclideanSpace ℝ (Fin N)),
-      (∀ x y : V, inner ℝ (ι x) (ι y) = ((Algebra.trace ℚ K (h x y) : ℚ) : ℝ))
-        ∧ (∀ a : K, ∃ C : ℝ, ∀ x : V, ‖ι (a • x)‖ ≤ C * ‖ι x‖)
-        ∧ (∀ M : Submodule (NumberField.RingOfIntegers K) V,
-          Submodule.IsFullLattice K M
-            → ∃ _ : DiscreteTopology (zmap ι M), IsZLattice ℝ (zmap ι M)) := by
+theorem traceReal_main (h : V →ₗ⋆[K] V →ₗ[K] K) (hS : h.IsSymm)
+    (hpos : ∀ x : V, x ≠ 0 → 0 < Algebra.trace ℚ K (h x x)) :
+    ∃ (N : ℕ) (ι : V →+ EuclideanSpace ℝ (Fin N)),
+      (∀ x y : V, inner ℝ (ι x) (ι y) = ((Algebra.trace ℚ K (h x y) : ℚ) : ℝ)) ∧
+      (∀ a : K, ∃ C : ℝ, ∀ x : V, ‖ι (a • x)‖ ≤ C * ‖ι x‖) ∧
+      (∀ M : Submodule (NumberField.RingOfIntegers K) V, Submodule.IsFullLattice K M →
+        ∃ _ : DiscreteTopology (zmap ι M), IsZLattice ℝ (zmap ι M)) := by
   classical
   let iQ : Module ℚ V := Module.compHom V (algebraMap ℚ K)
   have hQs : ∀ (q : ℚ) (x : V), q • x = (algebraMap ℚ K q) • x := fun _ _ => rfl
   have : IsScalarTower ℚ K V := ⟨fun q a x => by rw [hQs, Algebra.smul_def, mul_smul]⟩
   have : FiniteDimensional ℚ V := Module.Finite.trans K V
-  let B : LinearMap.BilinForm ℚ V :=
-    LinearMap.mk₂ ℚ
-      (fun x y => Algebra.trace ℚ K (h x y))
-      (fun x₁ x₂ y => by simp only [map_add (f := _), LinearMap.add_apply])
-      (fun q x y => by
-        simp only [hQs, LinearMap.map_smulₛₗ, LinearMap.smul_apply, smul_eq_mul, traceReal_star_rat,
-          traceReal_trace_smul])
-      (fun x y₁ y₂ => by simp only [map_add (f := _)])
-      (fun q x y => by simp only [hQs, map_smul, smul_eq_mul, traceReal_trace_smul])
+  let B : LinearMap.BilinForm ℚ V := LinearMap.mk₂ ℚ (fun x y => Algebra.trace ℚ K (h x y))
+    (fun x₁ x₂ y => by simp only [map_add (f := _), LinearMap.add_apply])
+    (fun q x y => by
+      simp only [hQs, LinearMap.map_smulₛₗ, LinearMap.smul_apply, smul_eq_mul,
+        traceReal_star_rat, traceReal_trace_smul])
+    (fun x y₁ y₂ => by simp only [map_add (f := _)])
+    (fun q x y => by simp only [hQs, map_smul, smul_eq_mul, traceReal_trace_smul])
   have hB : ∀ x y, B x y = Algebra.trace ℚ K (h x y) := fun _ _ => rfl
-  have hBS : LinearMap.IsSymm B :=
-    ⟨fun x y => by
-      simp only [RingHom.id_apply, hB]
-      rw [← hS.eq x y, traceReal_star]⟩
+  have hBS : LinearMap.IsSymm B := ⟨fun x y => by
+    simp only [RingHom.id_apply, hB]
+    rw [← hS.eq x y, traceReal_star]⟩
   obtain ⟨v, hv⟩ :=
     LinearMap.BilinForm.exists_orthogonal_basis (K := ℚ) (V := V) (B := B)
       (hK := invertibleOfNonzero (two_ne_zero : (2 : ℚ) ≠ 0)) hBS
@@ -143,31 +189,29 @@ theorem traceReal_main
   have hsq : ∀ i, 0 < Real.sqrt (d i) := fun i => Real.sqrt_pos.mpr (hdr i)
   let f : V → EuclideanSpace ℝ (Fin (finrank ℚ V)) := fun x =>
     WithLp.toLp 2 (fun i => Real.sqrt (d i) * (v.repr x i : ℝ))
-  let ι : V →+ EuclideanSpace ℝ (Fin (finrank ℚ V)) := {
-    toFun := f
-    map_zero' := by ext i; simp [f]
-    map_add' := fun x y => by ext i; simp [f, mul_add]
-  }
+  let ι : V →+ EuclideanSpace ℝ (Fin (finrank ℚ V)) :=
+    { toFun := f
+      map_zero' := by ext i; simp [f]
+      map_add' := fun x y => by ext i; simp [f, mul_add] }
   have hιapp : ∀ x i, (ι x) i = Real.sqrt (d i) * (v.repr x i : ℝ) := fun _ _ => rfl
   have hBexp : ∀ x y, B x y = ∑ i, v.repr x i * v.repr y i * d i := by
     intro x y
-    calc
-      B x y
-        = B (∑ i, v.repr x i • v i) (∑ j, v.repr y j • v j) := by rw [v.sum_repr, v.sum_repr]
+    calc B x y = B (∑ i, v.repr x i • v i) (∑ j, v.repr y j • v j) := by
+          rw [v.sum_repr, v.sum_repr]
       _ = ∑ i, ∑ j, v.repr x i * v.repr y j * B (v i) (v j) := by
-        set_option synthInstance.maxHeartbeats 100000 in
+
           simp only [map_sum, map_smul, LinearMap.sum_apply, LinearMap.smul_apply, smul_eq_mul,
-            Finset.mul_sum]
-        rw [Finset.sum_comm]
-        refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
-        ring
+          Finset.mul_sum]
+          rw [Finset.sum_comm]
+          refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
+          ring
       _ = ∑ i, v.repr x i * v.repr y i * d i := by
-        refine Finset.sum_congr rfl fun i _ => ?_
-        rw [Finset.sum_eq_single i]
-        · intro j _ hji
-          rw [hv (Ne.symm hji)]
-          simp
-        · simp
+          refine Finset.sum_congr rfl fun i _ => ?_
+          rw [Finset.sum_eq_single i]
+          · intro j _ hji
+            rw [hv (Ne.symm hji)]
+            simp
+          · simp
   have hinner : ∀ x y, inner ℝ (ι x) (ι y) = ((Algebra.trace ℚ K (h x y) : ℚ) : ℝ) := by
     intro x y
     rw [← hB, hBexp]
@@ -195,22 +239,21 @@ theorem traceReal_main
       rw [Finset.smul_sum]
       refine Finset.sum_congr rfl fun j _ => ?_
       rw [hQs, hQs, smul_smul, smul_smul, mul_comm]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hax, map_sum]
+
+    rw [hax, map_sum]
     simp only [hιq]
-    calc
-      ‖∑ j, ((v.repr x j : ℚ) : ℝ) • ι (a • v j)‖
+    calc ‖∑ j, ((v.repr x j : ℚ) : ℝ) • ι (a • v j)‖
         ≤ ∑ j, ‖((v.repr x j : ℚ) : ℝ) • ι (a • v j)‖ := norm_sum_le _ _
       _ = ∑ j, |(v.repr x j : ℝ)| * ‖ι (a • v j)‖ :=
-        Finset.sum_congr rfl fun j _ => by rw [norm_smul, Real.norm_eq_abs]
+          Finset.sum_congr rfl fun j _ => by rw [norm_smul, Real.norm_eq_abs]
       _ ≤ ∑ j, ‖ι x‖ / Real.sqrt (d j) * ‖ι (a • v j)‖ :=
-        Finset.sum_le_sum fun j _ => mul_le_mul_of_nonneg_right (hcoord x j) (norm_nonneg _)
+          Finset.sum_le_sum fun j _ => mul_le_mul_of_nonneg_right (hcoord x j) (norm_nonneg _)
       _ = (∑ j, ‖ι (a • v j)‖ / Real.sqrt (d j)) * ‖ι x‖ := by
-        rw [Finset.sum_mul]
-        refine Finset.sum_congr rfl fun j _ => ?_
-        ring
-  have hmem
-      : ∀ (M : Submodule (NumberField.RingOfIntegers K) V) y, y ∈ zmap ι M ↔ ∃ m ∈ M, ι m = y := by
+          rw [Finset.sum_mul]
+          refine Finset.sum_congr rfl fun j _ => ?_
+          ring
+  have hmem : ∀ (M : Submodule (NumberField.RingOfIntegers K) V) y,
+      y ∈ zmap ι M ↔ ∃ m ∈ M, ι m = y := by
     intro M y
     show y ∈ AddSubgroup.map ι M.toAddSubgroup ↔ _
     rw [AddSubgroup.mem_map]
@@ -241,18 +284,15 @@ theorem traceReal_main
     rw [← hnorm] at h2
     linarith
   have hspan : Submodule.span ℝ (zmap ι M : Set (EuclideanSpace ℝ (Fin (finrank ℚ V)))) = ⊤ := by
-    have hin
-        : ∀ x : V,
-          ι x ∈ Submodule.span ℝ (zmap ι M : Set (EuclideanSpace ℝ (Fin (finrank ℚ V)))) := by
+    have hin : ∀ x : V, ι x ∈ Submodule.span ℝ (zmap ι M : Set (EuclideanSpace ℝ (Fin (finrank ℚ V)))) := by
       intro x
       obtain ⟨n, hn, hnx⟩ := traceReal_mult M hM x
-      have h1
-          : ι (n • x) ∈ Submodule.span ℝ (zmap ι M : Set (EuclideanSpace ℝ (Fin (finrank ℚ V)))) :=
+      have h1 : ι (n • x) ∈ Submodule.span ℝ (zmap ι M : Set (EuclideanSpace ℝ (Fin (finrank ℚ V)))) :=
         Submodule.subset_span ((hmem M _).mpr ⟨_, hnx, rfl⟩)
       rw [map_zsmul] at h1
       have h2 := Submodule.smul_mem _ ((n : ℝ)⁻¹) h1
-      rwa [← Int.cast_smul_eq_zsmul ℝ, smul_smul, inv_mul_cancel₀ (by exact_mod_cast hn), one_smul]
-        at h2
+      rwa [← Int.cast_smul_eq_zsmul ℝ, smul_smul, inv_mul_cancel₀ (by exact_mod_cast hn),
+        one_smul] at h2
     apply eq_top_iff.mpr
     intro y _
     have hy : y = ∑ i, (y i / Real.sqrt (d i)) • ι (v i) := by

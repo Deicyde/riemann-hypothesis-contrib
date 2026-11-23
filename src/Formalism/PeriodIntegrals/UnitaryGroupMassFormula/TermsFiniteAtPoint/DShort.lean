@@ -1,7 +1,54 @@
 module
 
-public import Mathlib
+import Development.AbelianVarietyTheory.Proofs.FlagMeasures.TraceFormPosOnOrthLiftedFlag
 public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.TermsFiniteAtPoint.CarrierRow
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Int
+import Mathlib.Algebra.Order.Star.Rat
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.LinearAlgebra.Matrix.FiniteDimensional
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -13,11 +60,9 @@ namespace PI.TermsAtPtFiniteW
 
 open NumberField Formalism.BasicNotions
 
-theorem qcs_bound
-    {W : Type*} [AddCommGroup W] [Module ℚ W] [FiniteDimensional ℚ W]
+theorem qcs_bound {W : Type*} [AddCommGroup W] [Module ℚ W] [FiniteDimensional ℚ W]
     (B : LinearMap.BilinForm ℚ W) (hs : ∀ x y, B x y = B y x) (hp : ∀ x, x ≠ 0 → 0 < B x x)
-    (f : W →ₗ[ℚ] ℚ)
-    : ∃ K : ℚ, ∀ x, f x ^ 2 ≤ K * B x x := by
+    (f : W →ₗ[ℚ] ℚ) : ∃ K : ℚ, ∀ x, f x ^ 2 ≤ K * B x x := by
   let Bl : W →ₗ[ℚ] Module.Dual ℚ W := B
   have hinj : Function.Injective Bl := by
     rw [← LinearMap.ker_eq_bot, LinearMap.ker_eq_bot']
@@ -27,8 +72,7 @@ theorem qcs_bound
     have h0 : B w w = 0 := by simpa [Bl] using LinearMap.congr_fun hw w
     linarith
   have hsurj : Function.Surjective Bl :=
-    (LinearMap.injective_iff_surjective_of_finrank_eq_finrank (Subspace.dual_finrank_eq).symm).1
-      hinj
+    (LinearMap.injective_iff_surjective_of_finrank_eq_finrank (Subspace.dual_finrank_eq).symm).1 hinj
   obtain ⟨w, hw⟩ := hsurj f
   refine ⟨B w w, fun x => ?_⟩
   have hfx : f x = B w x := by rw [← hw]
@@ -42,9 +86,8 @@ theorem qcs_bound
       · rw [hy]
         simp
       · exact le_of_lt (hp _ hy)
-    have hexp
-        : B (B w w • x - B w x • w) (B w w • x - B w x • w)
-          = B w w * (B w w * B x x - B w x ^ 2) := by
+    have hexp : B (B w w • x - B w x • w) (B w w • x - B w x • w) =
+        B w w * (B w w * B x x - B w x ^ 2) := by
       simp only [map_sub, map_smul, LinearMap.sub_apply, LinearMap.smul_apply, smul_eq_mul]
       rw [hs x w]
       ring
@@ -52,26 +95,12 @@ theorem qcs_bound
     have h2 := (mul_nonneg_iff_of_pos_left hww).1 hyy
     linarith
 
-theorem trace_pos_of_re_pos
-    {E : Type} [Field E] [NumberField E] (z : E) (h : ∀ τ : E →+* ℂ, 0 < (τ z).re)
-    : 0 < Algebra.trace ℚ E z := by
-  haveI : Nonempty (E →ₐ[ℚ] ℂ) := ⟨IsAlgClosed.lift⟩
-  have h1 : algebraMap ℚ ℂ (Algebra.trace ℚ E z) = ∑ σ : E →ₐ[ℚ] ℂ, σ z := trace_eq_sum_embeddings ℂ
-  have h2 : (algebraMap ℚ ℂ (Algebra.trace ℚ E z)).re = ∑ σ : E →ₐ[ℚ] ℂ, (σ z).re := by
-    rw [h1, Complex.re_sum]
-  have h3 : (algebraMap ℚ ℂ (Algebra.trace ℚ E z)).re = ((Algebra.trace ℚ E z : ℚ) : ℝ) := by simp
-  have hpos : 0 < ∑ σ : E →ₐ[ℚ] ℂ, (σ z).re := by
-    apply Finset.sum_pos
-    · intro σ _
-      exact h σ.toRingHom
-    · exact Finset.univ_nonempty
-  have h4 : (0 : ℝ) < ((Algebra.trace ℚ E z : ℚ) : ℝ) := by
-    rw [← h3, h2]
-    exact hpos
-  exact_mod_cast h4
+theorem trace_pos_of_re_pos {E : Type} [Field E] [NumberField E] (z : E)
+    (h : ∀ τ : E →+* ℂ, 0 < (τ z).re) : 0 < Algebra.trace ℚ E z := by
+  apply GlobalTheory.LoopC.PerpPos.trace_pos <;> assumption
 
-theorem exists_common_den {E : Type} [Field E] [NumberField E] (t : Finset E)
-    : ∃ d : ℤ, d ≠ 0 ∧ ∀ e ∈ t, IsIntegral ℤ ((d : E) * e) := by
+theorem exists_common_den {E : Type} [Field E] [NumberField E] (t : Finset E) :
+    ∃ d : ℤ, d ≠ 0 ∧ ∀ e ∈ t, IsIntegral ℤ ((d : E) * e) := by
   have hintC : ∀ m : ℤ, IsIntegral ℤ (m : E) := fun m => by
     simpa using isIntegral_algebraMap (R := ℤ) (A := E) (x := m)
   have hone : ∀ a : E, ∃ y : ℤ, y ≠ 0 ∧ IsIntegral ℤ ((y : E) * a) := by
@@ -80,13 +109,10 @@ theorem exists_common_den {E : Type} [Field E] [NumberField E] (t : Finset E)
       intro k
       rw [integralBasis_apply]
       exact RingOfIntegers.isIntegral_coe _
-    have hsum
-        : ∀ Y : ℤ,
-          (Y : E) * a = ∑ k, ((Y : ℚ) * (integralBasis E).repr a k) • integralBasis E k := by
+    have hsum : ∀ Y : ℤ, (Y : E) * a = ∑ k, ((Y : ℚ) * (integralBasis E).repr a k) • integralBasis E k := by
       intro Y
-      have h1
-          : (Y : E) * (∑ k, (integralBasis E).repr a k • integralBasis E k)
-            = ∑ k, ((Y : ℚ) * (integralBasis E).repr a k) • integralBasis E k := by
+      have h1 : (Y : E) * (∑ k, (integralBasis E).repr a k • integralBasis E k) =
+          ∑ k, ((Y : ℚ) * (integralBasis E).repr a k) • integralBasis E k := by
         rw [Finset.mul_sum]
         refine Finset.sum_congr rfl (fun k _ => ?_)
         simp only [Algebra.smul_def, map_mul, map_intCast]
@@ -99,12 +125,10 @@ theorem exists_common_den {E : Type} [Field E] [NumberField E] (t : Finset E)
     · rw [hsum]
       apply IsIntegral.sum
       intro k _
-      obtain ⟨c, hc⟩
-          : (((integralBasis E).repr a k).den : ℤ) ∣ ∏ j, (((integralBasis E).repr a j).den : ℤ) :=
+      obtain ⟨c, hc⟩ : (((integralBasis E).repr a k).den : ℤ) ∣ ∏ j, (((integralBasis E).repr a j).den : ℤ) :=
         Finset.dvd_prod_of_mem _ (Finset.mem_univ k)
-      have hm
-          : ((∏ j, (((integralBasis E).repr a j).den : ℤ) : ℤ) : ℚ) * (integralBasis E).repr a k
-            = ((c * ((integralBasis E).repr a k).num : ℤ) : ℚ) := by
+      have hm : ((∏ j, (((integralBasis E).repr a j).den : ℤ) : ℤ) : ℚ) * (integralBasis E).repr a k =
+          ((c * ((integralBasis E).repr a k).num : ℤ) : ℚ) := by
         rw [hc]
         push_cast
         have h2 := Rat.den_mul_eq_num ((integralBasis E).repr a k)
@@ -129,11 +153,9 @@ theorem exists_common_den {E : Type} [Field E] [NumberField E] (t : Finset E)
       rw [h1]
       exact (hintC y).mul (hdint e he')
 
-theorem eq_of_trace_basis
-    {E : Type} [Field E] [NumberField E]
-    (a b : E)
-    (h : ∀ k, Algebra.trace ℚ E (integralBasis E k * a) = Algebra.trace ℚ E (integralBasis E k * b))
-    : a = b := by
+theorem eq_of_trace_basis {E : Type} [Field E] [NumberField E] (a b : E)
+    (h : ∀ k, Algebra.trace ℚ E (integralBasis E k * a) = Algebra.trace ℚ E (integralBasis E k * b)) :
+    a = b := by
   have hφ : (Algebra.trace ℚ E).comp (LinearMap.mulLeft ℚ (a - b)) = 0 := by
     apply (integralBasis E).ext
     intro k
@@ -150,24 +172,24 @@ theorem eq_of_trace_basis
     | exact (traceForm_nondegenerate (K := ℚ) (L := E)) (a - b) hall
   exact sub_eq_zero.1 hab
 
-theorem trace_int_of_isIntegral {E : Type} [Field E] [NumberField E] (z : E) (hz : IsIntegral ℤ z)
-    : ∃ n : ℤ, (n : ℚ) = Algebra.trace ℚ E z := by
+theorem trace_int_of_isIntegral {E : Type} [Field E] [NumberField E] (z : E) (hz : IsIntegral ℤ z) :
+    ∃ n : ℤ, (n : ℚ) = Algebra.trace ℚ E z := by
   have h1 : IsIntegral ℤ (Algebra.trace ℚ E z) := Algebra.isIntegral_trace hz
   obtain ⟨n, hn⟩ := IsIntegrallyClosed.isIntegral_iff.1 h1
   exact ⟨n, by simpa using hn⟩
 
 theorem shortFin_holds : ShortFin := by
   intro E _ _ _ S Λ hΛ P hpos c
-  have hsl
-      : ∀ (q : ℚ) (x y : S.V), S.hT (algebraMap ℚ E q • x) y = algebraMap ℚ E q * S.hT x y := by
+  have hsl : ∀ (q : ℚ) (x y : S.V),
+      S.hT (algebraMap ℚ E q • x) y = algebraMap ℚ E q * S.hT x y := by
     intro q x y
     rw [LinearMap.map_smulₛₗ₂, starRingEnd_apply, eq_ratCast, star_ratCast, smul_eq_mul]
-  have hsr
-      : ∀ (q : ℚ) (x y : S.V), S.hT x (algebraMap ℚ E q • y) = algebraMap ℚ E q * S.hT x y := by
+  have hsr : ∀ (q : ℚ) (x y : S.V),
+      S.hT x (algebraMap ℚ E q • y) = algebraMap ℚ E q * S.hT x y := by
     intro q x y
     rw [LinearMap.map_smul, smul_eq_mul]
-  have htq
-      : ∀ (q : ℚ) (z : E), Algebra.trace ℚ E (algebraMap ℚ E q * z) = q * Algebra.trace ℚ E z := by
+  have htq : ∀ (q : ℚ) (z : E),
+      Algebra.trace ℚ E (algebraMap ℚ E q * z) = q * Algebra.trace ℚ E z := by
     intro q z
     rw [← Algebra.smul_def, LinearMap.map_smul, smul_eq_mul]
   letI : Module ℚ P := Module.compHom P (algebraMap ℚ E)
@@ -175,24 +197,23 @@ theorem shortFin_holds : ShortFin := by
     show (q • e) • x = algebraMap ℚ E q • (e • x)
     rw [Algebra.smul_def, mul_smul]⟩
   haveI : FiniteDimensional ℚ P := Module.Finite.trans E P
-  have hcoe : ∀ (q : ℚ) (x : P), ((q • x : P) : S.V) = algebraMap ℚ E q • (x : S.V) := fun q x =>
-    rfl
-  let B : LinearMap.BilinForm ℚ P :=
-    LinearMap.mk₂ ℚ
-      (fun x y : P => Algebra.trace ℚ E (S.hT x y) + Algebra.trace ℚ E (S.hT y x))
-      (fun x1 x2 y => by simp only [Submodule.coe_add, map_add (f := _), LinearMap.add_apply]; ring)
-      (fun q x y => by simp only [hcoe, hsl, hsr, htq, smul_eq_mul]; ring)
-      (fun x y1 y2 => by simp only [Submodule.coe_add, map_add (f := _), LinearMap.add_apply]; ring)
-      (fun q x y => by simp only [hcoe, hsl, hsr, htq, smul_eq_mul]; ring)
-  have hBapp : ∀ x y : P, B x y = Algebra.trace ℚ E (S.hT x y) + Algebra.trace ℚ E (S.hT y x) :=
-    fun x y => rfl
+  have hcoe : ∀ (q : ℚ) (x : P), ((q • x : P) : S.V) = algebraMap ℚ E q • (x : S.V) :=
+    fun q x => rfl
+  let B : LinearMap.BilinForm ℚ P := LinearMap.mk₂ ℚ
+    (fun x y : P => Algebra.trace ℚ E (S.hT x y) + Algebra.trace ℚ E (S.hT y x))
+    (fun x1 x2 y => by simp only [Submodule.coe_add, map_add (f := _), LinearMap.add_apply]; ring)
+    (fun q x y => by simp only [hcoe, hsl, hsr, htq, smul_eq_mul]; ring)
+    (fun x y1 y2 => by simp only [Submodule.coe_add, map_add (f := _), LinearMap.add_apply]; ring)
+    (fun q x y => by simp only [hcoe, hsl, hsr, htq, smul_eq_mul]; ring)
+  have hBapp : ∀ x y : P,
+      B x y = Algebra.trace ℚ E (S.hT x y) + Algebra.trace ℚ E (S.hT y x) := fun x y => rfl
   have hsym : ∀ x y : P, B x y = B y x := fun x y => by rw [hBapp, hBapp]; ring
   have hp : ∀ x : P, x ≠ 0 → 0 < B x x := by
     intro x hx
-    have hx' : (x : S.V) ≠ 0 := by intro h; apply hx; exact Subtype.ext h
+    have hx' : (x : S.V) ≠ 0 := by
+      intro h; apply hx; exact Subtype.ext h
     have := trace_pos_of_re_pos _ (hpos x x.2 hx')
-    rw [hBapp]
-    linarith
+    rw [hBapp]; linarith
 
   obtain ⟨sg, hsg⟩ := hΛ.fg
   obtain ⟨d, hd0, hd⟩ :=
@@ -204,8 +225,7 @@ theorem shortFin_holds : ShortFin := by
     | mem g hg =>
       intro j
       exact hd _ (Finset.mem_biUnion.2 ⟨g, hg, Finset.mem_image.2 ⟨j, Finset.mem_univ _, rfl⟩⟩)
-    | zero =>
-      intro j; simpa using (isIntegral_zero : IsIntegral ℤ (0 : E))
+    | zero => intro j; simpa using (isIntegral_zero : IsIntegral ℤ (0 : E))
     | add x y _ _ hx hy =>
       intro j
       simp only [map_add (f := _), Finsupp.add_apply, mul_add]
@@ -237,11 +257,12 @@ theorem shortFin_holds : ShortFin := by
   let R : Fin S.rank × Module.Free.ChooseBasisIndex ℤ (𝓞 E) → ℤ := fun p =>
     ⌈K p * (2 * Algebra.trace ℚ E c)⌉
   refine Set.Finite.of_injOn (f := Φ)
-    (t := Set.pi Set.univ fun p => ((Int.cast : ℤ → ℚ) '' Set.Icc (- R p) (R p))) ?_ ?_
+    (t := Set.pi Set.univ fun p => ((Int.cast : ℤ → ℚ) '' Set.Icc (-R p) (R p))) ?_ ?_
     (Set.Finite.pi fun p => (Set.finite_Icc _ _).image _)
   · rintro x ⟨hxΛ, hxP, hxc⟩ p _
     obtain ⟨n, hn⟩ := hint x hxΛ p
-    have hB : B ⟨x, hxP⟩ ⟨x, hxP⟩ = 2 * Algebra.trace ℚ E c := by rw [hBapp]; simp only [hxc]; ring
+    have hB : B ⟨x, hxP⟩ ⟨x, hxP⟩ = 2 * Algebra.trace ℚ E c := by
+      rw [hBapp]; simp only [hxc]; ring
     have h1 : (Φ x p) ^ 2 ≤ K p * (2 * Algebra.trace ℚ E c) := by
       have := hK p ⟨x, hxP⟩
       rw [hf, hB] at this

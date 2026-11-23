@@ -1,16 +1,40 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.FieldValuesMemFixedField
-public import Formalism.LocalToGlobal.Divisibility.ColumnFamilyPlaceCharacterComap
-public import Formalism.LocalToGlobal.Divisibility.TiedLemmas
-public import Formalism.QuotientMetricDivisors.HermitianTwistDivisors.ValBasic
 public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.InGeoIff
-public import Formalism.LocalToGlobal.IndefiniteReal.LiftGoodPartComplexEqRangeFamily
-public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.OrZeroOf
-public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.RestrictedCharacterDataValid
-public import Formalism.LocalToGlobal.IndefiniteReal.PackageFromPrimitiveStatements
 public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.InclUInjective
+public import Formalism.LocalToGlobal.IndefiniteReal.WeakCharacterisationWithError
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
 
 @[expose] public section
 
@@ -136,7 +160,6 @@ def NzAt
       ≠ 0
     ∨ F0 w j ≠ 0
 
-set_option maxHeartbeats 1000000 in
 theorem toCx3_upd_reFace
     (R : RealDat3 D A3 Ks)
     (F : Face3 D A3)
@@ -147,7 +170,6 @@ theorem toCx3_upd_reFace
       = reErr (reScal (R.toCx3 F) (fun _ => kap) lam) err :=
   rfl
 
-set_option maxHeartbeats 1000000 in
 theorem complexSide_nonzeroIndexPlaces_iff
     (R : RealDat3 D A3 Ks)
     (F : Face3 D A3)
@@ -163,7 +185,6 @@ theorem complexSide_nonzeroIndexPlaces_iff
     (definiteSide_nonzeroIndexPlaces_any_columns_scale (R.toCx3 F) F.P0 F.ψ0 F.P1 F.ψ1 F.Dc Dc F.Sp
       Sp F.Zsc Zsc N w)
 
-set_option maxHeartbeats 1000000 in
 theorem complexSide_nonzeroIndexPlaces_iff_self
     (R : RealDat3 D A3 Ks) (F : Face3 D A3) (N : IndefNum A3.fam3.base3)
     (w : HeightOneSpectrum (𝓞 D.what₂.LL))
@@ -172,7 +193,6 @@ theorem complexSide_nonzeroIndexPlaces_iff_self
   definiteSide_nonzeroIndexPlaces_any_columns_scale (R.toCx3 F) F.P0 F.ψ0 F.P1 F.ψ1 F.Dc F.Dc F.Sp
     F.Sp F.Zsc F.Zsc N w
 
-set_option maxHeartbeats 1000000 in
 theorem nzAt_res
     {f : T' → T} {μ : T'} (R : RealDat3 D (A3.comap id (f μ)) Ks)
     (mu : HeightOneSpectrum (𝓞 D.what₂.LL) → T') (tw : Finset (HeightOneSpectrum (𝓞 D.what₂.LL)))
@@ -184,7 +204,6 @@ theorem nzAt_res
       ↔ NzAt R (Res.bare3 _ P0 ψ0 P1 ψ1) F0 j w :=
   Iff.rfl
 
-set_option maxHeartbeats 1000000 in
 theorem complexSide_numberContents_eq_scaleAtSubspaces
     (R : RealDat3 D A3 Ks)
     (F : Face3 D A3)
@@ -215,13 +234,12 @@ theorem _root_.GlobalTheory.Mem.R3.columnChoiceReferenceFace_eq_bareFaceTwoLevel
     : face0 X I hX U Xg tr = Res.bare3 (famR X I hX U Xg tr) (lev0 I) (chr0 I) (lev1 I) (chr1 I) :=
   rfl
 
-set_option maxHeartbeats 2000000 in
+
 def resGeo (h : Wt' ⊆ Wt) : GlobalTheory.RealGeo.GeoHalf z.core (z.resR h).toRealDat fun _ => 1 :=
   Res.geoHalf (A := (famR X I hX (usedOf I T Wt) z.Xg z.tr).A) (f := inclU I (usedOf_mono I T h))
     (μ := mu0F (X := X.B.fields) (tuOf I (usedOf I T Wt'))) (R := z.R.toRealDat) (z.resMu h)
     (z.resTw Wt') z.geo
 
-set_option maxHeartbeats 2000000 in
 theorem levOf_resR (h : Wt' ⊆ Wt) : LevOf X I (usedOf I T Wt') (z.resR h).toLevCh := ⟨
   Res.levCh_is (L := z.R.toLevCh) (inclU_injective (usedOf_mono I T h)) z.lev.is,
   z.lev.C,

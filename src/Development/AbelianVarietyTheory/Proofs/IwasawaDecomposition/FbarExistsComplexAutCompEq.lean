@@ -1,9 +1,58 @@
 module
 
-public import Mathlib
-public import Formalism.LocalToGlobal.NormalizedHeckeFactors.WittCoreInclusionMulVecMemLatticeCompletionAtPla
-public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.ConcreteTwistFrameExtraExcludedOverSmallPrimes
+public import Formalism.CyclotomicNorms.StatementT
+public import Mathlib.RingTheory.RootsOfUnity.PrimitiveRoots
 public import Development.AbelianVarietyTheory.Proofs.HomogeneousIdeals.ExistsRingEquivOfIsTranscendenceBasis
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.CStarAlgebra.Classes
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.Finsupp.Encodable
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+public import Mathlib.RingTheory.Algebraic.Cardinality
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
+public import Mathlib.FieldTheory.Minpoly.IsIntegrallyClosed
+public import Mathlib.RingTheory.Polynomial.Cyclotomic.Basic
+public import Mathlib.RingTheory.Polynomial.Cyclotomic.Roots
 
 @[expose] public section
 
@@ -15,12 +64,11 @@ namespace GlobalTheory.TeichGalois
 
 variable {g : ℕ} [Fact g.Prime]
 
-theorem map_zero_eq_zero
-    (t : Formalism.CyclotomicNorms.Fbar g →* ℂ)
-    (ht : ∀ x y : Formalism.CyclotomicNorms.Fbar g, x ≠ 0 → y ≠ 0 → t x = t y → x = y)
-    : t 0 = 0 := by
+theorem map_zero_eq_zero (t : Formalism.CyclotomicNorms.Fbar g →* ℂ)
+    (ht : ∀ x y : Formalism.CyclotomicNorms.Fbar g, x ≠ 0 → y ≠ 0 → t x = t y → x = y) : t 0 = 0 := by
   classical
-  have h2 : t 0 * (t 0 - 1) = 0 := by rw [mul_sub, mul_one, ← map_mul, mul_zero, sub_self]
+  have h2 : t 0 * (t 0 - 1) = 0 := by
+    rw [mul_sub, mul_one, ← map_mul, mul_zero, sub_self]
   rcases mul_eq_zero.1 h2 with h | h
   · exact h
   · exfalso
@@ -29,13 +77,12 @@ theorem map_zero_eq_zero
       have : t (x * 0) = t x * t 0 := map_mul t x 0
       rw [mul_zero, h1, mul_one] at this
       exact this.symm
-    obtain ⟨y, hy⟩ :=
-      Infinite.exists_notMem_finset ({0, 1} : Finset (Formalism.CyclotomicNorms.Fbar g))
+    obtain ⟨y, hy⟩ := Infinite.exists_notMem_finset ({0, 1} : Finset (Formalism.CyclotomicNorms.Fbar g))
     simp only [Finset.mem_insert, Finset.mem_singleton, not_or] at hy
     exact hy.2 (ht y 1 hy.1 one_ne_zero (by rw [hall, hall]))
 
-theorem exists_coprime_pow_eq_one {x : Formalism.CyclotomicNorms.Fbar g} (hx : x ≠ 0)
-    : ∃ m : ℕ, g.Coprime m ∧ x ^ m = 1 := by
+theorem exists_coprime_pow_eq_one {x : Formalism.CyclotomicNorms.Fbar g} (hx : x ≠ 0) :
+    ∃ m : ℕ, g.Coprime m ∧ x ^ m = 1 := by
   let K := IntermediateField.adjoin (ZMod g) ({x} : Set (Formalism.CyclotomicNorms.Fbar g))
   haveI : FiniteDimensional (ZMod g) K :=
     IntermediateField.adjoin.finiteDimensional (Algebra.IsIntegral.isIntegral x)
@@ -56,38 +103,31 @@ theorem exists_coprime_pow_eq_one {x : Formalism.CyclotomicNorms.Fbar g} (hx : x
     rw [sub_pow_char_pow, one_pow, ← pow_mul, mul_comm, ← heq, hn, sub_self]
   exact sub_eq_zero.1 (pow_eq_zero_iff (pow_ne_zero _ (Fact.out : g.Prime).ne_zero) |>.1 h2)
 
-theorem exists_common_exponent (s : Finset (Formalism.CyclotomicNorms.Fbar g)) (hs : ∀ x ∈ s, x ≠ 0)
-    : ∃ m : ℕ, g.Coprime m ∧ ∀ x ∈ s, x ^ m = 1 := by
+theorem exists_common_exponent (s : Finset (Formalism.CyclotomicNorms.Fbar g)) (hs : ∀ x ∈ s, x ≠ 0) :
+    ∃ m : ℕ, g.Coprime m ∧ ∀ x ∈ s, x ^ m = 1 := by
   have h := fun x (hx : x ∈ s) => exists_coprime_pow_eq_one (hs x hx)
   choose! e he using h
   refine ⟨∏ x ∈ s, e x, Nat.Coprime.prod_right fun x hx => (he x hx).1, fun x hx => ?_⟩
   obtain ⟨c, hc⟩ := Finset.dvd_prod_of_mem e hx
   rw [hc, pow_mul, (he x hx).2, one_pow]
 
-theorem isPrimitiveRoot_map
-    (t : Formalism.CyclotomicNorms.Fbar g →* ℂ)
-    (ht : ∀ x y : Formalism.CyclotomicNorms.Fbar g, x ≠ 0 → y ≠ 0 → t x = t y → x = y)
-    {u : Formalism.CyclotomicNorms.Fbar g} {m : ℕ} (hm : 0 < m) (hu : IsPrimitiveRoot u m)
-    : IsPrimitiveRoot (t u) m := by
+theorem isPrimitiveRoot_map (t : Formalism.CyclotomicNorms.Fbar g →* ℂ)
+    (ht : ∀ x y : Formalism.CyclotomicNorms.Fbar g, x ≠ 0 → y ≠ 0 → t x = t y → x = y) {u : Formalism.CyclotomicNorms.Fbar g} {m : ℕ}
+    (hm : 0 < m) (hu : IsPrimitiveRoot u m) : IsPrimitiveRoot (t u) m := by
   have hu0 : u ≠ 0 := hu.ne_zero hm.ne'
   refine ⟨by rw [← map_pow, hu.pow_eq_one, map_one], fun l hl => hu.dvd_of_pow_eq_one l ?_⟩
   exact ht _ _ (pow_ne_zero _ hu0) one_ne_zero (by rw [map_pow, hl, map_one])
 
-theorem lift_apply_eq_sum
-    (t : Formalism.CyclotomicNorms.Fbar g →* ℂ)
-    (f : MonoidAlgebra ℤ (Formalism.CyclotomicNorms.Fbar g))
-    : MonoidAlgebra.lift ℤ ℂ (Formalism.CyclotomicNorms.Fbar g) t f
-      = ∑ x ∈ f.coeff.support, (f.coeff x : ℂ) * t x := by
+theorem lift_apply_eq_sum (t : Formalism.CyclotomicNorms.Fbar g →* ℂ) (f : MonoidAlgebra ℤ (Formalism.CyclotomicNorms.Fbar g)) :
+    MonoidAlgebra.lift ℤ ℂ (Formalism.CyclotomicNorms.Fbar g) t f = ∑ x ∈ f.coeff.support, (f.coeff x : ℂ) * t x := by
   rw [MonoidAlgebra.lift_apply, Finsupp.sum]
   simp [zsmul_eq_mul]
 
-theorem lift_eq_zero_of_lift_eq_zero
-    (t t' : Formalism.CyclotomicNorms.Fbar g →* ℂ)
+theorem lift_eq_zero_of_lift_eq_zero (t t' : Formalism.CyclotomicNorms.Fbar g →* ℂ)
     (ht : ∀ x y : Formalism.CyclotomicNorms.Fbar g, x ≠ 0 → y ≠ 0 → t x = t y → x = y)
     (ht' : ∀ x y : Formalism.CyclotomicNorms.Fbar g, x ≠ 0 → y ≠ 0 → t' x = t' y → x = y)
-    (f : MonoidAlgebra ℤ (Formalism.CyclotomicNorms.Fbar g))
-    (h : MonoidAlgebra.lift ℤ ℂ (Formalism.CyclotomicNorms.Fbar g) t' f = 0)
-    : MonoidAlgebra.lift ℤ ℂ (Formalism.CyclotomicNorms.Fbar g) t f = 0 := by
+    (f : MonoidAlgebra ℤ (Formalism.CyclotomicNorms.Fbar g)) (h : MonoidAlgebra.lift ℤ ℂ (Formalism.CyclotomicNorms.Fbar g) t' f = 0) :
+    MonoidAlgebra.lift ℤ ℂ (Formalism.CyclotomicNorms.Fbar g) t f = 0 := by
   classical
   set s := f.coeff.support.filter (· ≠ 0) with hs
   obtain ⟨m, hmc, hpow⟩ := exists_common_exponent s (fun x hx => (Finset.mem_filter.1 hx).2)
@@ -99,25 +139,20 @@ theorem lift_eq_zero_of_lift_eq_zero
   haveI : NeZero (m : Formalism.CyclotomicNorms.Fbar g) := ⟨by
     rw [Ne, CharP.cast_eq_zero_iff (Formalism.CyclotomicNorms.Fbar g) g]
     exact (Nat.Prime.coprime_iff_not_dvd Fact.out).1 hmc⟩
-  obtain ⟨u, hu⟩ :=
-    IsAlgClosed.exists_root (cyclotomic m (Formalism.CyclotomicNorms.Fbar g))
-      (degree_cyclotomic_pos m _ hm).ne'
+  obtain ⟨u, hu⟩ := IsAlgClosed.exists_root (cyclotomic m (Formalism.CyclotomicNorms.Fbar g))
+    (degree_cyclotomic_pos m _ hm).ne'
   have hu : IsPrimitiveRoot u m := isRoot_cyclotomic_iff.1 hu
   have hk : ∀ x ∈ s, ∃ i : ℕ, u ^ i = x := fun x hx => by
     obtain ⟨i, -, hi⟩ := hu.eq_pow_of_pow_eq_one (hpow x hx)
     exact ⟨i, hi⟩
   choose! k hk using hk
   let P : ℤ[X] := ∑ x ∈ s, C (f.coeff x) * X ^ (k x)
-  have heval
-      : ∀ τ : Formalism.CyclotomicNorms.Fbar g →* ℂ,
-        τ 0 = 0
-          → MonoidAlgebra.lift ℤ ℂ (Formalism.CyclotomicNorms.Fbar g) τ f = aeval (τ u) P := by
+  have heval : ∀ τ : Formalism.CyclotomicNorms.Fbar g →* ℂ, τ 0 = 0 →
+      MonoidAlgebra.lift ℤ ℂ (Formalism.CyclotomicNorms.Fbar g) τ f = aeval (τ u) P := by
     intro τ hτ
-    rw [lift_apply_eq_sum,
-      ← Finset.sum_filter_of_ne (p := (· ≠ 0)) (fun x _ hx h0 => hx (by rw [h0, hτ, mul_zero]))]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [P, map_sum, map_mul, aeval_C, map_pow, aeval_X, algebraMap_int_eq, eq_intCast,
-        map_intCast]
+    rw [lift_apply_eq_sum, ← Finset.sum_filter_of_ne (p := (· ≠ 0)) (fun x _ hx h0 => hx (by rw [h0, hτ, mul_zero]))]
+
+    simp only [P, map_sum, map_mul, aeval_C, map_pow, aeval_X, algebraMap_int_eq, eq_intCast, map_intCast]
     refine Finset.sum_congr rfl fun x hx => ?_
     rw [← map_pow, hk x hx]
   have hζ := isPrimitiveRoot_map t ht hm hu
@@ -129,20 +164,13 @@ theorem lift_eq_zero_of_lift_eq_zero
   exact aeval_eq_zero_of_dvd_aeval_eq_zero hdvd (minpoly.aeval ℤ (t u))
 
 instance countable_fbar : Countable (Formalism.CyclotomicNorms.Fbar g) :=
-  Cardinal.mk_le_aleph0_iff.1
-    ((Algebra.IsAlgebraic.cardinalMk_le_max (ZMod g) (Formalism.CyclotomicNorms.Fbar g)).trans
-      (max_le Cardinal.mk_le_aleph0 le_rfl))
+  Cardinal.mk_le_aleph0_iff.1 ((Algebra.IsAlgebraic.cardinalMk_le_max (ZMod g) (Formalism.CyclotomicNorms.Fbar g)).trans
+    (max_le Cardinal.mk_le_aleph0 le_rfl))
 
-theorem exists_ringEquiv_comp_eq
-    : ∀ (g : ℕ) [Fact g.Prime] (t t' : Formalism.CyclotomicNorms.Fbar g →* ℂ),
-      (∀ x y : Formalism.CyclotomicNorms.Fbar g, x ≠ 0 → y ≠ 0 → t x = t y → x = y)
-        → (∀ x y : Formalism.CyclotomicNorms.Fbar g, x ≠ 0 → y ≠ 0 → t' x = t' y → x = y)
-        → ∃ σ : ℂ ≃+* ℂ, ∀ x, σ (t' x) = t x := by
+theorem exists_ringEquiv_comp_eq : ∀ (g : ℕ) [Fact g.Prime] (t t' : Formalism.CyclotomicNorms.Fbar g →* ℂ), (∀ x y : Formalism.CyclotomicNorms.Fbar g, x ≠ 0 → y ≠ 0 → t x = t y → x = y) → (∀ x y : Formalism.CyclotomicNorms.Fbar g, x ≠ 0 → y ≠ 0 → t' x = t' y → x = y) → ∃ σ : ℂ ≃+* ℂ, ∀ x, σ (t' x) = t x := by
   intro g _ t t' ht ht'
-  let α : MonoidAlgebra ℤ (Formalism.CyclotomicNorms.Fbar g) →+* ℂ :=
-    (MonoidAlgebra.lift ℤ ℂ (Formalism.CyclotomicNorms.Fbar g) t').toRingHom
-  let β : MonoidAlgebra ℤ (Formalism.CyclotomicNorms.Fbar g) →+* ℂ :=
-    (MonoidAlgebra.lift ℤ ℂ (Formalism.CyclotomicNorms.Fbar g) t).toRingHom
+  let α : MonoidAlgebra ℤ (Formalism.CyclotomicNorms.Fbar g) →+* ℂ := (MonoidAlgebra.lift ℤ ℂ (Formalism.CyclotomicNorms.Fbar g) t').toRingHom
+  let β : MonoidAlgebra ℤ (Formalism.CyclotomicNorms.Fbar g) →+* ℂ := (MonoidAlgebra.lift ℤ ℂ (Formalism.CyclotomicNorms.Fbar g) t).toRingHom
   have hker : RingHom.ker α ≤ RingHom.ker β := fun f hf =>
     lift_eq_zero_of_lift_eq_zero t t' ht ht' f hf
   have hker' : RingHom.ker β ≤ RingHom.ker α := fun f hf =>
@@ -153,8 +181,7 @@ theorem exists_ringEquiv_comp_eq
   let β' : Q →+* ℂ := Ideal.Quotient.lift (RingHom.ker α) β hker
   have hα' : Function.Injective α' := RingHom.kerLift_injective α
   have hβ' : Function.Injective β' := by
-    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
-      rw [injective_iff_map_eq_zero]
+    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
     intro q hq
     obtain ⟨f, rfl⟩ := Ideal.Quotient.mk_surjective q
     have : β f = 0 := hq
@@ -169,17 +196,13 @@ theorem exists_ringEquiv_comp_eq
   obtain ⟨σ, hσ⟩ := GlobalTheory.GaloisDescent.exists_complex_ringEquiv_comp_eq a b
   refine ⟨σ, fun x => ?_⟩
   have h := hσ (algebraMap Q (FractionRing Q) (Ideal.Quotient.mk _ (MonoidAlgebra.single x 1)))
-  have ha
-      : a (algebraMap Q (FractionRing Q) (Ideal.Quotient.mk _ (MonoidAlgebra.single x 1)))
-        = t' x := by
+  have ha : a (algebraMap Q (FractionRing Q) (Ideal.Quotient.mk _ (MonoidAlgebra.single x 1))) = t' x := by
     simp only [a]
     rw [IsFractionRing.lift_algebraMap]
     simp only [α']
     rw [RingHom.kerLift_mk]
     simp [α, MonoidAlgebra.lift_single]
-  have hb
-      : b (algebraMap Q (FractionRing Q) (Ideal.Quotient.mk _ (MonoidAlgebra.single x 1)))
-        = t x := by
+  have hb : b (algebraMap Q (FractionRing Q) (Ideal.Quotient.mk _ (MonoidAlgebra.single x 1))) = t x := by
     simp only [b]
     rw [IsFractionRing.lift_algebraMap]
     show β (MonoidAlgebra.single x 1) = t x

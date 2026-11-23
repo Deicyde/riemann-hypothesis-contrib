@@ -1,7 +1,55 @@
 module
 
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.DiscreteValuationRings.ThetaGenLevel
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.DiscreteValuationRings.ThetaGenFlat
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDescent.UnifBaseChangeSt
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.AlgebraicGeometry.Modules.Sheaf
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Lemma
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.DiscreteValuationRings.FamMod
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.DiscreteValuationRings.ThetaGenLevel
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.DiscreteValuationRings.ThetaGenThick
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.DiscreteValuationRings.WchartLePreimage
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDescent.ChartPullbacks.WeightedChartPullback.CancelSecAct
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDescent.ChartPullbacks.WeightedChartPullback.WchartPullLe
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDescent.ChartPullbacks.WeightedChartPullback.WeightIndep
 
 @[expose] public section
 
@@ -9,8 +57,7 @@ set_option autoImplicit false
 
 noncomputable section
 
-open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory
-  CartesianMonoidalCategory MonObj
+open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj
 open scoped CategoryTheory.Obj
 
 attribute [local instance] Over.cartesianMonoidalCategory
@@ -48,104 +95,72 @@ lemma appLE_pull {X Y Z : Scheme.{0}} (i0 : X ⟶ Y) (m : Y ⟶ Z) (m' : X ⟶ Z
     _ = ((i0 ≫ m).app W ≫ X.presheaf.map (homOfLE h0).op).hom x := by rw [e2]
     _ = _ := rfl
 
-variable
-  {R : Type} [CommRing R] [IsDomain R]
-  {I : Ideal R} {D : DegData R I} {A : PolAV (Spec (CommRingCat.of (FractionRing R)))}
+variable {R : Type} [CommRing R] [IsDomain R] {I : Ideal R} {D : DegData R I}
+  {A : PolAV (Spec (CommRingCat.of (FractionRing R)))}
   {G : Over (Spec (CommRingCat.of R))} [GrpObj G] [IsCommMonObj G]
 
-def expL
-    (U : UnifPre I D A G)
-    (e : ℕ) (p : (PUnit.{1} → D.toPre.P.L.ι) × (PUnit.{1} → U.LG.L.ι)) (j₁ : Fin 1 → U.LG.L.ι)
-    (S : Finset D.toPre.X) (jf jt : D.toPre.X → Fin 4 → D.toPre.P.L.ι) (σ : H0 U.LG.L 1)
-    : Γ((thickObj R I e G).left, U.expW e p j₁ S jf jt) :=
-  (res
-        (inf_le_left.trans inf_le_left
-          : U.expW e p j₁ S jf jt
-            ≤ (LB.div (D.toPre.P.L.pull (U.gt e).pG.left) (U.LG.L.pull (fstG I e G).left)).U p)
-        ((U.w e).s p)).val
-      ^ 1
-    * ((thickObj R I e G).left.presheaf.map
-        (homOfLE
-          (inf_le_left.trans inf_le_right
-            : U.expW e p j₁ S jf jt
-              ≤ (fstG I e G).left ⁻¹ᵁ LB.wchart U.LG.L (fun _ : Fin 1 => 𝟙 G.left) j₁)).op).hom
+def expL (U : UnifPre I D A G) (e : ℕ) (p : (PUnit.{1} → D.toPre.P.L.ι) × (PUnit.{1} → U.LG.L.ι))
+    (j₁ : Fin 1 → U.LG.L.ι) (S : Finset D.toPre.X) (jf jt : D.toPre.X → Fin 4 → D.toPre.P.L.ι)
+    (σ : H0 U.LG.L 1) : Γ((thickObj R I e G).left, U.expW e p j₁ S jf jt) :=
+  (res (inf_le_left.trans inf_le_left :
+      U.expW e p j₁ S jf jt ≤ (LB.div (D.toPre.P.L.pull (U.gt e).pG.left)
+        (U.LG.L.pull (fstG I e G).left)).U p) ((U.w e).s p)).val ^ 1 *
+    ((thickObj R I e G).left.presheaf.map (homOfLE (inf_le_left.trans inf_le_right :
+      U.expW e p j₁ S jf jt ≤
+        (fstG I e G).left ⁻¹ᵁ LB.wchart U.LG.L (fun _ : Fin 1 => 𝟙 G.left) j₁)).op).hom
       (((fstG I e G).left.app _).hom (σ.f j₁))
 
-def expR
-    (U : UnifPre I D A G)
-    (e : ℕ) (p : (PUnit.{1} → D.toPre.P.L.ι) × (PUnit.{1} → U.LG.L.ι)) (j₁ : Fin 1 → U.LG.L.ι)
-    (S : Finset D.toPre.X) (jf jt : D.toPre.X → Fin 4 → D.toPre.P.L.ι)
-    (f : ∀ α : D.toPre.X, D.toPre.SecB 1 α)
-    : Γ((thickObj R I e G).left, U.expW e p j₁ S jf jt) :=
+def expR (U : UnifPre I D A G) (e : ℕ) (p : (PUnit.{1} → D.toPre.P.L.ι) × (PUnit.{1} → U.LG.L.ι))
+    (j₁ : Fin 1 → U.LG.L.ι) (S : Finset D.toPre.X) (jf jt : D.toPre.X → Fin 4 → D.toPre.P.L.ι)
+    (f : ∀ α : D.toPre.X, D.toPre.SecB 1 α) : Γ((thickObj R I e G).left, U.expW e p j₁ S jf jt) :=
   ∑ α ∈ S.attach,
     ((thickObj R I e G).left.presheaf.map (homOfLE (U.expW_le_f e p j₁ jf jt α.2)).op).hom
         (((U.gt e).pG.left.app _).hom ((f α.1).f (jf α.1))) *
       (res (U.expWeight_le_chart_weight e p j₁ jf jt α.2) (((U.gt e).t α.1).s (jt α.1))).val
 
-set_option maxHeartbeats 1000000 in
-theorem expandsAt_of_div
-    (U : UnifPre I D A G)
-    [Flat G.hom]
-    {ϖ : R} (hϖ : ϖ ≠ 0) (hI : I = Ideal.span {ϖ})
+
+
+theorem expandsAt_of_div (U : UnifPre I D A G) [Flat G.hom] {ϖ : R} (hϖ : ϖ ≠ 0) (hI : I = Ideal.span {ϖ})
     (σ τ : H0 U.LG.L 1) (hστ : ∀ j, σ.f j = toW G.hom _ ϖ * τ.f j)
     (f g : ∀ α, D.toPre.SecB 1 α) (hfg : ∀ α j, (f α).f j = toW D.toPre.P.A.hom _ ϖ * (g α).f j)
-    (e : ℕ) (h : U.ExpandsAt (e + 1) 1 σ f)
-    : U.ExpandsAt e 1 τ g := by
+    (e : ℕ) (h : U.ExpandsAt (e + 1) 1 σ f) : U.ExpandsAt e 1 τ g := by
   classical
   obtain ⟨S, hout, hmain⟩ := h
-  have hι
-      : thickMap R I e G ≫ pullback.fst G.hom (thick R I (e + 1))
-        = pullback.fst G.hom (thick R I e) :=
+  have hι : thickMap R I e G ≫ pullback.fst G.hom (thick R I (e + 1)) = pullback.fst G.hom (thick R I e) :=
     thickMap_fst e
   have hq : thickMap R I e G ≫ (U.gt (e + 1)).pG.left = (U.gt e).pG.left := U.gt_q e
-  have hJ1 : I ^ (e + 1 + 1) ≤ Ideal.span {ϖ ^ (e + 2)} := by rw [hI, Ideal.span_singleton_pow]
+  have hJ1 : I ^ (e + 1 + 1) ≤ Ideal.span {ϖ ^ (e + 2)} := by
+    rw [hI, Ideal.span_singleton_pow]
   have hJ2 : ϖ ^ (e + 1) ∈ I ^ (e + 1) := by
     rw [hI, Ideal.span_singleton_pow]; exact Ideal.subset_span rfl
-  have van
-      : ∀ (V : (thickObj R I (e + 1) G).left.Opens) (y : Γ((thickObj R I (e + 1) G).left, V)),
-        toW (X := (thickObj R I (e + 1) G).left) ((fstG I (e + 1) G).left ≫ G.hom) V ϖ * y = 0
-          → (thickMap R I e G).app V y = 0 := fun V y hy =>
-    vanish_of_mul G.hom hϖ e hJ1 hJ2 (thickMap R I e G) hι V y hy
+  have van : ∀ (V : (thickObj R I (e + 1) G).left.Opens) (y : Γ((thickObj R I (e + 1) G).left, V)),
+      toW (X := (thickObj R I (e + 1) G).left) ((fstG I (e + 1) G).left ≫ G.hom) V ϖ * y = 0 →
+        (thickMap R I e G).app V y = 0 :=
+    fun V y hy => vanish_of_mul G.hom hϖ e hJ1 hJ2 (thickMap R I e G) hι V y hy
   refine ⟨S, fun α hα j => ?_, fun p j₁ jf jt hj hcoh => ?_⟩
   · have h1 := hout α hα j
     erw [hfg α j, map_mul, app_toW, toW_congr (pG_struct _)] at h1
     exact app_eq_zero_of_comp hq _ _ (van _ _ h1)
-  · have hfam
-        : ∀ z,
-          (Sum.elim
-                (fun _ : PUnit.{1} => (U.gt e).pG.left)
-                (Sum.elim
-                  (fun a : S × Fin 4 => (U.gt e).pG.left ≫ D.toPre.famφB a.1.1 a.2)
-                  (fun a : S × Fin 4 => D.toPre.Oφ (U.gt e).pG a.1.1 a.2)))
-              z
-            = thickMap R I e G ≫ (Sum.elim
-                (fun _ : PUnit.{1} => (U.gt (e + 1)).pG.left)
-                (Sum.elim
-                  (fun a : S × Fin 4 => (U.gt (e + 1)).pG.left ≫ D.toPre.famφB a.1.1 a.2)
-                  (fun a : S × Fin 4 => D.toPre.Oφ (U.gt (e + 1)).pG a.1.1 a.2)))
-              z := by
+  ·
+    have hfam : ∀ z, (Sum.elim (fun _ : PUnit.{1} => (U.gt e).pG.left)
+          (Sum.elim (fun a : S × Fin 4 => (U.gt e).pG.left ≫ D.toPre.famφB a.1.1 a.2)
+            (fun a : S × Fin 4 => D.toPre.Oφ (U.gt e).pG a.1.1 a.2))) z =
+        thickMap R I e G ≫ (Sum.elim (fun _ : PUnit.{1} => (U.gt (e + 1)).pG.left)
+          (Sum.elim (fun a : S × Fin 4 => (U.gt (e + 1)).pG.left ≫ D.toPre.famφB a.1.1 a.2)
+            (fun a : S × Fin 4 => D.toPre.Oφ (U.gt (e + 1)).pG a.1.1 a.2))) z := by
       rintro (z | z | z)
       · exact hq.symm
       · show (U.gt e).pG.left ≫ D.toPre.famφB z.1.1 z.2 =
           thickMap R I e G ≫ (U.gt (e + 1)).pG.left ≫ D.toPre.famφB z.1.1 z.2
         rw [← Category.assoc, hq]
       · exact (Oφ_thick U e z.1.1 z.2).symm
-    have hcoh1 :=
-      fun a b
-          (hab
-            : (Sum.elim
-                  (fun _ : PUnit.{1} => (U.gt (e + 1)).pG.left)
-                  (Sum.elim
-                    (fun a : S × Fin 4 => (U.gt (e + 1)).pG.left ≫ D.toPre.famφB a.1.1 a.2)
-                    (fun a : S × Fin 4 => D.toPre.Oφ (U.gt (e + 1)).pG a.1.1 a.2)))
-                a
-              = (Sum.elim
-                  (fun _ : PUnit.{1} => (U.gt (e + 1)).pG.left)
-                  (Sum.elim
-                    (fun a : S × Fin 4 => (U.gt (e + 1)).pG.left ≫ D.toPre.famφB a.1.1 a.2)
-                    (fun a : S × Fin 4 => D.toPre.Oφ (U.gt (e + 1)).pG a.1.1 a.2)))
-                b) =>
-        hcoh a b (by rw [hfam a, hfam b, hab])
+    have hcoh1 := fun a b (hab : (Sum.elim (fun _ : PUnit.{1} => (U.gt (e + 1)).pG.left)
+          (Sum.elim (fun a : S × Fin 4 => (U.gt (e + 1)).pG.left ≫ D.toPre.famφB a.1.1 a.2)
+            (fun a : S × Fin 4 => D.toPre.Oφ (U.gt (e + 1)).pG a.1.1 a.2))) a =
+        (Sum.elim (fun _ : PUnit.{1} => (U.gt (e + 1)).pG.left)
+          (Sum.elim (fun a : S × Fin 4 => (U.gt (e + 1)).pG.left ≫ D.toPre.famφB a.1.1 a.2)
+            (fun a : S × Fin 4 => D.toPre.Oφ (U.gt (e + 1)).pG a.1.1 a.2))) b) =>
+      hcoh a b (by rw [hfam a, hfam b, hab])
     have E := hmain p j₁ jf jt hj hcoh1
     have E' : expL U (e + 1) p j₁ S jf jt σ = expR U (e + 1) p j₁ S jf jt f := E
     show expL U e p j₁ S jf jt τ = expR U e p j₁ S jf jt g
@@ -155,33 +170,20 @@ theorem expandsAt_of_div
       intro x hx
       obtain ⟨⟨⟨h1, h2⟩, h3⟩, h4⟩ := hx
       refine ⟨⟨⟨?_, ?_⟩, ?_⟩, ?_⟩
-      · exact wchart_le_preimage D.toPre.P.L (thickMap R I e G)
-          (fun _ => (U.gt (e + 1)).pG.left)
-          (fun _ => (U.gt e).pG.left)
-          (fun _ => hq.symm)
-          p.1 h1
-      · exact wchart_le_preimage U.LG.L (thickMap R I e G)
-          (fun _ => (fstG I (e + 1) G).left)
-          (fun _ => (fstG I e G).left)
-          (fun _ => hι'.symm)
-          p.2 h2
+      · exact wchart_le_preimage D.toPre.P.L (thickMap R I e G) (fun _ => (U.gt (e + 1)).pG.left)
+          (fun _ => (U.gt e).pG.left) (fun _ => hq.symm) p.1 h1
+      · exact wchart_le_preimage U.LG.L (thickMap R I e G) (fun _ => (fstG I (e + 1) G).left)
+          (fun _ => (fstG I e G).left) (fun _ => hι'.symm) p.2 h2
       · show (fstG I (e + 1) G).left.base ((thickMap R I e G).base x) ∈
           LB.wchart U.LG.L (fun _ : Fin 1 => 𝟙 G.left) j₁
-        rw [← Scheme.Hom.comp_apply, hι']
-        exact h3
+        rw [← Scheme.Hom.comp_apply, hι']; exact h3
       · refine WeightPf.mem_finset_inf _ _ _ fun α hα => ?_
         have hx' := WeightPf.mem_of_finset_inf h4 hα
-        refine ⟨
-          ?_,
-          wchart_le_preimage D.toPre.P.L (thickMap R I e G) (D.toPre.Oφ (U.gt (e + 1)).pG α)
-            (D.toPre.Oφ (U.gt e).pG α)
-            (fun k => (Oφ_thick U e α k).symm)
-            (jt α) hx'.2
-        ⟩
+        refine ⟨?_, wchart_le_preimage D.toPre.P.L (thickMap R I e G) (D.toPre.Oφ (U.gt (e + 1)).pG α)
+          (D.toPre.Oφ (U.gt e).pG α) (fun k => (Oφ_thick U e α k).symm) (jt α) hx'.2⟩
         show (U.gt (e + 1)).pG.left.base ((thickMap R I e G).base x) ∈
           LB.wchart D.toPre.P.L (D.toPre.famφB α) (jf α)
-        rw [← Scheme.Hom.comp_apply, hq]
-        exact hx'.1
+        rw [← Scheme.Hom.comp_apply, hq]; exact hx'.1
     set c1 := toW (X := (thickObj R I (e + 1) G).left) ((fstG I (e + 1) G).left ≫ G.hom)
       (U.expW (e + 1) p j₁ S jf jt) ϖ with hc1
     have hL1 : expL U (e + 1) p j₁ S jf jt σ = c1 * expL U (e + 1) p j₁ S jf jt τ := by
@@ -196,73 +198,48 @@ theorem expandsAt_of_div
     have hdiff : c1 * (expL U (e + 1) p j₁ S jf jt τ - expR U (e + 1) p j₁ S jf jt g) = 0 := by
       rw [mul_sub, ← hL1, ← hR1, E', sub_self]
     have hvan := van _ _ hdiff
-    have hres
-        : (thickMap R I e G).appLE _ _ hV
-            (expL U (e + 1) p j₁ S jf jt τ - expR U (e + 1) p j₁ S jf jt g)
-          = 0 := by
+    have hres : (thickMap R I e G).appLE _ _ hV
+        (expL U (e + 1) p j₁ S jf jt τ - expR U (e + 1) p j₁ S jf jt g) = 0 := by
       show ((thickMap R I e G).app _ ≫ (thickObj R I e G).left.presheaf.map (homOfLE hV).op).hom _ = 0
       rw [CommRingCat.comp_apply, hvan, map_zero]
-    have h0w
-        : U.expW e p j₁ S jf jt
-          ≤ thickMap R I e G ⁻¹ᵁ (LB.div (D.toPre.P.L.pull (U.gt (e + 1)).pG.left)
-            (U.LG.L.pull (fstG I (e + 1) G).left)).U p := fun x hx =>
-      (inf_le_left.trans inf_le_left
-          : U.expW (e + 1) p j₁ S jf jt
-            ≤ (LB.div (D.toPre.P.L.pull (U.gt (e + 1)).pG.left)
-              (U.LG.L.pull (fstG I (e + 1) G).left)).U p)
-        (hV hx)
-    have hL2
-        : (thickMap R I e G).appLE _ _ hV (expL U (e + 1) p j₁ S jf jt τ)
-          = expL U e p j₁ S jf jt τ := by
+    have h0w : U.expW e p j₁ S jf jt ≤ thickMap R I e G ⁻¹ᵁ
+        (LB.div (D.toPre.P.L.pull (U.gt (e + 1)).pG.left) (U.LG.L.pull (fstG I (e + 1) G).left)).U p :=
+      fun x hx => (inf_le_left.trans inf_le_left :
+        U.expW (e + 1) p j₁ S jf jt ≤ (LB.div (D.toPre.P.L.pull (U.gt (e + 1)).pG.left)
+          (U.LG.L.pull (fstG I (e + 1) G).left)).U p) (hV hx)
+    have hL2 : (thickMap R I e G).appLE _ _ hV (expL U (e + 1) p j₁ S jf jt τ) = expL U e p j₁ S jf jt τ := by
       simp only [expL, map_mul, map_pow]
       congr 1
       · congr 1
         rw [WeightPf.res_val, appLE_res (thickMap R I e G) hV _ h0w]
-        exact congrArg Units.val
-          (U.w_compat e p (U.expW e p j₁ S jf jt) h0w (inf_le_left.trans inf_le_left))
+        exact congrArg Units.val (U.w_compat e p (U.expW e p j₁ S jf jt) h0w (inf_le_left.trans inf_le_left))
       · exact appLE_pull _ _ _ hι' hV _ _ _
-    have ht
-        : ∀ α : S,
-          (thickMap R I e G).appLE _ _ hV
-              (res (U.expWeight_le_chart_weight (e + 1) p j₁ jf jt α.2)
-                (((U.gt (e + 1)).t α.1).s (jt α.1))).val
-            = (res (U.expWeight_le_chart_weight e p j₁ jf jt α.2)
-              (((U.gt e).t α.1).s (jt α.1))).val := by
+    have ht : ∀ α : S, (thickMap R I e G).appLE _ _ hV
+        (res (U.expWeight_le_chart_weight (e + 1) p j₁ jf jt α.2) (((U.gt (e + 1)).t α.1).s (jt α.1))).val =
+        (res (U.expWeight_le_chart_weight e p j₁ jf jt α.2) (((U.gt e).t α.1).s (jt α.1))).val := by
       intro α
-      have hfun
-          : (fun k => thickMap R I e G ≫ D.toPre.Oφ (U.gt (e + 1)).pG α.1 k)
-            = D.toPre.Oφ (U.gt e).pG α.1 :=
-        funext (Oφ_thick U e α.1)
-      have hW
-          : U.expW e p j₁ S jf jt
-            ≤ LB.wchart D.toPre.P.L
-              (fun k => thickMap R I e G ≫ D.toPre.Oφ (U.gt (e + 1)).pG α.1 k)
-              (jt α.1) := by
+      have hfun : (fun k => thickMap R I e G ≫ D.toPre.Oφ (U.gt (e + 1)).pG α.1 k) =
+          D.toPre.Oφ (U.gt e).pG α.1 := funext (Oφ_thick U e α.1)
+      have hW : U.expW e p j₁ S jf jt ≤
+          LB.wchart D.toPre.P.L (fun k => thickMap R I e G ≫ D.toPre.Oφ (U.gt (e + 1)).pG α.1 k) (jt α.1) := by
         rw [hfun]; exact U.expWeight_le_chart_weight e p j₁ jf jt α.2
-      have hcohE
-          : ∀ k1 k2,
-            D.toPre.Oφ (U.gt e).pG α.1 k1 = D.toPre.Oφ (U.gt e).pG α.1 k2 → jt α.1 k1 = jt α.1 k2 :=
+      have hcohE : ∀ k1 k2, D.toPre.Oφ (U.gt e).pG α.1 k1 = D.toPre.Oφ (U.gt e).pG α.1 k2 →
+          jt α.1 k1 = jt α.1 k2 :=
         fun k1 k2 h => hcoh (Sum.inr (Sum.inr (α, k1))) (Sum.inr (Sum.inr (α, k2))) h
-      have C2 :=
-        LBVal.corr_val D.toPre.P.L _ _ _ _ _ _ (U.gt_t e α.1) (jt α.1) (jt α.1)
-          (fun k1 k2 h =>
-            hcohE k1 k2 ((Oφ_thick U e α.1 k1).symm.trans (h.trans (Oφ_thick U e α.1 k2))))
-          hcohE
-          (fun k k' h => hcohE k k' ((Oφ_thick U e α.1 k).symm.trans h))
-          (U.expW e p j₁ S jf jt) (le_inf hW (U.expWeight_le_chart_weight e p j₁ jf jt α.2))
+      have C2 := LBVal.corr_val D.toPre.P.L _ _ _ _ _ _ (U.gt_t e α.1) (jt α.1) (jt α.1)
+        (fun k1 k2 h => hcohE k1 k2 ((Oφ_thick U e α.1 k1).symm.trans (h.trans (Oφ_thick U e α.1 k2)))) hcohE
+        (fun k k' h => hcohE k k' ((Oφ_thick U e α.1 k).symm.trans h)) (U.expW e p j₁ S jf jt)
+        (le_inf hW (U.expWeight_le_chart_weight e p j₁ jf jt α.2))
       show ((thickObj R I (e + 1) G).left.presheaf.map (homOfLE (U.expWeight_le_chart_weight (e + 1) p j₁ jf jt α.2)).op ≫
           (thickMap R I e G).appLE _ _ hV).hom (((U.gt (e + 1)).t α.1).s (jt α.1)).val =
         ((thickObj R I e G).left.presheaf.map (homOfLE (U.expWeight_le_chart_weight e p j₁ jf jt α.2)).op).hom
           (((U.gt e).t α.1).s (jt α.1)).val
       erw [Scheme.Hom.map_appLE]
-      rw [← LBVal.pullGen_val (L := D.toPre.P.L) _ _ ((U.gt (e + 1)).t α.1) (thickMap R I e G)
-        (jt α.1) _ hW]
+      rw [← LBVal.pullGen_val (L := D.toPre.P.L) _ _ ((U.gt (e + 1)).t α.1) (thickMap R I e G) (jt α.1) _ hW]
       exact C2
-    have hR2
-        : (thickMap R I e G).appLE _ _ hV (expR U (e + 1) p j₁ S jf jt g)
-          = expR U e p j₁ S jf jt g := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [expR, map_sum, map_mul]
+    have hR2 : (thickMap R I e G).appLE _ _ hV (expR U (e + 1) p j₁ S jf jt g) = expR U e p j₁ S jf jt g := by
+
+      simp only [expR, map_sum, map_mul]
       refine Finset.sum_congr rfl fun α _ => ?_
       congr 1
       · exact appLE_pull _ _ _ hq hV _ _ _
@@ -276,9 +253,8 @@ namespace ReciprocityTheory.ChartRestriction.G.DVR.TG
 
 open ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out
 
-variable
-  {R : Type} [CommRing R] [IsDomain R]
-  {I : Ideal R} {D : DegData R I} {A : PolAV (Spec (CommRingCat.of (FractionRing R)))}
+variable {R : Type} [CommRing R] [IsDomain R] {I : Ideal R} {D : DegData R I}
+  {A : PolAV (Spec (CommRingCat.of (FractionRing R)))}
   {G : Over (Spec (CommRingCat.of R))} [GrpObj G] [IsCommMonObj G]
 
 lemma flat_G (U : UnifPre I D A G) : Flat G.hom := by
@@ -291,11 +267,10 @@ lemma flat_B : Flat D.toPre.P.A.hom := by
     AlgebraicGeometry.SmoothOfRelativeDimension.smooth D.toPre.P.g _
   exact AlgebraicGeometry.instFlatOfSmooth _
 
-theorem expandsAt_scale
-    (U : UnifPre I D A G) (c : R) (τ τ' : H0 U.LG.L 1) (hτ : ∀ j, τ'.f j = toW G.hom _ c * τ.f j)
+theorem expandsAt_scale (U : UnifPre I D A G) (c : R) (τ τ' : H0 U.LG.L 1)
+    (hτ : ∀ j, τ'.f j = toW G.hom _ c * τ.f j)
     (g g' : ∀ α, D.toPre.SecB 1 α) (hg : ∀ α j, (g' α).f j = toW D.toPre.P.A.hom _ c * (g α).f j)
-    (e : ℕ) (h : U.ExpandsAt e 1 τ g)
-    : U.ExpandsAt e 1 τ' g' := by
+    (e : ℕ) (h : U.ExpandsAt e 1 τ g) : U.ExpandsAt e 1 τ' g' := by
   obtain ⟨S, hout, hmain⟩ := h
   refine ⟨S, fun α hα j => ?_, fun p j₁ jf jt hj hcoh => ?_⟩
   · erw [hg α j, map_mul, hout α hα j, mul_zero]
@@ -313,14 +288,11 @@ theorem expandsAt_scale
       ring
     rw [hL, hR, E]
 
-theorem expand_div_one
-    (U : UnifPre I D A G)
-    (hWI : WeightIndepSt)
-    {ϖ : R} (hϖ : ϖ ≠ 0) (hI : I = Ideal.span {ϖ})
-    (σ τ : H0 U.LG.L 1) (hστ : ∀ j, σ.f j = toW G.hom _ ϖ * τ.f j)
-    (f : ∀ α, D.toPre.SecB 1 α) (hf : ∀ e, U.ExpandsAt e 1 σ f)
-    : ∃ g : ∀ α, D.toPre.SecB 1 α,
-      (∀ α j, (f α).f j = toW D.toPre.P.A.hom _ ϖ * (g α).f j) ∧ ∀ e, U.ExpandsAt e 1 τ g := by
+theorem expand_div_one (U : UnifPre I D A G) (hWI : WeightIndepSt) {ϖ : R} (hϖ : ϖ ≠ 0)
+    (hI : I = Ideal.span {ϖ}) (σ τ : H0 U.LG.L 1) (hστ : ∀ j, σ.f j = toW G.hom _ ϖ * τ.f j)
+    (f : ∀ α, D.toPre.SecB 1 α) (hf : ∀ e, U.ExpandsAt e 1 σ f) :
+    ∃ g : ∀ α, D.toPre.SecB 1 α, (∀ α j, (f α).f j = toW D.toPre.P.A.hom _ ϖ * (g α).f j) ∧
+      ∀ e, U.ExpandsAt e 1 τ g := by
   have := flat_G U
   have := flat_B (D := D)
   have hϖI : ϖ ∈ I ^ (0 + 1) := by rw [hI, zero_add, pow_one]; exact Ideal.mem_span_singleton_self ϖ
@@ -343,24 +315,17 @@ theorem expand_div_one
     (by rw [hI, zero_add, pow_one]) (hB α)
   exact ⟨g, hg, fun e => expandsAt_of_div U hϖ hI σ τ hστ f g hg e (hf (e + 1))⟩
 
-theorem expand_div_pow
-    (U : UnifPre I D A G) (hWI : WeightIndepSt)
-    {ϖ : R} (hϖ : ϖ ≠ 0) (hI : I = Ideal.span {ϖ})
-    (n : ℕ)
-    : ∀ (σ τ : H0 U.LG.L 1),
-      (∀ j, σ.f j = toW G.hom _ (ϖ ^ n) * τ.f j)
-        → ∀ (f : ∀ α, D.toPre.SecB 1 α),
-          (∀ e, U.ExpandsAt e 1 σ f)
-            → ∃ g : ∀ α, D.toPre.SecB 1 α,
-              (∀ α j, (f α).f j = toW D.toPre.P.A.hom _ (ϖ ^ n) * (g α).f j)
-                ∧ ∀ e, U.ExpandsAt e 1 τ g := by
+theorem expand_div_pow (U : UnifPre I D A G) (hWI : WeightIndepSt) {ϖ : R} (hϖ : ϖ ≠ 0)
+    (hI : I = Ideal.span {ϖ}) (n : ℕ) : ∀ (σ τ : H0 U.LG.L 1), (∀ j, σ.f j = toW G.hom _ (ϖ ^ n) * τ.f j) →
+    ∀ (f : ∀ α, D.toPre.SecB 1 α), (∀ e, U.ExpandsAt e 1 σ f) →
+    ∃ g : ∀ α, D.toPre.SecB 1 α, (∀ α j, (f α).f j = toW D.toPre.P.A.hom _ (ϖ ^ n) * (g α).f j) ∧
+      ∀ e, U.ExpandsAt e 1 τ g := by
   induction n with
   | zero =>
     intro σ τ hστ f hf
     refine ⟨f, fun α j => by rw [pow_zero, map_one, _root_.one_mul], fun e => ?_⟩
     have : σ = τ := SecOps.sec_ext fun j => by rw [hστ, pow_zero, map_one, _root_.one_mul]
-    rw [← this]
-    exact hf e
+    rw [← this]; exact hf e
   | succ n ih =>
     intro σ τ hστ f hf
     let σ' : H0 U.LG.L 1 := SecOps.secScale (scal G.hom (ϖ ^ n)) τ

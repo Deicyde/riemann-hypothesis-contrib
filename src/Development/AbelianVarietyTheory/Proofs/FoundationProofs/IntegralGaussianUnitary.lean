@@ -1,10 +1,51 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.IsPosHermFormV
-public import Development.AbelianVarietyTheory.Definitions.SpanningFamilies.IntMIffInt
 public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsOrthonormalBasisEigenOfInnerMap
 public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.IntegralCexpGaussianPlaneStatement
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.Finsupp.Pointwise
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+public import Mathlib.MeasureTheory.Integral.Pi
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -13,35 +54,27 @@ open scoped BigOperators ComplexConjugate Real Classical
 
 namespace GlobalTheory.UnitaryTheta
 
-theorem sesq_eq_sum_repr
-    {V : Type} [AddCommGroup V] [Module ℂ V]
-    (H : Sesq V)
-    {n : ℕ} (e : Module.Basis (Fin n) ℂ V) (he : ∀ i j, H (e i) (e j) = if i = j then 1 else 0)
-    (z w : V)
-    : H z w = ∑ i, e.repr z i * conj (e.repr w i) := by
+theorem sesq_eq_sum_repr {V : Type} [AddCommGroup V] [Module ℂ V] (H : Sesq V) {n : ℕ}
+    (e : Module.Basis (Fin n) ℂ V) (he : ∀ i j, H (e i) (e j) = if i = j then 1 else 0) (z w : V) :
+    H z w = ∑ i, e.repr z i * conj (e.repr w i) := by
   conv_lhs => rw [← e.sum_repr z, ← e.sum_repr w]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, map_smul, LinearMap.map_smulₛₗ, LinearMap.sum_apply, LinearMap.smul_apply,
-      he, smul_eq_mul, RingHom.id_apply, mul_ite, mul_one, mul_zero]
+
+  simp only [map_sum, map_smul, LinearMap.map_smulₛₗ, LinearMap.sum_apply, LinearMap.smul_apply, he,
+  smul_eq_mul, RingHom.id_apply, mul_ite, mul_one, mul_zero]
   refine Finset.sum_congr rfl fun i _ => ?_
   simp [mul_comm]
 
-theorem repr_apply_of_eigen
-    {V : Type} [AddCommGroup V] [Module ℂ V]
-    {n : ℕ} (e : Module.Basis (Fin n) ℂ V)
-    (b : V →ₗ[ℂ] V) (l : Fin n → ℂ) (hl : ∀ i, b (e i) = l i • e i)
-    (z : V) (i : Fin n)
-    : e.repr (b z) i = l i * e.repr z i := by
+theorem repr_apply_of_eigen {V : Type} [AddCommGroup V] [Module ℂ V] {n : ℕ}
+    (e : Module.Basis (Fin n) ℂ V) (b : V →ₗ[ℂ] V) (l : Fin n → ℂ) (hl : ∀ i, b (e i) = l i • e i) (z : V)
+    (i : Fin n) : e.repr (b z) i = l i * e.repr z i := by
   conv_lhs => rw [← e.sum_repr z]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, map_smul, hl]
+
+  simp only [map_sum, map_smul, hl]
   simp [Finsupp.single_apply, mul_comm]
 
-theorem det_of_eigen
-    {V : Type} [AddCommGroup V] [Module ℂ V]
-    {n : ℕ} (e : Module.Basis (Fin n) ℂ V)
-    (b : V →ₗ[ℂ] V) (l : Fin n → ℂ) (hl : ∀ i, b (e i) = l i • e i)
-    : LinearMap.det b = ∏ i, l i := by
+theorem det_of_eigen {V : Type} [AddCommGroup V] [Module ℂ V] {n : ℕ}
+    (e : Module.Basis (Fin n) ℂ V) (b : V →ₗ[ℂ] V) (l : Fin n → ℂ) (hl : ∀ i, b (e i) = l i • e i) :
+    LinearMap.det b = ∏ i, l i := by
   rw [← LinearMap.det_toMatrix e, ← Matrix.det_diagonal]
   congr 1
   ext i j
@@ -49,23 +82,9 @@ theorem det_of_eigen
   simp [Matrix.diagonal_apply, Finsupp.single_apply]
   split_ifs with h1 h2 h2 <;> simp_all
 
-theorem integral_gaussian_unitary
-    : ∀ (V : Type) [NormedAddCommGroup V] [NormedSpace ℂ V] [FiniteDimensional ℂ V]
-        [MeasurableSpace V] [BorelSpace V] (μ : Measure V) [μ.IsAddHaarMeasure] (H : Sesq V),
-      IsPosHerm H
-        → ∀ a : V ≃ₗ[ℂ] V,
-          (∀ z w, H (a z) (a w) = H z w) → LinearMap.det (1 - (a : V →ₗ[ℂ] V)) ≠ 0
-            → ∃ κ : ℝ,
-              κ ≠ 0
-                ∧ ∀ y v : V,
-                  Integrable
-                      (fun z => cexp (-(π : ℂ) * H (z - a z) z + π * H (y - a y) z + π * H z v))
-                      μ
-                    ∧ ∫ z, cexp (-(π : ℂ) * H (z - a z) z + π * H (y - a y) z + π * H z v) ∂μ
-                      = κ / LinearMap.det (1 - (a : V →ₗ[ℂ] V)) * cexp (π * H y v) := by
+theorem integral_gaussian_unitary : ∀ (V : Type) [NormedAddCommGroup V] [NormedSpace ℂ V] [FiniteDimensional ℂ V] [MeasurableSpace V] [BorelSpace V] (μ : Measure V) [μ.IsAddHaarMeasure] (H : Sesq V), IsPosHerm H → ∀ a : V ≃ₗ[ℂ] V, (∀ z w, H (a z) (a w) = H z w) → LinearMap.det (1 - (a : V →ₗ[ℂ] V)) ≠ 0 → ∃ κ : ℝ, κ ≠ 0 ∧ ∀ y v : V, Integrable (fun z => cexp (-(π : ℂ) * H (z - a z) z + π * H (y - a y) z + π * H z v)) μ ∧ ∫ z, cexp (-(π : ℂ) * H (z - a z) z + π * H (y - a y) z + π * H z v) ∂μ = κ / LinearMap.det (1 - (a : V →ₗ[ℂ] V)) * cexp (π * H y v) := by
   intro V _ _ _ _ _ μ _ H hH a ha hdet
-  obtain ⟨n, e, l, he, hl⟩ :=
-    GlobalTheory.UnitaryTheta.unitary_exists_orthonormal_eigenbasis V H hH a ha
+  obtain ⟨n, e, l, he, hl⟩ := GlobalTheory.UnitaryTheta.unitary_exists_orthonormal_eigenbasis V H hH a ha
   have hb : ∀ i, (1 - (a : V →ₗ[ℂ] V)) (e i) = (1 - l i) • e i := fun i => by
     simp [(hl i).2, sub_smul]
   have hd := det_of_eigen e _ _ hb
@@ -92,20 +111,14 @@ theorem integral_gaussian_unitary
   have hT : ∀ z i, Tm z i = e.repr z i := fun z i => rfl
   haveI : (μ.map Tm).IsAddHaarMeasure := T.isAddHaarMeasure_map μ
   have hν := Measure.isAddLeftInvariant_eq_smul (μ.map Tm) (volume : Measure (Fin n → ℂ))
-  have hpos :=
-    Measure.addHaarScalarFactor_pos_of_isAddHaarMeasure (μ.map Tm) (volume : Measure (Fin n → ℂ))
+  have hpos := Measure.addHaarScalarFactor_pos_of_isAddHaarMeasure (μ.map Tm) (volume : Measure (Fin n → ℂ))
   set c := Measure.addHaarScalarFactor (μ.map Tm) (volume : Measure (Fin n → ℂ)) with hc
   refine ⟨(c : ℝ), by exact_mod_cast hpos.ne', fun y v => ?_⟩
-  let g : Fin n → ℂ → ℂ := fun i z =>
-    cexp
-      (-(π : ℂ) * (1 - l i) * (z * conj z) + π * (((1 - l i) * e.repr y i) * conj z)
-        + π * (z * conj (e.repr v i)))
-  have hg := fun i =>
-    GlobalTheory.T.integral_cexp_complex_gaussian_linear (1 - l i) ((1 - l i) * e.repr y i)
-      (e.repr v i) (hre i)
-  have hF
-      : (fun z => cexp (-(π : ℂ) * H (z - a z) z + π * H (y - a y) z + π * H z v))
-        = (fun x : Fin n → ℂ => ∏ i, g i (x i)) ∘ Tm := by
+  let g : Fin n → ℂ → ℂ := fun i z => cexp (-(π : ℂ) * (1 - l i) * (z * conj z) +
+    π * (((1 - l i) * e.repr y i) * conj z) + π * (z * conj (e.repr v i)))
+  have hg := fun i => GlobalTheory.T.integral_cexp_complex_gaussian_linear (1 - l i) ((1 - l i) * e.repr y i) (e.repr v i) (hre i)
+  have hF : (fun z => cexp (-(π : ℂ) * H (z - a z) z + π * H (y - a y) z + π * H z v)) =
+      (fun x : Fin n → ℂ => ∏ i, g i (x i)) ∘ Tm := by
     funext z
     simp only [Function.comp, g, hT, ← Complex.exp_sum, sesq_eq_sum_repr H e he, hr, Finset.mul_sum,
       ← Finset.sum_add_distrib]
@@ -122,8 +135,7 @@ theorem integral_gaussian_unitary
     simp only [Function.comp_def]
     rw [← h1, hν, integral_smul_nnreal_measure, integral_fintype_prod_volume_eq_prod, hd,
       sesq_eq_sum_repr H e he, Finset.mul_sum, Complex.exp_sum]
-    have h2
-        : ∀ i, ∫ z, g i z = (1 - l i)⁻¹ * cexp (π * (e.repr y i * conj (e.repr v i))) := fun i => by
+    have h2 : ∀ i, ∫ z, g i z = (1 - l i)⁻¹ * cexp (π * (e.repr y i * conj (e.repr v i))) := fun i => by
       rw [show ∫ z, g i z = _ from (hg i).2]
       congr 2
       field_simp [hne i]

@@ -1,11 +1,53 @@
 module
 
 public import Development.WeilBound.CoreStatements.PlurisubharmonicCones.LevelFree
+public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.ComplexPointsIffCentresStatement
+public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.ComponentDataHodgeFirstStatement
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.ComponentDataIntersectionBound
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.IntersectionSystemHodgeDegree
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.TensorWedgeDetChangeStatement
+import Development.AutomorphicSpectrum.Proofs.GeometryProofs.IntersectionSystemHodgeDegree
+import Development.AutomorphicSpectrum.Proofs.GeometryProofs.TensorWedgeDetChangeStatement
+import Development.AutomorphicSpectrum.Proofs.GeometryProofs.UnitValueFrameDomainStatement
+import Development.AutomorphicSpectrum.Proofs.GeometryProofs.ValAtIffValueAtStatement
 public import Development.AutomorphicSpectrum.Proofs.MetricProofs.VerticalHodgeMetricLogFormulaStatement
-public import GroundTheory.HeightsAndTheta.Heights.HodgeLowerBound.PVertFactorPos
+import GroundTheory.HeightsAndTheta.Heights.HodgeLowerBound.PVertFactorPos
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
 
 @[expose] public section
 
@@ -135,11 +177,11 @@ theorem mh_change
       refine (Submodule.Quotient.eq (Hd.F τ)).1 ?_
       have := ht τ k
       simp_rw [← map_smul] at this
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [← map_sum] at this
+
+      rw [← map_sum] at this
       exact this.symm
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [Or.F_eq τ, Submodule.mem_comap, map_sub, map_sum] at h1
+
+    rw [Or.F_eq τ, Submodule.mem_comap, map_sub, map_sum] at h1
     rw [← sub_eq_zero]
     refine (Submodule.disjoint_def.1 (MuIndep.blocks_disjoint Or τ)) _ ?_
       (sub_mem (hs τ k).1 (sum_mem fun a _ => Submodule.smul_mem _ _ (hs' τ a).1))

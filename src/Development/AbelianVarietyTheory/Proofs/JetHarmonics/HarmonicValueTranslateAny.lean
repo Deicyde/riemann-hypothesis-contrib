@@ -1,25 +1,82 @@
 module
 
-public import Mathlib
-public import Formalism.LocalToGlobal.ProjectiveLattices.RecPJThAllNeBot
-public import Formalism.LocalToGlobal.ProjectiveLattices.PlaceBelow
-public import Formalism.SharpRestriction.Divisibility.AbelianOpenPart.OEOsInjective
-public import Formalism.SharpRestriction.Divisibility.GeneratorPowers.LemmaBStatement
-public import Formalism.SharpRestriction.Divisibility.GeneratorPowers.GermCut
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.FirstCohomology.OneCSt
-public import Formalism.SharpRestriction.Divisibility.GeneratorPowers.HarmInvA
-public import Formalism.LocalToGlobal.ProjectiveLattices.DepthTie
-public import Formalism.LocalToGlobal.ProjectiveLattices.ThProps
-public import Development.AbelianVarietyTheory.Proofs.JetHarmonics.AlphaFormHarmonicValueAtFramedPoint
+public import Development.AbelianVarietyTheory.Definitions.Jets.ExistsSecTieFOfTies
+public import Development.AbelianVarietyTheory.Definitions.Jets.JetsOnCopiesCompatibleFrames
+public import Development.AbelianVarietyTheory.Proofs.CuspFormEvaluations.HarmonicValuesInvariantUniversalEndomorphism
+public import Development.AbelianVarietyTheory.Proofs.CuspFormEvaluations.RawChartBaseChangeRigGerm
+public import Development.AbelianVarietyTheory.Proofs.CuspFormEvaluations.RawChartFormalBiextensionBaseChange
+public import Development.AbelianVarietyTheory.Proofs.FormalGroupCharts.HarmonicValueCopiesGaugeIndependent
+public import Development.AbelianVarietyTheory.Proofs.JetHarmonics.DvdOfPullEqZero
+public import Development.AbelianVarietyTheory.Proofs.JetHarmonics.ExistsBoxFamilyMultilinearMap
+public import Development.AbelianVarietyTheory.Proofs.JetHarmonics.ExistsIsBoxQkToA
+public import Development.AbelianVarietyTheory.Proofs.JetHarmonics.ExpandsGSum
+public import Development.AbelianVarietyTheory.Proofs.JetHarmonics.FiniteOrderThetaOperatorsRatioRootOfUnityStatement
+public import Development.AbelianVarietyTheory.Proofs.JetHarmonics.FrameNStHolds
+public import Development.AbelianVarietyTheory.Proofs.JetHarmonics.GermBoxProductEqProdGerms
+import Development.AbelianVarietyTheory.Proofs.JetHarmonics.GroupExpansionBijectiveOfCompleteDVR
 public import Development.AbelianVarietyTheory.Proofs.JetHarmonics.HarmonicValueConnectionIntegralChart
-public import Development.AbelianVarietyTheory.Proofs.JetHarmonics.TranslateThetaFrameGermEqUnitMulBoxProduct
-public import Development.AbelianVarietyTheory.Proofs.JetHarmonics.OneColumnTranslateSectionRootOfUnityMul
-public import Development.AbelianVarietyTheory.Proofs.JetHarmonics.ThetaRuleValueIntegralFramedPointExtensionField
+import Development.AbelianVarietyTheory.Proofs.JetHarmonics.ImportsBis
 public import Development.AbelianVarietyTheory.Proofs.JetHarmonics.JetDUnique
-public import Development.AbelianVarietyTheory.Proofs.FormalGroupCharts.JetFramesDifferByUnitEachOrder
-public import Development.AbelianVarietyTheory.Proofs.CuspFormEvaluations.ExistsFramedPointBaseChangeAlgHom
-public import Development.AbelianVarietyTheory.Proofs.JetHarmonics.StarRingExtOfStar
-public import Formalism.SharpRestriction.Divisibility.GeneratorPowers.CIndTop
+public import Development.AbelianVarietyTheory.Proofs.JetHarmonics.PowEqOneOfMultilinear
+public import Development.AbelianVarietyTheory.Proofs.JetHarmonics.ProdPullZero
+public import Development.AbelianVarietyTheory.Proofs.JetHarmonics.StalkMapInjectiveOfFlat
+public import Development.AbelianVarietyTheory.Proofs.JetHarmonics.ThetaFrameFamiliesDifferByValuationZeroUnitStatement
+public import Development.AbelianVarietyTheory.Proofs.JetHarmonics.TranslateThetaFrameGermEqUnitMulBoxProduct
+import Development.AbelianVarietyTheory.Proofs.JetHarmonics.ValCongr
+import Development.AbelianVarietyTheory.Proofs.RingsOfIntegers.ExistsBoxSec
+import Development.AbelianVarietyTheory.Proofs.RingsOfIntegers.ExpandsFSum
+import Development.AbelianVarietyTheory.Proofs.RingsOfIntegers.ExpansionValueZero
+import Development.AbelianVarietyTheory.Proofs.RingsOfIntegers.PsiWeightZeroProduct
+import Development.AbelianVarietyTheory.Proofs.UniformizationProofs.AllUniformizationLawsHold
+import Development.AbelianVarietyTheory.Proofs.UniformizationProofs.NonemptyCubicalPull
+import Development.AbelianVarietyTheory.Proofs.UniformizationProofs.TwistBaseChangeAndValuationStatements
+import Formalism.SharpRestriction.Divisibility.GeneratorPowers.ChartJetTrA
+import Formalism.SharpRestriction.Divisibility.GeneratorPowers.GermDPf
+import Formalism.SharpRestriction.Divisibility.GeneratorPowers.GermDVal
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.DiscreteValuationRings.LBCorr
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.DiscreteValuationRings.LBPull
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.DiscreteValuationRings.SectionScalarValuation
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.FirstCohomology.ClosedPointWeilPower
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.FirstCohomology.FinOrdExists
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.FirstCohomology.LevelFrameOfLaws
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.FirstCohomology.PhiPow
+public import Development.AbelianVarietyTheory.Proofs.FormalGroupCharts.ExistsFormalBiextMap
 
 @[expose] public section
 
@@ -147,7 +204,6 @@ end Basic
 section Box
 open GlobalTheory.BoxFamily FrameN BoxGerm
 
-set_option maxHeartbeats 1000000 in
 theorem psJet_of_box
     {E : Type} [Field E] [NumberField E] [IsCMField E]
     {H : Host E} {V : Type}
@@ -365,7 +421,6 @@ theorem jet_of_val
     (q'.trans ((gs_mul _ y _ hy _ _).trans
       (congrArg₂ (· * ·) (gs_res _ y le_top hy _) (gs_unit _ y _ hy _))).symm)
 
-set_option maxHeartbeats 800000 in
 theorem sv_of_tie_at
     {E : Type} [Field E] [NumberField E] [IsCMField E]
     {H : Host E} {Dw : Datum H} {l : Level H} {Xo : Moduli Dw l} {c : Coeff l} [StarRing (𝓞 E)]
@@ -418,7 +473,6 @@ theorem sv_of_tie_at
       (spMap (jetCoef (algebraMap T.V F) (Fin 1 × Fin (chD C.ch)) m))).trans ((hv _ _ _ _).trans k₂)
   exact alg_tie key (hz z J₂ hJ₂) k₁ k₃
 
-set_option maxHeartbeats 800000 in
 theorem harmonic_value_at
     : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H) (l : Level H)
         (Xo : Moduli Dw l) (c : Coeff l),
@@ -489,7 +543,6 @@ theorem harmonic_value_at
 
 end Ord
 
-set_option maxHeartbeats 800000 in
 theorem translate_eq_box
     : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H) (l : Level H)
         (Xo : Moduli Dw l) (c : Coeff l),

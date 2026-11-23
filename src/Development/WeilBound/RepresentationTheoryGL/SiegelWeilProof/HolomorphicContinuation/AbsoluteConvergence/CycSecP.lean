@@ -1,7 +1,47 @@
 module
 
-public import Mathlib
 public import Development.WeilBound.RepresentationTheoryGL.SiegelWeilProof.HolomorphicContinuation.AbsoluteConvergence.CycSec
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
@@ -24,9 +64,8 @@ def Mon (ε : Fin m → Bool) (d : ℕ) : Submodule ℂ (PX m n) :=
 theorem mon_mono (ε : Fin m → Bool) {d d' : ℕ} (h : d ≤ d') : Mon (n := n) ε d ≤ Mon ε d' :=
   Submodule.span_mono fun _ ⟨l, hl, e⟩ => ⟨l, hl.trans h, e⟩
 
-theorem gen_mul_mon
-    (ε : Fin m → Bool) (d : ℕ) (k : Bool × Fin n × Fin n) {M : PX m n} (hM : M ∈ Mon ε d)
-    : gen ε k * M ∈ Mon ε (d + 1) := by
+theorem gen_mul_mon (ε : Fin m → Bool) (d : ℕ) (k : Bool × Fin n × Fin n) {M : PX m n} (hM : M ∈ Mon ε d) :
+    gen ε k * M ∈ Mon ε (d + 1) := by
   induction hM using Submodule.span_induction with
   | mem x hx =>
     obtain ⟨l, hl, rfl⟩ := hx
@@ -35,8 +74,8 @@ theorem gen_mul_mon
   | add x y _ _ hx hy => rw [mul_add]; exact add_mem hx hy
   | smul a x _ hx => rw [mul_smul_comm]; exact Submodule.smul_mem _ _ hx
 
-theorem mon_mul (ε : Fin m → Bool) {d d' : ℕ} {a b : PX m n} (ha : a ∈ Mon ε d) (hb : b ∈ Mon ε d')
-    : a * b ∈ Mon ε (d + d') := by
+theorem mon_mul (ε : Fin m → Bool) {d d' : ℕ} {a b : PX m n} (ha : a ∈ Mon ε d) (hb : b ∈ Mon ε d') :
+    a * b ∈ Mon ε (d + d') := by
   induction ha using Submodule.span_induction with
   | mem x hx =>
     obtain ⟨l, hl, rfl⟩ := hx
@@ -51,12 +90,9 @@ theorem mon_mul (ε : Fin m → Bool) {d d' : ℕ} {a b : PX m n} (ha : a ∈ Mo
   | add u v _ _ hu hv => rw [add_mul]; exact add_mem hu hv
   | smul c u _ hu => rw [smul_mul_assoc]; exact Submodule.smul_mem _ _ hu
 
-theorem adjoin_le
-    (ε : Fin m → Bool)
-    {R : PX m n}
-    (hR : R ∈ Algebra.adjoin ℂ
-      (Set.range fun k : Bool × Fin n × Fin n => (Qb ε k.1 k.2.1 k.2.2 : PX m n)))
-    : ∃ d, R ∈ Mon ε d := by
+theorem adjoin_le (ε : Fin m → Bool) {R : PX m n}
+    (hR : R ∈ Algebra.adjoin ℂ (Set.range fun k : Bool × Fin n × Fin n => (Qb ε k.1 k.2.1 k.2.2 : PX m n))) :
+    ∃ d, R ∈ Mon ε d := by
   induction hR using Algebra.adjoin_induction with
   | mem x hx =>
     obtain ⟨k, rfl⟩ := hx
@@ -74,8 +110,8 @@ theorem adjoin_le
     obtain ⟨d', hd'⟩ := hy
     exact ⟨d + d', mon_mul ε hd hd'⟩
 
-theorem dsum_apply {ι : Type*} (s : Finset ι) (D : ι → Derivation ℂ (PX m n) (PX m n)) (x : PX m n)
-    : (∑ i ∈ s, D i) x = ∑ i ∈ s, D i x := by
+theorem dsum_apply {ι : Type*} (s : Finset ι) (D : ι → Derivation ℂ (PX m n) (PX m n)) (x : PX m n) :
+    (∑ i ∈ s, D i) x = ∑ i ∈ s, D i x := by
   classical
   induction s using Finset.induction_on with
   | empty => simp
@@ -88,24 +124,21 @@ def eulD (H : Matrix (Fin n) (Fin n) ℂ) : Derivation ℂ (PX m n) (PX m n) :=
 theorem eulH_eq (H : Matrix (Fin n) (Fin n) ℂ) (R : PX m n) : eulH H R = eulD H R := by
   simp [eulH, eulD, smul_eq_mul]
 
-theorem eulD_X_false (H : Matrix (Fin n) (Fin n) ℂ) (a : Fin m) (j : Fin n)
-    : eulD H (X (a, j, false) : PX m n) = ∑ i, X (a, i, false) * C (H i j) := by
+theorem eulD_X_false (H : Matrix (Fin n) (Fin n) ℂ) (a : Fin m) (j : Fin n) :
+    eulD H (X (a, j, false) : PX m n) = ∑ i, X (a, i, false) * C (H i j) := by
   simp [eulD, pderiv_X, Pi.single_apply, ite_and, Finset.sum_ite_eq]
 
-theorem eulD_X_true (H : Matrix (Fin n) (Fin n) ℂ) (a : Fin m) (j : Fin n)
-    : eulD H (X (a, j, true) : PX m n) = ∑ i, X (a, i, true) * C (star (H i j)) := by
+theorem eulD_X_true (H : Matrix (Fin n) (Fin n) ℂ) (a : Fin m) (j : Fin n) :
+    eulD H (X (a, j, true) : PX m n) = ∑ i, X (a, i, true) * C (star (H i j)) := by
   simp [eulD, pderiv_X, Pi.single_apply, ite_and, Finset.sum_ite_eq]
 
-theorem eulH_gen (ε : Fin m → Bool) (H : Matrix (Fin n) (Fin n) ℂ) (k : Bool × Fin n × Fin n)
-    : eulH H (gen ε k) ∈ Mon ε 1 := by
-  have : eulH H (gen ε k)
-      = ∑ l, C (H l k.2.2) * gen ε (k.1, k.2.1, l)
-        + ∑ l, C (star (H l k.2.1)) * gen ε (k.1, l, k.2.2) := by
+theorem eulH_gen (ε : Fin m → Bool) (H : Matrix (Fin n) (Fin n) ℂ) (k : Bool × Fin n × Fin n) :
+    eulH H (gen ε k) ∈ Mon ε 1 := by
+  have : eulH H (gen ε k) = ∑ l, C (H l k.2.2) * gen ε (k.1, k.2.1, l) + ∑ l, C (star (H l k.2.1)) * gen ε (k.1, l, k.2.2) := by
     obtain ⟨b, i, j⟩ := k
     rw [eulH_eq]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [gen, Qb, map_sum, Derivation.leibniz, smul_eq_mul, eulD_X_false, eulD_X_true,
-        Finset.mul_sum]
+
+    simp only [gen, Qb, map_sum, Derivation.leibniz, smul_eq_mul, eulD_X_false, eulD_X_true, Finset.mul_sum]
     rw [Finset.sum_add_distrib]
     congr 1
     · rw [Finset.sum_comm]
@@ -119,9 +152,8 @@ theorem eulH_gen (ε : Fin m → Bool) (H : Matrix (Fin n) (Fin n) ℂ) (k : Boo
   · rw [← smul_eq_C_mul]
     exact Submodule.smul_mem _ _ (Submodule.subset_span ⟨[(k.1, l, k.2.2)], by simp, by simp⟩)
 
-theorem eulH_mon
-    (ε : Fin m → Bool) (H : Matrix (Fin n) (Fin n) ℂ) (d : ℕ) {M : PX m n} (hM : M ∈ Mon ε d)
-    : eulH H M ∈ Mon ε d := by
+theorem eulH_mon (ε : Fin m → Bool) (H : Matrix (Fin n) (Fin n) ℂ) (d : ℕ) {M : PX m n} (hM : M ∈ Mon ε d) :
+    eulH H M ∈ Mon ε d := by
   rw [eulH_eq]
   induction hM using Submodule.span_induction with
   | mem x hx =>

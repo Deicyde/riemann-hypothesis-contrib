@@ -1,19 +1,56 @@
 module
 
-public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.TrueGeometryCommutationProperty
-public import Development.AutomorphicArithmetic.ThetaCorrespondence.ThetaPairLifts.ThirdPlaceSeries.CohomologicalCsdTempered
-public import Development.AutomorphicArithmetic.ThetaCorrespondence.ThetaPairLifts.ThirdPlaceSeries.RealPack
-public import Development.AutomorphicArithmetic.ThetaCorrespondence.ThetaPairLifts.ThirdPlaceSeries.GeoAll
-public import Development.AutomorphicArithmetic.ThetaCorrespondence.ThetaPairLifts.ThirdPlaceSeries.TopReadAt
 public import Development.AutomorphicArithmetic.ThetaCorrespondence.ThetaPairLifts.ThirdPlaceSeries.FamilyConstants
-public import Development.AutomorphicArithmetic.ThetaCorrespondence.ThetaPairLifts.ThirdPlaceSeries.QuadraticExtensionData
 public import Development.AutomorphicArithmetic.ThetaCorrespondence.ThetaPairLifts.ThirdPlaceSeries.ReadsLow
-public import Development.AutomorphicArithmetic.ThetaCorrespondence.ThetaPairLifts.ThirdPlaceSeries.TrueW
+public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.AdAtKStdOfTwist
+public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.ExistsRatOfSameOrb
+public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.MoveCompactLevelInvariant
+public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.NeConjOfIdemSum
+public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.ReadsRename
+public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.TrueGeometryCommutationProperty
+import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsMemberStepCharts
+import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.MemberLevelPrimeNotMemUnderLevelPrimes
+import Development.AbelianVarietyTheory.Proofs.SatakeParameters.MemberRepresentativeMovedAtTwistEqTupleFrames
 public import Development.AutomorphicArithmetic.ThetaCorrespondence.ThetaPairLifts.ThirdPlaceSeries.RowZero
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Development.AbelianVarietyTheory.Definitions.LatticeFrames.MiStarOfMid
 
 @[expose] public section
 
-set_option synthInstance.maxHeartbeats 200000
+
 
 section
 open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions
@@ -52,7 +89,6 @@ def QuadraticExtensionCarry
                 ∈ stdAt B.fields.E (B.R.N ((J.G i).s + 1)) (J.P i).1
               → (J.E i).cos (J.π i ((J.G i).s + 1) β)
                 = Submodule.Quotient.mk fun x => (ofSplit (J.G i).q).pr (y (e x))
-set_option maxHeartbeats 1000000 in
 theorem exists_GLint_carry
     {J : _root_.GlobalTheory.Fam.QuadraticExtensionData a t}
     (hJ : J.ReadsStd) (i : Fin J.r) (β : J.Ch₀ ((J.G i).s + 1))
@@ -78,7 +114,6 @@ theorem P_mem_Q_of_readsStd
     {J : _root_.GlobalTheory.Fam.QuadraticExtensionData a t} (hJ : J.ReadsStd) (i : Fin J.r)
     : (J.P i).1 ∈ I.Q (W.P.I.tup t) :=
   (Finset.mem_union.1 (J.P i).2).resolve_left (hJ.tw i).nmem
-set_option maxHeartbeats 1000000 in
 theorem exists_chPt_moves_of_readsStd
     (hW : _root_.GlobalTheory.Fam.AllFamilyConditions W)
     {J : _root_.GlobalTheory.Fam.QuadraticExtensionData a t} (hJ : J.ReadsStd)
@@ -130,7 +165,6 @@ theorem exists_chPt_moves_of_readsStd
   ⟩
   rw [← h2]
   exact e2
-set_option maxHeartbeats 1000000 in
 theorem frsF_p0_eq_one_of_readsStd
     (hW : _root_.GlobalTheory.Fam.AllFamilyConditions W)
     {J : _root_.GlobalTheory.Fam.QuadraticExtensionData a t} (hJ : J.ReadsStd) (i : Fin J.r)
@@ -149,7 +183,6 @@ theorem frsF_p0_eq_one_of_readsStd
     funext fun r => ?_)
   rw [Pi.basisFun_apply]
   exact (key r b).trans (Pi.single_apply b (1 : B.fields.E) r).symm
-set_option maxHeartbeats 1000000 in
 theorem cos_pi_eq_mk_pr_repY
     (hW : _root_.GlobalTheory.Fam.AllFamilyConditions W)
     {J : _root_.GlobalTheory.Fam.QuadraticExtensionData a t}
@@ -177,7 +210,6 @@ theorem cos_pi_eq_mk_pr_repY
     at h1
   rw [hJ.M i]
   exact h1
-set_option maxHeartbeats 1000000 in
 theorem pr_repY_sub_mem_integers
     (hW : _root_.GlobalTheory.Fam.AllFamilyConditions W) (ha : a.Is)
     (n : Fin a.n)
@@ -204,7 +236,6 @@ theorem pr_repY_sub_mem_integers
       (_root_.GlobalTheory.Fam.TopLoc.LocalIdempotentDensity.isIdemAt_G_pl hW a ha n) h4
   have h6 := map_sub ((a.G n).q.pr.comp (incA (I.rec7 l Z))) (repY p'.1.2 x) (repY p.1.2 x)
   exact h6 ▸ h5
-set_option maxHeartbeats 2000000 in
 theorem pen_moved_of_readsStd_at_last
     (hW : _root_.GlobalTheory.Fam.AllFamilyConditions W) (ha : a.Is)
     {J : _root_.GlobalTheory.Fam.QuadraticExtensionData a t} (hJ : J.ReadsStd)
@@ -285,7 +316,6 @@ theorem pen_moved_of_readsStd_at_last
 end GlobalTheory.Fam.Rebase
 namespace GlobalTheory.Fam
 open GlobalTheory.Fam.Rebase
-set_option maxHeartbeats 2000000 in
 theorem readsOfStd_alt
     : ∀ {B : GlobalTheory.Mem.Base} {X : PreX B.toPre} {I : TC B X} {l : I.Laws}
         {Z : TC.Later B (I.cols l)} {L : SizeData₂ (I.rec7 l Z)} {hT : GatTies (I.rec7 l Z)}

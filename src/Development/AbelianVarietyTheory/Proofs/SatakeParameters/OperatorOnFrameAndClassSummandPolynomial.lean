@@ -1,6 +1,49 @@
 module
 
-public import Development.AbelianVarietyTheory.Definitions.GaloisGeometry.RkLe
+public import Formalism.LocalToGlobal.InertKernelTheory.KernelDifferenceOfFrame
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Development.AbelianVarietyTheory.Definitions.GaloisGeometry.Realises
+import Formalism.LocalToGlobal.GroupLattices.ComparisonMaps.IsComplRatCompl
+import Formalism.LocalToGlobal.GroupLattices.PendingLemmas.WittFractionToCpAlgebraMap
+import Formalism.LocalToGlobal.InertKernelTheory.DelPolOfTies
+import Formalism.LocalToGlobal.InertKernelTheory.ProjRSurj
+import Formalism.LocalToGlobal.InertKernelTheory.SubBSplit
+import Formalism.LocalToGlobal.PairingIndexBounds.OrthogonalChartLevels.LtCNeZero
 
 @[expose] public section
 
@@ -37,8 +80,8 @@ theorem polD_eq_map_polDY
   rw [← AlgHom.comp_apply]
   congr 1
   refine MvPolynomial.algHom_ext fun k => ?_
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [AlgHom.comp_apply, MvPolynomial.aeval_X, MvPolynomial.aeval_X, map_sum]
+
+  rw [AlgHom.comp_apply, MvPolynomial.aeval_X, MvPolynomial.aeval_X, map_sum]
   refine Finset.sum_congr rfl fun b _ => ?_
   rw [MvPolynomial.mapAlgHom_apply]
   split_ifs with h
@@ -50,8 +93,8 @@ theorem applyFrame : Formalism.L2.KerInert.SecondKernelDifference.ApplyFrame := 
   intro D N N' s Q G y'
   rw [polD_eq_map_polDY]
   unfold GL3Theta.applyAt0 framePol GL3Theta.evFr
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+
+  rw [map_sum]
   symm
   rw [← Finset.sum_subset (MvPolynomial.support_map_subset
     (MvPolynomial.eval fun k : GL3Theta.FrV D N' => y' k.1 k.2.1 k.2.2) (polDY D s Q))]

@@ -1,6 +1,48 @@
 module
 
 public import ReciprocityTheory.GeometryOfNumbers.PluriharmonicAnalysis.BergmanDefs
+public import Mathlib.Analysis.CStarAlgebra.Classes
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
+public import Mathlib.MeasureTheory.Integral.Bochner.ContinuousLinearMap
 
 @[expose] public section
 
@@ -13,46 +55,32 @@ variable {X : Type*} [MeasurableSpace X]
 
 private theorem dotProduct_eq_sum_mul {r : ℕ} (u v : Fin r → ℂ) : u ⬝ᵥ v = ∑ i, u i * v i := rfl
 
-private theorem mulVec_apply_eq_sum_pluriharmonic_analysis
-    {r : ℕ} (M : Matrix (Fin r) (Fin r) ℂ) (v : Fin r → ℂ) (i : Fin r)
-    : (M *ᵥ v) i = ∑ j, M i j * v j :=
-  rfl
+private theorem mulVec_apply_eq_sum_pluriharmonic_analysis {r : ℕ} (M : Matrix (Fin r) (Fin r) ℂ) (v : Fin r → ℂ) (i : Fin r) :
+    (M *ᵥ v) i = ∑ j, M i j * v j := rfl
 
-theorem bNormSq_eq
-    (μ : Measure X)
-    {r : ℕ} (s : Fin r → X → ℂ)
-    (w : X → ℝ) (hint : ∀ i j, Integrable (fun x => starRingEnd ℂ (s i x) * s j x * (w x : ℂ)) μ)
-    (c : Fin r → ℂ)
-    : (bNormSq μ s w c : ℂ) = ∑ i, ∑ j, starRingEnd ℂ (c i) * c j * bGram μ s w i j := by
+theorem bNormSq_eq (μ : Measure X) {r : ℕ} (s : Fin r → X → ℂ) (w : X → ℝ)
+    (hint : ∀ i j, Integrable (fun x => starRingEnd ℂ (s i x) * s j x * (w x : ℂ)) μ)
+    (c : Fin r → ℂ) :
+    (bNormSq μ s w c : ℂ) = ∑ i, ∑ j, starRingEnd ℂ (c i) * c j * bGram μ s w i j := by
   have hI : ∀ i j, Integrable (fun x => starRingEnd ℂ (s i x) * s j x * (w x : ℂ)) μ := by
     assumption
-  have hpt
-      : ∀ x,
-        ((‖∑ i, c i * s i x‖ ^ 2 * w x : ℝ) : ℂ)
-          = ∑ i, ∑ j, starRingEnd ℂ (c i) * c j * (starRingEnd ℂ (s i x) * s j x * (w x : ℂ)) := by
+  have hpt : ∀ x, ((‖∑ i, c i * s i x‖ ^ 2 * w x : ℝ) : ℂ) =
+      ∑ i, ∑ j, starRingEnd ℂ (c i) * c j * (starRingEnd ℂ (s i x) * s j x * (w x : ℂ)) := by
     intro x
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [Complex.ofReal_mul, Complex.sq_norm, Complex.normSq_eq_conj_mul_self, map_sum,
-        Finset.sum_mul_sum, Finset.sum_mul]
+
+    rw [Complex.ofReal_mul, Complex.sq_norm, Complex.normSq_eq_conj_mul_self, map_sum,
+    Finset.sum_mul_sum, Finset.sum_mul]
     refine Finset.sum_congr rfl fun i _ => ?_
     rw [Finset.sum_mul]
     refine Finset.sum_congr rfl fun j _ => ?_
     simp only [map_mul]
     ring
-  have hJ
-      : ∀ i ∈ (Finset.univ : Finset (Fin r)),
-        Integrable
-          (fun x =>
-            ∑ j, starRingEnd ℂ (c i) * c j *
-              (starRingEnd ℂ (s i x) * s j x * (w x : ℂ)))
-          μ := fun i _ =>
-    MeasureTheory.integrable_finsetSum _ fun j _ => (hI i j).const_mul _
-  have hK
-      : ∀ i, ∀ j ∈ (Finset.univ : Finset (Fin r)),
-        Integrable
-          (fun x => starRingEnd ℂ (c i) * c j * (starRingEnd ℂ (s i x) * s j x * (w x : ℂ)))
-          μ := fun i j _ =>
-    (hI i j).const_mul _
+  have hJ : ∀ i ∈ (Finset.univ : Finset (Fin r)), Integrable (fun x => ∑ j, starRingEnd ℂ (c i) * c j *
+      (starRingEnd ℂ (s i x) * s j x * (w x : ℂ))) μ :=
+    fun i _ => MeasureTheory.integrable_finsetSum _ fun j _ => (hI i j).const_mul _
+  have hK : ∀ i, ∀ j ∈ (Finset.univ : Finset (Fin r)), Integrable (fun x => starRingEnd ℂ (c i) * c j *
+      (starRingEnd ℂ (s i x) * s j x * (w x : ℂ))) μ :=
+    fun i j _ => (hI i j).const_mul _
   unfold bNormSq
   rw [← integral_complex_ofReal]
   simp only [hpt]
@@ -63,17 +91,15 @@ theorem bNormSq_eq
   rw [integral_const_mul]
   rfl
 
-theorem bNormSq_eq_re
-    (μ : Measure X)
-    {r : ℕ} (s : Fin r → X → ℂ)
-    (w : X → ℝ) (hint : ∀ i j, Integrable (fun x => starRingEnd ℂ (s i x) * s j x * (w x : ℂ)) μ)
-    (c : Fin r → ℂ)
-    : bNormSq μ s w c = (star c ⬝ᵥ bGram μ s w *ᵥ c).re := by
+theorem bNormSq_eq_re (μ : Measure X) {r : ℕ} (s : Fin r → X → ℂ) (w : X → ℝ)
+    (hint : ∀ i j, Integrable (fun x => starRingEnd ℂ (s i x) * s j x * (w x : ℂ)) μ)
+    (c : Fin r → ℂ) :
+    bNormSq μ s w c = (star c ⬝ᵥ bGram μ s w *ᵥ c).re := by
   have hI : ∀ i j, Integrable (fun x => starRingEnd ℂ (s i x) * s j x * (w x : ℂ)) μ := by
     assumption
-  have h2 : star c ⬝ᵥ bGram μ s w *ᵥ c = ∑ i, ∑ j, starRingEnd ℂ (c i) * c j * bGram μ s w i j := by
-    simp only [dotProduct_eq_sum_mul, mulVec_apply_eq_sum_pluriharmonic_analysis, Pi.star_apply,
-      Finset.mul_sum, starRingEnd_apply]
+  have h2 : star c ⬝ᵥ bGram μ s w *ᵥ c =
+      ∑ i, ∑ j, starRingEnd ℂ (c i) * c j * bGram μ s w i j := by
+    simp only [dotProduct_eq_sum_mul, mulVec_apply_eq_sum_pluriharmonic_analysis, Pi.star_apply, Finset.mul_sum, starRingEnd_apply]
     exact Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => by ring
   rw [h2, ← bNormSq_eq μ s w hI c, Complex.ofReal_re]
 

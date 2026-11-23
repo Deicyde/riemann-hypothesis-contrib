@@ -1,27 +1,72 @@
 module
 
-public import Mathlib
-public import ReciprocityTheory.DualLattices.CotangentSurjective
-public import ReciprocityTheory.DualLattices.ProdDvdOfIso
-public import ReciprocityTheory.DualLattices.InvolutionPermApplyZero
-public import ReciprocityTheory.DualLattices.PowMemCarrier
-public import Development.AbelianVarietyTheory.Counterexamples.UpperHalfSurvey.HasColenNotUniqueWithoutGuard
-public import Development.AutomorphicSpectrum.Definitions.CommutativeAlgebra.IsTight
-public import Development.AutomorphicSpectrum.Definitions.CommutativeAlgebra.StepOrderRes
 public import Development.AutomorphicSpectrum.Statements.AlgebraStatements.PolarisedFlagStatement
-public import Development.AutomorphicSpectrum.Proofs.AlgebraProofs.StableHopfOrderSubgroupGenerationStatement
-public import Development.AutomorphicSpectrum.Proofs.AlgebraProofs.StableHopfOrderFundamentalLengthsStatement
-public import Development.AutomorphicSpectrum.Proofs.AlgebraProofs.StableHopfOrderBasisIdealsStatement
-public import Development.AutomorphicSpectrum.Proofs.AlgebraProofs.StableHopfOrderBasisLengthsStatement
-public import Development.AutomorphicSpectrum.Proofs.AlgebraProofs.TeichmullerCharacterOrderGeneratesStatement
-public import Development.AutomorphicSpectrum.Proofs.AlgebraProofs.StableHopfOrderBasisColengthStatement
-public import Development.AutomorphicSpectrum.Proofs.AlgebraProofs.ProductInequalitiesForceEqualityStatement
-public import Development.AutomorphicSpectrum.Proofs.AlgebraProofs.StableHopfOrderFundamentalIdealStatement
+public import Development.AbelianVarietyTheory.Counterexamples.UpperHalfSurvey.HasColenNotUniqueWithoutGuard
+public import Development.AutomorphicSpectrum.Proofs.AlgebraProofs.CharacterIdealPrincipalEigenStatement
+public import Development.AutomorphicSpectrum.Proofs.AlgebraProofs.FundamentalIdealFrobeniusProductStatement
 public import Development.AutomorphicSpectrum.Proofs.AlgebraProofs.FundamentalIdealFrobeniusValuationStatement
 public import Development.AutomorphicSpectrum.Proofs.AlgebraProofs.NonFundamentalEigenLeSquareAugmentationStatement
-public import Development.AutomorphicSpectrum.Proofs.AlgebraProofs.FundamentalIdealFrobeniusProductStatement
-public import Development.AutomorphicSpectrum.Proofs.AlgebraProofs.CharacterIdealPrincipalEigenStatement
-public import Development.AutomorphicSpectrum.Proofs.AlgebraProofs.StableHopfOrderSubgroupTranslationStatement
+public import Development.AutomorphicSpectrum.Proofs.AlgebraProofs.ProductInequalitiesForceEqualityStatement
+public import Development.AutomorphicSpectrum.Proofs.AlgebraProofs.StableHopfOrderBasisColengthStatement
+public import Development.AutomorphicSpectrum.Proofs.AlgebraProofs.StableHopfOrderBasisIdealsStatement
+public import Development.AutomorphicSpectrum.Proofs.AlgebraProofs.StableHopfOrderBasisLengthsStatement
+import Development.AutomorphicSpectrum.Proofs.AlgebraProofs.StableHopfOrderFundamentalIdealStatement
+public import Development.AutomorphicSpectrum.Proofs.AlgebraProofs.StableHopfOrderFundamentalLengthsStatement
+public import Development.AutomorphicSpectrum.Proofs.AlgebraProofs.StableHopfOrderSubgroupGenerationStatement
+import Development.AutomorphicSpectrum.Proofs.AlgebraProofs.StableHopfOrderSubgroupTranslationStatement
+import Development.AutomorphicSpectrum.Proofs.AlgebraProofs.TeichmullerCharacterOrderGeneratesStatement
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Lemma
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+public import ReciprocityTheory.DualLattices.InvolutionPermApplyZero
+import ReciprocityTheory.DualLattices.PowMemCarrier
+import ReciprocityTheory.DualLattices.ProdDvdOfIso
 
 @[expose] public section
 

@@ -1,10 +1,55 @@
 module
 
-public import Mathlib
 public import Formalism.DistinguishedUnitIdeals.BridgeLevelOf
 public import Formalism.DistinguishedUnitIdeals.DistinguishedOrderProofs.Graded
 public import Formalism.DistinguishedUnitIdeals.DistinguishedOrderProofs.Partners
 public import Formalism.DistinguishedUnitIdeals.DistinguishedOrderProofs.UnivPart
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Lemma
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -304,8 +349,8 @@ lemma exists_theta (hϖ : Irreducible ϖ) (lam : Fin r → D) (hI : LinearIndepe
     rw [hU, ← ho]
     exact W.smul_mem _ hw
   have h2 : f (algebraMap O LL (ϖ ^ N) • w) = algebraMap O LL (g o l) := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [ho, map_sum, LinearMap.pi_apply_eq_sum_univ g o, Finset.sum_apply, map_sum]
+
+    rw [ho, map_sum, LinearMap.pi_apply_eq_sum_univ g o, Finset.sum_apply, map_sum]
     refine Finset.sum_congr rfl fun k _ => ?_
     rw [map_smul, hf, smul_eq_mul, Pi.smul_apply, smul_eq_mul, map_mul]
     rfl
@@ -424,11 +469,11 @@ theorem core_mp
         exact Submodule.zero_mem _
       · exact h5
     have h5 := ev_kill f W hf2 h4
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [FA, cf_Fy_nat, map_sum] at h5
+
+    rw [FA, cf_Fy_nat, map_sum] at h5
     simp only [ev_smul_tmul, hf1] at h5
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [ex_apply, map_sum, map_sum]
+
+    rw [ex_apply, map_sum, map_sum]
     simp only [map_mul, hρ, PowerSeries.coeff_mul_C]
     exact h5
   obtain ⟨N1, z1, hz1⟩ := compl_vec hC m y h1

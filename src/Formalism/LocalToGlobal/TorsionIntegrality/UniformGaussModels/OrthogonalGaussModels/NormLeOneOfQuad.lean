@@ -2,9 +2,53 @@ module
 
 public import Formalism.LocalToGlobal.TorsionIntegrality.UniformGaussModels.GoodModelAll
 public import Formalism.LocalToGlobal.TorsionIntegrality.GaussSumParity.KummerThetaLogarithms.SecondLogDerivativeUnique
-public import Formalism.LocalToGlobal.TorsionIntegrality.TorsionTranslationPowers.AnalyticTransOfAdd
 public import Formalism.LocalToGlobal.TorsionIntegrality.RamifiedCurveKernels.FinalA
 public import Formalism.LocalToGlobal.TorsionIntegrality.RamifiedCurveKernels.FinalD
+public import Formalism.LocalToGlobal.TorsionIntegrality.TorsionTranslationPowers.AnalyticTransOfAdd
+public import Formalism.LocalToGlobal.TorsionIntegrality.TorsionTranslationPowers.NonsingularJetNorms.CmIntegralityOfTorsionPoints
+import Formalism.LocalToGlobal.TorsionIntegrality.WeierstrassTwoTorsion.CubeThreeR
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Int
+import Mathlib.Algebra.Order.Star.Real
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -21,10 +65,8 @@ open Formalism.G (unitBall)
 
 namespace OrthogonalGaussModelNormLemmas
 
-theorem norm_le_one_of_quad
-    {K : Type} [NormedField K] [IsUltrametricDist K]
-    {a b c : K} {t : ℤ} (hs : a + b = (t : K)) (hp : a * b = c) (hc : ‖c‖ ≤ 1)
-    : ‖a‖ ≤ 1 := by
+theorem norm_le_one_of_quad {K : Type} [NormedField K] [IsUltrametricDist K] {a b c : K} {t : ℤ}
+    (hs : a + b = (t : K)) (hp : a * b = c) (hc : ‖c‖ ≤ 1) : ‖a‖ ≤ 1 := by
   by_contra h
   rw [not_le] at h
   have e : a ^ 2 = (t : K) * a - c := by
@@ -42,19 +84,14 @@ theorem norm_le_one_of_quad
     exact h1.trans (max_le h2 h3)
   nlinarith
 
-theorem norm_eq_one_of_quad
-    {K : Type} [NormedField K] [IsUltrametricDist K]
-    {a b c : K} {t : ℤ} (hs : a + b = (t : K)) (hp : a * b = c) (hc : ‖c‖ = 1)
-    : ‖a‖ = 1 := by
+theorem norm_eq_one_of_quad {K : Type} [NormedField K] [IsUltrametricDist K] {a b c : K} {t : ℤ}
+    (hs : a + b = (t : K)) (hp : a * b = c) (hc : ‖c‖ = 1) : ‖a‖ = 1 := by
   have ha := norm_le_one_of_quad hs hp hc.le
-  have hb :=
-    norm_le_one_of_quad (a := b) (b := a) (by rw [add_comm]; exact hs) (by rw [mul_comm]; exact hp)
-      hc.le
+  have hb := norm_le_one_of_quad (a := b) (b := a) (by rw [add_comm]; exact hs)
+    (by rw [mul_comm]; exact hp) hc.le
   have h : ‖a‖ * ‖b‖ = 1 := by rw [← norm_mul, hp, hc]
   refine le_antisymm ha ?_
-  calc
-    (1 : ℝ)
-      = ‖a‖ * ‖b‖ := h.symm
+  calc (1 : ℝ) = ‖a‖ * ‖b‖ := h.symm
     _ ≤ ‖a‖ * 1 := mul_le_mul_of_nonneg_left hb (norm_nonneg a)
     _ = ‖a‖ := mul_one _
 
@@ -71,19 +108,16 @@ theorem norm_two (p : ℕ) [Fact p.Prime] (hp : p ≠ 2) : ‖(2 : ℂ_[p])‖ =
   have h : ¬ p ∣ 2 := fun h => hp ((Nat.prime_dvd_prime_iff_eq Fact.out Nat.prime_two).1 h)
   simpa using Formalism.L2.Th1.E.ScaledModelNorms.norm_nat p h
 
-theorem prod_bar {dK : ℕ} (hmod : dK % 4 = 3) (m n : ℤ)
-    : ((m : ℂ) + (n : ℂ) * omegaK dK) * ((m : ℂ) + (n : ℂ) * (1 - omegaK dK))
-      = ((normInt dK m n : ℤ) : ℂ) := by
+theorem prod_bar {dK : ℕ} (hmod : dK % 4 = 3) (m n : ℤ) :
+    ((m : ℂ) + (n : ℂ) * omegaK dK) * ((m : ℂ) + (n : ℂ) * (1 - omegaK dK)) =
+      ((normInt dK m n : ℤ) : ℂ) := by
   rw [Formalism.L2.Th1.D.CurveNormEndomorphisms.mul_bar]
-  have :=
-    congrArg
-      (fun x : ℝ => (x : ℂ))
-      (Formalism.L2.Th1.D.CurveNormEndomorphisms.normInt_cast hmod m n)
+  have := congrArg (fun x : ℝ => (x : ℂ)) (Formalism.L2.Th1.D.CurveNormEndomorphisms.normInt_cast hmod m n)
   push_cast at this
   rw [this]
 
-theorem four_normInt {dK : ℕ} (hmod : dK % 4 = 3) (m : ℤ)
-    : 4 * normInt dK m 1 = (2 * m + 1) ^ 2 + (dK : ℤ) := by
+theorem four_normInt {dK : ℕ} (hmod : dK % 4 = 3) (m : ℤ) :
+    4 * normInt dK m 1 = (2 * m + 1) ^ 2 + (dK : ℤ) := by
   obtain ⟨k, hk⟩ : ∃ k : ℤ, (dK : ℤ) + 1 = 4 * k := ⟨((dK : ℤ) + 1) / 4, by omega⟩
   have hdiv : ((dK : ℤ) + 1) / 4 = k := by omega
   unfold normInt
@@ -92,36 +126,34 @@ theorem four_normInt {dK : ℕ} (hmod : dK % 4 = 3) (m : ℤ)
 
 variable {p : ℕ} [Fact p.Prime] (ι : ℂ ≃+* ℂ_[p])
 
-theorem sum_bar (dK : ℕ) (m : ℤ)
-    : ι ((m : ℂ) + ((1 : ℤ) : ℂ) * omegaK dK) + ι ((m : ℂ) + ((1 : ℤ) : ℂ) * (1 - omegaK dK))
-      = ((2 * m + 1 : ℤ) : ℂ_[p]) := by
+theorem sum_bar (dK : ℕ) (m : ℤ) :
+    ι ((m : ℂ) + ((1 : ℤ) : ℂ) * omegaK dK) + ι ((m : ℂ) + ((1 : ℤ) : ℂ) * (1 - omegaK dK)) =
+      ((2 * m + 1 : ℤ) : ℂ_[p]) := by
   rw [← map_add (f := _)]
-  have e
-      : ((m : ℂ) + ((1 : ℤ) : ℂ) * omegaK dK) + ((m : ℂ) + ((1 : ℤ) : ℂ) * (1 - omegaK dK))
-        = ((2 * m + 1 : ℤ) : ℂ) := by
+  have e : ((m : ℂ) + ((1 : ℤ) : ℂ) * omegaK dK) + ((m : ℂ) + ((1 : ℤ) : ℂ) * (1 - omegaK dK)) =
+      ((2 * m + 1 : ℤ) : ℂ) := by
     push_cast
     ring
   rw [e, map_intCast]
 
-theorem diff_sq (dK : ℕ) (m : ℤ)
-    : (ι ((m : ℂ) + ((1 : ℤ) : ℂ) * omegaK dK) - ι ((m : ℂ) + ((1 : ℤ) : ℂ) * (1 - omegaK dK))) ^ 2
-      = -(dK : ℂ_[p]) := by
+theorem diff_sq (dK : ℕ) (m : ℤ) :
+    (ι ((m : ℂ) + ((1 : ℤ) : ℂ) * omegaK dK) - ι ((m : ℂ) + ((1 : ℤ) : ℂ) * (1 - omegaK dK))) ^ 2 =
+      -(dK : ℂ_[p]) := by
   rw [← map_sub, ← map_pow]
-  have e
-      : (((m : ℂ) + ((1 : ℤ) : ℂ) * omegaK dK) - ((m : ℂ) + ((1 : ℤ) : ℂ) * (1 - omegaK dK))) ^ 2
-        = -(dK : ℂ) := by
+  have e : (((m : ℂ) + ((1 : ℤ) : ℂ) * omegaK dK) -
+      ((m : ℂ) + ((1 : ℤ) : ℂ) * (1 - omegaK dK))) ^ 2 = -(dK : ℂ) := by
     push_cast
     linear_combination 4 * Formalism.L2.Th1.D.CurveNormEndomorphisms.omega_sq dK
   rw [e, map_neg, map_natCast]
 
-theorem norm_al {dK : ℕ} (hmod : dK % 4 = 3) (m : ℤ) (hN : ¬ (p : ℤ) ∣ normInt dK m 1)
-    : ‖ι ((m : ℂ) + ((1 : ℤ) : ℂ) * omegaK dK)‖ = 1 := by
+theorem norm_al {dK : ℕ} (hmod : dK % 4 = 3) (m : ℤ) (hN : ¬ (p : ℤ) ∣ normInt dK m 1) :
+    ‖ι ((m : ℂ) + ((1 : ℤ) : ℂ) * omegaK dK)‖ = 1 := by
   refine norm_eq_one_of_quad (sum_bar ι dK m) (c := ((normInt dK m 1 : ℤ) : ℂ_[p])) ?_
     (norm_int p hN)
   rw [← map_mul, prod_bar hmod, map_intCast]
 
-theorem coeffIn {W : WeierstrassCurve ℂ_[p]} (hW : IntCurve W)
-    : Formalism.L2.Th1.C.CoeffIn (unitBall ℂ_[p]) W :=
+theorem coeffIn {W : WeierstrassCurve ℂ_[p]} (hW : IntCurve W) :
+    Formalism.L2.Th1.C.CoeffIn (unitBall ℂ_[p]) W :=
   ⟨hW.1, hW.2.1, hW.2.2.1, hW.2.2.2.1, hW.2.2.2.2.1⟩
 
 end OrthogonalGaussModelNormLemmas
@@ -146,22 +178,11 @@ theorem CMDatum_proof : CMDatum := by
     rw [h, norm_zero] at this
     exact zero_ne_one this
   have hb2 : (curveL p L ι).b₂ = 0 := (Formalism.L2.Th1.A.shortInv ℂ_[p] _ _).1
-  refine ⟨
-    S,
-    neg,
-    fun P => ι (L.weierstrassP (P : ℂ)),
-    fun P => ι (L.derivWeierstrassP (P : ℂ)) / 2,
-    ?_,
-    ?_,
-    ?_,
-    ?_,
-    ?_
-  ⟩
-  · apply Formalism.L2.Th1.D.CurveNormEndomorphisms.endoCurve_of_endoZ (RingHom.id ℂ_[p])
-      (curveL p L ι)
-      (wF := fun P : S =>
-        PowerSeries.map (ι : ℂ →+* ℂ_[p])
-          (Formalism.L2.Th1.F.taylor0 (fun z => L.weierstrassP (z + (P : ℂ)))))
+  refine ⟨S, neg, fun P => ι (L.weierstrassP (P : ℂ)),
+    fun P => ι (L.derivWeierstrassP (P : ℂ)) / 2, ?_, ?_, ?_, ?_, ?_⟩
+  · apply Formalism.L2.Th1.D.CurveNormEndomorphisms.endoCurve_of_endoZ (RingHom.id ℂ_[p]) (curveL p L ι)
+      (wF := fun P : S => PowerSeries.map (ι : ℂ →+* ℂ_[p])
+        (Formalism.L2.Th1.F.taylor0 (fun z => L.weierstrassP (z + (P : ℂ)))))
     · intro P
       exact (Formalism.L2.Th1.E.ScaledModelNorms.nonsing p L ι hΔ _ (hker P).2).1
     · intro P
@@ -175,18 +196,16 @@ theorem CMDatum_proof : CMDatum := by
       rw [Formalism.L2.Th1.E.wpBridge]
       exact h
   · intro P
-    have h :=
-      (Formalism.L2.Th1.E.ptOfInt p L ι hW (P : ℂ) (S.card + 1) (Nat.succ_pos _) hpN (hker P).1
-        (hker P).2).1
+    have h := (Formalism.L2.Th1.E.ptOfInt p L ι hW (P : ℂ) (S.card + 1) (Nat.succ_pos _) hpN
+      (hker P).1 (hker P).2).1
     rwa [Formalism.L2.Th1.E.ScaledModelNorms.px_ptOf p L ι hΔ _ (hker P).2] at h
   · intro P
-    have h :=
-      (Formalism.L2.Th1.E.ptOfInt p L ι hW (P : ℂ) (S.card + 1) (Nat.succ_pos _) hpN (hker P).1
-        (hker P).2).2
+    have h := (Formalism.L2.Th1.E.ptOfInt p L ι hW (P : ℂ) (S.card + 1) (Nat.succ_pos _) hpN
+      (hker P).1 (hker P).2).2
     rwa [Formalism.L2.Th1.E.ScaledModelNorms.py_ptOf p L ι hΔ _ (hker P).2] at h
   · rw [← map_mul, hprod, Fintype.card_coe]
     simp
-  set_option synthInstance.maxHeartbeats 100000 in
+
   · rw [← map_sub, ← map_mul, ← map_mul, hs2C, map_sum, hb2]
     simp
 
@@ -208,11 +227,9 @@ theorem ShapeCM_of (hD : CMDatum) : ShapeCM := by
     exact (Fact.out : p.Prime).one_lt.ne' (Nat.dvd_one.1 h3)
   obtain ⟨S, neg, xP, yP, hE, hx, hy, hprod, hs⟩ := hD dK L hmod hCM p ι hW 0 1 hN
   have hb2 : (curveL p L ι).b₂ = 0 := (Formalism.L2.Th1.A.shortInv ℂ_[p] _ _).1
-  exact Formalism.L2.Th1.G.curveRamified ℂ_[p] (curveL p L ι)
-    (OrthogonalGaussModelNormLemmas.coeffIn hW) (OrthogonalGaussModelNormLemmas.norm_two p hp2)
-    (ι (Formalism.L2.Th1.F.s2 L)) _ _ dK (2 * 0 + 1) S neg xP yP hE hx hy hprod
-    (OrthogonalGaussModelNormLemmas.norm_al ι hmod 0 hN)
-    (OrthogonalGaussModelNormLemmas.sum_bar ι dK 0) (OrthogonalGaussModelNormLemmas.diff_sq ι dK 0)
+  exact Formalism.L2.Th1.G.curveRamified ℂ_[p] (curveL p L ι) (OrthogonalGaussModelNormLemmas.coeffIn hW)
+    (OrthogonalGaussModelNormLemmas.norm_two p hp2) (ι (Formalism.L2.Th1.F.s2 L)) _ _ dK (2 * 0 + 1) S neg xP yP hE hx hy hprod
+    (OrthogonalGaussModelNormLemmas.norm_al ι hmod 0 hN) (OrthogonalGaussModelNormLemmas.sum_bar ι dK 0) (OrthogonalGaussModelNormLemmas.diff_sq ι dK 0)
     (by omega) (by rw [hb2]; simp) hs
 
 theorem JetsCM_of (hD : CMDatum) : JetsCM := by
@@ -234,17 +251,13 @@ theorem JetsCM_of (hD : CMDatum) : JetsCM := by
     exact_mod_cast h2
   obtain ⟨S, neg, xP, yP, hE, hx, hy, hprod, hs⟩ := hD dK L hmod hCM p ι hW m 1 hN
   have hb2 : (curveL p L ι).b₂ = 0 := (Formalism.L2.Th1.A.shortInv ℂ_[p] _ _).1
-  have hdiff
-      : ‖ι ((m : ℂ) + ((1 : ℤ) : ℂ) * omegaK dK) -
-          ι ((m : ℂ) + ((1 : ℤ) : ℂ) * (1 - omegaK dK))‖
-        = 1 := by
+  have hdiff : ‖ι ((m : ℂ) + ((1 : ℤ) : ℂ) * omegaK dK) -
+      ι ((m : ℂ) + ((1 : ℤ) : ℂ) * (1 - omegaK dK))‖ = 1 := by
     have h1 := congrArg norm (OrthogonalGaussModelNormLemmas.diff_sq ι dK m)
     rw [norm_pow, norm_neg, Formalism.L2.Th1.E.ScaledModelNorms.norm_nat p hpd] at h1
     exact (pow_eq_one_iff_of_nonneg (norm_nonneg _) two_ne_zero).1 h1
-  exact Formalism.L2.Th1.G.curveJetsUnramThm ℂ_[p] (curveL p L ι)
-    (OrthogonalGaussModelNormLemmas.coeffIn hW) (OrthogonalGaussModelNormLemmas.norm_two p hp2)
-    (ι (Formalism.L2.Th1.F.s2 L)) _ _ (2 * m + 1) S neg xP yP hE hx hy hprod
-    (OrthogonalGaussModelNormLemmas.norm_al ι hmod m hN)
-    (OrthogonalGaussModelNormLemmas.sum_bar ι dK m) hdiff (by rw [hb2]; simp) hs
+  exact Formalism.L2.Th1.G.curveJetsUnramThm ℂ_[p] (curveL p L ι) (OrthogonalGaussModelNormLemmas.coeffIn hW)
+    (OrthogonalGaussModelNormLemmas.norm_two p hp2) (ι (Formalism.L2.Th1.F.s2 L)) _ _ (2 * m + 1) S neg xP yP hE hx hy hprod
+    (OrthogonalGaussModelNormLemmas.norm_al ι hmod m hN) (OrthogonalGaussModelNormLemmas.sum_bar ι dK m) hdiff (by rw [hb2]; simp) hs
 
 end Formalism.L2.Th1.Top

@@ -1,9 +1,57 @@
 module
 
-public import Mathlib
 public import GroundTheory.HeightsAndTheta.Heights.DiscreteValuationNumbers.StatementsSegreFlagConeAlg
 public import GroundTheory.HeightsAndTheta.Heights.DiscreteValuationNumbers.PPairConeAlg
 public import GroundTheory.HeightsAndTheta.Heights.DiscreteValuationNumbers.PSegreFlagClosureModel
+import GroundTheory.HeightsAndTheta.Heights.DiscreteValuationNumbers.PTwistedDualGensSpan
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Coalgebra.IsFrobenius
+import Mathlib.RingTheory.HopfAlgebra.Basic
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -17,39 +65,30 @@ noncomputable section
 
 namespace SegreFlagConeAlg
 
-theorem sum_castLE
-    {M : Type*} [AddCommMonoid M]
-    {N k : ℕ} (hkN : k ≤ N) (s : Fin N → M) (hs : ∀ j : Fin N, k ≤ (j : ℕ) → s j = 0)
-    : ∑ j, s j = ∑ j : Fin k, s (Fin.castLE hkN j) := by
+theorem sum_castLE {M : Type*} [AddCommMonoid M] {N k : ℕ} (hkN : k ≤ N) (s : Fin N → M)
+    (hs : ∀ j : Fin N, k ≤ (j : ℕ) → s j = 0) : ∑ j, s j = ∑ j : Fin k, s (Fin.castLE hkN j) := by
   symm
-  refine Fintype.sum_of_injective (Fin.castLE hkN) (Fin.castLE_injective hkN) _ _
-    (fun j hj => hs j ?_)
+  refine Fintype.sum_of_injective (Fin.castLE hkN) (Fin.castLE_injective hkN) _ _ (fun j hj => hs j ?_)
     (fun _ => rfl)
   by_contra h
   exact hj ⟨⟨j, by omega⟩, Fin.ext rfl⟩
 
-theorem apply_castLE
-    {Ω : Type*} [Field Ω]
-    {E : Type*} [AddCommGroup E] [Module Ω E]
-    {N k : ℕ} (hkN : k ≤ N) (w : Module.Basis (Fin N) Ω E)
-    (v : E) (hv : ∀ j : Fin N, k ≤ (j : ℕ) → w.repr v j = 0)
-    (ψ : Module.Dual Ω E)
-    : ψ v = ∑ j : Fin k, w.repr v (Fin.castLE hkN j) * ψ (w (Fin.castLE hkN j)) := by
+theorem apply_castLE {Ω : Type*} [Field Ω] {E : Type*} [AddCommGroup E] [Module Ω E] {N k : ℕ} (hkN : k ≤ N)
+    (w : Module.Basis (Fin N) Ω E) (v : E) (hv : ∀ j : Fin N, k ≤ (j : ℕ) → w.repr v j = 0)
+    (ψ : Module.Dual Ω E) :
+    ψ v = ∑ j : Fin k, w.repr v (Fin.castLE hkN j) * ψ (w (Fin.castLE hkN j)) := by
   conv_lhs => rw [← w.sum_repr v]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+
+  rw [map_sum]
   simp only [map_smul, smul_eq_mul]
   exact sum_castLE hkN _ fun j hj => by rw [hv j hj, zero_mul]
 
-theorem exists_coords
-    {Ω : Type*} [Field Ω]
-    {E : Type*} [AddCommGroup E] [Module Ω E]
-    {Φ : Type*} [Field Φ] [Algebra Ω Φ]
-    {N k : ℕ} (hkN : k ≤ N) (w : Module.Basis (Fin N) Ω E) (u : Fin k → E)
+theorem exists_coords {Ω : Type*} [Field Ω] {E : Type*} [AddCommGroup E] [Module Ω E] {Φ : Type*} [Field Φ]
+    [Algebra Ω Φ] {N k : ℕ} (hkN : k ≤ N) (w : Module.Basis (Fin N) Ω E) (u : Fin k → E)
     (hu : ∀ q (j : Fin N), k ≤ (j : ℕ) → w.repr (u q) j = 0)
-    (hdet : (Matrix.of fun q j : Fin k => w.repr (u q) (Fin.castLE hkN j)).det ≠ 0) (s : Fin N → Φ)
-    (hs : ∀ j : Fin N, k ≤ (j : ℕ) → s j = 0)
-    : ∃ s' : Fin k → Φ, ∀ ψ : Module.Dual Ω E,
+    (hdet : (Matrix.of fun q j : Fin k => w.repr (u q) (Fin.castLE hkN j)).det ≠ 0)
+    (s : Fin N → Φ) (hs : ∀ j : Fin N, k ≤ (j : ℕ) → s j = 0) :
+    ∃ s' : Fin k → Φ, ∀ ψ : Module.Dual Ω E,
       ∑ j, s j * algebraMap Ω Φ (ψ (w j)) = ∑ q, s' q * algebraMap Ω Φ (ψ (u q)) := by
   classical
   set T : Matrix (Fin k) (Fin k) Ω := Matrix.of fun q j : Fin k => w.repr (u q) (Fin.castLE hkN j) with hT
@@ -62,8 +101,8 @@ theorem exists_coords
   have hsk : Matrix.vecMul (Matrix.vecMul sk TΦ⁻¹) TΦ = sk := by
     rw [Matrix.vecMul_vecMul, Matrix.nonsing_inv_mul _ hTΦ, Matrix.vecMul_one]
   rw [sum_castLE hkN _ fun j hj => by rw [hs j hj, zero_mul]]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp_rw [apply_castLE hkN w (u _) (hu _) ψ, map_sum, Finset.mul_sum]
+
+  simp_rw [apply_castLE hkN w (u _) (hu _) ψ, map_sum, Finset.mul_sum]
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun j _ => ?_
   have h := congrFun hsk j
@@ -71,21 +110,16 @@ theorem exists_coords
   show sk j * _ = _
   rw [← h, Finset.sum_mul]
   refine Finset.sum_congr rfl fun q _ => ?_
-  simp only [TΦ, RingHom.mapMatrix_apply, Matrix.map_apply, hT, Matrix.of_apply, map_mul,
-    Matrix.vecMul, dotProduct]
+  simp only [TΦ, RingHom.mapMatrix_apply, Matrix.map_apply, hT, Matrix.of_apply, map_mul, Matrix.vecMul, dotProduct]
   ring
 
-theorem expand_coords
-    {Ω : Type*} [Field Ω]
-    {E : Type*} [AddCommGroup E] [Module Ω E]
-    {Φ : Type*} [Field Φ] [Algebra Ω Φ]
-    {n : ℕ} {σ : Type*} (u : Fin n → E) (s' : Fin n → Φ)
-    (ψ : Module.Dual Ω E) (V : Φ) (hV : V = ∑ q, s' q * algebraMap Ω Φ (ψ (u q)))
-    (Y Z : Ω) (o : σ)
-    : ∑ q, C (algebraMap Ω Φ (ψ (u q) / Z)) * (C (algebraMap Ω Φ Y * s' q) * (X o : MvPolynomial σ Φ))
-      = C (algebraMap Ω Φ (Y / Z) * V) * X o := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [hV, Finset.mul_sum, map_sum, Finset.sum_mul]
+theorem expand_coords {Ω : Type*} [Field Ω] {E : Type*} [AddCommGroup E] [Module Ω E] {Φ : Type*} [Field Φ]
+    [Algebra Ω Φ] {n : ℕ} {σ : Type*} (u : Fin n → E) (s' : Fin n → Φ) (ψ : Module.Dual Ω E) (V : Φ)
+    (hV : V = ∑ q, s' q * algebraMap Ω Φ (ψ (u q))) (Y Z : Ω) (o : σ) :
+    ∑ q, C (algebraMap Ω Φ (ψ (u q) / Z)) * (C (algebraMap Ω Φ Y * s' q) * (X o : MvPolynomial σ Φ)) =
+      C (algebraMap Ω Φ (Y / Z) * V) * X o := by
+
+  rw [hV, Finset.mul_sum, map_sum, Finset.sum_mul]
   refine Finset.sum_congr rfl fun q _ => ?_
   rw [← mul_assoc, ← map_mul]
   congr 2
@@ -94,11 +128,13 @@ theorem expand_coords
 
 end SegreFlagConeAlg
 
+
 open PairConeAlg SegreFlagConeAlg SegreFlagClosureModel GenericProjClosureDim in
 theorem SegreFlagConeAlg.proof : SegreFlagConeAlg.Statement := by
-  intro O _ _ _ ϖ hϖ Ω _ _ K _ _ ι _ y d hV N E _ _ B B' hB w w' x x' f g hfl M M' a₀ a₀' φ φ' hφ
-    hφ' Φ _ _ _ _ e t ht k hk hkN
+  intro O _ _ _ ϖ hϖ Ω _ _ K _ _ ι _ y d hV N E _ _ B B' hB w w' x x' f g hfl M M' a₀ a₀' φ φ' hφ hφ'
+    Φ _ _ _ _ e t ht k hk hkN
   classical
+
   have hne : ∀ k, ∃ j, y ⟨k, j⟩ ≠ 0 := fun k => by
     obtain ⟨j, hj⟩ := hV.multiProj.relevant k
     refine ⟨j, fun h0 => hj ?_⟩
@@ -122,15 +158,14 @@ theorem SegreFlagConeAlg.proof : SegreFlagConeAlg.Statement := by
       simp [(Fin.castLE_injective hkN).ne hj]
     · simp
 
-  obtain ⟨l, hl⟩
-      : ∃ l : Fin k → Fin M,
-        LinearIndependent Ω (fun i : Fin k => fun j : Fin k => φ (l i) (w (Fin.castLE hkN j))) := by
+  obtain ⟨l, hl⟩ : ∃ l : Fin k → Fin M,
+      LinearIndependent Ω (fun i : Fin k => fun j : Fin k => φ (l i) (w (Fin.castLE hkN j))) := by
     obtain ⟨κ, a, ha, hsp, hind⟩ := exists_linearIndependent' Ω (R ∘ φ)
     have : Finite κ := Finite.of_injective a ha
     have := Fintype.ofFinite κ
     have hcard : Fintype.card κ = k := by
-      rw [← finrank_span_eq_card hind, hsp, Set.range_comp, Submodule.span_image, hspan,
-        Submodule.map_top, LinearMap.range_eq_top.2 hRsurj, finrank_top, Module.finrank_fin_fun]
+      rw [← finrank_span_eq_card hind, hsp, Set.range_comp, Submodule.span_image, hspan, Submodule.map_top,
+        LinearMap.range_eq_top.2 hRsurj, finrank_top, Module.finrank_fin_fun]
     let σ := Fintype.equivFinOfCardEq hcard
     exact ⟨a ∘ σ.symm, hind.comp σ.symm σ.symm.injective⟩
   obtain ⟨m', hm'⟩ := exists_flag_ne_zero w e hli φ' hspan' hk hkN
@@ -138,27 +173,22 @@ theorem SegreFlagConeAlg.proof : SegreFlagConeAlg.Statement := by
   have hϖ0 : algebraMap O Ω ϖ ≠ 0 := by
     intro h0
     have hmem : ϖ ∈ (pointIdeal O y).comap (C : O →+* MRing ι O) := by
-      rw [Ideal.mem_comap, pointIdeal, RingHom.mem_ker, pointConeMap, aeval_C,
-        MvPolynomial.algebraMap_apply, h0, map_zero]
+      rw [Ideal.mem_comap, pointIdeal, RingHom.mem_ker, pointConeMap, aeval_C, MvPolynomial.algebraMap_apply, h0,
+        map_zero]
     rw [hV.noTorsion] at hmem
     exact hϖ.ne_zero (Ideal.mem_bot.1 hmem)
 
-  have hsec
-      : ∀ q : Fin k, ∃ v ∈ B.lat c,
-        (∀ j, Fin.castLE hkN q < j → w.repr v j = 0)
-          ∧ w.repr v (Fin.castLE hkN q) = 1 * ∏ k', y ⟨k', c k'⟩ ^ x (Fin.castLE hkN q) k' := by
+  have hsec : ∀ q : Fin k, ∃ v ∈ B.lat c, (∀ j, Fin.castLE hkN q < j → w.repr v j = 0) ∧
+      w.repr v (Fin.castLE hkN q) = 1 * ∏ k', y ⟨k', c k'⟩ ^ x (Fin.castLE hkN q) k' := by
     intro q
-    have hmem
-        : (1 * ∏ k', y ⟨k', c k'⟩ ^ x (Fin.castLE hkN q) k' : Ω)
-          ∈ degLat O y (x (Fin.castLE hkN q)) c :=
-      ⟨1, Subalgebra.one_mem _, rfl⟩
+    have hmem : (1 * ∏ k', y ⟨k', c k'⟩ ^ x (Fin.castLE hkN q) k' : Ω) ∈
+        degLat O y (x (Fin.castLE hkN q)) c := ⟨1, Subalgebra.one_mem _, rfl⟩
     rw [← hfl.flag.graded c hyc (Fin.castLE hkN q)] at hmem
     exact hmem
   choose u hu hup hud using hsec
   have hlt : ∀ (q : Fin k) (j : Fin N), (q : ℕ) < (j : ℕ) → w.repr (u q) j = 0 := fun q j h =>
     hup q j (by rw [Fin.lt_def, Fin.val_castLE]; exact h)
-  have hhi : ∀ (q : Fin k) (j : Fin N), k ≤ (j : ℕ) → w.repr (u q) j = 0 := fun q j h =>
-    hlt q j (by omega)
+  have hhi : ∀ (q : Fin k) (j : Fin N), k ≤ (j : ℕ) → w.repr (u q) j = 0 := fun q j h => hlt q j (by omega)
 
   set T : Matrix (Fin k) (Fin k) Ω := Matrix.of fun q j : Fin k => w.repr (u q) (Fin.castLE hkN j) with hT
   have hTdet : T.det ≠ 0 := by
@@ -169,10 +199,9 @@ theorem SegreFlagConeAlg.proof : SegreFlagConeAlg.Statement := by
     refine Finset.prod_ne_zero_iff.2 fun q _ => ?_
     rw [hT, Matrix.of_apply, hud q, one_mul]
     exact Finset.prod_ne_zero_iff.2 fun k' _ => zpow_ne_zero _ (hc k')
-  obtain ⟨s', hs'⟩ :=
-    exists_coords hkN w u hhi hTdet (flagCoord w e t k) (fun j hj => by
-      simp only [flagCoord]
-      rw [if_neg (not_lt.2 hj)])
+  obtain ⟨s', hs'⟩ := exists_coords hkN w u hhi hTdet (flagCoord w e t k) (fun j hj => by
+    simp only [flagCoord]
+    rw [if_neg (not_lt.2 hj)])
   set Y : Ω := ∏ k, y ⟨k, c k⟩ ^ a₀ k with hYdef
   set Y' : Ω := ∏ k, y ⟨k, c k⟩ ^ a₀' k with hY'def
   have hY : Y ≠ 0 := Finset.prod_ne_zero_iff.2 fun k _ => zpow_ne_zero _ (hc k)
@@ -196,46 +225,42 @@ theorem SegreFlagConeAlg.proof : SegreFlagConeAlg.Statement := by
     rw [hGm, Matrix.det_smul, Matrix.det_mul, Matrix.det_transpose]
     exact mul_ne_zero (pow_ne_zero _ (inv_ne_zero hY)) (mul_ne_zero hRows hTdet)
 
-  have key
-      : ∀ A1 : Subalgebra O (MvPolynomial (Option (Option K)) Φ),
-        (∀ q : Σ k, ι k, C (algebraMap Ω Φ (y q)) * X (some (some q.1)) ∈ A1)
-          → (∀ i, C (flagClosurePt y w e φ φ' t k ⟨some none, l i⟩) * X (some none) ∈ A1)
-          → C (flagClosurePt y w e φ φ' t k ⟨none, m'⟩) * X none ∈ A1
-          → ∀ p : Σ o, bundleIdx (bundleIdx ι M) M' o,
-            IsAlgebraic A1 (C (flagClosurePt y w e φ φ' t k p) * X p.1) := by
+  have key : ∀ A1 : Subalgebra O (MvPolynomial (Option (Option K)) Φ),
+      (∀ q : Σ k, ι k, C (algebraMap Ω Φ (y q)) * X (some (some q.1)) ∈ A1) →
+      (∀ i, C (flagClosurePt y w e φ φ' t k ⟨some none, l i⟩) * X (some none) ∈ A1) →
+      C (flagClosurePt y w e φ φ' t k ⟨none, m'⟩) * X none ∈ A1 →
+      ∀ p : Σ o, bundleIdx (bundleIdx ι M) M' o,
+        IsAlgebraic A1 (C (flagClosurePt y w e φ φ' t k p) * X p.1) := by
     intro A1 h1 h2 h3
     let AC := Subalgebra.algebraicClosure A1 (MvPolynomial (Option (Option K)) Φ)
     have hA : ∀ x ∈ A1, x ∈ AC := fun x hx => isAlgebraic_algebraMap (⟨x, hx⟩ : A1)
     let ψ : Ω →+* MvPolynomial (Option (Option K)) Φ := (C : Φ →+* _).comp (algebraMap Ω Φ)
     have hψ : ∀ a, ψ a = C (algebraMap Ω Φ a) := fun _ => rfl
 
-    let G : Subalgebra O Ω := {
-      carrier := {a | ψ a ∈ AC}
-      mul_mem' := fun {a b} ha hb => by
-        show ψ (a * b) ∈ AC
-        rw [map_mul]
-        exact AC.mul_mem ha hb
-      add_mem' := fun {a b} ha hb => by
-        show ψ (a + b) ∈ AC
-        rw [map_add (f := _)]
-        exact AC.add_mem ha hb
-      algebraMap_mem' := fun r => by
-        show ψ (algebraMap O Ω r) ∈ AC
-        have : ψ (algebraMap O Ω r) = algebraMap O (MvPolynomial (Option (Option K)) Φ) r := by
-          rw [hψ, ← IsScalarTower.algebraMap_apply, MvPolynomial.algebraMap_apply]
-        rw [this]
-        exact hA _ (A1.algebraMap_mem r)
-    }
+    let G : Subalgebra O Ω :=
+      { carrier := {a | ψ a ∈ AC}
+        mul_mem' := fun {a b} ha hb => by
+          show ψ (a * b) ∈ AC
+          rw [map_mul]
+          exact AC.mul_mem ha hb
+        add_mem' := fun {a b} ha hb => by
+          show ψ (a + b) ∈ AC
+          rw [map_add (f := _)]
+          exact AC.add_mem ha hb
+        algebraMap_mem' := fun r => by
+          show ψ (algebraMap O Ω r) ∈ AC
+          have : ψ (algebraMap O Ω r) = algebraMap O (MvPolynomial (Option (Option K)) Φ) r := by
+            rw [hψ, ← IsScalarTower.algebraMap_apply, MvPolynomial.algebraMap_apply]
+          rw [this]
+          exact hA _ (A1.algebraMap_mem r) }
     have hratio : ∀ k j, ψ (y ⟨k, j⟩ / y ⟨k, c k⟩) ∈ AC := by
       intro k j
-      have h0
-          : C (algebraMap Ω Φ (y ⟨k, c k⟩)) * X (some (some k))
-            ∈ nonZeroDivisors (MvPolynomial (Option (Option K)) Φ) :=
-        mem_nonZeroDivisors_of_ne_zero (mul_ne_zero (by rw [← hψ]; exact (map_ne_zero ψ).2 (hc k))
-          (X_ne_zero _))
+      have h0 : C (algebraMap Ω Φ (y ⟨k, c k⟩)) * X (some (some k)) ∈
+          nonZeroDivisors (MvPolynomial (Option (Option K)) Φ) :=
+        mem_nonZeroDivisors_of_ne_zero (mul_ne_zero (by rw [← hψ]; exact (map_ne_zero ψ).2 (hc k)) (X_ne_zero _))
       refine IsAlgebraic.of_mul h0 (hA _ (h1 ⟨k, c k⟩)) ?_
-      have : C (algebraMap Ω Φ (y ⟨k, c k⟩)) * X (some (some k)) * ψ (y ⟨k, j⟩ / y ⟨k, c k⟩)
-          = C (algebraMap Ω Φ (y ⟨k, j⟩)) * X (some (some k)) := by
+      have : C (algebraMap Ω Φ (y ⟨k, c k⟩)) * X (some (some k)) * ψ (y ⟨k, j⟩ / y ⟨k, c k⟩) =
+          C (algebraMap Ω Φ (y ⟨k, j⟩)) * X (some (some k)) := by
         rw [hψ, mul_right_comm, ← map_mul, ← map_mul, mul_div_cancel₀ _ (hc k)]
       rw [this]
       exact hA _ (h1 ⟨k, j⟩)
@@ -269,10 +294,8 @@ theorem SegreFlagConeAlg.proof : SegreFlagConeAlg.Statement := by
 
     let W : Fin k → MvPolynomial (Option (Option K)) Φ := fun q =>
       C (algebraMap Ω Φ Y * s' q) * X (some none)
-    have hx
-        : ∀ lφ,
-          C (flagClosurePt y w e φ φ' t k ⟨some none, lφ⟩) * X (some none)
-            = ∑ q, ψ (φ lφ (u q) / Y) * W q := by
+    have hx : ∀ lφ, C (flagClosurePt y w e φ φ' t k ⟨some none, lφ⟩) * X (some none) =
+        ∑ q, ψ (φ lφ (u q) / Y) * W q := by
       intro lφ
       have := expand_coords u s' (φ lφ) _ (hs' (φ lφ)) Y Y (some none : Option (Option K))
       rw [div_self hY, map_one, one_mul] at this
@@ -287,43 +310,34 @@ theorem SegreFlagConeAlg.proof : SegreFlagConeAlg.Statement := by
         rw [← RingHom.map_det]
         exact (map_ne_zero ψ).2 hdet
     rintro ⟨(_ | _ | k'), j⟩
-    · let P : Fin M' → MvPolynomial (Option (Option K)) Φ := fun l' =>
-        ∑ q, ψ (φ' l' (u q) / Y') * W q
-      have hP
-          : ∀ l',
-            P l'
-              = C (algebraMap Ω Φ (Y / Y') * flagClosurePt y w e φ φ' t k ⟨none, l'⟩)
-                * X (some none) := fun l' =>
-        expand_coords u s' (φ' l') _ (hs' (φ' l')) Y Y' (some none : Option (Option K))
-      have hPA : ∀ l', P l' ∈ AC := fun l' =>
-        Subalgebra.sum_mem AC fun q _ => AC.mul_mem (hg' l' q) (hW q)
+    ·
+      let P : Fin M' → MvPolynomial (Option (Option K)) Φ := fun l' => ∑ q, ψ (φ' l' (u q) / Y') * W q
+      have hP : ∀ l', P l' =
+          C (algebraMap Ω Φ (Y / Y') * flagClosurePt y w e φ φ' t k ⟨none, l'⟩) * X (some none) :=
+        fun l' => expand_coords u s' (φ' l') _ (hs' (φ' l')) Y Y' (some none : Option (Option K))
+      have hPA : ∀ l', P l' ∈ AC := fun l' => Subalgebra.sum_mem AC fun q _ => AC.mul_mem (hg' l' q) (hW q)
       have hP0 : P m' ∈ nonZeroDivisors (MvPolynomial (Option (Option K)) Φ) := by
         rw [hP]
         refine mem_nonZeroDivisors_of_ne_zero (mul_ne_zero ?_ (X_ne_zero _))
         rw [Ne, C_eq_zero]
         exact mul_ne_zero ((map_ne_zero _).2 (div_ne_zero hY hY')) hm'
       refine IsAlgebraic.of_mul hP0 (hPA m') ?_
-      have : P m' * (C (flagClosurePt y w e φ φ' t k ⟨none, j⟩) * X none)
-          = P j * (C (flagClosurePt y w e φ φ' t k ⟨none, m'⟩) * X none) := by
+      have : P m' * (C (flagClosurePt y w e φ φ' t k ⟨none, j⟩) * X none) =
+          P j * (C (flagClosurePt y w e φ φ' t k ⟨none, m'⟩) * X none) := by
         rw [hP m', hP j]
         simp only [map_mul]
         ring
       rw [this]
       exact AC.mul_mem (hPA j) (hA _ h3)
-    · show C (flagClosurePt y w e φ φ' t k ⟨some none, j⟩) * X (some none) ∈ AC
+    ·
+      show C (flagClosurePt y w e φ φ' t k ⟨some none, j⟩) * X (some none) ∈ AC
       rw [hx]
       exact Subalgebra.sum_mem AC fun q _ => AC.mul_mem (hg j q) (hW q)
-    · exact hA _ (h1 ⟨k', j⟩)
-  exact ⟨
-    l,
-    m',
-    hl,
-    hm',
-    key _
-      (fun q => Algebra.subset_adjoin (Or.inl ⟨q, rfl⟩))
-      (fun i => Algebra.subset_adjoin (Or.inr ⟨Sum.inl i, rfl⟩))
-      (Algebra.subset_adjoin (Or.inr ⟨Sum.inr (), rfl⟩))
-  ⟩
+    ·
+      exact hA _ (h1 ⟨k', j⟩)
+  exact ⟨l, m', hl, hm', key _ (fun q => Algebra.subset_adjoin (Or.inl ⟨q, rfl⟩))
+    (fun i => Algebra.subset_adjoin (Or.inr ⟨Sum.inl i, rfl⟩))
+    (Algebra.subset_adjoin (Or.inr ⟨Sum.inr (), rfl⟩))⟩
 
 end
 

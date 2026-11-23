@@ -83,7 +83,6 @@ theorem push_pG_two
     Category.assoc]
   exact congrArg _ (push_fstG e a)
 
-set_option maxHeartbeats 1600000 in
 theorem gen_invariant_of_mul
     : ∀ {R : Type} [CommRing R] [IsDomain R] {I : Ideal R} {D₁ D₂ : DegData R I}
         {A₁ A₂ : PolAV (Sp (FractionRing R))} {G₁ G₂ : Over (Sp R)} [GrpObj G₁] [IsCommMonObj G₁]

@@ -1,10 +1,62 @@
 module
 
-public import CompanionTheory.AutomorphicTheory.BesselWaveGrids.TiedNum
-public import CompanionTheory.AutomorphicTheory.BesselWaveGrids.NormalizedMeasureScaling
 public import CompanionTheory.AutomorphicTheory.BesselWaveGrids.PowFourLeRpowNineHalves
 public import Formalism.SharpRestriction.CuspSpanNormBounds.TheoremBConstants
-public import Formalism.SharpRestriction.CuspSpanNormBounds.RatioInvLeFrameFactor
+public import Formalism.LocalToGlobal.SiegelLatticeTheory.FlagStabilizerTensors.RootLatticeThresholds.TBBTie
+public import Formalism.SharpRestriction.CuspSpanNormBounds.IsPtRepTrDat
+public import Formalism.SharpRestriction.CuspSpanNormBounds.WeightedUniformRotatedOfExpansion
+public import CompanionTheory.AutomorphicTheory.BesselWaveGrids.GapSizes
+public import CompanionTheory.AutomorphicTheory.BesselWaveGrids.NormalizedMeasureScaling
+public import CompanionTheory.AutomorphicTheory.BesselWaveGrids.NqOfLamData
+public import CompanionTheory.AutomorphicTheory.BesselWaveGrids.TiedNum
+public import CompanionTheory.AutomorphicTheory.BesselWaveGrids.TypeHC
+public import Development.AbelianVarietyTheory.Proofs.JetHarmonics.IsBesselMapSmBesselCharIff
+import Formalism.HermitianCurvature.HermitianCurvatureProofs.CompactGroupHaarExists
+public import Formalism.LocalToGlobal.SiegelLatticeTheory.FlagStabilizerTensors.RootLatticeThresholds.BesselExpansion
+public import Formalism.LocalToGlobal.SiegelLatticeTheory.FlagStabilizerTensors.RootLatticeThresholds.UniformTheoremBOfLocalFrame
+import Formalism.SharpRestriction.CuspSpanNormBounds.BridgeCSB
+public import Formalism.SharpRestriction.CuspSpanNormBounds.OnePlaceExpansion
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Int
+import Mathlib.Algebra.Order.Star.Real
+import Mathlib.Algebra.Ring.IsFormallyReal
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -30,7 +82,7 @@ def WLoc1 (D : D7) (Ch Cg Ca C : ℝ) (N : LocBessel D.R.k D.R.rS → Prop) : Pr
       WIneq L f μsec γ (‖Dpt γ l‖ ^ (2 * a)) (b ^ (C * ((2 * D.R.rS + 2 : ℕ) : ℝ) ^ 5) *
         max 1 (1 / Gpt (Tz D.R.k D.R.rS L.z) (Tz D.R.k D.R.rS L.z') γ) ^ (40 * (D.R.rS + 1) ^ 2))
 
-set_option maxHeartbeats 1600000 in
+
 theorem wLoc1N_of (hW : ∀ Cb, WEnd.WBp Cb) {Cgc : ℝ} (hCC : CoefCC1 Cgc) (Ch Ca : ℝ) :
     ∃ C Cg₀ : ℝ, 0 ≤ C ∧ ∀ Cg, Cg₀ ≤ Cg → ∀ D : D7,
       WLoc1 D Ch Cg Ca C fun L => L.μN = Formalism.FourierDecayAlt.D.muN D.R.k D.R.rS := by
@@ -273,7 +325,7 @@ theorem weight_le {ι : Type} [Fintype ι] [Nonempty ι] (s x : ι → ℝ) (N :
     rw [mul_pow (2 * σ), ← pow_mul]
 
 
-set_option maxHeartbeats 1600000 in
+
 theorem weighted_uniform_rotated_of_expansion_alt_alt (hW : ∀ Cb, WEnd.WBp Cb) {Cgc Cgf : ℝ} (hCC : CoefCC1 Cgc)
     (hOB : ∀ D : D7, Formalism.MainNotions.FrameBoundFromBesselTorus.OneBesselTor D Cgf) : Formalism.MainNotions.RotatedPoints.WeightedBoundRotatedUniform := by
   intro Aw Ch hAw

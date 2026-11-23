@@ -1,36 +1,71 @@
 module
 
-public import Mathlib
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.PlaceDivisors.StChartFH
-public import ReciprocityTheory.DualLattices.TowerZeroSurjective
-public import ReciprocityTheory.DualLattices.LinPairStatement
-public import ReciprocityTheory.DualLattices.LengthDegreeAbelianVariety
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDescent.ChartPullbacks.UniversalCharts.LePreimageOfNil
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.Clauses
 public import Development.AbelianVarietyTheory.Definitions.TeichmullerDepth.IsEigBasisIff
-public import Development.AbelianVarietyTheory.Proofs.UnramifiedDepth.GmLawCharsMul
-public import Development.AbelianVarietyTheory.Proofs.FormalGroupCharts.MvPowerSeriesExistsPolynomialTotalDegreeLeSubMem
 public import Development.AbelianVarietyTheory.Proofs.FormalGroupCharts.MvPowerSeriesEvalOfPowMem
+public import Development.AbelianVarietyTheory.Proofs.FormalGroupCharts.MvPowerSeriesExistsPolynomialTotalDegreeLeSubMem
+public import Development.AbelianVarietyTheory.Proofs.UnramifiedDepth.GmLawCharsMul
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Real
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RootsOfUnity.AlgebraicallyClosed
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+public import Mathlib.RingTheory.RootsOfUnity.EnoughRootsOfUnity
 
 @[expose] public section
 
 set_option autoImplicit false
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ
-  ReciprocityTheory.ChartRestriction.G.Pdiv.ChartF GlobalTheory.ChF
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ ReciprocityTheory.ChartRestriction.G.Pdiv.ChartF GlobalTheory.ChF
 
 namespace GlobalTheory.ChF
 
-private theorem coeff_eq_zero_of_roots
-    {O : Type} [CommRing O] [IsDomain O]
-    {σ : Type} [Fintype σ] [DecidableEq σ]
-    {N : ℕ} {ζ : O} (hζ : IsPrimitiveRoot ζ N) (c : (σ → Fin N) → O)
-    (h : ∀ b : σ → ℕ, ∑ a : σ → Fin N, c a * ∏ i, (ζ ^ b i) ^ (a i : ℕ) = 0)
-    : ∀ a, c a = 0 := by
-  let χ : (σ → Fin N) → (Multiplicative (σ → ℕ) →* O) := fun a => {
-    toFun := fun b => ∏ i, (ζ ^ (Multiplicative.toAdd b) i) ^ (a i : ℕ)
-    map_one' := by simp
-    map_mul' := fun b b' => by simp [pow_add, mul_pow, Finset.prod_mul_distrib]
-  }
+private theorem coeff_eq_zero_of_roots {O : Type} [CommRing O] [IsDomain O] {σ : Type} [Fintype σ]
+    [DecidableEq σ] {N : ℕ} {ζ : O} (hζ : IsPrimitiveRoot ζ N) (c : (σ → Fin N) → O)
+    (h : ∀ b : σ → ℕ, ∑ a : σ → Fin N, c a * ∏ i, (ζ ^ b i) ^ (a i : ℕ) = 0) : ∀ a, c a = 0 := by
+  let χ : (σ → Fin N) → (Multiplicative (σ → ℕ) →* O) := fun a =>
+    { toFun := fun b => ∏ i, (ζ ^ (Multiplicative.toAdd b) i) ^ (a i : ℕ)
+      map_one' := by simp
+      map_mul' := fun b b' => by
+        simp [pow_add, mul_pow, Finset.prod_mul_distrib] }
   have hinj : Function.Injective χ := by
     intro a a' haa
     funext j
@@ -52,13 +87,10 @@ private theorem coeff_eq_zero_of_roots
   have := h (Multiplicative.toAdd b)
   simpa [Finset.sum_apply, χ] using this
 
-private theorem map_coe_mem_span
-    {O Q : Type} [CommRing O] [CommRing Q] [Algebra O Q]
-    {σ : Type} [Fintype σ] [DecidableEq σ]
-    {N : ℕ} (hN : 0 < N)
-    (ψ : MvPowerSeries σ O →ₐ[O] Q) (hy : ∀ i, (1 + ψ (MvPowerSeries.X i)) ^ N = 1)
-    (P : MvPolynomial σ O)
-    : ψ (P : MvPowerSeries σ O) ∈ Submodule.span O
+private theorem map_coe_mem_span {O Q : Type} [CommRing O] [CommRing Q] [Algebra O Q] {σ : Type}
+    [Fintype σ] [DecidableEq σ] {N : ℕ} (hN : 0 < N) (ψ : MvPowerSeries σ O →ₐ[O] Q)
+    (hy : ∀ i, (1 + ψ (MvPowerSeries.X i)) ^ N = 1) (P : MvPolynomial σ O) :
+    ψ (P : MvPowerSeries σ O) ∈ Submodule.span O
       (Set.range fun a : σ → Fin N => ∏ i, (1 + ψ (MvPowerSeries.X i)) ^ (a i : ℕ)) := by
   set S := Submodule.span O
       (Set.range fun a : σ → Fin N => ∏ i, (1 + ψ (MvPowerSeries.X i)) ^ (a i : ℕ)) with hS
@@ -75,12 +107,9 @@ private theorem map_coe_mem_span
       obtain ⟨a, rfl⟩ := hx
       have := hmon (fun i => (a i : ℕ) + (Pi.single j 1 : σ → ℕ) i)
       simp only [pow_add, Finset.prod_mul_distrib] at this
-      rwa [Finset.prod_eq_single j
-            (f := fun i => (1 + ψ (MvPowerSeries.X i)) ^ (Pi.single j 1 : σ → ℕ) i)
-            (fun i _ hij => by simp [Pi.single_eq_of_ne hij])
-            (by simp),
-          Pi.single_eq_same, pow_one]
-        at this
+      rwa [Finset.prod_eq_single j (f := fun i =>
+        (1 + ψ (MvPowerSeries.X i)) ^ (Pi.single j 1 : σ → ℕ) i)
+        (fun i _ hij => by simp [Pi.single_eq_of_ne hij]) (by simp), Pi.single_eq_same, pow_one] at this
     | zero => simp
     | add x y _ _ hx hy => rw [add_mul]; exact S.add_mem hx hy
     | smul a x _ hx => rw [smul_mul_assoc]; exact S.smul_mem a hx
@@ -92,27 +121,23 @@ private theorem map_coe_mem_span
       exact ψ.commutes a
     rw [this]
     exact S.smul_mem a h1
-  | add f g hf hg =>
-    rw [MvPolynomial.coe_add, map_add (f := _)]; exact S.add_mem hf hg
+  | add f g hf hg => rw [MvPolynomial.coe_add, map_add (f := _)]; exact S.add_mem hf hg
   | mul_X f j hf =>
     rw [MvPolynomial.coe_mul, MvPolynomial.coe_X, map_mul]
     have := S.sub_mem (hmul j _ hf) hf
     convert this using 1
     ring
 
-private theorem exists_pow_eq {A : Type} [CommRing A] {p : ℕ} (hp : p.Prime) (k : ℕ) (x : A)
-    : ∃ s : A, x ^ p ^ k = ((1 + x) ^ p ^ k - 1) + (p : A) * s := by
+private theorem exists_pow_eq {A : Type} [CommRing A] {p : ℕ} (hp : p.Prime) (k : ℕ) (x : A) :
+    ∃ s : A, x ^ p ^ k = ((1 + x) ^ p ^ k - 1) + (p : A) * s := by
   obtain ⟨s, hs⟩ := exists_add_pow_prime_pow_eq hp (1 : A) x k
   refine ⟨-(x * s), ?_⟩
   rw [hs]
   ring
 
-private theorem exists_primitiveRoot_integers
-    {C : Type} [Field C] [IsAlgClosed C] [CharZero C]
-    {v : Valuation C NNReal} {O : Type} [CommRing O] [Algebra O C]
-    (hv : v.Integers O)
-    {N : ℕ} (hN : 0 < N)
-    : ∃ ζ : O, IsPrimitiveRoot ζ N := by
+private theorem exists_primitiveRoot_integers {C : Type} [Field C] [IsAlgClosed C] [CharZero C]
+    {v : Valuation C NNReal} {O : Type} [CommRing O] [Algebra O C] (hv : v.Integers O) {N : ℕ}
+    (hN : 0 < N) : ∃ ζ : O, IsPrimitiveRoot ζ N := by
   haveI : NeZero N := ⟨hN.ne'⟩
   obtain ⟨z, hz⟩ := HasEnoughRootsOfUnity.exists_primitiveRoot C N
   have hvz : v z ≤ 1 := by
@@ -121,12 +146,9 @@ private theorem exists_primitiveRoot_integers
   obtain ⟨ζ, rfl⟩ := hv.exists_of_le_one hvz
   exact ⟨ζ, hz.of_map_of_injective hv.hom_inj⟩
 
-theorem fh_gmF
-    : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C] [CharZero C]
-        (v : Valuation C NNReal) (O : Type) [CommRing O] [Algebra O C],
-      v.Integers O
-        → ∀ [Fact ¬ IsUnit (p : O)] [IsAdicComplete (Ideal.span {(p : O)}) O] (r : ℕ),
-          FH p (gmF O r) := by
+theorem fh_gmF : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C] [CharZero C]
+    (v : Valuation C NNReal) (O : Type) [CommRing O] [Algebra O C], v.Integers O →
+    ∀ [Fact ¬IsUnit (p : O)] [IsAdicComplete (Ideal.span {(p : O)}) O] (r : ℕ), FH p (gmF O r) := by
   intro p hp C _ _ _ v O _ _ hv _ hc r k
   classical
   haveI : IsDomain O := hv.hom_inj.isDomain _
@@ -139,30 +161,26 @@ theorem fh_gmF
     obtain rfl : i0 = 0 := Subsingleton.elim _ _
     exact Ideal.subset_span ⟨i, hmul i⟩
 
-  obtain ⟨M, hM⟩
-      : ∃ M : ℕ,
-        Ideal.span (Set.range (MvPowerSeries.X : Fin 1 × Fin r → PS O 1 r)) ^ M
-          ≤ I ⊔ Ideal.map (MvPowerSeries.C : O →+* PS O 1 r) (Ideal.span {(p : O)}) := by
+  obtain ⟨M, hM⟩ : ∃ M : ℕ, Ideal.span (Set.range (MvPowerSeries.X : Fin 1 × Fin r → PS O 1 r)) ^ M ≤
+      I ⊔ Ideal.map (MvPowerSeries.C : O →+* PS O 1 r) (Ideal.span {(p : O)}) := by
     apply Ideal.exists_pow_le_of_le_radical_of_fg _ (Submodule.fg_span (Set.finite_range _))
     rw [Ideal.span_le]
     rintro _ ⟨i, rfl⟩
     obtain ⟨s, hs⟩ := exists_pow_eq hp.out k (MvPowerSeries.X i : PS O 1 r)
     refine ⟨p ^ k, ?_⟩
     rw [hs]
-    refine Ideal.add_mem _ (Ideal.mem_sup_left (hrel i))
-      (Ideal.mem_sup_right (Ideal.mul_mem_right _ _ ?_))
+    refine Ideal.add_mem _ (Ideal.mem_sup_left (hrel i)) (Ideal.mem_sup_right (Ideal.mul_mem_right _ _ ?_))
     rw [← map_natCast (MvPowerSeries.C : O →+* PS O 1 r) p]
     exact Ideal.mem_map_of_mem _ (Ideal.mem_span_singleton_self _)
   let π : PS O 1 r →ₐ[O] (PS O 1 r ⧸ I) := Ideal.Quotient.mkₐ O I
-  let m : (Fin 1 × Fin r → Fin (p ^ k)) → (PS O 1 r ⧸ I) := fun a =>
-    ∏ i, (1 + π (MvPowerSeries.X i)) ^ (a i : ℕ)
+  let m : (Fin 1 × Fin r → Fin (p ^ k)) → (PS O 1 r ⧸ I) :=
+    fun a => ∏ i, (1 + π (MvPowerSeries.X i)) ^ (a i : ℕ)
   have hspan : ∀ q : PS O 1 r ⧸ I, q ∈ Submodule.span O (Set.range m) := by
     intro q
     obtain ⟨g, rfl⟩ := Ideal.Quotient.mk_surjective q
-    obtain ⟨P, -, hP⟩ :=
-      GlobalTheory.CompleteBaseChange.exists_polynomial_totalDegree_le_sub_mem O
-        (Ideal.span {(p : O)}) (Submodule.fg_span (Set.finite_singleton _)) hc (Fin 1 × Fin r)
-        (Fin r) (mulF (gmF O r) (p ^ k)) M hM g
+    obtain ⟨P, -, hP⟩ := GlobalTheory.CompleteBaseChange.exists_polynomial_totalDegree_le_sub_mem O
+      (Ideal.span {(p : O)}) (Submodule.fg_span (Set.finite_singleton _)) hc (Fin 1 × Fin r) (Fin r)
+      (mulF (gmF O r) (p ^ k)) M hM g
     rw [Ideal.Quotient.eq.2 hP]
     refine map_coe_mem_span hN π (fun i => ?_) P
     have h0 : π ((1 + MvPowerSeries.X i : PS O 1 r) ^ p ^ k - 1) = 0 :=
@@ -170,21 +188,18 @@ theorem fh_gmF
     rw [map_sub, map_pow, map_add (f := _), map_one] at h0
     exact sub_eq_zero.1 h0
 
-  have hpt
-      : ∀ b : Fin 1 × Fin r → ℕ, ∃ φ : (PS O 1 r ⧸ I) →ₐ[O] O, ∀ i,
-        φ (π (MvPowerSeries.X i)) = ζ ^ b i - 1 := by
+  have hpt : ∀ b : Fin 1 × Fin r → ℕ, ∃ φ : (PS O 1 r ⧸ I) →ₐ[O] O,
+      ∀ i, φ (π (MvPowerSeries.X i)) = ζ ^ b i - 1 := by
     intro b
     have hone : ∀ i, (1 + (ζ ^ b i - 1)) ^ p ^ k - 1 = 0 := by
       intro i
       rw [add_sub_cancel, ← pow_mul, mul_comm, pow_mul, hζ.pow_eq_one, one_pow, sub_self]
-    obtain ⟨ψ, hψ⟩ :=
-      (GlobalTheory.mvPowerSeries_eval_of_pow_mem O (Ideal.span {(p : O)}) (Fin 1 × Fin r)
-        (fun i => ζ ^ b i - 1)
-        (fun i => by
-          obtain ⟨s, hs⟩ := exists_pow_eq hp.out k (ζ ^ b i - 1)
-          refine ⟨p ^ k, ?_⟩
-          rw [hs, hone, zero_add]
-          exact Ideal.mul_mem_right _ _ (Ideal.mem_span_singleton_self _))).1 hc O
+    obtain ⟨ψ, hψ⟩ := (GlobalTheory.mvPowerSeries_eval_of_pow_mem O (Ideal.span {(p : O)}) (Fin 1 × Fin r)
+      (fun i => ζ ^ b i - 1) (fun i => by
+        obtain ⟨s, hs⟩ := exists_pow_eq hp.out k (ζ ^ b i - 1)
+        refine ⟨p ^ k, ?_⟩
+        rw [hs, hone, zero_add]
+        exact Ideal.mul_mem_right _ _ (Ideal.mem_span_singleton_self _))).1 hc O
     have hker : I ≤ RingHom.ker ψ := by
       rw [hI, Ideal.span_le]
       rintro _ ⟨i, rfl⟩
@@ -192,17 +207,15 @@ theorem fh_gmF
       rw [hmul, map_sub, map_pow, map_add (f := _), map_one, hψ]
       exact hone _
     exact ⟨Ideal.Quotient.liftₐ I ψ (fun a ha => hker ha), fun i => hψ i⟩
-  have hsep
-      : ∀ c : (Fin 1 × Fin r → Fin (p ^ k)) → O,
-        (∀ φ : (PS O 1 r ⧸ I) →ₐ[O] O, φ (∑ a, c a • m a) = 0) → ∀ a, c a = 0 := by
+  have hsep : ∀ c : (Fin 1 × Fin r → Fin (p ^ k)) → O,
+      (∀ φ : (PS O 1 r ⧸ I) →ₐ[O] O, φ (∑ a, c a • m a) = 0) → ∀ a, c a = 0 := by
     intro c hcφ
     refine coeff_eq_zero_of_roots hζ c fun b => ?_
     obtain ⟨φ, hφ⟩ := hpt b
     have := hcφ φ
-    set_option synthInstance.maxHeartbeats 100000 in
-    simpa only [map_sum, map_smul, m, map_prod, map_pow, map_add (f := _), map_one, hφ,
-        add_sub_cancel, smul_eq_mul]
-      using this
+
+    simpa only [map_sum, map_smul, m, map_prod, map_pow, map_add (f := _), map_one, hφ, add_sub_cancel,
+    smul_eq_mul] using this
   have hli : LinearIndependent O m := by
     rw [Fintype.linearIndependent_iff]
     intro c h0

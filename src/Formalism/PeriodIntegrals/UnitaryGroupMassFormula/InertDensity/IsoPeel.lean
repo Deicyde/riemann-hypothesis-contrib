@@ -1,8 +1,61 @@
 module
 
 public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.InertDensity.FinrankInfKerAddOne
-public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.InertDensity.ExistsTraceNeZero
 public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.InertDensity.ValMain
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Int
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Coalgebra.IsFrobenius
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.HopfAlgebra.Basic
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.TotallySplit
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
@@ -17,36 +70,31 @@ open DensInertW.Sub
 section
 variable {L : Type} [Field L]
 
-theorem iso_li_tail
-    {n c : ℕ} (x : Fin n → L) (X' : Fin c → Fin n → L) (a : Fin c → L)
-    (h : LinearIndependent L (Fin.cons x X' : Fin (c + 1) → Fin n → L))
-    : LinearIndependent L (fun i => X' i - a i • x) := by
+theorem iso_li_tail {n c : ℕ} (x : Fin n → L) (X' : Fin c → Fin n → L) (a : Fin c → L)
+    (h : LinearIndependent L (Fin.cons x X' : Fin (c + 1) → Fin n → L)) :
+    LinearIndependent L (fun i => X' i - a i • x) := by
   rw [Fintype.linearIndependent_iff] at h ⊢
   intro g hg i
-  have :=
-    h (Fin.cons (-(∑ j, g j * a j)) g)
-      (by
-        rw [Fin.sum_univ_succ]
-        simp only [Fin.cons_zero, Fin.cons_succ]
-        rw [← hg]
-        simp only [smul_sub, Finset.sum_sub_distrib, smul_smul, ← Finset.sum_smul, neg_smul]
-        abel)
-      i.succ
+  have := h (Fin.cons (-(∑ j, g j * a j)) g) (by
+    rw [Fin.sum_univ_succ]
+    simp only [Fin.cons_zero, Fin.cons_succ]
+    rw [← hg]
+    simp only [smul_sub, Finset.sum_sub_distrib, smul_smul, ← Finset.sum_smul, neg_smul]
+    abel) i.succ
   simpa using this
 
-theorem iso_li_cons
-    {n c : ℕ} (x : Fin n → L) (U : Fin c → Fin n → L) (a : Fin c → L) (φ : (Fin n → L) →ₗ[L] L)
-    (hφx : φ x = 1) (hφU : ∀ i, φ (U i) = 0) (hU : LinearIndependent L U)
-    : LinearIndependent L (Fin.cons x (fun i => U i + a i • x) : Fin (c + 1) → Fin n → L) := by
+theorem iso_li_cons {n c : ℕ} (x : Fin n → L) (U : Fin c → Fin n → L) (a : Fin c → L)
+    (φ : (Fin n → L) →ₗ[L] L) (hφx : φ x = 1) (hφU : ∀ i, φ (U i) = 0)
+    (hU : LinearIndependent L U) :
+    LinearIndependent L (Fin.cons x (fun i => U i + a i • x) : Fin (c + 1) → Fin n → L) := by
   rw [Fintype.linearIndependent_iff] at hU ⊢
   intro g hg
   rw [Fin.sum_univ_succ] at hg
   simp only [Fin.cons_zero, Fin.cons_succ] at hg
   have h1 := congrArg φ hg
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_add (f := _), map_sum, map_smul, hφx, hφU, smul_eq_mul, mul_one, add_zero,
-        mul_add, mul_zero, map_zero]
-      at h1
+
+  simp only [map_add (f := _), map_sum, map_smul, hφx, hφU, smul_eq_mul, mul_one, add_zero, mul_add, mul_zero,
+  map_zero] at h1
   have h2 : ∑ i, g i.succ • U i = 0 := by
     have e : ∑ i, g i.succ • U i + (g 0 + ∑ i, g i.succ * a i) • x = 0 := by
       rw [← hg]
@@ -60,30 +108,26 @@ theorem iso_li_cons
   refine Fin.cases ?_ (fun j => hs j) i
   simpa [hs] using h1
 
-def isoP
-    {n m : ℕ}
-    (q : ℕ) (M : Matrix (Fin n) (Fin n) L) (W : Submodule L (Fin n → L)) (X : Fin m → Fin n → L)
-    : Prop :=
+def isoP {n m : ℕ} (q : ℕ) (M : Matrix (Fin n) (Fin n) L) (W : Submodule L (Fin n → L))
+    (X : Fin m → Fin n → L) : Prop :=
   (∀ i, X i ∈ W) ∧ LinearIndependent L X ∧ ∀ i j, hf q M (X i) (X j) = 0
 
 open Classical in
-theorem iso_cntT_zero_eq
-    [Fintype L] {n m q : ℕ} (M : Matrix (Fin n) (Fin n) L) (W : Submodule L (Fin n → L))
-    : cntT q M W (0 : Matrix (Fin m) (Fin m) L)
-      = (Finset.univ.filter (isoP (m := m) q M W)).card := by
+theorem iso_cntT_zero_eq [Fintype L] {n m q : ℕ} (M : Matrix (Fin n) (Fin n) L)
+    (W : Submodule L (Fin n → L)) :
+    cntT q M W (0 : Matrix (Fin m) (Fin m) L) = (Finset.univ.filter (isoP (m := m) q M W)).card := by
   rw [cntT, ← Set.ncard_coe_finset]
   congr 1
   ext X
   simp [isoP]
 
 open Classical in
-theorem iso_fiber
-    [Fintype L]
-    {n c q : ℕ} {M : Matrix (Fin n) (Fin n) L} (hadd : ∀ a b : L, (a + b) ^ q = a ^ q + b ^ q)
-    (hinv : ∀ a : L, (a ^ q) ^ q = a) (hM : IsHerm q M) (W : Submodule L (Fin n → L))
-    (x y : Fin n → L) (hxW : x ∈ W) (hyW : y ∈ W) (hxx : hf q M x x = 0) (hxy : hf q M x y = 1)
-    : (Finset.univ.filter (fun X : Fin (c + 1) → Fin n → L => isoP q M W X ∧ X 0 = x)).card
-      = Fintype.card (Fin c → L) * (Finset.univ.filter (isoP (m := c) q M
+theorem iso_fiber [Fintype L] {n c q : ℕ} {M : Matrix (Fin n) (Fin n) L}
+    (hadd : ∀ a b : L, (a + b) ^ q = a ^ q + b ^ q) (hinv : ∀ a : L, (a ^ q) ^ q = a)
+    (hM : IsHerm q M) (W : Submodule L (Fin n → L)) (x y : Fin n → L)
+    (hxW : x ∈ W) (hyW : y ∈ W) (hxx : hf q M x x = 0) (hxy : hf q M x y = 1) :
+    (Finset.univ.filter (fun X : Fin (c + 1) → Fin n → L => isoP q M W X ∧ X 0 = x)).card =
+      Fintype.card (Fin c → L) * (Finset.univ.filter (isoP (m := c) q M
         (W ⊓ LinearMap.ker (hfL q M x) ⊓ LinearMap.ker (hfL q M y)))).card := by
   have hq : q ≠ 0 := by
     rintro rfl
@@ -94,8 +138,7 @@ theorem iso_fiber
   rw [← Finset.card_univ, ← Finset.card_product]
   refine Finset.card_nbij'
     (fun X => ((fun i => hf q M (X i.succ) y), fun i => X i.succ - hf q M (X i.succ) y • x))
-    (fun p => Fin.cons x (fun i => p.2 i + p.1 i • x))
-    ?_ ?_ ?_ ?_
+    (fun p => Fin.cons x (fun i => p.2 i + p.1 i • x)) ?_ ?_ ?_ ?_
   · rintro X hX
     simp only [Finset.coe_filter, Finset.mem_univ, true_and, Set.mem_setOf_eq] at hX
     obtain ⟨⟨hW, hli, hiso⟩, hX0⟩ := hX
@@ -117,8 +160,7 @@ theorem iso_fiber
       simp [hiso]
   · rintro ⟨a, U⟩ hp
     simp only [Finset.coe_product, Finset.coe_univ, Finset.coe_filter, Finset.mem_univ, true_and,
-        Set.mem_prod, Set.mem_univ, Set.mem_setOf_eq]
-      at hp
+      Set.mem_prod, Set.mem_univ, Set.mem_setOf_eq] at hp
     obtain ⟨hUW, hUli, hUiso⟩ := hp
     have hU : ∀ i, U i ∈ W ∧ hf q M (U i) x = 0 ∧ hf q M (U i) y = 0 := fun i => by
       have := hUW i
@@ -131,8 +173,8 @@ theorem iso_fiber
       · simp only [Fin.cons_succ]
         exact W.add_mem (hU j).1 (W.smul_mem _ hxW)
     · exact iso_li_cons x U a (hfL q M y) hxy (fun i => (hU i).2.2) hUli
-    · refine Fin.cases ?_ (fun i' => ?_) i <;> refine Fin.cases ?_ (fun j' => ?_) j
-        <;> simp only [Fin.cons_zero, Fin.cons_succ]
+    · refine Fin.cases ?_ (fun i' => ?_) i <;> refine Fin.cases ?_ (fun j' => ?_) j <;>
+        simp only [Fin.cons_zero, Fin.cons_succ]
       · exact hxx
       · simp only [hf_add_right hadd, hf_smul_right, hxx, mul_zero, add_zero]
         exact hzero _ _ (hU j').2.1
@@ -149,8 +191,7 @@ theorem iso_fiber
     · simp
   · rintro ⟨a, U⟩ hp
     simp only [Finset.coe_product, Finset.coe_univ, Finset.coe_filter, Finset.mem_univ, true_and,
-        Set.mem_prod, Set.mem_univ, Set.mem_setOf_eq]
-      at hp
+      Set.mem_prod, Set.mem_univ, Set.mem_setOf_eq] at hp
     have hUy : ∀ i, hf q M (U i) y = 0 := fun i => by
       have := hp.1 i
       simp only [Submodule.mem_inf, LinearMap.mem_ker] at this
@@ -168,7 +209,8 @@ theorem isoPeel_of_valCount (hv : ValCount) : IsoPeel := by
   intro K L _ _ _ _ _ hKL n M W hM hW c k hk
   classical
   set q := Fintype.card K with hq_def
-  have hcardL : Fintype.card L = q ^ 2 := by rw [Module.card_eq_pow_finrank (K := K), hKL]
+  have hcardL : Fintype.card L = q ^ 2 := by
+    rw [Module.card_eq_pow_finrank (K := K), hKL]
   have hinv : ∀ a : L, (a ^ q) ^ q = a := fun a => by
     rw [← pow_mul, ← sq, ← hcardL, FiniteField.pow_card]
   have hadd : ∀ a b : L, (a + b) ^ q = a ^ q + b ^ q := by
@@ -190,10 +232,8 @@ theorem isoPeel_of_valCount (hv : ValCount) : IsoPeel := by
     exact ⟨hX.1 0, hX.2.1.ne_zero 0, hX.2.2 0 0⟩
   rw [Finset.card_eq_sum_card_fiberwise hmaps]
 
-  have hfib
-      : ∀ x ∈ S,
-        (((Finset.univ.filter (isoP (m := c + 1) q M W)).filter (fun X => X 0 = x)).card : ℤ)
-          = (q : ℤ) ^ (2 * c) * k := by
+  have hfib : ∀ x ∈ S, (((Finset.univ.filter (isoP (m := c + 1) q M W)).filter
+      (fun X => X 0 = x)).card : ℤ) = (q : ℤ) ^ (2 * c) * k := by
     intro x hx
     simp only [hS, Finset.mem_filter, Finset.mem_univ, true_and] at hx
     obtain ⟨hxW, hx0, hxx⟩ := hx
@@ -203,7 +243,8 @@ theorem isoPeel_of_valCount (hv : ValCount) : IsoPeel := by
       exact hx0 (hW x hxW h)
     obtain ⟨v, hvW, hv⟩ := hex
     obtain ⟨y, hy⟩ : ∃ y : Fin n → L, y = ((hf q M x v)⁻¹ ^ q) • v := ⟨_, rfl⟩
-    have hxy : hf q M x y = 1 := by rw [hy, hf_smul_right, hinv, inv_mul_cancel₀ hv]
+    have hxy : hf q M x y = 1 := by
+      rw [hy, hf_smul_right, hinv, inv_mul_cancel₀ hv]
     have hyW : y ∈ W := by
       rw [hy]
       exact W.smul_mem _ hvW
@@ -216,13 +257,8 @@ theorem isoPeel_of_valCount (hv : ValCount) : IsoPeel := by
 
     have hdec : ∀ u ∈ W, ∃ u' ∈ W', ∃ α β : L, u = u' + α • x + β • y := by
       intro u hu
-      refine ⟨
-        u - (hf q M u y - hf q M u x * hf q M y y) • x - hf q M u x • y,
-        ?_,
-        hf q M u y - hf q M u x * hf q M y y,
-        hf q M u x,
-        by abel
-      ⟩
+      refine ⟨u - (hf q M u y - hf q M u x * hf q M y y) • x - hf q M u x • y, ?_,
+        hf q M u y - hf q M u x * hf q M y y, hf q M u x, by abel⟩
       rw [hmemW']
       refine ⟨W.sub_mem (W.sub_mem hu (W.smul_mem _ hxW)) (W.smul_mem _ hyW), ?_, ?_⟩
       · rw [hf_sub_left, hf_sub_left, hf_smul_left, hf_smul_left, hxx, hyx]
@@ -236,13 +272,11 @@ theorem isoPeel_of_valCount (hv : ValCount) : IsoPeel := by
       apply hW w hwW
       intro u hu
       obtain ⟨u', hu', α, β, rfl⟩ := hdec u hu
-      rw [hf_add_right hadd, hf_add_right hadd, hf_smul_right, hf_smul_right, hwall u' hu', hwx,
-        hwy]
+      rw [hf_add_right hadd, hf_add_right hadd, hf_smul_right, hf_smul_right, hwall u' hu', hwx, hwy]
       ring
 
     have hdim : Module.finrank L W' + 2 = Module.finrank L W := by
-      let ψ : W →ₗ[L] L × L :=
-        LinearMap.prod ((hfL q M x).comp W.subtype) ((hfL q M y).comp W.subtype)
+      let ψ : W →ₗ[L] L × L := LinearMap.prod ((hfL q M x).comp W.subtype) ((hfL q M y).comp W.subtype)
       have hψ : ∀ w : W, ψ w = (hf q M w x, hf q M w y) := fun w => rfl
       have hsurj : Function.Surjective ψ := by
         rintro ⟨s, t⟩
@@ -278,9 +312,8 @@ theorem isoPeel_of_valCount (hv : ValCount) : IsoPeel := by
 
   have hval := hv K L hKL n M W hM hW 0 (by rw [zero_pow hq0])
   simp only [if_true] at hval
-  have hT
-      : ({v : Fin n → L | v ∈ W ∧ hf q M v v = 0}.ncard)
-        = (Finset.univ.filter fun v => v ∈ W ∧ hf q M v v = 0).card := by
+  have hT : ({v : Fin n → L | v ∈ W ∧ hf q M v v = 0}.ncard) =
+      (Finset.univ.filter fun v => v ∈ W ∧ hf q M v v = 0).card := by
     rw [← Set.ncard_coe_finset]
     congr 1
     ext v
@@ -297,8 +330,7 @@ theorem isoPeel_of_valCount (hv : ValCount) : IsoPeel := by
   push_cast
   rw [Finset.sum_congr rfl hfib, Finset.sum_const, nsmul_eq_mul]
   have hScast : (S.card : ℤ) = valZ q (Module.finrank L W) - 1 := by
-    have h1
-        : (S.card : ℤ) + 1 = ((Finset.univ.filter fun v => v ∈ W ∧ hf q M v v = 0).card : ℤ) := by
+    have h1 : (S.card : ℤ) + 1 = ((Finset.univ.filter fun v => v ∈ W ∧ hf q M v v = 0).card : ℤ) := by
       exact_mod_cast hcardS
     rw [← hq_def] at hval
     linarith

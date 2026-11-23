@@ -1,11 +1,49 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Definitions.AdelicHermitianForms.AdelicPair
 public import Development.AbelianVarietyTheory.Proofs.AdelicLatticeProofs.CompletelyReducibleKroneckerPowerTransposeStatement
-public import Development.AbelianVarietyTheory.Proofs.AdelicLatticeProofs.LeftTranslateMatrixPolyTensorFormPropertiesStatement
-public import Development.AbelianVarietyTheory.Proofs.AdelicLatticeProofs.LeftTranslateMatrixPolyCompletelyReducibleStatement
 public import Development.AbelianVarietyTheory.Proofs.AdelicLatticeProofs.ExistsReynoldsOfCompletelyReducibleStatement
+public import Development.AbelianVarietyTheory.Proofs.AdelicLatticeProofs.LeftTranslateMatrixPolyCompletelyReducibleStatement
+import Development.AbelianVarietyTheory.Proofs.AdelicLatticeProofs.LeftTranslateMatrixPolyTensorFormPropertiesStatement
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -14,55 +52,37 @@ open scoped Kronecker ComplexOrder TensorProduct
 
 namespace GlobalTheory.ClassFin
 
-theorem invariant_form_eq_sum_invariant_tensors
-    : ∀ (ι : Type) [Fintype ι] [DecidableEq ι] (Γ : Set (Matrix ι ι ℂ)),
-      IsPre Γ → SS Γ
-        → ∀ (n : ℕ) (F : MvPolynomial (ι × ι) ℂ),
-          IsInv Γ F → F.IsHomogeneous n
-            → ∃ l : (Fin n → ι) → (Fin n → ι) → ℂ,
-              (∀ b, ∀ g ∈ Γ, l b ᵥ* tpow n g = l b)
-                ∧ ∀ y : Matrix ι ι ℂ, evC F y = ∑ b, (l b ᵥ* tpow n y) b := by
+theorem invariant_form_eq_sum_invariant_tensors : ∀ (ι : Type) [Fintype ι] [DecidableEq ι] (Γ : Set (Matrix ι ι ℂ)), IsPre Γ → SS Γ → ∀ (n : ℕ) (F : MvPolynomial (ι × ι) ℂ), IsInv Γ F → F.IsHomogeneous n → ∃ l : (Fin n → ι) → (Fin n → ι) → ℂ, (∀ b, ∀ g ∈ Γ, l b ᵥ* tpow n g = l b) ∧ ∀ y : Matrix ι ι ℂ, evC F y = ∑ b, (l b ᵥ* tpow n y) b := by
   intro ι _ _ Γ hP hS n F hF hhom
   obtain ⟨-, hinv, -, hp⟩ := GlobalTheory.T.leftTranslateMatrixPoly_tensorForm_properties ι
   obtain ⟨p, hpev, hpl, hpsurj⟩ := hp n
   obtain ⟨l, hl⟩ := hpsurj F hhom
-  obtain ⟨R₁, h1a, -, -, h1d, -, -⟩ :=
-    GlobalTheory.T.exists_reynolds_of_completelyReducible' ((Fin n → ι) → ℂ)
-      ((fun g => Matrix.toLin' (tpow n g)ᵀ) '' Γ)
-      (by
-        intro U hU
-        obtain ⟨U', hU', hc⟩ :=
-          GlobalTheory.T.completelyReducible_kroneckerPower_transpose ι Γ hP hS n U (by
-            rintro _ ⟨g, hg, rfl⟩ v hv
-            simpa [Matrix.toLin'_apply] using hU _ ⟨g, hg, rfl⟩ v hv)
-        refine ⟨U', ?_, hc⟩
+  obtain ⟨R₁, h1a, -, -, h1d, -, -⟩ := GlobalTheory.T.exists_reynolds_of_completelyReducible' ((Fin n → ι) → ℂ)
+    ((fun g => Matrix.toLin' (tpow n g)ᵀ) '' Γ) (by
+      intro U hU
+      obtain ⟨U', hU', hc⟩ := GlobalTheory.T.completelyReducible_kroneckerPower_transpose ι Γ hP hS n U (by
         rintro _ ⟨g, hg, rfl⟩ v hv
-        simpa [Matrix.toLin'_apply] using hU' _ ⟨g, hg, rfl⟩ v hv)
-  obtain ⟨R₂, -, h2b, h2c, -, -, -⟩ :=
-    GlobalTheory.T.exists_reynolds_of_completelyReducible' (MvPolynomial (ι × ι) ℂ)
-      ((fun g => (ltr g).toLinearMap) '' Γ)
-      (by
-        intro U hU
-        obtain ⟨U', hU', hc⟩ :=
-          GlobalTheory.T.leftTranslateMatrixPoly_completelyReducible ι Γ hP hS U
-            (fun g hg f hf => hU _ ⟨g, hg, rfl⟩ f hf)
-        refine ⟨U', ?_, hc⟩
-        rintro _ ⟨g, hg, rfl⟩ v hv
-        exact hU' g hg v hv)
+        simpa [Matrix.toLin'_apply] using hU _ ⟨g, hg, rfl⟩ v hv)
+      refine ⟨U', ?_, hc⟩
+      rintro _ ⟨g, hg, rfl⟩ v hv
+      simpa [Matrix.toLin'_apply] using hU' _ ⟨g, hg, rfl⟩ v hv)
+  obtain ⟨R₂, -, h2b, h2c, -, -, -⟩ := GlobalTheory.T.exists_reynolds_of_completelyReducible' (MvPolynomial (ι × ι) ℂ)
+    ((fun g => (ltr g).toLinearMap) '' Γ) (by
+      intro U hU
+      obtain ⟨U', hU', hc⟩ := GlobalTheory.T.leftTranslateMatrixPoly_completelyReducible ι Γ hP hS U (fun g hg f hf => hU _ ⟨g, hg, rfl⟩ f hf)
+      refine ⟨U', ?_, hc⟩
+      rintro _ ⟨g, hg, rfl⟩ v hv
+      exact hU' g hg v hv)
   have hfix : ∀ v, ∀ g ∈ Γ, R₁ v ᵥ* tpow n g = R₁ v := by
     intro v g hg
     have := h1a v _ ⟨g, hg, rfl⟩
     simpa [Matrix.toLin'_apply, Matrix.mulVec_transpose] using this
-  have hkill
-      : ∀ b,
-        ∀ x
-            ∈ Submodule.span ℂ
-              {x | ∃ s ∈ ((fun g => Matrix.toLin' (tpow n g)ᵀ) '' Γ), ∃ w, x = s w - w},
-          R₂ (p b x) = 0 := by
+  have hkill : ∀ b, ∀ x ∈ Submodule.span ℂ
+      {x | ∃ s ∈ ((fun g => Matrix.toLin' (tpow n g)ᵀ) '' Γ), ∃ w, x = s w - w}, R₂ (p b x) = 0 := by
     intro b x hx
-    have hle
-        : Submodule.span ℂ {x | ∃ s ∈ ((fun g => Matrix.toLin' (tpow n g)ᵀ) '' Γ), ∃ w, x = s w - w}
-          ≤ LinearMap.ker (R₂ ∘ₗ p b) := by
+    have hle : Submodule.span ℂ
+        {x | ∃ s ∈ ((fun g => Matrix.toLin' (tpow n g)ᵀ) '' Γ), ∃ w, x = s w - w}
+        ≤ LinearMap.ker (R₂ ∘ₗ p b) := by
       rw [Submodule.span_le]
       rintro _ ⟨_, ⟨g, hg, rfl⟩, w, rfl⟩
       have h := h2c (p b w) _ ⟨g, hg, rfl⟩
@@ -83,14 +103,14 @@ theorem invariant_form_eq_sum_invariant_tensors
     rintro _ ⟨g, hg, rfl⟩
     exact (hinv Γ F).1 hF g hg
   have hF' : F = ∑ b, p b (R₁ (l b)) := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← hRF, hl, map_sum]
+
+    rw [← hRF, hl, map_sum]
     exact Finset.sum_congr rfl fun b _ => hb b _
   refine ⟨fun b => R₁ (l b), fun b g hg => hfix _ g hg, fun y => ?_⟩
   rw [hF']
   simp only [← hpev]
   unfold evC
-  set_option synthInstance.maxHeartbeats 100000 in
+
   rw [map_sum]
 
 end GlobalTheory.ClassFin

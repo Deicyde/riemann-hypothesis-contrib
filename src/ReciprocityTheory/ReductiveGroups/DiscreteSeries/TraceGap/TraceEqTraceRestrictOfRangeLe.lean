@@ -1,7 +1,11 @@
 module
 
-public import Mathlib.Analysis.InnerProductSpace.Projection.Basic
 public import Mathlib.LinearAlgebra.Trace
+public import Mathlib.Analysis.Complex.Basic
+public import Mathlib.Analysis.InnerProductSpace.Defs
+public import Mathlib.Analysis.InnerProductSpace.Projection.Basic
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.TypeStar
 
 @[expose] public section
 
@@ -95,9 +99,6 @@ theorem str_eq_str_ker
       simpa using this
     exact Subtype.ext (Submodule.disjoint_def.1 hkr.disjoint _ hv' v.2)
   set e := LinearEquiv.ofInjectiveEndo (Dl.restrict hDV) hinj
-  have hsplit : (Γ ∘ₗ B).restrict hV = Γ.restrict hΓV ∘ₗ B.restrict hBV := by
-    ext v
-    rfl
   have hconj : e.conj ((Γ ∘ₗ B).restrict hV) = -((Γ ∘ₗ B).restrict hV) := by
     ext v
     obtain ⟨w, rfl⟩ : ∃ w, v = e w := ⟨e.symm v, (e.apply_symm_apply v).symm⟩

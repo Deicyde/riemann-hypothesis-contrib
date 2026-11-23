@@ -1,9 +1,55 @@
 module
 
-public import Mathlib
-public import Formalism.DistinguishedUnitIdeals.CoprimeProd
+public import Formalism.DistinguishedUnitIdeals.Statement
 public import Formalism.DistinguishedUnitIdeals.DistinguishedOrderProofs.GroundTheory
 public import Formalism.GaussValuationBounds.GaussValueContraction.PhiIterXProof
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Coalgebra.IsFrobenius
+import Mathlib.RingTheory.HopfAlgebra.Basic
+import Mathlib.RingTheory.PowerSeries.NoZeroDivisors
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+public import Mathlib.LinearAlgebra.FreeModule.PID
 
 @[expose] public section
 
@@ -15,39 +61,36 @@ section Coprime
 
 variable {O : Type} [CommRing O]
 
-theorem coprimeRat_symm {ϖ : O} {p q : PowerSeries O} (h : CoprimeRat ϖ p q)
-    : CoprimeRat ϖ q p := by
+theorem coprimeRat_symm {ϖ : O} {p q : PowerSeries O} (h : CoprimeRat ϖ p q) :
+    CoprimeRat ϖ q p := by
   obtain ⟨N, a, a', h⟩ := h
   exact ⟨N, a', a, by rw [← h]; ring⟩
 
-theorem coprimeRat_mul_left
-    {ϖ : O} {p p' q : PowerSeries O} (h : CoprimeRat ϖ p q) (h' : CoprimeRat ϖ p' q)
-    : CoprimeRat ϖ (p * p') q := by
+theorem coprimeRat_mul_left {ϖ : O} {p p' q : PowerSeries O} (h : CoprimeRat ϖ p q)
+    (h' : CoprimeRat ϖ p' q) : CoprimeRat ϖ (p * p') q := by
   obtain ⟨N, a, a', h⟩ := h
   obtain ⟨M, b, b', h'⟩ := h'
   refine ⟨N + M, a * b, a * p * b' + a' * b * p' + a' * b' * q, ?_⟩
   rw [pow_add, map_mul, ← h, ← h']
   ring
 
-theorem coprimeRat_one_left {ϖ : O} {q : PowerSeries O} : CoprimeRat ϖ 1 q := ⟨0, 1, 0, by simp⟩
+theorem coprimeRat_one_left {ϖ : O} {q : PowerSeries O} : CoprimeRat ϖ 1 q :=
+  ⟨0, 1, 0, by simp⟩
 
-theorem coprimeRat_pow_left {ϖ : O} {p q : PowerSeries O} (h : CoprimeRat ϖ p q) (n : ℕ)
-    : CoprimeRat ϖ (p ^ n) q := by
+theorem coprimeRat_pow_left {ϖ : O} {p q : PowerSeries O} (h : CoprimeRat ϖ p q) (n : ℕ) :
+    CoprimeRat ϖ (p ^ n) q := by
   induction n with
   | zero => simpa using (coprimeRat_one_left (ϖ := ϖ) (q := q))
   | succ n ih => rw [pow_succ]; exact coprimeRat_mul_left ih h
 
-theorem coprimeRat_pow_pow {ϖ : O} {p q : PowerSeries O} (h : CoprimeRat ϖ p q) (m n : ℕ)
-    : CoprimeRat ϖ (p ^ m) (q ^ n) :=
+theorem coprimeRat_pow_pow {ϖ : O} {p q : PowerSeries O} (h : CoprimeRat ϖ p q) (m n : ℕ) :
+    CoprimeRat ϖ (p ^ m) (q ^ n) :=
   coprimeRat_symm (coprimeRat_pow_left (coprimeRat_symm (coprimeRat_pow_left h m)) n)
 
-theorem coprimeRat_prod_left
-    {ϖ : O} {ι : Type} (S : Finset ι) (f : ι → PowerSeries O)
-    {q : PowerSeries O} (h : ∀ s ∈ S, CoprimeRat ϖ (f s) q)
-    : CoprimeRat ϖ (∏ s ∈ S, f s) q :=
-  Finset.prod_induction f
-    (fun x => CoprimeRat ϖ x q)
-    (fun _ _ ha hb => coprimeRat_mul_left ha hb)
+theorem coprimeRat_prod_left {ϖ : O} {ι : Type} (S : Finset ι) (f : ι → PowerSeries O)
+    {q : PowerSeries O} (h : ∀ s ∈ S, CoprimeRat ϖ (f s) q) :
+    CoprimeRat ϖ (∏ s ∈ S, f s) q :=
+  Finset.prod_induction f (fun x => CoprimeRat ϖ x q) (fun _ _ ha hb => coprimeRat_mul_left ha hb)
     coprimeRat_one_left h
 
 end Coprime
@@ -62,11 +105,9 @@ theorem unitDist_ne_zero {ϖ : O} {d : ℕ} {p : PowerSeries O} (h : UnitDist ϖ
   rw [Ne, Polynomial.coe_eq_zero_iff]
   exact hE.monic.ne_zero
 
-theorem mem_of_mul_mem_coprime
-    {ϖ : O} (hϖ : Irreducible ϖ)
-    {d : ℕ} {p P x : PowerSeries O} (hp : UnitDist ϖ d p)
-    (K : ℕ) (hc : CoprimeRat ϖ P (p ^ K)) (h : x * P ∈ Ideal.span {p ^ K})
-    : x ∈ Ideal.span {p ^ K} := by
+theorem mem_of_mul_mem_coprime {ϖ : O} (hϖ : Irreducible ϖ) {d : ℕ} {p P x : PowerSeries O}
+    (hp : UnitDist ϖ d p) (K : ℕ) (hc : CoprimeRat ϖ P (p ^ K))
+    (h : x * P ∈ Ideal.span {p ^ K}) : x ∈ Ideal.span {p ^ K} := by
   obtain ⟨N, a, a', he⟩ := hc
   apply mem_span_pow_of_uniformizer_mul O ϖ hϖ d p hp K N x
   have e : PowerSeries.C (ϖ ^ N) * x = a * (x * P) + (a' * x) * p ^ K := by rw [← he]; ring
@@ -74,20 +115,18 @@ theorem mem_of_mul_mem_coprime
   exact Ideal.add_mem _ (Ideal.mul_mem_left _ _ h)
     (Ideal.mul_mem_left _ _ (Ideal.mem_span_singleton_self _))
 
-theorem mem_span_prod
-    {ϖ : O} (hϖ : Irreducible ϖ)
-    {ℓ ell : ℕ} {p : ℕ → PowerSeries O} (hP : DistinguishedFamily ϖ ℓ ell p)
-    (E : ℕ → ℕ) (f : PowerSeries O) (S : Finset ℕ)
-    : S ⊆ Finset.range ell → (∀ s ∈ S, f ∈ Ideal.span {p s ^ E s})
-      → f ∈ Ideal.span {∏ s ∈ S, p s ^ E s} := by
+theorem mem_span_prod {ϖ : O} (hϖ : Irreducible ϖ) {ℓ ell : ℕ} {p : ℕ → PowerSeries O}
+    (hP : DistinguishedFamily ϖ ℓ ell p) (E : ℕ → ℕ) (f : PowerSeries O) (S : Finset ℕ) :
+    S ⊆ Finset.range ell → (∀ s ∈ S, f ∈ Ideal.span {p s ^ E s}) →
+      f ∈ Ideal.span {∏ s ∈ S, p s ^ E s} := by
   induction S using Finset.induction_on with
   | empty => intro _ _; simp
   | insert t S ht ih =>
     intro hS hf
     have hS' : S ⊆ Finset.range ell := fun x hx => hS (Finset.mem_insert_of_mem hx)
     have ht' : t < ell := Finset.mem_range.mp (hS (Finset.mem_insert_self t S))
-    obtain ⟨w, rfl⟩ :=
-      Ideal.mem_span_singleton'.mp (ih hS' (fun s hs => hf s (Finset.mem_insert_of_mem hs)))
+    obtain ⟨w, rfl⟩ := Ideal.mem_span_singleton'.mp
+      (ih hS' (fun s hs => hf s (Finset.mem_insert_of_mem hs)))
     have hc : CoprimeRat ϖ (∏ s ∈ S, p s ^ E s) (p t ^ E t) := by
       refine coprimeRat_prod_left S _ (fun s hs => ?_)
       have hs' : s < ell := Finset.mem_range.mp (hS' hs)
@@ -104,11 +143,10 @@ section Linear
 
 variable {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
 
-theorem exists_lift_of_dvd
-    {ϖ : O} (hϖ : Irreducible ϖ)
-    {r : ℕ} {V : Submodule O (Fin r → O)} (hV : Saturated ϖ V) (d : Fin r → O)
-    (k : ℕ) (h : ∀ φ : (Fin r → O) →ₗ[O] O, (∀ v ∈ V, φ v = 0) → ϖ ^ k ∣ φ d)
-    : ∃ lam : Fin r → O, d - ϖ ^ k • lam ∈ V := by
+theorem exists_lift_of_dvd {ϖ : O} (hϖ : Irreducible ϖ) {r : ℕ} {V : Submodule O (Fin r → O)}
+    (hV : Saturated ϖ V) (d : Fin r → O) (k : ℕ)
+    (h : ∀ φ : (Fin r → O) →ₗ[O] O, (∀ v ∈ V, φ v = 0) → ϖ ^ k ∣ φ d) :
+    ∃ lam : Fin r → O, d - ϖ ^ k • lam ∈ V := by
   have hpow : ∀ (n : ℕ) (v : Fin r → O), ϖ ^ n • v ∈ V → v ∈ V := by
     intro n
     induction n with
@@ -133,14 +171,14 @@ theorem exists_lift_of_dvd
     rwa [smul_smul, ← mul_assoc, Units.inv_mul, one_mul] at this
   obtain ⟨n, bs⟩ := Module.basisOfFiniteTypeTorsionFree' (R := O) (M := (Fin r → O) ⧸ V)
   have hdiv : ∀ j, ϖ ^ k ∣ bs.repr (V.mkQ d) j := fun j => by
-    have :=
-      h ((bs.coord j).comp V.mkQ) (fun v hv => by simp [(Submodule.Quotient.mk_eq_zero V).mpr hv])
+    have := h ((bs.coord j).comp V.mkQ) (fun v hv => by
+      simp [(Submodule.Quotient.mk_eq_zero V).mpr hv])
     simpa using this
   choose m hm using hdiv
   obtain ⟨lam, hlam⟩ := Submodule.Quotient.mk_surjective V (∑ j, m j • bs j)
   refine ⟨lam, ?_⟩
-  rw [← Submodule.Quotient.mk_eq_zero, Submodule.Quotient.mk_sub, Submodule.Quotient.mk_smul, hlam,
-    sub_eq_zero, Finset.smul_sum]
+  rw [← Submodule.Quotient.mk_eq_zero, Submodule.Quotient.mk_sub, Submodule.Quotient.mk_smul,
+    hlam, sub_eq_zero, Finset.smul_sum]
   have hd := bs.sum_repr (V.mkQ d)
   rw [Submodule.mkQ_apply] at hd
   rw [← hd]
@@ -148,52 +186,42 @@ theorem exists_lift_of_dvd
   rw [Submodule.mkQ_apply] at hm
   rw [hm j, smul_smul]
 
-def extF {r : ℕ} (φ : (Fin r → O) →ₗ[O] O)
-    : (Fin r → PowerSeries O) →ₗ[PowerSeries O] PowerSeries O :=
+def extF {r : ℕ} (φ : (Fin r → O) →ₗ[O] O) :
+    (Fin r → PowerSeries O) →ₗ[PowerSeries O] PowerSeries O :=
   ∑ i, PowerSeries.C (φ (fun j => if i = j then 1 else 0)) • LinearMap.proj i
 
-theorem extF_apply {r : ℕ} (φ : (Fin r → O) →ₗ[O] O) (y : Fin r → PowerSeries O)
-    : extF φ y = ∑ i, PowerSeries.C (φ (fun j => if i = j then 1 else 0)) * y i := by
+theorem extF_apply {r : ℕ} (φ : (Fin r → O) →ₗ[O] O) (y : Fin r → PowerSeries O) :
+    extF φ y = ∑ i, PowerSeries.C (φ (fun j => if i = j then 1 else 0)) * y i := by
   simp [extF]
 
-theorem extF_cst {r : ℕ} (φ : (Fin r → O) →ₗ[O] O) (v : Fin r → O)
-    : extF φ (cst v) = PowerSeries.C (φ v) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [extF_apply, LinearMap.pi_apply_eq_sum_univ φ v, map_sum]
+theorem extF_cst {r : ℕ} (φ : (Fin r → O) →ₗ[O] O) (v : Fin r → O) :
+    extF φ (cst v) = PowerSeries.C (φ v) := by
+
+  rw [extF_apply, LinearMap.pi_apply_eq_sum_univ φ v, map_sum]
   refine Finset.sum_congr rfl (fun i _ => ?_)
   simp [cst, smul_eq_mul, mul_comm]
 
-theorem extF_eq_zero
-    {r : ℕ} (φ : (Fin r → O) →ₗ[O] O)
-    {V : Submodule O (Fin r → O)} (hφ : ∀ v ∈ V, φ v = 0)
-    {c : Fin r → PowerSeries O} (hc : c ∈ ext V)
-    : extF φ c = 0 := by
-  have : ext V ≤ LinearMap.ker (extF φ) :=
-    Submodule.span_le.mpr (by
-      rintro _ ⟨v, hv, rfl⟩
-      simp [extF_cst, hφ v hv])
+theorem extF_eq_zero {r : ℕ} (φ : (Fin r → O) →ₗ[O] O) {V : Submodule O (Fin r → O)}
+    (hφ : ∀ v ∈ V, φ v = 0) {c : Fin r → PowerSeries O} (hc : c ∈ ext V) : extF φ c = 0 := by
+  have : ext V ≤ LinearMap.ker (extF φ) := Submodule.span_le.mpr (by
+    rintro _ ⟨v, hv, rfl⟩
+    simp [extF_cst, hφ v hv])
   exact this hc
 
 end Linear
 
-theorem ext_add_const_mem
-    {O : Type} [CommRing O]
-    {r : ℕ} {V : Submodule O (Fin r → O)} {c : Fin r → PowerSeries O}
-    (a : PowerSeries O)
-    {v : Fin r → O}
-    (hc : c ∈ ext V) (hv : v ∈ V)
-    : c + a • cst v ∈ ext V :=
+theorem ext_add_const_mem {O : Type} [CommRing O] {r : ℕ} {V : Submodule O (Fin r → O)}
+    {c : Fin r → PowerSeries O} (a : PowerSeries O) {v : Fin r → O} (hc : c ∈ ext V)
+    (hv : v ∈ V) : c + a • cst v ∈ ext V :=
   Submodule.add_mem _ hc (Submodule.smul_mem _ a (Submodule.subset_span ⟨v, hv, rfl⟩))
 
 section Levels
 
 variable {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
 
-theorem levelCond_of_C_smul
-    {ϖ : O} {r : ℕ} {q : PowerSeries O} {H bb : ℕ} {kk : Kind}
-    {V : Submodule O (Fin r → O)} {u : Fin r → PowerSeries O}
-    (k : ℕ) (h : LevelCond ϖ q H bb kk V (PowerSeries.C (ϖ ^ k) • u))
-    : LevelCond ϖ q H bb kk V u := by
+theorem levelCond_of_C_smul {ϖ : O} {r : ℕ} {q : PowerSeries O} {H bb : ℕ} {kk : Kind}
+    {V : Submodule O (Fin r → O)} {u : Fin r → PowerSeries O} (k : ℕ)
+    (h : LevelCond ϖ q H bb kk V (PowerSeries.C (ϖ ^ k) • u)) : LevelCond ϖ q H bb kk V u := by
   cases kk with
   | thin =>
     obtain ⟨N, z, hz⟩ := h
@@ -205,11 +233,10 @@ theorem levelCond_of_C_smul
     obtain ⟨N, c, z, hc, hz⟩ := h
     exact ⟨N + k, c, z, hc, by rw [pow_add, map_mul, mul_smul]; exact hz⟩
 
-theorem levelCond_add_const
-    {ϖ : O} {r : ℕ} {q R : PowerSeries O} {H bb : ℕ} {kk : Kind} {V : Submodule O (Fin r → O)}
-    {u : Fin r → PowerSeries O}
-    (v : Fin r → O) (hv : kk ≠ Kind.down ∨ v ∈ V ∨ bb = 0) (h : LevelCond ϖ q H bb kk V u)
-    : LevelCond ϖ q H bb kk V (u + (q ^ H * R) • cst v) := by
+theorem levelCond_add_const {ϖ : O} {r : ℕ} {q R : PowerSeries O} {H bb : ℕ} {kk : Kind}
+    {V : Submodule O (Fin r → O)} {u : Fin r → PowerSeries O} (v : Fin r → O)
+    (hv : kk ≠ Kind.down ∨ v ∈ V ∨ bb = 0)
+    (h : LevelCond ϖ q H bb kk V u) : LevelCond ϖ q H bb kk V (u + (q ^ H * R) • cst v) := by
   cases kk with
   | thin =>
     obtain ⟨N, z, hz⟩ := h
@@ -229,7 +256,8 @@ theorem levelCond_add_const
     obtain ⟨N, c, z, hc, hz⟩ := h
     rcases hv with hv | hv | hv
     · exact absurd rfl hv
-    · refine ⟨N, c + (PowerSeries.C (ϖ ^ N) * R) • cst v, z, ext_add_const_mem _ hc hv, ?_⟩
+    · refine ⟨N, c + (PowerSeries.C (ϖ ^ N) * R) • cst v, z,
+        ext_add_const_mem _ hc hv, ?_⟩
       funext i
       have := congrFun hz i
       simp only [Pi.smul_apply, Pi.add_apply, smul_eq_mul] at this ⊢
@@ -247,14 +275,12 @@ section Model
 
 variable {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
 
-theorem extF_mem_of_levelCond
-    {ϖ : O} (hϖ : Irreducible ϖ)
-    {r : ℕ} (φ : (Fin r → O) →ₗ[O] O)
+theorem extF_mem_of_levelCond {ϖ : O} (hϖ : Irreducible ϖ) {r : ℕ} (φ : (Fin r → O) →ₗ[O] O)
     {q Λ R : PowerSeries O} {H bb dd : ℕ} {kk : Kind} {V : Submodule O (Fin r → O)}
     (hq : UnitDist ϖ dd q) (hΛ : Λ = q ^ H * R) (hkb : kk = Kind.up → bb ≤ H)
     {y : Fin r → PowerSeries O} {d : Fin r → O} {k : ℕ}
-    (h : LevelCond ϖ q H bb kk V (PowerSeries.C (ϖ ^ k) • y - Λ • cst d))
-    : extF φ y ∈ Ideal.span {q ^ (if kk = Kind.up then H - bb else H)} := by
+    (h : LevelCond ϖ q H bb kk V (PowerSeries.C (ϖ ^ k) • y - Λ • cst d)) :
+    extF φ y ∈ Ideal.span {q ^ (if kk = Kind.up then H - bb else H)} := by
   subst hΛ
   cases kk with
   | thin =>
@@ -264,10 +290,8 @@ theorem extF_mem_of_levelCond
     rw [if_neg (by decide)]
     apply mem_span_pow_of_uniformizer_mul O ϖ hϖ dd q hq _ (N + k)
     rw [Ideal.mem_span_singleton]
-    exact ⟨
-      extF φ z + PowerSeries.C (ϖ ^ N) * R * PowerSeries.C (φ d),
-      by rw [pow_add, map_mul]; linear_combination e
-    ⟩
+    exact ⟨extF φ z + PowerSeries.C (ϖ ^ N) * R * PowerSeries.C (φ d), by
+      rw [pow_add, map_mul]; linear_combination e⟩
   | up =>
     obtain ⟨N, c, z, hc, hz⟩ := h
     have e := congrArg (extF φ) hz
@@ -276,12 +300,9 @@ theorem extF_mem_of_levelCond
     have hH : q ^ H = q ^ (H - bb) * q ^ bb := by rw [← pow_add, Nat.sub_add_cancel (hkb rfl)]
     apply mem_span_pow_of_uniformizer_mul O ϖ hϖ dd q hq _ (N + k)
     rw [Ideal.mem_span_singleton]
-    exact ⟨
-      extF φ c + q ^ bb * (extF φ z + PowerSeries.C (ϖ ^ N) * R * PowerSeries.C (φ d)),
-      by
-        rw [pow_add, map_mul]
-        linear_combination e + (extF φ z + PowerSeries.C (ϖ ^ N) * R * PowerSeries.C (φ d)) * hH
-    ⟩
+    exact ⟨extF φ c + q ^ bb * (extF φ z + PowerSeries.C (ϖ ^ N) * R * PowerSeries.C (φ d)), by
+      rw [pow_add, map_mul]
+      linear_combination e + (extF φ z + PowerSeries.C (ϖ ^ N) * R * PowerSeries.C (φ d)) * hH⟩
   | down =>
     obtain ⟨N, c, z, hc, hz⟩ := h
     have e := congrArg (extF φ) hz
@@ -289,45 +310,34 @@ theorem extF_mem_of_levelCond
     rw [if_neg (by decide)]
     apply mem_span_pow_of_uniformizer_mul O ϖ hϖ dd q hq _ (N + k)
     rw [Ideal.mem_span_singleton]
-    exact ⟨
-      extF φ c + q ^ bb * extF φ z + PowerSeries.C (ϖ ^ N) * R * PowerSeries.C (φ d),
-      by rw [pow_add, map_mul]; linear_combination e
-    ⟩
+    exact ⟨extF φ c + q ^ bb * extF φ z + PowerSeries.C (ϖ ^ N) * R * PowerSeries.C (φ d), by
+      rw [pow_add, map_mul]; linear_combination e⟩
 
-theorem down_scalar
-    {ϖ : O} (hϖ : Irreducible ϖ)
-    {ℓ ell r : ℕ} {p : ℕ → PowerSeries O} {H b : ℕ → ℕ} {kind : ℕ → Kind}
-    {V : ℕ → Submodule O (Fin r → O)}
+theorem down_scalar {ϖ : O} (hϖ : Irreducible ϖ) {ℓ ell r : ℕ} {p : ℕ → PowerSeries O}
+    {H b : ℕ → ℕ} {kind : ℕ → Kind} {V : ℕ → Submodule O (Fin r → O)}
     (hP : DistinguishedFamily ϖ ℓ ell p) (hup : ∀ s < ell, kind s = Kind.up → b s ≤ H s)
-    {s₁ : ℕ} (hs₁ : s₁ < ell) (hk₁ : kind s₁ = Kind.down)
-    {y : Fin r → PowerSeries O} (hII : II ϖ p H b kind V ell y)
-    (φ : (Fin r → O) →ₗ[O] O) (hφ : ∀ v ∈ V s₁, φ v = 0)
+    {s₁ : ℕ} (hs₁ : s₁ < ell) (hk₁ : kind s₁ = Kind.down) {y : Fin r → PowerSeries O}
+    (hII : II ϖ p H b kind V ell y) (φ : (Fin r → O) →ₗ[O] O) (hφ : ∀ v ∈ V s₁, φ v = 0)
     (d : Fin r → O) (k : ℕ)
     (h₁ : LevelCond ϖ (p s₁) (H s₁) (b s₁) (kind s₁) (V s₁)
-      (PowerSeries.C (ϖ ^ k) • y - abelian₂ p H ell • cst d))
-    : ∃ w : PowerSeries O,
-      PowerSeries.C (ϖ ^ k) * w
-          - (∏ s ∈ Finset.range ell, p s ^ (if kind s = Kind.up then b s else 0))
-            * PowerSeries.C (φ d)
-        ∈ Ideal.span {p s₁ ^ b s₁} := by
-  have hΛs
-      : ∀ s < ell, abelian₂ p H ell = p s ^ H s * ∏ t ∈ (Finset.range ell).erase s, p t ^ H t :=
+      (PowerSeries.C (ϖ ^ k) • y - abelian₂ p H ell • cst d)) :
+    ∃ w : PowerSeries O, PowerSeries.C (ϖ ^ k) * w -
+      (∏ s ∈ Finset.range ell, p s ^ (if kind s = Kind.up then b s else 0)) *
+        PowerSeries.C (φ d) ∈ Ideal.span {p s₁ ^ b s₁} := by
+  have hΛs : ∀ s < ell, abelian₂ p H ell = p s ^ H s * ∏ t ∈ (Finset.range ell).erase s, p t ^ H t :=
     fun s hs => (Finset.mul_prod_erase _ _ (Finset.mem_range.2 hs)).symm
-  have hmem
-      : ∀ s ∈ Finset.range ell,
-        extF φ y ∈ Ideal.span {p s ^ (fun t => if kind t = Kind.up then H t - b t else H t) s} := by
+  have hmem : ∀ s ∈ Finset.range ell, extF φ y ∈
+      Ideal.span {p s ^ (fun t => if kind t = Kind.up then H t - b t else H t) s} := by
     intro s hs
     obtain ⟨d', k', h'⟩ := hII s (Finset.mem_range.1 hs)
     exact extF_mem_of_levelCond hϖ φ (hP.1 s (Finset.mem_range.1 hs))
       (hΛs s (Finset.mem_range.1 hs)) (hup s (Finset.mem_range.1 hs)) h'
-  obtain ⟨w, hw⟩ :=
-    Ideal.mem_span_singleton'.mp (mem_span_prod hϖ hP _ (extF φ y) (Finset.range ell) subset_rfl
-      hmem)
+  obtain ⟨w, hw⟩ := Ideal.mem_span_singleton'.mp
+    (mem_span_prod hϖ hP _ (extF φ y) (Finset.range ell) subset_rfl hmem)
   refine ⟨w, ?_⟩
-  have hΛ
-      : abelian₂ p H ell
-        = (∏ s ∈ Finset.range ell, p s ^ (if kind s = Kind.up then H s - b s else H s))
-          * ∏ s ∈ Finset.range ell, p s ^ (if kind s = Kind.up then b s else 0) := by
+  have hΛ : abelian₂ p H ell =
+      (∏ s ∈ Finset.range ell, p s ^ (if kind s = Kind.up then H s - b s else H s)) *
+        ∏ s ∈ Finset.range ell, p s ^ (if kind s = Kind.up then b s else 0) := by
     unfold abelian₂
     rw [← Finset.prod_mul_distrib]
     refine Finset.prod_congr rfl (fun s hs => ?_)
@@ -336,74 +346,61 @@ theorem down_scalar
     split_ifs with hk
     · have := hup s (Finset.mem_range.1 hs) hk; omega
     · simp
-  have hPE
-      : (∏ s ∈ Finset.range ell, p s ^ (if kind s = Kind.up then H s - b s else H s))
-        = p s₁ ^ H s₁
-          * ∏ s ∈ (Finset.range ell).erase s₁,
-            p s ^ (if kind s = Kind.up then H s - b s else H s) := by
+  have hPE : (∏ s ∈ Finset.range ell, p s ^ (if kind s = Kind.up then H s - b s else H s)) =
+      p s₁ ^ H s₁ * ∏ s ∈ (Finset.range ell).erase s₁,
+        p s ^ (if kind s = Kind.up then H s - b s else H s) := by
     rw [← Finset.mul_prod_erase _ _ (Finset.mem_range.2 hs₁)]
     simp [hk₁]
   rw [hk₁] at h₁
   obtain ⟨N, c, z, hc, hz⟩ := h₁
   have e := congrArg (extF φ) hz
-  simp only [map_smul, map_sub, map_add (f := _), extF_cst, smul_eq_mul, extF_eq_zero φ hφ hc,
-      mul_zero, zero_add]
-    at e
+  simp only [map_smul, map_sub, map_add (f := _), extF_cst, smul_eq_mul, extF_eq_zero φ hφ hc, mul_zero,
+    zero_add] at e
   rw [← hw, hΛ, hPE] at e
   have hne : p s₁ ^ H s₁ ≠ 0 := pow_ne_zero _ (unitDist_ne_zero (hP.1 s₁ hs₁))
-  have h2
-      : (PowerSeries.C (ϖ ^ N)
-            * (PowerSeries.C (ϖ ^ k) * w
-              - (∏ s ∈ Finset.range ell, p s ^ (if kind s = Kind.up then b s else 0))
-                * PowerSeries.C (φ d)))
-          * (∏ s ∈ (Finset.range ell).erase s₁, p s ^ (if kind s = Kind.up then H s - b s else H s))
-        = p s₁ ^ b s₁ * extF φ z := by
+  have h2 : (PowerSeries.C (ϖ ^ N) * (PowerSeries.C (ϖ ^ k) * w -
+      (∏ s ∈ Finset.range ell, p s ^ (if kind s = Kind.up then b s else 0)) *
+        PowerSeries.C (φ d))) *
+      (∏ s ∈ (Finset.range ell).erase s₁, p s ^ (if kind s = Kind.up then H s - b s else H s)) =
+      p s₁ ^ b s₁ * extF φ z := by
     apply mul_left_cancel₀ hne
     linear_combination e
   have hcop : CoprimeRat ϖ
       (∏ s ∈ (Finset.range ell).erase s₁, p s ^ (if kind s = Kind.up then H s - b s else H s))
       (p s₁ ^ b s₁) := by
     refine coprimeRat_prod_left _ _ (fun s hs => ?_)
-    exact coprimeRat_pow_pow
-      (hP.2 s (Finset.mem_range.1 (Finset.mem_of_mem_erase hs)) s₁ hs₁ (Finset.ne_of_mem_erase hs))
-      _ _
-  have h3 :=
-    mem_of_mul_mem_coprime hϖ (hP.1 s₁ hs₁) (b s₁) hcop
-      (Ideal.mem_span_singleton'.mpr ⟨extF φ z, by rw [h2, mul_comm]⟩)
+    exact coprimeRat_pow_pow (hP.2 s (Finset.mem_range.1 (Finset.mem_of_mem_erase hs)) s₁ hs₁
+      (Finset.ne_of_mem_erase hs)) _ _
+  have h3 := mem_of_mul_mem_coprime hϖ (hP.1 s₁ hs₁) (b s₁) hcop
+    (Ideal.mem_span_singleton'.mpr ⟨extF φ z, by rw [h2, mul_comm]⟩)
   exact mem_span_pow_of_uniformizer_mul O ϖ hϖ _ _ (hP.1 s₁ hs₁) _ N _ h3
 
-theorem forward_of_lift
-    {ϖ : O} {ell r : ℕ} {p : ℕ → PowerSeries O} {H b : ℕ → ℕ} {kind : ℕ → Kind}
-    {V : ℕ → Submodule O (Fin r → O)} {s₁ : ℕ}
-    (hs₁ : s₁ < ell) (hnd : ∀ s < ell, s ≠ s₁ → kind s ≠ Kind.down)
+theorem forward_of_lift {ϖ : O} {ell r : ℕ} {p : ℕ → PowerSeries O}
+    {H b : ℕ → ℕ} {kind : ℕ → Kind} {V : ℕ → Submodule O (Fin r → O)}
+    {s₁ : ℕ} (hs₁ : s₁ < ell) (hnd : ∀ s < ell, s ≠ s₁ → kind s ≠ Kind.down)
     {y : Fin r → PowerSeries O} (hII : II ϖ p H b kind V ell y)
-    (hlift : ∀ (d : Fin r → O) (k : ℕ),
-      LevelCond ϖ (p s₁) (H s₁) (b s₁) (kind s₁) (V s₁)
-          (PowerSeries.C (ϖ ^ k) • y - abelian₂ p H ell • cst d)
-        → b s₁ = 0 ∨ ∃ lam : Fin r → O, d - ϖ ^ k • lam ∈ V s₁)
-    : ∃ (lam : Fin r → O) (ν : Fin r → PowerSeries O),
-      NN ϖ p H b kind V ell ν ∧ y = abelian₂ p H ell • cst lam + ν := by
+    (hlift : ∀ (d : Fin r → O) (k : ℕ), LevelCond ϖ (p s₁) (H s₁) (b s₁) (kind s₁) (V s₁)
+      (PowerSeries.C (ϖ ^ k) • y - abelian₂ p H ell • cst d) →
+        b s₁ = 0 ∨ ∃ lam : Fin r → O, d - ϖ ^ k • lam ∈ V s₁) :
+    ∃ (lam : Fin r → O) (ν : Fin r → PowerSeries O), NN ϖ p H b kind V ell ν ∧
+      y = abelian₂ p H ell • cst lam + ν := by
   obtain ⟨d, k, h₁⟩ := hII s₁ hs₁
   obtain ⟨lam, hlam⟩ : ∃ lam : Fin r → O, b s₁ = 0 ∨ d - ϖ ^ k • lam ∈ V s₁ := by
     rcases hlift d k h₁ with h | ⟨lam, h⟩
     exacts [⟨0, Or.inl h⟩, ⟨lam, Or.inr h⟩]
   refine ⟨lam, y - abelian₂ p H ell • cst lam, ?_, by abel⟩
   intro s hs
-  have key
-      : ∀ (d' : Fin r → O) (k' : ℕ),
-        LevelCond ϖ (p s) (H s) (b s) (kind s) (V s)
-            (PowerSeries.C (ϖ ^ k') • y - abelian₂ p H ell • cst d')
-          → (kind s ≠ Kind.down ∨ d' - ϖ ^ k' • lam ∈ V s ∨ b s = 0)
-          → LevelCond ϖ (p s) (H s) (b s) (kind s) (V s) (y - abelian₂ p H ell • cst lam) := by
+  have key : ∀ (d' : Fin r → O) (k' : ℕ), LevelCond ϖ (p s) (H s) (b s) (kind s) (V s)
+      (PowerSeries.C (ϖ ^ k') • y - abelian₂ p H ell • cst d') →
+      (kind s ≠ Kind.down ∨ d' - ϖ ^ k' • lam ∈ V s ∨ b s = 0) →
+      LevelCond ϖ (p s) (H s) (b s) (kind s) (V s) (y - abelian₂ p H ell • cst lam) := by
     intro d' k' h' hv
     apply levelCond_of_C_smul k'
-    have e
-        : PowerSeries.C (ϖ ^ k') • (y - abelian₂ p H ell • cst lam)
-          = (PowerSeries.C (ϖ ^ k') • y - abelian₂ p H ell • cst d')
-            + (p s ^ H s * ∏ t ∈ (Finset.range ell).erase s, p t ^ H t)
-              • cst (d' - ϖ ^ k' • lam) := by
-      have hL :=
-        Finset.mul_prod_erase (Finset.range ell) (fun t => p t ^ H t) (Finset.mem_range.2 hs)
+    have e : PowerSeries.C (ϖ ^ k') • (y - abelian₂ p H ell • cst lam) =
+        (PowerSeries.C (ϖ ^ k') • y - abelian₂ p H ell • cst d') +
+          (p s ^ H s * ∏ t ∈ (Finset.range ell).erase s, p t ^ H t) • cst (d' - ϖ ^ k' • lam) := by
+      have hL := Finset.mul_prod_erase (Finset.range ell) (fun t => p t ^ H t)
+        (Finset.mem_range.2 hs)
       rw [hL]
       funext i
       simp [cst, Pi.smul_apply, smul_eq_mul, abelian₂]
@@ -416,11 +413,10 @@ theorem forward_of_lift
   · obtain ⟨d', k', h'⟩ := hII s hs
     exact key d' k' h' (Or.inl (hnd s hs hss))
 
-theorem II_of_decomp
-    {ϖ : O} {ell r : ℕ} {p : ℕ → PowerSeries O} {H b : ℕ → ℕ} {kind : ℕ → Kind}
-    {V : ℕ → Submodule O (Fin r → O)}
-    (lam : Fin r → O) (ν : Fin r → PowerSeries O) (hν : NN ϖ p H b kind V ell ν)
-    : II ϖ p H b kind V ell (abelian₂ p H ell • cst lam + ν) := by
+theorem II_of_decomp {ϖ : O} {ell r : ℕ} {p : ℕ → PowerSeries O}
+    {H b : ℕ → ℕ} {kind : ℕ → Kind} {V : ℕ → Submodule O (Fin r → O)}
+    (lam : Fin r → O) (ν : Fin r → PowerSeries O) (hν : NN ϖ p H b kind V ell ν) :
+    II ϖ p H b kind V ell (abelian₂ p H ell • cst lam + ν) := by
   intro s hs
   refine ⟨lam, 0, ?_⟩
   simpa using hν s hs
@@ -431,8 +427,8 @@ section Words
 
 variable {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
 
-theorem sub_unit_X_pow_mem {ϖ : O} {n : ℕ} {p : PowerSeries O} (h : UnitDist ϖ n p)
-    : ∃ v : PowerSeries O, IsUnit v ∧ p - v * PowerSeries.X ^ n ∈ Ideal.span {PowerSeries.C ϖ} := by
+theorem sub_unit_X_pow_mem {ϖ : O} {n : ℕ} {p : PowerSeries O} (h : UnitDist ϖ n p) :
+    ∃ v : PowerSeries O, IsUnit v ∧ p - v * PowerSeries.X ^ n ∈ Ideal.span {PowerSeries.C ϖ} := by
   obtain ⟨u, E, hu, hE, hdeg, rfl⟩ := h
   refine ⟨u, hu, ?_⟩
   have hmap := hE.map_eq_X_pow
@@ -443,28 +439,23 @@ theorem sub_unit_X_pow_mem {ϖ : O} {n : ℕ} {p : PowerSeries O} (h : UnitDist 
       rw [← Ideal.Quotient.eq_zero_iff_mem, ← Polynomial.coeff_map, Polynomial.map_sub, hmap,
         Polynomial.map_pow, Polynomial.map_X, sub_self, Polynomial.coeff_zero]
     rw [Ideal.mem_span_singleton] at hm
-    have e
-        : ((E : PowerSeries O) - PowerSeries.X ^ n)
-          = ((E - Polynomial.X ^ n : Polynomial O) : PowerSeries O) := by
+    have e : ((E : PowerSeries O) - PowerSeries.X ^ n) =
+        ((E - Polynomial.X ^ n : Polynomial O) : PowerSeries O) := by
       push_cast; rfl
     rw [e, Polynomial.coeff_coe]
     exact hm
   rw [Ideal.mem_span_singleton]
   have hd := C_dvd_of_forall_dvd_coeff ϖ _ hc
-  have e2
-      : u * (E : PowerSeries O) - u * PowerSeries.X ^ n
-        = u * ((E : PowerSeries O) - PowerSeries.X ^ n) := by
-    ring
+  have e2 : u * (E : PowerSeries O) - u * PowerSeries.X ^ n =
+      u * ((E : PowerSeries O) - PowerSeries.X ^ n) := by ring
   rw [e2]
   exact Dvd.dvd.mul_left hd u
 
-theorem dvd_of_down_up
-    {ϖ : O} (hϖ : Irreducible ϖ)
-    {ℓ s₀ s₁ b₀ b₁ : ℕ} (h01 : s₀ < s₁) (hb : b₀ < ℓ * b₁)
-    {p₀ p₁ : PowerSeries O} (h₀ : UnitDist ϖ (ℓ ^ s₀) p₀) (h₁ : UnitDist ϖ (ℓ ^ s₁) p₁)
-    (c : O) (k : ℕ) (w : PowerSeries O)
-    (hw : PowerSeries.C (ϖ ^ k) * w - p₀ ^ b₀ * PowerSeries.C c ∈ Ideal.span {p₁ ^ b₁})
-    : ϖ ^ k ∣ c := by
+theorem dvd_of_down_up {ϖ : O} (hϖ : Irreducible ϖ) {ℓ s₀ s₁ b₀ b₁ : ℕ} (h01 : s₀ < s₁)
+    (hb : b₀ < ℓ * b₁) {p₀ p₁ : PowerSeries O} (h₀ : UnitDist ϖ (ℓ ^ s₀) p₀)
+    (h₁ : UnitDist ϖ (ℓ ^ s₁) p₁) (c : O) (k : ℕ) (w : PowerSeries O)
+    (hw : PowerSeries.C (ϖ ^ k) * w - p₀ ^ b₀ * PowerSeries.C c ∈ Ideal.span {p₁ ^ b₁}) :
+    ϖ ^ k ∣ c := by
   by_contra hnd
   have hc0 : c ≠ 0 := by rintro rfl; exact hnd (dvd_zero _)
   obtain ⟨e, u, rfl⟩ := IsDiscreteValuationRing.eq_unit_mul_pow_irreducible hc0 hϖ
@@ -473,10 +464,9 @@ theorem dvd_of_down_up
     replace hle : k ≤ e := by omega
     exact hnd ((pow_dvd_pow ϖ hle).mul_left _)
   obtain ⟨t, rfl⟩ : ∃ t, k = e + (t + 1) := ⟨k - e - 1, by omega⟩
-  have e1
-      : PowerSeries.C (ϖ ^ (e + (t + 1))) * w - p₀ ^ b₀ * PowerSeries.C (↑u * ϖ ^ e)
-        = PowerSeries.C (ϖ ^ e)
-          * (PowerSeries.C (ϖ ^ t) * PowerSeries.C ϖ * w - PowerSeries.C (↑u : O) * p₀ ^ b₀) := by
+  have e1 : PowerSeries.C (ϖ ^ (e + (t + 1))) * w - p₀ ^ b₀ * PowerSeries.C (↑u * ϖ ^ e) =
+      PowerSeries.C (ϖ ^ e) *
+        (PowerSeries.C (ϖ ^ t) * PowerSeries.C ϖ * w - PowerSeries.C (↑u : O) * p₀ ^ b₀) := by
     rw [pow_add, pow_succ, map_mul, map_mul, map_mul]; ring
   rw [e1] at hw
   have h3 := mem_span_pow_of_uniformizer_mul O ϖ hϖ _ p₁ h₁ b₁ e _ hw
@@ -509,12 +499,10 @@ theorem descent_estimate_down : MD := by
     rw [hB, one_mul] at hw
     have hw1 : PowerSeries.C (ϖ ^ k) * w - PowerSeries.C (φ d) ∈ Ideal.span {p s₁} :=
       Ideal.span_singleton_le_span_singleton.mpr (dvd_pow_self _ hb) hw
-    apply pow_dvd_of_const_mem_span O ϖ hϖ (ℓ ^ s₁) (p s₁) (hP.1 s₁ hs₁)
-      (Nat.one_le_pow _ _ (by omega)) (φ d) k 0 w
-    have e
-        : PowerSeries.C (ϖ ^ 0) * (PowerSeries.C (φ d) - PowerSeries.C (ϖ ^ k) * w)
-          = -(PowerSeries.C (ϖ ^ k) * w - PowerSeries.C (φ d)) := by
-      simp
+    apply pow_dvd_of_const_mem_span O ϖ hϖ (ℓ ^ s₁) (p s₁) (hP.1 s₁ hs₁) (Nat.one_le_pow _ _ (by omega))
+      (φ d) k 0 w
+    have e : PowerSeries.C (ϖ ^ 0) * (PowerSeries.C (φ d) - PowerSeries.C (ϖ ^ k) * w) =
+        -(PowerSeries.C (ϖ ^ k) * w - PowerSeries.C (φ d)) := by simp
     rw [e]
     exact Submodule.neg_mem _ hw1
   · rintro ⟨lam, ν, hν, rfl⟩
@@ -533,8 +521,8 @@ theorem descent_estimate_down_up : MDU := by
     right
     refine exists_lift_of_dvd hϖ (hV s₁ hs₁) d k (fun φ hφ => ?_)
     obtain ⟨w, hw⟩ := down_scalar hϖ hP hup hs₁ hk₁ hII φ hφ d k h₁
-    have hB
-        : ∏ s ∈ Finset.range ell, p s ^ (if kind s = Kind.up then b s else 0) = p s₀ ^ b s₀ := by
+    have hB : ∏ s ∈ Finset.range ell, p s ^ (if kind s = Kind.up then b s else 0) =
+        p s₀ ^ b s₀ := by
       rw [Finset.prod_eq_single_of_mem s₀ (Finset.mem_range.2 hs₀) (fun s hs hne => ?_)]
       · rw [if_pos hk₀]
       · have : kind s ≠ Kind.up := by

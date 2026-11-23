@@ -1,6 +1,53 @@
 module
 
+public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.TwistedEisensteinCoset.Development
 public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.TwistedEisensteinCoset.IaDivDown
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+public import Mathlib.Algebra.BigOperators.Field
 
 @[expose] public section
 
@@ -30,56 +77,43 @@ theorem gh_decomp {N : ℕ} (v : Fin N → E) : v = ∑ m : Fin N, v m • eN E 
   funext l
   simp [eN, Finset.sum_apply, Fin.val_inj]
 
-theorem gh_apply {M N : ℕ} (f : (Fin M → E) →ₗ[E] (Fin N → E)) (v : Fin M → E) (l : Fin N)
-    : f v l = ∑ m : Fin M, v m * f (eN E M m.1) l := by
+theorem gh_apply {M N : ℕ} (f : (Fin M → E) →ₗ[E] (Fin N → E)) (v : Fin M → E) (l : Fin N) :
+    f v l = ∑ m : Fin M, v m * f (eN E M m.1) l := by
   conv_lhs => rw [gh_decomp v]
-  set_option synthInstance.maxHeartbeats 100000 in
+
   simp [map_sum, Finset.sum_apply, mul_comm]
 
 theorem gh_atN_add {N : ℕ} (v w : Fin N → E) (i : ℕ) : atN (v + w) i = atN v i + atN w i := by
   unfold atN
   split_ifs <;> simp
 
-theorem gh_chArg_add {n' c' n c : ℕ} (x z : (Fin (n' + c') → E) →ₗ[E] (Fin (n + c) → E))
-    : chArg (n := n) (c := c) (x + z) = chArg (n := n) (c := c) x + chArg (n := n) (c := c) z := by
+theorem gh_chArg_add {n' c' n c : ℕ} (x z : (Fin (n' + c') → E) →ₗ[E] (Fin (n + c) → E)) :
+    chArg (n := n) (c := c) (x + z) = chArg (n := n) (c := c) x + chArg (n := n) (c := c) z := by
   unfold chArg
   simp [LinearMap.add_apply, gh_atN_add, Finset.sum_add_distrib]
 
-theorem unfolding_matrix_free_coordinate
-    {n' c' n c : ℕ} (y : (Fin n' → E) →ₗ[E] (Fin n → E)) (t : FC n' c' n c → E) (p : FC n' c' n c)
-    : xx1 y t (eN E (n' + c') p.1.2.1) p.1.1 = t p := by
+theorem unfolding_matrix_free_coordinate {n' c' n c : ℕ} (y : (Fin n' → E) →ₗ[E] (Fin n → E)) (t : FC n' c' n c → E) (p : FC n' c' n c) :
+    xx1 y t (eN E (n' + c') p.1.2.1) p.1.1 = t p := by
   have he : eN E (n' + c') p.1.2.1 = Pi.single p.1.2 1 := gh_eN_lt p.1.2.2
   rw [he]
   unfold xx1
   rw [Matrix.toLin'_apply, Matrix.mulVec_single_one]
   exact dif_pos p.2
 
-private theorem xx1_eN_apply
-    {n' c' n c : ℕ} (y : (Fin n' → E) →ₗ[E] (Fin n → E)) (t : FC n' c' n c → E)
-    {s : ℕ} (hs : s < n' + c')
-    (l : Fin (n + c))
-    : xx1 y t (eN E (n' + c') s) l
-      = if hf : IsFree n' n c l.1 s then
-          t ⟨(l, ⟨s, hs⟩), hf⟩
-        else if hs' : s < n' then
-          (if hl : l.1 < n then LinearMap.toMatrix' y ⟨l.1, hl⟩ ⟨s, hs'⟩ else 0)
-        else if l.1 = n + (s - n') then
-          1
-        else
-          0 := by
+private theorem xx1_eN_apply {n' c' n c : ℕ} (y : (Fin n' → E) →ₗ[E] (Fin n → E))
+    (t : FC n' c' n c → E) {s : ℕ} (hs : s < n' + c') (l : Fin (n + c)) :
+    xx1 y t (eN E (n' + c') s) l =
+      if hf : IsFree n' n c l.1 s then t ⟨(l, ⟨s, hs⟩), hf⟩
+      else if hs' : s < n' then (if hl : l.1 < n then LinearMap.toMatrix' y ⟨l.1, hl⟩ ⟨s, hs'⟩ else 0)
+      else if l.1 = n + (s - n') then 1 else 0 := by
   rw [gh_eN_lt hs]
   unfold xx1
   rw [Matrix.toLin'_apply, Matrix.mulVec_single_one]
   rfl
 
-theorem unfolding_matrix_sub
-    {n' c' n c : ℕ} (y : (Fin n' → E) →ₗ[E] (Fin n → E)) (t t' : FC n' c' n c → E)
-    (s : ℕ) (l : Fin (n + c))
-    : (xx1 y t - xx1 y t') (eN E (n' + c') s) l
-      = if hs : s < n' + c' then
-          (if hf : IsFree n' n c l.1 s then t ⟨(l, ⟨s, hs⟩), hf⟩ - t' ⟨(l, ⟨s, hs⟩), hf⟩ else 0)
-        else
-          0 := by
+theorem unfolding_matrix_sub {n' c' n c : ℕ} (y : (Fin n' → E) →ₗ[E] (Fin n → E)) (t t' : FC n' c' n c → E) (s : ℕ) (l : Fin (n + c)) :
+    (xx1 y t - xx1 y t') (eN E (n' + c') s) l =
+      if hs : s < n' + c' then (if hf : IsFree n' n c l.1 s then t ⟨(l, ⟨s, hs⟩), hf⟩ - t' ⟨(l, ⟨s, hs⟩), hf⟩ else 0) else 0 := by
   by_cases hs : s < n' + c'
   · rw [dif_pos hs, LinearMap.sub_apply, Pi.sub_apply, xx1_eN_apply y t hs, xx1_eN_apply y t' hs]
     split_ifs <;> first | rfl | exact sub_self _
@@ -108,7 +142,8 @@ theorem character_argument_bounded : ChArgBddP := by
 theorem translated_function_support : GSuppP := by
   intro E K _ _ _ P hp a b mu v sq g₀ h Φ j hΦ hg hh x hx s l
   set y := h.symm.toLinearMap ∘ₗ x ∘ₗ g₀.toLinearMap with hy
-  have hy0 : Φ y ≠ 0 := by intro h0; apply hx; simp only [om]; rw [← hy, h0, mul_zero]
+  have hy0 : Φ y ≠ 0 := by
+    intro h0; apply hx; simp only [om]; rw [← hy, h0, mul_zero]
   have hyI := hΦ y hy0
   set w := y (g₀.symm (eN E a s)) with hw
   have e1 : x (eN E a s) l = h w l := by simp [hw, hy]
@@ -143,10 +178,9 @@ theorem translated_function_invariance : GPerP := by
   rw [gh_apply δ (g₀ (eN E a s)) k, Finset.sum_mul, Finset.sum_div]
   apply ia_sum (P := P)
   intro m _
-  have e3
-      : g₀ (eN E a s) m * δ (eN E a m.1) k * h.symm (eN E b k.1) l / (qOf P : E)
-        = ((qOf P : E) ^ e * g₀ (eN E a s) m) * (δ (eN E a m.1) k / (qOf P : E) ^ (e + 1))
-          * h.symm (eN E b k.1) l := by
+  have e3 : g₀ (eN E a s) m * δ (eN E a m.1) k * h.symm (eN E b k.1) l / (qOf P : E)
+      = ((qOf P : E) ^ e * g₀ (eN E a s) m) * (δ (eN E a m.1) k / (qOf P : E) ^ (e + 1))
+        * h.symm (eN E b k.1) l := by
     field_simp
     ring
   rw [e3]
@@ -157,7 +191,8 @@ theorem unfolding_integrand_good : HGoodP := by
   have hq : (qOf P : E) ≠ 0 := qE_ne (P := P) hp
   refine ⟨?_, ?_⟩
   · intro t ht l
-    have hGne : G (xx1 y t) ≠ 0 := by intro h0; apply ht; simp only [h0, zero_mul]
+    have hGne : G (xx1 y t) ≠ 0 := by
+      intro h0; apply ht; simp only [h0, zero_mul]
     rw [← unfolding_matrix_free_coordinate y t l]
     exact hGs _ hGne _ _
   · intro t δ hδ
@@ -173,27 +208,23 @@ theorem unfolding_integrand_good : HGoodP := by
       · rw [zero_div]; exact ia_zero (P := P)
     have hDint : ∀ (s : ℕ) (l : Fin (n + c)), IntAt P (Dm (eN E (n' + c') s) l) := by
       intro s l
-      have e
-          : Dm (eN E (n' + c') s) l
-            = (qOf P : E) ^ j * (Dm (eN E (n' + c') s) l / (qOf P : E) ^ j) := by
+      have e : Dm (eN E (n' + c') s) l
+          = (qOf P : E) ^ j * (Dm (eN E (n' + c') s) l / (qOf P : E) ^ j) := by
         field_simp
-      rw [e]
-      exact ia_mul (P := P) (ia_qpow (P := P) j) (hD s l)
+      rw [e]; exact ia_mul (P := P) (ia_qpow (P := P) j) (hD s l)
     have hGeq : G (X + Dm) = G X := hGp X Dm hD
     simp only
     rw [hsplit, hGeq]
     by_cases hG : G X = 0
     · rw [hG, zero_mul, zero_mul]
     · have hB : IntAt P (chArg (n := n) (c := c) Dm) := by
-        have :=
-          character_argument_bounded E P n' c' n c 0 Dm
-            (fun s l => by rw [pow_zero, one_mul]; exact hDint s l)
+        have := character_argument_bounded E P n' c' n c 0 Dm (fun s l => by rw [pow_zero, one_mul]; exact hDint s l)
         rwa [pow_zero, one_mul] at this
       have hA : IntAt P ((qOf P : E) ^ j * chArg (n := n) (c := c) X) :=
         character_argument_bounded E P n' c' n c j X (hGs X hG)
-      have hA' : IntAt P ((qOf P : E) ^ D * - chArg (n := n) (c := c) X) :=
+      have hA' : IntAt P ((qOf P : E) ^ D * -chArg (n := n) (c := c) X) :=
         ia_up (P := P) hjD (by rw [mul_neg]; exact ia_neg (P := P) hA)
-      have hB' : IntAt P ((qOf P : E) ^ D * - chArg (n := n) (c := c) Dm) :=
+      have hB' : IntAt P ((qOf P : E) ^ D * -chArg (n := n) (c := c) Dm) :=
         ia_mul (P := P) (ia_qpow (P := P) D) (ia_neg (P := P) hB)
       rw [gh_chArg_add, neg_add, hpsi.1 _ _ hA' hB', hpsi.2.1 _ (ia_neg (P := P) hB), mul_one]
 

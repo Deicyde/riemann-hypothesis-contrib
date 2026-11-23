@@ -2,6 +2,49 @@ module
 
 public import Formalism.SharpRestriction.GenusPolyhedralBounds.RelativeIndexClassSets.PublishedIntClosHolds
 public import Formalism.LocalToGlobal.ProjectiveLattices.OneLtAbsNormReal
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Int
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Lemma
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -13,14 +56,12 @@ namespace Formalism.L2.Pj
 
 section VV
 
-variable
-  {V F : Type}
-  [CommRing V] [IsDomain V] [IsDiscreteValuationRing V] [Field F] [Algebra V F] [IsFractionRing V F]
+variable {V F : Type} [CommRing V] [IsDomain V] [IsDiscreteValuationRing V] [Field F] [Algebra V F]
+  [IsFractionRing V F]
 
-private theorem valV_unit_lemma (u : Vˣ)
-    : IsDedekindDomain.HeightOneSpectrum.valuation F (IsDiscreteValuationRing.maximalIdeal V)
-        (algebraMap V F (u : V))
-      = 1 := by
+private theorem valV_unit_lemma (u : Vˣ) :
+    IsDedekindDomain.HeightOneSpectrum.valuation F (IsDiscreteValuationRing.maximalIdeal V)
+      (algebraMap V F (u : V)) = 1 := by
   rw [IsDedekindDomain.HeightOneSpectrum.valuation_of_algebraMap]
   have hu : (u : V) ∉ (IsDiscreteValuationRing.maximalIdeal V).asIdeal := fun h =>
     (IsLocalRing.mem_maximalIdeal _).mp h u.isUnit
@@ -28,20 +69,16 @@ private theorem valV_unit_lemma (u : Vˣ)
   | exact (IsDedekindDomain.HeightOneSpectrum.intValuation_eq_one_iff _).mpr hu
   | exact IsDedekindDomain.HeightOneSpectrum.intValuation_eq_one_iff.mpr hu
   | exact le_antisymm (IsDedekindDomain.HeightOneSpectrum.intValuation_le_one _ _)
-      (not_lt.mp fun h =>
-        hu ((IsDedekindDomain.HeightOneSpectrum.intValuation_lt_one_iff_mem _ _).mp h))
-  | simpa using hu
+      (not_lt.mp fun h => hu ((IsDedekindDomain.HeightOneSpectrum.intValuation_lt_one_iff_mem _ _).mp h))
 
-private theorem valV_unif_lemma_2 {ϖ : V} (hϖ : Irreducible ϖ)
-    : IsDedekindDomain.HeightOneSpectrum.valuation F (IsDiscreteValuationRing.maximalIdeal V)
-        (algebraMap V F ϖ)
-      = WithZero.exp (-1 : ℤ) := by
+private theorem valV_unif_lemma_2 {ϖ : V} (hϖ : Irreducible ϖ) :
+    IsDedekindDomain.HeightOneSpectrum.valuation F (IsDiscreteValuationRing.maximalIdeal V)
+      (algebraMap V F ϖ) = WithZero.exp (-1 : ℤ) := by
   rw [IsDedekindDomain.HeightOneSpectrum.valuation_of_algebraMap]
   have hspan : (IsDiscreteValuationRing.maximalIdeal V).asIdeal = Ideal.span {ϖ} :=
     (IsDiscreteValuationRing.irreducible_iff_uniformizer ϖ).mp hϖ
   first
   | exact IsDedekindDomain.HeightOneSpectrum.intValuation_singleton _ hϖ.ne_zero hspan
-  | simpa using IsDedekindDomain.HeightOneSpectrum.intValuation_singleton _ hϖ.ne_zero hspan
 
 lemma vV_unit_alg (u : Vˣ) : vV V (algebraMap V F (u : V)) = 0 := by
   unfold vV valV
@@ -53,8 +90,6 @@ lemma vV_pow_gen {x : F} (hx : x ≠ 0) (k : ℕ) : vV V (x ^ k) = k * vV V x :=
   rw [map_pow]
   first
   | rw [WithZero.log_pow, nsmul_eq_mul]; ring
-  | rw [WithZero.log_pow]; ring
-  | simp [WithZero.log_pow]
 
 lemma vV_alg_of_addVal {v : V} {k : ℕ} (hk : IsDiscreteValuationRing.addVal V v = k) :
     vV V (algebraMap V F v) = k := by
@@ -75,13 +110,11 @@ end VV
 
 section Cover
 
-variable
-  {O : Type*} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
-  {A : Type*} [CommRing A] [Algebra O A]
-  {ϖ : O}
+variable {O : Type*} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+  {A : Type*} [CommRing A] [Algebra O A] {ϖ : O}
 
-theorem isLocalization_unif (h : IsUnif A ϖ)
-    : IsLocalization.Away (algebraMap O ↥(As O A) ϖ) A := by
+theorem isLocalization_unif (h : IsUnif A ϖ) :
+    IsLocalization.Away (algebraMap O ↥(As O A) ϖ) A := by
   constructor
   constructor
   · first
@@ -92,19 +125,15 @@ theorem isLocalization_unif (h : IsUnif A ϖ)
     refine ⟨⟨⟨ϖ ^ n • x, hn⟩, ⟨_, n, rfl⟩⟩, ?_⟩
     first
     | simp [Algebra.smul_def, mul_comm]
-    | (
-        show x * (algebraMap O A ϖ) ^ n = ϖ ^ n • x
-        rw [Algebra.smul_def, map_pow, mul_comm]
-      )
+    | (show x * (algebraMap O A ϖ) ^ n = ϖ ^ n • x
+       rw [Algebra.smul_def, map_pow, mul_comm])
   · intro a b hab
     refine ⟨1, ?_⟩
     rw [Subtype.ext hab]
 
-variable
-  (ζ : Pts O A) [IsDVRAt ζ]
-  {V : Type} [CommRing V] [IsDomain V] [IsDiscreteValuationRing V]
-  (F : Type) [Field F] [Algebra V F] [IsFractionRing V F]
-  (ι : Loc ζ →+* V)
+variable (ζ : Pts O A) [IsDVRAt ζ]
+  {V : Type} [CommRing V] [IsDomain V] [IsDiscreteValuationRing V] (F : Type) [Field F] [Algebra V F]
+  [IsFractionRing V F] (ι : Loc ζ →+* V)
 
 def locMap : ↥(As O A) →+* F := (algebraMap V F).comp (ι.comp (algebraMap ↥(As O A) (Loc ζ)))
 
@@ -149,37 +178,29 @@ variable (ζ ι)
 
 def phiAt (h : IsUnif A ϖ) (hι : AddValPres ζ ι) : A →+* F :=
   letI := isLocalization_unif h
-  IsLocalization.Away.lift (algebraMap O ↥(As O A) ϖ) (g := locMap ζ F ι)
-    (IsUnit.mk0 _ (locMap_unif_ne (F := F) h hι))
+  IsLocalization.Away.lift (algebraMap O ↥(As O A) ϖ) (g := locMap ζ F ι) (IsUnit.mk0 _ (locMap_unif_ne (F := F) h hι))
 
 variable {ζ ι}
 
-theorem phiAt_coe (h : IsUnif A ϖ) (hι : AddValPres ζ ι) (a : ↥(As O A))
-    : phiAt ζ F ι h hι (a : A) = locMap ζ F ι a := by
+theorem phiAt_coe (h : IsUnif A ϖ) (hι : AddValPres ζ ι) (a : ↥(As O A)) :
+    phiAt ζ F ι h hι (a : A) = locMap ζ F ι a := by
   letI := isLocalization_unif h
   unfold phiAt
   first
   | exact IsLocalization.lift_eq _ a
-  | exact IsLocalization.Away.lift_eq _ _ a
-  | simp [IsLocalization.Away.lift]
 
-private theorem vV_mul_lemma_4
-    {V₁ F₁ : Type} [CommRing V₁] [IsDomain V₁] [IsDiscreteValuationRing V₁] [Field F₁]
-    [Algebra V₁ F₁] [IsFractionRing V₁ F₁]
-    {x y : F₁} (hx : x ≠ 0) (hy : y ≠ 0)
-    : vV V₁ (x * y) = vV V₁ x + vV V₁ y := by
+private theorem vV_mul_lemma_4 {V₁ F₁ : Type} [CommRing V₁] [IsDomain V₁] [IsDiscreteValuationRing V₁]
+    [Field F₁] [Algebra V₁ F₁] [IsFractionRing V₁ F₁] {x y : F₁} (hx : x ≠ 0) (hy : y ≠ 0) :
+    vV V₁ (x * y) = vV V₁ x + vV V₁ y := by
   unfold vV valV
-  rw [map_mul,
-    WithZero.log_mul ((Valuation.ne_zero_iff _).mpr hx) ((Valuation.ne_zero_iff _).mpr hy)]
+  rw [map_mul, WithZero.log_mul ((Valuation.ne_zero_iff _).mpr hx) ((Valuation.ne_zero_iff _).mpr hy)]
   ring
 
-private theorem toE_ordAt_lemma_3
-    (h : IsUnif A ϖ) (hι : AddValPres ζ ι)
-    (x : A) (m : ℕ) (a : ↥(As O A)) (ha : (a : A) = ϖ ^ m • x)
-    : toE (ordAt ϖ ζ m a) = nval V 1 (phiAt ζ F ι h hι x) := by
+private theorem toE_ordAt_lemma_3 (h : IsUnif A ϖ) (hι : AddValPres ζ ι) (x : A) (m : ℕ) (a : ↥(As O A))
+    (ha : (a : A) = ϖ ^ m • x) :
+    toE (ordAt ϖ ζ m a) = nval V 1 (phiAt ζ F ι h hι x) := by
   have hu : locMap ζ F ι (algebraMap O ↥(As O A) ϖ) ≠ 0 := locMap_unif_ne (F := F) h hι
-  have hkey
-      : locMap ζ F ι (algebraMap O ↥(As O A) ϖ) ^ m * phiAt ζ F ι h hι x = locMap ζ F ι a := by
+  have hkey : locMap ζ F ι (algebraMap O ↥(As O A) ϖ) ^ m * phiAt ζ F ι h hι x = locMap ζ F ι a := by
     rw [← phiAt_coe (F := F) h hι a, ha, Algebra.smul_def, map_mul]
     simp only [map_pow]
     rw [← phiAt_coe (F := F) h hι (algebraMap O ↥(As O A) ϖ)]
@@ -193,7 +214,8 @@ private theorem toE_ordAt_lemma_3
     rw [if_pos h0]
     unfold ordAt
     rw [hT]
-    first | rfl | simp [toE]
+    first
+    | rfl
   · obtain ⟨k, hk⟩ := ENat.ne_top_iff_exists.mp hT
     have hla : locMap ζ F ι a ≠ 0 := locMap_ne_zero (F := F) hι hT
     have hφ : phiAt ζ F ι h hι x ≠ 0 := by
@@ -201,16 +223,12 @@ private theorem toE_ordAt_lemma_3
       apply hla
       rw [← hkey, h0, mul_zero]
     have hϖT : vL ζ (algebraMap O ↥(As O A) ϖ) ≠ ⊤ := fun ht => hu (locMap_eq_zero (F := F) ht)
-    have hvu
-        : vV V (locMap ζ F ι (algebraMap O ↥(As O A) ϖ))
-          = ((vL ζ (algebraMap O ↥(As O A) ϖ)).toNat : ℤ) :=
+    have hvu : vV V (locMap ζ F ι (algebraMap O ↥(As O A) ϖ)) =
+        ((vL ζ (algebraMap O ↥(As O A) ϖ)).toNat : ℤ) :=
       vV_locMap (F := F) hι (ENat.coe_toNat hϖT).symm
     have hva : vV V (locMap ζ F ι a) = k := vV_locMap (F := F) hι hk.symm
-    have hv
-        : (m : ℤ) * ((vL ζ (algebraMap O ↥(As O A) ϖ)).toNat : ℤ) + vV V (phiAt ζ F ι h hι x)
-          = k := by
-      rw [← hva, ← hkey, vV_mul_lemma_4 (V₁ := V) (pow_ne_zero _ hu) hφ, vV_pow_gen (V := V) hu,
-        hvu]
+    have hv : (m : ℤ) * ((vL ζ (algebraMap O ↥(As O A) ϖ)).toNat : ℤ) + vV V (phiAt ζ F ι h hι x) = k := by
+      rw [← hva, ← hkey, vV_mul_lemma_4 (V₁ := V) (pow_ne_zero _ hu) hφ, vV_pow_gen (V := V) hu, hvu]
     have hz : vV V (phiAt ζ F ι h hι x) = (k : ℤ) - m * (ep ϖ ζ : ℤ) := by
       unfold ep
       linarith
@@ -221,15 +239,11 @@ private theorem toE_ordAt_lemma_3
     unfold nval
     rw [if_neg hφ, hord, hz]
     first
-    | (
-        show ((((k : ℤ) - m * (ep ϖ ζ : ℤ) : ℤ) : ℝ) : EReal) = _
-        rw [Nat.cast_one, div_one]
-      )
-    | simp [toE]
-    | rfl
+    | (show ((((k : ℤ) - m * (ep ϖ ζ : ℤ) : ℤ) : ℝ) : EReal) = _
+       rw [Nat.cast_one, div_one])
 
-theorem toE_ord_eq (h : IsUnif A ϖ) (hι : AddValPres ζ ι) (x : A)
-    : toE (ord ϖ ζ x) = nval V 1 (phiAt ζ F ι h hι x) := by
+theorem toE_ord_eq (h : IsUnif A ϖ) (hι : AddValPres ζ ι) (x : A) :
+    toE (ord ϖ ζ x) = nval V 1 (phiAt ζ F ι h hι x) := by
   have hex : ∃ n : ℕ, ϖ ^ n • x ∈ As O A := h.denom x
   unfold ord
   rw [dite_eq_left hex]

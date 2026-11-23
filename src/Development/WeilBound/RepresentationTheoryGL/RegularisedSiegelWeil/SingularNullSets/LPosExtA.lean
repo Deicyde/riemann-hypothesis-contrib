@@ -1,8 +1,11 @@
 module
 
+public import Mathlib.Analysis.Complex.Basic
+public import Mathlib.Topology.ContinuousMap.Star
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
 public import Mathlib.Topology.ContinuousMap.StoneWeierstrass
-public import Mathlib.MeasureTheory.Integral.RieszMarkovKakutani.Real
-public import Mathlib.Topology.Metrizable.Urysohn
+public import Mathlib.Topology.Algebra.StarSubalgebra
+public import Mathlib.Topology.ContinuousMap.Compact
 
 @[expose] public section
 

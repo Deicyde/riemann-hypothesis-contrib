@@ -1,79 +1,88 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Definitions.SemilocalFrames.SelfDualAt
-public import Formalism.LocalToGlobal.HermitianForms.TiedStep
-public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.SplitPlaceLatticeComponentsStatement
 public import Formalism.PeriodIntegrals.OrbitalBoundsConclusion.SplitIntLoc
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Formalism.LocalToGlobal.HermitianForms.IsLocBasis
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.UG Formalism.L2.Forms NumberField IsDedekindDomain Matrix
-  GlobalTheory.St.G
+open Formalism.BasicNotions Formalism.UG Formalism.L2.Forms NumberField IsDedekindDomain Matrix GlobalTheory.St.G
 open scoped TensorProduct
 
 namespace GlobalTheory.St.G
 
-theorem mem_levelVL_of_first_components
-    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [StarRing E] [Algebra F E]
-        (cm : CMData F E) (n : ℕ) (J : Matrix (Fin n) (Fin n) E) (v : HeightOneSpectrum (𝓞 F))
-        (sp : E ⊗[F] v.adicCompletion F ≃+* v.adicCompletion F × v.adicCompletion F),
-      (∀ x, sp (sigR cm.sig (v.adicCompletion F) x) = swapR _ (sp x))
-        → (∀ a : v.adicCompletion F, sp ((1 : E) ⊗ₜ[F] a) = (a, a))
-        → ∀ (L : Submodule (𝓞 E) (Fin n → E)),
-          SelfDualAt cm.sig J v L
-            → ∀ κ ∈ UPts cm.sig J (v.adicCompletion F),
-              (∀ x : Fin n → v.adicCompletion F,
-                  (∃ y ∈ loc v L, ∀ b, (sp (y b)).1 = x b)
-                    ↔ ∃ y ∈ loc v L, ∀ b,
-                      (sp (y b)).1
-                        = ((bc ((RingHom.fst _ _).comp sp.toRingHom) κ
-                            : GL (Fin n) (v.adicCompletion F))
-                          : Matrix (Fin n) (Fin n) (v.adicCompletion F)).mulVec x b)
-                → κ ∈ levelVL cm.sig J v L := by
+theorem mem_levelVL_of_first_components : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [StarRing E] [Algebra F E] (cm : CMData F E) (n : ℕ) (J : Matrix (Fin n) (Fin n) E) (v : HeightOneSpectrum (𝓞 F)) (sp : E ⊗[F] v.adicCompletion F ≃+* v.adicCompletion F × v.adicCompletion F), (∀ x, sp (sigR cm.sig (v.adicCompletion F) x) = swapR _ (sp x)) → (∀ a : v.adicCompletion F, sp ((1 : E) ⊗ₜ[F] a) = (a, a)) → ∀ (L : Submodule (𝓞 E) (Fin n → E)), SelfDualAt cm.sig J v L → ∀ κ ∈ UPts cm.sig J (v.adicCompletion F), (∀ x : Fin n → v.adicCompletion F, (∃ y ∈ loc v L, ∀ b, (sp (y b)).1 = x b) ↔ ∃ y ∈ loc v L, ∀ b, (sp (y b)).1 = ((bc ((RingHom.fst _ _).comp sp.toRingHom) κ : GL (Fin n) (v.adicCompletion F)) : Matrix (Fin n) (Fin n) (v.adicCompletion F)).mulVec x b) → κ ∈ levelVL cm.sig J v L := by
   intro F E _ _ _ _ _ _ cm n J v sp hsig hdiag L hsd κ hκ hfirst
-  have hint
-      : ∀ x,
-        x ∈ intV E v
-          ↔ (sp x).1 ∈ v.adicCompletionIntegers F ∧ (sp x).2 ∈ v.adicCompletionIntegers F :=
+  have hint : ∀ x, x ∈ intV E v ↔
+      (sp x).1 ∈ v.adicCompletionIntegers F ∧ (sp x).2 ∈ v.adicCompletionIntegers F :=
     split_integral_local F E v sp hdiag
 
-  have pair1
-      : ∀ z y : Fin n → E ⊗[F] v.adicCompletion F,
-        (sp (hR cm.sig J (v.adicCompletion F) z y)).1
-          = ∑ i, ∑ j, (sp (z i)).2 * (sp (inclE (F := F) (v.adicCompletion F) (J i j))).1 * (sp (y j)).1 :=
-    by
-      intro z y
-      unfold hR hform
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum, Prod.fst_sum]
-      refine Finset.sum_congr rfl fun i _ => ?_
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum, Prod.fst_sum]
-      refine Finset.sum_congr rfl fun j _ => ?_
-      rw [map_mul, map_mul, hsig]
-      rfl
-  have pair2
-      : ∀ z y : Fin n → E ⊗[F] v.adicCompletion F,
-        (sp (hR cm.sig J (v.adicCompletion F) z y)).2
-          = ∑ i, ∑ j, (sp (z i)).1 * (sp (inclE (F := F) (v.adicCompletion F) (J i j))).2 * (sp (y j)).2 :=
-    by
-      intro z y
-      unfold hR hform
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum, Prod.snd_sum]
-      refine Finset.sum_congr rfl fun i _ => ?_
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum, Prod.snd_sum]
-      refine Finset.sum_congr rfl fun j _ => ?_
-      rw [map_mul, map_mul, hsig]
-      rfl
+  have pair1 : ∀ z y : Fin n → E ⊗[F] v.adicCompletion F, (sp (hR cm.sig J (v.adicCompletion F) z y)).1 =
+      ∑ i, ∑ j, (sp (z i)).2 * (sp (inclE (F := F) (v.adicCompletion F) (J i j))).1 * (sp (y j)).1 := by
+    intro z y
+    unfold hR hform
 
-  have hprod
-      : ∀ y : Fin n → E ⊗[F] v.adicCompletion F,
-        y ∈ loc v L
-          ↔ (∃ y₁ ∈ loc v L, ∀ b, (sp (y₁ b)).1 = (sp (y b)).1)
-            ∧ ∃ y₂ ∈ loc v L, ∀ b, (sp (y₂ b)).2 = (sp (y b)).2 := by
+    rw [map_sum, Prod.fst_sum]
+    refine Finset.sum_congr rfl fun i _ => ?_
+
+    rw [map_sum, Prod.fst_sum]
+    refine Finset.sum_congr rfl fun j _ => ?_
+    rw [map_mul, map_mul, hsig]
+    rfl
+  have pair2 : ∀ z y : Fin n → E ⊗[F] v.adicCompletion F, (sp (hR cm.sig J (v.adicCompletion F) z y)).2 =
+      ∑ i, ∑ j, (sp (z i)).1 * (sp (inclE (F := F) (v.adicCompletion F) (J i j))).2 * (sp (y j)).2 := by
+    intro z y
+    unfold hR hform
+
+    rw [map_sum, Prod.snd_sum]
+    refine Finset.sum_congr rfl fun i _ => ?_
+
+    rw [map_sum, Prod.snd_sum]
+    refine Finset.sum_congr rfl fun j _ => ?_
+    rw [map_mul, map_mul, hsig]
+    rfl
+
+  have hprod : ∀ y : Fin n → E ⊗[F] v.adicCompletion F, y ∈ loc v L ↔
+      (∃ y₁ ∈ loc v L, ∀ b, (sp (y₁ b)).1 = (sp (y b)).1) ∧ ∃ y₂ ∈ loc v L, ∀ b, (sp (y₂ b)).2 = (sp (y b)).2 := by
     intro y
     refine ⟨fun hy => ⟨⟨y, hy, fun _ => rfl⟩, y, hy, fun _ => rfl⟩, ?_⟩
     rintro ⟨⟨y₁, h₁, e₁⟩, y₂, h₂, e₂⟩
@@ -90,8 +99,7 @@ theorem mem_levelVL_of_first_components
       ext
       · simp [e₁ b]
       · simp [e₂ b]
-    rw [hy]
-    exact hm
+    rw [hy]; exact hm
 
   set Kv := v.adicCompletion F with hKv
   set φ1 : E ⊗[F] Kv →+* Kv := (RingHom.fst _ _).comp sp.toRingHom with hφ1
@@ -102,16 +110,12 @@ theorem mem_levelVL_of_first_components
   set K2 : Matrix (Fin n) (Fin n) Kv := (κ : Matrix (Fin n) (Fin n) (E ⊗[F] Kv)).map φ2 with hK2
   set J2 : Matrix (Fin n) (Fin n) Kv := (J.map (inclE (F := F) Kv)).map φ2 with hJ2
 
-  have hU
-      : cT (sigR cm.sig Kv) (κ : Matrix (Fin n) (Fin n) (E ⊗[F] Kv)) * J.map (inclE (F := F) Kv)
-          * (κ : Matrix (Fin n) (Fin n) (E ⊗[F] Kv))
-        = J.map (inclE (F := F) Kv) :=
-    hκ
+  have hU : cT (sigR cm.sig Kv) (κ : Matrix (Fin n) (Fin n) (E ⊗[F] Kv)) * J.map (inclE (F := F) Kv) *
+      (κ : Matrix (Fin n) (Fin n) (E ⊗[F] Kv)) = J.map (inclE (F := F) Kv) := hκ
   have hc : (cT (sigR cm.sig Kv) (κ : Matrix (Fin n) (Fin n) (E ⊗[F] Kv))).map φ2 = K1ᵀ := by
     refine Matrix.ext fun i j => ?_
     show (sp (sigR cm.sig Kv ((κ : Matrix (Fin n) (Fin n) (E ⊗[F] Kv)) j i))).2 = (sp ((κ : Matrix (Fin n) (Fin n) (E ⊗[F] Kv)) j i)).1
-    rw [hsig]
-    rfl
+    rw [hsig]; rfl
   have hU2 : K1ᵀ * J2 * K2 = J2 := by
     have := congrArg (fun M => M.map φ2) hU
     simp only [Matrix.map_mul] at this
@@ -126,20 +130,15 @@ theorem mem_levelVL_of_first_components
     simp only [dotProduct, mulVec, Finset.mul_sum]
     exact Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => by ring
 
-  have hL2
-      : ∀ w : Fin n → Kv,
-        (∃ y ∈ loc v L, ∀ b, (sp (y b)).2 = w b)
-          ↔ ∀ u : Fin n → Kv,
-            (∃ z ∈ loc v L, ∀ b, (sp (z b)).1 = u b)
-              → u ⬝ᵥ (J2 *ᵥ w) ∈ v.adicCompletionIntegers F := by
+  have hL2 : ∀ w : Fin n → Kv, (∃ y ∈ loc v L, ∀ b, (sp (y b)).2 = w b) ↔
+      ∀ u : Fin n → Kv, (∃ z ∈ loc v L, ∀ b, (sp (z b)).1 = u b) → u ⬝ᵥ (J2 *ᵥ w) ∈ v.adicCompletionIntegers F := by
     intro w
     constructor
     · rintro ⟨y, hy, ey⟩ u ⟨z, hz, ez⟩
       have h := ((hint _).1 (((hsd y).1 hy) z hz)).2
       rw [pair2] at h
       simp only [ez, ey] at h
-      rw [← hsum]
-      exact h
+      rw [← hsum]; exact h
     · intro h
       refine ⟨fun b => sp.symm (0, w b), ?_, fun b => by simp⟩
       refine (hsd _).2 fun z hz => (hint _).2 ⟨?_, ?_⟩
@@ -151,10 +150,8 @@ theorem mem_levelVL_of_first_components
         simp only [e]
         exact this
 
-  have hH
-      : ∀ x : Fin n → Kv,
-        (∃ y ∈ loc v L, ∀ b, (sp (y b)).1 = x b) ↔ ∃ y ∈ loc v L, ∀ b, (sp (y b)).1 = (K1 *ᵥ x) b :=
-    hfirst
+  have hH : ∀ x : Fin n → Kv, (∃ y ∈ loc v L, ∀ b, (sp (y b)).1 = x b) ↔
+      ∃ y ∈ loc v L, ∀ b, (sp (y b)).1 = (K1 *ᵥ x) b := hfirst
   have hK1inv : ∀ u : Fin n → Kv, ∃ u', K1 *ᵥ u' = u := by
     intro u
     refine ⟨(((bc φ1 κ)⁻¹ : GL (Fin n) Kv) : Matrix (Fin n) (Fin n) Kv) *ᵥ u, ?_⟩
@@ -163,10 +160,8 @@ theorem mem_levelVL_of_first_components
       have := (bc φ1 κ).mul_inv
       exact this
     rw [this, Matrix.one_mulVec]
-  have hK2
-      : ∀ w : Fin n → Kv,
-        (∃ y ∈ loc v L, ∀ b, (sp (y b)).2 = w b)
-          ↔ ∃ y ∈ loc v L, ∀ b, (sp (y b)).2 = (K2 *ᵥ w) b := by
+  have hK2 : ∀ w : Fin n → Kv, (∃ y ∈ loc v L, ∀ b, (sp (y b)).2 = w b) ↔
+      ∃ y ∈ loc v L, ∀ b, (sp (y b)).2 = (K2 *ᵥ w) b := by
     intro w
     rw [hL2, hL2]
     constructor
@@ -178,21 +173,17 @@ theorem mem_levelVL_of_first_components
       rw [← hQ]
       exact h _ ((hH u).1 hu)
 
-  have hc1
-      : ∀ (x : Fin n → E ⊗[F] Kv) b,
-        (sp (((κ : Matrix (Fin n) (Fin n) (E ⊗[F] Kv)) *ᵥ x) b)).1
-          = (K1 *ᵥ fun j => (sp (x j)).1) b := by
+  have hc1 : ∀ (x : Fin n → E ⊗[F] Kv) b, (sp (((κ : Matrix (Fin n) (Fin n) (E ⊗[F] Kv)) *ᵥ x) b)).1 =
+      (K1 *ᵥ fun j => (sp (x j)).1) b := by
     intro x b
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [mulVec, dotProduct, map_sum, Prod.fst_sum, map_mul, Prod.fst_mul]
+
+    simp only [mulVec, dotProduct, map_sum, Prod.fst_sum, map_mul, Prod.fst_mul]
     rfl
-  have hc2
-      : ∀ (x : Fin n → E ⊗[F] Kv) b,
-        (sp (((κ : Matrix (Fin n) (Fin n) (E ⊗[F] Kv)) *ᵥ x) b)).2
-          = (K2 *ᵥ fun j => (sp (x j)).2) b := by
+  have hc2 : ∀ (x : Fin n → E ⊗[F] Kv) b, (sp (((κ : Matrix (Fin n) (Fin n) (E ⊗[F] Kv)) *ᵥ x) b)).2 =
+      (K2 *ᵥ fun j => (sp (x j)).2) b := by
     intro x b
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [mulVec, dotProduct, map_sum, Prod.snd_sum, map_mul, Prod.snd_mul]
+
+    simp only [mulVec, dotProduct, map_sum, Prod.snd_sum, map_mul, Prod.snd_mul]
     rfl
   show κ ∈ UJ _ _ ⊓ stabGL _
   rw [Subgroup.mem_inf]

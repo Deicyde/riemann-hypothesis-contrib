@@ -1,6 +1,53 @@
 module
 
-public import Mathlib
+public import Mathlib.LinearAlgebra.DFinsupp
+public import Mathlib.LinearAlgebra.FreeModule.Basic
+public import Mathlib.RingTheory.Finiteness.Defs
+public import Mathlib.RingTheory.PowerSeries.Basic
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Lemma
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -23,8 +70,8 @@ lemma coeff_comp {ι : Type} (b : Module.Basis ι O O₁) (j : ι) (f : PowerSer
 lemma decomp {ι : Type} [Fintype ι] (b : Module.Basis ι O O₁) (f : PowerSeries O₁) :
     f = ∑ j, C (b j) * map (algebraMap O O₁) (comp b j f) := by
   ext n
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+
+  rw [map_sum]
   simp only [coeff_C_mul, coeff_map, coeff_comp]
   conv_lhs => rw [← b.sum_repr (coeff n f)]
   refine Finset.sum_congr rfl fun j _ => ?_
@@ -51,20 +98,20 @@ lemma ext_C_mul_map (h : ∀ a : O, io (algebraMap O O₁ a) = i (C a)) (a : O�
   rw [ext_apply]
   simp only [comp_C_mul_map, map_mul, ← h, ← mul_assoc, ← Finset.sum_mul]
   congr 1
-  set_option synthInstance.maxHeartbeats 100000 in
-    conv_rhs => rw [← b.sum_repr a, map_sum]
+
+  conv_rhs => rw [← b.sum_repr a, map_sum]
   refine Finset.sum_congr rfl fun j _ => ?_
   rw [Algebra.smul_def, map_mul, mul_comm]
 
 lemma ext_mul (h : ∀ a : O, io (algebraMap O O₁ a) = i (C a)) (f g : PowerSeries O₁) :
     ext b i io (f * g) = ext b i io f * ext b i io g := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    conv_lhs => rw [decomp b f, decomp b g, Finset.sum_mul_sum, map_sum]
-  set_option synthInstance.maxHeartbeats 100000 in
-    conv_rhs => rw [decomp b f, decomp b g, map_sum, map_sum, Finset.sum_mul_sum]
+
+  conv_lhs => rw [decomp b f, decomp b g, Finset.sum_mul_sum, map_sum]
+
+  conv_rhs => rw [decomp b f, decomp b g, map_sum, map_sum, Finset.sum_mul_sum]
   refine Finset.sum_congr rfl fun j _ => ?_
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+
+  rw [map_sum]
   refine Finset.sum_congr rfl fun k _ => ?_
   have e : C (b j) * map (algebraMap O O₁) (comp b j f) * (C (b k) * map (algebraMap O O₁) (comp b k g))
       = C (b j * b k) * map (algebraMap O O₁) (comp b j f * comp b k g) := by

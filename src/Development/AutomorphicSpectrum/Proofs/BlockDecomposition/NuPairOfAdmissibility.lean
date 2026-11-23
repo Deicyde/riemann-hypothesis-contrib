@@ -1,24 +1,71 @@
 module
 
-public import Mathlib
 public import Development.WeilBound.RepresentationTheoryGL.GenericUnitaryGL.SegmentDerivatives.CuspPairSubGeneric
-public import Development.WeilBound.CoreStatements.TemperedRepresentationTheory.MirabolicDerivatives.LeibnizDerivatives.GenericProdIff
-public import Development.AbelianVarietyTheory.PublishedTheorems.TwistedTraceFormula.GeometricLemmaFiltration
-public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.IrreducibleAdmissibleGL
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.IsSmoothIterPhi
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ContinuousInvAddChar
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ExistsIrrRepInjectiveStatement
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.PairingTwistedDeterminantSubquotientStatement
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.WhitImgMono
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ProductTransposeInverseDualReverse
-public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.JhMultSubAddQuot
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.LocalLanglandsOfIrreducibleAdmissible
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.JacquetMultiplicityOfEquiv
+public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.WhitKerLeComapMap
+public import Development.WeilBound.CoreStatements.TemperedRepresentationTheory.MirabolicDerivatives.ColMatMulGlEmbMat
+public import GroundTheory.LocalFields.PadicLogSeries
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.NontrivialTwJacquetOfSurjective
+import Development.AbelianVarietyTheory.Proofs.SatakeParameters.SmoothContragredientIrreducibleAndReflexive
+import Development.AbelianVarietyTheory.Proofs.SatakeParameters.UnitarisableOfSquareIntegrable
+import Development.AbelianVarietyTheory.Proofs.TwistedOperators.JhMultSubAddQuot
+public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ContinuousInvAddChar
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.DerivativeJacquetTwistedQuotientStatement
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.WhittakerKernelPullbackJacquetStatement
+public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.DualClassTwistNeg
+import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.GelfandKazhdanContragredient
+public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.IsSmoothIterPhi
+public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.JacquetMultiplicityOfEquiv
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.JacquetThetaReverseBlocksStatement
+import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.LocalLanglandsOfIrreducibleAdmissible
+public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.PairingTwistedDeterminantSubquotientStatement
+import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.TransposeInverseInvolutionApply
+public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.WhittakerKernelPullbackJacquetStatement
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.WhittakerTwoBlockInjectiveIrreducibleStatement
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.WhittakerTwoBlockSubquotientTensorStatement
+import Development.AutomorphicSpectrum.Proofs.GlobalProofs.BernsteinZelevinskyFiniteness
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
+public import Development.AbelianVarietyTheory.PublishedTheorems.TwistedTraceFormula.HasFiniteLengthOfIsIrreducible
+import Development.WeilBound.CoreStatements.TemperedRepresentationTheory.MirabolicDerivatives.SegmentCuspLines.ProdIrrFiniteLength
+import Development.WeilBound.CoreStatements.TemperedRepresentationTheory.ZelevinskyJacquet.ZelevinskyCosocles.LUnlinkedComm
 
 @[expose] public section
 
@@ -76,7 +123,6 @@ theorem equiv_of_ker
       rw [← Units.val_mul, mul_inv_cancel, Units.val_one],
     one_smul]
 
-set_option maxHeartbeats 1000000 in
 theorem deriv_equiv
     (ψ : AddChar k Circle)
     (n j : ℕ)
@@ -132,7 +178,6 @@ theorem thetaL_surjective {h : ℕ} (d : Fin h → ℕ) : Function.Surjective (t
     rfl
   exact key _ (Fin.rev_rev a) _
 
-set_option maxHeartbeats 1000000 in
 theorem jm_contra_gen
     (hA : GlobalTheory.Published.IrreducibleAdmissibleGL)
     {h N : ℕ} (u : Fin h → IrrGL (k := k)) (hd : ∑ a, (u a).1 = N)

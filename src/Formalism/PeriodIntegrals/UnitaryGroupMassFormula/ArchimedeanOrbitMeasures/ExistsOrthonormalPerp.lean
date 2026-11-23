@@ -1,10 +1,51 @@
 module
 
-public import Mathlib
 public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.ArchimedeanOrbitMeasures.GoodChartExOfWitt
-public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.ArchimedeanOrbitMeasures.PerpPosV
 public import Formalism.PeriodIntegrals.OrbitalBoundsConclusion.WittExtensionTheorem
 public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.HermitianDiagonalization.ExistsOrthogonalFamily
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Coalgebra.CoassocSimps
+import Mathlib.RingTheory.Coalgebra.IsFrobenius
+import Mathlib.RingTheory.HopfAlgebra.Basic
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -19,8 +60,7 @@ section Lin
 variable {n : ℕ} (ε : Fin n → Bool)
 
 def BJ : (Fin n → ℂ) →ₗ⋆[ℂ] (Fin n → ℂ) →ₗ[ℂ] ℂ :=
-  LinearMap.mk₂'ₛₗ (starRingEnd ℂ) (RingHom.id ℂ)
-    (fun x y => star x ⬝ᵥ (Formalism.REAL.Jm ε *ᵥ y))
+  LinearMap.mk₂'ₛₗ (starRingEnd ℂ) (RingHom.id ℂ) (fun x y => star x ⬝ᵥ (Formalism.REAL.Jm ε *ᵥ y))
     (fun x x' y => by rw [star_add, add_dotProduct])
     (fun c x y => by rw [star_smul, smul_dotProduct]; rfl)
     (fun x y y' => by rw [mulVec_add, dotProduct_add])
@@ -35,7 +75,8 @@ theorem BJ_sum (x y : Fin n → ℂ) : BJ ε x y = ∑ i, star (x i) * (dJ ε i 
   simp only [dotProduct, Formalism.REAL.Jm, mulVec_diagonal, Pi.star_apply]
   rfl
 
-theorem dJ_star (i : Fin n) : star (dJ ε i) = dJ ε i := by unfold dJ; split_ifs <;> simp
+theorem dJ_star (i : Fin n) : star (dJ ε i) = dJ ε i := by
+  unfold dJ; split_ifs <;> simp
 
 theorem dJ_ne (i : Fin n) : dJ ε i ≠ 0 := by
   unfold dJ
@@ -60,8 +101,7 @@ theorem BJ_nondeg (x : Fin n → ℂ) (h : ∀ y, BJ ε x y = 0) : x = 0 := by
   · intro hj
     exact absurd (Finset.mem_univ j) hj
 
-theorem BJ_single (i j : Fin n)
-    : BJ ε (Pi.single i 1) (Pi.single j 1) = Formalism.REAL.Jm ε i j := by
+theorem BJ_single (i j : Fin n) : BJ ε (Pi.single i 1) (Pi.single j 1) = Formalism.REAL.Jm ε i j := by
   rw [BJ_sum]
   by_cases hij : i = j
   · subst hij
@@ -81,11 +121,9 @@ theorem BJ_single (i j : Fin n)
 theorem BJ_self_real (x : Fin n → ℂ) : ((BJ ε x x).re : ℂ) = BJ ε x x := by
   exact Complex.conj_eq_iff_re.mp (BJ_herm ε x x)
 
-theorem exists_orthonormal_perp
-    {m k : ℕ} (hn : n = m + k) (w : Fin m → Fin n → ℂ)
-    (hpos : ∀ z : Fin n → ℂ, z ≠ 0 → (∀ b, BJ ε (w b) z = 0) → 0 < (BJ ε z z).re)
-    : ∃ u : Fin k → Fin n → ℂ,
-      (∀ j b, BJ ε (w b) (u j) = 0) ∧ ∀ i j, BJ ε (u i) (u j) = if i = j then 1 else 0 := by
+theorem exists_orthonormal_perp {m k : ℕ} (hn : n = m + k) (w : Fin m → Fin n → ℂ)
+    (hpos : ∀ z : Fin n → ℂ, z ≠ 0 → (∀ b, BJ ε (w b) z = 0) → 0 < (BJ ε z z).re) :
+    ∃ u : Fin k → Fin n → ℂ, (∀ j b, BJ ε (w b) (u j) = 0) ∧ ∀ i j, BJ ε (u i) (u j) = if i = j then 1 else 0 := by
   classical
   let L : (Fin n → ℂ) →ₗ[ℂ] (Fin m → ℂ) := LinearMap.pi fun b => BJ ε (w b)
   have hW : k ≤ Module.finrank ℂ (LinearMap.ker L) := by
@@ -99,18 +137,12 @@ theorem exists_orthonormal_perp
     have hx := x.2
     rw [LinearMap.mem_ker] at hx
     exact congrFun hx b
-  obtain ⟨v, hvli, hvo⟩ :=
-    PI.UnitaryGroupMassFormula.HermConj.exists_orthogonal_family (starRingEnd ℂ)
-      (Module.finrank ℂ (LinearMap.ker L)) (LinearMap.ker L) rfl
-      (fun x y => BJ ε (x : Fin n → ℂ) (y : Fin n → ℂ))
-      ⟨fun x y z => by simp, fun x a y => by simp, fun x y => by rw [starRingEnd_apply, BJ_herm]⟩
-  refine ⟨
-    fun j =>
-      ((Real.sqrt (BJ ε (v (Fin.castLE hW j)) (v (Fin.castLE hW j))).re)⁻¹ : ℂ)
-        • ((v (Fin.castLE hW j) : LinearMap.ker L) : Fin n → ℂ),
-    ?_,
-    ?_
-  ⟩
+  obtain ⟨v, hvli, hvo⟩ := PI.UnitaryGroupMassFormula.HermConj.exists_orthogonal_family (starRingEnd ℂ)
+    (Module.finrank ℂ (LinearMap.ker L)) (LinearMap.ker L) rfl
+    (fun x y => BJ ε (x : Fin n → ℂ) (y : Fin n → ℂ))
+    ⟨fun x y z => by simp, fun x a y => by simp, fun x y => by rw [starRingEnd_apply, BJ_herm]⟩
+  refine ⟨fun j => ((Real.sqrt (BJ ε (v (Fin.castLE hW j)) (v (Fin.castLE hW j))).re)⁻¹ : ℂ) •
+    ((v (Fin.castLE hW j) : LinearMap.ker L) : Fin n → ℂ), ?_, ?_⟩
   · intro j b
     rw [map_smul, hker, smul_zero]
   · intro i j
@@ -133,27 +165,25 @@ theorem exists_orthonormal_perp
       rw [h0]
       simp
 
-private theorem card_true_ge_lemma
-    {k : ℕ} (u : Fin k → Fin n → ℂ) (huo : ∀ i j, BJ ε (u i) (u j) = if i = j then 1 else 0)
-    (c : Fin k → ℂ) (j : Fin k)
-    : BJ ε (u j) (∑ l, c l • u l) = c j := by
-  set_option synthInstance.maxHeartbeats 100000 in
+private theorem card_true_ge_lemma {k : ℕ} (u : Fin k → Fin n → ℂ)
+    (huo : ∀ i j, BJ ε (u i) (u j) = if i = j then 1 else 0) (c : Fin k → ℂ) (j : Fin k) :
+    BJ ε (u j) (∑ l, c l • u l) = c j := by
+
   simp [map_sum, huo]
 
-private theorem card_true_ge_lemma_2
-    {k : ℕ}
-    (u : Fin k → Fin n → ℂ) (huo : ∀ i j, BJ ε (u i) (u j) = if i = j then 1 else 0) (c : Fin k → ℂ)
-    : BJ ε (∑ l, c l • u l) (∑ l, c l • u l) = ∑ l, star (c l) * c l := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum (BJ ε), LinearMap.sum_apply]
+private theorem card_true_ge_lemma_2 {k : ℕ} (u : Fin k → Fin n → ℂ)
+    (huo : ∀ i j, BJ ε (u i) (u j) = if i = j then 1 else 0) (c : Fin k → ℂ) :
+    BJ ε (∑ l, c l • u l) (∑ l, c l • u l) = ∑ l, star (c l) * c l := by
+
+  rw [map_sum (BJ ε), LinearMap.sum_apply]
   refine Finset.sum_congr rfl fun l _ => ?_
   rw [LinearMap.map_smulₛₗ, LinearMap.smul_apply, card_true_ge_lemma ε u huo c l, smul_eq_mul,
     starRingEnd_apply]
 
+
 open Formalism.L2.SG.HidaSetting Formalism.L2.SG.PoincareInHH.Cut in
-theorem card_true_ge
-    {k : ℕ} (u : Fin k → Fin n → ℂ) (huo : ∀ i j, BJ ε (u i) (u j) = if i = j then 1 else 0)
-    : k ≤ (univ.filter fun i => ε i = true).card := by
+theorem card_true_ge {k : ℕ} (u : Fin k → Fin n → ℂ) (huo : ∀ i j, BJ ε (u i) (u j) = if i = j then 1 else 0) :
+    k ≤ (univ.filter fun i => ε i = true).card := by
   classical
   let A : (Fin k → ℂ) →ₗ[ℂ] (Fin n → ℂ) := ∑ l, (LinearMap.proj l).smulRight (u l)
   have hA : ∀ c, A c = ∑ l, c l • u l := by
@@ -186,29 +216,25 @@ theorem card_true_ge
     have hle : ∑ l, Complex.normSq (c l) ≤ 0 := by
       rw [← Finset.sum_congr rfl fun l _ => h1 l, ← e2]
       exact Finset.sum_nonpos fun i _ => h2 i
-    have hz :=
-      (Finset.sum_eq_zero_iff_of_nonneg fun l _ => Complex.normSq_nonneg (c l)).mp
-        (le_antisymm hle (Finset.sum_nonneg fun l _ => Complex.normSq_nonneg (c l)))
+    have hz := (Finset.sum_eq_zero_iff_of_nonneg fun l _ => Complex.normSq_nonneg (c l)).mp
+      (le_antisymm hle (Finset.sum_nonneg fun l _ => Complex.normSq_nonneg (c l)))
     funext l
     exact Complex.normSq_eq_zero.mp (hz l (Finset.mem_univ l))
   have h3 := LinearMap.finrank_le_finrank_of_injective hinj
   simpa [Module.finrank_fin_fun, Fintype.card_subtype] using h3
 
-theorem BJ_orth_sum
-    {k : ℕ} (u : Fin k → Fin n → ℂ) (huo : ∀ i j, BJ ε (u i) (u j) = if i = j then 1 else 0)
-    (c : Fin k → ℂ) (j : Fin k)
-    : BJ ε (u j) (∑ l, c l • u l) = c j := by
+theorem BJ_orth_sum {k : ℕ} (u : Fin k → Fin n → ℂ) (huo : ∀ i j, BJ ε (u i) (u j) = if i = j then 1 else 0)
+    (c : Fin k → ℂ) (j : Fin k) : BJ ε (u j) (∑ l, c l • u l) = c j := by
   exact card_true_ge_lemma ε u huo c j
 
-private theorem wittLin_holds_lemma
-    {k : ℕ}
-    (a b : Fin k → Fin n → ℂ) (h : ∀ i j, BJ ε (a i) (a j) = BJ ε (b i) (b j)) (c d : Fin k → ℂ)
-    : BJ ε (∑ i, c i • a i) (∑ j, d j • a j) = BJ ε (∑ i, c i • b i) (∑ j, d j • b j) := by
-  set_option synthInstance.maxHeartbeats 100000 in
+private theorem wittLin_holds_lemma {k : ℕ} (a b : Fin k → Fin n → ℂ)
+    (h : ∀ i j, BJ ε (a i) (a j) = BJ ε (b i) (b j)) (c d : Fin k → ℂ) :
+    BJ ε (∑ i, c i • a i) (∑ j, d j • a j) = BJ ε (∑ i, c i • b i) (∑ j, d j • b j) := by
+
   simp only [map_sum, LinearMap.sum_apply, LinearMap.map_smulₛₗ, LinearMap.smul_apply, map_smul, h]
 
-private theorem wittLin_holds_lemma_2 (c : Matrix (Fin n) (Fin n) ℂ) (i j : Fin n)
-    : (cᴴ * Formalism.REAL.Jm ε * c) i j = BJ ε (c *ᵥ Pi.single i 1) (c *ᵥ Pi.single j 1) := by
+private theorem wittLin_holds_lemma_2 (c : Matrix (Fin n) (Fin n) ℂ) (i j : Fin n) :
+    (cᴴ * Formalism.REAL.Jm ε * c) i j = BJ ε (c *ᵥ Pi.single i 1) (c *ᵥ Pi.single j 1) := by
   rw [BJ_apply]
   unfold Formalism.REAL.Jm
   rw [Matrix.mul_apply]
@@ -251,8 +277,8 @@ theorem wittLin_holds : WittLin := by
   have hfx : ∀ x : Submodule.span ℂ (Set.range u), f x = ∑ i, bU.repr x i • Pi.single (s i) 1 := by
     intro x
     conv_lhs => rw [← bU.sum_repr x]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     simp only [map_smul, hfb]
   have hgram : ∀ i j, BJ ε (u i) (u j) = BJ ε (Pi.single (s i) 1) (Pi.single (s j) 1) := by
     intro i j
@@ -274,8 +300,7 @@ theorem wittLin_holds : WittLin := by
       simpa [Finset.sum_apply, Pi.single_apply, hs_inj.eq_iff] using h1
     have h2 : bU.repr x = 0 := Finsupp.ext hr
     simpa using h2
-  obtain ⟨g, hg, hgU⟩ :=
-    witt_extension_theorem ℂ (Fin n → ℂ) (BJ ε) (BJ_herm ε) (BJ_nondeg ε) _ f hfinj hiso
+  obtain ⟨g, hg, hgU⟩ := witt_extension_theorem ℂ (Fin n → ℂ) (BJ ε) (BJ_herm ε) (BJ_nondeg ε) _ f hfinj hiso
   have hgu : ∀ j, g (u j) = Pi.single (s j) 1 := by
     intro j
     have h1 := hgU (bU j)
@@ -304,9 +329,7 @@ theorem wittLin_holds : WittLin := by
     simp only [LinearEquiv.apply_symm_apply] at h1
     exact h1.symm
   refine ⟨S, ⟨cU, hmem⟩, ⟨hScard, hST⟩, ?_⟩
-  have hgw
-      : ∀ b,
-        Formalism.MainNotions.S.uMat (⟨cU, hmem⟩ : Formalism.REAL.UJ ε)⁻¹ *ᵥ w b = g (w b) := by
+  have hgw : ∀ b, Formalism.MainNotions.S.uMat (⟨cU, hmem⟩ : Formalism.REAL.UJ ε)⁻¹ *ᵥ w b = g (w b) := by
     intro b
     show dM *ᵥ w b = g (w b)
     exact LinearMap.toMatrix'_mulVec _ _
@@ -345,9 +368,8 @@ theorem wittLin_holds : WittLin := by
       exact Submodule.smul_mem _ _ (Submodule.subset_span ⟨i, by simpa using hi, rfl⟩)
   · have hl1 : LinearIndependent ℂ (fun b => g (w b)) := hli.map' g.toLinearMap g.ker
     rw [finrank_span_eq_card hl1, Fintype.card_fin]
-    have hset
-        : (fun i : Fin n => (Pi.single i 1 : Fin n → ℂ)) '' (↑S)ᶜ
-          = ↑(Sᶜ.image fun i : Fin n => (Pi.single i 1 : Fin n → ℂ)) := by
+    have hset : (fun i : Fin n => (Pi.single i 1 : Fin n → ℂ)) '' (↑S)ᶜ =
+        ↑(Sᶜ.image fun i : Fin n => (Pi.single i 1 : Fin n → ℂ)) := by
       simp [Finset.coe_image, Finset.coe_compl]
     rw [hset]
     refine (finrank_span_finset_le_card _).trans ?_

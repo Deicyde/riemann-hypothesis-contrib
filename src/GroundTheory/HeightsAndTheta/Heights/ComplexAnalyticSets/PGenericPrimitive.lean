@@ -1,7 +1,54 @@
 module
 
-public import Mathlib
 public import GroundTheory.HeightsAndTheta.Heights.ComplexAnalyticSets.StGenericPrimitive
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
+public import Mathlib.FieldTheory.PrimitiveElement
 
 @[expose] public section
 
@@ -13,25 +60,24 @@ noncomputable section
 
 open MvPolynomial
 
-def linearFormPoly {k : Type*} [Field k] {n : ℕ} (φ : (Fin n → k) →ₗ[k] k)
-    : MvPolynomial (Fin n) k :=
+def linearFormPoly {k : Type*} [Field k] {n : ℕ} (φ : (Fin n → k) →ₗ[k] k) : MvPolynomial (Fin n) k :=
   ∑ j, C (φ (Pi.single j 1)) * X j
 
-theorem eval_linearFormPoly {k : Type*} [Field k] {n : ℕ} (φ : (Fin n → k) →ₗ[k] k) (c : Fin n → k)
-    : eval c (linearFormPoly φ) = φ c := by
+theorem eval_linearFormPoly {k : Type*} [Field k] {n : ℕ} (φ : (Fin n → k) →ₗ[k] k) (c : Fin n → k) :
+    eval c (linearFormPoly φ) = φ c := by
   have hc : c = ∑ j, c j • (Pi.single j 1 : Fin n → k) := by
     ext i; simp [Finset.sum_apply, Pi.single_apply]
   conv_rhs => rw [hc]
-  set_option synthInstance.maxHeartbeats 100000 in
+
   simp [linearFormPoly, map_sum, mul_comm]
 
 theorem GenericPrimitive.proof : GenericPrimitive.Statement := by
   intro k K L _ _ _ _ _ _ _ _ _ n x hx
   have hfin : Finite (IntermediateField K L) :=
-    Field.finite_intermediateField_of_exists_primitive_element K L
-      (Field.exists_primitive_element K L)
+    Field.finite_intermediateField_of_exists_primitive_element K L (Field.exists_primitive_element K L)
   have := Fintype.ofFinite (IntermediateField K L)
   classical
+
   let f : (Fin n → k) →ₗ[k] L := Fintype.linearCombination k x
   have hf : ∀ c, f c = ∑ j, c j • x j := fun c => Fintype.linearCombination_apply k x c
 
@@ -43,12 +89,12 @@ theorem GenericPrimitive.proof : GenericPrimitive.Statement := by
     have hxM : Set.range x ⊆ M := by
       rintro _ ⟨j, rfl⟩
       have hj : (Pi.single j 1 : Fin n → k) ∈ W M := htop ▸ Submodule.mem_top
-      have : f (Pi.single j 1) = x j := by rw [hf]; simp [Pi.single_apply]
+      have : f (Pi.single j 1) = x j := by
+        rw [hf]; simp [Pi.single_apply]
       simpa [W, this] using hj
     exact eq_top_iff.2 (hx ▸ IntermediateField.adjoin_le_iff.2 hxM)
-  have hφ
-      : ∀ M : IntermediateField K L, ∃ φ : (Fin n → k) →ₗ[k] k,
-        M ≠ ⊤ → φ ≠ 0 ∧ W M ≤ LinearMap.ker φ := by
+  have hφ : ∀ M : IntermediateField K L, ∃ φ : (Fin n → k) →ₗ[k] k,
+      M ≠ ⊤ → φ ≠ 0 ∧ W M ≤ LinearMap.ker φ := by
     intro M
     by_cases hM : M = ⊤
     · exact ⟨0, fun h => (h hM).elim⟩
@@ -69,8 +115,7 @@ theorem GenericPrimitive.proof : GenericPrimitive.Statement := by
   · intro c hc
     by_contra hne
     rw [map_prod, Finset.prod_ne_zero_iff] at hc
-    have hmem : IntermediateField.adjoin K {∑ j, c j • x j} ∈ S :=
-      Finset.mem_filter.2 ⟨Finset.mem_univ _, hne⟩
+    have hmem : IntermediateField.adjoin K {∑ j, c j • x j} ∈ S := Finset.mem_filter.2 ⟨Finset.mem_univ _, hne⟩
     apply hc _ hmem
     rw [eval_linearFormPoly]
     apply (hφ _ hne).2

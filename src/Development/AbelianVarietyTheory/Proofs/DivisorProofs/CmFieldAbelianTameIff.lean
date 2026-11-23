@@ -1,29 +1,69 @@
 module
 
-public import Mathlib
+import Development.AbelianVarietyTheory.Proofs.ModuliProofs.CoprimeLevel
 public import Development.AbelianVarietyTheory.BlockTheory.DivisorBase.EigenvectorLieDegree
 public import Development.AbelianVarietyTheory.BlockTheory.DivisorBase.AdelicDegreeTameRamification
+public import Mathlib.Algebra.AffineMonoid.Basic
 public import Development.AbelianVarietyTheory.Definitions.ArchimedeanThetaValues.IsCoprimeTwoSubRtTwoAddRt
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.GroupTheory.Nilpotent
+public import Mathlib.LinearAlgebra.FreeModule.IdealQuotient
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+public import Mathlib.NumberTheory.NumberField.Discriminant.Different
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.KrullDimension.PID
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
 
 @[expose] public section
 
 set_option autoImplicit false
 
-open NumberField IsDedekindDomain ReciprocityTheory.ChartRestriction.G.Geo.Tor
-  GlobalTheory.IndefiniteRowSideFullHecke GlobalTheory.HostModel
+open NumberField IsDedekindDomain ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.IndefiniteRowSideFullHecke GlobalTheory.HostModel
 
 namespace GlobalTheory.HostRamif
 
 variable {E : Type} [Field E] [NumberField E]
 
-theorem intCast_mem_iff
-    {l : ℕ} (hl : l.Prime) {w : Ideal (𝓞 E)} (hw : w.IsMaximal) (hlw : (l : 𝓞 E) ∈ w) (n : ℤ)
-    : (n : 𝓞 E) ∈ w ↔ (l : ℤ) ∣ n := by
+theorem intCast_mem_iff {l : ℕ} (hl : l.Prime) {w : Ideal (𝓞 E)} (hw : w.IsMaximal) (hlw : (l : 𝓞 E) ∈ w) (n : ℤ) :
+    (n : 𝓞 E) ∈ w ↔ (l : ℤ) ∣ n := by
   constructor
   · intro hn
     by_contra hnd
-    have hc : IsCoprime (l : ℤ) n :=
-      ((Nat.prime_iff_prime_int.mp hl).irreducible.coprime_iff_not_dvd).2 hnd
+    have hc : IsCoprime (l : ℤ) n := ((Nat.prime_iff_prime_int.mp hl).irreducible.coprime_iff_not_dvd).2 hnd
     obtain ⟨a, b, hab⟩ := hc
     apply hw.ne_top
     rw [Ideal.eq_top_iff_one]
@@ -37,9 +77,8 @@ theorem intCast_mem_iff
     push_cast
     exact w.mul_mem_right _ hlw
 
-theorem dvd_different_iff
-    [IsGalois ℚ E] {l : ℕ} (hl : l.Prime) {w : Ideal (𝓞 E)} (hw : w.IsMaximal) (hlw : (l : 𝓞 E) ∈ w)
-    : w ∣ differentIdeal ℤ (𝓞 E) ↔ (l : ℤ) ∣ discr E := by
+theorem dvd_different_iff [IsGalois ℚ E] {l : ℕ} (hl : l.Prime) {w : Ideal (𝓞 E)} (hw : w.IsMaximal)
+    (hlw : (l : 𝓞 E) ∈ w) : w ∣ differentIdeal ℤ (𝓞 E) ↔ (l : ℤ) ∣ discr E := by
   have hp : Prime (l : ℤ) := Nat.prime_iff_prime_int.mp hl
   have hwp := hw.isPrime
   haveI : w.LiesOver (Ideal.span {(l : ℤ)}) := (Ideal.liesOver_span_iff hw.ne_top hp).mpr (by simpa using hlw)
@@ -52,37 +91,13 @@ theorem dvd_different_iff
 
 variable [IsCMField E]
 
-theorem exists_coords (H : Host E) {a : 𝓞 E} (ha : a ∈ Algebra.adjoin ℤ {H.w0})
-    : ∃ x y : ℤ, a = x + y * H.w0 := by
-  obtain ⟨k, hk⟩ : ∃ k : ℕ, H.d = 4 * k + 3 := ⟨H.d / 4, by have := H.d_mod; omega⟩
-  have hsq : H.w0 ^ 2 = H.w0 - (k + 1) := by
-    have h := H.rt_sq
-    rw [rt_eq, hk] at h
-    push_cast at h
-    apply mul_left_cancel₀ (show (4 : 𝓞 E) ≠ 0 by norm_num)
-    linear_combination h
-  induction ha using Algebra.adjoin_induction with
-  | mem x hx => exact ⟨0, 1, by rw [Set.mem_singleton_iff.mp hx]; simp⟩
-  | algebraMap r => exact ⟨r, 0, by simp⟩
-  | add a b _ _ ha hb =>
-    obtain ⟨x, y, rfl⟩ := ha
-    obtain ⟨x', y', rfl⟩ := hb
-    exact ⟨x + x', y + y', by push_cast; ring⟩
-  | mul a b _ _ ha hb =>
-    obtain ⟨x, y, rfl⟩ := ha
-    obtain ⟨x', y', rfl⟩ := hb
-    exact ⟨
-      x * x' - y * y' * (k + 1),
-      x * y' + y * x' + y * y',
-      by push_cast; linear_combination (y : 𝓞 E) * y' * hsq
-    ⟩
+theorem exists_coords (H : Host E) {a : 𝓞 E} (ha : a ∈ Algebra.adjoin ℤ {H.w0}) :
+    ∃ x y : ℤ, a = x + y * H.w0 := by
+  apply GlobalTheory.Models.exists_eq_of_mem_adjoin_quadratic_generator <;> assumption
 
-theorem isSquare_iff
-    (H : Host E)
-    {l : ℕ} (hl : l.Prime)
-    {w : Ideal (𝓞 E)} (hw : w.IsMaximal) (hlw : (l : 𝓞 E) ∈ w)
-    (hd : l ≠ H.d)
-    : IsSquare (-(H.d : ZMod l)) ↔ ∃ a ∈ Algebra.adjoin ℤ {H.w0}, a ∈ w ∧ H.bar a ∉ w := by
+theorem isSquare_iff (H : Host E) {l : ℕ} (hl : l.Prime) {w : Ideal (𝓞 E)} (hw : w.IsMaximal)
+    (hlw : (l : 𝓞 E) ∈ w) (hd : l ≠ H.d) :
+    IsSquare (-(H.d : ZMod l)) ↔ ∃ a ∈ Algebra.adjoin ℤ {H.w0}, a ∈ w ∧ H.bar a ∉ w := by
   have hwp := hw.isPrime
   haveI := Fact.mk hl
   have h1 : (1 : 𝓞 E) ∉ w := fun h => hw.ne_top ((Ideal.eq_top_iff_one _).2 h)
@@ -108,8 +123,7 @@ theorem isSquare_iff
     · generalize (-(H.d : ZMod 2)) = z
       revert z
       decide
-  · have hl2 : ¬ (l : ℤ) ∣ 2 := fun h =>
-      h2 ((Nat.prime_dvd_prime_iff_eq hl Nat.prime_two).1 (by exact_mod_cast h))
+  · have hl2 : ¬ (l : ℤ) ∣ 2 := fun h => h2 ((Nat.prime_dvd_prime_iff_eq hl Nat.prime_two).1 (by exact_mod_cast h))
     have hp : Prime (l : ℤ) := Nat.prime_iff_prime_int.mp hl
     constructor
     · rintro ⟨s, hs⟩
@@ -125,7 +139,7 @@ theorem isSquare_iff
           linear_combination -H.rt_sq
         rw [e]
         exact neg_mem this
-      have hnb : ¬(H.rt - s ∈ w ∧ -H.rt - s ∈ w) := by
+      have hnb : ¬ (H.rt - s ∈ w ∧ -H.rt - s ∈ w) := by
         rintro ⟨ha, hb⟩
         have : ((2 * s : ℤ) : 𝓞 E) ∈ w := by
           have e : ((2 * s : ℤ) : 𝓞 E) = -((H.rt - s) + (-H.rt - s)) := by push_cast; ring
@@ -155,9 +169,8 @@ theorem isSquare_iff
         exact add_mem haw (w.mul_mem_right _ hyw)
       have hn : (l : ℤ) ∣ (2 * x + y) ^ 2 + H.d * y ^ 2 := by
         rw [← intCast_mem_iff hl hw hlw]
-        have e
-            : (((2 * x + y) ^ 2 + H.d * y ^ 2 : ℤ) : 𝓞 E)
-              = (x + y * H.w0) * (4 * (x + y * (1 - H.w0))) := by
+        have e : (((2 * x + y) ^ 2 + H.d * y ^ 2 : ℤ) : 𝓞 E) =
+            (x + y * H.w0) * (4 * (x + y * (1 - H.w0))) := by
           have h := H.rt_sq
           rw [rt_eq] at h
           push_cast
@@ -170,10 +183,8 @@ theorem isSquare_iff
       field_simp
       linear_combination -hn
 
-theorem isHostField_iff
-    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E),
-      EigenvectorLieDegree.IsHostField H
-        ↔ IsAbelianGalois ℚ E ∧ AdelicDegreeTameRamification.TameAtRamified H := by
+theorem isHostField_iff : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E),
+    EigenvectorLieDegree.IsHostField H ↔ IsAbelianGalois ℚ E ∧ AdelicDegreeTameRamification.TameAtRamified H := by
   intro E _ _ _ H
   unfold EigenvectorLieDegree.IsHostField AdelicDegreeTameRamification.TameAtRamified
   refine and_congr_right fun hab => ⟨fun h l w hl hld hw hlw => ?_, fun h w hwd => ?_⟩

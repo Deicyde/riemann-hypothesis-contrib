@@ -1,34 +1,49 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.Statements.CuspFrameWeights.DiscreteSpectrumKFiniteDecomposition
 public import Development.AbelianVarietyTheory.PublishedTheorems.AutomorphicForms₂.HarishChandraFinite
 public import Development.AbelianVarietyTheory.PublishedTheorems.AutomorphicForms₂.ExistsNormLeHeightPow
 public import Development.AbelianVarietyTheory.PublishedTheorems.AutomorphicForms₂.DiscreteSeriesUpqUniqueOfClassification
-public import Formalism.UnipotentAdelicQuotients.SiegelWeilUnitaryConvergent
-public import Formalism.PeriodIntegrals.BesselMapUniq
-public import Formalism.SharpRestriction.GlobalSchurBounds.ThickPlacesCorollaryOfAnyTranslate
-public import Development.AbelianVarietyTheory.Definitions.Foundations.CdScaleTieIff
-public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.ThetaChr
 public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.UpLReStage
 public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.NotLv3MvFixH
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsSpectralObjectsOverReplacedStagesStatement
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsColsTiedSym
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.RangeEEAndNorm
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsSStageTrue
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.GapHypOfNodes
-public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.SameDegreeZeroFormsSelf
-public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.ExistsGlobalSetting
-public import Development.AbelianVarietyTheory.Definitions.SemilocalFrames.LevelMatchIff
-public import Formalism.LocalToGlobal.SiegelLatticeTheory.HaarTransversals.UnitaryHaarProducts.InstExists
-public import Formalism.LocalToGlobal.SiegelLatticeTheory.FlagStabilizerTensors.RootLatticeThresholds.LocalAdditiveCharContinuous
-public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.RowDictGoodOpNonempty
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsDiscreteSeriesFormalDegreeProductStatement
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.TrueScaleIsScale
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.VolumesEqMassesOfUnfold
-public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.UnitaryHyperplaneVolumeRatioSiegelWeil
 public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.StarCoeffOfEqReverse
 public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.LabelEqOfMemSuppSpan
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsColsTiedSym
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsDiscreteSeriesFormalDegreeProductStatement
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsSpectralObjectsOverReplacedStagesStatement
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.RangeEEAndNorm
+import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.TrueScaleIsScale
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
 
 @[expose] public section
 
@@ -50,7 +65,6 @@ def RowHyp {D : D7} (p : RowPk D) : Prop :=
     ∧ LinearMap.range p.eE = (p.R.EEat (p.R.levR p.F true)).comap p.R.HE.e
     ∧ (∀ x, ‖p.eE x‖ ^ 2 = RealDat.nP p.F true * ‖x‖ ^ 2) ∧ DallTie p.R p.F
 
-set_option maxHeartbeats 4000000 in
 theorem rowHyp_read
     {D : D7} {G : Type} [Group G] [Fintype G]
     {Pl0 I0 T : Type} {A3 : FamIn3 D.what₂.LL G Pl0 I0 (List ℕ) T D.R.m} {Ks : Type}
@@ -75,7 +89,6 @@ theorem rowHyp_read
 
 variable {K : Ctx} {B : Base} {f : Fr B.toPre} {T : TwDat B} {w : ColW B f T}
 
-set_option maxHeartbeats 4000000 in
 theorem rowHyp_pkOf
     {Z : w.Lt} {Wt : Set B.places.Pl} {p0 : BaseLevelRowSide (w.D Z)} (r : RowsT K w Z Wt p0)
     : RowHyp (pkOf r) := (by
@@ -96,7 +109,6 @@ def SatNew : Prop :=
             (F₁ : ∀ u, Forms0 (reL a ⟨Zs, N, hh⟩).D u),
           SameL a ⟨Zs, N, hh⟩ F0 F₁ → Nonempty (SAtL a ⟨Zs, N, hh⟩ p.R p.F p.eE F₁)
 
-set_option maxHeartbeats 4000000 in
 theorem satOfDiscreteSeries
     (h1 : GlobalTheory.Dec.DSInfChar) (h2 : GlobalTheory.Published.HarishChandraFinite)
     (h3 : GlobalTheory.Published.CuspRapidDecay)
@@ -105,7 +117,6 @@ theorem satOfDiscreteSeries
   GlobalTheory.T.exists_spectralObjects_over_replacedStages h1 h2 h3 h4 h5 B C a p.G' p.Pl0 p.T p.A
     p.Ks p.R p.F F0 p.eE P g i l r d a1 a2 a3 e a4 a5 a6 a7
 
-set_option maxHeartbeats 8000000 in
 theorem sat_col
     (a : w.Lt) (col : ColT w a) (p : RowPk (Late.D a)) (Zs : SNew (Late.D a))
     (H : ∀ (N : ∀ u, Submodule (𝓞 (Late.D a).what₂.LL) ((Late.D a).div.Nu u).V)
@@ -137,7 +148,6 @@ def PackEx : Prop :=
     GapHyp D → Formalism.L2.SG.Pf.LocCP.LocTied D
       → ∃ P : SPack D F, Integrable P.X.ph (Formalism.L2.SG.ProjRows.muInf P.X.B.I)
 
-set_option maxHeartbeats 4000000 in
 theorem real_of
     (hR : RealOf)
     (a : w.Lt) (g : GIs2 K w a.G) (hs : a.S.s.cdScale = Vol.trueScale a.G.cd)

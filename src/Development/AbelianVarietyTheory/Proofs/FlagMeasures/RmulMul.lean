@@ -1,14 +1,55 @@
 module
 
-public import Mathlib
-public import Formalism.SharpRestriction.CuspSpanNormBounds.FractionFieldToGenericStalkAlgebraMapEq
-public import Development.AbelianVarietyTheory.Definitions.Foundations.IsHermND
 public import Development.AbelianVarietyTheory.Definitions.SemilocalFrames.ComplementReferenceCompactSubgroup
 public import Development.AbelianVarietyTheory.Definitions.SemilocalFrames.HermLat
-public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.IsPrincipalIdealRingOfHenselian
-public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.HermitianDoubleCosetFrameClassProperties
 public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.EncardUniCosetsLe
+public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.HermitianDoubleCosetFrameClassProperties
+import Development.AbelianVarietyTheory.Proofs.FlagMeasures.IsPrincipalIdealRingOfHenselian
 public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.LeadingMinorsProdDenominatorUnitriangularFactorsStatement
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.Order.CompletePartialOrder
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -21,8 +62,8 @@ variable {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F]
 variable {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E]
 
 omit [TopologicalSpace E] in
-theorem uni_mul {N : ℕ} {A B : Matrix (Fin N) (Fin N) E} (hA : IsUni A) (hB : IsUni B)
-    : IsUni (A * B) := by
+theorem uni_mul {N : ℕ} {A B : Matrix (Fin N) (Fin N) E} (hA : IsUni A) (hB : IsUni B) :
+    IsUni (A * B) := by
   refine ⟨fun i j hij => ?_, fun i => ?_⟩
   · rw [Matrix.mul_apply]
     refine Finset.sum_eq_zero fun l _ => ?_
@@ -37,22 +78,21 @@ theorem uni_mul {N : ℕ} {A B : Matrix (Fin N) (Fin N) E} (hA : IsUni A) (hB : 
       · rw [hB.1 l i h, mul_zero]
     · simp
 
-theorem int_mul
-    (L : LocE F E) {N : ℕ} {A B : Matrix (Fin N) (Fin N) E} (hA : IsIntM L A) (hB : IsIntM L B)
-    : IsIntM L (A * B) := fun i j => by
+theorem int_mul (L : LocE F E) {N : ℕ} {A B : Matrix (Fin N) (Fin N) E} (hA : IsIntM L A)
+    (hB : IsIntM L B) : IsIntM L (A * B) := fun i j => by
   rw [Matrix.mul_apply]
   exact L.O.sum_mem fun l _ => L.O.mul_mem (hA i l) (hB l j)
 
-theorem det_mem (L : LocE F E) {N : ℕ} {A : Matrix (Fin N) (Fin N) E} (hA : IsIntM L A)
-    : A.det ∈ L.O := by
+theorem det_mem (L : LocE F E) {N : ℕ} {A : Matrix (Fin N) (Fin N) E} (hA : IsIntM L A) :
+    A.det ∈ L.O := by
   rw [Matrix.det_apply']
   exact L.O.sum_mem fun σ _ => L.O.mul_mem (intCast_mem _ _) (L.O.prod_mem fun i _ => hA _ _)
 
-theorem exists_inv
-    (L : LocE F E) {N : ℕ} {A : Matrix (Fin N) (Fin N) E} (hA : IsUni A) (hI : IsIntM L A)
-    : ∃ B, IsUni B ∧ IsIntM L B ∧ A * B = 1 ∧ B * A = 1 := by
+theorem exists_inv (L : LocE F E) {N : ℕ} {A : Matrix (Fin N) (Fin N) E} (hA : IsUni A)
+    (hI : IsIntM L A) : ∃ B, IsUni B ∧ IsIntM L B ∧ A * B = 1 ∧ B * A = 1 := by
   have ht : A.BlockTriangular id := fun i j h => hA.1 i j h
-  have hd : A.det = 1 := by rw [Matrix.det_of_upperTriangular ht]; simp [hA.2]
+  have hd : A.det = 1 := by
+    rw [Matrix.det_of_upperTriangular ht]; simp [hA.2]
   have hu : IsUnit A.det := by rw [hd]; exact isUnit_one
   letI := A.invertibleOfIsUnitDet hu
   have hti : A⁻¹.BlockTriangular id := Matrix.blockTriangular_inv_of_blockTriangular ht
@@ -76,13 +116,11 @@ theorem exists_inv
       · exact L.O.zero_mem
     · exact hI a b
 
-theorem exists_reps
-    (L : LocE F E) (t : E) (m : ℕ)
-    (hm : m ≠ 0) (hc : Nat.card (L.O ⧸ Ideal.span {y : L.O | (y : E) = t}) = m)
-    (N : ℕ)
-    : ∃ R : Set (Matrix (Fin N) (Fin N) E),
-      R.encard ≤ ((m ^ (N * (N - 1) / 2) : ℕ) : ℕ∞) ∧ (∀ B ∈ R, IsUni B ∧ IsIntM L B)
-        ∧ ∀ B, IsUni B → IsIntM L B → ∃ B₀ ∈ R, ∀ i j, ∃ c ∈ L.O, B i j - B₀ i j = t * c := by
+theorem exists_reps (L : LocE F E) (t : E) (m : ℕ) (hm : m ≠ 0)
+    (hc : Nat.card (L.O ⧸ Ideal.span {y : L.O | (y : E) = t}) = m) (N : ℕ) :
+    ∃ R : Set (Matrix (Fin N) (Fin N) E), R.encard ≤ ((m ^ (N * (N - 1) / 2) : ℕ) : ℕ∞) ∧
+      (∀ B ∈ R, IsUni B ∧ IsIntM L B) ∧
+      ∀ B, IsUni B → IsIntM L B → ∃ B₀ ∈ R, ∀ i j, ∃ c ∈ L.O, B i j - B₀ i j = t * c := by
   set I : Ideal L.O := Ideal.span {y : L.O | (y : E) = t} with hI
   haveI : Finite (L.O ⧸ I) := Nat.finite_of_card_ne_zero (by rw [hc]; exact hm)
   have hmem : ∀ y ∈ I, ∃ c ∈ L.O, (y : E) = t * c := by
@@ -98,12 +136,7 @@ theorem exists_reps
       obtain ⟨c, hc, e⟩ := hx
       exact ⟨a * c, L.O.mul_mem a.2 hc, by rw [smul_eq_mul]; push_cast; rw [e]; ring⟩
   let lift : ((j : Fin N) → Fin j → L.O ⧸ I) → Matrix (Fin N) (Fin N) E := fun x i j =>
-    if h : i < j then
-      ((x j ⟨i, h⟩).out : L.O)
-    else if i = j then
-      1
-    else
-      0
+    if h : i < j then ((x j ⟨i, h⟩).out : L.O) else if i = j then 1 else 0
   refine ⟨Set.range lift, ?_, ?_, ?_⟩
   · rw [← Set.image_univ]
     refine (Set.encard_image_le _ _).trans (le_of_eq ?_)
@@ -123,8 +156,8 @@ theorem exists_reps
       · exact L.O.one_mem
       · exact L.O.zero_mem
   · intro B hB hBI
-    refine
-      ⟨_, ⟨fun j i => Ideal.Quotient.mk I ⟨B ⟨i, i.2.trans j.2⟩ j, hBI _ _⟩, rfl⟩, fun i j => ?_⟩
+    refine ⟨_, ⟨fun j i => Ideal.Quotient.mk I ⟨B ⟨i, i.2.trans j.2⟩ j, hBI _ _⟩, rfl⟩,
+      fun i j => ?_⟩
     simp only [lift]
     split_ifs with h1 h2
     · have h3 : (⟨B i j, hBI i j⟩ : L.O) - (Ideal.Quotient.mk I ⟨B i j, hBI i j⟩).out ∈ I := by
@@ -136,19 +169,17 @@ theorem exists_reps
     · exact ⟨0, L.O.zero_mem, by rw [hB.1 i j (lt_of_le_of_ne (not_lt.1 h1) (Ne.symm h2))]; simp⟩
 
 omit [TopologicalSpace E] in
-theorem rmul_mul {n N : ℕ} (x : Fin N → Fin n → E) (A B : Matrix (Fin N) (Fin N) E) (j : Fin N)
-    : ∑ i, (A * B) i j • x i = ∑ l, B l j • ∑ i, A i l • x i := by
+theorem rmul_mul {n N : ℕ} (x : Fin N → Fin n → E) (A B : Matrix (Fin N) (Fin N) E) (j : Fin N) :
+    ∑ i, (A * B) i j • x i = ∑ l, B l j • ∑ i, A i l • x i := by
   simp only [Matrix.mul_apply, Finset.sum_smul, Finset.smul_sum, smul_smul]
   rw [Finset.sum_comm]
   simp only [mul_comm]
 
-theorem pairing
-    (L : LocE F E)
-    {r k : ℕ} (S : Frames L r k) (u u' : Matrix (Fin (r + 1)) (Fin (r + 1)) E) (a b : Fin (r + 1))
-    : (cT L u * S.Zh * u') a b = S.h (∑ i, u' i b • S.f' i) (∑ i, u i a • S.f i) := by
-  have h1
-      : ∀ (y : S.V) (c : Fin (r + 1) → E) (x : Fin (r + 1) → S.V),
-        S.h (∑ i, c i • x i) y = ∑ i, c i * S.h (x i) y := by
+theorem pairing (L : LocE F E) {r k : ℕ} (S : Frames L r k)
+    (u u' : Matrix (Fin (r + 1)) (Fin (r + 1)) E) (a b : Fin (r + 1)) :
+    (cT L u * S.Zh * u') a b = S.h (∑ i, u' i b • S.f' i) (∑ i, u i a • S.f i) := by
+  have h1 : ∀ (y : S.V) (c : Fin (r + 1) → E) (x : Fin (r + 1) → S.V),
+      S.h (∑ i, c i • x i) y = ∑ i, c i * S.h (x i) y := by
     intro y c x
     simp only [Frames.h, hf, Finset.sum_apply, Pi.smul_apply, smul_eq_mul, Finset.sum_mul,
       Finset.mul_sum]
@@ -156,13 +187,12 @@ theorem pairing
     refine Finset.sum_congr rfl fun i _ => ?_
     conv_rhs => rw [Finset.sum_comm]
     simp only [mul_assoc]
-  have h2
-      : ∀ (y : S.V) (c : Fin (r + 1) → E) (x : Fin (r + 1) → S.V),
-        S.h y (∑ i, c i • x i) = ∑ i, L.cj (c i) * S.h y (x i) := by
+  have h2 : ∀ (y : S.V) (c : Fin (r + 1) → E) (x : Fin (r + 1) → S.V),
+      S.h y (∑ i, c i • x i) = ∑ i, L.cj (c i) * S.h y (x i) := by
     intro y c x
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [Frames.h, hf, Finset.sum_apply, Pi.smul_apply, smul_eq_mul, map_sum, map_mul,
-        Finset.mul_sum]
+
+    simp only [Frames.h, hf, Finset.sum_apply, Pi.smul_apply, smul_eq_mul, map_sum, map_mul,
+    Finset.mul_sum]
     conv_rhs => rw [Finset.sum_comm]
     refine Finset.sum_congr rfl fun i _ => ?_
     conv_rhs => rw [Finset.sum_comm]
@@ -174,19 +204,15 @@ theorem pairing
 def coset (L : LocE F E) {N : ℕ} (u : Matrix (Fin N) (Fin N) E) : Set (Matrix (Fin N) (Fin N) E) :=
   {v | ∃ A, IsUni A ∧ IsIntM L A ∧ v = u * A}
 
-theorem exists_section (L : LocE F E) (N : ℕ)
-    : ∃ s : Set (Matrix (Fin N) (Fin N) E) → Matrix (Fin N) (Fin N) E, ∀ u, ∃ A,
-      IsUni A ∧ IsIntM L A ∧ u = s (coset L u) * A := by
+theorem exists_section (L : LocE F E) (N : ℕ) :
+    ∃ s : Set (Matrix (Fin N) (Fin N) E) → Matrix (Fin N) (Fin N) E,
+      ∀ u, ∃ A, IsUni A ∧ IsIntM L A ∧ u = s (coset L u) * A := by
   refine ⟨fun C => if h : ∃ u, C = coset L u then h.choose else 0, fun u => ?_⟩
   have h : ∃ v, coset L u = coset L v := ⟨u, rfl⟩
   simp only [dif_pos h]
   have h1 : u ∈ coset L u := by
-    refine ⟨
-      1,
-      ⟨fun i j hij => Matrix.one_apply_ne (ne_of_gt hij), fun i => Matrix.one_apply_eq i⟩,
-      fun i j => ?_,
-      (mul_one u).symm
-    ⟩
+    refine ⟨1, ⟨fun i j hij => Matrix.one_apply_ne (ne_of_gt hij), fun i => Matrix.one_apply_eq i⟩,
+      fun i j => ?_, (mul_one u).symm⟩
     rw [Matrix.one_apply]
     split_ifs
     · exact L.O.one_mem

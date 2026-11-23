@@ -1,8 +1,71 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.Definitions.SpanningFamilies.IsHeatZero
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.SquareIntegrability.GCauchyStatement
+import Development.AbelianVarietyTheory.Proofs.CuspFormEvaluations.ExistsIsotropicGroupLatticeClassRepresentatives
+public import Mathlib.Algebra.Module.Projective
+public import Mathlib.Data.Nat.Prime.Defs
+public import Mathlib.GroupTheory.Index
+public import Mathlib.LinearAlgebra.Dimension.Finrank
+public import Mathlib.LinearAlgebra.TensorProduct.Defs
+public import Mathlib.RingTheory.Finiteness.Defs
+public import Mathlib.RingTheory.Ideal.Maximal
+public import Mathlib.RingTheory.Ideal.Quotient.Defs
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.LinearAlgebra.Matrix.FiniteDimensional
+public import Mathlib.LinearAlgebra.Projectivization.Cardinality
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Coalgebra.IsFrobenius
+import Mathlib.RingTheory.Etale.Weakly
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.HopfAlgebra.Basic
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.TotallySplit
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
+public import Mathlib.Algebra.Module.FinitePresentation
+public import Mathlib.FieldTheory.Finiteness
+public import Mathlib.GroupTheory.SpecificGroups.Cyclic.Subgroup
+public import Mathlib.LinearAlgebra.Dimension.Localization
+public import Mathlib.LinearAlgebra.Dual.Lemmas
+public import Mathlib.LinearAlgebra.Projectivization.Basic
+public import Mathlib.RingTheory.Localization.AtPrime.Basic
+public import Mathlib.RingTheory.Spectrum.Prime.FreeLocus
 
 @[expose] public section
 
@@ -12,11 +75,9 @@ namespace GlobalTheory.SW.Hyper
 
 variable {O M : Type} [CommRing O] [AddCommGroup M] [Module O M]
 
-theorem exists_fun
-    (P : Ideal O) [hP : P.IsMaximal]
-    (N : Submodule O M) (v : M)
-    (hv : v ∉ N) (hPv : ∀ c ∈ P, c • v ∈ N) (hc : ∀ x, ∃ r : O, x - r • v ∈ N)
-    : ∃ f : M →ₗ[O] O ⧸ P, f ≠ 0 ∧ LinearMap.ker f = N := by
+theorem exists_fun (P : Ideal O) [hP : P.IsMaximal] (N : Submodule O M) (v : M) (hv : v ∉ N)
+    (hPv : ∀ c ∈ P, c • v ∈ N) (hc : ∀ x, ∃ r : O, x - r • v ∈ N) :
+    ∃ f : M →ₗ[O] O ⧸ P, f ≠ 0 ∧ LinearMap.ker f = N := by
   classical
   let g : O →ₗ[O] M ⧸ N := LinearMap.toSpanSingleton O (M ⧸ N) (N.mkQ v)
   have hker : LinearMap.ker g = P := by
@@ -47,12 +108,11 @@ theorem exists_fun
     apply hv
     have h1 : (e.symm.toLinearMap ∘ₗ N.mkQ) v = 0 := by rw [h0]; rfl
     simpa only [LinearMap.comp_apply, LinearEquiv.coe_coe, LinearEquiv.map_eq_zero_iff,
-        Submodule.mkQ_apply, Submodule.Quotient.mk_eq_zero]
-      using h1
+      Submodule.mkQ_apply, Submodule.Quotient.mk_eq_zero] using h1
   · rw [LinearEquiv.ker_comp, Submodule.ker_mkQ]
 
-theorem surj_of_ne (P : Ideal O) [hP : P.IsMaximal] (f : M →ₗ[O] O ⧸ P) (hf : f ≠ 0)
-    : ∃ v, f v = 1 := by
+theorem surj_of_ne (P : Ideal O) [hP : P.IsMaximal] (f : M →ₗ[O] O ⧸ P) (hf : f ≠ 0) :
+    ∃ v, f v = 1 := by
   obtain ⟨w, hw⟩ : ∃ w, f w ≠ 0 := by
     by_contra h
     push Not at h
@@ -62,8 +122,8 @@ theorem surj_of_ne (P : Ideal O) [hP : P.IsMaximal] (f : M →ₗ[O] O ⧸ P) (h
   refine ⟨c • w, ?_⟩
   rw [map_smul, Algebra.smul_def, Ideal.Quotient.algebraMap_eq, mul_comm, hb]
 
-theorem index_ker (P : Ideal O) [hP : P.IsMaximal] (f : M →ₗ[O] O ⧸ P) (hf : f ≠ 0)
-    : (LinearMap.ker f).toAddSubgroup.index = Nat.card (O ⧸ P) := by
+theorem index_ker (P : Ideal O) [hP : P.IsMaximal] (f : M →ₗ[O] O ⧸ P) (hf : f ≠ 0) :
+    (LinearMap.ker f).toAddSubgroup.index = Nat.card (O ⧸ P) := by
   obtain ⟨v, hv⟩ := surj_of_ne P f hf
   have hs : Function.Surjective f := by
     intro y
@@ -74,11 +134,12 @@ theorem index_ker (P : Ideal O) [hP : P.IsMaximal] (f : M →ₗ[O] O ⧸ P) (hf
   rw [AddMonoidHom.range_eq_top.mpr hs, AddSubgroup.card_top] at h
   exact h
 
-theorem cyc_of_prime (N : Submodule O M) {q : ℕ} (hq : q.Prime) (h : N.toAddSubgroup.index = q)
-    : ∃ v, v ∉ N ∧ ∀ x, ∃ r : O, x - r • v ∈ N := by
+theorem cyc_of_prime (N : Submodule O M) {q : ℕ} (hq : q.Prime)
+    (h : N.toAddSubgroup.index = q) : ∃ v, v ∉ N ∧ ∀ x, ∃ r : O, x - r • v ∈ N := by
   classical
   have : Fact q.Prime := ⟨hq⟩
-  have hcard : Nat.card (M ⧸ N.toAddSubgroup) = q := by rw [← AddSubgroup.index_eq_card]; exact h
+  have hcard : Nat.card (M ⧸ N.toAddSubgroup) = q := by
+    rw [← AddSubgroup.index_eq_card]; exact h
   have hne : N.toAddSubgroup ≠ ⊤ := by
     intro ht
     rw [ht, AddSubgroup.index_top] at h
@@ -90,10 +151,8 @@ theorem cyc_of_prime (N : Submodule O M) {q : ℕ} (hq : q.Prime) (h : N.toAddSu
   refine ⟨v, hv, fun x => ?_⟩
   have hv0 : (QuotientAddGroup.mk v : M ⧸ N.toAddSubgroup) ≠ 0 := by
     rw [Ne, QuotientAddGroup.eq_zero_iff]; exact hv
-  have hx
-      : (QuotientAddGroup.mk x : M ⧸ N.toAddSubgroup)
-        ∈ AddSubgroup.zmultiples (QuotientAddGroup.mk v) :=
-    mem_zmultiples_of_prime_card hcard hv0
+  have hx : (QuotientAddGroup.mk x : M ⧸ N.toAddSubgroup) ∈
+      AddSubgroup.zmultiples (QuotientAddGroup.mk v) := mem_zmultiples_of_prime_card hcard hv0
   obtain ⟨n, hn⟩ := AddSubgroup.mem_zmultiples_iff.mp hx
   refine ⟨(n : O), ?_⟩
   rw [Int.cast_smul_eq_zsmul]
@@ -103,35 +162,18 @@ theorem cyc_of_prime (N : Submodule O M) {q : ℕ} (hq : q.Prime) (h : N.toAddSu
   rw [sub_eq_neg_add]
   exact h2
 
-theorem finrank_fibre
-    (O M k : Type) [CommRing O] [IsDomain O] [AddCommGroup M] [Module O M] [Module.Finite O M]
-    [Module.Projective O M] [Field k] [Algebra O k]
-    : Module.finrank k (k ⊗[O] M) = Module.finrank O M := by
-  have : Module.FinitePresentation O M := Module.finitePresentation_of_projective O M
-  have hlc := Module.isLocallyConstant_rankAtStalk (R := O) (M := M)
-  let q0 : PrimeSpectrum k := ⟨⊥, Ideal.isPrime_bot⟩
-  let p0 : PrimeSpectrum O := ⟨⊥, Ideal.isPrime_bot⟩
-  have h1 : Module.finrank k (k ⊗[O] M) = Module.rankAtStalk (R := k) (k ⊗[O] M) q0 := by
-    rw [Module.rankAtStalk_eq_finrank_of_free]; rfl
-  have hp : p0.asIdeal.primeCompl ≤ nonZeroDivisors O := by
-    intro x hx
-    have hx0 : x ≠ 0 := fun h0 => hx (h0 ▸ Ideal.zero_mem _)
-    exact mem_nonZeroDivisors_of_ne_zero hx0
-  have h2 : Module.rankAtStalk (R := O) M p0 = Module.finrank O M := by
-    rw [Module.rankAtStalk,
-      IsLocalization.finrank_eq (Localization.AtPrime p0.asIdeal) p0.asIdeal.primeCompl hp,
-      IsLocalizedModule.finrank_eq p0.asIdeal.primeCompl
-        (LocalizedModule.mkLinearMap p0.asIdeal.primeCompl M) hp]
-  rw [h1, Module.rankAtStalk_baseChange, hlc.apply_eq_of_preconnectedSpace _ p0, h2]
+theorem finrank_fibre (O M k : Type) [CommRing O] [IsDomain O] [AddCommGroup M] [Module O M]
+    [Module.Finite O M] [Module.Projective O M] [Field k] [Algebra O k] :
+    Module.finrank k (k ⊗[O] M) = Module.finrank O M := by
+  apply GlobalTheory.ZCount.finrank_fibre <;> assumption
+
 
 attribute [local instance] Ideal.Quotient.field in
-theorem count
-    [IsDomain O] [Module.Finite O M] [Module.Projective O M]
-    (P : Ideal O) [hP : P.IsMaximal] [Finite (O ⧸ P)]
-    : {N : Submodule O M | ∃ f : M →ₗ[O] O ⧸ P, f ≠ 0 ∧ LinearMap.ker f = N}.Finite
-      ∧ {N : Submodule O M | ∃ f : M →ₗ[O] O ⧸ P, f ≠ 0 ∧ LinearMap.ker f = N}.ncard
-          * (Nat.card (O ⧸ P) - 1)
-        = Nat.card (O ⧸ P) ^ Module.finrank O M - 1 := by
+theorem count [IsDomain O] [Module.Finite O M] [Module.Projective O M] (P : Ideal O)
+    [hP : P.IsMaximal] [Finite (O ⧸ P)] :
+    {N : Submodule O M | ∃ f : M →ₗ[O] O ⧸ P, f ≠ 0 ∧ LinearMap.ker f = N}.Finite ∧
+    {N : Submodule O M | ∃ f : M →ₗ[O] O ⧸ P, f ≠ 0 ∧ LinearMap.ker f = N}.ncard *
+      (Nat.card (O ⧸ P) - 1) = Nat.card (O ⧸ P) ^ Module.finrank O M - 1 := by
   classical
   have hcard : Nat.card (M →ₗ[O] O ⧸ P) = Nat.card (O ⧸ P) ^ Module.finrank O M := by
     rw [Nat.card_congr (LinearMap.liftBaseChangeEquiv (M := M) (N := O ⧸ P) (O ⧸ P)).toEquiv,
@@ -142,7 +184,8 @@ theorem count
   have : Finite (M →ₗ[O] O ⧸ P) :=
     Nat.finite_of_card_ne_zero (by rw [hcard]; exact pow_ne_zero _ Nat.card_pos.ne')
   let φ : ℙ (O ⧸ P) (M →ₗ[O] O ⧸ P) → Submodule O M :=
-    Projectivization.lift (K := O ⧸ P) (V := M →ₗ[O] O ⧸ P) (fun f => LinearMap.ker f.1) (by
+    Projectivization.lift (K := O ⧸ P) (V := M →ₗ[O] O ⧸ P)
+      (fun f => LinearMap.ker f.1) (by
       rintro ⟨a, ha⟩ ⟨b, hb⟩ t (hab : a = t • b)
       have ht : t ≠ 0 := by
         rintro rfl
@@ -150,10 +193,9 @@ theorem count
         rw [hab, zero_smul]
       ext x
       simp only [LinearMap.mem_ker, hab, LinearMap.smul_apply, smul_eq_zero, ht, false_or])
-  have key
-      : ∀ (f g : M →ₗ[O] O ⧸ P) (hf : f ≠ 0) (hg : g ≠ 0),
-        LinearMap.ker f = LinearMap.ker g
-          → Projectivization.mk (O ⧸ P) g hg = Projectivization.mk (O ⧸ P) f hf := by
+  have key : ∀ (f g : M →ₗ[O] O ⧸ P) (hf : f ≠ 0) (hg : g ≠ 0),
+      LinearMap.ker f = LinearMap.ker g →
+      Projectivization.mk (O ⧸ P) g hg = Projectivization.mk (O ⧸ P) f hf := by
     intro f g hf hg hfg
     obtain ⟨w, hw⟩ := surj_of_ne P f hf
     rw [Projectivization.mk_eq_mk_iff']
@@ -170,8 +212,8 @@ theorem count
     intro x y hxy
     rw [← Projectivization.mk_rep x, ← Projectivization.mk_rep y] at hxy ⊢
     exact (key _ _ _ _ hxy).symm
-  have hS
-      : {N : Submodule O M | ∃ f : M →ₗ[O] O ⧸ P, f ≠ 0 ∧ LinearMap.ker f = N} = Set.range φ := by
+  have hS : {N : Submodule O M | ∃ f : M →ₗ[O] O ⧸ P, f ≠ 0 ∧ LinearMap.ker f = N}
+      = Set.range φ := by
     ext N
     constructor
     · rintro ⟨f, hf, rfl⟩

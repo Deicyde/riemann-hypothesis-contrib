@@ -1,13 +1,60 @@
 module
 
-public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.TamagawaSpecialUnitary
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArakelovVolumes.UpperBounds.WeightFunctionOnFrames
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.FundamentalDomains.Signature
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Lemma
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Development.AbelianVarietyTheory.Definitions.Divisors.IsKMOne
+import Development.AbelianVarietyTheory.Definitions.ExistenceOfLattices.Hat1
+import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.EmbGLMemRealSU
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArakelovVolumes.ArakelovInstances.IsStrictDom
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArakelovVolumes.UpperBounds.LiftFactorization
 
 @[expose] public section
 
-open NumberField IsDedekindDomain MeasureTheory Matrix GlobalTheory.AdLat GlobalTheory.UCls
-  GlobalTheory.SUVol ReciprocityTheory.ChartRestriction.G.FD
-  ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.ChartRestriction.G.AR.Up
+open NumberField IsDedekindDomain MeasureTheory Matrix GlobalTheory.AdLat GlobalTheory.UCls GlobalTheory.SUVol ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.ChartRestriction.G.AR.Up
 open scoped ENNReal
 
 namespace GlobalTheory.TraceSkew
@@ -44,8 +91,8 @@ lemma form_skew_of_matrix {r : ℕ} (G Y : Matrix (Fin r) (Fin r) E)
     herm G (Y *ᵥ u) w + herm G u (Y *ᵥ w) = 0 := by
   have hc : (fun b => cc ((Y *ᵥ w) b)) = Y.map cc *ᵥ (fun b => cc (w b)) := by
     funext b
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp [mulVec, dotProduct, cc, map_sum, map_mul]
+
+    simp [mulVec, dotProduct, cc, map_sum, map_mul]
   rw [herm_eq_dot, herm_eq_dot, hc, mulVec_mulVec, ← vecMul_transpose, ← dotProduct_mulVec,
     mulVec_mulVec, ← dotProduct_add, ← add_mulVec, h, zero_mulVec, dotProduct_zero]
 
@@ -53,14 +100,7 @@ end GlobalTheory.TraceSkew
 
 namespace GlobalTheory.TraceSkew
 
-theorem traceForm_nondegenerate
-    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (r : ℕ) (G : Matrix (Fin r) (Fin r) E)
-        (X : Matrix (Fin r) (Fin r) E),
-      (∀ a b, cc (G a b) = G b a) → G.det ≠ 0 → X.trace = 0
-        → (∀ u w, herm G (X *ᵥ u) w + herm G u (X *ᵥ w) = 0)
-        → (∀ Y : Matrix (Fin r) (Fin r) E,
-          Y.trace = 0 → (∀ u w, herm G (Y *ᵥ u) w + herm G u (Y *ᵥ w) = 0) → (X * Y).trace = 0)
-        → X = 0 := by
+theorem traceForm_nondegenerate : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (r : ℕ) (G : Matrix (Fin r) (Fin r) E) (X : Matrix (Fin r) (Fin r) E), (∀ a b, cc (G a b) = G b a) → G.det ≠ 0 → X.trace = 0 → (∀ u w, herm G (X *ᵥ u) w + herm G u (X *ᵥ w) = 0) → (∀ Y : Matrix (Fin r) (Fin r) E, Y.trace = 0 → (∀ u w, herm G (Y *ᵥ u) w + herm G u (Y *ᵥ w) = 0) → (X * Y).trace = 0) → X = 0 := by
   intro E _ _ _ r G X hG hdet htr _hX hY
   rcases Nat.eq_zero_or_pos r with hr0 | hr0
   · subst hr0
@@ -85,25 +125,23 @@ theorem traceForm_nondegenerate
       simp [map_apply, Matrix.one_apply, cc]
     exact mul_eq_one_comm.mp h1
 
-  have hskew
-      : ∀ K : Matrix (Fin r) (Fin r) E,
-        Kᵀ + K.map cc = 0 → (Q * K)ᵀ * G + G * (Q * K).map cc = 0 := by
+  have hskew : ∀ K : Matrix (Fin r) (Fin r) E, Kᵀ + K.map cc = 0 →
+      (Q * K)ᵀ * G + G * (Q * K).map cc = 0 := by
     intro K hK
-    rw [transpose_mul, map_cc_mul, Matrix.mul_assoc, hQT, Matrix.mul_one, ← Matrix.mul_assoc, hQmap,
-      Matrix.one_mul]
+    rw [transpose_mul, map_cc_mul, Matrix.mul_assoc, hQT, Matrix.mul_one, ← Matrix.mul_assoc,
+      hQmap, Matrix.one_mul]
     exact hK
 
-  have htrskew
-      : ∀ Y : Matrix (Fin r) (Fin r) E, Yᵀ * G + G * Y.map cc = 0 → cc Y.trace = -Y.trace := by
+  have htrskew : ∀ Y : Matrix (Fin r) (Fin r) E, Yᵀ * G + G * Y.map cc = 0 →
+      cc Y.trace = -Y.trace := by
     intro Y hY'
     have h0 : G * Y.map cc = -(Yᵀ * G) := eq_neg_of_add_eq_zero_right hY'
     have h1 : Y.map cc = -(G⁻¹ * (Yᵀ * G)) := by
-      calc
-        Y.map cc = G⁻¹ * (G * Y.map cc) := by
-          rw [← Matrix.mul_assoc, nonsing_inv_mul G hGu, Matrix.one_mul]
+      calc Y.map cc = G⁻¹ * (G * Y.map cc) := by
+            rw [← Matrix.mul_assoc, nonsing_inv_mul G hGu, Matrix.one_mul]
         _ = -(G⁻¹ * (Yᵀ * G)) := by rw [h0, Matrix.mul_neg]
     have h2 : (Y.map cc).trace = cc Y.trace := by
-      set_option synthInstance.maxHeartbeats 100000 in
+
       simp [trace, cc, map_sum]
     rw [← h2, h1, trace_neg, trace_mul_comm, Matrix.mul_assoc, mul_nonsing_inv G hGu,
       Matrix.mul_one, trace_transpose]
@@ -113,23 +151,18 @@ theorem traceForm_nondegenerate
     set c : E := Y.trace / r with hcdef
     have hc : cc c = -c := by
       have : cc (r : E) = r := map_natCast (ccHom E) r
-      rw [hcdef, show cc (Y.trace / r) = cc Y.trace / cc (r : E) from map_div₀ (ccHom E) _ _, this,
-        htrskew Y hY', neg_div]
+      rw [hcdef, show cc (Y.trace / r) = cc Y.trace / cc (r : E) from map_div₀ (ccHom E) _ _,
+        this, htrskew Y hY', neg_div]
     have hmap1 : (c • (1 : Matrix (Fin r) (Fin r) E)).map cc = -(c • 1) := by
       ext a b
       by_cases hab : a = b
       · subst b
         simp [Matrix.one_apply, hc]
       · simp [Matrix.one_apply, hab, cc]
-    have hmapY
-        : (Y - c • (1 : Matrix (Fin r) (Fin r) E)).map cc
-          = Y.map cc - (c • (1 : Matrix (Fin r) (Fin r) E)).map cc := by
+    have hmapY : (Y - c • (1 : Matrix (Fin r) (Fin r) E)).map cc = Y.map cc - (c • (1 : Matrix (Fin r) (Fin r) E)).map cc := by
       ext a b
       simp [cc]
-    have hs
-        : (Y - c • (1 : Matrix (Fin r) (Fin r) E))ᵀ * G
-            + G * (Y - c • (1 : Matrix (Fin r) (Fin r) E)).map cc
-          = 0 := by
+    have hs : (Y - c • (1 : Matrix (Fin r) (Fin r) E))ᵀ * G + G * (Y - c • (1 : Matrix (Fin r) (Fin r) E)).map cc = 0 := by
       rw [hmapY, hmap1, transpose_sub, transpose_smul, transpose_one, Matrix.sub_mul,
         Matrix.mul_sub, Matrix.smul_mul, Matrix.mul_neg, Matrix.mul_smul, Matrix.one_mul,
         Matrix.mul_one, ← hY']
@@ -138,9 +171,8 @@ theorem traceForm_nondegenerate
       rw [trace_sub, trace_smul, trace_one, Fintype.card_fin, smul_eq_mul, hcdef,
         div_mul_cancel₀ _ hr, sub_self]
     have h := hY (Y - c • (1 : Matrix (Fin r) (Fin r) E)) ht (form_skew_of_matrix G _ hs)
-    rw [Matrix.mul_sub, trace_sub, Matrix.mul_smul, Matrix.mul_one, trace_smul, htr, smul_zero,
-        sub_zero]
-      at h
+    rw [Matrix.mul_sub, trace_sub, Matrix.mul_smul, Matrix.mul_one, trace_smul, htr,
+      smul_zero, sub_zero] at h
     exact h
 
   obtain ⟨β, hβ0, hβ⟩ := exists_ne_zero_cc_eq_neg (E := E)
@@ -151,13 +183,13 @@ theorem traceForm_nondegenerate
     let B : Matrix (Fin r) (Fin r) E := of fun i j => (K i j + cc (K j i)) / (2 * β)
     have hA : Aᵀ + A.map cc = 0 := by
       ext i j
-      simp only [A, Matrix.add_apply, transpose_apply, map_apply, of_apply, Matrix.zero_apply, cc,
-        map_sub, map_div₀, map_ofNat, IsCMField.complexConj_apply_apply]
+      simp only [A, Matrix.add_apply, transpose_apply, map_apply, of_apply, Matrix.zero_apply, cc, map_sub,
+        map_div₀, map_ofNat, IsCMField.complexConj_apply_apply]
       ring
     have hB : Bᵀ + B.map cc = 0 := by
       ext i j
-      simp only [B, Matrix.add_apply, transpose_apply, map_apply, of_apply, Matrix.zero_apply, cc,
-        map_add (f := _), map_div₀, map_mul, map_ofNat, IsCMField.complexConj_apply_apply, hβ']
+      simp only [B, Matrix.add_apply, transpose_apply, map_apply, of_apply, Matrix.zero_apply, cc, map_add (f := _),
+        map_div₀, map_mul, map_ofNat, IsCMField.complexConj_apply_apply, hβ']
       field_simp
       ring
     have hK : K = A + β • B := by
@@ -171,8 +203,7 @@ theorem traceForm_nondegenerate
     rw [ext_iff_trace_mul_right]
     intro K
     rw [hall K, Matrix.zero_mul, trace_zero]
-  calc
-    X = X * Q * Gᵀ := by rw [Matrix.mul_assoc, hQG, Matrix.mul_one]
+  calc X = X * Q * Gᵀ := by rw [Matrix.mul_assoc, hQG, Matrix.mul_one]
     _ = 0 := by rw [hXQ, Matrix.zero_mul]
 
 end GlobalTheory.TraceSkew

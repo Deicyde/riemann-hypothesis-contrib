@@ -1,10 +1,66 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.Definitions.Divisors.ZetaActRefl
-public import Development.AbelianVarietyTheory.Definitions.Foundations.MemRingOfInR
-public import ReciprocityTheory.ReductiveGroups.UnramifiedIntegrals.ModQPrin
-public import ReciprocityTheory.ReductiveGroups.UnramifiedIntegrals.ModJTau
+import Development.AbelianVarietyTheory.Proofs.FoundationProofs.MonicRootNormLeOneAddSum
+public import Mathlib.Analysis.CStarAlgebra.Classes
+public import Mathlib.Analysis.Calculus.FDeriv.Defs
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+public import Mathlib.Analysis.Complex.RemovableSingularity
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Development.AbelianVarietyTheory.Definitions.Divisors.HasQIff
+import Development.AbelianVarietyTheory.Definitions.Divisors.ZetaActRefl
+import Development.AbelianVarietyTheory.Definitions.Foundations.ExpUpper
+import Development.AbelianVarietyTheory.Definitions.Foundations.MemRingOfInR
+public import Mathlib.Analysis.Analytic.IsolatedZeros
+public import Mathlib.Analysis.Calculus.Deriv.Inv
+public import Mathlib.Analysis.Calculus.FDeriv.Mul
+public import Mathlib.Analysis.Calculus.FDeriv.Pow
+public import Mathlib.Analysis.Complex.CauchyIntegral
+import Mathlib.Geometry.Manifold.StructureGroupoid
+public import Mathlib.NumberTheory.ModularForms.EisensteinSeries.Basic
+import Mathlib.NumberTheory.ModularForms.SlashActions
+public import ReciprocityTheory.ReductiveGroups.UnramifiedIntegrals.ModDefs
 
 @[expose] public section
 
@@ -16,50 +72,15 @@ open Filter Topology
 
 namespace GlobalTheory
 
-theorem norm_root_monic_le (n : ℕ) (s : Fin n → ℂ) (y : ℂ) (hy : y ^ n + ∑ j, s j * y ^ (j : ℕ) = 0)
-    : ‖y‖ ≤ 1 + ∑ j, ‖s j‖ := by
-  have hS : 0 ≤ ∑ j, ‖s j‖ := Finset.sum_nonneg fun j _ => norm_nonneg _
-  by_cases h1 : ‖y‖ ≤ 1
-  · linarith
-  push_neg at h1
-  cases n with
-  | zero => simp at hy
-  | succ m =>
-    have hyn : y ^ (m + 1) = - ∑ j, s j * y ^ (j : ℕ) := eq_neg_of_add_eq_zero_left hy
-    have hle : ‖y‖ ^ (m + 1) ≤ (∑ j, ‖s j‖) * ‖y‖ ^ m := by
-      calc
-        ‖y‖ ^ (m + 1)
-          = ‖y ^ (m + 1)‖ := (norm_pow _ _).symm
-        _ = ‖∑ j, s j * y ^ (j : ℕ)‖ := by rw [hyn, norm_neg]
-        _ ≤ ∑ j, ‖s j * y ^ (j : ℕ)‖ := norm_sum_le _ _
-        _ ≤ ∑ j : Fin (m + 1), ‖s j‖ * ‖y‖ ^ m := by
-          refine Finset.sum_le_sum fun j _ => ?_
-          rw [norm_mul, norm_pow]
-          gcongr
-          · exact h1.le
-          · exact Nat.lt_succ_iff.1 j.isLt
-        _ = (∑ j, ‖s j‖) * ‖y‖ ^ m := by rw [Finset.sum_mul]
-    have hpos : 0 < ‖y‖ ^ m := pow_pos (by linarith) _
-    rw [pow_succ] at hle
-    have : ‖y‖ ≤ ∑ j, ‖s j‖ := by
-      by_contra hc
-      push_neg at hc
-      have := mul_lt_mul_of_pos_left hc hpos
-      nlinarith
-    linarith
+theorem norm_root_monic_le (n : ℕ) (s : Fin n → ℂ) (y : ℂ)
+    (hy : y ^ n + ∑ j, s j * y ^ (j : ℕ) = 0) : ‖y‖ ≤ 1 + ∑ j, ‖s j‖ := by
+  apply GlobalTheory.monic_root_norm_le_one_add_sum <;> assumption
 
 end GlobalTheory
 
 namespace GlobalTheory
 
-theorem quotient_integral_holomorphic
-    : ∀ (U : Set ℂ) (n : ℕ) (A D : ℂ → ℂ) (s : Fin n → ℂ → ℂ),
-      IsOpen U → IsPreconnected U → DifferentiableOn ℂ A U → DifferentiableOn ℂ D U
-        → (∀ j, DifferentiableOn ℂ (s j) U) → (∃ z ∈ U, D z ≠ 0)
-        → (∀ z ∈ U, A z ^ n + ∑ j, s j z * A z ^ (j : ℕ) * D z ^ (n - j) = 0)
-        → ∃ h : ℂ → ℂ,
-          DifferentiableOn ℂ h U ∧ (∀ z ∈ U, A z = h z * D z)
-            ∧ ∀ z ∈ U, h z ^ n + ∑ j, s j z * h z ^ (j : ℕ) = 0 := by
+theorem quotient_integral_holomorphic : ∀ (U : Set ℂ) (n : ℕ) (A D : ℂ → ℂ) (s : Fin n → ℂ → ℂ), IsOpen U → IsPreconnected U → DifferentiableOn ℂ A U → DifferentiableOn ℂ D U → (∀ j, DifferentiableOn ℂ (s j) U) → (∃ z ∈ U, D z ≠ 0) → (∀ z ∈ U, A z ^ n + ∑ j, s j z * A z ^ (j : ℕ) * D z ^ (n - j) = 0) → ∃ h : ℂ → ℂ, DifferentiableOn ℂ h U ∧ (∀ z ∈ U, A z = h z * D z) ∧ ∀ z ∈ U, h z ^ n + ∑ j, s j z * h z ^ (j : ℕ) = 0 := by
   intro U n A D s hU hUc hA hD hs ⟨z₁, hz₁U, hz₁⟩ heq
   classical
   have hiso : ∀ z₀ ∈ U, ∀ᶠ w in 𝓝[≠] z₀, D w ≠ 0 := by
@@ -72,9 +93,8 @@ theorem quotient_integral_holomorphic
   have hroot : ∀ w ∈ U, D w ≠ 0 → (A w / D w) ^ n + ∑ j, s j w * (A w / D w) ^ (j : ℕ) = 0 := by
     intro w hw hDw
     have hDn : D w ^ n ≠ 0 := pow_ne_zero _ hDw
-    have key
-        : D w ^ n * ((A w / D w) ^ n + ∑ j, s j w * (A w / D w) ^ (j : ℕ))
-          = A w ^ n + ∑ j, s j w * A w ^ (j : ℕ) * D w ^ (n - j) := by
+    have key : D w ^ n * ((A w / D w) ^ n + ∑ j, s j w * (A w / D w) ^ (j : ℕ))
+        = A w ^ n + ∑ j, s j w * A w ^ (j : ℕ) * D w ^ (n - j) := by
       rw [mul_add, Finset.mul_sum]
       congr 1
       · rw [div_pow, mul_div_cancel₀ _ hDn]
@@ -98,10 +118,8 @@ theorem quotient_integral_holomorphic
     rcases Nat.eq_zero_or_pos n with hn | hn
     · subst hn; simp at this
     · exact (pow_eq_zero_iff hn.ne').1 this
-  obtain ⟨h, hh⟩
-      : ∃ h : ℂ → ℂ, ∀ z,
-        h z = if D z = 0 then limUnder (𝓝[≠] z) (fun w => A w / D w) else A z / D z :=
-    ⟨_, fun z => rfl⟩
+  obtain ⟨h, hh⟩ : ∃ h : ℂ → ℂ, ∀ z, h z =
+      if D z = 0 then limUnder (𝓝[≠] z) (fun w => A w / D w) else A z / D z := ⟨_, fun z => rfl⟩
   have hdiffAt : ∀ z₀ ∈ U, DifferentiableAt ℂ h z₀ := by
     intro z₀ hz₀
     have hUn : U ∈ 𝓝 z₀ := hU.mem_nhds hz₀
@@ -126,19 +144,15 @@ theorem quotient_integral_holomorphic
       have hbd : BddAbove (norm ∘ (fun w => A w / D w) '' (Metric.ball z₀ r \ {z₀})) := by
         refine ⟨1 + ∑ j, (‖s j z₀‖ + 1), ?_⟩
         rintro _ ⟨w, hw, rfl⟩
-        have :=
-          GlobalTheory.norm_root_monic_le n
-            (fun j => s j w)
-            (A w / D w) (hroot w (hsub w hw.1) (hne w hw.1 hw.2))
+        have := GlobalTheory.norm_root_monic_le n (fun j => s j w) (A w / D w) (hroot w (hsub w hw.1) (hne w hw.1 hw.2))
         show ‖A w / D w‖ ≤ _
         refine this.trans ?_
         gcongr with j
         exact (hsb w hw.1 j).le
-      have hg :=
-        Complex.differentiableOn_update_limUnder_of_bddAbove (Metric.ball_mem_nhds z₀ hr) hfd hbd
-      have heqg
-          : h =ᶠ[𝓝 z₀] Function.update (fun w => A w / D w) z₀
-            (limUnder (𝓝[≠] z₀) (fun w => A w / D w)) := by
+      have hg := Complex.differentiableOn_update_limUnder_of_bddAbove
+        (Metric.ball_mem_nhds z₀ hr) hfd hbd
+      have heqg : h =ᶠ[𝓝 z₀] Function.update (fun w => A w / D w) z₀
+          (limUnder (𝓝[≠] z₀) (fun w => A w / D w)) := by
         filter_upwards [Metric.ball_mem_nhds z₀ hr] with w hw
         by_cases hw0 : w = z₀
         · subst hw0; rw [hh, if_pos hDz, Function.update_self]
@@ -159,10 +173,9 @@ theorem quotient_integral_holomorphic
     · have hUn : U ∈ 𝓝 z := hU.mem_nhds hz
       have hFd : DifferentiableAt ℂ (fun w => h w ^ n + ∑ j, s j w * h w ^ (j : ℕ)) z := by
         apply ((hdiffAt z hz).pow n).add
-        have hsum :=
-          DifferentiableAt.sum (u := Finset.univ)
-            (A := fun (j : Fin n) (w : ℂ) => s j w * h w ^ (j : ℕ))
-            (fun j _ => ((hs j).differentiableAt hUn).mul ((hdiffAt z hz).pow _))
+        have hsum := DifferentiableAt.sum (u := Finset.univ)
+          (A := fun (j : Fin n) (w : ℂ) => s j w * h w ^ (j : ℕ))
+          (fun j _ => ((hs j).differentiableAt hUn).mul ((hdiffAt z hz).pow _))
         convert hsum using 1
         ext w
         simp [Finset.sum_apply]

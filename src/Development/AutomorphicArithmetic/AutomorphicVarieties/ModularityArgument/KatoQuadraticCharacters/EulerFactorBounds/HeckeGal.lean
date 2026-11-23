@@ -1,26 +1,67 @@
 module
 
-public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityArgument.KatoQuadraticCharacters.EulerFactorBounds.GalAct
+public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityArgument.KatoQuadraticCharacters.EulerFactorBounds.KatoTwistedClassNormCompatibleCyclotomic
+public import Development.AbelianVarietyTheory.Definitions.Foundations.OpLDOneSubMemTriv
 public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.SlMulToRingEquiv
 public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.TowerUnitClassModPrimePowProperties
+import Development.AutomorphicArithmetic.AutomorphicVarieties.CommutativeAlgebra.ResMapBijective
+public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityArgument.KatoQuadraticCharacters.EulerFactorBounds.GalAct
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.AdicCompletion.Noetherian
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
 open scoped MatrixGroups Matrix Classical
-open GlobalTheory.KZ GlobalTheory.K4 UpperTheory.V.Z.Kato.Sym UpperTheory.Kd.K4
-  UpperTheory.V.Z.Kato.Nb
+open GlobalTheory.KZ GlobalTheory.K4 UpperTheory.V.Z.Kato.Sym UpperTheory.Kd.K4 UpperTheory.V.Z.Kato.Nb
 
 namespace UpperTheory.V.Z.Kato.Nb.HG
 
 variable {Ω : Type} [Field Ω] [Algebra ℚ Ω] {ε : Ω →+* ℂ}
 
-private theorem ent_toGQ (m : Matrix (Fin 2) (Fin 2) ℤ) (h : 0 < m.det) (i j : Fin 2)
-    : ent (toGQ m) i j = (m i j : ℚ) := by
+private theorem ent_toGQ (m : Matrix (Fin 2) (Fin 2) ℤ) (h : 0 < m.det) (i j : Fin 2) : ent (toGQ m) i j = (m i j : ℚ) := by
   simp [ent, toGQ, h]
 
-private theorem gal_diag
-    (X : Tower Ω ε) (a b : ℤ) (ha : 0 < a) (hb : 0 < b) (s : Ω ≃ₐ[ℚ] Ω) (f : X.K)
-    : X.gal s (X.sl (toGQ !![a, 0; 0, b]) f) = X.sl (toGQ !![a, 0; 0, b]) (X.gal s f) := by
+private theorem gal_diag (X : Tower Ω ε) (a b : ℤ) (ha : 0 < a) (hb : 0 < b) (s : Ω ≃ₐ[ℚ] Ω) (f : X.K) :
+    X.gal s (X.sl (toGQ !![a, 0; 0, b]) f) = X.sl (toGQ !![a, 0; 0, b]) (X.gal s f) := by
   have hd : 0 < (!![a, 0; 0, b] : Matrix (Fin 2) (Fin 2) ℤ).det := by
     rw [Matrix.det_fin_two_of]; simpa using mul_pos ha hb
   have h1 : eOm ε 0 = 1 := by
@@ -28,26 +69,20 @@ private theorem gal_diag
     simpa [eOm] using this
   have ha' : (a : ℚ) ≠ 0 := by exact_mod_cast ha.ne'
   have hb' : (b : ℚ) ≠ 0 := by exact_mod_cast hb.ne'
-  have key
-      : ∀ (f : X.K) (r : ℚ),
-        (X.exp (X.sl (toGQ !![a, 0; 0, b]) f)).coeff r = (X.exp f).coeff (r * b / a) := by
+  have key : ∀ (f : X.K) (r : ℚ), (X.exp (X.sl (toGQ !![a, 0; 0, b]) f)).coeff r = (X.exp f).coeff (r * b / a) := by
     intro f r
     have := X.exp_upper (toGQ !![a, 0; 0, b]) (by rw [ent_toGQ _ hd]; simp) f (r * b / a)
     rw [ent_toGQ _ hd, ent_toGQ _ hd, ent_toGQ _ hd] at this
-    simp only [Matrix.of_apply, Matrix.cons_val', Matrix.cons_val_zero, Matrix.cons_val_one,
-        Matrix.cons_val_fin_one, Int.cast_zero, mul_zero, zero_div, h1, one_mul]
-      at this
-    rw [← this]
-    congr 1
-    field_simp
+    simp only [Matrix.of_apply, Matrix.cons_val', Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.cons_val_fin_one,
+      Int.cast_zero, mul_zero, zero_div, h1, one_mul] at this
+    rw [← this]; congr 1; field_simp
   apply X.exp.toRingHom.injective
   ext r
   show (X.exp _).coeff r = (X.exp _).coeff r
   rw [X.gal_exp, key, key, X.gal_exp]
 
-private theorem galB_diag
-    (X : Tower Ω ε) (l : ℕ) [Fact l.Prime] (p : ℤ) (hp : 0 < p) (s : Ω ≃ₐ[ℚ] Ω) (b : X.Fn l)
-    : X.galB l s (X.act l !![p, 0; 0, 1] b) = X.act l !![p, 0; 0, 1] (X.galB l s b) := by
+private theorem galB_diag (X : Tower Ω ε) (l : ℕ) [Fact l.Prime] (p : ℤ) (hp : 0 < p) (s : Ω ≃ₐ[ℚ] Ω) (b : X.Fn l) :
+    X.galB l s (X.act l !![p, 0; 0, 1] b) = X.act l !![p, 0; 0, 1] (X.galB l s b) := by
   funext u
   show X.kmap l _ (X.kmap l _ (b _)) = X.kmap l _ (X.kmap l _ (b _))
   rw [X.kmap_kmap, X.kmap_kmap]
@@ -58,30 +93,17 @@ private theorem galB_diag
 
 private def tr (t : ℤ) : SL(2, ℤ) := ⟨!![1, t; 0, 1], by simp [Matrix.det_fin_two_of]⟩
 
-private theorem sl_up (X : Tower Ω ε) (p : ℤ) (hp : 0 < p) (j : ℤ) (f : X.K)
-    : X.sl (toGQ !![1, j; 0, p]) f = X.sl (ofSL (tr j)) (X.sl (toGQ !![1, 0; 0, p]) f) := by
-  rw [← X.sl_mul, ← Betti.toGQ_sl,
-    ← toGQ_mul_of_pos _ _ (by simpa [Matrix.det_fin_two_of] using hp)
-      (by rw [(tr j).det_coe]; exact one_pos)]
+private theorem sl_up (X : Tower Ω ε) (p : ℤ) (hp : 0 < p) (j : ℤ) (f : X.K) :
+    X.sl (toGQ !![1, j; 0, p]) f = X.sl (ofSL (tr j)) (X.sl (toGQ !![1, 0; 0, p]) f) := by
+  rw [← X.sl_mul, ← Betti.toGQ_sl, ← toGQ_mul_of_pos _ _ (by simpa [Matrix.det_fin_two_of] using hp)
+    (by rw [(tr j).det_coe]; exact one_pos)]
   congr 3
   simp [tr]
 
-private theorem recip_up
-    (X : Tower Ω ε)
-    (l : ℕ) [Fact l.Prime]
-    (n : ℕ)
-    (p : ℤ) (hp : 0 < p)
-    (s : Ω ≃ₐ[ℚ] Ω) (x : X.Khat l)
-    : ∃ M₀ : ℕ,
-      0 < M₀
-        ∧ ∀ (M : ℕ) (ζ : Ω) (e : ℕ),
-          0 < M → M₀ ∣ M → IsPrimitiveRoot ζ M → s ζ = ζ ^ e
-            → ∀ j : ℤ,
-              AdicCompletion.eval (idl l) (X.Kl l) n
-                  (X.kmap l (X.gal s) (X.kmap l (X.sl (toGQ !![1, j; 0, p])).toRingEquiv x))
-                = AdicCompletion.eval (idl l) (X.Kl l) n
-                  (X.kmap l (X.sl (toGQ !![1, j * e; 0, p])).toRingEquiv
-                    (X.kmap l (X.gal s) x)) := by
+private theorem recip_up (X : Tower Ω ε) (l : ℕ) [Fact l.Prime] (n : ℕ) (p : ℤ) (hp : 0 < p) (s : Ω ≃ₐ[ℚ] Ω) (x : X.Khat l) :
+    ∃ M₀ : ℕ, 0 < M₀ ∧ ∀ (M : ℕ) (ζ : Ω) (e : ℕ), 0 < M → M₀ ∣ M → IsPrimitiveRoot ζ M → s ζ = ζ ^ e → ∀ j : ℤ,
+      AdicCompletion.eval (idl l) (X.Kl l) n (X.kmap l (X.gal s) (X.kmap l (X.sl (toGQ !![1, j; 0, p])).toRingEquiv x)) =
+      AdicCompletion.eval (idl l) (X.Kl l) n (X.kmap l (X.sl (toGQ !![1, j * e; 0, p])).toRingEquiv (X.kmap l (X.gal s) x)) := by
   have hc := GlobalTheory.KZ.H3.cls_props Ω ε X l n
   obtain ⟨f, hf⟩ := hc.1 (AdicCompletion.eval (idl l) (X.Kl l) n x)
   obtain ⟨M₀, h0, hl⟩ := X.level (X.sl (toGQ !![1, 0; 0, p]) (f : X.K))
@@ -99,11 +121,9 @@ private theorem recip_up
   · rw [map_pow, hs, zpow_natCast, ← pow_mul, ← pow_mul, mul_comm]
   · simp [en, tr, mul_comm]
 
-private theorem expo
-    [IsAlgClosure ℚ Ω] (l n M : ℕ) [Fact l.Prime] (hM : 0 < M) (hd : l ^ n ∣ M) (s : Ω ≃ₐ[ℚ] Ω)
-    : ∃ (ζ : Ω) (e : ℕ),
-      IsPrimitiveRoot ζ M ∧ s ζ = ζ ^ e ∧ Nat.Coprime e M
-        ∧ (l : ℤ_[l]) ^ n ∣ (cyclotomicCharacter Ω l s.toRingEquiv : ℤ_[l]) - e := by
+private theorem expo [IsAlgClosure ℚ Ω] (l n M : ℕ) [Fact l.Prime] (hM : 0 < M) (hd : l ^ n ∣ M) (s : Ω ≃ₐ[ℚ] Ω) :
+    ∃ (ζ : Ω) (e : ℕ), IsPrimitiveRoot ζ M ∧ s ζ = ζ ^ e ∧ Nat.Coprime e M ∧
+      (l : ℤ_[l]) ^ n ∣ (cyclotomicCharacter Ω l s.toRingEquiv : ℤ_[l]) - e := by
   haveI : IsAlgClosed Ω := IsAlgClosure.isAlgClosed ℚ
   haveI : CharZero Ω := algebraRat.charZero Ω
   haveI : NeZero M := ⟨hM.ne'⟩
@@ -123,24 +143,17 @@ private theorem expo
   rw [← Ideal.mem_span_singleton, ← PadicInt.ker_toZModPow, RingHom.mem_ker, map_sub, map_natCast,
     (ZMod.natCast_eq_natCast_iff _ _ _).2 h3, ZMod.natCast_zmod_val, sub_self]
 
-private theorem sum_perm
-    {Q : Type} [AddCommMonoid Q]
-    (p e : ℕ) (hp : 0 < p) (he : Nat.Coprime e p)
-    (F : ℤ → Q) (hF : ∀ k t : ℤ, F (k + t * p) = F k)
-    : ∑ j ∈ Finset.range p, F (j * e) = ∑ j ∈ Finset.range p, F j := by
+private theorem sum_perm {Q : Type} [AddCommMonoid Q] (p e : ℕ) (hp : 0 < p) (he : Nat.Coprime e p) (F : ℤ → Q)
+    (hF : ∀ k t : ℤ, F (k + t * p) = F k) : ∑ j ∈ Finset.range p, F (j * e) = ∑ j ∈ Finset.range p, F j := by
   haveI : NeZero p := ⟨hp.ne'⟩
   have h1 : ∀ k : ℤ, F k = F ((k : ZMod p).val) := by
     intro k
     rw [ZMod.val_intCast, ← hF (k % p) (k / p)]
     congr 1
-    rw [mul_comm]
-    exact (Int.emod_add_mul_ediv k p).symm
+    rw [mul_comm]; exact (Int.emod_add_mul_ediv k p).symm
   have h2 : ∀ G : ZMod p → Q, ∑ j ∈ Finset.range p, G j = ∑ x, G x := fun G =>
-    Finset.sum_nbij'
-      (fun j => (j : ZMod p))
-      ZMod.val (by simp) (by simp [ZMod.val_lt])
-      (fun j hj => ZMod.val_cast_of_lt (by simpa using hj))
-      (by simp) (by simp)
+    Finset.sum_nbij' (fun j => (j : ZMod p)) ZMod.val (by simp) (by simp [ZMod.val_lt])
+      (fun j hj => ZMod.val_cast_of_lt (by simpa using hj)) (by simp) (by simp)
   have h3 := h2 fun x => F (x * e).val
   have h4 := h2 fun x => F x.val
   rw [Finset.sum_congr rfl fun (j : ℕ) _ => h1 (j * e), Finset.sum_congr rfl fun (j : ℕ) _ => h1 j]
@@ -148,74 +161,53 @@ private theorem sum_perm
   rw [h3, h4]
   exact Equiv.sum_comp (ZMod.unitOfCoprime e he).mulRight fun x => F x.val
 
-private theorem eval_kmap
-    (X : Tower Ω ε)
-    (l : ℕ) [Fact l.Prime]
-    (n : ℕ)
-    (φ : X.K ≃+* X.K)
-    {x y : X.Khat l}
-    (h : AdicCompletion.eval (idl l) (X.Kl l) n x = AdicCompletion.eval (idl l) (X.Kl l) n y)
-    : AdicCompletion.eval (idl l) (X.Kl l) n (X.kmap l φ x)
-      = AdicCompletion.eval (idl l) (X.Kl l) n (X.kmap l φ y) := by
+private theorem eval_kmap (X : Tower Ω ε) (l : ℕ) [Fact l.Prime] (n : ℕ) (φ : X.K ≃+* X.K) {x y : X.Khat l}
+    (h : AdicCompletion.eval (idl l) (X.Kl l) n x = AdicCompletion.eval (idl l) (X.Kl l) n y) :
+    AdicCompletion.eval (idl l) (X.Kl l) n (X.kmap l φ x) = AdicCompletion.eval (idl l) (X.Kl l) n (X.kmap l φ y) := by
   have hc := GlobalTheory.KZ.H3.cls_props Ω ε X l n
   obtain ⟨f, hf⟩ := hc.1 (AdicCompletion.eval (idl l) (X.Kl l) n y)
   rw [hc.2.2.2.2.2.1 φ x f (h.trans hf.symm), hc.2.2.2.2.2.1 φ y f hf.symm]
 
-private theorem poly_cg
-    (X : Tower Ω ε)
-    (l : ℕ) [Fact l.Prime]
-    (w n : ℕ) (a t : X.Fn l) (ht : PolMod X l w n t) (h : CgF X l n a t)
-    (u v : Fin 2 → ℤ_[l]) (h0 : (l : ℤ_[l]) ^ n ∣ u 0 - v 0) (h1 : u 1 = v 1)
-    : AdicCompletion.eval (idl l) (X.Kl l) n (a u)
-      = AdicCompletion.eval (idl l) (X.Kl l) n (a v) := by
+private theorem poly_cg (X : Tower Ω ε) (l : ℕ) [Fact l.Prime] (w n : ℕ) (a t : X.Fn l)
+    (ht : PolMod X l w n t) (h : CgF X l n a t) (u v : Fin 2 → ℤ_[l]) (h0 : (l : ℤ_[l]) ^ n ∣ u 0 - v 0) (h1 : u 1 = v 1) :
+    AdicCompletion.eval (idl l) (X.Kl l) n (a u) = AdicCompletion.eval (idl l) (X.Kl l) n (a v) := by
   obtain ⟨c, -, hc⟩ := ht
   have hu := h u
   have hv := h v
   rw [map_sub, sub_eq_zero] at hu hv
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [hu, hv, hc, hc, map_sum, map_sum]
+
+  rw [hu, hv, hc, hc, map_sum, map_sum]
   refine Finset.sum_congr rfl fun i _ => ?_
-  obtain ⟨x, hx⟩ :=
-    Submodule.Quotient.mk_surjective _ (AdicCompletion.eval (idl l) (X.Kl l) n (c i))
-  rw [map_smul, map_smul, ← hx, ← Submodule.Quotient.mk_smul, ← Submodule.Quotient.mk_smul,
-    Submodule.Quotient.eq, ← sub_smul]
+  obtain ⟨x, hx⟩ := Submodule.Quotient.mk_surjective _ (AdicCompletion.eval (idl l) (X.Kl l) n (c i))
+  rw [map_smul, map_smul, ← hx, ← Submodule.Quotient.mk_smul, ← Submodule.Quotient.mk_smul, Submodule.Quotient.eq,
+    ← sub_smul]
   refine Submodule.smul_mem_smul ?_ Submodule.mem_top
   rw [Ideal.span_singleton_pow, Ideal.mem_span_singleton, h1, ← sub_mul]
   exact (h0.trans (sub_dvd_pow_sub_pow _ _ _)).mul_right _
 
-private theorem cg_act
-    (X : Tower Ω ε)
-    (l : ℕ) [Fact l.Prime]
-    (n : ℕ)
-    (m : Matrix (Fin 2) (Fin 2) ℤ)
-    {a b : X.Fn l} (h : CgF X l n a b)
-    : CgF X l n (X.act l m a) (X.act l m b) := by
+private theorem cg_act (X : Tower Ω ε) (l : ℕ) [Fact l.Prime] (n : ℕ) (m : Matrix (Fin 2) (Fin 2) ℤ) {a b : X.Fn l}
+    (h : CgF X l n a b) : CgF X l n (X.act l m a) (X.act l m b) := by
   intro u
   have := h (mZl l m *ᵥ u)
   rw [map_sub, sub_eq_zero] at this ⊢
   exact eval_kmap X l n _ this
 
-private theorem cg_add
-    (X : Tower Ω ε)
-    (l : ℕ) [Fact l.Prime]
-    (n : ℕ)
-    {a b a' b' : X.Fn l} (h : CgF X l n a b) (h' : CgF X l n a' b')
-    : CgF X l n (a + a') (b + b') := by
+private theorem cg_add (X : Tower Ω ε) (l : ℕ) [Fact l.Prime] (n : ℕ) {a b a' b' : X.Fn l}
+    (h : CgF X l n a b) (h' : CgF X l n a' b') : CgF X l n (a + a') (b + b') := by
   intro u
   rw [Pi.add_apply, Pi.add_apply, add_sub_add_comm, map_add (f := _), h u, h' u, add_zero]
 
 end UpperTheory.V.Z.Kato.Nb.HG
 
 open UpperTheory.V.Z.Kato.Nb.HG in
-theorem UpperTheory.V.Z.Kato.Nb.sHeckeGal : UpperTheory.V.Z.Kato.Nb.SHeckeGal := by
+theorem UpperTheory.V.Z.Kato.Nb.sHeckeGal :
+    UpperTheory.V.Z.Kato.Nb.SHeckeGal := by
   intro Ω _ _ _ ε X l hl N w n p hN hp hc s a ha
   obtain ⟨ha', hG⟩ := sGalAct Ω ε X l N w n hN s a ha
   have hp' : (0 : ℤ) < p := by exact_mod_cast hp.pos
   have hσ := (Betti.isDiam_sgD hN.ne' hl.out.ne_zero (Nat.Coprime.coprime_mul_left_right hc)).1
-  have hD : 0 < (!![(p : ℤ), 0; 0, 1] : Matrix (Fin 2) (Fin 2) ℤ).det := by
-    simpa [Matrix.det_fin_two_of] using hp.pos
-  have hS : ∀ γ : SL(2, ℤ), 0 < (γ : Matrix (Fin 2) (Fin 2) ℤ).det := fun γ => by
-    rw [γ.det_coe]; exact one_pos
+  have hD : 0 < (!![(p : ℤ), 0; 0, 1] : Matrix (Fin 2) (Fin 2) ℤ).det := by simpa [Matrix.det_fin_two_of] using hp.pos
+  have hS : ∀ γ : SL(2, ℤ), 0 < (γ : Matrix (Fin 2) (Fin 2) ℤ).det := fun γ => by rw [γ.det_coe]; exact one_pos
   unfold Tower.heckeT
   rw [LinearMap.add_apply, LinearMap.add_apply, map_add (f := _)]
   refine cg_add X l n ?_ ?_
@@ -226,32 +218,22 @@ theorem UpperTheory.V.Z.Kato.Nb.sHeckeGal : UpperTheory.V.Z.Kato.Nb.SHeckeGal :=
       Nat.mul_pos (Finset.prod_pos fun j _ => hM₀ j) (Nat.mul_pos (pow_pos hl.out.pos n) hp.pos)
     obtain ⟨ζ, e, hζ, hs, he, hχe⟩ := expo l n _ hM ((Dvd.intro _ rfl : l ^ n ∣ _).mul_left _) s
     obtain ⟨t, ht, hat⟩ := ha.1
-    have hper
-        : ∀ k t : ℤ,
-          AdicCompletion.eval (idl l) (X.Kl l) n
-              (X.act l !![1, k + t * p; 0, (p : ℤ)] (X.galB l s a) u)
-            = AdicCompletion.eval (idl l) (X.Kl l) n
-              (X.act l !![1, k; 0, (p : ℤ)] (X.galB l s a) u) := by
+    have hper : ∀ k t : ℤ,
+        AdicCompletion.eval (idl l) (X.Kl l) n (X.act l !![1, k + t * p; 0, (p : ℤ)] (X.galB l s a) u) =
+        AdicCompletion.eval (idl l) (X.Kl l) n (X.act l !![1, k; 0, (p : ℤ)] (X.galB l s a) u) := by
       intro k t
-      have hg : tr t ∈ Gam N l := ⟨
-        (CongruenceSubgroup.Gamma1_mem N _).2 (by simp [tr]),
-        CongruenceSubgroup.Gamma0_mem.2 (by simp [tr])
-      ⟩
+      have hg : tr t ∈ Gam N l := ⟨(CongruenceSubgroup.Gamma1_mem N _).2 (by simp [tr]),
+        CongruenceSubgroup.Gamma0_mem.2 (by simp [tr])⟩
       have := cg_act X l n !![1, k; 0, (p : ℤ)] (ha'.2.1 _ hg) u
-      rw [Tower.act_act Ω ε X l _ _ (hS _) (by simpa [Matrix.det_fin_two_of] using hp.pos), map_sub,
-          sub_eq_zero]
-        at this
+      rw [Tower.act_act Ω ε X l _ _ (hS _) (by simpa [Matrix.det_fin_two_of] using hp.pos), map_sub, sub_eq_zero] at this
       rw [← this]
       congr 3
       simp [tr]
-    have hsum :=
-      sum_perm p e hp.pos (he.coprime_dvd_right ((Dvd.intro_left _ rfl : p ∣ _).mul_left _))
-        (fun k =>
-          AdicCompletion.eval (idl l) (X.Kl l) n (X.act l !![1, k; 0, (p : ℤ)] (X.galB l s a) u))
-        hper
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sub, sub_eq_zero, LinearMap.sum_apply, LinearMap.sum_apply, map_sum, Finset.sum_apply,
-        Finset.sum_apply, map_sum, map_sum, ← hsum]
+    have hsum := sum_perm p e hp.pos (he.coprime_dvd_right ((Dvd.intro_left _ rfl : p ∣ _).mul_left _))
+      (fun k => AdicCompletion.eval (idl l) (X.Kl l) n (X.act l !![1, k; 0, (p : ℤ)] (X.galB l s a) u)) hper
+
+    rw [map_sub, sub_eq_zero, LinearMap.sum_apply, LinearMap.sum_apply, map_sum, Finset.sum_apply, Finset.sum_apply,
+    map_sum, map_sum, ← hsum]
     refine Finset.sum_congr rfl fun j hj => ?_
     refine (hR j _ ζ e hM ((Finset.dvd_prod_of_mem _ hj).mul_right _) hζ hs j).trans ?_
     refine eval_kmap X l n _ (eval_kmap X l n _ (poly_cg X l w n a t ht hat _ _ ?_ ?_))
@@ -261,6 +243,5 @@ theorem UpperTheory.V.Z.Kato.Nb.sHeckeGal : UpperTheory.V.Z.Kato.Nb.SHeckeGal :=
       ring
     · simp [mZl, Matrix.mulVec, dotProduct, Fin.sum_univ_two, hχ]
       ring
-  · rw [← Tower.act_act Ω ε X l _ _ (hS _) hD, ← Tower.act_act Ω ε X l _ _ (hS _) hD,
-      galB_diag X l p hp']
+  · rw [← Tower.act_act Ω ε X l _ _ (hS _) hD, ← Tower.act_act Ω ε X l _ _ (hS _) hD, galB_diag X l p hp']
     exact cg_act X l n _ (hG _ hσ).2

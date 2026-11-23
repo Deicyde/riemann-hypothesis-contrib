@@ -1,40 +1,74 @@
 module
 
-public import Mathlib
-public import Formalism.LocalToGlobal.BesselHermitianTheta.DefsReal
-public import Formalism.LocalToGlobal.BesselHermitianTheta.TiedSmooth
-public import Formalism.RealPlaceAnalysis.RealPlaceTaylor.CompactExponentialSurjective
-public import Development.AbelianVarietyTheory.BlockTheory.HeightDefect.IsotypicSignedParameters
 public import Development.AbelianVarietyTheory.Proofs.HeightProofs.ExistsBlockOrd
+public import Formalism.RealPlaceAnalysis.RealPlaceTaylor.CompactExponentialSurjective
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+public import Mathlib.Analysis.Calculus.Deriv.Prod
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+public import Mathlib.Analysis.ODE.ExistUnique
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.LinearAlgebra.Matrix.FiniteDimensional
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Coalgebra.IsFrobenius
+import Mathlib.RingTheory.HopfAlgebra.Basic
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
+import Formalism.LocalToGlobal.BesselHermitianTheta.NoncompactGapAtLeastRange
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.S Formalism.L2.Theta
-  GlobalTheory.RealPar Matrix MeasureTheory
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.S Formalism.L2.Theta GlobalTheory.RealPar Matrix MeasureTheory
 open scoped TensorProduct
 
 namespace GlobalTheory.RealPar
 
-theorem flow_mem_map
-    {V H : Type*} [AddCommGroup V] [Module ℂ V] [NormedAddCommGroup H] [InnerProductSpace ℂ H]
-    (ι : V →ₗ[ℂ] H)
-    (a : V →ₗ[ℂ] V)
-    (W : Submodule ℂ V) [FiniteDimensional ℂ W]
-    (hW : ∀ w ∈ W, a w ∈ W)
+theorem flow_mem_map {V H : Type*} [AddCommGroup V] [Module ℂ V] [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+    (ι : V →ₗ[ℂ] H) (a : V →ₗ[ℂ] V) (W : Submodule ℂ V) [FiniteDimensional ℂ W] (hW : ∀ w ∈ W, a w ∈ W)
     (U : ℝ → H →L[ℂ] H) (h0 : U 0 = 1) (hadd : ∀ s t, U (s + t) = U s * U t)
-    (hder : ∀ v, HasDerivAt (fun t : ℝ => U t (ι v)) (ι (a v)) 0)
-    (t : ℝ)
-    : ∀ x ∈ W.map ι, U t x ∈ W.map ι := by
+    (hder : ∀ v, HasDerivAt (fun t : ℝ => U t (ι v)) (ι (a v)) 0) (t : ℝ) :
+    ∀ x ∈ W.map ι, U t x ∈ W.map ι := by
   classical
   have hd : ∀ v s, HasDerivAt (fun t : ℝ => U t (ι v)) (U s (ι (a v))) s := by
     intro v s
     have h1 : HasDerivAt (fun t : ℝ => U (t - s) (ι v)) (ι (a v)) s := by
-      have :=
-        (show HasDerivAt (fun t : ℝ => U t (ι v)) (ι (a v)) (s - s) by rw [sub_self]; exact hder v)
+      have := (show HasDerivAt (fun t : ℝ => U t (ι v)) (ι (a v)) (s - s) by
+        rw [sub_self]; exact hder v)
       exact this.comp_sub_const s s
     have h2 := ((U s).restrictScalars ℝ).hasFDerivAt.comp_hasDerivAt s h1
-    have h3
-        : (fun t : ℝ => U t (ι v)) = ((U s).restrictScalars ℝ) ∘ fun t : ℝ => U (t - s) (ι v) := by
+    have h3 : (fun t : ℝ => U t (ι v)) = ((U s).restrictScalars ℝ) ∘ fun t : ℝ => U (t - s) (ι v) := by
       ext r
       have := hadd s (r - s)
       rw [add_sub_cancel] at this
@@ -50,14 +84,14 @@ theorem flow_mem_map
     intro s u
     have h3 : (u : V) = ∑ j, b.repr u j • (b j : V) := by
       have := congrArg W.subtype (b.sum_repr u)
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum] at this
+
+      rw [map_sum] at this
       exact this.symm
     rw [h3]
-    set_option synthInstance.maxHeartbeats 100000 in
+
     simp only [f, map_sum, map_smul, inner_sum, inner_smul_right]
-  let M : Matrix (Fin (Module.finrank ℂ W)) (Fin (Module.finrank ℂ W)) ℂ := fun i j =>
-    b.repr ⟨a (b i), hW _ (b i).2⟩ j
+  let M : Matrix (Fin (Module.finrank ℂ W)) (Fin (Module.finrank ℂ W)) ℂ :=
+    fun i j => b.repr ⟨a (b i), hW _ (b i).2⟩ j
   let L := LinearMap.toContinuousLinearMap (Matrix.toLin' M)
   have hfd : ∀ s, HasDerivAt f (L (f s)) s := by
     intro s
@@ -75,24 +109,13 @@ theorem flow_mem_map
     simp only [f, h0]
     exact Submodule.inner_left_of_mem_orthogonal (K := W.map ι) ⟨b i, (b i).2, rfl⟩ hy
   have hz : f = fun _ => 0 := by
-    refine ODE_solution_unique_univ
-      (v := fun _ x => L x)
-      (s := fun _ => Set.univ)
-      (K := ‖L‖₊) (t₀ := 0)
-      (fun _ => L.lipschitz.lipschitzOnWith)
-      (fun s => ⟨hfd s, trivial⟩)
-      (fun s => ⟨?_, trivial⟩)
-      hf0
+    refine ODE_solution_unique_univ (v := fun _ x => L x) (s := fun _ => Set.univ) (K := ‖L‖₊) (t₀ := 0)
+      (fun _ => L.lipschitz.lipschitzOnWith) (fun s => ⟨hfd s, trivial⟩) (fun s => ⟨?_, trivial⟩) hf0
     simpa using hasDerivAt_const s (0 : Fin (Module.finrank ℂ W) → ℂ)
   rw [hf t ⟨w, hw⟩, hz]
   simp
 
-theorem isKStableOn_of_kStable
-    : ∀ (p q n : ℕ) (e : Ix p q ≃ Fin n) (ε : Fin n → Bool) (T : GrpData p q) (R : DSRep T)
-        (σ : Matrix (Fin n) (Fin n) ℂ → (R.U.H →L[ℂ] R.U.H)),
-      BlockOrd e ε → Factors R.U e σ
-        → ∀ W : Submodule ℂ R.HK.V,
-          FiniteDimensional ℂ W → KStable R.HK.act W → IsKStableOn ε σ (W.map R.ι) := by
+theorem isKStableOn_of_kStable : ∀ (p q n : ℕ) (e : Ix p q ≃ Fin n) (ε : Fin n → Bool) (T : GrpData p q) (R : DSRep T) (σ : Matrix (Fin n) (Fin n) ℂ → (R.U.H →L[ℂ] R.U.H)), BlockOrd e ε → Factors R.U e σ → ∀ W : Submodule ℂ R.HK.V, FiniteDimensional ℂ W → KStable R.HK.act W → IsKStableOn ε σ (W.map R.ι) := by
   intro p q n e ε T R σ hb hF W hfin hK k hk
   obtain ⟨Y, hY, hexp, -⟩ := Formalism.REAL.compact_exists_log_bounded ε k hk
   obtain ⟨X, rfl⟩ := (Matrix.reindex e e).surjective Y
@@ -109,9 +132,8 @@ theorem isKStableOn_of_kStable
     intro a b hab
     rw [hb.sameBlock_iff] at hab
     have h2 := congrFun (congrFun hY.2 (e a)) (e b)
-    simp only [Formalism.REAL.Jm, Matrix.mul_diagonal, Matrix.diagonal_mul, Matrix.reindex_apply,
-        Matrix.submatrix_apply, Equiv.symm_apply_apply]
-      at h2
+    simp only [Formalism.REAL.Jm, Matrix.mul_diagonal, Matrix.diagonal_mul, Matrix.reindex_apply, Matrix.submatrix_apply,
+      Equiv.symm_apply_apply] at h2
     cases h3 : ε (e a) <;> cases h4 : ε (e b) <;> rw [h3, h4] at hab h2
     · exact (hab rfl).elim
     · simp only [if_true, Bool.false_eq_true, if_false] at h2
@@ -123,15 +145,10 @@ theorem isKStableOn_of_kStable
     rw [hF, one_smul, T.expt_cov X hX, ← hexp]
     congr 1
     open scoped Matrix.Norms.Operator in
-    exact (NormedSpace.map_exp (Matrix.reindexAlgEquiv ℂ ℂ e)
-      (by
-        exact LinearMap.continuous_of_finiteDimensional (Matrix.reindexAlgEquiv ℂ ℂ e).toLinearMap)
-      X).symm
+    exact (NormedSpace.map_exp (Matrix.reindexAlgEquiv ℂ ℂ e) (by
+      exact LinearMap.continuous_of_finiteDimensional (Matrix.reindexAlgEquiv ℂ ℂ e).toLinearMap) X).symm
   rw [hk']
-  exact flow_mem_map R.ι (R.HK.act X) W (hK X hKC)
-    (fun t => R.U.π (T.expt (t • X)))
-    (by simp [T.expt_zero])
-    (fun s t => by simp only [T.expt_add X hX, map_mul])
-    (R.der X hX) 1
+  exact flow_mem_map R.ι (R.HK.act X) W (hK X hKC) (fun t => R.U.π (T.expt (t • X)))
+    (by simp [T.expt_zero]) (fun s t => by simp only [T.expt_add X hX, map_mul]) (R.der X hX) 1
 
 end GlobalTheory.RealPar

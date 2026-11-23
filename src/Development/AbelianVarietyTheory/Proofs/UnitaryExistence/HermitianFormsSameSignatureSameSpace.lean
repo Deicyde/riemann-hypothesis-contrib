@@ -1,14 +1,54 @@
 module
 
-public import Mathlib
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.IsHolPeriods
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.FundamentalDomains.Signature
-public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.DetMulVolMulConj
-public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.ExistsHermCoordOfDatum
-public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.FinrankEqOfInjectiveOfSpan
-public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.SignatureHermitianModelOfDatumStatement
-public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.ExistsBinaryEqAdicCompletion
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.TwoWeightEqOneAddRoot
 public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.ConjEqNegOfSqEqNegNat
+public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.DetMulVolMulConj
+public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.ExistsBinaryEqAdicCompletion
+public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.ExistsHermCoordOfDatum
+import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.FinrankEqOfInjectiveOfSpan
+public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.SignatureHermitianModelOfDatumStatement
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
 
 @[expose] public section
 
@@ -27,17 +67,14 @@ theorem rt_sq' (H : Host E) : (H.rt : E) ^ 2 = -(H.d : E) := by
   have := congrArg (algebraMap (𝓞 E) E) H.rt_sq
   simpa using this
 
-theorem conj_of_sq {z : ℂ} {d : ℕ} (hd : 0 < d) (h : z ^ 2 = -(d : ℂ)) : starRingEnd ℂ z = -z := by
+theorem conj_of_sq {z : ℂ} {d : ℕ} (hd : 0 < d) (h : z ^ 2 = -(d : ℂ)) :
+    starRingEnd ℂ z = -z := by
   first
   | exact @_root_.GlobalTheory.ConjNegSquareNat.conj_eq_neg_of_sq_eq_neg_nat
   | exact _root_.GlobalTheory.ConjNegSquareNat.conj_eq_neg_of_sq_eq_neg_nat
   | (apply _root_.GlobalTheory.ConjNegSquareNat.conj_eq_neg_of_sq_eq_neg_nat <;> assumption)
   | (intros; apply _root_.GlobalTheory.ConjNegSquareNat.conj_eq_neg_of_sq_eq_neg_nat <;> assumption)
-  | (
-      intros
-      apply @_root_.GlobalTheory.ConjNegSquareNat.conj_eq_neg_of_sq_eq_neg_nat
-        <;> first | assumption | infer_instance
-    )
+  | (intros; apply @_root_.GlobalTheory.ConjNegSquareNat.conj_eq_neg_of_sq_eq_neg_nat <;> first | assumption | infer_instance)
   | (intros; exact _root_.GlobalTheory.ConjNegSquareNat.conj_eq_neg_of_sq_eq_neg_nat ..)
 
 theorem emb_rt_sq (H : Host E) (τ : E →+* ℂ) : τ (H.rt : E) ^ 2 = -(H.d : ℂ) := by
@@ -56,30 +93,27 @@ theorem rt_ne (H : Host E) : (H.rt : E) ≠ 0 := by
   have h2 : (H.d : E) = 0 := by simpa using this
   exact H.d_prime.ne_zero (by exact_mod_cast h2)
 
-theorem gram_eq {r : ℕ} (τ : E →+* ℂ) (G : Matrix (Fin r) (Fin r) E) (Q : Matrix (Fin r) (Fin r) ℂ)
-    : FD.gram τ G Q = Qᵀ * G.map τ * Q.map (starRingEnd ℂ) := by
+theorem gram_eq {r : ℕ} (τ : E →+* ℂ) (G : Matrix (Fin r) (Fin r) E) (Q : Matrix (Fin r) (Fin r) ℂ) :
+    FD.gram τ G Q = Qᵀ * G.map τ * Q.map (starRingEnd ℂ) := by
   ext a b
   simp only [FD.gram, FD.hermC, FD.col, Matrix.of_apply, Matrix.mul_apply, Matrix.transpose_apply,
     Matrix.map_apply, Finset.sum_mul]
   exact Finset.sum_comm
 
-theorem det_gram {r : ℕ} (τ : E →+* ℂ) (G : Matrix (Fin r) (Fin r) E) (Q : Matrix (Fin r) (Fin r) ℂ)
-    : (FD.gram τ G Q).det = ((‖Q.det‖ ^ 2 : ℝ) : ℂ) * τ G.det := by
+theorem det_gram {r : ℕ} (τ : E →+* ℂ) (G : Matrix (Fin r) (Fin r) E) (Q : Matrix (Fin r) (Fin r) ℂ) :
+    (FD.gram τ G Q).det = ((‖Q.det‖ ^ 2 : ℝ) : ℂ) * τ G.det := by
   rw [gram_eq, det_mul, det_mul, det_transpose]
   have h1 : (G.map τ).det = τ G.det := (RingHom.map_det τ G).symm
   have h2 : (Q.map (starRingEnd ℂ)).det = starRingEnd ℂ Q.det := (RingHom.map_det _ Q).symm
   rw [h1, h2, ← Complex.normSq_eq_norm_sq, ← Complex.mul_conj]
   ring
 
-theorem gram_conj
-    {r : ℕ} (τ : E →+* ℂ) (G : Matrix (Fin r) (Fin r) E) (p : ℕ)
-    (h : ∃ Q : Matrix (Fin r) (Fin r) ℂ,
-      Q.det ≠ 0
-        ∧ FD.gram (ComplexEmbedding.conjugate τ) G Q
-          = Matrix.diagonal fun a : Fin r => ((FD.sgn p (a : ℕ) : ℝ) : ℂ))
-    : ∃ Q : Matrix (Fin r) (Fin r) ℂ,
-      Q.det ≠ 0
-        ∧ FD.gram τ G Q = Matrix.diagonal fun a : Fin r => ((FD.sgn p (a : ℕ) : ℝ) : ℂ) := by
+theorem gram_conj {r : ℕ} (τ : E →+* ℂ) (G : Matrix (Fin r) (Fin r) E) (p : ℕ)
+    (h : ∃ Q : Matrix (Fin r) (Fin r) ℂ, Q.det ≠ 0 ∧
+      FD.gram (ComplexEmbedding.conjugate τ) G Q =
+        Matrix.diagonal fun a : Fin r => ((FD.sgn p (a : ℕ) : ℝ) : ℂ)) :
+    ∃ Q : Matrix (Fin r) (Fin r) ℂ, Q.det ≠ 0 ∧
+      FD.gram τ G Q = Matrix.diagonal fun a : Fin r => ((FD.sgn p (a : ℕ) : ℝ) : ℂ) := by
   obtain ⟨Q, hQ, h⟩ := h
   refine ⟨Q.map (starRingEnd ℂ), ?_, ?_⟩
   · have h2 : (Q.map (starRingEnd ℂ)).det = starRingEnd ℂ Q.det := (RingHom.map_det _ Q).symm
@@ -87,15 +121,14 @@ theorem gram_conj
     simpa using hQ
   · ext a b
     have := congrArg (starRingEnd ℂ) (congrFun (congrFun h a) b)
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [FD.gram, FD.hermC, FD.col, Matrix.of_apply, Matrix.map_apply, map_sum, map_mul,
-          ComplexEmbedding.conjugate_coe_eq, Complex.conj_conj, Matrix.diagonal_apply]
-        at this ⊢
+
+    simp only [FD.gram, FD.hermC, FD.col, Matrix.of_apply, Matrix.map_apply, map_sum, map_mul,
+    ComplexEmbedding.conjugate_coe_eq, Complex.conj_conj, Matrix.diagonal_apply] at this ⊢
     rw [this]
     split_ifs <;> simp
 
-theorem cc_det {r : ℕ} (G : Matrix (Fin r) (Fin r) E) (h : ∀ a b, FD.cc (G a b) = G b a)
-    : FD.cc G.det = G.det := by
+theorem cc_det {r : ℕ} (G : Matrix (Fin r) (Fin r) E) (h : ∀ a b, FD.cc (G a b) = G b a) :
+    FD.cc G.det = G.det := by
   have h1 : IsCMField.complexConj E G.det = (G.map (IsCMField.complexConj E)).det :=
     RingHom.map_det (IsCMField.complexConj E).toRingEquiv.toRingHom G
   have h2 : G.map (IsCMField.complexConj E) = Gᵀ := by
@@ -121,39 +154,7 @@ namespace GlobalTheory
 
 open GlobalTheory.OneSpace
 
-theorem model_in_same_space
-    : (∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (r : ℕ)
-          (G G' : Matrix (Fin r) (Fin r) E),
-        (∀ a b, FD.cc (G a b) = G b a) → (∀ a b, FD.cc (G' a b) = G' b a) → G.det ≠ 0 → G'.det ≠ 0
-          → (∀ τ : E →+* ℂ, ∃ p0 : ℕ,
-            (∃ Q : Matrix (Fin r) (Fin r) ℂ,
-                Q.det ≠ 0
-                  ∧ FD.gram τ G Q = Matrix.diagonal fun a : Fin r => ((FD.sgn p0 (a : ℕ) : ℝ) : ℂ))
-              ∧ (∃ Q : Matrix (Fin r) (Fin r) ℂ,
-                Q.det ≠ 0
-                  ∧ FD.gram τ G' Q
-                    = Matrix.diagonal fun a : Fin r => ((FD.sgn p0 (a : ℕ) : ℝ) : ℂ)))
-          → (∃ z : E, G'.det = z * FD.cc z * G.det)
-          → ∃ γ : GL (Fin r) E, ∀ x y,
-            FD.herm G ((γ : Matrix (Fin r) (Fin r) E) *ᵥ x) ((γ : Matrix (Fin r) (Fin r) E) *ᵥ y)
-              = FD.herm G' x y)
-      → (∀ (F : Type) [Field F] [NumberField F] (δ x : F),
-        δ ≠ 0 → x ≠ 0 → (∀ σ : F →+* ℝ, ∃ a b : ℝ, σ x = a ^ 2 - σ δ * b ^ 2)
-          → (∀ v : IsDedekindDomain.HeightOneSpectrum (𝓞 F), ∃ a b : v.adicCompletion F,
-            algebraMap F (v.adicCompletion F) x
-              = a ^ 2 - algebraMap F (v.adicCompletion F) δ * b ^ 2)
-          → ∃ a b : F, x = a ^ 2 - δ * b ^ 2)
-      → ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D D' : Datum H) (r : ℕ)
-          (ξ : E) (Gm : Matrix (Fin r) (Fin r) E) (φ : D.La →ₗ[𝓞 E] (Fin r → E)),
-        D'.p = D.p → D'.q = D.q → FD.cc ξ = -ξ
-          → (Function.Injective φ ∧ Submodule.span E (Set.range φ) = ⊤
-            ∧ (∀ a b, FD.cc (Gm a b) = Gm b a) ∧ Gm.det ≠ 0
-            ∧ ∀ x y, ((D.EF x y : ℤ) : ℚ) = Algebra.trace ℚ E (ξ * FD.herm Gm (φ x) (φ y)))
-          → ∃ φ' : D'.La →ₗ[𝓞 E] (Fin r → E),
-            (Function.Injective φ' ∧ Submodule.span E (Set.range φ') = ⊤
-              ∧ (∀ a b, FD.cc (Gm a b) = Gm b a) ∧ Gm.det ≠ 0
-              ∧ ∀ x y,
-                ((D'.EF x y : ℤ) : ℚ) = Algebra.trace ℚ E (ξ * FD.herm Gm (φ' x) (φ' y))) := by
+theorem model_in_same_space : (∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (r : ℕ) (G G' : Matrix (Fin r) (Fin r) E), (∀ a b, FD.cc (G a b) = G b a) → (∀ a b, FD.cc (G' a b) = G' b a) → G.det ≠ 0 → G'.det ≠ 0 → (∀ τ : E →+* ℂ, ∃ p0 : ℕ, (∃ Q : Matrix (Fin r) (Fin r) ℂ, Q.det ≠ 0 ∧ FD.gram τ G Q = Matrix.diagonal fun a : Fin r => ((FD.sgn p0 (a : ℕ) : ℝ) : ℂ)) ∧ (∃ Q : Matrix (Fin r) (Fin r) ℂ, Q.det ≠ 0 ∧ FD.gram τ G' Q = Matrix.diagonal fun a : Fin r => ((FD.sgn p0 (a : ℕ) : ℝ) : ℂ))) → (∃ z : E, G'.det = z * FD.cc z * G.det) → ∃ γ : GL (Fin r) E, ∀ x y, FD.herm G ((γ : Matrix (Fin r) (Fin r) E) *ᵥ x) ((γ : Matrix (Fin r) (Fin r) E) *ᵥ y) = FD.herm G' x y) → (∀ (F : Type) [Field F] [NumberField F] (δ x : F), δ ≠ 0 → x ≠ 0 → (∀ σ : F →+* ℝ, ∃ a b : ℝ, σ x = a ^ 2 - σ δ * b ^ 2) → (∀ v : IsDedekindDomain.HeightOneSpectrum (𝓞 F), ∃ a b : v.adicCompletion F, algebraMap F (v.adicCompletion F) x = a ^ 2 - algebraMap F (v.adicCompletion F) δ * b ^ 2) → ∃ a b : F, x = a ^ 2 - δ * b ^ 2) → ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D D' : Datum H) (r : ℕ) (ξ : E) (Gm : Matrix (Fin r) (Fin r) E) (φ : D.La →ₗ[𝓞 E] (Fin r → E)), D'.p = D.p → D'.q = D.q → FD.cc ξ = -ξ → (Function.Injective φ ∧ Submodule.span E (Set.range φ) = ⊤ ∧ (∀ a b, FD.cc (Gm a b) = Gm b a) ∧ Gm.det ≠ 0 ∧ ∀ x y, ((D.EF x y : ℤ) : ℚ) = Algebra.trace ℚ E (ξ * FD.herm Gm (φ x) (φ y))) → ∃ φ' : D'.La →ₗ[𝓞 E] (Fin r → E), (Function.Injective φ' ∧ Submodule.span E (Set.range φ') = ⊤ ∧ (∀ a b, FD.cc (Gm a b) = Gm b a) ∧ Gm.det ≠ 0 ∧ ∀ x y, ((D'.EF x y : ℤ) : ℚ) = Algebra.trace ℚ E (ξ * FD.herm Gm (φ' x) (φ' y))) := by
   intro hL hH E _ _ _ H D D' r ξ Gm φ hp hq hξ hM
   have hr : r = D'.p + D'.q := by
     rw [hp, hq]
@@ -184,17 +185,7 @@ theorem model_in_same_space
     rw [this, h0]
     simp
   obtain ⟨Gm', ψ, hM'⟩ := GlobalTheory.exists_herm_coord_of_datum E H D' ξ hξ h0 r hr
-  have hsΨ
-      : ∀ τ : E →+* ℂ,
-        τ (H.rt : E) = H.rt0
-          → ∃ p0 : ℕ,
-            (∃ Q : Matrix (Fin r) (Fin r) ℂ,
-                Q.det ≠ 0
-                  ∧ FD.gram τ Gm Q = Matrix.diagonal fun a : Fin r => ((FD.sgn p0 (a : ℕ) : ℝ) : ℂ))
-              ∧ (∃ Q : Matrix (Fin r) (Fin r) ℂ,
-                Q.det ≠ 0
-                  ∧ FD.gram τ Gm' Q
-                    = Matrix.diagonal fun a : Fin r => ((FD.sgn p0 (a : ℕ) : ℝ) : ℂ)) := by
+  have hsΨ : ∀ τ : E →+* ℂ, τ (H.rt : E) = H.rt0 → ∃ p0 : ℕ, (∃ Q : Matrix (Fin r) (Fin r) ℂ, Q.det ≠ 0 ∧ FD.gram τ Gm Q = Matrix.diagonal fun a : Fin r => ((FD.sgn p0 (a : ℕ) : ℝ) : ℂ)) ∧ (∃ Q : Matrix (Fin r) (Fin r) ℂ, Q.det ≠ 0 ∧ FD.gram τ Gm' Q = Matrix.diagonal fun a : Fin r => ((FD.sgn p0 (a : ℕ) : ℝ) : ℂ)) := by
     intro τ hτ
     have s1 := GlobalTheory.T.signature_hermitian_model_of_datum E H D r ξ Gm φ hξ hM τ hτ
     have s2 := GlobalTheory.T.signature_hermitian_model_of_datum E H D' r ξ Gm' ψ hξ hM' τ hτ
@@ -202,23 +193,13 @@ theorem model_in_same_space
     rcases lt_or_gt_of_ne (im_ne τ hξ h0) with h | h
     · exact ⟨_, s1.2 h, s2.2 h⟩
     · exact ⟨_, s1.1 h, s2.1 h⟩
-  have hs
-      : ∀ τ : E →+* ℂ, ∃ p0 : ℕ,
-        (∃ Q : Matrix (Fin r) (Fin r) ℂ,
-            Q.det ≠ 0
-              ∧ FD.gram τ Gm Q = Matrix.diagonal fun a : Fin r => ((FD.sgn p0 (a : ℕ) : ℝ) : ℂ))
-          ∧ (∃ Q : Matrix (Fin r) (Fin r) ℂ,
-            Q.det ≠ 0
-              ∧ FD.gram τ Gm' Q
-                = Matrix.diagonal fun a : Fin r => ((FD.sgn p0 (a : ℕ) : ℝ) : ℂ)) := by
+  have hs : ∀ τ : E →+* ℂ, ∃ p0 : ℕ, (∃ Q : Matrix (Fin r) (Fin r) ℂ, Q.det ≠ 0 ∧ FD.gram τ Gm Q = Matrix.diagonal fun a : Fin r => ((FD.sgn p0 (a : ℕ) : ℝ) : ℂ)) ∧ (∃ Q : Matrix (Fin r) (Fin r) ℂ, Q.det ≠ 0 ∧ FD.gram τ Gm' Q = Matrix.diagonal fun a : Fin r => ((FD.sgn p0 (a : ℕ) : ℝ) : ℂ)) := by
     intro τ
     have h1 : τ (H.rt : E) ^ 2 = H.rt0 ^ 2 := by rw [emb_rt_sq, H.sqrt_neg_disc_sq]
     rcases sq_eq_sq_iff_eq_or_eq_neg.1 h1 with h | h
     · exact hsΨ τ h
-    · obtain ⟨p0, a, b⟩ :=
-        hsΨ (ComplexEmbedding.conjugate τ) (by
-          rw [ComplexEmbedding.conjugate_coe_eq, conj_of_sq H.d_prime.pos (emb_rt_sq H τ), h,
-            neg_neg])
+    · obtain ⟨p0, a, b⟩ := hsΨ (ComplexEmbedding.conjugate τ) (by
+        rw [ComplexEmbedding.conjugate_coe_eq, conj_of_sq H.d_prime.pos (emb_rt_sq H τ), h, neg_neg])
       exact ⟨p0, gram_conj τ _ _ a, gram_conj τ _ _ b⟩
   have hI := GlobalTheory.DetIdeal.det_ideal E H D D' r ξ Gm φ Gm' ψ hξ hM hM'
   obtain ⟨-, -, hG, hdet, -⟩ := hM
@@ -234,9 +215,8 @@ theorem model_in_same_space
     intro h
     exact div_ne_zero hdet' hdet (congrArg Subtype.val h)
   have hloc := GlobalTheory.local_norm_of_ideal_norm E H x hx0 hI
-  have hreal
-      : ∀ σ : maximalRealSubfield E →+* ℝ, ∃ a b : ℝ,
-        σ x = a ^ 2 - σ (-(H.d : maximalRealSubfield E)) * b ^ 2 := by
+  have hreal : ∀ σ : maximalRealSubfield E →+* ℝ, ∃ a b : ℝ,
+      σ x = a ^ 2 - σ (-(H.d : maximalRealSubfield E)) * b ^ 2 := by
     intro σ
     let τ : E →+* ℂ := ComplexEmbedding.lift E (Complex.ofRealHom.comp σ)
     have hτ : τ (Gm'.det / Gm.det) = (σ x : ℂ) :=
@@ -252,9 +232,8 @@ theorem model_in_same_space
     push_cast at e2 ⊢
     field_simp
     linear_combination -e2
-  obtain ⟨a, b, hab⟩ :=
-    hH (maximalRealSubfield E) (-(H.d : maximalRealSubfield E)) x (by simpa using H.d_prime.ne_zero)
-      hx0 hreal hloc
+  obtain ⟨a, b, hab⟩ := hH (maximalRealSubfield E) (-(H.d : maximalRealSubfield E)) x
+    (by simpa using H.d_prime.ne_zero) hx0 hreal hloc
   have hz : ∃ z : E, Gm'.det = z * FD.cc z * Gm.det := by
     refine ⟨(a : E) + (b : E) * (H.rt : E), ?_⟩
     have e1 : FD.cc ((a : E) + (b : E) * (H.rt : E)) = (a : E) - (b : E) * (H.rt : E) := by
@@ -273,8 +252,8 @@ theorem model_in_same_space
   let g : (Fin r → E) ≃ₗ[E] (Fin r → E) := Matrix.toLin'OfInv γ.inv_mul γ.mul_inv
   have hg : ∀ v, g v = (γ : Matrix (Fin r) (Fin r) E) *ᵥ v := fun v => rfl
   refine ⟨(g.toLinearMap.restrictScalars (𝓞 E)).comp ψ, g.injective.comp hinj, ?_, hG, hdet, ?_⟩
-  · have : Set.range ((g.toLinearMap.restrictScalars (𝓞 E)).comp ψ)
-        = g.toLinearMap '' Set.range ψ := by
+  · have : Set.range ((g.toLinearMap.restrictScalars (𝓞 E)).comp ψ) =
+        g.toLinearMap '' Set.range ψ := by
       rw [← Set.range_comp]; rfl
     rw [this, Submodule.span_image, hspan, Submodule.map_top, LinearEquiv.range]
   · intro u v

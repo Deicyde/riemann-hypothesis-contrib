@@ -1,7 +1,56 @@
 module
 
-public import Mathlib
+public import Mathlib.NumberTheory.Padics.Complex
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.MaximalIdealEqJointEigen
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Lemma
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
+public import Mathlib.LinearAlgebra.FreeModule.PID
 
 @[expose] public section
 
@@ -11,8 +60,7 @@ open MvPolynomial
 
 namespace GlobalTheory.ExpCover
 
-def transOp {L G W : Type} [CommRing L] [Mul G] [AddCommGroup W] [Module L W] (a : L) (t : Finset G)
-    : (G → W) →ₗ[L] (G → W) where
+def transOp {L G W : Type} [CommRing L] [Mul G] [AddCommGroup W] [Module L W] (a : L) (t : Finset G) : (G → W) →ₗ[L] (G → W) where
   toFun v g := a • ∑ s ∈ t, v (g * s)
   map_add' v v' := by funext g; simp [Finset.sum_add_distrib, smul_add]
   map_smul' c v := by funext g; simp [Finset.smul_sum, smul_comm c]
@@ -77,55 +125,51 @@ private lemma coeffs_eq_zero_of_linearIndependent_of_injective {O K X : Type} [C
     · exact hc0
     · exact htail' k
 
+
 set_option autoImplicit false in
 open MvPolynomial in
-theorem _root_.GlobalTheory.ExpCover.values_mem_of_local
-    {l : ℕ} [Fact l.Prime]
-    {O I G V W : Type} [CommRing O] [IsDomain O] [IsPrincipalIdealRing O] [Mul G] [AddCommGroup V]
-    [Module O V] [Module.Finite O V] [AddCommGroup W] [Module (PadicAlgCl l) W]
-    (M : Submodule O (G → V)) [hm : Module (MvPolynomial I O) M]
-    [@IsScalarTower O (MvPolynomial I O) M _ hm.toSMul _] [Module.Finite O M]
-    (emb : O →+* PadicAlgCl l) (hemb : Function.Injective emb) (h1 : ∀ c, ‖emb c‖ ≤ 1)
-    (hu : ∀ c, ‖emb c‖ = 1 → IsUnit c) (b : V →ₛₗ[emb] W) (hb : Function.Injective b)
-    (hli : ∀ (n : ℕ) (y : Fin n → V),
-      LinearIndependent O y → LinearIndependent (PadicAlgCl l) fun j => b (y j))
+theorem _root_.GlobalTheory.ExpCover.values_mem_of_local {l : ℕ} [Fact l.Prime] {O I G V W : Type} [CommRing O]
+    [IsDomain O] [IsPrincipalIdealRing O] [Mul G]
+    [AddCommGroup V] [Module O V] [Module.Finite O V] [AddCommGroup W] [Module (PadicAlgCl l) W]
+    (M : Submodule O (G → V)) [hm : Module (MvPolynomial I O) M] [@IsScalarTower O (MvPolynomial I O) M _ hm.toSMul _]
+    [Module.Finite O M]
+    (emb : O →+* PadicAlgCl l) (hemb : Function.Injective emb)
+    (h1 : ∀ c, ‖emb c‖ ≤ 1) (hu : ∀ c, ‖emb c‖ = 1 → IsUnit c) (b : V →ₛₗ[emb] W) (hb : Function.Injective b)
+    (hli : ∀ (n : ℕ) (y : Fin n → V), LinearIndependent O y → LinearIndependent (PadicAlgCl l) fun j => b (y j))
     (tr : I → Finset G) (cst : I → O)
-    (hX : ∀ i (f : M) g,
-      (((X i : MvPolynomial I O) • f : M) : G → V) g = cst i • ∑ s ∈ tr i, (f : G → V) (g * s))
-    (U : Submodule O V)
-    (S : Submodule (PadicAlgCl l) (G → W))
+    (hX : ∀ i (f : M) g, (((X i : MvPolynomial I O) • f : M) : G → V) g = cst i • ∑ s ∈ tr i, (f : G → V) (g * s))
+    (U : Submodule O V) (S : Submodule (PadicAlgCl l) (G → W))
     (hS : ∀ i, ∀ u ∈ S, _root_.GlobalTheory.ExpCover.transOp (emb (cst i)) (tr i) u ∈ S)
-    (x : M) (hx : (fun g => b ((x : G → V) g)) ∈ S)
-    (a : O) (J : ℕ) (D : Set M) (hD : ∀ y ∈ D, ∀ g, (y : G → V) g ∈ U)
-    (hloc : ∀ (m : Ideal (MvPolynomial I O)) (hmax : m.IsMaximal) (θ : I → PadicAlgCl l),
-      (∀ i, ‖θ i‖ ≤ 1) → (∀ p, p ∈ m ↔ ‖eval₂ emb θ p‖ < 1)
-        → (∃ v ∈ S, v ≠ 0 ∧ ∀ i g, emb (cst i) • ∑ s ∈ tr i, v (g * s) = θ i • v g)
-        → ∀ y : LocalizedModule (haveI := hmax.isPrime; m.primeCompl) M, ∃ x' ∈ D,
-          ∃ s : (haveI := hmax.isPrime; m.primeCompl),
-            LocalizedModule.mk x' s = (algebraMap O (MvPolynomial I O) a) ^ J • y)
-    : ∀ g, ((a ^ J • x : M) : G → V) g ∈ U := by
+    (x : M) (hx : (fun g => b ((x : G → V) g)) ∈ S) (a : O) (J : ℕ) (D : Set M) (hD : ∀ y ∈ D, ∀ g, (y : G → V) g ∈ U)
+    (hloc : ∀ (m : Ideal (MvPolynomial I O)) (hmax : m.IsMaximal) (θ : I → PadicAlgCl l), (∀ i, ‖θ i‖ ≤ 1) →
+      (∀ p, p ∈ m ↔ ‖eval₂ emb θ p‖ < 1) →
+      (∃ v ∈ S, v ≠ 0 ∧ ∀ i g, emb (cst i) • ∑ s ∈ tr i, v (g * s) = θ i • v g) →
+      ∀ y : LocalizedModule (haveI := hmax.isPrime; m.primeCompl) M,
+        ∃ x' ∈ D, ∃ s : (haveI := hmax.isPrime; m.primeCompl),
+          LocalizedModule.mk x' s = (algebraMap O (MvPolynomial I O) a) ^ J • y) :
+    ∀ g, ((a ^ J • x : M) : G → V) g ∈ U := by
   classical
-  let N : Submodule (MvPolynomial I O) M := {
-    carrier := {y | ∀ g, (y : G → V) g ∈ U}
-    add_mem' := fun {y z} hy hz g => by simpa using U.add_mem (hy g) (hz g)
-    zero_mem' := fun g => by simp
-    smul_mem' := fun p y hy => by
-      induction p using MvPolynomial.induction_on with
-      | C c =>
-        intro g
-        have h : (C c : MvPolynomial I O) • y = c • y := by
-          rw [← MvPolynomial.algebraMap_eq, algebraMap_smul]
-        rw [h, Submodule.coe_smul, Pi.smul_apply]
-        exact U.smul_mem c (hy g)
-      | add p q hp hq =>
-        intro g
-        rw [add_smul]
-        simpa using U.add_mem (hp g) (hq g)
-      | mul_X p i hp =>
-        intro g
-        rw [mul_comm, mul_smul, hX i (p • y) g]
-        exact U.smul_mem _ (U.sum_mem fun s _ => hp (g * s))
-  }
+  let N : Submodule (MvPolynomial I O) M :=
+    { carrier := {y | ∀ g, (y : G → V) g ∈ U}
+      add_mem' := fun {y z} hy hz g => by
+        simpa using U.add_mem (hy g) (hz g)
+      zero_mem' := fun g => by simp
+      smul_mem' := fun p y hy => by
+        induction p using MvPolynomial.induction_on with
+        | C c =>
+          intro g
+          have h : (C c : MvPolynomial I O) • y = c • y := by
+            rw [← MvPolynomial.algebraMap_eq, algebraMap_smul]
+          rw [h, Submodule.coe_smul, Pi.smul_apply]
+          exact U.smul_mem c (hy g)
+        | add p q hp hq =>
+          intro g
+          rw [add_smul]
+          simpa using U.add_mem (hp g) (hq g)
+        | mul_X p i hp =>
+          intro g
+          rw [mul_comm, mul_smul, hX i (p • y) g]
+          exact U.smul_mem _ (U.sum_mem fun s _ => hp (g * s)) }
   set z : M := a ^ J • x with hz_def
   let A : Ideal (MvPolynomial I O) := N.comap (LinearMap.toSpanSingleton (MvPolynomial I O) M z)
   have hA : ∀ p, p ∈ A ↔ p • z ∈ N := fun p => Iff.rfl
@@ -137,10 +181,8 @@ theorem _root_.GlobalTheory.ExpCover.values_mem_of_local
     have h1' : (1 : MvPolynomial I O) ∈ A := h ▸ Submodule.mem_top
     simpa using (hA 1).1 h1'
   obtain ⟨m, hmax, hAm⟩ := Ideal.exists_le_maximal A hAtop
-  have key
-      : ∃ θ : I → PadicAlgCl l,
-        (∀ i, ‖θ i‖ ≤ 1) ∧ (∀ p, p ∈ m ↔ ‖eval₂ emb θ p‖ < 1)
-          ∧ (∃ v ∈ S, v ≠ 0 ∧ ∀ i g, emb (cst i) • ∑ s ∈ tr i, v (g * s) = θ i • v g) := by
+  have key : ∃ θ : I → PadicAlgCl l, (∀ i, ‖θ i‖ ≤ 1) ∧ (∀ p, p ∈ m ↔ ‖eval₂ emb θ p‖ < 1) ∧
+      (∃ v ∈ S, v ≠ 0 ∧ ∀ i g, emb (cst i) • ∑ s ∈ tr i, v (g * s) = θ i • v g) := by
     haveI : Module.IsTorsionFree O V := Module.IsTorsionFree.of_smul_eq_zero fun r w h => by
       have h' : emb r • b w = 0 := by rw [← map_smulₛₗ, h, map_zero]
       rcases smul_eq_zero.1 h' with h'' | h''
@@ -165,40 +207,33 @@ theorem _root_.GlobalTheory.ExpCover.values_mem_of_local
         exact (LinearMap.toMatrixAlgEquiv B).injective (by simpa [ρ] using this)
       have := congrArg Subtype.val (LinearMap.congr_fun h0 ⟨x, hxZ⟩)
       simpa [φ] using this
-    obtain ⟨θ, hθ1, hθm, c, hc0, hc⟩ :=
-      _root_.GlobalTheory.maximal_ideal_eq_joint_eigen l O emb h1 hu I (Module.finrank O Z) ρ m hmax
-        (fun p hp =>
-          hAm ((hA p).2 (by rw [hz_def, smul_comm, hker p hp, smul_zero]; exact N.zero_mem)))
+    obtain ⟨θ, hθ1, hθm, c, hc0, hc⟩ := _root_.GlobalTheory.maximal_ideal_eq_joint_eigen l O emb h1 hu I
+      (Module.finrank O Z) ρ m hmax (fun p hp => hAm ((hA p).2 (by
+        rw [hz_def, smul_comm, hker p hp, smul_zero]; exact N.zero_mem)))
     have hpS : ∀ p : MvPolynomial I O, (fun g => b (((p • x : M) : G → V) g)) ∈ S := by
       intro p
       induction p using MvPolynomial.induction_on with
       | C r =>
-        have e
-            : (fun g => b ((((C r : MvPolynomial I O) • x : M) : G → V) g))
-              = emb r • fun g => b ((x : G → V) g) := by
+        have e : (fun g => b ((((C r : MvPolynomial I O) • x : M) : G → V) g)) =
+            emb r • fun g => b ((x : G → V) g) := by
           funext g
           rw [← MvPolynomial.algebraMap_eq, algebraMap_smul]
           simp [map_smulₛₗ]
-        rw [e]
-        exact S.smul_mem _ hx
+        rw [e]; exact S.smul_mem _ hx
       | add p q hp hq =>
-        have e
-            : (fun g => b ((((p + q) • x : M) : G → V) g))
-              = (fun g => b (((p • x : M) : G → V) g)) + fun g => b (((q • x : M) : G → V) g) := by
+        have e : (fun g => b ((((p + q) • x : M) : G → V) g)) =
+            (fun g => b (((p • x : M) : G → V) g)) + fun g => b (((q • x : M) : G → V) g) := by
           funext g; simp [add_smul]
-        rw [e]
-        exact S.add_mem hp hq
+        rw [e]; exact S.add_mem hp hq
       | mul_X p i hp =>
-        have e
-            : (fun g => b ((((p * X i) • x : M) : G → V) g))
-              = _root_.GlobalTheory.ExpCover.transOp (emb (cst i)) (tr i)
-                (fun g => b (((p • x : M) : G → V) g)) := by
+        have e : (fun g => b ((((p * X i) • x : M) : G → V) g)) =
+            _root_.GlobalTheory.ExpCover.transOp (emb (cst i)) (tr i)
+              (fun g => b (((p • x : M) : G → V) g)) := by
           funext g
           rw [mul_comm, mul_smul, hX]
-          set_option synthInstance.maxHeartbeats 100000 in
+
           simp [_root_.GlobalTheory.ExpCover.transOp, map_sum, map_smulₛₗ]
-        rw [e]
-        exact hS i _ hp
+        rw [e]; exact hS i _ hp
     have hZS : ∀ z ∈ Z, (fun g => b ((z : G → V) g)) ∈ S := by
       intro z hz
       obtain ⟨p, rfl⟩ := Submodule.mem_span_singleton.1 hz
@@ -209,8 +244,7 @@ theorem _root_.GlobalTheory.ExpCover.values_mem_of_local
       let w := Module.finBasis O V
       have hw := hli _ w w.linearIndependent
       let L : Z →ₗ[O] (G × Fin (Module.finrank O V) → O) :=
-        LinearMap.pi fun p =>
-          (Finsupp.lapply p.2 ∘ₗ w.repr.toLinearMap) ∘ₗ (LinearMap.proj p.1 ∘ₗ ι)
+        LinearMap.pi fun p => (Finsupp.lapply p.2 ∘ₗ w.repr.toLinearMap) ∘ₗ (LinearMap.proj p.1 ∘ₗ ι)
       have hL : Function.Injective L := by
         rw [← LinearMap.ker_eq_bot, LinearMap.ker_eq_bot']
         intro z hz
@@ -226,22 +260,20 @@ theorem _root_.GlobalTheory.ExpCover.values_mem_of_local
       have hfk : ∀ j g, f j g = ∑ k, emb ((L ∘ B) j (g, k)) • b (w k) := by
         intro j g
         have e := congrArg b (w.sum_repr ((((B j : Z) : M) : G → V) g))
-        set_option synthInstance.maxHeartbeats 100000 in
-          rw [map_sum] at e
+
+        rw [map_sum] at e
         simp only [map_smulₛₗ] at e
         show b ((((B j : Z) : M) : G → V) g) = _
         rw [← e]
         rfl
-      have hzero : c' = 0 :=
-        coeffs_eq_zero_of_linearIndependent_of_injective emb hemb _ _ hα c' fun p => by
-          have hg : ∑ j, c' j • f j p.1 = 0 := by simpa [Finset.sum_apply] using congrFun hc' p.1
-          have hsum : ∑ k, (∑ j, c' j * emb ((L ∘ B) j (p.1, k))) • b (w k) = 0 := by
-            have e
-                : ∑ k, (∑ j, c' j * emb ((L ∘ B) j (p.1, k))) • b (w k) = ∑ j, c' j • f j p.1 := by
-              simp only [hfk, Finset.smul_sum, Finset.sum_smul, smul_smul]
-              exact Finset.sum_comm
-            rw [e, hg]
-          exact (Fintype.linearIndependent_iff.1 hw) _ hsum p.2
+      have hzero : c' = 0 := coeffs_eq_zero_of_linearIndependent_of_injective emb hemb _ _ hα c' fun p => by
+        have hg : ∑ j, c' j • f j p.1 = 0 := by simpa [Finset.sum_apply] using congrFun hc' p.1
+        have hsum : ∑ k, (∑ j, c' j * emb ((L ∘ B) j (p.1, k))) • b (w k) = 0 := by
+          have e : ∑ k, (∑ j, c' j * emb ((L ∘ B) j (p.1, k))) • b (w k) = ∑ j, c' j • f j p.1 := by
+            simp only [hfk, Finset.smul_sum, Finset.sum_smul, smul_smul]
+            exact Finset.sum_comm
+          rw [e, hg]
+        exact (Fintype.linearIndependent_iff.1 hw) _ hsum p.2
       exact fun j => congrFun hzero j
     let v : G → W := ∑ j, c j • f j
     have hv_apply : ∀ h, v h = ∑ j, c j • f j h := by intro h; simp [v, Finset.sum_apply]
@@ -254,40 +286,40 @@ theorem _root_.GlobalTheory.ExpCover.values_mem_of_local
         have e1 : (X i : MvPolynomial I O) • B j = ∑ k, ρ (X i) k j • B k := by
           conv_lhs => rw [← B.sum_repr ((X i : MvPolynomial I O) • B j)]
           simp [ρ, φ, LinearMap.toMatrixAlgEquiv_apply]
-        calc
-          emb (cst i) • ∑ s ∈ tr i, f j (g * s)
-              = b ((((X i : MvPolynomial I O) • ((B j : Z) : M) : M) : G → V) g) := by
-            set_option synthInstance.maxHeartbeats 100000 in
-            rw [hX]; simp [f, map_sum, map_smulₛₗ]
+        calc emb (cst i) • ∑ s ∈ tr i, f j (g * s)
+            = b ((((X i : MvPolynomial I O) • ((B j : Z) : M) : M) : G → V) g) := by
+
+              rw [hX]; simp [f, map_sum, map_smulₛₗ]
           _ = b (((((X i : MvPolynomial I O) • B j : Z) : M) : G → V) g) := rfl
           _ = b ((((∑ k, ρ (X i) k j • B k : Z) : M) : G → V) g) := by rw [e1]
           _ = ∑ k, emb (ρ (X i) k j) • f k g := by
-            set_option synthInstance.maxHeartbeats 100000 in
-            simp [f, map_sum, map_smulₛₗ, Submodule.coe_sum, Finset.sum_apply]
-      calc
-        emb (cst i) • ∑ s ∈ tr i, v (g * s)
-            = ∑ j, c j • (emb (cst i) • ∑ s ∈ tr i, f j (g * s)) := by
-          simp only [hv_apply, Finset.smul_sum]
-          rw [Finset.sum_comm]
-          exact Finset.sum_congr rfl fun j _ => Finset.sum_congr rfl fun s _ => smul_comm _ _ _
-        _ = ∑ j, c j • ∑ k, emb (ρ (X i) k j) • f k g := Finset.sum_congr rfl fun j _ => by rw [hXB]
+
+              simp [f, map_sum, map_smulₛₗ, Submodule.coe_sum, Finset.sum_apply]
+      calc emb (cst i) • ∑ s ∈ tr i, v (g * s)
+          = ∑ j, c j • (emb (cst i) • ∑ s ∈ tr i, f j (g * s)) := by
+            simp only [hv_apply, Finset.smul_sum]
+            rw [Finset.sum_comm]
+            exact Finset.sum_congr rfl fun j _ => Finset.sum_congr rfl fun s _ => smul_comm _ _ _
+        _ = ∑ j, c j • ∑ k, emb (ρ (X i) k j) • f k g :=
+            Finset.sum_congr rfl fun j _ => by rw [hXB]
         _ = ∑ k, (∑ j, emb (ρ (X i) k j) * c j) • f k g := by
-          simp only [Finset.smul_sum, Finset.sum_smul, smul_smul]
-          rw [Finset.sum_comm]
-          exact Finset.sum_congr rfl fun k _ => Finset.sum_congr rfl fun j _ => by rw [mul_comm]
+            simp only [Finset.smul_sum, Finset.sum_smul, smul_smul]
+            rw [Finset.sum_comm]
+            exact Finset.sum_congr rfl fun k _ => Finset.sum_congr rfl fun j _ => by rw [mul_comm]
         _ = ∑ k, (θ i * c k) • f k g := by
-          refine Finset.sum_congr rfl fun k _ => ?_
-          congr 1
-          have := congrFun (hc i) k
-          simpa [Matrix.mulVec, dotProduct] using this
+            refine Finset.sum_congr rfl fun k _ => ?_
+            congr 1
+            have := congrFun (hc i) k
+            simpa [Matrix.mulVec, dotProduct] using this
         _ = θ i • v g := by
-          rw [hv_apply, Finset.smul_sum]
-          exact Finset.sum_congr rfl fun k _ => by rw [smul_smul]
+            rw [hv_apply, Finset.smul_sum]
+            exact Finset.sum_congr rfl fun k _ => by rw [smul_smul]
   obtain ⟨θ, hθ1, hθm, hv⟩ := key
   obtain ⟨x', hx'D, s, hs⟩ := hloc m hmax θ hθ1 hθm hv (LocalizedModule.mk x 1)
   rw [LocalizedModule.smul'_mk, LocalizedModule.mk_eq] at hs
   obtain ⟨u, hu⟩ := hs
-  have hpow : (algebraMap O (MvPolynomial I O) a) ^ J • x = z := by rw [← map_pow, algebraMap_smul]
+  have hpow : (algebraMap O (MvPolynomial I O) a) ^ J • x = z := by
+    rw [← map_pow, algebraMap_smul]
   rw [hpow, one_smul] at hu
   have hmem : ((u : MvPolynomial I O) * (s : MvPolynomial I O)) • z ∈ N := by
     rw [mul_smul]

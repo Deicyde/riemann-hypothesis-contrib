@@ -1,14 +1,56 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Definitions.Divisors.OfCore
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ReadingsExistRow
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.EtaValuesCoefficientExists
+import Development.AbelianVarietyTheory.BlockTheory.DivisorBase.LiftFormsMainTerm
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CoefMapNormEquivariantBasisOfFive
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ConjFormsRescale
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsBaseChange
+import Development.AbelianVarietyTheory.Proofs.DivisorProofs.HolShapeOfOverK
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.LiftEquivarianceWeilModel
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.OscillatorModelsEvaluateFirst
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.OscillatorModelsEvaluateSecond
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.EtaValuesCoefficientExists
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ThetaLiftUniqueUpToUnit
+import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ThetaLiftUniqueUpToUnit
+import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ThetaPureTensorO
+import Development.AbelianVarietyTheory.Proofs.DivisorProofs.WeilDatumUniqueOnThetaFunctions
+import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.HolomorphicDiscreteSeriesLowestKTypeSmoothIrredu
+import Development.AbelianVarietyTheory.Proofs.TwistedOperators.ExistsCharFamIsVacVec
+import Development.AbelianVarietyTheory.Proofs.TwistedOperators.IsFockVacAtOfIsThetaAt
+import Development.AbelianVarietyTheory.Proofs.TwistedOperators.IsSelfDualCoordLatticeOfSelfDualFrame
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
 
 @[expose] public section
 
@@ -56,7 +98,6 @@ variable
   [Field Ks] [NumberField Ks] [Algebra Ks D.what₂.LL]
   (R : RealDat D A Ks) (i : Fin D.R.m)
 
-set_option maxHeartbeats 2000000 in
 theorem isConjForms_base_five
     {F : Face D A} (hC : GlobalTheory.Core5 R F) {gramR c0R c0L} (hT : Comparison₂ R gramR c0R c0L)
     : IsConjForms R i (sg0 D A) (c0L i) (R.cV i)
@@ -90,7 +131,6 @@ theorem isConjForms_base_five
       hp _ _).trans (RingHom.congr_fun (realisation_embedding_eq_baseEmbedding R) _)
   · exact (ext_val (R.B.L i A.μ0).pres (c0L i) e he hact hχ _ h).imp fun v hv =>
       ⟨(congrFun (hC.models.jV i A.μ0 x) h).trans hv, (congrFun (hC.models.jV i A.μ0 x) h).trans hv⟩
-set_option maxHeartbeats 2000000 in
 theorem isConjLift_base_five {F : Face D A} (hC : GlobalTheory.Core5 R F)
     : IsConjLift R i (sg0 D A) (R.mu0 ((i : ℕ) + 1)) R.eta (R.cV i) (R.HV i A.μ0)
       (R.thG i A.μ0) := by
@@ -321,7 +361,6 @@ end GlobalTheory.GalLift.BaseId
 
 namespace GlobalTheory.ConjLiftUnique
 
-set_option maxHeartbeats 1600000 in
 theorem lift_unique_five
     : ∀ {D : D7} {G : Type} [Group G] [Fintype G] {Pl0 T0 : Type}
         {A : FamIn D.what₂.LL G Pl0 T0 D.R.m} {Ks : Type} [Field Ks] [NumberField Ks]

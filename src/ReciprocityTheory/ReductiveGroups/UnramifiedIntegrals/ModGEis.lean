@@ -1,7 +1,46 @@
 module
 
-public import Mathlib
+import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.NonzeroDiscriminants.DiscMain
 public import ReciprocityTheory.ReductiveGroups.UnramifiedIntegrals.ModDefs
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Formalism.LocalToGlobal.TorsionIntegrality.CMGoodModels.Statement
 
 @[expose] public section
 
@@ -14,8 +53,8 @@ namespace ReciprocityTheory.ChartRestriction.L1
 def latMap {L : PeriodPair} {c : ℂ} {τ : ℍ} (h : IsTauOf L c τ) (v : Fin 2 → ℤ) : L.lattice :=
   ⟨c * ((v 0 : ℂ) * (τ : ℂ) + (v 1 : ℂ)), (h.2 _).2 ⟨v 0, v 1, rfl⟩⟩
 
-theorem latMap_bijective {L : PeriodPair} {c : ℂ} {τ : ℍ} (h : IsTauOf L c τ)
-    : Function.Bijective (latMap h) := by
+theorem latMap_bijective {L : PeriodPair} {c : ℂ} {τ : ℍ} (h : IsTauOf L c τ) :
+    Function.Bijective (latMap h) := by
   constructor
   · intro v w hvw
     have h1 : c * ((v 0 : ℂ) * (τ : ℂ) + (v 1 : ℂ)) = c * ((w 0 : ℂ) * (τ : ℂ) + (w 1 : ℂ)) :=
@@ -24,8 +63,7 @@ theorem latMap_bijective {L : PeriodPair} {c : ℂ} {τ : ℍ} (h : IsTauOf L c 
     have him := congrArg Complex.im h2
     have hre := congrArg Complex.re h2
     simp only [Complex.add_im, Complex.mul_im, Complex.intCast_re, Complex.intCast_im, zero_mul,
-        add_zero, Complex.add_re, Complex.mul_re, sub_zero]
-      at him hre
+      add_zero, Complex.add_re, Complex.mul_re, sub_zero] at him hre
     have hτ : (τ : ℂ).im ≠ 0 := τ.im_ne_zero
     have h0 : (v 0 : ℝ) = w 0 := mul_right_cancel₀ hτ him
     rw [h0] at hre
@@ -38,9 +76,8 @@ theorem latMap_bijective {L : PeriodPair} {c : ℂ} {τ : ℍ} (h : IsTauOf L c 
     obtain ⟨u, v, rfl⟩ := (h.2 x).1 hx
     exact ⟨![u, v], by simp [latMap]⟩
 
-theorem G_eq
-    {L : PeriodPair} {c : ℂ} {τ : ℍ} (h : IsTauOf L c τ) {k : ℕ} (hk : 3 ≤ k) (hk2 : Even k)
-    : L.G k = (c ^ k)⁻¹ * (2 * riemannZeta k) * E hk τ := by
+theorem G_eq {L : PeriodPair} {c : ℂ} {τ : ℍ} (h : IsTauOf L c τ) {k : ℕ} (hk : 3 ≤ k) (hk2 : Even k) :
+    L.G k = (c ^ k)⁻¹ * (2 * riemannZeta k) * E hk τ := by
   have hE : E hk τ = (1 / 2 : ℂ) * eisensteinSeries (N := 1) 0 k τ := by
     rw [show E hk τ = (1 / 2 : ℂ) • eisensteinSeriesSIF (N := 1) 0 k τ from rfl,
       eisensteinSeriesSIF_apply 0 k τ, smul_eq_mul]
@@ -53,34 +90,20 @@ theorem G_eq
   ring
 
 theorem sixVal : riemannZeta 6 = (Real.pi : ℂ) ^ 6 / 945 := by
-  have h5 : bernoulli' 5 = 0 := by
-    rw [bernoulli'_def]
-    simp only [Finset.sum_range_succ, Finset.sum_range_zero, bernoulli'_zero, bernoulli'_one,
-      bernoulli'_two, bernoulli'_three, bernoulli'_four]
-    norm_num [Nat.choose]
-  have h6 : bernoulli' 6 = 1 / 42 := by
-    rw [bernoulli'_def]
-    simp only [Finset.sum_range_succ, Finset.sum_range_zero, bernoulli'_zero, bernoulli'_one,
-      bernoulli'_two, bernoulli'_three, bernoulli'_four, h5]
-    norm_num [Nat.choose]
-  have hB : bernoulli 6 = 1 / 42 := by rw [bernoulli_eq_bernoulli'_of_ne_one (by norm_num), h6]
-  have h := riemannZeta_two_mul_nat (k := 3) (by norm_num)
-  norm_num [Nat.factorial, hB] at h
-  rw [h]
-  ring
+  apply DiscrNeWork.zeta6 <;> assumption
 
-theorem g₂_eq {L : PeriodPair} {c : ℂ} {τ : ℍ} (h : IsTauOf L c τ)
-    : L.g₂ = (c ^ 4)⁻¹ * (4 * (Real.pi : ℂ) ^ 4 / 3) * E₄ τ := by
-  rw [PeriodPair.g₂, G_eq h (k := 4) (by norm_num) ⟨2, rfl⟩, show ((4 : ℕ) : ℂ) = 4 by norm_num,
-    riemannZeta_four]
+theorem g₂_eq {L : PeriodPair} {c : ℂ} {τ : ℍ} (h : IsTauOf L c τ) :
+    L.g₂ = (c ^ 4)⁻¹ * (4 * (Real.pi : ℂ) ^ 4 / 3) * E₄ τ := by
+  rw [PeriodPair.g₂, G_eq h (k := 4) (by norm_num) ⟨2, rfl⟩,
+    show ((4 : ℕ) : ℂ) = 4 by norm_num, riemannZeta_four]
   have hE : E (k := 4) (by norm_num) τ = E₄ τ := rfl
   rw [hE]
   ring
 
-theorem g₃_eq {L : PeriodPair} {c : ℂ} {τ : ℍ} (h : IsTauOf L c τ)
-    : L.g₃ = (c ^ 6)⁻¹ * (8 * (Real.pi : ℂ) ^ 6 / 27) * E₆ τ := by
-  rw [PeriodPair.g₃, G_eq h (k := 6) (by norm_num) ⟨3, rfl⟩, show ((6 : ℕ) : ℂ) = 6 by norm_num,
-    sixVal]
+theorem g₃_eq {L : PeriodPair} {c : ℂ} {τ : ℍ} (h : IsTauOf L c τ) :
+    L.g₃ = (c ^ 6)⁻¹ * (8 * (Real.pi : ℂ) ^ 6 / 27) * E₆ τ := by
+  rw [PeriodPair.g₃, G_eq h (k := 6) (by norm_num) ⟨3, rfl⟩,
+    show ((6 : ℕ) : ℂ) = 6 by norm_num, sixVal]
   have hE : E (k := 6) (by norm_num) τ = E₆ τ := rfl
   rw [hE]
   ring

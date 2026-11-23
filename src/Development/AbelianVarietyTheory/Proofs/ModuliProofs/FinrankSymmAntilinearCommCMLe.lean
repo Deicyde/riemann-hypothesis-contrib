@@ -1,29 +1,67 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Definitions.ModuliSpaces.IsSymm
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.ThetaUnifAV
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.UniformisationConclusion
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.IsHolPeriods
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDescent.UnifUniqSt
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Real
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Coalgebra.IsFrobenius
+import Mathlib.RingTheory.Etale.Weakly
+import Mathlib.RingTheory.Finiteness.ModuleFinitePresentation
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.TotallySplit
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
-  NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
-  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj TensorProduct ContDiff
 open GlobalTheory.KS
 
 noncomputable section
 namespace GlobalTheory.KS.DimPEL
 
-theorem exists_sum_eigen
-    {E : Type} [Field E] [NumberField E]
-    {V : Type} [AddCommGroup V] [Module ℂ V]
-    (F : 𝓞 E →+* Module.End ℂ V) (v : V)
-    : ∃ w : (E →+* ℂ) → V, (∀ τ (a : 𝓞 E), F a (w τ) = τ (a : E) • w τ) ∧ v = ∑ τ, w τ := by
+theorem exists_sum_eigen {E : Type} [Field E] [NumberField E] {V : Type} [AddCommGroup V] [Module ℂ V]
+    (F : 𝓞 E →+* Module.End ℂ V) (v : V) :
+    ∃ w : (E →+* ℂ) → V, (∀ τ (a : 𝓞 E), F a (w τ) = τ (a : E) • w τ) ∧ v = ∑ τ, w τ := by
   classical
   let B := canonicalEmbedding.latticeBasis E
   let Φ : ((E →+* ℂ) → ℂ) →ₗ[ℂ] Module.End ℂ V := B.constr ℂ (fun i => F (RingOfIntegers.basis E i))
@@ -33,8 +71,7 @@ theorem exists_sum_eigen
   have h1 : ∀ a : 𝓞 E, Φ (canonicalEmbedding E (a : E)) = F a := by
     intro a
     let L₁ : 𝓞 E →ₗ[ℤ] Module.End ℂ V :=
-      (Φ.toAddMonoidHom.comp (((canonicalEmbedding E).comp
-        (algebraMap (𝓞 E) E)).toAddMonoidHom)).toIntLinearMap
+      (Φ.toAddMonoidHom.comp (((canonicalEmbedding E).comp (algebraMap (𝓞 E) E)).toAddMonoidHom)).toIntLinearMap
     let L₂ : 𝓞 E →ₗ[ℤ] Module.End ℂ V := F.toAddMonoidHom.toIntLinearMap
     have : L₁ = L₂ := by
       apply (RingOfIntegers.basis E).ext
@@ -45,8 +82,7 @@ theorem exists_sum_eigen
     exact LinearMap.congr_fun this a
   have h2 : ∀ (a : 𝓞 E) (x : (E →+* ℂ) → ℂ), Φ (canonicalEmbedding E (a : E) * x) = F a * Φ x := by
     intro a x
-    have : Φ ∘ₗ LinearMap.mulLeft ℂ (canonicalEmbedding E (a : E))
-        = LinearMap.mulLeft ℂ (F a) ∘ₗ Φ := by
+    have : Φ ∘ₗ LinearMap.mulLeft ℂ (canonicalEmbedding E (a : E)) = LinearMap.mulLeft ℂ (F a) ∘ₗ Φ := by
       apply B.ext
       intro i
       simp only [LinearMap.comp_apply, LinearMap.mulLeft_apply]
@@ -54,14 +90,13 @@ theorem exists_sum_eigen
       rfl
     exact LinearMap.congr_fun this x
   refine ⟨fun τ => Φ (Pi.single τ 1) v, fun τ a => ?_, ?_⟩
-  · have : canonicalEmbedding E (a : E) * Pi.single τ 1
-        = τ (a : E) • (Pi.single τ 1 : (E →+* ℂ) → ℂ) := by
+  · have : canonicalEmbedding E (a : E) * Pi.single τ 1 = τ (a : E) • (Pi.single τ 1 : (E →+* ℂ) → ℂ) := by
       ext σ
       by_cases h : σ = τ
       · subst h; simp [canonicalEmbedding.apply_at]
       · simp [Pi.single_eq_of_ne h]
     rw [← Module.End.mul_apply, ← h2, this, map_smul, LinearMap.smul_apply]
-  set_option synthInstance.maxHeartbeats 100000 in
+
   · rw [← LinearMap.sum_apply, ← map_sum, Finset.univ_sum_single]
     have := h1 1
     have e : Φ 1 = 1 := by simpa using this
@@ -81,42 +116,28 @@ theorem conj_eq_neg {z : ℂ} {d : ℕ} (h : z ^ 2 = -(d : ℂ)) (hd : 0 < d) : 
     · rw [h4] at hre; nlinarith [mul_self_nonneg z.re]
   apply Complex.ext <;> simp [this]
 
-abbrev Eig
-    {E : Type} [Field E] [NumberField E]
-    {g : ℕ} (F : 𝓞 E →+* Module.End ℂ (Fin g → ℂ))
-    (τ : E →+* ℂ)
-    : Submodule ℂ (Fin g → ℂ) :=
-  ⨅ a : 𝓞 E, Module.End.eigenspace (F a) (τ (a : E))
+abbrev Eig {E : Type} [Field E] [NumberField E] {g : ℕ} (F : 𝓞 E →+* Module.End ℂ (Fin g → ℂ)) (τ : E →+* ℂ) :
+    Submodule ℂ (Fin g → ℂ) := ⨅ a : 𝓞 E, Module.End.eigenspace (F a) (τ (a : E))
 
-theorem mem_Eig
-    {E : Type} [Field E] [NumberField E]
-    {g : ℕ} (F : 𝓞 E →+* Module.End ℂ (Fin g → ℂ))
-    (τ : E →+* ℂ) (v : Fin g → ℂ)
-    : v ∈ Eig F τ ↔ ∀ a : 𝓞 E, F a v = τ (a : E) • v := by
+theorem mem_Eig {E : Type} [Field E] [NumberField E] {g : ℕ} (F : 𝓞 E →+* Module.End ℂ (Fin g → ℂ)) (τ : E →+* ℂ)
+    (v : Fin g → ℂ) : v ∈ Eig F τ ↔ ∀ a : 𝓞 E, F a v = τ (a : E) • v := by
   simp [Eig, Submodule.mem_iInf, Module.End.mem_eigenspace_iff]
 
-theorem theta_mem
-    {E : Type} [Field E] [NumberField E]
-    {g : ℕ} (F : 𝓞 E →+* Module.End ℂ (Fin g → ℂ))
-    (τ : E →+* ℂ)
-    (Θ : Matrix (Fin g) (Fin g) ℂ) (hΘ : ∀ a, Comm Θ (F a))
-    (v : Fin g → ℂ) (hv : v ∈ Eig F τ)
-    : Θ.mulVec (star v) ∈ Eig F (ComplexEmbedding.conjugate τ) := by
+theorem theta_mem {E : Type} [Field E] [NumberField E] {g : ℕ} (F : 𝓞 E →+* Module.End ℂ (Fin g → ℂ)) (τ : E →+* ℂ)
+    (Θ : Matrix (Fin g) (Fin g) ℂ) (hΘ : ∀ a, Comm Θ (F a)) (v : Fin g → ℂ) (hv : v ∈ Eig F τ) :
+    Θ.mulVec (star v) ∈ Eig F (ComplexEmbedding.conjugate τ) := by
   rw [mem_Eig] at hv ⊢
   intro a
   rw [hΘ a v, hv, star_smul, Matrix.mulVec_smul, ComplexEmbedding.conjugate_coe_eq]
   rfl
 
-theorem finrank_symm_comm_le
-    (E : Type) [Field E] [NumberField E] [IsCMField E]
-    (H : Host E) (g p q : ℕ)
-    (ρ₀ : ℂ) (Hm : Matrix (Fin g) (Fin g) ℂ) (F : 𝓞 E →+* Module.End ℂ (Fin g → ℂ))
-    (S : Submodule ℂ (Matrix (Fin g) (Fin g) ℂ)) (hρ : ρ₀ ^ 2 = -(H.d : ℂ)) (_hH : Hm.IsHermitian)
+theorem finrank_symm_comm_le (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (g p q : ℕ) (ρ₀ : ℂ)
+    (Hm : Matrix (Fin g) (Fin g) ℂ) (F : 𝓞 E →+* Module.End ℂ (Fin g → ℂ)) (S : Submodule ℂ (Matrix (Fin g) (Fin g) ℂ))
+    (hρ : ρ₀ ^ 2 = -(H.d : ℂ)) (_hH : Hm.IsHermitian)
     (hpos : ∀ z : Fin g → ℂ, z ≠ 0 → 0 < (hermForm Hm z z).re)
-    (hdim : ∀ τ : 𝓞 E →+* ℂ,
-      Module.finrank ℂ ↥(⨅ a, Module.End.eigenspace (F a) (τ a)) = if τ H.rt = ρ₀ then p else q)
-    (hS : ∀ Θ ∈ S, IsSymm Hm Θ ∧ ∀ a, Comm Θ (F a))
-    : Module.finrank ℂ S ≤ Module.finrank ℚ E / 2 * p * q := by
+    (hdim : ∀ τ : 𝓞 E →+* ℂ, Module.finrank ℂ ↥(⨅ a, Module.End.eigenspace (F a) (τ a)) = if τ H.rt = ρ₀ then p else q)
+    (hS : ∀ Θ ∈ S, IsSymm Hm Θ ∧ ∀ a, Comm Θ (F a)) :
+    Module.finrank ℂ S ≤ Module.finrank ℚ E / 2 * p * q := by
   classical
   have hd : 0 < H.d := H.d_prime.pos
   have hρ0 : ρ₀ ≠ 0 := by
@@ -149,11 +170,10 @@ theorem finrank_symm_comm_le
   let T := {τ : E →+* ℂ // τ (H.rt : E) = ρ₀}
   have hcard : Fintype.card T ≤ Module.finrank ℚ E / 2 := by
     have h1 : Fintype.card T ≤ Fintype.card {τ : E →+* ℂ // ¬ τ (H.rt : E) = ρ₀} := by
-      refine
-        Fintype.card_le_of_injective (fun τ => ⟨ComplexEmbedding.conjugate τ.1, hne τ.1 τ.2⟩) ?_
+      refine Fintype.card_le_of_injective
+        (fun τ => ⟨ComplexEmbedding.conjugate τ.1, hne τ.1 τ.2⟩) ?_
       intro σ τ h
-      have h2 : ComplexEmbedding.conjugate σ.1 = ComplexEmbedding.conjugate τ.1 :=
-        congrArg Subtype.val h
+      have h2 : ComplexEmbedding.conjugate σ.1 = ComplexEmbedding.conjugate τ.1 := congrArg Subtype.val h
       exact Subtype.ext (star_injective h2)
     rw [Fintype.card_subtype_compl, NumberField.Embeddings.card] at h1
     have h3 : Fintype.card T ≤ Fintype.card (E →+* ℂ) := Fintype.card_subtype_le _
@@ -161,25 +181,21 @@ theorem finrank_symm_comm_le
     change Fintype.card T ≤ _ - Fintype.card T at h1
     omega
   have hp : ∀ τ : T, Module.finrank ℂ (Eig F τ.1) = p := fun τ => by rw [hdim', if_pos τ.2]
-  have hq : ∀ τ : T, Module.finrank ℂ (Eig F (ComplexEmbedding.conjugate τ.1)) = q := fun τ => by
-    rw [hdim', if_neg (hne τ.1 τ.2)]
-  let b : ∀ τ : T, Module.Basis (Fin p) ℂ (Eig F τ.1) := fun τ =>
-    Module.finBasisOfFinrankEq ℂ _ (hp τ)
-  let Ψ : S →ₗ[ℂ] (∀ τ : T, Fin p → Eig F (ComplexEmbedding.conjugate τ.1)) := {
-    toFun := fun Θ τ i =>
-      ⟨Θ.1.mulVec (star (b τ i : Fin g → ℂ)), theta_mem F τ.1 Θ.1 (hS Θ.1 Θ.2).2 _ (b τ i).2⟩
-    map_add' := fun Θ Θ' => by
-      funext τ i
-      apply Subtype.ext
-      simp [Matrix.add_mulVec]
-    map_smul' := fun c Θ => by
-      funext τ i
-      apply Subtype.ext
-      simp [Matrix.smul_mulVec]
-  }
+  have hq : ∀ τ : T, Module.finrank ℂ (Eig F (ComplexEmbedding.conjugate τ.1)) = q :=
+    fun τ => by rw [hdim', if_neg (hne τ.1 τ.2)]
+  let b : ∀ τ : T, Module.Basis (Fin p) ℂ (Eig F τ.1) := fun τ => Module.finBasisOfFinrankEq ℂ _ (hp τ)
+  let Ψ : S →ₗ[ℂ] (∀ τ : T, Fin p → Eig F (ComplexEmbedding.conjugate τ.1)) :=
+    { toFun := fun Θ τ i => ⟨Θ.1.mulVec (star (b τ i : Fin g → ℂ)), theta_mem F τ.1 Θ.1 (hS Θ.1 Θ.2).2 _ (b τ i).2⟩
+      map_add' := fun Θ Θ' => by
+        funext τ i
+        apply Subtype.ext
+        simp [Matrix.add_mulVec]
+      map_smul' := fun c Θ => by
+        funext τ i
+        apply Subtype.ext
+        simp [Matrix.smul_mulVec] }
   have hinj : Function.Injective Ψ := by
-    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
-      rw [injective_iff_map_eq_zero]
+    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
     intro Θ hΘ
     obtain ⟨hs, hc⟩ := hS Θ.1 Θ.2
     have k1 : ∀ τ : E →+* ℂ, τ (H.rt : E) = ρ₀ → ∀ v ∈ Eig F τ, Θ.1.mulVec (star v) = 0 := by
@@ -213,12 +229,8 @@ theorem finrank_symm_comm_le
     simpa using this
   have hle := LinearMap.finrank_le_finrank_of_injective hinj
   rw [Module.finrank_pi_fintype] at hle
-  simp only [Module.finrank_pi_fintype, hq, Finset.sum_const, Finset.card_univ, Fintype.card_fin,
-      smul_eq_mul]
-    at hle
-  calc
-    Module.finrank ℂ S
-      ≤ Fintype.card T * (p * q) := hle
+  simp only [Module.finrank_pi_fintype, hq, Finset.sum_const, Finset.card_univ, Fintype.card_fin, smul_eq_mul] at hle
+  calc Module.finrank ℂ S ≤ Fintype.card T * (p * q) := hle
     _ ≤ Module.finrank ℚ E / 2 * (p * q) := Nat.mul_le_mul_right _ hcard
     _ = _ := by ring
 

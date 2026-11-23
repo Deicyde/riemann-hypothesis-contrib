@@ -1,31 +1,69 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.OverExtAlgebraMap
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.IsLocalRingOfIdem
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsIntegralBasisUnramifiedInvolutionExtStatement
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsIntegralBasisUnramifiedInvolutionExt
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsUniformizerCompatibleUnramifiedExtStatement
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.IsUnitTraceFormDiscrUnramifiedExtStatement
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.IsUnitDetConjugationMatrixIntegralBasisStatement
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.IsLocalRingOfIdem
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.IsUnitTraceFormDiscrUnramifiedExt
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
 open GlobalTheory.UnitLemma GlobalTheory.UnitLemma.Unr Polynomial
 
-theorem GlobalTheory.UnitLemma.Unr.exists_basis_trace_conj_unit
-    : ∀ (K K' : UQ) (d : ℕ) (φ : K.E →+* K'.E),
-      IsUnrExt K K' d φ → 0 < d
-        → (letI : Algebra K.E K'.E := φ.toAlgebra
-           ∃ w : Module.Basis (Fin d) K.E K'.E,
-             (Matrix.of fun k l => Algebra.trace K.E K'.E (w k * K'.c (w l))).det ≠ 0
-               ∧ val K.O (Matrix.of fun k l => Algebra.trace K.E K'.E (w k * K'.c (w l))).det
-                 = 0) := by
+theorem GlobalTheory.UnitLemma.Unr.exists_basis_trace_conj_unit :
+    ∀ (K K' : UQ) (d : ℕ) (φ : K.E →+* K'.E), IsUnrExt K K' d φ → 0 < d →
+      (letI : Algebra K.E K'.E := φ.toAlgebra
+       ∃ w : Module.Basis (Fin d) K.E K'.E,
+         (Matrix.of fun k l => Algebra.trace K.E K'.E (w k * K'.c (w l))).det ≠ 0 ∧
+           val K.O (Matrix.of fun k l => Algebra.trace K.E K'.E (w k * K'.c (w l))).det = 0) := by
   intro K K' d φ h hd
   let : Algebra K.E K'.E := φ.toAlgebra
-  have hbasis
-      : ∃ w : Module.Basis (Fin d) K.E K'.E, ∀ z : K'.E,
-        (∃ y : K'.O, algebraMap K'.O K'.E y = z)
-          ↔ ∀ k, ∃ a : K.O, algebraMap K.O K.E a = w.repr z k := by
+  have hbasis : ∃ w : Module.Basis (Fin d) K.E K'.E, ∀ z : K'.E,
+      (∃ y : K'.O, algebraMap K'.O K'.E y = z) ↔
+        ∀ k, ∃ a : K.O, algebraMap K.O K.E a = w.repr z k := by
     obtain ⟨w, key⟩ := IntBasis.exists_key h
     have : Nonempty (Fin d) := ⟨⟨0, hd⟩⟩
     have hmax (a : Fin d → K.E) : ∃ m, ∀ k, IntBasis.adicVal K (a k) ≤ IntBasis.adicVal K (a m) :=
@@ -42,16 +80,14 @@ theorem GlobalTheory.UnitLemma.Unr.exists_basis_trace_conj_unit
       have hkm := hm k
       rw [hgm, map_zero] at hkm
       exact (Valuation.zero_iff _).1 (le_antisymm hkm zero_le)
-    let B :=
-      basisOfLinearIndependentOfCardEqFinrank hli (by
-        rw [Fintype.card_fin]
-        exact h.2.2.2.2.symm)
+    let B := basisOfLinearIndependentOfCardEqFinrank hli (by
+      rw [Fintype.card_fin]
+      exact h.2.2.2.2.symm)
     refine ⟨B, fun z => ?_⟩
     have hz : ∑ k, φ (B.repr z k) * w k = z := by
       conv_rhs => rw [← B.sum_repr z]
       refine Finset.sum_congr rfl fun k _ => ?_
-      rw [coe_basisOfLinearIndependentOfCardEqFinrank, Algebra.smul_def,
-        RingHom.algebraMap_toAlgebra]
+      rw [coe_basisOfLinearIndependentOfCardEqFinrank, Algebra.smul_def, RingHom.algebraMap_toAlgebra]
     obtain ⟨m, hm⟩ := hmax (B.repr z)
     have hv := key _ m hm
     rw [hz] at hv
@@ -65,8 +101,7 @@ theorem GlobalTheory.UnitLemma.Unr.exists_basis_trace_conj_unit
       exact (IntBasis.adicVal_le_one_iff K _).2 (hall m)
   obtain ⟨w, hw⟩ := hbasis
   refine ⟨w, ?_⟩
-  obtain ⟨π, π', hππ, hm, hm'⟩ :=
-    GlobalTheory.T.exists_uniformizer_compatible_unramifiedExt K K' d φ h
+  obtain ⟨π, π', hππ, hm, hm'⟩ := GlobalTheory.T.exists_uniformizer_compatible_unramifiedExt K K' d φ h
   have hw1 : ∀ k, ∃ y : K'.O, algebraMap K'.O K'.E y = w k := by
     intro k
     apply (hw _).2
@@ -75,11 +110,8 @@ theorem GlobalTheory.UnitLemma.Unr.exists_basis_trace_conj_unit
     · subst m
       exact ⟨1, by simp⟩
     · exact ⟨0, by simp [hkm]⟩
-  have hdiscr
-      : ∃ u : K.O,
-        IsUnit u
-          ∧ algebraMap K.O K.E u
-            = (Matrix.of fun k m => Algebra.trace K.E K'.E (w k * w m)).det := by
+  have hdiscr : ∃ u : K.O, IsUnit u ∧ algebraMap K.O K.E u =
+      (Matrix.of fun k m => Algebra.trace K.E K'.E (w k * w m)).det := by
     have hj : Function.Injective (algebraMap K'.O K'.E) := IsFractionRing.injective K'.O K'.E
     have hi : Function.Injective (algebraMap K.O K.E) := IsFractionRing.injective K.O K.E
 
@@ -99,29 +131,23 @@ theorem GlobalTheory.UnitLemma.Unr.exists_basis_trace_conj_unit
       e.symm.toRingHom.comp ((φ.comp (algebraMap K.O K.E)).codRestrict _ hlift)
     have hι : ∀ a, algebraMap K'.O K'.E (ι a) = φ (algebraMap K.O K.E a) := by
       intro a
-      exact congrArg Subtype.val
-        (e.apply_symm_apply ((φ.comp (algebraMap K.O K.E)).codRestrict _ hlift a))
+      exact congrArg Subtype.val (e.apply_symm_apply ((φ.comp (algebraMap K.O K.E)).codRestrict _ hlift a))
     let : Algebra K.O K'.O := ι.toAlgebra
-    have hsm
-        : ∀ (a : K.O) (y : K'.O),
-          algebraMap K'.O K'.E (a • y) = algebraMap K.O K.E a • algebraMap K'.O K'.E y := by
+    have hsm : ∀ (a : K.O) (y : K'.O),
+        algebraMap K'.O K'.E (a • y) = algebraMap K.O K.E a • algebraMap K'.O K'.E y := by
       intro a y
       rw [Algebra.smul_def, map_mul, Algebra.smul_def]
       exact congrArg (· * _) (hι a)
-    have hsum
-        : ∀ (g : Fin d → K.O) (v : Fin d → K'.O),
-          algebraMap K'.O K'.E (∑ k, g k • v k)
-            = ∑ k, algebraMap K.O K.E (g k) • algebraMap K'.O K'.E (v k) := by
+    have hsum : ∀ (g : Fin d → K.O) (v : Fin d → K'.O),
+        algebraMap K'.O K'.E (∑ k, g k • v k) = ∑ k, algebraMap K.O K.E (g k) • algebraMap K'.O K'.E (v k) := by
       intro g v
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum]
+
+      rw [map_sum]
       exact Finset.sum_congr rfl fun k _ => hsm _ _
 
     choose bv hbv using hw1
-    have hcoord
-        : ∀ (y : K'.O) (k : Fin d), ∃ a : K.O,
-          algebraMap K.O K.E a = w.repr (algebraMap K'.O K'.E y) k := fun y =>
-      (hw _).1 ⟨y, rfl⟩
+    have hcoord : ∀ (y : K'.O) (k : Fin d), ∃ a : K.O, algebraMap K.O K.E a = w.repr (algebraMap K'.O K'.E y) k :=
+      fun y => (hw _).1 ⟨y, rfl⟩
     choose c hc using hcoord
     have hli : LinearIndependent K.O bv := by
       rw [Fintype.linearIndependent_iff]
@@ -147,14 +173,12 @@ theorem GlobalTheory.UnitLemma.Unr.exists_basis_trace_conj_unit
       simp only [hb]
       rw [w.repr_sum_self]
 
-    have hTr
-        : ∀ y,
-          algebraMap K.O K.E (Algebra.trace K.O K'.O y)
-            = Algebra.trace K.E K'.E (algebraMap K'.O K'.E y) := by
+    have hTr : ∀ y, algebraMap K.O K.E (Algebra.trace K.O K'.O y) =
+        Algebra.trace K.E K'.E (algebraMap K'.O K'.E y) := by
       intro y
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [Algebra.trace_eq_matrix_trace b, Algebra.trace_eq_matrix_trace w, Matrix.trace,
-          Matrix.trace, map_sum]
+
+      rw [Algebra.trace_eq_matrix_trace b, Algebra.trace_eq_matrix_trace w, Matrix.trace, Matrix.trace,
+      map_sum]
       refine Finset.sum_congr rfl fun k _ => ?_
       simp only [Matrix.diag_apply, Algebra.leftMulMatrix_apply, LinearMap.toMatrix_apply,
         Algebra.coe_lmul_eq_mul, LinearMap.mul_apply', hrep, map_mul, hb]
@@ -173,9 +197,8 @@ theorem GlobalTheory.UnitLemma.Unr.exists_basis_trace_conj_unit
       Algebra.traceForm_apply, Matrix.of_apply, hTr, map_mul, hb]
   obtain ⟨u, hu, hue⟩ := hdiscr
   have hφ := h.2.1
-  have hunit
-      : ∃ u : K.O,
-        IsUnit u ∧ algebraMap K.O K.E u = (Matrix.of fun m l => w.repr (K'.c (w l)) m).det := by
+  have hunit : ∃ u : K.O, IsUnit u ∧
+      algebraMap K.O K.E u = (Matrix.of fun m l => w.repr (K'.c (w l)) m).det := by
     set C : Matrix (Fin d) (Fin d) K.E := Matrix.of fun m l => w.repr (K'.c (w l)) m with hC
     have hsm : ∀ (e : K.E) (x : K'.E), e • x = φ e * x := fun e x => rfl
     have hint : ∀ m l, ∃ a : K.O, algebraMap K.O K.E a = C m l := by
@@ -189,12 +212,12 @@ theorem GlobalTheory.UnitLemma.Unr.exists_basis_trace_conj_unit
       intro x n
       have hx : K'.c x = ∑ m, K.c (w.repr x m) • K'.c (w m) := by
         conv_lhs => rw [← w.sum_repr x]
-        set_option synthInstance.maxHeartbeats 100000 in
-          rw [map_sum]
+
+        rw [map_sum]
         refine Finset.sum_congr rfl fun m _ => ?_
         rw [hsm, hsm, map_mul, ← hφ]
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [hx, map_sum, Finsupp.finsetSum_apply]
+
+      rw [hx, map_sum, Finsupp.finsetSum_apply]
       refine Finset.sum_congr rfl fun m _ => ?_
       rw [map_smul, Finsupp.smul_apply, smul_eq_mul]
       rfl
@@ -225,20 +248,16 @@ theorem GlobalTheory.UnitLemma.Unr.exists_basis_trace_conj_unit
     apply IsFractionRing.injective K.O K.E
     rw [map_mul, ← hβ, hdetA, hdet, map_one]
   obtain ⟨v, hv, hve⟩ := hunit
-  have key
-      : (Matrix.of fun k l => Algebra.trace K.E K'.E (w k * K'.c (w l)))
-        = (Matrix.of fun k m => Algebra.trace K.E K'.E (w k * w m))
-          * (Matrix.of fun m l => w.repr (K'.c (w l)) m) := by
+  have key : (Matrix.of fun k l => Algebra.trace K.E K'.E (w k * K'.c (w l))) =
+      (Matrix.of fun k m => Algebra.trace K.E K'.E (w k * w m)) * (Matrix.of fun m l => w.repr (K'.c (w l)) m) := by
     ext k l
     simp only [Matrix.mul_apply, Matrix.of_apply]
     conv_lhs => rw [← w.sum_repr (K'.c (w l))]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [Finset.mul_sum, map_sum]
+
+    rw [Finset.mul_sum, map_sum]
     refine Finset.sum_congr rfl fun m _ => ?_
     rw [mul_smul_comm, map_smul, smul_eq_mul, mul_comm]
-  have hdet
-      : (Matrix.of fun k l => Algebra.trace K.E K'.E (w k * K'.c (w l))).det
-        = algebraMap K.O K.E (u * v) := by
+  have hdet : (Matrix.of fun k l => Algebra.trace K.E K'.E (w k * K'.c (w l))).det = algebraMap K.O K.E (u * v) := by
     rw [key, Matrix.det_mul, ← hue, ← hve, map_mul]
   rw [hdet]
   refine ⟨?_, GlobalTheory.UnitLemma.Orbit.val_unit _ (hu.mul hv)⟩

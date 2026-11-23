@@ -1,7 +1,54 @@
 module
 
-public import Mathlib
 public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.GaussQ
+import Mathlib.Algebra.Module.StablyFree.Basic
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
@@ -9,22 +56,19 @@ noncomputable section
 
 namespace GlobalTheory.CompanionTheory.SW.BB.RatCoord
 
-open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.SW
-  GlobalTheory.CompanionTheory.SW.BB NumberField IsDedekindDomain MeasureTheory Topology
+open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.SW GlobalTheory.CompanionTheory.SW.BB NumberField IsDedekindDomain MeasureTheory Topology
 open scoped TensorProduct ENNReal NNReal Matrix
 
-theorem repr_ofF
-    {F E : Type} [Field F] [Field E] [Algebra F E]
-    {d M : ℕ} (b : Module.Basis (Fin d) F E) (x : Fin M × Fin d → F)
-    (u : Fin 1) (i : Fin M) (k : Fin d)
-    : b.repr (ofF b x u i) k = x (i, k) := by
+theorem repr_ofF {F E : Type} [Field F] [Field E] [Algebra F E] {d M : ℕ}
+    (b : Module.Basis (Fin d) F E) (x : Fin M × Fin d → F) (u : Fin 1) (i : Fin M) (k : Fin d) :
+    b.repr (ofF b x u i) k = x (i, k) := by
   have h : ofF b x u i = b.equivFun.symm (fun k => x (i, k)) := by
     simp [ofF, Module.Basis.equivFun_symm_apply]
   rw [h, ← Module.Basis.equivFun_apply, LinearEquiv.apply_symm_apply]
 
-theorem ofF_bijective
-    {F E : Type} [Field F] [Field E] [Algebra F E] {d M : ℕ} (b : Module.Basis (Fin d) F E)
-    : Function.Bijective (ofF b : (Fin M × Fin d → F) → Fin 1 → Fin M → E) := by
+theorem ofF_bijective {F E : Type} [Field F] [Field E] [Algebra F E] {d M : ℕ}
+    (b : Module.Basis (Fin d) F E) :
+    Function.Bijective (ofF b : (Fin M × Fin d → F) → Fin 1 → Fin M → E) := by
   constructor
   · intro x y hxy
     funext p
@@ -36,18 +80,15 @@ theorem ofF_bijective
     obtain rfl : u = 0 := Subsingleton.elim _ _
     exact b.sum_repr (Y 0 i)
 
-theorem ofF_zero
-    {F E : Type} [Field F] [Field E] [Algebra F E] {d M : ℕ} (b : Module.Basis (Fin d) F E)
-    : ofF b (0 : Fin M × Fin d → F) = 0 := by
+theorem ofF_zero {F E : Type} [Field F] [Field E] [Algebra F E] {d M : ℕ}
+    (b : Module.Basis (Fin d) F E) :
+    ofF b (0 : Fin M × Fin d → F) = 0 := by
   funext u i
   simp [ofF]
 
-theorem exists_algebraMap_of_fixed
-    {F E : Type} [Field F] [Field E] [Algebra F E]
-    (h2 : Module.finrank F E = 2)
-    {σ : E →ₐ[F] E} (hne : σ ≠ AlgHom.id F E)
-    {h : E} (hh : σ h = h)
-    : ∃ c : F, h = algebraMap F E c := by
+theorem exists_algebraMap_of_fixed {F E : Type} [Field F] [Field E] [Algebra F E]
+    (h2 : Module.finrank F E = 2) {σ : E →ₐ[F] E} (hne : σ ≠ AlgHom.id F E) {h : E}
+    (hh : σ h = h) : ∃ c : F, h = algebraMap F E c := by
   by_contra hcon
   push Not at hcon
   have : FiniteDimensional F E := Module.finite_of_finrank_pos (by omega)
@@ -57,7 +98,7 @@ theorem exists_algebraMap_of_fixed
     have ht : t = 0 := by
       by_contra ht
       apply hcon (-(s / t))
-      have h1 : algebraMap F E t * h = - algebraMap F E s := by
+      have h1 : algebraMap F E t * h = -algebraMap F E s := by
         rw [Algebra.smul_def, Algebra.smul_def, mul_one] at hst
         linear_combination hst
       have ht' : algebraMap F E t ≠ 0 := by simpa using ht
@@ -78,10 +119,8 @@ theorem exists_algebraMap_of_fixed
   ext y
   exact congrArg (fun f : E →ₗ[F] E => f y) hlin
 
-theorem sigma_ne_id
-    {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-    {σ : E →ₐ[F] E} (h : IsCMExt F E σ)
-    : σ ≠ AlgHom.id F E := by
+theorem sigma_ne_id {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+    {σ : E →ₐ[F] E} (h : IsCMExt F E σ) : σ ≠ AlgHom.id F E := by
   obtain ⟨τ⟩ : Nonempty (E →+* ℂ) := inferInstance
   intro hσ
   have := h.2.1
@@ -93,22 +132,18 @@ theorem sigma_ne_id
   rw [hσ] at this
   simpa using this.symm
 
-theorem sigma_sigma
-    {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-    {σ : E →ₐ[F] E} (h : IsCMExt F E σ)
-    (x : E)
-    : σ (σ x) = x := by
+theorem sigma_sigma {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+    {σ : E →ₐ[F] E} (h : IsCMExt F E σ) (x : E) : σ (σ x) = x := by
   obtain ⟨τ⟩ : Nonempty (E →+* ℂ) := inferInstance
   apply τ.injective
   rw [h.2.2.2, h.2.2.2, star_star]
 
-theorem sigma_hE_self
-    {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-    {σ : E →ₐ[F] E} (hσ : IsCMExt F E σ)
-    {M : ℕ} {J : Matrix (Fin M) (Fin M) E} (hJ : IsHermND σ J) (y : Fin M → E)
-    : σ (hE σ J y y) = hE σ J y y := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [hE, hform, map_sum, map_mul]
+theorem sigma_hE_self {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E]
+    [Algebra F E] {σ : E →ₐ[F] E} (hσ : IsCMExt F E σ) {M : ℕ}
+    {J : Matrix (Fin M) (Fin M) E} (hJ : IsHermND σ J) (y : Fin M → E) :
+    σ (hE σ J y y) = hE σ J y y := by
+
+  simp only [hE, hform, map_sum, map_mul]
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
   have h1 : (σ : E →+* E) (y j) = σ (y j) := rfl
@@ -116,23 +151,18 @@ theorem sigma_hE_self
   rw [h1, h2, sigma_sigma hσ, hJ.1 i j]
   ring
 
-theorem ofF_gram_iff
-    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-        (σ : E →ₐ[F] E),
-      IsCMExt F E σ
-        → ∀ (M : ℕ) (J : Matrix (Fin M) (Fin M) E),
-          IsHermND σ J
-            → ∀ (d : ℕ) (b : Module.Basis (Fin d) F E),
-              Function.Bijective (ofF b : (Fin M × Fin d → F) → Fin 1 → Fin M → E)
-                ∧ (∀ x : Fin M × Fin d → F, ofF b x ≠ 0 ↔ x ≠ 0)
-                ∧ ∀ (B : Matrix (Fin M × Fin d) (Fin M × Fin d) F),
-                  (∀ x : Fin M → E,
-                      Algebra.trace F E (hE σ J x x)
-                        = (fun p : Fin M × Fin d => b.repr (x p.1) p.2)
-                          ⬝ᵥ (B *ᵥ fun p : Fin M × Fin d => b.repr (x p.1) p.2))
-                    → ∀ (β : F) (x : Fin M × Fin d → F),
-                      gramE σ J (ofF b x) = (fun _ _ => algebraMap F E β)
-                        ↔ (1 / 2 : F) * (x ⬝ᵥ (B *ᵥ x)) = β := by
+theorem ofF_gram_iff : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E]
+    [Algebra F E] (σ : E →ₐ[F] E), IsCMExt F E σ → ∀ (M : ℕ) (J : Matrix (Fin M) (Fin M) E),
+    IsHermND σ J → ∀ (d : ℕ) (b : Module.Basis (Fin d) F E),
+    Function.Bijective (ofF b : (Fin M × Fin d → F) → Fin 1 → Fin M → E) ∧
+    (∀ x : Fin M × Fin d → F, ofF b x ≠ 0 ↔ x ≠ 0) ∧
+    ∀ (B : Matrix (Fin M × Fin d) (Fin M × Fin d) F),
+      (∀ x : Fin M → E, Algebra.trace F E (hE σ J x x) =
+        (fun p : Fin M × Fin d => b.repr (x p.1) p.2) ⬝ᵥ
+          (B *ᵥ fun p : Fin M × Fin d => b.repr (x p.1) p.2)) →
+      ∀ (β : F) (x : Fin M × Fin d → F),
+        gramE σ J (ofF b x) = (fun _ _ => algebraMap F E β) ↔
+          (1 / 2 : F) * (x ⬝ᵥ (B *ᵥ x)) = β := by
   intro F E _ _ _ _ _ σ hσ M J hJ d b
   refine ⟨ofF_bijective b, ?_, ?_⟩
   · intro x
@@ -143,8 +173,8 @@ theorem ofF_gram_iff
     · rintro rfl
       exact ofF_zero b
   · intro B hB β x
-    obtain ⟨c, hc⟩ :=
-      exists_algebraMap_of_fixed hσ.2.2.1 (sigma_ne_id hσ) (sigma_hE_self hσ hJ (ofF b x 0))
+    obtain ⟨c, hc⟩ := exists_algebraMap_of_fixed hσ.2.2.1 (sigma_ne_id hσ)
+      (sigma_hE_self hσ hJ (ofF b x 0))
     have hco : (fun p : Fin M × Fin d => b.repr (ofF b x 0 p.1) p.2) = x := by
       funext p
       exact repr_ofF b x 0 p.1 p.2

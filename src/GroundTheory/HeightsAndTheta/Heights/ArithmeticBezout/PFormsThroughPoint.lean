@@ -1,12 +1,60 @@
 module
 
-public import Mathlib
 public import GroundTheory.HeightsAndTheta.Heights.ArithmeticBezout.StatementsFormsThroughPoint
 public import GroundTheory.HeightsAndTheta.Heights.ArithmeticBezout.StatementsThroughPointIncIdeal
 public import GroundTheory.HeightsAndTheta.Heights.ArithmeticBezout.StatementsChartZeroTrdeg
 public import GroundTheory.HeightsAndTheta.Heights.ArithmeticBezout.StatementsThroughTwoPointsTrdeg
 public import GroundTheory.HeightsAndTheta.Heights.ArithmeticBezout.StatementsTrdegBaseAlgebraic
+public import GroundTheory.HeightsAndTheta.Heights.ArithmeticBezout.StatementsIncidenceZeroLocus
 public import GroundTheory.HeightsAndTheta.Heights.ChowForms.PComponentOfIncIdeal
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.Order.CompletePartialOrder
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -16,34 +64,27 @@ namespace GroundTheory.Heights₂.Heights
 
 open MvPolynomial
 
-theorem aeval_mul_homogeneousComponent
-    {F Ω : Type*} [Field F] [Field Ω] [Algebra F Ω]
-    {n : ℕ} (q : MvPolynomial (Fin n) F)
-    (e : ℕ) (t : Ω) (x : Fin n → Ω)
-    : aeval (fun m => t * x m) (homogeneousComponent e q)
-      = t ^ e * aeval x (homogeneousComponent e q) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [homogeneousComponent_apply, map_sum, map_sum, Finset.mul_sum]
+theorem aeval_mul_homogeneousComponent {F Ω : Type*} [Field F] [Field Ω] [Algebra F Ω] {n : ℕ}
+    (q : MvPolynomial (Fin n) F) (e : ℕ) (t : Ω) (x : Fin n → Ω) :
+    aeval (fun m => t * x m) (homogeneousComponent e q) = t ^ e * aeval x (homogeneousComponent e q) := by
+
+  rw [homogeneousComponent_apply, map_sum, map_sum, Finset.mul_sum]
   refine Finset.sum_congr rfl fun α hα => ?_
   rw [Finset.mem_filter] at hα
-  simp only [aeval_monomial, Finsupp.prod, mul_pow, Finset.prod_mul_distrib,
-    Finset.prod_pow_eq_pow_sum]
+  simp only [aeval_monomial, Finsupp.prod, mul_pow, Finset.prod_mul_distrib, Finset.prod_pow_eq_pow_sum]
   have hdeg : Finsupp.degree α = ∑ i ∈ α.support, α i := rfl
   rw [← hα.2, hdeg]
   ring
 
-theorem FormsThroughPoint.proof
-    (hZ : IncidenceZeroLocus.Statement) (hI : ThroughPointIncIdeal.Statement)
+theorem FormsThroughPoint.proof (hZ : IncidenceZeroLocus.Statement) (hI : ThroughPointIncIdeal.Statement)
     (hC : ChartZeroTrdeg.Statement) (hT : ThroughTwoPointsTrdeg.Statement)
-    (hB : TrdegBaseAlgebraic.Statement)
-    : FormsThroughPoint.Statement := by
+    (hB : TrdegBaseAlgebraic.Statement) : FormsThroughPoint.Statement := by
   intro F _ n k Q hQ hdim x hx hxQ
   obtain ⟨q, hqQ, hqx⟩ := hxQ
 
   have h1 := ComponentOfIncIdeal.one_le_ringKrullDim_quot hQ
-  obtain ⟨d, hd, hdk⟩
-      : ∃ d : ℕ,
-        ringKrullDim (MvPolynomial (Fin n) F ⧸ Q) = ((d + 1 : ℕ) : WithBot ℕ∞) ∧ d + 1 ≤ k := by
+  obtain ⟨d, hd, hdk⟩ : ∃ d : ℕ, ringKrullDim (MvPolynomial (Fin n) F ⧸ Q) = ((d + 1 : ℕ) : WithBot ℕ∞) ∧
+      d + 1 ≤ k := by
     generalize ringKrullDim (MvPolynomial (Fin n) F ⧸ Q) = D at h1 hdim ⊢
     induction D using WithBot.recBotCoe with
     | bot => exact absurd h1 (by simp)
@@ -74,13 +115,11 @@ theorem FormsThroughPoint.proof
   let Ω := AlgebraicClosure (FractionRing R)
   have hinj : Function.Injective (algebraMap R Ω) := by
     rw [IsScalarTower.algebraMap_eq R (FractionRing R) Ω]
-    exact (algebraMap (FractionRing R) Ω).injective.comp
-      (IsFractionRing.injective R (FractionRing R))
+    exact (algebraMap (FractionRing R) Ω).injective.comp (IsFractionRing.injective R (FractionRing R))
   let v : Fin k × Fin n → Ω := fun ij => algebraMap R Ω (genSubst x c ij)
   have hv : ∀ g ∈ incIdeal Q k, aeval v g = 0 := by
     intro g hgI
-    have hval : aeval v g = algebraMap R Ω (aeval (genSubst x c) g) :=
-      aeval_algebraMap_apply Ω (genSubst x c) g
+    have hval : aeval v g = algebraMap R Ω (aeval (genSubst x c) g) := aeval_algebraMap_apply Ω (genSubst x c) g
     rw [hval, hg g hgI, map_zero]
   obtain ⟨y, hy0, hyQ, hyv⟩ := hZ F n k Q hQ.isHomog Ω v hv
 
@@ -90,8 +129,8 @@ theorem FormsThroughPoint.proof
       by_contra h
       push Not at h
       apply hqx
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [← sum_homogeneousComponent q, map_sum]
+
+      rw [← sum_homogeneousComponent q, map_sum]
       exact Finset.sum_eq_zero fun e _ => h e
     have ht0 : t ≠ 0 := by
       rintro rfl

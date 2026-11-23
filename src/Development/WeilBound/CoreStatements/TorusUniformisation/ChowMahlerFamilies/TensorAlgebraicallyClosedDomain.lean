@@ -1,6 +1,59 @@
 module
 
-public import Mathlib
+import Development.AutomorphicSpectrum.Proofs.AlgebraProofs.NatDegreeMinpolyEqOfClosed
+public import Mathlib.FieldTheory.LinearDisjoint
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.FieldTheory.PurelyInseparable.Exponent
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Coalgebra.IsFrobenius
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.HopfAlgebra.Basic
+public import Mathlib.RingTheory.Localization.InvSubmonoid
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+public import Mathlib.RingTheory.Jacobson.Ring
+public import Mathlib.RingTheory.Polynomial.GaussLemma
 
 @[expose] public section
 
@@ -11,36 +64,16 @@ namespace PositivityTheory.Xgn.TensorDomain
 open Polynomial
 open scoped IntermediateField
 
-theorem natDegree_minpoly_eq
-    {k F A : Type}
-    [Field k] [Field F] [Field A] [Algebra k F] [Algebra F A] [Algebra k A] [IsScalarTower k F A]
+theorem natDegree_minpoly_eq {k F A : Type} [Field k] [Field F] [Field A] [Algebra k F]
+    [Algebra F A] [Algebra k A] [IsScalarTower k F A]
     (h : ∀ x : F, IsAlgebraic k x → x ∈ (algebraMap k F).range)
-    {θ : A} (hθ : IsIntegral k θ)
-    : (minpoly F θ).natDegree = (minpoly k θ).natDegree := by
-  have hF : IsIntegral F θ := hθ.tower_top
-  have hd : minpoly F θ ∣ (minpoly k θ).map (algebraMap k F) :=
-    minpoly.dvd_map_of_isScalarTower k F θ
-  have h1 :=
-    integralClosure.mem_lifts_of_monic_of_dvd_map F (minpoly.monic hθ) (minpoly.monic hF) hd
-  have h2 : minpoly F θ ∈ lifts (algebraMap k F) := by
-    rw [lifts_iff_coeff_lifts] at h1 ⊢
-    intro n
-    obtain ⟨y, hy⟩ := h1 n
-    rw [← hy]
-    exact h _ (IsIntegral.isAlgebraic y.2)
-  obtain ⟨q, hq, hdeg, hm⟩ := lifts_and_natDegree_eq_and_monic h2 (minpoly.monic hF)
-  apply le_antisymm
-  · have := natDegree_le_of_dvd hd ((minpoly.monic hθ).map _).ne_zero
-    rwa [natDegree_map] at this
-  · rw [← hdeg]
-    refine natDegree_le_of_dvd (minpoly.dvd k θ ?_) hm.ne_zero
-    rw [← aeval_map_algebraMap F, hq, minpoly.aeval]
+    {θ : A} (hθ : IsIntegral k θ) : (minpoly F θ).natDegree = (minpoly k θ).natDegree := by
+  apply GlobalTheory.CompanionTheory.Ar.Cmp.RegularTensor.natDegree_minpoly_eq_of_closed <;> assumption
 
-theorem linearDisjoint_algebraicClosure
-    {K Ω L : Type} [Field K] [CharZero K] [Field Ω] [Field L] [Algebra K Ω] [Algebra Ω L]
-    [Algebra K L] [IsScalarTower K Ω L]
-    (h : ∀ a : Ω, IsAlgebraic K a → a ∈ (algebraMap K Ω).range)
-    : (algebraicClosure K L).LinearDisjoint Ω := by
+theorem linearDisjoint_algebraicClosure {K Ω L : Type} [Field K] [CharZero K] [Field Ω] [Field L]
+    [Algebra K Ω] [Algebra Ω L] [Algebra K L] [IsScalarTower K Ω L]
+    (h : ∀ a : Ω, IsAlgebraic K a → a ∈ (algebraMap K Ω).range) :
+    (algebraicClosure K L).LinearDisjoint Ω := by
   have : Algebra.IsIntegral K (algebraicClosure K L).toSubalgebra :=
     (algebraicClosure.isAlgebraic K L).isIntegral
   refine Subalgebra.LinearDisjoint.of_linearDisjoint_finite_left _ _ fun B hB _ => ?_
@@ -59,19 +92,15 @@ theorem linearDisjoint_algebraicClosure
   have hd := natDegree_minpoly_eq (F := Ω) h hi
   have hl := linearIndependent_pow (K := Ω) (θ : L)
   rw [hd] at hl
-  have he
-      : (K⟮(θ : L)⟯.val ∘ (IntermediateField.adjoin.powerBasis hi).basis)
-        = fun i : Fin (IntermediateField.adjoin.powerBasis hi).dim => (θ : L) ^ (i : ℕ) := by
+  have he : (K⟮(θ : L)⟯.val ∘ (IntermediateField.adjoin.powerBasis hi).basis) =
+      fun i : Fin (IntermediateField.adjoin.powerBasis hi).dim => (θ : L) ^ (i : ℕ) := by
     funext i
     simp
   rw [he]
   exact hl
 
-theorem exists_point
-    (k A : Type)
-    [Field k] [IsAlgClosed k] [CommRing A] [IsDomain A] [Algebra k A] [Algebra.FiniteType k A]
-    {a : A} (ha : a ≠ 0)
-    : ∃ φ : A →ₐ[k] k, φ a ≠ 0 := by
+theorem exists_point (k A : Type) [Field k] [IsAlgClosed k] [CommRing A] [IsDomain A]
+    [Algebra k A] [Algebra.FiniteType k A] {a : A} (ha : a ≠ 0) : ∃ φ : A →ₐ[k] k, φ a ≠ 0 := by
   let S := Localization.Away a
   haveI : IsDomain S :=
     IsLocalization.isDomain_localization (powers_le_nonZeroDivisors_of_noZeroDivisors ha)
@@ -82,17 +111,16 @@ theorem exists_point
   haveI : Module.Finite k (S ⧸ m) := finite_of_finite_type_of_isJacobsonRing k (S ⧸ m)
   let ψ : (S ⧸ m) →ₐ[k] k := (by
     refine @_root_.IsAlgClosed.lift _ _ _ _ _ _ _ _ _ _ _ ?_ ?_ ?_
-    solve_by_elim* (maxDepth := 2) only [*, @_root_.DivisionSemiring.to_moduleIsTorsionFree,
+    solve_by_elim* (maxDepth := 2) only [*,
+      @_root_.DivisionSemiring.to_moduleIsTorsionFree,
       @_root_.Algebra.IsIntegral.isAlgebraic, @_root_.inferInstance])
   refine ⟨(ψ.comp (Ideal.Quotient.mkₐ k m)).comp (IsScalarTower.toAlgHom k A S), ?_⟩
   have hu : IsUnit (algebraMap A S a) := IsLocalization.Away.algebraMap_isUnit a
   exact (hu.map (ψ.comp (Ideal.Quotient.mkₐ k m))).ne_zero
 
-theorem isDomain_tensor_of_isAlgClosed
-    (k A : Type)
-    [Field k] [IsAlgClosed k] [CommRing A] [IsDomain A] [Algebra k A] [Algebra.FiniteType k A]
-    (F : Type) [Field F] [Algebra k F]
-    : IsDomain (F ⊗[k] A) := by
+theorem isDomain_tensor_of_isAlgClosed (k A : Type) [Field k] [IsAlgClosed k] [CommRing A]
+    [IsDomain A] [Algebra k A] [Algebra.FiniteType k A] (F : Type) [Field F] [Algebra k F] :
+    IsDomain (F ⊗[k] A) := by
   let b := Module.Basis.ofVectorSpace k F
   let B := Algebra.TensorProduct.basis A b
   haveI : Nontrivial (A ⊗[k] F) :=
@@ -128,15 +156,14 @@ theorem isDomain_tensor_of_isAlgClosed
   haveI : IsDomain (A ⊗[k] F) := NoZeroDivisors.to_isDomain _
   exact (Algebra.TensorProduct.comm k F A).toMulEquiv.isDomain
 
-theorem isDomain_tensor_of_closure
-    (k Ω S : Type) [Field k] [Field Ω] [IsAlgClosed Ω] [Algebra k Ω] [Algebra.IsAlgebraic k Ω]
-    [CommRing S] [Algebra k S] [Algebra.FiniteType k S] [IsDomain (Ω ⊗[k] S)]
-    (F : Type) [Field F] [Algebra k F]
-    : IsDomain (F ⊗[k] S) := by
+theorem isDomain_tensor_of_closure (k Ω S : Type) [Field k] [Field Ω] [IsAlgClosed Ω] [Algebra k Ω]
+    [Algebra.IsAlgebraic k Ω] [CommRing S] [Algebra k S] [Algebra.FiniteType k S]
+    [IsDomain (Ω ⊗[k] S)] (F : Type) [Field F] [Algebra k F] : IsDomain (F ⊗[k] S) := by
   let L := AlgebraicClosure F
   let j : Ω →ₐ[k] L := (by
     refine @_root_.IsAlgClosed.lift _ _ _ _ _ _ _ _ _ _ _ ?_ ?_ ?_
-    solve_by_elim* (maxDepth := 2) only [*, @_root_.DivisionSemiring.to_moduleIsTorsionFree,
+    solve_by_elim* (maxDepth := 2) only [*,
+      @_root_.DivisionSemiring.to_moduleIsTorsionFree,
       @_root_.Algebra.IsIntegral.isAlgebraic, @_root_.inferInstance])
   letI : Algebra Ω L := j.toRingHom.toAlgebra
   haveI : IsScalarTower k Ω L := IsScalarTower.of_algebraMap_eq fun x => (j.commutes x).symm
@@ -149,13 +176,10 @@ theorem isDomain_tensor_of_closure
       (IsScalarTower.toAlgHom k F L).toLinearMap (algebraMap F L).injective
   exact Function.Injective.isDomain φ.toRingHom hφ
 
-theorem isDomain_tensor
-    {K A Ω : Type} [Field K] [CharZero K] [CommRing A] [Field Ω] [Algebra K A] [Algebra K Ω]
-    [Algebra.FiniteType K A]
-    (j : A →ₐ[K] Ω) (hj : Function.Injective j)
-    (h : ∀ a : Ω, IsAlgebraic K a → a ∈ (algebraMap K Ω).range)
-    (F : Type) [Field F] [Algebra K F]
-    : IsDomain (F ⊗[K] A) := by
+theorem isDomain_tensor {K A Ω : Type} [Field K] [CharZero K] [CommRing A] [Field Ω] [Algebra K A]
+    [Algebra K Ω] [Algebra.FiniteType K A] (j : A →ₐ[K] Ω) (hj : Function.Injective j)
+    (h : ∀ a : Ω, IsAlgebraic K a → a ∈ (algebraMap K Ω).range) (F : Type) [Field F]
+    [Algebra K F] : IsDomain (F ⊗[K] A) := by
   let N := algebraicClosure K (AlgebraicClosure Ω)
   haveI : IsDomain (N ⊗[K] Ω) := (linearDisjoint_algebraicClosure h).isDomain
   haveI : IsAlgClosed N := IsAlgClosure.isAlgClosed K
@@ -165,10 +189,9 @@ theorem isDomain_tensor
   haveI : IsDomain (N ⊗[K] A) := Function.Injective.isDomain φ.toRingHom hφ
   exact isDomain_tensor_of_closure K N A F
 
-theorem isDomain_of_algClosed
-    {K L F : Type} [Field K] [Field L] [Field F] [Algebra K L] [Algebra K F] [CharZero K]
-    (h : ∀ a : F, IsAlgebraic K a → a ∈ (algebraMap K F).range)
-    : IsDomain (L ⊗[K] F) := by
+theorem isDomain_of_algClosed {K L F : Type} [Field K] [Field L] [Field F] [Algebra K L]
+    [Algebra K F] [CharZero K] (h : ∀ a : F, IsAlgebraic K a → a ∈ (algebraMap K F).range) :
+    IsDomain (L ⊗[K] F) := by
   classical
   haveI : Nontrivial (L ⊗[K] F) :=
     (Algebra.TensorProduct.includeRight_injective (R := K) (A := L) (B := F)
@@ -201,9 +224,7 @@ theorem isDomain_of_algClosed
 
 end PositivityTheory.Xgn.TensorDomain
 
-theorem PositivityTheory.Xgn.tensor_algebraically_closed_domain
-    : ∀ (K Ω C : Type) [Field K] [CharZero K] [Field Ω] [Algebra K Ω] [Field C] [Algebra K C],
-      (∀ a : Ω, IsAlgebraic K a → a ∈ (algebraMap K Ω).range) → IsDomain (Ω ⊗[K] C) := by
+theorem PositivityTheory.Xgn.tensor_algebraically_closed_domain : ∀ (K Ω C : Type) [Field K] [CharZero K] [Field Ω] [Algebra K Ω] [Field C] [Algebra K C], (∀ a : Ω, IsAlgebraic K a → a ∈ (algebraMap K Ω).range) → IsDomain (Ω ⊗[K] C) := by
   intro K Ω C _ _ _ _ _ _ h
   haveI : IsDomain (C ⊗[K] Ω) := PositivityTheory.Xgn.TensorDomain.isDomain_of_algClosed h
   exact (Algebra.TensorProduct.comm K Ω C).toMulEquiv.isDomain

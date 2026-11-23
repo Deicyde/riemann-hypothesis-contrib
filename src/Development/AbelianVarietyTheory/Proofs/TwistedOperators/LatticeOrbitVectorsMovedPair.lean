@@ -1,24 +1,47 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.Definitions.TwistedInnerProducts.TwistPlacesOffPrimeQZero
-public import Development.AbelianVarietyTheory.Definitions.Divisors.DiscreteSeriesHermitianUnique
-public import Development.AbelianVarietyTheory.Statements.PlaceShiftStatements.NormSmall
-public import Development.AbelianVarietyTheory.Statements.PlaceShiftStatements.DictAt
-public import Development.AbelianVarietyTheory.Statements.HeckeThetaIntegrals.ThetaIntegralsAgree
-public import Development.AbelianVarietyTheory.BlockTheory.DivisorBase.WeilTensorModels
-public import Development.AbelianVarietyTheory.BlockTheory.TwistedDiscreteSeries.CuspAlongSmoothRows
-public import Development.AbelianVarietyTheory.BlockTheory.DivisorBase.ToricSymbols
-public import Development.AbelianVarietyTheory.Definitions.Foundations.NormSumPairRankZeroOfCurveCoordNorm
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.FrT
-public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.SrcLat
-public import Formalism.SatakeDualWeyl.AdelicIwasawaHecke.CsSpan
-public import Formalism.SatakeDualWeyl.AdelicIwasawaHecke.CsApprox
-public import Development.AbelianVarietyTheory.Proofs.AdelicLatticeProofs.SmulMemLatO
-public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.SelfDualSplitComponentIsLatticeStabilizerEq
+public import Development.AbelianVarietyTheory.Statements.PlaceShiftStatements.InfClassAt
 public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.UnitaryPairMapsCompletedHomLatticeOntoTranslate
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.FinitePartEqIntegralCombinationOfMemCompletedLatStatement
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.WeilActionOMemLatticeOOfIntegralCombinationsStatement
+import Formalism.SatakeDualWeyl.AdelicIwasawaHecke.CsApprox
+import Formalism.SatakeDualWeyl.AdelicIwasawaHecke.CsSpan
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Development.AbelianVarietyTheory.Definitions.TwistedInnerProducts.TwistPlacesOffPrimeQZero
 
 @[expose] public section
 
@@ -43,14 +66,14 @@ noncomputable section
 namespace GlobalTheory.MovedHomLat
 open Matrix
 variable {D : D7}
-set_option synthInstance.maxHeartbeats 400000
+
 
 theorem bridge (V : HSp D) (k : GA D V) (s : Fin V.rank → D.host.E)
     : (fun i => Formalism.IndefR.Datum.toEAf D ((mt V k *ᵥ fun j => incA D (s j)) i))
       = (Formalism.IndefR.Lev.finE V k).1 *ᵥ (fun j => Formalism.IndefR.Datum.eToEAf D (s j)) := by
   funext i
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [Matrix.mulVec, dotProduct, map_sum, map_mul]
+
+  simp only [Matrix.mulVec, dotProduct, map_sum, map_mul]
   rfl
 
 theorem fwd
@@ -122,7 +145,6 @@ theorem colLat_span {n : ℕ} (B : GL (Fin n) D.host.E)
   rw [e]
   exact Submodule.sum_mem _ fun j _ => Submodule.smul_mem _ _ (hcol j)
 
-set_option maxHeartbeats 1000000 in
 theorem globLat_mul_iff
     {n : ℕ} (a b : GL (Fin n) (Formalism.IndefR.Lev.EAf D))
     (Λ C : Submodule (𝓞 D.host.E) (Fin n → D.host.E))

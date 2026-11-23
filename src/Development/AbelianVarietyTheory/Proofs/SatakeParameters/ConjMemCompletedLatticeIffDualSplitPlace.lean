@@ -1,19 +1,51 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.IsIntOv
-public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.IntegralTensorAdelesEqAdelicCompletionOne
-public import Development.AbelianVarietyTheory.Proofs.AdelicLatticeProofs.MemRangeOfOneTmulMem
 public import Development.AbelianVarietyTheory.Proofs.AdelicLatticeProofs.FinTensMemLatO
+public import Development.AbelianVarietyTheory.Proofs.AdelicLatticeProofs.MemRangeOfOneTmulMem
+public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.IntegralTensorAdelesEqAdelicCompletionOne
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
 
 @[expose] public section
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH
-  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
-  Formalism.L2.Theta Formalism.L2.NTheta Formalism.IndefR.Datum IsDedekindDomain NumberField Matrix
-  GlobalTheory.SplitHecke
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.L2.NTheta Formalism.IndefR.Datum IsDedekindDomain NumberField Matrix GlobalTheory.SplitHecke
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -21,9 +53,8 @@ namespace GlobalTheory.SplitDualLat
 
 variable {D : D7}
 
-theorem ringHom_sum {A B ι : Type} [Semiring A] [Semiring B] [Fintype ι] (f : A →+* B) (g : ι → A)
-    : f (∑ i, g i) = ∑ i, f (g i) :=
-  map_sum f g _
+theorem ringHom_sum {A B ι : Type} [Semiring A] [Semiring B] [Fintype ι] (f : A →+* B) (g : ι → A) :
+    f (∑ i, g i) = ∑ i, f (g i) := map_sum f g _
 
 theorem cA_cA (z : AE D) : cA D (cA D z) = z := by
   induction z using TensorProduct.induction_on with
@@ -35,8 +66,7 @@ theorem cA_cA (z : AE D) : cA D (cA D z) = z := by
 
 theorem cA_incA (x : D.host.E) : cA D (incA D x) = incA D (star x) := rfl
 
-theorem finPart_cA (x : AE D)
-    : finPart D (cA D x) = sigR (Af D.host.F) D.sp.cm.sig (finPart D x) := by
+theorem finPart_cA (x : AE D) : finPart D (cA D x) = sigR (Af D.host.F) D.sp.cm.sig (finPart D x) := by
   induction x using TensorProduct.induction_on with
   | zero => simp only [RingHom.map_zero]
   | add x y hx hy => simp only [RingHom.map_add (f := _), hx, hy]
@@ -52,51 +82,39 @@ theorem finPart_surjective : Function.Surjective (finPart D) := by
     exact ⟨a + b, RingHom.map_add _ _ _⟩
   | tmul a x => exact ⟨pairA D.host.F 0 a ⊗ₜ[D.host.F] x, rfl⟩
 
-theorem sigR_mem_intAE {z : Af D.host.F ⊗[D.host.F] D.host.E} (hz : z ∈ intAE D)
-    : sigR (Af D.host.F) D.sp.cm.sig z ∈ intAE D := by
+theorem sigR_mem_intAE {z : Af D.host.F ⊗[D.host.F] D.host.E} (hz : z ∈ intAE D) :
+    sigR (Af D.host.F) D.sp.cm.sig z ∈ intAE D := by
   induction hz using AddSubgroup.closure_induction with
   | mem w hw =>
     obtain ⟨a, ha, o, rfl⟩ := hw
-    exact AddSubgroup.subset_closure ⟨
-      a,
-      ha,
-      ⟨
-        D.sp.cm.sig (o : D.host.E),
-        (show IsIntegral ℤ (o : D.host.E) from o.2).map
-          (D.sp.cm.sig : D.host.E →+* D.host.E).toIntAlgHom
-      ⟩,
-      rfl
-    ⟩
+    exact AddSubgroup.subset_closure ⟨a, ha, ⟨D.sp.cm.sig (o : D.host.E),
+      (show IsIntegral ℤ (o : D.host.E) from o.2).map (D.sp.cm.sig : D.host.E →+* D.host.E).toIntAlgHom⟩, rfl⟩
   | zero => rw [RingHom.map_zero]; exact zero_mem _
   | add x y _ _ hx hy => rw [RingHom.map_add (f := _)]; exact add_mem hx hy
   | neg x _ hx => rw [RingHom.map_neg]; exact neg_mem hx
 
-def form (V : HSp D) (x z : Fin V.rank → AE D) : AE D :=
-  ∑ i, ∑ j, cA D (x i) * incA D (V.gram i j) * z j
+def form (V : HSp D) (x z : Fin V.rank → AE D) : AE D := ∑ i, ∑ j, cA D (x i) * incA D (V.gram i j) * z j
 
-theorem finPart_form (V : HSp D) (x z : Fin V.rank → AE D)
-    : finPart D (form V x z)
-      = hR (Af D.host.F) D.sp.cm.sig V.gram
-        (fun i => finPart D (x i))
-        fun i => finPart D (z i) := by
+theorem finPart_form (V : HSp D) (x z : Fin V.rank → AE D) :
+    finPart D (form V x z) =
+      hR (Af D.host.F) D.sp.cm.sig V.gram (fun i => finPart D (x i)) fun i => finPart D (z i) := by
   simp only [form, ringHom_sum, RingHom.map_mul, finPart_cA]
   rfl
 
 theorem cA_form (V : HSp D) (x z : Fin V.rank → AE D) : cA D (form V x z) = form V z x := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [form, map_sum, RingHom.map_mul, cA_cA, cA_incA, GlobalTheory.LatVac.gram_star]
+
+  simp only [form, map_sum, RingHom.map_mul, cA_cA, cA_incA, GlobalTheory.LatVac.gram_star]
   rw [Finset.sum_comm]
   exact Finset.sum_congr rfl fun _ _ => Finset.sum_congr rfl fun _ _ => by ring
 
-theorem form_mul (V : HSp D) (a b : AE D) (x z : Fin V.rank → AE D)
-    : form V (fun i => a * x i) (fun i => b * z i) = cA D a * b * form V x z := by
+theorem form_mul (V : HSp D) (a b : AE D) (x z : Fin V.rank → AE D) :
+    form V (fun i => a * x i) (fun i => b * z i) = cA D a * b * form V x z := by
   simp only [form, RingHom.map_mul, Finset.mul_sum]
   exact Finset.sum_congr rfl fun _ _ => Finset.sum_congr rfl fun _ _ => by ring
 
-theorem mem_iff (V : HSp D) (x : Fin V.rank → AE D)
-    : (fun i => finPart D (x i)) ∈ LamHat V
-      ↔ ∀ z : Fin V.rank → AE D,
-        (fun i => finPart D (z i)) ∈ LamHat V → finPart D (form V x z) ∈ intAE D := by
+theorem mem_iff (V : HSp D) (x : Fin V.rank → AE D) :
+    (fun i => finPart D (x i)) ∈ LamHat V ↔
+      ∀ z : Fin V.rank → AE D, (fun i => finPart D (z i)) ∈ LamHat V → finPart D (form V x z) ∈ intAE D := by
   rw [(GlobalTheory.LatDual.lamHat_selfDual_and_module V).1]
   constructor
   · intro h z hz
@@ -109,24 +127,14 @@ theorem mem_iff (V : HSp D) (x : Fin V.rank → AE D)
     rw [← finPart_form, ← cA_form, finPart_cA]
     exact sigR_mem_intAE (h _ hz)
 
-theorem map_form (V : HSp D) {K : Type} [CommRing K] (π : AE D →+* K) (x z : Fin V.rank → AE D)
-    : π (form V x z)
-      = ((fun i => π (cA D (x i))) ᵥ* (V.gram.map fun a => π (incA D a))) ⬝ᵥ fun k => π (z k) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [form, map_sum, RingHom.map_mul, dotProduct, vecMul, Finset.sum_mul, Matrix.map_apply]
+theorem map_form (V : HSp D) {K : Type} [CommRing K] (π : AE D →+* K) (x z : Fin V.rank → AE D) :
+    π (form V x z) =
+      ((fun i => π (cA D (x i))) ᵥ* (V.gram.map fun a => π (incA D a))) ⬝ᵥ fun k => π (z k) := by
+
+  simp only [form, map_sum, RingHom.map_mul, dotProduct, vecMul, Finset.sum_mul, Matrix.map_apply]
   exact Finset.sum_comm
 
-theorem conj_mem_lamHat_iff
-    : ∀ {D : D7} (e : AE D) (v : HeightOneSpectrum (𝓞 D.host.F)) (π : AE D →+* Fv D.host.F v),
-      IsSplitIdem D e → Chart e v π
-        → ∀ (V : HSp D) (β : GL (Fin V.rank) (Fv D.host.F v)),
-          Frame V e π β
-            → ∀ y : Fin V.rank → AE D,
-              (fun i => finPart D (cA D e * y i)) ∈ LamHat V
-                ↔ ∀ j,
-                  IsInt (Ov D v)
-                    (((fun i => π (cA D (y i))) ᵥ* ((V.gram.map fun a => π (incA D a)) * β.1))
-                      j) := by
+theorem conj_mem_lamHat_iff : ∀ {D : D7} (e : AE D) (v : HeightOneSpectrum (𝓞 D.host.F)) (π : AE D →+* Fv D.host.F v), IsSplitIdem D e → Chart e v π → ∀ (V : HSp D) (β : GL (Fin V.rank) (Fv D.host.F v)), Frame V e π β → ∀ y : Fin V.rank → AE D, (fun i => finPart D (cA D e * y i)) ∈ LamHat V ↔ ∀ j, IsInt (Ov D v) (((fun i => π (cA D (y i))) ᵥ* ((V.gram.map fun a => π (incA D a)) * β.1)) j) := by
   intro D e v π he hπ V β hβ y
   rw [mem_iff]
   constructor
@@ -136,22 +144,17 @@ theorem conj_mem_lamHat_iff
       funext k
       rw [hs, Matrix.mulVec_single_one]
       rfl
-    have h2 :=
-      h _
-        ((hβ fun k => s (β.1 k j)).2 fun i => by
-          rw [h1, Matrix.mulVec_mulVec, Units.inv_mul, Matrix.one_mulVec]
-          by_cases hi : i = j
-          · subst hi; rw [Pi.single_eq_same]; exact ⟨1, map_one _⟩
-          · rw [Pi.single_eq_of_ne hi]; exact ⟨0, map_zero _⟩)
-    rw [form_mul, cA_cA, he.1, hπ.2.2.2, map_form, h1, Matrix.dotProduct_mulVec,
-        Matrix.vecMul_vecMul, dotProduct_single, mul_one]
-      at h2
+    have h2 := h _ ((hβ fun k => s (β.1 k j)).2 fun i => by
+      rw [h1, Matrix.mulVec_mulVec, Units.inv_mul, Matrix.one_mulVec]
+      by_cases hi : i = j
+      · subst hi; rw [Pi.single_eq_same]; exact ⟨1, map_one _⟩
+      · rw [Pi.single_eq_of_ne hi]; exact ⟨0, map_zero _⟩)
+    rw [form_mul, cA_cA, he.1, hπ.2.2.2, map_form, h1, Matrix.dotProduct_mulVec, Matrix.vecMul_vecMul,
+      dotProduct_single, mul_one] at h2
     exact h2
   · intro h z hz
-    have h1 :=
-      (GlobalTheory.LatDual.lamHat_selfDual_and_module V).2 _
-        (GlobalTheory.AdIdem.idempotent_mem_intAE D (finPart D e) (by rw [← RingHom.map_mul, he.1]))
-        _ hz
+    have h1 := (GlobalTheory.LatDual.lamHat_selfDual_and_module V).2 _
+      (GlobalTheory.AdIdem.idempotent_mem_intAE D (finPart D e) (by rw [← RingHom.map_mul, he.1])) _ hz
     simp only [← RingHom.map_mul] at h1
     have h2 := (hβ z).1 h1
     have h3 := form_mul V (cA D e) 1 y z

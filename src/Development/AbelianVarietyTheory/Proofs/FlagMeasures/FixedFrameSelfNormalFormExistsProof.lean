@@ -1,8 +1,50 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Definitions.SemilocalFrames.RowsMeanC
+public import Formalism.SharpRestriction.CuspSpanNormBounds.LatticeGluingRadicals
 public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.UnitaryHostFieldArithmeticConditionsProofStatement
+import Mathlib.Algebra.Module.StablyFree.Basic
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.LinearAlgebra.Matrix.FiniteDimensional
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Coalgebra.IsFrobenius
+import Mathlib.RingTheory.HopfAlgebra.Basic
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -15,15 +57,15 @@ namespace GlobalTheory.IdNF
 section Gen
 variable {E : Type} [Field E] [NumberField E] [StarRing E] {S : HSpace E} {r : ℕ}
 
-theorem left_zero {s : Set S.V} {y : S.V} (h : ∀ x ∈ s, S.hT x y = 0)
-    : ∀ x ∈ Submodule.span E s, S.hT x y = 0 := by
+theorem left_zero {s : Set S.V} {y : S.V} (h : ∀ x ∈ s, S.hT x y = 0) :
+    ∀ x ∈ Submodule.span E s, S.hT x y = 0 := by
   intro x hx
   have hle : Submodule.span E s ≤ LinearMap.ker (S.hT.flip y) := by
     rw [Submodule.span_le]; intro v hv; simp [h v hv]
   simpa using hle hx
 
-theorem right_zero {s : Set S.V} {y : S.V} (h : ∀ x ∈ s, S.hT y x = 0)
-    : ∀ x ∈ Submodule.span E s, S.hT y x = 0 := by
+theorem right_zero {s : Set S.V} {y : S.V} (h : ∀ x ∈ s, S.hT y x = 0) :
+    ∀ x ∈ Submodule.span E s, S.hT y x = 0 := by
   intro x hx
   have hle : Submodule.span E s ≤ LinearMap.ker (S.hT y) := by
     rw [Submodule.span_le]; intro v hv; simp [h v hv]
@@ -31,21 +73,19 @@ theorem right_zero {s : Set S.V} {y : S.V} (h : ∀ x ∈ s, S.hT y x = 0)
 
 variable {n : ℕ}
 
-theorem frXa (F : Formalism.MainNotions.S.FlagG S r (n : E)) (hT : ((n : ℕ) : E) ≠ 0) (a : ℕ)
-    : (GlobalTheory.TypeAsm.frF F hT).Xa a = F.Xa a := by
+theorem frXa (F : Formalism.MainNotions.S.FlagG S r (n : E)) (hT : ((n : ℕ) : E) ≠ 0) (a : ℕ) :
+    (GlobalTheory.TypeAsm.frF F hT).Xa a = F.Xa a := by
   have h : (fun b : Fin r => F.fvec b.castSucc) = F.e := funext (GlobalTheory.TypeAsm.fv_cast F)
   show Submodule.span E ((fun b : Fin r => F.fvec b.castSucc) '' {b | b.val < a}) = _
-  rw [h]
-  rfl
+  rw [h]; rfl
 
-theorem frX (F : Formalism.MainNotions.S.FlagG S r (n : E)) (hT : ((n : ℕ) : E) ≠ 0)
-    : (GlobalTheory.TypeAsm.frF F hT).X = F.X := by
+theorem frX (F : Formalism.MainNotions.S.FlagG S r (n : E)) (hT : ((n : ℕ) : E) ≠ 0) :
+    (GlobalTheory.TypeAsm.frF F hT).X = F.X := by
   show (GlobalTheory.TypeAsm.frF F hT).Xa r = _
   rw [frXa]
   unfold Formalism.MainNotions.S.FlagG.X Formalism.MainNotions.S.FlagG.Xa
   congr 1
-  ext x
-  constructor
+  ext x; constructor
   · rintro ⟨i, -, rfl⟩; exact ⟨i, rfl⟩
   · rintro ⟨i, rfl⟩; exact ⟨i, i.2, rfl⟩
 
@@ -53,19 +93,16 @@ abbrev aaF (𝔡 : Ideal (𝓞 E)) (a : Fin r) : FractionalIdeal (nonZeroDivisor
   (𝔡 : FractionalIdeal (nonZeroDivisors (𝓞 E)) E) ^ (-((r : ℤ) - a.val))
 
 omit [StarRing E] in
-theorem aaF_inv (𝔡 : Ideal (𝓞 E)) (a : Fin r)
-    : (aaF 𝔡 a)⁻¹ = (𝔡 : FractionalIdeal (nonZeroDivisors (𝓞 E)) E) ^ ((r : ℤ) - a.val) := by
+theorem aaF_inv (𝔡 : Ideal (𝓞 E)) (a : Fin r) :
+    (aaF 𝔡 a)⁻¹ = (𝔡 : FractionalIdeal (nonZeroDivisors (𝓞 E)) E) ^ ((r : ℤ) - a.val) := by
   rw [aaF, zpow_neg, inv_inv]
 
-def idNF
-    (F : Formalism.MainNotions.S.FlagG S r (n : E))
-    (hT : ((n : ℕ) : E) ≠ 0)
-    (𝔡 : Ideal (𝓞 E)) (h𝔡 : 𝔡 ≠ ⊥) (h𝔡s : ∀ x ∈ 𝔡, ∃ y ∈ 𝔡, (y : E) = star (x : E))
-    (hP : Formalism.MainNotions.LatticeGluingRadicals.PosX
-      (⟨F, F.z⟩ : Formalism.MainNotions.S.Lat.LFlag S r (n : E)))
+def idNF (F : Formalism.MainNotions.S.FlagG S r (n : E)) (hT : ((n : ℕ) : E) ≠ 0) (𝔡 : Ideal (𝓞 E)) (h𝔡 : 𝔡 ≠ ⊥)
+    (h𝔡s : ∀ x ∈ 𝔡, ∃ y ∈ 𝔡, (y : E) = star (x : E))
+    (hP : Formalism.MainNotions.LatticeGluingRadicals.PosX (⟨F, F.z⟩ : Formalism.MainNotions.S.Lat.LFlag S r (n : E)))
     (f : Fin r → S.V) (hff : ∀ a b, S.hT (f a) (f b) = 0)
-    (hfe : ∀ a b, S.hT (f a) (F.e b) = if a = b then 1 else 0) (hfz : ∀ a, S.hT (f a) F.z = 0)
-    : GlobalTheory.DegCnt.NF (GlobalTheory.TypeAsm.spH S) r where
+    (hfe : ∀ a b, S.hT (f a) (F.e b) = if a = b then 1 else 0) (hfz : ∀ a, S.hT (f a) F.z = 0) :
+    GlobalTheory.DegCnt.NF (GlobalTheory.TypeAsm.spH S) r where
   F := GlobalTheory.TypeAsm.frF F hT
   F' := GlobalTheory.TypeAsm.frF F hT
   j := 0
@@ -89,33 +126,24 @@ def idNF
   ist_e' a b ha := absurd ha (Nat.not_lt_zero _)
   normalForm_dual_orthogonal_last b _ := by
     change S.hT (f b) (F.fvec (Fin.last r)) = 0
-    rw [GlobalTheory.TypeAsm.fv_last]
-    exact hfz b
+    rw [GlobalTheory.TypeAsm.fv_last]; exact hfz b
   ist_iso a b _ _ := hff b a
   posdef σ w hw hX := by
-    have hy
-        : w ∈ Formalism.MainNotions.S.Lat.orth S
-          (Formalism.MainNotions.S.Lat.Xplus
-            (⟨F, F.z⟩ : Formalism.MainNotions.S.Lat.LFlag S r (n : E))) := by
+    have hy : w ∈ Formalism.MainNotions.S.Lat.orth S (Formalism.MainNotions.S.Lat.Xplus (⟨F, F.z⟩ : Formalism.MainNotions.S.Lat.LFlag S r (n : E))) := by
       rw [Formalism.MainNotions.LatticeGluingRadicals.p_mem_orth]
       intro x hx
-      have hsub
-          : Formalism.MainNotions.S.Lat.Xplus
-              (⟨F, F.z⟩ : Formalism.MainNotions.S.Lat.LFlag S r (n : E))
-            ≤ Submodule.span E (Set.range F.fvec) := by
+      have hsub : Formalism.MainNotions.S.Lat.Xplus (⟨F, F.z⟩ : Formalism.MainNotions.S.Lat.LFlag S r (n : E)) ≤
+          Submodule.span E (Set.range F.fvec) := by
         show F.X ⊔ Submodule.span E {F.z} ≤ _
         refine sup_le (Submodule.span_le.2 ?_) (Submodule.span_le.2 ?_)
-        · rintro _ ⟨i, rfl⟩
-          exact Submodule.subset_span ⟨i.castSucc, GlobalTheory.TypeAsm.fv_cast F i⟩
+        · rintro _ ⟨i, rfl⟩; exact Submodule.subset_span ⟨i.castSucc, GlobalTheory.TypeAsm.fv_cast F i⟩
         · rintro _ rfl; exact Submodule.subset_span ⟨Fin.last r, GlobalTheory.TypeAsm.fv_last F⟩
       refine left_zero ?_ x (hsub hx)
       rintro _ ⟨i, rfl⟩
       have h := hw i
       change S.hT w (F.fvec i) = 0 at h
       exact Formalism.MainNotions.LatticeGluingRadicals.p_symm_zero S h
-    have hX'
-        : w ∉ Formalism.MainNotions.S.Lat.Xsp
-          (⟨F, F.z⟩ : Formalism.MainNotions.S.Lat.LFlag S r (n : E)) := by
+    have hX' : w ∉ Formalism.MainNotions.S.Lat.Xsp (⟨F, F.z⟩ : Formalism.MainNotions.S.Lat.LFlag S r (n : E)) := by
       intro h; apply hX; rw [frX]; exact h
     exact hP σ w hy hX'
   𝔡 := 𝔡
@@ -130,39 +158,29 @@ variable {E : Type} [Field E] [NumberField E] [StarRing E] {S : HSpace E} {r : �
 theorem Xa_r (F : Formalism.MainNotions.S.FlagG S r (n : E)) : F.Xa r = F.X := by
   unfold Formalism.MainNotions.S.FlagG.X Formalism.MainNotions.S.FlagG.Xa
   congr 1
-  ext x
-  constructor
+  ext x; constructor
   · rintro ⟨i, -, rfl⟩; exact ⟨i, rfl⟩
   · rintro ⟨i, rfl⟩; exact ⟨i, i.2, rfl⟩
 
-theorem line_le {A : Submodule (𝓞 E) E} {v : S.V} {M : Submodule (𝓞 E) S.V} (h : ∀ x ∈ A, x • v ∈ M)
-    : GlobalTheory.DegCnt.line A v ≤ M := by
+theorem line_le {A : Submodule (𝓞 E) E} {v : S.V} {M : Submodule (𝓞 E) S.V} (h : ∀ x ∈ A, x • v ∈ M) :
+    GlobalTheory.DegCnt.line A v ≤ M := by
   rintro _ ⟨x, hx, rfl⟩; exact h x hx
 
-theorem idNF_spec
-    (F : Formalism.MainNotions.S.FlagG S r (n : E))
-    (hT : ((n : ℕ) : E) ≠ 0)
-    (𝔡 : Ideal (𝓞 E)) (h𝔡 : 𝔡 ≠ ⊥) (h𝔡s : ∀ x ∈ 𝔡, ∃ y ∈ 𝔡, (y : E) = star (x : E))
-    (hP : Formalism.MainNotions.LatticeGluingRadicals.PosX
-      (⟨F, F.z⟩ : Formalism.MainNotions.S.Lat.LFlag S r (n : E)))
-    (f : Fin r → S.V)
-    (hff : ∀ a b, S.hT (f a) (f b) = 0) (hfe : ∀ a b, S.hT (f a) (F.e b) = if a = b then 1 else 0)
-    (Λ L : Submodule (𝓞 E) S.V)
-    (hLe : ∀ x ∈ L, ∀ a, S.hT (F.e a) x = 0) (hLf : ∀ x ∈ L, ∀ a, S.hT (f a) x = 0) (hz : F.z ∈ L)
-    (hΛ : Λ
-      = Formalism.L2.SG.Saturated.latSpan (aaF 𝔡) F.e ⊔ L
-        ⊔ Formalism.L2.SG.Saturated.latSpan (fun a => (aaF 𝔡 a)⁻¹) f)
+theorem idNF_spec (F : Formalism.MainNotions.S.FlagG S r (n : E)) (hT : ((n : ℕ) : E) ≠ 0) (𝔡 : Ideal (𝓞 E)) (h𝔡 : 𝔡 ≠ ⊥)
+    (h𝔡s : ∀ x ∈ 𝔡, ∃ y ∈ 𝔡, (y : E) = star (x : E))
+    (hP : Formalism.MainNotions.LatticeGluingRadicals.PosX (⟨F, F.z⟩ : Formalism.MainNotions.S.Lat.LFlag S r (n : E)))
+    (f : Fin r → S.V) (hff : ∀ a b, S.hT (f a) (f b) = 0)
+    (hfe : ∀ a b, S.hT (f a) (F.e b) = if a = b then 1 else 0)
+    (Λ L : Submodule (𝓞 E) S.V) (hLe : ∀ x ∈ L, ∀ a, S.hT (F.e a) x = 0)
+    (hLf : ∀ x ∈ L, ∀ a, S.hT (f a) x = 0) (hz : F.z ∈ L)
+    (hΛ : Λ = Formalism.L2.SG.Saturated.latSpan (aaF 𝔡) F.e ⊔ L ⊔
+      Formalism.L2.SG.Saturated.latSpan (fun a => (aaF 𝔡 a)⁻¹) f)
     (hlat : Submodule.IsLattice E Λ) (huni : Formalism.HermitianLatticesTheory.IsUnimodular S.hT Λ)
-    (hprim : ∀ c : E,
-      c • F.z ∈ Formalism.MainNotions.S.Lat.Lsub Λ
-          (⟨F, F.z⟩ : Formalism.MainNotions.S.Lat.LFlag S r (n : E))
-        → ∃ o : 𝓞 E, (o : E) = c)
-    (g : ℕ)
-    : (idNF F hT 𝔡 h𝔡 h𝔡s hP f hff hfe (fun a => hLf _ hz a)).IsTerm g Λ
-      ∧ (idNF F hT 𝔡 h𝔡 h𝔡s hP f hff hfe (fun a => hLf _ hz a)).Ref
-          (GlobalTheory.HermLat.latL (GlobalTheory.TypeAsm.frF F hT) (GlobalTheory.TypeAsm.frF F hT)
-            Λ)
-        = Λ := by
+    (hprim : ∀ c : E, c • F.z ∈ Formalism.MainNotions.S.Lat.Lsub Λ (⟨F, F.z⟩ : Formalism.MainNotions.S.Lat.LFlag S r (n : E)) →
+      ∃ o : 𝓞 E, (o : E) = c) (g : ℕ) :
+    (idNF F hT 𝔡 h𝔡 h𝔡s hP f hff hfe (fun a => hLf _ hz a)).IsTerm g Λ ∧
+      (idNF F hT 𝔡 h𝔡 h𝔡s hP f hff hfe (fun a => hLf _ hz a)).Ref
+        (GlobalTheory.HermLat.latL (GlobalTheory.TypeAsm.frF F hT) (GlobalTheory.TypeAsm.frF F hT) Λ) = Λ := by
   set N := idNF F hT 𝔡 h𝔡 h𝔡s hP f hff hfe (fun a => hLf _ hz a) with hN
 
   have hval : ∀ c, ∀ y ∈ Λ, S.hT (f c) y ∈ (aaF 𝔡 c : Submodule (𝓞 E) E) := by
@@ -179,28 +197,24 @@ theorem idNF_spec
         · rw [if_neg h, mul_zero]; exact Submodule.zero_mem _
       · intro x hx
         show S.hT (f c) x ∈ (aaF 𝔡 c : Submodule (𝓞 E) E)
-        rw [hLf x hx c]
-        exact Submodule.zero_mem _
+        rw [hLf x hx c]; exact Submodule.zero_mem _
       · refine Submodule.span_le.2 ?_
         rintro _ ⟨a, x, hx, rfl⟩
         show S.hT (f c) (x • f a) ∈ (aaF 𝔡 c : Submodule (𝓞 E) E)
-        rw [map_smul, hff, smul_zero]
-        exact Submodule.zero_mem _
-    intro y hy
-    exact hle hy
+        rw [map_smul, hff, smul_zero]; exact Submodule.zero_mem _
+    intro y hy; exact hle hy
   have hXa0 : ∀ a : Fin r, ∀ x ∈ F.Xa a.val, S.hT (f a) x = 0 := by
     intro a
     refine right_zero ?_
     rintro _ ⟨i, hi, rfl⟩
     rw [hfe, if_neg]
-    rintro rfl
-    exact lt_irrefl _ (show a.val < a.val from hi)
+    rintro rfl; exact lt_irrefl _ (show a.val < a.val from hi)
   have hXcoord : ∀ x ∈ F.X, x = ∑ c, S.hT (f c) x • F.e c := by
     intro x hx
     obtain ⟨s, rfl⟩ := (Submodule.mem_span_range_iff_exists_fun E).1 hx
     refine Finset.sum_congr rfl fun c _ => ?_
     congr 1
-    set_option synthInstance.maxHeartbeats 100000 in
+
     simp [map_sum, hfe]
   have hXiso : ∀ x ∈ F.X, ∀ y ∈ F.X, S.hT x y = 0 := by
     intro x hx y hy
@@ -216,16 +230,13 @@ theorem idNF_spec
       constructor
       · intro ht
         obtain ⟨y, hy, x, hx, hxy⟩ := Submodule.mem_sup.1 ht
-        have h1 : S.hT (f a) (t • F.e a) = t := by
-          rw [map_smul, hfe, if_pos rfl, smul_eq_mul, mul_one]
+        have h1 : S.hT (f a) (t • F.e a) = t := by rw [map_smul, hfe, if_pos rfl, smul_eq_mul, mul_one]
         rw [← hxy, map_add (f := _), hXa0 a x hx, add_zero] at h1
-        rw [← h1]
-        exact hval a y hy
+        rw [← h1]; exact hval a y hy
       · intro ht
         apply Submodule.mem_sup_left
         rw [hΛ]
-        exact Submodule.mem_sup_left (Submodule.mem_sup_left (Submodule.subset_span
-          ⟨a, t, ht, rfl⟩))
+        exact Submodule.mem_sup_left (Submodule.mem_sup_left (Submodule.subset_span ⟨a, t, ht, rfl⟩))
     · ext t
       show t • F.fvec (Fin.last r) ∈ Λ ⊔ GlobalTheory.HermLat.rs (𝓞 E) ((GlobalTheory.TypeAsm.frF F hT).Xa (Fin.last r).val) ↔
         t ∈ (1 : Submodule (𝓞 E) E)
@@ -242,34 +253,25 @@ theorem idNF_spec
           intro w hw
           have hy' : y = t • F.z - x := by rw [← hxy]; abel
           rw [hy', map_sub, hzo w hw, hXiso w hw x hxX, sub_zero]
-        obtain ⟨o, ho⟩ :=
-          hprim t (by
-            refine Submodule.mem_inf.2 ⟨?_, ?_⟩
-            · refine Submodule.mem_sup.2 ⟨y, Submodule.mem_inf.2 ⟨hy, ?_⟩, x, hxX, hxy⟩
-              exact Formalism.MainNotions.LatticeGluingRadicals.p_mem_orth.2 hyo
-            · exact Formalism.MainNotions.LatticeGluingRadicals.p_mem_orth.2 hzo)
+        obtain ⟨o, ho⟩ := hprim t (by
+          refine Submodule.mem_inf.2 ⟨?_, ?_⟩
+          · refine Submodule.mem_sup.2 ⟨y, Submodule.mem_inf.2 ⟨hy, ?_⟩, x, hxX, hxy⟩
+            exact Formalism.MainNotions.LatticeGluingRadicals.p_mem_orth.2 hyo
+          · exact Formalism.MainNotions.LatticeGluingRadicals.p_mem_orth.2 hzo)
         exact ⟨o, ho⟩
       · rintro ⟨o, rfl⟩
         apply Submodule.mem_sup_left
         rw [algebraMap_smul, hΛ]
         exact Submodule.mem_sup_left (Submodule.mem_sup_right (L.smul_mem o hz))
-  refine ⟨
-    ⟨
-      ⟨?_, hframe, hframe⟩,
-      fun a t x' hx' h => ⟨x', hx', h, by rw [sub_self]; exact Submodule.zero_mem _⟩
-    ⟩,
-    ?_
-  ⟩
+  refine ⟨⟨⟨?_, hframe, hframe⟩, fun a t x' hx' h => ⟨x', hx', h, by rw [sub_self]; exact Submodule.zero_mem _⟩⟩, ?_⟩
   · have hsurj : Function.Surjective S.hT := by
       have hinj : Function.Injective S.hT := by
-        set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
-          rw [injective_iff_map_eq_zero]
+        set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
         intro x hx
         exact S.nondeg.1 x (fun y => by rw [hx]; rfl)
       have hbij : Function.Bijective S.hT.rangeRestrict :=
         ⟨fun a b hab => hinj (congrArg Subtype.val hab), S.hT.surjective_rangeRestrict⟩
-      let j : S.V ≃+ LinearMap.range S.hT :=
-        AddEquiv.ofBijective S.hT.rangeRestrict.toAddMonoidHom hbij
+      let j : S.V ≃+ LinearMap.range S.hT := AddEquiv.ofBijective S.hT.rangeRestrict.toAddMonoidHom hbij
       have hr : Module.rank E S.V = Module.rank E (LinearMap.range S.hT) :=
         rank_eq_of_equiv_equiv (starRingEnd E) j star_involutive.bijective (fun r m => by
           apply Subtype.ext
@@ -288,13 +290,13 @@ theorem idNF_spec
       have hline (c : E) : c • v ∈ Λ := by
         rw [← huni]
         change c • v ∈ Formalism.E.hdual S.hT Λ
-        simp only [Formalism.E.hdual, Submodule.mem_iInf, Submodule.mem_comap,
-          LinearMap.restrictScalars_apply]
+        simp only [Formalism.E.hdual, Submodule.mem_iInf, Submodule.mem_comap, LinearMap.restrictScalars_apply]
         intro y hy
         have hy0 : S.hT v y = 0 := by
           rw [hv]
           exact (Submodule.mem_dualAnnihilator φ).mp hφ y (Submodule.subset_span hy)
-        have hz : S.hT y v = 0 := by simpa [hy0] using (S.herm.eq v y).symm
+        have hz : S.hT y v = 0 := by
+          simpa [hy0] using (S.herm.eq v y).symm
         simp [hz]
       have hv0 : v = 0 := by
         apply S.frame.repr.injective
@@ -316,14 +318,9 @@ theorem idNF_spec
     rw [show (GlobalTheory.TypeAsm.spH S).B.flip = S.hT from LinearMap.flip_flip S.hT]
     exact huni
 
-  have hperpL
-      : ∀ l ∈ L,
-        ∀ w ∈ (GlobalTheory.TypeAsm.frF F hT).X ⊔ (GlobalTheory.TypeAsm.frF F hT).X ⊔ N.Ist,
-          S.hT w l = 0 := by
+  have hperpL : ∀ l ∈ L, ∀ w ∈ (GlobalTheory.TypeAsm.frF F hT).X ⊔ (GlobalTheory.TypeAsm.frF F hT).X ⊔ N.Ist, S.hT w l = 0 := by
     intro l hl w hw
-    have hle
-        : (GlobalTheory.TypeAsm.frF F hT).X ⊔ (GlobalTheory.TypeAsm.frF F hT).X ⊔ N.Ist
-          ≤ LinearMap.ker (S.hT.flip l) := by
+    have hle : (GlobalTheory.TypeAsm.frF F hT).X ⊔ (GlobalTheory.TypeAsm.frF F hT).X ⊔ N.Ist ≤ LinearMap.ker (S.hT.flip l) := by
       have h1 : (GlobalTheory.TypeAsm.frF F hT).X ≤ LinearMap.ker (S.hT.flip l) := by
         rw [frX]
         refine Submodule.span_le.2 ?_
@@ -353,12 +350,9 @@ theorem idNF_spec
       rw [hΛ]
       refine Submodule.mem_sup_right (Submodule.subset_span ⟨a, x, ?_, rfl⟩)
       show x ∈ (aaF 𝔡 a)⁻¹
-      rw [aaF_inv]
-      exact hx
-  have hLL
-      : GlobalTheory.HermLat.latL (GlobalTheory.TypeAsm.frF F hT) (GlobalTheory.TypeAsm.frF F hT) Λ
-          ⊓ GlobalTheory.HermLat.rs (𝓞 E) N.Wn
-        ≤ Λ := by
+      rw [aaF_inv]; exact hx
+  have hLL : GlobalTheory.HermLat.latL (GlobalTheory.TypeAsm.frF F hT) (GlobalTheory.TypeAsm.frF F hT) Λ ⊓
+      GlobalTheory.HermLat.rs (𝓞 E) N.Wn ≤ Λ := by
     intro v hv
     obtain ⟨hv1, hv2⟩ := Submodule.mem_inf.1 hv
     obtain ⟨-, hv3⟩ := Submodule.mem_inf.1 hv1
@@ -370,21 +364,18 @@ theorem idNF_spec
     have hx' : x ∈ Λ := by
       rw [hXcoord x hxX]
       refine Submodule.sum_mem _ fun c _ => ?_
-      have hc : S.hT (f c) x = - S.hT (f c) y := by
+      have hc : S.hT (f c) x = -S.hT (f c) y := by
         have := hfc c
         rw [map_add (f := _)] at this
         exact eq_neg_of_add_eq_zero_right this
       rw [hΛ]
       refine Submodule.mem_sup_left (Submodule.mem_sup_left (Submodule.subset_span ⟨c, _, ?_, rfl⟩))
-      rw [hc]
-      exact Submodule.neg_mem _ (hval c y hy)
+      rw [hc]; exact Submodule.neg_mem _ (hval c y hy)
     exact Submodule.add_mem _ hy hx'
   refine le_antisymm (sup_le hP0 hLL) ?_
-  have key
-      : Formalism.L2.SG.Saturated.latSpan (aaF 𝔡) F.e ⊔ L
-          ⊔ Formalism.L2.SG.Saturated.latSpan (fun a => (aaF 𝔡 a)⁻¹) f
-        ≤ N.Ref (GlobalTheory.HermLat.latL (GlobalTheory.TypeAsm.frF F hT)
-          (GlobalTheory.TypeAsm.frF F hT) Λ) := by
+  have key : Formalism.L2.SG.Saturated.latSpan (aaF 𝔡) F.e ⊔ L ⊔
+      Formalism.L2.SG.Saturated.latSpan (fun a => (aaF 𝔡 a)⁻¹) f ≤
+      N.Ref (GlobalTheory.HermLat.latL (GlobalTheory.TypeAsm.frF F hT) (GlobalTheory.TypeAsm.frF F hT) Λ) := by
     refine sup_le (sup_le ?_ ?_) ?_
     · refine Submodule.span_le.2 ?_
       rintro _ ⟨a, x, hx, rfl⟩
@@ -399,19 +390,16 @@ theorem idNF_spec
       · refine (GlobalTheory.HermLat.mem_perp_iff _ _ _).2 fun w hw => ?_
         exact hperpL l hl w (Submodule.mem_sup_left hw)
       · refine Submodule.mem_sup_left ?_
-        rw [hΛ]
-        exact Submodule.mem_sup_left (Submodule.mem_sup_right hl)
+        rw [hΛ]; exact Submodule.mem_sup_left (Submodule.mem_sup_right hl)
       · exact (GlobalTheory.HermLat.mem_perp_iff _ _ _).2 fun w hw => hperpL l hl w hw
     · refine Submodule.span_le.2 ?_
       rintro _ ⟨a, x, hx, rfl⟩
       refine Submodule.mem_sup_left ?_
       unfold GlobalTheory.DegCnt.NF.P0
-      refine Submodule.mem_sup_right (Submodule.mem_iSup_of_mem a
-        (Submodule.mem_iSup_of_mem (Nat.zero_le _) ?_))
+      refine Submodule.mem_sup_right (Submodule.mem_iSup_of_mem a (Submodule.mem_iSup_of_mem (Nat.zero_le _) ?_))
       refine ⟨x, ?_, rfl⟩
       change x ∈ (aaF 𝔡 a)⁻¹ at hx
-      rw [aaF_inv] at hx
-      exact hx
+      rw [aaF_inv] at hx; exact hx
   rwa [← hΛ] at key
 
 end Spec
@@ -420,11 +408,9 @@ section D7
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-theorem fe_of
-    {E : Type} [Field E] [NumberField E] [StarRing E]
-    {S : HSpace E} {r : ℕ} {e f : Fin r → S.V}
-    (hef : ∀ a b, S.hT (e a) (f b) = if a = b then 1 else 0)
-    : ∀ a b, S.hT (f a) (e b) = if a = b then 1 else 0 := by
+theorem fe_of {E : Type} [Field E] [NumberField E] [StarRing E] {S : HSpace E} {r : ℕ} {e f : Fin r → S.V}
+    (hef : ∀ a b, S.hT (e a) (f b) = if a = b then 1 else 0) :
+    ∀ a b, S.hT (f a) (e b) = if a = b then 1 else 0 := by
   intro a b
   rw [← S.herm.eq, hef b a]
   by_cases h : a = b
@@ -433,54 +419,33 @@ theorem fe_of
 
 theorem idNFC_holds : GlobalTheory.TypeAsm.IdNFC := by
   intro D large₂ X Y u hStd Λ hΛ
-  obtain ⟨-, -, -, -, -, -, -, hne, hstar, -⟩ :=
-    GlobalTheory.T.unitaryHostFieldArithmeticConditions D large₂ hStd
+  obtain ⟨-, -, -, -, -, -, -, hne, hstar, -⟩ := GlobalTheory.T.unitaryHostFieldArithmeticConditions D large₂ hStd
   have hpos : 0 < (D.mem u).A.T := (D.mem u).A.T_prime.pos
-  have hP :=
-    Formalism.MainNotions.LatticeGluingRadicals.p_posX D _ hpos
-      (Formalism.MainNotions.S.lf D (X.Fu u))
+  have hP := Formalism.MainNotions.LatticeGluingRadicals.p_posX D _ hpos (Formalism.MainNotions.S.lf D (X.Fu u))
   by_cases h0 : Λ = (Formalism.MainNotions.S.VS D).L0
-  · have hfe
-        : ∀ a b,
-          (Formalism.MainNotions.S.VS D).hT (X.fY a) ((X.Fu u).e b) = if a = b then 1 else 0 := by
+  · have hfe : ∀ a b, (Formalism.MainNotions.S.VS D).hT (X.fY a) ((X.Fu u).e b) = if a = b then 1 else 0 := by
       rw [X.Fu_e]; exact fe_of X.ef
     have hLe : ∀ x ∈ X.Lb, ∀ a, (Formalism.MainNotions.S.VS D).hT ((X.Fu u).e a) x = 0 := by
       rw [X.Fu_e]; exact fun x hx a => (X.Lb_perp x hx a).1
-    have hLf : ∀ x ∈ X.Lb, ∀ a, (Formalism.MainNotions.S.VS D).hT (X.fY a) x = 0 := fun x hx a =>
-      (X.Lb_perp x hx a).2
+    have hLf : ∀ x ∈ X.Lb, ∀ a, (Formalism.MainNotions.S.VS D).hT (X.fY a) x = 0 := fun x hx a => (X.Lb_perp x hx a).2
     have hz : (X.Fu u).z ∈ X.Lb := by rw [X.flagZVector]; exact X.zu_Lb u
-    have hsplit
-        : Λ
-          = Formalism.L2.SG.Saturated.latSpan (aaF (GlobalTheory.TypeAsm.dI D)) (X.Fu u).e ⊔ X.Lb
-            ⊔ Formalism.L2.SG.Saturated.latSpan
-              (fun a => (aaF (GlobalTheory.TypeAsm.dI D) a)⁻¹)
-              X.fY := by
+    have hsplit : Λ = Formalism.L2.SG.Saturated.latSpan (aaF (GlobalTheory.TypeAsm.dI D)) (X.Fu u).e ⊔ X.Lb ⊔
+        Formalism.L2.SG.Saturated.latSpan (fun a => (aaF (GlobalTheory.TypeAsm.dI D) a)⁻¹) X.fY := by
       rw [h0, X.Fu_e]; exact X.Lam_split
     have hfix := X.Fu_fixed u
-    have hprim
-        : ∀ c : D.host.E,
-          c • (X.Fu u).z ∈ Formalism.MainNotions.S.Lat.Lsub Λ
-              (⟨X.Fu u, (X.Fu u).z⟩
-                : Formalism.MainNotions.S.Lat.LFlag (Formalism.MainNotions.S.VS D) D.R.rS _)
-            → ∃ o : 𝓞 D.host.E, (o : D.host.E) = c := by
+    have hprim : ∀ c : D.host.E, c • (X.Fu u).z ∈ Formalism.MainNotions.S.Lat.Lsub Λ
+        (⟨X.Fu u, (X.Fu u).z⟩ : Formalism.MainNotions.S.Lat.LFlag (Formalism.MainNotions.S.VS D) D.R.rS _) → ∃ o : 𝓞 D.host.E, (o : D.host.E) = c := by
       intro c hc
       rw [h0] at hc
       exact hfix.2.2.2.2 c hc
-    obtain ⟨hterm, href⟩ :=
-      idNF_spec (X.Fu u) (GlobalTheory.TypeAsm.tu_ne D u) (GlobalTheory.TypeAsm.dI D) hne hstar hP
-        X.fY X.ff hfe Λ X.Lb hLe hLf hz hsplit
-        (h0 ▸ (Formalism.MainNotions.S.VS D).standardTuple_isLattice)
-        (h0 ▸ (Formalism.MainNotions.S.VS D).baseLattice_isUnimodular) hprim _
+    obtain ⟨hterm, href⟩ := idNF_spec (X.Fu u) (GlobalTheory.TypeAsm.tu_ne D u) (GlobalTheory.TypeAsm.dI D) hne hstar hP X.fY X.ff hfe
+      Λ X.Lb hLe hLf hz hsplit (h0 ▸ (Formalism.MainNotions.S.VS D).standardTuple_isLattice) (h0 ▸ (Formalism.MainNotions.S.VS D).baseLattice_isUnimodular) hprim _
     exact ⟨_, rfl, rfl, rfl, rfl, rfl, hterm, href, fun _ => rfl⟩
   · have hrow := hΛ.resolve_right h0
     obtain ⟨f, L, hff, hef, hL, hz, hsplit⟩ := Y.split u Λ hrow
     have hfix := ((Y.rowsOK u).1 Λ hrow).2.1
-    obtain ⟨hterm, href⟩ :=
-      idNF_spec (X.Fu u) (GlobalTheory.TypeAsm.tu_ne D u) (GlobalTheory.TypeAsm.dI D) hne hstar hP f
-        hff (fe_of hef) Λ L
-        (fun x hx a => (hL x hx a).1)
-        (fun x hx a => (hL x hx a).2)
-        hz hsplit hfix.1 hfix.2.1 hfix.2.2.2.2 _
+    obtain ⟨hterm, href⟩ := idNF_spec (X.Fu u) (GlobalTheory.TypeAsm.tu_ne D u) (GlobalTheory.TypeAsm.dI D) hne hstar hP f hff (fe_of hef)
+      Λ L (fun x hx a => (hL x hx a).1) (fun x hx a => (hL x hx a).2) hz hsplit hfix.1 hfix.2.1 hfix.2.2.2.2 _
     exact ⟨_, rfl, rfl, rfl, rfl, rfl, hterm, href, fun h => absurd h h0⟩
 
 end D7

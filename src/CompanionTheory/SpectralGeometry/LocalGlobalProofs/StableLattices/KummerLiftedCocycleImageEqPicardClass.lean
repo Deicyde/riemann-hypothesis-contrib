@@ -1,8 +1,52 @@
 module
 
-public import Mathlib
 public import CompanionTheory.HarishChandraModules.LowKTypeMultiplicity.DiscreteSeriesCharacters.CapelliDeterminantBlockProduct
-public import Formalism.RealPlaceAnalysis.ThirdArithmeticHolds
+public import Mathlib.Algebra.MvPolynomial.PDeriv
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
@@ -16,9 +60,9 @@ open CompanionTheory.D.DSIC Formalism.REAL
 
 variable {n : ℕ} {ε : Fin n → Bool}
 
-theorem sum_nc {R : Type} [AddCommMonoid R] (d b : Fin n) (g : Fin n → Fin n → R)
-    : (∑ j : NC ε, if d = j.1.1 ∧ b = j.1.2 then g j.1.1 j.1.2 else 0)
-      = if ε d = true ∧ ε b = false then g d b else 0 := by
+theorem sum_nc {R : Type} [AddCommMonoid R] (d b : Fin n) (g : Fin n → Fin n → R) :
+    (∑ j : NC ε, if d = j.1.1 ∧ b = j.1.2 then g j.1.1 j.1.2 else 0) =
+      if ε d = true ∧ ε b = false then g d b else 0 := by
   split_ifs with h
   · rw [Finset.sum_eq_single (⟨(d, b), h⟩ : NC ε)]
     · simp
@@ -38,20 +82,17 @@ variable {R : Type} [Ring R] (Y : NC ε → R) (u v : Fin n → Fin n → R)
 
 theorem inner_sum
     (huY : ∀ a c j, u a c * Y j - Y j * u a c = -(if a = j.1.1 ∧ c = j.1.2 then 1 else 0))
-    (hvY : ∀ a c j, v a c * Y j - Y j * v a c = if a = j.1.1 ∧ c = j.1.2 then 1 else 0) (i : NC ε)
-    (c d e f : Fin n)
-    : (∑ j : NC ε, ((u i.1.1 c * v d i.1.2) * Y j - Y j * (u i.1.1 c * v d i.1.2)) * (u j.1.1 e * v f j.1.2))
-      = u i.1.1 c * (if ε d = true then u d e else 0) * v f i.1.2
-        - v d i.1.2 * u i.1.1 e * (if ε c = false then v f c else 0) := by
-  have h1
-      : ∀ j : NC ε,
-        ((u i.1.1 c * v d i.1.2) * Y j - Y j * (u i.1.1 c * v d i.1.2)) * (u j.1.1 e * v f j.1.2)
-          = (if d = j.1.1 ∧ i.1.2 = j.1.2 then u i.1.1 c * u j.1.1 e * v f j.1.2 else 0)
-            - (if i.1.1 = j.1.1 ∧ c = j.1.2 then v d i.1.2 * u j.1.1 e * v f j.1.2 else 0) := by
+    (hvY : ∀ a c j, v a c * Y j - Y j * v a c = if a = j.1.1 ∧ c = j.1.2 then 1 else 0)
+    (i : NC ε) (c d e f : Fin n) :
+    (∑ j : NC ε, ((u i.1.1 c * v d i.1.2) * Y j - Y j * (u i.1.1 c * v d i.1.2)) * (u j.1.1 e * v f j.1.2)) =
+      u i.1.1 c * (if ε d = true then u d e else 0) * v f i.1.2 -
+        v d i.1.2 * u i.1.1 e * (if ε c = false then v f c else 0) := by
+  have h1 : ∀ j : NC ε, ((u i.1.1 c * v d i.1.2) * Y j - Y j * (u i.1.1 c * v d i.1.2)) * (u j.1.1 e * v f j.1.2) =
+      (if d = j.1.1 ∧ i.1.2 = j.1.2 then u i.1.1 c * u j.1.1 e * v f j.1.2 else 0) -
+        (if i.1.1 = j.1.1 ∧ c = j.1.2 then v d i.1.2 * u j.1.1 e * v f j.1.2 else 0) := by
     intro j
-    have : (u i.1.1 c * v d i.1.2) * Y j - Y j * (u i.1.1 c * v d i.1.2)
-        = u i.1.1 c * (v d i.1.2 * Y j - Y j * v d i.1.2)
-          + (u i.1.1 c * Y j - Y j * u i.1.1 c) * v d i.1.2 := by
+    have : (u i.1.1 c * v d i.1.2) * Y j - Y j * (u i.1.1 c * v d i.1.2) =
+        u i.1.1 c * (v d i.1.2 * Y j - Y j * v d i.1.2) + (u i.1.1 c * Y j - Y j * u i.1.1 c) * v d i.1.2 := by
       noncomm_ring
     rw [this, huY, hvY]
     split_ifs <;> noncomm_ring
@@ -61,23 +102,19 @@ theorem inner_sum
   simp only [i.2.1, i.2.2, and_true, true_and]
   split_ifs <;> simp
 
-theorem glRel_abstract
-    (hYY : ∀ i j, Commute (Y i) (Y j)) (huu : ∀ a b c d, Commute (u a b) (u c d))
-    (huv : ∀ a b c d, Commute (u a b) (v c d)) (hvv : ∀ a b c d, Commute (v a b) (v c d))
+theorem glRel_abstract (hYY : ∀ i j, Commute (Y i) (Y j))
+    (huu : ∀ a b c d, Commute (u a b) (u c d)) (huv : ∀ a b c d, Commute (u a b) (v c d))
+    (hvv : ∀ a b c d, Commute (v a b) (v c d))
     (huY : ∀ a c j, u a c * Y j - Y j * u a c = -(if a = j.1.1 ∧ c = j.1.2 then 1 else 0))
     (hvY : ∀ a c j, v a c * Y j - Y j * v a c = if a = j.1.1 ∧ c = j.1.2 then 1 else 0)
-    (hs : ∀ d e,
-      (if ε d = true then u d e else 0) + (if ε e = false then v d e else 0)
-        = if d = e then 1 else 0)
-    (c d e f : Fin n)
-    : (∑ i : NC ε, Y i * (u i.1.1 c * v d i.1.2)) * (∑ i : NC ε, Y i * (u i.1.1 e * v f i.1.2))
-        - (∑ i : NC ε, Y i * (u i.1.1 e * v f i.1.2)) * (∑ i : NC ε, Y i * (u i.1.1 c * v d i.1.2))
-      = (if d = e then ∑ i : NC ε, Y i * (u i.1.1 c * v f i.1.2) else 0)
-        - (if f = c then ∑ i : NC ε, Y i * (u i.1.1 e * v d i.1.2) else 0) := by
-  have hprod
-      : ∀ p q : NC ε → R,
-        (∑ i, Y i * p i) * (∑ j, Y j * q j)
-          = ∑ i, ∑ j, Y i * Y j * (p i * q j) + ∑ i, Y i * ∑ j, (p i * Y j - Y j * p i) * q j := by
+    (hs : ∀ d e, (if ε d = true then u d e else 0) + (if ε e = false then v d e else 0) =
+      if d = e then 1 else 0) (c d e f : Fin n) :
+    (∑ i : NC ε, Y i * (u i.1.1 c * v d i.1.2)) * (∑ i : NC ε, Y i * (u i.1.1 e * v f i.1.2)) -
+      (∑ i : NC ε, Y i * (u i.1.1 e * v f i.1.2)) * (∑ i : NC ε, Y i * (u i.1.1 c * v d i.1.2)) =
+      (if d = e then ∑ i : NC ε, Y i * (u i.1.1 c * v f i.1.2) else 0) -
+        (if f = c then ∑ i : NC ε, Y i * (u i.1.1 e * v d i.1.2) else 0) := by
+  have hprod : ∀ p q : NC ε → R, (∑ i, Y i * p i) * (∑ j, Y j * q j) =
+      ∑ i, ∑ j, Y i * Y j * (p i * q j) + ∑ i, Y i * ∑ j, (p i * Y j - Y j * p i) * q j := by
     intro p q
     rw [Finset.sum_mul_sum, ← Finset.sum_add_distrib]
     refine Finset.sum_congr rfl fun i _ => ?_
@@ -85,29 +122,22 @@ theorem glRel_abstract
     refine Finset.sum_congr rfl fun j _ => ?_
     noncomm_ring
   rw [hprod, hprod]
-  have hsym
-      : (∑ i : NC ε, ∑ j : NC ε, Y i * Y j * (u i.1.1 c * v d i.1.2 * (u j.1.1 e * v f j.1.2)))
-        = ∑ i : NC ε, ∑ j : NC ε, Y i * Y j * (u i.1.1 e * v f i.1.2 * (u j.1.1 c * v d j.1.2)) :=
-    by
-      rw [Finset.sum_comm]
-      refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
-      rw [(hYY j i).eq,
-        (((huu _ _ _ _).mul_right (huv _ _ _ _)).mul_left
-          ((huv _ _ _ _).symm.mul_right (hvv _ _ _ _))).eq]
+  have hsym : (∑ i : NC ε, ∑ j : NC ε, Y i * Y j * (u i.1.1 c * v d i.1.2 * (u j.1.1 e * v f j.1.2))) =
+      ∑ i : NC ε, ∑ j : NC ε, Y i * Y j * (u i.1.1 e * v f i.1.2 * (u j.1.1 c * v d j.1.2)) := by
+    rw [Finset.sum_comm]
+    refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
+    rw [(hYY j i).eq, (((huu _ _ _ _).mul_right (huv _ _ _ _)).mul_left
+      ((huv _ _ _ _).symm.mul_right (hvv _ _ _ _))).eq]
   rw [hsym, add_sub_add_left_eq_sub, ← Finset.sum_sub_distrib]
-  have key
-      : ∀ i : NC ε,
-        Y i * (∑ j : NC ε, ((u i.1.1 c * v d i.1.2) * Y j - Y j * (u i.1.1 c * v d i.1.2)) * (u j.1.1 e * v f j.1.2))
-            - Y i
-              * (∑ j : NC ε, ((u i.1.1 e * v f i.1.2) * Y j - Y j * (u i.1.1 e * v f i.1.2)) * (u j.1.1 c * v d j.1.2))
-          = (if d = e then Y i * (u i.1.1 c * v f i.1.2) else 0)
-            - (if f = c then Y i * (u i.1.1 e * v d i.1.2) else 0) := by
+  have key : ∀ i : NC ε,
+      Y i * (∑ j : NC ε, ((u i.1.1 c * v d i.1.2) * Y j - Y j * (u i.1.1 c * v d i.1.2)) * (u j.1.1 e * v f j.1.2)) -
+      Y i * (∑ j : NC ε, ((u i.1.1 e * v f i.1.2) * Y j - Y j * (u i.1.1 e * v f i.1.2)) * (u j.1.1 c * v d j.1.2)) =
+      (if d = e then Y i * (u i.1.1 c * v f i.1.2) else 0) -
+        (if f = c then Y i * (u i.1.1 e * v d i.1.2) else 0) := by
     intro i
     rw [inner_sum Y u v huY hvY, inner_sum Y u v huY hvY]
-    have e1
-        : ∀ c d e f : Fin n,
-          v d i.1.2 * u i.1.1 e * (if ε c = false then v f c else 0)
-            = u i.1.1 e * (if ε c = false then v f c else 0) * v d i.1.2 := by
+    have e1 : ∀ c d e f : Fin n, v d i.1.2 * u i.1.1 e * (if ε c = false then v f c else 0) =
+        u i.1.1 e * (if ε c = false then v f c else 0) * v d i.1.2 := by
       intro c d e f
       split_ifs
       · rw [mul_assoc]
@@ -120,9 +150,7 @@ theorem glRel_abstract
     generalize (if ε e = false then v d e else 0) = B at *
     generalize (if ε f = true then u f c else 0) = C at *
     generalize (if ε c = false then v f c else 0) = D at *
-    calc
-      _ = Y i * (u i.1.1 c * (A + B) * v f i.1.2) - Y i * (u i.1.1 e * (C + D) * v d i.1.2) := by
-        noncomm_ring
+    calc _ = Y i * (u i.1.1 c * (A + B) * v f i.1.2) - Y i * (u i.1.1 e * (C + D) * v d i.1.2) := by noncomm_ring
       _ = _ := by rw [h1, h2]; split_ifs <;> simp
   simp only [key, Finset.sum_sub_distrib]
   split_ifs <;> simp
@@ -136,8 +164,8 @@ def dd (ε : Fin n → Bool) (a b : Fin n) : Module.End ℂ (MvPolynomial (NC ε
 
 def yy (i : NC ε) : Module.End ℂ (MvPolynomial (NC ε) ℂ) := LinearMap.mulLeft ℂ (X i)
 
-theorem pderiv_comm' {σ : Type} (i j : σ) (f : MvPolynomial σ ℂ)
-    : pderiv i (pderiv j f) = pderiv j (pderiv i f) := by
+theorem pderiv_comm' {σ : Type} (i j : σ) (f : MvPolynomial σ ℂ) :
+    pderiv i (pderiv j f) = pderiv j (pderiv i f) := by
   classical
   induction f using MvPolynomial.induction_on with
   | C a => simp
@@ -153,8 +181,8 @@ theorem dd_comm (a b c d : Fin n) : Commute (dd ε a b) (dd ε c d) := by
     exact pderiv_comm' _ _ f
   all_goals simp
 
-theorem dd_yy (a c : Fin n) (j : NC ε)
-    : dd ε a c * yy j - yy j * dd ε a c = if a = j.1.1 ∧ c = j.1.2 then 1 else 0 := by
+theorem dd_yy (a c : Fin n) (j : NC ε) :
+    dd ε a c * yy j - yy j * dd ε a c = if a = j.1.1 ∧ c = j.1.2 then 1 else 0 := by
   classical
   unfold dd yy
   split_ifs with h1 h2 h2
@@ -172,13 +200,10 @@ theorem dd_yy (a c : Fin n) (j : NC ε)
 
 theorem verma : CompanionTheory.D.DSIC.Verma := by
   intro n ε
-  let u : Fin n → Fin n → Module.End ℂ (MvPolynomial (NC ε) ℂ) := fun a c =>
-    (if a = c then 1 else 0) - dd ε a c
-  let v : Fin n → Fin n → Module.End ℂ (MvPolynomial (NC ε) ℂ) := fun a c =>
-    (if a = c then 1 else 0) + dd ε a c
-  have hδ
-      : ∀ (a c : Fin n) (T : Module.End ℂ (MvPolynomial (NC ε) ℂ)),
-        Commute (if a = c then 1 else 0) T := by
+  let u : Fin n → Fin n → Module.End ℂ (MvPolynomial (NC ε) ℂ) := fun a c => (if a = c then 1 else 0) - dd ε a c
+  let v : Fin n → Fin n → Module.End ℂ (MvPolynomial (NC ε) ℂ) := fun a c => (if a = c then 1 else 0) + dd ε a c
+  have hδ : ∀ (a c : Fin n) (T : Module.End ℂ (MvPolynomial (NC ε) ℂ)),
+      Commute (if a = c then 1 else 0) T := by
     intro a c T
     split_ifs <;> simp
   refine ⟨fun c d => ∑ i : NC ε, yy i * (u i.1.1 c * v d i.1.2), ?_, ?_, ?_⟩
@@ -225,7 +250,7 @@ theorem verma : CompanionTheory.D.DSIC.Verma := by
       all_goals simp
     · simp
   · intro a b f
-    set_option synthInstance.maxHeartbeats 100000 in
+
     simp [yy, LinearMap.sum_apply, map_sum]
 
 end GlobalTheory.CompanionTheory.DSVerma

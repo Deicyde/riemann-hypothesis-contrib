@@ -1,11 +1,48 @@
 module
 
-public import Mathlib
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.IsLieBasis
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.ThetaUnifAV
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.IsIntersectionFamily
 public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.EigLat
 public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.IsGenericFlag
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
 
 @[expose] public section
 
@@ -13,74 +50,49 @@ noncomputable section
 
 namespace GlobalTheory.CompanionTheory.Ar
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
-  NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo
-  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
 open scoped ComplexOrder
 
 variable {X : Scheme.{0}} {Ω : Type} [Field Ω]
 
-variable
-  {G : Over X} [GrpObj G] {ξ : Spec (CommRingCat.of Ω) ⟶ X} {E : Type} [AddCommGroup E] [Module Ω E]
+variable {G : Over X} [GrpObj G] {ξ : Spec (CommRingCat.of Ω) ⟶ X} {E : Type} [AddCommGroup E] [Module Ω E]
 
-def HodgeForm
-    (G : Over X) [GrpObj G]
-    (L : LB G.left)
-    (z : Spec (CommRingCat.of ℂ) ⟶ X) (v w : epsAt z ⟶ G)
-    (c : ℂ)
-    : Prop :=
-  L.IsLB ∧ IsTanAt G z v ∧ IsTanAt G z w
-    ∧ ∃ (A : Over (Sp ℂ)) (_ : GrpObj A) (φ : A.left ⟶ G.left) (g : ℕ) (u : HolUnif A (L.pull φ) g)
-        (Hm : Matrix (Fin g) (Fin g) ℂ) (χ : u.Λ → ℂ) (v' w' : epsR ℂ ⟶ A) (a b : Fin g → ℂ),
-      IsGrpPullback A G z φ ∧ u.IsAH Hm χ ∧ v'.left ≫ φ = v.left ∧ w'.left ≫ φ = w.left
-        ∧ u.IsDiff a v' ∧ u.IsDiff b w' ∧ c = Real.pi * hermForm Hm a b
+def HodgeForm (G : Over X) [GrpObj G] (L : LB G.left) (z : Spec (CommRingCat.of ℂ) ⟶ X) (v w : epsAt z ⟶ G)
+    (c : ℂ) : Prop :=
+  L.IsLB ∧ IsTanAt G z v ∧ IsTanAt G z w ∧
+  ∃ (A : Over (Sp ℂ)) (_ : GrpObj A) (φ : A.left ⟶ G.left) (g : ℕ) (u : HolUnif A (L.pull φ) g)
+    (Hm : Matrix (Fin g) (Fin g) ℂ) (χ : u.Λ → ℂ) (v' w' : epsR ℂ ⟶ A) (a b : Fin g → ℂ),
+    IsGrpPullback A G z φ ∧ u.IsAH Hm χ ∧ v'.left ≫ φ = v.left ∧ w'.left ≫ φ = w.left ∧
+      u.IsDiff a v' ∧ u.IsDiff b w' ∧ c = Real.pi * hermForm Hm a b
 
-def HodgeIP
-    (G : Over X) [GrpObj G]
-    (L : LB G.left)
-    (z : Spec (CommRingCat.of ℂ) ⟶ X) (v w : epsAt z ⟶ G)
-    (c : ℂ)
-    : Prop :=
-  L.IsLB ∧ IsTanAt G z v ∧ IsTanAt G z w
-    ∧ ∃ (A : Over (Sp ℂ)) (_ : GrpObj A) (φ : A.left ⟶ G.left) (g : ℕ) (u : HolUnif A (L.pull φ) g)
-        (Hm : Matrix (Fin g) (Fin g) ℂ) (χ : u.Λ → ℂ) (v' w' : epsR ℂ ⟶ A) (a b : Fin g → ℂ),
-      IsGrpPullback A G z φ ∧ u.IsAH Hm χ ∧ v'.left ≫ φ = v.left ∧ w'.left ≫ φ = w.left
-        ∧ u.IsDiff a v' ∧ u.IsDiff b w' ∧ c = Real.pi * (b ⬝ᵥ Hm.mulVec (star a))
+def HodgeIP (G : Over X) [GrpObj G] (L : LB G.left) (z : Spec (CommRingCat.of ℂ) ⟶ X) (v w : epsAt z ⟶ G)
+    (c : ℂ) : Prop :=
+  L.IsLB ∧ IsTanAt G z v ∧ IsTanAt G z w ∧
+  ∃ (A : Over (Sp ℂ)) (_ : GrpObj A) (φ : A.left ⟶ G.left) (g : ℕ) (u : HolUnif A (L.pull φ) g)
+    (Hm : Matrix (Fin g) (Fin g) ℂ) (χ : u.Λ → ℂ) (v' w' : epsR ℂ ⟶ A) (a b : Fin g → ℂ),
+    IsGrpPullback A G z φ ∧ u.IsAH Hm χ ∧ v'.left ≫ φ = v.left ∧ w'.left ≫ φ = w.left ∧
+      u.IsDiff a v' ∧ u.IsDiff b w' ∧ c = Real.pi * (b ⬝ᵥ Hm.mulVec (star a))
 
-def LieModel.GramAt
-    (M : LieModel G ξ E) (L : LB G.left) (z : Spec (CommRingCat.of ℂ) ⟶ X)
-    {r : ℕ} (b : Fin r → E) (Γ : Matrix (Fin r) (Fin r) ℂ)
-    : Prop :=
-  ∃ v : Fin r → (epsAt z ⟶ G),
-    (∀ i, M.ValAt z (b i) (v i)) ∧ ∀ p q, HodgeIP G L z (v p) (v q) (Γ p q)
+def LieModel.GramAt (M : LieModel G ξ E) (L : LB G.left) (z : Spec (CommRingCat.of ℂ) ⟶ X) {r : ℕ}
+    (b : Fin r → E) (Γ : Matrix (Fin r) (Fin r) ℂ) : Prop :=
+  ∃ v : Fin r → (epsAt z ⟶ G), (∀ i, M.ValAt z (b i) (v i)) ∧ ∀ p q, HodgeIP G L z (v p) (v q) (Γ p q)
 
 def leadMinor {r : ℕ} (Γ : Matrix (Fin r) (Fin r) ℂ) (s : ℕ) : ℝ :=
   if h : s ≤ r then (Γ.submatrix (Fin.castLE h) (Fin.castLE h)).det.re else 0
 
-def LieModel.IsGrNorm
-    (M : LieModel G ξ E) (L : LB G.left) (V : Lat ξ E)
-    {r : ℕ} (b₀ : Fin r → E) (i : Fin r)
-    (z : Spec (CommRingCat.of ℂ) ⟶ X) (t : Ω) (ν : ℝ)
-    : Prop :=
+def LieModel.IsGrNorm (M : LieModel G ξ E) (L : LB G.left) (V : Lat ξ E) {r : ℕ} (b₀ : Fin r → E) (i : Fin r)
+    (z : Spec (CommRingCat.of ℂ) ⟶ X) (t : Ω) (ν : ℝ) : Prop :=
   ∃ (h : genPt ξ ⤳ centre z) (b : Fin r → E) (Γ : Matrix (Fin r) (Fin r) ℂ),
-    (∀ s, flagStep Ω b s = flagStep Ω b₀ s) ∧ V.IsFrameAt b ⟨centre z, h⟩
-      ∧ b i - t • b₀ i ∈ flagStep Ω b₀ i ∧ M.GramAt L z b Γ ∧ Γ.PosDef
-      ∧ ν = Real.sqrt (leadMinor Γ (i + 1) / leadMinor Γ i)
+    (∀ s, flagStep Ω b s = flagStep Ω b₀ s) ∧ V.IsFrameAt b ⟨centre z, h⟩ ∧ b i - t • b₀ i ∈ flagStep Ω b₀ i ∧
+      M.GramAt L z b Γ ∧ Γ.PosDef ∧ ν = Real.sqrt (leadMinor Γ (i + 1) / leadMinor Γ i)
 
-def SecNorm
-    (ξ : Spec (CommRingCat.of Ω) ⟶ X)
-    {K : Type} [Fintype K]
-    {J : K → Type} [∀ k, Fintype (J k)]
-    (y : (Σ k, J k) → Ω) (A : HermLine J) (e₀ : Ω) (z : Spec (CommRingCat.of ℂ) ⟶ X)
-    (w : (Σ k, J k) → ℂ) (t : Ω) (ν : ℝ)
-    : Prop :=
-  e₀ ≠ 0 ∧ CoordsAt ξ y z w
-    ∧ ∀ c : (k : K) → J k,
-      (∀ k, w ⟨k, c k⟩ ≠ 0)
-        → ∃ u : ℂ,
-          ValAt ξ z (t / ((∏ k, y ⟨k, c k⟩ ^ A.a k) * e₀)) u
-            ∧ ν * A.h w = ‖u‖ * ∏ k, ‖w ⟨k, c k⟩‖ ^ A.a k
+def SecNorm (ξ : Spec (CommRingCat.of Ω) ⟶ X) {K : Type} [Fintype K] {J : K → Type} [∀ k, Fintype (J k)]
+    (y : (Σ k, J k) → Ω) (A : HermLine J) (e₀ : Ω) (z : Spec (CommRingCat.of ℂ) ⟶ X) (w : (Σ k, J k) → ℂ)
+    (t : Ω) (ν : ℝ) : Prop :=
+  e₀ ≠ 0 ∧ CoordsAt ξ y z w ∧
+  ∀ c : (k : K) → J k, (∀ k, w ⟨k, c k⟩ ≠ 0) → ∃ u : ℂ, ValAt ξ z (t / ((∏ k, y ⟨k, c k⟩ ^ A.a k) * e₀)) u ∧
+    ν * A.h w = ‖u‖ * ∏ k, ‖w ⟨k, c k⟩‖ ^ A.a k
 
 section Form
 
@@ -93,12 +105,12 @@ theorem hodgeInnerProduct_iff_hodgeForm : HodgeIP G L z v w c ↔ HodgeForm G L 
   · rintro ⟨hL, hv, hw, A, _, φ, g, u, Hm, χ, v', w', a, b, h1, h2, h3, h4, h5, h6, rfl⟩
     exact ⟨hL, hw, hv, A, inferInstance, φ, g, u, Hm, χ, w', v', b, a, h1, h2, h4, h3, h6, h5, rfl⟩
 
-theorem conj_hermForm {g : ℕ} {Hm : Matrix (Fin g) (Fin g) ℂ} (h : Hm.IsHermitian) (a b : Fin g → ℂ)
-    : (starRingEnd ℂ) (hermForm Hm a b) = hermForm Hm b a := by
+theorem conj_hermForm {g : ℕ} {Hm : Matrix (Fin g) (Fin g) ℂ} (h : Hm.IsHermitian) (a b : Fin g → ℂ) :
+    (starRingEnd ℂ) (hermForm Hm a b) = hermForm Hm b a := by
   have hH : ∀ i j, (starRingEnd ℂ) (Hm i j) = Hm j i := fun i j => h.apply j i
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [hermForm, dotProduct, Matrix.mulVec, map_sum, map_mul, Finset.mul_sum, Pi.star_apply,
-      RCLike.star_def, Complex.conj_conj, hH]
+
+  simp only [hermForm, dotProduct, Matrix.mulVec, map_sum, map_mul, Finset.mul_sum, Pi.star_apply,
+  RCLike.star_def, Complex.conj_conj, hH]
   rw [Finset.sum_comm]
   exact Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => by ring
 
@@ -112,18 +124,15 @@ section Minor
 
 variable {r : ℕ} {Γ : Matrix (Fin r) (Fin r) ℂ}
 
-theorem leadMinor_size_zero (Γ : Matrix (Fin r) (Fin r) ℂ) : leadMinor Γ 0 = 1 := by
-  simp [leadMinor]
+theorem leadMinor_size_zero (Γ : Matrix (Fin r) (Fin r) ℂ) : leadMinor Γ 0 = 1 := by simp [leadMinor]
 
-theorem leadMinor_size_one (Γ : Matrix (Fin (r + 1)) (Fin (r + 1)) ℂ)
-    : leadMinor Γ 1 = (Γ 0 0).re := by
+theorem leadMinor_size_one (Γ : Matrix (Fin (r + 1)) (Fin (r + 1)) ℂ) : leadMinor Γ 1 = (Γ 0 0).re := by
   simp [leadMinor]
 
 theorem leadMinor_size_self (Γ : Matrix (Fin r) (Fin r) ℂ) : leadMinor Γ r = Γ.det.re := by
   simp [leadMinor]
 
-theorem leadMinor_transpose (Γ : Matrix (Fin r) (Fin r) ℂ) (s : ℕ)
-    : leadMinor Γ.transpose s = leadMinor Γ s := by
+theorem leadMinor_transpose (Γ : Matrix (Fin r) (Fin r) ℂ) (s : ℕ) : leadMinor Γ.transpose s = leadMinor Γ s := by
   unfold leadMinor
   split_ifs with h
   · rw [← Matrix.transpose_submatrix, Matrix.det_transpose]
@@ -138,14 +147,12 @@ end Minor
 
 section Gr
 
-variable
-  {M : LieModel G ξ E} {L : LB G.left} {V : Lat ξ E} {r : ℕ}
-  {b₀ : Fin r → E} {i : Fin r} {z : Spec (CommRingCat.of ℂ) ⟶ X} {t : Ω} {ν : ℝ}
+variable {M : LieModel G ξ E} {L : LB G.left} {V : Lat ξ E} {r : ℕ} {b₀ : Fin r → E} {i : Fin r}
+  {z : Spec (CommRingCat.of ℂ) ⟶ X} {t : Ω} {ν : ℝ}
 
 theorem LieModel.IsGrNorm.pos (h : M.IsGrNorm L V b₀ i z t ν) : 0 < ν := by
   obtain ⟨_, _, Γ, -, -, -, -, hΓ, rfl⟩ := h
-  exact Real.sqrt_pos.2 (div_pos (leadMinor_pos_of_posDef hΓ i.2)
-    (leadMinor_pos_of_posDef hΓ i.2.le))
+  exact Real.sqrt_pos.2 (div_pos (leadMinor_pos_of_posDef hΓ i.2) (leadMinor_pos_of_posDef hΓ i.2.le))
 
 end Gr
 
@@ -155,16 +162,14 @@ variable {z : Spec (CommRingCat.of ℂ) ⟶ X}
 
 namespace CxVal
 
-theorem mul {a b : Ω} {r s : ℂ} (h : ValAt ξ z a r) (h' : ValAt ξ z b s)
-    : ValAt ξ z (a * b) (r * s) := by
+theorem mul {a b : Ω} {r s : ℂ} (h : ValAt ξ z a r) (h' : ValAt ξ z b s) : ValAt ξ z (a * b) (r * s) := by
   obtain ⟨h, x, rfl, rfl⟩ := h
   obtain ⟨_, y, rfl, rfl⟩ := h'
   exact ⟨h, x * y, map_mul _ _ _, map_mul _ _ _⟩
 
 theorem one (h : genPt ξ ⤳ centre z) : ValAt ξ z 1 1 := ⟨h, 1, map_one _, map_one _⟩
 
-theorem isUnit (x : X.presheaf.stalk (centre z)) (h : (Scheme.stalkClosedPointTo z).hom x ≠ 0)
-    : IsUnit x :=
+theorem isUnit (x : X.presheaf.stalk (centre z)) (h : (Scheme.stalkClosedPointTo z).hom x ≠ 0) : IsUnit x :=
   (inferInstance : IsLocalHom (Scheme.stalkClosedPointTo z).hom).map_nonunit x (IsUnit.mk0 _ h)
 
 theorem inv {a : Ω} {r : ℂ} (h : ValAt ξ z a r) (hr : r ≠ 0) : ValAt ξ z a⁻¹ r⁻¹ := by
@@ -172,8 +177,7 @@ theorem inv {a : Ω} {r : ℂ} (h : ValAt ξ z a r) (hr : r ≠ 0) : ValAt ξ z 
   obtain ⟨x, rfl⟩ : IsUnit x := isUnit x hr
   exact ⟨h, x⁻¹.val, map_units_inv _ x, map_units_inv _ x⟩
 
-theorem zpow {a : Ω} {r : ℂ} (h : ValAt ξ z a r) (hr : r ≠ 0) (n : ℤ)
-    : ValAt ξ z (a ^ n) (r ^ n) := by
+theorem zpow {a : Ω} {r : ℂ} (h : ValAt ξ z a r) (hr : r ≠ 0) (n : ℤ) : ValAt ξ z (a ^ n) (r ^ n) := by
   have hn : ∀ n : ℕ, ValAt ξ z (a ^ n) (r ^ n) := fun n => by
     induction n with
     | zero => simpa using one h.1
@@ -182,56 +186,41 @@ theorem zpow {a : Ω} {r : ℂ} (h : ValAt ξ z a r) (hr : r ≠ 0) (n : ℤ)
   · simpa using hn n
   · simpa using inv (hn n) (pow_ne_zero _ hr)
 
-theorem aeval
-    {σ : Type} {a : σ → Ω} {r : σ → ℂ}
-    (hz : genPt ξ ⤳ centre z) (h : ∀ p, ValAt ξ z (a p) (r p)) (s : MvPolynomial σ ℤ)
-    : ValAt ξ z (MvPolynomial.aeval a s) (MvPolynomial.aeval r s) := by
+theorem aeval {σ : Type} {a : σ → Ω} {r : σ → ℂ} (hz : genPt ξ ⤳ centre z) (h : ∀ p, ValAt ξ z (a p) (r p))
+    (s : MvPolynomial σ ℤ) : ValAt ξ z (MvPolynomial.aeval a s) (MvPolynomial.aeval r s) := by
   induction s using MvPolynomial.induction_on with
   | C n => exact ⟨hz, n, by simp, (map_intCast (Scheme.stalkClosedPointTo z).hom n).trans (by simp)⟩
   | add p q hp hq =>
     obtain ⟨_, x, hx, hx'⟩ := hp
     obtain ⟨_, y, hy, hy'⟩ := hq
-    exact ⟨
-      hz,
-      x + y,
-      by rw [map_add (f := _), map_add (f := _), hx, hy],
-      (map_add (Scheme.stalkClosedPointTo z).hom x y).trans
-        (by rw [map_add (f := _), ← hx', ← hy']; rfl)
-    ⟩
+    exact ⟨hz, x + y, by rw [map_add (f := _), map_add (f := _), hx, hy],
+      (map_add (Scheme.stalkClosedPointTo z).hom x y).trans (by rw [map_add (f := _), ← hx', ← hy']; rfl)⟩
   | mul_X p i hp => simpa using mul hp (h i)
 
 theorem unique {a : Ω} {r s : ℂ} (h : ValAt ξ z a r) (h' : ValAt ξ z a s) : r = s := by
   obtain ⟨h, x, hx, rfl⟩ := h
   obtain ⟨_, y, hy, rfl⟩ := h'
   by_contra hne
-  have hu : IsUnit (x - y) :=
-    isUnit _ fun h0 =>
-      hne (sub_eq_zero.1 ((map_sub (Scheme.stalkClosedPointTo z).hom x y).symm.trans h0))
+  have hu : IsUnit (x - y) := isUnit _ fun h0 =>
+    hne (sub_eq_zero.1 ((map_sub (Scheme.stalkClosedPointTo z).hom x y).symm.trans h0))
   have := hu.map (genMap ξ ⟨centre z, h⟩)
   rw [map_sub, hx, hy, sub_self] at this
   exact not_isUnit_zero this
 
 end CxVal
 
-variable
-  {K : Type} [Fintype K]
-  {J : K → Type} [∀ k, Fintype (J k)]
-  {y : (Σ k, J k) → Ω} {A : HermLine J} {e₀ : Ω} {w : (Σ k, J k) → ℂ} {t : Ω} {ν ν' : ℝ}
+variable {K : Type} [Fintype K] {J : K → Type} [∀ k, Fintype (J k)] {y : (Σ k, J k) → Ω} {A : HermLine J} {e₀ : Ω}
+  {w : (Σ k, J k) → ℂ} {t : Ω} {ν ν' : ℝ}
 
-theorem secNorm_iff_chart
-    (he : e₀ ≠ 0) (hw : CoordsAt ξ y z w) (c : (k : K) → J k) (hc : ∀ k, w ⟨k, c k⟩ ≠ 0)
-    : SecNorm ξ y A e₀ z w t ν
-      ↔ ∃ u : ℂ,
-        ValAt ξ z (t / ((∏ k, y ⟨k, c k⟩ ^ A.a k) * e₀)) u
-          ∧ ν * A.h w = ‖u‖ * ∏ k, ‖w ⟨k, c k⟩‖ ^ A.a k := by
+theorem secNorm_iff_chart (he : e₀ ≠ 0) (hw : CoordsAt ξ y z w) (c : (k : K) → J k) (hc : ∀ k, w ⟨k, c k⟩ ≠ 0) :
+    SecNorm ξ y A e₀ z w t ν ↔ ∃ u : ℂ, ValAt ξ z (t / ((∏ k, y ⟨k, c k⟩ ^ A.a k) * e₀)) u ∧
+      ν * A.h w = ‖u‖ * ∏ k, ‖w ⟨k, c k⟩‖ ^ A.a k := by
   refine ⟨fun h => h.2.2 c hc, ?_⟩
   rintro ⟨u, hu, hν⟩
   refine ⟨he, hw, fun c' hc' => ?_⟩
   choose r hr hr' using fun k => (hw.2 k (c' k) (IsUnit.mk0 _ (hc' k))).2 (c k)
   have hr0 : ∀ k, r k ≠ 0 := fun k h => hc k (by rw [hr', h, zero_mul])
-  have hp
-      : ∀ s : Finset K,
-        ValAt ξ z (∏ k ∈ s, (y ⟨k, c k⟩ / y ⟨k, c' k⟩) ^ A.a k) (∏ k ∈ s, r k ^ A.a k) := by
+  have hp : ∀ s : Finset K, ValAt ξ z (∏ k ∈ s, (y ⟨k, c k⟩ / y ⟨k, c' k⟩) ^ A.a k) (∏ k ∈ s, r k ^ A.a k) := by
     classical
     intro s
     induction s using Finset.induction_on with
@@ -251,13 +240,11 @@ theorem secNorm_iff_chart
     refine Finset.prod_congr rfl fun k _ => ?_
     rw [hr' k, norm_mul, mul_zpow, norm_zpow]
 
-theorem SecNorm.exists_chart (h : SecNorm ξ y A e₀ z w t ν)
-    : ∃ c : (k : K) → J k, ∀ k, w ⟨k, c k⟩ ≠ 0 := by
+theorem SecNorm.exists_chart (h : SecNorm ξ y A e₀ z w t ν) : ∃ c : (k : K) → J k, ∀ k, w ⟨k, c k⟩ ≠ 0 := by
   choose c hc using h.2.1.1
   exact ⟨c, fun k => (hc k).ne_zero⟩
 
-theorem SecNorm.unique (h : SecNorm ξ y A e₀ z w t ν) (h' : SecNorm ξ y A e₀ z w t ν')
-    : ν = ν' := by
+theorem SecNorm.unique (h : SecNorm ξ y A e₀ z w t ν) (h' : SecNorm ξ y A e₀ z w t ν') : ν = ν' := by
   obtain ⟨c, hc⟩ := h.exists_chart
   obtain ⟨u, hu, e⟩ := h.2.2 c hc
   obtain ⟨u', hu', e'⟩ := h'.2.2 c hc
@@ -269,8 +256,8 @@ theorem SecNorm.specializes (h : SecNorm ξ y A e₀ z w t ν) : genPt ξ ⤳ ce
   obtain ⟨u, hu, -⟩ := h.2.2 c hc
   exact hu.1
 
-theorem SecNorm.mul (h : SecNorm ξ y A e₀ z w t ν) {f : Ω} {s : ℂ} (hf : ValAt ξ z f s)
-    : SecNorm ξ y A e₀ z w (f * t) (‖s‖ * ν) := by
+theorem SecNorm.mul (h : SecNorm ξ y A e₀ z w t ν) {f : Ω} {s : ℂ} (hf : ValAt ξ z f s) :
+    SecNorm ξ y A e₀ z w (f * t) (‖s‖ * ν) := by
   refine ⟨h.1, h.2.1, fun c hc => ?_⟩
   obtain ⟨u, hu, e⟩ := h.2.2 c hc
   refine ⟨s * u, ?_, ?_⟩
@@ -278,11 +265,9 @@ theorem SecNorm.mul (h : SecNorm ξ y A e₀ z w t ν) {f : Ω} {s : ℂ} (hf : 
     exact CxVal.mul hf hu
   · rw [_root_.mul_assoc, e, norm_mul, _root_.mul_assoc]
 
-theorem aeval_blockScale
-    {R : Type} [CommRing R]
-    {s : MRing J} {b : K → ℕ} (hs : IsMultiHomog s b)
-    (κ : K → R) (x : (Σ k, J k) → R)
-    : MvPolynomial.aeval (fun p => κ p.1 * x p) s = (∏ k, κ k ^ b k) * MvPolynomial.aeval x s := by
+theorem aeval_blockScale {R : Type} [CommRing R] {s : MRing J} {b : K → ℕ} (hs : IsMultiHomog s b) (κ : K → R)
+    (x : (Σ k, J k) → R) :
+    MvPolynomial.aeval (fun p => κ p.1 * x p) s = (∏ k, κ k ^ b k) * MvPolynomial.aeval x s := by
   simp only [MvPolynomial.aeval_def, MvPolynomial.eval₂_eq', Finset.mul_sum]
   refine Finset.sum_congr rfl fun m hm => ?_
   simp only [mul_pow, Finset.prod_mul_distrib]

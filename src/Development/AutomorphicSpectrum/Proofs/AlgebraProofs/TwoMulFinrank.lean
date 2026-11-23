@@ -1,7 +1,53 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Definitions.CommutativeAlgebra.OmStable
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+public import Mathlib.LinearAlgebra.BilinearForm.Orthogonal
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -13,11 +59,10 @@ open Module NumberField
 
 namespace PtBasic
 
-variable
-  {C O : Type} [Field C] [CommRing O] [Algebra O C]
-  {E : Type} [Field E] [NumberField E]
-  {c : E ≃+* E} {κ : O} {N : ℕ} {V Ω : Type} [AddCommGroup V] [Module C V] [Module O V]
-  [IsScalarTower O C V] [AddCommGroup Ω] [Module C Ω] [Module O Ω] [IsScalarTower O C Ω]
+variable {C O : Type} [Field C] [CommRing O] [Algebra O C] {E : Type} [Field E] [NumberField E]
+  {c : E ≃+* E} {κ : O} {N : ℕ}
+  {V Ω : Type} [AddCommGroup V] [Module C V] [Module O V] [IsScalarTower O C V]
+  [AddCommGroup Ω] [Module C Ω] [Module O Ω] [IsScalarTower O C Ω]
   (P : HTPoint C O c κ N V Ω)
 
 theorem ht_surjective : Function.Surjective P.ht := by
@@ -57,8 +102,8 @@ theorem rho_t_mem (a : 𝓞 E) (i : Fin N) : P.ρ a (P.t i) ∈ P.T := by
     rw [hT]
     exact Submodule.subset_span ⟨(i, k), rfl⟩
   rw [← (RingOfIntegers.basis E).sum_repr a]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, map_zsmul, LinearMap.sum_apply, LinearMap.smul_apply]
+
+  simp only [map_sum, map_zsmul, LinearMap.sum_apply, LinearMap.smul_apply]
   exact Submodule.sum_mem _ fun k _ => zsmul_mem (hmem k) _
 
 theorem T_stable (a : 𝓞 E) : ∀ x ∈ P.T, P.ρ a x ∈ P.T := by
@@ -68,15 +113,14 @@ theorem T_stable (a : 𝓞 E) : ∀ x ∈ P.T, P.ρ a x ∈ P.T := by
     rw [Submodule.span_le]
     rintro _ ⟨q, rfl⟩
     show P.ρ a (P.ρ (RingOfIntegers.basis E q.2) (P.t q.1)) ∈ P.T
-    rw [show P.ρ a (P.ρ (RingOfIntegers.basis E q.2) (P.t q.1))
-          = (P.ρ a * P.ρ (RingOfIntegers.basis E q.2)) (P.t q.1) from
-        rfl,
-      ← map_mul]
+    rw [show P.ρ a (P.ρ (RingOfIntegers.basis E q.2) (P.t q.1)) =
+        (P.ρ a * P.ρ (RingOfIntegers.basis E q.2)) (P.t q.1) from rfl, ← map_mul]
     exact rho_t_mem P _ _
   exact fun x hx => hle hx
 
-theorem ht_eigProj (σ : E →+* C) (x : V) : P.ht (eigProj P.ρ σ x) = eigProj P.ρΩ σ (P.ht x) := by
-  set_option synthInstance.maxHeartbeats 100000 in
+theorem ht_eigProj (σ : E →+* C) (x : V) :
+    P.ht (eigProj P.ρ σ x) = eigProj P.ρΩ σ (P.ht x) := by
+
   simp only [eigProj, LinearMap.sum_apply, LinearMap.smul_apply, map_sum, map_smul, P.ht_lin]
 
 theorem om'_lattice : P.om'.IsLattice C := by
@@ -87,10 +131,10 @@ theorem om'_lattice : P.om'.IsLattice C := by
   · rw [HTPoint.om']
     exact (T_lattice P).fg.map _
 
-theorem omHT_eq (σ : E →+* C) : P.omHT σ = (eigQuot P.ρ σ P.T).map (P.ht.restrictScalars O) := by
-  have hcomm
-      : ((eigProj P.ρΩ σ).restrictScalars O) ∘ₗ (P.ht.restrictScalars O)
-        = (P.ht.restrictScalars O) ∘ₗ ((eigProj P.ρ σ).restrictScalars O) :=
+theorem omHT_eq (σ : E →+* C) :
+    P.omHT σ = (eigQuot P.ρ σ P.T).map (P.ht.restrictScalars O) := by
+  have hcomm : ((eigProj P.ρΩ σ).restrictScalars O) ∘ₗ (P.ht.restrictScalars O) =
+      (P.ht.restrictScalars O) ∘ₗ ((eigProj P.ρ σ).restrictScalars O) :=
     LinearMap.ext fun x => (ht_eigProj P σ x).symm
   show (P.T.map (P.ht.restrictScalars O)).map ((eigProj P.ρΩ σ).restrictScalars O) =
     (P.T.map ((eigProj P.ρ σ).restrictScalars O)).map (P.ht.restrictScalars O)
@@ -135,26 +179,9 @@ theorem two_mul_finrank : 2 * finrank C Ω = finrank C V := by
 
 end PtBasic
 
-theorem htPoint_basic
-    : ∀ (C : Type) [Field C] (v : Valuation C NNReal) (O : Type) [CommRing O] [Algebra O C]
-        (hv : v.Integers O) [IsAlgClosed C] [CharZero C] (E : Type) [Field E] [NumberField E]
-        (c : E ≃+* E) (hc : ∀ x, c (c x) = x) (κ : O) (N : ℕ) (V : Type) [AddCommGroup V]
-        [Module C V] [Module O V] [IsScalarTower O C V] (Ω : Type) [AddCommGroup Ω] [Module C Ω]
-        [Module O Ω] [IsScalarTower O C Ω] (P : HTPoint C O c κ N V Ω),
-      Function.Surjective P.ht ∧ P.T.IsLattice C ∧ (∀ (a : 𝓞 E), ∀ x ∈ P.T, P.ρ a x ∈ P.T)
-        ∧ (∀ (σ : E →+* C) x, P.ht (eigProj P.ρ σ x) = eigProj P.ρΩ σ (P.ht x)) ∧ P.om'.IsLattice C
-        ∧ (∀ σ : E →+* C, P.omHT σ = (eigQuot P.ρ σ P.T).map (P.ht.restrictScalars O))
-        ∧ dualLat P.e.flip P.T = P.T ∧ 2 * Module.finrank C Ω = Module.finrank C V := by
+theorem htPoint_basic : ∀ (C : Type) [Field C] (v : Valuation C NNReal) (O : Type) [CommRing O] [Algebra O C] (hv : v.Integers O) [IsAlgClosed C] [CharZero C] (E : Type) [Field E] [NumberField E] (c : E ≃+* E) (hc : ∀ x, c (c x) = x) (κ : O) (N : ℕ) (V : Type) [AddCommGroup V] [Module C V] [Module O V] [IsScalarTower O C V] (Ω : Type) [AddCommGroup Ω] [Module C Ω] [Module O Ω] [IsScalarTower O C Ω] (P : HTPoint C O c κ N V Ω), Function.Surjective P.ht ∧ P.T.IsLattice C ∧ (∀ (a : 𝓞 E), ∀ x ∈ P.T, P.ρ a x ∈ P.T) ∧ (∀ (σ : E →+* C) x, P.ht (eigProj P.ρ σ x) = eigProj P.ρΩ σ (P.ht x)) ∧ P.om'.IsLattice C ∧ (∀ σ : E →+* C, P.omHT σ = (eigQuot P.ρ σ P.T).map (P.ht.restrictScalars O)) ∧ dualLat P.e.flip P.T = P.T ∧ 2 * Module.finrank C Ω = Module.finrank C V := by
   intro C _ v O _ _ _ _ _ E _ _ c _ κ N V _ _ _ _ Ω _ _ _ _ P
-  exact ⟨
-    PtBasic.ht_surjective P,
-    PtBasic.T_lattice P,
-    PtBasic.T_stable P,
-    PtBasic.ht_eigProj P,
-    PtBasic.om'_lattice P,
-    PtBasic.omHT_eq P,
-    PtBasic.dualLat_flip P,
-    PtBasic.two_mul_finrank P
-  ⟩
+  exact ⟨PtBasic.ht_surjective P, PtBasic.T_lattice P, PtBasic.T_stable P, PtBasic.ht_eigProj P,
+    PtBasic.om'_lattice P, PtBasic.omHT_eq P, PtBasic.dualLat_flip P, PtBasic.two_mul_finrank P⟩
 
 end GlobalTheory.CompanionTheory.Ar.HT

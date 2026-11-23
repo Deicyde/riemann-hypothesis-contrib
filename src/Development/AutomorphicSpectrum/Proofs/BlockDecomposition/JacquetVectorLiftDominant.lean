@@ -1,9 +1,52 @@
 module
 
-public import Mathlib
 public import Development.WeilBound.RepresentationTheoryGL.ArchimedeanBaseChange.ArchimedeanBaseChangeProof.IwahoriFactorisation.StrictDominance.JointGeneralisedEigenvectors.IsJointGenEig
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.CompactFixedVectorProjectionStatement
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.CompactGroupFiniteCosetRepsStatement
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -18,8 +61,8 @@ variable {G : Type} [Group G] {V : Type} [AddCommGroup V] [Module ℂ V]
 theorem pi_mul (π : Representation ℂ G V) (a b : G) (v : V) : π a (π b v) = π (a * b) v := by
   rw [map_mul, Module.End.mul_apply]
 
-theorem mem_fixed_iff (π : Representation ℂ G V) (H : Subgroup G) (v : V)
-    : v ∈ fixed π H ↔ ∀ h ∈ H, π h v = v := by
+theorem mem_fixed_iff (π : Representation ℂ G V) (H : Subgroup G) (v : V) :
+    v ∈ fixed π H ↔ ∀ h ∈ H, π h v = v := by
   constructor
   · intro hv h hh
     have h1 : ∀ h : H, π (h : G) v = (((1 : H →* ℂˣ) h : ℂˣ) : ℂ) • v := hv
@@ -29,69 +72,56 @@ theorem mem_fixed_iff (π : Representation ℂ G V) (H : Subgroup G) (v : V)
     intro h
     simpa using hv h h.2
 
-theorem mkQ_avg
-    (W : Submodule ℂ V) (r : ℕ) (hr : 0 < r) (f : Fin r → V) (m : V ⧸ W) (h : ∀ i, W.mkQ (f i) = m)
-    : W.mkQ (((r : ℂ)⁻¹) • ∑ i, f i) = m := by
+theorem mkQ_avg (W : Submodule ℂ V) (r : ℕ) (hr : 0 < r) (f : Fin r → V) (m : V ⧸ W)
+    (h : ∀ i, W.mkQ (f i) = m) : W.mkQ (((r : ℂ)⁻¹) • ∑ i, f i) = m := by
   have hr' : (r : ℂ) ≠ 0 := Nat.cast_ne_zero.2 hr.ne'
-  set_option synthInstance.maxHeartbeats 100000 in
+
   rw [map_smul, map_sum, Finset.sum_congr rfl (fun i _ => h i), Finset.sum_const, Finset.card_univ,
-    Fintype.card_fin, ← Nat.cast_smul_eq_nsmul ℂ, smul_smul, inv_mul_cancel₀ hr', one_smul]
+  Fintype.card_fin, ← Nat.cast_smul_eq_nsmul ℂ, smul_smul, inv_mul_cancel₀ hr', one_smul]
 
 end SlopeTestRemainingChoices
 
 section Avg
 
-variable
-  {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
+variable {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
   {V : Type} [AddCommGroup V] [Module ℂ V]
 
-theorem exists_avg
-    (K : Subgroup G) (hK : IsCompact (K : Set G))
-    (π : Representation ℂ G V) (hπ : IsSmooth π)
-    (E : V →ₗ[ℂ] V)
-    (hE : ∀ (u : V) (H : Subgroup G),
-      H ≤ K → (∀ h ∈ H, π h u = u)
-        → ∀ (r : ℕ) (x : Fin r → G),
-          0 < r → (∀ i, x i ∈ K) → (∀ y ∈ K, ∃! i, (x i)⁻¹ * y ∈ H)
-            → E u = ((r : ℂ)⁻¹) • ∑ i, π (x i) u)
-    (u : V) (A : Subgroup G) (hA : A ≤ K) (hc : ∀ y ∈ K, ∃ a ∈ A, π (a⁻¹ * y) u = u)
-    : ∃ (r : ℕ) (x : Fin r → G), 0 < r ∧ (∀ i, x i ∈ A) ∧ E u = ((r : ℂ)⁻¹) • ∑ i, π (x i) u := by
+theorem exists_avg (K : Subgroup G) (hK : IsCompact (K : Set G)) (π : Representation ℂ G V)
+    (hπ : IsSmooth π) (E : V →ₗ[ℂ] V)
+    (hE : ∀ (u : V) (H : Subgroup G), H ≤ K → (∀ h ∈ H, π h u = u) → ∀ (r : ℕ) (x : Fin r → G),
+      0 < r → (∀ i, x i ∈ K) → (∀ y ∈ K, ∃! i, (x i)⁻¹ * y ∈ H) →
+      E u = ((r : ℂ)⁻¹) • ∑ i, π (x i) u)
+    (u : V) (A : Subgroup G) (hA : A ≤ K) (hc : ∀ y ∈ K, ∃ a ∈ A, π (a⁻¹ * y) u = u) :
+    ∃ (r : ℕ) (x : Fin r → G), 0 < r ∧ (∀ i, x i ∈ A) ∧
+      E u = ((r : ℂ)⁻¹) • ∑ i, π (x i) u := by
   haveI : CompactSpace K := isCompact_iff_compactSpace.1 hK
-  let H' : Subgroup K := {
-    carrier := {g | π (g : G) u = u}
-    mul_mem' := by
-      intro a b ha hb
-      show π ((a * b : K) : G) u = u
-      rw [Subgroup.coe_mul, ← pi_mul, show π (b : G) u = u from hb, show π (a : G) u = u from ha]
-    one_mem' := by
-      show π ((1 : K) : G) u = u
-      simp
-    inv_mem' := by
-      intro a ha
-      show π ((a⁻¹ : K) : G) u = u
-      have ha' : π (a : G) u = u := ha
-      conv_lhs => rw [← ha']
-      rw [pi_mul]
-      simp
-  }
+  let H' : Subgroup K :=
+    { carrier := {g | π (g : G) u = u}
+      mul_mem' := by
+        intro a b ha hb
+        show π ((a * b : K) : G) u = u
+        rw [Subgroup.coe_mul, ← pi_mul, show π (b : G) u = u from hb, show π (a : G) u = u from ha]
+      one_mem' := by
+        show π ((1 : K) : G) u = u
+        simp
+      inv_mem' := by
+        intro a ha
+        show π ((a⁻¹ : K) : G) u = u
+        have ha' : π (a : G) u = u := ha
+        conv_lhs => rw [← ha']
+        rw [pi_mul]
+        simp }
   have hH' : IsOpen (H' : Set K) := (hπ u).preimage continuous_subtype_val
   have hcomp : IsCompact (((⊤ : Subgroup K)) : Set K) := by
     simpa using (isCompact_univ : IsCompact (Set.univ : Set K))
-  obtain ⟨r, hr, x, hxA, hx⟩ :=
-    GlobalTheory.T.compact_group_finite_coset_reps K ⊤ H' (A.subgroupOf K) hcomp hH' le_top le_top
-      (by
-        intro y _
-        obtain ⟨a, ha, hau⟩ := hc y y.2
-        refine ⟨⟨a, hA ha⟩, Subgroup.mem_subgroupOf.2 ha, ?_⟩
-        show π (((⟨a, hA ha⟩ : K)⁻¹ * y : K) : G) u = u
-        simpa using hau)
-  refine ⟨
-    r,
-    fun i => (x i : G),
-    hr,
-    fun i => Subgroup.mem_subgroupOf.1 (hxA i),
-    hE u (H'.map K.subtype) ?_ ?_ r _ hr (fun i => (x i).2) ?_
-  ⟩
+  obtain ⟨r, hr, x, hxA, hx⟩ := GlobalTheory.T.compact_group_finite_coset_reps K ⊤ H' (A.subgroupOf K) hcomp hH' le_top le_top (by
+    intro y _
+    obtain ⟨a, ha, hau⟩ := hc y y.2
+    refine ⟨⟨a, hA ha⟩, Subgroup.mem_subgroupOf.2 ha, ?_⟩
+    show π (((⟨a, hA ha⟩ : K)⁻¹ * y : K) : G) u = u
+    simpa using hau)
+  refine ⟨r, fun i => (x i : G), hr, fun i => Subgroup.mem_subgroupOf.1 (hxA i),
+    hE u (H'.map K.subtype) ?_ ?_ r _ hr (fun i => (x i).2) ?_⟩
   · rintro _ ⟨g, _, rfl⟩
     exact g.2
   · rintro _ ⟨g, hg, rfl⟩
@@ -114,31 +144,22 @@ section Dom
 
 variable {G : Type} [Group G] [TopologicalSpace G]
 
-theorem conj_pow_mem (D : CassData G) (t : D.T) (hd : D.IsDom t) (j : ℕ)
-    : ∀ b ∈ D.J ⊓ D.T, ((t : G) ^ j)⁻¹ * b * (t : G) ^ j ∈ D.J ⊓ D.T := by
+theorem conj_pow_mem (D : CassData G) (t : D.T) (hd : D.IsDom t) (j : ℕ) :
+    ∀ b ∈ D.J ⊓ D.T, ((t : G) ^ j)⁻¹ * b * (t : G) ^ j ∈ D.J ⊓ D.T := by
   induction j with
   | zero => intro b hb; simpa using hb
   | succ j ih =>
     intro b hb
     have h := (hd.2.2 _ (ih b hb)).2
-    have e
-        : ((t : G) ^ (j + 1))⁻¹ * b * (t : G) ^ (j + 1)
-          = (t : G)⁻¹ * (((t : G) ^ j)⁻¹ * b * (t : G) ^ j) * (t : G) := by
+    have e : ((t : G) ^ (j + 1))⁻¹ * b * (t : G) ^ (j + 1)
+        = (t : G)⁻¹ * (((t : G) ^ j)⁻¹ * b * (t : G) ^ j) * (t : G) := by
       rw [pow_succ]; group
     rw [e]
     exact h
 
 end Dom
 
-theorem exists_fixed_proj_eq_piN_pow
-    : ∀ (G : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
-        (D : PositivityTheory.SphericalProduct.CassData G),
-      ∀ (V : Type) [AddCommGroup V] [Module ℂ V] (π : Representation ℂ G V),
-        IsSmooth π
-          → ∀ t : D.T,
-            D.IsStrDom t
-              → ∀ w ∈ fixed (D.piN π) D.JT, ∃ j : ℕ, ∃ v : fixed π D.J,
-                D.proj π (v : V) = D.piN π (t ^ j) w := by
+theorem exists_fixed_proj_eq_piN_pow : ∀ (G : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] (D : PositivityTheory.SphericalProduct.CassData G), ∀ (V : Type) [AddCommGroup V] [Module ℂ V] (π : Representation ℂ G V), IsSmooth π → ∀ t : D.T, D.IsStrDom t → ∀ w ∈ fixed (D.piN π) D.JT, ∃ j : ℕ, ∃ v : fixed π D.J, D.proj π (v : V) = D.piN π (t ^ j) w := by
   intro G _ _ _ D V _ _ π hπ t ht w hw
   obtain ⟨u, rfl⟩ := Submodule.Quotient.mk_surjective _ w
   obtain ⟨hd, -, hsh⟩ := ht
@@ -147,7 +168,8 @@ theorem exists_fixed_proj_eq_piN_pow
   have hKc : IsCompact ((D.J ⊓ D.T : Subgroup G) : Set G) := by
     rw [Subgroup.coe_inf]
     exact D.isCompact_J.inter_right D.isClosed_alt
-  have hN : ∀ n ∈ D.N, ∀ v : V, (twKer π D.N 1).mkQ (π n v) = (twKer π D.N 1).mkQ v := by
+  have hN : ∀ n ∈ D.N, ∀ v : V,
+      (twKer π D.N 1).mkQ (π n v) = (twKer π D.N 1).mkQ v := by
     intro n hn v
     refine (Submodule.Quotient.eq _).2 (Submodule.subset_span ⟨⟨n, hn⟩, v, by simp⟩)
 
@@ -161,10 +183,9 @@ theorem exists_fixed_proj_eq_piN_pow
     congr 2
     group
 
-  obtain ⟨E1, hE1fix, -, -, -, hE1⟩ :=
-    GlobalTheory.T.compact_fixed_vector_projection G (D.J ⊓ D.T) hKc V π hπ
-  obtain ⟨r, b, hr, hb, hy⟩ :=
-    exists_avg (D.J ⊓ D.T) hKc π hπ E1 hE1 x (D.J ⊓ D.T) le_rfl (fun y hy => ⟨y, hy, by simp⟩)
+  obtain ⟨E1, hE1fix, -, -, -, hE1⟩ := GlobalTheory.T.compact_fixed_vector_projection G (D.J ⊓ D.T) hKc V π hπ
+  obtain ⟨r, b, hr, hb, hy⟩ := exists_avg (D.J ⊓ D.T) hKc π hπ E1 hE1 x (D.J ⊓ D.T) le_rfl
+    (fun y hy => ⟨y, hy, by simp⟩)
   obtain ⟨y, hydef⟩ : ∃ y, y = E1 x := ⟨_, rfl⟩
   rw [← hydef] at hy
   have hyK : ∀ k ∈ D.J ⊓ D.T, π k y = y := by
@@ -172,8 +193,8 @@ theorem exists_fixed_proj_eq_piN_pow
     exact (mem_fixed_iff _ _ _).1 (hE1fix x)
   have hyNm : ∀ n ∈ D.J ⊓ D.Nm, π n y = y := by
     intro n hn
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hy, map_smul, map_sum]
+
+    rw [hy, map_smul, map_sum]
     congr 1
     refine Finset.sum_congr rfl fun i _ => ?_
     have hbi := hb i
@@ -196,23 +217,19 @@ theorem exists_fixed_proj_eq_piN_pow
       congr 2
       group
     rw [h4]
-    have h5
-        : (twKer π D.N 1).mkQ (π (((t : G) ^ j)⁻¹ * b i * (t : G) ^ j) u)
-          = Submodule.Quotient.mk u :=
-      hfix
-    have h6
-        : ∀ m : V,
-          (twKer π D.N 1).mkQ (π ((t : G) ^ j) m) = D.piN π (t ^ j) ((twKer π D.N 1).mkQ m) := by
+    have h5 : (twKer π D.N 1).mkQ (π (((t : G) ^ j)⁻¹ * b i * (t : G) ^ j) u)
+        = Submodule.Quotient.mk u := hfix
+    have h6 : ∀ m : V, (twKer π D.N 1).mkQ (π ((t : G) ^ j) m)
+        = D.piN π (t ^ j) ((twKer π D.N 1).mkQ m) := by
       intro m
       have : (((t ^ j : D.T)) : G) = (t : G) ^ j := by simp
       rw [← this]
       rfl
     rw [h6, h5]
 
-  obtain ⟨E2, hE2fix, -, -, -, hE2⟩ :=
-    GlobalTheory.T.compact_fixed_vector_projection G D.J D.isCompact_J V π hπ
-  obtain ⟨r2, c, hr2, hc, hv⟩ :=
-    exists_avg D.J D.isCompact_J π hπ E2 hE2 y (D.J ⊓ D.N) inf_le_left (fun g hg => by
+  obtain ⟨E2, hE2fix, -, -, -, hE2⟩ := GlobalTheory.T.compact_fixed_vector_projection G D.J D.isCompact_J V π hπ
+  obtain ⟨r2, c, hr2, hc, hv⟩ := exists_avg D.J D.isCompact_J π hπ E2 hE2 y (D.J ⊓ D.N) inf_le_left
+    (fun g hg => by
       obtain ⟨c, hc, b', hb', a, ha, rfl⟩ := D.fact_up g hg
       refine ⟨c, hc, ?_⟩
       have e : c⁻¹ * (c * b' * a) = b' * a := by group

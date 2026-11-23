@@ -2,6 +2,54 @@ module
 
 public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.ProductFormulaHaar.TrBase
 public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.ProductFormulaHaar.ExistsEqEllMul
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Real
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.Padics.RingHoms
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Lemma
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -25,9 +73,8 @@ lemma valuation_natCast_le_one' {K : Type*} [Field K] [ValuativeRel K] (n : ℕ)
     push_cast
     exact Valuation.map_add_le _ ih (by simp)
 
-private theorem isClosed_setOf_valuation_le_one
-    {K : Type} [Field K] [ValuativeRel K] [TopologicalSpace K] [IsNonarchimedeanLocalField K]
-    : IsClosed {x : K | valuation K x ≤ 1} := by
+private theorem isClosed_setOf_valuation_le_one {K : Type} [Field K] [ValuativeRel K] [TopologicalSpace K]
+    [IsNonarchimedeanLocalField K] : IsClosed {x : K | valuation K x ≤ 1} := by
   have h := Valuation.isClosed_closedBall (R := K) (v := valuation K) 1
   first
   | (convert h using 3 with x; simp)
@@ -49,15 +96,11 @@ lemma LocFam.valuation_ιF_le_one (D : LocFam F ℓ ι) (i : ι) (x : 𝓞 F) :
   have h := (D.val i (x : F) 1).2 (by simpa using (D.P i).valuation_le_one x)
   simpa [vle_iff'] using h
 
-theorem LocFam.linearIndependent
-    [Fintype ι]
-    (D : LocFam F ℓ ι) (hD : D.Over)
-    (hA : ∀ X : 𝓞 F,
-      (∀ v : HeightOneSpectrum (𝓞 F),
-          (ℓ : 𝓞 F) ∈ v.asIdeal → v.valuation F (X : F) ≤ v.valuation F (ℓ : F))
-        → ∃ Z : 𝓞 F, X = ℓ * Z)
-    (hB : ∀ c : ℚ_[ℓ], ‖c‖ ≤ 1 → ∃ m : ℤ, ‖(c - m) / ℓ‖ ≤ 1)
-    : LinearIndependent ℚ_[ℓ] (fun k => D.Φ (1 ⊗ₜ integralBasis F k)) := by
+theorem LocFam.linearIndependent [Fintype ι] (D : LocFam F ℓ ι) (hD : D.Over)
+    (hA : ∀ X : 𝓞 F, (∀ v : HeightOneSpectrum (𝓞 F), (ℓ : 𝓞 F) ∈ v.asIdeal →
+      v.valuation F (X : F) ≤ v.valuation F (ℓ : F)) → ∃ Z : 𝓞 F, X = ℓ * Z)
+    (hB : ∀ c : ℚ_[ℓ], ‖c‖ ≤ 1 → ∃ m : ℤ, ‖(c - m) / ℓ‖ ≤ 1) :
+    LinearIndependent ℚ_[ℓ] (fun k => D.Φ (1 ⊗ₜ integralBasis F k)) := by
   classical
   set b := integralBasis F with hb_def
   set bZ := RingOfIntegers.basis F with hbZ
@@ -70,8 +113,7 @@ theorem LocFam.linearIndependent
   by_contra hne
   push_neg at hne
   obtain ⟨k1, hk1⟩ := hne
-  obtain ⟨k0, -, hk0⟩ :=
-    Finset.exists_max_image Finset.univ (fun k => ‖g k‖) ⟨k1, Finset.mem_univ _⟩
+  obtain ⟨k0, -, hk0⟩ := Finset.exists_max_image Finset.univ (fun k => ‖g k‖) ⟨k1, Finset.mem_univ _⟩
   have hg0 : g k0 ≠ 0 := by
     intro h
     have h' := hk0 k1 (Finset.mem_univ _)
@@ -100,31 +142,28 @@ theorem LocFam.linearIndependent
     field_simp
   set X : 𝓞 F := ∑ k, m k • bZ k with hX_def
   have hXF : ((X : 𝓞 F) : F) = ∑ k, (m k : F) * b k := by
-    first | (rw [hX_def]; simp [hbb, zsmul_eq_mul]) | (push_cast [hX_def, hbb, zsmul_eq_mul]; rfl)
-  have hval
-      : ∀ v : HeightOneSpectrum (𝓞 F),
-        (ℓ : 𝓞 F) ∈ v.asIdeal → v.valuation F (X : F) ≤ v.valuation F (ℓ : F) := by
+    first
+    | (rw [hX_def]; simp [hbb, zsmul_eq_mul])
+    | (push_cast [hX_def, hbb, zsmul_eq_mul]; rfl)
+  have hval : ∀ v : HeightOneSpectrum (𝓞 F), (ℓ : 𝓞 F) ∈ v.asIdeal →
+      v.valuation F (X : F) ≤ v.valuation F (ℓ : F) := by
     intro v hv
     obtain ⟨i, rfl⟩ := (hD.2 v).2 hv
     rw [← D.val i, vle_iff']
-    have hterm
-        : ∀ k,
-          D.ιF i ((m k : F) * b k)
-            = algebraMap ℚ_[ℓ] (D.K i) (c k) * D.ιF i (b k)
-              - (ℓ : D.K i) * (algebraMap ℚ_[ℓ] (D.K i) (d k) * D.ιF i (b k)) := by
+    have hterm : ∀ k, D.ιF i ((m k : F) * b k) = algebraMap ℚ_[ℓ] (D.K i) (c k) * D.ιF i (b k)
+        - (ℓ : D.K i) * (algebraMap ℚ_[ℓ] (D.K i) (d k) * D.ιF i (b k)) := by
       intro k
       have e : (m k : ℚ_[ℓ]) = c k - ℓ * d k := by rw [← hcd]; ring
-      have e'
-          : ((m k : ℤ) : D.K i)
-            = algebraMap ℚ_[ℓ] (D.K i) (c k) - (ℓ : D.K i) * algebraMap ℚ_[ℓ] (D.K i) (d k) := by
+      have e' : ((m k : ℤ) : D.K i) = algebraMap ℚ_[ℓ] (D.K i) (c k)
+          - (ℓ : D.K i) * algebraMap ℚ_[ℓ] (D.K i) (d k) := by
         rw [← map_intCast (algebraMap ℚ_[ℓ] (D.K i)), e, map_sub, map_mul, map_natCast]
       rw [map_mul, map_intCast, e']
       ring
-    have hιX
-        : D.ιF i (X : F) = -((ℓ : D.K i) * ∑ k, algebraMap ℚ_[ℓ] (D.K i) (d k) * D.ιF i (b k)) := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [hXF, map_sum, Finset.sum_congr rfl fun k _ => hterm k, Finset.sum_sub_distrib, hrel i,
-          Finset.mul_sum]
+    have hιX : D.ιF i (X : F) =
+        -((ℓ : D.K i) * ∑ k, algebraMap ℚ_[ℓ] (D.K i) (d k) * D.ιF i (b k)) := by
+
+      rw [hXF, map_sum, Finset.sum_congr rfl fun k _ => hterm k, Finset.sum_sub_distrib, hrel i,
+      Finset.mul_sum]
       ring
     have hsum : valuation (D.K i) (∑ k, algebraMap ℚ_[ℓ] (D.K i) (d k) * D.ιF i (b k)) ≤ 1 := by
       refine Valuation.map_sum_le _ fun k _ => ?_
@@ -135,13 +174,11 @@ theorem LocFam.linearIndependent
     first
     | exact mul_le_of_le_one_right' hsum
     | exact mul_le_of_le_one_right₀ hsum
-    | (
-        calc
-          _ ≤ valuation (D.K i) (ℓ : D.K i) * 1 := by gcongr
-          _ = _ := mul_one _
-      )
+    | (calc _ ≤ valuation (D.K i) (ℓ : D.K i) * 1 := by gcongr
+        _ = _ := mul_one _)
   obtain ⟨Z, hZ⟩ := hA X hval
-  have hrepr : ∀ k, bZ.repr X k = m k := fun k => by rw [hX_def, bZ.repr_sum_self]
+  have hrepr : ∀ k, bZ.repr X k = m k := fun k => by
+    rw [hX_def, bZ.repr_sum_self]
   have hmk : m k0 = ℓ * bZ.repr Z k0 := by
     have h := congrArg (fun y => bZ.repr y k0) hZ
     simp only [hrepr] at h
@@ -159,17 +196,16 @@ theorem LocFam.linearIndependent
     (Padic.nonarchimedean _ _).trans (max_le (Padic.norm_int_le_one _) (hd1 k0))
   nlinarith [norm_nonneg (ℓ : ℚ_[ℓ]), norm_nonneg (((bZ.repr Z k0 : ℤ) : ℚ_[ℓ]) + d k0)]
 
-theorem LocFam.injective_of_linearIndependent
-    [Fintype ι]
-    (D : LocFam F ℓ ι) (hl : LinearIndependent ℚ_[ℓ] (fun k => D.Φ (1 ⊗ₜ integralBasis F k)))
-    : Function.Injective D.Φ := by
+theorem LocFam.injective_of_linearIndependent [Fintype ι] (D : LocFam F ℓ ι)
+    (hl : LinearIndependent ℚ_[ℓ] (fun k => D.Φ (1 ⊗ₜ integralBasis F k))) :
+    Function.Injective D.Φ := by
   classical
   set bb := Algebra.TensorProduct.basis ℚ_[ℓ] (integralBasis F) with hbb
   have hb : ∀ k, bb k = 1 ⊗ₜ integralBasis F k := fun k => Algebra.TensorProduct.basis_apply _ _
   refine (injective_iff_map_eq_zero D.Φ).2 fun x hx => ?_
   rw [← bb.sum_repr x] at hx ⊢
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, map_smul, hb] at hx
+
+  simp only [map_sum, map_smul, hb] at hx
   have h0 := (Fintype.linearIndependent_iff.1 hl) (fun k => bb.repr x k) hx
   simp [h0]
 

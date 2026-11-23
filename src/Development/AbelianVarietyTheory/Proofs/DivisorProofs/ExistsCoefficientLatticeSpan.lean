@@ -1,21 +1,45 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.RationalEstimateStatement
-public import Development.AbelianVarietyTheory.Statements.PlaceShiftStatements.SingleIndexPlacesAreTwisted
-public import Development.AbelianVarietyTheory.Definitions.Divisors.LevelOfOfSameBut
-public import Development.AbelianVarietyTheory.PublishedTheorems.AutomorphicForms₂.ExistsUniqueHcharOfFiniteOrder
-public import Development.AbelianVarietyTheory.PublishedTheorems.AutomorphicForms₂.ExistsNormLeHeightPow
-public import Development.AbelianVarietyTheory.PublishedTheorems.PublishedFoundations.NonemptyAlgHomOfIsRayOfDvd
 public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.MemRangeSrcForm
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.SplitPartRealisationWithScalarsCharOfWeakStatement
-public import Formalism.LocalToGlobal.IndefiniteReal.PrimitivePackageFullHecke
-public import Formalism.LocalToGlobal.IndefiniteReal.PackageFromPrimitiveStatements
-public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.CharacterUpdateOfWeakRealisation
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.SplitRowsBarPhaseCompatibility
-public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.WeilActionLiftPairStepVectorInvLevelChar
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.TwistedCharacterRationalValues
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.LiftEquivarianceWeilModel
+import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ResidueCharIsOfFinOrder
+import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ThetaKernelFiniteAdelicLawsStatement
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+public import Development.AbelianVarietyTheory.BlockTheory.TorsionBlocks.ToricLatticeDenominators
+import Development.AbelianVarietyTheory.Definitions.Divisors.LevelOfOfSameBut
+import Development.AbelianVarietyTheory.Definitions.Divisors.TupleReadBaseTupleEqFamily
 
 @[expose] public section
 
@@ -30,8 +54,8 @@ open Formalism.IndefR.FWT GlobalTheory.OntoChain GlobalTheory.RealIndexBound Glo
   GlobalTheory.SeriesTie
 open GlobalTheory.IndefiniteRowSideFullHecke.ToricLatticeDenominators (FmExt eExt incl)
 open scoped TensorProduct
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 800000
+
+
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 set_option autoImplicit false
@@ -71,15 +95,14 @@ theorem clSum_trU_of_lift
     : clSum (presV R i t) (kern R i t) (trU (A.leftGroupActionLift i t) U ψ f) v
       = levelTrace R i U ψ (clSum (presV R i t) (kern R i t) f v) := by
   unfold levelTrace gaL
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [trU_apply, map_sum, Finset.sum_apply, LinearMap.sum_apply]
+
+  rw [trU_apply, map_sum, Finset.sum_apply, LinearMap.sum_apply]
   refine Finset.sum_congr rfl fun g _ => ?_
   rw [map_smulₛₗ, clSum_equiv_of_lift hS hl, LinearMap.smul_apply, invChar,
     apply_dite D.what₂.embLL, map_zero]
   rfl
 
 open GlobalTheory.TraceIncl in
-set_option maxHeartbeats 4000000 in
 theorem exists_adForm_levelTrace
     {D : D7} {G : Type} [Group G] [Fintype G]
     {Pl0 T0 : Type} {A : FamIn D.what₂.LL G Pl0 T0 D.R.m} {Ks : Type}

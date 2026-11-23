@@ -1,8 +1,54 @@
 module
 
-public import Mathlib
 public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.AdelicUnitaryOrbits.UnitChoice
-public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.AdelicUnitaryOrbits.QuadFiniteDimensional
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -14,59 +60,45 @@ open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
 open scoped TensorProduct
 
 def QuadGen : Prop :=
-  ∀ (F E : Type) [Field F] [CharZero F] [Field E] [Algebra F E] (σ : E →ₐ[F] E),
-    Module.finrank F E = 2 → (∀ a : E, σ a = a ↔ a ∈ (algebraMap F E).range)
-      → ∃ (θ : E) (d : F),
-        θ ^ 2 = algebraMap F E d ∧ σ θ = -θ ∧ d ≠ 0
-          ∧ ∀ e : E, ∃ p q : F, e = algebraMap F E p + algebraMap F E q * θ
+  ∀ (F E : Type) [Field F] [CharZero F] [Field E] [Algebra F E] (σ : E →ₐ[F] E), Module.finrank F E = 2 →
+    (∀ a : E, σ a = a ↔ a ∈ (algebraMap F E).range) →
+    ∃ (θ : E) (d : F), θ ^ 2 = algebraMap F E d ∧ σ θ = -θ ∧ d ≠ 0 ∧
+      ∀ e : E, ∃ p q : F, e = algebraMap F E p + algebraMap F E q * θ
 
-theorem glue_mul
-    {S : Type} [CommRing S]
-    {k : ℕ} (e : Fin k → S) (hid : ∀ i, e i * e i = e i) (hor : ∀ i j, i ≠ j → e i * e j = 0)
-    (X Y : Fin k → S)
-    : (∑ i, e i * X i) * (∑ j, e j * Y j) = ∑ i, e i * (X i * Y i) := by
+theorem glue_mul {S : Type} [CommRing S] {k : ℕ} (e : Fin k → S) (hid : ∀ i, e i * e i = e i)
+    (hor : ∀ i j, i ≠ j → e i * e j = 0) (X Y : Fin k → S) :
+    (∑ i, e i * X i) * (∑ j, e j * Y j) = ∑ i, e i * (X i * Y i) := by
   rw [Finset.sum_mul_sum]
   refine Finset.sum_congr rfl fun i _ => ?_
   rw [Finset.sum_eq_single i]
-  · calc
-      e i * X i * (e i * Y i)
-        = (e i * e i) * (X i * Y i) := by ring
+  · calc e i * X i * (e i * Y i) = (e i * e i) * (X i * Y i) := by ring
       _ = e i * (X i * Y i) := by rw [hid i]
   · intro j _ hji
-    calc
-      e i * X i * (e j * Y j)
-        = (e i * e j) * (X i * Y j) := by ring
+    calc e i * X i * (e j * Y j) = (e i * e j) * (X i * Y j) := by ring
       _ = 0 := by rw [hor i j (Ne.symm hji), zero_mul]
   · intro h
     exact absurd (Finset.mem_univ i) h
 
-theorem norm_id {S : Type} [CommRing S] (B p q a b D Θ : S) (h : Θ ^ 2 = D)
-    : (B - (p - q * Θ) * (a + b * Θ)) * (B - (p + q * Θ) * (a - b * Θ))
-      = (B - p * a + q * b * D) ^ 2 - D * (q * a - p * b) ^ 2 := by
+theorem norm_id {S : Type} [CommRing S] (B p q a b D Θ : S) (h : Θ ^ 2 = D) :
+    (B - (p - q * Θ) * (a + b * Θ)) * (B - (p + q * Θ) * (a - b * Θ)) =
+      (B - p * a + q * b * D) ^ 2 - D * (q * a - p * b) ^ 2 := by
   linear_combination (2 * B * q * b - p ^ 2 * b ^ 2 - q ^ 2 * a ^ 2 + q ^ 2 * b ^ 2 * (Θ ^ 2 + D)) * h
 
-theorem norm_one {S : Type} [CommRing S] (p q D Θ : S) (h : Θ ^ 2 = D)
-    : (p + q * Θ) * (p - q * Θ) = p ^ 2 - D * q ^ 2 := by
+theorem norm_one {S : Type} [CommRing S] (p q D Θ : S) (h : Θ ^ 2 = D) :
+    (p + q * Θ) * (p - q * Θ) = p ^ 2 - D * q ^ 2 := by
   linear_combination (-q ^ 2) * h
 
-theorem core
-    {R S : Type} [CommRing R] [CommRing S]
-    (ι : R →+* S)
-    (s : S →+* S)
-    (Θ : S) (D Bt P Q a b : R) (hΘ : Θ ^ 2 = ι D)
-    (hsΘ : s Θ = -Θ) (hsι : ∀ r, s (ι r) = ι r) (hPQ : P ^ 2 - D * Q ^ 2 = 1)
-    (Bi K i4 : R) (hB : Bt * Bi = 1) (hK : Q * D * K = 1) (h4 : (4 : R) * i4 = 1)
-    (hU : UnitChoice R)
-    : ∃ lam : S, lam * s lam = 1 ∧ IsUnit (ι Bt - s lam * (ι a + ι b * Θ)) := by
+theorem core {R S : Type} [CommRing R] [CommRing S] (ι : R →+* S) (s : S →+* S) (Θ : S) (D Bt P Q a b : R)
+    (hΘ : Θ ^ 2 = ι D) (hsΘ : s Θ = -Θ) (hsι : ∀ r, s (ι r) = ι r) (hPQ : P ^ 2 - D * Q ^ 2 = 1)
+    (Bi K i4 : R) (hB : Bt * Bi = 1) (hK : Q * D * K = 1) (h4 : (4 : R) * i4 = 1) (hU : UnitChoice R) :
+    ∃ lam : S, lam * s lam = 1 ∧ IsUnit (ι Bt - s lam * (ι a + ι b * Θ)) := by
   let p : Fin 4 → R := ![1, -1, P, -P]
   let q : Fin 4 → R := ![0, 0, Q, -Q]
   have hnorm : ∀ i, p i ^ 2 - D * q i ^ 2 = 1 := by
     intro i
     fin_cases i <;> simp [p, q] <;> linear_combination hPQ
-  obtain ⟨f, hf⟩
-      : ∃ f : Fin 4 → R, ∀ i,
-        f i = (Bt - p i * a + q i * b * D) ^ 2 - D * (q i * a - p i * b) ^ 2 :=
-    ⟨_, fun _ => rfl⟩
+  obtain ⟨f, hf⟩ : ∃ f : Fin 4 → R, ∀ i,
+      f i = (Bt - p i * a + q i * b * D) ^ 2 - D * (q i * a - p i * b) ^ 2 := ⟨_, fun _ => rfl⟩
   have hspan : Ideal.span (Set.range f) = ⊤ := by
     set I := Ideal.span (Set.range f) with hI
     have hm : ∀ i, f i ∈ I := fun i => Ideal.subset_span ⟨i, rfl⟩
@@ -88,7 +120,8 @@ theorem core
       rw [h]
       exact I.mul_mem_left _ (sub_mem (hm 3) (hm 2))
     have hb : b ∈ I := by
-      have h : b = K * (P * a - (P * a - Q * b * D)) := by linear_combination (-b) * hK
+      have h : b = K * (P * a - (P * a - Q * b * D)) := by
+        linear_combination (-b) * hK
       rw [h]
       exact I.mul_mem_left _ (sub_mem (I.mul_mem_left _ ha) hx)
     have h1 : (1 : R) = Bi ^ 2 * f 0 + (Bi ^ 2 * (2 * Bt - a)) * a + (Bi ^ 2 * D * b) * b := by
@@ -103,10 +136,10 @@ theorem core
   have horS : ∀ i j, i ≠ j → ι (e i) * ι (e j) = 0 := fun i j h => by
     rw [← map_mul, hor i j h, map_zero]
   have hE1 : ∑ i, ι (e i) = 1 := by rw [← map_sum, hsum1, map_one]
-  have hsl
-      : s (∑ i, ι (e i) * (ι (p i) + ι (q i) * Θ)) = ∑ i, ι (e i) * (ι (p i) - ι (q i) * Θ) := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+  have hsl : s (∑ i, ι (e i) * (ι (p i) + ι (q i) * Θ)) =
+      ∑ i, ι (e i) * (ι (p i) - ι (q i) * Θ) := by
+
+    rw [map_sum]
     refine Finset.sum_congr rfl fun i _ => ?_
     rw [map_mul, map_add (f := _), map_mul, hsι, hsι, hsι, hsΘ]
     ring
@@ -118,30 +151,25 @@ theorem core
     exact hE1
   · rw [hsl]
     set w := ι a + ι b * Θ with hw
-    have hz
-        : ι Bt - (∑ i, ι (e i) * (ι (p i) - ι (q i) * Θ)) * w
-          = ∑ i, ι (e i) * (ι Bt - (ι (p i) - ι (q i) * Θ) * w) := by
-      have h
-          : ∑ i, ι (e i) * (ι Bt - (ι (p i) - ι (q i) * Θ) * w)
-            = (∑ i, ι (e i)) * ι Bt - (∑ i, ι (e i) * (ι (p i) - ι (q i) * Θ)) * w := by
+    have hz : ι Bt - (∑ i, ι (e i) * (ι (p i) - ι (q i) * Θ)) * w =
+        ∑ i, ι (e i) * (ι Bt - (ι (p i) - ι (q i) * Θ) * w) := by
+      have h : ∑ i, ι (e i) * (ι Bt - (ι (p i) - ι (q i) * Θ) * w) =
+          (∑ i, ι (e i)) * ι Bt - (∑ i, ι (e i) * (ι (p i) - ι (q i) * Θ)) * w := by
         rw [Finset.sum_mul, Finset.sum_mul, ← Finset.sum_sub_distrib]
         exact Finset.sum_congr rfl fun i _ => by ring
       rw [h, hE1, one_mul]
     rw [hz]
-    have hsz
-        : s (∑ i, ι (e i) * (ι Bt - (ι (p i) - ι (q i) * Θ) * w))
-          = ∑ i, ι (e i) * (ι Bt - (ι (p i) + ι (q i) * Θ) * (ι a - ι b * Θ)) := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum]
+    have hsz : s (∑ i, ι (e i) * (ι Bt - (ι (p i) - ι (q i) * Θ) * w)) =
+        ∑ i, ι (e i) * (ι Bt - (ι (p i) + ι (q i) * Θ) * (ι a - ι b * Θ)) := by
+
+      rw [map_sum]
       refine Finset.sum_congr rfl fun i _ => ?_
       simp only [hw, map_mul, map_sub, map_add (f := _), hsι, hsΘ]
       ring
-    have hprod
-        : (∑ i, ι (e i) * (ι Bt - (ι (p i) - ι (q i) * Θ) * w))
-            * s (∑ i, ι (e i) * (ι Bt - (ι (p i) - ι (q i) * Θ) * w))
-          = ι (∑ i, e i * f i) := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [hsz, glue_mul _ hidS horS, map_sum]
+    have hprod : (∑ i, ι (e i) * (ι Bt - (ι (p i) - ι (q i) * Θ) * w)) *
+        s (∑ i, ι (e i) * (ι Bt - (ι (p i) - ι (q i) * Θ) * w)) = ι (∑ i, e i * f i) := by
+
+      rw [hsz, glue_mul _ hidS horS, map_sum]
       refine Finset.sum_congr rfl fun i _ => ?_
       rw [hw, norm_id _ _ _ _ _ _ _ hΘ, hf i, map_mul]
       simp only [map_sub, map_add (f := _), map_mul, map_pow]
@@ -154,26 +182,25 @@ section Tensor
 variable {F E : Type} [Field F] [Field E] [Algebra F E] (σ : E →ₐ[F] E)
 variable (R : Type) [CommRing R] [Algebra F R]
 
-theorem sigR_algebraMap (r : R)
-    : sigR R σ (algebraMap R (R ⊗[F] E) r) = algebraMap R (R ⊗[F] E) r := by
+theorem sigR_algebraMap (r : R) :
+    sigR R σ (algebraMap R (R ⊗[F] E) r) = algebraMap R (R ⊗[F] E) r := by
   rw [Algebra.TensorProduct.algebraMap_apply]
   simp [sigR]
 
-theorem sigR_tmul (r : R) (x : E) : sigR R σ (r ⊗ₜ x) = r ⊗ₜ σ x := by simp [sigR]
+theorem sigR_tmul (r : R) (x : E) : sigR R σ (r ⊗ₜ x) = r ⊗ₜ σ x := by
+  simp [sigR]
 
-theorem decomp
-    (θ : E) (hspan : ∀ e : E, ∃ p q : F, e = algebraMap F E p + algebraMap F E q * θ) (z : R ⊗[F] E)
-    : ∃ a b : R, z = algebraMap R (R ⊗[F] E) a + algebraMap R (R ⊗[F] E) b * (1 ⊗ₜ θ) := by
+theorem decomp (θ : E) (hspan : ∀ e : E, ∃ p q : F, e = algebraMap F E p + algebraMap F E q * θ)
+    (z : R ⊗[F] E) : ∃ a b : R, z = algebraMap R (R ⊗[F] E) a + algebraMap R (R ⊗[F] E) b * (1 ⊗ₜ θ) := by
   have hidR : ∀ x : R, algebraMap R R x = x := fun _ => rfl
   induction z using TensorProduct.induction_on with
   | zero => exact ⟨0, 0, by simp⟩
   | tmul r x =>
     obtain ⟨p, q, rfl⟩ := hspan x
     refine ⟨p • r, q • r, ?_⟩
-    simp only [Algebra.TensorProduct.algebraMap_apply, hidR, Algebra.TensorProduct.tmul_mul_tmul,
-      mul_one, one_mul, TensorProduct.tmul_add]
-    rw [TensorProduct.smul_tmul, TensorProduct.smul_tmul, Algebra.smul_def, Algebra.smul_def,
-      mul_one]
+    simp only [Algebra.TensorProduct.algebraMap_apply, hidR,
+      Algebra.TensorProduct.tmul_mul_tmul, mul_one, one_mul, TensorProduct.tmul_add]
+    rw [TensorProduct.smul_tmul, TensorProduct.smul_tmul, Algebra.smul_def, Algebra.smul_def, mul_one]
   | add x y hx hy =>
     obtain ⟨a1, b1, rfl⟩ := hx
     obtain ⟨a2, b2, rfl⟩ := hy
@@ -202,13 +229,15 @@ theorem stLam_of (hQ : QuadGen) : StLam := by
     · exact div_ne_zero (mul_ne_zero two_ne_zero hT0) hTd
   have hidR : ∀ x : R, algebraMap R R x = x := fun _ => rfl
   have hβS : algebraMap F (R ⊗[F] E) β = algebraMap R (R ⊗[F] E) (algebraMap F R β) := by
-    rw [Algebra.TensorProduct.algebraMap_apply, Algebra.TensorProduct.algebraMap_apply, hidR]
+    rw [Algebra.TensorProduct.algebraMap_apply, Algebra.TensorProduct.algebraMap_apply,
+      hidR]
   rw [hβS]
-  refine core (algebraMap R (R ⊗[F] E)) (sigR R σ) (1 ⊗ₜ θ) (algebraMap F R d) (algebraMap F R β)
-    (algebraMap F R P) (algebraMap F R Q) a b ?_ ?_ ?_ ?_ (algebraMap F R β⁻¹)
-    (algebraMap F R (Q * d)⁻¹) (algebraMap F R (1 / 4)) ?_ ?_ ?_ hU
-  · rw [Algebra.TensorProduct.tmul_pow, one_pow, hθ, Algebra.TensorProduct.algebraMap_apply, hidR,
-      Algebra.algebraMap_eq_smul_one d, Algebra.algebraMap_eq_smul_one d, TensorProduct.smul_tmul]
+  refine core (algebraMap R (R ⊗[F] E)) (sigR R σ) (1 ⊗ₜ θ) (algebraMap F R d)
+    (algebraMap F R β) (algebraMap F R P) (algebraMap F R Q) a b ?_ ?_ ?_ ?_
+    (algebraMap F R β⁻¹) (algebraMap F R (Q * d)⁻¹) (algebraMap F R (1 / 4)) ?_ ?_ ?_ hU
+  · rw [Algebra.TensorProduct.tmul_pow, one_pow, hθ, Algebra.TensorProduct.algebraMap_apply,
+      hidR, Algebra.algebraMap_eq_smul_one d, Algebra.algebraMap_eq_smul_one d,
+      TensorProduct.smul_tmul]
   · rw [sigR_tmul, hσθ, TensorProduct.tmul_neg]
   · exact fun r => sigR_algebraMap σ R r
   · rw [← map_pow, ← map_pow, ← map_mul, ← map_sub, hPQ, map_one]
@@ -250,23 +279,22 @@ theorem quadGen : QuadGen := by
       rw [map_mul, map_neg, map_inv₀]
       linear_combination (-(algebraMap F E t)⁻¹) * hst + e * h'
   have hcard : Fintype.card (Fin 2) = Module.finrank F E := by rw [hfin, Fintype.card_fin]
-  obtain ⟨Bs, hBs⟩ : ∃ Bs : Module.Basis (Fin 2) F E, ⇑Bs = ![(1 : E), e] := ⟨
-    basisOfLinearIndependentOfCardEqFinrank hli hcard,
-    coe_basisOfLinearIndependentOfCardEqFinrank hli hcard
-  ⟩
+  obtain ⟨Bs, hBs⟩ : ∃ Bs : Module.Basis (Fin 2) F E, ⇑Bs = ![(1 : E), e] :=
+    ⟨basisOfLinearIndependentOfCardEqFinrank hli hcard,
+      coe_basisOfLinearIndependentOfCardEqFinrank hli hcard⟩
   have hspan : ∀ x : E, ∃ c0 c1 : F, x = algebraMap F E c0 + algebraMap F E c1 * e := by
     intro x
     refine ⟨Bs.repr x 0, Bs.repr x 1, ?_⟩
     nth_rewrite 1 [← Bs.sum_repr x]
     rw [Fin.sum_univ_two, hBs]
-    simp only [Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.head_cons, Algebra.smul_def,
-      mul_one]
+    simp only [Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.head_cons, Algebra.smul_def, mul_one]
   obtain ⟨v, u, hsq⟩ := hspan (e ^ 2)
   have hse : σ e ≠ e := fun h => he ((hfix e).mp h)
   have hσsq : σ e ^ 2 = algebraMap F E v + algebraMap F E u * σ e := by
     rw [← map_pow, hsq, map_add (f := _), map_mul, AlgHom.commutes, AlgHom.commutes]
   have hsum : σ e = algebraMap F E u - e := by
-    have h0 : (σ e - e) * (σ e + e - algebraMap F E u) = 0 := by linear_combination hσsq - hsq
+    have h0 : (σ e - e) * (σ e + e - algebraMap F E u) = 0 := by
+      linear_combination hσsq - hsq
     rcases mul_eq_zero.mp h0 with h | h
     · exact absurd (sub_eq_zero.mp h) hse
     · linear_combination h

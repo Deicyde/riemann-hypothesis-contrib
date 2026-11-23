@@ -1,13 +1,61 @@
 module
 
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArakelovVolumes.UpperBounds.MeasInvStatementPfF
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArakelovVolumes.UpperBounds.MeasInvStatementPfI
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Coalgebra.IsFrobenius
+import Mathlib.RingTheory.HopfAlgebra.Basic
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Lemma
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArakelovVolumes.UpperBounds.MeasInvStatementPfG
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArakelovVolumes.UpperBounds.MeasInvStatementPfJ
 
 @[expose] public section
 
 namespace ReciprocityTheory.ChartRestriction.G.AR.Up.MI
 
-open NumberField Matrix MeasureTheory ReciprocityTheory.ChartRestriction.G.FD
-  ReciprocityTheory.ChartRestriction.G.FD.FrameDegreeData Finset
+open NumberField Matrix MeasureTheory ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.FD.FrameDegreeData Finset
 open scoped ComplexConjugate
 
 noncomputable section
@@ -36,25 +84,21 @@ lemma det_Nmat (x : LoI X.Ψ r → ℂ) (τ : X.Ψ) : (Nmat x τ).det = 1 := by
   rw [Matrix.of_apply, dite_eq_right (lt_irrefl a)]
   simp
 
-private theorem det_gram' (τ : X.Ψ) (M : Matrix (Fin r) (Fin r) ℂ)
-    : (ReciprocityTheory.ChartRestriction.G.FD.gram τ.1 X.Gm M).det
-      = M.det * (X.Gm.map τ.1).det * (starRingEnd ℂ) M.det := by
-  have e
-      : ReciprocityTheory.ChartRestriction.G.FD.gram τ.1 X.Gm M
-        = Mᵀ * X.Gm.map τ.1 * M.map (starRingEnd ℂ) := by
+private theorem det_gram' (τ : X.Ψ) (M : Matrix (Fin r) (Fin r) ℂ) :
+    (ReciprocityTheory.ChartRestriction.G.FD.gram τ.1 X.Gm M).det = M.det * (X.Gm.map τ.1).det * (starRingEnd ℂ) M.det := by
+  have e : ReciprocityTheory.ChartRestriction.G.FD.gram τ.1 X.Gm M = Mᵀ * X.Gm.map τ.1 * M.map (starRingEnd ℂ) := by
     ext a b
-    simp only [ReciprocityTheory.ChartRestriction.G.FD.gram,
-      ReciprocityTheory.ChartRestriction.G.FD.hermC, ReciprocityTheory.ChartRestriction.G.FD.col,
-      Matrix.of_apply, Matrix.mul_apply, Matrix.transpose_apply, Matrix.map_apply, Finset.sum_mul]
-    first | exact Finset.sum_comm | rw [Finset.sum_comm]
+    simp only [ReciprocityTheory.ChartRestriction.G.FD.gram, ReciprocityTheory.ChartRestriction.G.FD.hermC, ReciprocityTheory.ChartRestriction.G.FD.col, Matrix.of_apply, Matrix.mul_apply, Matrix.transpose_apply,
+      Matrix.map_apply, Finset.sum_mul]
+    first
+    | exact Finset.sum_comm
   have hc : (M.map (starRingEnd ℂ)).det = (starRingEnd ℂ) M.det := by
     rw [RingHom.map_det]
     rfl
   rw [e, Matrix.det_mul, Matrix.det_mul, Matrix.det_transpose, hc]
 
-private theorem norm_det_mat_mul_norm_det_Gm_mul_norm_det_eq_one
-    {x0 : Frame X.Ψ r} (hx0 : X.IsOrtho x0) (τ : X.Ψ)
-    : ‖(mat x0 τ).det‖ * ‖(X.Gm.map τ.1).det‖ * ‖(mat x0 τ).det‖ = 1 := by
+private theorem norm_det_mat_mul_norm_det_Gm_mul_norm_det_eq_one {x0 : Frame X.Ψ r} (hx0 : X.IsOrtho x0) (τ : X.Ψ) :
+    ‖(mat x0 τ).det‖ * ‖(X.Gm.map τ.1).det‖ * ‖(mat x0 τ).det‖ = 1 := by
   have h := congrArg Matrix.det (hx0 τ)
   rw [det_gram', Matrix.det_diagonal] at h
   have hn : ‖(mat x0 τ).det * (X.Gm.map τ.1).det * (starRingEnd ℂ) (mat x0 τ).det‖ = 1 := by
@@ -72,7 +116,6 @@ lemma norm_dmin_last {x0 : Frame X.Ψ r} (hx0 : X.IsOrtho x0) (x : LoI X.Ψ r �
     first
     | rfl
     | (congr 1)
-    | simp
   have hdm : (mat (rmul x0 (NF X x)) τ).det = (mat x0 τ).det := by
     show (mat x0 τ * Nmat x τ).det = _
     rw [Matrix.det_mul, det_Nmat, mul_one]
@@ -89,10 +132,7 @@ def gI (x0 : Frame X.Ψ r) (φ : Frame X.Ψ r → ENNReal) (v : Ix X.Ψ r → �
   φ (rmul x0 (uf X v)) * Wf X (rmul x0 (uf X v))
 
 def GLo (x0 : Frame X.Ψ r) (φ : Frame X.Ψ r → ENNReal) (x : LoI X.Ψ r → ℂ) : ENNReal :=
-  if rmul x0 (NF X x) ∈ X.dom then
-    φ (rmul x0 (NF X x)) * ENNReal.ofReal (densY X (rmul x0 (NF X x)))
-  else
-    0
+  if rmul x0 (NF X x) ∈ X.dom then φ (rmul x0 (NF X x)) * ENNReal.ofReal (densY X (rmul x0 (NF X x))) else 0
 
 lemma uf_lu_eS (x : LoI X.Ψ r → ℂ) (y : UpI X.Ψ r → ℂ) :
     uf X (lu ((eS X.Ψ r).symm (x, y))) = rmul (NF X x) (UF X y) := by
@@ -103,24 +143,16 @@ lemma uf_lu_eS (x : LoI X.Ψ r → ℂ) (y : UpI X.Ψ r → ℂ) :
     · have hab : a ≠ b := ne_of_gt h
       first
       | simp [sl, Nmat, Matrix.one_apply, eS, h, hab, MeasurableEquiv.piEquivPiSubtypeProd_symm_apply]
-      | simp [sl, Nmat, Matrix.one_apply, eS, h, hab, MeasurableEquiv.piEquivPiSubtypeProd, Equiv.piEquivPiSubtypeProd_symm_apply]
-      | simp [sl, Nmat, Matrix.one_apply, eS, h, hab, MeasurableEquiv.piEquivPiSubtypeProd, Equiv.piEquivPiSubtypeProd, MeasurableEquiv.symm]
     · first
       | simp [sl, Nmat, Matrix.one_apply, eS, h, MeasurableEquiv.piEquivPiSubtypeProd_symm_apply]
-      | simp [sl, Nmat, Matrix.one_apply, eS, h, MeasurableEquiv.piEquivPiSubtypeProd, Equiv.piEquivPiSubtypeProd_symm_apply]
-      | simp [sl, Nmat, Matrix.one_apply, eS, h, MeasurableEquiv.piEquivPiSubtypeProd, Equiv.piEquivPiSubtypeProd, MeasurableEquiv.symm]
   have h2 : ∀ τ : X.Ψ, up ((eS X.Ψ r).symm (x, y)) τ = Umat y τ := by
     intro τ
     ext a b
     by_cases h : b < a
     · first
       | simp [up, Umat, eS, h, MeasurableEquiv.piEquivPiSubtypeProd_symm_apply]
-      | simp [up, Umat, eS, h, MeasurableEquiv.piEquivPiSubtypeProd, Equiv.piEquivPiSubtypeProd_symm_apply]
-      | simp [up, Umat, eS, h, MeasurableEquiv.piEquivPiSubtypeProd, Equiv.piEquivPiSubtypeProd, MeasurableEquiv.symm]
     · first
       | simp [up, Umat, eS, h, MeasurableEquiv.piEquivPiSubtypeProd_symm_apply]
-      | simp [up, Umat, eS, h, MeasurableEquiv.piEquivPiSubtypeProd, Equiv.piEquivPiSubtypeProd_symm_apply]
-      | simp [up, Umat, eS, h, MeasurableEquiv.piEquivPiSubtypeProd, Equiv.piEquivPiSubtypeProd, MeasurableEquiv.symm]
   funext τ a b
   show ((1 + sl ((eS X.Ψ r).symm (x, y)) τ) * up ((eS X.Ψ r).symm (x, y)) τ) a b =
     (Nmat x τ * Umat y τ) a b
@@ -134,7 +166,6 @@ lemma continuous_uf : Continuous (uf X) := by
   unfold uf
   first
   | fun_prop
-  | exact continuous_pi fun τ => continuous_pi fun a => continuous_pi fun b => continuous_apply _
 
 lemma densY_eq {y : Frame X.Ψ r} :
     densY X y = (∏ τ, ∏ i : Fin r, ‖dmin X.Gm y τ i.castSucc‖ ^ 2)⁻¹ := by
@@ -145,31 +176,19 @@ lemma densY_eq {y : Frame X.Ψ r} :
   refine Finset.prod_congr rfl fun i _ => ?_
   first
   | simp only [_root_.zpow_neg, zpow_ofNat]
-  | simp [_root_.zpow_neg]
-  | norm_num [_root_.zpow_neg]
 
-theorem inner_eq
-    {x0 : Frame X.Ψ r} (hx0 : X.IsOrtho x0)
-    {φ : Frame X.Ψ r → ENNReal} (hφ : ∀ x ∈ X.dom, ∀ b ∈ Bor X.Ψ r, φ (rmul x b) = φ x)
-    (x : LoI X.Ψ r → ℂ)
-    : ∫⁻ y, (if ∀ τ b, y (dI τ b) ≠ 0 then
-        ENNReal.ofReal (Complex.normSq (jacU y)) * gI X x0 φ (lu ((eS X.Ψ r).symm (x, y))) else 0)
-      = GLo X x0 φ x * K0 X.Ψ r := by
+theorem inner_eq {x0 : Frame X.Ψ r} (hx0 : X.IsOrtho x0) {φ : Frame X.Ψ r → ENNReal}
+    (hφ : ∀ x ∈ X.dom, ∀ b ∈ Bor X.Ψ r, φ (rmul x b) = φ x) (x : LoI X.Ψ r → ℂ) :
+    ∫⁻ y, (if ∀ τ b, y (dI τ b) ≠ 0 then
+      ENNReal.ofReal (Complex.normSq (jacU y)) * gI X x0 φ (lu ((eS X.Ψ r).symm (x, y))) else 0) =
+      GLo X x0 φ x * K0 X.Ψ r := by
   set Y := rmul x0 (NF X x) with hYd
-  have hrw
-      : ∀ y,
-        gI X x0 φ (lu ((eS X.Ψ r).symm (x, y))) = φ (rmul Y (UF X y)) * Wf X (rmul Y (UF X y)) := by
+  have hrw : ∀ y, gI X x0 φ (lu ((eS X.Ψ r).symm (x, y))) = φ (rmul Y (UF X y)) * Wf X (rmul Y (UF X y)) := by
     intro y; simp only [gI, uf_lu_eS, rmul_assoc', hYd]
   by_cases hY : Y ∈ X.dom
-  · have hpt
-        : ∀ y,
-          (if ∀ τ b, y (dI τ b) ≠ 0 then
-             ENNReal.ofReal (Complex.normSq (jacU y)) * gI X x0 φ (lu ((eS X.Ψ r).symm (x, y)))
-           else
-             0)
-            = φ Y
-              * (ENNReal.ofReal (Complex.normSq (jacU y))
-                * (Cy X.Ψ r).indicator 1 (Lβ (β0 X Y) y)) := by
+  · have hpt : ∀ y, (if ∀ τ b, y (dI τ b) ≠ 0 then
+        ENNReal.ofReal (Complex.normSq (jacU y)) * gI X x0 φ (lu ((eS X.Ψ r).symm (x, y))) else 0) =
+        φ Y * (ENNReal.ofReal (Complex.normSq (jacU y)) * (Cy X.Ψ r).indicator 1 (Lβ (β0 X Y) y)) := by
       intro y
       split_ifs with hd
       · rw [hrw, hφ Y hY _ (UF_mem X hd), Wf_rmul_UF X hY hd]; ring
@@ -179,8 +198,7 @@ theorem inner_eq
           have := ((hC (dI τ b)).1 rfl).1
           rw [Lβ_diag _ (β0_upper X hY) y τ b, hb, mul_zero, norm_zero] at this
           norm_num at this
-        rw [Set.indicator_of_notMem hC]
-        simp
+        rw [Set.indicator_of_notMem hC]; simp
     have hmeas : Measurable fun y : UpI X.Ψ r → ℂ =>
         ENNReal.ofReal (Complex.normSq (jacU y)) * (Cy X.Ψ r).indicator 1 (Lβ (β0 X Y) y) :=
       measurable_normSq_jacU.mul ((measurable_one.indicator measurableSet_Cy).comp
@@ -191,29 +209,20 @@ theorem inner_eq
       exact (abs_re_pos X hY τ b).ne this
     rw [lintegral_congr hpt, lintegral_const_mul _ hmeas, lintegral_upper _ (β0_upper X hY) hdiag,
       exponent_identity X hY (norm_dmin_last X hx0 x), GLo, if_pos hY, densY_eq, mul_assoc]
-  · have hpt
-        : ∀ y,
-          (if ∀ τ b, y (dI τ b) ≠ 0 then
-             ENNReal.ofReal (Complex.normSq (jacU y)) * gI X x0 φ (lu ((eS X.Ψ r).symm (x, y)))
-           else
-             0)
-            = 0 := by
+  · have hpt : ∀ y, (if ∀ τ b, y (dI τ b) ≠ 0 then
+        ENNReal.ofReal (Complex.normSq (jacU y)) * gI X x0 φ (lu ((eS X.Ψ r).symm (x, y))) else 0) = 0 := by
       intro y
       split_ifs with hd
       · rw [hrw, Wf_rmul_not_dom X hY (UF_mem X hd), mul_zero, mul_zero]
       · rfl
     rw [lintegral_congr hpt, lintegral_zero, GLo, if_neg hY, zero_mul]
 
-theorem core
-    {x0 : Frame X.Ψ r} (hx0 : X.IsOrtho x0)
-    {φ : Frame X.Ψ r → ENNReal}
-    (hφm : Measurable φ) (hφ : ∀ x ∈ X.dom, ∀ b ∈ Bor X.Ψ r, φ (rmul x b) = φ x)
-    : (∫⁻ x, GLo X x0 φ x) * K0 X.Ψ r
-      = ENNReal.ofReal (∏ τ : X.Ψ, ‖(X.Gm.map τ.1).det‖ ^ r)
-        * ∫⁻ v, φ (uf X v) * Wf X (uf X v) := by
+theorem core {x0 : Frame X.Ψ r} (hx0 : X.IsOrtho x0) {φ : Frame X.Ψ r → ENNReal} (hφm : Measurable φ)
+    (hφ : ∀ x ∈ X.dom, ∀ b ∈ Bor X.Ψ r, φ (rmul x b) = φ x) :
+    (∫⁻ x, GLo X x0 φ x) * K0 X.Ψ r =
+      ENNReal.ofReal (∏ τ : X.Ψ, ‖(X.Gm.map τ.1).det‖ ^ r) * ∫⁻ v, φ (uf X v) * Wf X (uf X v) := by
   have hF : Measurable fun v => φ (uf X v) * Wf X (uf X v) :=
-    (hφm.comp (continuous_uf X).measurable).mul
-      ((measurable_Wf X).comp (continuous_uf X).measurable)
+    (hφm.comp (continuous_uf X).measurable).mul ((measurable_Wf X).comp (continuous_uf X).measurable)
   have hdet : ∀ τ, (mat x0 τ).det ≠ 0 := fun τ h0 => by
     have := normSq_det_orthogonalFrame X hx0 τ
     rw [h0, map_zero, zero_mul] at this
@@ -223,11 +232,8 @@ theorem core
     exact this
   have h1 := lintegral_flat hg
   simp only [inner_eq X hx0 hφ] at h1
-  have h2
-      : ∫⁻ v, gI X x0 φ v
-        = ENNReal.ofReal (Complex.normSq (∏ τ, (mat x0 τ).det ^ r))⁻¹
-          * ∫⁻ v, φ (uf X v) * Wf X (uf X v) :=
-    lintegral_comp_LA (fun τ => mat x0 τ) hdet hF
+  have h2 : ∫⁻ v, gI X x0 φ v = ENNReal.ofReal (Complex.normSq (∏ τ, (mat x0 τ).det ^ r))⁻¹ *
+      ∫⁻ v, φ (uf X v) * Wf X (uf X v) := lintegral_comp_LA (fun τ => mat x0 τ) hdet hF
   rw [← lintegral_mul_const' _ _ (measureConstant_lt_top (ι := X.Ψ) (r := r)).ne, ← h1, h2]
   congr 2
   rw [map_prod, ← Finset.prod_inv_distrib]

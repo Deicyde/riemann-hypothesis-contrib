@@ -1,8 +1,46 @@
 module
 
-public import Mathlib
 public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.GramSubstitutionIntegral.IntegralSubst
 public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.GramSubstitutionIntegral.HasSubstGood
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -26,8 +64,8 @@ theorem good_X {σ : Type*} (i : σ) : Good (Xv (p := p) i) := by
   rw [MvPowerSeries.coeff_X]
   split_ifs <;> simp
 
-theorem hP_fst {κ : Type*} [Fintype κ] (x y : κ → ℂ_[p] × ℂ_[p])
-    : (hP x y).1 = ∑ i, (x i).1 * (y i).2 := by
+theorem hP_fst {κ : Type*} [Fintype κ] (x y : κ → ℂ_[p] × ℂ_[p]) :
+    (hP x y).1 = ∑ i, (x i).1 * (y i).2 := by
   unfold hP
   rw [Prod.fst_sum]
   rfl
@@ -36,9 +74,8 @@ theorem column_of (hE : Expand) : Column := by
   intro p _ l ex ph S H k c d hcd
   have hg : ∀ j, Good (mulBy l ex (c j) (Xv j : MvPowerSeries (Fin k) ℂ_[p])) := fun j =>
     goodMul p l ex ph S H (Fin k) (c j, d j) (hcd j) _ (good_X j)
-  have e
-      : lin l ex c (fun j => (Xv j : MvPowerSeries (Fin k) ℂ_[p]))
-        = pt ex (∑ j, lg l (mulBy l ex (c j) (Xv j))) := by
+  have e : lin l ex c (fun j => (Xv j : MvPowerSeries (Fin k) ℂ_[p])) =
+      pt ex (∑ j, lg l (mulBy l ex (c j) (Xv j))) := by
     unfold lin
     congr 1
     refine Finset.sum_congr rfl fun j _ => ?_
@@ -47,51 +84,41 @@ theorem column_of (hE : Expand) : Column := by
   rw [e]
   refine sTrans (hE p l ex ph S H (Fin k) k _ hg) (sAdd ?_ ?_)
   · exact sSum _ fun j _ => normSub p l ex ph S H (Fin k) (c j, d j) (hcd j) _ (good_X j)
-  · exact sSum _ fun j _ =>
-      sSum _ fun j' _ =>
-        moveSub p l ex ph S H (Fin k) (c j, d j) (c j', d j') (hcd j) (hcd j') _ _ (good_X j)
-          (good_X j')
+  · exact sSum _ fun j _ => sSum _ fun j' _ =>
+      moveSub p l ex ph S H (Fin k) (c j, d j) (c j', d j') (hcd j) (hcd j') _ _ (good_X j) (good_X j')
 
 theorem gather_of (hSF : SumFirst) : Gather := by
   intro p _ l ex ph S H hC κ _ k A hA
-  have hcol
-      : ∀ i,
-        Simeq
-          (phAt ph (lin l ex (fun e => (A e i).1) (fun e => (Xv e : MvPowerSeries (Fin k) ℂ_[p]))))
-          (∑ j, MvPowerSeries.C ((A j i).1 * (A j i).2) * phAt ph (Xv j)
-            + ∑ j, ∑ j' ∈ Finset.univ.filter (fun j' => j < j'),
-                be l ex ph (mulBy l ex ((A j' i).2 * (A j i).1) (Xv j)) (Xv j')) := fun i =>
-    hC k (fun j => (A j i).1) (fun j => (A j i).2) (fun j => by simpa using hA j i)
+  have hcol : ∀ i, Simeq (phAt ph (lin l ex (fun e => (A e i).1) (fun e => (Xv e : MvPowerSeries (Fin k) ℂ_[p]))))
+      (∑ j, MvPowerSeries.C ((A j i).1 * (A j i).2) * phAt ph (Xv j) +
+        ∑ j, ∑ j' ∈ Finset.univ.filter (fun j' => j < j'),
+          be l ex ph (mulBy l ex ((A j' i).2 * (A j i).1) (Xv j)) (Xv j')) :=
+    fun i => hC k (fun j => (A j i).1) (fun j => (A j i).2) (fun j => by simpa using hA j i)
   unfold PhOn GramRhs
   refine sTrans (sSum Finset.univ fun i _ => hcol i) ?_
   rw [Finset.sum_add_distrib]
   refine sAdd (sOfEq ?_) ?_
   · rw [Finset.sum_comm]
     refine Finset.sum_congr rfl fun j _ => ?_
-    set_option synthInstance.maxHeartbeats 100000 in
+
     rw [← Finset.sum_mul, ← map_sum, hP_fst]
-  · have e1
-        : (∑ i, ∑ j, ∑ j' ∈ Finset.univ.filter (fun j' => j < j'),
-              be l ex ph (mulBy l ex ((A j' i).2 * (A j i).1) (Xv j)) (Xv j')
-            : MvPowerSeries (Fin k) ℂ_[p])
-          = ∑ j, ∑ j' ∈ Finset.univ.filter (fun j' => j < j'), ∑ i,
-              be l ex ph (mulBy l ex ((A j' i).2 * (A j i).1) (Xv j)) (Xv j') := by
+  · have e1 : (∑ i, ∑ j, ∑ j' ∈ Finset.univ.filter (fun j' => j < j'),
+          be l ex ph (mulBy l ex ((A j' i).2 * (A j i).1) (Xv j)) (Xv j') : MvPowerSeries (Fin k) ℂ_[p]) =
+        ∑ j, ∑ j' ∈ Finset.univ.filter (fun j' => j < j'), ∑ i,
+          be l ex ph (mulBy l ex ((A j' i).2 * (A j i).1) (Xv j)) (Xv j') := by
       rw [Finset.sum_comm]
       refine Finset.sum_congr rfl fun j _ => ?_
       rw [Finset.sum_comm]
     rw [e1]
     refine sSum _ fun j _ => sSum _ fun j' _ => ?_
-    have hg
-        : ∀ i ∈ (Finset.univ : Finset κ),
-          Good (mulBy l ex ((A j' i).2 * (A j i).1) (Xv j : MvPowerSeries (Fin k) ℂ_[p])) := by
+    have hg : ∀ i ∈ (Finset.univ : Finset κ),
+        Good (mulBy l ex ((A j' i).2 * (A j i).1) (Xv j : MvPowerSeries (Fin k) ℂ_[p])) := by
       intro i _
       rw [← mulBy_mulBy H.data _ _ (cc_X _)]
       exact goodMul p l ex ph S H (Fin k) (A j' i).swap (H.swap _ (hA j' i)) _
         (goodMul p l ex ph S H (Fin k) (A j i) (hA j i) _ (good_X j))
-    have h :=
-      hSF p l ex ph S H (Fin k) κ Finset.univ
-        (fun i => (A j' i).2 * (A j i).1)
-        (Xv j) (Xv j') (good_X j) (good_X j') hg
+    have h := hSF p l ex ph S H (Fin k) κ Finset.univ (fun i => (A j' i).2 * (A j i).1) (Xv j) (Xv j')
+      (good_X j) (good_X j') hg
     have e2 : (hP (A j) (A j')).1 = ∑ i, (A j' i).2 * (A j i).1 := by
       rw [hP_fst]
       exact Finset.sum_congr rfl fun i _ => mul_comm _ _

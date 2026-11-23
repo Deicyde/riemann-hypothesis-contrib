@@ -1,9 +1,57 @@
 module
 
-public import Mathlib
 public import GroundTheory.HeightsAndTheta.Heights.HilbertSamuel.StatementsProjAvoidingForm
+public import GroundTheory.HeightsAndTheta.Heights.HilbertSamuel.StatementsSegreArith
 public import GroundTheory.HeightsAndTheta.Heights.HilbertSamuel.ExistsHomogeneousComponentNeZero
 public import GroundTheory.HeightsAndTheta.Heights.HilbertSamuel.PRatNoetherFrame
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.LemCone
 
 @[expose] public section
 
@@ -11,14 +59,12 @@ set_option maxSynthPendingDepth 1
 
 namespace GroundTheory.Heights₂.Heights.HilbertSamuel
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
-  ReciprocityTheory.ChartRestriction.G.ArakelovGeometry ProjAvoidingForm
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.ArakelovGeometry ProjAvoidingForm
 
 noncomputable section
 
-theorem ProjAvoidingForm.constantCoeff_homogeneousComponent
-    {σ : Type} {G : MvPolynomial σ ℚ} {d : ℕ} (hd : 0 < d)
-    : constantCoeff (homogeneousComponent d G) = 0 := by
+theorem ProjAvoidingForm.constantCoeff_homogeneousComponent {σ : Type} {G : MvPolynomial σ ℚ} {d : ℕ}
+    (hd : 0 < d) : constantCoeff (homogeneousComponent d G) = 0 := by
   show AddMonoidAlgebra.coeff (homogeneousComponent d G) 0 = 0
   rw [coeff_homogeneousComponent]
   split_ifs with h
@@ -37,7 +83,8 @@ theorem ProjAvoidingForm.proof (hSeg : SegreArith.Statement) : ProjAvoidingForm.
     have h1 : ((n : ℤ) : MRing ι) ∈ mCoordIdeal y := by
       rw [mCoordIdeal, RingHom.mem_ker, map_intCast, Int.cast_natCast,
         ← map_natCast (C : Ω →+* MvPolynomial K Ω), hn, map_zero]
-    have h2 : (n : ℤ) ∈ (mCoordIdeal y).comap (C : ℤ →+* MRing ι) := by simpa using h1
+    have h2 : (n : ℤ) ∈ (mCoordIdeal y).comap (C : ℤ →+* MRing ι) := by
+      simpa using h1
     rw [hhor] at h2
     exact_mod_cast Ideal.mem_bot.mp h2
 
@@ -63,22 +110,22 @@ theorem ProjAvoidingForm.proof (hSeg : SegreArith.Statement) : ProjAvoidingForm.
       split_ifs <;> simp
     simp [h1]
 
-  have hlin
-      : ∀ c : Ix ((k : K) → ι k) → ℚ,
-        (∑ i, C (c i) * X i : MvPolynomial (Ix ((k : K) → ι k)) ℚ).IsHomogeneous 1 := fun c =>
-    IsHomogeneous.sum _ _ _ fun i _ => (isHomogeneous_X _ _).C_mul _
+  have hlin : ∀ c : Ix ((k : K) → ι k) → ℚ,
+      (∑ i, C (c i) * X i : MvPolynomial (Ix ((k : K) → ι k)) ℚ).IsHomogeneous 1 :=
+    fun c => IsHomogeneous.sum _ _ _ fun i _ => (isHomogeneous_X _ _).C_mul _
   have hint : ∀ p, IsIntegral R₀ (Polynomial.C (x p) * Polynomial.X) := by
     intro p
     have := isIntegral_coneMap x' R₀ hF.integral (∑ i, C (B' p i) * X i)
     rw [coneMap_of_isHomogeneous ℚ x' (hlin _), pow_one] at this
     convert this using 2
     rw [hxinv p]
-    set_option synthInstance.maxHeartbeats 100000 in
+
     simp [map_sum]
 
   let ℓq : Fin (D + 1) → MvPolynomial (Ix ((k : K) → ι k)) ℚ := fun j => ∑ i, C (B (e j) i) * X i
   have hℓhom : ∀ j, (ℓq j).IsHomogeneous 1 := fun j => hlin _
-  have hℓx : ∀ j, aeval x (ℓq j) = w j := fun j => by simp [ℓq, hwdef, hx'def, matAct]
+  have hℓx : ∀ j, aeval x (ℓq j) = w j := fun j => by
+    simp [ℓq, hwdef, hx'def, matAct]
   set N : ℕ := ∏ j, ∏ i, (B (e j) i).den with hNdef
   have hN : (N : ℚ) ≠ 0 := by
     rw [hNdef]
@@ -100,13 +147,12 @@ theorem ProjAvoidingForm.proof (hSeg : SegreArith.Statement) : ProjAvoidingForm.
   choose n hn using hden
   let L : Fin (D + 1) → MRing ι := fun j => segreSub (∑ i, C (n j i) * X i)
   have hLhom : ∀ j, IsMultiHomog (L j) (fun _ => 1) := fun j => isMultiHomog_segreSub_linear (n j)
-  have hLz
-      : ∀ (z : (Σ k, ι k) → ℂ) j,
-        eval z (map (Int.castRingHom ℂ) (L j)) = (N : ℂ) * aeval (segreCoords z) (ℓq j) := by
+  have hLz : ∀ (z : (Σ k, ι k) → ℂ) j,
+      eval z (map (Int.castRingHom ℂ) (L j)) = (N : ℂ) * aeval (segreCoords z) (ℓq j) := by
     intro z j
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [L, ℓq, eval_segreSub, map_sum, map_mul, map_C, map_X, eval_X, eval_C, aeval_C,
-        aeval_X, Finset.mul_sum]
+
+    simp only [L, ℓq, eval_segreSub, map_sum, map_mul, map_C, map_X, eval_X, eval_C, aeval_C, aeval_X,
+    Finset.mul_sum]
     refine Finset.sum_congr rfl fun i _ => ?_
     have := congrArg (fun q : ℚ => (q : ℂ)) (hn j i)
     push_cast at this
@@ -117,35 +163,25 @@ theorem ProjAvoidingForm.proof (hSeg : SegreArith.Statement) : ProjAvoidingForm.
     intro z hz
     by_contra hall
     push Not at hall
-    have hℓ0 : (fun j => aeval (segreCoords z) (ℓq j)) = 0 :=
-      funext fun j => by
-        have := hLz z j
-        rw [hall j] at this
-        exact (mul_eq_zero.mp this.symm).resolve_left hNC
+    have hℓ0 : (fun j => aeval (segreCoords z) (ℓq j)) = 0 := funext fun j => by
+      have := hLz z j
+      rw [hall j] at this
+      exact (mul_eq_zero.mp this.symm).resolve_left hNC
     have hu0 : ∀ p, segreCoords z p = 0 := by
       intro p
       have hα : IsIntegral R₀ (coneMap ℚ x (X p)) := isIntegral_coneMap x R₀ hint (X p)
-      have hg
-          : ∀ k, ∃ g, coneMap ℚ w g = ((minpoly R₀ (coneMap ℚ x (X p))).coeff k : Polynomial Ω) :=
+      have hg : ∀ k, ∃ g, coneMap ℚ w g = ((minpoly R₀ (coneMap ℚ x (X p))).coeff k : Polynomial Ω) :=
         fun k => (AlgHom.mem_range _).mp ((minpoly R₀ (coneMap ℚ x (X p))).coeff k).2
       choose g hg using hg
-      have hrel :=
-        key_relation y w ℓq hℓhom hℓx (isHomogeneous_X ℚ p) _ (minpoly.aeval R₀ _) g hg
-          (minpoly R₀ (coneMap ℚ x (X p))).natDegree hz
+      have hrel := key_relation y w ℓq hℓhom hℓx (isHomogeneous_X ℚ p) _ (minpoly.aeval R₀ _) g hg
+        (minpoly R₀ (coneMap ℚ x (X p))).natDegree hz
       simp only [← hxdef] at hrel
-      rw [hℓ0, Finset.sum_range_succ,
-          Finset.sum_eq_zero fun k hk => by
-            rw [Finset.mem_range] at hk
-            rw [if_pos (by omega), aeval_zero, constantCoeff_homogeneousComponent (by omega),
-              map_zero, mul_zero],
-          zero_add, if_pos (by omega), one_mul, Nat.sub_self, aeval_zero, homogeneousComponent_zero,
-          constantCoeff_C]
-        at hrel
+      rw [hℓ0, Finset.sum_range_succ, Finset.sum_eq_zero fun k hk => by
+        rw [Finset.mem_range] at hk
+        rw [if_pos (by omega), aeval_zero, constantCoeff_homogeneousComponent (by omega), map_zero, mul_zero],
+        zero_add, if_pos (by omega), one_mul, Nat.sub_self, aeval_zero, homogeneousComponent_zero, constantCoeff_C] at hrel
       have htop : AddMonoidAlgebra.coeff (g (minpoly R₀ (coneMap ℚ x (X p))).natDegree) 0 = 1 := by
-        have h1 :=
-          congrArg
-            (fun q => _root_.AddMonoidAlgebra.coeff (M := ℕ) q 0)
-            (hg (minpoly R₀ (coneMap ℚ x (X p))).natDegree)
+        have h1 := congrArg (fun q => _root_.AddMonoidAlgebra.coeff (M := ℕ) q 0) (hg (minpoly R₀ (coneMap ℚ x (X p))).natDegree)
         simp only [coeff_coneMap, homogeneousComponent_zero, aeval_C] at h1
         rw [(minpoly.monic hα).coeff_natDegree] at h1
         simp only [OneMemClass.coe_one, Polynomial.coeff_one_zero] at h1
@@ -171,8 +207,7 @@ theorem ProjAvoidingForm.proof (hSeg : SegreArith.Statement) : ProjAvoidingForm.
     · exact hfP h1
     · exact hW h1
   have hαint : IsIntegral R₀ (coneMap ℚ x (qmap F)) := isIntegral_coneMap x R₀ hint (qmap F)
-  have hg
-      : ∀ k, ∃ g, coneMap ℚ w g = ((minpoly R₀ (coneMap ℚ x (qmap F))).coeff k : Polynomial Ω) :=
+  have hg : ∀ k, ∃ g, coneMap ℚ w g = ((minpoly R₀ (coneMap ℚ x (qmap F))).coeff k : Polynomial Ω) :=
     fun k => (AlgHom.mem_range _).mp ((minpoly R₀ (coneMap ℚ x (qmap F))).coeff k).2
   choose g hg using hg
   have hg0 : g 0 ≠ 0 := by
@@ -189,19 +224,17 @@ theorem ProjAvoidingForm.proof (hSeg : SegreArith.Statement) : ProjAvoidingForm.
     · exact hM (by exact_mod_cast h)
     · exact hd h
   · rintro ζ hGζ z hz ⟨t, ht⟩ hfz
-    have hrel :=
-      key_relation y w ℓq hℓhom hℓx (hFhom.map (Int.castRingHom ℚ)) _ (minpoly.aeval R₀ _) g hg d hz
+    have hrel := key_relation y w ℓq hℓhom hℓx (hFhom.map (Int.castRingHom ℚ)) _ (minpoly.aeval R₀ _) g hg d hz
     simp only [← hxdef] at hrel
     have hFu : aeval (segreCoords z) (qmap F) = 0 := by
       rw [aeval_qmap, ← eval_segreSub, hFeq, map_mul, eval_mul, hfz, zero_mul]
     rw [Finset.sum_eq_single 0 (fun k _ hk => by rw [hFu, zero_pow hk]; simp) (by simp)] at hrel
     simp only [mul_zero, zero_le, if_true, pow_zero, one_mul, Nat.sub_zero] at hrel
-    have hℓu : (fun j => aeval (segreCoords z) (ℓq j)) = fun j => (t / N) * ζ j :=
-      funext fun j => by
-        have := hLz z j
-        rw [ht j] at this
-        field_simp
-        linear_combination this.symm
+    have hℓu : (fun j => aeval (segreCoords z) (ℓq j)) = fun j => (t / N) * ζ j := funext fun j => by
+      have := hLz z j
+      rw [ht j] at this
+      field_simp
+      linear_combination this.symm
     rw [hℓu, aeval_mul_of_isHomogeneous (homogeneousComponent_isHomogeneous d (g 0))] at hrel
     have hG1 : aeval ζ (homogeneousComponent d (g 0)) ≠ 0 := by
       intro h

@@ -1,42 +1,86 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.Definitions.Divisors.ExistsDefiniteDatumGoodObj
-public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.RangeSubsetOfGeom
-public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ExistsCoprimeZpow
-public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ExistsFiniteEtaleLatticeTorsionHom
-public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.UnitOnInjectiveOfCommRing
-public import Development.AbelianVarietyTheory.Proofs.AbelianSchemeLawProofs.WeilIsAlternatingSkewNatural
-public import Development.AbelianVarietyTheory.Proofs.AbelianSchemeLawProofs.GlobalFnsHolds
-public import Development.AbelianVarietyTheory.Proofs.HomogeneousIdeals.FormallyUnramifiedOfTangentMapInjective
-public import Development.AbelianVarietyTheory.Proofs.HomogeneousIdeals.BijectiveRestrictPointsOfEtaleOfHenselian
+public import Mathlib.AlgebraicGeometry.Morphisms.Etale
+public import Mathlib.RingTheory.Henselian
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.IsCompletedStrictHens
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.SemiabelianSchemes.AbelianSchemeQuotients.IsAbelianScheme
 public import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.ExistsUnramifiedExtTorsionPointsGoodReduction
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsSepClosedResidueFieldOfModuleFinite
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.BijectiveResidueCompEtaleHenselian
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsSepClosedResidueFieldOfModuleFinite
+import Development.AbelianVarietyTheory.Proofs.HomogeneousIdeals.BijectiveRestrictPointsOfEtaleOfHenselian
+import Development.AbelianVarietyTheory.Proofs.HomogeneousIdeals.FormallyUnramifiedOfTangentMapInjective
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.AlgebraicGeometry.Modules.Sheaf
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.FieldTheory.PurelyInseparable.Exponent
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Etale.Weakly
+import Mathlib.RingTheory.Finiteness.ModuleFinitePresentation
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.TotallySplit
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Std.Tactic.BVDecide.Normalize.Prop
+import Development.AbelianVarietyTheory.Definitions.Divisors.ExistsDefiniteDatumGoodObj
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
-  NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
-  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel
 open scoped CategoryTheory.Obj TensorProduct
 
 namespace GlobalTheory.TorsLift
 
-theorem surjective_algebraMap_of_finite_unramified
-    : ∀ (R : Type) [CommRing R] [IsLocalRing R] [IsAlgClosed (IsLocalRing.ResidueField R)]
-        (T : Type) [CommRing T] [IsLocalRing T] [Algebra R T] [Module.Finite R T]
-        [Algebra.FormallyUnramified R T],
-      Function.Surjective (algebraMap R T) := by
+theorem surjective_algebraMap_of_finite_unramified : ∀ (R : Type) [CommRing R] [IsLocalRing R] [IsAlgClosed (IsLocalRing.ResidueField R)]
+    (T : Type) [CommRing T] [IsLocalRing T] [Algebra R T] [Module.Finite R T]
+    [Algebra.FormallyUnramified R T], Function.Surjective (algebraMap R T) := by
   intro R _ _ _ T _ _ _ _ _
   haveI := GlobalTheory.isLocalHom_algebraMap_of_moduleFinite R T
   have hm := Algebra.FormallyUnramified.map_maximalIdeal (R := R) (S := T)
   haveI : Algebra.IsIntegral R T := Algebra.IsIntegral.of_finite R T
   haveI : Algebra.IsIntegral (IsLocalRing.ResidueField R) (IsLocalRing.ResidueField T) :=
     inferInstance
-  have hk : Function.Surjective (algebraMap (IsLocalRing.ResidueField R)
-      (IsLocalRing.ResidueField T)) :=
+  have hk : Function.Surjective
+      (algebraMap (IsLocalRing.ResidueField R) (IsLocalRing.ResidueField T)) :=
     IsAlgClosed.algebraMap_bijective_of_isIntegral.2
   let N : Submodule R T := LinearMap.range (Algebra.linearMap R T)
   have hNN : (⊤ : Submodule R T) ≤ N ⊔ IsLocalRing.maximalIdeal R • ⊤ := by
@@ -45,8 +89,7 @@ theorem surjective_algebraMap_of_finite_unramified
     obtain ⟨r, rfl⟩ := IsLocalRing.residue_surjective c
     have hr : IsLocalRing.residue T (algebraMap R T r) = IsLocalRing.residue T x := by
       rw [← hc, ← IsLocalRing.ResidueField.algebraMap_eq, ← IsLocalRing.ResidueField.algebraMap_eq,
-        ← IsScalarTower.algebraMap_apply,
-        IsScalarTower.algebraMap_apply R (IsLocalRing.ResidueField R)]
+        ← IsScalarTower.algebraMap_apply, IsScalarTower.algebraMap_apply R (IsLocalRing.ResidueField R)]
     have hx : x - algebraMap R T r ∈ IsLocalRing.maximalIdeal T := by
       rw [← IsLocalRing.residue_eq_zero_iff, map_sub, hr, sub_self]
     rw [← hm] at hx
@@ -55,17 +98,15 @@ theorem surjective_algebraMap_of_finite_unramified
     have : x = algebraMap R T r + (x - algebraMap R T r) := by ring
     rw [this]
     exact Submodule.add_mem_sup ⟨r, rfl⟩ hx'
-  have hle :=
-    Submodule.le_of_le_smul_of_le_jacobson_bot (Module.Finite.fg_top)
-      (IsLocalRing.jacobson_eq_maximalIdeal ⊥ bot_ne_top).ge hNN
+  have hle := Submodule.le_of_le_smul_of_le_jacobson_bot (Module.Finite.fg_top)
+    (IsLocalRing.jacobson_eq_maximalIdeal ⊥ bot_ne_top).ge hNN
   intro y
   obtain ⟨r, hr⟩ := hle (Submodule.mem_top (x := y))
   exact ⟨r, hr⟩
 
-theorem nonempty_algHom_residueField
-    : ∀ (R : Type) [CommRing R] [IsLocalRing R] [IsAlgClosed (IsLocalRing.ResidueField R)]
-        (T : Type) [CommRing T] [IsLocalRing T] [Algebra R T] [Module.Finite R T],
-      Nonempty (T →ₐ[R] IsLocalRing.ResidueField R) := by
+theorem nonempty_algHom_residueField : ∀ (R : Type) [CommRing R] [IsLocalRing R] [IsAlgClosed (IsLocalRing.ResidueField R)]
+    (T : Type) [CommRing T] [IsLocalRing T] [Algebra R T] [Module.Finite R T],
+    Nonempty (T →ₐ[R] IsLocalRing.ResidueField R) := by
   intro R _ _ _ T _ _ _ _
   haveI := GlobalTheory.isLocalHom_algebraMap_of_moduleFinite R T
   haveI : Algebra.IsIntegral R T := Algebra.IsIntegral.of_finite R T
@@ -75,29 +116,25 @@ theorem nonempty_algHom_residueField
     IsAlgClosed.lift
   exact ⟨(l.restrictScalars R).comp (IsScalarTower.toAlgHom R T (IsLocalRing.ResidueField T))⟩
 
-theorem exists_section_of_point
-    : ∀ (R : Type) [CommRing R] [HenselianLocalRing R] [IsAlgClosed (IsLocalRing.ResidueField R)]
-        (B : Type) [CommRing B] [Algebra R B] [Algebra.Etale R B] [Module.Finite R B] (K : Type)
-        [Field K] (φ : R →+* K) (χ : B →+* K),
-      χ.comp (algebraMap R B) = φ
-        → ∃ ψ : B →+* R, ψ.comp (algebraMap R B) = RingHom.id R ∧ φ.comp ψ = χ := by
+theorem exists_section_of_point : ∀ (R : Type) [CommRing R] [HenselianLocalRing R] [IsAlgClosed (IsLocalRing.ResidueField R)]
+    (B : Type) [CommRing B] [Algebra R B] [Algebra.Etale R B] [Module.Finite R B]
+    (K : Type) [Field K] (φ : R →+* K) (χ : B →+* K), χ.comp (algebraMap R B) = φ →
+    ∃ ψ : B →+* R, ψ.comp (algebraMap R B) = RingHom.id R ∧ φ.comp ψ = χ := by
   intro R _ _ _ B _ _ _ _ K _ φ χ hχ
   classical
   obtain ⟨J, hJ, T, _, _, e, hT, hT'⟩ := GlobalTheory.finite_algebra_strictly_henselian_pi R B
   haveI := Fintype.ofFinite J
   let ε : J → B := fun i => e.symm (Pi.single i 1)
   have hεsum : ∑ i, ε i = 1 := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [ε, ← map_sum, Finset.univ_sum_single]
+
+    simp only [ε, ← map_sum, Finset.univ_sum_single]
     exact map_one e.symm
   have hεid : ∀ i, IsIdempotentElem (ε i) := fun i => by
     show e.symm _ * e.symm _ = e.symm _
     rw [← map_mul, ← Pi.single_mul, _root_.one_mul]
 
-  have hfac
-      : ∀ (L : Type) [CommRing L] (ω : B →+* L) (i : J),
-        ω (ε i) = 1
-          → ∀ (x : B) (r : R), e x i = algebraMap R (T i) r → ω x = ω (algebraMap R B r) := by
+  have hfac : ∀ (L : Type) [CommRing L] (ω : B →+* L) (i : J), ω (ε i) = 1 →
+      ∀ (x : B) (r : R), e x i = algebraMap R (T i) r → ω x = ω (algebraMap R B r) := by
     intro L _ ω i hωi x r hr
     have hx : x * ε i = algebraMap R B r * ε i := by
       apply e.injective
@@ -113,7 +150,7 @@ theorem exists_section_of_point
     by_contra h
     push_neg at h
     have := congrArg χ hεsum
-    set_option synthInstance.maxHeartbeats 100000 in
+
     simp [map_sum, h] at this
   have hi1 : χ (ε i) = 1 := (IsIdempotentElem.iff_eq_zero_or_one.1 ((hεid i).map χ)).resolve_left hi
   haveI : IsLocalRing (T i) := inferInstance
@@ -121,8 +158,7 @@ theorem exists_section_of_point
   let π : B →ₐ[R] T i := (Pi.evalAlgHom R T i).comp e.toAlgHom
   have hπ : Function.Surjective π := fun y => ⟨e.symm (Pi.single i y), by simp [π]⟩
   haveI : Algebra.FormallyUnramified R (T i) := Algebra.FormallyUnramified.of_surjective π hπ
-  have hsurj : Function.Surjective (algebraMap R (T i)) :=
-    surjective_algebraMap_of_finite_unramified R (T i)
+  have hsurj : Function.Surjective (algebraMap R (T i)) := surjective_algebraMap_of_finite_unramified R (T i)
   obtain ⟨β⟩ := nonempty_algHom_residueField R (T i)
   obtain ⟨ψ₀, hψ₀⟩ := (GlobalTheory.EtaleHensel.bijective_residue_comp R B R).2 (β.comp π)
   have hψi : ψ₀ (ε i) = 1 := by
@@ -154,12 +190,9 @@ theorem exists_section_of_point
     show φ (ψ₀ x) = χ x
     rw [h1, h2]
 
-theorem exists_iso_sp_of_finite_etale
-    : ∀ (R : Type) [CommRing R] (X : Scheme.{0}) (f : X ⟶ Sp R),
-      IsFinite f → Etale f
-        → ∃ (B : Type) (_ : CommRing B) (_ : Algebra R B),
-          Algebra.Etale R B ∧ Module.Finite R B
-            ∧ ∃ e : X ≅ Sp B, e.hom ≫ spMap (algebraMap R B) = f := by
+theorem exists_iso_sp_of_finite_etale : ∀ (R : Type) [CommRing R] (X : Scheme.{0}) (f : X ⟶ Sp R), IsFinite f → Etale f →
+    ∃ (B : Type) (_ : CommRing B) (_ : Algebra R B), Algebra.Etale R B ∧ Module.Finite R B ∧
+      ∃ e : X ≅ Sp B, e.hom ≫ spMap (algebraMap R B) = f := by
   intro R _ X f hf hfe
   haveI : IsAffine X := isAffine_of_isAffineHom f
   let ρ : R →+* Γ(X, ⊤) := ((Scheme.ΓSpecIso (CommRingCat.of R)).inv ≫ f.appTop).hom
@@ -171,45 +204,33 @@ theorem exists_iso_sp_of_finite_etale
     rw [show CommRingCat.ofHom ρ = (Scheme.ΓSpecIso (CommRingCat.of R)).inv ≫ f.appTop from rfl,
       Spec.map_comp, ← Category.assoc, h, Category.assoc, ← Spec.map_comp, Iso.inv_hom_id,
       Spec.map_id, Category.comp_id]
-  have hsp : spMap (algebraMap R Γ(X, ⊤)) = X.isoSpec.inv ≫ f := by rw [← key, Iso.inv_hom_id_assoc]
+  have hsp : spMap (algebraMap R Γ(X, ⊤)) = X.isoSpec.inv ≫ f := by
+    rw [← key, Iso.inv_hom_id_assoc]
   have het : Etale (spMap (algebraMap R Γ(X, ⊤))) := by rw [hsp]; infer_instance
   have hfi : IsFinite (spMap (algebraMap R Γ(X, ⊤))) := by rw [hsp]; infer_instance
   refine ⟨Γ(X, ⊤), inferInstance, inferInstance, ?_, ?_, X.isoSpec, key⟩
   · exact (HasRingHomProperty.Spec_iff (P := @Etale)).1 het
   · exact (IsFinite.SpecMap_iff _).1 hfi
 
-theorem preconnectedSpace_sp (R : Type) [CommRing R] [IsLocalRing R]
-    : PreconnectedSpace (Sp R) := by
+theorem preconnectedSpace_sp (R : Type) [CommRing R] [IsLocalRing R] : PreconnectedSpace (Sp R) := by
   rw [preconnectedSpace_iff_clopen]
   intro s hs
   have key : ∀ z : Sp R, z ⤳ (IsLocalRing.closedPoint R : PrimeSpectrum R) := fun z =>
     IsLocalRing.specializes_closedPoint (R := R) z
   by_cases h : (IsLocalRing.closedPoint R : PrimeSpectrum R) ∈ s
   · right; ext z; simp only [Set.mem_univ, iff_true]; exact (key z).mem_open hs.isOpen h
-  · left
-    ext z
-    simp only [Set.mem_empty_iff_false, iff_false]
+  · left; ext z; simp only [Set.mem_empty_iff_false, iff_false]
     exact fun hz => h ((key z).mem_closed hs.isClosed hz)
 
-theorem torsion_points_restrict_bijective
-    : ∀ (S : Scheme.{0}) (A : Over S) [GrpObj A] [IsCommMonObj A],
-      IsAbelianScheme A
-        → ∀ (n : ℕ),
-          0 < n → IsUnit (n : Γ(S, ⊤))
-            → ∀ (R : Type) [CommRing R] [HenselianLocalRing R]
-                [IsAlgClosed (IsLocalRing.ResidueField R)] (t : Sp R ⟶ S) (K : Type) [Field K]
-                (φ : R →+* K),
-              (∀ g h : Over.mk t ⟶ A,
-                  g ^ n = 1 → h ^ n = 1
-                    → (Over.homMk (spMap φ) rfl : Over.mk (spMap φ ≫ t) ⟶ Over.mk t) ≫ g
-                      = (Over.homMk (spMap φ) rfl : Over.mk (spMap φ ≫ t) ⟶ Over.mk t) ≫ h
-                    → g = h)
-                ∧ ∀ x : Over.mk (spMap φ ≫ t) ⟶ A,
-                  x ^ n = 1
-                    → ∃ g : Over.mk t ⟶ A,
-                      g ^ n = 1
-                        ∧ (Over.homMk (spMap φ) rfl : Over.mk (spMap φ ≫ t) ⟶ Over.mk t) ≫ g
-                          = x := by
+theorem torsion_points_restrict_bijective : ∀ (S : Scheme.{0}) (A : Over S) [GrpObj A] [IsCommMonObj A],
+    IsAbelianScheme A → ∀ (n : ℕ), 0 < n → IsUnit (n : Γ(S, ⊤)) →
+    ∀ (R : Type) [CommRing R] [HenselianLocalRing R] [IsAlgClosed (IsLocalRing.ResidueField R)] (t : Sp R ⟶ S)
+    (K : Type) [Field K] (φ : R →+* K),
+    (∀ g h : Over.mk t ⟶ A, g ^ n = 1 → h ^ n = 1 →
+      (Over.homMk (spMap φ) rfl : Over.mk (spMap φ ≫ t) ⟶ Over.mk t) ≫ g =
+        (Over.homMk (spMap φ) rfl : Over.mk (spMap φ ≫ t) ⟶ Over.mk t) ≫ h → g = h) ∧
+    ∀ x : Over.mk (spMap φ ≫ t) ⟶ A, x ^ n = 1 → ∃ g : Over.mk t ⟶ A, g ^ n = 1 ∧
+      (Over.homMk (spMap φ) rfl : Over.mk (spMap φ ≫ t) ⟶ Over.mk t) ≫ g = x := by
   intro S A _ _ hA n _ hn R _ _ _ t K _ φ
   haveI := hA
   obtain ⟨-, hfin, het⟩ := GlobalTheory.GrpTangent.finiteEtale_mulN_torsion A hn
@@ -236,16 +257,14 @@ theorem torsion_points_restrict_bijective
   · obtain ⟨y, hy⟩ := (E _).surjective ⟨x, hx⟩
     have yx : y ≫ torsion.ι A n = x := congrArg Subtype.val hy
     obtain ⟨B, _, _, _, _, e, he⟩ :=
-      exists_iso_sp_of_finite_etale R _ (pullback.snd (torsion A n).hom t) inferInstance
-        inferInstance
+      exists_iso_sp_of_finite_etale R _ (pullback.snd (torsion A n).hom t) inferInstance inferInstance
     let q : Sp K ⟶ Sp B := pullback.lift y.left (spMap φ) (Over.w y) ≫ e.hom
     obtain ⟨χ', hχ'⟩ := Spec.map_surjective q
     have hq : q ≫ spMap (algebraMap R B) = spMap φ := by
       simp only [q, Category.assoc, he, pullback.lift_snd]
     have hχ : χ'.hom.comp (algebraMap R B) = φ := by
-      have h0
-          : Spec.map (CommRingCat.ofHom (algebraMap R B) ≫ χ')
-            = Spec.map (CommRingCat.ofHom φ) := by
+      have h0 : Spec.map (CommRingCat.ofHom (algebraMap R B) ≫ χ') =
+          Spec.map (CommRingCat.ofHom φ) := by
         rw [Spec.map_comp, hχ']
         exact hq
       exact congrArg CommRingCat.Hom.hom (Spec.map_injective h0)

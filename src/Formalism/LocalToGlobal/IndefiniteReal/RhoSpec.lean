@@ -1,8 +1,47 @@
 module
 
-public import Mathlib
 public import Formalism.LocalToGlobal.IndefiniteReal.InBlock
 public import Formalism.LocalToGlobal.IndefiniteReal.CxPassRep
+import Formalism.LocalToGlobal.Divisibility.ProjLemmas
+import Formalism.LocalToGlobal.Divisibility.RowLatLemmas
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Lemma
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -13,8 +52,7 @@ noncomputable section
 
 namespace Formalism.IndefR.CxPass
 
-open Formalism.DivisionValues Formalism.L2.Indef Formalism.L2.DIV Formalism.IndefR.Cx
-  Formalism.L2.GlobalTheoryTheory.DivPassage
+open Formalism.DivisionValues Formalism.L2.Indef Formalism.L2.DIV Formalism.IndefR.Cx Formalism.L2.GlobalTheoryTheory.DivPassage
 
 namespace PassRep3
 
@@ -22,10 +60,8 @@ open Formalism.IndefR.CxPass.PassRep
 
 section Lev
 
-variable
-  {K : Type} [Field K] [NumberField K] [StarRing K]
-  {G : Type} [Group G] [Fintype G]
-  {Pl0 I0 Ty T : Type} {m : ℕ} (I : In3 K G Pl0 I0 Ty T m)
+variable {K : Type} [Field K] [NumberField K] [StarRing K] {G : Type} [Group G] [Fintype G] {Pl0 I0 Ty T : Type} {m : ℕ}
+  (I : In3 K G Pl0 I0 Ty T m)
 
 private lemma exists_toF_bot_eq_toF (B : BlockDat K G Pl0) (Xs : Finset (G → K)) (P : Subgroup G) (ψ : P →* Kˣ)
     (Z : Submodule K B.S.Forms) (x : Fin (B.dZ ⟨Xs, P, ψ⟩ Z) → K) :
@@ -71,10 +107,9 @@ private lemma exists_toF_bot_eq_toF (B : BlockDat K G Pl0) (Xs : Finset (G → K
     rw [hy', hu1]
   rw [BlockDat.toF_apply, BlockDat.toF_apply, hin]
 
-theorem sub_lvl
-    (b : Bool) (t : I.A3.fam3.base3.Tup)
-    (x : Fin ((lv (faceOf3 I.A3 I.P0 I.ψ0 I.P1 I.ψ1 I.Dc I.Sp I.Zsc I.X.zs) b).dQ t) → K)
-    : ∃ y, I.cg.toR I.X.zs false t y = I.cr.toR I.X.zs b t x := by
+theorem sub_lvl (b : Bool) (t : I.A3.fam3.base3.Tup)
+    (x : Fin ((lv (faceOf3 I.A3 I.P0 I.ψ0 I.P1 I.ψ1 I.Dc I.Sp I.Zsc I.X.zs) b).dQ t) → K) :
+    ∃ y, I.cg.toR I.X.zs false t y = I.cr.toR I.X.zs b t x := by
   cases b
   · exact exists_toF_bot_eq_toF (I.A.fam.R t) I.A.fam.X I.P0 I.ψ0 (I.X.zs.Z t) x
   · exact exists_toF_bot_eq_toF (I.A.fam.R t) I.A.fam.X I.P1 I.ψ1 (I.X.zs.Z t) x
@@ -82,86 +117,64 @@ theorem sub_lvl
 private lemma cpt_injective' (σ : K →+* ℂ) {n : ℕ} {x y : Fin n → K} (h : cpt σ x = cpt σ y) : x = y :=
   funext fun i => σ.injective (congrFun h i)
 
-theorem jt_spec
-    (h2g : PrincipalLevelBijectivity I.A3 I.X (P1 := I.P1) (ψ1 := I.ψ1) (Dc := I.Dc) (Sp := I.Sp)
-      (Zsc := I.Zsc))
-    (b : Bool) (t : I.A3.fam3.base3.Tup)
-    : (∀ x,
-        I.X.iC I.cg false t (cpt I.A3.fam3.base3.v0.embedding ((I.Jt b t).mulVec x))
-          = I.X.iC I.cr b t (cpt I.A3.fam3.base3.v0.embedding x))
-      ∧ ∀ x, I.cg.toR I.X.zs false t ((I.Jt b t).mulVec x) = I.cr.toR I.X.zs b t x := by
-  have hg
-      : ∀ x, ∃ y,
-        I.X.iC I.cg false t (cpt I.A3.fam3.base3.v0.embedding y)
-          = I.X.iC I.cr b t (cpt I.A3.fam3.base3.v0.embedding x) := by
+theorem jt_spec (h2g : PrincipalLevelBijectivity I.A3 I.X (P1 := I.P1) (ψ1 := I.ψ1) (Dc := I.Dc) (Sp := I.Sp) (Zsc := I.Zsc)) (b : Bool) (t : I.A3.fam3.base3.Tup) :
+    (∀ x, I.X.iC I.cg false t (cpt I.A3.fam3.base3.v0.embedding ((I.Jt b t).mulVec x)) =
+      I.X.iC I.cr b t (cpt I.A3.fam3.base3.v0.embedding x)) ∧
+    ∀ x, I.cg.toR I.X.zs false t ((I.Jt b t).mulVec x) = I.cr.toR I.X.zs b t x := by
+  have hg : ∀ x, ∃ y, I.X.iC I.cg false t (cpt I.A3.fam3.base3.v0.embedding y) =
+      I.X.iC I.cr b t (cpt I.A3.fam3.base3.v0.embedding x) := by
     intro x
     obtain ⟨y, hy⟩ := PassRep3.sub_lvl I b t x
     exact ⟨y, by rw [CxData.iC_cpt', CxData.iC_cpt', hy]⟩
-  have hR :=
-    PassRep.relK I.A3.fam3.base3.v0.embedding (I.X.iC I.cg false t) (I.X.iC I.cr b t) (h2g.2 t).1 hg
+  have hR := PassRep.relK I.A3.fam3.base3.v0.embedding (I.X.iC I.cg false t) (I.X.iC I.cr b t) (h2g.2 t).1 hg
   refine ⟨hR.2, fun x => ?_⟩
   obtain ⟨y, hy⟩ := PassRep3.sub_lvl I b t x
-  have h1
-      : I.X.iC I.cg false t (cpt I.A3.fam3.base3.v0.embedding y)
-        = I.X.iC I.cg false t (cpt I.A3.fam3.base3.v0.embedding ((I.Jt b t).mulVec x)) := by
-    rw [show I.X.iC I.cg false t (cpt I.A3.fam3.base3.v0.embedding ((I.Jt b t).mulVec x))
-          = I.X.iC I.cr b t (cpt I.A3.fam3.base3.v0.embedding x) from
-        hR.2 x,
-      CxData.iC_cpt', CxData.iC_cpt', hy]
+  have h1 : I.X.iC I.cg false t (cpt I.A3.fam3.base3.v0.embedding y) =
+      I.X.iC I.cg false t (cpt I.A3.fam3.base3.v0.embedding ((I.Jt b t).mulVec x)) := by
+    rw [show I.X.iC I.cg false t (cpt I.A3.fam3.base3.v0.embedding ((I.Jt b t).mulVec x)) =
+      I.X.iC I.cr b t (cpt I.A3.fam3.base3.v0.embedding x) from hR.2 x, CxData.iC_cpt', CxData.iC_cpt', hy]
   have h2 := cpt_injective' _ ((h2g.2 t).1 h1)
   rw [← h2, hy]
 
-theorem rho_y {s : ℕ} (H : I.Hyp s) (g : G) (x : Fin I.Sg.D → K)
-    : ∃ y : Fin I.Sg.D → K,
-      I.cg.toR I.X.zs false I.A3.fam3.base3.μ0 y
-        = (I.A.fam.R I.A3.fam3.base3.μ0).r g (I.cg.toR I.X.zs false I.A3.fam3.base3.μ0 x) := by
+theorem rho_y {s : ℕ} (H : I.Hyp s) (g : G) (x : Fin I.Sg.D → K) :
+    ∃ y : Fin I.Sg.D → K, I.cg.toR I.X.zs false I.A3.fam3.base3.μ0 y =
+      (I.A.fam.R I.A3.fam3.base3.μ0).r g (I.cg.toR I.X.zs false I.A3.fam3.base3.μ0 x) := by
   have hX := H.ok.ok2.irr
-  have hZ
-      : ∀ f ∈ I.X.zs.Z I.A3.fam3.base3.μ0,
-        (I.A.fam.R I.A3.fam3.base3.μ0).r g f ∈ I.X.zs.Z I.A3.fam3.base3.μ0 := fun f hf =>
+  have hZ : ∀ f ∈ I.X.zs.Z I.A3.fam3.base3.μ0,
+      (I.A.fam.R I.A3.fam3.base3.μ0).r g f ∈ I.X.zs.Z I.A3.fam3.base3.μ0 := fun f hf =>
     H.stable.1 _ (Sum.inr g) (Submodule.mem_map_of_mem hf)
-  exact PassRep.toF_act (I.A.fam.R I.A3.fam3.base3.μ0) I.A.fam.X hX (I.X.zs.Z I.A3.fam3.base3.μ0) g
-    hZ x
+  exact PassRep.toF_act (I.A.fam.R I.A3.fam3.base3.μ0) I.A.fam.X hX (I.X.zs.Z I.A3.fam3.base3.μ0) g hZ x
 
-theorem iCg_of_y
-    {s : ℕ} (H : I.Hyp s)
-    (g : G) (x y : Fin I.Sg.D → K)
-    (hy : I.cg.toR I.X.zs false I.A3.fam3.base3.μ0 y
-      = (I.A.fam.R I.A3.fam3.base3.μ0).r g (I.cg.toR I.X.zs false I.A3.fam3.base3.μ0 x))
-    : I.iCg (cpt I.A3.fam3.base3.v0.embedding y)
-      = I.gE g (I.iCg (cpt I.A3.fam3.base3.v0.embedding x)) := by
+theorem iCg_of_y {s : ℕ} (H : I.Hyp s) (g : G) (x y : Fin I.Sg.D → K)
+    (hy : I.cg.toR I.X.zs false I.A3.fam3.base3.μ0 y =
+      (I.A.fam.R I.A3.fam3.base3.μ0).r g (I.cg.toR I.X.zs false I.A3.fam3.base3.μ0 x)) :
+    I.iCg (cpt I.A3.fam3.base3.v0.embedding y) = I.gE g (I.iCg (cpt I.A3.fam3.base3.v0.embedding x)) := by
   show I.X.iC I.cg false I.A3.fam3.base3.μ0 (cpt I.A3.fam3.base3.v0.embedding y) =
     I.gE g (I.X.iC I.cg false I.A3.fam3.base3.μ0 (cpt I.A3.fam3.base3.v0.embedding x))
   erw [CxData.iC_cpt', CxData.iC_cpt', hy]
   exact H.gequiv _ g _
 
-theorem rho_spec {s : ℕ} (H : I.Hyp s) (g : G) (x : Fin I.Sg.D → K)
-    : I.iCg (cpt I.A3.fam3.base3.v0.embedding ((I.ρf g).mulVec x))
-      = I.gE g (I.iCg (cpt I.A3.fam3.base3.v0.embedding x)) := by
-  have hg
-      : ∀ x : Fin I.Sg.D → K, ∃ y : Fin I.Sg.D → K,
-        I.iCg (cpt I.A3.fam3.base3.v0.embedding y)
-          = ((I.gE g).comp I.iCg) (cpt I.A3.fam3.base3.v0.embedding x) := by
+theorem rho_spec {s : ℕ} (H : I.Hyp s) (g : G) (x : Fin I.Sg.D → K) :
+    I.iCg (cpt I.A3.fam3.base3.v0.embedding ((I.ρf g).mulVec x)) =
+      I.gE g (I.iCg (cpt I.A3.fam3.base3.v0.embedding x)) := by
+  have hg : ∀ x : Fin I.Sg.D → K, ∃ y : Fin I.Sg.D → K, I.iCg (cpt I.A3.fam3.base3.v0.embedding y) =
+      ((I.gE g).comp I.iCg) (cpt I.A3.fam3.base3.v0.embedding x) := by
     intro x
     obtain ⟨y, hy⟩ := PassRep3.rho_y I H g x
     exact ⟨y, PassRep3.iCg_of_y I H g x y hy⟩
   exact (PassRep.relK I.A3.fam3.base3.v0.embedding I.iCg ((I.gE g).comp I.iCg) H.h2g.1 hg).2 x
 
-theorem rho_cv {s : ℕ} (H : I.Hyp s) (g : G) (x : Fin I.Sg.D → K)
-    : cv (I.A.fam.R I.A3.fam3.base3.μ0) ⟨I.A.fam.X, ⊥, 1⟩ (I.X.zs.Z I.A3.fam3.base3.μ0)
-        ((I.ρf g).mulVec x)
-      = ((I.A.fam.R I.A3.fam3.base3.μ0).S.actMat (I.A.fam.R I.A3.fam3.base3.μ0).r g).mulVec
+theorem rho_cv {s : ℕ} (H : I.Hyp s) (g : G) (x : Fin I.Sg.D → K) :
+    cv (I.A.fam.R I.A3.fam3.base3.μ0) ⟨I.A.fam.X, ⊥, 1⟩ (I.X.zs.Z I.A3.fam3.base3.μ0) ((I.ρf g).mulVec x) =
+      ((I.A.fam.R I.A3.fam3.base3.μ0).S.actMat (I.A.fam.R I.A3.fam3.base3.μ0).r g).mulVec
         (cv (I.A.fam.R I.A3.fam3.base3.μ0) ⟨I.A.fam.X, ⊥, 1⟩ (I.X.zs.Z I.A3.fam3.base3.μ0) x) := by
   obtain ⟨y, hy⟩ := PassRep3.rho_y I H g x
   have hyeq : y = (I.ρf g).mulVec x :=
-    cpt_injective' _
-      (H.h2g.1 ((PassRep3.iCg_of_y I H g x y hy).trans (PassRep3.rho_spec I H g x).symm))
+    cpt_injective' _ (H.h2g.1 ((PassRep3.iCg_of_y I H g x y hy).trans (PassRep3.rho_spec I H g x).symm))
   subst hyeq
-  have key
-      : ∀ v : Fin I.Sg.D → K,
-        cv (I.A.fam.R I.A3.fam3.base3.μ0) ⟨I.A.fam.X, ⊥, 1⟩ (I.X.zs.Z I.A3.fam3.base3.μ0) v
-          = (I.A.fam.R I.A3.fam3.base3.μ0).S.basis.equivFun
-            (I.cg.toR I.X.zs false I.A3.fam3.base3.μ0 v) := by
+  have key : ∀ v : Fin I.Sg.D → K,
+      cv (I.A.fam.R I.A3.fam3.base3.μ0) ⟨I.A.fam.X, ⊥, 1⟩ (I.X.zs.Z I.A3.fam3.base3.μ0) v =
+      (I.A.fam.R I.A3.fam3.base3.μ0).S.basis.equivFun (I.cg.toR I.X.zs false I.A3.fam3.base3.μ0 v) := by
     intro v
     show _ = (I.A.fam.R I.A3.fam3.base3.μ0).S.basis.equivFun
       ((I.A.fam.R I.A3.fam3.base3.μ0).toF ⟨I.A.fam.X, ⊥, 1⟩ (I.X.zs.Z I.A3.fam3.base3.μ0) v)
@@ -171,46 +184,30 @@ theorem rho_cv {s : ℕ} (H : I.Hyp s) (g : G) (x : Fin I.Sg.D → K)
   first
   | exact (LinearMap.toMatrix_mulVec_repr _ _ _ _).symm
   | (simp only [Basis.equivFun_apply]; exact (LinearMap.toMatrix_mulVec_repr _ _ _ _).symm)
-  | (
-      simp only [Basis.equivFun_apply, CSD.actMat]
-      exact (LinearMap.toMatrix_mulVec_repr _ _ _ _).symm
-    )
+  | (simp only [Basis.equivFun_apply, CSD.actMat]; exact (LinearMap.toMatrix_mulVec_repr _ _ _ _).symm)
 
-theorem cv_epM {s : ℕ} (H : I.Hyp s) (P : Subgroup G) (ψ : P →* Kˣ) (y : Fin I.Sg.D → K)
-    : cv (I.A.fam.R I.A3.fam3.base3.μ0) ⟨I.A.fam.X, ⊥, 1⟩ (I.X.zs.Z I.A3.fam3.base3.μ0)
-        ((I.epM P ψ).mulVec y)
-      = ((I.A.fam.R I.A3.fam3.base3.μ0).S.gaMat (I.A.fam.R I.A3.fam3.base3.μ0).r
-          (lvlIdem P ψ)).mulVec
+theorem cv_epM {s : ℕ} (H : I.Hyp s) (P : Subgroup G) (ψ : P →* Kˣ) (y : Fin I.Sg.D → K) :
+    cv (I.A.fam.R I.A3.fam3.base3.μ0) ⟨I.A.fam.X, ⊥, 1⟩ (I.X.zs.Z I.A3.fam3.base3.μ0) ((I.epM P ψ).mulVec y) =
+      ((I.A.fam.R I.A3.fam3.base3.μ0).S.gaMat (I.A.fam.R I.A3.fam3.base3.μ0).r (lvlIdem P ψ)).mulVec
         (cv (I.A.fam.R I.A3.fam3.base3.μ0) ⟨I.A.fam.X, ⊥, 1⟩ (I.X.zs.Z I.A3.fam3.base3.μ0) y) := by
   classical
   let cvL : (Fin I.Sg.D → K) →ₗ[K] (Fin (I.A.fam.R I.A3.fam3.base3.μ0).S.dim → K) :=
-    ((I.A.fam.R I.A3.fam3.base3.μ0).vE (⟨I.A.fam.X, ⊥, 1⟩ : Lvl K G)).mulVecLin
-      ∘ₗ ((I.A.fam.R I.A3.fam3.base3.μ0).zE (⟨I.A.fam.X, ⊥, 1⟩ : Lvl K G)
-        (I.X.zs.Z I.A3.fam3.base3.μ0)).mulVecLin
-  have hcv
-      : ∀ v : Fin I.Sg.D → K,
-        cv (I.A.fam.R I.A3.fam3.base3.μ0) ⟨I.A.fam.X, ⊥, 1⟩ (I.X.zs.Z I.A3.fam3.base3.μ0) v
-          = cvL v := fun v =>
-    rfl
-  have e1
-      : I.epM P ψ *ᵥ y
-        = ∑ h : P, (((Nat.card P : K)⁻¹ * ((ψ h⁻¹ : Kˣ) : K)) • (I.ρf (h : G) *ᵥ y)) := by
+    ((I.A.fam.R I.A3.fam3.base3.μ0).vE (⟨I.A.fam.X, ⊥, 1⟩ : Lvl K G)).mulVecLin ∘ₗ ((I.A.fam.R I.A3.fam3.base3.μ0).zE (⟨I.A.fam.X, ⊥, 1⟩ : Lvl K G) (I.X.zs.Z I.A3.fam3.base3.μ0)).mulVecLin
+  have hcv : ∀ v : Fin I.Sg.D → K, cv (I.A.fam.R I.A3.fam3.base3.μ0) ⟨I.A.fam.X, ⊥, 1⟩ (I.X.zs.Z I.A3.fam3.base3.μ0) v = cvL v := fun v => rfl
+  have e1 : I.epM P ψ *ᵥ y = ∑ h : P, (((Nat.card P : K)⁻¹ * ((ψ h⁻¹ : Kˣ) : K)) • (I.ρf (h : G) *ᵥ y)) := by
     rw [← Matrix.toLin'_apply, In3.epM]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_smul, map_sum, LinearMap.smul_apply, LinearMap.sum_apply, Matrix.toLin'_apply,
-        Finset.smul_sum, smul_smul, map_inv]
+
+    simp only [map_smul, map_sum, LinearMap.smul_apply, LinearMap.sum_apply, Matrix.toLin'_apply,
+    Finset.smul_sum, smul_smul, map_inv]
     congr 1
     all_goals first | rfl | exact congrArg (@Finset.univ _) (Subsingleton.elim _ _)
-  have e2
-      : (I.A.fam.R I.A3.fam3.base3.μ0).S.gaMat (I.A.fam.R I.A3.fam3.base3.μ0).r (lvlIdem P ψ)
-          *ᵥ cvL y
-        = ∑ h : P, (((Nat.card P : K)⁻¹ * ((ψ h⁻¹ : Kˣ) : K)) • ((I.A.fam.R I.A3.fam3.base3.μ0).S.actMat (I.A.fam.R I.A3.fam3.base3.μ0).r (h : G) *ᵥ cvL y)) :=
-    by
-      rw [CSD.gaMat_lvlIdem, ← Matrix.toLin'_apply]
-      set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_smul, map_sum, LinearMap.smul_apply, LinearMap.sum_apply, Matrix.toLin'_apply]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [hcv, hcv, e1, e2, map_sum]
+  have e2 : (I.A.fam.R I.A3.fam3.base3.μ0).S.gaMat (I.A.fam.R I.A3.fam3.base3.μ0).r (lvlIdem P ψ) *ᵥ cvL y =
+      ∑ h : P, (((Nat.card P : K)⁻¹ * ((ψ h⁻¹ : Kˣ) : K)) • ((I.A.fam.R I.A3.fam3.base3.μ0).S.actMat (I.A.fam.R I.A3.fam3.base3.μ0).r (h : G) *ᵥ cvL y)) := by
+    rw [CSD.gaMat_lvlIdem, ← Matrix.toLin'_apply]
+
+    simp only [map_smul, map_sum, LinearMap.smul_apply, LinearMap.sum_apply, Matrix.toLin'_apply]
+
+  rw [hcv, hcv, e1, e2, map_sum]
   refine Finset.sum_congr rfl fun h _ => ?_
   rw [map_smul, ← hcv, ← hcv, PassRep3.rho_cv I H (h : G) y]
 
@@ -222,59 +219,44 @@ namespace In3
 
 open Formalism.IndefR.CxPass.PassRep Formalism.IndefR.CxPass.PassRep3
 
-variable
-  {K : Type} [Field K] [NumberField K] [StarRing K]
-  {G : Type} [Group G] [Fintype G]
-  {Pl0 I0 Ty T : Type} {m : ℕ} (I : In3 K G Pl0 I0 Ty T m)
+variable {K : Type} [Field K] [NumberField K] [StarRing K] {G : Type} [Group G] [Fintype G] {Pl0 I0 Ty T : Type} {m : ℕ}
+  (I : In3 K G Pl0 I0 Ty T m)
 
-private theorem iCg_cpt_Jm_mulVec_and_Jm_injective {s : ℕ} (H : I.Hyp s) (b : Bool)
-    : (∀ x : Fin (I.Sb b).D → K,
-        I.iCg (cpt I.A3.fam3.base3.v0.embedding (I.Jm b *ᵥ x))
-          = I.X.iC I.cr b I.A3.fam3.base3.μ0 (cpt I.A3.fam3.base3.v0.embedding x))
-      ∧ Function.Injective (I.Jm b).mulVec := by
-  have hg
-      : ∀ x : Fin (I.Sb b).D → K, ∃ y : Fin I.Sg.D → K,
-        I.iCg (cpt I.A3.fam3.base3.v0.embedding y)
-          = I.X.iC I.cr b I.A3.fam3.base3.μ0 (cpt I.A3.fam3.base3.v0.embedding x) := by
+private theorem iCg_cpt_Jm_mulVec_and_Jm_injective {s : ℕ} (H : I.Hyp s) (b : Bool) :
+    (∀ x : Fin (I.Sb b).D → K, I.iCg (cpt I.A3.fam3.base3.v0.embedding (I.Jm b *ᵥ x)) =
+      I.X.iC I.cr b I.A3.fam3.base3.μ0 (cpt I.A3.fam3.base3.v0.embedding x)) ∧ Function.Injective (I.Jm b).mulVec := by
+  have hg : ∀ x : Fin (I.Sb b).D → K, ∃ y : Fin I.Sg.D → K, I.iCg (cpt I.A3.fam3.base3.v0.embedding y) =
+      I.X.iC I.cr b I.A3.fam3.base3.μ0 (cpt I.A3.fam3.base3.v0.embedding x) := by
     intro x
     obtain ⟨y, hy⟩ := PassRep3.sub_lvl I b I.A3.fam3.base3.μ0 x
     refine ⟨y, ?_⟩
     show I.X.iC I.cg false I.A3.fam3.base3.μ0 (cpt I.A3.fam3.base3.v0.embedding y) = _
     erw [CxData.iC_cpt', CxData.iC_cpt', hy]
-  have hR :=
-    PassRep.relK I.A3.fam3.base3.v0.embedding I.iCg (I.X.iC I.cr b I.A3.fam3.base3.μ0) H.h2g.1 hg
+  have hR := PassRep.relK I.A3.fam3.base3.v0.embedding I.iCg (I.X.iC I.cr b I.A3.fam3.base3.μ0) H.h2g.1 hg
   refine ⟨hR.2, fun x y hxy => ?_⟩
-  have h1
-      : I.X.iC I.cr b I.A3.fam3.base3.μ0 (cpt I.A3.fam3.base3.v0.embedding x)
-        = I.X.iC I.cr b I.A3.fam3.base3.μ0 (cpt I.A3.fam3.base3.v0.embedding y) :=
-    (hR.2 x).symm.trans
-      ((congrArg (fun v => I.iCg (cpt I.A3.fam3.base3.v0.embedding v)) hxy).trans (hR.2 y))
+  have h1 : I.X.iC I.cr b I.A3.fam3.base3.μ0 (cpt I.A3.fam3.base3.v0.embedding x) =
+      I.X.iC I.cr b I.A3.fam3.base3.μ0 (cpt I.A3.fam3.base3.v0.embedding y) :=
+    (hR.2 x).symm.trans ((congrArg (fun v => I.iCg (cpt I.A3.fam3.base3.v0.embedding v)) hxy).trans (hR.2 y))
   exact PassRep3.cpt_injective' _ ((H.h2 b).1 h1)
 
 theorem pJt : I.PJt := by
   intro s H b t
   obtain ⟨h1, h2⟩ := PassRep3.jt_spec I H.h2g b t
   refine ⟨h1, h2, fun x => ?_⟩
-  have e1
-      : I.iCg (cpt I.A3.fam3.base3.v0.embedding (I.Jm b *ᵥ (I.X.rowMat I.cr b t *ᵥ x)))
-        = I.X.iC I.cr b t (cpt I.A3.fam3.base3.v0.embedding x) :=
-    ((iCg_cpt_Jm_mulVec_and_Jm_injective I H b).1 _).trans
-      (PassRep.key_row' I.X I.cr b (fun t => ((H.h2 b).2.1 t).2) (H.ratMu b) t x)
-  have e2
-      : I.iCg (cpt I.A3.fam3.base3.v0.embedding (I.X.rowMat I.cg false t *ᵥ (I.Jt b t *ᵥ x)))
-        = I.X.iC I.cr b t (cpt I.A3.fam3.base3.v0.embedding x) :=
+  have e1 : I.iCg (cpt I.A3.fam3.base3.v0.embedding (I.Jm b *ᵥ (I.X.rowMat I.cr b t *ᵥ x))) =
+      I.X.iC I.cr b t (cpt I.A3.fam3.base3.v0.embedding x) :=
+    ((iCg_cpt_Jm_mulVec_and_Jm_injective I H b).1 _).trans (PassRep.key_row' I.X I.cr b (fun t => ((H.h2 b).2.1 t).2) (H.ratMu b) t x)
+  have e2 : I.iCg (cpt I.A3.fam3.base3.v0.embedding (I.X.rowMat I.cg false t *ᵥ (I.Jt b t *ᵥ x))) =
+      I.X.iC I.cr b t (cpt I.A3.fam3.base3.v0.embedding x) :=
     (PassRep.key_row' I.X I.cg false (fun t => (H.h2g.2 t).2) H.ratMug t _).trans (h1 x)
   exact PassRep3.cpt_injective' _ (H.h2g.1 (e1.trans e2.symm))
 
 theorem pRho : I.PRho := by
   intro s H
   have hsp := fun g x => PassRep3.rho_spec I H g x
-  have hinj
-      : ∀ M N : Matrix (Fin I.Sg.D) (Fin I.Sg.D) K,
-        (∀ x,
-            I.iCg (cpt I.A3.fam3.base3.v0.embedding (M *ᵥ x))
-              = I.iCg (cpt I.A3.fam3.base3.v0.embedding (N *ᵥ x)))
-          → M = N := by
+  have hinj : ∀ M N : Matrix (Fin I.Sg.D) (Fin I.Sg.D) K,
+      (∀ x, I.iCg (cpt I.A3.fam3.base3.v0.embedding (M *ᵥ x)) = I.iCg (cpt I.A3.fam3.base3.v0.embedding (N *ᵥ x))) →
+      M = N := by
     intro M N h
     have h' : ∀ x, M *ᵥ x = N *ᵥ x := fun x => PassRep3.cpt_injective' _ (H.h2g.1 (h x))
     exact Matrix.toLin'.injective (LinearMap.ext h')
@@ -291,42 +273,30 @@ theorem pJ : I.PJ := by
 theorem pRange : I.PRange := by
   intro s H b
   have hX := H.ok.ok2.irr
-  have hJt
-      : ∀ x,
-        I.cg.toR I.X.zs false I.A3.fam3.base3.μ0 (I.Jm b *ᵥ x)
-          = I.cr.toR I.X.zs b I.A3.fam3.base3.μ0 x := by
+  have hJt : ∀ x, I.cg.toR I.X.zs false I.A3.fam3.base3.μ0 (I.Jm b *ᵥ x) =
+      I.cr.toR I.X.zs b I.A3.fam3.base3.μ0 x := by
     intro x
     obtain ⟨y, hy⟩ := PassRep3.sub_lvl I b I.A3.fam3.base3.μ0 x
-    have h1
-        : I.iCg (cpt I.A3.fam3.base3.v0.embedding y)
-          = I.iCg (cpt I.A3.fam3.base3.v0.embedding (I.Jm b *ᵥ x)) := by
+    have h1 : I.iCg (cpt I.A3.fam3.base3.v0.embedding y) = I.iCg (cpt I.A3.fam3.base3.v0.embedding (I.Jm b *ᵥ x)) := by
       rw [(iCg_cpt_Jm_mulVec_and_Jm_injective I H b).1 x]
       show I.X.iC I.cg false I.A3.fam3.base3.μ0 (cpt I.A3.fam3.base3.v0.embedding y) = _
       erw [CxData.iC_cpt', CxData.iC_cpt', hy]
     have h2 := PassRep3.cpt_injective' _ (H.h2g.1 h1)
     rw [← h2, hy]
-  have key
-      : ∀ (ℓ : Lvl K G)
-          (v : Fin ((I.A.fam.R I.A3.fam3.base3.μ0).dZ ℓ (I.X.zs.Z I.A3.fam3.base3.μ0)) → K),
-        cv (I.A.fam.R I.A3.fam3.base3.μ0) ℓ (I.X.zs.Z I.A3.fam3.base3.μ0) v
-          = (I.A.fam.R I.A3.fam3.base3.μ0).S.basis.equivFun
-            ((I.A.fam.R I.A3.fam3.base3.μ0).toF ℓ (I.X.zs.Z I.A3.fam3.base3.μ0) v) := by
+  have key : ∀ (ℓ : Lvl K G) (v : Fin ((I.A.fam.R I.A3.fam3.base3.μ0).dZ ℓ (I.X.zs.Z I.A3.fam3.base3.μ0)) → K),
+      cv (I.A.fam.R I.A3.fam3.base3.μ0) ℓ (I.X.zs.Z I.A3.fam3.base3.μ0) v =
+        (I.A.fam.R I.A3.fam3.base3.μ0).S.basis.equivFun
+          ((I.A.fam.R I.A3.fam3.base3.μ0).toF ℓ (I.X.zs.Z I.A3.fam3.base3.μ0) v) := by
     intro ℓ v
     erw [BlockDat.toF_apply, LinearEquiv.apply_symm_apply]
     rfl
   cases b
-  · refine PassRep.range_eq_block (I.A.fam.R I.A3.fam3.base3.μ0) I.A.fam.X hX I.P0 I.ψ0
-      (I.X.zs.Z I.A3.fam3.base3.μ0) (I.Jm false)
-      (fun x => ?_)
-      (I.epM I.P0 I.ψ0)
-      (fun y => PassRep3.cv_epM I H I.P0 I.ψ0 y)
+  · refine PassRep.range_eq_block (I.A.fam.R I.A3.fam3.base3.μ0) I.A.fam.X hX I.P0 I.ψ0 (I.X.zs.Z I.A3.fam3.base3.μ0) (I.Jm false) (fun x => ?_)
+      (I.epM I.P0 I.ψ0) (fun y => PassRep3.cv_epM I H I.P0 I.ψ0 y)
     rw [key, key]
     exact congrArg _ (hJt x)
-  · refine PassRep.range_eq_block (I.A.fam.R I.A3.fam3.base3.μ0) I.A.fam.X hX I.P1 I.ψ1
-      (I.X.zs.Z I.A3.fam3.base3.μ0) (I.Jm true)
-      (fun x => ?_)
-      (I.epM I.P1 I.ψ1)
-      (fun y => PassRep3.cv_epM I H I.P1 I.ψ1 y)
+  · refine PassRep.range_eq_block (I.A.fam.R I.A3.fam3.base3.μ0) I.A.fam.X hX I.P1 I.ψ1 (I.X.zs.Z I.A3.fam3.base3.μ0) (I.Jm true) (fun x => ?_)
+      (I.epM I.P1 I.ψ1) (fun y => PassRep3.cv_epM I H I.P1 I.ψ1 y)
     rw [key, key]
     exact congrArg _ (hJt x)
 

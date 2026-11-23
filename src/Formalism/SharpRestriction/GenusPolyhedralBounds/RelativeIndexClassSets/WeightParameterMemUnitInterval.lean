@@ -1,10 +1,60 @@
 module
 
-public import Formalism.LocalToGlobal.IndefiniteForms.IndefiniteTree.ExampleSatisfiesConditionsAtFive
 public import Formalism.SharpRestriction.Divisibility.WeightAlgebra
-public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.LatticeIndexDeterminant.NegLogValuation
-public import Formalism.MirabolicMackeyTheory.MirabolicMackeyProofs.ThreeForms
+public import Formalism.MirabolicMackeyTheory.StatementL
 public import Development.AutomorphicArithmetic.IntegralCasts.CapelliIdentities.ExistsBasisOfPid
+public import Formalism.HermitianLattices.HermitianLatticesProofs.LocBasic
+import Formalism.MirabolicMackeyTheory.MirabolicMackeyProofs.IdxRules
+public import Formalism.MirabolicMackeyTheory.MirabolicMackeyProofs.ThreeForms
+public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.LatticeIndexDeterminant.NegLogValuation
+import Formalism.QuotientMetricDivisors.HermitianTwistDivisors.IdxChange
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Int
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Coalgebra.IsFrobenius
+import Mathlib.RingTheory.HopfAlgebra.Basic
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
+public import Formalism.LocalToGlobal.IndefiniteForms.IndefSide
+public import Formalism.LocalToGlobal.IndefiniteForms.IndefiniteTree.ExampleSatisfiesConditionsAtFive
 
 @[expose] public section
 
@@ -19,14 +69,23 @@ open Formalism.DivisionValues (vw conjPl)
 open Formalism.EigenvalueLevelCeiling (lix cut sc IsLatIn plc)
 
 structure Run (D : D7) (B : WeightFamilies.Prov D) (P : ModuliIntegralCharts.Prov D) where
+
   jn : ℕ
+
   X : WeightAlgebra.PJ D B P jn
+
   S : WeightAlgebra.Scal B
+
   ka : WeightFamilies.Wt D jn
+
   wL : WeightFamilies.Wt D jn
+
   wF : WeightFamilies.Wt D jn
+
   T : ℕ
+
   nus : HeightOneSpectrum (𝓞 B.KO) → ℝ
+
   β : ℝ
 
 namespace Run
@@ -53,13 +112,10 @@ section Comparison₂
 
 variable {K : Type} [Field K] [NumberField K] [StarRing K]
 
-def RemOK {n : ℕ} (v : HeightOneSpectrum (𝓞 K)) (M Th : Submodule (𝓞 K) (Fin n → K)) (E : ℕ) (ρ : ℝ)
-    : Prop :=
+def RemOK {n : ℕ} (v : HeightOneSpectrum (𝓞 K)) (M Th : Submodule (𝓞 K) (Fin n → K)) (E : ℕ) (ρ : ℝ) : Prop :=
   ∀ W : Submodule K (Fin n → K), (lix v (cut W M) (cut W Th) : ℝ) ≤ (E : ℝ) * (finrank K W : ℝ) + ρ
 
-variable
-  {Bs : DefBase K} {Df : DefSide Bs} {S : IndefData Df} {P' : Type} [Group P'] [Finite P']
-  {c : OnConst}
+variable {Bs : DefBase K} {Df : DefSide Bs} {S : IndefData Df} {P' : Type} [Group P'] [Finite P'] {c : OnConst}
 
 end Comparison₂
 
@@ -79,91 +135,70 @@ open Formalism.HermitianLatticesTheory (lidx localization₂ locLen)
 
 section Comp
 
-variable
-  {R K F : Type} [CommRing R] [IsDedekindDomain R] [Field K] [Algebra R K] [IsFractionRing R K]
-  [AddCommGroup F] [Module K F] [Module R F] [IsScalarTower R K F]
-  (v : HeightOneSpectrum R)
+variable {R K F : Type} [CommRing R] [IsDedekindDomain R] [Field K] [Algebra R K] [IsFractionRing R K]
+  [AddCommGroup F] [Module K F] [Module R F] [IsScalarTower R K F] (v : HeightOneSpectrum R)
 
-def bcC : F →ₗ[K] TensorProduct K (v.adicCompletion K) F :=
-  TensorProduct.mk K (v.adicCompletion K) F 1
+def bcC : F →ₗ[K] TensorProduct K (v.adicCompletion K) F := TensorProduct.mk K (v.adicCompletion K) F 1
 
-def locC (N : Submodule R F)
-    : Submodule (v.adicCompletionIntegers K) (TensorProduct K (v.adicCompletion K) F) :=
+def locC (N : Submodule R F) : Submodule (v.adicCompletionIntegers K) (TensorProduct K (v.adicCompletion K) F) :=
   Submodule.span (v.adicCompletionIntegers K) (bcC v '' (N : Set F))
 
-def locKC (W : Submodule K F)
-    : Submodule (v.adicCompletion K) (TensorProduct K (v.adicCompletion K) F) :=
+def locKC (W : Submodule K F) : Submodule (v.adicCompletion K) (TensorProduct K (v.adicCompletion K) F) :=
   Submodule.span (v.adicCompletion K) (bcC v '' (W : Set F))
 
 def LengthLocalizationLeCompletion : Prop :=
   ∀ (A T : Submodule R F) (W : Submodule K F),
     Module.length (v.adicCompletionIntegers K)
-          (↥(locC v A ⊓ (locKC v W).restrictScalars (v.adicCompletionIntegers K)) ⧸
-            (locC v T ⊓ (locKC v W).restrictScalars (v.adicCompletionIntegers K)).comap
-              (locC v A ⊓ (locKC v W).restrictScalars (v.adicCompletionIntegers K)).subtype)
-        ≠ ⊤
-      → Module.length R
-          (↥(localization₂ v.asIdeal (A ⊓ W.restrictScalars R)) ⧸
-            (localization₂ v.asIdeal (A ⊓ W.restrictScalars R ⊓ T)).comap (localization₂ v.asIdeal (A ⊓ W.restrictScalars R)).subtype)
-        ≤ Module.length (v.adicCompletionIntegers K)
-          (↥(locC v A ⊓ (locKC v W).restrictScalars (v.adicCompletionIntegers K)) ⧸
-            (locC v T ⊓ (locKC v W).restrictScalars (v.adicCompletionIntegers K)).comap
-              (locC v A ⊓ (locKC v W).restrictScalars (v.adicCompletionIntegers K)).subtype)
+      (↥(locC v A ⊓ (locKC v W).restrictScalars (v.adicCompletionIntegers K)) ⧸
+        (locC v T ⊓ (locKC v W).restrictScalars (v.adicCompletionIntegers K)).comap
+          (locC v A ⊓ (locKC v W).restrictScalars (v.adicCompletionIntegers K)).subtype) ≠ ⊤ →
+    Module.length R (↥(localization₂ v.asIdeal (A ⊓ W.restrictScalars R)) ⧸
+        (localization₂ v.asIdeal (A ⊓ W.restrictScalars R ⊓ T)).comap (localization₂ v.asIdeal (A ⊓ W.restrictScalars R)).subtype) ≤
+    Module.length (v.adicCompletionIntegers K)
+      (↥(locC v A ⊓ (locKC v W).restrictScalars (v.adicCompletionIntegers K)) ⧸
+        (locC v T ⊓ (locKC v W).restrictScalars (v.adicCompletionIntegers K)).comap
+          (locC v A ⊓ (locKC v W).restrictScalars (v.adicCompletionIntegers K)).subtype)
 
 def CompletionPreservesFinrank : Prop :=
-  ∀ W : Submodule K F,
-    FiniteDimensional K W → finrank (v.adicCompletion K) (locKC v W) = finrank K W
+  ∀ W : Submodule K F, FiniteDimensional K W → finrank (v.adicCompletion K) (locKC v W) = finrank K W
 
 def CompletionSpanContainment : Prop :=
-  ∀ (A : Submodule R F) (W : Submodule K F),
-    W ≤ Submodule.span K (A : Set F)
-      → locKC v W ≤ Submodule.span (v.adicCompletion K) (bcC v '' (A : Set F))
+  ∀ (A : Submodule R F) (W : Submodule K F), W ≤ Submodule.span K (A : Set F) →
+    locKC v W ≤ Submodule.span (v.adicCompletion K) (bcC v '' (A : Set F))
 
 end Comp
 
 section BC
 
-variable
-  {K0 K : Type} [Field K0] [NumberField K0] [Field K] [NumberField K] [Algebra K0 K]
-  {Z0 : Type} [AddCommGroup Z0] [Module K0 Z0] [FiniteDimensional K0 Z0] [Module (𝓞 K0) Z0]
-  [IsScalarTower (𝓞 K0) K0 Z0]
+variable {K0 K : Type} [Field K0] [NumberField K0] [Field K] [NumberField K] [Algebra K0 K]
+  {Z0 : Type} [AddCommGroup Z0] [Module K0 Z0] [FiniteDimensional K0 Z0] [Module (𝓞 K0) Z0] [IsScalarTower (𝓞 K0) K0 Z0]
   {n : ℕ}
 
 def up (ι : Z0 →ₗ[K0] (Fin n → K)) (A0 : Submodule (𝓞 K0) Z0) : Submodule (𝓞 K) (Fin n → K) :=
   Submodule.span (𝓞 K) (ι '' (A0 : Set Z0))
 
 def IndexMulRamificationIndex (ι : Z0 →ₗ[K0] (Fin n → K)) : Prop :=
-  (∀ (m : ℕ) (b : Fin m → Z0), LinearIndependent K0 b → LinearIndependent K fun a => ι (b a))
-    → Submodule.span K (Set.range ι) = ⊤
-    → ∀ A0 C0 : Submodule (𝓞 K0) Z0,
-      A0.FG → Submodule.span K0 (A0 : Set Z0) = ⊤ → C0.FG → Submodule.span K0 (C0 : Set Z0) = ⊤
-        → ∀ v : HeightOneSpectrum (𝓞 K),
-          lidx v.asIdeal (up ι A0) (up ι C0)
-            = (v.asIdeal.ramificationIdx (𝓞 K0) : ℤ) * lidx (v.under (𝓞 K0)).asIdeal A0 C0
+  (∀ (m : ℕ) (b : Fin m → Z0), LinearIndependent K0 b → LinearIndependent K fun a => ι (b a)) →
+  Submodule.span K (Set.range ι) = ⊤ →
+  ∀ A0 C0 : Submodule (𝓞 K0) Z0, A0.FG → Submodule.span K0 (A0 : Set Z0) = ⊤ → C0.FG →
+    Submodule.span K0 (C0 : Set Z0) = ⊤ → ∀ v : HeightOneSpectrum (𝓞 K),
+    lidx v.asIdeal (up ι A0) (up ι C0) =
+      (v.asIdeal.ramificationIdx (𝓞 K0) : ℤ) * lidx (v.under (𝓞 K0)).asIdeal A0 C0
 
-def ValuationMulRamificationIndex
-    (K0 K : Type) [Field K0] [NumberField K0] [Field K] [NumberField K] [Algebra K0 K]
-    : Prop :=
-  ∀ (v : HeightOneSpectrum (𝓞 K)) (a : K0),
-    a ≠ 0
-      → FractionalIdeal.count K v
-          (FractionalIdeal.spanSingleton (nonZeroDivisors (𝓞 K)) (algebraMap K0 K a))
-        = (v.asIdeal.ramificationIdx (𝓞 K0) : ℤ) * FractionalIdeal.count K0 (v.under (𝓞 K0))
-          (FractionalIdeal.spanSingleton (nonZeroDivisors (𝓞 K0)) a)
+def ValuationMulRamificationIndex (K0 K : Type) [Field K0] [NumberField K0] [Field K] [NumberField K] [Algebra K0 K] : Prop :=
+  ∀ (v : HeightOneSpectrum (𝓞 K)) (a : K0), a ≠ 0 →
+    FractionalIdeal.count K v (FractionalIdeal.spanSingleton (nonZeroDivisors (𝓞 K)) (algebraMap K0 K a)) =
+      (v.asIdeal.ramificationIdx (𝓞 K0) : ℤ) *
+        FractionalIdeal.count K0 (v.under (𝓞 K0)) (FractionalIdeal.spanSingleton (nonZeroDivisors (𝓞 K0)) a)
 
-def RamificationIndexNeZero
-    (K0 K : Type) [Field K0] [NumberField K0] [Field K] [NumberField K] [Algebra K0 K]
-    : Prop :=
+def RamificationIndexNeZero (K0 K : Type) [Field K0] [NumberField K0] [Field K] [NumberField K] [Algebra K0 K] : Prop :=
   ∀ v : HeightOneSpectrum (𝓞 K), v.asIdeal.ramificationIdx (𝓞 K0) ≠ 0
 
-def SumOverPlacesLeBaseSum
-    (K0 K : Type) [Field K0] [NumberField K0] [Field K] [NumberField K] [Algebra K0 K]
-    : Prop :=
-  ∀ r : HeightOneSpectrum (𝓞 K0) → ℝ,
-    (∀ la, 0 ≤ r la) → Summable (fun la => r la * Formalism.BasicNotions.lw K0 la)
-      → ∀ S' : Finset (HeightOneSpectrum (𝓞 K)),
-        ∑ v ∈ S', Formalism.BasicNotions.lw K v * ((v.asIdeal.ramificationIdx (𝓞 K0) : ℝ) * r (v.under (𝓞 K0)))
-          ≤ ∑' la, r la * Formalism.BasicNotions.lw K0 la
+def SumOverPlacesLeBaseSum (K0 K : Type) [Field K0] [NumberField K0] [Field K] [NumberField K] [Algebra K0 K] : Prop :=
+  ∀ r : HeightOneSpectrum (𝓞 K0) → ℝ, (∀ la, 0 ≤ r la) → Summable (fun la => r la * Formalism.BasicNotions.lw K0 la) →
+    ∀ S' : Finset (HeightOneSpectrum (𝓞 K)),
+      ∑ v ∈ S', Formalism.BasicNotions.lw K v * ((v.asIdeal.ramificationIdx (𝓞 K0) : ℝ) * r (v.under (𝓞 K0))) ≤
+        ∑' la, r la * Formalism.BasicNotions.lw K0 la
 
 end BC
 
@@ -185,17 +220,15 @@ open Formalism.HermitianLatticesTheory (lidx localization₂ locLen locS)
 
 section CompP
 
-variable
-  {R K F : Type} [CommRing R] [IsDedekindDomain R] [Field K] [Algebra R K] [IsFractionRing R K]
-  [AddCommGroup F] [Module K F] [Module R F] [IsScalarTower R K F]
-  (v : HeightOneSpectrum R)
+variable {R K F : Type} [CommRing R] [IsDedekindDomain R] [Field K] [Algebra R K] [IsFractionRing R K]
+  [AddCommGroup F] [Module K F] [Module R F] [IsScalarTower R K F] (v : HeightOneSpectrum R)
 
 abbrev OOv : Subalgebra R K :=
   Localization.subalgebra.ofField K v.asIdeal.primeCompl v.asIdeal.primeCompl_le_nonZeroDivisors
 
-theorem mem_OOv (x : K)
-    : x ∈ OOv (K := K) v
-      ↔ ∃ (a s : R) (_ : s ∈ v.asIdeal.primeCompl), x = algebraMap R K a * (algebraMap R K s)⁻¹ :=
+theorem mem_OOv (x : K) :
+    x ∈ OOv (K := K) v ↔ ∃ (a s : R) (_ : s ∈ v.asIdeal.primeCompl),
+      x = algebraMap R K a * (algebraMap R K s)⁻¹ :=
   Iff.rfl
 
 theorem isDVR_OOv : IsDiscreteValuationRing (OOv (K := K) v) :=
@@ -206,8 +239,8 @@ theorem alg_ne_zero {s : R} (hs : s ∉ v.asIdeal) : algebraMap R K s ≠ 0 := b
   have : s = 0 := (IsFractionRing.injective R K) (by rw [h, map_zero])
   exact hs (this ▸ v.asIdeal.zero_mem)
 
-theorem mem_localization_iff_mem_span' (M : Submodule R F) (x : F)
-    : x ∈ localization₂ v.asIdeal M ↔ x ∈ Submodule.span (OOv (K := K) v) (M : Set F) := by
+theorem mem_localization_iff_mem_span' (M : Submodule R F) (x : F) :
+    x ∈ localization₂ v.asIdeal M ↔ x ∈ Submodule.span (OOv (K := K) v) (M : Set F) := by
   constructor
   · rintro ⟨s, hs, hsx⟩
     have hs0 := alg_ne_zero (K := K) v hs
@@ -256,15 +289,12 @@ theorem mem_OOv_of_val {a : K} (h : v.valuation K a ≤ 1) : a ∈ OOv (K := K) 
       have h1 : v.valuation K (algebraMap R K r) < 1 := by
         rw [HeightOneSpectrum.valuation_of_algebraMap]; exact (v.intValuation_lt_one_iff_mem r).2 hr
       have h2 : v.valuation K (algebraMap R K s) = 1 := by
-        rw [HeightOneSpectrum.valuation_of_algebraMap]
-        exact (v.intValuation_eq_one_iff_mem_primeCompl s).2 hs
+        rw [HeightOneSpectrum.valuation_of_algebraMap]; exact (v.intValuation_eq_one_iff_mem_primeCompl s).2 hs
       have h3 : v.valuation K a⁻¹ < 1 := by
         rw [hc', map_mul, map_inv₀, h2, inv_one, mul_one]; exact h1
       have h4 : v.valuation K (a * a⁻¹) < 1 := by
         rw [map_mul]
-        calc
-          v.valuation K a * v.valuation K a⁻¹
-            ≤ 1 * v.valuation K a⁻¹ := mul_le_mul' h le_rfl
+        calc v.valuation K a * v.valuation K a⁻¹ ≤ 1 * v.valuation K a⁻¹ := mul_le_mul' h le_rfl
           _ = v.valuation K a⁻¹ := one_mul _
           _ < 1 := h3
       rw [mul_inv_cancel₀ ha, map_one] at h4
@@ -278,32 +308,26 @@ end CompP
 
 section CompD
 
-variable
-  {R K F : Type} [CommRing R] [IsDedekindDomain R] [Field K] [Algebra R K] [IsFractionRing R K]
-  [AddCommGroup F] [Module K F] [Module R F] [IsScalarTower R K F]
-  (v : HeightOneSpectrum R)
+variable {R K F : Type} [CommRing R] [IsDedekindDomain R] [Field K] [Algebra R K] [IsFractionRing R K]
+  [AddCommGroup F] [Module K F] [Module R F] [IsScalarTower R K F] (v : HeightOneSpectrum R)
 
 theorem val_of_mem_OOv {a : K} (h : a ∈ OOv (K := K) v) : v.valuation K a ≤ 1 := by
   obtain ⟨r, s, hs, rfl⟩ := (mem_OOv v a).mp h
   have h2 : v.valuation K (algebraMap R K s) = 1 := by
-    rw [HeightOneSpectrum.valuation_of_algebraMap]
-    exact (v.intValuation_eq_one_iff_mem_primeCompl s).2 hs
+    rw [HeightOneSpectrum.valuation_of_algebraMap]; exact (v.intValuation_eq_one_iff_mem_primeCompl s).2 hs
   rw [map_mul, map_inv₀, h2, inv_one, mul_one]
   exact v.valuation_le_one r
 
-theorem bc_smul (k : K) (x : F)
-    : bcC (K := K) v (k • x) = algebraMap K (v.adicCompletion K) k • bcC (K := K) v x := by
+theorem bc_smul (k : K) (x : F) : bcC (K := K) v (k • x) = algebraMap K (v.adicCompletion K) k • bcC (K := K) v x := by
   rw [map_smul, algebraMap_smul]
 
-theorem descent (T : Submodule R F) (y : F) (h : bcC (K := K) v y ∈ locC (K := K) v T)
-    : y ∈ localization₂ v.asIdeal T := by
+theorem descent (T : Submodule R F) (y : F) (h : bcC (K := K) v y ∈ locC (K := K) v T) : y ∈ localization₂ v.asIdeal T := by
   classical
   have hdvr := isDVR_OOv (K := K) v
   obtain ⟨t', ht', hy'⟩ := Submodule.mem_span_finite_of_mem_span h
   obtain ⟨t, htT, rfl⟩ := Finset.subset_set_image_iff.1 ht'
   set L : Submodule (OOv (K := K) v) F := Submodule.span (OOv (K := K) v) (t : Set F) with hL
-  have hfin : Module.Finite (OOv (K := K) v) L :=
-    Module.Finite.of_fg (Submodule.fg_span t.finite_toSet)
+  have hfin : Module.Finite (OOv (K := K) v) L := Module.Finite.of_fg (Submodule.fg_span t.finite_toSet)
   have htf : Module.IsTorsionFree (OOv (K := K) v) L := by
     refine Module.IsTorsionFree.of_smul_eq_zero fun r m h => ?_
     have h1 : ((r : K)) • (m : F) = 0 := congrArg Subtype.val h
@@ -315,16 +339,15 @@ theorem descent (T : Submodule R F) (y : F) (h : bcC (K := K) v y ∈ locC (K :=
   let u' : Module.Free.ChooseBasisIndex (OOv (K := K) v) L → F := fun i => (u i : F)
   have hli0 : LinearIndependent (OOv (K := K) v) u' :=
     u.linearIndependent.map' L.subtype (Submodule.ker_subtype _)
-  have hli : LinearIndependent K u' :=
-    (LinearIndependent.iff_fractionRing (OOv (K := K) v) K).1 hli0
+  have hli : LinearIndependent K u' := (LinearIndependent.iff_fractionRing (OOv (K := K) v) K).1 hli0
   have hspan : Submodule.span (OOv (K := K) v) (Set.range u') = L := by
-    have e : Set.range u' = L.subtype '' Set.range u := by rw [← Set.range_comp]; rfl
+    have e : Set.range u' = L.subtype '' Set.range u := by
+      rw [← Set.range_comp]; rfl
     rw [e, Submodule.span_image, u.span_eq, Submodule.map_top, Submodule.range_subtype]
   let b := Module.Basis.extend hli.linearIndepOn_id
   let bh := b.baseChange (v.adicCompletion K)
 
-  have hPF
-      : ∀ x ∈ L, ∀ i, b.repr x i ∈ OOv (K := K) v ∧ ((i : F) ∉ Set.range u' → b.repr x i = 0) := by
+  have hPF : ∀ x ∈ L, ∀ i, b.repr x i ∈ OOv (K := K) v ∧ ((i : F) ∉ Set.range u' → b.repr x i = 0) := by
     intro x hx
     rw [← hspan] at hx
     induction hx using Submodule.span_induction with
@@ -336,24 +359,18 @@ theorem descent (T : Submodule R F) (y : F) (h : bcC (K := K) v y ∈ locC (K :=
       split_ifs with hi
       · exact ⟨Subalgebra.one_mem _, fun h => absurd (hi ▸ hx) h⟩
       · exact ⟨Subalgebra.zero_mem _, fun _ => rfl⟩
-    | zero =>
-      intro i; simp
+    | zero => intro i; simp
     | add x z _ _ hx hz =>
       intro i
       rw [map_add (f := _), Finsupp.add_apply]
-      exact
-        ⟨Subalgebra.add_mem _ (hx i).1 (hz i).1, fun h => by rw [(hx i).2 h, (hz i).2 h, add_zero]⟩
+      exact ⟨Subalgebra.add_mem _ (hx i).1 (hz i).1, fun h => by rw [(hx i).2 h, (hz i).2 h, add_zero]⟩
     | smul a x _ hx =>
       intro i
       rw [Subalgebra.smul_def, map_smul, Finsupp.smul_apply, smul_eq_mul]
       exact ⟨Subalgebra.mul_mem _ a.2 (hx i).1, fun h => by rw [(hx i).2 h, mul_zero]⟩
 
-  have hPH
-      : ∀ z
-          ∈ Submodule.span (v.adicCompletionIntegers K)
-            ((t.image (bcC (K := K) v) : Finset _) : Set _),
-        ∀ i,
-          Valued.v (bh.repr z i) ≤ 1 ∧ ((i : F) ∉ Set.range u' → bh.repr z i = 0) := by
+  have hPH : ∀ z ∈ Submodule.span (v.adicCompletionIntegers K) ((t.image (bcC (K := K) v) : Finset _) : Set _),
+      ∀ i, Valued.v (bh.repr z i) ≤ 1 ∧ ((i : F) ∉ Set.range u' → bh.repr z i = 0) := by
     intro z hz
     induction hz using Submodule.span_induction with
     | mem z hz =>
@@ -366,23 +383,17 @@ theorem descent (T : Submodule R F) (y : F) (h : bcC (K := K) v y ∈ locC (K :=
         rw [Module.Basis.baseChange_repr_tmul, Algebra.smul_def, mul_one]
       rw [e, val_alg]
       exact ⟨val_of_mem_OOv v h1.1, fun h => by rw [h1.2 h, map_zero]⟩
-    | zero =>
-      intro i; simp
+    | zero => intro i; simp
     | add x z _ _ hx hz =>
       intro i
       rw [map_add (f := _), Finsupp.add_apply]
-      exact ⟨
-        Valuation.map_add_le _ (hx i).1 (hz i).1,
-        fun h => by rw [(hx i).2 h, (hz i).2 h, add_zero]
-      ⟩
+      exact ⟨Valuation.map_add_le _ (hx i).1 (hz i).1, fun h => by rw [(hx i).2 h, (hz i).2 h, add_zero]⟩
     | smul a x _ hx =>
       intro i
       have e : a • x = (a : v.adicCompletion K) • x := rfl
       rw [e, map_smul, Finsupp.smul_apply, smul_eq_mul, map_mul]
-      exact ⟨
-        mul_le_one' ((HeightOneSpectrum.mem_adicCompletionIntegers R K v).1 a.2) (hx i).1,
-        fun h => by rw [(hx i).2 h, mul_zero]
-      ⟩
+      exact ⟨mul_le_one' ((HeightOneSpectrum.mem_adicCompletionIntegers R K v).1 a.2) (hx i).1,
+        fun h => by rw [(hx i).2 h, mul_zero]⟩
   have hy := hPH _ hy'
   have e : ∀ i, bh.repr (bcC (K := K) v y) i = algebraMap K (v.adicCompletion K) (b.repr y i) := by
     intro i
@@ -400,13 +411,10 @@ theorem descent (T : Submodule R F) (y : F) (h : bcC (K := K) v y ∈ locC (K :=
       rw [e2]
       exact hspan.le (Submodule.smul_mem _ _ (Submodule.subset_span hi))
     · have h3 := h1.2 hi
-      have h4 : b.repr y i = 0 :=
-        (algebraMap K (v.adicCompletion K)).injective (by rw [h3, map_zero])
+      have h4 : b.repr y i = 0 := (algebraMap K (v.adicCompletion K)).injective (by rw [h3, map_zero])
       rw [h4, zero_smul]
       exact Submodule.zero_mem _
-  have h5
-      : y ∈ Submodule.span (OOv (K := K) v)
-        ((Submodule.span R (t : Set F) : Submodule R F) : Set F) :=
+  have h5 : y ∈ Submodule.span (OOv (K := K) v) ((Submodule.span R (t : Set F) : Submodule R F) : Set F) :=
     Submodule.span_mono Submodule.subset_span hyL
   have h6 := (mem_localization_iff_mem_span' (K := K) v _ y).2 h5
   obtain ⟨s, hs, hsy⟩ := h6
@@ -416,19 +424,13 @@ end CompD
 
 section CompA
 
-variable
-  {R K F : Type} [CommRing R] [IsDedekindDomain R] [Field K] [Algebra R K] [IsFractionRing R K]
-  [AddCommGroup F] [Module K F] [Module R F] [IsScalarTower R K F]
-  (v : HeightOneSpectrum R)
+variable {R K F : Type} [CommRing R] [IsDedekindDomain R] [Field K] [Algebra R K] [IsFractionRing R K]
+  [AddCommGroup F] [Module K F] [Module R F] [IsScalarTower R K F] (v : HeightOneSpectrum R)
 
-theorem coe_algO (r : R)
-    : ((algebraMap R (v.adicCompletionIntegers K) r : v.adicCompletionIntegers K)
-        : v.adicCompletion K)
-      = algebraMap K (v.adicCompletion K) (algebraMap R K r) :=
-  rfl
+theorem coe_algO (r : R) : ((algebraMap R (v.adicCompletionIntegers K) r : v.adicCompletionIntegers K) : v.adicCompletion K) =
+    algebraMap K (v.adicCompletion K) (algebraMap R K r) := rfl
 
-theorem exists_inv_mod (n : ℕ) {s : R} (hs : s ∉ v.asIdeal)
-    : ∃ t : R, 1 - s * t ∈ v.asIdeal ^ n := by
+theorem exists_inv_mod (n : ℕ) {s : R} (hs : s ∉ v.asIdeal) : ∃ t : R, 1 - s * t ∈ v.asIdeal ^ n := by
   obtain ⟨y, i, hi, hyi⟩ := v.isMaximal.exists_inv hs
   obtain ⟨w, hw⟩ := sub_dvd_pow_sub_pow (1 : R) i n
   refine ⟨y * w, ?_⟩
@@ -439,28 +441,22 @@ theorem exists_inv_mod (n : ℕ) {s : R} (hs : s ∉ v.asIdeal)
   rw [e]
   exact Ideal.pow_mem_pow hi n
 
-theorem approx (c : v.adicCompletionIntegers K) (n : ℕ)
-    : ∃ r : R,
-      Valued.v ((c : v.adicCompletion K) - algebraMap K (v.adicCompletion K) (algebraMap R K r))
-        ≤ WithZero.exp (-(n : ℤ)) := by
+theorem approx (c : v.adicCompletionIntegers K) (n : ℕ) :
+    ∃ r : R, Valued.v ((c : v.adicCompletion K) - algebraMap K (v.adicCompletion K) (algebraMap R K r)) ≤
+      WithZero.exp (-(n : ℤ)) := by
   obtain ⟨π, hπ⟩ := v.intValuation_exists_uniformizer
   set p : v.adicCompletion K := algebraMap K (v.adicCompletion K) (algebraMap R K π) with hp
   have hpv : Valued.v p = WithZero.exp (-1 : ℤ) := by
     rw [hp, val_alg, HeightOneSpectrum.valuation_of_algebraMap, hπ]
   have hpn : Valued.v (p ^ n) = WithZero.exp (-(n : ℤ)) := by
     rw [map_pow, hpv, ← WithZero.exp_nsmul]; congr 1; simp
-  have hopen : IsOpen
-      {x : v.adicCompletion K |
-        (x - (c : v.adicCompletion K)) * (p ^ n)⁻¹ ∈ (Valued.v.valuationSubring : ValuationSubring (v.adicCompletion K))} :=
+  have hopen : IsOpen {x : v.adicCompletion K |
+      (x - (c : v.adicCompletion K)) * (p ^ n)⁻¹ ∈ (Valued.v.valuationSubring : ValuationSubring (v.adicCompletion K))} :=
     (Valued.isOpen_valuationSubring (v.adicCompletion K)).preimage
       ((continuous_sub_right _).mul continuous_const)
   obtain ⟨k, hk⟩ := (v.denseRange_algebraMap K).exists_mem_open hopen ⟨c, by simp⟩
-  have hk'
-      : Valued.v (algebraMap K (v.adicCompletion K) k - (c : v.adicCompletion K))
-        ≤ WithZero.exp (-(n : ℤ)) := by
-    have h1
-        : Valued.v ((algebraMap K (v.adicCompletion K) k - (c : v.adicCompletion K)) * (p ^ n)⁻¹)
-          ≤ 1 :=
+  have hk' : Valued.v (algebraMap K (v.adicCompletion K) k - (c : v.adicCompletion K)) ≤ WithZero.exp (-(n : ℤ)) := by
+    have h1 : Valued.v ((algebraMap K (v.adicCompletion K) k - (c : v.adicCompletion K)) * (p ^ n)⁻¹) ≤ 1 :=
       (Valuation.mem_valuationSubring_iff _ _).1 hk
     rw [map_mul, map_inv₀, hpn] at h1
     have h2 := mul_le_mul' h1 (le_refl (WithZero.exp (-(n : ℤ))))
@@ -469,64 +465,49 @@ theorem approx (c : v.adicCompletionIntegers K) (n : ℕ)
     rw [← WithZero.exp_zero, WithZero.exp_le_exp]; omega
   have hk1 : v.valuation K k ≤ 1 := by
     rw [← val_alg]
-    have e
-        : algebraMap K (v.adicCompletion K) k = (algebraMap K (v.adicCompletion K) k - c) + c := by
-      ring
+    have e : algebraMap K (v.adicCompletion K) k = (algebraMap K (v.adicCompletion K) k - c) + c := by ring
     rw [e]
-    exact Valuation.map_add_le _ (hk'.trans hle1)
-      ((HeightOneSpectrum.mem_adicCompletionIntegers R K v).1 c.2)
+    exact Valuation.map_add_le _ (hk'.trans hle1) ((HeightOneSpectrum.mem_adicCompletionIntegers R K v).1 c.2)
   obtain ⟨a, s, hs, rfl⟩ := (mem_OOv v k).mp (mem_OOv_of_val v hk1)
   obtain ⟨t, ht⟩ := exists_inv_mod v n hs
   refine ⟨a * t, ?_⟩
   have hs0 := alg_ne_zero (K := K) v hs
-  have e1
-      : algebraMap R K a * (algebraMap R K s)⁻¹ - algebraMap R K (a * t)
-        = algebraMap R K a * algebraMap R K (1 - s * t) * (algebraMap R K s)⁻¹ := by
+  have e1 : algebraMap R K a * (algebraMap R K s)⁻¹ - algebraMap R K (a * t) =
+      algebraMap R K a * algebraMap R K (1 - s * t) * (algebraMap R K s)⁻¹ := by
     simp only [map_mul, map_sub, map_one]
     field_simp
   have h2 : v.valuation K (algebraMap R K s) = 1 := by
-    rw [HeightOneSpectrum.valuation_of_algebraMap]
-    exact (v.intValuation_eq_one_iff_mem_primeCompl s).2 hs
-  have h3
-      : v.valuation K (algebraMap R K a * (algebraMap R K s)⁻¹ - algebraMap R K (a * t))
-        ≤ WithZero.exp (-(n : ℤ)) := by
+    rw [HeightOneSpectrum.valuation_of_algebraMap]; exact (v.intValuation_eq_one_iff_mem_primeCompl s).2 hs
+  have h3 : v.valuation K (algebraMap R K a * (algebraMap R K s)⁻¹ - algebraMap R K (a * t)) ≤ WithZero.exp (-(n : ℤ)) := by
     rw [e1, map_mul, map_mul, map_inv₀, h2, inv_one, mul_one]
-    calc
-      v.valuation K (algebraMap R K a) * v.valuation K (algebraMap R K (1 - s * t))
-          ≤ 1 * WithZero.exp (-(n : ℤ)) := by
-        refine mul_le_mul' (v.valuation_le_one a) ?_
-        rw [HeightOneSpectrum.valuation_of_algebraMap]
-        exact (v.intValuation_le_pow_iff_mem _ n).2 ht
+    calc v.valuation K (algebraMap R K a) * v.valuation K (algebraMap R K (1 - s * t))
+        ≤ 1 * WithZero.exp (-(n : ℤ)) := by
+          refine mul_le_mul' (v.valuation_le_one a) ?_
+          rw [HeightOneSpectrum.valuation_of_algebraMap]
+          exact (v.intValuation_le_pow_iff_mem _ n).2 ht
       _ = _ := one_mul _
-  have e2
-      : (c : v.adicCompletion K) - algebraMap K (v.adicCompletion K) (algebraMap R K (a * t))
-        = -(algebraMap K (v.adicCompletion K) (algebraMap R K a * (algebraMap R K s)⁻¹) - c)
-          + algebraMap K (v.adicCompletion K)
-            (algebraMap R K a * (algebraMap R K s)⁻¹ - algebraMap R K (a * t)) := by
+  have e2 : (c : v.adicCompletion K) - algebraMap K (v.adicCompletion K) (algebraMap R K (a * t)) =
+      -(algebraMap K (v.adicCompletion K) (algebraMap R K a * (algebraMap R K s)⁻¹) - c) +
+        algebraMap K (v.adicCompletion K) (algebraMap R K a * (algebraMap R K s)⁻¹ - algebraMap R K (a * t)) := by
     rw [map_sub]; ring
   rw [e2]
   refine Valuation.map_add_le _ ?_ ?_
   · rw [Valuation.map_neg]; exact hk'
   · rw [val_alg]; exact h3
 
-theorem bc_smulR (r : R) (x : F)
-    : bcC (K := K) v (r • x) = algebraMap R (v.adicCompletionIntegers K) r • bcC (K := K) v x := by
-  have e
-      : algebraMap R (v.adicCompletionIntegers K) r • bcC (K := K) v x
-        = ((algebraMap R (v.adicCompletionIntegers K) r : v.adicCompletionIntegers K)
-            : v.adicCompletion K)
-          • bcC (K := K) v x :=
-    rfl
+theorem bc_smulR (r : R) (x : F) :
+    bcC (K := K) v (r • x) = algebraMap R (v.adicCompletionIntegers K) r • bcC (K := K) v x := by
+  have e : algebraMap R (v.adicCompletionIntegers K) r • bcC (K := K) v x =
+      ((algebraMap R (v.adicCompletionIntegers K) r : v.adicCompletionIntegers K) : v.adicCompletion K) •
+        bcC (K := K) v x := rfl
   rw [e, coe_algO, ← bc_smul, algebraMap_smul]
 
-theorem isUnit_algO {s : R} (hs : s ∉ v.asIdeal)
-    : IsUnit (algebraMap R (v.adicCompletionIntegers K) s) := by
+theorem isUnit_algO {s : R} (hs : s ∉ v.asIdeal) : IsUnit (algebraMap R (v.adicCompletionIntegers K) s) := by
   rw [HeightOneSpectrum.adicCompletionIntegers.isUnit_iff_valued_eq_one, coe_algO, val_alg,
     HeightOneSpectrum.valuation_of_algebraMap]
   exact (v.intValuation_eq_one_iff_mem_primeCompl s).2 hs
 
-theorem bc_mem_locC (N : Submodule R F) {x : F} (hx : x ∈ localization₂ v.asIdeal N)
-    : bcC (K := K) v x ∈ locC (K := K) v N := by
+theorem bc_mem_locC (N : Submodule R F) {x : F} (hx : x ∈ localization₂ v.asIdeal N) : bcC (K := K) v x ∈ locC (K := K) v N := by
   obtain ⟨s, hs, hsx⟩ := hx
   obtain ⟨u, hu⟩ := isUnit_algO (K := K) v hs
   have h1 : bcC (K := K) v (s • x) ∈ locC (K := K) v N := Submodule.subset_span ⟨_, hsx, rfl⟩
@@ -534,12 +515,9 @@ theorem bc_mem_locC (N : Submodule R F) {x : F} (hx : x ∈ localization₂ v.as
   have h2 := (locC (K := K) v N).smul_mem (↑u⁻¹ : v.adicCompletionIntegers K) h1
   rwa [smul_smul, Units.inv_mul, one_smul] at h2
 
-theorem exists_factor
-    {π : R} (hπ : v.intValuation π = WithZero.exp (-1 : ℤ))
-    (n : ℕ) (d : v.adicCompletionIntegers K)
-    (hd : Valued.v (d : v.adicCompletion K) ≤ WithZero.exp (-(n : ℤ)))
-    : ∃ d' : v.adicCompletionIntegers K,
-      d = algebraMap R (v.adicCompletionIntegers K) π ^ n * d' := by
+theorem exists_factor {π : R} (hπ : v.intValuation π = WithZero.exp (-1 : ℤ)) (n : ℕ) (d : v.adicCompletionIntegers K)
+    (hd : Valued.v (d : v.adicCompletion K) ≤ WithZero.exp (-(n : ℤ))) :
+    ∃ d' : v.adicCompletionIntegers K, d = algebraMap R (v.adicCompletionIntegers K) π ^ n * d' := by
   set p : v.adicCompletion K := algebraMap K (v.adicCompletion K) (algebraMap R K π) with hp
   have hpv : Valued.v p = WithZero.exp (-1 : ℤ) := by
     rw [hp, val_alg, HeightOneSpectrum.valuation_of_algebraMap, hπ]
@@ -551,8 +529,7 @@ theorem exists_factor
     rw [map_pow, hpv, ← WithZero.exp_nsmul]; congr 1; simp
   have hmem : (d : v.adicCompletion K) * (p ^ n)⁻¹ ∈ v.adicCompletionIntegers K := by
     rw [HeightOneSpectrum.mem_adicCompletionIntegers, map_mul, map_inv₀, hpn]
-    calc
-      Valued.v (d : v.adicCompletion K) * (WithZero.exp (-(n : ℤ)))⁻¹
+    calc Valued.v (d : v.adicCompletion K) * (WithZero.exp (-(n : ℤ)))⁻¹
         ≤ WithZero.exp (-(n : ℤ)) * (WithZero.exp (-(n : ℤ)))⁻¹ := mul_le_mul' hd le_rfl
       _ = 1 := mul_inv_cancel₀ WithZero.exp_ne_zero
   refine ⟨⟨_, hmem⟩, Subtype.ext ?_⟩
@@ -563,14 +540,10 @@ end CompA
 
 section CompM
 
-variable
-  {R K F : Type} [CommRing R] [IsDedekindDomain R] [Field K] [Algebra R K] [IsFractionRing R K]
-  [AddCommGroup F] [Module K F] [Module R F] [IsScalarTower R K F]
-  (v : HeightOneSpectrum R)
+variable {R K F : Type} [CommRing R] [IsDedekindDomain R] [Field K] [Algebra R K] [IsFractionRing R K]
+  [AddCommGroup F] [Module K F] [Module R F] [IsScalarTower R K F] (v : HeightOneSpectrum R)
 
-theorem mem_of_mem_localization_restrictScalars
-    (W : Submodule K F) {x : F} (hx : x ∈ localization₂ v.asIdeal (W.restrictScalars R))
-    : x ∈ W := by
+theorem mem_of_mem_localization_restrictScalars (W : Submodule K F) {x : F} (hx : x ∈ localization₂ v.asIdeal (W.restrictScalars R)) : x ∈ W := by
   obtain ⟨s, hs, hsx⟩ := hx
   have hs0 := alg_ne_zero (K := K) v hs
   have h1 : algebraMap R K s • x ∈ W := by rw [algebraMap_smul]; exact hsx
@@ -584,19 +557,14 @@ theorem l1 : LengthLocalizationLeCompletion (K := K) (F := F) v := by
   set A' := localization₂ v.asIdeal (A ⊓ W.restrictScalars R) with hA'
   set B' := localization₂ v.asIdeal (A ⊓ W.restrictScalars R ⊓ T) with hB'
   have hW : ∀ x ∈ A', x ∈ W := fun x hx =>
-    mem_of_mem_localization_restrictScalars v W
-      (Formalism.HermitianLatticesTheory.locBasic_locS_mono _ inf_le_right hx)
-  have hmem : ∀ x ∈ A', bcC (K := K) v x ∈ Ah := fun x hx => ⟨
-    bc_mem_locC v A (Formalism.HermitianLatticesTheory.locBasic_locS_mono _ inf_le_left hx),
-    Submodule.subset_span ⟨x, hW x hx, rfl⟩
-  ⟩
-  let g : A' → (Ah ⧸ Th.comap Ah.subtype) := fun x =>
-    Submodule.Quotient.mk ⟨bcC (K := K) v x, hmem x x.2⟩
+    mem_of_mem_localization_restrictScalars v W (Formalism.HermitianLatticesTheory.locBasic_locS_mono _ inf_le_right hx)
+  have hmem : ∀ x ∈ A', bcC (K := K) v x ∈ Ah := fun x hx =>
+    ⟨bc_mem_locC v A (Formalism.HermitianLatticesTheory.locBasic_locS_mono _ inf_le_left hx), Submodule.subset_span ⟨x, hW x hx, rfl⟩⟩
+  let g : A' → (Ah ⧸ Th.comap Ah.subtype) := fun x => Submodule.Quotient.mk ⟨bcC (K := K) v x, hmem x x.2⟩
   have g_add : ∀ x y, g (x + y) = g x + g y := by
     intro x y
-    have e
-        : (⟨bcC (K := K) v ((x + y : A') : F), hmem _ (x + y).2⟩ : Ah)
-          = ⟨bcC (K := K) v (x : F), hmem x x.2⟩ + ⟨bcC (K := K) v (y : F), hmem y y.2⟩ :=
+    have e : (⟨bcC (K := K) v ((x + y : A') : F), hmem _ (x + y).2⟩ : Ah) =
+        ⟨bcC (K := K) v (x : F), hmem x x.2⟩ + ⟨bcC (K := K) v (y : F), hmem y y.2⟩ :=
       Subtype.ext (map_add (bcC (K := K) v) (x : F) (y : F))
     show Submodule.Quotient.mk _ = _
     rw [e]
@@ -609,9 +577,8 @@ theorem l1 : LengthLocalizationLeCompletion (K := K) (F := F) v := by
     rfl
   have g_smul : ∀ (r : R) x, g (r • x) = algebraMap R (v.adicCompletionIntegers K) r • g x := by
     intro r x
-    have e
-        : (⟨bcC (K := K) v ((r • x : A') : F), hmem _ (r • x).2⟩ : Ah)
-          = algebraMap R (v.adicCompletionIntegers K) r • ⟨bcC (K := K) v (x : F), hmem x x.2⟩ :=
+    have e : (⟨bcC (K := K) v ((r • x : A') : F), hmem _ (r • x).2⟩ : Ah) =
+        algebraMap R (v.adicCompletionIntegers K) r • ⟨bcC (K := K) v (x : F), hmem x x.2⟩ :=
       Subtype.ext (bc_smulR (K := K) v r (x : F))
     show Submodule.Quotient.mk _ = _
     rw [e]
@@ -623,54 +590,43 @@ theorem l1 : LengthLocalizationLeCompletion (K := K) (F := F) v := by
     rw [← map_sub] at h2
     have h3 := descent v T _ h2.1
     have h4 : ((x : F) - (y : F)) ∈ A' := A'.sub_mem x.2 y.2
-    have h5
-        : ((x : F) - (y : F))
-          ∈ locS v.asIdeal.primeCompl (A ⊓ W.restrictScalars R) ⊓ locS v.asIdeal.primeCompl T :=
-      ⟨h4, h3⟩
+    have h5 : ((x : F) - (y : F)) ∈ locS v.asIdeal.primeCompl (A ⊓ W.restrictScalars R) ⊓
+        locS v.asIdeal.primeCompl T := ⟨h4, h3⟩
     rw [← Formalism.HermitianLatticesTheory.locBasic_locS_inf] at h5
     exact h5
 
   obtain ⟨π, hπ⟩ := v.intValuation_exists_uniformizer
-  have hπm
-      : algebraMap R (v.adicCompletionIntegers K) π
-        ∈ IsLocalRing.maximalIdeal (v.adicCompletionIntegers K) := by
+  have hπm : algebraMap R (v.adicCompletionIntegers K) π ∈ IsLocalRing.maximalIdeal (v.adicCompletionIntegers K) := by
     rw [IsLocalRing.mem_maximalIdeal, mem_nonunits_iff,
       HeightOneSpectrum.adicCompletionIntegers.isUnit_iff_valued_eq_one, coe_algO, val_alg,
       HeightOneSpectrum.valuation_of_algebraMap, hπ, ← WithZero.exp_zero]
     intro h
     have := WithZero.exp_injective h
     omega
-  obtain ⟨n, hn⟩ :=
-    Formalism.EigenvalueLevelCeiling.ThreeFormsAlt.exists_pow_smul_eq_zero
-      (v.adicCompletionIntegers K) _ hπm (Ah ⧸ Th.comap Ah.subtype)
-      (Module.length_ne_top_iff.1 hfin)
-  have hact
-      : ∀ (c : v.adicCompletionIntegers K), ∃ r : R, ∀ q : (Ah ⧸ Th.comap Ah.subtype),
-        c • q = algebraMap R (v.adicCompletionIntegers K) r • q := by
+  obtain ⟨n, hn⟩ := Formalism.EigenvalueLevelCeiling.ThreeFormsAlt.exists_pow_smul_eq_zero (v.adicCompletionIntegers K) _ hπm
+    (Ah ⧸ Th.comap Ah.subtype) (Module.length_ne_top_iff.1 hfin)
+  have hact : ∀ (c : v.adicCompletionIntegers K), ∃ r : R, ∀ q : (Ah ⧸ Th.comap Ah.subtype),
+      c • q = algebraMap R (v.adicCompletionIntegers K) r • q := by
     intro c
     obtain ⟨r, hr⟩ := approx v c n
     obtain ⟨d', hd'⟩ := exists_factor v hπ n (c - algebraMap R (v.adicCompletionIntegers K) r) hr
     refine ⟨r, fun q => ?_⟩
-    have e
-        : c
-          = algebraMap R (v.adicCompletionIntegers K) r
-            + d' * algebraMap R (v.adicCompletionIntegers K) π ^ n := by
+    have e : c = algebraMap R (v.adicCompletionIntegers K) r +
+        d' * algebraMap R (v.adicCompletionIntegers K) π ^ n := by
       rw [mul_comm, ← hd']; ring
     conv_lhs => rw [e]
     rw [add_smul, mul_smul, hn, smul_zero, add_zero]
-  let Φ
-      : Submodule R (A' ⧸ B'.comap A'.subtype)
-        → Submodule (v.adicCompletionIntegers K) (Ah ⧸ Th.comap Ah.subtype) := fun N => {
-    carrier := g '' (N.comap (B'.comap A'.subtype).mkQ : Set A')
-    zero_mem' := ⟨0, Submodule.zero_mem _, g_zero⟩
-    add_mem' := by
-      rintro _ _ ⟨x, hx, rfl⟩ ⟨y, hy, rfl⟩
-      exact ⟨x + y, Submodule.add_mem _ hx hy, g_add x y⟩
-    smul_mem' := by
-      rintro c _ ⟨x, hx, rfl⟩
-      obtain ⟨r, hr⟩ := hact c
-      exact ⟨r • x, Submodule.smul_mem _ r hx, by rw [g_smul, hr]⟩
-  }
+  let Φ : Submodule R (A' ⧸ B'.comap A'.subtype) → Submodule (v.adicCompletionIntegers K) (Ah ⧸ Th.comap Ah.subtype) :=
+    fun N =>
+    { carrier := g '' (N.comap (B'.comap A'.subtype).mkQ : Set A')
+      zero_mem' := ⟨0, Submodule.zero_mem _, g_zero⟩
+      add_mem' := by
+        rintro _ _ ⟨x, hx, rfl⟩ ⟨y, hy, rfl⟩
+        exact ⟨x + y, Submodule.add_mem _ hx hy, g_add x y⟩
+      smul_mem' := by
+        rintro c _ ⟨x, hx, rfl⟩
+        obtain ⟨r, hr⟩ := hact c
+        exact ⟨r • x, Submodule.smul_mem _ r hx, by rw [g_smul, hr]⟩ }
   have hΦ : StrictMono Φ := by
     refine strictMono_of_le_iff_le fun N N' => ⟨fun h => ?_, fun h => ?_⟩
     · rintro _ ⟨x, hx, rfl⟩
@@ -703,11 +659,11 @@ noncomputable section
 
 namespace Formalism.MainNotions.Gaps.LocalGlobalPassage
 
-theorem exists_vw_eq
-    {K : Type} [Field K] [NumberField K] [StarRing K] (v : HeightOneSpectrum (𝓞 K)) (E : ℕ)
-    : ∃ a : K, a ≠ 0 ∧ Formalism.DivisionValues.vw v a = (E : ℤ) := by
+theorem exists_vw_eq {K : Type} [Field K] [NumberField K] [StarRing K] (v : HeightOneSpectrum (𝓞 K)) (E : ℕ) :
+    ∃ a : K, a ≠ 0 ∧ Formalism.DivisionValues.vw v a = (E : ℤ) := by
   obtain ⟨ϖ, -, hϖ0, hϖ1, -⟩ := Formalism.DivisionValues.idxChange_unif (K := K) v
-  have h0 : algebraMap (𝓞 K) K ϖ ≠ 0 := by simpa using hϖ0
+  have h0 : algebraMap (𝓞 K) K ϖ ≠ 0 := by
+    simpa using hϖ0
   have h1 : Formalism.DivisionValues.vw v (algebraMap (𝓞 K) K ϖ) = 1 := hϖ1
   refine ⟨algebraMap (𝓞 K) K ϖ ^ E, pow_ne_zero _ h0, ?_⟩
   induction E with
@@ -715,10 +671,8 @@ theorem exists_vw_eq
     rw [pow_zero]
     exact Formalism.DivisionValues.idxChange_cnt_one v
   | succ n ih =>
-    have h2
-        : Formalism.DivisionValues.vw v (algebraMap (𝓞 K) K ϖ ^ n * algebraMap (𝓞 K) K ϖ)
-          = Formalism.DivisionValues.vw v (algebraMap (𝓞 K) K ϖ ^ n)
-            + Formalism.DivisionValues.vw v (algebraMap (𝓞 K) K ϖ) :=
+    have h2 : Formalism.DivisionValues.vw v (algebraMap (𝓞 K) K ϖ ^ n * algebraMap (𝓞 K) K ϖ) =
+        Formalism.DivisionValues.vw v (algebraMap (𝓞 K) K ϖ ^ n) + Formalism.DivisionValues.vw v (algebraMap (𝓞 K) K ϖ) :=
       Formalism.DivisionValues.idxChange_cnt_mul v (pow_ne_zero _ h0) h0
     rw [pow_succ, h2, ih, h1]
     push_cast
@@ -726,20 +680,16 @@ theorem exists_vw_eq
 
 section Comp
 
-variable
-  {R K F : Type} [CommRing R] [IsDedekindDomain R] [Field K] [Algebra R K] [IsFractionRing R K]
-  [AddCommGroup F] [Module K F] [Module R F] [IsScalarTower R K F]
-  (v : HeightOneSpectrum R)
+variable {R K F : Type} [CommRing R] [IsDedekindDomain R] [Field K] [Algebra R K] [IsFractionRing R K]
+  [AddCommGroup F] [Module K F] [Module R F] [IsScalarTower R K F] (v : HeightOneSpectrum R)
 
 theorem l1c : CompletionSpanContainment (K := K) (F := F) v := by
   intro A W hW
   unfold locKC
   rw [Submodule.span_le]
   rintro _ ⟨w, hw, rfl⟩
-  have h
-      : Submodule.span K (A : Set F)
-        ≤ ((Submodule.span (v.adicCompletion K) (bcC v '' (A : Set F))).restrictScalars K).comap
-          (bcC v) := by
+  have h : Submodule.span K (A : Set F) ≤
+      ((Submodule.span (v.adicCompletion K) (bcC v '' (A : Set F))).restrictScalars K).comap (bcC v) := by
     rw [Submodule.span_le]
     intro x hx
     exact Submodule.subset_span ⟨x, hx, rfl⟩
@@ -755,9 +705,7 @@ theorem l1b : CompletionPreservesFinrank (K := K) (F := F) v := by
       induction x using TensorProduct.induction_on with
       | zero => simp
       | tmul a w =>
-        have e
-            : LinearMap.baseChange (v.adicCompletion K) W.subtype (a ⊗ₜ[K] w)
-              = a • bcC v (w : F) := by
+        have e : LinearMap.baseChange (v.adicCompletion K) W.subtype (a ⊗ₜ[K] w) = a • bcC v (w : F) := by
           simp [bcC, TensorProduct.smul_tmul']
         rw [e]
         exact Submodule.smul_mem _ _ (Submodule.subset_span ⟨w, w.2, rfl⟩)
@@ -791,15 +739,12 @@ open Formalism.EigenvalueLevelCeiling.ThreeFormsAlt (OO isDVR_OO mem_localizatio
 
 section LocBasis
 
-variable
-  {K : Type} [Field K] [NumberField K] [StarRing K]
-  {Z : Type}
-  [AddCommGroup Z] [Module K Z] [Module (𝓞 K) Z] [IsScalarTower (𝓞 K) K Z] [FiniteDimensional K Z]
+variable {K : Type} [Field K] [NumberField K] [StarRing K]
+  {Z : Type} [AddCommGroup Z] [Module K Z] [Module (𝓞 K) Z] [IsScalarTower (𝓞 K) K Z] [FiniteDimensional K Z]
 
-theorem exists_loc_basis
-    (w : HeightOneSpectrum (𝓞 K))
-    (A : Submodule (𝓞 K) Z) (hfg : A.FG) (hA : Submodule.span K (A : Set Z) = ⊤)
-    : ∃ b : Basis (Fin (finrank K Z)) K Z,
+theorem exists_loc_basis (w : HeightOneSpectrum (𝓞 K)) (A : Submodule (𝓞 K) Z) (hfg : A.FG)
+    (hA : Submodule.span K (A : Set Z) = ⊤) :
+    ∃ b : Basis (Fin (finrank K Z)) K Z,
       localization₂ w.asIdeal A = localization₂ w.asIdeal (Submodule.span (𝓞 K) (Set.range b)) :=
   _root_.UpperTheory.Reformulated.B.Qi33.exists_loc_basis w A hfg hA
 
@@ -809,23 +754,18 @@ section StructureSheafH2BaseChange
 
 open Formalism.HermitianLatticesTheory
 
-variable
-  {K0 K : Type} [Field K0] [NumberField K0] [Field K] [NumberField K] [Algebra K0 K]
-  {Z0 : Type} [AddCommGroup Z0] [Module K0 Z0] [FiniteDimensional K0 Z0] [Module (𝓞 K0) Z0]
-  [IsScalarTower (𝓞 K0) K0 Z0]
+variable {K0 K : Type} [Field K0] [NumberField K0] [Field K] [NumberField K] [Algebra K0 K]
+  {Z0 : Type} [AddCommGroup Z0] [Module K0 Z0] [FiniteDimensional K0 Z0] [Module (𝓞 K0) Z0] [IsScalarTower (𝓞 K0) K0 Z0]
   {n : ℕ}
 
-theorem iota_smul (ι : Z0 →ₗ[K0] (Fin n → K)) (s : 𝓞 K0) (x : Z0)
-    : ι (s • x) = (algebraMap (𝓞 K0) (𝓞 K) s) • ι x := by
+theorem iota_smul (ι : Z0 →ₗ[K0] (Fin n → K)) (s : 𝓞 K0) (x : Z0) :
+    ι (s • x) = (algebraMap (𝓞 K0) (𝓞 K) s) • ι x := by
   rw [← algebraMap_smul K0 s x, map_smul, ← algebraMap_smul K (algebraMap (𝓞 K0) (𝓞 K) s) (ι x),
     ← algebraMap_smul K (algebraMap (𝓞 K0) K0 s) (ι x)]
   congr 1
 
-theorem up_le_locP
-    (ι : Z0 →ₗ[K0] (Fin n → K))
-    (v : HeightOneSpectrum (𝓞 K))
-    {A0 B0 : Submodule (𝓞 K0) Z0} (h : A0 ≤ localization₂ (v.under (𝓞 K0)).asIdeal B0)
-    : up ι A0 ≤ localization₂ v.asIdeal (up ι B0) := by
+theorem up_le_locP (ι : Z0 →ₗ[K0] (Fin n → K)) (v : HeightOneSpectrum (𝓞 K)) {A0 B0 : Submodule (𝓞 K0) Z0}
+    (h : A0 ≤ localization₂ (v.under (𝓞 K0)).asIdeal B0) : up ι A0 ≤ localization₂ v.asIdeal (up ι B0) := by
   refine Submodule.span_le.mpr ?_
   rintro _ ⟨x, hx, rfl⟩
   obtain ⟨s, hs, hsx⟩ := h hx
@@ -835,29 +775,22 @@ theorem up_le_locP
   · rw [← iota_smul]
     exact Submodule.subset_span ⟨_, hsx, rfl⟩
 
-theorem localization_up_congr
-    (ι : Z0 →ₗ[K0] (Fin n → K))
-    (v : HeightOneSpectrum (𝓞 K))
-    {A0 B0 : Submodule (𝓞 K0) Z0}
-    (h : localization₂ (v.under (𝓞 K0)).asIdeal A0 = localization₂ (v.under (𝓞 K0)).asIdeal B0)
-    : localization₂ v.asIdeal (up ι A0) = localization₂ v.asIdeal (up ι B0) := by
-  have key
-      : ∀ {X Y : Submodule (𝓞 K0) Z0},
-        localization₂ (v.under (𝓞 K0)).asIdeal X = localization₂ (v.under (𝓞 K0)).asIdeal Y
-          → localization₂ v.asIdeal (up ι X) ≤ localization₂ v.asIdeal (up ι Y) := by
+theorem localization_up_congr (ι : Z0 →ₗ[K0] (Fin n → K)) (v : HeightOneSpectrum (𝓞 K)) {A0 B0 : Submodule (𝓞 K0) Z0}
+    (h : localization₂ (v.under (𝓞 K0)).asIdeal A0 = localization₂ (v.under (𝓞 K0)).asIdeal B0) :
+    localization₂ v.asIdeal (up ι A0) = localization₂ v.asIdeal (up ι B0) := by
+  have key : ∀ {X Y : Submodule (𝓞 K0) Z0},
+      localization₂ (v.under (𝓞 K0)).asIdeal X = localization₂ (v.under (𝓞 K0)).asIdeal Y →
+      localization₂ v.asIdeal (up ι X) ≤ localization₂ v.asIdeal (up ι Y) := by
     intro X Y hXY
     have h1 : X ≤ localization₂ (v.under (𝓞 K0)).asIdeal Y := by
       rw [← hXY]; exact locBasic_le_locS _ X
     have h2 := locBasic_locS_mono v.asIdeal.primeCompl (up_le_locP ι v h1)
-    rwa [show locS v.asIdeal.primeCompl (localization₂ v.asIdeal (up ι Y))
-          = localization₂ v.asIdeal (up ι Y) from
-        locBasic_locS_idem _ _]
-      at h2
+    rwa [show locS v.asIdeal.primeCompl (localization₂ v.asIdeal (up ι Y)) = localization₂ v.asIdeal (up ι Y) from
+      locBasic_locS_idem _ _] at h2
   exact le_antisymm (key h) (key h.symm)
 
-theorem up_span_range (ι : Z0 →ₗ[K0] (Fin n → K)) {I : Type} (a : I → Z0)
-    : up ι (Submodule.span (𝓞 K0) (Set.range a))
-      = Submodule.span (𝓞 K) (Set.range fun i => ι (a i)) := by
+theorem up_span_range (ι : Z0 →ₗ[K0] (Fin n → K)) {I : Type} (a : I → Z0) :
+    up ι (Submodule.span (𝓞 K0) (Set.range a)) = Submodule.span (𝓞 K) (Set.range fun i => ι (a i)) := by
   apply le_antisymm
   · refine Submodule.span_le.mpr ?_
     rintro _ ⟨x, hx, rfl⟩
@@ -878,31 +811,26 @@ section Main
 
 open Formalism.HermitianLatticesTheory
 
-variable
-  {K0 K : Type} [Field K0] [NumberField K0] [Field K] [NumberField K] [Algebra K0 K]
-  {Z0 : Type} [AddCommGroup Z0] [Module K0 Z0] [FiniteDimensional K0 Z0] [Module (𝓞 K0) Z0]
-  [IsScalarTower (𝓞 K0) K0 Z0]
+variable {K0 K : Type} [Field K0] [NumberField K0] [Field K] [NumberField K] [Algebra K0 K]
+  {Z0 : Type} [AddCommGroup Z0] [Module K0 Z0] [FiniteDimensional K0 Z0] [Module (𝓞 K0) Z0] [IsScalarTower (𝓞 K0) K0 Z0]
   {n : ℕ}
 
-theorem iota_eq_sum (ι : Z0 →ₗ[K0] (Fin n → K)) {d : ℕ} (b : Basis (Fin d) K0 Z0) (z : Z0)
-    : ι z = ∑ i, algebraMap K0 K (b.repr z i) • ι (b i) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    conv_lhs => rw [← b.sum_repr z, map_sum]
+theorem iota_eq_sum (ι : Z0 →ₗ[K0] (Fin n → K)) {d : ℕ} (b : Basis (Fin d) K0 Z0) (z : Z0) :
+    ι z = ∑ i, algebraMap K0 K (b.repr z i) • ι (b i) := by
+
+  conv_lhs => rw [← b.sum_repr z, map_sum]
   refine Finset.sum_congr rfl fun i _ => ?_
   rw [map_smul, algebraMap_smul]
 
-theorem span_iota_basis
-    (ι : Z0 →ₗ[K0] (Fin n → K)) (htop : Submodule.span K (Set.range ι) = ⊤)
-    {d : ℕ} (b : Basis (Fin d) K0 Z0)
-    : ⊤ ≤ Submodule.span K (Set.range fun i => ι (b i)) := by
+theorem span_iota_basis (ι : Z0 →ₗ[K0] (Fin n → K)) (htop : Submodule.span K (Set.range ι) = ⊤) {d : ℕ}
+    (b : Basis (Fin d) K0 Z0) : ⊤ ≤ Submodule.span K (Set.range fun i => ι (b i)) := by
   rw [← htop]
   refine Submodule.span_le.mpr ?_
   rintro _ ⟨z, rfl⟩
   rw [iota_eq_sum ι b z]
   exact Submodule.sum_mem _ fun i _ => Submodule.smul_mem _ _ (Submodule.subset_span ⟨i, rfl⟩)
 
-theorem l3 (h3a : ValuationMulRamificationIndex K0 K) (ι : Z0 →ₗ[K0] (Fin n → K))
-    : IndexMulRamificationIndex ι := by
+theorem l3 (h3a : ValuationMulRamificationIndex K0 K) (ι : Z0 →ₗ[K0] (Fin n → K)) : IndexMulRamificationIndex ι := by
   intro hind htop A0 C0 hAfg hA hCfg hC v
   let _ : StarRing K0 := starRingOfComm
   obtain ⟨a, ha⟩ := exists_loc_basis (v.under (𝓞 K0)) A0 hAfg hA
@@ -917,22 +845,18 @@ theorem l3 (h3a : ValuationMulRamificationIndex K0 K) (ι : Z0 →ₗ[K0] (Fin n
   let γ : (Fin n → K) ≃ₗ[K] (Fin n → K) := aK.equiv cK (Equiv.refl _)
   have hγ0 : ∀ i, γ0 (a i) = c i := fun i => by simp [γ0]
   have hγ : ∀ i, γ (aK i) = cK i := fun i => by simp [γ]
-  have hL
-      : lidx (v.under (𝓞 K0)).asIdeal A0 C0
-        = FractionalIdeal.count K0 (v.under (𝓞 K0))
-          (FractionalIdeal.spanSingleton (nonZeroDivisors (𝓞 K0))
-            (LinearMap.det (γ0 : Z0 →ₗ[K0] Z0))) := by
+  have hL : lidx (v.under (𝓞 K0)).asIdeal A0 C0 =
+      FractionalIdeal.count K0 (v.under (𝓞 K0))
+        (FractionalIdeal.spanSingleton (nonZeroDivisors (𝓞 K0)) (LinearMap.det (γ0 : Z0 →ₗ[K0] Z0))) := by
     rw [PI.LatIdxDetW.lidx_congr _ ha hc, ← PI.LatIdxDetW.lidx_free (v.under (𝓞 K0)) a γ0]
     congr 1
     rw [Submodule.map_span, ← Set.range_comp]
     refine congrArg (Submodule.span (𝓞 K0)) (congrArg Set.range ?_)
     funext i
     exact (hγ0 i).symm
-  have hR
-      : lidx v.asIdeal (up ι A0) (up ι C0)
-        = FractionalIdeal.count K v
-          (FractionalIdeal.spanSingleton (nonZeroDivisors (𝓞 K))
-            (LinearMap.det (γ : (Fin n → K) →ₗ[K] (Fin n → K)))) := by
+  have hR : lidx v.asIdeal (up ι A0) (up ι C0) =
+      FractionalIdeal.count K v
+        (FractionalIdeal.spanSingleton (nonZeroDivisors (𝓞 K)) (LinearMap.det (γ : (Fin n → K) →ₗ[K] (Fin n → K)))) := by
     have h1 := localization_up_congr ι v ha
     have h2 := localization_up_congr ι v hc
     rw [up_span_range] at h1 h2
@@ -948,21 +872,18 @@ theorem l3 (h3a : ValuationMulRamificationIndex K0 K) (ι : Z0 →ₗ[K0] (Fin n
     refine congrArg (Submodule.span (𝓞 K)) (congrArg Set.range ?_)
     funext i
     exact (hγ i).symm
-  have hrepr
-      : ∀ (z : Z0) (i : Fin (finrank K0 Z0)), aK.repr (ι z) i = algebraMap K0 K (a.repr z i) := by
+  have hrepr : ∀ (z : Z0) (i : Fin (finrank K0 Z0)), aK.repr (ι z) i = algebraMap K0 K (a.repr z i) := by
     intro z i
     have h1 : ι z = ∑ i, algebraMap K0 K (a.repr z i) • aK i := by
       rw [iota_eq_sum ι a z]
       exact Finset.sum_congr rfl fun i _ => by rw [haK]
     rw [h1, Basis.repr_sum_self]
-  have hdet
-      : LinearMap.det (γ : (Fin n → K) →ₗ[K] (Fin n → K))
-        = algebraMap K0 K (LinearMap.det (γ0 : Z0 →ₗ[K0] Z0)) := by
+  have hdet : LinearMap.det (γ : (Fin n → K) →ₗ[K] (Fin n → K)) =
+      algebraMap K0 K (LinearMap.det (γ0 : Z0 →ₗ[K0] Z0)) := by
     rw [← LinearMap.det_toMatrix aK, ← LinearMap.det_toMatrix a, RingHom.map_det]
     congr 1
     ext i j
-    rw [LinearMap.toMatrix_apply, RingHom.mapMatrix_apply, Matrix.map_apply,
-      LinearMap.toMatrix_apply]
+    rw [LinearMap.toMatrix_apply, RingHom.mapMatrix_apply, Matrix.map_apply, LinearMap.toMatrix_apply]
     show aK.repr (γ (aK j)) i = algebraMap K0 K (a.repr (γ0 (a j)) i)
     rw [hγ, hγ0, hcK, hrepr]
   rw [hL, hR, hdet]
@@ -988,60 +909,49 @@ section BC4
 
 variable {K0 K : Type} [Field K0] [NumberField K0] [Field K] [NumberField K] [Algebra K0 K]
 
-theorem liesOver_under (v : HeightOneSpectrum (𝓞 K))
-    : v.asIdeal.LiesOver (v.under (𝓞 K0)).asIdeal :=
+theorem liesOver_under (v : HeightOneSpectrum (𝓞 K)) : v.asIdeal.LiesOver (v.under (𝓞 K0)).asIdeal :=
   ⟨by rw [HeightOneSpectrum.under_asIdeal]⟩
 
-theorem ram_eq (v : HeightOneSpectrum (𝓞 K))
-    : (v.under (𝓞 K0)).asIdeal.ramificationIdx' v.asIdeal = v.asIdeal.ramificationIdx (𝓞 K0) := by
+theorem ram_eq (v : HeightOneSpectrum (𝓞 K)) :
+    (v.under (𝓞 K0)).asIdeal.ramificationIdx' v.asIdeal = v.asIdeal.ramificationIdx (𝓞 K0) := by
   have := liesOver_under (K0 := K0) v
   exact Ideal.ramificationIdx'_eq_ramificationIdx _ _ (v.under (𝓞 K0)).ne_bot
 
 theorem l3e : RamificationIndexNeZero K0 K := fun v => by
   have := liesOver_under (K0 := K0) v
   rw [← ram_eq]
-  exact Ideal.IsDedekindDomain.ramificationIdx'_ne_zero_of_liesOver v.asIdeal
-    (v.under (𝓞 K0)).ne_bot
+  exact Ideal.IsDedekindDomain.ramificationIdx'_ne_zero_of_liesOver v.asIdeal (v.under (𝓞 K0)).ne_bot
 
 theorem l3a : ValuationMulRamificationIndex K0 K := fun v a ha => by
   have := liesOver_under (K0 := K0) v
   have ha' : algebraMap K0 K a ≠ 0 := by simpa using ha
-  rw [← PI.LatIdxDetW.neg_log_valuation v ha',
-    ← PI.LatIdxDetW.neg_log_valuation (v.under (𝓞 K0)) ha,
+  rw [← PI.LatIdxDetW.neg_log_valuation v ha', ← PI.LatIdxDetW.neg_log_valuation (v.under (𝓞 K0)) ha,
     ← HeightOneSpectrum.valuation_liesOver K (v.under (𝓞 K0)) v a, WithZero.log_pow]
   simp
 
-theorem lw_eq (v : HeightOneSpectrum (𝓞 K))
-    : Formalism.BasicNotions.lw K v
-      = (v.asIdeal.inertiaDeg (𝓞 K0) : ℝ) * Real.log (Ideal.absNorm (v.under (𝓞 K0)).asIdeal : ℝ)
-        / (finrank ℚ K : ℝ) := by
+theorem lw_eq (v : HeightOneSpectrum (𝓞 K)) :
+    Formalism.BasicNotions.lw K v = (v.asIdeal.inertiaDeg (𝓞 K0) : ℝ) *
+      Real.log (Ideal.absNorm (v.under (𝓞 K0)).asIdeal : ℝ) / (finrank ℚ K : ℝ) := by
   have := liesOver_under (K0 := K0) v
   unfold Formalism.BasicNotions.lw
   rw [← Ideal.absNorm_pow_inertiaDeg (v.under (𝓞 K0)).asIdeal v.asIdeal, Nat.cast_pow, Real.log_pow]
 
-theorem sum_ef_le
-    (la : HeightOneSpectrum (𝓞 K0)) (T : Finset (HeightOneSpectrum (𝓞 K)))
-    (hT : ∀ v ∈ T, v.under (𝓞 K0) = la)
-    : ∑ v ∈ T, v.asIdeal.ramificationIdx (𝓞 K0) * v.asIdeal.inertiaDeg (𝓞 K0) ≤ finrank K0 K := by
+theorem sum_ef_le (la : HeightOneSpectrum (𝓞 K0)) (T : Finset (HeightOneSpectrum (𝓞 K)))
+    (hT : ∀ v ∈ T, v.under (𝓞 K0) = la) :
+    ∑ v ∈ T, v.asIdeal.ramificationIdx (𝓞 K0) * v.asIdeal.inertiaDeg (𝓞 K0) ≤ finrank K0 K := by
   classical
   let _ : Fintype (la.asIdeal.primesOver (𝓞 K)) := Fintype.ofFinite _
   have h := Ideal.sum_ramification_inertia_eq_finrank la.asIdeal (𝓞 K)
   rw [← IsFractionRing.finrank_eq (𝓞 K0) K0 (𝓞 K) K,
-      Finset.sum_set_coe (la.asIdeal.primesOver (𝓞 K))
-        (f := fun q : Ideal (𝓞 K) => q.ramificationIdx (𝓞 K0) * q.inertiaDeg (𝓞 K0))]
-    at h
+    Finset.sum_set_coe (la.asIdeal.primesOver (𝓞 K))
+      (f := fun q : Ideal (𝓞 K) => q.ramificationIdx (𝓞 K0) * q.inertiaDeg (𝓞 K0))] at h
   rw [← h]
-  have hinj : Set.InjOn
-      (fun v : HeightOneSpectrum (𝓞 K) => v.asIdeal)
-      (T : Set (HeightOneSpectrum (𝓞 K))) := fun a _ b _ hab =>
-    HeightOneSpectrum.ext hab
-  calc
-    ∑ v ∈ T, v.asIdeal.ramificationIdx (𝓞 K0) * v.asIdeal.inertiaDeg (𝓞 K0)
-        = ∑ q ∈ T.image (fun v : HeightOneSpectrum (𝓞 K) => v.asIdeal),
-            q.ramificationIdx (𝓞 K0) * q.inertiaDeg (𝓞 K0) :=
-      (Finset.sum_image
-        (f := fun q : Ideal (𝓞 K) => q.ramificationIdx (𝓞 K0) * q.inertiaDeg (𝓞 K0))
-        hinj).symm
+  have hinj : Set.InjOn (fun v : HeightOneSpectrum (𝓞 K) => v.asIdeal) (T : Set (HeightOneSpectrum (𝓞 K))) :=
+    fun a _ b _ hab => HeightOneSpectrum.ext hab
+  calc ∑ v ∈ T, v.asIdeal.ramificationIdx (𝓞 K0) * v.asIdeal.inertiaDeg (𝓞 K0)
+      = ∑ q ∈ T.image (fun v : HeightOneSpectrum (𝓞 K) => v.asIdeal),
+          q.ramificationIdx (𝓞 K0) * q.inertiaDeg (𝓞 K0) :=
+        (Finset.sum_image (f := fun q : Ideal (𝓞 K) => q.ramificationIdx (𝓞 K0) * q.inertiaDeg (𝓞 K0)) hinj).symm
     _ ≤ _ := by
       refine Finset.sum_le_sum_of_subset ?_
       intro q hq
@@ -1059,19 +969,17 @@ theorem l4 : SumOverPlacesLeBaseSum K0 K := by
   classical
   intro r hr hs S'
   set u : HeightOneSpectrum (𝓞 K) → HeightOneSpectrum (𝓞 K0) := fun v => v.under (𝓞 K0) with hu
-  have h1
-      : ∑ v ∈ S', Formalism.BasicNotions.lw K v * ((v.asIdeal.ramificationIdx (𝓞 K0) : ℝ) * r (u v))
-        = ∑ la ∈ S'.image u, ∑ v ∈ S' with u v = la,
-            Formalism.BasicNotions.lw K v * ((v.asIdeal.ramificationIdx (𝓞 K0) : ℝ) * r (u v)) :=
+  have h1 : ∑ v ∈ S', Formalism.BasicNotions.lw K v * ((v.asIdeal.ramificationIdx (𝓞 K0) : ℝ) * r (u v)) =
+      ∑ la ∈ S'.image u, ∑ v ∈ S' with u v = la,
+        Formalism.BasicNotions.lw K v * ((v.asIdeal.ramificationIdx (𝓞 K0) : ℝ) * r (u v)) :=
     (Finset.sum_fiberwise_of_maps_to (fun v hv => Finset.mem_image_of_mem u hv) _).symm
   rw [h1]
   refine le_trans (Finset.sum_le_sum fun la _ => ?_)
     (hs.sum_le_tsum (S'.image u) fun la _ => mul_nonneg (hr la) (lw_nonneg' la))
-  have h2
-      : ∀ v ∈ S'.filter (fun v => u v = la),
-        Formalism.BasicNotions.lw K v * ((v.asIdeal.ramificationIdx (𝓞 K0) : ℝ) * r (u v))
-          = (r la * Real.log (Ideal.absNorm la.asIdeal : ℝ) / (finrank ℚ K : ℝ))
-            * ((v.asIdeal.ramificationIdx (𝓞 K0) * v.asIdeal.inertiaDeg (𝓞 K0) : ℕ) : ℝ) := by
+  have h2 : ∀ v ∈ S'.filter (fun v => u v = la),
+      Formalism.BasicNotions.lw K v * ((v.asIdeal.ramificationIdx (𝓞 K0) : ℝ) * r (u v)) =
+        (r la * Real.log (Ideal.absNorm la.asIdeal : ℝ) / (finrank ℚ K : ℝ)) *
+          ((v.asIdeal.ramificationIdx (𝓞 K0) * v.asIdeal.inertiaDeg (𝓞 K0) : ℕ) : ℝ) := by
     intro v hv
     have hv' : u v = la := (Finset.mem_filter.1 hv).2
     rw [lw_eq (K0 := K0) v, hv']
@@ -1111,14 +1019,10 @@ open Formalism.BasicNotions Formalism.MainNotions
 open Formalism.HermitianLatticesTheory (lidx localization₂ locLen locS)
 open Formalism.EigenvalueLevelCeiling
 
-theorem span_of_fin
-    {R K V : Type} [CommRing R] [IsDedekindDomain R] [Field K] [Algebra R K] [IsFractionRing R K]
-    [AddCommGroup V] [Module K V] [Module R V] [IsScalarTower R K V]
-    (v : HeightOneSpectrum R) (A N : Submodule R V)
-    (h : Module.length R
-        (↥(localization₂ v.asIdeal A) ⧸ (localization₂ v.asIdeal N).comap (localization₂ v.asIdeal A).subtype)
-      ≠ ⊤)
-    : (A : Set V) ⊆ Submodule.span K (N : Set V) := by
+theorem span_of_fin {R K V : Type} [CommRing R] [IsDedekindDomain R] [Field K] [Algebra R K] [IsFractionRing R K]
+    [AddCommGroup V] [Module K V] [Module R V] [IsScalarTower R K V] (v : HeightOneSpectrum R) (A N : Submodule R V)
+    (h : Module.length R (↥(localization₂ v.asIdeal A) ⧸ (localization₂ v.asIdeal N).comap (localization₂ v.asIdeal A).subtype) ≠ ⊤) :
+    (A : Set V) ⊆ Submodule.span K (N : Set V) := by
   intro x hx
   have hxA : x ∈ localization₂ v.asIdeal A := ⟨1, v.asIdeal.primeCompl.one_mem, by simpa using hx⟩
   set q := (localization₂ v.asIdeal N).comap (localization₂ v.asIdeal A).subtype with hq
@@ -1135,8 +1039,7 @@ theorem span_of_fin
     by_contra hc
     push Not at hc
     apply hni
-    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
-      rw [injective_iff_map_eq_zero]
+    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
     intro d hd
     by_contra h0
     exact hc d h0 hd
@@ -1147,65 +1050,44 @@ theorem span_of_fin
     simpa using this
   obtain ⟨s, hs, hsx⟩ : d • x ∈ localization₂ v.asIdeal N := hd'
   have hs0 : s ≠ 0 := fun e => hs (e ▸ v.asIdeal.zero_mem)
-  have hK : algebraMap R K (s * d) ≠ 0 := by simpa using (mul_ne_zero hs0 hd0)
+  have hK : algebraMap R K (s * d) ≠ 0 := by
+    simpa using (mul_ne_zero hs0 hd0)
   have e : x = (algebraMap R K (s * d))⁻¹ • (s • d • x) := by
     rw [smul_smul, ← algebraMap_smul K (s * d) x, smul_smul, inv_mul_cancel₀ hK, one_smul]
   rw [e]
   exact Submodule.smul_mem _ _ (Submodule.subset_span hsx)
 
-def lenC
-    {R K F : Type} [CommRing R] [IsDedekindDomain R] [Field K] [Algebra R K] [IsFractionRing R K]
-    [AddCommGroup F] [Module K F] [Module R F] [IsScalarTower R K F]
-    (v : HeightOneSpectrum R)
-    (A T : Submodule R F)
-    (V : Submodule (v.adicCompletion K) (TensorProduct K (v.adicCompletion K) F))
-    : ℕ∞ :=
+def lenC {R K F : Type} [CommRing R] [IsDedekindDomain R] [Field K] [Algebra R K] [IsFractionRing R K]
+    [AddCommGroup F] [Module K F] [Module R F] [IsScalarTower R K F] (v : HeightOneSpectrum R) (A T : Submodule R F)
+    (V : Submodule (v.adicCompletion K) (TensorProduct K (v.adicCompletion K) F)) : ℕ∞ :=
   Module.length (v.adicCompletionIntegers K)
-    (↥(locC v A ⊓ V.restrictScalars (v.adicCompletionIntegers K)) ⧸
-      (locC v T ⊓ V.restrictScalars (v.adicCompletionIntegers K)).comap
-        (locC v A ⊓ V.restrictScalars (v.adicCompletionIntegers K)).subtype)
+      (↥(locC v A ⊓ V.restrictScalars (v.adicCompletionIntegers K)) ⧸
+        (locC v T ⊓ V.restrictScalars (v.adicCompletionIntegers K)).comap
+          (locC v A ⊓ V.restrictScalars (v.adicCompletionIntegers K)).subtype)
 
-theorem l1'
-    {R K F : Type} [CommRing R] [IsDedekindDomain R] [Field K] [Algebra R K] [IsFractionRing R K]
-    [AddCommGroup F] [Module K F] [Module R F] [IsScalarTower R K F]
-    (v : HeightOneSpectrum R) (H1 : LengthLocalizationLeCompletion (K := K) (F := F) v)
-    (A T : Submodule R F) (W : Submodule K F) (h : lenC v A T (locKC v W) ≠ ⊤)
-    : Module.length R
-        (↥(localization₂ v.asIdeal (A ⊓ W.restrictScalars R)) ⧸
-          (localization₂ v.asIdeal (A ⊓ W.restrictScalars R ⊓ T)).comap (localization₂ v.asIdeal (A ⊓ W.restrictScalars R)).subtype)
-      ≤ lenC v A T (locKC v W) :=
-  H1 A T W h
+theorem l1' {R K F : Type} [CommRing R] [IsDedekindDomain R] [Field K] [Algebra R K] [IsFractionRing R K]
+    [AddCommGroup F] [Module K F] [Module R F] [IsScalarTower R K F] (v : HeightOneSpectrum R)
+    (H1 : LengthLocalizationLeCompletion (K := K) (F := F) v) (A T : Submodule R F) (W : Submodule K F) (h : lenC v A T (locKC v W) ≠ ⊤) :
+    Module.length R (↥(localization₂ v.asIdeal (A ⊓ W.restrictScalars R)) ⧸
+        (localization₂ v.asIdeal (A ⊓ W.restrictScalars R ⊓ T)).comap (localization₂ v.asIdeal (A ⊓ W.restrictScalars R)).subtype) ≤
+      lenC v A T (locKC v W) := H1 A T W h
 
 variable {D : D7} {B : WeightFamilies.Prov D} {P : ModuliIntegralCharts.Prov D}
 
-theorem qlen_gen
-    {j : ℕ} (X : WeightAlgebra.PJ D B P j)
-    (la : HeightOneSpectrum (𝓞 B.KO))
-    (A T : Submodule (𝓞 B.KO) X.Forms) (V : Submodule (X.Kl la) (X.Vl la))
-    : X.qlen la (X.loc la A ⊓ X.ofK la V) (X.loc la T ⊓ X.ofK la V) = lenC la A T V :=
-  rfl
+theorem qlen_gen {j : ℕ} (X : WeightAlgebra.PJ D B P j) (la : HeightOneSpectrum (𝓞 B.KO)) (A T : Submodule (𝓞 B.KO) X.Forms)
+    (V : Submodule (X.Kl la) (X.Vl la)) :
+    X.qlen la (X.loc la A ⊓ X.ofK la V) (X.loc la T ⊓ X.ofK la V) = lenC la A T V := rfl
 
-theorem l2
-    (Q : Run D B P)
-    (H1 : ∀ la : HeightOneSpectrum (𝓞 B.KO),
-      LengthLocalizationLeCompletion (K := B.KO) (F := Q.X.Forms) la)
-    (H1b : ∀ la : HeightOneSpectrum (𝓞 B.KO),
-      CompletionPreservesFinrank (K := B.KO) (F := Q.X.Forms) la)
-    (H1c : ∀ la : HeightOneSpectrum (𝓞 B.KO),
-      CompletionSpanContainment (K := B.KO) (F := Q.X.Forms) la)
-    (hM : Submodule.IsFullLattice B.KO Q.M0) (h : Q.Concl)
-    : ∃ r : HeightOneSpectrum (𝓞 B.KO) → ℝ,
-      (∀ la, 0 ≤ r la) ∧ Summable (fun la => r la * Formalism.BasicNotions.lw B.KO la)
-        ∧ (∑' la, r la * Formalism.BasicNotions.lw B.KO la) ≤ Q.β
-        ∧ ∀ la,
-          Submodule.span B.KO ((Q.M0 ⊓ Q.Th0 : Submodule (𝓞 B.KO) _) : Set (B.Cusp Q.jn Q.ka)) = ⊤
-            ∧ ∀ e0 : ℤ,
-              (Q.T : ℝ) * Q.nus la ≤ (e0 : ℝ)
-                → ∀ W0 : Submodule B.KO (B.Cusp Q.jn Q.ka),
-                  (lidx la.asIdeal (Q.M0 ⊓ W0.restrictScalars (𝓞 B.KO))
-                        (Q.M0 ⊓ Q.Th0 ⊓ W0.restrictScalars (𝓞 B.KO))
-                      : ℝ)
-                    ≤ (e0 : ℝ) * (finrank B.KO W0 : ℝ) + r la := by
+theorem l2 (Q : Run D B P) (H1 : ∀ la : HeightOneSpectrum (𝓞 B.KO), LengthLocalizationLeCompletion (K := B.KO) (F := Q.X.Forms) la)
+    (H1b : ∀ la : HeightOneSpectrum (𝓞 B.KO), CompletionPreservesFinrank (K := B.KO) (F := Q.X.Forms) la)
+    (H1c : ∀ la : HeightOneSpectrum (𝓞 B.KO), CompletionSpanContainment (K := B.KO) (F := Q.X.Forms) la)
+    (hM : Submodule.IsFullLattice B.KO Q.M0) (h : Q.Concl) :
+    ∃ r : HeightOneSpectrum (𝓞 B.KO) → ℝ, (∀ la, 0 ≤ r la) ∧ Summable (fun la => r la * Formalism.BasicNotions.lw B.KO la) ∧
+      (∑' la, r la * Formalism.BasicNotions.lw B.KO la) ≤ Q.β ∧ ∀ la,
+        Submodule.span B.KO ((Q.M0 ⊓ Q.Th0 : Submodule (𝓞 B.KO) _) : Set (B.Cusp Q.jn Q.ka)) = ⊤ ∧
+        ∀ e0 : ℤ, (Q.T : ℝ) * Q.nus la ≤ (e0 : ℝ) → ∀ W0 : Submodule B.KO (B.Cusp Q.jn Q.ka),
+          (lidx la.asIdeal (Q.M0 ⊓ W0.restrictScalars (𝓞 B.KO)) (Q.M0 ⊓ Q.Th0 ⊓ W0.restrictScalars (𝓞 B.KO)) : ℝ) ≤
+            (e0 : ℝ) * (finrank B.KO W0 : ℝ) + r la := by
   letI := hM
   obtain ⟨r, h0, h1, h2, h3⟩ := h
   refine ⟨r, h0, h1, h2, fun la => ?_⟩
@@ -1213,44 +1095,28 @@ theorem l2
   have hinj : Function.Injective φ := Q.X.inc_inj Q.ka
   have hinj' : Function.Injective (φ.restrictScalars (𝓞 B.KO)) := hinj
 
-  have key
-      : ∀ e0 : ℤ,
-        (Q.T : ℝ) * Q.nus la ≤ (e0 : ℝ)
-          → ∀ W0 : Submodule B.KO (B.Cusp Q.jn Q.ka),
-            Module.length (𝓞 B.KO)
-                  (↥(localization₂ la.asIdeal (Q.M0 ⊓ W0.restrictScalars (𝓞 B.KO))) ⧸
-                    (localization₂ la.asIdeal (Q.M0 ⊓ W0.restrictScalars (𝓞 B.KO) ⊓ Q.Th0)).comap
-                      (localization₂ la.asIdeal (Q.M0 ⊓ W0.restrictScalars (𝓞 B.KO))).subtype)
-                ≠ ⊤
-              ∧ ((locLen la.asIdeal (Q.M0 ⊓ W0.restrictScalars (𝓞 B.KO))
-                      (Q.M0 ⊓ W0.restrictScalars (𝓞 B.KO) ⊓ Q.Th0)
-                    : ℕ)
-                  : ℝ)
-                ≤ (e0 : ℝ) * (finrank B.KO W0 : ℝ) + r la := by
+  have key : ∀ e0 : ℤ, (Q.T : ℝ) * Q.nus la ≤ (e0 : ℝ) → ∀ W0 : Submodule B.KO (B.Cusp Q.jn Q.ka),
+      Module.length (𝓞 B.KO) (↥(localization₂ la.asIdeal (Q.M0 ⊓ W0.restrictScalars (𝓞 B.KO))) ⧸
+        (localization₂ la.asIdeal (Q.M0 ⊓ W0.restrictScalars (𝓞 B.KO) ⊓ Q.Th0)).comap
+          (localization₂ la.asIdeal (Q.M0 ⊓ W0.restrictScalars (𝓞 B.KO))).subtype) ≠ ⊤ ∧
+      ((locLen la.asIdeal (Q.M0 ⊓ W0.restrictScalars (𝓞 B.KO)) (Q.M0 ⊓ W0.restrictScalars (𝓞 B.KO) ⊓ Q.Th0) : ℕ) : ℝ) ≤
+        (e0 : ℝ) * (finrank B.KO W0 : ℝ) + r la := by
     intro e0 he0 W0
-    have hW
-        : W0.map φ
-          ≤ Submodule.span B.KO
-            ((Q.X.Msup Q.ka : Submodule (𝓞 B.KO) Q.X.Forms) : Set Q.X.Forms) := by
-      have e1
-          : Submodule.span B.KO ((Q.X.Msup Q.ka : Submodule (𝓞 B.KO) Q.X.Forms) : Set Q.X.Forms)
-            = (Submodule.span B.KO (Q.M0 : Set _)).map φ :=
-        idxRules_span_map φ Q.M0
+    have hW : W0.map φ ≤ Submodule.span B.KO ((Q.X.Msup Q.ka : Submodule (𝓞 B.KO) Q.X.Forms) : Set Q.X.Forms) := by
+      have e1 : Submodule.span B.KO ((Q.X.Msup Q.ka : Submodule (𝓞 B.KO) Q.X.Forms) : Set Q.X.Forms) =
+          (Submodule.span B.KO (Q.M0 : Set _)).map φ := idxRules_span_map φ Q.M0
       rw [e1, Submodule.IsFullLattice.span_eq_top]
       exact Submodule.map_mono le_top
-    have hV : locKC la (W0.map φ) ≤ Q.X.locK la (Q.X.Msup Q.ka) :=
-      H1c la (Q.X.Msup Q.ka) (W0.map φ) hW
+    have hV : locKC la (W0.map φ) ≤ Q.X.locK la (Q.X.Msup Q.ka) := H1c la (Q.X.Msup Q.ka) (W0.map φ) hW
     obtain ⟨hfin, hle⟩ := h3 la e0 he0 (locKC la (W0.map φ)) hV
     rw [qlen_gen] at hfin hle
     have hl1 := l1' la (H1 la) (Q.X.Msup Q.ka) (Q.X.Theta Q.S Q.ka Q.wL Q.wF Q.T) (W0.map φ) hfin
-    have eA
-        : Q.X.Msup Q.ka ⊓ (W0.map φ).restrictScalars (𝓞 B.KO)
-          = (Q.M0 ⊓ W0.restrictScalars (𝓞 B.KO)).map (φ.restrictScalars (𝓞 B.KO)) := by
+    have eA : Q.X.Msup Q.ka ⊓ (W0.map φ).restrictScalars (𝓞 B.KO) =
+        (Q.M0 ⊓ W0.restrictScalars (𝓞 B.KO)).map (φ.restrictScalars (𝓞 B.KO)) := by
       rw [Submodule.map_inf _ hinj']
       rfl
-    have eT
-        : Q.X.Msup Q.ka ⊓ (W0.map φ).restrictScalars (𝓞 B.KO) ⊓ Q.X.Theta Q.S Q.ka Q.wL Q.wF Q.T
-          = (Q.M0 ⊓ W0.restrictScalars (𝓞 B.KO) ⊓ Q.Th0).map (φ.restrictScalars (𝓞 B.KO)) := by
+    have eT : Q.X.Msup Q.ka ⊓ (W0.map φ).restrictScalars (𝓞 B.KO) ⊓ Q.X.Theta Q.S Q.ka Q.wL Q.wF Q.T =
+        (Q.M0 ⊓ W0.restrictScalars (𝓞 B.KO) ⊓ Q.Th0).map (φ.restrictScalars (𝓞 B.KO)) := by
       rw [eA]
       ext y
       constructor
@@ -1264,8 +1130,7 @@ theorem l2
       exact (LinearEquiv.finrank_eq (Submodule.equivMapOfInjective φ hinj W0)).symm
     rw [hdim] at hle
     unfold locLen
-    exact
-      ⟨ne_top_of_le_ne_top hfin hl1, le_trans (by exact_mod_cast ENat.toNat_le_toNat hl1 hfin) hle⟩
+    exact ⟨ne_top_of_le_ne_top hfin hl1, le_trans (by exact_mod_cast ENat.toNat_le_toNat hl1 hfin) hle⟩
   constructor
   · have h4 := span_of_fin (K := B.KO) la _ _ (key _ (Q.eLa_ge la) ⊤).1
     rw [Submodule.restrictScalars_top, inf_top_eq] at h4
@@ -1296,16 +1161,12 @@ open Formalism.EigenvalueLevelCeiling.ThreeFormsAlt (mem_sc_inv isLatIn_cut qlen
 
 section Mono
 
-variable
-  {R K V : Type} [CommRing R] [IsDedekindDomain R] [Field K] [Algebra R K] [IsFractionRing R K]
+variable {R K V : Type} [CommRing R] [IsDedekindDomain R] [Field K] [Algebra R K] [IsFractionRing R K]
   [AddCommGroup V] [Module K V] [Module R V] [IsScalarTower R K V]
 
-theorem lidx_anti
-    (p : Ideal R) [p.IsPrime]
-    (W : Submodule K V)
-    {A B' B : Submodule R V} (hA : A.FG) (hAW : Submodule.span K (A : Set V) = W)
-    (hB'W : Submodule.span K (B' : Set V) = W) (hB'A : B' ≤ A) (hB : B' ≤ B)
-    : lidx p A B ≤ lidx p A B' := by
+theorem lidx_anti (p : Ideal R) [p.IsPrime] (W : Submodule K V) {A B' B : Submodule R V} (hA : A.FG)
+    (hAW : Submodule.span K (A : Set V) = W) (hB'W : Submodule.span K (B' : Set V) = W) (hB'A : B' ≤ A) (hB : B' ≤ B) :
+    lidx p A B ≤ lidx p A B' := by
   rw [idxRules_lidx_of_le p hB'A]
   have h1 : lidx p A B ≤ (locLen p A (A ⊓ B) : ℤ) := by
     unfold lidx
@@ -1313,8 +1174,7 @@ theorem lidx_anti
     linarith
   refine h1.trans ?_
   have hfin := idxRules_fin p A B' hA (idxRules_le_locS hAW hB'W)
-  have hle : localization₂ p B' ≤ localization₂ p (A ⊓ B) :=
-    Formalism.HermitianLatticesTheory.locBasic_locS_mono _ (le_inf hB'A hB)
+  have hle : localization₂ p B' ≤ localization₂ p (A ⊓ B) := Formalism.HermitianLatticesTheory.locBasic_locS_mono _ (le_inf hB'A hB)
   have := qlen_anti_right (localization₂ p A) hle
   unfold locLen
   exact_mod_cast ENat.toNat_le_toNat this hfin
@@ -1323,27 +1183,21 @@ end Mono
 
 section BC5
 
-variable
-  {K0 K : Type} [Field K0] [NumberField K0] [Field K] [NumberField K] [StarRing K] [Algebra K0 K]
-  {Z0 : Type} [AddCommGroup Z0] [Module K0 Z0] [FiniteDimensional K0 Z0] [Module (𝓞 K0) Z0]
-  [IsScalarTower (𝓞 K0) K0 Z0]
+variable {K0 K : Type} [Field K0] [NumberField K0] [Field K] [NumberField K] [StarRing K] [Algebra K0 K]
+  {Z0 : Type} [AddCommGroup Z0] [Module K0 Z0] [FiniteDimensional K0 Z0] [Module (𝓞 K0) Z0] [IsScalarTower (𝓞 K0) K0 Z0]
   {n : ℕ}
 
-theorem up_mono (ι : Z0 →ₗ[K0] (Fin n → K)) {A0 B0 : Submodule (𝓞 K0) Z0} (h : A0 ≤ B0)
-    : up ι A0 ≤ up ι B0 :=
+theorem up_mono (ι : Z0 →ₗ[K0] (Fin n → K)) {A0 B0 : Submodule (𝓞 K0) Z0} (h : A0 ≤ B0) : up ι A0 ≤ up ι B0 :=
   Submodule.span_mono (Set.image_mono h)
 
-theorem up_fg (ι : Z0 →ₗ[K0] (Fin n → K)) {A0 : Submodule (𝓞 K0) Z0} (h : A0.FG)
-    : (up ι A0).FG := by
+theorem up_fg (ι : Z0 →ₗ[K0] (Fin n → K)) {A0 : Submodule (𝓞 K0) Z0} (h : A0.FG) : (up ι A0).FG := by
   obtain ⟨s, rfl⟩ := h
   have e : (s : Set Z0) = Set.range (fun x : s => (x : Z0)) := by simp
   rw [e, up_span_range]
   exact Submodule.fg_span (Set.finite_range _)
 
-theorem up_top
-    (ι : Z0 →ₗ[K0] (Fin n → K)) (htop : Submodule.span K (Set.range ι) = ⊤)
-    {A0 : Submodule (𝓞 K0) Z0} (h : Submodule.span K0 (A0 : Set Z0) = ⊤)
-    : Submodule.span K (up ι A0 : Set (Fin n → K)) = ⊤ := by
+theorem up_top (ι : Z0 →ₗ[K0] (Fin n → K)) (htop : Submodule.span K (Set.range ι) = ⊤) {A0 : Submodule (𝓞 K0) Z0}
+    (h : Submodule.span K0 (A0 : Set Z0) = ⊤) : Submodule.span K (up ι A0 : Set (Fin n → K)) = ⊤ := by
   rw [eq_top_iff, ← htop]
   refine Submodule.span_le.mpr ?_
   rintro _ ⟨z, rfl⟩
@@ -1356,23 +1210,17 @@ theorem up_top
     rw [map_smul, ← algebraMap_smul K a (ι x)]
     exact Submodule.smul_mem _ _ hx
 
-theorem l5
-    (ι : Z0 →ₗ[K0] (Fin n → K))
-    (hind
-      : ∀ (m : ℕ) (b : Fin m → Z0), LinearIndependent K0 b → LinearIndependent K fun a => ι (b a))
-    (htop : Submodule.span K (Set.range ι) = ⊤)
-    (M0 N0 : Submodule (𝓞 K0) Z0) (hMfg : M0.FG) (hM : Submodule.span K0 (M0 : Set Z0) = ⊤)
-    (hN : Submodule.span K0 (N0 : Set Z0) = ⊤) (hNM : N0 ≤ M0)
-    (v : HeightOneSpectrum (𝓞 K)) (e0 : ℤ)
-    (ρ : ℝ)
-    (E : ℕ) (hE : (E : ℤ) = (v.asIdeal.ramificationIdx (𝓞 K0) : ℤ) * e0)
+theorem l5 (ι : Z0 →ₗ[K0] (Fin n → K))
+    (hind : ∀ (m : ℕ) (b : Fin m → Z0), LinearIndependent K0 b → LinearIndependent K fun a => ι (b a))
+    (htop : Submodule.span K (Set.range ι) = ⊤) (M0 N0 : Submodule (𝓞 K0) Z0) (hMfg : M0.FG)
+    (hM : Submodule.span K0 (M0 : Set Z0) = ⊤) (hN : Submodule.span K0 (N0 : Set Z0) = ⊤) (hNM : N0 ≤ M0)
+    (v : HeightOneSpectrum (𝓞 K)) (e0 : ℤ) (ρ : ℝ) (E : ℕ)
+    (hE : (E : ℤ) = (v.asIdeal.ramificationIdx (𝓞 K0) : ℤ) * e0)
     (h : ∀ W0 : Submodule K0 Z0,
-      (lidx (v.under (𝓞 K0)).asIdeal (M0 ⊓ W0.restrictScalars (𝓞 K0))
-            (N0 ⊓ W0.restrictScalars (𝓞 K0))
-          : ℝ)
-        ≤ (e0 : ℝ) * (finrank K0 W0 : ℝ) + ρ)
-    (Th : Submodule (𝓞 K) (Fin n → K)) (hTh : up ι N0 ≤ Th)
-    : RemOK v (up ι M0) Th E ((v.asIdeal.ramificationIdx (𝓞 K0) : ℝ) * ρ) := by
+      (lidx (v.under (𝓞 K0)).asIdeal (M0 ⊓ W0.restrictScalars (𝓞 K0)) (N0 ⊓ W0.restrictScalars (𝓞 K0)) : ℝ) ≤
+        (e0 : ℝ) * (finrank K0 W0 : ℝ) + ρ)
+    (Th : Submodule (𝓞 K) (Fin n → K)) (hTh : up ι N0 ≤ Th) :
+    RemOK v (up ι M0) Th E ((v.asIdeal.ramificationIdx (𝓞 K0) : ℝ) * ρ) := by
   let _ : StarRing K0 := starRingOfComm
   set la := v.under (𝓞 K0) with hla
   set e := v.asIdeal.ramificationIdx (𝓞 K0) with he
@@ -1390,16 +1238,16 @@ theorem l5
     exact isNoetherian_submodule.mp this _ hNM
   have hML : IsLatIn ⊤ M0 := ⟨hMfg, hM⟩
   have hNL : IsLatIn ⊤ N0 := ⟨hNfg, hN⟩
-  have h3f :=
-    (three_forms K0 Z0 la M0 N0 hML hNL hNM a0 E0 ρ ha0 hva0).mp (fun W0 => by
-      have := h W0
-      simp only [Int.cast_natCast] at this
-      exact this)
+  have h3f := (three_forms K0 Z0 la M0 N0 hML hNL hNM a0 E0 ρ ha0 hva0).mp (fun W0 => by
+    have := h W0
+    simp only [Int.cast_natCast] at this
+    exact this)
   set C0 := M0 ⊓ sc a0⁻¹ N0 with hC0
   have hCL : IsLatIn ⊤ C0 := lattice_intersection K0 Z0 M0 N0 hML hNL a0⁻¹ (inv_ne_zero ha0)
   have hl3 := l3 l3a ι hind htop M0 C0 hMfg hM hCL.1 hCL.2 v
   set a : K := algebraMap K0 K a0 with ha
-  have hane : a ≠ 0 := by rw [ha]; simpa using ha0
+  have hane : a ≠ 0 := by
+    rw [ha]; simpa using ha0
   have hva : vw v a = (E : ℤ) := by
     rw [hE]
     have := l3a v a0 ha0
@@ -1417,11 +1265,9 @@ theorem l5
     refine (mem_sc_inv hane _ _).mpr ?_
     rw [ha, algebraMap_smul, ← map_smul]
     exact Submodule.subset_span ⟨_, hx2, rfl⟩
-  have hmono :=
-    index_monotone K _ v ⊤ (up ι M0) (up ι C0) (up ι M0 ⊓ sc a⁻¹ (up ι N0)) hMsL hCsL hIL hCle
+  have hmono := index_monotone K _ v ⊤ (up ι M0) (up ι C0) (up ι M0 ⊓ sc a⁻¹ (up ι N0)) hMsL hCsL hIL hCle
   have hd : (lix v (up ι M0) (up ι M0 ⊓ sc a⁻¹ (up ι N0)) : ℝ) ≤ (e : ℝ) * ρ := by
-    have h1
-        : (lix v (up ι M0) (up ι M0 ⊓ sc a⁻¹ (up ι N0)) : ℝ) ≤ (lix v (up ι M0) (up ι C0) : ℝ) := by
+    have h1 : (lix v (up ι M0) (up ι M0 ⊓ sc a⁻¹ (up ι N0)) : ℝ) ≤ (lix v (up ι M0) (up ι C0) : ℝ) := by
       exact_mod_cast hmono
     have h2 : (lix v (up ι M0) (up ι C0) : ℝ) = (e : ℝ) * (lix la M0 C0 : ℝ) := by
       unfold lix
@@ -1430,15 +1276,13 @@ theorem l5
       rfl
     rw [h2] at h1
     exact h1.trans (mul_le_mul_of_nonneg_left h3f (Nat.cast_nonneg _))
-  have hall :=
-    (three_forms K _ v (up ι M0) (up ι N0) hMsL hNsL (up_mono ι hNM) a E _ hane hva).mpr hd
+  have hall := (three_forms K _ v (up ι M0) (up ι N0) hMsL hNsL (up_mono ι hNM) a E _ hane hva).mpr hd
   intro W
   refine le_trans ?_ (hall W)
   have hcA := isLatIn_cut W (up ι M0) hMsL
   have hcN := isLatIn_cut W (up ι N0) hNsL
-  have :=
-    lidx_anti (K := K) v.asIdeal W (A := cut W (up ι M0)) (B' := cut W (up ι N0)) (B := cut W Th)
-      hcA.1 hcA.2 hcN.2 (inf_le_inf_right _ (up_mono ι hNM)) (inf_le_inf_right _ hTh)
+  have := lidx_anti (K := K) v.asIdeal W (A := cut W (up ι M0)) (B' := cut W (up ι N0)) (B := cut W Th) hcA.1 hcA.2 hcN.2
+    (inf_le_inf_right _ (up_mono ι hNM)) (inf_le_inf_right _ hTh)
   exact_mod_cast this
 
 end BC5
@@ -1462,9 +1306,7 @@ open Formalism.DivisionValues (vw conjPl)
 open Formalism.EigenvalueLevelCeiling (lix cut sc IsLatIn plc)
 
 variable {K : Type} [Field K] [NumberField K] [StarRing K]
-variable
-  {Bs : DefBase K} {Df : DefSide Bs} {S : IndefData Df} {P' : Type} [Group P'] [Finite P']
-  {c : OnConst}
+variable {Bs : DefBase K} {Df : DefSide Bs} {S : IndefData Df} {P' : Type} [Group P'] [Finite P'] {c : OnConst}
 
 end Formalism.MainNotions.Gaps.LocalGlobalPassage
 
@@ -1513,10 +1355,8 @@ namespace Formalism.MainNotions.Gaps.LocalGlobalPassage
 open Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Indef Formalism.L2.Indef.Tree
 
 variable {K : Type} [Field K] [NumberField K] [StarRing K]
-variable
-  {Bs : DefBase K} {Df : DefSide Bs} {S : IndefData Df} {P' : Type} [Group P'] [Finite P']
-  {c : OnConst} {O : OnObj S P' c} {D : D7} {B : WeightFamilies.Prov D}
-  {P : ModuliIntegralCharts.Prov D} [Algebra B.KO K]
+variable {Bs : DefBase K} {Df : DefSide Bs} {S : IndefData Df} {P' : Type} [Group P'] [Finite P'] {c : OnConst}
+  {O : OnObj S P' c} {D : D7} {B : WeightFamilies.Prov D} {P : ModuliIntegralCharts.Prov D} [Algebra B.KO K]
 
 end Formalism.MainNotions.Gaps.LocalGlobalPassage
 

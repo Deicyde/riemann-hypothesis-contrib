@@ -1,17 +1,57 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Definitions.CommutativeAlgebra.IsLatticeFamily
-public import Development.AutomorphicSpectrum.Definitions.DivisibilityTowers.BundleChernComparison
 public import Development.AutomorphicSpectrum.Proofs.AlgebraProofs.LocallyFreeFiniteProjectiveBaseChange
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import GroundTheory.HeightsAndTheta.Heights.DiscreteValuationNumbers.Objects
 
 @[expose] public section
 
 open MvPolynomial GlobalTheory.CompanionTheory.Ar.Num GroundTheory.Heights₂.Heights.NumbersDVR
 open ReciprocityTheory.ChartRestriction.G.Geo (ChartBundle chartRing)
-open GroundTheory.Heights₂.Heights.IndefiniteRowSideFullHecke.NumbersDVR.Bundles
-  (mseg mcIdeal chartMon joinCoord bcCoord pullDeg restrictChart fnField ck rootNum SameGeneric
-    LatLE IsPull IsPullBC)
+open GroundTheory.Heights₂.Heights.IndefiniteRowSideFullHecke.NumbersDVR.Bundles (mseg mcIdeal chartMon joinCoord bcCoord pullDeg restrictChart fnField ck rootNum SameGeneric LatLE IsPull IsPullBC)
 
 namespace PositivityTheory.Xgn.A_fam_constr
 
@@ -21,11 +61,9 @@ variable {o : Type} [CommRing o] {Ω : Type} [Field Ω] [Algebra o Ω]
 variable {K : Type} [Fintype K] {ι : K → Type} {x : (Σ k, ι k) → Ω}
 variable {V V₁ : Type} [AddCommGroup V] [Module Ω V] [AddCommGroup V₁] [Module Ω V₁]
 
-theorem mono
-    {Γ : (∀ k, ι k) → AddSubgroup V} (h : IsLatFamily o x Γ)
-    {s t : ∀ k, ι k} (ht : mseg x t ≠ 0)
-    {v : V} {m m' : ℕ} (hm : m ≤ m') (hv : (mseg x s / mseg x t) ^ m • v ∈ Γ t)
-    : (mseg x s / mseg x t) ^ m' • v ∈ Γ t := by
+theorem mono {Γ : (∀ k, ι k) → AddSubgroup V} (h : IsLatFamily o x Γ) {s t : ∀ k, ι k}
+    (ht : mseg x t ≠ 0) {v : V} {m m' : ℕ} (hm : m ≤ m') (hv : (mseg x s / mseg x t) ^ m • v ∈ Γ t) :
+    (mseg x s / mseg x t) ^ m' • v ∈ Γ t := by
   rw [← Nat.sub_add_cancel hm, pow_add, mul_smul]
   exact h.1 t ht _ (pow_mem (div_mem_chartRing (mseg x) t s) _) _ hv
 
@@ -37,8 +75,8 @@ theorem fam_top : IsLatFamily o x (fun _ => (⊤ : AddSubgroup V)) :=
 
 theorem fam_bot : IsLatFamily o x (fun _ => (⊥ : AddSubgroup V)) := fam_sub ⊥
 
-theorem fam_sup {A B : (∀ k, ι k) → AddSubgroup V} (hA : IsLatFamily o x A) (hB : IsLatFamily o x B)
-    : IsLatFamily o x (fun c => A c ⊔ B c) := by
+theorem fam_sup {A B : (∀ k, ι k) → AddSubgroup V} (hA : IsLatFamily o x A) (hB : IsLatFamily o x B) :
+    IsLatFamily o x (fun c => A c ⊔ B c) := by
   refine ⟨fun s hs a ha v hv => ?_, fun s t hs ht v hv => ?_⟩
   · obtain ⟨y, hy, z, hz, rfl⟩ := AddSubgroup.mem_sup.1 hv
     rw [smul_add]
@@ -51,18 +89,16 @@ theorem fam_sup {A B : (∀ k, ι k) → AddSubgroup V} (hA : IsLatFamily o x A)
     exact AddSubgroup.add_mem_sup (mono hA ht (Nat.le_add_right _ _) hm)
       (mono hB ht (Nat.le_add_left _ _) hm')
 
-theorem fam_inf {A B : (∀ k, ι k) → AddSubgroup V} (hA : IsLatFamily o x A) (hB : IsLatFamily o x B)
-    : IsLatFamily o x (fun c => A c ⊓ B c) := by
-  refine
-    ⟨fun s hs a ha v hv => ⟨hA.1 s hs a ha v hv.1, hB.1 s hs a ha v hv.2⟩, fun s t hs ht v hv => ?_⟩
+theorem fam_inf {A B : (∀ k, ι k) → AddSubgroup V} (hA : IsLatFamily o x A) (hB : IsLatFamily o x B) :
+    IsLatFamily o x (fun c => A c ⊓ B c) := by
+  refine ⟨fun s hs a ha v hv => ⟨hA.1 s hs a ha v hv.1, hB.1 s hs a ha v hv.2⟩,
+    fun s t hs ht v hv => ?_⟩
   obtain ⟨m, hm⟩ := hA.2 s t hs ht v hv.1
   obtain ⟨m', hm'⟩ := hB.2 s t hs ht v hv.2
   exact ⟨m + m', mono hA ht (Nat.le_add_right _ _) hm, mono hB ht (Nat.le_add_left _ _) hm'⟩
 
-theorem fam_map
-    {A : (∀ k, ι k) → AddSubgroup V} (hA : IsLatFamily o x A)
-    (f : V →+ V₁) (hf : ∀ (a : Ω) v, f (a • v) = a • f v)
-    : IsLatFamily o x (fun c => (A c).map f) := by
+theorem fam_map {A : (∀ k, ι k) → AddSubgroup V} (hA : IsLatFamily o x A) (f : V →+ V₁)
+    (hf : ∀ (a : Ω) v, f (a • v) = a • f v) : IsLatFamily o x (fun c => (A c).map f) := by
   refine ⟨fun s hs a ha v hv => ?_, fun s t hs ht v hv => ?_⟩
   · obtain ⟨y, hy, rfl⟩ := hv
     exact ⟨_, hA.1 s hs a ha y hy, hf a y⟩
@@ -70,22 +106,19 @@ theorem fam_map
     obtain ⟨m, hm⟩ := hA.2 s t hs ht y hy
     exact ⟨m, _, hm, hf _ y⟩
 
-theorem fam_comap
-    {A : (∀ k, ι k) → AddSubgroup V₁} (hA : IsLatFamily o x A)
-    (f : V →+ V₁) (hf : ∀ (a : Ω) v, f (a • v) = a • f v)
-    : IsLatFamily o x (fun c => (A c).comap f) := by
+theorem fam_comap {A : (∀ k, ι k) → AddSubgroup V₁} (hA : IsLatFamily o x A) (f : V →+ V₁)
+    (hf : ∀ (a : Ω) v, f (a • v) = a • f v) : IsLatFamily o x (fun c => (A c).comap f) := by
   refine ⟨fun s hs a ha v hv => ?_, fun s t hs ht v hv => ?_⟩
   · rw [AddSubgroup.mem_comap, hf]
     exact hA.1 s hs a ha _ hv
   · obtain ⟨m, hm⟩ := hA.2 s t hs ht _ hv
     exact ⟨m, by rw [AddSubgroup.mem_comap, hf]; exact hm⟩
 
-theorem fam_prod
-    {A : (∀ k, ι k) → AddSubgroup V} {B : (∀ k, ι k) → AddSubgroup V₁}
-    (hA : IsLatFamily o x A) (hB : IsLatFamily o x B)
-    : IsLatFamily o x (fun c => (A c).prod (B c)) := by
-  refine
-    ⟨fun s hs a ha v hv => ⟨hA.1 s hs a ha _ hv.1, hB.1 s hs a ha _ hv.2⟩, fun s t hs ht v hv => ?_⟩
+theorem fam_prod {A : (∀ k, ι k) → AddSubgroup V} {B : (∀ k, ι k) → AddSubgroup V₁}
+    (hA : IsLatFamily o x A) (hB : IsLatFamily o x B) :
+    IsLatFamily o x (fun c => (A c).prod (B c)) := by
+  refine ⟨fun s hs a ha v hv => ⟨hA.1 s hs a ha _ hv.1, hB.1 s hs a ha _ hv.2⟩,
+    fun s t hs ht v hv => ?_⟩
   obtain ⟨m, hm⟩ := hA.2 s t hs ht _ hv.1
   obtain ⟨m', hm'⟩ := hB.2 s t hs ht _ hv.2
   exact ⟨m + m', mono hA ht (Nat.le_add_right _ _) hm, mono hB ht (Nat.le_add_left _ _) hm'⟩
@@ -93,43 +126,38 @@ theorem fam_prod
 theorem mem_stdLat (R : Subalgebra o Ω) {J : Type} (v : J → Ω) : v ∈ stdLat R J ↔ ∀ j, v j ∈ R :=
   ⟨fun h j => h j trivial, fun h j _ => h j⟩
 
-theorem fam_std (J : Type) [Fintype J]
-    : IsLatFamily o x (fun c => stdLat (chartRing o (mseg x) c) J) := by
+theorem fam_std (J : Type) [Fintype J] :
+    IsLatFamily o x (fun c => stdLat (chartRing o (mseg x) c) J) := by
   refine ⟨fun s _ a ha v hv => ?_, fun s t hs _ v hv => ?_⟩
   · rw [mem_stdLat] at hv ⊢
     exact fun j => mul_mem ha (hv j)
   · rw [mem_stdLat] at hv
     choose m hm using fun j => exists_pow_mul_mem_chartRing (mseg x) s t hs (hv j)
     refine ⟨∑ q, m q, (mem_stdLat _ _).2 fun q => ?_⟩
-    have hle : m q ≤ ∑ q, m q := Finset.single_le_sum (fun _ _ => Nat.zero_le _) (Finset.mem_univ q)
+    have hle : m q ≤ ∑ q, m q :=
+      Finset.single_le_sum (fun _ _ => Nat.zero_le _) (Finset.mem_univ q)
     rw [Pi.smul_apply, smul_eq_mul, ← Nat.sub_add_cancel hle, pow_add, mul_assoc]
     exact mul_mem (pow_mem (div_mem_chartRing (mseg x) t s) _) (hm q)
 
-theorem mem_dotDual (R : Subalgebra o Ω) {m : ℕ} (L : AddSubgroup (Fin m → Ω)) (w : Fin m → Ω)
-    : w ∈ dotDual R L ↔ ∀ v ∈ L, v ⬝ᵥ w ∈ R := by
+theorem mem_dotDual (R : Subalgebra o Ω) {m : ℕ} (L : AddSubgroup (Fin m → Ω)) (w : Fin m → Ω) :
+    w ∈ dotDual R L ↔ ∀ v ∈ L, v ⬝ᵥ w ∈ R := by
   simp only [dotDual, AddSubgroup.mem_iInf, AddSubgroup.mem_comap]
   rfl
 
 def FG (R : Subalgebra o Ω) (L : AddSubgroup V) : Prop :=
-  ∃ (I : Type) (_ : Fintype I) (g : I → V),
-    (∀ i, g i ∈ L) ∧ ∀ e ∈ L, ∃ a : I → Ω, (∀ i, a i ∈ R) ∧ ∑ i, a i • g i = e
+  ∃ (I : Type) (_ : Fintype I) (g : I → V), (∀ i, g i ∈ L) ∧
+    ∀ e ∈ L, ∃ a : I → Ω, (∀ i, a i ∈ R) ∧ ∑ i, a i • g i = e
 
-theorem fg_of_locFree {R : Subalgebra o Ω} {r : ℕ} {L : AddSubgroup V} (h : LocFree R r L)
-    : FG R L := by
+theorem fg_of_locFree {R : Subalgebra o Ω} {r : ℕ} {L : AddSubgroup V} (h : LocFree R r L) :
+    FG R L := by
   let L' : Submodule R V := { L with smul_mem' := fun a e he => h.1 a a.2 e he }
   obtain ⟨k, φ, v, hφ, hv⟩ := LocFreeProj.exists_dualBasis (L := L') (r := r) h
-  exact ⟨
-    _,
-    inferInstance,
-    fun i => v i,
-    fun i => (v i).2,
-    fun e he => ⟨fun i => φ i e, fun i => hφ i e he, hv e⟩
-  ⟩
+  exact ⟨_, inferInstance, fun i => v i, fun i => (v i).2,
+    fun e he => ⟨fun i => φ i e, fun i => hφ i e he, hv e⟩⟩
 
-theorem fg_comap
-    {R : Subalgebra o Ω} {L : AddSubgroup V₁} (h : FG R L)
-    (f : V →ₗ[Ω] V₁) (hf : Function.Injective f) (hS : Summand L (LinearMap.range f))
-    : FG R (L.comap f.toAddMonoidHom) := by
+theorem fg_comap {R : Subalgebra o Ω} {L : AddSubgroup V₁} (h : FG R L) (f : V →ₗ[Ω] V₁)
+    (hf : Function.Injective f) (hS : Summand L (LinearMap.range f)) :
+    FG R (L.comap f.toAddMonoidHom) := by
   obtain ⟨I, hI, g, hg, hL⟩ := h
   obtain ⟨ρ, h1, h2, h3⟩ := hS
   choose y hy using fun i => h1 (g i)
@@ -140,13 +168,12 @@ theorem fg_comap
   · obtain ⟨a, ha, hs⟩ := hL (f e) he
     refine ⟨a, ha, hf ?_⟩
     rw [← h2 (f e) ⟨e, rfl⟩, ← hs]
-    set_option synthInstance.maxHeartbeats 100000 in
+
     simp only [map_sum, map_smul, hy]
 
-theorem fam_dual
-    {m : ℕ} {A : (∀ k, ι k) → AddSubgroup (Fin m → Ω)}
-    (hA : IsLatFamily o x A) (hfg : ∀ c, mseg x c ≠ 0 → FG (chartRing o (mseg x) c) (A c))
-    : IsLatFamily o x (fun c => dotDual (chartRing o (mseg x) c) (A c)) := by
+theorem fam_dual {m : ℕ} {A : (∀ k, ι k) → AddSubgroup (Fin m → Ω)} (hA : IsLatFamily o x A)
+    (hfg : ∀ c, mseg x c ≠ 0 → FG (chartRing o (mseg x) c) (A c)) :
+    IsLatFamily o x (fun c => dotDual (chartRing o (mseg x) c) (A c)) := by
   refine ⟨fun s _ a ha w hw => ?_, fun s t hs ht w hw => ?_⟩
   · rw [mem_dotDual] at hw ⊢
     intro v hv
@@ -162,9 +189,8 @@ theorem fam_dual
       have hu : (mseg x s / mseg x t) ^ k * (mseg x t / mseg x s) ^ k = 1 := by
         rw [← mul_pow, div_mul_div_comm, mul_comm (mseg x s), div_self (mul_ne_zero ht hs), one_pow]
       rw [smul_dotProduct, smul_eq_mul] at hk'
-      have : (mseg x s / mseg x t) ^ k' * (g i ⬝ᵥ w)
-          = (mseg x s / mseg x t) ^ k
-            * ((mseg x s / mseg x t) ^ k' * ((mseg x t / mseg x s) ^ k * (g i ⬝ᵥ w))) := by
+      have : (mseg x s / mseg x t) ^ k' * (g i ⬝ᵥ w) = (mseg x s / mseg x t) ^ k *
+          ((mseg x s / mseg x t) ^ k' * ((mseg x t / mseg x s) ^ k * (g i ⬝ᵥ w))) := by
         linear_combination (-(mseg x s / mseg x t) ^ k' * (g i ⬝ᵥ w)) * hu
       rw [this]
       exact mul_mem (pow_mem (div_mem_chartRing (mseg x) t s) _) hk'
@@ -173,15 +199,15 @@ theorem fam_dual
     obtain ⟨a, ha, rfl⟩ := hL v hv
     rw [sum_dotProduct]
     refine sum_mem fun q _ => ?_
-    have hle : k q ≤ ∑ q, k q := Finset.single_le_sum (fun _ _ => Nat.zero_le _) (Finset.mem_univ q)
-    rw [smul_dotProduct, dotProduct_smul, smul_eq_mul, smul_eq_mul, ← Nat.sub_add_cancel hle,
-      pow_add, mul_assoc]
+    have hle : k q ≤ ∑ q, k q :=
+      Finset.single_le_sum (fun _ _ => Nat.zero_le _) (Finset.mem_univ q)
+    rw [smul_dotProduct, dotProduct_smul, smul_eq_mul, smul_eq_mul, ← Nat.sub_add_cancel hle, pow_add,
+      mul_assoc]
     exact mul_mem (ha q) (mul_mem (pow_mem (div_mem_chartRing (mseg x) t s) _) (hk q))
 
-theorem linMap_inj {F : Type} [Zero F] [One F] (n : ℕ) (χ : F → Ω) (h0 : χ 0 = 0) (h1 : χ 1 = 1)
-    : Function.Injective (linMap n χ) := by
-  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
-    rw [injective_iff_map_eq_zero]
+theorem linMap_inj {F : Type} [Zero F] [One F] (n : ℕ) (χ : F → Ω) (h0 : χ 0 = 0) (h1 : χ 1 = 1) :
+    Function.Injective (linMap n χ) := by
+  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
   intro l hl
   funext j
   have := congrFun hl (Pi.single j 1)
@@ -194,36 +220,7 @@ theorem linMap_inj {F : Type} [Zero F] [One F] (n : ℕ) (χ : F → Ω) (h0 : �
 end PositivityTheory.Xgn.A_fam_constr
 
 open PositivityTheory.Xgn.A_fam_constr in
-theorem PositivityTheory.Xgn.t_fam_constr
-    : ∀ (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] (Ω : Type) [Field Ω]
-        [Algebra O Ω] (K : Type) [Fintype K] [DecidableEq K] (ι : K → Type) [∀ k, Fintype (ι k)]
-        (x : (Σ k, ι k) → Ω),
-      Function.Injective (algebraMap O Ω)
-        → ∀ {F : Type} [Zero F] [One F] [Fintype F] {n : ℕ} {Sg : Type} [Fintype Sg] {r s : Sg → ℕ}
-            (p : ℕ),
-          p.Prime
-            → ∀ (w : O) (χ : Sg → F → O) (φ : Equiv.Perm Sg)
-                (D : (∀ k, ι k) → LieLatticeData Ω F n Sg r s),
-              IsLatticeFamily O x p w χ φ D
-                → IsLatFamily O x (fun c => (D c).l1 (chartRing O (mseg x) c) p)
-                  ∧ ∀ τ,
-                    IsLatFamily O x (fun c =>
-                        (D c).af (chartRing O (mseg x) c) p (fun a => algebraMap O Ω (χ τ a)))
-                      ∧ (∀ i,
-                        IsLatFamily O x (fun c => (D c).xId (fun a => algebraMap O Ω (χ τ a)) i)
-                          ∧ IsLatFamily O x
-                            (fun c => (D c).stepGraph τ (fun a => algebraMap O Ω (χ τ a)) i))
-                      ∧ (∀ i, IsLatFamily O x (fun c => (D c).kk τ i))
-                      ∧ IsLatFamily O x (fun c => dotDual (chartRing O (mseg x) c) ((D c).lie τ))
-                      ∧ ((∀ c,
-                          mseg x c ≠ 0
-                            → (D c).Good₁ (chartRing O (mseg x) c) p
-                              (fun τ a => algebraMap O Ω (χ τ a)))
-                        → IsLatFamily O x (fun c =>
-                            (D c).hh (chartRing O (mseg x) c) p (fun a => algebraMap O Ω (χ τ a)))
-                          ∧ IsLatFamily O x (fun c =>
-                            (D c).imH (chartRing O (mseg x) c) p τ
-                              (fun a => algebraMap O Ω (χ τ a)))) := by
+theorem PositivityTheory.Xgn.t_fam_constr : ∀ (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] (Ω : Type) [Field Ω] [Algebra O Ω] (K : Type) [Fintype K] [DecidableEq K] (ι : K → Type) [∀ k, Fintype (ι k)] (x : (Σ k, ι k) → Ω), Function.Injective (algebraMap O Ω) → ∀ {F : Type} [Zero F] [One F] [Fintype F] {n : ℕ} {Sg : Type} [Fintype Sg] {r s : Sg → ℕ} (p : ℕ), p.Prime → ∀ (w : O) (χ : Sg → F → O) (φ : Equiv.Perm Sg) (D : (∀ k, ι k) → LieLatticeData Ω F n Sg r s), IsLatticeFamily O x p w χ φ D → IsLatFamily O x (fun c => (D c).l1 (chartRing O (mseg x) c) p) ∧ ∀ τ, IsLatFamily O x (fun c => (D c).af (chartRing O (mseg x) c) p (fun a => algebraMap O Ω (χ τ a))) ∧ (∀ i, IsLatFamily O x (fun c => (D c).xId (fun a => algebraMap O Ω (χ τ a)) i) ∧ IsLatFamily O x (fun c => (D c).stepGraph τ (fun a => algebraMap O Ω (χ τ a)) i)) ∧ (∀ i, IsLatFamily O x (fun c => (D c).kk τ i)) ∧ IsLatFamily O x (fun c => dotDual (chartRing O (mseg x) c) ((D c).lie τ)) ∧ ((∀ c, mseg x c ≠ 0 → (D c).Good₁ (chartRing O (mseg x) c) p (fun τ a => algebraMap O Ω (χ τ a))) → IsLatFamily O x (fun c => (D c).hh (chartRing O (mseg x) c) p (fun a => algebraMap O Ω (χ τ a))) ∧ IsLatFamily O x (fun c => (D c).imH (chartRing O (mseg x) c) p τ (fun a => algebraMap O Ω (χ τ a)))) := by
   classical
   intro O _ _ _ Ω _ _ K _ _ ι _ x _ F _ _ _ n Sg _ r s p _ w χ φ D hD
   have hl1 : IsLatFamily O x (fun c => (D c).l1 (chartRing O (mseg x) c) p) :=
@@ -234,16 +231,16 @@ theorem PositivityTheory.Xgn.t_fam_constr
       (fun c => (D c).af (chartRing O (mseg x) c) p (fun a => algebraMap O Ω (χ τ a))) :=
     fam_comap hl1 _ fun a v => (linMap n (fun a => algebraMap O Ω (χ τ a))).map_smul a v
   refine ⟨haf, fun i => ⟨?_, ?_⟩, fun i => ?_, ?_, fun hG => ?_⟩
-  · exact fam_comap (fam_sup hD.famM (fam_sub _)) _ fun a v =>
-      (LinearMap.toSpanSingleton Ω _ _).map_smul a v
-  · exact fam_comap (fam_sup hTh (fam_prod (fam_sub _) fam_bot)) _ fun a v =>
-      Prod.ext ((LinearMap.toSpanSingleton Ω _ _).map_smul a v.1) rfl
+  · exact fam_comap (fam_sup hD.famM (fam_sub _)) _
+      fun a v => (LinearMap.toSpanSingleton Ω _ _).map_smul a v
+  · exact fam_comap (fam_sup hTh (fam_prod (fam_sub _) fam_bot)) _
+      fun a v => Prod.ext ((LinearMap.toSpanSingleton Ω _ _).map_smul a v.1) rfl
   · exact fam_map (fam_inf hTh (fam_prod (fam_sub _) fam_top)) _ fun a v => rfl
   · exact fam_dual hlie fun c hc => fg_of_locFree ((hD.base c hc).free τ).1
   · have hh : IsLatFamily O x
         (fun c => (D c).hh (chartRing O (mseg x) c) p (fun a => algebraMap O Ω (χ τ a))) := by
-      refine fam_dual haf fun c hc =>
-        fg_comap (fg_of_locFree (hG c hc).l1) _ (linMap_inj n _ ?_ ?_) ((hG c hc).lin τ)
+      refine fam_dual haf fun c hc => fg_comap (fg_of_locFree (hG c hc).l1) _
+        (linMap_inj n _ ?_ ?_) ((hG c hc).lin τ)
       · simp [(hD.char.2.2.2.2 τ).1]
       · simp [(hD.char.2.2.2.2 τ).2]
     exact ⟨hh, fam_map (fam_inf hDel (fam_prod hh fam_top)) _ fun a v => rfl⟩

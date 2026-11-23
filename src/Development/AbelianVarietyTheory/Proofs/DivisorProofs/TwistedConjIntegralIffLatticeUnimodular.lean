@@ -1,14 +1,49 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.Definitions.Divisors.IsUnifAt
-public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.UnitLemmaGroup
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.MulHomInjective
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep
-  Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT
+open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT
 open scoped Classical TensorProduct
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 noncomputable section
@@ -21,12 +56,9 @@ section Mat
 
 variable {L : Type} [Field L] {a : ℕ}
 
-theorem mem_GLint_iff' {S : Subring L} {x : GL (Fin a) L}
-    : x ∈ GLint (Fin a) S ↔ (∀ i j, x.1 i j ∈ S) ∧ ∀ i j, (x⁻¹).1 i j ∈ S := by
-  refine ⟨
-    ?_,
-    fun h => ⟨⟨Matrix.of fun i j => ⟨_, h.1 i j⟩, Matrix.of fun i j => ⟨_, h.2 i j⟩, ?_, ?_⟩, rfl⟩
-  ⟩
+theorem mem_GLint_iff' {S : Subring L} {x : GL (Fin a) L} :
+    x ∈ GLint (Fin a) S ↔ (∀ i j, x.1 i j ∈ S) ∧ ∀ i j, (x⁻¹).1 i j ∈ S := by
+  refine ⟨?_, fun h => ⟨⟨Matrix.of fun i j => ⟨_, h.1 i j⟩, Matrix.of fun i j => ⟨_, h.2 i j⟩, ?_, ?_⟩, rfl⟩⟩
   · rintro ⟨y, rfl⟩
     exact ⟨fun i j => (y.1 i j).2, fun i j => ((y⁻¹).1 i j).2⟩
   · refine Matrix.map_injective S.subtype_injective ?_
@@ -38,11 +70,8 @@ theorem mem_GLint_iff' {S : Subring L} {x : GL (Fin a) L}
     rw [Matrix.map_mul, Matrix.map_one _ (map_zero _) (map_one _)]
     exact x.inv_mul
 
-theorem mulVec_mem
-    {S : Subring L} {M : Matrix (Fin a) (Fin a) L} {v : Fin a → L}
-    (hM : ∀ i j, M i j ∈ S) (hv : ∀ j, v j ∈ S)
-    (i : Fin a)
-    : (M *ᵥ v) i ∈ S := by
+theorem mulVec_mem {S : Subring L} {M : Matrix (Fin a) (Fin a) L} {v : Fin a → L}
+    (hM : ∀ i j, M i j ∈ S) (hv : ∀ j, v j ∈ S) (i : Fin a) : (M *ᵥ v) i ∈ S := by
   simp only [Matrix.mulVec, dotProduct]
   exact Subring.sum_mem _ fun j _ => S.mul_mem (hM i j) (hv j)
 
@@ -51,10 +80,9 @@ theorem single_mem (S : Subring L) (j k : Fin a) : (Pi.single j (1 : L) : Fin a 
   · subst hk; simp [S.one_mem]
   · simp [Pi.single_eq_of_ne hk, S.zero_mem]
 
-theorem mem_GLint_iff_dual
-    {S : Subring L} (c : L →+* L) (hc : ∀ x, c (c x) = x) (hS : ∀ x, c x ∈ S ↔ x ∈ S)
-    (Y : GL (Fin a) L)
-    : Y ∈ GLint (Fin a) S ↔ ∀ u : Fin a → L, (∀ j, u j ∈ S) ↔ ∀ i, (Y.1 *ᵥ (c ∘ u)) i ∈ S := by
+theorem mem_GLint_iff_dual {S : Subring L} (c : L →+* L) (hc : ∀ x, c (c x) = x) (hS : ∀ x, c x ∈ S ↔ x ∈ S)
+    (Y : GL (Fin a) L) :
+    Y ∈ GLint (Fin a) S ↔ ∀ u : Fin a → L, (∀ j, u j ∈ S) ↔ ∀ i, (Y.1 *ᵥ (c ∘ u)) i ∈ S := by
   rw [mem_GLint_iff']
   constructor
   · rintro ⟨h1, h2⟩ u
@@ -79,35 +107,31 @@ theorem mem_GLint_iff_dual
       simpa [Matrix.col] using h3
     · have hY : Y.1 *ᵥ ((Y⁻¹).1 *ᵥ Pi.single j 1) = Pi.single j 1 := by
         rw [Matrix.mulVec_mulVec, ← Units.val_mul, mul_inv_cancel, Units.val_one, Matrix.one_mulVec]
-      have hcc : c ∘ (c ∘ ((Y⁻¹).1 *ᵥ Pi.single j 1)) = (Y⁻¹).1 *ᵥ Pi.single j 1 :=
-        funext fun k => hc _
+      have hcc : c ∘ (c ∘ ((Y⁻¹).1 *ᵥ Pi.single j 1)) = (Y⁻¹).1 *ᵥ Pi.single j 1 := funext fun k => hc _
       have h2 := (h (c ∘ ((Y⁻¹).1 *ᵥ Pi.single j 1))).2 (by rw [hcc, hY]; exact single_mem S j) i
       have h4 := (hS _).1 h2
       rw [Matrix.mulVec_single_one] at h4
       simpa [Matrix.col] using h4
 
-theorem invT_mem_iff {S : Subring L} (x : GL (Fin a) L)
-    : invT a L x ∈ GLint (Fin a) S ↔ x ∈ GLint (Fin a) S := by
+theorem invT_mem_iff {S : Subring L} (x : GL (Fin a) L) :
+    invT a L x ∈ GLint (Fin a) S ↔ x ∈ GLint (Fin a) S := by
   rw [mem_GLint_iff', mem_GLint_iff']
   have h1 : (invT a L x).1 = (x⁻¹).1ᵀ := rfl
   have h2 : ((invT a L x)⁻¹).1 = x.1ᵀ := rfl
   rw [h1, h2]
   simp only [Matrix.transpose_apply]
-  exact ⟨
-    fun h => ⟨fun i j => h.2 j i, fun i j => h.1 j i⟩,
-    fun h => ⟨fun i j => h.2 j i, fun i j => h.1 j i⟩
-  ⟩
+  exact ⟨fun h => ⟨fun i j => h.2 j i, fun i j => h.1 j i⟩, fun h => ⟨fun i j => h.2 j i, fun i j => h.1 j i⟩⟩
 
 theorem PhiU_mem (S : Subring L) : PhiU a L ∈ GLint (Fin a) S := by
   rw [mem_GLint_iff']
   have h2 : ((PhiU a L)⁻¹).1 = (GlobalTheory.Tw.Phi a L)ᵀ := rfl
   have h1 : (PhiU a L).1 = GlobalTheory.Tw.Phi a L := rfl
   rw [h1, h2]
-  refine ⟨fun i j => ?_, fun i j => ?_⟩
-    <;> · simp only [Matrix.transpose_apply, GlobalTheory.Tw.Phi, Matrix.of_apply]
-          split_ifs
-          · exact S.pow_mem (S.neg_mem S.one_mem) _
-          · exact S.zero_mem
+  refine ⟨fun i j => ?_, fun i j => ?_⟩ <;>
+  · simp only [Matrix.transpose_apply, GlobalTheory.Tw.Phi, Matrix.of_apply]
+    split_ifs
+    · exact S.pow_mem (S.neg_mem S.one_mem) _
+    · exact S.zero_mem
 
 end Mat
 
@@ -124,7 +148,8 @@ variable {K : GlobalTheory.UnitLemma.UQ} (B : GlobalTheory.UnitLemma.InvAlg K) (
 theorem herm_add_left (y y' z : B.A) : B.herm β (y + y') z = B.herm β y z + B.herm β y' z := by
   simp [GlobalTheory.UnitLemma.InvAlg.herm, mul_add, add_mul, map_add (f := _)]
 
-theorem herm_zero_left (z : B.A) : B.herm β 0 z = 0 := by simp [GlobalTheory.UnitLemma.InvAlg.herm]
+theorem herm_zero_left (z : B.A) : B.herm β 0 z = 0 := by
+  simp [GlobalTheory.UnitLemma.InvAlg.herm]
 
 theorem herm_smul_left (t : K.E) (y z : B.A) : B.herm β (t • y) z = t * B.herm β y z := by
   simp only [GlobalTheory.UnitLemma.InvAlg.herm]
@@ -132,36 +157,30 @@ theorem herm_smul_left (t : K.E) (y z : B.A) : B.herm β (t • y) z = t * B.her
 
 theorem herm_smul_right (t : K.E) (y z : B.A) : B.herm β y (t • z) = K.c t * B.herm β y z := by
   simp only [GlobalTheory.UnitLemma.InvAlg.herm]
-  rw [Algebra.smul_def, (B.σ).map_mul, B.σ_alg, ← Algebra.smul_def, mul_smul_comm, map_smul,
-    smul_eq_mul]
+  rw [Algebra.smul_def, (B.σ).map_mul, B.σ_alg, ← Algebra.smul_def, mul_smul_comm, map_smul, smul_eq_mul]
 
-theorem herm_sum_left (f : Fin a → B.A) (z : B.A)
-    : B.herm β (∑ i, f i) z = ∑ i, B.herm β (f i) z := by
-  set_option synthInstance.maxHeartbeats 100000 in
+theorem herm_sum_left (f : Fin a → B.A) (z : B.A) : B.herm β (∑ i, f i) z = ∑ i, B.herm β (f i) z := by
+
   simp [GlobalTheory.UnitLemma.InvAlg.herm, Finset.mul_sum, Finset.sum_mul, map_sum]
 
-theorem herm_sum_right (y : B.A) (f : Fin a → B.A)
-    : B.herm β y (∑ i, f i) = ∑ i, B.herm β y (f i) := by
-  set_option synthInstance.maxHeartbeats 100000 in
+theorem herm_sum_right (y : B.A) (f : Fin a → B.A) : B.herm β y (∑ i, f i) = ∑ i, B.herm β y (f i) := by
+
   simp [GlobalTheory.UnitLemma.InvAlg.herm, Finset.mul_sum, Finset.sum_mul, map_sum]
 
 end Herm
 
-variable
-  {E : Type} [Field E] [NumberField E]
-  {w : Pl E} {K : GlobalTheory.UnitLemma.UQ} (e : K.E ≃+* w.adicCompletion E)
-  {a : ℕ} {B : GlobalTheory.UnitLemma.InvAlg K} (b : Module.Basis (Fin a) K.E B.A)
+variable {E : Type} [Field E] [NumberField E] {w : Pl E} {K : GlobalTheory.UnitLemma.UQ}
+  (e : K.E ≃+* w.adicCompletion E) {a : ℕ} {B : GlobalTheory.UnitLemma.InvAlg K} (b : Module.Basis (Fin a) K.E B.A)
 
-theorem herm_crd
-    (c : w.adicCompletion E →+* w.adicCompletion E) (hc : ∀ x, e (K.c x) = c (e x))
-    (β : B.A) (y z : B.A)
-    : e (B.herm β y z) = crd e b y ⬝ᵥ (GlobalTheory.TwLat.gram e b β *ᵥ (c ∘ crd e b z)) := by
+theorem herm_crd (c : w.adicCompletion E →+* w.adicCompletion E) (hc : ∀ x, e (K.c x) = c (e x)) (β : B.A)
+    (y z : B.A) :
+    e (B.herm β y z) = crd e b y ⬝ᵥ (GlobalTheory.TwLat.gram e b β *ᵥ (c ∘ crd e b z)) := by
   conv_lhs => rw [← b.sum_repr y, ← b.sum_repr z]
   rw [herm_sum_left]
   simp_rw [herm_smul_left, herm_sum_right, herm_smul_right]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, map_mul, hc, crd, GlobalTheory.TwLat.gram, dotProduct, Matrix.mulVec,
-      Function.comp_apply, Matrix.of_apply, Finset.mul_sum]
+
+  simp only [map_sum, map_mul, hc, crd, GlobalTheory.TwLat.gram, dotProduct, Matrix.mulVec, Function.comp_apply,
+  Matrix.of_apply, Finset.mul_sum]
   refine Finset.sum_congr rfl fun k _ => Finset.sum_congr rfl fun l _ => by ring
 
 end GlobalTheory.TwOrbUnimod
@@ -169,22 +188,7 @@ end GlobalTheory.TwOrbUnimod
 namespace GlobalTheory.TwOrbUnimod
 open GlobalTheory.TwOrbLat
 
-theorem twist_integral_iff_unimodular
-    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (w : Pl E),
-      ¬ IsSplitAt w
-        → ∀ (K : GlobalTheory.UnitLemma.UQ) (e : K.E ≃+* w.adicCompletion E),
-          (∀ x, e (K.c x) = cj w (e x)) → (∀ x, x ∈ (algebraMap K.O K.E).range ↔ Valued.v (e x) ≤ 1)
-            → ∀ (a : ℕ) (B : GlobalTheory.UnitLemma.InvAlg K) (β : B.Aˣ)
-                (b : Module.Basis (Fin a) K.E B.A) (δ : GLw a w),
-              (∀ i j,
-                  ((δ.val * GlobalTheory.Tw.Phi a (w.adicCompletion E))⁻¹)ᵀ i j
-                    = e (B.herm β (b i) (b j)))
-                → ∀ q : GLw a w,
-                  (q⁻¹ * δ * thL a w q ∈ GlobalTheory.LFun.KGL w (n := a)
-                    ↔ ∀ z,
-                      z ∈ GlobalTheory.TwLat.lat e b q
-                        ↔ ∀ y ∈ GlobalTheory.TwLat.lat e b q,
-                          B.herm β y z ∈ (algebraMap K.O K.E).range) := by
+theorem twist_integral_iff_unimodular : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (w : Pl E), ¬ IsSplitAt w → ∀ (K : GlobalTheory.UnitLemma.UQ) (e : K.E ≃+* w.adicCompletion E), (∀ x, e (K.c x) = cj w (e x)) → (∀ x, x ∈ (algebraMap K.O K.E).range ↔ Valued.v (e x) ≤ 1) → ∀ (a : ℕ) (B : GlobalTheory.UnitLemma.InvAlg K) (β : B.Aˣ) (b : Module.Basis (Fin a) K.E B.A) (δ : GLw a w), (∀ i j, ((δ.val * GlobalTheory.Tw.Phi a (w.adicCompletion E))⁻¹)ᵀ i j = e (B.herm β (b i) (b j))) → ∀ q : GLw a w, (q⁻¹ * δ * thL a w q ∈ GlobalTheory.LFun.KGL w (n := a) ↔ ∀ z, z ∈ GlobalTheory.TwLat.lat e b q ↔ ∀ y ∈ GlobalTheory.TwLat.lat e b q, B.herm β y z ∈ (algebraMap K.O K.E).range) := by
   intro E _ _ _ w hw K e he hO a B β b δ hG q
   set F := w.adicCompletion E
   set c := cj w
@@ -215,29 +219,21 @@ theorem twist_integral_iff_unimodular
     show ((q⁻¹ * (δ * PhiU a F) * invT a F (GeneralLinearGroup.map c q))⁻¹).valᵀ = _
     rw [_root_.mul_inv_rev, _root_.mul_inv_rev, inv_inv, ← map_inv (invT a F)]
     simp only [Units.val_mul, Matrix.transpose_mul]
-    have h2
-        : (invT a F (GeneralLinearGroup.map c q)⁻¹).val = (GeneralLinearGroup.map c q).valᵀ := by
+    have h2 : (invT a F (GeneralLinearGroup.map c q)⁻¹).val = (GeneralLinearGroup.map c q).valᵀ := by
       show ((GeneralLinearGroup.map c q)⁻¹⁻¹).valᵀ = _
       rw [inv_inv]
     rw [h2, Matrix.transpose_transpose, Matrix.coe_units_inv, Units.val_mul]
     rfl
-  have step1
-      : q⁻¹ * δ * thL a w q ∈ GlobalTheory.LFun.KGL w (n := a)
-        ↔ Yg ∈ GlobalTheory.LFun.KGL w (n := a) := by
+  have step1 : q⁻¹ * δ * thL a w q ∈ GlobalTheory.LFun.KGL w (n := a) ↔ Yg ∈ GlobalTheory.LFun.KGL w (n := a) := by
     have hth : thL a w q = PhiU a F * invT a F (GeneralLinearGroup.map c q) * (PhiU a F)⁻¹ := by
       simp only [GlobalTheory.BCT.thL, if_neg hw]
       rfl
     have hP : PhiU a F ∈ GlobalTheory.LFun.KGL w (n := a) := PhiU_mem _
-    rw [hth,
-      show q⁻¹ * δ * (PhiU a F * invT a F (GeneralLinearGroup.map c q) * (PhiU a F)⁻¹)
-          = (q⁻¹ * (δ * PhiU a F) * invT a F (GeneralLinearGroup.map c q)) * (PhiU a F)⁻¹ by
-        group,
+    rw [hth, show q⁻¹ * δ * (PhiU a F * invT a F (GeneralLinearGroup.map c q) * (PhiU a F)⁻¹) =
+      (q⁻¹ * (δ * PhiU a F) * invT a F (GeneralLinearGroup.map c q)) * (PhiU a F)⁻¹ by group,
       Subgroup.mul_mem_cancel_right _ (inv_mem hP), hYg, invT_mem_iff]
-  have step2
-      : (∀ z,
-          z ∈ GlobalTheory.TwLat.lat e b q
-            ↔ ∀ y ∈ GlobalTheory.TwLat.lat e b q, B.herm β y z ∈ (algebraMap K.O K.E).range)
-        ↔ ∀ u : Fin a → F, (∀ j, u j ∈ Ov E w) ↔ ∀ i, (Yg.1 *ᵥ (c ∘ u)) i ∈ Ov E w := by
+  have step2 : (∀ z, z ∈ GlobalTheory.TwLat.lat e b q ↔ ∀ y ∈ GlobalTheory.TwLat.lat e b q, B.herm β y z ∈ (algebraMap K.O K.E).range) ↔
+      ∀ u : Fin a → F, (∀ j, u j ∈ Ov E w) ↔ ∀ i, (Yg.1 *ᵥ (c ∘ u)) i ∈ Ov E w := by
     set y : Fin a → B.A := fun j => ofCrd e b fun i => q.val i j with hy
     have hcrdy : ∀ j, crd e b (y j) = fun i => q.val i j := fun j => crd_ofCrd e b _
     have hL : GlobalTheory.TwLat.lat e b q = Submodule.span K.O (Set.range y) := latOf_eq e b q
@@ -249,18 +245,12 @@ theorem twist_integral_iff_unimodular
     have hinv : ∀ u v : Fin a → F, q.val *ᵥ u = q.val *ᵥ v → u = v := by
       intro u v h
       have := congrArg (fun x => (q⁻¹).val *ᵥ x) h
-      simpa only [Matrix.mulVec_mulVec, ← Units.val_mul, inv_mul_cancel, Units.val_one,
-          Matrix.one_mulVec]
-        using this
+      simpa only [Matrix.mulVec_mulVec, ← Units.val_mul, inv_mul_cancel, Units.val_one, Matrix.one_mulVec] using this
     let zOf : (Fin a → F) → B.A := fun u => ofCrd e b (q.val *ᵥ u)
     have hz : ∀ u, crd e b (zOf u) = q.val *ᵥ u := fun u => crd_ofCrd e b _
-    have hsurj : ∀ z, ∃ u, z = zOf u := fun z => ⟨
-      (q⁻¹).val *ᵥ crd e b z,
-      by
-        apply crd_injective e b
-        rw [hz, Matrix.mulVec_mulVec, ← Units.val_mul, mul_inv_cancel, Units.val_one,
-          Matrix.one_mulVec]
-    ⟩
+    have hsurj : ∀ z, ∃ u, z = zOf u := fun z => ⟨(q⁻¹).val *ᵥ crd e b z, by
+      apply crd_injective e b
+      rw [hz, Matrix.mulVec_mulVec, ← Units.val_mul, mul_inv_cancel, Units.val_one, Matrix.one_mulVec]⟩
     have hmem : ∀ u, zOf u ∈ GlobalTheory.TwLat.lat e b q ↔ ∀ j, u j ∈ Ov E w := by
       intro u
       rw [hL, Submodule.mem_span_range_iff_exists_fun]
@@ -279,15 +269,12 @@ theorem twist_integral_iff_unimodular
         refine ⟨o, ?_⟩
         apply crd_injective e b
         rw [show (∑ j, o j • y j) = ∑ j, (algebraMap K.O K.E (o j)) • y j from
-            Finset.sum_congr rfl fun j _ => (algebraMap_smul K.E (o j) (y j)).symm,
-          hcomb, hz]
+          Finset.sum_congr rfl fun j _ => (algebraMap_smul K.E (o j) (y j)).symm, hcomb, hz]
         congr 1
         funext j
         rw [ho, RingEquiv.apply_symm_apply]
-    have hdual
-        : ∀ z,
-          (∀ x ∈ GlobalTheory.TwLat.lat e b q, B.herm β x z ∈ (algebraMap K.O K.E).range)
-            ↔ ∀ i, B.herm β (y i) z ∈ (algebraMap K.O K.E).range := by
+    have hdual : ∀ z, (∀ x ∈ GlobalTheory.TwLat.lat e b q, B.herm β x z ∈ (algebraMap K.O K.E).range) ↔
+        ∀ i, B.herm β (y i) z ∈ (algebraMap K.O K.E).range := by
       intro z
       rw [hL]
       constructor
@@ -301,8 +288,7 @@ theorem twist_integral_iff_unimodular
     have hform : ∀ u i, e (B.herm β (y i) (zOf u)) = (Yg.1 *ᵥ (c ∘ u)) i := by
       intro u i
       rw [herm_crd e b c he, hcrdy, hz, hY]
-      have hcu : c ∘ (q.val *ᵥ u) = q.val.map c *ᵥ (c ∘ u) :=
-        funext fun k => RingHom.map_mulVec c _ _ k
+      have hcu : c ∘ (q.val *ᵥ u) = q.val.map c *ᵥ (c ∘ u) := funext fun k => RingHom.map_mulVec c _ _ k
       rw [hcu, ← Matrix.mulVec_mulVec, ← Matrix.mulVec_mulVec]
       rfl
     constructor

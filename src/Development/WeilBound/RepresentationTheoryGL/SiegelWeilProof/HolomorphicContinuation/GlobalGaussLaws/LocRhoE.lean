@@ -1,15 +1,51 @@
 module
 
+public import Development.WeilBound.RepresentationTheoryGL.SiegelWeilProof.HolomorphicContinuation.GlobalGaussLaws.LocRhoC
 public import Development.WeilBound.RepresentationTheoryGL.SiegelWeilProof.HolomorphicContinuation.GlobalGaussLaws.LocRhoD
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
 noncomputable section
 
 open scoped Matrix NNReal ComplexConjugate TensorProduct
-open Formalism.BasicNotions Formalism.BasicNotions.TH
-  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta
-  Formalism.IndefR.Datum MeasureTheory
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.IndefR.Datum MeasureTheory
 open GlobalTheory.AdelicU GlobalTheory.StdUnn MvPolynomial
 open GlobalTheory.IndefiniteRowSideFullHecke.ModerateGrowthSchwartz (schwartzA)
 
@@ -19,31 +55,20 @@ namespace PositivityTheory.Rg.Sw.Glob.RhoH
 
 variable {D : D7} {n : ℕ}
 
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 2000000
+
+
+
 
 open Classical in
-def substP
-    {m : ℕ}
-    (τ : D.what₂.Tau) (fr : Matrix (Fin m) (Fin m) ℂ)
-    (p : MvPolynomial (D.what₂.Tau × Fin m × Fin n × Bool) ℂ)
-    : PX m n :=
-  aeval
-    (fun v : D.what₂.Tau × Fin m × Fin n × Bool =>
-      if v.1 = τ then
-        (if v.2.2.2 then
-           ∑ c, C (star (fr v.2.1 c)) * X (c, v.2.2.1, true)
-         else
-           ∑ c, C (fr v.2.1 c) * X (c, v.2.2.1, false))
-      else
-        0)
-    p
+def substP {m : ℕ} (τ : D.what₂.Tau) (fr : Matrix (Fin m) (Fin m) ℂ) (p : MvPolynomial (D.what₂.Tau × Fin m × Fin n × Bool) ℂ) :
+    PX m n :=
+  aeval (fun v : D.what₂.Tau × Fin m × Fin n × Bool => if v.1 = τ then
+      (if v.2.2.2 then ∑ c, C (star (fr v.2.1 c)) * X (c, v.2.2.1, true) else ∑ c, C (fr v.2.1 c) * X (c, v.2.2.1, false))
+    else 0) p
 
-theorem evX_substP
-    {m : ℕ}
-    (τ : D.what₂.Tau) (fr : Matrix (Fin m) (Fin m) ℂ)
-    (p : MvPolynomial (D.what₂.Tau × Fin m × Fin n × Bool) ℂ) (u : Matrix (Fin m) (Fin n) ℂ)
-    : evX (substP τ fr p) u = evalPoly p (GlobalTheory.FockAnnKill.dirAt τ (fr * u)) := by
+theorem evX_substP {m : ℕ} (τ : D.what₂.Tau) (fr : Matrix (Fin m) (Fin m) ℂ)
+    (p : MvPolynomial (D.what₂.Tau × Fin m × Fin n × Bool) ℂ) (u : Matrix (Fin m) (Fin n) ℂ) :
+    evX (substP τ fr p) u = evalPoly p (GlobalTheory.FockAnnKill.dirAt τ (fr * u)) := by
   classical
   unfold evX substP evalPoly
   rw [eval_aeval_subst]
@@ -53,21 +78,17 @@ theorem evX_substP
   · subst hτ
     rw [if_pos rfl, dirAt_self]
     cases b
-    set_option synthInstance.maxHeartbeats 100000 in
-      · simp only [Bool.false_eq_true, ↓ reduceIte, map_sum, map_mul, eval_C, eval_X,
-          Matrix.mul_apply]
-    set_option synthInstance.maxHeartbeats 100000 in
-    · simp only [↓ reduceIte, map_sum, map_mul, eval_C, eval_X, Matrix.mul_apply, map_sum,
-        Complex.star_def]
+
+    · simp only [Bool.false_eq_true, ↓reduceIte, map_sum, map_mul, eval_C, eval_X, Matrix.mul_apply]
+
+    · simp only [↓reduceIte, map_sum, map_mul, eval_C, eval_X, Matrix.mul_apply, map_sum, Complex.star_def]
   · rw [if_neg hτ, dirAt_ne hτ]
     cases b <;> simp
 
-theorem slice
-    {θ : InfFam D} (hθ : IsInfFam θ)
-    {V : HSp D} {τ : D.what₂.Tau} {s : D.what₂.Tau → Matrix (Fin V.rank) (Fin V.rank) ℂ}
-    {ε : Fin V.rank → Bool} {fr : Matrix (Fin V.rank) (Fin V.rank) ℂ} (hfr : IsTauFrame V τ s ε fr)
-    (l : D.what₂.Tau → ℝ)
-    : ∀ F ∈ fockA θ V n l s, ∃ Q : PX V.rank n, ∀ u : Matrix (Fin V.rank) (Fin n) ℂ,
+theorem slice {θ : InfFam D} (hθ : IsInfFam θ) {V : HSp D} {τ : D.what₂.Tau}
+    {s : D.what₂.Tau → Matrix (Fin V.rank) (Fin V.rank) ℂ} {ε : Fin V.rank → Bool} {fr : Matrix (Fin V.rank) (Fin V.rank) ℂ}
+    (hfr : IsTauFrame V τ s ε fr) (l : D.what₂.Tau → ℝ) :
+    ∀ F ∈ fockA θ V n l s, ∃ Q : PX V.rank n, ∀ u : Matrix (Fin V.rank) (Fin n) ℂ,
       F (xL θ τ (fr * u)) = evX Q u * gs (cLoc l τ) u := by
   intro F hF
   induction hF using Submodule.span_induction with
@@ -79,8 +100,7 @@ theorem slice
     rw [compAt_xL hθ, finPart_xL hθ, gauss_dirAt hfr, ← evX_substP]
     simp only [evX, map_mul, eval_C]
     ring
-  | zero =>
-    exact ⟨0, fun u => by simp [evX]⟩
+  | zero => exact ⟨0, fun u => by simp [evX]⟩
   | add F G _ _ hF hG =>
     obtain ⟨Q₁, h₁⟩ := hF
     obtain ⟨Q₂, h₂⟩ := hG
@@ -93,13 +113,10 @@ theorem slice
     simp only [Pi.smul_apply, smul_eq_mul, h, evX, map_mul, eval_C]
     ring
 
-theorem tens_slice
-    {θ : InfFam D} (hθ : IsInfFam θ)
-    {V : HSp D} {τ : D.what₂.Tau} {s : D.what₂.Tau → Matrix (Fin V.rank) (Fin V.rank) ℂ}
-    {ε : Fin V.rank → Bool} {fr : Matrix (Fin V.rank) (Fin V.rank) ℂ} (hfr : IsTauFrame V τ s ε fr)
-    (l : D.what₂.Tau → ℝ) (f : (Fin V.rank → Fin n → ℂ) → ℂ)
-    (hf : tens θ τ fr f (psi0 θ V n l s τ) ∈ fockA θ V n l s)
-    : ∃ Q : PX V.rank n, f = fP (cLoc l τ) Q := by
+theorem tens_slice {θ : InfFam D} (hθ : IsInfFam θ) {V : HSp D} {τ : D.what₂.Tau}
+    {s : D.what₂.Tau → Matrix (Fin V.rank) (Fin V.rank) ℂ} {ε : Fin V.rank → Bool} {fr : Matrix (Fin V.rank) (Fin V.rank) ℂ}
+    (hfr : IsTauFrame V τ s ε fr) (l : D.what₂.Tau → ℝ) (f : (Fin V.rank → Fin n → ℂ) → ℂ)
+    (hf : tens θ τ fr f (psi0 θ V n l s τ) ∈ fockA θ V n l s) : ∃ Q : PX V.rank n, f = fP (cLoc l τ) Q := by
   obtain ⟨Q, hQ⟩ := slice hθ hfr l _ hf
   refine ⟨Q, funext fun (u : Matrix (Fin V.rank) (Fin n) ℂ) => ?_⟩
   have h := hQ u

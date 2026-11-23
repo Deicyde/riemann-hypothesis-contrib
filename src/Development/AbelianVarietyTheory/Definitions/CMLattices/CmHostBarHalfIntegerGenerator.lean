@@ -1,15 +1,48 @@
 module
 
-public import Mathlib
+import Development.AbelianVarietyTheory.Proofs.UnramifiedDepth.CmHostIdempotentTraceEqOne
 public import Development.AbelianVarietyTheory.Definitions.CMLattices.IsDiffOf
-public import Development.AbelianVarietyTheory.Statements.FundamentalDomains.ExistsIsAddFundamentalDomain
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Real
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
-  NumberField IsDedekindDomain
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
-  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.GeometryOfNumbersTheory
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField IsDedekindDomain
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.GeometryOfNumbersTheory
 open scoped CategoryTheory.Obj
 
 noncomputable section
@@ -18,41 +51,14 @@ namespace GlobalTheory.CM.Test
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E}
 
 theorem bar_rt (H : Host E) : H.bar H.rt = -H.rt := by
-  have hsq : (H.bar H.rt - H.rt) * (H.bar H.rt + H.rt) = 0 := by
-    have e : H.bar (H.rt ^ 2) = H.bar (-(H.d : 𝓞 E)) := by rw [H.rt_sq]
-    rw [map_pow, map_neg, map_natCast, ← H.rt_sq] at e
-    linear_combination e
-  rcases mul_eq_zero.mp hsq with h | h
-  · exfalso
-    have hfix : H.bar H.rt = H.rt := sub_eq_zero.mp h
-    obtain ⟨φ⟩ : Nonempty (E →+* ℂ) := inferInstance
-    have hc := H.bar_eq H.rt
-    rw [hfix] at hc
-    have hconj : starRingEnd ℂ (φ (H.rt : E)) = φ (H.rt : E) := by
-      rw [← NumberField.IsCMField.complexEmbedding_complexConj, ← hc]
-    have hsqC : (φ (H.rt : E)) ^ 2 = -(H.d : ℂ) := by
-      rw [← map_pow]
-      have e : ((H.rt ^ 2 : 𝓞 E) : E) = ((-(H.d : 𝓞 E) : 𝓞 E) : E) := by rw [H.rt_sq]
-      push_cast at e
-      rw [e]
-      simp
-    have him : (φ (H.rt : E)).im = 0 := Complex.conj_eq_iff_im.mp hconj
-    have hre := congrArg Complex.re hsqC
-    simp only [pow_two, Complex.mul_re, him, mul_zero, sub_zero, Complex.neg_re, Complex.natCast_re]
-      at hre
-    have hd : (2 : ℝ) ≤ H.d := by exact_mod_cast H.d_prime.two_le
-    nlinarith [mul_self_nonneg (φ (H.rt : E)).re]
-  · linear_combination h
+  apply GlobalTheory.QuadTrace.bar_rt <;> assumption
 
 variable {D : Datum H} {ε : ℤˣ} {h : D.La → D.La → OK H}
 
 variable {K : Type} [Field K] [NumberField K]
 
-theorem hasType_neg
-    {ρ : 𝓞 K} (hρ : ρ ^ 2 = -(H.d : 𝓞 K))
-    {G : Over (Sp (𝓞 K))} [GrpObj G]
-    {act : OAct (𝓞 E) G} {p q : ℕ} (h : HasType H act ρ p q)
-    : HasType H act (-ρ) q p := by
+theorem hasType_neg {ρ : 𝓞 K} (hρ : ρ ^ 2 = -(H.d : 𝓞 K)) {G : Over (Sp (𝓞 K))} [GrpObj G] {act : OAct (𝓞 E) G}
+    {p q : ℕ} (h : HasType H act ρ p q) : HasType H act (-ρ) q p := by
   intro k _ _ β hβ τ
   obtain ⟨h1, h2⟩ := h k β hβ τ
   have e1 : τ H.rt ^ 2 = -(H.d : k) := by rw [← map_pow, H.rt_sq, map_neg, map_natCast]
@@ -73,7 +79,7 @@ theorem hasType_neg
   have hβρ : β ρ ≠ 0 := by
     intro h0
     exact hρ0 (hβ (h0.trans (map_zero β).symm))
-  have hne : β ρ ≠ - β ρ := by
+  have hne : β ρ ≠ -β ρ := by
     intro h0
     have e : (2 : k) * β ρ = 0 := by linear_combination h0
     rcases mul_eq_zero.mp e with e' | e'

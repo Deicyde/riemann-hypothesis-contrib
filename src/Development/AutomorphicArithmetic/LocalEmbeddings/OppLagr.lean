@@ -1,17 +1,53 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IndicatorIntMMemSB
-public import Development.AbelianVarietyTheory.Definitions.Divisors.DiscreteSeriesHermitianUnique
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.LocalMomentMatrixTransform
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.LocalCharacterNormOneUnit
+public import Development.AbelianVarietyTheory.BlockTheory.DivisorBase.WeilTensorModels
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsHomSuppSplit
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.LocalCharacterNormOneUnit
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Coalgebra.IsFrobenius
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Development.AbelianVarietyTheory.Definitions.Divisors.MatchingOfParts
+import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IndicatorIntMMemSB
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
-  GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
-  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK GlobalTheory.KSplit
+open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK GlobalTheory.KSplit
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 open scoped Matrix
 
@@ -19,28 +55,22 @@ noncomputable section
 namespace GlobalTheory.OppLagr
 open scoped TensorProduct
 
-theorem det_ne_zero_of_hasSig {n r s : ℕ} {M : Matrix (Fin n) (Fin n) ℂ} (h : HasSig M r s)
-    : M.det ≠ 0 := by
+theorem det_ne_zero_of_hasSig {n r s : ℕ} {M : Matrix (Fin n) (Fin n) ℂ} (h : HasSig M r s) : M.det ≠ 0 := by
   obtain ⟨hrs, A, hA⟩ := h
-  have hNN
-      : Matrix.fromBlocks (1 : Matrix (Fin r) (Fin r) ℂ) 0 0 (-1 : Matrix (Fin s) (Fin s) ℂ)
-          * Matrix.fromBlocks (1 : Matrix (Fin r) (Fin r) ℂ) 0 0 (-1 : Matrix (Fin s) (Fin s) ℂ)
-        = 1 := by
+  have hNN : Matrix.fromBlocks (1 : Matrix (Fin r) (Fin r) ℂ) 0 0 (-1 : Matrix (Fin s) (Fin s) ℂ) *
+      Matrix.fromBlocks (1 : Matrix (Fin r) (Fin r) ℂ) 0 0 (-1 : Matrix (Fin s) (Fin s) ℂ) = 1 := by
     rw [Matrix.fromBlocks_multiply]; simp [Matrix.fromBlocks_one]
-  have hN : IsUnit (Matrix.fromBlocks (1 : Matrix (Fin r) (Fin r) ℂ) 0 0
-      (-1 : Matrix (Fin s) (Fin s) ℂ)) :=
+  have hN : IsUnit (Matrix.fromBlocks (1 : Matrix (Fin r) (Fin r) ℂ) 0 0 (-1 : Matrix (Fin s) (Fin s) ℂ)) :=
     ⟨⟨_, _, hNN, hNN⟩, rfl⟩
   have h1 := Matrix.rank_of_isUnit _ hN
-  have h2 : (Aᵀ * M * A.map star).rank ≤ M.rank :=
-    (Matrix.rank_mul_le_left _ _).trans (Matrix.rank_mul_le_right _ _)
+  have h2 : (Aᵀ * M * A.map star).rank ≤ M.rank := (Matrix.rank_mul_le_left _ _).trans (Matrix.rank_mul_le_right _ _)
   rw [hA, h1] at h2
   simp only [Fintype.card_sum, Fintype.card_fin, hrs] at h2
   have h3 : LinearMap.range M.mulVecLin = ⊤ := by
     apply Submodule.eq_top_of_finrank_eq
     have := M.rank_le_width
-    simp only [Matrix.rank, Fintype.card_fin] at h2 this
-    rw [Module.finrank_fin_fun]
-    omega
+    simp only [← Matrix.finrank_range_mulVecLin, Fintype.card_fin] at h2 this
+    rw [Module.finrank_fin_fun]; omega
   have hu : IsUnit M := (Matrix.mulVec_surjective_iff_isUnit).mp (LinearMap.range_eq_top.mp h3)
   exact ((Matrix.isUnit_iff_isUnit_det M).mp hu).ne_zero
 
@@ -49,16 +79,14 @@ end GlobalTheory.OppLagr
 namespace GlobalTheory.OppLagr
 open scoped TensorProduct
 
-variable
-  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E}
+variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E}
 
 theorem conj_conj (h : IsCMExt F E σ) (x : E) : σ (σ x) = x := by
   obtain ⟨τ⟩ : Nonempty (E →+* ℂ) := inferInstance
   apply τ.injective
   rw [h.2.2.2 τ, h.2.2.2 τ, star_star]
 
-theorem comp_comp (h : IsCMExt F E σ) {K : Type} [Ring K] [Algebra F K] (t : E →ₐ[F] K)
-    : (t.comp σ).comp σ = t :=
+theorem comp_comp (h : IsCMExt F E σ) {K : Type} [Ring K] [Algebra F K] (t : E →ₐ[F] K) : (t.comp σ).comp σ = t :=
   AlgHom.ext fun x => by simp [conj_conj h]
 
 theorem exists_anti (h : IsCMExt F E σ) : ∃ ξ : E, ξ ≠ 0 ∧ σ ξ = -ξ := by
@@ -95,8 +123,8 @@ theorem exists_isQuad (h : IsCMExt F E σ) : ∃ ξ : AE F E, IsQuad (cA σ) ξ 
   let b := basisOfLinearIndependentOfCardEqFinrank hli hcard
   have hb : ∀ i, b i = ![(1 : E), ξ] i := fun i => by simp [b]
   refine ⟨(1 : AF F) ⊗ₜ[F] ξ, ⟨?_, ?_, ⟨Algebra.TensorProduct.basis (AF F) b, ?_, ?_⟩⟩⟩
-  · refine ⟨⟨(1 : AF F) ⊗ₜ[F] ξ, (1 : AF F) ⊗ₜ[F] ξ⁻¹, ?_, ?_⟩, rfl⟩
-      <;> simp [Algebra.TensorProduct.tmul_mul_tmul, hξ0, ← Algebra.TensorProduct.one_def]
+  · refine ⟨⟨(1 : AF F) ⊗ₜ[F] ξ, (1 : AF F) ⊗ₜ[F] ξ⁻¹, ?_, ?_⟩, rfl⟩ <;>
+      simp [Algebra.TensorProduct.tmul_mul_tmul, hξ0, ← Algebra.TensorProduct.one_def]
   · simp [cA, Algebra.TensorProduct.map_tmul, hξ, TensorProduct.tmul_neg]
   · rw [Algebra.TensorProduct.basis_apply, hb]; rfl
   · rw [Algebra.TensorProduct.basis_apply, hb]; rfl
@@ -106,15 +134,11 @@ end GlobalTheory.OppLagr
 namespace GlobalTheory.OppLagr
 open scoped TensorProduct
 
-variable
-  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E}
+variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E}
 
-theorem chrW_comp
-    (h : IsCMExt F E σ)
-    (χ : Chr F E)
-    {m : ℕ} (hχ : ResEtaPow (Units.map (algebraMap F (AF F)).toMonoidHom).range χ m)
-    {v : Pl (F := F)} (t : E →ₐ[F] Fv F v)
-    : chrW χ (t.comp σ) = (chrW χ t)⁻¹ := by
+theorem chrW_comp (h : IsCMExt F E σ) (χ : Chr F E) {m : ℕ}
+    (hχ : ResEtaPow (Units.map (algebraMap F (AF F)).toMonoidHom).range χ m) {v : Pl (F := F)} (t : E →ₐ[F] Fv F v) :
+    chrW χ (t.comp σ) = (chrW χ t)⁻¹ := by
   obtain ⟨ξ, hξ⟩ := exists_isQuad h
   ext x
   let L := GlobalTheory.SplitGLLift.liftPair (v := v) h t
@@ -123,26 +147,17 @@ theorem chrW_comp
     have := congrArg L hpq
     rw [map_add (f := _), map_add (f := _), map_mul, map_zero] at this
     linear_combination this
-  have hx1
-      : ((x : Fv F v) - 1, (0 : Fv F v)) + (((x⁻¹ : (Fv F v)ˣ) : Fv F v) - 1, 0)
-          + ((x : Fv F v) - 1, (0 : Fv F v)) * (((x⁻¹ : (Fv F v)ˣ) : Fv F v) - 1, 0)
-        = 0 := by
+  have hx1 : ((x : Fv F v) - 1, (0 : Fv F v)) + (((x⁻¹ : (Fv F v)ˣ) : Fv F v) - 1, 0) +
+      ((x : Fv F v) - 1, (0 : Fv F v)) * (((x⁻¹ : (Fv F v)ˣ) : Fv F v) - 1, 0) = 0 := by
     refine Prod.ext ?_ ?_
     · simp only [Prod.fst_add, Prod.fst_mul, Prod.fst_zero]; linear_combination Units.mul_inv x
     · simp
-  have hx2
-      : (((x⁻¹ : (Fv F v)ˣ) : Fv F v) - 1, (0 : Fv F v)) + ((x : Fv F v) - 1, (0 : Fv F v))
-          + (((x⁻¹ : (Fv F v)ˣ) : Fv F v) - 1, 0) * ((x : Fv F v) - 1, (0 : Fv F v))
-        = 0 := by
+  have hx2 : (((x⁻¹ : (Fv F v)ˣ) : Fv F v) - 1, (0 : Fv F v)) + ((x : Fv F v) - 1, (0 : Fv F v)) +
+      (((x⁻¹ : (Fv F v)ˣ) : Fv F v) - 1, 0) * ((x : Fv F v) - 1, (0 : Fv F v)) = 0 := by
     refine Prod.ext ?_ ?_
     · simp only [Prod.fst_add, Prod.fst_mul, Prod.fst_zero]; linear_combination Units.mul_inv x
     · simp
-  let z : (AE F E)ˣ := ⟨
-    1 + L ((x : Fv F v) - 1, 0),
-    1 + L (((x⁻¹ : (Fv F v)ˣ) : Fv F v) - 1, 0),
-    key _ _ hx1,
-    key _ _ hx2
-  ⟩
+  let z : (AE F E)ˣ := ⟨1 + L ((x : Fv F v) - 1, 0), 1 + L (((x⁻¹ : (Fv F v)ˣ) : Fv F v) - 1, 0), key _ _ hx1, key _ _ hx2⟩
   have hzt : Units.map (piW t).toMonoidHom z = x := by
     ext
     simp [z, L, GlobalTheory.SplitGLLift.piW_liftPair]
@@ -172,37 +187,26 @@ end GlobalTheory.OppLagr
 namespace GlobalTheory.OppLagr
 open scoped TensorProduct
 
-variable
-  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E}
+variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E}
 
-theorem det_map_ne_zero
-    {m : ℕ} {J : Matrix (Fin m) (Fin m) E} (hJ : J.det ≠ 0)
-    {K : Type} [Field K] [Algebra F K]
-    (t : E →ₐ[F] K)
-    : (J.map t).det ≠ 0 := by
+theorem det_map_ne_zero {m : ℕ} {J : Matrix (Fin m) (Fin m) E} (hJ : J.det ≠ 0) {K : Type} [Field K] [Algebra F K]
+    (t : E →ₐ[F] K) : (J.map t).det ≠ 0 := by
   have : (J.map t).det = t J.det := (AlgHom.map_det t J).symm
   rw [this]
   exact (map_ne_zero t).mpr hJ
 
-theorem det_ne_zero_herm {B : Base F E} {m : ℕ} {X : Spc F E m} {r s : ℕ} (hX : X.IsHerm σ B r s)
-    : X.J.det ≠ 0 := by
+theorem det_ne_zero_herm {B : Base F E} {m : ℕ} {X : Spc F E m} {r s : ℕ} (hX : X.IsHerm σ B r s) : X.J.det ≠ 0 := by
   obtain w := Classical.arbitrary (InfinitePlace F)
   have h := det_ne_zero_of_hasSig (hX.sig w)
   intro h0
   apply h
-  rw [show (X.J.map (B.emb w).1).det = (B.emb w).1 X.J.det from
-      (RingHom.map_det (B.emb w).1 X.J).symm,
-    h0, map_zero]
+  rw [show (X.J.map (B.emb w).1).det = (B.emb w).1 X.J.det from (RingHom.map_det (B.emb w).1 X.J).symm, h0, map_zero]
 
-theorem det_ne_zero_skew {B : Base F E} {m : ℕ} {X : Spc F E m} {r s : ℕ} (hX : X.IsSkew σ B r s)
-    : X.J.det ≠ 0 := by
+theorem det_ne_zero_skew {B : Base F E} {m : ℕ} {X : Spc F E m} {r s : ℕ} (hX : X.IsSkew σ B r s) : X.J.det ≠ 0 := by
   obtain w := Classical.arbitrary (InfinitePlace F)
   have h := det_ne_zero_of_hasSig (hX.sig w)
   intro h0
   apply h
-  rw [Matrix.det_smul,
-    show (X.J.map (B.emb w).1).det = (B.emb w).1 X.J.det from
-      (RingHom.map_det (B.emb w).1 X.J).symm,
-    h0, map_zero, mul_zero]
+  rw [Matrix.det_smul, show (X.J.map (B.emb w).1).det = (B.emb w).1 X.J.det from (RingHom.map_det (B.emb w).1 X.J).symm, h0, map_zero, mul_zero]
 
 end GlobalTheory.OppLagr

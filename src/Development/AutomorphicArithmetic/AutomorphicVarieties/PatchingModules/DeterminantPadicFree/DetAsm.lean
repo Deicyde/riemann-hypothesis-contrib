@@ -1,21 +1,67 @@
 module
 
-public import Development.AutomorphicArithmetic.AutomorphicVarieties.PatchingModules.DeterminantPadicFree.FrameWith
+public import Development.AutomorphicArithmetic.AutomorphicVarieties.PatchingModules.ThetaCoefficientMapEq
+public import Development.AutomorphicArithmetic.AutomorphicVarieties.PatchingModules.DeterminantPadicFree.ConstantAndLinearPartsZeroOfMem
 public import Development.AutomorphicArithmetic.AutomorphicVarieties.PatchingModules.DeterminantPadicFree.DetAlg
 public import Development.AutomorphicArithmetic.AutomorphicVarieties.PatchingModules.DeterminantPadicFree.MapSpan
-public import Development.AutomorphicArithmetic.AutomorphicVarieties.PatchingModules.DeterminantPadicFree.ConstantAndLinearPartsZeroOfMem
-public import Development.AutomorphicArithmetic.AutomorphicVarieties.PatchingModules.DeterminantPadicFree.W1sMem
+import Development.AutomorphicArithmetic.AutomorphicVarieties.PatchingModules.DeterminantPadicFree.W1sMem
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.AdicCompletion.Noetherian
+import Mathlib.RingTheory.Coalgebra.IsFrobenius
+import Mathlib.RingTheory.HopfAlgebra.Basic
+import Mathlib.RingTheory.PicardGroup
+import Mathlib.RingTheory.PowerSeries.Inverse
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
 open Matrix IsLocalRing UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.Pa
 
-private theorem clr
-    {K : Type} [Field K] {ι : Type} [Finite ι] (y : ι → FractionRing (PowerSeries K))
-    : ∃ (s : ℕ) (a : ι → PowerSeries K), ∀ i,
-      algebraMap _ (FractionRing (PowerSeries K)) (a i)
-        = algebraMap _ (FractionRing (PowerSeries K)) ((PowerSeries.X : PowerSeries K) ^ s)
-          * y i := by
+private theorem clr {K : Type} [Field K] {ι : Type} [Finite ι] (y : ι → FractionRing (PowerSeries K)) :
+    ∃ (s : ℕ) (a : ι → PowerSeries K), ∀ i, algebraMap _ (FractionRing (PowerSeries K)) (a i) =
+      algebraMap _ (FractionRing (PowerSeries K)) ((PowerSeries.X : PowerSeries K) ^ s) * y i := by
   obtain ⟨b, hb⟩ :=
     IsLocalization.exist_integer_multiples_of_finite (nonZeroDivisors (PowerSeries K)) y
   have hb0 : (b : PowerSeries K) ≠ 0 := nonZeroDivisors.coe_ne_zero b
@@ -30,8 +76,7 @@ section Mp
 
 variable {A B : Type} [CommRing A] [CommRing B] {n a : ℕ} (f : A →+* B)
 
-private theorem mp_smul (c : A) (M : Matrix (Fin n) (Fin n) A)
-    : f.mapMatrix (c • M) = f c • f.mapMatrix M := by
+private theorem mp_smul (c : A) (M : Matrix (Fin n) (Fin n) A) : f.mapMatrix (c • M) = f c • f.mapMatrix M := by
   ext i j; simp
 
 private theorem mp_tr (M : Matrix (Fin n) (Fin n) A) : f.mapMatrix Mᵀ = (f.mapMatrix M)ᵀ := rfl
@@ -41,25 +86,24 @@ private theorem mp_trace (M : Matrix (Fin n) (Fin n) A) : (f.mapMatrix M).trace 
 
 variable {f}
 
-private theorem mp_inj
-    (hf : Function.Injective f) {M N : Matrix (Fin n) (Fin n) A} (h : f.mapMatrix M = f.mapMatrix N)
-    : M = N := by
+private theorem mp_inj (hf : Function.Injective f) {M N : Matrix (Fin n) (Fin n) A}
+    (h : f.mapMatrix M = f.mapMatrix N) : M = N := by
   ext i j
   apply hf
   simpa using congrFun (congrFun h i) j
 
-private theorem mp_ev (hf : Function.Injective f) {M : Matrix (Fin n) (Fin n) A}
-    : f.mapMatrix M ∈ Ev B B n a ↔ M ∈ Ev A A n a := by
+private theorem mp_ev (hf : Function.Injective f) {M : Matrix (Fin n) (Fin n) A} :
+    f.mapMatrix M ∈ Ev B B n a ↔ M ∈ Ev A A n a := by
   simp [Ev, blkMat, map_eq_zero_iff f hf]
 
-private theorem mp_od (hf : Function.Injective f) {M : Matrix (Fin n) (Fin n) A}
-    : f.mapMatrix M ∈ Od B B n a ↔ M ∈ Od A A n a := by
+private theorem mp_od (hf : Function.Injective f) {M : Matrix (Fin n) (Fin n) A} :
+    f.mapMatrix M ∈ Od B B n a ↔ M ∈ Od A A n a := by
   simp [Od, blkMat, map_eq_zero_iff f hf]
 
 variable {g : ℕ} (P Q : Matrix (Fin n) (Fin n) (DD A g)) (c : A)
 
 private theorem eta_add : etaM (P + Q) = etaM P + etaM Q := rfl
-private theorem eta_neg : etaM (-P) = - etaM P := rfl
+private theorem eta_neg : etaM (-P) = -etaM P := rfl
 private theorem eta_sub : etaM (P - Q) = etaM P - etaM Q := (rfl)
 private theorem eta_tr : etaM Pᵀ = (etaM P)ᵀ := rfl
 private theorem eta_C : etaM ((DD.C c : DD A g) • P) = c • etaM P := by
@@ -71,7 +115,7 @@ private theorem eta_C : etaM ((DD.C c : DD A g) • P) = c • etaM P := by
   simp [etaM, ha, he, hp, hq]
 private theorem eta_smul : etaM (c • P) = c • etaM P := eta_C P c
 private theorem ep_add (j) : ep'M j (P + Q) = ep'M j P + ep'M j Q := rfl
-private theorem ep_neg (j) : ep'M j (-P) = - ep'M j P := rfl
+private theorem ep_neg (j) : ep'M j (-P) = -ep'M j P := rfl
 private theorem ep_sub (j) : ep'M j (P - Q) = ep'M j P - ep'M j Q := (rfl)
 private theorem ep_tr (j) : ep'M j Pᵀ = (ep'M j P)ᵀ := rfl
 private theorem ep_C (j) : ep'M j ((DD.C c : DD A g) • P) = c • ep'M j P := by
@@ -81,9 +125,7 @@ private theorem ep_C (j) : ep'M j ((DD.C c : DD A g) • P) = c • ep'M j P := 
   simp [ep'M, ha, hq]
 private theorem ep_smul (j) : ep'M j (c • P) = c • ep'M j P := ep_C P c j
 
-private theorem constant_smul_mem_symmetric_deformation
-    (h : P ∈ pairedDualFirstOrderDualMatrixSpace n A A g a)
-    : (DD.C c : DD A g) • P ∈ pairedDualFirstOrderDualMatrixSpace n A A g a := by
+private theorem constant_smul_mem_symmetric_deformation (h : P ∈ pairedDualFirstOrderDualMatrixSpace n A A g a) : (DD.C c : DD A g) • P ∈ pairedDualFirstOrderDualMatrixSpace n A A g a := by
   have ha : (DD.C c : DD A g).a = c := rfl
   have hp : (DD.C c : DD A g).ep = 0 := rfl
   have hq : (DD.C c : DD A g).ep' = 0 := rfl
@@ -106,9 +148,7 @@ private theorem constant_smul_mem_symmetric_deformation
     have e : (P i j).ep k = 0 := congrFun h2 k
     simp [ha, hp, h1, e]
 
-private theorem transpose_mem_symmetric_deformation
-    (h : P ∈ pairedDualFirstOrderDualMatrixSpace n A A g a)
-    : Pᵀ ∈ pairedDualFirstOrderDualMatrixSpace n A A g a := by
+private theorem transpose_mem_symmetric_deformation (h : P ∈ pairedDualFirstOrderDualMatrixSpace n A A g a) : Pᵀ ∈ pairedDualFirstOrderDualMatrixSpace n A A g a := by
   simp [pairedDualFirstOrderDualMatrixSpace, blkMat, ddPart] at h ⊢
   intro i j
   have hji := h j i
@@ -120,12 +160,10 @@ private theorem transpose_mem_symmetric_deformation
 
 end Mp
 
-private theorem isKap
-    {l : ℕ} [Fact l.Prime]
-    {F : GFrame l} {n : ℕ} {x : NP F n}
-    (k : Kap x) (D : DetFr (FractionRing x.A) F.G₀ n) (ha : D.a = x.a) (hσ : D.σ = F.conj)
-    (hr : ∀ g, D.r g = (algebraMap x.A (FractionRing x.A)).mapMatrix (x.ρX x.A g))
-    : D.IsKap fun j g => (algebraMap x.A (FractionRing x.A)).mapMatrix (k.κ j g) := by
+private theorem isKap {l : ℕ} [Fact l.Prime] {F : GFrame l} {n : ℕ} {x : NP F n} (k : Kap x)
+    (D : DetFr (FractionRing x.A) F.G₀ n) (ha : D.a = x.a) (hσ : D.σ = F.conj)
+    (hr : ∀ g, D.r g = (algebraMap x.A (FractionRing x.A)).mapMatrix (x.ρX x.A g)) :
+    D.IsKap fun j g => (algebraMap x.A (FractionRing x.A)).mapMatrix (k.κ j g) := by
   set φ := algebraMap x.A (FractionRing x.A) with hφ
   have hinj : Function.Injective φ := IsFractionRing.injective x.A (FractionRing x.A)
   have hsel := k.mem
@@ -143,7 +181,8 @@ private theorem isKap
     rw [ha] at hY
     obtain ⟨s, b, hb⟩ := clr (K := x.K) (Sum.elim c (fun p : Fin n × Fin n => Y p.1 p.2))
     set t : FractionRing x.A := φ ((PowerSeries.X : x.A) ^ s) with ht
-    have ht0 : t ≠ 0 := (map_ne_zero_iff φ hinj).2 (pow_ne_zero _ PowerSeries.X_ne_zero)
+    have ht0 : t ≠ 0 :=
+      (map_ne_zero_iff φ hinj).2 (pow_ne_zero _ PowerSeries.X_ne_zero)
     let c' : Fin k.g → x.A := fun j => b (Sum.inl j)
     let Y' : Matrix (Fin n) (Fin n) x.A := fun i j => b (Sum.inr (i, j))
     have hc' : ∀ j, φ (c' j) = t * c j := fun j => hb (Sum.inl j)
@@ -160,8 +199,8 @@ private theorem isKap
       funext g
       apply mp_inj hinj
       rw [Finset.sum_apply]
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [Pi.smul_apply, map_sum, mp_smul, hc', mul_smul]
+
+      simp only [Pi.smul_apply, map_sum, mp_smul, hc', mul_smul]
       rw [← Finset.smul_sum, hc g]
       simp only [dTw, dY, one_smul, map_sub, map_mul, hY', hr]
       simp [smul_sub, Matrix.mul_smul, Matrix.smul_mul]
@@ -172,10 +211,8 @@ private theorem isKap
     simp only [Pi.zero_apply, map_zero] at e
     exact (mul_eq_zero.1 e.symm).resolve_left ht0
 
-theorem UpperTheory.V.Pa.Det.detAsm
-    : ∀ {l : ℕ} [Fact l.Prime] {F : GFrame l} {n : ℕ} {x : NP F n} (k : Kap x),
-      l ≠ 2 → (∃ g : F.G₀, PadicInt.toZMod ((F.ε g : ℤ_[l]ˣ) : ℤ_[l]) ≠ 1)
-        → Detects k (F.G' : Set F.G₀) := by
+theorem UpperTheory.V.Pa.Det.detAsm :
+    ∀ {l : ℕ} [Fact l.Prime] {F : GFrame l} {n : ℕ} {x : NP F n} (k : Kap x), l ≠ 2 → (∃ g : F.G₀, PadicInt.toZMod ((F.ε g : ℤ_[l]ˣ) : ℤ_[l]) ≠ 1) → Detects k (F.G' : Set F.G₀) := by
   intro l _ F n x k hl hε
   set φ := algebraMap x.A (FractionRing x.A) with hφ
   have hinj : Function.Injective φ := IsFractionRing.injective x.A (FractionRing x.A)
@@ -198,17 +235,17 @@ theorem UpperTheory.V.Pa.Det.detAsm
   have hW := UpperTheory.V.Pa.Det.w1sMem (A := x.A) (X := x.A) (g := k.g) (n := n) (a := x.a)
   have hact := UpperTheory.V.Pa.Det.w1sAct k x.A
   let ph : F.G₀ → Matrix (Fin n) (Fin n) (FractionRing x.A) := fun g => φ.mapMatrix (etaM (z g))
-  let la : Fin k.g → F.G₀ → Matrix (Fin n) (Fin n) (FractionRing x.A) := fun j g =>
-    φ.mapMatrix (ep'M j (z g))
-  let s : FractionRing x.A := - φ (e F.c)
+  let la : Fin k.g → F.G₀ → Matrix (Fin n) (Fin n) (FractionRing x.A) :=
+    fun j g => φ.mapMatrix (ep'M j (z g))
+  let s : FractionRing x.A := -φ (e F.c)
   have hee : e F.c * e F.c = 1 := by
     simp only [e, ← map_mul, ← Units.val_mul, ← map_mul F.ε, F.c_sq, map_one, Units.val_one]
   have hTw : D.IsTw (fun j g => φ.mapMatrix (k.κ j g)) s ph la := by
     refine ⟨?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_⟩
     · simp only [s, neg_mul_neg, ← map_mul, hee, map_one]
     · intro j g _ h _
-      simp only [la, hzc g h, ep_add, heps, ep_C, (hact (z h) (hzW h) g).2.1 j, map_add (f := _),
-        mp_smul, map_mul, hr, hχ]
+      simp only [la, hzc g h, ep_add, heps, ep_C, (hact (z h) (hzW h) g).2.1 j, map_add (f := _), mp_smul,
+        map_mul, hr, hχ]
     · intro j g
       rw [hDa, mp_od hinj]
       exact (hW.1 _ (hzW g)).2 j
@@ -218,24 +255,20 @@ theorem UpperTheory.V.Pa.Det.detAsm
       rw [hDa, mp_ev hinj]
       exact (hW.1 _ (hzW g)).1
     · intro g h
-      set_option synthInstance.maxHeartbeats 100000 in
+
       simp only [ph, la, hzc g h, eta_add, heps, eta_C, (hact (z h) (hzW h) g).2.2.1, hmapid,
-        map_add, mp_smul, map_sum, map_sub, map_mul, hr, hχ]
+      map_add, mp_smul, map_sum, map_sub, map_mul, hr, hχ]
     · intro g
-      simp only [ph, hDσ, hzconj g, eta_neg, heps, eta_C, eta_tr, map_neg, mp_smul, mp_tr, s,
-        neg_smul]
+      simp only [ph, hDσ, hzconj g, eta_neg, heps, eta_C, eta_tr, map_neg, mp_smul, mp_tr, s, neg_smul]
     · intro g hg
       rw [hDG] at hg
       have h0 := hell g hg
       simp only [ell, (hact (z g) (hzW g) g).2.2.2, hmapid] at h0
-      set_option synthInstance.maxHeartbeats 100000 in
+
       simp only [ph, la, hr, ← map_mul, mp_trace, ← map_sum, ← map_add (f := _), h0, map_zero]
   obtain ⟨Y₀, Y, hY₀ev, hY₀s, hY, hph⟩ := UpperTheory.V.Pa.Det.detAlg D _ la s ph hK hTw
-  obtain ⟨m, b, hb⟩ :=
-    clr (K := x.K)
-      (Sum.elim
-        (fun p : Fin n × Fin n => Y₀ p.1 p.2)
-        (fun q : Fin k.g × Fin n × Fin n => Y q.1 q.2.1 q.2.2))
+  obtain ⟨m, b, hb⟩ := clr (K := x.K)
+    (Sum.elim (fun p : Fin n × Fin n => Y₀ p.1 p.2) (fun q : Fin k.g × Fin n × Fin n => Y q.1 q.2.1 q.2.2))
   set t : FractionRing x.A := φ ((PowerSeries.X : x.A) ^ m) with ht
   let Y₀' : Matrix (Fin n) (Fin n) x.A := fun i j => b (Sum.inl (i, j))
   let Y' : Fin k.g → Matrix (Fin n) (Fin n) x.A := fun q i j => b (Sum.inr (q, i, j))
@@ -257,8 +290,7 @@ theorem UpperTheory.V.Pa.Det.detAsm
   refine ⟨m, Z, hZW, ?_, ?_⟩
   · apply hW.2.1
     · rw [heps]
-      exact Submodule.neg_mem _
-        (constant_smul_mem_symmetric_deformation _ _ (transpose_mem_symmetric_deformation _ hZW))
+      exact Submodule.neg_mem _ (constant_smul_mem_symmetric_deformation _ _ (transpose_mem_symmetric_deformation _ hZW))
     · exact hZW
     · apply mp_inj hinj
       rw [heps, eta_neg, eta_C, eta_tr, hZeta, map_neg, mp_smul, mp_tr, hY₀']
@@ -277,9 +309,9 @@ theorem UpperTheory.V.Pa.Det.detAsm
     · apply mp_inj hinj
       have h1 := hph g
       simp only [ph] at h1
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [Pi.smul_apply, eta_smul, heps, eta_sub, eta_C, (hact Z hZW g).2.2.1, hmapid,
-          hZeta, hZep, map_sub, map_add, mp_smul, map_sum, map_mul, ← hr, hY₀', hY', h1, dTw, hχ]
+
+      simp only [Pi.smul_apply, eta_smul, heps, eta_sub, eta_C, (hact Z hZW g).2.2.1, hmapid,
+      hZeta, hZep, map_sub, map_add, mp_smul, map_sum, map_mul, ← hr, hY₀', hY', h1, dTw, hχ]
       simp only [smul_add, smul_sub, Finset.smul_sum, Matrix.mul_smul, Matrix.smul_mul, smul_smul,
         mul_comm]
       abel
@@ -287,7 +319,7 @@ theorem UpperTheory.V.Pa.Det.detAsm
       apply mp_inj hinj
       have h1 := (hY j).2.2 g
       simp only [la] at h1
-      simp only [Pi.smul_apply, ep_smul, heps, ep_sub, ep_C, (hact Z hZW g).2.1 j, hZep, map_sub,
-        mp_smul, map_mul, ← hr, hY', h1, dTw, hχ]
+      simp only [Pi.smul_apply, ep_smul, heps, ep_sub, ep_C, (hact Z hZW g).2.1 j,
+        hZep, map_sub, mp_smul, map_mul, ← hr, hY', h1, dTw, hχ]
       simp only [smul_sub, Matrix.mul_smul, Matrix.smul_mul, smul_smul, mul_comm]
       rfl

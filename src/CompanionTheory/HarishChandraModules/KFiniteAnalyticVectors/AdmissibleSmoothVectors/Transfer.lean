@@ -1,6 +1,56 @@
 module
 
 public import CompanionTheory.HarishChandraModules.KFiniteAnalyticVectors.AdmissibleSmoothVectors.MapStdPoly
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Real
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Coalgebra.IsFrobenius
+import Mathlib.RingTheory.HopfAlgebra.Basic
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+public import Mathlib.Topology.ContinuousMap.StoneWeierstrass
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
+public import Mathlib.Analysis.LocallyConvex.SeparatingDual
+public import Mathlib.MeasureTheory.Function.LocallyIntegrable
+public import Mathlib.MeasureTheory.Integral.Bochner.ContinuousLinearMap
 
 @[expose] public section
 
@@ -15,17 +65,14 @@ namespace PrismTransfer
 
 section Closure
 
-variable
-  {G : Type} [Group G] {ι ι' : Type} [Fintype ι] [DecidableEq ι] [Fintype ι'] [DecidableEq ι']
+variable {G : Type} [Group G] {ι ι' : Type} [Fintype ι] [DecidableEq ι] [Fintype ι'] [DecidableEq ι']
 
-def sumRep (ρ : G →* Matrix ι ι ℂ) (ρ' : G →* Matrix ι' ι' ℂ)
-    : G →* Matrix (ι ⊕ ι') (ι ⊕ ι') ℂ where
+def sumRep (ρ : G →* Matrix ι ι ℂ) (ρ' : G →* Matrix ι' ι' ℂ) : G →* Matrix (ι ⊕ ι') (ι ⊕ ι') ℂ where
   toFun x := fromBlocks (ρ x) 0 0 (ρ' x)
   map_one' := by simp
   map_mul' x y := by simp [fromBlocks_multiply]
 
-def tensRep (ρ : G →* Matrix ι ι ℂ) (ρ' : G →* Matrix ι' ι' ℂ)
-    : G →* Matrix (ι × ι') (ι × ι') ℂ where
+def tensRep (ρ : G →* Matrix ι ι ℂ) (ρ' : G →* Matrix ι' ι' ℂ) : G →* Matrix (ι × ι') (ι × ι') ℂ where
   toFun x := ρ x ⊗ₖ ρ' x
   map_one' := by simp
   map_mul' x y := by simp [mul_kronecker_mul]
@@ -35,8 +82,7 @@ def conjRep (ρ : G →* Matrix ι ι ℂ) : G →* Matrix ι ι ℂ where
   map_one' := by simp
   map_mul' x y := by simp [Matrix.map_mul]
 
-variable
-  [TopologicalSpace G] {st : G → G} {S : Set G} {ρ : G →* Matrix ι ι ℂ} {ρ' : G →* Matrix ι' ι' ℂ}
+variable [TopologicalSpace G] {st : G → G} {S : Set G} {ρ : G →* Matrix ι ι ℂ} {ρ' : G →* Matrix ι' ι' ℂ}
 
 theorem isGood_sum (h : IsGood st S ρ) (h' : IsGood st S ρ') : IsGood st S (sumRep ρ ρ') where
   cont := Continuous.matrix_fromBlocks h.cont continuous_const continuous_const h'.cont
@@ -114,11 +160,10 @@ theorem isGood_one : IsGood st S (1 : G →* Matrix Unit Unit ℂ) where
   tri := ⟨fun _ => 0, fun _ _ _ => rfl, fun _ _ _ _ h => absurd h (lt_irrefl _)⟩
 
 omit [DecidableEq ι] [DecidableEq ι'] in
-theorem coef_kronecker (A : Matrix ι ι ℂ) (B : Matrix ι' ι' ℂ) (a b : ι → ℂ) (a' b' : ι' → ℂ)
-    : (fun p : ι × ι' => a p.1 * a' p.2) ⬝ᵥ ((A ⊗ₖ B) *ᵥ fun p : ι × ι' => b p.1 * b' p.2)
-      = (a ⬝ᵥ (A *ᵥ b)) * (a' ⬝ᵥ (B *ᵥ b')) := by
-  have : ((A ⊗ₖ B) *ᵥ fun p : ι × ι' => b p.1 * b' p.2)
-      = fun p => (A *ᵥ b) p.1 * (B *ᵥ b') p.2 := by
+theorem coef_kronecker (A : Matrix ι ι ℂ) (B : Matrix ι' ι' ℂ) (a b : ι → ℂ) (a' b' : ι' → ℂ) :
+    (fun p : ι × ι' => a p.1 * a' p.2) ⬝ᵥ ((A ⊗ₖ B) *ᵥ fun p : ι × ι' => b p.1 * b' p.2) =
+      (a ⬝ᵥ (A *ᵥ b)) * (a' ⬝ᵥ (B *ᵥ b')) := by
+  have : ((A ⊗ₖ B) *ᵥ fun p : ι × ι' => b p.1 * b' p.2) = fun p => (A *ᵥ b) p.1 * (B *ᵥ b') p.2 := by
     funext p
     simp only [mulVec, dotProduct, Fintype.sum_prod_type, Finset.sum_mul_sum, kroneckerMap_apply]
     exact Finset.sum_congr rfl fun _ _ => Finset.sum_congr rfl fun _ _ => by ring
@@ -127,35 +172,18 @@ theorem coef_kronecker (A : Matrix ι ι ℂ) (B : Matrix ι' ι' ℂ) (a b : ι
   exact Finset.sum_congr rfl fun _ _ => Finset.sum_congr rfl fun _ _ => by ring
 
 def coefAlg (st : G → G) (S : Set G) (C : Set G) : StarSubalgebra ℂ C(C, ℂ) where
-  carrier :=
-    {f | ∃ (κ : Type) (_ : Fintype κ) (_ : DecidableEq κ) (τ : G →* Matrix κ κ ℂ) (a b : κ → ℂ),
-      IsGood st S τ ∧ ∀ x : C, f x = a ⬝ᵥ (τ x *ᵥ b)}
+  carrier := {f | ∃ (κ : Type) (_ : Fintype κ) (_ : DecidableEq κ) (τ : G →* Matrix κ κ ℂ) (a b : κ → ℂ),
+    IsGood st S τ ∧ ∀ x : C, f x = a ⬝ᵥ (τ x *ᵥ b)}
   mul_mem' := by
     rintro f g ⟨κ, _, _, τ, a, b, h, hf⟩ ⟨κ', _, _, τ', a', b', h', hg⟩
-    refine ⟨
-      κ × κ',
-      inferInstance,
-      inferInstance,
-      tensRep τ τ',
-      fun p => a p.1 * a' p.2,
-      fun p => b p.1 * b' p.2,
-      isGood_tens h h',
-      fun x => ?_
-    ⟩
+    refine ⟨κ × κ', inferInstance, inferInstance, tensRep τ τ', fun p => a p.1 * a' p.2,
+      fun p => b p.1 * b' p.2, isGood_tens h h', fun x => ?_⟩
     rw [ContinuousMap.mul_apply, hf, hg]
     exact (coef_kronecker _ _ _ _ _ _).symm
   add_mem' := by
     rintro f g ⟨κ, _, _, τ, a, b, h, hf⟩ ⟨κ', _, _, τ', a', b', h', hg⟩
-    refine ⟨
-      κ ⊕ κ',
-      inferInstance,
-      inferInstance,
-      sumRep τ τ',
-      Sum.elim a a',
-      Sum.elim b b',
-      isGood_sum h h',
-      fun x => ?_
-    ⟩
+    refine ⟨κ ⊕ κ', inferInstance, inferInstance, sumRep τ τ', Sum.elim a a', Sum.elim b b',
+      isGood_sum h h', fun x => ?_⟩
     rw [ContinuousMap.add_apply, hf, hg]
     change _ = Sum.elim a a' ⬝ᵥ (fromBlocks (τ x) 0 0 (τ' x) *ᵥ Sum.elim b b')
     simp [fromBlocks_mulVec, sumElim_dotProduct_sumElim]
@@ -169,33 +197,26 @@ def coefAlg (st : G → G) (S : Set G) (C : Set G) : StarSubalgebra ℂ C(C, ℂ
     change _ = star a ⬝ᵥ ((τ x).map (starRingEnd ℂ) *ᵥ star b)
     simp [dotProduct, mulVec, mul_comm]
 
-theorem coefAlg_separates (h : IsGood st S ρ) (hi : Function.Injective ρ) (C : Set G)
-    : (coefAlg st S C).SeparatesPoints := by
+theorem coefAlg_separates (h : IsGood st S ρ) (hi : Function.Injective ρ) (C : Set G) :
+    (coefAlg st S C).SeparatesPoints := by
   intro x y hxy
   have : ρ x ≠ ρ y := fun e => hxy (Subtype.ext (hi e))
   obtain ⟨i, j, hij⟩ : ∃ i j, ρ x i j ≠ ρ y i j := by
     by_contra hc
     push Not at hc
     exact this (Matrix.ext hc)
-  refine ⟨
-    fun z : C => ρ z i j,
-    ⟨⟨fun z : C => ρ z i j, (h.cont.matrix_elem i j).comp continuous_subtype_val⟩, ?_, rfl⟩,
-    hij
-  ⟩
+  refine ⟨fun z : C => ρ z i j, ⟨⟨fun z : C => ρ z i j,
+    (h.cont.matrix_elem i j).comp continuous_subtype_val⟩, ?_, rfl⟩, hij⟩
   refine ⟨ι, inferInstance, inferInstance, ρ, Pi.single i 1, Pi.single j 1, h, fun z => ?_⟩
   simp
 
-theorem exists_approx
-    (h : IsGood st S ρ) (hi : Function.Injective ρ)
-    {C : Set G} (hC : IsCompact C)
-    {Φ : G → ℂ} (hΦ : Continuous Φ)
-    {δ : ℝ} (hδ : 0 < δ)
-    : ∃ (κ : Type) (_ : Fintype κ) (_ : DecidableEq κ) (τ : G →* Matrix κ κ ℂ) (a b : κ → ℂ),
+theorem exists_approx (h : IsGood st S ρ) (hi : Function.Injective ρ) {C : Set G} (hC : IsCompact C)
+    {Φ : G → ℂ} (hΦ : Continuous Φ) {δ : ℝ} (hδ : 0 < δ) :
+    ∃ (κ : Type) (_ : Fintype κ) (_ : DecidableEq κ) (τ : G →* Matrix κ κ ℂ) (a b : κ → ℂ),
       IsGood st S τ ∧ ∀ x ∈ C, ‖Φ x - a ⬝ᵥ (τ x *ᵥ b)‖ ≤ δ := by
   have : CompactSpace C := isCompact_iff_compactSpace.1 hC
-  have htop :=
-    ContinuousMap.starSubalgebra_topologicalClosure_eq_top_of_separatesPoints _
-      (coefAlg_separates h hi C)
+  have htop := ContinuousMap.starSubalgebra_topologicalClosure_eq_top_of_separatesPoints _
+    (coefAlg_separates h hi C)
   let F : C(C, ℂ) := ⟨fun x => Φ x, hΦ.comp continuous_subtype_val⟩
   have hF : F ∈ closure (coefAlg st S C : Set C(C, ℂ)) := by
     have : F ∈ (coefAlg st S C).topologicalClosure := by rw [htop]; trivial
@@ -210,10 +231,8 @@ end Closure
 
 section Bound
 
-variable
-  {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
-  {K : Subgroup G} [CompactSpace K] [MeasurableSpace K] [BorelSpace K]
-  (μ : Measure K) [IsFiniteMeasure μ]
+variable {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
+  {K : Subgroup G} [CompactSpace K] [MeasurableSpace K] [BorelSpace K] (μ : Measure K) [IsFiniteMeasure μ]
   (e : K → ℂ)
 
 structure IsFam (Φ : G → ℂ) (F : List G → G → ℂ) : Prop where
@@ -225,50 +244,37 @@ structure IsFam (Φ : G → ℂ) (F : List G → G → ℂ) : Prop where
 variable {μ e}
 
 omit [IsTopologicalGroup G] in
-theorem integrable_of_cont
-    {V : Type} [NormedAddCommGroup V] [SecondCountableTopology K] {f : K → V} (hf : Continuous f)
-    : Integrable f μ :=
+theorem integrable_of_cont {V : Type} [NormedAddCommGroup V] [SecondCountableTopology K] {f : K → V}
+    (hf : Continuous f) : Integrable f μ :=
   hf.integrable_of_hasCompactSupport (HasCompactSupport.of_compactSpace f)
 
-theorem IsFam.sub
-    [SecondCountableTopology K]
-    (he : Continuous e)
-    {Φ Φ' : G → ℂ} {F F' : List G → G → ℂ} (h : IsFam μ e Φ F) (h' : IsFam μ e Φ' F')
-    : IsFam μ e (fun x => Φ x - Φ' x) (fun l x => F l x - F' l x) where
+theorem IsFam.sub [SecondCountableTopology K] (he : Continuous e) {Φ Φ' : G → ℂ} {F F' : List G → G → ℂ}
+    (h : IsFam μ e Φ F) (h' : IsFam μ e Φ' F') :
+    IsFam μ e (fun x => Φ x - Φ' x) (fun l x => F l x - F' l x) where
   cont₀ := h.cont₀.sub h'.cont₀
   cont l := (h.cont l).sub (h'.cont l)
   nil x := by
     have h1 := h.cont₀
     have h2 := h'.cont₀
-    rw [h.nil, h'.nil,
-      ← integral_sub (integrable_of_cont (by fun_prop)) (integrable_of_cont (by fun_prop))]
+    rw [h.nil, h'.nil, ← integral_sub (integrable_of_cont (by fun_prop)) (integrable_of_cont (by fun_prop))]
     simp only [mul_sub]
   cons a l x := by
     have h1 := h.cont l
     have h2 := h'.cont l
-    rw [h.cons, h'.cons,
-      ← integral_sub (integrable_of_cont (by fun_prop)) (integrable_of_cont (by fun_prop))]
+    rw [h.cons, h'.cons, ← integral_sub (integrable_of_cont (by fun_prop)) (integrable_of_cont (by fun_prop))]
     simp only [mul_sub]
 
 omit [IsTopologicalGroup G] in
-theorem norm_avg_le
-    [SecondCountableTopology K] (he : Continuous e) {f : K → ℂ} {δ : ℝ} (hf : ∀ k, ‖f k‖ ≤ δ)
-    : ‖∫ k, e k * f k ∂μ‖ ≤ (∫ k, ‖e k‖ ∂μ) * δ := by
+theorem norm_avg_le [SecondCountableTopology K] (he : Continuous e) {f : K → ℂ} {δ : ℝ} (hf : ∀ k, ‖f k‖ ≤ δ) :
+    ‖∫ k, e k * f k ∂μ‖ ≤ (∫ k, ‖e k‖ ∂μ) * δ := by
   rw [← integral_mul_const]
   refine norm_integral_le_of_norm_le (integrable_of_cont (by fun_prop)) (ae_of_all _ fun k => ?_)
   rw [norm_mul]
   exact mul_le_mul_of_nonneg_left (hf k) (norm_nonneg _)
 
-theorem exists_bound [SecondCountableTopology K] (he : Continuous e) (l : List G)
-    : ∀ C : Set G,
-      IsCompact C
-        → ∃ C' : Set G,
-          IsCompact C'
-            ∧ ∀ Φ F,
-              IsFam μ e Φ F
-                → ∀ δ : ℝ,
-                  (∀ y ∈ C', ‖Φ y‖ ≤ δ)
-                    → ∀ x ∈ C, ‖F l x‖ ≤ (∫ k, ‖e k‖ ∂μ) ^ (l.length + 1) * δ := by
+theorem exists_bound [SecondCountableTopology K] (he : Continuous e) (l : List G) :
+    ∀ C : Set G, IsCompact C → ∃ C' : Set G, IsCompact C' ∧ ∀ Φ F, IsFam μ e Φ F → ∀ δ : ℝ,
+      (∀ y ∈ C', ‖Φ y‖ ≤ δ) → ∀ x ∈ C, ‖F l x‖ ≤ (∫ k, ‖e k‖ ∂μ) ^ (l.length + 1) * δ := by
   have hK : IsCompact (K : Set G) := isCompact_iff_compactSpace.2 ‹_›
   induction l with
   | nil =>
@@ -284,43 +290,33 @@ theorem exists_bound [SecondCountableTopology K] (he : Continuous e) (l : List G
     exact norm_avg_le he fun k => H Φ F h δ hδ _ (Set.mul_mem_mul (Set.mul_mem_mul hx k.2) rfl)
 
 omit [IsTopologicalGroup G] in
-theorem isFam_rep
-    [SecondCountableTopology K]
-    (he : Continuous e)
-    {V : Type} [NormedAddCommGroup V] [NormedSpace ℂ V] [CompleteSpace V]
-    (τ : G →* Module.End ℂ V) (h1 : ∀ x, Continuous (τ x)) (h2 : ∀ v, Continuous fun x => τ x v)
-    (E : Module.End ℂ V) (hE : ∀ u, E u = ∫ k : K, e k • τ k u ∂μ)
-    (ℓ : V →L[ℂ] ℂ) (u : V)
-    : IsFam μ e (fun x => ℓ (τ x u)) (fun l x => ℓ (τ x (word E (l.map τ) u))) := by
+theorem isFam_rep [SecondCountableTopology K] (he : Continuous e) {V : Type} [NormedAddCommGroup V]
+    [NormedSpace ℂ V] [CompleteSpace V] (τ : G →* Module.End ℂ V) (h1 : ∀ x, Continuous (τ x))
+    (h2 : ∀ v, Continuous fun x => τ x v) (E : Module.End ℂ V) (hE : ∀ u, E u = ∫ k : K, e k • τ k u ∂μ)
+    (ℓ : V →L[ℂ] ℂ) (u : V) :
+    IsFam μ e (fun x => ℓ (τ x u)) (fun l x => ℓ (τ x (word E (l.map τ) u))) := by
   have key : ∀ x w, ℓ (τ x (E w)) = ∫ k : K, e k * ℓ (τ (x * k) w) ∂μ := by
     intro x w
     have hw := h2 w
-    have :=
-      (ℓ.comp ⟨τ x, h1 x⟩).integral_comp_comm (μ := μ)
-        (φ := fun k : K => e k • τ k w)
-        (integrable_of_cont (he.smul (hw.comp continuous_subtype_val)))
+    have := (ℓ.comp ⟨τ x, h1 x⟩).integral_comp_comm (μ := μ) (φ := fun k : K => e k • τ k w)
+      (integrable_of_cont (he.smul (hw.comp continuous_subtype_val)))
     rw [hE]
     refine Eq.trans this.symm ?_
     simp
-  refine
-    ⟨ℓ.continuous.comp (h2 u), fun l => ℓ.continuous.comp (h2 _), fun x => key x u, fun a l x => ?_⟩
+  refine ⟨ℓ.continuous.comp (h2 u), fun l => ℓ.continuous.comp (h2 _), fun x => key x u, fun a l x => ?_⟩
   simp only [List.map_cons, word_cons, Module.End.mul_apply]
   rw [key]
   simp
 
 end Bound
 
-theorem apply_stdPoly
-    {G V : Type} [AddCommGroup V] [Module ℂ V]
-    (τ : G → Module.End ℂ V) (E : Module.End ℂ V)
-    {M : ℕ} (g : Fin M → G)
-    (ℓ : V →ₗ[ℂ] ℂ) (u : V)
-    : ℓ (stdPoly E (fun i => τ (g i)) u)
-      = ∑ π : Equiv.Perm (Fin M),
-        ((Equiv.Perm.sign π : ℤ) : ℂ) * ℓ (word E ((List.ofFn fun i => g (π i)).map τ) u) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-  simp only [stdPoly, LinearMap.sum_apply, map_sum, List.map_ofFn, Function.comp_def,
-    Module.End.mul_apply, Module.End.intCast_apply, map_zsmul, zsmul_eq_mul]
+theorem apply_stdPoly {G V : Type} [AddCommGroup V] [Module ℂ V] (τ : G → Module.End ℂ V) (E : Module.End ℂ V)
+    {M : ℕ} (g : Fin M → G) (ℓ : V →ₗ[ℂ] ℂ) (u : V) :
+    ℓ (stdPoly E (fun i => τ (g i)) u) = ∑ π : Equiv.Perm (Fin M),
+      ((Equiv.Perm.sign π : ℤ) : ℂ) * ℓ (word E ((List.ofFn fun i => g (π i)).map τ) u) := by
+
+  simp only [stdPoly, LinearMap.sum_apply, map_sum, List.map_ofFn, Function.comp_def, Module.End.mul_apply,
+  Module.End.intCast_apply, map_zsmul, zsmul_eq_mul]
 
 end PrismTransfer
 
@@ -343,44 +339,32 @@ theorem transfer_holds : Transfer := by
     rw [map_stdPoly]
     rfl
   rw [hmap]
-  have main
-      : ∀ δ : ℝ,
-        0 < δ
-          → ‖ℓ (stdPoly (φ E) (fun i => σ' (g i)) v)‖
-            ≤ (Fintype.card (Equiv.Perm (Fin M)) * B ^ (M + 1)) * δ := by
+  have main : ∀ δ : ℝ, 0 < δ → ‖ℓ (stdPoly (φ E) (fun i => σ' (g i)) v)‖ ≤
+      (Fintype.card (Equiv.Perm (Fin M)) * B ^ (M + 1)) * δ := by
     intro δ hδ
     obtain ⟨κ, _, _, τ, a, b, hτ, hap⟩ := exists_approx hρ₀ hi hCU hF.cont₀ hδ
-    let τ' : G →* Module.End ℂ (κ → ℂ) :=
-      (Matrix.toLinAlgEquiv' : Matrix κ κ ℂ ≃ₐ[ℂ] _).toMonoidHom.comp τ
-    have hc : ∀ u : κ → ℂ, Continuous fun x => τ x *ᵥ u := fun u =>
-      hτ.cont.matrix_mulVec continuous_const
+    let τ' : G →* Module.End ℂ (κ → ℂ) := (Matrix.toLinAlgEquiv' : Matrix κ κ ℂ ≃ₐ[ℂ] _).toMonoidHom.comp τ
+    have hc : ∀ u : κ → ℂ, Continuous fun x => τ x *ᵥ u := fun u => hτ.cont.matrix_mulVec continuous_const
     have hint : ∀ u : κ → ℂ, Integrable (fun k : K => e k • (τ k *ᵥ u)) μ := fun u =>
       integrable_of_cont (he.smul ((hc u).comp continuous_subtype_val))
-    let E' : Module.End ℂ (κ → ℂ) := {
-      toFun := fun u => ∫ k : K, e k • (τ k *ᵥ u) ∂μ
-      map_add' := fun u w => by
-        rw [← integral_add (hint u) (hint w)]
-        simp only [mulVec_add, smul_add]
-      map_smul' := fun c u => by
-        rw [RingHom.id_apply, ← integral_smul]
-        simp only [mulVec_smul, smul_comm c]
-    }
+    let E' : Module.End ℂ (κ → ℂ) :=
+      { toFun := fun u => ∫ k : K, e k • (τ k *ᵥ u) ∂μ
+        map_add' := fun u w => by
+          rw [← integral_add (hint u) (hint w)]
+          simp only [mulVec_add, smul_add]
+        map_smul' := fun c u => by
+          rw [RingHom.id_apply, ← integral_smul]
+          simp only [mulVec_smul, smul_comm c] }
     let ℓ' : (κ → ℂ) →L[ℂ] ℂ := LinearMap.toContinuousLinearMap (dotProductBilin ℂ ℂ a)
-    have hF' :=
-      isFam_rep (μ := μ) he τ'
-        (fun x => (τ' x).continuous_of_finiteDimensional)
-        hc E'
-        (fun _ => rfl)
-        ℓ' b
+    have hF' := isFam_rep (μ := μ) he τ' (fun x => (τ' x).continuous_of_finiteDimensional) hc E'
+      (fun _ => rfl) ℓ' b
     have hz : stdPoly E' (fun i => τ' (g i)) = 0 := hgood κ τ hτ E' fun _ => rfl
     have e1 := apply_stdPoly σ' (φ E) g (ℓ : H →ₗ[ℂ] ℂ) v
     have e2 := apply_stdPoly τ' E' g (ℓ' : (κ → ℂ) →ₗ[ℂ] ℂ) b
     rw [hz, LinearMap.zero_apply, map_zero] at e2
-    have e3
-        : ℓ (stdPoly (φ E) (fun i => σ' (g i)) v)
-          = ∑ π : Equiv.Perm (Fin M),
-            ((Equiv.Perm.sign π : ℤ) : ℂ) * (ℓ (word (φ E) ((List.ofFn fun i => g (π i)).map σ') v) -
-              ℓ' (word E' ((List.ofFn fun i => g (π i)).map τ') b)) := by
+    have e3 : ℓ (stdPoly (φ E) (fun i => σ' (g i)) v) = ∑ π : Equiv.Perm (Fin M),
+        ((Equiv.Perm.sign π : ℤ) : ℂ) * (ℓ (word (φ E) ((List.ofFn fun i => g (π i)).map σ') v) -
+          ℓ' (word E' ((List.ofFn fun i => g (π i)).map τ') b)) := by
       simp only [mul_sub, Finset.sum_sub_distrib]
       exact e1.trans (by rw [← sub_zero (Finset.sum _ _), e2]; rfl)
     rw [e3]
@@ -390,13 +374,12 @@ theorem transfer_holds : Transfer := by
     have hs : ‖((Equiv.Perm.sign π : ℤ) : ℂ)‖ = 1 := by
       rcases Int.units_eq_one_or (Equiv.Perm.sign π) with h | h <;> simp [h]
     rw [norm_mul, hs, one_mul]
-    have := hbd π _ _ (hF.sub he hF') δ (fun y hy => hap y (Set.mem_iUnion.2 ⟨π, hy⟩)) 1 rfl
+    have := hbd π _ _ (hF.sub he hF') δ
+      (fun y hy => hap y (Set.mem_iUnion.2 ⟨π, hy⟩)) 1 rfl
     simpa only [map_one, Module.End.one_apply, List.length_ofFn] using this
   rw [← norm_le_zero_iff]
   refine le_of_forall_pos_le_add fun ε hε => ?_
   set D : ℝ := Fintype.card (Equiv.Perm (Fin M)) * B ^ (M + 1)
-  have hD : 0 ≤ D :=
-    mul_nonneg (Nat.cast_nonneg _) (pow_nonneg (integral_nonneg fun _ => norm_nonneg _) _)
   refine (main (ε / (D + 1)) (by positivity)).trans ?_
   rw [zero_add, mul_div_assoc', div_le_iff₀ (by positivity)]
   nlinarith

@@ -1,11 +1,57 @@
 module
 
-public import Mathlib
 public import Formalism.MirabolicMackeyTheory.StatementL
-public import Formalism.MirabolicMackeyTheory.MirabolicMackeyProofs.OrthogonalityOfMackey
-public import Formalism.QuotientMetricDivisors.HermitianTwistDivisors.ValBasic
 public import Formalism.HermitianLattices.HermitianLatticesProofs.IndexBasic
 public import Formalism.MirabolicMackeyTheory.MirabolicMackeyProofs.IdxRules
+public import Formalism.MirabolicMackeyTheory.MirabolicMackeyProofs.OrthogonalityOfMackey
+public import Formalism.QuotientMetricDivisors.HermitianTwistDivisors.ValBasic
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Int
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -17,15 +63,13 @@ open Formalism.DivisionValues
 
 section Abstract
 
-variable
-  {R : Type*} [CommRing R] {Y Q : Type*} [AddCommGroup Y] [Module R Y] [AddCommGroup Q] [Module R Q]
+variable {R : Type*} [CommRing R] {Y Q : Type*} [AddCommGroup Y] [Module R Y] [AddCommGroup Q]
+  [Module R Q]
 
-theorem gg_len_range
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (n : R) (s : ι → Y →ₗ[R] Q) (t : ι → Q →ₗ[R] Y)
-    (hts : ∀ i j y, t i (s j y) = if i = j then n • y else 0)
-    : (Fintype.card ι : ℕ∞) * Module.length R (LinearMap.range (n • (LinearMap.id : Y →ₗ[R] Y)))
-      ≤ Module.length R Q := by
+theorem gg_len_range {ι : Type*} [Fintype ι] [DecidableEq ι] (n : R) (s : ι → Y →ₗ[R] Q)
+    (t : ι → Q →ₗ[R] Y) (hts : ∀ i j y, t i (s j y) = if i = j then n • y else 0) :
+    (Fintype.card ι : ℕ∞) * Module.length R (LinearMap.range (n • (LinearMap.id : Y →ₗ[R] Y))) ≤
+      Module.length R Q := by
   set NY := LinearMap.range (n • (LinearMap.id : Y →ₗ[R] Y)) with hNY
   have h1 : Module.length R (ι → NY) = (Fintype.card ι : ℕ∞) * Module.length R NY := by
     rw [Module.length_pi_of_fintype]
@@ -52,23 +96,21 @@ theorem gg_len_range
   ext i
   exact congrFun h3 i
 
-theorem gg_len_split (f : Y →ₗ[R] Y)
-    : Module.length R Y
-      = Module.length R (LinearMap.range f) + Module.length R (Y ⧸ LinearMap.range f) :=
+theorem gg_len_split (f : Y →ₗ[R] Y) :
+    Module.length R Y =
+      Module.length R (LinearMap.range f) + Module.length R (Y ⧸ LinearMap.range f) :=
   Module.length_eq_add_of_exact (LinearMap.range f).subtype (LinearMap.range f).mkQ
     (Submodule.injective_subtype _) (Submodule.mkQ_surjective _) (LinearMap.exact_subtype_mkQ _)
 
-theorem gg_core
-    {Z : Type*} [AddCommGroup Z] [Module R Z]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
+theorem gg_core {Z : Type*} [AddCommGroup Z] [Module R Z] {ι : Type*} [Fintype ι] [DecidableEq ι]
     (n : R) (A A' C B B' : Submodule R Z) (s t : ι → Z →ₗ[R] Z)
     (hsA : ∀ i, ∀ a ∈ A, s i a ∈ B) (hsA' : ∀ i, ∀ a ∈ A', s i a ∈ B')
     (htB : ∀ i, ∀ b ∈ B, t i b ∈ A) (htB' : ∀ i, ∀ b ∈ B', t i b ∈ A')
     (hts : ∀ i j, ∀ a ∈ A, t i (s j a) = if i = j then n • a else 0)
-    (hC : ∀ c ∈ C, c ∈ A → ∃ a ∈ A, c = n • a)
-    : (Fintype.card ι : ℕ∞) * Module.length R (A ⧸ A'.comap A.subtype)
-      ≤ Module.length R (B ⧸ B'.comap B.subtype)
-        + (Fintype.card ι : ℕ∞) * Module.length R (A ⧸ C.comap A.subtype) := by
+    (hC : ∀ c ∈ C, c ∈ A → ∃ a ∈ A, c = n • a) :
+    (Fintype.card ι : ℕ∞) * Module.length R (A ⧸ A'.comap A.subtype) ≤
+      Module.length R (B ⧸ B'.comap B.subtype) +
+        (Fintype.card ι : ℕ∞) * Module.length R (A ⧸ C.comap A.subtype) := by
   have hs' : ∀ i, A'.comap A.subtype ≤ (B'.comap B.subtype).comap ((s i).restrict (hsA i)) := by
     intro i x hx
     rw [Submodule.mem_comap, Submodule.mem_comap, Submodule.subtype_apply,
@@ -89,8 +131,8 @@ theorem gg_core
     | H x =>
       dsimp only [sb, tb]
       rw [Submodule.mapQ_apply, Submodule.mapQ_apply]
-      have e
-          : ((t i).restrict (htB i)) (((s j).restrict (hsA j)) x) = if i = j then n • x else 0 := by
+      have e : ((t i).restrict (htB i)) (((s j).restrict (hsA j)) x) =
+          if i = j then n • x else 0 := by
         apply Subtype.ext
         rw [LinearMap.coe_restrict_apply, LinearMap.coe_restrict_apply, hts i j _ x.2]
         split_ifs <;> simp
@@ -98,14 +140,11 @@ theorem gg_core
       split_ifs <;> simp
   have k1 := gg_len_range n sb tb hb
   have k2 := gg_len_split (n • (LinearMap.id : (A ⧸ A'.comap A.subtype) →ₗ[R] _))
-  have k3
-      : Module.length R
-          ((A ⧸ A'.comap A.subtype) ⧸
-            LinearMap.range (n • (LinearMap.id : (A ⧸ A'.comap A.subtype) →ₗ[R] _)))
-        ≤ Module.length R (A ⧸ C.comap A.subtype) := by
-    let F
-        : (A ⧸ C.comap A.subtype) →ₗ[R] ((A ⧸ A'.comap A.subtype) ⧸
-          LinearMap.range (n • (LinearMap.id : (A ⧸ A'.comap A.subtype) →ₗ[R] _))) :=
+  have k3 : Module.length R ((A ⧸ A'.comap A.subtype) ⧸
+      LinearMap.range (n • (LinearMap.id : (A ⧸ A'.comap A.subtype) →ₗ[R] _))) ≤
+      Module.length R (A ⧸ C.comap A.subtype) := by
+    let F : (A ⧸ C.comap A.subtype) →ₗ[R] ((A ⧸ A'.comap A.subtype) ⧸
+      LinearMap.range (n • (LinearMap.id : (A ⧸ A'.comap A.subtype) →ₗ[R] _))) :=
       Submodule.liftQ _ ((Submodule.mkQ _) ∘ₗ (Submodule.mkQ _)) (by
         intro x hx
         obtain ⟨a, ha, hxa⟩ := hC _ hx x.2
@@ -128,58 +167,46 @@ end Abstract
 
 section Concrete
 
-variable
-  {K : Type} [Field K] [NumberField K] [StarRing K]
+variable {K : Type} [Field K] [NumberField K] [StarRing K]
   {Z : Type} [AddCommGroup Z] [Module K Z] [Module (𝓞 K) Z] [IsScalarTower (𝓞 K) K Z]
 
-noncomputable def ggE
-    {P : Type} [Group P] (ρ : Representation K P Z) (U : Subgroup P) [Fintype U] (ψ : P → 𝓞 K)
-    : Z →ₗ[K] Z :=
+noncomputable def ggE {P : Type} [Group P] (ρ : Representation K P Z) (U : Subgroup P) [Fintype U]
+    (ψ : P → 𝓞 K) : Z →ₗ[K] Z :=
   ∑ u : U, ((ψ ((u : P)⁻¹) : 𝓞 K) : K) • ρ (u : P)
 
-theorem ggE_apply
-    {P : Type} [Group P]
-    (ρ : Representation K P Z)
-    (U : Subgroup P) [Fintype U]
-    (ψ : P → 𝓞 K) (x : Z)
-    : ggE ρ U ψ x = ∑ u : U, ((ψ ((u : P)⁻¹) : 𝓞 K) : K) • ρ (u : P) x := by
+theorem ggE_apply {P : Type} [Group P] (ρ : Representation K P Z) (U : Subgroup P) [Fintype U]
+    (ψ : P → 𝓞 K) (x : Z) :
+    ggE ρ U ψ x = ∑ u : U, ((ψ ((u : P)⁻¹) : 𝓞 K) : K) • ρ (u : P) x := by
   simp [ggE, LinearMap.sum_apply]
 
-theorem gg_mem_eig
-    {P : Type} [Group P] (ρ : Representation K P Z) (U : Subgroup P) (ψ : P → 𝓞 K) (z : Z)
-    : z ∈ eig ρ U ψ ↔ ∀ u : U, ρ (u : P) z = ((ψ (u : P) : 𝓞 K) : K) • z := by
+theorem gg_mem_eig {P : Type} [Group P] (ρ : Representation K P Z) (U : Subgroup P)
+    (ψ : P → 𝓞 K) (z : Z) :
+    z ∈ eig ρ U ψ ↔ ∀ u : U, ρ (u : P) z = ((ψ (u : P) : 𝓞 K) : K) • z := by
   unfold eig
   rw [Submodule.mem_iInf]
   refine forall_congr' (fun u => ?_)
-  rw [LinearMap.mem_ker, LinearMap.sub_apply, LinearMap.smul_apply, LinearMap.id_apply, sub_eq_zero]
+  rw [LinearMap.mem_ker, LinearMap.sub_apply, LinearMap.smul_apply, LinearMap.id_apply,
+    sub_eq_zero]
 
-theorem ggE_mem_eig
-    {P : Type} [Group P]
-    (ρ : Representation K P Z)
-    (U : Subgroup P) [Fintype U]
-    (ψ : P → 𝓞 K) (hMk : IsMackey U ψ)
-    (x : Z)
-    : ggE ρ U ψ x ∈ eig ρ U ψ := by
+theorem ggE_mem_eig {P : Type} [Group P] (ρ : Representation K P Z) (U : Subgroup P) [Fintype U]
+    (ψ : P → 𝓞 K) (hMk : IsMackey U ψ) (x : Z) : ggE ρ U ψ x ∈ eig ρ U ψ := by
   obtain ⟨hone, hmul, -⟩ := hMk
   rw [gg_mem_eig]
   intro u0
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [ggE_apply, map_sum, Finset.smul_sum]
+
+  rw [ggE_apply, map_sum, Finset.smul_sum]
   refine Fintype.sum_equiv (Equiv.mulLeft u0) _ _ (fun u => ?_)
   simp only [Equiv.coe_mulLeft, Subgroup.coe_mul, mul_inv_rev]
-  rw [map_smul, hmul _ (U.inv_mem u.2) _ (U.inv_mem u0.2), smul_smul, map_mul, Module.End.mul_apply]
+  rw [map_smul, hmul _ (U.inv_mem u.2) _ (U.inv_mem u0.2), smul_smul, map_mul,
+    Module.End.mul_apply]
   congr 1
   have h1 : ψ (u0 : P)⁻¹ * ψ (u0 : P) = 1 := by
     rw [← hmul _ (U.inv_mem u0.2) _ u0.2, inv_mul_cancel, hone]
   rw [← map_mul, mul_comm, mul_assoc, h1, mul_one]
 
-theorem ggE_eig
-    {P : Type} [Group P]
-    (ρ : Representation K P Z)
-    (U : Subgroup P) [Fintype U]
-    (ψ : P → 𝓞 K) (hMk : IsMackey U ψ)
-    (z : Z) (hz : z ∈ eig ρ U ψ)
-    : ggE ρ U ψ z = ((Fintype.card U : ℕ) : K) • z := by
+theorem ggE_eig {P : Type} [Group P] (ρ : Representation K P Z) (U : Subgroup P) [Fintype U]
+    (ψ : P → 𝓞 K) (hMk : IsMackey U ψ) (z : Z) (hz : z ∈ eig ρ U ψ) :
+    ggE ρ U ψ z = ((Fintype.card U : ℕ) : K) • z := by
   obtain ⟨hone, hmul, -⟩ := hMk
   rw [ggE_apply]
   have : ∀ u : U, ((ψ ((u : P)⁻¹) : 𝓞 K) : K) • ρ (u : P) z = z := by
@@ -189,37 +216,29 @@ theorem ggE_eig
   rw [Finset.sum_congr rfl (fun u _ => this u)]
   simp [Nat.cast_smul_eq_nsmul]
 
-theorem ggE_stable
-    {P : Type} [Group P]
-    (ρ : Representation K P Z)
-    (U : Subgroup P) [Fintype U]
-    (ψ : P → 𝓞 K)
-    (L : Submodule (𝓞 K) Z) (hst : ∀ g : P, L.map ((ρ g).restrictScalars (𝓞 K)) ≤ L)
-    (x : Z) (hx : x ∈ L)
-    : ggE ρ U ψ x ∈ L := by
+theorem ggE_stable {P : Type} [Group P] (ρ : Representation K P Z) (U : Subgroup P) [Fintype U]
+    (ψ : P → 𝓞 K) (L : Submodule (𝓞 K) Z)
+    (hst : ∀ g : P, L.map ((ρ g).restrictScalars (𝓞 K)) ≤ L) (x : Z) (hx : x ∈ L) :
+    ggE ρ U ψ x ∈ L := by
   rw [ggE_apply]
   refine Submodule.sum_mem _ (fun u _ => ?_)
   rw [algebraMap_smul]
   exact L.smul_mem _ (hst _ ⟨x, hx, rfl⟩)
 
-theorem mapsTo_locP
-    {R W : Type*} [CommRing R] [AddCommGroup W] [Module R W]
-    (p : Ideal R) [p.IsPrime]
-    (f : W →ₗ[R] W) (X Y : Submodule R W) (h : ∀ x ∈ X, f x ∈ Y)
-    : ∀ x ∈ Formalism.HermitianLatticesTheory.localization₂ p X,
-      f x ∈ Formalism.HermitianLatticesTheory.localization₂ p Y := by
+theorem mapsTo_locP {R W : Type*} [CommRing R] [AddCommGroup W] [Module R W] (p : Ideal R)
+    [p.IsPrime] (f : W →ₗ[R] W) (X Y : Submodule R W) (h : ∀ x ∈ X, f x ∈ Y) :
+    ∀ x ∈ Formalism.HermitianLatticesTheory.localization₂ p X, f x ∈ Formalism.HermitianLatticesTheory.localization₂ p Y := by
   rintro x ⟨s, hs, hx⟩
   exact ⟨s, hs, by rw [← map_smul]; exact h _ hx⟩
 
-theorem gg_lix_of_le (w : HeightOneSpectrum (𝓞 K)) (A B : Submodule (𝓞 K) Z) (h : B ≤ A)
-    : lix w A B = (Formalism.HermitianLatticesTheory.locLen w.asIdeal A B : ℤ) := by
+theorem gg_lix_of_le (w : HeightOneSpectrum (𝓞 K)) (A B : Submodule (𝓞 K) Z) (h : B ≤ A) :
+    lix w A B = (Formalism.HermitianLatticesTheory.locLen w.asIdeal A B : ℤ) := by
   unfold lix Formalism.HermitianLatticesTheory.lidx
   rw [inf_eq_right.mpr h, Formalism.HermitianLatticesTheory.indexBasic_locLen_self]
   simp
 
-theorem gg_isLatIn_cut
-    [FiniteDimensional K Z] (W : Submodule K Z) (B : Submodule (𝓞 K) Z) (hB : IsLatIn ⊤ B)
-    : IsLatIn W (cut W B) := by
+theorem gg_isLatIn_cut [FiniteDimensional K Z] (W : Submodule K Z) (B : Submodule (𝓞 K) Z)
+    (hB : IsLatIn ⊤ B) : IsLatIn W (cut W B) := by
   constructor
   · have hno : IsNoetherian (𝓞 K) B := isNoetherian_of_fg_of_noetherian B hB.1
     have h1 : ((cut W B).comap B.subtype).FG := IsNoetherian.noetherian _
@@ -233,8 +252,7 @@ theorem gg_isLatIn_cut
       exact hx.2
     · intro z hz
       have htop := Formalism.HermitianLatticesTheory.indexBasic_locS_top (K := K) B hB.2
-      have hz' : z ∈ Formalism.HermitianLatticesTheory.locS (nonZeroDivisors (𝓞 K)) B := by
-        rw [htop]; trivial
+      have hz' : z ∈ Formalism.HermitianLatticesTheory.locS (nonZeroDivisors (𝓞 K)) B := by rw [htop]; trivial
       obtain ⟨d, hd, hdz⟩ := hz'
       have hd0 : (d : K) ≠ 0 := by
         have := nonZeroDivisors.ne_zero hd
@@ -268,9 +286,8 @@ theorem lemmaGG_of (hSc : IdxScaleIn) : LemmaGG := by
     intro i j h
     have := QuotientGroup.eq.mpr h
     rwa [QuotientGroup.out_eq', QuotientGroup.out_eq'] at this
-  have hkey
-      : ∀ i j, ∀ a ∈ W,
-        ggE ρ U ψ (ρ (rep i)⁻¹ (ρ (rep j) a)) = if i = j then (N : K) • a else 0 := by
+  have hkey : ∀ i j, ∀ a ∈ W, ggE ρ U ψ (ρ (rep i)⁻¹ (ρ (rep j) a)) =
+      if i = j then (N : K) • a else 0 := by
     intro i j a ha
     have e0 : ρ (rep i)⁻¹ (ρ (rep j) a) = ρ ((rep i)⁻¹ * rep j) a := by
       rw [map_mul, Module.End.mul_apply]
@@ -290,9 +307,9 @@ theorem lemmaGG_of (hSc : IdxScaleIn) : LemmaGG := by
       rw [Submodule.mem_bot]
       ext i
       have h1 : ggE ρ U ψ (ρ (rep i)⁻¹ (S f)) = (N : K) • (f i : Z) := by
-        set_option synthInstance.maxHeartbeats 100000 in
-          simp only [S, LinearMap.sum_apply, LinearMap.comp_apply, LinearMap.proj_apply,
-            Submodule.subtype_apply, map_sum]
+
+        simp only [S, LinearMap.sum_apply, LinearMap.comp_apply, LinearMap.proj_apply,
+        Submodule.subtype_apply, map_sum]
         rw [Finset.sum_congr rfl (fun j _ => hkey i j _ (f j).2)]
         simp
       rw [hf, map_zero, map_zero] at h1
@@ -305,10 +322,7 @@ theorem lemmaGG_of (hSc : IdxScaleIn) : LemmaGG := by
   have hp : w.asIdeal.IsPrime := w.isPrime
   let s : P ⧸ U → Z →ₗ[𝓞 K] Z := fun i => (ρ (rep i)).restrictScalars (𝓞 K)
   let t : P ⧸ U → Z →ₗ[𝓞 K] Z := fun i => (ggE ρ U ψ ∘ₗ ρ (rep i)⁻¹).restrictScalars (𝓞 K)
-  have hlocW
-      : ∀ L : Submodule (𝓞 K) Z,
-        ∀ a ∈ Formalism.HermitianLatticesTheory.localization₂ w.asIdeal (cut W L),
-          a ∈ W := by
+  have hlocW : ∀ L : Submodule (𝓞 K) Z, ∀ a ∈ Formalism.HermitianLatticesTheory.localization₂ w.asIdeal (cut W L), a ∈ W := by
     rintro L a ⟨σ, hσ, ha⟩
     have hσ0 : (σ : K) ≠ 0 := by
       have : σ ≠ 0 := fun h => hσ (by rw [h]; exact w.asIdeal.zero_mem)
@@ -317,62 +331,55 @@ theorem lemmaGG_of (hSc : IdxScaleIn) : LemmaGG := by
       rw [← algebraMap_smul K σ a, smul_smul, inv_mul_cancel₀ hσ0, one_smul]
     rw [e]
     exact W.smul_mem _ ha.2
-  have hcore :=
-    gg_core (N : 𝓞 K) (Formalism.HermitianLatticesTheory.localization₂ w.asIdeal (cut W B))
-      (Formalism.HermitianLatticesTheory.localization₂ w.asIdeal (cut W B'))
-      (Formalism.HermitianLatticesTheory.localization₂ w.asIdeal (sc (N : K) (cut W B)))
-      (Formalism.HermitianLatticesTheory.localization₂ w.asIdeal B)
-      (Formalism.HermitianLatticesTheory.localization₂ w.asIdeal B') s t
-      (fun i => mapsTo_locP _ _ _ _ (fun x hx => hst _ ⟨x, hx.1, rfl⟩))
-      (fun i => mapsTo_locP _ _ _ _ (fun x hx => hst' _ ⟨x, hx.1, rfl⟩))
-      (fun i =>
-        mapsTo_locP _ _ _ _ (fun x hx =>
-          ⟨ggE_stable ρ U ψ B hst _ (hst _ ⟨x, hx, rfl⟩), hW ▸ ggE_mem_eig ρ U ψ hMk _⟩))
-      (fun i =>
-        mapsTo_locP _ _ _ _ (fun x hx =>
-          ⟨ggE_stable ρ U ψ B' hst' _ (hst' _ ⟨x, hx, rfl⟩), hW ▸ ggE_mem_eig ρ U ψ hMk _⟩))
-      (by
-        intro i j a ha
-        have := hkey i j a (hlocW B a ha)
-        have e : ((N : 𝓞 K)) • a = (N : K) • a := by
-          rw [← algebraMap_smul K (N : 𝓞 K) a, map_natCast]
-        rw [e]
-        exact this)
-      (by
-        rintro c ⟨σ, hσ, hc⟩ -
-        obtain ⟨y, hy, hyc⟩ := hc
-        have hσ0 : (σ : K) ≠ 0 := by
-          have : σ ≠ 0 := fun h => hσ (by rw [h]; exact w.asIdeal.zero_mem)
-          exact_mod_cast this
-        refine ⟨(σ : K)⁻¹ • y, ⟨σ, hσ, ?_⟩, ?_⟩
-        · rw [← algebraMap_smul K σ, smul_smul, mul_inv_cancel₀ hσ0, one_smul]
-          exact hy
-        · have hyc' : (N : K) • y = (σ : K) • c := by
-            rw [algebraMap_smul]
-            simpa using hyc
-          rw [← algebraMap_smul K (N : 𝓞 K), map_natCast, smul_comm, hyc', smul_smul,
-            inv_mul_cancel₀ hσ0, one_smul])
+  have hcore := gg_core (N : 𝓞 K) (Formalism.HermitianLatticesTheory.localization₂ w.asIdeal (cut W B))
+    (Formalism.HermitianLatticesTheory.localization₂ w.asIdeal (cut W B')) (Formalism.HermitianLatticesTheory.localization₂ w.asIdeal (sc (N : K) (cut W B)))
+    (Formalism.HermitianLatticesTheory.localization₂ w.asIdeal B) (Formalism.HermitianLatticesTheory.localization₂ w.asIdeal B') s t
+    (fun i => mapsTo_locP _ _ _ _ (fun x hx => hst _ ⟨x, hx.1, rfl⟩))
+    (fun i => mapsTo_locP _ _ _ _ (fun x hx => hst' _ ⟨x, hx.1, rfl⟩))
+    (fun i => mapsTo_locP _ _ _ _ (fun x hx =>
+      ⟨ggE_stable ρ U ψ B hst _ (hst _ ⟨x, hx, rfl⟩), hW ▸ ggE_mem_eig ρ U ψ hMk _⟩))
+    (fun i => mapsTo_locP _ _ _ _ (fun x hx =>
+      ⟨ggE_stable ρ U ψ B' hst' _ (hst' _ ⟨x, hx, rfl⟩), hW ▸ ggE_mem_eig ρ U ψ hMk _⟩))
+    (by
+      intro i j a ha
+      have := hkey i j a (hlocW B a ha)
+      have e : ((N : 𝓞 K)) • a = (N : K) • a := by
+        rw [← algebraMap_smul K (N : 𝓞 K) a, map_natCast]
+      rw [e]
+      exact this)
+    (by
+      rintro c ⟨σ, hσ, hc⟩ -
+      obtain ⟨y, hy, hyc⟩ := hc
+      have hσ0 : (σ : K) ≠ 0 := by
+        have : σ ≠ 0 := fun h => hσ (by rw [h]; exact w.asIdeal.zero_mem)
+        exact_mod_cast this
+      refine ⟨(σ : K)⁻¹ • y, ⟨σ, hσ, ?_⟩, ?_⟩
+      · rw [← algebraMap_smul K σ, smul_smul, mul_inv_cancel₀ hσ0, one_smul]
+        exact hy
+      · have hyc' : (N : K) • y = (σ : K) • c := by
+          rw [algebraMap_smul]
+          simpa using hyc
+        rw [← algebraMap_smul K (N : 𝓞 K), map_natCast, smul_comm, hyc', smul_smul,
+          inv_mul_cancel₀ hσ0, one_smul])
 
   have hA := gg_isLatIn_cut W B hB
   obtain ⟨d, hd, hdB⟩ : ∃ d ∈ nonZeroDivisors (𝓞 K), ∀ x ∈ B, d • x ∈ B' := by
     apply Formalism.HermitianLatticesTheory.indexBasic_denom _ B B' hB.1
     rw [Formalism.HermitianLatticesTheory.indexBasic_locS_top (K := K) B' hB'.2]
     exact le_top
-  have f1 :=
-    Module.length_ne_top_iff.mpr (Formalism.HermitianLatticesTheory.indexBasic_finLen w.asIdeal B B'
-      hB.1 hd hdB)
-  have f2 :=
-    Module.length_ne_top_iff.mpr (Formalism.HermitianLatticesTheory.indexBasic_finLen w.asIdeal
-      (cut W B) (cut W B') hA.1 hd
-      (fun x hx => ⟨hdB x hx.1, (W.restrictScalars (𝓞 K)).smul_mem d hx.2⟩))
+  have f1 := Module.length_ne_top_iff.mpr
+    (Formalism.HermitianLatticesTheory.indexBasic_finLen w.asIdeal B B' hB.1 hd hdB)
+  have f2 := Module.length_ne_top_iff.mpr
+    (Formalism.HermitianLatticesTheory.indexBasic_finLen w.asIdeal (cut W B) (cut W B') hA.1 hd (fun x hx =>
+      ⟨hdB x hx.1, (W.restrictScalars (𝓞 K)).smul_mem d hx.2⟩))
   have hNnz : (N : 𝓞 K) ∈ nonZeroDivisors (𝓞 K) :=
     mem_nonZeroDivisors_of_ne_zero (Nat.cast_ne_zero.mpr hN0)
   have eN : ∀ x : Z, (N : 𝓞 K) • x = (N : K) • x := by
     intro x
     rw [← algebraMap_smul K (N : 𝓞 K) x, map_natCast]
-  have f3 :=
-    Module.length_ne_top_iff.mpr (Formalism.HermitianLatticesTheory.indexBasic_finLen w.asIdeal
-      (cut W B) (sc (N : K) (cut W B)) hA.1 hNnz (fun x hx => ⟨x, hx, by rw [eN]; rfl⟩))
+  have f3 := Module.length_ne_top_iff.mpr
+    (Formalism.HermitianLatticesTheory.indexBasic_finLen w.asIdeal (cut W B) (sc (N : K) (cut W B)) hA.1 hNnz
+      (fun x hx => ⟨x, hx, by rw [eN]; rfl⟩))
   have hscle : sc (N : K) (cut W B) ≤ cut W B := by
     rintro x ⟨y, hy, rfl⟩
     have : ((N : K) • (LinearMap.id : Z →ₗ[K] Z)).restrictScalars (𝓞 K) y = (N : 𝓞 K) • y := by
@@ -380,29 +387,18 @@ theorem lemmaGG_of (hSc : IdxScaleIn) : LemmaGG := by
     rw [this]
     exact (cut W B).smul_mem _ hy
   obtain ⟨-, hsc⟩ := hSc K Z w W (cut W B) (cut W B) hA hA (N : K) hNK
-  rw [gg_lix_of_le w _ _ hscle, gg_lix_of_le w _ _ le_rfl,
-      Formalism.HermitianLatticesTheory.indexBasic_locLen_self]
-    at hsc
+  rw [gg_lix_of_le w _ _ hscle, gg_lix_of_le w _ _ le_rfl, Formalism.HermitianLatticesTheory.indexBasic_locLen_self] at hsc
   have hcutle : cut W B' ≤ cut W B := inf_le_inf_right _ hle
   rw [gg_lix_of_le w (cut W B) (cut W B') hcutle, gg_lix_of_le w _ _ hle]
   unfold Formalism.HermitianLatticesTheory.locLen at hsc ⊢
   revert hcore hsc
-  generalize Module.length (𝓞 K)
-        (↥(Formalism.HermitianLatticesTheory.localization₂ w.asIdeal B) ⧸
-          (Formalism.HermitianLatticesTheory.localization₂ w.asIdeal B').comap (Formalism.HermitianLatticesTheory.localization₂ w.asIdeal B).subtype)
-      = l1
-    at f1 ⊢
-  generalize Module.length (𝓞 K)
-        (↥(Formalism.HermitianLatticesTheory.localization₂ w.asIdeal (cut W B)) ⧸
-          (Formalism.HermitianLatticesTheory.localization₂ w.asIdeal (cut W B')).comap (Formalism.HermitianLatticesTheory.localization₂ w.asIdeal (cut W B)).subtype)
-      = l2
-    at f2 ⊢
-  generalize Module.length (𝓞 K)
-        (↥(Formalism.HermitianLatticesTheory.localization₂ w.asIdeal (cut W B)) ⧸
-          (Formalism.HermitianLatticesTheory.localization₂ w.asIdeal (sc (N : K) (cut W B))).comap
-            (Formalism.HermitianLatticesTheory.localization₂ w.asIdeal (cut W B)).subtype)
-      = l3
-    at f3 ⊢
+  generalize Module.length (𝓞 K) (↥(Formalism.HermitianLatticesTheory.localization₂ w.asIdeal B) ⧸
+    (Formalism.HermitianLatticesTheory.localization₂ w.asIdeal B').comap (Formalism.HermitianLatticesTheory.localization₂ w.asIdeal B).subtype) = l1 at f1 ⊢
+  generalize Module.length (𝓞 K) (↥(Formalism.HermitianLatticesTheory.localization₂ w.asIdeal (cut W B)) ⧸
+    (Formalism.HermitianLatticesTheory.localization₂ w.asIdeal (cut W B')).comap (Formalism.HermitianLatticesTheory.localization₂ w.asIdeal (cut W B)).subtype) = l2 at f2 ⊢
+  generalize Module.length (𝓞 K) (↥(Formalism.HermitianLatticesTheory.localization₂ w.asIdeal (cut W B)) ⧸
+    (Formalism.HermitianLatticesTheory.localization₂ w.asIdeal (sc (N : K) (cut W B))).comap
+      (Formalism.HermitianLatticesTheory.localization₂ w.asIdeal (cut W B)).subtype) = l3 at f3 ⊢
   intro hcore hsc
   lift l1 to ℕ using f1
   lift l2 to ℕ using f2

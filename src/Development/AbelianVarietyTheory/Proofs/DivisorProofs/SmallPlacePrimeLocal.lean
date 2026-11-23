@@ -1,20 +1,56 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsSystemOf
+public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.ContinuousMapPFin
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsUnitaryTransferPosDef
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.StableComplementSecondPolynomial
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ThetaIntegrandIntegrable
-public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.ThetaLiftLevelsGoodPrimesProperties
 public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.SphericalHeckeConjPlaceEqDualLabel
-public import Formalism.LocalToGlobal.IndefiniteReal.IsThPKernelSigBase
+public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.ThetaLiftLevelsGoodPrimesProperties
 public import Development.AutomorphicArithmetic.DivisorFrames.ExistsInvariantPosDefHermitianFormAutFormUnitary
 public import Development.AutomorphicArithmetic.DivisorFrames.ExistsNonzeroVectorValuedEigenformUnitary
-public import Development.AutomorphicArithmetic.DivisorFrames.VectorValuedAutFormEquivariantInfiniteComponent
+public import Development.AutomorphicArithmetic.DivisorFrames.ExistsSphericalHeckeRepSplitLabelOfOffLevelPlace
 public import Development.AutomorphicArithmetic.DivisorFrames.ExistsUnitaryAutomorphicFormOfWeightVectorValued
 public import Development.AutomorphicArithmetic.DivisorFrames.LevChiEqOneOfGoodPlace
-public import Development.AutomorphicArithmetic.DivisorFrames.ExistsSphericalHeckeRepSplitLabelOfOffLevelPlace
-public import Development.AutomorphicArithmetic.DivisorFrames.GoodPlaceOfTwistPlaceDividing
+public import Development.AutomorphicArithmetic.DivisorFrames.VectorValuedAutFormEquivariantInfiniteComponent
+public import Formalism.LocalToGlobal.IndefiniteReal.IsThPKernelSigBase
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+public import Development.AbelianVarietyTheory.Definitions.Divisors.HasBlockOfOccurs
+public import Development.AbelianVarietyTheory.Definitions.Divisors.LiftFrameEmbeddingBase
+public import Development.AbelianVarietyTheory.Definitions.GaloisGeometry.NormalFam
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsSystemOf
 
 @[expose] public section
 
@@ -49,7 +85,6 @@ private theorem places_inj
   · exact h.1 (hi _ _ e)
   · exact absurd (hi _ _ ((emb_cj io _).trans e)) (h.2.1 τ τ')
 
-set_option maxHeartbeats 1600000 in
 private theorem finiteRing_sq_sub_mul_sq_eq_of_card
     {D : D7} {L : SizeData₂ D} {hT : GatTies D} {Gi : Formalism.MainNotions.G.Inst D L}
     {Gl : Formalism.MainNotions.G.LatInst D} {Kc : Formalism.MainNotions.G.Consts} {Y : DivX D}
@@ -195,6 +230,6 @@ private theorem finiteRing_sq_sub_mul_sq_eq_of_card
     (fun γ hγ => ((hTr.2.2.2.2.2.2.2 _ _ R hR).1 γ hγ).1.1)
     fun g => ?_
   simp only [htr, MulEquiv.apply_symm_apply]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [← map_sum, hRs _ Fm hFr, hA, ← map_smul]
+
+  rw [← map_sum, hRs _ Fm hFr, hA, ← map_smul]
   exact congrArg A (hFh i hloc _)

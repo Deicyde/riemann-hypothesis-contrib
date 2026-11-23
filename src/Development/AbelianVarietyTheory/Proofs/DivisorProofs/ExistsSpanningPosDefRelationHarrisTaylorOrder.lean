@@ -1,19 +1,65 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.RosatiFor
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.SabComp
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.AdjugateGramSymm
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.TraceCompPosOfAdjoint
+public import Development.AbelianVarietyTheory.Definitions.Divisors.NotCompactOfMEqOne
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.HarrisTaylorOrderFaithfulLatticeStatement
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IntegralCasimirElementCentralStatement
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IntegralCasimirElementMulPosStatement
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.TraceCompPosOfAdjoint
+import Mathlib.Algebra.Module.StablyFree.Basic
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Real
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+public import Mathlib.LinearAlgebra.Basis.MulOpposite
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Etale.Weakly
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.TotallySplit
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Development.AbelianVarietyTheory.PublishedTheorems.AutomorphicForms₂.SiegelToroidalIntegral
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
-  NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
-  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.SiegelTor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.SiegelTor
 
 namespace GlobalTheory.CasimirOrder
 
@@ -21,14 +67,13 @@ open Matrix
 
 variable {O : Type} [Ring O] {r : ℕ}
 
-theorem exists_W_of_casimir
-    (x : Module.Basis (Fin r) ℤ O) (s : O →+ O) (φ : O →+ ℤ)
+theorem exists_W_of_casimir (x : Module.Basis (Fin r) ℤ O) (s : O →+ O) (φ : O →+ ℤ)
     (hs : ∀ a b, s (a * b) = s b * s a) (hss : ∀ a, s (s a) = a) (hφs : ∀ a, φ (s a) = φ a)
-    (hp : ∀ a, a ≠ 0 → 0 < φ (s a * a)) (hcen : ∀ a, a * casimir x s φ = casimir x s φ * a)
-    (hpos : ∀ u, u ≠ 0 → 0 < φ (s (casimir x s φ * u) * u))
-    : ∃ (W : Matrix (Fin r) (Fin r) ℤ) (d : ℕ),
-      ((W + Wᵀ).map (Int.cast : ℤ → ℝ)).PosDef ∧ 0 < d
-        ∧ ∑ i, ∑ j, W i j • (s (x i) * x j) = (d : O) := by
+    (hp : ∀ a, a ≠ 0 → 0 < φ (s a * a))
+    (hcen : ∀ a, a * casimir x s φ = casimir x s φ * a)
+    (hpos : ∀ u, u ≠ 0 → 0 < φ (s (casimir x s φ * u) * u)) :
+    ∃ (W : Matrix (Fin r) (Fin r) ℤ) (d : ℕ), ((W + Wᵀ).map (Int.cast : ℤ → ℝ)).PosDef ∧ 0 < d ∧
+      ∑ i, ∑ j, W i j • (s (x i) * x j) = (d : O) := by
   classical
   set C := casimir x s φ with hC
   have sC : s C = C := casimir_star hs hss hφs
@@ -79,10 +124,8 @@ theorem exists_W_of_casimir
     rw [← gram_eq] at h
     simpa only [form_apply] using h
   set C₁ : O := ∑ i, ∑ j, A' i j • (s (x i) * x j) with hC₁
-  have lhs
-      : G'.det • C
-        = ∑ k, ∑ l, ∑ i, ∑ j,
-          (A k l * (A' i j * φ (s (x i) * C * x l))) • (s (x k) * x j) := by
+  have lhs : G'.det • C = ∑ k, ∑ l, ∑ i, ∑ j,
+      (A k l * (A' i j * φ (s (x i) * C * x l))) • (s (x k) * x j) := by
     conv_lhs => rw [hC, casimir]
     simp only [Finset.smul_sum]
     refine Finset.sum_congr rfl fun k _ => Finset.sum_congr rfl fun l _ => ?_
@@ -91,38 +134,33 @@ theorem exists_W_of_casimir
     rw [Finset.mul_sum, Finset.smul_sum]
     refine Finset.sum_congr rfl fun j _ => ?_
     rw [mul_smul_comm, smul_smul]
-  have rhs
-      : C * (G.det • C₁)
-        = ∑ i, ∑ j, ∑ a, ∑ b,
-          (A' i j * (A a b * φ (s (x a) * (C * x i)))) • (s (x b) * x j) := by
+  have rhs : C * (G.det • C₁) = ∑ i, ∑ j, ∑ a, ∑ b,
+      (A' i j * (A a b * φ (s (x a) * (C * x i)))) • (s (x b) * x j) := by
     rw [hC₁, Finset.smul_sum, Finset.mul_sum]
     refine Finset.sum_congr rfl fun i _ => ?_
     rw [Finset.smul_sum, Finset.mul_sum]
     refine Finset.sum_congr rfl fun j _ => ?_
     have e : C * (G.det • (A' i j • (s (x i) * x j))) = A' i j • (s (G.det • (C * x i)) * x j) := by
-      rw [mul_smul_comm, mul_smul_comm, map_zsmul, smul_mul_assoc, hs, sC, smul_comm,
-        ← _root_.mul_assoc, ← hcen]
+      rw [mul_smul_comm, mul_smul_comm, map_zsmul, smul_mul_assoc, hs, sC, smul_comm, ← _root_.mul_assoc,
+        ← hcen]
     rw [e, L1 (C * x i)]
-    set_option synthInstance.maxHeartbeats 100000 in
+
     simp only [map_sum, map_zsmul, Finset.sum_mul, smul_mul_assoc, Finset.smul_sum, smul_smul]
-  have swap4
-      : ∀ f : Fin r → Fin r → Fin r → Fin r → O,
-        ∑ k, ∑ l, ∑ i, ∑ j, f k l i j = ∑ i, ∑ j, ∑ l, ∑ k, f k l i j := by
+  have swap4 : ∀ f : Fin r → Fin r → Fin r → Fin r → O,
+      ∑ k, ∑ l, ∑ i, ∑ j, f k l i j = ∑ i, ∑ j, ∑ l, ∑ k, f k l i j := by
     intro f
-    calc
-      ∑ k, ∑ l, ∑ i, ∑ j, f k l i j
-        = ∑ k, ∑ i, ∑ l, ∑ j, f k l i j := Finset.sum_congr rfl fun k _ => Finset.sum_comm
+    calc ∑ k, ∑ l, ∑ i, ∑ j, f k l i j = ∑ k, ∑ i, ∑ l, ∑ j, f k l i j :=
+          Finset.sum_congr rfl fun k _ => Finset.sum_comm
       _ = ∑ k, ∑ i, ∑ j, ∑ l, f k l i j :=
-        Finset.sum_congr rfl fun k _ => Finset.sum_congr rfl fun i _ => Finset.sum_comm
+          Finset.sum_congr rfl fun k _ => Finset.sum_congr rfl fun i _ => Finset.sum_comm
       _ = ∑ i, ∑ k, ∑ j, ∑ l, f k l i j := Finset.sum_comm
       _ = ∑ i, ∑ j, ∑ k, ∑ l, f k l i j := Finset.sum_congr rfl fun i _ => Finset.sum_comm
       _ = ∑ i, ∑ j, ∑ l, ∑ k, f k l i j :=
-        Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => Finset.sum_comm
+          Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => Finset.sum_comm
   have key : G'.det • C = C * (G.det • C₁) := by
     rw [lhs, rhs, swap4]
-    refine Finset.sum_congr rfl fun i _ =>
-      Finset.sum_congr rfl fun j _ =>
-        Finset.sum_congr rfl fun l _ => Finset.sum_congr rfl fun k _ => ?_
+    refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ =>
+      Finset.sum_congr rfl fun l _ => Finset.sum_congr rfl fun k _ => ?_
     have hb := b'symm (x i) (x l)
     simp only [form_apply, hs'a] at hb
     rw [hAs l k, ← _root_.mul_assoc (s (x l)), hb]
@@ -138,15 +176,13 @@ theorem exists_W_of_casimir
   refine ⟨G.det • A', G'.det.toNat, ?_, by omega, ?_⟩
   · have hadj : (G'.map (Int.cast : ℤ → ℝ)).adjugate = A'.map Int.cast := by
       rw [hA']; exact ((Int.castRingHom ℝ).map_adjugate G').symm
-    have e
-        : ((G.det • A' + (G.det • A')ᵀ).map (Int.cast : ℤ → ℝ))
-          = ((2 * G.det : ℤ) : ℝ) • (G'.map (Int.cast : ℤ → ℝ)).adjugate := by
+    have e : ((G.det • A' + (G.det • A')ᵀ).map (Int.cast : ℤ → ℝ)) =
+        ((2 * G.det : ℤ) : ℝ) • (G'.map (Int.cast : ℤ → ℝ)).adjugate := by
       rw [hadj]
       ext i j
-      simp only [Matrix.map_apply, Matrix.add_apply, Matrix.transpose_apply, Matrix.smul_apply,
-        smul_eq_mul, hA's j i]
-      push_cast
-      ring
+      simp only [Matrix.map_apply, Matrix.add_apply, Matrix.transpose_apply, Matrix.smul_apply, smul_eq_mul,
+        hA's j i]
+      push_cast; ring
     rw [e]
     exact (adjugate_posDef hG'pd).smul (by exact_mod_cast (by omega : (0 : ℤ) < 2 * G.det))
   · have e : ∑ i, ∑ j, (G.det • A') i j • (s (x i) * x j) = G.det • C₁ := by
@@ -171,18 +207,15 @@ noncomputable def htTrace (D : Datum p) : D.O →+ ℤ where
     have : DistribSMul.toLinearMap ℤ D.La (0 : D.O) = 0 := by ext y; exact zero_smul _ _
     rw [this, map_zero]
   map_add' a b := by
-    have : DistribSMul.toLinearMap ℤ D.La (a + b)
-        = DistribSMul.toLinearMap ℤ D.La a + DistribSMul.toLinearMap ℤ D.La b := by
+    have : DistribSMul.toLinearMap ℤ D.La (a + b) =
+        DistribSMul.toLinearMap ℤ D.La a + DistribSMul.toLinearMap ℤ D.La b := by
       ext y; exact add_smul _ _ _
     rw [this, map_add (f := _)]
 
 theorem htTrace_mul_comm (D : Datum p) (a b : D.O) : htTrace D (a * b) = htTrace D (b * a) := by
-  haveI := D.freeLa
-  haveI := D.finLa
-  have hm
-      : ∀ a b : D.O,
-        DistribSMul.toLinearMap ℤ D.La (a * b)
-          = DistribSMul.toLinearMap ℤ D.La a * DistribSMul.toLinearMap ℤ D.La b := by
+  haveI := D.freeLa; haveI := D.finLa
+  have hm : ∀ a b : D.O, DistribSMul.toLinearMap ℤ D.La (a * b) =
+      DistribSMul.toLinearMap ℤ D.La a * DistribSMul.toLinearMap ℤ D.La b := by
     intro a b; ext y; exact mul_smul _ _ _
   show LinearMap.trace ℤ D.La _ = LinearMap.trace ℤ D.La _
   rw [hm, hm, LinearMap.trace_mul_comm]
@@ -193,15 +226,14 @@ theorem htStar_mul (D : Datum p) (a b : D.O) : htStar D (a * b) = htStar D b * h
   change (D.star (a * b)).unop = (D.star b).unop * (D.star a).unop
   rw [map_mul, MulOpposite.unop_mul]
 
-theorem htStar_star (D : Datum p) (a : D.O) : htStar D (htStar D a) = a := by exact D.star_star a
+theorem htStar_star (D : Datum p) (a : D.O) : htStar D (htStar D a) = a := by
+  exact D.star_star a
 
 open scoped TensorProduct in
-theorem exists_W_datum (D : Datum p)
-    : ∃ (r : ℕ) (x : Module.Basis (Fin r) ℤ D.O) (W : Matrix (Fin r) (Fin r) ℤ) (d : ℕ),
-      ((W + W.transpose).map (Int.cast : ℤ → ℝ)).PosDef ∧ 0 < d
-        ∧ ∑ i, ∑ j, W i j • (htStar D (x i) * x j) = (d : D.O) := by
-  haveI := D.freeO
-  haveI := D.finO
+theorem exists_W_datum (D : Datum p) : ∃ (r : ℕ) (x : Module.Basis (Fin r) ℤ D.O) (W : Matrix (Fin r) (Fin r) ℤ)
+    (d : ℕ), ((W + W.transpose).map (Int.cast : ℤ → ℝ)).PosDef ∧ 0 < d ∧
+      ∑ i, ∑ j, W i j • (htStar D (x i) * x j) = (d : D.O) := by
+  haveI := D.freeO; haveI := D.finO
   have hs := htStar_mul D
   have hss := htStar_star D
   have hφs : ∀ a, htForm D (htStar D a) = htForm D a := by
@@ -211,16 +243,15 @@ theorem exists_W_datum (D : Datum p)
     simp only [htForm, AddMonoidHom.add_apply, AddMonoidHom.comp_apply, hs]
     rw [htTrace_mul_comm D a b, htTrace_mul_comm D (htStar D b)]
   have hp : ∀ a, a ≠ 0 → 0 < htForm D (htStar D a * a) := by
-    have trace_pos (x : D.O) (hx : x ≠ 0)
-        : 0 < LinearMap.trace ℤ D.La (DistribSMul.toLinearMap ℤ D.La (x * (D.star x).unop)) := by
+    have trace_pos (x : D.O) (hx : x ≠ 0) :
+        0 < LinearMap.trace ℤ D.La (DistribSMul.toLinearMap ℤ D.La (x * (D.star x).unop)) := by
       have := D.freeLa
       have := D.finLa
       obtain ⟨J, hJJ, hJinv, hpos, hcomm, -⟩ := D.dom
       let A : D.O → (ℝ ⊗[ℤ] D.La →ₗ[ℝ] ℝ ⊗[ℤ] D.La) := fun b =>
         (DistribSMul.toLinearMap ℤ D.La b).baseChange ℝ
-      have hcomp
-          : A x ∘ₗ A (D.star x).unop
-            = (DistribSMul.toLinearMap ℤ D.La (x * (D.star x).unop)).baseChange ℝ := by
+      have hcomp : A x ∘ₗ A (D.star x).unop =
+          (DistribSMul.toLinearMap ℤ D.La (x * (D.star x).unop)).baseChange ℝ := by
         clear hcomm hpos hJinv hJJ
         simp only [A]
         rw [← LinearMap.baseChange_comp]
@@ -252,24 +283,20 @@ theorem exists_W_datum (D : Datum p)
           simp only [map_add (f := _), LinearMap.add_apply]
           rw [hu, hw]
           ring
-      have hadjB
-          : ∀ b u v, D.EF.baseChange ℝ (A b u) v = D.EF.baseChange ℝ u (A (D.star b).unop v) := by
+      have hadjB : ∀ b u v, D.EF.baseChange ℝ (A b u) v = D.EF.baseChange ℝ u (A (D.star b).unop v) := by
         intro b u v
         induction u using TensorProduct.inductionOn with
         | tmul r y =>
           induction v using TensorProduct.inductionOn with
           | tmul s z =>
-            rw [hA, hA, LinearMap.BilinForm.baseChange_tmul, LinearMap.BilinForm.baseChange_tmul,
-              D.adj]
+            rw [hA, hA, LinearMap.BilinForm.baseChange_tmul, LinearMap.BilinForm.baseChange_tmul, D.adj]
           | add v w hv hw => simp only [map_add (f := _), hv, hw]
         | add u w hu hw => simp only [map_add (f := _), LinearMap.add_apply, hu, hw]
       have hsym : ∀ u v, D.EF.baseChange ℝ (J u) v = D.EF.baseChange ℝ (J v) u := by
         intro u v
         rw [← hJinv (J v) u, hJJ, map_neg, LinearMap.neg_apply, hanti v (J u), neg_neg]
-      have hadjg
-          : ∀ u v,
-            (D.EF.baseChange ℝ ∘ₗ J) (A x u) v
-              = (D.EF.baseChange ℝ ∘ₗ J) u (A (D.star x).unop v) := by
+      have hadjg : ∀ u v, (D.EF.baseChange ℝ ∘ₗ J) (A x u) v =
+          (D.EF.baseChange ℝ ∘ₗ J) u (A (D.star x).unop v) := by
         intro u v
         simp only [LinearMap.comp_apply]
         rw [← LinearMap.comp_apply J (A x), hAJ, LinearMap.comp_apply, hadjB]
@@ -282,18 +309,16 @@ theorem exists_W_datum (D : Datum p)
       have hT' : A (D.star x).unop ≠ 0 := by
         intro h0
         apply hx
-        have hz : ∀ y : D.La, (D.star x).unop • y = 0 := fun y =>
-          hinj _ (by
-            have := LinearMap.congr_fun h0 ((1 : ℝ) ⊗ₜ y)
-            rwa [hA, LinearMap.zero_apply] at this)
+        have hz : ∀ y : D.La, (D.star x).unop • y = 0 := fun y => hinj _ (by
+          have := LinearMap.congr_fun h0 ((1 : ℝ) ⊗ₜ y)
+          rwa [hA, LinearMap.zero_apply] at this)
         have h1 := GlobalTheory.T.harrisTaylor_order_faithful_lattice p D _ hz
         rw [← D.star_star x, h1]
         simp
-      have htr :=
-        trace_comp_pos_of_adjoint (D.EF.baseChange ℝ ∘ₗ J)
-          (fun u v => by simp only [LinearMap.comp_apply]; exact hsym u v)
-          (fun u hu => by simpa only [LinearMap.comp_apply] using hpos u hu)
-          (A x) (A (D.star x).unop) hadjg hT'
+      have htr := trace_comp_pos_of_adjoint (D.EF.baseChange ℝ ∘ₗ J)
+        (fun u v => by simp only [LinearMap.comp_apply]; exact hsym u v)
+        (fun u hu => by simpa only [LinearMap.comp_apply] using hpos u hu)
+        (A x) (A (D.star x).unop) hadjg hT'
       rw [hcomp, LinearMap.trace_baseChange] at htr
       simpa using htr
     intro a ha
@@ -301,28 +326,20 @@ theorem exists_W_datum (D : Datum p)
     have h' : htTrace D (htStar D a * a) = htTrace D (a * htStar D a) := htTrace_mul_comm D _ _
     have h'' : 0 < htTrace D (a * htStar D a) := trace_pos a ha
     omega
-  exact ⟨
-    _,
-    Module.finBasis ℤ D.O,
-    exists_W_of_casimir (Module.finBasis ℤ D.O) (htStar D) (htForm D) hs hss hφs hp
-      (GlobalTheory.T.integralCasimirElement_central _ _ _ hs hss hφc hφs hp)
-      (GlobalTheory.T.integralCasimirElement_mul_pos _ _ _ hs hss hφc hφs hp)
-  ⟩
+  exact ⟨_, Module.finBasis ℤ D.O, exists_W_of_casimir (Module.finBasis ℤ D.O) (htStar D) (htForm D) hs hss hφs hp
+    (GlobalTheory.T.integralCasimirElement_central _ _ _ hs hss hφc hφs hp) (GlobalTheory.T.integralCasimirElement_mul_pos _ _ _ hs hss hφc hφs hp)⟩
 
 end GlobalTheory.CasimirOrder
 
-theorem GlobalTheory.CasimirOrder.exists_posdef_relation
-    : ∀ (p : ℕ) [Fact p.Prime] (D : Datum p),
-      ∃ (r : ℕ) (e : Fin r → D.Oᵐᵒᵖ) (W : Matrix (Fin r) (Fin r) ℤ) (d : ℕ),
-        Submodule.span ℤ (Set.range e) = ⊤ ∧ ((W + W.transpose).map (Int.cast : ℤ → ℝ)).PosDef
-          ∧ 0 < d
-          ∧ ∑ i, ∑ j, W i j • (e j * MulOpposite.op ((D.star (e i).unop).unop)) = (d : D.Oᵐᵒᵖ) := by
+theorem GlobalTheory.CasimirOrder.exists_posdef_relation : ∀ (p : ℕ) [Fact p.Prime] (D : Datum p), ∃ (r : ℕ) (e : Fin r → D.Oᵐᵒᵖ) (W : Matrix (Fin r) (Fin r) ℤ) (d : ℕ), Submodule.span ℤ (Set.range e) = ⊤ ∧ ((W + W.transpose).map (Int.cast : ℤ → ℝ)).PosDef ∧ 0 < d ∧ ∑ i, ∑ j, W i j • (e j * MulOpposite.op ((D.star (e i).unop).unop)) = (d : D.Oᵐᵒᵖ) := by
   intro p _ D
   obtain ⟨r, x, W, d, hW, hd, hsum⟩ := GlobalTheory.CasimirOrder.exists_W_datum D
   refine ⟨_, fun i => MulOpposite.op (x i), W, d, ?_, hW, hd, ?_⟩
   · have h := x.mulOpposite.span_eq
     convert h using 3
-    all_goals first | exact Subsingleton.elim _ _ | (funext i; simp)
+    all_goals first
+      | exact Subsingleton.elim _ _
+      | (funext i; simp)
   · rw [← MulOpposite.op_natCast, ← hsum, Finset.op_sum]
     refine Finset.sum_congr rfl fun i _ => ?_
     rw [Finset.op_sum]

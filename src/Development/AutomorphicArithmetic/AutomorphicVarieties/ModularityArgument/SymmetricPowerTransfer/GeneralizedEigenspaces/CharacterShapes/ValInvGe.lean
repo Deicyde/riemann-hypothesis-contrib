@@ -1,5 +1,6 @@
 module
 
+public import Mathlib
 public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityArgument.SymmetricPowerTransfer.GeneralizedEigenspaces.CharacterShapes.HodgeTateFromSandwich
 public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityArgument.SymmetricPowerTransfer.GeneralizedEigenspaces.CharacterShapes.FiniteOrbits.ConjMemLevel
 public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityArgument.SymmetricPowerTransfer.GeneralizedEigenspaces.CharacterShapes.FiniteOrbits.DetRoot
@@ -168,7 +169,6 @@ variable {L : Type} [Field L] [NumberField L] [IsCMField L]
 
 def eS (B : Bridge L) : SA B.Δ ≃* ↥((SUA L).subgroupOf (finU (E := L) (n := 2))) := B.bS.trans eT
 
-set_option maxHeartbeats 2000000 in
 theorem left_eq
     (B : Bridge L) (hB : B.Ok)
     (p : UA L 2 →* finU (E := L) (n := 2))
@@ -252,7 +252,6 @@ theorem val_inv_ge
 
 variable {B : Bridge L}
 
-set_option maxHeartbeats 4000000 in
 theorem place_el
     (hB : B.Ok)
     (T : Spl B)

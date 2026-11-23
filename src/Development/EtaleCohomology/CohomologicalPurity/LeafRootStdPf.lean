@@ -2,7 +2,8 @@ module
 
 public import Development.EtaleCohomology.CohomologicalPurity.LeafRootPf
 public import Mathlib.RingTheory.Etale.StandardEtale
-public import Mathlib.RingTheory.RingHom.Etale
+import Mathlib.Tactic.Lemma
+import Mathlib.Tactic.Linter.HaveILetI
 
 @[expose] public section
 

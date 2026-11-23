@@ -1,13 +1,69 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.HasLabelOfIsCuspOf
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.SeriesIdempotentMulOfMapsToParabolicInduction
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.HarishChandraSeriesLabelExistsUniqueGLn
+public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.DetCharacterMemPrincipalCongruenceFixedVectors
+public import Development.AbelianVarietyTheory.Definitions.TwistedInnerProducts.IsSubquotientDetRepParInd
+public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.MemChainVecsDet
+public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.PadicIsNonarchimedeanLocalField
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.IntertwinerUnipotentInvariant
+import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.CentralIdempotentOfIrrCharacterOrthogonalCentralStatement
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.DepthZeroSupercuspidalCuspidalModule
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ValuationUnitsMapEqOne
+import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsCuspidalListHarishChandraPairingNeZeroStatement
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsUpperMulInc
+import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.FiniteIrrCharactersAndFinsumCentralIdempotentsEqStatement
+import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.HarishChandraSeriesCentralIdempotentLaws
+import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.HarishChandraSeriesLabelMulOfConstituentStatement
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.HasLabelOfIsCuspOf
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.HasSupportOfIsSubquotientProdIrr
+import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.MemPrincipalCongruenceFixedVectorsIff
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.SeriesIdempotentMulOfMapsToParabolicInduction
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ValuationUnitsMapEqOne
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.IwahoriProjSurjective
+import Development.AbelianVarietyTheory.Proofs.TwistedOperators.ParIndJacPlacing
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.LabelEqOfSuppAdds
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.CharInOfIsCharLab
 
 @[expose] public section
 
@@ -161,8 +217,8 @@ def sysOf (L : LabelDatum g) (h5 : 5 ≤ g) (hA : AllLab L) : Sys g where
       have := congrArg (fun z => ρ.asAlgebraHom z v) hv
       simpa only [map_mul, Module.End.mul_apply, hN, hA', hB, map_zero, LinearMap.zero_apply] using this
     have e : v = ∑ F ∈ S, ρ.asAlgebraHom (eSerC L (a + b) F) v := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [← LinearMap.sum_apply, ← map_sum, hS, map_one, Module.End.one_apply]
+
+      rw [← LinearMap.sum_apply, ← map_sum, hS, map_one, Module.End.one_apply]
     by_cases hm : f * f' ∈ S
     · rw [Finset.sum_eq_single_of_mem _ hm fun F _ hF => hz F hF] at e; exact e.symm
     · rw [Finset.sum_eq_zero fun F hF => hz F (by rintro rfl; exact hm hF)] at e; rw [e]; simp
@@ -276,10 +332,10 @@ theorem series_of_sep (S : Sys g) (a b : ℕ) (V : Type) [AddCommGroup V] [Modul
     intro m i u hu
     obtain ⟨R, hR⟩ := S.sum m
     have e : u = ∑ f ∈ R, (repK π).asAlgebraHom (mapDomainAlgHom ℂ ℂ i (S.e m f)) u := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [← LinearMap.sum_apply, ← map_sum, ← map_sum, hR, map_one, map_one, Module.End.one_apply]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [e, map_sum] at hu
+
+      rw [← LinearMap.sum_apply, ← map_sum, ← map_sum, hR, map_one, map_one, Module.End.one_apply]
+
+    rw [e, map_sum] at hu
     obtain ⟨f, -, hf⟩ := Finset.exists_ne_zero_of_sum_ne_zero hu
     exact ⟨f, hf⟩
   obtain ⟨f₂, hf₂⟩ := hsum (inB finSumFinEquiv) _ hw0
@@ -358,8 +414,8 @@ theorem actK_map {n : ℕ} {V V' : Type} [AddCommGroup V] [Module ℂ V] [AddCom
     {π : Representation ℂ (GL (Fin n) ℚ_[g]) V} {π' : Representation ℂ (GL (Fin n) ℚ_[g]) V'} (T : V →ₗ[ℂ] V')
     (hT : ∀ x v, T (π x v) = π' x (T v)) (a : MonoidAlgebra ℂ (Gn g n)) (v : V) :
     T (actK π a v) = actK π' a (T v) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [actK, LinearMap.sum_apply, LinearMap.smul_apply, map_sum, map_smul, hT]
+
+  simp only [actK, LinearMap.sum_apply, LinearMap.smul_apply, map_sum, map_smul, hT]
 
 
 open GlobalTheory.SmGL GlobalTheory.PRep in

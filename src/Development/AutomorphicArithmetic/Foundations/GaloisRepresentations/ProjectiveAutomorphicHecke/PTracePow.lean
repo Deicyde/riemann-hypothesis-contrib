@@ -1,16 +1,53 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentations.ProjectiveAutomorphicHecke.MapWopWmap
 public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentations.ProjectiveAutomorphicHecke.PProjTrace
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
 open Module
 universe u v
 
-theorem UpperTheory.Gal.CertificateRingHomMap.pTracePow_holds
-    : UpperTheory.Gal.CertificateRingHomMap.TracePow.{u} := by
+theorem UpperTheory.Gal.CertificateRingHomMap.pTracePow_holds :
+    UpperTheory.Gal.CertificateRingHomMap.TracePow.{u} := by
   intro F _ _ W _ _ _ q s hq hq0 hqs hinj j₀
   by_contra hcon
   push_neg at hcon
@@ -60,10 +97,9 @@ theorem UpperTheory.Gal.CertificateRingHomMap.pTracePow_holds
     have h0 : Polynomial.aeval t P = 0 := minpoly.aeval F t
     rw [Polynomial.aeval_eq_sum_range] at h0
     have h1 := congrArg (fun f => LinearMap.trace F (LinearMap.range q) (f * t ^ j)) h0
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [Finset.sum_mul, map_sum, zero_mul, map_zero, smul_mul_assoc, map_smul, ← pow_add,
-          smul_eq_mul]
-        at h1
+
+    simp only [Finset.sum_mul, map_sum, zero_mul, map_zero, smul_mul_assoc, map_smul,
+    ← pow_add, smul_eq_mul] at h1
     simpa [ha] using h1
   have hall : ∀ n j, j₀ ≤ j + n → a j = 0 := by
     intro n
@@ -80,7 +116,7 @@ theorem UpperTheory.Gal.CertificateRingHomMap.pTracePow_holds
       exact (mul_eq_zero.mp h).resolve_left hc0
   have ha0 : a 0 = 0 := hall j₀ 0 (by omega)
   have hne : LinearMap.range q ≠ ⊥ := fun h => hq0 (LinearMap.range_eq_bot.mp h)
-  have hpos : Module.finrank F (LinearMap.range q) ≠ 0 := fun h =>
-    hne (Submodule.finrank_eq_zero.mp h)
+  have hpos : Module.finrank F (LinearMap.range q) ≠ 0 :=
+    fun h => hne (Submodule.finrank_eq_zero.mp h)
   simp only [ha, pow_zero, LinearMap.trace_one] at ha0
   exact (Nat.cast_ne_zero.mpr hpos) ha0

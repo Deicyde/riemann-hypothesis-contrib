@@ -1,9 +1,62 @@
 module
 
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.HeightTheory.HtDefs
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.HeightTheory.AevalElimEqRenameLinearSubstitution
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.HeightTheory.HeightIntegralEstimates
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.Order.CompletePartialOrder
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.HeightTheory.HeightKerScaledSubstitutionLeOne
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.HeightTheory.IrreducibleFactorStructure
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.HeightTheory.LogHeightLeTorusHeightSubst
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.HeightTheory.ValAlgebraMapEqZero
+import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
@@ -11,13 +64,11 @@ namespace ReciprocityTheory.ChartRestriction.G.T0
 
 open NumberField
 
-variable
-  {K : Type} [Field K] [NumberField K]
-  {ι : Type} [Fintype ι]
+variable {K : Type} [Field K] [NumberField K] {ι : Type} [Fintype ι]
   {Ω : ι → Type} [∀ c, Field (Ω c)] [∀ c, Algebra K (Ω c)]
   {WT : Type} [AddCommGroup WT]
-  {A : ι → Type}
-  [∀ c, CommRing (A c)] [∀ c, Algebra (Ω c) (A c)] [∀ c, Algebra K (A c)] [∀ c, Algebra (𝓞 K) (A c)]
+  {A : ι → Type} [∀ c, CommRing (A c)] [∀ c, Algebra (Ω c) (A c)] [∀ c, Algebra K (A c)]
+  [∀ c, Algebra (𝓞 K) (A c)]
   {𝒜 : (c : ι) → WT → Submodule (Ω c) (A c)}
 
 abbrev UXVar (D N : ℕ) : Type := (Fin (D + 2) × Fin (N + 1)) ⊕ Fin (D + 2)
@@ -29,20 +80,20 @@ def uDeg {D N : ℕ} (s : UXVar D N →₀ ℕ) : ℕ := ∑ p, s (Sum.inl p)
 def XHom {R : Type*} [CommSemiring R] {D N : ℕ} (n : ℕ) (Q : MvPolynomial (UXVar D N) R) : Prop :=
   ∀ s ∈ Q.support, xDeg s = n
 
-def UDegLE {R : Type*} [CommSemiring R] {D N : ℕ} (n : ℕ) (Q : MvPolynomial (UXVar D N) R) : Prop :=
+def UDegLE {R : Type*} [CommSemiring R] {D N : ℕ} (n : ℕ) (Q : MvPolynomial (UXVar D N) R) :
+    Prop :=
   ∀ s ∈ Q.support, uDeg s ≤ n
 
 noncomputable def hT {κ : Type} [Fintype κ] (f : MvPolynomial κ K) : ℝ :=
-  ((∑ᶠ w : FinitePlace K, Real.log (ReciprocityTheory.MultiplicativeHeights.gaussAbs w f))
-      + ∑ σ : K →+* ℂ, ReciprocityTheory.MultiplicativeHeights.torusMean (MvPolynomial.map σ f))
-    / (Module.finrank ℚ K : ℝ)
+  ((∑ᶠ w : FinitePlace K, Real.log (ReciprocityTheory.MultiplicativeHeights.gaussAbs w f)) +
+      ∑ σ : K →+* ℂ, ReciprocityTheory.MultiplicativeHeights.torusMean (MvPolynomial.map σ f)) / (Module.finrank ℚ K : ℝ)
 
 namespace Data
 
 variable (d : Data K ι Ω WT A)
 
-noncomputable def evc (c : ι)
-    : MvPolynomial (UXVar d.D d.N) K →ₐ[K] MvPolynomial (Fin (d.D + 2) × Fin (d.N + 1)) (A c) :=
+noncomputable def evc (c : ι) :
+    MvPolynomial (UXVar d.D d.N) K →ₐ[K] MvPolynomial (Fin (d.D + 2) × Fin (d.N + 1)) (A c) :=
   MvPolynomial.aeval fun v =>
     match v with
     | Sum.inl p => MvPolynomial.X p
@@ -50,10 +101,11 @@ noncomputable def evc (c : ι)
 
 noncomputable def laW : ℝ := meanK fun sg => ⨆ j, Real.log (d.supN sg d.wL (d.w j))
 
-noncomputable def upB : ℝ := d.PP0' * d.wsize d.wL + max 0 d.laW + Real.log (d.N + 1 : ℕ) + 1
+noncomputable def upB : ℝ :=
+  d.PP0' * d.wsize d.wL + max 0 d.laW + Real.log (d.N + 1 : ℕ) + 1
 
-theorem lineSection_eq_ratio_smul (hd : d.AxH 𝒜) (c : ι) (j : Fin (d.N + 1))
-    : d.w j c = d.affineCoord c j • d.w (d.jc c) c := by
+theorem lineSection_eq_ratio_smul (hd : d.AxH 𝒜) (c : ι) (j : Fin (d.N + 1)) :
+    d.w j c = d.affineCoord c j • d.w (d.jc c) c := by
   exact d.w_eq_scalarRatio_smul hd c j
 
 theorem lineSection_pow_ne_zero (hd : d.AxH 𝒜) (c : ι) (n : ℕ) : d.w (d.jc c) c ^ n ≠ 0 := by
@@ -69,8 +121,8 @@ theorem lineSection_pow_ne_zero (hd : d.AxH 𝒜) (c : ι) (n : ℕ) : d.w (d.jc
     rw [pow_succ]
     exact hd.mul_ne_zero c (SetLike.pow_mem_graded n hw) hw ih hw0
 
-private theorem sum_support_inr_eq_xDeg {D N : ℕ} (s : UXVar D N →₀ ℕ)
-    : ∑ x ∈ s.support, Sum.elim (fun _ => 0) (fun i => s (Sum.inr i)) x = xDeg s := by
+private theorem sum_support_inr_eq_xDeg {D N : ℕ} (s : UXVar D N →₀ ℕ) :
+    ∑ x ∈ s.support, Sum.elim (fun _ => 0) (fun i => s (Sum.inr i)) x = xDeg s := by
   rw [xDeg, Finset.sum_subset (Finset.subset_univ _), Fintype.sum_sum_type]
   · simp
   · intro x _ hx
@@ -78,20 +130,17 @@ private theorem sum_support_inr_eq_xDeg {D N : ℕ} (s : UXVar D N →₀ ℕ)
     | inl p => rfl
     | inr i => simpa using hx
 
-theorem lineEval_eq_zero_iff
-    (hd : d.AxH 𝒜) (c : ι) (n : ℕ) (Q : MvPolynomial (UXVar d.D d.N) K) (hQ : XHom n Q)
-    : d.evc c Q = 0 ↔ d.linearSubstitution c Q = 0 := by
+theorem lineEval_eq_zero_iff (hd : d.AxH 𝒜) (c : ι) (n : ℕ) (Q : MvPolynomial (UXVar d.D d.N) K)
+    (hQ : XHom n Q) : d.evc c Q = 0 ↔ d.linearSubstitution c Q = 0 := by
   haveI := hd.tower c
   have hw0 := d.lineSection_pow_ne_zero hd c n
-  have hfac
-      : d.evc c Q
-        = MvPolynomial.map (algebraMap (Ω c) (A c)) (d.linearSubstitution c Q)
-          * MvPolynomial.C (d.w (d.jc c) c ^ n) := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [Q.as_sum, map_sum, map_sum, map_sum, Finset.sum_mul]
+  have hfac : d.evc c Q = MvPolynomial.map (algebraMap (Ω c) (A c)) (d.linearSubstitution c Q) *
+      MvPolynomial.C (d.w (d.jc c) c ^ n) := by
+
+    rw [Q.as_sum, map_sum, map_sum, map_sum, Finset.sum_mul]
     refine Finset.sum_congr rfl fun s hs => ?_
-    simp only [evc, linearSubstitution, MvPolynomial.aeval_monomial, MvPolynomial.algebraMap_apply,
-      map_mul, MvPolynomial.map_C, Finsupp.prod, map_prod, map_pow]
+    simp only [evc, linearSubstitution, MvPolynomial.aeval_monomial, MvPolynomial.algebraMap_apply, map_mul,
+      MvPolynomial.map_C, Finsupp.prod, map_prod, map_pow]
     rw [← IsScalarTower.algebraMap_apply, mul_assoc]
     congr 1
     rw [← hQ s hs, ← sum_support_inr_eq_xDeg s]
@@ -100,8 +149,8 @@ theorem lineEval_eq_zero_iff
     cases x with
     | inl p => simp
     | inr i =>
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [Sum.elim_inr, map_sum, map_mul, MvPolynomial.map_X, MvPolynomial.map_C]
+
+      simp only [Sum.elim_inr, map_sum, map_mul, MvPolynomial.map_X, MvPolynomial.map_C]
       rw [← mul_pow, Finset.sum_mul]
       congr 1
       refine Finset.sum_congr rfl fun j _ => ?_
@@ -112,24 +161,20 @@ theorem lineEval_eq_zero_iff
   · intro h
     ext β
     have hb := congrArg (AddMonoidAlgebra.coeff · β) h
-    rw [mul_comm, MvPolynomial.coeff_C_mul, MvPolynomial.coeff_map, MvPolynomial.coeff_zero,
-        mul_comm, ← Algebra.smul_def]
-      at hb
+    rw [mul_comm, MvPolynomial.coeff_C_mul, MvPolynomial.coeff_map, MvPolynomial.coeff_zero, mul_comm,
+      ← Algebra.smul_def] at hb
     rw [MvPolynomial.coeff_zero]
     exact (smul_eq_zero.1 hb).resolve_right hw0
   · intro h
     rw [h, map_zero, zero_mul]
 
-theorem irreducible_factor_height_bound
-    (hd : d.AxH 𝒜)
-    (h : d.S1) (F : ι → KTp K d.D d.N)
-    (hF : ∀ c, algebraMap (KTp K d.D d.N) (KTf K d.D d.N) (F c) = d.fZ h c)
-    (c : ι) (hpos : 0 < ReciprocityTheory.MultiplicativeHeights.h0 (F c))
-    : ∃ (F1 : MvPolynomial (UXVar d.D d.N) K) (m deF : ℕ),
-      1 ≤ m ∧ 1 ≤ deF ∧ m * deF ≤ d.delc c ∧ Irreducible F1 ∧ XHom deF F1
-        ∧ UDegLE ((d.D + 1) * d.delc c) F1
-        ∧ ReciprocityTheory.MultiplicativeHeights.h0 (F c) ≤ m * hT F1
-        ∧ ∀ (n : ℕ) (Q : MvPolynomial (UXVar d.D d.N) K), XHom n Q → (d.evc c Q = 0 ↔ F1 ∣ Q) := by
+theorem irreducible_factor_height_bound (hd : d.AxH 𝒜) (h : d.S1) (F : ι → KTp K d.D d.N)
+    (hF : ∀ c, algebraMap (KTp K d.D d.N) (KTf K d.D d.N) (F c) = d.fZ h c) (c : ι)
+    (hpos : 0 < ReciprocityTheory.MultiplicativeHeights.h0 (F c)) :
+    ∃ (F1 : MvPolynomial (UXVar d.D d.N) K) (m deF : ℕ), 1 ≤ m ∧ 1 ≤ deF ∧
+      m * deF ≤ d.delc c ∧ Irreducible F1 ∧ XHom deF F1 ∧ UDegLE ((d.D + 1) * d.delc c) F1 ∧
+      ReciprocityTheory.MultiplicativeHeights.h0 (F c) ≤ m * hT F1 ∧
+      ∀ (n : ℕ) (Q : MvPolynomial (UXVar d.D d.N) K), XHom n Q → (d.evc c Q = 0 ↔ F1 ∣ Q) := by
   obtain ⟨F1, κ, a, m, deF, hκ, hm, hmd, hirr, hx, hu, hG, hphiG, hmh⟩ :=
     d.irreducible_factor_structure hd h F hF c hpos
   have hy : d.affineCoord c (d.jc c) ≠ 0 := by
@@ -140,14 +185,12 @@ theorem irreducible_factor_height_bound
     exact e
   have hx0 : d.linearSubstitution c (MvPolynomial.X (Sum.inr 0)) ≠ 0 := by
     intro h0
-    have e :=
-      congrArg
-        (MvPolynomial.eval (fun p : Fin (d.D + 2) × Fin (d.N + 1) =>
-          if p = (0, d.jc c) then (1 : Ω c) else 0))
-        h0
+    have e := congrArg (MvPolynomial.eval (fun p : Fin (d.D + 2) × Fin (d.N + 1) =>
+      if p = (0, d.jc c) then (1 : Ω c) else 0)) h0
     simp [linearSubstitution] at e
     exact hy e
-  have hκ' : d.linearSubstitution c (MvPolynomial.C κ) ≠ 0 := by simp [linearSubstitution, hκ]
+  have hκ' : d.linearSubstitution c (MvPolynomial.C κ) ≠ 0 := by
+    simp [linearSubstitution, hκ]
   have hF1 : d.linearSubstitution c F1 = 0 := by
     rw [hG, map_mul, map_mul, map_pow, map_pow] at hphiG
     simp only [mul_eq_zero, pow_eq_zero_iff', hκ', hx0, false_and, false_or] at hphiG
@@ -155,8 +198,8 @@ theorem irreducible_factor_height_bound
   have hF1ne : F1 ≠ 0 := hirr.ne_zero
   have hspan : (Ideal.span {F1}).IsPrime := (Ideal.span_singleton_prime hF1ne).mpr hirr.prime
   have hle : Ideal.span {F1} ≤ RingHom.ker (d.scaledSubstitution c) := by
-    rw [Ideal.span_singleton_le_iff_mem, RingHom.mem_ker,
-      d.scaledSubstitution_of_homogeneous c deF F1 hx, hF1, map_zero, mul_zero]
+    rw [Ideal.span_singleton_le_iff_mem, RingHom.mem_ker, d.scaledSubstitution_of_homogeneous c deF F1 hx, hF1,
+      map_zero, mul_zero]
   have hPp : (RingHom.ker (d.scaledSubstitution c)).IsPrime := RingHom.ker_isPrime _
   have heq : Ideal.span {F1} = RingHom.ker (d.scaledSubstitution c) := by
     by_contra hne
@@ -172,8 +215,8 @@ theorem irreducible_factor_height_bound
     by_contra h0
     have h0' : deF = 0 := by omega
     exact hF1ne (d.eq_zero_of_xhom_zero c F1 (fun s hs => (hx s hs).trans h0') hF1)
-  have hkey
-      : ∀ (n : ℕ) (Q : MvPolynomial (UXVar d.D d.N) K), XHom n Q → (d.evc c Q = 0 ↔ F1 ∣ Q) := by
+  have hkey : ∀ (n : ℕ) (Q : MvPolynomial (UXVar d.D d.N) K), XHom n Q →
+      (d.evc c Q = 0 ↔ F1 ∣ Q) := by
     intro n Q hQ
     rw [d.lineEval_eq_zero_iff hd c n Q hQ, ← Ideal.mem_span_singleton, heq, RingHom.mem_ker,
       d.scaledSubstitution_of_homogeneous c n Q hQ]
@@ -187,10 +230,7 @@ theorem irreducible_factor_height_bound
   have hFne : F c ≠ 0 := by
     intro h0
     rw [h0] at hpos
-    simp [ReciprocityTheory.MultiplicativeHeights.h0,
-        ReciprocityTheory.MultiplicativeHeights.gaussAbs,
-        ReciprocityTheory.MultiplicativeHeights.blockSphereMean]
-      at hpos
+    simp [ReciprocityTheory.MultiplicativeHeights.h0, ReciprocityTheory.MultiplicativeHeights.gaussAbs, ReciprocityTheory.MultiplicativeHeights.blockSphereMean] at hpos
   have hh : ReciprocityTheory.MultiplicativeHeights.h0 (F c) ≤ m * hT F1 := by
     have e1 := logHeight_le_torusHeight_subst (F c) hFne _ hmh
     rw [hG, hTX5_C_mul_X_pow_mul_pow κ hκ _ a m F1 hF1ne] at e1

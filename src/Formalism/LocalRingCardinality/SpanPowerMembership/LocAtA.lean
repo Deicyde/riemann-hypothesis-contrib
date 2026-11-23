@@ -1,7 +1,61 @@
 module
 
-public import Mathlib
-public import Formalism.LocalRingCardinality.SpanPowerMembership.Adelic
+import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.LcscAdelicUnitaryGroup
+public import Mathlib.NumberTheory.LocalField.Basic
+public import Mathlib.NumberTheory.NumberField.Completion.FinitePlace
+public import Mathlib.NumberTheory.Padics.PadicNumbers
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Rat
+import Mathlib.Algebra.Order.Star.Real
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+public import Mathlib.LinearAlgebra.FreeModule.IdealQuotient
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.Padics.LocalField
+public import Mathlib.NumberTheory.Padics.RingHoms
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Connected.Separation
+import Mathlib.Topology.MetricSpace.Ultra.TotallySeparated
+import Mathlib.Topology.Sheaves.Init
+public import Mathlib.NumberTheory.Padics.PadicIntegers
 
 @[expose] public section
 
@@ -13,71 +67,16 @@ open NumberField IsDedekindDomain HeightOneSpectrum WithZero
 
 variable {F : Type} [Field F] [NumberField F] (v : HeightOneSpectrum (𝓞 F))
 
-@[reducible]
-def vrel : ValuativeRel (v.adicCompletion F) :=
+@[reducible] def vrel : ValuativeRel (v.adicCompletion F) :=
   .ofValuation (Valued.v : Valuation (v.adicCompletion F) ℤᵐ⁰)
 
-theorem vcompat
-    : letI := vrel v
-      (Valued.v : Valuation (v.adicCompletion F) ℤᵐ⁰).Compatible :=
-  .ofValuation _
+theorem vcompat : letI := vrel v
+    (Valued.v : Valuation (v.adicCompletion F) ℤᵐ⁰).Compatible := .ofValuation _
 
 theorem finite_quot : Finite (𝓞 F ⧸ v.asIdeal) := Ideal.finiteQuotientOfFreeOfNeBot _ v.ne_bot
 
 theorem proper : ProperSpace (v.adicCompletion F) := by
-  have := finite_quot v
-  have h1 : IsDiscreteValuationRing (v.adicCompletionIntegers F) := inferInstance
-  let Ov := v.adicCompletionIntegers F
-  let Kv := v.adicCompletion F
-  have hv (y : F) : Valued.v (algebraMap F Kv y) = v.valuation F y := by
-    exact valuedAdicCompletion_eq_valuation' v y
-  have hm (x : Ov) : x ∈ IsLocalRing.maximalIdeal Ov ↔ Valued.v (x : Kv) < 1 := by
-    have hI : Valuation.Integers (Valued.v : Valuation Kv ℤᵐ⁰) Ov := Valuation.integer.integers _
-    rw [IsLocalRing.mem_maximalIdeal, mem_nonunits_iff, hI.isUnit_iff_valuation_eq_one]
-    exact (hI.map_le_one x).lt_iff_ne.symm
-  have hs : Function.Surjective ((IsLocalRing.residue Ov).comp (algebraMap (𝓞 F) Ov)) := by
-    intro y
-    obtain ⟨x, rfl⟩ := IsLocalRing.residue_surjective y
-    have hn : {z : Kv | Valued.v (z - x) < 1} ∈ nhds (x : Kv) := by
-      rw [Valued.mem_nhds]
-      refine ⟨1, fun z hz => ?_⟩
-      simp only [Set.mem_ofPred_eq, Valuation.restrict_lt_iff_lt_embedding, Units.val_one, map_one]
-        at hz ⊢
-      exact hz
-    obtain ⟨_, hz, ⟨k, rfl⟩⟩ :=
-      mem_closure_iff_nhds.1 (denseRange_algebraMap (R := 𝓞 F) (K := F) (v := v) (x : Kv)) _ hn
-    have hz' : Valued.v (algebraMap F Kv k - x) < 1 := hz
-    have hk : v.valuation F k ≤ 1 := by
-      rw [← hv]
-      have e : algebraMap F Kv k = (algebraMap F Kv k - x) + x := by ring
-      rw [e]
-      exact Valuation.map_add_le _ hz'.le x.2
-    obtain ⟨a, ha⟩ := exists_valuation_sub_lt_of_integer (K := F) v hk 1
-    refine ⟨a, ?_⟩
-    simp only [RingHom.coe_comp, Function.comp_apply]
-    apply (Ideal.Quotient.eq).2
-    rw [hm]
-    have e1 : ((algebraMap (𝓞 F) Ov a : Ov) : Kv) = algebraMap F Kv (algebraMap (𝓞 F) F a) := rfl
-    have e2
-        : ((algebraMap (𝓞 F) Ov a - x : Ov) : Kv)
-          = algebraMap F Kv (algebraMap (𝓞 F) F a - k) + (algebraMap F Kv k - x) := by
-      rw [map_sub, AddSubgroupClass.coe_sub, e1]
-      ring
-    rw [e2]
-    refine Valuation.map_add_lt _ ?_ hz'
-    rw [hv]
-    simpa using ha
-  have hf : ∀ a ∈ v.asIdeal, ((IsLocalRing.residue Ov).comp (algebraMap (𝓞 F) Ov)) a = 0 := by
-    intro a ha
-    rw [RingHom.comp_apply, IsLocalRing.residue_eq_zero_iff, hm]
-    have h1 : ((algebraMap (𝓞 F) Ov a : Ov) : Kv) = algebraMap F Kv (algebraMap (𝓞 F) F a) := rfl
-    rw [h1, hv, valuation_of_algebraMap]
-    exact (v.intValuation_lt_one_iff_dvd a).mpr (Ideal.dvd_span_singleton.mpr ha)
-  have h2 : Finite (IsLocalRing.ResidueField Ov) :=
-    Finite.of_surjective _ (Ideal.Quotient.lift_surjective_of_surjective v.asIdeal hf hs)
-  exact
-    Valued.integer.properSpace_iff_completeSpace_and_isDiscreteValuationRing_integer_and_finite_residueField.mpr
-      ⟨inferInstance, h1, h2⟩
+  apply GlobalTheory.AdelicUnitaryTop.properSpace_adicCompletion <;> assumption
 
 theorem isLocalField : letI := vrel v; IsNonarchimedeanLocalField (v.adicCompletion F) := by
   let _ := vrel v
@@ -87,9 +86,9 @@ theorem isLocalField : letI := vrel v; IsNonarchimedeanLocalField (v.adicComplet
     IsValuativeTopology.of_mem_nhds_iff_vle (Valued.v : Valuation (v.adicCompletion F) ℤᵐ⁰)
       (fun {s x} => Valued.mem_nhds)
   have h2 : ValuativeRel.IsNontrivial (v.adicCompletion F) :=
-    (ValuativeRel.isNontrivial_iff_isNontrivial (Valued.v : Valuation (v.adicCompletion F) ℤᵐ⁰)).mpr
-      inferInstance
-  exact {}
+    (ValuativeRel.isNontrivial_iff_isNontrivial
+      (Valued.v : Valuation (v.adicCompletion F) ℤᵐ⁰)).mpr inferInstance
+  exact { }
 
 section Ql
 
@@ -104,8 +103,8 @@ theorem not_dvd_den (q : ℚ) (h : ‖(q : ℚ_[l])‖ ≤ 1) : ¬ l ∣ q.den :
   rw [Int.cast_natCast] at this
   exact absurd hu this.ne
 
-theorem norm_nat (n : ℕ)
-    : ‖(n : v.adicCompletion F)‖ = ‖FinitePlace.embedding v (algebraMap (𝓞 F) F (n : 𝓞 F))‖ := by
+theorem norm_nat (n : ℕ) : ‖(n : v.adicCompletion F)‖ =
+    ‖FinitePlace.embedding v (algebraMap (𝓞 F) F (n : 𝓞 F))‖ := by
   rw [map_natCast, map_natCast]
 
 theorem norm_int_le (n : ℤ) : ‖(n : v.adicCompletion F)‖ ≤ 1 := by
@@ -177,9 +176,8 @@ theorem emb_cont : Continuous (emb v l hv) :=
   (uniformContinuous_uniformly_extend (iQ_ind l) (iQ_dense l) (fQ_uc v l hv)).continuous
 
 open scoped TensorProduct in
-theorem emb_finite
-    : letI := (emb v l hv).toAlgebra
-      FiniteDimensional ℚ_[l] (v.adicCompletion F) := by
+theorem emb_finite : letI := (emb v l hv).toAlgebra
+    FiniteDimensional ℚ_[l] (v.adicCompletion F) := by
   let _ := (emb v l hv).toAlgebra
   have : ContinuousSMul ℚ_[l] (v.adicCompletion F) :=
     continuousSMul_of_algebraMap _ _ (emb_cont v l hv)
@@ -192,8 +190,7 @@ theorem emb_finite
     apply (v.denseRange_algebraMap F).mono
     rintro _ ⟨x, rfl⟩
     refine ⟨1 ⊗ₜ x, ?_⟩
-    exact (Algebra.TensorProduct.lift_tmul _ _ (fun _ _ => Commute.all _ _) 1 x).trans
-      (by rw [map_one, one_mul]; rfl)
+    exact (Algebra.TensorProduct.lift_tmul _ _ (fun _ _ => Commute.all _ _) 1 x).trans (by rw [map_one, one_mul]; rfl)
   exact Module.Finite.of_surjective Φ (by
     rw [← Set.range_eq_univ, ← Φ.coe_range, ← Φ.range.closed_of_finiteDimensional.closure_eq]
     exact hd.closure_range)
@@ -227,8 +224,7 @@ theorem exists_frac (x : ℚ_[l]) : ∃ a : ℚ, (∃ n : ℕ, a.den = l ^ n) �
     rw [this]
     exact e.2
 
-theorem int_of_frac (b : ℚ) (n : ℕ) (hd : b.den ∣ l ^ n) (h : ‖(b : ℚ_[l])‖ ≤ 1)
-    : ∃ z : ℤ, b = z := by
+theorem int_of_frac (b : ℚ) (n : ℕ) (hd : b.den ∣ l ^ n) (h : ‖(b : ℚ_[l])‖ ≤ 1) : ∃ z : ℤ, b = z := by
   obtain ⟨k, -, hk⟩ := (Nat.dvd_prime_pow hl.out).mp hd
   have hnd := not_dvd_den l b h
   have : k = 0 := by
@@ -239,14 +235,11 @@ theorem int_of_frac (b : ℚ) (n : ℕ) (hd : b.den ∣ l ^ n) (h : ‖(b : ℚ_
 
 def frac (x : ℚ_[l]) : ℚ := (exists_frac l x).choose
 
-theorem exp_eq_of_int (a b : ℚ) (z : ℤ) (h : a - b = z)
-    : Complex.exp (2 * Real.pi * Complex.I * (a : ℂ))
-      = Complex.exp (2 * Real.pi * Complex.I * (b : ℂ)) := by
+theorem exp_eq_of_int (a b : ℚ) (z : ℤ) (h : a - b = z) :
+    Complex.exp (2 * Real.pi * Complex.I * (a : ℂ)) = Complex.exp (2 * Real.pi * Complex.I * (b : ℂ)) := by
   have : (a : ℂ) = b + z := by
     have h' : a = b + z := by linarith
-    rw [h']
-    push_cast
-    ring
+    rw [h']; push_cast; ring
   rw [this, mul_add, Complex.exp_add, mul_comm _ (z : ℂ), Complex.exp_int_mul_two_pi_mul_I, mul_one]
 
 def psi0 : AddChar ℚ_[l] ℂ where
@@ -266,25 +259,18 @@ def psi0 : AddChar ℚ_[l] ℂ where
       refine mul_dvd_mul (hk ▸ dvd_rfl) ((Rat.add_den_dvd _ _).trans ?_)
       exact mul_dvd_mul (hn ▸ dvd_rfl) (hm ▸ dvd_rfl)
     have hn1 : ‖((frac l (x + y) - (frac l x + frac l y) : ℚ) : ℚ_[l])‖ ≤ 1 := by
-      have e
-          : ((frac l (x + y) - (frac l x + frac l y) : ℚ) : ℚ_[l])
-            = ((x - frac l x) + (y - frac l y)) + -((x + y) - frac l (x + y)) := by
-        push_cast; ring
+      have e : ((frac l (x + y) - (frac l x + frac l y) : ℚ) : ℚ_[l]) =
+          ((x - frac l x) + (y - frac l y)) + -((x + y) - frac l (x + y)) := by push_cast; ring
       rw [e]
-      refine (Padic.nonarchimedean _ _).trans
-        (max_le ((Padic.nonarchimedean _ _).trans (max_le h h')) ?_)
-      rw [norm_neg]
-      exact h''
+      refine (Padic.nonarchimedean _ _).trans (max_le ((Padic.nonarchimedean _ _).trans (max_le h h')) ?_)
+      rw [norm_neg]; exact h''
     obtain ⟨z, hz⟩ := int_of_frac l _ _ hd hn1
     rw [exp_eq_of_int _ _ z hz, ← Complex.exp_add]
     congr 1
-    push_cast
-    ring
+    push_cast; ring
 
-theorem padicCharacter_spec (x : ℚ_[l])
-    : ∃ a : ℚ,
-      (∃ n : ℕ, a.den = l ^ n) ∧ ‖x - (a : ℚ_[l])‖ ≤ 1
-        ∧ psi0 l x = Complex.exp (2 * Real.pi * Complex.I * (a : ℂ)) :=
+theorem padicCharacter_spec (x : ℚ_[l]) : ∃ a : ℚ, (∃ n : ℕ, a.den = l ^ n) ∧ ‖x - (a : ℚ_[l])‖ ≤ 1 ∧
+    psi0 l x = Complex.exp (2 * Real.pi * Complex.I * (a : ℂ)) :=
   ⟨frac l x, (exists_frac l x).choose_spec.1, (exists_frac l x).choose_spec.2, rfl⟩
 
 end Ql

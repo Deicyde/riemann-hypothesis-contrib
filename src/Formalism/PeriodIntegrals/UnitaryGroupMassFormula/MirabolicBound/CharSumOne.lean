@@ -1,7 +1,48 @@
 module
 
-public import Mathlib
 public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.MirabolicBound.Development
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+public import Mathlib.NumberTheory.LegendreSymbol.AddCharacter
 
 @[expose] public section
 
@@ -13,8 +54,8 @@ noncomputable section
 
 open Classical
 
-theorem addChar_sum {F : Type} [Field F] (ψ₀ : AddChar F ℂ) {m : ℕ} (g : Fin m → F)
-    : ψ₀ (∑ i, g i) = ∏ i, ψ₀ (g i) := by
+theorem addChar_sum {F : Type} [Field F] (ψ₀ : AddChar F ℂ) {m : ℕ} (g : Fin m → F) :
+    ψ₀ (∑ i, g i) = ∏ i, ψ₀ (g i) := by
   have h : ∀ s : Finset (Fin m), ψ₀ (∑ i ∈ s, g i) = ∏ i ∈ s, ψ₀ (g i) := by
     intro s
     induction s using Finset.induction_on with
@@ -23,22 +64,21 @@ theorem addChar_sum {F : Type} [Field F] (ψ₀ : AddChar F ℂ) {m : ℕ} (g : 
       rw [Finset.sum_insert ha, Finset.prod_insert ha, AddChar.map_add_eq_mul, ih]
   exact h _
 
-theorem charSum_one {F : Type} [Field F] [Fintype F] (ψ₀ : AddChar F ℂ) (hψ : ψ₀ ≠ 1) (a : F)
-    : ∑ t : F, ψ₀ (a * t) = if a = 0 then (Fintype.card F : ℂ) else 0 := by
+theorem charSum_one {F : Type} [Field F] [Fintype F] (ψ₀ : AddChar F ℂ) (hψ : ψ₀ ≠ 1) (a : F) :
+    ∑ t : F, ψ₀ (a * t) = if a = 0 then (Fintype.card F : ℂ) else 0 := by
   split_ifs with ha
   · subst ha
     simp [AddChar.map_zero_eq_one]
   · rw [show (∑ t : F, ψ₀ (a * t)) = ∑ t : F, ψ₀ t from
-      Fintype.sum_equiv (Equiv.mulLeft₀ a ha) _ _ (fun t => rfl)]
+        Fintype.sum_equiv (Equiv.mulLeft₀ a ha) _ _ (fun t => rfl)]
     exact AddChar.sum_eq_zero_of_ne_one hψ
 
-theorem charSum
-    {F : Type} [Field F] [Fintype F] (ψ₀ : AddChar F ℂ) (hψ : ψ₀ ≠ 1) {m : ℕ} (ν : Fin m → F)
-    : ∑ c : Fin m → F, ψ₀ (∑ i, ν i * c i) = if ν = 0 then (Fintype.card F : ℂ) ^ m else 0 := by
+theorem charSum {F : Type} [Field F] [Fintype F] (ψ₀ : AddChar F ℂ) (hψ : ψ₀ ≠ 1) {m : ℕ} (ν : Fin m → F) :
+    ∑ c : Fin m → F, ψ₀ (∑ i, ν i * c i) = if ν = 0 then (Fintype.card F : ℂ) ^ m else 0 := by
   have hps : ∑ c : Fin m → F, ∏ i, ψ₀ (ν i * c i) = ∏ i, ∑ t : F, ψ₀ (ν i * t) := by
     first
-    | exact (Fintype.prod_sum (fun i t => ψ₀ (ν i * t))).symm
-    | (rw [Finset.prod_univ_sum]; simp)
+      | exact (Fintype.prod_sum (fun i t => ψ₀ (ν i * t))).symm
+      | (rw [Finset.prod_univ_sum]; simp)
   simp_rw [addChar_sum ψ₀]
   rw [hps]
   simp_rw [charSum_one ψ₀ hψ]
@@ -70,22 +110,22 @@ theorem sepLemma : SepLemma := by
   have h1 : ∑ x, χ' s x • T x (∑ q, g q • f q) = 0 := by
     rw [hg]
     simp
-  have h2 : ∑ x, χ' s x • T x (∑ q, g q • f q) = ∑ q, (if q.1 = s then N * g q else 0) • f q := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp_rw [map_sum, map_smul, hf', Finset.smul_sum, smul_smul]
+  have h2 : ∑ x, χ' s x • T x (∑ q, g q • f q) =
+      ∑ q, (if q.1 = s then N * g q else 0) • f q := by
+
+    simp_rw [map_sum, map_smul, hf', Finset.smul_sum, smul_smul]
     rw [Finset.sum_comm]
     refine Finset.sum_congr rfl fun q _ => ?_
     rw [← Finset.sum_smul]
     congr 1
     have ho := horth q.1 s
-    calc
-      ∑ x, χ' s x * (g q * χ q.1 x) = g q * ∑ x, χ q.1 x * χ' s x := by
-        rw [Finset.mul_sum]
-        refine Finset.sum_congr rfl fun x _ => ?_
-        ring
+    calc ∑ x, χ' s x * (g q * χ q.1 x) = g q * ∑ x, χ q.1 x * χ' s x := by
+          rw [Finset.mul_sum]
+          refine Finset.sum_congr rfl fun x _ => ?_
+          ring
       _ = _ := by
-        rw [ho]
-        split_ifs <;> ring
+          rw [ho]
+          split_ifs <;> ring
   have h3 : ∑ q : R × ι, (if q.1 = s then N * g q else 0) • f q = N • ∑ j, g (s, j) • f (s, j) := by
     rw [Fintype.sum_prod_type, Finset.sum_eq_single s]
     · simp [Finset.smul_sum, smul_smul]

@@ -1,19 +1,62 @@
 module
 
-public import Mathlib
+public import Formalism.LocalToGlobal.SiegelLatticeTheory.ClosedLocalOrbits.Saturated
+public import Formalism.LocalToGlobal.SiegelLatticeTheory.CokernelGLCounts.RankPointCounts.DualFamilyCounting.StepsR
+public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.CountingFormula.OFDefs
+public import Formalism.SharpRestriction.CuspSpanNormBounds.BruhatCellsKronecker.IdLiftDef
 public import Formalism.GL3MeanSquares.GenusMeanAsymptotics.UnimodularClassRepresentatives.FiniteRepSetOfOrtho
-public import Formalism.LocalToGlobal.SiegelLatticeTheory.CokernelGLCounts.RankPointCounts.DualFamilyCounting.PerpendicularDefinitionHolds
-public import Formalism.LocalToGlobal.SiegelLatticeTheory.ClosedLocalOrbits.GaugeLatticeShifts.SaturatedPf
 public import Formalism.GL3MeanSquares.GenusMeanAsymptotics.UnimodularClassRepresentatives.UnimodularOfMemGenusOrtho
-public import Formalism.GL3MeanSquares.GenusMeanAsymptotics.UnimodularClassRepresentatives.InvMemLocROfUnimod
-public import Formalism.SharpRestriction.CuspSpanNormBounds.CayleyDegreeNondegeneracy.GenusMassPosOfMassLowerBound
-public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.CountingFormula.TransMemUnipotentIntegral
+public import Formalism.LocalToGlobal.SiegelLatticeTheory.ClosedLocalOrbits.GaugeLatticeShifts.SaturatedPf
+public import Formalism.LocalToGlobal.SiegelLatticeTheory.CokernelGLCounts.RankPointCounts.DualFamilyCounting.IsAdmissibleIntegralBasisChangeOne
+public import Formalism.LocalToGlobal.SiegelLatticeTheory.CokernelGLCounts.RankPointCounts.DualFamilyCounting.LocalUnimodularHolds
+public import Formalism.LocalToGlobal.SiegelLatticeTheory.CokernelGLCounts.RankPointCounts.DualFamilyCounting.PerpendicularDefinitionHolds
 public import Formalism.PeriodIntegrals.OrbitalBoundsConclusion.AutLzFinite
 public import Formalism.PeriodIntegrals.OrbitalBoundsConclusion.SplitRow
 public import Formalism.PeriodIntegrals.OrbitalBoundsConclusion.WittExtensionTheorem
+public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.CountingFormula.TransMemUnipotentIntegral
 public import Formalism.SharpRestriction.CuspSpanNormBounds.BridgeRowsLift
-public import Formalism.LocalToGlobal.SiegelLatticeTheory.CokernelGLCounts.RankPointCounts.DualFamilyCounting.IsAdmissibleIntegralBasisChangeOne
-public import Formalism.LocalToGlobal.SiegelLatticeTheory.CokernelGLCounts.RankPointCounts.DualFamilyCounting.LocalUnimodularHolds
+public import Formalism.SharpRestriction.CuspSpanNormBounds.CayleyDegreeNondegeneracy.GenusMassPosOfMassLowerBound
+import Formalism.SharpRestriction.CuspSpanNormBounds.LatticeGluingRadicals
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -51,8 +94,8 @@ theorem nOrb_eq_of {x y : X} (hy : y ∈ nOrb N A x) : nOrb N A y = nOrb N A x :
     rw [mul_smul, inv_smul_smul]
 
 include hA hN in
-theorem image_nOrb (h : H) {x : X} (hx : x ∈ A)
-    : (fun y => h • y) '' nOrb N A x = nOrb N A (h • x) := by
+theorem image_nOrb (h : H) {x : X} (hx : x ∈ A) :
+    (fun y => h • y) '' nOrb N A x = nOrb N A (h • x) := by
   ext z
   simp only [nOrb, Set.mem_image, Set.mem_setOf_eq]
   constructor
@@ -65,28 +108,23 @@ theorem image_nOrb (h : H) {x : X} (hx : x ∈ A)
       simpa using hc
     · simp only [mul_smul, smul_inv_smul]
 
-def qSMul (h : H) (O : nOrbs N A) : nOrbs N A := ⟨
-  (fun y => h • y) '' O.1,
-  by
+def qSMul (h : H) (O : nOrbs N A) : nOrbs N A :=
+  ⟨(fun y => h • y) '' O.1, by
     obtain ⟨x, hx, e⟩ := O.2
-    exact ⟨h • x, hA h x hx, by rw [e, image_nOrb N A hA h hx]⟩
-⟩
+    exact ⟨h • x, hA h x hx, by rw [e, image_nOrb N A hA h hx]⟩⟩
 
-@[reducible]
-def qAct : MulAction H (nOrbs N A) where
+@[reducible] def qAct : MulAction H (nOrbs N A) where
   smul := qSMul N A hA
-  one_smul O :=
-    Subtype.ext (by
-      show (fun y => (1 : H) • y) '' O.1 = O.1
-      simp)
-  mul_smul a b O :=
-    Subtype.ext (by
-      show (fun y => (a * b) • y) '' O.1 = (fun y => a • y) '' ((fun y => b • y) '' O.1)
-      rw [Set.image_image]
-      simp only [mul_smul])
+  one_smul O := Subtype.ext (by
+    show (fun y => (1 : H) • y) '' O.1 = O.1
+    simp)
+  mul_smul a b O := Subtype.ext (by
+    show (fun y => (a * b) • y) '' O.1 = (fun y => a • y) '' ((fun y => b • y) '' O.1)
+    rw [Set.image_image]
+    simp only [mul_smul])
 
-theorem qAct_apply (h : H) (x : X) (hx : x ∈ A)
-    : ((qAct N A hA).smul h ⟨nOrb N A x, x, hx, rfl⟩ : nOrbs N A).1 = nOrb N A (h • x) := by
+theorem qAct_apply (h : H) (x : X) (hx : x ∈ A) :
+    ((qAct N A hA).smul h ⟨nOrb N A x, x, hx, rfl⟩ : nOrbs N A).1 = nOrb N A (h • x) := by
   exact image_nOrb N A hA h hx
 
 theorem qAct_N (n : H) (hn : n ∈ N) (O : nOrbs N A) : (qAct N A hA).smul n O = O := by
@@ -111,26 +149,22 @@ end Act
 
 section Count
 
-variable
-  (N : Subgroup H) [hN : N.Normal]
-  (A : Set X) (hA : ∀ h : H, ∀ x ∈ A, h • x ∈ A) (hfree : ∀ n ∈ N, ∀ x ∈ A, n • x = x → n = 1)
+variable (N : Subgroup H) [hN : N.Normal] (A : Set X) (hA : ∀ h : H, ∀ x ∈ A, h • x ∈ A)
+  (hfree : ∀ n ∈ N, ∀ x ∈ A, n • x = x → n = 1)
 
 include hfree in
-theorem card_stab_q (t : X) (ht : t ∈ A)
-    : letI := MulAction.compHom (nOrbs N A) (qHom N A hA)
-      Nat.card (MulAction.stabilizer (H ⧸ N) (⟨nOrb N A t, t, ht, rfl⟩ : nOrbs N A))
-        = Nat.card (MulAction.stabilizer H t) := by
+theorem card_stab_q (t : X) (ht : t ∈ A) :
+    letI := MulAction.compHom (nOrbs N A) (qHom N A hA)
+    Nat.card (MulAction.stabilizer (H ⧸ N) (⟨nOrb N A t, t, ht, rfl⟩ : nOrbs N A)) =
+      Nat.card (MulAction.stabilizer H t) := by
   letI := MulAction.compHom (nOrbs N A) (qHom N A hA)
-  have hsm
-      : ∀ h : H, ((h : H ⧸ N) • (⟨nOrb N A t, t, ht, rfl⟩ : nOrbs N A)).1 = nOrb N A (h • t) := by
+  have hsm : ∀ h : H, ((h : H ⧸ N) • (⟨nOrb N A t, t, ht, rfl⟩ : nOrbs N A)).1 = nOrb N A (h • t) := by
     intro h
     show (qHom N A hA (h : H ⧸ N) (⟨nOrb N A t, t, ht, rfl⟩ : nOrbs N A)).1 = _
     rw [qHom_mk]
     exact qAct_apply N A hA h t ht
-  have key
-      : ∀ h : H,
-        (h : H ⧸ N) ∈ MulAction.stabilizer (H ⧸ N) (⟨nOrb N A t, t, ht, rfl⟩ : nOrbs N A)
-          ↔ ∃ n ∈ N, n • t = h • t := by
+  have key : ∀ h : H, (h : H ⧸ N) ∈ MulAction.stabilizer (H ⧸ N) (⟨nOrb N A t, t, ht, rfl⟩ : nOrbs N A) ↔
+      ∃ n ∈ N, n • t = h • t := by
     intro h
     rw [MulAction.mem_stabilizer_iff]
     constructor
@@ -149,19 +183,14 @@ theorem card_stab_q (t : X) (ht : t ∈ A)
       apply nOrb_eq_of N A hA
       show h • t ∈ A ∧ ∃ m ∈ N, m • t = h • t
       exact ⟨hA h t ht, n, hn, e⟩
-  let f
-      : MulAction.stabilizer H t
-        → MulAction.stabilizer (H ⧸ N) (⟨nOrb N A t, t, ht, rfl⟩ : nOrbs N A) := fun g => ⟨
-    ((g : H) : H ⧸ N),
-    (key g).2 ⟨1, N.one_mem, by rw [one_smul, MulAction.mem_stabilizer_iff.mp g.2]⟩
-  ⟩
+  let f : MulAction.stabilizer H t → MulAction.stabilizer (H ⧸ N) (⟨nOrb N A t, t, ht, rfl⟩ : nOrbs N A) :=
+    fun g => ⟨((g : H) : H ⧸ N), (key g).2 ⟨1, N.one_mem, by rw [one_smul, MulAction.mem_stabilizer_iff.mp g.2]⟩⟩
   refine (Nat.card_eq_of_bijective f ⟨?_, ?_⟩).symm
   · rintro ⟨a, ha⟩ ⟨b, hb⟩ hab
     have hab' : ((a : H) : H ⧸ N) = ((b : H) : H ⧸ N) := congrArg Subtype.val hab
     rw [QuotientGroup.eq] at hab'
     have hfix : (a⁻¹ * b) • t = t := by
-      rw [mul_smul, MulAction.mem_stabilizer_iff.mp hb, inv_smul_eq_iff,
-        MulAction.mem_stabilizer_iff.mp ha]
+      rw [mul_smul, MulAction.mem_stabilizer_iff.mp hb, inv_smul_eq_iff, MulAction.mem_stabilizer_iff.mp ha]
     have h1 := hfree _ hab' t ht hfix
     rw [inv_mul_eq_one] at h1
     exact Subtype.ext h1
@@ -176,17 +205,16 @@ theorem card_stab_q (t : X) (ht : t ∈ A)
       have hc := hN.conj_mem n hn h⁻¹
       simpa [mul_inv_rev, mul_assoc] using hc
 
+
 include hA hfree in
-theorem count
-    [Finite (H ⧸ N)]
-    (T : Finset X) (hTA : ∀ t ∈ T, t ∈ A) (hT : ∀ x ∈ A, ∃! t, t ∈ T ∧ ∃ h : H, h • t = x)
-    : (nOrbs N A).Finite
-      ∧ ((nOrbs N A).ncard : ℝ) / (Nat.card (H ⧸ N) : ℝ)
-        = ∑ t ∈ T, ((Nat.card (MulAction.stabilizer H t) : ℕ) : ℝ)⁻¹ := by
+theorem count [Finite (H ⧸ N)] (T : Finset X) (hTA : ∀ t ∈ T, t ∈ A)
+    (hT : ∀ x ∈ A, ∃! t, t ∈ T ∧ ∃ h : H, h • t = x) :
+    (nOrbs N A).Finite ∧
+    ((nOrbs N A).ncard : ℝ) / (Nat.card (H ⧸ N) : ℝ) =
+      ∑ t ∈ T, ((Nat.card (MulAction.stabilizer H t) : ℕ) : ℝ)⁻¹ := by
   letI := MulAction.compHom (nOrbs N A) (qHom N A hA)
-  have hsm
-      : ∀ (h : H) (x : X) (hx : x ∈ A),
-        ((h : H ⧸ N) • (⟨nOrb N A x, x, hx, rfl⟩ : nOrbs N A)).1 = nOrb N A (h • x) := by
+  have hsm : ∀ (h : H) (x : X) (hx : x ∈ A),
+      ((h : H ⧸ N) • (⟨nOrb N A x, x, hx, rfl⟩ : nOrbs N A)).1 = nOrb N A (h • x) := by
     intro h x hx
     show (qHom N A hA (h : H ⧸ N) _).1 = _
     rw [qHom_mk]
@@ -197,11 +225,9 @@ theorem count
     obtain ⟨t, ⟨htT, h, rfl⟩, -⟩ := hT x hx
     exact ⟨⟨t, htT⟩, h, Subtype.ext (hsm h t (hTA t htT))⟩
   have hfin : Finite (nOrbs N A) :=
-    Finite.of_surjective
-      (fun p : T × (H ⧸ N) => p.2 • O p.1)
-      (fun P => by
-        obtain ⟨t, g, e⟩ := hsurj P
-        exact ⟨(t, g), e⟩)
+    Finite.of_surjective (fun p : T × (H ⧸ N) => p.2 • O p.1) (fun P => by
+      obtain ⟨t, g, e⟩ := hsurj P
+      exact ⟨(t, g), e⟩)
   have hrel : ∀ (t1 t2 : T) (g : H ⧸ N), g • O t1 = O t2 → t1 = t2 := by
     intro t1 t2 g e
     obtain ⟨h, rfl⟩ := QuotientGroup.mk_surjective g
@@ -217,19 +243,15 @@ theorem count
     exact Subtype.ext (h1.trans h2.symm)
   have hOinj : Function.Injective O := fun t1 t2 e => hrel t1 t2 1 (by rw [one_smul]; exact e)
   haveI := hfin
-  have key :=
-    Formalism.HermitianLattices.Ext.L3.sum_inv_card_stab (G := H ⧸ N) (X := nOrbs N A) Set.univ
-      (fun _ _ _ => Set.mem_univ _)
-      (Finset.univ.image O)
-      (fun _ _ => Set.mem_univ _)
-      (by
-        intro P _
-        obtain ⟨t, g, e⟩ := hsurj P
-        refine ⟨O t, ⟨Finset.mem_image_of_mem _ (Finset.mem_univ _), g, e⟩, ?_⟩
-        rintro Q ⟨hQ, g', e'⟩
-        obtain ⟨t', -, rfl⟩ := Finset.mem_image.1 hQ
-        have h3 : (g⁻¹ * g') • O t' = O t := by rw [mul_smul, e', ← e, inv_smul_smul]
-        rw [hrel t' t _ h3])
+  have key := Formalism.HermitianLattices.Ext.L3.sum_inv_card_stab (G := H ⧸ N) (X := nOrbs N A) Set.univ
+    (fun _ _ _ => Set.mem_univ _) (Finset.univ.image O) (fun _ _ => Set.mem_univ _) (by
+      intro P _
+      obtain ⟨t, g, e⟩ := hsurj P
+      refine ⟨O t, ⟨Finset.mem_image_of_mem _ (Finset.mem_univ _), g, e⟩, ?_⟩
+      rintro Q ⟨hQ, g', e'⟩
+      obtain ⟨t', -, rfl⟩ := Finset.mem_image.1 hQ
+      have h3 : (g⁻¹ * g') • O t' = O t := by rw [mul_smul, e', ← e, inv_smul_smul]
+      rw [hrel t' t _ h3])
   refine ⟨Set.finite_coe_iff.mp hfin, ?_⟩
   rw [Finset.sum_image (fun t1 _ t2 _ e => hOinj e)] at key
   rw [← Nat.card_coe_set_eq, ← Finset.sum_coe_sort T]
@@ -244,8 +266,7 @@ end Count
 
 end Formalism.L2.SG.Pf.Cnt.StabilizerQuotient
 
-open NumberField Module Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat
-  Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.CntLocal Formalism.L2.SG.Saturated
+open NumberField Module Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.CntLocal Formalism.L2.SG.Saturated
 open Classical
 
 noncomputable section
@@ -258,10 +279,8 @@ section Basic
 
 variable {E : Type} [Field E] [NumberField E] [StarRing E] {S : HSpace E} {r : ℕ}
 
-theorem lflag_ext
-    {T' : E} {F1 F2 : LFlag S r T'}
-    (he : ∀ a, F1.fl.e a = F2.fl.e a) (hz : F1.fl.z = F2.fl.z) (ht : F1.zt = F2.zt)
-    : F1 = F2 := by
+theorem lflag_ext {T' : E} {F1 F2 : LFlag S r T'} (he : ∀ a, F1.fl.e a = F2.fl.e a)
+    (hz : F1.fl.z = F2.fl.z) (ht : F1.zt = F2.zt) : F1 = F2 := by
   obtain ⟨⟨e1, z1, _, _, _, _⟩, zt1⟩ := F1
   obtain ⟨⟨e2, z2, _, _, _, _⟩, zt2⟩ := F2
   obtain rfl : e1 = e2 := funext he
@@ -274,8 +293,7 @@ end Basic
 variable {D : Formalism.BasicNotions.D7} {T : D.host.E} (F0 : FlagG (VS D) D.R.rS T)
 
 def G0 : Subgroup ((VS D).V ≃ₗ[D.host.E] (VS D).V) where
-  carrier :=
-    {g | g ∈ Formalism.HermitianLatticesTheory.isom (VS D).hT ∧ ∀ a, g (F0.fvec a) = F0.fvec a}
+  carrier := {g | g ∈ Formalism.HermitianLatticesTheory.isom (VS D).hT ∧ ∀ a, g (F0.fvec a) = F0.fvec a}
   one_mem' := ⟨(Formalism.HermitianLatticesTheory.isom _).one_mem, fun _ => rfl⟩
   mul_mem' := by
     rintro a b ⟨ha, ha'⟩ ⟨hb, hb'⟩
@@ -290,44 +308,39 @@ def G0 : Subgroup ((VS D).V ≃ₗ[D.host.E] (VS D).V) where
 
 variable {F0}
 
-theorem G0.isom (g : G0 F0)
-    : (g : (VS D).V ≃ₗ[D.host.E] (VS D).V) ∈ Formalism.HermitianLatticesTheory.isom (VS D).hT := by
+theorem G0.isom (g : G0 F0) : (g : (VS D).V ≃ₗ[D.host.E] (VS D).V) ∈ Formalism.HermitianLatticesTheory.isom (VS D).hT := by
   exact g.2.1
 
-theorem G0.hT (g : G0 F0) (x y : (VS D).V)
-    : (VS D).hT ((g : (VS D).V ≃ₗ[D.host.E] (VS D).V) x) ((g : (VS D).V ≃ₗ[D.host.E] (VS D).V) y)
-      = (VS D).hT x y := by
+theorem G0.hT (g : G0 F0) (x y : (VS D).V) : (VS D).hT ((g : (VS D).V ≃ₗ[D.host.E] (VS D).V) x)
+    ((g : (VS D).V ≃ₗ[D.host.E] (VS D).V) y) = (VS D).hT x y := by
   exact g.2.1 x y
 
-theorem G0.fix (g : G0 F0) (a : Fin (D.R.rS + 1))
-    : (g : (VS D).V ≃ₗ[D.host.E] (VS D).V) (F0.fvec a) = F0.fvec a := by
+theorem G0.fix (g : G0 F0) (a : Fin (D.R.rS + 1)) :
+    (g : (VS D).V ≃ₗ[D.host.E] (VS D).V) (F0.fvec a) = F0.fvec a := by
   exact g.2.2 a
 
-theorem G0.fix_e (g : G0 F0) (a : Fin D.R.rS)
-    : (g : (VS D).V ≃ₗ[D.host.E] (VS D).V) (F0.e a) = F0.e a := by
+theorem G0.fix_e (g : G0 F0) (a : Fin D.R.rS) : (g : (VS D).V ≃ₗ[D.host.E] (VS D).V) (F0.e a) = F0.e a := by
   have h := G0.fix g (Fin.castSucc a)
   simpa [Formalism.MainNotions.S.FlagG.fvec, Fin.snoc_castSucc] using h
 
-theorem G0.isometry_fix_flagAnisotropicVector_of_fix_frame (g : G0 F0)
-    : (g : (VS D).V ≃ₗ[D.host.E] (VS D).V) F0.z = F0.z := by
+theorem G0.isometry_fix_flagAnisotropicVector_of_fix_frame (g : G0 F0) : (g : (VS D).V ≃ₗ[D.host.E] (VS D).V) F0.z = F0.z := by
   have h := G0.fix g (Fin.last _)
   simpa [Formalism.MainNotions.S.FlagG.fvec, Fin.snoc_last] using h
 
-theorem G0.fix_X (g : G0 F0) {x : (VS D).V} (hx : x ∈ F0.X)
-    : (g : (VS D).V ≃ₗ[D.host.E] (VS D).V) x = x := by
-  have h1 : Set.EqOn ((g : (VS D).V ≃ₗ[D.host.E] (VS D).V) : (VS D).V →ₗ[D.host.E] (VS D).V)
-      (LinearMap.id : (VS D).V →ₗ[D.host.E] (VS D).V) (Set.range F0.e) := by
+theorem G0.fix_X (g : G0 F0) {x : (VS D).V} (hx : x ∈ F0.X) : (g : (VS D).V ≃ₗ[D.host.E] (VS D).V) x = x := by
+  have h1 : Set.EqOn ((g : (VS D).V ≃ₗ[D.host.E] (VS D).V) : (VS D).V →ₗ[D.host.E] (VS D).V) (LinearMap.id : (VS D).V →ₗ[D.host.E] (VS D).V)
+      (Set.range F0.e) := by
     rintro _ ⟨a, rfl⟩
     exact G0.fix_e g a
   exact LinearMap.eqOn_span h1 hx
 
-theorem G0.symm_fix_X (g : G0 F0) {x : (VS D).V} (hx : x ∈ F0.X)
-    : (g : (VS D).V ≃ₗ[D.host.E] (VS D).V).symm x = x := by
+theorem G0.symm_fix_X (g : G0 F0) {x : (VS D).V} (hx : x ∈ F0.X) :
+    (g : (VS D).V ≃ₗ[D.host.E] (VS D).V).symm x = x := by
   rw [LinearEquiv.symm_apply_eq]
   exact (G0.fix_X g hx).symm
 
-theorem G0.perp (g : G0 F0) {x : (VS D).V} (hx : x ∈ perpS (VS D) F0.X)
-    : (g : (VS D).V ≃ₗ[D.host.E] (VS D).V) x ∈ perpS (VS D) F0.X := by
+theorem G0.perp (g : G0 F0) {x : (VS D).V} (hx : x ∈ perpS (VS D) F0.X) :
+    (g : (VS D).V ≃ₗ[D.host.E] (VS D).V) x ∈ perpS (VS D) F0.X := by
   have hx' : ∀ y ∈ F0.X, (VS D).hT y x = 0 := hx
   show ∀ y ∈ F0.X, (VS D).hT y ((g : (VS D).V ≃ₗ[D.host.E] (VS D).V) x) = 0
   intro y hy
@@ -337,9 +350,7 @@ theorem G0.perp (g : G0 F0) {x : (VS D).V} (hx : x ∈ perpS (VS D) F0.X)
   exact hx' y hy
 
 theorem G0.lf (g : G0 F0) : mapL g.1 (G0.isom g) (lf D F0) = lf D F0 := by
-  refine Formalism.L2.SG.Saturated.mapL_eq_self _ _ _
-    (fun a => ?_)
-    (G0.isometry_fix_flagAnisotropicVector_of_fix_frame g)
+  refine Formalism.L2.SG.Saturated.mapL_eq_self _ _ _ (fun a => ?_) (G0.isometry_fix_flagAnisotropicVector_of_fix_frame g)
   exact G0.fix g a
 
 theorem G0.mapFlag (g : G0 F0) : mapFlag g.1 (G0.isom g) F0 = F0 := by
@@ -357,20 +368,13 @@ instance instActL (T' : D.host.E) : MulAction (G0 F0) (LFlag (VS D) D.R.rS T') w
   one_smul F := mapL_eq_self _ _ F (fun _ => rfl) rfl
   mul_smul _ _ _ := rfl
 
-theorem smul_def {T' : D.host.E} (g : G0 F0) (F : LFlag (D.sp.Y 0) D.R.rS T')
-    : g • F = mapL g.1 (G0.isom g) F :=
-  rfl
+theorem smul_def {T' : D.host.E} (g : G0 F0) (F : LFlag (D.sp.Y 0) D.R.rS T') : g • F = mapL g.1 (G0.isom g) F := rfl
 
-theorem frame_smul
-    {T' : D.host.E} (g : G0 F0) (F : LFlag (D.sp.Y 0) D.R.rS T') (a : Fin (D.R.rS + 1))
-    : (g • F).fl.fvec a = (g : (VS D).V ≃ₗ[D.host.E] (VS D).V) (F.fl.fvec a) := by
+theorem frame_smul {T' : D.host.E} (g : G0 F0) (F : LFlag (D.sp.Y 0) D.R.rS T') (a : Fin (D.R.rS + 1)) :
+    (g • F).fl.fvec a = (g : (VS D).V ≃ₗ[D.host.E] (VS D).V) (F.fl.fvec a) := by
   induction a using Fin.lastCases with
-  | last =>
-    simp [smul_def, Formalism.L2.SG.Saturated.mapL, Formalism.L2.SG.Saturated.mapFlag,
-      Formalism.MainNotions.S.FlagG.fvec]
-  | cast b =>
-    simp [smul_def, Formalism.L2.SG.Saturated.mapL, Formalism.L2.SG.Saturated.mapFlag,
-      Formalism.MainNotions.S.FlagG.fvec]
+  | last => simp [smul_def, Formalism.L2.SG.Saturated.mapL, Formalism.L2.SG.Saturated.mapFlag, Formalism.MainNotions.S.FlagG.fvec]
+  | cast b => simp [smul_def, Formalism.L2.SG.Saturated.mapL, Formalism.L2.SG.Saturated.mapFlag, Formalism.MainNotions.S.FlagG.fvec]
 
 def Hsub (Λ : Submodule (𝓞 D.host.E) (VS D).V) : Subgroup (G0 F0) where
   carrier := {g | Formalism.HermitianLatticesTheory.gmap (g : (VS D).V ≃ₗ[D.host.E] (VS D).V) Λ = Λ}
@@ -378,33 +382,25 @@ def Hsub (Λ : Submodule (𝓞 D.host.E) (VS D).V) : Subgroup (G0 F0) where
   mul_mem' := by
     intro a b ha hb
     show Formalism.HermitianLatticesTheory.gmap ((a : (VS D).V ≃ₗ[D.host.E] (VS D).V) * (b : (VS D).V ≃ₗ[D.host.E] (VS D).V)) Λ = Λ
-    have ha' : Formalism.HermitianLatticesTheory.gmap (a : (VS D).V ≃ₗ[D.host.E] (VS D).V) Λ = Λ :=
-      ha
-    have hb' : Formalism.HermitianLatticesTheory.gmap (b : (VS D).V ≃ₗ[D.host.E] (VS D).V) Λ = Λ :=
-      hb
+    have ha' : Formalism.HermitianLatticesTheory.gmap (a : (VS D).V ≃ₗ[D.host.E] (VS D).V) Λ = Λ := ha
+    have hb' : Formalism.HermitianLatticesTheory.gmap (b : (VS D).V ≃ₗ[D.host.E] (VS D).V) Λ = Λ := hb
     rw [gmap_mul_sat, hb', ha']
   inv_mem' := by
     intro a ha
-    replace ha
-        : Formalism.HermitianLatticesTheory.gmap (a : (VS D).V ≃ₗ[D.host.E] (VS D).V) Λ = Λ :=
-      ha
+    replace ha : Formalism.HermitianLatticesTheory.gmap (a : (VS D).V ≃ₗ[D.host.E] (VS D).V) Λ = Λ := ha
     show Formalism.HermitianLatticesTheory.gmap ((a : (VS D).V ≃ₗ[D.host.E] (VS D).V)⁻¹) Λ = Λ
     conv_lhs => rw [← ha]
     exact gmap_inv_gmap _ _
 
-theorem Hsub.gmap {Λ : Submodule (𝓞 D.host.E) (VS D).V} (h : Hsub (F0 := F0) Λ)
-    : Formalism.HermitianLatticesTheory.gmap ((h : G0 F0) : (VS D).V ≃ₗ[D.host.E] (VS D).V) Λ
-      = Λ := by
+theorem Hsub.gmap {Λ : Submodule (𝓞 D.host.E) (VS D).V} (h : Hsub (F0 := F0) Λ) :
+    Formalism.HermitianLatticesTheory.gmap ((h : G0 F0) : (VS D).V ≃ₗ[D.host.E] (VS D).V) Λ = Λ := by
   exact h.2
 
-theorem mem_Hsub_of_autF
-    {Λ : Submodule (𝓞 D.host.E) (VS D).V} {β : (VS D).V ≃ₗ[D.host.E] (VS D).V}
-    (hβ : β ∈ AutF Λ (lf D F0))
-    : ∃ h : Hsub (F0 := F0) Λ, ((h : G0 F0) : (VS D).V ≃ₗ[D.host.E] (VS D).V) = β := by
+theorem mem_Hsub_of_autF {Λ : Submodule (𝓞 D.host.E) (VS D).V} {β : (VS D).V ≃ₗ[D.host.E] (VS D).V}
+    (hβ : β ∈ AutF Λ (lf D F0)) : ∃ h : Hsub (F0 := F0) Λ, ((h : G0 F0) : (VS D).V ≃ₗ[D.host.E] (VS D).V) = β := by
   obtain ⟨⟨hi, hg⟩, hf, -⟩ := hβ
   have hG : β ∈ G0 F0 :=
-    show β ∈ Formalism.HermitianLatticesTheory.isom (VS D).hT ∧ ∀ a, β (F0.fvec a) = F0.fvec a from
-      ⟨hi, fun a => hf a⟩
+    show β ∈ Formalism.HermitianLatticesTheory.isom (VS D).hT ∧ ∀ a, β (F0.fvec a) = F0.fvec a from ⟨hi, fun a => hf a⟩
   exact ⟨⟨⟨β, hG⟩, show Formalism.HermitianLatticesTheory.gmap β Λ = Λ from hg⟩, rfl⟩
 
 def Nsub (Λ : Submodule (𝓞 D.host.E) (VS D).V) : Subgroup (Hsub (F0 := F0) Λ) where
@@ -428,14 +424,11 @@ instance Nsub.normal (Λ : Submodule (𝓞 D.host.E) (VS D).V) : (Nsub (F0 := F0
   · show (g : G0 F0).1 ((n : G0 F0).1 ((g : G0 F0).1.symm (F0.e a))) = F0.e a
     rw [(LinearEquiv.symm_apply_eq _).2 (G0.fix_e g.1 a).symm, he, G0.fix_e g.1 a]
   · show (g : G0 F0).1 ((n : G0 F0).1 ((g : G0 F0).1.symm F0.z)) = F0.z
-    rw [(LinearEquiv.symm_apply_eq _).2
-        (G0.isometry_fix_flagAnisotropicVector_of_fix_frame g.1).symm,
-      hz, G0.isometry_fix_flagAnisotropicVector_of_fix_frame g.1]
+    rw [(LinearEquiv.symm_apply_eq _).2 (G0.isometry_fix_flagAnisotropicVector_of_fix_frame g.1).symm, hz, G0.isometry_fix_flagAnisotropicVector_of_fix_frame g.1]
 
 end Formalism.L2.SG.Pf.Cnt.StabilizerQuotient
 
-open NumberField Module Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat
-  Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.CntLocal Formalism.L2.SG.Saturated
+open NumberField Module Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.CntLocal Formalism.L2.SG.Saturated
 open Classical
 
 noncomputable section
@@ -446,26 +439,18 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 variable {D : Formalism.BasicNotions.D7} {T : D.host.E} {F0 : FlagG (VS D) D.R.rS T}
 
-theorem ez_smul
-    {T' : D.host.E}
-    (g : G0 F0)
-    {Λ : Submodule (𝓞 D.host.E) (VS D).V} {Z : MatZ D} {F' : LFlag (D.sp.Y 0) D.R.rS T'}
-    (h : F' ∈ EZ T' F0 Λ Z)
-    : g • F' ∈ EZ T' F0
-      (Formalism.HermitianLatticesTheory.gmap (g : (VS D).V ≃ₗ[D.host.E] (VS D).V) Λ) Z := by
+theorem ez_smul {T' : D.host.E} (g : G0 F0) {Λ : Submodule (𝓞 D.host.E) (VS D).V} {Z : MatZ D}
+    {F' : LFlag (D.sp.Y 0) D.R.rS T'} (h : F' ∈ EZ T' F0 Λ Z) :
+    g • F' ∈ EZ T' F0 (Formalism.HermitianLatticesTheory.gmap (g : (VS D).V ≃ₗ[D.host.E] (VS D).V) Λ) Z := by
   obtain ⟨h1, h2, h3, h4, h5⟩ := h
   have hβ := G0.isom g
   have hl := G0.lf g
-  change IsTerm _ _ (lf D F0) _ ∧ AdmWit _ _ (lf D F0) _ 1 ∧ IsGeneric _ _ (lf D F0) _
-    ∧ FrameOK D _ _ ∧ ZhatL (lf D F0) _ = Z
+  change IsTerm _ _ (lf D F0) _ ∧ AdmWit _ _ (lf D F0) _ 1 ∧ IsGeneric _ _ (lf D F0) _ ∧ FrameOK D _ _ ∧
+    ZhatL (lf D F0) _ = Z
   rw [← hl, smul_def]
-  refine ⟨
-    ⟨(IsLift_mapL _ hβ Λ F').2 h1.1, (IsAdmissible_mapL _ hβ _ Λ _ F').2 h1.2.1, ?_⟩,
+  refine ⟨⟨(IsLift_mapL _ hβ Λ F').2 h1.1, (IsAdmissible_mapL _ hβ _ Λ _ F').2 h1.2.1, ?_⟩,
     (AdmWit_mapL _ hβ _ Λ _ F' 1).2 h2,
-    (generic_isomorphism_holds (S := VS D) (r := D.R.rS) (gS D) T T' _ hβ Λ _ F').2 h3,
-    ⟨(IsFixedConv_mapL _ hβ _ Λ F').2 h4.1, ?_⟩,
-    ?_
-  ⟩
+    (generic_isomorphism_holds (S := VS D) (r := D.R.rS) (gS D) T T' _ hβ Λ _ F').2 h3, ⟨(IsFixedConv_mapL _ hβ _ Λ F').2 h4.1, ?_⟩, ?_⟩
   · rw [gval_mapL]
     exact h1.2.2
   · rw [XLam_mapL _ hβ, h4.2]
@@ -474,36 +459,26 @@ theorem ez_smul
   · rw [zhat_mapL]
     exact h5
 
-theorem rowLat_gmap (g : G0 F0) {Λ : Submodule (𝓞 D.host.E) (VS D).V} (h : IsRowLat D F0 Λ)
-    : IsRowLat D F0
-      (Formalism.HermitianLatticesTheory.gmap (g : (VS D).V ≃ₗ[D.host.E] (VS D).V) Λ) := by
+theorem rowLat_gmap (g : G0 F0) {Λ : Submodule (𝓞 D.host.E) (VS D).V} (h : IsRowLat D F0 Λ) :
+    IsRowLat D F0 (Formalism.HermitianLatticesTheory.gmap (g : (VS D).V ≃ₗ[D.host.E] (VS D).V) Λ) := by
   obtain ⟨⟨hL, hG⟩, ⟨hL', hU, hLift, hFC⟩, hX⟩ := h
   have hβ := G0.isom g
   have hl := G0.lf g
-  have hmap
-      : ∀ {L : Submodule (𝓞 D.host.E) (VS D).V},
-        Submodule.IsLattice D.host.E L
-          → Submodule.IsLattice D.host.E
-            (Formalism.HermitianLatticesTheory.gmap (g : (VS D).V ≃ₗ[D.host.E] (VS D).V) L) := by
+  have hmap : ∀ {L : Submodule (𝓞 D.host.E) (VS D).V}, Submodule.IsLattice D.host.E L →
+      Submodule.IsLattice D.host.E (Formalism.HermitianLatticesTheory.gmap (g : (VS D).V ≃ₗ[D.host.E] (VS D).V) L) := by
     intro L hL
     refine ⟨hL.fg.map _, ?_⟩
     exact fun _ _ hli => (LinearIndependent.iff_fractionRing _ _).mp hli
   have hfull : Submodule.IsFullLattice D.host.E
       (Formalism.HermitianLatticesTheory.gmap (g : (VS D).V ≃ₗ[D.host.E] (VS D).V) Λ) := by
     refine { toIsLattice := hmap hL.toIsLattice, span_eq_top := ?_ }
-    change Submodule.span D.host.E
-        (((g : (VS D).V ≃ₗ[D.host.E] (VS D).V) : (VS D).V →ₗ[D.host.E] (VS D).V)
-          '' (Λ : Set (VS D).V))
-      = ⊤
+    change Submodule.span D.host.E (((g : (VS D).V ≃ₗ[D.host.E] (VS D).V) : (VS D).V →ₗ[D.host.E] (VS D).V) '' (Λ : Set (VS D).V)) = ⊤
     rw [Submodule.span_image, hL.span_eq_top, Submodule.map_top, LinearMap.range_eq_top]
     exact (g : (VS D).V ≃ₗ[D.host.E] (VS D).V).surjective
-  refine ⟨⟨hfull, fun p hp => ?_⟩, ⟨hmap hL', ?_, ?_, ?_⟩, ?_⟩
+  refine ⟨⟨hfull, fun p hp => ?_⟩,
+    ⟨hmap hL', ?_, ?_, ?_⟩, ?_⟩
   · obtain ⟨k, hk, hkL⟩ := hG p hp
-    refine ⟨
-      (g : (VS D).V ≃ₗ[D.host.E] (VS D).V) * k,
-      (Formalism.HermitianLatticesTheory.isom _).mul_mem hβ hk,
-      ?_
-    ⟩
+    refine ⟨(g : (VS D).V ≃ₗ[D.host.E] (VS D).V) * k, (Formalism.HermitianLatticesTheory.isom _).mul_mem hβ hk, ?_⟩
     rw [gmap_mul_sat, hkL, Formalism.HermitianLattices.Ext.L3.loc_gmap]
   · unfold Formalism.HermitianLatticesTheory.IsUnimodular
     rw [Formalism.MainNotions.BridgeLemma₂.c3sub_dual_gmap _ _ hβ, hU]
@@ -515,11 +490,10 @@ theorem rowLat_gmap (g : G0 F0) {Λ : Submodule (𝓞 D.host.E) (VS D).V} (h : I
     conv_rhs => rw [← G0.mapFlag g]
     rw [XS_mapFlag]
 
-theorem fixes_upair {T' : D.host.E} (g : G0 F0) (F' : LFlag (D.sp.Y 0) D.R.rS T') (hF : g • F' = F')
-    : ∀ x ∈ UPair D F0 F', (g : (VS D).V ≃ₗ[D.host.E] (VS D).V) x = x := by
+theorem fixes_upair {T' : D.host.E} (g : G0 F0) (F' : LFlag (D.sp.Y 0) D.R.rS T') (hF : g • F' = F') :
+    ∀ x ∈ UPair D F0 F', (g : (VS D).V ≃ₗ[D.host.E] (VS D).V) x = x := by
   intro x hx
-  have h1 : Set.EqOn ((g : (VS D).V ≃ₗ[D.host.E] (VS D).V) : (VS D).V →ₗ[D.host.E] (VS D).V)
-      (LinearMap.id : (VS D).V →ₗ[D.host.E] (VS D).V)
+  have h1 : Set.EqOn ((g : (VS D).V ≃ₗ[D.host.E] (VS D).V) : (VS D).V →ₗ[D.host.E] (VS D).V) (LinearMap.id : (VS D).V →ₗ[D.host.E] (VS D).V)
       (Set.range F0.fvec ∪ Set.range F'.fl.fvec) := by
     rintro _ (⟨a, rfl⟩ | ⟨a, rfl⟩)
     · exact G0.fix g a
@@ -528,33 +502,26 @@ theorem fixes_upair {T' : D.host.E} (g : G0 F0) (F' : LFlag (D.sp.Y 0) D.R.rS T'
       exact h2.symm
   exact LinearMap.eqOn_span h1 hx
 
-theorem eq_one_of_fix
-    (g : G0 F0)
-    {Λ : Submodule (𝓞 D.host.E) (VS D).V}
-    (hn : (g : (VS D).V ≃ₗ[D.host.E] (VS D).V) ∈ NLam Λ (lf D F0))
-    {T' : D.host.E}
-    (F' : LFlag (D.sp.Y 0) D.R.rS T') (hG : GZ T T' (ZhatL (lf D F0) F') ≠ 0) (hF : g • F' = F')
-    : g = 1 := by
+theorem eq_one_of_fix (g : G0 F0) {Λ : Submodule (𝓞 D.host.E) (VS D).V}
+    (hn : (g : (VS D).V ≃ₗ[D.host.E] (VS D).V) ∈ NLam Λ (lf D F0)) {T' : D.host.E}
+    (F' : LFlag (D.sp.Y 0) D.R.rS T') (hG : GZ T T' (ZhatL (lf D F0) F') ≠ 0) (hF : g • F' = F') : g = 1 := by
   have hU := fixes_upair g F' hF
   have hC := PairSpanDimension.isCompl F0 F' hG
   obtain ⟨-, -, hno⟩ := hn
   have hW : ∀ w ∈ orthK (VS D).hT (UPair D F0 F'), (g : (VS D).V ≃ₗ[D.host.E] (VS D).V) w = w := by
     intro w hw
-    have h1 : (g : (VS D).V ≃ₗ[D.host.E] (VS D).V) w - w ∈ F0.X :=
-      hno w (by
-        rw [Formalism.MainNotions.LatticeGluingRadicals.p_mem_orth]
-        intro x hx
-        exact (PairSpanDimension.mem_orthK.1 hw) x (PairSpanDimension.X_le_upair F0 F' hx))
+    have h1 : (g : (VS D).V ≃ₗ[D.host.E] (VS D).V) w - w ∈ F0.X := hno w (by
+      rw [Formalism.MainNotions.LatticeGluingRadicals.p_mem_orth]
+      intro x hx
+      exact (PairSpanDimension.mem_orthK.1 hw) x (PairSpanDimension.X_le_upair F0 F' hx))
     have h2 : (g : (VS D).V ≃ₗ[D.host.E] (VS D).V) w - w ∈ orthK (VS D).hT (UPair D F0 F') := by
       refine sub_mem ?_ hw
       rw [PairSpanDimension.mem_orthK] at hw ⊢
       intro x hx
       rw [← hU x hx, G0.hT]
       exact hw x hx
-    have h3
-        : (g : (VS D).V ≃ₗ[D.host.E] (VS D).V) w - w
-          ∈ UPair D F0 F' ⊓ orthK (VS D).hT (UPair D F0 F') :=
-      ⟨PairSpanDimension.X_le_upair F0 F' h1, h2⟩
+    have h3 : (g : (VS D).V ≃ₗ[D.host.E] (VS D).V) w - w ∈
+        UPair D F0 F' ⊓ orthK (VS D).hT (UPair D F0 F') := ⟨PairSpanDimension.X_le_upair F0 F' h1, h2⟩
     rw [PairSpanDimension.inf_orth F0 F' hG, Submodule.mem_bot, sub_eq_zero] at h3
     exact h3
   refine Subtype.ext (LinearEquiv.ext fun v => ?_)
@@ -567,8 +534,7 @@ theorem eq_one_of_fix
 
 end Formalism.L2.SG.Pf.Cnt.StabilizerQuotient
 
-open NumberField Module Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat
-  Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.CntLocal Formalism.L2.SG.Saturated
+open NumberField Module Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.CntLocal Formalism.L2.SG.Saturated
 open Classical
 
 noncomputable section
@@ -580,19 +546,15 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 variable {D : Formalism.BasicNotions.D7} {T : D.host.E} {F0 : FlagG (VS D) D.R.rS T}
 
 def rho (g : G0 F0) : WbQ D F0 → WbQ D F0 :=
-  Submodule.mapQ _ _
-    (((g : (VS D).V ≃ₗ[D.host.E] (VS D).V) : (VS D).V →ₗ[D.host.E] (VS D).V).restrict
-      (fun x hx => G0.perp g hx))
-    (fun x hx => by
+  Submodule.mapQ _ _ (((g : (VS D).V ≃ₗ[D.host.E] (VS D).V) : (VS D).V →ₗ[D.host.E] (VS D).V).restrict
+    (fun x hx => G0.perp g hx)) (fun x hx => by
       show (g : (VS D).V ≃ₗ[D.host.E] (VS D).V) x.1 ∈ F0.X
       have hx' : x.1 ∈ F0.X := hx
       rw [G0.fix_X g hx']
       exact hx')
 
-theorem rho_mk (g : G0 F0) (x : perpS (VS D) F0.X)
-    : rho g (Submodule.Quotient.mk x)
-      = Submodule.Quotient.mk ⟨(g : (VS D).V ≃ₗ[D.host.E] (VS D).V) x.1, G0.perp g x.2⟩ :=
-  rfl
+theorem rho_mk (g : G0 F0) (x : perpS (VS D) F0.X) :
+    rho g (Submodule.Quotient.mk x) = Submodule.Quotient.mk ⟨(g : (VS D).V ≃ₗ[D.host.E] (VS D).V) x.1, G0.perp g x.2⟩ := rfl
 
 theorem flag_stabilizer_of_mem (g : G0 F0) : (g : (VS D).V ≃ₗ[D.host.E] (VS D).V) ∈ stabF D F0 := by
   refine ⟨G0.isom g, fun j => ?_, G0.isometry_fix_flagAnisotropicVector_of_fix_frame g⟩
@@ -602,44 +564,26 @@ theorem flag_stabilizer_of_mem (g : G0 F0) : (g : (VS D).V ≃ₗ[D.host.E] (VS 
     exact G0.fix_e g i
   rw [Formalism.MainNotions.S.FlagG.Xa, Submodule.map_span, hE.image_eq, Set.image_id]
 
-theorem rho_mem {Λ : Submodule (𝓞 D.host.E) (VS D).V} (h : Hsub (F0 := F0) Λ)
-    : rho h.1 ∈ autLz D F0 Λ := by
-  exact ⟨
-    ((h : G0 F0) : (VS D).V ≃ₗ[D.host.E] (VS D).V),
-    flag_stabilizer_of_mem h.1,
-    Hsub.gmap h,
-    fun x hx => rfl
-  ⟩
+theorem rho_mem {Λ : Submodule (𝓞 D.host.E) (VS D).V} (h : Hsub (F0 := F0) Λ) : rho h.1 ∈ autLz D F0 Λ := by
+  exact ⟨((h : G0 F0) : (VS D).V ≃ₗ[D.host.E] (VS D).V), flag_stabilizer_of_mem h.1, Hsub.gmap h, fun x hx => rfl⟩
 
 theorem mem_perp_iff {x : (VS D).V} : x ∈ perpS (VS D) F0.X ↔ x ∈ orth (VS D) (Xsp (lf D F0)) := by
   show (∀ y ∈ F0.X, (VS D).hT y x = 0) ↔ _
   simp only [Formalism.MainNotions.S.Lat.orth, Submodule.mem_iInf, LinearMap.mem_ker]
 
-theorem rho_eq_iff {Λ : Submodule (𝓞 D.host.E) (VS D).V} (a b : Hsub (F0 := F0) Λ)
-    : rho a.1 = rho b.1 ↔ a⁻¹ * b ∈ Nsub (F0 := F0) Λ := by
+theorem rho_eq_iff {Λ : Submodule (𝓞 D.host.E) (VS D).V} (a b : Hsub (F0 := F0) Λ) :
+    rho a.1 = rho b.1 ↔ a⁻¹ * b ∈ Nsub (F0 := F0) Λ := by
   set A : (VS D).V ≃ₗ[D.host.E] (VS D).V := a.1.1 with hA
   set B : (VS D).V ≃ₗ[D.host.E] (VS D).V := b.1.1 with hB
-  have hn : (((a⁻¹ * b : Hsub (F0 := F0) Λ) : G0 F0) : (VS D).V ≃ₗ[D.host.E] (VS D).V) = A⁻¹ * B :=
-    rfl
+  have hn : (((a⁻¹ * b : Hsub (F0 := F0) Λ) : G0 F0) : (VS D).V ≃ₗ[D.host.E] (VS D).V) = A⁻¹ * B := rfl
   have hAX : ∀ y ∈ F0.X, A.symm y = y := fun y hy => G0.symm_fix_X a.1 hy
   have key : (∀ x ∈ perpS (VS D) F0.X, B x - A x ∈ F0.X) ↔ a⁻¹ * b ∈ Nsub (F0 := F0) Λ := by
     constructor
     · intro h
       show (((a⁻¹ * b : Hsub (F0 := F0) Λ) : G0 F0) : (VS D).V ≃ₗ[D.host.E] (VS D).V) ∈ N0 F0 Λ
       rw [hn]
-      refine ⟨
-        ⟨
-          ⟨
-            (Formalism.HermitianLatticesTheory.isom _).mul_mem
-              ((Formalism.HermitianLatticesTheory.isom _).inv_mem (G0.isom a.1)) (G0.isom b.1),
-            ?_
-          ⟩,
-          ?_,
-          ?_
-        ⟩,
-        fun i => ?_,
-        ?_
-      ⟩
+      refine ⟨⟨⟨(Formalism.HermitianLatticesTheory.isom _).mul_mem ((Formalism.HermitianLatticesTheory.isom _).inv_mem (G0.isom a.1)) (G0.isom b.1), ?_⟩, ?_, ?_⟩,
+        fun i => ?_, ?_⟩
       · exact (a⁻¹ * b).2
       · intro j x hx
         have hxX : x ∈ F0.X := PI.UnitaryGroupMassFormula.CntFormula.Xa_le_X F0 (j + 1) hx
@@ -660,7 +604,8 @@ theorem rho_eq_iff {Λ : Submodule (𝓞 D.host.E) (VS D).V} (a b : Hsub (F0 := 
       obtain ⟨⟨-, -, hno⟩, -, -⟩ := h
       rw [hn] at hno
       have h1 := hno x (mem_perp_iff.1 hx)
-      have e : B x - A x = A (A.symm (B x) - x) := by rw [map_sub, LinearEquiv.apply_symm_apply]
+      have e : B x - A x = A (A.symm (B x) - x) := by
+        rw [map_sub, LinearEquiv.apply_symm_apply]
       rw [e]
       have h1' : A.symm (B x) - x ∈ F0.X := h1
       rw [G0.fix_X a.1 h1']
@@ -682,19 +627,15 @@ theorem rho_eq_iff {Λ : Submodule (𝓞 D.host.E) (VS D).V} (a b : Hsub (F0 := 
       rw [neg_sub] at h2
       exact h2
 
-theorem card_quot
-    (u : D.what₂.Word) (F0 : FlagG (VS D) D.R.rS (Tn u))
-    (Λ : Submodule (𝓞 D.host.E) (VS D).V) (hΛ : IsRowLat D F0 Λ)
-    : Finite (Hsub (F0 := F0) Λ ⧸ Nsub (F0 := F0) Λ)
-      ∧ Nat.card (Hsub (F0 := F0) Λ ⧸ Nsub (F0 := F0) Λ) = Nat.card (autLz D F0 Λ) := by
+theorem card_quot (u : D.what₂.Word) (F0 : FlagG (VS D) D.R.rS (Tn u)) (Λ : Submodule (𝓞 D.host.E) (VS D).V)
+    (hΛ : IsRowLat D F0 Λ) :
+    Finite (Hsub (F0 := F0) Λ ⧸ Nsub (F0 := F0) Λ) ∧
+      Nat.card (Hsub (F0 := F0) Λ ⧸ Nsub (F0 := F0) Λ) = Nat.card (autLz D F0 Λ) := by
   let f : Hsub (F0 := F0) Λ ⧸ Nsub (F0 := F0) Λ → autLz D F0 Λ :=
-    Quotient.lift
-      (fun h => ⟨rho h.1, rho_mem h⟩)
-      (fun a b hab => Subtype.ext ((rho_eq_iff a b).2 (QuotientGroup.leftRel_apply.mp hab)))
-  have hf
-      : ∀ h : Hsub (F0 := F0) Λ,
-        f (h : Hsub (F0 := F0) Λ ⧸ Nsub (F0 := F0) Λ) = ⟨rho h.1, rho_mem h⟩ := fun _ =>
-    rfl
+    Quotient.lift (fun h => ⟨rho h.1, rho_mem h⟩) (fun a b hab =>
+      Subtype.ext ((rho_eq_iff a b).2 (QuotientGroup.leftRel_apply.mp hab)))
+  have hf : ∀ h : Hsub (F0 := F0) Λ, f (h : Hsub (F0 := F0) Λ ⧸ Nsub (F0 := F0) Λ) = ⟨rho h.1, rho_mem h⟩ :=
+    fun _ => rfl
   have hinj : Function.Injective f := by
     intro q1 q2 e
     induction q1 using QuotientGroup.induction_on with
@@ -706,9 +647,7 @@ theorem card_quot
   have hsurj : Function.Surjective f := by
     rintro ⟨φ, hφ⟩
     have hsplit := _root_.split_row_iso D u F0 Λ hΛ
-    have hφ' :=
-      (Set.ext_iff.mp (Formalism.L2.SG.Pf.automorphism_induces_lattice_map D u F0 Λ hΛ hsplit) φ).1
-        hφ
+    have hφ' := (Set.ext_iff.mp (Formalism.L2.SG.Pf.automorphism_induces_lattice_map D u F0 Λ hΛ hsplit) φ).1 hφ
     obtain ⟨β, hβ, hφβ⟩ := hφ'
     obtain ⟨h, rfl⟩ := mem_Hsub_of_autF (F0 := F0) hβ
     refine ⟨(QuotientGroup.mk h : Hsub (F0 := F0) Λ ⧸ Nsub (F0 := F0) Λ), ?_⟩
@@ -720,15 +659,13 @@ theorem card_quot
       rw [rho_mk]
       exact (hφβ x _).symm
   have hfin : (autLz D F0 Λ).Finite :=
-    _root_.automorphism_lattice_finite D (D.sp.Y_sig 0) (D.mem u).A.T (D.mem u).A.T_prime.pos F0 Λ
-      hΛ
+    _root_.automorphism_lattice_finite D (D.sp.Y_sig 0) (D.mem u).A.T (D.mem u).A.T_prime.pos F0 Λ hΛ
   haveI := hfin.to_subtype
   exact ⟨Finite.of_injective f hinj, Nat.card_eq_of_bijective f ⟨hinj, hsurj⟩⟩
 
 end Formalism.L2.SG.Pf.Cnt.StabilizerQuotient
 
-open NumberField Module Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat
-  Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.CntLocal Formalism.L2.SG.Saturated
+open NumberField Module Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.CntLocal Formalism.L2.SG.Saturated
 open Classical
 
 noncomputable section
@@ -739,20 +676,16 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 variable {D : Formalism.BasicNotions.D7} {T : D.host.E} {F0 : FlagG (VS D) D.R.rS T}
 
-theorem flagStabilizer_fixes_frame
-    {Λ : Submodule (𝓞 D.host.E) (VS D).V} {n : (VS D).V ≃ₗ[D.host.E] (VS D).V} (hn : n ∈ N0 F0 Λ)
-    (a : Fin (D.R.rS + 1))
-    : n (F0.fvec a) = F0.fvec a := by
+theorem flagStabilizer_fixes_frame {Λ : Submodule (𝓞 D.host.E) (VS D).V} {n : (VS D).V ≃ₗ[D.host.E] (VS D).V}
+    (hn : n ∈ N0 F0 Λ) (a : Fin (D.R.rS + 1)) : n (F0.fvec a) = F0.fvec a := by
   obtain ⟨-, he, hz⟩ := hn
   induction a using Fin.lastCases with
   | last => simpa [Formalism.MainNotions.S.FlagG.fvec] using hz
   | cast b => simpa [Formalism.MainNotions.S.FlagG.fvec] using he b
 
-theorem orbit_set_eq
-    {T' : D.host.E} {Λ : Submodule (𝓞 D.host.E) (VS D).V} {Z : MatZ D}
-    {F' : LFlag (D.sp.Y 0) D.R.rS T'} (hF' : F' ∈ EZ T' F0 Λ Z)
-    : {F'' | F'' ∈ EZ T' F0 Λ Z ∧ NilradicalFlagMoved F0 Λ F' F''}
-      = nOrb (Nsub (F0 := F0) Λ) (EZ T' F0 Λ Z) F' := by
+theorem orbit_set_eq {T' : D.host.E} {Λ : Submodule (𝓞 D.host.E) (VS D).V} {Z : MatZ D}
+    {F' : LFlag (D.sp.Y 0) D.R.rS T'} (hF' : F' ∈ EZ T' F0 Λ Z) :
+    {F'' | F'' ∈ EZ T' F0 Λ Z ∧ NilradicalFlagMoved F0 Λ F' F''} = nOrb (Nsub (F0 := F0) Λ) (EZ T' F0 Λ Z) F' := by
   ext F''
   constructor
   · rintro ⟨hF'', n, hn, he, hz⟩
@@ -765,14 +698,12 @@ theorem orbit_set_eq
   · rintro ⟨hF'', m, hm, rfl⟩
     exact ⟨hF'', _, hm, fun a => rfl, rfl⟩
 
-theorem row_count
-    (u u' : D.what₂.Word) (F0 : FlagG (VS D) D.R.rS (Tn u))
-    (Λ : Submodule (𝓞 D.host.E) (VS D).V) (hΛ : IsRowLat D F0 Λ)
-    (Z : MatZ D) (hP : TotPos (GZ (Tn u) (Tn u') Z))
+theorem row_count (u u' : D.what₂.Word) (F0 : FlagG (VS D) D.R.rS (Tn u)) (Λ : Submodule (𝓞 D.host.E) (VS D).V)
+    (hΛ : IsRowLat D F0 Λ) (Z : MatZ D) (hP : TotPos (GZ (Tn u) (Tn u') Z))
     (Tr : Finset (LFlag (VS D) D.R.rS (Tn u'))) (hTA : ∀ t ∈ Tr, t ∈ EZ (Tn u') F0 Λ Z)
-    (hT : ∀ x ∈ EZ (Tn u') F0 Λ Z, ∃! t, t ∈ Tr ∧ ∃ h : Hsub (F0 := F0) Λ, h • t = x)
-    : wRow D F0 Λ * ((cntE (Tn u') F0 Λ Z).toNat : ℝ)
-      = ∑ t ∈ Tr, ((Nat.card (MulAction.stabilizer (Hsub (F0 := F0) Λ) t) : ℕ) : ℝ)⁻¹ := by
+    (hT : ∀ x ∈ EZ (Tn u') F0 Λ Z, ∃! t, t ∈ Tr ∧ ∃ h : Hsub (F0 := F0) Λ, h • t = x) :
+    wRow D F0 Λ * ((cntE (Tn u') F0 Λ Z).toNat : ℝ) =
+      ∑ t ∈ Tr, ((Nat.card (MulAction.stabilizer (Hsub (F0 := F0) Λ) t) : ℕ) : ℝ)⁻¹ := by
   obtain ⟨hfin, hcard⟩ := card_quot u F0 Λ hΛ
   haveI := hfin
   have hA : ∀ (h : Hsub (F0 := F0) Λ), ∀ x ∈ EZ (Tn u') F0 Λ Z, h • x ∈ EZ (Tn u') F0 Λ Z := by
@@ -787,26 +718,23 @@ theorem row_count
       exact PairSpanDimension.totPos_ne_zero hP
     exact Subtype.ext (eq_one_of_fix n.1 hn.1 x hG hnx)
   obtain ⟨-, hQ⟩ := count (Nsub (F0 := F0) Λ) (EZ (Tn u') F0 Λ Z) hA hfree Tr hTA hT
-  have hset
-      : {O : Set (LFlag (VS D) D.R.rS (Tn u')) | ∃ F' ∈ EZ (Tn u') F0 Λ Z,
-          O = {F'' | F'' ∈ EZ (Tn u') F0 Λ Z ∧ NilradicalFlagMoved F0 Λ F' F''}}
-        = nOrbs (Nsub (F0 := F0) Λ) (EZ (Tn u') F0 Λ Z) := by
+  have hset : {O : Set (LFlag (VS D) D.R.rS (Tn u')) | ∃ F' ∈ EZ (Tn u') F0 Λ Z,
+      O = {F'' | F'' ∈ EZ (Tn u') F0 Λ Z ∧ NilradicalFlagMoved F0 Λ F' F''}} =
+        nOrbs (Nsub (F0 := F0) Λ) (EZ (Tn u') F0 Λ Z) := by
     ext O
     constructor
     · rintro ⟨F', hF', rfl⟩
       exact ⟨F', hF', orbit_set_eq hF'⟩
     · rintro ⟨F', hF', rfl⟩
       exact ⟨F', hF', (orbit_set_eq hF').symm⟩
-  have hc
-      : (cntE (Tn u') F0 Λ Z).toNat = (nOrbs (Nsub (F0 := F0) Λ) (EZ (Tn u') F0 Λ Z)).ncard := by
+  have hc : (cntE (Tn u') F0 Λ Z).toNat = (nOrbs (Nsub (F0 := F0) Λ) (EZ (Tn u') F0 Λ Z)).ncard := by
     rw [cntE, hset]
     rfl
   rw [hc, ← hQ, wRow, ← hcard, div_eq_mul_inv, mul_comm]
 
 end Formalism.L2.SG.Pf.Cnt.StabilizerQuotient
 
-open NumberField Module Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat
-  Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.CntLocal Formalism.L2.SG.Saturated
+open NumberField Module Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.CntLocal Formalism.L2.SG.Saturated
 open Classical
 
 noncomputable section
@@ -817,11 +745,9 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 variable {D : Formalism.BasicNotions.D7} {T : D.host.E} {F0 : FlagG (VS D) D.R.rS T}
 
-theorem witt_trans
-    {T' : D.host.E}
-    (F' F'' : LFlag (D.sp.Y 0) D.R.rS T') (hzt' : F'.zt = F'.fl.z) (hzt'' : F''.zt = F''.fl.z)
-    (hZ : ZhatL (lf D F0) F'' = ZhatL (lf D F0) F') (hG : GZ T T' (ZhatL (lf D F0) F') ≠ 0)
-    : ∃ g : G0 F0, g • F'' = F' := by
+theorem witt_trans {T' : D.host.E} (F' F'' : LFlag (D.sp.Y 0) D.R.rS T') (hzt' : F'.zt = F'.fl.z)
+    (hzt'' : F''.zt = F''.fl.z) (hZ : ZhatL (lf D F0) F'' = ZhatL (lf D F0) F')
+    (hG : GZ T T' (ZhatL (lf D F0) F') ≠ 0) : ∃ g : G0 F0, g • F'' = F' := by
   have hG'' : GZ T T' (ZhatL (lf D F0) F'') ≠ 0 := by rw [hZ]; exact hG
   set v := PairSpanDimension.fam F0 F'' with hv
   set w := PairSpanDimension.fam F0 F' with hw
@@ -842,43 +768,34 @@ theorem witt_trans
     have hx' : ∑ i, bv.repr x i • w i = 0 := by
       rw [← hx]
       conv_rhs => rw [← bv.sum_repr x]
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum]
+
+      rw [map_sum]
       simp only [map_smul, hfb]
     have hc := Fintype.linearIndependent_iff.1 hlw _ hx'
     rw [Submodule.mem_bot]
     have : bv.repr x = 0 := Finsupp.ext hc
     simpa using this
-  have hiso
-      : ∀ x y : Submodule.span D.host.E (Set.range v), (VS D).hT (f x) (f y) = (VS D).hT x y := by
-    have hcx
-        : ∀ x : Submodule.span D.host.E (Set.range v), (x : (VS D).V) = ∑ i, bv.repr x i • v i := by
+  have hiso : ∀ x y : Submodule.span D.host.E (Set.range v), (VS D).hT (f x) (f y) = (VS D).hT x y := by
+    have hcx : ∀ x : Submodule.span D.host.E (Set.range v), (x : (VS D).V) = ∑ i, bv.repr x i • v i := by
       intro x
-      calc
-        (x : (VS D).V)
-            = ((∑ i, bv.repr x i • bv i : Submodule.span D.host.E (Set.range v)) : (VS D).V) := by
-          rw [bv.sum_repr]
+      calc (x : (VS D).V) = ((∑ i, bv.repr x i • bv i : Submodule.span D.host.E (Set.range v)) : (VS D).V) := by
+            rw [bv.sum_repr]
         _ = ∑ i, bv.repr x i • v i := by
-          rw [Submodule.coe_sum]
-          simp only [Submodule.coe_smul, hbv]
+            rw [Submodule.coe_sum]
+            simp only [Submodule.coe_smul, hbv]
     have hfx : ∀ x : Submodule.span D.host.E (Set.range v), f x = ∑ i, bv.repr x i • w i := by
       intro x
-      calc
-        f x
-          = f (∑ i, bv.repr x i • bv i) := by rw [bv.sum_repr]
+      calc f x = f (∑ i, bv.repr x i • bv i) := by rw [bv.sum_repr]
         _ = ∑ i, bv.repr x i • w i := by
-          set_option synthInstance.maxHeartbeats 100000 in
+
             rw [map_sum]
-          simp only [map_smul, hfb]
+            simp only [map_smul, hfb]
     intro x y
     rw [hfx, hfx, hcx, hcx]
-    set_option synthInstance.maxHeartbeats 100000 in
+
     simp only [map_sum, LinearMap.map_smulₛₗ₂, map_smul, LinearMap.sum_apply, hgram]
-  obtain ⟨g, hgi, hgf⟩ :=
-    _root_.witt_extension_theorem D.host.E (VS D).V (VS D).hT
-      (fun x y => (VS D).herm.eq x y)
-      (fun x hx => (VS D).nondeg.1 x hx)
-      _ f hinj hiso
+  obtain ⟨g, hgi, hgf⟩ := _root_.witt_extension_theorem D.host.E (VS D).V (VS D).hT
+    (fun x y => (VS D).herm.eq x y) (fun x hx => (VS D).nondeg.1 x hx) _ f hinj hiso
   have hgv : ∀ i, g (v i) = w i := by
     intro i
     have := hgf (bv i)
@@ -897,16 +814,13 @@ theorem witt_trans
     simp only [hv, hw, PairSpanDimension.fam, Sum.elim_inr, FlagG.fvec, Fin.snoc_last] at this
     rw [hzt'', hzt', this]
 
-theorem mem_stabilizer_of_isometry_fix
-    {T' : D.host.E} (F' : LFlag (D.sp.Y 0) D.R.rS T')
-    {g : (VS D).V ≃ₗ[D.host.E] (VS D).V} (hg : g ∈ isomFix (VS D).hT (UPair D F0 F'))
-    : g ∈ G0 F0 := by
+theorem mem_stabilizer_of_isometry_fix {T' : D.host.E} (F' : LFlag (D.sp.Y 0) D.R.rS T') {g : (VS D).V ≃ₗ[D.host.E] (VS D).V}
+    (hg : g ∈ isomFix (VS D).hT (UPair D F0 F')) : g ∈ G0 F0 := by
   obtain ⟨hi, hu⟩ := hg
   exact ⟨hi, fun a => hu _ (Submodule.subset_span (Or.inl ⟨a, rfl⟩))⟩
 
-theorem isomFix_iff
-    {T' : D.host.E} (F' : LFlag (D.sp.Y 0) D.R.rS T') (hzt : F'.zt = F'.fl.z) (g : G0 F0)
-    : (g : (VS D).V ≃ₗ[D.host.E] (VS D).V) ∈ isomFix (VS D).hT (UPair D F0 F') ↔ g • F' = F' := by
+theorem isomFix_iff {T' : D.host.E} (F' : LFlag (D.sp.Y 0) D.R.rS T') (hzt : F'.zt = F'.fl.z) (g : G0 F0) :
+    (g : (VS D).V ≃ₗ[D.host.E] (VS D).V) ∈ isomFix (VS D).hT (UPair D F0 F') ↔ g • F' = F' := by
   constructor
   · rintro ⟨-, hu⟩
     have hmem : ∀ a, F'.fl.fvec a ∈ UPair D F0 F' := fun a =>
@@ -927,8 +841,7 @@ theorem isomFix_iff
 
 end Formalism.L2.SG.Pf.Cnt.StabilizerQuotient
 
-open NumberField Module Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat
-  Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.CntLocal Formalism.L2.SG.Saturated
+open NumberField Module Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.CntLocal Formalism.L2.SG.Saturated
 open Classical
 
 noncomputable section
@@ -942,26 +855,19 @@ variable {D : Formalism.BasicNotions.D7}
 def retr (e f : Fin D.R.rS → (VS D).V) : (VS D).V →ₗ[D.host.E] (VS D).V :=
   ∑ a, ((VS D).hT (f a)).smulRight (e a)
 
-theorem retr_apply (e f : Fin D.R.rS → (VS D).V) (v : (VS D).V)
-    : retr e f v = ∑ a, (VS D).hT (f a) v • e a := by
+theorem retr_apply (e f : Fin D.R.rS → (VS D).V) (v : (VS D).V) :
+    retr e f v = ∑ a, (VS D).hT (f a) v • e a := by
   simp [retr, LinearMap.sum_apply, LinearMap.smulRight_apply]
 
-theorem retr_conj
-    {X : Submodule D.host.E (VS D).V} {Λ : Submodule (𝓞 D.host.E) (VS D).V} {z : (VS D).V}
-    (δ : (VS D).V ≃ₗ[D.host.E] (VS D).V)
-    (hX : ∀ x ∈ X, δ x ∈ X) (hX' : ∀ x ∈ X, δ.symm x ∈ X) (hz : δ z = z)
+theorem retr_conj {X : Submodule D.host.E (VS D).V} {Λ : Submodule (𝓞 D.host.E) (VS D).V} {z : (VS D).V}
+    (δ : (VS D).V ≃ₗ[D.host.E] (VS D).V) (hX : ∀ x ∈ X, δ x ∈ X) (hX' : ∀ x ∈ X, δ.symm x ∈ X) (hz : δ z = z)
     (P0 : (VS D).V →ₗ[D.host.E] (VS D).V) (hid : ∀ x ∈ X, P0 x = x) (hran : ∀ y, P0 y ∈ X)
-    (hint : Formalism.MainNotions.BridgeLemma.LInt Λ P0) (hP0z : P0 z = 0)
-    : (∀ x ∈ X,
-        ((δ : (VS D).V →ₗ[D.host.E] (VS D).V) ∘ₗ P0 ∘ₗ (δ.symm : (VS D).V →ₗ[D.host.E] (VS D).V)) x
-          = x)
-      ∧ (∀ y,
-        ((δ : (VS D).V →ₗ[D.host.E] (VS D).V) ∘ₗ P0 ∘ₗ (δ.symm : (VS D).V →ₗ[D.host.E] (VS D).V)) y
-          ∈ X)
-      ∧ Formalism.MainNotions.BridgeLemma.LInt (Formalism.HermitianLatticesTheory.gmap δ Λ)
-        ((δ : (VS D).V →ₗ[D.host.E] (VS D).V) ∘ₗ P0 ∘ₗ (δ.symm : (VS D).V →ₗ[D.host.E] (VS D).V))
-      ∧ ((δ : (VS D).V →ₗ[D.host.E] (VS D).V) ∘ₗ P0 ∘ₗ (δ.symm : (VS D).V →ₗ[D.host.E] (VS D).V)) z
-        = 0 := by
+    (hint : Formalism.MainNotions.BridgeLemma.LInt Λ P0) (hP0z : P0 z = 0) :
+    (∀ x ∈ X, ((δ : (VS D).V →ₗ[D.host.E] (VS D).V) ∘ₗ P0 ∘ₗ (δ.symm : (VS D).V →ₗ[D.host.E] (VS D).V)) x = x) ∧
+    (∀ y, ((δ : (VS D).V →ₗ[D.host.E] (VS D).V) ∘ₗ P0 ∘ₗ (δ.symm : (VS D).V →ₗ[D.host.E] (VS D).V)) y ∈ X) ∧
+    Formalism.MainNotions.BridgeLemma.LInt (Formalism.HermitianLatticesTheory.gmap δ Λ)
+      ((δ : (VS D).V →ₗ[D.host.E] (VS D).V) ∘ₗ P0 ∘ₗ (δ.symm : (VS D).V →ₗ[D.host.E] (VS D).V)) ∧
+    ((δ : (VS D).V →ₗ[D.host.E] (VS D).V) ∘ₗ P0 ∘ₗ (δ.symm : (VS D).V →ₗ[D.host.E] (VS D).V)) z = 0 := by
   have hz' : δ.symm z = z := by
     rw [LinearEquiv.symm_apply_eq]
     exact hz.symm
@@ -976,8 +882,7 @@ theorem retr_conj
   · simp only [LinearMap.comp_apply, LinearEquiv.coe_coe]
     rw [hz', hP0z, map_zero]
 
-theorem iso_X {T : D.host.E} (F0 : FlagG (VS D) D.R.rS T)
-    : ∀ x ∈ F0.X, ∀ y ∈ F0.X, (VS D).hT x y = 0 := by
+theorem iso_X {T : D.host.E} (F0 : FlagG (VS D) D.R.rS T) : ∀ x ∈ F0.X, ∀ y ∈ F0.X, (VS D).hT x y = 0 := by
   have h1 : ∀ a, ∀ y ∈ F0.X, (VS D).hT (F0.e a) y = 0 := by
     intro a y hy
     have hle : F0.X ≤ LinearMap.ker ((VS D).hT (F0.e a)) := by
@@ -992,51 +897,40 @@ theorem iso_X {T : D.host.E} (F0 : FlagG (VS D) D.R.rS T)
     exact h1 a y hy
   exact hle hx
 
-theorem class_red
-    (u : D.what₂.Word) (F0 : FlagG (VS D) D.R.rS (Tn u))
-    {Λ Λ' : Submodule (𝓞 D.host.E) (VS D).V} (hΛ : IsRowLat D F0 Λ) (hΛ' : IsRowLat D F0 Λ')
-    {γ : (VS D).V ≃ₗ[D.host.E] (VS D).V}
-    (hγ : γ ∈ stabF D F0) (hγΛ : Formalism.HermitianLatticesTheory.gmap γ Λ = Λ')
-    : ∃ g : G0 F0,
-      Formalism.HermitianLatticesTheory.gmap (g : (VS D).V ≃ₗ[D.host.E] (VS D).V) Λ = Λ' := by
+theorem class_red (u : D.what₂.Word) (F0 : FlagG (VS D) D.R.rS (Tn u)) {Λ Λ' : Submodule (𝓞 D.host.E) (VS D).V}
+    (hΛ : IsRowLat D F0 Λ) (hΛ' : IsRowLat D F0 Λ') {γ : (VS D).V ≃ₗ[D.host.E] (VS D).V}
+    (hγ : γ ∈ stabF D F0) (hγΛ : Formalism.HermitianLatticesTheory.gmap γ Λ = Λ') :
+    ∃ g : G0 F0, Formalism.HermitianLatticesTheory.gmap (g : (VS D).V ≃ₗ[D.host.E] (VS D).V) Λ = Λ' := by
   obtain ⟨f, L, hff, hef, hLp, hzL, hΛeq⟩ := _root_.split_row_iso D u F0 Λ hΛ
   have hee : ∀ a b, (VS D).hT (F0.e a) (F0.e b) = 0 := F0.e_iso
   obtain ⟨hγi, hγX, hγz⟩ := hγ
   have hXX : (F0.X).map (γ : (VS D).V →ₗ[D.host.E] (VS D).V) = F0.X := by
     rw [← Formalism.L2.SG.Pf.Xa_r' F0]
     exact hγX _
-  have hX
-      : ∀ x ∈ Submodule.span D.host.E (Set.range F0.e),
-        γ x ∈ Submodule.span D.host.E (Set.range F0.e) := fun x hx => by
+  have hX : ∀ x ∈ Submodule.span D.host.E (Set.range F0.e),
+      γ x ∈ Submodule.span D.host.E (Set.range F0.e) := fun x hx => by
     change γ x ∈ F0.X
     rw [← hXX]
     exact Submodule.mem_map_of_mem hx
-  have hX'
-      : ∀ x ∈ Submodule.span D.host.E (Set.range F0.e),
-        γ.symm x ∈ Submodule.span D.host.E (Set.range F0.e) := fun x hx => by
+  have hX' : ∀ x ∈ Submodule.span D.host.E (Set.range F0.e),
+      γ.symm x ∈ Submodule.span D.host.E (Set.range F0.e) := fun x hx => by
     change x ∈ F0.X at hx
     rw [← hXX, Submodule.mem_map_equiv] at hx
     exact hx
-  obtain ⟨β, hβ⟩
-      : ∃ β : (VS D).V ≃ₗ[D.host.E] (VS D).V, ∀ v, β v = Formalism.L2.SG.Pf.bmap F0.e f γ v :=
+  obtain ⟨β, hβ⟩ : ∃ β : (VS D).V ≃ₗ[D.host.E] (VS D).V, ∀ v, β v = Formalism.L2.SG.Pf.bmap F0.e f γ v :=
     ⟨Formalism.L2.SG.Pf.bEquiv hee hff hef γ hγi hX hX', fun v => rfl⟩
   have hzp : Formalism.L2.SG.Pf.pj F0.e f F0.z = F0.z := Formalism.L2.SG.Pf.pj_perp _ (hLp _ hzL)
   have hβe : ∀ i, β (F0.e i) = F0.e i := fun i => by
-    rw [hβ, Formalism.L2.SG.Pf.bmap_apply, Formalism.L2.SG.Pf.pj_e hee hef, sub_zero, map_zero,
-      map_zero, add_zero]
+    rw [hβ, Formalism.L2.SG.Pf.bmap_apply, Formalism.L2.SG.Pf.pj_e hee hef, sub_zero, map_zero, map_zero, add_zero]
   have hβz : β F0.z = F0.z := by
     rw [hβ, Formalism.L2.SG.Pf.bmap_apply, hzp, sub_self, zero_add, hγz, hzp]
   have hβi : β ∈ Formalism.HermitianLatticesTheory.isom (VS D).hT := fun v v' => by
     rw [hβ, hβ]
     exact Formalism.L2.SG.Pf.bmap_isom hee hff hef γ hγi hX' v v'
-  let bG : G0 F0 := ⟨
-    β,
-    hβi,
-    fun a => by
-      induction a using Fin.lastCases with
-      | last => simpa [FlagG.fvec] using hβz
-      | cast i => simpa [FlagG.fvec] using hβe i
-  ⟩
+  let bG : G0 F0 := ⟨β, hβi, fun a => by
+    induction a using Fin.lastCases with
+    | last => simpa [FlagG.fvec] using hβz
+    | cast i => simpa [FlagG.fvec] using hβe i⟩
 
   set P0 := retr F0.e f with hP0
   have hP0e : ∀ b, P0 (F0.e b) = F0.e b := by
@@ -1060,16 +954,14 @@ theorem class_red
     rw [retr_apply]
     simp [(hLp _ hzL _).2]
   have hint : Formalism.MainNotions.BridgeLemma.LInt Λ P0 := by
-    have key
-        : latSpan (aaS D) F0.e ⊔ L ⊔ latSpan (fun a => (aaS D a)⁻¹) f
-          ≤ Λ.comap (P0.restrictScalars (𝓞 D.host.E)) := by
+    have key : latSpan (aaS D) F0.e ⊔ L ⊔ latSpan (fun a => (aaS D a)⁻¹) f ≤
+        Λ.comap (P0.restrictScalars (𝓞 D.host.E)) := by
       refine sup_le (sup_le ?_ ?_) ?_
       · rw [latSpan, Submodule.span_le]
         rintro _ ⟨a, x, hx, rfl⟩
         show P0 (x • F0.e a) ∈ Λ
         rw [map_smul, hP0e, hΛeq]
-        exact Submodule.mem_sup_left (Submodule.mem_sup_left (Submodule.subset_span
-          ⟨a, x, hx, rfl⟩))
+        exact Submodule.mem_sup_left (Submodule.mem_sup_left (Submodule.subset_span ⟨a, x, hx, rfl⟩))
       · intro l hl
         show P0 l ∈ Λ
         rw [retr_apply]
@@ -1081,44 +973,33 @@ theorem class_red
         simp [hff]
     rw [← hΛeq] at key
     exact fun l hl => key hl
-  have hXβ : ∀ x ∈ F0.X, β x ∈ F0.X := fun x hx => by
-    rw [show β x = x from G0.fix_X bG hx]; exact hx
+  have hXβ : ∀ x ∈ F0.X, β x ∈ F0.X := fun x hx => by rw [show β x = x from G0.fix_X bG hx]; exact hx
   have hXβ' : ∀ x ∈ F0.X, β.symm x ∈ F0.X := fun x hx => by
     rw [show β.symm x = x from G0.symm_fix_X bG hx]; exact hx
   have R1 := retr_conj β hXβ hXβ' hβz P0 hid hran hint hP0z
   have R2 := retr_conj γ hX hX' hγz P0 hid hran hint hP0z
   rw [hγΛ] at R2
   have hcm := D.sp.cm.cmUnram
-  have hu1 : Formalism.HermitianLatticesTheory.IsUnimodular (VS D).hT
-      (Formalism.HermitianLatticesTheory.gmap β Λ) := by
+  have hu1 : Formalism.HermitianLatticesTheory.IsUnimodular (VS D).hT (Formalism.HermitianLatticesTheory.gmap β Λ) := by
     unfold Formalism.HermitianLatticesTheory.IsUnimodular
     rw [Formalism.MainNotions.BridgeLemma₂.c3sub_dual_gmap _ _ hβi, hΛ.2.1.2.1]
   have hu2 : Formalism.HermitianLatticesTheory.IsUnimodular (VS D).hT Λ' := hΛ'.2.1.2.1
   have hiso := iso_X F0
-  obtain ⟨Q1, Q1', hs1, hk1⟩ :=
-    Formalism.MainNotions.BridgeRowsLift.rlift_spl_of_retr hcm _ F0.X hu1 hiso _ R1.1 R1.2.1
-      R1.2.2.1
-  obtain ⟨Q2, Q2', hs2, hk2⟩ :=
-    Formalism.MainNotions.BridgeRowsLift.rlift_spl_of_retr hcm _ F0.X hu2 hiso _ R2.1 R2.2.1
-      R2.2.2.1
+  obtain ⟨Q1, Q1', hs1, hk1⟩ := Formalism.MainNotions.BridgeRowsLift.rlift_spl_of_retr hcm _ F0.X hu1 hiso _ R1.1 R1.2.1 R1.2.2.1
+  obtain ⟨Q2, Q2', hs2, hk2⟩ := Formalism.MainNotions.BridgeRowsLift.rlift_spl_of_retr hcm _ F0.X hu2 hiso _ R2.1 R2.2.1 R2.2.2.1
   have hzX : ∀ x ∈ F0.X, (VS D).hT x F0.z = 0 :=
-    Formalism.L2.SG.Pf.hT_span_left (s := Set.range F0.e)
-      (fun x hx => by obtain ⟨a, rfl⟩ := hx; exact F0.z_orth a)
+    Formalism.L2.SG.Pf.hT_span_left (s := Set.range F0.e) (fun x hx => by obtain ⟨a, rfl⟩ := hx; exact F0.z_orth a)
   have hz1 : Q1 F0.z = 0 := hk1 F0.z hzX R1.2.2.2
   have hz2 : Q2 F0.z = 0 := hk2 F0.z hzX R2.2.2.2
-  have hXL
-      : ∀ {M : Submodule (𝓞 D.host.E) (VS D).V} {x : (VS D).V},
-        x ∈ F0.X → (x ∈ M ↔ x ∈ XLam M (lf D F0)) := fun {M x} hx =>
-    ⟨fun h => ⟨h, hx⟩, fun h => h.1⟩
+  have hXL : ∀ {M : Submodule (𝓞 D.host.E) (VS D).V} {x : (VS D).V}, x ∈ F0.X →
+      (x ∈ M ↔ x ∈ XLam M (lf D F0)) := fun {M x} hx => ⟨fun h => ⟨h, hx⟩, fun h => h.1⟩
   have hA : ∀ x ∈ F0.X, x ∈ Formalism.HermitianLatticesTheory.gmap β Λ ↔ x ∈ Λ' := by
     intro x hx
     have e1 : x ∈ Formalism.HermitianLatticesTheory.gmap β Λ ↔ x ∈ Λ := by
       conv_lhs => rw [← show β x = x from G0.fix_X bG hx]
       exact Formalism.L2.SG.Pf.gmap_apply_mem β Λ x
     rw [e1, hXL hx, hXL (M := Λ') hx, hΛ.2.2, hΛ'.2.2]
-  have hL
-      : ∀ l ∈ Formalism.HermitianLatticesTheory.gmap β Λ,
-        (∀ x ∈ F0.X, (VS D).hT x l = 0) → ∃ l₂ ∈ Λ', l - l₂ ∈ F0.X := by
+  have hL : ∀ l ∈ Formalism.HermitianLatticesTheory.gmap β Λ, (∀ x ∈ F0.X, (VS D).hT x l = 0) → ∃ l₂ ∈ Λ', l - l₂ ∈ F0.X := by
     intro l hl hlX
     have hm : β.symm l ∈ Λ := by
       rw [← Formalism.L2.SG.Pf.gmap_apply_mem β Λ, LinearEquiv.apply_symm_apply]
@@ -1150,8 +1031,7 @@ theorem class_red
 
 end Formalism.L2.SG.Pf.Cnt.StabilizerQuotient
 
-open NumberField Module Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat
-  Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.CntLocal Formalism.L2.SG.Saturated
+open NumberField Module Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.CntLocal Formalism.L2.SG.Saturated
 open Classical
 
 noncomputable section
@@ -1164,22 +1044,19 @@ namespace StabilizerQuotient
 
 variable {D : Formalism.BasicNotions.D7} {T : D.host.E} {F0 : FlagG (VS D) D.R.rS T}
 
-theorem inv_gmap_of
-    (g : G0 F0)
-    {M N : Submodule (𝓞 D.host.E) (VS D).V}
-    (h : Formalism.HermitianLatticesTheory.gmap (g : (VS D).V ≃ₗ[D.host.E] (VS D).V) M = N)
-    : Formalism.HermitianLatticesTheory.gmap ((g⁻¹ : G0 F0) : (VS D).V ≃ₗ[D.host.E] (VS D).V) N
-      = M := by
+theorem inv_gmap_of (g : G0 F0) {M N : Submodule (𝓞 D.host.E) (VS D).V}
+    (h : Formalism.HermitianLatticesTheory.gmap (g : (VS D).V ≃ₗ[D.host.E] (VS D).V) M = N) :
+    Formalism.HermitianLatticesTheory.gmap ((g⁻¹ : G0 F0) : (VS D).V ≃ₗ[D.host.E] (VS D).V) N = M := by
   rw [← h]
   exact gmap_inv_gmap _ _
 
-theorem gmap_mul (g h : G0 F0) (M : Submodule (𝓞 D.host.E) (VS D).V)
-    : Formalism.HermitianLatticesTheory.gmap ((g * h : G0 F0) : (VS D).V ≃ₗ[D.host.E] (VS D).V) M
-      = Formalism.HermitianLatticesTheory.gmap (g : (VS D).V ≃ₗ[D.host.E] (VS D).V)
-        (Formalism.HermitianLatticesTheory.gmap (h : (VS D).V ≃ₗ[D.host.E] (VS D).V) M) := by
+theorem gmap_mul (g h : G0 F0) (M : Submodule (𝓞 D.host.E) (VS D).V) :
+    Formalism.HermitianLatticesTheory.gmap ((g * h : G0 F0) : (VS D).V ≃ₗ[D.host.E] (VS D).V) M =
+      Formalism.HermitianLatticesTheory.gmap (g : (VS D).V ≃ₗ[D.host.E] (VS D).V) (Formalism.HermitianLatticesTheory.gmap (h : (VS D).V ≃ₗ[D.host.E] (VS D).V) M) := by
   exact gmap_mul_sat _ _ M
 
 end StabilizerQuotient
+
 
 open StabilizerQuotient in
 theorem rowsGroupoid_of (hM : MMChar) : RowsGroupoid := by
@@ -1187,18 +1064,14 @@ theorem rowsGroupoid_of (hM : MMChar) : RowsGroupoid := by
   have hG : GZ (Tn u) (Tn u') (ZhatL (lf D F0) F') ≠ 0 := by
     rw [hZ]
     exact PairSpanDimension.totPos_ne_zero hP
-  have hMF
-      : ∀ F'' : LFlag (D.sp.Y 0) D.R.rS (Tn u'),
-        F''.zt = F''.fl.z → ZhatL (lf D F0) F'' = Z
-          → ∀ Λ,
-            (IsRowLat D F0 Λ ∧ F'' ∈ EZ (Tn u') F0 Λ Z)
-              ↔ Λ ∈ GlueSet (VS D).hT (UPair D F0 F'') (MMof D F0 F'') := fun F'' h1 h2 =>
-    (hM D u u' hT F0 what₂ hrows Z F'' h1 h2 hP).2
-  have hsrow : ∀ Λ' ∈ s, IsRowLat D F0 Λ' ∧ F' ∈ EZ (Tn u') F0 Λ' Z := fun Λ' h =>
-    (hMF F' hzt hZ Λ').2 (hs.1 Λ' h)
-  have hbase
-      : ∀ Λ' ∈ s, ∃ Λ ∈ what₂, ∃ c : G0 F0,
-        Formalism.HermitianLatticesTheory.gmap (c : (VS D).V ≃ₗ[D.host.E] (VS D).V) Λ = Λ' := by
+  have hMF : ∀ F'' : LFlag (D.sp.Y 0) D.R.rS (Tn u'), F''.zt = F''.fl.z → ZhatL (lf D F0) F'' = Z →
+      ∀ Λ, (IsRowLat D F0 Λ ∧ F'' ∈ EZ (Tn u') F0 Λ Z) ↔
+        Λ ∈ GlueSet (VS D).hT (UPair D F0 F'') (MMof D F0 F'') :=
+    fun F'' h1 h2 => (hM D u u' hT F0 what₂ hrows Z F'' h1 h2 hP).2
+  have hsrow : ∀ Λ' ∈ s, IsRowLat D F0 Λ' ∧ F' ∈ EZ (Tn u') F0 Λ' Z :=
+    fun Λ' h => (hMF F' hzt hZ Λ').2 (hs.1 Λ' h)
+  have hbase : ∀ Λ' ∈ s, ∃ Λ ∈ what₂, ∃ c : G0 F0,
+      Formalism.HermitianLatticesTheory.gmap (c : (VS D).V ≃ₗ[D.host.E] (VS D).V) Λ = Λ' := by
     intro Λ' h
     obtain ⟨Λ, ⟨hΛr, γ, hγ, hγΛ⟩, -⟩ := hrows.2 Λ' (hsrow Λ' h).1
     obtain ⟨c, hc⟩ := class_red u F0 (hrows.1 Λ hΛr) (hsrow Λ' h).1 hγ hγΛ
@@ -1211,16 +1084,10 @@ theorem rowsGroupoid_of (hM : MMChar) : RowsGroupoid := by
     have := ez_smul (c Λ')⁻¹ (hsrow Λ' h).2
     rwa [inv_gmap_of (c Λ') (hc Λ' h)] at this
 
-  have huniq
-      : ∀ A1 ∈ s, ∀ A2 ∈ s,
-        b A1 = b A2
-          → ∀ h1 h2 : G0 F0,
-            Formalism.HermitianLatticesTheory.gmap (h1 : (VS D).V ≃ₗ[D.host.E] (VS D).V) (b A1)
-                = b A1
-              → Formalism.HermitianLatticesTheory.gmap (h2 : (VS D).V ≃ₗ[D.host.E] (VS D).V) (b A2)
-                = b A2
-              → h1 • tm A1 = h2 • tm A2
-              → A1 = A2 := by
+  have huniq : ∀ A1 ∈ s, ∀ A2 ∈ s, b A1 = b A2 → ∀ h1 h2 : G0 F0,
+      Formalism.HermitianLatticesTheory.gmap (h1 : (VS D).V ≃ₗ[D.host.E] (VS D).V) (b A1) = b A1 →
+      Formalism.HermitianLatticesTheory.gmap (h2 : (VS D).V ≃ₗ[D.host.E] (VS D).V) (b A2) = b A2 →
+      h1 • tm A1 = h2 • tm A2 → A1 = A2 := by
     intro A1 hA1 A2 hA2 hbb h1 h2 hh1 hh2 he
     have hgF : (c A2 * h2⁻¹ * h1 * (c A1)⁻¹) • F' = F' := by
       rw [mul_smul, mul_smul, mul_smul]
@@ -1228,47 +1095,37 @@ theorem rowsGroupoid_of (hM : MMChar) : RowsGroupoid := by
       rw [he, inv_smul_smul]
       show c A2 • (c A2)⁻¹ • F' = F'
       rw [smul_inv_smul]
-    have hgΛ
-        : Formalism.HermitianLatticesTheory.gmap
-            ((c A2 * h2⁻¹ * h1 * (c A1)⁻¹ : G0 F0) : (VS D).V ≃ₗ[D.host.E] (VS D).V) A1
-          = A2 := by
-      rw [gmap_mul, gmap_mul, gmap_mul, inv_gmap_of (c A1) (hc A1 hA1), hh1, hbb,
-        inv_gmap_of h2 hh2, hc A2 hA2]
+    have hgΛ : Formalism.HermitianLatticesTheory.gmap ((c A2 * h2⁻¹ * h1 * (c A1)⁻¹ : G0 F0) : (VS D).V ≃ₗ[D.host.E] (VS D).V) A1 = A2 := by
+      rw [gmap_mul, gmap_mul, gmap_mul, inv_gmap_of (c A1) (hc A1 hA1), hh1, hbb, inv_gmap_of h2 hh2,
+        hc A2 hA2]
     have hgfix := (isomFix_iff F' hzt _).2 hgF
     exact (hs.2.1 A2 (hs.1 A2 hA2)).unique ⟨hA1, _, hgfix, hgΛ⟩
       ⟨hA2, 1, (isomFix (VS D).hT (UPair D F0 F')).one_mem, gmap_one_sat A2⟩
 
-  let Tr : Submodule (𝓞 D.host.E) (VS D).V → Finset (LFlag (VS D) D.R.rS (Tn u')) := fun Λ =>
-    (s.filter (fun A => b A = Λ)).image tm
+  let Tr : Submodule (𝓞 D.host.E) (VS D).V → Finset (LFlag (VS D) D.R.rS (Tn u')) :=
+    fun Λ => (s.filter (fun A => b A = Λ)).image tm
   have hTA : ∀ Λ, ∀ t ∈ Tr Λ, t ∈ EZ (Tn u') F0 Λ Z := by
     intro Λ t ht
     obtain ⟨A, hA, rfl⟩ := Finset.mem_image.1 ht
     obtain ⟨hAs, hbA⟩ := Finset.mem_filter.1 hA
     rw [← hbA]
     exact htm_mem A hAs
-  have hTrep
-      : ∀ Λ ∈ what₂, ∀ x ∈ EZ (Tn u') F0 Λ Z,
-        ∃! t, t ∈ Tr Λ ∧ ∃ h : Hsub (F0 := F0) Λ, h • t = x := by
+  have hTrep : ∀ Λ ∈ what₂, ∀ x ∈ EZ (Tn u') F0 Λ Z,
+      ∃! t, t ∈ Tr Λ ∧ ∃ h : Hsub (F0 := F0) Λ, h • t = x := by
     intro Λ hΛ x hx
     have hzx : x.zt = x.fl.z := hx.1.1.2
     have hZx : ZhatL (lf D F0) x = Z := hx.2.2.2.2
     obtain ⟨γ, hγ⟩ := witt_trans F' x hzt hzx (hZx.trans hZ.symm) hG
-    have hrowγ : IsRowLat D F0
-        (Formalism.HermitianLatticesTheory.gmap (γ : (VS D).V ≃ₗ[D.host.E] (VS D).V) Λ) :=
+    have hrowγ : IsRowLat D F0 (Formalism.HermitianLatticesTheory.gmap (γ : (VS D).V ≃ₗ[D.host.E] (VS D).V) Λ) :=
       rowLat_gmap γ (hrows.1 Λ hΛ)
-    have hezγ
-        : F' ∈ EZ (Tn u') F0
-          (Formalism.HermitianLatticesTheory.gmap (γ : (VS D).V ≃ₗ[D.host.E] (VS D).V) Λ) Z := by
+    have hezγ : F' ∈ EZ (Tn u') F0 (Formalism.HermitianLatticesTheory.gmap (γ : (VS D).V ≃ₗ[D.host.E] (VS D).V) Λ) Z := by
       have := ez_smul γ hx
       rwa [hγ] at this
     have hglue := (hMF F' hzt hZ _).1 ⟨hrowγ, hezγ⟩
     obtain ⟨A, ⟨hA, g, hg, hgA⟩, -⟩ := hs.2.1 _ hglue
     let gG : G0 F0 := ⟨g, mem_stabilizer_of_isometry_fix F' hg⟩
     have hgF : gG • F' = F' := (isomFix_iff F' hzt gG).1 hg
-    have hδ
-        : Formalism.HermitianLatticesTheory.gmap
-            ((γ⁻¹ * gG * c A : G0 F0) : (VS D).V ≃ₗ[D.host.E] (VS D).V) (b A)
-          = Λ := by
+    have hδ : Formalism.HermitianLatticesTheory.gmap ((γ⁻¹ * gG * c A : G0 F0) : (VS D).V ≃ₗ[D.host.E] (VS D).V) (b A) = Λ := by
       rw [gmap_mul, gmap_mul, hc A hA]
       show Formalism.HermitianLatticesTheory.gmap ((γ⁻¹ : G0 F0) : (VS D).V ≃ₗ[D.host.E] (VS D).V) (Formalism.HermitianLatticesTheory.gmap g A) = Λ
       rw [hgA, inv_gmap_of γ rfl]
@@ -1291,29 +1148,20 @@ theorem rowsGroupoid_of (hM : MMChar) : RowsGroupoid := by
         rw [mul_smul, mul_smul]
         show x = γ⁻¹ • gG • c A • (c A)⁻¹ • F'
         rw [smul_inv_smul, hgF, eq_comm, inv_smul_eq_iff, hγ]
-      have h1
-          : Formalism.HermitianLatticesTheory.gmap (((h' : G0 F0)) : (VS D).V ≃ₗ[D.host.E] (VS D).V)
-              (b A2)
-            = b A2 := by
+      have h1 : Formalism.HermitianLatticesTheory.gmap (((h' : G0 F0)) : (VS D).V ≃ₗ[D.host.E] (VS D).V) (b A2) = b A2 := by
         rw [hbA2]
         exact h'.2
-      have h2
-          : Formalism.HermitianLatticesTheory.gmap
-              ((γ⁻¹ * gG * c A : G0 F0) : (VS D).V ≃ₗ[D.host.E] (VS D).V) (b A)
-            = b A := by
+      have h2 : Formalism.HermitianLatticesTheory.gmap ((γ⁻¹ * gG * c A : G0 F0) : (VS D).V ≃ₗ[D.host.E] (VS D).V) (b A) = b A := by
         rw [hbA]
         exact hδ
       rw [huniq A2 hA2s A hA (hbA2.trans hbA.symm) _ _ h1 h2 hxx]
 
-  have hstab
-      : ∀ A ∈ s,
-        Nat.card (MulAction.stabilizer (Hsub (F0 := F0) (b A)) (tm A))
-          = Nat.card (stabFix (VS D).hT (UPair D F0 F') A) := by
+  have hstab : ∀ A ∈ s, Nat.card (MulAction.stabilizer (Hsub (F0 := F0) (b A)) (tm A)) =
+      Nat.card (stabFix (VS D).hT (UPair D F0 F') A) := by
     intro A hA
     have hcA := hc A hA
     refine Nat.card_eq_of_bijective
-      (fun h => ⟨((c A * (h.1 : G0 F0) * (c A)⁻¹ : G0 F0) : (VS D).V ≃ₗ[D.host.E] (VS D).V), ?_⟩)
-      ⟨?_, ?_⟩
+      (fun h => ⟨((c A * (h.1 : G0 F0) * (c A)⁻¹ : G0 F0) : (VS D).V ≃ₗ[D.host.E] (VS D).V), ?_⟩) ⟨?_, ?_⟩
     · have hfix : (h.1 : G0 F0) • tm A = tm A := MulAction.mem_stabilizer_iff.1 h.2
       refine ⟨(isomFix_iff F' hzt _).2 ?_, ?_⟩
       · rw [mul_smul, mul_smul]
@@ -1322,31 +1170,22 @@ theorem rowsGroupoid_of (hM : MMChar) : RowsGroupoid := by
         show c A • (c A)⁻¹ • F' = F'
         rw [smul_inv_smul]
       · rw [gmap_mul, gmap_mul, inv_gmap_of (c A) hcA]
-        have : Formalism.HermitianLatticesTheory.gmap
-              (((h.1 : G0 F0)) : (VS D).V ≃ₗ[D.host.E] (VS D).V) (b A)
-            = b A :=
-          h.1.2
+        have : Formalism.HermitianLatticesTheory.gmap (((h.1 : G0 F0)) : (VS D).V ≃ₗ[D.host.E] (VS D).V) (b A) = b A := h.1.2
         rw [this, hcA]
     · intro h1 h2 e
       have e1 := congrArg Subtype.val e
       simp only at e1
-      have e' : (c A * (h1.1 : G0 F0) * (c A)⁻¹ : G0 F0) = c A * (h2.1 : G0 F0) * (c A)⁻¹ :=
-        Subtype.ext e1
+      have e' : (c A * (h1.1 : G0 F0) * (c A)⁻¹ : G0 F0) = c A * (h2.1 : G0 F0) * (c A)⁻¹ := Subtype.ext e1
       have e'' : (h1.1 : G0 F0) = (h2.1 : G0 F0) := mul_left_cancel (mul_right_cancel e')
       exact Subtype.ext (Subtype.ext e'')
     · rintro ⟨g, hg1, hg2⟩
       let gG : G0 F0 := ⟨g, mem_stabilizer_of_isometry_fix F' hg1⟩
       have hgF : gG • F' = F' := (isomFix_iff F' hzt gG).1 hg1
-      have hmem
-          : Formalism.HermitianLatticesTheory.gmap
-              (((c A)⁻¹ * gG * c A : G0 F0) : (VS D).V ≃ₗ[D.host.E] (VS D).V) (b A)
-            = b A := by
+      have hmem : Formalism.HermitianLatticesTheory.gmap (((c A)⁻¹ * gG * c A : G0 F0) : (VS D).V ≃ₗ[D.host.E] (VS D).V) (b A) = b A := by
         rw [gmap_mul, gmap_mul, hcA]
         show Formalism.HermitianLatticesTheory.gmap (((c A)⁻¹ : G0 F0) : (VS D).V ≃ₗ[D.host.E] (VS D).V) (Formalism.HermitianLatticesTheory.gmap g A) = b A
         rw [hg2, inv_gmap_of (c A) hcA]
-      have hst
-          : (⟨_, hmem⟩ : Hsub (F0 := F0) (b A))
-            ∈ MulAction.stabilizer (Hsub (F0 := F0) (b A)) (tm A) := by
+      have hst : (⟨_, hmem⟩ : Hsub (F0 := F0) (b A)) ∈ MulAction.stabilizer (Hsub (F0 := F0) (b A)) (tm A) := by
         rw [MulAction.mem_stabilizer_iff]
         show ((c A)⁻¹ * gG * c A) • tm A = tm A
         rw [mul_smul, mul_smul]
@@ -1357,10 +1196,8 @@ theorem rowsGroupoid_of (hM : MMChar) : RowsGroupoid := by
       have : (c A * ((c A)⁻¹ * gG * c A) * (c A)⁻¹ : G0 F0) = gG := by group
       rw [this]
 
-  have hnu
-      : Formalism.L2.SG.CntLocal.nu (Tn u') F0 what₂ Z
-          * Formalism.MainNotions.S.Cnt.massRows D F0 what₂
-        = ∑ Λ ∈ what₂, wRow D F0 Λ * ((cntE (Tn u') F0 Λ Z).toNat : ℝ) := by
+  have hnu : Formalism.L2.SG.CntLocal.nu (Tn u') F0 what₂ Z * Formalism.MainNotions.S.Cnt.massRows D F0 what₂ =
+      ∑ Λ ∈ what₂, wRow D F0 Λ * ((cntE (Tn u') F0 Λ Z).toNat : ℝ) := by
     unfold Formalism.L2.SG.CntLocal.nu Formalism.MainNotions.S.Cnt.massRows
     by_cases h0 : ∑ Λ ∈ what₂, wRow D F0 Λ = 0
     · have hw0 : ∀ Λ ∈ what₂, wRow D F0 Λ = 0 :=

@@ -1,59 +1,88 @@
 module
 
-public import Development.AutomorphicArithmetic.AutomorphicVarieties.PadicHodgeTheory.LocalPublishedTheorems
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.FontaineFormalismOfRegular
+public import Development.AutomorphicArithmetic.AutomorphicVarieties.PadicHodgeTheory.FiniteCohomology
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.CrystallineAndJumps
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Coalgebra.IsFrobenius
+import Mathlib.RingTheory.HopfAlgebra.Basic
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
+public import Development.AbelianVarietyTheory.BlockTheory.NonGaloisCusps.CrystallineSubrepresentation
 
 @[expose] public section
 
-open Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N Formalism.BasicNotions
-  Formalism.BasicNotions.Loc ReciprocityTheory.Gal TensorProduct Module UpperTheory.V.Loc Topology
-  Polynomial
+open Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N Formalism.BasicNotions Formalism.BasicNotions.Loc ReciprocityTheory.Gal TensorProduct Module UpperTheory.V.Loc Topology Polynomial
 
 section Generic
 
 open GlobalTheory.RegularRing GlobalTheory.IndefiniteRowSideFullHecke.CrystallineSubrepresentation
 
-variable
-  {G : Type} [Group G]
-  {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K] [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K]
-  [IsScalarTower Qp K₀ K]
-  {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
-  [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
-  [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
-  (PD : PeriodData G Qp K₀ K B BdR)
-  {V : Type} [AddCommGroup V] [Module Qp V] [FiniteDimensional Qp V] [IsDomain B]
+variable {G : Type} [Group G] {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K]
+    [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K] [IsScalarTower Qp K₀ K]
+    {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
+    [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
+    [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
+    (PD : PeriodData G Qp K₀ K B BdR)
+    {V : Type} [AddCommGroup V] [Module Qp V] [FiniteDimensional Qp V] [IsDomain B]
 
-private theorem exists_inv_matrix
-    (hf : FracInv PD) (hu : LineUnit PD)
-    (ρ : Representation Qp G V)
-    {d : ℕ} (v : Basis (Fin d) Qp V)
-    (h : IsCrys PD ρ)
-    : ∃ M M' : Matrix (Fin d) (Fin d) B,
-      M * M' = 1
-        ∧ ∀ g, (LinearMap.toMatrix v v (ρ g)).map (algebraMap Qp B) * M.map (PD.actB g) = M := by
+private theorem exists_inv_matrix (hf : FracInv PD) (hu : LineUnit PD) (ρ : Representation Qp G V) {d : ℕ}
+    (v : Basis (Fin d) Qp V) (h : IsCrys PD ρ) :
+    ∃ M M' : Matrix (Fin d) (Fin d) B, M * M' = 1 ∧
+      ∀ g, (LinearMap.toMatrix v v (ρ g)).map (algebraMap Qp B) * M.map (PD.actB g) = M := by
   classical
   obtain ⟨h1, -⟩ := finite_le₀ PD hf ρ
   have h2 : finrank K₀ ↥(DcrisK₀ PD ρ) = d := by
     rw [(isCrys_iff_finrank PD ρ).1 h, finrank_eq_card_basis v, Fintype.card_fin]
   let d₀ := Module.finBasisOfFinrankEq K₀ ↥(DcrisK₀ PD ρ) h2
-  let b :=
-    (Algebra.TensorProduct.basis B d₀).map
-      (LinearEquiv.ofBijective _ (comparison_bijective PD hf hu ρ h))
+  let b := (Algebra.TensorProduct.basis B d₀).map
+    (LinearEquiv.ofBijective _ (comparison_bijective PD hf hu ρ h))
   have hd : ∀ g i, sig PD ρ g (b i) = b i := by
     intro g i
     have : b i = (d₀ i : B ⊗[Qp] V) := by simp [b, comparison_tmul]
     rw [this]
     exact (mem_DcrisK₀ PD ρ _).1 (d₀ i).2 g
   let e := Algebra.TensorProduct.basis B v
-  have hrep
-      : ∀ g (w : B ⊗[Qp] V) k,
-        e.repr (sig PD ρ g w) k
-          = ∑ j, algebraMap Qp B (v.repr (ρ g (v j)) k) * PD.actB g (e.repr w j) := by
+  have hrep : ∀ g (w : B ⊗[Qp] V) k, e.repr (sig PD ρ g w) k =
+      ∑ j, algebraMap Qp B (v.repr (ρ g (v j)) k) * PD.actB g (e.repr w j) := by
     intro g w k
     conv_lhs => rw [← e.sum_repr w]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, sig_smul, map_smul, Finset.sum_apply', Finsupp.smul_apply, smul_eq_mul]
+
+    simp only [map_sum, sig_smul, map_smul, Finset.sum_apply', Finsupp.smul_apply,
+    smul_eq_mul]
     refine Finset.sum_congr rfl fun j _ => ?_
     rw [mul_comm]
     congr 1
@@ -66,14 +95,11 @@ private theorem exists_inv_matrix
   refine Finset.sum_congr rfl fun j _ => ?_
   simp [LinearMap.toMatrix_apply, Basis.toMatrix_apply]
 
-private theorem exists_period_matrix
-    (hf : FracInv PD) (hu : LineUnit PD)
-    (ρ : Representation Qp G V)
-    {d : ℕ} (v : Basis (Fin d) Qp V)
-    (h : IsCrys PD ρ)
-    : ∃ (M M' : Matrix (Fin d) (Fin d) B) (A : Matrix (Fin d) (Fin d) K₀),
-      M * M' = 1 ∧ IsUnit A.det ∧ M.map PD.φ = M * A.map (algebraMap K₀ B)
-        ∧ ∀ g, (LinearMap.toMatrix v v (ρ g)).map (algebraMap Qp B) * M.map (PD.actB g) = M := by
+private theorem exists_period_matrix (hf : FracInv PD) (hu : LineUnit PD) (ρ : Representation Qp G V) {d : ℕ}
+    (v : Basis (Fin d) Qp V) (h : IsCrys PD ρ) :
+    ∃ (M M' : Matrix (Fin d) (Fin d) B) (A : Matrix (Fin d) (Fin d) K₀), M * M' = 1 ∧ IsUnit A.det ∧
+      M.map PD.φ = M * A.map (algebraMap K₀ B) ∧
+      ∀ g, (LinearMap.toMatrix v v (ρ g)).map (algebraMap Qp B) * M.map (PD.actB g) = M := by
   obtain ⟨M, M', hM, hg⟩ := exists_inv_matrix PD hf hu ρ v h
   have hM' : M' * M = 1 := mul_eq_one_comm.1 hM
   have hinv : ∀ g, (M' * M.map PD.φ).map (PD.actB g) = M' * M.map PD.φ := by
@@ -113,23 +139,13 @@ private theorem exists_period_matrix
 
 end Generic
 
-theorem UpperTheory.exists_crystalline_period_matrix_bcris_of_isCrys
-    : ∀ {l : ℕ} [Fact l.Prime] (K : FinExt l) {V : Type} [AddCommGroup V] [Module ℚ_[l] V]
-        [FiniteDimensional ℚ_[l] V] (ρ : Representation ℚ_[l] ↥(GK K) V) {d : ℕ}
-        (e : Basis (Fin d) ℚ_[l] V),
-      IsCrys ((PP l).PD K) ρ
-        → ∃ (M M' : Matrix (Fin d) (Fin d) (Bcr l)) (A : Matrix (Fin d) (Fin d) ↥(K0 K)),
-          M * M' = 1 ∧ IsUnit A.det ∧ M.map (PP l).φB = M * A.map (algebraMap ↥(K0 K) (Bcr l))
-            ∧ (∀ g : ↥(GK K),
-              (LinearMap.toMatrix e e (ρ g)).map (algebraMap ℚ_[l] (Bcr l))
-                  * M.map ((PP l).actQ (g : GQ l))
-                = M) := by
+theorem UpperTheory.exists_crystalline_period_matrix_bcris_of_isCrys :
+    ∀ {l : ℕ} [Fact l.Prime] (K : FinExt l) {V : Type} [AddCommGroup V] [Module ℚ_[l] V] [FiniteDimensional ℚ_[l] V] (ρ : Representation ℚ_[l] ↥(GK K) V) {d : ℕ} (e : Basis (Fin d) ℚ_[l] V), IsCrys ((PP l).PD K) ρ → ∃ (M M' : Matrix (Fin d) (Fin d) (Bcr l)) (A : Matrix (Fin d) (Fin d) ↥(K0 K)), M * M' = 1 ∧ IsUnit A.det ∧ M.map (PP l).φB = M * A.map (algebraMap ↥(K0 K) (Bcr l)) ∧ (∀ g : ↥(GK K), (LinearMap.toMatrix e e (ρ g)).map (algebraMap ℚ_[l] (Bcr l)) * M.map ((PP l).actQ (g : GQ l)) = M) := by
   intro l _ K V _ _ _ ρ d e h
   obtain ⟨T⟩ := tiedP l
   haveI := GlobalTheory.RegularRing.isDomain_of_tied T K
-  obtain ⟨M, M', A, h1, h2, h3, h4⟩ :=
-    exists_period_matrix ((PP l).PD K) (GlobalTheory.TateDualCrys.fracInv_of_tied T K)
-      (GlobalTheory.TateDualCrys.lineUnit_of_tied T K) ρ e h
+  obtain ⟨M, M', A, h1, h2, h3, h4⟩ := exists_period_matrix ((PP l).PD K)
+    (GlobalTheory.TateDualCrys.fracInv_of_tied T K) (GlobalTheory.TateDualCrys.lineUnit_of_tied T K) ρ e h
   refine ⟨M, M', A, h1, h2, ?_, fun g => ?_⟩
   · rw [← h3]
     ext i j

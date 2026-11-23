@@ -2,6 +2,57 @@ module
 
 public import Formalism.HermitianCurvature.StatementG
 public import Formalism.HermitianCurvature.HermitianCurvatureProofs.RemainderNormLeStrictUpper
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Real
+public import Mathlib.Analysis.Calculus.ContDiff.Bounds
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+public import Mathlib.Analysis.InnerProductSpace.Calculus
+import Mathlib.Analysis.LocallyConvex.AbsConvexOpen
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.Order.CompletePartialOrder
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
+import Mathlib.Topology.UniformSpace.Uniformizable
 
 @[expose] public section
 
@@ -267,7 +318,6 @@ theorem critical_cutoff_spec : Formalism.FourierDecayAlt.G.CritCutSpec := by
       have e : z - z' = -(x 0 - z) + (x 0 - z') := by ring
       rw [e]
       exact (norm_add_le _ _).trans (by rw [norm_neg])
-    have h5 : 2 * δ ≤ ‖x 0 - z'‖ := by linarith
     refine Finset.prod_eq_zero (Finset.mem_univ (0 : Fin (m + 1)))
       (smooth_cutoff_eq_zero_of_two_le ?_)
     rw [le_div_iff₀ (by positivity)]
@@ -408,7 +458,6 @@ theorem product_lower_bound : Formalism.FourierDecayAlt.G.ProdLower := by
   obtain ⟨d, hd, hD⟩ := exists_lower hK h0
   set R' : ℝ := max R 1 with hR'
   have hR1 : 1 ≤ R' := le_max_right _ _
-  have hR0 : 0 < R' := lt_of_lt_of_le one_pos hR1
   set Cm : ℝ := ((m : ℝ) + 1) * ((m : ℝ) * ((m : ℝ) + 1) ^ m) with hCm
   have hCm0 : 0 ≤ Cm := by positivity
   set Ce : ℝ := (m : ℝ) * ((m : ℝ) + 1) ^ m with hCe
@@ -473,7 +522,6 @@ theorem product_lower_bound : Formalism.FourierDecayAlt.G.ProdLower := by
   have h5 : d / 2 ≤ ‖P‖ * L := by
     have := hD D hDK
     linarith
-  have hRpow : 0 < R' ^ (m + 1) := by positivity
   constructor
   · have hinv : ‖t‖ ^ ε = W⁻¹ := by rw [hW, Real.rpow_neg hT.le, inv_inv]
     rw [hinv, ← div_eq_mul_inv, div_le_iff₀ hW0, div_le_iff₀ (by positivity)]

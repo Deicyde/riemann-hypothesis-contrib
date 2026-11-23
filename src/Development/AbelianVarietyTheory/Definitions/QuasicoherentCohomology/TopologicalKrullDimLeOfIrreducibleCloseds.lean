@@ -1,7 +1,63 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Definitions.QuasicoherentCohomology.IsLocalizedModuleGermLinearPointOfPrime
+public import Mathlib.AlgebraicGeometry.Noetherian
+public import Mathlib.AlgebraicGeometry.ResidueField
+public import Mathlib.Order.CompletePartialOrder
+public import Mathlib.RingTheory.Ideal.AssociatedPrime.Basic
+public import Mathlib.RingTheory.KrullDimension.Module
+public import Development.AbelianVarietyTheory.Proofs.CoherentCohomologyProofs.ExactAndSurjectiveAppOfExactOfEpi
+import Mathlib.Algebra.Module.LocalizedModule.Away
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.AlgebraicGeometry.Properties
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.CategoryTheory.EffectiveEpi.Comp
+import Mathlib.CategoryTheory.ExtremalEpi
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Coalgebra.IsFrobenius
+import Mathlib.RingTheory.HopfAlgebra.Basic
+public import Mathlib.RingTheory.Ideal.AssociatedPrime.Finiteness
+public import Mathlib.RingTheory.Ideal.AssociatedPrime.Localization
+import Mathlib.RingTheory.Radical.NatInt
+public import Mathlib.RingTheory.Regular.IsSMulRegular
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.TypeStar
+public import Mathlib.Algebra.GroupWithZero.Action.Regular
+public import Mathlib.RingTheory.IntegralClosure.IntegrallyClosed
 
 @[expose] public section
 
@@ -145,8 +201,8 @@ theorem isQuasicoherent_of_sum_eq_id (h : ∑ i, p i ≫ q i = 𝟙 F) [∀ i, (
   · choose n t ht using fun i ↦
       exists_pow_smul_eq_res (A i) hU f (X.basicOpen_le f) rfl ((p i).app _ s)
     refine ⟨∑ i, n i, ∑ i, (q i).app U (f ^ (∑ j, n j - n i) • t i), ?_⟩
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, ← sum_app_app p q h s, Finset.smul_sum]
+
+    rw [map_sum, ← sum_app_app p q h s, Finset.smul_sum]
     refine Finset.sum_congr rfl fun i _ ↦ ?_
     have hi : n i ≤ ∑ j, n j := Finset.single_le_sum (fun _ _ ↦ Nat.zero_le _) (Finset.mem_univ i)
     rw [← app_res, Scheme.Modules.map_smul, ← ht, smul_smul, map_pow, ← pow_add,

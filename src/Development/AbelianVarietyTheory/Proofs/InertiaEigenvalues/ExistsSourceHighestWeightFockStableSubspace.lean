@@ -1,20 +1,51 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.LengthPosOfPosDef
-public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.AdjFormula
-public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.ParamsEx
-public import Formalism.LocalToGlobal.IndefiniteReal.LinksStage
-public import Development.AbelianVarietyTheory.PublishedTheorems.AutomorphicForms₂.ExistsNormLeHeightPow
-public import Development.AbelianVarietyTheory.PublishedTheorems.GaloisGeometry₂.HoweUnram
-public import Development.AbelianVarietyTheory.BlockTheory.TwistedDiscreteSeries.GaussianBinomialClosedForm
-public import Development.AbelianVarietyTheory.Definitions.TwistedInnerProducts.SqNormIntegralFundamentalDomainEqL2NormSq
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ActOfMemGfC
-public import Development.AbelianVarietyTheory.BlockTheory.TwistedDiscreteSeries.RaisingLoweringOperators
-public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.TranslateMemCoefLatFn
-public import Development.AbelianVarietyTheory.Definitions.Foundations.ForallEventuallyFinLocIff
-public import Development.AbelianVarietyTheory.Definitions.TwistedInnerProducts.RealLowestKTypeCoeffSquareIntegrable
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.IsKHwMap
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Int
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Lemma
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.BitVec
+import Std.Tactic.BVDecide.Normalize.Prop
+import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.ParamsEx
 
 @[expose] public section
 
@@ -120,7 +151,7 @@ lemma coeff_sop_diag (w : GlobalTheory.ExportSeries.Weight D n) (τ : D.what₂.
   classical
   induction P using MvPolynomial.induction_on' with
   | monomial u c =>
-    rw [sop_diag, coeff_smul, coeff_monomial, smul_eq_mul]
+    rw [sop_diag, MvPolynomial.coeff_smul, coeff_monomial, smul_eq_mul]
     split_ifs with h
     · rw [h]
     · simp
@@ -191,8 +222,8 @@ lemma sop_off (w : GlobalTheory.ExportSeries.Weight D n) (τ : D.what₂.Tau) (a
     (P : PolF D m n) (β : FVar D m n →₀ ℕ) (hβ : β ∈ (sop w τ a b P).support) :
     ∃ α ∈ P.support, ht w β = ht w α + ((b : ℕ) - (a : ℕ) : ℤ) := by
   classical
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [as_sum P, map_sum] at hβ
+
+  rw [as_sum P, map_sum] at hβ
   obtain ⟨α, hα, h⟩ := Finset.mem_biUnion.1 (support_sum hβ)
   exact ⟨α, hα, sop_off_mono w τ a b hab α β _ h⟩
 
@@ -254,7 +285,7 @@ lemma purify (w : GlobalTheory.ExportSeries.Weight D n) (V : Submodule ℂ (PolF
       · exact ⟨α, hα, h⟩
     set R := sop w τ a a P - lamM w τ a γ • P with hR
     have hcoeff : ∀ δ, AddMonoidAlgebra.coeff R δ = (lamM w τ a δ - lamM w τ a γ) * AddMonoidAlgebra.coeff P δ := by
-      intro δ; rw [hR, coeff_sub, coeff_smul, coeff_sop_diag, smul_eq_mul]; ring
+      intro δ; rw [hR, MvPolynomial.coeff_sub, MvPolynomial.coeff_smul, coeff_sop_diag, smul_eq_mul]; ring
     have hRV : R ∈ V := V.sub_mem (hV P hPV τ a a) (V.smul_mem _ hPV)
     have hsub : R.support ⊆ P.support.erase γ := by
       intro δ hδ
@@ -287,7 +318,7 @@ lemma pure_eigen (w : GlobalTheory.ExportSeries.Weight D n) (Q : PolF D m n) (hQ
     (hα : α ∈ Q.support) (τ : D.what₂.Tau) (a : Fin n) : sop w τ a a Q = lamM w τ a α • Q := by
   classical
   ext γ
-  rw [coeff_sop_diag, coeff_smul, smul_eq_mul]
+  rw [coeff_sop_diag, MvPolynomial.coeff_smul, smul_eq_mul]
   by_cases hγ : AddMonoidAlgebra.coeff Q γ = 0
   · rw [hγ, mul_zero, mul_zero]
   · rw [hQ τ a γ (mem_support_iff.2 hγ) α hα]

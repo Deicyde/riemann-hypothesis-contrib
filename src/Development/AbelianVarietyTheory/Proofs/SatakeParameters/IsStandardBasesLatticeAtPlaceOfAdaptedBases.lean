@@ -1,11 +1,53 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Definitions.GaloisGeometry.StdBases
 public import Formalism.LocalToGlobal.KernelLattices.AdaptedEnt
+public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.InducedTypeThetaGenusOnePermutes
 public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.IsRBasisOfLocBasis
 public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.NormTauEmbPosPlConjEq
 public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.PartnerPlaceInvolutiveNormConjEqStatement
+import Formalism.SharpRestriction.GlobalSchurBounds.GlobalRankLatticeProofs.EqOfLeOfAbsNormEq
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Coalgebra.IsFrobenius
+import Mathlib.RingTheory.HopfAlgebra.Basic
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
@@ -128,8 +170,8 @@ theorem span_top
     rw [Finset.sum_comm]
     refine Finset.sum_eq_zero fun k _ => ?_
     have : ∑ i, ρ (φ i) * (r k * ρ (x k i)) = r k * ρ (∑ i, x k i * φ i) := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum, Finset.mul_sum]
+
+      rw [map_sum, Finset.mul_sum]
       exact Finset.sum_congr rfl fun i _ => by rw [map_mul]; ring
     rw [this, hL _ (hx k), map_zero, mul_zero]
   have hz : ρ ∘ φ = 0 := by
@@ -200,8 +242,8 @@ theorem locBasis_of
         rw [Finset.sum_comm]
         refine Finset.sum_congr rfl fun k _ => ?_
         rw [hxc k]
-        set_option synthInstance.maxHeartbeats 100000 in
-          simp only [Matrix.mulVec, dotProduct, map_sum, map_mul, Finset.mul_sum, Matrix.map_apply]
+
+        simp only [Matrix.mulVec, dotProduct, map_sum, map_mul, Finset.mul_sum, Matrix.map_apply]
         exact Finset.sum_congr rfl fun b _ => by ring
       have := congrArg (fun v => (Q.map ρ)⁻¹.mulVec v) e1
       simpa only [Matrix.mulVec_mulVec, Matrix.nonsing_inv_mul _ (Ne.isUnit hQρ), Matrix.one_mulVec]

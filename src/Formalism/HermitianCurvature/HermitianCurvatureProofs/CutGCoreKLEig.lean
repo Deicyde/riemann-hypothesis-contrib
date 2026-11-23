@@ -1,7 +1,50 @@
 module
 
 public import Formalism.HermitianCurvature.HermitianCurvatureProofs.CutGCoreGTKLineCut
+public import Formalism.HermitianCurvature.HermitianCurvatureProofs.DiagonalTransferAction
+import Formalism.HermitianCurvature.HermitianCurvatureProofs.NFRadRedA
 public import Formalism.HermitianCurvature.HermitianCurvatureProofs.NFRadRedF
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -13,17 +56,14 @@ noncomputable section
 
 namespace KLEigPf
 
-variable
-  {Wp Wq : Type}
-  [NormedAddCommGroup Wp] [NormedSpace ℂ Wp] [NormedAddCommGroup Wq] [NormedSpace ℂ Wq]
+variable {Wp Wq : Type} [NormedAddCommGroup Wp] [NormedSpace ℂ Wp] [NormedAddCommGroup Wq] [NormedSpace ℂ Wq]
 
-theorem alg
-    {ι : Type} [Fintype ι] [DecidableEq ι]
-    (Qs : ι → (Wq →L[ℂ] Wq)) (x : ι → ℂ → ℂ) (C : ℂ → (Wq →L[ℂ] Wq)) (E : Wq →L[ℂ] Wp)
+theorem alg {ι : Type} [Fintype ι] [DecidableEq ι] (Qs : ι → (Wq →L[ℂ] Wq)) (x : ι → ℂ → ℂ)
+    (C : ℂ → (Wq →L[ℂ] Wq)) (E : Wq →L[ℂ] Wp)
     (hQQ : ∀ ρ σ, (Qs ρ).comp (Qs σ) = if ρ = σ then Qs ρ else 0) (hsum : ∑ ρ, Qs ρ = 1)
     (hsep : ∀ ρ σ, ρ ≠ σ → ∃ Y, x ρ Y ≠ x σ Y)
-    (hid : ∀ Y, E.comp (∑ σ, x σ Y • Qs σ) = E.comp (C Y)) (ρ : ι)
-    : E.comp (Qs ρ) = E ↔ ∀ (Y : ℂ) (v : Wq), E (C Y v) = x ρ Y • E v := by
+    (hid : ∀ Y, E.comp (∑ σ, x σ Y • Qs σ) = E.comp (C Y)) (ρ : ι) :
+    E.comp (Qs ρ) = E ↔ ∀ (Y : ℂ) (v : Wq), E (C Y v) = x ρ Y • E v := by
   have hQv : ∀ ρ σ v, Qs ρ (Qs σ v) = if ρ = σ then Qs ρ v else 0 := by
     intro ρ σ v
     have h := congrArg (fun T : Wq →L[ℂ] Wq => T v) (hQQ ρ σ)
@@ -35,13 +75,13 @@ theorem alg
     have h := congrArg (fun T : Wq →L[ℂ] Wp => T v) (hid Y)
     simp only [ContinuousLinearMap.comp_apply] at h
     rw [← h]
-    set_option synthInstance.maxHeartbeats 100000 in
+
     simp [map_sum]
   have hEv : ∀ v, E v = ∑ σ, E (Qs σ v) := by
     intro v
     have h : (∑ σ, Qs σ) v = v := by rw [hsum, ContinuousLinearMap.one_apply]
     conv_lhs => rw [← h]
-    set_option synthInstance.maxHeartbeats 100000 in
+
     rw [ContinuousLinearMap.sum_apply, map_sum]
   constructor
   · intro h Y v
@@ -85,7 +125,8 @@ theorem lie_eigenvalue_holds : KLEig := by
   obtain ⟨hOK, hz, hz', hTz, hTz', -, -⟩ := id hpl
   have hT : 0 < Tz P.k P.r Bs.z := by rw [hTz]; exact hOK.T_pos
   have hT' : 0 < Tz P.k P.r Bs.z' := by rw [hTz']; exact hOK.T'_pos
-  have hζ' : Tz P.k P.r Bs.z * Tz P.k P.r Bs.z' < Complex.normSq ζ := by rw [hTz, hTz']; exact hζ
+  have hζ' : Tz P.k P.r Bs.z * Tz P.k P.r Bs.z' < Complex.normSq ζ := by
+    rw [hTz, hTz']; exact hζ
   set c0 : Fin P.r → ℂ := fun _ => 1 with hc0def
   have hq : ((c0, ζ) : (Fin P.r → ℂ) × ℂ) ∈ NF.QR P.k P.r Bs.z Bs.z' := ⟨fun _ => one_ne_zero, hζ'⟩
   set φ : (Fin P.r → ℂ) × ℂ → (Wq →L[ℂ] Wp) := (NF.QR P.k P.r Bs.z Bs.z').indicator (fun _ => E) with hφdef
@@ -101,24 +142,21 @@ theorem lie_eigenvalue_holds : KLEig := by
       exact Set.indicator_of_notMem hq' _
   have hbase : NF.RadBase P.k P.r Bs.z Bs.z' Bs.μsec Bs.π Bs.π' :=
     ⟨by omega, hz, hz', hT, hT', hcs.1, Bs.π_rep, Bs.π'_rep, Bs.π_cont, Bs.π'_cont⟩
-  obtain ⟨Φ, hΦ, hΦr⟩ :=
-    Formalism.FourierDecayAlt.P.radical_reduction_surjective Wp Wq P.k P.r Bs.z Bs.z' Bs.μsec Bs.π
-      Bs.π' hbase φ hφ
+  obtain ⟨Φ, hΦ, hΦr⟩ := Formalism.FourierDecayAlt.P.radical_reduction_surjective Wp Wq P.k P.r Bs.z Bs.z' Bs.μsec Bs.π Bs.π' hbase φ hφ
   set g := NF.muZ P.k P.r Bs.μsec ζ with hgdef
   have hval : Φ c0 g = E := by
     have h1 := congrFun hΦr (c0, ζ)
     simp only [NF.radR, Set.indicator_of_mem hq, hφdef] at h1
     exact h1
-  have hx : (c0, g) ∈ Q.DomR P.k P.r Bs.z Bs.z' :=
-    Formalism.FourierDecayAlt.P.NFRadRedA.mem_domR hz hz' hcs.1 hq
+  have hx : (c0, g) ∈ Q.DomR P.k P.r Bs.z Bs.z' := Formalism.FourierDecayAlt.P.NFRadRedA.mem_domR hz hz' hcs.1 hq
   set Φ' : Q.RadSp P.k P.r Bs.z Bs.z' Bs.π Bs.π' := ⟨Φ, hΦ⟩ with hΦ'def
   let qq : MA.Qp P.r P.TT := ⟨(c0, ζ), ⟨fun _ => one_ne_zero, hζ⟩⟩
   have hx1 : ∀ Y : ℂ, (d.x Y).1 = X.fn 5 * X.t Y 1 1 := by
     intro Y
     have h : d.x Y = d.L.GGi * X.QQ Y 1 1 := by
       rw [hQ]
-      simp only [Q.NFData.QQ, Matrix.of_apply, Matrix.cons_val', Matrix.cons_val_one,
-        Matrix.head_cons, Matrix.cons_val_fin_one, Matrix.empty_val', Matrix.cons_val_zero]
+      simp only [Q.NFData.QQ, Matrix.of_apply, Matrix.cons_val', Matrix.cons_val_one, Matrix.head_cons,
+        Matrix.cons_val_fin_one, Matrix.empty_val', Matrix.cons_val_zero]
       rw [← mul_assoc, d.L.GGi_GG, one_mul]
     show Formalism.FourierDecayAlt.P5.Kfp.fstAlg _ (d.x Y) = _
     rw [h, hL.2.2.2.2.2.2.2.2.2.2.2.1]
@@ -130,24 +168,19 @@ theorem lie_eigenvalue_holds : KLEig := by
     ext v
     have hk1 := hK.2.2.2 (fun σ => M.xC P σ Y) Φ' qq
     have hk2 := congrArg (fun L : Wq →L[ℂ] Wp => L v) hk1
-    have hact :=
-      Formalism.FourierDecayAlt.P5.Kfp.diagonal_transfer_action X hz hz' Bs.π'_rep Bs.π'_cont hx Fr
-        hFr Y Φ' v
+    have hact := Formalism.FourierDecayAlt.P5.Kfp.diagonal_transfer_action X hz hz' Bs.π'_rep Bs.π'_cont hx Fr hFr Y Φ' v
     have hκx : (d.κ fun σ => M.xC P σ Y) = d.x Y := rfl
     rw [hκx, hx1 Y] at hk2
-    change (((X.fn 5 * X.t Y 1 1) Φ' : Q.RadSp P.k P.r Bs.z Bs.z' Bs.π Bs.π')
-            : Q.Fn P.k P.r (Wq →L[ℂ] Wp))
-          c0 g v
-        = (Φ c0 g) ((∑ σ, M.xC P σ Y • Qρ σ) v)
-      at hk2
+    change (((X.fn 5 * X.t Y 1 1) Φ' : Q.RadSp P.k P.r Bs.z Bs.z' Bs.π Bs.π') : Q.Fn P.k P.r (Wq →L[ℂ] Wp)) c0 g v =
+      (Φ c0 g) ((∑ σ, M.xC P σ Y • Qρ σ) v) at hk2
     rw [hact, hval] at hk2
     rw [ContinuousLinearMap.comp_apply, ContinuousLinearMap.comp_apply, ← hk2]
     show (Φ c0 g) _ = _
     rw [hval]
     rfl
   obtain ⟨Y₀, hY₀⟩ := Formalism.FourierDecayAlt.P5.Kfp.sep_real hOK
-  have hsep : ∀ ρ σ : M.Ty P, ρ ≠ σ → ∃ Y, M.xC P ρ Y ≠ M.xC P σ Y := fun ρ σ h =>
-    ⟨(Y₀ : ℂ), fun he => h (hY₀ he)⟩
+  have hsep : ∀ ρ σ : M.Ty P, ρ ≠ σ → ∃ Y, M.xC P ρ Y ≠ M.xC P σ Y :=
+    fun ρ σ h => ⟨(Y₀ : ℂ), fun he => h (hY₀ he)⟩
   classical
   exact alg Qρ (fun σ Y => M.xC P σ Y) C E hK.1 hK.2.1 hsep hid ρ
 

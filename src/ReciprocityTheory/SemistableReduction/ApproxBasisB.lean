@@ -1,6 +1,54 @@
 module
 
 public import ReciprocityTheory.SemistableReduction.ApproxBasisA
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Coalgebra.IsFrobenius
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.HopfAlgebra.Basic
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -10,15 +58,13 @@ namespace ReciprocityTheory.MultiplicativeHeights
 
 open Matrix NumberField ComplexConjugate
 
-theorem approxB_h_add_right
-    {K : Type} [Field K] [NumberField K] {r : ℕ} (S : HermForm K r) (x y z : Fin r → K)
-    : S.h x (y + z) = S.h x y + S.h x z := by
+theorem approxB_h_add_right {K : Type} [Field K] [NumberField K] {r : ℕ} (S : HermForm K r)
+    (x y z : Fin r → K) : S.h x (y + z) = S.h x y + S.h x z := by
   unfold ReciprocityTheory.MultiplicativeHeights.HermForm.h
   simp only [Pi.add_apply, mul_add, Finset.sum_add_distrib]
 
-theorem approxB_h_smul_right
-    {K : Type} [Field K] [NumberField K] {r : ℕ} (S : HermForm K r) (x y : Fin r → K) (a : K)
-    : S.h x (a • y) = a * S.h x y := by
+theorem approxB_h_smul_right {K : Type} [Field K] [NumberField K] {r : ℕ} (S : HermForm K r)
+    (x y : Fin r → K) (a : K) : S.h x (a • y) = a * S.h x y := by
   unfold ReciprocityTheory.MultiplicativeHeights.HermForm.h
   rw [Finset.mul_sum]
   refine Finset.sum_congr rfl fun i _ => ?_
@@ -27,28 +73,22 @@ theorem approxB_h_smul_right
   rw [Pi.smul_apply, smul_eq_mul]
   ring
 
-theorem approxB_h_sub_right
-    {K : Type} [Field K] [NumberField K] {r : ℕ} (S : HermForm K r) (x y z : Fin r → K)
-    : S.h x (y - z) = S.h x y - S.h x z := by
+theorem approxB_h_sub_right {K : Type} [Field K] [NumberField K] {r : ℕ} (S : HermForm K r)
+    (x y z : Fin r → K) : S.h x (y - z) = S.h x y - S.h x z := by
   unfold ReciprocityTheory.MultiplicativeHeights.HermForm.h
   simp only [Pi.sub_apply, mul_sub, Finset.sum_sub_distrib]
 
-theorem approxB_h_zero_right
-    {K : Type} [Field K] [NumberField K] {r : ℕ} (S : HermForm K r) (x : Fin r → K)
-    : S.h x 0 = 0 := by
+theorem approxB_h_zero_right {K : Type} [Field K] [NumberField K] {r : ℕ} (S : HermForm K r)
+    (x : Fin r → K) : S.h x 0 = 0 := by
   simp [ReciprocityTheory.MultiplicativeHeights.HermForm.h]
 
-theorem approxB_h_sum_right
-    {K : Type} [Field K] [NumberField K]
-    {r : ℕ} (S : HermForm K r)
-    {α : Type*} (s : Finset α)
-    (x : Fin r → K) (f : α → Fin r → K)
-    : S.h x (∑ j ∈ s, f j) = ∑ j ∈ s, S.h x (f j) := by
+theorem approxB_h_sum_right {K : Type} [Field K] [NumberField K] {r : ℕ} (S : HermForm K r)
+    {α : Type*} (s : Finset α) (x : Fin r → K) (f : α → Fin r → K) :
+    S.h x (∑ j ∈ s, f j) = ∑ j ∈ s, S.h x (f j) := by
   exact map_sum (AddMonoidHom.mk' (S.h x) ((approxB_h_add_right S) x)) f s
 
-theorem approxB_h_smul_left
-    {K : Type} [Field K] [NumberField K] {r : ℕ} (S : HermForm K r) (x y : Fin r → K) (a : K)
-    : S.h (a • x) y = S.c a * S.h x y := by
+theorem approxB_h_smul_left {K : Type} [Field K] [NumberField K] {r : ℕ} (S : HermForm K r)
+    (x y : Fin r → K) (a : K) : S.h (a • x) y = S.c a * S.h x y := by
   unfold ReciprocityTheory.MultiplicativeHeights.HermForm.h
   rw [Finset.mul_sum]
   refine Finset.sum_congr rfl fun i _ => ?_
@@ -57,63 +97,47 @@ theorem approxB_h_smul_left
   rw [Pi.smul_apply, smul_eq_mul, map_mul]
   ring
 
-private theorem hermForm_h_add_left
-    {K : Type} [Field K] [NumberField K] {r : ℕ} (S : HermForm K r) (x y z : Fin r → K)
-    : S.h (x + y) z = S.h x z + S.h y z := by
+private theorem hermForm_h_add_left {K : Type} [Field K] [NumberField K] {r : ℕ}
+    (S : HermForm K r) (x y z : Fin r → K) : S.h (x + y) z = S.h x z + S.h y z := by
   unfold ReciprocityTheory.MultiplicativeHeights.HermForm.h
   simp only [Pi.add_apply, map_add (f := _), add_mul, Finset.sum_add_distrib]
 
-theorem approxB_h_sum_left
-    {K : Type} [Field K] [NumberField K]
-    {r : ℕ} (S : HermForm K r)
-    {α : Type*} (s : Finset α)
-    (y : Fin r → K) (f : α → Fin r → K)
-    : S.h (∑ j ∈ s, f j) y = ∑ j ∈ s, S.h (f j) y := by
+theorem approxB_h_sum_left {K : Type} [Field K] [NumberField K] {r : ℕ} (S : HermForm K r)
+    {α : Type*} (s : Finset α) (y : Fin r → K) (f : α → Fin r → K) :
+    S.h (∑ j ∈ s, f j) y = ∑ j ∈ s, S.h (f j) y := by
   exact map_sum (AddMonoidHom.mk' (fun z => S.h z y) (fun a b => (hermForm_h_add_left S) a b y)) f s
 
-theorem approxB_embVec_add
-    {K : Type} [Field K] [NumberField K] {r : ℕ} (σ : K →+* ℂ) (x y : Fin r → K)
-    : embVec σ (x + y) = embVec σ x + embVec σ y := by
+theorem approxB_embVec_add {K : Type} [Field K] [NumberField K] {r : ℕ} (σ : K →+* ℂ)
+    (x y : Fin r → K) : embVec σ (x + y) = embVec σ x + embVec σ y := by
   funext a
   simp [embVec]
 
-theorem approxB_embVec_sub
-    {K : Type} [Field K] [NumberField K] {r : ℕ} (σ : K →+* ℂ) (x y : Fin r → K)
-    : embVec σ (x - y) = embVec σ x - embVec σ y := by
+theorem approxB_embVec_sub {K : Type} [Field K] [NumberField K] {r : ℕ} (σ : K →+* ℂ)
+    (x y : Fin r → K) : embVec σ (x - y) = embVec σ x - embVec σ y := by
   funext a
   simp [embVec]
 
-theorem approxB_embVec_smul
-    {K : Type} [Field K] [NumberField K] {r : ℕ} (σ : K →+* ℂ) (a : K) (x : Fin r → K)
-    : embVec σ (a • x) = σ a • embVec σ x := by
+theorem approxB_embVec_smul {K : Type} [Field K] [NumberField K] {r : ℕ} (σ : K →+* ℂ)
+    (a : K) (x : Fin r → K) : embVec σ (a • x) = σ a • embVec σ x := by
   funext i
   simp [embVec]
 
-theorem approxB_embVec_sum
-    {K : Type} [Field K] [NumberField K]
-    {r : ℕ}
-    (σ : K →+* ℂ)
-    {α : Type*} (s : Finset α) (f : α → Fin r → K)
-    : embVec σ (∑ j ∈ s, f j) = ∑ j ∈ s, embVec σ (f j) := by
+theorem approxB_embVec_sum {K : Type} [Field K] [NumberField K] {r : ℕ} (σ : K →+* ℂ)
+    {α : Type*} (s : Finset α) (f : α → Fin r → K) :
+    embVec σ (∑ j ∈ s, f j) = ∑ j ∈ s, embVec σ (f j) := by
   exact map_sum (AddMonoidHom.mk' (embVec σ) (approxB_embVec_add σ)) f s
 
-theorem approxB_split
-    {K : Type} [Field K] [NumberField K]
-    {r p : ℕ}
-    (hp : p ≤ r) (S : HermForm K r) (L : Submodule (𝓞 K) (Fin r → K)) (hL : IsIntegralOn S L)
-    (l v : Fin r → Fin r → K) (hl : ∀ j, l j ∈ L) (hvi : LinearIndependent K v)
+theorem approxB_split {K : Type} [Field K] [NumberField K] {r p : ℕ} (hp : p ≤ r) (S : HermForm K r)
+    (L : Submodule (𝓞 K) (Fin r → K)) (hL : IsIntegralOn S L) (l v : Fin r → Fin r → K)
+    (hl : ∀ j, l j ∈ L) (hvi : LinearIndependent K v)
     (hinj : ∀ g : ApproxPosIdx r p → K,
-      (∀ k : ApproxPosIdx r p, S.h (l k.1) (∑ j : ApproxPosIdx r p, g j • l j.1) = 0) → g = 0)
-    : ∃ (Δ : K) (coef : (Fin r → K) → ApproxPosIdx r p → K)
-        (a : {j : Fin r // ¬ (j : ℕ) < p} → Fin r),
-      Δ ≠ 0 ∧ Δ = (Matrix.of fun k j : ApproxPosIdx r p => S.h (l k.1) (l j.1)).det
-        ∧ (∀ x (k : ApproxPosIdx r p), S.h (l k.1) (Δ • x - ∑ k', coef x k' • l k'.1) = 0)
-        ∧ (∀ x ∈ L, Δ • x - ∑ k', coef x k' • l k'.1 ∈ L)
-        ∧ LinearIndependent K (fun j : Fin r =>
-          if h : (j : ℕ) < p then
-            l j
-          else
-            Δ • v (a ⟨j, h⟩) - ∑ k', coef (v (a ⟨j, h⟩)) k' • l k'.1) := by
+      (∀ k : ApproxPosIdx r p, S.h (l k.1) (∑ j : ApproxPosIdx r p, g j • l j.1) = 0) → g = 0) :
+    ∃ (Δ : K) (coef : (Fin r → K) → ApproxPosIdx r p → K) (a : {j : Fin r // ¬ (j : ℕ) < p} → Fin r),
+      Δ ≠ 0 ∧ Δ = (Matrix.of fun k j : ApproxPosIdx r p => S.h (l k.1) (l j.1)).det ∧
+      (∀ x (k : ApproxPosIdx r p), S.h (l k.1) (Δ • x - ∑ k', coef x k' • l k'.1) = 0) ∧
+      (∀ x ∈ L, Δ • x - ∑ k', coef x k' • l k'.1 ∈ L) ∧
+      LinearIndependent K (fun j : Fin r => if h : (j : ℕ) < p then l j else
+        Δ • v (a ⟨j, h⟩) - ∑ k', coef (v (a ⟨j, h⟩)) k' • l k'.1) := by
   classical
   set M : Matrix (ApproxPosIdx r p) (ApproxPosIdx r p) K := Matrix.of fun k j => S.h (l k.1) (l j.1) with hM
   set Δ := M.det with hΔdef
@@ -156,50 +180,49 @@ theorem approxB_split
     have hcz : ∀ k, f (((Matrix.of Mz).adjugate *ᵥ bz) k) = coef x k := by
       intro k
       rw [show coef x = M.adjugate *ᵥ bv x from rfl, ← hMmap, ← RingHom.map_adjugate]
-      set_option synthInstance.maxHeartbeats 100000 in
-      simp only [mulVec, dotProduct, RingHom.mapMatrix_apply, Matrix.map_apply, map_sum, map_mul,
-        hbz]
-    have hT : T x = (Matrix.of Mz).det • x - ∑ k', ((Matrix.of Mz).adjugate *ᵥ bz) k' • l k'.1 := by
+
+      simp only [mulVec, dotProduct, RingHom.mapMatrix_apply, Matrix.map_apply, map_sum,
+      map_mul, hbz]
+    have hT : T x = (Matrix.of Mz).det • x -
+        ∑ k', ((Matrix.of Mz).adjugate *ᵥ bz) k' • l k'.1 := by
       simp only [T, ← hΔz, ← hcz]
       simp only [f, algebraMap_smul]
     rw [hT]
     exact L.sub_mem (L.smul_mem _ hx) (L.sum_mem fun k _ => L.smul_mem _ (hl _))
 
-  have hbadd : ∀ x y, bv (x + y) = bv x + bv y := fun x y =>
-    funext fun k => approxB_h_add_right S _ x y
-  have hbsmul : ∀ (c : K) x, bv (c • x) = c • bv x := fun c x =>
-    funext fun k => by simp [bv, approxB_h_smul_right]
-  let Tl : (Fin r → K) →ₗ[K] (Fin r → K) := {
-    toFun := T
-    map_add' := fun x y => by
-      simp only [T, coef, hbadd, mulVec_add, Pi.add_apply, add_smul, Finset.sum_add_distrib,
-        smul_add]
-      abel
-    map_smul' := fun c x => by
-      simp only [T, coef, hbsmul, mulVec_smul, Pi.smul_apply, smul_eq_mul, mul_smul,
-        ← Finset.smul_sum, RingHom.id_apply, smul_sub]
-      rw [smul_comm Δ c x]
-  }
-  have hker
-      : LinearMap.ker Tl ≤ Submodule.span K (Set.range fun k : ApproxPosIdx r p => l k.1) := by
+  have hbadd : ∀ x y, bv (x + y) = bv x + bv y :=
+    fun x y => funext fun k => approxB_h_add_right S _ x y
+  have hbsmul : ∀ (c : K) x, bv (c • x) = c • bv x :=
+    fun c x => funext fun k => by simp [bv, approxB_h_smul_right]
+  let Tl : (Fin r → K) →ₗ[K] (Fin r → K) :=
+    { toFun := T
+      map_add' := fun x y => by
+        simp only [T, coef, hbadd, mulVec_add, Pi.add_apply, add_smul, Finset.sum_add_distrib,
+          smul_add]
+        abel
+      map_smul' := fun c x => by
+        simp only [T, coef, hbsmul, mulVec_smul, Pi.smul_apply, smul_eq_mul, mul_smul,
+          ← Finset.smul_sum, RingHom.id_apply, smul_sub]
+        rw [smul_comm Δ c x] }
+  have hker : LinearMap.ker Tl ≤ Submodule.span K (Set.range fun k : ApproxPosIdx r p => l k.1) := by
     intro x hx
     have h0 : T x = 0 := LinearMap.mem_ker.mp hx
     have hx' : x = Δ⁻¹ • ∑ k', coef x k' • l k'.1 := by
       have h1 : Δ • x = ∑ k', coef x k' • l k'.1 := sub_eq_zero.mp h0
       rw [← h1, smul_smul, inv_mul_cancel₀ hΔ, one_smul]
     rw [hx']
-    exact Submodule.smul_mem _ _
-      (Submodule.sum_mem _ fun k _ => Submodule.smul_mem _ _ (Submodule.subset_span ⟨k, rfl⟩))
+    exact Submodule.smul_mem _ _ (Submodule.sum_mem _ fun k _ =>
+      Submodule.smul_mem _ _ (Submodule.subset_span ⟨k, rfl⟩))
   have hfk : Module.finrank K (LinearMap.ker Tl) ≤ p := by
-    calc
-      _ ≤ Module.finrank K (Submodule.span K (Set.range fun k : ApproxPosIdx r p => l k.1)) :=
-        Submodule.finrank_mono hker
+    calc _ ≤ Module.finrank K (Submodule.span K (Set.range fun k : ApproxPosIdx r p => l k.1)) :=
+          Submodule.finrank_mono hker
       _ ≤ Fintype.card (ApproxPosIdx r p) := finrank_range_le_card (R := K) _
       _ = p := approxB_card_pos hp
   have hrn := LinearMap.finrank_range_add_finrank_ker Tl
   rw [Module.finrank_fin_fun] at hrn
   have hfr : r - p ≤ Module.finrank K (LinearMap.range Tl) := by omega
-  have hspan_v : Submodule.span K (Set.range v) = ⊤ := hvi.span_eq_top_of_card_eq_finrank' (by simp)
+  have hspan_v : Submodule.span K (Set.range v) = ⊤ :=
+    hvi.span_eq_top_of_card_eq_finrank' (by simp)
   have hrange : Submodule.span K (Set.range (Tl ∘ v)) = LinearMap.range Tl := by
     rw [Set.range_comp, ← Submodule.map_span, hspan_v, Submodule.map_top]
   obtain ⟨κ, a0, ha0, hsp, hli⟩ := exists_linearIndependent' K (Tl ∘ v)
@@ -214,22 +237,18 @@ theorem approxB_split
   refine ⟨Δ, coef, fun k => a0 (e k), hΔ, rfl, horth, hint, ?_⟩
   rw [Fintype.linearIndependent_iff]
   intro g hg
-  have hsplit
-      : ∑ k : ApproxPosIdx r p, g k.1 • l k.1
-          + ∑ k : {j : Fin r // ¬ (j : ℕ) < p}, g k.1 • T (v (a0 (e k)))
-        = 0 := by
+  have hsplit : ∑ k : ApproxPosIdx r p, g k.1 • l k.1 +
+      ∑ k : {j : Fin r // ¬ (j : ℕ) < p}, g k.1 • T (v (a0 (e k))) = 0 := by
     rw [← hg, ← Fintype.sum_subtype_add_sum_subtype (fun j : Fin r => (j : ℕ) < p)]
     congr 1
     · exact Finset.sum_congr rfl fun k _ => by simp only [dif_pos k.2]
     · exact Finset.sum_congr rfl fun k _ => by simp only [dif_neg k.2]; rfl
-  have hBorth
-      : ∀ k' : ApproxPosIdx r p,
-        S.h (l k'.1) (∑ k : {j : Fin r // ¬ (j : ℕ) < p}, g k.1 • T (v (a0 (e k)))) = 0 := by
+  have hBorth : ∀ k' : ApproxPosIdx r p,
+      S.h (l k'.1) (∑ k : {j : Fin r // ¬ (j : ℕ) < p}, g k.1 • T (v (a0 (e k)))) = 0 := by
     intro k'
     rw [approxB_h_sum_right]
     exact Finset.sum_eq_zero fun k _ => by rw [approxB_h_smul_right, horth, mul_zero]
-  have hApos
-      : ∀ k' : ApproxPosIdx r p, S.h (l k'.1) (∑ k : ApproxPosIdx r p, g k.1 • l k.1) = 0 := by
+  have hApos : ∀ k' : ApproxPosIdx r p, S.h (l k'.1) (∑ k : ApproxPosIdx r p, g k.1 • l k.1) = 0 := by
     intro k'
     have := congrArg (S.h (l k'.1)) hsplit
     rw [approxB_h_add_right, hBorth, add_zero, approxB_h_zero_right] at this

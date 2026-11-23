@@ -1,6 +1,49 @@
 module
 
-public import Mathlib
+public import Mathlib.Analysis.CStarAlgebra.Classes
+public import Mathlib.NumberTheory.NumberField.CanonicalEmbedding.Basic
+public import Mathlib.NumberTheory.NumberField.InfinitePlace.TotallyRealComplex
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -19,19 +62,16 @@ theorem emb_indep (g : (E →+* ℂ) → ℂ) (h : ∀ β : 𝓞 E, ∑ σ, σ (
   have hE : ∀ x : E, ∑ σ : E →+* ℂ, σ x * g σ = 0 := by
     intro x
     rw [← (integralBasis E).sum_repr x]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, Finset.sum_mul]
+
+    simp only [map_sum, Finset.sum_mul]
     rw [Finset.sum_comm]
     refine Finset.sum_eq_zero fun i _ => ?_
-    have e
-        : ∀ σ : E →+* ℂ,
-          σ ((integralBasis E).repr x i • integralBasis E i) * g σ
-            = ((integralBasis E).repr x i : ℂ) * (σ (integralBasis E i) * g σ) := fun σ => by
+    have e : ∀ σ : E →+* ℂ, σ ((integralBasis E).repr x i • integralBasis E i) * g σ =
+        ((integralBasis E).repr x i : ℂ) * (σ (integralBasis E i) * g σ) := fun σ => by
       rw [map_rat_smul, Rat.smul_def, mul_assoc]
     rw [Finset.sum_congr rfl fun σ _ => e σ, ← Finset.mul_sum, hb i, mul_zero]
   have hli : LinearIndependent ℂ (fun σ : E →+* ℂ => ((σ : E →* ℂ) : E → ℂ)) :=
-    (linearIndependent_monoidHom E ℂ).comp
-      (fun σ : E →+* ℂ => (σ : E →* ℂ))
+    (linearIndependent_monoidHom E ℂ).comp (fun σ : E →+* ℂ => (σ : E →* ℂ))
       (fun a b hab => RingHom.ext fun x => DFunLike.congr_fun hab x)
   rw [Fintype.linearIndependent_iff] at hli
   funext σ
@@ -48,19 +88,16 @@ def ConjSymm (t : (E →+* ℂ) → ℂ) : Prop :=
 theorem conjSymm_canonical (x : E) : ConjSymm (canonicalEmbedding E x) := fun σ => by
   simp only [canonicalEmbedding.apply_at, ComplexEmbedding.conjugate_coe_eq]
 
-theorem conjSymm_sum
-    {ι : Type} (s : Finset ι) (c : ι → ℝ) (v : ι → (E →+* ℂ) → ℂ) (hv : ∀ i, ConjSymm (v i))
-    : ConjSymm (∑ i ∈ s, c i • v i) := fun σ => by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [Finset.sum_apply, Finset.sum_apply, map_sum]
+theorem conjSymm_sum {ι : Type} (s : Finset ι) (c : ι → ℝ) (v : ι → (E →+* ℂ) → ℂ)
+    (hv : ∀ i, ConjSymm (v i)) : ConjSymm (∑ i ∈ s, c i • v i) := fun σ => by
+
+  rw [Finset.sum_apply, Finset.sum_apply, map_sum]
   refine Finset.sum_congr rfl fun i _ => ?_
   rw [Pi.smul_apply, Pi.smul_apply, hv i σ, Complex.real_smul, Complex.real_smul, map_mul,
     Complex.conj_ofReal]
 
-theorem eq_of_commMap
-    (t t' : (E →+* ℂ) → ℂ) (ht : ConjSymm t) (ht' : ConjSymm t')
-    (h : mixedEmbedding.commMap E t = mixedEmbedding.commMap E t')
-    : t = t' := by
+theorem eq_of_commMap (t t' : (E →+* ℂ) → ℂ) (ht : ConjSymm t) (ht' : ConjSymm t')
+    (h : mixedEmbedding.commMap E t = mixedEmbedding.commMap E t') : t = t' := by
   funext σ
   obtain ⟨w, hwdef⟩ : ∃ w, w = InfinitePlace.mk σ := ⟨_, rfl⟩
   have hcases := InfinitePlace.embedding_mk_eq σ
@@ -84,24 +121,21 @@ theorem eq_of_commMap
   · rw [he, ht, ht'] at key
     simpa using congrArg (starRingEnd ℂ) key
 
-theorem real_span (t : (E →+* ℂ) → ℂ) (ht : ConjSymm t)
-    : ∃ c : Free.ChooseBasisIndex ℤ (𝓞 E) → ℝ,
+theorem real_span (t : (E →+* ℂ) → ℂ) (ht : ConjSymm t) :
+    ∃ c : Free.ChooseBasisIndex ℤ (𝓞 E) → ℝ,
       t = ∑ k, c k • canonicalEmbedding E (integralBasis E k) := by
   refine ⟨fun k => (mixedEmbedding.latticeBasis E).repr (mixedEmbedding.commMap E t) k, ?_⟩
-  apply eq_of_commMap t _ ht
-    (conjSymm_sum Finset.univ
-      (fun k => (mixedEmbedding.latticeBasis E).repr (mixedEmbedding.commMap E t) k)
-      (fun k => canonicalEmbedding E (integralBasis E k))
-      fun k => conjSymm_canonical _)
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+  apply eq_of_commMap t _ ht (conjSymm_sum Finset.univ
+    (fun k => (mixedEmbedding.latticeBasis E).repr (mixedEmbedding.commMap E t) k)
+    (fun k => canonicalEmbedding E (integralBasis E k)) fun k => conjSymm_canonical _)
+
+  rw [map_sum]
   simp only [map_smul]
   conv_lhs => rw [← (mixedEmbedding.latticeBasis E).sum_repr (mixedEmbedding.commMap E t)]
   refine Finset.sum_congr rfl fun k _ => ?_
   rw [mixedEmbedding.latticeBasis_apply, mixedEmbedding.commMap_canonical_eq_mixed]
 
-theorem conjugate_ne [_root_.NumberField.IsTotallyComplex E] (σ : E →+* ℂ)
-    : ComplexEmbedding.conjugate σ ≠ σ := by
+theorem conjugate_ne [_root_.NumberField.IsTotallyComplex E] (σ : E →+* ℂ) : ComplexEmbedding.conjugate σ ≠ σ := by
   intro h
   have hr : ComplexEmbedding.IsReal σ := ComplexEmbedding.isReal_iff.mpr h
   exact InfinitePlace.not_isReal_iff_isComplex.mpr (IsTotallyComplex.isComplex (InfinitePlace.mk σ))

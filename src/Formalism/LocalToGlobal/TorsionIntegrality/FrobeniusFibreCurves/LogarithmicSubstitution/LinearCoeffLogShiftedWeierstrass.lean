@@ -1,8 +1,53 @@
 module
 
-public import Mathlib
-public import Formalism.LocalToGlobal.TorsionIntegrality.FrobeniusFibreCurves.FinalD
 public import Formalism.LocalToGlobal.TorsionIntegrality.FrobeniusFibreCurves.StatementI
+public import Formalism.LocalToGlobal.TorsionIntegrality.FrobeniusFibreCurves.LogarithmicSubstitution.ConstantCoeffSig1S
+import Formalism.LocalToGlobal.TorsionIntegrality.FrobeniusFibreCurves.LogarithmicSubstitution.OneAddMulDerivLogSubst
+import Formalism.LocalToGlobal.TorsionIntegrality.FrobeniusFibreCurves.LogarithmicSubstitution.WeierstrassReducedEquations
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -16,13 +61,14 @@ open Formalism.L2.Th1.C (wpShift HasSecondLogDeriv)
 
 variable {K : Type} [Field K] [CharZero K]
 
-theorem dz_rescale (a : K) (f : PowerSeries K) : dz (rescale a f) = C a * rescale a (dz f) := by
+theorem dz_rescale (a : K) (f : PowerSeries K) :
+    dz (rescale a f) = C a * rescale a (dz f) := by
   ext n
   rw [dz, coeff_derivative, coeff_rescale, coeff_C_mul, coeff_rescale, coeff_derivative]
   ring
 
-theorem second_derivative_rescale (a : K) (f : PowerSeries K)
-    : dz (dz (rescale a f)) = C (a ^ 2) * rescale a (dz (dz f)) := by
+theorem second_derivative_rescale (a : K) (f : PowerSeries K) :
+    dz (dz (rescale a f)) = C (a ^ 2) * rescale a (dz (dz f)) := by
   rw [dz_rescale, dz_mul, dz_C, dz_rescale, map_pow]
   ring
 
@@ -42,33 +88,30 @@ theorem fExp_zero : fExp (0 : PowerSeries K) = 1 := by
   have h : fExp (0 : PowerSeries K) * fExp (0 : PowerSeries K) = fExp (0 : PowerSeries K) := by
     rw [← fExp_add (map_zero _) (map_zero _), add_zero]
   have h1 : constantCoeff (fExp (0 : PowerSeries K)) = 1 := constantCoeff_fExp (map_zero _)
-  have hne : fExp (0 : PowerSeries K) ≠ 0 :=
-    ne_zero_of_constantCoeff (by rw [h1]; exact one_ne_zero)
+  have hne : fExp (0 : PowerSeries K) ≠ 0 := ne_zero_of_constantCoeff (by rw [h1]; exact one_ne_zero)
   exact mul_left_cancel₀ hne (by rw [h, mul_one])
 
-theorem fExp_nsmul {f : PowerSeries K} (hf : constantCoeff f = 0) (n : ℕ)
-    : fExp (n • f) = fExp f ^ n := by
+theorem fExp_nsmul {f : PowerSeries K} (hf : constantCoeff f = 0) (n : ℕ) :
+    fExp (n • f) = fExp f ^ n := by
   induction n with
   | zero => rw [zero_smul, pow_zero, fExp_zero]
   | succ m ih =>
     have hm : constantCoeff (m • f) = 0 := by rw [map_nsmul, hf, smul_zero]
     rw [succ_nsmul, fExp_add hm hf, ih, pow_succ]
 
-theorem fExp_sum
-    {ι : Type} (s : Finset ι) (f : ι → PowerSeries K) (hf : ∀ i, constantCoeff (f i) = 0)
-    : fExp (∑ i ∈ s, f i) = ∏ i ∈ s, fExp (f i) := by
+theorem fExp_sum {ι : Type} (s : Finset ι) (f : ι → PowerSeries K)
+    (hf : ∀ i, constantCoeff (f i) = 0) : fExp (∑ i ∈ s, f i) = ∏ i ∈ s, fExp (f i) := by
   classical
   induction s using Finset.induction_on with
   | empty => rw [Finset.sum_empty, Finset.prod_empty, fExp_zero]
   | insert a s ha ih =>
     have hs : constantCoeff (∑ i ∈ s, f i) = 0 := by
-      set_option synthInstance.maxHeartbeats 100000 in
+
       rw [map_sum]; exact Finset.sum_eq_zero fun i _ => hf i
     rw [Finset.sum_insert ha, Finset.prod_insert ha, fExp_add (hf a) hs, ih]
 
-theorem second_derivative_formal_log
-    {f g : PowerSeries K} (hf : constantCoeff f = 1) (h : HasSecondLogDeriv f g)
-    : dz (dz (fLog f)) = g := by
+theorem second_derivative_formal_log {f g : PowerSeries K} (hf : constantCoeff f = 1) (h : HasSecondLogDeriv f g) :
+    dz (dz (fLog f)) = g := by
   have hne : f ≠ 0 := ne_zero_of_constantCoeff (by rw [hf]; exact one_ne_zero)
   have hL1 : f * dz (fLog f) = dz f := Sq.mul_dz_fLog hf
   have hL2 : f * dz (dz (fLog f)) + dz (fLog f) * dz f = dz (dz f) := by
@@ -84,17 +127,16 @@ theorem constantCoeff_wpShift (P : PowerSeries K) (c : K) : constantCoeff (wpShi
 theorem dz_X_sq : dz ((X : PowerSeries K) ^ 2) = 2 * X := by
   have := dz_X_pow (K := K) 1; push_cast at this; linear_combination this
 
-theorem linear_coeff_log_shifted_weierstrass (P : PowerSeries K) (c : K)
-    : constantCoeff (dz (fLog (wpShift P c))) = 0 := by
+theorem linear_coeff_log_shifted_weierstrass (P : PowerSeries K) (c : K) :
+    constantCoeff (dz (fLog (wpShift P c))) = 0 := by
   have h := congrArg constantCoeff (Sq.mul_dz_fLog (constantCoeff_wpShift P c))
   rw [map_mul, constantCoeff_wpShift, one_mul] at h
   rw [h, wpShift, dz_add, dz_mul, dz_one, dz_X_sq]
   simp
 
-theorem second_log_derivative_two_isogeny
-    (g2 g3 e1 : K) (P : PowerSeries K) (hP : IsWp g2 g3 P) (he : 4 * e1 ^ 3 - g2 * e1 - g3 = 0)
-    : HasSecondLogDeriv (wpShift P e1)
-      (2 * P - 2 * (C e1 + C (3 * e1 ^ 2 - g2 / 4) * wOf e1 P)) := by
+theorem second_log_derivative_two_isogeny (g2 g3 e1 : K) (P : PowerSeries K) (hP : IsWp g2 g3 P)
+    (he : 4 * e1 ^ 3 - g2 * e1 - g3 = 0) :
+    HasSecondLogDeriv (wpShift P e1) (2 * P - 2 * (C e1 + C (3 * e1 ^ 2 - g2 / 4) * wOf e1 P)) := by
   obtain ⟨hF1, hF2⟩ := weierstrassReducedEquations K g2 g3 P hP
   have hZW : wpShift P e1 = 1 + X ^ 2 * P - C e1 * X ^ 2 := by rw [wpShift]; ring
   rw [hZW]
@@ -116,7 +158,8 @@ theorem second_log_derivative_two_isogeny
   have he' : 4 * (C e1 : PowerSeries K) ^ 3 - C g2 * C e1 - C g3 = 0 := by
     simp only [← map_ofNat (C (R := K)), ← map_mul, ← map_pow, ← map_sub]; rw [he, map_zero]
   generalize 3 * e1 ^ 2 - g2 / 4 = kap at c2 ⊢
-  have hB : Ze * dz (dz Ze) - dz Ze ^ 2 = (2 * P - 2 * C e1) * Ze ^ 2 - 2 * C kap * X ^ 2 * Ze := by
+  have hB : Ze * dz (dz Ze) - dz Ze ^ 2 =
+      (2 * P - 2 * C e1) * Ze ^ 2 - 2 * C kap * X ^ 2 * Ze := by
     rw [hZ2, hZ1, hZe]
     linear_combination (-1 : PowerSeries K) * hF1 + (1 + X ^ 2 * P - C e1 * X ^ 2) * hF2 -
       X ^ 4 * he' + X ^ 2 * (1 + X ^ 2 * P - C e1 * X ^ 2) * c2 -
@@ -138,7 +181,7 @@ theorem theta_zero_isogeny_holds : Th0Isogeny := by
   rw [← fExp_add hS1 hq]
   set abelian₂ : PowerSeries K := sigmaOneSeries e1 kap w + -(C (s2 / 2) * X ^ 2) with hLam
   have hL0 : constantCoeff abelian₂ = 0 := by rw [hLam, map_add (f := _), hS1, hq, add_zero]
-  have hL1 : dz abelian₂ = - prim (C e1 + C kap * w) - C s2 * X := by
+  have hL1 : dz abelian₂ = -prim (C e1 + C kap * w) - C s2 * X := by
     have c3 : 2 * C (s2 / 2) = (C s2 : PowerSeries K) := by
       rw [← map_ofNat (C (R := K)) 2, ← map_mul]; congr 1; ring
     rw [hLam, sigmaOneSeries]
@@ -148,52 +191,49 @@ theorem theta_zero_isogeny_holds : Th0Isogeny := by
     rw [hL1]
     simp only [dz_sub, dz_neg, dz_prim, dz_mul, dz_C, dz_X]
     ring
-  have hL1c : constantCoeff (dz abelian₂) = 0 := by rw [hL1]; simp [constantCoeff_prim]
+  have hL1c : constantCoeff (dz abelian₂) = 0 := by
+    rw [hL1]; simp [constantCoeff_prim]
   have hR0 : constantCoeff (rescale al abelian₂) = 0 := by
     rw [← coeff_zero_eq_constantCoeff_apply, coeff_rescale, coeff_zero_eq_constantCoeff_apply, hL0,
       mul_zero]
   have hZ1 : ∀ a : K, constantCoeff (wpShift P a) = 1 := constantCoeff_wpShift P
   have hZl : ∀ a : K, constantCoeff (fLog (wpShift P a)) = 0 := fun a => constantCoeff_fLog (hZ1 a)
   clear_value abelian₂
-  have key
-      : rescale al abelian₂ + n • fLog (wpShift P e1)
-        = (2 * n) • abelian₂ + ∑ Q, fLog (wpShift P (c Q)) := by
+  have key : rescale al abelian₂ + n • fLog (wpShift P e1) =
+      (2 * n) • abelian₂ + ∑ Q, fLog (wpShift P (c Q)) := by
     refine derivative.ext (derivative.ext ?_ ?_) ?_
     · show dz (dz _) = dz (dz _)
       have hsum : dz (dz (∑ Q, fLog (wpShift P (c Q)))) = ∑ Q, (2 * P - wp Q - wm Q) := by
-        set_option synthInstance.maxHeartbeats 100000 in
-          rw [dz, dz, map_sum, map_sum]
+
+        rw [dz, dz, map_sum, map_sum]
         exact Finset.sum_congr rfl fun Q _ => second_derivative_formal_log (hZ1 _) (hF1 Q)
-      have hsum2
-          : ∑ Q, (2 * P - wp Q - wm Q) = (n : PowerSeries K) * (2 * P) - ∑ Q, (wp Q + wm Q) := by
+      have hsum2 : ∑ Q, (2 * P - wp Q - wm Q) =
+          (n : PowerSeries K) * (2 * P) - ∑ Q, (wp Q + wm Q) := by
         have : ∀ Q, 2 * P - wp Q - wm Q = 2 * P - (wp Q + wm Q) := fun Q => by ring
         rw [Finset.sum_congr rfl fun Q _ => this Q, Finset.sum_sub_distrib, Finset.sum_const,
           Finset.card_univ, nsmul_eq_mul]
       have hSC : C (al ^ 2) * C s2 - 2 * (n : PowerSeries K) * C s2 = C S := by
         rw [← hS, ← map_natCast (C (R := K)) n, ← map_ofNat (C (R := K)) 2]
         simp only [← map_mul, ← map_sub]
-        congr 1
-        ring
-      rw [dz_add, dz_add, dz_add, dz_add, hsum, hsum2, second_derivative_rescale, hL2,
-        second_derivative_nsmul, second_derivative_nsmul, hL2,
-        second_derivative_formal_log (hZ1 _) hD, map_sub, map_neg, rescale_C', nsmul_eq_mul,
-        nsmul_eq_mul]
+        congr 1; ring
+      rw [dz_add, dz_add, dz_add, dz_add, hsum, hsum2, second_derivative_rescale, hL2, second_derivative_nsmul, second_derivative_nsmul, hL2,
+        second_derivative_formal_log (hZ1 _) hD, map_sub, map_neg, rescale_C', nsmul_eq_mul, nsmul_eq_mul]
       push_cast
       linear_combination (-1 : PowerSeries K) * hF2 - hSC
     · show constantCoeff (dz _) = constantCoeff (dz _)
       have hsum : constantCoeff (dz (∑ Q, fLog (wpShift P (c Q)))) = 0 := by
-        set_option synthInstance.maxHeartbeats 100000 in
-          rw [dz, map_sum, map_sum]
+
+        rw [dz, map_sum, map_sum]
         exact Finset.sum_eq_zero fun Q _ => linear_coeff_log_shifted_weierstrass P _
       have hr : constantCoeff (rescale al (dz abelian₂)) = 0 := by
         rw [← coeff_zero_eq_constantCoeff_apply, coeff_rescale, coeff_zero_eq_constantCoeff_apply,
           hL1c, mul_zero]
-      rw [dz_add, dz_add, map_add (f := _), map_add (f := _), hsum, dz_rescale, map_mul, hr,
-        dz_nsmul, dz_nsmul, map_nsmul, map_nsmul, linear_coeff_log_shifted_weierstrass, hL1c]
+      rw [dz_add, dz_add, map_add (f := _), map_add (f := _), hsum, dz_rescale, map_mul, hr, dz_nsmul, dz_nsmul,
+        map_nsmul, map_nsmul, linear_coeff_log_shifted_weierstrass, hL1c]
       simp
-    set_option synthInstance.maxHeartbeats 100000 in
+
     · rw [map_add (f := _), map_add (f := _), hR0, map_nsmul, map_nsmul, hZl, hL0, map_sum,
-        Finset.sum_eq_zero fun Q _ => hZl _]
+      Finset.sum_eq_zero fun Q _ => hZl _]
       simp
   rw [Sq.rescale_fExp al hL0]
   have e1' : wpShift P e1 ^ n = fExp (n • fLog (wpShift P e1)) := by
@@ -204,7 +244,7 @@ theorem theta_zero_isogeny_holds : Th0Isogeny := by
   have hn0 : constantCoeff (n • fLog (wpShift P e1)) = 0 := by rw [map_nsmul, hZl, smul_zero]
   have hn1 : constantCoeff ((2 * n) • abelian₂) = 0 := by rw [map_nsmul, hL0, smul_zero]
   have hn2 : constantCoeff (∑ Q, fLog (wpShift P (c Q))) = 0 := by
-    set_option synthInstance.maxHeartbeats 100000 in
+
     rw [map_sum]; exact Finset.sum_eq_zero fun Q _ => hZl _
   rw [e1', e2', ← fExp_nsmul hL0, ← fExp_add hR0 hn0, ← fExp_add hn1 hn2, key]
 

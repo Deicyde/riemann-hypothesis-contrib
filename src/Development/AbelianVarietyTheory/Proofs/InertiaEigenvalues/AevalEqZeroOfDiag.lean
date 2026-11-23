@@ -1,17 +1,76 @@
 module
 
-public import Mathlib
 public import Formalism.SharpRestriction.LevelLetterCocycles.InvariantsGenerators
-public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.JSmul
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.CharpolyOfDiagWith
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsEqOfExhaustive
+public import Development.AbelianVarietyTheory.BlockTheory.NonGaloisCusps.DiagonalQuotientEigen
+public import Development.AbelianVarietyTheory.BlockTheory.NonGaloisCusps.GradedSeries
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.CompletionLines
 public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.EventuallyClosedOfDictClosed
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.MapDcrisEqDdRCrystallineUnramified
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.FinrankSpanImageEqCard
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.SpanIsLinesOfGraded
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.AlgebraMapPadicIntFinExtInjective
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.AntitoneFiltrationExistsAdaptedLinearIndepSet
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.CardTorsionMulFinrank
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.CharpolyOfDiagWith
+import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.CoeffEqOfApply
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.DvrComplete
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsAlgEquivXAddC
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsBasisAddPiSmul
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsEqOfExhaustive
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsIsPtPrimitiveRoot
+import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsMatrixFrobenius
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsSubstInvariants
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.FinrankSpanImageEqCard
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ISupIndepDdRE
+import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.InjectiveOfSpan
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.MapDcrisEqDdRCrystallineUnramified
+import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.MemXSmulOfProjective
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.SpanIsLinesOfGraded
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.WachExpansionLatticeGradedOfLevelLe
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Coalgebra.IsFrobenius
+import Mathlib.RingTheory.Flat.Equalizer
+import Mathlib.RingTheory.HopfAlgebra.Basic
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.TotallySplit
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
+import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.ResBound
 
 @[expose] public section
 
@@ -93,8 +152,8 @@ theorem finrank_ker_of_diag
     · intro x hx
       rw [b.mem_span_image]
       intro s hs
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [LinearMap.mem_ker, ← b.sum_repr x, map_sum] at hx
+
+      rw [LinearMap.mem_ker, ← b.sum_repr x, map_sum] at hx
       simp only [map_smul, h2, smul_smul] at hx
       have := Fintype.linearIndependent_iff.1 b.linearIndependent _ hx s
       exact (sub_eq_zero.1 ((mul_eq_zero.1 this).resolve_left (Finsupp.mem_support_iff.1 hs))).symm
@@ -680,7 +739,6 @@ theorem senLat_of_tie
 end Generic
 
 open Formalism.MainNotions in
-set_option maxHeartbeats 1000000 in
 theorem senLat_of_coeff
     {l : ℕ} [Fact l.Prime]
     {P : LocPrime l} {AI : LocAinf l P} (hT : LocTied l P AI)

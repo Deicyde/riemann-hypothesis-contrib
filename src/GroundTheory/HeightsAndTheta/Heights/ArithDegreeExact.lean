@@ -1,8 +1,51 @@
 module
 
-public import Mathlib
 public import GroundTheory.HeightsAndTheta.Heights.ArithDegree
 public import GroundTheory.HeightsAndTheta.Heights.HeightsOfSets.Slopes
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+public import Mathlib.Analysis.Matrix.PosDef
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -16,15 +59,12 @@ variable {K : Type*} [Field K] [NumberField K]
 
 section Span
 
-variable
-  {E : Type*} [AddCommGroup E] [Module (𝓞 K) E] [Module.Finite (𝓞 K) E] [Module.Projective (𝓞 K) E]
-  (h : HermitianMetric K E) (σ : K →+* ℂ)
+variable {E : Type*} [AddCommGroup E] [Module (𝓞 K) E] [Module.Finite (𝓞 K) E]
+  [Module.Projective (𝓞 K) E] (h : HermitianMetric K E) (σ : K →+* ℂ)
 
-theorem mem_span_fibreVec
-    {ι : Type*} [Fintype ι]
-    {s : ι → E} (hs : LinearIndependent (𝓞 K) s)
-    (hcard : Fintype.card ι = Module.finrank (𝓞 K) E) (y : Fibre σ E)
-    : FibreSpace.equiv h σ y ∈ Submodule.span ℂ (Set.range fun i ↦ fibreVec h σ (s i)) := by
+theorem mem_span_fibreVec {ι : Type*} [Fintype ι] {s : ι → E} (hs : LinearIndependent (𝓞 K) s)
+    (hcard : Fintype.card ι = Module.finrank (𝓞 K) E) (y : Fibre σ E) :
+    FibreSpace.equiv h σ y ∈ Submodule.span ℂ (Set.range fun i ↦ fibreVec h σ (s i)) := by
   have hfin := finite_quotient_span hs hcard
   set n := Nat.card (E ⧸ Submodule.span (𝓞 K) (Set.range s))
   have hn : (n : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr Nat.card_pos.ne'
@@ -32,9 +72,8 @@ theorem mem_span_fibreVec
   have key : ∀ e : E, fibreVec h σ e ∈ W := by
     intro e
     have hmem : (n : 𝓞 K) • e ∈ Submodule.span (𝓞 K) (Set.range s) := by
-      have :=
-        card_nsmul_eq_zero' (G := E ⧸ Submodule.span (𝓞 K) (Set.range s))
-          (x := Submodule.Quotient.mk e)
+      have := card_nsmul_eq_zero' (G := E ⧸ Submodule.span (𝓞 K) (Set.range s))
+        (x := Submodule.Quotient.mk e)
       rw [← Submodule.Quotient.mk_smul, Submodule.Quotient.mk_eq_zero] at this
       rwa [Nat.cast_smul_eq_nsmul]
     obtain ⟨c, hc⟩ := (Submodule.mem_span_range_iff_exists_fun (𝓞 K)).mp hmem
@@ -59,12 +98,11 @@ theorem mem_span_fibreVec
 
 end Span
 
+
 omit [NumberField K] in
-theorem lTensor_complex_smul
-    (σ : K →+* ℂ)
-    {M N : Type*} [AddCommGroup M] [Module (𝓞 K) M] [AddCommGroup N] [Module (𝓞 K) N]
-    (f : M →ₗ[𝓞 K] N) (c : ℂ) (x : Fibre σ M)
-    : f.lTensor (ComplexAt σ) (c • x) = c • f.lTensor (ComplexAt σ) x := by
+theorem lTensor_complex_smul (σ : K →+* ℂ) {M N : Type*} [AddCommGroup M] [Module (𝓞 K) M]
+    [AddCommGroup N] [Module (𝓞 K) N] (f : M →ₗ[𝓞 K] N) (c : ℂ) (x : Fibre σ M) :
+    f.lTensor (ComplexAt σ) (c • x) = c • f.lTensor (ComplexAt σ) x := by
   induction x using TensorProduct.induction_on with
   | zero => simp only [smul_zero, map_zero]
   | tmul z m => rw [smul_tmul', LinearMap.lTensor_tmul, LinearMap.lTensor_tmul, smul_tmul']
@@ -74,14 +112,14 @@ section GramBlock
 
 variable {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℂ V]
 
-theorem det_gram_im {n : Type*} [Fintype n] [DecidableEq n] (v : n → V) : (det (gram ℂ v)).im = 0 :=
+theorem det_gram_im {n : Type*} [Fintype n] [DecidableEq n] (v : n → V) :
+    (det (gram ℂ v)).im = 0 :=
   ((Complex.nonneg_iff.mp (posSemidef_gram ℂ v).det_nonneg).2).symm
 
-theorem det_gram_sumElim
-    {m n : Type*} [Fintype m] [Fintype n] [DecidableEq m] [DecidableEq n]
+theorem det_gram_sumElim {m n : Type*} [Fintype m] [Fintype n] [DecidableEq m] [DecidableEq n]
     (a : m → V) (b q : n → V) (C : Matrix m n ℂ) (hq : ∀ j, q j = b j - ∑ i, C i j • a i)
-    (horth : ∀ i j, inner ℂ (a i) (q j) = 0)
-    : det (gram ℂ (Sum.elim a b)) = det (gram ℂ a) * det (gram ℂ q) := by
+    (horth : ∀ i j, inner ℂ (a i) (q j) = 0) :
+    det (gram ℂ (Sum.elim a b)) = det (gram ℂ a) * det (gram ℂ q) := by
   let T : Matrix (m ⊕ n) (m ⊕ n) ℂ := fromBlocks 1 (-C) 0 1
   have h1 : Sum.elim a q = fun k ↦ ∑ l, T l k • Sum.elim a b l := by
     funext k
@@ -100,9 +138,8 @@ theorem det_gram_sumElim
     · simp [gram_apply, horth]
     · simp [gram_apply, inner_eq_zero_symm.mp (horth i' j)]
     · rfl
-  calc
-    det (gram ℂ (Sum.elim a b)) = det (gram ℂ (Sum.elim a q)) := by
-      rw [h1, gram_comb, det_mul, det_mul, det_conjTranspose, h2, star_one, one_mul, mul_one]
+  calc det (gram ℂ (Sum.elim a b)) = det (gram ℂ (Sum.elim a q)) := by
+        rw [h1, gram_comb, det_mul, det_mul, det_conjTranspose, h2, star_one, one_mul, mul_one]
     _ = det (gram ℂ a) * det (gram ℂ q) := by rw [h3, det_fromBlocks_zero₂₁]
 
 end GramBlock
@@ -116,10 +153,10 @@ variable {E' E E'' : HermitianBundle K} (X : HermitianExtension E' E E'')
 
 theorem proj_incl (y : E'.carrier) : X.proj (X.incl y) = 0 := X.exact.apply_apply_eq_zero y
 
+
 include X in
-theorem finrank_eq
-    : Module.finrank (𝓞 K) E.carrier
-      = Module.finrank (𝓞 K) E'.carrier + Module.finrank (𝓞 K) E''.carrier := by
+theorem finrank_eq : Module.finrank (𝓞 K) E.carrier =
+    Module.finrank (𝓞 K) E'.carrier + Module.finrank (𝓞 K) E''.carrier := by
   have h1 := rank_quotient_add_rank_of_isDomain (LinearMap.range X.incl)
   have hker : LinearMap.ker X.proj = LinearMap.range X.incl := X.exact.linearMap_ker_eq
   let e1 : (E.carrier ⧸ LinearMap.range X.incl) ≃ₗ[𝓞 K] E''.carrier :=
@@ -134,36 +171,34 @@ theorem finrank_eq
 
 variable {m n : Type*} [Fintype m] [Fintype n]
 
-theorem linearIndependent_sumElim
-    {s' : m → E'.carrier} {s'' : n → E''.carrier} {u : n → E.carrier}
-    (hu : ∀ j, X.proj (u j) = s'' j) (hs' : LinearIndependent (𝓞 K) s')
-    (hs'' : LinearIndependent (𝓞 K) s'')
-    : LinearIndependent (𝓞 K) (Sum.elim (fun i ↦ X.incl (s' i)) u) := by
+theorem linearIndependent_sumElim {s' : m → E'.carrier} {s'' : n → E''.carrier}
+    {u : n → E.carrier} (hu : ∀ j, X.proj (u j) = s'' j) (hs' : LinearIndependent (𝓞 K) s')
+    (hs'' : LinearIndependent (𝓞 K) s'') :
+    LinearIndependent (𝓞 K) (Sum.elim (fun i ↦ X.incl (s' i)) u) := by
   rw [Fintype.linearIndependent_iff] at hs' hs'' ⊢
   intro g hg
   rw [Fintype.sum_sum_type] at hg
   simp only [Sum.elim_inl, Sum.elim_inr] at hg
   have h2 : ∑ j, g (Sum.inr j) • s'' j = 0 := by
     have := congrArg X.proj hg
-    set_option synthInstance.maxHeartbeats 100000 in
+
     simpa [map_add (f := _), map_sum, map_smul, proj_incl, hu] using this
   have hr := hs'' _ h2
   have h1 : ∑ i, g (Sum.inl i) • s' i = 0 := by
     apply X.incl_injective
     simp only [hr, zero_smul, Finset.sum_const_zero, add_zero] at hg
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, map_zero]
+
+    rw [map_sum, map_zero]
     simpa [map_smul] using hg
   have hl := hs' _ h1
   rintro (i | j)
   exacts [hl i, hr j]
 
-theorem card_quotient_sumElim
-    {s' : m → E'.carrier} {s'' : n → E''.carrier} {u : n → E.carrier}
-    (hu : ∀ j, X.proj (u j) = s'' j) (hs'' : LinearIndependent (𝓞 K) s'')
-    : Nat.card (E.carrier ⧸ Submodule.span (𝓞 K) (Set.range (Sum.elim (fun i ↦ X.incl (s' i)) u)))
-      = Nat.card (E'.carrier ⧸ Submodule.span (𝓞 K) (Set.range s'))
-        * Nat.card (E''.carrier ⧸ Submodule.span (𝓞 K) (Set.range s'')) := by
+theorem card_quotient_sumElim {s' : m → E'.carrier} {s'' : n → E''.carrier}
+    {u : n → E.carrier} (hu : ∀ j, X.proj (u j) = s'' j) (hs'' : LinearIndependent (𝓞 K) s'') :
+    Nat.card (E.carrier ⧸ Submodule.span (𝓞 K) (Set.range (Sum.elim (fun i ↦ X.incl (s' i)) u))) =
+      Nat.card (E'.carrier ⧸ Submodule.span (𝓞 K) (Set.range s')) *
+        Nat.card (E''.carrier ⧸ Submodule.span (𝓞 K) (Set.range s'')) := by
   set w := Sum.elim (fun i ↦ X.incl (s' i)) u
   set N := Submodule.span (𝓞 K) (Set.range w)
   set S := N ⊔ LinearMap.range X.incl
@@ -182,13 +217,13 @@ theorem card_quotient_sumElim
         simp only [w, Sum.elim_inl, Sum.elim_inr] at hg
         have h2 : ∑ j, g (Sum.inr j) • s'' j = 0 := by
           have := congrArg X.proj hg
-          set_option synthInstance.maxHeartbeats 100000 in
+
           simpa [map_add (f := _), map_sum, map_smul, proj_incl, hu] using this
         have hr := (Fintype.linearIndependent_iff.mp hs'') _ h2
         simp only [hr, zero_smul, Finset.sum_const_zero, add_zero] at hg
         have : X.incl (∑ i, g (Sum.inl i) • s' i) = X.incl x := by
-          set_option synthInstance.maxHeartbeats 100000 in
-            rw [← hg, map_sum]
+
+          rw [← hg, map_sum]
           simp [map_smul]
         rw [← X.incl_injective this]
         exact Submodule.sum_mem _ fun i _ ↦ Submodule.smul_mem _ _ (Submodule.subset_span ⟨i, rfl⟩)
@@ -207,16 +242,14 @@ theorem card_quotient_sumElim
       apply le_antisymm
       · intro x hx
         simp only [φ, LinearMap.mem_ker, LinearMap.coe_comp, Function.comp_apply,
-            Submodule.mkQ_apply, Submodule.Quotient.mk_eq_zero]
-          at hx
+          Submodule.mkQ_apply, Submodule.Quotient.mk_eq_zero] at hx
         obtain ⟨b, hb⟩ := (Submodule.mem_span_range_iff_exists_fun (𝓞 K)).mp hx
         have hy : x - ∑ j, b j • u j ∈ LinearMap.range X.incl := by
-          set_option synthInstance.maxHeartbeats 100000 in
-            rw [← X.exact.linearMap_ker_eq, LinearMap.mem_ker, map_sub, map_sum]
+
+          rw [← X.exact.linearMap_ker_eq, LinearMap.mem_ker, map_sub, map_sum]
           simp only [map_smul, hu, hb, sub_self]
         have hN : ∑ j, b j • u j ∈ N :=
-          Submodule.sum_mem _ fun j _ ↦
-            Submodule.smul_mem _ _ (Submodule.subset_span ⟨Sum.inr j, rfl⟩)
+          Submodule.sum_mem _ fun j _ ↦ Submodule.smul_mem _ _ (Submodule.subset_span ⟨Sum.inr j, rfl⟩)
         have := Submodule.add_mem_sup hN hy
         rwa [add_sub_cancel] at this
       · refine sup_le ?_ ?_
@@ -240,13 +273,11 @@ namespace HermitianExtension
 variable {E' E E'' : HermitianBundle K} (X : HermitianExtension E' E E'')
 variable {m n : Type*} [Fintype m] [Fintype n] [DecidableEq m] [DecidableEq n]
 
-theorem gramDet_sumElim
-    (σ : K →+* ℂ)
-    {s' : m → E'.carrier} {s'' : n → E''.carrier} {u : n → E.carrier}
-    (hu : ∀ j, X.proj (u j) = s'' j) (hs' : LinearIndependent (𝓞 K) s')
-    (hcard' : Fintype.card m = Module.finrank (𝓞 K) E'.carrier)
-    : gramDet E.metric σ (Sum.elim (fun i ↦ X.incl (s' i)) u)
-      = gramDet E'.metric σ s' * gramDet E''.metric σ s'' := by
+theorem gramDet_sumElim (σ : K →+* ℂ) {s' : m → E'.carrier} {s'' : n → E''.carrier}
+    {u : n → E.carrier} (hu : ∀ j, X.proj (u j) = s'' j) (hs' : LinearIndependent (𝓞 K) s')
+    (hcard' : Fintype.card m = Module.finrank (𝓞 K) E'.carrier) :
+    gramDet E.metric σ (Sum.elim (fun i ↦ X.incl (s' i)) u) =
+      gramDet E'.metric σ s' * gramDet E''.metric σ s'' := by
   let a : m → FibreSpace E.metric σ := fun i ↦ fibreVec E.metric σ (X.incl (s' i))
   let b : n → FibreSpace E.metric σ := fun j ↦ fibreVec E.metric σ (u j)
   let W := Submodule.span ℂ (Set.range a)
@@ -254,8 +285,8 @@ theorem gramDet_sumElim
   have : CompleteSpace W := FiniteDimensional.complete ℂ W
   have hdec : ∀ j, ∃ p ∈ W, ∃ q ∈ Wᗮ, b j = p + q := fun j ↦ W.exists_add_mem_mem_orthogonal (b j)
   choose p hpW q hqW hb using hdec
-  have hc : ∀ j, ∃ c : m → ℂ, ∑ i, c i • a i = p j := fun j ↦
-    (Submodule.mem_span_range_iff_exists_fun ℂ).mp (hpW j)
+  have hc : ∀ j, ∃ c : m → ℂ, ∑ i, c i • a i = p j :=
+    fun j ↦ (Submodule.mem_span_range_iff_exists_fun ℂ).mp (hpW j)
   choose c hc using hc
   have hq : ∀ j, q j = b j - ∑ i, (Matrix.of fun i j ↦ c j i) i j • a i := by
     intro j
@@ -264,21 +295,19 @@ theorem gramDet_sumElim
   have horth : ∀ i j, inner ℂ (a i) (q j) = 0 := fun i j ↦
     Submodule.inner_right_of_mem_orthogonal (K := W) (Submodule.subset_span (Set.mem_range_self i))
       (hqW j)
-  have hfam
-      : (fun k ↦ fibreVec E.metric σ (Sum.elim (fun i ↦ X.incl (s' i)) u k)) = Sum.elim a b := by
+  have hfam : (fun k ↦ fibreVec E.metric σ (Sum.elim (fun i ↦ X.incl (s' i)) u k)) =
+      Sum.elim a b := by
     funext k
     rcases k with i | j <;> rfl
 
-  let L : FibreSpace E'.metric σ →ₗ[ℂ] FibreSpace E.metric σ := {
-    toFun := fun x ↦ X.incl.lTensor (ComplexAt σ) x
-    map_add' := map_add _
-    map_smul' := lTensor_complex_smul σ X.incl
-  }
-  let P : FibreSpace E.metric σ →ₗ[ℂ] FibreSpace E''.metric σ := {
-    toFun := fun x ↦ X.proj.lTensor (ComplexAt σ) x
-    map_add' := map_add _
-    map_smul' := lTensor_complex_smul σ X.proj
-  }
+  let L : FibreSpace E'.metric σ →ₗ[ℂ] FibreSpace E.metric σ :=
+    { toFun := fun x ↦ X.incl.lTensor (ComplexAt σ) x
+      map_add' := map_add _
+      map_smul' := lTensor_complex_smul σ X.incl }
+  let P : FibreSpace E.metric σ →ₗ[ℂ] FibreSpace E''.metric σ :=
+    { toFun := fun x ↦ X.proj.lTensor (ComplexAt σ) x
+      map_add' := map_add _
+      map_smul' := lTensor_complex_smul σ X.proj }
   have hga : gram ℂ a = gram ℂ (fun i ↦ fibreVec E'.metric σ (s' i)) := by
     ext i k
     exact X.incl_isometric σ (1 ⊗ₜ s' i) (1 ⊗ₜ s' k)
@@ -287,14 +316,13 @@ theorem gramDet_sumElim
     have hw := Submodule.mem_map_of_mem (f := L) (mem_span_fibreVec E'.metric σ hs' hcard' w)
     rw [Submodule.map_span, ← Set.range_comp] at hw
     exact hw
-  have hperp
-      : ∀ j (w : Fibre σ E'.carrier),
-        (E.metric.form σ).inner (X.incl.lTensor (ComplexAt σ) w) (q j) = 0 := fun j w ↦
-    Submodule.inner_right_of_mem_orthogonal (hLW w) (hqW j)
+  have hperp : ∀ j (w : Fibre σ E'.carrier),
+      (E.metric.form σ).inner (X.incl.lTensor (ComplexAt σ) w) (q j) = 0 :=
+    fun j w ↦ Submodule.inner_right_of_mem_orthogonal (hLW w) (hqW j)
   have hP : ∀ j, P (q j) = fibreVec E''.metric σ (s'' j) := by
     intro j
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hq j, map_sub, map_sum]
+
+    rw [hq j, map_sub, map_sum]
     have h0 : ∀ i, P (a i) = 0 := fun i ↦ by
       change X.proj.lTensor (ComplexAt σ) ((1 : ComplexAt σ) ⊗ₜ X.incl (s' i)) = 0
       rw [LinearMap.lTensor_tmul, proj_incl, tmul_zero]
@@ -307,8 +335,9 @@ theorem gramDet_sumElim
     rw [gram_apply, gram_apply, ← hP j, ← hP k]
     exact (X.proj_coisometric σ (q j) (q k) (hperp j) (hperp k)).symm
   simp only [gramDet]
-  rw [hfam, det_gram_sumElim a b q _ hq horth, hga, hgq, Complex.mul_re, det_gram_im, det_gram_im,
-    mul_zero, sub_zero]
+  rw [hfam, det_gram_sumElim a b q _ hq horth, hga, hgq, Complex.mul_re, det_gram_im,
+    det_gram_im, mul_zero, sub_zero]
+
 
 include X in
 theorem arithDegree_eq_add : E.arithDegree = E'.arithDegree + E''.arithDegree := by
@@ -316,25 +345,19 @@ theorem arithDegree_eq_add : E.arithDegree = E'.arithDegree + E''.arithDegree :=
   obtain ⟨s'', hs''⟩ := exists_linearIndependent_fin (K := K) (E := E''.carrier)
   choose u hu using fun j ↦ X.proj_surjective (s'' j)
   have hw := X.linearIndependent_sumElim hu hs' hs''
-  have hcard
-      : Fintype.card
-          (Fin (Module.finrank (𝓞 K) E'.carrier) ⊕ Fin (Module.finrank (𝓞 K) E''.carrier))
-        = Module.finrank (𝓞 K) E.carrier := by
+  have hcard : Fintype.card (Fin (Module.finrank (𝓞 K) E'.carrier) ⊕
+      Fin (Module.finrank (𝓞 K) E''.carrier)) = Module.finrank (𝓞 K) E.carrier := by
     rw [Fintype.card_sum, Fintype.card_fin, Fintype.card_fin, X.finrank_eq]
   simp only [HermitianBundle.arithDegree]
   rw [arithDegree_eq E.metric hw hcard, arithDegree_eq E'.metric hs' (Fintype.card_fin _),
     arithDegree_eq E''.metric hs'' (Fintype.card_fin _)]
   have hfin' := finite_quotient_span hs' (Fintype.card_fin _)
   have hfin'' := finite_quotient_span hs'' (Fintype.card_fin _)
-  have hg
-      : ∀ σ : K →+* ℂ,
-        gramDet E.metric σ (Sum.elim (fun i ↦ X.incl (s' i)) u)
-          = gramDet E'.metric σ s' * gramDet E''.metric σ s'' := fun σ ↦
-    X.gramDet_sumElim σ hu hs' (Fintype.card_fin _)
-  have hlog
-      : ∀ σ : K →+* ℂ,
-        Real.log (gramDet E'.metric σ s' * gramDet E''.metric σ s'')
-          = Real.log (gramDet E'.metric σ s') + Real.log (gramDet E''.metric σ s'') := fun σ ↦
+  have hg : ∀ σ : K →+* ℂ, gramDet E.metric σ (Sum.elim (fun i ↦ X.incl (s' i)) u) =
+      gramDet E'.metric σ s' * gramDet E''.metric σ s'' :=
+    fun σ ↦ X.gramDet_sumElim σ hu hs' (Fintype.card_fin _)
+  have hlog : ∀ σ : K →+* ℂ, Real.log (gramDet E'.metric σ s' * gramDet E''.metric σ s'') =
+      Real.log (gramDet E'.metric σ s') + Real.log (gramDet E''.metric σ s'') := fun σ ↦
     Real.log_mul (gramDet_pos _ σ hs').ne' (gramDet_pos _ σ hs'').ne'
   simp only [degreeWith]
   rw [X.card_quotient_sumElim hu hs'', Nat.cast_mul,

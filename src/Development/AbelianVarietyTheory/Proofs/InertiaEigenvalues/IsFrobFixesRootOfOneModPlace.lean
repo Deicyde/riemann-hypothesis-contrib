@@ -1,7 +1,55 @@
 module
 
-public import Mathlib
-public import ReciprocityTheory.GaloisValuations.Global
+public import Formalism.ConjugateSelfDual.Statement
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+public import Mathlib.RingTheory.Polynomial.Cyclotomic.Basic
 
 @[expose] public section
 
@@ -9,16 +57,13 @@ open NumberField IsDedekindDomain Polynomial
 
 namespace GlobalTheory
 
-theorem frob_fixes_root_of_one_mod
-    (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω]
-    (M : ℕ) (ζ : F) (hζ : IsPrimitiveRoot ζ M)
-    (v : HeightOneSpectrum (𝓞 F)) (hMv : ((M : ℕ) : 𝓞 F) ∉ v.asIdeal)
-    (A : ValuationSubring Ω) (hA : Formalism.ConjugateSelfDual.IsPlaceOver A v)
-    (σ : Formalism.ConjugateSelfDual.G F Ω)
+theorem frob_fixes_root_of_one_mod (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω]
+    (M : ℕ) (ζ : F) (hζ : IsPrimitiveRoot ζ M) (v : HeightOneSpectrum (𝓞 F))
+    (hMv : ((M : ℕ) : 𝓞 F) ∉ v.asIdeal)
+    (A : ValuationSubring Ω) (hA : Formalism.ConjugateSelfDual.IsPlaceOver A v) (σ : Formalism.ConjugateSelfDual.G F Ω)
     (hσ : Formalism.ConjugateSelfDual.IsFrob A (Formalism.ConjugateSelfDual.normV v) σ)
-    (x : 𝓞 F) (hx : x - 1 ∈ v.asIdeal)
-    (w : Ω) (hw : w ^ M = algebraMap F Ω (x : F))
-    : σ w = w := by
+    (x : 𝓞 F) (hx : x - 1 ∈ v.asIdeal) (w : Ω) (hw : w ^ M = algebraMap F Ω (x : F)) :
+    σ w = w := by
   set q := Formalism.ConjugateSelfDual.normV v
   set x' := algebraMap F Ω (x : F) with hx'
   have hM0 : 0 < M := by
@@ -41,7 +86,8 @@ theorem frob_fixes_root_of_one_mod
   have hwA : w ∈ A := hpow w (hw ▸ hx'A)
   set ζ' := algebraMap F Ω ζ with hζ'
   have hζ'p : IsPrimitiveRoot ζ' M := hζ.map_of_injective (algebraMap F Ω).injective
-  have hσζ : ∀ n : ℕ, σ (ζ' ^ n) = ζ' ^ n := by intro n; rw [map_pow, hζ', AlgEquiv.commutes]
+  have hσζ : ∀ n : ℕ, σ (ζ' ^ n) = ζ' ^ n := by
+    intro n; rw [map_pow, hζ', AlgEquiv.commutes]
   have hσx : σ x' = x' := AlgEquiv.commutes σ _
   have hroot : ∀ μ : Ω, μ ^ M = 1 → μ ∈ A := fun μ h => hpow μ (h ▸ A.one_mem)
   let res := IsLocalRing.residue A
@@ -53,12 +99,11 @@ theorem frob_fixes_root_of_one_mod
     intro a
     have h := hσ.2 a ((A.valuation_le_one_iff _).2 a.2)
     have hb : σ (a : Ω) ∈ A := by
-      have h1 : σ (a : Ω) - (a : Ω) ^ q ∈ A := (A.valuation_le_one_iff _).1 h.le
+      have h1 : σ (a:Ω) - (a:Ω) ^ q ∈ A := (A.valuation_le_one_iff _).1 h.le
       have h2 : (a : Ω) ^ q ∈ A := A.pow_mem a.2 q
       simpa using add_mem h1 h2
     refine ⟨⟨_, hb⟩, rfl, ?_⟩
-    rw [← map_pow, key]
-    simpa using h
+    rw [← map_pow, key]; simpa using h
 
   obtain ⟨μ, hμM, hμ⟩ : ∃ μ : Ω, μ ^ M = 1 ∧ A.valuation (w - μ) < 1 := by
     have hprod := congrArg (Polynomial.eval w) (X_pow_sub_one_eq_prod hM0 hζ'p)
@@ -85,11 +130,11 @@ theorem frob_fixes_root_of_one_mod
   obtain ⟨bμ, hbμ, hbμ'⟩ := hfrob aμ
   have hbμe : bμ = aμ := by
     apply Subtype.ext
-    rw [hbμ]
-    show σ μ = μ
+    rw [hbμ]; show σ μ = μ
     rw [← hj, hσζ]
   rw [hbμe] at hbμ'
-  have hB : res bw = res aw := by rw [hbw', hwμ, ← hbμ']
+  have hB : res bw = res aw := by
+    rw [hbw', hwμ, ← hbμ']
 
   have hw0 : w ≠ 0 := by
     rintro rfl
@@ -98,7 +143,8 @@ theorem frob_fixes_root_of_one_mod
     simp at hx1
   have hx'0 : x' ≠ 0 := by rw [← hw]; exact pow_ne_zero _ hw0
   set ξ := σ w / w with hξ
-  have hξM : ξ ^ M = 1 := by rw [hξ, div_pow, ← map_pow, hw, hσx, div_self hx'0]
+  have hξM : ξ ^ M = 1 := by
+    rw [hξ, div_pow, ← map_pow, hw, hσx, div_self hx'0]
   let aξ : A := ⟨ξ, hroot ξ hξM⟩
   have hbw_eq : bw = aξ * aw := by
     apply Subtype.ext
@@ -110,8 +156,7 @@ theorem frob_fixes_root_of_one_mod
     have h2 : res (aw ^ M) = res 1 := by
       rw [key]
       have : ((aw ^ M : A) : Ω) = x' := by simp [aw, hw]
-      rw [this]
-      simpa using hx1
+      rw [this]; simpa using hx1
     rw [h1, map_one] at h2
     exact zero_ne_one h2
   have hresξ : res aξ = 1 := by
@@ -120,20 +165,20 @@ theorem frob_fixes_root_of_one_mod
     exact mul_right_cancel₀ hresw (h.trans (one_mul _).symm)
   by_contra hne
   have hξ1 : ξ ≠ 1 := by
-    intro h
-    apply hne
+    intro h; apply hne
     rw [hξ] at h
     exact (div_eq_one_iff_eq hw0).1 h
-  have hsum : ∑ l ∈ Finset.range M, ξ ^ l = 0 := by rw [geom_sum_eq hξ1, hξM, sub_self, zero_div]
+  have hsum : ∑ l ∈ Finset.range M, ξ ^ l = 0 := by
+    rw [geom_sum_eq hξ1, hξM, sub_self, zero_div]
   have hsumA : ∑ l ∈ Finset.range M, aξ ^ l = 0 := by
     apply Subtype.ext
     simpa [aξ] using hsum
   have hres : res ((M : ℕ) : A) = res 0 := by
     have := congrArg res hsumA
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum] at this
-    simp only [map_pow, hresξ, one_pow, Finset.sum_const, Finset.card_range, nsmul_eq_mul, mul_one]
-      at this
+
+    rw [map_sum] at this
+    simp only [map_pow, hresξ, one_pow, Finset.sum_const, Finset.card_range, nsmul_eq_mul,
+      mul_one] at this
     rw [map_natCast, this]
   rw [key] at hres
   apply hMk

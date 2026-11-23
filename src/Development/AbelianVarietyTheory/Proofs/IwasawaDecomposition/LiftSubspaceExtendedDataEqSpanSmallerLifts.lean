@@ -1,23 +1,48 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.IsBaseEnlargementFixedCoefFieldOfCoeffEnlargemen
-public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.CoefAEqOfHeq
 public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.Forms
 public import Development.AbelianVarietyTheory.PublishedTheorems.TwistedTraceFormula.AdmissibleDiscreteSeriesOfHasParam
 public import Development.AbelianVarietyTheory.PublishedTheorems.TwistedTraceFormula.HarishChandraModulesOn
 public import Development.AbelianVarietyTheory.PublishedTheorems.AutomorphicForms₂.HasDRepIffHasDerivAt
-public import Development.AbelianVarietyTheory.PublishedTheorems.GaloisCohomology₂.GreenCuspidalIff
-public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.ExistsIsBIffCoreB
 public import Development.AbelianVarietyTheory.PublishedTheorems.AutomorphicForms₂.WeilRepresentationUnitaryPair
 public import Development.AbelianVarietyTheory.PublishedTheorems.AutomorphicForms₂.DsExistsOfDiscreteSeriesExists
 public import Development.AbelianVarietyTheory.PublishedTheorems.AutomorphicForms₂.HarishChandraFinite
 public import Development.AbelianVarietyTheory.PublishedTheorems.AutomorphicForms₂.ExistsNormLeHeightPow
-public import Formalism.LocalToGlobal.IndefiniteReal.LinksStage
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.BlockBaseChange
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.FinrankSpanImage
-public import Formalism.LocalToGlobal.IndefiniteReal.RationalAdjoints.RangeAdjointRat
-public import Formalism.LocalToGlobal.IndefiniteReal.BaseLiftsPackageOfPrimitiveLinks
+import Formalism.LocalToGlobal.IndefiniteReal.RationalAdjoints.RangeAdjointRat
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
 
 @[expose] public section
 
@@ -146,13 +171,11 @@ variable
   [Field Ks] [NumberField Ks] [Algebra Ks D.what₂.LL]
   (R : RealDat3 D A3 Ks) (F : Face3 D A3)
 
-set_option maxHeartbeats 1000000 in
 private theorem zl_eq (hp : ∀ i, R.phs i = 1) (i : Fin D.R.m) (t : T)
     : (zsOf R F).Zl i t = (LinearMap.range (LinearMap.adjoint (R.thG i t))).comap (R.jV i t) := (by
   with_unfolding_all
     exact (tw_comap (twAt D.what₂.embLL A3.A.v0) (R.thG i t) (hp i) R.toRealDat.emb0 (R.jV i t) :))
 
-set_option maxHeartbeats 1000000 in
 private theorem rat
     (hp : ∀ i, R.phs i = 1) (hM : R.toRealDat.IsModels)
     (hT : Formalism.IndefR.Rat.LiftTest (R.toCx3 F)) (i : Fin D.R.m) (t : T)
@@ -168,7 +191,6 @@ private theorem rat
         : _))
 
 include F in
-set_option maxHeartbeats 1000000 in
 private theorem li (hM : R.toRealDat.IsModels) (i : Fin D.R.m) (t : T)
     : LinearIndependent ℂ fun k =>
       R.jV i t (Module.Basis.ofVectorSpace D.what₂.LL (A3.A.fam.amb.FL i t) k) :=
@@ -177,7 +199,6 @@ private theorem li (hM : R.toRealDat.IsModels) (i : Fin D.R.m) (t : T)
 
 end One
 
-set_option maxHeartbeats 2000000 in
 private theorem gen
     {D D' : D7} {G G' : Type} [Group G] [Fintype G] [Group G'] [Fintype G']
     {Pl0 I0 T Pl0' I0' T' : Type} {A3 : FamIn3 D.what₂.LL G Pl0 I0 (List ℕ) T D.R.m}
@@ -235,7 +256,6 @@ variable
   {B B' : Base} {f : Fr B.toPre} {f' : Fr B'.toPre} {T : TwDat B} {T' : TwDat B'} {w : ColW B f T}
   {w' : ColW B' f' T'} {Z : w.Lt} {Z' : w'.Lt}
 
-set_option maxHeartbeats 4000000 in
 private theorem mmap_eq
     (q : B'.toPre = B.toPre)
     (i : Fin (w.st Z).toD7.R.m) (i' : Fin (w'.st Z').toD7.R.m) (hi : (i : ℕ) = i')
@@ -265,7 +285,6 @@ private theorem mmap_eq
   cases g
   exact ⟨rfl, HEq.rfl, HEq.rfl⟩
 
-set_option maxHeartbeats 4000000 in
 private theorem gf_eq
     (q : B'.toPre = B.toPre)
     (i : Fin (w.st Z).toD7.R.m) (i' : Fin (w'.st Z').toD7.R.m) (hi : (i : ℕ) = i')
@@ -290,7 +309,6 @@ private theorem gf_eq
   cases d
   exact ⟨rfl, HEq.rfl, HEq.rfl⟩
 
-set_option maxHeartbeats 4000000 in
 private theorem jL_of
     {hX : B.fields.Ok} {hX' : B'.fields.Ok} {Wt : Set B.places.Pl} {Wt' : Set B'.places.Pl}
     {z : Dat (w.st Z) w.I hX T Wt} {z' : Dat (w'.st Z') w'.I hX' T' Wt'} (e : ExtN z z')
@@ -333,7 +351,6 @@ end Two
 
 end GlobalTheory.Mem.R3.SubExt
 
-set_option maxHeartbeats 4000000 in
 theorem _root_.GlobalTheory.T.liftSubspace_extendedData_eq_span_smallerLifts
     : GlobalTheory.Published.DiscreteSeriesCover → GlobalTheory.Published.HarishChandraModules
       → GlobalTheory.Published.CuspRapidDecay → GlobalTheory.Published.CasselmanWallach

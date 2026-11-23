@@ -1,8 +1,50 @@
 module
 
-public import Mathlib
+import GroundTheory.HeightsAndTheta.Heights.FieldsOfNumbers.PRenameIntNum
 public import GroundTheory.HeightsAndTheta.Heights.DiscreteValuationNumbers.Objects
+public import Mathlib.Tactic.Continuity
 public import GroundTheory.HeightsAndTheta.Heights.FieldsOfNumbers.PIntNumBaseChange
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
+public import Mathlib.Order.Filter.AtTopBot.Map
 
 @[expose] public section
 
@@ -34,10 +76,9 @@ def precompOrderIso : (K₂ → ℤ) ≃o (K₁ → ℤ) where
     · intro h k
       exact h (e k)
 
-theorem eventualValue_congr
-    {K K' : Type*} {f : (K → ℤ) → ℤ} {g : (K' → ℤ) → ℤ}
-    (h : ∀ c, (∀ᶠ m in atTop, f m = c) ↔ ∀ᶠ m in atTop, g m = c)
-    : eventualValue f = eventualValue g := by
+theorem eventualValue_congr {K K' : Type*} {f : (K → ℤ) → ℤ} {g : (K' → ℤ) → ℤ}
+    (h : ∀ c, (∀ᶠ m in atTop, f m = c) ↔ ∀ᶠ m in atTop, g m = c) :
+    eventualValue f = eventualValue g := by
   unfold eventualValue
   by_cases hf : ∃ c, ∀ᶠ m in atTop, f m = c
   · have hg : ∃ c, ∀ᶠ m in atTop, g m = c := hf.imp fun c hc => (h c).1 hc
@@ -49,40 +90,29 @@ theorem eventualValue_congr
   · have hg : ¬ ∃ c, ∀ᶠ m in atTop, g m = c := fun ⟨c, hc⟩ => hf ⟨c, (h c).2 hc⟩
     rw [dite_eq_right hf, dite_eq_right hg]
 
-theorem eventualValue_precomp (g : (K₁ → ℤ) → ℤ)
-    : eventualValue (fun m : K₂ → ℤ => g (m ∘ e)) = eventualValue g := by
+theorem eventualValue_precomp (g : (K₁ → ℤ) → ℤ) :
+    eventualValue (fun m : K₂ → ℤ => g (m ∘ e)) = eventualValue g := by
   refine eventualValue_congr fun c => ?_
   rw [← (precompOrderIso e).map_atTop, Filter.eventually_map]
   rfl
 
-theorem mixedDiff_precomp {n : ℕ} (bs : Fin n → K₂ → ℤ) (h : (K₁ → ℤ) → ℤ)
-    : mixedDiff bs (fun m => h (m ∘ e)) = fun m => mixedDiff (fun i => bs i ∘ e) h (m ∘ e) := by
-  unfold mixedDiff
-  have hl : List.ofFn (fun i => bs i ∘ e) = (List.ofFn bs).map (fun b => b ∘ e) := by
-    rw [List.map_ofFn]
-    rfl
-  rw [hl]
-  generalize List.ofFn bs = l
-  induction l with
-  | nil => rfl
-  | cons b l ih =>
-    rw [List.foldr_cons, List.map_cons, List.foldr_cons, ih]
-    rfl
+theorem mixedDiff_precomp {n : ℕ} (bs : Fin n → K₂ → ℤ) (h : (K₁ → ℤ) → ℤ) :
+    mixedDiff bs (fun m => h (m ∘ e)) = fun m => mixedDiff (fun i => bs i ∘ e) h (m ∘ e) := by
+  apply _root_.GroundTheory.Heights₂.Heights.FieldNumbers.RenameIntNum.mixedDiff_comp <;> assumption
 
 end Eventual
 
 section Rename
 
-variable
-  {K₁ K₂ : Type*} [DecidableEq K₁] [DecidableEq K₂]
-  {ι₁ : K₁ → Type*} {ι₂ : K₂ → Type*}
+variable {K₁ K₂ : Type*} [DecidableEq K₁] [DecidableEq K₂] {ι₁ : K₁ → Type*} {ι₂ : K₂ → Type*}
   (e : K₁ ≃ K₂) (φ : (Σ k, ι₁ k) ≃ (Σ k, ι₂ k)) (hφ : ∀ v, (φ v).1 = e v.1)
   {F : Type*} [Field F]
 
+
 include hφ in
-theorem weight_mapDomain (d : (Σ k, ι₁ k) →₀ ℕ)
-    : Finsupp.weight (blockWeight ι₂) (Finsupp.mapDomain φ d)
-      = Finsupp.weight (blockWeight ι₁) d ∘ e.symm := by
+theorem weight_mapDomain (d : (Σ k, ι₁ k) →₀ ℕ) :
+    Finsupp.weight (blockWeight ι₂) (Finsupp.mapDomain φ d) =
+      Finsupp.weight (blockWeight ι₁) d ∘ e.symm := by
   induction d using Finsupp.induction_linear with
   | zero => funext k; simp
   | add a b ha hb =>
@@ -94,13 +124,13 @@ theorem weight_mapDomain (d : (Σ k, ι₁ k) →₀ ℕ)
     simp only [blockWeight, hφ, Pi.smul_apply, Function.comp_apply, Pi.single_apply,
       Equiv.symm_apply_eq]
 
+
 include hφ in
-theorem gradedPiece_map_rename (I : Ideal (MRing ι₁ F)) (d : K₂ → ℕ)
-    : gradedPiece (I.map (renameEquiv F φ)) d
-      = (gradedPiece I (d ∘ e)).map
-        ((Ideal.quotientEquivAlg I (I.map (renameEquiv F φ)) (renameEquiv F φ)
-            (Ideal.map_coe _ _).symm).toLinearEquiv
-          : (MRing ι₁ F ⧸ I) →ₗ[F] MRing ι₂ F ⧸ I.map (renameEquiv F φ)) := by
+theorem gradedPiece_map_rename (I : Ideal (MRing ι₁ F)) (d : K₂ → ℕ) :
+    gradedPiece (I.map (renameEquiv F φ)) d =
+      (gradedPiece I (d ∘ e)).map
+        ((Ideal.quotientEquivAlg I (I.map (renameEquiv F φ)) (renameEquiv F φ) (Ideal.map_coe _ _).symm).toLinearEquiv :
+          (MRing ι₁ F ⧸ I) →ₗ[F] MRing ι₂ F ⧸ I.map (renameEquiv F φ)) := by
   rw [gradedPiece_eq_span, gradedPiece_eq_span, Submodule.map_span, Set.image_image]
   congr 1
   ext x
@@ -121,15 +151,17 @@ theorem gradedPiece_map_rename (I : Ideal (MRing ι₁ F)) (d : K₂ → ℕ)
     funext k
     simp
 
-include hφ in
-theorem finrank_gradedPiece_map_rename (I : Ideal (MRing ι₁ F)) (d : K₂ → ℕ)
-    : Module.finrank F (gradedPiece (I.map (renameEquiv F φ)) d)
-      = Module.finrank F (gradedPiece I (d ∘ e)) := by
-  rw [gradedPiece_map_rename e φ hφ, LinearEquiv.finrank_map_eq]
 
 include hφ in
-theorem hilbFn_map_rename (I : Ideal (MRing ι₁ F)) (m : K₂ → ℤ)
-    : hilbFn (I.map (renameEquiv F φ)) m = hilbFn I (m ∘ e) := by
+theorem finrank_gradedPiece_map_rename (I : Ideal (MRing ι₁ F)) (d : K₂ → ℕ) :
+    Module.finrank F (gradedPiece (I.map (renameEquiv F φ)) d) =
+      Module.finrank F (gradedPiece I (d ∘ e)) := by
+  rw [gradedPiece_map_rename e φ hφ, LinearEquiv.finrank_map_eq]
+
+
+include hφ in
+theorem hilbFn_map_rename (I : Ideal (MRing ι₁ F)) (m : K₂ → ℤ) :
+    hilbFn (I.map (renameEquiv F φ)) m = hilbFn I (m ∘ e) := by
   unfold hilbFn
   have hpos : (∀ k, 0 ≤ m k) ↔ ∀ k, 0 ≤ (m ∘ e) k :=
     ⟨fun h k => h (e k), fun h k => by simpa using h (e.symm k)⟩
@@ -138,9 +170,10 @@ theorem hilbFn_map_rename (I : Ideal (MRing ι₁ F)) (m : K₂ → ℤ)
     exact congrArg _ (finrank_gradedPiece_map_rename e φ hφ I (fun k => (m k).toNat))
   · rw [if_neg h, if_neg (mt hpos.2 h)]
 
+
 include hφ in
-theorem intNum_map_rename (I : Ideal (MRing ι₁ F)) {n : ℕ} (bs : Fin n → K₂ → ℤ)
-    : intNum F (I.map (renameEquiv F φ)) bs = intNum F I (fun i => bs i ∘ e) := by
+theorem intNum_map_rename (I : Ideal (MRing ι₁ F)) {n : ℕ} (bs : Fin n → K₂ → ℤ) :
+    intNum F (I.map (renameEquiv F φ)) bs = intNum F I (fun i => bs i ∘ e) := by
   unfold intNum
   have h : hilbFn (I.map (renameEquiv F φ)) = fun m => hilbFn I (m ∘ e) :=
     funext (hilbFn_map_rename e φ hφ I)

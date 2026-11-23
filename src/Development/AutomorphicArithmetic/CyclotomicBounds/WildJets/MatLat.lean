@@ -1,18 +1,46 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Statements.PlaceShiftStatements.InfClassAt
-public import Development.AbelianVarietyTheory.Statements.PlaceShiftStatements.DictAt
-public import Development.AbelianVarietyTheory.Definitions.Divisors.DiscreteSeriesHermitianUnique
-public import Development.AbelianVarietyTheory.Definitions.Foundations.NormSumPairRankZeroOfCurveCoordNorm
-public import Development.AbelianVarietyTheory.Statements.CuspidalUnitaryTwists.ExistsSmallSpherical
-public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.PadicValuationThetaKernelJetBound
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.HighestWeightBelow
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.VwNatCastNonneg
-public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.JetKapIff
 public import Development.AutomorphicArithmetic.CyclotomicBounds.WildJets.LatCoordA
 public import Development.AutomorphicArithmetic.CyclotomicBounds.WildJets.LatCoordB
 public import Formalism.PairingDivisors.PairingDivisorProofs.ValAdd
+import Formalism.QuotientMetricDivisors.HermitianTwistDivisors.ValBasic
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Tactic.TypeStar
 
 @[expose] public section
 
@@ -99,8 +127,8 @@ theorem UpperTheory.WildA.matLat
       (bVV ℂ lam').repr (f v) i
         = (bVV ℂ lam').repr (f (∑ j, (bVV ℂ lam).repr v j • bVV ℂ lam j)) i := by rw [hsum]
       _ = _ := by
-        set_option synthInstance.maxHeartbeats 100000 in
-          rw [map_sum, map_sum, Finset.sum_apply']
+
+        rw [map_sum, map_sum, Finset.sum_apply']
         refine Finset.sum_congr rfl fun j _ => ?_
         rw [map_smul, map_smul, Finsupp.smul_apply, smul_eq_mul]
   rw [hrepr]

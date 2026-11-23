@@ -1,22 +1,65 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Definitions.SemilocalFrames.RowMinor
-public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.ExistsUniquePlace
-public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.StandardBaseFlagComplementIntegralLatticeStatement
-public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.IntegralOfUnimodular
+public import Formalism.FlagUnipotentLattices.CardSubmodulesAndLinearEquivBounds
 public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.CentralMapMemIntegralUnipotentFixingFrame
-public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.PerpendicularRankIdealBoundStatement
+public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.ExistsUniquePlace
 public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.FixedFramesPerpendicularVectorsStatement
 public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.FramesSameGramDifferBySkewSolutionStatement
+public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.IntegralOfUnimodular
 public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.MinorSmulEqRowSpaceOfCofVecOrth
-public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.XClassesDenom
 public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.OneLeNormMulAbsNormSq
+public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.PerpendicularRankIdealBoundStatement
+import Development.AbelianVarietyTheory.Proofs.FlagMeasures.StandardBaseFlagComplementIntegralLatticeStatement
+public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.XClassesDenom
+import Mathlib.Algebra.AffineMonoid.Basic
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Lemma
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
-open NumberField Module Matrix Formalism.BasicNotions Formalism.MainNotions.S
-  Formalism.MainNotions.S.Lat Formalism.MainNotions.S.Cnt GlobalTheory.LoopC
+open NumberField Module Matrix Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.MainNotions.S.Cnt GlobalTheory.LoopC
 open scoped ENNReal Classical
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -31,9 +74,8 @@ lemma mem_dual' {K V : Type} [Field K] [NumberField K] [StarRing K] [AddCommGrou
 
 section Gen
 
-variable
-  {E : Type} [Field E] [NumberField E] [StarRing E]
-  {S : HSpace E} {r : ℕ} {Λ : Submodule (𝓞 E) S.V} {T : E} {F : LFlag S r T}
+variable {E : Type} [Field E] [NumberField E] [StarRing E] {S : HSpace E} {r : ℕ}
+  {Λ : Submodule (𝓞 E) S.V} {T : E} {F : LFlag S r T}
 
 lemma gmap_iff (n : S.V ≃ₗ[E] S.V) : Formalism.HermitianLatticesTheory.gmap n Λ = Λ ↔ (∀ x, n x ∈ Λ ↔ x ∈ Λ) := by
   constructor
@@ -125,19 +167,15 @@ lemma NLam_symm {m : S.V ≃ₗ[E] S.V} (hm : m ∈ NLam Λ F) (he : ∀ a, m (F
     have := Submodule.neg_mem _ (m4 _ h1)
     simpa using this
 
-def move
-    {T' : E}
-    (n : S.V ≃ₗ[E] S.V) (hn : n ∈ Formalism.HermitianLatticesTheory.isom S.hT)
-    (F' : LFlag S r T')
-    : LFlag S r T' where
-  fl := {
-    e := fun a => n (F'.fl.e a)
-    z := n F'.fl.z
-    e_indep := F'.fl.e_indep.map' (n : S.V →ₗ[E] S.V) n.ker
-    e_iso := fun a b => (hn _ _).trans (F'.fl.e_iso a b)
-    z_orth := fun a => (hn _ _).trans (F'.fl.z_orth a)
-    z_norm := (hn _ _).trans F'.fl.z_norm
-  }
+def move {T' : E} (n : S.V ≃ₗ[E] S.V) (hn : n ∈ Formalism.HermitianLatticesTheory.isom S.hT) (F' : LFlag S r T') :
+    LFlag S r T' where
+  fl :=
+    { e := fun a => n (F'.fl.e a)
+      z := n F'.fl.z
+      e_indep := F'.fl.e_indep.map' (n : S.V →ₗ[E] S.V) n.ker
+      e_iso := fun a b => (hn _ _).trans (F'.fl.e_iso a b)
+      z_orth := fun a => (hn _ _).trans (F'.fl.z_orth a)
+      z_norm := (hn _ _).trans F'.fl.z_norm }
   zt := n F'.fl.z
 
 lemma frame_move {T' : E} (n : S.V ≃ₗ[E] S.V) (hn : n ∈ Formalism.HermitianLatticesTheory.isom S.hT) (F' : LFlag S r T')
@@ -150,10 +188,8 @@ lemma frame_castSucc {T' : E} (F' : LFlag S r T') (a : Fin r) : frame F' a.castS
 lemma frame_last {T' : E} (F' : LFlag S r T') : frame F' (Fin.last r) = F'.fl.z := by
   simp [frame, FlagG.fvec]
 
-def cls
-    {T' : E}
-    (Λ : Submodule (𝓞 E) S.V) (F : LFlag S r T) (X : Set (LFlag S r T')) (f : Fin (r + 1) → S.V)
-    : Set (LFlag S r T') :=
+def cls {T' : E} (Λ : Submodule (𝓞 E) S.V) (F : LFlag S r T) (X : Set (LFlag S r T'))
+    (f : Fin (r + 1) → S.V) : Set (LFlag S r T') :=
   {b | b ∈ X ∧ ∃ n ∈ NLam Λ F, ∃ ξ : Matrix (Fin (r + 1)) (Fin (r + 1)) (𝓞 E),
     (∀ a b, b < a → ξ a b = 0) ∧ (∀ a, ξ a a = 1) ∧ frame b = frameAct (fun a => n (f a)) ξ}
 
@@ -309,14 +345,10 @@ section Main
 
 variable {D : D7}
 
-def FixGr
-    (Λ : LatV D)
-    {T : D.host.E} (F : Fg D T)
-    (P : LatW D) (φ : P →ₗ[𝓞 D.host.E] (hS D).V)
-    (n : (hS D).V ≃ₗ[D.host.E] (hS D).V)
-    : Prop :=
-  n ∈ NLam Λ F ∧ (∀ b, n (frame F b) = frame F b)
-    ∧ ∀ p : P, n (D.sp.iXY 0 (p : (D.sp.X 0).V) + φ p) = D.sp.iXY 0 (p : (D.sp.X 0).V) + φ p
+def FixGr (Λ : LatV D) {T : D.host.E} (F : Fg D T) (P : LatW D) (φ : P →ₗ[𝓞 D.host.E] (hS D).V)
+    (n : (hS D).V ≃ₗ[D.host.E] (hS D).V) : Prop :=
+  n ∈ NLam Λ F ∧ (∀ b, n (frame F b) = frame F b) ∧
+    ∀ p : P, n (D.sp.iXY 0 (p : (D.sp.X 0).V) + φ p) = D.sp.iXY 0 (p : (D.sp.X 0).V) + φ p
 
 lemma move_mem {Λ : LatV D} {T T' : D.host.E} {F : Fg D T} {P : LatW D}
     {φ : P →ₗ[𝓞 D.host.E] (hS D).V} {Z : GramM D} {n : (hS D).V ≃ₗ[D.host.E] (hS D).V}
@@ -352,12 +384,10 @@ lemma iXY_isom (x y : (D.sp.X 0).V) :
 lemma mem_perpE {P : LatW D} {v : (D.sp.X 0).V} : v ∈ perpE D P ↔ ∀ p ∈ P, (D.sp.X 0).hT p v = 0 := by
   simp [perpE, Submodule.mem_iInf]
 
-def Shifts
-    {T : D.host.E} (F : Fg D T) (n : (hS D).V ≃ₗ[D.host.E] (hS D).V) (v : Fin D.R.rS → (D.sp.X 0).V)
-    : Prop :=
-  ∀ x σ,
-    (hS D).hT (D.sp.iXY 0 σ) (n x)
-      = (hS D).hT (D.sp.iXY 0 σ) x + ∑ a, (hS D).hT (F.fl.e a) x * (D.sp.X 0).hT σ (v a)
+def Shifts {T : D.host.E} (F : Fg D T) (n : (hS D).V ≃ₗ[D.host.E] (hS D).V)
+    (v : Fin D.R.rS → (D.sp.X 0).V) : Prop :=
+  ∀ x σ, (hS D).hT (D.sp.iXY 0 σ) (n x) =
+    (hS D).hT (D.sp.iXY 0 σ) x + ∑ a, (hS D).hT (F.fl.e a) x * (D.sp.X 0).hT σ (v a)
 
 lemma eich_single {u : D.what₂.Word} {F0 : Fb D u} {Λ : LatV D} (hb : IsBase D u F0)
     (hΛ : IsRowLat D F0 Λ) {P : LatW D} {φ : P →ₗ[𝓞 D.host.E] (hS D).V}
@@ -427,24 +457,14 @@ lemma eich {u : D.what₂.Word} {F0 : Fb D u} {Λ : LatV D} (hb : IsBase D u F0)
       simp only [this, Pi.add_apply, map_add (f := _), mul_add, Finset.sum_add_distrib, add_assoc]
   · exact ⟨LinearEquiv.refl _ _, ⟨NLam_one, fun _ => rfl, fun _ => rfl⟩, fun x σ => by simp⟩
 
-theorem card_frames_le
-    : ∀ (D : D7) (u u' : D.what₂.Word) (F0 : Fb D u) (Λ : LatV D),
-      Stand D u u' → IsBase D u F0 → IsRowLat D F0 Λ → IsSplit D F0 Λ
-        → ∀ (P : LatW D) (φ : P →ₗ[𝓞 D.host.E] (hS D).V) (Z : GramM D) (s : ℕ) (De Q : ℝ),
-          1 ≤ s → s ≤ D.R.k → (∀ p, φ p ∈ XLam Λ (lf D F0)) → SubOK D (L0X D Λ (lf D F0)) P s De
-            → QOK D u u' Z Q
-            → (cntCl (FixSet D Λ (lf D F0) ((Tu D u' : ℕ) : D.host.E) Z P φ) (TEqv D Λ (lf D F0))
-                : ℝ≥0∞)
-              ≤ ENNReal.ofReal (fixB D s (NT D u) De Q) := by
+theorem card_frames_le : ∀ (D : D7) (u u' : D.what₂.Word) (F0 : Fb D u) (Λ : LatV D), Stand D u u' → IsBase D u F0 → IsRowLat D F0 Λ → IsSplit D F0 Λ → ∀ (P : LatW D) (φ : P →ₗ[𝓞 D.host.E] (hS D).V) (Z : GramM D) (s : ℕ) (De Q : ℝ), 1 ≤ s → s ≤ D.R.k → (∀ p, φ p ∈ XLam Λ (lf D F0)) → SubOK D (L0X D Λ (lf D F0)) P s De → QOK D u u' Z Q → (cntCl (FixSet D Λ (lf D F0) ((Tu D u' : ℕ) : D.host.E) Z P φ) (TEqv D Λ (lf D F0)) : ℝ≥0∞) ≤ ENNReal.ofReal (fixB D s (NT D u) De Q) := by
   intro D u u' F0 Λ hSt hb hΛ hsp P φ Z s De Q _ hsk hφ hsub hQ
   set X := FixSet D Λ (lf D F0) ((Tu D u' : ℕ) : D.host.E) Z P φ with hX
   rcases X.eq_empty_or_nonempty with hE | ⟨F1, hF1⟩
   · simp [cntCl, hE]
   obtain ⟨hcard, -, hf, -, hrd, hstar, hnorm, -⟩ := GlobalTheory.real_places_facts D
-  obtain ⟨-, -, hpos, hlat, hint, -⟩ :=
-    GlobalTheory.T.standardBaseFlag_complement_integralLattice D u u' F0 Λ hSt hb hΛ
-  obtain ⟨hrk, I, hI, hIN, hIS⟩ :=
-    GlobalTheory.T.perpendicular_rank_ideal_bound D u u' F0 Λ hSt hb hΛ P s De hsk hsub
+  obtain ⟨-, -, hpos, hlat, hint, -⟩ := GlobalTheory.T.standardBaseFlag_complement_integralLattice D u u' F0 Λ hSt hb hΛ
+  obtain ⟨hrk, I, hI, hIN, hIS⟩ := GlobalTheory.T.perpendicular_rank_ideal_bound D u u' F0 Λ hSt hb hΛ P s De hsk hsub
   obtain ⟨hQ1, hQrd, ⟨b₀, hd, hdQ⟩, hG, hGQ⟩ := hQ
   have huni : Formalism.HermitianLatticesTheory.IsUnimodular (hS D).hT Λ := hΛ.2.1.2.1
   have hZ : ∀ F' ∈ X, ∀ a b, (hS D).hT (F0.e a) (frame F' b) = Z (Fin.castSucc a) b := by
@@ -460,8 +480,7 @@ theorem card_frames_le
   have hYZ : Y'.map (algebraMap (𝓞 D.host.E) D.host.E) = Z.submatrix Fin.castSucc id := by
     funext a b
     exact (hY a b).trans (hZ F1 hF1 a b)
-  have hdet
-      : algebraMap (𝓞 D.host.E) D.host.E (Y'.submatrix id b₀.succAbove).det = rowMinor D Z b₀ := by
+  have hdet : algebraMap (𝓞 D.host.E) D.host.E (Y'.submatrix id b₀.succAbove).det = rowMinor D Z b₀ := by
     rw [rowMinor, ← hYZ, RingHom.map_det]
     rfl
   have hd' : (Y'.submatrix id b₀.succAbove).det ≠ 0 := fun h => hd (by rw [← hdet, h, map_zero])
@@ -477,16 +496,13 @@ theorem card_frames_le
     exact finrank_pos
   set S0 := perpW D (L0X D Λ (lf D F0)) P with hS0
   have hle : S0 ≤ L0X D Λ (lf D F0) := inf_le_left
-  obtain ⟨RW, hRW, hcovW⟩ :=
-    tuples D.host.E (D.sp.X 0).V (D.sp.X 0).hT D.what₂.Tau (embS D) S0 I D.R.rS s Y' b₀ (Tu D u) _
-      (De ^ 2 * NT D u ^ 2) Q (D.sp.X 0).herm hstar hnorm
-      (fun v => hpos (embS D v))
-      hne (hlat.fg.of_le hle)
-      (fun x hx y hy => hint x (hle hx) y (hle hy))
-      hrk hI hIS hd' hdQ' hIN (one_le_mul_of_one_le_of_one_le (one_le_pow₀ hDe) (one_le_pow₀ hNT))
-      hQ1 hT hG hGQ
-  obtain ⟨RX, hRX, hcovX⟩ :=
-    GlobalTheory.xClasses D.host.E (ddI D ^ D.R.rS) D.R.rS Y' b₀ (pow_ne_zero _ (ddI_ne D)) hd'
+  obtain ⟨RW, hRW, hcovW⟩ := tuples D.host.E (D.sp.X 0).V (D.sp.X 0).hT D.what₂.Tau (embS D) S0 I D.R.rS s
+    Y' b₀ (Tu D u) _ (De ^ 2 * NT D u ^ 2) Q (D.sp.X 0).herm hstar hnorm
+    (fun v => hpos (embS D v)) hne (hlat.fg.of_le hle)
+    (fun x hx y hy => hint x (hle hx) y (hle hy)) hrk hI hIS hd' hdQ' hIN
+    (one_le_mul_of_one_le_of_one_le (one_le_pow₀ hDe) (one_le_pow₀ hNT)) hQ1 hT hG hGQ
+  obtain ⟨RX, hRX, hcovX⟩ := GlobalTheory.xClasses D.host.E (ddI D ^ D.R.rS) D.R.rS Y' b₀
+    (pow_ne_zero _ (ddI_ne D)) hd'
   have hRX' : (RX.card : ℝ) ≤ Q ^ (2 * D.R.rS ^ 2) := by
     refine (Nat.cast_le.2 hRX).trans ?_
     rw [map_mul, map_pow, pow_mul, pow_two Q]
@@ -498,23 +514,17 @@ theorem card_frames_le
   haveI : Nonempty (Fg D ((Tu D u' : ℕ) : D.host.E)) := ⟨F1⟩
   let G : (Fin (D.R.rS + 1) → (D.sp.X 0).V) → Fg D ((Tu D u' : ℕ) : D.host.E) := fun w =>
     Classical.epsilon (Pw w)
-  let g
-      : (Fin (D.R.rS + 1) → (D.sp.X 0).V) × Matrix (Fin D.R.rS) (Fin (D.R.rS + 1)) D.host.E
-        → Set (Fg D ((Tu D u' : ℕ) : D.host.E)) := fun p =>
+  let g : (Fin (D.R.rS + 1) → (D.sp.X 0).V) × Matrix (Fin D.R.rS) (Fin (D.R.rS + 1)) D.host.E →
+      Set (Fg D ((Tu D u' : ℕ) : D.host.E)) := fun p =>
     cls Λ (lf D F0) X fun b => frame (G p.1) b + ∑ a, p.2 a b • F0.e a
-  have key
-      : {O : Set (Fg D ((Tu D u' : ℕ) : D.host.E)) |
-          ∃ a ∈ X, O = {b | b ∈ X ∧ TEqv D Λ (lf D F0) a b}}
-        ⊆ ((RW ×ˢ RX).image g : Finset _) := by
+  have key : {O : Set (Fg D ((Tu D u' : ℕ) : D.host.E)) |
+      ∃ a ∈ X, O = {b | b ∈ X ∧ TEqv D Λ (lf D F0) a b}} ⊆ ((RW ×ˢ RX).image g : Finset _) := by
     rintro _ ⟨F', hF', rfl⟩
     change cls Λ (lf D F0) X (frame F') ∈ _
-    obtain ⟨w, hw, hwG⟩ :=
-      GlobalTheory.T.fixed_frames_perpendicular_vectors D u u' F0 Λ hSt hb hΛ hsp P φ Z hφ hsub.1 F'
-        hF'
-    obtain ⟨w₀, hw₀, v, hv, ew⟩ :=
-      hcovW w (fun b => (hw b).2) (by
-        rw [← hwG, ← hYZ]
-        simp only [cofVec_map, algebraMap_smul])
+    obtain ⟨w, hw, hwG⟩ := GlobalTheory.T.fixed_frames_perpendicular_vectors D u u' F0 Λ hSt hb hΛ hsp P φ Z hφ hsub.1 F' hF'
+    obtain ⟨w₀, hw₀, v, hv, ew⟩ := hcovW w (fun b => (hw b).2) (by
+      rw [← hwG, ← hYZ]
+      simp only [cofVec_map, algebraMap_smul])
     obtain ⟨n, hn, sn⟩ := eich hb hΛ hφ (-v) fun a => S0.neg_mem (hv a)
     have hF2 : move n hn.1.1.1 F' ∈ X := move_mem hn hF'
     have hP2 : Pw w₀ (move n hn.1.1.1 F') := by
@@ -534,15 +544,11 @@ theorem card_frames_le
         rw [this, ← algebraMap_smul D.host.E (Y' a b) (v a), map_smul, Pi.neg_apply, map_neg,
           smul_eq_mul, mul_neg]
     have hPG : Pw w₀ (G w₀) := Classical.epsilon_spec ⟨_, hP2⟩
-    obtain ⟨x, hx1, hx2, hx3⟩ :=
-      GlobalTheory.T.frames_same_gram_differ_by_skew_solution D u u' F0 Λ hSt hb hΛ P φ Z hφ (G w₀)
-        hPG.1 _ hF2 fun b => ⟨w₀ b, hPG.2 b, hP2.2 b⟩
-    obtain ⟨x₀, hx₀, c, hc, ex⟩ :=
-      hcovX x (fun a b α hα => mul_mem_of D _ (hx2 a b) hα) (by rw [hYZ]; exact hx3)
-    obtain ⟨m, hm, -, hmf⟩ :=
-      GlobalTheory.LoopC.Centre.centralMap_mem_integralUnipotentFixingFrame D _ (lf D F0) Λ huni
-        (fun a => (e_mem D F0 hΛ a).1)
-        c hc
+    obtain ⟨x, hx1, hx2, hx3⟩ := GlobalTheory.T.frames_same_gram_differ_by_skew_solution D u u' F0 Λ hSt hb hΛ P φ Z hφ (G w₀) hPG.1 _ hF2
+      fun b => ⟨w₀ b, hPG.2 b, hP2.2 b⟩
+    obtain ⟨x₀, hx₀, c, hc, ex⟩ := hcovX x (fun a b α hα => mul_mem_of D _ (hx2 a b) hα)
+      (by rw [hYZ]; exact hx3)
+    obtain ⟨m, hm, -, hmf⟩ := GlobalTheory.LoopC.Centre.centralMap_mem_integralUnipotentFixingFrame D _ (lf D F0) Λ huni (fun a => (e_mem D F0 hΛ a).1) c hc
     have hne : ∀ a, n (F0.e a) = F0.e a := fun a => by
       have := hn.2.1 a.castSucc
       rwa [frame_castSucc] at this
@@ -560,10 +566,10 @@ theorem card_frames_le
     rw [Matrix.add_apply, add_smul, Matrix.mul_apply, Finset.sum_smul]
     congr 1
     refine Finset.sum_congr rfl fun a' _ => ?_
-    have : (hS D).hT ((lf D F0).fl.e a') (frame (G w₀) b + ∑ a, x₀ a b • F0.e a)
-        = (Y'.map (algebraMap (𝓞 D.host.E) D.host.E)) a' b := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [hYZ, map_add (f := _), map_sum]
+    have : (hS D).hT ((lf D F0).fl.e a') (frame (G w₀) b + ∑ a, x₀ a b • F0.e a) =
+        (Y'.map (algebraMap (𝓞 D.host.E) D.host.E)) a' b := by
+
+      rw [hYZ, map_add (f := _), map_sum]
       have : ∀ a, (hS D).hT ((lf D F0).fl.e a') (x₀ a b • F0.e a) = 0 := fun a => by
         rw [map_smul, show (hS D).hT ((lf D F0).fl.e a') (F0.e a) = 0 from F0.e_iso a' a, smul_zero]
       simp only [this, Finset.sum_const_zero, add_zero]

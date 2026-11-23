@@ -1,6 +1,41 @@
 module
 
 public import Development.WeilBound.RepresentationTheoryGL.ArchimedeanBaseChange.ArchimedeanBaseChangeProof.SatakeExponents.UniformizerValuations.StrictJoinCandidates.IntertwiningCandidates.FinReps
+public import Development.WeilBound.RepresentationTheoryGL.ArchimedeanBaseChange.ArchimedeanBaseChangeProof.SatakeExponents.UniformizerValuations.LemDCand
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
 
 @[expose] public section
 
@@ -12,8 +47,8 @@ open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions
   PositivityTheory.Rg.BcB.F.Tail PositivityTheory.Rg.BcB.SpectralAccumulation
 open scoped Classical
 
-set_option synthInstance.maxHeartbeats 200000
-set_option maxHeartbeats 1000000
+
+
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
@@ -70,7 +105,6 @@ theorem ub_fin
         (fun _ _ => Nat.zero_le _)
         (Finset.mem_univ i)
 
-set_option maxHeartbeats 4000000 in
 def ClauseA
     {hR : Rd.ReadLimit} {E : Type} [Field E] [NumberField E] [IsCMField E]
     {n : ℕ} {π : Submodule ℂ (UA E n → ℂ)} {S : Finset (Pl E)} (F₀ : Frame0 hR π S)
@@ -81,7 +115,6 @@ def ClauseA
       ∧ ∀ s₁ s₂ Pa Pb D,
         F₀.Cand d i s₁ s₂ Pa Pb D → w ∈ T' → ∀ ξa ξb, JEig Pa Pb w (F₀.d₀.ϖ w) ξa ξb → (ξa, ξb) ∈ Z
 
-set_option maxHeartbeats 4000000 in
 def ClauseC
     {hR : Rd.ReadLimit} {E : Type} [Field E] [NumberField E] [IsCMField E]
     {n : ℕ} {π : Submodule ℂ (UA E n → ℂ)} {S : Finset (Pl E)} (F₀ : Frame0 hR π S)
@@ -91,7 +124,6 @@ def ClauseC
     F₀.Cand d i s₁ s₂ Pa Pb D
       → ∀ w ∈ T', Module.finrank ℂ ↥(fixed (pairAt Pa Pb w) (I2 (F₀.C.a i) (n - F₀.C.a i) w)) ≤ m₀
 
-set_option maxHeartbeats 4000000 in
 theorem candFin_d
     (hJ : JEigFin) (hFS : FinStrict) (hEq : StrictEqv) (hSP : StrictPre) (hSPr : StrictProd)
     (hSJ : StrictJoin) (hCP : CandParts) (hII : IsoInv) (hAd : AdmProd)
@@ -153,7 +185,7 @@ theorem candFin_d
       ((hZ i w ja jb).2 Pa Pb (preEquiv_symm (hSP E _ _ _ ha)) (preEquiv_symm (hSP E _ _ _ hb))).1
     exact h1.trans (hub i (ja, jb) w hw)
 
-set_option maxHeartbeats 4000000 in
+
 theorem candFin_of : CandFinOf := by
   intro hJ hFS hEq hSP hSPr hSJ hCP hLO hII hAd
   intro hR E _ _ _ hU n hn π hπ S F₀ T' c e b hT'

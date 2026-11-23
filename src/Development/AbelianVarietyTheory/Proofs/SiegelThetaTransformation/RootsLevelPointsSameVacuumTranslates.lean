@@ -1,28 +1,64 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.Definitions.SpanningFamilies.IntMIffInt
-public import Development.AbelianVarietyTheory.Definitions.SpanningFamilies.IsBaseClassLevelAdapted
 public import Development.AbelianVarietyTheory.BlockTheory.JetGauges.ThetaSpanAdjoint
-public import Formalism.SharpRestriction.Divisibility.GeneratorPowers.ThExprUniqOfChartIndep2
+public import Development.AbelianVarietyTheory.Definitions.SpanningFamilies.IsStabForm
 public import Development.AbelianVarietyTheory.Proofs.SiegelThetaTransformation.HMatMulVecPerCrd
 public import Development.AbelianVarietyTheory.Proofs.SiegelThetaTransformation.TensorLatticeSelfDualSemicharacterIndex
-public import Development.AbelianVarietyTheory.Proofs.SiegelThetaTransformation.DualHalfLevelMarkingExistsAndMatch
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Rat
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Development.AbelianVarietyTheory.Definitions.SpanningFamilies.IntMIffInt
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
-  NumberField Matrix Complex
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
-  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.FD GlobalTheory
-  GlobalTheory.ThFr
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField Matrix Complex
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.FD GlobalTheory GlobalTheory.ThFr
 open ReciprocityTheory.ChartRestriction.G.Geo.Tor hiding Level
 open GlobalTheory.SW hiding Level
 open Formalism.L2.Pj Formalism.L2.PjFree
 open scoped ComplexConjugate Classical
 attribute [local instance] Over.cartesianMonoidalCategory
-open GlobalTheory.Dict GlobalTheory.Phase
-  GlobalTheory.IndefiniteRowSideFullHecke.UnitaryAdjointCongruence
+open GlobalTheory.Dict GlobalTheory.Phase GlobalTheory.IndefiniteRowSideFullHecke.UnitaryAdjointCongruence
 
 namespace GlobalTheory.Dict.RootsMove
 
@@ -30,10 +66,9 @@ section Abstract
 
 variable {R Q : Type} [CommRing R] [AddCommGroup Q] [Module R Q] {n : ℕ}
 
-private theorem inv_lemma'
-    {R Q : Type} [CommRing R] [AddCommGroup Q] [Module R Q]
-    {M k : ℕ} (hM : ∀ x : Q, (M : R) • x = 0) (hk : k.Coprime M)
-    : ∃ c : R, ∀ x : Q, (c * k) • x = x := by
+private theorem inv_lemma' {R Q : Type} [CommRing R] [AddCommGroup Q] [Module R Q] {M k : ℕ}
+    (hM : ∀ x : Q, (M : R) • x = 0) (hk : k.Coprime M) :
+    ∃ c : R, ∀ x : Q, (c * k) • x = x := by
   refine ⟨(Nat.gcdA k M : R), fun x => ?_⟩
   have h := Nat.gcd_eq_gcd_ab k M
   rw [hk.gcd_eq_one] at h
@@ -43,38 +78,28 @@ private theorem inv_lemma'
   have h3 : (Nat.gcdA k M : R) * k = 1 - (M : R) * Nat.gcdB k M := by linear_combination -h2
   rw [h3, sub_smul, one_smul, mul_smul, hM, sub_zero]
 
-private theorem sum_smul_sum_smul_eq_mul_apply
-    {R Q : Type} [CommRing R] [AddCommGroup Q] [Module R Q]
-    {n : ℕ} (c d : Matrix (Fin n) (Fin n) R) (q : Fin n → Q) (i : Fin n)
-    : ∑ j, c i j • ∑ l, d j l • q l = ∑ l, (c * d) i l • q l := by
+private theorem sum_smul_sum_smul_eq_mul_apply {R Q : Type} [CommRing R] [AddCommGroup Q] [Module R Q] {n : ℕ}
+    (c d : Matrix (Fin n) (Fin n) R) (q : Fin n → Q) (i : Fin n) :
+    ∑ j, c i j • ∑ l, d j l • q l = ∑ l, (c * d) i l • q l := by
   simp only [Matrix.mul_apply, Finset.smul_sum, Finset.sum_smul, mul_smul]
   exact Finset.sum_comm
 
-private theorem sum_smul_one_apply_smul
-    {R Q : Type} [CommRing R] [AddCommGroup Q] [Module R Q]
-    {n : ℕ}
-    (m : R) (q : Fin n → Q) (i : Fin n)
-    : ∑ l, (m • (1 : Matrix (Fin n) (Fin n) R)) i l • q l = m • q i := by
+private theorem sum_smul_one_apply_smul {R Q : Type} [CommRing R] [AddCommGroup Q] [Module R Q] {n : ℕ}
+    (m : R) (q : Fin n → Q) (i : Fin n) :
+    ∑ l, (m • (1 : Matrix (Fin n) (Fin n) R)) i l • q l = m • q i := by
   simp [Matrix.one_apply]
 
-theorem exists_perm
-    {M k m : ℕ} (hM : ∀ x : Q, (M : R) • x = 0) (hk : k.Coprime M) (hm : m.Coprime M)
-    (a b : Matrix (Fin n) (Fin n) R) (hab : a * b = (m : R) • 1) (hba : b * a = (m : R) • 1)
-    : ∃ e : (Fin n → Q) ≃ (Fin n → Q), ∀ q i, (k : R) • e q i = ∑ j, a i j • q j := by
+theorem exists_perm {M k m : ℕ} (hM : ∀ x : Q, (M : R) • x = 0) (hk : k.Coprime M) (hm : m.Coprime M)
+    (a b : Matrix (Fin n) (Fin n) R) (hab : a * b = (m : R) • 1) (hba : b * a = (m : R) • 1) :
+    ∃ e : (Fin n → Q) ≃ (Fin n → Q), ∀ q i, (k : R) • e q i = ∑ j, a i j • q j := by
   obtain ⟨ck, hck⟩ := inv_lemma' hM hk
   obtain ⟨cm, hcm⟩ := inv_lemma' hM hm
   have hfix : ∀ x : Q, ck • (cm * k) • (m : R) • x = x := fun x => by
-    rw [smul_smul, smul_smul, show ck * (cm * k) * m = (ck * k) * (cm * m) by ring, mul_smul, hcm,
-      hck]
-  refine ⟨
-    {
-      toFun := fun q i => ck • ∑ j, a i j • q j
-      invFun := fun q i => (cm * k) • ∑ j, b i j • q j
-      left_inv := ?_
-      right_inv := ?_
-    },
-    fun q i => ?_
-  ⟩
+    rw [smul_smul, smul_smul, show ck * (cm * k) * m = (ck * k) * (cm * m) by ring, mul_smul, hcm, hck]
+  refine ⟨{ toFun := fun q i => ck • ∑ j, a i j • q j
+            invFun := fun q i => (cm * k) • ∑ j, b i j • q j
+            left_inv := ?_
+            right_inv := ?_ }, fun q i => ?_⟩
   · intro q
     funext i
     show (cm * k) • ∑ j, b i j • (ck • ∑ l, a j l • q l) = q i
@@ -85,18 +110,15 @@ theorem exists_perm
   · intro q
     funext i
     show ck • ∑ j, a i j • ((cm * k) • ∑ l, b j l • q l) = q i
-    have e1
-        : ∑ j, a i j • ((cm * k) • ∑ l, b j l • q l)
-          = (cm * k) • ∑ j, a i j • ∑ l, b j l • q l := by
+    have e1 : ∑ j, a i j • ((cm * k) • ∑ l, b j l • q l) = (cm * k) • ∑ j, a i j • ∑ l, b j l • q l := by
       rw [Finset.smul_sum]
       exact Finset.sum_congr rfl fun j _ => smul_comm _ _ _
     rw [e1, sum_smul_sum_smul_eq_mul_apply, hab, sum_smul_one_apply_smul, hfix]
   · show (k : R) • ck • ∑ j, a i j • q j = _
     rw [smul_smul, mul_comm, hck]
 
-theorem int_of_coprime
-    {x : ℚ} {s t : ℕ} (h : s.Coprime t) {a b : ℤ} (ha : (s : ℚ) * x = a) (hb : (t : ℚ) * x = b)
-    : ∃ c : ℤ, x = c := by
+theorem int_of_coprime {x : ℚ} {s t : ℕ} (h : s.Coprime t) {a b : ℤ} (ha : (s : ℚ) * x = a)
+    (hb : (t : ℚ) * x = b) : ∃ c : ℤ, x = c := by
   refine ⟨Nat.gcdA s t * a + Nat.gcdB s t * b, ?_⟩
   have h' := Nat.gcd_eq_gcd_ab s t
   rw [h.gcd_eq_one] at h'
@@ -106,16 +128,16 @@ theorem int_of_coprime
   rw [← ha, ← hb]
   linear_combination x * h''
 
-private theorem heisS_heisS
-    {K1 K2 : Type} [Fintype K1] [Fintype K2] (a b a' b' : Matrix K1 K2 ℚ) (φ : Matrix K1 K2 ℚ → ℂ)
-    : heisS a b (heisS a' b' φ)
-      = cexp (Real.pi * I * ((∑ k, (a k ⬝ᵥ b' k - a' k ⬝ᵥ b k) : ℚ) : ℂ))
-        • heisS (a + a') (b + b') φ := by
+private theorem heisS_heisS {K1 K2 : Type} [Fintype K1] [Fintype K2] (a b a' b' : Matrix K1 K2 ℚ)
+    (φ : Matrix K1 K2 ℚ → ℂ) :
+    heisS a b (heisS a' b' φ) =
+      cexp (Real.pi * I * ((∑ k, (a k ⬝ᵥ b' k - a' k ⬝ᵥ b k) : ℚ) : ℂ)) •
+        heisS (a + a') (b + b') φ := by
   funext x
-  have hq
-      : (∑ k, (2 * ((x - b) k ⬝ᵥ a' k) - a' k ⬝ᵥ b' k)) + (∑ k, (2 * (x k ⬝ᵥ a k) - a k ⬝ᵥ b k))
-        = (∑ k, (a k ⬝ᵥ b' k - a' k ⬝ᵥ b k))
-          + ∑ k, (2 * (x k ⬝ᵥ (a + a') k) - (a + a') k ⬝ᵥ (b + b') k) := by
+  have hq : (∑ k, (2 * ((x - b) k ⬝ᵥ a' k) - a' k ⬝ᵥ b' k)) +
+      (∑ k, (2 * (x k ⬝ᵥ a k) - a k ⬝ᵥ b k)) =
+      (∑ k, (a k ⬝ᵥ b' k - a' k ⬝ᵥ b k)) +
+        ∑ k, (2 * (x k ⬝ᵥ (a + a') k) - (a + a') k ⬝ᵥ (b + b') k) := by
     rw [← Finset.sum_add_distrib, ← Finset.sum_add_distrib]
     refine Finset.sum_congr rfl fun k _ => ?_
     have e1 : (x - b) k = x k - b k := rfl
@@ -125,45 +147,38 @@ private theorem heisS_heisS
     simp only [sub_dotProduct, add_dotProduct, dotProduct_add, dotProduct_comm (b k) (a' k)]
     ring
   simp only [heisS, Pi.smul_apply, smul_eq_mul]
-  rw [sub_sub, _root_.mul_assoc, ← Complex.exp_add, _root_.mul_left_comm, ← Complex.exp_add,
-    ← _root_.mul_add, ← _root_.mul_add]
+  rw [sub_sub, _root_.mul_assoc, ← Complex.exp_add, _root_.mul_left_comm, ← Complex.exp_add, ← _root_.mul_add,
+    ← _root_.mul_add]
   congr 3
   exact_mod_cast hq
 
 end Abstract
 
-variable
-  {E : Type} [Field E] [NumberField E] [IsCMField E]
-  {r n g : ℕ} {H : Host E} {Dw : Datum H} {l : Geo.Tor.Level H} {X : Data E r} {L : Lt E r}
+variable {E : Type} [Field E] [NumberField E] [IsCMField E] {r n g : ℕ} {H : Host E} {Dw : Datum H}
+  {l : Geo.Tor.Level H} {X : Data E r} {L : Lt E r}
 
-theorem heisG_comp
-    {bas : (Fin g ⊕ Fin g → ℤ) ≃ₗ[ℤ] X.Λ} (hs : IsSympl X bas)
-    (y y' : Matrix (Fin n) (Fin r) E)
-    {φ : TF n g} (hφ : IsSB φ)
-    : heisG X bas y (heisG X bas y' φ)
-      = cexp (-(Real.pi * I * ((∑ k, EF X (y k) (y' k) : ℚ) : ℂ))) • heisG X bas (y + y') φ := by
-  have hA
-      : (Matrix.of fun k i => crd X bas ((y + y') k) (Sum.inl i) : Matrix (Fin n) (Fin g) ℚ)
-        = Matrix.of (fun k i => crd X bas (y k) (Sum.inl i))
-          + Matrix.of (fun k i => crd X bas (y' k) (Sum.inl i)) := by
+theorem heisG_comp {bas : (Fin g ⊕ Fin g → ℤ) ≃ₗ[ℤ] X.Λ} (hs : IsSympl X bas)
+    (y y' : Matrix (Fin n) (Fin r) E) {φ : TF n g} (hφ : IsSB φ) : heisG X bas y (heisG X bas y' φ) =
+      cexp (-(Real.pi * I * ((∑ k, EF X (y k) (y' k) : ℚ) : ℂ))) • heisG X bas (y + y') φ := by
+  have hA : (Matrix.of fun k i => crd X bas ((y + y') k) (Sum.inl i) : Matrix (Fin n) (Fin g) ℚ) =
+      Matrix.of (fun k i => crd X bas (y k) (Sum.inl i)) +
+        Matrix.of (fun k i => crd X bas (y' k) (Sum.inl i)) := by
     ext k i
     show crd X bas (y k + y' k) _ = _
     rw [crd_add hs]
     rfl
-  have hB
-      : (Matrix.of fun k i => crd X bas ((y + y') k) (Sum.inr i) : Matrix (Fin n) (Fin g) ℚ)
-        = Matrix.of (fun k i => crd X bas (y k) (Sum.inr i))
-          + Matrix.of (fun k i => crd X bas (y' k) (Sum.inr i)) := by
+  have hB : (Matrix.of fun k i => crd X bas ((y + y') k) (Sum.inr i) : Matrix (Fin n) (Fin g) ℚ) =
+      Matrix.of (fun k i => crd X bas (y k) (Sum.inr i)) +
+        Matrix.of (fun k i => crd X bas (y' k) (Sum.inr i)) := by
     ext k i
     show crd X bas (y k + y' k) _ = _
     rw [crd_add hs]
     rfl
-  have hE
-      : (∑ k, ((Matrix.of fun k i => crd X bas (y k) (Sum.inl i) : Matrix (Fin n) (Fin g) ℚ) k ⬝ᵥ
-          (Matrix.of fun k i => crd X bas (y' k) (Sum.inr i) : Matrix (Fin n) (Fin g) ℚ) k -
-          (Matrix.of fun k i => crd X bas (y' k) (Sum.inl i) : Matrix (Fin n) (Fin g) ℚ) k ⬝ᵥ
-          (Matrix.of fun k i => crd X bas (y k) (Sum.inr i) : Matrix (Fin n) (Fin g) ℚ) k))
-        = - ∑ k, EF X (y k) (y' k) := by
+  have hE : (∑ k, ((Matrix.of fun k i => crd X bas (y k) (Sum.inl i) : Matrix (Fin n) (Fin g) ℚ) k ⬝ᵥ
+        (Matrix.of fun k i => crd X bas (y' k) (Sum.inr i) : Matrix (Fin n) (Fin g) ℚ) k -
+        (Matrix.of fun k i => crd X bas (y' k) (Sum.inl i) : Matrix (Fin n) (Fin g) ℚ) k ⬝ᵥ
+        (Matrix.of fun k i => crd X bas (y k) (Sum.inr i) : Matrix (Fin n) (Fin g) ℚ) k)) =
+      -∑ k, EF X (y k) (y' k) := by
     rw [← Finset.sum_neg_distrib]
     refine Finset.sum_congr rfl fun k _ => ?_
     rw [EF_crd hs]
@@ -174,8 +189,8 @@ theorem heisG_comp
   push_cast
   ring_nf
 
-theorem sumEF_smul (s t : ℕ) (y y' : Matrix (Fin n) (Fin r) E)
-    : ∑ k, EF X (((s : E) • y) k) (((t : E) • y') k) = s * t * ∑ k, EF X (y k) (y' k) := by
+theorem sumEF_smul (s t : ℕ) (y y' : Matrix (Fin n) (Fin r) E) :
+    ∑ k, EF X (((s : E) • y) k) (((t : E) • y') k) = s * t * ∑ k, EF X (y k) (y' k) := by
   rw [Finset.mul_sum]
   refine Finset.sum_congr rfl fun k _ => ?_
   show EF X ((s : E) • y k) ((t : E) • y' k) = _
@@ -190,16 +205,11 @@ theorem sumEF_smul (s t : ℕ) (y y' : Matrix (Fin n) (Fin r) E)
   simp only [smul_eq_mul]
   ring
 
-theorem heisG_add_two
-    {bas : (Fin g ⊕ Fin g → ℤ) ≃ₗ[ℤ] X.Λ} (hs : IsSympl X bas)
-    (hL : SelfD X L)
-    {M : ℕ} {Λ : Lt E n} (hΛ : Λ ∈ Vset E n M)
-    {w : E} (hw : IsIntegral ℤ w)
-    {u : TF n g} (hu : IsVac X bas w (tens Λ L) u)
-    (y : Matrix (Fin n) (Fin r) E)
-    {d : Matrix (Fin n) (Fin r) E} (hd : d ∈ tens Λ L)
-    {c : ℤ} (hc : ∑ k, EF X (y k) (d k) = c)
-    : heisG X bas (y + ((2 : ℕ) : E) • d) u = heisG X bas y u := by
+theorem heisG_add_two {bas : (Fin g ⊕ Fin g → ℤ) ≃ₗ[ℤ] X.Λ} (hs : IsSympl X bas) (hL : SelfD X L) {M : ℕ}
+    {Λ : Lt E n} (hΛ : Λ ∈ Vset E n M) {w : E} (hw : IsIntegral ℤ w) {u : TF n g}
+    (hu : IsVac X bas w (tens Λ L) u) (y : Matrix (Fin n) (Fin r) E) {d : Matrix (Fin n) (Fin r) E}
+    (hd : d ∈ tens Λ L) {c : ℤ} (hc : ∑ k, EF X (y k) (d k) = c) :
+    heisG X bas (y + ((2 : ℕ) : E) • d) u = heisG X bas y u := by
   obtain ⟨hsb, -, hfix⟩ := hu
   have h2d : ((2 : ℕ) : E) • d ∈ tens Λ L := by
     rw [Nat.cast_smul_eq_nsmul]
@@ -207,21 +217,18 @@ theorem heisG_add_two
   obtain ⟨m, hm⟩ := (TensLat.tens_selfDual hΛ hL d).mp hd (w • d) (TensLat.smul_mem_tens hΛ hw hd)
   have heps : epsW X w (((2 : ℕ) : E) • d) = 1 := by
     unfold epsW
-    have hsum
-        : ∑ k, EF X ((((2 : ℕ) : E) • d) k) (w • (((2 : ℕ) : E) • d) k)
-          = ∑ k, EF X ((((2 : ℕ) : E) • d) k) ((((2 : ℕ) : E) • (w • d)) k) := by
+    have hsum : ∑ k, EF X ((((2 : ℕ) : E) • d) k) (w • (((2 : ℕ) : E) • d) k) =
+        ∑ k, EF X ((((2 : ℕ) : E) • d) k) ((((2 : ℕ) : E) • (w • d)) k) := by
       refine Finset.sum_congr rfl fun k _ => ?_
       congr 1
       show w • ((2 : ℕ) : E) • d k = ((2 : ℕ) : E) • w • d k
       exact smul_comm _ _ _
-    have hq
-        : ∑ k, EF X ((((2 : ℕ) : E) • d) k) ((((2 : ℕ) : E) • (w • d)) k) = ((4 * m : ℤ) : ℚ) := by
+    have hq : ∑ k, EF X ((((2 : ℕ) : E) • d) k) ((((2 : ℕ) : E) • (w • d)) k) = ((4 * m : ℤ) : ℚ) := by
       rw [sumEF_smul, hm]
       push_cast
       ring
     rw [hsum, hq]
-    have e
-        : (Real.pi : ℂ) * I * (((4 * m : ℤ) : ℚ) : ℂ) = ((2 * m : ℤ) : ℂ) * (2 * Real.pi * I) := by
+    have e : (Real.pi : ℂ) * I * (((4 * m : ℤ) : ℚ) : ℂ) = ((2 * m : ℤ) : ℂ) * (2 * Real.pi * I) := by
       push_cast
       ring
     rw [e]
@@ -237,8 +244,7 @@ theorem heisG_add_two
       push_cast
       ring
     rw [hq]
-    have e
-        : -((Real.pi : ℂ) * I * (((2 * c : ℤ) : ℚ) : ℂ)) = ((-c : ℤ) : ℂ) * (2 * Real.pi * I) := by
+    have e : -((Real.pi : ℂ) * I * (((2 * c : ℤ) : ℚ) : ℂ)) = ((-c : ℤ) : ℂ) * (2 * Real.pi * I) := by
       push_cast
       ring
     rw [e]
@@ -247,16 +253,14 @@ theorem heisG_add_two
   rw [h2fix, hexp, one_smul] at hcomp
   exact hcomp.symm
 
+
 omit [IsCMField E] in
-theorem mul_mem_tens
-    {Λ Λ' : Lt E n} {h : Matrix (Fin n) (Fin n) E} (hh : ∀ v ∈ Λ, h *ᵥ v ∈ Λ')
-    {y : Matrix (Fin n) (Fin r) E} (hy : y ∈ tens Λ L)
-    : h * y ∈ tens Λ' L := by
-  let f : Matrix (Fin n) (Fin r) E →+ Matrix (Fin n) (Fin r) E := {
-    toFun := fun z => h * z
-    map_zero' := Matrix.mul_zero h
-    map_add' := fun z z' => Matrix.mul_add h z z'
-  }
+theorem mul_mem_tens {Λ Λ' : Lt E n} {h : Matrix (Fin n) (Fin n) E} (hh : ∀ v ∈ Λ, h *ᵥ v ∈ Λ')
+    {y : Matrix (Fin n) (Fin r) E} (hy : y ∈ tens Λ L) : h * y ∈ tens Λ' L := by
+  let f : Matrix (Fin n) (Fin r) E →+ Matrix (Fin n) (Fin r) E :=
+    { toFun := fun z => h * z
+      map_zero' := Matrix.mul_zero h
+      map_add' := fun z z' => Matrix.mul_add h z z' }
   have key : tens Λ L ≤ (tens Λ' L).comap f := by
     refine TensLat.tens_le fun v hv u hu => ?_
     show h * vecMulVec v u ∈ tens Λ' L
@@ -268,13 +272,12 @@ theorem mul_mem_tens
     exact TensLat.pure_mem (hh v hv) hu
   exact key hy
 
+
 omit [IsCMField E] in
-theorem smul_mem_tens'
-    {Λ Λ' : Lt E n} {s : E} (hh : ∀ v ∈ Λ, s • v ∈ Λ')
-    {y : Matrix (Fin n) (Fin r) E} (hy : y ∈ tens Λ L)
-    : s • y ∈ tens Λ' L := by
-  have key
-      : tens Λ L ≤ (tens Λ' L).comap (DistribSMul.toAddMonoidHom (Matrix (Fin n) (Fin r) E) s) := by
+theorem smul_mem_tens' {Λ Λ' : Lt E n} {s : E} (hh : ∀ v ∈ Λ, s • v ∈ Λ')
+    {y : Matrix (Fin n) (Fin r) E} (hy : y ∈ tens Λ L) : s • y ∈ tens Λ' L := by
+  have key : tens Λ L ≤ (tens Λ' L).comap
+      (DistribSMul.toAddMonoidHom (Matrix (Fin n) (Fin r) E) s) := by
     refine TensLat.tens_le fun v hv u hu => ?_
     show s • vecMulVec v u ∈ tens Λ' L
     have e : s • vecMulVec v u = vecMulVec (s • v) u := by
@@ -285,11 +288,9 @@ theorem smul_mem_tens'
     exact TensLat.pure_mem (hh v hv) hu
   exact key hy
 
-theorem exists_int
-    {M : ℕ} {Λ Λ' : Lt E n} (hΛ : Λ ∈ Vset E n M) (hΛ' : Λ' ∈ Vset E n M)
-    {h : Matrix (Fin n) (Fin n) E} (hh : Moves h Λ Λ')
-    : ∃ (k : ℕ) (a : Matrix (Fin n) (Fin n) (𝓞 E)),
-      k.Coprime M ∧ ∀ i j, (a i j : E) = (k : E) * h i j := by
+theorem exists_int {M : ℕ} {Λ Λ' : Lt E n} (hΛ : Λ ∈ Vset E n M) (hΛ' : Λ' ∈ Vset E n M)
+    {h : Matrix (Fin n) (Fin n) E} (hh : Moves h Λ Λ') :
+    ∃ (k : ℕ) (a : Matrix (Fin n) (Fin n) (𝓞 E)), k.Coprime M ∧ ∀ i j, (a i j : E) = (k : E) * h i j := by
   obtain ⟨-, -, s, -, hsc, -, hs2⟩ := hΛ
   obtain ⟨-, -, s', -, hsc', hs1', -⟩ := hΛ'
   have hcol : ∀ j, ∃ c : Fin n → 𝓞 E, ∀ i, (c i : E) = ((s * s' : ℕ) : E) * h i j := by
@@ -301,8 +302,7 @@ theorem exists_int
     refine ⟨c, fun i => ?_⟩
     have hci := congrFun hc i
     simp only [Finset.sum_apply, Pi.smul_apply, Pi.single_apply, smul_ite, smul_zero,
-        Finset.sum_ite_eq, Finset.mem_univ, if_true, mulVec_smul, mulVec_single_one]
-      at hci
+      Finset.sum_ite_eq, Finset.mem_univ, if_true, mulVec_smul, mulVec_single_one] at hci
     rw [Algebra.smul_def, _root_.mul_one] at hci
     rw [show (c i : E) = algebraMap (𝓞 E) E (c i) from rfl, hci]
     simp only [smul_eq_mul, Matrix.col_apply]
@@ -311,27 +311,23 @@ theorem exists_int
   choose c hc using hcol
   exact ⟨s * s', Matrix.of fun i j => c j i, Nat.Coprime.mul_left hsc hsc', fun i j => hc j i⟩
 
-theorem exists_levPerm
-    {Λ Λ' : Lt E n} (hΛ : Λ ∈ Vset E n l.M) (hΛ' : Λ' ∈ Vset E n l.M)
-    {h : Matrix (Fin n) (Fin n) E} (hu : ccT h * h = 1) (hh : Moves h Λ Λ')
-    : ∃ e : (Fin n → LevQ Dw l) ≃ (Fin n → LevQ Dw l), ∀ q, LevMoves h q (e q) := by
+theorem exists_levPerm {Λ Λ' : Lt E n} (hΛ : Λ ∈ Vset E n l.M) (hΛ' : Λ' ∈ Vset E n l.M)
+    {h : Matrix (Fin n) (Fin n) E} (hu : ccT h * h = 1) (hh : Moves h Λ Λ') :
+    ∃ e : (Fin n → LevQ Dw l) ≃ (Fin n → LevQ Dw l), ∀ q, LevMoves h q (e q) := by
   obtain ⟨k, a, hk, ha⟩ := exists_int hΛ hΛ' hh
   have hinv : h * ccT h = 1 := _root_.mul_eq_one_comm.mp hu
   have hh' : Moves (ccT h) Λ' Λ := by
     intro v
     rw [hh (ccT h *ᵥ v), mulVec_mulVec, hinv, one_mulVec]
   obtain ⟨k', b, hk', hb⟩ := exists_int hΛ' hΛ hh'
-  have key
-      : ∀ (A B : Matrix (Fin n) (Fin n) E),
-        A * B = 1
-          → ∀ (c d : Matrix (Fin n) (Fin n) (𝓞 E)) (kc kd : ℕ),
-            (∀ i j, (c i j : E) = (kc : E) * A i j) → (∀ i j, (d i j : E) = (kd : E) * B i j)
-              → c * d = ((kc * kd : ℕ) : 𝓞 E) • 1 := by
+  have key : ∀ (A B : Matrix (Fin n) (Fin n) E), A * B = 1 → ∀ (c d : Matrix (Fin n) (Fin n) (𝓞 E))
+      (kc kd : ℕ), (∀ i j, (c i j : E) = (kc : E) * A i j) → (∀ i j, (d i j : E) = (kd : E) * B i j) →
+      c * d = ((kc * kd : ℕ) : 𝓞 E) • 1 := by
     intro A B hAB c d kc kd hc hd
     ext i j
     have e1 : ((c * d) i j : E) = ((kc * kd : ℕ) : E) * (A * B) i j := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [Matrix.mul_apply, map_sum, map_mul]
+
+      simp only [Matrix.mul_apply, map_sum, map_mul]
       rw [Finset.mul_sum]
       refine Finset.sum_congr rfl fun l _ => ?_
       rw [show (algebraMap (𝓞 E) E (c i l)) = (c i l : E) from rfl,
@@ -357,34 +353,25 @@ theorem exists_levPerm
   obtain ⟨e, he⟩ := exists_perm hM hk (Nat.Coprime.mul_left hk hk') a b hab hba
   exact ⟨e, fun q => ⟨k, a, hk, ha, fun i => he q i⟩⟩
 
-theorem exists_pow
-    {mk : Dw.La →ₗ[𝓞 E] (Fin r → E)} {N : ℕ} {Y : (Fin n → LevQ Dw l) → Matrix (Fin n) (Fin r) E}
-    (hY : IsRoots l L mk N Y)
-    (q : Fin n → LevQ Dw l)
-    : ∃ j₀ : ℕ, ∀ j,
-      j₀ ≤ j
-        → ∀ s ∈ l.Mb, ∃ U : Matrix (Fin n) (Fin r) E,
-          (∀ b, U b ∈ L) ∧ ((s : E) ^ j) • Y q = ((2 * N : ℕ) : E) • U := by
+theorem exists_pow {mk : Dw.La →ₗ[𝓞 E] (Fin r → E)} {N : ℕ}
+    {Y : (Fin n → LevQ Dw l) → Matrix (Fin n) (Fin r) E} (hY : IsRoots l L mk N Y) (q : Fin n → LevQ Dw l) :
+    ∃ j₀ : ℕ, ∀ j, j₀ ≤ j → ∀ s ∈ l.Mb, ∃ U : Matrix (Fin n) (Fin r) E, (∀ b, U b ∈ L) ∧
+      ((s : E) ^ j) • Y q = ((2 * N : ℕ) : E) • U := by
   have hb : ∀ b, ∃ j : ℕ, ∀ s ∈ l.Mb ^ j, ∃ u ∈ L, s • Y q b = (2 * N) • u := fun b => (hY q b).2
   choose j hj using hb
   refine ⟨Finset.univ.sup j, fun i hi s hs => ?_⟩
   have hu : ∀ b, ∃ u ∈ L, (s ^ i) • Y q b = (2 * N) • u := fun b =>
-    hj b _
-      (Ideal.pow_le_pow_right (le_trans (Finset.le_sup (Finset.mem_univ b)) hi)
-        (Ideal.pow_mem_pow hs i))
+    hj b _ (Ideal.pow_le_pow_right (le_trans (Finset.le_sup (Finset.mem_univ b)) hi)
+      (Ideal.pow_mem_pow hs i))
   choose U hUL hU using hu
   refine ⟨fun b => U b, hUL, ?_⟩
   funext b
   show ((s : E) ^ i) • Y q b = ((2 * N : ℕ) : E) • U b
   rw [Nat.cast_smul_eq_nsmul, ← hU b, ← algebraMap_smul E (s ^ i) (Y q b), map_pow]
 
-theorem ef_int
-    (hL : SelfD X L)
-    {mk : Dw.La →ₗ[𝓞 E] (Fin r → E)} (hmk : ∀ a, mk a ∈ L)
-    {y d u : Fin r → E} {a : Dw.La} (ha : a ∈ Mfr l • (⊤ : Submodule (𝓞 E) Dw.La))
-    (hy : y - (l.M : E)⁻¹ • mk a ∈ L) (hd : d ∈ L) (hu : u ∈ L)
-    {s : 𝓞 E} (hs : 1 - s ∈ Mfr l) (hsd : (s : E) • d = (l.M : E) • u)
-    : ∃ c : ℤ, EF X y d = c := by
+theorem ef_int (hL : SelfD X L) {mk : Dw.La →ₗ[𝓞 E] (Fin r → E)} (hmk : ∀ a, mk a ∈ L) {y d u : Fin r → E}
+    {a : Dw.La} (ha : a ∈ Mfr l • (⊤ : Submodule (𝓞 E) Dw.La)) (hy : y - (l.M : E)⁻¹ • mk a ∈ L) (hd : d ∈ L)
+    (hu : u ∈ L) {s : 𝓞 E} (hs : 1 - s ∈ Mfr l) (hsd : (s : E) • d = (l.M : E) • u) : ∃ c : ℤ, EF X y d = c := by
   obtain ⟨-, hself⟩ := hL
   have hint : ∀ x ∈ L, ∀ z ∈ L, ∃ k : ℤ, EF X x z = k := fun x hx z hz => (hself x).mp hx z hz
   have hM0 : (l.M : E) ≠ 0 := by
@@ -397,8 +384,7 @@ theorem ef_int
     change EFBil X v (z + z') = EFBil X v z + EFBil X v z'
     rw [LinearMap.map_add (f := _)]
   have hs' : 1 - s ∈ l.Mb.map (H.bar : 𝓞 E →+* 𝓞 E) := hs
-  obtain ⟨p, hp, hpt⟩ :=
-    (Ideal.mem_map_iff_of_surjective (H.bar : 𝓞 E →+* 𝓞 E) H.bar.surjective).mp hs'
+  obtain ⟨p, hp, hpt⟩ := (Ideal.mem_map_iff_of_surjective (H.bar : 𝓞 E →+* 𝓞 E) H.bar.surjective).mp hs'
   have hpt' : H.bar p = 1 - s := hpt
   have hccp : cc (p : E) = 1 - (s : E) := by
     have hb := H.bar_eq p
@@ -424,10 +410,8 @@ theorem ef_int
     rw [map_inv₀, map_natCast]
   have split1 : EF X y d = EF X (y - (l.M : E)⁻¹ • mk a) d + EF X ((l.M : E)⁻¹ • mk a) d := by
     rw [← addL, sub_add_cancel]
-  have split2
-      : EF X ((l.M : E)⁻¹ • mk a) d
-        = EF X ((l.M : E)⁻¹ • mk a) ((s : E) • d)
-          + EF X ((l.M : E)⁻¹ • mk a) ((1 - (s : E)) • d) := by
+  have split2 : EF X ((l.M : E)⁻¹ • mk a) d =
+      EF X ((l.M : E)⁻¹ • mk a) ((s : E) • d) + EF X ((l.M : E)⁻¹ • mk a) ((1 - (s : E)) • d) := by
     rw [← addR, ← add_smul, add_sub_cancel, one_smul]
   have t2 : EF X ((l.M : E)⁻¹ • mk a) ((s : E) • d) = EF X (mk a) u := by
     rw [hsd, TensLat.EF_smul X, hccM, smul_smul, inv_mul_cancel₀ hM0, one_smul]
@@ -441,12 +425,8 @@ theorem ef_int
   push_cast
   ring
 
-private theorem mem_of_natCast_smul_mem_of_coprime
-    {F V : Type} [Field F] [AddCommGroup V] [Module F V]
-    (G : AddSubgroup V)
-    {p q : ℕ} (hpq : p.Coprime q)
-    {v : V} (hp : (p : F) • v ∈ G) (hq : (q : F) • v ∈ G)
-    : v ∈ G := by
+private theorem mem_of_natCast_smul_mem_of_coprime {F V : Type} [Field F] [AddCommGroup V] [Module F V] (G : AddSubgroup V) {p q : ℕ}
+    (hpq : p.Coprime q) {v : V} (hp : (p : F) • v ∈ G) (hq : (q : F) • v ∈ G) : v ∈ G := by
   have h := Nat.gcd_eq_gcd_ab p q
   rw [hpq.gcd_eq_one] at h
   have h2 : ((Nat.gcdA p q : ℤ) : F) * p + ((Nat.gcdB p q : ℤ) : F) * q = 1 := by
@@ -454,16 +434,14 @@ private theorem mem_of_natCast_smul_mem_of_coprime
     push_cast at this
     linear_combination -this
   have hv : v = Nat.gcdA p q • ((p : F) • v) + Nat.gcdB p q • ((q : F) • v) := by
-    rw [← Int.cast_smul_eq_zsmul F, ← Int.cast_smul_eq_zsmul F, smul_smul, smul_smul, ← add_smul,
-      h2, one_smul]
+    rw [← Int.cast_smul_eq_zsmul F, ← Int.cast_smul_eq_zsmul F, smul_smul, smul_smul, ← add_smul, h2,
+      one_smul]
   rw [hv]
   exact add_mem (AddSubgroup.zsmul_mem _ hp _) (AddSubgroup.zsmul_mem _ hq _)
 
-private theorem mem_mul_smul_of_mem_smul_of_sup_eq_top
-    {R V : Type} [CommRing R] [AddCommGroup V] [Module R V]
-    {I J : Ideal R} {P : Submodule R V} (hIJ : I ⊔ J = ⊤)
-    {x : V} (hI : x ∈ I • P) (hJ : x ∈ J • P)
-    : x ∈ (I * J) • P := by
+private theorem mem_mul_smul_of_mem_smul_of_sup_eq_top {R V : Type} [CommRing R] [AddCommGroup V] [Module R V] {I J : Ideal R}
+    {P : Submodule R V} (hIJ : I ⊔ J = ⊤) {x : V} (hI : x ∈ I • P) (hJ : x ∈ J • P) :
+    x ∈ (I * J) • P := by
   have h1 : (1 : R) ∈ I ⊔ J := by
     rw [hIJ]
     exact Submodule.mem_top
@@ -476,22 +454,18 @@ private theorem mem_mul_smul_of_mem_smul_of_sup_eq_top
   · rw [_root_.mul_comm, Submodule.mul_smul]
     exact Submodule.smul_mem_smul hj hI
 
-private theorem map_mul_row_mem_of_rows_mem
-    {F : Type} [Field F] [NumberField F]
-    {m s : ℕ} {L : Submodule (𝓞 F) (Fin s → F)} (B : Matrix (Fin m) (Fin m) (𝓞 F))
-    (W : Matrix (Fin m) (Fin s) F) (hW : ∀ i, W i ∈ L) (i : Fin m)
-    : (B.map (algebraMap (𝓞 F) F) * W) i ∈ L := by
+private theorem map_mul_row_mem_of_rows_mem {F : Type} [Field F] [NumberField F] {m s : ℕ} {L : Submodule (𝓞 F) (Fin s → F)}
+    (B : Matrix (Fin m) (Fin m) (𝓞 F)) (W : Matrix (Fin m) (Fin s) F) (hW : ∀ i, W i ∈ L) (i : Fin m) :
+    (B.map (algebraMap (𝓞 F) F) * W) i ∈ L := by
   have e : (B.map (algebraMap (𝓞 F) F) * W) i = ∑ j, B i j • W j := by
     funext c
-    simp only [Matrix.mul_apply, Matrix.map_apply, Finset.sum_apply, Pi.smul_apply,
-      Algebra.smul_def]
+    simp only [Matrix.mul_apply, Matrix.map_apply, Finset.sum_apply, Pi.smul_apply, Algebra.smul_def]
   rw [e]
   exact Submodule.sum_mem _ fun j _ => Submodule.smul_mem _ _ (hW j)
 
-private theorem natCast_smul_mem_of_span_smul_stdLat_le
-    {F : Type} [Field F] [NumberField F]
-    {m N : ℕ} {Λ : Lt F m} (hle : Ideal.span {(N : 𝓞 F)} • stdLat F m ≤ (⟨Λ⟩ : GenLat F m).Ln)
-    : ∀ v ∈ stdL F m, (N : F) • v ∈ Λ := by
+private theorem natCast_smul_mem_of_span_smul_stdLat_le {F : Type} [Field F] [NumberField F] {m N : ℕ} {Λ : Lt F m}
+    (hle : Ideal.span {(N : 𝓞 F)} • stdLat F m ≤ (⟨Λ⟩ : GenLat F m).Ln) :
+    ∀ v ∈ stdL F m, (N : F) • v ∈ Λ := by
   intro v hv
   have hv' : v ∈ stdLat F m := by
     refine Submodule.span_le.mpr ?_ hv
@@ -503,47 +477,23 @@ private theorem natCast_smul_mem_of_span_smul_stdLat_le
       exact ⟨1, by simp⟩
     · exact ⟨0, by simp [hij]⟩
   have h1 := hle (Submodule.smul_mem_smul (Ideal.mem_span_singleton_self (N : 𝓞 F)) hv')
-  have h2 : (N : 𝓞 F) • v = (N : F) • v := by rw [← algebraMap_smul F (N : 𝓞 F) v, map_natCast]
+  have h2 : (N : 𝓞 F) • v = (N : F) • v := by
+    rw [← algebraMap_smul F (N : 𝓞 F) v, map_natCast]
   rw [← h2]
   exact h1.1
 
-private theorem matrix_mul_row_eq_sum_smul
-    {F : Type} [Field F]
-    {m s : ℕ} (A : Matrix (Fin m) (Fin m) F) (Z : Matrix (Fin m) (Fin s) F) (i : Fin m)
-    : (A * Z) i = ∑ j, A i j • Z j := by
+private theorem matrix_mul_row_eq_sum_smul {F : Type} [Field F] {m s : ℕ} (A : Matrix (Fin m) (Fin m) F)
+    (Z : Matrix (Fin m) (Fin s) F) (i : Fin m) :
+    (A * Z) i = ∑ j, A i j • Z j := by
   funext c
   simp [Matrix.mul_apply, Finset.sum_apply]
 
-theorem roots_move
-    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H)
-        (l : Geo.Tor.Level H) (r : ℕ) (X : Data E r) (g : ℕ) (bas : (Fin g ⊕ Fin g → ℤ) ≃ₗ[ℤ] X.Λ)
-        (n : ℕ),
-      IsSympl X bas → Even n
-        → ∀ L : Lt E r,
-          SelfD X L
-            → ∀ mk : Dw.La →ₗ[𝓞 E] (Fin r → E),
-              IsMark l L mk
-                → ∀ h : Matrix (Fin n) (Fin n) E,
-                  ccT h * h = 1
-                    → ∀ Λ ∈ Vset E n l.M, ∀ Λ' ∈ Vset E n l.M,
-                      Moves h Λ Λ'
-                        → ∀ N N' : ℕ,
-                          (⟨Λ⟩ : GenLat E n).LevOK N l.M → (⟨Λ'⟩ : GenLat E n).LevOK N' l.M
-                            → ∀ Y Y' : (Fin n → LevQ Dw l) → Matrix (Fin n) (Fin r) E,
-                              IsRoots l L mk N Y → IsRoots l L mk N' Y'
-                                → (∃ e : (Fin n → LevQ Dw l) ≃ (Fin n → LevQ Dw l), ∀ q,
-                                    LevMoves h q (e q))
-                                  ∧ ∀ q q',
-                                    LevMoves h q q'
-                                      → ∀ u : TF n g,
-                                        IsVac X bas (H.w0 : E) (tens Λ' L) u
-                                          → heisG X bas (Y' q') u = heisG X bas (h * Y q) u := by
+theorem roots_move : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H) (l : Geo.Tor.Level H) (r : ℕ) (X : Data E r) (g : ℕ) (bas : (Fin g ⊕ Fin g → ℤ) ≃ₗ[ℤ] X.Λ) (n : ℕ), IsSympl X bas → Even n → ∀ L : Lt E r, SelfD X L → ∀ mk : Dw.La →ₗ[𝓞 E] (Fin r → E), IsMark l L mk → ∀ h : Matrix (Fin n) (Fin n) E, ccT h * h = 1 → ∀ Λ ∈ Vset E n l.M, ∀ Λ' ∈ Vset E n l.M, Moves h Λ Λ' → ∀ N N' : ℕ, (⟨Λ⟩ : GenLat E n).LevOK N l.M → (⟨Λ'⟩ : GenLat E n).LevOK N' l.M → ∀ Y Y' : (Fin n → LevQ Dw l) → Matrix (Fin n) (Fin r) E, IsRoots l L mk N Y → IsRoots l L mk N' Y' → (∃ e : (Fin n → LevQ Dw l) ≃ (Fin n → LevQ Dw l), ∀ q, LevMoves h q (e q)) ∧ ∀ q q', LevMoves h q q' → ∀ u : TF n g, IsVac X bas (H.w0 : E) (tens Λ' L) u → heisG X bas (Y' q') u = heisG X bas (h * Y q) u := by
   intro E _ _ _ H Dw l r X g bas n hs _ L hL mk hmk h hu Λ hΛ Λ' hΛ' hh N N' hN hN' Y Y' hY hY'
   refine ⟨exists_levPerm (Dw := Dw) hΛ hΛ' hu hh, ?_⟩
   intro q q' hmv u hvac
   obtain ⟨k1, g1, hk1, hg1, hq⟩ := hmv
-  have cs : ∀ (x : 𝓞 E) (v : Fin r → E), x • v = (x : E) • v := fun x v =>
-    (algebraMap_smul E x v).symm
+  have cs : ∀ (x : 𝓞 E) (v : Fin r → E), x • v = (x : E) • v := fun x v => (algebraMap_smul E x v).symm
   have hM0 : (l.M : E) ≠ 0 := by
     have h3 := l.three_le
     exact_mod_cast (show l.M ≠ 0 by omega)
@@ -583,31 +533,23 @@ theorem roots_move
     exact Nat.Coprime.symm ((Nat.Prime.coprime_iff_not_dvd Nat.prime_two).2 (by omega))
   obtain ⟨t, -, htc, -, ht2⟩ := hΛ'.2.2
 
-  have hrep
-      : ∀ j, ∃ a ∈ Mfr l • (⊤ : Submodule (𝓞 E) Dw.La),
-        Submodule.Quotient.mk a = q j ∧ Y q j - ((l.M : E)⁻¹) • mk a ∈ L := fun j =>
-    (hY q j).1
+  have hrep : ∀ j, ∃ a ∈ Mfr l • (⊤ : Submodule (𝓞 E) Dw.La), Submodule.Quotient.mk a = q j ∧
+      Y q j - ((l.M : E)⁻¹) • mk a ∈ L := fun j => (hY q j).1
   choose A hAm hAq hAL using hrep
-  have hrep'
-      : ∀ j, ∃ a ∈ Mfr l • (⊤ : Submodule (𝓞 E) Dw.La),
-        Submodule.Quotient.mk a = q' j ∧ Y' q' j - ((l.M : E)⁻¹) • mk a ∈ L := fun j =>
-    (hY' q' j).1
+  have hrep' : ∀ j, ∃ a ∈ Mfr l • (⊤ : Submodule (𝓞 E) Dw.La), Submodule.Quotient.mk a = q' j ∧
+      Y' q' j - ((l.M : E)⁻¹) • mk a ∈ L := fun j => (hY' q' j).1
   choose A' hA'm hA'q hA'L using hrep'
   have hC : ∀ i, ∃ Ci : Dw.La, (l.M : 𝓞 E) • Ci = (k1 : 𝓞 E) • A' i - ∑ j, g1 i j • A j := by
     intro i
     have hxb : (k1 : 𝓞 E) • A' i - ∑ j, g1 i j • A j ∈ l.Mb • (⊤ : Submodule (𝓞 E) Dw.La) := by
-      have h0
-          : (l.Mb • (⊤ : Submodule (𝓞 E) Dw.La)).mkQ ((k1 : 𝓞 E) • A' i - ∑ j, g1 i j • A j)
-            = 0 := by
-        set_option synthInstance.maxHeartbeats 100000 in
-          simp only [map_sub, map_smul, map_sum, Submodule.mkQ_apply, hAq, hA'q]
+      have h0 : (l.Mb • (⊤ : Submodule (𝓞 E) Dw.La)).mkQ ((k1 : 𝓞 E) • A' i - ∑ j, g1 i j • A j) = 0 := by
+
+        simp only [map_sub, map_smul, map_sum, Submodule.mkQ_apply, hAq, hA'q]
         rw [hq i, sub_self]
       exact (Submodule.Quotient.mk_eq_zero _).mp h0
-    have hxf
-        : (k1 : 𝓞 E) • A' i - ∑ j, g1 i j • A j
-          ∈ l.Mb.map (H.bar : 𝓞 E →+* 𝓞 E) • (⊤ : Submodule (𝓞 E) Dw.La) :=
-      sub_mem (Submodule.smul_mem _ _ (hA'm i))
-        (Submodule.sum_mem _ fun j _ => Submodule.smul_mem _ _ (hAm j))
+    have hxf : (k1 : 𝓞 E) • A' i - ∑ j, g1 i j • A j ∈
+        l.Mb.map (H.bar : 𝓞 E →+* 𝓞 E) • (⊤ : Submodule (𝓞 E) Dw.La) :=
+      sub_mem (Submodule.smul_mem _ _ (hA'm i)) (Submodule.sum_mem _ fun j _ => Submodule.smul_mem _ _ (hAm j))
     have hx := mem_mul_smul_of_mem_smul_of_sup_eq_top l.coprime hxb hxf
     rw [l.prod, Submodule.ideal_span_singleton_smul, Submodule.mem_smul_pointwise_iff_exists] at hx
     obtain ⟨Ci, -, hCi⟩ := hx
@@ -628,16 +570,13 @@ theorem roots_move
     intro i
     have hCE : (l.M : E) • mk (C i) = (k1 : E) • mk (A' i) - ∑ j, (g1 i j : E) • mk (A j) := by
       have := congrArg mk (hC i)
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [map_sub, map_sum, LinearMap.map_smul, cs, hMc, hk1c] at this
+
+      simp only [map_sub, map_sum, LinearMap.map_smul, cs, hMc, hk1c] at this
       exact this
     have hmkC : mk (C i) = (l.M : E)⁻¹ • ((k1 : E) • mk (A' i) - ∑ j, (g1 i j : E) • mk (A j)) := by
       rw [← hCE, smul_smul, inv_mul_cancel₀ hM0, one_smul]
-    have hsplit
-        : W i
-          = mk (C i)
-            + ((k1 : E) • (Y' q' i - (l.M : E)⁻¹ • mk (A' i))
-              - ∑ j, (g1 i j : E) • (Y q j - (l.M : E)⁻¹ • mk (A j))) := by
+    have hsplit : W i = mk (C i) + ((k1 : E) • (Y' q' i - (l.M : E)⁻¹ • mk (A' i)) -
+        ∑ j, (g1 i j : E) • (Y q j - (l.M : E)⁻¹ • mk (A j))) := by
       rw [hWi, hmkC]
       simp only [smul_sub, Finset.smul_sum, Finset.sum_sub_distrib, smul_comm ((l.M : E)⁻¹)]
       abel
@@ -650,12 +589,8 @@ theorem roots_move
   have hg : g1.map (algebraMap (𝓞 E) E) = (k1 : E) • h := by
     ext i j
     rw [Matrix.map_apply, Matrix.smul_apply, smul_eq_mul, ← hg1]
-  obtain ⟨Um, hUm⟩
-      : ∃ Um : Matrix (Fin n) (Fin r) E,
-        Um
-          = ((2 * n2 * k1 : ℕ) : E) • U2
-            - ((2 * n1 : ℕ) : E) • (g1.map (algebraMap (𝓞 E) E) * U1) :=
-    ⟨_, rfl⟩
+  obtain ⟨Um, hUm⟩ : ∃ Um : Matrix (Fin n) (Fin r) E, Um = ((2 * n2 * k1 : ℕ) : E) • U2 -
+      ((2 * n1 : ℕ) : E) • (g1.map (algebraMap (𝓞 E) E) * U1) := ⟨_, rfl⟩
   have hUmL : ∀ i, Um i ∈ L := by
     intro i
     rw [hUm]
@@ -666,8 +601,8 @@ theorem roots_move
     · rw [Nat.cast_smul_eq_nsmul]
       exact Submodule.smul_of_tower_mem _ _ (map_mul_row_mem_of_rows_mem g1 U1 hU1L i)
   have hsW : ((s0 : E) ^ J) • W = (l.M : E) • Um := by
-    rw [hUm, hg, Matrix.smul_mul, hW, hD, smul_comm, smul_sub, ← Matrix.mul_smul, hU1, hU2,
-      Matrix.mul_smul, hn1, hn2]
+    rw [hUm, hg, Matrix.smul_mul, hW, hD, smul_comm, smul_sub, ← Matrix.mul_smul, hU1, hU2, Matrix.mul_smul,
+      hn1, hn2]
     push_cast
     module
   have hsd : ∀ i, (((s0 ^ J : 𝓞 E)) : E) • W i = (l.M : E) • Um i := by
@@ -687,18 +622,14 @@ theorem roots_move
     rw [hd, smul_smul, Nat.cast_two, mul_inv_cancel₀ two_ne_zero, one_smul, hD, add_sub_cancel]
 
   have hN'V2 : (N' : E) • V2 ∈ tens Λ' L :=
-    smul_mem_tens' (natCast_smul_mem_of_span_smul_stdLat_le hN'le)
-      ((TensLat.mem_tens_stdL L V2).mpr hV2L)
+    smul_mem_tens' (natCast_smul_mem_of_span_smul_stdLat_le hN'le) ((TensLat.mem_tens_stdL L V2).mpr hV2L)
   have hNV1 : (N : E) • (h * V1) ∈ tens Λ' L := by
     rw [← Matrix.mul_smul]
-    exact mul_mem_tens
-      (fun v hv => (hh v).mp hv)
-      (smul_mem_tens' (natCast_smul_mem_of_span_smul_stdLat_le hNle)
-        ((TensLat.mem_tens_stdL L V1).mpr hV1L))
+    exact mul_mem_tens (fun v hv => (hh v).mp hv)
+      (smul_mem_tens' (natCast_smul_mem_of_span_smul_stdLat_le hNle) ((TensLat.mem_tens_stdL L V1).mpr hV1L))
   have hdmem : d ∈ tens Λ' L := by
     refine mem_of_natCast_smul_mem_of_coprime (F := E) (tens Λ' L) (p := l.M ^ J) (q := 2 * k1 * t)
-      (Nat.Coprime.pow_left J (Nat.Coprime.mul_right (Nat.Coprime.mul_right hM2 hk1.symm) htc.symm))
-      ?_ ?_
+      (Nat.Coprime.pow_left J (Nat.Coprime.mul_right (Nat.Coprime.mul_right hM2 hk1.symm) htc.symm)) ?_ ?_
     · have e : ((l.M ^ J : ℕ) : E) • d = (N' : E) • V2 - (N : E) • (h * V1) := by
         rw [hd, hD, smul_comm, smul_sub, ← Matrix.mul_smul, Nat.cast_pow, hV1, hV2, Matrix.mul_smul]
         push_cast
@@ -753,12 +684,10 @@ theorem roots_move
     exact Finset.sum_congr rfl fun i _ => hz i
   obtain ⟨za, hza⟩ := hXa
   obtain ⟨zb, hzb⟩ := hXb
-  obtain ⟨c, hc⟩ :=
-    int_of_coprime (Nat.Coprime.pow_left J (Nat.Coprime.mul_right hM2 hk1.symm)) hza hzb
+  obtain ⟨c, hc⟩ := int_of_coprime
+    (Nat.Coprime.pow_left J (Nat.Coprime.mul_right hM2 hk1.symm)) hza hzb
   have hcX : ∑ k, EF X ((h * Y q) k) (d k) = c := by rw [hXeq, hc]
-  have hmain :=
-    heisG_add_two hs hL hΛ' (NumberField.RingOfIntegers.isIntegral_coe H.w0) hvac (h * Y q) hdmem
-      hcX
+  have hmain := heisG_add_two hs hL hΛ' (NumberField.RingOfIntegers.isIntegral_coe H.w0) hvac (h * Y q) hdmem hcX
   rw [hYd]
   exact hmain
 

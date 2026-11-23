@@ -1,7 +1,57 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Definitions.Divisors.Uniformised
+public import Mathlib.LinearAlgebra.Lagrange
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Real
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Coalgebra.IsFrobenius
+import Mathlib.RingTheory.Etale.Weakly
+import Mathlib.RingTheory.Finiteness.ModuleFinitePresentation
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.TotallySplit
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
 
 @[expose] public section
 
@@ -12,32 +62,28 @@ noncomputable section
 
 namespace GlobalTheory.UPel.HT.LieProj
 
-theorem aeval_mul_of_mul_eq
-    {g : ℕ} {T P : Matrix (Fin g) (Fin g) ℂ} {r : ℂ} (h : T * P = r • P) (q : ℂ[X])
-    : aeval T q * P = q.eval r • P := by
+theorem aeval_mul_of_mul_eq {g : ℕ} {T P : Matrix (Fin g) (Fin g) ℂ} {r : ℂ} (h : T * P = r • P) (q : ℂ[X]) :
+    aeval T q * P = q.eval r • P := by
   have hp : ∀ k : ℕ, T ^ k * P = r ^ k • P := by
     intro k
     induction k with
     | zero => simp
-    | succ k ih =>
-      rw [pow_succ', mul_assoc, ih, mul_smul_comm, h, smul_smul, pow_succ, mul_comm (r ^ k)]
+    | succ k ih => rw [pow_succ', mul_assoc, ih, mul_smul_comm, h, smul_smul, pow_succ, mul_comm (r ^ k)]
   induction q using Polynomial.induction_on' with
   | add p q hp' hq' => rw [map_add (f := _), add_mul, hp', hq', eval_add, add_smul]
   | monomial k a =>
-    rw [aeval_monomial, eval_monomial, Algebra.algebraMap_eq_smul_one, smul_mul_assoc, one_mul,
-      smul_mul_assoc, hp, smul_smul]
+    rw [aeval_monomial, eval_monomial, Algebra.algebraMap_eq_smul_one, smul_mul_assoc, one_mul, smul_mul_assoc, hp,
+      smul_smul]
 
-theorem X_sub_C_mul_basis {s : Finset ℂ} {r : ℂ} (hr : r ∈ s)
-    : (X - C r) * Lagrange.basis s id r
-      = C (Lagrange.nodalWeight s id r) * Lagrange.nodal s id := by
+theorem X_sub_C_mul_basis {s : Finset ℂ} {r : ℂ} (hr : r ∈ s) :
+    (X - C r) * Lagrange.basis s id r = C (Lagrange.nodalWeight s id r) * Lagrange.nodal s id := by
   rw [Lagrange.basis_eq_prod_sub_inv_mul_nodal_div hr, mul_left_comm]
   congr 1
   exact EuclideanDomain.mul_div_cancel' (X_sub_C_ne_zero r) (Lagrange.X_sub_C_dvd_nodal id hr)
 
-theorem spectral (K : Type) [Field K] [NumberField K] (g : ℕ) (Φ : K →+* Matrix (Fin g) (Fin g) ℂ)
-    : ∃ E : (K →+* ℂ) → Matrix (Fin g) (Fin g) ℂ,
-      (∀ τ, E τ * E τ = E τ) ∧ ∑ τ, E τ = 1 ∧ (∀ τ x, Φ x * E τ = τ x • E τ)
-        ∧ (∀ τ x, E τ * Φ x = τ x • E τ) := by
+theorem spectral (K : Type) [Field K] [NumberField K] (g : ℕ) (Φ : K →+* Matrix (Fin g) (Fin g) ℂ) :
+    ∃ E : (K →+* ℂ) → Matrix (Fin g) (Fin g) ℂ, (∀ τ, E τ * E τ = E τ) ∧ ∑ τ, E τ = 1 ∧
+      (∀ τ x, Φ x * E τ = τ x • E τ) ∧ (∀ τ x, E τ * Φ x = τ x • E τ) := by
   classical
   let pb := Field.powerBasisOfFiniteOfSeparable ℚ K
   let θ := pb.gen
@@ -45,16 +91,14 @@ theorem spectral (K : Type) [Field K] [NumberField K] (g : ℕ) (Φ : K →+* Ma
   let f : ℂ[X] := (minpoly ℚ θ).map (algebraMap ℚ ℂ)
   let S : Finset ℂ := f.roots.toFinset
   have hfmon : f.Monic := (minpoly.monic (Algebra.IsIntegral.isIntegral θ)).map _
-  have hnod : f.roots.Nodup :=
-    nodup_roots (Polynomial.Separable.map (Algebra.IsSeparable.isSeparable ℚ θ))
+  have hnod : f.roots.Nodup := nodup_roots (Polynomial.Separable.map (Algebra.IsSeparable.isSeparable ℚ θ))
   have hnodal : Lagrange.nodal S id = f := by
     rw [Lagrange.nodal]
     conv_rhs => rw [(IsAlgClosed.splits f).eq_prod_roots_of_monic hfmon]
     rw [Finset.prod_eq_multiset_prod, Multiset.toFinset_val, hnod.dedup]
     rfl
   have hfT : aeval T f = 0 := by
-    rw [aeval_map_algebraMap, show T = Φ.toRatAlgHom θ from rfl, aeval_algHom_apply, minpoly.aeval,
-      map_zero]
+    rw [aeval_map_algebraMap, show T = Φ.toRatAlgHom θ from rfl, aeval_algHom_apply, minpoly.aeval, map_zero]
   have hroot : ∀ r : ℂ, r ∈ S ↔ aeval r (minpoly ℚ θ) = 0 := by
     intro r
     rw [Multiset.mem_toFinset, mem_roots hfmon.ne_zero, IsRoot.def, eval_map_algebraMap]
@@ -98,7 +142,7 @@ theorem spectral (K : Type) [Field K] [NumberField K] (g : ℕ) (Φ : K →+* Ma
   · have hne : S.Nonempty := ⟨_, hmemS (IsAlgClosed.lift (R := ℚ) (M := ℂ) (S := K)).toRingHom⟩
     rw [← Finset.sum_image (f := P) (fun τ _ τ' _ h => hinjθ τ τ' h), himage]
     show ∑ r ∈ S, aeval T (Lagrange.basis S id r) = 1
-    set_option synthInstance.maxHeartbeats 100000 in
+
     rw [← map_sum, Lagrange.sum_basis hinjS hne, map_one]
   · obtain ⟨q, hq, hτq⟩ := hpoly x
     rw [hq, aeval_mul_of_mul_eq (heig _ (hmemS τ)), hτq]
@@ -110,14 +154,14 @@ end GlobalTheory.UPel.HT.LieProj
 
 namespace GlobalTheory.UPel.HT.LieProj
 
-theorem exists_mul_eq_nat {K : Type} [Field K] [NumberField K] {x : 𝓞 K} (hx : x ≠ 0)
-    : ∃ (y : 𝓞 K) (N : ℕ), N ≠ 0 ∧ x * y = N := by
+theorem exists_mul_eq_nat {K : Type} [Field K] [NumberField K] {x : 𝓞 K} (hx : x ≠ 0) :
+    ∃ (y : 𝓞 K) (N : ℕ), N ≠ 0 ∧ x * y = N := by
   have hI : Ideal.span {x} ≠ ⊥ := by simpa [Ideal.span_singleton_eq_bot] using hx
   obtain ⟨y, hy⟩ := Ideal.mem_span_singleton'.mp (Ideal.absNorm_mem (Ideal.span {x}))
   exact ⟨y, _, fun h => hI (Ideal.absNorm_eq_zero_iff.mp h), by rw [mul_comm, hy]⟩
 
-theorem extend {K : Type} [Field K] [NumberField K] {g : ℕ} (ψ : 𝓞 K →+* Matrix (Fin g) (Fin g) ℂ)
-    : ∃ Φ : K →+* Matrix (Fin g) (Fin g) ℂ, ∀ c : 𝓞 K, Φ (c : K) = ψ c := by
+theorem extend {K : Type} [Field K] [NumberField K] {g : ℕ} (ψ : 𝓞 K →+* Matrix (Fin g) (Fin g) ℂ) :
+    ∃ Φ : K →+* Matrix (Fin g) (Fin g) ℂ, ∀ c : 𝓞 K, Φ (c : K) = ψ c := by
   have hcomm : ∀ a ∈ Set.range ψ, ∀ b ∈ Set.range ψ, a * b = b * a := by
     rintro _ ⟨a, rfl⟩ _ ⟨b, rfl⟩
     rw [← map_mul, mul_comm, map_mul]
@@ -131,51 +175,33 @@ theorem extend {K : Type} [Field K] [NumberField K] {g : ℕ} (ψ : 𝓞 K →+*
     intro y
     obtain ⟨y', N, hN, hy⟩ := exists_mul_eq_nat (nonZeroDivisors.coe_ne_zero y)
     refine IsUnit.of_mul_eq_one (ψ' y' * algebraMap ℚ _ (N : ℚ)⁻¹) ?_
-    rw [← mul_assoc, ← map_mul, hy, map_natCast,
-      ← map_natCast (algebraMap ℚ (Algebra.adjoin ℚ (Set.range ψ))), ← map_mul,
-      mul_inv_cancel₀ (by exact_mod_cast hN), map_one]
-  refine ⟨
-    (Algebra.adjoin ℚ (Set.range ψ)).val.toRingHom.comp
-      (IsLocalization.lift (M := nonZeroDivisors (𝓞 K)) (S := K) (g := ψ') hu),
-    fun c => ?_
-  ⟩
+    rw [← mul_assoc, ← map_mul, hy, map_natCast, ← map_natCast (algebraMap ℚ (Algebra.adjoin ℚ (Set.range ψ))),
+      ← map_mul, mul_inv_cancel₀ (by exact_mod_cast hN), map_one]
+  refine ⟨(Algebra.adjoin ℚ (Set.range ψ)).val.toRingHom.comp
+    (IsLocalization.lift (M := nonZeroDivisors (𝓞 K)) (S := K) (g := ψ') hu), fun c => ?_⟩
   have := IsLocalization.lift_eq (M := nonZeroDivisors (𝓞 K)) (S := K) (g := ψ') hu c
   simp only [RingHom.comp_apply]
   erw [this]
   rfl
 
-theorem idem_eq_zero {g : ℕ} {P : Matrix (Fin g) (Fin g) ℂ} (h : P * P = P) (ht : P.trace = 0)
-    : P = 0 := by
+theorem idem_eq_zero {g : ℕ} {P : Matrix (Fin g) (Fin g) ℂ} (h : P * P = P) (ht : P.trace = 0) : P = 0 := by
   have hPid : IsIdempotentElem (Matrix.toLinAlgEquiv' P) := (show IsIdempotentElem P from h).map _
   have hPtr : LinearMap.trace ℂ (Fin g → ℂ) (Matrix.toLinAlgEquiv' P) = 0 := by
     show LinearMap.trace ℂ (Fin g → ℂ) (Matrix.toLin' P) = 0
     rw [Matrix.trace_toLin'_eq, ht]
-  have :=
-    LinearMap.IsIdempotentElem.eq_zero_of_trace_eq_zero (e := Matrix.toLinAlgEquiv' P) hPid hPtr
+  have := LinearMap.IsIdempotentElem.eq_zero_of_trace_eq_zero (e := Matrix.toLinAlgEquiv' P) hPid hPtr
   exact (map_eq_zero_iff _ (Matrix.toLinAlgEquiv' (R := ℂ) (n := Fin g)).injective).mp this
 
 end GlobalTheory.UPel.HT.LieProj
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
-  NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
-  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.PELU
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.PELU
 open scoped Matrix
 open GlobalTheory.UPel.HT
 
 namespace GlobalTheory.UPel.HT.LieProj
 
-theorem lie_projectors
-    : ∀ (p : ℕ) [Fact p.Prime] (D : Datum p) (R : Type) [CommRing R] (b : Base D R) (σ : R →+* ℂ)
-        (ρ : D.O →+* Matrix (Fin D.g) (Fin D.g) ℂ),
-      b.IsType σ ρ
-        → ∃ E : Fin D.a → Matrix (Fin D.g) (Fin D.g) ℂ,
-          (∀ i, E i * E i = E i) ∧ (∀ i, (E i).trace = (D.m : ℂ))
-            ∧ (∀ i c, ρ (algebraMap (𝓞 D.F) D.O c) * E i = σ (b.t i c) • E i)
-            ∧ (∀ i c, E i * ρ (algebraMap (𝓞 D.F) D.O c) = σ (b.t i c) • E i)
-            ∧ (2 * σ b.ρ - D.tr) • ∑ i, E i
-              = ρ (algebraMap (𝓞 D.F) D.O D.ω)
-                - ((D.tr : ℂ) - σ b.ρ) • (1 : Matrix (Fin D.g) (Fin D.g) ℂ) := by
+theorem lie_projectors : ∀ (p : ℕ) [Fact p.Prime] (D : Datum p) (R : Type) [CommRing R] (b : Base D R) (σ : R →+* ℂ) (ρ : D.O →+* Matrix (Fin D.g) (Fin D.g) ℂ), b.IsType σ ρ → ∃ E : Fin D.a → Matrix (Fin D.g) (Fin D.g) ℂ, (∀ i, E i * E i = E i) ∧ (∀ i, (E i).trace = (D.m : ℂ)) ∧ (∀ i c, ρ (algebraMap (𝓞 D.F) D.O c) * E i = σ (b.t i c) • E i) ∧ (∀ i c, E i * ρ (algebraMap (𝓞 D.F) D.O c) = σ (b.t i c) • E i) ∧ (2 * σ b.ρ - D.tr) • ∑ i, E i = ρ (algebraMap (𝓞 D.F) D.O D.ω) - ((D.tr : ℂ) - σ b.ρ) • (1 : Matrix (Fin D.g) (Fin D.g) ℂ) := by
   intro p _ D R _ b σ ρ hT
   classical
   obtain ⟨Φ, hΦ⟩ := extend (ρ.comp (algebraMap (𝓞 D.F) D.O))
@@ -240,10 +266,8 @@ theorem lie_projectors
     have := congrArg (fun f : D.F →+* ℂ => f (D.ω : D.F)) hj
     simp only [RingHom.comp_apply, hτω, hω'] at this
     exact hnreal this
-  let coef : (D.F →+* ℂ) → ℂ := fun τ' =>
-    (D.m : ℂ)
-      * ((if τ' ∈ I then 1 else 0) + (if τ' (D.ω : D.F) = lam then 0 else (D.n : ℂ))
-        - (if τ' ∈ J then 1 else 0))
+  let coef : (D.F →+* ℂ) → ℂ := fun τ' => (D.m : ℂ) * ((if τ' ∈ I then 1 else 0) +
+    (if τ' (D.ω : D.F) = lam then 0 else (D.n : ℂ)) - (if τ' ∈ J then 1 else 0))
   have hdiff : ∀ c : 𝓞 D.F, ∑ τ', ((E τ').trace - coef τ') * τ' (c : D.F) = 0 := by
     intro c
     have h1 := hT c
@@ -255,20 +279,17 @@ theorem lie_projectors
       exact Finset.sum_congr rfl fun i _ => by simp [hτ i c]
     rw [hI, hJ, Finset.sum_filter, hΦ', hexp, Matrix.trace_sum] at h1
     rw [← Finset.sum_add_distrib, ← Finset.sum_sub_distrib, Finset.mul_sum, ← sub_eq_zero,
-        ← Finset.sum_sub_distrib]
-      at h1
+      ← Finset.sum_sub_distrib] at h1
     rw [← h1]
     refine Finset.sum_congr rfl fun τ' _ => ?_
     simp only [coef, Matrix.trace_smul, smul_eq_mul]
     split_ifs <;> first | ring1 | (exfalso; tauto)
-  have hlin :=
-    (linearIndependent_monoidHom (𝓞 D.F) ℂ).comp
-      (fun τ' : D.F →+* ℂ => ((τ'.comp (algebraMap (𝓞 D.F) D.F)).toMonoidHom : 𝓞 D.F →* ℂ))
-      (by
-        intro a a' h
-        apply IsLocalization.ringHom_ext (nonZeroDivisors (𝓞 D.F))
-        ext x
-        exact DFunLike.congr_fun h x)
+  have hlin := (linearIndependent_monoidHom (𝓞 D.F) ℂ).comp
+    (fun τ' : D.F →+* ℂ => ((τ'.comp (algebraMap (𝓞 D.F) D.F)).toMonoidHom : 𝓞 D.F →* ℂ)) (by
+      intro a a' h
+      apply IsLocalization.ringHom_ext (nonZeroDivisors (𝓞 D.F))
+      ext x
+      exact DFunLike.congr_fun h x)
   have hcoef : ∀ τ', (E τ').trace - coef τ' = 0 := by
     refine Fintype.linearIndependent_iff.mp hlin _ ?_
     funext c
@@ -291,9 +312,7 @@ theorem lie_projectors
   · rw [hΦ', hr, hτ]
   · have hL : ∑ i, E (τ i) = ∑ τ', (if τ' ∈ I then E τ' else 0) := by
       rw [Finset.sum_ite_mem, Finset.univ_inter, Finset.sum_image (fun i _ j _ h => hτinj h)]
-    have h1
-        : ((D.tr : ℂ) - lam) • (1 : Matrix (Fin D.g) (Fin D.g) ℂ)
-          = ∑ τ', ((D.tr : ℂ) - lam) • E τ' := by
+    have h1 : ((D.tr : ℂ) - lam) • (1 : Matrix (Fin D.g) (Fin D.g) ℂ) = ∑ τ', ((D.tr : ℂ) - lam) • E τ' := by
       rw [← hsum, Finset.smul_sum]
     rw [hL, h1, hΦ', hexp, ← Finset.sum_sub_distrib, Finset.smul_sum]
     refine Finset.sum_congr rfl fun τ' _ => ?_

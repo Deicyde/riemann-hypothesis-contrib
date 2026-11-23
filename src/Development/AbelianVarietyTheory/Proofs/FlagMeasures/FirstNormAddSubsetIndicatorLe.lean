@@ -1,37 +1,84 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Definitions.SemilocalFrames.OnePlaceKF
-public import Development.AbelianVarietyTheory.Definitions.Jets.SumIoPr
-public import Formalism.SharpRestriction.CuspSpanNormBounds.LeadMinorK
 public import Development.AbelianVarietyTheory.Definitions.SemilocalFrames.DegVand
 public import Formalism.LocalRingCardinality.DataTies
-public import Development.AbelianVarietyTheory.Proofs.JetHarmonics.TensorMomentEstimate
-public import Development.AbelianVarietyTheory.Proofs.JetHarmonics.FamilySetupBesselGrowth
-public import Development.AbelianVarietyTheory.Proofs.JetHarmonics.AbsCoordLeOfLOneNormLe
-public import Development.AbelianVarietyTheory.Proofs.JetHarmonics.NumericalFamilyShapeGaps
-public import Development.AbelianVarietyTheory.Proofs.JetHarmonics.HaarEqSmul
-public import Development.AbelianVarietyTheory.Proofs.JetHarmonics.TensorDecompositionInjectiveParameters
-public import Development.AbelianVarietyTheory.Proofs.JetHarmonics.PieriTensorDecomposition
-public import Development.AbelianVarietyTheory.Proofs.JetHarmonics.IsFRepExteriorPowerStandardRep
-public import Development.AbelianVarietyTheory.Proofs.JetHarmonics.DiscreteSeriesUnitarySmoothBasic
-public import Development.AbelianVarietyTheory.Proofs.JetHarmonics.LenEqOfUnitriangular
-public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.HaarLieIsHaarOnUnipotentRadicalStatement
-public import Development.AbelianVarietyTheory.Proofs.JetHarmonics.QuotientMeasureAeMemAndMeasurableBesselModel
-public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.BesselPeriodPositivityStatement
 public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.TorusNormaliserBessel
-public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.BlockProjectionBesselStatement
+public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.AmplitudeSizeConsequencesOfWordIndependentHyps
 public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.AmplitudesRelevantCellMonomialRepStatement
 public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.BesselMapPairingBoundStatement
-public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.ExistsUnitaryTorusScaleBesselCharacter
-public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.TorusCommutesWithUnipotentStatement
-public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.MomentPieriNumericsOfSizeHypsStatement
-public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.FormalDegreeProportional
+public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.BesselPeriodPositivityStatement
+public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.BlockProjectionBesselStatement
 public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.DegreeNearParameterBoundStatement
-public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.AmplitudeSizeConsequencesOfWordIndependentHyps
-public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.MassBoundLowTypesAltBis
-public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.PairingEqLeadingMinor
+import Development.AbelianVarietyTheory.Proofs.FlagMeasures.ExistsUnitaryTorusScaleBesselCharacter
 public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.FlagWedgeFixedAndLengthEqProdDistancesStatement
+import Development.AbelianVarietyTheory.Proofs.FlagMeasures.FormalDegreeProportional
+import Development.AbelianVarietyTheory.Proofs.FlagMeasures.HaarLieIsHaarOnUnipotentRadicalStatement
+public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.MassBoundLowTypesAltBis
+import Development.AbelianVarietyTheory.Proofs.FlagMeasures.MomentPieriNumericsOfSizeHypsStatement
+public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.PairingEqLeadingMinor
+public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.TorusCommutesWithUnipotentStatement
+import Development.AbelianVarietyTheory.Proofs.JetHarmonics.AbsCoordLeOfLOneNormLe
+import Development.AbelianVarietyTheory.Proofs.JetHarmonics.DiscreteSeriesUnitarySmoothBasic
+import Development.AbelianVarietyTheory.Proofs.JetHarmonics.FamilySetupBesselGrowth
+import Development.AbelianVarietyTheory.Proofs.JetHarmonics.HaarEqSmul
+import Development.AbelianVarietyTheory.Proofs.JetHarmonics.IsFRepExteriorPowerStandardRep
+import Development.AbelianVarietyTheory.Proofs.JetHarmonics.LenEqOfUnitriangular
+import Development.AbelianVarietyTheory.Proofs.JetHarmonics.NumericalFamilyShapeGaps
+import Development.AbelianVarietyTheory.Proofs.JetHarmonics.PieriTensorDecomposition
+import Development.AbelianVarietyTheory.Proofs.JetHarmonics.QuotientMeasureAeMemAndMeasurableBesselModel
+public import Development.AbelianVarietyTheory.Proofs.JetHarmonics.TensorDecompositionInjectiveParameters
+import Development.AbelianVarietyTheory.Proofs.JetHarmonics.TensorMomentEstimate
+import Formalism.HermitianCurvature.HermitianCurvatureProofs.BesselNeZeroOfCyclicOrbit
+import Formalism.HermitianCurvature.HermitianCurvatureProofs.ContinuousMulMt
+import Formalism.HermitianCurvature.HermitianCurvatureProofs.SigmaContOn
+import Formalism.HermitianCurvature.HermitianCurvatureProofs.SmoothAdd
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Int
+import Mathlib.Algebra.Order.Star.Real
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.Real.Pi.Bounds
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
@@ -228,7 +275,6 @@ theorem rpow_ratio {K c d e : ℝ} (hK : 0 < K) (hc : 0 < c) (hd : 0 < d) (he : 
   congr 1
   field_simp
 
-set_option maxHeartbeats 1000000 in
 theorem line_of_tens
     (hH : Hyps) (hKF : AmpKF) (hCC : CellConv)
     (D : D7)
@@ -667,7 +713,6 @@ theorem scale_le
     have : g * v / Real.pi ≤ g * v := div_le_self (by positivity) (by linarith)
     exact this.trans (mul_le_mul hgb (by nlinarith) (by linarith) (by linarith))
 
-set_option maxHeartbeats 1000000 in
 theorem minor_line
     : Hyps → AmpKF → CellConv
       → ∀ Cg cb Cu cT CT C0 C1 : ℝ, ∃ C : ℝ, ∀ Cn : ℝ, ∃ m₀ : ℝ, ∀ (D : D7) (large₂ : SizeData₂ D) (C' Cl : ℝ),

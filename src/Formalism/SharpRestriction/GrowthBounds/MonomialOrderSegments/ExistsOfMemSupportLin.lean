@@ -1,7 +1,56 @@
 module
 
-public import Formalism.SharpRestriction.GrowthBounds.MonomialOrderSegments.TestBoundOfRhoAndNormSets
 public import Formalism.SharpRestriction.GrowthBounds.MonomialOrderSegments.SegDefs
+public import Formalism.SharpRestriction.GrowthBounds.MonomialOrderSegments.DigitPartMonomial
+public import Formalism.SharpRestriction.GrowthBounds.MonomialOrderSegments.AddMemSupportOfMemSupportCoefOut
+public import Formalism.SharpRestriction.GrowthBounds.MonomialOrderSegments.Monomial
+public import Formalism.SharpRestriction.GrowthBounds.MonomialOrderSegments.TestBoundOfRhoAndNormSets
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Int
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Presheaf
+import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
@@ -16,8 +65,8 @@ variable {K : Type} [Field K]
 theorem lin_eq_sum {σ τ : Type} (T : MvPolynomial σ K →ₗ[K] MvPolynomial τ K) (Z : MvPolynomial σ K)
     : T Z = ∑ ζ ∈ Z.support, Z.coeff ζ • T (monomial ζ 1) := by
   conv_lhs => rw [Z.as_sum]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+
+  rw [map_sum]
   refine Finset.sum_congr rfl fun ζ _ => ?_
   rw [show monomial ζ (Z.coeff ζ) = Z.coeff ζ • monomial ζ (1 : K) by
       rw [smul_monomial, smul_eq_mul, mul_one],
@@ -35,7 +84,7 @@ theorem exists_of_mem_support_lin
   refine Finset.sum_eq_zero fun ζ hζ => ?_
   have hz := hc ζ hζ
   rw [mem_support_iff, not_not] at hz
-  rw [coeff_smul, hz, smul_zero]
+  rw [MvPolynomial.coeff_smul, hz, smul_zero]
 
 namespace TwistData
 
@@ -241,12 +290,12 @@ theorem inv_step
     rw [lin_eq_sum Th Z, coeff_sum]
     apply AddValuation.map_le_sum
     intro ζ hζ
-    rw [coeff_smul, smul_eq_mul, AddValuation.map_mul]
+    rw [MvPolynomial.coeff_smul, smul_eq_mul, AddValuation.map_mul]
     exact add_nonneg (hInt ζ) (tI ζ (hpre ζ hζ) α)
-  set_option synthInstance.maxHeartbeats 100000 in
-    · rw [lin_eq_sum Th Z, map_sum, ← hph, D.ph_lin_sum p Z]
-      refine Finset.sum_congr rfl fun ζ hζ => ?_
-      rw [map_smul, tph ζ (hpre ζ hζ)]
+
+  · rw [lin_eq_sum Th Z, map_sum, ← hph, D.ph_lin_sum p Z]
+    refine Finset.sum_congr rfl fun ζ hζ => ?_
+    rw [map_smul, tph ζ (hpre ζ hζ)]
   · intro ζ' hζ'
     obtain ⟨ζ, hζ, hζ'1⟩ := exists_of_mem_support_lin Th Z hζ'
     obtain ⟨hpost, hag⟩ := tsupp ζ (hpre ζ hζ) ζ' hζ'1
@@ -330,8 +379,8 @@ theorem Sp_monomial (p : ℕ) (ζ : D.EM)
   rw [Sp, lsup_monomial, one_smul]
 
 theorem ph_Sp (p : ℕ) (Z : MvPolynomial (D.ML × Fin D.r) K) : D.ph p (D.Sp p Z) = D.ph p Z := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [Sp, lsup_apply, map_sum, ph_eq_sum]
+
+  rw [Sp, lsup_apply, map_sum, ph_eq_sum]
   refine Finset.sum_congr rfl fun ζ _ => ?_
   rw [map_smul, ph_monomial, phE_splitE, smul_monomial, smul_eq_mul, mul_one]
 
@@ -345,7 +394,7 @@ theorem integral_Sp
   rw [Sp, lsup_apply, coeff_sum]
   apply AddValuation.map_le_sum
   intro ζ _
-  rw [coeff_smul, coeff_monomial]
+  rw [MvPolynomial.coeff_smul, coeff_monomial]
   split_ifs
   · rw [smul_eq_mul, mul_one]
     exact hZ ζ

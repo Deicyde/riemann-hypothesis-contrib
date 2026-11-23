@@ -1,6 +1,50 @@
 module
 
+public import Formalism.SharpRestriction.GrowthBounds.MonomialOrderSegments.DigitPartMonomial
+public import Formalism.SharpRestriction.GrowthBounds.MonomialOrderSegments.SecondEmbeddingInjective
+public import Formalism.SharpRestriction.GrowthBounds.MonomialOrderSegments.IntegralMonomial
 public import Formalism.SharpRestriction.GrowthBounds.MonomialOrderSegments.SubstitutionXFirstEmbedding
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+public import Formalism.SharpRestriction.GrowthBounds.MonomialOrderSegments.AddMemSupportOfMemSupportCoefOut
 
 @[expose] public section
 
@@ -10,11 +54,8 @@ open MvPolynomial Finset
 
 namespace Formalism.MainNotions.PlaneGram
 
-theorem monomial_mem_PolK_sg
-    {K : Type} [Field K]
-    {L : Type} {r : ℕ} (d : L → ℕ) (α : L × Fin r →₀ ℕ)
-    (c : K) (h : ∀ i, ldeg α i = d i)
-    : monomial α c ∈ PolK K r d := by
+theorem monomial_mem_PolK_sg {K : Type} [Field K] {L : Type} {r : ℕ} (d : L → ℕ) (α : L × Fin r →₀ ℕ)
+    (c : K) (h : ∀ i, ldeg α i = d i) : monomial α c ∈ PolK K r d := by
   rw [mem_PolK_iff]
   intro β hβ
   rw [Finset.mem_singleton.mp (MvPolynomial.support_monomial_subset hβ)]
@@ -32,17 +73,17 @@ def pullE (ζ : D.EM) : Fin (D.nB j + D.r) × Fin D.r →₀ ℕ :=
   Finsupp.comapDomain (Prod.map (D.e0 j) id) ζ
     (((D.index_embedding_injective j).prodMap (Function.injective_id (α := Fin D.r))).injOn)
 
-theorem pullE_apply (ζ : D.EM) (k : Fin (D.nB j + D.r)) (a : Fin D.r)
-    : D.pullE j ζ (k, a) = ζ (D.e0 j k, a) := by
+theorem pullE_apply (ζ : D.EM) (k : Fin (D.nB j + D.r)) (a : Fin D.r) :
+    D.pullE j ζ (k, a) = ζ (D.e0 j k, a) := by
   exact Finsupp.comapDomain_apply _ _ _ _
 
-theorem ldeg_pullE (ζ : D.EM) (k : Fin (D.nB j + D.r))
-    : ldeg (D.pullE j ζ) k = ldeg ζ (D.e0 j k) := by
+theorem ldeg_pullE (ζ : D.EM) (k : Fin (D.nB j + D.r)) :
+    ldeg (D.pullE j ζ) k = ldeg ζ (D.e0 j k) := by
   unfold ldeg
   simp only [pullE_apply]
 
-theorem mapDomain_pullE (ζ : D.EM)
-    : Finsupp.mapDomain (Prod.map (D.e0 j) id) (D.pullE j ζ) = eIn (D.outSeg j) ζ := by
+theorem mapDomain_pullE (ζ : D.EM) :
+    Finsupp.mapDomain (Prod.map (D.e0 j) id) (D.pullE j ζ) = eIn (D.outSeg j) ζ := by
   ext ⟨i, a⟩
   by_cases hi : ∃ k, D.e0 j k = i
   · obtain ⟨k, rfl⟩ := hi
@@ -50,16 +91,15 @@ theorem mapDomain_pullE (ζ : D.EM)
       (D.index_embedding_injective j).prodMap Function.injective_id
     have hout : ¬ D.outSeg j (D.e0 j k) := fun h => h ⟨k, rfl⟩
     exact (Finsupp.mapDomain_apply_of_injective hinj (D.pullE j ζ) (k, a)).trans
-      ((D.pullE_apply j ζ k a).trans
-        ((eIn_apply (out := D.outSeg j) ζ (D.e0 j k, a)).trans (if_neg hout)).symm)
+      ((D.pullE_apply j ζ k a).trans ((eIn_apply (out := D.outSeg j) ζ (D.e0 j k, a)).trans (if_neg hout)).symm)
   · have hout : D.outSeg j i := hi
     rw [Finsupp.mapDomain_notin_range]
     · exact ((eIn_apply (out := D.outSeg j) ζ (i, a)).trans (if_pos hout)).symm
     · rintro ⟨⟨k, b⟩, hkb⟩
       exact hi ⟨k, (Prod.mk.inj hkb).1⟩
 
-theorem pullE_congr (ζ ζ' : D.EM) (h : ∀ k a, ζ (D.e0 j k, a) = ζ' (D.e0 j k, a))
-    : D.pullE j ζ = D.pullE j ζ' := by
+theorem pullE_congr (ζ ζ' : D.EM) (h : ∀ k a, ζ (D.e0 j k, a) = ζ' (D.e0 j k, a)) :
+    D.pullE j ζ = D.pullE j ζ' := by
   ext ⟨k, a⟩
   rw [pullE_apply, pullE_apply]
   exact h k a
@@ -70,8 +110,8 @@ theorem pullE_eIn (ζ : D.EM) : D.pullE j (eIn (D.outSeg j) ζ) = D.pullE j ζ :
   have hout : ¬ D.outSeg j (D.e0 j k) := fun h => h ⟨k, rfl⟩
   exact (eIn_apply (out := D.outSeg j) ζ (D.e0 j k, a)).trans (if_neg hout)
 
-theorem pullE_deg (ζ : D.EM) (h : D.PreE j ζ) (k : Fin (D.nB j + D.r))
-    : ldeg (D.pullE j ζ) k = D.dO (D.eA j k) := by
+theorem pullE_deg (ζ : D.EM) (h : D.PreE j ζ) (k : Fin (D.nB j + D.r)) :
+    ldeg (D.pullE j ζ) k = D.dO (D.eA j k) := by
   rw [ldeg_pullE]
   cases k using Fin.addCases with
   | left a =>
@@ -84,33 +124,31 @@ theorem pullE_deg (ζ : D.EM) (h : D.PreE j ζ) (k : Fin (D.nB j + D.r))
 
 variable {ι : Type} [Fintype ι]
 
-def TT (cc : (Fin (D.nB j + D.r) × Fin D.r →₀ ℕ) → ι → K) (PP : ι → MvPolynomial (D.ML × Fin D.r) K)
-    : MvPolynomial (Fin (D.nB j + D.r) × Fin D.r) K →ₗ[K] MvPolynomial (D.ML × Fin D.r) K :=
+def TT (cc : (Fin (D.nB j + D.r) × Fin D.r →₀ ℕ) → ι → K) (PP : ι → MvPolynomial (D.ML × Fin D.r) K) :
+    MvPolynomial (Fin (D.nB j + D.r) × Fin D.r) K →ₗ[K] MvPolynomial (D.ML × Fin D.r) K :=
   lsup fun lam => ∑ b, cc lam b • PP b
 
-def Th (cc : (Fin (D.nB j + D.r) × Fin D.r →₀ ℕ) → ι → K) (PP : ι → MvPolynomial (D.ML × Fin D.r) K)
-    : MvPolynomial (D.ML × Fin D.r) K →ₗ[K] MvPolynomial (D.ML × Fin D.r) K :=
+def Th (cc : (Fin (D.nB j + D.r) × Fin D.r →₀ ℕ) → ι → K) (PP : ι → MvPolynomial (D.ML × Fin D.r) K) :
+    MvPolynomial (D.ML × Fin D.r) K →ₗ[K] MvPolynomial (D.ML × Fin D.r) K :=
   lsup fun ζ => monomial (eOut (D.outSeg j) ζ) 1 * D.TT j cc PP (monomial (D.pullE j ζ) 1)
 
-variable
-  (cc : (Fin (D.nB j + D.r) × Fin D.r →₀ ℕ) → ι → K) (PP : ι → MvPolynomial (D.ML × Fin D.r) K)
+variable (cc : (Fin (D.nB j + D.r) × Fin D.r →₀ ℕ) → ι → K) (PP : ι → MvPolynomial (D.ML × Fin D.r) K)
 
-theorem TT_monomial (lam : Fin (D.nB j + D.r) × Fin D.r →₀ ℕ)
-    : D.TT j cc PP (monomial lam 1) = ∑ b, cc lam b • PP b := by
+theorem TT_monomial (lam : Fin (D.nB j + D.r) × Fin D.r →₀ ℕ) :
+    D.TT j cc PP (monomial lam 1) = ∑ b, cc lam b • PP b := by
   simp only [TT, lsup_monomial, one_smul]
 
-theorem Th_monomial (ζ : D.EM)
-    : D.Th j cc PP (monomial ζ 1)
-      = monomial (eOut (D.outSeg j) ζ) 1 * ∑ b, cc (D.pullE j ζ) b • PP b := by
+theorem Th_monomial (ζ : D.EM) :
+    D.Th j cc PP (monomial ζ 1) =
+      monomial (eOut (D.outSeg j) ζ) 1 * ∑ b, cc (D.pullE j ζ) b • PP b := by
   simp only [Th, lsup_monomial, one_smul, TT_monomial]
 
-theorem TT_expand
-    (Ψ : ι → MvPolynomial (Fin (D.nB j + D.r) × Fin D.r) K) (hli : LinearIndependent K Ψ)
+theorem TT_expand (Ψ : ι → MvPolynomial (Fin (D.nB j + D.r) × Fin D.r) K)
+    (hli : LinearIndependent K Ψ)
     (hcc : ∀ lam, (∀ k, ldeg lam k = D.dO (D.eA j k)) → monomial lam (1 : K) = ∑ b, cc lam b • Ψ b)
     (Q : MvPolynomial (Fin (D.nB j + D.r) × Fin D.r) K)
-    (hQ : Q ∈ PolK K D.r (fun k => D.dO (D.eA j k)))
-    (a : ι → K) (ha : Q = ∑ b, a b • Ψ b)
-    : D.TT j cc PP Q = ∑ b, a b • PP b := by
+    (hQ : Q ∈ PolK K D.r (fun k => D.dO (D.eA j k))) (a : ι → K) (ha : Q = ∑ b, a b • Ψ b) :
+    D.TT j cc PP Q = ∑ b, a b • PP b := by
   classical
   have hQsupp : ∀ lam ∈ Q.support, ∀ k, ldeg lam k = D.dO (D.eA j k) := by
     intro lam hlam k
@@ -120,17 +158,16 @@ theorem TT_expand
     simp only [TT, lsup_apply, Finset.smul_sum, smul_smul, hc, Finset.sum_smul]
     exact Finset.sum_comm
   have hQ' : Q = ∑ b, c b • Ψ b := by
-    calc
-      Q = ∑ lam ∈ Q.support, Q.coeff lam • monomial lam (1 : K) := by
-        conv_lhs => rw [Q.as_sum]
-        refine Finset.sum_congr rfl fun lam _ => ?_
-        rw [MvPolynomial.smul_monomial, smul_eq_mul, mul_one]
+    calc Q = ∑ lam ∈ Q.support, Q.coeff lam • monomial lam (1 : K) := by
+            conv_lhs => rw [Q.as_sum]
+            refine Finset.sum_congr rfl fun lam _ => ?_
+            rw [MvPolynomial.smul_monomial, smul_eq_mul, mul_one]
       _ = ∑ lam ∈ Q.support, Q.coeff lam • ∑ b, cc lam b • Ψ b := by
-        refine Finset.sum_congr rfl fun lam hlam => ?_
-        rw [hcc lam (hQsupp lam hlam)]
+            refine Finset.sum_congr rfl fun lam hlam => ?_
+            rw [hcc lam (hQsupp lam hlam)]
       _ = ∑ b, c b • Ψ b := by
-        simp only [Finset.smul_sum, smul_smul, hc, Finset.sum_smul]
-        exact Finset.sum_comm
+            simp only [Finset.smul_sum, smul_smul, hc, Finset.sum_smul]
+            exact Finset.sum_comm
   have hca : ∀ b, c b = a b := by
     have h0 : ∑ b, (c b - a b) • Ψ b = 0 := by
       simp only [sub_smul, Finset.sum_sub_distrib]
@@ -140,38 +177,33 @@ theorem TT_expand
   rw [hT]
   exact Finset.sum_congr rfl fun b _ => by rw [hca b]
 
-theorem Th_integral
-    {v : AddValuation K (WithTop ℚ)}
+theorem Th_integral {v : AddValuation K (WithTop ℚ)}
     (hccint : ∀ lam, (∀ k, ldeg lam k = D.dO (D.eA j k)) → ∀ b, 0 ≤ v (cc lam b))
-    (hPP : ∀ b, Integral v (PP b))
-    (ζ : D.EM) (hζ : D.PreE j ζ)
-    : Integral v (D.Th j cc PP (monomial ζ 1)) := by
+    (hPP : ∀ b, Integral v (PP b)) (ζ : D.EM) (hζ : D.PreE j ζ) :
+    Integral v (D.Th j cc PP (monomial ζ 1)) := by
   rw [Th_monomial]
   apply integral_mul' (integral_monomial' _ (by simp))
   apply integral_sum'
   intro b _
   exact integral_smul' (hccint _ (D.pullE_deg j ζ hζ) b) (hPP b)
 
-theorem Th_ph
-    (p : ℕ) (Ψ : ι → MvPolynomial (Fin (D.nB j + D.r) × Fin D.r) K)
+theorem Th_ph (p : ℕ) (Ψ : ι → MvPolynomial (Fin (D.nB j + D.r) × Fin D.r) K)
     (hcc : ∀ lam, (∀ k, ldeg lam k = D.dO (D.eA j k)) → monomial lam (1 : K) = ∑ b, cc lam b • Ψ b)
-    (hPP : ∀ b, D.ph p (PP b) = rename (Prod.map (D.eA j) id) (Ψ b))
-    (ζ : D.EM) (hζ : D.PreE j ζ)
-    : D.ph p (D.Th j cc PP (monomial ζ 1)) = D.ph p (monomial ζ 1) := by
-  have hsum
-      : (∑ b, cc (D.pullE j ζ) b • rename (Prod.map (D.eA j) id) (Ψ b))
-        = D.ph p (monomial (eIn (D.outSeg j) ζ) 1) := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← D.mapDomain_pullE j ζ, ← MvPolynomial.rename_monomial,
-        substitution_rename_first_embedding, hcc _ (D.pullE_deg j ζ hζ), map_sum]
+    (hPP : ∀ b, D.ph p (PP b) = rename (Prod.map (D.eA j) id) (Ψ b)) (ζ : D.EM) (hζ : D.PreE j ζ) :
+    D.ph p (D.Th j cc PP (monomial ζ 1)) = D.ph p (monomial ζ 1) := by
+  have hsum : (∑ b, cc (D.pullE j ζ) b • rename (Prod.map (D.eA j) id) (Ψ b)) =
+      D.ph p (monomial (eIn (D.outSeg j) ζ) 1) := by
+
+    rw [← D.mapDomain_pullE j ζ, ← MvPolynomial.rename_monomial, substitution_rename_first_embedding,
+    hcc _ (D.pullE_deg j ζ hζ), map_sum]
     simp only [map_smul]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [Th_monomial, map_mul, map_sum]
+
+  rw [Th_monomial, map_mul, map_sum]
   simp only [map_smul, hPP]
   rw [hsum, ← map_mul, MvPolynomial.monomial_mul, one_mul, eOut_add_eIn]
 
-theorem Th_supp (ζ ζ' : D.EM) (h : ζ' ∈ (D.Th j cc PP (monomial ζ 1)).support)
-    : ∃ b, ∃ ξ ∈ (PP b).support, ζ' = eOut (D.outSeg j) ζ + ξ := by
+theorem Th_supp (ζ ζ' : D.EM) (h : ζ' ∈ (D.Th j cc PP (monomial ζ 1)).support) :
+    ∃ b, ∃ ξ ∈ (PP b).support, ζ' = eOut (D.outSeg j) ζ + ξ := by
   rw [Th_monomial, MvPolynomial.mem_support_iff, MvPolynomial.coeff_monomial_mul'] at h
   split_ifs at h with hle
   · rw [one_mul, MvPolynomial.coeff_sum] at h
@@ -195,11 +227,9 @@ theorem outSeg_of_not_segL (i : D.ML) (hi : ¬ D.SegL j i) : D.outSeg j i := by
     rw [first_embedding_natAdd]
     exact Or.inr (Or.inl ⟨Fin.rev m, rfl⟩)
 
-theorem Th_post
-    (hPP : ∀ b, ∀ ξ ∈ (PP b).support, D.PostE j ξ ∧ ∀ i, ¬ D.SegL j i → ∀ a, ξ (i, a) = 0)
-    (ζ : D.EM) (hζ : D.PreE j ζ)
-    (ζ' : D.EM) (h : ζ' ∈ (D.Th j cc PP (monomial ζ 1)).support)
-    : D.PostE j ζ' ∧ ∀ i, ¬ D.SegL j i → ∀ a, ζ' (i, a) = ζ (i, a) := by
+theorem Th_post (hPP : ∀ b, ∀ ξ ∈ (PP b).support, D.PostE j ξ ∧ ∀ i, ¬ D.SegL j i → ∀ a, ξ (i, a) = 0)
+    (ζ : D.EM) (hζ : D.PreE j ζ) (ζ' : D.EM) (h : ζ' ∈ (D.Th j cc PP (monomial ζ 1)).support) :
+    D.PostE j ζ' ∧ ∀ i, ¬ D.SegL j i → ∀ a, ζ' (i, a) = ζ (i, a) := by
   obtain ⟨b, ξ, hξ, rfl⟩ := D.Th_supp j cc PP ζ ζ' h
   obtain ⟨hpost, hzero⟩ := hPP b ξ hξ
   have hO : ∀ i, ¬ D.outSeg j i → ∀ a, eOut (D.outSeg j) ζ (i, a) = 0 := by
@@ -218,9 +248,8 @@ theorem Th_post
     split_ifs
     · exact hζ.2.2 m a
     · rfl
-  have hldeg
-      : ∀ i,
-        (∀ a, eOut (D.outSeg j) ζ (i, a) = 0) → ldeg (eOut (D.outSeg j) ζ + ξ) i = ldeg ξ i := by
+  have hldeg : ∀ i, (∀ a, eOut (D.outSeg j) ζ (i, a) = 0) →
+      ldeg (eOut (D.outSeg j) ζ + ξ) i = ldeg ξ i := by
     intro i hi
     simp only [ldeg, Finsupp.add_apply, hi, zero_add]
   refine ⟨⟨?_, ?_, ?_, ?_⟩, ?_⟩
@@ -240,11 +269,9 @@ theorem Th_post
     rw [Finsupp.add_apply, hzero i hi a, add_zero]
     exact (eOut_apply (out := D.outSeg j) ζ (i, a)).trans (if_pos (D.outSeg_of_not_segL j i hi))
 
-theorem Th_away
-    (hPP : ∀ b, ∀ ξ ∈ (PP b).support, ∀ i, ¬ D.SegL j i → ∀ a, ξ (i, a) = 0)
-    (S : Finset D.ML) (hS : ∀ i ∈ S, ¬ D.SegL j i)
-    (Z : MvPolynomial (D.ML × Fin D.r) K)
-    : valS D.msg S Z ≤ valS D.msg S (D.Th j cc PP Z) := by
+theorem Th_away (hPP : ∀ b, ∀ ξ ∈ (PP b).support, ∀ i, ¬ D.SegL j i → ∀ a, ξ (i, a) = 0)
+    (S : Finset D.ML) (hS : ∀ i ∈ S, ¬ D.SegL j i) (Z : MvPolynomial (D.ML × Fin D.r) K) :
+    valS D.msg S Z ≤ valS D.msg S (D.Th j cc PP Z) := by
   have hIn : ∀ α : D.EM, eIn (fun i => ¬ D.outSeg j i) α = eOut (D.outSeg j) α := by
     intro α
     ext x
@@ -253,9 +280,8 @@ theorem Th_away
     intro α
     ext x
     simp [eIn, eOut, Finsupp.filter_apply]
-  have hIn1
-      : ∀ α : D.EM,
-        D.Th j cc PP (monomial (eIn (D.outSeg j) α) 1) = ∑ b, cc (D.pullE j α) b • PP b := by
+  have hIn1 : ∀ α : D.EM,
+      D.Th j cc PP (monomial (eIn (D.outSeg j) α) 1) = ∑ b, cc (D.pullE j α) b • PP b := by
     intro α
     rw [Th_monomial, eOut_eIn, pullE_eIn, ← C_apply, map_one, one_mul]
   refine valS_outside_linear (fun i => ¬ D.outSeg j i) D.msg S (D.Th j cc PP) ?_ ?_ ?_ Z

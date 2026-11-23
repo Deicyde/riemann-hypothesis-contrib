@@ -1,8 +1,45 @@
 module
 
-public import Mathlib
 public import GroundTheory.ProfiniteCohomology.GlobalClassFormation.UnitsLevels
-public import GroundTheory.ProfiniteCohomology.LocalClassFormation.InvariantRes
+import GroundTheory.ProfiniteCohomology.CohomologyFunctoriality.Naturality
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
 
 @[expose] public section
 
@@ -81,7 +118,6 @@ theorem localUnitsMor_finiteComponentRep_levelDiag (u : Additive F.1ˣ)
       = (unitsLocalMor (v.adicCompletion K.1) ι).hom ((unitsLevelMor K F).hom u) :=
   congrArg Additive.ofMul (Units.ext (completionEmbedding_algebraMap ι F (u.toMul : F.1)))
 
-set_option maxHeartbeats 4000000 in
 theorem localInfl_finiteComponent_levelDiag (n : ℕ) (y : cohomology (galUnitsZ K.1 F.1) n)
     : (localInfl ι F n).hom
         ((finiteComponent (placeOfEmbedding ι F) n).hom ((cohomologyMap (levelDiag K F) n).hom y))
@@ -106,7 +142,6 @@ variable
   {v : InfinitePlace K.1} (ι : ℚ̄ →ₐ[K.1] AlgebraicClosure v.Completion)
   (F : FiniteSubfield) [Fact (K ≤ F)] [F.1.fixingSubgroup.Normal]
 
-set_option maxHeartbeats 4000000 in
 theorem levelDiag_infiniteComponent_infLocalInfl_cochains
     : cochainsMap (levelDiag K F)
         ≫ cochainsMapAlong
@@ -147,7 +182,6 @@ theorem levelDiag_infiniteComponent_infLocalInfl_cochains
   rw [funext fun i => hfun (σ i)]
   exact hval _
 
-set_option maxHeartbeats 4000000 in
 theorem infLocalInfl_infiniteComponent_levelDiag (n : ℕ) (y : cohomology (galUnitsZ K.1 F.1) n)
     : (infLocalInfl ι F n).hom
         ((infiniteComponent (infPlaceOfEmbedding ι F) n).hom
@@ -188,7 +222,6 @@ section Components
 
 variable (ι : LocalEmbeddings K) {n : ℕ} (hn : 1 ≤ n)
 
-set_option maxHeartbeats 4000000 in
 theorem idelesLimitCohomologyEquiv_unitsToIdeles_inr
     (v : HeightOneSpectrum (𝓞 K.1)) (x : cohomology (unitsLimitRep K) n)
     : idelesLimitCohomologyEquiv ι hn ((unitsToIdeles K n).hom x) (.inr v)
@@ -202,7 +235,6 @@ theorem idelesLimitCohomologyEquiv_unitsToIdeles_inr
   rw [CompatiblePlaces.shapiro_placeProj_inr]
   exact localInfl_finiteComponent_levelDiag (ι.fin v) p.1 n y
 
-set_option maxHeartbeats 4000000 in
 theorem idelesLimitCohomologyEquiv_unitsToIdeles_inl
     (v : InfinitePlace K.1) (x : cohomology (unitsLimitRep K) n)
     : idelesLimitCohomologyEquiv ι hn ((unitsToIdeles K n).hom x) (.inl v)

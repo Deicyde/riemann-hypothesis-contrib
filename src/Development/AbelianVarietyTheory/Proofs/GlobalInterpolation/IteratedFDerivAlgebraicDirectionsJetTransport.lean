@@ -1,12 +1,55 @@
 module
 
-public import Development.AbelianVarietyTheory.Definitions.GlobalTwisting.LatIntZero
-public import Formalism.LocalToGlobal.KernelLattices.LateralTheory
+public import Formalism.SharpRestriction.GlobalSchurBounds.GeneralLinearActions.IsDiscriminantTwelfthRootOfIdealLattice
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+public import Mathlib.Analysis.Analytic.IteratedFDeriv
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
+import Development.AbelianVarietyTheory.Definitions.GlobalTwisting.LatIntZero
+import Formalism.LocalToGlobal.KernelLattices.LateralTheory
+import Formalism.LocalToGlobal.InertKernelTheory.InertCoprimeLemmas.FourthTensorThetaEqKernel
 
 @[expose] public section
 
-open NumberField Formalism.BasicNotions Classical Formalism.MainNotions
-  Formalism.MainNotions.TaylorLogMetric Formalism.L2.Ker GlobalTheory.MomN
+open NumberField Formalism.BasicNotions Classical Formalism.MainNotions Formalism.MainNotions.TaylorLogMetric Formalism.L2.Ker GlobalTheory.MomN
 
 noncomputable section
 
@@ -20,56 +63,44 @@ def factP (n : σ →₀ ℕ) : ℂ_[p] := ∏ i, ((n i).factorial : ℂ_[p])
 
 theorem multiIndexFactorial_zero : (factP (0 : σ →₀ ℕ) : ℂ_[p]) = 1 := by simp [factP]
 
-theorem multiIndexFactorial_add_single (n : σ →₀ ℕ) (k : σ)
-    : (factP (n + Finsupp.single k 1) : ℂ_[p]) = factP n * ((n k : ℂ_[p]) + 1) := by
+theorem multiIndexFactorial_add_single (n : σ →₀ ℕ) (k : σ) :
+    (factP (n + Finsupp.single k 1) : ℂ_[p]) = factP n * ((n k : ℂ_[p]) + 1) := by
   unfold factP
-  have h
-      : ∀ i,
-        (((n + Finsupp.single k 1 : σ →₀ ℕ) i).factorial : ℂ_[p])
-          = ((n i).factorial : ℂ_[p]) * (if i = k then (n k : ℂ_[p]) + 1 else 1) := by
+  have h : ∀ i, (((n + Finsupp.single k 1 : σ →₀ ℕ) i).factorial : ℂ_[p]) =
+      ((n i).factorial : ℂ_[p]) * (if i = k then (n k : ℂ_[p]) + 1 else 1) := by
     intro i
     by_cases hi : i = k
     · subst hi
       rw [Finsupp.add_apply, Finsupp.single_eq_same, Nat.factorial_succ, if_pos rfl]
-      push_cast
-      ring
+      push_cast; ring
     · rw [Finsupp.add_apply, if_neg hi]
       simp [Finsupp.single_apply, Ne.symm hi]
-  rw [Finset.prod_congr rfl fun i _ => h i, Finset.prod_mul_distrib,
-    Finset.prod_ite_eq' Finset.univ k]
+  rw [Finset.prod_congr rfl fun i _ => h i, Finset.prod_mul_distrib, Finset.prod_ite_eq' Finset.univ k]
   simp
 
-theorem coeff_pd (k : σ) (F : MvPowerSeries σ ℂ_[p]) (n : σ →₀ ℕ)
-    : MvPowerSeries.coeff n (pd k F)
-      = ((n k : ℂ_[p]) + 1) * MvPowerSeries.coeff (n + Finsupp.single k 1) F :=
-  rfl
+theorem coeff_pd (k : σ) (F : MvPowerSeries σ ℂ_[p]) (n : σ →₀ ℕ) :
+    MvPowerSeries.coeff n (pd k F) = ((n k : ℂ_[p]) + 1) * MvPowerSeries.coeff (n + Finsupp.single k 1) F := rfl
 
 def cntL (l : List σ) : σ →₀ ℕ := (l.map fun k => Finsupp.single k 1).sum
 
-theorem coeff_foldr_pd (F : MvPowerSeries σ ℂ_[p])
-    : ∀ (l : List σ) (n : σ →₀ ℕ),
-      factP n * MvPowerSeries.coeff n (l.foldr (fun k G => pd k G) F)
-        = factP (n + cntL l) * MvPowerSeries.coeff (n + cntL l) F
+theorem coeff_foldr_pd (F : MvPowerSeries σ ℂ_[p]) : ∀ (l : List σ) (n : σ →₀ ℕ),
+    factP n * MvPowerSeries.coeff n (l.foldr (fun k G => pd k G) F) =
+      factP (n + cntL l) * MvPowerSeries.coeff (n + cntL l) F
   | [], n => by simp [cntL]
   | k :: l, n => by
     have hc : cntL (k :: l) = Finsupp.single k 1 + cntL l := by simp [cntL]
-    rw [List.foldr_cons, coeff_pd, ← mul_assoc, ← multiIndexFactorial_add_single,
-      coeff_foldr_pd F l, hc, add_assoc]
+    rw [List.foldr_cons, coeff_pd, ← mul_assoc, ← multiIndexFactorial_add_single, coeff_foldr_pd F l, hc, add_assoc]
 
-theorem pd_sum_smul
-    {ι : Type} (s : Finset ι) (a : ι → ℂ_[p]) (P : ι → MvPowerSeries σ ℂ_[p]) (k : σ)
-    : pd k (∑ i ∈ s, a i • P i) = ∑ i ∈ s, a i • pd k (P i) := by
+theorem pd_sum_smul {ι : Type} (s : Finset ι) (a : ι → ℂ_[p]) (P : ι → MvPowerSeries σ ℂ_[p]) (k : σ) :
+    pd k (∑ i ∈ s, a i • P i) = ∑ i ∈ s, a i • pd k (P i) := by
   ext n
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [coeff_pd, map_sum, map_smul, smul_eq_mul, Finset.mul_sum]
+
+  simp only [coeff_pd, map_sum, map_smul, smul_eq_mul, Finset.mul_sum]
   exact Finset.sum_congr rfl fun i _ => by ring
 
-theorem foldr_expand {β : Type} (c : β → σ → ℂ_[p]) (F : MvPowerSeries σ ℂ_[p])
-    : ∀ (m : ℕ) (y : Fin m → β),
-      (List.ofFn y).foldr
-          (fun b G => ∑ k, algebraMap ℂ_[p] (MvPowerSeries σ ℂ_[p]) (c b k) * pd k G)
-          F
-        = ∑ f : Fin m → σ, (∏ j, c (y j) (f j)) • (List.ofFn f).foldr (fun k G => pd k G) F
+theorem foldr_expand {β : Type} (c : β → σ → ℂ_[p]) (F : MvPowerSeries σ ℂ_[p]) : ∀ (m : ℕ) (y : Fin m → β),
+    (List.ofFn y).foldr (fun b G => ∑ k, algebraMap ℂ_[p] (MvPowerSeries σ ℂ_[p]) (c b k) * pd k G) F =
+      ∑ f : Fin m → σ, (∏ j, c (y j) (f j)) • (List.ofFn f).foldr (fun k G => pd k G) F
   | 0, y => by simp
   | m + 1, y => by
     rw [List.ofFn_succ, List.foldr_cons, foldr_expand c F m]
@@ -92,35 +123,17 @@ variable {σ : Type} [Fintype σ]
 
 def cnt {k : ℕ} (f : Fin k → σ) (i : σ) : ℕ := (Finset.univ.filter fun j => f j = i).card
 
-theorem perm_of_cnt {k : ℕ} (f l : Fin k → σ) (h : ∀ i, cnt f i = cnt l i)
-    : ∃ e : Equiv.Perm (Fin k), f = l ∘ e := by
+theorem perm_of_cnt {k : ℕ} (f l : Fin k → σ) (h : ∀ i, cnt f i = cnt l i) :
+    ∃ e : Equiv.Perm (Fin k), f = l ∘ e := by
   have e : ∀ c, {a // f a = c} ≃ {b // l b = c} := fun c =>
     Fintype.equivOfCardEq (by rw [Fintype.card_subtype, Fintype.card_subtype]; exact h c)
   refine ⟨Equiv.ofFiberEquiv e, ?_⟩
   funext a
   exact (Equiv.ofFiberEquiv_map e a).symm
 
-theorem cnt_toList (α : σ →₀ ℕ) (i : σ)
-    : cnt
-        (fun j : Fin (Multiset.card α.toMultiset) =>
-          α.toMultiset.toList.get ⟨j, by simpa using j.2⟩)
-        i
-      = α i := by
-  set l := fun j : Fin (Multiset.card α.toMultiset) => α.toMultiset.toList.get ⟨j, by simpa using j.2⟩
-  have hmap : Multiset.map l Finset.univ.val = α.toMultiset := by
-    rw [Fin.univ_val_map]
-    have : List.ofFn l = α.toMultiset.toList := by
-      refine List.ext_get (by simp) ?_
-      intro n h1 h2
-      simp [l]
-    rw [this, Multiset.coe_toList]
-  have h := congrArg (Multiset.count i) hmap
-  rw [Multiset.count_map, Finsupp.count_toMultiset] at h
-  rw [← h]
-  unfold cnt
-  rw [Finset.card_def, Finset.filter_val]
-  congr 1
-  exact Multiset.filter_congr fun j _ => eq_comm
+theorem cnt_toList (α : σ →₀ ℕ) (i : σ) :
+    cnt (fun j : Fin (Multiset.card α.toMultiset) => α.toMultiset.toList.get ⟨j, by simpa using j.2⟩) i = α i := by
+  apply _root_.Formalism.L2.KerInert.AlgP.cnt_toList <;> assumption
 
 def cntF {m : ℕ} (f : Fin m → σ) : σ →₀ ℕ := ∑ j, Finsupp.single (f j) 1
 
@@ -132,8 +145,8 @@ theorem cntF_apply {m : ℕ} (f : Fin m → σ) (i : σ) : cntF f i = cnt f i :=
   · rw [if_neg h, Finsupp.single_apply, if_neg h]
 
 theorem card_cntF {m : ℕ} (f : Fin m → σ) : Multiset.card (cntF f).toMultiset = m := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [cntF, map_sum, Multiset.card_sum]
+
+  rw [cntF, map_sum, Multiset.card_sum]
   simp
 
 end Cplx
@@ -142,8 +155,8 @@ section Main
 
 variable {D : D7} {N N' : ℕ}
 
-theorem vec_eq (v : VC D N N')
-    : v = ∑ k : D.what₂.Tau × Fin N' × Fin N, v k.1 k.2.1 k.2.2 • coordV D k := by
+theorem vec_eq (v : VC D N N') :
+    v = ∑ k : D.what₂.Tau × Fin N' × Fin N, v k.1 k.2.1 k.2.2 • coordV D k := by
   funext τ i j
   simp only [Finset.sum_apply, Pi.smul_apply, coordV, smul_eq_mul, mul_ite, mul_one, mul_zero]
   rw [Finset.sum_eq_single (τ, i, j)]
@@ -154,36 +167,29 @@ theorem vec_eq (v : VC D N N')
     exact hb rfl
   · simp
 
-theorem mlin_expand
-    {m : ℕ} (A : ContinuousMultilinearMap ℂ (fun _ : Fin m => VC D N N') ℂ) (v : Fin m → VC D N N')
-    : A v
-      = ∑ f : Fin m → D.what₂.Tau × Fin N' × Fin N,
-        (∏ j, v j (f j).1 (f j).2.1 (f j).2.2) * A (fun j => coordV D (f j)) := by
+theorem mlin_expand {m : ℕ} (A : ContinuousMultilinearMap ℂ (fun _ : Fin m => VC D N N') ℂ) (v : Fin m → VC D N N') :
+    A v = ∑ f : Fin m → D.what₂.Tau × Fin N' × Fin N,
+      (∏ j, v j (f j).1 (f j).2.1 (f j).2.2) * A (fun j => coordV D (f j)) := by
   have hv : v = fun j => ∑ k : D.what₂.Tau × Fin N' × Fin N, v j k.1 k.2.1 k.2.2 • coordV D k :=
     funext fun j => vec_eq (v j)
   conv_lhs => rw [hv]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [A.map_sum]
+
+  rw [A.map_sum]
   refine Finset.sum_congr rfl fun f _ => ?_
   rw [A.map_smul_univ, smul_eq_mul]
 
-theorem iFD_coord
-    (G : VC D N N' → ℂ) (hG : ContDiff ℂ ⊤ G) {m : ℕ} (f : Fin m → D.what₂.Tau × Fin N' × Fin N)
-    : iteratedFDeriv ℂ m G 0 (fun j => coordV D (f j))
-      = (∏ i, ((cntF f i).factorial : ℂ)) * taylor D G (cntF f) := by
-  have key
-      : ∀ (k : ℕ) (hk : k = m) (l : Fin k → D.what₂.Tau × Fin N' × Fin N),
-        (∀ i, cnt l i = cntF f i)
-          → iteratedFDeriv ℂ k G 0 (fun j => coordV D (l j))
-            = iteratedFDeriv ℂ m G 0 (fun j => coordV D (f j)) := by
+theorem iFD_coord (G : VC D N N' → ℂ) (hG : ContDiff ℂ ⊤ G) {m : ℕ} (f : Fin m → D.what₂.Tau × Fin N' × Fin N) :
+    iteratedFDeriv ℂ m G 0 (fun j => coordV D (f j)) =
+      (∏ i, ((cntF f i).factorial : ℂ)) * taylor D G (cntF f) := by
+  have key : ∀ (k : ℕ) (hk : k = m) (l : Fin k → D.what₂.Tau × Fin N' × Fin N), (∀ i, cnt l i = cntF f i) →
+      iteratedFDeriv ℂ k G 0 (fun j => coordV D (l j)) = iteratedFDeriv ℂ m G 0 (fun j => coordV D (f j)) := by
     rintro k rfl l hl
     obtain ⟨e, he⟩ := perm_of_cnt f l (fun i => by rw [hl, cntF_apply])
     rw [he]
     exact (hG.contDiffAt.iteratedFDeriv_comp_perm (fun j => coordV D (l j)) e).symm
-  have e1
-      : iteratedFDeriv ℂ (Multiset.card (cntF f).toMultiset) G 0
-          (fun i => coordV D ((cntF f).toMultiset.toList.get ⟨i, by simpa using i.2⟩))
-        = iteratedFDeriv ℂ m G 0 (fun j => coordV D (f j)) :=
+  have e1 : iteratedFDeriv ℂ (Multiset.card (cntF f).toMultiset) G 0
+      (fun i => coordV D ((cntF f).toMultiset.toList.get ⟨i, by simpa using i.2⟩)) =
+      iteratedFDeriv ℂ m G 0 (fun j => coordV D (f j)) :=
     key _ (card_cntF f) _ (cnt_toList (cntF f))
   have h0 : ((cntF f).prod fun _ n => (n.factorial : ℂ)) = ∏ i, ((cntF f i).factorial : ℂ) :=
     Finsupp.prod_fintype _ _ (by simp)
@@ -193,11 +199,10 @@ theorem iFD_coord
   rw [e1, h0, mul_div_cancel₀ _ hne]
 
 theorem embT_mem (τ : D.what₂.Tau) (x : D.host.E) : embT D τ x ∈ Qbar :=
-  mem_algebraicClosure_iff.2 ((Algebra.IsAlgebraic.isAlgebraic (R := ℚ) x).algHom
-    (embT D τ).toRatAlgHom)
+  mem_algebraicClosure_iff.2 ((Algebra.IsAlgebraic.isAlgebraic (R := ℚ) x).algHom (embT D τ).toRatAlgHom)
 
-theorem lam_mk {p : ℕ} [Fact p.Prime] (lam : Qbar →+* ℂ_[p]) (a : ℂ) (h : a ∈ Qbar)
-    : lam ⟨a, h⟩ = lamC lam a := by
+theorem lam_mk {p : ℕ} [Fact p.Prime] (lam : Qbar →+* ℂ_[p]) (a : ℂ) (h : a ∈ Qbar) :
+    lam ⟨a, h⟩ = lamC lam a := by
   unfold lamC; rw [dite_eq_left h]
 
 end Main
@@ -206,34 +211,22 @@ end GlobalTheory.JetTransport
 
 namespace GlobalTheory.JetTransport
 
-theorem jet_pSer
-    : ∀ (D : D7) (cc : Ideal (𝓞 D.host.K)) (δ : ℂ) (p : ℕ) [Fact p.Prime] (lam : Qbar →+* ℂ_[p])
-        (N N' : ℕ) (G : VC D N N' → ℂ),
-      ContDiff ℂ ⊤ G → CoefIn D G Qbar
-        → ∀ (m : ℕ) (y : Fin m → Matrix (Fin N') (Fin N) D.host.E),
-          iteratedFDeriv ℂ m G 0 (fun j => embV D (tor0 D cc δ) (y j)) ∈ Qbar
-            ∧ jet D lam y (pSer D lam G)
-              = lamC lam (iteratedFDeriv ℂ m G 0 fun j => embV D (tor0 D cc δ) (y j)) := by
+theorem jet_pSer : ∀ (D : D7) (cc : Ideal (𝓞 D.host.K)) (δ : ℂ) (p : ℕ) [Fact p.Prime] (lam : Qbar →+* ℂ_[p]) (N N' : ℕ) (G : VC D N N' → ℂ), ContDiff ℂ ⊤ G → CoefIn D G Qbar → ∀ (m : ℕ) (y : Fin m → Matrix (Fin N') (Fin N) D.host.E), iteratedFDeriv ℂ m G 0 (fun j => embV D (tor0 D cc δ) (y j)) ∈ Qbar ∧ jet D lam y (pSer D lam G) = lamC lam (iteratedFDeriv ℂ m G 0 fun j => embV D (tor0 D cc δ) (y j)) := by
   intro D cc δ p _ lam N N' G hG hco m y
-  have hC
-      : iteratedFDeriv ℂ m G 0 (fun j => embV D (tor0 D cc δ) (y j))
-        = ∑ f : Fin m → D.what₂.Tau × Fin N' × Fin N, (∏ j, embT D (f j).1 (y j (f j).2.1 (f j).2.2)) *
-            ((∏ i, ((cntF f i).factorial : ℂ)) * taylor D G (cntF f)) := by
+  have hC : iteratedFDeriv ℂ m G 0 (fun j => embV D (tor0 D cc δ) (y j)) =
+      ∑ f : Fin m → D.what₂.Tau × Fin N' × Fin N, (∏ j, embT D (f j).1 (y j (f j).2.1 (f j).2.2)) *
+        ((∏ i, ((cntF f i).factorial : ℂ)) * taylor D G (cntF f)) := by
     rw [mlin_expand]
     refine Finset.sum_congr rfl fun f _ => ?_
     rw [iFD_coord G hG f]
     rfl
-  have hP
-      : jet D lam y (pSer D lam G)
-        = ∑ f : Fin m → D.what₂.Tau × Fin N' × Fin N, (∏ j, lamC lam (embT D (f j).1 (y j (f j).2.1 (f j).2.2))) *
-            ((∏ i, ((cntF f i).factorial : ℂ_[p])) * lamC lam (taylor D G (cntF f))) := by
+  have hP : jet D lam y (pSer D lam G) =
+      ∑ f : Fin m → D.what₂.Tau × Fin N' × Fin N, (∏ j, lamC lam (embT D (f j).1 (y j (f j).2.1 (f j).2.2))) *
+        ((∏ i, ((cntF f i).factorial : ℂ_[p])) * lamC lam (taylor D G (cntF f))) := by
     unfold jet
     rw [← MvPowerSeries.coeff_zero_eq_constantCoeff_apply]
-    have hx :=
-      foldr_expand
-        (fun (b : Matrix (Fin N') (Fin N) D.host.E) (k : D.what₂.Tau × Fin N' × Fin N) =>
-          lamC lam (embT D k.1 (b k.2.1 k.2.2)))
-        (pSer D lam G) m y
+    have hx := foldr_expand (fun (b : Matrix (Fin N') (Fin N) D.host.E) (k : D.what₂.Tau × Fin N' × Fin N) =>
+      lamC lam (embT D k.1 (b k.2.1 k.2.2))) (pSer D lam G) m y
     erw [hx, map_sum]
     refine Finset.sum_congr rfl fun f _ => ?_
     rw [map_smul, smul_eq_mul]
@@ -248,12 +241,11 @@ theorem jet_pSer
   have hz : (z : ℂ) = iteratedFDeriv ℂ m G 0 (fun j => embV D (tor0 D cc δ) (y j)) := by
     rw [hC, hzdef, IntermediateField.coe_sum]
     refine Finset.sum_congr rfl fun f _ => ?_
-    rw [IntermediateField.coe_mul, IntermediateField.coe_mul, IntermediateField.coe_prod,
-      IntermediateField.coe_prod]
+    rw [IntermediateField.coe_mul, IntermediateField.coe_mul, IntermediateField.coe_prod, IntermediateField.coe_prod]
     simp
   have hl : lam z = jet D lam y (pSer D lam G) := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hP, hzdef, map_sum]
+
+    rw [hP, hzdef, map_sum]
     refine Finset.sum_congr rfl fun f _ => ?_
     simp only [map_mul, map_prod, map_natCast, lam_mk]
   refine ⟨hz ▸ z.2, ?_⟩

@@ -1,6 +1,48 @@
 module
 
 public import Development.WeilBound.RepresentationTheoryGL.SiegelWeilProof.HolomorphicContinuation.MollifiedIntegrability.DensDefs
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+public import Mathlib.Topology.Algebra.MvPolynomial
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -14,14 +56,13 @@ open PositivityTheory.Rg.Sw
 
 variable {m n : ℕ}
 
-theorem gramX_star (ε : Fin m → Bool) (x : Fin m → Fin n → ℂ) (i j : Fin n)
-    : star (gramX ε x i j) = gramX ε x j i := by
-  set_option synthInstance.maxHeartbeats 100000 in
-  simp only [gramX, Qp, Qb, evX, map_sub, map_sum, map_mul, MvPolynomial.eval_X, ↓ reduceIte,
-    Bool.false_eq_true, star_sub, star_sum, star_mul, star_star]
+theorem gramX_star (ε : Fin m → Bool) (x : Fin m → Fin n → ℂ) (i j : Fin n) :
+    star (gramX ε x i j) = gramX ε x j i := by
 
-theorem herm_hinv (T : Matrix (Fin n) (Fin n) ℂ) (hT : ∀ i j, star (T i j) = T j i)
-    : herm (hinv T) = T := by
+  simp only [gramX, Qp, Qb, evX, map_sub, map_sum, map_mul, MvPolynomial.eval_X, ↓reduceIte,
+  Bool.false_eq_true, star_sub, star_sum, star_mul, star_star]
+
+theorem herm_hinv (T : Matrix (Fin n) (Fin n) ℂ) (hT : ∀ i j, star (T i j) = T j i) : herm (hinv T) = T := by
   ext i j
   have h1 : (T j i).re = (T i j).re := by rw [← hT i j]; simp
   have h2 : (T j i).im = -(T i j).im := by rw [← hT i j]; simp
@@ -36,10 +77,9 @@ theorem hinv_herm' (y : E n) : hinv (herm y) = y := by
   simp [hinv, herm]
   ring
 
-theorem herm_mul_apply (y y' : E n) (i j : Fin n)
-    : herm y i j * herm y' j i
-      = (((y i j * y' i j + y j i * y' j i) / 2 : ℝ) : ℂ)
-        + Complex.I * (((y i j * y' j i - y j i * y' i j) / 2 : ℝ) : ℂ) := by
+theorem herm_mul_apply (y y' : E n) (i j : Fin n) :
+    herm y i j * herm y' j i =
+      (((y i j * y' i j + y j i * y' j i) / 2 : ℝ) : ℂ) + Complex.I * (((y i j * y' j i - y j i * y' i j) / 2 : ℝ) : ℂ) := by
   apply Complex.ext <;> simp [herm] <;> ring
 
 theorem trace_herm_mul (y y' : E n) : (herm y * herm y').trace = ((ip y y' : ℝ) : ℂ) := by
@@ -53,12 +93,11 @@ theorem trace_herm_mul (y y' : E n) : (herm y * herm y').trace = ((ip y y' : ℝ
     simp only [ip, ← Finset.sum_add_distrib]
     refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
     ring
-  calc
-    (herm y * herm y').trace
-      = ∑ i, ∑ j, herm y i j * herm y' j i := by simp [Matrix.trace, Matrix.mul_apply]
-    _ = ((∑ i, ∑ j, (y i j * y' i j + y j i * y' j i) / 2 : ℝ) : ℂ)
-        + Complex.I * ((∑ i, ∑ j, (y i j * y' j i - y j i * y' i j) / 2 : ℝ) : ℂ) := by
-      simp only [herm_mul_apply, Finset.sum_add_distrib, Complex.ofReal_sum, Finset.mul_sum]
+  calc (herm y * herm y').trace = ∑ i, ∑ j, herm y i j * herm y' j i := by
+        simp [Matrix.trace, Matrix.mul_apply]
+    _ = ((∑ i, ∑ j, (y i j * y' i j + y j i * y' j i) / 2 : ℝ) : ℂ) +
+          Complex.I * ((∑ i, ∑ j, (y i j * y' j i - y j i * y' i j) / 2 : ℝ) : ℂ) := by
+        simp only [herm_mul_apply, Finset.sum_add_distrib, Complex.ofReal_sum, Finset.mul_sum]
     _ = ((ip y y' : ℝ) : ℂ) := by rw [h1, h2]; simp
 
 theorem evX_detQ (ε : Fin m → Bool) (x : Fin m → Fin n → ℂ) : evX (detQ ε) x = (gramX ε x).det := by
@@ -73,15 +112,12 @@ theorem continuous_evX (P : PX m n) : Continuous fun x : Fin m → Fin n → ℂ
 
 theorem continuous_qX (ε : Fin m → Bool) : Continuous (qX (n := n) ε) := by
   unfold qX hinv gramX
-  exact continuous_pi fun i =>
-    continuous_pi fun j =>
-      (Complex.continuous_re.comp (continuous_evX _)).add
-        (Complex.continuous_im.comp (continuous_evX _))
+  exact continuous_pi fun i => continuous_pi fun j =>
+    (Complex.continuous_re.comp (continuous_evX _)).add (Complex.continuous_im.comp (continuous_evX _))
 
 theorem algA : AlgA := by
   intro m n ε
-  refine
-    ⟨fun y x => ?_, fun x => herm_hinv _ (gramX_star ε x), hinv_herm', evX_detQ ε, continuous_qX ε⟩
+  refine ⟨fun y x => ?_, fun x => herm_hinv _ (gramX_star ε x), hinv_herm', evX_detQ ε, continuous_qX ε⟩
   have h := trace_herm_mul y (qX ε x)
   rwa [show herm (qX ε x) = gramX ε x from herm_hinv _ (gramX_star ε x)] at h
 

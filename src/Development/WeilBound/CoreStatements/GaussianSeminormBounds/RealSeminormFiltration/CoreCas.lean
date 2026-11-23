@@ -1,8 +1,56 @@
 module
 
+public import Mathlib.Analysis.CStarAlgebra.Module.Constructions
+public import Mathlib.LinearAlgebra.FiniteDimensional.Defs
 public import Development.WeilBound.CoreStatements.GaussianSeminormBounds.RealSeminormFiltration.CoreCasA
 public import Development.WeilBound.CoreStatements.GaussianSeminormBounds.RealSeminormFiltration.CoreCasB
 public import Development.WeilBound.CoreStatements.GaussianSeminormBounds.RealSeminormFiltration.CoreCasC
+import Mathlib.Algebra.Module.StablyFree.Basic
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.InnerProductSpace.Dual
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.Order.CompletePartialOrder
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -13,29 +61,23 @@ open scoped InnerProductSpace
 
 namespace PositivityTheory.KReal
 
-theorem cas_bound
-    {K I : Type} [Fintype K] [Fintype I] [DecidableEq I]
-    (σ : K → K) (hσ : Function.Involutive σ)
-    {M : Type} [AddCommGroup M] [Module ℂ M]
-    (e : K → Module.End ℂ M) (X : I → Module.End ℂ M)
-    (c : K → Matrix I I ℂ)
-    (d c0 : ℝ)
+theorem cas_bound {K I : Type} [Fintype K] [Fintype I] [DecidableEq I] (σ : K → K) (hσ : Function.Involutive σ)
+    {M : Type} [AddCommGroup M] [Module ℂ M] (e : K → Module.End ℂ M) (X : I → Module.End ℂ M)
+    (c : K → Matrix I I ℂ) (d c0 : ℝ)
     (h1 : ∀ k i, e k * X i - X i * e k = ∑ j, c k j i • X j)
     (h2 : ∀ i j, X i * X j - X j * X i ∈ Submodule.span ℂ (Set.range e))
-    (h3 : ∀ k, c (σ k) = (c k)ᴴ) (h4 : ∑ k, c k * c (σ k) = (d : ℂ) • (1 : Matrix I I ℂ))
+    (h3 : ∀ k, c (σ k) = (c k)ᴴ)
+    (h4 : ∑ k, c k * c (σ k) = (d : ℂ) • (1 : Matrix I I ℂ))
     {V : Type} [NormedAddCommGroup V] [InnerProductSpace ℂ V] [FiniteDimensional ℂ V]
     (ρ : K → Module.End ℂ V) (hadj : ∀ k u v, ⟪ρ k u, v⟫_ℂ = ⟪u, ρ (σ k) v⟫_ℂ)
     (hc0 : ∑ k, ρ k * ρ (σ k) = (c0 : ℂ) • (1 : Module.End ℂ V))
     (ι : V →ₗ[ℂ] M) (hι : ∀ k v, ι (ρ k v) = e k (ι v))
-    (h5 : ∀ t : ℝ,
-      t ≤ c0 + d
-        → ∀ x ∈ Submodule.span ℂ {y | ∃ i v, y = X i (ι v)},
-          (∑ k, e k * e (σ k)) x = (t : ℂ) • x → x = 0)
+    (h5 : ∀ t : ℝ, t ≤ c0 + d → ∀ x ∈ Submodule.span ℂ {y | ∃ i v, y = X i (ι v)},
+      (∑ k, e k * e (σ k)) x = (t : ℂ) • x → x = 0)
     (G : Submodule ℂ M)
-    (hG
-      : G = sInf {N | LinearMap.range ι ≤ N ∧ (∀ k, ∀ x ∈ N, e k x ∈ N) ∧ ∀ i, ∀ x ∈ N, X i x ∈ N})
-    : (∀ x ∈ G, (∑ k, e k * e (σ k)) x - (c0 : ℂ) • x ∈ LinearMap.range ι → x ∈ LinearMap.range ι)
-      ∧ ∀ x ∈ G, ∃ F : Submodule ℂ M, FiniteDimensional ℂ F ∧ x ∈ F ∧ ∀ k, ∀ y ∈ F, e k y ∈ F := by
+    (hG : G = sInf {N | LinearMap.range ι ≤ N ∧ (∀ k, ∀ x ∈ N, e k x ∈ N) ∧ ∀ i, ∀ x ∈ N, X i x ∈ N}) :
+    (∀ x ∈ G, (∑ k, e k * e (σ k)) x - (c0 : ℂ) • x ∈ LinearMap.range ι → x ∈ LinearMap.range ι) ∧
+    ∀ x ∈ G, ∃ F : Submodule ℂ M, FiniteDimensional ℂ F ∧ x ∈ F ∧ ∀ k, ∀ y ∈ F, e k y ∈ F := by
   classical
   have hFe : ∀ n k, ∀ x ∈ filtX X ι n, e k x ∈ filtX X ι n := fun n k => filtX_e e X c h1 ρ ι hι n k
   have hGF : ∀ x ∈ G, ∃ n, x ∈ filtX X ι n := by
@@ -61,8 +103,7 @@ theorem cas_bound
   have hCF : ∀ n, ∀ x ∈ filtX X ι n, C x ∈ filtX X ι n := by
     intro n x hx
     rw [hCa, LinearMap.sum_apply]
-    exact Submodule.sub_mem _ (Submodule.sum_mem _ fun k _ => hFe n k _ (hFe n _ x hx))
-      (Submodule.smul_mem _ _ hx)
+    exact Submodule.sub_mem _ (Submodule.sum_mem _ fun k _ => hFe n k _ (hFe n _ x hx)) (Submodule.smul_mem _ _ hx)
 
   have hsurj : ∀ n, filtX X ι (n + 1) ≤ filtX X ι n ⊔ (filtX X ι (n + 1)).map C := by
     intro n
@@ -78,30 +119,22 @@ theorem cas_bound
     have hex : ∀ w : Fin (n + 1) → I, ∃ u : V, ∀ v, ⟪u, v⟫_ℂ = φ (W w (ι v)) := by
       intro w
       haveI : CompleteSpace V := FiniteDimensional.complete ℂ V
-      refine ⟨
-        (InnerProductSpace.toDual ℂ V).symm (LinearMap.toContinuousLinearMap (φ ∘ₗ (W w) ∘ₗ ι)),
-        fun v => ?_
-      ⟩
+      refine ⟨(InnerProductSpace.toDual ℂ V).symm
+        (LinearMap.toContinuousLinearMap (φ ∘ₗ (W w) ∘ₗ ι)), fun v => ?_⟩
       rw [InnerProductSpace.toDual_symm_apply]
       rfl
     choose Ψ hΨ using hex
     have hWm : ∀ w v, W w (ι v) ∈ filtX X ι (n + 1) := fun w v =>
       Submodule.subset_span ⟨List.ofFn w, v, by simp, rfl⟩
     have hΨ0 : Ψ = 0 := by
-      refine cas_tensor σ hσ e c c0 h3 ρ hadj hc0 ι hι W
-        (fun k w => wordX_comm e X c h1 k (n + 1) w)
-        φ Ψ hΨ
-        (fun w v => ?_)
-        (fun s w => ?_)
+      refine cas_tensor σ hσ e c c0 h3 ρ hadj hc0 ι hι W (fun k w => wordX_comm e X c h1 k (n + 1) w) φ Ψ hΨ
+        (fun w v => ?_) (fun s w => ?_)
       · rw [← hCa]
         exact hφz _ (Submodule.mem_sup_right (Submodule.mem_map_of_mem (hWm w v)))
-      · refine cas_one σ hσ e X c d c0 h1 h3 h4 ρ hadj hc0 ι hι h5
-          (fun i => Ψ (Function.update w s i))
+      · refine cas_one σ hσ e X c d c0 h1 h3 h4 ρ hadj hc0 ι hι h5 (fun i => Ψ (Function.update w s i))
           (fun Θ hΘ => ?_)
-        have key
-            : ∀ i,
-              ⟪Ψ (Function.update w s i), Θ i⟫_ℂ
-                = φ (wordX X ((List.ofFn w).eraseIdx s) (X i (ι (Θ i)))) := by
+        have key : ∀ i, ⟪Ψ (Function.update w s i), Θ i⟫_ℂ =
+            φ (wordX X ((List.ofFn w).eraseIdx s) (X i (ι (Θ i)))) := by
           intro i
           rw [hΨ]
           have hp : (List.ofFn (Function.update w s i)).Perm ((List.ofFn w).eraseIdx s ++ [i]) := by
@@ -113,8 +146,7 @@ theorem cas_bound
                 by_cases hm : (s : ℕ) = m
                 · subst hm; simp
                 · rw [if_neg hm, Function.update_of_ne]
-                  intro h
-                  exact hm (by rw [← h])
+                  intro h; exact hm (by rw [← h])
             rw [e1]
             exact (List.set_perm_cons_eraseIdx (by simpa using s.2) i).trans
               (List.perm_append_singleton _ _).symm
@@ -124,13 +156,13 @@ theorem cas_bound
           refine h0.trans ?_
           simp [wordX]
         simp only [key]
-        set_option synthInstance.maxHeartbeats 100000 in
+
         rw [← map_sum, ← map_sum, hΘ, map_zero, map_zero]
     apply hφx
     obtain ⟨y, hy, z, hz, rfl⟩ := Submodule.mem_sup.1 (filtX_succ_le X ι n hx)
     rw [map_add (f := _), hφz y (Submodule.mem_sup_left hy), zero_add]
-    have : Submodule.span ℂ {y | ∃ (w : Fin (n + 1) → I) (v : V), y = wordX X (List.ofFn w) (ι v)}
-        ≤ LinearMap.ker φ := by
+    have : Submodule.span ℂ {y | ∃ (w : Fin (n + 1) → I) (v : V), y = wordX X (List.ofFn w) (ι v)} ≤
+        LinearMap.ker φ := by
       rw [Submodule.span_le]
       rintro _ ⟨w, v, rfl⟩
       have := hΨ w v

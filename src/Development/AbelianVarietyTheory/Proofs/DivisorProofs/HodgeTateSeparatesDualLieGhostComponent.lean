@@ -1,37 +1,65 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Definitions.Divisors.GhostFrobenius
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.SmulMemRange
+public import Development.AbelianVarietyTheory.Proofs.CoherentCohomologyProofs.IsSaturatedSubmoduleIffExistsIsComplOfValuationR
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FontaineAinfLocalDomainXiAdicOrderStatement
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.HodgeTateLatticeEqRowSpaceOfSandwichDatumStatement
-public import Development.AbelianVarietyTheory.Proofs.CoherentCohomologyProofs.IsSaturatedSubmoduleIffExistsIsComplOfValuationR
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.SmulMemRange
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Etale.Weakly
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
 
 @[expose] public section
 
-open CategoryTheory Opposite Matrix GlobalTheory GlobalTheory.PDivGroup GlobalTheory.Sandwich
-  GlobalTheory.IndefiniteRowSideFullHecke.EpsilonPairingZeta GlobalTheory.PDivLat
+open CategoryTheory Opposite Matrix GlobalTheory GlobalTheory.PDivGroup GlobalTheory.Sandwich GlobalTheory.IndefiniteRowSideFullHecke.EpsilonPairingZeta GlobalTheory.PDivLat
 
 namespace GlobalTheory.LieHodgeTate
 
-theorem main
-    : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C] [CharZero C]
-        (v : Valuation C NNReal) (O : Type) [CommRing O] [Algebra O C] [Fact ¬ IsUnit (p : O)]
-        [IsAdicComplete (Ideal.span {(p : O)}) O] [IsDomain O],
-      v.Integers O
-        → ∀ (ε : PreTilt O p) (hε : IsPrimitiveSystem ε), ∀ G : PDivGroup p O,
-          HasDatum hε G
-            → (∀ x : G.dual.Lie, (∀ t, x (hodgeTate G t) = 0) → x = 0)
-              ∧ (∀ x : G.dual.Lie, ∃ y : latt G, ∀ t,
-                WittVector.fontaineTheta O p (y.1 t) = x (hodgeTate G t)) := by
+theorem main : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C] [CharZero C] (v : Valuation C NNReal) (O : Type) [CommRing O] [Algebra O C] [Fact ¬IsUnit (p : O)] [IsAdicComplete (Ideal.span {(p : O)}) O] [IsDomain O], v.Integers O → ∀ (ε : PreTilt O p) (hε : IsPrimitiveSystem ε), ∀ G : PDivGroup p O, HasDatum hε G → (∀ x : G.dual.Lie, (∀ t, x (hodgeTate G t) = 0) → x = 0) ∧ (∀ x : G.dual.Lie, ∃ y : latt G, ∀ t, WittVector.fontaineTheta O p (y.1 t) = x (hodgeTate G t)) := by
   intro p _ C _ _ _ v O _ _ _ _ _ hv ε hε G hG
   obtain ⟨D, e, fil, lie, hal, -⟩ := hG
   have hprim : IsPrimitiveRoot (root ε).untilt p := by
     have := hε 1
     simpa [zeta] using this
   obtain ⟨-, hle, -, hfil, -, -⟩ := HodgeTateBound.bound p C v O hv ε hprim ℤ_[p] G.height D
-  obtain ⟨-, -, -, hsurj, hν, -, -⟩ :=
-    GlobalTheory.T.fontaineAinf_localDomain_xiAdic_order p C v O hv ε hprim
+  obtain ⟨-, -, -, hsurj, hν, -, -⟩ := GlobalTheory.T.fontaineAinf_localDomain_xiAdic_order p C v O hv ε hprim
   have hsingle : ∀ i, toO e (e.symm (Pi.single i 1)) = Pi.single i 1 := by
     intro i
     funext j
@@ -46,10 +74,8 @@ theorem main
       apply (Pi.basisFun O (Fin G.height)).ext
       intro i
       rw [Pi.basisFun_apply, LinearMap.zero_apply, ← hsingle i]
-      have h1
-          : (⟨D.al (toO e (e.symm (Pi.single i 1))), hle ⟨_, rfl⟩⟩ : D.Fil)
-            = fil (hodgeTate G (e.symm (Pi.single i 1))) :=
-        Subtype.ext (hal _)
+      have h1 : (⟨D.al (toO e (e.symm (Pi.single i 1))), hle ⟨_, rfl⟩⟩ : D.Fil) =
+          fil (hodgeTate G (e.symm (Pi.single i 1))) := Subtype.ext (hal _)
       change x (fil.symm ⟨D.al _, _⟩) = 0
       rw [h1, LinearEquiv.symm_apply_apply]
       exact hx _
@@ -58,8 +84,8 @@ theorem main
     have h1 : WittVector.fontaineTheta O p (nu ε) • fil w = ⟨D.al u, hle ⟨u, rfl⟩⟩ :=
       Subtype.ext hu.symm
     have h2 : WittVector.fontaineTheta O p (nu ε) * x w = 0 := by
-      rw [← smul_eq_mul, ← map_smul,
-        ← fil.symm_apply_apply (WittVector.fontaineTheta O p (nu ε) • w), map_smul fil, h1]
+      rw [← smul_eq_mul, ← map_smul, ← fil.symm_apply_apply (WittVector.fontaineTheta O p (nu ε) • w),
+        map_smul fil, h1]
       exact LinearMap.congr_fun hφ u
     rcases mul_eq_zero.1 h2 with h | h
     · exact absurd h hν
@@ -72,11 +98,10 @@ theorem main
     haveI : Module.Free O ((Fin G.height → O) ⧸ D.Fil) := by
       change Module.Free O ((Fin G.height → O) ⧸ LinearMap.ker D.bb); infer_instance
     obtain ⟨N', hN'⟩ := GlobalTheory.exists_isCompl_of_projective_quotient D.Fil
-    let ρ : (Fin G.height → O) →ₗ[O] O := x ∘ₗ fil.symm.toLinearMap ∘ₗ D.Fil.projectionOnto N' hN'
+    let ρ : (Fin G.height → O) →ₗ[O] O :=
+      x ∘ₗ fil.symm.toLinearMap ∘ₗ D.Fil.projectionOnto N' hN'
     choose r hr using fun i => hsurj (ρ (Pi.single i 1))
-    obtain ⟨L, hL⟩ :=
-      GlobalTheory.T.hodgeTate_lattice_eq_rowSpace_of_sandwich_datum p C v O hv ε hε G G.height D e
-        fil hal
+    obtain ⟨L, hL⟩ := GlobalTheory.T.hodgeTate_lattice_eq_rowSpace_of_sandwich_datum p C v O hv ε hε G G.height D e fil hal
     refine ⟨L r, fun t => ?_⟩
     rw [hL]
     have hρ : ∀ w, ρ w = ∑ i, WittVector.fontaineTheta O p (r i) * w i := by
@@ -87,11 +112,10 @@ theorem main
       congr 2
       funext j
       simp [Pi.single_apply, eq_comm]
-    have hθ
-        : WittVector.fontaineTheta O p (r ⬝ᵥ (D.F *ᵥ fun i => ofPadic p O (e t i)))
-          = ρ (D.al (toO e t)) := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [hρ, dotProduct, map_sum]
+    have hθ : WittVector.fontaineTheta O p (r ⬝ᵥ (D.F *ᵥ fun i => ofPadic p O (e t i))) =
+        ρ (D.al (toO e t)) := by
+
+      rw [hρ, dotProduct, map_sum]
       refine Finset.sum_congr rfl fun i _ => ?_
       rw [map_mul, RingHom.map_mulVec]
       rfl

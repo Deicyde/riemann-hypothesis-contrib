@@ -1,6 +1,49 @@
 module
 
 public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.HermitianClassFiniteness.Development
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -20,50 +63,40 @@ def Frame.Jt (fr : Frame I S) : Matrix (Fin fr.m ⊕ Fin fr.k) (Fin fr.m ⊕ Fin
 
 theorem Frame.J'_eq (fr : Frame I S) : fr.J' = fr.Jt.toBlocks₂₂ := rfl
 
-theorem hform_add_left
-    {A : Type} [CommRing A] {n : Type} [Fintype n] (σ : A →+* A) (J : Matrix n n A) (x x' y : n → A)
-    : hform σ J (x + x') y = hform σ J x y + hform σ J x' y := by
+theorem hform_add_left {A : Type} [CommRing A] {n : Type} [Fintype n] (σ : A →+* A)
+    (J : Matrix n n A) (x x' y : n → A) : hform σ J (x + x') y = hform σ J x y + hform σ J x' y := by
   simp only [hform, Pi.add_apply, map_add (f := _), add_mul, Finset.sum_add_distrib]
 
-theorem hform_smul_left
-    {A : Type} [CommRing A]
-    {n : Type} [Fintype n]
-    (σ : A →+* A) (J : Matrix n n A) (c : A) (x y : n → A)
-    : hform σ J (c • x) y = σ c * hform σ J x y := by
+theorem hform_smul_left {A : Type} [CommRing A] {n : Type} [Fintype n] (σ : A →+* A)
+    (J : Matrix n n A) (c : A) (x y : n → A) : hform σ J (c • x) y = σ c * hform σ J x y := by
   simp only [hform, Pi.smul_apply, smul_eq_mul, map_mul, Finset.mul_sum]
   exact Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => by ring
 
-theorem hform_zero_left
-    {A : Type} [CommRing A] {n : Type} [Fintype n] (σ : A →+* A) (J : Matrix n n A) (y : n → A)
-    : hform σ J 0 y = 0 := by
+theorem hform_zero_left {A : Type} [CommRing A] {n : Type} [Fintype n] (σ : A →+* A)
+    (J : Matrix n n A) (y : n → A) : hform σ J 0 y = 0 := by
   simp [hform]
 
-theorem hform_add_right
-    {A : Type} [CommRing A] {n : Type} [Fintype n] (σ : A →+* A) (J : Matrix n n A) (x y y' : n → A)
-    : hform σ J x (y + y') = hform σ J x y + hform σ J x y' := by
+theorem hform_add_right {A : Type} [CommRing A] {n : Type} [Fintype n] (σ : A →+* A)
+    (J : Matrix n n A) (x y y' : n → A) : hform σ J x (y + y') = hform σ J x y + hform σ J x y' := by
   simp only [hform, Pi.add_apply, mul_add, Finset.sum_add_distrib]
 
-theorem hform_smul_right
-    {A : Type} [CommRing A]
-    {n : Type} [Fintype n]
-    (σ : A →+* A) (J : Matrix n n A) (c : A) (x y : n → A)
-    : hform σ J x (c • y) = c * hform σ J x y := by
+theorem hform_smul_right {A : Type} [CommRing A] {n : Type} [Fintype n] (σ : A →+* A)
+    (J : Matrix n n A) (c : A) (x y : n → A) : hform σ J x (c • y) = c * hform σ J x y := by
   simp only [hform, Pi.smul_apply, smul_eq_mul, Finset.mul_sum]
   exact Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => by ring
 
-theorem hform_sum_right
-    {A : Type} [CommRing A]
-    {n ι : Type} [Fintype n]
-    (σ : A →+* A) (J : Matrix n n A) (x : n → A) (s : Finset ι) (y : ι → n → A)
-    : hform σ J x (∑ i ∈ s, y i) = ∑ i ∈ s, hform σ J x (y i) := by
+theorem hform_sum_right {A : Type} [CommRing A] {n ι : Type} [Fintype n] (σ : A →+* A)
+    (J : Matrix n n A) (x : n → A) (s : Finset ι) (y : ι → n → A) :
+    hform σ J x (∑ i ∈ s, y i) = ∑ i ∈ s, hform σ J x (y i) := by
   classical
   refine Finset.induction_on s ?_ ?_
   · simp [hform]
   · intro a s ha ih
     rw [Finset.sum_insert ha, Finset.sum_insert ha, hform_add_right, ih]
 
-theorem hform_span_left (σ : I.E →+* I.E) (w : Fin I.n → I.E) (hw : ∀ s ∈ S, hform σ I.J s w = 0)
-    : ∀ u ∈ Submodule.span I.E S, hform σ I.J u w = 0 := by
+theorem hform_span_left (σ : I.E →+* I.E) (w : Fin I.n → I.E)
+    (hw : ∀ s ∈ S, hform σ I.J s w = 0) :
+    ∀ u ∈ Submodule.span I.E S, hform σ I.J u w = 0 := by
   intro u hu
   induction hu using Submodule.span_induction with
   | mem x hx => exact hw x hx
@@ -71,21 +104,21 @@ theorem hform_span_left (σ : I.E →+* I.E) (w : Fin I.n → I.E) (hw : ∀ s �
   | add x y _ _ hx hy => rw [hform_add_left, hx, hy, add_zero]
   | smul a x _ hx => rw [hform_smul_left, hx, mul_zero]
 
-theorem hform_swap (x y : Fin I.n → I.E)
-    : hform (starRingEnd I.E) I.J y x = starRingEnd I.E (hform (starRingEnd I.E) I.J x y) := by
+theorem hform_swap (x y : Fin I.n → I.E) :
+    hform (starRingEnd I.E) I.J y x = starRingEnd I.E (hform (starRingEnd I.E) I.J x y) := by
   have hJ : ∀ i j, starRingEnd I.E (I.J i j) = I.J j i := by
     intro i j
     have h := congrFun (congrFun I.J_herm j) i
     simpa [Formalism.UG.cT, Matrix.transpose_apply, Matrix.map_apply] using h
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [hform, map_sum, map_mul, starRingEnd_self_apply, hJ]
+
+  simp only [hform, map_sum, map_mul, starRingEnd_self_apply, hJ]
   rw [Finset.sum_comm]
   exact Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => by ring
 
-theorem Frame.Jt_apply (fr : Frame I S) (p q : Fin fr.m ⊕ Fin fr.k)
-    : fr.Jt p q = hform (starRingEnd I.E) I.J (fun a => fr.B a p) (fun a => fr.B a q) := by
-  simp only [Frame.Jt, hform, Matrix.mul_apply, Formalism.UG.cT, Matrix.transpose_apply,
-    Matrix.map_apply, Finset.sum_mul]
+theorem Frame.Jt_apply (fr : Frame I S) (p q : Fin fr.m ⊕ Fin fr.k) :
+    fr.Jt p q = hform (starRingEnd I.E) I.J (fun a => fr.B a p) (fun a => fr.B a q) := by
+  simp only [Frame.Jt, hform, Matrix.mul_apply, Formalism.UG.cT, Matrix.transpose_apply, Matrix.map_apply,
+    Finset.sum_mul]
   rw [Finset.sum_comm]
 
 theorem Frame.Jt_12 (fr : Frame I S) : fr.Jt.toBlocks₁₂ = 0 := by
@@ -97,24 +130,21 @@ theorem Frame.Jt_12 (fr : Frame I S) : fr.Jt.toBlocks₁₂ = 0 := by
 theorem Frame.Jt_21 (fr : Frame I S) : fr.Jt.toBlocks₂₁ = 0 := by
   ext p q
   show fr.Jt (Sum.inr p) (Sum.inl q) = 0
-  rw [Frame.Jt_apply, hform_swap,
-    hform_span_left _ _ (fun s hs => fr.orth s hs p) _ (fr.col_span q), map_zero]
+  rw [Frame.Jt_apply, hform_swap, hform_span_left _ _ (fun s hs => fr.orth s hs p) _ (fr.col_span q), map_zero]
 
-theorem Frame.Jt_blocks (fr : Frame I S)
-    : fr.Jt = Matrix.fromBlocks fr.Jt.toBlocks₁₁ 0 0 fr.J' := by
+theorem Frame.Jt_blocks (fr : Frame I S) : fr.Jt = Matrix.fromBlocks fr.Jt.toBlocks₁₁ 0 0 fr.J' := by
   have h := (Matrix.fromBlocks_toBlocks fr.Jt).symm
   rw [Frame.Jt_12, Frame.Jt_21, ← Frame.J'_eq] at h
   exact h
 
-theorem cT_mul' {m p q : Type} [Fintype p] (M : Matrix m p I.E) (N : Matrix p q I.E)
-    : cT (starRingEnd I.E) (M * N) = cT (starRingEnd I.E) N * cT (starRingEnd I.E) M := by
+theorem cT_mul' {m p q : Type} [Fintype p] (M : Matrix m p I.E) (N : Matrix p q I.E) :
+    cT (starRingEnd I.E) (M * N) = cT (starRingEnd I.E) N * cT (starRingEnd I.E) M := by
   simp only [Formalism.UG.cT, Matrix.map_mul, Matrix.transpose_mul]
 
-theorem Frame.Jt_inv (fr : Frame I S)
-    : fr.Jt * (fr.Bi * I.J⁻¹ * cT (starRingEnd I.E) fr.Bi) = 1 := by
+theorem Frame.Jt_inv (fr : Frame I S) :
+    fr.Jt * (fr.Bi * I.J⁻¹ * cT (starRingEnd I.E) fr.Bi) = 1 := by
   have hJ : I.J * I.J⁻¹ = 1 := Matrix.mul_nonsing_inv _ (isUnit_iff_ne_zero.mpr I.J_det)
-  have h1
-      : cT (starRingEnd I.E) (1 : Matrix (Fin fr.m ⊕ Fin fr.k) (Fin fr.m ⊕ Fin fr.k) I.E) = 1 := by
+  have h1 : cT (starRingEnd I.E) (1 : Matrix (Fin fr.m ⊕ Fin fr.k) (Fin fr.m ⊕ Fin fr.k) I.E) = 1 := by
     ext i j
     by_cases h : i = j
     · subst h
@@ -122,13 +152,11 @@ theorem Frame.Jt_inv (fr : Frame I S)
     · simp [Formalism.UG.cT, Matrix.one_apply, h, Ne.symm h]
   have hc : cT (starRingEnd I.E) fr.B * cT (starRingEnd I.E) fr.Bi = 1 := by
     rw [← cT_mul', fr.inv_mul, h1]
-  calc
-    fr.Jt * (fr.Bi * I.J⁻¹ * cT (starRingEnd I.E) fr.Bi)
-        = cT (starRingEnd I.E) fr.B * I.J * (fr.B * fr.Bi) * I.J⁻¹
-          * cT (starRingEnd I.E) fr.Bi := by
-      simp only [Frame.Jt, Matrix.mul_assoc]
+  calc fr.Jt * (fr.Bi * I.J⁻¹ * cT (starRingEnd I.E) fr.Bi)
+      = cT (starRingEnd I.E) fr.B * I.J * (fr.B * fr.Bi) * I.J⁻¹ * cT (starRingEnd I.E) fr.Bi := by
+        simp only [Frame.Jt, Matrix.mul_assoc]
     _ = cT (starRingEnd I.E) fr.B * cT (starRingEnd I.E) fr.Bi := by
-      rw [fr.mul_inv, Matrix.mul_one, Matrix.mul_assoc (cT _ fr.B), hJ, Matrix.mul_one]
+        rw [fr.mul_inv, Matrix.mul_one, Matrix.mul_assoc (cT _ fr.B), hJ, Matrix.mul_one]
     _ = 1 := hc
 
 theorem Frame.det_blocks (fr : Frame I S) : fr.Jt.toBlocks₁₁.det ≠ 0 ∧ fr.J'.det ≠ 0 := by
@@ -149,30 +177,29 @@ theorem Frame.J'_herm (fr : Frame I S) : IsHerm (I.cm.sig : I.E →+* I.E) fr.J'
   rw [Frame.Jt_apply, Frame.Jt_apply,
     hform_swap (fun a => fr.B a (Sum.inr q)) (fun a => fr.B a (Sum.inr p))]
 
-theorem hform_eq_dot
-    {A : Type} [CommRing A] {n : Type} [Fintype n] (σ : A →+* A) (J : Matrix n n A) (x y : n → A)
-    : hform σ J x y = (fun i => σ (x i)) ⬝ᵥ (J *ᵥ y) := by
+theorem hform_eq_dot {A : Type} [CommRing A] {n : Type} [Fintype n] (σ : A →+* A)
+    (J : Matrix n n A) (x y : n → A) : hform σ J x y = (fun i => σ (x i)) ⬝ᵥ (J *ᵥ y) := by
   simp only [hform, dotProduct, mulVec, Finset.mul_sum, mul_assoc]
 
-theorem hform_cT {p : Type} [Fintype p] (B : Matrix (Fin I.n) p I.E) (u v : p → I.E)
-    : hform (starRingEnd I.E) (cT (starRingEnd I.E) B * I.J * B) u v
-      = hform (starRingEnd I.E) I.J (B *ᵥ u) (B *ᵥ v) := by
+theorem hform_cT {p : Type} [Fintype p] (B : Matrix (Fin I.n) p I.E) (u v : p → I.E) :
+    hform (starRingEnd I.E) (cT (starRingEnd I.E) B * I.J * B) u v =
+      hform (starRingEnd I.E) I.J (B *ᵥ u) (B *ᵥ v) := by
   rw [hform_eq_dot, hform_eq_dot, ← Matrix.mulVec_mulVec, ← Matrix.mulVec_mulVec, dotProduct_mulVec]
   congr 1
   funext i
-  set_option synthInstance.maxHeartbeats 100000 in
+
   simp [Formalism.UG.cT, vecMul, mulVec, dotProduct, map_sum, mul_comm]
 
-theorem Frame.hform_J' (fr : Frame I S) (x y : Fin fr.k → I.E)
-    : hform (starRingEnd I.E) fr.J' x y
-      = hform (starRingEnd I.E) I.J (fr.B *ᵥ Sum.elim 0 x) (fr.B *ᵥ Sum.elim 0 y) := by
+theorem Frame.hform_J' (fr : Frame I S) (x y : Fin fr.k → I.E) :
+    hform (starRingEnd I.E) fr.J' x y =
+      hform (starRingEnd I.E) I.J (fr.B *ᵥ Sum.elim 0 x) (fr.B *ᵥ Sum.elim 0 y) := by
   rw [← hform_cT]
-  simp only [hform, Fintype.sum_sum_type, Sum.elim_inl, Sum.elim_inr, Pi.zero_apply, map_zero,
-    zero_mul, mul_zero, Finset.sum_const_zero, zero_add, add_zero]
+  simp only [hform, Fintype.sum_sum_type, Sum.elim_inl, Sum.elim_inr, Pi.zero_apply, map_zero, zero_mul,
+    mul_zero, Finset.sum_const_zero, zero_add, add_zero]
   rfl
 
-theorem Frame.orth_vec (fr : Frame I S) (x : Fin fr.k → I.E)
-    : ∀ s ∈ S, hform (starRingEnd I.E) I.J s (fr.B *ᵥ Sum.elim 0 x) = 0 := by
+theorem Frame.orth_vec (fr : Frame I S) (x : Fin fr.k → I.E) :
+    ∀ s ∈ S, hform (starRingEnd I.E) I.J s (fr.B *ᵥ Sum.elim 0 x) = 0 := by
   intro s hs
   have e : fr.B *ᵥ Sum.elim 0 x = ∑ b, x b • (fun i => fr.B i (Sum.inr b)) := by
     ext i
@@ -181,8 +208,8 @@ theorem Frame.orth_vec (fr : Frame I S) (x : Fin fr.k → I.E)
   refine Finset.sum_eq_zero fun b _ => ?_
   rw [hform_smul_right, fr.orth s hs b, mul_zero]
 
-theorem Frame.vec_ne_zero (fr : Frame I S) (x : Fin fr.k → I.E) (hx : x ≠ 0)
-    : fr.B *ᵥ Sum.elim 0 x ≠ 0 := by
+theorem Frame.vec_ne_zero (fr : Frame I S) (x : Fin fr.k → I.E) (hx : x ≠ 0) :
+    fr.B *ᵥ Sum.elim 0 x ≠ 0 := by
   intro h
   apply hx
   have hw : Sum.elim (0 : Fin fr.m → I.E) x = 0 := by
@@ -194,8 +221,7 @@ theorem Frame.vec_ne_zero (fr : Frame I S) (x : Fin fr.k → I.E) (hx : x ≠ 0)
 
 theorem frameGram : FrameGram := by
   intro I S fr hS
-  refine
-    ⟨Frame.J'_herm fr, isUnit_iff_ne_zero.mpr (Frame.det_blocks fr).2, I.cm.totReal, fun ι => ?_⟩
+  refine ⟨Frame.J'_herm fr, isUnit_iff_ne_zero.mpr (Frame.det_blocks fr).2, I.cm.totReal, fun ι => ?_⟩
   unfold Formalism.UG.IsDefiniteAt
   simp only [sig_eq]
   rcases hS ι with hpos | hneg

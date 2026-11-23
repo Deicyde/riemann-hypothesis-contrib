@@ -1,9 +1,52 @@
 module
 
-public import Mathlib
 public import Formalism.LocalToGlobal.Divisibility.CoefMod
-public import Formalism.GradedWeylDivisibility.DualWeylDominanceOf
-public import Formalism.GradedWeylDivisibility.FinalD
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
+import Formalism.LocalRingCardinality.Params
 
 @[expose] public section
 
@@ -55,7 +98,7 @@ theorem coeff_actP_diag
     · intro b _ hb
       simp [Matrix.diagonal_apply_ne _ (Ne.symm hb)]
     · simp
-  rw [actP, LinearMap.smul_apply, AlgHom.toLinearMap_apply, coeff_smul, smul_eq_mul, h,
+  rw [actP, LinearMap.smul_apply, AlgHom.toLinearMap_apply, MvPolynomial.coeff_smul, smul_eq_mul, h,
     coeff_aeval_scale]
 
 theorem detTwK_ne_zero
@@ -100,7 +143,7 @@ theorem weight_preserved
   have h1 : rhoK lam h v = (detTwK lam h * 2 ^ (lam τ0).natW a0) • v := by
     apply Subtype.ext
     ext m'
-    rw [hco, Submodule.coe_smul, coeff_smul, smul_eq_mul, mul_assoc]
+    rw [hco, Submodule.coe_smul, MvPolynomial.coeff_smul, smul_eq_mul, mul_assoc]
     by_cases hm' : m' ∈ (v : Pol K ι n).support
     · rw [hv m' hm']
     · rw [notMem_support_iff.mp hm']
@@ -108,7 +151,7 @@ theorem weight_preserved
   have h2 := hg h v
   rw [h1, map_smul] at h2
   have h3 := congrArg (fun w : VV K lam => AddMonoidAlgebra.coeff (w : Pol K ι n) m) h2
-  simp only [hco, Submodule.coe_smul, coeff_smul, smul_eq_mul, mul_assoc] at h3
+  simp only [hco, Submodule.coe_smul, MvPolynomial.coeff_smul, smul_eq_mul, mul_assoc] at h3
   have h4 := mul_right_cancel₀ (mem_support_iff.mp hm) (mul_left_cancel₀ (detTwK_ne_zero lam h) h3)
   have h5 : (2 : ℕ) ^ (lam τ0).natW a0 = 2 ^ (∑ s : Fin n, m (τ0, a0, s)) := by exact_mod_cast h4
   exact (Nat.pow_right_injective le_rfl h5).symm

@@ -1,31 +1,72 @@
 module
 
-public import Mathlib
-public import Formalism.LocalRingCardinality.AdicCompletionLocal.LocTied
-public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.ExistsOfLayers
+import Formalism.SharpRestriction.LevelLetterCocycles.ZlWCbInjective
+public import Formalism.SharpRestriction.LevelLetterCocycles.DataNLoc
+public import Mathlib.RingTheory.Flat.Basic
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.FrobSubMulSurjective
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.IntegersCompleteDVR
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.Domain
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
+import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.ExistsOfLayers
+public import Mathlib.RingTheory.Flat.TorsionFree
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations
-  TensorProduct GlobalTheory.HWL
+open Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations TensorProduct GlobalTheory.HWL
 
 namespace GlobalTheory.WittTensorFixed
 
-theorem tensor_flat
-    {R W T : Type}
-    [CommRing R] [CommRing W] [Algebra R W] [AddCommGroup T] [Module R T] [Module.Flat R T]
-    (f : W →ₐ[R] W) (hs : ∀ y, ∃ b, f b - b = y) (hk : ∀ b, f b = b → ∃ z, b = algebraMap R W z)
-    (hi : Function.Injective (algebraMap R W))
-    : (∀ y : W ⊗[R] T, ∃ b, TensorProduct.map f.toLinearMap LinearMap.id b - b = y)
-      ∧ (∀ b : W ⊗[R] T,
-        TensorProduct.map f.toLinearMap LinearMap.id b = b ↔ ∃ t : T, b = (1 : W) ⊗ₜ[R] t)
-      ∧ Function.Injective (fun t : T => (1 : W) ⊗ₜ[R] t) := by
+theorem tensor_flat {R W T : Type} [CommRing R] [CommRing W] [Algebra R W] [AddCommGroup T]
+    [Module R T] [Module.Flat R T] (f : W →ₐ[R] W) (hs : ∀ y, ∃ b, f b - b = y)
+    (hk : ∀ b, f b = b → ∃ z, b = algebraMap R W z)
+    (hi : Function.Injective (algebraMap R W)) :
+    (∀ y : W ⊗[R] T, ∃ b, TensorProduct.map f.toLinearMap LinearMap.id b - b = y) ∧
+    (∀ b : W ⊗[R] T, TensorProduct.map f.toLinearMap LinearMap.id b = b ↔
+      ∃ t : T, b = (1 : W) ⊗ₜ[R] t) ∧
+    Function.Injective (fun t : T => (1 : W) ⊗ₜ[R] t) := by
+
   let g : W →ₗ[R] W := f.toLinearMap - LinearMap.id
   let i : R →ₗ[R] W := Algebra.linearMap R W
-  have key
-      : ∀ b : W ⊗[R] T, TensorProduct.map f.toLinearMap LinearMap.id b - b = g.rTensor T b := by
+  have key : ∀ b : W ⊗[R] T,
+      TensorProduct.map f.toLinearMap LinearMap.id b - b = g.rTensor T b := by
     intro b
     simp only [g, LinearMap.rTensor_sub, LinearMap.rTensor_id, LinearMap.sub_apply,
       LinearMap.id_apply]
@@ -74,18 +115,19 @@ theorem tensor_flat
       exact h
     simpa using congrArg (TensorProduct.lid R T) (hinj h')
 
-theorem baseChange_flat
-    {R W O : Type}
-    [CommRing R] [CommRing W] [Algebra R W] [CommRing O] [Algebra R O] [Module.Flat R O]
-    (f : W →ₐ[R] W) (hs : ∀ y, ∃ b, f b - b = y) (hk : ∀ b, f b = b → ∃ z, b = algebraMap R W z)
-    (hi : Function.Injective (algebraMap R W))
-    : (∀ y : O ⊗[R] W, ∃ b, Algebra.TensorProduct.map (AlgHom.id O O) f b - b = y)
-      ∧ (∀ b : O ⊗[R] W,
-        Algebra.TensorProduct.map (AlgHom.id O O) f b = b → ∃ z, b = algebraMap O (O ⊗[R] W) z)
-      ∧ Function.Injective (algebraMap O (O ⊗[R] W)) := by
+theorem baseChange_flat {R W O : Type} [CommRing R] [CommRing W] [Algebra R W] [CommRing O]
+    [Algebra R O] [Module.Flat R O] (f : W →ₐ[R] W) (hs : ∀ y, ∃ b, f b - b = y)
+    (hk : ∀ b, f b = b → ∃ z, b = algebraMap R W z)
+    (hi : Function.Injective (algebraMap R W)) :
+    (∀ y : O ⊗[R] W, ∃ b, Algebra.TensorProduct.map (AlgHom.id O O) f b - b = y) ∧
+    (∀ b : O ⊗[R] W, Algebra.TensorProduct.map (AlgHom.id O O) f b = b →
+      ∃ z, b = algebraMap O (O ⊗[R] W) z) ∧
+    Function.Injective (algebraMap O (O ⊗[R] W)) := by
+
   let g : W →ₗ[R] W := f.toLinearMap - LinearMap.id
   let i : R →ₗ[R] W := Algebra.linearMap R W
-  have key : ∀ b : O ⊗[R] W, Algebra.TensorProduct.map (AlgHom.id O O) f b - b = g.lTensor O b := by
+  have key : ∀ b : O ⊗[R] W,
+      Algebra.TensorProduct.map (AlgHom.id O O) f b - b = g.lTensor O b := by
     intro b
     induction b using TensorProduct.induction_on with
     | zero => simp
@@ -109,8 +151,8 @@ theorem baseChange_flat
   have emb : ∀ z : O, algebraMap O (O ⊗[R] W) z = i.lTensor O (z ⊗ₜ[R] (1 : R)) := by
     intro z
     simp [i]
-  have hrange
-      : ∀ x : O ⊗[R] R, i.lTensor O x = algebraMap O (O ⊗[R] W) (TensorProduct.rid R O x) := by
+  have hrange : ∀ x : O ⊗[R] R,
+      i.lTensor O x = algebraMap O (O ⊗[R] W) (TensorProduct.rid R O x) := by
     intro x
     induction x using TensorProduct.induction_on with
     | zero => simp
@@ -130,31 +172,15 @@ theorem baseChange_flat
     rw [emb, emb] at h
     simpa using congrArg (TensorProduct.rid R O) (hinj h)
 
-theorem algebraMap_WCb_injective (l : ℕ) [Fact l.Prime]
-    : Function.Injective (algebraMap ℤ_[l] (WCb l)) := by
-  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
-    rw [injective_iff_map_eq_zero]
-  intro x hx
-  by_contra hne
-  have hker : RingHom.ker (algebraMap ℤ_[l] (WCb l)) ≠ ⊥ := by
-    intro h
-    apply hne
-    have hxk : x ∈ RingHom.ker (algebraMap ℤ_[l] (WCb l)) := hx
-    rw [h] at hxk
-    exact (Submodule.mem_bot _).mp hxk
-  obtain ⟨n, hn⟩ := PadicInt.ideal_eq_span_pow_p hker
-  have hmem : (l : ℤ_[l]) ^ n ∈ RingHom.ker (algebraMap ℤ_[l] (WCb l)) := by
-    rw [hn]
-    exact Ideal.subset_span (Set.mem_singleton _)
-  rw [RingHom.mem_ker, map_pow, map_natCast] at hmem
-  exact pow_ne_zero n (WittVector.p_nonzero l (Cb l)) hmem
+theorem algebraMap_WCb_injective (l : ℕ) [Fact l.Prime] :
+    Function.Injective (algebraMap ℤ_[l] (WCb l)) := by
+  apply Formalism.MainNotions.InvariantsGenerators.InvariantsFromGenerators.zl_WCb_injective <;> assumption
 
-theorem flat_lattice
-    {G : Type} [Group G] [TopologicalSpace G]
-    {Qp LL O : Type} [Field Qp] [Field LL] [Algebra Qp LL] [CommRing O] [Algebra O LL]
-    [TopologicalSpace LL] [IsDomain O] [IsBezout O]
-    (hO : Function.Injective (algebraMap O LL)) (T : LocLat G Qp LL O)
-    : Module.Flat O ↥T.L.T := by
+theorem flat_lattice {G : Type} [Group G] [TopologicalSpace G] {Qp LL O : Type} [Field Qp]
+    [Field LL] [Algebra Qp LL] [CommRing O] [Algebra O LL] [TopologicalSpace LL] [IsDomain O]
+    [IsBezout O] (hO : Function.Injective (algebraMap O LL)) (T : LocLat G Qp LL O) :
+    Module.Flat O ↥T.L.T := by
+
   rw [Module.Flat.flat_iff_torsion_eq_bot_of_isBezout, eq_bot_iff]
   intro x hx
   rw [Submodule.mem_torsion_iff] at hx
@@ -168,38 +194,32 @@ theorem flat_lattice
     rfl
   exact Subtype.ext ((smul_eq_zero.mp hx0).resolve_left hLL)
 
-theorem lattice_fixed
-    {G : Type} [Group G] [TopologicalSpace G]
-    {Qp LL O : Type} [Field Qp] [Field LL] [Algebra Qp LL] [CommRing O] [Algebra O LL]
-    [TopologicalSpace LL] [IsDomain O] [IsBezout O]
-    (hO : Function.Injective (algebraMap O LL)) (T : LocLat G Qp LL O)
-    {R : Type} [CommRing R] [Algebra O R]
-    (f : R →ₐ[O] R) (hs : ∀ y, ∃ b, f b - b = y) (hk : ∀ b, f b = b → ∃ z, b = algebraMap O R z)
-    (hi : Function.Injective (algebraMap O R))
-    : (∀ y : TW R T, ∃ b, TWmap f T b - b = y)
-      ∧ (∀ b : TW R T, TWmap f T b = b ↔ ∃ t : ↥T.L.T, b = (1 : R) ⊗ₜ[O] t)
-      ∧ Function.Injective (fun t : ↥T.L.T => (1 : R) ⊗ₜ[O] t) := by
+theorem lattice_fixed {G : Type} [Group G] [TopologicalSpace G] {Qp LL O : Type} [Field Qp]
+    [Field LL] [Algebra Qp LL] [CommRing O] [Algebra O LL] [TopologicalSpace LL] [IsDomain O]
+    [IsBezout O] (hO : Function.Injective (algebraMap O LL)) (T : LocLat G Qp LL O)
+    {R : Type} [CommRing R] [Algebra O R] (f : R →ₐ[O] R) (hs : ∀ y, ∃ b, f b - b = y)
+    (hk : ∀ b, f b = b → ∃ z, b = algebraMap O R z)
+    (hi : Function.Injective (algebraMap O R)) :
+    (∀ y : TW R T, ∃ b, TWmap f T b - b = y) ∧
+    (∀ b : TW R T, TWmap f T b = b ↔ ∃ t : ↥T.L.T, b = (1 : R) ⊗ₜ[O] t) ∧
+    Function.Injective (fun t : ↥T.L.T => (1 : R) ⊗ₜ[O] t) := by
   haveI := flat_lattice hO T
   unfold TW TWmap
   exact tensor_flat f hs hk hi
 
-theorem ring_fixed (l : ℕ) [Fact l.Prime] (LL : FinExt l)
-    : (∀ y : RW LL, ∃ b, φRW LL b - b = y)
-      ∧ (∀ b : RW LL, φRW LL b = b → ∃ z, b = algebraMap ↥(OL LL) (RW LL) z)
-      ∧ Function.Injective (algebraMap ↥(OL LL) (RW LL)) := by
+theorem ring_fixed (l : ℕ) [Fact l.Prime] (LL : FinExt l) :
+    (∀ y : RW LL, ∃ b, φRW LL b - b = y) ∧
+    (∀ b : RW LL, φRW LL b = b → ∃ z, b = algebraMap ↥(OL LL) (RW LL) z) ∧
+    Function.Injective (algebraMap ↥(OL LL) (RW LL)) := by
   obtain ⟨_, -, -, -, hfree, -, -⟩ := GlobalTheory.Per.integers_completeDVR l LL
   haveI : Module.Flat ℤ_[l] ↥(OL LL) := Module.Flat.of_free
   obtain ⟨hs, hk, -⟩ := GlobalTheory.ArtinSchreierWitt.main l
   unfold RW φRW
   exact baseChange_flat (frobW l) hs hk (algebraMap_WCb_injective l)
 
-set_option maxHeartbeats 1600000 in
-theorem main
-    : ∀ (l : ℕ) [Fact l.Prime] (K LL : FinExt l) (T : LocLat ↥(GK K) ℚ_[l] ↥LL.1 ↥(OL LL)),
-      (∀ y : TW (RW LL) T, ∃ b, TWmap (φRW LL) T b - b = y)
-        ∧ (∀ b : TW (RW LL) T,
-          TWmap (φRW LL) T b = b ↔ ∃ t : ↥T.L.T, b = (1 : RW LL) ⊗ₜ[↥(OL LL)] t)
-        ∧ Function.Injective (fun t : ↥T.L.T => (1 : RW LL) ⊗ₜ[↥(OL LL)] t) := by
+
+
+theorem main : ∀ (l : ℕ) [Fact l.Prime] (K LL : FinExt l) (T : LocLat ↥(GK K) ℚ_[l] ↥LL.1 ↥(OL LL)), (∀ y : TW (RW LL) T, ∃ b, TWmap (φRW LL) T b - b = y) ∧ (∀ b : TW (RW LL) T, TWmap (φRW LL) T b = b ↔ ∃ t : ↥T.L.T, b = (1 : RW LL) ⊗ₜ[↥(OL LL)] t) ∧ Function.Injective (fun t : ↥T.L.T => (1 : RW LL) ⊗ₜ[↥(OL LL)] t) := by
   intro l _ K LL T
   obtain ⟨hdvr, -⟩ := GlobalTheory.Per.integers_completeDVR l LL
   have hO : Function.Injective (algebraMap ↥(OL LL) ↥LL.1) := fun a b h => Subtype.ext h

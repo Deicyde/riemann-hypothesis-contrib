@@ -1,6 +1,46 @@
 module
 
 public import Formalism.SharpRestriction.GrowthBounds.RootWeights.CasimirIsotypicNoHigherWeight
+public import Formalism.SharpRestriction.GrowthBounds.RootWeights.CrAevalStable
+import Formalism.SharpRestriction.GrowthBounds.RootWeights.IsotypicComponentLeLowerWeights
+public import Formalism.SharpRestriction.GrowthBounds.RootWeights.V2repResIsGLRep
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -14,25 +54,19 @@ open Formalism.MainNotions.G Formalism.MainNotions.CovariantDegrees
 
 variable {n : ℕ} {K V : Type*} [Field K] [AddCommGroup V] [Module K V]
 
-theorem cr_lift
-    [CharZero K]
-    (E : GLOps n K V) (hT : (⨆ ν, weightSp E ν) = ⊤)
-    (W Z : Submodule K V) (hW : IsStableUnderOperators E W) (hZ : IsStableUnderOperators E Z)
-    (mu : Fin n → ℤ) (x0 : V) (hx0 : x0 ∈ W) (hq : Z.mkQ x0 ∈ weightSp (cr_quot E Z hZ) mu)
-    : ∃ x ∈ W, x ∈ weightSp E mu ∧ Z.mkQ x = Z.mkQ x0 := by
+theorem cr_lift [CharZero K] (E : GLOps n K V) (hT : (⨆ ν, weightSp E ν) = ⊤) (W Z : Submodule K V)
+    (hW : IsStableUnderOperators E W) (hZ : IsStableUnderOperators E Z) (mu : Fin n → ℤ) (x0 : V) (hx0 : x0 ∈ W)
+    (hq : Z.mkQ x0 ∈ weightSp (cr_quot E Z hZ) mu) :
+    ∃ x ∈ W, x ∈ weightSp E mu ∧ Z.mkQ x = Z.mkQ x0 := by
   classical
   have hg := v2rep_graded E W (fun a x hx => hW a a x hx) x0 hx0 (by rw [hT]; trivial)
   obtain ⟨f, hf, hsum⟩ := (Submodule.mem_iSup_iff_exists_finsupp _ _).1 hg
   have hm : ∑ ν ∈ f.support, Z.mkQ (f ν) = Z.mkQ x0 := by
-    set_option synthInstance.maxHeartbeats 100000 in
+
     rw [← hsum, Finsupp.sum, map_sum]
-  have hc :=
-    v2rep_comp_mem (cr_quot E Z hZ) (weightSp (cr_quot E Z hZ) mu)
-      (fun a x hx => cr_wt_diag_stable _ mu a x hx)
-      f.support
-      (fun ν => Z.mkQ (f ν))
-      (fun ν _ => cr_quot_wt E Z hZ ν _ (hf ν).1)
-      (by rw [hm]; exact hq)
+  have hc := v2rep_comp_mem (cr_quot E Z hZ) (weightSp (cr_quot E Z hZ) mu)
+    (fun a x hx => cr_wt_diag_stable _ mu a x hx) f.support (fun ν => Z.mkQ (f ν))
+    (fun ν _ => cr_quot_wt E Z hZ ν _ (hf ν).1) (by rw [hm]; exact hq)
   refine ⟨f mu, (hf mu).2, (hf mu).1, ?_⟩
   rw [← hm]
   symm
@@ -40,15 +74,12 @@ theorem cr_lift
   · exact cr_wt_disj _ hne (cr_quot_wt E Z hZ ν _ (hf ν).1) (hc ν hν)
   · rw [Finsupp.notMem_support_iff.1 hn, map_zero]
 
-theorem cr_CR
-    [CharZero K] [FiniteDimensional K V]
-    (E : GLOps n K V) (hR : SatisfiesGLRelations E) (hT : (⨆ ν, weightSp E ν) = ⊤)
-    (W : Submodule K V) (hW : IsStableUnderOperators E W)
-    : W ≤ ⨆ mu, isotypicPartIn E W mu := by
+theorem cr_CR [CharZero K] [FiniteDimensional K V] (E : GLOps n K V) (hR : SatisfiesGLRelations E)
+    (hT : (⨆ ν, weightSp E ν) = ⊤) (W : Submodule K V) (hW : IsStableUnderOperators E W) :
+    W ≤ ⨆ mu, isotypicPartIn E W mu := by
   classical
   set W2 : Submodule K V := ⨆ mu, isotypicPartIn E W mu with hW2
-  have hW2st : IsStableUnderOperators E W2 :=
-    v2rep_iSup_stable E _ fun mu => v2rep_isoIn_stable E W mu
+  have hW2st : IsStableUnderOperators E W2 := v2rep_iSup_stable E _ fun mu => v2rep_isoIn_stable E W mu
   by_contra hnot
   have hZne : W.map W2.mkQ ≠ ⊥ := by
     intro h
@@ -59,9 +90,8 @@ theorem cr_CR
     rintro a b y ⟨x, hx, rfl⟩
     exact ⟨E a b x, hW a b x hx, rfl⟩
   have hRq := cr_quot_rel E hR W2 hW2st
-  obtain ⟨mu, xb, hxbZ, hxb⟩ :=
-    v2rep_exists_hwv (cr_quot E W2 hW2st) hRq (W.map W2.mkQ) hZst
-      (le_top.trans (cr_quot_top E W2 hW2st hT)) hZne
+  obtain ⟨mu, xb, hxbZ, hxb⟩ := v2rep_exists_hwv (cr_quot E W2 hW2st) hRq (W.map W2.mkQ) hZst
+    (le_top.trans (cr_quot_top E W2 hW2st hT)) hZne
   obtain ⟨x0, hx0W, rfl⟩ := hxbZ
   obtain ⟨x, hxW, hxwt, hxq⟩ := cr_lift E hT W W2 hW hW2st mu x0 hx0W hxb.2.1
   rw [← hxq] at hxb
@@ -91,14 +121,11 @@ theorem cr_CR
     intro h
     apply hxn
     have : x = x' - (x' - x) := by abel
-    rw [this]
-    exact W2.sub_mem h h1
+    rw [this]; exact W2.sub_mem h h1
 
   have hy0 : T x' - ((cr_c mu : ℤ) : K) • x' = aeval T q (T x - ((cr_c mu : ℤ) : K) • x) := by
     rw [map_sub, map_smul, cr_aeval_comm T T rfl q x]
-  have hy0e
-      : T (T x' - ((cr_c mu : ℤ) : K) • x')
-        = ((cr_c mu : ℤ) : K) • (T x' - ((cr_c mu : ℤ) : K) • x') := by
+  have hy0e : T (T x' - ((cr_c mu : ℤ) : K) • x') = ((cr_c mu : ℤ) : K) • (T x' - ((cr_c mu : ℤ) : K) • x') := by
     rw [hy0]
     exact casimir_acts_scalar_on_level E hR (fun _ => W) (cr_c mu) _ hq2
   have hzero : ∀ a b : Fin n, a < b → E a b x' = 0 := by
@@ -106,8 +133,7 @@ theorem cr_CR
     set z := E a b x' with hz
     have hzW2 : z ∈ W2 := by
       have : z = E a b x + E a b (x' - x) := by rw [hz, ← map_add (f := _)]; congr 1; abel
-      rw [this]
-      exact W2.add_mem (hup a b hab) (hW2st a b _ h1)
+      rw [this]; exact W2.add_mem (hup a b hab) (hW2st a b _ h1)
     have hzwt : z ∈ weightSp E (mu + rootW a b) := v2rep_shift E hR a b mu x' h3
     set w1 := T z - ((cr_c mu : ℤ) : K) • z with hw1
     have hw1' : w1 = E a b (T x' - ((cr_c mu : ℤ) : K) • x') := by
@@ -116,9 +142,8 @@ theorem cr_CR
       rw [hw1', hTdef, cr_C_comm_apply E hR, ← hTdef, hy0e, map_smul]
     obtain ⟨r, hr1, hr2⟩ := casimir_polynomial_isolates_level E hR (fun _ => W) z hzW2 (cr_c mu)
     have hz0 : aeval T r z = 0 := by
-      refine casimir_isotypic_no_higher_weight E hR
-        (fun _ => W)
-        mu hdom (mu + rootW a b) ?_ ?_ _ hr2 (cr_aeval_stable T _ (cr_C_weightSp E hR _) z hzwt r)
+      refine casimir_isotypic_no_higher_weight E hR (fun _ => W) mu hdom (mu + rootW a b) ?_ ?_ _ hr2
+        (cr_aeval_stable T _ (cr_C_weightSp E hR _) z hzwt r)
       · rw [add_sub_cancel_left]; exact cr_root_mem a b hab
       · rw [add_sub_cancel_left]; exact cr_ht_root a b hab
     have hspan : aeval T r z - r.eval (((cr_c mu : ℤ) : K)) • z ∈ Submodule.span K {w1} := by
@@ -136,7 +161,6 @@ theorem cr_CR
     rw [hzt, hw0, smul_zero]
   apply h4
   have hne : x' ≠ 0 := fun h => h4 (by rw [h]; exact zero_mem _)
-  exact Submodule.mem_iSup_of_mem mu
-    (Submodule.subset_span ⟨1, one_mem _, x', h2, ⟨hne, h3, hzero⟩, rfl⟩)
+  exact Submodule.mem_iSup_of_mem mu (Submodule.subset_span ⟨1, one_mem _, x', h2, ⟨hne, h3, hzero⟩, rfl⟩)
 
 end Formalism.MainNotions.G.GLWeightTheory

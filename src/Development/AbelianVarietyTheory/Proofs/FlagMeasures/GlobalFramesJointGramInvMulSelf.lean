@@ -1,16 +1,52 @@
 module
 
-public import Mathlib
-public import Formalism.SharpRestriction.CuspSpanNormBounds.FractionFieldToGenericStalkAlgebraMapEq
-public import Formalism.SharpRestriction.CuspSpanNormBounds.PsiEDef
-public import Development.AbelianVarietyTheory.Definitions.Foundations.IsHermND
-public import Development.AbelianVarietyTheory.Definitions.SemilocalFrames.ComplementReferenceCompactSubgroup
 public import Development.AbelianVarietyTheory.Definitions.SemilocalFrames.GFrames
 public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.BasisOfIsCompl
-public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.SpanToLePerp
-public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.FramesCommonStabiliserEqPairingMatrixStabiliser
 public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.RationalExtend
-public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.IsIntegralOfQuad
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -19,33 +55,21 @@ open scoped Pointwise ENNReal Classical
 
 namespace GlobalTheory.HL.GamInv
 
-theorem hf_add_right
-    {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F]
-    {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E]
-    (L : LocE F E)
-    {n : ℕ} (H : Matrix (Fin n) (Fin n) E) (x y z : Fin n → E)
-    : hf L H x (y + z) = hf L H x y + hf L H x z := by
+theorem hf_add_right {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F]
+    {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] (L : LocE F E) {n : ℕ}
+    (H : Matrix (Fin n) (Fin n) E) (x y z : Fin n → E) :
+    hf L H x (y + z) = hf L H x y + hf L H x z := by
   simp [hf, mul_add, Finset.sum_add_distrib]
 
-theorem hf_smul_right
-    {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F]
-    {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E]
-    (L : LocE F E)
-    {n : ℕ} (H : Matrix (Fin n) (Fin n) E) (x z : Fin n → E)
-    (c : E)
-    : hf L H x (c • z) = L.cj c * hf L H x z := by
+theorem hf_smul_right {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F]
+    {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] (L : LocE F E) {n : ℕ}
+    (H : Matrix (Fin n) (Fin n) E) (x z : Fin n → E) (c : E) :
+    hf L H x (c • z) = L.cj c * hf L H x z := by
   simp only [hf, Pi.smul_apply, smul_eq_mul, map_mul, Finset.mul_sum]
   refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
   ring
 
-theorem main
-    : ∀ {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-        {sig : E →ₐ[F] E} (A : Places F E sig) (r k : ℕ) (G : GFrames A r k),
-      (Matrix.of fun k l : Fin (r + 1) ⊕ Fin (r + 1) =>
-            ∑ i, ∑ j, Sum.elim G.f G.f' k i * G.Hm i j * sig (Sum.elim G.f G.f' l j))⁻¹
-          * (Matrix.of fun k l : Fin (r + 1) ⊕ Fin (r + 1) =>
-            ∑ i, ∑ j, Sum.elim G.f G.f' k i * G.Hm i j * sig (Sum.elim G.f G.f' l j))
-        = 1 := by
+theorem main : ∀ {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {sig : E →ₐ[F] E} (A : Places F E sig) (r k : ℕ) (G : GFrames A r k), (Matrix.of fun k l : Fin (r + 1) ⊕ Fin (r + 1) => ∑ i, ∑ j, Sum.elim G.f G.f' k i * G.Hm i j * sig (Sum.elim G.f G.f' l j))⁻¹ * (Matrix.of fun k l : Fin (r + 1) ⊕ Fin (r + 1) => ∑ i, ∑ j, Sum.elim G.f G.f' k i * G.Hm i j * sig (Sum.elim G.f G.f' l j)) = 1 := by
   intro F E _ _ _ _ _ sig A r k G
   classical
   set g : Fin (r + 1) ⊕ Fin (r + 1) → Fin (k + 2 * r + 1) → E := Sum.elim G.f G.f' with hg
@@ -59,22 +83,21 @@ theorem main
   set S := G.S p with hS
   set Ep := (A.loc p).Ep
   let s : Fin (r + 1) ⊕ Fin (r + 1) → Epˣ := fun q =>
-    Units.map (algebraMap (A.loc p).Fp Ep).toMonoidHom
-      (G.c p ^ (r - (Sum.elim (fun a : Fin (r + 1) => (a : ℕ)) (fun a => (a : ℕ)) q)))
+    Units.map (algebraMap (A.loc p).Fp Ep).toMonoidHom (G.c p ^ (r - (Sum.elim (fun a : Fin (r + 1) => (a : ℕ)) (fun a => (a : ℕ)) q)))
   have hu : ∀ q, A.bc p (g q) = ((s q : Epˣ) : Ep) • Sum.elim S.f S.f' q := by
     intro q
     rcases q with a | a
-    · simp only [hg, Sum.elim_inl, s, Units.coe_map, RingHom.toMonoidHom_eq_coe, MonoidHom.coe_coe,
-        Units.val_pow_eq_pow_val]
+    · simp only [hg, Sum.elim_inl, s, Units.coe_map, RingHom.toMonoidHom_eq_coe, MonoidHom.coe_coe, Units.val_pow_eq_pow_val]
       exact (G.f_eq p a).symm
-    · simp only [hg, Sum.elim_inr, s, Units.coe_map, RingHom.toMonoidHom_eq_coe, MonoidHom.coe_coe,
-        Units.val_pow_eq_pow_val]
+    · simp only [hg, Sum.elim_inr, s, Units.coe_map, RingHom.toMonoidHom_eq_coe, MonoidHom.coe_coe, Units.val_pow_eq_pow_val]
       exact (G.f'_eq p a).symm
   have hgli : LinearIndependent E g := by
     let e := (finSumFinEquiv (m := r + 1) (n := r + 1))
     refine (linearIndependent_equiv e.symm).1 ((hind _ (g ∘ e.symm)).2 ?_)
-    have : (fun q => A.bc p (g q)) = s • Sum.elim S.f S.f' := by funext q; rw [hu]; rfl
-    have h2 : LinearIndependent Ep (fun q => A.bc p (g q)) := by rw [this]; exact hli.units_smul s
+    have : (fun q => A.bc p (g q)) = s • Sum.elim S.f S.f' := by
+      funext q; rw [hu]; rfl
+    have h2 : LinearIndependent Ep (fun q => A.bc p (g q)) := by
+      rw [this]; exact hli.units_smul s
     exact (linearIndependent_equiv e.symm).2 h2
   have hME : S.ME = Submodule.span Ep (Set.range (Sum.elim S.f S.f')) := by
     have h1 : ∀ v : Fin (r + 1) → S.V, S.spanTo v (r + 1) = Submodule.span Ep (Set.range v) := by
@@ -94,8 +117,8 @@ theorem main
       intro l
       have h : Matrix.vecMul v Γ l = 0 := congrFun hv l
       rw [← h]
-      simp only [Matrix.vecMul, dotProduct, hΓ, Matrix.of_apply, hx, Finset.sum_apply,
-        Pi.smul_apply, smul_eq_mul, Finset.sum_mul, Finset.mul_sum, Pi.zero_apply]
+      simp only [Matrix.vecMul, dotProduct, hΓ, Matrix.of_apply, hx, Finset.sum_apply, Pi.smul_apply,
+        smul_eq_mul, Finset.sum_mul, Finset.mul_sum, Pi.zero_apply]
       symm
       rw [Finset.sum_comm]
       refine Finset.sum_congr rfl fun i _ => ?_
@@ -106,7 +129,7 @@ theorem main
       rw [G.Hm_eq p, hform, hx0, map_zero]
     have hbcx : A.bc p x = ∑ q, (A.loc p).ιE (v q) • A.bc p (g q) := by
       funext i
-      set_option synthInstance.maxHeartbeats 100000 in
+
       simp [Places.bc, hx, Finset.sum_apply, map_sum]
     have hmem : A.bc p x ∈ S.ME := by
       rw [hbcx, hME]
@@ -133,9 +156,8 @@ theorem main
     have hx00 : x = 0 := hinj (by rw [hbot]; funext i; simp [Places.bc])
     funext q
     exact Fintype.linearIndependent_iff.1 hgli v (by rw [← hx]; exact hx00) q
-  have hU : IsUnit Γ :=
-    Matrix.vecMul_injective_iff_isUnit.1 fun a b h =>
-      sub_eq_zero.1 (key _ (by rw [Matrix.sub_vecMul]; exact sub_eq_zero.2 h))
+  have hU : IsUnit Γ := Matrix.vecMul_injective_iff_isUnit.1 fun a b h =>
+    sub_eq_zero.1 (key _ (by rw [Matrix.sub_vecMul]; exact sub_eq_zero.2 h))
   exact Matrix.nonsing_inv_mul Γ ((Matrix.isUnit_iff_isUnit_det Γ).1 hU)
 
 end GlobalTheory.HL.GamInv

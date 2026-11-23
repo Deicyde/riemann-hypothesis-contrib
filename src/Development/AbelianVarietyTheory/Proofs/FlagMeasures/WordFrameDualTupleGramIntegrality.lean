@@ -1,15 +1,54 @@
 module
 
 public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.Direct
-public import Formalism.LocalToGlobal.SiegelLatticeTheory.HaarTransversals.PoincareInHH
+public import Development.AbelianVarietyTheory.Definitions.SemilocalFrames.MemConfTOfDetNeZero
+public import Development.AbelianVarietyTheory.Definitions.SemilocalFrames.NCoords
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.LatticeUnimodular
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
 open scoped Classical ENNReal
-open Matrix MeasureTheory NumberField Formalism.BasicNotions Formalism.MainNotions.S
-  Formalism.L2.SG.HidaSetting Formalism.L2.SG.LocWSOf Formalism.L2.SG.PoincareInHH.PoincareSetting
-  GlobalTheory.CovDom
+open Matrix MeasureTheory NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.L2.SG.HidaSetting Formalism.L2.SG.LocWSOf Formalism.L2.SG.PoincareInHH.PoincareSetting GlobalTheory.CovDom
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 noncomputable section
@@ -18,12 +57,10 @@ namespace GlobalTheory.CovDom.FrameCrd
 
 variable {D : D7} (X : HidaSetting D)
 
-theorem sig_apply (x : D.host.E)
-    : (D.sp.cm.sig : D.host.E →+* D.host.E) x = starRingEnd D.host.E x :=
-  rfl
+theorem sig_apply (x : D.host.E) : (D.sp.cm.sig : D.host.E →+* D.host.E) x = starRingEnd D.host.E x := rfl
 
-theorem vecOf_sum (x : Fin (2 * D.R.rS + D.R.k + 1) → D.host.E)
-    : vecOf X x = ∑ i, x i • X.bas (ci X i) := by
+theorem vecOf_sum (x : Fin (2 * D.R.rS + D.R.k + 1) → D.host.E) :
+    vecOf X x = ∑ i, x i • X.bas (ci X i) := by
   simp only [vecOf, LinearMap.coe_comp, LinearEquiv.coe_coe, Function.comp_apply,
     Module.Basis.equivFun_symm_apply, LinearEquiv.funCongrLeft_apply]
   rw [← Equiv.sum_comp (ci X).symm]
@@ -35,18 +72,16 @@ theorem vecOf_crdH (y : (VS D).V) : vecOf X (crdH X y) = y := by
   rw [Equiv.sum_comp (ci X) (fun j => X.bas.repr y j • X.bas j)]
   exact X.bas.sum_repr y
 
-theorem pairM_apply
-    {α β : Type} [Fintype α] [Fintype β]
-    (P : Matrix (Fin (2 * D.R.rS + D.R.k + 1)) α D.host.E)
-    (Q : Matrix (Fin (2 * D.R.rS + D.R.k + 1)) β D.host.E) (a : α) (b : β)
-    : GlobalTheory.SgAlg.pairM (D.sp.cm.sig : D.host.E →+* D.host.E) (Jc X) Q P a b
-      = (VS D).hT (vecOf X fun i => P i a) (vecOf X fun i => Q i b) := by
+theorem pairM_apply {α β : Type} [Fintype α] [Fintype β]
+    (P : Matrix (Fin (2 * D.R.rS + D.R.k + 1)) α D.host.E) (Q : Matrix (Fin (2 * D.R.rS + D.R.k + 1)) β D.host.E)
+    (a : α) (b : β) :
+    GlobalTheory.SgAlg.pairM (D.sp.cm.sig : D.host.E →+* D.host.E) (Jc X) Q P a b =
+      (VS D).hT (vecOf X fun i => P i a) (vecOf X fun i => Q i b) := by
   rw [vecOf_sum, vecOf_sum]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [GlobalTheory.SgAlg.pairM, GlobalTheory.SgAlg.cT, Matrix.mul_apply,
-      Matrix.transpose_apply, Matrix.map_apply, Jc, map_sum, LinearMap.map_smulₛₗ,
-      LinearMap.sum_apply, LinearMap.smul_apply, smul_eq_mul, Finset.sum_mul, Finset.mul_sum,
-      sig_apply]
+
+  simp only [GlobalTheory.SgAlg.pairM, GlobalTheory.SgAlg.cT, Matrix.mul_apply, Matrix.transpose_apply, Matrix.map_apply, Jc,
+  map_sum, LinearMap.map_smulₛₗ, LinearMap.sum_apply, LinearMap.smul_apply, smul_eq_mul, Finset.sum_mul,
+  Finset.mul_sum, sig_apply]
   refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
   simp only [RingHom.id_apply]
   ring
@@ -54,11 +89,11 @@ theorem pairM_apply
 theorem col_last (u : D.what₂.Word) : (fun i => Pc X u i (Fin.last D.R.rS)) = crdH X (X.zu u) := by
   funext i; simp [Pc]
 
-theorem col_cs (u : D.what₂.Word) (a : Fin D.R.rS)
-    : (fun i => Pc X u i a.castSucc) = crdH X (X.eX a) := by
+theorem col_cs (u : D.what₂.Word) (a : Fin D.R.rS) : (fun i => Pc X u i a.castSucc) = crdH X (X.eX a) := by
   funext i; simp [Pc]
 
-theorem col_f (a : Fin D.R.rS) : (fun i => fc X i a) = crdH X (X.fY a) := by funext i; simp [fc]
+theorem col_f (a : Fin D.R.rS) : (fun i => fc X i a) = crdH X (X.fY a) := by
+  funext i; simp [fc]
 
 theorem hT_swap_zero {x y : (VS D).V} (h : (VS D).hT x y = 0) : (VS D).hT y x = 0 := by
   rw [← (VS D).herm.eq x y, h, map_zero]
@@ -66,9 +101,9 @@ theorem hT_swap_zero {x y : (VS D).V} (h : (VS D).hT x y = 0) : (VS D).hT y x = 
 theorem T_ne_zero (u : D.what₂.Word) : ((((D.mem u).A.T : ℕ) : D.host.E)) ≠ 0 :=
   Nat.cast_ne_zero.2 (D.mem u).A.T_prime.ne_zero
 
-theorem gram_frame (u : D.what₂.Word)
-    : GlobalTheory.SgAlg.pairM (D.sp.cm.sig : D.host.E →+* D.host.E) (Jc X) (Pc X u) (Pc X u)
-      = GlobalTheory.SgAlg.TF D.R.rS (algebraMap D.host.F D.host.E (Tc u)) := by
+theorem gram_frame (u : D.what₂.Word) :
+    GlobalTheory.SgAlg.pairM (D.sp.cm.sig : D.host.E →+* D.host.E) (Jc X) (Pc X u) (Pc X u) =
+      GlobalTheory.SgAlg.TF D.R.rS (algebraMap D.host.F D.host.E (Tc u)) := by
   ext a b
   rw [pairM_apply]
   induction a using Fin.lastCases with
@@ -94,10 +129,8 @@ theorem free_frame (u : D.what₂.Word) : GlobalTheory.SgAlg.Free (Pc X u) := by
   let Dg : Matrix (Fin (D.R.rS + 1)) (Fin (D.R.rS + 1)) D.host.E :=
     Matrix.diagonal fun c => Fin.lastCases (-(((D.mem u).A.T : ℕ) : D.host.E))⁻¹ (fun _ => 1) c
   refine ⟨Dg * (GlobalTheory.SgAlg.cT (D.sp.cm.sig : D.host.E →+* D.host.E) Y * Jc X), ?_⟩
-  have h
-      : Dg * (GlobalTheory.SgAlg.cT (D.sp.cm.sig : D.host.E →+* D.host.E) Y * Jc X) * Pc X u
-        = Dg
-          * GlobalTheory.SgAlg.pairM (D.sp.cm.sig : D.host.E →+* D.host.E) (Jc X) (Pc X u) Y := by
+  have h : Dg * (GlobalTheory.SgAlg.cT (D.sp.cm.sig : D.host.E →+* D.host.E) Y * Jc X) * Pc X u =
+      Dg * GlobalTheory.SgAlg.pairM (D.sp.cm.sig : D.host.E →+* D.host.E) (Jc X) (Pc X u) Y := by
     simp only [GlobalTheory.SgAlg.pairM, Matrix.mul_assoc]
   rw [h]
   ext c d
@@ -122,8 +155,8 @@ theorem free_frame (u : D.what₂.Word) : GlobalTheory.SgAlg.Free (Pc X u) := by
       · subst hab; simp
       · simp [hab, Ne.symm hab]
 
-theorem dual_frame (u : D.what₂.Word)
-    : GlobalTheory.SgAlg.IsDual (D.sp.cm.sig : D.host.E →+* D.host.E) (Jc X) (Pc X u) (fc X) := by
+theorem dual_frame (u : D.what₂.Word) :
+    GlobalTheory.SgAlg.IsDual (D.sp.cm.sig : D.host.E →+* D.host.E) (Jc X) (Pc X u) (fc X) := by
   refine ⟨?_, ?_⟩
   · ext a b
     rw [pairM_apply, col_f, vecOf_crdH]
@@ -139,13 +172,11 @@ theorem dual_frame (u : D.what₂.Word)
     simp
 
 theorem aaD_eq (a : Fin D.R.rS) : aaD D a = GlobalTheory.SgGlob.dInv D.host.E (D.R.rS - a) := by
-  rw [aaD, GlobalTheory.IntTerm.Conv.ddS_eq, GlobalTheory.SgGlob.dInv, ← Nat.cast_sub a.2.le,
-    _root_.zpow_neg, _root_.zpow_natCast, inv_pow]
+  rw [aaD, GlobalTheory.IntTerm.Conv.ddS_eq, GlobalTheory.SgGlob.dInv, ← Nat.cast_sub a.2.le, _root_.zpow_neg, _root_.zpow_natCast,
+    inv_pow]
 
-theorem tupLat_le (u : D.what₂.Word)
-    : GlobalTheory.SnMass.tupLat (GlobalTheory.SnMass.id1 D.host.E D.R.rS)
-        (GlobalTheory.SnMass.sideM (Pc X u) (fc X))
-      ≤ Lc X := by
+theorem tupLat_le (u : D.what₂.Word) :
+    GlobalTheory.SnMass.tupLat (GlobalTheory.SnMass.id1 D.host.E D.R.rS) (GlobalTheory.SnMass.sideM (Pc X u) (fc X)) ≤ Lc X := by
   rw [GlobalTheory.SnMass.tupLat, Submodule.span_le]
   rintro _ ⟨b, x, hx, rfl⟩
   show vecOf X (x • fun i => GlobalTheory.SnMass.sideM (Pc X u) (fc X) i b) ∈ (VS D).L0
@@ -176,15 +207,12 @@ end GlobalTheory.CovDom.FrameCrd
 
 namespace GlobalTheory.CovDom
 
+
 open GlobalTheory.CovDom.FrameCrd in
-theorem frame_dual_lat
-    : ∀ (D : D7) (X : HidaSetting D) (u : D.what₂.Word),
-      GlobalTheory.SgAlg.IsFrame (D.sp.cm.sig : D.host.E →+* D.host.E) (Jc X)
-          (algebraMap D.host.F D.host.E (Tc u)) (Pc X u)
-        ∧ GlobalTheory.SgAlg.IsDual (D.sp.cm.sig : D.host.E →+* D.host.E) (Jc X) (Pc X u) (fc X)
-        ∧ GlobalTheory.SnMass.tupLat (GlobalTheory.SnMass.id1 D.host.E D.R.rS)
-            (GlobalTheory.SnMass.sideM (Pc X u) (fc X))
-          ≤ Lc X := fun _ X u =>
-  ⟨⟨free_frame X u, gram_frame X u⟩, dual_frame X u, tupLat_le X u⟩
+theorem frame_dual_lat : ∀ (D : D7) (X : HidaSetting D) (u : D.what₂.Word),
+    GlobalTheory.SgAlg.IsFrame (D.sp.cm.sig : D.host.E →+* D.host.E) (Jc X) (algebraMap D.host.F D.host.E (Tc u)) (Pc X u) ∧
+    GlobalTheory.SgAlg.IsDual (D.sp.cm.sig : D.host.E →+* D.host.E) (Jc X) (Pc X u) (fc X) ∧
+    GlobalTheory.SnMass.tupLat (GlobalTheory.SnMass.id1 D.host.E D.R.rS) (GlobalTheory.SnMass.sideM (Pc X u) (fc X)) ≤ Lc X :=
+  fun _ X u => ⟨⟨free_frame X u, gram_frame X u⟩, dual_frame X u, tupLat_le X u⟩
 
 end GlobalTheory.CovDom

@@ -1,7 +1,56 @@
 module
 
 public import Development.AutomorphicArithmetic.DedekindLFunctions.SplitInertia
+public import Formalism.SizeWindowBrackets.SChain
 public import Development.AutomorphicArithmetic.DedekindLFunctions.LandauTheorems.ChBalance
+public import Formalism.SizeWindowBrackets.ChainSlopeWindows.LipschitzWeightAndMinimum
+public import Formalism.SizeWindowBrackets.ChainSlopeWindows.PChain
+public import Formalism.ThickAverageLoss.ThickAverageProofs.ThickAverage
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Real
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Lemma
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
@@ -349,7 +398,6 @@ lemma core (A0 : AddSubgroup H) (D : ArithData H) (S : Finset ℕ) (hD : HostFac
 
 end CharacterBalanceMoves
 
-set_option maxHeartbeats 1600000 in
 theorem ch_core (C ε CE Ko c M : ℝ) (hC : 0 ≤ C) (hε : 0 < ε) (hc : |c| ≤ 1)
     : ∃ x1 : ℝ, ∀ x ≥ x1,
       ∀ (H : Type) [AddCommGroup H] [Fintype H] [DecidableEq H] (m : ℕ) (D : ArithData H)
@@ -369,7 +417,6 @@ theorem ch_core (C ε CE Ko c M : ℝ) (hC : 0 ≤ C) (hε : 0 < ε) (hc : |c| �
     Filter.eventually_atTop.1
       ((tendsto_rpow_atTop (show 0 < 3 * ε / 8 by positivity)).eventually_ge_atTop 26)
   set A1 : ℝ := 5 + Cd + |Ko| + |M| * (4 + Cd + |Ko|) + 4 * |CE| with hA1
-  have hA10 : 0 ≤ A1 := by positivity
   obtain ⟨x₂, hx₂⟩ :=
     Filter.eventually_atTop.1
       ((tendsto_rpow_atTop (show (0 : ℝ) < 1 / 4 by norm_num)).eventually_ge_atTop (|M| * A1))
@@ -424,13 +471,6 @@ theorem ch_core (C ε CE Ko c M : ℝ) (hC : 0 ≤ C) (hε : 0 < ε) (hc : |c| �
   have hMe : 0 ≤ |M| * (4 + Cd + |Ko|) * (s * e) := by positivity
   have hCe : 0 ≤ |CE| * (s * e) := by positivity
   have hKe : 0 ≤ |Ko| * (s * e) := by positivity
-  have hCde : 0 ≤ Cd * (s * e) := by positivity
-  have hR
-      : A1 * (s * e)
-        = 5 * (s * e) + Cd * (s * e) + |Ko| * (s * e) + |M| * (4 + Cd + |Ko|) * (s * e)
-          + 4 * (|CE| * (s * e)) := by
-    rw [hA1]; ring
-  have hρ0 : 0 ≤ x ^ (-1 + ε) := Real.rpow_nonneg hx0.le _
   have r1 : Cd ≤ A1 * (s * e) := by linarith [up Cd hCd]
   have r2
       : Real.log (x + 1) + Cd + |Ko| + |M| * x ^ (-1 + ε) * (x * (Real.log x + Cd + |Ko|))
@@ -445,7 +485,6 @@ theorem ch_core (C ε CE Ko c M : ℝ) (hC : 0 ≤ C) (hε : 0 < ε) (hc : |c| �
       linarith
     have e3 : |M| * ((Real.log x + Cd + |Ko|) * e) ≤ |M| * ((4 + Cd + |Ko|) * s * e) :=
       mul_le_mul_of_nonneg_left (mul_le_mul_of_nonneg_right e2 (by linarith)) (abs_nonneg M)
-    have e4 : |M| * ((4 + Cd + |Ko|) * s * e) = |M| * (4 + Cd + |Ko|) * (s * e) := by ring
     rw [e1]
     linarith [up Cd hCd, up _ (abs_nonneg Ko)]
   have r3 : Real.log (x + 1) + Cd + |CE| * Real.log x ≤ A1 * (s * e) := by
@@ -478,7 +517,6 @@ theorem ch_core (C ε CE Ko c M : ℝ) (hC : 0 ≤ C) (hε : 0 < ε) (hc : |c| �
         mul_le_mul_of_nonneg_right (hM.trans (le_abs_self M)) (show 0 ≤ A1 * (s * e) by positivity)
       have k2 := mul_le_mul_of_nonneg_right hbig (show 0 ≤ s * e by positivity)
       have k3 : 0 ≤ s * (s * e) := by positivity
-      have k4 : |M| * (A1 * (s * e)) = |M| * A1 * (s * e) := by ring
       linarith
   have hc' :=
     CharacterBalanceMoves.core A0 D S hHost ell N TT T2 a w hx3 hb hS hThin hCost hT2 hTop hY

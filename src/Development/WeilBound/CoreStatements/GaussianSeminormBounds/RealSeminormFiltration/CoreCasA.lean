@@ -1,6 +1,49 @@
 module
 
-public import Mathlib
+public import Mathlib.Analysis.CStarAlgebra.Module.Constructions
+public import Mathlib.Analysis.InnerProductSpace.PiL2
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+public import Mathlib.Analysis.InnerProductSpace.Spectrum
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -11,11 +54,9 @@ open scoped InnerProductSpace
 
 namespace PositivityTheory.KReal
 
-theorem pos_of_eig
-    {E : Type} [NormedAddCommGroup E] [InnerProductSpace ℂ E] [FiniteDimensional ℂ E]
-    (S : E →ₗ[ℂ] E) (hS : S.IsSymmetric) (h : ∀ t : ℝ, t ≤ 0 → ∀ x, S x = (t : ℂ) • x → x = 0)
-    (x : E)
-    : 0 ≤ (⟪x, S x⟫_ℂ).re ∧ ((⟪x, S x⟫_ℂ).re = 0 → x = 0) := by
+theorem pos_of_eig {E : Type} [NormedAddCommGroup E] [InnerProductSpace ℂ E] [FiniteDimensional ℂ E]
+    (S : E →ₗ[ℂ] E) (hS : S.IsSymmetric) (h : ∀ t : ℝ, t ≤ 0 → ∀ x, S x = (t : ℂ) • x → x = 0) (x : E) :
+    0 ≤ (⟪x, S x⟫_ℂ).re ∧ ((⟪x, S x⟫_ℂ).re = 0 → x = 0) := by
   let b := hS.eigenvectorBasis (n := Module.finrank ℂ E) rfl
   let ev := hS.eigenvalues (n := Module.finrank ℂ E) rfl
   have hb : ∀ i, S (b i) = (ev i : ℂ) • b i := fun i => hS.apply_eigenvectorBasis rfl i
@@ -26,10 +67,10 @@ theorem pos_of_eig
   have key : (⟪x, S x⟫_ℂ).re = ∑ i, ev i * Complex.normSq ⟪b i, x⟫_ℂ := by
     rw [← b.sum_inner_mul_inner x (S x), Complex.re_sum]
     refine Finset.sum_congr rfl fun i _ => ?_
-    rw [← hS (b i) x, hb, inner_smul_left, Complex.conj_ofReal, ← inner_conj_symm x (b i),
-      mul_left_comm, ← Complex.normSq_eq_conj_mul_self, ← Complex.ofReal_mul, Complex.ofReal_re]
-  have hnn : ∀ i ∈ Finset.univ, 0 ≤ ev i * Complex.normSq ⟪b i, x⟫_ℂ := fun i _ =>
-    mul_nonneg (hev i).le (Complex.normSq_nonneg _)
+    rw [← hS (b i) x, hb, inner_smul_left, Complex.conj_ofReal, ← inner_conj_symm x (b i), mul_left_comm,
+      ← Complex.normSq_eq_conj_mul_self, ← Complex.ofReal_mul, Complex.ofReal_re]
+  have hnn : ∀ i ∈ Finset.univ, 0 ≤ ev i * Complex.normSq ⟪b i, x⟫_ℂ :=
+    fun i _ => mul_nonneg (hev i).le (Complex.normSq_nonneg _)
   rw [key]
   refine ⟨Finset.sum_nonneg hnn, fun h0 => ?_⟩
   rw [Finset.sum_eq_zero_iff_of_nonneg hnn] at h0
@@ -60,16 +101,14 @@ def valOp (A : Module.End ℂ V) : Module.End ℂ (PiLp 2 (fun _ : I => V)) wher
     ext i
     simp
 
-theorem matOp_apply (m : Matrix I I ℂ) (Θ : PiLp 2 (fun _ : I => V)) (i : I)
-    : matOp m Θ i = ∑ j, m i j • Θ j :=
-  rfl
+theorem matOp_apply (m : Matrix I I ℂ) (Θ : PiLp 2 (fun _ : I => V)) (i : I) :
+    matOp m Θ i = ∑ j, m i j • Θ j := rfl
 
-theorem valOp_apply (A : Module.End ℂ V) (Θ : PiLp 2 (fun _ : I => V)) (i : I)
-    : valOp A Θ i = A (Θ i) :=
-  rfl
+theorem valOp_apply (A : Module.End ℂ V) (Θ : PiLp 2 (fun _ : I => V)) (i : I) :
+    valOp A Θ i = A (Θ i) := rfl
 
-theorem matOp_adj (m : Matrix I I ℂ) (x y : PiLp 2 (fun _ : I => V))
-    : ⟪matOp m x, y⟫_ℂ = ⟪x, matOp mᴴ y⟫_ℂ := by
+theorem matOp_adj (m : Matrix I I ℂ) (x y : PiLp 2 (fun _ : I => V)) :
+    ⟪matOp m x, y⟫_ℂ = ⟪x, matOp mᴴ y⟫_ℂ := by
   simp only [PiLp.inner_apply, matOp_apply, sum_inner, inner_sum, inner_smul_left, inner_smul_right,
     conjTranspose_apply]
   rw [Finset.sum_comm]
@@ -77,27 +116,21 @@ theorem matOp_adj (m : Matrix I I ℂ) (x y : PiLp 2 (fun _ : I => V))
 
 end Ops
 
-theorem cas_one
-    {K I : Type} [Fintype K] [Fintype I] [DecidableEq I]
-    (σ : K → K) (hσ : Function.Involutive σ)
-    {M : Type} [AddCommGroup M] [Module ℂ M]
-    (e : K → Module.End ℂ M)
-    (X : I → Module.End ℂ M)
-    (c : K → Matrix I I ℂ)
-    (d c0 : ℝ)
-    (h1 : ∀ k i, e k * X i - X i * e k = ∑ j, c k j i • X j) (h3 : ∀ k, c (σ k) = (c k)ᴴ)
+theorem cas_one {K I : Type} [Fintype K] [Fintype I] [DecidableEq I] (σ : K → K) (hσ : Function.Involutive σ)
+    {M : Type} [AddCommGroup M] [Module ℂ M] (e : K → Module.End ℂ M) (X : I → Module.End ℂ M)
+    (c : K → Matrix I I ℂ) (d c0 : ℝ)
+    (h1 : ∀ k i, e k * X i - X i * e k = ∑ j, c k j i • X j)
+    (h3 : ∀ k, c (σ k) = (c k)ᴴ)
     (h4 : ∑ k, c k * c (σ k) = (d : ℂ) • (1 : Matrix I I ℂ))
     {V : Type} [NormedAddCommGroup V] [InnerProductSpace ℂ V] [FiniteDimensional ℂ V]
     (ρ : K → Module.End ℂ V) (hadj : ∀ k u v, ⟪ρ k u, v⟫_ℂ = ⟪u, ρ (σ k) v⟫_ℂ)
     (hc0 : ∑ k, ρ k * ρ (σ k) = (c0 : ℂ) • (1 : Module.End ℂ V))
     (ι : V →ₗ[ℂ] M) (hι : ∀ k v, ι (ρ k v) = e k (ι v))
-    (h5 : ∀ t : ℝ,
-      t ≤ c0 + d
-        → ∀ x ∈ Submodule.span ℂ {y | ∃ i v, y = X i (ι v)},
-          (∑ k, e k * e (σ k)) x = (t : ℂ) • x → x = 0)
-    (Φ : I → V) (hΦ : ∀ Θ : I → V, ∑ i, X i (ι (Θ i)) = 0 → ∑ i, ⟪Φ i, Θ i⟫_ℂ = 0)
-    : 0 ≤ (∑ k, ∑ i, ∑ j, ⟪Φ i, c k i j • ρ (σ k) (Φ j)⟫_ℂ).re
-      ∧ ((∑ k, ∑ i, ∑ j, ⟪Φ i, c k i j • ρ (σ k) (Φ j)⟫_ℂ).re = 0 → Φ = 0) := by
+    (h5 : ∀ t : ℝ, t ≤ c0 + d → ∀ x ∈ Submodule.span ℂ {y | ∃ i v, y = X i (ι v)},
+      (∑ k, e k * e (σ k)) x = (t : ℂ) • x → x = 0)
+    (Φ : I → V) (hΦ : ∀ Θ : I → V, ∑ i, X i (ι (Θ i)) = 0 → ∑ i, ⟪Φ i, Θ i⟫_ℂ = 0) :
+    0 ≤ (∑ k, ∑ i, ∑ j, ⟪Φ i, c k i j • ρ (σ k) (Φ j)⟫_ℂ).re ∧
+      ((∑ k, ∑ i, ∑ j, ⟪Φ i, c k i j • ρ (σ k) (Φ j)⟫_ℂ).re = 0 → Φ = 0) := by
   let R : K → Module.End ℂ (PiLp 2 (fun _ : I => V)) := fun k => matOp (c k) + valOp (ρ k)
   have hRa : ∀ k Θ i, R k Θ i = ∑ j, c k i j • Θ j + ρ k (Θ i) := fun k Θ i => rfl
   have hRadj : ∀ k x y, ⟪R k x, y⟫_ℂ = ⟪x, R (σ k) y⟫_ℂ := by
@@ -106,24 +139,20 @@ theorem cas_one
     rw [matOp_adj, h3]
     congr 1
     simp only [PiLp.inner_apply, valOp_apply, hadj]
-  let m1 : PiLp 2 (fun _ : I => V) →ₗ[ℂ] M := {
-    toFun := fun Θ => ∑ i, X i (ι (Θ i))
-    map_add' := fun x y => by simp [Finset.sum_add_distrib]
-    map_smul' := fun a x => by simp [Finset.smul_sum]
-  }
+  let m1 : PiLp 2 (fun _ : I => V) →ₗ[ℂ] M :=
+    { toFun := fun Θ => ∑ i, X i (ι (Θ i))
+      map_add' := fun x y => by simp [Finset.sum_add_distrib]
+      map_smul' := fun a x => by simp [Finset.smul_sum] }
   have hm1 : ∀ Θ, m1 Θ = ∑ i, X i (ι (Θ i)) := fun _ => rfl
   have hem : ∀ k Θ, e k (m1 Θ) = m1 (R k Θ) := by
     intro k Θ
     have h1' : ∀ i y, e k (X i y) = ∑ j, c k j i • X j y + X i (e k y) := by
       intro i y
       have := LinearMap.congr_fun (h1 k i) y
-      simp only [LinearMap.sub_apply, Module.End.mul_apply, LinearMap.sum_apply,
-          LinearMap.smul_apply]
-        at this
-      rw [← this]
-      abel
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [hm1, hRa, map_sum, map_add (f := _), map_smul, h1', hι, Finset.sum_add_distrib]
+      simp only [LinearMap.sub_apply, Module.End.mul_apply, LinearMap.sum_apply, LinearMap.smul_apply] at this
+      rw [← this]; abel
+
+    simp only [hm1, hRa, map_sum, map_add (f := _), map_smul, h1', hι, Finset.sum_add_distrib]
     rw [Finset.sum_comm]
   let N := (LinearMap.ker m1)ᗮ
   have hRN : ∀ k, ∀ x ∈ N, R k x ∈ N := by
@@ -137,12 +166,12 @@ theorem cas_one
   let S : Module.End ℂ (PiLp 2 (fun _ : I => V)) := ∑ k, R k * R (σ k) - ((c0 + d : ℝ) : ℂ) • 1
   have hSa : ∀ x, S x = ∑ k, R k (R (σ k) x) - ((c0 + d : ℝ) : ℂ) • x := by
     intro x
-    simp only [S, LinearMap.sub_apply, LinearMap.sum_apply, Module.End.mul_apply,
-      LinearMap.smul_apply, Module.End.one_apply]
+    simp only [S, LinearMap.sub_apply, LinearMap.sum_apply, Module.End.mul_apply, LinearMap.smul_apply,
+      Module.End.one_apply]
   have hS : LinearMap.IsSymmetric S := by
     intro x y
-    rw [hSa, hSa, inner_sub_left, inner_sub_right, sum_inner, inner_sum, inner_smul_left,
-      inner_smul_right, Complex.conj_ofReal]
+    rw [hSa, hSa, inner_sub_left, inner_sub_right, sum_inner, inner_sum, inner_smul_left, inner_smul_right,
+      Complex.conj_ofReal]
     congr 1
     refine Finset.sum_congr rfl fun k _ => ?_
     rw [hRadj, hRadj, hσ]
@@ -155,25 +184,22 @@ theorem cas_one
     intro u hu
     rw [PiLp.inner_apply]
     exact hΦ (fun i => u i) hu
-  have hpos :=
-    pos_of_eig (S.restrict hSN) (hS.restrict_invariant hSN)
-      (by
-        intro t ht x hx
-        have hx' : S x.1 = (t : ℂ) • x.1 := congrArg Subtype.val hx
-        have h0 : m1 x.1 = 0 := by
-          refine h5 (t + (c0 + d)) (by linarith) _ ?_ ?_
-          · rw [hm1]
-            exact Submodule.sum_mem _ fun i _ => Submodule.subset_span ⟨i, _, rfl⟩
-          · rw [hSa, sub_eq_iff_eq_add, ← add_smul] at hx'
-            rw [LinearMap.sum_apply]
-            simp only [Module.End.mul_apply, hem]
-            set_option synthInstance.maxHeartbeats 100000 in
-              rw [← map_sum, hx', map_smul]
-            push_cast
-            rfl
-        have h2 : ⟪x.1, x.1⟫_ℂ = 0 := (Submodule.mem_orthogonal' _ _).1 x.2 _ h0
-        exact Subtype.ext (inner_self_eq_zero.1 h2))
-      ⟨_, hΦN⟩
+  have hpos := pos_of_eig (S.restrict hSN) (hS.restrict_invariant hSN) (by
+    intro t ht x hx
+    have hx' : S x.1 = (t : ℂ) • x.1 := congrArg Subtype.val hx
+    have h0 : m1 x.1 = 0 := by
+      refine h5 (t + (c0 + d)) (by linarith) _ ?_ ?_
+      · rw [hm1]
+        exact Submodule.sum_mem _ fun i _ => Submodule.subset_span ⟨i, _, rfl⟩
+      · rw [hSa, sub_eq_iff_eq_add, ← add_smul] at hx'
+        rw [LinearMap.sum_apply]
+        simp only [Module.End.mul_apply, hem]
+
+        rw [← map_sum, hx', map_smul]
+        push_cast
+        rfl
+    have h2 : ⟪x.1, x.1⟫_ℂ = 0 := (Submodule.mem_orthogonal' _ _).1 x.2 _ h0
+    exact Subtype.ext (inner_self_eq_zero.1 h2)) ⟨_, hΦN⟩
   have hval : ∀ i, S (WithLp.toLp 2 Φ) i = (2 : ℂ) • ∑ k, ∑ j, c k i j • ρ (σ k) (Φ j) := by
     intro i
     have e1 : ∑ k, ∑ j, c k i j • ∑ l, c (σ k) j l • Φ l = (d : ℂ) • Φ i := by
@@ -181,15 +207,14 @@ theorem cas_one
         intro l
         have := congrFun (congrFun h4 i) l
         simpa [Matrix.sum_apply, Matrix.mul_apply, Matrix.one_apply] using this
-      calc
-        ∑ k, ∑ j, c k i j • ∑ l, c (σ k) j l • Φ l
-            = ∑ k, ∑ l, ∑ j, (c k i j * c (σ k) j l) • Φ l := by
-          refine Finset.sum_congr rfl fun k _ => ?_
-          rw [Finset.sum_comm]
-          simp only [Finset.smul_sum, smul_smul]
+      calc ∑ k, ∑ j, c k i j • ∑ l, c (σ k) j l • Φ l
+          = ∑ k, ∑ l, ∑ j, (c k i j * c (σ k) j l) • Φ l := by
+            refine Finset.sum_congr rfl fun k _ => ?_
+            rw [Finset.sum_comm]
+            simp only [Finset.smul_sum, smul_smul]
         _ = ∑ l, (∑ k, ∑ j, c k i j * c (σ k) j l) • Φ l := by
-          rw [Finset.sum_comm]
-          simp only [Finset.sum_smul]
+            rw [Finset.sum_comm]
+            simp only [Finset.sum_smul]
         _ = (d : ℂ) • Φ i := by simp [this]
     have e2 : ∑ k, ρ k (ρ (σ k) (Φ i)) = (c0 : ℂ) • Φ i := by
       have := LinearMap.congr_fun hc0 (Φ i)
@@ -197,11 +222,9 @@ theorem cas_one
     have e3 : ∑ k, ρ k (∑ l, c (σ k) i l • Φ l) = ∑ k, ∑ j, c k i j • ρ (σ k) (Φ j) := by
       rw [← Equiv.sum_comp hσ.toPerm]
       refine Finset.sum_congr rfl fun k _ => ?_
-      set_option synthInstance.maxHeartbeats 100000 in
+
       simp only [Function.Involutive.coe_toPerm, hσ k, map_sum, map_smul]
-    have e4
-        : S (WithLp.toLp 2 Φ) i
-          = ∑ k, R k (R (σ k) (WithLp.toLp 2 Φ)) i - ((c0 + d : ℝ) : ℂ) • Φ i := by
+    have e4 : S (WithLp.toLp 2 Φ) i = ∑ k, R k (R (σ k) (WithLp.toLp 2 Φ)) i - ((c0 + d : ℝ) : ℂ) • Φ i := by
       rw [hSa]
       simp
     rw [e4]
@@ -210,9 +233,8 @@ theorem cas_one
     push_cast
     rw [add_smul]
     abel
-  have hin
-      : (⟪(⟨_, hΦN⟩ : N), S.restrict hSN ⟨_, hΦN⟩⟫_ℂ)
-        = 2 * ∑ k, ∑ i, ∑ j, ⟪Φ i, c k i j • ρ (σ k) (Φ j)⟫_ℂ := by
+  have hin : (⟪(⟨_, hΦN⟩ : N), S.restrict hSN ⟨_, hΦN⟩⟫_ℂ) =
+      2 * ∑ k, ∑ i, ∑ j, ⟪Φ i, c k i j • ρ (σ k) (Φ j)⟫_ℂ := by
     change ⟪WithLp.toLp 2 Φ, S (WithLp.toLp 2 Φ)⟫_ℂ = _
     rw [PiLp.inner_apply, Finset.sum_comm, Finset.mul_sum]
     refine Finset.sum_congr rfl fun i _ => ?_

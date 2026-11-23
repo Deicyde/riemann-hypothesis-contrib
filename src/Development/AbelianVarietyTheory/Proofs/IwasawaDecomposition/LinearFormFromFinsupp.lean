@@ -1,14 +1,45 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsEqAddOfRedVEq
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.NonnegSumSmulIntBilinFormToRealMemPsdConeStatement
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.IsStrictIff
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.HomExtNormalSt
 
 @[expose] public section
 
-open NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.Toroidal
-  GlobalTheory.LocM GlobalTheory.TorRef GlobalTheory.PolFan GlobalTheory.PolCell
+open NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.TorRef GlobalTheory.PolFan GlobalTheory.PolCell
 
 noncomputable section
 
@@ -16,45 +47,40 @@ namespace GlobalTheory.PolCell
 
 variable {X : Type} [AddCommGroup X]
 
-theorem linW_single_apply (p : X × X) (k : ℤ) (β : LinearMap.BilinForm ℤ X)
-    : linW (Finsupp.single p k) β = k * β p.1 p.2 := by
+theorem linW_single_apply (p : X × X) (k : ℤ) (β : LinearMap.BilinForm ℤ X) :
+    linW (Finsupp.single p k) β = k * β p.1 p.2 := by
   rw [linW_apply, Finsupp.sum_single_index (by simp)]
 
-theorem linW_add_apply (w v : (X × X) →₀ ℤ) (β : LinearMap.BilinForm ℤ X)
-    : linW (w + v) β = linW w β + linW v β := by
+theorem linW_add_apply (w v : (X × X) →₀ ℤ) (β : LinearMap.BilinForm ℤ X) :
+    linW (w + v) β = linW w β + linW v β := by
   simp only [linW_apply]
   exact Finsupp.sum_add_index' (fun _ => by simp) (fun _ _ _ => by ring)
 
-theorem linW_finset_sum_apply
-    {ι : Type} (s : Finset ι) (g : ι → (X × X) →₀ ℤ) (β : LinearMap.BilinForm ℤ X)
-    : linW (∑ i ∈ s, g i) β = ∑ i ∈ s, linW (g i) β := by
+theorem linW_finset_sum_apply {ι : Type} (s : Finset ι) (g : ι → (X × X) →₀ ℤ) (β : LinearMap.BilinForm ℤ X) :
+    linW (∑ i ∈ s, g i) β = ∑ i ∈ s, linW (g i) β := by
   classical
   induction s using Finset.induction_on with
   | empty => simp [linW_apply]
   | insert a s ha ih => rw [Finset.sum_insert ha, Finset.sum_insert ha, linW_add_apply, ih]
 
-theorem bilin_eq_zero_of_mem_torsion_left
-    (β : LinearMap.BilinForm ℤ X) {t : X} (ht : t ∈ Submodule.torsion ℤ X) (y : X)
-    : β t y = 0 := by
+theorem bilin_eq_zero_of_mem_torsion_left (β : LinearMap.BilinForm ℤ X) {t : X}
+    (ht : t ∈ Submodule.torsion ℤ X) (y : X) : β t y = 0 := by
   obtain ⟨n, hn⟩ := (Submodule.mem_torsion_iff t).mp ht
   rw [Submonoid.smul_def] at hn
   have h := LinearMap.map_smul₂ β (n : ℤ) t y
   rw [hn, map_zero, LinearMap.zero_apply, eq_comm, smul_eq_zero] at h
   exact h.resolve_left (nonZeroDivisors.coe_ne_zero n)
 
-theorem bilin_eq_zero_of_mem_torsion_right
-    (β : LinearMap.BilinForm ℤ X) (x : X) {t : X} (ht : t ∈ Submodule.torsion ℤ X)
-    : β x t = 0 := by
+theorem bilin_eq_zero_of_mem_torsion_right (β : LinearMap.BilinForm ℤ X) (x : X) {t : X}
+    (ht : t ∈ Submodule.torsion ℤ X) : β x t = 0 := by
   obtain ⟨n, hn⟩ := (Submodule.mem_torsion_iff t).mp ht
   rw [Submonoid.smul_def] at hn
   have h := (β x).map_smul (n : ℤ) t
   rw [hn, map_zero, eq_comm, smul_eq_zero] at h
   exact h.resolve_left (nonZeroDivisors.coe_ne_zero n)
 
-theorem exists_linW_eq
-    : ∀ (X : Type) [AddCommGroup X] [Module.Finite ℤ X] (ℓ : LinearMap.BilinForm ℤ X →ₗ[ℤ] ℤ),
-      ∃ w : (X × X) →₀ ℤ,
-        linW w = ℓ := by
+theorem exists_linW_eq : ∀ (X : Type) [AddCommGroup X] [Module.Finite ℤ X] (ℓ : LinearMap.BilinForm ℤ X →ₗ[ℤ] ℤ),
+    ∃ w : (X × X) →₀ ℤ, linW w = ℓ := by
   intro X _ _ ℓ
   classical
   let T := Submodule.torsion ℤ X
@@ -66,11 +92,12 @@ theorem exists_linW_eq
     intro x
     refine (Submodule.Quotient.mk_eq_zero T).mp ?_
     change T.mkQ _ = 0
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sub, map_sum]
+
+    rw [map_sub, map_sum]
     simp only [map_smul, he, c, LinearMap.comp_apply, Module.Basis.coord_apply]
     rw [b.sum_repr, sub_self]
-  have hβ : ∀ β : LinearMap.BilinForm ℤ X, β = ∑ i, ∑ j, β (e i) (e j) • (c i).smulRight (c j) := by
+  have hβ : ∀ β : LinearMap.BilinForm ℤ X,
+      β = ∑ i, ∑ j, β (e i) (e j) • (c i).smulRight (c j) := by
     intro β
     ext x y
     have h1 : β x y = β (∑ i, c i x • e i) y := by
@@ -81,9 +108,8 @@ theorem exists_linW_eq
       have := bilin_eq_zero_of_mem_torsion_right β x' (hdec y)
       rwa [map_sub, sub_eq_zero] at this
     rw [h1, h2]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_smul, LinearMap.sum_apply, LinearMap.smul_apply,
-        LinearMap.smulRight_apply, smul_eq_mul]
+
+    simp only [map_sum, map_smul, LinearMap.sum_apply, LinearMap.smul_apply, LinearMap.smulRight_apply, smul_eq_mul]
     simp only [Finset.mul_sum]
     rw [Finset.sum_comm]
     exact Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => by ring
@@ -91,8 +117,8 @@ theorem exists_linW_eq
   ext β
   rw [linW_finset_sum_apply]
   conv_rhs => rw [hβ β]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, map_smul, smul_eq_mul, linW_finset_sum_apply, linW_single_apply]
+
+  simp only [map_sum, map_smul, smul_eq_mul, linW_finset_sum_apply, linW_single_apply]
   exact Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => by ring
 
 end GlobalTheory.PolCell

@@ -1,11 +1,51 @@
 module
 
-public import Mathlib
-public import ReciprocityTheory.AnalyticForms.RegularLocalRings.IntToRat
+import GroundTheory.HeightsAndTheta.Heights.ArithmeticBezout.PGenericFibreDim
 public import GroundTheory.HeightsAndTheta.Heights.HilbertSamuel.StatementsGeneratedNefGeneric
 public import GroundTheory.HeightsAndTheta.Heights.HilbertSamuel.StatementsPerturb
 public import GroundTheory.HeightsAndTheta.Heights.HilbertSamuel.StatementsGeneratedRestrict
 public import GroundTheory.HeightsAndTheta.Heights.HilbertSamuel.StatementsGeneratedProductNonneg
+public import GroundTheory.HeightsAndTheta.Heights.DiscreteValuationNumbers.AssemblyBridgeFull
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
+public import ReciprocityTheory.AnalyticForms.RegularLocalRings.IntToRat
 
 @[expose] public section
 
@@ -13,36 +53,17 @@ set_option maxSynthPendingDepth 1
 
 namespace GroundTheory.Heights₂.Heights.HilbertSamuel
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
-  ReciprocityTheory.ChartRestriction.G.ArakelovGeometry ReciprocityTheory.ChartRestriction.G.AI.I1
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.ArakelovGeometry ReciprocityTheory.ChartRestriction.G.AI.I1
 
 noncomputable section
 
-theorem GeneratedNefGeneric.eq_natCast_of_add_one_eq
-    (d : ℕ) (x : WithBot ℕ∞) (hform : x + 1 = ((d : ℕ) : WithBot ℕ∞) + 1)
-    : x = d := by
-  induction x using WithBot.recBotCoe with
-  | bot => exact absurd hform (by simp; rw [← Nat.cast_succ]; exact (WithBot.natCast_ne_bot _).symm)
-  | coe y =>
-    induction y using ENat.recTopCoe with
-    | top =>
-      exfalso
-      have h1 : (((⊤ : ℕ∞) + 1 : ℕ∞) : WithBot ℕ∞) = (((d + 1 : ℕ) : ℕ∞) : WithBot ℕ∞) := by
-        rw [WithBot.coe_add]; exact_mod_cast hform
-      have h2 : ((⊤ : ℕ∞) + 1 : ℕ∞) = ((d + 1 : ℕ) : ℕ∞) := WithBot.coe_injective h1
-      rw [top_add] at h2
-      exact ENat.top_ne_natCast _ h2
-    | coe y =>
-      have h1 : ((y + 1 : ℕ) : WithBot ℕ∞) = ((d + 1 : ℕ) : WithBot ℕ∞) := by exact_mod_cast hform
-      have : y = d := by exact_mod_cast (by exact_mod_cast h1 : y + 1 = d + 1) |> Nat.succ_injective
-      subst this
-      rfl
+theorem GeneratedNefGeneric.eq_natCast_of_add_one_eq (d : ℕ) (x : WithBot ℕ∞)
+    (hform : x + 1 = ((d : ℕ) : WithBot ℕ∞) + 1) : x = d := by
+  apply GroundTheory.Heights₂.Heights.ObjectsChow.GenericFibreDim.eq_natCast_of_add_one_eq <;> assumption
 
-theorem GeneratedNefGeneric.isProjVarF_map
-    {K : Type} [Fintype K]
-    {ι : K → Type} [∀ k, Fintype (ι k)]
-    {W : Ideal (MRing ι)} {d : ℕ} (hW : IsArithVar W (d + 1))
-    : IsProjVarF (W.map (MvPolynomial.map (Int.castRingHom ℚ))) d := by
+theorem GeneratedNefGeneric.isProjVarF_map {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)]
+    {W : Ideal (MRing ι)} {d : ℕ} (hW : IsArithVar W (d + 1)) :
+    IsProjVarF (W.map (MvPolynomial.map (Int.castRingHom ℚ))) d := by
   obtain ⟨-, ⟨hWp, ⟨S, hS, hWS⟩, hrel⟩, hhor, hdim⟩ := hW
   have : W.IsPrime := hWp
   have hchar : ∀ m : ℤ, (C m : MvPolynomial (Σ k, ι k) ℤ) ∈ W → m = 0 := by
@@ -70,10 +91,8 @@ theorem GeneratedNefGeneric.isProjVarF_map
     push_cast
     rfl
 
-theorem GeneratedNefGeneric.proof
-    (hG : GenOnFibres.Statement) (hR : GeneratedRestrict.Statement)
-    (hN : GeneratedProductNonneg.Statement)
-    : GeneratedNefGeneric.Statement := by
+theorem GeneratedNefGeneric.proof (hG : GenOnFibres.Statement) (hR : GeneratedRestrict.Statement)
+    (hN : GeneratedProductNonneg.Statement) : GeneratedNefGeneric.Statement := by
   intro K _ ι _ Ω _ _ y D a q w _ hw hgen W hW hPW
   classical
   let _ : LinearOrder K := LinearOrder.lift' (Fintype.equivFin K) (Fintype.equivFin K).injective
@@ -84,13 +103,8 @@ theorem GeneratedNefGeneric.proof
     hR ℚ K ι _ _ a (Ideal.map_mono hPW) hQ
   have hV : IsProjVarF (W.map (MvPolynomial.map (Int.castRingHom ℚ))) 1 :=
     GeneratedNefGeneric.isProjVarF_map (d := 1) hW
-  have h :=
-    hN ℚ K ι
-      (fun V _ L => NumbersDVR.intNum ℚ V L)
-      _ 1
-      (fun _ => a)
-      (NumbersDVR.IntNumIsFieldIntersection.full ℚ K ι) hV
-      (fun _ => hWQ)
+  have h := hN ℚ K ι (fun V _ L => NumbersDVR.intNum ℚ V L) _ 1 (fun _ => a)
+    (NumbersDVR.IntNumIsFieldIntersection.full ℚ K ι) hV (fun _ => hWQ)
   unfold genDeg
   convert h
 

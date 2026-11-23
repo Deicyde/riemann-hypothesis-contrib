@@ -1,12 +1,50 @@
 module
 
-public import Mathlib
-public import Formalism.LocalToGlobal.CharacterGerms.ContentLargeFromSupplies
-public import Formalism.LocalToGlobal.CharacterGerms.ContentZeroAt
-public import Formalism.LocalToGlobal.CharacterGerms.LatticeInclusionFormsInjective
 public import Formalism.LocalToGlobal.CharacterGerms.CoeffIterateZero
 public import Development.AbelianVarietyTheory.Proofs.UnramifiedDepth.ProdFactorialDiag
 public import Development.AbelianVarietyTheory.Proofs.UnramifiedDepth.CharacterBlocksAttainBound
+public import Development.AbelianVarietyTheory.Proofs.UnramifiedDepth.LegendreAndCapelli
+import Development.AbelianVarietyTheory.Proofs.UnramifiedDepth.LegendreBoundsFactorialMultiIndexCapelli
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+public import Mathlib.Data.Nat.Prime.Factorial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.MvPowerSeries.Rename
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
@@ -23,8 +61,8 @@ variable {C : Type} [Field C]
 def Tan {σ : Type} (x : σ) (F : MvPowerSeries σ C) : Prop :=
   ∀ m : σ →₀ ℕ, m.degree ≤ 1 → coeff m F = coeff m (X x : MvPowerSeries σ C)
 
-theorem Tan.subst {σ τ : Type} [Finite σ] {x : σ} {F : MvPowerSeries σ C} (h : Tan x F) (e : σ → τ)
-    : Tan (e x) (F.subst fun j => (X (e j) : MvPowerSeries τ C)) := by
+theorem Tan.subst {σ τ : Type} [Finite σ] {x : σ} {F : MvPowerSeries σ C} (h : Tan x F) (e : σ → τ) :
+    Tan (e x) (F.subst fun j => (X (e j) : MvPowerSeries τ C)) := by
   intro m hm
   have h1 : rename e F = F.subst fun j => (X (e j) : MvPowerSeries τ C) := rename_eq_subst e F
   rw [← h1, ← rename_X e x, coeff_rename, coeff_rename]
@@ -35,12 +73,8 @@ theorem Tan.subst {σ τ : Type} [Finite σ] {x : σ} {F : MvPowerSeries σ C} (
 
 variable {V : VF C} {d : ℕ}
 
-theorem tan_std
-    {I J : Type} [Fintype I] [Fintype J]
-    (X : Cart V d I J)
-    {t : I → MvPowerSeries I C} (ht : (GlobalTheory.CharBlock.stdSys X).IsT t)
-    (x : I)
-    : Tan x (t x) := by
+theorem tan_std {I J : Type} [Fintype I] [Fintype J] (X : Cart V d I J)
+    {t : I → MvPowerSeries I C} (ht : (GlobalTheory.CharBlock.stdSys X).IsT t) (x : I) : Tan x (t x) := by
   intro m hm
   have h := ht.2 x m
   rw [Sys.eqn_eq] at h
@@ -59,8 +93,8 @@ theorem tan_std
 
 variable {I J : Fin 2 → Type} [∀ g, Fintype (I g)] [∀ g, Fintype (J g)]
 
-theorem cc_upG (g : Fin 2) (F : MvPowerSeries (I g) C)
-    : constantCoeff (upG g F) = constantCoeff F := by
+theorem cc_upG (g : Fin 2) (F : MvPowerSeries (I g) C) :
+    constantCoeff (upG g F) = constantCoeff F := by
   have h1 : rename (fun x : I g => (⟨g, x⟩ : WV I)) F = upG g F := rename_eq_subst _ F
   rw [← h1, constantCoeff_rename]
 
@@ -77,8 +111,8 @@ theorem hasSubst_upG_curveSystem : HasSubst (fun w : WV I => upG w.1 (t w.1 w.2)
 theorem isMon_one : IsMon t 1 :=
   ⟨0, by rw [← coe_substAlgHom (hasSubst_upG_curveSystem h0)]; exact (map_one _).symm⟩
 
-theorem IsMon.mul {F G : MvPowerSeries (WV I) C} (hF : IsMon t F) (hG : IsMon t G)
-    : IsMon t (F * G) := by
+theorem IsMon.mul {F G : MvPowerSeries (WV I) C} (hF : IsMon t F) (hG : IsMon t G) :
+    IsMon t (F * G) := by
   obtain ⟨m, rfl⟩ := hF
   obtain ⟨m', rfl⟩ := hG
   refine ⟨m + m', ?_⟩
@@ -92,9 +126,8 @@ theorem isMon_pow (g : Fin 2) (c : I g) (n : ℕ) : IsMon t (upG g (t g c) ^ n) 
     refine ih.mul h0 ⟨Finsupp.single ⟨g, c⟩ 1, ?_⟩
     exact (subst_X (hasSubst_upG_curveSystem h0) (⟨g, c⟩ : WV I)).symm
 
-theorem isMon_prod
-    {ι : Type} (s : Finset ι) (F : ι → MvPowerSeries (WV I) C) (h : ∀ i, IsMon t (F i))
-    : IsMon t (∏ i ∈ s, F i) :=
+theorem isMon_prod {ι : Type} (s : Finset ι) (F : ι → MvPowerSeries (WV I) C)
+    (h : ∀ i, IsMon t (F i)) : IsMon t (∏ i ∈ s, F i) :=
   Finset.prod_induction _ _ (fun _ _ => IsMon.mul h0) (isMon_one h0) fun i _ => h i
 
 omit h0 in
@@ -108,10 +141,10 @@ theorem IsMon.mem {F : MvPowerSeries (WV I) C} (hF : IsMon t F) : F ∈ IntGerm 
 
 end
 
-theorem degree_dg {σ : Type} {N N' : ℕ} (j : Fin N × Fin N' → σ) (e : ℕ → ℕ)
-    : (dg j (monAl N N' e)).degree = monDeg N N' e := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [← sum_monAl, Fin.sum_univ_eq_sum_range (fun ρ => monAl N N' e ρ) N, dg, map_sum]
+theorem degree_dg {σ : Type} {N N' : ℕ} (j : Fin N × Fin N' → σ) (e : ℕ → ℕ) :
+    (dg j (monAl N N' e)).degree = monDeg N N' e := by
+
+  rw [← sum_monAl, Fin.sum_univ_eq_sum_range (fun ρ => monAl N N' e ρ) N, dg, map_sum]
   refine Finset.sum_congr rfl fun ρ hρ => ?_
   unfold dgOne
   split_ifs with h
@@ -120,29 +153,18 @@ theorem degree_dg {σ : Type} {N N' : ℕ} (j : Fin N × Fin N' → σ) (e : ℕ
 
 variable [NeZero d]
 
-theorem core
-    (X : RowData C V d I J) (g : Fin 2) (r : ZMod d → ℕ) (en : ∀ a, Fin (r a) → I g)
+theorem core (X : RowData C V d I J) (g : Fin 2) (r : ZMod d → ℕ) (en : ∀ a, Fin (r a) → I g)
     (hinj : ∀ a, Function.Injective (en a)) (hty : ∀ a c, (X.G g).ty (Sum.inl (en a c)) = a)
-    (e : ZMod d → ℕ → ℕ) (N : ℕ)
-    : ∃ (S : ∀ g, Sys (X.G g)) (t : ∀ g, I g → MvPowerSeries (I g) C),
-      (∀ g, (S g).IsT (t g))
-        ∧ ∃ gr : Fin N → MvPowerSeries (WV I) C,
-          (∀ ρ, gr ρ ∈ IntGerm V t)
-            ∧ V.v (ValOf X.hL
-                (∏ a : ZMod d, MvPolynomial.rename
-                  (fun x : Fin N × Fin (r a) => ((x.1, ⟨g, en a x.2⟩) : Fin N × WV I))
-                  (monP C N (r a) (e a)))
-                (fun _ => none)
-                gr)
-              ≤ (((((∑ a, monDeg N (r a) (e a) : ℕ) : ℝ) / ((V.l : ℝ) - 1)) : ℝ) : WithTop ℝ)
-            ∧ ((∀ a ρ, monAl N (r a) (e a) ρ < V.l)
-              → V.v (ValOf X.hL
-                  (∏ a : ZMod d, MvPolynomial.rename
-                    (fun x : Fin N × Fin (r a) => ((x.1, ⟨g, en a x.2⟩) : Fin N × WV I))
-                    (monP C N (r a) (e a)))
-                  (fun _ => none)
-                  gr)
-                ≤ ((0 : ℝ) : WithTop ℝ)) := by
+    (e : ZMod d → ℕ → ℕ) (N : ℕ) :
+    ∃ (S : ∀ g, Sys (X.G g)) (t : ∀ g, I g → MvPowerSeries (I g) C), (∀ g, (S g).IsT (t g)) ∧
+      ∃ gr : Fin N → MvPowerSeries (WV I) C, (∀ ρ, gr ρ ∈ IntGerm V t) ∧
+        V.v (ValOf X.hL (∏ a : ZMod d, MvPolynomial.rename
+          (fun x : Fin N × Fin (r a) => ((x.1, ⟨g, en a x.2⟩) : Fin N × WV I))
+          (monP C N (r a) (e a))) (fun _ => none) gr) ≤
+          (((((∑ a, monDeg N (r a) (e a) : ℕ) : ℝ) / ((V.l : ℝ) - 1)) : ℝ) : WithTop ℝ) ∧
+        ((∀ a ρ, monAl N (r a) (e a) ρ < V.l) → V.v (ValOf X.hL (∏ a : ZMod d, MvPolynomial.rename
+          (fun x : Fin N × Fin (r a) => ((x.1, ⟨g, en a x.2⟩) : Fin N × WV I))
+          (monP C N (r a) (e a))) (fun _ => none) gr) ≤ ((0 : ℝ) : WithTop ℝ)) := by
   choose t ht _ using fun g => tExistsUnique (X.G g) (GlobalTheory.CharBlock.stdSys (X.G g))
   have h0 : ∀ g c, constantCoeff (t g c) = 0 := fun g => (ht g).1
   let j : ∀ a, Fin N × Fin (r a) → Fin N × WV I := fun a x => (x.1, ⟨g, en a x.2⟩)
@@ -153,50 +175,37 @@ theorem core
   have hj' : ∀ a, Function.Injective (j a) := by
     intro a y y' h
     exact Prod.ext (Prod.mk.inj h).1 (hinj a (eq_of_heq (Sigma.mk.inj (Prod.mk.inj h).2).2))
-  let T : Fin N × WV I → MvPowerSeries (Fin N × WV I) C := fun x =>
-    rowCopy x.1 (upG x.2.1 (t x.2.1 x.2.2))
+  let T : Fin N × WV I → MvPowerSeries (Fin N × WV I) C :=
+    fun x => rowCopy x.1 (upG x.2.1 (t x.2.1 x.2.2))
   have hT : TangentId T := fun x =>
     ((tan_std _ (ht x.2.1) x.2.2).subst (fun c : I x.2.1 => (⟨x.2.1, c⟩ : WV I))).subst
       fun w : WV I => (x.1, w)
-  let gr : Fin N → MvPowerSeries (WV I) C := fun ρ =>
-    ∏ a : ZMod d,
-      if h : ρ.val < r a then upG g (t g (en a ⟨ρ.val, h⟩)) ^ monAl N (r a) (e a) ρ.val else 1
-  have hgr : ∀ ρ, gr ρ ∈ IntGerm V t := fun ρ =>
-    IsMon.mem <| isMon_prod h0 _ _ fun a => by
-      split_ifs
-      · exact isMon_pow h0 _ _ _
-      · exact isMon_one h0
-  have hlead :=
-    lead_prod (C := C)
-      (p := fun x : Fin N × WV I => ∃ a y, x = j a y ∧ y.1.val = y.2.val)
-      Finset.univ _ _
-      fun a _ =>
-        lead_monP (j a)
-          (fun b c => ⟨
-            fun ⟨a', y, h1, h2⟩ => by
-              obtain rfl := hj _ _ _ _ h1
-              obtain rfl := hj' _ h1
-              exact h2,
-            fun h => ⟨a, (b, c), rfl, h⟩
-          ⟩)
-          (e a)
+  let gr : Fin N → MvPowerSeries (WV I) C := fun ρ => ∏ a : ZMod d,
+    if h : ρ.val < r a then upG g (t g (en a ⟨ρ.val, h⟩)) ^ monAl N (r a) (e a) ρ.val else 1
+  have hgr : ∀ ρ, gr ρ ∈ IntGerm V t := fun ρ => IsMon.mem <| isMon_prod h0 _ _ fun a => by
+    split_ifs
+    · exact isMon_pow h0 _ _ _
+    · exact isMon_one h0
+  have hlead := lead_prod (C := C)
+    (p := fun x : Fin N × WV I => ∃ a y, x = j a y ∧ y.1.val = y.2.val) Finset.univ _ _
+    fun a _ => lead_monP (j a) (fun b c => ⟨fun ⟨a', y, h1, h2⟩ => by
+      obtain rfl := hj _ _ _ _ h1
+      obtain rfl := hj' _ h1
+      exact h2, fun h => ⟨a, (b, c), rfl, h⟩⟩) (e a)
   have hlow := low_prod Finset.univ _ _ fun a _ => low_monG (j a) hT (e a)
-  have hval
-      : ValOf X.hL (∏ a : ZMod d, MvPolynomial.rename (j a) (monP C N (r a) (e a)))
-          (fun _ => none)
-          gr
-        = (mfact (∑ a, dg (j a) (monAl N (r a) (e a))) : C) := by
+  have hval : ValOf X.hL (∏ a : ZMod d, MvPolynomial.rename (j a) (monP C N (r a) (e a)))
+      (fun _ => none) gr = (mfact (∑ a, dg (j a) (monAl N (r a) (e a))) : C) := by
     rw [← jet_eq hlead hlow]
     unfold ValOf
     congr 1
-    have hs
-        : ∀ ρ : Fin N,
-          HasSubst (fun w : WV I => (MvPowerSeries.X (ρ, w) : MvPowerSeries (Fin N × WV I) C)) :=
+    have hs : ∀ ρ : Fin N, HasSubst
+        (fun w : WV I => (MvPowerSeries.X (ρ, w) : MvPowerSeries (Fin N × WV I) C)) :=
       fun ρ => hasSubst_of_constantCoeff_zero (by simp)
     unfold monG
     rw [Finset.prod_comm]
     refine Finset.prod_congr rfl fun ρ _ => ?_
-    have hc : ∀ F, rowCopy ρ F = substAlgHom (hs ρ) F := fun F => by rw [coe_substAlgHom]; rfl
+    have hc : ∀ F, rowCopy ρ F = substAlgHom (hs ρ) F := fun F => by
+      rw [coe_substAlgHom]; rfl
     rw [hc, hc, map_zero, GlobalTheory.CharBlock.mvExp_zero, mul_one, map_prod]
     refine Finset.prod_congr rfl fun a _ => ?_
     split_ifs
@@ -207,8 +216,8 @@ theorem core
       val_nat V.v V.l_prime V.v_l (Finset.prod_ne_zero_iff.2 fun _ _ => Nat.factorial_ne_zero _),
       WithTop.coe_le_coe, GlobalTheory.LegendreBounds.padicValNat_prod_factorial V.l V.l_prime]
     have hd : ∑ a, monDeg N (r a) (e a) = ∑ x, (∑ a, dg (j a) (monAl N (r a) (e a))) x := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [← Finsupp.degree_eq_sum, map_sum]
+
+      rw [← Finsupp.degree_eq_sum, map_sum]
       exact Finset.sum_congr rfl fun a _ => (degree_dg _ _).symm
     rw [hd, Nat.cast_sum, Finset.sum_div]
     exact Finset.sum_le_sum fun ρ _ => GlobalTheory.LegendreBounds.upper V.l V.l_prime _
@@ -232,10 +241,12 @@ theorem core
 theorem monSupply : MONSupply ∧ RF.MONSupply := by
   constructor
   · intro C _ V d _ I J _ _ X F g e N
-    obtain ⟨S, t, ht, gr, hgr, h1, h2⟩ := core X g (X.rk g) (F.en g) (F.en_inj g) (F.en_ty g) e N
+    obtain ⟨S, t, ht, gr, hgr, h1, h2⟩ :=
+      core X g (X.rk g) (F.en g) (F.en_inj g) (F.en_ty g) e N
     exact ⟨⟨S, t, ht, gr, hgr, h1⟩, fun h => ⟨S, t, ht, gr, hgr, h2 h⟩⟩
   · intro C _ V d _ I J _ _ X F g e N
-    obtain ⟨S, t, ht, gr, hgr, h1, h2⟩ := core X g (X.rkF g) (F.en g) (F.en_inj g) (F.en_ty g) e N
+    obtain ⟨S, t, ht, gr, hgr, h1, h2⟩ :=
+      core X g (X.rkF g) (F.en g) (F.en_inj g) (F.en_ty g) e N
     exact ⟨⟨S, t, ht, gr, hgr, h1⟩, fun h => ⟨S, t, ht, gr, hgr, h2 h⟩⟩
 
 end GlobalTheory.MonBlock

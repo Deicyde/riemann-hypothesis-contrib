@@ -1,9 +1,50 @@
 module
 
-public import Mathlib
 public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.TermsFiniteAtPoint.CarrierRow
 public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.TermsFiniteAtPoint.SkewSolve
 public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.RelativeEquivalence.DCRelEquivAllHolds
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
@@ -13,8 +54,7 @@ open scoped Classical
 
 namespace PI.TermsAtPtFiniteW
 
-open NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat
-  Formalism.L2.SG.TermDef
+open NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.L2.SG.TermDef
 
 section Int
 
@@ -39,16 +79,14 @@ theorem IntE.sub {x y : E} (hx : IntE x) (hy : IntE y) : IntE (x - y) := by
   exact ⟨a - b, map_sub (algebraMap (𝓞 E) E) a b⟩
 theorem IntE.nat (n : ℕ) : IntE (n : E) := ⟨n, map_natCast (algebraMap (𝓞 E) E) n⟩
 theorem IntE.zero : IntE (0 : E) := ⟨0, map_zero (algebraMap (𝓞 E) E)⟩
-theorem IntE.sum {ι : Type*} (s : Finset ι) (g : ι → E) (h : ∀ i ∈ s, IntE (g i))
-    : IntE (∑ i ∈ s, g i) := by
+theorem IntE.sum {ι : Type*} (s : Finset ι) (g : ι → E) (h : ∀ i ∈ s, IntE (g i)) : IntE (∑ i ∈ s, g i) := by
   induction s using Finset.induction_on with
   | empty =>
     rw [Finset.sum_empty]
     exact IntE.zero
   | @insert a s ha ih =>
     rw [Finset.sum_insert ha]
-    exact IntE.add (h a (Finset.mem_insert_self a s))
-      (ih (fun i hi => h i (Finset.mem_insert_of_mem hi)))
+    exact IntE.add (h a (Finset.mem_insert_self a s)) (ih (fun i hi => h i (Finset.mem_insert_of_mem hi)))
 
 end Int
 
@@ -61,33 +99,29 @@ def piL (e f : Fin r → S.V) : S.V →ₗ[E] S.V := LinearMap.id - ∑ c, (S.hT
 theorem piL_apply (e f : Fin r → S.V) (x : S.V) : piL e f x = x - ∑ c, S.hT (f c) x • e c := by
   simp [piL, LinearMap.smulRight_apply]
 
-theorem herm_star (x y : S.V) : star (S.hT x y) = S.hT y x := by exact S.herm.eq x y
+theorem herm_star (x y : S.V) : star (S.hT x y) = S.hT y x := by
+  exact S.herm.eq x y
 
-theorem related_gen
-    (hH : HeisOp) (hSk : SkewSolve)
-    {T T' : E}
-    (Λ : Submodule (𝓞 E) S.V)
-    (F : LFlag S r T)
+theorem related_gen (hH : HeisOp) (hSk : SkewSolve) {T T' : E} (Λ : Submodule (𝓞 E) S.V) (F : LFlag S r T)
     (f : Fin r → S.V)
-    (hint : ∀ x ∈ Λ, ∀ y ∈ Λ, ∃ o : 𝓞 E, (o : E) = S.hT x y) (he : ∀ c, F.fl.e c ∈ Λ)
+    (hint : ∀ x ∈ Λ, ∀ y ∈ Λ, ∃ o : 𝓞 E, (o : E) = S.hT x y)
+    (he : ∀ c, F.fl.e c ∈ Λ)
     (hef : ∀ a b, S.hT (F.fl.e a) (f b) = if a = b then 1 else 0)
     (θ : 𝓞 E) (hθ : (θ : E) + star (θ : E) = 1)
     (nd nQ : ℕ) (hfint : ∀ x ∈ Λ, ∀ c, IntE ((nd : E) * S.hT (f c) x))
-    (β : Matrix (Fin r) (Fin (r + 1)) E)
-    (Q : Matrix (Fin (r + 1)) (Fin r) E)
-    (v l : Fin (r + 1) → E)
-    (hind : ∀ u : Fin r → E, (∀ b, ∑ c, u c * β c b = 0) → u = 0) (hβQ : β * Q = 1)
-    (hv : ∀ c, ∑ b, β c b * v b = 0)
+    (β : Matrix (Fin r) (Fin (r + 1)) E) (Q : Matrix (Fin (r + 1)) (Fin r) E) (v l : Fin (r + 1) → E)
+    (hind : ∀ u : Fin r → E, (∀ b, ∑ c, u c * β c b = 0) → u = 0)
+    (hβQ : β * Q = 1) (hv : ∀ c, ∑ b, β c b * v b = 0)
     (hQβ : ∀ i j, (Q * β) i j = (if i = j then 1 else 0) - v i * l j)
     (hQint : ∀ b c, IntE ((nQ : E) * Q b c))
     (y1 y2 : LFlag S r T')
     (hzt1 : y1.zt = frame y1 (Fin.last r)) (hzt2 : y2.zt = frame y2 (Fin.last r))
-    (hy1 : ∀ b, frame y1 b ∈ Λ) (hβ1 : ∀ c b, S.hT (F.fl.e c) (frame y1 b) = β c b)
-    (hβ2 : ∀ c b, S.hT (F.fl.e c) (frame y2 b) = β c b)
+    (hy1 : ∀ b, frame y1 b ∈ Λ)
+    (hβ1 : ∀ c b, S.hT (F.fl.e c) (frame y1 b) = β c b) (hβ2 : ∀ c b, S.hT (F.fl.e c) (frame y2 b) = β c b)
     (hgram : ∀ a b, S.hT (frame y2 a) (frame y2 b) = S.hT (frame y1 a) (frame y1 b))
     (hδ : ∀ b, ∃ lam ∈ Λ, frame y2 b - frame y1 b = (((nd * nQ) ^ 2 : ℕ) : E) • lam)
-    (hι : piL F.fl.e f (∑ b, v b • frame y1 b) = piL F.fl.e f (∑ b, v b • frame y2 b))
-    : DCRel Λ F y1 y2 := by
+    (hι : piL F.fl.e f (∑ b, v b • frame y1 b) = piL F.fl.e f (∑ b, v b • frame y2 b)) :
+    DCRel Λ F y1 y2 := by
   set e := F.fl.e with he_def
   have hee : ∀ a b, S.hT (e a) (e b) = 0 := F.fl.e_iso
   have hfe : ∀ a b, S.hT (f a) (e b) = if a = b then 1 else 0 := fun a b => by
@@ -96,18 +130,17 @@ theorem related_gen
     · subst h; simp
     · simp [h, Ne.symm h]
   have hpi_e : ∀ a x, S.hT (e a) (piL e f x) = S.hT (e a) x := fun a x => by
-    set_option synthInstance.maxHeartbeats 100000 in
+
     simp [piL_apply, map_sub, map_sum, hee]
   have hpi_f : ∀ a x, S.hT (f a) (piL e f x) = 0 := fun a x => by
-    set_option synthInstance.maxHeartbeats 100000 in
+
     simp [piL_apply, map_sub, map_sum, hfe]
   have hmemE : ∀ (x : E) (w : S.V), IntE x → w ∈ Λ → x • w ∈ Λ := by
     rintro x w ⟨o, rfl⟩ hw
     show (algebraMap (𝓞 E) E o) • w ∈ Λ
     rw [algebraMap_smul]
     exact Λ.smul_mem o hw
-  have hnat : ∀ (k : ℕ) (w : S.V), w ∈ Λ → (k : E) • w ∈ Λ := fun k w hw =>
-    hmemE _ w (IntE.nat k) hw
+  have hnat : ∀ (k : ℕ) (w : S.V), w ∈ Λ → (k : E) • w ∈ Λ := fun k w hw => hmemE _ w (IntE.nat k) hw
   choose lam hlam hδeq using hδ
 
   let P : Fin (r + 1) → S.V := fun b => (nd : E) • piL e f (lam b)
@@ -116,15 +149,14 @@ theorem related_gen
     have : P b = (nd : E) • lam b - ∑ c, ((nd : E) * S.hT (f c) (lam b)) • e c := by
       simp only [P, piL_apply, smul_sub, Finset.smul_sum, smul_smul]
     rw [this]
-    refine Λ.sub_mem (hnat nd _ (hlam b))
-      (Λ.sum_mem fun c _ => hmemE _ _ (hfint _ (hlam b) c) (he c))
+    refine Λ.sub_mem (hnat nd _ (hlam b)) (Λ.sum_mem fun c _ => hmemE _ _ (hfint _ (hlam b) c) (he c))
   let δ : Fin (r + 1) → S.V := fun b => frame y2 b - frame y1 b
   let ρ : Fin (r + 1) → S.V := fun b => piL e f (δ b)
   have hδe : ∀ c b, S.hT (e c) (δ b) = 0 := fun c b => by simp [δ, map_sub, hβ1, hβ2]
   have hρe : ∀ c b, S.hT (e c) (ρ b) = 0 := fun c b => by simp only [ρ, hpi_e, hδe]
   have hρsum : ∑ b, v b • ρ b = 0 := by
     have : ∑ b, v b • ρ b = piL e f (∑ b, v b • frame y2 b) - piL e f (∑ b, v b • frame y1 b) := by
-      set_option synthInstance.maxHeartbeats 100000 in
+
       simp only [ρ, δ, map_sum, map_smul, map_sub, smul_sub, Finset.sum_sub_distrib]
     rw [this, ← hι, sub_self]
   obtain ⟨qo, hqo⟩ : ∃ qo : Fin (r + 1) → Fin r → 𝓞 E, ∀ b c, (qo b c : E) = (nQ : E) * Q b c :=
@@ -144,13 +176,8 @@ theorem related_gen
   have hea : ∀ c d, S.hT (e c) (a d) = 0 := fun c d => by simp [a, map_sum, hρe]
 
   let s : Matrix (Fin r) (Fin r) E := fun c d =>
-    if c < d then
-      - S.hT (a c) (a d)
-    else if c = d then
-      -((θ : E) * S.hT (a c) (a c))
-    else
-      0
-  have hs : ∀ c d, s c d + star (s d c) = - S.hT (a c) (a d) := by
+    if c < d then -S.hT (a c) (a d) else if c = d then -((θ : E) * S.hT (a c) (a c)) else 0
+  have hs : ∀ c d, s c d + star (s d c) = -S.hT (a c) (a d) := by
     intro c d
     rcases lt_trichotomy c d with h | h | h
     · simp [s, h, not_lt.2 h.le, h.ne']
@@ -166,12 +193,7 @@ theorem related_gen
     push_cast
     ring
   let s' : Matrix (Fin r) (Fin r) E := fun c d =>
-    if c < d then
-      - S.hT (a' c) (a' d)
-    else if c = d then
-      -((θ : E) * S.hT (a' c) (a' c))
-    else
-      0
+    if c < d then -S.hT (a' c) (a' d) else if c = d then -((θ : E) * S.hT (a' c) (a' c)) else 0
   have hss' : ∀ c d, s c d = (((nd * nQ) ^ 2 : ℕ) : E) * s' c d := by
     intro c d
     simp only [s, s', haa]
@@ -193,7 +215,8 @@ theorem related_gen
     rw [hn1act, heisFun]
     have : ∀ c', S.hT (a c') (e c) = 0 := fun c' => by rw [← herm_star, hea]; simp
     simp [hee, this]
-  have hrow : ∀ c b, S.hT (e c) (n1 (frame y1 b)) = β c b := fun c b => by rw [← hn1e c, hiso1, hβ1]
+  have hrow : ∀ c b, S.hT (e c) (n1 (frame y1 b)) = β c b := fun c b => by
+    rw [← hn1e c, hiso1, hβ1]
 
   have hsum_a : ∀ b, ∑ c, S.hT (e c) (frame y1 b) • a c = ρ b := by
     intro b
@@ -217,8 +240,7 @@ theorem related_gen
       simp only [ρ, piL_apply, δ]
       abel
     rw [hn1act, heisFun, hsum_a, hy2]
-    simp only [x', add_smul, sub_smul, Finset.sum_add_distrib, Finset.sum_sub_distrib,
-      Finset.sum_smul, hβ1]
+    simp only [x', add_smul, sub_smul, Finset.sum_add_distrib, Finset.sum_sub_distrib, Finset.sum_smul, hβ1]
     abel
 
   have hcol : ∀ d a0, S.hT (n1 (frame y1 a0)) (e d) = star (β d a0) := fun d a0 => by
@@ -227,11 +249,10 @@ theorem related_gen
     intro a0 b
     have h := hgram a0 b
     rw [hk a0, hk b, ← hiso1 (frame y1 a0) (frame y1 b)] at h
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_add (f := _), LinearMap.add_apply, map_sum, LinearMap.sum_apply,
-          LinearMap.map_smulₛₗ, LinearMap.smul_apply, smul_eq_mul, hee, mul_zero,
-          Finset.sum_const_zero, add_zero, hrow, hcol, starRingEnd_apply]
-        at h
+
+    simp only [map_add (f := _), LinearMap.add_apply, map_sum, LinearMap.sum_apply, LinearMap.map_smulₛₗ,
+    LinearMap.smul_apply, smul_eq_mul, hee, mul_zero, Finset.sum_const_zero, add_zero, hrow, hcol,
+    starRingEnd_apply] at h
     rw [Finset.sum_add_distrib]
     have e1 : ∑ c, star (β c a0) * x' c b = ∑ c, x' c b * star (β c a0) :=
       Finset.sum_congr rfl fun _ _ => mul_comm _ _
@@ -239,30 +260,25 @@ theorem related_gen
     linear_combination h
   obtain ⟨hskew, hfact⟩ := hSk E r β x' Q v l hind hβQ hv hQβ hid
 
-  have hfd
-      : ∀ c b, S.hT (f c) (δ b) = (((nd * nQ) ^ 2 : ℕ) : E) * S.hT (f c) (lam b) := fun c b => by
+  have hfd : ∀ c b, S.hT (f c) (δ b) = (((nd * nQ) ^ 2 : ℕ) : E) * S.hT (f c) (lam b) := fun c b => by
     show S.hT (f c) (frame y2 b - frame y1 b) = _
     rw [hδeq b, map_smul, smul_eq_mul]
-  have hac
-      : ∀ c b,
-        S.hT (a c) (frame y1 b) = ((nd * nQ : ℕ) : E) * S.hT (a' c) (frame y1 b) := fun c b => by
-    rw [haa', LinearMap.map_smulₛₗ, LinearMap.smul_apply, starRingEnd_apply, star_natCast,
-      smul_eq_mul]
+  have hac : ∀ c b, S.hT (a c) (frame y1 b) = ((nd * nQ : ℕ) : E) * S.hT (a' c) (frame y1 b) := fun c b => by
+    rw [haa', LinearMap.map_smulₛₗ, LinearMap.smul_apply, starRingEnd_apply, star_natCast, smul_eq_mul]
   let w : Matrix (Fin r) (Fin (r + 1)) E := fun c b =>
-    ((nd * nQ : ℕ) : E) * ((nd : E) * S.hT (f c) (lam b)) + (nd : E) * S.hT (a' c) (frame y1 b)
-      - ∑ d, ((nd ^ 2 * nQ : ℕ) : E) * s' c d * β d b
+    ((nd * nQ : ℕ) : E) * ((nd : E) * S.hT (f c) (lam b)) + (nd : E) * S.hT (a' c) (frame y1 b) -
+      ∑ d, ((nd ^ 2 * nQ : ℕ) : E) * s' c d * β d b
   have hw : ∀ c b, IntE (w c b) := by
     intro c b
-    refine ((IntE.nat _).mul (hfint _ (hlam b) c)).add ((IntE.nat _).mul (hint _ (ha' c) _ (hy1 b)))
-      |>.sub (IntE.sum _ _ fun d _ => ((IntE.nat _).mul (hs'int c d)).mul ?_)
+    refine ((IntE.nat _).mul (hfint _ (hlam b) c)).add ((IntE.nat _).mul (hint _ (ha' c) _ (hy1 b))) |>.sub
+      (IntE.sum _ _ fun d _ => ((IntE.nat _).mul (hs'int c d)).mul ?_)
     rw [← hβ1]
     exact hint _ (he d) _ (hy1 b)
   have hxw : ∀ c b, x' c b = (nQ : E) * w c b := by
     intro c b
     simp only [x', w, hfd, hac, hss']
-    have hsum
-        : ∑ x, (((nd * nQ) ^ 2 : ℕ) : E) * s' c x * β x b
-          = (nQ : E) * ∑ d, ((nd ^ 2 * nQ : ℕ) : E) * s' c d * β d b := by
+    have hsum : ∑ x, (((nd * nQ) ^ 2 : ℕ) : E) * s' c x * β x b =
+        (nQ : E) * ∑ d, ((nd ^ 2 * nQ : ℕ) : E) * s' c d * β d b := by
       rw [Finset.mul_sum]
       refine Finset.sum_congr rfl fun d _ => ?_
       push_cast
@@ -277,29 +293,21 @@ theorem related_gen
       exact Finset.sum_congr rfl fun b _ => by rw [hxw]; ring
     rw [this]
     exact IntE.sum _ _ fun b _ => (hw c b).mul (hQint b d)
-  obtain ⟨n2, hn2, hn2act⟩ :=
-    hH E S r T Λ F 0 (x' * Q) hint he (fun _ => Λ.zero_mem) (by simp) hSint (by
-      intro c d; simp [hskew c d])
+  obtain ⟨n2, hn2, hn2act⟩ := hH E S r T Λ F 0 (x' * Q) hint he (fun _ => Λ.zero_mem) (by simp) hSint
+    (by intro c d; simp [hskew c d])
   simp only [← he_def] at hn2act
   have hfin2 : ∀ b, n2 (n1 (frame y1 b)) = frame y2 b := by
     intro b
     rw [hn2act, heisFun, hk b]
-    simp only [Pi.zero_apply, smul_zero, Finset.sum_const_zero, map_zero, LinearMap.zero_apply,
-      zero_smul, add_zero, sub_zero, hrow]
+    simp only [Pi.zero_apply, smul_zero, Finset.sum_const_zero, map_zero, LinearMap.zero_apply, zero_smul,
+      add_zero, sub_zero, hrow]
     congr 1
     refine Finset.sum_congr rfl fun c _ => ?_
     rw [← Finset.sum_smul]
     congr 1
     conv_rhs => rw [hfact]
     rw [Matrix.mul_apply]
-  refine ⟨
-    n2 * n1,
-    PI.DCRelEquiv.UnitaryGroupMassFormula.nlam_mul hn2 hn1,
-    1,
-    one_mem_NLam Λ y1,
-    fun b => ?_,
-    ?_
-  ⟩
+  refine ⟨n2 * n1, PI.DCRelEquiv.UnitaryGroupMassFormula.nlam_mul hn2 hn1, 1, one_mem_NLam Λ y1, fun b => ?_, ?_⟩
   · simp [hfin2]
   · rw [hzt2, hzt1]
     simp [hfin2]

@@ -1,25 +1,48 @@
 module
 
-public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.GrothendieckDeformation
-public import Development.AbelianVarietyTheory.Definitions.Divisors.CovolXOfCovol
-public import Development.AbelianVarietyTheory.Definitions.Divisors.ToKnownTheoremsOf
-public import Development.AbelianVarietyTheory.Definitions.Divisors.CuspIso
-public import Development.AbelianVarietyTheory.Definitions.Divisors.WellChosen
-public import Mathlib
-public import Development.AbelianVarietyTheory.Definitions.Divisors.IntegralBound
-public import Development.AbelianVarietyTheory.Definitions.Divisors.ExistsCoordAtPoints
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.NormalizedPointHeightLatticeSmul
-public import Development.AbelianVarietyTheory.Definitions.Divisors.IsHeightIffOfDegreeEq
-public import Development.AbelianVarietyTheory.Definitions.Divisors.WedgeNrmLeOfWedgeNormLe
-public import Development.AbelianVarietyTheory.Definitions.Divisors.VolMeasureOfAdd
-public import Development.AbelianVarietyTheory.Definitions.Divisors.MemLevEigenIffTransl
-public import Formalism.LocalToGlobal.IndefiniteForms.IndefiniteTree.RealCubicMeans.LogMeanShares.LogMeanStatements.HSClaim
-public import Development.AbelianVarietyTheory.Definitions.Divisors.GenRatios
-public import Development.AbelianVarietyTheory.Definitions.Divisors.BadElt
 public import Development.AbelianVarietyTheory.Definitions.Divisors.BarCompSubsetClosure
 public import Development.AbelianVarietyTheory.Definitions.Divisors.QuoIff
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.HostBoundHolds
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.WeightBoundHolds
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Int
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+public import Development.AbelianVarietyTheory.BlockTheory.TorsionBlocks.LevelCarrying
+import Development.AbelianVarietyTheory.Definitions.Divisors.CuspIso
+import Development.AbelianVarietyTheory.Definitions.Divisors.GenRatios
+public import Development.AbelianVarietyTheory.Definitions.Divisors.IsCoprimeOfNatCast
+import Development.AbelianVarietyTheory.Definitions.Divisors.IsRightActFunPull
+public import Development.AbelianVarietyTheory.Definitions.Divisors.MemLevEigenIffTransl
+import Development.AbelianVarietyTheory.Definitions.Divisors.Multiplier
 
 @[expose] public section
 
@@ -240,7 +263,6 @@ end GlobalTheory.CovTop.WtSz
 
 namespace GlobalTheory.CovTop.WtSz
 
-set_option maxHeartbeats 4000000 in
 theorem arith
     (f r L PP b kap T D c : ℝ) (hf : 8 ≤ f) (hr : 1 ≤ r) (hL : 10 ≤ L) (hPP : (f * r * L) ^ 12 ≤ PP)
     (hb : PP ^ 10 ≤ b) (hk : b ≤ PP * kap) (hT1 : 1 ≤ T) (hD0 : 0 ≤ D) (hDT : D ≤ T)
@@ -374,7 +396,6 @@ variable
   {Gl : Formalism.MainNotions.G.LatInst D} {Kc : Formalism.MainNotions.G.Consts} {Y0 : DivX D}
   {cX : ExtraC} {ex : Extra D L hT Gi Gl Kc Y0 cX} {Csz : ℝ} (p : PtAt ex Csz) (i : Fin D.R.m)
 
-set_option maxHeartbeats 1000000 in
 theorem at_pt
     (PP A A' : ℝ)
     (hi : (i : ℕ) + 1 < D.R.m) (hS : SizeAt p i PP A) (hH : HostNum D L PP A' 10)

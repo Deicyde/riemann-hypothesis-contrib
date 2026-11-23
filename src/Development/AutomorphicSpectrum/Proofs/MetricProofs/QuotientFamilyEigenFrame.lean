@@ -1,11 +1,52 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Definitions.MetricPeriods.IsEigFrames
-public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.BdryChart
-public import ReciprocityTheory.AnalyticForms.PlurisubharmonicFunctions.IsPshLocallyIntegrableStatement
-public import Development.AutomorphicSpectrum.Proofs.MetricProofs.RiemannLatticeEigenProjectionStatement
 public import Development.AutomorphicSpectrum.Proofs.MetricProofs.IsotropicEigencomponentConjugateFormStatement
+public import Development.AutomorphicSpectrum.Proofs.MetricProofs.RiemannLatticeEigenProjectionStatement
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Etale.Weakly
+import Mathlib.RingTheory.Finiteness.ModuleFinitePresentation
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.TotallySplit
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
@@ -13,23 +54,21 @@ noncomputable section
 
 namespace GlobalTheory.CompanionTheory.Ar.Cusp.SchurGram
 
-open NumberField Matrix Filter Topology GlobalTheory.CompanionTheory.Ar
-  GlobalTheory.CompanionTheory.Ar.Cusp GroundTheory.Heights₂.Heights.LowerBoundFree
+open NumberField Matrix Filter Topology GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Cusp GroundTheory.Heights₂.Heights.LowerBoundFree
   GroundTheory.Heights₂.Heights.Regular
 
 section Proj
 
 variable {V O : Type} [AddCommGroup V] [Module ℂ V] [CommRing O]
 
-theorem mem_eigSp_iff (B : O →+* Module.End ℂ V) (s : O →+* ℂ) (y : V)
-    : y ∈ eigSp B s ↔ ∀ a, B a y = s a • y := by
+theorem mem_eigSp_iff (B : O →+* Module.End ℂ V) (s : O →+* ℂ) (y : V) :
+    y ∈ eigSp B s ↔ ∀ a, B a y = s a • y := by
   simp [eigSp, Submodule.mem_iInf, sub_eq_zero]
 
-theorem exists_proj
-    (B : O →+* Module.End ℂ V) (W : Submodule ℂ V) (hW : ∀ a, ∀ y ∈ W, B a y ∈ W)
-    (s : O →+* ℂ) (F : Finset (O →+* ℂ)) (hF : s ∉ F)
-    : ∃ L : V →ₗ[ℂ] V,
-      (∀ y ∈ W, L y ∈ W) ∧ (∀ y ∈ eigSp B s, L y = y) ∧ ∀ t ∈ F, ∀ y ∈ eigSp B t, L y = 0 := by
+theorem exists_proj (B : O →+* Module.End ℂ V) (W : Submodule ℂ V) (hW : ∀ a, ∀ y ∈ W, B a y ∈ W)
+    (s : O →+* ℂ) (F : Finset (O →+* ℂ)) (hF : s ∉ F) :
+    ∃ L : V →ₗ[ℂ] V, (∀ y ∈ W, L y ∈ W) ∧ (∀ y ∈ eigSp B s, L y = y) ∧
+      ∀ t ∈ F, ∀ y ∈ eigSp B t, L y = 0 := by
   classical
   induction F using Finset.induction_on with
   | empty => exact ⟨LinearMap.id, fun y hy => hy, fun _ _ => rfl, by simp⟩
@@ -63,9 +102,7 @@ end Proj
 
 section Riem
 
-variable
-  {E : Type} [Field E] [NumberField E] [IsCMField E]
-  {g : ℕ} {Λ : Type} [AddCommGroup Λ] [Module (𝓞 E) Λ]
+variable {E : Type} [Field E] [NumberField E] [IsCMField E] {g : ℕ} {Λ : Type} [AddCommGroup Λ] [Module (𝓞 E) Λ]
   (R : RiemLat E g Λ)
 
 theorem ip_add_right (x y y' : Fin g → ℂ) : R.ip x (y + y') = R.ip x y + R.ip x y' := by
@@ -86,19 +123,21 @@ theorem ip_add_left (x x' y : Fin g → ℂ) : R.ip (x + x') y = R.ip x y + R.ip
 theorem ip_smul_left (c : ℂ) (x y : Fin g → ℂ) : R.ip (c • x) y = starRingEnd ℂ c * R.ip x y := by
   simp [RiemLat.ip, star_smul, mulVec_smul, dotProduct_smul]
 
-theorem ip_zero_left (y : Fin g → ℂ) : R.ip 0 y = 0 := by simp [RiemLat.ip]
+theorem ip_zero_left (y : Fin g → ℂ) : R.ip 0 y = 0 := by
+  simp [RiemLat.ip]
 
-theorem ip_zero_right (x : Fin g → ℂ) : R.ip x 0 = 0 := by simp [RiemLat.ip]
+theorem ip_zero_right (x : Fin g → ℂ) : R.ip x 0 = 0 := by
+  simp [RiemLat.ip]
 
-theorem ip_sum_right {ι : Type} (t : Finset ι) (x : Fin g → ℂ) (f : ι → Fin g → ℂ)
-    : R.ip x (∑ i ∈ t, f i) = ∑ i ∈ t, R.ip x (f i) := by
+theorem ip_sum_right {ι : Type} (t : Finset ι) (x : Fin g → ℂ) (f : ι → Fin g → ℂ) :
+    R.ip x (∑ i ∈ t, f i) = ∑ i ∈ t, R.ip x (f i) := by
   classical
   induction t using Finset.induction_on with
   | empty => simp [ip_zero_right]
   | insert i t hi ih => rw [Finset.sum_insert hi, Finset.sum_insert hi, ip_add_right, ih]
 
-theorem ip_sum_left {ι : Type} (t : Finset ι) (f : ι → Fin g → ℂ) (y : Fin g → ℂ)
-    : R.ip (∑ i ∈ t, f i) y = ∑ i ∈ t, R.ip (f i) y := by
+theorem ip_sum_left {ι : Type} (t : Finset ι) (f : ι → Fin g → ℂ) (y : Fin g → ℂ) :
+    R.ip (∑ i ∈ t, f i) y = ∑ i ∈ t, R.ip (f i) y := by
   classical
   induction t using Finset.induction_on with
   | empty => simp [ip_zero_left]
@@ -110,8 +149,7 @@ theorem eq_zero_of_ip_self (y : Fin g → ℂ) (h : R.ip y y = 0) : y = 0 := by
   rw [show y ⬝ᵥ R.Hm *ᵥ star y = R.ip y y from rfl, h] at this
   simp at this
 
-theorem gram_det_ne_zero {r : ℕ} (w : Fin r → Fin g → ℂ) (hw : LinearIndependent ℂ w)
-    : (R.gram w).det ≠ 0 := by
+theorem gram_det_ne_zero {r : ℕ} (w : Fin r → Fin g → ℂ) (hw : LinearIndependent ℂ w) : (R.gram w).det ≠ 0 := by
   intro h
   obtain ⟨c, hc, hAc⟩ := Matrix.exists_mulVec_eq_zero_iff.mpr h
   have h1 : ∀ a, R.ip (w a) (∑ b, c b • w b) = 0 := fun a => by
@@ -124,12 +162,11 @@ theorem gram_det_ne_zero {r : ℕ} (w : Fin r → Fin g → ℂ) (hw : LinearInd
     simp only [ip_smul_left, h1, mul_zero, Finset.sum_const_zero]
   exact hc (funext (Fintype.linearIndependent_iff.mp hw c (eq_zero_of_ip_self R _ h2)))
 
-theorem gram_append_det
-    {r k : ℕ} (w : Fin r → Fin g → ℂ) (x : Fin k → Fin g → ℂ) (hw : LinearIndependent ℂ w)
-    : ∃ M : Matrix (Fin r) (Fin k) ℂ,
-      (∀ b j, R.ip (w b) (x j - ∑ a, M a j • w a) = 0)
-        ∧ (R.gram (Fin.append w x)).det
-          = (R.gram w).det * (R.gram fun j => x j - ∑ a, M a j • w a).det := by
+theorem gram_append_det {r k : ℕ} (w : Fin r → Fin g → ℂ) (x : Fin k → Fin g → ℂ) (hw : LinearIndependent ℂ w) :
+    ∃ M : Matrix (Fin r) (Fin k) ℂ,
+      (∀ b j, R.ip (w b) (x j - ∑ a, M a j • w a) = 0) ∧
+      (R.gram (Fin.append w x)).det =
+        (R.gram w).det * (R.gram fun j => x j - ∑ a, M a j • w a).det := by
   classical
   have hdet : IsUnit (R.gram w).det := isUnit_iff_ne_zero.2 (gram_det_ne_zero R w hw)
   set A := R.gram w with hA
@@ -149,9 +186,8 @@ theorem gram_append_det
     simp only [ip_smul_right]
     rw [h2, sub_self]
   refine ⟨M, horth, ?_⟩
-  have hblock
-      : (R.gram (Fin.append w x)).submatrix finSumFinEquiv finSumFinEquiv
-        = Matrix.fromBlocks A Bm C D := by
+  have hblock : (R.gram (Fin.append w x)).submatrix finSumFinEquiv finSumFinEquiv =
+      Matrix.fromBlocks A Bm C D := by
     ext (a | a) (b | b) <;> simp [RiemLat.gram, Bm, C, D, A]
   rw [← Matrix.det_submatrix_equiv_self finSumFinEquiv, hblock, Matrix.det_fromBlocks₁₁,
     Matrix.invOf_eq_nonsing_inv]
@@ -160,9 +196,8 @@ theorem gram_append_det
   have e1 : (D - C * A⁻¹ * Bm) i j = R.ip (x i) (x j) - ∑ a, M a j * R.ip (x i) (w a) := by
     rw [Matrix.mul_assoc, Matrix.sub_apply, Matrix.mul_apply]
     simp [D, C, RiemLat.gram, M, mul_comm]
-  have e2
-      : R.ip (x i - ∑ a, M a i • w a) (x j - ∑ a, M a j • w a)
-        = R.ip (x i) (x j) - ∑ a, M a j * R.ip (x i) (w a) := by
+  have e2 : R.ip (x i - ∑ a, M a i • w a) (x j - ∑ a, M a j • w a) =
+      R.ip (x i) (x j) - ∑ a, M a j * R.ip (x i) (w a) := by
     rw [ip_sub_left, ip_sum_left]
     simp only [ip_smul_left, horth, mul_zero, Finset.sum_const_zero, sub_zero]
     rw [ip_sub_right, ip_sum_right]
@@ -170,32 +205,22 @@ theorem gram_append_det
   rw [e1]
   exact e2.symm
 
-theorem exists_eigLin (s : 𝓞 E →+* ℂ)
-    : ∃ L : (Fin g → ℂ) →ₗ[ℂ] (Fin g → ℂ), ∀ x, L x = eigComp R.B s x := by
+theorem exists_eigLin (s : 𝓞 E →+* ℂ) :
+    ∃ L : (Fin g → ℂ) →ₗ[ℂ] (Fin g → ℂ), ∀ x, L x = eigComp R.B s x := by
   obtain ⟨-, -, h1, -, -⟩ := GlobalTheory.T.riemann_lattice_eigen_projection E g Λ Unit R
   have hl := (h1 s).2.2.1
   have h0 : eigComp R.B s 0 = 0 := by simpa using hl (-1) 0 0
-  exact ⟨
-    {
-      toFun := eigComp R.B s
-      map_add' := fun x y => by simpa using hl 1 x y
-      map_smul' := fun c x => by simpa [h0] using hl c x 0
-    },
-    fun _ => rfl
-  ⟩
+  exact ⟨{ toFun := eigComp R.B s
+           map_add' := fun x y => by simpa using hl 1 x y
+           map_smul' := fun c x => by simpa [h0] using hl c x 0 }, fun _ => rfl⟩
 
-theorem eigComp_mem
-    (W : Submodule ℂ (Fin g → ℂ)) (hW : ∀ a, ∀ y ∈ W, R.B a y ∈ W)
-    (s : 𝓞 E →+* ℂ)
-    {y : Fin g → ℂ} (hy : y ∈ W)
-    : eigComp R.B s y ∈ W := by
+theorem eigComp_mem (W : Submodule ℂ (Fin g → ℂ)) (hW : ∀ a, ∀ y ∈ W, R.B a y ∈ W) (s : 𝓞 E →+* ℂ)
+    {y : Fin g → ℂ} (hy : y ∈ W) : eigComp R.B s y ∈ W := by
   classical
   obtain ⟨-, -, h1, h2, -⟩ := GlobalTheory.T.riemann_lattice_eigen_projection E g Λ Unit R
   obtain ⟨Ls, hLs⟩ := exists_eigLin R s
-  obtain ⟨L, hLW, hLid, hLF⟩ :=
-    exists_proj R.B W hW s
-      ((Finset.univ.image fun t : E →+* ℂ => t.comp (algebraMap (𝓞 E) E)).erase s)
-      (Finset.notMem_erase _ _)
+  obtain ⟨L, hLW, hLid, hLF⟩ := exists_proj R.B W hW s
+    ((Finset.univ.image fun t : E →+* ℂ => t.comp (algebraMap (𝓞 E) E)).erase s) (Finset.notMem_erase _ _)
   have key : ∀ t : E →+* ℂ, ∀ x ∈ eigSp R.B (t.comp (algebraMap (𝓞 E) E)), L x = Ls x := by
     intro t x hx
     by_cases ht : t.comp (algebraMap (𝓞 E) E) = s
@@ -211,12 +236,10 @@ theorem eigComp_mem
       have e2 : ((t.comp (algebraMap (𝓞 E) E)) a - s a) • Ls x = 0 := by rw [sub_smul, e1, sub_self]
       exact ((smul_eq_zero.1 e2).resolve_left (sub_ne_zero.2 ha)).symm
   have e : L y = Ls y := by
-    calc
-      L y
-        = L (∑ t : E →+* ℂ, eigComp R.B (t.comp (algebraMap (𝓞 E) E)) y) := by rw [h2 y]
+    calc L y = L (∑ t : E →+* ℂ, eigComp R.B (t.comp (algebraMap (𝓞 E) E)) y) := by rw [h2 y]
       _ = Ls (∑ t : E →+* ℂ, eigComp R.B (t.comp (algebraMap (𝓞 E) E)) y) := by
-        set_option synthInstance.maxHeartbeats 100000 in
-          rw [map_sum, map_sum]
+
+        rw [map_sum, map_sum]
         exact Finset.sum_congr rfl fun t _ => key t _ ((h1 _).1 y)
       _ = Ls y := by rw [h2 y]
   rw [← hLs, ← e]
@@ -224,17 +247,7 @@ theorem eigComp_mem
 
 end Riem
 
-theorem gram_append_eq
-    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (g g' : ℕ) (Λ Λ' : Type) [AddCommGroup Λ]
-        [Module (𝓞 E) Λ] [AddCommGroup Λ'] [Module (𝓞 E) Λ'] (R : RiemLat E g Λ)
-        (R' : RiemLat E g' Λ') (q : (Fin g → ℂ) →ₗ[ℂ] (Fin g' → ℂ)) (I : Submodule (𝓞 E) Λ)
-        (s : 𝓞 E →+* ℂ) (r k : ℕ) (v : Fin r → Λ) (x : Fin k → Fin g → ℂ),
-      IsIsoSub R.form I → IsNzFamily I r v → LinearMap.ker q = Submodule.span ℂ (R.P '' I)
-        → (∀ y z, (∀ u ∈ I, R.ip (R.P u) y = 0) → R'.ip (q y) (q z) = R.ip y z)
-        → (∀ j, x j ∈ eigSp R.B s)
-        → (R.gram (Fin.append (fun a => eigComp R.B s (R.P (v a))) x)).det
-          = (R.gram (fun a => eigComp R.B s (R.P (v a)))).det
-            * (R'.gram (fun j => q (x j))).det := by
+theorem gram_append_eq : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (g g' : ℕ) (Λ Λ' : Type) [AddCommGroup Λ] [Module (𝓞 E) Λ] [AddCommGroup Λ'] [Module (𝓞 E) Λ'] (R : RiemLat E g Λ) (R' : RiemLat E g' Λ') (q : (Fin g → ℂ) →ₗ[ℂ] (Fin g' → ℂ)) (I : Submodule (𝓞 E) Λ) (s : 𝓞 E →+* ℂ) (r k : ℕ) (v : Fin r → Λ) (x : Fin k → Fin g → ℂ), IsIsoSub R.form I → IsNzFamily I r v → LinearMap.ker q = Submodule.span ℂ (R.P '' I) → (∀ y z, (∀ u ∈ I, R.ip (R.P u) y = 0) → R'.ip (q y) (q z) = R.ip y z) → (∀ j, x j ∈ eigSp R.B s) → (R.gram (Fin.append (fun a => eigComp R.B s (R.P (v a))) x)).det = (R.gram (fun a => eigComp R.B s (R.P (v a)))).det * (R'.gram (fun j => q (x j))).det := by
   intro E _ _ _ g g' Λ Λ' _ _ _ _ R R' q I s r k v x hI hv hq hR hx
   classical
   obtain ⟨-, hvI, hvli, hidx⟩ := hv
@@ -260,7 +273,7 @@ theorem gram_append_eq
       exact eigComp_mem R _ hstable s (Submodule.subset_span ⟨v a, hvI a, rfl⟩)
     exact this
   have hqz : ∀ j, q (z j) = q (x j) := fun j => by
-    set_option synthInstance.maxHeartbeats 100000 in
+
     simp [hzdef, map_sub, map_sum, hwq]
   have hzeig : ∀ j, z j ∈ eigSp R.B s := fun j =>
     Submodule.sub_mem _ (hx j) (Submodule.sum_mem _ fun a _ => Submodule.smul_mem _ _ ((h1 s).1 _))
@@ -272,8 +285,8 @@ theorem gram_append_eq
     have e1 : (n : ℂ) • eigComp R.B s (R.P u) = ∑ a, s (c a) • w a := by
       have e2 := (h1 s).2.2.2 (n : 𝓞 E) (R.P u)
       rw [← R.act, Nat.cast_smul_eq_nsmul, ← hc, map_natCast] at e2
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [← e2, map_sum, ← hLs, map_sum]
+
+      rw [← e2, map_sum, ← hLs, map_sum]
       refine Finset.sum_congr rfl fun a _ => ?_
       rw [R.act, hLs, (h1 s).2.2.2, hw]
     have e3 : starRingEnd ℂ (n : ℂ) * R.ip (eigComp R.B s (R.P u)) (z j) = 0 := by

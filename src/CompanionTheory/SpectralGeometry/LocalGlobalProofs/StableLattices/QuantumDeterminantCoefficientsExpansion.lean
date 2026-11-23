@@ -1,7 +1,55 @@
 module
 
-public import Mathlib
-public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.StableLattices.Bdy
+public import GroundTheory.IdeleRoots.ConstantFrames.GaugeExistence.QdetSub
+public import Formalism.RealPlaceAnalysis.ThirdArithmeticHolds
+import Mathlib.Algebra.Module.StablyFree.Basic
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
+public import CompanionTheory.HarishChandraModules.LowKTypeMultiplicity.EigenspaceCyclicDensity.LowKMultOneP
+import CompanionTheory.RealGroups.DiscreteSeries.DiscreteSeriesClassification.DiscreteSeriesExhaustion.FarRegularity.LKTExists
+import CompanionTheory.RealGroups.DiscreteSeries.DiscreteSeriesClassification.DiscreteSeriesExhaustion.IsSimpleTriv
+import Development.AbelianVarietyTheory.PublishedTheorems.GaloisCohomology₂.BaseChangeDefiniteUnitary
+import Development.AbelianVarietyTheory.PublishedTheorems.GaloisCohomology₂.IsNormalisedOfIsDiscrete
+import Development.AutomorphicArithmetic.IntegralCasts.IsOpenStabOfMemNhds
 
 @[expose] public section
 
@@ -14,9 +62,8 @@ open Formalism.REAL (GlRel KHighest IsWeight qdet Tm qminor)
 open CompanionTheory.D.LK (Pos Cn ann cre lift bd cpt allT wt ev)
 open CompanionTheory.RgExh CompanionTheory.RgExh.U
 open GlobalTheory.CuspRep GlobalTheory.UnitaryBC GlobalTheory.SmGL GlobalTheory.DiscSpec
-open GroundTheory.BlockD.FourierDecayAlt.GaugeExists
-  (qdetPoly tmPoly evU evU_apply evU_qdetPoly natDegree_qdetPoly_le coeff_qdetPoly_top prod_linear
-    sum_fin_cast)
+open GroundTheory.BlockD.FourierDecayAlt.GaugeExists (qdetPoly tmPoly evU evU_apply evU_qdetPoly natDegree_qdetPoly_le
+  coeff_qdetPoly_top prod_linear sum_fin_cast)
 
 section Poly
 
@@ -30,34 +77,30 @@ theorem poly_eq_zero_of_evU (Q : A[X]) (h : ∀ u : ℂ, evU u Q = 0) : Q = 0 :=
   have hR : R = 0 := by
     refine Polynomial.funext fun u => ?_
     have h1 := congrArg φ (h u)
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [evU_apply, eval₂_eq_sum_range, map_sum, map_zero] at h1
+
+    rw [evU_apply, eval₂_eq_sum_range, map_sum, map_zero] at h1
     rw [eval_zero, ← h1]
     simp only [R, eval_finsetSum, eval_monomial, RingHom.id_apply, ← map_pow]
     refine Finset.sum_congr rfl fun k _ => ?_
     rw [← Algebra.commutes, ← Algebra.smul_def, map_smul, smul_eq_mul, mul_comm]
   have h2 := congrArg (fun p => p.coeff j) hR
-  simp only [R, finsetSum_coeff, coeff_monomial, Finsupp.single_apply, coeff_zero,
-      Finset.sum_ite_eq', mem_range]
-    at h2
+  simp only [R, finsetSum_coeff, coeff_monomial, Finsupp.single_apply, coeff_zero, Finset.sum_ite_eq', mem_range] at h2
   split_ifs at h2 with hj
   · exact h2
   · rw [coeff_eq_zero_of_natDegree_lt (by omega), map_zero]
 
-theorem commute_coeff_of_evU (P : A[X]) (a : A) (h : ∀ u : ℂ, Commute (evU u P) a) (j : ℕ)
-    : Commute (P.coeff j) a := by
+theorem commute_coeff_of_evU (P : A[X]) (a : A) (h : ∀ u : ℂ, Commute (evU u P) a) (j : ℕ) :
+    Commute (P.coeff j) a := by
   have hC : ∀ u : ℂ, evU u (C a) = a := fun u => by simp [evU_apply]
-  have hQ : P * C a - C a * P = 0 :=
-    poly_eq_zero_of_evU _ fun u => by
-      rw [map_sub, map_mul, map_mul, hC, sub_eq_zero]
-      exact h u
+  have hQ : P * C a - C a * P = 0 := poly_eq_zero_of_evU _ fun u => by
+    rw [map_sub, map_mul, map_mul, hC, sub_eq_zero]
+    exact h u
   have h2 := congrArg (fun p => p.coeff j) hQ
   simp only [coeff_sub, coeff_mul_C, coeff_C_mul, coeff_zero] at h2
   exact sub_eq_zero.1 h2
 
-theorem coeff_qdetPoly_mem
-    {n : ℕ} (E : Fin n → Fin n → A) (S : Subalgebra ℂ A) (hS : ∀ p q, E p q ∈ S) (j : ℕ)
-    : (qdetPoly E).coeff j ∈ S := by
+theorem coeff_qdetPoly_mem {n : ℕ} (E : Fin n → Fin n → A) (S : Subalgebra ℂ A)
+    (hS : ∀ p q, E p q ∈ S) (j : ℕ) : (qdetPoly E).coeff j ∈ S := by
   let f : S →+* A := S.val.toRingHom
   have hC : ∀ a ∈ S, C a ∈ liftsRing f := fun a ha => by
     rw [← lifts_iff_liftsRing]
@@ -84,43 +127,26 @@ theorem coeff_qdetPoly_mem
 
 end Poly
 
-theorem capelli_coef_commute
-    : ∀ (W : Type) [AddCommGroup W] [Module ℂ W] (M : ℕ) (d : Fin M → ℕ)
-        (X : ∀ i, Fin (d i) → Fin (d i) → Module.End ℂ W),
-      (∀ i, GlRel (X i)) → (∀ i j, i ≠ j → ∀ p q r v, Commute (X i p q) (X j r v))
-        → ∃ c : Fin M → ℕ → Module.End ℂ W,
-          (∀ i, c i (d i) = 1)
-            ∧ (∀ i (u : ℂ), qdet (X i) u = ∑ j ∈ Finset.range (d i + 1), u ^ j • c i j)
-            ∧ (∀ i,
-              1 ≤ d i
-                → c i (d i - 1)
-                  = ∑ p, X i p p - (((d i : ℂ) * ((d i : ℂ) - 1) / 2)) • (1 : Module.End ℂ W))
-            ∧ ∀ i j a b, Commute (c i a) (c j b) := by
+theorem capelli_coef_commute : ∀ (W : Type) [AddCommGroup W] [Module ℂ W] (M : ℕ) (d : Fin M → ℕ) (X : ∀ i, Fin (d i) → Fin (d i) → Module.End ℂ W), (∀ i, GlRel (X i)) → (∀ i j, i ≠ j → ∀ p q r v, Commute (X i p q) (X j r v)) → ∃ c : Fin M → ℕ → Module.End ℂ W, (∀ i, c i (d i) = 1) ∧ (∀ i (u : ℂ), qdet (X i) u = ∑ j ∈ Finset.range (d i + 1), u ^ j • c i j) ∧ (∀ i, 1 ≤ d i → c i (d i - 1) = ∑ p, X i p p - (((d i : ℂ) * ((d i : ℂ) - 1) / 2)) • (1 : Module.End ℂ W)) ∧ ∀ i j a b, Commute (c i a) (c j b) := by
   intro W _ _ M d X hgl hcomm
   have hL : ∀ i a p q, Commute ((qdetPoly (X i)).coeff a) (X i p q) := fun i a p q =>
-    commute_coeff_of_evU _ _
-      (fun u => by
-        rw [evU_qdetPoly]
-        exact Formalism.REAL.qDetCentral _ _ (X i) (hgl i) u p q)
-      a
+    commute_coeff_of_evU _ _ (fun u => by
+      rw [evU_qdetPoly]
+      exact Formalism.REAL.qDetCentral _ _ (X i) (hgl i) u p q) a
   have hL2 : ∀ i j a r v, Commute ((qdetPoly (X i)).coeff a) (X j r v) := by
     intro i j a r v
     by_cases hij : i = j
     · subst hij
       exact hL i a r v
-    · have hm :=
-        coeff_qdetPoly_mem (X i) (Subalgebra.centralizer ℂ {X j r v})
-          (fun p q => by
-            rw [Subalgebra.mem_centralizer_iff]
-            rintro g rfl
-            exact (hcomm i j hij p q r v).symm.eq)
-          a
+    · have hm := coeff_qdetPoly_mem (X i) (Subalgebra.centralizer ℂ {X j r v}) (fun p q => by
+        rw [Subalgebra.mem_centralizer_iff]
+        rintro g rfl
+        exact (hcomm i j hij p q r v).symm.eq) a
       rw [Subalgebra.mem_centralizer_iff] at hm
       exact (hm _ rfl).symm
   refine ⟨fun i j => (qdetPoly (X i)).coeff j, ?_, ?_, ?_, ?_⟩
   · intro i
-    obtain ⟨-, htop, -⟩ :=
-      prod_linear (d i) fun k => X i k k - algebraMap ℂ (Module.End ℂ W) ((k : ℕ) : ℂ)
+    obtain ⟨-, htop, -⟩ := prod_linear (d i) fun k => X i k k - algebraMap ℂ (Module.End ℂ W) ((k : ℕ) : ℂ)
     show (qdetPoly (X i)).coeff (d i) = 1
     rw [coeff_qdetPoly_top _ _ (by omega), htop]
   · intro i u
@@ -131,20 +157,17 @@ theorem capelli_coef_commute
     rw [Algebra.smul_def]
     exact (Algebra.commutes _ _).symm
   · intro i hi
-    obtain ⟨-, -, hsub⟩ :=
-      prod_linear (d i) fun k => X i k k - algebraMap ℂ (Module.End ℂ W) ((k : ℕ) : ℂ)
+    obtain ⟨-, -, hsub⟩ := prod_linear (d i) fun k => X i k k - algebraMap ℂ (Module.End ℂ W) ((k : ℕ) : ℂ)
     show (qdetPoly (X i)).coeff (d i - 1) = _
-    set_option synthInstance.maxHeartbeats 100000 in
+
     rw [coeff_qdetPoly_top _ _ (by omega), hsub (d i - 1) (by omega), Finset.sum_sub_distrib,
-      ← map_sum, sum_fin_cast, Algebra.algebraMap_eq_smul_one]
+    ← map_sum, sum_fin_cast, Algebra.algebraMap_eq_smul_one]
   · intro i j a b
-    have hm :=
-      coeff_qdetPoly_mem (X j) (Subalgebra.centralizer ℂ {(qdetPoly (X i)).coeff a})
-        (fun p q => by
-          rw [Subalgebra.mem_centralizer_iff]
-          rintro g rfl
-          exact (hL2 i j a p q).eq)
-        b
+    have hm := coeff_qdetPoly_mem (X j) (Subalgebra.centralizer ℂ {(qdetPoly (X i)).coeff a})
+      (fun p q => by
+        rw [Subalgebra.mem_centralizer_iff]
+        rintro g rfl
+        exact (hL2 i j a p q).eq) b
     rw [Subalgebra.mem_centralizer_iff] at hm
     exact hm _ rfl
 

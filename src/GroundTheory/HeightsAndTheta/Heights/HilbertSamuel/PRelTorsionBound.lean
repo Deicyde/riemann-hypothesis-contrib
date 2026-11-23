@@ -1,7 +1,60 @@
 module
 
-public import Mathlib
 public import GroundTheory.HeightsAndTheta.Heights.HilbertSamuel.StatementsRelTorsionBound
+public import Mathlib.CategoryTheory.Category.Basic
+public import Mathlib.RingTheory.MvPolynomial.WeightedHomogeneous
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Sub.Prod
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArakelovGeometry.ProjDefs
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.IsSemipositiveOn
 
 @[expose] public section
 
@@ -9,8 +62,7 @@ set_option maxSynthPendingDepth 1
 
 namespace GroundTheory.Heights₂.Heights.HilbertSamuel
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
-  ReciprocityTheory.ChartRestriction.G.ArakelovGeometry
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.ArakelovGeometry
 
 noncomputable section
 
@@ -20,13 +72,12 @@ attribute [local instance] MvPolynomial.weightedGradedAlgebra
 
 section Lemmas
 
-variable
-  {K : Type*} [Fintype K] [DecidableEq K] {ι : K → Type*} [∀ k, Fintype (ι k)] {Ω : Type*} [Field Ω]
+variable {K : Type*} [Fintype K] [DecidableEq K] {ι : K → Type*} [∀ k, Fintype (ι k)] {Ω : Type*} [Field Ω]
 
 def blockWeight : (Σ k, ι k) → (K → ℕ) := fun p => Pi.single p.1 1
 
-theorem weight_blockWeight (μ : (Σ k, ι k) →₀ ℕ)
-    : Finsupp.weight (blockWeight (ι := ι)) μ = fun k => ∑ i, μ ⟨k, i⟩ := by
+theorem weight_blockWeight (μ : (Σ k, ι k) →₀ ℕ) :
+    Finsupp.weight (blockWeight (ι := ι)) μ = fun k => ∑ i, μ ⟨k, i⟩ := by
   funext k
   rw [Finsupp.weight_apply, Finsupp.sum_fintype _ _ (by simp), Finset.sum_apply, Fintype.sum_sigma,
     Finset.sum_eq_single k]
@@ -35,15 +86,15 @@ theorem weight_blockWeight (μ : (Σ k, ι k) →₀ ℕ)
     simp [blockWeight, Ne.symm hk]
   · simp
 
+
 omit [DecidableEq K] in
-theorem aeval_monomial_one (R : Subalgebra ℤ Ω) (y : (Σ k, ι k) → Ω) (μ : (Σ k, ι k) →₀ ℕ)
-    : aeval y (monomial μ (1 : R)) = ∏ p, y p ^ μ p := by
+theorem aeval_monomial_one (R : Subalgebra ℤ Ω) (y : (Σ k, ι k) → Ω) (μ : (Σ k, ι k) →₀ ℕ) :
+    aeval y (monomial μ (1 : R)) = ∏ p, y p ^ μ p := by
   rw [aeval_monomial, Finsupp.prod_fintype _ _ (by simp)]
   simp
 
-theorem relSecM_le_map (R : Subalgebra ℤ Ω) (y : (Σ k, ι k) → Ω) (b : K → ℕ)
-    : relSecM R y b
-      ≤ (weightedHomogeneousSubmodule R (blockWeight (ι := ι)) b).map (aeval y).toLinearMap := by
+theorem relSecM_le_map (R : Subalgebra ℤ Ω) (y : (Σ k, ι k) → Ω) (b : K → ℕ) :
+    relSecM R y b ≤ (weightedHomogeneousSubmodule R (blockWeight (ι := ι)) b).map (aeval y).toLinearMap := by
   rw [relSecM, Submodule.span_le]
   rintro _ ⟨μ, hμ, rfl⟩
   refine ⟨monomial (Finsupp.equivFunOnFinite.symm μ) 1, ?_, ?_⟩
@@ -53,10 +104,10 @@ theorem relSecM_le_map (R : Subalgebra ℤ Ω) (y : (Σ k, ι k) → Ω) (b : K 
     simpa using hμ k
   · simp [aeval_monomial_one]
 
+
 omit [Fintype K] [DecidableEq K] in
-theorem exists_chart_le
-    (N : ℕ) (μ : (Σ k, ι k) → ℕ) (h : ∀ k, Fintype.card (ι k) * N < ∑ i, μ ⟨k, i⟩)
-    : ∃ c : ∀ k, ι k, ∀ k, N ≤ μ ⟨k, c k⟩ := by
+theorem exists_chart_le (N : ℕ) (μ : (Σ k, ι k) → ℕ)
+    (h : ∀ k, Fintype.card (ι k) * N < ∑ i, μ ⟨k, i⟩) : ∃ c : ∀ k, ι k, ∀ k, N ≤ μ ⟨k, c k⟩ := by
   have hk : ∀ k, ∃ i, N ≤ μ ⟨k, i⟩ := by
     intro k
     by_contra hn
@@ -66,14 +117,16 @@ theorem exists_chart_le
     exact absurd (h k) (not_lt.2 hle)
   exact ⟨fun k => (hk k).choose, fun k => (hk k).choose_spec⟩
 
+
 open Classical in
 theorem sum_chart (c : ∀ k, ι k) (N : ℕ) (k : K) : ∑ i, (if c k = i then N else 0) = N := by
   rw [Finset.sum_ite_eq]
   simp
 
+
 open Classical in
-theorem prod_chart (z : (Σ k, ι k) → Ω) (c : ∀ k, ι k) (N : ℕ)
-    : ∏ p : Σ k, ι k, z p ^ (if c p.1 = p.2 then N else 0) = (∏ k, z ⟨k, c k⟩) ^ N := by
+theorem prod_chart (z : (Σ k, ι k) → Ω) (c : ∀ k, ι k) (N : ℕ) :
+    ∏ p : Σ k, ι k, z p ^ (if c p.1 = p.2 then N else 0) = (∏ k, z ⟨k, c k⟩) ^ N := by
   rw [Fintype.prod_sigma, ← Finset.prod_pow]
   refine Finset.prod_congr rfl fun k _ => ?_
   rw [Finset.prod_eq_single (c k)]
@@ -82,22 +135,22 @@ theorem prod_chart (z : (Σ k, ι k) → Ω) (c : ∀ k, ι k) (N : ℕ)
     simp [Ne.symm hi]
   · simp
 
+
 omit [DecidableEq K] in
-theorem chart_pow_mem (R : Subalgebra ℤ Ω) (y : (Σ k, ι k) → Ω) (c : ∀ k, ι k) (N : ℕ)
-    : (∏ k, y ⟨k, c k⟩) ^ N ∈ relSecM R y (fun _ => N) := by
+theorem chart_pow_mem (R : Subalgebra ℤ Ω) (y : (Σ k, ι k) → Ω) (c : ∀ k, ι k) (N : ℕ) :
+    (∏ k, y ⟨k, c k⟩) ^ N ∈ relSecM R y (fun _ => N) := by
   classical
   rw [← prod_chart]
   exact monomial_mem_relSecM R y _ fun k => sum_chart c N k
 
+
 omit [DecidableEq K] in
-theorem exists_chart_factor (N : ℕ) (μ : (Σ k, ι k) → ℕ) (c : ∀ k, ι k) (hc : ∀ k, N ≤ μ ⟨k, c k⟩)
-    : ∃ ν : (Σ k, ι k) → ℕ,
-      (∀ k, ∑ i, ν ⟨k, i⟩ + N = ∑ i, μ ⟨k, i⟩)
-        ∧ ∀ z : (Σ k, ι k) → Ω, ∏ p, z p ^ μ p = (∏ p, z p ^ ν p) * (∏ k, z ⟨k, c k⟩) ^ N := by
+theorem exists_chart_factor (N : ℕ) (μ : (Σ k, ι k) → ℕ) (c : ∀ k, ι k) (hc : ∀ k, N ≤ μ ⟨k, c k⟩) :
+    ∃ ν : (Σ k, ι k) → ℕ, (∀ k, ∑ i, ν ⟨k, i⟩ + N = ∑ i, μ ⟨k, i⟩) ∧
+      ∀ z : (Σ k, ι k) → Ω, ∏ p, z p ^ μ p = (∏ p, z p ^ ν p) * (∏ k, z ⟨k, c k⟩) ^ N := by
   classical
-  have hsplit
-      : ∀ p : Σ k, ι k,
-        μ p = (μ p - if c p.1 = p.2 then N else 0) + if c p.1 = p.2 then N else 0 := by
+  have hsplit : ∀ p : Σ k, ι k,
+      μ p = (μ p - if c p.1 = p.2 then N else 0) + if c p.1 = p.2 then N else 0 := by
     intro p
     split_ifs with h
     · have hp : N ≤ μ p := by
@@ -107,95 +160,66 @@ theorem exists_chart_factor (N : ℕ) (μ : (Σ k, ι k) → ℕ) (c : ∀ k, ι
       omega
     · omega
   refine ⟨fun p => μ p - if c p.1 = p.2 then N else 0, fun k => ?_, fun z => ?_⟩
-  · have hs
-        : ∑ i, μ ⟨k, i⟩ = ∑ i, ((μ ⟨k, i⟩ - if c k = i then N else 0) + if c k = i then N else 0) :=
+  · have hs : ∑ i, μ ⟨k, i⟩ = ∑ i, ((μ ⟨k, i⟩ - if c k = i then N else 0) + if c k = i then N else 0) :=
       Finset.sum_congr rfl fun i _ => hsplit ⟨k, i⟩
     rw [hs, Finset.sum_add_distrib, sum_chart]
   · rw [← prod_chart z c N, ← Finset.prod_mul_distrib]
     refine Finset.prod_congr rfl fun p _ => ?_
     rw [← pow_add, ← hsplit p]
 
+
 open Classical in
-theorem comp_mul
-    (R : Type*) [CommRing R]
-    {d : K → ℕ}
-    (m : K → ℕ)
-    {G : MvPolynomial (Σ k, ι k) R}
-    (hG : G ∈ weightedHomogeneousSubmodule R (blockWeight (ι := ι)) d)
-    (A : MvPolynomial (Σ k, ι k) R)
-    : weightedHomogeneousComponent blockWeight m (A * G)
-      = if d ≤ m then weightedHomogeneousComponent blockWeight (m - d) A * G else 0 := by
-  have h :=
-    DirectSum.coe_decompose_mul_of_right_mem
-      (𝒜 := weightedHomogeneousSubmodule R (blockWeight (ι := ι))) (a := A) m hG
+theorem comp_mul (R : Type*) [CommRing R] {d : K → ℕ} (m : K → ℕ) {G : MvPolynomial (Σ k, ι k) R}
+    (hG : G ∈ weightedHomogeneousSubmodule R (blockWeight (ι := ι)) d) (A : MvPolynomial (Σ k, ι k) R) :
+    weightedHomogeneousComponent blockWeight m (A * G) =
+      if d ≤ m then weightedHomogeneousComponent blockWeight (m - d) A * G else 0 := by
+  have h := DirectSum.coe_decompose_mul_of_right_mem
+    (𝒜 := weightedHomogeneousSubmodule R (blockWeight (ι := ι))) (a := A) m hG
   rw [← decompose'_apply R blockWeight, ← decompose'_apply R blockWeight]
   exact h
 
-def KilledAt
-    (R : Subalgebra ℤ Ω) (y : (Σ k, ι k) → Ω) (c0 : ∀ k, ι k) (k0 : K) (c : ∀ k, ι k) (d : K → ℕ)
-    (N : ℕ) (v : Ω)
-    : Prop :=
-  ∃ a : K → ℕ,
-    a + Pi.single k0 1 = d + (fun _ => N)
-      ∧ ∃ g ∈ relSecM R y a, (∏ k, y ⟨k, c k⟩) ^ N * v = y ⟨k0, c0 k0⟩ * g
+def KilledAt (R : Subalgebra ℤ Ω) (y : (Σ k, ι k) → Ω) (c0 : ∀ k, ι k) (k0 : K) (c : ∀ k, ι k) (d : K → ℕ)
+    (N : ℕ) (v : Ω) : Prop :=
+  ∃ a : K → ℕ, a + Pi.single k0 1 = d + (fun _ => N) ∧
+    ∃ g ∈ relSecM R y a, (∏ k, y ⟨k, c k⟩) ^ N * v = y ⟨k0, c0 k0⟩ * g
 
-theorem KilledAt.mono
-    {R : Subalgebra ℤ Ω} {y : (Σ k, ι k) → Ω} {c0 : ∀ k, ι k} {k0 : K} {c : ∀ k, ι k} {d : K → ℕ}
-    {N N' : ℕ} {v : Ω} (h : KilledAt R y c0 k0 c d N v) (hN : N ≤ N')
-    : KilledAt R y c0 k0 c d N' v := by
+theorem KilledAt.mono {R : Subalgebra ℤ Ω} {y : (Σ k, ι k) → Ω} {c0 : ∀ k, ι k} {k0 : K} {c : ∀ k, ι k}
+    {d : K → ℕ} {N N' : ℕ} {v : Ω} (h : KilledAt R y c0 k0 c d N v) (hN : N ≤ N') :
+    KilledAt R y c0 k0 c d N' v := by
   obtain ⟨a, ha, g, hg, hgv⟩ := h
   obtain ⟨m, rfl⟩ := Nat.exists_eq_add_of_le hN
-  refine ⟨
-    (fun _ => m) + a,
-    ?_,
-    (∏ k, y ⟨k, c k⟩) ^ m * g,
-    mul_mem_relSecM R y (chart_pow_mem R y c m) hg,
-    ?_
-  ⟩
+  refine ⟨(fun _ => m) + a, ?_, (∏ k, y ⟨k, c k⟩) ^ m * g, mul_mem_relSecM R y (chart_pow_mem R y c m) hg, ?_⟩
   · funext k
     have := congrFun ha k
     simp only [Pi.add_apply] at this ⊢
     omega
   · linear_combination (∏ k, y ⟨k, c k⟩) ^ m * hgv
 
-def TorsionForm
-    (R : Subalgebra ℤ Ω)
-    (y : (Σ k, ι k) → Ω) (c0 : ∀ k, ι k) (k0 : K) (d : K → ℕ) (N : ℕ)
-    (G : MvPolynomial (Σ k, ι k) R)
-    : Prop :=
-  G ∈ weightedHomogeneousSubmodule R (blockWeight (ι := ι)) d
-    ∧ ∀ c : ∀ k, ι k, (∀ k, y ⟨k, c k⟩ ≠ 0) → KilledAt R y c0 k0 c d N (aeval y G)
+def TorsionForm (R : Subalgebra ℤ Ω) (y : (Σ k, ι k) → Ω) (c0 : ∀ k, ι k) (k0 : K) (d : K → ℕ) (N : ℕ)
+    (G : MvPolynomial (Σ k, ι k) R) : Prop :=
+  G ∈ weightedHomogeneousSubmodule R (blockWeight (ι := ι)) d ∧
+    ∀ c : ∀ k, ι k, (∀ k, y ⟨k, c k⟩ ≠ 0) → KilledAt R y c0 k0 c d N (aeval y G)
 
-theorem TorsionForm.mono
-    {R : Subalgebra ℤ Ω} {y : (Σ k, ι k) → Ω} {c0 : ∀ k, ι k} {k0 : K} {d : K → ℕ} {N N' : ℕ}
-    {G : MvPolynomial (Σ k, ι k) R} (h : TorsionForm R y c0 k0 d N G) (hN : N ≤ N')
-    : TorsionForm R y c0 k0 d N' G :=
+theorem TorsionForm.mono {R : Subalgebra ℤ Ω} {y : (Σ k, ι k) → Ω} {c0 : ∀ k, ι k} {k0 : K} {d : K → ℕ}
+    {N N' : ℕ} {G : MvPolynomial (Σ k, ι k) R} (h : TorsionForm R y c0 k0 d N G) (hN : N ≤ N') :
+    TorsionForm R y c0 k0 d N' G :=
   ⟨h.1, fun c hc => (h.2 c hc).mono hN⟩
 
-theorem aeval_mul_mem
-    (R : Subalgebra ℤ Ω)
-    (y : (Σ k, ι k) → Ω) (c0 : ∀ k, ι k)
-    (k0 : K)
-    {d a b : K → ℕ} {N : ℕ} (hN : 1 ≤ N)
-    {G : MvPolynomial (Σ k, ι k) R} (hG : TorsionForm R y c0 k0 d N G)
+theorem aeval_mul_mem (R : Subalgebra ℤ Ω) (y : (Σ k, ι k) → Ω) (c0 : ∀ k, ι k) (k0 : K) {d a b : K → ℕ}
+    {N : ℕ} (hN : 1 ≤ N) {G : MvPolynomial (Σ k, ι k) R} (hG : TorsionForm R y c0 k0 d N G)
     (ha : ∀ k, Fintype.card (ι k) * N < a k) (hab : a + d = b + Pi.single k0 1)
-    {A : MvPolynomial (Σ k, ι k) R}
-    (hA : A ∈ weightedHomogeneousSubmodule R (blockWeight (ι := ι)) a)
-    : aeval y (A * G) ∈ (relSecM R y b).map (LinearMap.mulLeft R (y ⟨k0, c0 k0⟩)) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [A.as_sum, Finset.sum_mul, map_sum]
+    {A : MvPolynomial (Σ k, ι k) R} (hA : A ∈ weightedHomogeneousSubmodule R (blockWeight (ι := ι)) a) :
+    aeval y (A * G) ∈ (relSecM R y b).map (LinearMap.mulLeft R (y ⟨k0, c0 k0⟩)) := by
+
+  rw [A.as_sum, Finset.sum_mul, map_sum]
   refine Submodule.sum_mem _ fun μ hμ => ?_
   have hwμ : Finsupp.weight blockWeight μ = a := hA (mem_support_iff.1 hμ)
   rw [weight_blockWeight] at hwμ
   obtain ⟨c, hc⟩ := exists_chart_le N μ fun k => by rw [congrFun hwμ k]; exact ha k
   obtain ⟨ν, hν, hfac⟩ := exists_chart_factor (Ω := Ω) N μ c hc
-  have hval
-      : aeval y (monomial μ (AddMonoidAlgebra.coeff A μ) * G)
-        = algebraMap R Ω (AddMonoidAlgebra.coeff A μ)
-          * ((∏ p, y p ^ ν p) * ((∏ k, y ⟨k, c k⟩) ^ N * aeval y G)) := by
-    rw [show monomial μ (AddMonoidAlgebra.coeff A μ)
-          = C (AddMonoidAlgebra.coeff A μ) * monomial μ 1 by
-        rw [C_mul_monomial, mul_one],
+  have hval : aeval y (monomial μ (AddMonoidAlgebra.coeff A μ) * G) = algebraMap R Ω (AddMonoidAlgebra.coeff A μ) *
+      ((∏ p, y p ^ ν p) * ((∏ k, y ⟨k, c k⟩) ^ N * aeval y G)) := by
+    rw [show monomial μ (AddMonoidAlgebra.coeff A μ) = C (AddMonoidAlgebra.coeff A μ) * monomial μ 1 by rw [C_mul_monomial, mul_one],
       map_mul, map_mul, aeval_C, aeval_monomial_one, hfac y]
     ring
   by_cases hgood : ∀ k, y ⟨k, c k⟩ ≠ 0
@@ -226,9 +250,7 @@ theorem proof : RelTorsionBound.Statement := by
   classical
   have := hR
   let s : Set (MvPolynomial (Σ k, ι k) R) := {G | ∃ d N, TorsionForm R y c0 k0 d N G}
-  obtain ⟨t, hts, hspan⟩ :=
-    (Submodule.fg_span_iff_fg_span_finset_subset s).1
-      (IsNoetherian.noetherian (R := MvPolynomial (Σ k, ι k) R) _)
+  obtain ⟨t, hts, hspan⟩ := (Submodule.fg_span_iff_fg_span_finset_subset s).1 (IsNoetherian.noetherian (R := MvPolynomial (Σ k, ι k) R) _)
   have hs : ∀ G ∈ s, ∃ d N, TorsionForm R y c0 k0 d N G := fun G h => h
   choose! dG NG hdN using hs
   set N₀ := t.sup NG + 1 with hN₀
@@ -239,39 +261,33 @@ theorem proof : RelTorsionBound.Statement := by
   choose! D g hg hgf using hyp
   have hFs : F ∈ s := by
     refine ⟨b + Pi.single k0 1, Finset.univ.sup D, hF, fun c hc => ?_⟩
-    refine KilledAt.mono ⟨b + fun _ => D c, ?_, g c, hg c hc, hgf c hc⟩
-      (Finset.le_sup (Finset.mem_univ c))
+    refine KilledAt.mono ⟨b + fun _ => D c, ?_, g c, hg c hc, hgf c hc⟩ (Finset.le_sup (Finset.mem_univ c))
     funext k
     simp only [Pi.add_apply]
     omega
   have hFt : F ∈ Submodule.span (MvPolynomial (Σ k, ι k) R) (t : Set (MvPolynomial (Σ k, ι k) R)) :=
     hspan ▸ Submodule.subset_span hFs
   obtain ⟨A, -, hA⟩ := Submodule.mem_span_finset.1 hFt
-  have hFsum
-      : F = ∑ G ∈ t, weightedHomogeneousComponent blockWeight (b + Pi.single k0 1) (A G * G) := by
+  have hFsum : F = ∑ G ∈ t, weightedHomogeneousComponent blockWeight (b + Pi.single k0 1) (A G * G) := by
     have h1 : weightedHomogeneousComponent blockWeight (b + Pi.single k0 1) F = F :=
-      IsWeightedHomogeneous.weightedHomogeneousComponent_same
-        ((mem_weightedHomogeneousSubmodule _ _ _ _).1 hF)
+      IsWeightedHomogeneous.weightedHomogeneousComponent_same ((mem_weightedHomogeneousSubmodule _ _ _ _).1 hF)
     rw [← h1]
     conv_lhs => rw [← hA]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     simp only [smul_eq_mul]
   suffices h : aeval y F ∈ (relSecM R y b).map (LinearMap.mulLeft R (y ⟨k0, c0 k0⟩)) by
     obtain ⟨g', hg', hgx⟩ := h
     exact ⟨g', hg', by simpa using hgx.symm⟩
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [hFsum, map_sum]
+
+  rw [hFsum, map_sum]
   refine Submodule.sum_mem _ fun G hG => ?_
   rw [comp_mul _ _ (hT G hG).1]
   split_ifs with hle
-  · refine aeval_mul_mem R y c0 k0 (by omega) (hT G hG)
-      (fun k => ?_)
-      (tsub_add_cancel_of_le hle) (weightedHomogeneousComponent_mem _ _ _)
+  · refine aeval_mul_mem R y c0 k0 (by omega) (hT G hG) (fun k => ?_) (tsub_add_cancel_of_le hle)
+      (weightedHomogeneousComponent_mem _ _ _)
     have h1 : Fintype.card (ι k) * N₀ + 1 ≤ ∑ k, (Fintype.card (ι k) * N₀ + 1) :=
-      Finset.single_le_sum
-        (f := fun k => Fintype.card (ι k) * N₀ + 1)
-        (fun _ _ => Nat.zero_le _)
+      Finset.single_le_sum (f := fun k => Fintype.card (ι k) * N₀ + 1) (fun _ _ => Nat.zero_le _)
         (Finset.mem_univ k)
     have h2 : dG G k ≤ ∑ k, dG G k :=
       Finset.single_le_sum (f := fun k => dG G k) (fun _ _ => Nat.zero_le _) (Finset.mem_univ k)

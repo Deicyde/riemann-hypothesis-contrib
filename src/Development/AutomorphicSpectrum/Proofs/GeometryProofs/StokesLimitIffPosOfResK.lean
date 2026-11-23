@@ -1,69 +1,50 @@
 module
 
-public import Mathlib
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.InterNamed
-public import GroundTheory.HeightsAndTheta.Heights.HodgeLowerBound.FrameDefinitions.CpRegPhRegOfNonneg
 public import GroundTheory.HeightsAndTheta.Heights.HodgeLowerBound.FlagIndices
-public import ReciprocityTheory.AnalyticForms.PlurisubharmonicFunctions.PshRegMax
-public import ReciprocityTheory.AnalyticForms.PotentialTheory.HessCEqZeroOfEventuallyEqZero
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.InterGood
-public import GroundTheory.HeightsAndTheta.Heights.HodgeLowerBound.PMuRegSmooth
-public import GroundTheory.HeightsAndTheta.Heights.StabilizerCovolume.PMUcSmooth
-public import GroundTheory.HeightsAndTheta.Heights.StabilizerCovolume.BRegWeightLevi
-public import GroundTheory.HeightsAndTheta.Heights.HodgeLowerBound.PProjSmoothAlong
-public import GroundTheory.HeightsAndTheta.Heights.HodgeLowerBound.PHoloInjDerivInj
-public import GroundTheory.HeightsAndTheta.Heights.HodgeLowerBound.PHermExtend
-public import GroundTheory.HeightsAndTheta.Heights.HodgeLowerBound.PVertFactorSmooth
-public import GroundTheory.HeightsAndTheta.Heights.HodgeLowerBound.PVertFactorPos
-public import GroundTheory.HeightsAndTheta.Heights.HodgeLowerBound.StatementsPtsBddConv
-public import GroundTheory.HeightsAndTheta.Heights.OrbitLimits.ArithSystem
 public import GroundTheory.HeightsAndTheta.Heights.HodgeLowerBound.PMuHomDensityNonneg
 public import GroundTheory.HeightsAndTheta.Heights.HodgeLowerBound.PMuSheetLeviNonneg
-public import GroundTheory.HeightsAndTheta.Heights.HodgeLowerBound.PSheetChartHolo
 public import GroundTheory.HeightsAndTheta.Heights.HodgeLowerBound.PRefAlongSheet
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.BlowupProjections.BlowupProjStatement
-public import Development.AutomorphicSpectrum.Proofs.MetricProofs.MeasureLimitStatementHolds
-public import Development.AutomorphicSpectrum.Proofs.MetricProofs.ProjectionFormulaOfArithSystem
-public import Development.AutomorphicSpectrum.Proofs.MetricProofs.ResolutionExistsOfResolutionStatementStatement
-public import Development.AutomorphicSpectrum.Proofs.MetricProofs.DegreeAndCoordinatesOfResolutionStatement
-public import Development.AutomorphicSpectrum.Proofs.MetricProofs.LocalOrbitChartStatement
-public import GroundTheory.HeightsAndTheta.Heights.HodgeLowerBound.PStokesLimit
-public import GroundTheory.HeightsAndTheta.Heights.HodgeLowerBound.PStokesTelescope
-public import GroundTheory.HeightsAndTheta.Heights.HodgeLowerBound.PStokesStep
-public import GroundTheory.HeightsAndTheta.Heights.HodgeLowerBound.PStokesLimitTp
-public import GroundTheory.HeightsAndTheta.Heights.HodgeLowerBound.PStokesLimitT
-public import GroundTheory.HeightsAndTheta.Heights.HodgeLowerBound.PStokesLimitEps
-public import GroundTheory.HeightsAndTheta.Heights.HodgeLowerBound.PTpIntegrandLimit
-public import GroundTheory.HeightsAndTheta.Heights.HodgeLowerBound.PRegAboveWeight
-public import GroundTheory.HeightsAndTheta.Heights.HodgeLowerBound.PBdPtsNull
-public import GroundTheory.HeightsAndTheta.Heights.HodgeLowerBound.PParamImageNull
-public import GroundTheory.HeightsAndTheta.Heights.HodgeLowerBound.PDivisorPreimageNull
-public import GroundTheory.HeightsAndTheta.Heights.HodgeLowerBound.PPtsBddConv
-public import GroundTheory.HeightsAndTheta.Heights.HodgeLowerBound.PPtsMonoSemipos
-public import GroundTheory.HeightsAndTheta.Heights.HodgeLowerBound.POmNPoly
-public import GroundTheory.HeightsAndTheta.Heights.HodgeLowerBound.PTopNMixedExpand
-public import GroundTheory.HeightsAndTheta.Heights.HodgeLowerBound.POmNVbInt
-public import GroundTheory.HeightsAndTheta.Heights.HodgeLowerBound.PNbarChartSemipos
-public import GroundTheory.HeightsAndTheta.Heights.HodgeLowerBound.PNbarSemipos
-public import GroundTheory.HeightsAndTheta.Heights.HodgeLowerBound.PModelLogIntegrable
-public import GroundTheory.HeightsAndTheta.Heights.HodgeLowerBound.PBoundaryNull
-public import GroundTheory.HeightsAndTheta.Heights.StabilizerCovolume.ThreeLeLevel
-public import GroundTheory.HeightsAndTheta.Heights.StabilizerCovolume.GaussCM
-public import GroundTheory.HeightsAndTheta.Heights.HodgeLowerBound.DataHodge
-public import GroundTheory.HeightsAndTheta.Heights.HodgeLowerBound.FrameDefinitions.IsFrameOverLine
-public import GroundTheory.HeightsAndTheta.Heights.HodgeLowerBound.FrameDefinitions.Values
-public import GroundTheory.HeightsAndTheta.Heights.HodgeLowerBound.StNbarLeviChart
-public import GroundTheory.HeightsAndTheta.Heights.StabilizerCovolume.StMUcSmooth
-public import GroundTheory.HeightsAndTheta.Heights.ElementarySymmetric.PNbarLeviChartReg
-public import GroundTheory.HeightsAndTheta.Heights.ElementarySymmetric.PRefChartDisc
-public import GroundTheory.HeightsAndTheta.Heights.HodgeLowerBound.PAPrimeChartMargin
-public import GroundTheory.HeightsAndTheta.Heights.HodgeLowerBound.PChartVelLift
-public import GroundTheory.HeightsAndTheta.Heights.HodgeLowerBound.PAPrimeChartLevi
-public import GroundTheory.HeightsAndTheta.Heights.HodgeLowerBound.PAPrimeChartLeviLocal
-public import Development.AutomorphicSpectrum.Proofs.MetricProofs.GenericDegreeEqGeometricDegree
-public import Development.AutomorphicSpectrum.Proofs.MetricProofs.ModelPointsIntegrableStatementHolds
-public import Development.AutomorphicSpectrum.Proofs.MetricProofs.TopMixedLimitOfResolution
-public import Development.AutomorphicSpectrum.Proofs.MetricProofs.StokesLimitStatementHolds
+public import GroundTheory.HeightsAndTheta.Heights.HodgeLowerBound.PSheetChartHolo
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Real
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
+import Development.AutomorphicSpectrum.Proofs.MetricProofs.MeasureLimitStatementHolds
 
 @[expose] public section
 

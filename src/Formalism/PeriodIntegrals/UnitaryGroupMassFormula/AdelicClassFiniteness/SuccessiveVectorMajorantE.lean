@@ -1,7 +1,46 @@
 module
 
-public import Mathlib
 public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.AdelicClassFiniteness.PartShortOf
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+public import Mathlib.Analysis.Matrix.Spectrum
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
+public import Mathlib.Algebra.Star.UnitaryStarAlgAut
 
 @[expose] public section
 
@@ -12,9 +51,9 @@ namespace PIW.AdelClassFin
 open Formalism.UG NumberField Matrix
 open scoped ComplexOrder
 
-theorem svM_conj_form {n : ℕ} (U : Matrix (Fin n) (Fin n) ℂ) (d z : Fin n → ℂ)
-    : star z ⬝ᵥ ((U * diagonal d * star U) *ᵥ z)
-      = ∑ i, star ((star U *ᵥ z) i) * (d i * (star U *ᵥ z) i) := by
+theorem svM_conj_form {n : ℕ} (U : Matrix (Fin n) (Fin n) ℂ) (d z : Fin n → ℂ) :
+    star z ⬝ᵥ ((U * diagonal d * star U) *ᵥ z) =
+      ∑ i, star ((star U *ᵥ z) i) * (d i * (star U *ᵥ z) i) := by
   rw [Matrix.star_eq_conjTranspose, ← Matrix.mulVec_mulVec, ← Matrix.mulVec_mulVec,
     Matrix.dotProduct_mulVec]
   have h : star z ᵥ* U = star (Uᴴ *ᵥ z) := by
@@ -52,8 +91,7 @@ theorem successive_vector_majorant : SvMaj := by
       simpa [Matrix.mulVec_mulVec, hUU'] using this
     have h2 := hD.conjTranspose_mul_mul_same hinj
     rwa [Matrix.star_eq_conjTranspose, Matrix.conjTranspose_conjTranspose,
-        ← Matrix.star_eq_conjTranspose]
-      at h2
+      ← Matrix.star_eq_conjTranspose] at h2
   · have hdU : U.det * (star U).det = 1 := by rw [← Matrix.det_mul, hUU', Matrix.det_one]
     rw [Matrix.det_mul, Matrix.det_mul, mul_right_comm, hdU, one_mul, Matrix.det_diagonal,
       hJ.det_eq_prod_eigenvalues, norm_prod]
@@ -98,22 +136,15 @@ theorem successive_vector_majorant_e : SvMajE := by
     ext i j
     rw [Matrix.map_apply, Matrix.transpose_apply, ← hM.apply j i]
     rfl
-  have hid
-      : ∀ (N : Matrix (Fin m) (Fin m) ℂ) (z : Fin m → ℂ),
-        star z ⬝ᵥ (N.map (starRingEnd ℂ) *ᵥ z) = starRingEnd ℂ (z ⬝ᵥ (N *ᵥ star z)) := by
+  have hid : ∀ (N : Matrix (Fin m) (Fin m) ℂ) (z : Fin m → ℂ),
+      star z ⬝ᵥ (N.map (starRingEnd ℂ) *ᵥ z) = starRingEnd ℂ (z ⬝ᵥ (N *ᵥ star z)) := by
     intro N z
-    set_option synthInstance.maxHeartbeats 100000 in
+
     simp [dotProduct, mulVec, map_sum, map_mul]
   choose H0 hH0 using fun φ : E →+* ℂ => successive_vector_majorant m (J.map φ) (hherm φ) (hdetφ φ)
   let ι := Fintype.equivFin (E →+* ℂ)
-  refine ⟨
-    fun φ =>
-      if ι φ < ι (ComplexEmbedding.conjugate φ) then
-        H0 φ
-      else
-        (H0 (ComplexEmbedding.conjugate φ)).map (starRingEnd ℂ),
-    ?_
-  ⟩
+  refine ⟨fun φ => if ι φ < ι (ComplexEmbedding.conjugate φ) then H0 φ
+    else (H0 (ComplexEmbedding.conjugate φ)).map (starRingEnd ℂ), ?_⟩
   intro φ
   have hcc : ComplexEmbedding.conjugate (ComplexEmbedding.conjugate φ) = φ := star_star φ
   by_cases hp : ι φ < ι (ComplexEmbedding.conjugate φ)
@@ -133,9 +164,8 @@ theorem successive_vector_majorant_e : SvMajE := by
     refine ⟨?_, ?_, ?_, ?_⟩
     · rw [hmapT _ hM.1.1]
       exact hM.1.transpose
-    · have hdc
-          : ∀ N : Matrix (Fin m) (Fin m) ℂ,
-            (N.map (starRingEnd ℂ)).det = starRingEnd ℂ N.det := fun N => by
+    · have hdc : ∀ N : Matrix (Fin m) (Fin m) ℂ,
+          (N.map (starRingEnd ℂ)).det = starRingEnd ℂ N.det := fun N => by
         rw [← RingHom.mapMatrix_apply, ← RingHom.map_det]
       rw [hmapT _ hM.1.1, Matrix.det_transpose, hM.2.1, hJφ, hdc, Complex.norm_conj]
     · intro z

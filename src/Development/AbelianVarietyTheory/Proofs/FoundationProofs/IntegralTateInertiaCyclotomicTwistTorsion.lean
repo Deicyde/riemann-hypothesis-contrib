@@ -1,17 +1,67 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Definitions.Foundations.EeProd
 public import ReciprocityTheory.GaloisValuations.Global
-public import ReciprocityTheory.NeutralLocalFields.LocalFieldComparison.LocalFieldAutomorphisms.Inertia
-public import ReciprocityTheory.ClassFieldTheory.LocalClassField.ExistsDvdQKPowSubOne
 public import GroundTheory.PAdicHodge.AxLemma
+public import ReciprocityTheory.ClassFieldTheory.LocalClassField.ExistsIntEKMulVbar
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.NormSubOnePowTotient
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Int
+import Mathlib.Algebra.Order.Star.Real
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RootsOfUnity.AlgebraicallyClosed
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
+public import ReciprocityTheory.ClassFieldTheory.LocalClassField.ExistsDvdQKPowSubOne
+import ReciprocityTheory.ClassFieldTheory.LocalClassField.UnrExtC
+public import ReciprocityTheory.NeutralLocalFields.LocalFieldComparison.LocalFieldAutomorphisms.Inertia
+import ReciprocityTheory.NeutralLocalFields.LocalFieldComparison.LocalFieldAutomorphisms.MemRangeOfAevalRatEqZero
+import ReciprocityTheory.NeutralLocalFields.LocalFieldComparison.LocalFieldAutomorphisms.ValuationIntCastLtOneIff
+import Std.Tactic.BVDecide.Normalize.Prop
+public import ReciprocityTheory.NeutralLocalFields.LocalFieldComparison.LocalFieldAutomorphisms.ContinuousGK
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.KZ
-  GlobalTheory.Glue
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.KZ GlobalTheory.Glue
 
 noncomputable section
 
@@ -24,12 +74,9 @@ variable {l : ℕ} [hl : Fact l.Prime] {W : IntermediateField ℚ_[l] (PadicAlgC
 def IntVal (W : IntermediateField ℚ_[l] (PadicAlgCl l)) : Prop :=
   ∀ a : W, a ≠ 0 → ∃ v : ℤ, ‖(a : PadicAlgCl l)‖ = ((l : ℝ)⁻¹) ^ v
 
-theorem coeff_bound_unif
-    (hW : IntVal W)
-    (π : PadicAlgCl l) (e : ℕ) (hπ : ‖π‖ ^ e = (l : ℝ)⁻¹)
-    (Q : W[X]) (hQ : Q.natDegree < e)
-    (k : ℕ)
-    : (l : ℝ)⁻¹ * ‖(Q.coeff k : PadicAlgCl l)‖ ≤ ‖aeval π Q‖ := by
+theorem coeff_bound_unif (hW : IntVal W) (π : PadicAlgCl l) (e : ℕ) (hπ : ‖π‖ ^ e = (l : ℝ)⁻¹)
+    (Q : W[X]) (hQ : Q.natDegree < e) (k : ℕ) :
+    (l : ℝ)⁻¹ * ‖(Q.coeff k : PadicAlgCl l)‖ ≤ ‖aeval π Q‖ := by
   have hl1 : (1 : ℝ) < l := by exact_mod_cast hl.out.one_lt
   have hl0 : (0 : ℝ) < l := by linarith
   have he : e ≠ 0 := by omega
@@ -47,11 +94,10 @@ theorem coeff_bound_unif
   swap
   · rw [coeff_eq_zero_of_natDegree_lt (by omega)]
     simp
-  have hs : ∀ (a : W) (y : PadicAlgCl l), ‖a • y‖ = ‖(a : PadicAlgCl l)‖ * ‖y‖ := fun a y =>
-    norm_mul _ _
+  have hs : ∀ (a : W) (y : PadicAlgCl l), ‖a • y‖ = ‖(a : PadicAlgCl l)‖ * ‖y‖ := fun a y => norm_mul _ _
   rw [aeval_eq_sum_range' hQ]
-  refine le_trans ?_
-    (norm_le_norm_sum (Finset.range e) (fun j => Q.coeff j • π ^ j) ?_ (Finset.mem_range.2 hk))
+  refine le_trans ?_ (norm_le_norm_sum (Finset.range e) (fun j => Q.coeff j • π ^ j) ?_
+    (Finset.mem_range.2 hk))
   · simp only [hs, norm_pow]
     rw [mul_comm, ← hπ]
     exact mul_le_mul_of_nonneg_left (pow_le_pow_of_le_one hr0.le hr1.le hk.le) (norm_nonneg _)
@@ -64,9 +110,8 @@ theorem coeff_bound_unif
       exact (mul_pos (norm_pos_iff.2 (by simpa using hi0)) (pow_pos hr0 _)).ne' hij
     obtain ⟨u, hu⟩ := hW _ hi0
     obtain ⟨v, hv⟩ := hW _ hj0
-    rw [hu, hv, ← hπ, ← zpow_natCast, ← zpow_natCast, ← zpow_natCast, ← zpow_mul, ← zpow_mul,
-        ← zpow_add₀ hr0.ne', ← zpow_add₀ hr0.ne']
-      at hij
+    rw [hu, hv, ← hπ, ← zpow_natCast, ← zpow_natCast, ← zpow_natCast,
+      ← zpow_mul, ← zpow_mul, ← zpow_add₀ hr0.ne', ← zpow_add₀ hr0.ne'] at hij
     have h3 := zpow_right_injective₀ hr0 hr1.ne hij
     have hi' := Finset.mem_range.1 hi
     have hj' := Finset.mem_range.1 hj
@@ -74,17 +119,15 @@ theorem coeff_bound_unif
     have h5 := Int.eq_zero_of_abs_lt_dvd h4 (by rw [abs_lt]; constructor <;> omega)
     omega
 
-theorem coeff_bound
-    (hW : IntVal W)
-    (N : ℕ) (z : PadicAlgCl l) (hz : IsPrimitiveRoot z (l ^ (N + 1)))
-    (P : W[X]) (hP : P.natDegree < (l ^ (N + 1)).totient)
-    (k : ℕ)
-    : (l : ℝ)⁻¹ * ‖(P.coeff k : PadicAlgCl l)‖ ≤ ‖aeval z P‖ := by
+theorem coeff_bound (hW : IntVal W) (N : ℕ) (z : PadicAlgCl l) (hz : IsPrimitiveRoot z (l ^ (N + 1)))
+    (P : W[X]) (hP : P.natDegree < (l ^ (N + 1)).totient) (k : ℕ) :
+    (l : ℝ)⁻¹ * ‖(P.coeff k : PadicAlgCl l)‖ ≤ ‖aeval z P‖ := by
   have hl0 : (0 : ℝ) < l := by exact_mod_cast hl.out.pos
   have hπ := norm_sub_one_pow_totient l N z hz
   rw [norm_l] at hπ
   have hQ := coeff_bound_unif hW (z - 1) _ hπ (taylor 1 P) (by rwa [natDegree_taylor])
-  have e1 : aeval (z - 1) (taylor 1 P) = aeval z P := by rw [taylor_apply, aeval_comp]; simp
+  have e1 : aeval (z - 1) (taylor 1 P) = aeval z P := by
+    rw [taylor_apply, aeval_comp]; simp
   rw [e1] at hQ
   have e2 : P = taylor (-1) (taylor 1 P) := by rw [taylor_taylor]; simp
   generalize taylor 1 P = Q at hQ e2
@@ -99,30 +142,18 @@ theorem coeff_bound
     have h1 := IsUltrametricDist.norm_natCast_le_one (PadicAlgCl l) ((j + k).choose k)
     have h2 := hQ (j + k)
     rw [inv_mul_le_iff₀ hl0] at h2
-    calc
-      _ ≤ 1 * ‖(Q.coeff (j + k) : PadicAlgCl l)‖ := mul_le_mul_of_nonneg_right h1 (norm_nonneg _)
+    calc _ ≤ 1 * ‖(Q.coeff (j + k) : PadicAlgCl l)‖ := mul_le_mul_of_nonneg_right h1 (norm_nonneg _)
       _ ≤ _ := by rwa [one_mul]
   rwa [inv_mul_le_iff₀ hl0]
 
-theorem aeval_cyclotomic
-    {K L : Type*} [Field K] [Field L] [Algebra K L]
-    {n : ℕ} (hn : 0 < n)
-    {w : L} (hw : IsPrimitiveRoot w n)
-    : aeval w (cyclotomic n K) = 0 := by
+theorem aeval_cyclotomic {K L : Type*} [Field K] [Field L] [Algebra K L] {n : ℕ} (hn : 0 < n) {w : L}
+    (hw : IsPrimitiveRoot w n) : aeval w (cyclotomic n K) = 0 := by
   rw [aeval_def, ← eval_map, map_cyclotomic]
   exact hw.isRoot_cyclotomic hn
 
-theorem exists_poly_small
-    {K L : Type*} [Field K] [Field L] [Algebra K L]
-    {n : ℕ} (hn : 0 < n)
-    {w : L} (hw : IsPrimitiveRoot w n)
-    (t : ℕ)
-    : ∃ R : K[X], R.natDegree < n.totient ∧ aeval w R = w ^ t := by
-  refine ⟨
-    X ^ t %ₘ cyclotomic n K,
-    ?_,
-    (aeval_modByMonic_eq_self_of_root (aeval_cyclotomic hn hw)).trans (by simp)
-  ⟩
+theorem exists_poly_small {K L : Type*} [Field K] [Field L] [Algebra K L] {n : ℕ} (hn : 0 < n) {w : L}
+    (hw : IsPrimitiveRoot w n) (t : ℕ) : ∃ R : K[X], R.natDegree < n.totient ∧ aeval w R = w ^ t := by
+  refine ⟨X ^ t %ₘ cyclotomic n K, ?_, (aeval_modByMonic_eq_self_of_root (aeval_cyclotomic hn hw)).trans (by simp)⟩
   rw [← natDegree_cyclotomic n K]
   refine natDegree_modByMonic_lt _ (cyclotomic.monic _ _) ?_
   intro h
@@ -130,14 +161,13 @@ theorem exists_poly_small
   rw [h, natDegree_one] at this
   exact (Nat.totient_pos.2 hn).ne this
 
-theorem exists_poly_pow
-    (n m : ℕ) (z : PadicAlgCl l) (hz : IsPrimitiveRoot z (l ^ (n + m + 1))) (k : ℕ)
-    : ∃ P : W[X],
-      aeval z P = z ^ k
-        ∧ ∀ j, P.coeff j ≠ 0 → j < (l ^ (n + m + 1)).totient ∧ (l ^ m ∣ j ↔ l ^ m ∣ k) := by
+theorem exists_poly_pow (n m : ℕ) (z : PadicAlgCl l) (hz : IsPrimitiveRoot z (l ^ (n + m + 1))) (k : ℕ) :
+    ∃ P : W[X], aeval z P = z ^ k ∧
+      ∀ j, P.coeff j ≠ 0 → j < (l ^ (n + m + 1)).totient ∧ (l ^ m ∣ j ↔ l ^ m ∣ k) := by
   have hp := hl.out
   have hM : 0 < l ^ m := pow_pos hp.pos m
-  have hw : IsPrimitiveRoot (z ^ (l ^ m)) (l ^ (n + 1)) := hz.pow (pow_pos hp.pos _) (by ring)
+  have hw : IsPrimitiveRoot (z ^ (l ^ m)) (l ^ (n + 1)) :=
+    hz.pow (pow_pos hp.pos _) (by ring)
   have htot : (l ^ (n + m + 1)).totient = (l ^ (n + 1)).totient * l ^ m := by
     rw [Nat.totient_prime_pow_succ hp, Nat.totient_prime_pow_succ hp]; ring
   obtain ⟨R, hR1, hR2⟩ := exists_poly_small (K := W) (pow_pos hp.pos _) hw (k / l ^ m)
@@ -161,22 +191,18 @@ theorem exists_poly_pow
     · rw [htot, h4]; nlinarith
     · rw [h4, Nat.dvd_add_right (Dvd.intro _ rfl), Nat.dvd_mod_iff dvd_rfl]
 
-def sp (W : IntermediateField ℚ_[l] (PadicAlgCl l)) (z : PadicAlgCl l) (A : ℕ → Prop)
-    : Submodule W (PadicAlgCl l) :=
+def sp (W : IntermediateField ℚ_[l] (PadicAlgCl l)) (z : PadicAlgCl l) (A : ℕ → Prop) : Submodule W (PadicAlgCl l) :=
   Submodule.span W {w | ∃ k, A k ∧ w = z ^ k}
 
-theorem sp_repr
-    (n m : ℕ) (z : PadicAlgCl l) (hz : IsPrimitiveRoot z (l ^ (n + m + 1)))
-    (A : Prop → Prop) (w : PadicAlgCl l) (hw : w ∈ sp W z fun k => A (l ^ m ∣ k))
-    : ∃ P : W[X],
-      aeval z P = w ∧ ∀ j, P.coeff j ≠ 0 → j < (l ^ (n + m + 1)).totient ∧ A (l ^ m ∣ j) := by
+theorem sp_repr (n m : ℕ) (z : PadicAlgCl l) (hz : IsPrimitiveRoot z (l ^ (n + m + 1))) (A : Prop → Prop)
+    (w : PadicAlgCl l) (hw : w ∈ sp W z fun k => A (l ^ m ∣ k)) :
+    ∃ P : W[X], aeval z P = w ∧ ∀ j, P.coeff j ≠ 0 → j < (l ^ (n + m + 1)).totient ∧ A (l ^ m ∣ j) := by
   induction hw using Submodule.span_induction with
   | mem w hw =>
     obtain ⟨k, hk, rfl⟩ := hw
     obtain ⟨P, h1, h2⟩ := exists_poly_pow (W := W) n m z hz k
     exact ⟨P, h1, fun j hj => ⟨(h2 j hj).1, by rwa [propext (h2 j hj).2]⟩⟩
-  | zero =>
-    exact ⟨0, by simp, by simp⟩
+  | zero => exact ⟨0, by simp, by simp⟩
   | add x y _ _ hx hy =>
     obtain ⟨P, rfl, h1⟩ := hx
     obtain ⟨Q, rfl, h2⟩ := hy
@@ -188,18 +214,15 @@ theorem sp_repr
     obtain ⟨P, rfl, h1⟩ := hx
     exact ⟨c • P, by simp, fun j hj => h1 j (fun h => hj (by simp [h]))⟩
 
-theorem bound
-    (hW : IntVal W)
-    (n m : ℕ) (z : PadicAlgCl l) (hz : IsPrimitiveRoot z (l ^ (n + m + 1)))
-    (b w : PadicAlgCl l) (hb : b ∈ sp W z fun k => l ^ m ∣ k) (hw : w ∈ sp W z fun k => ¬ l ^ m ∣ k)
-    : ‖b‖ ≤ l * ‖b + w‖ := by
+theorem bound (hW : IntVal W) (n m : ℕ) (z : PadicAlgCl l) (hz : IsPrimitiveRoot z (l ^ (n + m + 1)))
+    (b w : PadicAlgCl l) (hb : b ∈ sp W z fun k => l ^ m ∣ k) (hw : w ∈ sp W z fun k => ¬ l ^ m ∣ k) :
+    ‖b‖ ≤ l * ‖b + w‖ := by
   have hl0 : (0 : ℝ) < l := by exact_mod_cast hl.out.pos
   obtain ⟨P, rfl, h1⟩ := sp_repr n m z hz id b hb
   obtain ⟨Q, rfl, h2⟩ := sp_repr n m z hz Not w hw
   have hpos : 0 < (l ^ (n + m + 1)).totient := Nat.totient_pos.2 (pow_pos hl.out.pos _)
   have hdeg : (P + Q).natDegree < (l ^ (n + m + 1)).totient := by
-    refine lt_of_le_of_lt (natDegree_le_iff_coeff_eq_zero.2 fun N hN => ?_)
-      (Nat.sub_lt hpos one_pos)
+    refine lt_of_le_of_lt (natDegree_le_iff_coeff_eq_zero.2 fun N hN => ?_) (Nat.sub_lt hpos one_pos)
     have a1 : P.coeff N = 0 := by by_contra h; have := (h1 N h).1; omega
     have a2 : Q.coeff N = 0 := by by_contra h; have := (h2 N h).1; omega
     simp [a1, a2]
@@ -217,8 +240,8 @@ theorem bound
   change ‖(P.coeff j : PadicAlgCl l) * z ^ j‖ = _
   rw [norm_mul, norm_pow, hz1, one_pow, mul_one]
 
-theorem mem_sp_of_adjoin (z y : PadicAlgCl l) (hy : y ∈ IntermediateField.adjoin W {z})
-    : y ∈ sp W z fun _ => True := by
+theorem mem_sp_of_adjoin (z y : PadicAlgCl l) (hy : y ∈ IntermediateField.adjoin W {z}) :
+    y ∈ sp W z fun _ => True := by
   have hz : IsAlgebraic W z := Algebra.IsAlgebraic.isAlgebraic z
   have hy' : y ∈ Algebra.adjoin W {z} := by
     rw [← IntermediateField.adjoin_simple_toSubalgebra_of_isAlgebraic hz]
@@ -227,11 +250,10 @@ theorem mem_sp_of_adjoin (z y : PadicAlgCl l) (hy : y ∈ IntermediateField.adjo
   obtain ⟨p, rfl⟩ := hy'
   change aeval z p ∈ _
   rw [aeval_eq_sum_range]
-  exact Submodule.sum_mem _ fun i _ =>
-    Submodule.smul_mem _ _ (Submodule.subset_span ⟨i, trivial, rfl⟩)
+  exact Submodule.sum_mem _ fun i _ => Submodule.smul_mem _ _ (Submodule.subset_span ⟨i, trivial, rfl⟩)
 
-theorem decomp (z : PadicAlgCl l) (A : ℕ → Prop) (y : PadicAlgCl l) (hy : y ∈ sp W z fun _ => True)
-    : ∃ b ∈ sp W z A, ∃ w ∈ sp W z (fun k => ¬ A k), y = b + w := by
+theorem decomp (z : PadicAlgCl l) (A : ℕ → Prop) (y : PadicAlgCl l) (hy : y ∈ sp W z fun _ => True) :
+    ∃ b ∈ sp W z A, ∃ w ∈ sp W z (fun k => ¬ A k), y = b + w := by
   have : (sp W z fun _ => True) ≤ sp W z A ⊔ sp W z (fun k => ¬ A k) := by
     refine Submodule.span_le.2 ?_
     rintro _ ⟨k, -, rfl⟩
@@ -242,17 +264,16 @@ theorem decomp (z : PadicAlgCl l) (A : ℕ → Prop) (y : PadicAlgCl l) (hy : y 
   exact ⟨b, hb, w, hw, e.symm⟩
 
 def chi (W : IntermediateField ℚ_[l] (PadicAlgCl l)) : (PadicAlgCl l ≃ₐ[W] PadicAlgCl l) →* ℤ_[l] :=
-  (Units.coeHom ℤ_[l]).comp
-    ((cyclotomicCharacter (PadicAlgCl l) l).comp
-      (MulSemiringAction.toRingAut (PadicAlgCl l ≃ₐ[W] PadicAlgCl l) (PadicAlgCl l)))
+  (Units.coeHom ℤ_[l]).comp ((cyclotomicCharacter (PadicAlgCl l) l).comp
+    (MulSemiringAction.toRingAut (PadicAlgCl l ≃ₐ[W] PadicAlgCl l) (PadicAlgCl l)))
 
-theorem chi_spec
-    (σ : PadicAlgCl l ≃ₐ[W] PadicAlgCl l) (n : ℕ) (t : PadicAlgCl l) (ht : t ^ l ^ n = 1)
-    : σ t = t ^ (PadicInt.toZModPow n (chi W σ)).val := by
+theorem chi_spec (σ : PadicAlgCl l ≃ₐ[W] PadicAlgCl l) (n : ℕ) (t : PadicAlgCl l) (ht : t ^ l ^ n = 1) :
+    σ t = t ^ (PadicInt.toZModPow n (chi W σ)).val := by
   have : NeZero ((l : ℕ) : PadicAlgCl l) := ⟨Nat.cast_ne_zero.mpr hl.out.ne_zero⟩
   exact cyclotomicCharacter.spec l (MulSemiringAction.toRingAut _ (PadicAlgCl l) σ) t ht
 
-theorem norm_chi (σ : PadicAlgCl l ≃ₐ[W] PadicAlgCl l) : ‖chi W σ‖ = 1 := PadicInt.norm_units _
+theorem norm_chi (σ : PadicAlgCl l ≃ₐ[W] PadicAlgCl l) : ‖chi W σ‖ = 1 :=
+  PadicInt.norm_units _
 
 def emb (l : ℕ) [Fact l.Prime] : ℤ_[l] →+* PadicAlgCl l :=
   (algebraMap ℚ_[l] (PadicAlgCl l)).comp PadicInt.Coe.ringHom
@@ -267,16 +288,13 @@ theorem map_emb (σ : PadicAlgCl l ≃ₐ[W] PadicAlgCl l) (a : ℤ_[l]) : σ (e
 theorem norm_gal (σ : PadicAlgCl l ≃ₐ[W] PadicAlgCl l) (x : PadicAlgCl l) : ‖σ x‖ = ‖x‖ :=
   ReciprocityTheory.Neutral.Cmp.norm_map (σ.restrictScalars ℚ_[l]) x
 
-theorem norm_le_of_toZModPow (n : ℕ) (a : ℤ_[l]) (h : PadicInt.toZModPow n a = 0)
-    : ‖a‖ ≤ ((l : ℝ)⁻¹) ^ n := by
+theorem norm_le_of_toZModPow (n : ℕ) (a : ℤ_[l]) (h : PadicInt.toZModPow n a = 0) : ‖a‖ ≤ ((l : ℝ)⁻¹) ^ n := by
   have h1 : a ∈ RingHom.ker (PadicInt.toZModPow (p := l) n) := h
   rw [PadicInt.ker_toZModPow, ← PadicInt.norm_le_pow_iff_mem_span_pow] at h1
   simpa using h1
 
-theorem chi_mod_eq_one
-    (σ : PadicAlgCl l ≃ₐ[W] PadicAlgCl l) (n : ℕ) (z : PadicAlgCl l)
-    (hz : IsPrimitiveRoot z (l ^ (n + 1))) (h : σ z = z)
-    : PadicInt.toZModPow (n + 1) (chi W σ) = 1 := by
+theorem chi_mod_eq_one (σ : PadicAlgCl l ≃ₐ[W] PadicAlgCl l) (n : ℕ) (z : PadicAlgCl l)
+    (hz : IsPrimitiveRoot z (l ^ (n + 1))) (h : σ z = z) : PadicInt.toZModPow (n + 1) (chi W σ) = 1 := by
   have h1 : 1 < l ^ (n + 1) := Nat.one_lt_pow (by omega) hl.out.one_lt
   have : NeZero (l ^ (n + 1)) := ⟨by omega⟩
   have h2 := chi_spec σ _ z hz.pow_eq_one
@@ -284,17 +302,15 @@ theorem chi_mod_eq_one
   have h3 := hz.pow_inj h1 (ZMod.val_lt _) ((pow_one z).trans h2)
   rw [← ZMod.natCast_zmod_val (PadicInt.toZModPow (n + 1) (chi W σ)), ← h3, Nat.cast_one]
 
-theorem exists_gamma (hW : IntVal W) (n j : ℕ) (hj : 1 ≤ j)
-    : ∃ γ : PadicAlgCl l ≃ₐ[W] PadicAlgCl l,
-      (∀ t : PadicAlgCl l, t ^ l ^ (n + 1) = 1 → γ t = t) ∧ chi W γ ^ j ≠ 1 := by
+theorem exists_gamma (hW : IntVal W) (n j : ℕ) (hj : 1 ≤ j) :
+    ∃ γ : PadicAlgCl l ≃ₐ[W] PadicAlgCl l, (∀ t : PadicAlgCl l, t ^ l ^ (n + 1) = 1 → γ t = t) ∧ chi W γ ^ j ≠ 1 := by
   have hp := hl.out
   have : NeZero ((l : ℕ) : PadicAlgCl l) := ⟨Nat.cast_ne_zero.mpr hp.ne_zero⟩
   set a := 1 + l ^ (n + 1) with ha
   have ha1 : 1 < a := by have := pow_pos hp.pos (n + 1); omega
   set m := a ^ j with hm
   have hm1 : 1 < m := Nat.one_lt_pow (by omega) ha1
-  have hlt : m < l ^ (n + m + 1) :=
-    lt_of_lt_of_le (Nat.lt_pow_self hp.one_lt) (Nat.pow_le_pow_right hp.pos (by omega))
+  have hlt : m < l ^ (n + m + 1) := lt_of_lt_of_le (Nat.lt_pow_self hp.one_lt) (Nat.pow_le_pow_right hp.pos (by omega))
   have hpos : 0 < l ^ (n + m + 1) := pow_pos hp.pos _
   have : NeZero (l ^ (n + m + 1)) := ⟨hpos.ne'⟩
   obtain ⟨z, hz⟩ := HasEnoughRootsOfUnity.exists_isPrimitiveRoot (PadicAlgCl l) (l ^ (n + m + 1))
@@ -313,9 +329,8 @@ theorem exists_gamma (hW : IntVal W) (n j : ℕ) (hj : 1 ≤ j)
     refine Nat.Coprime.pow_right _ ((Nat.Prime.coprime_iff_not_dvd hp).2 ?_).symm
     rw [ha, Nat.dvd_add_left (dvd_pow_self l (by omega))]
     exact hp.not_dvd_one
-  obtain ⟨γ, hγ⟩ :=
-    minpoly.exists_algEquiv_of_root' hint.isAlgebraic
-      (heq ▸ aeval_cyclotomic hpos (hz.pow_of_coprime a hcop))
+  obtain ⟨γ, hγ⟩ := minpoly.exists_algEquiv_of_root' hint.isAlgebraic
+    (heq ▸ aeval_cyclotomic hpos (hz.pow_of_coprime a hcop))
   refine ⟨γ, fun t ht => ?_, fun h => ?_⟩
   · have ht' : t ^ l ^ (n + m + 1) = 1 := by
       rw [show n + m + 1 = n + 1 + m by ring, pow_add, pow_mul, ht, one_pow]
@@ -332,21 +347,17 @@ theorem exists_gamma (hW : IntVal W) (n j : ℕ) (hj : 1 ≤ j)
     have := hz.pow_inj hlt (by omega) h2
     omega
 
-theorem gal_smul (g : PadicAlgCl l ≃ₐ[W] PadicAlgCl l) (c : W) (x : PadicAlgCl l)
-    : g (c • x) = c • g x := by
+theorem gal_smul (g : PadicAlgCl l ≃ₐ[W] PadicAlgCl l) (c : W) (x : PadicAlgCl l) : g (c • x) = c • g x := by
   change g ((c : PadicAlgCl l) * x) = (c : PadicAlgCl l) * g x
   rw [map_mul]
   exact congrArg (· * g x) (g.commutes c)
 
-theorem sp_stable
-    (n m : ℕ) (z : PadicAlgCl l) (hz : IsPrimitiveRoot z (l ^ (n + m + 1)))
-    (g : PadicAlgCl l ≃ₐ[W] PadicAlgCl l)
-    (w : PadicAlgCl l) (hw : w ∈ sp W z fun k => ¬ l ^ m ∣ k)
-    : g w ∈ sp W z fun k => ¬ l ^ m ∣ k := by
+theorem sp_stable (n m : ℕ) (z : PadicAlgCl l) (hz : IsPrimitiveRoot z (l ^ (n + m + 1)))
+    (g : PadicAlgCl l ≃ₐ[W] PadicAlgCl l) (w : PadicAlgCl l) (hw : w ∈ sp W z fun k => ¬ l ^ m ∣ k) :
+    g w ∈ sp W z fun k => ¬ l ^ m ∣ k := by
   have : NeZero (l ^ (n + m + 1)) := ⟨(pow_pos hl.out.pos _).ne'⟩
   obtain ⟨a, -, hac, ha⟩ := (hz.isPrimitiveRoot_iff (ξ := g z)).1 (hz.map_of_injective g.injective)
-  have hac' : (l ^ m).Coprime a :=
-    (Nat.Coprime.coprime_dvd_right (pow_dvd_pow l (by omega)) hac).symm
+  have hac' : (l ^ m).Coprime a := (Nat.Coprime.coprime_dvd_right (pow_dvd_pow l (by omega)) hac).symm
   induction hw using Submodule.span_induction with
   | mem w hw =>
     obtain ⟨k, hk, rfl⟩ := hw
@@ -356,10 +367,8 @@ theorem sp_stable
   | add x y _ _ hx hy => rw [map_add]; exact add_mem hx hy
   | smul c x _ hx => rw [gal_smul]; exact Submodule.smul_mem _ c hx
 
-theorem sp_fixed
-    (N : ℕ) (z : PadicAlgCl l) (g : PadicAlgCl l ≃ₐ[W] PadicAlgCl l) (hg : g (z ^ N) = z ^ N)
-    (b : PadicAlgCl l) (hb : b ∈ sp W z fun k => N ∣ k)
-    : g b = b := by
+theorem sp_fixed (N : ℕ) (z : PadicAlgCl l) (g : PadicAlgCl l ≃ₐ[W] PadicAlgCl l) (hg : g (z ^ N) = z ^ N)
+    (b : PadicAlgCl l) (hb : b ∈ sp W z fun k => N ∣ k) : g b = b := by
   induction hb using Submodule.span_induction with
   | mem w hw =>
     obtain ⟨k, ⟨t, rfl⟩, rfl⟩ := hw
@@ -368,60 +377,45 @@ theorem sp_fixed
   | add x y _ _ hx hy => rw [map_add (f := _), hx, hy]
   | smul c x _ hx => rw [gal_smul, hx]
 
-theorem sp_pow_le (N : ℕ) (z : PadicAlgCl l)
-    : (sp W (z ^ N) fun _ => True) ≤ sp W z fun k => N ∣ k := by
+theorem sp_pow_le (N : ℕ) (z : PadicAlgCl l) : (sp W (z ^ N) fun _ => True) ≤ sp W z fun k => N ∣ k := by
   refine Submodule.span_mono ?_
   rintro _ ⟨k, -, rfl⟩
   exact ⟨N * k, Dvd.intro _ rfl, (pow_mul _ _ _).symm⟩
 
-theorem estimate
-    (hW : IntVal W)
-    (n m : ℕ) (z : PadicAlgCl l) (hz : IsPrimitiveRoot z (l ^ (n + m + 1)))
-    (g : PadicAlgCl l ≃ₐ[W] PadicAlgCl l) (hg : g (z ^ l ^ m) = z ^ l ^ m)
-    (c : ℤ_[l])
-    (y₀ y : PadicAlgCl l) (h₀ : y₀ ∈ sp W (z ^ l ^ m) fun _ => True) (hy : y ∈ sp W z fun _ => True)
-    : ∃ b : PadicAlgCl l, ‖b - y₀‖ ≤ l * ‖y - y₀‖ ∧ ‖1 - c‖ * ‖b‖ ≤ l * ‖g y - emb l c * y‖ := by
+theorem estimate (hW : IntVal W) (n m : ℕ) (z : PadicAlgCl l) (hz : IsPrimitiveRoot z (l ^ (n + m + 1)))
+    (g : PadicAlgCl l ≃ₐ[W] PadicAlgCl l) (hg : g (z ^ l ^ m) = z ^ l ^ m) (c : ℤ_[l]) (y₀ y : PadicAlgCl l)
+    (h₀ : y₀ ∈ sp W (z ^ l ^ m) fun _ => True) (hy : y ∈ sp W z fun _ => True) :
+    ∃ b : PadicAlgCl l, ‖b - y₀‖ ≤ l * ‖y - y₀‖ ∧ ‖1 - c‖ * ‖b‖ ≤ l * ‖g y - emb l c * y‖ := by
   obtain ⟨b, hb, w, hw, rfl⟩ := decomp z (fun k => l ^ m ∣ k) y hy
   refine ⟨b, ?_, ?_⟩
   · have := bound hW n m z hz (b - y₀) w (sub_mem hb (sp_pow_le _ _ h₀)) hw
     rwa [sub_add_eq_add_sub] at this
-  · have :=
-      bound hW n m z hz (emb l (1 - c) * b) (g w - emb l c * w)
-        (Submodule.smul_mem _ (⟨_, emb_mem (1 - c)⟩ : W) hb)
-        (sub_mem (sp_stable n m z hz g w hw) (Submodule.smul_mem _ (⟨_, emb_mem c⟩ : W) hw))
+  · have := bound hW n m z hz (emb l (1 - c) * b) (g w - emb l c * w)
+      (Submodule.smul_mem _ (⟨_, emb_mem (1 - c)⟩ : W) hb)
+      (sub_mem (sp_stable n m z hz g w hw) (Submodule.smul_mem _ (⟨_, emb_mem c⟩ : W) hw))
     rw [norm_mul, norm_emb] at this
     convert this using 3
     rw [map_add (f := _), sp_fixed _ z g hg b hb, map_sub, map_one]
     ring
 
-theorem ax
-    (z x : PadicAlgCl l) (r : ℝ)
-    (h : ∀ σ : PadicAlgCl l ≃ₐ[W] PadicAlgCl l, σ z = z → ‖σ x - x‖ ≤ r)
-    : ∃ y ∈ sp W z fun _ => True, ‖x - y‖ ≤ GroundTheory.PAdicHodge.axConstant l * r := by
-  obtain ⟨y, hy, hxy⟩ :=
-    GroundTheory.PAdicHodge.ax_lemma (K := (IntermediateField.adjoin W {z}).restrictScalars ℚ_[l]) x
-      (r := r)
-      (fun τ =>
-        h
-          {
-            τ.toRingEquiv with
-            commutes' := fun k => τ.commutes ⟨k, (IntermediateField.adjoin W {z}).algebraMap_mem k⟩
-          }
-          (τ.commutes ⟨z, IntermediateField.mem_adjoin_simple_self W z⟩))
+theorem ax (z x : PadicAlgCl l) (r : ℝ)
+    (h : ∀ σ : PadicAlgCl l ≃ₐ[W] PadicAlgCl l, σ z = z → ‖σ x - x‖ ≤ r) :
+    ∃ y ∈ sp W z fun _ => True, ‖x - y‖ ≤ GroundTheory.PAdicHodge.axConstant l * r := by
+  obtain ⟨y, hy, hxy⟩ := GroundTheory.PAdicHodge.ax_lemma (K := (IntermediateField.adjoin W {z}).restrictScalars ℚ_[l]) x (r := r)
+    (fun τ => h { τ.toRingEquiv with
+      commutes' := fun k => τ.commutes ⟨k, (IntermediateField.adjoin W {z}).algebraMap_mem k⟩ }
+      (τ.commutes ⟨z, IntermediateField.mem_adjoin_simple_self W z⟩))
   exact ⟨y, mem_sp_of_adjoin z y hy, hxy⟩
 
 def Small (j : ℕ) (H : Subgroup (PadicAlgCl l ≃ₐ[W] PadicAlgCl l)) : Prop :=
-  ∃ C : ℝ, ∀ (x : PadicAlgCl l) (ε : ℝ),
-    (∀ σ ∈ H, ‖σ x - emb l (chi W σ ^ j) * x‖ ≤ ε) → ‖x‖ ≤ C * ε
+  ∃ C : ℝ, ∀ (x : PadicAlgCl l) (ε : ℝ), (∀ σ ∈ H, ‖σ x - emb l (chi W σ ^ j) * x‖ ≤ ε) → ‖x‖ ≤ C * ε
 
 theorem norm_chi_pow (σ : PadicAlgCl l ≃ₐ[W] PadicAlgCl l) (j : ℕ) : ‖emb l (chi W σ ^ j)‖ = 1 := by
   rw [norm_emb, norm_pow, norm_chi, one_pow]
 
-theorem move_le
-    (j n : ℕ) (z : PadicAlgCl l) (hz : IsPrimitiveRoot z (l ^ (n + 1)))
-    (x : PadicAlgCl l) (ε : ℝ) (σ : PadicAlgCl l ≃ₐ[W] PadicAlgCl l)
-    (h : σ z = z) (H : ‖σ x - emb l (chi W σ ^ j) * x‖ ≤ ε)
-    : ‖σ x - x‖ ≤ ε + ((l : ℝ)⁻¹) ^ (n + 1) * ‖x‖ := by
+theorem move_le (j n : ℕ) (z : PadicAlgCl l) (hz : IsPrimitiveRoot z (l ^ (n + 1))) (x : PadicAlgCl l) (ε : ℝ)
+    (σ : PadicAlgCl l ≃ₐ[W] PadicAlgCl l) (h : σ z = z) (H : ‖σ x - emb l (chi W σ ^ j) * x‖ ≤ ε) :
+    ‖σ x - x‖ ≤ ε + ((l : ℝ)⁻¹) ^ (n + 1) * ‖x‖ := by
   have e : σ x - x = (σ x - emb l (chi W σ ^ j) * x) + emb l (chi W σ ^ j - 1) * x := by
     rw [map_sub, map_one]; ring
   rw [e]
@@ -450,16 +444,12 @@ theorem small_top (hW : IntVal W) (j : ℕ) (hj : 1 ≤ j) : Small (W := W) j �
   have hw : IsPrimitiveRoot (z ^ (l ^ m)) (l ^ (n + 1)) := hz.pow (pow_pos hp.pos _) (by ring)
   refine ⟨2 * (D / δ + D), fun x ε H => ?_⟩
   have hε : 0 ≤ ε := (norm_nonneg _).trans (H 1 trivial)
-  obtain ⟨y₀, hy₀, h₀⟩ :=
-    ax (W := W) (z ^ l ^ m) x _ fun σ h => move_le j n _ hw x ε σ h (H σ trivial)
+  obtain ⟨y₀, hy₀, h₀⟩ := ax (W := W) (z ^ l ^ m) x _ fun σ h => move_le j n _ hw x ε σ h (H σ trivial)
   obtain ⟨y, hy, h₁⟩ := ax (W := W) z x _ fun σ h => move_le j (n + m) _ hz x ε σ h (H σ trivial)
   obtain ⟨b, hb1, hb2⟩ := estimate hW n m z hz γ (hγ _ hw.pow_eq_one) (chi W γ ^ j) y₀ y hy₀ hy
-  have ha1 : ((l : ℝ)⁻¹) ^ (n + 1) ≤ 1 / (4 * D) :=
-    (pow_le_pow_of_le_one hq0.le hq1.le (by omega)).trans hn.le
-  have ha2 : ((l : ℝ)⁻¹) ^ (n + m + 1) ≤ 1 / (4 * D) :=
-    (pow_le_pow_of_le_one hq0.le hq1.le (by omega)).trans hn.le
-  have ha3 : ((l : ℝ)⁻¹) ^ (n + m + 1) ≤ δ / (4 * D) :=
-    (pow_le_pow_of_le_one hq0.le hq1.le (by omega)).trans hm.le
+  have ha1 : ((l : ℝ)⁻¹) ^ (n + 1) ≤ 1 / (4 * D) := (pow_le_pow_of_le_one hq0.le hq1.le (by omega)).trans hn.le
+  have ha2 : ((l : ℝ)⁻¹) ^ (n + m + 1) ≤ 1 / (4 * D) := (pow_le_pow_of_le_one hq0.le hq1.le (by omega)).trans hn.le
+  have ha3 : ((l : ℝ)⁻¹) ^ (n + m + 1) ≤ δ / (4 * D) := (pow_le_pow_of_le_one hq0.le hq1.le (by omega)).trans hm.le
   have hX := norm_nonneg x
   set u := ε + 1 / (4 * D) * ‖x‖ with hu
   set v := ε + δ / (4 * D) * ‖x‖ with hv
@@ -470,13 +460,10 @@ theorem small_top (hW : IntVal W) (j : ℕ) (hj : 1 ≤ j) : Small (W := W) j �
   have k2 : ‖x - y‖ ≤ A * v := h₁.trans (by rw [hv]; gcongr)
   have k3 : ‖y - y₀‖ ≤ 2 * (A * u) := by
     have e : y - y₀ = (x - y₀) - (x - y) := by ring
-    rw [e]
-    refine (norm_sub_le _ _).trans ?_
-    linarith
+    rw [e]; refine (norm_sub_le _ _).trans ?_; linarith
   have k4 : ‖γ y - emb l (chi W γ ^ j) * y‖ ≤ 3 * (A * v) := by
-    have e
-        : γ y - emb l (chi W γ ^ j) * y
-          = (γ x - emb l (chi W γ ^ j) * x) - γ (x - y) + emb l (chi W γ ^ j) * (x - y) := by
+    have e : γ y - emb l (chi W γ ^ j) * y =
+        (γ x - emb l (chi W γ ^ j) * x) - γ (x - y) + emb l (chi W γ ^ j) * (x - y) := by
       rw [map_sub]; ring
     rw [e]
     refine (norm_add_le _ _).trans ((add_le_add_left (norm_sub_le _ _) _).trans ?_)
@@ -490,20 +477,17 @@ theorem small_top (hW : IntVal W) (j : ℕ) (hj : 1 ≤ j) : Small (W := W) j �
       exact (norm_add_le _ _).trans (add_le_add_left (norm_sub_le _ _) _)
     have h2 : ‖b - y₀‖ ≤ l * (2 * (A * u)) := hb1.trans (by gcongr)
     have h3 : A * u ≤ l * (A * u) := le_mul_of_one_le_left (by positivity) hl1.le
-    rw [hD]
-    linarith
+    rw [hD]; linarith
   have k6 : ‖b‖ ≤ D * v / δ := by
     rw [le_div_iff₀ hδ0, mul_comm]
     refine hb2.trans ((mul_le_mul_of_nonneg_left k4 (by positivity)).trans (le_of_eq ?_))
-    rw [hD]
-    ring
+    rw [hD]; ring
   have e1 : D * u = D * ε + ‖x‖ / 4 := by rw [hu]; field_simp
   have e2 : D * v / δ = D / δ * ε + ‖x‖ / 4 := by rw [hv]; field_simp
   linarith
 
-theorem small_inf
-    (j : ℕ) (H : Subgroup (PadicAlgCl l ≃ₐ[W] PadicAlgCl l)) (hH : Small j H) (α : PadicAlgCl l)
-    : Small j (H ⊓ MulAction.stabilizer _ α) := by
+theorem small_inf (j : ℕ) (H : Subgroup (PadicAlgCl l ≃ₐ[W] PadicAlgCl l)) (hH : Small j H) (α : PadicAlgCl l) :
+    Small j (H ⊓ MulAction.stabilizer _ α) := by
   classical
   obtain ⟨C, hC⟩ := hH
   have hint : IsIntegral W α := Algebra.IsIntegral.isIntegral α
@@ -522,11 +506,9 @@ theorem small_inf
   have cm : ∀ σ σ', c (σ * σ') = c σ * c σ' := fun σ σ' => by simp only [hc, map_mul, mul_pow]
   have c1 : ∀ σ, ‖c σ‖ = 1 := fun σ => norm_chi_pow σ j
   have cf : ∀ σ σ' : PadicAlgCl l ≃ₐ[W] PadicAlgCl l, σ (c σ') = c σ' := fun σ σ' => map_emb σ _
-  have key
-      : ∀ P : (PadicAlgCl l)[X], ∃ D : ℝ, ∀ (x : PadicAlgCl l) (ε : ℝ),
-        (∀ σ ∈ H ⊓ MulAction.stabilizer _ α, ‖σ x - c σ * x‖ ≤ ε)
-          → ‖∑ t : MulAction.orbit H α, P.eval (t : PadicAlgCl l) * (c (τ t)⁻¹ * τ t x)‖
-            ≤ D * ε := by
+  have key : ∀ P : (PadicAlgCl l)[X], ∃ D : ℝ, ∀ (x : PadicAlgCl l) (ε : ℝ),
+      (∀ σ ∈ H ⊓ MulAction.stabilizer _ α, ‖σ x - c σ * x‖ ≤ ε) →
+      ‖∑ t : MulAction.orbit H α, P.eval (t : PadicAlgCl l) * (c (τ t)⁻¹ * τ t x)‖ ≤ D * ε := by
     intro P
     induction P using Polynomial.induction_on' with
     | add P Q hP hQ =>
@@ -541,11 +523,10 @@ theorem small_inf
       rw [norm_mul]
       refine mul_le_mul_of_nonneg_left (hC _ _ fun σ hσ => ?_) (norm_nonneg _)
       change ‖_ - c σ * _‖ ≤ _
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum, Finset.mul_sum,
-          ← Equiv.sum_comp (MulAction.toPerm (⟨σ, hσ⟩ : H))
-            (fun t : MulAction.orbit H α => c σ * ((t : PadicAlgCl l) ^ k * (c (τ t)⁻¹ * τ t x))),
-          ← Finset.sum_sub_distrib]
+
+      rw [map_sum, Finset.mul_sum, ← Equiv.sum_comp (MulAction.toPerm (⟨σ, hσ⟩ : H))
+      (fun t : MulAction.orbit H α => c σ * ((t : PadicAlgCl l) ^ k * (c (τ t)⁻¹ * τ t x))),
+      ← Finset.sum_sub_distrib]
       refine (norm_sum_le _ _).trans ?_
       rw [← nsmul_eq_mul, ← Finset.card_univ]
       refine Finset.sum_le_card_nsmul _ _ _ fun t _ => ?_
@@ -561,39 +542,30 @@ theorem small_inf
         have : c (τ t)⁻¹ * c (τ t) = 1 := by rw [← cm, inv_mul_cancel]; simp [hc]
         rw [cm, cm]
         linear_combination (c σ * c (τ t')⁻¹) * this
-      have e4
-          : σ ((t : PadicAlgCl l) ^ k * (c (τ t)⁻¹ * τ t x))
-              - c σ * ((t' : PadicAlgCl l) ^ k * (c (τ t')⁻¹ * τ t' x))
-            = (t' : PadicAlgCl l) ^ k
-              * (c (τ t)⁻¹ * τ t' (((τ t')⁻¹ * σ * τ t) x - c ((τ t')⁻¹ * σ * τ t) * x)) := by
+      have e4 : σ ((t : PadicAlgCl l) ^ k * (c (τ t)⁻¹ * τ t x)) - c σ * ((t' : PadicAlgCl l) ^ k * (c (τ t')⁻¹ * τ t' x))
+          = (t' : PadicAlgCl l) ^ k * (c (τ t)⁻¹ * τ t' (((τ t')⁻¹ * σ * τ t) x - c ((τ t')⁻¹ * σ * τ t) * x)) := by
         rw [map_sub, e2, map_mul, map_mul, map_mul, map_pow, cf, cf, ← e1]
         linear_combination ((t' : PadicAlgCl l) ^ k * τ t' x) * e3
       rw [e4, norm_mul, norm_mul, c1, one_mul, norm_gal, norm_pow, ← hτ t', norm_gal]
       exact mul_le_mul_of_nonneg_left h2 (by positivity)
   let t₀ : MulAction.orbit H α := ⟨α, MulAction.mem_orbit_self α⟩
   obtain ⟨D, hD⟩ := key (∏ t ∈ Finset.univ.erase t₀, (X - Polynomial.C (t : PadicAlgCl l)))
-  have hne
-      : (∏ t ∈ Finset.univ.erase t₀, (X - Polynomial.C (t : PadicAlgCl l))).eval (t₀ : PadicAlgCl l)
-        ≠ 0 := by
+  have hne : (∏ t ∈ Finset.univ.erase t₀, (X - Polynomial.C (t : PadicAlgCl l))).eval (t₀ : PadicAlgCl l) ≠ 0 := by
     rw [eval_prod]
     refine Finset.prod_ne_zero_iff.2 fun t ht => ?_
     rw [eval_sub, eval_X, eval_C, sub_ne_zero]
     exact fun e => Finset.ne_of_mem_erase ht (Subtype.ext e.symm)
-  refine ⟨
-    D / ‖(∏ t ∈ Finset.univ.erase t₀, (X - Polynomial.C (t : PadicAlgCl l))).eval (t₀ : PadicAlgCl l)‖,
-    fun x ε h => ?_
-  ⟩
+  refine ⟨D / ‖(∏ t ∈ Finset.univ.erase t₀, (X - Polynomial.C (t : PadicAlgCl l))).eval (t₀ : PadicAlgCl l)‖, fun x ε h => ?_⟩
   have := hD x ε h
   rw [Finset.sum_eq_single t₀, norm_mul, norm_mul, c1, one_mul, norm_gal] at this
   · rw [div_mul_eq_mul_div, le_div_iff₀ (norm_pos_iff.2 hne), mul_comm]
     exact this
   · intro t _ ht
-    rw [eval_prod, Finset.prod_eq_zero (Finset.mem_erase.2 ⟨ht, Finset.mem_univ t⟩) (by simp),
-      zero_mul]
+    rw [eval_prod, Finset.prod_eq_zero (Finset.mem_erase.2 ⟨ht, Finset.mem_univ t⟩) (by simp), zero_mul]
   · simp
 
-theorem small_finset (hW : IntVal W) (j : ℕ) (hj : 1 ≤ j) (S : Finset (PadicAlgCl l))
-    : ∃ H : Subgroup (PadicAlgCl l ≃ₐ[W] PadicAlgCl l), Small j H ∧ ∀ σ ∈ H, ∀ y ∈ S, σ y = y := by
+theorem small_finset (hW : IntVal W) (j : ℕ) (hj : 1 ≤ j) (S : Finset (PadicAlgCl l)) :
+    ∃ H : Subgroup (PadicAlgCl l ≃ₐ[W] PadicAlgCl l), Small j H ∧ ∀ σ ∈ H, ∀ y ∈ S, σ y = y := by
   classical
   induction S using Finset.induction_on with
   | empty => exact ⟨⊤, small_top hW j hj, by simp⟩
@@ -618,11 +590,8 @@ theorem intVal_Kur : IntVal (MaximalUnramifiedExtension l ⊥) := by
   rw [e, PadicAlgCl.norm_extends, Padic.norm_eq_zpow_neg_valuation hb, inv_zpow']
 
 open ReciprocityTheory.DiscreteGroups.LocalClassField in
-theorem inert_Kur
-    (σ
-      : PadicAlgCl l ≃ₐ[MaximalUnramifiedExtension l (⊥ : IntermediateField ℚ_[l] (PadicAlgCl l))] PadicAlgCl l)
-    (x : PadicAlgCl l) (hx : ‖x‖ ≤ 1)
-    : ‖σ x - x‖ < 1 := by
+theorem inert_Kur (σ : PadicAlgCl l ≃ₐ[MaximalUnramifiedExtension l (⊥ : IntermediateField ℚ_[l] (PadicAlgCl l))] PadicAlgCl l)
+    (x : PadicAlgCl l) (hx : ‖x‖ ≤ 1) : ‖σ x - x‖ < 1 := by
   have key : ∀ y : PadicAlgCl l, ‖y‖ < 1 → ‖σ y - y‖ < 1 := fun y hy => by
     rw [sub_eq_add_neg]
     refine (IsUltrametricDist.norm_add_le_max _ _).trans_lt (max_lt ?_ ?_)
@@ -637,19 +606,12 @@ theorem inert_Kur
 
 end GlobalTheory.IntTate
 
+
 open GlobalTheory.IntTate ReciprocityTheory.Neutral.Cmp in
-theorem GlobalTheory.IntTate.integral_tate_inertia
-    : ∀ (l : ℕ) [Fact l.Prime] (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω]
-        (A : ValuationSubring Ω),
-      A.valuation (l : Ω) < 1
-        → ∀ (j : ℕ),
-          1 ≤ j
-            → ∀ F : Finset Ω, ∃ c : ℕ, ∀ (n : ℕ) (x : Ω),
-              x ∈ A
-                → (∀ s ∈ Ine (F := ℚ) A,
-                  (∀ y ∈ F, s y = y)
-                    → CgA A l n (s x) ((((cycMod ℚ Ω l n s : ZMod (l ^ n)).val : ℕ) : Ω) ^ j * x))
-                → CgA A l n ((l : Ω) ^ c * x) 0 := by
+theorem GlobalTheory.IntTate.integral_tate_inertia : ∀ (l : ℕ) [Fact l.Prime] (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (A : ValuationSubring Ω), A.valuation (l : Ω) < 1 →
+  ∀ (j : ℕ), 1 ≤ j → ∀ F : Finset Ω, ∃ c : ℕ, ∀ (n : ℕ) (x : Ω), x ∈ A →
+  (∀ s ∈ Ine (F := ℚ) A, (∀ y ∈ F, s y = y) → CgA A l n (s x) ((((cycMod ℚ Ω l n s : ZMod (l ^ n)).val : ℕ) : Ω) ^ j * x)) →
+  CgA A l n ((l : Ω) ^ c * x) 0 := by
   intro l hl Ω _ _ _ A hA j hj F
   classical
   obtain ⟨ι, hι⟩ := exists_compat ℚ A hA
@@ -663,43 +625,37 @@ theorem GlobalTheory.IntTate.integral_tate_inertia
   have hl0' : (l : PadicAlgCl l) ≠ 0 := Nat.cast_ne_zero.mpr hl.out.ne_zero
   refine ⟨(l : Ω) ^ c * x / (l : Ω) ^ n, ?_, by field_simp; ring⟩
   rw [hι, map_div₀, map_mul, map_pow, map_pow, map_natCast, norm_div,
-    div_le_one (norm_pos_iff.mpr (pow_ne_zero _ hl0')), norm_mul, norm_pow, norm_pow,
-    GlobalTheory.CycTrace.norm_l, inv_pow, inv_mul_le_iff₀ (by positivity)]
+    div_le_one (norm_pos_iff.mpr (pow_ne_zero _ hl0')), norm_mul, norm_pow, norm_pow, GlobalTheory.CycTrace.norm_l,
+    inv_pow, inv_mul_le_iff₀ (by positivity)]
   refine (hC (ι x) _ fun σ hσ => ?_).trans (mul_le_mul_of_nonneg_right hc.le (by positivity))
   have hK : Kloc ℚ ι ≤ ⊥ := by
     refine IntermediateField.adjoin_le_iff.mpr ?_
     rintro _ ⟨q, rfl⟩
     refine IntermediateField.mem_bot.mpr ⟨(q : ℚ_[l]), ?_⟩
     simp
-  let σ' : GK ℚ ι := {
-    σ.toRingEquiv with
-    commutes' := fun k =>
-      σ.commutes ⟨k, ReciprocityTheory.DiscreteGroups.LocalClassField.le_Kur (hK k.2)⟩
-  }
+  let σ' : GK ℚ ι :=
+    { σ.toRingEquiv with
+      commutes' := fun k => σ.commutes ⟨k, ReciprocityTheory.DiscreteGroups.LocalClassField.le_Kur (hK k.2)⟩ }
   have hσ' : ∀ z, σ' z = σ z := fun _ => rfl
   have hs := (res_mem_ine_iff hι σ').2 (inert_Kur σ)
-  obtain ⟨z, hz, e⟩ :=
-    H _ hs (fun y hy =>
-      ι.injective (by rw [res_spec, hσ']; exact hG σ hσ _ (Finset.mem_image_of_mem _ hy)))
+  obtain ⟨z, hz, e⟩ := H _ hs (fun y hy => ι.injective (by
+    rw [res_spec, hσ']; exact hG σ hσ _ (Finset.mem_image_of_mem _ hy)))
   have hχ : (cycMod ℚ Ω l n (res ι σ') : ZMod (l ^ n)) = PadicInt.toZModPow n (chi _ σ) := by
     have := cycZ_res ι l σ'
     change PadicInt.toZModPow n ((cycZ ℚ Ω l (res ι σ') : ℤ_[l]ˣ) : ℤ_[l]) = _
     rw [this]
     rfl
   have e' := congrArg ι e
-  rw [map_sub, res_spec, hσ', map_mul, map_mul, map_pow, map_pow, map_natCast, map_natCast, hχ]
-    at e'
+  rw [map_sub, res_spec, hσ', map_mul, map_mul, map_pow, map_pow, map_natCast, map_natCast, hχ] at e'
   set v := (PadicInt.toZModPow n (chi _ σ)).val with hv
-  have e2
-      : σ (ι x) - emb l (chi _ σ ^ j) * ι x
-        = (l : PadicAlgCl l) ^ n * ι z + emb l ((v : ℤ_[l]) ^ j - chi _ σ ^ j) * ι x := by
+  have e2 : σ (ι x) - emb l (chi _ σ ^ j) * ι x =
+      (l : PadicAlgCl l) ^ n * ι z + emb l ((v : ℤ_[l]) ^ j - chi _ σ ^ j) * ι x := by
     rw [← e', map_sub, map_pow (emb l) (v : ℤ_[l]), map_natCast]; ring
   rw [e2]
   refine (IsUltrametricDist.norm_add_le_max _ _).trans (max_le ?_ ?_)
   · rw [norm_mul, norm_pow, GlobalTheory.CycTrace.norm_l]
     exact mul_le_of_le_one_right (by positivity) ((hι z).1 hz)
   · rw [norm_mul, norm_emb]
-    refine (mul_le_of_le_one_right (norm_nonneg _) ((hι x).1 hx)).trans
-      (norm_le_of_toZModPow _ _ ?_)
+    refine (mul_le_of_le_one_right (norm_nonneg _) ((hι x).1 hx)).trans (norm_le_of_toZModPow _ _ ?_)
     have : NeZero (l ^ n) := ⟨(pow_pos hl.out.pos _).ne'⟩
     rw [map_sub, map_pow, map_pow, map_natCast, hv, ZMod.natCast_zmod_val, sub_self]

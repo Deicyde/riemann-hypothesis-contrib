@@ -1,6 +1,59 @@
 module
 
 public import Formalism.EllipticTorsion.WChordSeries
+public import Mathlib.RingTheory.MvPowerSeries.Inverse
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.Finsupp.WellFounded
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Lemma
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
@@ -305,12 +358,9 @@ lemma coeff_Wi (w : PowerSeries K) (i : Fin 2) (e : Fin 2 →₀ ℕ) :
   have ha : PowerSeries.HasSubst (MvPowerSeries.X i : MvPowerSeries (Fin 2) K) := by
     first
       | exact PowerSeries.HasSubst.of_constantCoeff_zero (by simp)
-      | exact PowerSeries.HasSubst.X i
-      | exact PowerSeries.HasSubst.X'
   rw [Wi, PowerSeries.coeff_subst ha]
   first
     | simp only [MvPowerSeries.coeff_X_pow]
-    | simp only [MvPowerSeries.X_pow_eq, MvPowerSeries.coeff_monomial]
   split_ifs with h
   · rw [finsum_eq_single _ (e i)]
     · rw [if_pos h, smul_eq_mul, mul_one]
@@ -569,7 +619,6 @@ lemma mem_T {φ : MvPowerSeries (Fin 2) K} : φ ∈ T W ↔ ∀ e, MvPowerSeries
     ext e
     first
       | rfl
-      | simp [MvPowerSeries.coeff_map]
 
 lemma inv_mem_integralSeries {φ : MvPowerSeries (Fin 2) K} (h : φ ∈ T W) (h0 : cc φ ≠ 0)
     (hi : (cc φ)⁻¹ ∈ Sadj W) : φ⁻¹ ∈ T W := by
@@ -588,8 +637,6 @@ lemma inv_mem_integralSeries {φ : MvPowerSeries (Fin 2) K} (h : φ ∈ T W) (h0
   intro n
   first
     | exact (wellFounded_lt (α := Fin 2 →₀ ℕ)).induction n step
-    | exact WellFoundedLT.induction n step
-    | exact (wellFounded_lt (α := Fin 2 →₀ ℕ)).induction (C := fun n => MvPowerSeries.coeff n φ⁻¹ ∈ Sadj W) n step
 
 lemma X_mem_T (i : Fin 2) : (MvPowerSeries.X i : MvPowerSeries (Fin 2) K) ∈ T W := by
   rw [mem_T]
@@ -604,7 +651,6 @@ lemma constSeries_mem_integralSeries {a : K} (ha : a ∈ ({W.a₁, W.a₂, W.a�
   intro e
   first
     | rw [MvPowerSeries.coeff_C]
-    | rw [ca, MvPowerSeries.coeff_C]
   split_ifs
   · exact Algebra.subset_adjoin ha
   · exact zero_mem _
@@ -676,7 +722,6 @@ lemma v_ne_of_G (W : WeierstrassCurve K) {z v : MvPowerSeries (Fin 2) K} (hz : z
   rw [G_zero] at hG
   first
     | exact hz (pow_eq_zero_iff (by norm_num) |>.mp hG)
-    | exact hz (pow_eq_zero hG)
 
 lemma chord (hU : WSubstUnique.{u}) (hw : WFixed W w) :
     ChordAt W w (MvPowerSeries.X 0) (MvPowerSeries.X 1) (F2 W w) := by
@@ -689,7 +734,6 @@ lemma chord (hU : WSubstUnique.{u}) (hw : WFixed W w) :
     first
       | rfl
       | (rw [IsScalarTower.algebraMap_apply K (MvPowerSeries (Fin 2) K) (FractionRing (MvPowerSeries (Fin 2) K))]; rfl)
-      | simp [IsScalarTower.algebraMap_apply K (MvPowerSeries (Fin 2) K) (FractionRing (MvPowerSeries (Fin 2) K))]
   have hE : ∀ s : MvPowerSeries (Fin 2) K, MvPowerSeries.constantCoeff s = 0 →
       G (ca W.a₁) (ca W.a₂) (ca W.a₃) (ca W.a₄)
         (ca W.a₆) s (w.subst s) = 0 :=

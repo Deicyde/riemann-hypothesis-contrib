@@ -1,63 +1,94 @@
 module
 
-public import Mathlib
+import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.IsOpenKerFinIdele
 public import Development.AbelianVarietyTheory.BlockTheory.TwistedDiscreteSeries.PositiveTwistAverage
-public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.OrbitLocallyConstant
-public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.IntegrableOfMemSB
+public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.PadicIsNonarchimedeanLocalField
+public import Mathlib.Algebra.Module.Lattice.Full
+public import Mathlib.Analysis.CStarAlgebra.Classes
+import Aesop.Main
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.AddCharConductorAndHaarIntegersExist
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.IsClopenIsCompactMapsPair
+public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.RootExchangeSupportAndFourierRelation
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Real
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.Order.CompletePartialOrder
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Development.AbelianVarietyTheory.Proofs.TwistedOperators.OrbitLocallyConstant
 
 @[expose] public section
 
-open MeasureTheory ValuativeRel Matrix GlobalTheory.SplitWeil GlobalTheory.RootEx
-  GlobalTheory.IndefiniteRowSideFullHecke.PositiveTwistAverage
+open MeasureTheory ValuativeRel Matrix GlobalTheory.SplitWeil GlobalTheory.RootEx GlobalTheory.IndefiniteRowSideFullHecke.PositiveTwistAverage
 open Filter Topology
 
 noncomputable section
 namespace GlobalTheory.RootEx.UniformLattices
 
 theorem eq_one_of_pow_near {z : ℂ} (h : ∀ n : ℕ, ‖z ^ n - 1‖ < 1 / 2) : z = 1 := by
-  by_contra hz
-  have hp : 0 < ‖z - 1‖ := norm_pos_iff.2 (sub_ne_zero.2 hz)
-  obtain ⟨n, hn⟩ := exists_nat_gt (1 / ‖z - 1‖)
-  have h1 : ‖(∑ k ∈ Finset.range n, z ^ k) - n‖ ≤ n / 2 := by
-    have : (∑ k ∈ Finset.range n, z ^ k) - n = ∑ k ∈ Finset.range n, (z ^ k - 1) := by
-      rw [Finset.sum_sub_distrib]; simp
-    rw [this]
-    refine (norm_sum_le _ _).trans ?_
-    refine (Finset.sum_le_sum fun k _ => (h k).le).trans ?_
-    simp
-    linarith
-  have h2 : (n : ℝ) / 2 ≤ ‖∑ k ∈ Finset.range n, z ^ k‖ := by
-    have := norm_sub_norm_le (n : ℂ) (∑ k ∈ Finset.range n, z ^ k)
-    rw [norm_sub_rev, Complex.norm_natCast] at this
-    linarith
-  have h3 := h n
-  rw [← geom_sum_mul, norm_mul] at h3
-  rw [div_lt_iff₀ hp] at hn
-  nlinarith
+  apply GlobalTheory.CuspRep.eq_one_of_pow_near <;> assumption
 
 section Lattices
 variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
 
-theorem isOpen_ker_of_cball (μ : kˣ →* ℂˣ) (s : kˣ) (h : ∀ x : kˣ, (x : k) - 1 ∈ cball s → μ x = 1)
-    : IsOpen (μ.ker : Set kˣ) := by
+theorem isOpen_ker_of_cball (μ : kˣ →* ℂˣ) (s : kˣ) (h : ∀ x : kˣ, (x : k) - 1 ∈ cball s → μ x = 1) :
+    IsOpen (μ.ker : Set kˣ) := by
   refine Subgroup.isOpen_of_mem_nhds _ (g := 1) ?_
   have : (fun x : kˣ => (x : k) - 1) ⁻¹' cball s ∈ 𝓝 (1 : kˣ) :=
-    ((isOpen_cball s).preimage (Units.continuous_val.sub continuous_const)).mem_nhds
-      (by simp [cball])
+    ((isOpen_cball s).preimage (Units.continuous_val.sub continuous_const)).mem_nhds (by simp [cball])
   exact mem_of_superset this h
 
 theorem isOpen_ker_of_continuous (μ : kˣ →* ℂˣ) (hμ : Continuous μ) : IsOpen (μ.ker : Set kˣ) := by
   have hV : {u | ‖((μ u : ℂˣ) : ℂ) - 1‖ < 1 / 2} ∈ 𝓝 (1 : kˣ) := by
-    refine (isOpen_lt (((Units.continuous_val.comp hμ).sub continuous_const).norm)
-      continuous_const).mem_nhds ?_
+    refine (isOpen_lt (((Units.continuous_val.comp hμ).sub continuous_const).norm) continuous_const).mem_nhds ?_
     simp
   rw [Units.isEmbedding_val₀.isInducing.nhds_eq_comap, Filter.mem_comap] at hV
   obtain ⟨T, hT, hTV⟩ := hV
   have h1 : (fun b : k => 1 + b) ⁻¹' T ∩ cball 1 ∈ 𝓝 (0 : k) :=
-    inter_mem
-      ((continuous_const.add continuous_id).continuousAt.preimage_mem_nhds (by simpa using hT))
+    inter_mem ((continuous_const.add continuous_id).continuousAt.preimage_mem_nhds (by simpa using hT))
       (cball_mem_nhds 1)
   obtain ⟨s, hs⟩ := exists_cball_subset h1
   refine isOpen_ker_of_cball μ s fun x hx => Units.ext (eq_one_of_pow_near fun n => ?_)
@@ -93,8 +124,7 @@ theorem ballLat_isLattice (s : kˣ) : (ballLat m s).IsFullLattice k := by
   have hs : ∀ i : m, (Pi.single i (s : k) : m → k) ∈ ballLat m s := fun i j => by
     rw [Pi.single_apply]; split_ifs <;> simp [cball]
   refine { toIsLattice := Submodule.IsLattice.of_fg k ?_, span_eq_top := ?_ }
-  · refine
-      ⟨Finset.univ.image fun i : m => (Pi.single i (s : k) : m → k), le_antisymm ?_ fun x hx => ?_⟩
+  · refine ⟨Finset.univ.image fun i : m => (Pi.single i (s : k) : m → k), le_antisymm ?_ fun x hx => ?_⟩
     · rw [Submodule.span_le]
       intro y hy
       obtain ⟨i, -, rfl⟩ := Finset.mem_image.1 hy
@@ -102,14 +132,12 @@ theorem ballLat_isLattice (s : kˣ) : (ballLat m s).IsFullLattice k := by
     · rw [← Finset.univ_sum_single x]
       refine sum_mem fun i _ => ?_
       have h1 : x i * (s : k)⁻¹ ∈ 𝒪[k] := by
-        rw [Valuation.mem_integer_iff, map_mul, map_inv₀, mul_inv_le_iff₀ (by simp [zero_lt_iff]),
-          one_mul]
+        rw [Valuation.mem_integer_iff, map_mul, map_inv₀, mul_inv_le_iff₀ (by simp [zero_lt_iff]), one_mul]
         exact hx i
       have e : (Pi.single i (x i) : m → k) = (⟨_, h1⟩ : 𝒪[k]) • (Pi.single i (s : k) : m → k) := by
         funext j
         show _ = x i * (s : k)⁻¹ * (Pi.single i (s : k) : m → k) j
-        simp only [Pi.single_apply]
-        split_ifs <;> simp
+        simp only [Pi.single_apply]; split_ifs <;> simp
       rw [e]
       exact Submodule.smul_mem _ _ (Submodule.subset_span (by simp))
   · rw [eq_top_iff]
@@ -118,48 +146,31 @@ theorem ballLat_isLattice (s : kˣ) : (ballLat m s).IsFullLattice k := by
     refine sum_mem fun i _ => ?_
     have e : (Pi.single i (x i) : m → k) = (x i * (s : k)⁻¹) • (Pi.single i (s : k) : m → k) := by
       funext j
-      simp only [Pi.single_apply, Pi.smul_apply, smul_eq_mul]
-      split_ifs <;> simp
+      simp only [Pi.single_apply, Pi.smul_apply, smul_eq_mul]; split_ifs <;> simp
     rw [e]
     exact Submodule.smul_mem _ _ (Submodule.subset_span (hs i))
 
-theorem exists_ballLat_subset {V : Set (m → k)} (hV : V ∈ 𝓝 (0 : m → k))
-    : ∃ s : kˣ, (ballLat m s : Set (m → k)) ⊆ V := by
+theorem exists_ballLat_subset {V : Set (m → k)} (hV : V ∈ 𝓝 (0 : m → k)) :
+    ∃ s : kˣ, (ballLat m s : Set (m → k)) ⊆ V := by
   rw [nhds_pi, Filter.mem_pi] at hV
   obtain ⟨I, -, t, ht, h⟩ := hV
   obtain ⟨s, hs⟩ := exists_cball_subset (U := ⋂ i, t i) (iInter_mem.2 ht)
   exact ⟨s, fun x hx => h fun i _ => Set.mem_iInter.1 (hs (hx i)) i⟩
 
-theorem exists_subset_ballLat {K : Set (m → k)} (hK : IsCompact K)
-    : ∃ s : kˣ, K ⊆ (ballLat m s : Set (m → k)) := by
+theorem exists_subset_ballLat {K : Set (m → k)} (hK : IsCompact K) :
+    ∃ s : kˣ, K ⊆ (ballLat m s : Set (m → k)) := by
   have hK' : IsCompact (⋃ i, (fun x : m → k => x i) '' K) :=
     isCompact_iUnion fun i => hK.image (continuous_apply i)
-  obtain ⟨s, hs⟩ :=
-    hK'.elim_directed_cover
-      (fun s : kˣ => cball s)
-      isOpen_cball
-      (fun x _ => by
-        by_cases h : x = 0
-        · exact Set.mem_iUnion.2 ⟨1, by simp [cball, h]⟩
-        · exact Set.mem_iUnion.2 ⟨Units.mk0 x h, by simp [cball]⟩)
-      fun a b => by
-        rcases le_total (valuation k (a : k)) (valuation k (b : k)) with h | h
-        · exact ⟨
-            b,
-            fun x (hx : x ∈ cball a) =>
-              le_trans (a := valuation k x) (c := valuation k (b : k)) hx h,
-            subset_rfl
-          ⟩
-        · exact ⟨
-            a,
-            subset_rfl,
-            fun x (hx : x ∈ cball b) =>
-              le_trans (a := valuation k x) (c := valuation k (a : k)) hx h
-          ⟩
+  obtain ⟨s, hs⟩ := hK'.elim_directed_cover (fun s : kˣ => cball s) isOpen_cball (fun x _ => by
+    by_cases h : x = 0
+    · exact Set.mem_iUnion.2 ⟨1, by simp [cball, h]⟩
+    · exact Set.mem_iUnion.2 ⟨Units.mk0 x h, by simp [cball]⟩) fun a b => by
+    rcases le_total (valuation k (a : k)) (valuation k (b : k)) with h | h
+    · exact ⟨b, fun x (hx : x ∈ cball a) => le_trans (a := valuation k x) (c := valuation k (b : k)) hx h, subset_rfl⟩
+    · exact ⟨a, subset_rfl, fun x (hx : x ∈ cball b) => le_trans (a := valuation k x) (c := valuation k (a : k)) hx h⟩
   exact ⟨s, fun x hx i => hs (Set.mem_iUnion.2 ⟨i, x, hx, rfl⟩)⟩
 
-theorem isCompact_lattice (L : Submodule 𝒪[k] (m → k)) (hL : L.IsFullLattice k)
-    : IsCompact (L : Set (m → k)) := by
+theorem isCompact_lattice (L : Submodule 𝒪[k] (m → k)) (hL : L.IsFullLattice k) : IsCompact (L : Set (m → k)) := by
   letI : L.IsFullLattice k := hL
   obtain ⟨S, hS⟩ := hL.toIsLattice.fg
   obtain ⟨s, hs⟩ := exists_subset_ballLat (K := (S : Set (m → k))) S.finite_toSet.isCompact
@@ -167,40 +178,32 @@ theorem isCompact_lattice (L : Submodule 𝒪[k] (m → k)) (hL : L.IsFullLattic
   have h2 : IsCompact (ballLat m s : Set (m → k)) := by
     have := isCompact_univ_pi fun _ : m => isCompact_cball s
     convert this using 1
-    ext x
-    exact ⟨fun h i _ => h i, fun h i => h i trivial⟩
+    ext x; exact ⟨fun h i _ => h i, fun h i => h i trivial⟩
   exact h2.of_isClosed_subset (LatPair.isClopen_lattice L).1 h1
 
 variable {ψ : AddChar k Circle}
 
-theorem perp_mem_nhds (hψ : Continuous ψ) (L : Submodule 𝒪[k] (m → k)) (hL : L.IsFullLattice k)
-    : (perp ψ L : Set (m → k)) ∈ 𝓝 (0 : m → k) := by
+theorem perp_mem_nhds (hψ : Continuous ψ) (L : Submodule 𝒪[k] (m → k)) (hL : L.IsFullLattice k) :
+    (perp ψ L : Set (m → k)) ∈ 𝓝 (0 : m → k) := by
   obtain ⟨s, hs⟩ := exists_cball_addChar_eq_one ψ hψ
   refine IsCompact.eventually_forall_of_forall_eventually (isCompact_lattice L hL)
-    (P := fun β u => ψ (u ⬝ᵥ β) = 1)
-    fun u _ => ?_
+    (P := fun β u => ψ (u ⬝ᵥ β) = 1) fun u _ => ?_
   have hc : Continuous fun q : (m → k) × (m → k) => q.2 ⬝ᵥ q.1 := by fun_prop
   filter_upwards [((isOpen_cball s).preimage hc).mem_nhds (x := (0, u)) (by simp [cball])] with q hq
   exact hs _ hq
 
-theorem isCompact_perp
-    (hψ : Continuous ψ) (hψ1 : ψ ≠ 1)
-    [DecidableEq m]
-    (L : Submodule 𝒪[k] (m → k)) (hL : L.IsFullLattice k)
-    : IsCompact (perp ψ L : Set (m → k)) := by
+theorem isCompact_perp (hψ : Continuous ψ) (hψ1 : ψ ≠ 1) [DecidableEq m] (L : Submodule 𝒪[k] (m → k))
+    (hL : L.IsFullLattice k) : IsCompact (perp ψ L : Set (m → k)) := by
   letI : L.IsFullLattice k := hL
-  have h :=
-    ExchangeSupport.mem_SB_of hψ1 ((perp ψ L : Set (m → k)).indicator fun _ => (1 : ℂ)) ?_ ?_
+  have h := ExchangeSupport.mem_SB_of hψ1 ((perp ψ L : Set (m → k)).indicator fun _ => (1 : ℂ)) ?_ ?_
   · have h2 : IsCompact (closure _) := h.2
     rwa [Set.support_indicator, Function.support_const one_ne_zero, Set.inter_univ,
-        (AddSubgroup.isClosed_of_isOpen _
-          (AddSubgroup.isOpen_of_mem_nhds _ (perp_mem_nhds hψ L hL))).closure_eq]
-      at h2
+      (AddSubgroup.isClosed_of_isOpen _
+        (AddSubgroup.isOpen_of_mem_nhds _ (perp_mem_nhds hψ L hL))).closure_eq] at h2
   · filter_upwards [perp_mem_nhds hψ L hL] with w hw u
     by_cases hu : u ∈ perp ψ L
     · rw [Set.indicator_of_mem (add_mem hu hw), Set.indicator_of_mem hu]
-    · rw [Set.indicator_of_notMem (fun h => hu (by simpa using sub_mem h hw)),
-        Set.indicator_of_notMem hu]
+    · rw [Set.indicator_of_notMem (fun h => hu (by simpa using sub_mem h hw)), Set.indicator_of_notMem hu]
   · filter_upwards [(LatPair.isClopen_lattice L).2.mem_nhds L.zero_mem] with β hβ u
     by_cases hu : u ∈ perp ψ L
     · rw [dotProduct_comm, hu β hβ]; simp
@@ -211,16 +214,14 @@ end Lattices
 section Reps
 variable {V : Type} [AddCommGroup V] [TopologicalSpace V] [IsTopologicalAddGroup V]
 
-theorem exists_isReps (D B : AddSubgroup V) (hD : IsCompact (D : Set V)) (hB : IsOpen (B : Set V))
-    : ∃ T, IsReps D B T := by
+theorem exists_isReps (D B : AddSubgroup V) (hD : IsCompact (D : Set V)) (hB : IsOpen (B : Set V)) :
+    ∃ T, IsReps D B T := by
   classical
   haveI : DiscreteTopology (V ⧸ B) := QuotientAddGroup.discreteTopology hB
   have hfin : ((QuotientAddGroup.mk : V → V ⧸ B) '' D).Finite :=
     (hD.image QuotientAddGroup.continuous_mk).finite_of_discrete
-  have hs
-      : ∀ q : V ⧸ B, ∃ v : V,
-        q ∈ (QuotientAddGroup.mk : V → V ⧸ B) '' D
-          → v ∈ D ∧ (QuotientAddGroup.mk v : V ⧸ B) = q := fun q => by
+  have hs : ∀ q : V ⧸ B, ∃ v : V, q ∈ (QuotientAddGroup.mk : V → V ⧸ B) '' D →
+      v ∈ D ∧ (QuotientAddGroup.mk v : V ⧸ B) = q := fun q => by
     by_cases h : q ∈ (QuotientAddGroup.mk : V → V ⧸ B) '' D
     · obtain ⟨v, hv, e⟩ := h
       exact ⟨v, fun _ => ⟨hv, e⟩⟩
@@ -235,24 +236,21 @@ theorem exists_isReps (D B : AddSubgroup V) (hD : IsCompact (D : Set V)) (hB : I
     obtain ⟨q, hq, rfl⟩ := Finset.mem_image.1 ht
     rw [QuotientAddGroup.eq_iff_sub_mem.2 h, (hs q (hfin.mem_toFinset.1 hq)).2]
 
-theorem integral_eq_sum_reps
-    [MeasurableSpace V] [BorelSpace V]
-    (m : Measure V) [m.IsAddHaarMeasure]
+theorem integral_eq_sum_reps [MeasurableSpace V] [BorelSpace V] (m : Measure V) [m.IsAddHaarMeasure]
     {D B : AddSubgroup V} (hBD : B ≤ D) (hB : IsOpen (B : Set V)) (hBc : IsCompact (B : Set V))
-    {T : Finset V} (hT : IsReps D B T)
-    (f : V → ℂ) (h0 : ∀ β, β ∉ D → f β = 0) (h1 : ∀ β, ∀ b ∈ B, f (β + b) = f β)
-    : ∫ β, f β ∂m = ((m.real (B : Set V) : ℝ) : ℂ) * ∑ t ∈ T, f t := by
+    {T : Finset V} (hT : IsReps D B T) (f : V → ℂ) (h0 : ∀ β, β ∉ D → f β = 0)
+    (h1 : ∀ β, ∀ b ∈ B, f (β + b) = f β) :
+    ∫ β, f β ∂m = ((m.real (B : Set V) : ℝ) : ℂ) * ∑ t ∈ T, f t := by
   have hm : ∀ t : V, MeasurableSet ((fun β => -t + β) ⁻¹' (B : Set V)) := fun t =>
     (hB.preimage (by fun_prop)).measurableSet
   have e : ∀ β, f β = ∑ t ∈ T, ((fun β => -t + β) ⁻¹' (B : Set V)).indicator (fun _ => f t) β := by
     intro β
     by_cases hβ : β ∈ D
     · obtain ⟨t, ⟨ht, hb⟩, hu⟩ := hT.2 β hβ
-      rw [Finset.sum_eq_single_of_mem t ht,
-        Set.indicator_of_mem (by simpa [neg_add_eq_sub] using hb), ← h1 t _ hb, add_sub_cancel]
+      rw [Finset.sum_eq_single_of_mem t ht, Set.indicator_of_mem (by simpa [neg_add_eq_sub] using hb),
+        ← h1 t _ hb, add_sub_cancel]
       intro t' ht' hne
-      exact
-        Set.indicator_of_notMem (fun h => hne (hu t' ⟨ht', by simpa [neg_add_eq_sub] using h⟩)) _
+      exact Set.indicator_of_notMem (fun h => hne (hu t' ⟨ht', by simpa [neg_add_eq_sub] using h⟩)) _
     · rw [h0 β hβ]
       refine (Finset.sum_eq_zero fun t ht => Set.indicator_of_notMem (fun h => hβ ?_) _).symm
       simpa using add_mem (hT.1 t ht) (hBD h)
@@ -268,23 +266,19 @@ theorem integral_eq_sum_reps
 end Reps
 
 section Abstract
-variable
-  {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
-  [MeasurableSpace k] [BorelSpace k]
-  {n : Type} [Fintype n] [DecidableEq n]
-  {c p : ℕ} {ψ : AddChar k Circle} {ν : Measure k} {V : Type} [AddCommGroup V] [Module ℂ V]
+variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+  [MeasurableSpace k] [BorelSpace k] {n : Type} [Fintype n] [DecidableEq n] {c p : ℕ}
+  {ψ : AddChar k Circle} {ν : Measure k} {V : Type} [AddCommGroup V] [Module ℂ V]
   {ω : Representation ℂ (GL (n ⊕ Fin c) k) V} {l : V →ₗ[ℂ] ℂ} {v : V}
 
 end Abstract
 
 section Target
 open Unfolding
-variable
-  {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
-  [MeasurableSpace k] [BorelSpace k]
-  {n n' : Type} [Fintype n] [DecidableEq n] [Fintype n'] [DecidableEq n']
-  {c p : ℕ} {ψ : AddChar k Circle} {ν : Measure k} {μ : kˣ →* ℂˣ} {A P P' : Type}
-  [AddCommGroup A] [Module ℂ A] [AddCommGroup P] [Module ℂ P] [AddCommGroup P'] [Module ℂ P']
+variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+  [MeasurableSpace k] [BorelSpace k] {n n' : Type} [Fintype n] [DecidableEq n] [Fintype n'] [DecidableEq n']
+  {c p : ℕ} {ψ : AddChar k Circle} {ν : Measure k} {μ : kˣ →* ℂˣ}
+  {A P P' : Type} [AddCommGroup A] [Module ℂ A] [AddCommGroup P] [Module ℂ P] [AddCommGroup P'] [Module ℂ P']
   {σ : Representation ℂ (GL (n ⊕ Fin c) k) A} {π : Representation ℂ (GL n k) P}
   {π' : Representation ℂ (GL n' k) P'}
 

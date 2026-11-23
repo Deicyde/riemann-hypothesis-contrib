@@ -1,11 +1,51 @@
 module
 
-public import Mathlib
-public import GroundTheory.GlobalFields.AnalyticClassNumber.HeckeContinued
-public import GroundTheory.GlobalFields.TateThesis.RootNumberLocalFinite
-public import GroundTheory.GlobalFields.IdeleGroups.ClassGroup
+import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ConductorEqTopOfStandardOpen
+public import GroundTheory.GlobalFields.TateThesis.HeckeTheoremFE
 public import GroundTheory.GlobalFields.IdeleGroups.LocalConditionIndex
-public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.PartialZetaFunctionalEquation
+import GroundTheory.GlobalFields.TateThesis.EulerFactorsInverse
+public import GroundTheory.GlobalFields.TateThesis.RootNumberLocalFinite
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Int
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -21,25 +61,10 @@ noncomputable section
 variable {F : Type} [Field F] [NumberField F] {χ : HeckeCharacter F}
 
 theorem conductor_eq_top (h : standardOpenSubgroup F ≤ χ.toIdele.ker) : χ.conductor = ⊤ := by
-  have hd : χ.conductor ∣ ⊤ := by
-    refine (χ.map_idealLevel_le_ker_iff (𝔪 := ⊤) top_ne_bot).1 ?_
-    rintro _ ⟨x, hx, rfl⟩
-    refine h ((mem_standardOpenSubgroup_iff_toFinite_mem _).2 ?_)
-    rw [toFinite_ofFinite]
-    have hx' : x ∈ idealLevel (⊤ : Ideal (𝓞 F)) := hx
-    rw [idealLevel, mem_finiteLevel] at hx'
-    rw [mem_finiteLevel]
-    intro v
-    have hv := hx' v
-    have h0 : multiplicity v.asIdeal (⊤ : Ideal (𝓞 F)) = 0 :=
-      multiplicity_eq_zero_of_not_dvd fun hdv ↦
-        v.isPrime.ne_top (by rwa [Ideal.dvd_iff_le, top_le_iff] at hdv)
-    rw [h0] at hv
-    exact hv
-  rwa [Ideal.dvd_iff_le, top_le_iff] at hd
+  apply GlobalTheory.CompanionTheory.PartialZeta.conductor_eq_top_of_standardOpen <;> assumption
 
-theorem infiniteWeight_eq_zero (h : standardOpenSubgroup F ≤ χ.toIdele.ker) (w : InfinitePlace F)
-    : χ.infiniteWeight w = 0 := by
+theorem infiniteWeight_eq_zero (h : standardOpenSubgroup F ≤ χ.toIdele.ker)
+    (w : InfinitePlace F) : χ.infiniteWeight w = 0 := by
   have hp : χ.infiniteParams w = (0, 0) := by
     refine (χ.infiniteParams_unique w (p := (0, 0)) (fun _ ↦ ⟨le_rfl, by norm_num⟩) fun a ↦ ?_).symm
     have h1 : χ.infiniteComponent w a = 1 := h (infiniteEmbedding_mem_standardOpenSubgroup w a)
@@ -51,21 +76,18 @@ theorem idealUnit_eq_one {I : Ideal (𝓞 F)} (hI : I = ⊤) (h : I ≠ ⊥) : i
   ext
   simp [idealUnit]
 
-theorem finiteFourier_eq
-    (h : χ.conductor = ⊤)
-    {δ : (FiniteAdeleRing (𝓞 F) F)ˣ}
-    (hδ : toFractionalIdeal (ofFinite δ) = idealUnit χ.conductor χ.conductor_ne_bot * differentUnit)
-    : finiteFourier F χ.finiteTestFun ((δ⁻¹ : (FiniteAdeleRing (𝓞 F) F)ˣ) : FiniteAdeleRing (𝓞 F) F)
-      = (((NNReal.sqrt ‖discr F‖₊)⁻¹ : ℝ≥0) : ℂ) := by
-  have hE : IsEmpty χ.conductorPrimes :=
-    ⟨fun v ↦ by
-      have hv := χ.mem_conductorPrimes.1 v.2
-      rw [h, Ideal.dvd_iff_le, top_le_iff] at hv
-      exact v.1.isPrime.ne_top hv⟩
+theorem finiteFourier_eq (h : χ.conductor = ⊤) {δ : (FiniteAdeleRing (𝓞 F) F)ˣ}
+    (hδ : toFractionalIdeal (ofFinite δ) = idealUnit χ.conductor χ.conductor_ne_bot * differentUnit) :
+    finiteFourier F χ.finiteTestFun ((δ⁻¹ : (FiniteAdeleRing (𝓞 F) F)ˣ) : FiniteAdeleRing (𝓞 F) F) =
+      (((NNReal.sqrt ‖discr F‖₊)⁻¹ : ℝ≥0) : ℂ) := by
+  have hE : IsEmpty χ.conductorPrimes := ⟨fun v ↦ by
+    have hv := χ.mem_conductorPrimes.1 v.2
+    rw [h, Ideal.dvd_iff_le, top_le_iff] at hv
+    exact v.1.isPrime.ne_top hv⟩
   rw [χ.finiteFourier_finiteTestFun_inv_eq hδ, Finset.univ_eq_empty, Finset.prod_empty, mul_one]
 
-theorem discr_sqrt_mul (h : χ.conductor = ⊤)
-    : (((NNReal.sqrt ‖discr F‖₊)⁻¹ : ℝ≥0) : ℂ) * (χ.discrNormConductor : ℂ) ^ (1 / 2 : ℂ) = 1 := by
+theorem discr_sqrt_mul (h : χ.conductor = ⊤) :
+    (((NNReal.sqrt ‖discr F‖₊)⁻¹ : ℝ≥0) : ℂ) * (χ.discrNormConductor : ℂ) ^ (1 / 2 : ℂ) = 1 := by
   have hd : χ.discrNormConductor = |(discr F : ℝ)| := by
     rw [HeckeCharacter.discrNormConductor, h, Ideal.absNorm_top]
     simp
@@ -77,16 +99,14 @@ theorem discr_sqrt_mul (h : χ.conductor = ⊤)
     norm_num
   have hne : ((Real.sqrt |(discr F : ℝ)| : ℝ) : ℂ) ≠ 0 :=
     Complex.ofReal_ne_zero.2 (Real.sqrt_pos.2 hpos).ne'
-  have hinv
-      : (((NNReal.sqrt ‖discr F‖₊)⁻¹ : ℝ≥0) : ℂ) = ((Real.sqrt |(discr F : ℝ)| : ℝ) : ℂ)⁻¹ := by
+  have hinv : (((NNReal.sqrt ‖discr F‖₊)⁻¹ : ℝ≥0) : ℂ) = ((Real.sqrt |(discr F : ℝ)| : ℝ) : ℂ)⁻¹ := by
     rw [← hs]
     simp
   rw [hd, hcp, hinv, inv_mul_cancel₀ hne]
 
-theorem rootNumber_eq_coeff_different
-    (F : Type) [Field F] [NumberField F]
-    (χ : HeckeCharacter F) (h : standardOpenSubgroup F ≤ χ.toIdele.ker)
-    : χ.rootNumber = χ.coeff (differentIdeal ℤ (𝓞 F)) := by
+theorem rootNumber_eq_coeff_different (F : Type) [Field F] [NumberField F] (χ : HeckeCharacter F)
+    (h : standardOpenSubgroup F ≤ χ.toIdele.ker) :
+    χ.rootNumber = χ.coeff (differentIdeal ℤ (𝓞 F)) := by
   have hc := conductor_eq_top h
   have hδ := χ.toFractionalIdeal_conductorDifferentIdele
   have hcop : IsCoprime (differentIdeal ℤ (𝓞 F)) χ.conductor := by
@@ -96,9 +116,8 @@ theorem rootNumber_eq_coeff_different
     refine mem_primeToLevel.2 ⟨toInfinite_ofFinite _, fun v hv ↦ ?_⟩
     rw [hc, Ideal.dvd_iff_le, top_le_iff] at hv
     exact absurd hv v.isPrime.ne_top
-  have hval
-      : χ.coeff (differentIdeal ℤ (𝓞 F))
-        = (χ.toIdele (ofFinite χ.conductorDifferentIdele) : ℂ) := by
+  have hval : χ.coeff (differentIdeal ℤ (𝓞 F)) =
+      (χ.toIdele (ofFinite χ.conductorDifferentIdele) : ℂ) := by
     rw [χ.coeff_of_mem ⟨differentIdeal_ne_bot, hcop⟩]
     congr 1
     refine χ.idealCharacter_apply hmem _ ?_

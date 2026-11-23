@@ -1,6 +1,54 @@
 module
 
-public import Mathlib
+import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.AssociatedTraceAndLvlDvd
+public import Mathlib.NumberTheory.Padics.RingHoms
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.GroupTheory.Nilpotent
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+public import Mathlib.NumberTheory.Multiplicity
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+public import Mathlib.Data.Nat.Factorization.Induction
+public import Mathlib.FieldTheory.Finite.Basic
+import Mathlib.RingTheory.PowerSeries.Basic
 
 @[expose] public section
 
@@ -8,54 +56,16 @@ open PowerSeries
 
 namespace GlobalTheory
 
-theorem padicInt_eq_one_of_pow_eq_one_of_toZMod_eq_one
-    {l : ℕ} [hl : Fact l.Prime]
-    (h2 : l ≠ 2)
-    (δ : ℤ_[l])
-    {n : ℕ} (hn : n ≠ 0) (hδ : δ ^ n = 1)
-    (h1 : PadicInt.toZMod δ = 1)
-    : δ = 1 := by
-  have key : ∀ p : ℕ, p.Prime → ∀ ε : ℤ_[l], ε ^ p = 1 → PadicInt.toZMod ε = 1 → ε = 1 := by
-    intro p hp ε hε he1
-    by_contra hne
-    have hsum : ∑ i ∈ Finset.range p, ε ^ i = 0 := by
-      have := geom_sum_mul ε p
-      rw [hε, sub_self] at this
-      exact (mul_eq_zero.mp this).resolve_right (sub_ne_zero.mpr hne)
-    have hp0 : (p : ZMod l) = 0 := by
-      have := congrArg PadicInt.toZMod hsum
-      set_option synthInstance.maxHeartbeats 100000 in
-      simpa [map_sum, map_pow, he1] using this
-    have hpl : l = p :=
-      (Nat.prime_dvd_prime_iff_eq hl.out hp).mp ((ZMod.natCast_eq_zero_iff _ _).mp hp0)
-    subst hpl
-    have hmem : ∀ z : ℤ_[l], (l : ℤ_[l]) ∣ z ↔ PadicInt.toZMod z = 0 := by
-      intro z
-      rw [← RingHom.mem_ker, PadicInt.ker_toZMod, PadicInt.maximalIdeal_eq_span_p,
-        Ideal.mem_span_singleton]
-    have h :=
-      emultiplicity_geom_sum₂_eq_one (p := l) (x := ε) (y := 1) PadicInt.prime_p
-        (hl.out.odd_of_ne_two h2) ((hmem _).mpr (by simp [he1]))
-        (by rw [hmem, he1]; exact one_ne_zero)
-    simp [hsum] at h
-  induction n using Nat.recOnMul generalizing δ with
-  | zero => exact absurd rfl hn
-  | one => simpa using hδ
-  | prime p hp => exact key p hp δ hδ h1
-  | mul a b iha ihb =>
-    have ha : a ≠ 0 := left_ne_zero_of_mul hn
-    have hb : b ≠ 0 := right_ne_zero_of_mul hn
-    refine iha δ ha (ihb (δ ^ a) hb (by rw [← pow_mul, hδ]) (by rw [map_pow, h1, one_pow])) h1
+theorem padicInt_eq_one_of_pow_eq_one_of_toZMod_eq_one {l : ℕ} [hl : Fact l.Prime] (h2 : l ≠ 2)
+    (δ : ℤ_[l]) {n : ℕ} (hn : n ≠ 0) (hδ : δ ^ n = 1) (h1 : PadicInt.toZMod δ = 1) : δ = 1 := by
+  apply GlobalTheory.CycFr.TraceOnePlusX.eq_one_of_pow_eq_one <;> assumption
 
-theorem exists_coset_representatives_of_finite_subgroup_padicInt_units
-    {l : ℕ} [hl : Fact l.Prime] (Δ : Subgroup ℤ_[l]ˣ) [Finite Δ] (h2 : l ≠ 2)
-    : ∃ (e : ℕ) (a : Fin e → ℕ),
-      e * Nat.card Δ = l - 1 ∧ (∀ τ, ¬ l ∣ a τ)
-        ∧ (∀ τ τ', τ ≠ τ' → (a τ : ZMod l) ^ Nat.card Δ ≠ (a τ' : ZMod l) ^ Nat.card Δ)
-        ∧ ∀ x : ZMod l,
-          x ≠ 0
-            → ∃! p : Fin e × Δ,
-              x = (a p.1 : ZMod l) * PadicInt.toZMod ((p.2 : ℤ_[l]ˣ) : ℤ_[l]) := by
+theorem exists_coset_representatives_of_finite_subgroup_padicInt_units {l : ℕ} [hl : Fact l.Prime]
+    (Δ : Subgroup ℤ_[l]ˣ) [Finite Δ] (h2 : l ≠ 2) :
+    ∃ (e : ℕ) (a : Fin e → ℕ), e * Nat.card Δ = l - 1 ∧ (∀ τ, ¬ l ∣ a τ) ∧
+      (∀ τ τ', τ ≠ τ' → (a τ : ZMod l) ^ Nat.card Δ ≠ (a τ' : ZMod l) ^ Nat.card Δ) ∧
+      ∀ x : ZMod l, x ≠ 0 → ∃! p : Fin e × Δ,
+        x = (a p.1 : ZMod l) * PadicInt.toZMod ((p.2 : ℤ_[l]ˣ) : ℤ_[l]) := by
   classical
   let g : Δ →* (ZMod l)ˣ :=
     (Units.map (PadicInt.toZMod (p := l) : ℤ_[l] →+* ZMod l).toMonoidHom).comp Δ.subtype
@@ -69,8 +79,7 @@ theorem exists_coset_representatives_of_finite_subgroup_padicInt_units
       have : d ^ Nat.card Δ = 1 := pow_card_eq_one'
       have := congrArg (fun z : Δ => ((z : ℤ_[l]ˣ) : ℤ_[l])) this
       simpa only [SubgroupClass.coe_pow, Units.val_pow_eq_pow_val, OneMemClass.coe_one,
-          Units.val_one]
-        using this
+        Units.val_one] using this
     exact Subtype.ext (Units.ext (padicInt_eq_one_of_pow_eq_one_of_toZMod_eq_one h2 _ hs hp h1))
   let H : Subgroup (ZMod l)ˣ := g.range
   have hH : Nat.card H = Nat.card Δ := (Nat.card_congr (MonoidHom.ofInjective hinj).toEquiv).symm
@@ -108,12 +117,12 @@ theorem exists_coset_representatives_of_finite_subgroup_padicInt_units
     exact hne (hreq _ _ (hHmem _ (by rw [mul_pow, inv_pow, h', inv_mul_cancel])))
   · intro x hx
     let u : (ZMod l)ˣ := Units.mk0 x hx
-    have hu : (r (φ u))⁻¹ * u ∈ H := by rw [← QuotientGroup.eq, hr, Equiv.symm_apply_apply]
+    have hu : (r (φ u))⁻¹ * u ∈ H := by
+      rw [← QuotientGroup.eq, hr, Equiv.symm_apply_apply]
     obtain ⟨d, hd⟩ := hu
-    have hform
-        : ∀ p : Fin (Nat.card ((ZMod l)ˣ ⧸ H)) × Δ,
-          x = (((r p.1 : ZMod l).val : ℕ) : ZMod l) * PadicInt.toZMod ((p.2 : ℤ_[l]ˣ) : ℤ_[l])
-            ↔ u = r p.1 * g p.2 := by
+    have hform : ∀ p : Fin (Nat.card ((ZMod l)ˣ ⧸ H)) × Δ,
+        x = (((r p.1 : ZMod l).val : ℕ) : ZMod l) * PadicInt.toZMod ((p.2 : ℤ_[l]ˣ) : ℤ_[l]) ↔
+          u = r p.1 * g p.2 := by
       intro p
       rw [hcast, ← hg, Units.ext_iff]
       rfl

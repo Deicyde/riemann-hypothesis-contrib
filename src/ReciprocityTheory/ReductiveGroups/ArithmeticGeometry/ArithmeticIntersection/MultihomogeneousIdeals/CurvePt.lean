@@ -1,7 +1,62 @@
 module
 
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArithmeticIntersection.MultihomogeneousIdeals.MemDivSuppOfDivCycleNeZero
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArithmeticIntersection.MultihomogeneousIdeals.ExistsMonomialNotMem
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArithmeticIntersection.MultihomogeneousIdeals.IsFieldIntersection
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.Finsupp.Interval
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.Order.CompletePartialOrder
+import Mathlib.RingTheory.Coalgebra.IsFrobenius
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.HopfAlgebra.Basic
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.TotallySplit
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArithmeticIntersection.MultihomogeneousIdeals.CycDim
+import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
@@ -21,8 +76,8 @@ attribute [local instance] MvPolynomial.weightedGradedAlgebra
 
 def mw : (Σ k, ι k) → (K → ℕ) := fun p => Pi.single p.1 1
 
-theorem weight_mw (m : (Σ k, ι k) →₀ ℕ)
-    : Finsupp.weight (mw (ι := ι)) m = fun k => ∑ i, m ⟨k, i⟩ := by
+theorem weight_mw (m : (Σ k, ι k) →₀ ℕ) :
+    Finsupp.weight (mw (ι := ι)) m = fun k => ∑ i, m ⟨k, i⟩ := by
   funext k
   rw [Finsupp.weight_apply, Finsupp.sum_fintype _ _ (fun _ => by simp), Finset.sum_apply]
   simp only [Pi.smul_apply, mw, smul_eq_mul]
@@ -32,35 +87,37 @@ theorem weight_mw (m : (Σ k, ι k) →₀ ℕ)
     simp [Pi.single_apply, Ne.symm hb]
   · simp
 
-theorem mem_weighted_of_isMultiHomog {f : MRingOver F ι} {a : K → ℕ} (hf : IsMultiHomog f a)
-    : f ∈ weightedHomogeneousSubmodule F (mw (ι := ι)) a := by
+theorem mem_weighted_of_isMultiHomog {f : MRingOver F ι} {a : K → ℕ}
+    (hf : IsMultiHomog f a) : f ∈ weightedHomogeneousSubmodule F (mw (ι := ι)) a := by
   rw [mem_weightedHomogeneousSubmodule]
   intro m hm
   rw [weight_mw]
   unfold IsMultiHomog at hf
   have h := hf m (by simpa [MvPolynomial.mem_support_iff] using hm)
-  first | exact h | exact funext h | simpa [funext_iff] using h
+  first
+    | exact h
+    | exact funext h
+    | simpa [funext_iff] using h
 
-theorem isMultiHomog_of_mem_weighted
-    {f : MRingOver F ι} {a : K → ℕ} (hf : f ∈ weightedHomogeneousSubmodule F (mw (ι := ι)) a)
-    : IsMultiHomog f a := by
+theorem isMultiHomog_of_mem_weighted {f : MRingOver F ι} {a : K → ℕ}
+    (hf : f ∈ weightedHomogeneousSubmodule F (mw (ι := ι)) a) : IsMultiHomog f a := by
   unfold IsMultiHomog
   intro m hm
   rw [mem_weightedHomogeneousSubmodule] at hf
   have h := hf (by simpa [MvPolynomial.mem_support_iff] using hm)
   rw [weight_mw] at h
-  first | exact h | exact congrFun h | simpa [funext_iff] using h
+  first
+    | exact h
+    | exact congrFun h
+    | simpa [funext_iff] using h
 
-theorem monomial_mem_weighted (m : (Σ k, ι k) →₀ ℕ) (c : F)
-    : monomial m c ∈ weightedHomogeneousSubmodule F (mw (ι := ι)) (fun k => ∑ i, m ⟨k, i⟩) :=
-  (mem_weightedHomogeneousSubmodule _ _ _ _).mpr
+theorem monomial_mem_weighted (m : (Σ k, ι k) →₀ ℕ) (c : F) :
+    monomial m c ∈ weightedHomogeneousSubmodule F (mw (ι := ι)) (fun k => ∑ i, m ⟨k, i⟩) := (mem_weightedHomogeneousSubmodule _ _ _ _).mpr
     (isWeightedHomogeneous_monomial _ _ _ (weight_mw m))
 
-theorem exists_homog_chart (V : Ideal (MRingOver F ι)) (j : ∀ k, ι k) (b : MRingOver F ι)
-    : ∃ e₀ : K → ℕ, ∀ e,
-      e₀ ≤ e
-        → ∃ b' ∈ weightedHomogeneousSubmodule F (mw (ι := ι)) e,
-          Ideal.Quotient.mk (chartIdeal V j) b' = Ideal.Quotient.mk (chartIdeal V j) b := by
+theorem exists_homog_chart (V : Ideal (MRingOver F ι)) (j : ∀ k, ι k) (b : MRingOver F ι) :
+    ∃ e₀ : K → ℕ, ∀ e, e₀ ≤ e → ∃ b' ∈ weightedHomogeneousSubmodule F (mw (ι := ι)) e,
+      Ideal.Quotient.mk (chartIdeal V j) b' = Ideal.Quotient.mk (chartIdeal V j) b := by
   have hX1 : ∀ k, Ideal.Quotient.mk (chartIdeal V j) (X ⟨k, j k⟩) = 1 := by
     intro k
     rw [← map_one (Ideal.Quotient.mk (chartIdeal V j)), Ideal.Quotient.eq]
@@ -69,20 +126,14 @@ theorem exists_homog_chart (V : Ideal (MRingOver F ι)) (j : ∀ k, ι k) (b : M
   refine ⟨fun _ => b.totalDegree, fun e he => ?_⟩
   have hd : ∀ m ∈ b.support, ∀ k, ∑ i, m ⟨k, i⟩ ≤ e k := by
     intro m hm k
-    calc
-      ∑ i, m ⟨k, i⟩ ≤ ∑ k', ∑ i, m ⟨k', i⟩ :=
-        Finset.single_le_sum
-          (f := fun k' => ∑ i, m ⟨k', i⟩)
-          (fun _ _ => Nat.zero_le _)
-          (Finset.mem_univ k)
+    calc ∑ i, m ⟨k, i⟩ ≤ ∑ k', ∑ i, m ⟨k', i⟩ :=
+          Finset.single_le_sum (f := fun k' => ∑ i, m ⟨k', i⟩) (fun _ _ => Nat.zero_le _)
+            (Finset.mem_univ k)
       _ = m.sum fun _ n => n := by rw [Finsupp.sum_fintype _ _ (fun _ => rfl), Fintype.sum_sigma]
       _ ≤ b.totalDegree := MvPolynomial.le_totalDegree hm
       _ ≤ e k := he k
-  refine ⟨
-    ∑ m ∈ b.support, monomial m (AddMonoidAlgebra.coeff b m) * ∏ k, X ⟨k, j k⟩ ^ (e k - ∑ i, m ⟨k, i⟩),
-    ?_,
-    ?_
-  ⟩
+  refine ⟨∑ m ∈ b.support, monomial m (AddMonoidAlgebra.coeff b m) * ∏ k, X ⟨k, j k⟩ ^ (e k - ∑ i, m ⟨k, i⟩),
+    ?_, ?_⟩
   · refine Submodule.sum_mem _ fun m hm => ?_
     rw [mem_weightedHomogeneousSubmodule]
     have h1 : IsWeightedHomogeneous (mw (ι := ι)) (monomial m (AddMonoidAlgebra.coeff b m))
@@ -94,18 +145,18 @@ theorem exists_homog_chart (V : Ideal (MRingOver F ι)) (j : ∀ k, ι k) (b : M
       IsWeightedHomogeneous.prod _ _ _ fun k _ =>
         (isWeightedHomogeneous_X (R := F) (w := mw (ι := ι)) (i := (⟨k, j k⟩ : Σ k, ι k))).pow _
     have h3 := h1.mul h2
-    have hsum
-        : ((fun k => ∑ i, m ⟨k, i⟩) + ∑ k, (e k - ∑ i, m ⟨k, i⟩) • mw (ι := ι) ⟨k, j k⟩) = e := by
+    have hsum : ((fun k => ∑ i, m ⟨k, i⟩) +
+        ∑ k, (e k - ∑ i, m ⟨k, i⟩) • mw (ι := ι) ⟨k, j k⟩) = e := by
       funext k
       have := hd m hm k
       simp only [Pi.add_apply, Finset.sum_apply, Pi.smul_apply, mw, smul_eq_mul, Pi.single_apply,
         mul_ite, mul_one, mul_zero, Finset.sum_ite_eq, Finset.mem_univ, if_true]
       omega
     rwa [hsum] at h3
-  · set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
-    set_option synthInstance.maxHeartbeats 100000 in
-      conv_rhs => rw [MvPolynomial.as_sum b, map_sum]
+  ·
+    rw [map_sum]
+
+    conv_rhs => rw [MvPolynomial.as_sum b, map_sum]
     refine Finset.sum_congr rfl fun m _ => ?_
     rw [map_mul, map_prod]
     simp only [map_pow, hX1, one_pow, Finset.prod_const_one, mul_one]
@@ -116,68 +167,59 @@ section Rho
 
 variable {W : Ideal (MRingOver F ι)} [hWp : W.IsPrime]
 
-def chartTheta (W : Ideal (MRingOver F ι)) [W.IsPrime]
-    : MRingOver F ι →ₐ[F] FractionRing (MRingOver F ι ⧸ W) :=
+def chartTheta (W : Ideal (MRingOver F ι)) [W.IsPrime] :
+    MRingOver F ι →ₐ[F] FractionRing (MRingOver F ι ⧸ W) :=
   (IsScalarTower.toAlgHom F (MRingOver F ι ⧸ W) (FractionRing (MRingOver F ι ⧸ W))).comp
     (Ideal.Quotient.mkₐ F W)
 
-theorem chartTheta_apply (g : MRingOver F ι)
-    : chartTheta W g
-      = algebraMap (MRingOver F ι ⧸ W) (FractionRing (MRingOver F ι ⧸ W)) (Ideal.Quotient.mk W g) :=
-  rfl
+theorem chartTheta_apply (g : MRingOver F ι) :
+    chartTheta W g = algebraMap (MRingOver F ι ⧸ W) (FractionRing (MRingOver F ι ⧸ W))
+      (Ideal.Quotient.mk W g) := rfl
 
 theorem chartTheta_eq_zero_iff {g : MRingOver F ι} : chartTheta W g = 0 ↔ g ∈ W := by
-  rw [chartTheta_apply,
-    map_eq_zero_iff _
-      (IsFractionRing.injective (MRingOver F ι ⧸ W) (FractionRing (MRingOver F ι ⧸ W))),
+  rw [chartTheta_apply, map_eq_zero_iff _
+    (IsFractionRing.injective (MRingOver F ι ⧸ W) (FractionRing (MRingOver F ι ⧸ W))),
     Ideal.Quotient.eq_zero_iff_mem]
 
-def chartC (W : Ideal (MRingOver F ι)) [W.IsPrime] (j : ∀ k, ι k) (k : K)
-    : FractionRing (MRingOver F ι ⧸ W) :=
+def chartC (W : Ideal (MRingOver F ι)) [W.IsPrime] (j : ∀ k, ι k) (k : K) :
+    FractionRing (MRingOver F ι ⧸ W) :=
   (chartTheta W (X ⟨k, j k⟩))⁻¹
 
-def chartRho (W : Ideal (MRingOver F ι)) [W.IsPrime] (j : ∀ k, ι k)
-    : MRingOver F ι →ₐ[F] FractionRing (MRingOver F ι ⧸ W) :=
+def chartRho (W : Ideal (MRingOver F ι)) [W.IsPrime] (j : ∀ k, ι k) :
+    MRingOver F ι →ₐ[F] FractionRing (MRingOver F ι ⧸ W) :=
   aeval fun p => chartC W j p.1 * chartTheta W (X p)
 
-theorem chartTheta_X_ne_zero {j : ∀ k, ι k} (hj : IsChart W j) (k : K)
-    : chartTheta W (X ⟨k, j k⟩) ≠ 0 := by
+theorem chartTheta_X_ne_zero {j : ∀ k, ι k} (hj : IsChart W j) (k : K) :
+    chartTheta W (X ⟨k, j k⟩) ≠ 0 := by
   rw [Ne, chartTheta_eq_zero_iff]
   unfold IsChart at hj
   exact hj k
 
-private theorem aeval_mul_const_of_isMultiHomog
-    {A : Type*} [CommRing A] [Algebra F A]
-    (c : K → A) (y : (Σ k, ι k) → A)
-    {f : MRingOver F ι} {a : K → ℕ} (hf : IsMultiHomog f a)
-    : aeval (fun p => c p.1 * y p) f = (∏ k, c k ^ a k) * aeval y f := by
+private theorem aeval_mul_const_of_isMultiHomog {A : Type*} [CommRing A] [Algebra F A] (c : K → A)
+    (y : (Σ k, ι k) → A) {f : MRingOver F ι} {a : K → ℕ} (hf : IsMultiHomog f a) :
+    aeval (fun p => c p.1 * y p) f = (∏ k, c k ^ a k) * aeval y f := by
   classical
   conv_lhs => rw [MvPolynomial.as_sum f]
   conv_rhs => rw [MvPolynomial.as_sum f]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum, map_sum, Finset.mul_sum]
+
+  rw [map_sum, map_sum, Finset.mul_sum]
   refine Finset.sum_congr rfl fun m hm => ?_
-  have hw :=
-    (mem_weightedHomogeneousSubmodule _ _ _ _).mp (mem_weighted_of_isMultiHomog hf)
-      (MvPolynomial.mem_support_iff.mp hm)
+  have hw := (mem_weightedHomogeneousSubmodule _ _ _ _).mp (mem_weighted_of_isMultiHomog hf)
+    (MvPolynomial.mem_support_iff.mp hm)
   rw [weight_mw] at hw
   rw [aeval_monomial, aeval_monomial]
   have key : (m.prod fun p e => c p.1 ^ e) = ∏ k, c k ^ a k := by
     rw [Finsupp.prod_fintype _ _ (fun _ => pow_zero _), Fintype.prod_sigma, ← hw]
     simp only [Finset.prod_pow_eq_pow_sum]
-  have split
-      : (m.prod fun p e => (c p.1 * y p) ^ e)
-        = (m.prod fun p e => c p.1 ^ e) * m.prod fun p e => y p ^ e := by
+  have split : (m.prod fun p e => (c p.1 * y p) ^ e) =
+      (m.prod fun p e => c p.1 ^ e) * m.prod fun p e => y p ^ e := by
     simp only [mul_pow]
     exact Finsupp.prod_mul
   rw [split, key]
   ring
 
-theorem chartRho_chartIdeal
-    (hW : IsMultiHomogIdeal W)
-    {j : ∀ k, ι k} (hj : IsChart W j)
-    {g : MRingOver F ι} (hg : g ∈ chartIdeal W j)
-    : chartRho W j g = 0 := by
+theorem chartRho_chartIdeal (hW : IsMultiHomogIdeal W) {j : ∀ k, ι k} (hj : IsChart W j)
+    {g : MRingOver F ι} (hg : g ∈ chartIdeal W j) : chartRho W j g = 0 := by
   have hX : ∀ k, chartRho W j (X ⟨k, j k⟩ - 1) = 0 := by
     intro k
     rw [map_sub, map_one]
@@ -207,8 +249,8 @@ theorem chartRho_chartIdeal
     exact RingHom.mem_ker.mpr (hX k)
   exact RingHom.mem_ker.mp (hker hg)
 
-theorem chartIdeal_ne_top (hW : IsMultiHomogIdeal W) {j : ∀ k, ι k} (hj : IsChart W j)
-    : chartIdeal W j ≠ ⊤ := by
+theorem chartIdeal_ne_top (hW : IsMultiHomogIdeal W) {j : ∀ k, ι k} (hj : IsChart W j) :
+    chartIdeal W j ≠ ⊤ := by
   intro h
   have h1 := chartRho_chartIdeal hW hj ((Ideal.eq_top_iff_one _).mp h)
   rw [map_one] at h1
@@ -220,42 +262,33 @@ section Point
 
 variable {W : Ideal (MRingOver F ι)}
 
-theorem isUnit_mk_chartIdeal_form
-    {V : Ideal (MRingOver F ι)} (hV : IsProjVarF V 0)
-    (j : ∀ k, ι k)
-    {a : MRingOver F ι} {α : K → ℕ} (ha : IsMultiHomog a α) (hp : a ∉ V)
-    : IsUnit (Ideal.Quotient.mk (chartIdeal V j) a) := by
+theorem isUnit_mk_chartIdeal_form {V : Ideal (MRingOver F ι)} (hV : IsProjVarF V 0) (j : ∀ k, ι k)
+    {a : MRingOver F ι} {α : K → ℕ} (ha : IsMultiHomog a α) (hp : a ∉ V) :
+    IsUnit (Ideal.Quotient.mk (chartIdeal V j) a) := by
   classical
   by_contra hu
   obtain ⟨M, hM, hpM⟩ := exists_max_ideal_of_mem_nonunits hu
   have hVp : V.IsPrime := hV.1.1
   letI : Field (((MRingOver F ι ⧸ chartIdeal V j) ⧸ M)) := Ideal.Quotient.field M
   let θ : MRingOver F ι →ₐ[F] MvPolynomial K (((MRingOver F ι ⧸ chartIdeal V j) ⧸ M)) :=
-    (IsScalarTower.toAlgHom F (((MRingOver F ι ⧸ chartIdeal V j) ⧸ M))
-        (MvPolynomial K (((MRingOver F ι ⧸ chartIdeal V j) ⧸ M)))).comp
+    (IsScalarTower.toAlgHom F (((MRingOver F ι ⧸ chartIdeal V j) ⧸ M)) (MvPolynomial K (((MRingOver F ι ⧸ chartIdeal V j) ⧸ M)))).comp
       ((Ideal.Quotient.mkₐ F M).comp (Ideal.Quotient.mkₐ F (chartIdeal V j)))
-  have hθ
-      : ∀ g, θ g = MvPolynomial.C (Ideal.Quotient.mk M (Ideal.Quotient.mk (chartIdeal V j) g)) :=
-    fun g => rfl
-  let c : Finset K → K → MvPolynomial K (((MRingOver F ι ⧸ chartIdeal V j) ⧸ M)) := fun S k =>
-    if k ∈ S then 0 else MvPolynomial.X k
+  have hθ : ∀ g, θ g = MvPolynomial.C (Ideal.Quotient.mk M (Ideal.Quotient.mk (chartIdeal V j) g)) := fun g => rfl
+  let c : Finset K → K → MvPolynomial K (((MRingOver F ι ⧸ chartIdeal V j) ⧸ M)) :=
+    fun S k => if k ∈ S then 0 else MvPolynomial.X k
   let φ : Finset K → MRingOver F ι →ₐ[F] MvPolynomial K (((MRingOver F ι ⧸ chartIdeal V j) ⧸ M)) :=
     fun S => aeval fun q => c S q.1 * θ (X q)
   have hφX : ∀ S q, φ S (X q) = c S q.1 * θ (X q) := fun S q => aeval_X _ _
   let Q : Finset K → Ideal (MRingOver F ι) := fun S => RingHom.ker (φ S)
   have hQp : ∀ S, (Q S).IsPrime := fun S => RingHom.ker_isPrime (φ S).toRingHom
-  have hVQ : ∀ S, V ≤ Q S := fun S g hg =>
-    RingHom.mem_ker.mpr (aeval_blockScale_eq_zero hV.1.2.1 (c S) θ
-      (fun g hg => by
-        rw [hθ,
-          Ideal.Quotient.eq_zero_iff_mem.mpr (show g ∈ chartIdeal V j from Ideal.mem_sup_left hg),
-          map_zero, map_zero])
-      hg)
+  have hVQ : ∀ S, V ≤ Q S := fun S g hg => RingHom.mem_ker.mpr
+    (aeval_blockScale_eq_zero hV.1.2.1 (c S) θ (fun g hg => by
+      rw [hθ, Ideal.Quotient.eq_zero_iff_mem.mpr (show g ∈ chartIdeal V j from Ideal.mem_sup_left hg),
+        map_zero, map_zero]) hg)
 
   have hmono : ∀ S k, Q S ≤ Q (insert k S) := by
     intro S k g hg
-    let ρ
-        : MvPolynomial K (((MRingOver F ι ⧸ chartIdeal V j) ⧸ M)) →ₐ[F] MvPolynomial K (((MRingOver F ι ⧸ chartIdeal V j) ⧸ M)) :=
+    let ρ : MvPolynomial K (((MRingOver F ι ⧸ chartIdeal V j) ⧸ M)) →ₐ[F] MvPolynomial K (((MRingOver F ι ⧸ chartIdeal V j) ⧸ M)) :=
       (aeval fun k' => if k' = k then 0 else MvPolynomial.X k').restrictScalars F
     have e : ρ.comp (φ S) = φ (insert k S) := by
       refine MvPolynomial.algHom_ext fun q => ?_
@@ -288,13 +321,11 @@ theorem isUnit_mk_chartIdeal_form
     have e1 := aeval_blockScale ha (c ∅) (fun q => θ (X q))
     have e2 : (aeval fun q => θ (X q) : MRingOver F ι →ₐ[F] _) = θ :=
       MvPolynomial.algHom_ext fun q => aeval_X _ _
-    rw [DFunLike.congr_fun e2 a, hθ, Ideal.Quotient.eq_zero_iff_mem.mpr hpM, map_zero, mul_zero]
-      at e1
+    rw [DFunLike.congr_fun e2 a, hθ, Ideal.Quotient.eq_zero_iff_mem.mpr hpM, map_zero,
+      mul_zero] at e1
     exact e1
-  have chain
-      : ∀ S : Finset K,
-        ((S.card : ℕ) : WithBot ℕ∞) + 1 + ringKrullDim (MRingOver F ι ⧸ Q S)
-          ≤ ringKrullDim (MRingOver F ι ⧸ V) := by
+  have chain : ∀ S : Finset K, ((S.card : ℕ) : WithBot ℕ∞) + 1 + ringKrullDim (MRingOver F ι ⧸ Q S) ≤
+      ringKrullDim (MRingOver F ι ⧸ V) := by
     intro S
     induction S using Finset.induction_on with
     | empty =>
@@ -305,10 +336,9 @@ theorem isUnit_mk_chartIdeal_form
       have : (Q S).IsPrime := hQp S
       have h1 := cyc_dim_add_one_le (hmono S k) (hin S k) (hout S k hk)
       rw [Finset.card_insert_of_notMem hk]
-      calc
-        (((S.card + 1 : ℕ)) : WithBot ℕ∞) + 1 + ringKrullDim (MRingOver F ι ⧸ Q (insert k S))
-            = (S.card : WithBot ℕ∞) + 1 + (ringKrullDim (MRingOver F ι ⧸ Q (insert k S)) + 1) := by
-          push_cast; abel
+      calc (((S.card + 1 : ℕ)) : WithBot ℕ∞) + 1 + ringKrullDim (MRingOver F ι ⧸ Q (insert k S))
+          = (S.card : WithBot ℕ∞) + 1 + (ringKrullDim (MRingOver F ι ⧸ Q (insert k S)) + 1) := by
+            push_cast; abel
         _ ≤ (S.card : WithBot ℕ∞) + 1 + ringKrullDim (MRingOver F ι ⧸ Q S) := add_le_add_right h1 _
         _ ≤ _ := ih
   have h := chain Finset.univ
@@ -317,18 +347,16 @@ theorem isUnit_mk_chartIdeal_form
   have h0 : (0 : WithBot ℕ∞) ≤ ringKrullDim (MRingOver F ι ⧸ Q Finset.univ) :=
     ringKrullDim_nonneg_of_nontrivial
   rw [hV.2, Finset.card_univ] at h
-  have h2
-      : (((Fintype.card K + 1 : ℕ)) : WithBot ℕ∞) ≤ ((0 + Fintype.card K : ℕ) : WithBot ℕ∞) := by
-    calc
-      (((Fintype.card K + 1 : ℕ)) : WithBot ℕ∞)
-        = (Fintype.card K : WithBot ℕ∞) + 1 + 0 := by push_cast; simp
+  have h2 : (((Fintype.card K + 1 : ℕ)) : WithBot ℕ∞) ≤ ((0 + Fintype.card K : ℕ) : WithBot ℕ∞) := by
+    calc (((Fintype.card K + 1 : ℕ)) : WithBot ℕ∞) = (Fintype.card K : WithBot ℕ∞) + 1 + 0 := by
+          push_cast; simp
       _ ≤ _ := add_le_add_right h0 _
       _ ≤ _ := h
   have h3 : Fintype.card K + 1 ≤ 0 + Fintype.card K := by exact_mod_cast h2
   omega
 
-theorem chart_isField (hW : IsProjVarF W 0) {j : ∀ k, ι k} (hj : IsChart W j)
-    : IsField (MRingOver F ι ⧸ chartIdeal W j) := by
+theorem chart_isField (hW : IsProjVarF W 0) {j : ∀ k, ι k} (hj : IsChart W j) :
+    IsField (MRingOver F ι ⧸ chartIdeal W j) := by
   classical
   haveI := hW.1.1
   have hnt : Nontrivial (MRingOver F ι ⧸ chartIdeal W j) :=
@@ -337,22 +365,22 @@ theorem chart_isField (hW : IsProjVarF W 0) {j : ∀ k, ι k} (hj : IsChart W j)
   obtain ⟨b, rfl⟩ := Ideal.Quotient.mk_surjective y
   obtain ⟨e₀, h⟩ := exists_homog_chart W j b
   obtain ⟨b', hb', eb⟩ := h e₀ le_rfl
-  have hb'W : b' ∉ W := fun h =>
-    hy (by rw [← eb]; exact Ideal.Quotient.eq_zero_iff_mem.mpr (Ideal.mem_sup_left h))
+  have hb'W : b' ∉ W := fun h => hy (by
+    rw [← eb]; exact Ideal.Quotient.eq_zero_iff_mem.mpr (Ideal.mem_sup_left h))
   have hu := isUnit_mk_chartIdeal_form hW j (isMultiHomog_of_mem_weighted hb') hb'W
   rw [eb] at hu
   exact hu.exists_right_inv
 
-theorem chart_finite (hW : IsProjVarF W 0) {j : ∀ k, ι k} (hj : IsChart W j)
-    : Module.Finite F (MRingOver F ι ⧸ chartIdeal W j) := by
+theorem chart_finite (hW : IsProjVarF W 0) {j : ∀ k, ι k} (hj : IsChart W j) :
+    Module.Finite F (MRingOver F ι ⧸ chartIdeal W j) := by
   letI := (chart_isField hW hj).toField
   haveI : Algebra.FiniteType F (MRingOver F ι ⧸ chartIdeal W j) :=
     Algebra.FiniteType.of_surjective (Ideal.Quotient.mkₐ F (chartIdeal W j))
       (Ideal.Quotient.mkₐ_surjective F _)
   exact finite_of_finite_type_of_isJacobsonRing F _
 
-instance finiteDimensional_weighted [DecidableEq K] (e : K → ℕ)
-    : FiniteDimensional F (weightedHomogeneousSubmodule F (mw (ι := ι)) e) := by
+instance finiteDimensional_weighted [DecidableEq K] (e : K → ℕ) :
+    FiniteDimensional F (weightedHomogeneousSubmodule F (mw (ι := ι)) e) := by
   classical
   rw [weightedHomogeneousSubmodule_eq_finsupp_supported, AddMonoidAlgebra.supported_eq_span_single]
   apply FiniteDimensional.span_of_finite
@@ -364,9 +392,7 @@ instance finiteDimensional_weighted [DecidableEq K] (e : K → ℕ)
     intro p
     simp only [Finsupp.equivFunOnFinite_symm_apply_apply]
     rw [← hm]
-    exact Finset.single_le_sum
-      (f := fun i => m ⟨p.1, i⟩)
-      (fun _ _ => Nat.zero_le _)
+    exact Finset.single_le_sum (f := fun i => m ⟨p.1, i⟩) (fun _ _ => Nat.zero_le _)
       (Finset.mem_univ p.2)
   exact hfin.image _
 

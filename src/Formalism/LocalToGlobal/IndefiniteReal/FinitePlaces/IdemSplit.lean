@@ -1,8 +1,52 @@
 module
 
-public import Formalism.LocalToGlobal.IndefiniteReal.FinitePlaces.IdemOrth
-public import Formalism.LocalToGlobal.SiegelLatticeTheory.TraceIntegralEstimates.PsiTrCoreApprox
+public import Formalism.LocalToGlobal.IndefiniteReal.FinitePlaces.IdemUniq
 public import Development.AutomorphicArithmetic.IntegralCasts.CapelliIdentities.DecompositionAlmostEverywhere
+import Formalism.LocalRingCardinality.SpanPowerMembership.ExampleLayerExistsGenerators
+import Formalism.LocalToGlobal.IndefiniteReal.FinitePlaces.FinPartPhiE
+public import Formalism.LocalToGlobal.SiegelLatticeTheory.TraceIntegralEstimates.PsiTrCoreApprox
+import Formalism.SharpRestriction.GlobalSchurBounds.GlobalRankLatticeProofs.EqOfLeOfAbsNormEq
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.PicardGroup
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -13,7 +57,7 @@ open Formalism.BasicNotions Formalism.BasicNotions.TH
   Formalism.L2.Theta IsDedekindDomain NumberField Polynomial
 open scoped TensorProduct
 
-set_option synthInstance.maxHeartbeats 160000
+
 
 namespace Formalism.IndefR.Fin
 
@@ -47,7 +91,6 @@ theorem idemAt_int
   have := not_not.1 (mt h.2 h1P)
   rwa [show ((1 : 𝓞 D.host.E) : D.host.E)⁻¹ = 1 by simp, map_one, mul_one] at this
 
-set_option maxHeartbeats 800000 in
 theorem decomp_AE (hadj : Algebra.adjoin D.host.F {D.host.sqrtMinusD} = ⊤) (z : AE D)
     : ∃ p q : AF D.host.F,
       z = algebraMap (AF D.host.F) (AE D) p
@@ -68,7 +111,6 @@ theorem cA_alg (x : AF D.host.F)
   rw [Algebra.TensorProduct.map_tmul, map_one]
   rfl
 
-set_option maxHeartbeats 800000 in
 theorem fixed_AE
     (hadj : Algebra.adjoin D.host.F {D.host.sqrtMinusD} = ⊤) {z : AE D} (hz : cA D z = z)
     : ∃ r : AF D.host.F, z = algebraMap (AF D.host.F) (AE D) r := by
@@ -85,7 +127,6 @@ theorem fixed_AE
     linear_combination -hz
   rw [two_mul_eq_zero h0, add_zero]
 
-set_option synthInstance.maxHeartbeats 200000 in
 theorem adjoin_top_of
     (b : D.host.E) (t N : D.host.F) (ht : algebraMap D.host.F D.host.E t = b + star b)
     (hN : algebraMap D.host.F D.host.E N = b * star b)
@@ -112,7 +153,6 @@ theorem adjoin_top_of
   rw [← IntermediateField.adjoin_simple_toSubalgebra_of_isAlgebraic hbi.isAlgebraic, htop,
     IntermediateField.top_toSubalgebra]
 
-set_option maxHeartbeats 800000 in
 theorem approx_int
     (v : HeightOneSpectrum (𝓞 D.host.F)) (ι : D.host.E →ₐ[D.host.F] v.adicCompletion D.host.F)
     {z : Af D.host.F ⊗[D.host.F] D.host.E} (hz : z ∈ intAE D)
@@ -189,7 +229,6 @@ theorem approx_int
         Valuation.map_neg]
       exact ha2
 
-set_option maxHeartbeats 1000000 in
 theorem idemAt_split
     {P : HeightOneSpectrum (𝓞 D.host.E)} {e : AE D} (he : Formalism.L2.NTheta.IsIdemAt e P)
     : ¬ Lev.IsConjPl (D := D) P P := by

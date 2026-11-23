@@ -1,6 +1,47 @@
 module
 
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.FundamentalDomains.TraceIntegralBasis
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -21,8 +62,8 @@ instance free_int : Module.Free ℤ X.Λ := inferInstance
 
 noncomputable def zb : Basis (Fin (finrank ℤ X.Λ)) ℤ X.Λ := Module.finBasis ℤ X.Λ
 
-theorem smul_mem_spanQ (α : E) {l : Fin r → E} (hl : l ∈ X.Λ)
-    : α • l ∈ span ℚ (X.Λ : Set (Fin r → E)) := by
+theorem smul_mem_spanQ (α : E) {l : Fin r → E} (hl : l ∈ X.Λ) :
+    α • l ∈ span ℚ (X.Λ : Set (Fin r → E)) := by
   have hα : α = ∑ k, (integralBasis E).repr α k • integralBasis E k :=
     ((integralBasis E).sum_repr α).symm
   rw [hα, Finset.sum_smul]
@@ -32,8 +73,8 @@ theorem smul_mem_spanQ (α : E) {l : Fin r → E} (hl : l ∈ X.Λ)
   rw [integralBasis_apply]
   exact X.Λ.smul_of_tower_mem (RingOfIntegers.basis E k) hl
 
-theorem spanQ_eq_top {ι : Type} [Fintype ι] (g : Basis ι ℤ X.Λ)
-    : span ℚ (Set.range fun i => (g i : Fin r → E)) = ⊤ := by
+theorem spanQ_eq_top {ι : Type} [Fintype ι] (g : Basis ι ℤ X.Λ) :
+    span ℚ (Set.range fun i => (g i : Fin r → E)) = ⊤ := by
   set S := span ℚ (Set.range fun i => (g i : Fin r → E)) with hS
   have hΛ : ∀ l ∈ X.Λ, l ∈ S := by
     intro l hl
@@ -65,8 +106,8 @@ theorem spanQ_eq_top {ι : Type} [Fintype ι] (g : Basis ι ℤ X.Λ)
   | add y z _ _ hy hz => exact S.add_mem hy hz
   | smul α y _ hy => exact hE α y hy
 
-theorem linIndQ {ι : Type} [Fintype ι] (g : Basis ι ℤ X.Λ)
-    : LinearIndependent ℚ fun i => (g i : Fin r → E) := by
+theorem linIndQ {ι : Type} [Fintype ι] (g : Basis ι ℤ X.Λ) :
+    LinearIndependent ℚ fun i => (g i : Fin r → E) := by
   have hZ : LinearIndependent ℤ fun i => (g i : Fin r → E) :=
     g.linearIndependent.map' (X.Λ.toAddSubgroup.subtype.toIntLinearMap)
       (LinearMap.ker_eq_bot.mpr Subtype.val_injective)
@@ -75,12 +116,12 @@ theorem linIndQ {ι : Type} [Fintype ι] (g : Basis ι ℤ X.Λ)
 noncomputable def qb {ι : Type} [Fintype ι] (g : Basis ι ℤ X.Λ) : Basis ι ℚ (Fin r → E) :=
   Basis.mk (linIndQ X g) (spanQ_eq_top X g).ge
 
-theorem qb_apply {ι : Type} [Fintype ι] (g : Basis ι ℤ X.Λ) (i : ι)
-    : qb X g i = (g i : Fin r → E) := by
+theorem qb_apply {ι : Type} [Fintype ι] (g : Basis ι ℤ X.Λ) (i : ι) : qb X g i = (g i : Fin r → E) := by
   unfold qb
   exact Basis.mk_apply _ _ _
 
-theorem card_qb {ι : Type} [Fintype ι] (g : Basis ι ℤ X.Λ) : Fintype.card ι = r * finrank ℚ E := by
+theorem card_qb {ι : Type} [Fintype ι] (g : Basis ι ℤ X.Λ) :
+    Fintype.card ι = r * finrank ℚ E := by
   rw [← Module.finrank_eq_card_basis (qb X g), Module.finrank_pi_fintype]
   simp
 
@@ -139,10 +180,8 @@ theorem Tm_injective : Function.Injective (Tm X) := by
     · exact ⟨⟨_, h⟩, Subtype.ext (InfinitePlace.mk_embedding w.1)⟩
     · have h2 : ComplexEmbedding.conjugate w.1.embedding ∈ X.Ψ :=
         (X.cmType _).mpr (by rw [TraceIntegralBasis.conj_conj]; exact h)
-      exact ⟨
-        ⟨_, h2⟩,
-        Subtype.ext ((InfinitePlace.mk_conjugate_eq _).trans (InfinitePlace.mk_embedding w.1))
-      ⟩
+      exact ⟨⟨_, h2⟩, Subtype.ext ((InfinitePlace.mk_conjugate_eq _).trans
+        (InfinitePlace.mk_embedding w.1))⟩
   have h3 := congrFun hz τ
   simp only [Tm, LinearMap.coe_mk, AddHom.coe_mk, Pi.zero_apply] at h3
   subst hτ
@@ -185,17 +224,17 @@ noncomputable def Ja (a : Fin r) : (X.Ψ → ℂ) →ₗ[ℝ] (X.Ψ → Fin r �
     simp only [Pi.smul_apply, RingHom.id_apply]
     split_ifs <;> simp
 
-theorem span_embV {ι : Type} [Fintype ι] (g : Basis ι ℤ X.Λ)
-    : span ℝ (Set.range fun i => X.embV (g i : Fin r → E)) = ⊤ := by
+theorem span_embV {ι : Type} [Fintype ι] (g : Basis ι ℤ X.Λ) :
+    span ℝ (Set.range fun i => X.embV (g i : Fin r → E)) = ⊤ := by
   set S := span ℝ (Set.range fun i => X.embV (g i : Fin r → E)) with hS
   have h1 : ∀ v : Fin r → E, X.embV v ∈ S := by
     intro v
     have hv : X.embV v = ∑ i, (((qb X g).repr v i : ℚ) : ℝ) • X.embV (g i : Fin r → E) := by
       conv_lhs => rw [← (qb X g).sum_repr v]
       funext τ a
-      set_option synthInstance.maxHeartbeats 100000 in
+
       simp only [Data.embV, Data.emb, qb_apply, Finset.sum_apply, Pi.smul_apply, Rat.smul_def,
-        map_sum, map_mul, map_ratCast, Complex.real_smul, Complex.ofReal_ratCast]
+      map_sum, map_mul, map_ratCast, Complex.real_smul, Complex.ofReal_ratCast]
     rw [hv]
     exact Submodule.sum_mem _ fun i _ => Submodule.smul_mem _ _ (subset_span ⟨i, rfl⟩)
   rw [eq_top_iff]
@@ -218,8 +257,8 @@ theorem span_embV {ι : Type} [Fintype ι] (g : Basis ι ℤ X.Λ)
   rw [h3]
   exact h1 _
 
-theorem linIndR {ι : Type} [Fintype ι] (g : Basis ι ℤ X.Λ)
-    : LinearIndependent ℝ fun i => X.embV (g i : Fin r → E) := by
+theorem linIndR {ι : Type} [Fintype ι] (g : Basis ι ℤ X.Λ) :
+    LinearIndependent ℝ fun i => X.embV (g i : Fin r → E) := by
   refine linearIndependent_of_top_le_span_of_card_eq_finrank (span_embV X g).ge ?_
   rw [card_qb X g, Module.finrank_pi_fintype]
   simp only [Module.finrank_pi_fintype, Complex.finrank_real_complex, Finset.sum_const,

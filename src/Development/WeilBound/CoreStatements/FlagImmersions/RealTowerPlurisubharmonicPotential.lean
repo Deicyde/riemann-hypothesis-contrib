@@ -1,25 +1,66 @@
 module
 
-public import Mathlib
-public import Development.AutomorphicSpectrum.Definitions.DivisibilityTowers.RefLinked
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.InterSt
-public import ReciprocityTheory.AnalyticForms.PotentialTheory.Pullback
-public import Development.AutomorphicSpectrum.Proofs.MetricProofs.AnalyticSystemRegularityProperties
-public import Development.WeilBound.CoreStatements.FlagImmersions.DifferentiableAtAffCoord
+import Development.AutomorphicSpectrum.Proofs.MetricProofs.LogResolutionFubiniStudyPositive
+public import Development.AutomorphicSpectrum.Definitions.MetricPeriods.MetricsProjectionFormulaNef
+public import GroundTheory.HeightsAndTheta.Heights.HodgeLowerBound.CoordinateIdeals
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+public import ReciprocityTheory.AnalyticForms.PotentialTheory.PshShiftA
+import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
 noncomputable section
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo Filter Topology
-  GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Top
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo Filter Topology GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Top
 open ReciprocityTheory.AnForm ReciprocityTheory.AnForm.M
 open GroundTheory.Heights₂.Heights.LowerBoundFree (torusSmul)
 
 namespace RootFieldNumerics.Levi
 
-theorem telescope (g : ℕ → ℝ) (k n : ℕ) (h : k ≤ n)
-    : ∑ i ∈ Finset.range n, (if k ≤ i then g i - g (i + 1) else 0) = g k - g n := by
+theorem telescope (g : ℕ → ℝ) (k n : ℕ) (h : k ≤ n) :
+    ∑ i ∈ Finset.range n, (if k ≤ i then g i - g (i + 1) else 0) = g k - g n := by
   induction n, h using Nat.le_induction with
   | base =>
     rw [sub_self]
@@ -28,8 +69,8 @@ theorem telescope (g : ℕ → ℝ) (k n : ℕ) (h : k ≤ n)
     omega
   | succ n hn ih => rw [Finset.sum_range_succ, ih, if_pos hn]; ring
 
-private theorem sum_gap_of_le_eq {Ψ : Type} {N : ℕ} (lam : Ψ × Fin N → ℝ) (ψ : Ψ) (j : Fin N)
-    : ∑ k : Fin N, (if j ≤ k then PB.gap lam (ψ, k) else 0) = lam (ψ, j) := by
+private theorem sum_gap_of_le_eq {Ψ : Type} {N : ℕ} (lam : Ψ × Fin N → ℝ) (ψ : Ψ) (j : Fin N) :
+    ∑ k : Fin N, (if j ≤ k then PB.gap lam (ψ, k) else 0) = lam (ψ, j) := by
   set g : ℕ → ℝ := fun i => if h : i < N then lam (ψ, ⟨i, h⟩) else 0 with hgdef
   have hg : ∀ k : Fin N, PB.gap lam (ψ, k) = g k - g (k + 1) := by
     intro k
@@ -37,24 +78,22 @@ private theorem sum_gap_of_le_eq {Ψ : Type} {N : ℕ} (lam : Ψ × Fin N → �
     split_ifs with h
     · simp
     · simp
-  calc
-    ∑ k : Fin N, (if j ≤ k then PB.gap lam (ψ, k) else 0)
-        = ∑ k : Fin N, (fun i : ℕ => if (j : ℕ) ≤ i then g i - g (i + 1) else 0) k := by
-      apply Finset.sum_congr rfl
-      intro k _
-      simp only [Fin.le_iff_val_le_val, hg]
+  calc ∑ k : Fin N, (if j ≤ k then PB.gap lam (ψ, k) else 0)
+      = ∑ k : Fin N, (fun i : ℕ => if (j : ℕ) ≤ i then g i - g (i + 1) else 0) k := by
+        apply Finset.sum_congr rfl
+        intro k _
+        simp only [Fin.le_iff_val_le_val, hg]
     _ = ∑ i ∈ Finset.range N, (if (j : ℕ) ≤ i then g i - g (i + 1) else 0) :=
-      Fin.sum_univ_eq_sum_range (fun i : ℕ => if (j : ℕ) ≤ i then g i - g (i + 1) else 0) N
+        Fin.sum_univ_eq_sum_range (fun i : ℕ => if (j : ℕ) ≤ i then g i - g (i + 1) else 0) N
     _ = g j - g N := telescope g j N j.2.le
     _ = lam (ψ, j) := by simp [hgdef]
 
-theorem sum_gap_mul {Ψ : Type} [Fintype Ψ] {N : ℕ} (lam f : Ψ × Fin N → ℝ)
-    : ∑ p, PB.gap lam p * ∑ k ∈ Finset.Iic p.2, f (p.1, k) = ∑ p, lam p * f p := by
+theorem sum_gap_mul {Ψ : Type} [Fintype Ψ] {N : ℕ} (lam f : Ψ × Fin N → ℝ) :
+    ∑ p, PB.gap lam p * ∑ k ∈ Finset.Iic p.2, f (p.1, k) = ∑ p, lam p * f p := by
   rw [Fintype.sum_prod_type, Fintype.sum_prod_type]
   apply Finset.sum_congr rfl
   intro ψ _
-  have hI
-      : ∀ k : Fin N, ∑ j ∈ Finset.Iic k, f (ψ, j) = ∑ j : Fin N, if j ≤ k then f (ψ, j) else 0 := by
+  have hI : ∀ k : Fin N, ∑ j ∈ Finset.Iic k, f (ψ, j) = ∑ j : Fin N, if j ≤ k then f (ψ, j) else 0 := by
     intro k
     rw [← Finset.sum_filter]
     apply Finset.sum_congr
@@ -73,10 +112,9 @@ theorem sum_gap_mul {Ψ : Type} [Fintype Ψ] {N : ℕ} (lam f : Ψ × Fin N → 
 
 variable {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)]
 
-theorem log_h_torus
-    (L : HermLine ι)
-    (c : K → ℂ) (z : (Σ k, ι k) → ℂ) (hc : ∀ k, c k ≠ 0) (hz : ∀ k, ∃ i, z ⟨k, i⟩ ≠ 0)
-    : Real.log (L.h (torusSmul c z)) = ∑ k, (L.a k : ℝ) * Real.log ‖c k‖ + Real.log (L.h z) := by
+theorem log_h_torus (L : HermLine ι) (c : K → ℂ) (z : (Σ k, ι k) → ℂ) (hc : ∀ k, c k ≠ 0)
+    (hz : ∀ k, ∃ i, z ⟨k, i⟩ ≠ 0) :
+    Real.log (L.h (torusSmul c z)) = ∑ k, (L.a k : ℝ) * Real.log ‖c k‖ + Real.log (L.h z) := by
   have hsm : L.h (torusSmul c z) = (∏ k, ‖c k‖ ^ L.a k) * L.h z := L.smul c z hc
   have hpos : 0 < L.h z := L.pos z hz
   have hprod : ∀ k ∈ (Finset.univ : Finset K), ‖c k‖ ^ L.a k ≠ 0 := by
@@ -88,49 +126,25 @@ theorem log_h_torus
   intro k _
   rw [Real.log_zpow]
 
-theorem contDiffAt_log_h
-    {L : HermLine ι} (hL : IsSmoothHerm L) (z : (Σ k, ι k) → ℂ) (hz : ∀ k, ∃ i, z ⟨k, i⟩ ≠ 0)
-    : ContDiffAt ℝ 2 (fun z => Real.log (L.h z)) z := by
-  have hopen : IsOpen {z : (Σ k, ι k) → ℂ | ∀ k, ∃ i, z ⟨k, i⟩ ≠ 0} := by
-    have hset
-        : {z : (Σ k, ι k) → ℂ | ∀ k, ∃ i, z ⟨k, i⟩ ≠ 0}
-          = ⋂ k, ⋃ i, {z : (Σ k, ι k) → ℂ | z ⟨k, i⟩ ≠ 0} := by
-      ext w
-      simp
-    rw [hset]
-    apply isOpen_iInter_of_finite
-    intro k
-    apply isOpen_iUnion
-    intro i
-    exact isOpen_ne_fun (continuous_apply _) continuous_const
-  have hh : ContDiffAt ℝ 2 L.h z := by
-    have h1 := hL.contDiffAt (hopen.mem_nhds hz)
-    exact h1.of_le (WithTop.coe_le_coe.mpr le_top)
-  exact hh.log (L.pos z hz).ne'
+theorem contDiffAt_log_h {L : HermLine ι} (hL : IsSmoothHerm L) (z : (Σ k, ι k) → ℂ)
+    (hz : ∀ k, ∃ i, z ⟨k, i⟩ ≠ 0) : ContDiffAt ℝ 2 (fun z => Real.log (L.h z)) z := by
+  apply GlobalTheory.CompanionTheory.Ar.PB.PosFs.contDiffAt_log_h <;> assumption
 
-theorem log_line_lift
-    {D : ℕ} {σ : Type} {S : PB.AnSys D σ} {P : Ideal (MRing ι)} (Re : PB.Realis S P) (a : σ)
-    (t : ℝ) (ht : 0 < t) (ht' : t ≤ S.t₀)
-    (x y : Re.R.X) (hy : y ∈ Re.R.U x)
-    : Real.log ((Re.line a t).h (Re.R.lift x y))
-      = Real.log ((Re.ref a).h (Re.R.lift x y)) + S.phT a t (Re.π y) := by
+theorem log_line_lift {D : ℕ} {σ : Type} {S : PB.AnSys D σ} {P : Ideal (MRing ι)} (Re : PB.Realis S P) (a : σ) (t : ℝ)
+    (ht : 0 < t) (ht' : t ≤ S.t₀) (x y : Re.R.X) (hy : y ∈ Re.R.U x) :
+    Real.log ((Re.line a t).h (Re.R.lift x y)) = Real.log ((Re.ref a).h (Re.R.lift x y)) + S.phT a t (Re.π y) := by
   obtain ⟨c, hc, h⟩ := Re.R.compat x y y ⟨hy, Re.R.mem_U y⟩
   have hz := (Re.R.mem y y (Re.R.mem_U y)).1
   change Re.R.lift x y = torusSmul c _ at h
   rw [h, log_h_torus _ c _ hc hz, log_h_torus _ c _ hc hz, Re.line_eq a t ht ht', Re.line_deg]
   ring
 
-theorem levi_chart_nonneg
-    {D : ℕ} {σ : Type} [Fintype σ]
-    {S : PB.AnSys D σ} {P : Ideal (MRing ι)} (Re : PB.Realis S P)
-    (t : ℝ) (ht : 0 < t) (ht' : t ≤ S.t₀)
-    (c : σ → ℝ) (hpsh : IsPsh S.A (PB.sumPot c fun a => S.potT a t))
+theorem levi_chart_nonneg {D : ℕ} {σ : Type} [Fintype σ] {S : PB.AnSys D σ} {P : Ideal (MRing ι)} (Re : PB.Realis S P)
+    (t : ℝ) (ht : 0 < t) (ht' : t ≤ S.t₀) (c : σ → ℝ) (hpsh : IsPsh S.A (PB.sumPot c fun a => S.potT a t))
     (x : Re.R.X) (F : Re.R.X → ℝ)
-    (hF : ∀ y ∈ Re.R.U x,
-      F y = ∑ a, c a * (Real.log ((Re.ref a).h (Re.R.lift x y)) + S.phT a t (Re.π y)))
-    (j : Fin Re.R.A.n) (hj : x ∈ (Re.R.A.chart j).source)
-    (u : Fin D → ℂ)
-    : 0 ≤ levi (fun v => F ((Re.R.A.chart j).symm v)) (Re.R.A.chart j x) u := by
+    (hF : ∀ y ∈ Re.R.U x, F y = ∑ a, c a * (Real.log ((Re.ref a).h (Re.R.lift x y)) + S.phT a t (Re.π y)))
+    (j : Fin Re.R.A.n) (hj : x ∈ (Re.R.A.chart j).source) (u : Fin D → ℂ) :
+    0 ≤ levi (fun v => F ((Re.R.A.chart j).symm v)) (Re.R.A.chart j x) u := by
   set χ := Re.R.A.chart j with hχ
   have hv0 : χ x ∈ χ.target := χ.map_source hj
   have hχx : χ.symm (χ x) = x := χ.left_inv hj
@@ -149,9 +163,7 @@ theorem levi_chart_nonneg
   have hψx : ψ (Re.π x) ∈ ψ.target := ψ.map_source hk
   have hψxl : ψ.symm (ψ (Re.π x)) = Re.π x := ψ.left_inv hk
   have hΦsm : ContDiffAt ℝ 2 (Φ ∘ ψ.symm) (ψ (Re.π x)) := by
-    have hfun
-        : Φ ∘ ψ.symm
-          = fun v => ∑ a, c a * ((S.th a).φ (Re.π x) (ψ.symm v) + S.phT a t (ψ.symm v)) := by
+    have hfun : Φ ∘ ψ.symm = fun v => ∑ a, c a * ((S.th a).φ (Re.π x) (ψ.symm v) + S.phT a t (ψ.symm v)) := by
       funext v
       exact hΦ _
     rw [hfun]
@@ -177,9 +189,8 @@ theorem levi_chart_nonneg
     have hfun : Gs ∘ χ.symm = fun v => ∑ a, (c a : ℂ) * (G a ∘ χ.symm) v := by
       funext v
       rfl
-    have hfun2
-        : (fun v => ∑ a, (c a : ℂ) * (G a ∘ χ.symm) v)
-          = ∑ a, (fun v => (c a : ℂ) * (G a ∘ χ.symm) v) := by
+    have hfun2 : (fun v => ∑ a, (c a : ℂ) * (G a ∘ χ.symm) v) =
+        ∑ a, (fun v => (c a : ℂ) * (G a ∘ χ.symm) v) := by
       funext v
       simp [Finset.sum_apply]
     rw [hfun, hfun2]
@@ -207,24 +218,19 @@ theorem levi_chart_nonneg
     show ψ.source ∈ 𝓝 (Re.π (χ.symm (χ x)))
     rw [hχx]
     exact ψ.open_source.mem_nhds hk
-  have heq
-      : (fun v => F (χ.symm v)) =ᶠ[𝓝 (χ x)]
-        (fun v => ((Φ ∘ ψ.symm) ∘ τ) v + 1 * ((Gs ∘ χ.symm) v).re) := by
+  have heq : (fun v => F (χ.symm v)) =ᶠ[𝓝 (χ x)]
+      (fun v => ((Φ ∘ ψ.symm) ∘ τ) v + 1 * ((Gs ∘ χ.symm) v).re) := by
     filter_upwards [hev1, hev2, hev3] with v h1 h2 h3
     have hl : ψ.symm (ψ (Re.π (χ.symm v))) = Re.π (χ.symm v) := ψ.left_inv h3
-    simp only [Function.comp_apply, hτd, hl, hΦ, hGsum, one_mul, Complex.re_sum,
-      Complex.re_ofReal_mul]
+    simp only [Function.comp_apply, hτd, hl, hΦ, hGsum, one_mul, Complex.re_sum, Complex.re_ofReal_mul]
     rw [hF _ h1, ← Finset.sum_add_distrib]
     apply Finset.sum_congr rfl
     intro a _
     have h := hGeq a (χ.symm v) (h2 a)
-    have h'
-        : Real.log ((Re.ref a).h (Re.R.lift x (χ.symm v))) - (S.th a).φ (Re.π x) (Re.π (χ.symm v))
-          = (G a (χ.symm v)).re :=
-      h
-    rw [show Real.log ((Re.ref a).h (Re.R.lift x (χ.symm v)))
-        = (S.th a).φ (Re.π x) (Re.π (χ.symm v)) + (G a (χ.symm v)).re by
-      linarith]
+    have h' : Real.log ((Re.ref a).h (Re.R.lift x (χ.symm v))) - (S.th a).φ (Re.π x) (Re.π (χ.symm v)) =
+        (G a (χ.symm v)).re := h
+    rw [show Real.log ((Re.ref a).h (Re.R.lift x (χ.symm v))) =
+        (S.th a).φ (Re.π x) (Re.π (χ.symm v)) + (G a (χ.symm v)).re by linarith]
     ring
   have hC1 : ContDiffAt ℝ 2 ((Φ ∘ ψ.symm) ∘ τ) (χ x) := by
     apply ContDiffAt.comp (χ x) (by rw [hτv0]; exact hΦsm)

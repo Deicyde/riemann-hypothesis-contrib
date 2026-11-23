@@ -1,10 +1,50 @@
 module
 
-public import Mathlib
+import Development.AbelianVarietyTheory.Proofs.FlagMeasures.LocInOfUniqOfDecLow
 public import Development.AbelianVarietyTheory.Definitions.SemilocalFrames.MatrixOfBesselTwoSidedAction
+public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.BesselOpNormPowerIntegralLtTopClosedSubgroupStatement
 public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.BesselRegularDoubleCosetPolynomialPropernessStatement
 public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.BesselSubgroupsClosedUnitaryWCompactStatement
-public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.BesselOpNormPowerIntegralLtTopClosedSubgroupStatement
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.LinearAlgebra.Matrix.FiniteDimensional
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -15,47 +55,25 @@ namespace GlobalTheory.SgInf.OrbNorm
 
 theorem continuous_opn {n : ℕ} : Continuous (opn : Matrix (Fin n) (Fin n) ℂ → ℝ) := by
   unfold opn
-  have h : Continuous (fun g : Matrix (Fin n) (Fin n) ℂ =>
-      Matrix.toEuclideanCLM (𝕜 := ℂ) (n := Fin n) g) :=
-    LinearMap.continuous_of_finiteDimensional ((Matrix.toEuclideanCLM (𝕜 := ℂ)
-      (n := Fin n)).toAlgEquiv.toLinearEquiv.toLinearMap)
+  have h : Continuous (fun g : Matrix (Fin n) (Fin n) ℂ => Matrix.toEuclideanCLM (𝕜 := ℂ) (n := Fin n) g) :=
+    LinearMap.continuous_of_finiteDimensional
+      ((Matrix.toEuclideanCLM (𝕜 := ℂ) (n := Fin n)).toAlgEquiv.toLinearEquiv.toLinearMap)
   exact continuous_norm.comp h
 
 theorem opn_pos {k r : ℕ} {g : Mat k r} (hg : g ∈ GG k r) : 0 < opn g := by
-  rcases (opn_nonneg g).lt_or_eq with h | h
-  · exact h
-  exfalso
-  have h0 : g = 0 := by
-    have h1 : Matrix.toEuclideanCLM (𝕜 := ℂ) (n := Fin (2 * r + k + 1)) g = 0 := by
-      rw [← norm_eq_zero]; exact h.symm
-    simpa using h1
-  have hg' : gᴴ * Hpk k r * g = Hpk k r := hg
-  rw [h0] at hg'
-  have hH : Hpk k r = 0 := by simpa using hg'.symm
-  have hr : r < 2 * r + k + 1 := by omega
-  have hent : Hpk k r ⟨r, hr⟩ ⟨r, hr⟩ = 0 := by rw [hH]; rfl
-  simp only [Hpk] at hent
-  split_ifs at hent
-  all_goals
-    first
-    | exact absurd ⟨le_refl r, Nat.le_add_right r k, trivial⟩ ‹¬(r ≤ r ∧ r ≤ r + k ∧ True)›
-    | norm_num at hent
+  apply GlobalTheory.Amp.LocalInputs.opn_pos <;> assumption
 
-theorem integrable_of_normInt {k r : ℕ} {μ : Measure (Mt k r)} {A : ℝ} (h : normInt μ A < ⊤)
-    : Integrable (fun x : Mt k r => opn (Matrix.of x) ^ (-A)) μ := by
+theorem integrable_of_normInt {k r : ℕ} {μ : Measure (Mt k r)} {A : ℝ} (h : normInt μ A < ⊤) :
+    Integrable (fun x : Mt k r => opn (Matrix.of x) ^ (-A)) μ := by
   have hm : Measurable (fun x : Mt k r => opn (Matrix.of x) ^ (-A)) :=
-    ((continuous_opn.comp
-      (continuous_id
-        : Continuous (fun x : Mt k r => (Matrix.of x : Mat k r)))).measurable).pow_const _
+    ((continuous_opn.comp (continuous_id : Continuous (fun x : Mt k r => (Matrix.of x : Mat k r)))).measurable).pow_const _
   refine ⟨hm.aestronglyMeasurable, ?_⟩
-  rw [hasFiniteIntegral_iff_ofReal (Filter.Eventually.of_forall fun x =>
-    Real.rpow_nonneg (opn_nonneg _) _)]
+  rw [hasFiniteIntegral_iff_ofReal (Filter.Eventually.of_forall fun x => Real.rpow_nonneg (opn_nonneg _) _)]
   exact h
 
-theorem rpow_le
-    {a a' x C0 A : ℝ} {M : ℕ}
-    (ha : 0 < a) (ha' : 0 < a') (hx : 0 ≤ x) (hC : 0 < C0) (hA : 0 ≤ A) (h : max a a' ≤ C0 * x ^ M)
-    : x ^ (-(2 * M * A)) ≤ C0 ^ (2 * A) * (a ^ (-A) * a' ^ (-A)) := by
+theorem rpow_le {a a' x C0 A : ℝ} {M : ℕ} (ha : 0 < a) (ha' : 0 < a') (hx : 0 ≤ x) (hC : 0 < C0)
+    (hA : 0 ≤ A) (h : max a a' ≤ C0 * x ^ M) :
+    x ^ (-(2 * M * A)) ≤ C0 ^ (2 * A) * (a ^ (-A) * a' ^ (-A)) := by
   have hy : 0 < x ^ M := by
     have h1 : 0 < max a a' := lt_max_of_lt_left ha
     exact pos_of_mul_pos_right (lt_of_lt_of_le h1 h) hC.le
@@ -74,29 +92,14 @@ theorem rpow_le
     have e2 : -A + -A = -(2 * A) := by ring
     rw [e1, e2, Real.rpow_zero, one_mul]
   rw [hx', ← key]
-  exact mul_le_mul_of_nonneg_left
-    (mul_le_mul h1 h2 (Real.rpow_nonneg hCy.le _) (Real.rpow_nonneg ha.le _))
+  exact mul_le_mul_of_nonneg_left (mul_le_mul h1 h2 (Real.rpow_nonneg hCy.le _) (Real.rpow_nonneg ha.le _))
     (Real.rpow_nonneg hC.le _)
 
-theorem orbNormInt_lt_top
-    : ∀ (k r : ℕ) (z z' : Fin (2 * r + k + 1) → ℂ) (μS μS' : Measure (Mt k r)) (b : ℝ)
-        (C : Set (Mat k r)),
-      inWb k r z → inWb k r z' → 0 < Tz k r z → 0 < Tz k r z' → IsHaarOn (Sset k r z) μS
-        → IsHaarOn (Sset k r z') μS'
-        → 2 * ((2 * (r ^ 2 + r + 1) : ℕ) : ℝ) * (2 * ((2 * r + k + 1 : ℕ) : ℝ) ^ 2) < b
-        → IsCompact C → C ⊆ Greg k r z z'
-        → (∀ γ ∈ C, orbNormInt μS μS' b γ < ⊤)
-          ∧ ∃ F : Mt k r × Mt k r → ℝ,
-            Integrable F (μS.prod μS')
-              ∧ ∀ γ ∈ C, ∀ p : Mt k r × Mt k r,
-                Matrix.of p.1 ∈ Sset k r z → Matrix.of p.2 ∈ Sset k r z'
-                  → opn (Matrix.of (act2 γ p)) ^ (-b) ≤ F p := by
+theorem orbNormInt_lt_top : ∀ (k r : ℕ) (z z' : Fin (2 * r + k + 1) → ℂ) (μS μS' : Measure (Mt k r)) (b : ℝ) (C : Set (Mat k r)), inWb k r z → inWb k r z' → 0 < Tz k r z → 0 < Tz k r z' → IsHaarOn (Sset k r z) μS → IsHaarOn (Sset k r z') μS' → 2 * ((2 * (r ^ 2 + r + 1) : ℕ) : ℝ) * (2 * ((2 * r + k + 1 : ℕ) : ℝ) ^ 2) < b → IsCompact C → C ⊆ Greg k r z z' → (∀ γ ∈ C, orbNormInt μS μS' b γ < ⊤) ∧ ∃ F : Mt k r × Mt k r → ℝ, Integrable F (μS.prod μS') ∧ ∀ γ ∈ C, ∀ p : Mt k r × Mt k r, Matrix.of p.1 ∈ Sset k r z → Matrix.of p.2 ∈ Sset k r z' → opn (Matrix.of (act2 γ p)) ^ (-b) ≤ F p := by
   intro k r z z' μS μS' b C hz hz' hT hT' hS hS' hb hC hCr
-  obtain ⟨C0, hC0, hbd⟩ :=
-    GlobalTheory.T.besselRegularDoubleCoset_polynomial_properness k r z z' C hz hz' hT hT' hC hCr
+  obtain ⟨C0, hC0, hbd⟩ := GlobalTheory.T.besselRegularDoubleCoset_polynomial_properness k r z z' C hz hz' hT hT' hC hCr
   obtain ⟨-, -, -, hSS, -⟩ := GlobalTheory.T.bessel_subgroups_closed_unitaryW_compact k r z hz hT
-  obtain ⟨-, -, -, hSS', -⟩ :=
-    GlobalTheory.T.bessel_subgroups_closed_unitaryW_compact k r z' hz' hT'
+  obtain ⟨-, -, -, hSS', -⟩ := GlobalTheory.T.bessel_subgroups_closed_unitaryW_compact k r z' hz' hT'
   set M : ℕ := 2 * (r ^ 2 + r + 1) with hM
   have hM0 : 0 < M := by rw [hM]; positivity
   have hMr : (0 : ℝ) < M := by exact_mod_cast hM0
@@ -109,21 +112,15 @@ theorem orbNormInt_lt_top
   have hbA : b = 2 * (M : ℝ) * A := by
     rw [hA]
     field_simp
-  have hi :=
-    integrable_of_normInt (GlobalTheory.T.besselOpNormPowerIntegral_lt_top_closedSubgroup k r
-      (Sset k r z) μS A hSS hS hA2)
-  have hi' :=
-    integrable_of_normInt (GlobalTheory.T.besselOpNormPowerIntegral_lt_top_closedSubgroup k r
-      (Sset k r z') μS' A hSS' hS' hA2)
+  have hi := integrable_of_normInt (GlobalTheory.T.besselOpNormPowerIntegral_lt_top_closedSubgroup k r (Sset k r z) μS A hSS hS hA2)
+  have hi' := integrable_of_normInt (GlobalTheory.T.besselOpNormPowerIntegral_lt_top_closedSubgroup k r (Sset k r z') μS' A hSS' hS' hA2)
   have : SigmaFinite μS := hS.1
   have : SigmaFinite μS' := hS'.1
   let F : Mt k r × Mt k r → ℝ := fun p =>
     C0 ^ (2 * A) * (opn (Matrix.of p.1) ^ (-A) * opn (Matrix.of p.2) ^ (-A))
   have hF : Integrable F (μS.prod μS') := (hi.mul_prod hi').const_mul _
-  have hbound
-      : ∀ γ ∈ C, ∀ p : Mt k r × Mt k r,
-        Matrix.of p.1 ∈ Sset k r z → Matrix.of p.2 ∈ Sset k r z'
-          → opn (Matrix.of (act2 γ p)) ^ (-b) ≤ F p := by
+  have hbound : ∀ γ ∈ C, ∀ p : Mt k r × Mt k r, Matrix.of p.1 ∈ Sset k r z → Matrix.of p.2 ∈ Sset k r z' →
+      opn (Matrix.of (act2 γ p)) ^ (-b) ≤ F p := by
     intro γ hγ p h1 h2
     have hg1 := opn_pos (hSS.1 h1)
     have hg2 := opn_pos (hSS'.1 h2)
@@ -134,21 +131,18 @@ theorem orbNormInt_lt_top
   have e1 : ∀ᵐ p ∂(μS.prod μS'), Matrix.of p.1 ∈ Sset k r z := by
     rw [ae_iff]
     refine measure_mono_null (t := {x : Mt k r | Matrix.of x ∉ Sset k r z} ×ˢ Set.univ)
-      (fun p hp => ⟨hp, trivial⟩)
-      ?_
+      (fun p hp => ⟨hp, trivial⟩) ?_
     rw [Measure.prod_prod, hS.2.2.1, zero_mul]
   have e2 : ∀ᵐ p ∂(μS.prod μS'), Matrix.of p.2 ∈ Sset k r z' := by
     rw [ae_iff]
     refine measure_mono_null (t := Set.univ ×ˢ {x : Mt k r | Matrix.of x ∉ Sset k r z'})
-      (fun p hp => ⟨trivial, hp⟩)
-      ?_
+      (fun p hp => ⟨trivial, hp⟩) ?_
     rw [Measure.prod_prod, hS'.2.2.1, mul_zero]
-  calc
-    orbNormInt μS μS' b γ ≤ ∫⁻ p, ENNReal.ofReal (F p) ∂(μS.prod μS') := by
-      unfold orbNormInt
-      apply lintegral_mono_ae
-      filter_upwards [e1, e2] with p h1 h2
-      exact ENNReal.ofReal_le_ofReal (hbound γ hγ p h1 h2)
+  calc orbNormInt μS μS' b γ ≤ ∫⁻ p, ENNReal.ofReal (F p) ∂(μS.prod μS') := by
+        unfold orbNormInt
+        apply lintegral_mono_ae
+        filter_upwards [e1, e2] with p h1 h2
+        exact ENNReal.ofReal_le_ofReal (hbound γ hγ p h1 h2)
     _ < ⊤ := hF.lintegral_lt_top
 
 end GlobalTheory.SgInf.OrbNorm

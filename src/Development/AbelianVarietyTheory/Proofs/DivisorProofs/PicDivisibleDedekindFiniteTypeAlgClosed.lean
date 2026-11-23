@@ -1,19 +1,72 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ConstantCoeffHasse
+public import Mathlib.FieldTheory.IsAlgClosed.Basic
+public import Mathlib.RingTheory.PicardGroup
+public import Mathlib.RingTheory.PowerSeries.Substitution
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.AlgebraMapQuotBijective
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsCompletionEmbedding
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.DegreeCountGenerates
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ClassGroupNthPowerOfCodimOneMod
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FiniteDimensionalBoundedIn
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.JetsMemSubalgebraOfFiniteType
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CcSubst
-public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsNeZeroForallPointExtendSubalgebra
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.HasseDerivativePowerSeriesMulSubstLeibnizStatement
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.HasseJetVanishingMemPowStatement
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ClassGroupNthPowerOfCodimOneMod
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.DegreeCountGenerates
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsCompletionEmbedding
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsFinrankQuotientSpanModEqOneStatement
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsSeparableNormalisationReducedFibresStatement
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FiniteDimensionalBoundedIn
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.HasseDerivativePowerSeriesMulSubstLeibnizStatement
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.HasseJetVanishingMemPowStatement
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.JetsMemSubalgebraOfFiniteType
+public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsNeZeroForallPointExtendSubalgebra
+import Mathlib.Algebra.AffineMonoid.UniqueSums
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Finiteness.ModuleFinitePresentation
+import Mathlib.RingTheory.Henselian
+public import Mathlib.RingTheory.PowerSeries.Inverse
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.TotallySplit
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
@@ -21,9 +74,9 @@ open Polynomial
 
 namespace GlobalTheory.PicDiv.FormalDeformHasse
 
-theorem constantCoeff_subst_eq
-    {k : Type} [Field k] (a φ : PowerSeries k) (ha : PowerSeries.constantCoeff a = 0)
-    : PowerSeries.constantCoeff (φ.subst a : PowerSeries k) = PowerSeries.constantCoeff φ := by
+theorem constantCoeff_subst_eq {k : Type} [Field k] (a φ : PowerSeries k)
+    (ha : PowerSeries.constantCoeff a = 0) :
+    PowerSeries.constantCoeff (φ.subst a : PowerSeries k) = PowerSeries.constantCoeff φ := by
   have hs := PowerSeries.HasSubst.of_constantCoeff_zero' ha
   rw [← PowerSeries.coeff_zero_eq_constantCoeff_apply, PowerSeries.coeff_subst' hs,
     finsum_eq_single _ 0]
@@ -31,14 +84,11 @@ theorem constantCoeff_subst_eq
   · intro d hd
     rw [PowerSeries.coeff_zero_eq_constantCoeff_apply, map_pow, ha, zero_pow hd, smul_zero]
 
-theorem not_mem_pow_succ
-    {A : Type} [CommRing A] [IsDedekindDomain A]
-    {N : ℕ} {I : Type} [Fintype I]
-    {D P₀ : Ideal A} {Q : I → Ideal A} {f₀ : A} (hP₀ : P₀.IsMaximal) (hQmax : ∀ i, (Q i).IsMaximal)
-    (hQinj : Function.Injective Q) (hQP : ∀ i, Q i ≠ P₀) (hDQ : ∀ i, ¬ D ≤ Q i) (hf₀ : f₀ ≠ 0)
-    (hspan : Ideal.span {f₀} = P₀ * D * ∏ i, Q i ^ N)
-    (i : I)
-    : f₀ ∉ Q i ^ (N + 1) := by
+theorem not_mem_pow_succ {A : Type} [CommRing A] [IsDedekindDomain A] {N : ℕ} {I : Type}
+    [Fintype I] {D P₀ : Ideal A} {Q : I → Ideal A} {f₀ : A} (hP₀ : P₀.IsMaximal)
+    (hQmax : ∀ i, (Q i).IsMaximal) (hQinj : Function.Injective Q) (hQP : ∀ i, Q i ≠ P₀)
+    (hDQ : ∀ i, ¬ D ≤ Q i) (hf₀ : f₀ ≠ 0)
+    (hspan : Ideal.span {f₀} = P₀ * D * ∏ i, Q i ^ N) (i : I) : f₀ ∉ Q i ^ (N + 1) := by
   classical
   intro hmem
   have hQne : Q i ≠ ⊥ := by
@@ -56,7 +106,8 @@ theorem not_mem_pow_succ
   · rcases hp.dvd_or_dvd h with h | h
     · exact hQP i (hP₀.eq_of_le (hQmax i).ne_top (Ideal.le_of_dvd h)).symm
     · exact hDQ i (Ideal.le_of_dvd h)
-  · have hex : ∀ s : Finset I, Q i ∣ ∏ j ∈ s, Q j ^ N → ∃ j ∈ s, Q i ∣ Q j ^ N := by
+  · have hex : ∀ s : Finset I, Q i ∣ ∏ j ∈ s, Q j ^ N →
+        ∃ j ∈ s, Q i ∣ Q j ^ N := by
       intro s
       induction s using Finset.induction_on with
       | empty =>
@@ -72,34 +123,16 @@ theorem not_mem_pow_succ
     have hle : Q j ≤ Q i := Ideal.le_of_dvd (hp.dvd_of_dvd_pow hji)
     exact (Finset.mem_erase.mp hj).1 (hQinj ((hQmax j).eq_of_le (hQmax i).ne_top hle))
 
-theorem coeff_map_sum
-    {k A : Type} [Field k] [CommRing A] [Algebra k A]
-    {m : ℕ}
-    (σ : A →ₐ[k] PowerSeries k) (v : Fin m → A) (c : Fin m → k) (l : ℕ)
-    : ∑ j, c j * PowerSeries.coeff l (σ (v j)) = PowerSeries.coeff l (σ (∑ j, c j • v j)) := by
-  set_option synthInstance.maxHeartbeats 100000 in
+theorem coeff_map_sum {k A : Type} [Field k] [CommRing A] [Algebra k A] {m : ℕ}
+    (σ : A →ₐ[k] PowerSeries k) (v : Fin m → A) (c : Fin m → k) (l : ℕ) :
+    ∑ j, c j * PowerSeries.coeff l (σ (v j)) = PowerSeries.coeff l (σ (∑ j, c j • v j)) := by
+
   simp [map_sum, map_smul]
 
-theorem formal_deformation
-    : ∀ (k A : Type) [Field k] [IsAlgClosed k] [CommRing A] [IsDedekindDomain A] [Algebra k A]
-        [Algebra.FiniteType k A] (N : ℕ) (I : Type) [Fintype I] (V : Submodule k A) (D P₀ : Ideal A)
-        (Q : I → Ideal A) (f₀ : A),
-      2 ≤ N → (N : k) ≠ 0 → P₀.IsMaximal
-        → (FiniteDimensional k V ∧ (∀ v ∈ V, v ∈ D) ∧ (∀ i, (Q i).IsMaximal) ∧ Function.Injective Q
-          ∧ (∀ i, Q i ≠ P₀) ∧ (∀ i, ¬ D ≤ Q i) ∧ ¬ D ≤ P₀ ∧ f₀ ∈ V ∧ f₀ ≠ 0
-          ∧ Ideal.span {f₀} = P₀ * D * ∏ i, Q i ^ N
-          ∧ (∀ u : A, ∃ v ∈ V, u - v ∈ P₀ * ∏ i, Q i ^ (N - 1)))
-        → ∃ (ξ : A →ₐ[k] PowerSeries k) (Δ : I → ℕ → A →ₗ[k] PowerSeries k) (m : ℕ) (v : Fin m → A)
-            (y : Fin m → PowerSeries k),
-          Function.Injective ξ ∧ (∀ i, Δ i 0 1 = 1)
-            ∧ (∀ i,
-              (∀ l, ∀ u w : A, Δ i l (u * w) = ∑ p ∈ Finset.range (l + 1), Δ i p u * Δ i (l - p) w))
-            ∧ (∀ i, ∃ π : A, Δ i 1 π = 1) ∧ (∀ j, v j ∈ V) ∧ LinearIndependent k v
-            ∧ (∃ j, IsUnit (y j)) ∧ ∑ j, y j * ξ (v j) = 0
-            ∧ (∀ i, ∀ l < N, ∑ j, y j * Δ i l (v j) = 0)
-            ∧ (∀ i i', i ≠ i' → ∃ u : A, IsUnit (Δ i 0 u - Δ i' 0 u))
-            ∧ (∀ i, ∃ u : A, IsUnit (Δ i 0 u - ξ u)) ∧ (∀ i, ∃ u ∈ D, IsUnit (Δ i 0 u))
-            ∧ (∃ u ∈ D, IsUnit (ξ u)) := by
+theorem formal_deformation : ∀ (k A : Type) [Field k] [IsAlgClosed k] [CommRing A] [IsDedekindDomain A] [Algebra k A] [Algebra.FiniteType k A] (N : ℕ) (I : Type) [Fintype I] (V : Submodule k A) (D P₀ : Ideal A) (Q : I → Ideal A) (f₀ : A), 2 ≤ N → (N : k) ≠ 0 → P₀.IsMaximal → (FiniteDimensional k V ∧ (∀ v ∈ V, v ∈ D) ∧ (∀ i, (Q i).IsMaximal) ∧ Function.Injective Q ∧ (∀ i, Q i ≠ P₀) ∧ (∀ i, ¬ D ≤ Q i) ∧ ¬ D ≤ P₀ ∧ f₀ ∈ V ∧ f₀ ≠ 0 ∧ Ideal.span {f₀} = P₀ * D * ∏ i, Q i ^ N ∧ (∀ u : A, ∃ v ∈ V, u - v ∈ P₀ * ∏ i, Q i ^ (N - 1))) → ∃ (ξ : A →ₐ[k] PowerSeries k) (Δ : I → ℕ → A →ₗ[k] PowerSeries k) (m : ℕ) (v : Fin m → A) (y : Fin m → PowerSeries k),
+  Function.Injective ξ ∧ (∀ i, Δ i 0 1 = 1) ∧ (∀ i, (∀ l, ∀ u w : A, Δ i l (u * w) = ∑ p ∈ Finset.range (l + 1), Δ i p u * Δ i (l - p) w)) ∧ (∀ i, ∃ π : A, Δ i 1 π = 1) ∧
+  (∀ j, v j ∈ V) ∧ LinearIndependent k v ∧ (∃ j, IsUnit (y j)) ∧ ∑ j, y j * ξ (v j) = 0 ∧ (∀ i, ∀ l < N, ∑ j, y j * Δ i l (v j) = 0) ∧
+  (∀ i i', i ≠ i' → ∃ u : A, IsUnit (Δ i 0 u - Δ i' 0 u)) ∧ (∀ i, ∃ u : A, IsUnit (Δ i 0 u - ξ u)) ∧ (∀ i, ∃ u ∈ D, IsUnit (Δ i 0 u)) ∧ (∃ u ∈ D, IsUnit (ξ u)) := by
   intro k A _ _ _ _ _ _ N I _ V D P₀ Q f₀ hN hNk hP₀ hyp
   obtain ⟨hVfin, hVD, hQmax, hQinj, hQP, hDQ, hDP, hf₀V, hf₀, hspan, hsurj⟩ := hyp
   classical
@@ -113,22 +146,20 @@ theorem formal_deformation
     have h2 : (∏ i, Q i ^ N) ≤ Q i ^ N :=
       Ideal.le_of_dvd (Finset.dvd_prod_of_mem (fun j => Q j ^ N) (Finset.mem_univ i))
     exact h2 (h1 (Ideal.mem_span_singleton_self f₀))
-  have hP₀ne : P₀ ≠ ⊥ := by rintro rfl; exact hf₀ ((Ideal.mem_bot).mp hf₀P)
+  have hP₀ne : P₀ ≠ ⊥ := by
+    rintro rfl; exact hf₀ ((Ideal.mem_bot).mp hf₀P)
   have hQne : ∀ i, Q i ≠ ⊥ := by
     intro i h
     have := hf₀Q i
     rw [h, Ideal.bot_pow (by omega), Ideal.mem_bot] at this
     exact hf₀ this
 
-  obtain ⟨σ₀, π₀, -, hσ₀inj, hσ₀pow, hσ₀surj⟩ :=
-    GlobalTheory.CurveCompletionG.exists_completion_embedding k A P₀ hP₀ hP₀ne
-  have hcomp := fun i =>
-    GlobalTheory.CurveCompletionG.exists_completion_embedding k A (Q i) (hQmax i) (hQne i)
+  obtain ⟨σ₀, π₀, -, hσ₀inj, hσ₀pow, hσ₀surj⟩ := GlobalTheory.CurveCompletionG.exists_completion_embedding k A P₀ hP₀ hP₀ne
+  have hcomp := fun i => GlobalTheory.CurveCompletionG.exists_completion_embedding k A (Q i) (hQmax i) (hQne i)
   choose σ π hσπ hσinj hσpow hσsurj using hcomp
-  have hzero
-      : ∀ (τ : A →ₐ[k] PowerSeries k) (R : Ideal A),
-        (∀ (m : ℕ) (u : A), u ∈ R ^ m ↔ (PowerSeries.X : PowerSeries k) ^ m ∣ τ u)
-          → ∀ u, u ∈ R ↔ PowerSeries.constantCoeff (τ u) = 0 := by
+  have hzero : ∀ (τ : A →ₐ[k] PowerSeries k) (R : Ideal A),
+      (∀ (m : ℕ) (u : A), u ∈ R ^ m ↔ (PowerSeries.X : PowerSeries k) ^ m ∣ τ u) →
+      ∀ u, u ∈ R ↔ PowerSeries.constantCoeff (τ u) = 0 := by
     intro τ R h u
     rw [← PowerSeries.X_dvd_iff, ← pow_one (PowerSeries.X : PowerSeries k), ← h 1 u, pow_one]
 
@@ -142,14 +173,12 @@ theorem formal_deformation
     simpa [v] using h
   let y₀ : Fin m → k := fun j => b.repr ⟨f₀, hf₀V⟩ j
   have hy₀ : ∑ j, y₀ j • v j = f₀ := hrepr ⟨f₀, hf₀V⟩
-  have hlin
-      : ∀ (τ : A →ₐ[k] PowerSeries k) (c : Fin m → k) (l : ℕ),
-        ∑ j, c j * PowerSeries.coeff l (τ (v j)) = PowerSeries.coeff l (τ (∑ j, c j • v j)) :=
+  have hlin : ∀ (τ : A →ₐ[k] PowerSeries k) (c : Fin m → k) (l : ℕ),
+      ∑ j, c j * PowerSeries.coeff l (τ (v j)) = PowerSeries.coeff l (τ (∑ j, c j • v j)) :=
     fun τ c l => coeff_map_sum τ v c l
-  have hlin0
-      : ∀ (τ : A →ₐ[k] PowerSeries k) (c : Fin m → k),
-        ∑ j, c j * PowerSeries.constantCoeff (τ (v j))
-          = PowerSeries.constantCoeff (τ (∑ j, c j • v j)) := by
+  have hlin0 : ∀ (τ : A →ₐ[k] PowerSeries k) (c : Fin m → k),
+      ∑ j, c j * PowerSeries.constantCoeff (τ (v j)) =
+        PowerSeries.constantCoeff (τ (∑ j, c j • v j)) := by
     intro τ c
     simpa [PowerSeries.coeff_zero_eq_constantCoeff_apply] using hlin τ c 0
   have h1 : ∑ j, y₀ j * PowerSeries.constantCoeff (σ₀ (v j)) = 0 := by
@@ -167,28 +196,26 @@ theorem formal_deformation
     rcases Nat.lt_succ_iff_lt_or_eq.mp hl with hl | rfl
     · exact PowerSeries.X_pow_dvd_iff.mp ((hσpow i N f₀).mp (hf₀Q i)) l hl
     · exact hc
-  have h4
-      : ∀ (e₀ : k) (e : I → ℕ → k), ∃ h : Fin m → k,
-        ∑ j, h j * PowerSeries.constantCoeff (σ₀ (v j)) = e₀
-          ∧ ∀ i, ∀ l, l + 1 < N → ∑ j, h j * PowerSeries.coeff l (σ i (v j)) = e i l := by
+  have h4 : ∀ (e₀ : k) (e : I → ℕ → k), ∃ h : Fin m → k,
+      ∑ j, h j * PowerSeries.constantCoeff (σ₀ (v j)) = e₀ ∧
+        ∀ i, ∀ l, l + 1 < N → ∑ j, h j * PowerSeries.coeff l (σ i (v j)) = e i l := by
     intro e₀ e
     obtain ⟨u₀, hu₀⟩ := hσ₀surj 1 (PowerSeries.C e₀)
     choose u hu using fun i => hσsurj i (N - 1) (PowerSeries.mk (e i))
     let P : Option I → Ideal A := fun o => o.elim P₀ Q
     let ex : Option I → ℕ := fun o => o.elim 1 (fun _ => N - 1)
-    obtain ⟨w, hw⟩ :=
-      IsDedekindDomain.exists_forall_sub_mem_ideal (s := Finset.univ) P ex
-        (by
-          rintro (_ | i) -
-          exacts [Ideal.prime_of_isPrime hP₀ne hP₀.isPrime,
-            Ideal.prime_of_isPrime (hQne i) (hQmax i).isPrime])
-        (by
-          rintro (_ | i) - (_ | j) - hij
-          · exact absurd rfl hij
-          · exact (hQP j).symm
-          · exact hQP i
-          · exact hQinj.ne (fun h => hij (by rw [h])))
-        (fun o => o.1.elim u₀ u)
+    obtain ⟨w, hw⟩ := IsDedekindDomain.exists_forall_sub_mem_ideal (s := Finset.univ) P ex
+      (by
+        rintro (_ | i) -
+        exacts [Ideal.prime_of_isPrime hP₀ne hP₀.isPrime,
+          Ideal.prime_of_isPrime (hQne i) (hQmax i).isPrime])
+      (by
+        rintro (_ | i) - (_ | j) - hij
+        · exact absurd rfl hij
+        · exact (hQP j).symm
+        · exact hQP i
+        · exact hQinj.ne (fun h => hij (by rw [h])))
+      (fun o => o.1.elim u₀ u)
     have hw₀ : w - u₀ ∈ P₀ := by simpa [P, ex] using hw none (Finset.mem_univ _)
     have hwi : ∀ i, w - u i ∈ Q i ^ (N - 1) := fun i => by
       simpa [P, ex] using hw (some i) (Finset.mem_univ _)
@@ -196,16 +223,14 @@ theorem formal_deformation
     have hv'P : v' - u₀ ∈ P₀ := by
       have : w - v' ∈ P₀ := Ideal.mul_le_left hv'
       have e1 : v' - u₀ = (w - u₀) - (w - v') := by ring
-      rw [e1]
-      exact P₀.sub_mem hw₀ this
+      rw [e1]; exact P₀.sub_mem hw₀ this
     have hv'Q : ∀ i, v' - u i ∈ Q i ^ (N - 1) := by
       intro i
       have h5 : (∏ i, Q i ^ (N - 1)) ≤ Q i ^ (N - 1) :=
         Ideal.le_of_dvd (Finset.dvd_prod_of_mem (fun j => Q j ^ (N - 1)) (Finset.mem_univ i))
       have : w - v' ∈ Q i ^ (N - 1) := h5 (Ideal.mul_le_right hv')
       have e1 : v' - u i = (w - u i) - (w - v') := by ring
-      rw [e1]
-      exact Ideal.sub_mem _ (hwi i) this
+      rw [e1]; exact Ideal.sub_mem _ (hwi i) this
     refine ⟨fun j => b.repr ⟨v', hv'V⟩ j, ?_, ?_⟩
     · rw [hlin0, hrepr ⟨v', hv'V⟩]
       have h6 : (PowerSeries.X : PowerSeries k) ^ 1 ∣ σ₀ v' - σ₀ u₀ := by
@@ -213,8 +238,7 @@ theorem formal_deformation
       have h7 : (PowerSeries.X : PowerSeries k) ∣ PowerSeries.C e₀ - σ₀ v' := by
         have := dvd_sub hu₀ h6
         rw [pow_one] at this
-        convert this using 1
-        ring
+        convert this using 1; ring
       rw [PowerSeries.X_dvd_iff, map_sub, PowerSeries.constantCoeff_C, sub_eq_zero] at h7
       exact h7.symm
     · intro i l hl
@@ -222,24 +246,18 @@ theorem formal_deformation
       have h6 : (PowerSeries.X : PowerSeries k) ^ (N - 1) ∣ σ i v' - σ i (u i) := by
         rw [← map_sub, ← hσpow i]; exact hv'Q i
       have h7 := PowerSeries.X_pow_dvd_iff.mp (dvd_sub (hu i) h6) l (by omega)
-      rw [show PowerSeries.mk (e i) - σ i (u i) - (σ i v' - σ i (u i))
-              = PowerSeries.mk (e i) - σ i v' by
-            ring,
-          map_sub, PowerSeries.coeff_mk, sub_eq_zero]
-        at h7
+      rw [show PowerSeries.mk (e i) - σ i (u i) - (σ i v' - σ i (u i)) =
+        PowerSeries.mk (e i) - σ i v' by ring, map_sub, PowerSeries.coeff_mk, sub_eq_zero] at h7
       exact h7.symm
-  obtain ⟨y, a, hy0, ha0, hyξ, hyΔ⟩ :=
-    GlobalTheory.PicDiv.DeformZerosHasse.deform k (Fin m) I N
-      (fun j => σ₀ (v j))
-      (fun i j => σ i (v j))
-      y₀ (by omega) hNk h1 h2 h3 h4
-  have hsub : ∀ i, PowerSeries.HasSubst (a i) := fun i =>
-    PowerSeries.HasSubst.of_constantCoeff_zero' (ha0 i)
+  obtain ⟨y, a, hy0, ha0, hyξ, hyΔ⟩ := GlobalTheory.PicDiv.DeformZerosHasse.deform k (Fin m) I N (fun j => σ₀ (v j))
+    (fun i j => σ i (v j)) y₀ (by omega) hNk h1 h2 h3 h4
+  have hsub : ∀ i, PowerSeries.HasSubst (a i) :=
+    fun i => PowerSeries.HasSubst.of_constantCoeff_zero' (ha0 i)
   let Δ : I → ℕ → A →ₗ[k] PowerSeries k := fun i l =>
-    (PowerSeries.substAlgHom (R := k) (hsub i)).toLinearMap ∘ₗ (GlobalTheory.PicDiv.hasse l)
-      ∘ₗ (σ i).toLinearMap
-  have hΔ
-      : ∀ i l u, Δ i l u = ((GlobalTheory.PicDiv.hasse l (σ i u)).subst (a i) : PowerSeries k) := by
+    (PowerSeries.substAlgHom (R := k) (hsub i)).toLinearMap ∘ₗ
+      (GlobalTheory.PicDiv.hasse l) ∘ₗ (σ i).toLinearMap
+  have hΔ : ∀ i l u, Δ i l u =
+      ((GlobalTheory.PicDiv.hasse l (σ i u)).subst (a i) : PowerSeries k) := by
     intro i l u
     simp only [Δ, LinearMap.coe_comp, Function.comp_apply, AlgHom.toLinearMap_apply,
       PowerSeries.coe_substAlgHom]
@@ -249,22 +267,19 @@ theorem formal_deformation
     exact constantCoeff_subst_eq _ _ (ha0 i)
   have hunit : ∀ φ : PowerSeries k, IsUnit φ ↔ PowerSeries.constantCoeff φ ≠ 0 := by
     intro φ; rw [PowerSeries.isUnit_iff_constantCoeff, isUnit_iff_ne_zero]
-  have hQσ : ∀ i u, u ∈ Q i ↔ PowerSeries.constantCoeff (σ i u) = 0 := fun i =>
-    hzero (σ i) (Q i) (hσpow i)
+  have hQσ : ∀ i u, u ∈ Q i ↔ PowerSeries.constantCoeff (σ i u) = 0 :=
+    fun i => hzero (σ i) (Q i) (hσpow i)
   have hPσ : ∀ u, u ∈ P₀ ↔ PowerSeries.constantCoeff (σ₀ u) = 0 := hzero σ₀ P₀ hσ₀pow
   refine ⟨σ₀, Δ, m, v, y, hσ₀inj, ?_, ?_, ?_, ?_, ?_, ?_, hyξ, ?_, ?_, ?_, ?_, ?_⟩
   · intro i
-    rw [hΔ, GlobalTheory.PicDiv.hasse_zero, map_one, ← PowerSeries.coe_substAlgHom (hsub i),
-      map_one]
+    rw [hΔ, GlobalTheory.PicDiv.hasse_zero, map_one, ← PowerSeries.coe_substAlgHom (hsub i), map_one]
   · intro i l u w
     simp only [hΔ, map_mul]
     exact GlobalTheory.T.hasseDerivativePowerSeries_mul_subst_leibniz k (a i) _ _ l (ha0 i)
   · intro i
     refine ⟨π i, ?_⟩
     have hX : GlobalTheory.PicDiv.hasse 1 (PowerSeries.X : PowerSeries k) = 1 := by
-      ext n
-      rw [GlobalTheory.PicDiv.coeff_hasse, PowerSeries.coeff_X, PowerSeries.coeff_one]
-      rcases n with _ | n <;> simp
+      ext n; rw [GlobalTheory.PicDiv.coeff_hasse, PowerSeries.coeff_X, PowerSeries.coeff_one]; rcases n with _ | n <;> simp
     rw [hΔ, hσπ, hX, ← PowerSeries.coe_substAlgHom (hsub i), map_one]
   · intro j; exact (b j).2
   · exact b.linearIndependent.map' V.subtype (Submodule.ker_subtype V)
@@ -280,7 +295,8 @@ theorem formal_deformation
   · intro i l hl
     simpa only [hΔ] using hyΔ i l hl
   · intro i i' hii'
-    have hle : ¬ Q i' ≤ Q i := fun h => hii' (hQinj ((hQmax i').eq_of_le (hQmax i).ne_top h)).symm
+    have hle : ¬ Q i' ≤ Q i := fun h =>
+      hii' (hQinj ((hQmax i').eq_of_le (hQmax i).ne_top h)).symm
     obtain ⟨u, hu', hu⟩ := SetLike.not_le_iff_exists.mp hle
     refine ⟨u, ?_⟩
     rw [hunit, map_sub, hcc, hcc, (hQσ i' u).mp hu', sub_zero]
@@ -306,22 +322,18 @@ end GlobalTheory.PicDiv.FormalDeformHasse
 namespace GlobalTheory.PicDiv
 namespace GenericSpecialHasse
 
-theorem ext_unit_ne
-    {k R : Type} [Field k] [CommRing R] [IsDomain R] [Algebra k R]
-    (S : Subalgebra k R) (L : R →ₗ[k] k)
-    (hone : L 1 = 1) (hmul : ∀ x ∈ S, ∀ z ∈ S, L (x * z) = L x * L z)
-    (x : R) (hx : x ∈ S) (hu : IsUnit x) (hi : Ring.inverse x ∈ S)
-    : L x ≠ 0 := by
+theorem ext_unit_ne {k R : Type} [Field k] [CommRing R] [IsDomain R] [Algebra k R]
+    (S : Subalgebra k R) (L : R →ₗ[k] k) (hone : L 1 = 1)
+    (hmul : ∀ x ∈ S, ∀ z ∈ S, L (x * z) = L x * L z) (x : R) (hx : x ∈ S) (hu : IsUnit x)
+    (hi : Ring.inverse x ∈ S) : L x ≠ 0 := by
   intro h
   have e := hmul x hx _ hi
   rw [Ring.mul_inverse_cancel x hu, hone, h, zero_mul] at e
   exact one_ne_zero e
 
-theorem lin_eq_of_zero_iff
-    {k A : Type} [Field k] [CommRing A] [Algebra k A]
-    (g h : A →ₗ[k] k) (hg : g 1 = 1) (hh : h 1 = 1) (hk : ∀ u, g u = 0 ↔ h u = 0)
-    (u : A)
-    : g u = h u := by
+theorem lin_eq_of_zero_iff {k A : Type} [Field k] [CommRing A] [Algebra k A]
+    (g h : A →ₗ[k] k) (hg : g 1 = 1) (hh : h 1 = 1) (hk : ∀ u, g u = 0 ↔ h u = 0) (u : A) :
+    g u = h u := by
   have h1 : g (u - g u • 1) = 0 := by simp [hg]
   have h2 := (hk _).1 h1
   rw [map_sub, map_smul, hh, smul_eq_mul, mul_one, sub_eq_zero] at h2
@@ -329,51 +341,14 @@ theorem lin_eq_of_zero_iff
 
 end GenericSpecialHasse
 
-theorem specialise_generic_solution_hasse
-    : ∀ (k A : Type) [Field k] [IsAlgClosed k] [CommRing A] [IsDedekindDomain A] [Algebra k A]
-        [Algebra.FiniteType k A] (R : Type) [CommRing R] [IsDomain R] [Algebra k R] (N : ℕ)
-        (I : Type) [Fintype I] (V : Submodule k A) (D : Ideal A),
-      2 ≤ N
-        → (∃ (ξ : A →ₐ[k] R) (Δ : I → ℕ → A →ₗ[k] R) (m : ℕ) (v : Fin m → A) (y : Fin m → R),
-          Function.Injective ξ ∧ (∀ i, Δ i 0 1 = 1)
-            ∧ (∀ i,
-              (∀ l, ∀ u w : A, Δ i l (u * w) = ∑ p ∈ Finset.range (l + 1), Δ i p u * Δ i (l - p) w))
-            ∧ (∀ i, ∃ π : A, Δ i 1 π = 1) ∧ (∀ j, v j ∈ V) ∧ LinearIndependent k v
-            ∧ (∃ j, IsUnit (y j)) ∧ ∑ j, y j * ξ (v j) = 0
-            ∧ (∀ i, ∀ l < N, ∑ j, y j * Δ i l (v j) = 0)
-            ∧ (∀ i i', i ≠ i' → ∃ u : A, IsUnit (Δ i 0 u - Δ i' 0 u))
-            ∧ (∀ i, ∃ u : A, IsUnit (Δ i 0 u - ξ u)) ∧ (∀ i, ∃ u ∈ D, IsUnit (Δ i 0 u))
-            ∧ (∃ u ∈ D, IsUnit (ξ u)))
-        → ∃ a : A,
-          a ≠ 0
-            ∧ ∀ P : Ideal A,
-              P.IsMaximal → a ∉ P
-                → ∃ (Q' : I → Ideal A) (f : A),
-                  (∀ i, (Q' i).IsMaximal) ∧ Function.Injective Q' ∧ (∀ i, Q' i ≠ P)
-                    ∧ (∀ i, ¬ D ≤ Q' i) ∧ ¬ D ≤ P ∧ f ∈ V ∧ f ≠ 0 ∧ f ∈ P ∧ ∀ i, f ∈ Q' i ^ N := by
+theorem specialise_generic_solution_hasse : ∀ (k A : Type) [Field k] [IsAlgClosed k] [CommRing A] [IsDedekindDomain A] [Algebra k A] [Algebra.FiniteType k A] (R : Type) [CommRing R] [IsDomain R] [Algebra k R] (N : ℕ) (I : Type) [Fintype I] (V : Submodule k A) (D : Ideal A), 2 ≤ N → (∃ (ξ : A →ₐ[k] R) (Δ : I → ℕ → A →ₗ[k] R) (m : ℕ) (v : Fin m → A) (y : Fin m → R),
+  Function.Injective ξ ∧ (∀ i, Δ i 0 1 = 1) ∧ (∀ i, (∀ l, ∀ u w : A, Δ i l (u * w) = ∑ p ∈ Finset.range (l + 1), Δ i p u * Δ i (l - p) w)) ∧ (∀ i, ∃ π : A, Δ i 1 π = 1) ∧
+  (∀ j, v j ∈ V) ∧ LinearIndependent k v ∧ (∃ j, IsUnit (y j)) ∧ ∑ j, y j * ξ (v j) = 0 ∧ (∀ i, ∀ l < N, ∑ j, y j * Δ i l (v j) = 0) ∧
+  (∀ i i', i ≠ i' → ∃ u : A, IsUnit (Δ i 0 u - Δ i' 0 u)) ∧ (∀ i, ∃ u : A, IsUnit (Δ i 0 u - ξ u)) ∧ (∀ i, ∃ u ∈ D, IsUnit (Δ i 0 u)) ∧ (∃ u ∈ D, IsUnit (ξ u))) → ∃ a : A, a ≠ 0 ∧ ∀ P : Ideal A, P.IsMaximal → a ∉ P → ∃ (Q' : I → Ideal A) (f : A), (∀ i, (Q' i).IsMaximal) ∧ Function.Injective Q' ∧ (∀ i, Q' i ≠ P) ∧ (∀ i, ¬ D ≤ Q' i) ∧ ¬ D ≤ P ∧ f ∈ V ∧ f ≠ 0 ∧ f ∈ P ∧ ∀ i, f ∈ Q' i ^ N := by
   intro k A _ _ _ _ _ _ R _ _ _ N I _ V D hN hex
   classical
-  obtain ⟨
-      ξ,
-      Δ,
-      m,
-      v,
-      y,
-      hinj,
-      h01,
-      hleib,
-      hπ,
-      hvV,
-      hli,
-      ⟨j0, hj0⟩,
-      heq0,
-      heqΔ,
-      hsep,
-      hsepξ,
-      hD,
-      hDξ
-    ⟩ :=
-    hex
+  obtain ⟨ξ, Δ, m, v, y, hinj, h01, hleib, hπ, hvV, hli, ⟨j0, hj0⟩, heq0, heqΔ, hsep, hsepξ,
+    hD, hDξ⟩ := hex
   have hsep' : ∀ p : I × I, ∃ u : A, p.1 ≠ p.2 → IsUnit (Δ p.1 0 u - Δ p.2 0 u) := by
     intro p
     by_cases hp : p.1 = p.2
@@ -385,99 +360,79 @@ theorem specialise_generic_solution_hasse
   choose uD huDmem huD using hD
   obtain ⟨u0, hu0D, hu0⟩ := hDξ
   choose TJ hTJ using fun i => GlobalTheory.PicDiv.jets_mem_subalgebra_of_finiteType k A R N (Δ i) (h01 i) (hleib i)
-  let T : Finset R :=
-    Finset.univ.biUnion TJ ∪ Finset.univ.image y
-      ∪ Finset.univ.image (fun p : I × I => Ring.inverse (Δ p.1 0 (us p) - Δ p.2 0 (us p)))
-      ∪ Finset.univ.image (fun i => Ring.inverse (Δ i 0 (uξ i) - ξ (uξ i)))
-      ∪ Finset.univ.image (fun i => Ring.inverse (Δ i 0 (uD i)))
-      ∪ {Ring.inverse (ξ u0), Ring.inverse (y j0)}
-  obtain ⟨a, S, hξS, ha0, hTS, hspec⟩ :=
-    GlobalTheory.exists_ne_zero_forall_point_extend_subalgebra k A R ξ hinj T
+  let T : Finset R := Finset.univ.biUnion TJ ∪ Finset.univ.image y ∪
+    Finset.univ.image (fun p : I × I => Ring.inverse (Δ p.1 0 (us p) - Δ p.2 0 (us p))) ∪
+    Finset.univ.image (fun i => Ring.inverse (Δ i 0 (uξ i) - ξ (uξ i))) ∪
+    Finset.univ.image (fun i => Ring.inverse (Δ i 0 (uD i))) ∪
+    {Ring.inverse (ξ u0), Ring.inverse (y j0)}
+  obtain ⟨a, S, hξS, ha0, hTS, hspec⟩ := GlobalTheory.exists_ne_zero_forall_point_extend_subalgebra k A R ξ hinj T
   refine ⟨a, ha0, ?_⟩
   intro P hPmax haP
   obtain ⟨-, φ, hφ⟩ := (GlobalTheory.DedekindCodimG.dedekind_finiteType_codim k A).2.1 P hPmax
   obtain ⟨ψ, hψ⟩ := hspec φ (fun h => haP ((hφ a).2 h))
-  obtain ⟨L, hL⟩ :=
-    LinearMap.exists_extend (ψ.toLinearMap.comp (LinearEquiv.refl k
-      (Subalgebra.toSubmodule S)).toLinearMap)
+  obtain ⟨L, hL⟩ := LinearMap.exists_extend (ψ.toLinearMap.comp
+    (LinearEquiv.refl k (Subalgebra.toSubmodule S)).toLinearMap)
   have hLS : ∀ x (hx : x ∈ S), L x = ψ ⟨x, hx⟩ := by
     intro x hx
     exact LinearMap.congr_fun hL ⟨x, hx⟩
   have hone : L 1 = 1 := by rw [hLS 1 S.one_mem]; exact map_one ψ
   have hmul : ∀ x ∈ S, ∀ z ∈ S, L (x * z) = L x * L z := by
     intro x hx z hz
-    rw [hLS _ (S.mul_mem hx hz), hLS x hx, hLS z hz, ← map_mul]
-    rfl
+    rw [hLS _ (S.mul_mem hx hz), hLS x hx, hLS z hz, ← map_mul]; rfl
   have hLξ : ∀ u, L (ξ u) = φ u := fun u => by rw [hLS _ (hξS u), hψ]
   have hSΔ : ∀ i l, l < N → ∀ u, Δ i l u ∈ S := fun i =>
-    hTJ i S (fun t ht =>
-      hTS t (by
-        simp only [T, Finset.mem_union, Finset.mem_biUnion]
-        exact Or.inl (Or.inl (Or.inl (Or.inl (Or.inl ⟨i, Finset.mem_univ _, ht⟩))))))
+    hTJ i S (fun t ht => hTS t (by simp only [T, Finset.mem_union, Finset.mem_biUnion]; exact Or.inl (Or.inl (Or.inl (Or.inl (Or.inl ⟨i, Finset.mem_univ _, ht⟩))))))
   have hy : ∀ j, y j ∈ S := fun j => hTS _ (by simp [T])
   have hN0 : 0 < N := by omega
   have hN1 : 1 < N := by omega
   let Δ' : I → ℕ → A →ₗ[k] k := fun i l => if l < N then L ∘ₗ Δ i l else 0
-  have hΔ' : ∀ i l, l < N → ∀ u, Δ' i l u = L (Δ i l u) := by intro i l h u; simp [Δ', h]
-  have hjet
-      : ∀ i, ∃ Q : Ideal A,
-        Q.IsMaximal ∧ (∀ u, u ∈ Q ↔ Δ' i 0 u = 0)
-          ∧ ∀ f : A, (∀ l < N, Δ' i l f = 0) → f ∈ Q ^ N := by
+  have hΔ' : ∀ i l, l < N → ∀ u, Δ' i l u = L (Δ i l u) := by
+    intro i l h u; simp [Δ', h]
+  have hjet : ∀ i, ∃ Q : Ideal A, Q.IsMaximal ∧ (∀ u, u ∈ Q ↔ Δ' i 0 u = 0) ∧
+      ∀ f : A, (∀ l < N, Δ' i l f = 0) → f ∈ Q ^ N := by
     intro i
     apply GlobalTheory.T.exists_maximal_mem_pow_of_hasse_vanishing k A N (Δ' i) hN
     · rw [hΔ' i 0 hN0, h01 i, hone]
     · intro l hl u w
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [hΔ' i l hl, hleib i l u w, map_sum]
+
+      rw [hΔ' i l hl, hleib i l u w, map_sum]
       refine Finset.sum_congr rfl fun p hp => ?_
       have hp' : p < l + 1 := Finset.mem_range.1 hp
-      rw [hmul _ (hSΔ i p (by omega) u) _ (hSΔ i (l - p) (by omega) w), hΔ' i p (by omega),
-        hΔ' i (l - p) (by omega)]
+      rw [hmul _ (hSΔ i p (by omega) u) _ (hSΔ i (l - p) (by omega) w),
+        hΔ' i p (by omega), hΔ' i (l - p) (by omega)]
     · obtain ⟨π, hπ'⟩ := hπ i
       exact ⟨π, by rw [hΔ' i 1 hN1, hπ', hone]⟩
   choose Q' hQmax hQmem hQpow using hjet
-  have hunit : ∀ x ∈ S, IsUnit x → Ring.inverse x ∈ S → L x ≠ 0 := fun x hx hu hi =>
-    GenericSpecialHasse.ext_unit_ne S L hone hmul x hx hu hi
+  have hunit : ∀ x ∈ S, IsUnit x → Ring.inverse x ∈ S → L x ≠ 0 :=
+    fun x hx hu hi => GenericSpecialHasse.ext_unit_ne S L hone hmul x hx hu hi
   let f : A := ∑ j, L (y j) • v j
   refine ⟨Q', f, hQmax, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_⟩
-  · intro i i' hii'
+  ·
+    intro i i' hii'
     by_contra hne
     have hu := hus (i, i') hne
     set u := us (i, i')
-    have heqv :=
-      GenericSpecialHasse.lin_eq_of_zero_iff (Δ' i 0) (Δ' i' 0) (by rw [hΔ' i 0 hN0, h01 i, hone])
-        (by rw [hΔ' i' 0 hN0, h01 i', hone])
-        (fun w => by rw [← hQmem, ← hQmem, hii'])
-        u
+    have heqv := GenericSpecialHasse.lin_eq_of_zero_iff (Δ' i 0) (Δ' i' 0)
+      (by rw [hΔ' i 0 hN0, h01 i, hone]) (by rw [hΔ' i' 0 hN0, h01 i', hone])
+      (fun w => by rw [← hQmem, ← hQmem, hii']) u
     rw [hΔ' i 0 hN0, hΔ' i' 0 hN0] at heqv
     refine hunit _ (S.sub_mem (hSΔ i 0 hN0 u) (hSΔ i' 0 hN0 u)) hu
-      (hTS _ (by
-        simp only [T, Finset.mem_union, Finset.mem_image]
-        exact Or.inl (Or.inl (Or.inl (Or.inr ⟨(i, i'), Finset.mem_univ _, rfl⟩)))))
-      ?_
+      (hTS _ (by simp only [T, Finset.mem_union, Finset.mem_image]; exact Or.inl (Or.inl (Or.inl (Or.inr ⟨(i, i'), Finset.mem_univ _, rfl⟩))))) ?_
     rw [map_sub, heqv, sub_self]
   · intro i hiP
     have hu := huξ i
-    have heqv :=
-      GenericSpecialHasse.lin_eq_of_zero_iff (Δ' i 0) φ.toLinearMap
-        (by rw [hΔ' i 0 hN0, h01 i, hone]) (map_one φ)
-        (fun w => by rw [← hQmem, hiP, hφ]; rfl)
-        (uξ i)
+    have heqv := GenericSpecialHasse.lin_eq_of_zero_iff (Δ' i 0) φ.toLinearMap
+      (by rw [hΔ' i 0 hN0, h01 i, hone]) (map_one φ)
+      (fun w => by rw [← hQmem, hiP, hφ]; rfl) (uξ i)
     rw [hΔ' i 0 hN0, AlgHom.toLinearMap_apply, ← hLξ] at heqv
     refine hunit _ (S.sub_mem (hSΔ i 0 hN0 _) (hξS _)) hu
-      (hTS _ (by
-        simp only [T, Finset.mem_union, Finset.mem_image]
-        exact Or.inl (Or.inl (Or.inr ⟨i, Finset.mem_univ _, rfl⟩))))
-      ?_
+      (hTS _ (by simp only [T, Finset.mem_union, Finset.mem_image]; exact Or.inl (Or.inl (Or.inr ⟨i, Finset.mem_univ _, rfl⟩)))) ?_
     rw [map_sub, heqv, sub_self]
   · intro i hDQ
     have h0 : Δ' i 0 (uD i) = 0 := (hQmem i _).1 (hDQ (huDmem i))
     rw [hΔ' i 0 hN0] at h0
     exact hunit _ (hSΔ i 0 hN0 _) (huD i)
-      (hTS _ (by
-        simp only [T, Finset.mem_union, Finset.mem_image]
-        exact Or.inl (Or.inr ⟨i, Finset.mem_univ _, rfl⟩)))
-      h0
+      (hTS _ (by simp only [T, Finset.mem_union, Finset.mem_image]; exact Or.inl (Or.inr ⟨i, Finset.mem_univ _, rfl⟩))) h0
   · intro hDP
     have h0 : φ u0 = 0 := (hφ u0).1 (hDP hu0D)
     rw [← hLξ] at h0
@@ -488,8 +443,8 @@ theorem specialise_generic_solution_hasse
     exact hunit _ (hy j0) hj0 (hTS _ (by simp [T])) this
   · apply (hφ f).2
     have : φ f = L (∑ j, y j * ξ (v j)) := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [f, map_sum, map_smul, smul_eq_mul]
+
+      simp only [f, map_sum, map_smul, smul_eq_mul]
       refine Finset.sum_congr rfl fun j _ => ?_
       rw [hmul _ (hy j) _ (hξS _), hLξ]
     rw [this, heq0, map_zero]
@@ -497,8 +452,8 @@ theorem specialise_generic_solution_hasse
     apply hQpow i
     intro l hl
     have : Δ' i l f = L (∑ j, y j * Δ i l (v j)) := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [f, map_sum, map_smul, smul_eq_mul]
+
+      simp only [f, map_sum, map_smul, smul_eq_mul]
       refine Finset.sum_congr rfl fun j _ => ?_
       rw [hmul _ (hy j) _ (hSΔ i l hl _), hΔ' i l hl]
     rw [this, heqΔ i l hl, map_zero]
@@ -507,25 +462,23 @@ end GlobalTheory.PicDiv
 
 namespace GlobalTheory.PicDiv
 
-theorem classGroup_mk0_mul_mul_pow_eq_one_of_span_eq
-    {A : Type} [CommRing A] [IsDedekindDomain A]
-    (N : ℕ) (P D C : Ideal A) (f : A)
-    (hP : P ∈ nonZeroDivisors (Ideal A)) (hD : D ∈ nonZeroDivisors (Ideal A))
-    (hC : C ∈ nonZeroDivisors (Ideal A)) (h : Ideal.span {f} = P * D * C ^ N)
-    : ClassGroup.mk0 ⟨P, hP⟩ * ClassGroup.mk0 ⟨D, hD⟩ * ClassGroup.mk0 ⟨C, hC⟩ ^ N = 1 := by
+theorem classGroup_mk0_mul_mul_pow_eq_one_of_span_eq {A : Type} [CommRing A] [IsDedekindDomain A]
+    (N : ℕ) (P D C : Ideal A) (f : A) (hP : P ∈ nonZeroDivisors (Ideal A))
+    (hD : D ∈ nonZeroDivisors (Ideal A)) (hC : C ∈ nonZeroDivisors (Ideal A))
+    (h : Ideal.span {f} = P * D * C ^ N) :
+    ClassGroup.mk0 ⟨P, hP⟩ * ClassGroup.mk0 ⟨D, hD⟩ * ClassGroup.mk0 ⟨C, hC⟩ ^ N = 1 := by
   rw [← map_pow, ← map_mul, ← map_mul]
-  have hm : P * D * C ^ N ∈ nonZeroDivisors (Ideal A) := mul_mem (mul_mem hP hD) (pow_mem hC N)
+  have hm : P * D * C ^ N ∈ nonZeroDivisors (Ideal A) :=
+    mul_mem (mul_mem hP hD) (pow_mem hC N)
   have e : (⟨P, hP⟩ * ⟨D, hD⟩ * ⟨C, hC⟩ ^ N : nonZeroDivisors (Ideal A)) = ⟨P * D * C ^ N, hm⟩ :=
     Subtype.ext (by simp)
   rw [e, ClassGroup.mk0_eq_one_iff, ← h]
   exact ⟨⟨f, rfl⟩⟩
 
-theorem prod_maximal_mem_nonZeroDivisors
-    {A : Type} [CommRing A] [IsDedekindDomain A]
-    {I : Type} [Fintype I]
-    (Q : I → Ideal A) (hQ : ∀ i, (Q i).IsMaximal)
-    (P₀ : Ideal A) (hP₀ : P₀.IsMaximal) (h₀ : P₀ ≠ ⊥)
-    : (∏ i, Q i) ∈ nonZeroDivisors (Ideal A) := by
+theorem prod_maximal_mem_nonZeroDivisors {A : Type} [CommRing A] [IsDedekindDomain A]
+    {I : Type} [Fintype I] (Q : I → Ideal A) (hQ : ∀ i, (Q i).IsMaximal)
+    (P₀ : Ideal A) (hP₀ : P₀.IsMaximal) (h₀ : P₀ ≠ ⊥) :
+    (∏ i, Q i) ∈ nonZeroDivisors (Ideal A) := by
   refine prod_mem fun i _ => mem_nonZeroDivisors_of_ne_zero ?_
   intro hi
   have hb : (⊥ : Ideal A).IsMaximal := by
@@ -533,39 +486,24 @@ theorem prod_maximal_mem_nonZeroDivisors
     rwa [hi] at this
   exact h₀ (hb.eq_of_le hP₀.ne_top bot_le).symm
 
-theorem exists_classGroup_mk0_eq_mul_pow_reduced
-    : ∀ (k A : Type) [Field k] [IsAlgClosed k] [CommRing A] [IsDedekindDomain A] [Algebra k A]
-        [Algebra k[X] A] [IsScalarTower k k[X] A] [Module.Finite k[X] A] [Module.Free k[X] A],
-      (∃ δ : k[X],
-          δ ≠ 0
-            ∧ ∀ α : k,
-              δ.eval α ≠ 0 → ∀ Q : Ideal A, Q.IsMaximal → algebraMap k[X] A (X - C α) ∉ Q ^ 2)
-        → ∀ (N : ℕ),
-          2 ≤ N → (N : k) ≠ 0
-            → ∀ P₀ : Ideal A,
-              P₀.IsMaximal
-                → ∀ h₀ : P₀ ∈ nonZeroDivisors (Ideal A), ∃ a : A,
-                  a ≠ 0
-                    ∧ ∀ P : Ideal A,
-                      P.IsMaximal → a ∉ P
-                        → ∀ h : P ∈ nonZeroDivisors (Ideal A), ∃ d : ClassGroup A,
-                          ClassGroup.mk0 ⟨P, h⟩ = ClassGroup.mk0 ⟨P₀, h₀⟩ * d ^ N := by
+theorem exists_classGroup_mk0_eq_mul_pow_reduced :
+    ∀ (k A : Type) [Field k] [IsAlgClosed k] [CommRing A] [IsDedekindDomain A]
+      [Algebra k A] [Algebra k[X] A] [IsScalarTower k k[X] A] [Module.Finite k[X] A]
+      [Module.Free k[X] A], (∃ δ : k[X], δ ≠ 0 ∧ ∀ α : k, δ.eval α ≠ 0 → ∀ Q : Ideal A, Q.IsMaximal → algebraMap k[X] A (X - C α) ∉ Q ^ 2) → ∀ (N : ℕ), 2 ≤ N → (N : k) ≠ 0 → ∀ P₀ : Ideal A, P₀.IsMaximal →
+      ∀ h₀ : P₀ ∈ nonZeroDivisors (Ideal A), ∃ a : A, a ≠ 0 ∧ ∀ P : Ideal A, P.IsMaximal →
+        a ∉ P → ∀ h : P ∈ nonZeroDivisors (Ideal A), ∃ d : ClassGroup A,
+          ClassGroup.mk0 ⟨P, h⟩ = ClassGroup.mk0 ⟨P₀, h₀⟩ * d ^ N := by
   intro k A _ _ _ _ _ _ _ _ _ hred N hN hNk P₀ hP₀ h₀
   haveI : Algebra.FiniteType k A :=
     Algebra.FiniteType.trans (S := k[X]) inferInstance inferInstance
-  obtain ⟨r, V, D, Q, f₀, hset, hdeg⟩ :=
-    GlobalTheory.PicDiv.linear_system_setup k A hred N P₀ (by omega) hP₀
-  have hform :=
-    GlobalTheory.PicDiv.FormalDeformHasse.formal_deformation k A N (Fin r) V D P₀ Q f₀ hN hNk hP₀
-      hset
-  obtain ⟨a, ha, hall⟩ :=
-    GlobalTheory.PicDiv.specialise_generic_solution_hasse k A (PowerSeries k) N (Fin r) V D hN hform
+  obtain ⟨r, V, D, Q, f₀, hset, hdeg⟩ := GlobalTheory.PicDiv.linear_system_setup k A hred N P₀ (by omega) hP₀
+  have hform := GlobalTheory.PicDiv.FormalDeformHasse.formal_deformation k A N (Fin r) V D P₀ Q f₀ hN hNk hP₀ hset
+  obtain ⟨a, ha, hall⟩ := GlobalTheory.PicDiv.specialise_generic_solution_hasse k A (PowerSeries k) N (Fin r) V D hN hform
   obtain ⟨-, hVD, hQ, -, -, -, -, -, hf₀, hspan₀, -⟩ := hset
   refine ⟨a, ha, fun P hP haP h => ?_⟩
   obtain ⟨Q', f, hQ', hinj, hne, hDQ', hDP, hfV, hf, hfP, hfQ'⟩ := hall P hP haP
-  have hspan :=
-    GlobalTheory.PicDiv.degree_count_generates k A N (Fin r) D P₀ P Q Q' f₀ f hP₀ hP hQ hQ' hinj hne
-      hDQ' hDP hf₀ hf hspan₀ (hVD f hfV) hfP hfQ' (hdeg f hfV hf)
+  have hspan := GlobalTheory.PicDiv.degree_count_generates k A N (Fin r) D P₀ P Q Q' f₀ f hP₀ hP hQ hQ' hinj hne hDQ' hDP
+    hf₀ hf hspan₀ (hVD f hfV) hfP hfQ' (hdeg f hfV hf)
   have hP₀ne : P₀ ≠ ⊥ := nonZeroDivisors.ne_zero h₀
   have hD : D ∈ nonZeroDivisors (Ideal A) := by
     refine mem_nonZeroDivisors_of_ne_zero ?_
@@ -593,13 +531,10 @@ end GlobalTheory.PicDiv
 
 namespace GlobalTheory.PicDiv
 
-theorem injective_of_finite_not_field
-    (k B : Type) [Field k] [IsAlgClosed k] [CommRing B] [IsDomain B] [Algebra k B]
-    (y : B) (hfin : (Polynomial.aeval (R := k) y).Finite)
-    (hB : ¬ IsField B)
-    : Function.Injective (Polynomial.aeval (R := k) y) := by
-  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
-    rw [injective_iff_map_eq_zero]
+theorem injective_of_finite_not_field (k B : Type) [Field k] [IsAlgClosed k] [CommRing B] [IsDomain B]
+    [Algebra k B] (y : B) (hfin : (Polynomial.aeval (R := k) y).Finite) (hB : ¬ IsField B) :
+    Function.Injective (Polynomial.aeval (R := k) y) := by
+  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
   intro p hp
   by_contra hp0
   have hint : IsIntegral k y := (isAlgebraic_iff_isIntegral).mp ⟨p, hp0, hp⟩
@@ -628,17 +563,14 @@ theorem injective_of_finite_not_field
     intro b _
     exact key b (by rw [hs]; trivial)
   haveI : Module.Finite k B := ⟨⟨s, hk⟩⟩
-  exact hB ((Algebra.IsIntegral.isField_iff_isField (algebraMap k B).injective).mp
-    (Field.toIsField k))
+  exact hB ((Algebra.IsIntegral.isField_iff_isField (algebraMap k B).injective).mp (Field.toIsField k))
 
 end GlobalTheory.PicDiv
 
 namespace GlobalTheory.PicDiv
 
-theorem pic_divisible
-    : ∀ (k B : Type) [Field k] [IsAlgClosed k] [CommRing B] [IsDomain B] [IsDedekindDomain B]
-        [Algebra k B] [Algebra.FiniteType k B] (q : ℕ),
-      IsUnit (q : k) → ∀ c : CommRing.Pic B, ∃ d, d ^ q = c := by
+theorem pic_divisible : ∀ (k B : Type) [Field k] [IsAlgClosed k] [CommRing B] [IsDomain B] [IsDedekindDomain B]
+    [Algebra k B] [Algebra.FiniteType k B] (q : ℕ), IsUnit (q : k) → ∀ c : CommRing.Pic B, ∃ d, d ^ q = c := by
   intro k B _ _ _ _ _ _ _ q hq c
   suffices h : ∀ c : ClassGroup B, ∃ d, d ^ q = c by
     obtain ⟨d, hd⟩ := h ((ClassGroup.equivPic B).symm c)
@@ -659,23 +591,17 @@ theorem pic_divisible
     exact ⟨⟨1, by simp⟩⟩
   rcases Nat.lt_or_ge q 2 with h1 | h2
   · have : q = 1 := by omega
-    subst this
-    exact ⟨c, pow_one c⟩
+    subst this; exact ⟨c, pow_one c⟩
   obtain ⟨y, hfin, hred⟩ := GlobalTheory.T.exists_separable_normalization_reduced_fibers k B hfield
   letI : Algebra k[X] B := (Polynomial.aeval y).toRingHom.toAlgebra
   have hmap : ∀ p : k[X], algebraMap k[X] B p = Polynomial.aeval y p := fun p => rfl
   haveI : IsScalarTower k k[X] B := IsScalarTower.of_algebraMap_eq (fun c => by
     rw [hmap, Polynomial.algebraMap_eq, Polynomial.aeval_C])
   haveI : Module.Finite k[X] B := hfin
-  have hinj : Function.Injective (algebraMap k[X] B) :=
-    injective_of_finite_not_field k B y hfin hfield
+  have hinj : Function.Injective (algebraMap k[X] B) := injective_of_finite_not_field k B y hfin hfield
   haveI : Module.IsTorsionFree k[X] B := Module.isTorsionFree_iff_algebraMap_injective.mpr hinj
   haveI : Module.Free k[X] B := Module.free_of_finite_type_torsion_free'
-  have hred'
-      : (∃ δ : k[X],
-        δ ≠ 0
-          ∧ ∀ α : k,
-            δ.eval α ≠ 0 → ∀ Q : Ideal B, Q.IsMaximal → algebraMap k[X] B (X - C α) ∉ Q ^ 2) := by
+  have hred' : (∃ δ : k[X], δ ≠ 0 ∧ ∀ α : k, δ.eval α ≠ 0 → ∀ Q : Ideal B, Q.IsMaximal → algebraMap k[X] B (X - C α) ∉ Q ^ 2) := by
     obtain ⟨δ, hδ0, hδ⟩ := hred
     refine ⟨δ, hδ0, fun α hα Q hQ => ?_⟩
     rw [hmap, map_sub, Polynomial.aeval_X, Polynomial.aeval_C]

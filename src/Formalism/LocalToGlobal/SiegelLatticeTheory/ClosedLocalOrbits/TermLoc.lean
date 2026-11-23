@@ -1,10 +1,55 @@
 module
 
-public import Mathlib
 public import Formalism.SharpRestriction.CuspSpanNormBounds.LocalGroupInFamilyNontrivial
 public import Formalism.SharpRestriction.CuspSpanNormBounds.IsTermOver
 public import Formalism.LocalToGlobal.SiegelLatticeTheory.ClosedLocalOrbits.Saturated
 public import Formalism.LocalRingCardinality.SpanPowerMembership.ExampleLayerExistsGenerators
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Coalgebra.IsFrobenius
+import Mathlib.RingTheory.HopfAlgebra.Basic
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.TotallySplit
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
@@ -14,8 +59,7 @@ open scoped Classical BigOperators
 
 namespace Formalism.L2.SG.TermLoc
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions.S
-  Formalism.MainNotions.S.Lat Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.TermDef
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.TermDef
   Formalism.L2.SG.Saturated ValuativeRel
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
@@ -35,19 +79,17 @@ def gramV (i j : Fin (nV D)) : D.host.E := brS (VS D) ((VS D).frame i) ((VS D).f
 
 variable {D}
 
-def LocFacts₂ (M : ∀ p : PlF D, Loc.Model (D.s.atP p).Fp (D.s.atP p).Ep) (p : PlF D) (x y : Vp D p)
-    : (D.s.atP p).Ep :=
+def LocFacts₂ (M : ∀ p : PlF D, Loc.Model (D.s.atP p).Fp (D.s.atP p).Ep) (p : PlF D) (x y : Vp D p) :
+    (D.s.atP p).Ep :=
   ∑ i, ∑ j, x i * (M p).L.cj (y j) * (D.s.atP p).ιE (gramV D i j)
 
 theorem star_gramV (i j : Fin (nV D)) : star (gramV D i j) = gramV D j i := by
   simp only [gramV, brS]
   exact (VS D).herm.eq _ _
 
-theorem cj_iota
-    {M : ∀ p : PlF D, Loc.Model (D.s.atP p).Fp (D.s.atP p).Ep} {p : PlF D}
-    (hcj : (M p).L.cj = (D.s.atP p).cj)
-    (z : D.host.E)
-    : (M p).L.cj ((D.s.atP p).ιE z) = (D.s.atP p).ιE (star z) := by
+theorem cj_iota {M : ∀ p : PlF D, Loc.Model (D.s.atP p).Fp (D.s.atP p).Ep} {p : PlF D}
+    (hcj : (M p).L.cj = (D.s.atP p).cj) (z : D.host.E) :
+    (M p).L.cj ((D.s.atP p).ιE z) = (D.s.atP p).ιE (star z) := by
   rw [hcj, (D.s.atP p).cj_ιE, D.conjF_eq, Formalism.BasicNotions.Examples₂.star_eq_conj]
 
 theorem gram_det_ne : (Matrix.of (gramV D)).det ≠ 0 := by
@@ -60,17 +102,15 @@ theorem gram_det_ne : (Matrix.of (gramV D)).det ≠ 0 := by
     intro j
     have := congrFun hv j
     simp only [Matrix.vecMul, dotProduct, Matrix.of_apply, Pi.zero_apply, gramV, brS] at this
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hw, map_sum]
+
+    rw [hw, map_sum]
     simpa [map_smul, smul_eq_mul] using this
   have hall : (VS D).hT.flip w = 0 := b.ext fun j => by simpa using hj j
-  have hw0 : w = 0 :=
-    (VS D).nondeg.2 w fun x => by
-      have := congrArg (fun f => f x) hall
-      simpa using this
+  have hw0 : w = 0 := (VS D).nondeg.2 w fun x => by
+    have := congrArg (fun f => f x) hall
+    simpa using this
   have := (Fintype.linearIndependent_iff.1 b.linearIndependent) v (by rw [← hw]; exact hw0)
-  funext i
-  exact this i
+  funext i; exact this i
 
 instance ntEp (p : PlF D) : Nontrivial (D.s.atP p).Ep := by
   by_contra h
@@ -79,25 +119,21 @@ instance ntEp (p : PlF D) : Nontrivial (D.s.atP p).Ep := by
   rw [Module.finrank_zero_of_subsingleton] at this
   omega
 
-theorem localForm_single
-    (M : ∀ p : PlF D, Loc.Model (D.s.atP p).Fp (D.s.atP p).Ep)
-    (p : PlF D) (x : Vp D p)
-    (j : Fin (nV D))
-    : LocFacts₂ M p x (Pi.single j 1)
-      = Matrix.vecMul x ((Matrix.of (gramV D)).map (D.s.atP p).ιE) j := by
+theorem localForm_single (M : ∀ p : PlF D, Loc.Model (D.s.atP p).Fp (D.s.atP p).Ep) (p : PlF D) (x : Vp D p)
+    (j : Fin (nV D)) :
+    LocFacts₂ M p x (Pi.single j 1) = Matrix.vecMul x ((Matrix.of (gramV D)).map (D.s.atP p).ιE) j := by
   simp [LocFacts₂, Matrix.vecMul, dotProduct, Pi.single_apply, apply_ite, Finset.sum_ite_eq']
 
-def locHerm
-    (M : ∀ p : PlF D, Loc.Model (D.s.atP p).Fp (D.s.atP p).Ep) (p : PlF D)
-    (hcj : (M p).L.cj = (D.s.atP p).cj)
-    : Loc.HermSp (M p) (Vp D p) where
+def locHerm (M : ∀ p : PlF D, Loc.Model (D.s.atP p).Fp (D.s.atP p).Ep) (p : PlF D)
+    (hcj : (M p).L.cj = (D.s.atP p).cj) : Loc.HermSp (M p) (Vp D p) where
   h := LocFacts₂ M p
-  h_add_left x x' y := by simp only [LocFacts₂, Pi.add_apply, add_mul, Finset.sum_add_distrib]
+  h_add_left x x' y := by
+    simp only [LocFacts₂, Pi.add_apply, add_mul, Finset.sum_add_distrib]
   h_smul_left a x y := by
     simp only [LocFacts₂, Pi.smul_apply, smul_eq_mul, Finset.mul_sum, mul_assoc]
   h_herm x y := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [LocFacts₂, map_sum, map_mul, (M p).L.cj_cj, cj_iota hcj, star_gramV]
+
+    simp only [LocFacts₂, map_sum, map_mul, (M p).L.cj_cj, cj_iota hcj, star_gramV]
     rw [Finset.sum_comm]
     refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
     ring
@@ -105,9 +141,7 @@ def locHerm
     have h0 : Matrix.vecMul x ((Matrix.of (gramV D)).map (D.s.atP p).ιE) = 0 := by
       funext j; rw [← localForm_single]; exact hx _
     have hu : IsUnit ((Matrix.of (gramV D)).map (D.s.atP p).ιE).det := by
-      have e
-          : ((Matrix.of (gramV D)).map (D.s.atP p).ιE).det
-            = (D.s.atP p).ιE (Matrix.of (gramV D)).det := by
+      have e : ((Matrix.of (gramV D)).map (D.s.atP p).ιE).det = (D.s.atP p).ιE (Matrix.of (gramV D)).det := by
         rw [RingHom.map_det]; rfl
       rw [e]
       exact (isUnit_iff_ne_zero.2 gram_det_ne).map _
@@ -122,43 +156,35 @@ theorem finrank_Vp (p : PlF D) : Module.finrank (D.s.atP p).Ep (Vp D p) = D.R.r 
   rw [D.sp.Y_rank 0 (Nat.zero_le _)]
   simp [Ranks.rankY]
 
-theorem baseChange_smul₂ (p : PlF D) (a : D.host.E) (x : (VS D).V)
-    : baseChange₂ D p ((a • x : (VS D).V))
-      = ((D.s.atP p).ιE a : (D.s.atP p).Ep) • (baseChange₂ D p x : Vp D p) := by
+theorem baseChange_smul₂ (p : PlF D) (a : D.host.E) (x : (VS D).V) :
+    baseChange₂ D p ((a • x : (VS D).V)) = ((D.s.atP p).ιE a : (D.s.atP p).Ep) • (baseChange₂ D p x : Vp D p) := by
   funext i
-  simp only [baseChange₂, AddMonoidHom.coe_mk, ZeroHom.coe_mk, Pi.smul_apply, smul_eq_mul,
-    LinearEquiv.map_smul, Finsupp.smul_apply, map_mul]
+  simp only [baseChange₂, AddMonoidHom.coe_mk, ZeroHom.coe_mk, Pi.smul_apply, smul_eq_mul, LinearEquiv.map_smul,
+    Finsupp.smul_apply, map_mul]
 
-theorem baseChangeAt_frame (p : PlF D) (i : Fin (nV D))
-    : baseChange₂ D p ((VS D).frame i) = Pi.single i 1 := by
+theorem baseChangeAt_frame (p : PlF D) (i : Fin (nV D)) : baseChange₂ D p ((VS D).frame i) = Pi.single i 1 := by
   funext j; simp [baseChange₂, Finsupp.single_apply, Pi.single_apply, eq_comm, apply_ite]
 
-theorem span_baseChange_eq_top (p : PlF D)
-    : Submodule.span (D.s.atP p).Ep (Set.range (baseChange₂ D p)) = ⊤ := by
+theorem span_baseChange_eq_top (p : PlF D) : Submodule.span (D.s.atP p).Ep (Set.range (baseChange₂ D p)) = ⊤ := by
   rw [eq_top_iff, ← (Pi.basisFun (D.s.atP p).Ep (Fin (nV D))).span_eq]
   apply Submodule.span_mono
   rintro _ ⟨i, rfl⟩
   exact ⟨(VS D).frame i, by rw [baseChangeAt_frame, Pi.basisFun_apply]⟩
 
-theorem baseChangeAt_form
-    (M : ∀ p : PlF D, Loc.Model (D.s.atP p).Fp (D.s.atP p).Ep) (p : PlF D)
-    (hcj : (M p).L.cj = (D.s.atP p).cj)
-    (x y : (VS D).V)
-    : LocFacts₂ M p (baseChange₂ D p x) (baseChange₂ D p y) = (D.s.atP p).ιE (brS (VS D) x y) := by
-  have key
-      : (VS D).hT y x
-        = ∑ j, ∑ i, star ((VS D).frame.repr y j) *
-          ((VS D).frame.repr x i * (VS D).hT ((VS D).frame j) ((VS D).frame i)) := by
+theorem baseChangeAt_form (M : ∀ p : PlF D, Loc.Model (D.s.atP p).Fp (D.s.atP p).Ep) (p : PlF D)
+    (hcj : (M p).L.cj = (D.s.atP p).cj) (x y : (VS D).V) :
+    LocFacts₂ M p (baseChange₂ D p x) (baseChange₂ D p y) = (D.s.atP p).ιE (brS (VS D) x y) := by
+  have key : (VS D).hT y x = ∑ j, ∑ i, star ((VS D).frame.repr y j) *
+      ((VS D).frame.repr x i * (VS D).hT ((VS D).frame j) ((VS D).frame i)) := by
     conv_lhs => rw [← (VS D).frame.sum_repr y, ← (VS D).frame.sum_repr x]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_smulₛₗ, smul_eq_mul, starRingEnd_apply, LinearMap.sum_apply,
-        LinearMap.smul_apply, RingHom.id_apply, Finset.mul_sum]
+
+    simp only [map_sum, map_smulₛₗ, smul_eq_mul, starRingEnd_apply, LinearMap.sum_apply, LinearMap.smul_apply,
+    RingHom.id_apply, Finset.mul_sum]
     rw [Finset.sum_comm]
     refine Finset.sum_congr rfl fun j _ => Finset.sum_congr rfl fun i _ => ?_
     ring
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [LocFacts₂, brS, key, baseChange₂, AddMonoidHom.coe_mk, ZeroHom.coe_mk, cj_iota hcj,
-      map_sum, map_mul, gramV]
+
+  simp only [LocFacts₂, brS, key, baseChange₂, AddMonoidHom.coe_mk, ZeroHom.coe_mk, cj_iota hcj, map_sum, map_mul, gramV]
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
   ring
@@ -172,11 +198,13 @@ theorem LocDat.hcj (Z : LocDat D) (p : PlF D) : (Z.M p).L.cj = (D.s.atP p).cj :=
 
 def locH (Z : LocDat D) (p : PlF D) : Loc.HermSp (Z.M p) (Vp D p) := locHerm Z.M p (Z.hcj p)
 
+
 variable (D) in
 def sgnP (p : PlF D) (a : Fin (D.R.rS + 1)) : (D.s.atP p).Ep :=
   match (D.s.atP p).split with
   | some sg => sg.e.symm ((-1) ^ (D.R.rS - a.val), 1)
   | none => 1
+
 
 variable (D) in
 def sgnP' (p : PlF D) (b : Fin (D.R.rS + 1)) : (D.s.atP p).Ep :=
@@ -189,11 +217,8 @@ theorem localSign_sq (p : PlF D) (a : Fin (D.R.rS + 1)) : sgnP D p a * sgnP D p 
   split
   · rename_i sg _
     rw [← map_mul]
-    have h
-        : (((-1 : (D.s.atP p).Fp) ^ (D.R.rS - a.val), (1 : (D.s.atP p).Fp))
-              * ((-1) ^ (D.R.rS - a.val), 1)
-            : (D.s.atP p).Fp × (D.s.atP p).Fp)
-          = 1 := by
+    have h : (((-1 : (D.s.atP p).Fp) ^ (D.R.rS - a.val), (1 : (D.s.atP p).Fp)) *
+        ((-1) ^ (D.R.rS - a.val), 1) : (D.s.atP p).Fp × (D.s.atP p).Fp) = 1 := by
       ext <;> simp [← mul_pow]
     rw [h, map_one]
   · exact one_mul 1
@@ -204,35 +229,32 @@ theorem sgnP'_sq (p : PlF D) (b : Fin (D.R.rS + 1)) : sgnP' D p b * sgnP' D p b 
   · exact localSign_sq p b
   · rw [← mul_pow]; simp
 
+
 variable (D) in
-def lattice₂
-    (M : ∀ p : PlF D, Loc.Model (D.s.atP p).Fp (D.s.atP p).Ep) (p : PlF D)
-    (Λ : Submodule (𝓞 D.host.E) (VS D).V)
-    : Submodule (M p).L.O (Vp D p) :=
+def lattice₂ (M : ∀ p : PlF D, Loc.Model (D.s.atP p).Fp (D.s.atP p).Ep) (p : PlF D)
+    (Λ : Submodule (𝓞 D.host.E) (VS D).V) : Submodule (M p).L.O (Vp D p) :=
   Submodule.span (M p).L.O (baseChange₂ D p '' (Λ : Set (VS D).V))
 
+
 variable (D) in
-def admXi
-    (Λ : Submodule (𝓞 D.host.E) (VS D).V)
-    {T T' : D.host.E} (F : LFlag (D.sp.Y 0) D.R.rS T) (F' : LFlag (D.sp.Y 0) D.R.rS T')
-    : Matrix (Fin (D.R.rS + 1)) (Fin (D.R.rS + 1)) (𝓞 D.host.E) :=
+def admXi (Λ : Submodule (𝓞 D.host.E) (VS D).V) {T T' : D.host.E} (F : LFlag (D.sp.Y 0) D.R.rS T)
+    (F' : LFlag (D.sp.Y 0) D.R.rS T') : Matrix (Fin (D.R.rS + 1)) (Fin (D.R.rS + 1)) (𝓞 D.host.E) :=
   if h : IsAdmissible Λ (gS D) F F' then h.choose else 1
 
-theorem admissibility_witness_unitriangular
-    (Λ : Submodule (𝓞 D.host.E) (VS D).V)
-    {T T' : D.host.E} (F : LFlag (D.sp.Y 0) D.R.rS T) (F' : LFlag (D.sp.Y 0) D.R.rS T')
-    : (∀ a b, b < a → admXi D Λ F F' a b = 0) ∧ (∀ a, admXi D Λ F F' a a = 1) := by
+theorem admissibility_witness_unitriangular (Λ : Submodule (𝓞 D.host.E) (VS D).V) {T T' : D.host.E} (F : LFlag (D.sp.Y 0) D.R.rS T)
+    (F' : LFlag (D.sp.Y 0) D.R.rS T') :
+    (∀ a b, b < a → admXi D Λ F F' a b = 0) ∧ (∀ a, admXi D Λ F F' a a = 1) := by
   unfold admXi
   split_ifs with h
   · exact ⟨h.choose_spec.1, h.choose_spec.2.1⟩
   · exact ⟨fun a b hab => Matrix.one_apply_ne (ne_of_lt hab).symm, fun a => Matrix.one_apply_eq a⟩
 
-theorem inv_unitri
-    {n : ℕ} {R : Type*} [CommRing R]
-    (ξ : Matrix (Fin n) (Fin n) R) (h1 : ∀ a b, b < a → ξ a b = 0) (h2 : ∀ a, ξ a a = 1)
-    : (∀ a b, b < a → ξ⁻¹ a b = 0) ∧ (∀ a, ξ⁻¹ a a = 1) := by
+theorem inv_unitri {n : ℕ} {R : Type*} [CommRing R] (ξ : Matrix (Fin n) (Fin n) R)
+    (h1 : ∀ a b, b < a → ξ a b = 0) (h2 : ∀ a, ξ a a = 1) :
+    (∀ a b, b < a → ξ⁻¹ a b = 0) ∧ (∀ a, ξ⁻¹ a a = 1) := by
   have hbt : ξ.BlockTriangular id := fun i j hij => h1 i j hij
-  have hdet : ξ.det = 1 := by rw [Matrix.det_of_isUpperTriangular hbt]; simp [h2]
+  have hdet : ξ.det = 1 := by
+    rw [Matrix.det_of_isUpperTriangular hbt]; simp [h2]
   have hu : IsUnit ξ.det := by rw [hdet]; exact isUnit_one
   let _inst : Invertible ξ := ξ.invertibleOfIsUnitDet hu
   have hbt' : ξ⁻¹.BlockTriangular id := Matrix.blockTriangular_inv_of_blockTriangular hbt
@@ -246,66 +268,50 @@ theorem inv_unitri
     · rw [h1 k a hk, mul_zero]
   · intro h; exact absurd (Finset.mem_univ a) h
 
-def locTerm
-    (Z : LocDat D) (p : PlF D) (Λ : Submodule (𝓞 D.host.E) (VS D).V)
-    {T T' : D.host.E} (F : LFlag (D.sp.Y 0) D.R.rS T) (F' : LFlag (D.sp.Y 0) D.R.rS T')
-    (Tn T'n : ℕ)
-    : Loc.Term (Vp D p) (Z.M p) D.R.rS where
+def locTerm (Z : LocDat D) (p : PlF D) (Λ : Submodule (𝓞 D.host.E) (VS D).V) {T T' : D.host.E}
+    (F : LFlag (D.sp.Y 0) D.R.rS T) (F' : LFlag (D.sp.Y 0) D.R.rS T') (Tn T'n : ℕ) :
+    Loc.Term (Vp D p) (Z.M p) D.R.rS where
   abelian₂ := lattice₂ D Z.M p Λ
   f a := (sgnP D p a * frFac Z.δ p a) • baseChange₂ D p (frame F a)
   f' b := (sgnP' D p b * frFac Z.δ p b) • baseChange₂ D p (frameAct (frame F') (admXi D Λ F F')⁻¹ b)
   T := (Tn : (D.s.atP p).Fp)
   T' := (T'n : (D.s.atP p).Fp)
 
-def locBBne
-    (Z : LocDat D) (p : PlF D) (Λ : Submodule (𝓞 D.host.E) (VS D).V)
-    {T T' : D.host.E} (F : LFlag (D.sp.Y 0) D.R.rS T) (F' : LFlag (D.sp.Y 0) D.R.rS T')
-    (Tn T'n : ℕ)
-    : Prop :=
+def locBBne (Z : LocDat D) (p : PlF D) (Λ : Submodule (𝓞 D.host.E) (VS D).V) {T T' : D.host.E}
+    (F : LFlag (D.sp.Y 0) D.R.rS T) (F' : LFlag (D.sp.Y 0) D.R.rS T') (Tn T'n : ℕ) : Prop :=
   LocNG.BBne (H := locH Z p) (locTerm Z p Λ F F' Tn T'n)
+
 
 variable (D) in
 def BBTie (Z : LocDat D) : Prop :=
   ∀ (u u' : D.what₂.Word) (F0 : FlagG (VS D) D.R.rS ((Tu D u : ℕ) : D.host.E))
-      (Λ : Submodule (𝓞 D.host.E) (VS D).V)
-      (F' : LFlag (D.sp.Y 0) D.R.rS (((D.mem u').A.T : ℕ) : D.host.E)),
-    IsRowLat D F0 Λ → PD D Λ (lf D F0) u' F' → MplusIndep Λ (lf D F0) (gS D) F'
-      → ∀ p : PlF D, BBneF D Λ (lf D F0) F' p ↔ locBBne Z p Λ (lf D F0) F' (Tu D u) (Tu D u')
+    (Λ : Submodule (𝓞 D.host.E) (VS D).V) (F' : LFlag (D.sp.Y 0) D.R.rS (((D.mem u').A.T : ℕ) : D.host.E)),
+    IsRowLat D F0 Λ → PD D Λ (lf D F0) u' F' → MplusIndep Λ (lf D F0) (gS D) F' →
+      ∀ p : PlF D, BBneF D Λ (lf D F0) F' p ↔ locBBne Z p Λ (lf D F0) F' (Tu D u) (Tu D u')
 
-def locBBneT
-    (Z : LocDat D)
-    {u u' : D.what₂.Word} {F0 : FlagG (VS D) D.R.rS ((Tu D u : ℕ) : D.host.E)}
-    {what₂ : Finset (Submodule (𝓞 D.host.E) (VS D).V)} (t : Term D u u' F0 what₂)
-    (p : PlF D)
-    : Prop :=
+def locBBneT (Z : LocDat D) {u u' : D.what₂.Word} {F0 : FlagG (VS D) D.R.rS ((Tu D u : ℕ) : D.host.E)}
+    {what₂ : Finset (Submodule (𝓞 D.host.E) (VS D).V)} (t : Term D u u' F0 what₂) (p : PlF D) : Prop :=
   locBBne Z p t.lam (lf D F0) (Quot.out t.cls).1 (Tu D u) (Tu D u')
 
-theorem termBBne_iff_loc
-    (Z : LocDat D) (hT : BBTie D Z)
-    {u u' : D.what₂.Word} {F0 : FlagG (VS D) D.R.rS ((Tu D u : ℕ) : D.host.E)}
-    {what₂ : Finset (Submodule (𝓞 D.host.E) (VS D).V)}
+theorem termBBne_iff_loc (Z : LocDat D) (hT : BBTie D Z) {u u' : D.what₂.Word}
+    {F0 : FlagG (VS D) D.R.rS ((Tu D u : ℕ) : D.host.E)} {what₂ : Finset (Submodule (𝓞 D.host.E) (VS D).V)}
     (hrows : IsRowReps D F0 what₂) (hBF : BBFun D u u')
-    (hMI : ∀ (Λ : Submodule (𝓞 D.host.E) (VS D).V)
-        (F' : LFlag (D.sp.Y 0) D.R.rS (((D.mem u').A.T : ℕ) : D.host.E)),
+    (hMI : ∀ (Λ : Submodule (𝓞 D.host.E) (VS D).V) (F' : LFlag (D.sp.Y 0) D.R.rS (((D.mem u').A.T : ℕ) : D.host.E)),
       MplusIndep Λ (lf D F0) (gS D) F')
-    (t : Term D u u' F0 what₂)
-    (p : PlF D)
-    : termBBne t p ↔ locBBneT Z t p := by
+    (t : Term D u u' F0 what₂) (p : PlF D) : termBBne t p ↔ locBBneT Z t p := by
   have hL := hrows.1 t.lam t.mem
   have hxm : mk t.lam (lf D F0) (PD D t.lam (lf D F0) u') (Quot.out t.cls) = t.cls := Quot.out_eq _
   apply Iff.trans (b := BBneF D t.lam (lf D F0) (Quot.out t.cls).1 p)
   · constructor
     · rintro ⟨F', ⟨h, hm⟩, P, hP, hbb⟩
-      have e :=
-        const_of_mk
-          (fun y : Carrier (PD D t.lam (lf D F0) u') => BBneP t.lam (gS D) (lf D F0) y.1 P)
-          (fun a b hab => propext (hBF F0 t.lam hL P a b hab))
-          (hm.trans hxm.symm)
+      have e := const_of_mk (fun y : Carrier (PD D t.lam (lf D F0) u') => BBneP t.lam (gS D) (lf D F0) y.1 P)
+        (fun a b hab => propext (hBF F0 t.lam hL P a b hab)) (hm.trans hxm.symm)
       simp only at e
       exact ⟨P, hP, e ▸ hbb⟩
     · intro h
       exact ⟨(Quot.out t.cls).1, ⟨(Quot.out t.cls).2, hxm⟩, h⟩
   · exact hT u u' F0 t.lam (Quot.out t.cls).1 hL (Quot.out t.cls).2 (hMI _ _) p
+
 
 variable (D) in
 def below (P : HeightOneSpectrum (𝓞 D.host.E)) : PlF D where
@@ -313,20 +319,16 @@ def below (P : HeightOneSpectrum (𝓞 D.host.E)) : PlF D where
   isPrime := Ideal.comap_isPrime _ _
   ne_bot := fun h => P.ne_bot (Ideal.eq_bot_of_comap_eq_bot h)
 
+
 variable (D) in
 def GenIffLocBB (Z : LocDat D) (u u' : D.what₂.Word) : Prop :=
-  ∀ (F0 : FlagG (VS D) D.R.rS ((Tu D u : ℕ) : D.host.E))
-      (what₂ : Finset (Submodule (𝓞 D.host.E) (VS D).V)),
+  ∀ (F0 : FlagG (VS D) D.R.rS ((Tu D u : ℕ) : D.host.E)) (what₂ : Finset (Submodule (𝓞 D.host.E) (VS D).V)),
     IsRowReps D F0 what₂ → ∀ t : Term D u u' F0 what₂, t.generic ↔ ∀ p, ¬ locBBneT Z t p
 
-theorem genIffLocBB_of
-    (Z : LocDat D) (hT : BBTie D Z)
-    (u u' : D.what₂.Word) (hBF : BBFun D u u')
-    (hMI
-      : ∀ (F0 : FlagG (VS D) D.R.rS ((Tu D u : ℕ) : D.host.E)) (Λ : Submodule (𝓞 D.host.E) (VS D).V)
-          (F' : LFlag (D.sp.Y 0) D.R.rS (((D.mem u').A.T : ℕ) : D.host.E)),
-        MplusIndep Λ (lf D F0) (gS D) F')
-    : GenIffLocBB D Z u u' := by
+theorem genIffLocBB_of (Z : LocDat D) (hT : BBTie D Z) (u u' : D.what₂.Word) (hBF : BBFun D u u')
+    (hMI : ∀ (F0 : FlagG (VS D) D.R.rS ((Tu D u : ℕ) : D.host.E)) (Λ : Submodule (𝓞 D.host.E) (VS D).V)
+      (F' : LFlag (D.sp.Y 0) D.R.rS (((D.mem u').A.T : ℕ) : D.host.E)), MplusIndep Λ (lf D F0) (gS D) F') :
+    GenIffLocBB D Z u u' := by
   intro F0 what₂ hrows t
   have hloc := fun p => termBBne_iff_loc Z hT hrows hBF (hMI F0) t p
   simp only [← hloc]
@@ -335,11 +337,19 @@ theorem genIffLocBB_of
     exact not_bbne_of_generic hrows hBF hg p
   · intro h
     have hL := hrows.1 t.lam t.mem
-    have hxm : mk t.lam (lf D F0) (PD D t.lam (lf D F0) u') (Quot.out t.cls) = t.cls :=
-      Quot.out_eq _
+    have hxm : mk t.lam (lf D F0) (PD D t.lam (lf D F0) u') (Quot.out t.cls) = t.cls := Quot.out_eq _
     refine ⟨(Quot.out t.cls).1, ⟨(Quot.out t.cls).2, hxm⟩, ?_⟩
     refine generic_of_not_BBneP (hMI F0 t.lam _) hL.2.1.2.2.1 hL.2.1.2.2.2 (Quot.out t.cls).2.2.1 ?_
     intro P hP
     exact h (below D P) ⟨(Quot.out t.cls).1, ⟨(Quot.out t.cls).2, hxm⟩, P, rfl, hP⟩
+
+
+
+
+
+
+
+
+
 
 end Formalism.L2.SG.TermLoc

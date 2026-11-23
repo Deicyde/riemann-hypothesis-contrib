@@ -1,7 +1,51 @@
 module
 
-public import Mathlib
 public import Formalism.LocalToGlobal.IndefiniteReal.AllPartsTransfer
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
+public import Mathlib.RingTheory.Localization.Finiteness
 
 @[expose] public section
 
@@ -15,29 +59,28 @@ open Formalism.IndefR.TransferLatticeStatement Formalism.HN Formalism.IndefR.Lat
 
 section
 
-variable
-  {K : Type} [Field K] [NumberField K]
+variable {K : Type} [Field K] [NumberField K]
   {V : Type} [AddCommGroup V] [Module K V] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V]
 
 omit [NumberField K] in
-theorem mem_cut {A : Submodule (𝓞 K) V} {p : V →ₗ[K] V} (hp : ∀ a, p (p a) = p a) {a : V}
-    : a ∈ cut A p ↔ a ∈ A ∧ p a = a := by
+theorem mem_cut {A : Submodule (𝓞 K) V} {p : V →ₗ[K] V} (hp : ∀ a, p (p a) = p a) {a : V} :
+    a ∈ cut A p ↔ a ∈ A ∧ p a = a := by
   unfold cut
   simp only [Submodule.mem_inf, Submodule.restrictScalars_mem, LinearMap.mem_range]
   refine and_congr_right fun _ => ⟨?_, fun h => ⟨a, h⟩⟩
   rintro ⟨z, rfl⟩
   exact hp z
 
-theorem exists_smul_mem {A : Submodule (𝓞 K) V} {x : V} (hx : x ∈ Submodule.span K (A : Set V))
-    : ∃ d : 𝓞 K, d ≠ 0 ∧ d • x ∈ A := by
-  obtain ⟨t, ht⟩ :=
-    multiple_mem_span_of_mem_localization_span (nonZeroDivisors (𝓞 K)) K (A : Set V) x hx
+theorem exists_smul_mem {A : Submodule (𝓞 K) V} {x : V} (hx : x ∈ Submodule.span K (A : Set V)) :
+    ∃ d : 𝓞 K, d ≠ 0 ∧ d • x ∈ A := by
+  obtain ⟨t, ht⟩ := multiple_mem_span_of_mem_localization_span (nonZeroDivisors (𝓞 K)) K
+    (A : Set V) x hx
   refine ⟨t, nonZeroDivisors.coe_ne_zero t, ?_⟩
   rw [Submodule.span_eq] at ht
   exact ht
 
-theorem mem_span_of_smul_mem {A : Submodule (𝓞 K) V} {x : V} {d : 𝓞 K} (hd : d ≠ 0) (hx : d • x ∈ A)
-    : x ∈ Submodule.span K (A : Set V) := by
+theorem mem_span_of_smul_mem {A : Submodule (𝓞 K) V} {x : V} {d : 𝓞 K} (hd : d ≠ 0)
+    (hx : d • x ∈ A) : x ∈ Submodule.span K (A : Set V) := by
   have hdK : (d : K) ≠ 0 := by exact_mod_cast hd
   have h1 : x = (d : K)⁻¹ • (d • x) := by
     rw [← IsScalarTower.algebraMap_smul K d x, smul_smul]
@@ -45,8 +88,8 @@ theorem mem_span_of_smul_mem {A : Submodule (𝓞 K) V} {x : V} {d : 𝓞 K} (hd
   rw [h1]
   exact Submodule.smul_mem _ _ (Submodule.subset_span hx)
 
-theorem span_cut {A : Submodule (𝓞 K) V} (hA : Submodule.span K (A : Set V) = ⊤) (p : V →ₗ[K] V)
-    : Submodule.span K (cut A p : Set V) = LinearMap.range p := by
+theorem span_cut {A : Submodule (𝓞 K) V} (hA : Submodule.span K (A : Set V) = ⊤)
+    (p : V →ₗ[K] V) : Submodule.span K (cut A p : Set V) = LinearMap.range p := by
   apply le_antisymm
   · rw [Submodule.span_le]
     intro a ha
@@ -59,8 +102,8 @@ theorem span_cut {A : Submodule (𝓞 K) V} (hA : Submodule.span K (A : Set V) =
     rw [this]
     exact Submodule.smul_mem _ _ hu
 
-theorem rkK_cut {A : Submodule (𝓞 K) V} (hA : Submodule.span K (A : Set V) = ⊤) (p : V →ₗ[K] V)
-    : rkK (cut A p) = finrank K (LinearMap.range p) := by
+theorem rkK_cut {A : Submodule (𝓞 K) V} (hA : Submodule.span K (A : Set V) = ⊤)
+    (p : V →ₗ[K] V) : rkK (cut A p) = finrank K (LinearMap.range p) := by
   unfold rkK
   rw [span_cut hA]
 
@@ -68,10 +111,8 @@ theorem fg_cut {A : Submodule (𝓞 K) V} (hA : A.FG) (p : V →ₗ[K] V) : (cut
   hA.of_le inf_le_left
 
 omit [NumberField K] in
-theorem map_osmul
-    {W : Type} [AddCommGroup W] [Module K W] [Module (𝓞 K) W] [IsScalarTower (𝓞 K) K W]
-    (p : V →ₗ[K] W) (d : 𝓞 K) (a : V)
-    : p (d • a) = d • p a := by
+theorem map_osmul {W : Type} [AddCommGroup W] [Module K W] [Module (𝓞 K) W]
+    [IsScalarTower (𝓞 K) K W] (p : V →ₗ[K] W) (d : 𝓞 K) (a : V) : p (d • a) = d • p a := by
   rw [← IsScalarTower.algebraMap_smul K d a, map_smul, IsScalarTower.algebraMap_smul]
 
 end
@@ -81,23 +122,23 @@ section
 variable {K : Type} [Field K] {V : Type} [AddCommGroup V] [Module K V] {n : ℕ}
 
 def Tr (p₀ p : V →ₗ[K] V) (x y : Fin n → V →ₗ[K] V) (c : Matrix (Fin n) (Fin n) K) : Prop :=
-  (∀ a, p₀ (p₀ a) = p₀ a) ∧ (∀ a, p (p a) = p a) ∧ (∀ j a, p₀ a = a → p (x j a) = x j a)
-    ∧ (∀ i a, p a = a → p₀ (y i a) = y i a) ∧ c.det ≠ 0
-    ∧ (∀ i j a, p₀ a = a → y i (x j a) = c i j • a)
-    ∧ (∀ a, p a = a → ∑ j, ∑ i, c⁻¹ j i • x j (y i a) = a)
+  (∀ a, p₀ (p₀ a) = p₀ a) ∧ (∀ a, p (p a) = p a) ∧
+  (∀ j a, p₀ a = a → p (x j a) = x j a) ∧ (∀ i a, p a = a → p₀ (y i a) = y i a) ∧
+  c.det ≠ 0 ∧ (∀ i j a, p₀ a = a → y i (x j a) = c i j • a) ∧
+  (∀ a, p a = a → ∑ j, ∑ i, c⁻¹ j i • x j (y i a) = a)
 
 variable {p₀ p : V →ₗ[K] V} {x y : Fin n → V →ₗ[K] V} {c : Matrix (Fin n) (Fin n) K}
 
-theorem Tr.yx_sum (h : Tr p₀ p x y c) (a : Fin n → V) (ha : ∀ j, p₀ (a j) = a j) (i : Fin n)
-    : y i (∑ j, x j (a j)) = ∑ j, c i j • a j := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+theorem Tr.yx_sum (h : Tr p₀ p x y c) (a : Fin n → V) (ha : ∀ j, p₀ (a j) = a j) (i : Fin n) :
+    y i (∑ j, x j (a j)) = ∑ j, c i j • a j := by
+
+  rw [map_sum]
   exact Finset.sum_congr rfl fun j _ => h.2.2.2.2.2.1 i j _ (ha j)
 
-theorem Tr.first_axis_injective
-    (h : Tr p₀ p x y c) (a : Fin n → V) (ha : ∀ j, p₀ (a j) = a j) (h0 : ∑ j, x j (a j) = 0)
-    : a = 0 := by
-  have h1 : ∀ i, ∑ j, c i j • a j = 0 := fun i => by rw [← h.yx_sum a ha i, h0, map_zero]
+theorem Tr.first_axis_injective (h : Tr p₀ p x y c) (a : Fin n → V) (ha : ∀ j, p₀ (a j) = a j)
+    (h0 : ∑ j, x j (a j) = 0) : a = 0 := by
+  have h1 : ∀ i, ∑ j, c i j • a j = 0 := fun i => by
+    rw [← h.yx_sum a ha i, h0, map_zero]
   have hu : IsUnit c.det := isUnit_iff_ne_zero.mpr h.2.2.2.2.1
   funext k
   have h2 : ∑ i, c⁻¹ k i • ∑ j, c i j • a j = a k := by
@@ -112,21 +153,21 @@ theorem Tr.inj_y (h : Tr p₀ p x y c) (a : V) (ha : p a = a) (h0 : ∀ i, y i a
   rw [← h.2.2.2.2.2.2 a ha]
   simp [h0]
 
-theorem Tr.rank [FiniteDimensional K V] (h : Tr p₀ p x y c)
-    : finrank K (LinearMap.range p) = n * finrank K (LinearMap.range p₀) := by
-  have hfix0 : ∀ a : LinearMap.range p₀, p₀ a = a := by rintro ⟨_, z, rfl⟩; exact h.1 z
-  have hfix : ∀ a : LinearMap.range p, p a = a := by rintro ⟨_, z, rfl⟩; exact h.2.1 z
+theorem Tr.rank [FiniteDimensional K V] (h : Tr p₀ p x y c) :
+    finrank K (LinearMap.range p) = n * finrank K (LinearMap.range p₀) := by
+  have hfix0 : ∀ a : LinearMap.range p₀, p₀ a = a := by
+    rintro ⟨_, z, rfl⟩; exact h.1 z
+  have hfix : ∀ a : LinearMap.range p, p a = a := by
+    rintro ⟨_, z, rfl⟩; exact h.2.1 z
   have hpi : finrank K (Fin n → LinearMap.range p₀) = n * finrank K (LinearMap.range p₀) := by
     rw [Module.finrank_pi_fintype]; simp
   rw [← hpi]
   apply le_antisymm
   · let Y : LinearMap.range p →ₗ[K] (Fin n → LinearMap.range p₀) :=
-      LinearMap.pi fun i =>
-        LinearMap.codRestrict _ (y i ∘ₗ (LinearMap.range p).subtype) fun a =>
-          ⟨_, h.2.2.2.1 i a (hfix a)⟩
+      LinearMap.pi fun i => LinearMap.codRestrict _ (y i ∘ₗ (LinearMap.range p).subtype)
+        fun a => ⟨_, h.2.2.2.1 i a (hfix a)⟩
     refine LinearMap.finrank_le_finrank_of_injective (f := Y) ?_
-    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
-      rw [injective_iff_map_eq_zero]
+    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
     intro a ha
     apply Subtype.ext
     refine h.inj_y a (hfix a) fun i => ?_
@@ -137,13 +178,11 @@ theorem Tr.rank [FiniteDimensional K V] (h : Tr p₀ p x y c)
           rw [LinearMap.sum_apply]
           exact Submodule.sum_mem _ fun j _ => ⟨_, h.2.2.1 j (a j) (hfix0 _)⟩
     refine LinearMap.finrank_le_finrank_of_injective (f := X) ?_
-    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
-      rw [injective_iff_map_eq_zero]
+    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
     intro a ha
     have h1 := congrArg Subtype.val ha
     simp only [X, LinearMap.codRestrict_apply, LinearMap.sum_apply, LinearMap.comp_apply,
-        Submodule.subtype_apply, LinearMap.proj_apply, ZeroMemClass.coe_zero]
-      at h1
+      Submodule.subtype_apply, LinearMap.proj_apply, ZeroMemClass.coe_zero] at h1
     have h2 := h.first_axis_injective (fun j => (a j : V)) (fun j => hfix0 _) h1
     funext j
     exact Subtype.ext (congrFun h2 j)
@@ -152,13 +191,12 @@ end
 
 section
 
-variable
-  {K : Type} [Field K] [NumberField K]
-  {G : Type} [Group G] [Fintype G]
+variable {K : Type} [Field K] [NumberField K] {G : Type} [Group G] [Fintype G]
   {V : Type} [AddCommGroup V] [Module K V] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V]
 
-theorem pe_facts {ε e : V →ₗ[K] V} (hε : ε ∘ₗ ε = ε) (he : e ∘ₗ e = e) (hc : e ∘ₗ ε = ε ∘ₗ e)
-    : (∀ a, (ε ∘ₗ e) ((ε ∘ₗ e) a) = (ε ∘ₗ e) a) ∧ ∀ a, (ε ∘ₗ e) a = a ↔ ε a = a ∧ e a = a := by
+theorem pe_facts {ε e : V →ₗ[K] V} (hε : ε ∘ₗ ε = ε) (he : e ∘ₗ e = e) (hc : e ∘ₗ ε = ε ∘ₗ e) :
+    (∀ a, (ε ∘ₗ e) ((ε ∘ₗ e) a) = (ε ∘ₗ e) a) ∧
+    ∀ a, (ε ∘ₗ e) a = a ↔ ε a = a ∧ e a = a := by
   have h1 : ∀ a, ε (ε a) = ε a := fun a => LinearMap.congr_fun hε a
   have h2 : ∀ a, e (e a) = e a := fun a => LinearMap.congr_fun he a
   have h3 : ∀ a, e (ε a) = ε (e a) := fun a => LinearMap.congr_fun hc a
@@ -170,69 +208,50 @@ theorem pe_facts {ε e : V →ₗ[K] V} (hε : ε ∘ₗ ε = ε) (he : e ∘ₗ
     · rw [← h, h3, h2]
   · simp only [LinearMap.comp_apply, h.1, h.2]
 
-theorem tr_of_core
-    (hP : IdemP)
-    {T : Type} [AddCommGroup T] [Module K T] [FiniteDimensional K T]
+theorem tr_of_core (hP : IdemP) {T : Type} [AddCommGroup T] [Module K T] [FiniteDimensional K T]
     {τ : Representation K G T} {H₀ : Subgroup G} {χ₀ : H₀ →* (𝓞 K)ˣ} {H : Subgroup G}
     {χ : H →* (𝓞 K)ˣ} {n : ℕ} {γ δ : Fin n → G} {c : Matrix (Fin n) (Fin n) K}
     {Γ : Matrix (Fin n) (Fin n) (𝓞 K)} (h : CoreData τ H₀ χ₀ H χ γ δ c Γ)
-    (ρ : Representation K G V) (he : eS τ ρ ∘ₗ eS τ ρ = eS τ ρ)
-    : Tr (epP H₀ χ₀ ρ ∘ₗ eS τ ρ) (epP H χ ρ ∘ₗ eS τ ρ)
-      (fun j => epP H χ ρ ∘ₗ ρ (γ j))
-      (fun i => epP H₀ χ₀ ρ ∘ₗ ρ (δ i))
-      c := by
+    (ρ : Representation K G V) (he : eS τ ρ ∘ₗ eS τ ρ = eS τ ρ) :
+    Tr (epP H₀ χ₀ ρ ∘ₗ eS τ ρ) (epP H χ ρ ∘ₗ eS τ ρ) (fun j => epP H χ ρ ∘ₗ ρ (γ j))
+      (fun i => epP H₀ χ₀ ρ ∘ₗ ρ (δ i)) c := by
   obtain ⟨hE, hEp⟩ := hP K G V ρ
   obtain ⟨hc, hcp, -⟩ := hE T τ
   have f0 := pe_facts (hEp H₀ χ₀).1 he (hcp H₀ χ₀)
   have f1 := pe_facts (hEp H χ).1 he (hcp H χ)
-  have key
-      : ∀ (H : Subgroup G) (χ : H →* (𝓞 K)ˣ) (g : G) (a : V),
-        eS τ ρ a = a → (epP H χ ρ ∘ₗ eS τ ρ) ((epP H χ ρ ∘ₗ ρ g) a) = (epP H χ ρ ∘ₗ ρ g) a := by
+  have key : ∀ (H : Subgroup G) (χ : H →* (𝓞 K)ˣ) (g : G) (a : V), eS τ ρ a = a →
+      (epP H χ ρ ∘ₗ eS τ ρ) ((epP H χ ρ ∘ₗ ρ g) a) = (epP H χ ρ ∘ₗ ρ g) a := by
     intro H χ g a ha
-    have h1 : ∀ a, epP H χ ρ (epP H χ ρ a) = epP H χ ρ a := fun a =>
-      LinearMap.congr_fun (hEp H χ).1 a
-    have h2 : ∀ a, eS τ ρ (epP H χ ρ a) = epP H χ ρ (eS τ ρ a) := fun a =>
-      LinearMap.congr_fun (hcp H χ) a
+    have h1 : ∀ a, epP H χ ρ (epP H χ ρ a) = epP H χ ρ a :=
+      fun a => LinearMap.congr_fun (hEp H χ).1 a
+    have h2 : ∀ a, eS τ ρ (epP H χ ρ a) = epP H χ ρ (eS τ ρ a) :=
+      fun a => LinearMap.congr_fun (hcp H χ) a
     have h3 : eS τ ρ (ρ g a) = ρ g (eS τ ρ a) := LinearMap.congr_fun (hc g) a
     simp only [LinearMap.comp_apply, h2, h1, h3, ha]
   obtain ⟨hd, -, -, hV⟩ := h
-  refine ⟨
-    f0.1,
-    f1.1,
-    fun j a ha => key H χ _ a ((f0.2 a).1 ha).2,
-    fun i a ha => key H₀ χ₀ _ a ((f1.2 a).1 ha).2,
-    hd,
-    fun i j a ha => (hV V ρ).1 i j a ha,
-    fun a ha => (hV V ρ).2 a ha
-  ⟩
+  refine ⟨f0.1, f1.1, fun j a ha => key H χ _ a ((f0.2 a).1 ha).2,
+    fun i a ha => key H₀ χ₀ _ a ((f1.2 a).1 ha).2, hd, fun i j a ha => (hV V ρ).1 i j a ha,
+    fun a ha => (hV V ρ).2 a ha⟩
 
-theorem smul_mem_cut
-    (hP : IdemP)
-    (ρ : Representation K G V)
-    {A : Submodule (𝓞 K) V} (hA : ∀ g : G, ∀ a ∈ A, ρ g a ∈ A)
-    (H : Subgroup G) (χ : H →* (𝓞 K)ˣ)
-    (g : G)
-    {p : V →ₗ[K] V} (hp : ∀ a, p (p a) = p a)
-    {a : V} (ha : a ∈ A) (hx : p ((epP H χ ρ ∘ₗ ρ g) a) = (epP H χ ρ ∘ₗ ρ g) a)
-    : (Fintype.card G : 𝓞 K) • (epP H χ ρ ∘ₗ ρ g) a ∈ cut A p := by
+theorem smul_mem_cut (hP : IdemP) (ρ : Representation K G V) {A : Submodule (𝓞 K) V}
+    (hA : ∀ g : G, ∀ a ∈ A, ρ g a ∈ A) (H : Subgroup G) (χ : H →* (𝓞 K)ˣ) (g : G)
+    {p : V →ₗ[K] V} (hp : ∀ a, p (p a) = p a) {a : V} (ha : a ∈ A)
+    (hx : p ((epP H χ ρ ∘ₗ ρ g) a) = (epP H χ ρ ∘ₗ ρ g) a) :
+    (Fintype.card G : 𝓞 K) • (epP H χ ρ ∘ₗ ρ g) a ∈ cut A p := by
   rw [mem_cut hp]
   refine ⟨((hP K G V ρ).2 H χ).2 A hA _ (hA g a ha), ?_⟩
   rw [map_osmul, hx]
 
-variable
-  {S : Type} [Fintype S]
-  {T : S → Type} [∀ s, AddCommGroup (T s)] [∀ s, Module K (T s)] [∀ s, FiniteDimensional K (T s)]
-  {τ : ∀ s, Representation K G (T s)}
+variable {S : Type} [Fintype S] {T : S → Type} [∀ s, AddCommGroup (T s)] [∀ s, Module K (T s)]
+  [∀ s, FiniteDimensional K (T s)] {τ : ∀ s, Representation K G (T s)}
 
-theorem sandwich
-    (hE : IdemE) (hP : IdemP) (hτ : IsGood τ)
-    (ρ : Representation K G V)
-    {A : Submodule (𝓞 K) V} (hA : ∀ g : G, ∀ a ∈ A, ρ g a ∈ A)
-    (H : Subgroup G) (χ : H →* (𝓞 K)ˣ)
-    : (∀ s, cut A (epP H χ ρ ∘ₗ eS (τ s) ρ) ≤ cut A (epP H χ ρ ∘ₗ eGood τ ρ))
-      ∧ (∀ a ∈ cut A (epP H χ ρ ∘ₗ eGood τ ρ),
-        (Fintype.card G : 𝓞 K) • a ∈ ⨆ s, cut A (epP H χ ρ ∘ₗ eS (τ s) ρ))
-      ∧ ∀ s, ∀ a ∈ cut A (epP H χ ρ ∘ₗ eS (τ s) ρ), eS (τ s) ρ a = a := by
+theorem sandwich (hE : IdemE) (hP : IdemP) (hτ : IsGood τ) (ρ : Representation K G V)
+    {A : Submodule (𝓞 K) V} (hA : ∀ g : G, ∀ a ∈ A, ρ g a ∈ A) (H : Subgroup G)
+    (χ : H →* (𝓞 K)ˣ) :
+    (∀ s, cut A (epP H χ ρ ∘ₗ eS (τ s) ρ) ≤ cut A (epP H χ ρ ∘ₗ eGood τ ρ)) ∧
+    (∀ a ∈ cut A (epP H χ ρ ∘ₗ eGood τ ρ),
+      (Fintype.card G : 𝓞 K) • a ∈ ⨆ s, cut A (epP H χ ρ ∘ₗ eS (τ s) ρ)) ∧
+    ∀ s, ∀ a ∈ cut A (epP H χ ρ ∘ₗ eS (τ s) ρ), eS (τ s) ρ a = a := by
   obtain ⟨he, ho⟩ := hE K G S T τ hτ V ρ
   obtain ⟨hE', hEp⟩ := hP K G V ρ
   have f := fun s => pe_facts (hEp H χ).1 (he s) ((hE' (T s) (τ s)).2.1 H χ)
@@ -253,17 +272,17 @@ theorem sandwich
   · obtain ⟨haA, z, hz⟩ := ha
     have hz' : a = ∑ s, epP H χ ρ (eS (τ s) ρ z) := by
       rw [← hz]
-      set_option synthInstance.maxHeartbeats 100000 in
+
       simp only [LinearMap.comp_apply, eGood, LinearMap.sum_apply, map_sum]
     have hs : ∀ s, eS (τ s) ρ a = epP H χ ρ (eS (τ s) ρ z) := by
       intro s
-      have h2 : ∀ a, eS (τ s) ρ (epP H χ ρ a) = epP H χ ρ (eS (τ s) ρ a) := fun a =>
-        LinearMap.congr_fun ((hE' (T s) (τ s)).2.1 H χ) a
+      have h2 : ∀ a, eS (τ s) ρ (epP H χ ρ a) = epP H χ ρ (eS (τ s) ρ a) :=
+        fun a => LinearMap.congr_fun ((hE' (T s) (τ s)).2.1 H χ) a
       have h3 : eS (τ s) ρ (eGood τ ρ z) = eS (τ s) ρ z := by
         classical
         unfold eGood
-        set_option synthInstance.maxHeartbeats 100000 in
-          rw [LinearMap.sum_apply, map_sum, Finset.sum_eq_single s]
+
+        rw [LinearMap.sum_apply, map_sum, Finset.sum_eq_single s]
         · exact LinearMap.congr_fun (he s) z
         · intro t _ hts
           exact LinearMap.congr_fun (ho s t hts.symm) z

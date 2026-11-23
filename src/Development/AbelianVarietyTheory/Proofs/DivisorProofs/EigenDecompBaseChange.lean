@@ -1,6 +1,50 @@
 module
 
-public import Mathlib
+public import Mathlib.Data.Matrix.Mul
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+public import Mathlib.Data.Matrix.Basic
 
 @[expose] public section
 
@@ -8,22 +52,8 @@ open Matrix
 
 namespace GlobalTheory
 
-theorem eigen_decomp_base_change
-    : ∀ (K C : Type) [CommRing K] [CommRing C] (n a : ℕ) (ω : K) (tr nm : ℤ),
-      ω ^ 2 - (tr : K) * ω + (nm : K) = 0
-        → ∀ (f : K →+* Matrix (Fin n) (Fin n) C) (ρ : C),
-          ρ ^ 2 - (tr : C) * ρ + (nm : C) = 0 → IsUnit (2 * ρ - (tr : C))
-            → ∀ (t : Fin a → (K →+* C)),
-              (∀ i, t i ω = ρ)
-                → (∀ v : Fin n → C,
-                  Matrix.mulVec (f ω) v = ρ • v
-                    → ∃ w : Fin a → Fin n → C,
-                      (∀ i (c : K), Matrix.mulVec (f c) (w i) = t i c • w i) ∧ v = ∑ i, w i)
-                → ∀ (R' : Type) [CommRing R'] (g : C →+* R') (v : Fin n → R'),
-                  Matrix.mulVec ((f ω).map g) v = g ρ • v
-                    → ∃ w : Fin a → Fin n → R',
-                      (∀ i (c : K), Matrix.mulVec ((f c).map g) (w i) = g (t i c) • w i)
-                        ∧ v = ∑ i, w i := by
+theorem eigen_decomp_base_change :
+  ∀ (K C : Type) [CommRing K] [CommRing C] (n a : ℕ) (ω : K) (tr nm : ℤ), ω ^ 2 - (tr : K) * ω + (nm : K) = 0 → ∀ (f : K →+* Matrix (Fin n) (Fin n) C) (ρ : C), ρ ^ 2 - (tr : C) * ρ + (nm : C) = 0 → IsUnit (2 * ρ - (tr : C)) → ∀ (t : Fin a → (K →+* C)), (∀ i, t i ω = ρ) → (∀ v : Fin n → C, Matrix.mulVec (f ω) v = ρ • v → ∃ w : Fin a → Fin n → C, (∀ i (c : K), Matrix.mulVec (f c) (w i) = t i c • w i) ∧ v = ∑ i, w i) → ∀ (R' : Type) [CommRing R'] (g : C →+* R') (v : Fin n → R'), Matrix.mulVec ((f ω).map g) v = g ρ • v → ∃ w : Fin a → Fin n → R', (∀ i (c : K), Matrix.mulVec ((f c).map g) (w i) = g (t i c) • w i) ∧ v = ∑ i, w i := by
   intro K C _ _ n a ω tr nm hω f ρ hρ hu t ht H R' _ g v hv
   obtain ⟨uinv, huinv⟩ : ∃ uinv : C, uinv * (2 * ρ - (tr : C)) = 1 := by
     obtain ⟨u, hu'⟩ := hu
@@ -37,9 +67,7 @@ theorem eigen_decomp_base_change
   have key : ∀ x : Fin n → C, Ω *ᵥ (Ω *ᵥ x) = (tr : C) • (Ω *ᵥ x) - (nm : C) • x := by
     intro x
     rw [mulVec_mulVec, hΩΩ, sub_mulVec, ← mulVec_mulVec, intCast_mulVec, intCast_mulVec]
-  have eig
-      : ∀ x : Fin n → C,
-        Ω *ᵥ (Ω *ᵥ x - ((tr : C) - ρ) • x) = ρ • (Ω *ᵥ x - ((tr : C) - ρ) • x) := by
+  have eig : ∀ x : Fin n → C, Ω *ᵥ (Ω *ᵥ x - ((tr : C) - ρ) • x) = ρ • (Ω *ᵥ x - ((tr : C) - ρ) • x) := by
     intro x
     rw [mulVec_sub, mulVec_smul, key]
     ext k
@@ -52,8 +80,7 @@ theorem eigen_decomp_base_change
     rw [smul_comm]
   choose W hW hWsum using fun j => H (e j) (he j)
 
-  have hmap
-      : ∀ (M : Matrix (Fin n) (Fin n) C) (x : Fin n → C), M.map g *ᵥ (g ∘ x) = g ∘ (M *ᵥ x) := by
+  have hmap : ∀ (M : Matrix (Fin n) (Fin n) C) (x : Fin n → C), M.map g *ᵥ (g ∘ x) = g ∘ (M *ᵥ x) := by
     intro M x
     funext k
     simp only [Function.comp_apply]
@@ -65,11 +92,8 @@ theorem eigen_decomp_base_change
     simp only [e, Finset.sum_apply, Pi.smul_apply, Function.comp_apply, smul_eq_mul, Pi.sub_apply,
       mulVec_single_one, col_apply, Pi.single_apply, map_mul, map_sub, mul_ite, mul_one, mul_zero,
       map_zero]
-    have hterm
-        : ∀ x,
-          v x * (g uinv * (g (Ω k x) - g (if k = x then (tr : C) - ρ else 0)))
-            = g uinv * (g (Ω k x) * v x)
-              - (if k = x then g uinv * g ((tr : C) - ρ) * v k else 0) := by
+    have hterm : ∀ x, v x * (g uinv * (g (Ω k x) - g (if k = x then (tr : C) - ρ else 0))) =
+        g uinv * (g (Ω k x) * v x) - (if k = x then g uinv * g ((tr : C) - ρ) * v k else 0) := by
       intro x
       split_ifs with h
       · subst h; ring
@@ -97,7 +121,7 @@ theorem eigen_decomp_base_change
     congr 1
     rw [hWsum j]
     funext k
-    set_option synthInstance.maxHeartbeats 100000 in
+
     simp [Finset.sum_apply, map_sum]
 
 end GlobalTheory

@@ -1,7 +1,48 @@
 module
 
-public import Mathlib
 public import Development.WeilBound.CoreStatements.AutomorphicKernels.GrothendieckRingPolynomial.ProdList
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -9,20 +50,18 @@ open MvPolynomial
 
 namespace PositivityTheory.Groth.ChartWirtingerDerivatives
 
-def toZAlg {σ : Type*} (ψ : MvPolynomial σ ℤ →+* MvPolynomial σ ℤ)
-    : MvPolynomial σ ℤ →ₐ[ℤ] MvPolynomial σ ℤ :=
+def toZAlg {σ : Type*} (ψ : MvPolynomial σ ℤ →+* MvPolynomial σ ℤ) :
+    MvPolynomial σ ℤ →ₐ[ℤ] MvPolynomial σ ℤ :=
   AlgHom.mk ψ (by
     intro r
     show ψ (algebraMap ℤ (MvPolynomial σ ℤ) r) = algebraMap ℤ (MvPolynomial σ ℤ) r
     rw [algebraMap_eq, eq_intCast C r]
     exact map_intCast ψ r)
 
-theorem tri_supported_le
-    {σ : Type*} (w : σ → ℕ) (ψ : MvPolynomial σ ℤ →+* MvPolynomial σ ℤ)
-    (h : ∀ s, ∃ (ε : ℤˣ) (p : MvPolynomial σ ℤ),
-      (∀ t ∈ p.vars, w t < w s) ∧ ψ (X s) = (ε : ℤ) • X s + p)
-    (N : ℕ)
-    : supported ℤ {t | w t < N} ≤ (supported ℤ {t | w t < N}).map (toZAlg ψ) := by
+theorem tri_supported_le {σ : Type*} (w : σ → ℕ) (ψ : MvPolynomial σ ℤ →+* MvPolynomial σ ℤ)
+    (h : ∀ s, ∃ (ε : ℤˣ) (p : MvPolynomial σ ℤ), (∀ t ∈ p.vars, w t < w s) ∧
+      ψ (X s) = (ε : ℤ) • X s + p) (N : ℕ) :
+    supported ℤ {t | w t < N} ≤ (supported ℤ {t | w t < N}).map (toZAlg ψ) := by
   induction N with
   | zero =>
     intro x hx
@@ -55,19 +94,17 @@ theorem tri_supported_le
       show w t < N + 1
       omega
     have key : X s = ((ε⁻¹ : ℤˣ) : ℤ) • (ψ (X s) - p) := by
-      rw [hψ, add_sub_cancel_right, smul_smul, ← Units.val_mul, inv_mul_cancel, Units.val_one,
-        one_smul]
+      rw [hψ, add_sub_cancel_right, smul_smul, ← Units.val_mul, inv_mul_cancel, Units.val_one, one_smul]
     rw [key]
     exact Subalgebra.smul_mem _ (Subalgebra.sub_mem _ h1 h2) _
 
-theorem tri_surj
-    {σ : Type*} (w : σ → ℕ) (ψ : MvPolynomial σ ℤ →+* MvPolynomial σ ℤ)
-    (h : ∀ s, ∃ (ε : ℤˣ) (p : MvPolynomial σ ℤ),
-      (∀ t ∈ p.vars, w t < w s) ∧ ψ (X s) = (ε : ℤ) • X s + p)
-    : Function.Surjective ψ := by
+theorem tri_surj {σ : Type*} (w : σ → ℕ) (ψ : MvPolynomial σ ℤ →+* MvPolynomial σ ℤ)
+    (h : ∀ s, ∃ (ε : ℤˣ) (p : MvPolynomial σ ℤ), (∀ t ∈ p.vars, w t < w s) ∧
+      ψ (X s) = (ε : ℤ) • X s + p) : Function.Surjective ψ := by
   have hrange : ∀ s, X s ∈ (toZAlg ψ).range := by
     intro s
-    have hmem := tri_supported_le w ψ h (w s + 1) (X_mem_supported.2 (show w s < w s + 1 by omega))
+    have hmem := tri_supported_le w ψ h (w s + 1)
+      (X_mem_supported.2 (show w s < w s + 1 by omega))
     obtain ⟨y, -, hy⟩ := Subalgebra.mem_map.1 hmem
     exact (AlgHom.mem_range _).2 ⟨y, hy⟩
   have htop : (toZAlg ψ).range = ⊤ := by
@@ -81,15 +118,12 @@ theorem tri_surj
   obtain ⟨x, hx⟩ := (AlgHom.mem_range _).1 hy
   exact ⟨x, hx⟩
 
-theorem tri_bij
-    {σ : Type*} (w : σ → ℕ) (ψ : MvPolynomial σ ℤ →+* MvPolynomial σ ℤ)
-    (h : ∀ s, ∃ (ε : ℤˣ) (p : MvPolynomial σ ℤ),
-      (∀ t ∈ p.vars, w t < w s) ∧ ψ (X s) = (ε : ℤ) • X s + p)
-    : Function.Bijective ψ := by
+theorem tri_bij {σ : Type*} (w : σ → ℕ) (ψ : MvPolynomial σ ℤ →+* MvPolynomial σ ℤ)
+    (h : ∀ s, ∃ (ε : ℤˣ) (p : MvPolynomial σ ℤ), (∀ t ∈ p.vars, w t < w s) ∧
+      ψ (X s) = (ε : ℤ) • X s + p) : Function.Bijective ψ := by
   refine ⟨?_, tri_surj w ψ h⟩
-  have hpre
-      : ∀ s, ∃ (ε : ℤˣ) (q : MvPolynomial σ ℤ),
-        (∀ t ∈ q.vars, w t < w s) ∧ ψ ((ε : ℤ) • X s + q) = X s := by
+  have hpre : ∀ s, ∃ (ε : ℤˣ) (q : MvPolynomial σ ℤ), (∀ t ∈ q.vars, w t < w s) ∧
+      ψ ((ε : ℤ) • X s + q) = X s := by
     intro s
     obtain ⟨ε, p, hp, hψ⟩ := h s
     have hp' : ((ε⁻¹ : ℤˣ) : ℤ) • p ∈ supported ℤ {t | w t < w s} := by
@@ -128,12 +162,10 @@ theorem tri_bij
   rw [hcomp, hcomp] at hab
   rw [hab]
 
-theorem uni_inj
-    {M I : Type*} (L : M ≃ I) (w : M → ℕ) (f : M → I →₀ ℤ) (h1 : ∀ m, f m (L m) = 1)
-    (hlt : ∀ m n, f m (L n) ≠ 0 → m = n ∨ w m < w n)
-    : Function.Injective (Finsupp.linearCombination ℤ f) := by
-  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
-    rw [injective_iff_map_eq_zero]
+theorem uni_inj {M I : Type*} (L : M ≃ I) (w : M → ℕ) (f : M → I →₀ ℤ)
+    (h1 : ∀ m, f m (L m) = 1) (hlt : ∀ m n, f m (L n) ≠ 0 → m = n ∨ w m < w n) :
+    Function.Injective (Finsupp.linearCombination ℤ f) := by
+  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
   intro a ha
   by_contra hne
   have hsupp : a.support.Nonempty := Finsupp.support_nonempty_iff.2 hne
@@ -153,27 +185,22 @@ theorem uni_inj
   · intro hn'
     exact absurd hn hn'
 
-theorem uni_exists
-    {M I C : Type*}
-    (L : M ≃ I) (c : M → C) (w : M → ℕ) (b : C → ℕ) (f : M → I →₀ ℤ) (hb : ∀ m, w m ≤ b (c m))
-    (h1 : ∀ m, f m (L m) = 1) (hlt : ∀ m n, f m (L n) ≠ 0 → c m = c n ∧ (m = n ∨ w m < w n))
-    : ∀ n, ∃ a : M →₀ ℤ,
-      (∀ m ∈ a.support, c m = c n) ∧ Finsupp.linearCombination ℤ f a = Finsupp.single (L n) 1 := by
+theorem uni_exists {M I C : Type*} (L : M ≃ I) (c : M → C) (w : M → ℕ) (b : C → ℕ) (f : M → I →₀ ℤ)
+    (hb : ∀ m, w m ≤ b (c m)) (h1 : ∀ m, f m (L m) = 1)
+    (hlt : ∀ m n, f m (L n) ≠ 0 → c m = c n ∧ (m = n ∨ w m < w n)) :
+    ∀ n, ∃ a : M →₀ ℤ, (∀ m ∈ a.support, c m = c n) ∧
+      Finsupp.linearCombination ℤ f a = Finsupp.single (L n) 1 := by
   classical
   intro n
-  suffices key
-      : ∀ d n,
-        b (c n) - w n = d
-          → ∃ a : M →₀ ℤ,
-            (∀ m ∈ a.support, c m = c n)
-              ∧ Finsupp.linearCombination ℤ f a = Finsupp.single (L n) 1 from
-    key _ n rfl
+  suffices key : ∀ d n, b (c n) - w n = d → ∃ a : M →₀ ℤ, (∀ m ∈ a.support, c m = c n) ∧
+      Finsupp.linearCombination ℤ f a = Finsupp.single (L n) 1 from key _ n rfl
   intro d
   induction d using Nat.strong_induction_on with
   | _ d ih =>
     intro n hd
     set v : I →₀ ℤ := Finsupp.single (L n) 1 - f n with hv
-    have hvsupp : ∀ i ∈ v.support, c (L.symm i) = c n ∧ b (c (L.symm i)) - w (L.symm i) < d := by
+    have hvsupp : ∀ i ∈ v.support, c (L.symm i) = c n ∧
+        b (c (L.symm i)) - w (L.symm i) < d := by
       intro i hi
       have hvi : v i ≠ 0 := Finsupp.mem_support_iff.1 hi
       set m := L.symm i with hm
@@ -195,9 +222,8 @@ theorem uni_exists
         have hbm := hb m
         rw [← hc] at hbm ⊢
         omega
-    have hex
-        : ∀ i ∈ v.support, ∃ a : M →₀ ℤ,
-          (∀ m ∈ a.support, c m = c n) ∧ Finsupp.linearCombination ℤ f a = Finsupp.single i 1 := by
+    have hex : ∀ i ∈ v.support, ∃ a : M →₀ ℤ, (∀ m ∈ a.support, c m = c n) ∧
+        Finsupp.linearCombination ℤ f a = Finsupp.single i 1 := by
       intro i hi
       obtain ⟨hc, hlt'⟩ := hvsupp i hi
       obtain ⟨a, ha1, ha2⟩ := ih _ hlt' (L.symm i) rfl
@@ -220,7 +246,7 @@ theorem uni_exists
           exact Finsupp.mem_support_iff.mp hm1 hz
         obtain ⟨i, hi, hmi⟩ := hex'
         exact hg1 i hi m (Finsupp.support_smul hmi)
-    set_option synthInstance.maxHeartbeats 100000 in
+
     · rw [map_add (f := _), map_sum, Finsupp.linearCombination_single, one_smul]
       rw [Finset.sum_congr rfl (fun i hi => by rw [map_smul, hg2 i hi])]
       have hsum : ∑ i ∈ v.support, v i • Finsupp.single i (1 : ℤ) = v := by
@@ -231,14 +257,12 @@ theorem uni_exists
       rw [hsum, hv]
       abel
 
-theorem uni_bij
-    {M I C : Type*}
-    (L : M ≃ I) (c : M → C) (w : M → ℕ) (b : C → ℕ) (f : M → I →₀ ℤ) (hb : ∀ m, w m ≤ b (c m))
-    (h1 : ∀ m, f m (L m) = 1) (hlt : ∀ m n, f m (L n) ≠ 0 → c m = c n ∧ (m = n ∨ w m < w n))
-    : Function.Bijective (Finsupp.linearCombination ℤ f) := by
+theorem uni_bij {M I C : Type*} (L : M ≃ I) (c : M → C) (w : M → ℕ) (b : C → ℕ) (f : M → I →₀ ℤ)
+    (hb : ∀ m, w m ≤ b (c m)) (h1 : ∀ m, f m (L m) = 1)
+    (hlt : ∀ m n, f m (L n) ≠ 0 → c m = c n ∧ (m = n ∨ w m < w n)) :
+    Function.Bijective (Finsupp.linearCombination ℤ f) := by
   refine ⟨uni_inj L w f h1 (fun m n hf => (hlt m n hf).2), ?_⟩
-  have hrange
-      : ∀ i, Finsupp.single i (1 : ℤ) ∈ LinearMap.range (Finsupp.linearCombination ℤ f) := by
+  have hrange : ∀ i, Finsupp.single i (1 : ℤ) ∈ LinearMap.range (Finsupp.linearCombination ℤ f) := by
     intro i
     obtain ⟨a, -, ha⟩ := uni_exists L c w b f hb h1 hlt (L.symm i)
     rw [Equiv.apply_symm_apply] at ha
@@ -260,9 +284,7 @@ namespace PositivityTheory.Groth
 
 theorem triAut : TriAut := fun _ w ψ h => ChartWirtingerDerivatives.tri_bij w ψ h
 
-theorem uniTri : UniTri := fun _ _ _ L c w b f hb h1 hlt => ⟨
-  ChartWirtingerDerivatives.uni_bij L c w b f hb h1 hlt,
-  ChartWirtingerDerivatives.uni_exists L c w b f hb h1 hlt
-⟩
+theorem uniTri : UniTri := fun _ _ _ L c w b f hb h1 hlt =>
+  ⟨ChartWirtingerDerivatives.uni_bij L c w b f hb h1 hlt, ChartWirtingerDerivatives.uni_exists L c w b f hb h1 hlt⟩
 
 end PositivityTheory.Groth

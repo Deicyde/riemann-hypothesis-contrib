@@ -1,10 +1,63 @@
 module
 
 public import Formalism.HermitianCurvature.StatementG
-public import Formalism.HermitianCurvature.HermitianCurvatureProofs.PhaseFunctionCriticalPoints
-public import Formalism.HermitianCurvature.HermitianCurvatureProofs.OrbitalIntegralConvergesAbs
-public import Formalism.HermitianCurvature.HermitianCurvatureProofs.FourierUniquenessMirabolic
+public import Mathlib.Data.Nat.Choose.Multinomial
+public import Formalism.HermitianCurvature.HermitianCurvatureProofs.AdditiveCharacterPsi
 public import Formalism.HermitianCurvature.HermitianCurvatureProofs.CuspidalIrreducibleSubrep
+public import Formalism.HermitianCurvature.HermitianCurvatureProofs.FourierUniquenessMirabolic
+import Formalism.HermitianCurvature.HermitianCurvatureProofs.OrbitalIntegralConvergesAbs
+import Formalism.HermitianCurvature.HermitianCurvatureProofs.PhaseFunctionCriticalPoints
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Real
+import Mathlib.Algebra.Ring.IsFormallyReal
+public import Mathlib.Analysis.Calculus.ContDiff.Bounds
+public import Mathlib.Analysis.Calculus.Deriv.Pi
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.CategoryTheory.Countable
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Separation.CompletelyRegular
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
+public import Mathlib.MeasureTheory.Measure.Haar.NormedSpace
 
 @[expose] public section
 
@@ -134,8 +187,8 @@ theorem a_fderiv_single {n : ℕ} (D' : ℂ) (x : Fin n → ℂ) (hx : ∀ k, x 
 theorem a_fderiv_apply {n : ℕ} (D' : ℂ) (x : Fin n → ℂ) (hx : ∀ k, x k ≠ 0) (v : Fin n → ℂ)
     : fderiv ℂ (g0 D') x v = ∑ k, v k * dg0 D' x k := by
   conv_lhs => rw [pi_eq_sum_univ v]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+
+  rw [map_sum]
   refine Finset.sum_congr rfl fun k _ => ?_
   have : (fun j => if k = j then (1 : ℂ) else 0) = Pi.single k 1 := by
     funext j; simp [Pi.single_apply, eq_comm]
@@ -286,8 +339,6 @@ theorem b_near
     (x : Fin (m + 1) → ℂ) (hx : ∀ k, ‖x k - z‖ ≤ 2 * δ) (hx0 : ∀ k, x k ≠ 0)
     (k : Fin (m + 1))
     : ‖x k - z‖ ≤ 6 * ‖z‖ * ‖dg0 (z ^ (m + 2)) x‖ := by
-  have hm0 : (0 : ℝ) ≤ m := Nat.cast_nonneg m
-  have hs : (0 : ℝ) < (m : ℝ) + 2 := by linarith
   have hzpos : 0 < ‖z‖ := lt_of_lt_of_le (by positivity) hz
   have hz0 : z ≠ 0 := norm_pos_iff.1 hzpos
   have hD : z ^ (m + 2) ≠ 0 := pow_ne_zero _ hz0
@@ -361,7 +412,6 @@ open Formalism.FourierDecayAlt.G
 
 theorem phase_near_critical : Formalism.FourierDecayAlt.G.PhaseFunctionNearCritical := by
   intro m δ Rz hδ
-  have hm0 : (0 : ℝ) ≤ m := Nat.cast_nonneg m
   refine ⟨(2 * ((m : ℝ) + 1) + 2 ^ (m + 1) + 6) * |Rz| + 1, by positivity, ?_⟩
   intro z hz hzR
   have hzpos : 0 < ‖z‖ := lt_of_lt_of_le (by positivity) hz
@@ -436,7 +486,6 @@ theorem phase_near_critical : Formalism.FourierDecayAlt.G.PhaseFunctionNearCriti
     refine (PhaseFunctionDerivatives.b_near m δ hδ z hz x hxk (hne x hx') k).trans ?_
     apply mul_le_mul_of_nonneg_right _ hd0
     have : (0 : ℝ) ≤ 2 ^ (m + 1) := by positivity
-    have h0 : 0 ≤ |Rz| := abs_nonneg _
     nlinarith
 
 end Formalism.FourierDecayAlt.P
@@ -460,7 +509,6 @@ theorem c_le (a : ℝ) (ha : 0 ≤ a) (E' : ℕ) (d A : ℝ) (hd : 0 ≤ d) (hA 
     · rw [max_eq_left h]; linarith
     · rw [max_eq_right h]; linarith
   obtain ⟨p, hp⟩ : ∃ p : ℝ, p = (E' : ℝ) + d + 1 := ⟨_, rfl⟩
-  have hp0 : 0 ≤ p := by rw [hp]; positivity
   rw [← hp] at hA ⊢
   have s1 : (max 1 a) ^ (-A) ≤ (max 1 a) ^ (-p) :=
     Real.rpow_le_rpow_of_exponent_le hM1 (by linarith)

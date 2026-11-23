@@ -1,42 +1,62 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.FixedVectorEqOfStandardData
 public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.IsTwIffCanonEq
 public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.JetsInIffStepField
 public import Development.AbelianVarietyTheory.Definitions.GlobalTwisting.IdxMatNF
-public import Formalism.LocalToGlobal.Columns.FiniteSumNonzeroLargeDepth
-public import Formalism.LocalToGlobal.KernelLattices.TopLawQ
-public import Formalism.LocalToGlobal.KernelLattices.ColInst
-public import Formalism.LocalToGlobal.KernelLattices.KernelLocalFactors.ColInst
-public import Formalism.LocalToGlobal.Columns.ChainInstY
-public import Formalism.LocalToGlobal.KernelLattices.KernelLocalFactors.MemGoodPrimesOfNoExceptional
-public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.CmQuadraticFormEqAlternatingForm
-public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.IsHalfPtIff
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.KernelsOverOfFamily
-public import Formalism.LocalToGlobal.Columns.ReferenceKernelEquivOfLastComponent
-public import Formalism.LocalToGlobal.KernelLattices.KernelLocalFactors.KerEquivConcrete
-public import Formalism.LocalToGlobal.Columns.FixEColLevSym
-public import Formalism.LocalToGlobal.KernelLattices.KernelLocalFactors.RatKDeg
-public import Formalism.LocalToGlobal.Columns.RecChainUnfOne
-public import Formalism.LocalToGlobal.Columns.ChainLawPhiTop
-public import Formalism.LocalToGlobal.Columns.UnfoldingNonvanishingDoubleCosetHolds
-public import Formalism.LocalToGlobal.Columns.ChainLawXiQF
-public import Formalism.LocalToGlobal.KernelLattices.KernelLocalFactors.KerHypAll
-public import Formalism.LocalToGlobal.KernelLattices.KernelLocalFactors.RkEqcar
-public import Formalism.LocalToGlobal.KernelLattices.KernelLocalFactors.RkVolLaHyp
+public import Formalism.LocalToGlobal.KernelLattices.RatKDeg
 public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.EvGSDOkOfEqOne
-public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.ToLinNfMatEqSumNfGen
-public import Formalism.LocalToGlobal.Columns.ChainTwOk
-public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.TrueColumnPeriodLatticeVacuumSmooth
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.OrdSubConjEqNeg
-public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.NormOneDetIdealTransportedLattice
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.BaseFieldsDefiniteLaws
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.TwistedNormalForms
-public import Formalism.LocalToGlobal.GlobalTheory.GL3.PLinkThIndep
-public import Formalism.LocalToGlobal.KernelLattices.KernelLocalFactors.ExistsIntegralMulOrderElement
-public import Formalism.LocalToGlobal.KernelLattices.ColumnData.Smooth
 public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.AbsNormEqOfSplit
+public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.NormOneDetIdealTransportedLattice
+public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.NotDvdDifferent
+import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.BaseFieldsDefiniteLaws
+import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.BaseFieldsPrimesOk
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.KernelsOverOfFamily
+import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.OrdSubConjEqNeg
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.TwistedNormalForms
+import Formalism.LocalToGlobal.Columns.ChainTwPsi
+import Formalism.LocalToGlobal.Columns.UnfoldingNonvanishingDoubleCosetHolds
+import Formalism.LocalToGlobal.GlobalTheory.GL3.PLinkThIndep
+public import Formalism.LocalToGlobal.KernelLattices.ColumnData.Smooth
+public import Formalism.LocalToGlobal.KernelLattices.KernelLocalFactors.ColDatK
+public import Formalism.LocalToGlobal.KernelLattices.KernelLocalFactors.ExistsIntegralMulOrderElement
+public import Formalism.LocalToGlobal.KernelLattices.KernelLocalFactors.LocalProductMeasures
+public import Formalism.LocalToGlobal.KernelLattices.KernelLocalFactors.RatKDeg
+public import Formalism.LocalToGlobal.KernelLattices.KernelLocalFactors.RkEqcar
+import Formalism.LocalToGlobal.KernelLattices.KernelLocalFactors.ThetaLocalEquivalence.ThEquivPAmbOfTiesD
+import Formalism.LocalToGlobal.KernelLattices.KernelLocalFactors.ThetaLocalEquivalence.ThEquivPStepCIff
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
 
 @[expose] public section
 
@@ -76,7 +96,6 @@ theorem n1_detStd
       (seamOf_ok B (I.cols l) Z.W Z.V Z.S Z.N Z.G) hN
   rwa [seamOf_lat] at h
 
-set_option maxHeartbeats 1000000 in
 theorem jetsRat_chi
     (I : TC B X) (l : I.Laws) (Z : TC.Later B (I.cols l)) (hJ : ColIn.JetsIn I)
     (χ : Submodule (𝓞 B.host.E) B.host.E → ℂ)
@@ -159,7 +178,6 @@ namespace GlobalTheory.Mem.Col2.TC.RcHyp
 
 variable {B : Base} {X : PreX B.toPre}
 
-set_option maxHeartbeats 1000000 in
 theorem chTh_ok_chi
     (I : TC B X) (h : I.Ok) (l : I.Laws) (Z : TC.Later B (I.cols l)) (hJ : ColIn.JetsIn I)
     (χ : Submodule (𝓞 B.host.E) B.host.E → ℂ)

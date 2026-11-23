@@ -2,8 +2,54 @@ module
 
 public import Formalism.LocalRingCardinality.DataKerI
 public import Formalism.LocalRingCardinality.DataParamsT
+public import Formalism.LocalRingCardinality.DataIdx
+public import Formalism.HermitianLattices.HermitianLatticesProofs.LocBasic
 public import Formalism.LocalRingCardinality.RankBoundMonotoneInDimension
 public import Formalism.LocalToGlobal.Columns.LocWLemmas
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Rat
+import Mathlib.Algebra.Order.Star.Real
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Coalgebra.IsFrobenius
+import Mathlib.RingTheory.HopfAlgebra.Basic
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+public import Formalism.LocalToGlobal.Columns.AlgebraMapMemMaximalIdealPowIff
 
 @[expose] public section
 
@@ -580,8 +626,8 @@ theorem li_of_semilinear
   intro g hg i
   have h1 : ∑ i, σ (g i) • e (v i) = 0 := by
     have := congrArg e hg
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, map_zero] at this
+
+    rw [map_sum, map_zero] at this
     rw [← this]
     exact Finset.sum_congr rfl fun i _ => by rw [map_smulₛₗ]
   have := Fintype.linearIndependent_iff.1 h _ h1 i
@@ -647,8 +693,8 @@ theorem factStepBz {D : D7} (X : DivX D) : FactStepBz X := by
     funext i
     apply jM_inj X j
     unfold famOf
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hs, hZ i, map_sum]
+
+    rw [hs, hZ i, map_sum]
     exact Finset.sum_congr rfl fun k _ => by rw [map_smulₛₗ, hs0]
   have hdZ : Z.det ≠ 0 := det_ne_zero_of_li _ Z (hcZ ▸ hc)
 

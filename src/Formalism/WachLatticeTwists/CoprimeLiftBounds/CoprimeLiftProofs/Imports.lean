@@ -1,6 +1,49 @@
 module
 
+public import Formalism.WachLatticeTwists.CoprimeLiftBounds.Statement
 public import Formalism.WachLatticeTwists.CoprimeLiftBounds.CoprimeLiftProofs.SmulYGenEqZero
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -13,14 +56,14 @@ namespace Formalism.RepresentationBoundsCohomology.BR
 open Formalism.NG
 
 theorem c3 : SelmerFInjective := by
-  intro O _ _ _ D _ L V M _ _ _ _ _ _ _ _ ρL ρV ρM i q hi hq hker hsat hiρ hqρ Ff j κ hF1 hF2 hF3
-    hF4 x m hx
+  intro O _ _ _ D _ L V M _ _ _ _ _ _ _ _ ρL ρV ρM i q hi hq hker hsat hiρ hqρ Ff j κ hF1 hF2 hF3 hF4
+    x m hx
 
-  obtain ⟨⟨c, hc⟩, hcx⟩ :=
-    IsLocalization.exist_integer_multiples (nonZeroDivisors O) (Finset.univ : Finset (Fin j)) x
+  obtain ⟨⟨c, hc⟩, hcx⟩ := IsLocalization.exist_integer_multiples (nonZeroDivisors O)
+    (Finset.univ : Finset (Fin j)) x
   have hc0 : c ≠ 0 := nonZeroDivisors.ne_zero hc
-  have hcx' : ∀ a, ∃ t : O, algebraMap O (FractionRing O) t = c • x a := fun a =>
-    RingHom.mem_rangeS.mp (hcx a (Finset.mem_univ a))
+  have hcx' : ∀ a, ∃ t : O, algebraMap O (FractionRing O) t = c • x a :=
+    fun a => RingHom.mem_rangeS.mp (hcx a (Finset.mem_univ a))
   choose y hy using hcx'
   obtain ⟨v, rfl⟩ := hq m
   obtain ⟨d, hd0, hw'⟩ := hsat (c • v)
@@ -31,8 +74,7 @@ theorem c3 : SelmerFInjective := by
 
   have cancelV : ∀ u u' : V, (d * c) • u = (d * c) • u' → u = u' := by
     intro u u' h
-    rw [← algebraMap_smul (FractionRing O) (d * c) u, ← algebraMap_smul (FractionRing O) (d * c) u']
-      at h
+    rw [← algebraMap_smul (FractionRing O) (d * c) u, ← algebraMap_smul (FractionRing O) (d * c) u'] at h
     exact smul_right_injective V hK0 h
   have cancelL : ∀ a b : L, (d * c) • a = (d * c) • b → a = b := by
     intro a b h
@@ -57,9 +99,8 @@ theorem c3 : SelmerFInjective := by
   have hY : ∀ g, (d * c) • z g = (Y : D → L) g := by
     intro g
     apply hi
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hYg g, map_smul, hz g, map_sub, map_sub, map_sum, hiρ, hw, smul_sub, smul_sub,
-        Finset.smul_sum]
+
+    rw [hYg g, map_smul, hz g, map_sub, map_sub, map_sum, hiρ, hw, smul_sub, smul_sub, Finset.smul_sum]
     congr 1
     · refine Finset.sum_congr rfl fun a _ => ?_
       rw [map_smul, mul_smul, mul_smul, ← smul_assoc c (x a), ← hy a, algebraMap_smul]
@@ -73,27 +114,24 @@ theorem c3 : SelmerFInjective := by
     exact Y.2 g h
   have hZY : (d * c) • (⟨z, hzc⟩ : coZ1s ρL) = Y := Subtype.ext (funext hY)
   have hYcl : (Submodule.mkQ _ Y : H1z ρL) = ∑ a, (d * y a) • (Submodule.mkQ _ (κ a) : H1z ρL) := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hYdef, map_sub, mkQ_cobZ, sub_zero, map_sum]
+
+    rw [hYdef, map_sub, mkQ_cobZ, sub_zero, map_sum]
     simp only [map_smul]
-  have h2
-      : (d * c) • (Submodule.mkQ _ ⟨z, hzc⟩ : H1z ρL)
-        = ∑ a, (d * y a) • (Submodule.mkQ _ (κ a) : H1z ρL) := by
+  have h2 : (d * c) • (Submodule.mkQ _ ⟨z, hzc⟩ : H1z ρL) =
+      ∑ a, (d * y a) • (Submodule.mkQ _ (κ a) : H1z ρL) := by
     rw [← map_smul, hZY, hYcl]
   have hZF : (Submodule.mkQ _ ⟨z, hzc⟩ : H1z ρL) ∈ Ff := by
     apply hF1 (d * c) _ he0
     rw [h2]
     exact Submodule.sum_mem _ fun a _ => Submodule.smul_mem _ _ (hF2 a)
   obtain ⟨b, c', hc'0, hc'⟩ := hF3 _ hZF
-  have h1
-      : c' • (Submodule.mkQ _ ⟨z, hzc⟩ : H1z ρL)
-        = c' • ∑ a, b a • (Submodule.mkQ _ (κ a) : H1z ρL) := by
+  have h1 : c' • (Submodule.mkQ _ ⟨z, hzc⟩ : H1z ρL) =
+      c' • ∑ a, b a • (Submodule.mkQ _ (κ a) : H1z ρL) := by
     rw [smul_sub, sub_eq_zero] at hc'
     exact hc'
-  have hsplit
-      : ∑ a, (d * y a - d * c * b a) • (Submodule.mkQ _ (κ a) : H1z ρL)
-        = ∑ a, (d * y a) • (Submodule.mkQ _ (κ a) : H1z ρL)
-          - (d * c) • ∑ a, b a • (Submodule.mkQ _ (κ a) : H1z ρL) := by
+  have hsplit : ∑ a, (d * y a - d * c * b a) • (Submodule.mkQ _ (κ a) : H1z ρL) =
+      ∑ a, (d * y a) • (Submodule.mkQ _ (κ a) : H1z ρL) -
+        (d * c) • ∑ a, b a • (Submodule.mkQ _ (κ a) : H1z ρL) := by
     simp only [sub_smul, Finset.sum_sub_distrib, mul_smul, Finset.smul_sum]
   have h3 : c' • ∑ a, (d * y a - d * c * b a) • (Submodule.mkQ _ (κ a) : H1z ρL) = 0 := by
     rw [hsplit, ← h2, smul_sub, smul_comm c' (d * c), h1, smul_comm c' (d * c), sub_self]

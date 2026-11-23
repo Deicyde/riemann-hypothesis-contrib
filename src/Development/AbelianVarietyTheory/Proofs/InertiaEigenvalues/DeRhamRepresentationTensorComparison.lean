@@ -1,92 +1,118 @@
 module
 
-public import Mathlib
-public import Formalism.LocalRingCardinality.RhoDetPrimeEqMuTildeMulChiPow
 public import Formalism.LocalRingCardinality.AdicCompletionLocal.LocTied
-public import Formalism.SharpRestriction.LevelLetterCocycles.LocalSituation
 public import Formalism.SharpRestriction.LevelLetterCocycles.LocCoh
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.JumpIffMultNeZero
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsEmbeddingIdempotentTensor
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.DeRhamSubrepQuotientAndStrictnessStatement
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsEmbeddingIdempotentTensor
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.JumpIffMultNeZero
 public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.IsJumpVOfInjective
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
-open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc
-  Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N TensorProduct Module
+open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N TensorProduct Module
 
 namespace GlobalTheory.Per.ExactMult
 
-theorem finrank_add_of_exact
-    {L A₀ A₁ A₂ : Type} [Field L] [AddCommGroup A₀] [Module L A₀] [AddCommGroup A₁] [Module L A₁]
-    [AddCommGroup A₂] [Module L A₂]
-    (i : A₀ →ₗ[L] A₁) (p : A₁ →ₗ[L] A₂)
+theorem finrank_add_of_exact {L A₀ A₁ A₂ : Type} [Field L] [AddCommGroup A₀] [Module L A₀]
+    [AddCommGroup A₁] [Module L A₁] [AddCommGroup A₂] [Module L A₂] (i : A₀ →ₗ[L] A₁) (p : A₁ →ₗ[L] A₂)
     (hi : Function.Injective i) (hk : LinearMap.range i = LinearMap.ker p)
-    (S₀ : Submodule L A₀)
-    (S₁ : Submodule L A₁)
-    (S₂ : Submodule L A₂)
-    [FiniteDimensional L S₁]
-    (h0 : S₀ = S₁.comap i) (h2 : S₁.map p = S₂)
-    : finrank L S₁ = finrank L S₀ + finrank L S₂ := by
+    (S₀ : Submodule L A₀) (S₁ : Submodule L A₁) (S₂ : Submodule L A₂) [FiniteDimensional L S₁]
+    (h0 : S₀ = S₁.comap i) (h2 : S₁.map p = S₂) :
+    finrank L S₁ = finrank L S₀ + finrank L S₂ := by
   have e := LinearMap.finrank_range_add_finrank_ker (p.domRestrict S₁)
   rw [LinearMap.range_domRestrict, h2, LinearMap.ker_domRestrict, ← hk] at e
   have e1 : finrank L ((LinearMap.range i).comap S₁.subtype) = finrank L S₀ := by
     rw [← Submodule.finrank_map_subtype_eq, Submodule.map_comap_subtype, h0,
-      (Submodule.equivMapOfInjective i hi (S₁.comap i)).finrank_eq, Submodule.map_comap_eq,
-      inf_comm]
+      (Submodule.equivMapOfInjective i hi (S₁.comap i)).finrank_eq, Submodule.map_comap_eq, inf_comm]
   omega
 
 section General
 
-variable
-  {G : Type} [Group G]
-  {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K] [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K]
-  [IsScalarTower Qp K₀ K]
-  {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
-  [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
-  [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
-  (PD : PeriodData G Qp K₀ K B BdR)
-  {LL : Type} [Field LL] [Algebra Qp LL]
-  {V : Type} [AddCommGroup V] [Module LL V] [Module Qp V] [IsScalarTower Qp LL V]
-  {V' : Type} [AddCommGroup V'] [Module LL V'] [Module Qp V'] [IsScalarTower Qp LL V']
+variable {G : Type} [Group G] {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K]
+    [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K] [IsScalarTower Qp K₀ K]
+    {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
+    [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
+    [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
+    (PD : PeriodData G Qp K₀ K B BdR)
+    {LL : Type} [Field LL] [Algebra Qp LL]
+    {V : Type} [AddCommGroup V] [Module LL V] [Module Qp V] [IsScalarTower Qp LL V]
+    {V' : Type} [AddCommGroup V'] [Module LL V'] [Module Qp V'] [IsScalarTower Qp LL V']
 
-theorem mem_fil (ρ : Representation LL G V) (τ : K →ₐ[Qp] LL) (a : ℤ) (x : V ⊗[Qp] BdR)
-    : x ∈ FildR PD ρ τ a
-      ↔ ((∀ g, actVdR PD ρ g x = x) ∧ ∀ c : K, mulVdR (LL := LL) (V := V) c x = τ c • x)
-        ∧ x ∈ FilV PD (LL := LL) (V := V) a := by
-  simp only [FildR, DdRE, DdR, Submodule.mem_inf, Submodule.mem_iInf, LinearMap.mem_ker,
-    LinearMap.sub_apply, LinearMap.id_apply, LinearMap.smul_apply, sub_eq_zero]
+theorem mem_fil (ρ : Representation LL G V) (τ : K →ₐ[Qp] LL) (a : ℤ) (x : V ⊗[Qp] BdR) :
+    x ∈ FildR PD ρ τ a ↔ ((∀ g, actVdR PD ρ g x = x) ∧
+      ∀ c : K, mulVdR (LL := LL) (V := V) c x = τ c • x) ∧ x ∈ FilV PD (LL := LL) (V := V) a := by
+  simp only [FildR, DdRE, DdR, Submodule.mem_inf, Submodule.mem_iInf,
+    LinearMap.mem_ker, LinearMap.sub_apply, LinearMap.id_apply, LinearMap.smul_apply, sub_eq_zero]
 
-theorem map_mul (f : V →ₗ[LL] V') (c : K) (x : V ⊗[Qp] BdR)
-    : AlgebraTensorModule.map f (LinearMap.id : BdR →ₗ[Qp] BdR) (mulVdR (LL := LL) (V := V) c x)
-      = mulVdR (LL := LL) (V := V') c
-        (AlgebraTensorModule.map f (LinearMap.id : BdR →ₗ[Qp] BdR) x) := by
+theorem map_mul (f : V →ₗ[LL] V') (c : K) (x : V ⊗[Qp] BdR) :
+    AlgebraTensorModule.map f (LinearMap.id : BdR →ₗ[Qp] BdR) (mulVdR (LL := LL) (V := V) c x) =
+      mulVdR (LL := LL) (V := V') c (AlgebraTensorModule.map f (LinearMap.id : BdR →ₗ[Qp] BdR) x) := by
   induction x using TensorProduct.induction_on with
   | zero => simp
   | tmul v b => simp [mulVdR]
   | add y z hy hz => simp only [map_add (f := _), hy, hz]
 
-theorem map_act
-    (ρ : Representation LL G V) (ρ' : Representation LL G V') (f : V →ₗ[LL] V')
-    (he : ∀ g v, f (ρ g v) = ρ' g (f v))
-    (g : G) (x : V ⊗[Qp] BdR)
-    : AlgebraTensorModule.map f (LinearMap.id : BdR →ₗ[Qp] BdR) (actVdR PD ρ g x)
-      = actVdR PD ρ' g (AlgebraTensorModule.map f (LinearMap.id : BdR →ₗ[Qp] BdR) x) := by
+theorem map_act (ρ : Representation LL G V) (ρ' : Representation LL G V') (f : V →ₗ[LL] V')
+    (he : ∀ g v, f (ρ g v) = ρ' g (f v)) (g : G) (x : V ⊗[Qp] BdR) :
+    AlgebraTensorModule.map f (LinearMap.id : BdR →ₗ[Qp] BdR) (actVdR PD ρ g x) =
+      actVdR PD ρ' g (AlgebraTensorModule.map f (LinearMap.id : BdR →ₗ[Qp] BdR) x) := by
   induction x using TensorProduct.induction_on with
   | zero => simp
   | tmul v b => simp [actVdR, he]
   | add y z hy hz => simp only [map_add (f := _), hy, hz]
 
-theorem act_mul (ρ : Representation LL G V) (g : G) (c : K) (x : V ⊗[Qp] BdR)
-    : actVdR PD ρ g (mulVdR (LL := LL) (V := V) c x)
-      = mulVdR (LL := LL) (V := V) c (actVdR PD ρ g x) := by
+theorem act_mul (ρ : Representation LL G V) (g : G) (c : K) (x : V ⊗[Qp] BdR) :
+    actVdR PD ρ g (mulVdR (LL := LL) (V := V) c x) =
+      mulVdR (LL := LL) (V := V) c (actVdR PD ρ g x) := by
   induction x using TensorProduct.induction_on with
   | zero => simp
   | tmul v b => simp [actVdR, mulVdR]
   | add y z hy hz => simp only [map_add (f := _), hy, hz]
 
-theorem mul_mem_filV (a : ℤ) (c : K) (x : V ⊗[Qp] BdR) (hx : x ∈ FilV PD (LL := LL) (V := V) a)
-    : mulVdR (LL := LL) (V := V) c x ∈ FilV PD (LL := LL) (V := V) a := by
+theorem mul_mem_filV (a : ℤ) (c : K) (x : V ⊗[Qp] BdR) (hx : x ∈ FilV PD (LL := LL) (V := V) a) :
+    mulVdR (LL := LL) (V := V) c x ∈ FilV PD (LL := LL) (V := V) a := by
   obtain ⟨y, rfl⟩ := hx
   induction y using TensorProduct.induction_on with
   | zero => simp
@@ -96,10 +122,8 @@ theorem mul_mem_filV (a : ℤ) (c : K) (x : V ⊗[Qp] BdR) (hx : x ∈ FilV PD (
   | add y z hy hz => rw [map_add (f := _), map_add (f := _)]; exact Submodule.add_mem _ hy hz
 
 noncomputable def ev (x : V ⊗[Qp] BdR) : LL ⊗[Qp] K →ₗ[Qp] V ⊗[Qp] BdR :=
-  TensorProduct.lift (LinearMap.mk₂ Qp
-    (fun (c : LL) (k : K) => c • mulVdR (LL := LL) (V := V) k x)
-    (fun _ _ _ => add_smul _ _ _)
-    (fun _ _ _ => smul_assoc _ _ _)
+  TensorProduct.lift (LinearMap.mk₂ Qp (fun (c : LL) (k : K) => c • mulVdR (LL := LL) (V := V) k x)
+    (fun _ _ _ => add_smul _ _ _) (fun _ _ _ => smul_assoc _ _ _)
     (fun c k k' => by
       rw [← smul_add]
       congr 1
@@ -115,39 +139,32 @@ noncomputable def ev (x : V ⊗[Qp] BdR) : LL ⊗[Qp] K →ₗ[Qp] V ⊗[Qp] BdR
       | tmul v b =>
         have : algebraMap K BdR (q • k) * b = q • (algebraMap K BdR k * b) := by
           rw [← Algebra.smul_def, ← Algebra.smul_def, smul_assoc]
-        simp only [mulVdR, AlgebraTensorModule.map_tmul, LinearMap.id_apply,
-          LinearMap.mulLeft_apply, this, tmul_smul]
+        simp only [mulVdR, AlgebraTensorModule.map_tmul, LinearMap.id_apply, LinearMap.mulLeft_apply, this,
+          tmul_smul]
       | add y z hy hz => simp only [map_add (f := _), hy, hz, smul_add]))
 
-theorem ev_tmul (x : V ⊗[Qp] BdR) (c : LL) (k : K)
-    : ev (LL := LL) (K := K) x (c ⊗ₜ k) = c • mulVdR (LL := LL) (V := V) k x :=
-  rfl
+theorem ev_tmul (x : V ⊗[Qp] BdR) (c : LL) (k : K) :
+    ev (LL := LL) (K := K) x (c ⊗ₜ k) = c • mulVdR (LL := LL) (V := V) k x := rfl
 
-theorem mul_mul (y k : K) (x : V ⊗[Qp] BdR)
-    : mulVdR (LL := LL) (V := V) (y * k) x
-      = mulVdR (LL := LL) (V := V) y (mulVdR (LL := LL) (V := V) k x) := by
+theorem mul_mul (y k : K) (x : V ⊗[Qp] BdR) :
+    mulVdR (LL := LL) (V := V) (y * k) x = mulVdR (LL := LL) (V := V) y (mulVdR (LL := LL) (V := V) k x) := by
   induction x using TensorProduct.induction_on with
   | zero => simp
   | tmul v b => simp [mulVdR, mul_assoc]
   | add y z hy hz => simp only [map_add (f := _), hy, hz]
 
-theorem map_fildR_eq
-    [CharZero Qp]
-    (ρ : Representation LL G V) (ρ' : Representation LL G V') (f : V →ₗ[LL] V')
-    (he : ∀ g v, f (ρ g v) = ρ' g (f v))
-    (τ : K →ₐ[Qp] LL)
-    (a : ℤ)
+theorem map_fildR_eq [CharZero Qp] (ρ : Representation LL G V) (ρ' : Representation LL G V')
+    (f : V →ₗ[LL] V') (he : ∀ g v, f (ρ g v) = ρ' g (f v)) (τ : K →ₐ[Qp] LL) (a : ℤ)
     (hs : ∀ y ∈ DdR PD ρ' ⊓ FilV PD (LL := LL) (V := V') a,
       ∃ x ∈ DdR PD ρ ⊓ FilV PD (LL := LL) (V := V) a,
-        AlgebraTensorModule.map f (LinearMap.id : BdR →ₗ[Qp] BdR) x = y)
-    : (FildR PD ρ τ a).map (AlgebraTensorModule.map f (LinearMap.id : BdR →ₗ[Qp] BdR))
-      = FildR PD ρ' τ a := by
+        AlgebraTensorModule.map f (LinearMap.id : BdR →ₗ[Qp] BdR) x = y) :
+    (FildR PD ρ τ a).map (AlgebraTensorModule.map f (LinearMap.id : BdR →ₗ[Qp] BdR)) =
+      FildR PD ρ' τ a := by
   haveI := PD.finK
   apply le_antisymm
   · rintro _ ⟨x, hx, rfl⟩
     obtain ⟨⟨h1, h2⟩, h3⟩ := (mem_fil PD ρ τ a x).1 hx
-    refine (mem_fil PD ρ' τ a _).2
-      ⟨⟨fun g => ?_, fun c => ?_⟩, GlobalTheory.HTW.map_mem_FilV PD f a x h3⟩
+    refine (mem_fil PD ρ' τ a _).2 ⟨⟨fun g => ?_, fun c => ?_⟩, GlobalTheory.HTW.map_mem_FilV PD f a x h3⟩
     · rw [← map_act PD ρ ρ' f he, h1]
     · rw [← map_mul, h2, map_smul]
   · intro y hy
@@ -155,46 +172,37 @@ theorem map_fildR_eq
     obtain ⟨⟨-, h2⟩, -⟩ := (mem_fil PD ρ' τ a _).1 hy
     have h1 : ∀ g, actVdR PD ρ g x = x := by
       simpa only [DdR, SetLike.mem_coe, Submodule.mem_iInf, LinearMap.mem_ker, LinearMap.sub_apply,
-          LinearMap.id_apply, sub_eq_zero]
-        using hx1
+        LinearMap.id_apply, sub_eq_zero] using hx1
     obtain ⟨m, c, k, hc, hk⟩ := GlobalTheory.exists_embedding_idempotent_tensor Qp K LL τ
-    refine ⟨
-      ∑ j, c j • mulVdR (LL := LL) (V := V) (k j) x,
-      (mem_fil PD ρ τ a _).2 ⟨⟨fun g => ?_, fun y => ?_⟩, ?_⟩,
-      ?_
-    ⟩
-    set_option synthInstance.maxHeartbeats 100000 in
-      · simp only [map_sum, map_smul, act_mul, h1]
+    refine ⟨∑ j, c j • mulVdR (LL := LL) (V := V) (k j) x,
+      (mem_fil PD ρ τ a _).2 ⟨⟨fun g => ?_, fun y => ?_⟩, ?_⟩, ?_⟩
+
+    · simp only [map_sum, map_smul, act_mul, h1]
     · have := congrArg (ev (LL := LL) (K := K) x) (hk y)
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [map_sum, ev_tmul, mul_mul] at this
-      set_option synthInstance.maxHeartbeats 100000 in
+
+      simp only [map_sum, ev_tmul, mul_mul] at this
+
       simp only [map_sum, map_smul, this, Finset.smul_sum, mul_smul]
     · exact Submodule.sum_mem _ fun j _ => Submodule.smul_mem _ _ (mul_mem_filV PD a _ x hx2)
-    set_option synthInstance.maxHeartbeats 100000 in
+
     · simp only [map_sum, map_smul, map_mul, h2, ← mul_smul, ← Finset.sum_smul, hc, one_smul]
 
 variable {V₀ : Type} [AddCommGroup V₀] [Module LL V₀] [Module Qp V₀] [IsScalarTower Qp LL V₀]
 
-theorem tensor_exact
-    (ι : V₀ →ₗ[LL] V) (π : V →ₗ[LL] V') (hι : Function.Injective ι) (hπ : Function.Surjective π)
-    (hk : LinearMap.range ι = LinearMap.ker π)
-    : Function.Injective (AlgebraTensorModule.map ι (LinearMap.id : BdR →ₗ[Qp] BdR))
-      ∧ LinearMap.range (AlgebraTensorModule.map ι (LinearMap.id : BdR →ₗ[Qp] BdR))
-        = LinearMap.ker (AlgebraTensorModule.map π (LinearMap.id : BdR →ₗ[Qp] BdR)) := by
-  have e1
-      : ∀ x,
-        AlgebraTensorModule.map ι (LinearMap.id : BdR →ₗ[Qp] BdR) x
-          = (ι.restrictScalars Qp).rTensor BdR x := by
+theorem tensor_exact (ι : V₀ →ₗ[LL] V) (π : V →ₗ[LL] V') (hι : Function.Injective ι)
+    (hπ : Function.Surjective π) (hk : LinearMap.range ι = LinearMap.ker π) :
+    Function.Injective (AlgebraTensorModule.map ι (LinearMap.id : BdR →ₗ[Qp] BdR)) ∧
+      LinearMap.range (AlgebraTensorModule.map ι (LinearMap.id : BdR →ₗ[Qp] BdR)) =
+        LinearMap.ker (AlgebraTensorModule.map π (LinearMap.id : BdR →ₗ[Qp] BdR)) := by
+  have e1 : ∀ x, AlgebraTensorModule.map ι (LinearMap.id : BdR →ₗ[Qp] BdR) x =
+      (ι.restrictScalars Qp).rTensor BdR x := by
     intro x
     induction x using TensorProduct.induction_on with
     | zero => simp
     | tmul v b => simp
     | add y z hy hz => simp only [map_add (f := _), hy, hz]
-  have e2
-      : ∀ x,
-        AlgebraTensorModule.map π (LinearMap.id : BdR →ₗ[Qp] BdR) x
-          = (π.restrictScalars Qp).rTensor BdR x := by
+  have e2 : ∀ x, AlgebraTensorModule.map π (LinearMap.id : BdR →ₗ[Qp] BdR) x =
+      (π.restrictScalars Qp).rTensor BdR x := by
     intro x
     induction x using TensorProduct.induction_on with
     | zero => simp
@@ -213,44 +221,17 @@ theorem tensor_exact
 
 end General
 
-theorem exact_hodge_add
-    : ∀ (l : ℕ) [Fact l.Prime] (P : LocPrime l) (AI : LocAinf l P),
-      LocTied l P AI
-        → ∀ (K LL : FinExt l) (V₀ : Type) [AddCommGroup V₀] [Module ↥LL.1 V₀] [Module ℚ_[l] V₀]
-            [IsScalarTower ℚ_[l] ↥LL.1 V₀] [FiniteDimensional ↥LL.1 V₀]
-            (ρ₀ : Representation ↥LL.1 ↥(GK K) V₀) (V₁ : Type) [AddCommGroup V₁] [Module ↥LL.1 V₁]
-            [Module ℚ_[l] V₁] [IsScalarTower ℚ_[l] ↥LL.1 V₁] [FiniteDimensional ↥LL.1 V₁]
-            (ρ₁ : Representation ↥LL.1 ↥(GK K) V₁) (V₂ : Type) [AddCommGroup V₂] [Module ↥LL.1 V₂]
-            [Module ℚ_[l] V₂] [IsScalarTower ℚ_[l] ↥LL.1 V₂] [FiniteDimensional ↥LL.1 V₂]
-            (ρ₂ : Representation ↥LL.1 ↥(GK K) V₂) (ι : V₀ →ₗ[↥LL.1] V₁) (π : V₁ →ₗ[↥LL.1] V₂),
-          (∀ g x, ι (ρ₀ g x) = ρ₁ g (ι x)) → (∀ g x, π (ρ₁ g x) = ρ₂ g (π x)) → Function.Injective ι
-            → Function.Surjective π → LinearMap.range ι = LinearMap.ker π → IsDR (P.PD K) ρ₁
-            → IsDR (P.PD K) ρ₀ ∧ IsDR (P.PD K) ρ₂
-              ∧ ∀ (τ : ↥K.1 →ₐ[ℚ_[l]] ↥LL.1) (a : ℤ),
-                finrank ↥LL.1 ↥(FildR (P.PD K) ρ₁ τ a)
-                    = finrank ↥LL.1 ↥(FildR (P.PD K) ρ₀ τ a)
-                      + finrank ↥LL.1 ↥(FildR (P.PD K) ρ₂ τ a)
-                  ∧ multV (P.PD K) ρ₁ τ a = multV (P.PD K) ρ₀ τ a + multV (P.PD K) ρ₂ τ a
-                  ∧ (IsJumpV (P.PD K) ρ₁ τ a
-                    ↔ IsJumpV (P.PD K) ρ₀ τ a ∨ IsJumpV (P.PD K) ρ₂ τ a) := by
+theorem exact_hodge_add : ∀ (l : ℕ) [Fact l.Prime] (P : LocPrime l) (AI : LocAinf l P), LocTied l P AI → ∀ (K LL : FinExt l) (V₀ : Type) [AddCommGroup V₀] [Module ↥LL.1 V₀] [Module ℚ_[l] V₀] [IsScalarTower ℚ_[l] ↥LL.1 V₀] [FiniteDimensional ↥LL.1 V₀] (ρ₀ : Representation ↥LL.1 ↥(GK K) V₀) (V₁ : Type) [AddCommGroup V₁] [Module ↥LL.1 V₁] [Module ℚ_[l] V₁] [IsScalarTower ℚ_[l] ↥LL.1 V₁] [FiniteDimensional ↥LL.1 V₁] (ρ₁ : Representation ↥LL.1 ↥(GK K) V₁) (V₂ : Type) [AddCommGroup V₂] [Module ↥LL.1 V₂] [Module ℚ_[l] V₂] [IsScalarTower ℚ_[l] ↥LL.1 V₂] [FiniteDimensional ↥LL.1 V₂] (ρ₂ : Representation ↥LL.1 ↥(GK K) V₂) (ι : V₀ →ₗ[↥LL.1] V₁) (π : V₁ →ₗ[↥LL.1] V₂), (∀ g x, ι (ρ₀ g x) = ρ₁ g (ι x)) → (∀ g x, π (ρ₁ g x) = ρ₂ g (π x)) → Function.Injective ι → Function.Surjective π → LinearMap.range ι = LinearMap.ker π → IsDR (P.PD K) ρ₁ → IsDR (P.PD K) ρ₀ ∧ IsDR (P.PD K) ρ₂ ∧ ∀ (τ : ↥K.1 →ₐ[ℚ_[l]] ↥LL.1) (a : ℤ), finrank ↥LL.1 ↥(FildR (P.PD K) ρ₁ τ a) = finrank ↥LL.1 ↥(FildR (P.PD K) ρ₀ τ a) + finrank ↥LL.1 ↥(FildR (P.PD K) ρ₂ τ a) ∧ multV (P.PD K) ρ₁ τ a = multV (P.PD K) ρ₀ τ a + multV (P.PD K) ρ₂ τ a ∧ (IsJumpV (P.PD K) ρ₁ τ a ↔ IsJumpV (P.PD K) ρ₀ τ a ∨ IsJumpV (P.PD K) ρ₂ τ a) := by
   intro l _ P AI T K LL V₀ _ _ _ _ _ ρ₀ V₁ _ _ _ _ _ ρ₁ V₂ _ _ _ _ _ ρ₂ ι π hι hπ hi hs hk hd
-  obtain ⟨d2, hst⟩ :=
-    (GlobalTheory.T.deRham_subrep_quotient_and_strictness l P AI T K LL V₁ ρ₁ V₂ ρ₂ π hπ).2 hs hd
+  obtain ⟨d2, hst⟩ := (GlobalTheory.T.deRham_subrep_quotient_and_strictness l P AI T K LL V₁ ρ₁ V₂ ρ₂ π hπ).2 hs hd
   obtain ⟨t1, t2⟩ := tensor_exact (Qp := ℚ_[l]) (BdR := P.R.BdR) ι π hi hs hk
-  have hf
-      : ∀ (τ : ↥K.1 →ₐ[ℚ_[l]] ↥LL.1) (a : ℤ),
-        finrank ↥LL.1 ↥(FildR (P.PD K) ρ₁ τ a)
-          = finrank ↥LL.1 ↥(FildR (P.PD K) ρ₀ τ a) + finrank ↥LL.1 ↥(FildR (P.PD K) ρ₂ τ a) := by
+  have hf : ∀ (τ : ↥K.1 →ₐ[ℚ_[l]] ↥LL.1) (a : ℤ), finrank ↥LL.1 ↥(FildR (P.PD K) ρ₁ τ a) =
+      finrank ↥LL.1 ↥(FildR (P.PD K) ρ₀ τ a) + finrank ↥LL.1 ↥(FildR (P.PD K) ρ₂ τ a) := by
     intro τ a
     haveI := (GlobalTheory.Per.JumpMult.jump_iff_mult_ne_zero l P AI T K LL V₁ ρ₁ τ a).1
-    exact finrank_add_of_exact _ _ t1 t2 _ _ _
-      (GlobalTheory.HTW.FildR_eq_comap (P.PD K) ρ₀ ρ₁ ι hi hι τ a)
+    exact finrank_add_of_exact _ _ t1 t2 _ _ _ (GlobalTheory.HTW.FildR_eq_comap (P.PD K) ρ₀ ρ₁ ι hi hι τ a)
       (map_fildR_eq (P.PD K) ρ₁ ρ₂ π hπ τ a (hst a))
-  refine ⟨
-    (GlobalTheory.T.deRham_subrep_quotient_and_strictness l P AI T K LL V₀ ρ₀ V₁ ρ₁ ι hι).1 hi hd,
-    d2,
-    fun τ a => ?_
-  ⟩
+  refine ⟨(GlobalTheory.T.deRham_subrep_quotient_and_strictness l P AI T K LL V₀ ρ₀ V₁ ρ₁ ι hι).1 hi hd, d2, fun τ a => ?_⟩
   have hm : multV (P.PD K) ρ₁ τ a = multV (P.PD K) ρ₀ τ a + multV (P.PD K) ρ₂ τ a := by
     unfold multV
     rw [hf τ a, hf τ (a + 1)]

@@ -4,6 +4,47 @@ public import Formalism.SharpRestriction.GenusPolyhedralBounds.RelativeIndexClas
 public import Formalism.SharpRestriction.GenusPolyhedralBounds.RelativeIndexClassSets.RestrictionEqZeroIffMemVanishingFiltration
 public import Formalism.SharpRestriction.GenusPolyhedralBounds.RelativeIndexClassSets.HasseKpAlgebraMapKl
 public import Formalism.SharpRestriction.GenusPolyhedralBounds.RelativeIndexClassSets.ExistsPowSmulMemBall
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Coalgebra.IsFrobenius
+import Mathlib.RingTheory.HopfAlgebra.Basic
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -93,7 +134,6 @@ private theorem fld_lemma_3
     exact (algebraMap K (A ⧸ M)).injective.comp (IsFractionRing.injective O K)
   exact hinj (congrArg Subtype.val hab)
 
-set_option maxHeartbeats 800000 in
 private theorem dvr_lemma_4
     (Cr Dr : Type) [CommRing Cr] [CommRing Dr] [IsDomain Dr] [IsDedekindDomain Dr]
     (hD : ¬ IsField Dr)
@@ -209,7 +249,6 @@ private theorem fin_lemma_5
     exact congrArg Subtype.val (congrFun hxy M)
   exact Module.Finite.of_injective ψ hψ
 
-set_option maxHeartbeats 800000 in
 private theorem pt_lemma_6
     (O K A : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field K] [Algebra O K]
     [IsFractionRing O K] [CharZero K] [CommRing A] [Algebra K A] [Algebra O A] [IsScalarTower O K A]
@@ -253,8 +292,8 @@ private theorem pt_lemma_6
     rw [← sub_eq_zero]
     apply inj_lemma K A
     intro M
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← Ideal.Quotient.eq_zero_iff_mem, map_sub, map_sum, map_one, Finset.sum_eq_single M]
+
+    rw [← Ideal.Quotient.eq_zero_iff_mem, map_sub, map_sum, map_one, Finset.sum_eq_single M]
     · rw [hE1, sub_self]
     · intro J _ hJ
       exact hE0 J M (Ne.symm hJ)

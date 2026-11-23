@@ -1,6 +1,55 @@
 module
 
 public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.UnipotentComposition.StepOne
+public import Formalism.HermitianCurvature.HermitianCurvatureProofs.BetaSesquilinearity
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+public import Mathlib.Analysis.Calculus.Deriv.Prod
+public import Mathlib.Analysis.Calculus.Deriv.Star
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
+public import Mathlib.Analysis.Calculus.Deriv.Inv
 
 @[expose] public section
 
@@ -10,16 +59,13 @@ noncomputable section
 
 namespace PI.UnitaryGroupMassFormula.UsCompose
 
-open Formalism.FourierDecayAlt Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.U
-  Formalism.REAL Formalism.FourierDecayAlt.P.BetaSesquilinearity
+open Formalism.FourierDecayAlt Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.U Formalism.REAL Formalism.FourierDecayAlt.P.BetaSesquilinearity
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
-theorem hasDerivAt_eval
-    {σ : Type*} [Fintype σ]
-    (v : ℝ → σ → ℂ) (v' : σ → ℂ) (hv : ∀ i, HasDerivAt (fun t => v t i) (v' i) 0)
-    (q : MvPolynomial σ ℂ)
-    : HasDerivAt (fun t => eval (v t) q) (∑ i, eval (v 0) (pderiv i q) * v' i) 0 := by
+theorem hasDerivAt_eval {σ : Type*} [Fintype σ] (v : ℝ → σ → ℂ) (v' : σ → ℂ)
+    (hv : ∀ i, HasDerivAt (fun t => v t i) (v' i) 0) (q : MvPolynomial σ ℂ) :
+    HasDerivAt (fun t => eval (v t) q) (∑ i, eval (v 0) (pderiv i q) * v' i) 0 := by
   classical
   induction q using MvPolynomial.induction_on with
   | C a => simpa [pderiv_C] using hasDerivAt_const (0 : ℝ) a
@@ -30,21 +76,22 @@ theorem hasDerivAt_eval
     refine (hp.add hq).congr_deriv ?_
     simp [map_add (f := _), add_mul, Finset.sum_add_distrib]
   | mul_X p i hp =>
-    have hf : (fun t => eval (v t) (p * X i)) = fun t => eval (v t) p * v t i := by funext t; simp
+    have hf : (fun t => eval (v t) (p * X i)) = fun t => eval (v t) p * v t i := by
+      funext t; simp
     rw [hf]
     refine (hp.mul (hv i)).congr_deriv ?_
     symm
-    · simp only [Derivation.leibniz, smul_eq_mul, map_add (f := _), map_mul, eval_X, pderiv_X,
-        add_mul, Finset.sum_add_distrib]
-      rw [show ∀ a b c d : ℂ, b = c → a = d → a + b = c + d from fun a b c d h1 h2 => by
-        rw [h1, h2, add_comm]]
+    · simp only [Derivation.leibniz, smul_eq_mul, map_add (f := _), map_mul, eval_X, pderiv_X, add_mul,
+        Finset.sum_add_distrib]
+      rw [show ∀ a b c d : ℂ, b = c → a = d → a + b = c + d from
+        fun a b c d h1 h2 => by rw [h1, h2, add_comm]]
       · rw [Finset.sum_mul]
         exact Finset.sum_congr rfl fun j _ => by ring
       · simp [Pi.single_apply, apply_ite (eval (v 0)), mul_ite, ite_mul, Finset.sum_ite_eq,
           Finset.sum_ite_eq']
 
-theorem crv_var {k r : ℕ} (X g : Mat k r) (i : Vr (2 * r + k + 1))
-    : HasDerivAt (fun t => vars (crv (false, X) g t) i) (eval (vars g) (lin X i)) 0 := by
+theorem crv_var {k r : ℕ} (X g : Mat k r) (i : Vr (2 * r + k + 1)) :
+    HasDerivAt (fun t => vars (crv (false, X) g t) i) (eval (vars g) (lin X i)) 0 := by
   have h := crv_hasDerivAt (false, X) g
   have hab : ∀ a b, HasDerivAt (fun t => crv (false, X) g t a b) ((g * X) a b) 0 := by
     intro a b
@@ -53,27 +100,22 @@ theorem crv_var {k r : ℕ} (X g : Mat k r) (i : Vr (2 * r + k + 1))
     simpa [dirv] using h2
   rcases i with ⟨a, b⟩ | ⟨a, b⟩
   · refine (hab a b).congr_deriv ?_
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [lin, map_sum, map_mul, eval_C, eval_X, vars, Sum.elim_inl, Matrix.mul_apply]
+
+    simp only [lin, map_sum, map_mul, eval_C, eval_X, vars, Sum.elim_inl, Matrix.mul_apply]
     exact Finset.sum_congr rfl fun c _ => mul_comm _ _
   · refine (hab a b).star.congr_deriv ?_
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [lin, map_sum, map_mul, eval_C, eval_X, vars, Sum.elim_inr, Matrix.mul_apply,
-        star_sum, star_mul']
+
+    simp only [lin, map_sum, map_mul, eval_C, eval_X, vars, Sum.elim_inr, Matrix.mul_apply, star_sum, star_mul']
     exact Finset.sum_congr rfl fun c _ => mul_comm _ _
 
-theorem hasDerivAt_poly {k r : ℕ} (X g : Mat k r) (q : MvPolynomial (Vr (2 * r + k + 1)) ℂ)
-    : HasDerivAt (fun t => eval (vars (crv (false, X) g t)) q) (eval (vars g) (dP X q)) 0 := by
-  have h :=
-    hasDerivAt_eval
-      (fun t => vars (crv (false, X) g t))
-      (fun i => eval (vars g) (lin X i))
-      (fun i => crv_var X g i)
-      q
+theorem hasDerivAt_poly {k r : ℕ} (X g : Mat k r) (q : MvPolynomial (Vr (2 * r + k + 1)) ℂ) :
+    HasDerivAt (fun t => eval (vars (crv (false, X) g t)) q) (eval (vars g) (dP X q)) 0 := by
+  have h := hasDerivAt_eval (fun t => vars (crv (false, X) g t)) (fun i => eval (vars g) (lin X i))
+    (fun i => crv_var X g i) q
   have h0 : crv (false, X) g 0 = g := by simp [crv]
   rw [h0] at h
   convert h using 1
-  set_option synthInstance.maxHeartbeats 100000 in
+
   simp only [dP, map_sum, map_mul]
 
 theorem eval_qD {k j ρ : ℕ} (g : Mat k (j + ρ)) : eval (vars g) (qD k j ρ) = DjU k j ρ g := by
@@ -82,16 +124,15 @@ theorem eval_qD {k j ρ : ℕ} (g : Mat k (j + ρ)) : eval (vars g) (qD k j ρ) 
   ext a b
   simp [zP, Zh, vars]
 
-theorem eval_qDb {k j ρ : ℕ} (g : Mat k (j + ρ))
-    : eval (vars g) (qDb k j ρ) = star (DjU k j ρ g) := by
-  rw [qDb, DjU, RingHom.map_det,
-    show star (Zh k j ρ g).det = (starRingEnd ℂ) (Zh k j ρ g).det from rfl, RingHom.map_det]
+theorem eval_qDb {k j ρ : ℕ} (g : Mat k (j + ρ)) : eval (vars g) (qDb k j ρ) = star (DjU k j ρ g) := by
+  rw [qDb, DjU, RingHom.map_det, show star (Zh k j ρ g).det = (starRingEnd ℂ) (Zh k j ρ g).det from rfl,
+    RingHom.map_det]
   congr 1
   ext a b
   simp [zPb, Zh, vars]
 
-theorem hasDerivAt_invpow {c : ℝ → ℂ} {c' : ℂ} (hc : HasDerivAt c c' 0) (h0 : c 0 ≠ 0) (a : ℕ)
-    : HasDerivAt (fun t => (c t)⁻¹ ^ a) (-(a : ℂ) * c' * (c 0)⁻¹ ^ (a + 1)) 0 := by
+theorem hasDerivAt_invpow {c : ℝ → ℂ} {c' : ℂ} (hc : HasDerivAt c c' 0) (h0 : c 0 ≠ 0) (a : ℕ) :
+    HasDerivAt (fun t => (c t)⁻¹ ^ a) (-(a : ℂ) * c' * (c 0)⁻¹ ^ (a + 1)) 0 := by
   have h2 := ((hasDerivAt_inv h0).pow a).comp (0 : ℝ) hc
   have hf : (fun t => (c t)⁻¹ ^ a) = ((fun y => y⁻¹) ^ a) ∘ c := by
     funext t; simp [Function.comp, Pi.pow_apply]
@@ -103,22 +144,17 @@ theorem hasDerivAt_invpow {c : ℝ → ℂ} {c' : ℂ} (hc : HasDerivAt c c' 0) 
     field_simp
     ring
 
-theorem hasDerivAt_sv
-    {k j ρ : ℕ} (X g : Mat k (j + ρ)) (hg : DjU k j ρ g ≠ 0) (s : SC (2 * (j + ρ) + k + 1))
-    : HasDerivAt
-      (fun t => sv k j ρ s (crv (false, X) g t))
+theorem hasDerivAt_sv {k j ρ : ℕ} (X g : Mat k (j + ρ)) (hg : DjU k j ρ g ≠ 0) (s : SC (2 * (j + ρ) + k + 1)) :
+    HasDerivAt (fun t => sv k j ρ s (crv (false, X) g t))
       (sv k j ρ (dP X s.1, s.2.1, s.2.2) g
         + sv k j ρ (C (-(s.2.1 : ℂ)) * s.1 * dP X (qD k j ρ), s.2.1 + 1, s.2.2) g
-        + sv k j ρ (C (-(s.2.2 : ℂ)) * s.1 * dP X (qDb k j ρ), s.2.1, s.2.2 + 1) g)
-      0 := by
+        + sv k j ρ (C (-(s.2.2 : ℂ)) * s.1 * dP X (qDb k j ρ), s.2.1, s.2.2 + 1) g) 0 := by
   obtain ⟨q, a, b⟩ := s
   have hq := hasDerivAt_poly X g q
-  have hD : HasDerivAt
-      (fun t => DjU k j ρ (crv (false, X) g t))
+  have hD : HasDerivAt (fun t => DjU k j ρ (crv (false, X) g t))
       (eval (vars g) (dP X (qD k j ρ))) 0 := by
     simpa only [eval_qD] using hasDerivAt_poly X g (qD k j ρ)
-  have hDb : HasDerivAt
-      (fun t => star (DjU k j ρ (crv (false, X) g t)))
+  have hDb : HasDerivAt (fun t => star (DjU k j ρ (crv (false, X) g t)))
       (eval (vars g) (dP X (qDb k j ρ))) 0 := by
     simpa only [eval_qDb] using hasDerivAt_poly X g (qDb k j ρ)
   have h0 : crv (false, X) g 0 = g := by simp [crv]

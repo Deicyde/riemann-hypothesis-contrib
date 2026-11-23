@@ -1,6 +1,56 @@
 module
 
 public import ReciprocityTheory.AnalyticForms.RegularLocalRings.MemConePtsIffChartIdeal
+public import Mathlib.AlgebraicGeometry.ProjectiveSpectrum.Basic
+public import Mathlib.RingTheory.MvPolynomial.IrreducibleQuadratic
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.Order.CompletePartialOrder
+public import Mathlib.RingTheory.MvPolynomial.Ideal
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Lemma
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
 
 @[expose] public section
 
@@ -16,23 +66,19 @@ variable {σ : Type} (I : Ideal (MvPolynomial σ ℂ))
 
 attribute [local instance] MvPolynomial.gradedAlgebra
 
-def quotGrading : ℕ → Submodule ℂ (MvPolynomial σ ℂ ⧸ I) := fun d =>
-  (homogeneousSubmodule σ ℂ d).map (Ideal.Quotient.mkₐ ℂ I).toLinearMap
+def quotGrading : ℕ → Submodule ℂ (MvPolynomial σ ℂ ⧸ I) :=
+  fun d => (homogeneousSubmodule σ ℂ d).map (Ideal.Quotient.mkₐ ℂ I).toLinearMap
 
-theorem quot_gradedAlgebra (hI : I.IsHomogeneous (homogeneousSubmodule σ ℂ))
-    : Nonempty (GradedAlgebra (quotGrading I)) := by
+theorem quot_gradedAlgebra (hI : I.IsHomogeneous (homogeneousSubmodule σ ℂ)) :
+    Nonempty (GradedAlgebra (quotGrading I)) := by
   classical
-  have hgm : SetLike.GradedMonoid (quotGrading I) := {
-    one_mem :=
-      ⟨1, SetLike.one_mem_graded (homogeneousSubmodule σ ℂ), map_one (Ideal.Quotient.mkₐ ℂ I)⟩
-    mul_mem := by
-      rintro i j _ _ ⟨f, hf, rfl⟩ ⟨g, hg, rfl⟩
-      exact ⟨f * g, SetLike.mul_mem_graded hf hg, map_mul (Ideal.Quotient.mkₐ ℂ I) f g⟩
-  }
-  have hproj
-      : ∀ i,
-        (⨆ j, ⨆ (_ : j ≠ i), homogeneousSubmodule σ ℂ j)
-          ≤ LinearMap.ker (GradedAlgebra.proj (homogeneousSubmodule σ ℂ) i) := by
+  have hgm : SetLike.GradedMonoid (quotGrading I) :=
+    { one_mem := ⟨1, SetLike.one_mem_graded (homogeneousSubmodule σ ℂ), map_one (Ideal.Quotient.mkₐ ℂ I)⟩
+      mul_mem := by
+        rintro i j _ _ ⟨f, hf, rfl⟩ ⟨g, hg, rfl⟩
+        exact ⟨f * g, SetLike.mul_mem_graded hf hg, map_mul (Ideal.Quotient.mkₐ ℂ I) f g⟩ }
+  have hproj : ∀ i, (⨆ j, ⨆ (_ : j ≠ i), homogeneousSubmodule σ ℂ j) ≤
+      LinearMap.ker (GradedAlgebra.proj (homogeneousSubmodule σ ℂ) i) := by
     intro i
     refine iSup_le fun j => iSup_le fun hj => ?_
     intro g hg
@@ -44,10 +90,8 @@ theorem quot_gradedAlgebra (hI : I.IsHomogeneous (homogeneousSubmodule σ ℂ))
       intro i
       rw [Submodule.disjoint_def]
       rintro x ⟨f, hf, rfl⟩ hx
-      have hx'
-          : (Ideal.Quotient.mkₐ ℂ I).toLinearMap f
-            ∈ (⨆ j, ⨆ (_ : j ≠ i), homogeneousSubmodule σ ℂ j).map
-              (Ideal.Quotient.mkₐ ℂ I).toLinearMap := by
+      have hx' : (Ideal.Quotient.mkₐ ℂ I).toLinearMap f ∈
+          (⨆ j, ⨆ (_ : j ≠ i), homogeneousSubmodule σ ℂ j).map (Ideal.Quotient.mkₐ ℂ I).toLinearMap := by
         simp only [Submodule.map_iSup]
         exact hx
       obtain ⟨g, hg, hgf⟩ := hx'
@@ -59,8 +103,7 @@ theorem quot_gradedAlgebra (hI : I.IsHomogeneous (homogeneousSubmodule σ ℂ))
         have := hproj i hg
         rwa [LinearMap.mem_ker, GradedAlgebra.proj_apply] at this
       rw [DirectSum.decompose_sub, DFinsupp.sub_apply, Submodule.coe_sub, hgi, sub_zero,
-          DirectSum.decompose_of_mem_same _ hf]
-        at hcomp
+        DirectSum.decompose_of_mem_same _ hf] at hcomp
       show Ideal.Quotient.mk I f = 0
       exact Ideal.Quotient.eq_zero_iff_mem.mpr hcomp
     · have htop : (⨆ i, homogeneousSubmodule σ ℂ i) = ⊤ :=
@@ -113,8 +156,8 @@ private lemma segre_isWH [DecidableEq K] {φ : MvPolynomial ((k : K) → ι k) �
     simp [Finset.sum_apply, Pi.single_apply]
   rw [← mem_weightedHomogeneousSubmodule]
   show aeval (fun p : (k : K) → ι k => ∏ k, (X ⟨k, p k⟩ : MvPolynomial (Σ k, ι k) ℂ)) φ ∈ _
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [φ.as_sum, map_sum]
+
+  rw [φ.as_sum, map_sum]
   refine Submodule.sum_mem _ fun d hd => ?_
   rw [mem_weightedHomogeneousSubmodule, aeval_monomial, MvPolynomial.algebraMap_eq, Finsupp.prod]
   have hdeg : (0 : K → ℕ) + ∑ p ∈ d.support, d p • (fun _ : K => 1) = fun _ => n := by
@@ -128,8 +171,8 @@ private lemma segre_isWH [DecidableEq K] {φ : MvPolynomial ((k : K) → ι k) �
     (IsWeightedHomogeneous.prod _ _ _ fun p _ => (hg p).pow (d p))
 
 attribute [local instance] MvPolynomial.gradedAlgebra in
-theorem segreIdeal_isHomogeneous {P : Ideal (MvPolynomial (Σ k, ι k) ℂ)} (hP : IsMultiHomogIdeal P)
-    : (segreIdeal P).IsHomogeneous (homogeneousSubmodule ((k : K) → ι k) ℂ) := by
+theorem segreIdeal_isHomogeneous {P : Ideal (MvPolynomial (Σ k, ι k) ℂ)} (hP : IsMultiHomogIdeal P) :
+    (segreIdeal P).IsHomogeneous (homogeneousSubmodule ((k : K) → ι k) ℂ) := by
   classical
   obtain ⟨S, hS, rfl⟩ := hP
   letI := MvPolynomial.weightedGradedAlgebra ℂ (fun q : Σ k, ι k => (Pi.single q.1 1 : K → ℕ))
@@ -142,36 +185,21 @@ theorem segreIdeal_isHomogeneous {P : Ideal (MvPolynomial (Σ k, ι k) ℂ)} (hP
   intro n φ hφ
   unfold segreIdeal at hφ ⊢
   rw [Ideal.mem_comap] at hφ ⊢
-  have hdec
-      : (DirectSum.decompose (homogeneousSubmodule ((k : K) → ι k) ℂ) φ n
-          : MvPolynomial ((k : K) → ι k) ℂ)
-        = homogeneousComponent n φ :=
+  have hdec : (DirectSum.decompose (homogeneousSubmodule ((k : K) → ι k) ℂ) φ n :
+      MvPolynomial ((k : K) → ι k) ℂ) = homogeneousComponent n φ :=
     MvPolynomial.decomposition.decompose'_apply φ n
   rw [hdec]
   have h1 := (hPh.mem_iff _).mp hφ (fun _ => n)
-  have hwdec
-      : (DirectSum.decompose
-            (weightedHomogeneousSubmodule ℂ (fun q : Σ k, ι k => (Pi.single q.1 1 : K → ℕ)))
-            (segreMap φ) (fun _ => n)
-          : MvPolynomial (Σ k, ι k) ℂ)
-        = weightedHomogeneousComponent
-          (fun q : Σ k, ι k => (Pi.single q.1 1 : K → ℕ))
-          (fun _ => n)
-          (segreMap φ) :=
+  have hwdec : (DirectSum.decompose (weightedHomogeneousSubmodule ℂ (fun q : Σ k, ι k => (Pi.single q.1 1 : K → ℕ)))
+      (segreMap φ) (fun _ => n) : MvPolynomial (Σ k, ι k) ℂ) =
+      weightedHomogeneousComponent (fun q : Σ k, ι k => (Pi.single q.1 1 : K → ℕ)) (fun _ => n) (segreMap φ) :=
     MvPolynomial.weightedDecomposition.decompose'_apply ℂ _ _ _
   rw [hwdec] at h1
-  have hsum
-      : segreMap φ
-        = ∑ m ∈ Finset.range (φ.totalDegree + 1), segreMap (homogeneousComponent m φ) := by
-    set_option synthInstance.maxHeartbeats 100000 in
+  have hsum : segreMap φ = ∑ m ∈ Finset.range (φ.totalDegree + 1), segreMap (homogeneousComponent m φ) := by
+
     rw [← map_sum, sum_homogeneousComponent]
-  have hterm
-      : ∀ m,
-        weightedHomogeneousComponent
-            (fun q : Σ k, ι k => (Pi.single q.1 1 : K → ℕ))
-            (fun _ => n)
-            (segreMap (homogeneousComponent m φ))
-          = if n = m then segreMap (homogeneousComponent m φ) else 0 := by
+  have hterm : ∀ m, weightedHomogeneousComponent (fun q : Σ k, ι k => (Pi.single q.1 1 : K → ℕ)) (fun _ => n)
+      (segreMap (homogeneousComponent m φ)) = if n = m then segreMap (homogeneousComponent m φ) else 0 := by
     intro m
     rw [weightedHomogeneousComponent_of_mem ((mem_weightedHomogeneousSubmodule _ _ _ _).mpr
       (segre_isWH (homogeneousComponent_isHomogeneous m φ)))]
@@ -182,46 +210,41 @@ theorem segreIdeal_isHomogeneous {P : Ideal (MvPolynomial (Σ k, ι k) ℂ)} (hP
       intro he
       obtain ⟨k⟩ := ‹Nonempty K›
       exact h (congrFun he k)
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [hsum, map_sum] at h1
+
+  rw [hsum, map_sum] at h1
   simp only [hterm, Finset.sum_ite_eq] at h1
   split_ifs at h1 with hn
   · exact h1
   · rw [homogeneousComponent_eq_zero _ _ (by simp at hn; omega), map_zero]
     exact zero_mem _
 
-abbrev segreGrading (P : Ideal (MvPolynomial (Σ k, ι k) ℂ))
-    : ℕ → Submodule ℂ (MvPolynomial ((k : K) → ι k) ℂ ⧸ segreIdeal P) :=
+abbrev segreGrading (P : Ideal (MvPolynomial (Σ k, ι k) ℂ)) :
+    ℕ → Submodule ℂ (MvPolynomial ((k : K) → ι k) ℂ ⧸ segreIdeal P) :=
   quotGrading (segreIdeal P)
 
-@[reducible]
-def segreGraded {P : Ideal (MvPolynomial (Σ k, ι k) ℂ)} (hP : IsMultiHomogIdeal P)
-    : GradedAlgebra (segreGrading P) :=
+@[reducible] def segreGraded {P : Ideal (MvPolynomial (Σ k, ι k) ℂ)} (hP : IsMultiHomogIdeal P) :
+    GradedAlgebra (segreGrading P) :=
   Classical.choice (quot_gradedAlgebra _ (segreIdeal_isHomogeneous hP))
 
 def projX (P : Ideal (MvPolynomial (Σ k, ι k) ℂ)) (hP : IsMultiHomogIdeal P) : Scheme :=
   letI := segreGraded hP
   Proj (segreGrading P)
 
-abbrev segreW (P : Ideal (MvPolynomial (Σ k, ι k) ℂ)) (p : (k : K) → ι k)
-    : MvPolynomial ((k : K) → ι k) ℂ ⧸ segreIdeal P :=
+abbrev segreW (P : Ideal (MvPolynomial (Σ k, ι k) ℂ)) (p : (k : K) → ι k) :
+    MvPolynomial ((k : K) → ι k) ℂ ⧸ segreIdeal P :=
   Ideal.Quotient.mk _ (X p)
 
-theorem segreW_mem (P : Ideal (MvPolynomial (Σ k, ι k) ℂ)) (p : (k : K) → ι k)
-    : segreW P p ∈ segreGrading P 1 := by
+theorem segreW_mem (P : Ideal (MvPolynomial (Σ k, ι k) ℂ)) (p : (k : K) → ι k) :
+    segreW P p ∈ segreGrading P 1 := by
   exact ⟨X p, (mem_homogeneousSubmodule 1 _).mpr (isHomogeneous_X ℂ p), rfl⟩
 
-def chartOpen {P : Ideal (MvPolynomial (Σ k, ι k) ℂ)} (hP : IsMultiHomogIdeal P) (p : (k : K) → ι k)
-    : (projX P hP).affineOpens :=
+def chartOpen {P : Ideal (MvPolynomial (Σ k, ι k) ℂ)} (hP : IsMultiHomogIdeal P) (p : (k : K) → ι k) :
+    (projX P hP).affineOpens :=
   letI := segreGraded hP
-  ⟨
-    Proj.basicOpen (segreGrading P) (segreW P p),
-    Proj.isAffineOpen_basicOpen _ _ (segreW_mem P p) one_pos
-  ⟩
+  ⟨Proj.basicOpen (segreGrading P) (segreW P p), Proj.isAffineOpen_basicOpen _ _ (segreW_mem P p) one_pos⟩
 
-theorem chartOpen_cover
-    {P : Ideal (MvPolynomial (Σ k, ι k) ℂ)} (hP : IsMultiHomogIdeal P) (x : projX P hP)
-    : ∃ p, x ∈ (chartOpen hP p).1 := by
+theorem chartOpen_cover {P : Ideal (MvPolynomial (Σ k, ι k) ℂ)} (hP : IsMultiHomogIdeal P)
+    (x : projX P hP) : ∃ p, x ∈ (chartOpen hP p).1 := by
   classical
   letI := segreGraded hP
   by_contra hcon
@@ -230,9 +253,8 @@ theorem chartOpen_cover
     intro p
     by_contra h
     exact hcon p ((Proj.mem_basicOpen (segreGrading P) (segreW P p) x).mpr h)
-  have key
-      : ∀ f ∈ Ideal.span (MvPolynomial.X '' (Set.univ : Set ((k : K) → ι k))),
-        Ideal.Quotient.mk (segreIdeal P) f ∈ x.asHomogeneousIdeal.toIdeal := by
+  have key : ∀ f ∈ Ideal.span (MvPolynomial.X '' (Set.univ : Set ((k : K) → ι k))),
+      Ideal.Quotient.mk (segreIdeal P) f ∈ x.asHomogeneousIdeal.toIdeal := by
     intro f hf
     refine Submodule.span_induction ?_ ?_ ?_ ?_ hf
     · rintro _ ⟨p, -, rfl⟩

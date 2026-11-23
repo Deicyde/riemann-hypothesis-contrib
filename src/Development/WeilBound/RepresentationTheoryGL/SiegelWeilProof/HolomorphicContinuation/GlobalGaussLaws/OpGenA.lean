@@ -1,6 +1,45 @@
 module
 
 public import Development.WeilBound.RepresentationTheoryGL.SiegelWeilProof.HolomorphicContinuation.GlobalGaussLaws.OpGenSt
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Calculus.BumpFunction.FiniteDimension
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+public import Mathlib.Analysis.Calculus.BumpFunction.Basic
 
 @[expose] public section
 
@@ -27,38 +66,31 @@ theorem isSch_cmul (c : ℂ) {f : EE → ℂ} (hf : IsSch f) : IsSch (fun u => c
   exact ⟨c • S, by ext u; simp⟩
 
 def rmulEquiv (a : Matrix (Fin n) (Fin n) ℂ) (ha : IsUnit a.det) : EE ≃L[ℝ] EE :=
-  LinearEquiv.toContinuousLinearEquiv {
-    toFun := fun u => (Matrix.of u * a : Matrix (Fin m) (Fin n) ℂ)
-    invFun := fun u => (Matrix.of u * a⁻¹ : Matrix (Fin m) (Fin n) ℂ)
-    map_add' := fun u v => by
-      show Matrix.of (u + v) * a = Matrix.of u * a + Matrix.of v * a
-      rw [← Matrix.add_mul]
-      rfl
-    map_smul' := fun c u => by
-      show Matrix.of (c • u) * a = c • (Matrix.of u * a)
-      ext i j
-      simp [Matrix.mul_apply, Finset.smul_sum, mul_assoc]
-    left_inv := fun u => by
-      show Matrix.of u * a * a⁻¹ = u
-      rw [Matrix.mul_assoc, Matrix.mul_nonsing_inv _ ha, Matrix.mul_one]
-      rfl
-    right_inv := fun u => by
-      show Matrix.of u * a⁻¹ * a = u
-      rw [Matrix.mul_assoc, Matrix.nonsing_inv_mul _ ha, Matrix.mul_one]
-      rfl
-  }
+  LinearEquiv.toContinuousLinearEquiv
+    { toFun := fun u => (Matrix.of u * a : Matrix (Fin m) (Fin n) ℂ)
+      invFun := fun u => (Matrix.of u * a⁻¹ : Matrix (Fin m) (Fin n) ℂ)
+      map_add' := fun u v => by
+        show Matrix.of (u + v) * a = Matrix.of u * a + Matrix.of v * a
+        rw [← Matrix.add_mul]; rfl
+      map_smul' := fun c u => by
+        show Matrix.of (c • u) * a = c • (Matrix.of u * a)
+        ext i j
+        simp [Matrix.mul_apply, Finset.smul_sum, mul_assoc]
+      left_inv := fun u => by
+        show Matrix.of u * a * a⁻¹ = u
+        rw [Matrix.mul_assoc, Matrix.mul_nonsing_inv _ ha, Matrix.mul_one]; rfl
+      right_inv := fun u => by
+        show Matrix.of u * a⁻¹ * a = u
+        rw [Matrix.mul_assoc, Matrix.nonsing_inv_mul _ ha, Matrix.mul_one]; rfl }
 
-theorem isSch_rmul (a : Matrix (Fin n) (Fin n) ℂ) (ha : IsUnit a.det) {f : EE → ℂ} (hf : IsSch f)
-    : IsSch (fun u => f (Matrix.of u * a)) := by
+theorem isSch_rmul (a : Matrix (Fin n) (Fin n) ℂ) (ha : IsUnit a.det) {f : EE → ℂ} (hf : IsSch f) :
+    IsSch (fun u => f (Matrix.of u * a)) := by
   obtain ⟨S, rfl⟩ := hf
   exact ⟨SchwartzMap.compCLMOfContinuousLinearEquiv ℂ (rmulEquiv a ha) S, by ext u; rfl⟩
 
-theorem hasTemperateGrowth_expI
-    : (fun t : ℝ => Complex.exp (Complex.I * t)).HasTemperateGrowth := by
-  have key
-      : ∀ k : ℕ,
-        iteratedDeriv k (fun t : ℝ => Complex.exp (Complex.I * (t : ℂ)))
-          = fun t : ℝ => Complex.I ^ k * Complex.exp (Complex.I * (t : ℂ)) := by
+theorem hasTemperateGrowth_expI : (fun t : ℝ => Complex.exp (Complex.I * t)).HasTemperateGrowth := by
+  have key : ∀ k : ℕ, iteratedDeriv k (fun t : ℝ => Complex.exp (Complex.I * (t : ℂ))) =
+      fun t : ℝ => Complex.I ^ k * Complex.exp (Complex.I * (t : ℂ)) := by
     intro k
     induction k with
     | zero => simp
@@ -70,8 +102,7 @@ theorem hasTemperateGrowth_expI
       have h2 := (h1.cexp).const_mul (Complex.I ^ k)
       rw [h2.deriv]
       ring
-  refine
-    ⟨ContDiff.cexp (contDiff_const.mul Complex.ofRealCLM.contDiff), fun k => ⟨0, 1, fun x => ?_⟩⟩
+  refine ⟨ContDiff.cexp (contDiff_const.mul Complex.ofRealCLM.contDiff), fun k => ⟨0, 1, fun x => ?_⟩⟩
   rw [norm_iteratedFDeriv_eq_norm_iteratedDeriv, key]
   simp only [norm_mul, norm_pow, Complex.norm_I, one_pow, one_mul, pow_zero]
   rw [mul_comm Complex.I (x : ℂ), Complex.norm_exp_ofReal_mul_I]
@@ -92,43 +123,35 @@ theorem hasTemperateGrowth_evX (P : PX m n) : (fun u : EE => evX P u).HasTempera
     rw [e]
     exact hp.add hq
   | mul_X p k hp =>
-    have hk
-        : (fun u : EE => if k.2.2 then star (u k.1 k.2.1) else u k.1 k.2.1).HasTemperateGrowth := by
+    have hk : (fun u : EE => if k.2.2 then star (u k.1 k.2.1) else u k.1 k.2.1).HasTemperateGrowth := by
       by_cases h : k.2.2
       · simp only [h, ite_true]
-        exact ((Complex.conjCLE.toContinuousLinearMap.restrictScalars ℝ).comp
-          (coordL k.1 k.2.1)).hasTemperateGrowth
+        exact ((Complex.conjCLE.toContinuousLinearMap.restrictScalars ℝ).comp (coordL k.1 k.2.1)).hasTemperateGrowth
       · simp only [h]
         exact (coordL k.1 k.2.1).hasTemperateGrowth
-    have e
-        : (fun u : EE => evX (p * X k) u)
-          = (fun u : EE => evX p u)
-            * (fun u : EE => if k.2.2 then star (u k.1 k.2.1) else u k.1 k.2.1) := by
+    have e : (fun u : EE => evX (p * X k) u) =
+        (fun u : EE => evX p u) * (fun u : EE => if k.2.2 then star (u k.1 k.2.1) else u k.1 k.2.1) := by
       ext u; simp [evX]
     rw [e]
     exact hp.mul hk
 
 theorem gramX_herm (ε : Fin m → Bool) (u : EE) : (gramX ε u)ᴴ = gramX ε u := by
   ext i j
-  set_option synthInstance.maxHeartbeats 100000 in
+
   simp [Matrix.conjTranspose_apply, gramX, Qp, Qb, evX, map_sum, mul_comm]
 
-theorem trace_real (ε : Fin m → Bool) (b : Matrix (Fin n) (Fin n) ℂ) (hb : bᴴ = b) (u : EE)
-    : (((b * gramX ε u).trace.re : ℝ) : ℂ) = (b * gramX ε u).trace := by
+theorem trace_real (ε : Fin m → Bool) (b : Matrix (Fin n) (Fin n) ℂ) (hb : bᴴ = b) (u : EE) :
+    (((b * gramX ε u).trace.re : ℝ) : ℂ) = (b * gramX ε u).trace := by
   have h : star (b * gramX ε u).trace = (b * gramX ε u).trace := by
-    rw [← Matrix.trace_conjTranspose, Matrix.conjTranspose_mul, gramX_herm, hb,
-      Matrix.trace_mul_comm]
+    rw [← Matrix.trace_conjTranspose, Matrix.conjTranspose_mul, gramX_herm, hb, Matrix.trace_mul_comm]
   exact Complex.conj_eq_iff_re.1 h
 
-theorem hasTemperateGrowth_phase
-    (ε : Fin m → Bool) (t : ℝ) (b : Matrix (Fin n) (Fin n) ℂ) (hb : bᴴ = b)
-    : (fun u : EE =>
-      Complex.exp (Complex.I * (t : ℂ) * (b * gramX ε u).trace)).HasTemperateGrowth := by
-  have hP
-      : (fun u : EE => (b * gramX ε u).trace)
-        = fun u => evX (∑ i, ∑ j, MvPolynomial.C (b i j) * Qp ε j i) u := by
+theorem hasTemperateGrowth_phase (ε : Fin m → Bool) (t : ℝ) (b : Matrix (Fin n) (Fin n) ℂ) (hb : bᴴ = b) :
+    (fun u : EE => Complex.exp (Complex.I * (t : ℂ) * (b * gramX ε u).trace)).HasTemperateGrowth := by
+  have hP : (fun u : EE => (b * gramX ε u).trace) =
+      fun u => evX (∑ i, ∑ j, MvPolynomial.C (b i j) * Qp ε j i) u := by
     funext u
-    set_option synthInstance.maxHeartbeats 100000 in
+
     simp [evX, gramX, Matrix.trace, Matrix.mul_apply, map_sum]
   have hT : (fun u : EE => (b * gramX ε u).trace).HasTemperateGrowth := by
     rw [hP]
@@ -143,38 +166,25 @@ theorem hasTemperateGrowth_phase
   funext u
   simp only [Function.comp_apply, Complex.ofReal_mul, trace_real ε b hb u, mul_assoc]
 
-theorem isSch_phase
-    (ε : Fin m → Bool) (t : ℝ)
-    (b : Matrix (Fin n) (Fin n) ℂ) (hb : bᴴ = b)
-    {f : EE → ℂ} (hf : IsSch f)
-    : IsSch (fun u => Complex.exp (Complex.I * (t : ℂ) * (b * gramX ε u).trace) * f u) := by
+theorem isSch_phase (ε : Fin m → Bool) (t : ℝ) (b : Matrix (Fin n) (Fin n) ℂ) (hb : bᴴ = b) {f : EE → ℂ}
+    (hf : IsSch f) : IsSch (fun u => Complex.exp (Complex.I * (t : ℂ) * (b * gramX ε u).trace) * f u) := by
   obtain ⟨S, rfl⟩ := hf
-  refine ⟨
-    SchwartzMap.smulLeftCLM ℂ
-      (fun u : EE => Complex.exp (Complex.I * (t : ℂ) * (b * gramX ε u).trace))
-      S,
-    ?_
-  ⟩
+  refine ⟨SchwartzMap.smulLeftCLM ℂ
+    (fun u : EE => Complex.exp (Complex.I * (t : ℂ) * (b * gramX ε u).trace)) S, ?_⟩
   ext u
   simp [SchwartzMap.smulLeftCLM_apply_apply (hasTemperateGrowth_phase ε t b hb)]
 
 theorem exists_isSch_one : ∃ f : EE → ℂ, IsSch f ∧ f 0 = 1 := by
   let β : ContDiffBump (0 : EE) := ⟨1, 2, one_pos, one_lt_two⟩
-  have h1 : HasCompactSupport (fun u : EE => ((β u : ℝ) : ℂ)) :=
-    β.hasCompactSupport.comp_left Complex.ofReal_zero
-  have h2 : ContDiff ℝ ∞ (fun u : EE => ((β u : ℝ) : ℂ)) :=
-    Complex.ofRealCLM.contDiff.comp β.contDiff
+  have h1 : HasCompactSupport (fun u : EE => ((β u : ℝ) : ℂ)) := β.hasCompactSupport.comp_left Complex.ofReal_zero
+  have h2 : ContDiff ℝ ∞ (fun u : EE => ((β u : ℝ) : ℂ)) := Complex.ofRealCLM.contDiff.comp β.contDiff
   refine ⟨_, ⟨h1.toSchwartzMap h2, rfl⟩, ?_⟩
   simp [β.one_of_mem_closedBall (Metric.mem_closedBall_self zero_le_one)]
 
 end Local
 
-theorem _root_.PositivityTheory.Rg.Sw.Glob.schOps : SchOps := fun _ _ => ⟨
-  fun _ _ hf hg => isSch_add' hf hg,
-  fun c _ hf => isSch_cmul c hf,
-  fun a _ ha hf => isSch_rmul a ha hf,
-  fun ε t b _ hb hf => isSch_phase ε t b hb hf,
-  exists_isSch_one
-⟩
+theorem _root_.PositivityTheory.Rg.Sw.Glob.schOps : SchOps := fun _ _ =>
+  ⟨fun _ _ hf hg => isSch_add' hf hg, fun c _ hf => isSch_cmul c hf, fun a _ ha hf => isSch_rmul a ha hf,
+    fun ε t b _ hb hf => isSch_phase ε t b hb hf, exists_isSch_one⟩
 
 end PositivityTheory.Rg.Sw.Glob.OpGenAH

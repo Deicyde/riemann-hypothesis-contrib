@@ -1,39 +1,65 @@
 module
 
 public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibrary.WignerHighestWeights.IsAlgIsoRefl
-public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.DualInfinitesimalCharacterRegular
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
 open NumberField Matrix GlobalTheory.CuspRep GlobalTheory.GKCoh UpperTheory.V.AlgRepEndIrreducible
 open scoped TensorProduct
 
-private theorem weight_operator_commutator_multiGl
-    {ι V : Type} [Fintype ι] [AddCommGroup V] [Module ℂ V]
-    {n : ℕ} (F : ι → Fin n → Fin n → Module.End ℂ V) (hF : IsMultiGl F)
-    (t : ι) (i j : Fin n) (x : V)
-    : (∑ s, ∑ a : Fin n, ((a : ℕ) : ℂ) • F s a a) (F t i j x)
-      = F t i j ((∑ s, ∑ a : Fin n, ((a : ℕ) : ℂ) • F s a a) x)
-        + (((i : ℕ) : ℂ) - ((j : ℕ) : ℂ)) • F t i j x := by
+private theorem weight_operator_commutator_multiGl {ι V : Type} [Fintype ι] [AddCommGroup V] [Module ℂ V] {n : ℕ}
+    (F : ι → Fin n → Fin n → Module.End ℂ V) (hF : IsMultiGl F) (t : ι) (i j : Fin n) (x : V) :
+    (∑ s, ∑ a : Fin n, ((a : ℕ) : ℂ) • F s a a) (F t i j x) =
+      F t i j ((∑ s, ∑ a : Fin n, ((a : ℕ) : ℂ) • F s a a) x) +
+        (((i : ℕ) : ℂ) - ((j : ℕ) : ℂ)) • F t i j x := by
   classical
   obtain ⟨hgl, hcomm⟩ := hF
-  have key
-      : ∀ s (a : Fin n),
-        F s a a (F t i j x)
-          = F t i j (F s a a x)
-            + (if s = t then
-                 ((if a = i then F t a j x else 0) - (if j = a then F t i a x else 0))
-               else
-                 0) := by
+  have key : ∀ s (a : Fin n), F s a a (F t i j x) = F t i j (F s a a x) +
+      (if s = t then ((if a = i then F t a j x else 0) - (if j = a then F t i a x else 0)) else 0) := by
     intro s a
     by_cases hst : s = t
     · subst hst
       rw [if_pos rfl]
       have h1 := congrArg (fun f : Module.End ℂ V => f x) (hgl s a a i j)
       simp only [LinearMap.sub_apply, Module.End.mul_apply] at h1
-      have h2
-          : (if a = i then F s a j x else 0) - (if j = a then F s i a x else 0)
-            = (if a = i then F s a j else 0) x - (if j = a then F s i a else 0) x := by
+      have h2 : (if a = i then F s a j x else 0) - (if j = a then F s i a x else 0) =
+          (if a = i then F s a j else 0) x - (if j = a then F s i a else 0) x := by
         split_ifs <;> simp
       rw [h2, ← h1]
       abel
@@ -41,20 +67,16 @@ private theorem weight_operator_commutator_multiGl
       have h1 := congrArg (fun f : Module.End ℂ V => f x) (hcomm s t hst a a i j)
       simp only [Module.End.mul_apply] at h1
       rw [h1, add_zero]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [LinearMap.sum_apply, LinearMap.smul_apply, key, smul_add, Finset.sum_add_distrib,
-      map_sum, map_smul]
+
+  simp only [LinearMap.sum_apply, LinearMap.smul_apply, key, smul_add, Finset.sum_add_distrib,
+  map_sum, map_smul]
   congr 1
   simp [smul_ite, smul_sub, Finset.sum_sub_distrib, Finset.sum_ite_eq', Finset.sum_ite_eq,
     Finset.sum_ite_irrel, sub_smul]
 
-theorem UpperTheory.V.AlgRepEndIrreducible.lowLine
-    : ∀ (ι V : Type) [Fintype ι] [AddCommGroup V] [Module ℂ V] (n : ℕ)
-        (F : ι → Fin n → Fin n → Module.End ℂ V),
-      IsMultiGl F
-        → ∀ (ν : ι → Fin n → ℂ) (v : V),
-          (∀ t, Formalism.REAL.IsHW (F t) (ν t) v)
-            → ∀ w ∈ low F v, (∀ t k, F t k k w = ν t k • w) → ∃ c : ℂ, w = c • v := by
+theorem UpperTheory.V.AlgRepEndIrreducible.lowLine :
+    ∀ (ι V : Type) [Fintype ι] [AddCommGroup V] [Module ℂ V] (n : ℕ) (F : ι → Fin n → Fin n → Module.End ℂ V), IsMultiGl F → ∀ (ν : ι → Fin n → ℂ) (v : V), (∀ t, Formalism.REAL.IsHW (F t) (ν t) v) →
+      ∀ w ∈ low F v, (∀ t k, F t k k w = ν t k • w) → ∃ c : ℂ, w = c • v := by
   intro ι V _ _ _ n F hF ν v hv w hw hwν
   classical
   set H : Module.End ℂ V := ∑ s, ∑ a : Fin n, ((a : ℕ) : ℂ) • F s a a with hH
@@ -62,9 +84,8 @@ theorem UpperTheory.V.AlgRepEndIrreducible.lowLine
   have hHx : ∀ x : V, (∀ s k, F s k k x = ν s k • x) → H x = l0 • x := by
     intro x hx
     simp only [hH, hl0, LinearMap.sum_apply, LinearMap.smul_apply, hx, smul_smul, Finset.sum_smul]
-  have hsh
-      : ∀ t (i j : Fin n) (μ : ℂ) (x : V),
-        H x = μ • x → H (F t i j x) = (μ + (((i : ℕ) : ℂ) - ((j : ℕ) : ℂ))) • F t i j x := by
+  have hsh : ∀ t (i j : Fin n) (μ : ℂ) (x : V), H x = μ • x →
+      H (F t i j x) = (μ + (((i : ℕ) : ℂ) - ((j : ℕ) : ℂ))) • F t i j x := by
     intro t i j μ x hx
     rw [hH, weight_operator_commutator_multiGl F hF t i j x, ← hH, hx, map_smul, add_smul]
   have hdist : ∀ i j : Fin n, j < i → ∃ d : ℕ, ((i : ℕ) : ℂ) - ((j : ℕ) : ℂ) = (d : ℂ) + 1 := by

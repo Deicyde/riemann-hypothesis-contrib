@@ -1,9 +1,50 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.LenCob
 public import Formalism.SharpRestriction.LevelLetterCocycles.IdempotentChoiceDepthZero
+public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.MatKOSmulOne
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.LengthCoboundariesAmongBlockCocyclesLe
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
@@ -119,8 +160,8 @@ theorem del_smul_sum
       at h2
     rw [h2]
     congr 1
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [z, map_sum]
+
+    simp only [z, map_sum]
     refine Finset.sum_congr rfl fun j _ => ?_
     rw [h1 _ (inSpan_scalar (hs j)) _ (Check.inY_yg i r S _), hψ _ (hs j), Check.matKO_smul_one]
     rfl
@@ -179,8 +220,8 @@ theorem sum_blocks
           = ∑ j, toK D.nd i (f j S.π') • ((A j).map (toK D.nd i)).mulVec v := by
     intro k A v
     change ((toK D.nd i).mapMatrix _).mulVec v = _
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, Matrix.sum_mulVec]
+
+    rw [map_sum, Matrix.sum_mulVec]
     exact Finset.sum_congr rfl fun j _ => map_smul_mulVec _ _ _
   have h1
       : ∀ g u,
@@ -193,8 +234,8 @@ theorem sum_blocks
     hS.2.1
   have h := fun u => hS.2.2.2.2.2.2.2.2.2.2.1.2.2.1 (S.e.symm u)
   rw [congrFun e S.π'] at h
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [Finset.sum_apply, hp, hsum, map_sum, map_smul, h1, LinearEquiv.apply_symm_apply] at h
+
+  simp only [Finset.sum_apply, hp, hsum, map_sum, map_smul, h1, LinearEquiv.apply_symm_apply] at h
   refine ⟨mat_ext fun v => ?_, fun c => ?_⟩
   · rw [Matrix.map_zero _ (map_zero _), Matrix.zero_mulVec, hsum]
     have := congrArg Prod.fst (h (v, 0))
@@ -204,8 +245,8 @@ theorem sum_blocks
     rw [Prod.snd_sum, Finset.sum_apply] at this
     simp only [Prod.smul_snd, Pi.smul_apply, smul_eq_mul, mul_one] at this
     apply IsFractionRing.injective (D.nd.O i) (KK D.nd i)
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [apply_ite (algebraMap (D.nd.O i) (KK D.nd i)), map_zero, map_sum]
+
+    rw [apply_ite (algebraMap (D.nd.O i) (KK D.nd i)), map_zero, map_sum]
     simp only [map_mul]
     exact this
 

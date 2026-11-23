@@ -1,9 +1,49 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Definitions.Divisors.IsEulerContraction
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsDerivationEqIteratePrimeCharP
 public import Development.WeilBound.CoreStatements.PublishedTheorems.NadelVanishingPairs.NadelVanishingLemmas.KernelDifferentialPthPower
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+public import Mathlib.Data.Nat.Choose.Dvd
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+public import Mathlib.RingTheory.Derivation.Lie
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
 
 @[expose] public section
 
@@ -11,9 +51,8 @@ open GlobalTheory GlobalTheory.LogDR
 
 namespace GlobalTheory.ProjFn
 
-theorem list_prod_apply_fixed
-    {M : Type} [AddCommMonoid M] (l : List (AddMonoid.End M)) (y : M) (h : ∀ f ∈ l, f y = y)
-    : l.prod y = y := by
+theorem list_prod_apply_fixed {M : Type} [AddCommMonoid M] (l : List (AddMonoid.End M)) (y : M)
+    (h : ∀ f ∈ l, f y = y) : l.prod y = y := by
   induction l with
   | nil => rfl
   | cons f l ih =>
@@ -21,11 +60,8 @@ theorem list_prod_apply_fixed
     show f (l.prod y) = y
     rw [ih (fun g hg => h g (List.mem_cons_of_mem _ hg)), h f List.mem_cons_self]
 
-theorem mul_list_prod_eq_zero
-    {R : Type} [Ring R]
-    (a b : R) (l : List R) (hb : b ∈ l) (hc : ∀ f ∈ l, Commute a f)
-    (hab : a * b = 0)
-    : a * l.prod = 0 := by
+theorem mul_list_prod_eq_zero {R : Type} [Ring R] (a b : R) (l : List R) (hb : b ∈ l)
+    (hc : ∀ f ∈ l, Commute a f) (hab : a * b = 0) : a * l.prod = 0 := by
   induction l with
   | nil => simp at hb
   | cons f l ih =>
@@ -35,26 +71,26 @@ theorem mul_list_prod_eq_zero
     · rw [(hc f List.mem_cons_self).eq, mul_assoc,
         ih hb' (fun g hg => hc g (List.mem_cons_of_mem _ hg)), mul_zero]
 
-private theorem derivation_iterate_mul_antidiagonal
-    {K : Type} [Field K] (D : Derivation ℤ K K) (n : ℕ) (a b : K)
-    : (⇑D)^[n] (a * b)
-      = ∑ ij ∈ Finset.HasAntidiagonal.antidiagonal n,
-          n.choose ij.1 • ((⇑D)^[ij.1] a * (⇑D)^[ij.2] b) := by
+private theorem derivation_iterate_mul_antidiagonal {K : Type} [Field K] (D : Derivation ℤ K K) (n : ℕ) (a b : K) :
+    (⇑D)^[n] (a * b) =
+      ∑ ij ∈ Finset.HasAntidiagonal.antidiagonal n,
+        n.choose ij.1 • ((⇑D)^[ij.1] a * (⇑D)^[ij.2] b) := by
   induction n with
   | zero => simp
   | succ n ih =>
-    rw [Finset.sum_antidiagonal_choose_succ_nsmul (fun i j => (⇑D)^[i] a * (⇑D)^[j] b) n]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [Function.iterate_succ_apply', ih, map_sum, ← Finset.sum_add_distrib]
+    rw [Finset.sum_antidiagonal_choose_succ_nsmul
+      (fun i j => (⇑D)^[i] a * (⇑D)^[j] b) n]
+
+    rw [Function.iterate_succ_apply', ih, map_sum, ← Finset.sum_add_distrib]
     refine Finset.sum_congr rfl fun ij hij => ?_
     rw [map_nsmul, Derivation.leibniz, smul_eq_mul, smul_eq_mul, Function.iterate_succ_apply',
       Function.iterate_succ_apply',
-      n.choose_symm_of_eq_add (Finset.HasAntidiagonal.mem_antidiagonal.1 hij).symm, nsmul_add,
-      mul_comm ((⇑D)^[ij.2] b)]
+      n.choose_symm_of_eq_add (Finset.HasAntidiagonal.mem_antidiagonal.1 hij).symm,
+      nsmul_add, mul_comm ((⇑D)^[ij.2] b)]
 
-private theorem derivation_iterate_char_mul
-    {K : Type} [Field K] (p : ℕ) [hp : Fact p.Prime] [CharP K p] (D : Derivation ℤ K K) (a b : K)
-    : (⇑D)^[p] (a * b) = a * (⇑D)^[p] b + b * (⇑D)^[p] a := by
+private theorem derivation_iterate_char_mul {K : Type} [Field K] (p : ℕ) [hp : Fact p.Prime] [CharP K p]
+    (D : Derivation ℤ K K) (a b : K) :
+    (⇑D)^[p] (a * b) = a * (⇑D)^[p] b + b * (⇑D)^[p] a := by
   rw [derivation_iterate_mul_antidiagonal, Finset.sum_eq_add_of_mem (0, p) (p, 0)]
   · simp only [Nat.choose_zero_right, Nat.choose_self, one_smul, Function.iterate_zero, id]
     rw [mul_comm ((⇑D)^[p] a)]
@@ -83,43 +119,35 @@ private theorem derivation_iterate_char_mul
     have hdvd := hp.out.dvd_choose_self hc1 hc2
     rw [nsmul_eq_mul, (CharP.cast_eq_zero_iff K p _).2 hdvd, zero_mul]
 
-private theorem derivation_eq_zero_of_kills_coords
-    {K : Type} [Field K]
-    {n : ℕ}
-    (x : Fin n → Kˣ) (D : Fin n → Derivation ℤ K K) (hd : ∀ c : K, dK c = ∑ j, D j c • dlog (x j))
-    (E : Derivation ℤ K K) (hE : ∀ k, E (x k : K) = 0)
-    (c : K)
-    : E c = 0 := by
+private theorem derivation_eq_zero_of_kills_coords {K : Type} [Field K] {n : ℕ} (x : Fin n → Kˣ)
+    (D : Fin n → Derivation ℤ K K) (hd : ∀ c : K, dK c = ∑ j, D j c • dlog (x j))
+    (E : Derivation ℤ K K) (hE : ∀ k, E (x k : K) = 0) (c : K) : E c = 0 := by
   rw [← E.liftKaehlerDifferential_comp_D c]
   have hc : KaehlerDifferential.D ℤ K c = ∑ j, D j c • dlog (x j) := hd c
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [hc, map_sum]
+
+  rw [hc, map_sum]
   refine Finset.sum_eq_zero fun j _ => ?_
   rw [map_smul]
   show D j c • E.liftKaehlerDifferential
     (((↑(x j)⁻¹ : Kˣ) : K) • KaehlerDifferential.D ℤ K (x j : K)) = 0
   rw [map_smul, Derivation.liftKaehlerDifferential_comp_D, hE, smul_zero, smul_zero]
 
-private theorem derivation_iterate_char_eq_self_of_coords
-    {K : Type} [Field K]
-    (p : ℕ) [hp : Fact p.Prime] [CharP K p]
-    {n : ℕ}
-    (x : Fin n → Kˣ) (D : Fin n → Derivation ℤ K K) (hd : ∀ c : K, dK c = ∑ j, D j c • dlog (x j))
-    (hD : ∀ i j, D i (x j : K) = if i = j then (x j : K) else 0) (i : Fin n)
-    (c : K)
-    : (⇑(D i))^[p] c = D i c := by
+private theorem derivation_iterate_char_eq_self_of_coords {K : Type} [Field K] (p : ℕ) [hp : Fact p.Prime] [CharP K p] {n : ℕ}
+    (x : Fin n → Kˣ) (D : Fin n → Derivation ℤ K K)
+    (hd : ∀ c : K, dK c = ∑ j, D j c • dlog (x j))
+    (hD : ∀ i j, D i (x j : K) = if i = j then (x j : K) else 0) (i : Fin n) (c : K) :
+    (⇑(D i))^[p] c = D i c := by
   let L : K →ₗ[ℤ] K := ((D i : K →ₗ[ℤ] K) ^ p) - (D i : K →ₗ[ℤ] K)
   have hL : ∀ a, L a = (⇑(D i))^[p] a - D i a := by
     intro a
     show ((D i : K →ₗ[ℤ] K) ^ p) a - (D i : K →ₗ[ℤ] K) a = _
     rw [Module.End.pow_apply]
     rfl
-  let E : Derivation ℤ K K :=
-    Derivation.mk' L (by
-      intro a b
-      rw [hL, hL, hL, derivation_iterate_char_mul p, Derivation.leibniz, smul_eq_mul, smul_eq_mul,
-        smul_eq_mul, smul_eq_mul]
-      ring)
+  let E : Derivation ℤ K K := Derivation.mk' L (by
+    intro a b
+    rw [hL, hL, hL, derivation_iterate_char_mul p, Derivation.leibniz, smul_eq_mul, smul_eq_mul, smul_eq_mul,
+      smul_eq_mul]
+    ring)
   have hE : ∀ k, E (x k : K) = 0 := by
     intro k
     show L (x k : K) = 0
@@ -136,32 +164,18 @@ private theorem derivation_iterate_char_eq_self_of_coords
   rw [hL, sub_eq_zero] at h2
   exact h2
 
-private theorem derivation_comm_of_dK_eq_sum_dlog
-    {K : Type} [Field K]
-    {n : ℕ}
-    (x : Fin n → Kˣ) (D : Fin n → Derivation ℤ K K) (hd : ∀ c : K, dK c = ∑ j, D j c • dlog (x j))
-    (hD : ∀ i j, D i (x j : K) = if i = j then (x j : K) else 0) (i j : Fin n)
-    (c : K)
-    : D i (D j c) = D j (D i c) := by
-  have h :=
-    derivation_eq_zero_of_kills_coords x D hd ⁅D i, D j⁆
-      (by
-        intro k
-        rw [Derivation.commutator_apply]
-        by_cases hik : i = k <;> by_cases hjk : j = k <;> simp [hD, hik, hjk])
-      c
+private theorem derivation_comm_of_dK_eq_sum_dlog {K : Type} [Field K] {n : ℕ} (x : Fin n → Kˣ)
+    (D : Fin n → Derivation ℤ K K) (hd : ∀ c : K, dK c = ∑ j, D j c • dlog (x j))
+    (hD : ∀ i j, D i (x j : K) = if i = j then (x j : K) else 0) (i j : Fin n) (c : K) :
+    D i (D j c) = D j (D i c) := by
+  have h := derivation_eq_zero_of_kills_coords x D hd ⁅D i, D j⁆ (by
+    intro k
+    rw [Derivation.commutator_apply]
+    by_cases hik : i = k <;> by_cases hjk : j = k <;> simp [hD, hik, hjk]) c
   rw [Derivation.commutator_apply, sub_eq_zero] at h
   exact h
 
-theorem projector_pthPow
-    : ∀ (K : Type) [Field K] (p : ℕ) [Fact p.Prime] [CharP K p] (n : ℕ) (x : Fin n → Kˣ)
-        (D : Fin n → Derivation ℤ K K),
-      IsCoord x → (∀ c : K, dK c = ∑ j, D j c • dlog (x j))
-        → (∀ i j, D i (x j : K) = if i = j then (x j : K) else 0)
-        → ∀ π : AddMonoid.End K,
-          π = (List.ofFn fun i =>
-              1 - (show AddMonoid.End K from (D i).toLinearMap.toAddMonoidHom) ^ (p - 1)).prod
-            → (∀ c, ∃ g : K, π c = g ^ p) ∧ ∀ g : K, π (g ^ p) = g ^ p := by
+theorem projector_pthPow : ∀ (K : Type) [Field K] (p : ℕ) [Fact p.Prime] [CharP K p] (n : ℕ) (x : Fin n → Kˣ) (D : Fin n → Derivation ℤ K K), IsCoord x → (∀ c : K, dK c = ∑ j, D j c • dlog (x j)) → (∀ i j, D i (x j : K) = if i = j then (x j : K) else 0) → ∀ π : AddMonoid.End K, π = (List.ofFn fun i => 1 - (show AddMonoid.End K from (D i).toLinearMap.toAddMonoidHom) ^ (p - 1)).prod → (∀ c, ∃ g : K, π c = g ^ p) ∧ ∀ g : K, π (g ^ p) = g ^ p := by
   intro K _ p _ _ n x D _hx hd hD π hπ
   have hpr : p.Prime := Fact.out
   let Dend : Fin n → AddMonoid.End K := fun i => (D i).toLinearMap.toAddMonoidHom
@@ -189,9 +203,8 @@ theorem projector_pthPow
         rw [List.mem_ofFn] at hf
         obtain ⟨i, rfl⟩ := hf
         exact (Commute.one_right _).sub_right ((hcomm j i).pow_right _)
-      · have hp' : Dend j ^ p = Dend j :=
-          AddMonoidHom.ext fun c =>
-            (hpow j p c).trans (derivation_iterate_char_eq_self_of_coords p x D hd hD j c)
+      · have hp' : Dend j ^ p = Dend j := AddMonoidHom.ext fun c =>
+          (hpow j p c).trans (derivation_iterate_char_eq_self_of_coords p x D hd hD j c)
         rw [mul_sub, mul_one, ← pow_succ', Nat.sub_add_cancel hpr.one_lt.le, hp', sub_self]
     have h0 : D j (π c) = 0 := by
       show (Dend j * π) c = 0

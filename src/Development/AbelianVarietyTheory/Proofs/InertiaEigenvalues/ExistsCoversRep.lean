@@ -1,15 +1,55 @@
 module
 
-public import Mathlib
-public import Formalism.LocalToGlobal.IndefiniteReal.OneMapT
-public import Formalism.LocalToGlobal.IndefiniteReal.ConcretePkgSpec
-public import Formalism.LocalToGlobal.IndefiniteReal.FWExist
-public import Formalism.LocalRingCardinality.DataExtra
-public import Formalism.LocalRingCardinality.DataTies
+public import Development.AbelianVarietyTheory.Definitions.ExistenceOfLattices.CoeSelfDualLatticeInFrameCoordinatesEq
+public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsHalfOfBasePins
+public import Formalism.LocalToGlobal.ProjectiveLattices.CompHt
+public import Development.AbelianVarietyTheory.Proofs.AdelicLatticeProofs.IsOpenCongruenceIdelesAndRealFiniteParts
 public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsCoversOfHalves
-public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsRepsOfFiniteIndex
-public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.ExistsFirstOfSecond
-public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.ExistsIndexIdeal
+import Development.AbelianVarietyTheory.Proofs.FoundationProofs.HeckeCharEqOneOfTrivialFinitePartOneStatement
+import Development.AbelianVarietyTheory.Proofs.FoundationProofs.IdelicCharacterPowEqOneFiniteIdelesOfOrderDvdStatement
+import Development.AbelianVarietyTheory.Proofs.GenericRegularity.MemRangeOfIsAlgebraicRatFun
+import Development.AbelianVarietyTheory.Proofs.HeightProofs.ExistsSecCharVal
+import Development.AbelianVarietyTheory.Proofs.HeightProofs.PowClassNumberIntegral
+import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ModuliSchemeLevelMapsHeckePointsStatement
+import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.ExistsDeltaDatumHigherLevel
+import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.ExistsLatticeEmbeddingLiftDatumHermitianSpace
+import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.ExistsMemberDictionaryContextGoodEmbedding
+import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.ExistsPrincipalLevelSubgroupOpen
+import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.ExistsUniformisationDictionaryCharacterLaws
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
 
 @[expose] public section
 
@@ -29,7 +69,6 @@ open ReciprocityTheory.ChartRestriction.G.FD GlobalTheory.Member GlobalTheory.Co
 
 variable {D : D7}
 
-set_option maxHeartbeats 1000000 in
 theorem exists_fun_cover
     {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host D.host.E} {Dw : Datum H} {l : Level H}
     {Xo : Moduli Dw l} {c : Coeff l} {n r : ℕ} (d : DeltaDat Xo c n)
@@ -152,7 +191,6 @@ def CoversRep
         (iotaW T i) (T.x₀ ((i : ℕ) + 1) (sOv T.toCore c' hle)) xi
       ∧ (∀ t k, ModelW (Wc D i) (rank_Wc i) ((U (rep t)).X k))
 
-set_option maxHeartbeats 2000000 in
 theorem exists_covers_rep
     (T : CoreJ D) [Algebra T.Q.c.F D.what₂.LL]
     (R : RealDat D A T.Q.c.F)

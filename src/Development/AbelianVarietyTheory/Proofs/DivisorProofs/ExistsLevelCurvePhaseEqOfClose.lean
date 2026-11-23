@@ -1,39 +1,73 @@
 module
 
-public import Mathlib
+public import Formalism.SharpRestriction.GlobalSchurBounds.StandardLatticesGL3
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.NormPeriodSq
-public import Formalism.LocalToGlobal.IndefiniteReal.FinitePlaces.CharLem
-public import Formalism.SharpRestriction.GlobalSchurBounds.GlobalRankLatticeProofs.UnitTraceSumBounds.EmbeddingPermutesLettersHolds
-public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.UnitaryHeckeCharacterValues
-public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsUnitaryExtension
-public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.CmBaseFieldIntegersAndCurveIdealFacts
-public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.DefiniteThetaPairTestVectorExpansion
 public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.CompletedStandardAdelicLatticeProperties
+public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.DefiniteThetaPairTestVectorExpansion
+public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsUnitaryExtension
+import Development.AbelianVarietyTheory.Proofs.FoundationProofs.UnitaryHeckeCharacterValues
+import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.CmBaseFieldIntegersAndCurveIdealFacts
+public import Formalism.SharpRestriction.GlobalSchurBounds.GlobalRankLatticeProofs.UnitTraceSumBounds.EmbeddingPermutesLettersHolds
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+public import Development.AbelianVarietyTheory.BlockTheory.TwistedDiscreteSeries.ClassFunctionSumIntegral
+public import Development.AbelianVarietyTheory.Definitions.Foundations.NormSumPairRankZeroOfCurveCoordNorm
+public import Development.AbelianVarietyTheory.Definitions.Jets.CmLatticeCommutatorPairingPowEqOneOfGoodLift
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsFinPt
 
 @[expose] public section
 
 open NumberField MeasureTheory
 open scoped Classical
-open Formalism.BasicNotions Formalism.BasicNotions.TH
-  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.IndefR
-  Formalism.IndefR.Datum
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum
 open Formalism.MainNotions.TaylorLogMetric (VC embT tor0 Hf lamOf area Th U)
 open Formalism.MainNotions.StandardLatticesGL3 (WeilO HeckeU TT stdL pt oddE0)
 open GlobalTheory.NormSum (Pair Tup minorPol ratG intG Cls gam)
 open GlobalTheory.NormDict GlobalTheory.NormExact
 open GlobalTheory.BotFormula (IsFinPt)
-open GlobalTheory.IndefiniteRowSideFullHecke.ClassFunctionSumIntegral
-  (IsDefiniteSpace IsOpenCompactLevel)
+open GlobalTheory.IndefiniteRowSideFullHecke.ClassFunctionSumIntegral (IsDefiniteSpace IsOpenCompactLevel)
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 noncomputable section
 namespace GlobalTheory.PhaseMove
 
-theorem trace_sum_int
-    : ∀ (D : D7) (w : D.host.E),
-      IsIntegral ℤ w
-        → ∃ m : ℤ, 2 * (∑ τ, Formalism.MainNotions.TaylorLogMetric.embT D τ w).re = m := by
+theorem trace_sum_int : ∀ (D : D7) (w : D.host.E), IsIntegral ℤ w → ∃ m : ℤ, 2 * (∑ τ, Formalism.MainNotions.TaylorLogMetric.embT D τ w).re = m := by
   intro D w hw
   have htr := Formalism.MainNotions.Ext.trace_sum_over_letters_holds D w
   have ht : IsIntegral ℤ (Algebra.trace D.host.K D.host.E w) := Algebra.isIntegral_trace hw
@@ -44,9 +78,7 @@ theorem trace_sum_int
   simp [GlobalTheory.MomOne.wK]
   ring
 
-def cTA
-    (D : D7) {m p : ℕ} (B : Matrix (Fin m) (Fin p) (Formalism.MainNotions.StandardLatticesGL3.AE D))
-    : Matrix (Fin p) (Fin m) (Formalism.MainNotions.StandardLatticesGL3.AE D) :=
+def cTA (D : D7) {m p : ℕ} (B : Matrix (Fin m) (Fin p) (Formalism.MainNotions.StandardLatticesGL3.AE D)) : Matrix (Fin p) (Fin m) (Formalism.MainNotions.StandardLatticesGL3.AE D) :=
   (B.map (Formalism.MainNotions.StandardLatticesGL3.sgA D)).transpose
 
 theorem sq_unitary : ∀ {D : D7} {a d : ℕ} (x : Formalism.MainNotions.StandardLatticesGL3.GA D a) (y : Formalism.MainNotions.StandardLatticesGL3.GA D d) (A : Matrix (Fin d) (Fin a) (Formalism.MainNotions.StandardLatticesGL3.AE D)), (∑ i, ∑ j, (((y : GL (Fin d) (Formalism.MainNotions.StandardLatticesGL3.AE D)) : Matrix (Fin d) (Fin d) (Formalism.MainNotions.StandardLatticesGL3.AE D)) * A * ((((x : GL (Fin a) (Formalism.MainNotions.StandardLatticesGL3.AE D))⁻¹ : GL (Fin a) (Formalism.MainNotions.StandardLatticesGL3.AE D))) : Matrix (Fin a) (Fin a) (Formalism.MainNotions.StandardLatticesGL3.AE D))) i j * Formalism.MainNotions.StandardLatticesGL3.sgA D ((((y : GL (Fin d) (Formalism.MainNotions.StandardLatticesGL3.AE D)) : Matrix (Fin d) (Fin d) (Formalism.MainNotions.StandardLatticesGL3.AE D)) * A * ((((x : GL (Fin a) (Formalism.MainNotions.StandardLatticesGL3.AE D))⁻¹ : GL (Fin a) (Formalism.MainNotions.StandardLatticesGL3.AE D))) : Matrix (Fin a) (Fin a) (Formalism.MainNotions.StandardLatticesGL3.AE D))) i j)) = ∑ i, ∑ j, A i j * Formalism.MainNotions.StandardLatticesGL3.sgA D (A i j) := by
@@ -113,71 +145,32 @@ theorem sq_move_int : ∀ {D : D7} (cc : Ideal (𝓞 D.host.K)) {a d : ℕ} (A :
   push_cast
   ring
 
-theorem sq_diff_int
-    : ∀ {D : D7} (cc : Ideal (𝓞 D.host.K)) {a d : ℕ}
-        (x : Formalism.MainNotions.StandardLatticesGL3.GA D a)
-        (y : Formalism.MainNotions.StandardLatticesGL3.GA D d) (z : Matrix (Fin d) (Fin a) D.host.E)
-        (M : ℕ),
-      0 < M
-        → ∃ n : ℕ,
-          0 < n
-            ∧ ∀ z' : Matrix (Fin d) (Fin a) D.host.E,
-              Formalism.MainNotions.StandardLatticesGL3.CloseTo D cc n
-                  (x : GL (Fin a) (Formalism.MainNotions.StandardLatticesGL3.AE D))
-                  (y : GL (Fin d) (Formalism.MainNotions.StandardLatticesGL3.AE D)) z z'
-                → IsIntegral ℤ
-                  (((∑ i, ∑ j, z' i j * D.host.conj (z' i j))
-                      - ∑ i, ∑ j, z i j * D.host.conj (z i j))
-                    / (M : D.host.E)) := by
+theorem sq_diff_int : ∀ {D : D7} (cc : Ideal (𝓞 D.host.K)) {a d : ℕ} (x : Formalism.MainNotions.StandardLatticesGL3.GA D a) (y : Formalism.MainNotions.StandardLatticesGL3.GA D d) (z : Matrix (Fin d) (Fin a) D.host.E) (M : ℕ), 0 < M → ∃ n : ℕ, 0 < n ∧ ∀ z' : Matrix (Fin d) (Fin a) D.host.E, Formalism.MainNotions.StandardLatticesGL3.CloseTo D cc n (x : GL (Fin a) (Formalism.MainNotions.StandardLatticesGL3.AE D)) (y : GL (Fin d) (Formalism.MainNotions.StandardLatticesGL3.AE D)) z z' → IsIntegral ℤ (((∑ i, ∑ j, z' i j * D.host.conj (z' i j)) - ∑ i, ∑ j, z i j * D.host.conj (z i j)) / (M : D.host.E)) := by
   intro D cc a d x y z M hM
-  obtain ⟨n, hn, h⟩ :=
-    sq_move_int cc
-      ((((y : GL (Fin d) (Formalism.MainNotions.StandardLatticesGL3.AE D))
-          : Matrix (Fin d) (Fin d) (Formalism.MainNotions.StandardLatticesGL3.AE D))
-        * z.map (Formalism.MainNotions.StandardLatticesGL3.inc D)
-        * ((((x : GL (Fin a) (Formalism.MainNotions.StandardLatticesGL3.AE D))⁻¹
-            : GL (Fin a) (Formalism.MainNotions.StandardLatticesGL3.AE D)))
-          : Matrix (Fin a) (Fin a) (Formalism.MainNotions.StandardLatticesGL3.AE D))))
-      M hM
+  obtain ⟨n, hn, h⟩ := sq_move_int cc ((((y : GL (Fin d) (Formalism.MainNotions.StandardLatticesGL3.AE D)) : Matrix (Fin d) (Fin d) (Formalism.MainNotions.StandardLatticesGL3.AE D)) * z.map (Formalism.MainNotions.StandardLatticesGL3.inc D) * ((((x : GL (Fin a) (Formalism.MainNotions.StandardLatticesGL3.AE D))⁻¹ : GL (Fin a) (Formalism.MainNotions.StandardLatticesGL3.AE D))) : Matrix (Fin a) (Fin a) (Formalism.MainNotions.StandardLatticesGL3.AE D)))) M hM
   refine ⟨n, hn, fun z' hz' => ?_⟩
-  obtain ⟨s, hs, e⟩ :=
-    h (z'.map (Formalism.MainNotions.StandardLatticesGL3.inc D)) fun i j => by
-      obtain ⟨t, ht, et⟩ := hz' i j
-      exact ⟨t, ht, by rw [← et, Matrix.sub_apply]⟩
+  obtain ⟨s, hs, e⟩ := h (z'.map (Formalism.MainNotions.StandardLatticesGL3.inc D)) fun i j => by
+    obtain ⟨t, ht, et⟩ := hz' i j
+    exact ⟨t, ht, by rw [← et, Matrix.sub_apply]⟩
   rw [sq_unitary] at e
-  have hinc
-      : ∀ w : Matrix (Fin d) (Fin a) D.host.E,
-        (∑ i, ∑ j, w.map (Formalism.MainNotions.StandardLatticesGL3.inc D) i j * Formalism.MainNotions.StandardLatticesGL3.sgA D (w.map (Formalism.MainNotions.StandardLatticesGL3.inc D) i j))
-          = Formalism.MainNotions.StandardLatticesGL3.inc D
-            (∑ i, ∑ j, w i j * D.host.conj (w i j)) := fun w => by
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [Matrix.map_apply, map_sum, map_mul]
+  have hinc : ∀ w : Matrix (Fin d) (Fin a) D.host.E, (∑ i, ∑ j, w.map (Formalism.MainNotions.StandardLatticesGL3.inc D) i j * Formalism.MainNotions.StandardLatticesGL3.sgA D (w.map (Formalism.MainNotions.StandardLatticesGL3.inc D) i j)) = Formalism.MainNotions.StandardLatticesGL3.inc D (∑ i, ∑ j, w i j * D.host.conj (w i j)) := fun w => by
+
+    simp only [Matrix.map_apply, map_sum, map_mul]
     rfl
   rw [hinc, hinc, ← map_sub] at e
   have hM0 : (M : D.host.E) ≠ 0 := Nat.cast_ne_zero.2 hM.ne'
   rw [← GlobalTheory.HeckeVal.inc_mem_iff]
-  have e2
-      : Formalism.MainNotions.StandardLatticesGL3.inc D
-          (((∑ i, ∑ j, z' i j * D.host.conj (z' i j)) - ∑ i, ∑ j, z i j * D.host.conj (z i j))
-            / (M : D.host.E))
-        = Formalism.MainNotions.StandardLatticesGL3.inc D (M : D.host.E)⁻¹
-          * (M : Formalism.MainNotions.StandardLatticesGL3.AE D) * s := by
+  have e2 : Formalism.MainNotions.StandardLatticesGL3.inc D (((∑ i, ∑ j, z' i j * D.host.conj (z' i j)) - ∑ i, ∑ j, z i j * D.host.conj (z i j)) / (M : D.host.E)) = Formalism.MainNotions.StandardLatticesGL3.inc D (M : D.host.E)⁻¹ * (M : Formalism.MainNotions.StandardLatticesGL3.AE D) * s := by
     rw [div_eq_inv_mul, map_mul, e, mul_assoc]
-  have e3
-      : Formalism.MainNotions.StandardLatticesGL3.inc D (M : D.host.E)⁻¹
-          * (M : Formalism.MainNotions.StandardLatticesGL3.AE D)
-        = 1 := by
-    rw [← map_natCast (Formalism.MainNotions.StandardLatticesGL3.inc D), ← map_mul,
-      inv_mul_cancel₀ hM0, map_one]
+  have e3 : Formalism.MainNotions.StandardLatticesGL3.inc D (M : D.host.E)⁻¹ * (M : Formalism.MainNotions.StandardLatticesGL3.AE D) = 1 := by
+    rw [← map_natCast (Formalism.MainNotions.StandardLatticesGL3.inc D), ← map_mul, inv_mul_cancel₀ hM0, map_one]
   rw [e2, e3, one_mul]
   exact hs
 
-theorem qH_pt
-    {D : D7} {cc : Ideal (𝓞 D.host.K)} {δ : ℂ}
-    (hC : Formalism.MainNotions.StandardLatticesGL3.Crv D cc δ)
-    {a d : ℕ} (z : Matrix (Fin d) (Fin a) D.host.E)
-    : Formalism.MainNotions.TaylorLogMetric.qH D (tor0 D cc δ) (pt D (tor0 D cc δ) δ z)
-      = (∑ τ, embT D τ (∑ i, ∑ j, z i j * D.host.conj (z i j))).re / (Ideal.absNorm cc : ℝ) := by
+theorem qH_pt {D : D7} {cc : Ideal (𝓞 D.host.K)} {δ : ℂ} (hC : Formalism.MainNotions.StandardLatticesGL3.Crv D cc δ) {a d : ℕ}
+    (z : Matrix (Fin d) (Fin a) D.host.E) :
+    Formalism.MainNotions.TaylorLogMetric.qH D (tor0 D cc δ) (pt D (tor0 D cc δ) δ z) =
+      (∑ τ, embT D τ (∑ i, ∑ j, z i j * D.host.conj (z i j))).re / (Ideal.absNorm cc : ℝ) := by
   have hδ : δ ≠ 0 := GlobalTheory.NormExact.delta_ne_zero hC
   have hN : (0 : ℝ) < Ideal.absNorm cc := by
     exact_mod_cast Nat.pos_of_ne_zero (Ideal.absNorm_eq_zero_iff.not.2 hC.1.1)
@@ -185,46 +178,30 @@ theorem qH_pt
   have hc : ∀ τ x, embT D τ (D.host.conj x) = starRingEnd ℂ (embT D τ x) := fun τ x =>
     D.host.conjE_apply (embT D τ) x
   have hpt : ∀ τ i j, pt D (tor0 D cc δ) δ z τ i j = δ * embT D τ (z i j) := fun τ i j => rfl
-  have hS
-      : ∑ τ, embT D τ (∑ i, ∑ j, z i j * D.host.conj (z i j))
-        = ∑ τ, ∑ i, ∑ j, embT D τ (z i j) * starRingEnd ℂ (embT D τ (z i j)) := by
-    set_option synthInstance.maxHeartbeats 100000 in
+  have hS : ∑ τ, embT D τ (∑ i, ∑ j, z i j * D.host.conj (z i j)) =
+      ∑ τ, ∑ i, ∑ j, embT D τ (z i j) * starRingEnd ℂ (embT D τ (z i j)) := by
+
     simp only [map_sum, map_mul, hc]
-  have hH
-      : Hf D (tor0 D cc δ) (pt D (tor0 D cc δ) δ z) (pt D (tor0 D cc δ) δ z)
-        = ((Complex.normSq δ : ℝ) : ℂ) * (∑ τ, embT D τ (∑ i, ∑ j, z i j * D.host.conj (z i j)))
-          / ((area (lamOf D cc δ) : ℝ) : ℂ) := by
+  have hH : Hf D (tor0 D cc δ) (pt D (tor0 D cc δ) δ z) (pt D (tor0 D cc δ) δ z) =
+      ((Complex.normSq δ : ℝ) : ℂ) * (∑ τ, embT D τ (∑ i, ∑ j, z i j * D.host.conj (z i j))) /
+        ((area (lamOf D cc δ) : ℝ) : ℂ) := by
     rw [hS, Hf]
     simp only [hpt, map_mul, Finset.mul_sum]
     congr 1
-    refine Finset.sum_congr rfl fun τ _ =>
-      Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
+    refine Finset.sum_congr rfl fun τ _ => Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
     rw [Complex.normSq_eq_conj_mul_self]
     ring
   rw [Formalism.MainNotions.TaylorLogMetric.qH, hH, GlobalTheory.MomDict.area_lamOf D cc δ hC.1.1]
   have hδ2 : 0 < Complex.normSq δ := Complex.normSq_pos.2 hδ
-  rw [show ((Complex.normSq δ * (Ideal.absNorm cc : ℝ) * √(D.host.d : ℝ) / 2 : ℝ) : ℂ)
-        = ((Complex.normSq δ * (Ideal.absNorm cc : ℝ) * √(D.host.d : ℝ) / 2 : ℝ) : ℂ) from
-      rfl,
+  rw [show ((Complex.normSq δ * (Ideal.absNorm cc : ℝ) * √(D.host.d : ℝ) / 2 : ℝ) : ℂ) =
+    ((Complex.normSq δ * (Ideal.absNorm cc : ℝ) * √(D.host.d : ℝ) / 2 : ℝ) : ℂ) from rfl,
     mul_div_assoc, Complex.re_ofReal_mul, Complex.div_ofReal_re]
   field_simp
 
-theorem phase_eq
-    : ∀ {D : D7} (cc : Ideal (𝓞 D.host.K)) (δ : ℂ),
-      Formalism.MainNotions.StandardLatticesGL3.Crv D cc δ
-        → ∀ {a d : ℕ} (x : Formalism.MainNotions.StandardLatticesGL3.GA D a)
-            (y : Formalism.MainNotions.StandardLatticesGL3.GA D d)
-            (z : Matrix (Fin d) (Fin a) D.host.E),
-          ∃ n : ℕ,
-            0 < n
-              ∧ ∀ z',
-                Formalism.MainNotions.StandardLatticesGL3.CloseTo D cc n
-                    (x : GL (Fin a) (Formalism.MainNotions.StandardLatticesGL3.AE D))
-                    (y : GL (Fin d) (Formalism.MainNotions.StandardLatticesGL3.AE D)) z z'
-                  → Formalism.MainNotions.StandardLatticesGL3.wdPh D (tor0 D cc δ)
-                      (pt D (tor0 D cc δ) δ z')
-                    = Formalism.MainNotions.StandardLatticesGL3.wdPh D (tor0 D cc δ)
-                      (pt D (tor0 D cc δ) δ z) := by
+theorem phase_eq : ∀ {D : D7} (cc : Ideal (𝓞 D.host.K)) (δ : ℂ), Formalism.MainNotions.StandardLatticesGL3.Crv D cc δ →
+  ∀ {a d : ℕ} (x : Formalism.MainNotions.StandardLatticesGL3.GA D a) (y : Formalism.MainNotions.StandardLatticesGL3.GA D d) (z : Matrix (Fin d) (Fin a) D.host.E),
+  ∃ n : ℕ, 0 < n ∧ ∀ z', Formalism.MainNotions.StandardLatticesGL3.CloseTo D cc n (x : GL (Fin a) (Formalism.MainNotions.StandardLatticesGL3.AE D)) (y : GL (Fin d) (Formalism.MainNotions.StandardLatticesGL3.AE D)) z z' →
+    Formalism.MainNotions.StandardLatticesGL3.wdPh D (tor0 D cc δ) (pt D (tor0 D cc δ) δ z') = Formalism.MainNotions.StandardLatticesGL3.wdPh D (tor0 D cc δ) (pt D (tor0 D cc δ) δ z) := by
   intro D cc δ hC a d x y z
   have hN : 0 < Ideal.absNorm cc := Nat.pos_of_ne_zero (Ideal.absNorm_eq_zero_iff.not.2 hC.1.1)
   obtain ⟨n, hn, h⟩ := sq_diff_int cc x y z (8 * Ideal.absNorm cc) (by positivity)
@@ -233,28 +210,20 @@ theorem phase_eq
   set S' := ∑ i, ∑ j, z' i j * D.host.conj (z' i j)
   set S := ∑ i, ∑ j, z i j * D.host.conj (z i j)
   have h8 : ((8 * Ideal.absNorm cc : ℕ) : D.host.E) ≠ 0 := Nat.cast_ne_zero.2 (by positivity)
-  have hsplit
-      : S'
-        = S
-          + ((8 * Ideal.absNorm cc : ℕ) : D.host.E)
-            * ((S' - S) / ((8 * Ideal.absNorm cc : ℕ) : D.host.E)) := by
+  have hsplit : S' = S + ((8 * Ideal.absNorm cc : ℕ) : D.host.E) * ((S' - S) / ((8 * Ideal.absNorm cc : ℕ) : D.host.E)) := by
     field_simp; ring
   have key : (∑ τ, embT D τ S').re = (∑ τ, embT D τ S).re + 4 * (Ideal.absNorm cc : ℝ) * m := by
     rw [hsplit]
-    simp only [map_add (f := _), map_mul, map_natCast, Finset.sum_add_distrib, ← Finset.mul_sum,
-      Complex.add_re]
+    simp only [map_add (f := _), map_mul, map_natCast, Finset.sum_add_distrib, ← Finset.mul_sum, Complex.add_re]
     have e : ((8 * Ideal.absNorm cc : ℕ) : ℂ) = (((8 * Ideal.absNorm cc : ℕ) : ℝ) : ℂ) := rfl
     rw [e, Complex.re_ofReal_mul]
     push_cast at hm ⊢
-    rw [← hm]
-    ring
+    rw [← hm]; ring
   have hN' : (0 : ℝ) < Ideal.absNorm cc := by exact_mod_cast hN
-  have harg
-      : (∑ τ, embT D τ S').re / (Ideal.absNorm cc : ℝ) / 2
-        = (∑ τ, embT D τ S).re / (Ideal.absNorm cc : ℝ) / 2 + 2 * m := by
+  have harg : (∑ τ, embT D τ S').re / (Ideal.absNorm cc : ℝ) / 2 =
+      (∑ τ, embT D τ S).re / (Ideal.absNorm cc : ℝ) / 2 + 2 * m := by
     rw [key]; field_simp; ring
-  rw [Formalism.MainNotions.StandardLatticesGL3.wdPh,
-    Formalism.MainNotions.StandardLatticesGL3.wdPh, qH_pt hC z', qH_pt hC z, harg]
+  rw [Formalism.MainNotions.StandardLatticesGL3.wdPh, Formalism.MainNotions.StandardLatticesGL3.wdPh, qH_pt hC z', qH_pt hC z, harg]
   unfold Formalism.MainNotions.StandardLatticesGL3.ee
   rw [Complex.exp_eq_exp_iff_exists_int]
   refine ⟨2 * m, ?_⟩

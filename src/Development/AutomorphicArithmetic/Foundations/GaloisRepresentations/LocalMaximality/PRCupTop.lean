@@ -1,16 +1,59 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentations.LocalMaximality.DualForm
+public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentations.LocalMaximality.LiftFactorization
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CechDifferentialAdjointCupProductPairingStatement
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ResidueFunctionalVanishesOnOmegaFormsStatement
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.KahlerFormsOverSubalgebraClosurePropertiesStatement
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ResidueFunctionalVanishesOnOmegaFormsStatement
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.TwistedDualRegularFormsFiniteCoverStatement
+import Mathlib.Algebra.Module.StablyFree.Basic
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
-open KaehlerDifferential GlobalTheory.CechDR GlobalTheory.PD GlobalTheory.WH GlobalTheory.W1
-  UpperTheory.Gal.productCup_of_system
+open KaehlerDifferential GlobalTheory.CechDR GlobalTheory.PD GlobalTheory.WH GlobalTheory.W1 UpperTheory.Gal.productCup_of_system
 open GlobalTheory.W1.Lef
 open scoped TensorProduct
 
@@ -18,14 +61,13 @@ set_option autoImplicit false
 
 namespace UpperTheory.Gal.productCup_of_system.RCT
 
-private theorem wd_one
-    {ι E : Type} [LinearOrder ι] [AddCommGroup E] [Module ℂ E] (c : Finset ι → E) (s : Finset ι)
-    : wd (fun _ : ι => (1 : Module.End ℂ E)) c s = deltaL ℂ ι E c s := by
+private theorem wd_one {ι E : Type} [LinearOrder ι] [AddCommGroup E] [Module ℂ E] (c : Finset ι → E) (s : Finset ι) :
+    wd (fun _ : ι => (1 : Module.End ℂ E)) c s = deltaL ℂ ι E c s := by
   show _ = ∑ i ∈ s, GlobalTheory.cubeSign s i • c (s.erase i)
   simp [wd, Units.smul_def]
 
-private theorem card_filters {n : ℕ} (i : Fin n)
-    : (Finset.univ.filter (· ≤ i)).card + (Finset.univ.filter (i ≤ ·)).card = n + 1 := by
+private theorem card_filters {n : ℕ} (i : Fin n) :
+    (Finset.univ.filter (· ≤ i)).card + (Finset.univ.filter (i ≤ ·)).card = n + 1 := by
   have h1 : (Finset.univ.filter (· ≤ i)) ∪ (Finset.univ.filter (i ≤ ·)) = Finset.univ := by
     ext j; simp [le_total]
   have h2 : (Finset.univ.filter (· ≤ i)) ∩ (Finset.univ.filter (i ≤ ·)) = {i} := by
@@ -37,32 +79,28 @@ private theorem card_filters {n : ℕ} (i : Fin n)
   simp at this
   omega
 
-variable
-  {F K : Type} [Field F] [Field K] [Algebra ℂ F] [Algebra ℂ K] [Algebra F K] [IsScalarTower ℂ F K]
+variable {F K : Type} [Field F] [Field K] [Algebra ℂ F] [Algebra ℂ K] [Algebra F K] [IsScalarTower ℂ F K]
 
-private theorem muP_tmul (τ : DR ℂ K →ₗ[K] K) (w' w'' w : DR ℂ K)
-    : muP F K τ (w' ⊗ₜ w'') w = (Algebra.trace F K (τ (w' * w))) ⊗ₜ w'' := by
+private theorem muP_tmul (τ : DR ℂ K →ₗ[K] K) (w' w'' w : DR ℂ K) :
+    muP F K τ (w' ⊗ₜ w'') w = (Algebra.trace F K (τ (w' * w))) ⊗ₜ w'' := by
   simp [muP]
 
-private theorem res_tmul (ρ : F →ₗ[ℂ] ℂ) (f : F) (w : DR ℂ K)
-    : resP (DR ℂ K) ρ (f ⊗ₜ w) = ρ f • w := by
+private theorem res_tmul (ρ : F →ₗ[ℂ] ℂ) (f : F) (w : DR ℂ K) : resP (DR ℂ K) ρ (f ⊗ₜ w) = ρ f • w := by
   simp [resP]
 
-private noncomputable def bil (τ : DR ℂ K →ₗ[K] K) (ρ : F →ₗ[ℂ] ℂ)
-    : DR ℂ K ⊗[ℂ] DR ℂ K →ₗ[ℂ] DR ℂ K →ₗ[ℂ] DR ℂ K :=
+private noncomputable def bil (τ : DR ℂ K →ₗ[K] K) (ρ : F →ₗ[ℂ] ℂ) :
+    DR ℂ K ⊗[ℂ] DR ℂ K →ₗ[ℂ] DR ℂ K →ₗ[ℂ] DR ℂ K :=
   (muP F K τ).compr₂ (resP (DR ℂ K) ρ)
 
-private theorem bil_tmul (τ : DR ℂ K →ₗ[K] K) (ρ : F →ₗ[ℂ] ℂ) (w' w'' w : DR ℂ K)
-    : bil τ ρ (w' ⊗ₜ w'') w = ρ (Algebra.trace F K (τ (w' * w))) • w'' := by
+private theorem bil_tmul (τ : DR ℂ K →ₗ[K] K) (ρ : F →ₗ[ℂ] ℂ) (w' w'' w : DR ℂ K) :
+    bil τ ρ (w' ⊗ₜ w'') w = ρ (Algebra.trace F K (τ (w' * w))) • w'' := by
   simp [bil, muP_tmul, res_tmul]
 
 variable {d : ℕ} {x : Fin (d + 1) → Fˣ}
 
-private theorem bil_mem
-    (τ : DR ℂ K →ₗ[K] K) (ρ : F →ₗ[ℂ] ℂ)
-    {a : ℕ} {I J : Finset (Fin (d + 1))} {e : DR ℂ K ⊗[ℂ] DR ℂ K} (he : e ∈ MZ F K (xv x) a I J)
-    (v : DR ℂ K)
-    : bil τ ρ e v ∈ omB ℂ K (rB ℂ K (xv x) J) a := by
+private theorem bil_mem (τ : DR ℂ K →ₗ[K] K) (ρ : F →ₗ[ℂ] ℂ) {a : ℕ} {I J : Finset (Fin (d + 1))}
+    {e : DR ℂ K ⊗[ℂ] DR ℂ K} (he : e ∈ MZ F K (xv x) a I J) (v : DR ℂ K) :
+    bil τ ρ e v ∈ omB ℂ K (rB ℂ K (xv x) J) a := by
   have h : MZ F K (xv x) a I J ≤ (omB ℂ K (rB ℂ K (xv x) J) a).comap ((bil τ ρ).flip v) :=
     Submodule.map₂_le.2 fun m _ n hn => by
       show bil τ ρ (m ⊗ₜ n) v ∈ omB ℂ K (rB ℂ K (xv x) J) a
@@ -70,97 +108,70 @@ private theorem bil_mem
       exact Submodule.smul_mem _ _ hn
   exact h he
 
-private theorem bil_face
-    (hc : IsFinCover ℂ K (xv x))
-    {τ : DR ℂ K →ₗ[K] K} (hτ : IsTop ℂ K (xv x) τ)
-    {ρ : F →ₗ[ℂ] ℂ} (hρ : IsRes ℂ (xv x) ρ)
-    {a : ℕ} (had : a ≤ d)
-    (i : Fin (d + 1)) (hne : (Finset.univ.erase i).Nonempty)
-    (J : Finset (Fin (d + 1)))
+private theorem bil_face (hc : IsFinCover ℂ K (xv x)) {τ : DR ℂ K →ₗ[K] K} (hτ : IsTop ℂ K (xv x) τ)
+    {ρ : F →ₗ[ℂ] ℂ} (hρ : IsRes ℂ (xv x) ρ) {a : ℕ} (had : a ≤ d) (i : Fin (d + 1))
+    (hne : (Finset.univ.erase i).Nonempty) (J : Finset (Fin (d + 1)))
     {e : DR ℂ K ⊗[ℂ] DR ℂ K} (he : e ∈ MZ F K (xv x) a (Finset.univ.erase i) J)
-    {v : DR ℂ K} (hv : v ∈ omB ℂ K (rB ℂ K (xv x) (Finset.univ.erase i)) a)
-    : bil τ ρ e v = 0 := by
-  have hdeg : v ∈ ⋀[K]^a Ω[K⁄ℂ] :=
-    ((GlobalTheory.T.kahlerFormsOverSubalgebra_closure_properties ℂ K _ a 0).2.1 v hv).2.2.1
+    {v : DR ℂ K} (hv : v ∈ omB ℂ K (rB ℂ K (xv x) (Finset.univ.erase i)) a) :
+    bil τ ρ e v = 0 := by
+  have hdeg : v ∈ ⋀[K]^a Ω[K⁄ℂ] := ((GlobalTheory.T.kahlerFormsOverSubalgebra_closure_properties ℂ K _ a 0).2.1 v hv).2.2.1
   have h : MZ F K (xv x) a (Finset.univ.erase i) J ≤ LinearMap.ker ((bil τ ρ).flip v) :=
     Submodule.map₂_le.2 fun m hm n _ => by
       show bil τ ρ (m ⊗ₜ n) v = 0
       rw [bil_tmul]
-      have hmem :=
-        (GlobalTheory.T.twistedDual_regularForms_finiteCover ℂ F K d (xv x) hc τ hτ
-          (Finset.univ.erase i) hne (d - a) a (by omega) v hdeg).2 hv m hm
-      rw [GlobalTheory.T.residue_functional_vanishes_on_omega_forms ℂ F d (xv x) hc.pd ρ hρ i _ hne
-          (Finset.notMem_erase i _) _ hmem,
-        zero_smul]
+      have hmem := (GlobalTheory.T.twistedDual_regularForms_finiteCover ℂ F K d (xv x) hc τ hτ (Finset.univ.erase i) hne (d - a) a
+        (by omega) v hdeg).2 hv m hm
+      rw [GlobalTheory.T.residue_functional_vanishes_on_omega_forms ℂ F d (xv x) hc.pd ρ hρ i _ hne (Finset.notMem_erase i _) _ hmem, zero_smul]
   exact h he
 
-private theorem top_zero
-    (hc : IsFinCover ℂ K (xv x))
-    {τ : DR ℂ K →ₗ[K] K} (hτ : IsTop ℂ K (xv x) τ)
-    {ρ : F →ₗ[ℂ] ℂ} (hρ : IsRes ℂ (xv x) ρ)
-    {a p : ℕ} (had : a ≤ d)
-    (monoM : ∀ I I' J J' : Finset (Fin (d + 1)),
-      I.Nonempty → J.Nonempty → I ⊆ I' → J ⊆ J' → MZ F K (xv x) a I J ≤ MZ F K (xv x) a I' J')
-    (monoB : ∀ s t : Finset (Fin (d + 1)),
-      s.Nonempty → s ⊆ t → omB ℂ K (rB ℂ K (xv x) s) a ≤ omB ℂ K (rB ℂ K (xv x) t) a)
+private theorem top_zero (hc : IsFinCover ℂ K (xv x)) {τ : DR ℂ K →ₗ[K] K} (hτ : IsTop ℂ K (xv x) τ)
+    {ρ : F →ₗ[ℂ] ℂ} (hρ : IsRes ℂ (xv x) ρ) {a p : ℕ} (had : a ≤ d)
+    (monoM : ∀ I I' J J' : Finset (Fin (d + 1)), I.Nonempty → J.Nonempty → I ⊆ I' → J ⊆ J' →
+      MZ F K (xv x) a I J ≤ MZ F K (xv x) a I' J')
+    (monoB : ∀ s t : Finset (Fin (d + 1)), s.Nonempty → s ⊆ t →
+      omB ℂ K (rB ℂ K (xv x) s) a ≤ omB ℂ K (rB ℂ K (xv x) t) a)
     (α : Finset (Fin (d + 1)) → DR ℂ K) (hα : α ∈ (omCx (rB ℂ K (xv x)) a).Z p)
     (J : Finset (Fin (d + 1))) (u : Finset (Fin (d + 1)) → DR ℂ K ⊗[ℂ] DR ℂ K)
-    (hJ : J.Nonempty) (hu : u ∈ (cech fun I => MZ F K (xv x) a I J).C ((d : ℤ) - p - 1))
-    : ∑ i, bil τ ρ (deltaL ℂ _ _ u (Finset.univ.filter (· ≤ i))) (α (Finset.univ.filter (i ≤ ·)))
-      = 0 := by
+    (hJ : J.Nonempty)
+    (hu : u ∈ (cech fun I => MZ F K (xv x) a I J).C ((d : ℤ) - p - 1)) :
+    ∑ i, bil τ ρ (deltaL ℂ _ _ u (Finset.univ.filter (· ≤ i))) (α (Finset.univ.filter (i ≤ ·))) = 0 := by
   obtain ⟨hαC, hαZ⟩ := Submodule.mem_inf.1 hα
   have hαZ' : deltaL ℂ _ _ α = 0 := LinearMap.mem_ker.1 hαZ
   refine (Module.forall_dual_apply_eq_zero_iff ℂ _).1 fun φ => ?_
-  have adj :=
-    GlobalTheory.T.cechDifferential_adjoint_cupProductPairing ℂ d _ _
-      (fun I => MZ F K (xv x) a I J)
-      (fun I => omB ℂ K (rB ℂ K (xv x) I) a)
-      ((bil τ ρ).compr₂ φ)
-      (fun s t hs hst => monoM s t J J hs hJ hst subset_rfl)
-      monoB
-      (fun i hne e he v hv => by
-        show φ (bil τ ρ e v) = 0
-        rw [bil_face hc hτ hρ had i hne J he hv, map_zero])
+  have adj := GlobalTheory.T.cechDifferential_adjoint_cupProductPairing ℂ d _ _ (fun I => MZ F K (xv x) a I J)
+    (fun I => omB ℂ K (rB ℂ K (xv x) I) a) ((bil τ ρ).compr₂ φ)
+    (fun s t hs hst => monoM s t J J hs hJ hst subset_rfl) monoB
+    (fun i hne e he v hv => by
+      show φ (bil τ ρ e v) = 0
+      rw [bil_face hc hτ hρ had i hne J he hv, map_zero])
   obtain ⟨ε, hε⟩ := adj ((d : ℤ) - p - 1)
-  have h1 :=
-    hε u hu α (by
-      have : (d : ℤ) - ((d : ℤ) - p - 1) - 1 = p := by ring
-      rw [this]
-      exact hαC)
+  have h1 := hε u hu α (by
+    have : (d : ℤ) - ((d : ℤ) - p - 1) - 1 = p := by ring
+    rw [this]; exact hαC)
   have h2 : (cech fun I => omB ℂ K (rB ℂ K (xv x) I) a).D α = 0 := hαZ'
   rw [h2, map_zero, smul_zero] at h1
-  have h3
-      : cupPair ((bil τ ρ).compr₂ φ) ((cech fun I => MZ F K (xv x) a I J).D u) α
-        = φ
-          (∑ i, bil τ ρ (deltaL ℂ _ _ u (Finset.univ.filter (· ≤ i))) (α (Finset.univ.filter (i ≤ ·)))) :=
-    by
-      set_option synthInstance.maxHeartbeats 100000 in
-      simp [cupPair, cech, map_sum]
-  rw [← h3]
-  exact h1
+  have h3 : cupPair ((bil τ ρ).compr₂ φ) ((cech fun I => MZ F K (xv x) a I J).D u) α =
+      φ (∑ i, bil τ ρ (deltaL ℂ _ _ u (Finset.univ.filter (· ≤ i))) (α (Finset.univ.filter (i ≤ ·)))) := by
+
+    simp [cupPair, cech, map_sum]
+  rw [← h3]; exact h1
 
 end UpperTheory.Gal.productCup_of_system.RCT
 
 open UpperTheory.Gal.productCup_of_system.RCT in
-theorem UpperTheory.Gal.productCup_of_system.rCupTop_of : WdUni → GoodZ → RCupTop := by
+theorem UpperTheory.Gal.productCup_of_system.rCupTop_of :
+    WdUni → GoodZ → RCupTop := by
   intro hW hG F K _ _ _ _ _ _ d x hc τ hτ ρ hρ a p had t ht α hα
   obtain ⟨y, hy, rfl⟩ := Submodule.mem_map.1 ht
   have hgood := hG F K d x hc a
-  have monoM
-      : ∀ I I' J J' : Finset (Fin (d + 1)),
-        I.Nonempty → J.Nonempty → I ⊆ I' → J ⊆ J' → MZ F K (xv x) a I J ≤ MZ F K (xv x) a I' J' :=
-    hgood.1.monoM
+  have monoM : ∀ I I' J J' : Finset (Fin (d + 1)), I.Nonempty → J.Nonempty → I ⊆ I' → J ⊆ J' →
+      MZ F K (xv x) a I J ≤ MZ F K (xv x) a I' J' := hgood.1.monoM
   have monoB := hgood.2.2
   have hU := fun I J => hW (Fin (d + 1)) (Fin (d + 1)) (DR ℂ K ⊗[ℂ] DR ℂ K) (fun _ => 1) y I J
-  have hs
-      : ∀ s,
-        y s
-          ∈ (if (s.card : ℤ) = ((d : ℤ) + 2 - 1) then mixF (sysZ K x a).M s else ⊥
-            : Submodule ℂ (DR ℂ K ⊗[ℂ] DR ℂ K)) := fun s =>
-    (Submodule.mem_pi.1 hy) s (Set.mem_univ _)
-  have hy0
-      : ∀ I J : Finset (Fin (d + 1)),
-        ¬(I.Nonempty ∧ J.Nonempty ∧ I.card + J.card = d + 1) → y (uni I J) = 0 := by
+  have hs : ∀ s, y s ∈ (if (s.card : ℤ) = ((d : ℤ) + 2 - 1) then mixF (sysZ K x a).M s else ⊥ :
+      Submodule ℂ (DR ℂ K ⊗[ℂ] DR ℂ K)) := fun s => (Submodule.mem_pi.1 hy) s (Set.mem_univ _)
+  have hy0 : ∀ I J : Finset (Fin (d + 1)), ¬ (I.Nonempty ∧ J.Nonempty ∧ I.card + J.card = d + 1) →
+      y (uni I J) = 0 := by
     intro I J hn
     obtain ⟨e1, e2, e3, -⟩ := (hU I J).2
     have h := hs (uni I J)
@@ -180,20 +191,12 @@ theorem UpperTheory.Gal.productCup_of_system.rCupTop_of : WdUni → GoodZ → RC
     · rw [hy0 I J hn]; exact Submodule.zero_mem _
   have hα0 : ∀ s : Finset (Fin (d + 1)), s.card ≠ p + 1 → α s = 0 := by
     intro s hsc
-    have h
-        : α s
-          ∈ (if s.Nonempty ∧ (s.card : ℤ) = (p : ℤ) + 1 then omB ℂ K (rB ℂ K (xv x) s) a else ⊥
-            : Submodule ℂ (DR ℂ K)) :=
-      (Submodule.mem_pi.1 (Submodule.mem_inf.1 hα).1) s (Set.mem_univ _)
+    have h : α s ∈ (if s.Nonempty ∧ (s.card : ℤ) = (p : ℤ) + 1 then omB ℂ K (rB ℂ K (xv x) s) a else ⊥ :
+        Submodule ℂ (DR ℂ K)) := (Submodule.mem_pi.1 (Submodule.mem_inf.1 hα).1) s (Set.mem_univ _)
     rw [if_neg (fun hh => hsc (by omega))] at h
     exact (Submodule.mem_bot ℂ).1 h
-  refine Submodule.mem_map.2 ⟨
-    fun J' =>
-      ∑ i, ((-1 : ℤ) ^ (Finset.univ.filter (· ≤ i)).card) •
-        bil τ ρ (y (uni (Finset.univ.filter (· ≤ i)) J')) (α (Finset.univ.filter (i ≤ ·))),
-    ?_,
-    ?_
-  ⟩
+  refine Submodule.mem_map.2 ⟨fun J' => ∑ i, ((-1 : ℤ) ^ (Finset.univ.filter (· ≤ i)).card) •
+    bil τ ρ (y (uni (Finset.univ.filter (· ≤ i)) J')) (α (Finset.univ.filter (i ≤ ·))), ?_, ?_⟩
   · refine Submodule.mem_pi.2 fun J' _ => ?_
     show _ ∈ (if J'.Nonempty ∧ (J'.card : ℤ) = (p : ℤ) - 1 + 1 then omB ℂ K (rB ℂ K (xv x) J') a else ⊥ :
       Submodule ℂ (DR ℂ K))
@@ -207,20 +210,16 @@ theorem UpperTheory.Gal.productCup_of_system.rCupTop_of : WdUni → GoodZ → RC
         exact hJ ⟨hJn, by omega⟩
       · rw [hα0 _ h2, map_zero, smul_zero]
   · funext J
-    have hD
-        : ∀ i,
-          (sysZ K x a).mix.D y (uni (Finset.univ.filter (· ≤ i)) J)
-            = deltaL ℂ _ _ (fun b' => y (uni b' J)) (Finset.univ.filter (· ≤ i))
-              + ((-1 : ℤ) ^ (Finset.univ.filter (· ≤ i)).card)
-                • deltaL ℂ _ _ (fun L' => y (uni (Finset.univ.filter (· ≤ i)) L')) J := by
+    have hD : ∀ i, (sysZ K x a).mix.D y (uni (Finset.univ.filter (· ≤ i)) J) =
+        deltaL ℂ _ _ (fun b' => y (uni b' J)) (Finset.univ.filter (· ≤ i)) +
+        ((-1 : ℤ) ^ (Finset.univ.filter (· ≤ i)).card) •
+          deltaL ℂ _ _ (fun L' => y (uni (Finset.univ.filter (· ≤ i)) L')) J := by
       intro i
       have h := (hU (Finset.univ.filter (· ≤ i)) J).1
       refine Eq.trans h ?_
       rw [wd_one, wd_one]
-    have hI
-        : ∑ i, bil τ ρ (deltaL ℂ _ _ (fun b' => y (uni b' J)) (Finset.univ.filter (· ≤ i)))
-            (α (Finset.univ.filter (i ≤ ·)))
-          = 0 := by
+    have hI : ∑ i, bil τ ρ (deltaL ℂ _ _ (fun b' => y (uni b' J)) (Finset.univ.filter (· ≤ i)))
+        (α (Finset.univ.filter (i ≤ ·))) = 0 := by
       by_cases hJ : J.Nonempty ∧ J.card = p + 1
       · refine top_zero hc hτ hρ had monoM monoB α hα J _ hJ.1 ?_
         refine Submodule.mem_pi.2 fun s _ => ?_
@@ -243,32 +242,24 @@ theorem UpperTheory.Gal.productCup_of_system.rCupTop_of : WdUni → GoodZ → RC
             exact hJ ⟨hJn, by omega⟩
           rw [hz, map_zero, LinearMap.zero_apply]
         · rw [hα0 _ h2, map_zero]
-    have hB
-        : ∀ i,
-          bil τ ρ
-              (((-1 : ℤ) ^ (Finset.univ.filter (· ≤ i)).card)
-                • deltaL ℂ _ _ (fun L' => y (uni (Finset.univ.filter (· ≤ i)) L')) J)
-              (α (Finset.univ.filter (i ≤ ·)))
-            = ∑ j ∈ J, GlobalTheory.cubeSign J j • (((-1 : ℤ) ^ (Finset.univ.filter (· ≤ i)).card) •
-                bil τ ρ (y (uni (Finset.univ.filter (· ≤ i)) (J.erase j))) (α (Finset.univ.filter (i ≤ ·)))) :=
-      by
-        intro i
-        show (bil τ ρ).flip _ (((-1 : ℤ) ^ (Finset.univ.filter (· ≤ i)).card) •
-          ∑ j ∈ J, GlobalTheory.cubeSign J j • y (uni (Finset.univ.filter (· ≤ i)) (J.erase j))) = _
-        set_option synthInstance.maxHeartbeats 100000 in
-          simp only [Units.smul_def, map_zsmul, map_sum, LinearMap.flip_apply, Finset.smul_sum]
-        exact Finset.sum_congr rfl fun j _ => smul_comm _ _ _
+    have hB : ∀ i, bil τ ρ (((-1 : ℤ) ^ (Finset.univ.filter (· ≤ i)).card) •
+          deltaL ℂ _ _ (fun L' => y (uni (Finset.univ.filter (· ≤ i)) L')) J) (α (Finset.univ.filter (i ≤ ·))) =
+        ∑ j ∈ J, GlobalTheory.cubeSign J j • (((-1 : ℤ) ^ (Finset.univ.filter (· ≤ i)).card) •
+          bil τ ρ (y (uni (Finset.univ.filter (· ≤ i)) (J.erase j))) (α (Finset.univ.filter (i ≤ ·)))) := by
+      intro i
+      show (bil τ ρ).flip _ (((-1 : ℤ) ^ (Finset.univ.filter (· ≤ i)).card) •
+        ∑ j ∈ J, GlobalTheory.cubeSign J j • y (uni (Finset.univ.filter (· ≤ i)) (J.erase j))) = _
+
+      simp only [Units.smul_def, map_zsmul, map_sum, LinearMap.flip_apply, Finset.smul_sum]
+      exact Finset.sum_congr rfl fun j _ => smul_comm _ _ _
     show ∑ j ∈ J, GlobalTheory.cubeSign J j • ∑ i, ((-1 : ℤ) ^ (Finset.univ.filter (· ≤ i)).card) •
         bil τ ρ (y (uni (Finset.univ.filter (· ≤ i)) (J.erase j))) (α (Finset.univ.filter (i ≤ ·))) =
       resP (DR ℂ K) ρ (∑ i, muP F K τ ((sysZ K x a).mix.D y (uni (Finset.univ.filter (· ≤ i)) J))
         (α (Finset.univ.filter (i ≤ ·))))
-    have hR
-        : resP (DR ℂ K) ρ
-            (∑ i, muP F K τ ((sysZ K x a).mix.D y (uni (Finset.univ.filter (· ≤ i)) J))
-              (α (Finset.univ.filter (i ≤ ·))))
-          = ∑ i, bil τ ρ ((sysZ K x a).mix.D y (uni (Finset.univ.filter (· ≤ i)) J))
-              (α (Finset.univ.filter (i ≤ ·))) :=
-      map_sum _ _ _
+    have hR : resP (DR ℂ K) ρ (∑ i, muP F K τ ((sysZ K x a).mix.D y (uni (Finset.univ.filter (· ≤ i)) J))
+        (α (Finset.univ.filter (i ≤ ·)))) =
+        ∑ i, bil τ ρ ((sysZ K x a).mix.D y (uni (Finset.univ.filter (· ≤ i)) J))
+          (α (Finset.univ.filter (i ≤ ·))) := map_sum _ _ _
     rw [hR]
     simp only [hD, map_add (f := _), LinearMap.add_apply, Finset.sum_add_distrib, hI, zero_add, hB]
     rw [Finset.sum_comm]

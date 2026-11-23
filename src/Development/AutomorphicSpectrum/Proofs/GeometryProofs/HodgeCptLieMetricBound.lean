@@ -1,29 +1,65 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.SlopeBoundSt
-public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.ArchBetween
-public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.BdryChart
-public import Development.AutomorphicSpectrum.Definitions.MetricPeriods.ClopenCondOnto
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.UniformisationConclusion
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.HeckeKer
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.BlowupProjections.BlowupProjStatement
 public import Development.AbelianVarietyTheory.PublishedTheorems.SemiabelianTori.GeometricallyConnectedSplitTorusAff
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.SabComp
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.SabPull
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.ExistsAbelianPartExtensionStatement
+public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.IsHodgeLine
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.AbelianPartBaseChangeStatement
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.IsPrincipalBaseChangeIffStatement
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.AbelianPartLieSignatureStatement
+public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.AbelianPartMapsCompatibleRightStatement
+public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.ExistsAbelianPartExtensionStatement
+public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.ExistsCocharacterLieModelStatement
+public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.IsPrincipalBaseChangeIffStatement
+public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.LieMetricHeightBoundStatement
+public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.LieModelRankEqGenericStatement
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.LieSignatureNumberFieldStatement
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.PrincipalHermitianFibreStatement
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.LieMetricHeightBoundStatement
+public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.SemiAbelianPullbackTorusExtensionStatement
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.SemiabelianLieMetricHeightStatement
 public import Development.AutomorphicSpectrum.Proofs.MetricProofs.HermitianBundleQuotientDegreeBoundStatement
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.ExistsCocharacterLieModelStatement
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.LieModelRankEqGenericStatement
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.SemiAbelianPullbackTorusExtensionStatement
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.AbelianPartMapsCompatibleRightStatement
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.SabComp
+import Std.Tactic.BVDecide.Normalize.Prop
+public import Development.AutomorphicSpectrum.Definitions.MetricPeriods.IsOrthFull
 
 @[expose] public section
 

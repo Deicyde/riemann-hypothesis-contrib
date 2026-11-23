@@ -1,6 +1,55 @@
 module
 
-public import Mathlib
+public import Mathlib.NumberTheory.NumberField.Basic
+import Mathlib.Algebra.Module.StablyFree.Basic
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.GroupTheory.Nilpotent
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
+public import Mathlib.Algebra.Algebra.ZMod
+public import Mathlib.RingTheory.Ideal.Norm.AbsNorm
 
 @[expose] public section
 
@@ -8,13 +57,10 @@ open NumberField Polynomial
 
 namespace GlobalTheory
 
-theorem ringOfIntegers_action_injective
-    (F : Type) [Field F] [NumberField F]
-    (X : Type) [AddCommGroup X] [Module.Free ℤ X] [Nontrivial X]
-    (ρ : 𝓞 F →+* Module.End ℤ X)
-    : Function.Injective ρ := by
-  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
-    rw [injective_iff_map_eq_zero]
+theorem ringOfIntegers_action_injective (F : Type) [Field F] [NumberField F] (X : Type)
+    [AddCommGroup X] [Module.Free ℤ X] [Nontrivial X] (ρ : 𝓞 F →+* Module.End ℤ X) :
+    Function.Injective ρ := by
+  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
   intro a ha
   have hmem : a ∈ RingHom.ker ρ := ha
   have hn : ((Ideal.absNorm (RingHom.ker ρ) : ℕ) : 𝓞 F) ∈ RingHom.ker ρ := Ideal.absNorm_mem _
@@ -32,17 +78,13 @@ theorem ringOfIntegers_action_injective
   rw [h2] at hmem
   simpa using hmem
 
-theorem dvd_coord_of_action_dvd
-    (F : Type) [Field F] [NumberField F]
-    (X : Type) [AddCommGroup X] [Module.Free ℤ X] [Module.Finite ℤ X] [Nontrivial X]
-    (ρ : 𝓞 F →+* Module.End ℤ X)
-    (ι : Type) [Fintype ι]
-    (b : Module.Basis ι ℤ (𝓞 F))
-    (p : ℤ) (hp : p ≠ 0)
-    (a : 𝓞 F)
+theorem dvd_coord_of_action_dvd (F : Type) [Field F] [NumberField F] (X : Type)
+    [AddCommGroup X] [Module.Free ℤ X] [Module.Finite ℤ X] [Nontrivial X]
+    (ρ : 𝓞 F →+* Module.End ℤ X) (ι : Type) [Fintype ι] (b : Module.Basis ι ℤ (𝓞 F))
+    (p : ℤ) (hp : p ≠ 0) (a : 𝓞 F)
     (h : ∀ (χ : X) (r : Module.Free.ChooseBasisIndex ℤ X),
-      p ∣ (Module.Free.chooseBasis ℤ X).repr (ρ a χ) r)
-    : ∀ i, p ∣ b.repr a i := by
+      p ∣ (Module.Free.chooseBasis ℤ X).repr (ρ a χ) r) :
+    ∀ i, p ∣ b.repr a i := by
   set B := Module.Free.chooseBasis ℤ X
   let T : Module.End ℤ X := B.constr ℤ (fun s => ∑ r, ((B.repr (ρ a (B s)) r) / p) • B r)
   have hT : algebraMap ℤ (Module.End ℤ X) p * T = ρ a := by
@@ -68,7 +110,8 @@ theorem dvd_coord_of_action_dvd
     rw [Polynomial.aeval_algebraMap_apply, h2, map_zero]
   have hpF : (algebraMap ℤ F p) ≠ 0 := by simpa using hp
   set β : F := algebraMap (𝓞 F) F a / algebraMap ℤ F p with hβdef
-  have hβa : algebraMap ℤ F p * β = algebraMap (𝓞 F) F a := by rw [hβdef]; field_simp
+  have hβa : algebraMap ℤ F p * β = algebraMap (𝓞 F) F a := by
+    rw [hβdef]; field_simp
   have h4 : eval₂ (algebraMap ℤ F) β f = 0 := by
     have e := Polynomial.scaleRoots_eval₂_mul (p := f) (algebraMap ℤ F) β p
     rw [hβa, ← aeval_def, h3] at e
@@ -85,30 +128,29 @@ theorem dvd_coord_of_action_dvd
   refine ⟨b.repr y i, ?_⟩
   rw [← hy, map_zsmul, Finsupp.smul_apply, smul_eq_mul]
 
-theorem finrank_eq_zero_of_dual_killed
-    : ∀ (F : Type) [Field F] [NumberField F] (X : Type) [AddCommGroup X] [Module.Free ℤ X]
-        [Module.Finite ℤ X] (ρ : 𝓞 F →+* Module.End ℤ X) (k : Type) [Field k] (ι : Type) [Fintype ι]
-        (b : Module.Basis ι ℤ (𝓞 F)) (w : ι → k),
-      w ≠ 0 → (∀ (l : X →+ k) (χ : X), ∑ i, w i * l (ρ (b i) χ) = 0) → Module.finrank ℤ X = 0 := by
+theorem finrank_eq_zero_of_dual_killed : ∀ (F : Type) [Field F] [NumberField F] (X : Type)
+    [AddCommGroup X] [Module.Free ℤ X] [Module.Finite ℤ X] (ρ : 𝓞 F →+* Module.End ℤ X)
+    (k : Type) [Field k] (ι : Type) [Fintype ι] (b : Module.Basis ι ℤ (𝓞 F)) (w : ι → k),
+    w ≠ 0 → (∀ (l : X →+ k) (χ : X), ∑ i, w i * l (ρ (b i) χ) = 0) →
+    Module.finrank ℤ X = 0 := by
   intro F _ _ X _ _ _ ρ k _ ι _ b w hw hyp
   classical
   by_contra hX
   haveI : Nontrivial X := Module.finrank_pos_iff.mp (Nat.pos_of_ne_zero hX)
-  obtain ⟨i0, hi0⟩ : ∃ i, w i ≠ 0 := by by_contra hc; push_neg at hc; exact hw (funext hc)
+  obtain ⟨i0, hi0⟩ : ∃ i, w i ≠ 0 := by
+    by_contra hc; push_neg at hc; exact hw (funext hc)
   set B := Module.Free.chooseBasis ℤ X
-  have key
-      : ∀ (χ : X) (r : Module.Free.ChooseBasisIndex ℤ X),
-        ∑ i, (B.repr (ρ (b i) χ) r) • w i = 0 := by
+  have key : ∀ (χ : X) (r : Module.Free.ChooseBasisIndex ℤ X),
+      ∑ i, (B.repr (ρ (b i) χ) r) • w i = 0 := by
     intro χ r
     have := hyp ((Int.castAddHom k).comp (B.coord r).toAddMonoidHom) χ
     rw [← this]
     refine Finset.sum_congr rfl fun i _ => ?_
     simp [zsmul_eq_mul, mul_comm]
-  have lin
-      : ∀ (e : ι → ℤ) (χ : X) (r : Module.Free.ChooseBasisIndex ℤ X),
-        B.repr (ρ (∑ i, e i • b i) χ) r = ∑ i, e i * B.repr (ρ (b i) χ) r := by
+  have lin : ∀ (e : ι → ℤ) (χ : X) (r : Module.Free.ChooseBasisIndex ℤ X),
+      B.repr (ρ (∑ i, e i • b i) χ) r = ∑ i, e i * B.repr (ρ (b i) χ) r := by
     intro e χ r
-    set_option synthInstance.maxHeartbeats 100000 in
+
     simp [map_sum, map_zsmul, LinearMap.sum_apply, Finsupp.finsetSum_apply]
   rcases CharP.char_is_prime_or_zero k (ringChar k) with hp | hp
   · set p := ringChar k with hpdef
@@ -116,62 +158,53 @@ theorem finrank_eq_zero_of_dual_killed
     haveI : CharP k p := ringChar.charP k
     letI : Algebra (ZMod p) k := ZMod.algebra k p
     obtain ⟨π, hπ⟩ : ∃ π : Module.Dual (ZMod p) k, π (w i0) ≠ 0 := by
-      by_contra hc
-      push_neg at hc
+      by_contra hc; push_neg at hc
       exact hi0 ((Module.forall_dual_apply_eq_zero_iff (ZMod p) (w i0)).mp hc)
     set e : ι → ℤ := fun i => ((π (w i)).val : ℤ) with hedef
-    have hdiv
-        : ∀ (χ : X) (r : Module.Free.ChooseBasisIndex ℤ X),
-          (p : ℤ) ∣ B.repr (ρ (∑ i, e i • b i) χ) r := by
+    have hdiv : ∀ (χ : X) (r : Module.Free.ChooseBasisIndex ℤ X),
+        (p : ℤ) ∣ B.repr (ρ (∑ i, e i • b i) χ) r := by
       intro χ r
       rw [lin, ← ZMod.intCast_zmod_eq_zero_iff_dvd]
       have := congrArg π (key χ r)
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum, map_zero] at this
+
+      rw [map_sum, map_zero] at this
       rw [← this]
       push_cast
       refine Finset.sum_congr rfl fun i _ => ?_
       rw [map_zsmul, zsmul_eq_mul, hedef]
       simp [ZMod.natCast_zmod_val, mul_comm]
-    have h :=
-      GlobalTheory.dvd_coord_of_action_dvd F X ρ ι b p (by exact_mod_cast hp.ne_zero) _ hdiv i0
+    have h := GlobalTheory.dvd_coord_of_action_dvd F X ρ ι b p (by exact_mod_cast hp.ne_zero) _ hdiv i0
     rw [Module.Basis.repr_sum_self] at h
     apply hπ
     rw [← ZMod.natCast_zmod_val (π (w i0))]
-    have h' : ((((π (w i0)).val : ℕ) : ℤ) : ZMod p) = 0 :=
-      (ZMod.intCast_zmod_eq_zero_iff_dvd _ _).mpr h
+    have h' : ((((π (w i0)).val : ℕ) : ℤ) : ZMod p) = 0 := (ZMod.intCast_zmod_eq_zero_iff_dvd _ _).mpr h
     exact_mod_cast h'
   · haveI : CharZero k := by
       have := ringChar.charP k; rw [hp] at this; exact CharP.charP_to_charZero k
     letI : Algebra ℚ k := DivisionRing.toRatAlgebra
     obtain ⟨π, hπ⟩ : ∃ π : Module.Dual ℚ k, π (w i0) ≠ 0 := by
-      by_contra hc
-      push_neg at hc
+      by_contra hc; push_neg at hc
       exact hi0 ((Module.forall_dual_apply_eq_zero_iff ℚ (w i0)).mp hc)
     set c : ι → ℚ := fun i => π (w i) with hcdef
     set e : ι → ℤ := fun i => (c i).num * ∏ j ∈ Finset.univ.erase i, ((c j).den : ℤ) with hedef
     have he : ∀ i, (e i : ℚ) = c i * ∏ j, ((c j).den : ℚ) := by
       intro i
       rw [← Finset.mul_prod_erase _ _ (Finset.mem_univ i), ← mul_assoc, Rat.mul_den_eq_num, hedef]
-      push_cast
-      rfl
-    have hzero
-        : ∀ (χ : X) (r : Module.Free.ChooseBasisIndex ℤ X),
-          B.repr (ρ (∑ i, e i • b i) χ) r = 0 := by
+      push_cast; rfl
+    have hzero : ∀ (χ : X) (r : Module.Free.ChooseBasisIndex ℤ X),
+        B.repr (ρ (∑ i, e i • b i) χ) r = 0 := by
       intro χ r
       rw [lin]
       have := congrArg π (key χ r)
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum, map_zero] at this
+
+      rw [map_sum, map_zero] at this
       simp only [map_zsmul] at this
-      have h2
-          : ((∑ i, e i * B.repr (ρ (b i) χ) r : ℤ) : ℚ)
-            = (∏ j, ((c j).den : ℚ)) * ∑ i, (B.repr (ρ (b i) χ) r) • π (w i) := by
+      have h2 : ((∑ i, e i * B.repr (ρ (b i) χ) r : ℤ) : ℚ)
+          = (∏ j, ((c j).den : ℚ)) * ∑ i, (B.repr (ρ (b i) χ) r) • π (w i) := by
         push_cast
         rw [Finset.mul_sum]
         refine Finset.sum_congr rfl fun i _ => ?_
-        rw [he, zsmul_eq_mul, hcdef]
-        ring
+        rw [he, zsmul_eq_mul, hcdef]; ring
       rw [this, mul_zero] at h2
       exact_mod_cast h2
     have hρ : ρ (∑ i, e i • b i) = 0 := by

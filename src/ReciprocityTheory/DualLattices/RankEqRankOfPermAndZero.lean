@@ -1,9 +1,62 @@
 module
 
 public import ReciprocityTheory.DualLattices.EmbeddingSeparatingGroupStatement
-public import ReciprocityTheory.DualLattices.UnramifiedCokernelLengthOfLengthEigenLengthProduct
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Coalgebra.IsFrobenius
+import Mathlib.RingTheory.Etale.Weakly
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.HopfAlgebra.Basic
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.TotallySplit
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Lemma
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 public import ReciprocityTheory.DualLattices.IsLocalOfIntegers
 public import ReciprocityTheory.DualLattices.RankMapLeRank
+public import ReciprocityTheory.DualLattices.UnramifiedCokernelLengthOfLengthEigenLengthProduct
+public import Mathlib.LinearAlgebra.Matrix.Rank
+public import Mathlib.RingTheory.LocalRing.ResidueField.Basic
 
 @[expose] public section
 
@@ -22,11 +75,8 @@ private lemma map_smul_hom {n S T : Type} [Fintype n] [CommRing S] [CommRing T] 
   ext i j
   simp [Matrix.map_apply, Matrix.smul_apply]
 
-variable
-  {p : ℕ} [Fact p.Prime]
-  {g : ℕ} {C : Type} [Field C]
-  {v : Valuation C NNReal} {R : Type} [CommRing R] [Algebra R C] [Algebra ℤ_[p] R]
-  {O : Type} [CommRing O] [Algebra ℤ_[p] O]
+variable {p : ℕ} [Fact p.Prime] {g : ℕ} {C : Type} [Field C] {v : Valuation C NNReal} {R : Type}
+  [CommRing R] [Algebra R C] [Algebra ℤ_[p] R] {O : Type} [CommRing O] [Algebra ℤ_[p] O]
   {σ : O ≃ₐ[ℤ_[p]] O} {cp : R}
 
 private lemma εL_eq_zero (hS : HodgeTateSetting p v R O σ cp) (H : HodgeTateDatum p g v R O σ cp)
@@ -221,7 +271,7 @@ private lemma rank_phi_le (hS : HodgeTateSetting p v R O σ cp) [CharP (IsLocalR
     _ ≤ Module.finrank (IsLocalRing.ResidueField R)
           (LinearMap.range ((U.εT i).map (IsLocalRing.residue R)).mulVecLin) :=
         RankA.rank_map_le _ _
-    _ = ((U.εT i).map (IsLocalRing.residue R)).rank := rfl
+    _ = ((U.εT i).map (IsLocalRing.residue R)).rank := Matrix.finrank_range_mulVecLin _
 
 end Local
 
@@ -237,57 +287,42 @@ theorem rank_eq_rank_of_perm_and_zero : EigenRankStatement := by
     fun i => (RankA.free_range_idem _ (hidem i)).1
   haveI hfin : ∀ i, Module.Finite R (LinearMap.range (U.εT i).mulVecLin) :=
     fun i => (RankA.free_range_idem _ (hidem i)).2
-  have hsn
-      : ∀ i ∈ Finset.univ,
-        ((U.εT i).map (IsLocalRing.residue R)).rank
-          ≤ Module.finrank R (LinearMap.range (U.εT i).mulVecLin) := fun i _ =>
-    RankA.rank_map_le _ _
+  have hsn : ∀ i ∈ Finset.univ, ((U.εT i).map (IsLocalRing.residue R)).rank ≤
+      Module.finrank R (LinearMap.range (U.εT i).mulVecLin) := fun i _ => RankA.rank_map_le _ _
   have hsumn : ∑ i, Module.finrank R (LinearMap.range (U.εT i).mulVecLin) = Fintype.card (Ix g) :=
     RankA.sum_finrank U.εT U.εT_orth U.εT_sum
   have hsums : ∑ i, ((U.εT i).map (IsLocalRing.residue R)).rank = Fintype.card (Ix g) := by
-    have horth
-        : ∀ i j,
-          (U.εT i).map (IsLocalRing.residue R) * (U.εT j).map (IsLocalRing.residue R)
-            = if i = j then (U.εT i).map (IsLocalRing.residue R) else 0 := by
+    have horth : ∀ i j, (U.εT i).map (IsLocalRing.residue R) * (U.εT j).map (IsLocalRing.residue R) =
+        if i = j then (U.εT i).map (IsLocalRing.residue R) else 0 := by
       intro i j
       rw [← Matrix.map_mul, U.εT_orth]
       split_ifs <;> simp
     have hs1 : ∑ i, (U.εT i).map (IsLocalRing.residue R) = 1 := by
-      have e
-          : ∑ i, (U.εT i).map (IsLocalRing.residue R)
-            = (IsLocalRing.residue R).mapMatrix (∑ i, U.εT i) := by
+      have e : ∑ i, (U.εT i).map (IsLocalRing.residue R) =
+          (IsLocalRing.residue R).mapMatrix (∑ i, U.εT i) := by
         set_option synthInstance.maxHeartbeats 100000 in
-        simp only [map_sum, RingHom.mapMatrix_apply]
+          simp only [map_sum, RingHom.mapMatrix_apply]
       rw [e, U.εT_sum, map_one]
-    exact RankA.sum_finrank (fun i => (U.εT i).map (IsLocalRing.residue R)) horth hs1
-  have hseq
-      : ∀ i,
-        ((U.εT i).map (IsLocalRing.residue R)).rank
-          = Module.finrank R (LinearMap.range (U.εT i).mulVecLin) := by
+    have h := RankA.sum_finrank (fun i => (U.εT i).map (IsLocalRing.residue R)) horth hs1
+    simp only [Matrix.finrank_range_mulVecLin] at h
+    exact h
+  have hseq : ∀ i, ((U.εT i).map (IsLocalRing.residue R)).rank =
+      Module.finrank R (LinearMap.range (U.εT i).mulVecLin) := by
     have h := (Finset.sum_eq_sum_iff_of_le hsn).mp (hsums.trans hsumn.symm)
     exact fun i => h i (Finset.mem_univ i)
-  have hphi
-      : ∀ i,
-        ((U.εT (U.φ i)).map (IsLocalRing.residue R)).rank
-          = ((U.εT i).map (IsLocalRing.residue R)).rank := by
-    have hle
-        : ∀ i ∈ Finset.univ,
-          ((U.εT (U.φ i)).map (IsLocalRing.residue R)).rank
-            ≤ ((U.εT i).map (IsLocalRing.residue R)).rank := fun i _ =>
-      rank_phi_le hS U i
-    have hs
-        : ∑ i, ((U.εT (U.φ i)).map (IsLocalRing.residue R)).rank
-          = ∑ i, ((U.εT i).map (IsLocalRing.residue R)).rank :=
+  have hphi : ∀ i, ((U.εT (U.φ i)).map (IsLocalRing.residue R)).rank =
+      ((U.εT i).map (IsLocalRing.residue R)).rank := by
+    have hle : ∀ i ∈ Finset.univ, ((U.εT (U.φ i)).map (IsLocalRing.residue R)).rank ≤
+        ((U.εT i).map (IsLocalRing.residue R)).rank := fun i _ => rank_phi_le hS U i
+    have hs : ∑ i, ((U.εT (U.φ i)).map (IsLocalRing.residue R)).rank =
+        ∑ i, ((U.εT i).map (IsLocalRing.residue R)).rank :=
       Equiv.sum_comp U.φ (fun i => ((U.εT i).map (IsLocalRing.residue R)).rank)
     exact fun i => (Finset.sum_eq_sum_iff_of_le hle).mp hs i (Finset.mem_univ i)
-  refine ⟨
-    fun i => ⟨Module.finrank R (LinearMap.range (U.εT i).mulVecLin), ?_, ?_⟩,
-    fun i h0 => r_eq_zero hS H U i h0
-  ⟩
+  refine ⟨fun i => ⟨Module.finrank R (LinearMap.range (U.εT i).mulVecLin), ?_, ?_⟩,
+    fun i h0 => r_eq_zero hS H U i h0⟩
   · exact ⟨(Module.finBasisOfFinrankEq R _ rfl).equivFun⟩
-  · have hn
-        : Module.finrank R (LinearMap.range (U.εT (U.φ i)).mulVecLin)
-          = Module.finrank R (LinearMap.range (U.εT i).mulVecLin) := by
+  · have hn : Module.finrank R (LinearMap.range (U.εT (U.φ i)).mulVecLin) =
+        Module.finrank R (LinearMap.range (U.εT i).mulVecLin) := by
       rw [← hseq, ← hseq, hphi]
     exact ⟨(Module.finBasisOfFinrankEq R _ hn).equivFun⟩
 

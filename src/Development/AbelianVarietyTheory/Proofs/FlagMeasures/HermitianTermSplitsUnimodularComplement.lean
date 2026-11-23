@@ -1,59 +1,86 @@
 module
 
-public import Mathlib
-public import Formalism.SharpRestriction.CuspSpanNormBounds.FractionFieldToGenericStalkAlgebraMapEq
-public import Formalism.SharpRestriction.CuspSpanNormBounds.PsiEDef
-public import Development.AbelianVarietyTheory.Definitions.Foundations.IsHermND
 public import Development.AbelianVarietyTheory.Definitions.SemilocalFrames.ComplementReferenceCompactSubgroup
-public import Development.AbelianVarietyTheory.Definitions.SemilocalFrames.GFrames
-public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.ExistsEqZpowMulUnit
-public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.OrthonormalBasisAndOneOrbit
-public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.ExistsEquivOfRetractions
 public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.BasisOfIsCompl
-public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.FramesCommonStabiliserEqPairingMatrixStabiliser
-public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.SelfDualLatticeUnipotentTranslateStandard
-public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.HermitianDoubleCosetTermBasicFacts
-public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.TermInvariantsIndependentOfWitnesses
-public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.HermitianFramesStabilizerActsOnTerms
-public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.HermitianFramesComplementUnitaryActsOnTerms
-public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.TermExponentsNonnegAndDefectGroupBound
 public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.ExistsGluingHomomorphismDefectGroup
-public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.UnitEntries
+import Development.AbelianVarietyTheory.Proofs.FlagMeasures.HermitianDoubleCosetTermBasicFacts
 public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.IntegralOfMulVec
-public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.HmUnit
-public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.RationalExtend
-public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.IsIntegralOfQuad
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Coalgebra.IsFrobenius
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.HopfAlgebra.Basic
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Development.AbelianVarietyTheory.Proofs.FlagMeasures.HmUnit
 
 @[expose] public section
 
-open ValuativeRel Formalism.MainNotions.S.Loc GlobalTheory.HL GlobalTheory.HL.StdPlace NumberField
-  IsDedekindDomain
+open ValuativeRel Formalism.MainNotions.S.Loc GlobalTheory.HL GlobalTheory.HL.StdPlace NumberField IsDedekindDomain
 open scoped Pointwise ENNReal Classical
 
 noncomputable section
 
 namespace GlobalTheory.HL.UnimodSplit
 
-variable
-  {F : Type}
-  [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F] [CharZero F]
-  {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E]
+variable {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
+  [CharZero F] {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E]
+
 
 omit [IsNonarchimedeanLocalField F] [CharZero F] in
-theorem eq_zero_of_forall_hf
-    (L : LocE F E)
-    {n : ℕ} {Hm : Matrix (Fin n) (Fin n) E} (hd : IsUnit Hm.det)
-    {z : Fin n → E} (hz : ∀ v, hf L Hm z v = 0)
-    : z = 0 := by
+theorem eq_zero_of_forall_hf (L : LocE F E) {n : ℕ} {Hm : Matrix (Fin n) (Fin n) E}
+    (hd : IsUnit Hm.det) {z : Fin n → E} (hz : ∀ v, hf L Hm z v = 0) : z = 0 := by
   have h1 : Matrix.vecMul z Hm = 0 := by
     funext j
     have := hz (Pi.single j 1)
     simp only [hf, Pi.single_apply, apply_ite (⇑L.cj), map_one, map_zero, mul_ite, mul_one,
-        mul_zero, Finset.sum_ite_eq', Finset.mem_univ, if_true]
-      at this
+      mul_zero, Finset.sum_ite_eq', Finset.mem_univ, if_true] at this
     simpa [Matrix.vecMul, dotProduct] using this
   have := congrArg (fun u => Matrix.vecMul u Hm⁻¹) h1
   simpa [Matrix.vecMul_vecMul, Matrix.mul_nonsing_inv _ hd] using this
+
 
 omit [IsNonarchimedeanLocalField F] [CharZero F] in
 theorem cj_mem (L : LocE F E) {x : E} (hx : x ∈ L.O) : L.cj x ∈ L.O := by
@@ -61,44 +88,32 @@ theorem cj_mem (L : LocE F E) {x : E} (hx : x ∈ L.O) : L.cj x ∈ L.O := by
   exact hx.map ((L.cj : E →ₐ[F] E).restrictScalars 𝒪[F])
 
 omit [IsNonarchimedeanLocalField F] [CharZero F] in
-theorem hf_add_left (L : LocE F E) {n : ℕ} (Hm : Matrix (Fin n) (Fin n) E) (x x' y : Fin n → E)
-    : hf L Hm (x + x') y = hf L Hm x y + hf L Hm x' y := by
+theorem hf_add_left (L : LocE F E) {n : ℕ} (Hm : Matrix (Fin n) (Fin n) E) (x x' y : Fin n → E) :
+    hf L Hm (x + x') y = hf L Hm x y + hf L Hm x' y := by
   simp [hf, add_mul, Finset.sum_add_distrib]
 
 omit [IsNonarchimedeanLocalField F] [CharZero F] in
-theorem hf_add_right (L : LocE F E) {n : ℕ} (Hm : Matrix (Fin n) (Fin n) E) (x y y' : Fin n → E)
-    : hf L Hm x (y + y') = hf L Hm x y + hf L Hm x y' := by
+theorem hf_add_right (L : LocE F E) {n : ℕ} (Hm : Matrix (Fin n) (Fin n) E) (x y y' : Fin n → E) :
+    hf L Hm x (y + y') = hf L Hm x y + hf L Hm x y' := by
   simp [hf, mul_add, Finset.sum_add_distrib]
 
 omit [IsNonarchimedeanLocalField F] [CharZero F] in
-theorem hf_sum_right
-    {L : LocE F E} {r k : ℕ} (S : Frames L r k)
-    {ι : Type} [Fintype ι]
-    (x : S.V) (c : ι → E) (g : ι → S.V)
-    : hf L S.Hm x (∑ l, c l • g l) = ∑ l, hf L S.Hm x (g l) * L.cj (c l) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [FrameBasic.hf_conj L S.herm.1 x, UnimodTerm.hf_sum_left S, map_sum]
+theorem hf_sum_right {L : LocE F E} {r k : ℕ} (S : Frames L r k) {ι : Type} [Fintype ι] (x : S.V)
+    (c : ι → E) (g : ι → S.V) :
+    hf L S.Hm x (∑ l, c l • g l) = ∑ l, hf L S.Hm x (g l) * L.cj (c l) := by
+
+  rw [FrameBasic.hf_conj L S.herm.1 x, UnimodTerm.hf_sum_left S, map_sum]
   refine Finset.sum_congr rfl fun l _ => ?_
   rw [map_mul, ← FrameBasic.hf_conj L S.herm.1 x (g l)]
 
-theorem main
-    : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
-        [CharZero F] {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] (L : LocE F E),
-      ∀ (r k : ℕ) (S : Frames L r k), ∀ (d : S.Datum) (Λ : Submodule L.O S.V),
-        S.IsTerm d Λ → S.a = 0
-          → ∃ b : Fin (k - 1) → S.V,
-            (∀ i, b i ∈ S.W0) ∧ Λ = S.M d Λ ⊔ Submodule.span L.O (Set.range b)
-              ∧ (∀ i j, hf L S.Hm (b i) (b j) ∈ L.O)
-              ∧ ∃ P : Matrix (Fin (k - 1)) (Fin (k - 1)) E,
-                IsIntM L P ∧ (Matrix.of fun i j => hf L S.Hm (b i) (b j)) * P = 1 := by
+theorem main : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F] [CharZero F] {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] (L : LocE F E), ∀ (r k : ℕ) (S : Frames L r k), ∀ (d : S.Datum) (Λ : Submodule L.O S.V), S.IsTerm d Λ → S.a = 0 → ∃ b : Fin (k - 1) → S.V, (∀ i, b i ∈ S.W0) ∧ Λ = S.M d Λ ⊔ Submodule.span L.O (Set.range b) ∧ (∀ i j, hf L S.Hm (b i) (b j) ∈ L.O) ∧ ∃ P : Matrix (Fin (k - 1)) (Fin (k - 1)) E, IsIntM L P ∧ (Matrix.of fun i j => hf L S.Hm (b i) (b j)) * P = 1 := by
   intro F _ _ _ _ _ E _ _ _ L r k S d Λ hT ha
   obtain ⟨hSD, hW, hM, -⟩ := TermBasic.term_basic L r k S d Λ hT
   obtain ⟨-, hc, -⟩ := FrameBasic.main L r k S
   obtain ⟨-, -, -, hW0, -, b, hbli, hb⟩ := Gluing.main L r k S d Λ hT
   have hMΛ : ∀ m ∈ S.M d Λ, m ∈ Λ := fun m h => (hM h).1
   have hMME : ∀ m ∈ S.M d Λ, m ∈ S.ME := fun m h => (hM h).2
-  have hbL
-      : ∀ w, w ∈ Submodule.span L.O (Set.range b) ↔ w ∈ S.complementLatticeOfDatum d := fun w => by
+  have hbL : ∀ w, w ∈ Submodule.span L.O (Set.range b) ↔ w ∈ S.complementLatticeOfDatum d := fun w => by
     rw [hb]; rfl
   have hbW : ∀ i, b i ∈ S.W0 := fun i => ((hbL _).1 (Submodule.subset_span ⟨i, rfl⟩)).1
   have hspan : ∀ w ∈ S.W0, (w ∈ Λ ↔ w ∈ Submodule.span L.O (Set.range b)) := by
@@ -138,8 +153,7 @@ theorem main
     obtain ⟨m, hm, y, hy, rfl⟩ := Submodule.mem_sup.1 (htop (Submodule.mem_top (x := w)))
     have hm0 : m ∈ S.ME ⊓ S.W0 := ⟨hm, by simpa using S.W0.sub_mem hw (hYW hy)⟩
     rw [hc.inf_eq_bot, Submodule.mem_bot] at hm0
-    rw [hm0, zero_add]
-    exact hy
+    rw [hm0, zero_add]; exact hy
   have hzero : ∀ z ∈ S.W0, (∀ j, hf L S.Hm z (b j) = 0) → z = 0 := by
     intro z hz hzb
     apply eq_zero_of_forall_hf L S.herm.2
@@ -164,8 +178,7 @@ theorem main
         intro j
         have := congrFun hc j
         simp only [Matrix.vecMulLinear_apply, Matrix.vecMul, dotProduct, Pi.zero_apply, hGb,
-            Matrix.of_apply]
-          at this
+          Matrix.of_apply] at this
         rw [UnimodTerm.hf_sum_left S, ← this]
         exact Finset.sum_congr rfl fun i _ => mul_comm _ _
       funext i
@@ -198,10 +211,9 @@ theorem main
   obtain ⟨Q, hQ⟩ := (Submodule.mem_span_range_iff_exists_fun L.O).1 ((hspan y hyW).1 hyΛ)
   have hQ' : ∑ i, (Q i : E) • b i = y := hQ
   have hcoef : L.cj (Gb⁻¹ l j) = (Q l : E) := by
-    have h0 :=
-      Fintype.linearIndependent_iff.1 hbli (fun l' => L.cj (Gb⁻¹ l' j) - (Q l' : E)) (by
-        simp only [sub_smul, Finset.sum_sub_distrib]
-        rw [← hy, hQ', sub_self])
+    have h0 := Fintype.linearIndependent_iff.1 hbli (fun l' => L.cj (Gb⁻¹ l' j) - (Q l' : E)) (by
+      simp only [sub_smul, Finset.sum_sub_distrib]
+      rw [← hy, hQ', sub_self])
     exact sub_eq_zero.1 (h0 l)
   have h1 := cj_mem L (Q l).2
   rw [← hcoef, L.cj_cj] at h1

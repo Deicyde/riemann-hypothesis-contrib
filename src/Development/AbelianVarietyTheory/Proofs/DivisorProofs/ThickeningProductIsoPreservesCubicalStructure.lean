@@ -3,6 +3,7 @@ module
 public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsBoxGenOfSection
 public import Development.AbelianVarietyTheory.Proofs.RingsOfIntegers.CubBoxVal
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsProdUnif
 
 @[expose] public section
 
@@ -19,7 +20,6 @@ namespace GlobalTheory.ProdUnif
 
 open GlobalTheory.WCub GlobalTheory.PowUnif
 
-set_option maxHeartbeats 1600000 in
 theorem cubAlong_prod
     : ∀ (R : Type) [CommRing R] [IsDomain R] (I : Ideal R) (D₁ : DegData R I)
         (A₁ : PolAV (Sp (FractionRing R))) (G₁ : Over (Sp R)) [GrpObj G₁] [IsCommMonObj G₁]

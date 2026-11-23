@@ -1,8 +1,52 @@
 module
 
-public import Development.AutomorphicArithmetic.DivisorFrames.MemAdjoinGelfandSupOfCommuteGlGenerators
+public import Formalism.RealPlaceAnalysis.StatementE
+public import Mathlib.RingTheory.TensorProduct.Basic
 public import Development.AutomorphicArithmetic.DivisorFrames.GelfandElementMemAdjoinCapelliCoeffs
-public import Formalism.RealPlaceAnalysis.ThirdArithmeticHolds
+public import Development.AutomorphicArithmetic.DivisorFrames.MemAdjoinGelfandSupOfCommuteGlGenerators
+import Formalism.RealPlaceAnalysis.ThirdArithmeticHolds
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -13,8 +57,8 @@ namespace UpperTheory.V.Fb
 
 variable {A ι : Type} [Ring A] [Algebra ℂ A] {n : ℕ}
 
-private theorem qdet_mem (S : Subalgebra ℂ A) (X : Fin n → Fin n → A) (h : ∀ a b, X a b ∈ S) (u : ℂ)
-    : qdet X u ∈ S := by
+private theorem qdet_mem (S : Subalgebra ℂ A) (X : Fin n → Fin n → A) (h : ∀ a b, X a b ∈ S) (u : ℂ) :
+    qdet X u ∈ S := by
   refine S.sum_mem fun σ _ => S.mul_mem (intCast_mem S _) (S.list_prod_mem fun x hx => ?_)
   obtain ⟨k, rfl⟩ := List.mem_ofFn.1 hx
   refine S.add_mem ?_ (h _ _)
@@ -22,23 +66,16 @@ private theorem qdet_mem (S : Subalgebra ℂ A) (X : Fin n → Fin n → A) (h :
   · exact S.algebraMap_mem _
   · exact S.zero_mem
 
-theorem multiCentre
-    [Fintype ι]
-    (X : ι → Fin n → Fin n → A)
-    (hX : ∀ i, GlRel (X i)) (hc : ∀ i j, i ≠ j → ∀ a b c d, Commute (X i a b) (X j c d))
-    {z : A} (hz : z ∈ Algebra.adjoin ℂ {x | ∃ i a b, x = X i a b})
-    (hzc : ∀ i a b, X i a b * z = z * X i a b)
-    : z ∈ Algebra.adjoin ℂ {x | ∃ i u, x = qdet (X i) u} := by
+theorem multiCentre [Fintype ι] (X : ι → Fin n → Fin n → A) (hX : ∀ i, GlRel (X i))
+    (hc : ∀ i j, i ≠ j → ∀ a b c d, Commute (X i a b) (X j c d)) {z : A}
+    (hz : z ∈ Algebra.adjoin ℂ {x | ∃ i a b, x = X i a b}) (hzc : ∀ i a b, X i a b * z = z * X i a b) :
+    z ∈ Algebra.adjoin ℂ {x | ∃ i u, x = qdet (X i) u} := by
   classical
-  have key
-      : ∀ s : Finset ι,
-        z ∈ Algebra.adjoin ℂ
-          ({x | ∃ i ∈ s, ∃ u, x = qdet (X i) u} ∪ {x | ∃ i ∉ s, ∃ a b, x = X i a b}) := by
+  have key : ∀ s : Finset ι,
+      z ∈ Algebra.adjoin ℂ ({x | ∃ i ∈ s, ∃ u, x = qdet (X i) u} ∪ {x | ∃ i ∉ s, ∃ a b, x = X i a b}) := by
     intro s
     induction s using Finset.induction_on with
-    | empty =>
-      exact Algebra.adjoin_mono (by rintro _ ⟨i, a, b, rfl⟩; exact Or.inr ⟨i, by simp, a, b, rfl⟩)
-        hz
+    | empty => exact Algebra.adjoin_mono (by rintro _ ⟨i, a, b, rfl⟩; exact Or.inr ⟨i, by simp, a, b, rfl⟩) hz
     | insert i s hi ih =>
       set B := Algebra.adjoin ℂ
         ({x | ∃ j ∈ s, ∃ u, x = qdet (X j) u} ∪ {x | ∃ j ∉ insert i s, ∃ a b, x = X j a b}) with hB
@@ -52,23 +89,16 @@ theorem multiCentre
           · rintro _ rfl
             exact hc i j (fun e => hj (e ▸ Finset.mem_insert_self i s)) c d a b
         exact this hb _ rfl
-      have h2 :=
-        UpperTheory.mem_adjoin_gelfand_sup_of_commute_glGenerators A n (X i) (hX i) B h1 z
-          (Algebra.adjoin_le
-            (by
-              rintro _ (⟨j, hj, u, rfl⟩ | ⟨j, hj, a, b, rfl⟩)
-              · exact Algebra.mem_sup_right (Algebra.subset_adjoin (Or.inl ⟨j, hj, u, rfl⟩))
-              · by_cases e : j = i
-                · subst e
-                  exact Algebra.mem_sup_left (Algebra.subset_adjoin ⟨(a, b), rfl⟩)
-                · exact Algebra.mem_sup_right (Algebra.subset_adjoin (Or.inr
-                    ⟨j, by simp [e, hj], a, b, rfl⟩)))
-            ih)
-          (hzc i)
+      have h2 := UpperTheory.mem_adjoin_gelfand_sup_of_commute_glGenerators A n (X i) (hX i) B h1 z (Algebra.adjoin_le (by
+        rintro _ (⟨j, hj, u, rfl⟩ | ⟨j, hj, a, b, rfl⟩)
+        · exact Algebra.mem_sup_right (Algebra.subset_adjoin (Or.inl ⟨j, hj, u, rfl⟩))
+        · by_cases e : j = i
+          · subst e
+            exact Algebra.mem_sup_left (Algebra.subset_adjoin ⟨(a, b), rfl⟩)
+          · exact Algebra.mem_sup_right (Algebra.subset_adjoin (Or.inr ⟨j, by simp [e, hj], a, b, rfl⟩))) ih) (hzc i)
       refine (sup_le (Algebra.adjoin_le ?_) (Algebra.adjoin_mono ?_) : _ ≤ _) h2
       · rintro _ ⟨k, rfl⟩
-        refine Algebra.adjoin_mono ?_
-          (UpperTheory.gelfandElement_mem_adjoin_capelliCoeffs A n (X i) (hX i) k)
+        refine Algebra.adjoin_mono ?_ (UpperTheory.gelfandElement_mem_adjoin_capelliCoeffs A n (X i) (hX i) k)
         rintro _ ⟨u, rfl⟩
         exact Or.inl ⟨i, Finset.mem_insert_self i s, u, rfl⟩
       · rintro _ (⟨j, hj, u, rfl⟩ | h)
@@ -79,29 +109,22 @@ theorem multiCentre
   · exact ⟨j, u, rfl⟩
   · exact absurd (Finset.mem_univ j) hj
 
-theorem map_qdet {B : Type} [Ring B] [Algebra ℂ B] (f : A →ₐ[ℂ] B) (X : Fin n → Fin n → A) (u : ℂ)
-    : f (qdet X u) = qdet (fun a b => f (X a b)) u := by
+theorem map_qdet {B : Type} [Ring B] [Algebra ℂ B] (f : A →ₐ[ℂ] B) (X : Fin n → Fin n → A) (u : ℂ) :
+    f (qdet X u) = qdet (fun a b => f (X a b)) u := by
   have hT : ∀ v a b, f (Tm X v a b) = Tm (fun a b => f (X a b)) v a b := fun v a b => by
     unfold Tm
     split_ifs <;> simp
-  set_option synthInstance.maxHeartbeats 100000 in
-  simp only [qdet, qminor, map_sum, map_mul, map_intCast, map_list_prod, List.map_ofFn,
-    Function.comp_def, hT]
 
-theorem glRel_map
-    {R S F : Type} [Ring R] [Ring S] [FunLike F R S] [RingHomClass F R S]
-    (f : F)
-    {X : Fin n → Fin n → R} (h : GlRel X)
-    : GlRel fun a b => f (X a b) := fun a b c d => by
+  simp only [qdet, qminor, map_sum, map_mul, map_intCast, map_list_prod, List.map_ofFn, Function.comp_def, hT]
+
+theorem glRel_map {R S F : Type} [Ring R] [Ring S] [FunLike F R S] [RingHomClass F R S] (f : F) {X : Fin n → Fin n → R}
+    (h : GlRel X) : GlRel fun a b => f (X a b) := fun a b c d => by
   have := congrArg f (h a b c d)
   simpa only [map_sub, map_mul, apply_ite f, map_zero] using this
 
-theorem exists_re_im
-    {B : Type} [Ring B] [Algebra ℝ B] (w : ℂ ⊗[ℝ] B) (hw : ∀ x : B, (1 ⊗ₜ x) * w = w * (1 ⊗ₜ x))
-    : ∃ p ∈ Subalgebra.center ℝ B, ∃ q ∈ Subalgebra.center ℝ B,
-      w = (1 : ℂ) ⊗ₜ p + Complex.I ⊗ₜ q := by
-  let P : (ℂ →ₗ[ℝ] ℝ) → ℂ ⊗[ℝ] B →ₗ[ℝ] B := fun f =>
-    (TensorProduct.lid ℝ B).toLinearMap ∘ₗ f.rTensor B
+theorem exists_re_im {B : Type} [Ring B] [Algebra ℝ B] (w : ℂ ⊗[ℝ] B) (hw : ∀ x : B, (1 ⊗ₜ x) * w = w * (1 ⊗ₜ x)) :
+    ∃ p ∈ Subalgebra.center ℝ B, ∃ q ∈ Subalgebra.center ℝ B, w = (1 : ℂ) ⊗ₜ p + Complex.I ⊗ₜ q := by
+  let P : (ℂ →ₗ[ℝ] ℝ) → ℂ ⊗[ℝ] B →ₗ[ℝ] B := fun f => (TensorProduct.lid ℝ B).toLinearMap ∘ₗ f.rTensor B
   have hP : ∀ f c x, P f (c ⊗ₜ x) = f c • x := fun f c x => by simp [P]
   have hl : ∀ f (x : B) (w : ℂ ⊗[ℝ] B), P f ((1 ⊗ₜ x) * w) = x * P f w := fun f x w => by
     induction w with
@@ -121,27 +144,20 @@ theorem exists_re_im
     congr 1
     simp
   | add a b ha hb =>
-    rw [map_add (f := _), map_add (f := _), TensorProduct.tmul_add, TensorProduct.tmul_add,
-      add_add_add_comm, ← ha, ← hb]
+    rw [map_add (f := _), map_add (f := _), TensorProduct.tmul_add, TensorProduct.tmul_add, add_add_add_comm, ← ha, ← hb]
 
-theorem qdet_mem_span_center
-    [Algebra ℝ A] [IsScalarTower ℝ ℂ A]
-    {B : Type} [Ring B] [Algebra ℝ B]
-    (X : ι → Fin n → Fin n → B)
-    (hX : ∀ i, GlRel (X i)) (hc : ∀ i j, i ≠ j → ∀ a b c d, Commute (X i a b) (X j c d))
-    (htop : Algebra.adjoin ℝ {x | ∃ i a b, x = X i a b} = ⊤)
-    (ρ : B →ₐ[ℝ] A) (i : ι) (u : ℂ)
-    : qdet (fun a b => ρ (X i a b)) u
-      ∈ Submodule.span ℂ (ρ '' (Subalgebra.center ℝ B : Set B)) := by
+theorem qdet_mem_span_center [Algebra ℝ A] [IsScalarTower ℝ ℂ A] {B : Type} [Ring B] [Algebra ℝ B]
+    (X : ι → Fin n → Fin n → B) (hX : ∀ i, GlRel (X i))
+    (hc : ∀ i j, i ≠ j → ∀ a b c d, Commute (X i a b) (X j c d))
+    (htop : Algebra.adjoin ℝ {x | ∃ i a b, x = X i a b} = ⊤) (ρ : B →ₐ[ℝ] A) (i : ι) (u : ℂ) :
+    qdet (fun a b => ρ (X i a b)) u ∈ Submodule.span ℂ (ρ '' (Subalgebra.center ℝ B : Set B)) := by
   let j : B →ₐ[ℝ] ℂ ⊗[ℝ] B := Algebra.TensorProduct.includeRight
-  let ψ : ℂ ⊗[ℝ] B →ₐ[ℂ] A :=
-    Algebra.TensorProduct.lift (Algebra.ofId ℂ A) ρ fun c x => Algebra.commutes c (ρ x)
+  let ψ : ℂ ⊗[ℝ] B →ₐ[ℂ] A := Algebra.TensorProduct.lift (Algebra.ofId ℂ A) ρ fun c x => Algebra.commutes c (ρ x)
   have hψ : ∀ c x, ψ (c ⊗ₜ x) = c • ρ x := fun c x =>
     (Algebra.TensorProduct.lift_tmul _ _ _ c x).trans (Algebra.smul_def c (ρ x)).symm
   set w := qdet (fun a b => j (X i a b)) u with hw
   have h1 : ∀ x : B, j x * w = w * j x := fun x => by
-    have : Algebra.adjoin ℝ {x | ∃ i a b, x = X i a b}
-        ≤ (Subalgebra.centralizer ℝ {w}).comap j := by
+    have : Algebra.adjoin ℝ {x | ∃ i a b, x = X i a b} ≤ (Subalgebra.centralizer ℝ {w}).comap j := by
       refine Algebra.adjoin_le ?_
       rintro _ ⟨k, a, b, rfl⟩ _ rfl
       by_cases e : k = i

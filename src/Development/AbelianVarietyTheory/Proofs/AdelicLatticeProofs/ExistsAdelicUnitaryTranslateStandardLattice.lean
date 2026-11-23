@@ -1,10 +1,51 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Definitions.AdelicHermitianForms.IsHermForm
-public import Formalism.LocalToGlobal.ProjectiveLattices.ThClass
-public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.AdelicCompletionRationalPointsAndApproximation
+public import Formalism.LocalToGlobal.ProjectiveLattices.ThShort
 public import Development.AbelianVarietyTheory.Proofs.RingsOfIntegers.ExistsUnitaryOfSelfDual
+public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.AdelicCompletionRationalPointsAndApproximation
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+public import Development.AbelianVarietyTheory.BlockTheory.ExistenceTori.AdmissibleHarmonicLattice
 
 @[expose] public section
 
@@ -12,8 +53,7 @@ set_option autoImplicit false
 
 noncomputable section
 
-open NumberField IsDedekindDomain GlobalTheory.AdLat GlobalTheory.UnRep
-  ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj
+open NumberField IsDedekindDomain GlobalTheory.AdLat GlobalTheory.UnRep ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj
 open scoped TensorProduct Matrix
 
 namespace GlobalTheory.AdelTranslate
@@ -24,41 +64,34 @@ variable {F E : Type} [Field F] [NumberField F] [Field E] [Algebra F E] {n : ℕ
 
 def tv (a : FiniteAdeleRing (𝓞 F) F) (x : Fin n → E) : Fin n → RA F E := fun i => a ⊗ₜ[F] x i
 
-theorem tv_nsmul_left (d : ℕ) (a : FiniteAdeleRing (𝓞 F) F) (x : Fin n → E)
-    : tv (d • a) x = d • tv a x := by
+theorem tv_nsmul_left (d : ℕ) (a : FiniteAdeleRing (𝓞 F) F) (x : Fin n → E) : tv (d • a) x = d • tv a x := by
   funext i
   simp only [tv, Pi.smul_apply]
   induction d with
   | zero => simp
   | succ d ih => rw [succ_nsmul, succ_nsmul, TensorProduct.add_tmul, ih]
 
-theorem tv_nsmul_right (d : ℕ) (a : FiniteAdeleRing (𝓞 F) F) (x : Fin n → E)
-    : tv a (d • x) = d • tv a x :=
+theorem tv_nsmul_right (d : ℕ) (a : FiniteAdeleRing (𝓞 F) F) (x : Fin n → E) : tv a (d • x) = d • tv a x :=
   cap_tmul_nsmul F d a x
 
-theorem tv_mul_mem
-    {L : Set (Fin n → E)} {a b : FiniteAdeleRing (𝓞 F) F}
-    (ha : ∀ v, a v ∈ v.adicCompletionIntegers F) (hb : ∀ v, b v ∈ v.adicCompletionIntegers F)
-    {x : Fin n → E} (hx : x ∈ L)
-    : tv (a * b) x ∈ hat F L := by
+theorem tv_mul_mem {L : Set (Fin n → E)} {a b : FiniteAdeleRing (𝓞 F) F}
+    (ha : ∀ v, a v ∈ v.adicCompletionIntegers F) (hb : ∀ v, b v ∈ v.adicCompletionIntegers F) {x : Fin n → E}
+    (hx : x ∈ L) : tv (a * b) x ∈ hat F L := by
   have h : ∀ v : HeightOneSpectrum (𝓞 F), (a * b) v ∈ v.adicCompletionIntegers F := fun v => by
     change a v * b v ∈ _
     exact mul_mem (ha v) (hb v)
   exact cap_gen_mem F L (a * b) h x hx
 
-def glue (e : FiniteAdeleRing (𝓞 F) F) (γ : Matrix (Fin n) (Fin n) E)
-    : Matrix (Fin n) (Fin n) (RA F E) :=
-  (e ⊗ₜ[F] (1 : E) : RA F E) • fm F γ
-    + (1 - e ⊗ₜ[F] (1 : E) : RA F E) • (1 : Matrix (Fin n) (Fin n) (RA F E))
+def glue (e : FiniteAdeleRing (𝓞 F) F) (γ : Matrix (Fin n) (Fin n) E) : Matrix (Fin n) (Fin n) (RA F E) :=
+  (e ⊗ₜ[F] (1 : E) : RA F E) • fm F γ + (1 - e ⊗ₜ[F] (1 : E) : RA F E) • (1 : Matrix (Fin n) (Fin n) (RA F E))
 
-theorem glue_mulVec_tv
-    (e a : FiniteAdeleRing (𝓞 F) F) (γ : Matrix (Fin n) (Fin n) E) (x : Fin n → E)
-    : glue e γ *ᵥ tv a x = tv (e * a) (γ *ᵥ x) + tv ((1 - e) * a) x := by
+theorem glue_mulVec_tv (e a : FiniteAdeleRing (𝓞 F) F) (γ : Matrix (Fin n) (Fin n) E) (x : Fin n → E) :
+    glue e γ *ᵥ tv a x = tv (e * a) (γ *ᵥ x) + tv ((1 - e) * a) x := by
   rw [glue, Matrix.add_mulVec, Matrix.smul_mulVec, Matrix.smul_mulVec, Matrix.one_mulVec]
   funext i
-  simp only [tv, fm, Pi.add_apply, Pi.smul_apply, smul_eq_mul, Matrix.mulVec, dotProduct,
-    Matrix.map_apply, Algebra.TensorProduct.tmul_mul_tmul, one_mul, Finset.mul_sum,
-    TensorProduct.tmul_sum, sub_mul, TensorProduct.sub_tmul]
+  simp only [tv, fm, Pi.add_apply, Pi.smul_apply, smul_eq_mul, Matrix.mulVec, dotProduct, Matrix.map_apply,
+    Algebra.TensorProduct.tmul_mul_tmul, one_mul, Finset.mul_sum, TensorProduct.tmul_sum, sub_mul,
+    TensorProduct.sub_tmul]
 
 theorem fm_mul (γ δ : Matrix (Fin n) (Fin n) E) : fm F γ * fm F δ = fm F (γ * δ) :=
   (Matrix.map_mul (f := (Algebra.TensorProduct.includeRight : E →ₐ[F] RA F E))).symm
@@ -66,9 +99,8 @@ theorem fm_mul (γ δ : Matrix (Fin n) (Fin n) E) : fm F γ * fm F δ = fm F (γ
 theorem fm_one : fm F (1 : Matrix (Fin n) (Fin n) E) = 1 :=
   Matrix.map_one _ (by simp) (Algebra.TensorProduct.one_def).symm
 
-theorem glue_mul
-    {e : FiniteAdeleRing (𝓞 F) F} (he : e * e = e) {γ δ : Matrix (Fin n) (Fin n) E} (h : γ * δ = 1)
-    : glue e γ * glue e δ = 1 := by
+theorem glue_mul {e : FiniteAdeleRing (𝓞 F) F} (he : e * e = e) {γ δ : Matrix (Fin n) (Fin n) E}
+    (h : γ * δ = 1) : glue e γ * glue e δ = 1 := by
   have hε : (e ⊗ₜ[F] (1 : E) : RA F E) * (e ⊗ₜ[F] (1 : E)) = e ⊗ₜ[F] (1 : E) := by
     rw [Algebra.TensorProduct.tmul_mul_tmul, he, one_mul]
   unfold glue
@@ -76,27 +108,22 @@ theorem glue_mul
   have h1 : (1 - ε) * ε = 0 := by linear_combination -hε
   have h2 : ε * (1 - ε) = 0 := by linear_combination -hε
   have h3 : (1 - ε) * (1 - ε) = 1 - ε := by linear_combination hε
-  simp only [Matrix.add_mul, Matrix.mul_add, Matrix.smul_mul, Matrix.mul_smul, smul_smul, smul_add,
-    fm_mul, h, fm_one, Matrix.mul_one, Matrix.one_mul, hε, h1, h2, h3, zero_smul, add_zero,
-    zero_add]
+  simp only [Matrix.add_mul, Matrix.mul_add, Matrix.smul_mul, Matrix.mul_smul, smul_smul, smul_add, fm_mul, h,
+    fm_one, Matrix.mul_one, Matrix.one_mul, hε, h1, h2, h3, zero_smul, add_zero, zero_add]
   rw [← add_smul, add_sub_cancel, one_smul]
 
-theorem glue_map_sg (c : E ≃ₐ[F] E) (e : FiniteAdeleRing (𝓞 F) F) (γ : Matrix (Fin n) (Fin n) E)
-    : ((glue e γ).map (sg (FiniteAdeleRing (𝓞 F) F) c))ᵀ = glue e (γ.map c)ᵀ := by
+theorem glue_map_sg (c : E ≃ₐ[F] E) (e : FiniteAdeleRing (𝓞 F) F) (γ : Matrix (Fin n) (Fin n) E) :
+    ((glue e γ).map (sg (FiniteAdeleRing (𝓞 F) F) c))ᵀ = glue e (γ.map c)ᵀ := by
   ext i j
   by_cases h : i = j
   · subst h
     simp [glue, fm, sg]
   · simp [glue, fm, sg, Matrix.one_apply_ne h, Matrix.one_apply_ne (Ne.symm h)]
 
-theorem isUnA_of
-    (c : E ≃ₐ[F] E)
-    {g : Matrix (Fin n) (Fin n) (RA F E)} (h : (g.map (sg (FiniteAdeleRing (𝓞 F) F) c))ᵀ * g = 1)
-    : IsUnA c (1 : Matrix (Fin n) (Fin n) E) g := by
-  have hA
-      : ∀ x y : Fin n → RA F E,
-        hermA c (1 : Matrix (Fin n) (Fin n) E) x y
-          = (fun b => sg (FiniteAdeleRing (𝓞 F) F) c (y b)) ⬝ᵥ x := fun x y => by
+theorem isUnA_of (c : E ≃ₐ[F] E) {g : Matrix (Fin n) (Fin n) (RA F E)}
+    (h : (g.map (sg (FiniteAdeleRing (𝓞 F) F) c))ᵀ * g = 1) : IsUnA c (1 : Matrix (Fin n) (Fin n) E) g := by
+  have hA : ∀ x y : Fin n → RA F E, hermA c (1 : Matrix (Fin n) (Fin n) E) x y =
+      (fun b => sg (FiniteAdeleRing (𝓞 F) F) c (y b)) ⬝ᵥ x := fun x y => by
     simp only [hermA, dotProduct]
     refine Finset.sum_congr rfl fun a _ => ?_
     rw [Finset.sum_eq_single a]
@@ -106,16 +133,15 @@ theorem isUnA_of
       simp
     · simp
   intro x y
-  have : (fun b => sg (FiniteAdeleRing (𝓞 F) F) c ((g *ᵥ y) b))
-      = g.map (sg (FiniteAdeleRing (𝓞 F) F) c) *ᵥ fun b => sg (FiniteAdeleRing (𝓞 F) F) c (y b) :=
+  have : (fun b => sg (FiniteAdeleRing (𝓞 F) F) c ((g *ᵥ y) b)) =
+      g.map (sg (FiniteAdeleRing (𝓞 F) F) c) *ᵥ fun b => sg (FiniteAdeleRing (𝓞 F) F) c (y b) :=
     funext fun i => RingHom.map_mulVec (sg (FiniteAdeleRing (𝓞 F) F) c : RA F E →+* RA F E) g y i
   rw [hA, hA, this, ← Matrix.vecMul_transpose, ← Matrix.dotProduct_mulVec, Matrix.mulVec_mulVec, h,
     Matrix.one_mulVec]
 
-theorem exists_div
-    (d : ℕ) (e : FiniteAdeleRing (𝓞 F) F) (he : ∀ v, e v ∈ v.adicCompletionIntegers F)
-    (hd : ∀ v : HeightOneSpectrum (𝓞 F), (d : 𝓞 F) ∈ v.asIdeal → e v = 0)
-    : ∃ a : FiniteAdeleRing (𝓞 F) F, (∀ v, a v ∈ v.adicCompletionIntegers F) ∧ d • a = e := by
+theorem exists_div (d : ℕ) (e : FiniteAdeleRing (𝓞 F) F) (he : ∀ v, e v ∈ v.adicCompletionIntegers F)
+    (hd : ∀ v : HeightOneSpectrum (𝓞 F), (d : 𝓞 F) ∈ v.asIdeal → e v = 0) :
+    ∃ a : FiniteAdeleRing (𝓞 F) F, (∀ v, a v ∈ v.adicCompletionIntegers F) ∧ d • a = e := by
   rcases Nat.eq_zero_or_pos d with rfl | hpos
   · refine ⟨0, fun v => (v.adicCompletionIntegers F).zero_mem, ?_⟩
     rw [zero_smul]
@@ -135,23 +161,21 @@ theorem exists_div
       rw [map_natCast] at h1
       have h2 := v.valuedAdicCompletion_eq_valuation' (d : F)⁻¹
       exact le_of_eq (h2.trans (by rw [map_inv₀, h1, inv_one]))
-  · rw [nsmul_eq_mul, ← mul_assoc, ← map_natCast (algebraMap F (FiniteAdeleRing (𝓞 F) F)),
-      ← map_mul, mul_inv_cancel₀ hd0, map_one, one_mul]
+  · rw [nsmul_eq_mul, ← mul_assoc, ← map_natCast (algebraMap F (FiniteAdeleRing (𝓞 F) F)), ← map_mul,
+      mul_inv_cancel₀ hd0, map_one, one_mul]
+
 
 open Classical in
-def idem (F : Type) [Field F] [NumberField F] (k : ℕ) : FiniteAdeleRing (𝓞 F) F := ⟨
-  fun v => if (k : 𝓞 F) ∈ v.asIdeal then 1 else 0,
-  Filter.Eventually.of_forall fun v => by
+def idem (F : Type) [Field F] [NumberField F] (k : ℕ) : FiniteAdeleRing (𝓞 F) F :=
+  ⟨fun v => if (k : 𝓞 F) ∈ v.asIdeal then 1 else 0, Filter.Eventually.of_forall fun v => by
     dsimp only
     split_ifs
     · exact (v.adicCompletionIntegers F).one_mem
-    · exact (v.adicCompletionIntegers F).zero_mem
-⟩
+    · exact (v.adicCompletionIntegers F).zero_mem⟩
 
 open Classical in
-theorem idem_apply (k : ℕ) (v : HeightOneSpectrum (𝓞 F))
-    : idem F k v = if (k : 𝓞 F) ∈ v.asIdeal then 1 else 0 :=
-  rfl
+theorem idem_apply (k : ℕ) (v : HeightOneSpectrum (𝓞 F)) :
+    idem F k v = if (k : 𝓞 F) ∈ v.asIdeal then 1 else 0 := rfl
 
 theorem idem_mul (k : ℕ) : idem F k * idem F k = idem F k := by
   refine DFunLike.ext _ _ fun v => ?_
@@ -159,16 +183,14 @@ theorem idem_mul (k : ℕ) : idem F k * idem F k = idem F k := by
   rw [idem_apply]
   split_ifs <;> simp
 
-theorem idem_int (k : ℕ) (v : HeightOneSpectrum (𝓞 F))
-    : idem F k v ∈ v.adicCompletionIntegers F := by
+theorem idem_int (k : ℕ) (v : HeightOneSpectrum (𝓞 F)) : idem F k v ∈ v.adicCompletionIntegers F := by
   rw [idem_apply]
   split_ifs
   · exact one_mem _
   · exact zero_mem _
 
-theorem exists_div_idem {k d : ℕ} (h : d.Coprime k)
-    : ∃ a : FiniteAdeleRing (𝓞 F) F,
-      (∀ v, a v ∈ v.adicCompletionIntegers F) ∧ d • a = idem F k := by
+theorem exists_div_idem {k d : ℕ} (h : d.Coprime k) :
+    ∃ a : FiniteAdeleRing (𝓞 F) F, (∀ v, a v ∈ v.adicCompletionIntegers F) ∧ d • a = idem F k := by
   refine exists_div d _ (idem_int k) fun v hv => ?_
   rw [idem_apply, if_neg]
   intro hk
@@ -176,20 +198,17 @@ theorem exists_div_idem {k d : ℕ} (h : d.Coprime k)
   exact v.isPrime.ne_top ((Ideal.eq_top_iff_one _).2
     (hab ▸ add_mem (v.asIdeal.mul_mem_left a hv) (v.asIdeal.mul_mem_left b hk)))
 
-theorem exists_div_one_sub_idem (k : ℕ)
-    : ∃ a : FiniteAdeleRing (𝓞 F) F,
-      (∀ v, a v ∈ v.adicCompletionIntegers F) ∧ k • a = 1 - idem F k := by
+theorem exists_div_one_sub_idem (k : ℕ) :
+    ∃ a : FiniteAdeleRing (𝓞 F) F, (∀ v, a v ∈ v.adicCompletionIntegers F) ∧ k • a = 1 - idem F k := by
   refine exists_div k _ (fun v => ?_) fun v hv => ?_
   · change 1 - idem F k v ∈ _
     exact sub_mem (one_mem _) (idem_int k v)
   · change 1 - idem F k v = 0
     rw [idem_apply, if_pos hv, sub_self]
 
-theorem glue_mem_hat
-    {L₁ L₂ : Set (Fin n → E)} {k k' : ℕ} (hk : k'.Coprime k)
-    {γ : Matrix (Fin n) (Fin n) E} (h₁ : ∀ x ∈ L₁, k' • γ *ᵥ x ∈ L₂)
-    (h₂ : ∀ x ∈ L₁, k • x ∈ L₂)
-    : ∀ z ∈ hat F L₁, glue (idem F k) γ *ᵥ z ∈ hat F L₂ := by
+theorem glue_mem_hat {L₁ L₂ : Set (Fin n → E)} {k k' : ℕ} (hk : k'.Coprime k) {γ : Matrix (Fin n) (Fin n) E}
+    (h₁ : ∀ x ∈ L₁, k' • γ *ᵥ x ∈ L₂) (h₂ : ∀ x ∈ L₁, k • x ∈ L₂) :
+    ∀ z ∈ hat F L₁, glue (idem F k) γ *ᵥ z ∈ hat F L₂ := by
   obtain ⟨a, ha, ea⟩ := exists_div_idem (F := F) hk
   obtain ⟨b, hb, eb⟩ := exists_div_one_sub_idem (F := F) k
   intro z hz
@@ -204,8 +223,8 @@ theorem glue_mem_hat
   | add z z' _ _ hz hz' => rw [Matrix.mulVec_add]; exact add_mem hz hz'
   | neg z _ hz => rw [Matrix.mulVec_neg]; exact neg_mem hz
 
-theorem exists_factor {k M : ℕ} (h : k.Coprime M) (D : ℕ) (hD : 0 < D)
-    : ∃ D₁ D₂ : ℕ, D = D₁ * D₂ ∧ D₁.Coprime M ∧ D₂.Coprime k := by
+theorem exists_factor {k M : ℕ} (h : k.Coprime M) (D : ℕ) (hD : 0 < D) :
+    ∃ D₁ D₂ : ℕ, D = D₁ * D₂ ∧ D₁.Coprime M ∧ D₂.Coprime k := by
   induction D using Nat.recOnMul with
   | zero => exact absurd hD (lt_irrefl 0)
   | one => exact ⟨1, 1, rfl, by simp, by simp⟩
@@ -218,12 +237,9 @@ theorem exists_factor {k M : ℕ} (h : k.Coprime M) (D : ℕ) (hD : 0 < D)
     obtain ⟨b₁, b₂, rfl, h₃, h₄⟩ := hb (Nat.pos_of_mul_pos_left hD)
     exact ⟨a₁ * b₁, a₂ * b₂, by ring, Nat.Coprime.mul_left h₁ h₃, Nat.Coprime.mul_left h₂ h₄⟩
 
-theorem congAtA_glue
-    (L : Submodule (𝓞 E) (Fin n → E))
-    {k k' M : ℕ} (hk : k'.Coprime k) (hM : k.Coprime M)
-    {γ : Matrix (Fin n) (Fin n) E} (h : ∀ x ∈ L, (k * k') • γ *ᵥ x ∈ L)
-    (D : ℕ) (hD : 0 < D)
-    : CongAtA F L M D (glue (idem F k) γ) := by
+theorem congAtA_glue (L : Submodule (𝓞 E) (Fin n → E)) {k k' M : ℕ} (hk : k'.Coprime k) (hM : k.Coprime M)
+    {γ : Matrix (Fin n) (Fin n) E} (h : ∀ x ∈ L, (k * k') • γ *ᵥ x ∈ L) (D : ℕ) (hD : 0 < D) :
+    CongAtA F L M D (glue (idem F k) γ) := by
   obtain ⟨D₁, D₂, rfl, h₁, h₂⟩ := exists_factor hM D hD
   obtain ⟨a, ha, ea⟩ := exists_div_idem (F := F) (Nat.Coprime.mul_left h₂ hk)
   refine ⟨D₁ * k, Nat.Coprime.mul_left h₁ hM, fun z hz => ?_⟩
@@ -243,8 +259,7 @@ theorem congAtA_glue
       rw [e1, ← ea, smul_mul_assoc, tv_nsmul_left, tv_nsmul_right, smul_smul, smul_smul]
       congr 1
       ring
-  | zero =>
-    exact ⟨0, zero_mem _, by simp⟩
+  | zero => exact ⟨0, zero_mem _, by simp⟩
   | add z z' _ _ hz hz' =>
     obtain ⟨w, hw, e⟩ := hz
     obtain ⟨w', hw', e'⟩ := hz'
@@ -265,8 +280,7 @@ section Lattice
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {n : ℕ}
 
-theorem span_eq_top (Λ : GenLat E n) (hU : Λ.Unimod)
-    : Submodule.span E (Λ.La : Set (Fin n → E)) = ⊤ := by
+theorem span_eq_top (Λ : GenLat E n) (hU : Λ.Unimod) : Submodule.span E (Λ.La : Set (Fin n → E)) = ⊤ := by
   classical
   by_contra hne
   obtain ⟨φ, hφ0, hφ⟩ := Submodule.exists_le_ker_of_lt_top _ (lt_top_iff_ne_top.2 hne)
@@ -279,31 +293,27 @@ theorem span_eq_top (Λ : GenLat E n) (hU : Λ.Unimod)
       simp [Pi.single_apply, eq_comm]
     simp [v, this, mul_comm]
   have h0 : ∀ w ∈ Λ.La, φ w = 0 := fun w hw => hφ (Submodule.subset_span hw)
-  have hvΛ : v ∈ Λ.La :=
-    (hU v).2 fun w hw => by
-      rw [hv, h0 w hw]
-      exact zero_mem _
+  have hvΛ : v ∈ Λ.La := (hU v).2 fun w hw => by
+    rw [hv, h0 w hw]
+    exact zero_mem _
   have h1 : ∑ j, IsCMField.complexConj E (v j) * v j = 0 := (hv v).trans (h0 v hvΛ)
   obtain ⟨σ⟩ : Nonempty (E →+* ℂ) := inferInstance
   have h2 : ∑ j, Complex.normSq (σ (v j)) = 0 := by
     have := congrArg σ h1
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_mul, IsCMField.complexEmbedding_complexConj, map_zero,
-          ← Complex.normSq_eq_conj_mul_self]
-        at this
+
+    simp only [map_sum, map_mul, IsCMField.complexEmbedding_complexConj, map_zero,
+    ← Complex.normSq_eq_conj_mul_self] at this
     exact_mod_cast this
   have h3 : ∀ j, v j = 0 := fun j => by
-    have :=
-      (Finset.sum_eq_zero_iff_of_nonneg fun j _ => Complex.normSq_nonneg _).1 h2 j
-        (Finset.mem_univ j)
+    have := (Finset.sum_eq_zero_iff_of_nonneg fun j _ => Complex.normSq_nonneg _).1 h2 j (Finset.mem_univ j)
     simpa using this
   refine hφ0 (LinearMap.ext fun w => ?_)
   rw [← hv]
   simp [h3]
 
 omit [IsCMField E] in
-theorem span_smul_le_iff (k : ℕ) (L₁ L₂ : Submodule (𝓞 E) (Fin n → E))
-    : Ideal.span {(k : 𝓞 E)} • L₁ ≤ L₂ ↔ ∀ x ∈ L₁, k • x ∈ L₂ := by
+theorem span_smul_le_iff (k : ℕ) (L₁ L₂ : Submodule (𝓞 E) (Fin n → E)) :
+    Ideal.span {(k : 𝓞 E)} • L₁ ≤ L₂ ↔ ∀ x ∈ L₁, k • x ∈ L₂ := by
   constructor
   · intro h x hx
     have := h (Submodule.smul_mem_smul (Ideal.mem_span_singleton_self _) hx)
@@ -314,9 +324,8 @@ theorem span_smul_le_iff (k : ℕ) (L₁ L₂ : Submodule (𝓞 E) (Fin n → E)
     rw [mul_smul, Nat.cast_smul_eq_nsmul]
     exact L₂.smul_mem a (h x hx)
 
-theorem exists_pos (Λ : GenLat E n) (hU : Λ.Unimod) {M : ℕ} (hT : Λ.TrivAt M)
-    : ∃ k : ℕ,
-      0 < k ∧ k.Coprime M ∧ (∀ x ∈ Λ.La, k • x ∈ stdLat E n) ∧ ∀ x ∈ stdLat E n, k • x ∈ Λ.La := by
+theorem exists_pos (Λ : GenLat E n) (hU : Λ.Unimod) {M : ℕ} (hT : Λ.TrivAt M) :
+    ∃ k : ℕ, 0 < k ∧ k.Coprime M ∧ (∀ x ∈ Λ.La, k • x ∈ stdLat E n) ∧ ∀ x ∈ stdLat E n, k • x ∈ Λ.La := by
   classical
   obtain ⟨k, hk, h₁, h₂⟩ := hT
   rcases Nat.eq_zero_or_pos k with rfl | hpos
@@ -342,24 +351,14 @@ theorem exists_pos (Λ : GenLat E n) (hU : Λ.Unimod) {M : ℕ} (hT : Λ.TrivAt 
 
 end Lattice
 
-theorem exists_adelic_translate
-    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E]
-        (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (n M : ℕ) (Λ : GenLat E n),
-      0 < M → Λ.Unimod → Λ.TrivAt M
-        → ∃ g : GL (Fin n) (RA (maximalRealSubfield E) E),
-          IsUnA (IsCMField.complexConj E) (1 : Matrix (Fin n) (Fin n) E) g.1
-            ∧ (Λ.La : Set (Fin n → E))
-              = latOf (maximalRealSubfield E) g.1 (stdLat E n : Set (Fin n → E))
-            ∧ ∀ D : ℕ, 0 < D → CongAtA (maximalRealSubfield E) (stdLat E n) M D g.1 := by
+theorem exists_adelic_translate : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (n M : ℕ) (Λ : GenLat E n), 0 < M → Λ.Unimod → Λ.TrivAt M → ∃ g : GL (Fin n) (RA (maximalRealSubfield E) E), IsUnA (IsCMField.complexConj E) (1 : Matrix (Fin n) (Fin n) E) g.1 ∧ (Λ.La : Set (Fin n → E)) = latOf (maximalRealSubfield E) g.1 (stdLat E n : Set (Fin n → E)) ∧ ∀ D : ℕ, 0 < D → CongAtA (maximalRealSubfield E) (stdLat E n) M D g.1 := by
   intro E _ _ _ H n M Λ _ hU hT
   obtain ⟨k, hk0, hkM, h₁, h₂⟩ := exists_pos Λ hU hT
   have hle := (span_smul_le_iff k _ _).2 h₂
-  obtain ⟨k', γ, hk', hγ, h₃, h₄⟩ :=
-    GlobalTheory.AdaptUnitary.exists_unitary_adapted E H n Λ k hU hk0 hle k hk0
+  obtain ⟨k', γ, hk', hγ, h₃, h₄⟩ := GlobalTheory.AdaptUnitary.exists_unitary_adapted E H n Λ k hU hk0 hle k hk0
   obtain ⟨Λ', hΛ', -⟩ := GlobalTheory.AdaptUnitary.exists_lat Λ hU hk0 hle
-  have hcap :=
-    (hat_rational_points_and_approx (maximalRealSubfield E) E n Λ.La (hΛ' ▸ Λ'.fg)
-      (span_eq_top Λ hU)).1
+  have hcap := (hat_rational_points_and_approx (maximalRealSubfield E) E n Λ.La (hΛ' ▸ Λ'.fg)
+    (span_eq_top Λ hU)).1
   set c := IsCMField.complexConj E with hc
   set δ : Matrix (Fin n) (Fin n) E := (γ.map c)ᵀ with hδ
   have hδγ : δ * γ = 1 := by
@@ -372,18 +371,13 @@ theorem exists_adelic_translate
     simp [hδ, hc]
   have h₅ : ∀ x ∈ stdLat E n, k' • δ *ᵥ x ∈ Λ.La := fun x hx => by
     obtain ⟨w, hw, e⟩ := h₄ x hx
-    rwa [← Nat.cast_smul_eq_nsmul E, ← Matrix.mulVec_smul, e, Matrix.mulVec_mulVec, hδγ,
-      Matrix.one_mulVec]
+    rwa [← Nat.cast_smul_eq_nsmul E, ← Matrix.mulVec_smul, e, Matrix.mulVec_mulVec, hδγ, Matrix.one_mulVec]
   have h₆ : ∀ x ∈ Λ.La, k' • γ *ᵥ x ∈ stdLat E n := fun x hx => by
     rw [← Nat.cast_smul_eq_nsmul E]
     exact h₃ x hx
   have he := idem_mul (F := maximalRealSubfield E) k
-  refine ⟨
-    ⟨glue (idem _ k) δ, glue (idem _ k) γ, glue_mul he hδγ, glue_mul he hγδ⟩,
-    isUnA_of c ?_,
-    ?_,
-    congAtA_glue _ hk' hkM fun x hx => ?_
-  ⟩
+  refine ⟨⟨glue (idem _ k) δ, glue (idem _ k) γ, glue_mul he hδγ, glue_mul he hγδ⟩, isUnA_of c ?_, ?_,
+    congAtA_glue _ hk' hkM fun x hx => ?_⟩
   · change ((glue (idem _ k) δ).map _)ᵀ * glue (idem _ k) δ = 1
     rw [glue_map_sg, hδc]
     exact glue_mul he hγδ

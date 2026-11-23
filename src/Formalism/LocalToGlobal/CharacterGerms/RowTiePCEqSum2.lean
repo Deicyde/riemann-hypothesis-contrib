@@ -1,6 +1,53 @@
 module
 
-public import Formalism.LocalToGlobal.CharacterGerms.RowTiePCEqOf
+public import Formalism.LocalToGlobal.CharacterGerms.RowTieDefs
+public import Formalism.FormalGroupLog.FormalGroupLogProofs.ChainRule
+public import Formalism.LocalToGlobal.CharacterGerms.ConstMemTypeSetOfNonneg
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Formalism.LocalToGlobal.CharacterGerms.RowTiePCEqOf
+import Formalism.LocalToGlobal.CharacterGerms.RowTiePGerm
 
 @[expose] public section
 
@@ -11,16 +58,14 @@ open Classical
 
 namespace Formalism.L2.FormalSeriesBounds
 
-open Formalism.IncomingBounds PartialDerivEval RowTiePCEq
-  ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ
+open Formalism.IncomingBounds PartialDerivEval RowTiePCEq ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ
 
 variable {C : Type} [Field C]
 
 namespace RowTiePCEqSum
 
-theorem subst_zero_const
-    {σ τ : Type} [Finite σ] (f : MvPowerSeries σ C) (hf : MvPowerSeries.constantCoeff f = 0)
-    : MvPowerSeries.subst (fun _ : σ => (0 : MvPowerSeries τ C)) f = 0 := by
+theorem subst_zero_const {σ τ : Type} [Finite σ] (f : MvPowerSeries σ C) (hf : MvPowerSeries.constantCoeff f = 0) :
+    MvPowerSeries.subst (fun _ : σ => (0 : MvPowerSeries τ C)) f = 0 := by
   ext e
   rw [MvPowerSeries.coeff_subst MvPowerSeries.HasSubst.zero, map_zero]
   apply finsum_eq_zero_of_forall_eq_zero
@@ -34,32 +79,29 @@ theorem subst_zero_const
       Finset.prod_eq_zero (i := s) (Finsupp.mem_support_iff.2 hs') (zero_pow hs')
     rw [this, map_zero, smul_zero]
 
-theorem hasSubst_unit {τ : Type} {T : MvPowerSeries τ C} (hT : MvPowerSeries.constantCoeff T = 0)
-    : MvPowerSeries.HasSubst (fun _ : Unit => T) :=
-  MvPowerSeries.hasSubst_of_constantCoeff_zero (fun _ => hT)
+theorem hasSubst_unit {τ : Type} {T : MvPowerSeries τ C} (hT : MvPowerSeries.constantCoeff T = 0) :
+    MvPowerSeries.HasSubst (fun _ : Unit => T) := MvPowerSeries.hasSubst_of_constantCoeff_zero (fun _ => hT)
 
-theorem subst_lin
-    {σ τ : Type} {a : σ → MvPowerSeries τ C} (ha : MvPowerSeries.HasSubst a)
-    {ι : Type} (s : Finset ι) (r : ι → C) (F : ι → MvPowerSeries σ C)
-    : MvPowerSeries.subst a (∑ i ∈ s, r i • F i) = ∑ i ∈ s, r i • MvPowerSeries.subst a (F i) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [← MvPowerSeries.coe_substAlgHom ha, map_sum]
+theorem subst_lin {σ τ : Type} {a : σ → MvPowerSeries τ C} (ha : MvPowerSeries.HasSubst a) {ι : Type}
+    (s : Finset ι) (r : ι → C) (F : ι → MvPowerSeries σ C) :
+    MvPowerSeries.subst a (∑ i ∈ s, r i • F i) = ∑ i ∈ s, r i • MvPowerSeries.subst a (F i) := by
+
+  rw [← MvPowerSeries.coe_substAlgHom ha, map_sum]
   refine Finset.sum_congr rfl (fun i _ => ?_)
-  first | exact map_smul _ _ _ | exact AlgHom.map_smul_of_tower _ _ _
+  first
+  | exact map_smul _ _ _
+  | exact AlgHom.map_smul_of_tower _ _ _
 
-theorem coeff_subst_tyS
-    {τ : Type} [Finite τ]
-    {l : ℕ} (hl : 2 ≤ l)
-    {T : MvPowerSeries τ C} (hT : MvPowerSeries.constantCoeff T = 0)
-    (a : ℕ → C) (μ : τ →₀ ℕ)
-    : MvPowerSeries.coeff μ (MvPowerSeries.subst (fun _ : Unit => T) (tyS l a))
-      = ∑ s ∈ Finset.range (μ.degree + 1), a s * MvPowerSeries.coeff μ (T ^ (l ^ s)) := by
+theorem coeff_subst_tyS {τ : Type} [Finite τ] {l : ℕ} (hl : 2 ≤ l) {T : MvPowerSeries τ C}
+    (hT : MvPowerSeries.constantCoeff T = 0) (a : ℕ → C) (μ : τ →₀ ℕ) :
+    MvPowerSeries.coeff μ (MvPowerSeries.subst (fun _ : Unit => T) (tyS l a)) =
+      ∑ s ∈ Finset.range (μ.degree + 1), a s * MvPowerSeries.coeff μ (T ^ (l ^ s)) := by
   set N := μ.degree + 1 with hN
   set P : PowerSeries C := ∑ s ∈ Finset.range N, a s • PowerSeries.X ^ (l ^ s) with hP
   have hPc : ∀ m < l ^ N, PowerSeries.coeff m (tyS l a) = PowerSeries.coeff m P := by
     intro m hm
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hP, map_sum]
+
+    rw [hP, map_sum]
     simp only [PowerSeries.coeff_smul, PowerSeries.coeff_X_pow]
     by_cases h : ∃ s', l ^ s' = m
     · obtain ⟨s', rfl⟩ := h
@@ -79,24 +121,16 @@ theorem coeff_subst_tyS
       symm
       refine Finset.sum_eq_zero fun s _ => ?_
       rw [if_neg (h s).symm, smul_zero]
-  have hAg
-      : Formalism.G.LogCR.Agree N (tyS l a : MvPowerSeries Unit C) (P : MvPowerSeries Unit C) := by
+  have hAg : Formalism.G.LogCR.Agree N (tyS l a : MvPowerSeries Unit C) (P : MvPowerSeries Unit C) := by
     intro e he
     have hes : e = Finsupp.single () (e ()) := Finsupp.unique_single e
     rw [hes] at he ⊢
     rw [Finsupp.degree_single] at he
     exact hPc _ (lt_of_lt_of_le he (Nat.lt_pow_self (by omega)).le)
-  have h1 :=
-    Formalism.G.LogCR.Agree.subst
-      (a := fun _ : Unit => T)
-      (a' := fun _ : Unit => T)
-      (fun _ => hT)
-      (fun _ => hT)
-      hAg
-      (fun _ _ _ => rfl)
-      μ (by omega)
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [h1, hP, ← MvPowerSeries.coe_substAlgHom (hasSubst_unit hT), map_sum, map_sum]
+  have h1 := Formalism.G.LogCR.Agree.subst (a := fun _ : Unit => T) (a' := fun _ : Unit => T) (fun _ => hT) (fun _ => hT) hAg
+    (fun _ _ _ => rfl) μ (by omega)
+
+  rw [h1, hP, ← MvPowerSeries.coe_substAlgHom (hasSubst_unit hT), map_sum, map_sum]
   refine Finset.sum_congr rfl fun s _ => ?_
   rw [map_smul, map_pow, MvPowerSeries.coe_substAlgHom]
   rw [show (PowerSeries.X : PowerSeries C) = (MvPowerSeries.X () : MvPowerSeries Unit C) from rfl,
@@ -104,14 +138,12 @@ theorem coeff_subst_tyS
 
 section Add
 
-variable
-  [CharZero C]
-  {V : VF C} {O : Type} [CommRing O] [StarRing O]
-  {dd : ℕ} {d : ℕ} {I : Fin 2 → Type} [∀ g, Fintype (I g)]
-  (Y : FBChart C V O dd) (p : PairData Y d I)
+variable [CharZero C] {V : VF C} {O : Type} [CommRing O] [StarRing O] {dd : ℕ} {d : ℕ} {I : Fin 2 → Type}
+  [∀ g, Fintype (I g)] (Y : FBChart C V O dd) (p : PairData Y d I)
 
 end Add
 
 end RowTiePCEqSum
+
 
 end Formalism.L2.FormalSeriesBounds

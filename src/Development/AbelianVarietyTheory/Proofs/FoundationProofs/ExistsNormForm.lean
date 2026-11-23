@@ -1,6 +1,56 @@
 module
 
-public import Mathlib
+public import Mathlib.RingTheory.MvPolynomial.Homogeneous
+public import Mathlib.RingTheory.Norm.Defs
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+public import Mathlib.Algebra.MvPolynomial.Funext
+public import Mathlib.RingTheory.Norm.Basic
 
 @[expose] public section
 
@@ -8,12 +58,10 @@ open Polynomial
 
 namespace GlobalTheory.NormFormBound
 
-theorem prod_pow_bound
-    {k σ : Type} [Field k]
-    (s : Finset σ) (m : σ → ℕ)
-    (p : σ → k[X]) (d : ℕ) (hp : ∀ i, (p i).natDegree ≤ d)
-    : (∏ i ∈ s, p i ^ m i).natDegree ≤ (∑ i ∈ s, m i) * d
-      ∧ (∏ i ∈ s, p i ^ m i).coeff ((∑ i ∈ s, m i) * d) = ∏ i ∈ s, (p i).coeff d ^ m i := by
+theorem prod_pow_bound {k σ : Type} [Field k] (s : Finset σ) (m : σ → ℕ) (p : σ → k[X]) (d : ℕ)
+    (hp : ∀ i, (p i).natDegree ≤ d) :
+    (∏ i ∈ s, p i ^ m i).natDegree ≤ (∑ i ∈ s, m i) * d ∧
+      (∏ i ∈ s, p i ^ m i).coeff ((∑ i ∈ s, m i) * d) = ∏ i ∈ s, (p i).coeff d ^ m i := by
   classical
   induction s using Finset.induction_on with
   | empty => simp
@@ -23,18 +71,15 @@ theorem prod_pow_bound
     have hpa : (p a ^ m a).natDegree ≤ m a * d :=
       natDegree_pow_le.trans (Nat.mul_le_mul_left _ (hp a))
     refine ⟨natDegree_mul_le.trans (add_le_add hpa ih1), ?_⟩
-    rw [coeff_mul_add_eq_of_natDegree_le hpa ih1, coeff_pow_of_natDegree_le (hp a), ih2,
-      Finset.prod_insert ha]
+    rw [coeff_mul_add_eq_of_natDegree_le hpa ih1, coeff_pow_of_natDegree_le (hp a), ih2, Finset.prod_insert ha]
 
-theorem form_bound
-    {k σ : Type} [Field k] [Infinite k] [Fintype σ]
-    (n : ℕ) (F : MvPolynomial σ k[X]) (hF : F.IsHomogeneous n) (h0 : F ≠ 0)
-    : ∃ (c : ℕ) (lam : σ → k),
-      (∀ (d : ℕ) (p : σ → k[X]),
-          (∀ i, (p i).natDegree ≤ d) → (MvPolynomial.eval p F).natDegree ≤ n * d + c)
-        ∧ ∀ (d : ℕ) (p : σ → k[X]),
-          (∀ i, (p i).natDegree ≤ d) → (∀ i, (p i).coeff d = lam i)
-            → (MvPolynomial.eval p F).coeff (n * d + c) ≠ 0 := by
+theorem form_bound {k σ : Type} [Field k] [Infinite k] [Fintype σ] (n : ℕ)
+    (F : MvPolynomial σ k[X]) (hF : F.IsHomogeneous n) (h0 : F ≠ 0) :
+    ∃ (c : ℕ) (lam : σ → k),
+      (∀ (d : ℕ) (p : σ → k[X]), (∀ i, (p i).natDegree ≤ d) →
+        (MvPolynomial.eval p F).natDegree ≤ n * d + c) ∧
+      ∀ (d : ℕ) (p : σ → k[X]), (∀ i, (p i).natDegree ≤ d) → (∀ i, (p i).coeff d = lam i) →
+        (MvPolynomial.eval p F).coeff (n * d + c) ≠ 0 := by
   classical
   set c := F.support.sup (fun m => (F.coeff m).natDegree) with hc
   set G : MvPolynomial σ k := ∑ m ∈ F.support, MvPolynomial.monomial m ((F.coeff m).coeff c) with hG
@@ -74,81 +119,61 @@ theorem form_bound
     omega
   · intro d p hp hpl
     rw [MvPolynomial.eval_eq, Polynomial.finsetSum_coeff]
-    have hterm
-        : ∀ m ∈ F.support,
-          (F.coeff m * ∏ i ∈ m.support, p i ^ m i).coeff (n * d + c)
-            = (F.coeff m).coeff c * ∏ i ∈ m.support, lam i ^ m i := by
+    have hterm : ∀ m ∈ F.support, (F.coeff m * ∏ i ∈ m.support, p i ^ m i).coeff (n * d + c) =
+        (F.coeff m).coeff c * ∏ i ∈ m.support, lam i ^ m i := by
       intro m hm
       have hb := prod_pow_bound m.support m p d hp
       rw [hsumdeg m hm] at hb
       rw [add_comm (n * d) c, coeff_mul_add_eq_of_natDegree_le (hcle m hm) hb.1, hb.2]
       simp [hpl]
     rw [Finset.sum_congr rfl hterm]
-    have hev
-        : MvPolynomial.eval lam G
-          = ∑ m ∈ F.support, (F.coeff m).coeff c * ∏ i ∈ m.support, lam i ^ m i := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [hG, map_sum]
+    have hev : MvPolynomial.eval lam G =
+        ∑ m ∈ F.support, (F.coeff m).coeff c * ∏ i ∈ m.support, lam i ^ m i := by
+
+      rw [hG, map_sum]
       refine Finset.sum_congr rfl fun m _ => ?_
       rw [MvPolynomial.eval_monomial, Finsupp.prod]
     rw [← hev]
     exact hlam
 
-theorem exists_norm_form
-    {R A : Type} [CommRing R] [CommRing A] [Algebra R A] (n : ℕ) (b : Module.Basis (Fin n) R A)
-    : ∃ F : MvPolynomial (Fin n) R,
-      F.IsHomogeneous n
-        ∧ ∀ p : Fin n → R, MvPolynomial.eval p F = Algebra.norm R (∑ i, p i • b i) := by
+theorem exists_norm_form {R A : Type} [CommRing R] [CommRing A] [Algebra R A] (n : ℕ)
+    (b : Module.Basis (Fin n) R A) :
+    ∃ F : MvPolynomial (Fin n) R, F.IsHomogeneous n ∧
+      ∀ p : Fin n → R, MvPolynomial.eval p F = Algebra.norm R (∑ i, p i • b i) := by
   classical
-  refine ⟨
-    (Matrix.of fun a c =>
-      ∑ i, MvPolynomial.C (Algebra.leftMulMatrix b (b i) a c) *
-        MvPolynomial.X i).det,
-    ?_,
-    ?_
-  ⟩
+  refine ⟨(Matrix.of fun a c => ∑ i, MvPolynomial.C (Algebra.leftMulMatrix b (b i) a c) *
+      MvPolynomial.X i).det, ?_, ?_⟩
   · rw [Matrix.det_apply]
     refine MvPolynomial.IsHomogeneous.sum _ _ _ fun σ _ => ?_
     rw [Units.smul_def, zsmul_eq_mul]
-    have hC
-        : ((Equiv.Perm.sign σ : ℤ) : MvPolynomial (Fin n) R)
-          = MvPolynomial.C ((Equiv.Perm.sign σ : ℤ) : R) := by
-      simp
+    have hC : ((Equiv.Perm.sign σ : ℤ) : MvPolynomial (Fin n) R) =
+        MvPolynomial.C ((Equiv.Perm.sign σ : ℤ) : R) := by simp
     rw [hC]
-    have hent
-        : ∀ a ∈ (Finset.univ : Finset (Fin n)),
-          ((Matrix.of fun a c =>
-              ∑ i,
-                MvPolynomial.C (Algebra.leftMulMatrix b (b i) a c) * MvPolynomial.X i)
-            (σ a) a).IsHomogeneous 1 := by
+    have hent : ∀ a ∈ (Finset.univ : Finset (Fin n)), ((Matrix.of fun a c => ∑ i,
+        MvPolynomial.C (Algebra.leftMulMatrix b (b i) a c) * MvPolynomial.X i) (σ a) a).IsHomogeneous 1 := by
       intro a _
       rw [Matrix.of_apply]
       refine MvPolynomial.IsHomogeneous.sum _ _ _ fun i _ => ?_
-      simpa using
-        (MvPolynomial.isHomogeneous_C (Fin n) (Algebra.leftMulMatrix b (b i) (σ a) a)).mul
-          (MvPolynomial.isHomogeneous_X R i)
-    have hmul :=
-      (MvPolynomial.isHomogeneous_C (Fin n) ((Equiv.Perm.sign σ : ℤ) : R)).mul
-        (MvPolynomial.IsHomogeneous.prod _ _ (fun _ => 1) hent)
+      simpa using (MvPolynomial.isHomogeneous_C (Fin n) (Algebra.leftMulMatrix b (b i) (σ a) a)).mul
+        (MvPolynomial.isHomogeneous_X R i)
+    have hmul := (MvPolynomial.isHomogeneous_C (Fin n) ((Equiv.Perm.sign σ : ℤ) : R)).mul
+      (MvPolynomial.IsHomogeneous.prod _ _ (fun _ => 1) hent)
     simpa using hmul
   · intro p
     rw [Algebra.norm_eq_matrix_det b, RingHom.map_det]
     congr 1
     ext a c
-    set_option synthInstance.maxHeartbeats 100000 in
+
     simp [map_sum, Matrix.sum_apply, mul_comm]
 
-theorem norm_degree
-    (k A : Type) [Field k] [Infinite k] [CommRing A] [IsDomain A] [Algebra k[X] A]
-    (n : ℕ) (b : Module.Basis (Fin n) k[X] A)
-    : ∃ (c : ℕ) (lam : Fin n → k),
-      (∀ (d : ℕ) (p : Fin n → k[X]),
-          (∀ i, (p i).natDegree ≤ d) → (Algebra.norm k[X] (∑ i, p i • b i)).natDegree ≤ n * d + c)
-        ∧ ∀ (d : ℕ) (p : Fin n → k[X]),
-          (∀ i, (p i).degree < (d : WithBot ℕ))
-            → ∑ i, (C (lam i) * X ^ d + p i) • b i ≠ 0
-              ∧ (Algebra.norm k[X] (∑ i, (C (lam i) * X ^ d + p i) • b i)).natDegree
-                = n * d + c := by
+theorem norm_degree (k A : Type) [Field k] [Infinite k] [CommRing A] [IsDomain A]
+    [Algebra k[X] A] (n : ℕ) (b : Module.Basis (Fin n) k[X] A) :
+    ∃ (c : ℕ) (lam : Fin n → k),
+      (∀ (d : ℕ) (p : Fin n → k[X]), (∀ i, (p i).natDegree ≤ d) →
+        (Algebra.norm k[X] (∑ i, p i • b i)).natDegree ≤ n * d + c) ∧
+      ∀ (d : ℕ) (p : Fin n → k[X]), (∀ i, (p i).degree < (d : WithBot ℕ)) →
+        ∑ i, (C (lam i) * X ^ d + p i) • b i ≠ 0 ∧
+          (Algebra.norm k[X] (∑ i, (C (lam i) * X ^ d + p i) • b i)).natDegree = n * d + c := by
   classical
   haveI : Module.Free k[X] A := Module.Free.of_basis b
   haveI : Module.Finite k[X] A := Module.Finite.of_basis b

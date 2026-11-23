@@ -1,13 +1,55 @@
 module
 
-public import Mathlib
-public import Development.AutomorphicSpectrum.Definitions.MetricPeriods.IsEigFrames
 public import Development.WeilBound.CoreStatements.PlurisubharmonicCones.EmbEquivSymmApply
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+public import Mathlib.Analysis.Matrix.Hermitian
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+public import Mathlib.GroupTheory.FiniteAbelian.Basic
+public import Mathlib.LinearAlgebra.Dimension.Torsion.Finite
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
 
 @[expose] public section
 
-open NumberField Matrix GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Cusp
-  GroundTheory.Heights₂.Heights.LowerBoundFree
+open NumberField Matrix GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Cusp GroundTheory.Heights₂.Heights.LowerBoundFree
 open scoped ComplexConjugate ComplexOrder
 
 noncomputable section
@@ -16,13 +58,11 @@ namespace LevelTowerAlt
 
 section Index
 
-variable
-  {E : Type} [Field E] [NumberField E]
-  {M N : Type} [AddCommGroup M] [Module (𝓞 E) M] [AddCommGroup N] [Module (𝓞 E) N]
+variable {E : Type} [Field E] [NumberField E] {M N : Type} [AddCommGroup M] [Module (𝓞 E) M] [AddCommGroup N]
+  [Module (𝓞 E) N]
 
-theorem index_range
-    [Module.Free (𝓞 E) M] [Module.Finite (𝓞 E) M] (f : M →ₗ[𝓞 E] M) (hf : Function.Injective f)
-    : (LinearMap.range f).toAddSubgroup.index = (Algebra.norm ℤ (LinearMap.det f)).natAbs := by
+theorem index_range [Module.Free (𝓞 E) M] [Module.Finite (𝓞 E) M] (f : M →ₗ[𝓞 E] M) (hf : Function.Injective f) :
+    (LinearMap.range f).toAddSubgroup.index = (Algebra.norm ℤ (LinearMap.det f)).natAbs := by
   classical
   haveI : Module.Free ℤ M := Module.Free.trans (S := 𝓞 E)
   haveI : Module.Finite ℤ M := Module.Finite.trans (𝓞 E) M
@@ -39,23 +79,18 @@ theorem index_range
   rw [key]
   rfl
 
-theorem relIndex_map
-    {R A B : Type} [Ring R] [AddCommGroup A] [Module R A] [AddCommGroup B] [Module R B]
-    (φ : A →ₗ[R] B) (hφ : Function.Injective φ)
-    (J K : Submodule R A)
-    : (J.map φ).toAddSubgroup.relIndex (K.map φ).toAddSubgroup
-      = J.toAddSubgroup.relIndex K.toAddSubgroup := by
+theorem relIndex_map {R A B : Type} [Ring R] [AddCommGroup A] [Module R A] [AddCommGroup B] [Module R B]
+    (φ : A →ₗ[R] B) (hφ : Function.Injective φ) (J K : Submodule R A) :
+    (J.map φ).toAddSubgroup.relIndex (K.map φ).toAddSubgroup = J.toAddSubgroup.relIndex K.toAddSubgroup := by
   have e : ∀ S : Submodule R A, (S.map φ).toAddSubgroup = S.toAddSubgroup.map φ.toAddMonoidHom := by
     intro S
     ext y
     simp
   rw [e, e]
-  exact AddSubgroup.relIndex_map_map_of_injective (f := φ.toAddMonoidHom) J.toAddSubgroup
-    K.toAddSubgroup hφ
+  exact AddSubgroup.relIndex_map_map_of_injective (f := φ.toAddMonoidHom) J.toAddSubgroup K.toAddSubgroup hφ
 
-private theorem exists_int_eq_mul_of_ne_zero'
-    {E : Type} [Field E] [NumberField E] {a : 𝓞 E} (ha : a ≠ 0)
-    : ∃ n : ℤ, n ≠ 0 ∧ ∃ b : 𝓞 E, (n : 𝓞 E) = b * a := by
+private theorem exists_int_eq_mul_of_ne_zero' {E : Type} [Field E] [NumberField E] {a : 𝓞 E} (ha : a ≠ 0) :
+    ∃ n : ℤ, n ≠ 0 ∧ ∃ b : 𝓞 E, (n : 𝓞 E) = b * a := by
   have hne : (Ideal.span {a}).comap (algebraMap ℤ (𝓞 E)) ≠ ⊥ :=
     Ideal.comap_ne_bot_of_integral_mem ha (Ideal.mem_span_singleton_self a)
       (Algebra.IsIntegral.isIntegral a)
@@ -77,32 +112,27 @@ theorem finite_of_torsion [Module.Finite (𝓞 E) M] (h : Module.IsTorsion (𝓞
   rw [Submonoid.smul_def] at hax
   simp [hax]
 
-theorem index_ne_zero
-    [Module.Finite (𝓞 E) M]
-    (J : Submodule (𝓞 E) M) (h : Module.finrank (𝓞 E) J = Module.finrank (𝓞 E) M)
-    : J.toAddSubgroup.index ≠ 0 := by
+theorem index_ne_zero [Module.Finite (𝓞 E) M] (J : Submodule (𝓞 E) M)
+    (h : Module.finrank (𝓞 E) J = Module.finrank (𝓞 E) M) : J.toAddSubgroup.index ≠ 0 := by
   have h1 := J.finrank_quotient_add_finrank
   have h2 : Module.finrank (𝓞 E) (M ⧸ J) = 0 := by omega
   have h3 : Finite (M ⧸ J) := finite_of_torsion (Module.finrank_eq_zero_iff_isTorsion.1 h2)
   have : Finite (M ⧸ J.toAddSubgroup) := h3
   exact AddSubgroup.index_ne_zero_of_finite
 
-theorem eq_zero_of_smul [Module.Free ℤ M] {a : 𝓞 E} (ha : a ≠ 0) {x : M} (hx : a • x = 0)
-    : x = 0 := by
+theorem eq_zero_of_smul [Module.Free ℤ M] {a : 𝓞 E} (ha : a ≠ 0) {x : M} (hx : a • x = 0) : x = 0 := by
   obtain ⟨n, hn, b, hb⟩ := exists_int_eq_mul_of_ne_zero' ha
-  have h1 : n • x = 0 := by rw [← Int.cast_smul_eq_zsmul (𝓞 E), hb, mul_smul, hx, smul_zero]
+  have h1 : n • x = 0 := by
+    rw [← Int.cast_smul_eq_zsmul (𝓞 E), hb, mul_smul, hx, smul_zero]
   rcases smul_eq_zero.1 h1 with h | h
   · exact absurd h hn
   · exact h
 
-private theorem mem_span_range_subtype_iff
-    {R N : Type} [CommRing R] [AddCommGroup N] [Module R N]
-    {I : Submodule R N} {r : ℕ} (v : Fin r → I) (z : I)
-    : z ∈ Submodule.span R (Set.range v)
-      ↔ (z : N) ∈ Submodule.span R (Set.range fun a => (v a : N)) := by
-  have hmap
-      : (Submodule.span R (Set.range v)).map I.subtype
-        = Submodule.span R (Set.range fun a => (v a : N)) := by
+private theorem mem_span_range_subtype_iff {R N : Type} [CommRing R] [AddCommGroup N] [Module R N] {I : Submodule R N}
+    {r : ℕ} (v : Fin r → I) (z : I) :
+    z ∈ Submodule.span R (Set.range v) ↔ (z : N) ∈ Submodule.span R (Set.range fun a => (v a : N)) := by
+  have hmap : (Submodule.span R (Set.range v)).map I.subtype =
+      Submodule.span R (Set.range fun a => (v a : N)) := by
     rw [Submodule.map_span, ← Set.range_comp]
     rfl
   rw [← hmap, Submodule.mem_map]
@@ -112,32 +142,25 @@ private theorem mem_span_range_subtype_iff
   · rintro ⟨y, hy, hyz⟩
     rwa [← Subtype.ext hyz]
 
-private theorem relIndex_span_coe_eq_index_span
-    {R N : Type} [CommRing R] [AddCommGroup N] [Module R N]
-    {I : Submodule R N} {r : ℕ} (v : Fin r → I)
-    : (Submodule.span R (Set.range fun a => (v a : N))).toAddSubgroup.relIndex I.toAddSubgroup
-      = (Submodule.span R (Set.range v)).toAddSubgroup.index := by
+private theorem relIndex_span_coe_eq_index_span {R N : Type} [CommRing R] [AddCommGroup N] [Module R N] {I : Submodule R N}
+    {r : ℕ} (v : Fin r → I) :
+    (Submodule.span R (Set.range fun a => (v a : N))).toAddSubgroup.relIndex I.toAddSubgroup =
+      (Submodule.span R (Set.range v)).toAddSubgroup.index := by
   rw [AddSubgroup.relIndex]
   congr 1
   ext z
   simp only [AddSubgroup.mem_addSubgroupOf, Submodule.mem_toAddSubgroup]
   exact (mem_span_range_subtype_iff v z).symm
 
-theorem exists_family [Module.Free ℤ M] [Module.Finite ℤ M] {I : Submodule (𝓞 E) M} (hI : I ≠ ⊥)
-    : ∃ r v, IsNzFamily I r v := by
+theorem exists_family [Module.Free ℤ M] [Module.Finite ℤ M] {I : Submodule (𝓞 E) M} (hI : I ≠ ⊥) :
+    ∃ r v, IsNzFamily I r v := by
   haveI : Module.Finite (𝓞 E) M := Module.Finite.of_restrictScalars_finite ℤ (𝓞 E) M
   haveI : IsNoetherian (𝓞 E) M := isNoetherian_of_isNoetherianRing_of_finite (𝓞 E) M
-  obtain ⟨u, hu⟩ :=
-    exists_linearIndependent_of_le_finrank (R := 𝓞 E) (M := I) (le_refl (Module.finrank (𝓞 E) I))
+  obtain ⟨u, hu⟩ := exists_linearIndependent_of_le_finrank (R := 𝓞 E) (M := I)
+    (le_refl (Module.finrank (𝓞 E) I))
   obtain ⟨x, hxI, hx0⟩ := Submodule.exists_mem_ne_zero_of_ne_bot hI
-  refine ⟨
-    Module.finrank (𝓞 E) I,
-    fun a => (u a : M),
-    ?_,
-    fun a => (u a).2,
-    hu.map' I.subtype I.ker_subtype,
-    ?_
-  ⟩
+  refine ⟨Module.finrank (𝓞 E) I, fun a => (u a : M), ?_, fun a => (u a).2,
+    hu.map' I.subtype I.ker_subtype, ?_⟩
   · have hl : LinearIndependent (𝓞 E) (fun _ : Fin 1 => (⟨x, hxI⟩ : I)) := by
       rw [Fintype.linearIndependent_iff]
       intro c hc i
@@ -153,17 +176,14 @@ theorem exists_family [Module.Free ℤ M] [Module.Finite ℤ M] {I : Submodule (
     simp
 
 omit [NumberField E] in
-theorem family_nsmul {I : Submodule (𝓞 E) M} {r : ℕ} {v : Fin r → M} {x : M} (hx : x ∈ I)
-    : (((Submodule.span (𝓞 E) (Set.range v)).toAddSubgroup.relIndex I.toAddSubgroup : ℕ) : 𝓞 E) • x
-      ∈ Submodule.span (𝓞 E) (Set.range v) := by
+theorem family_nsmul {I : Submodule (𝓞 E) M} {r : ℕ} {v : Fin r → M} {x : M} (hx : x ∈ I) :
+    (((Submodule.span (𝓞 E) (Set.range v)).toAddSubgroup.relIndex I.toAddSubgroup : ℕ) : 𝓞 E) • x ∈
+      Submodule.span (𝓞 E) (Set.range v) := by
   rw [Nat.cast_smul_eq_nsmul]
-  exact AddSubgroup.nsmul_relIndex_mem (Submodule.span (𝓞 E) (Set.range v)).toAddSubgroup
-    (K := I.toAddSubgroup) hx
+  exact AddSubgroup.nsmul_relIndex_mem (Submodule.span (𝓞 E) (Set.range v)).toAddSubgroup (K := I.toAddSubgroup) hx
 
-theorem family_rank
-    [Module.Free ℤ M] [Module.Finite ℤ M]
-    {I : Submodule (𝓞 E) M} {r : ℕ} {v : Fin r → M} (hv : IsNzFamily I r v)
-    : r = Module.finrank (𝓞 E) I := by
+theorem family_rank [Module.Free ℤ M] [Module.Finite ℤ M] {I : Submodule (𝓞 E) M} {r : ℕ} {v : Fin r → M}
+    (hv : IsNzFamily I r v) : r = Module.finrank (𝓞 E) I := by
   obtain ⟨h1, hmem, hli, hidx⟩ := hv
   let v' : Fin r → I := fun a => ⟨v a, hmem a⟩
   have hli' : LinearIndependent (𝓞 E) v' := LinearIndependent.of_comp I.subtype hli
@@ -180,13 +200,10 @@ theorem family_rank
   rw [Module.finrank, ← hsum, Cardinal.mk_range_eq v' hli'.injective]
   simp
 
-theorem relIndex_matrix
-    {r : ℕ} {v w : Fin r → M} (hv : LinearIndependent (𝓞 E) v) (hw : LinearIndependent (𝓞 E) w)
-    (A : Matrix (Fin r) (Fin r) (𝓞 E)) (hA : ∀ b, w b = ∑ a, A a b • v a)
-    : A.det ≠ 0
-      ∧ (Submodule.span (𝓞 E) (Set.range w)).toAddSubgroup.relIndex
-          (Submodule.span (𝓞 E) (Set.range v)).toAddSubgroup
-        = (Algebra.norm ℤ A.det).natAbs := by
+theorem relIndex_matrix {r : ℕ} {v w : Fin r → M} (hv : LinearIndependent (𝓞 E) v)
+    (hw : LinearIndependent (𝓞 E) w) (A : Matrix (Fin r) (Fin r) (𝓞 E)) (hA : ∀ b, w b = ∑ a, A a b • v a) :
+    A.det ≠ 0 ∧ (Submodule.span (𝓞 E) (Set.range w)).toAddSubgroup.relIndex
+      (Submodule.span (𝓞 E) (Set.range v)).toAddSubgroup = (Algebra.norm ℤ A.det).natAbs := by
   classical
   set V := Submodule.span (𝓞 E) (Set.range v) with hV
   let bV : Module.Basis (Fin r) (𝓞 E) V := Module.Basis.span hv
@@ -214,8 +231,8 @@ theorem relIndex_matrix
   have hdet : LinearMap.det f = A.det := LinearMap.det_toLin bV A
   have hrange : (LinearMap.range f).map V.subtype = Submodule.span (𝓞 E) (Set.range w) := by
     have hfw : (fun b => ((f (bV b) : V) : M)) = w := funext hfb
-    rw [LinearMap.range_eq_map, ← bV.span_eq, Submodule.map_span, Submodule.map_span,
-      ← Set.range_comp, ← Set.range_comp, ← hfw]
+    rw [LinearMap.range_eq_map, ← bV.span_eq, Submodule.map_span, Submodule.map_span, ← Set.range_comp,
+      ← Set.range_comp, ← hfw]
     rfl
   refine ⟨?_, ?_⟩
   · intro h0
@@ -233,11 +250,9 @@ theorem relIndex_matrix
     rw [hrange, Submodule.map_subtype_top] at hm
     rw [hm, Submodule.top_toAddSubgroup, AddSubgroup.relIndex_top_right, index_range f hinj, hdet]
 
-private theorem ringOfIntegers_ringHom_complex_injective
-    {E : Type} [Field E] [NumberField E] (s : 𝓞 E →+* ℂ)
-    : Function.Injective s := by
-  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
-    rw [injective_iff_map_eq_zero]
+private theorem ringOfIntegers_ringHom_complex_injective {E : Type} [Field E] [NumberField E] (s : 𝓞 E →+* ℂ) :
+    Function.Injective s := by
+  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
   intro a ha
   have hker : RingHom.ker s = ⊥ := by
     apply Ideal.eq_bot_of_comap_eq_bot (R := ℤ)
@@ -250,8 +265,8 @@ private theorem ringOfIntegers_ringHom_complex_injective
   rw [hker] at this
   exact this
 
-private theorem bijective_algHom_comp_algebraMap {E : Type} [Field E] [NumberField E]
-    : Function.Bijective fun σ : E →ₐ[ℚ] ℂ => (σ : E →+* ℂ).comp (algebraMap (𝓞 E) E) := by
+private theorem bijective_algHom_comp_algebraMap {E : Type} [Field E] [NumberField E] :
+    Function.Bijective fun σ : E →ₐ[ℚ] ℂ => (σ : E →+* ℂ).comp (algebraMap (𝓞 E) E) := by
   constructor
   · intro σ₁ σ₂ h
     apply AlgHom.coe_ringHom_injective
@@ -274,20 +289,17 @@ end Index
 
 section Riem
 
-variable
-  {E : Type} [Field E] [NumberField E] [IsCMField E]
-  {g : ℕ} {Λ : Type} [AddCommGroup Λ] [Module (𝓞 E) Λ]
-  {Ψ : Type} [Fintype Ψ]
-  (R : RiemLat E g Λ)
+variable {E : Type} [Field E] [NumberField E] [IsCMField E] {g : ℕ} {Λ : Type} [AddCommGroup Λ] [Module (𝓞 E) Λ]
+  {Ψ : Type} [Fintype Ψ] (R : RiemLat E g Λ)
 
-private theorem starRingEnd_comp_starRingEnd_comp {A : Type} [Ring A] (f : A →+* ℂ)
-    : (starRingEnd ℂ).comp ((starRingEnd ℂ).comp f) = f := by
+private theorem starRingEnd_comp_starRingEnd_comp {A : Type} [Ring A] (f : A →+* ℂ) :
+    (starRingEnd ℂ).comp ((starRingEnd ℂ).comp f) = f := by
   ext x
   simp
 
 omit [Fintype Ψ] in
-theorem cm_bij {σ : Ψ → (𝓞 E →+* ℂ)} (hσ : IsCMFam σ)
-    : Function.Bijective (Sum.elim σ fun τ => (starRingEnd ℂ).comp (σ τ)) := by
+theorem cm_bij {σ : Ψ → (𝓞 E →+* ℂ)} (hσ : IsCMFam σ) :
+    Function.Bijective (Sum.elim σ fun τ => (starRingEnd ℂ).comp (σ τ)) := by
   obtain ⟨hinj, hiff⟩ := hσ
   constructor
   · rintro (a | a) (b | b) h
@@ -312,15 +324,11 @@ theorem cm_bij {σ : Ψ → (𝓞 E →+* ℂ)} (hσ : IsCMFam σ)
       refine ⟨Sum.inr τ, ?_⟩
       simp only [Sum.elim_inr, hτ, starRingEnd_comp_starRingEnd_comp]
 
-theorem prod_normSq {σ : Ψ → (𝓞 E →+* ℂ)} (hσ : IsCMFam σ) (d : 𝓞 E)
-    : ∏ τ, Complex.normSq (σ τ d) = ((Algebra.norm ℤ d).natAbs : ℝ) := by
+theorem prod_normSq {σ : Ψ → (𝓞 E →+* ℂ)} (hσ : IsCMFam σ) (d : 𝓞 E) :
+    ∏ τ, Complex.normSq (σ τ d) = ((Algebra.norm ℤ d).natAbs : ℝ) := by
   have h := norm_eq_prod d
-  rw [← Fintype.prod_bijective _ (cm_bij hσ)
-        (fun x => Sum.elim σ (fun τ => (starRingEnd ℂ).comp (σ τ)) x d)
-        _
-        (fun _ => rfl),
-      Fintype.prod_sum_type]
-    at h
+  rw [← Fintype.prod_bijective _ (cm_bij hσ) (fun x => Sum.elim σ (fun τ => (starRingEnd ℂ).comp (σ τ)) x d) _
+    (fun _ => rfl), Fintype.prod_sum_type] at h
   simp only [Sum.elim_inl, Sum.elim_inr, RingHom.comp_apply] at h
   rw [← Finset.prod_mul_distrib] at h
   simp only [Complex.mul_conj] at h
@@ -330,35 +338,28 @@ theorem prod_normSq {σ : Ψ → (𝓞 E →+* ℂ)} (hσ : IsCMFam σ) (d : �
     Finset.prod_nonneg fun τ _ => Complex.normSq_nonneg _
   rw [Nat.cast_natAbs, Int.cast_abs, hR, abs_of_nonneg hnn]
 
-private theorem gram_eq_transpose_of_mul_Hm {r : ℕ} (u : Fin r → Fin g → ℂ)
-    : R.gram u = (Matrix.of u * R.Hm * (Matrix.of u)ᴴ)ᵀ := by
+private theorem gram_eq_transpose_of_mul_Hm {r : ℕ} (u : Fin r → Fin g → ℂ) :
+    R.gram u = (Matrix.of u * R.Hm * (Matrix.of u)ᴴ)ᵀ := by
   ext a b
-  simp [RiemLat.gram, RiemLat.ip, Matrix.mul_apply, dotProduct, mulVec, Finset.mul_sum,
-    Finset.sum_mul, mul_assoc]
+  simp [RiemLat.gram, RiemLat.ip, Matrix.mul_apply, dotProduct, mulVec, Finset.mul_sum, Finset.sum_mul, mul_assoc]
   rw [Finset.sum_comm]
 
-theorem gram_matrix
-    {r : ℕ}
-    (u u' : Fin r → Fin g → ℂ) (A : Matrix (Fin r) (Fin r) ℂ) (h : ∀ b, u' b = ∑ a, A a b • u a)
-    : (R.gram u').det.re = Complex.normSq A.det * (R.gram u).det.re := by
+theorem gram_matrix {r : ℕ} (u u' : Fin r → Fin g → ℂ) (A : Matrix (Fin r) (Fin r) ℂ)
+    (h : ∀ b, u' b = ∑ a, A a b • u a) : (R.gram u').det.re = Complex.normSq A.det * (R.gram u).det.re := by
   have hU : Matrix.of u' = Aᵀ * Matrix.of u := by
     ext b i
     simp [h, Matrix.mul_apply, Finset.sum_apply]
-  rw [gram_eq_transpose_of_mul_Hm, gram_eq_transpose_of_mul_Hm, hU, Matrix.det_transpose,
-    Matrix.det_transpose, Matrix.conjTranspose_mul,
-    show Aᵀ * Matrix.of u * R.Hm * ((Matrix.of u)ᴴ * Aᵀᴴ)
-        = Aᵀ * (Matrix.of u * R.Hm * (Matrix.of u)ᴴ) * Aᵀᴴ by
-      simp only [Matrix.mul_assoc],
+  rw [gram_eq_transpose_of_mul_Hm, gram_eq_transpose_of_mul_Hm, hU, Matrix.det_transpose, Matrix.det_transpose, Matrix.conjTranspose_mul,
+    show Aᵀ * Matrix.of u * R.Hm * ((Matrix.of u)ᴴ * Aᵀᴴ) =
+      Aᵀ * (Matrix.of u * R.Hm * (Matrix.of u)ᴴ) * Aᵀᴴ by simp only [Matrix.mul_assoc],
     Matrix.det_mul, Matrix.det_mul, Matrix.det_conjTranspose, Matrix.det_transpose]
-  have hc
-      : A.det * (Matrix.of u * R.Hm * (Matrix.of u)ᴴ).det * star A.det
-        = (Complex.normSq A.det : ℂ) * (Matrix.of u * R.Hm * (Matrix.of u)ᴴ).det := by
+  have hc : A.det * (Matrix.of u * R.Hm * (Matrix.of u)ᴴ).det * star A.det =
+      (Complex.normSq A.det : ℂ) * (Matrix.of u * R.Hm * (Matrix.of u)ᴴ).det := by
     rw [Complex.normSq_eq_conj_mul_self, Complex.star_def]
     ring
   rw [hc, Complex.re_ofReal_mul]
 
-theorem gram_det_pos {r : ℕ} {u : Fin r → Fin g → ℂ} (hu : LinearIndependent ℂ u)
-    : 0 < (R.gram u).det.re := by
+theorem gram_det_pos {r : ℕ} {u : Fin r → Fin g → ℂ} (hu : LinearIndependent ℂ u) : 0 < (R.gram u).det.re := by
   have hHm : R.Hm.PosDef := by
     refine Matrix.posDef_iff_dotProduct_mulVec.2 ⟨R.herm, fun x hx => ?_⟩
     have h1 := R.pos (star x) (by simpa using hx)
@@ -380,11 +381,9 @@ theorem gram_det_pos {r : ℕ} {u : Fin r → Fin g → ℂ} (hu : LinearIndepen
   rw [gram_eq_transpose_of_mul_Hm, Matrix.det_transpose]
   exact (Complex.pos_iff.1 hM.det_pos).1
 
-theorem nzOf_of_le
-    {σ : Ψ → (𝓞 E →+* ℂ)} (hσ : IsCMFam σ)
-    {I : Submodule (𝓞 E) Λ} {r : ℕ} {v w : Fin r → Λ} (hv : IsNzFamily I r v)
-    (hw : LinearIndependent (𝓞 E) w) (hle : ∀ b, w b ∈ Submodule.span (𝓞 E) (Set.range v))
-    : R.nzOf σ I w = R.nzOf σ I v := by
+theorem nzOf_of_le {σ : Ψ → (𝓞 E →+* ℂ)} (hσ : IsCMFam σ) {I : Submodule (𝓞 E) Λ} {r : ℕ} {v w : Fin r → Λ}
+    (hv : IsNzFamily I r v) (hw : LinearIndependent (𝓞 E) w)
+    (hle : ∀ b, w b ∈ Submodule.span (𝓞 E) (Set.range v)) : R.nzOf σ I w = R.nzOf σ I v := by
   classical
   obtain ⟨_, hvI, hvli, _⟩ := hv
   have hex : ∀ b, ∃ c : Fin r → 𝓞 E, ∑ a, c a • v a = w b := fun b =>
@@ -397,33 +396,26 @@ theorem nzOf_of_le
     Submodule.span_le.2 (by rintro _ ⟨b, rfl⟩; exact hle b)
   have hvle : Submodule.span (𝓞 E) (Set.range v) ≤ I :=
     Submodule.span_le.2 (by rintro _ ⟨a, rfl⟩; exact hvI a)
-  have hmul :=
-    AddSubgroup.relIndex_mul_relIndex (Submodule.span (𝓞 E) (Set.range w)).toAddSubgroup
-      (Submodule.span (𝓞 E) (Set.range v)).toAddSubgroup I.toAddSubgroup hwv hvle
-  have hnum
-      : ∀ τ,
-        (R.gram fun b => eigComp R.B (σ τ) (R.P (w b))).det.re
-          = Complex.normSq (σ τ A.det)
-            * (R.gram fun a => eigComp R.B (σ τ) (R.P (v a))).det.re := by
+  have hmul := AddSubgroup.relIndex_mul_relIndex
+    (Submodule.span (𝓞 E) (Set.range w)).toAddSubgroup (Submodule.span (𝓞 E) (Set.range v)).toAddSubgroup
+    I.toAddSubgroup hwv hvle
+  have hnum : ∀ τ, (R.gram fun b => eigComp R.B (σ τ) (R.P (w b))).det.re =
+      Complex.normSq (σ τ A.det) * (R.gram fun a => eigComp R.B (σ τ) (R.P (v a))).det.re := by
     intro τ
     rw [RingHom.map_det, RingHom.mapMatrix_apply]
     apply gram_matrix
     intro b
-    set_option synthInstance.maxHeartbeats 100000 in
+
     simp only [eigComp_eq, hAw b, map_sum, R.act, proj_act, Matrix.map_apply]
   have hN : ((Algebra.norm ℤ A.det).natAbs : ℝ) ≠ 0 := by
     exact_mod_cast Int.natAbs_ne_zero.2 (Algebra.norm_ne_zero_iff.2 hdet)
   unfold RiemLat.nzOf
-  rw [Finset.prod_congr rfl (fun τ _ => hnum τ), Finset.prod_mul_distrib, prod_normSq hσ, ← hmul,
-    hidx]
+  rw [Finset.prod_congr rfl (fun τ _ => hnum τ), Finset.prod_mul_distrib, prod_normSq hσ, ← hmul, hidx]
   push_cast
   rw [mul_div_mul_left _ _ hN]
 
-theorem nzOf_eq
-    {σ : Ψ → (𝓞 E →+* ℂ)} (hσ : IsCMFam σ)
-    {I : Submodule (𝓞 E) Λ} {r r' : ℕ} {v : Fin r → Λ} {w : Fin r' → Λ}
-    (hv : IsNzFamily I r v) (hw : IsNzFamily I r' w)
-    : R.nzOf σ I w = R.nzOf σ I v := by
+theorem nzOf_eq {σ : Ψ → (𝓞 E →+* ℂ)} (hσ : IsCMFam σ) {I : Submodule (𝓞 E) Λ} {r r' : ℕ} {v : Fin r → Λ}
+    {w : Fin r' → Λ} (hv : IsNzFamily I r v) (hw : IsNzFamily I r' w) : R.nzOf σ I w = R.nzOf σ I v := by
   haveI := R.free
   haveI := R.fin
   have hr := family_rank hv
@@ -441,25 +433,19 @@ theorem nzOf_eq
     nzOf_of_le R hσ hv hli (fun b => by simpa [f] using family_nsmul (v := v) (hw.2.1 b))
   have h2 : R.nzOf σ I (f ∘ w) = R.nzOf σ I w :=
     nzOf_of_le R hσ hw hli (fun b => by
-      simpa [f] using
-        Submodule.smul_mem (Submodule.span (𝓞 E) (Set.range w)) (n : 𝓞 E)
-          (Submodule.subset_span (Set.mem_range_self b)))
+      simpa [f] using Submodule.smul_mem (Submodule.span (𝓞 E) (Set.range w)) (n : 𝓞 E)
+        (Submodule.subset_span (Set.mem_range_self b)))
   rw [← h2, h1]
 
-theorem nz_eq
-    {σ : Ψ → (𝓞 E →+* ℂ)} (hσ : IsCMFam σ)
-    {I : Submodule (𝓞 E) Λ} {r : ℕ} {v : Fin r → Λ} (hv : IsNzFamily I r v)
-    : R.nz σ I = R.nzOf σ I v := by
+theorem nz_eq {σ : Ψ → (𝓞 E →+* ℂ)} (hσ : IsCMFam σ) {I : Submodule (𝓞 E) Λ} {r : ℕ} {v : Fin r → Λ}
+    (hv : IsNzFamily I r v) : R.nz σ I = R.nzOf σ I v := by
   have h : ∃ r v, IsNzFamily I r v := ⟨r, v, hv⟩
   unfold RiemLat.nz
   rw [dite_eq_left h]
   exact nzOf_eq R hσ hv h.choose_spec.choose_spec
 
-theorem nzOf_pos
-    (σ : Ψ → (𝓞 E →+* ℂ))
-    {I : Submodule (𝓞 E) Λ} (hI : IsIsoSub R.form I)
-    {r : ℕ} {v : Fin r → Λ} (hv : IsNzFamily I r v)
-    : 0 < R.nzOf σ I v := by
+theorem nzOf_pos (σ : Ψ → (𝓞 E →+* ℂ)) {I : Submodule (𝓞 E) Λ} (hI : IsIsoSub R.form I) {r : ℕ} {v : Fin r → Λ}
+    (hv : IsNzFamily I r v) : 0 < R.nzOf σ I v := by
   obtain ⟨_, hvI, hvli, hidx⟩ := hv
   unfold RiemLat.nzOf
   apply div_pos

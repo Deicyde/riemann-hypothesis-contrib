@@ -1,6 +1,45 @@
 module
 
 public import Formalism.SharpRestriction.GrowthBounds.FrobeniusPaths.ColStepFactor
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Lemma
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -12,10 +51,8 @@ namespace Formalism.MainNotions.LemmaBAlt
 
 section LinkG
 
-variable
-  (p f : ℕ) [Fact p.Prime]
-  {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Algebra (WF p f) O]
-  {N r K : ℕ}
+variable (p f : ℕ) [Fact p.Prime] {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+  [Algebra (WF p f) O] {N r K : ℕ}
 
 lemma lift_letG (w : O) (LL : LiftLetters (Fin N)) (g : Matrix (Fin (r + K)) (Fin (r + K)) (WF p f)) (hg : IsGLW g)
     (i : Fin N) (b : Fin (r + K)) :
@@ -26,23 +63,23 @@ lemma lift_letG (w : O) (LL : LiftLetters (Fin N)) (g : Matrix (Fin (r + K)) (Fi
   have hC : ∀ x : KK O, liftSubst p f O w r LL g (C x) = C x := fun x => (liftSubst p f O w r LL g).commutes x
   simp only [yO, map_mul, map_C, map_X]
   by_cases hv : LL.vec i = true
-  set_option synthInstance.maxHeartbeats 100000 in
-    · simp only [letG, hv, if_true, map_sum, map_mul, hC, liftSubst_X_vec p f O w LL r g hg i _ hv]
-      simp_rw [Finset.sum_mul, mul_assoc, ← map_mul]
-      rw [Finset.sum_comm]
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp_rw [← Finset.mul_sum, ← map_sum, ← Matrix.mul_apply, hinv, Matrix.one_apply, apply_ite C, map_one, map_zero,
-        mul_ite, mul_one, mul_zero, Finset.sum_ite_eq', Finset.mem_univ, if_true]
-  · have hv' : LL.vec i = false := by simpa using hv
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [letG, hv', Bool.false_eq_true, if_false, map_sum, map_mul, hC,
-      liftSubst_X_cov p f O w LL r g i _ hv', sigMat_inv p f O g hg]
+
+  · simp only [letG, hv, if_true, map_sum, map_mul, hC, liftSubst_X_vec p f O w LL r g hg i _ hv]
     simp_rw [Finset.sum_mul, mul_assoc, ← map_mul]
     rw [Finset.sum_comm]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp_rw [← Finset.mul_sum, ← map_sum, mul_comm (sigMat p f O g (LL.pos i) _ _), ← Matrix.mul_apply, hinv,
-      Matrix.one_apply, apply_ite C, map_one, map_zero, mul_ite, mul_one, mul_zero, Finset.sum_ite_eq,
-      Finset.mem_univ, if_true]
+
+    simp_rw [← Finset.mul_sum, ← map_sum, ← Matrix.mul_apply, hinv, Matrix.one_apply, apply_ite C, map_one, map_zero,
+    mul_ite, mul_one, mul_zero, Finset.sum_ite_eq', Finset.mem_univ, if_true]
+  · have hv' : LL.vec i = false := by simpa using hv
+
+    simp only [letG, hv', Bool.false_eq_true, if_false, map_sum, map_mul, hC,
+    liftSubst_X_cov p f O w LL r g i _ hv', sigMat_inv p f O g hg]
+    simp_rw [Finset.sum_mul, mul_assoc, ← map_mul]
+    rw [Finset.sum_comm]
+
+    simp_rw [← Finset.mul_sum, ← map_sum, mul_comm (sigMat p f O g (LL.pos i) _ _), ← Matrix.mul_apply, hinv,
+    Matrix.one_apply, apply_ite C, map_one, map_zero, mul_ite, mul_one, mul_zero, Finset.sum_ite_eq,
+    Finset.mem_univ, if_true]
 
 lemma lift_KKc (w : O) (LL : LiftLetters (Fin N)) (g : Matrix (Fin (r + K)) (Fin (r + K)) (WF p f)) (hg : IsGLW g)
     (z : ℤ) (mu : Fin (N + 1) → Fin (r + K) → ℤ) (c : ℤ) (J : Finset (Fin (r + K))) :
@@ -85,63 +122,49 @@ end MapSg
 
 section Clause4
 
-variable
-  (p f : ℕ) [Fact p.Prime]
-  {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Algebra (WF p f) O]
-  {N r K : ℕ}
+variable (p f : ℕ) [Fact p.Prime] {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+  [Algebra (WF p f) O] {N r K : ℕ}
 
-theorem lifted_column_congruence
-    (S : UniformizedDVR p O)
-    (LL : LiftLetters (Fin N))
-    (g : Matrix (Fin (r + K)) (Fin (r + K)) (WF p f)) (hg : IsGLW g)
-    (z : ℤ) (mu : Fin (N + 1) → Fin (r + K) → ℤ) (c : ℤ)
-    (hmono : Monotone LL.pos) (hz : ∀ i, LL.pos i ≤ z)
+theorem lifted_column_congruence (S : UniformizedDVR p O) (LL : LiftLetters (Fin N)) (g : Matrix (Fin (r + K)) (Fin (r + K)) (WF p f))
+    (hg : IsGLW g) (z : ℤ) (mu : Fin (N + 1) → Fin (r + K) → ℤ) (c : ℤ) (hmono : Monotone LL.pos)
+    (hz : ∀ i, LL.pos i ≤ z)
     (hposc : ∀ i j : Fin N, i < j → IsUsed mu c i → IsCostly mu c j → LL.pos i < LL.pos j)
-    (HV : SgVanish LL mu c) (hS2 : ∀ J, plTanCol O mu c J = SgW O LL mu c N J)
-    (J : Finset (Fin (r + K)))
-    : InWj S.w
-      (liftSubst p f O S.w r LL g (KKc p f (O := O) LL g z mu c J)
-        - C (algebraMap O (KK O) S.w ^ oc (fun i => p ^ (z - LL.pos i).toNat) mu c)
-          * powSubst p LL z (plTanCol O mu c J))
+    (HV : SgVanish LL mu c) (hS2 : ∀ J, plTanCol O mu c J = SgW O LL mu c N J) (J : Finset (Fin (r + K))) :
+    InWj S.w (liftSubst p f O S.w r LL g (KKc p f (O := O) LL g z mu c J) -
+        C (algebraMap O (KK O) S.w ^ oc (fun i => p ^ (z - LL.pos i).toNat) mu c) *
+          powSubst p LL z (plTanCol O mu c J))
       (oc (fun i => p ^ (z - LL.pos i).toNat) mu c + 1) := by
-  have : CharP (FF O) p :=
-    (CharP.charP_iff_prime_eq_zero (Fact.out : p.Prime)).2 (by
-      rw [← map_natCast (IsLocalRing.residue O), IsLocalRing.residue_eq_zero_iff]; exact S.p_mem)
+  have : CharP (FF O) p := (CharP.charP_iff_prime_eq_zero (Fact.out : p.Prime)).2 (by
+    rw [← map_natCast (IsLocalRing.residue O), IsLocalRing.residue_eq_zero_iff]; exact S.p_mem)
   obtain ⟨Y, hY, hYres⟩ := Inv_main p S LL mu c hmono hposc HV N le_rfl z (fun i _ _ => hz i) J
   rw [oS_top] at hY
   set o := oc (fun i => p ^ (z - LL.pos i).toNat) mu c with ho
-  let P : Fin N × Fin (r + K) → MvPolynomial (Fin N × Fin (r + K)) O := fun v =>
-    X v ^ p ^ (z - LL.pos v.1).toNat
-  have hps
-      : ∀ F : MvPolynomial (Fin N × Fin (r + K)) O,
-        powSubst p LL z F = MvPolynomial.map (algebraMap O (KK O)) (aeval P F) := by
+  let P : Fin N × Fin (r + K) → MvPolynomial (Fin N × Fin (r + K)) O := fun v => X v ^ p ^ (z - LL.pos v.1).toNat
+  have hps : ∀ F : MvPolynomial (Fin N × Fin (r + K)) O,
+      powSubst p LL z F = MvPolynomial.map (algebraMap O (KK O)) (aeval P F) := by
     intro F
     induction F using MvPolynomial.induction_on with
     | C a => simp [powSubst, MvPolynomial.algebraMap_eq]
     | add F G hF hG => simp only [map_add (f := _), hF, hG]
-    | mul_X F v hF => simp [powSubst, hF, P] at hF ⊢
-  have hres
-      : ∀ F : MvPolynomial (Fin N × Fin (r + K)) ℤ,
-        MvPolynomial.map (IsLocalRing.residue O) (aeval P (MvPolynomial.map (Int.castRingHom O) F))
-          = piS p O LL.pos z F := by
+    | mul_X F v hF => simp [powSubst, hF, P] at hF ⊢ <;> assumption
+  have hres : ∀ F : MvPolynomial (Fin N × Fin (r + K)) ℤ,
+      MvPolynomial.map (IsLocalRing.residue O) (aeval P (MvPolynomial.map (Int.castRingHom O) F)) =
+        piS p O LL.pos z F := by
     intro F
     induction F using MvPolynomial.induction_on with
     | C a => simp [piS]
     | add F G hF hG => simp only [map_add (f := _), hF, hG]
     | mul_X F v hF => simp [piS, hF, P] at hF ⊢
   set Q := aeval P (SgW O LL mu c N J) with hQ
-  have hQres
-      : MvPolynomial.map (IsLocalRing.residue O) Q = piS p O LL.pos z (SgW ℤ LL mu c N J) := by
+  have hQres : MvPolynomial.map (IsLocalRing.residue O) Q = piS p O LL.pos z (SgW ℤ LL mu c N J) := by
     rw [hQ, ← SgW_map (Int.castRingHom O) LL mu c N J, hres]
   obtain ⟨T, hT⟩ := piR_ker p S (Y - Q) (by rw [map_sub, hYres, hQres, sub_self])
-  have key
-      : liftSubst p f O S.w r LL g (KKc p f (O := O) LL g z mu c J)
-          - C (algebraMap O (KK O) S.w ^ o) * powSubst p LL z (plTanCol O mu c J)
-        = MvPolynomial.map (algebraMap O (KK O)) (C (S.w ^ (o + 1)) * T) := by
+  have key : liftSubst p f O S.w r LL g (KKc p f (O := O) LL g z mu c J) -
+      C (algebraMap O (KK O) S.w ^ o) * powSubst p LL z (plTanCol O mu c J) =
+      MvPolynomial.map (algebraMap O (KK O)) (C (S.w ^ (o + 1)) * T) := by
     rw [lift_KKc p f S.w LL g hg z mu c J, hY, hS2 J, hps, ← hQ, ← map_pow]
-    have e
-        : (C ((algebraMap O (KK O)) S.w ^ o) : MvPolynomial (Fin N × Fin (r + K)) (KK O))
-          = MvPolynomial.map (algebraMap O (KK O)) (C (S.w ^ o)) := by
+    have e : (C ((algebraMap O (KK O)) S.w ^ o) : MvPolynomial (Fin N × Fin (r + K)) (KK O)) =
+        MvPolynomial.map (algebraMap O (KK O)) (C (S.w ^ o)) := by
       rw [map_C, map_pow (algebraMap O (KK O))]
     rw [e, ← map_mul, ← map_sub, ← mul_sub, hT, ← mul_assoc, ← C_mul, ← pow_succ]
   intro m

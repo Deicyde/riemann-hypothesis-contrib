@@ -1,8 +1,45 @@
 module
 
-public import Mathlib
 public import Formalism.SharpRestriction.CuspSpanNormBounds.LinQRawRange
 public import Formalism.SharpRestriction.CuspSpanNormBounds.LocalModelPeriodLattices
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -16,12 +53,9 @@ open Formalism.MainNotions.S ValuativeRel
 
 section Act
 
-variable
-  {F E : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [CommRing E] [Algebra F E]
-  [TopologicalSpace E] [MeasurableSpace E]
-  {M : Loc.Model F E} {V : Type} [AddCommGroup V] [Module E V]
-  (H : Loc.HermSp M V)
-  {ι : Type} [Fintype ι]
+variable {F E : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [CommRing E] [Algebra F E]
+  [TopologicalSpace E] [MeasurableSpace E] {M : Loc.Model F E} {V : Type} [AddCommGroup V] [Module E V]
+  (H : Loc.HermSp M V) {ι : Type} [Fintype ι]
 
 def act (A : Matrix ι ι E) (v : ι → V) : ι → V := fun b => ∑ a, A a b • v a
 
@@ -31,26 +65,25 @@ theorem act_act (A B : Matrix ι ι E) (v : ι → V) : act A (act B v) = act (B
   rw [Finset.sum_comm]
   exact Finset.sum_congr rfl fun c _ => Finset.sum_congr rfl fun a _ => by rw [mul_comm]
 
-theorem h_sum_left {κ : Type} (s : Finset κ) (f : κ → V) (y : V)
-    : H.h (∑ c ∈ s, f c) y = ∑ c ∈ s, H.h (f c) y := by
+theorem h_sum_left {κ : Type} (s : Finset κ) (f : κ → V) (y : V) : H.h (∑ c ∈ s, f c) y = ∑ c ∈ s, H.h (f c) y := by
   induction s using Finset.induction_on with
   | empty => simp only [Finset.sum_empty]; exact H.h_zero_left y
   | insert c s hc ih => rw [Finset.sum_insert hc, Finset.sum_insert hc, H.h_add_left, ih]
 
-theorem h_right (x y : V) : H.h x y = M.L.cj (H.h y x) := by rw [H.h_herm x y, M.L.cj_cj]
+theorem h_right (x y : V) : H.h x y = M.L.cj (H.h y x) := by
+  rw [H.h_herm x y, M.L.cj_cj]
 
-theorem h_sum_right {κ : Type} (s : Finset κ) (f : κ → V) (x : V)
-    : H.h x (∑ c ∈ s, f c) = ∑ c ∈ s, H.h x (f c) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [h_right, h_sum_left, map_sum]
+theorem h_sum_right {κ : Type} (s : Finset κ) (f : κ → V) (x : V) : H.h x (∑ c ∈ s, f c) = ∑ c ∈ s, H.h x (f c) := by
+
+  rw [h_right, h_sum_left, map_sum]
   exact Finset.sum_congr rfl fun c _ => (h_right H x (f c)).symm
 
 theorem h_smul_right (a : E) (x y : V) : H.h x (a • y) = M.L.cj a * H.h x y := by
   rw [h_right, H.h_smul_left, map_mul, ← h_right]
 
-theorem gram_act (A : Matrix ι ι E) (v : ι → V) (a b : ι)
-    : H.h (act A v b) (act A v a)
-      = ((A.map M.L.cj).transpose * Matrix.of (fun c d => H.h (v d) (v c)) * A) a b := by
+theorem gram_act (A : Matrix ι ι E) (v : ι → V) (a b : ι) :
+    H.h (act A v b) (act A v a) =
+      ((A.map M.L.cj).transpose * Matrix.of (fun c d => H.h (v d) (v c)) * A) a b := by
   simp only [act, Matrix.mul_apply, Matrix.transpose_apply, Matrix.map_apply, Matrix.of_apply]
   rw [h_sum_left]
   simp only [H.h_smul_left, h_sum_right, h_smul_right, Finset.mul_sum, Finset.sum_mul]
@@ -67,63 +100,45 @@ open scoped Matrix
 
 section Main
 
-variable
-  {F E : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [CommRing E] [Algebra F E]
-  [TopologicalSpace E] [MeasurableSpace E]
-  {M : Loc.Model F E} {V : Type} [AddCommGroup V] [Module E V]
-  (H : Loc.HermSp M V)
-  {ι : Type} [Fintype ι] [DecidableEq ι]
+variable {F E : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [CommRing E] [Algebra F E]
+  [TopologicalSpace E] [MeasurableSpace E] {M : Loc.Model F E} {V : Type} [AddCommGroup V] [Module E V]
+  (H : Loc.HermSp M V) {ι : Type} [Fintype ι] [DecidableEq ι]
 
 theorem act_one (v : ι → V) : act (1 : Matrix ι ι E) v = v := by
   funext b
-  simp only [act, Matrix.one_apply, ite_smul, one_smul, zero_smul, Finset.sum_ite_eq',
-    Finset.mem_univ, if_true]
+  simp only [act, Matrix.one_apply, ite_smul, one_smul, zero_smul, Finset.sum_ite_eq', Finset.mem_univ, if_true]
 
 theorem o_mul_mem (S : Submodule M.L.O E) {o x : E} (ho : o ∈ M.L.O) (hx : x ∈ S) : o * x ∈ S :=
   S.smul_mem ⟨o, ho⟩ hx
 
-theorem cong_act
-    (S : Submodule M.L.O E)
-    (A G : Matrix ι ι E) (hAO : ∀ i j, A i j ∈ M.L.O)
-    (v : ι → V) (hv : ∀ a b, H.h (v b) (v a) - G a b ∈ S)
-    : ∀ a b, H.h (act A v b) (act A v a) - ((A.map M.L.cj).transpose * G * A) a b ∈ S := by
+theorem cong_act (S : Submodule M.L.O E) (A G : Matrix ι ι E) (hAO : ∀ i j, A i j ∈ M.L.O) (v : ι → V)
+    (hv : ∀ a b, H.h (v b) (v a) - G a b ∈ S) :
+    ∀ a b, H.h (act A v b) (act A v a) - ((A.map M.L.cj).transpose * G * A) a b ∈ S := by
   intro a b
   rw [gram_act, ← Matrix.sub_apply, ← Matrix.sub_mul, ← Matrix.mul_sub]
-  simp only [Matrix.mul_apply, Matrix.transpose_apply, Matrix.map_apply, Matrix.sub_apply,
-    Matrix.of_apply]
+  simp only [Matrix.mul_apply, Matrix.transpose_apply, Matrix.map_apply, Matrix.sub_apply, Matrix.of_apply]
   refine S.sum_mem fun c _ => ?_
   rw [Finset.sum_mul]
   refine S.sum_mem fun d _ => ?_
   rw [mul_comm _ (A c b), ← mul_assoc]
   rw [mul_comm (A c b)]
-  refine o_mul_mem S
-    (Subring.mul_mem _ (Formalism.MainNotions.LocalModelPeriodLattices.cj_mem_O M.L _ (hAO d a))
-      (hAO c b))
-    (hv d c)
+  refine o_mul_mem S (Subring.mul_mem _ (Formalism.MainNotions.LocalModelPeriodLattices.cj_mem_O M.L _ (hAO d a)) (hAO c b)) (hv d c)
 
-theorem mem_lam_act
-    (abelian₂ : Submodule M.L.O V)
-    (A : Matrix ι ι E) (hAO : ∀ i j, A i j ∈ M.L.O)
-    (v : ι → V) (hv : ∀ a, v a ∈ abelian₂)
-    (b : ι)
-    : act A v b ∈ abelian₂ :=
+theorem mem_lam_act (abelian₂ : Submodule M.L.O V) (A : Matrix ι ι E) (hAO : ∀ i j, A i j ∈ M.L.O) (v : ι → V)
+    (hv : ∀ a, v a ∈ abelian₂) (b : ι) : act A v b ∈ abelian₂ :=
   abelian₂.sum_mem fun a _ => abelian₂.smul_mem ⟨A a b, hAO a b⟩ (hv a)
 
-theorem mem_span_act (A : Matrix ι ι E) (hAO : ∀ i j, A i j ∈ M.L.O) (v : ι → V) (b : ι)
-    : act A v b ∈ Submodule.span M.L.O (Set.range v) :=
-  Submodule.sum_mem _ fun a _ =>
-    Submodule.smul_mem _ (⟨A a b, hAO a b⟩ : M.L.O) (Submodule.subset_span ⟨a, rfl⟩)
+theorem mem_span_act (A : Matrix ι ι E) (hAO : ∀ i j, A i j ∈ M.L.O) (v : ι → V) (b : ι) :
+    act A v b ∈ Submodule.span M.L.O (Set.range v) :=
+  Submodule.sum_mem _ fun a _ => Submodule.smul_mem _ (⟨A a b, hAO a b⟩ : M.L.O) (Submodule.subset_span ⟨a, rfl⟩)
 
-theorem mem_spanE_act (A : Matrix ι ι E) (v : ι → V) (b : ι)
-    : act A v b ∈ Submodule.span E (Set.range v) :=
+theorem mem_spanE_act (A : Matrix ι ι E) (v : ι → V) (b : ι) :
+    act A v b ∈ Submodule.span E (Set.range v) :=
   Submodule.sum_mem _ fun a _ => Submodule.smul_mem _ (A a b) (Submodule.subset_span ⟨a, rfl⟩)
 
-theorem prim_act
-    (abelian₂ : Submodule M.L.O V)
-    (A B : Matrix ι ι E)
-    (hAO : ∀ i j, A i j ∈ M.L.O) (hBO : ∀ i j, B i j ∈ M.L.O) (hAB : A * B = 1) (hBA : B * A = 1)
-    (v : ι → V) (hv : H.Prim abelian₂ v)
-    : H.Prim abelian₂ (act A v) := by
+theorem prim_act (abelian₂ : Submodule M.L.O V) (A B : Matrix ι ι E) (hAO : ∀ i j, A i j ∈ M.L.O)
+    (hBO : ∀ i j, B i j ∈ M.L.O) (hAB : A * B = 1) (hBA : B * A = 1) (v : ι → V) (hv : H.Prim abelian₂ v) :
+    H.Prim abelian₂ (act A v) := by
   obtain ⟨h1, h2, h3⟩ := hv
   have hback : act B (act A v) = v := by rw [act_act, hAB, act_one]
   refine ⟨mem_lam_act abelian₂ A hAO v h1, ?_, ?_⟩
@@ -163,12 +178,9 @@ open scoped Matrix
 
 section Count
 
-variable
-  {F E : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [CommRing E] [Algebra F E]
-  [TopologicalSpace E] [MeasurableSpace E]
-  {M : Loc.Model F E} {V : Type} [AddCommGroup V] [Module E V]
-  (H : Loc.HermSp M V)
-  {ι : Type} [Fintype ι] [DecidableEq ι]
+variable {F E : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [CommRing E] [Algebra F E]
+  [TopologicalSpace E] [MeasurableSpace E] {M : Loc.Model F E} {V : Type} [AddCommGroup V] [Module E V]
+  (H : Loc.HermSp M V) {ι : Type} [Fintype ι] [DecidableEq ι]
 
 theorem det_mem (A : Matrix ι ι E) (hA : ∀ i j, A i j ∈ M.L.O) : A.det ∈ M.L.O := by
   rw [Matrix.det_apply]
@@ -183,51 +195,37 @@ theorem adj_mem (A : Matrix ι ι E) (hA : ∀ i j, A i j ∈ M.L.O) : ∀ i j, 
   · rw [Pi.single_apply]; split_ifs; exacts [M.L.O.one_mem, M.L.O.zero_mem]
   · exact hA a b
 
-def cls (ϖ : 𝒪[F]) (abelian₂ : Submodule M.L.O V) (G₀ : Matrix ι ι E)
-    : Set (ι → V ⧸ H.smulLat (algebraMap F E (ϖ : F)) abelian₂) :=
-  Set.range
-    fun v
-        : {v : ι → V // H.Prim abelian₂ v
-          ∧ ∀ a b, H.h (v b) (v a) - G₀ a b ∈ Submodule.span M.L.O {algebraMap F E (ϖ : F)}} =>
-      fun a => Submodule.Quotient.mk (p := H.smulLat (algebraMap F E (ϖ : F)) abelian₂) (v.1 a)
+def cls (ϖ : 𝒪[F]) (abelian₂ : Submodule M.L.O V) (G₀ : Matrix ι ι E) :
+    Set (ι → V ⧸ H.smulLat (algebraMap F E (ϖ : F)) abelian₂) :=
+  Set.range fun v : {v : ι → V // H.Prim abelian₂ v ∧ ∀ a b,
+      H.h (v b) (v a) - G₀ a b ∈ Submodule.span M.L.O {algebraMap F E (ϖ : F)}} =>
+    fun a => Submodule.Quotient.mk (p := H.smulLat (algebraMap F E (ϖ : F)) abelian₂) (v.1 a)
 
-def psi
-    (abelian₂ : Submodule M.L.O V) (c : E)
-    (A : Matrix ι ι E) (hAO : ∀ i j, A i j ∈ M.L.O)
-    (x : ι → V ⧸ H.smulLat c abelian₂)
-    : ι → V ⧸ H.smulLat c abelian₂ := fun b =>
-  ∑ a, (⟨A a b, hAO a b⟩ : M.L.O) • x a
+def psi (abelian₂ : Submodule M.L.O V) (c : E) (A : Matrix ι ι E) (hAO : ∀ i j, A i j ∈ M.L.O)
+    (x : ι → V ⧸ H.smulLat c abelian₂) : ι → V ⧸ H.smulLat c abelian₂ :=
+  fun b => ∑ a, (⟨A a b, hAO a b⟩ : M.L.O) • x a
 
-theorem psi_mk
-    (abelian₂ : Submodule M.L.O V) (c : E)
-    (A : Matrix ι ι E) (hAO : ∀ i j, A i j ∈ M.L.O)
-    (v : ι → V)
-    : psi H abelian₂ c A hAO (fun a => Submodule.Quotient.mk (p := H.smulLat c abelian₂) (v a))
-      = fun a => Submodule.Quotient.mk (p := H.smulLat c abelian₂) (act A v a) := by
+theorem psi_mk (abelian₂ : Submodule M.L.O V) (c : E) (A : Matrix ι ι E) (hAO : ∀ i j, A i j ∈ M.L.O) (v : ι → V) :
+    psi H abelian₂ c A hAO (fun a => Submodule.Quotient.mk (p := H.smulLat c abelian₂) (v a)) =
+      fun a => Submodule.Quotient.mk (p := H.smulLat c abelian₂) (act A v a) := by
   funext b
   simp only [psi, act]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [show (Submodule.Quotient.mk (∑ a, A a b • v a) : V ⧸ H.smulLat c abelian₂)
-          = (H.smulLat c abelian₂).mkQ (∑ a, A a b • v a) from
-        rfl,
-      map_sum]
+
+  rw [show (Submodule.Quotient.mk (∑ a, A a b • v a) : V ⧸ H.smulLat c abelian₂) =
+  (H.smulLat c abelian₂).mkQ (∑ a, A a b • v a) from rfl, map_sum]
   refine Finset.sum_congr rfl fun a _ => ?_
   show _ = (H.smulLat c abelian₂).mkQ ((⟨A a b, hAO a b⟩ : M.L.O) • v a)
   rw [LinearMap.map_smul]
   rfl
 
-theorem psi_psi
-    (abelian₂ : Submodule M.L.O V) (c : E)
-    (A B : Matrix ι ι E) (hAO : ∀ i j, A i j ∈ M.L.O) (hBO : ∀ i j, B i j ∈ M.L.O) (hAB : A * B = 1)
-    (x : ι → V ⧸ H.smulLat c abelian₂)
-    : psi H abelian₂ c B hBO (psi H abelian₂ c A hAO x) = x := by
+theorem psi_psi (abelian₂ : Submodule M.L.O V) (c : E) (A B : Matrix ι ι E) (hAO : ∀ i j, A i j ∈ M.L.O)
+    (hBO : ∀ i j, B i j ∈ M.L.O) (hAB : A * B = 1) (x : ι → V ⧸ H.smulLat c abelian₂) :
+    psi H abelian₂ c B hBO (psi H abelian₂ c A hAO x) = x := by
   funext b
   simp only [psi, Finset.smul_sum, smul_smul]
   rw [Finset.sum_comm]
-  have e
-      : ∀ a,
-        ∑ y, ((⟨B y b, hBO y b⟩ : M.L.O) * ⟨A a y, hAO a y⟩) • x a
-          = (if a = b then (1 : M.L.O) else 0) • x a := by
+  have e : ∀ a, ∑ y, ((⟨B y b, hBO y b⟩ : M.L.O) * ⟨A a y, hAO a y⟩) • x a =
+      (if a = b then (1 : M.L.O) else 0) • x a := by
     intro a
     rw [← Finset.sum_smul]
     congr 1

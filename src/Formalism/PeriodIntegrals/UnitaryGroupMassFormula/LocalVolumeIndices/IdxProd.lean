@@ -1,12 +1,49 @@
 module
 
-public import Mathlib
+import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.ExistsMemProjEqOnFinset
 public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.LocalVolumeIndices.MassDataKppVolOf
-public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.LocalVolumeIndices.Bridge
-public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.LocalVolumeIndices.LocKMem
-public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.LocalVolumeIndices.CompPiVLocGSame
-public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.LocalVolumeIndices.CstNatCastApply
 public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.LocalVolumeIndices.Single
+public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.LocalVolumeIndices.CstNatCastApply
+public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.LocalVolumeIndices.LocKMem
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
@@ -15,34 +52,13 @@ noncomputable section
 namespace PI.MassDataKppVolLemmas
 
 open scoped TensorProduct
-open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub
-  Formalism.L2.SG.Measures Formalism.L2.SG.TypedSets NumberField IsDedekindDomain
+open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub Formalism.L2.SG.Measures Formalism.L2.SG.TypedSets NumberField IsDedekindDomain
   Formalism.BasicNotions Formalism.L2.SG.HidaSetting Formalism.L2.SG.AdBridge
 open Formalism.MainNotions.S (AutInst)
 
-theorem index_pi₂ {ι : Type} [Fintype ι] {G : ι → Type} [∀ i, Group (G i)] (H : ∀ i, Subgroup (G i))
-    : (Subgroup.pi Set.univ H).index = ∏ i, (H i).index := by
-  classical
-  show Nat.card ((∀ i, G i) ⧸ Subgroup.pi Set.univ H) = ∏ i, Nat.card (G i ⧸ H i)
-  rw [← Nat.card_pi]
-  refine Nat.card_congr (Equiv.ofBijective
-    (fun q => Quotient.liftOn' q (fun g i => (QuotientGroup.mk (g i) : G i ⧸ H i)) ?_)
-    ⟨?_, ?_⟩)
-  · intro a b hab
-    funext i
-    rw [QuotientGroup.eq]
-    have h1 : a⁻¹ * b ∈ Subgroup.pi Set.univ H := QuotientGroup.leftRel_apply.mp hab
-    exact (Subgroup.mem_pi _).mp h1 i (Set.mem_univ i)
-  · intro q q' h
-    obtain ⟨a, rfl⟩ := QuotientGroup.mk_surjective q
-    obtain ⟨b, rfl⟩ := QuotientGroup.mk_surjective q'
-    rw [QuotientGroup.eq, Subgroup.mem_pi]
-    intro i _
-    exact QuotientGroup.eq.mp (congrFun h i)
-  · intro f
-    refine ⟨QuotientGroup.mk (fun i => (f i).out), ?_⟩
-    funext i
-    exact QuotientGroup.out_eq' (f i)
+theorem index_pi₂ {ι : Type} [Fintype ι] {G : ι → Type} [∀ i, Group (G i)] (H : ∀ i, Subgroup (G i)) :
+    (Subgroup.pi Set.univ H).index = ∏ i, (H i).index := by
+  apply GlobalTheory.index_pi_univ_dep <;> assumption
 
 def KsetSub (I : AutInst) : Subgroup I.Gf :=
   (Formalism.UG.stabGL I.Lf).comap (Formalism.UG.UPts I.cm.sig I.J (Af I.F)).subtype
@@ -57,8 +73,7 @@ def levelSubgroupOfCharacter (hK : X.LevelSubgroupCharacter) : Subgroup X.B.I.Gf
 
 theorem IP_K2HA_eq : levelUnitary X hb = tf X.B.I hb '' X.K2 := rfl
 
-theorem IP_KppS (hK : X.LevelSubgroupCharacter)
-    : KppS X hb = (levelSubgroupOfCharacter X hK).map (tfHom X.B.I hb) := by
+theorem IP_KppS (hK : X.LevelSubgroupCharacter) : KppS X hb = (levelSubgroupOfCharacter X hK).map (tfHom X.B.I hb) := by
   rw [← Subgroup.closure_eq (levelSubgroupOfCharacter X hK), MonoidHom.map_closure]
   rfl
 
@@ -72,8 +87,7 @@ theorem IP_KfS : KfS X = (KsetSub X.B.I).map (tfHom X.B.I hb) := by
   · rintro ⟨x, hx, rfl⟩
     exact (Bridge_mem_Kf_iff X.B.I hb x).2 hx
 
-theorem IP_gIdx (hK : X.LevelSubgroupCharacter)
-    : gIdx X hb = (levelSubgroupOfCharacter X hK).relIndex (KsetSub X.B.I) := by
+theorem IP_gIdx (hK : X.LevelSubgroupCharacter) : gIdx X hb = (levelSubgroupOfCharacter X hK).relIndex (KsetSub X.B.I) := by
   rw [gIdx, IP_KppS X hb hK, IP_KfS X hb]
   exact Subgroup.relIndex_map_map_of_injective _ _ (Bridge_tf_injective X.B.I hb)
 
@@ -84,38 +98,34 @@ theorem IP_KvS (p : TypX X) : KvS X p = KvSub X p := by
   rw [KvS]
   exact Subgroup.closure_eq (KvSub X p)
 
-theorem piV_mem_KvS (p : TypX X) (x : X.B.I.Gf) (hx : x ∈ X.B.I.Kset)
-    : piV X.B.I p.1 (tf X.B.I hb x) ∈ KvS X p := by
+theorem piV_mem_KvS (p : TypX X) (x : X.B.I.Gf) (hx : x ∈ X.B.I.Kset) :
+    piV X.B.I p.1 (tf X.B.I hb x) ∈ KvS X p := by
   rw [IP_KvS]
   have h := (Bridge_mem_Kf_iff X.B.I hb x).2 hx
   rw [Kf, Subgroup.mem_iInf] at h
   exact h p.1
 
 def phiK : KsetSub X.B.I →* ∀ p : TypX X, KvS X p :=
-  MonoidHom.pi fun p =>
-    MonoidHom.codRestrict (((piV X.B.I p.1).comp (tfHom X.B.I hb)).comp (KsetSub X.B.I).subtype)
-      (KvS X p) (fun x => piV_mem_KvS X hb p x.1 x.2)
+  MonoidHom.pi fun p => MonoidHom.codRestrict
+    (((piV X.B.I p.1).comp (tfHom X.B.I hb)).comp (KsetSub X.B.I).subtype) (KvS X p)
+    (fun x => piV_mem_KvS X hb p x.1 x.2)
 
-theorem phiK_apply₂ (x : KsetSub X.B.I) (p : TypX X)
-    : ((phiK X hb x p : KvS X p) : HA (Fv X.B.I.F p.1) X.B.I.cm.sig X.B.I.J)
-      = piV X.B.I p.1 (tf X.B.I hb x.1) :=
-  rfl
+theorem phiK_apply₂ (x : KsetSub X.B.I) (p : TypX X) :
+    ((phiK X hb x p : KvS X p) : HA (Fv X.B.I.F p.1) X.B.I.cm.sig X.B.I.J) = piV X.B.I p.1 (tf X.B.I hb x.1) := rfl
 
-theorem IP_KppvS (hK : X.LevelSubgroupCharacter) (p : TypX X)
-    : KppvS X hb p
-      = (levelSubgroupOfCharacter X hK).map ((piV X.B.I p.1).comp (tfHom X.B.I hb)) := by
+theorem IP_KppvS (hK : X.LevelSubgroupCharacter) (p : TypX X) :
+    KppvS X hb p = (levelSubgroupOfCharacter X hK).map ((piV X.B.I p.1).comp (tfHom X.B.I hb)) := by
   rw [KppvS]
-  have : compSet X.B.I.cm.sig X.B.I.J (levelUnitary X hb) p.1
-      = ((levelSubgroupOfCharacter X hK).map ((piV X.B.I p.1).comp (tfHom X.B.I hb)) : Set _) := by
+  have : compSet X.B.I.cm.sig X.B.I.J (levelUnitary X hb) p.1 =
+      ((levelSubgroupOfCharacter X hK).map ((piV X.B.I p.1).comp (tfHom X.B.I hb)) : Set _) := by
     rw [Subgroup.coe_map, compSet, IP_K2HA_eq, Set.image_image]; rfl
   rw [this, Subgroup.closure_eq]
 
 theorem g_ne_zero₂ (i : Fin 2) : D.host.g i ≠ 0 := (D.host.g_prime i).ne_zero
 
-theorem levelSubgroupAlt_subgroupOf_eq_comap_pi
-    (hK : X.LevelSubgroupCharacter) (hL : X.LevelSubgroupNormalized)
-    : (levelSubgroupOfCharacter X hK).subgroupOf (KsetSub X.B.I)
-      = (Subgroup.pi Set.univ fun p => (KppvS X hb p).subgroupOf (KvS X p)).comap (phiK X hb) := by
+theorem levelSubgroupAlt_subgroupOf_eq_comap_pi (hK : X.LevelSubgroupCharacter) (hL : X.LevelSubgroupNormalized) :
+    (levelSubgroupOfCharacter X hK).subgroupOf (KsetSub X.B.I) =
+      (Subgroup.pi Set.univ fun p => (KppvS X hb p).subgroupOf (KvS X p)).comap (phiK X hb) := by
   ext ⟨z, hz⟩
   rw [Subgroup.mem_subgroupOf, Subgroup.mem_comap, Subgroup.mem_pi]
   simp only [Set.mem_univ, true_implies, Subgroup.mem_subgroupOf, phiK_apply₂, IP_KppvS X hb hK,
@@ -124,14 +134,10 @@ theorem levelSubgroupAlt_subgroupOf_eq_comap_pi
   · intro h p
     exact ⟨z, h, rfl⟩
   · intro h
-    have hgc :=
-      Cst_gc X.B.I (D.host.g 0) (D.host.g 1) (g_ne_zero₂ (D := D) 0) (g_ne_zero₂ (D := D) 1)
+    have hgc := Cst_gc X.B.I (D.host.g 0) (D.host.g 1) (g_ne_zero₂ (D := D) 0) (g_ne_zero₂ (D := D) 1)
     rw [← X.g_eq] at hgc
-    refine LocK_mem X.B.I X.K2 hK.1 hK.2.1 X.B.g
-      (fun x hx => (hL.1 x hx).1)
-      Finset.univ
-      (fun p : TypX X => chi X.B.I p.1)
-      (fun p => Comp_chi_idem X.B.I p.1)
+    refine LocK_mem X.B.I X.K2 hK.1 hK.2.1 X.B.g (fun x hx => (hL.1 x hx).1) Finset.univ
+      (fun p : TypX X => chi X.B.I p.1) (fun p => Comp_chi_idem X.B.I p.1)
       (fun p q hpq => Comp_chi_orth X.B.I p.1 q.1 fun h => hpq (Subtype.ext h))
       (cElt X.B.I (D.host.g 0) (D.host.g 1)) (Cst_int X.B.I _ _) hgc z hz ?_
     intro p _
@@ -142,18 +148,15 @@ theorem levelSubgroupAlt_subgroupOf_eq_comap_pi
 theorem phiK_surjective (hS : SngSurj) : Function.Surjective (phiK X hb) := by
   classical
   intro f
-  have key
-      : ∀ S : Finset (TypX X), ∃ z : KsetSub X.B.I, ∀ p,
-        (phiK X hb z p : HA (Fv X.B.I.F p.1) X.B.I.cm.sig X.B.I.J)
-          = if p ∈ S then (f p : _) else 1 := by
+  have key : ∀ S : Finset (TypX X), ∃ z : KsetSub X.B.I, ∀ p,
+      (phiK X hb z p : HA (Fv X.B.I.F p.1) X.B.I.cm.sig X.B.I.J) = if p ∈ S then (f p : _) else 1 := by
     intro S
     induction S using Finset.induction_on with
     | empty => exact ⟨1, fun p => by simp⟩
     | insert q S hq ih =>
       obtain ⟨z, hz⟩ := ih
-      have hfq
-          : ((f q : KvS X q) : HA (Fv X.B.I.F q.1) X.B.I.cm.sig X.B.I.J)
-            ∈ Kv X.B.I.cm.sig X.B.I.J (lamS X) q.1 := by
+      have hfq : ((f q : KvS X q) : HA (Fv X.B.I.F q.1) X.B.I.cm.sig X.B.I.J) ∈
+          Kv X.B.I.cm.sig X.B.I.J (lamS X) q.1 := by
         have h2 : ∀ x, x ∈ KvS X q → x ∈ Kv X.B.I.cm.sig X.B.I.J (lamS X) q.1 := fun x hx => by
           rw [IP_KvS] at hx; exact hx
         exact h2 _ (f q).2
@@ -179,13 +182,11 @@ theorem phiK_surjective (hS : SngSurj) : Function.Surjective (phiK X hb) := by
   refine ⟨z, funext fun p => Subtype.ext ?_⟩
   rw [hz p, if_pos (Finset.mem_univ p)]
 
-theorem IP_idxProd (hS : SngSurj) (hK : X.LevelSubgroupCharacter) (hL : X.LevelSubgroupNormalized)
-    : IdxProd X hb := by
+theorem IP_idxProd (hS : SngSurj) (hK : X.LevelSubgroupCharacter) (hL : X.LevelSubgroupNormalized) : IdxProd X hb := by
   show gIdx X hb = ∏ p : TypX X, lIdx X hb p
   rw [IP_gIdx X hb hK]
   show ((levelSubgroupOfCharacter X hK).subgroupOf (KsetSub X.B.I)).index = _
-  rw [levelSubgroupAlt_subgroupOf_eq_comap_pi X hb hK hL,
-    Subgroup.index_comap_of_surjective (hf := phiK_surjective X hb hS), index_pi₂]
+  rw [levelSubgroupAlt_subgroupOf_eq_comap_pi X hb hK hL, Subgroup.index_comap_of_surjective (hf := phiK_surjective X hb hS), index_pi₂]
   rfl
 
 theorem idxProdAll_of (hS : SngSurj) : IdxProdAll := by

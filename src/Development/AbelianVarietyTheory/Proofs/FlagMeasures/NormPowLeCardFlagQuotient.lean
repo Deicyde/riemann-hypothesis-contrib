@@ -1,52 +1,77 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.Definitions.SemilocalFrames.RowMinor
-public import Formalism.SharpRestriction.CuspSpanNormBounds.CongruenceAtSplitFrobeniusHolds
+public import Formalism.SharpRestriction.CuspSpanNormBounds.IsPrimitiveSub
 public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.ExistsPartnerLift
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
-open NumberField Module IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions
-  Formalism.MainNotions.S Formalism.MainNotions.S.Lat
+open NumberField Module IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat
 open scoped Classical
 
 namespace GlobalTheory.LoopC.AdmissibleOrder
 
 open GlobalTheory.LoopC.Partner
 
-theorem one_mem_of_local
-    {E : Type} [Field E] [NumberField E]
-    (g : 𝓞 E) (J : Ideal (𝓞 E))
-    (hg : g ∈ J) (h : ∀ P : HeightOneSpectrum (𝓞 E), g ∈ P.asIdeal → ∃ s ∈ J, s ∉ P.asIdeal)
-    : (1 : 𝓞 E) ∈ J := by
+theorem one_mem_of_local {E : Type} [Field E] [NumberField E] (g : 𝓞 E) (J : Ideal (𝓞 E)) (hg : g ∈ J)
+    (h : ∀ P : HeightOneSpectrum (𝓞 E), g ∈ P.asIdeal → ∃ s ∈ J, s ∉ P.asIdeal) : (1 : 𝓞 E) ∈ J := by
   by_contra h1
   have hJ : J ≠ ⊤ := fun hJ => h1 (hJ ▸ Submodule.mem_top)
   obtain ⟨M, hM, hJM⟩ := Ideal.exists_le_maximal J hJ
-  have hM0 : M ≠ ⊥ :=
-    Ring.ne_bot_of_isMaximal_of_not_isField hM (NumberField.RingOfIntegers.not_isField E)
+  have hM0 : M ≠ ⊥ := Ring.ne_bot_of_isMaximal_of_not_isField hM (NumberField.RingOfIntegers.not_isField E)
   obtain ⟨s, hsJ, hsM⟩ := h ⟨M, hM.isPrime, hM0⟩ (hJM hg)
   exact hsM (hJM hsJ)
 
-theorem pow_card_le
-    {R Q : Type} [CommRing R] [AddCommGroup Q] [Module R Q] [Finite Q]
-    (I : Ideal R)
-    {n : ℕ} (q : Fin n → Q) (h : ∀ c : Fin n → R, ∑ b, c b • q b = 0 → ∀ b, c b ∈ I)
-    : Nat.card (R ⧸ I) ^ n ≤ Nat.card Q := by
-  have key
-      : ∀ c c' : Fin n → R,
-        ∑ b, c b • q b = ∑ b, c' b • q b
-          → ∀ b, Ideal.Quotient.mk I (c b) = Ideal.Quotient.mk I (c' b) := by
+theorem pow_card_le {R Q : Type} [CommRing R] [AddCommGroup Q] [Module R Q] [Finite Q] (I : Ideal R) {n : ℕ}
+    (q : Fin n → Q) (h : ∀ c : Fin n → R, ∑ b, c b • q b = 0 → ∀ b, c b ∈ I) :
+    Nat.card (R ⧸ I) ^ n ≤ Nat.card Q := by
+  have key : ∀ c c' : Fin n → R, ∑ b, c b • q b = ∑ b, c' b • q b →
+      ∀ b, Ideal.Quotient.mk I (c b) = Ideal.Quotient.mk I (c' b) := by
     intro c c' hcc b
     rw [Ideal.Quotient.eq]
     have hz : ∑ b, (c - c') b • q b = 0 := by
       simp only [Pi.sub_apply, sub_smul, Finset.sum_sub_distrib, hcc, sub_self]
     simpa using h (c - c') hz b
   let f : Q → (Fin n → R ⧸ I) := fun x =>
-    if hx : ∃ c : Fin n → R, ∑ b, c b • q b = x then fun b =>
-      Ideal.Quotient.mk I (hx.choose b)
-    else
-      0
+    if hx : ∃ c : Fin n → R, ∑ b, c b • q b = x then fun b => Ideal.Quotient.mk I (hx.choose b) else 0
   have hf : Function.Surjective f := by
     intro t
     choose c hc using fun b => Ideal.Quotient.mk_surjective (I := I) (t b)
@@ -60,28 +85,23 @@ theorem pow_card_le
 
 variable {E : Type} [Field E] [NumberField E] [StarRing E] {S : HSpace E} {r : ℕ} {T T' : E}
 
-theorem frame_indep
-    (F : FlagG S r T) (F' : FlagG S r T') (hG : Gflag F F' ≠ 0)
-    (b : Fin (r + 1) → E) (hb : ∑ j, b j • F'.fvec j = 0)
-    : b = 0 := by
+theorem frame_indep (F : FlagG S r T) (F' : FlagG S r T') (hG : Gflag F F' ≠ 0) (b : Fin (r + 1) → E)
+    (hb : ∑ j, b j • F'.fvec j = 0) : b = 0 := by
   have hlast : T' * b (Fin.last r) = 0 := by
     have h0 := hT_fvec_sum F' b (Fin.last r)
     rw [hb, map_zero] at h0
     simpa using h0.symm
-  have hZ
-      : (Zhat F F').mulVec b = Pi.single (Fin.last r) (T * (0 : Fin (r + 1) → E) (Fin.last r)) := by
+  have hZ : (Zhat F F').mulVec b = Pi.single (Fin.last r) (T * (0 : Fin (r + 1) → E) (Fin.last r)) := by
     funext i
     have h0 : S.hT (F.fvec i) (∑ j, b j • F'.fvec j) = 0 := by rw [hb, map_zero]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum] at h0
+
+    rw [map_sum] at h0
     simp only [map_smul, smul_eq_mul] at h0
     simp only [Pi.zero_apply, mul_zero, Pi.single_zero]
     rw [← h0]
     simp only [Matrix.mulVec, dotProduct, Zhat, brS]
     exact Finset.sum_congr rfl fun j _ => mul_comm _ _
-  have h2
-      : (Zhat F F').conjTranspose.mulVec (0 : Fin (r + 1) → E)
-        = Pi.single (Fin.last r) (T' * b (Fin.last r)) := by
+  have h2 : (Zhat F F').conjTranspose.mulVec (0 : Fin (r + 1) → E) = Pi.single (Fin.last r) (T' * b (Fin.last r)) := by
     rw [hlast, Matrix.mulVec_zero, Pi.single_zero]
   have hd1 : Dl F F' (r + 1) = (Zhat F F').det := by
     unfold Dl leadMinorE
@@ -98,8 +118,7 @@ theorem frame_indep
 
 variable {Λ : Submodule (𝓞 E) S.V}
 
-theorem exists_div {g : ℕ} {x : S.V} (hx : x ∈ Λ) (h : ModG S Λ g x)
-    : ∃ w ∈ Λ, (g : 𝓞 E) • w = x := by
+theorem exists_div {g : ℕ} {x : S.V} (hx : x ∈ Λ) (h : ModG S Λ g x) : ∃ w ∈ Λ, (g : 𝓞 E) • w = x := by
   set J : Ideal (𝓞 E) := (Ideal.span {(g : 𝓞 E)} • Λ).colon {x} with hJ
   have hmem : ∀ s : 𝓞 E, s ∈ J ↔ s • x ∈ Ideal.span {(g : 𝓞 E)} • Λ := fun s =>
     Submodule.mem_colon_singleton
@@ -114,14 +133,10 @@ theorem exists_div {g : ℕ} {x : S.V} (hx : x ∈ Λ) (h : ModG S Λ g x)
   obtain ⟨w, hw, hwx⟩ := (Submodule.mem_smul_pointwise_iff_exists _ _ _).1 hx1
   exact ⟨w, hw, hwx⟩
 
-theorem coeff_mem
-    {g : ℕ} (F : LFlag S r T) (hL : IsLift Λ F) (hC : IsFixedConv Λ g F)
-    (hind : ∀ b : Fin (r + 1) → E, ∑ j, b j • frame F j = 0 → b = 0)
-    (c : Fin (r + 1) → 𝓞 E)
-    {q : S.V}
-    (hq : q ∈ XLam Λ F ⊔ Submodule.span (𝓞 E) {F.zt}) (h : ∑ j, c j • frame F j = (g : 𝓞 E) • q)
-    (b : Fin (r + 1))
-    : c b ∈ Ideal.span {(g : 𝓞 E)} := by
+theorem coeff_mem {g : ℕ} (F : LFlag S r T) (hL : IsLift Λ F) (hC : IsFixedConv Λ g F)
+    (hind : ∀ b : Fin (r + 1) → E, ∑ j, b j • frame F j = 0 → b = 0) (c : Fin (r + 1) → 𝓞 E) {q : S.V}
+    (hq : q ∈ XLam Λ F ⊔ Submodule.span (𝓞 E) {F.zt}) (h : ∑ j, c j • frame F j = (g : 𝓞 E) • q) (b : Fin (r + 1)) :
+    c b ∈ Ideal.span {(g : 𝓞 E)} := by
   obtain ⟨x, hx, y, hy, rfl⟩ := Submodule.mem_sup.1 hq
   obtain ⟨o, rfl⟩ := Submodule.mem_span_singleton.1 hy
   set J : Ideal (𝓞 E) := (Ideal.span {(g : 𝓞 E)}).colon {c b} with hJ
@@ -151,10 +166,7 @@ theorem coeff_mem
       exact Ideal.mul_mem_right _ _ (Ideal.mem_span_singleton_self _)
     · intro P hP
       obtain ⟨cc, -, hc1, hloc⟩ := hC.1 P
-      have hx'
-          : x
-            ∈ (haveI := P.isPrime
-               Formalism.HermitianLatticesTheory.localization₂ P.asIdeal (XLam Λ F)) := by
+      have hx' : x ∈ (haveI := P.isPrime; Formalism.HermitianLatticesTheory.localization₂ P.asIdeal (XLam Λ F)) := by
         show ∃ s ∈ P.asIdeal.primeCompl, s • x ∈ XLam Λ F
         exact ⟨1, Submonoid.one_mem _, by rwa [one_smul]⟩
       rw [hloc] at hx'
@@ -164,16 +176,11 @@ theorem coeff_mem
       rwa [hfun] at hsx
   simpa using (hmem 1).1 h1
 
-theorem NE_pow_le_card_BQ
-    : ∀ (E : Type) [Field E] [NumberField E] [StarRing E] (S : HSpace E) (r : ℕ)
-        (Λ : Submodule (𝓞 E) S.V) (g : ℕ) (T T' : E) (F : LFlag S r T) (F' : LFlag S r T'),
-      g ≠ 0 → IsLift Λ F → IsLift Λ F' → (∀ b, frame F b ∈ Λ) → (∀ b, frame F' b ∈ Λ)
-        → IsFixedConv Λ g F' → IsAdmissible Λ g F F' → Gval F F' ≠ 0 → Finite (BQ Λ F F')
-        → NE (E := E) g ^ (r + 1) ≤ (Nat.card (BQ Λ F F') : ℝ) := by
+theorem NE_pow_le_card_BQ : ∀ (E : Type) [Field E] [NumberField E] [StarRing E] (S : HSpace E) (r : ℕ) (Λ : Submodule (𝓞 E) S.V) (g : ℕ) (T T' : E) (F : LFlag S r T) (F' : LFlag S r T'), g ≠ 0 → IsLift Λ F → IsLift Λ F' → (∀ b, frame F b ∈ Λ) → (∀ b, frame F' b ∈ Λ) → IsFixedConv Λ g F' → IsAdmissible Λ g F F' → Gval F F' ≠ 0 → Finite (BQ Λ F F') → NE (E := E) g ^ (r + 1) ≤ (Nat.card (BQ Λ F F') : ℝ) := by
   intro E _ _ _ S r Λ g T T' F F' hg hL hL' hF hF' hC' hAdm hGv hfin
   obtain ⟨ξ, -, -, hξ⟩ := hAdm
-  have hfX : ∀ b, frameAct (frame F) ξ b ∈ Xplus F := fun b =>
-    (mem_Xplus_iff F.fl _).2 ⟨fun a => ((ξ a b : 𝓞 E) : E), rfl⟩
+  have hfX : ∀ b, frameAct (frame F) ξ b ∈ Xplus F :=
+    fun b => (mem_Xplus_iff F.fl _).2 ⟨fun a => ((ξ a b : 𝓞 E) : E), rfl⟩
   have hf'X : ∀ b, frame F' b ∈ Xplus F' := fun b =>
     (mem_Xplus_iff F'.fl _).2 ⟨Pi.single b 1, by simp [Pi.single_apply, ite_smul]⟩
   have hxΛ : ∀ b, frame F' b - frameAct (frame F) ξ b ∈ Λ := by
@@ -200,34 +207,27 @@ theorem NE_pow_le_card_BQ
   have key : ∀ c : Fin (r + 1) → 𝓞 E, ∑ b, c b • q b = 0 → ∀ b, c b ∈ Ideal.span {(g : 𝓞 E)} := by
     intro c hc
     have hc' : ∑ b, c b • w b ∈ UU Λ F F' := by
-      have h0
-          : (Submodule.mkQ ((UU Λ F F').comap (BLat Λ F F').subtype))
-              (∑ b, c b • (⟨w b, hwB b⟩ : BLat Λ F F'))
-            = 0 := by
-        set_option synthInstance.maxHeartbeats 100000 in
-          rw [map_sum]
+      have h0 : (Submodule.mkQ ((UU Λ F F').comap (BLat Λ F F').subtype))
+          (∑ b, c b • (⟨w b, hwB b⟩ : BLat Λ F F')) = 0 := by
+
+        rw [map_sum]
         simpa only [map_smul, Submodule.mkQ_apply, q] using hc
       rw [Submodule.mkQ_apply, Submodule.Quotient.mk_eq_zero, Submodule.mem_comap] at h0
       simpa using h0
     rw [UU_eq] at hc'
     obtain ⟨u, hu, u', hu', huu⟩ := Submodule.mem_sup.1 hc'
-    have hgsum
-        : ∑ b, c b • (frame F' b - frameAct (frame F) ξ b) = (g : 𝓞 E) • u + (g : 𝓞 E) • u' := by
+    have hgsum : ∑ b, c b • (frame F' b - frameAct (frame F) ξ b) = (g : 𝓞 E) • u + (g : 𝓞 E) • u' := by
       rw [← smul_add, huu, Finset.smul_sum]
       refine Finset.sum_congr rfl fun b _ => ?_
       rw [← hw b, smul_comm]
     simp only [smul_sub, Finset.sum_sub_distrib] at hgsum
-    have hA
-        : ∑ b, c b • frame F' b - (g : 𝓞 E) • u'
-          = ∑ b, c b • frameAct (frame F) ξ b + (g : 𝓞 E) • u := by
-      calc
-        ∑ b, c b • frame F' b - (g : 𝓞 E) • u'
-            = (∑ b, c b • frame F' b - ∑ b, c b • frameAct (frame F) ξ b)
-              + ∑ b, c b • frameAct (frame F) ξ b - (g : 𝓞 E) • u' := by
-          abel
-        _ = ((g : 𝓞 E) • u + (g : 𝓞 E) • u') + ∑ b, c b • frameAct (frame F) ξ b
-            - (g : 𝓞 E) • u' := by
-          rw [hgsum]
+    have hA : ∑ b, c b • frame F' b - (g : 𝓞 E) • u' =
+        ∑ b, c b • frameAct (frame F) ξ b + (g : 𝓞 E) • u := by
+      calc ∑ b, c b • frame F' b - (g : 𝓞 E) • u'
+          = (∑ b, c b • frame F' b - ∑ b, c b • frameAct (frame F) ξ b) +
+              ∑ b, c b • frameAct (frame F) ξ b - (g : 𝓞 E) • u' := by abel
+        _ = ((g : 𝓞 E) • u + (g : 𝓞 E) • u') + ∑ b, c b • frameAct (frame F) ξ b - (g : 𝓞 E) • u' := by
+              rw [hgsum]
         _ = ∑ b, c b • frameAct (frame F) ξ b + (g : 𝓞 E) • u := by abel
     have huX : u ∈ Xplus F := (Submodule.mem_inf.1 (half_le F hL hu)).2
     have hu'X : u' ∈ Xplus F' := (Submodule.mem_inf.1 (half_le F' hL' hu')).2
@@ -240,8 +240,7 @@ theorem NE_pow_le_card_BQ
     have hm : ∑ b, c b • frame F' b - (g : 𝓞 E) • u' ∈ F.fl.Xplus ⊓ F'.fl.Xplus :=
       Submodule.mem_inf.2 ⟨hA ▸ hmF, hmF'⟩
     rw [Xplus_inf F.fl F'.fl hGv] at hm
-    have hfin2 : ∑ b, c b • frame F' b = (g : 𝓞 E) • u' :=
-      sub_eq_zero.1 ((Submodule.mem_bot E).1 hm)
+    have hfin2 : ∑ b, c b • frame F' b = (g : 𝓞 E) • u' := sub_eq_zero.1 ((Submodule.mem_bot E).1 hm)
     exact coeff_mem F' hL' hC' (fun b hb => frame_indep F.fl F'.fl hGv b hb) c hu' hfin2
   have hcard := pow_card_le (Ideal.span {(g : 𝓞 E)}) q key
   have hN : ((Nat.card (𝓞 E ⧸ Ideal.span {(g : 𝓞 E)}) : ℕ) : ℝ) = NE (E := E) g := by

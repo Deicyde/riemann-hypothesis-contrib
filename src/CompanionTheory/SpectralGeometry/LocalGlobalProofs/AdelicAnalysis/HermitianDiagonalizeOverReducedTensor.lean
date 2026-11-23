@@ -1,9 +1,48 @@
 module
 
-public import Mathlib
-public import CompanionTheory.SpectralGeometry.CountingDefinitions.AdelicEulerProducts.IsEulerProd
+public import Formalism.UnipotentAdelicQuotients.SWXSDefs
 public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.OneVectorCcOfSiegelWeil
 public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.AdelicUnitaryOrbits.QuadFiniteDimensional
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -18,14 +57,13 @@ section SemiLocal
 
 variable {B : Type} [CommRing B]
 
-theorem isUnit_of_forall_notMem {a : B} (h : ∀ m : MaximalSpectrum B, a ∉ m.asIdeal)
-    : IsUnit a := by
+theorem isUnit_of_forall_notMem {a : B} (h : ∀ m : MaximalSpectrum B, a ∉ m.asIdeal) : IsUnit a := by
   by_contra hu
   obtain ⟨M, hM, ha⟩ := exists_max_ideal_of_mem_nonunits (mem_nonunits_iff.2 hu)
   exact h ⟨M, hM⟩ ha
 
-theorem exists_crt [Finite (MaximalSpectrum B)] (y : MaximalSpectrum B → B)
-    : ∃ c : B, ∀ m : MaximalSpectrum B, c - y m ∈ m.asIdeal := by
+theorem exists_crt [Finite (MaximalSpectrum B)] (y : MaximalSpectrum B → B) :
+    ∃ c : B, ∀ m : MaximalSpectrum B, c - y m ∈ m.asIdeal := by
   have hcop : Pairwise (Function.onFun IsCoprime fun m : MaximalSpectrum B => m.asIdeal) := by
     intro m m' hne
     refine Ideal.isCoprime_iff_sup_eq.2 (Ideal.IsMaximal.coprime_of_ne m.isMaximal m'.isMaximal ?_)
@@ -35,15 +73,14 @@ theorem exists_crt [Finite (MaximalSpectrum B)] (y : MaximalSpectrum B → B)
 
 variable {ι : Type} [Fintype ι] [DecidableEq ι]
 
-theorem exists_unit_comb
-    [Finite (MaximalSpectrum B)] (i0 : ι) (x l : ι → B) (h : ∑ i, l i * x i = 1)
-    : ∃ c : ι → B, c i0 = 1 ∧ IsUnit (∑ i, c i * x i) := by
+theorem exists_unit_comb [Finite (MaximalSpectrum B)] (i0 : ι) (x l : ι → B)
+    (h : ∑ i, l i * x i = 1) : ∃ c : ι → B, c i0 = 1 ∧ IsUnit (∑ i, c i * x i) := by
   classical
   choose C hC using fun i : ι =>
     exists_crt (B := B) fun m => if x i0 ∈ m.asIdeal then l i else 0
   refine ⟨Function.update C i0 1, by simp, isUnit_of_forall_notMem fun m hm => ?_⟩
-  have hsplit
-      : ∑ i, Function.update C i0 1 i * x i = x i0 + ∑ i ∈ Finset.univ.erase i0, C i * x i := by
+  have hsplit : ∑ i, Function.update C i0 1 i * x i
+      = x i0 + ∑ i ∈ Finset.univ.erase i0, C i * x i := by
     rw [← Finset.add_sum_erase _ _ (Finset.mem_univ i0)]
     simp only [Function.update_self, one_mul]
     congr 1
@@ -54,10 +91,8 @@ theorem exists_unit_comb
   · have h1 : ∀ i, C i - l i ∈ m.asIdeal := fun i => by simpa [hx] using hC i m
     have h2 : ∑ i ∈ Finset.univ.erase i0, (C i - l i) * x i ∈ m.asIdeal :=
       Ideal.sum_mem _ fun i _ => Ideal.mul_mem_right _ _ (h1 i)
-    have h3
-        : (1 : B)
-          = (x i0 + ∑ i ∈ Finset.univ.erase i0, C i * x i) + l i0 * x i0 - x i0
-            - ∑ i ∈ Finset.univ.erase i0, (C i - l i) * x i := by
+    have h3 : (1 : B) = (x i0 + ∑ i ∈ Finset.univ.erase i0, C i * x i) + l i0 * x i0 - x i0
+        - ∑ i ∈ Finset.univ.erase i0, (C i - l i) * x i := by
       rw [← h, ← Finset.add_sum_erase _ _ (Finset.mem_univ i0)]
       simp only [sub_mul, Finset.sum_sub_distrib]
       ring
@@ -70,8 +105,8 @@ theorem exists_unit_comb
       Ideal.sum_mem _ fun i _ => Ideal.mul_mem_right _ _ (h1 i)
     exact hx ((Ideal.add_mem_iff_left _ h2).1 hm)
 
-theorem exists_col [Finite (MaximalSpectrum B)] (i0 : ι) (x l : ι → B) (h : ∑ i, l i * x i = 1)
-    : ∃ g : Matrix ι ι B, IsUnit g.det ∧ ∀ i, g i i0 = x i := by
+theorem exists_col [Finite (MaximalSpectrum B)] (i0 : ι) (x l : ι → B)
+    (h : ∑ i, l i * x i = 1) : ∃ g : Matrix ι ι B, IsUnit g.det ∧ ∀ i, g i i0 = x i := by
   obtain ⟨c, hc, hu⟩ := exists_unit_comb i0 x l h
   set p : Matrix ι ι B := (1 : Matrix ι ι B).updateRow i0 c with hp
   have hdp : p.det = 1 := by
@@ -112,39 +147,39 @@ def bf (S : Matrix ι ι A) (x y : ι → A) : A := (fun i => s (x i)) ⬝ᵥ (S
 
 variable {s}
 
-theorem bf_add_left (S : Matrix ι ι A) (x x' y : ι → A)
-    : bf s S (x + x') y = bf s S x y + bf s S x' y := by
+theorem bf_add_left (S : Matrix ι ι A) (x x' y : ι → A) :
+    bf s S (x + x') y = bf s S x y + bf s S x' y := by
   simp only [bf, Pi.add_apply, map_add (f := _)]
   exact add_dotProduct _ _ _
 
-theorem bf_add_right (S : Matrix ι ι A) (x y y' : ι → A)
-    : bf s S x (y + y') = bf s S x y + bf s S x y' := by
+theorem bf_add_right (S : Matrix ι ι A) (x y y' : ι → A) :
+    bf s S x (y + y') = bf s S x y + bf s S x y' := by
   simp only [bf, mulVec_add, dotProduct_add]
 
-theorem bf_smul_left (S : Matrix ι ι A) (a : A) (x y : ι → A)
-    : bf s S (a • x) y = s a * bf s S x y := by
+theorem bf_smul_left (S : Matrix ι ι A) (a : A) (x y : ι → A) :
+    bf s S (a • x) y = s a * bf s S x y := by
   simp only [bf, Pi.smul_apply, smul_eq_mul, map_mul, dotProduct, Finset.mul_sum, mul_assoc]
 
-theorem bf_smul_right (S : Matrix ι ι A) (a : A) (x y : ι → A)
-    : bf s S x (a • y) = a * bf s S x y := by
+theorem bf_smul_right (S : Matrix ι ι A) (a : A) (x y : ι → A) :
+    bf s S x (a • y) = a * bf s S x y := by
   simp only [bf, mulVec_smul, dotProduct_smul, smul_eq_mul]
 
-theorem bf_sum_left {κ : Type} (T : Finset κ) (S : Matrix ι ι A) (f : κ → ι → A) (y : ι → A)
-    : bf s S (∑ k ∈ T, f k) y = ∑ k ∈ T, bf s S (f k) y := by
+theorem bf_sum_left {κ : Type} (T : Finset κ) (S : Matrix ι ι A) (f : κ → ι → A) (y : ι → A) :
+    bf s S (∑ k ∈ T, f k) y = ∑ k ∈ T, bf s S (f k) y := by
   classical
   induction T using Finset.induction_on with
   | empty => simp [bf]
   | insert a T ha ih => rw [Finset.sum_insert ha, Finset.sum_insert ha, bf_add_left, ih]
 
-theorem bf_sum_right {κ : Type} (T : Finset κ) (S : Matrix ι ι A) (x : ι → A) (f : κ → ι → A)
-    : bf s S x (∑ k ∈ T, f k) = ∑ k ∈ T, bf s S x (f k) := by
+theorem bf_sum_right {κ : Type} (T : Finset κ) (S : Matrix ι ι A) (x : ι → A) (f : κ → ι → A) :
+    bf s S x (∑ k ∈ T, f k) = ∑ k ∈ T, bf s S x (f k) := by
   classical
   induction T using Finset.induction_on with
   | empty => simp [bf]
   | insert a T ha ih => rw [Finset.sum_insert ha, Finset.sum_insert ha, bf_add_right, ih]
 
-theorem bf_single (S : Matrix ι ι A) (i j : ι)
-    : bf s S (Pi.single i 1) (Pi.single j 1) = S i j := by
+theorem bf_single (S : Matrix ι ι A) (i j : ι) :
+    bf s S (Pi.single i 1) (Pi.single j 1) = S i j := by
   have h : (fun k => s ((Pi.single i (1 : A) : ι → A) k)) = Pi.single i 1 := by
     funext k
     by_cases hk : k = i
@@ -154,21 +189,16 @@ theorem bf_single (S : Matrix ι ι A) (i j : ι)
 
 theorem cT_apply {l m : Type} (S : Matrix l m A) (i : m) (j : l) : cT s S i j = s (S j i) := rfl
 
-theorem bf_conj (hs : ∀ z, s (s z) = z) {S : Matrix ι ι A} (hS : cT s S = S) (x y : ι → A)
-    : s (bf s S x y) = bf s S y x := by
+theorem bf_conj (hs : ∀ z, s (s z) = z) {S : Matrix ι ι A} (hS : cT s S = S) (x y : ι → A) :
+    s (bf s S x y) = bf s S y x := by
   have hS' : ∀ i j, s (S i j) = S j i := fun i j => by rw [← cT_apply, hS]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [bf, dotProduct, mulVec, map_sum, map_mul, hs, hS', Finset.mul_sum]
+
+  simp only [bf, dotProduct, mulVec, map_sum, map_mul, hs, hS', Finset.mul_sum]
   rw [Finset.sum_comm]
   exact Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => by ring
 
-theorem entry_mem
-    (I : Ideal A)
-    {θ : A} (hθ : IsUnit θ) (hsθ : s θ = -θ)
-    (h2 : IsUnit (2 : A))
-    (S : Matrix ι ι A) (hv : ∀ x, bf s S x x ∈ I)
-    (i j : ι)
-    : S i j ∈ I := by
+theorem entry_mem (I : Ideal A) {θ : A} (hθ : IsUnit θ) (hsθ : s θ = -θ) (h2 : IsUnit (2 : A))
+    (S : Matrix ι ι A) (hv : ∀ x, bf s S x x ∈ I) (i j : ι) : S i j ∈ I := by
   have pol : ∀ x y, bf s S x y + bf s S y x ∈ I := fun x y => by
     have h := I.sub_mem (I.sub_mem (hv (x + y)) (hv x)) (hv y)
     have e : bf s S (x + y) (x + y) - bf s S x x - bf s S y y = bf s S x y + bf s S y x := by
@@ -193,40 +223,36 @@ theorem det_cT (S : Matrix ι ι A) : (cT s S).det = s S.det := by
   rw [cT, Matrix.det_transpose, RingHom.map_det]
   rfl
 
-theorem isUnit_det_congr (S g : Matrix ι ι A) (hS : IsUnit S.det) (hg : IsUnit g.det)
-    : IsUnit (cT s g * S * g).det := by
+theorem isUnit_det_congr (S g : Matrix ι ι A) (hS : IsUnit S.det) (hg : IsUnit g.det) :
+    IsUnit (cT s g * S * g).det := by
   rw [Matrix.det_mul, Matrix.det_mul, det_cT]
   exact ((hg.map s).mul hS).mul hg
 
-theorem cT_congr (hs : ∀ z, s (s z) = z) {S : Matrix ι ι A} (hS : cT s S = S) (g : Matrix ι ι A)
-    : cT s (cT s g * S * g) = cT s g * S * g := by
+theorem cT_congr (hs : ∀ z, s (s z) = z) {S : Matrix ι ι A} (hS : cT s S = S) (g : Matrix ι ι A) :
+    cT s (cT s g * S * g) = cT s g * S * g := by
   have h : cT s (cT s g) = g := by
     ext i j
     simp [cT_apply, hs]
   rw [cT_mul, cT_mul, h, hS, Matrix.mul_assoc]
 
-theorem congr_mul (S g g' : Matrix ι ι A)
-    : cT s (g * g') * S * (g * g') = cT s g' * (cT s g * S * g) * g' := by
+theorem congr_mul (S g g' : Matrix ι ι A) :
+    cT s (g * g') * S * (g * g') = cT s g' * (cT s g * S * g) * g' := by
   rw [cT_mul]
   simp only [Matrix.mul_assoc]
 
-theorem congr_apply (S g : Matrix ι ι A) (i : ι)
-    : (cT s g * S * g) i i = bf s S (fun k => g k i) (fun k => g k i) := by
+theorem congr_apply (S g : Matrix ι ι A) (i : ι) :
+    (cT s g * S * g) i i = bf s S (fun k => g k i) (fun k => g k i) := by
   simp only [bf, dotProduct, mulVec, Matrix.mul_apply, cT_apply, Finset.sum_mul, Finset.mul_sum]
   rw [Finset.sum_comm]
   exact Finset.sum_congr rfl fun j _ => Finset.sum_congr rfl fun k _ => by ring
 
-variable
-  (hs : ∀ z, s (s z) = z) (hR : ∀ r, s (algebraMap R A r) = algebraMap R A r)
-  (t : A →ₗ[R] R)
-  (ht : ∀ r, t (algebraMap R A r) = r) (hfix : ∀ z, s z = z → algebraMap R A (t z) = z)
-  {θ : A} (hθ : IsUnit θ) (hsθ : s θ = -θ)
-  (h2 : IsUnit (2 : A))
+variable (hs : ∀ z, s (s z) = z) (hR : ∀ r, s (algebraMap R A r) = algebraMap R A r)
+  (t : A →ₗ[R] R) (ht : ∀ r, t (algebraMap R A r) = r) (hfix : ∀ z, s z = z → algebraMap R A (t z) = z)
+  {θ : A} (hθ : IsUnit θ) (hsθ : s θ = -θ) (h2 : IsUnit (2 : A))
 
 include hs ht hfix hθ hsθ h2 in
-theorem exists_value_notMem
-    [Nonempty ι] {S : Matrix ι ι A} (hS : cT s S = S) (hdet : IsUnit S.det) (m : MaximalSpectrum R)
-    : ∃ x, t (bf s S x x) ∉ m.asIdeal := by
+theorem exists_value_notMem [Nonempty ι] {S : Matrix ι ι A} (hS : cT s S = S) (hdet : IsUnit S.det)
+    (m : MaximalSpectrum R) : ∃ x, t (bf s S x x) ∉ m.asIdeal := by
   by_contra hcon
   push_neg at hcon
   set I : Ideal A := m.asIdeal.map (algebraMap R A) with hI
@@ -255,10 +281,8 @@ theorem exists_value_notMem
   exact m.isMaximal.ne_top ((Ideal.eq_top_iff_one _).2 h4)
 
 include hs hR ht hfix hθ hsθ h2 in
-theorem exists_value_unit
-    [Nonempty ι] [Finite (MaximalSpectrum R)]
-    {S : Matrix ι ι A} (hS : cT s S = S) (hdet : IsUnit S.det)
-    : ∃ (x : ι → A) (r : Rˣ), bf s S x x = algebraMap R A r := by
+theorem exists_value_unit [Nonempty ι] [Finite (MaximalSpectrum R)] {S : Matrix ι ι A}
+    (hS : cT s S = S) (hdet : IsUnit S.det) : ∃ (x : ι → A) (r : Rˣ), bf s S x x = algebraMap R A r := by
   classical
   haveI := Fintype.ofFinite (MaximalSpectrum R)
   choose xm hxm using exists_value_notMem hs t ht hfix hθ hsθ h2 hS hdet
@@ -266,61 +290,52 @@ theorem exists_value_unit
     exists_crt (B := R) fun m => if m = k then 1 else 0
   set x : ι → A := ∑ k, algebraMap R A (c k) • xm k with hx
   have hval : t (bf s S x x) = ∑ k, ∑ l, c k * c l * t (bf s S (xm k) (xm l)) := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hx, bf_sum_left, map_sum]
+
+    rw [hx, bf_sum_left, map_sum]
     refine Finset.sum_congr rfl fun k _ => ?_
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [bf_sum_right, map_sum]
+
+    rw [bf_sum_right, map_sum]
     refine Finset.sum_congr rfl fun l _ => ?_
     rw [bf_smul_left, bf_smul_right, hR, ← mul_assoc, ← map_mul, ← Algebra.smul_def, map_smul,
       smul_eq_mul]
-  have hunit : IsUnit (t (bf s S x x)) :=
-    isUnit_of_forall_notMem fun m hm => by
-      have hπ : ∀ k, Ideal.Quotient.mk m.asIdeal (c k) = if m = k then 1 else 0 := fun k => by
-        have := Ideal.Quotient.eq.2 (hc k m)
-        rw [this]
-        split_ifs <;> simp
-      have h1
-          : Ideal.Quotient.mk m.asIdeal (t (bf s S x x))
-            = Ideal.Quotient.mk m.asIdeal (t (bf s S (xm m) (xm m))) := by
-        rw [hval]
-        set_option synthInstance.maxHeartbeats 100000 in
-          simp only [map_sum, map_mul, hπ]
-        simp
-      rw [Ideal.Quotient.eq_zero_iff_mem.2 hm] at h1
-      exact hxm m (Ideal.Quotient.eq_zero_iff_mem.1 h1.symm)
+  have hunit : IsUnit (t (bf s S x x)) := isUnit_of_forall_notMem fun m hm => by
+    have hπ : ∀ k, Ideal.Quotient.mk m.asIdeal (c k) = if m = k then 1 else 0 := fun k => by
+      have := Ideal.Quotient.eq.2 (hc k m)
+      rw [this]
+      split_ifs <;> simp
+    have h1 : Ideal.Quotient.mk m.asIdeal (t (bf s S x x))
+        = Ideal.Quotient.mk m.asIdeal (t (bf s S (xm m) (xm m))) := by
+      rw [hval]
+
+      simp only [map_sum, map_mul, hπ]
+      simp
+    rw [Ideal.Quotient.eq_zero_iff_mem.2 hm] at h1
+    exact hxm m (Ideal.Quotient.eq_zero_iff_mem.1 h1.symm)
   exact ⟨x, hunit.unit, by rw [IsUnit.unit_spec]; exact (hfix _ (bf_conj hs hS x x)).symm⟩
 
-theorem cT_fromBlocks
-    {l m : Type} (a : Matrix l l A) (b : Matrix l m A) (c : Matrix m l A) (d : Matrix m m A)
-    : cT s (fromBlocks a b c d) = fromBlocks (cT s a) (cT s c) (cT s b) (cT s d) := by
+theorem cT_fromBlocks {l m : Type} (a : Matrix l l A) (b : Matrix l m A) (c : Matrix m l A)
+    (d : Matrix m m A) : cT s (fromBlocks a b c d) = fromBlocks (cT s a) (cT s c) (cT s b) (cT s d) := by
   rw [cT, Matrix.fromBlocks_map, Matrix.fromBlocks_transpose]
   rfl
 
-variable (s R) in
-def DiagProp
-    (A : Type) [CommRing A] [Algebra R A] (s : A →+* A) (ι : Type) [Fintype ι] [DecidableEq ι]
-    : Prop :=
-  ∀ S : Matrix ι ι A,
-    cT s S = S → IsUnit S.det
-      → ∃ (g : Matrix ι ι A) (D : ι → Rˣ),
-        IsUnit g.det ∧ cT s g * S * g = diagonal fun i => algebraMap R A (D i : R)
 
-theorem DiagProp.of_equiv
-    {κ : Type} [Fintype κ] [DecidableEq κ] (e : ι ≃ κ) (h : DiagProp (R := R) A s ι)
-    : DiagProp (R := R) A s κ := by
+variable (s R) in
+def DiagProp (A : Type) [CommRing A] [Algebra R A] (s : A →+* A) (ι : Type) [Fintype ι] [DecidableEq ι] : Prop :=
+  ∀ S : Matrix ι ι A, cT s S = S → IsUnit S.det →
+    ∃ (g : Matrix ι ι A) (D : ι → Rˣ), IsUnit g.det ∧
+      cT s g * S * g = diagonal fun i => algebraMap R A (D i : R)
+
+theorem DiagProp.of_equiv {κ : Type} [Fintype κ] [DecidableEq κ] (e : ι ≃ κ)
+    (h : DiagProp (R := R) A s ι) : DiagProp (R := R) A s κ := by
   intro S hS hdet
   have hS' : cT s (S.submatrix e e) = S.submatrix e e := by
     ext i j
     simp only [cT_apply, submatrix_apply]
     rw [← cT_apply, hS]
   obtain ⟨g, D, hg, hgS⟩ := h (S.submatrix e e) hS' (by rwa [Matrix.det_submatrix_equiv_self])
-  refine
-    ⟨g.submatrix e.symm e.symm, fun k => D (e.symm k), by rwa [Matrix.det_submatrix_equiv_self], ?_⟩
-  have h1
-      : (cT s g * S.submatrix e e * g).submatrix e.symm e.symm
-        = (diagonal fun i => algebraMap R A (D i : R)).submatrix e.symm e.symm := by
-    rw [hgS]
+  refine ⟨g.submatrix e.symm e.symm, fun k => D (e.symm k), by rwa [Matrix.det_submatrix_equiv_self], ?_⟩
+  have h1 : (cT s g * S.submatrix e e * g).submatrix e.symm e.symm
+      = (diagonal fun i => algebraMap R A (D i : R)).submatrix e.symm e.symm := by rw [hgS]
   have hc : cT s (g.submatrix e.symm e.symm) = (cT s g).submatrix e.symm e.symm := rfl
   have hS2 : S = (S.submatrix e e).submatrix e.symm e.symm := by
     ext i j
@@ -331,24 +346,22 @@ theorem DiagProp.of_equiv
   simp [Matrix.diagonal_apply]
 
 include hs hR in
-theorem split_step
-    (ih : DiagProp (R := R) A s ι)
-    {S : Matrix (Unit ⊕ ι) (Unit ⊕ ι) A} (hS : cT s S = S) (hdet : IsUnit S.det)
-    (r : Rˣ) (h0 : S (Sum.inl ()) (Sum.inl ()) = algebraMap R A r)
-    : ∃ (g : Matrix (Unit ⊕ ι) (Unit ⊕ ι) A) (D : Unit ⊕ ι → Rˣ),
-      IsUnit g.det ∧ cT s g * S * g = diagonal fun i => algebraMap R A (D i : R) := by
+theorem split_step (ih : DiagProp (R := R) A s ι) {S : Matrix (Unit ⊕ ι) (Unit ⊕ ι) A} (hS : cT s S = S)
+    (hdet : IsUnit S.det) (r : Rˣ) (h0 : S (Sum.inl ()) (Sum.inl ()) = algebraMap R A r) :
+    ∃ (g : Matrix (Unit ⊕ ι) (Unit ⊕ ι) A) (D : Unit ⊕ ι → Rˣ), IsUnit g.det ∧
+      cT s g * S * g = diagonal fun i => algebraMap R A (D i : R) := by
   obtain ⟨a, b, c, d, rfl⟩ : ∃ a b c d, S = fromBlocks a b c d :=
     ⟨_, _, _, _, (fromBlocks_toBlocks S).symm⟩
   set u := algebraMap R A (r : R) with hu
   set v := algebraMap R A ((r⁻¹ : Rˣ) : R) with hv
-  have huv : u * v = 1 := by rw [hu, hv, ← map_mul, Units.mul_inv, map_one]
+  have huv : u * v = 1 := by
+    rw [hu, hv, ← map_mul, Units.mul_inv, map_one]
   have hsv : s v = v := hR _
   rw [cT_fromBlocks] at hS
   obtain ⟨-, hcb, hbc, hd⟩ := Matrix.fromBlocks_inj.1 hS
   have ha : a = u • (1 : Matrix Unit Unit A) := by
     ext i j
-    cases i
-    cases j
+    cases i; cases j
     simpa using h0
   subst ha
   set P : Matrix (Unit ⊕ ι) (Unit ⊕ ι) A := fromBlocks 1 (-(v • b)) 0 1 with hP
@@ -368,10 +381,11 @@ theorem split_step
   have huv' : v * u = 1 := by rw [mul_comm, huv]
   have hcong : cT s P * fromBlocks (u • 1) b c d * P = fromBlocks (u • 1) 0 0 d' := by
     rw [hcP, hP, Matrix.fromBlocks_multiply, Matrix.fromBlocks_multiply]
-    have e1 : (u • (1 : Matrix Unit Unit A)) * (-(v • b)) + b = 0 := by simp [smul_smul, huv']
-    have e2 : -(v • c) * (u • (1 : Matrix Unit Unit A)) + c = 0 := by simp [smul_smul, huv, huv']
-    simp only [Matrix.one_mul, Matrix.zero_mul, Matrix.mul_one, Matrix.mul_zero, add_zero, zero_add,
-      e2, e1]
+    have e1 : (u • (1 : Matrix Unit Unit A)) * (-(v • b)) + b = 0 := by
+      simp [smul_smul, huv']
+    have e2 : -(v • c) * (u • (1 : Matrix Unit Unit A)) + c = 0 := by
+      simp [smul_smul, huv, huv']
+    simp only [Matrix.one_mul, Matrix.zero_mul, Matrix.mul_one, Matrix.mul_zero, add_zero, zero_add, e2, e1]
     congr 1
     rw [hd']
     simp only [Matrix.neg_mul, Matrix.smul_mul]
@@ -379,8 +393,7 @@ theorem split_step
   have hcb' : cT s (c * b) = c * b := by rw [cT_mul, hbc, hcb]
   have hherm : cT s d' = d' := by
     ext i j
-    simp only [hd', cT_apply, Matrix.sub_apply, Matrix.smul_apply, smul_eq_mul, map_sub, map_mul,
-      hsv]
+    simp only [hd', cT_apply, Matrix.sub_apply, Matrix.smul_apply, smul_eq_mul, map_sub, map_mul, hsv]
     rw [← cT_apply, ← cT_apply, hd, hcb']
   have hdet' : IsUnit d'.det := by
     have h1 := isUnit_det_congr (s := s) _ P hdet (by rw [hPdet]; exact isUnit_one)
@@ -400,12 +413,10 @@ theorem split_step
   · rw [Matrix.det_mul, hPdet, one_mul, hg3, Matrix.det_fromBlocks_zero₂₁]
     simpa using hg'
   · rw [congr_mul, hcong, hc3, hg3, Matrix.fromBlocks_multiply, Matrix.fromBlocks_multiply]
-    simp only [Matrix.one_mul, Matrix.zero_mul, Matrix.mul_one, Matrix.mul_zero, add_zero, zero_add,
-      hgd]
+    simp only [Matrix.one_mul, Matrix.zero_mul, Matrix.mul_one, Matrix.mul_zero, add_zero, zero_add, hgd]
     have hdiag : u • (1 : Matrix Unit Unit A) = diagonal fun _ => u := by
       ext i j
-      cases i
-      cases j
+      cases i; cases j
       simp
     rw [hdiag, Matrix.fromBlocks_diagonal]
     congr 1
@@ -413,13 +424,13 @@ theorem split_step
     cases i <;> rfl
 
 include hs hR ht hfix hθ hsθ h2 in
-theorem diagProp_succ
-    [Finite (MaximalSpectrum R)] [Finite (MaximalSpectrum A)] (ih : DiagProp (R := R) A s ι)
-    : DiagProp (R := R) A s (Unit ⊕ ι) := by
+theorem diagProp_succ [Finite (MaximalSpectrum R)] [Finite (MaximalSpectrum A)]
+    (ih : DiagProp (R := R) A s ι) : DiagProp (R := R) A s (Unit ⊕ ι) := by
   intro S hS hdet
   obtain ⟨x, r, hx⟩ := exists_value_unit hs hR t ht hfix hθ hsθ h2 hS hdet
   set v := algebraMap R A ((r⁻¹ : Rˣ) : R) with hv
-  have hvr : v * algebraMap R A (r : R) = 1 := by rw [hv, ← map_mul, Units.inv_mul, map_one]
+  have hvr : v * algebraMap R A (r : R) = 1 := by
+    rw [hv, ← map_mul, Units.inv_mul, map_one]
   have hl : ∑ j, (v * ∑ i, s (x i) * S i j) * x j = 1 := by
     rw [← hvr, ← hx]
     simp only [bf, dotProduct, mulVec, Finset.mul_sum, Finset.sum_mul]
@@ -429,15 +440,14 @@ theorem diagProp_succ
   have h00 : (cT s g1 * S * g1) (Sum.inl ()) (Sum.inl ()) = algebraMap R A (r : R) := by
     rw [congr_apply, ← hx]
     simp only [hcol]
-  obtain ⟨g2, D, hg2, h⟩ :=
-    split_step hs hR ih (cT_congr hs hS g1) (isUnit_det_congr S g1 hdet hg1) r h00
+  obtain ⟨g2, D, hg2, h⟩ := split_step hs hR ih (cT_congr hs hS g1) (isUnit_det_congr S g1 hdet hg1) r h00
   refine ⟨g1 * g2, D, by rw [Matrix.det_mul]; exact hg1.mul hg2, ?_⟩
   rw [congr_mul]
   exact h
 
 include hs hR ht hfix hθ hsθ h2 in
-theorem diagProp_fin [Finite (MaximalSpectrum R)] [Finite (MaximalSpectrum A)] (n : ℕ)
-    : DiagProp (R := R) A s (Fin n) := by
+theorem diagProp_fin [Finite (MaximalSpectrum R)] [Finite (MaximalSpectrum A)] (n : ℕ) :
+    DiagProp (R := R) A s (Fin n) := by
   induction n with
   | zero =>
     intro S _ _
@@ -455,17 +465,7 @@ namespace GlobalTheory.CompanionTheory.SW
 open HeckeCharacterZeroLocus.SiegelWeilU NumberField IsDedekindDomain MeasureTheory Topology
 open scoped TensorProduct ENNReal NNReal Matrix
 
-theorem exists_diagonal_congr
-    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-        (σ : E →ₐ[F] E),
-      IsCMExt F E σ
-        → ∀ (R : Type) [CommRing R] [Algebra F R] [IsArtinianRing R] [IsReduced R] (n : ℕ)
-            (S : Matrix (Fin n) (Fin n) (R ⊗[F] E)),
-          cT (sigR R σ) S = S → IsUnit S.det
-            → ∃ (g : GL (Fin n) (R ⊗[F] E)) (D : Fin n → Rˣ),
-              cT (sigR R σ) (g : Matrix (Fin n) (Fin n) (R ⊗[F] E)) * S
-                  * (g : Matrix (Fin n) (Fin n) (R ⊗[F] E))
-                = Matrix.diagonal fun i => algebraMap R (R ⊗[F] E) (D i : R) := by
+theorem exists_diagonal_congr : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E), IsCMExt F E σ → ∀ (R : Type) [CommRing R] [Algebra F R] [IsArtinianRing R] [IsReduced R] (n : ℕ) (S : Matrix (Fin n) (Fin n) (R ⊗[F] E)), cT (sigR R σ) S = S → IsUnit S.det → ∃ (g : GL (Fin n) (R ⊗[F] E)) (D : Fin n → Rˣ), cT (sigR R σ) (g : Matrix (Fin n) (Fin n) (R ⊗[F] E)) * S * (g : Matrix (Fin n) (Fin n) (R ⊗[F] E)) = Matrix.diagonal fun i => algebraMap R (R ⊗[F] E) (D i : R) := by
   intro F E _ _ _ _ _ σ h R _ _ _ _ n S hS hdet
   have h2 : Module.finrank F E = 2 := h.2.2.1
   have h' : Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.IsCMExt F E σ := h
@@ -483,9 +483,8 @@ theorem exists_diagonal_congr
     simp
   let t : (R ⊗[F] E) →ₗ[R] R := algebraMap F R (1 / 2) • Algebra.trace R (R ⊗[F] E)
   have ht : ∀ r, t (algebraMap R (R ⊗[F] E) r) = r := fun r => by
-    have :=
-      Algebra.trace_algebraMap_of_basis
-        (Algebra.TensorProduct.basis R (Module.finBasisOfFinrankEq F E h2)) r
+    have := Algebra.trace_algebraMap_of_basis
+      (Algebra.TensorProduct.basis R (Module.finBasisOfFinrankEq F E h2)) r
     simp only [t, LinearMap.smul_apply, this, Fintype.card_fin, smul_eq_mul, nsmul_eq_mul]
     rw [← mul_assoc]
     norm_num [hhalf]

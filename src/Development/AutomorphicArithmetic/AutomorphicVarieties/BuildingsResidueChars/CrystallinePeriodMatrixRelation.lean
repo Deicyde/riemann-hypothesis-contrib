@@ -1,20 +1,59 @@
 module
 
+public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.MkMemAdmissibleAtIffCocycle
+public import Development.AutomorphicArithmetic.AutomorphicVarieties.PadicHodgeTheory.FiniteCohomology
 public import Development.AutomorphicArithmetic.AutomorphicVarieties.BuildingsResidueChars.CrystallineVectorBasisExpansion
-public import Development.AutomorphicArithmetic.AutomorphicVarieties.PadicHodgeTheory.WtMatFix
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
-open Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N Formalism.BasicNotions
-  Formalism.BasicNotions.Loc ReciprocityTheory.Gal TensorProduct Module UpperTheory.V.Loc Polynomial
+open Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N Formalism.BasicNotions Formalism.BasicNotions.Loc ReciprocityTheory.Gal TensorProduct Module UpperTheory.V.Loc Polynomial
 
-private theorem specRoot_semi
-    {R K U : Type} [Field R] [Field K] [Algebra R K] [AddCommGroup U] [Module R U]
+private theorem specRoot_semi {R K U : Type} [Field R] [Field K] [Algebra R K] [AddCommGroup U] [Module R U]
     {d : ℕ} (Φ : (Fin d → K) → U) (hadd : ∀ a b, Φ (a + b) = Φ a + Φ b)
-    (hsm : ∀ (r : R) a, Φ (r • a) = r • Φ a)
-    (T : Module.End R U) (F : Matrix (Fin d) (Fin d) K) (h : ∀ c, T (Φ c) = Φ (F.mulVec c))
-    (q : R[X]) (c : Fin d → K)
-    : aeval T q (Φ c) = Φ ((aeval F q).mulVec c) := by
+    (hsm : ∀ (r : R) a, Φ (r • a) = r • Φ a) (T : Module.End R U) (F : Matrix (Fin d) (Fin d) K)
+    (h : ∀ c, T (Φ c) = Φ (F.mulVec c)) (q : R[X]) (c : Fin d → K) :
+    aeval T q (Φ c) = Φ ((aeval F q).mulVec c) := by
   have hp : ∀ (n : ℕ) (c : Fin d → K), (T ^ n) (Φ c) = Φ ((F ^ n).mulVec c) := by
     intro n
     induction n with
@@ -23,28 +62,22 @@ private theorem specRoot_semi
       intro c
       rw [pow_succ', Module.End.mul_apply, ih, h, Matrix.mulVec_mulVec, pow_succ']
   induction q using Polynomial.induction_on' with
-  | add p q hp hq =>
-    rw [map_add (f := _), map_add (f := _), LinearMap.add_apply, hp, hq, Matrix.add_mulVec, hadd]
+  | add p q hp hq => rw [map_add (f := _), map_add (f := _), LinearMap.add_apply, hp, hq, Matrix.add_mulVec, hadd]
   | monomial n a =>
-    rw [aeval_monomial, aeval_monomial, ← Algebra.smul_def, ← Algebra.smul_def,
-      LinearMap.smul_apply, hp, Matrix.smul_mulVec, hsm]
+    rw [aeval_monomial, aeval_monomial, ← Algebra.smul_def, ← Algebra.smul_def, LinearMap.smul_apply, hp,
+      Matrix.smul_mulVec, hsm]
 
-private theorem specRoot_spec
-    {R K L : Type} [Field R] [Field K] [Field L] [Algebra R K] [Algebra K L] [Algebra R L]
-    [IsScalarTower R K L] [IsAlgClosed L]
-    {d : ℕ} (F : Matrix (Fin d) (Fin d) K)
-    (q : R[X]) (hq : q ≠ 0)
-    (c : Fin d → K) (hc : c ≠ 0) (h : (aeval F q).mulVec c = 0)
-    : ∃ β ∈ spectrum L (F.map (algebraMap K L)), aeval β q = 0 := by
+private theorem specRoot_spec {R K L : Type} [Field R] [Field K] [Field L] [Algebra R K] [Algebra K L]
+    [Algebra R L] [IsScalarTower R K L] [IsAlgClosed L] {d : ℕ} (F : Matrix (Fin d) (Fin d) K) (q : R[X])
+    (hq : q ≠ 0) (c : Fin d → K) (hc : c ≠ 0) (h : (aeval F q).mulVec c = 0) :
+    ∃ β ∈ spectrum L (F.map (algebraMap K L)), aeval β q = 0 := by
   have h1 : (aeval F q).det = 0 := Matrix.exists_mulVec_eq_zero_iff.1 ⟨c, hc, h⟩
-  have h2
-      : (algebraMap K L).mapMatrix (aeval F q)
-        = aeval (F.map (algebraMap K L)) (q.map (algebraMap R L)) := by
-    refine Polynomial.map_aeval_eq_aeval_map (φ := algebraMap R L) (ψ := (algebraMap K L).mapMatrix)
-      ?_ q F
+  have h2 : (algebraMap K L).mapMatrix (aeval F q) =
+      aeval (F.map (algebraMap K L)) (q.map (algebraMap R L)) := by
+    refine Polynomial.map_aeval_eq_aeval_map (φ := algebraMap R L)
+      (ψ := (algebraMap K L).mapMatrix) ?_ q F
     ext r i j
-    simp only [RingHom.comp_apply, RingHom.mapMatrix_apply, Matrix.map_apply,
-      Matrix.algebraMap_matrix_apply]
+    simp only [RingHom.comp_apply, RingHom.mapMatrix_apply, Matrix.map_apply, Matrix.algebraMap_matrix_apply]
     split_ifs
     · simp [← IsScalarTower.algebraMap_apply]
     · simp
@@ -53,40 +86,14 @@ private theorem specRoot_spec
     exact not_isUnit_zero
   have hq' : q.map (algebraMap R L) ≠ 0 := Polynomial.map_ne_zero hq
   have hs := (IsAlgClosed.splits (q.map (algebraMap R L))).eq_prod_roots
-  obtain ⟨β, hβ, e⟩ :=
-    spectrum.exists_mem_of_not_isUnit_aeval_prod (p := q.map (algebraMap R L))
-      (a := F.map (algebraMap K L))
-      (fun hu =>
-        h3 (by
-          rw [hs, map_mul, aeval_C]
-          exact ((IsUnit.mk0 _ (leadingCoeff_ne_zero.2 hq')).map _).mul hu))
+  obtain ⟨β, hβ, e⟩ := spectrum.exists_mem_of_not_isUnit_aeval_prod (p := q.map (algebraMap R L))
+    (a := F.map (algebraMap K L)) (fun hu => h3 (by
+      rw [hs, map_mul, aeval_C]
+      exact ((IsUnit.mk0 _ (leadingCoeff_ne_zero.2 hq')).map _).mul hu))
   exact ⟨β, hβ, by rwa [eval_map_algebraMap] at e⟩
 
-theorem UpperTheory.crystalline_period_matrix_relation
-    : ∀ {l : ℕ} [Fact l.Prime] (K : FinExt l) (f : ℕ),
-      (∀ x : ↥(K0 K), (((PP l).PD K).σ)^[f] x = x)
-        → ∀ {V : Type} [AddCommGroup V] [Module ℚ_[l] V] [FiniteDimensional ℚ_[l] V]
-            (ρ : Representation ℚ_[l] ↥(GK K) V) {d : ℕ} (e : Basis (Fin d) ℚ_[l] V)
-            (M M' : Matrix (Fin d) (Fin d) (Bcr l)),
-          M * M' = 1
-            → (∀ g : ↥(GK K),
-              (LinearMap.toMatrix e e (ρ g)).map (algebraMap ℚ_[l] (Bcr l))
-                  * M.map ((PP l).actQ (g : GQ l))
-                = M)
-            → ∀ F : Matrix (Fin d) (Fin d) ↥(K0 K),
-              M.map (((PP l).φB)^[f]) = M * F.map (algebraMap ↥(K0 K) (Bcr l))
-                → ∀ x ∈ Dcris ((PP l).PD K) ρ,
-                  x ≠ 0
-                    → ∀ q : ℚ_[l][X],
-                      q ≠ 0
-                        → aeval
-                            ((φVB ((PP l).PD K) (LL := ℚ_[l]) (V := V)
-                                : Module.End ℚ_[l] (V ⊗[ℚ_[l]] Bcr l))
-                              ^ f)
-                            q x
-                          = 0
-                        → ∃ β ∈ spectrum (Om l) (F.map (algebraMap ↥(K0 K) (Om l))),
-                          aeval β q = 0 := by
+theorem UpperTheory.crystalline_period_matrix_relation :
+    ∀ {l : ℕ} [Fact l.Prime] (K : FinExt l) (f : ℕ), (∀ x : ↥(K0 K), (((PP l).PD K).σ)^[f] x = x) → ∀ {V : Type} [AddCommGroup V] [Module ℚ_[l] V] [FiniteDimensional ℚ_[l] V] (ρ : Representation ℚ_[l] ↥(GK K) V) {d : ℕ} (e : Basis (Fin d) ℚ_[l] V) (M M' : Matrix (Fin d) (Fin d) (Bcr l)), M * M' = 1 → (∀ g : ↥(GK K), (LinearMap.toMatrix e e (ρ g)).map (algebraMap ℚ_[l] (Bcr l)) * M.map ((PP l).actQ (g : GQ l)) = M) → ∀ F : Matrix (Fin d) (Fin d) ↥(K0 K), M.map (((PP l).φB)^[f]) = M * F.map (algebraMap ↥(K0 K) (Bcr l)) → ∀ x ∈ Dcris ((PP l).PD K) ρ, x ≠ 0 → ∀ q : ℚ_[l][X], q ≠ 0 → aeval ((φVB ((PP l).PD K) (LL := ℚ_[l]) (V := V) : Module.End ℚ_[l] (V ⊗[ℚ_[l]] Bcr l)) ^ f) q x = 0 → ∃ β ∈ spectrum (Om l) (F.map (algebraMap ↥(K0 K) (Om l))), aeval β q = 0 := by
   intro l _ K f hσ V _ _ _ ρ d e M M' hMM hρ F hF x hx hx0 q hq h0
   obtain ⟨c, hc⟩ := UpperTheory.crystalline_vector_basis_expansion K ρ e M M' hMM hρ x hx
   have hMM' : M' * M = 1 := mul_eq_one_comm.1 hMM
@@ -99,13 +106,10 @@ theorem UpperTheory.crystalline_period_matrix_relation
     | zero => intro c; rfl
     | succ k ih =>
       intro c
-      rw [Function.iterate_succ_apply', Function.iterate_succ_apply', ih, ← (PP l).PD_φ K,
-        ((PP l).PD K).φ_K₀]
-  have hT
-      : ∀ (k : ℕ) (v : V) (b : Bcr l),
-        ((φVB ((PP l).PD K) (LL := ℚ_[l]) (V := V) : Module.End ℚ_[l] (V ⊗[ℚ_[l]] Bcr l)) ^ k)
-            (v ⊗ₜ[ℚ_[l]] b)
-          = v ⊗ₜ[ℚ_[l]] (((PP l).φB)^[k] b) := by
+      rw [Function.iterate_succ_apply', Function.iterate_succ_apply', ih, ← (PP l).PD_φ K, ((PP l).PD K).φ_K₀]
+  have hT : ∀ (k : ℕ) (v : V) (b : Bcr l),
+      ((φVB ((PP l).PD K) (LL := ℚ_[l]) (V := V) : Module.End ℚ_[l] (V ⊗[ℚ_[l]] Bcr l)) ^ k) (v ⊗ₜ[ℚ_[l]] b) =
+        v ⊗ₜ[ℚ_[l]] (((PP l).φB)^[k] b) := by
     intro k
     induction k with
     | zero => intro v b; rfl
@@ -115,36 +119,32 @@ theorem UpperTheory.crystalline_period_matrix_relation
       rfl
   let ψ : Bcr l →+* Bcr l := (((PP l).φB ^ f : Bcr l →ₐ[ℚ_[l]] Bcr l) : Bcr l →+* Bcr l)
   have hψ : (ψ : Bcr l → Bcr l) = ((PP l).φB)^[f] := AlgHom.coe_pow _ _
-  have key :=
-    specRoot_semi Φ
-      (fun a b => by
-        simp only [Φ, Pi.add_apply, map_add (f := _), ← Finset.sum_add_distrib,
-          ← TensorProduct.tmul_add]
-        refine Finset.sum_congr rfl fun i _ => ?_
-        congr 1
-        simp only [Matrix.mulVec, dotProduct, mul_add, Finset.sum_add_distrib])
-      (fun (r : ℚ_[l]) a => by
-        simp only [Φ, Finset.smul_sum, ← TensorProduct.tmul_smul]
-        refine Finset.sum_congr rfl fun i _ => ?_
-        congr 1
-        simp only [Matrix.mulVec, dotProduct, Finset.smul_sum, Pi.smul_apply, Algebra.smul_def,
-          map_mul, j, ← IsScalarTower.algebraMap_apply, Finset.mul_sum]
-        exact Finset.sum_congr rfl fun k _ => by ring)
-      ((φVB ((PP l).PD K) (LL := ℚ_[l]) (V := V) : Module.End ℚ_[l] (V ⊗[ℚ_[l]] Bcr l)) ^ f) F
-      (fun c => by
-        set_option synthInstance.maxHeartbeats 100000 in
-          simp only [Φ, map_sum, hT]
-        refine Finset.sum_congr rfl fun i _ => ?_
-        congr 1
-        rw [← hψ, RingHom.map_mulVec, hψ, hF, ← Matrix.mulVec_mulVec]
-        have e1 : ((PP l).φB)^[f] ∘ (fun k => j (c k)) = j ∘ c := by
-          funext m
-          exact (hfix f _).trans (congrArg j (hσ _))
-        have e2 : (F.map j).mulVec (j ∘ c) = fun k => j (F.mulVec c k) := by
-          funext k
-          exact (RingHom.map_mulVec j F c k).symm
-        rw [e1, e2])
-      q c
+  have key := specRoot_semi Φ (fun a b => by
+      simp only [Φ, Pi.add_apply, map_add (f := _), ← Finset.sum_add_distrib, ← TensorProduct.tmul_add]
+      refine Finset.sum_congr rfl fun i _ => ?_
+      congr 1
+      simp only [Matrix.mulVec, dotProduct, mul_add, Finset.sum_add_distrib])
+    (fun (r : ℚ_[l]) a => by
+      simp only [Φ, Finset.smul_sum, ← TensorProduct.tmul_smul]
+      refine Finset.sum_congr rfl fun i _ => ?_
+      congr 1
+      simp only [Matrix.mulVec, dotProduct, Finset.smul_sum, Pi.smul_apply, Algebra.smul_def, map_mul, j,
+        ← IsScalarTower.algebraMap_apply, Finset.mul_sum]
+      exact Finset.sum_congr rfl fun k _ => by ring)
+    ((φVB ((PP l).PD K) (LL := ℚ_[l]) (V := V) : Module.End ℚ_[l] (V ⊗[ℚ_[l]] Bcr l)) ^ f) F
+    (fun c => by
+
+      simp only [Φ, map_sum, hT]
+      refine Finset.sum_congr rfl fun i _ => ?_
+      congr 1
+      rw [← hψ, RingHom.map_mulVec, hψ, hF, ← Matrix.mulVec_mulVec]
+      have e1 : ((PP l).φB)^[f] ∘ (fun k => j (c k)) = j ∘ c := by
+        funext m
+        exact (hfix f _).trans (congrArg j (hσ _))
+      have e2 : (F.map j).mulVec (j ∘ c) = fun k => j (F.mulVec c k) := by
+        funext k
+        exact (RingHom.map_mulVec j F c k).symm
+      rw [e1, e2]) q c
   have hxc : x = Φ c := hc
   rw [← hxc, h0] at key
   refine specRoot_spec F q hq c ?_ ?_
@@ -153,12 +153,10 @@ theorem UpperTheory.crystalline_period_matrix_relation
     rw [hc]
     simp [Matrix.mulVec, dotProduct]
   · set y := (aeval F q).mulVec c
-    have h1 :=
-      TensorProduct.sum_tmul_basis_left_eq_zero e
-        (Finsupp.equivFunOnFinite.symm (M.mulVec (fun k => j (y k))))
-        (by
-          rw [Finsupp.sum_fintype _ _ (fun i => TensorProduct.tmul_zero _ _)]
-          exact key.symm)
+    have h1 := TensorProduct.sum_tmul_basis_left_eq_zero e
+      (Finsupp.equivFunOnFinite.symm (M.mulVec (fun k => j (y k)))) (by
+        rw [Finsupp.sum_fintype _ _ (fun i => TensorProduct.tmul_zero _ _)]
+        exact key.symm)
     have h2 : M.mulVec (fun k => j (y k)) = 0 := by
       funext i
       exact DFunLike.congr_fun h1 i

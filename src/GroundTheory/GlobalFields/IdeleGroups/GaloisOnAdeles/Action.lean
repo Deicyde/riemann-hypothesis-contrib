@@ -1,7 +1,51 @@
 module
 
-public import Mathlib
 public import GroundTheory.GlobalFields.IdeleGroups.GaloisOnAdeles
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+public import Mathlib.RepresentationTheory.Homological.GroupCohomology.Hilbert90
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -16,6 +60,7 @@ variable {K L : Type*} [Field K] [NumberField K] [Field L] [NumberField L] [Alge
 
 namespace AdeleBaseChange
 
+
 variable (K L) in
 def adeleRingAut : (L ≃ₐ[K] L) →* RingAut 𝔸[L] where
   toFun σ := adeleRingEquiv (σ : L ≃+* L)
@@ -25,12 +70,14 @@ def adeleRingAut : (L ≃ₐ[K] L) →* RingAut 𝔸[L] where
       adeleRingEquiv_trans]
     rfl
 
-instance : MulSemiringAction (L ≃ₐ[K] L) 𝔸[L] := MulSemiringAction.compHom _ (adeleRingAut K L)
+instance : MulSemiringAction (L ≃ₐ[K] L) 𝔸[L] :=
+  MulSemiringAction.compHom _ (adeleRingAut K L)
+
 
 omit [NumberField K] in
 @[simp]
-theorem smul_algebraMap (σ : L ≃ₐ[K] L) (l : L)
-    : σ • algebraMap L 𝔸[L] l = algebraMap L 𝔸[L] (σ l) :=
+theorem smul_algebraMap (σ : L ≃ₐ[K] L) (l : L) :
+    σ • algebraMap L 𝔸[L] l = algebraMap L 𝔸[L] (σ l) :=
   adeleRingEquiv_algebraMap _ l
 
 @[simp]
@@ -48,9 +95,10 @@ section Galois
 
 variable [IsGalois K L]
 
+
 open Classical in
-theorem isUnit_det_conjugates (b : Module.Basis (L ≃ₐ[K] L) K L)
-    : IsUnit (Matrix.of fun σ τ : L ≃ₐ[K] L ↦ σ (b τ)).det := by
+theorem isUnit_det_conjugates (b : Module.Basis (L ≃ₐ[K] L) K L) :
+    IsUnit (Matrix.of fun σ τ : L ≃ₐ[K] L ↦ σ (b τ)).det := by
   classical
   set D := Matrix.of fun σ τ : L ≃ₐ[K] L ↦ σ (b τ)
   have hT : D.transpose * D = (Algebra.traceMatrix K b).map (algebraMap K L) := by
@@ -66,7 +114,8 @@ theorem isUnit_det_conjugates (b : Module.Basis (L ≃ₐ[K] L) K L)
   rw [h, zero_mul] at hdet
   exact (FaithfulSMul.algebraMap_injective K L) (hdet.symm.trans (map_zero _).symm)
 
-theorem adeleMap_norm (y : 𝔸[L]) : adeleMap K L (Algebra.norm 𝔸[K] y) = ∏ σ : L ≃ₐ[K] L, σ • y := by
+theorem adeleMap_norm (y : 𝔸[L]) :
+    adeleMap K L (Algebra.norm 𝔸[K] y) = ∏ σ : L ≃ₐ[K] L, σ • y := by
   classical
   have hcard : Fintype.card (L ≃ₐ[K] L) = Module.finrank K L := by
     rw [Fintype.card_eq_nat_card]; exact IsGalois.card_aut_eq_finrank K L
@@ -75,16 +124,16 @@ theorem adeleMap_norm (y : 𝔸[L]) : adeleMap K L (Algebra.norm 𝔸[K] y) = �
   let B := adeleBasis b
   let M := Algebra.leftMulMatrix B y
   let D : Matrix (L ≃ₐ[K] L) (L ≃ₐ[K] L) L := Matrix.of fun σ τ ↦ σ (b τ)
-  have hM : ∀ ρ τ, M ρ τ = B.repr (y * B τ) ρ := fun ρ τ ↦ Algebra.leftMulMatrix_eq_repr_mul B y ρ τ
-  have hy
-      : ∀ τ, y * algebraMap L 𝔸[L] (b τ) = ∑ ρ, adeleMap K L (M ρ τ) * algebraMap L 𝔸[L] (b ρ) := by
+  have hM : ∀ ρ τ, M ρ τ = B.repr (y * B τ) ρ := fun ρ τ ↦
+    Algebra.leftMulMatrix_eq_repr_mul B y ρ τ
+  have hy : ∀ τ, y * algebraMap L 𝔸[L] (b τ) =
+      ∑ ρ, adeleMap K L (M ρ τ) * algebraMap L 𝔸[L] (b ρ) := by
     intro τ
     conv_lhs => rw [← B.sum_repr (y * algebraMap L 𝔸[L] (b τ))]
     refine Finset.sum_congr rfl fun ρ _ ↦ ?_
     rw [Algebra.smul_def, algebraMap_adeleRing, adeleBasis_apply, hM, adeleBasis_apply]
-  have key
-      : Matrix.diagonal (fun σ : L ≃ₐ[K] L ↦ σ • y) * D.map (algebraMap L 𝔸[L])
-        = D.map (algebraMap L 𝔸[L]) * M.map (adeleMap K L) := by
+  have key : Matrix.diagonal (fun σ : L ≃ₐ[K] L ↦ σ • y) * D.map (algebraMap L 𝔸[L]) =
+      D.map (algebraMap L 𝔸[L]) * M.map (adeleMap K L) := by
     ext σ τ
     rw [Matrix.diagonal_mul, Matrix.mul_apply]
     have h := congrArg (σ • ·) (hy τ)
@@ -93,14 +142,13 @@ theorem adeleMap_norm (y : 𝔸[L]) : adeleMap K L (Algebra.norm 𝔸[K] y) = �
     exact Finset.sum_congr rfl fun ρ _ ↦ mul_comm _ _
   have hdet := congrArg Matrix.det key
   rw [Matrix.det_mul, Matrix.det_mul, Matrix.det_diagonal, ← RingHom.mapMatrix_apply,
-      ← RingHom.mapMatrix_apply, ← RingHom.map_det, ← RingHom.map_det]
-    at hdet
+    ← RingHom.mapMatrix_apply, ← RingHom.map_det, ← RingHom.map_det] at hdet
   rw [Algebra.norm_eq_matrix_det B]
   rw [mul_comm] at hdet
   exact (((isUnit_det_conjugates b).map (algebraMap L 𝔸[L])).mul_left_cancel hdet).symm
 
-theorem exists_adeleMap_eq_sum_smul (y : 𝔸[L])
-    : ∃ a : 𝔸[K], adeleMap K L a = ∑ σ : L ≃ₐ[K] L, σ • y := by
+theorem exists_adeleMap_eq_sum_smul (y : 𝔸[L]) :
+    ∃ a : 𝔸[K], adeleMap K L a = ∑ σ : L ≃ₐ[K] L, σ • y := by
   classical
   let b := Module.finBasis K L
   let B := adeleBasis b
@@ -111,14 +159,15 @@ theorem exists_adeleMap_eq_sum_smul (y : 𝔸[L])
     rw [Algebra.smul_def, algebraMap_adeleRing, adeleBasis_apply]
   conv_rhs => rw [hy]
   simp only [Finset.smul_sum, smul_mul', smul_adeleMap, smul_algebraMap]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [Finset.sum_comm, map_sum]
-  refine Finset.sum_congr rfl fun i _ ↦ ?_
-  set_option synthInstance.maxHeartbeats 100000 in
-  rw [← Finset.mul_sum, ← map_sum, ← trace_eq_sum_automorphisms, map_mul, adeleMap_algebraMap]
 
-theorem forall_smul_eq_iff_mem_range (y : 𝔸[L])
-    : (∀ σ : L ≃ₐ[K] L, σ • y = y) ↔ y ∈ (adeleMap K L).range := by
+  rw [Finset.sum_comm, map_sum]
+  refine Finset.sum_congr rfl fun i _ ↦ ?_
+
+  rw [← Finset.mul_sum, ← map_sum, ← trace_eq_sum_automorphisms, map_mul,
+  adeleMap_algebraMap]
+
+theorem forall_smul_eq_iff_mem_range (y : 𝔸[L]) :
+    (∀ σ : L ≃ₐ[K] L, σ • y = y) ↔ y ∈ (adeleMap K L).range := by
   constructor
   · intro hy
     obtain ⟨a, ha⟩ := exists_adeleMap_eq_sum_smul (K := K) y
@@ -136,17 +185,19 @@ end Galois
 
 end AdeleBaseChange
 
-instance : MulDistribMulAction (L ≃ₐ[K] L) (IdeleGroup L) := Units.mulDistribMulActionRight
+instance : MulDistribMulAction (L ≃ₐ[K] L) (IdeleGroup L) :=
+  Units.mulDistribMulActionRight
 
 omit [NumberField K] in
 @[simp]
-theorem coe_smul_idele (σ : L ≃ₐ[K] L) (x : IdeleGroup L)
-    : ((σ • x : IdeleGroup L) : 𝔸[L]) = σ • (x : 𝔸[L]) :=
+theorem coe_smul_idele (σ : L ≃ₐ[K] L) (x : IdeleGroup L) :
+    ((σ • x : IdeleGroup L) : 𝔸[L]) = σ • (x : 𝔸[L]) :=
   rfl
 
+
 omit [NumberField K] in
-theorem smul_idele_eq_ideleEquiv (σ : L ≃ₐ[K] L) (x : IdeleGroup L)
-    : σ • x = ideleEquiv (σ : L ≃+* L) x :=
+theorem smul_idele_eq_ideleEquiv (σ : L ≃ₐ[K] L) (x : IdeleGroup L) :
+    σ • x = ideleEquiv (σ : L ≃+* L) x :=
   Units.ext rfl
 
 instance : ContinuousConstSMul (L ≃ₐ[K] L) (IdeleGroup L) where
@@ -156,47 +207,49 @@ instance : ContinuousConstSMul (L ≃ₐ[K] L) (IdeleGroup L) where
     rw [h]
     exact (ideleEquiv (σ : L ≃+* L)).continuous
 
+
 omit [NumberField K] in
 @[simp]
-theorem smul_diagonal (σ : L ≃ₐ[K] L) (l : Lˣ)
-    : σ • IdeleGroup.diagonal L l = IdeleGroup.diagonal L (σ • l) :=
+theorem smul_diagonal (σ : L ≃ₐ[K] L) (l : Lˣ) :
+    σ • IdeleGroup.diagonal L l = IdeleGroup.diagonal L (σ • l) :=
   Units.ext (smul_algebraMap σ (l : L))
 
 @[simp]
-theorem smul_ideleEmbedding (σ : L ≃ₐ[K] L) (x : IdeleGroup K)
-    : σ • ideleEmbedding K L x = ideleEmbedding K L x :=
+theorem smul_ideleEmbedding (σ : L ≃ₐ[K] L) (x : IdeleGroup K) :
+    σ • ideleEmbedding K L x = ideleEmbedding K L x :=
   Units.ext (smul_adeleMap σ (x : 𝔸[K]))
 
 @[simp]
-theorem ideleNorm_smul (σ : L ≃ₐ[K] L) (x : IdeleGroup L)
-    : ideleNorm K L (σ • x) = ideleNorm K L x :=
+theorem ideleNorm_smul (σ : L ≃ₐ[K] L) (x : IdeleGroup L) :
+    ideleNorm K L (σ • x) = ideleNorm K L x :=
   Units.ext (norm_smul σ (x : 𝔸[L]))
 
 section Galois
 
 variable [IsGalois K L]
 
-theorem ideleEmbedding_ideleNorm (x : IdeleGroup L)
-    : ideleEmbedding K L (ideleNorm K L x) = ∏ σ : L ≃ₐ[K] L, σ • x :=
+theorem ideleEmbedding_ideleNorm (x : IdeleGroup L) :
+    ideleEmbedding K L (ideleNorm K L x) = ∏ σ : L ≃ₐ[K] L, σ • x :=
   Units.ext (by rw [coe_ideleEmbedding, coe_ideleNorm, adeleMap_norm, Units.coe_prod]; rfl)
 
-theorem forall_smul_eq_iff_mem_range_ideleEmbedding (x : IdeleGroup L)
-    : (∀ σ : L ≃ₐ[K] L, σ • x = x) ↔ x ∈ (ideleEmbedding K L).range := by
+theorem forall_smul_eq_iff_mem_range_ideleEmbedding (x : IdeleGroup L) :
+    (∀ σ : L ≃ₐ[K] L, σ • x = x) ↔ x ∈ (ideleEmbedding K L).range := by
   constructor
   · intro hx
-    obtain ⟨a, ha⟩ :=
-      (forall_smul_eq_iff_mem_range (K := K) (x : 𝔸[L])).1 fun σ ↦ congrArg Units.val (hx σ)
-    obtain ⟨a', ha'⟩ :=
-      (forall_smul_eq_iff_mem_range (K := K) ((x⁻¹ : IdeleGroup L) : 𝔸[L])).1 fun σ ↦
-        congrArg Units.val (show σ • x⁻¹ = x⁻¹ by rw [smul_inv', hx σ])
-    have h1 : a * a' = 1 :=
-      adeleMap_injective (K := K) (L := L) (by rw [map_mul, ha, ha', Units.mul_inv, map_one])
+    obtain ⟨a, ha⟩ := (forall_smul_eq_iff_mem_range (K := K) (x : 𝔸[L])).1 fun σ ↦
+      congrArg Units.val (hx σ)
+    obtain ⟨a', ha'⟩ := (forall_smul_eq_iff_mem_range (K := K) ((x⁻¹ : IdeleGroup L) : 𝔸[L])).1
+      fun σ ↦ congrArg Units.val (show σ • x⁻¹ = x⁻¹ by rw [smul_inv', hx σ])
+    have h1 : a * a' = 1 := adeleMap_injective (K := K) (L := L) (by
+      rw [map_mul, ha, ha', Units.mul_inv, map_one])
     refine ⟨⟨a, a', h1, by rw [mul_comm, h1]⟩, Units.ext ?_⟩
     exact ha
   · rintro ⟨y, rfl⟩ σ
     exact smul_ideleEmbedding σ y
 
+
 end Galois
+
 
 variable (K L) in
 def ideleClassAut : (L ≃ₐ[K] L) →* MulAut (IdeleClassGroup L) where
@@ -207,16 +260,17 @@ def ideleClassAut : (L ≃ₐ[K] L) →* MulAut (IdeleClassGroup L) where
 instance : MulDistribMulAction (L ≃ₐ[K] L) (IdeleClassGroup L) :=
   MulDistribMulAction.compHom _ (ideleClassAut K L)
 
+
 omit [NumberField K] in
 @[simp]
-theorem smul_mk (σ : L ≃ₐ[K] L) (x : IdeleGroup L)
-    : σ • IdeleClassGroup.mk L x = IdeleClassGroup.mk L (σ • x) := by
+theorem smul_mk (σ : L ≃ₐ[K] L) (x : IdeleGroup L) :
+    σ • IdeleClassGroup.mk L x = IdeleClassGroup.mk L (σ • x) := by
   rw [smul_idele_eq_ideleEquiv]
   rfl
 
 @[simp]
-theorem smul_ideleClassMap (σ : L ≃ₐ[K] L) (c : IdeleClassGroup K)
-    : σ • ideleClassMap K L c = ideleClassMap K L c := by
+theorem smul_ideleClassMap (σ : L ≃ₐ[K] L) (c : IdeleClassGroup K) :
+    σ • ideleClassMap K L c = ideleClassMap K L c := by
   obtain ⟨x, rfl⟩ := IdeleClassGroup.mk_surjective K c
   rw [ideleClassMap_mk, smul_mk, smul_ideleEmbedding]
 
@@ -224,13 +278,13 @@ section Galois
 
 variable [IsGalois K L]
 
-theorem ideleClassMap_ideleClassNorm (c : IdeleClassGroup L)
-    : ideleClassMap K L (ideleClassNorm K L c) = ∏ σ : L ≃ₐ[K] L, σ • c := by
+theorem ideleClassMap_ideleClassNorm (c : IdeleClassGroup L) :
+    ideleClassMap K L (ideleClassNorm K L c) = ∏ σ : L ≃ₐ[K] L, σ • c := by
   obtain ⟨x, rfl⟩ := IdeleClassGroup.mk_surjective L c
   simp only [ideleClassNorm_mk, ideleClassMap_mk, ideleEmbedding_ideleNorm, smul_mk, map_prod]
 
-theorem forall_smul_eq_iff_mem_range_ideleClassMap (c : IdeleClassGroup L)
-    : (∀ σ : L ≃ₐ[K] L, σ • c = c) ↔ c ∈ (ideleClassMap K L).range := by
+theorem forall_smul_eq_iff_mem_range_ideleClassMap (c : IdeleClassGroup L) :
+    (∀ σ : L ≃ₐ[K] L, σ • c = c) ↔ c ∈ (ideleClassMap K L).range := by
   constructor
   · intro hc
     obtain ⟨x, rfl⟩ := IdeleClassGroup.mk_surjective L c
@@ -248,9 +302,8 @@ theorem forall_smul_eq_iff_mem_range_ideleClassMap (c : IdeleClassGroup L)
       rw [← ha, mul_smul, ha τ, smul_mul', ha σ, smul_diagonal, map_mul, mul_assoc,
         mul_comm (IdeleGroup.diagonal L (a σ))]
     obtain ⟨β, hβ⟩ := groupCohomology.isMulCoboundary₁_of_isMulCocycle₁_of_aut_to_units a hcoc
-    have hfix
-        : ∀ σ : L ≃ₐ[K] L,
-          σ • (x * (IdeleGroup.diagonal L β)⁻¹) = x * (IdeleGroup.diagonal L β)⁻¹ := by
+    have hfix : ∀ σ : L ≃ₐ[K] L, σ • (x * (IdeleGroup.diagonal L β)⁻¹) =
+        x * (IdeleGroup.diagonal L β)⁻¹ := by
       intro σ
       rw [smul_mul', smul_inv', ha σ, smul_diagonal, ← hβ σ, map_div, div_eq_mul_inv, mul_assoc x,
         mul_inv_cancel_comm]

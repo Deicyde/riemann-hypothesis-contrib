@@ -1,12 +1,66 @@
 module
 
-public import Formalism.HermitianCurvature.StatementQ
+import Formalism.HermitianCurvature.HermitianCurvatureProofs.RestrictionIrrelevantDoubleLevelOperator
 public import Formalism.FormalDegreeBessel.FormalDegreeRatio.GBasic
 public import Formalism.HermitianCurvature.HermitianCurvatureProofs.SumDualVectorEqZeta
 public import Formalism.HermitianCurvature.HermitianCurvatureProofs.ChainRecursionFromSingleDescent
-public import Formalism.RealPlaceAnalysis.RealPlaceTaylor.QuantumDetHighestWeightHolds
+import Formalism.HermitianCurvature.HermitianCurvatureProofs.RegularisedPairingViaPhase
+import Formalism.RealPlaceAnalysis.RealPlaceTaylor.CartanInvolutionConjTransposeMul
+import Formalism.RealPlaceAnalysis.RealPlaceTaylor.ComplexifiedDerivativeCommutator
 public import Formalism.RealPlaceAnalysis.RealPlaceTaylor.ShiftedGeneratorEqIteSmulAdd
-public import Formalism.RealPlaceAnalysis.RealPlaceTaylor.ComplexifiedDerivativeCommutator
+import Mathlib.Algebra.Order.Archimedean.Real.Hom
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Calculus.FDeriv.Symmetric
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.Normed.Algebra.MatrixExponential
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+public import Mathlib.Data.Fin.Parity
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.LinearAlgebra.Matrix.FiniteDimensional
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
@@ -457,41 +511,7 @@ theorem mulVec_bvec {m : ℕ} (g : Matrix (Fin m) (Fin m) ℂ) (i j : Fin m)
   simp [mulVec, dotProduct, bvec, Pi.single_apply]
 
 theorem Nlev_last {k r : ℕ} {n : Mx k r} (hn : n ∈ Nlev k r (Fin.last r)) : n = 1 := by
-  obtain ⟨⟨hU, -, h3⟩, -, hfix⟩ := hn
-  ext i j
-  by_cases hj1 : j.val < r
-  · have h := (hfix ⟨j.val, hj1⟩ (by simpa using hj1)).1
-    have e : eI k r ⟨j.val, hj1⟩ = j := Fin.ext rfl
-    rw [e] at h
-    have := congrFun h i
-    rw [mulVec_bvec] at this
-    rw [this, Matrix.one_apply, bvec, Pi.single_apply]
-  by_cases hj2 : r + k < j.val
-  · have hjl := j.isLt
-    have ha : 2 * r + k - j.val < r := by omega
-    have h := (hfix ⟨2 * r + k - j.val, ha⟩ (by simpa using ha)).2
-    have e : esI k r ⟨2 * r + k - j.val, ha⟩ = j := Fin.ext (by simp only [esI]; omega)
-    rw [e] at h
-    have := congrFun h i
-    rw [mulVec_bvec] at this
-    rw [this, Matrix.one_apply, bvec, Pi.single_apply]
-  by_cases hi : r ≤ i.val
-  · rw [h3 i j (by omega) (by omega) hi, Matrix.one_apply]
-  · have hi' : i.val < r := by omega
-    have h := (hfix ⟨i.val, hi'⟩ (by simpa using hi')).2
-    have h1 := herm_UH hU (bvec j) (bvec (esI k r ⟨i.val, hi'⟩))
-    rw [h, herm_bvec_right, herm_bvec_right, Hpk_mulVec, Hpk_mulVec] at h1
-    have es : GBasic.sig k r (esI k r ⟨i.val, hi'⟩) = i := by
-      apply Fin.ext
-      have hv : (esI k r ⟨i.val, hi'⟩).val = 2 * r + k - i.val := rfl
-      rw [GBasic.sig_hi k r _ (by rw [hv]; omega), hv]
-      omega
-    have sg : GBasic.sgn k r (esI k r ⟨i.val, hi'⟩) = 1 := by
-      have hv : (esI k r ⟨i.val, hi'⟩).val = 2 * r + k - i.val := rfl
-      unfold GBasic.sgn
-      rw [if_neg (by rw [hv]; omega)]
-    rw [es, sg, one_mul, one_mul, mulVec_bvec] at h1
-    rw [h1, Matrix.one_apply, bvec, Pi.single_apply]
+  apply Formalism.FourierDecayAlt.P.Qx8.Nlev_last <;> assumption
 
 theorem psi_one {k r : ℕ} {z : Fin (2 * r + k + 1) → ℂ} (hz : inWb k r z) (c : ℂ)
     : psi k r z c 1 = 1 := by
@@ -773,8 +793,8 @@ theorem ntw_qminor (hD : IsOpen D) (φ : E →L[ℂ] E') {t : ℕ} (a b : Fin t 
       (fun f => qminorOp (EH k r) (posL k r i ∘ a) (posL k r i ∘ b) u f)
       (fun f => qminorOp (EH k r) (posL k r i ∘ a) (posL k r i ∘ b) u f) := by
   intro f hf x hx
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [qminorOp, Finset.sum_apply, Pi.smul_apply, map_sum, map_smul]
+
+  simp only [qminorOp, Finset.sum_apply, Pi.smul_apply, map_sum, map_smul]
   refine Finset.sum_congr rfl fun σ _ => ?_
   congr 1
   have h :=
@@ -792,20 +812,20 @@ theorem ntw_tL
   fin_cases p <;> fin_cases q
   · exact ntw_qminor hD φ id id _ f hf x hx
   · show -(chatL _ _ _ _ _ _ x) = φ (-(chatL _ _ _ _ _ f x))
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [chatL, map_neg, map_sum, map_smul]
+
+    simp only [chatL, map_neg, map_sum, map_smul]
     congr 1
     refine Finset.sum_congr rfl fun i₁ _ => Finset.sum_congr rfl fun j₁ _ => ?_
     exact congrArg _ (ntw_qminor hD φ (skip1 i₁) (skip1 j₁) _ f hf x hx)
   · show -(chatL _ _ _ _ _ _ x) = φ (-(chatL _ _ _ _ _ f x))
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [chatL, map_neg, map_sum, map_smul]
+
+    simp only [chatL, map_neg, map_sum, map_smul]
     congr 1
     refine Finset.sum_congr rfl fun i₁ _ => Finset.sum_congr rfl fun j₁ _ => ?_
     exact congrArg _ (ntw_qminor hD φ (skip1 i₁) (skip1 j₁) _ f hf x hx)
   · show -(chat2L _ _ _ _ _ _ _ _ x) = φ (-(chat2L _ _ _ _ _ _ _ f x))
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [chat2L, map_neg, map_sum]
+
+    simp only [chat2L, map_neg, map_sum]
     congr 1
     refine Finset.sum_congr rfl fun i₁ _ =>
       Finset.sum_congr rfl fun i₂ _ =>

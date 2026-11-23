@@ -1,115 +1,88 @@
 module
 
-public import Mathlib
+import Development.AbelianVarietyTheory.Proofs.FlagMeasures.ImageRationalOrthComplementUnitaryEqRationalStab
 public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.IsFinEmb
 public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.RationalUnitaryPointsDiscreteFundamentalDomain
 public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.AutPointLatticeIntersectionSelfDualProperties
 public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.ExistsUnitaryMulVecEqOfFormEqStatement
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
-open MeasureTheory NumberField Matrix Finset Formalism.MainNotions.S GlobalTheory.Count
-  GlobalTheory.FlagMeas GlobalTheory.GaussMean GlobalTheory.StabUnfold
+open MeasureTheory NumberField Matrix Finset Formalism.MainNotions.S GlobalTheory.Count GlobalTheory.FlagMeas GlobalTheory.GaussMean GlobalTheory.StabUnfold
 open scoped TensorProduct
 
 namespace GlobalTheory.StabCosets
 
 open GlobalTheory.RatDiscrete IsDedekindDomain
 
-theorem map_mulVec_incl
-    {E A : Type} [CommRing E] [CommRing A]
-    (ι : E →+* A)
-    {n : ℕ} (M : Matrix (Fin n) (Fin n) E) (w : Fin n → E)
-    : M.map ι *ᵥ (fun i => ι (w i)) = fun i => ι ((M *ᵥ w) i) := by
+theorem map_mulVec_incl {E A : Type} [CommRing E] [CommRing A] (ι : E →+* A) {n : ℕ}
+    (M : Matrix (Fin n) (Fin n) E) (w : Fin n → E) :
+    M.map ι *ᵥ (fun i => ι (w i)) = fun i => ι ((M *ᵥ w) i) := by
   funext i
-  set_option synthInstance.maxHeartbeats 100000 in
+
   simp only [Matrix.mulVec, dotProduct, Matrix.map_apply, map_sum, map_mul]
 
-theorem unitary_map
-    {E A : Type} [CommRing E] [CommRing A]
-    (σ : E →+* E) (s : A →+* A) (ι : E →+* A) (hι : ∀ e, s (ι e) = ι (σ e))
-    {n : ℕ} (J g : Matrix (Fin n) (Fin n) E) (hg : Formalism.UG.cT σ g * J * g = J)
-    : Formalism.UG.cT s (g.map ι) * J.map ι * g.map ι = J.map ι := by
+theorem unitary_map {E A : Type} [CommRing E] [CommRing A] (σ : E →+* E) (s : A →+* A)
+    (ι : E →+* A) (hι : ∀ e, s (ι e) = ι (σ e)) {n : ℕ} (J g : Matrix (Fin n) (Fin n) E)
+    (hg : Formalism.UG.cT σ g * J * g = J) :
+    Formalism.UG.cT s (g.map ι) * J.map ι * g.map ι = J.map ι := by
   have hc : Formalism.UG.cT s (g.map ι) = (Formalism.UG.cT σ g).map ι := by
     ext i j
     simp [Formalism.UG.cT, hι]
   rw [hc, ← Matrix.map_mul, ← Matrix.map_mul, hg]
 
-theorem cT_star {E : Type} [CommRing E] [StarRing E] {n : ℕ} (g : Matrix (Fin n) (Fin n) E)
-    : Formalism.UG.cT (starRingEnd E) g = gᴴ := by
+theorem cT_star {E : Type} [CommRing E] [StarRing E] {n : ℕ} (g : Matrix (Fin n) (Fin n) E) :
+    Formalism.UG.cT (starRingEnd E) g = gᴴ := by
   ext i j
   simp [Formalism.UG.cT, Matrix.conjTranspose_apply, starRingEnd_apply]
 
 variable (I : AutInst)
 
-theorem exists_isImage (γ : GL (Fin I.n) I.E) (hγ : γ ∈ Formalism.UG.UJ (starRingEnd I.E) I.J)
-    : ∃ a, IsImage I (γ : Matrix (Fin I.n) (Fin I.n) I.E) a := by
-  classical
-  have hu
-      : Formalism.UG.cT (starRingEnd I.E) (γ : Matrix (Fin I.n) (Fin I.n) I.E) * I.J * γ = I.J :=
-    hγ
-  obtain ⟨-, hconj, -⟩ := I.cm.cmUnram
-  have hinf
-      : ∀ v, ∃ u : Formalism.REAL.UJ (I.ε v),
-        uMat u = (I.P v)⁻¹ * (γ : Matrix (Fin I.n) (Fin I.n) I.E).map (I.φ v) * I.P v := by
-    intro v
-    have hQu : IsUnit (I.P v) := I.P_unit v
-    have hQQ : I.P v * (I.P v)⁻¹ = 1 :=
-      Matrix.mul_nonsing_inv _ ((Matrix.isUnit_iff_isUnit_det _).1 hQu)
-    have hQQ' : ((I.P v)⁻¹)ᴴ * (I.P v)ᴴ = 1 := by
-      rw [← Matrix.conjTranspose_mul, hQQ, Matrix.conjTranspose_one]
-    have hNu : IsUnit ((γ : Matrix (Fin I.n) (Fin I.n) I.E).map (I.φ v)) :=
-      γ.isUnit.map (I.φ v).mapMatrix
-    have hM : IsUnit ((I.P v)⁻¹ * (γ : Matrix (Fin I.n) (Fin I.n) I.E).map (I.φ v) * I.P v) :=
-      ((Matrix.isUnit_nonsing_inv_iff.2 hQu).mul hNu).mul hQu
-    have hφ
-        : ((γ : Matrix (Fin I.n) (Fin I.n) I.E).map (I.φ v))ᴴ * I.J.map (I.φ v)
-            * (γ : Matrix (Fin I.n) (Fin I.n) I.E).map (I.φ v)
-          = I.J.map (I.φ v) := by
-      rw [← cT_star]
-      refine unitary_map (starRingEnd I.E) (starRingEnd ℂ) (I.φ v) (fun e => ?_) I.J _ hu
-      rw [starRingEnd_apply (x := e)]
-      exact (hconj (I.φ v) e).symm
-    have hin
-        : ((I.P v)⁻¹ * (γ : Matrix (Fin I.n) (Fin I.n) I.E).map (I.φ v) * I.P v)ᴴ
-            * Formalism.REAL.Jm (I.ε v)
-            * ((I.P v)⁻¹ * (γ : Matrix (Fin I.n) (Fin I.n) I.E).map (I.φ v) * I.P v)
-          = Formalism.REAL.Jm (I.ε v) := by
-      rw [← I.P_spec v]
-      simp only [Matrix.conjTranspose_mul, Matrix.mul_assoc]
-      rw [← Matrix.mul_assoc ((I.P v)⁻¹ᴴ) ((I.P v)ᴴ), hQQ', Matrix.one_mul,
-        ← Matrix.mul_assoc (I.P v) ((I.P v)⁻¹), hQQ, Matrix.one_mul]
-      rw [show ∀ X : Matrix (Fin I.n) (Fin I.n) ℂ,
-            ((γ : Matrix (Fin I.n) (Fin I.n) I.E).map (I.φ v))ᴴ
-                * (I.J.map (I.φ v) * ((γ : Matrix (Fin I.n) (Fin I.n) I.E).map (I.φ v) * X))
-              = (((γ : Matrix (Fin I.n) (Fin I.n) I.E).map (I.φ v))ᴴ * I.J.map (I.φ v)
-                  * (γ : Matrix (Fin I.n) (Fin I.n) I.E).map (I.φ v))
-                * X from fun X => by
-          simp only [Matrix.mul_assoc],
-        hφ]
-    refine ⟨⟨hM.unit, ?_⟩, hM.unit_spec⟩
-    show Formalism.REAL.inUJ (I.ε v) (hM.unit : Matrix (Fin I.n) (Fin I.n) ℂ)
-    unfold Formalism.REAL.inUJ
-    rw [hM.unit_spec]
-    exact hin
-  have hsig
-      : ∀ e : I.E,
-        Formalism.UG.sigR I.cm.sig (Af I.F) (Formalism.UG.inclE (F := I.F) (Af I.F) e)
-          = Formalism.UG.inclE (F := I.F) (Af I.F) (starRingEnd I.E e) := by
-    intro e
-    first | rfl | simp [Formalism.UG.sigR, Formalism.UG.inclE, Formalism.BasicNotions.CMData.sig]
-  have hfin
-      : ∃ h : I.Gf,
-        I.fmat h
-          = (γ : Matrix (Fin I.n) (Fin I.n) I.E).map (Formalism.UG.inclE (F := I.F) (Af I.F)) := by
-    refine ⟨⟨Matrix.GeneralLinearGroup.map (Formalism.UG.inclE (F := I.F) (Af I.F)) γ, ?_⟩, rfl⟩
-    exact unitary_map (starRingEnd I.E) (Formalism.UG.sigR I.cm.sig (Af I.F))
-      (Formalism.UG.inclE (F := I.F) (Af I.F)) hsig I.J _ hu
-  choose u hu' using hinf
-  obtain ⟨h, hh⟩ := hfin
-  refine ⟨(u, h), ?_⟩
-  unfold IsImage
-  exact ⟨hu', hh⟩
+theorem exists_isImage (γ : GL (Fin I.n) I.E) (hγ : γ ∈ Formalism.UG.UJ (starRingEnd I.E) I.J) :
+    ∃ a, IsImage I (γ : Matrix (Fin I.n) (Fin I.n) I.E) a := by
+  apply GlobalTheory.StabUnfold.RatPts.exists_isImage <;> assumption
 
 theorem afVec_injective {m : ℕ} : Function.Injective (afVec I (m := m)) := by
   have hhalf : (2 : I.E)⁻¹ ∉ (algebraMap (𝓞 I.E) I.E).range := by
@@ -118,7 +91,7 @@ theorem afVec_injective {m : ℕ} : Function.Injective (afVec I (m := m)) := by
       rw [← hz]
       exact z.isIntegral_coe
     have h2 : (2 : I.E)⁻¹ = algebraMap ℚ I.E (2 : ℚ)⁻¹ := by simp
-    rw [h2, isIntegral_algebraMap_iff] at hint
+    rw [h2, isIntegral_algebraMap_iff ] at hint
     obtain ⟨m, hm⟩ := IsIntegrallyClosed.isIntegral_iff.1 hint
     simp only [algebraMap_int_eq, eq_intCast] at hm
     have h3 : ((m * 2 : ℤ) : ℚ) = 1 := by
@@ -129,9 +102,7 @@ theorem afVec_injective {m : ℕ} : Function.Injective (afVec I (m := m)) := by
     omega
   intro x y hxy
   funext i
-  have h
-      : Formalism.UG.inclE (F := I.F) (Af I.F) (x i)
-        = Formalism.UG.inclE (F := I.F) (Af I.F) (y i) :=
+  have h : Formalism.UG.inclE (F := I.F) (Af I.F) (x i) = Formalism.UG.inclE (F := I.F) (Af I.F) (y i) :=
     congrFun hxy i
   by_contra hne
   apply hhalf
@@ -144,15 +115,15 @@ theorem afVec_injective {m : ℕ} : Function.Injective (afVec I (m := m)) := by
 
 variable {I}
 
-theorem fmat_mulVec {γ a} (h : IsImage I γ a) (y : Fin I.n → I.E)
-    : I.fmat a.2 *ᵥ afVec I y = afVec I (γ *ᵥ y) := by
+theorem fmat_mulVec {γ a} (h : IsImage I γ a) (y : Fin I.n → I.E) :
+    I.fmat a.2 *ᵥ afVec I y = afVec I (γ *ᵥ y) := by
   obtain ⟨-, h2⟩ := h
   rw [h2]
   unfold afVec
   exact map_mulVec_incl _ γ y
 
-theorem uMat_mulVec {γ a} (h : IsImage I γ a) (y : Fin I.n → I.E) (v)
-    : uMat (a.1 v) *ᵥ infVec I v y = infVec I v (γ *ᵥ y) := by
+theorem uMat_mulVec {γ a} (h : IsImage I γ a) (y : Fin I.n → I.E) (v) :
+    uMat (a.1 v) *ᵥ infVec I v y = infVec I v (γ *ᵥ y) := by
   obtain ⟨h1, -⟩ := h
   rw [h1 v]
   unfold infVec
@@ -161,25 +132,21 @@ theorem uMat_mulVec {γ a} (h : IsImage I γ a) (y : Fin I.n → I.E) (v)
   rw [Matrix.mulVec_mulVec, Matrix.mul_assoc _ (I.P v), hQQ, Matrix.mul_one, ← Matrix.mulVec_mulVec,
     map_mulVec_incl]
 
-theorem length_mulVec
-    {γ : Matrix (Fin I.n) (Fin I.n) I.E} (h : γᴴ * I.J * γ = I.J) (y : Fin I.n → I.E)
-    : star (γ *ᵥ y) ⬝ᵥ (I.J *ᵥ (γ *ᵥ y)) = star y ⬝ᵥ (I.J *ᵥ y) := by
+theorem length_mulVec {γ : Matrix (Fin I.n) (Fin I.n) I.E} (h : γᴴ * I.J * γ = I.J) (y : Fin I.n → I.E) :
+    star (γ *ᵥ y) ⬝ᵥ (I.J *ᵥ (γ *ᵥ y)) = star y ⬝ᵥ (I.J *ᵥ y) := by
   rw [Matrix.star_mulVec, ← Matrix.dotProduct_mulVec, Matrix.mulVec_mulVec, Matrix.mulVec_mulVec, h]
 
-theorem gaussAt_mul {γ a} (h : IsImage I γ a) (y : Fin I.n → I.E) (g : I.GA)
-    : gaussAt I (γ *ᵥ y) (a * g) = gaussAt I y g := by
+theorem gaussAt_mul {γ a} (h : IsImage I γ a) (y : Fin I.n → I.E) (g : I.GA) :
+    gaussAt I (γ *ᵥ y) (a * g) = gaussAt I y g := by
   have hmem : ∀ h' : I.Gf, (γ *ᵥ y ∈ lamX I (1, a.2 * h') ↔ y ∈ lamX I (1, h')) := by
     intro h'
-    rw [(GlobalTheory.PointLattice.lamX_selfDual I _).1,
-      (GlobalTheory.PointLattice.lamX_selfDual I _).1]
-    have e1
-        : (fun i => Formalism.UG.inclE (F := I.F) (Af I.F) ((γ *ᵥ y) i))
-          = I.fmat a.2 *ᵥ afVec I y :=
+    rw [(GlobalTheory.PointLattice.lamX_selfDual I _).1, (GlobalTheory.PointLattice.lamX_selfDual I _).1]
+    have e1 : (fun i => Formalism.UG.inclE (F := I.F) (Af I.F) ((γ *ᵥ y) i)) = I.fmat a.2 *ᵥ afVec I y :=
       (fmat_mulVec h y).symm
     have e2 : I.fmat ((1, a.2 * h') : I.GA).2⁻¹ * I.fmat a.2 = I.fmat ((1, h') : I.GA).2⁻¹ := by
       show I.fmat (a.2 * h')⁻¹ * I.fmat a.2 = I.fmat h'⁻¹
-      simp only [AutInst.fmat, _root_.mul_inv_rev, Subgroup.coe_mul, Units.val_mul,
-        Matrix.mul_assoc, Subgroup.coe_inv, Units.inv_mul, Matrix.mul_one]
+      simp only [AutInst.fmat, _root_.mul_inv_rev, Subgroup.coe_mul, Units.val_mul, Matrix.mul_assoc,
+        Subgroup.coe_inv, Units.inv_mul, Matrix.mul_one]
     rw [e1, Matrix.mulVec_mulVec, e2]
     rfl
   unfold gaussAt
@@ -189,8 +156,8 @@ theorem gaussAt_mul {γ a} (h : IsImage I γ a) (y : Fin I.n → I.E) (g : I.GA)
     congr 2
     show ((((a.1 v * g.1 v : Formalism.REAL.UJ (I.ε v)) : (Matrix (Fin I.n) (Fin I.n) ℂ)ˣ) :
       Matrix (Fin I.n) (Fin I.n) ℂ))⁻¹ *ᵥ (uMat (a.1 v) *ᵥ infVec I v y) = (uMat (g.1 v))⁻¹ *ᵥ infVec I v y
-    rw [Subgroup.coe_mul, ← Matrix.coe_units_inv, ← Matrix.coe_units_inv, _root_.mul_inv_rev,
-      Units.val_mul, Matrix.mulVec_mulVec, Matrix.mul_assoc, Units.inv_mul, Matrix.mul_one]
+    rw [Subgroup.coe_mul, ← Matrix.coe_units_inv, ← Matrix.coe_units_inv, _root_.mul_inv_rev, Units.val_mul,
+      Matrix.mulVec_mulVec, Matrix.mul_assoc, Units.inv_mul, Matrix.mul_one]
   · by_cases hy : y ∈ lamX I (1, g.2)
     · have h1 : a.2 * g.2 ∈ {h' : I.Gf | γ *ᵥ y ∈ lamX I (1, h')} := (hmem g.2).2 hy
       have h2 : g.2 ∈ {h' : I.Gf | y ∈ lamX I (1, h')} := hy
@@ -199,43 +166,34 @@ theorem gaussAt_mul {γ a} (h : IsImage I γ a) (y : Fin I.n → I.E) (g : I.GA)
       have h2 : g.2 ∉ {h' : I.Gf | y ∈ lamX I (1, h')} := hy
       simp only [Prod.snd_mul, Set.indicator_of_notMem h1, Set.indicator_of_notMem h2]
 
-theorem gaussSum_eq (β : I.E) (g : I.GA)
-    : gaussSum I β g = ∑' y : {y : Fin I.n → I.E // star y ⬝ᵥ (I.J *ᵥ y) = β}, gaussAt I y.1 g := by
+theorem gaussSum_eq (β : I.E) (g : I.GA) :
+    gaussSum I β g = ∑' y : {y : Fin I.n → I.E // star y ⬝ᵥ (I.J *ᵥ y) = β}, gaussAt I y.1 g := by
   classical
   have hL : lamX I g = lamX I (1, g.2) := by
     rw [GlobalTheory.PointLattice.lamX_eq_globLat, GlobalTheory.PointLattice.lamX_eq_globLat]
-  have hF
-      : ∀ y : Fin I.n → I.E,
-        ENNReal.ofReal (∏ v, gauss (((uMat (g.1 v))⁻¹ * (I.P v)⁻¹) *ᵥ fun i => I.φ v (y i)))
-          = ∏ v, ENNReal.ofReal (gauss ((uMat (g.1 v))⁻¹ *ᵥ infVec I v y)) := by
+  have hF : ∀ y : Fin I.n → I.E,
+      ENNReal.ofReal (∏ v, gauss (((uMat (g.1 v))⁻¹ * (I.P v)⁻¹) *ᵥ fun i => I.φ v (y i))) =
+        ∏ v, ENNReal.ofReal (gauss ((uMat (g.1 v))⁻¹ *ᵥ infVec I v y)) := by
     intro y
     rw [ENNReal.ofReal_prod_of_nonneg (fun v _ => (gauss_pos _).le)]
     refine Finset.prod_congr rfl fun v _ => ?_
     rw [← Matrix.mulVec_mulVec]
     rfl
-  have h1 :=
-    tsum_subtype {y : Fin I.n → I.E | y ∈ lamX I g ∧ star y ⬝ᵥ (I.J *ᵥ y) = β} (fun y =>
-      ENNReal.ofReal (∏ v, gauss (((uMat (g.1 v))⁻¹ * (I.P v)⁻¹) *ᵥ fun i => I.φ v (y i))))
+  have h1 := tsum_subtype {y : Fin I.n → I.E | y ∈ lamX I g ∧ star y ⬝ᵥ (I.J *ᵥ y) = β}
+    (fun y => ENNReal.ofReal (∏ v, gauss (((uMat (g.1 v))⁻¹ * (I.P v)⁻¹) *ᵥ fun i => I.φ v (y i))))
   have h2 := tsum_subtype {y : Fin I.n → I.E | star y ⬝ᵥ (I.J *ᵥ y) = β} (fun y => gaussAt I y g)
   unfold GlobalTheory.GaussMean.gaussSum
   refine h1.trans (Eq.trans ?_ h2.symm)
   congr 1
   funext y
-  by_cases hy : y ∈ lamX I (1, g.2) <;> by_cases hq : star y ⬝ᵥ (I.J *ᵥ y) = β
-    <;> simp [Set.indicator, gaussAt, hL, hF, hy, hq]
+  by_cases hy : y ∈ lamX I (1, g.2) <;> by_cases hq : star y ⬝ᵥ (I.J *ᵥ y) = β <;>
+    simp [Set.indicator, gaussAt, hL, hF, hy, hq]
 
-theorem gaussSum_cosets
-    : ∀ (I : AutInst) (s : Bool) (x : Fin I.n → I.E),
-      star x ⬝ᵥ (I.J *ᵥ x) = sgn I.E s
-        → ∃ (ι : Type) (_ : Countable ι) (r : ι → I.GA),
-          (∀ i, r i ∈ I.GFset) ∧ (∀ γ ∈ I.GFset, ∃! i, γ * (r i)⁻¹ ∈ stabF I x)
-            ∧ ∀ g, gaussSum I (sgn I.E s) g = ∑' i, gaussAt I x (r i * g) := by
+theorem gaussSum_cosets : ∀ (I : AutInst) (s : Bool) (x : Fin I.n → I.E), star x ⬝ᵥ (I.J *ᵥ x) = sgn I.E s → ∃ (ι : Type) (_ : Countable ι) (r : ι → I.GA), (∀ i, r i ∈ I.GFset) ∧ (∀ γ ∈ I.GFset, ∃! i, γ * (r i)⁻¹ ∈ stabF I x) ∧ ∀ g, gaussSum I (sgn I.E s) g = ∑' i, gaussAt I x (r i * g) := by
   intro I s x hx
   classical
-  have hUJ
-      : ∀ δ : GL (Fin I.n) I.E,
-        δ ∈ Formalism.UG.UJ (starRingEnd I.E) I.J
-          ↔ (δ : Matrix (Fin I.n) (Fin I.n) I.E)ᴴ * I.J * δ = I.J := by
+  have hUJ : ∀ δ : GL (Fin I.n) I.E, δ ∈ Formalism.UG.UJ (starRingEnd I.E) I.J ↔
+      (δ : Matrix (Fin I.n) (Fin I.n) I.E)ᴴ * I.J * δ = I.J := by
     intro δ
     rw [← cT_star]
     exact Iff.rfl
@@ -246,15 +204,12 @@ theorem gaussSum_cosets
     rw [hx]
     unfold sgn
     split <;> simp
-  have hE : Countable I.E := Function.Injective.countable (Module.finBasis ℚ I.E).equivFun.injective
-  have hW
-      : ∀ y : {y : Fin I.n → I.E // star y ⬝ᵥ (I.J *ᵥ y) = sgn I.E s}, ∃ δ : GL (Fin I.n) I.E,
-        δ ∈ Formalism.UG.UJ (starRingEnd I.E) I.J
-          ∧ (δ : Matrix (Fin I.n) (Fin I.n) I.E) *ᵥ x = y.1 := by
+  have hE : Countable I.E :=
+    Function.Injective.countable (Module.finBasis ℚ I.E).equivFun.injective
+  have hW : ∀ y : {y : Fin I.n → I.E // star y ⬝ᵥ (I.J *ᵥ y) = sgn I.E s}, ∃ δ : GL (Fin I.n) I.E,
+      δ ∈ Formalism.UG.UJ (starRingEnd I.E) I.J ∧ (δ : Matrix (Fin I.n) (Fin I.n) I.E) *ᵥ x = y.1 := by
     intro y
-    obtain ⟨m, hm, hmx⟩ :=
-      GlobalTheory.T.exists_unitary_mulVec_eq_of_form_eq' I.E I.n I.J hJ I.J_det x y.1
-        (hx.trans y.2.symm) hne
+    obtain ⟨m, hm, hmx⟩ := GlobalTheory.T.exists_unitary_mulVec_eq_of_form_eq' I.E I.n I.J hJ I.J_det x y.1 (hx.trans y.2.symm) hne
     have hdet : IsUnit m.det := by
       have hd := congrArg Matrix.det hm
       rw [Matrix.det_mul, Matrix.det_mul, Matrix.det_conjTranspose] at hd
@@ -282,15 +237,13 @@ theorem gaussSum_cosets
       exact ⟨hd1, hd2⟩
     have key : ∀ y, γ * (r y)⁻¹ ∈ stabF I x ↔ (d : Matrix (Fin I.n) (Fin I.n) I.E) *ᵥ y.1 = x := by
       intro y
-      have hi : IsImage I
-          ((d : Matrix (Fin I.n) (Fin I.n) I.E) * (δ y : Matrix (Fin I.n) (Fin I.n) I.E))
+      have hi : IsImage I ((d : Matrix (Fin I.n) (Fin I.n) I.E) * (δ y : Matrix (Fin I.n) (Fin I.n) I.E))
           (γ * (r y)⁻¹) := by
         have hinv := isImage_inv I (hr y)
         rw [inv_inv] at hinv
         exact isImage_mul I hdI hinv
       have hmemF : γ * (r y)⁻¹ ∈ I.GFset :=
-        (ratSub I).mul_mem (show γ ∈ ratSub I from hγ)
-          ((ratSub I).inv_mem (show r y ∈ ratSub I from hrF y))
+        (ratSub I).mul_mem (show γ ∈ ratSub I from hγ) ((ratSub I).inv_mem (show r y ∈ ratSub I from hrF y))
       unfold stabF
       rw [Set.mem_setOf_eq, fmat_mulVec hi, ← Matrix.mulVec_mulVec, hδx y]
       constructor
@@ -298,19 +251,10 @@ theorem gaussSum_cosets
         exact afVec_injective I hx'
       · intro hx'
         exact ⟨hmemF, by rw [hx']⟩
-    have hd'
-        : ((d⁻¹ : GL (Fin I.n) I.E) : Matrix (Fin I.n) (Fin I.n) I.E)ᴴ * I.J
-            * ((d⁻¹ : GL (Fin I.n) I.E) : Matrix (Fin I.n) (Fin I.n) I.E)
-          = I.J :=
-      (hUJ _).1 (inv_mem hdU)
-    refine ⟨
-      ⟨
-        ((d⁻¹ : GL (Fin I.n) I.E) : Matrix (Fin I.n) (Fin I.n) I.E) *ᵥ x,
-        by rw [length_mulVec hd', hx]
-      ⟩,
-      (key _).2 ?_,
-      fun y hy => ?_
-    ⟩
+    have hd' : ((d⁻¹ : GL (Fin I.n) I.E) : Matrix (Fin I.n) (Fin I.n) I.E)ᴴ * I.J *
+        ((d⁻¹ : GL (Fin I.n) I.E) : Matrix (Fin I.n) (Fin I.n) I.E) = I.J := (hUJ _).1 (inv_mem hdU)
+    refine ⟨⟨((d⁻¹ : GL (Fin I.n) I.E) : Matrix (Fin I.n) (Fin I.n) I.E) *ᵥ x, by rw [length_mulVec hd', hx]⟩,
+      (key _).2 ?_, fun y hy => ?_⟩
     · show (d : Matrix (Fin I.n) (Fin I.n) I.E) *ᵥ (((d⁻¹ : GL (Fin I.n) I.E) : Matrix (Fin I.n) (Fin I.n) I.E) *ᵥ x) = x
       rw [Matrix.mulVec_mulVec, Units.mul_inv, Matrix.one_mulVec]
     · apply Subtype.ext

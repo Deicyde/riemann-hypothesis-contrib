@@ -1,7 +1,47 @@
 module
 
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.PullbackSections.HolomorphicFamilies.HolPairB
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.AnChart
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.IsHolPeriods
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.AlgebraicGeometry.Modules.Sheaf
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Lemma
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.TaylorDiscriminants.ValAtLem
 
 @[expose] public section
 
@@ -9,22 +49,20 @@ noncomputable section
 
 namespace ReciprocityTheory.ChartRestriction.G.PullbackSections
 
-open AlgebraicGeometry CategoryTheory NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor
-  ReciprocityTheory.ChartRestriction.G.TB.ValAt
+open AlgebraicGeometry CategoryTheory NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.TB.ValAt
 
-theorem valAt'_spMap {A : Type} [CommRing A] (ψ : A →+* ℂ) (a : A)
-    : valAt' (spMap ψ) ⊤ ((Scheme.ΓSpecIso (CommRingCat.of A)).inv a) = ψ a := by
+theorem valAt'_spMap {A : Type} [CommRing A] (ψ : A →+* ℂ) (a : A) :
+    valAt' (spMap ψ) ⊤ ((Scheme.ΓSpecIso (CommRingCat.of A)).inv a) = ψ a := by
   unfold valAt'
   rw [dite_eq_left (by simp)]
   unfold valAt
   have h1 : (spMap ψ).appLE ⊤ ⊤ (by simp) = (spMap ψ).appTop := by
     rw [Scheme.Hom.appTop, Scheme.Hom.app_eq_appLE]
-    first | rfl | simp
+    first
+      | rfl
   rw [h1]
-  have h2 :=
-    congrArg
-      (fun f => (CommRingCat.Hom.hom f) ((Scheme.ΓSpecIso (CommRingCat.of A)).inv a))
-      (Scheme.ΓSpecIso_naturality (CommRingCat.ofHom ψ))
+  have h2 := congrArg (fun f => (CommRingCat.Hom.hom f) ((Scheme.ΓSpecIso (CommRingCat.of A)).inv a))
+    (Scheme.ΓSpecIso_naturality (CommRingCat.ofHom ψ))
   simp only [CommRingCat.hom_comp, RingHom.comp_apply, CommRingCat.hom_ofHom] at h2
   refine h2.trans ?_
   simp
@@ -39,7 +77,6 @@ private lemma app_lemma_0 {A : Type} [CommRing A] (ψ : A →+* ℂ) (a : A) :
     rw [Scheme.Hom.appTop, Scheme.Hom.app_eq_appLE]
     first
       | rfl
-      | simp
   rw [h1] at h0
   exact h0
 
@@ -54,9 +91,6 @@ private lemma preMono_lemma_8 {A : Type} [CommRing A] (ψ : A →+* ℂ) {V W : 
     spMap ψ ⁻¹ᵁ V ≤ spMap ψ ⁻¹ᵁ W := by
   first
     | exact fun x hx => hVW hx
-    | exact (Opens.map (spMap ψ).base).monotone hVW
-    | exact Scheme.Hom.preimage_mono _ hVW
-    | (intro x hx; exact hVW hx)
 
 private lemma vRes_lemma_2 {A : Type} [CommRing A] (ψ : A →+* ℂ) {V W : (Sp A).Opens} (hVW : V ≤ W)
     (e : ⊤ ≤ spMap ψ ⁻¹ᵁ V) (s : Γ(Sp A, W)) :
@@ -90,9 +124,6 @@ private lemma topLe_lemma_3 {A : Type} [CommRing A] (ψ : A →+* ℂ) (g : A) (
   rw [Scheme.preimage_basicOpen]
   first
     | exact hb.symm.le
-    | exact le_of_eq hb.symm
-    | (rw [← Scheme.Hom.appTop, hb])
-    | simp [Scheme.Hom.appTop, hb]
 
 private lemma local_lemma_4 {A : Type} [CommRing A] (ψ : A →+* ℂ) {U : (Sp A).Opens}
     (e : ⊤ ≤ spMap ψ ⁻¹ᵁ U) : ∃ g : A, ψ g ≠ 0 ∧
@@ -100,7 +131,6 @@ private lemma local_lemma_4 {A : Type} [CommRing A] (ψ : A →+* ℂ) {U : (Sp 
   obtain ⟨pt⟩ : Nonempty (Sp ℂ) := by
     first
       | infer_instance
-      | exact ⟨(⟨⊥, Ideal.isPrime_bot⟩ : PrimeSpectrum ℂ)⟩
   have hpt : pt ∈ spMap ψ ⁻¹ᵁ U := e (show pt ∈ (⊤ : (Sp ℂ).Opens) by first | trivial | simp)
   obtain ⟨g', hD, hxD⟩ := (isAffineOpen_top (Sp A)).exists_basicOpen_le ⟨(spMap ψ).base pt, hpt⟩
     (by first | trivial | simp)
@@ -118,14 +148,9 @@ private lemma local_lemma_4 {A : Type} [CommRing A] (ψ : A →+* ℂ) {U : (Sp 
   first
     | rw [hc0] at hpt'
     | erw [hc0] at hpt'
-    | rw [← Scheme.Hom.appTop, hc0] at hpt'
   first
     | (rw [Scheme.basicOpen_zero] at hpt'; simp at hpt')
     | (erw [Scheme.basicOpen_zero] at hpt'; simp at hpt')
-    | (simp at hpt'; done)
-    | exact absurd hpt' (by simp [Scheme.basicOpen_zero])
-    | (rw [Scheme.mem_basicOpen] at hpt'; simp at hpt')
-    | (erw [Scheme.mem_basicOpen] at hpt'; simp at hpt')
 
 private lemma alg_lemma_5 {A : Type} [CommRing A] (ψ : A →+* ℂ) (g' : Γ(Sp A, ⊤))
     (e : ⊤ ≤ spMap ψ ⁻¹ᵁ (Sp A).basicOpen g') (x : Γ(Sp A, ⊤)) :
@@ -138,23 +163,17 @@ private lemma alg_lemma_5 {A : Type} [CommRing A] (ψ : A →+* ℂ) (g' : Γ(Sp
   rw [hx] at h2
   exact h0.trans h2
 
-theorem isHolTo_spMap
-    {A : Type} [CommRing A]
-    {m : ℕ} {B : Set (Fin m → ℂ)} (hB : IsOpen B)
-    {Ψ : (Fin m → ℂ) → (A →+* ℂ)} (h : ∀ a, DifferentiableOn ℂ (fun b => Ψ b a) B)
-    : IsHolTo B fun b => spMap (Ψ b) := by
+theorem isHolTo_spMap {A : Type} [CommRing A] {m : ℕ} {B : Set (Fin m → ℂ)} (hB : IsOpen B) {Ψ : (Fin m → ℂ) → (A →+* ℂ)}
+    (h : ∀ a, DifferentiableOn ℂ (fun b => Ψ b a) B) : IsHolTo B fun b => spMap (Ψ b) := by
   unfold IsHolTo
   intro U f
-  have nbhd
-      : ∀ b0 ∈ {b | b ∈ B ∧ ⊤ ≤ spMap (Ψ b) ⁻¹ᵁ U}, ∃ g : A,
-        Ψ b0 g ≠ 0 ∧ (Sp A).basicOpen ((Scheme.ΓSpecIso (CommRingCat.of A)).inv g) ≤ U :=
+  have nbhd : ∀ b0 ∈ {b | b ∈ B ∧ ⊤ ≤ spMap (Ψ b) ⁻¹ᵁ U}, ∃ g : A, Ψ b0 g ≠ 0 ∧
+      (Sp A).basicOpen ((Scheme.ΓSpecIso (CommRingCat.of A)).inv g) ≤ U :=
     fun b0 hb0 => local_lemma_4 (Ψ b0) hb0.2
-  have hopen : ∀ g : A, IsOpen (B ∩ (fun b => Ψ b g) ⁻¹' {0}ᶜ) := fun g =>
-    ((h g).continuousOn).isOpen_inter_preimage hB isOpen_compl_singleton
-  have hsub
-      : ∀ g : A,
-        (Sp A).basicOpen ((Scheme.ΓSpecIso (CommRingCat.of A)).inv g) ≤ U
-          → B ∩ (fun b => Ψ b g) ⁻¹' {0}ᶜ ⊆ {b | b ∈ B ∧ ⊤ ≤ spMap (Ψ b) ⁻¹ᵁ U} := by
+  have hopen : ∀ g : A, IsOpen (B ∩ (fun b => Ψ b g) ⁻¹' {0}ᶜ) :=
+    fun g => ((h g).continuousOn).isOpen_inter_preimage hB isOpen_compl_singleton
+  have hsub : ∀ g : A, (Sp A).basicOpen ((Scheme.ΓSpecIso (CommRingCat.of A)).inv g) ≤ U →
+      B ∩ (fun b => Ψ b g) ⁻¹' {0}ᶜ ⊆ {b | b ∈ B ∧ ⊤ ≤ spMap (Ψ b) ⁻¹ᵁ U} := by
     intro g hD b hb
     exact ⟨hb.1, (topLe_lemma_3 (Ψ b) g hb.2).trans (preMono_lemma_8 (Ψ b) hD)⟩
   refine ⟨?_, ?_⟩
@@ -167,39 +186,26 @@ theorem isHolTo_spMap
     obtain ⟨g, hg, hD⟩ := nbhd b0 hb0
     refine ⟨_, hopen g, ⟨hb0.1, hg⟩, ?_⟩
     haveI := (isAffineOpen_top (Sp A)).isLocalization_basicOpen ((Scheme.ΓSpecIso (CommRingCat.of A)).inv g)
-    obtain ⟨⟨h', m⟩, hm⟩ :=
-      IsLocalization.surj (Submonoid.powers ((Scheme.ΓSpecIso (CommRingCat.of A)).inv g))
-        ((Sp A).presheaf.map (homOfLE hD).op f)
+    obtain ⟨⟨h', m⟩, hm⟩ := IsLocalization.surj (Submonoid.powers ((Scheme.ΓSpecIso (CommRingCat.of A)).inv g))
+      ((Sp A).presheaf.map (homOfLE hD).op f)
     dsimp only at hm
-    obtain ⟨n, hn⟩
-        : ∃ n : ℕ, (Scheme.ΓSpecIso (CommRingCat.of A)).inv g ^ n = (m : Γ(Sp A, ⊤)) := by
+    obtain ⟨n, hn⟩ : ∃ n : ℕ, (Scheme.ΓSpecIso (CommRingCat.of A)).inv g ^ n = (m : Γ(Sp A, ⊤)) := by
       first
-      | exact (Submonoid.mem_powers_iff _ _).mp m.2
-      | exact m.2
-      | simpa using m.2
-      | (obtain ⟨k, hk⟩ := m.2; exact ⟨k, hk⟩)
-    have key
-        : ∀ b ∈ {b | b ∈ B ∧ ⊤ ≤ spMap (Ψ b) ⁻¹ᵁ U} ∩ (B ∩ (fun b => Ψ b g) ⁻¹' {0}ᶜ),
-          valAt' (spMap (Ψ b)) U f
-            = Ψ b ((Scheme.ΓSpecIso (CommRingCat.of A)).hom h') * (Ψ b g ^ n)⁻¹ := by
+        | exact (Submonoid.mem_powers_iff _ _).mp m.2
+    have key : ∀ b ∈ {b | b ∈ B ∧ ⊤ ≤ spMap (Ψ b) ⁻¹ᵁ U} ∩ (B ∩ (fun b => Ψ b g) ⁻¹' {0}ᶜ),
+        valAt' (spMap (Ψ b)) U f = Ψ b ((Scheme.ΓSpecIso (CommRingCat.of A)).hom h') * (Ψ b g ^ n)⁻¹ := by
       intro b hb
       have hgb : Ψ b g ≠ 0 := hb.2.2
       have eD := topLe_lemma_3 (Ψ b) g hgb
       rw [← div_eq_mul_inv, eq_div_iff (pow_ne_zero _ hgb), ← vRes_lemma_2 (Ψ b) hD eD f]
       have hm' := congrArg (valAt' (spMap (Ψ b)) _) hm
-      rw [vMul_lemma_6 (Ψ b) eD, ← hn, map_pow, vPow_lemma_7 (Ψ b) eD, alg_lemma_5 (Ψ b) _ eD,
-          alg_lemma_5 (Ψ b) _ eD]
-        at hm'
-      have hg'
-          : (Scheme.ΓSpecIso (CommRingCat.of A)).hom ((Scheme.ΓSpecIso (CommRingCat.of A)).inv g)
-            = g := by
+      rw [vMul_lemma_6 (Ψ b) eD, ← hn, map_pow, vPow_lemma_7 (Ψ b) eD, alg_lemma_5 (Ψ b) _ eD, alg_lemma_5 (Ψ b) _ eD] at hm'
+      have hg' : (Scheme.ΓSpecIso (CommRingCat.of A)).hom ((Scheme.ΓSpecIso (CommRingCat.of A)).inv g) = g := by
         simp
       rw [hg'] at hm'
       exact hm'
     refine DifferentiableOn.congr ?_ key
-    exact ((((h _).mono Set.inter_subset_left).mul
-        ((((h g).mono Set.inter_subset_left).pow n).inv
-          (fun b (hb : b ∈ B ∩ (fun b => Ψ b g) ⁻¹' {0}ᶜ) => pow_ne_zero n hb.2))).mono
-      Set.inter_subset_right)
+    exact ((((h _).mono Set.inter_subset_left).mul ((((h g).mono Set.inter_subset_left).pow n).inv
+      (fun b (hb : b ∈ B ∩ (fun b => Ψ b g) ⁻¹' {0}ᶜ) => pow_ne_zero n hb.2))).mono Set.inter_subset_right)
 
 end ReciprocityTheory.ChartRestriction.G.PullbackSections

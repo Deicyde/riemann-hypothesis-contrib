@@ -1,8 +1,58 @@
 module
 
-public import Mathlib
-public import Development.AutomorphicSpectrum.Proofs.DivisibilityProofs.IsChainFirst
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArithmeticIntersection.MultihomogeneousIdeals.IsFieldIntersection
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Coalgebra.IsFrobenius
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.HopfAlgebra.Basic
+public import Mathlib.RingTheory.KrullDimension.Field
+public import Mathlib.RingTheory.KrullDimension.Polynomial
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArithmeticIntersection.MultihomogeneousIdeals.InhDivCycleOfSuppEmpty
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArithmeticIntersection.MixedFieldContraction.GenericFibreKerTarget
+import GroundTheory.HeightsAndTheta.Heights.HodgeLowerBound.FrameDefinitions.PermFinTwoUniv
 
 @[expose] public section
 
@@ -10,8 +60,7 @@ noncomputable section
 
 namespace GlobalTheory.CompanionTheory.Ar.Top.FlDeg.LinDeg
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
-  ReciprocityTheory.ChartRestriction.G.AI.I1
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.AI.I1
 
 section Forms
 
@@ -41,37 +90,36 @@ theorem eq_sum_single (c : σ → F) : c = ∑ p, c p • (Pi.single p (1 : F) :
   ext q
   simp [Finset.sum_apply, Pi.single_apply]
 
-theorem eval_linForm (l : (σ → F) →ₗ[F] F) (c : σ → F)
-    : eval (fun q => l (Pi.single q 1)) (linForm c) = l c := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    conv_rhs => rw [eq_sum_single c, map_sum]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [linForm_apply, map_sum]
+theorem eval_linForm (l : (σ → F) →ₗ[F] F) (c : σ → F) :
+    eval (fun q => l (Pi.single q 1)) (linForm c) = l c := by
+
+  conv_rhs => rw [eq_sum_single c, map_sum]
+
+  rw [linForm_apply, map_sum]
   refine Finset.sum_congr rfl fun p _ => ?_
   simp [smul_eval]
 
-theorem lin_le_ker {U : Submodule F (σ → F)} (l : (σ → F) →ₗ[F] F) (h : U ≤ LinearMap.ker l)
-    : lin U ≤ RingHom.ker (eval fun q => l (Pi.single q 1)) := by
+theorem lin_le_ker {U : Submodule F (σ → F)} (l : (σ → F) →ₗ[F] F) (h : U ≤ LinearMap.ker l) :
+    lin U ≤ RingHom.ker (eval fun q => l (Pi.single q 1)) := by
   refine Ideal.span_le.2 ?_
   rintro _ ⟨c, hc, rfl⟩
   change eval _ _ = 0
   rw [eval_linForm]
   exact h hc
 
-theorem X_notMem_lin {U : Submodule F (σ → F)} {p : σ} (h : (Pi.single p (1 : F) : σ → F) ∉ U)
-    : (X p : MvPolynomial σ F) ∉ lin U := by
+theorem X_notMem_lin {U : Submodule F (σ → F)} {p : σ} (h : (Pi.single p (1 : F) : σ → F) ∉ U) :
+    (X p : MvPolynomial σ F) ∉ lin U := by
   obtain ⟨l, hl, hU⟩ := Submodule.exists_le_ker_of_notMem h
   intro hX
   have := lin_le_ker l hU hX
   rw [RingHom.mem_ker, eval_X] at this
   exact hl this
 
-theorem single_notMem {U : Submodule F (σ → F)} {p : σ} (h : (X p : MvPolynomial σ F) ∉ lin U)
-    : (Pi.single p (1 : F) : σ → F) ∉ U := fun h' =>
-  h (linForm_single (F := F) p ▸ linForm_mem h')
+theorem single_notMem {U : Submodule F (σ → F)} {p : σ} (h : (X p : MvPolynomial σ F) ∉ lin U) :
+    (Pi.single p (1 : F) : σ → F) ∉ U := fun h' => h (linForm_single (F := F) p ▸ linForm_mem h')
 
-theorem lin_sup (U : Submodule F (σ → F)) (p : σ)
-    : lin (U ⊔ Submodule.span F {(Pi.single p (1 : F) : σ → F)}) = lin U ⊔ Ideal.span {X p} := by
+theorem lin_sup (U : Submodule F (σ → F)) (p : σ) :
+    lin (U ⊔ Submodule.span F {(Pi.single p (1 : F) : σ → F)}) = lin U ⊔ Ideal.span {X p} := by
   refine le_antisymm (Ideal.span_le.2 ?_) (sup_le (Ideal.span_mono (Set.image_mono ?_)) ?_)
   · rintro _ ⟨c, hc, rfl⟩
     obtain ⟨u, hu, v, hv, rfl⟩ := Submodule.mem_sup.1 hc
@@ -83,14 +131,15 @@ theorem lin_sup (U : Submodule F (σ → F)) (p : σ)
   · rw [Ideal.span_singleton_le_iff_mem, ← linForm_single (F := F) p]
     exact linForm_mem (Submodule.mem_sup_right (Submodule.mem_span_singleton_self _))
 
-theorem finrank_quot_succ (U : Submodule F (σ → F)) {e : σ → F} (h : e ∉ U)
-    : Module.finrank F ((σ → F) ⧸ (U ⊔ Submodule.span F {e})) + 1
-      = Module.finrank F ((σ → F) ⧸ U) := by
+theorem finrank_quot_succ (U : Submodule F (σ → F)) {e : σ → F} (h : e ∉ U) :
+    Module.finrank F ((σ → F) ⧸ (U ⊔ Submodule.span F {e})) + 1 =
+      Module.finrank F ((σ → F) ⧸ U) := by
   have he : e ≠ 0 := fun h0 => h (h0 ▸ U.zero_mem)
   have h1 := Submodule.finrank_quotient_add_finrank U
   have h2 := Submodule.finrank_quotient_add_finrank (U ⊔ Submodule.span F {e})
   have h3 := Submodule.finrank_sup_add_finrank_inf_eq U (Submodule.span F {e})
-  have h4 : U ⊓ Submodule.span F {e} = ⊥ := ((Submodule.disjoint_span_singleton' he).2 h).eq_bot
+  have h4 : U ⊓ Submodule.span F {e} = ⊥ :=
+    ((Submodule.disjoint_span_singleton' he).2 h).eq_bot
   rw [h4, finrank_bot, finrank_span_singleton he] at h3
   omega
 
@@ -98,18 +147,20 @@ end Forms
 
 section Quot
 
-variable {σ : Type*} [Fintype σ] [DecidableEq σ] {F : Type*} [Field F] (U : Submodule F (σ → F))
+variable {σ : Type*} [Fintype σ] [DecidableEq σ] {F : Type*} [Field F]
+  (U : Submodule F (σ → F))
 
-def qb : Module.Basis (Fin (Module.finrank F ((σ → F) ⧸ U))) F ((σ → F) ⧸ U) := Module.finBasis F _
+def qb : Module.Basis (Fin (Module.finrank F ((σ → F) ⧸ U))) F ((σ → F) ⧸ U) :=
+  Module.finBasis F _
 
 def toY : MvPolynomial σ F →ₐ[F] MvPolynomial (Fin (Module.finrank F ((σ → F) ⧸ U))) F :=
   aeval fun p => linForm ((qb U).equivFun (U.mkQ (Pi.single p 1)))
 
 theorem toY_linForm (c : σ → F) : toY U (linForm c) = linForm ((qb U).equivFun (U.mkQ c)) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [linForm_apply c, map_sum]
+
+  rw [linForm_apply c, map_sum]
   conv_rhs => rw [eq_sum_single c]
-  set_option synthInstance.maxHeartbeats 100000 in
+
   simp only [map_sum, map_smul, toY, aeval_X]
 
 theorem toY_kill : ∀ a ∈ lin U, toY U a = 0 := by
@@ -132,15 +183,15 @@ theorem mkQ_sec (t : Fin (Module.finrank F ((σ → F) ⧸ U))) : U.mkQ (sec U t
 def fromY : MvPolynomial (Fin (Module.finrank F ((σ → F) ⧸ U))) F →ₐ[F] MvPolynomial σ F ⧸ lin U :=
   aeval fun t => Ideal.Quotient.mkₐ F (lin U) (linForm (sec U t))
 
-theorem fromY_linForm (w : Fin (Module.finrank F ((σ → F) ⧸ U)) → F)
-    : fromY U (linForm w) = Ideal.Quotient.mkₐ F (lin U) (linForm (∑ t, w t • sec U t)) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [linForm_apply w, map_sum, map_sum, map_sum]
+theorem fromY_linForm (w : Fin (Module.finrank F ((σ → F) ⧸ U)) → F) :
+    fromY U (linForm w) = Ideal.Quotient.mkₐ F (lin U) (linForm (∑ t, w t • sec U t)) := by
+
+  rw [linForm_apply w, map_sum, map_sum, map_sum]
   refine Finset.sum_congr rfl fun t _ => ?_
   simp only [map_smul, fromY, aeval_X]
 
-def quotEquiv
-    : (MvPolynomial σ F ⧸ lin U) ≃ₐ[F] MvPolynomial (Fin (Module.finrank F ((σ → F) ⧸ U))) F :=
+def quotEquiv :
+    (MvPolynomial σ F ⧸ lin U) ≃ₐ[F] MvPolynomial (Fin (Module.finrank F ((σ → F) ⧸ U))) F :=
   AlgEquiv.ofAlgHom (Ideal.Quotient.liftₐ (lin U) (toY U) (toY_kill U)) (fromY U)
     (by
       apply MvPolynomial.algHom_ext
@@ -162,8 +213,8 @@ def quotEquiv
       rw [Ideal.Quotient.eq, ← linForm_single (F := F) p, ← map_sub]
       refine linForm_mem ((Submodule.Quotient.eq U).1 ?_)
       change U.mkQ _ = U.mkQ _
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum]
+
+      rw [map_sum]
       simp only [map_smul, mkQ_sec]
       exact (qb U).sum_equivFun _)
 
@@ -171,8 +222,8 @@ instance lin_isPrime : (lin U).IsPrime := by
   rw [← Ideal.Quotient.isDomain_iff_prime]
   exact (quotEquiv U).toRingEquiv.toMulEquiv.isDomain
 
-theorem lin_dim
-    : ringKrullDim (MvPolynomial σ F ⧸ lin U) = (Module.finrank F ((σ → F) ⧸ U) : WithBot ℕ∞) := by
+theorem lin_dim :
+    ringKrullDim (MvPolynomial σ F ⧸ lin U) = (Module.finrank F ((σ → F) ⧸ U) : WithBot ℕ∞) := by
   rw [ringKrullDim_eq_of_ringEquiv (quotEquiv U).toRingEquiv,
     MvPolynomial.ringKrullDim_of_isNoetherianRing, ringKrullDim_eq_zero_of_field, zero_add]
   simp
@@ -183,8 +234,8 @@ section Block
 
 variable {F : Type*} [Field F] {K : Type*} [Fintype K] {ι : K → Type*} [∀ k, Fintype (ι k)]
 
-theorem homog_linForm (k₀ : K) (hK : ∀ a : K, a = k₀) (c : (Σ k, ι k) → F)
-    : IsMultiHomog (linForm c : MRingOver F ι) fun _ => 1 := by
+theorem homog_linForm (k₀ : K) (hK : ∀ a : K, a = k₀) (c : (Σ k, ι k) → F) :
+    IsMultiHomog (linForm c : MRingOver F ι) fun _ => 1 := by
   classical
   intro m hm k
   rw [linForm_apply] at hm
@@ -194,16 +245,15 @@ theorem homog_linForm (k₀ : K) (hK : ∀ a : K, a = k₀) (c : (Σ k, ι k) �
   rw [this, (hK k).trans (hK q.1).symm]
   simp
 
-theorem eq_linForm
-    (k₀ : K) (hK : ∀ a : K, a = k₀) {f : MRingOver F ι} (hf : IsMultiHomog f fun _ => 1)
-    : f = linForm fun p => AddMonoidAlgebra.coeff f (Finsupp.single p 1) := by
+theorem eq_linForm (k₀ : K) (hK : ∀ a : K, a = k₀) {f : MRingOver F ι}
+    (hf : IsMultiHomog f fun _ => 1) :
+    f = linForm fun p => AddMonoidAlgebra.coeff f (Finsupp.single p 1) := by
   classical
   have hsupp : ∀ m ∈ f.support, ∃ q : Σ k, ι k, m = Finsupp.single q 1 := by
     intro m hm
     have hs : ∑ i, m ⟨k₀, i⟩ = 1 := hf m hm k₀
-    obtain ⟨a, -, ha0⟩ :=
-      Finset.exists_ne_zero_of_sum_ne_zero (s := Finset.univ) (f := fun i => m ⟨k₀, i⟩) (by
-        rw [hs]; exact one_ne_zero)
+    obtain ⟨a, -, ha0⟩ := Finset.exists_ne_zero_of_sum_ne_zero (s := Finset.univ)
+      (f := fun i => m ⟨k₀, i⟩) (by rw [hs]; exact one_ne_zero)
     have hsplit := Finset.add_sum_erase Finset.univ (fun i => m ⟨k₀, i⟩) (Finset.mem_univ a)
     have ha : m ⟨k₀, a⟩ = 1 := by omega
     have hrest : ∑ x ∈ Finset.univ.erase a, m ⟨k₀, x⟩ = 0 := by omega
@@ -220,7 +270,7 @@ theorem eq_linForm
       exact hb (sigma_mk_injective h).symm
   ext m
   rw [linForm_apply, coeff_sum]
-  simp only [coeff_smul, coeff_X', smul_eq_mul, mul_ite, mul_one, mul_zero]
+  simp only [MvPolynomial.coeff_smul, coeff_X', smul_eq_mul, mul_ite, mul_one, mul_zero]
   by_cases hm : m ∈ f.support
   · obtain ⟨q, rfl⟩ := hsupp m hm
     rw [Finset.sum_eq_single q]
@@ -238,12 +288,10 @@ theorem eq_linForm
       exact notMem_support_iff.1 hm
     · rfl
 
-theorem ptDeg_eq_one
-    [DecidableEq (Σ k, ι k)]
-    (k₀ : K) (hK : ∀ a : K, a = k₀)
-    (U : Submodule F ((Σ k, ι k) → F)) (hd : Module.finrank F (((Σ k, ι k) → F) ⧸ U) = 1)
-    (i : ∀ k, ι k) (hi : IsChart (lin U) i)
-    : ptDeg (lin U) i = 1 := by
+theorem ptDeg_eq_one [DecidableEq (Σ k, ι k)] (k₀ : K) (hK : ∀ a : K, a = k₀)
+    (U : Submodule F ((Σ k, ι k) → F))
+    (hd : Module.finrank F (((Σ k, ι k) → F) ⧸ U) = 1) (i : ∀ k, ι k) (hi : IsChart (lin U) i) :
+    ptDeg (lin U) i = 1 := by
   set p0 : Σ k, ι k := ⟨k₀, i k₀⟩ with hp0
   set e0 : (Σ k, ι k) → F := Pi.single p0 1 with he0
   have h0 : e0 ∉ U := single_notMem (hi k₀)
@@ -278,17 +326,16 @@ theorem ptDeg_eq_one
     rw [hlc]
     have hmem : (linForm (c • e0 - Pi.single q 1) : MRingOver F ι) ∈ chartIdeal (lin U) i :=
       Ideal.mem_sup_left (linForm_mem hc)
-    have heq
-        : (X q - C c : MRingOver F ι) = C c * (X p0 - 1) - linForm (c • e0 - Pi.single q 1) := by
+    have heq : (X q - C c : MRingOver F ι) =
+        C c * (X p0 - 1) - linForm (c • e0 - Pi.single q 1) := by
       rw [map_sub, map_smul, linForm_single, linForm_single, smul_eq_C_mul]
       ring
     rw [heq]
     exact sub_mem (Ideal.mul_mem_left _ _ hrange) hmem
 
-theorem exists_single_notMem
-    [DecidableEq (Σ k, ι k)]
-    (U : Submodule F ((Σ k, ι k) → F)) (hd : 0 < Module.finrank F (((Σ k, ι k) → F) ⧸ U))
-    : ∃ q : Σ k, ι k, (Pi.single q (1 : F) : (Σ k, ι k) → F) ∉ U := by
+theorem exists_single_notMem [DecidableEq (Σ k, ι k)] (U : Submodule F ((Σ k, ι k) → F))
+    (hd : 0 < Module.finrank F (((Σ k, ι k) → F) ⧸ U)) :
+    ∃ q : Σ k, ι k, (Pi.single q (1 : F) : (Σ k, ι k) → F) ∉ U := by
   by_contra hcon
   push_neg at hcon
   have htop : U = ⊤ := by
@@ -301,14 +348,13 @@ theorem exists_single_notMem
   rw [Module.finrank_zero_of_subsingleton] at hd
   exact lt_irrefl _ hd
 
-theorem degree_lin (k₀ : K) (hK : ∀ a : K, a = k₀) (J : IFamily F ι) (hJ : IsFieldIntersection J)
-    : ∀ (r : ℕ) (U : Submodule F ((Σ k, ι k) → F)),
-      IsProjVarF (lin U) r → J (lin U) r (fun _ _ => 1) = 1 := by
+theorem degree_lin (k₀ : K) (hK : ∀ a : K, a = k₀) (J : IFamily F ι) (hJ : IsFieldIntersection J) :
+    ∀ (r : ℕ) (U : Submodule F ((Σ k, ι k) → F)), IsProjVarF (lin U) r →
+      J (lin U) r (fun _ _ => 1) = 1 := by
   classical
   have hcard : Fintype.card K = 1 := Fintype.card_eq_one_iff.2 ⟨k₀, hK⟩
-  have hdim
-      : ∀ (r : ℕ) (U : Submodule F ((Σ k, ι k) → F)),
-        IsProjVarF (lin U) r → Module.finrank F (((Σ k, ι k) → F) ⧸ U) = r + 1 := by
+  have hdim : ∀ (r : ℕ) (U : Submodule F ((Σ k, ι k) → F)), IsProjVarF (lin U) r →
+      Module.finrank F (((Σ k, ι k) → F) ⧸ U) = r + 1 := by
     intro r U hV
     have h := hV.2
     rw [lin_dim, hcard] at h
@@ -354,9 +400,8 @@ theorem degree_lin (k₀ : K) (hK : ∀ a : K, a = k₀) (J : IFamily F ι) (hJ 
         rwa [h1] at this
       · exact (Ideal.ne_top_iff_one _).1 hV.1.1.ne_top
     have hb := hJ.2 (lin U) r (fun _ _ => 1) (fun _ => 1) (X p) 1 hV hrat
-    have hsn
-        : Fin.snoc (α := fun _ => K → ℤ) (fun _ _ => (1 : ℤ)) (fun _ => 1)
-          = fun (_ : Fin (r + 1)) _ => 1 := by
+    have hsn : Fin.snoc (α := fun _ => K → ℤ) (fun _ _ => (1 : ℤ)) (fun _ => 1) =
+        fun (_ : Fin (r + 1)) _ => 1 := by
       funext j
       refine Fin.lastCases ?_ (fun j => ?_) j <;> simp
     rw [hsn] at hb
@@ -369,19 +414,13 @@ end GlobalTheory.CompanionTheory.Ar.Top.FlDeg.LinDeg
 
 namespace GlobalTheory.CompanionTheory.Ar.Top.FlDeg
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
-  ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I4
-  GroundTheory.Heights₂.Heights.LowerBoundFree GlobalTheory.CompanionTheory.Ar
-  GlobalTheory.CompanionTheory.Ar.Top
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I4
+  GroundTheory.Heights₂.Heights.LowerBoundFree GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Top
 
-theorem linear_subspace_degree_one
-    : ∀ (F : Type) [Field F] (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fintype (ι k)] (k₀ : K),
-      (∀ a : K, a = k₀)
-        → ∀ (J : IFamily F ι),
-          IsFieldIntersection J
-            → ∀ (S : Set (MRingOver F ι)),
-              (∀ f ∈ S, IsMultiHomog f fun _ => 1)
-                → ∀ r : ℕ, IsProjVarF (Ideal.span S) r → J (Ideal.span S) r (fun _ _ => 1) = 1 := by
+theorem linear_subspace_degree_one : ∀ (F : Type) [Field F] (K : Type) [Fintype K] (ι : K → Type)
+    [∀ k, Fintype (ι k)] (k₀ : K), (∀ a : K, a = k₀) → ∀ (J : IFamily F ι), IsFieldIntersection J →
+    ∀ (S : Set (MRingOver F ι)), (∀ f ∈ S, IsMultiHomog f fun _ => 1) → ∀ r : ℕ,
+    IsProjVarF (Ideal.span S) r → J (Ideal.span S) r (fun _ _ => 1) = 1 := by
   intro F _ K _ ι _ k₀ hK J hJ S hS r hV
   set U : Submodule F ((Σ k, ι k) → F) :=
     ((Ideal.span S).restrictScalars F).comap LinDeg.linForm with hU

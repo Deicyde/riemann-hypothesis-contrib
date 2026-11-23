@@ -1,9 +1,47 @@
 module
 
-public import Mathlib
-public import CompanionTheory.RealGroups.UnitaryAdmissibility.ArchimedeanUnitaryDual.StDefinite
 public import CompanionTheory.HarishChandraModules.KFiniteAnalyticVectors.AdmissibleSmoothVectors.FinOfPI
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.HilbertSchurOfAdjointClosed
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
+import Development.AbelianVarietyTheory.Definitions.Foundations.AestronglyMeasurableQuotMeasureIffLift
 
 @[expose] public section
 
@@ -17,20 +55,18 @@ namespace GlobalTheory.CompanionTheory.Factor
 
 open CompanionTheory.D.gk.admitted.FinOfPIAux
 
-variable
-  {G : Type} [Group G] {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
+variable {G : Type} [Group G] {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
 
 section Diag
 
 variable {ι : Type} [Fintype ι] [DecidableEq ι]
 
-theorem diag_mem_of_bicomm
-    (σ : G →* (H →L[ℂ] H)) (hσ : ∀ g v, ‖σ g v‖ = ‖v‖)
-    (C : Submodule ℂ (PiLp 2 (fun _ : ι => H)))
-    (hcl : IsClosed (C : Set (PiLp 2 (fun _ : ι => H)))) (hC : ∀ g, ∀ z ∈ C, diag (σ g) z ∈ C)
-    (T : H →L[ℂ] H) (hT : ∀ S : H →L[ℂ] H, (∀ g, S * σ g = σ g * S) → S * T = T * S)
-    (z : PiLp 2 (fun _ : ι => H)) (hz : z ∈ C)
-    : diag T z ∈ C := by
+theorem diag_mem_of_bicomm (σ : G →* (H →L[ℂ] H)) (hσ : ∀ g v, ‖σ g v‖ = ‖v‖)
+    (C : Submodule ℂ (PiLp 2 (fun _ : ι => H))) (hcl : IsClosed (C : Set (PiLp 2 (fun _ : ι => H))))
+    (hC : ∀ g, ∀ z ∈ C, diag (σ g) z ∈ C) (T : H →L[ℂ] H)
+    (hT : ∀ S : H →L[ℂ] H, (∀ g, S * σ g = σ g * S) → S * T = T * S)
+    (z : PiLp 2 (fun _ : ι => H)) (hz : z ∈ C) :
+    diag T z ∈ C := by
   haveI : CompleteSpace C := hcl.completeSpace_coe
   have hPg := proj_comm (ι := ι) σ hσ C hC
   let Q : ι → ι → H →L[ℂ] H := fun k l =>
@@ -42,17 +78,16 @@ theorem diag_mem_of_bicomm
     ext v
     simp only [Q, ContinuousLinearMap.mul_apply, ContinuousLinearMap.comp_apply, PiLp.proj_apply]
     rw [← diag_incl, hPg, diag_apply]
-  have hsum
-      : ∀ w : PiLp 2 (fun _ : ι => H), ∀ k,
-        (C.starProjection w).ofLp k = ∑ l, Q k l (w.ofLp l) := by
+  have hsum : ∀ w : PiLp 2 (fun _ : ι => H), ∀ k,
+      (C.starProjection w).ofLp k = ∑ l, Q k l (w.ofLp l) := by
     intro w k
     conv_lhs => rw [← sum_incl w]
-    set_option synthInstance.maxHeartbeats 100000 in
+
     simp [Q, map_sum]
   have key : C.starProjection (diag T z) = diag T (C.starProjection z) := by
     ext k
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hsum, diag_apply, hsum, map_sum]
+
+    rw [hsum, diag_apply, hsum, map_sum]
     refine Finset.sum_congr rfl fun l _ => ?_
     rw [diag_apply]
     exact congrArg (fun S : H →L[ℂ] H => S (z.ofLp l)) (hQ k l)
@@ -60,38 +95,32 @@ theorem diag_mem_of_bicomm
   rw [← hz', ← key]
   exact C.starProjection_apply_mem _
 
-theorem sum_eq_zero_of_bicomm
-    (σ : G →* (H →L[ℂ] H)) (hσ : ∀ g v, ‖σ g v‖ = ‖v‖)
-    (L : ι → H →L[ℂ] H) (y : ι → H) (h : ∀ g, ∑ k, L k (σ g (y k)) = 0)
-    (T : H →L[ℂ] H) (hT : ∀ S : H →L[ℂ] H, (∀ g, S * σ g = σ g * S) → S * T = T * S)
-    : ∑ k, L k (T (y k)) = 0 := by
+theorem sum_eq_zero_of_bicomm (σ : G →* (H →L[ℂ] H)) (hσ : ∀ g v, ‖σ g v‖ = ‖v‖)
+    (L : ι → H →L[ℂ] H) (y : ι → H) (h : ∀ g, ∑ k, L k (σ g (y k)) = 0) (T : H →L[ℂ] H)
+    (hT : ∀ S : H →L[ℂ] H, (∀ g, S * σ g = σ g * S) → S * T = T * S) :
+    ∑ k, L k (T (y k)) = 0 := by
   let y' : PiLp 2 (fun _ : ι => H) := WithLp.toLp 2 y
   let V : Submodule ℂ (PiLp 2 (fun _ : ι => H)) :=
     Submodule.span ℂ (Set.range fun g : G => diag (σ g) y')
-  have hdiag_mul
-      : ∀ a b : G, ∀ w : PiLp 2 (fun _ : ι => H),
-        diag (σ a) (diag (σ b) w) = diag (σ (a * b)) w := by
+  have hdiag_mul : ∀ a b : G, ∀ w : PiLp 2 (fun _ : ι => H),
+      diag (σ a) (diag (σ b) w) = diag (σ (a * b)) w := by
     intro a b w
     ext k
     simp only [diag_apply, map_mul, ContinuousLinearMap.mul_apply]
   have hCinv : ∀ g, ∀ z ∈ V.topologicalClosure, diag (σ g) z ∈ V.topologicalClosure := by
     intro g
-    have hle
-        : V
-          ≤ V.topologicalClosure.comap
-            ((diag (σ g) : (PiLp 2 (fun _ : ι => H)) →L[ℂ] (PiLp 2 (fun _ : ι => H)))
-              : (PiLp 2 (fun _ : ι => H)) →ₗ[ℂ] (PiLp 2 (fun _ : ι => H))) := by
+    have hle : V ≤ V.topologicalClosure.comap
+        ((diag (σ g) : (PiLp 2 (fun _ : ι => H)) →L[ℂ] (PiLp 2 (fun _ : ι => H))) :
+          (PiLp 2 (fun _ : ι => H)) →ₗ[ℂ] (PiLp 2 (fun _ : ι => H))) := by
       rw [Submodule.span_le]
       rintro _ ⟨b, rfl⟩
       show diag (σ g) (diag (σ b) y') ∈ V.topologicalClosure
       rw [hdiag_mul]
       exact V.le_topologicalClosure (Submodule.subset_span ⟨g * b, rfl⟩)
-    have hcl' : IsClosed
-        ((V.topologicalClosure.comap
-              ((diag (σ g) : (PiLp 2 (fun _ : ι => H)) →L[ℂ] (PiLp 2 (fun _ : ι => H)))
-                : (PiLp 2 (fun _ : ι => H)) →ₗ[ℂ] (PiLp 2 (fun _ : ι => H)))
-            : Submodule ℂ (PiLp 2 (fun _ : ι => H)))
-          : Set (PiLp 2 (fun _ : ι => H))) :=
+    have hcl' : IsClosed ((V.topologicalClosure.comap
+        ((diag (σ g) : (PiLp 2 (fun _ : ι => H)) →L[ℂ] (PiLp 2 (fun _ : ι => H))) :
+          (PiLp 2 (fun _ : ι => H)) →ₗ[ℂ] (PiLp 2 (fun _ : ι => H))) :
+          Submodule ℂ (PiLp 2 (fun _ : ι => H))) : Set (PiLp 2 (fun _ : ι => H))) :=
       V.isClosed_topologicalClosure.preimage (diag (σ g)).continuous
     intro z hz
     exact Submodule.topologicalClosure_minimal V hle hcl' hz
@@ -101,8 +130,8 @@ theorem sum_eq_zero_of_bicomm
     refine ⟨1, ?_⟩
     ext k
     simp [diag_apply]
-  have hT' :=
-    diag_mem_of_bicomm σ hσ V.topologicalClosure V.isClosed_topologicalClosure hCinv T hT y' hy'
+  have hT' := diag_mem_of_bicomm σ hσ V.topologicalClosure V.isClosed_topologicalClosure
+    hCinv T hT y' hy'
   let Λ : (PiLp 2 (fun _ : ι => H)) →L[ℂ] H := ∑ k, (L k).comp (PiLp.proj 2 (fun _ : ι => H) k)
   have hΛ : ∀ w : PiLp 2 (fun _ : ι => H), Λ w = ∑ k, L k (w.ofLp k) := by
     intro w
@@ -120,16 +149,14 @@ theorem sum_eq_zero_of_bicomm
 
 end Diag
 
-theorem standard_polynomial_vanishes_on_bicommutant
-    (σ : G →* (H →L[ℂ] H)) (hσ : ∀ g v, ‖σ g v‖ = ‖v‖)
-    (E : H →L[ℂ] H) (M : ℕ)
-    (h : ∀ g : Fin M → G, stdPoly E (fun i => σ (g i)) = 0) (a : Fin M → H →L[ℂ] H)
-    (ha : ∀ i, ∀ T : H →L[ℂ] H, (∀ g, T * σ g = σ g * T) → T * a i = a i * T)
-    : stdPoly E a = 0 := by
+theorem standard_polynomial_vanishes_on_bicommutant (σ : G →* (H →L[ℂ] H)) (hσ : ∀ g v, ‖σ g v‖ = ‖v‖)
+    (E : H →L[ℂ] H) (M : ℕ) (h : ∀ g : Fin M → G, stdPoly E (fun i => σ (g i)) = 0)
+    (a : Fin M → H →L[ℂ] H)
+    (ha : ∀ i, ∀ T : H →L[ℂ] H, (∀ g, T * σ g = σ g * T) → T * a i = a i * T) :
+    stdPoly E a = 0 := by
   classical
-  have step
-      : ∀ j : ℕ, ∀ g : Fin M → G,
-        stdPoly E (fun i : Fin M => if (i : ℕ) < j then a i else σ (g i)) = 0 := by
+  have step : ∀ j : ℕ, ∀ g : Fin M → G,
+      stdPoly E (fun i : Fin M => if (i : ℕ) < j then a i else σ (g i)) = 0 := by
     intro j
     induction j with
     | zero => intro g; simpa using h g
@@ -138,9 +165,8 @@ theorem standard_polynomial_vanishes_on_bicommutant
       by_cases hj : j < M
       · let k : Fin M := ⟨j, hj⟩
         let b : Fin M → H →L[ℂ] H := fun i => if (i : ℕ) < j then a i else σ (g i)
-        have hb
-            : (fun i : Fin M => if (i : ℕ) < j + 1 then a i else σ (g i))
-              = Function.update b k (a k) := by
+        have hb : (fun i : Fin M => if (i : ℕ) < j + 1 then a i else σ (g i)) =
+            Function.update b k (a k) := by
           funext i
           by_cases hik : i = k
           · subst hik
@@ -177,15 +203,9 @@ theorem standard_polynomial_vanishes_on_bicommutant
         simpa [hiff] using ih g
   simpa using step M (fun _ => 1)
 
-theorem stdPoly_bicomm
-    : ∀ (G H : Type) [Group G] [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
-        (σ : G →* (H →L[ℂ] H)),
-      (∀ g v, ‖σ g v‖ = ‖v‖)
-        → ∀ (E : H →L[ℂ] H) (m : ℕ),
-          (∀ g : Fin m → G, stdPoly E (fun i => σ (g i)) = 0)
-            → ∀ a : Fin m → (H →L[ℂ] H),
-              (∀ i, ∀ T : H →L[ℂ] H, (∀ g, T * σ g = σ g * T) → T * a i = a i * T)
-                → stdPoly E a = 0 := by
+theorem stdPoly_bicomm : ∀ (G H : Type) [Group G] [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H] (σ : G →* (H →L[ℂ] H)),
+    (∀ g v, ‖σ g v‖ = ‖v‖) → ∀ (E : H →L[ℂ] H) (m : ℕ), (∀ g : Fin m → G, stdPoly E (fun i => σ (g i)) = 0) →
+    ∀ a : Fin m → (H →L[ℂ] H), (∀ i, ∀ T : H →L[ℂ] H, (∀ g, T * σ g = σ g * T) → T * a i = a i * T) → stdPoly E a = 0 := by
   intro G H _ _ _ _ σ hσ E m h a ha
   exact standard_polynomial_vanishes_on_bicommutant σ hσ E m h a ha
 

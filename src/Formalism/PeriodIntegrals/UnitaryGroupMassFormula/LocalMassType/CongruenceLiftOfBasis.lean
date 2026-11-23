@@ -1,10 +1,51 @@
 module
 
-public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.LocalMassType.WCoreG
+public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.LocalMassType.IdxStep
+public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.LocalMassType.WProof
+public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.LocalMassType.IsClosedCongruenceSubgroup
 public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.LocalMassType.MemSecondProjectionIff
 public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.LocalMassType.SaturatedSplitLattice
-public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.LocalMassType.IdxStep
-public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.LocalMassType.IsClosedCongruenceSubgroup
+import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.LocalMassType.SplitDecomp
+public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.LocalMassType.WCoreG
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -12,16 +53,16 @@ noncomputable section
 
 namespace PI.LocMassTypL
 
-open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub
-  Formalism.L2.SG.LocVol NumberField IsDedekindDomain Matrix PI.LocMassTypW
+open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub Formalism.L2.SG.LocVol NumberField IsDedekindDomain Matrix
+  PI.LocMassTypW
 open scoped TensorProduct
 
 section Core
 
 variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
 
-theorem natCast_mem_max (v : HeightOneSpectrum (𝓞 F)) {g : ℕ} (hgv : (g : 𝓞 F) ∈ v.asIdeal)
-    : (g : v.adicCompletionIntegers F) ∈ IsLocalRing.maximalIdeal (v.adicCompletionIntegers F) := by
+theorem natCast_mem_max (v : HeightOneSpectrum (𝓞 F)) {g : ℕ} (hgv : (g : 𝓞 F) ∈ v.asIdeal) :
+    (g : v.adicCompletionIntegers F) ∈ IsLocalRing.maximalIdeal (v.adicCompletionIntegers F) := by
   rw [IsLocalRing.mem_maximalIdeal, mem_nonunits_iff]
   intro hu
   obtain ⟨w, hw⟩ := hu.exists_left_inv
@@ -35,21 +76,18 @@ theorem natCast_mem_max (v : HeightOneSpectrum (𝓞 F)) {g : ℕ} (hgv : (g : �
   rw [e, map_one] at this
   exact lt_irrefl _ this
 
-theorem congruence_lift_of_basis
-    {σ : E →ₐ[F] E} {n : ℕ} {J : Matrix (Fin n) (Fin n) E} {v : HeightOneSpectrum (𝓞 F)} {r : ℕ}
-    {P : Frame E n r} {Λ : Set (Fin n → E)} (D : SD σ v) (Q : GL (Fin n) (Fv F v ⊗[F] E))
-    (hQΛ : ∀ y,
-      y ∈ latLoc (E := E) v Λ
-        ↔ ∃ x : Fin n → Fv F v ⊗[F] E,
-          (∀ i, x i ∈ OEv (E := E) v) ∧ y = (Q : Matrix (Fin n) (Fin n) (Fv F v ⊗[F] E)) *ᵥ x)
+theorem congruence_lift_of_basis {σ : E →ₐ[F] E} {n : ℕ} {J : Matrix (Fin n) (Fin n) E} {v : HeightOneSpectrum (𝓞 F)}
+    {r : ℕ} {P : Frame E n r} {Λ : Set (Fin n → E)} (D : SD σ v) (Q : GL (Fin n) (Fv F v ⊗[F] E))
+    (hQΛ : ∀ y, y ∈ latLoc (E := E) v Λ ↔
+      ∃ x : Fin n → Fv F v ⊗[F] E, (∀ i, x i ∈ OEv (E := E) v) ∧
+        y = (Q : Matrix (Fin n) (Fin n) (Fv F v ⊗[F] E)) *ᵥ x)
     (hQh : ∀ x y : Fin n → Fv F v ⊗[F] E,
       hR (Fv F v) σ J ((Q : Matrix (Fin n) (Fin n) (Fv F v ⊗[F] E)) *ᵥ x)
-          ((Q : Matrix (Fin n) (Fin n) (Fv F v ⊗[F] E)) *ᵥ y)
-        = ∑ i, sigR (Fv F v) σ (x i) * y i)
-    (hSat : SatSplit) (hPr : IsPrim v Λ (locF v (ratTup (F := F) (Fv F v) (F0 P))))
-    {g : ℕ} (hgv : (g : 𝓞 F) ∈ v.asIdeal)
-    (k : HA (Fv F v) σ J) (hk : k ∈ K1 σ J v Λ g P)
-    : k ∈ Formalism.L2.SG.TypedSets.Knatv σ J Λ P g v := by
+        ((Q : Matrix (Fin n) (Fin n) (Fv F v ⊗[F] E)) *ᵥ y) = ∑ i, sigR (Fv F v) σ (x i) * y i)
+    (hSat : SatSplit)
+    (hPr : IsPrim v Λ (locF v (ratTup (F := F) (Fv F v) (F0 P)))) {g : ℕ}
+    (hgv : (g : 𝓞 F) ∈ v.asIdeal) (k : HA (Fv F v) σ J) (hk : k ∈ K1 σ J v Λ g P) :
+    k ∈ Formalism.L2.SG.TypedSets.Knatv σ J Λ P g v := by
   classical
   have hkK := hk.1
   set Qm : Matrix (Fin n) (Fin n) (Fv F v ⊗[F] E) := (Q : Matrix (Fin n) (Fin n) (Fv F v ⊗[F] E)) with hQm
@@ -75,34 +113,28 @@ theorem congruence_lift_of_basis
   have hPrk : IsPrim v Λ (k • Y0) := by
     refine ⟨fun a => kv_lat hkK (hPr.1 a), fun c hc => hPr.2 c ?_⟩
     have e : ∑ a, c a • (k • Y0) a = lin (Fv F v) σ J k (∑ a, c a • Y0 a) := by
-      set_option synthInstance.maxHeartbeats 100000 in
+
       rw [map_sum]; simp only [map_smul, smul_tup]
     rw [e] at hc
     have := kv_lat (kv_inv hkK) hc
     rwa [lin_inv_lin] at this
 
-  have hunit
-      : ∀ x y,
-        hR (Fv F v) σ J ((HA.mat (Fv F v) σ J k : Matrix (Fin n) (Fin n) _) *ᵥ x)
-            ((HA.mat (Fv F v) σ J k : Matrix (Fin n) (Fin n) _) *ᵥ y)
-          = hR (Fv F v) σ J x y := by
+  have hunit : ∀ x y, hR (Fv F v) σ J ((HA.mat (Fv F v) σ J k : Matrix (Fin n) (Fin n) _) *ᵥ x)
+      ((HA.mat (Fv F v) σ J k : Matrix (Fin n) (Fin n) _) *ᵥ y) = hR (Fv F v) σ J x y := by
     intro x y
     have hmem := (show HR (Fv F v) σ J from k).2
     show Formalism.UG.hform _ _ _ _ = Formalism.UG.hform _ _ _ _
     rw [hform_mulVec]
     congr 1
-  have primT
-      : ∀ W : Fin (r + 1) → Fin n → Fv F v ⊗[F] E,
-        IsPrim v Λ W
-          → ∀ c : Fin (r + 1) → Fv F v ⊗[F] E,
-            IntV v (∑ a, c a • (Qi *ᵥ W a)) → ∀ a, c a ∈ OEv (E := E) v := by
+  have primT : ∀ W : Fin (r + 1) → Fin n → Fv F v ⊗[F] E, IsPrim v Λ W →
+      ∀ c : Fin (r + 1) → Fv F v ⊗[F] E, IntV v (∑ a, c a • (Qi *ᵥ W a)) → ∀ a, c a ∈ OEv (E := E) v := by
     intro W hW c hc
     apply hW.2 c
     rw [memΛ]
     have : Qi *ᵥ (∑ a, c a • W a) = ∑ a, c a • (Qi *ᵥ W a) := by
       show Matrix.mulVecLin Qi (∑ a, c a • W a) = _
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum]
+
+      rw [map_sum]
       simp only [map_smul, Matrix.mulVecLin_apply]
     rwa [this]
   set Z0 : Fin (r + 1) → Fin n → Fv F v ⊗[F] E := fun a => Qi *ᵥ Y0 a with hZ0def
@@ -112,13 +144,11 @@ theorem congruence_lift_of_basis
   have pZ0 := primT Y0 hPr
   have pZ := primT (k • Y0) hPrk
 
-  have hcong
-      : ∀ a, ∃ y ∈ latLoc (E := E) v Λ, (k • Y0) a = Y0 a + sc (E := E) v (g : Fv F v) • y := by
+  have hcong : ∀ a, ∃ y ∈ latLoc (E := E) v Λ, (k • Y0) a = Y0 a + sc (E := E) v (g : Fv F v) • y := by
     intro a
     obtain ⟨y, hy, hye⟩ := hk.2 a
     refine ⟨y, hy, ?_⟩
-    rw [← hYdef, ← hye]
-    abel
+    rw [← hYdef, ← hye]; abel
   choose yv hyv hyve using hcong
   set Wv : Fin (r + 1) → Fin n → Fv F v ⊗[F] E := fun a => Qi *ᵥ yv a with hWv
   have hW : ∀ a, IntV v (Wv a) := fun a => (memΛ _).1 (hyv a)
@@ -168,16 +198,15 @@ theorem congruence_lift_of_basis
     simp only [B1, B0, B', Matrix.of_apply, Matrix.add_apply, Matrix.smul_apply, smul_eq_mul]
     push_cast
     rw [hZW a, Pi.add_apply, Pi.smul_apply, smul_eq_mul, map_add (f := _), map_mul, (D.hsc _).2]
-  obtain ⟨k1, K', hk1u, hk1A, hk1B, hk1e⟩ :=
-    wCoreG (v.adicCompletionIntegers F) (g : v.adicCompletionIntegers F) (natCast_mem_max v hgv) A0
-      A1 B0 B1 A' B' L0 M1 hL0 hM1 hgram hA1 hB1
+  obtain ⟨k1, K', hk1u, hk1A, hk1B, hk1e⟩ := wCoreG (v.adicCompletionIntegers F)
+    (g : v.adicCompletionIntegers F) (natCast_mem_max v hgv) A0 A1 B0 B1 A' B' L0 M1 hL0 hM1
+    hgram hA1 hB1
   have hdet : IsUnit k1.det := (Matrix.isUnit_iff_isUnit_det k1).1 hk1u
   have hki : k1 * k1⁻¹ = 1 := Matrix.mul_nonsing_inv k1 hdet
   have hik : k1⁻¹ * k1 = 1 := Matrix.nonsing_inv_mul k1 hdet
   set f := (v.adicCompletionIntegers F).subtype with hf
-  have mo
-      : ∀ {M N : Matrix (Fin n) (Fin n) (v.adicCompletionIntegers F)},
-        M * N = 1 → M.map f * N.map f = 1 := by
+  have mo : ∀ {M N : Matrix (Fin n) (Fin n) (v.adicCompletionIntegers F)}, M * N = 1 →
+      M.map f * N.map f = 1 := by
     intro M N hMN
     rw [← Matrix.map_mul, hMN, Matrix.map_one f (map_zero f) (map_one f)]
   have e1 : (k1⁻¹)ᵀᵀ * k1 = 1 := by rw [transpose_transpose, hik]
@@ -187,7 +216,8 @@ theorem congruence_lift_of_basis
     fun M => (Matrix.transpose_map).symm
   set kstd := D.kS (k1.map f) ((k1⁻¹)ᵀ.map f) with hkstd
   set kstd' := D.kS (k1⁻¹.map f) (k1ᵀ.map f) with hkstd'
-  have hkk : kstd * kstd' = 1 := by rw [hkstd, hkstd', SD.kS_mul, mo hki, mo e3, SD.kS_one]
+  have hkk : kstd * kstd' = 1 := by
+    rw [hkstd, hkstd', SD.kS_mul, mo hki, mo e3, SD.kS_one]
   have hk'k : kstd' * kstd = 1 := mul_eq_one_comm.mp hkk
   have hkU : ∀ x y, stdH σ (kstd *ᵥ x) (kstd *ᵥ y) = stdH σ x y := by
     intro x y
@@ -208,16 +238,17 @@ theorem congruence_lift_of_basis
     · intro i
       rw [hkstd, SD.fst_proj_split_matrix_mulVec]
       have := congrArg (fun M => f (M i a)) hk1A
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [Matrix.mul_apply, map_sum, map_mul] at this
+
+      simp only [Matrix.mul_apply, map_sum, map_mul] at this
       simp only [mulVec, dotProduct, Matrix.map_apply]
       exact this
     · intro i
-      have hB : (k1⁻¹)ᵀ * B0 = B1 := by rw [← hk1B, ← Matrix.mul_assoc, e3, Matrix.one_mul]
+      have hB : (k1⁻¹)ᵀ * B0 = B1 := by
+        rw [← hk1B, ← Matrix.mul_assoc, e3, Matrix.one_mul]
       rw [hkstd, SD.snd_proj_split_matrix_mulVec]
       have := congrArg (fun M => f (M i a)) hB
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [Matrix.mul_apply, map_sum, map_mul] at this
+
+      simp only [Matrix.mul_apply, map_sum, map_mul] at this
       simp only [mulVec, dotProduct, Matrix.map_apply]
       exact this
 
@@ -227,8 +258,7 @@ theorem congruence_lift_of_basis
       have : k1⁻¹ * k1 = k1⁻¹ + (g : v.adicCompletionIntegers F) • (k1⁻¹ * K') := by
         rw [hk1e, Matrix.mul_add, Matrix.mul_one, Matrix.mul_smul]
       rw [hik] at this
-      rw [this]
-      abel
+      rw [this]; abel
     rw [h0, hK'', Matrix.transpose_sub, Matrix.transpose_one, Matrix.transpose_smul, smul_neg]
     abel
   set U := D.kS (K'.map f) (K''.map f) with hU
@@ -236,33 +266,28 @@ theorem congruence_lift_of_basis
     intro x
     apply D.extV
     · intro i
-      rw [Pi.sub_apply, map_sub, hkstd, SD.fst_proj_split_matrix_mulVec, Pi.smul_apply, smul_eq_mul,
-        map_mul, (D.hsc _).1, hU, SD.fst_proj_split_matrix_mulVec, hk1e,
-        Matrix.map_add f (map_add f), Matrix.map_one f (map_zero f) (map_one f), add_mulVec,
+      rw [Pi.sub_apply, map_sub, hkstd, SD.fst_proj_split_matrix_mulVec, Pi.smul_apply, smul_eq_mul, map_mul, (D.hsc _).1,
+        hU, SD.fst_proj_split_matrix_mulVec, hk1e, Matrix.map_add f (map_add f), Matrix.map_one f (map_zero f) (map_one f), add_mulVec,
         one_mulVec, Pi.add_apply, add_sub_cancel_left]
       simp only [mulVec, dotProduct, Matrix.map_apply, Matrix.smul_apply, smul_eq_mul, map_mul,
         Finset.mul_sum, hf, Subring.coe_subtype]
       refine Finset.sum_congr rfl fun j _ => ?_
-      rw [map_natCast]
-      ring
+      rw [map_natCast]; ring
     · intro i
-      rw [Pi.sub_apply, map_sub, hkstd, SD.snd_proj_split_matrix_mulVec, Pi.smul_apply, smul_eq_mul,
-        map_mul, (D.hsc _).2, hU, SD.snd_proj_split_matrix_mulVec, hk1i,
-        Matrix.map_add f (map_add f), Matrix.map_one f (map_zero f) (map_one f), add_mulVec,
+      rw [Pi.sub_apply, map_sub, hkstd, SD.snd_proj_split_matrix_mulVec, Pi.smul_apply, smul_eq_mul, map_mul, (D.hsc _).2,
+        hU, SD.snd_proj_split_matrix_mulVec, hk1i, Matrix.map_add f (map_add f), Matrix.map_one f (map_zero f) (map_one f), add_mulVec,
         one_mulVec, Pi.add_apply, add_sub_cancel_left]
       simp only [mulVec, dotProduct, Matrix.map_apply, Matrix.smul_apply, smul_eq_mul, map_mul,
         Finset.mul_sum, hf, Subring.coe_subtype]
       refine Finset.sum_congr rfl fun j _ => ?_
-      rw [map_natCast]
-      ring
+      rw [map_natCast]; ring
 
   set kM := Qm * kstd * Qi with hkM
   set kMi := Qm * kstd' * Qi with hkMi
   have hkMM : kM * kMi = 1 := by
     rw [hkM, hkMi]
-    calc
-      Qm * kstd * Qi * (Qm * kstd' * Qi)
-        = Qm * (kstd * (Qi * Qm) * kstd') * Qi := by simp only [Matrix.mul_assoc]
+    calc Qm * kstd * Qi * (Qm * kstd' * Qi) = Qm * (kstd * (Qi * Qm) * kstd') * Qi := by
+          simp only [Matrix.mul_assoc]
       _ = 1 := by rw [hQiQ, Matrix.mul_one, hkk, Matrix.mul_one, hQQi]
   have hkMM' : kMi * kM = 1 := mul_eq_one_comm.mp hkMM
   let kG : GL (Fin n) (Fv F v ⊗[F] E) := ⟨kM, kMi, hkMM, hkMM'⟩
@@ -302,7 +327,8 @@ theorem congruence_lift_of_basis
 
   set s := kH⁻¹ * k with hs
   have hsK : s ∈ Formalism.L2.SG.TypedSets.Kv σ J Λ v := kv_mul (kv_inv hkHK) hkK
-  have hsX : s • X0r = X0r := by rw [hs, mul_smul, ← hkHX, inv_smul_smul]
+  have hsX : s • X0r = X0r := by
+    rw [hs, mul_smul, ← hkHX, inv_smul_smul]
   have hsS : s ∈ (Ssub (Fv F v) σ J P : Set (HA (Fv F v) σ J)) := by
     intro b
     show lin (Fv F v) σ J s (ratV (F := F) (Fv F v) (F0 P b)) - ratV (F := F) (Fv F v) (F0 P b) ∈ _

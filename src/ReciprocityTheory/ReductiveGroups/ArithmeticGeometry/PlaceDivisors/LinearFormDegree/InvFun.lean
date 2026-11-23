@@ -1,6 +1,52 @@
 module
 
-public import Mathlib
+public import Mathlib.LinearAlgebra.Matrix.NonsingularInverse
+public import Mathlib.RingTheory.MvPowerSeries.Substitution
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.Order.CompletePartialOrder
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Presheaf
 
 @[expose] public section
 
@@ -12,10 +58,9 @@ namespace ReciprocityTheory.ChartRestriction.G.LF.InvFun
 
 variable {σ R : Type} [CommRing R]
 
-theorem pow_sub_pow_order
-    (x y : MvPowerSeries σ R) (k : ℕ∞) (hxy : k ≤ (x - y).order)
-    (hx : 1 ≤ x.order) (hy : 1 ≤ y.order) (n : ℕ)
-    : k + n ≤ (x ^ n - y ^ n).order + 1 := by
+theorem pow_sub_pow_order (x y : MvPowerSeries σ R) (k : ℕ∞) (hxy : k ≤ (x - y).order)
+    (hx : 1 ≤ x.order) (hy : 1 ≤ y.order) (n : ℕ) :
+    k + n ≤ (x ^ n - y ^ n).order + 1 := by
   induction n with
   | zero => simp
   | succ n ih =>
@@ -30,25 +75,20 @@ theorem pow_sub_pow_order
     refine le_trans ?_ (add_le_add hm (le_refl (1 : ℕ∞)))
     rw [← min_add_add_right]
     refine le_min ?_ ?_
-    · calc
-        k + ((n + 1 : ℕ) : ℕ∞)
-          = (k + n) + 1 := by push_cast; ring
+    · calc k + ((n + 1 : ℕ) : ℕ∞) = (k + n) + 1 := by push_cast; ring
         _ ≤ ((x ^ n - y ^ n).order + 1) + 1 := by gcongr
         _ ≤ ((x ^ n - y ^ n).order + x.order) + 1 := by gcongr
         _ ≤ _ := by gcongr
-    · calc
-        k + ((n + 1 : ℕ) : ℕ∞)
-          = ((n : ℕ∞) + k) + 1 := by push_cast; ring
+    · calc k + ((n + 1 : ℕ) : ℕ∞) = ((n : ℕ∞) + k) + 1 := by push_cast; ring
         _ ≤ ((y ^ n).order + (x - y).order) + 1 := by gcongr
         _ ≤ _ := by gcongr
 
-theorem prod_sub_prod_order
-    {ι : Type} (x y : ι → MvPowerSeries σ R) (n : ι → ℕ)
-    (k : ℕ∞) (hxy : ∀ i, k ≤ (x i - y i).order)
-    (hx : ∀ i, 1 ≤ (x i).order) (hy : ∀ i, 1 ≤ (y i).order) (s : Finset ι)
-    : ((∑ i ∈ s, n i : ℕ) : ℕ∞) ≤ (∏ i ∈ s, x i ^ n i).order
-      ∧ ((∑ i ∈ s, n i : ℕ) : ℕ∞) ≤ (∏ i ∈ s, y i ^ n i).order
-      ∧ k + (∑ i ∈ s, n i : ℕ) ≤ (∏ i ∈ s, x i ^ n i - ∏ i ∈ s, y i ^ n i).order + 1 := by
+theorem prod_sub_prod_order {ι : Type} (x y : ι → MvPowerSeries σ R) (n : ι → ℕ) (k : ℕ∞)
+    (hxy : ∀ i, k ≤ (x i - y i).order) (hx : ∀ i, 1 ≤ (x i).order) (hy : ∀ i, 1 ≤ (y i).order)
+    (s : Finset ι) :
+    ((∑ i ∈ s, n i : ℕ) : ℕ∞) ≤ (∏ i ∈ s, x i ^ n i).order ∧
+    ((∑ i ∈ s, n i : ℕ) : ℕ∞) ≤ (∏ i ∈ s, y i ^ n i).order ∧
+    k + (∑ i ∈ s, n i : ℕ) ≤ (∏ i ∈ s, x i ^ n i - ∏ i ∈ s, y i ^ n i).order + 1 := by
   classical
   induction s using Finset.induction_on with
   | empty => simp
@@ -63,35 +103,27 @@ theorem prod_sub_prod_order
     refine ⟨?_, ?_, ?_⟩
     · push_cast at hP ⊢; exact le_trans (add_le_add hxa hP) le_order_mul
     · push_cast at hQ ⊢; exact le_trans (add_le_add hya hQ) le_order_mul
-    · have e
-          : x a ^ n a * ∏ i ∈ s, x i ^ n i - y a ^ n a * ∏ i ∈ s, y i ^ n i
-            = (x a ^ n a - y a ^ n a) * ∏ i ∈ s, x i ^ n i
-              + y a ^ n a * (∏ i ∈ s, x i ^ n i - ∏ i ∈ s, y i ^ n i) := by
-        ring
+    · have e : x a ^ n a * ∏ i ∈ s, x i ^ n i - y a ^ n a * ∏ i ∈ s, y i ^ n i =
+          (x a ^ n a - y a ^ n a) * ∏ i ∈ s, x i ^ n i +
+            y a ^ n a * (∏ i ∈ s, x i ^ n i - ∏ i ∈ s, y i ^ n i) := by ring
       rw [e]
       refine le_trans ?_ (add_le_add min_order_le_add (le_refl (1 : ℕ∞)))
       rw [← min_add_add_right]
       refine le_min ?_ ?_
-      · calc
-          k + ((n a + ∑ i ∈ s, n i : ℕ) : ℕ∞)
-            = (k + n a) + (∑ i ∈ s, n i : ℕ) := by push_cast; ring
+      · calc k + ((n a + ∑ i ∈ s, n i : ℕ) : ℕ∞) = (k + n a) + (∑ i ∈ s, n i : ℕ) := by push_cast; ring
           _ ≤ ((x a ^ n a - y a ^ n a).order + 1) + (∏ i ∈ s, x i ^ n i).order := by gcongr
           _ = ((x a ^ n a - y a ^ n a).order + (∏ i ∈ s, x i ^ n i).order) + 1 := by ring
           _ ≤ _ := by gcongr; exact le_order_mul
-      · calc
-          k + ((n a + ∑ i ∈ s, n i : ℕ) : ℕ∞)
-            = (n a : ℕ∞) + (k + (∑ i ∈ s, n i : ℕ)) := by push_cast; ring
+      · calc k + ((n a + ∑ i ∈ s, n i : ℕ) : ℕ∞) = (n a : ℕ∞) + (k + (∑ i ∈ s, n i : ℕ)) := by
+              push_cast; ring
           _ ≤ (y a ^ n a).order + ((∏ i ∈ s, x i ^ n i - ∏ i ∈ s, y i ^ n i).order + 1) := by gcongr
           _ = ((y a ^ n a).order + (∏ i ∈ s, x i ^ n i - ∏ i ∈ s, y i ^ n i).order) + 1 := by ring
           _ ≤ _ := by gcongr; exact le_order_mul
 
-theorem subst_sub_subst_order
-    [Finite σ]
-    (a b : σ → MvPowerSeries σ R)
-    (ha : ∀ i, constantCoeff (a i) = 0) (hb : ∀ i, constantCoeff (b i) = 0)
-    (k : ℕ) (hab : ∀ i, (k : ℕ∞) ≤ (a i - b i).order)
-    (N : MvPowerSeries σ R) (hN : 2 ≤ N.order)
-    : ((k + 1 : ℕ) : ℕ∞) ≤ (subst a N - subst b N).order := by
+theorem subst_sub_subst_order [Finite σ] (a b : σ → MvPowerSeries σ R)
+    (ha : ∀ i, constantCoeff (a i) = 0) (hb : ∀ i, constantCoeff (b i) = 0) (k : ℕ)
+    (hab : ∀ i, (k : ℕ∞) ≤ (a i - b i).order) (N : MvPowerSeries σ R) (hN : 2 ≤ N.order) :
+    ((k + 1 : ℕ) : ℕ∞) ≤ (subst a N - subst b N).order := by
   have hsa : HasSubst a := hasSubst_of_constantCoeff_zero ha
   have hsb : HasSubst b := hasSubst_of_constantCoeff_zero hb
   apply le_order
@@ -122,8 +154,7 @@ theorem subst_sub_subst_order
       exact_mod_cast (by omega : e.degree < m)
   rw [hz, smul_zero]
 
-theorem eq_single_of_degree_eq_one {e : σ →₀ ℕ} (h : e.degree = 1)
-    : ∃ j, e = Finsupp.single j 1 := by
+theorem eq_single_of_degree_eq_one {e : σ →₀ ℕ} (h : e.degree = 1) : ∃ j, e = Finsupp.single j 1 := by
   classical
   have hne : e ≠ 0 := by rintro rfl; simp at h
   obtain ⟨j, hj⟩ := Finsupp.support_nonempty_iff.mpr hne
@@ -142,67 +173,61 @@ section Inv
 
 variable [Fintype σ] [DecidableEq σ]
 
-def lin (A : Matrix σ σ R) (f : σ → MvPowerSeries σ R) : σ → MvPowerSeries σ R := fun i =>
-  ∑ j, C (A i j) * f j
+def lin (A : Matrix σ σ R) (f : σ → MvPowerSeries σ R) : σ → MvPowerSeries σ R :=
+  fun i => ∑ j, C (A i j) * f j
 
-theorem order_lin
-    (A : Matrix σ σ R) (f : σ → MvPowerSeries σ R) (k : ℕ∞) (h : ∀ j, k ≤ (f j).order) (i : σ)
-    : k ≤ (lin A f i).order := by
+theorem order_lin (A : Matrix σ σ R) (f : σ → MvPowerSeries σ R) (k : ℕ∞) (h : ∀ j, k ≤ (f j).order)
+    (i : σ) : k ≤ (lin A f i).order := by
   apply le_order
   intro e he
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [lin, map_sum]
+
+  rw [lin, map_sum]
   refine Finset.sum_eq_zero fun j _ => ?_
   rw [coeff_C_mul, coeff_of_lt_order (lt_of_lt_of_le he (h j)), mul_zero]
 
-theorem lin_sub (A : Matrix σ σ R) (f g : σ → MvPowerSeries σ R) (i : σ)
-    : lin A f i - lin A g i = lin A (fun j => f j - g j) i := by
+theorem lin_sub (A : Matrix σ σ R) (f g : σ → MvPowerSeries σ R) (i : σ) :
+    lin A f i - lin A g i = lin A (fun j => f j - g j) i := by
   simp only [lin, ← Finset.sum_sub_distrib, mul_sub]
 
-theorem lin_lin (A B : Matrix σ σ R) (f : σ → MvPowerSeries σ R)
-    : lin A (lin B f) = lin (A * B) f := by
+theorem lin_lin (A B : Matrix σ σ R) (f : σ → MvPowerSeries σ R) :
+    lin A (lin B f) = lin (A * B) f := by
   funext i
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [lin, Matrix.mul_apply, map_sum, Finset.sum_mul, Finset.mul_sum, ← mul_assoc,
-      ← map_mul]
+
+  simp only [lin, Matrix.mul_apply, map_sum, Finset.sum_mul, Finset.mul_sum, ← mul_assoc, ← map_mul]
   exact Finset.sum_comm
 
 theorem lin_one (f : σ → MvPowerSeries σ R) : lin 1 f = f := by
   funext i
   simp [lin, Matrix.one_apply]
 
-theorem constantCoeff_lin
-    (A : Matrix σ σ R) (f : σ → MvPowerSeries σ R) (h : ∀ j, constantCoeff (f j) = 0) (i : σ)
-    : constantCoeff (lin A f i) = 0 := by
+theorem constantCoeff_lin (A : Matrix σ σ R) (f : σ → MvPowerSeries σ R) (h : ∀ j, constantCoeff (f j) = 0)
+    (i : σ) : constantCoeff (lin A f i) = 0 := by
   simp [lin, h]
 
-theorem subst_lin (a : σ → MvPowerSeries σ R) (ha : HasSubst a) (A : Matrix σ σ R) (i : σ)
-    : subst a (lin A (fun j => X j) i) = lin A a i := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [lin, ← coe_substAlgHom ha, map_sum]
+theorem subst_lin (a : σ → MvPowerSeries σ R) (ha : HasSubst a) (A : Matrix σ σ R) (i : σ) :
+    subst a (lin A (fun j => X j) i) = lin A a i := by
+
+  rw [lin, ← coe_substAlgHom ha, map_sum]
   refine Finset.sum_congr rfl fun j _ => ?_
   rw [map_mul, coe_substAlgHom ha, subst_C, subst_X ha]
 
-def nl (φ : σ → MvPowerSeries σ R) (L : Matrix σ σ R) : σ → MvPowerSeries σ R := fun i =>
-  φ i - lin L (fun j => X j) i
+def nl (φ : σ → MvPowerSeries σ R) (L : Matrix σ σ R) : σ → MvPowerSeries σ R :=
+  fun i => φ i - lin L (fun j => X j) i
 
-theorem two_le_order_nl
-    (φ : σ → MvPowerSeries σ R) (L : Matrix σ σ R)
-    (h0 : ∀ i, constantCoeff (φ i) = 0) (h1 : ∀ i j, coeff (Finsupp.single j 1) (φ i) = L i j)
-    (i : σ)
-    : 2 ≤ (nl φ L i).order := by
+theorem two_le_order_nl (φ : σ → MvPowerSeries σ R) (L : Matrix σ σ R)
+    (h0 : ∀ i, constantCoeff (φ i) = 0) (h1 : ∀ i j, coeff (Finsupp.single j 1) (φ i) = L i j) (i : σ) :
+    2 ≤ (nl φ L i).order := by
   apply le_order
   intro e he
   have he' : e.degree < 2 := by exact_mod_cast he
   rcases (by omega : e.degree = 0 ∨ e.degree = 1) with h | h
   · rw [Finsupp.degree_eq_zero_iff] at h
     subst h
-    rw [coeff_zero_eq_constantCoeff_apply, nl, map_sub, h0,
-      constantCoeff_lin _ _ (fun j => constantCoeff_X j)]
+    rw [coeff_zero_eq_constantCoeff_apply, nl, map_sub, h0, constantCoeff_lin _ _ (fun j => constantCoeff_X j)]
     simp
   · obtain ⟨j, rfl⟩ := eq_single_of_degree_eq_one h
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [nl, map_sub, h1, lin, map_sum]
+
+    rw [nl, map_sub, h1, lin, map_sum]
     simp only [coeff_C_mul, coeff_X]
     rw [Finset.sum_eq_single j]
     · simp
@@ -220,9 +245,8 @@ end Inv
 
 section Inv2
 
-variable
-  [Fintype σ] [DecidableEq σ]
-  (φ : σ → MvPowerSeries σ R) (L M : Matrix σ σ R) (hnl : ∀ i, 2 ≤ (nl φ L i).order)
+variable [Fintype σ] [DecidableEq σ] (φ : σ → MvPowerSeries σ R) (L M : Matrix σ σ R)
+  (hnl : ∀ i, 2 ≤ (nl φ L i).order)
 
 include hnl in
 theorem constantCoeff_nl (i : σ) : constantCoeff (nl φ L i) = 0 :=
@@ -236,36 +260,29 @@ theorem constantCoeff_it (n : ℕ) (i : σ) : constantCoeff (it φ L M n i) = 0 
     have hs : HasSubst (it φ L M n) := hasSubst_of_constantCoeff_zero ih
     rw [it]
     refine constantCoeff_lin _ _ (fun j => ?_) i
-    rw [map_sub, constantCoeff_X, constantCoeff_subst_eq_zero hs ih (constantCoeff_nl φ L hnl j),
-      sub_zero]
+    rw [map_sub, constantCoeff_X, constantCoeff_subst_eq_zero hs ih (constantCoeff_nl φ L hnl j), sub_zero]
 
 include hnl in
-theorem order_it_step (n : ℕ) (i : σ)
-    : ((n + 1 : ℕ) : ℕ∞) ≤ (it φ L M (n + 1) i - it φ L M n i).order := by
+theorem order_it_step (n : ℕ) (i : σ) : ((n + 1 : ℕ) : ℕ∞) ≤ (it φ L M (n + 1) i - it φ L M n i).order := by
   induction n generalizing i with
   | zero =>
     simp only [it, Pi.zero_apply, sub_zero]
     exact one_le_order_iff_constCoeff_eq_zero.2 (constantCoeff_it φ L M hnl 1 i)
   | succ n ih =>
-    rw [show it φ L M (n + 1 + 1) = lin M (fun j => X j - subst (it φ L M (n + 1)) (nl φ L j)) from
-        rfl,
-      show it φ L M (n + 1) = lin M (fun j => X j - subst (it φ L M n) (nl φ L j)) from rfl,
-      lin_sub]
+    rw [show it φ L M (n + 1 + 1) = lin M (fun j => X j - subst (it φ L M (n + 1)) (nl φ L j)) from rfl,
+      show it φ L M (n + 1) = lin M (fun j => X j - subst (it φ L M n) (nl φ L j)) from rfl, lin_sub]
     refine order_lin _ _ _ (fun j => ?_) i
-    rw [show X j - subst (lin M (fun j => X j - subst (it φ L M n) (nl φ L j))) (nl φ L j)
-          - (X j - subst (it φ L M n) (nl φ L j))
-        = subst (it φ L M n) (nl φ L j) - subst (it φ L M (n + 1)) (nl φ L j) by
-      rw [it]; ring]
-    refine subst_sub_subst_order _ _ (constantCoeff_it φ L M hnl n)
-      (constantCoeff_it φ L M hnl (n + 1)) (n + 1)
-      (fun l => ?_)
-      _ (hnl j)
+    rw [show X j - subst (lin M (fun j => X j - subst (it φ L M n) (nl φ L j))) (nl φ L j) -
+        (X j - subst (it φ L M n) (nl φ L j)) =
+        subst (it φ L M n) (nl φ L j) - subst (it φ L M (n + 1)) (nl φ L j) by rw [it]; ring]
+    refine subst_sub_subst_order _ _ (constantCoeff_it φ L M hnl n) (constantCoeff_it φ L M hnl (n + 1))
+      (n + 1) (fun l => ?_) _ (hnl j)
     rw [← neg_sub, order_neg]
     exact ih l
 
 include hnl in
-theorem coeff_it_stable (n m : ℕ) (e : σ →₀ ℕ) (he : e.degree ≤ n) (i : σ)
-    : coeff e (it φ L M (n + m) i) = coeff e (it φ L M n i) := by
+theorem coeff_it_stable (n m : ℕ) (e : σ →₀ ℕ) (he : e.degree ≤ n) (i : σ) :
+    coeff e (it φ L M (n + m) i) = coeff e (it φ L M n i) := by
   induction m with
   | zero => rfl
   | succ m ih =>
@@ -276,12 +293,10 @@ theorem coeff_it_stable (n m : ℕ) (e : σ →₀ ℕ) (he : e.degree ≤ n) (i
 
 def lim (i : σ) : MvPowerSeries σ R := fun e => coeff e (it φ L M e.degree i)
 
-theorem coeff_lim (i : σ) (e : σ →₀ ℕ) : coeff e (lim φ L M i) = coeff e (it φ L M e.degree i) :=
-  rfl
+theorem coeff_lim (i : σ) (e : σ →₀ ℕ) : coeff e (lim φ L M i) = coeff e (it φ L M e.degree i) := rfl
 
 include hnl in
-theorem order_lim_sub (n : ℕ) (i : σ)
-    : ((n + 1 : ℕ) : ℕ∞) ≤ (lim φ L M i - it φ L M n i).order := by
+theorem order_lim_sub (n : ℕ) (i : σ) : ((n + 1 : ℕ) : ℕ∞) ≤ (lim φ L M i - it φ L M n i).order := by
   apply le_order
   intro e he
   have he' : e.degree ≤ n := by
@@ -305,17 +320,14 @@ theorem subst_lim (hLM : L * M = 1) (i : σ) : subst (lim φ L M) (φ i) = X i :
     have hX : X i = lin L (it φ L M (n + 1)) i + subst (it φ L M n) (nl φ L i) := by
       rw [show it φ L M (n + 1) = lin M (fun j => X j - subst (it φ L M n) (nl φ L j)) from rfl,
         lin_lin, hLM, lin_one, sub_add_cancel]
-    have e
-        : subst (lim φ L M) (φ i) - X i
-          = (subst (lim φ L M) (nl φ L i) - subst (it φ L M n) (nl φ L i))
-            + lin L (fun j => lim φ L M j - it φ L M (n + 1) j) i := by
+    have e : subst (lim φ L M) (φ i) - X i =
+        (subst (lim φ L M) (nl φ L i) - subst (it φ L M n) (nl φ L i)) +
+          lin L (fun j => lim φ L M j - it φ L M (n + 1) j) i := by
       rw [← lin_sub, hφ, subst_add hs, subst_lin _ hs, hX]; ring
     rw [e]
     refine le_trans (le_min ?_ ?_) min_order_le_add
-    · refine le_trans ?_
-        (subst_sub_subst_order _ _ hc (constantCoeff_it φ L M hnl n) (n + 1)
-          (fun l => order_lim_sub φ L M hnl n l)
-          _ (hnl i))
+    · refine le_trans ?_ (subst_sub_subst_order _ _ hc (constantCoeff_it φ L M hnl n) (n + 1)
+        (fun l => order_lim_sub φ L M hnl n l) _ (hnl i))
       exact_mod_cast (by omega : n + 1 ≤ n + 1 + 1)
     · refine order_lin _ _ _ (fun j => le_trans ?_ (order_lim_sub φ L M hnl (n + 1) j)) i
       exact_mod_cast (by omega : n + 1 ≤ n + 1 + 1)
@@ -330,16 +342,13 @@ section Main
 
 variable [Fintype σ] [DecidableEq σ]
 
-theorem coeff_lim_single
-    (φ : σ → MvPowerSeries σ R) (L M : Matrix σ σ R) (hnl : ∀ i, 2 ≤ (nl φ L i).order) (i j : σ)
-    : coeff (Finsupp.single j 1) (lim φ L M i) = M i j := by
+theorem coeff_lim_single (φ : σ → MvPowerSeries σ R) (L M : Matrix σ σ R) (hnl : ∀ i, 2 ≤ (nl φ L i).order)
+    (i j : σ) : coeff (Finsupp.single j 1) (lim φ L M i) = M i j := by
   rw [coeff_lim, Finsupp.degree_single]
-  change coeff (Finsupp.single j 1)
-      (lin M (fun l => X l - subst (0 : σ → MvPowerSeries σ R) (nl φ L l)) i)
-    = M i j
+  change coeff (Finsupp.single j 1) (lin M (fun l => X l - subst (0 : σ → MvPowerSeries σ R) (nl φ L l)) i) = M i j
   simp only [subst_zero_of_constantCoeff_zero (constantCoeff_nl φ L hnl _), sub_zero]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [lin, map_sum]
+
+  rw [lin, map_sum]
   simp only [coeff_C_mul, coeff_X]
   rw [Finset.sum_eq_single j]
   · simp
@@ -349,25 +358,18 @@ theorem coeff_lim_single
     exact hb ((Finsupp.single_left_inj one_ne_zero).mp hh).symm
   · simp
 
-theorem exists_rightInv
-    (φ : σ → MvPowerSeries σ R) (h0 : ∀ i, constantCoeff (φ i) = 0)
-    (L : Matrix σ σ R) (h1 : ∀ i j, coeff (Finsupp.single j 1) (φ i) = L i j) (hu : IsUnit L.det)
-    : ∃ ψ : σ → MvPowerSeries σ R,
-      (∀ i, constantCoeff (ψ i) = 0) ∧ (∀ i j, coeff (Finsupp.single j 1) (ψ i) = L⁻¹ i j)
-        ∧ ∀ i, subst ψ (φ i) = X i := by
+theorem exists_rightInv (φ : σ → MvPowerSeries σ R) (h0 : ∀ i, constantCoeff (φ i) = 0) (L : Matrix σ σ R)
+    (h1 : ∀ i j, coeff (Finsupp.single j 1) (φ i) = L i j) (hu : IsUnit L.det) :
+    ∃ ψ : σ → MvPowerSeries σ R, (∀ i, constantCoeff (ψ i) = 0) ∧
+      (∀ i j, coeff (Finsupp.single j 1) (ψ i) = L⁻¹ i j) ∧ ∀ i, subst ψ (φ i) = X i := by
   have hnl := two_le_order_nl φ L h0 h1
-  exact ⟨
-    lim φ L L⁻¹,
-    constantCoeff_lim φ L L⁻¹ hnl,
-    coeff_lim_single φ L L⁻¹ hnl,
-    subst_lim φ L L⁻¹ hnl (Matrix.mul_nonsing_inv L hu)
-  ⟩
+  exact ⟨lim φ L L⁻¹, constantCoeff_lim φ L L⁻¹ hnl, coeff_lim_single φ L L⁻¹ hnl,
+    subst_lim φ L L⁻¹ hnl (Matrix.mul_nonsing_inv L hu)⟩
 
-theorem exists_inv
-    (φ : σ → MvPowerSeries σ R) (h0 : ∀ i, constantCoeff (φ i) = 0)
-    (L : Matrix σ σ R) (h1 : ∀ i j, coeff (Finsupp.single j 1) (φ i) = L i j) (hu : IsUnit L.det)
-    : ∃ ψ : σ → MvPowerSeries σ R,
-      (∀ i, constantCoeff (ψ i) = 0) ∧ (∀ i, subst ψ (φ i) = X i) ∧ ∀ i, subst φ (ψ i) = X i := by
+theorem exists_inv (φ : σ → MvPowerSeries σ R) (h0 : ∀ i, constantCoeff (φ i) = 0) (L : Matrix σ σ R)
+    (h1 : ∀ i j, coeff (Finsupp.single j 1) (φ i) = L i j) (hu : IsUnit L.det) :
+    ∃ ψ : σ → MvPowerSeries σ R, (∀ i, constantCoeff (ψ i) = 0) ∧
+      (∀ i, subst ψ (φ i) = X i) ∧ ∀ i, subst φ (ψ i) = X i := by
   obtain ⟨ψ, hψ0, hψ1, hψ⟩ := exists_rightInv φ h0 L h1 hu
   obtain ⟨χ, hχ0, -, hχ⟩ := exists_rightInv ψ hψ0 L⁻¹ hψ1 (Matrix.isUnit_nonsing_inv_det L hu)
   have hsψ : HasSubst ψ := hasSubst_of_constantCoeff_zero hψ0

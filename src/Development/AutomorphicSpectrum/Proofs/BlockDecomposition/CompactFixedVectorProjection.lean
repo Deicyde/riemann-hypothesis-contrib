@@ -1,8 +1,50 @@
 module
 
-public import Mathlib
-public import Development.WeilBound.RepresentationTheoryGL.TwistedFactors.LocalBaseChange.StrictDominanceCasselman.IsStrictlyDominant
+public import Development.AbelianVarietyTheory.Definitions.Foundations.SmoothPartStable
+public import Mathlib.Basic.Complex.Basic
 public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.NonemptyEquivOfRangeEq
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.IsCuspidalIffCompositions
+import Development.WeilBound.RepresentationTheoryGL.TwistedFactors.LocalBaseChange.StrictDominanceCasselman.IsStrictlyDominant
 
 @[expose] public section
 
@@ -10,12 +52,9 @@ open GlobalTheory.PRep GlobalTheory.SmGL ValuativeRel PositivityTheory.Lbc
 
 namespace GlobalTheory.CompanionTheory.CompactAvg
 
-theorem exists_perm_of_reps
-    {G : Type} [Group G]
-    (J H : Subgroup G)
-    {r : ℕ} (x : Fin r → G) (hx : ∀ i, x i ∈ J) (hu : ∀ y ∈ J, ∃! i, (x i)⁻¹ * y ∈ H)
-    {j : G} (hj : j ∈ J)
-    : ∃ σ : Equiv.Perm (Fin r), ∀ i, (x (σ i))⁻¹ * (j * x i) ∈ H := by
+theorem exists_perm_of_reps {G : Type} [Group G] (J H : Subgroup G) {r : ℕ} (x : Fin r → G)
+    (hx : ∀ i, x i ∈ J) (hu : ∀ y ∈ J, ∃! i, (x i)⁻¹ * y ∈ H) {j : G} (hj : j ∈ J) :
+    ∃ σ : Equiv.Perm (Fin r), ∀ i, (x (σ i))⁻¹ * (j * x i) ∈ H := by
   have h : ∀ i, ∃ k, (x k)⁻¹ * (j * x i) ∈ H := fun i => (hu _ (J.mul_mem hj (hx i))).exists
   choose f hf using h
   have hinj : Function.Injective f := by
@@ -31,32 +70,13 @@ theorem exists_perm_of_reps
     exact (hu (x b) (hx b)).unique hm h1
   exact ⟨Equiv.ofBijective f (Finite.injective_iff_bijective.1 hinj), hf⟩
 
-theorem exists_average
-    : ∀ (G : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] (J : Subgroup G),
-      IsCompact (J : Set G)
-        → ∀ (V : Type) [AddCommGroup V] [Module ℂ V] (π : Representation ℂ G V),
-          IsSmooth π
-            → ∃ E : V →ₗ[ℂ] V,
-              (∀ v, E v ∈ fixed π J) ∧ (∀ v ∈ fixed π J, E v = v)
-                ∧ (∀ l : Module.Dual ℂ V, (∀ x ∈ J, l ∘ₗ π x = l) → l ∘ₗ E = l)
-                ∧ (∀ x ∈ J, E ∘ₗ π x = E)
-                ∧ ∀ (u : V) (H : Subgroup G),
-                  H ≤ J → (∀ h ∈ H, π h u = u)
-                    → ∀ (r : ℕ) (x : Fin r → G),
-                      0 < r → (∀ i, x i ∈ J) → (∀ y ∈ J, ∃! i, (x i)⁻¹ * y ∈ H)
-                        → E u = ((r : ℂ)⁻¹) • ∑ i, π (x i) u := by
+theorem exists_average : ∀ (G : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] (J : Subgroup G), IsCompact (J : Set G) → ∀ (V : Type) [AddCommGroup V] [Module ℂ V] (π : Representation ℂ G V), IsSmooth π → ∃ E : V →ₗ[ℂ] V, (∀ v, E v ∈ fixed π J) ∧ (∀ v ∈ fixed π J, E v = v) ∧ (∀ l : Module.Dual ℂ V, (∀ x ∈ J, l ∘ₗ π x = l) → l ∘ₗ E = l) ∧ (∀ x ∈ J, E ∘ₗ π x = E) ∧ ∀ (u : V) (H : Subgroup G), H ≤ J → (∀ h ∈ H, π h u = u) → ∀ (r : ℕ) (x : Fin r → G), 0 < r → (∀ i, x i ∈ J) → (∀ y ∈ J, ∃! i, (x i)⁻¹ * y ∈ H) → E u = ((r : ℂ)⁻¹) • ∑ i, π (x i) u := by
   intro G _ _ _ J hJ V _ _ π hπ
   have hsub : ∀ v, v - GlobalTheory.LocGL.idem hπ hJ v ∈ twKer π J 1 := fun v => by
     rw [← GlobalTheory.LocGL.idem_eq_zero_iff hπ hJ, map_sub,
       GlobalTheory.LocGL.idem_of_mem hπ hJ (GlobalTheory.LocGL.idem_mem hπ hJ v), sub_self]
-  refine ⟨
-    GlobalTheory.LocGL.idem hπ hJ,
-    GlobalTheory.LocGL.idem_mem hπ hJ,
-    fun v hv => GlobalTheory.LocGL.idem_of_mem hπ hJ hv,
-    ?_,
-    ?_,
-    ?_
-  ⟩
+  refine ⟨GlobalTheory.LocGL.idem hπ hJ, GlobalTheory.LocGL.idem_mem hπ hJ, fun v hv => GlobalTheory.LocGL.idem_of_mem hπ hJ hv,
+    ?_, ?_, ?_⟩
   · intro l hl
     have hk : twKer π J 1 ≤ LinearMap.ker l := by
       refine Submodule.span_le.2 ?_
@@ -71,23 +91,19 @@ theorem exists_average
     exact LinearMap.ext fun v => GlobalTheory.LocGL.idem_apply_mem hπ hJ hx v
   · intro u H _ hu r x hr hxJ hex
     have hrc : (r : ℂ) ≠ 0 := Nat.cast_ne_zero.2 hr.ne'
-    have hfix : ((r : ℂ)⁻¹ • ∑ i, π (x i) u) ∈ fixed π J :=
-      GlobalTheory.Parabolic.mem_fixed.2 fun j hj => by
-        obtain ⟨σ, hσ⟩ := exists_perm_of_reps J H x hxJ hex hj
-        set_option synthInstance.maxHeartbeats 100000 in
-          rw [map_smul, map_sum]
-        congr 1
-        refine Fintype.sum_equiv σ _ _ fun i => ?_
-        have e : j * x i = x (σ i) * ((x (σ i))⁻¹ * (j * x i)) := by group
-        rw [← Module.End.mul_apply, ← map_mul, e, map_mul, Module.End.mul_apply, hu _ (hσ i)]
-    have h3
-        : GlobalTheory.LocGL.idem hπ hJ ((r : ℂ)⁻¹ • ∑ i, π (x i) u)
-          = GlobalTheory.LocGL.idem hπ hJ u := by
-      set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_smul, map_sum,
-        Finset.sum_congr rfl fun i _ => GlobalTheory.LocGL.idem_apply_mem hπ hJ (hxJ i) u,
-        Finset.sum_const, Finset.card_univ, Fintype.card_fin, ← Nat.cast_smul_eq_nsmul ℂ, smul_smul,
-        inv_mul_cancel₀ hrc, one_smul]
+    have hfix : ((r : ℂ)⁻¹ • ∑ i, π (x i) u) ∈ fixed π J := GlobalTheory.Parabolic.mem_fixed.2 fun j hj => by
+      obtain ⟨σ, hσ⟩ := exists_perm_of_reps J H x hxJ hex hj
+
+      rw [map_smul, map_sum]
+      congr 1
+      refine Fintype.sum_equiv σ _ _ fun i => ?_
+      have e : j * x i = x (σ i) * ((x (σ i))⁻¹ * (j * x i)) := by group
+      rw [← Module.End.mul_apply, ← map_mul, e, map_mul, Module.End.mul_apply, hu _ (hσ i)]
+    have h3 : GlobalTheory.LocGL.idem hπ hJ ((r : ℂ)⁻¹ • ∑ i, π (x i) u) = GlobalTheory.LocGL.idem hπ hJ u := by
+
+      rw [map_smul, map_sum, Finset.sum_congr rfl fun i _ => GlobalTheory.LocGL.idem_apply_mem hπ hJ (hxJ i) u,
+      Finset.sum_const, Finset.card_univ, Fintype.card_fin, ← Nat.cast_smul_eq_nsmul ℂ, smul_smul,
+      inv_mul_cancel₀ hrc, one_smul]
     rw [← h3, GlobalTheory.LocGL.idem_of_mem hπ hJ hfix]
 
 end GlobalTheory.CompanionTheory.CompactAvg

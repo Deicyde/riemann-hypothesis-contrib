@@ -1,7 +1,55 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Definitions.Divisors.IsAdmissibleIntegralBasisChangeOne
+import Mathlib.Algebra.AffineMonoid.UniqueSums
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Henselian
+public import Mathlib.RingTheory.PowerSeries.Trunc
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -26,8 +74,8 @@ theorem ev_monomial (n : ℕ) (a : F) : ev c (monomial n a) = c n * a := by
 theorem ev_expand (q p : F[X]) (n : ℕ) (hp : p.natDegree < n)
     : ev c (q * p) = ∑ j ∈ Finset.range n, p.coeff j * ev c (q * X ^ j) := by
   conv_lhs => rw [p.as_sum_range' n hp]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [Finset.mul_sum, map_sum]
+
+  rw [Finset.mul_sum, map_sum]
   refine Finset.sum_congr rfl fun j _ => ?_
   rw [← C_mul_X_pow_eq_monomial,
     show q * (C (p.coeff j) * X ^ j) = p.coeff j • (q * X ^ j) by rw [smul_eq_C_mul]; ring,
@@ -68,8 +116,8 @@ theorem exists_kill (n : ℕ) (h : hankel c n = 0)
   · intro j hj
     have := congrFun hv ⟨j, Nat.lt_succ_of_le hj⟩
     simp only [Matrix.mulVec, dotProduct, Matrix.of_apply, Pi.zero_apply] at this
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [Finset.sum_mul, map_sum, ← this]
+
+    rw [Finset.sum_mul, map_sum, ← this]
     refine Finset.sum_congr rfl fun k _ => ?_
     rw [monomial_mul_X_pow, ev_monomial, add_comm]
 
@@ -182,11 +230,11 @@ theorem isRat_of_ann
             = ∑ k ∈ Finset.range (q.natDegree + 1),
               PowerSeries.C (q.coeff k) * PowerSeries.X ^ (q.natDegree - k) := by
         show Polynomial.coeToPowerSeries.ringHom R = _
-        set_option synthInstance.maxHeartbeats 100000 in
-          rw [map_sum]
+
+        rw [map_sum]
         simp [Polynomial.coeToPowerSeries.ringHom_apply]
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [hR, Finset.sum_mul, map_sum, ← h m, ev_X_pow_mul]
+
+      rw [hR, Finset.sum_mul, map_sum, ← h m, ev_X_pow_mul]
       refine Finset.sum_congr rfl fun k hk => ?_
       have hk' := Finset.mem_range.1 hk
       rw [mul_assoc, PowerSeries.coeff_C_mul, PowerSeries.coeff_X_pow_mul', if_pos (by omega)]

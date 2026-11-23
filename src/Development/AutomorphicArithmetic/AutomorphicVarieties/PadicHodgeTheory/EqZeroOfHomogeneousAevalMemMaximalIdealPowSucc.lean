@@ -1,6 +1,56 @@
 module
 
-public import Development.AutomorphicArithmetic.AutomorphicVarieties.CommutativeAlgebra.ResMapBijective
+public import Mathlib.RingTheory.Henselian
+public import Mathlib.RingTheory.MvPolynomial.Homogeneous
+public import Mathlib.RingTheory.MvPowerSeries.Inverse
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.Order.CompletePartialOrder
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
+import Development.AutomorphicArithmetic.AutomorphicVarieties.CommutativeAlgebra.ResMapBijective
 
 @[expose] public section
 
@@ -9,10 +59,8 @@ open IsLocalRing UpperTheory.V.Alg
 private def Cg {A : Type} [CommRing A] (I : Ideal A) (k : ℕ) (a b : A) : Prop :=
   b ∈ I ^ k ∧ a - b ∈ I ^ (k + 1)
 
-private theorem Cg.mul
-    {A : Type} [CommRing A]
-    {I : Ideal A} {k l : ℕ} {a b c d : A} (h1 : Cg I k a b) (h2 : Cg I l c d)
-    : Cg I (k + l) (a * c) (b * d) := by
+private theorem Cg.mul {A : Type} [CommRing A] {I : Ideal A} {k l : ℕ} {a b c d : A}
+    (h1 : Cg I k a b) (h2 : Cg I l c d) : Cg I (k + l) (a * c) (b * d) := by
   have hc : c ∈ I ^ l := by
     have := (I ^ l).add_mem (Ideal.pow_le_pow_right (Nat.le_succ l) h2.2) h2.1
     simpa using this
@@ -28,17 +76,15 @@ private theorem Cg.mul
 private theorem Cg.refl {A : Type} [CommRing A] (I : Ideal A) (a : A) : Cg I 0 a a :=
   ⟨by simp, by simp⟩
 
-private theorem Cg.pow {A : Type} [CommRing A] {I : Ideal A} {a b : A} (h : Cg I 1 a b) (k : ℕ)
-    : Cg I k (a ^ k) (b ^ k) := by
+private theorem Cg.pow {A : Type} [CommRing A] {I : Ideal A} {a b : A}
+    (h : Cg I 1 a b) (k : ℕ) : Cg I k (a ^ k) (b ^ k) := by
   induction k with
   | zero => simpa using Cg.refl I 1
   | succ k ih => rw [pow_succ, pow_succ]; exact ih.mul h
 
-private theorem Cg.prod
-    {A ι : Type} [CommRing A]
-    {I : Ideal A} {a b : ι → A} (h : ∀ i, Cg I 1 (a i) (b i))
-    (d : ι → ℕ) (s : Finset ι)
-    : Cg I (∑ i ∈ s, d i) (∏ i ∈ s, a i ^ d i) (∏ i ∈ s, b i ^ d i) := by
+private theorem Cg.prod {A ι : Type} [CommRing A] {I : Ideal A} {a b : ι → A}
+    (h : ∀ i, Cg I 1 (a i) (b i)) (d : ι → ℕ) (s : Finset ι) :
+    Cg I (∑ i ∈ s, d i) (∏ i ∈ s, a i ^ d i) (∏ i ∈ s, b i ^ d i) := by
   classical
   induction s using Finset.induction_on with
   | empty => simpa using Cg.refl I 1
@@ -46,8 +92,8 @@ private theorem Cg.prod
     rw [Finset.sum_insert hi, Finset.prod_insert hi, Finset.prod_insert hi]
     exact ((h i).pow _).mul ih
 
-private theorem order_of_mem_pow {σ E : Type} [Field E] (k : ℕ)
-    : ∀ f : MvPowerSeries σ E, f ∈ maximalIdeal (MvPowerSeries σ E) ^ k → (k : ℕ∞) ≤ f.order := by
+private theorem order_of_mem_pow {σ E : Type} [Field E] (k : ℕ) :
+    ∀ f : MvPowerSeries σ E, f ∈ maximalIdeal (MvPowerSeries σ E) ^ k → (k : ℕ∞) ≤ f.order := by
   induction k with
   | zero => intro f _; simp
   | succ k ih =>
@@ -63,8 +109,7 @@ private theorem order_of_mem_pow {σ E : Type} [Field E] (k : ℕ)
           exact (Finsupp.degree_eq_zero_iff d).1 this
         subst hd0
         rw [mem_maximalIdeal, mem_nonunits_iff, MvPowerSeries.isUnit_iff_constantCoeff,
-            isUnit_iff_ne_zero, not_not]
-          at hb
+          isUnit_iff_ne_zero, not_not] at hb
         simpa using hb
       refine le_trans ?_ MvPowerSeries.le_order_mul
       rw [Nat.cast_add]
@@ -72,14 +117,8 @@ private theorem order_of_mem_pow {σ E : Type} [Field E] (k : ℕ)
     · intro a b ha hb
       exact le_trans (le_min ha hb) MvPowerSeries.min_order_le_add
 
-theorem UpperTheory.eq_zero_of_homogeneous_aeval_mem_maximalIdeal_pow_succ
-    : ∀ (O E : Type) [CommRing O] [IsDomain O] [Field E] [Algebra O E] [IsFractionRing O E] (n : ℕ)
-        (u : Fin n → MvPowerSeries (Fin n) E) (c : O),
-      c ≠ 0 → (∀ i, u i - c • MvPowerSeries.X i ∈ maximalIdeal (MvPowerSeries (Fin n) E) ^ 2)
-        → ∀ (N : ℕ) (h : MvPolynomial (Fin n) O),
-          h.IsHomogeneous N
-            → MvPolynomial.aeval u h ∈ maximalIdeal (MvPowerSeries (Fin n) E) ^ (N + 1)
-            → h = 0 := by
+theorem UpperTheory.eq_zero_of_homogeneous_aeval_mem_maximalIdeal_pow_succ :
+    ∀ (O E : Type) [CommRing O] [IsDomain O] [Field E] [Algebra O E] [IsFractionRing O E] (n : ℕ) (u : Fin n → MvPowerSeries (Fin n) E) (c : O), c ≠ 0 → (∀ i, u i - c • MvPowerSeries.X i ∈ maximalIdeal (MvPowerSeries (Fin n) E) ^ 2) → ∀ (N : ℕ) (h : MvPolynomial (Fin n) O), h.IsHomogeneous N → MvPolynomial.aeval u h ∈ maximalIdeal (MvPowerSeries (Fin n) E) ^ (N + 1) → h = 0 := by
   intro O E _ _ _ _ _ n u c hc hu N h hh hm
   classical
   set I := maximalIdeal (MvPowerSeries (Fin n) E) with hI
@@ -110,18 +149,14 @@ theorem UpperTheory.eq_zero_of_homogeneous_aeval_mem_maximalIdeal_pow_succ
   have hvm : MvPolynomial.aeval v h ∈ I ^ (N + 1) := by
     have := (I ^ (N + 1)).sub_mem hm hdiff
     simpa using this
-  have hval
-      : MvPolynomial.aeval v h
-        = ∑ d ∈ h.support, MvPowerSeries.monomial d (algebraMap O E (h.coeff d * c ^ N)) := by
+  have hval : MvPolynomial.aeval v h =
+      ∑ d ∈ h.support, MvPowerSeries.monomial d (algebraMap O E (h.coeff d * c ^ N)) := by
     rw [MvPolynomial.aeval_def, MvPolynomial.eval₂_eq']
     refine Finset.sum_congr rfl fun d hd => ?_
-    have hX
-        : (∏ i, (MvPowerSeries.X i : MvPowerSeries (Fin n) E) ^ d i)
-          = MvPowerSeries.monomial d 1 := by
-      have h1
-          : ((MvPolynomial.monomial d (1 : E) : MvPolynomial (Fin n) E) : MvPowerSeries (Fin n) E)
-            = MvPowerSeries.monomial d 1 :=
-        MvPolynomial.coe_monomial _ _
+    have hX : (∏ i, (MvPowerSeries.X i : MvPowerSeries (Fin n) E) ^ d i)
+        = MvPowerSeries.monomial d 1 := by
+      have h1 : ((MvPolynomial.monomial d (1 : E) : MvPolynomial (Fin n) E) :
+          MvPowerSeries (Fin n) E) = MvPowerSeries.monomial d 1 := MvPolynomial.coe_monomial _ _
       rw [← h1, MvPolynomial.monomial_eq, Finsupp.prod_fintype _ _ (by simp)]
       rw [← MvPolynomial.coeToMvPowerSeries.ringHom_apply]
       simp [map_prod]
@@ -135,9 +170,10 @@ theorem UpperTheory.eq_zero_of_homogeneous_aeval_mem_maximalIdeal_pow_succ
     refine MvPowerSeries.coeff_of_lt_order (lt_of_lt_of_le ?_ (order_of_mem_pow _ _ hvm))
     rw [Finsupp.degree_eq_sum, hdeg d hd]
     exact_mod_cast Nat.lt_succ_self N
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [hval, map_sum, Finset.sum_eq_single d] at h0
-  · rw [MvPowerSeries.coeff_monomial_same, map_eq_zero_iff _ (IsFractionRing.injective O E)] at h0
+
+  rw [hval, map_sum, Finset.sum_eq_single d] at h0
+  · rw [MvPowerSeries.coeff_monomial_same,
+      map_eq_zero_iff _ (IsFractionRing.injective O E)] at h0
     exact mul_ne_zero (MvPolynomial.mem_support_iff.1 hd) (pow_ne_zero _ hc) h0
   · intro e _ he
     exact MvPowerSeries.coeff_monomial_ne he.symm _

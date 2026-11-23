@@ -1,9 +1,50 @@
 module
 
-public import Mathlib
 public import Development.WeilBound.CoreStatements.PadicHodgeComparison.EtaleCohomologyComparison.WittExactSequences.IsCompl
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ExistsEvalEqProdOfNatDegreeEq
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.MulProdCongr
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
+public import Mathlib.RingTheory.Ideal.BigOperators
 
 @[expose] public section
 
@@ -12,17 +53,9 @@ open scoped LaurentPolynomial
 
 namespace GlobalTheory.CompanionTheory.AicStep
 
+
 open Polynomial in
-theorem aic_step
-    : ∀ (B : Type) [CommRing B] (T : Type) [CommRing T] (π : B) (g : B →+* T),
-      IsCompl π g → π ∈ nonZeroDivisors B → AIC B → VAL π
-        → ∀ P : Polynomial T,
-          P.Monic → 0 < P.natDegree
-            → ∀ (M : ℕ) (a : B),
-              P.eval (g a) ∈ Ideal.span {g π ^ (P.natDegree * M)}
-                → ∃ a₁ : B,
-                  a₁ - a ∈ Ideal.span {π ^ M}
-                    ∧ P.eval (g a₁) ∈ Ideal.span {g π ^ (P.natDegree * (M + 1))} := by
+theorem aic_step : ∀ (B : Type) [CommRing B] (T : Type) [CommRing T] (π : B) (g : B →+* T), IsCompl π g → π ∈ nonZeroDivisors B → AIC B → VAL π → ∀ P : Polynomial T, P.Monic → 0 < P.natDegree → ∀ (M : ℕ) (a : B), P.eval (g a) ∈ Ideal.span {g π ^ (P.natDegree * M)} → ∃ a₁ : B, a₁ - a ∈ Ideal.span {π ^ M} ∧ P.eval (g a₁) ∈ Ideal.span {g π ^ (P.natDegree * (M + 1))} := by
   open Polynomial in
   intro B _ T _ π g hC hπ hA hV P hP hd M a ha
   obtain ⟨_, hsurj, hinj⟩ := hC
@@ -33,9 +66,8 @@ theorem aic_step
     simp [hP0] at hd
   haveI : Nontrivial B := g.domain_nontrivial
   choose c hc using fun i : ℕ => hsurj (P.natDegree * (M + 1)) (P.coeff i)
-  have hsum
-      : (∑ i ∈ Finset.range P.natDegree, C (c i) * X ^ i : Polynomial B)
-        = ∑ i : Fin P.natDegree, C (c i) * X ^ (i : ℕ) :=
+  have hsum : (∑ i ∈ Finset.range P.natDegree, C (c i) * X ^ i : Polynomial B) =
+      ∑ i : Fin P.natDegree, C (c i) * X ^ (i : ℕ) :=
     (Fin.sum_univ_eq_sum_range (fun i => (C (c i) * X ^ i : Polynomial B)) _).symm
   let Q : Polynomial B := X ^ P.natDegree + ∑ i ∈ Finset.range P.natDegree, C (c i) * X ^ i
   have hQm : Q.Monic := by
@@ -49,20 +81,17 @@ theorem aic_step
     exact degree_sum_fin_lt _
   have key : ∀ x : B, P.eval (g x) - g (Q.eval x) ∈ Ideal.span {g π ^ (P.natDegree * (M + 1))} := by
     intro x
-    have e
-        : P.eval (g x) - g (Q.eval x)
-          = ∑ i ∈ Finset.range P.natDegree, (P.coeff i - g (c i)) * g x ^ i := by
+    have e : P.eval (g x) - g (Q.eval x) =
+        ∑ i ∈ Finset.range P.natDegree, (P.coeff i - g (c i)) * g x ^ i := by
       conv_lhs => rw [hP.as_sum]
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [Q, eval_add, eval_pow, eval_X, eval_finsetSum, eval_mul, eval_C,
-          map_add (f := _), map_pow, map_sum, map_mul, sub_mul, Finset.sum_sub_distrib]
+
+      simp only [Q, eval_add, eval_pow, eval_X, eval_finsetSum, eval_mul, eval_C, map_add (f := _), map_pow,
+      map_sum, map_mul, sub_mul, Finset.sum_sub_distrib]
       ring
     rw [e]
     exact Ideal.sum_mem _ fun i _ => Ideal.mul_mem_right _ _ (hc i)
-  obtain ⟨b, hb⟩ :=
-    GlobalTheory.CompanionTheory.AicSplit.exists_eval_eq_prod_of_natDegree_eq
-      (fun p hp hpd => hA p hp hpd)
-      P.natDegree Q hQm hQd
+  obtain ⟨b, hb⟩ := GlobalTheory.CompanionTheory.AicSplit.exists_eval_eq_prod_of_natDegree_eq
+    (fun p hp hpd => hA p hp hpd) P.natDegree Q hQm hQd
   have hle : Ideal.span {g π ^ (P.natDegree * (M + 1))} ≤ Ideal.span {g π ^ (P.natDegree * M)} :=
     Ideal.span_singleton_le_span_singleton.mpr (pow_dvd_pow _ (by gcongr; omega))
   have h1 : g (Q.eval a) ∈ Ideal.span {g π ^ (P.natDegree * M)} := by
@@ -70,8 +99,7 @@ theorem aic_step
     rwa [sub_sub_cancel] at h
   have h2 := hinj _ _ h1
   rw [hb a] at h2
-  obtain ⟨a₁, ha₁, h0⟩ :=
-    GlobalTheory.CompanionTheory.RootNear.root_near B π hπ hV P.natDegree M b a hd h2
+  obtain ⟨a₁, ha₁, h0⟩ := GlobalTheory.CompanionTheory.RootNear.root_near B π hπ hV P.natDegree M b a hd h2
   refine ⟨a₁, ha₁, ?_⟩
   have h3 := key a₁
   rwa [hb a₁, h0, map_zero, sub_zero] at h3

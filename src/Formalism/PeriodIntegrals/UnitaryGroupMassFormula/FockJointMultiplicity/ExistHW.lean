@@ -2,6 +2,52 @@ module
 
 public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.FockJointMultiplicity.JointMultOfSteps
 public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.FockJointMultiplicity.ExistGen
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
@@ -13,11 +59,10 @@ namespace PI.FJMX
 
 variable {p q r s : ℕ}
 
-theorem der_sum_apply
-    {ι : Type*} (t : Finset ι) (D : ι → Derivation ℂ (Pol p q r s) (Pol p q r s)) (f : Pol p q r s)
-    : (∑ c ∈ t, D c) f = ∑ c ∈ t, D c f := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [← Derivation.coeFnAddMonoidHom_apply, map_sum, Finset.sum_apply]
+theorem der_sum_apply {ι : Type*} (t : Finset ι) (D : ι → Derivation ℂ (Pol p q r s) (Pol p q r s))
+    (f : Pol p q r s) : (∑ c ∈ t, D c) f = ∑ c ∈ t, D c f := by
+
+  rw [← Derivation.coeFnAddMonoidHom_apply, map_sum, Finset.sum_apply]
   rfl
 
 def der1 (a b : Ix p q) : Derivation ℂ (Pol p q r s) (Pol p q r s) :=
@@ -28,12 +73,9 @@ def der2 (c d : Ix r s) : Derivation ℂ (Pol p q r s) (Pol p q r s) :=
   ∑ a : Ix p q, if linePos (a, c) = true then (X (a, c) : Pol p q r s) • pderiv (a, d)
     else -((X (a, d) : Pol p q r s) • pderiv (a, c))
 
-theorem leftRootDerivation_X (a b : Ix p q) (v : Ln p q r s)
-    : der1 a b (X v : Pol p q r s)
-      = if linePos (a, v.2) = true then
-          (if v.1 = b then X (a, v.2) else 0)
-        else
-          (if v.1 = a then - X (b, v.2) else 0) := by
+theorem leftRootDerivation_X (a b : Ix p q) (v : Ln p q r s) :
+    der1 a b (X v : Pol p q r s) = if linePos (a, v.2) = true then (if v.1 = b then X (a, v.2) else 0)
+      else (if v.1 = a then -X (b, v.2) else 0) := by
   classical
   rw [der1, der_sum_apply, Finset.sum_eq_single v.2]
   · obtain ⟨v1, v2⟩ := v
@@ -53,12 +95,9 @@ theorem leftRootDerivation_X (a b : Ix p q) (v : Ln p q r s)
     split_ifs <;> simp [pderiv_X, Pi.single_apply, h1.symm, h2.symm]
   · simp
 
-theorem rightRootDerivation_X (c d : Ix r s) (v : Ln p q r s)
-    : der2 c d (X v : Pol p q r s)
-      = if linePos (v.1, c) = true then
-          (if v.2 = d then X (v.1, c) else 0)
-        else
-          (if v.2 = c then - X (v.1, d) else 0) := by
+theorem rightRootDerivation_X (c d : Ix r s) (v : Ln p q r s) :
+    der2 c d (X v : Pol p q r s) = if linePos (v.1, c) = true then (if v.2 = d then X (v.1, c) else 0)
+      else (if v.2 = c then -X (v.1, d) else 0) := by
   classical
   rw [der2, der_sum_apply, Finset.sum_eq_single v.1]
   · obtain ⟨v1, v2⟩ := v
@@ -78,10 +117,8 @@ theorem rightRootDerivation_X (c d : Ix r s) (v : Ln p q r s)
     split_ifs <;> simp [pderiv_X, Pi.single_apply, h1.symm, h2.symm]
   · simp
 
-theorem leftRootOperator_eq_derivation
-    (a b : Ix p q) (hab : a ≠ b) (hblk : ∀ c : Ix r s, linePos (a, c) = linePos (b, c))
-    (f : Pol p q r s)
-    : rai1 (r := r) (s := s) a b f = der1 a b f := by
+theorem leftRootOperator_eq_derivation (a b : Ix p q) (hab : a ≠ b) (hblk : ∀ c : Ix r s, linePos (a, c) = linePos (b, c))
+    (f : Pol p q r s) : rai1 (r := r) (s := s) a b f = der1 a b f := by
   classical
   rw [rai1, der1, der_sum_apply, LinearMap.sum_apply]
   apply Finset.sum_congr rfl
@@ -95,10 +132,8 @@ theorem leftRootOperator_eq_derivation
     rw [pderiv_mul, pderiv_X_of_ne hne.symm]
     ring
 
-theorem rightRootOperator_eq_derivation
-    (c d : Ix r s) (hcd : c ≠ d) (hblk : ∀ a : Ix p q, linePos (a, c) = linePos (a, d))
-    (f : Pol p q r s)
-    : rai2 (p := p) (q := q) c d f = der2 c d f := by
+theorem rightRootOperator_eq_derivation (c d : Ix r s) (hcd : c ≠ d) (hblk : ∀ a : Ix p q, linePos (a, c) = linePos (a, d))
+    (f : Pol p q r s) : rai2 (p := p) (q := q) c d f = der2 c d f := by
   classical
   rw [rai2, der2, der_sum_apply, LinearMap.sum_apply]
   apply Finset.sum_congr rfl
@@ -116,15 +151,12 @@ section Kill
 
 variable {m k : ℕ}
 
-theorem leadT_der_rows
-    (D : Derivation ℂ (Pol p q r s) (Pol p q r s)) (ρ : Fin m → Ix p q) (κ : Fin k → Ix r s) (t : ℕ)
-    (h : ∀ i₀ : Fin m,
-      i₀.val < t
-        → (∀ j : Fin k, j.val < t → D (X (ρ i₀, κ j)) = 0)
-          ∨ ∃ i₁ : Fin m,
-            i₁.val < t ∧ i₁ ≠ i₀
-              ∧ ∃ e : Pol p q r s, ∀ j : Fin k, j.val < t → D (X (ρ i₀, κ j)) = e * X (ρ i₁, κ j))
-    : D (leadT (varMat ρ κ) t) = 0 := by
+theorem leadT_der_rows (D : Derivation ℂ (Pol p q r s) (Pol p q r s)) (ρ : Fin m → Ix p q)
+    (κ : Fin k → Ix r s) (t : ℕ)
+    (h : ∀ i₀ : Fin m, i₀.val < t → (∀ j : Fin k, j.val < t → D (X (ρ i₀, κ j)) = 0) ∨
+      ∃ i₁ : Fin m, i₁.val < t ∧ i₁ ≠ i₀ ∧ ∃ e : Pol p q r s,
+        ∀ j : Fin k, j.val < t → D (X (ρ i₀, κ j)) = e * X (ρ i₁, κ j)) :
+    D (leadT (varMat ρ κ) t) = 0 := by
   unfold leadT
   split_ifs with hh
   · apply deriv_det_eq_zero_rows
@@ -146,15 +178,12 @@ theorem leadT_der_rows
         rfl
   · simp
 
-theorem leadT_der_cols
-    (D : Derivation ℂ (Pol p q r s) (Pol p q r s)) (ρ : Fin m → Ix p q) (κ : Fin k → Ix r s) (t : ℕ)
-    (h : ∀ j₀ : Fin k,
-      j₀.val < t
-        → (∀ i : Fin m, i.val < t → D (X (ρ i, κ j₀)) = 0)
-          ∨ ∃ j₁ : Fin k,
-            j₁.val < t ∧ j₁ ≠ j₀
-              ∧ ∃ e : Pol p q r s, ∀ i : Fin m, i.val < t → D (X (ρ i, κ j₀)) = e * X (ρ i, κ j₁))
-    : D (leadT (varMat ρ κ) t) = 0 := by
+theorem leadT_der_cols (D : Derivation ℂ (Pol p q r s) (Pol p q r s)) (ρ : Fin m → Ix p q)
+    (κ : Fin k → Ix r s) (t : ℕ)
+    (h : ∀ j₀ : Fin k, j₀.val < t → (∀ i : Fin m, i.val < t → D (X (ρ i, κ j₀)) = 0) ∨
+      ∃ j₁ : Fin k, j₁.val < t ∧ j₁ ≠ j₀ ∧ ∃ e : Pol p q r s,
+        ∀ i : Fin m, i.val < t → D (X (ρ i, κ j₀)) = e * X (ρ i, κ j₁)) :
+    D (leadT (varMat ρ κ) t) = 0 := by
   unfold leadT
   split_ifs with hh
   · apply deriv_det_eq_zero
@@ -176,20 +205,18 @@ theorem leadT_der_cols
         rfl
   · simp
 
-theorem shapeProd_der
-    (D : Derivation ℂ (Pol p q r s) (Pol p q r s)) (M : Matrix (Fin m) (Fin k) (Pol p q r s))
-    (α : List ℕ) (h : ∀ t, D (leadT M t) = 0)
-    : D (shapeProd M α) = 0 := by
+theorem shapeProd_der (D : Derivation ℂ (Pol p q r s) (Pol p q r s))
+    (M : Matrix (Fin m) (Fin k) (Pol p q r s)) (α : List ℕ) (h : ∀ t, D (leadT M t) = 0) :
+    D (shapeProd M α) = 0 := by
   unfold shapeProd
   apply deriv_prod_eq_zero
   intro t _
   exact deriv_pow_eq_zero _ _ _ (h _)
 
-theorem leadingMinor_leftRootDerivation_pos
-    (x y : Ix p q) (hxy : x ≠ y)
-    (ρ : Fin m → Ix p q) (κ : Fin k → Ix r s) (t : ℕ) (hpos : ∀ j, linePos (x, κ j) = true)
-    (hcl : ∀ i₀ : Fin m, i₀.val < t → ρ i₀ = y → ∃ i₁ : Fin m, i₁.val < t ∧ ρ i₁ = x)
-    : der1 x y (leadT (varMat ρ κ) t) = 0 := by
+theorem leadingMinor_leftRootDerivation_pos (x y : Ix p q) (hxy : x ≠ y) (ρ : Fin m → Ix p q) (κ : Fin k → Ix r s)
+    (t : ℕ) (hpos : ∀ j, linePos (x, κ j) = true)
+    (hcl : ∀ i₀ : Fin m, i₀.val < t → ρ i₀ = y → ∃ i₁ : Fin m, i₁.val < t ∧ ρ i₁ = x) :
+    der1 x y (leadT (varMat ρ κ) t) = 0 := by
   apply leadT_der_rows
   intro i₀ hi₀
   by_cases hy : ρ i₀ = y
@@ -203,11 +230,10 @@ theorem leadingMinor_leftRootDerivation_pos
     rw [leftRootDerivation_X]
     simp [hpos j, hy]
 
-theorem leadingMinor_leftRootDerivation_neg
-    (x y : Ix p q) (hxy : x ≠ y)
-    (ρ : Fin m → Ix p q) (κ : Fin k → Ix r s) (t : ℕ) (hneg : ∀ j, linePos (x, κ j) = false)
-    (hcl : ∀ i₀ : Fin m, i₀.val < t → ρ i₀ = x → ∃ i₁ : Fin m, i₁.val < t ∧ ρ i₁ = y)
-    : der1 x y (leadT (varMat ρ κ) t) = 0 := by
+theorem leadingMinor_leftRootDerivation_neg (x y : Ix p q) (hxy : x ≠ y) (ρ : Fin m → Ix p q) (κ : Fin k → Ix r s)
+    (t : ℕ) (hneg : ∀ j, linePos (x, κ j) = false)
+    (hcl : ∀ i₀ : Fin m, i₀.val < t → ρ i₀ = x → ∃ i₁ : Fin m, i₁.val < t ∧ ρ i₁ = y) :
+    der1 x y (leadT (varMat ρ κ) t) = 0 := by
   apply leadT_der_rows
   intro i₀ hi₀
   by_cases hx : ρ i₀ = x
@@ -221,11 +247,10 @@ theorem leadingMinor_leftRootDerivation_neg
     rw [leftRootDerivation_X]
     simp [hneg j, hx]
 
-theorem leadingMinor_rightRootDerivation_pos
-    (x y : Ix r s) (hxy : x ≠ y)
-    (ρ : Fin m → Ix p q) (κ : Fin k → Ix r s) (t : ℕ) (hpos : ∀ i, linePos (ρ i, x) = true)
-    (hcl : ∀ j₀ : Fin k, j₀.val < t → κ j₀ = y → ∃ j₁ : Fin k, j₁.val < t ∧ κ j₁ = x)
-    : der2 x y (leadT (varMat ρ κ) t) = 0 := by
+theorem leadingMinor_rightRootDerivation_pos (x y : Ix r s) (hxy : x ≠ y) (ρ : Fin m → Ix p q) (κ : Fin k → Ix r s)
+    (t : ℕ) (hpos : ∀ i, linePos (ρ i, x) = true)
+    (hcl : ∀ j₀ : Fin k, j₀.val < t → κ j₀ = y → ∃ j₁ : Fin k, j₁.val < t ∧ κ j₁ = x) :
+    der2 x y (leadT (varMat ρ κ) t) = 0 := by
   apply leadT_der_cols
   intro j₀ hj₀
   by_cases hy : κ j₀ = y
@@ -239,11 +264,10 @@ theorem leadingMinor_rightRootDerivation_pos
     rw [rightRootDerivation_X]
     simp [hpos i, hy]
 
-theorem leadingMinor_rightRootDerivation_neg
-    (x y : Ix r s) (hxy : x ≠ y)
-    (ρ : Fin m → Ix p q) (κ : Fin k → Ix r s) (t : ℕ) (hneg : ∀ i, linePos (ρ i, x) = false)
-    (hcl : ∀ j₀ : Fin k, j₀.val < t → κ j₀ = x → ∃ j₁ : Fin k, j₁.val < t ∧ κ j₁ = y)
-    : der2 x y (leadT (varMat ρ κ) t) = 0 := by
+theorem leadingMinor_rightRootDerivation_neg (x y : Ix r s) (hxy : x ≠ y) (ρ : Fin m → Ix p q) (κ : Fin k → Ix r s)
+    (t : ℕ) (hneg : ∀ i, linePos (ρ i, x) = false)
+    (hcl : ∀ j₀ : Fin k, j₀.val < t → κ j₀ = x → ∃ j₁ : Fin k, j₁.val < t ∧ κ j₁ = y) :
+    der2 x y (leadT (varMat ρ κ) t) = 0 := by
   apply leadT_der_cols
   intro j₀ hj₀
   by_cases hx : κ j₀ = x
@@ -259,40 +283,22 @@ theorem leadingMinor_rightRootDerivation_neg
 
 end Kill
 
-theorem hwVec_der
-    (D : Derivation ℂ (Pol p q r s) (Pol p q r s))
-    (a b c d : List ℤ)
-    (h1 : ∀ t,
-      D (leadT
-          (varMat (fun i : Fin p => (Sum.inl i : Ix p q)) (fun k : Fin r => (Sum.inl k : Ix r s)))
-          t)
-        = 0)
-    (h2 : ∀ t,
-      D (leadT
-          (varMat
-            (fun i : Fin p => (Sum.inl (Fin.rev i) : Ix p q))
-            (fun l : Fin s => (Sum.inr (Fin.rev l) : Ix r s)))
-          t)
-        = 0)
-    (h3 : ∀ t,
-      D (leadT
-          (varMat (fun j : Fin q => (Sum.inr j : Ix p q)) (fun l : Fin s => (Sum.inr l : Ix r s)))
-          t)
-        = 0)
-    (h4 : ∀ t,
-      D (leadT
-          (varMat
-            (fun j : Fin q => (Sum.inr (Fin.rev j) : Ix p q))
-            (fun k : Fin r => (Sum.inl (Fin.rev k) : Ix r s)))
-          t)
-        = 0)
-    : D (hwVec p q r s a b c d) = 0 := by
+theorem hwVec_der (D : Derivation ℂ (Pol p q r s) (Pol p q r s)) (a b c d : List ℤ)
+    (h1 : ∀ t, D (leadT (varMat (fun i : Fin p => (Sum.inl i : Ix p q))
+      (fun k : Fin r => (Sum.inl k : Ix r s))) t) = 0)
+    (h2 : ∀ t, D (leadT (varMat (fun i : Fin p => (Sum.inl (Fin.rev i) : Ix p q))
+      (fun l : Fin s => (Sum.inr (Fin.rev l) : Ix r s))) t) = 0)
+    (h3 : ∀ t, D (leadT (varMat (fun j : Fin q => (Sum.inr j : Ix p q))
+      (fun l : Fin s => (Sum.inr l : Ix r s))) t) = 0)
+    (h4 : ∀ t, D (leadT (varMat (fun j : Fin q => (Sum.inr (Fin.rev j) : Ix p q))
+      (fun k : Fin r => (Sum.inl (Fin.rev k) : Ix r s))) t) = 0) :
+    D (hwVec p q r s a b c d) = 0 := by
   rw [hwVec]
   simp only [Derivation.leibniz, shapeProd_der D _ _ h1, shapeProd_der D _ _ h2,
     shapeProd_der D _ _ h3, shapeProd_der D _ _ h4, smul_zero, add_zero]
 
-theorem vecRaise1 (a b c d : List ℤ) (x y : Ix p q) (hxy : posC x y)
-    : der1 (r := r) (s := s) x y (hwVec p q r s a b c d) = 0 := by
+theorem vecRaise1 (a b c d : List ℤ) (x y : Ix p q) (hxy : posC x y) :
+    der1 (r := r) (s := s) x y (hwVec p q r s a b c d) = 0 := by
   cases x with
   | inl i =>
     cases y with
@@ -353,8 +359,8 @@ theorem vecRaise1 (a b c d : List ℤ) (x y : Ix p q) (hxy : posC x y)
         simp only [Fin.val_rev] at this ⊢
         omega
 
-theorem vecRaise2 (a b c d : List ℤ) (x y : Ix r s) (hxy : posC x y)
-    : der2 (p := p) (q := q) x y (hwVec p q r s a b c d) = 0 := by
+theorem vecRaise2 (a b c d : List ℤ) (x y : Ix r s) (hxy : posC x y) :
+    der2 (p := p) (q := q) x y (hwVec p q r s a b c d) = 0 := by
   cases x with
   | inl k =>
     cases y with

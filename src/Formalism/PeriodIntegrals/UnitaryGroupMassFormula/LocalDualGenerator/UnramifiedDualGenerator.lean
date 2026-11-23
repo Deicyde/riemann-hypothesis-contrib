@@ -1,9 +1,56 @@
 module
 
-public import Mathlib
 public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.LocalDualGenerator.FpDualUnram
 public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.LocalDualGenerator.IsClosedO
 public import Development.AutomorphicArithmetic.IntegralCasts.CapelliIdentities.MemOfClosed
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+public import Mathlib.FieldTheory.Finite.Trace
 
 @[expose] public section
 
@@ -13,9 +60,8 @@ open ValuativeRel IsLocalRing
 
 namespace PI.LocDualGen.FpU
 
-theorem exists_trace_ne_zero
-    (F : Type) [Field F] [Finite F] (p : ℕ) [Fact p.Prime] [CharP F p] [Algebra (ZMod p) F]
-    : ∃ z : F, Algebra.trace (ZMod p) F z ≠ 0 := by
+theorem exists_trace_ne_zero (F : Type) [Field F] [Finite F] (p : ℕ) [Fact p.Prime] [CharP F p]
+    [Algebra (ZMod p) F] : ∃ z : F, Algebra.trace (ZMod p) F z ≠ 0 := by
   have h : ringChar F = p := ringChar.eq F p
   subst h
   obtain ⟨b, hb⟩ := FiniteField.trace_to_zmod_nondegenerate F (one_ne_zero : (1 : F) ≠ 0)
@@ -23,20 +69,19 @@ theorem exists_trace_ne_zero
 
 section Main
 
-variable
-  (K : Type) [Field K] [ValuativeRel K] [TopologicalSpace K] [IsNonarchimedeanLocalField K]
+variable (K : Type) [Field K] [ValuativeRel K] [TopologicalSpace K] [IsNonarchimedeanLocalField K]
   (l : ℕ) [Fact l.Prime] [Algebra ℚ_[l] K]
 
 variable [CharP 𝓀[K] l]
 
 attribute [local instance] algRes
 
-theorem linIndep (hcont : Continuous (algebraMap ℚ_[l] K))
-    : LinearIndependent ℚ_[l] (fun i => (blift K l i : K)) := by
-  apply _root_.UpperTheory.Reformulated.B.Qi13.linIndep <;> assumption
+theorem linIndep (hcont : Continuous (algebraMap ℚ_[l] K)) :
+    LinearIndependent ℚ_[l] (fun i => (blift K l i : K)) :=
+  by apply _root_.UpperTheory.Reformulated.B.Qi13.linIndep <;> assumption
 
-theorem exists_pow_mul_mem (huni : Irreducible ((l : ℕ) : 𝒪[K])) (x : K)
-    : ∃ n : ℕ, (l : K) ^ n * x ∈ 𝒪[K] := by
+theorem exists_pow_mul_mem (huni : Irreducible ((l : ℕ) : 𝒪[K])) (x : K) :
+    ∃ n : ℕ, (l : K) ^ n * x ∈ 𝒪[K] := by
   by_cases hx : x ∈ 𝒪[K]
   · exact ⟨0, by simpa using hx⟩
   have hx1 : 1 < valuation K x := by
@@ -72,18 +117,17 @@ theorem exists_pow_mul_mem (huni : Irreducible ((l : ℕ) : 𝒪[K])) (x : K)
   rw [hv]
   exact (u⁻¹ : (𝒪[K])ˣ).1.2
 
-theorem spanTop (hcont : Continuous (algebraMap ℚ_[l] K)) (huni : Irreducible ((l : ℕ) : 𝒪[K]))
-    : ⊤ ≤ Submodule.span ℚ_[l] (Set.range fun i => (blift K l i : K)) := by
+theorem spanTop (hcont : Continuous (algebraMap ℚ_[l] K)) (huni : Irreducible ((l : ℕ) : 𝒪[K])) :
+    ⊤ ≤ Submodule.span ℚ_[l] (Set.range fun i => (blift K l i : K)) := by
   intro x _
   obtain ⟨n, hn⟩ := exists_pow_mul_mem K l huni x
   obtain ⟨c, hc⟩ := span K l hcont huni ⟨_, hn⟩
   have hc' := congrArg Subtype.val hc
   rw [Phi_coe] at hc'
   change (l : K) ^ n * x = _ at hc'
-  have hl0 : (l : K) ^ n ≠ 0 :=
-    pow_ne_zero _ (by
-      rw [← map_natCast (algebraMap ℚ_[l] K)]
-      exact (map_ne_zero _).mpr (by exact_mod_cast (Fact.out : l.Prime).ne_zero))
+  have hl0 : (l : K) ^ n ≠ 0 := pow_ne_zero _ (by
+    rw [← map_natCast (algebraMap ℚ_[l] K)]
+    exact (map_ne_zero _).mpr (by exact_mod_cast (Fact.out : l.Prime).ne_zero))
   have hx : x = ∑ i, (((l : ℚ_[l]) ^ n)⁻¹ * (c i : ℚ_[l])) • (blift K l i : K) := by
     have e : x = ((l : K) ^ n)⁻¹ * ((l : K) ^ n * x) := by field_simp
     rw [e, hc', Finset.mul_sum]
@@ -93,74 +137,65 @@ theorem spanTop (hcont : Continuous (algebraMap ℚ_[l] K)) (huni : Irreducible 
   rw [hx]
   exact Submodule.sum_mem _ (fun i _ => Submodule.smul_mem _ _ (Submodule.subset_span ⟨i, rfl⟩))
 
-def B (hcont : Continuous (algebraMap ℚ_[l] K)) (huni : Irreducible ((l : ℕ) : 𝒪[K]))
-    : Module.Basis (Fin (fdim K l)) ℚ_[l] K :=
+def B (hcont : Continuous (algebraMap ℚ_[l] K)) (huni : Irreducible ((l : ℕ) : 𝒪[K])) :
+    Module.Basis (Fin (fdim K l)) ℚ_[l] K :=
   Module.Basis.mk (linIndep K l hcont) (spanTop K l hcont huni)
 
-theorem B_apply
-    (hcont : Continuous (algebraMap ℚ_[l] K)) (huni : Irreducible ((l : ℕ) : 𝒪[K]))
-    (i : Fin (fdim K l))
-    : B K l hcont huni i = (blift K l i : K) := by
+theorem B_apply (hcont : Continuous (algebraMap ℚ_[l] K)) (huni : Irreducible ((l : ℕ) : 𝒪[K]))
+    (i : Fin (fdim K l)) : B K l hcont huni i = (blift K l i : K) := by
   simp [B]
 
-def coef (hcont : Continuous (algebraMap ℚ_[l] K)) (huni : Irreducible ((l : ℕ) : 𝒪[K])) (y : 𝒪[K])
-    : Fin (fdim K l) → ℤ_[l] :=
+def coef (hcont : Continuous (algebraMap ℚ_[l] K)) (huni : Irreducible ((l : ℕ) : 𝒪[K]))
+    (y : 𝒪[K]) : Fin (fdim K l) → ℤ_[l] :=
   (span K l hcont huni y).choose
 
-theorem repr_coe
-    (hcont : Continuous (algebraMap ℚ_[l] K)) (huni : Irreducible ((l : ℕ) : 𝒪[K])) (y : 𝒪[K])
-    (j : Fin (fdim K l))
-    : (B K l hcont huni).repr (y : K) j = (coef K l hcont huni y j : ℚ_[l]) := by
+theorem repr_coe (hcont : Continuous (algebraMap ℚ_[l] K)) (huni : Irreducible ((l : ℕ) : 𝒪[K]))
+    (y : 𝒪[K]) (j : Fin (fdim K l)) :
+    (B K l hcont huni).repr (y : K) j = (coef K l hcont huni y j : ℚ_[l]) := by
   have h' : (y : K) = ((Phi K l hcont (coef K l hcont huni y) : 𝒪[K]) : K) :=
     congrArg Subtype.val (span K l hcont huni y).choose_spec
   rw [h', Phi_coe]
-  have e
-      : ∑ i, algebraMap ℚ_[l] K ((coef K l hcont huni y i : ℤ_[l]) : ℚ_[l]) * (blift K l i : K)
-        = ∑ i, ((coef K l hcont huni y i : ℤ_[l]) : ℚ_[l]) • B K l hcont huni i := by
+  have e : ∑ i, algebraMap ℚ_[l] K ((coef K l hcont huni y i : ℤ_[l]) : ℚ_[l]) * (blift K l i : K) =
+      ∑ i, ((coef K l hcont huni y i : ℤ_[l]) : ℚ_[l]) • B K l hcont huni i := by
     refine Finset.sum_congr rfl (fun i _ => ?_)
     rw [B_apply, Algebra.smul_def]
   rw [e, repr_sum]
 
-theorem res_coef
-    (hcont : Continuous (algebraMap ℚ_[l] K)) (huni : Irreducible ((l : ℕ) : 𝒪[K])) (y : 𝒪[K])
-    (j : Fin (fdim K l))
-    : (bb K l).repr (residue 𝒪[K] y) j = PadicInt.toZMod (coef K l hcont huni y j) := by
+theorem res_coef (hcont : Continuous (algebraMap ℚ_[l] K)) (huni : Irreducible ((l : ℕ) : 𝒪[K]))
+    (y : 𝒪[K]) (j : Fin (fdim K l)) :
+    (bb K l).repr (residue 𝒪[K] y) j = PadicInt.toZMod (coef K l hcont huni y j) := by
   conv_lhs => rw [(span K l hcont huni y).choose_spec]
   rw [res_Phi, repr_sum]
   rfl
 
-theorem trace_eq
-    (hcont : Continuous (algebraMap ℚ_[l] K)) (huni : Irreducible ((l : ℕ) : 𝒪[K])) (x : 𝒪[K])
-    : Algebra.trace ℚ_[l] K (x : K)
-      = ((∑ i, coef K l hcont huni (x * blift K l i) i : ℤ_[l]) : ℚ_[l]) := by
+theorem trace_eq (hcont : Continuous (algebraMap ℚ_[l] K)) (huni : Irreducible ((l : ℕ) : 𝒪[K]))
+    (x : 𝒪[K]) : Algebra.trace ℚ_[l] K (x : K) =
+      ((∑ i, coef K l hcont huni (x * blift K l i) i : ℤ_[l]) : ℚ_[l]) := by
   rw [Algebra.trace_eq_matrix_trace (B K l hcont huni), Matrix.trace]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [show ((∑ i, coef K l hcont huni (x * blift K l i) i : ℤ_[l]) : ℚ_[l])
-        = ∑ i, ((coef K l hcont huni (x * blift K l i) i : ℤ_[l]) : ℚ_[l]) from
-      map_sum PadicInt.Coe.ringHom _ _]
+
+  rw [show ((∑ i, coef K l hcont huni (x * blift K l i) i : ℤ_[l]) : ℚ_[l]) =
+    ∑ i, ((coef K l hcont huni (x * blift K l i) i : ℤ_[l]) : ℚ_[l]) from
+  map_sum PadicInt.Coe.ringHom _ _]
   refine Finset.sum_congr rfl (fun i _ => ?_)
   rw [Matrix.diag, Algebra.leftMulMatrix_eq_repr_mul, B_apply]
   have e : (x : K) * (blift K l i : K) = ((x * blift K l i : 𝒪[K]) : K) := rfl
   rw [e, repr_coe]
 
-theorem toZMod_trace
-    (hcont : Continuous (algebraMap ℚ_[l] K)) (huni : Irreducible ((l : ℕ) : 𝒪[K])) (x : 𝒪[K])
-    : PadicInt.toZMod (∑ i, coef K l hcont huni (x * blift K l i) i)
-      = Algebra.trace (ZMod l) 𝓀[K] (residue 𝒪[K] x) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [Algebra.trace_eq_matrix_trace (bb K l), Matrix.trace, map_sum]
+theorem toZMod_trace (hcont : Continuous (algebraMap ℚ_[l] K)) (huni : Irreducible ((l : ℕ) : 𝒪[K]))
+    (x : 𝒪[K]) : PadicInt.toZMod (∑ i, coef K l hcont huni (x * blift K l i) i) =
+      Algebra.trace (ZMod l) 𝓀[K] (residue 𝒪[K] x) := by
+
+  rw [Algebra.trace_eq_matrix_trace (bb K l), Matrix.trace, map_sum]
   refine Finset.sum_congr rfl (fun i _ => ?_)
   rw [Matrix.diag, Algebra.leftMulMatrix_eq_repr_mul, ← res_blift K l i, ← map_mul, res_coef]
 
-theorem trace_int
-    (hcont : Continuous (algebraMap ℚ_[l] K)) (huni : Irreducible ((l : ℕ) : 𝒪[K])) (x : 𝒪[K])
-    : ‖Algebra.trace ℚ_[l] K (x : K)‖ ≤ 1 := by
+theorem trace_int (hcont : Continuous (algebraMap ℚ_[l] K)) (huni : Irreducible ((l : ℕ) : 𝒪[K]))
+    (x : 𝒪[K]) : ‖Algebra.trace ℚ_[l] K (x : K)‖ ≤ 1 := by
   rw [trace_eq K l hcont huni]
   exact (∑ i, coef K l hcont huni (x * blift K l i) i).2
 
-theorem exists_trace_unit
-    (hcont : Continuous (algebraMap ℚ_[l] K)) (huni : Irreducible ((l : ℕ) : 𝒪[K]))
-    : ∃ x : 𝒪[K], ¬ ‖Algebra.trace ℚ_[l] K (x : K)‖ < 1 := by
+theorem exists_trace_unit (hcont : Continuous (algebraMap ℚ_[l] K))
+    (huni : Irreducible ((l : ℕ) : 𝒪[K])) : ∃ x : 𝒪[K], ¬ ‖Algebra.trace ℚ_[l] K (x : K)‖ < 1 := by
   obtain ⟨z, hz⟩ := exists_trace_ne_zero 𝓀[K] l
   obtain ⟨x, rfl⟩ := residue_surjective z
   refine ⟨x, fun hlt => hz ?_⟩
@@ -200,8 +235,8 @@ theorem unramified_dual_generator : PI.LocDualGen.W.FpDualUnram := by
       rw [map_inv₀, inv_eq_one] at h1
       rw [h1] at ha1
       exact lt_irrefl _ ha1
-    rw [(IsDiscreteValuationRing.irreducible_iff_uniformizer _).mp huni, Ideal.mem_span_singleton']
-      at hnu
+    rw [(IsDiscreteValuationRing.irreducible_iff_uniformizer _).mp huni,
+      Ideal.mem_span_singleton'] at hnu
     obtain ⟨t, ht⟩ := hnu
     have ht' : (t : K) * (l : K) = a⁻¹ := congrArg Subtype.val ht
     have hl0 : (l : K) ≠ 0 := by
@@ -216,10 +251,8 @@ theorem unramified_dual_generator : PI.LocDualGen.W.FpDualUnram := by
       ring
     have h1 := H (t * z)
     change ‖Algebra.trace ℚ_[l] K (a * ((t : K) * (z : K)))‖ ≤ 1 at h1
-    rw [← mul_assoc, hat, ← Algebra.smul_def, LinearMap.map_smul, smul_eq_mul, norm_mul, norm_inv]
-      at h1
-    have hlpos : 0 < ‖(l : ℚ_[l])‖ :=
-      norm_pos_iff.mpr (by exact_mod_cast (Fact.out : l.Prime).ne_zero)
+    rw [← mul_assoc, hat, ← Algebra.smul_def, LinearMap.map_smul, smul_eq_mul, norm_mul, norm_inv] at h1
+    have hlpos : 0 < ‖(l : ℚ_[l])‖ := norm_pos_iff.mpr (by exact_mod_cast (Fact.out : l.Prime).ne_zero)
     rw [inv_mul_le_iff₀ hlpos, mul_one] at h1
     exact hz (lt_of_le_of_lt h1 Padic.norm_p_lt_one)
   · intro ha b

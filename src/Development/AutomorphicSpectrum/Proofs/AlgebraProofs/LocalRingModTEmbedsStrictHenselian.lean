@@ -1,32 +1,78 @@
 module
 
-public import Mathlib
+public import Mathlib.Algebra.Exact.Basic
+public import Mathlib.LinearAlgebra.LinearIndependent.Defs
+public import Mathlib.RingTheory.Valuation.ValuationRing
+import Mathlib.Algebra.Module.StablyFree.Basic
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+public import Mathlib.Algebra.Module.FinitePresentation
+public import Mathlib.Algebra.Module.Torsion.Basic
+public import Mathlib.RingTheory.Flat.TorsionFree
+public import Mathlib.RingTheory.LocalRing.Module
 
 @[expose] public section
 
 namespace GlobalTheory.CompanionTheory.Ar.Flat
 
-theorem exists_basis_split_of_exact_of_fg_valuationRing
-    : ∀ (V C A W B : Type) [CommRing V] [IsDomain V] [ValuationRing V] [Field C] [Algebra V C]
-        [IsFractionRing V C] [AddCommGroup A] [Module C A] [Module V A] [IsScalarTower V C A]
-        [AddCommGroup W] [Module C W] [Module V W] [IsScalarTower V C W] [AddCommGroup B]
-        [Module C B] [Module V B] [IsScalarTower V C B] (b : A →ₗ[C] W) (al : W →ₗ[C] B),
-      Function.Injective b → Function.Exact b al
-        → ∀ (T : Submodule V W),
-          T.FG
-            → ∃ (p q : ℕ) (w : Fin p → A) (t : Fin q → W),
-              LinearIndependent C w ∧ Submodule.span V (Set.range w) = T.comap (b.restrictScalars V)
-                ∧ LinearIndependent C (fun j => al (t j))
-                ∧ Submodule.span V (Set.range fun j => al (t j)) = T.map (al.restrictScalars V)
-                ∧ LinearIndependent C (Sum.elim (fun i => b (w i)) t)
-                ∧ Submodule.span V (Set.range (Sum.elim (fun i => b (w i)) t)) = T := by
+theorem exists_basis_split_of_exact_of_fg_valuationRing :
+    ∀ (V C A W B : Type) [CommRing V] [IsDomain V] [ValuationRing V] [Field C] [Algebra V C]
+      [IsFractionRing V C] [AddCommGroup A] [Module C A] [Module V A] [IsScalarTower V C A]
+      [AddCommGroup W] [Module C W] [Module V W] [IsScalarTower V C W] [AddCommGroup B]
+      [Module C B] [Module V B] [IsScalarTower V C B] (b : A →ₗ[C] W) (al : W →ₗ[C] B),
+      Function.Injective b → Function.Exact b al → ∀ (T : Submodule V W), T.FG →
+      ∃ (p q : ℕ) (w : Fin p → A) (t : Fin q → W), LinearIndependent C w ∧
+        Submodule.span V (Set.range w) = T.comap (b.restrictScalars V) ∧
+        LinearIndependent C (fun j => al (t j)) ∧
+        Submodule.span V (Set.range fun j => al (t j)) = T.map (al.restrictScalars V) ∧
+        LinearIndependent C (Sum.elim (fun i => b (w i)) t) ∧
+        Submodule.span V (Set.range (Sum.elim (fun i => b (w i)) t)) = T := by
   intro V C A W B _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ b al hb hex T hT
   have : IsBezout V := ValuationRing.instIsBezout
 
-  have hfree
-      : ∀ (X : Type) [AddCommGroup X] [Module C X] [Module V X] [IsScalarTower V C X]
-          (N : Submodule V X),
-        N.FG → Module.Free V N := by
+  have hfree : ∀ (X : Type) [AddCommGroup X] [Module C X] [Module V X] [IsScalarTower V C X]
+      (N : Submodule V X), N.FG → Module.Free V N := by
     intro X _ _ _ _ N hN
     have : Module.Finite V N := Module.Finite.iff_fg.mpr hN
     have : Module.Flat V N := by
@@ -38,7 +84,8 @@ theorem exists_basis_split_of_exact_of_fg_valuationRing
       have h3 : (a : V) • (x : X) = 0 := by
         have h4 := congrArg Subtype.val h2
         simpa using h4
-      have h1 : (algebraMap V C (a : V)) • (x : X) = 0 := by rw [algebraMap_smul]; exact h3
+      have h1 : (algebraMap V C (a : V)) • (x : X) = 0 := by
+        rw [algebraMap_smul]; exact h3
       have ha0 : algebraMap V C (a : V) ≠ 0 := by
         intro h
         have h5 : (a : V) = 0 := (IsFractionRing.injective V C) (by rw [h, map_zero])
@@ -47,17 +94,14 @@ theorem exists_basis_split_of_exact_of_fg_valuationRing
       exact Subtype.ext (by simp [hx0])
     exact Module.free_of_flat_of_isLocalRing
 
-  have hL
-      : ∀ (X : Type) [AddCommGroup X] [Module C X] [Module V X] [IsScalarTower V C X]
-          (N : Submodule V X),
-        N.FG
-          → ∃ (n : ℕ) (v : Fin n → X),
-            LinearIndependent C v ∧ Submodule.span V (Set.range v) = N := by
+  have hL : ∀ (X : Type) [AddCommGroup X] [Module C X] [Module V X] [IsScalarTower V C X]
+      (N : Submodule V X), N.FG → ∃ (n : ℕ) (v : Fin n → X),
+        LinearIndependent C v ∧ Submodule.span V (Set.range v) = N := by
     intro X _ _ _ _ N hN
     have := hfree X N hN
     have : Module.Finite V N := Module.Finite.iff_fg.mpr hN
-    let e :=
-      (Module.Free.chooseBasis V N).reindex (Fintype.equivFin (Module.Free.ChooseBasisIndex V N))
+    let e := (Module.Free.chooseBasis V N).reindex
+      (Fintype.equivFin (Module.Free.ChooseBasisIndex V N))
     refine ⟨Fintype.card (Module.Free.ChooseBasisIndex V N), fun i => (e i : X), ?_, ?_⟩
     · rw [← LinearIndependent.iff_fractionRing V C]
       exact e.linearIndependent.map' N.subtype (Submodule.ker_subtype N)
@@ -83,9 +127,8 @@ theorem exists_basis_split_of_exact_of_fg_valuationRing
     Module.FinitePresentation.fg_ker _ (LinearMap.submoduleMap_surjective _ _)
   have hK : (T.comap (b.restrictScalars V)).FG := by
     apply Submodule.fg_of_fg_map_injective (b.restrictScalars V) hb
-    have heq
-        : (T.comap (b.restrictScalars V)).map (b.restrictScalars V)
-          = (LinearMap.ker ((al.restrictScalars V).submoduleMap T)).map T.subtype := by
+    have heq : (T.comap (b.restrictScalars V)).map (b.restrictScalars V)
+        = (LinearMap.ker ((al.restrictScalars V).submoduleMap T)).map T.subtype := by
       ext x
       constructor
       · rintro ⟨a, ha, rfl⟩
@@ -112,14 +155,15 @@ theorem exists_basis_split_of_exact_of_fg_valuationRing
     have h1 : ∀ i, al (b (w i)) = 0 := fun i => (hex _).mpr ⟨w i, rfl⟩
     have h2 : ∑ j, g (Sum.inr j) • u j = 0 := by
       have h7 := congrArg al hg
-      set_option synthInstance.maxHeartbeats 100000 in
+
       simpa [map_add (f := _), map_sum, map_smul, h1, hta'] using h7
     have h3 : ∀ j, g (Sum.inr j) = 0 :=
       Fintype.linearIndependent_iff.mp hu (fun j => g (Sum.inr j)) h2
-    have h4 : ∑ i, g (Sum.inl i) • b (w i) = 0 := by simpa [h3] using hg
+    have h4 : ∑ i, g (Sum.inl i) • b (w i) = 0 := by
+      simpa [h3] using hg
     have h5 : ∑ i, g (Sum.inl i) • w i = 0 := by
       apply hb
-      set_option synthInstance.maxHeartbeats 100000 in
+
       simpa [map_sum, map_smul] using h4
     have h6 := Fintype.linearIndependent_iff.mp hw (fun i => g (Sum.inl i)) h5
     intro i
@@ -140,8 +184,8 @@ theorem exists_basis_split_of_exact_of_fg_valuationRing
       rw [← hus, Submodule.mem_span_range_iff_exists_fun] at hax
       obtain ⟨c, hc⟩ := hax
       have hyal : al (x - ∑ j, c j • t j) = 0 := by
-        set_option synthInstance.maxHeartbeats 100000 in
-          rw [map_sub, map_sum]
+
+        rw [map_sub, map_sum]
         simp only [LinearMap.map_smul_of_tower, hta']
         rw [hc, sub_self]
       obtain ⟨a, ha⟩ := (hex _).mp hyal
@@ -157,6 +201,7 @@ theorem exists_basis_split_of_exact_of_fg_valuationRing
           rw [← Set.range_comp]; rfl
         rw [hr, Submodule.span_image]
         exact Submodule.mem_map_of_mem haK
-      · exact Submodule.sum_mem _ fun j _ => Submodule.smul_mem _ _ (Submodule.subset_span ⟨j, rfl⟩)
+      · exact Submodule.sum_mem _ fun j _ =>
+          Submodule.smul_mem _ _ (Submodule.subset_span ⟨j, rfl⟩)
 
 end GlobalTheory.CompanionTheory.Ar.Flat

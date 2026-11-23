@@ -1,29 +1,80 @@
 module
 
-public import Mathlib
+public import Mathlib.RingTheory.Ideal.Defs
+public import Mathlib.SetTheory.Cardinal.Finite
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
+public import Mathlib.Algebra.BigOperators.Ring.Finset
+public import Mathlib.Algebra.Group.Submonoid.BigOperators
+public import Mathlib.Data.Set.Finite.Range
+public import Mathlib.GroupTheory.Coset.Card
+public import Mathlib.GroupTheory.QuotientGroup.Basic
+public import Mathlib.RingTheory.Ideal.Maps
 
 @[expose] public section
 
 namespace Formalism.HermitianLattices.Ext.L3.NormLifting
 
-theorem card_fiber_mul_card_range
-    {G H : Type*} [AddCommGroup G] [AddCommGroup H] (f : G →+ H) (h : H) (hh : h ∈ f.range)
-    : Nat.card {g : G // f g = h} * Nat.card f.range = Nat.card G := by
+theorem card_fiber_mul_card_range {G H : Type*} [AddCommGroup G] [AddCommGroup H]
+    (f : G →+ H) (h : H) (hh : h ∈ f.range) :
+    Nat.card {g : G // f g = h} * Nat.card f.range = Nat.card G := by
+
   obtain ⟨g0, hg0⟩ := hh
-  have e1 : {g : G // f g = h} ≃ f.ker := {
-    toFun := fun g => ⟨g.1 - g0, by rw [AddMonoidHom.mem_ker, map_sub, g.2, hg0, sub_self]⟩
-    invFun := fun k =>
-      ⟨k.1 + g0, by rw [map_add (f := _), (AddMonoidHom.mem_ker).mp k.2, hg0, zero_add]⟩
-    left_inv := fun g => by ext; simp
-    right_inv := fun k => by ext; simp
-  }
-  rw [Nat.card_congr e1, ← Nat.card_congr (QuotientAddGroup.quotientKerEquivRange f).toEquiv,
-    mul_comm]
+  have e1 : {g : G // f g = h} ≃ f.ker :=
+    { toFun := fun g => ⟨g.1 - g0, by rw [AddMonoidHom.mem_ker, map_sub, g.2, hg0, sub_self]⟩
+      invFun := fun k => ⟨k.1 + g0, by rw [map_add (f := _), (AddMonoidHom.mem_ker).mp k.2, hg0, zero_add]⟩
+      left_inv := fun g => by ext; simp
+      right_inv := fun k => by ext; simp }
+  rw [Nat.card_congr e1, ← Nat.card_congr (QuotientAddGroup.quotientKerEquivRange f).toEquiv, mul_comm]
   exact (AddSubgroup.card_eq_card_quotient_mul_card_addSubgroup f.ker).symm
 
-theorem card_eq_mul_of_fibers
-    {X Y : Type*} [Finite X] (f : X → Y) (c : ℕ) (hc : ∀ y, Nat.card {x : X // f x = y} = c)
-    : Nat.card X = c * Nat.card Y := by
+theorem card_eq_mul_of_fibers {X Y : Type*} [Finite X] (f : X → Y) (c : ℕ)
+    (hc : ∀ y, Nat.card {x : X // f x = y} = c) : Nat.card X = c * Nat.card Y := by
+
   classical
   by_cases hY : Finite Y
   · haveI := Fintype.ofFinite Y
@@ -62,32 +113,32 @@ theorem mem_fixSub {w : A} : w ∈ fixSub σ I ↔ w ∈ I ∧ σ w = w := Iff.r
 variable {σ I}
 
 theorem map_inv_eq_neg (hσ : ∀ a, σ (σ a) = a) {θ e : A} (he : (θ - σ θ) * e = 1) : σ e = -e := by
-  have h1 : (θ - σ θ) * (- σ e) = 1 := by
+
+  have h1 : (θ - σ θ) * (-σ e) = 1 := by
     have h0 := congrArg σ he
     rw [map_mul, map_sub, hσ, map_one] at h0
     linear_combination h0
-  have h2 : e = - σ e := by
-    calc
-      e = e * ((θ - σ θ) * (- σ e)) := by rw [h1, mul_one]
-      _ = ((θ - σ θ) * e) * (- σ e) := by ring
-      _ = - σ e := by rw [he, one_mul]
+  have h2 : e = -σ e := by
+    calc e = e * ((θ - σ θ) * (-σ e)) := by rw [h1, mul_one]
+      _ = ((θ - σ θ) * e) * (-σ e) := by ring
+      _ = -σ e := by rw [he, one_mul]
   linear_combination h2
 
-theorem exists_trace
-    (hσ : ∀ a, σ (σ a) = a) {θ e : A} (he : (θ - σ θ) * e = 1) {w : A} (hw : w ∈ fixSub σ I)
-    : ∃ v ∈ I, v + σ v = w := by
+theorem exists_trace (hσ : ∀ a, σ (σ a) = a) {θ e : A} (he : (θ - σ θ) * e = 1) {w : A}
+    (hw : w ∈ fixSub σ I) : ∃ v ∈ I, v + σ v = w := by
+
   have hw' := (mem_fixSub σ I).mp hw
   refine ⟨w * (θ * e), I.mul_mem_right _ hw'.1, ?_⟩
   rw [map_mul, map_mul, hw'.2, map_inv_eq_neg hσ he]
   linear_combination w * he
 
 def trI (σ : A →+* A) (I : Ideal A) : I →+ A :=
-  AddMonoidHom.mk'
-    (fun w => (w : A) + σ w)
-    (fun a b => by simp only [Submodule.coe_add, map_add (f := _)]; abel)
+  AddMonoidHom.mk' (fun w => (w : A) + σ w) (fun a b => by
+    simp only [Submodule.coe_add, map_add (f := _)]; abel)
 
-theorem range_trI (hσ : ∀ a, σ (σ a) = a) (hI : ∀ a ∈ I, σ a ∈ I) {θ e : A} (he : (θ - σ θ) * e = 1)
-    : (trI σ I).range = fixSub σ I := by
+theorem range_trI (hσ : ∀ a, σ (σ a) = a) (hI : ∀ a ∈ I, σ a ∈ I) {θ e : A}
+    (he : (θ - σ θ) * e = 1) : (trI σ I).range = fixSub σ I := by
+
   ext x
   rw [mem_fixSub, AddMonoidHom.mem_range]
   constructor
@@ -99,43 +150,33 @@ theorem range_trI (hσ : ∀ a, σ (σ a) = a) (hI : ∀ a ∈ I, σ a ∈ I) {�
     obtain ⟨v, hv, hv2⟩ := exists_trace hσ he ((mem_fixSub σ I).mpr hx)
     exact ⟨⟨v, hv⟩, hv2⟩
 
-theorem card_fixSub_sq
-    (hσ : ∀ a, σ (σ a) = a) (hI : ∀ a ∈ I, σ a ∈ I) {θ e : A} (he : (θ - σ θ) * e = 1)
-    : Nat.card (fixSub σ I) ^ 2 = Nat.card I := by
+theorem card_fixSub_sq (hσ : ∀ a, σ (σ a) = a) (hI : ∀ a ∈ I, σ a ∈ I) {θ e : A}
+    (he : (θ - σ θ) * e = 1) : Nat.card (fixSub σ I) ^ 2 = Nat.card I := by
+
   have hδ : σ (θ - σ θ) = -(θ - σ θ) := by
     rw [map_sub, hσ]
     ring
   have he' := map_inv_eq_neg hσ he
   have h1 := card_fiber_mul_card_range (trI σ I) 0 (zero_mem _)
   rw [range_trI hσ hI he] at h1
-  have e1 : {w : I // trI σ I w = 0} ≃ fixSub σ I := {
-    toFun := fun w => ⟨
-      e * (w.1 : A),
-      (mem_fixSub σ I).mpr ⟨
-        I.mul_mem_left _ w.1.2,
-        by
+  have e1 : {w : I // trI σ I w = 0} ≃ fixSub σ I :=
+    { toFun := fun w => ⟨e * (w.1 : A), (mem_fixSub σ I).mpr ⟨I.mul_mem_left _ w.1.2, by
           have hw : (w.1 : A) + σ (w.1 : A) = 0 := w.2
           rw [map_mul, he']
-          linear_combination (-e) * hw
-      ⟩
-    ⟩
-    invFun := fun x => ⟨
-      ⟨(θ - σ θ) * (x : A), I.mul_mem_left _ ((mem_fixSub σ I).mp x.2).1⟩,
-      by
-        show (θ - σ θ) * (x : A) + σ ((θ - σ θ) * (x : A)) = 0
-        rw [map_mul, hδ, ((mem_fixSub σ I).mp x.2).2]
-        ring
-    ⟩
-    left_inv := fun w => by
-      apply Subtype.ext
-      apply Subtype.ext
-      show (θ - σ θ) * (e * (w.1 : A)) = w.1
-      rw [← mul_assoc, he, one_mul]
-    right_inv := fun x => by
-      apply Subtype.ext
-      show e * ((θ - σ θ) * (x : A)) = x
-      rw [← mul_assoc, mul_comm e, he, one_mul]
-  }
+          linear_combination (-e) * hw⟩⟩
+      invFun := fun x => ⟨⟨(θ - σ θ) * (x : A), I.mul_mem_left _ ((mem_fixSub σ I).mp x.2).1⟩, by
+          show (θ - σ θ) * (x : A) + σ ((θ - σ θ) * (x : A)) = 0
+          rw [map_mul, hδ, ((mem_fixSub σ I).mp x.2).2]
+          ring⟩
+      left_inv := fun w => by
+        apply Subtype.ext
+        apply Subtype.ext
+        show (θ - σ θ) * (e * (w.1 : A)) = w.1
+        rw [← mul_assoc, he, one_mul]
+      right_inv := fun x => by
+        apply Subtype.ext
+        show e * ((θ - σ θ) * (x : A)) = x
+        rw [← mul_assoc, mul_comm e, he, one_mul] }
   rw [Nat.card_congr e1] at h1
   rw [sq]
   exact h1
@@ -147,38 +188,31 @@ section Lift
 variable {A B : Type*} [CommRing A] [CommRing B] {σ : A →+* A} {τ : B →+* B} {π : A →+* B}
 
 def linPart (σ : A →+* A) (I : Ideal A) {M : ℕ} (y : Fin M → A) : (Fin M → I) →+ A :=
-  AddMonoidHom.mk'
-    (fun δ => ∑ i, (σ (y i) * (δ i : A) + σ (δ i) * y i))
-    (fun a b => by
-      rw [← Finset.sum_add_distrib]
-      refine Finset.sum_congr rfl fun i _ => ?_
-      simp only [Pi.add_apply, Submodule.coe_add, map_add (f := _)]
-      ring)
+  AddMonoidHom.mk' (fun δ => ∑ i, (σ (y i) * (δ i : A) + σ (δ i) * y i)) (fun a b => by
+    rw [← Finset.sum_add_distrib]
+    refine Finset.sum_congr rfl fun i _ => ?_
+    simp only [Pi.add_apply, Submodule.coe_add, map_add (f := _)]; ring)
 
-theorem linPart_apply (I : Ideal A) {M : ℕ} (y : Fin M → A) (δ : Fin M → I)
-    : linPart σ I y δ = ∑ i, (σ (y i) * (δ i : A) + σ (δ i) * y i) :=
-  rfl
+theorem linPart_apply (I : Ideal A) {M : ℕ} (y : Fin M → A) (δ : Fin M → I) :
+    linPart σ I y δ = ∑ i, (σ (y i) * (δ i : A) + σ (δ i) * y i) := rfl
 
-theorem range_linPart
-    (hσ : ∀ a, σ (σ a) = a)
-    {I : Ideal A} (hI : ∀ a ∈ I, σ a ∈ I) (hsq : ∀ a ∈ I, ∀ b ∈ I, a * b = 0)
-    {θ e : A} (he : (θ - σ θ) * e = 1)
-    {n m : A} (hnm : n * m = 1)
-    {M : ℕ} (y : Fin M → A) (hy : n - ∑ i, σ (y i) * y i ∈ I)
-    : (linPart σ I y).range = fixSub σ I := by
+theorem range_linPart (hσ : ∀ a, σ (σ a) = a) {I : Ideal A} (hI : ∀ a ∈ I, σ a ∈ I)
+    (hsq : ∀ a ∈ I, ∀ b ∈ I, a * b = 0) {θ e : A} (he : (θ - σ θ) * e = 1) {n m : A}
+    (hnm : n * m = 1) {M : ℕ} (y : Fin M → A) (hy : n - ∑ i, σ (y i) * y i ∈ I) :
+    (linPart σ I y).range = fixSub σ I := by
+
   ext w
   rw [mem_fixSub, AddMonoidHom.mem_range]
   constructor
   · rintro ⟨δ, rfl⟩
     rw [linPart_apply]
     constructor
-    · exact sum_mem (fun i _ =>
-        I.add_mem (I.mul_mem_left _ (δ i).2) (I.mul_mem_right _ (hI _ (δ i).2)))
+    · exact sum_mem (fun i _ => I.add_mem (I.mul_mem_left _ (δ i).2) (I.mul_mem_right _ (hI _ (δ i).2)))
     · set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
-      refine Finset.sum_congr rfl (fun i _ => ?_)
-      simp only [map_add (f := _), map_mul, hσ]
-      ring
+        rw [map_sum]
+        refine Finset.sum_congr rfl (fun i _ => ?_)
+        simp only [map_add (f := _), map_mul, hσ]
+        ring
   · rintro ⟨hwI, hwσ⟩
     obtain ⟨v, hv, hv2⟩ := exists_trace hσ he ((mem_fixSub σ I).mpr ⟨hwI, hwσ⟩)
     refine ⟨fun i => ⟨y i * (m * v), I.mul_mem_left _ (I.mul_mem_left _ hv)⟩, ?_⟩
@@ -190,28 +224,24 @@ theorem range_linPart
       rw [h1]
       have h2 := hsq _ hy _ hv
       linear_combination (-m) * h2 + v * hnm
-    calc
-      ∑ i, (σ (y i) * ((⟨y i * (m * v), I.mul_mem_left _ (I.mul_mem_left _ hv)⟩ : I) : A) +
-       σ ((⟨y i * (m * v), I.mul_mem_left _ (I.mul_mem_left _ hv)⟩ : I) : A) * y i)
-          = ∑ i, σ (y i) * (y i * (m * v)) + σ (∑ i, σ (y i) * (y i * (m * v))) := by
-        set_option synthInstance.maxHeartbeats 100000 in
+    calc ∑ i, (σ (y i) * ((⟨y i * (m * v), I.mul_mem_left _ (I.mul_mem_left _ hv)⟩ : I) : A) +
+          σ ((⟨y i * (m * v), I.mul_mem_left _ (I.mul_mem_left _ hv)⟩ : I) : A) * y i)
+        = ∑ i, σ (y i) * (y i * (m * v)) + σ (∑ i, σ (y i) * (y i * (m * v))) := by
+
           rw [Finset.sum_add_distrib, map_sum]
-        congr 1
-        refine Finset.sum_congr rfl (fun i _ => ?_)
-        simp only [map_mul, hσ]
-        ring
+          congr 1
+          refine Finset.sum_congr rfl (fun i _ => ?_)
+          simp only [map_mul, hσ]
+          ring
       _ = w := by rw [hs, hv2]
 
-theorem card_lift
-    [Finite A]
-    (hπ : Function.Surjective π) (hστ : ∀ a, π (σ a) = τ (π a)) (hσ : ∀ a, σ (σ a) = a)
-    (hsq : ∀ a b, π a = 0 → π b = 0 → a * b = 0)
-    {θ e : A} (he : (θ - σ θ) * e = 1)
-    {n m : A} (hnm : n * m = 1) (hn : σ n = n)
-    (q : ℕ) (hq : Nat.card A = q ^ 2 * Nat.card B)
-    (M : ℕ) (hM : 1 ≤ M)
-    : Nat.card {x : Fin M → A // ∑ i, σ (x i) * x i = n}
-      = q ^ (2 * M - 1) * Nat.card {x : Fin M → B // ∑ i, τ (x i) * x i = π n} := by
+theorem card_lift [Finite A] (hπ : Function.Surjective π) (hστ : ∀ a, π (σ a) = τ (π a))
+    (hσ : ∀ a, σ (σ a) = a) (hsq : ∀ a b, π a = 0 → π b = 0 → a * b = 0) {θ e : A}
+    (he : (θ - σ θ) * e = 1) {n m : A} (hnm : n * m = 1) (hn : σ n = n) (q : ℕ)
+    (hq : Nat.card A = q ^ 2 * Nat.card B) (M : ℕ) (hM : 1 ≤ M) :
+    Nat.card {x : Fin M → A // ∑ i, σ (x i) * x i = n} =
+      q ^ (2 * M - 1) * Nat.card {x : Fin M → B // ∑ i, τ (x i) * x i = π n} := by
+
   classical
   let I : Ideal A := RingHom.ker π
   have hmemI : ∀ a, a ∈ I ↔ π a = 0 := fun a => RingHom.mem_ker
@@ -219,23 +249,20 @@ theorem card_lift
     intro a ha
     rw [hmemI] at ha ⊢
     rw [hστ, ha, map_zero]
-  have hsqI : ∀ a ∈ I, ∀ b ∈ I, a * b = 0 := fun a ha b hb =>
-    hsq a b ((hmemI a).mp ha) ((hmemI b).mp hb)
+  have hsqI : ∀ a ∈ I, ∀ b ∈ I, a * b = 0 := fun a ha b hb => hsq a b ((hmemI a).mp ha) ((hmemI b).mp hb)
   haveI : Finite B := Finite.of_surjective π hπ
   have hAIB : Nat.card I * Nat.card B = Nat.card A := by
     have h1 := card_fiber_mul_card_range π.toAddMonoidHom 0 (zero_mem _)
-    have e1 : {g : A // π.toAddMonoidHom g = 0} ≃ I := {
-      toFun := fun g => ⟨g.1, (hmemI _).mpr g.2⟩
-      invFun := fun g => ⟨g.1, (hmemI _).mp g.2⟩
-      left_inv := fun g => rfl
-      right_inv := fun g => rfl
-    }
-    have e2 : (π.toAddMonoidHom.range) ≃ B := {
-      toFun := fun b => b.1
-      invFun := fun b => ⟨b, (hπ b).elim fun a ha => ⟨a, ha⟩⟩
-      left_inv := fun b => rfl
-      right_inv := fun b => rfl
-    }
+    have e1 : {g : A // π.toAddMonoidHom g = 0} ≃ I :=
+      { toFun := fun g => ⟨g.1, (hmemI _).mpr g.2⟩
+        invFun := fun g => ⟨g.1, (hmemI _).mp g.2⟩
+        left_inv := fun g => rfl
+        right_inv := fun g => rfl }
+    have e2 : (π.toAddMonoidHom.range) ≃ B :=
+      { toFun := fun b => b.1
+        invFun := fun b => ⟨b, (hπ b).elim fun a ha => ⟨a, ha⟩⟩
+        left_inv := fun b => rfl
+        right_inv := fun b => rfl }
     rw [Nat.card_congr e1, Nat.card_congr e2] at h1
     exact h1
   have hBpos : 0 < Nat.card B := Nat.card_pos
@@ -255,28 +282,25 @@ theorem card_lift
     rw [hIcard] at h1
     exact Nat.pow_left_injective (by norm_num) h1
   let Φ : {x : Fin M → A // ∑ i, σ (x i) * x i = n} → {x : Fin M → B // ∑ i, τ (x i) * x i = π n} :=
-    fun x => ⟨
-      fun i => π (x.1 i),
-      by
-        have h1 : ∑ i, τ (π (x.1 i)) * π (x.1 i) = π (∑ i, σ (x.1 i) * x.1 i) := by
-          set_option synthInstance.maxHeartbeats 100000 in
-            rw [map_sum]
-          exact Finset.sum_congr rfl (fun i _ => by rw [map_mul, hστ])
-        rw [h1, x.2]
-    ⟩
+    fun x => ⟨fun i => π (x.1 i), by
+      have h1 : ∑ i, τ (π (x.1 i)) * π (x.1 i) = π (∑ i, σ (x.1 i) * x.1 i) := by
+
+        rw [map_sum]
+        exact Finset.sum_congr rfl (fun i _ => by rw [map_mul, hστ])
+      rw [h1, x.2]⟩
   refine card_eq_mul_of_fibers Φ _ (fun yb => ?_)
   choose lift hlift using hπ
   let y : Fin M → A := fun i => lift (yb.1 i)
   have hyπ : ∀ i, π (y i) = yb.1 i := fun i => hlift _
   have hwI : n - ∑ i, σ (y i) * y i ∈ I := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hmemI, map_sub, map_sum]
+
+    rw [hmemI, map_sub, map_sum]
     have h1 : ∑ i, π (σ (y i) * y i) = ∑ i, τ (yb.1 i) * yb.1 i :=
       Finset.sum_congr rfl (fun i _ => by rw [map_mul, hστ, hyπ])
     rw [h1, yb.2, sub_self]
   have hwσ : σ (n - ∑ i, σ (y i) * y i) = n - ∑ i, σ (y i) * y i := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sub, hn, map_sum]
+
+    rw [map_sub, hn, map_sum]
     congr 1
     exact Finset.sum_congr rfl (fun i _ => by rw [map_mul, hσ, mul_comm])
   have hwR : n - ∑ i, σ (y i) * y i ∈ (linPart σ I y).range := by
@@ -287,63 +311,49 @@ theorem card_lift
   have hcardI : Nat.card (Fin M → I) = q ^ (2 * M) := by
     rw [Nat.card_pi, Finset.prod_const, Finset.card_univ, Fintype.card_fin, hIcard, ← pow_mul]
   rw [hcardI] at h1
-  have key
-      : ∀ x : Fin M → A, ∀ hx : ∀ i, x i - y i ∈ I,
-        ∑ i, σ (x i) * x i = ∑ i, σ (y i) * y i + linPart σ I y (fun i => ⟨x i - y i, hx i⟩) := by
+  have key : ∀ x : Fin M → A, ∀ hx : ∀ i, x i - y i ∈ I,
+      ∑ i, σ (x i) * x i = ∑ i, σ (y i) * y i + linPart σ I y (fun i => ⟨x i - y i, hx i⟩) := by
     intro x hx
     rw [linPart_apply, ← Finset.sum_add_distrib]
     refine Finset.sum_congr rfl (fun i _ => ?_)
     have h0 : σ (x i - y i) * (x i - y i) = 0 := hsqI _ (hI _ (hx i)) _ (hx i)
     simp only [map_sub] at h0 ⊢
     linear_combination h0
-  have hmem
-      : ∀ x : {x : {x : Fin M → A // ∑ i, σ (x i) * x i = n} // Φ x = yb}, ∀ i,
-        x.1.1 i - y i ∈ I := by
+  have hmem : ∀ x : {x : {x : Fin M → A // ∑ i, σ (x i) * x i = n} // Φ x = yb}, ∀ i, x.1.1 i - y i ∈ I := by
     intro x i
     rw [hmemI, map_sub, hyπ]
     have h2 := congrArg (fun z : {x : Fin M → B // ∑ i, τ (x i) * x i = π n} => z.1 i) x.2
     simp only [Φ] at h2
     rw [h2, sub_self]
-  have e
-      : {x : {x : Fin M → A // ∑ i, σ (x i) * x i = n} // Φ x = yb}
-        ≃ {δ : Fin M → I // linPart σ I y δ = n - ∑ i, σ (y i) * y i} := {
-    toFun := fun x => ⟨
-      fun i => ⟨x.1.1 i - y i, hmem x i⟩,
-      by
-        have h2 := key x.1.1 (hmem x)
-        rw [x.1.2] at h2
-        linear_combination -h2
-    ⟩
-    invFun := fun δ => ⟨
-      ⟨
-        fun i => y i + δ.1 i,
-        by
-          have h2 := key (fun i => y i + δ.1 i) (fun i => by simp [(δ.1 i).2])
-          rw [h2]
-          have h3 : (fun i => (⟨y i + (δ.1 i : A) - y i, by simp [(δ.1 i).2]⟩ : I)) = δ.1 := by
-            funext i
-            apply Subtype.ext
-            simp
-          rw [h3, δ.2]
-          ring
-      ⟩,
-      by
+  have e : {x : {x : Fin M → A // ∑ i, σ (x i) * x i = n} // Φ x = yb} ≃
+      {δ : Fin M → I // linPart σ I y δ = n - ∑ i, σ (y i) * y i} :=
+    { toFun := fun x => ⟨fun i => ⟨x.1.1 i - y i, hmem x i⟩, by
+          have h2 := key x.1.1 (hmem x)
+          rw [x.1.2] at h2
+          linear_combination -h2⟩
+      invFun := fun δ => ⟨⟨fun i => y i + δ.1 i, by
+            have h2 := key (fun i => y i + δ.1 i) (fun i => by simp [(δ.1 i).2])
+            rw [h2]
+            have h3 : (fun i => (⟨y i + (δ.1 i : A) - y i, by simp [(δ.1 i).2]⟩ : I)) = δ.1 := by
+              funext i
+              apply Subtype.ext
+              simp
+            rw [h3, δ.2]
+            ring⟩, by
+          apply Subtype.ext
+          funext i
+          simp only [Φ]
+          rw [map_add (f := _), hyπ, (hmemI _).mp (δ.1 i).2, add_zero]⟩
+      left_inv := fun x => by
+        apply Subtype.ext
         apply Subtype.ext
         funext i
-        simp only [Φ]
-        rw [map_add (f := _), hyπ, (hmemI _).mp (δ.1 i).2, add_zero]
-    ⟩
-    left_inv := fun x => by
-      apply Subtype.ext
-      apply Subtype.ext
-      funext i
-      simp
-    right_inv := fun δ => by
-      apply Subtype.ext
-      funext i
-      apply Subtype.ext
-      simp
-  }
+        simp
+      right_inv := fun δ => by
+        apply Subtype.ext
+        funext i
+        apply Subtype.ext
+        simp }
   rw [Nat.card_congr e]
   have h4 : q ^ (2 * M) = q ^ (2 * M - 1) * q := by
     rw [← pow_succ]

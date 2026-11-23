@@ -1,15 +1,53 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.Definitions.Divisors.WittOnFalse
 public import Development.AbelianVarietyTheory.Definitions.Divisors.FormalCoboundarySmul
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FormalGroupLawLinearCoeffAdditiveStatement
-public import Development.AbelianVarietyTheory.Proofs.RingsOfIntegers.CoeffSingleLawAdd
+import Development.AbelianVarietyTheory.Proofs.RingsOfIntegers.CoeffSingleLawAdd
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
-open CategoryTheory TensorProduct MvPowerSeries GlobalTheory GlobalTheory.PDiv
-  GlobalTheory.PDivGroup GlobalTheory.Katz
+open CategoryTheory TensorProduct MvPowerSeries GlobalTheory GlobalTheory.PDiv GlobalTheory.PDivGroup GlobalTheory.Katz
 
 set_option autoImplicit false
 
@@ -17,8 +55,8 @@ noncomputable section
 
 namespace GlobalTheory.WittStart
 
-theorem eq_zero_or_single {ι : Type} [Fintype ι] [DecidableEq ι] (γ : ι →₀ ℕ) (h : γ.degree < 2)
-    : γ = 0 ∨ ∃ s, γ = Finsupp.single s 1 := by
+theorem eq_zero_or_single {ι : Type} [Fintype ι] [DecidableEq ι] (γ : ι →₀ ℕ) (h : γ.degree < 2) :
+    γ = 0 ∨ ∃ s, γ = Finsupp.single s 1 := by
   by_cases h0 : γ = 0
   · exact Or.inl h0
   right
@@ -37,22 +75,17 @@ theorem eq_zero_or_single {ι : Type} [Fintype ι] [DecidableEq ι] (γ : ι →
     omega
   · simp only [Finsupp.single_apply, Ne.symm hts, if_false]
     have : γ t ≤ ∑ i ∈ Finset.univ.erase s, γ i :=
-      Finset.single_le_sum
-        (fun _ _ => Nat.zero_le _)
-        (Finset.mem_erase.mpr ⟨hts, Finset.mem_univ t⟩)
+      Finset.single_le_sum (fun _ _ => Nat.zero_le _) (Finset.mem_erase.mpr ⟨hts, Finset.mem_univ t⟩)
     omega
 
 variable {R : Type} [CommRing R] {d : ℕ}
 
-theorem coeff_single_linear_substitution_pair
-    {τ : Type}
-    (c : MvPowerSeries (Fin d ⊕ Fin d) R)
-    (u v : Fin d → MvPowerSeries τ R)
-    (hu : ∀ i, constantCoeff (u i) = 0) (hv : ∀ i, constantCoeff (v i) = 0)
-    (t : τ)
-    : coeff (Finsupp.single t 1) (at2 c u v)
-      = ∑ i, coeff (Finsupp.single (Sum.inl i) 1) c * coeff (Finsupp.single t 1) (u i)
-        + ∑ i, coeff (Finsupp.single (Sum.inr i) 1) c * coeff (Finsupp.single t 1) (v i) := by
+theorem coeff_single_linear_substitution_pair {τ : Type} (c : MvPowerSeries (Fin d ⊕ Fin d) R)
+    (u v : Fin d → MvPowerSeries τ R) (hu : ∀ i, constantCoeff (u i) = 0)
+    (hv : ∀ i, constantCoeff (v i) = 0) (t : τ) :
+    coeff (Finsupp.single t 1) (at2 c u v) =
+      ∑ i, coeff (Finsupp.single (Sum.inl i) 1) c * coeff (Finsupp.single t 1) (u i) +
+      ∑ i, coeff (Finsupp.single (Sum.inr i) 1) c * coeff (Finsupp.single t 1) (v i) := by
   unfold at2
   rw [GlobalTheory.FormalCalc.coeff_single_subst, Fintype.sum_sum_type]
   · rfl
@@ -60,51 +93,40 @@ theorem coeff_single_linear_substitution_pair
     · exact hu i
     · exact hv i
 
-theorem constantCoeff_subst0
-    {σ τ : Type} [Finite σ]
-    {a : σ → MvPowerSeries τ R} (ha : ∀ i, constantCoeff (a i) = 0)
-    (f : MvPowerSeries σ R)
-    : constantCoeff (subst a f) = constantCoeff f := by
+theorem constantCoeff_subst0 {σ τ : Type} [Finite σ] {a : σ → MvPowerSeries τ R}
+    (ha : ∀ i, constantCoeff (a i) = 0) (f : MvPowerSeries σ R) :
+    constantCoeff (subst a f) = constantCoeff f := by
   have hs : HasSubst a := hasSubst_of_constantCoeff_zero ha
   have h1 : f = (f - C (constantCoeff f)) + C (constantCoeff f) := by ring
   conv_lhs => rw [h1]
-  rw [subst_add hs, map_add (f := _), constantCoeff_subst_eq_zero hs ha (by simp), subst_C,
-    zero_add]
+  rw [subst_add hs, map_add (f := _), constantCoeff_subst_eq_zero hs ha (by simp), subst_C, zero_add]
   simp
 
-theorem constantCoeff_op
-    {τ : Type} {μ : Fin d → MvPowerSeries (Fin d ⊕ Fin d) R}
+theorem constantCoeff_op {τ : Type} {μ : Fin d → MvPowerSeries (Fin d ⊕ Fin d) R}
     (hμ0 : ∀ i, constantCoeff (μ i) = 0) (u v : Fin d → MvPowerSeries τ R)
-    (hu : ∀ i, constantCoeff (u i) = 0) (hv : ∀ i, constantCoeff (v i) = 0)
-    (i : Fin d)
-    : constantCoeff (op μ u v i) = 0 := by
+    (hu : ∀ i, constantCoeff (u i) = 0) (hv : ∀ i, constantCoeff (v i) = 0) (i : Fin d) :
+    constantCoeff (op μ u v i) = 0 := by
   unfold op at2
-  rw [constantCoeff_subst0 (fun s => by
-    cases s with
-    | inl s => exact hu s
-    | inr s => exact hv s)]
+  rw [constantCoeff_subst0 (fun s => by cases s with | inl s => exact hu s | inr s => exact hv s)]
   exact hμ0 i
 
-theorem coeff_single_op
-    {τ : Type} {μ : Fin d → MvPowerSeries (Fin d ⊕ Fin d) R}
+theorem coeff_single_op {τ : Type} {μ : Fin d → MvPowerSeries (Fin d ⊕ Fin d) R}
     (hμ : ∀ i s, coeff (Finsupp.single s 1) (μ i) = coeff (Finsupp.single s 1) (addLaw R d i))
-    (u v : Fin d → MvPowerSeries τ R) (hu : ∀ i, constantCoeff (u i) = 0)
-    (hv : ∀ i, constantCoeff (v i) = 0)
-    (i : Fin d) (t : τ)
-    : coeff (Finsupp.single t 1) (op μ u v i)
-      = coeff (Finsupp.single t 1) (u i) + coeff (Finsupp.single t 1) (v i) := by
+    (u v : Fin d → MvPowerSeries τ R)
+    (hu : ∀ i, constantCoeff (u i) = 0) (hv : ∀ i, constantCoeff (v i) = 0) (i : Fin d) (t : τ) :
+    coeff (Finsupp.single t 1) (op μ u v i) =
+      coeff (Finsupp.single t 1) (u i) + coeff (Finsupp.single t 1) (v i) := by
   classical
   unfold op
   rw [coeff_single_linear_substitution_pair _ _ _ hu hv]
   simp only [hμ, addLaw, map_add (f := _), GlobalTheory.FormalCalc.coeff_single_X]
   simp [add_mul, Finset.sum_add_distrib]
 
-theorem coeff_single_coc
-    {μ : Fin d → MvPowerSeries (Fin d ⊕ Fin d) R} (hμ0 : ∀ i, constantCoeff (μ i) = 0)
+theorem coeff_single_coc {μ : Fin d → MvPowerSeries (Fin d ⊕ Fin d) R}
+    (hμ0 : ∀ i, constantCoeff (μ i) = 0)
     (hμ : ∀ i s, coeff (Finsupp.single s 1) (μ i) = coeff (Finsupp.single s 1) (addLaw R d i))
-    (c : MvPowerSeries (Fin d ⊕ Fin d) R) (hc : IsCoc μ c)
-    (s : Fin d ⊕ Fin d)
-    : coeff (Finsupp.single s 1) c = 0 := by
+    (c : MvPowerSeries (Fin d ⊕ Fin d) R) (hc : IsCoc μ c) (s : Fin d ⊕ Fin d) :
+    coeff (Finsupp.single s 1) c = 0 := by
   classical
   have hx1 : ∀ i, constantCoeff (x1 (R := R) (d := d) i) = 0 := fun i => constantCoeff_X _
   have hx2 : ∀ i, constantCoeff (x2 (R := R) (d := d) i) = 0 := fun i => constantCoeff_X _
@@ -114,28 +136,22 @@ theorem coeff_single_coc
     have h := congrArg (coeff (Finsupp.single (Sum.inl j : Fin d ⊕ (Fin d ⊕ Fin d)) 1)) hc.1
     unfold cob2 at h
     rw [map_sub, map_add (f := _), map_sub, map_zero,
-        coeff_single_linear_substitution_pair _ _ _ hx2 hx3,
-        coeff_single_linear_substitution_pair _ _ _ (constantCoeff_op hμ0 _ _ hx1 hx2) hx3,
-        coeff_single_linear_substitution_pair _ _ _ hx1 (constantCoeff_op hμ0 _ _ hx2 hx3),
-        coeff_single_linear_substitution_pair _ _ _ hx1 hx2]
-      at h
+      coeff_single_linear_substitution_pair _ _ _ hx2 hx3,
+      coeff_single_linear_substitution_pair _ _ _ (constantCoeff_op hμ0 _ _ hx1 hx2) hx3,
+      coeff_single_linear_substitution_pair _ _ _ hx1 (constantCoeff_op hμ0 _ _ hx2 hx3),
+      coeff_single_linear_substitution_pair _ _ _ hx1 hx2] at h
     simp only [coeff_single_op hμ _ _ hx1 hx2, coeff_single_op hμ _ _ hx2 hx3, x1, x2, x3,
-        GlobalTheory.FormalCalc.coeff_single_X]
-      at h
+      GlobalTheory.FormalCalc.coeff_single_X] at h
     simpa using h
   cases s with
   | inl j => exact hinl j
   | inr j =>
     have h := congrArg (coeff (Finsupp.single (Sum.inr j) 1)) hc.2
     unfold swap at h
-    rw [coeff_single_linear_substitution_pair _ _ _
-        (fun _ => constantCoeff_X _)
-        (fun _ => constantCoeff_X _)]
-      at h
+    rw [coeff_single_linear_substitution_pair _ _ _ (fun _ => constantCoeff_X _) (fun _ => constantCoeff_X _)] at h
     simp only [GlobalTheory.FormalCalc.coeff_single_X] at h
     simp only [Sum.inr.injEq, reduceCtorEq, if_false, mul_zero, Finset.sum_const_zero, zero_add,
-        mul_ite, mul_one, Finset.sum_ite_eq', Finset.mem_univ, if_true]
-      at h
+      mul_ite, mul_one, Finset.sum_ite_eq', Finset.mem_univ, if_true] at h
     rw [← h]
     simp [hinl]
 
@@ -143,19 +159,12 @@ end GlobalTheory.WittStart
 
 namespace GlobalTheory.WittStart
 
-theorem start
-    : ∀ (p : ℕ) [Fact p.Prime] (k : Type) [Field k] [CharP k p] [PerfectRing k p] (d : ℕ)
-        (μ : Fin d → MvPowerSeries (Fin d ⊕ Fin d) k),
-      IsLaw μ
-        → ∀ c,
-          IsCoc μ c
-            → ∀ w : Fin d → k, ∃ f ∈ intBy p k (Fin d) 1,
-              RedV p (lin f) w
-                ∧ ∀ γ : Fin d ⊕ Fin d →₀ ℕ,
-                  γ.degree < 2
-                    → ∃ w : WittVector p k,
-                      coeff γ (cob1 (fun i => Katz.lift p (μ i)) f - Katz.lift p c)
-                        = algebraMap (WittVector p k) (Fr p k) (p * w) := by
+theorem start : ∀ (p : ℕ) [Fact p.Prime] (k : Type) [Field k] [CharP k p] [PerfectRing k p] (d : ℕ)
+    (μ : Fin d → MvPowerSeries (Fin d ⊕ Fin d) k), IsLaw μ → ∀ c, IsCoc μ c →
+    ∀ w : Fin d → k, ∃ f ∈ intBy p k (Fin d) 1, RedV p (lin f) w ∧
+      ∀ γ : Fin d ⊕ Fin d →₀ ℕ, γ.degree < 2 → ∃ w : WittVector p k,
+        coeff γ (cob1 (fun i => Katz.lift p (μ i)) f - Katz.lift p c) =
+          algebraMap (WittVector p k) (Fr p k) (p * w) := by
   intro p _ k _ _ _ d μ hμ c hc w
   classical
   have hL := GlobalTheory.T.formal_group_law_linear_coeff_additive p k d μ hμ
@@ -163,30 +172,22 @@ theorem start
     rw [Finsupp.degree_single]
   have hμk : ∀ i s, coeff (Finsupp.single s 1) (μ i) = coeff (Finsupp.single s 1) (addLaw k d i) :=
     fun i s => (hL i _ (hdeg s)).1
-  have hμF
-      : ∀ i s,
-        coeff (Finsupp.single s 1) (Katz.lift p (μ i))
-          = coeff (Finsupp.single s 1) (addLaw (Fr p k) d i) := fun i s =>
-    (hL i _ (hdeg s)).2
-  have hμ0F : ∀ i, constantCoeff (Katz.lift p (μ i)) = 0 := fun i =>
-    constantCoeff_lift p (hμ.const i)
+  have hμF : ∀ i s, coeff (Finsupp.single s 1) (Katz.lift p (μ i)) =
+      coeff (Finsupp.single s 1) (addLaw (Fr p k) d i) := fun i s => (hL i _ (hdeg s)).2
+  have hμ0F : ∀ i, constantCoeff (Katz.lift p (μ i)) = 0 := fun i => constantCoeff_lift p (hμ.const i)
   have hclin := coeff_single_coc hμ.const hμk c hc
   set T : k → Fr p k := fun x => algebraMap (WittVector p k) (Fr p k) (WittVector.teichmuller p x)
     with hT
   set f : MvPowerSeries (Fin d) (Fr p k) :=
     (-(WittVector.teichmuller p (constantCoeff c))) • (1 : MvPowerSeries (Fin d) (Fr p k)) +
       ∑ i, WittVector.teichmuller p (w i) • (X i : MvPowerSeries (Fin d) (Fr p k)) with hf
-  have hcoeff
-      : ∀ α,
-        coeff α f
-          = (if α = 0 then - T (constantCoeff c) else 0)
-            + ∑ i, if α = Finsupp.single i 1 then T (w i) else 0 := by
+  have hcoeff : ∀ α, coeff α f = (if α = 0 then -T (constantCoeff c) else 0) +
+      ∑ i, if α = Finsupp.single i 1 then T (w i) else 0 := by
     intro α
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hf, map_add (f := _), map_sum]
-    have e
-        : ∀ (r : WittVector p k) (g : MvPowerSeries (Fin d) (Fr p k)),
-          coeff α (r • g) = algebraMap (WittVector p k) (Fr p k) r * coeff α g := fun r g => by
+
+    rw [hf, map_add (f := _), map_sum]
+    have e : ∀ (r : WittVector p k) (g : MvPowerSeries (Fin d) (Fr p k)),
+        coeff α (r • g) = algebraMap (WittVector p k) (Fr p k) r * coeff α g := fun r g => by
       rw [← algebraMap_smul (Fr p k) r g, coeff_smul]
     simp only [e, coeff_one, coeff_X, hT, map_neg]
     congr 1
@@ -196,13 +197,10 @@ theorem start
   refine ⟨f, ?_, ?_, ?_⟩
   · intro α
     rw [hcoeff α]
-    refine ⟨
-      (if α = 0 then - WittVector.teichmuller p (constantCoeff c) else 0)
-        + ∑ i, if α = Finsupp.single i 1 then WittVector.teichmuller p (w i) else 0,
-      ?_
-    ⟩
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [one_mul, map_add (f := _), map_sum]
+    refine ⟨(if α = 0 then -WittVector.teichmuller p (constantCoeff c) else 0) +
+      ∑ i, if α = Finsupp.single i 1 then WittVector.teichmuller p (w i) else 0, ?_⟩
+
+    rw [one_mul, map_add (f := _), map_sum]
     congr 1
     · split_ifs <;> simp [hT]
     · refine Finset.sum_congr rfl fun i _ => ?_
@@ -217,12 +215,11 @@ theorem start
     refine ⟨0, ?_⟩
     rw [mul_zero, map_zero]
     rcases eq_zero_or_single γ hγ with rfl | ⟨s, rfl⟩
-    · have h0s : ∀ i : Fin d, (0 : Fin d →₀ ℕ) ≠ Finsupp.single i 1 := fun i =>
-        (Finsupp.single_ne_zero.mpr one_ne_zero).symm
+    · have h0s : ∀ i : Fin d, (0 : Fin d →₀ ℕ) ≠ Finsupp.single i 1 :=
+        fun i => (Finsupp.single_ne_zero.mpr one_ne_zero).symm
       rw [coeff_zero_eq_constantCoeff_apply, map_sub]
       unfold cob1 inL inR
-      rw [map_sub, map_sub, constantCoeff_subst0 hμ0F,
-        constantCoeff_subst0 (fun _ => constantCoeff_X _),
+      rw [map_sub, map_sub, constantCoeff_subst0 hμ0F, constantCoeff_subst0 (fun _ => constantCoeff_X _),
         constantCoeff_subst0 (fun _ => constantCoeff_X _), ← coeff_zero_eq_constantCoeff_apply,
         ← coeff_zero_eq_constantCoeff_apply, coeff_lift, hcoeff]
       simp [hT, coeff_zero_eq_constantCoeff_apply, h0s]

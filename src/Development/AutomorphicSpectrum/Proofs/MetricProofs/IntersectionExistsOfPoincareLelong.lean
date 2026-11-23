@@ -1,75 +1,126 @@
 module
 
-public import Mathlib
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.InterNamed
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.InterSt
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.InterRes
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.BlowupProjections.BlowupProjStatement
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArithmeticIntersection.RationalSections.ThmISt
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArithmeticIntersection.MixedFieldContraction.ContractMixedFieldStatement
 public import Development.AutomorphicSpectrum.PublishedTheorems.Metrics₂.PoincareLelong
+public import GroundTheory.HeightsAndTheta.Heights.ArithmeticBezout.StatementsAreaFormulaInj
+public import GroundTheory.HeightsAndTheta.Heights.ArithmeticBezout.StatementsAreaFormulaInjSet
+public import GroundTheory.HeightsAndTheta.Heights.ArithmeticBezout.StatementsConeMapArea
+public import GroundTheory.HeightsAndTheta.Heights.ArithmeticBezout.StatementsConeMapAreaOne
+public import GroundTheory.HeightsAndTheta.Heights.ComplexAnalyticSets.StConeSheetGramLintegral
+public import GroundTheory.HeightsAndTheta.Heights.ComplexAnalyticSets.StConeSliceSheetParam
+public import GroundTheory.HeightsAndTheta.Heights.ComplexAnalyticSets.StDiscriminantSheetCover
+public import GroundTheory.HeightsAndTheta.Heights.ComplexAnalyticSets.StSliceMassFinite
+public import GroundTheory.HeightsAndTheta.Heights.OrbitLimits.StGoodChartDim
+public import GroundTheory.HeightsAndTheta.Heights.OrbitLimits.StPtsGenericCount
+public import GroundTheory.HeightsAndTheta.Heights.OrbitLimits.StPtsIntegralProjIndep
+public import GroundTheory.HeightsAndTheta.Heights.OrbitLimits.StPtsIntegralSegreChartProj
+public import GroundTheory.HeightsAndTheta.Heights.OrbitLimits.StPtsPosDensIntegrable
+public import GroundTheory.HeightsAndTheta.Heights.OrbitLimits.StPtsSegreChartFibreSum
+public import GroundTheory.HeightsAndTheta.Heights.OrbitLimits.StPtsSemiPosMassFinite
+public import GroundTheory.HeightsAndTheta.Heights.OrbitLimits.StPtsSheetOnlyNull
+public import GroundTheory.HeightsAndTheta.Heights.OrbitLimits.StSegreChart
+public import GroundTheory.HeightsAndTheta.Heights.OrbitLimits.StSegreChartAbsIntegrable
+public import GroundTheory.HeightsAndTheta.Heights.OrbitLimits.StSegreChartIntegral
+public import Development.AutomorphicSpectrum.Proofs.AlgebraProofs.DvdOfForallEmultiplicityLe
 public import Development.AutomorphicSpectrum.Proofs.AlgebraProofs.IsMultiHomogIdealMapRedMap
-public import GroundTheory.HeightsAndTheta.Heights.Intersections.PThmIExists
-public import GroundTheory.HeightsAndTheta.Heights.Intersections.PThmISymm
+public import GroundTheory.HeightsAndTheta.Heights.ArithmeticBezout.PAreaFormulaInj
+public import GroundTheory.HeightsAndTheta.Heights.ArithmeticBezout.PAreaFormulaInjSet
+public import GroundTheory.HeightsAndTheta.Heights.ArithmeticBezout.PAreaFormulaLocal
+public import GroundTheory.HeightsAndTheta.Heights.ArithmeticBezout.PConeMapArea
+public import GroundTheory.HeightsAndTheta.Heights.ArithmeticBezout.PConeMapAreaOne
+public import GroundTheory.HeightsAndTheta.Heights.ComplexAnalyticSets.PConeSheetGramLintegral
+public import GroundTheory.HeightsAndTheta.Heights.ComplexAnalyticSets.PConeSliceSheetParam
+public import GroundTheory.HeightsAndTheta.Heights.ComplexAnalyticSets.PDiscriminantSheetCover
+public import GroundTheory.HeightsAndTheta.Heights.ComplexAnalyticSets.PSliceMassFiniteDirect
+public import GroundTheory.HeightsAndTheta.Heights.HilbertSamuel.AssemblyBase
 public import GroundTheory.HeightsAndTheta.Heights.Intersections.ArIntMul
-public import GroundTheory.HeightsAndTheta.Heights.Intersections.PWellDefined
-public import GroundTheory.HeightsAndTheta.Heights.Intersections.NotLtLtOfMemMinimalPrimes
-public import GroundTheory.HeightsAndTheta.Heights.Intersections.PSwapCycles
-public import GroundTheory.HeightsAndTheta.Heights.Intersections.PGeoNumCut
-public import GroundTheory.HeightsAndTheta.Heights.Intersections.DeEqZeroOfSemiPosOff
-public import GroundTheory.HeightsAndTheta.Heights.Intersections.PDeSlotAdd
-public import GroundTheory.HeightsAndTheta.Heights.Intersections.PDeLeSemiPos
 public import GroundTheory.HeightsAndTheta.Heights.Intersections.Assembly
+public import GroundTheory.HeightsAndTheta.Heights.Intersections.DeEqZeroOfSemiPosOff
+public import GroundTheory.HeightsAndTheta.Heights.Intersections.NotLtLtOfMemMinimalPrimes
+public import GroundTheory.HeightsAndTheta.Heights.Intersections.PDeLeSemiPos
+public import GroundTheory.HeightsAndTheta.Heights.Intersections.PDeSlotAdd
+import GroundTheory.HeightsAndTheta.Heights.Intersections.PGeoNumCut
 public import GroundTheory.HeightsAndTheta.Heights.Intersections.PPtsAbsIntegrable
 public import GroundTheory.HeightsAndTheta.Heights.Intersections.PPtsAbsMeasurable
 public import GroundTheory.HeightsAndTheta.Heights.Intersections.PPtsAddFirst
 public import GroundTheory.HeightsAndTheta.Heights.Intersections.PPtsRegLimit
-public import GroundTheory.HeightsAndTheta.Heights.OrbitLimits.Stokes
-public import GroundTheory.HeightsAndTheta.Heights.OrbitLimits.PPtsBilinear
-public import GroundTheory.HeightsAndTheta.Heights.OrbitLimits.PPtsSumMeasurable
-public import GroundTheory.HeightsAndTheta.Heights.OrbitLimits.ExistsUnique
-public import GroundTheory.HeightsAndTheta.Heights.OrbitLimits.IntNumCompPerm
-public import GroundTheory.HeightsAndTheta.Heights.OrbitLimits.GeoNum
-public import GroundTheory.HeightsAndTheta.Heights.HilbertSamuel.AssemblyBase
-public import GroundTheory.HeightsAndTheta.Heights.LocalFiniteness.NumbersDVRC3ResidualContractionComponent
-public import GroundTheory.HeightsAndTheta.Heights.OrbitLimits.PSegreChart
+public import GroundTheory.HeightsAndTheta.Heights.Intersections.PSwapCycles
+public import GroundTheory.HeightsAndTheta.Heights.Intersections.PThmIExists
+public import GroundTheory.HeightsAndTheta.Heights.Intersections.PThmISymm
+public import GroundTheory.HeightsAndTheta.Heights.Intersections.PWellDefined
 public import GroundTheory.HeightsAndTheta.Heights.LocalFiniteness.HilbertSamuelIrreducibleBasicOpenConnected
-public import GroundTheory.HeightsAndTheta.Heights.SemipositiveHeights.PtsIntegrable
-public import Development.AutomorphicSpectrum.Proofs.AlgebraProofs.DvdOfForallEmultiplicityLe
-public import GroundTheory.HeightsAndTheta.Heights.OrbitLimits.PSegreChartZeroSet
-public import GroundTheory.HeightsAndTheta.Heights.OrbitLimits.PSegreChartProjFinite
-public import GroundTheory.HeightsAndTheta.Heights.OrbitLimits.PSegreChartSheetCompare
-public import GroundTheory.HeightsAndTheta.Heights.ArithmeticBezout.PAreaFormulaLocal
-public import GroundTheory.HeightsAndTheta.Heights.ArithmeticBezout.PAreaFormulaInjSet
-public import GroundTheory.HeightsAndTheta.Heights.OrbitLimits.PPtsSegreChartFibreSum
-public import GroundTheory.HeightsAndTheta.Heights.ArithmeticBezout.PConeMapAreaOne
-public import GroundTheory.HeightsAndTheta.Heights.ArithmeticBezout.PConeMapArea
-public import GroundTheory.HeightsAndTheta.Heights.ArithmeticBezout.PAreaFormulaInj
-public import GroundTheory.HeightsAndTheta.Heights.ComplexAnalyticSets.PDiscriminantSheetCover
-public import GroundTheory.HeightsAndTheta.Heights.ComplexAnalyticSets.PConeSheetGramLintegral
-public import GroundTheory.HeightsAndTheta.Heights.ComplexAnalyticSets.PSliceMassFiniteDirect
-public import GroundTheory.HeightsAndTheta.Heights.ComplexAnalyticSets.PConeSliceSheetParam
-public import GroundTheory.HeightsAndTheta.Heights.OrbitLimits.PPtsPosDensMeasurable
-public import GroundTheory.HeightsAndTheta.Heights.OrbitLimits.PSegreChartAbsIntegrable
-public import GroundTheory.HeightsAndTheta.Heights.OrbitLimits.PPtsIntegralSegreChartProj
-public import GroundTheory.HeightsAndTheta.Heights.OrbitLimits.PCriticalFibreInfinite
-public import GroundTheory.HeightsAndTheta.Heights.OrbitLimits.PPtsPosPartLocal
-public import GroundTheory.HeightsAndTheta.Heights.OrbitLimits.PPtsSheetOnlyNull
-public import GroundTheory.HeightsAndTheta.Heights.OrbitLimits.PComponentsGenericCount
-public import GroundTheory.HeightsAndTheta.Heights.OrbitLimits.PSheetLift
+import GroundTheory.HeightsAndTheta.Heights.LocalFiniteness.NumbersDVRC3ResidualContractionComponent
+import GroundTheory.HeightsAndTheta.Heights.OrbitLimits.ExistsUnique
+import GroundTheory.HeightsAndTheta.Heights.OrbitLimits.GeoNum
+public import GroundTheory.HeightsAndTheta.Heights.OrbitLimits.IntNumCompPerm
 public import GroundTheory.HeightsAndTheta.Heights.OrbitLimits.PChartDehomogPrime
+public import GroundTheory.HeightsAndTheta.Heights.OrbitLimits.PComponentsGenericCount
 public import GroundTheory.HeightsAndTheta.Heights.OrbitLimits.PConeSliceIdeal
-public import GroundTheory.HeightsAndTheta.Heights.OrbitLimits.PGoodChartDim
-public import GroundTheory.HeightsAndTheta.Heights.OrbitLimits.PPtsGenericCount
-public import GroundTheory.HeightsAndTheta.Heights.OrbitLimits.PPtsSemiPosMassFinite
-public import GroundTheory.HeightsAndTheta.Heights.OrbitLimits.PPtsPosDensIntegrable
 public import GroundTheory.HeightsAndTheta.Heights.OrbitLimits.PConeVanishingHomog
-public import GroundTheory.HeightsAndTheta.Heights.OrbitLimits.PPtsSheetSimpleNull
+public import GroundTheory.HeightsAndTheta.Heights.OrbitLimits.PCriticalFibreInfinite
+public import GroundTheory.HeightsAndTheta.Heights.OrbitLimits.PGoodChartDim
 public import GroundTheory.HeightsAndTheta.Heights.OrbitLimits.PGoodChartModel
-public import GroundTheory.HeightsAndTheta.Heights.OrbitLimits.PPtsPosPartProjIndep
-public import GroundTheory.HeightsAndTheta.Heights.OrbitLimits.PGoodChartZeroSet
-public import GroundTheory.HeightsAndTheta.Heights.OrbitLimits.PSegreChartIntegral
+import GroundTheory.HeightsAndTheta.Heights.OrbitLimits.PGoodChartZeroSet
+public import GroundTheory.HeightsAndTheta.Heights.OrbitLimits.PPtsBilinear
+public import GroundTheory.HeightsAndTheta.Heights.OrbitLimits.PPtsGenericCount
 public import GroundTheory.HeightsAndTheta.Heights.OrbitLimits.PPtsIntegralProjIndep
+public import GroundTheory.HeightsAndTheta.Heights.OrbitLimits.PPtsIntegralSegreChartProj
+public import GroundTheory.HeightsAndTheta.Heights.OrbitLimits.PPtsPosDensIntegrable
+public import GroundTheory.HeightsAndTheta.Heights.OrbitLimits.PPtsPosDensMeasurable
+public import GroundTheory.HeightsAndTheta.Heights.OrbitLimits.PPtsPosPartLocal
+public import GroundTheory.HeightsAndTheta.Heights.OrbitLimits.PPtsPosPartProjIndep
+public import GroundTheory.HeightsAndTheta.Heights.OrbitLimits.PPtsSegreChartFibreSum
+public import GroundTheory.HeightsAndTheta.Heights.OrbitLimits.PPtsSemiPosMassFinite
+public import GroundTheory.HeightsAndTheta.Heights.OrbitLimits.PPtsSheetOnlyNull
+public import GroundTheory.HeightsAndTheta.Heights.OrbitLimits.PPtsSheetSimpleNull
+import GroundTheory.HeightsAndTheta.Heights.OrbitLimits.PPtsSumMeasurable
+public import GroundTheory.HeightsAndTheta.Heights.OrbitLimits.PSegreChart
+public import GroundTheory.HeightsAndTheta.Heights.OrbitLimits.PSegreChartAbsIntegrable
+public import GroundTheory.HeightsAndTheta.Heights.OrbitLimits.PSegreChartIntegral
+import GroundTheory.HeightsAndTheta.Heights.OrbitLimits.PSegreChartProjFinite
+public import GroundTheory.HeightsAndTheta.Heights.OrbitLimits.PSegreChartSheetCompare
+import GroundTheory.HeightsAndTheta.Heights.OrbitLimits.PSegreChartZeroSet
+public import GroundTheory.HeightsAndTheta.Heights.OrbitLimits.PSheetLift
+public import GroundTheory.HeightsAndTheta.Heights.OrbitLimits.Stokes
+public import GroundTheory.HeightsAndTheta.Heights.SemipositiveHeights.PtsIntegrable
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 

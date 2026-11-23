@@ -1,33 +1,64 @@
 module
 
-public import Mathlib
-public import Formalism.LocalToGlobal.SiegelLatticeTheory.CokernelGLCounts.MassDataConc
-public import Formalism.LocalToGlobal.SiegelLatticeTheory.CokernelGLCounts.LocVol
-public import Formalism.LocalToGlobal.SiegelLatticeTheory.HaarTransversals.UnitaryHaarProducts.MultiplicityGExists
-public import Formalism.LocalToGlobal.SiegelLatticeTheory.HaarTransversals.UnitaryHaarProducts.MeasCore
 public import Formalism.LocalToGlobal.SiegelLatticeTheory.FlagStabilizerTensors.RootLatticeThresholds.RescaleCore
+public import Formalism.LocalToGlobal.SiegelLatticeTheory.CokernelGLCounts.MassDataInst
 public import Formalism.LocalRingCardinality.RankBoundMonotoneInDimension
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
 noncomputable section
 
-open MeasureTheory NumberField Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
-  Formalism.L2.SG.Sub Matrix
+open MeasureTheory NumberField Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub Matrix
 
 namespace Formalism.L2.SG.Pf.Rescale
 
 section Gram
 
-variable
-  {F E : Type} [Field F] [Field E] [Algebra F E]
-  (σ : E →ₐ[F] E)
-  {n : ℕ} (J : Matrix (Fin n) (Fin n) E)
+variable {F E : Type} [Field F] [Field E] [Algebra F E] (σ : E →ₐ[F] E) {n : ℕ} (J : Matrix (Fin n) (Fin n) E)
 
-theorem hE_swap (hσ : ∀ x, σ (σ x) = x) (hJ : IsHermND σ J) (x y : Fin n → E)
-    : hE σ J y x = σ (hE σ J x y) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [hE, Formalism.UG.hform, AlgHom.coe_toRingHom, map_sum, map_mul, hσ]
+theorem hE_swap (hσ : ∀ x, σ (σ x) = x) (hJ : IsHermND σ J) (x y : Fin n → E) :
+    hE σ J y x = σ (hE σ J x y) := by
+
+  simp only [hE, Formalism.UG.hform, AlgHom.coe_toRingHom, map_sum, map_mul, hσ]
   conv_lhs => rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
   simp only [hJ.1]
@@ -45,12 +76,10 @@ theorem standard_gram_nondegenerate : Formalism.L2.SG.Pf.RescaleCore.GramStdND :
     simp [tupH, F0, Fin.append_left, Fin.snoc_last]
   have tF : ∀ a : Fin r, tupH P (Fin.natAdd (r + 1) a) = P.f a := by
     intro a; simp [tupH, Fin.append_right]
-  have hsum
-      : ∀ i,
-        (gramE σ J (tupH P) *ᵥ v) i
-          = (∑ b : Fin r, hE σ J (tupH P i) (P.e b) * v (Fin.castAdd r (Fin.castSucc b)))
-            + hE σ J (tupH P i) P.z * v (Fin.castAdd r (Fin.last r))
-            + ∑ b : Fin r, hE σ J (tupH P i) (P.f b) * v (Fin.natAdd (r + 1) b) := by
+  have hsum : ∀ i, (gramE σ J (tupH P) *ᵥ v) i =
+      (∑ b : Fin r, hE σ J (tupH P i) (P.e b) * v (Fin.castAdd r (Fin.castSucc b))) +
+        hE σ J (tupH P i) P.z * v (Fin.castAdd r (Fin.last r)) +
+        ∑ b : Fin r, hE σ J (tupH P i) (P.f b) * v (Fin.natAdd (r + 1) b) := by
     intro i
     simp only [Matrix.mulVec, dotProduct, gramE]
     rw [Fin.sum_univ_add, Fin.sum_univ_castSucc]
@@ -61,8 +90,7 @@ theorem standard_gram_nondegenerate : Formalism.L2.SG.Pf.RescaleCore.GramStdND :
     have h := hrow (Fin.castAdd r (Fin.castSucc a))
     rw [hsum, tE] at h
     simp only [hee, zero_mul, Finset.sum_const_zero, zero_add, hez, hef, ite_mul, one_mul,
-        Finset.sum_ite_eq, Finset.mem_univ, if_true]
-      at h
+      Finset.sum_ite_eq, Finset.mem_univ, if_true] at h
     exact h
   have hze : ∀ b, hE σ J P.z (P.e b) = 0 := fun b => by rw [hE_swap σ J hσ hJ, hez, map_zero]
   have hzf : ∀ b, hE σ J P.z (P.f b) = 0 := fun b => by rw [hE_swap σ J hσ hJ, hfz, map_zero]
@@ -82,9 +110,8 @@ theorem standard_gram_nondegenerate : Formalism.L2.SG.Pf.RescaleCore.GramStdND :
     intro a
     have h := hrow (Fin.natAdd (r + 1) a)
     rw [hsum, tF] at h
-    simp only [hfe, hfz', hff, zero_mul, Finset.sum_const_zero, add_zero, ite_mul, one_mul,
-        zero_mul, Finset.sum_ite_eq', Finset.mem_univ, if_true]
-      at h
+    simp only [hfe, hfz', hff, zero_mul, Finset.sum_const_zero, add_zero, ite_mul, one_mul, zero_mul,
+      Finset.sum_ite_eq', Finset.mem_univ, if_true] at h
     exact h
   apply hv0
   funext i
@@ -98,9 +125,7 @@ end Gram
 
 end Formalism.L2.SG.Pf.Rescale
 
-open MeasureTheory NumberField Formalism.BasicNotions Formalism.MainNotions.S
-  Formalism.L2.SG.HidaSetting Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
-  Formalism.L2.SG.Sub
+open MeasureTheory NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.L2.SG.HidaSetting Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub
 
 namespace Formalism.L2.SG.Pf.Rescale
 
@@ -108,29 +133,26 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 variable {D : D7}
 
-theorem hform_crdX (X : HidaSetting D) (v w : (VS D).V)
-    : X.ιE (Formalism.UG.hform (starRingEnd X.B.I.E) X.B.I.J (crdOf X.B.I X.ιE X.bas v)
-        (crdOf X.B.I X.ιE X.bas w))
-      = (VS D).hT v w := by
+theorem hform_crdX (X : HidaSetting D) (v w : (VS D).V) :
+    X.ιE (Formalism.UG.hform (starRingEnd X.B.I.E) X.B.I.J (crdOf X.B.I X.ιE X.bas v) (crdOf X.B.I X.ιE X.bas w)) =
+      (VS D).hT v w := by
   conv_rhs => rw [← X.bas.sum_repr v, ← X.bas.sum_repr w]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, LinearMap.map_smulₛₗ, LinearMap.sum_apply, LinearMap.smul_apply,
-      smul_eq_mul, Formalism.UG.hform, map_mul, crdOf, starRingEnd_apply, X.ιE_conj,
-      RingEquiv.apply_symm_apply, X.J_eq, Finset.mul_sum]
+
+  simp only [map_sum, LinearMap.map_smulₛₗ, LinearMap.sum_apply, LinearMap.smul_apply, smul_eq_mul,
+  Formalism.UG.hform, map_mul, crdOf, starRingEnd_apply, X.ιE_conj, RingEquiv.apply_symm_apply,
+  X.J_eq, Finset.mul_sum]
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
   simp only [← Formalism.BasicNotions.bridge_star_holds D.R D.host, RingHom.id_apply]
   ring
 
-theorem hE_crdX (X : HidaSetting D) (v w : (VS D).V)
-    : hE X.B.I.cm.sig X.B.I.J (crdOf X.B.I X.ιE X.bas v) (crdOf X.B.I X.ιE X.bas w)
-      = X.ιE.symm ((VS D).hT v w) := by
+theorem hE_crdX (X : HidaSetting D) (v w : (VS D).V) :
+    hE X.B.I.cm.sig X.B.I.J (crdOf X.B.I X.ιE X.bas v) (crdOf X.B.I X.ιE X.bas w) = X.ιE.symm ((VS D).hT v w) := by
   show Formalism.UG.hform (starRingEnd X.B.I.E) X.B.I.J _ _ = _
   rw [← hform_crdX X v w, RingEquiv.symm_apply_apply]
 
-theorem frame_stdX (X : HidaSetting D) (u : D.what₂.Word)
-    : (Formalism.L2.SG.TypedSets.frameOf X u).IsStd X.B.I.cm.sig X.B.I.J
-      (((D.mem u).A.T : ℕ) : X.B.I.F) := by
+theorem frame_stdX (X : HidaSetting D) (u : D.what₂.Word) :
+    (Formalism.L2.SG.TypedSets.frameOf X u).IsStd X.B.I.cm.sig X.B.I.J (((D.mem u).A.T : ℕ) : X.B.I.F) := by
   refine ⟨fun a b => ?_, fun a b => ?_, fun a b => ?_, fun a => ?_, fun a => ?_, ?_, ?_⟩
   · show hE _ _ (crdOf X.B.I X.ιE X.bas (X.eX a)) (crdOf X.B.I X.ιE X.bas (X.eX b)) = 0
     rw [hE_crdX, X.ee, map_zero]
@@ -147,5 +169,6 @@ theorem frame_stdX (X : HidaSetting D) (u : D.what₂.Word)
     rw [hE_crdX, X.zu_norm]
     simp
   · exact Nat.cast_ne_zero.2 (D.mem u).A.T_prime.ne_zero
+
 
 end Formalism.L2.SG.Pf.Rescale

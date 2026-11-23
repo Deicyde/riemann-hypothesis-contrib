@@ -1,8 +1,48 @@
 module
 
-public import Mathlib
 public import GroundTheory.HeightsAndTheta.Heights.HeightKernels.StatementsGrassHeight
 public import GroundTheory.HeightsAndTheta.Heights.HeightKernels.StatementsGrassHeightNE
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
@@ -19,8 +59,8 @@ namespace RootDivisorSupportEmpty
 theorem isIntegral_of_pow_eq_one {z : ℂ} {k : ℕ} (hk : 0 < k) (hz : z ^ k = 1) : IsIntegral ℤ z :=
   ⟨Polynomial.X ^ k - 1, Polynomial.monic_X_pow_sub_C 1 hk.ne', by simp [hz]⟩
 
-theorem isIntegral_det {n : ℕ} (M : Matrix (Fin n) (Fin n) ℂ) (h : ∀ a b, IsIntegral ℤ (M a b))
-    : IsIntegral ℤ M.det := by
+theorem isIntegral_det {n : ℕ} (M : Matrix (Fin n) (Fin n) ℂ) (h : ∀ a b, IsIntegral ℤ (M a b)) :
+    IsIntegral ℤ M.det := by
   have : M.det ∈ integralClosure ℤ ℂ := by
     rw [Matrix.det_apply]
     refine Subalgebra.sum_mem _ fun σ _ => ?_
@@ -28,10 +68,8 @@ theorem isIntegral_det {n : ℕ} (M : Matrix (Fin n) (Fin n) ℂ) (h : ∀ a b, 
     exact zsmul_mem (Subalgebra.prod_mem _ fun i _ => h _ _) _
   exact this
 
-theorem isIntegral_rootCoord
-    {f j m : ℕ} {ζ : Fin f → Matrix (Fin j) (Fin m) ℂ}
-    (hζ : IsRootMatrix ζ) (p : Σ _ : Fin f, PlIdx j m)
-    : IsIntegral ℤ (rootCoord ζ p) := by
+theorem isIntegral_rootCoord {f j m : ℕ} {ζ : Fin f → Matrix (Fin j) (Fin m) ℂ} (hζ : IsRootMatrix ζ)
+    (p : Σ _ : Fin f, PlIdx j m) : IsIntegral ℤ (rootCoord ζ p) := by
   refine isIntegral_det _ fun a b => ?_
   simp only [colsOf, Matrix.submatrix_apply, id, onePipe, Matrix.of_apply]
   refine Fin.addCases (fun c => ?_) (fun c => ?_) ((p.2.1.orderEmbOfFin p.2.2) b)
@@ -45,6 +83,7 @@ theorem isIntegral_rootCoord
 
 end RootDivisorSupportEmpty
 
+
 open RootDivisorSupportEmpty in
 theorem RootDivSuppEmpty.proof : RootDivSuppEmpty.Statement := by
   intro f j m ζ hζ
@@ -53,8 +92,7 @@ theorem RootDivSuppEmpty.proof : RootDivSuppEmpty.Statement := by
   rintro ⟨hQmin, hrel⟩
   have hQp : Q.IsPrime := hQmin.1.1
   have hle := hQmin.1.2
-  have hs : rootAnchorSection f j m ∈ Q :=
-    hle (Ideal.mem_sup_right (Ideal.mem_span_singleton_self _))
+  have hs : rootAnchorSection f j m ∈ Q := hle (Ideal.mem_sup_right (Ideal.mem_span_singleton_self _))
   obtain ⟨τ, -, hτ⟩ := (hQp.prod_mem_iff).1 hs
   obtain ⟨I, hI⟩ := hrel τ
   apply hI
@@ -65,21 +103,20 @@ theorem RootDivSuppEmpty.proof : RootDivSuppEmpty.Statement := by
   have hy0 : rootCoord ζ ⟨τ, plAnchor j m⟩ = 1 := anchor_minor _ _ _
   have hG : G ∈ rootPointIdeal ζ := by
     rw [rootPointIdeal, mCoordIdeal, RingHom.mem_ker]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [hGdef, mConeMap, map_sum, map_mul, map_pow, MvPolynomial.aeval_C,
-        MvPolynomial.aeval_X, hy0, MvPolynomial.C_1, one_mul]
-    have hterm
-        : ∀ k ∈ Finset.range (n + 1),
-          algebraMap ℤ (MvPolynomial (Fin f) ℂ) (p.coeff k) * (C (rootCoord ζ ⟨τ, I⟩) * X τ) ^ k
-              * (X τ : MvPolynomial (Fin f) ℂ) ^ (n - k)
-            = C ((p.coeff k : ℂ) * rootCoord ζ ⟨τ, I⟩ ^ k) * X τ ^ n := by
+
+    simp only [hGdef, mConeMap, map_sum, map_mul, map_pow, MvPolynomial.aeval_C, MvPolynomial.aeval_X,
+    hy0, MvPolynomial.C_1, one_mul]
+    have hterm : ∀ k ∈ Finset.range (n + 1),
+        algebraMap ℤ (MvPolynomial (Fin f) ℂ) (p.coeff k) * (C (rootCoord ζ ⟨τ, I⟩) * X τ) ^ k *
+          (X τ : MvPolynomial (Fin f) ℂ) ^ (n - k) =
+        C ((p.coeff k : ℂ) * rootCoord ζ ⟨τ, I⟩ ^ k) * X τ ^ n := by
       intro k hk
       have hkn : k ≤ n := Nat.lt_succ_iff.1 (Finset.mem_range.1 hk)
       rw [eq_intCast, ← map_intCast (C : ℂ →+* MvPolynomial (Fin f) ℂ), mul_pow, C_mul, C_pow,
         ← Nat.add_sub_cancel' hkn, pow_add, Nat.add_sub_cancel_left]
       ring
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [Finset.sum_congr rfl hterm, ← Finset.sum_mul, ← map_sum]
+
+    rw [Finset.sum_congr rfl hterm, ← Finset.sum_mul, ← map_sum]
     have hsum : ∑ k ∈ Finset.range (n + 1), (p.coeff k : ℂ) * rootCoord ζ ⟨τ, I⟩ ^ k = 0 := by
       rw [← hp, Polynomial.eval₂_eq_sum_range]
       simp [n]
@@ -88,11 +125,10 @@ theorem RootDivSuppEmpty.proof : RootDivSuppEmpty.Statement := by
   have h0 : Ideal.Quotient.mk Q (X ⟨τ, plAnchor j m⟩) = 0 := Ideal.Quotient.eq_zero_iff_mem.2 hτ
   have hpow : Ideal.Quotient.mk Q (X ⟨τ, I⟩) ^ n = 0 := by
     have h1 := Ideal.Quotient.eq_zero_iff_mem.2 hGQ
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [hGdef, map_sum, map_mul, map_pow, h0] at h1
+
+    simp only [hGdef, map_sum, map_mul, map_pow, h0] at h1
     rw [Finset.sum_range_succ, Finset.sum_eq_zero, zero_add, Nat.sub_self, pow_zero, mul_one,
-        hpm.coeff_natDegree, map_one, map_one, one_mul]
-      at h1
+      hpm.coeff_natDegree, map_one, map_one, one_mul] at h1
     · exact h1
     · intro k hk
       rw [zero_pow (Nat.sub_ne_zero_of_lt (Finset.mem_range.1 hk)), mul_zero]

@@ -1,10 +1,49 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.PolyhedralPolarisationFaceCutIsCell
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.PullLinInjective
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.NonnegSumSmulIntBilinFormToRealMemPsdCone
 public import CompanionTheory.SpectralGeometry.CountingDefinitions.VoronoiMeans.VorFunEvalEqFineMean
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.IsBaryStageStart
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.NonnegSumSmulIntBilinFormToRealMemPsdCone
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.PullLinInjective
+import Mathlib.Algebra.Module.StablyFree.Basic
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Int
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Std.Tactic.BVDecide.Normalize.Prop
+import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.HomExtNormalSt
 
 @[expose] public section
 
@@ -12,22 +51,18 @@ set_option autoImplicit false
 
 noncomputable section
 
-open NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.Toroidal
-  GlobalTheory.LocM GlobalTheory.TorRef GlobalTheory.PolFan GlobalTheory.PolFan.CarDim
-  GlobalTheory.CompanionTheory.Ar.Fan
+open NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.TorRef GlobalTheory.PolFan GlobalTheory.PolFan.CarDim GlobalTheory.CompanionTheory.Ar.Fan
 
 namespace GlobalTheory.CompanionTheory.Ar.Fan.CellFaces
 
-variable
-  {O : Type} [CommRing O]
-  {bar : O → O} {ψ : InvFun O} {X : Type} [AddCommGroup X] [Module O X] [Module.Finite O X]
+variable {O : Type} [CommRing O] {bar : O → O} {ψ : InvFun O}
+  {X : Type} [AddCommGroup X] [Module O X] [Module.Finite O X]
+
 
 omit [Module O X] [Module.Finite O X] in
-theorem apply_eq_sum_of_toReal
-    {m : ℕ} {β : LinearMap.BilinForm ℤ X} {u : Fin m → LinearMap.BilinForm ℤ X} {c : Fin m → ℝ}
-    (hβ : toReal β = ∑ i, c i • toReal (u i))
-    (F : LinearMap.BilinForm ℤ X →ₗ[ℤ] ℤ)
-    : (F β : ℝ) = ∑ i, c i * (F (u i) : ℝ) := by
+theorem apply_eq_sum_of_toReal {m : ℕ} {β : LinearMap.BilinForm ℤ X} {u : Fin m → LinearMap.BilinForm ℤ X}
+    {c : Fin m → ℝ} (hβ : toReal β = ∑ i, c i • toReal (u i)) (F : LinearMap.BilinForm ℤ X →ₗ[ℤ] ℤ) :
+    (F β : ℝ) = ∑ i, c i * (F (u i) : ℝ) := by
   have hpt : ∀ a b : X, ((β a b : ℤ) : ℝ) = ∑ i, c i * ((u i a b : ℤ) : ℝ) := by
     intro a b
     have := congrArg (fun B : X →ₗ[ℤ] X →ₗ[ℤ] ℝ => B a b) hβ
@@ -40,13 +75,11 @@ theorem apply_eq_sum_of_toReal
     have hq : ∀ a b : X, π 1 * ((β a b : ℤ) : ℚ) = ∑ i, π (c i) * ((u i a b : ℤ) : ℚ) := by
       intro a b
       have h1 := congrArg π (hpt a b)
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [← one_mul ((β a b : ℤ) : ℝ), hπ, map_sum] at h1
+
+      rw [← one_mul ((β a b : ℤ) : ℝ), hπ, map_sum] at h1
       simpa only [hπ] using h1
-    obtain ⟨b, hb⟩ :=
-      IsLocalization.exist_integer_multiples (nonZeroDivisors ℤ)
-        (Finset.univ : Finset (Option (Fin m)))
-        (fun o : Option (Fin m) => o.elim (π 1) (fun i => π (c i)))
+    obtain ⟨b, hb⟩ := IsLocalization.exist_integer_multiples (nonZeroDivisors ℤ)
+      (Finset.univ : Finset (Option (Fin m))) (fun o : Option (Fin m) => o.elim (π 1) (fun i => π (c i)))
     choose z hz using fun o => hb o (Finset.mem_univ o)
     have hz' : ∀ o, ((z o : ℤ) : ℚ) = ((b : ℤ) : ℚ) * o.elim (π 1) (fun i => π (c i)) := by
       intro o
@@ -54,39 +87,35 @@ theorem apply_eq_sum_of_toReal
     have hint : z none • β = ∑ i, z (some i) • u i := by
       ext x y
       apply Int.cast_injective (α := ℚ)
-      simp only [LinearMap.smul_apply, LinearMap.sum_apply, smul_eq_mul, Int.cast_mul, Int.cast_sum,
-        hz', Option.elim_none, Option.elim_some]
+      simp only [LinearMap.smul_apply, LinearMap.sum_apply, smul_eq_mul, Int.cast_mul, Int.cast_sum, hz',
+        Option.elim_none, Option.elim_some]
       rw [mul_assoc, hq x y, Finset.mul_sum]
       exact Finset.sum_congr rfl fun i _ => by ring
     have h2 := congrArg (fun β => ((F β : ℤ) : ℚ)) hint
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_zsmul, map_sum, smul_eq_mul, Int.cast_mul, Int.cast_sum, hz', Option.elim_none,
-          Option.elim_some]
-        at h2
+
+    simp only [map_zsmul, map_sum, smul_eq_mul, Int.cast_mul, Int.cast_sum, hz', Option.elim_none,
+    Option.elim_some] at h2
     have hb0 : ((b : ℤ) : ℚ) ≠ 0 := by exact_mod_cast nonZeroDivisors.ne_zero b.2
     apply mul_left_cancel₀ hb0
     rw [Finset.mul_sum, ← mul_assoc, h2]
     exact Finset.sum_congr rfl fun i _ => by ring
   have hr : ∑ i, c i * (F (u i) : ℝ) - (F β : ℝ) = 0 := by
     refine (Module.forall_dual_apply_eq_zero_iff ℚ _).mp fun π => ?_
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sub, map_sum, ← one_mul ((F β : ℤ) : ℝ), hπ]
+
+    rw [map_sub, map_sum, ← one_mul ((F β : ℤ) : ℝ), hπ]
     simp only [hπ]
     rw [← hrat π]
     ring
   linarith
 
-theorem est_at
-    {m : ℕ} {γ : Fin m → LinearMap.BilinForm ℤ X} {N : ℕ} {ℓ h : LinearMap.BilinForm ℤ X →ₗ[ℤ] ℤ}
-    (hstr : ∀ β ∈ balForms bar X,
-      (∀ y, 0 ≤ β y y) → N * ψ.evalZ β = ℓ β
-        → ∃ (k : ℕ) (c : Fin m → ℕ), 0 < k ∧ k • β = ∑ i, c i • γ i)
-    (hle : ∀ β ∈ balForms bar X, (∀ y, 0 ≤ β y y) → N * ψ.evalZ β ≤ ℓ β) (hγ : ∀ j, 0 ≤ h (γ j))
-    {C : ℕ} (hC : ∀ β ∈ balForms bar X, (∀ y, 0 ≤ β y y) → -(h β : ℝ) ≤ C * ℓ β)
-    {u : LinearMap.BilinForm ℤ X} (hu : u ∈ balForms bar X) (hp : ∀ y, 0 ≤ u y y)
-    (n : ℤ) (hn : ψ.evalZ u = n)
-    {B0 L : ℝ} (hb : N * ψ.evalZ u ≤ B0) (hB0 : 0 ≤ B0) (hL : C * (B0 + 1) + C ≤ L)
-    : L * (N * ψ.evalZ u) ≤ L * ℓ u + h u := by
+theorem est_at {m : ℕ} {γ : Fin m → LinearMap.BilinForm ℤ X} {N : ℕ} {ℓ h : LinearMap.BilinForm ℤ X →ₗ[ℤ] ℤ}
+    (hstr : ∀ β ∈ balForms bar X, (∀ y, 0 ≤ β y y) → N * ψ.evalZ β = ℓ β →
+      ∃ (k : ℕ) (c : Fin m → ℕ), 0 < k ∧ k • β = ∑ i, c i • γ i)
+    (hle : ∀ β ∈ balForms bar X, (∀ y, 0 ≤ β y y) → N * ψ.evalZ β ≤ ℓ β)
+    (hγ : ∀ j, 0 ≤ h (γ j)) {C : ℕ} (hC : ∀ β ∈ balForms bar X, (∀ y, 0 ≤ β y y) → -(h β : ℝ) ≤ C * ℓ β)
+    {u : LinearMap.BilinForm ℤ X} (hu : u ∈ balForms bar X) (hp : ∀ y, 0 ≤ u y y) (n : ℤ) (hn : ψ.evalZ u = n)
+    {B0 L : ℝ} (hb : N * ψ.evalZ u ≤ B0) (hB0 : 0 ≤ B0) (hL : C * (B0 + 1) + C ≤ L) :
+    L * (N * ψ.evalZ u) ≤ L * ℓ u + h u := by
   have hle' := hle u hu hp
   have hhC := hC u hu hp
   rw [hn] at hle' hb ⊢
@@ -105,7 +134,7 @@ theorem est_at
     obtain ⟨k, c, hk, hkc⟩ := hstr u hu hp heqR
     have hsum : (k : ℤ) * h u = ∑ i, (c i : ℤ) * h (γ i) := by
       have := congrArg h hkc
-      set_option synthInstance.maxHeartbeats 100000 in
+
       simpa [map_nsmul, map_sum, nsmul_eq_mul] using this
     have hnn : 0 ≤ ∑ i, (c i : ℤ) * h (γ i) :=
       Finset.sum_nonneg fun i _ => mul_nonneg (Int.natCast_nonneg _) (hγ i)
@@ -118,21 +147,13 @@ theorem est_at
     rw [hℓR]
     linarith
 
-theorem isCell_comp
-    : ∀ (O : Type) [CommRing O] [IsDedekindDomain O] [CharZero O] [Module.Finite ℤ O] (bar : O → O),
-      CMOrd O bar
-        → ∀ (ψ : InvFun O) (X : Type) [AddCommGroup X] [Module O X] [Module.Finite O X],
-          IsPolyFanOn bar ψ X → Dominates bar X
-            → ∀ (m m' : ℕ) (γ : Fin m → LinearMap.BilinForm ℤ X) (s : Fin m' ↪ Fin m)
-                (h : LinearMap.BilinForm ℤ X →ₗ[ℤ] ℤ),
-              IsCell bar ψ γ → IsFaceCut γ s h → IsCell bar ψ (fun i => γ (s i)) := by
+theorem isCell_comp : ∀ (O : Type) [CommRing O] [IsDedekindDomain O] [CharZero O] [Module.Finite ℤ O] (bar : O → O), CMOrd O bar → ∀ (ψ : InvFun O) (X : Type) [AddCommGroup X] [Module O X] [Module.Finite O X], IsPolyFanOn bar ψ X → Dominates bar X → ∀ (m m' : ℕ) (γ : Fin m → LinearMap.BilinForm ℤ X) (s : Fin m' ↪ Fin m) (h : LinearMap.BilinForm ℤ X →ₗ[ℤ] ℤ), IsCell bar ψ γ → IsFaceCut γ s h → IsCell bar ψ (fun i => γ (s i)) := by
   intro O _ _ _ _ bar _ ψ X _ _ _ hfan hdom m m' γ s h hcell hface
   obtain ⟨hmem, hnn, hlin, hstrict⟩ := hcell
   obtain ⟨N, ℓ, hN, hℓγ, hle, hstr⟩ := hstrict
   obtain ⟨hh0, hhz⟩ := hface
-  have reidx
-      : ∀ (c' : Fin m' → ℝ) (f : Fin m → ℝ),
-        ∑ j, Function.extend s c' 0 j * f j = ∑ i, c' i * f (s i) := by
+  have reidx : ∀ (c' : Fin m' → ℝ) (f : Fin m → ℝ),
+      ∑ j, Function.extend s c' 0 j * f j = ∑ i, c' i * f (s i) := by
     intro c' f
     refine ((Finset.sum_subset (Finset.subset_univ (Finset.univ.map s)) fun j _ hj => ?_).symm.trans
       (Finset.sum_map Finset.univ s (fun j => Function.extend s c' 0 j * f j))).trans ?_
@@ -150,9 +171,8 @@ theorem isCell_comp
     intro c' hc'
     have hl := hlin (Function.extend s c' 0) (hext_nn c' hc')
     show ψ.eval X (fun a b => ∑ i, c' i * ((γ (s i) a b : ℤ) : ℝ)) = ∑ i, c' i * ψ.evalZ (γ (s i))
-    have e1
-        : (fun a b => ∑ i, c' i * ((γ (s i) a b : ℤ) : ℝ))
-          = (fun a b => ∑ j, Function.extend s c' 0 j * ((γ j a b : ℤ) : ℝ)) := by
+    have e1 : (fun a b => ∑ i, c' i * ((γ (s i) a b : ℤ) : ℝ)) =
+        (fun a b => ∑ j, Function.extend s c' 0 j * ((γ j a b : ℤ) : ℝ)) := by
       funext a b
       rw [reidx c' (fun j => ((γ j a b : ℤ) : ℝ))]
     rw [e1, hl, reidx c' (fun j => ψ.evalZ (γ j))]
@@ -173,32 +193,19 @@ theorem isCell_comp
   set B0 : ℝ := ∑ x ∈ hSfin.toFinset, |(N : ℝ) * ψ.evalZ x| with hB0def
   have hB0 : 0 ≤ B0 := Finset.sum_nonneg fun _ _ => abs_nonneg _
   have hB0ge : ∀ x ∈ S, (N : ℝ) * ψ.evalZ x ≤ B0 := fun x hx =>
-    (le_abs_self _).trans
-      (Finset.single_le_sum
-        (f := fun x => |(N : ℝ) * ψ.evalZ x|)
-        (fun _ _ => abs_nonneg _)
-        (hSfin.mem_toFinset.mpr hx))
-  have key
-      : ∀ L : ℝ,
-        (C : ℝ) * (B0 + 1) + C ≤ L
-          → ∀ β ∈ balForms bar X, (∀ y, 0 ≤ β y y) → L * (N * ψ.evalZ β) ≤ L * ℓ β + h β := by
+    (le_abs_self _).trans (Finset.single_le_sum (f := fun x => |(N : ℝ) * ψ.evalZ x|)
+      (fun _ _ => abs_nonneg _) (hSfin.mem_toFinset.mpr hx))
+  have key : ∀ L : ℝ, (C : ℝ) * (B0 + 1) + C ≤ L → ∀ β ∈ balForms bar X, (∀ y, 0 ≤ β y y) →
+      L * (N * ψ.evalZ β) ≤ L * ℓ β + h β := by
     intro L hL β hβ hp
     have hB : toReal β ∈ psdCone (bar := bar) (X := X) := by
-      have :=
-        GlobalTheory.PolFan.ConeSub.sum_smul_toReal_mem_psdCone O bar X 1
-          (fun _ => β)
-          (fun _ => 1)
-          (fun _ => hβ)
-          (fun _ => hp)
-          (fun _ => zero_le_one)
+      have := GlobalTheory.PolFan.ConeSub.sum_smul_toReal_mem_psdCone O bar X 1 (fun _ => β) (fun _ => 1)
+        (fun _ => hβ) (fun _ => hp) (fun _ => zero_le_one)
       simpa using this
     obtain ⟨e, k, γ', c, hcell', hS', hc', heq⟩ := hcov _ hB
     have hsurj : Function.Surjective (e.symm : X →ₗ[O] X) := fun x => ⟨e x, by simp⟩
-    have hcellu : IsCell bar ψ (fun i => pull (e.symm : X →ₗ[O] X) (γ' i)) :=
-      isCell_pull_equiv hcell' e.symm
-    have hpt
-        : ∀ a b : X,
-          ((β a b : ℤ) : ℝ) = ∑ i, c i * ((pull (e.symm : X →ₗ[O] X) (γ' i) a b : ℤ) : ℝ) := by
+    have hcellu : IsCell bar ψ (fun i => pull (e.symm : X →ₗ[O] X) (γ' i)) := isCell_pull_equiv hcell' e.symm
+    have hpt : ∀ a b : X, ((β a b : ℤ) : ℝ) = ∑ i, c i * ((pull (e.symm : X →ₗ[O] X) (γ' i) a b : ℤ) : ℝ) := by
       intro a b
       have := congrArg (fun B : X →ₗ[ℤ] X →ₗ[ℤ] ℝ => B (e.symm a) (e.symm b)) heq
       simpa [pullR, pull_apply, toReal_apply, LinearMap.sum_apply] using this
@@ -213,34 +220,30 @@ theorem isCell_comp
       congr 1
       funext a b
       exact hpt a b
-    have hest
-        : ∀ i,
-          L * (N * ψ.evalZ (pull (e.symm : X →ₗ[O] X) (γ' i)))
-            ≤ L * ℓ (pull (e.symm : X →ₗ[O] X) (γ' i)) + h (pull (e.symm : X →ₗ[O] X) (γ' i)) := by
+    have hest : ∀ i, L * (N * ψ.evalZ (pull (e.symm : X →ₗ[O] X) (γ' i))) ≤
+        L * ℓ (pull (e.symm : X →ₗ[O] X) (γ' i)) + h (pull (e.symm : X →ₗ[O] X) (γ' i)) := by
       intro i
       obtain ⟨n, hn⟩ := hfan.integral _ (hcellu.mem i) (hcellu.nonneg i)
       have hbi : (N : ℝ) * ψ.evalZ (pull (e.symm : X →ₗ[O] X) (γ' i)) ≤ B0 := by
         rw [evalZ_pull ψ hsurj]
         exact hB0ge _ (hS' i)
       exact est_at (bar := bar) hstr hle hh0 hCR (hcellu.mem i) (hcellu.nonneg i) n hn hbi hB0 hL
-    calc
-      L * (N * ψ.evalZ β) = ∑ i, c i * (L * (N * ψ.evalZ (pull (e.symm : X →ₗ[O] X) (γ' i)))) := by
-        rw [hφ, Finset.mul_sum, Finset.mul_sum]
-        exact Finset.sum_congr rfl fun i _ => by ring
+    calc L * (N * ψ.evalZ β)
+        = ∑ i, c i * (L * (N * ψ.evalZ (pull (e.symm : X →ₗ[O] X) (γ' i)))) := by
+          rw [hφ, Finset.mul_sum, Finset.mul_sum]
+          exact Finset.sum_congr rfl fun i _ => by ring
       _ ≤ ∑ i, c i * (L * ℓ (pull (e.symm : X →ₗ[O] X) (γ' i)) + h (pull (e.symm : X →ₗ[O] X) (γ' i))) :=
-        Finset.sum_le_sum fun i _ => mul_le_mul_of_nonneg_left (hest i) (hc' i)
+          Finset.sum_le_sum fun i _ => mul_le_mul_of_nonneg_left (hest i) (hc' i)
       _ = L * ℓ β + h β := by
-        rw [hℓ, hh, Finset.mul_sum, ← Finset.sum_add_distrib]
-        exact Finset.sum_congr rfl fun i _ => by ring
+          rw [hℓ, hh, Finset.mul_sum, ← Finset.sum_add_distrib]
+          exact Finset.sum_congr rfl fun i _ => by ring
   have hL0 := Nat.le_ceil ((C : ℝ) * (B0 + 1) + C)
   set L0 : ℕ := ⌈(C : ℝ) * (B0 + 1) + C⌉₊ with hL0def
-  have reidxN
-      : ∀ c : Fin m → ℕ,
-        (∀ j, j ∉ Set.range s → c j = 0) → ∑ j, c j • γ j = ∑ i, c (s i) • γ (s i) := by
+  have reidxN : ∀ c : Fin m → ℕ, (∀ j, j ∉ Set.range s → c j = 0) →
+      ∑ j, c j • γ j = ∑ i, c (s i) • γ (s i) := by
     intro c hc
     exact (Finset.sum_subset (Finset.subset_univ (Finset.univ.map s)) fun j _ hj => by
-        rw [hc j (by simpa using hj), zero_smul]).symm.trans
-      (Finset.sum_map Finset.univ s (fun j => c j • γ j))
+      rw [hc j (by simpa using hj), zero_smul]).symm.trans (Finset.sum_map Finset.univ s (fun j => c j • γ j))
   refine ⟨fun i => hmem (s i), fun i => hnn (s i), hlin', ?_⟩
   unfold GlobalTheory.PolFan.IsStrict
   refine ⟨(L0 + 1) * N, ((L0 + 1 : ℕ) : ℤ) • ℓ + h, Nat.mul_pos (Nat.succ_pos _) hN, ?_, ?_, ?_⟩
@@ -266,13 +269,12 @@ theorem isCell_comp
     obtain ⟨k, c, hk, hkc⟩ := hstr β hβ hp hd
     have hsum : (k : ℤ) * h β = ∑ j, (c j : ℤ) * h (γ j) := by
       have := congrArg h hkc
-      set_option synthInstance.maxHeartbeats 100000 in
+
       simpa [map_nsmul, map_sum, nsmul_eq_mul] using this
     have hhβ : h β = 0 := by exact_mod_cast hh0β
     rw [hhβ, mul_zero] at hsum
-    have hterm :=
-      (Finset.sum_eq_zero_iff_of_nonneg (fun j _ =>
-        mul_nonneg (Int.natCast_nonneg (c j)) (hh0 j))).mp hsum.symm
+    have hterm := (Finset.sum_eq_zero_iff_of_nonneg
+      (fun j _ => mul_nonneg (Int.natCast_nonneg (c j)) (hh0 j))).mp hsum.symm
     have hc0 : ∀ j, j ∉ Set.range s → c j = 0 := by
       intro j hj
       have h2 : h (γ j) ≠ 0 := fun h0 => hj ((hhz j).mp h0)

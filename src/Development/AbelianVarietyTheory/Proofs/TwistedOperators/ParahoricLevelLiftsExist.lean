@@ -1,14 +1,59 @@
 module
 
-public import Mathlib
-public import Formalism.LocalToGlobal.IndefiniteReal.ScalarOnPartsFull
-public import Formalism.LocalToGlobal.IndefiniteReal.SubgroupCharExtensionOneApply
-public import Formalism.LocalToGlobal.IndefiniteReal.OrthogonalComplementCharacterisation
-public import Formalism.LocalToGlobal.IndefiniteReal.DatumVec
-public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.SupportedSubgroupSplitCommutePrimeIdempotents
 public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.LevelHyperspecialTrivialCharacterSplitsOffPlaces
+public import Development.AbelianVarietyTheory.Definitions.ExistenceOfLattices.CoeSelfDualLatticeInFrameCoordinatesEq
+public import Development.AbelianVarietyTheory.Definitions.ExistenceOfLattices.Hat1
 public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.ExistsAdelicUnitarySplitPlaceComponent
+public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.IntegralTensorAdelesEqAdelicCompletionOne
 public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.MemHyperspecialOfSplitPlaceStabilizer
+import Development.AbelianVarietyTheory.Proofs.SatakeParameters.SupportedSubgroupSplitCommutePrimeIdempotents
+import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.AdelicCompletionSelfDualOfSelfDualLattice
+import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.CompletedLatticeEqAdelicCompletionAndGram
+import Formalism.LocalToGlobal.Columns.StdLatUnimodular
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.NumberField.ClassNumber
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Etale.Weakly
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.TotallySplit
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Formalism.LocalToGlobal.IndefiniteReal.LocalNewformFunction
 
 @[expose] public section
 
@@ -242,11 +287,11 @@ theorem swp_hermA
         (fun i => Formalism.UG.inclE (F := F) (Formalism.L2.Herm.Af F) (x i))
         (fun i => swp F E (y i)) := by
   unfold Formalism.UG.hform GlobalTheory.AdLat.hermA
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [Finset.sum_comm, map_sum (swp F E)]
+
+  rw [Finset.sum_comm, map_sum (swp F E)]
   refine Finset.sum_congr rfl fun a _ => ?_
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum (swp F E)]
+
+  rw [map_sum (swp F E)]
   refine Finset.sum_congr rfl fun b _ => ?_
   have e1
       : swp F E (GlobalTheory.AdLat.sg (FiniteAdeleRing (𝓞 F) F) c (GlobalTheory.AdLat.fv F x a))
@@ -594,7 +639,6 @@ theorem exists_matrix_lift
   rw [RingHom.map_det, RingHom.mapMatrix_apply, e]
   exact (Matrix.isUnits_det_units k).ne_zero
 
-set_option maxHeartbeats 1000000 in
 theorem exists_local_lift
     {V : HSp D} {β : GL (Fin V.rank) (Lev.EAf D)}
     {Λ : Submodule (𝓞 D.host.E) (Fin V.rank → D.host.E)} {N : ℕ} (hB : IsBaseFrame V β Λ N)

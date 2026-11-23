@@ -1,17 +1,74 @@
 module
 
-public import Development.AutomorphicArithmetic.AutomorphicVarieties.PatchingModules.SelmerScaling.EpC
+public import Mathlib.LinearAlgebra.Dual.Defs
+public import Mathlib.LinearAlgebra.LinearIndependent.Defs
+public import Mathlib.RingTheory.Finiteness.Defs
+import Development.AutomorphicArithmetic.AutomorphicVarieties.CommutativeAlgebra.ResMapBijective
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.LinearAlgebra.Matrix.FiniteDimensional
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.AdicCompletion.Noetherian
+import Mathlib.RingTheory.Coalgebra.IsFrobenius
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.HopfAlgebra.Basic
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Development.AutomorphicArithmetic.AutomorphicVarieties.AlgebraTools.IsCplAtSelf
+import Development.AutomorphicArithmetic.AutomorphicVarieties.PatchingModules.PairedDualFirstOrderDualMatrixSpace
+import Development.AutomorphicArithmetic.AutomorphicVarieties.WeilGroupCharacters.RepAlg
+public import Mathlib.LinearAlgebra.Basis.Basic
+public import Mathlib.LinearAlgebra.Basis.VectorSpace
+public import Mathlib.LinearAlgebra.Dimension.Constructions
+public import Mathlib.LinearAlgebra.Dimension.RankNullity
+public import Mathlib.LinearAlgebra.Dual.Lemmas
 
 @[expose] public section
 
-open IsLocalRing Matrix UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.AlgebraTools
-  UpperTheory.V.Pa
+open IsLocalRing Matrix UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.AlgebraTools UpperTheory.V.Pa
 
-private theorem finrank_quotient_le_of_forall_dependent_mod
-    {F V : Type} [Field F] [AddCommGroup V] [Module F V] [Module.Finite F V]
+private theorem finrank_quotient_le_of_forall_dependent_mod {F V : Type} [Field F] [AddCommGroup V] [Module F V] [Module.Finite F V]
     (g : ℕ) (U : Submodule F V)
-    (h : ∀ z : Fin (g + 1) → V, ∃ c : Fin (g + 1) → F, c ≠ 0 ∧ ∑ i, c i • z i ∈ U)
-    : Module.finrank F (V ⧸ U) ≤ g := by
+    (h : ∀ z : Fin (g + 1) → V, ∃ c : Fin (g + 1) → F, c ≠ 0 ∧ ∑ i, c i • z i ∈ U) :
+    Module.finrank F (V ⧸ U) ≤ g := by
   by_contra hlt
   push_neg at hlt
   let b := Module.finBasis F (V ⧸ U)
@@ -23,16 +80,13 @@ private theorem finrank_quotient_le_of_forall_dependent_mod
     have : U.mkQ (∑ i, c i • z i) = 0 := by
       rw [Submodule.mkQ_apply, Submodule.Quotient.mk_eq_zero]
       exact hc
-    set_option synthInstance.maxHeartbeats 100000 in
+
     simpa [map_sum, map_smul, hz] using this
   exact hc0 (funext fun i => Fintype.linearIndependent_iff.1 hli c hsum i)
 
-private theorem exists_spanning_family_of_finrank_le
-    {F V : Type} [Field F] [AddCommGroup V] [Module F V]
-    (N : ℕ)
-    (C : Submodule F V) [Module.Finite F C]
-    (h : Module.finrank F C ≤ N)
-    : ∃ ψ : Fin N → V, (∀ i, ψ i ∈ C) ∧ C ≤ Submodule.span F (Set.range ψ) := by
+private theorem exists_spanning_family_of_finrank_le {F V : Type} [Field F] [AddCommGroup V] [Module F V] (N : ℕ)
+    (C : Submodule F V) [Module.Finite F C] (h : Module.finrank F C ≤ N) :
+    ∃ ψ : Fin N → V, (∀ i, ψ i ∈ C) ∧ C ≤ Submodule.span F (Set.range ψ) := by
   classical
   let b := Module.finBasis F C
   refine ⟨fun i => if hi : (i : ℕ) < Module.finrank F C then (b ⟨i, hi⟩ : V) else 0, ?_, ?_⟩
@@ -48,19 +102,12 @@ private theorem exists_spanning_family_of_finrank_le
       simp only [Submodule.coe_smul] at this
       exact this.symm
     rw [hf']
-    refine Submodule.sum_mem _ fun k _ =>
-      Submodule.smul_mem _ _ (Submodule.subset_span ⟨⟨k, lt_of_lt_of_le k.2 h⟩, ?_⟩)
+    refine Submodule.sum_mem _ fun k _ => Submodule.smul_mem _ _
+      (Submodule.subset_span ⟨⟨k, lt_of_lt_of_le k.2 h⟩, ?_⟩)
     simp [k.2]
 
-theorem UpperTheory.V.Pa.linAlg
-    : ∀ (F T : Type) [Field F] [AddCommGroup T] [Module F T] [Module.Finite F T] (g D0 : ℕ)
-        (U : Submodule F (Fin g → T)),
-      (∀ z : Fin (g + 1) → Fin g → T, ∃ c : Fin (g + 1) → F, c ≠ 0 ∧ ∑ i, c i • z i ∈ U)
-        → (∀ (e : ℕ) (α : Fin e → T),
-          LinearIndependent F α → (∀ i j, Pi.single j (α i) ∈ U) → e + g * g ≤ D0)
-        → ∃ (X : Fin D0 → Module.Dual F T) (c : Fin g × Fin g → Fin D0 → F),
-          Submodule.span F (Set.range X) = ⊤ ∧ LinearIndependent F c
-            ∧ ∀ a ∈ U, ∀ i, ∑ j, ∑ k, c (i, j) k * X k (a j) = 0 := by
+theorem UpperTheory.V.Pa.linAlg :
+    ∀ (F T : Type) [Field F] [AddCommGroup T] [Module F T] [Module.Finite F T] (g D0 : ℕ) (U : Submodule F (Fin g → T)), (∀ z : Fin (g + 1) → Fin g → T, ∃ c : Fin (g + 1) → F, c ≠ 0 ∧ ∑ i, c i • z i ∈ U) → (∀ (e : ℕ) (α : Fin e → T), LinearIndependent F α → (∀ i j, Pi.single j (α i) ∈ U) → e + g * g ≤ D0) → ∃ (X : Fin D0 → Module.Dual F T) (c : Fin g × Fin g → Fin D0 → F), Submodule.span F (Set.range X) = ⊤ ∧ LinearIndependent F c ∧ ∀ a ∈ U, ∀ i, ∑ j, ∑ k, c (i, j) k * X k (a j) = 0 := by
   intro F T _ _ _ _ g D0 U h1 h2
   classical
   have hAdim : Module.finrank F U.dualAnnihilator ≤ g := by
@@ -74,8 +121,8 @@ theorem UpperTheory.V.Pa.linAlg
   have hrow : ∀ a ∈ U, ∀ i, ∑ j, φ i j (a j) = 0 := by
     intro a ha i
     simp only [hφ]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← map_sum, Finset.univ_sum_single]
+
+    rw [← map_sum, Finset.univ_sum_single]
     exact (Submodule.mem_dualAnnihilator _).1 (hΦA i) a ha
   set W : Submodule F T := ⨅ j : Fin g, U.comap (LinearMap.single F (fun _ : Fin g => T) j) with hWdef
   have hW : Module.finrank F W + g * g ≤ D0 := by
@@ -97,10 +144,8 @@ theorem UpperTheory.V.Pa.linAlg
     rw [Submodule.mem_comap, ← Subspace.dualAnnihilator_dualCoannihilator_eq (W := U),
       Submodule.mem_dualCoannihilator]
     intro f hf
-    have hle
-        : Submodule.span F (Set.range Φ)
-          ≤ LinearMap.ker (Module.Dual.eval F (Fin g → T)
-            (LinearMap.single F (fun _ : Fin g => T) j t)) := by
+    have hle : Submodule.span F (Set.range Φ) ≤ LinearMap.ker
+        (Module.Dual.eval F (Fin g → T) (LinearMap.single F (fun _ : Fin g => T) j t)) := by
       rw [Submodule.span_le]
       rintro _ ⟨i, rfl⟩
       simp only [SetLike.mem_coe, LinearMap.mem_ker, Module.Dual.eval_apply]
@@ -128,13 +173,8 @@ theorem UpperTheory.V.Pa.linAlg
   have hXκ : ∀ p, X (κ p) = φ p.1 p.2 := by
     intro p
     simp only [X, κ, Equiv.apply_symm_apply, Sum.elim_inl, Equiv.symm_apply_apply]
-  refine ⟨
-    X,
-    fun p => Pi.basisFun F (Fin D0) (κ p),
-    ?_,
-    (Pi.basisFun F (Fin D0)).linearIndependent.comp κ hκ,
-    ?_
-  ⟩
+  refine ⟨X, fun p => Pi.basisFun F (Fin D0) (κ p), ?_,
+    (Pi.basisFun F (Fin D0)).linearIndependent.comp κ hκ, ?_⟩
   · rw [eq_top_iff, ← hC.sup_eq_top, sup_le_iff]
     constructor
     · rw [hSdef, Submodule.span_le]

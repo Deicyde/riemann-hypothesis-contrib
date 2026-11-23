@@ -1,7 +1,48 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Definitions.Foundations.StandardFiveNontrivial
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -37,28 +78,25 @@ theorem convCalc_dirac_right (a : G → ℂ) : conv a dirac = a := by
   funext x
   simp [conv, dirac, inv_mul_eq_one]
 
-theorem convCalc_star
-    (a b : G → ℂ)
-    (ha : ∀ x, a x⁻¹ = (starRingEnd ℂ) (a x)) (hb : ∀ x, b x⁻¹ = (starRingEnd ℂ) (b x))
-    (x : G)
-    : conv a b x⁻¹ = (starRingEnd ℂ) (conv b a x) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [conv, map_sum, map_mul, ← ha, ← hb]
+theorem convCalc_star (a b : G → ℂ) (ha : ∀ x, a x⁻¹ = (starRingEnd ℂ) (a x))
+    (hb : ∀ x, b x⁻¹ = (starRingEnd ℂ) (b x)) (x : G) :
+    conv a b x⁻¹ = (starRingEnd ℂ) (conv b a x) := by
+
+  simp only [conv, map_sum, map_mul, ← ha, ← hb]
   rw [← Equiv.sum_comp (Equiv.mulLeft x⁻¹)]
   refine Finset.sum_congr rfl fun y _ => ?_
   simp [mul_comm, mul_assoc]
 
-theorem convCalc_isProj_conv (a b : G → ℂ) (ha : IsProj a) (hb : IsProj b) (h : conv a b = conv b a)
-    : IsProj (conv a b) := by
+theorem convCalc_isProj_conv (a b : G → ℂ) (ha : IsProj a) (hb : IsProj b) (h : conv a b = conv b a) :
+    IsProj (conv a b) := by
   refine ⟨?_, fun x => ?_⟩
-  · rw [convCalc_assoc, ← convCalc_assoc b a b, ← h, convCalc_assoc a b b, hb.1, ← convCalc_assoc,
-      ha.1]
+  · rw [convCalc_assoc, ← convCalc_assoc b a b, ← h, convCalc_assoc a b b, hb.1, ← convCalc_assoc, ha.1]
   · rw [convCalc_star a b ha.2 hb.2, h]
 
 theorem convCalc_isProj_compl (a : G → ℂ) (ha : IsProj a) : IsProj (dirac - a) := by
   refine ⟨?_, fun x => ?_⟩
-  · rw [convCalc_sub_left, convCalc_sub_right, convCalc_sub_right, convCalc_dirac_left,
-      convCalc_dirac_left, convCalc_dirac_right, ha.1]
+  · rw [convCalc_sub_left, convCalc_sub_right, convCalc_sub_right, convCalc_dirac_left, convCalc_dirac_left,
+      convCalc_dirac_right, ha.1]
     simp
   · simp only [Pi.sub_apply, map_sub, ha.2, dirac, inv_eq_one]
     split_ifs <;> simp
@@ -80,46 +118,27 @@ theorem convCalc_op_sub (a b : G → ℂ) : op ρ (a - b) = op ρ a - op ρ b :=
 theorem convCalc_op_add (a b : G → ℂ) : op ρ (a + b) = op ρ a + op ρ b := by
   simp [op, add_smul, Finset.sum_add_distrib]
 
-theorem convCalc_op_dirac : op ρ dirac = 1 := by simp [op, dirac]
+theorem convCalc_op_dirac : op ρ dirac = 1 := by
+  simp [op, dirac]
 
-theorem convCalc_rk [FiniteDimensional ℂ M] (e : G → ℂ) (he : conv e e = e)
-    : (rk ρ e : ℂ) = ∑ γ, e γ * LinearMap.trace ℂ M (ρ γ) := by
+theorem convCalc_rk [FiniteDimensional ℂ M] (e : G → ℂ) (he : conv e e = e) :
+    (rk ρ e : ℂ) = ∑ γ, e γ * LinearMap.trace ℂ M (ρ γ) := by
   have h1 : op ρ e * op ρ e = op ρ e := by rw [← convCalc_op_conv, he]
-  have hp : LinearMap.IsProj (LinearMap.range (op ρ e)) (op ρ e) := ⟨
-    fun x => LinearMap.mem_range_self _ x,
-    by
+  have hp : LinearMap.IsProj (LinearMap.range (op ρ e)) (op ρ e) :=
+    ⟨fun x => LinearMap.mem_range_self _ x, by
       rintro x ⟨y, rfl⟩
-      exact LinearMap.congr_fun h1 y
-  ⟩
+      exact LinearMap.congr_fun h1 y⟩
   rw [rk, ← hp.trace]
-  set_option synthInstance.maxHeartbeats 100000 in
+
   simp [op, map_sum]
 
 end
 
-theorem convCalc
-    : ∀ (G : Type) [Group G] [Fintype G] (M : Type) [AddCommGroup M] [Module ℂ M]
-        [FiniteDimensional ℂ M] (ρ : Representation ℂ G M),
-      (∀ a b : G → ℂ,
-          op ρ (conv a b) = op ρ a * op ρ b ∧ op ρ (a - b) = op ρ a - op ρ b
-            ∧ op ρ (a + b) = op ρ a + op ρ b)
-        ∧ op ρ dirac = 1
-        ∧ (∀ a b c : G → ℂ,
-          conv (conv a b) c = conv a (conv b c) ∧ conv (a - b) c = conv a c - conv b c
-            ∧ conv c (a - b) = conv c a - conv c b)
-        ∧ (∀ a : G → ℂ, conv dirac a = a ∧ conv a dirac = a)
-        ∧ (∀ a b : G → ℂ, IsProj a → IsProj b → conv a b = conv b a → IsProj (conv a b))
-        ∧ (∀ a : G → ℂ, IsProj a → IsProj (dirac - a))
-        ∧ ∀ e : G → ℂ, conv e e = e → (rk ρ e : ℂ) = ∑ γ, e γ * LinearMap.trace ℂ M (ρ γ) := by
+theorem convCalc : ∀ (G : Type) [Group G] [Fintype G] (M : Type) [AddCommGroup M] [Module ℂ M] [FiniteDimensional ℂ M] (ρ : Representation ℂ G M), (∀ a b : G → ℂ, op ρ (conv a b) = op ρ a * op ρ b ∧ op ρ (a - b) = op ρ a - op ρ b ∧ op ρ (a + b) = op ρ a + op ρ b) ∧ op ρ dirac = 1 ∧ (∀ a b c : G → ℂ, conv (conv a b) c = conv a (conv b c) ∧ conv (a - b) c = conv a c - conv b c ∧ conv c (a - b) = conv c a - conv c b) ∧ (∀ a : G → ℂ, conv dirac a = a ∧ conv a dirac = a) ∧ (∀ a b : G → ℂ, IsProj a → IsProj b → conv a b = conv b a → IsProj (conv a b)) ∧ (∀ a : G → ℂ, IsProj a → IsProj (dirac - a)) ∧ ∀ e : G → ℂ, conv e e = e → (rk ρ e : ℂ) = ∑ γ, e γ * LinearMap.trace ℂ M (ρ γ) := by
   intro G _ _ M _ _ _ ρ
-  exact ⟨
-    fun a b => ⟨convCalc_op_conv ρ a b, convCalc_op_sub ρ a b, convCalc_op_add ρ a b⟩,
-    convCalc_op_dirac ρ,
+  exact ⟨fun a b => ⟨convCalc_op_conv ρ a b, convCalc_op_sub ρ a b, convCalc_op_add ρ a b⟩, convCalc_op_dirac ρ,
     fun a b c => ⟨convCalc_assoc a b c, convCalc_sub_left a b c, convCalc_sub_right a b c⟩,
-    fun a => ⟨convCalc_dirac_left a, convCalc_dirac_right a⟩,
-    convCalc_isProj_conv,
-    convCalc_isProj_compl,
-    convCalc_rk ρ
-  ⟩
+    fun a => ⟨convCalc_dirac_left a, convCalc_dirac_right a⟩, convCalc_isProj_conv, convCalc_isProj_compl,
+    convCalc_rk ρ⟩
 
 end GlobalTheory.BadShare

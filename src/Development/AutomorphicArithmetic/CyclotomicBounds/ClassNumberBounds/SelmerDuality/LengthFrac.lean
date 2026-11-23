@@ -1,7 +1,55 @@
 module
 
 public import Development.AutomorphicArithmetic.CyclotomicBounds.ClassNumberBounds.SelmerDuality.H1cEqH1
+public import Mathlib.RingTheory.DiscreteValuationRing.Basic
 public import Development.AutomorphicArithmetic.CyclotomicBounds.ClassNumberBounds.SelmerDuality.LengthDet
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.Order.CompletePartialOrder
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
+public import Mathlib.LinearAlgebra.Matrix.ToLinearEquiv
 
 @[expose] public section
 
@@ -9,38 +57,38 @@ namespace KStar.Selmer
 
 open Matrix Module
 
-variable
-  {O : Type*} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+variable {O : Type*} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
   {n : Type*} [Fintype n] [DecidableEq n]
   {K : Type*} [Field K] [Algebra O K] [IsFractionRing O K]
 
-private noncomputable def fracInv (K : Type*) [Field K] [Algebra O K] (Φ : Matrix n n O)
-    : (n → O) →ₗ[O] (n → FracMod O K) :=
-  LinearMap.pi fun i =>
-    (1 : Submodule O K).mkQ ∘ₗ LinearMap.toSpanSingleton O K (algebraMap O K Φ.det)⁻¹
-      ∘ₗ LinearMap.proj i ∘ₗ Φ.adjugate.mulVecLin
+private noncomputable def fracInv (K : Type*) [Field K] [Algebra O K] (Φ : Matrix n n O) :
+    (n → O) →ₗ[O] (n → FracMod O K) :=
+  LinearMap.pi fun i => (1 : Submodule O K).mkQ ∘ₗ
+    LinearMap.toSpanSingleton O K (algebraMap O K Φ.det)⁻¹ ∘ₗ LinearMap.proj i ∘ₗ
+      Φ.adjugate.mulVecLin
 
 omit [IsDomain O] [IsDiscreteValuationRing O] [IsFractionRing O K] in
-private theorem fracInv_apply (Φ : Matrix n n O) (y : n → O) (i : n)
-    : fracInv K Φ y i = (1 : Submodule O K).mkQ ((Φ.adjugate *ᵥ y) i • (algebraMap O K Φ.det)⁻¹) :=
-  rfl
+private theorem fracInv_apply (Φ : Matrix n n O) (y : n → O) (i : n) :
+    fracInv K Φ y i =
+      (1 : Submodule O K).mkQ ((Φ.adjugate *ᵥ y) i • (algebraMap O K Φ.det)⁻¹) := rfl
 
 omit [IsDomain O] [IsDiscreteValuationRing O] [IsFractionRing O K] in
-private theorem mkQ_eq_zero_iff (z : K)
-    : (1 : Submodule O K).mkQ z = 0 ↔ ∃ y : O, algebraMap O K y = z := by
+private theorem mkQ_eq_zero_iff (z : K) :
+    (1 : Submodule O K).mkQ z = 0 ↔ ∃ y : O, algebraMap O K y = z := by
   rw [Submodule.mkQ_apply, Submodule.Quotient.mk_eq_zero, Submodule.mem_one]
 
 omit [IsDiscreteValuationRing O] in
-private theorem ker_fracInv (Φ : Matrix n n O) (h : Φ.det ≠ 0)
-    : LinearMap.ker (fracInv K Φ) = LinearMap.range Φ.mulVecLin := by
+private theorem ker_fracInv (Φ : Matrix n n O) (h : Φ.det ≠ 0) :
+    LinearMap.ker (fracInv K Φ) = LinearMap.range Φ.mulVecLin := by
   have hK : algebraMap O K Φ.det ≠ 0 := fun h0 =>
     h (IsFractionRing.injective O K (by rw [h0, map_zero]))
   ext y
   rw [LinearMap.mem_ker, LinearMap.mem_range]
   constructor
   · intro hy
-    have : ∀ i, ∃ x : O, algebraMap O K x = (Φ.adjugate *ᵥ y) i • (algebraMap O K Φ.det)⁻¹ :=
-      fun i => (mkQ_eq_zero_iff _).1 (congrFun hy i)
+    have : ∀ i, ∃ x : O, algebraMap O K x =
+        (Φ.adjugate *ᵥ y) i • (algebraMap O K Φ.det)⁻¹ := fun i =>
+      (mkQ_eq_zero_iff _).1 (congrFun hy i)
     choose x hx using this
     have h1 : Φ.det • x = Φ.adjugate *ᵥ y := by
       funext i
@@ -49,21 +97,21 @@ private theorem ker_fracInv (Φ : Matrix n n O) (h : Φ.det ≠ 0)
       field_simp
     refine ⟨x, ?_⟩
     have h2 : Φ.det • (Φ *ᵥ x) = Φ.det • y := by
-      rw [← Matrix.mulVec_smul, h1, Matrix.mulVec_mulVec, Matrix.mul_adjugate, Matrix.smul_mulVec,
-        Matrix.one_mulVec]
+      rw [← Matrix.mulVec_smul, h1, Matrix.mulVec_mulVec, Matrix.mul_adjugate,
+        Matrix.smul_mulVec, Matrix.one_mulVec]
     funext i
     exact mul_left_cancel₀ h (congrFun h2 i)
   · rintro ⟨x, rfl⟩
     funext i
     rw [fracInv_apply, Pi.zero_apply, mkQ_eq_zero_iff]
     refine ⟨x i, ?_⟩
-    rw [Matrix.mulVecLin_apply, Matrix.mulVec_mulVec, Matrix.adjugate_mul, Matrix.smul_mulVec,
-      Matrix.one_mulVec, Pi.smul_apply, smul_eq_mul, Algebra.smul_def, map_mul]
+    rw [Matrix.mulVecLin_apply, Matrix.mulVec_mulVec, Matrix.adjugate_mul,
+      Matrix.smul_mulVec, Matrix.one_mulVec, Pi.smul_apply, smul_eq_mul, Algebra.smul_def, map_mul]
     field_simp
 
 omit [IsDomain O] [IsDiscreteValuationRing O] in
-private theorem range_fracInv (Φ : Matrix n n O) (h : Φ.det ≠ 0)
-    : LinearMap.range (fracInv K Φ) = H1c Φ (FracMod O K) := by
+private theorem range_fracInv (Φ : Matrix n n O) (h : Φ.det ≠ 0) :
+    LinearMap.range (fracInv K Φ) = H1c Φ (FracMod O K) := by
   have hK : algebraMap O K Φ.det ≠ 0 := fun h0 =>
     h (IsFractionRing.injective O K (by rw [h0, map_zero]))
   ext w
@@ -72,8 +120,8 @@ private theorem range_fracInv (Φ : Matrix n n O) (h : Φ.det ≠ 0)
   · rintro ⟨y, rfl⟩
     funext i
     rw [coefMap_apply, Pi.zero_apply]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [fracInv_apply, ← map_smul, ← map_sum]
+
+    simp only [fracInv_apply, ← map_smul, ← map_sum]
     rw [mkQ_eq_zero_iff]
     refine ⟨y i, ?_⟩
     simp only [smul_smul, ← Finset.sum_smul]
@@ -87,8 +135,8 @@ private theorem range_fracInv (Φ : Matrix n n O) (h : Φ.det ≠ 0)
   · intro hw
     choose z hz using fun i => (1 : Submodule O K).mkQ_surjective (w i)
     have : ∀ i, ∃ y : O, algebraMap O K y = ∑ j, Φ i j • z j := fun i => by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [← mkQ_eq_zero_iff, map_sum]
+
+      rw [← mkQ_eq_zero_iff, map_sum]
       have := congrFun hw i
       rw [coefMap_apply, Pi.zero_apply] at this
       simpa only [map_smul, hz] using this
@@ -97,18 +145,19 @@ private theorem range_fracInv (Φ : Matrix n n O) (h : Φ.det ≠ 0)
     rw [fracInv_apply, ← hz]
     congr 1
     have h3 : algebraMap O K ((Φ.adjugate *ᵥ y) i) = algebraMap O K Φ.det * z i := by
-      have h4 : algebraMap O K ((Φ.adjugate *ᵥ y) i) = ∑ k, (Φ.adjugate * Φ) i k • z k := by
-        set_option synthInstance.maxHeartbeats 100000 in
-          simp only [Matrix.mulVec, dotProduct, map_sum, map_mul, hy, Matrix.mul_apply,
-            Finset.sum_smul, ← Algebra.smul_def, Finset.smul_sum, smul_smul]
+      have h4 : algebraMap O K ((Φ.adjugate *ᵥ y) i) =
+          ∑ k, (Φ.adjugate * Φ) i k • z k := by
+
+        simp only [Matrix.mulVec, dotProduct, map_sum, map_mul, hy, Matrix.mul_apply,
+        Finset.sum_smul, ← Algebra.smul_def, Finset.smul_sum, smul_smul]
         exact Finset.sum_comm
       rw [h4, Matrix.adjugate_mul, ← Algebra.smul_def]
       simp [Matrix.one_apply, ite_smul]
     rw [Algebra.smul_def, h3]
     field_simp
 
-private theorem length_kernel_fraction_module_of_det_ne_zero (Φ : Matrix n n O) (h : Φ.det ≠ 0)
-    : Module.length O (H1c Φ (FracMod O K)) = IsDiscreteValuationRing.addVal O Φ.det := by
+private theorem length_kernel_fraction_module_of_det_ne_zero (Φ : Matrix n n O) (h : Φ.det ≠ 0) :
+    Module.length O (H1c Φ (FracMod O K)) = IsDiscreteValuationRing.addVal O Φ.det := by
   rw [← length_cokernel_eq_addVal_det, ← range_fracInv Φ h,
     ← (fracInv K Φ).quotKerEquivRange.length_eq]
   exact (Submodule.quotEquivOfEq _ _ (ker_fracInv Φ h)).length_eq
@@ -118,15 +167,14 @@ private theorem length_fracMod : Module.length O (Unit → FracMod O K) = ⊤ :=
   rw [ENat.eq_top_iff_forall_ge]
   intro k
   have hd : (Matrix.of fun (_ _ : Unit) => ϖ ^ k).det = ϖ ^ k := by simp
-  have :=
-    length_kernel_fraction_module_of_det_ne_zero (K := K) (Matrix.of fun (_ _ : Unit) => ϖ ^ k)
-      (by rw [hd]; exact pow_ne_zero _ hϖ.ne_zero)
+  have := length_kernel_fraction_module_of_det_ne_zero (K := K) (Matrix.of fun (_ _ : Unit) => ϖ ^ k)
+    (by rw [hd]; exact pow_ne_zero _ hϖ.ne_zero)
   rw [hd, hϖ.addVal_pow] at this
   rw [← this]
   exact Module.length_le_of_injective _ (Submodule.subtype_injective _)
 
-theorem length_kernel_fraction_module_eq_addVal_det (Φ : Matrix n n O)
-    : Module.length O (H1c Φ (FracMod O K)) = IsDiscreteValuationRing.addVal O Φ.det := by
+theorem length_kernel_fraction_module_eq_addVal_det (Φ : Matrix n n O) :
+    Module.length O (H1c Φ (FracMod O K)) = IsDiscreteValuationRing.addVal O Φ.det := by
   by_cases h : Φ.det = 0
   · rw [h, IsDiscreteValuationRing.addVal_zero, eq_top_iff, ← length_fracMod (O := O) (K := K)]
     obtain ⟨v, hv, hΦ⟩ := Matrix.exists_mulVec_eq_zero_iff.2 h

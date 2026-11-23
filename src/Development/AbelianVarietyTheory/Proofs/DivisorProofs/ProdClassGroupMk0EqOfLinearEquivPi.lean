@@ -1,6 +1,51 @@
 module
 
-public import Mathlib
+public import Mathlib.CategoryTheory.Category.Basic
+public import Mathlib.RingTheory.ClassGroup.Basic
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+public import Mathlib.RingTheory.Ideal.BigOperators
 
 @[expose] public section
 
@@ -10,12 +55,11 @@ namespace GlobalTheory.DetClass
 
 variable {R : Type} [CommRing R] {ι : Type} [Fintype ι] [DecidableEq ι]
 
-def mat {I J : ι → Ideal R} (φ : ((i : ι) → I i) →ₗ[R] ((i : ι) → J i)) (a : (i : ι) → I i)
-    : Matrix ι ι R := fun j i =>
-  (φ (Pi.single i (a i)) j : R)
+def mat {I J : ι → Ideal R} (φ : ((i : ι) → I i) →ₗ[R] ((i : ι) → J i)) (a : (i : ι) → I i) :
+    Matrix ι ι R := fun j i => (φ (Pi.single i (a i)) j : R)
 
-theorem det_mem {I J : ι → Ideal R} (φ : ((i : ι) → I i) →ₗ[R] ((i : ι) → J i)) (a : (i : ι) → I i)
-    : (mat φ a).det ∈ ∏ j, J j := by
+theorem det_mem {I J : ι → Ideal R} (φ : ((i : ι) → I i) →ₗ[R] ((i : ι) → J i))
+    (a : (i : ι) → I i) : (mat φ a).det ∈ ∏ j, J j := by
   rw [Matrix.det_apply]
   refine Ideal.sum_mem _ fun σ _ => ?_
   rw [Units.smul_def]
@@ -24,17 +68,15 @@ theorem det_mem {I J : ι → Ideal R} (φ : ((i : ι) → I i) →ₗ[R] ((i : 
     Ideal.prod_mem_prod fun i _ => (φ (Pi.single i (a i)) (σ i)).2
   rwa [Equiv.prod_comp σ J] at h
 
-theorem det_swap
-    {I J : ι → Ideal R} (φ : ((i : ι) → I i) →ₗ[R] ((i : ι) → J i)) (a b : (i : ι) → I i)
-    : (∏ i, (b i : R)) * (mat φ a).det = (∏ i, (a i : R)) * (mat φ b).det := by
-  have key
-      : mat φ a * Matrix.diagonal (fun i => (b i : R))
-        = mat φ b * Matrix.diagonal (fun i => (a i : R)) := by
+theorem det_swap {I J : ι → Ideal R} (φ : ((i : ι) → I i) →ₗ[R] ((i : ι) → J i))
+    (a b : (i : ι) → I i) :
+    (∏ i, (b i : R)) * (mat φ a).det = (∏ i, (a i : R)) * (mat φ b).det := by
+  have key : mat φ a * Matrix.diagonal (fun i => (b i : R))
+      = mat φ b * Matrix.diagonal (fun i => (a i : R)) := by
     ext j i
     simp only [Matrix.mul_diagonal, mat]
-    have h1
-        : (b i : R) • (Pi.single i (a i) : (k : ι) → I k)
-          = (a i : R) • (Pi.single i (b i) : (k : ι) → I k) := by
+    have h1 : (b i : R) • (Pi.single i (a i) : (k : ι) → I k)
+        = (a i : R) • (Pi.single i (b i) : (k : ι) → I k) := by
       funext k
       by_cases hk : k = i
       · subst hk
@@ -49,9 +91,9 @@ theorem det_swap
   rw [mul_comm, h, mul_comm]
 
 open Pointwise in
-theorem span_mul_le
-    {I J : ι → Ideal R} (φ : ((i : ι) → I i) →ₗ[R] ((i : ι) → J i)) (b : (i : ι) → I i)
-    : Ideal.span {(mat φ b).det} * ∏ i, I i ≤ Ideal.span {∏ i, (b i : R)} * ∏ j, J j := by
+theorem span_mul_le {I J : ι → Ideal R} (φ : ((i : ι) → I i) →ₗ[R] ((i : ι) → J i))
+    (b : (i : ι) → I i) :
+    Ideal.span {(mat φ b).det} * ∏ i, I i ≤ Ideal.span {∏ i, (b i : R)} * ∏ j, J j := by
   rw [Ideal.span_singleton_mul_le_iff]
   intro z hz
   have hP : ∏ i, I i = Submodule.span R (∏ i, (I i : Set R)) := by
@@ -65,8 +107,7 @@ theorem span_mul_le
     simp only at hs
     rw [mul_comm ((mat φ b).det), ← hs]
     exact Ideal.mul_mem_mul (Ideal.mem_span_singleton_self _) (det_mem φ _)
-  | zero =>
-    simp
+  | zero => simp
   | add x y _ _ hx hy =>
     rw [mul_add]
     exact Ideal.add_mem _ hx hy
@@ -74,18 +115,15 @@ theorem span_mul_le
     rw [smul_eq_mul, mul_left_comm]
     exact Ideal.mul_mem_left _ r hx
 
-theorem mat_mul
-    {I J : ι → Ideal R} (φ : ((i : ι) → I i) ≃ₗ[R] ((i : ι) → J i))
-    (c : R) (hI : ∀ i, c ∈ I i) (hJ : ∀ i, c ∈ J i)
-    : mat φ.symm.toLinearMap (fun i => ⟨c, hJ i⟩) * mat φ.toLinearMap (fun i => ⟨c, hI i⟩)
+theorem mat_mul {I J : ι → Ideal R} (φ : ((i : ι) → I i) ≃ₗ[R] ((i : ι) → J i))
+    (c : R) (hI : ∀ i, c ∈ I i) (hJ : ∀ i, c ∈ J i) :
+    mat φ.symm.toLinearMap (fun i => ⟨c, hJ i⟩) * mat φ.toLinearMap (fun i => ⟨c, hI i⟩)
       = Matrix.diagonal fun _ => c * c := by
   ext j k
   simp only [Matrix.mul_apply, mat, Matrix.diagonal_apply, LinearEquiv.coe_coe]
   set v := φ (Pi.single k ⟨c, hI k⟩) with hv
-  have hsw
-      : ∀ i,
-        (v i : R) • (Pi.single i ⟨c, hJ i⟩ : (l : ι) → J l)
-          = c • (Pi.single i (v i) : (l : ι) → J l) := by
+  have hsw : ∀ i, (v i : R) • (Pi.single i ⟨c, hJ i⟩ : (l : ι) → J l)
+      = c • (Pi.single i (v i) : (l : ι) → J l) := by
     intro i
     funext l
     by_cases hl : l = i
@@ -96,10 +134,9 @@ theorem mat_mul
   have hsum : ∑ i, (v i : R) • (Pi.single i ⟨c, hJ i⟩ : (l : ι) → J l) = c • v := by
     simp_rw [hsw, ← Finset.smul_sum, Finset.univ_sum_single]
   have h := congrArg (fun x => ((φ.symm x) j : R)) hsum
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, map_smul, hv, LinearEquiv.symm_apply_apply, Finset.sum_apply, Pi.smul_apply,
-        Submodule.coe_sum, Submodule.coe_smul, smul_eq_mul]
-      at h
+
+  simp only [map_sum, map_smul, hv, LinearEquiv.symm_apply_apply, Finset.sum_apply,
+  Pi.smul_apply, Submodule.coe_sum, Submodule.coe_smul, smul_eq_mul] at h
   simp_rw [mul_comm _ ((v _ : J _) : R)]
   rw [h]
   by_cases hjk : j = k
@@ -107,11 +144,10 @@ theorem mat_mul
     simp
   · simp [hjk]
 
-theorem exists_span_mul_eq
-    [IsDomain R]
-    {I J : ι → Ideal R} (φ : ((i : ι) → I i) ≃ₗ[R] ((i : ι) → J i))
-    (c : R) (hc0 : c ≠ 0) (hI : ∀ i, c ∈ I i) (hJ : ∀ i, c ∈ J i)
-    : ∃ x y : R, x ≠ 0 ∧ y ≠ 0 ∧ Ideal.span {x} * ∏ i, I i = Ideal.span {y} * ∏ i, J i := by
+theorem exists_span_mul_eq [IsDomain R] {I J : ι → Ideal R}
+    (φ : ((i : ι) → I i) ≃ₗ[R] ((i : ι) → J i))
+    (c : R) (hc0 : c ≠ 0) (hI : ∀ i, c ∈ I i) (hJ : ∀ i, c ∈ J i) :
+    ∃ x y : R, x ≠ 0 ∧ y ≠ 0 ∧ Ideal.span {x} * ∏ i, I i = Ideal.span {y} * ∏ i, J i := by
   set d : R := ∏ _i : ι, c with hd
   have h1 := span_mul_le φ.toLinearMap (fun i => ⟨c, hI i⟩)
   have h2 := span_mul_le φ.symm.toLinearMap (fun i => ⟨c, hJ i⟩)
@@ -136,28 +172,24 @@ theorem exists_span_mul_eq
 
 end GlobalTheory.DetClass
 
+
 open GlobalTheory.DetClass in
-theorem GlobalTheory.prod_classGroup_mk0_eq_of_pi_linearEquiv
-    (R : Type) [CommRing R] [IsDedekindDomain R]
-    (ι : Type) [Fintype ι]
-    (I J : ι → (Ideal R)⁰)
-    (h : Nonempty (((i : ι) → (I i : Ideal R)) ≃ₗ[R] ((i : ι) → (J i : Ideal R))))
-    : ∏ i, ClassGroup.mk0 (I i) = ∏ i, ClassGroup.mk0 (J i) := by
+theorem GlobalTheory.prod_classGroup_mk0_eq_of_pi_linearEquiv (R : Type) [CommRing R] [IsDedekindDomain R]
+    (ι : Type) [Fintype ι] (I J : ι → (Ideal R)⁰)
+    (h : Nonempty (((i : ι) → (I i : Ideal R)) ≃ₗ[R] ((i : ι) → (J i : Ideal R)))) :
+    ∏ i, ClassGroup.mk0 (I i) = ∏ i, ClassGroup.mk0 (J i) := by
   classical
   obtain ⟨φ⟩ := h
   have hne : ∀ K : (Ideal R)⁰, ∃ e : R, e ∈ (K : Ideal R) ∧ e ≠ 0 := fun K =>
     Submodule.exists_mem_ne_zero_of_ne_bot (nonZeroDivisors.coe_ne_zero K)
   choose e he he0 using hne
   set c : R := (∏ i, e (I i)) * ∏ i, e (J i) with hc
-  have hc0 : c ≠ 0 :=
-    mul_ne_zero (Finset.prod_ne_zero_iff.mpr fun i _ => he0 _)
-      (Finset.prod_ne_zero_iff.mpr fun i _ => he0 _)
+  have hc0 : c ≠ 0 := mul_ne_zero (Finset.prod_ne_zero_iff.mpr fun i _ => he0 _)
+    (Finset.prod_ne_zero_iff.mpr fun i _ => he0 _)
   have hI : ∀ i, c ∈ (I i : Ideal R) := fun i =>
-    Ideal.mul_mem_right _ _
-      (Ideal.mem_of_dvd _ (Finset.dvd_prod_of_mem _ (Finset.mem_univ i)) (he _))
+    Ideal.mul_mem_right _ _ (Ideal.mem_of_dvd _ (Finset.dvd_prod_of_mem _ (Finset.mem_univ i)) (he _))
   have hJ : ∀ i, c ∈ (J i : Ideal R) := fun i =>
-    Ideal.mul_mem_left _ _
-      (Ideal.mem_of_dvd _ (Finset.dvd_prod_of_mem _ (Finset.mem_univ i)) (he _))
+    Ideal.mul_mem_left _ _ (Ideal.mem_of_dvd _ (Finset.dvd_prod_of_mem _ (Finset.mem_univ i)) (he _))
   obtain ⟨x, y, hx, hy, hxy⟩ := exists_span_mul_eq φ c hc0 hI hJ
   rw [← map_prod, ← map_prod, ClassGroup.mk0_eq_mk0_iff]
   refine ⟨x, y, hx, hy, ?_⟩

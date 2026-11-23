@@ -1,8 +1,6 @@
 module
 
 public import Mathlib.LinearAlgebra.Matrix.NonsingularInverse
-public import Mathlib.Data.Matrix.Block
-public import Mathlib.Algebra.BigOperators.Fin
 
 @[expose] public section
 
@@ -74,8 +72,8 @@ theorem extM_spec
   have hz : (fun a => φ (z a)) = B.map φ *ᵥ Pi.single (Fin.last n) 1 := by
     rw [← hBz]
     ext a
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [Matrix.mulVec, dotProduct, map_apply, map_sum, map_mul]
+
+    simp only [Matrix.mulVec, dotProduct, map_apply, map_sum, map_mul]
     refine Finset.sum_congr rfl fun k _ => ?_
     congr 1
     by_cases hk : k = Fin.last n

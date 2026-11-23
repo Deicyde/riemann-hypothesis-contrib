@@ -1,8 +1,47 @@
 module
 
-public import Mathlib
 public import Development.WeilBound.RepresentationTheoryGL.GaloisPermutationReps.SubquotientEquivalence.IsTypeMap
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.IsIrreducibleIffOfLinearEquiv
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
@@ -10,8 +49,7 @@ noncomputable section
 
 open NumberField IsDedekindDomain ValuativeRel Matrix Polynomial
 open Formalism.ConjugateSelfDual ReciprocityTheory.Gal
-open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL
-  GlobalTheory.WeilDeligne GlobalTheory.LocLanglands
+open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL GlobalTheory.WeilDeligne GlobalTheory.LocLanglands
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
@@ -23,11 +61,9 @@ section Entries
 
 variable {R : Type} [CommRing R] {s N : ℕ} {d : Fin s → ℕ} {e : (Σ a, Fin (d a)) ≃ Fin N}
 
-theorem mem_unipotent_radical_iff_alt {u : GL (Fin N) R}
-    : u ∈ unipRad R e
-      ↔ ∀ i j,
-        ¬ blk e i < blk e j
-          → (u : Matrix (Fin N) (Fin N) R) i j = (1 : Matrix (Fin N) (Fin N) R) i j := by
+theorem mem_unipotent_radical_iff_alt {u : GL (Fin N) R} :
+    u ∈ unipRad R e ↔
+      ∀ i j, ¬ blk e i < blk e j → (u : Matrix (Fin N) (Fin N) R) i j = (1 : Matrix (Fin N) (Fin N) R) i j := by
   rw [mem_unipRad, mem_parab]
   constructor
   · rintro ⟨hP, hD⟩ i j hij
@@ -60,15 +96,13 @@ theorem exists_block_lt_of_ne_bot (h : unipRad R e ≠ ⊥) : ∃ i j, blk e i <
   rw [Units.val_one]
   exact (mem_unipotent_radical_iff_alt.1 hu) i j (not_lt.2 (hc i j))
 
-theorem unipotent_radical_ne_bot {K : Type} [Field K] (h : ∃ i j, blk e i < blk e j)
-    : unipRad K e ≠ ⊥ := by
+theorem unipotent_radical_ne_bot {K : Type} [Field K] (h : ∃ i j, blk e i < blk e j) : unipRad K e ≠ ⊥ := by
   obtain ⟨i, j, hij⟩ := h
   have hne : i ≠ j := by
     rintro rfl
     exact lt_irrefl _ hij
-  let t : GL (Fin N) K :=
-    Matrix.GeneralLinearGroup.mkOfDetNeZero (Matrix.transvection i j 1)
-      (by rw [Matrix.det_transvection_of_ne _ _ hne]; exact one_ne_zero)
+  let t : GL (Fin N) K := Matrix.GeneralLinearGroup.mkOfDetNeZero (Matrix.transvection i j 1)
+    (by rw [Matrix.det_transvection_of_ne _ _ hne]; exact one_ne_zero)
   have ht : t ∈ unipRad K e := by
     rw [mem_unipotent_radical_iff_alt]
     intro a b hab
@@ -88,25 +122,18 @@ end Entries
 
 section Local
 
-variable
-  {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
   {s N : ℕ} {d : Fin s → ℕ} {e : (Σ a, Fin (d a)) ≃ Fin N}
 
-theorem exists_lift_unipotent_radical (u : GL (Fin N) 𝓀[k]) (hu : u ∈ unipRad 𝓀[k] e)
-    : ∃ g : KO k (Fin N), redK k (Fin N) g = u ∧ (g : GL (Fin N) k) ∈ unipRad k e := by
+theorem exists_lift_unipotent_radical (u : GL (Fin N) 𝓀[k]) (hu : u ∈ unipRad 𝓀[k] e) :
+    ∃ g : KO k (Fin N), redK k (Fin N) g = u ∧ (g : GL (Fin N) k) ∈ unipRad k e := by
   classical
-  obtain ⟨r, hr⟩ : ∃ r : 𝓀[k] → 𝒪[k], ∀ x, IsLocalRing.residue 𝒪[k] (r x) = x := ⟨
-    Function.surjInv IsLocalRing.residue_surjective,
-    Function.surjInv_eq IsLocalRing.residue_surjective
-  ⟩
+  obtain ⟨r, hr⟩ : ∃ r : 𝓀[k] → 𝒪[k], ∀ x, IsLocalRing.residue 𝒪[k] (r x) = x :=
+    ⟨Function.surjInv IsLocalRing.residue_surjective, Function.surjInv_eq IsLocalRing.residue_surjective⟩
   let M : Matrix (Fin N) (Fin N) 𝒪[k] := fun a b =>
-    if blk e a < blk e b then
-      r ((u : Matrix (Fin N) (Fin N) 𝓀[k]) a b)
-    else
-      (1 : Matrix (Fin N) (Fin N) 𝒪[k]) a b
-  have hM
-      : ∀ a b,
-        ¬ blk e a < blk e b → M a b = (1 : Matrix (Fin N) (Fin N) 𝒪[k]) a b := fun a b h => by
+    if blk e a < blk e b then r ((u : Matrix (Fin N) (Fin N) 𝓀[k]) a b)
+    else (1 : Matrix (Fin N) (Fin N) 𝒪[k]) a b
+  have hM : ∀ a b, ¬ blk e a < blk e b → M a b = (1 : Matrix (Fin N) (Fin N) 𝒪[k]) a b := fun a b h => by
     simp only [M, ite_eq_right h]
   have hT : M.BlockTriangular (blk e) := fun a b hab => by
     rw [hM a b (not_lt.2 hab.le), Matrix.one_apply_ne]
@@ -138,45 +165,40 @@ theorem exists_lift_unipotent_radical (u : GL (Fin N) 𝓀[k]) (hu : u ∈ unipR
     rw [hM a b h, Matrix.one_apply, Matrix.one_apply]
     split_ifs <;> simp
 
-theorem lift_mem_twisted_kernel
-    {W V : Type} [AddCommGroup W] [Module ℂ W] [AddCommGroup V] [Module ℂ V]
-    (τ : Representation ℂ (GL (Fin N) 𝓀[k]) W) (ρ : Representation ℂ (GL (Fin N) k) V)
-    (j : W →ₗ[ℂ] V)
+theorem lift_mem_twisted_kernel {W V : Type} [AddCommGroup W] [Module ℂ W] [AddCommGroup V] [Module ℂ V]
+    (τ : Representation ℂ (GL (Fin N) 𝓀[k]) W) (ρ : Representation ℂ (GL (Fin N) k) V) (j : W →ₗ[ℂ] V)
     (hj : ∀ (g : KO k (Fin N)) (v : W), j (τ (redK k (Fin N) g) v) = ρ (g : GL (Fin N) k) (j v))
-    (hCF : ∀ v : W, (∀ u ∈ unipRad 𝓀[k] e, τ u v = v) → v = 0) (x : W)
-    : j x ∈ twKer ρ (unipRad k e) 1 := by
+    (hCF : ∀ v : W, (∀ u ∈ unipRad 𝓀[k] e, τ u v = v) → v = 0) (x : W) :
+    j x ∈ twKer ρ (unipRad k e) 1 := by
   classical
   have : Finite (GL (Fin N) 𝓀[k]) :=
-    Finite.of_injective
-      (fun g : GL (Fin N) 𝓀[k] => fun i j => (g : Matrix (Fin N) (Fin N) 𝓀[k]) i j)
+    Finite.of_injective (fun g : GL (Fin N) 𝓀[k] => fun i j => (g : Matrix (Fin N) (Fin N) 𝓀[k]) i j)
       (fun a b h => Units.ext (Matrix.ext fun i j => congrFun (congrFun h i) j))
   let _ : Fintype (unipRad 𝓀[k] e) := Fintype.ofFinite _
   let y : W := ∑ u : unipRad 𝓀[k] e, τ u x
   have hy : y = 0 := by
     apply hCF
     intro u hu
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [y, map_sum]
-    rw [show (∑ v : unipRad 𝓀[k] e, τ u (τ v x))
-        = ∑ v : unipRad 𝓀[k] e, τ ((⟨u, hu⟩ * v : unipRad 𝓀[k] e) : GL (Fin N) 𝓀[k]) x from
+
+    simp only [y, map_sum]
+    rw [show (∑ v : unipRad 𝓀[k] e, τ u (τ v x)) =
+        ∑ v : unipRad 𝓀[k] e, τ ((⟨u, hu⟩ * v : unipRad 𝓀[k] e) : GL (Fin N) 𝓀[k]) x from
       Finset.sum_congr rfl fun v _ => by rw [Subgroup.coe_mul, map_mul, mul_apply_eq_comp]]
     exact Fintype.sum_equiv (Equiv.mulLeft (⟨u, hu⟩ : unipRad 𝓀[k] e)) _ _ fun v => rfl
   choose lf hlf using fun u : unipRad 𝓀[k] e => exists_lift_unipotent_radical (e := e) u.1 u.2
-  have hsum
-      : ∑ u : unipRad 𝓀[k] e, (j x - ρ ((lf u : KO k (Fin N)) : GL (Fin N) k) (j x))
-        ∈ twKer ρ (unipRad k e) 1 := by
+  have hsum : ∑ u : unipRad 𝓀[k] e, (j x - ρ ((lf u : KO k (Fin N)) : GL (Fin N) k) (j x)) ∈
+      twKer ρ (unipRad k e) 1 := by
     refine Submodule.sum_mem _ fun u _ => ?_
     have : ρ ((lf u : KO k (Fin N)) : GL (Fin N) k) (j x) - j x ∈ twKer ρ (unipRad k e) 1 :=
       Submodule.subset_span ⟨⟨_, (hlf u).2⟩, j x, by simp⟩
     rw [← neg_sub]
     exact neg_mem this
-  have h2
-      : ∑ u : unipRad 𝓀[k] e, (j x - ρ ((lf u : KO k (Fin N)) : GL (Fin N) k) (j x))
-        = (Fintype.card (unipRad 𝓀[k] e) : ℂ) • j x := by
+  have h2 : ∑ u : unipRad 𝓀[k] e, (j x - ρ ((lf u : KO k (Fin N)) : GL (Fin N) k) (j x)) =
+      (Fintype.card (unipRad 𝓀[k] e) : ℂ) • j x := by
     rw [Finset.sum_sub_distrib]
     have : ∑ u : unipRad 𝓀[k] e, ρ ((lf u : KO k (Fin N)) : GL (Fin N) k) (j x) = j y := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [y, map_sum]
+
+      simp only [y, map_sum]
       refine Finset.sum_congr rfl fun u _ => ?_
       rw [← hj, (hlf u).1]
     rw [this, hy, map_zero, sub_zero, Finset.sum_const, Finset.card_univ, Nat.cast_smul_eq_nsmul]
@@ -188,6 +210,7 @@ theorem lift_mem_twisted_kernel
 end Local
 
 end L5
+
 
 open L5 in
 theorem st5 : St5 := by
@@ -216,8 +239,7 @@ theorem st5 : St5 := by
     obtain ⟨p, w, hw, rfl⟩ := GlobalTheory.SmGL.MultiIrr.exists_parab_mul e h
     rw [map_mul, mul_apply_eq_comp,
       show π.ρ w (j x) = j (τ (redK k (Fin n) ⟨w, hw⟩) x) from (hj.2 ⟨w, hw⟩ x).symm]
-    exact twKer_le_comap π.ρ _ p (parab_le_normalizer k e p.2)
-      (lift_mem_twisted_kernel τ π.ρ j hj.2 hCF _)
+    exact twKer_le_comap π.ρ _ p (parab_le_normalizer k e p.2) (lift_mem_twisted_kernel τ π.ρ j hj.2 hCF _)
   have htop : S = ⊤ := by
     let S' : Subrepresentation π.ρ := ⟨S, fun x v hv => hSst x v hv⟩
     rcases π.irr.eq_bot_or_eq_top S' with h | h

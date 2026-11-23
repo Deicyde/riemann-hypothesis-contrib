@@ -1,6 +1,52 @@
 module
 
+public import Development.WeilBound.RepresentationTheoryGL.SiegelWeilProof.HolomorphicContinuation.PolynomialDerivatives.CoreSt
+public import Development.WeilBound.RepresentationTheoryGL.SiegelWeilProof.HolomorphicContinuation.PolynomialDerivatives.ZeroRight
 public import Development.WeilBound.RepresentationTheoryGL.SiegelWeilProof.HolomorphicContinuation.PolynomialDerivatives.SupPerp
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -12,11 +58,9 @@ namespace CoreA
 
 variable {V : Type} [AddCommGroup V] [Module ℂ V] {φ : V → V → ℂ}
 
-theorem adj_closed
-    (h : PosH φ)
-    {ι : Type} (T : ι → Module.End ℂ V) (hT : ∀ i, ∃ j, ∀ v w, φ (T i v) w = φ v (T j w))
-    : ∀ s ∈ Algebra.adjoin ℂ (Set.range T), ∃ s' ∈ Algebra.adjoin ℂ (Set.range T), ∀ v w,
-      φ (s v) w = φ v (s' w) := by
+theorem adj_closed (h : PosH φ) {ι : Type} (T : ι → Module.End ℂ V)
+    (hT : ∀ i, ∃ j, ∀ v w, φ (T i v) w = φ v (T j w)) :
+    ∀ s ∈ Algebra.adjoin ℂ (Set.range T), ∃ s' ∈ Algebra.adjoin ℂ (Set.range T), ∀ v w, φ (s v) w = φ v (s' w) := by
   intro s hs
   induction hs using Algebra.adjoin_induction with
   | mem x hx =>
@@ -40,13 +84,10 @@ theorem adj_closed
     simp only [Module.End.mul_apply]
     rw [hx'', hy'']
 
-theorem orbit
-    [FiniteDimensional ℂ V]
-    (h : PosH φ)
-    {ι : Type} (T : ι → Module.End ℂ V) (hT : ∀ i, ∃ j, ∀ v w, φ (T i v) w = φ v (T j w))
-    (x : Module.End ℂ V) (hx : ∀ t : Module.End ℂ V, (∀ i, t * T i = T i * t) → x * t = t * x)
-    (v : V)
-    : ∃ s ∈ Algebra.adjoin ℂ (Set.range T), x v = s v := by
+theorem orbit [FiniteDimensional ℂ V] (h : PosH φ) {ι : Type} (T : ι → Module.End ℂ V)
+    (hT : ∀ i, ∃ j, ∀ v w, φ (T i v) w = φ v (T j w)) (x : Module.End ℂ V)
+    (hx : ∀ t : Module.End ℂ V, (∀ i, t * T i = T i * t) → x * t = t * x) (v : V) :
+    ∃ s ∈ Algebra.adjoin ℂ (Set.range T), x v = s v := by
   classical
   set S := Algebra.adjoin ℂ (Set.range T) with hS
   let M : Submodule ℂ V := (Subalgebra.toSubmodule S).map (LinearMap.applyₗ v)
@@ -86,7 +127,8 @@ theorem orbit
   have hxP := hx P hPT
   have hvM : v ∈ M := (hM v).2 ⟨1, Subalgebra.one_mem S, rfl⟩
   have hPv : P v = v := by simpa using hPdec v hvM 0 (Submodule.zero_mem _)
-  have hxv : x v = P (x v) := by rw [← Module.End.mul_apply, ← hxP, Module.End.mul_apply, hPv]
+  have hxv : x v = P (x v) := by
+    rw [← Module.End.mul_apply, ← hxP, Module.End.mul_apply, hPv]
   have hmem : P (x v) ∈ M := by
     simp only [P, LinearMap.comp_apply, Submodule.subtype_apply]
     exact Submodule.coe_mem _
@@ -101,8 +143,7 @@ def diag (d : ℕ) : Module.End ℂ V →ₐ[ℂ] Module.End ℂ (Fin d → V) w
   map_add' f g := LinearMap.ext fun w => funext fun k => by simp
   commutes' r := LinearMap.ext fun w => funext fun k => by simp
 
-theorem diag_apply (d : ℕ) (f : Module.End ℂ V) (w : Fin d → V) (k : Fin d)
-    : diag d f w k = f (w k) := by
+theorem diag_apply (d : ℕ) (f : Module.End ℂ V) (w : Fin d → V) (k : Fin d) : diag d f w k = f (w k) := by
   simp [diag]
 
 def amp (φ : V → V → ℂ) (d : ℕ) (v w : Fin d → V) : ℂ := ∑ k, φ (v k) (w k)
@@ -118,13 +159,9 @@ theorem amp_posH (h : PosH φ) (d : ℕ) : PosH (amp φ d) := by
   · intro v hv
     obtain ⟨k, hk⟩ := Function.ne_iff.1 hv
     simp only [amp, Complex.re_sum]
-    calc
-      0 < (φ (v k) (v k)).re := h.pos _ hk
+    calc 0 < (φ (v k) (v k)).re := h.pos _ hk
       _ ≤ ∑ l, (φ (v l) (v l)).re :=
-        Finset.single_le_sum
-          (f := fun l => (φ (v l) (v l)).re)
-          (fun l _ => h.re_nonneg _)
-          (Finset.mem_univ k)
+        Finset.single_le_sum (f := fun l => (φ (v l) (v l)).re) (fun l _ => h.re_nonneg _) (Finset.mem_univ k)
 
 end CoreA
 
@@ -140,12 +177,9 @@ theorem bicomm : Bicomm := by
     intro i
     obtain ⟨j, hj⟩ := hT i
     exact ⟨j, fun v w => by simp only [amp, T', diag_apply, hj]⟩
-  have hx'
-      : ∀ t : Module.End ℂ (Fin d → V),
-        (∀ i, t * T' i = T' i * t) → diag d x * t = t * diag d x := by
+  have hx' : ∀ t : Module.End ℂ (Fin d → V), (∀ i, t * T' i = T' i * t) → diag d x * t = t * diag d x := by
     intro t ht
-    let tt : Fin d → Fin d → Module.End ℂ V := fun k l =>
-      LinearMap.proj k ∘ₗ t ∘ₗ LinearMap.single ℂ (fun _ => V) l
+    let tt : Fin d → Fin d → Module.End ℂ V := fun k l => LinearMap.proj k ∘ₗ t ∘ₗ LinearMap.single ℂ (fun _ => V) l
     have htt : ∀ k l, x * tt k l = tt k l * x := by
       intro k l
       apply hx
@@ -159,17 +193,17 @@ theorem bicomm : Bicomm := by
         · simp [Pi.single_apply, hl]
       have := LinearMap.congr_fun (ht i) (Pi.single l u)
       simp only [Module.End.mul_apply] at this
-      simp only [Module.End.mul_apply, tt, LinearMap.comp_apply, LinearMap.coe_single,
-        LinearMap.coe_proj, Function.eval, hs, this]
+      simp only [Module.End.mul_apply, tt, LinearMap.comp_apply, LinearMap.coe_single, LinearMap.coe_proj,
+        Function.eval, hs, this]
       simp [T', diag_apply]
     have hsum : ∀ w : Fin d → V, ∀ k, t w k = ∑ l, tt k l (w l) := by
       intro w k
       conv_lhs => rw [← Finset.univ_sum_single w]
-      set_option synthInstance.maxHeartbeats 100000 in
+
       simp [tt, map_sum]
     refine LinearMap.ext fun w => funext fun k => ?_
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [Module.End.mul_apply, diag_apply, hsum, map_sum]
+
+    simp only [Module.End.mul_apply, diag_apply, hsum, map_sum]
     refine Finset.sum_congr rfl fun l _ => ?_
     exact LinearMap.congr_fun (htt k l) (w l)
   obtain ⟨s', hs', hs'E⟩ := orbit (amp_posH h d) T' hT' (diag d x) hx' (fun k => e k)

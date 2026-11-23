@@ -1,6 +1,58 @@
 module
 
-public import Mathlib
+public import Mathlib.CategoryTheory.Category.Basic
+public import Mathlib.LinearAlgebra.Matrix.Determinant.Basic
+public import Mathlib.RingTheory.DiscreteValuationRing.Basic
+public import Mathlib.RingTheory.LocalRing.ResidueField.Defs
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
+public import Mathlib.LinearAlgebra.Matrix.Adjugate
+public import Mathlib.LinearAlgebra.Matrix.NonsingularInverse
+public import Mathlib.LinearAlgebra.Matrix.ToLinearEquiv
+public import Mathlib.RingTheory.LocalRing.ResidueField.Basic
 
 @[expose] public section
 
@@ -13,30 +65,28 @@ variable {O : Type*} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
 noncomputable def scaleAt {ι : Type*} [DecidableEq ι] (j : ι) (a : O) : Matrix ι ι O :=
   Matrix.diagonal (Function.update (fun _ => (1 : O)) j a)
 
-theorem det_scaleAt {ι : Type*} [Fintype ι] [DecidableEq ι] (j : ι) (a : O)
-    : (scaleAt j a).det = a := by
+theorem det_scaleAt {ι : Type*} [Fintype ι] [DecidableEq ι] (j : ι) (a : O) :
+    (scaleAt j a).det = a := by
   simp [scaleAt, Matrix.det_diagonal, Function.update_apply, Finset.prod_ite_eq']
 
-theorem range_toLin'_eq_top_of_isUnit_det
-    {ι : Type*} [Fintype ι] [DecidableEq ι] (C : Matrix ι ι O) (h : IsUnit C.det)
-    : LinearMap.range (Matrix.toLin' C) = ⊤ := by
+theorem range_toLin'_eq_top_of_isUnit_det {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (C : Matrix ι ι O) (h : IsUnit C.det) : LinearMap.range (Matrix.toLin' C) = ⊤ := by
   rw [LinearMap.range_eq_top]
   intro y
   refine ⟨C⁻¹ *ᵥ y, ?_⟩
   rw [Matrix.toLin'_apply, Matrix.mulVec_mulVec, Matrix.mul_nonsing_inv _ h, Matrix.one_mulVec]
 
-theorem card_quot_range_of_isUnit_det
-    {ι : Type*} [Fintype ι] [DecidableEq ι] (C : Matrix ι ι O) (h : IsUnit C.det)
-    : Nat.card ((ι → O) ⧸ LinearMap.range (Matrix.toLin' C)) = 1 := by
+theorem card_quot_range_of_isUnit_det {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (C : Matrix ι ι O) (h : IsUnit C.det) :
+    Nat.card ((ι → O) ⧸ LinearMap.range (Matrix.toLin' C)) = 1 := by
   rw [range_toLin'_eq_top_of_isUnit_det C h]
   refine Nat.card_eq_one_iff_unique.mpr ⟨⟨fun a b => ?_⟩, ⟨0⟩⟩
   obtain ⟨x, rfl⟩ := Submodule.Quotient.mk_surjective _ a
   obtain ⟨y, rfl⟩ := Submodule.Quotient.mk_surjective _ b
   exact (Submodule.Quotient.eq _).mpr Submodule.mem_top
 
-theorem injective_toLin'_of_det_ne_zero
-    {ι : Type*} [Fintype ι] [DecidableEq ι] (C : Matrix ι ι O) (h : C.det ≠ 0)
-    : Function.Injective (Matrix.toLin' C) := by
+theorem injective_toLin'_of_det_ne_zero {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (C : Matrix ι ι O) (h : C.det ≠ 0) : Function.Injective (Matrix.toLin' C) := by
   rw [← LinearMap.ker_eq_bot, LinearMap.ker_eq_bot']
   intro x hx
   rw [Matrix.toLin'_apply] at hx
@@ -48,32 +98,29 @@ theorem injective_toLin'_of_det_ne_zero
   rw [Pi.zero_apply, Pi.smul_apply, smul_eq_mul] at h3
   exact (mul_eq_zero.mp h3.symm).resolve_left h
 
-theorem card_quot_range_comp
-    {M : Type*} [AddCommGroup M] [Module O M] (A B : M →ₗ[O] M) (hA : Function.Injective A)
-    : Nat.card (M ⧸ LinearMap.range (A ∘ₗ B))
-      = Nat.card (M ⧸ LinearMap.range B) * Nat.card (M ⧸ LinearMap.range A) := by
-  have h1
-      : (LinearMap.range (A ∘ₗ B)).toAddSubgroup
-        = (LinearMap.range B).toAddSubgroup.map A.toAddMonoidHom := by
+theorem card_quot_range_comp {M : Type*} [AddCommGroup M] [Module O M]
+    (A B : M →ₗ[O] M) (hA : Function.Injective A) :
+    Nat.card (M ⧸ LinearMap.range (A ∘ₗ B)) =
+      Nat.card (M ⧸ LinearMap.range B) * Nat.card (M ⧸ LinearMap.range A) := by
+  have h1 : (LinearMap.range (A ∘ₗ B)).toAddSubgroup =
+      (LinearMap.range B).toAddSubgroup.map A.toAddMonoidHom := by
     rw [LinearMap.range_comp, Submodule.map_toAddSubgroup]
     rfl
   have h2 : A.toAddMonoidHom.range = (LinearMap.range A).toAddSubgroup := by
     ext y
     simp
-  change (LinearMap.range (A ∘ₗ B)).toAddSubgroup.index
-    = (LinearMap.range B).toAddSubgroup.index * (LinearMap.range A).toAddSubgroup.index
+  change (LinearMap.range (A ∘ₗ B)).toAddSubgroup.index =
+    (LinearMap.range B).toAddSubgroup.index * (LinearMap.range A).toAddSubgroup.index
   rw [h1, AddSubgroup.index_map_of_injective _ hA, h2]
 
-theorem card_quot_range_scaleAt
-    {ι : Type*} [Fintype ι] [DecidableEq ι] (ϖ : O) (hϖ : Irreducible ϖ) (j : ι)
-    : Nat.card ((ι → O) ⧸ LinearMap.range (Matrix.toLin' (scaleAt j ϖ)))
-      = Nat.card (IsLocalRing.ResidueField O) := by
+theorem card_quot_range_scaleAt {ι : Type*} [Fintype ι] [DecidableEq ι] (ϖ : O)
+    (hϖ : Irreducible ϖ) (j : ι) :
+    Nat.card ((ι → O) ⧸ LinearMap.range (Matrix.toLin' (scaleAt j ϖ))) =
+      Nat.card (IsLocalRing.ResidueField O) := by
   classical
   have hmax := (IsDiscreteValuationRing.irreducible_iff_uniformizer ϖ).mp hϖ
-  have hrange
-      : LinearMap.range (Matrix.toLin' (scaleAt j ϖ))
-        = LinearMap.ker
-          ((Algebra.linearMap O (IsLocalRing.ResidueField O)) ∘ₗ LinearMap.proj j) := by
+  have hrange : LinearMap.range (Matrix.toLin' (scaleAt j ϖ)) =
+      LinearMap.ker ((Algebra.linearMap O (IsLocalRing.ResidueField O)) ∘ₗ LinearMap.proj j) := by
     ext y
     simp only [LinearMap.mem_range, LinearMap.mem_ker, LinearMap.comp_apply, LinearMap.proj_apply,
       Algebra.linearMap_apply]
@@ -93,20 +140,17 @@ theorem card_quot_range_scaleAt
         exact hc.symm
       · simp
   rw [hrange]
-  have hsurj : Function.Surjective
-      ((Algebra.linearMap O (IsLocalRing.ResidueField O))
-        ∘ₗ (LinearMap.proj j : (ι → O) →ₗ[O] O)) := by
+  have hsurj : Function.Surjective ((Algebra.linearMap O (IsLocalRing.ResidueField O)) ∘ₗ
+      (LinearMap.proj j : (ι → O) →ₗ[O] O)) := by
     intro z
     obtain ⟨a, rfl⟩ := IsLocalRing.residue_surjective z
     exact ⟨Pi.single j a, by simp [IsLocalRing.ResidueField.algebraMap_eq]⟩
   exact Nat.card_congr (LinearMap.quotKerEquivOfSurjective _ hsurj).toEquiv
 
-theorem card_quot_range_toLin_clean
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (ϖ : O) (hϖ : Irreducible ϖ)
-    (C : Matrix ι ι O) (e : ℕ) (w : Oˣ) (hC : C.det = ϖ ^ e * w)
-    : Nat.card ((ι → O) ⧸ LinearMap.range (Matrix.toLin' C))
-      = Nat.card (IsLocalRing.ResidueField O) ^ e := by
+theorem card_quot_range_toLin_clean {ι : Type*} [Fintype ι] [DecidableEq ι] (ϖ : O)
+    (hϖ : Irreducible ϖ) (C : Matrix ι ι O) (e : ℕ) (w : Oˣ) (hC : C.det = ϖ ^ e * w) :
+    Nat.card ((ι → O) ⧸ LinearMap.range (Matrix.toLin' C)) =
+      Nat.card (IsLocalRing.ResidueField O) ^ e := by
   classical
   induction e generalizing C w with
   | zero =>
@@ -117,11 +161,9 @@ theorem card_quot_range_toLin_clean
     have hmax := (IsDiscreteValuationRing.irreducible_iff_uniformizer ϖ).mp hϖ
     have hϖ0 : ϖ ≠ 0 := hϖ.ne_zero
     have hres : IsLocalRing.residue O ϖ = 0 :=
-      (IsLocalRing.residue_eq_zero_iff ϖ).mpr
-        ((IsLocalRing.mem_maximalIdeal _).mpr (mem_nonunits_iff.mpr hϖ.not_isUnit))
+      (IsLocalRing.residue_eq_zero_iff ϖ).mpr ((IsLocalRing.mem_maximalIdeal _).mpr (mem_nonunits_iff.mpr hϖ.not_isUnit))
     have hdetb : (C.map (IsLocalRing.residue O)).det = 0 := by
-      rw [show (C.map (IsLocalRing.residue O)).det = IsLocalRing.residue O C.det from
-          (RingHom.map_det _ _).symm,
+      rw [show (C.map (IsLocalRing.residue O)).det = IsLocalRing.residue O C.det from (RingHom.map_det _ _).symm,
         hC, map_mul, map_pow, hres, zero_pow (Nat.succ_ne_zero e), zero_mul]
     obtain ⟨vb, hvb0, hCvb⟩ := Matrix.exists_mulVec_eq_zero_iff.mpr hdetb
     choose vlift hvlift using fun i => IsLocalRing.residue_surjective (vb i)
@@ -138,7 +180,7 @@ theorem card_quot_range_toLin_clean
         have h3 := congrFun hCvb m
         rw [Pi.zero_apply] at h3
         rw [← h3]
-        set_option synthInstance.maxHeartbeats 100000 in
+
         simp only [Matrix.mulVec, dotProduct, map_sum, map_mul, Matrix.map_apply, hvlift]
       rw [IsLocalRing.residue_eq_zero_iff, hmax, Ideal.mem_span_singleton] at h1
       exact h1
@@ -167,18 +209,15 @@ theorem card_quot_range_toLin_clean
       rw [h1]
       simp only [Units.val_mul, IsUnit.unit_spec]
       ring
-    have hCinj :=
-      injective_toLin'_of_det_ne_zero C
-        (by rw [hC]; exact mul_ne_zero (pow_ne_zero _ hϖ0) w.ne_zero)
-    have hC'inj :=
-      injective_toLin'_of_det_ne_zero C'
-        (by rw [hdetC']; exact mul_ne_zero (pow_ne_zero _ hϖ0) (Units.ne_zero _))
+    have hCinj := injective_toLin'_of_det_ne_zero C
+      (by rw [hC]; exact mul_ne_zero (pow_ne_zero _ hϖ0) w.ne_zero)
+    have hC'inj := injective_toLin'_of_det_ne_zero C'
+      (by rw [hdetC']; exact mul_ne_zero (pow_ne_zero _ hϖ0) (Units.ne_zero _))
     have e1 := card_quot_range_comp (Matrix.toLin' C) (Matrix.toLin' P) hCinj
     have e2 := card_quot_range_comp (Matrix.toLin' C') (Matrix.toLin' (scaleAt i0 ϖ)) hC'inj
     rw [← Matrix.toLin'_mul, hCP, Matrix.toLin'_mul, e2,
-        card_quot_range_of_isUnit_det P (by rw [hdetP]; exact hunit), one_mul,
-        card_quot_range_scaleAt ϖ hϖ i0, ih C' _ hdetC']
-      at e1
+      card_quot_range_of_isUnit_det P (by rw [hdetP]; exact hunit), one_mul,
+      card_quot_range_scaleAt ϖ hϖ i0, ih C' _ hdetC'] at e1
     rw [← e1, pow_succ']
 
 end DVRLatticeIndex

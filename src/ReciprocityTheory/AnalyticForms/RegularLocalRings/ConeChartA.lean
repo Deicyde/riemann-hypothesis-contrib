@@ -1,7 +1,57 @@
 module
 
 public import ReciprocityTheory.AnalyticForms.RegularLocalRings.ProjHyp
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Finiteness.ModuleFinitePresentation
+import Mathlib.RingTheory.KrullDimension.NonZeroDivisors
+public import Mathlib.RingTheory.MvPolynomial.EulerIdentity
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.TotallySplit
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Tactic.TypeStar
 public import ReciprocityTheory.CommutativeAlgebra.PolynomialHeights.HeightAddRingKrullDimQuotientMvPolynomialField
+import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
@@ -9,34 +59,28 @@ namespace ReciprocityTheory.AnForm.R
 
 open MvPolynomial Algebra
 
-theorem ringKrullDim_le_of_forall_quotient
-    {A : Type*} [CommRing A]
-    (d : WithBot ℕ∞) (h : ∀ P : Ideal A, P.IsPrime → ringKrullDim (A ⧸ P) ≤ d)
-    : ringKrullDim A ≤ d := by
+theorem ringKrullDim_le_of_forall_quotient {A : Type*} [CommRing A] (d : WithBot ℕ∞)
+    (h : ∀ P : Ideal A, P.IsPrime → ringKrullDim (A ⧸ P) ≤ d) : ringKrullDim A ≤ d := by
   refine iSup_le fun p => ?_
   let P : Ideal A := (p.toFun 0).asIdeal
   have hP : P.IsPrime := (p.toFun 0).isPrime
   have hmem : ∀ i, p.toFun i ∈ PrimeSpectrum.zeroLocus (P : Set A) := fun i =>
     (PrimeSpectrum.mem_zeroLocus _ _).2
       ((PrimeSpectrum.asIdeal_le_asIdeal _ _).2 (p.monotone (Fin.zero_le i)))
-  let q : LTSeries (PrimeSpectrum.zeroLocus (P : Set A)) := {
-    length := p.length
-    toFun := fun i => ⟨p.toFun i, hmem i⟩
-    step := fun i => p.step i
-  }
+  let q : LTSeries (PrimeSpectrum.zeroLocus (P : Set A)) :=
+    { length := p.length, toFun := fun i => ⟨p.toFun i, hmem i⟩, step := fun i => p.step i }
   exact (Order.LTSeries.length_le_krullDim q).trans
     ((ringKrullDim_quotient P).symm.le.trans (h P hP))
 
 theorem ptIdealOf_isMaximal {σ : Type} (z : σ → ℂ) : (ptIdealOf z).IsMaximal :=
   RingHom.ker_isMaximal_of_surjective _ fun x => ⟨MvPolynomial.C x, MvPolynomial.eval_C x⟩
 
-theorem ringKrullDim_locAt
-    {σ : Type} (J : Ideal (MvPolynomial σ ℂ)) (z : σ → ℂ) (hJ : J ≤ ptIdealOf z)
-    : ringKrullDim (locAt J z) = ((ptIdealOf z).map (Ideal.Quotient.mk J)).height := by
+theorem ringKrullDim_locAt {σ : Type} (J : Ideal (MvPolynomial σ ℂ)) (z : σ → ℂ)
+    (hJ : J ≤ ptIdealOf z) :
+    ringKrullDim (locAt J z) = ((ptIdealOf z).map (Ideal.Quotient.mk J)).height := by
   haveI hm : (ptIdealOf z).IsPrime := (ptIdealOf_isMaximal z).isPrime
-  have hmem
-      : ∀ a : MvPolynomial σ ℂ,
-        Ideal.Quotient.mk J a ∈ (ptIdealOf z).map (Ideal.Quotient.mk J) ↔ a ∈ ptIdealOf z :=
+  have hmem : ∀ a : MvPolynomial σ ℂ,
+      Ideal.Quotient.mk J a ∈ (ptIdealOf z).map (Ideal.Quotient.mk J) ↔ a ∈ ptIdealOf z :=
     fun a => Ideal.mem_quotient_iff_mem hJ
   haveI hm' : ((ptIdealOf z).map (Ideal.Quotient.mk J)).IsPrime :=
     Ideal.map_isPrime_of_surjective Ideal.Quotient.mk_surjective (by rw [Ideal.mk_ker]; exact hJ)
@@ -88,16 +132,15 @@ theorem ringKrullDim_locAt
 
 variable {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)]
 
-theorem aeval_smul_of_isMultiHomog
-    {T : Type*} [CommRing T] [Algebra ℂ T]
-    {f : MvPolynomial (Σ k, ι k) ℂ} {a : K → ℕ} (hf : IsMultiHomog f a)
-    (c : K → T) (y : (Σ k, ι k) → T)
-    : aeval (fun q => c q.1 * y q) f = (∏ k, c k ^ a k) * aeval y f := by
+theorem aeval_smul_of_isMultiHomog {T : Type*} [CommRing T] [Algebra ℂ T]
+    {f : MvPolynomial (Σ k, ι k) ℂ} {a : K → ℕ}
+    (hf : IsMultiHomog f a) (c : K → T) (y : (Σ k, ι k) → T) :
+    aeval (fun q => c q.1 * y q) f = (∏ k, c k ^ a k) * aeval y f := by
   classical
   conv_lhs => rw [f.as_sum]
   conv_rhs => rw [f.as_sum]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, Finset.mul_sum]
+
+  simp only [map_sum, Finset.mul_sum]
   refine Finset.sum_congr rfl fun m hm => ?_
   rw [aeval_monomial, aeval_monomial, Finsupp.prod_pow, Finsupp.prod_pow]
   have e : ∏ q : (Σ k, ι k), (c q.1 * y q) ^ m q = (∏ k, c k ^ a k) * ∏ q, y q ^ m q := by
@@ -110,27 +153,21 @@ theorem aeval_smul_of_isMultiHomog
   rw [e]
   ring
 
-theorem ringKrullDim_quotient_le_of_chartIdeal_le
-    {P : Ideal (MvPolynomial (Σ k, ι k) ℂ)} (hP : IsMultiHomogIdeal P)
-    (e : ℕ)
+theorem ringKrullDim_quotient_le_of_chartIdeal_le {P : Ideal (MvPolynomial (Σ k, ι k) ℂ)}
+    (hP : IsMultiHomogIdeal P) (e : ℕ)
     (hdim : ∀ Q ∈ P.minimalPrimes,
       ringKrullDim (MvPolynomial (Σ k, ι k) ℂ ⧸ Q) = ((e + Fintype.card K : ℕ) : WithBot ℕ∞))
-    (p : (k : K) → ι k)
-    (𝔮 : Ideal (MvPolynomial (Σ k, ι k) ℂ)) [𝔮.IsPrime]
-    (h𝔮 : chartIdeal P p ≤ 𝔮)
-    : ringKrullDim (MvPolynomial (Σ k, ι k) ℂ ⧸ 𝔮) ≤ e := by
+    (p : (k : K) → ι k) (𝔮 : Ideal (MvPolynomial (Σ k, ι k) ℂ)) [𝔮.IsPrime]
+    (h𝔮 : chartIdeal P p ≤ 𝔮) :
+    ringKrullDim (MvPolynomial (Σ k, ι k) ℂ ⧸ 𝔮) ≤ e := by
   classical
   have : IsDomain (MvPolynomial (Σ k, ι k) ℂ ⧸ 𝔮) := Ideal.Quotient.isDomain 𝔮
-  let y : (Σ k, ι k) → MvPolynomial K (MvPolynomial (Σ k, ι k) ℂ ⧸ 𝔮) := fun q =>
-    C (Ideal.Quotient.mk 𝔮 (X q))
-  let θ : (MvPolynomial (Σ k, ι k) ℂ) →ₐ[ℂ] MvPolynomial K (MvPolynomial (Σ k, ι k) ℂ ⧸ 𝔮) :=
-    aeval (fun q => (X q.1 : MvPolynomial K (MvPolynomial (Σ k, ι k) ℂ ⧸ 𝔮)) * y q)
+  let y : (Σ k, ι k) → MvPolynomial K (MvPolynomial (Σ k, ι k) ℂ ⧸ 𝔮) := fun q => C (Ideal.Quotient.mk 𝔮 (X q))
+  let θ : (MvPolynomial (Σ k, ι k) ℂ) →ₐ[ℂ] MvPolynomial K (MvPolynomial (Σ k, ι k) ℂ ⧸ 𝔮) := aeval (fun q => (X q.1 : MvPolynomial K (MvPolynomial (Σ k, ι k) ℂ ⧸ 𝔮)) * y q)
   have hy : ∀ f : (MvPolynomial (Σ k, ι k) ℂ), aeval y f = C (Ideal.Quotient.mk 𝔮 f) := by
     intro f
-    have : (aeval y
-          : (MvPolynomial (Σ k, ι k) ℂ) →ₐ[ℂ] MvPolynomial K (MvPolynomial (Σ k, ι k) ℂ ⧸ 𝔮))
-        = (IsScalarTower.toAlgHom ℂ (MvPolynomial (Σ k, ι k) ℂ ⧸ 𝔮)
-          (MvPolynomial K (MvPolynomial (Σ k, ι k) ℂ ⧸ 𝔮))).comp (Ideal.Quotient.mkₐ ℂ 𝔮) := by
+    have : (aeval y : (MvPolynomial (Σ k, ι k) ℂ) →ₐ[ℂ] MvPolynomial K (MvPolynomial (Σ k, ι k) ℂ ⧸ 𝔮)) =
+        (IsScalarTower.toAlgHom ℂ (MvPolynomial (Σ k, ι k) ℂ ⧸ 𝔮) (MvPolynomial K (MvPolynomial (Σ k, ι k) ℂ ⧸ 𝔮))).comp (Ideal.Quotient.mkₐ ℂ 𝔮) := by
       apply MvPolynomial.algHom_ext
       intro q
       simp [y, MvPolynomial.algebraMap_eq]
@@ -146,17 +183,16 @@ theorem ringKrullDim_quotient_le_of_chartIdeal_le
       have hf𝔮 : f ∈ 𝔮 := h𝔮 (Ideal.mem_sup_left hfP)
       show θ f = 0
       simp only [θ]
-      rw [aeval_smul_of_isMultiHomog ha (X : K → MvPolynomial K (MvPolynomial (Σ k, ι k) ℂ ⧸ 𝔮)) y,
-        hy, Ideal.Quotient.eq_zero_iff_mem.mpr hf𝔮, map_zero, mul_zero]
+      rw [aeval_smul_of_isMultiHomog ha (X : K → MvPolynomial K (MvPolynomial (Σ k, ι k) ℂ ⧸ 𝔮)) y, hy,
+        Ideal.Quotient.eq_zero_iff_mem.mpr hf𝔮, map_zero, mul_zero]
     rw [hPS]
     exact hle
   have : (RingHom.ker θ).IsPrime := RingHom.ker_isPrime θ
   obtain ⟨Q, hQmin, hQle⟩ := Ideal.exists_minimalPrimes_le hPθ
   have hdimR : ringKrullDim θ.range ≤ ((e + Fintype.card K : ℕ) : WithBot ℕ∞) := by
     rw [← hdim Q hQmin]
-    let g : (MvPolynomial (Σ k, ι k) ℂ) ⧸ Q →+* θ.range :=
-      Ideal.Quotient.lift Q (θ.rangeRestrict : (MvPolynomial (Σ k, ι k) ℂ) →+* θ.range)
-        (fun a ha => Subtype.ext (by simpa using hQle ha))
+    let g : (MvPolynomial (Σ k, ι k) ℂ) ⧸ Q →+* θ.range := Ideal.Quotient.lift Q (θ.rangeRestrict : (MvPolynomial (Σ k, ι k) ℂ) →+* θ.range)
+      (fun a ha => Subtype.ext (by simpa using hQle ha))
     refine ringKrullDim_le_of_surjective g ?_
     intro x
     obtain ⟨a, ha⟩ := θ.rangeRestrict_surjective x
@@ -165,26 +201,17 @@ theorem ringKrullDim_quotient_le_of_chartIdeal_le
     Algebra.FiniteType.of_surjective θ.rangeRestrict θ.rangeRestrict_surjective
   have : Algebra.FiniteType ℂ (MvPolynomial (Σ k, ι k) ℂ ⧸ 𝔮) :=
     Algebra.FiniteType.of_surjective (Ideal.Quotient.mkₐ ℂ 𝔮) (Ideal.Quotient.mkₐ_surjective ℂ 𝔮)
-  obtain ⟨sA, hAdim, hAtr⟩ :=
-    ReciprocityTheory.CA.exists_dim_trdeg_field (K := ℂ) (A := (MvPolynomial (Σ k, ι k) ℂ ⧸ 𝔮))
+  obtain ⟨sA, hAdim, hAtr⟩ := ReciprocityTheory.CA.exists_dim_trdeg_field (K := ℂ) (A := (MvPolynomial (Σ k, ι k) ℂ ⧸ 𝔮))
   obtain ⟨sR, hRdim, hRtr⟩ := ReciprocityTheory.CA.exists_dim_trdeg_field (K := ℂ) (A := θ.range)
   have : FaithfulSMul ℂ (MvPolynomial (Σ k, ι k) ℂ ⧸ 𝔮) :=
-    (faithfulSMul_iff_algebraMap_injective ℂ (MvPolynomial (Σ k, ι k) ℂ ⧸ 𝔮)).mpr
-      (algebraMap ℂ (MvPolynomial (Σ k, ι k) ℂ ⧸ 𝔮)).injective
-  have : FaithfulSMul (MvPolynomial (Σ k, ι k) ℂ ⧸ 𝔮)
-      (MvPolynomial K (MvPolynomial (Σ k, ι k) ℂ ⧸ 𝔮)) :=
-    (faithfulSMul_iff_algebraMap_injective (MvPolynomial (Σ k, ι k) ℂ ⧸ 𝔮)
-        (MvPolynomial K (MvPolynomial (Σ k, ι k) ℂ ⧸ 𝔮))).mpr
-      (MvPolynomial.C_injective K (MvPolynomial (Σ k, ι k) ℂ ⧸ 𝔮))
+    (faithfulSMul_iff_algebraMap_injective ℂ (MvPolynomial (Σ k, ι k) ℂ ⧸ 𝔮)).mpr (algebraMap ℂ (MvPolynomial (Σ k, ι k) ℂ ⧸ 𝔮)).injective
+  have : FaithfulSMul (MvPolynomial (Σ k, ι k) ℂ ⧸ 𝔮) (MvPolynomial K (MvPolynomial (Σ k, ι k) ℂ ⧸ 𝔮)) :=
+    (faithfulSMul_iff_algebraMap_injective (MvPolynomial (Σ k, ι k) ℂ ⧸ 𝔮) (MvPolynomial K (MvPolynomial (Σ k, ι k) ℂ ⧸ 𝔮))).mpr (MvPolynomial.C_injective K (MvPolynomial (Σ k, ι k) ℂ ⧸ 𝔮))
   have : FaithfulSMul ℂ θ.range :=
     (faithfulSMul_iff_algebraMap_injective ℂ θ.range).mpr (algebraMap ℂ θ.range).injective
   have : FaithfulSMul θ.range (MvPolynomial K (MvPolynomial (Σ k, ι k) ℂ ⧸ 𝔮)) :=
-    (faithfulSMul_iff_algebraMap_injective θ.range
-      (MvPolynomial K (MvPolynomial (Σ k, ι k) ℂ ⧸ 𝔮))).mpr Subtype.val_injective
-  have hT1
-      : trdeg ℂ (MvPolynomial (Σ k, ι k) ℂ ⧸ 𝔮)
-          + trdeg (MvPolynomial (Σ k, ι k) ℂ ⧸ 𝔮) (MvPolynomial K (MvPolynomial (Σ k, ι k) ℂ ⧸ 𝔮))
-        = trdeg ℂ (MvPolynomial K (MvPolynomial (Σ k, ι k) ℂ ⧸ 𝔮)) :=
+    (faithfulSMul_iff_algebraMap_injective θ.range (MvPolynomial K (MvPolynomial (Σ k, ι k) ℂ ⧸ 𝔮))).mpr Subtype.val_injective
+  have hT1 : trdeg ℂ (MvPolynomial (Σ k, ι k) ℂ ⧸ 𝔮) + trdeg (MvPolynomial (Σ k, ι k) ℂ ⧸ 𝔮) (MvPolynomial K (MvPolynomial (Σ k, ι k) ℂ ⧸ 𝔮)) = trdeg ℂ (MvPolynomial K (MvPolynomial (Σ k, ι k) ℂ ⧸ 𝔮)) :=
     trdeg_add_eq ℂ (MvPolynomial (Σ k, ι k) ℂ ⧸ 𝔮)
 
   have h1 : ∀ k, Ideal.Quotient.mk 𝔮 (X ⟨k, p k⟩ : (MvPolynomial (Σ k, ι k) ℂ)) = 1 := by
@@ -195,16 +222,16 @@ theorem ringKrullDim_quotient_le_of_chartIdeal_le
     intro k
     refine (θ.mem_range).mpr ⟨X ⟨k, p k⟩, ?_⟩
     simp only [θ, y, aeval_X, h1, map_one, mul_one]
-  have hXq : ∀ q, (X q.1 : MvPolynomial K (MvPolynomial (Σ k, ι k) ℂ ⧸ 𝔮)) * y q ∈ θ.range :=
-    fun q => (θ.mem_range).mpr ⟨X q, by simp only [θ, aeval_X]⟩
+  have hXq : ∀ q, (X q.1 : MvPolynomial K (MvPolynomial (Σ k, ι k) ℂ ⧸ 𝔮)) * y q ∈ θ.range := fun q =>
+    (θ.mem_range).mpr ⟨X q, by simp only [θ, aeval_X]⟩
   let AC := Subalgebra.algebraicClosure θ.range (MvPolynomial K (MvPolynomial (Σ k, ι k) ℂ ⧸ 𝔮))
   have hRAC : ∀ t ∈ θ.range, t ∈ AC := fun t ht =>
     (Subalgebra.mem_algebraicClosure _ _).mpr (isAlgebraic_algebraMap (⟨t, ht⟩ : θ.range))
   have hyAC : ∀ q, y q ∈ AC := fun q =>
-    (Subalgebra.mem_algebraicClosure _ _).mpr
-      (IsAlgebraic.of_mul (mem_nonZeroDivisors_of_ne_zero (X_ne_zero q.1))
-        ((Subalgebra.mem_algebraicClosure _ _).mp (hRAC _ (hXk q.1)))
-        ((Subalgebra.mem_algebraicClosure _ _).mp (hRAC _ (hXq q))))
+    (Subalgebra.mem_algebraicClosure _ _).mpr (IsAlgebraic.of_mul
+      (mem_nonZeroDivisors_of_ne_zero (X_ne_zero q.1))
+      ((Subalgebra.mem_algebraicClosure _ _).mp (hRAC _ (hXk q.1)))
+      ((Subalgebra.mem_algebraicClosure _ _).mp (hRAC _ (hXq q))))
   set_option synthInstance.maxHeartbeats 200000 in
   have hCAC : ∀ f : (MvPolynomial (Σ k, ι k) ℂ), C (Ideal.Quotient.mk 𝔮 f) ∈ AC := by
     intro f
@@ -216,9 +243,8 @@ theorem ringKrullDim_quotient_le_of_chartIdeal_le
       rfl
     · intro f g hf hg
       rw [map_add (Ideal.Quotient.mk 𝔮),
-        map_add
-          (MvPolynomial.C
-            : (MvPolynomial (Σ k, ι k) ℂ ⧸ 𝔮) →+* MvPolynomial K (MvPolynomial (Σ k, ι k) ℂ ⧸ 𝔮))]
+        map_add (MvPolynomial.C : (MvPolynomial (Σ k, ι k) ℂ ⧸ 𝔮) →+*
+          MvPolynomial K (MvPolynomial (Σ k, ι k) ℂ ⧸ 𝔮))]
       exact AC.add_mem hf hg
     · intro f q hf
       rw [map_mul, map_mul]
@@ -235,15 +261,11 @@ theorem ringKrullDim_quotient_le_of_chartIdeal_le
       exact AC.mul_mem hf (hRAC _ (hXk k))
   have : Algebra.IsAlgebraic θ.range (MvPolynomial K (MvPolynomial (Σ k, ι k) ℂ ⧸ 𝔮)) :=
     ⟨fun t => (Subalgebra.mem_algebraicClosure _ _).mp (hall t)⟩
-  have hT2
-      : trdeg ℂ θ.range + trdeg θ.range (MvPolynomial K (MvPolynomial (Σ k, ι k) ℂ ⧸ 𝔮))
-        = trdeg ℂ (MvPolynomial K (MvPolynomial (Σ k, ι k) ℂ ⧸ 𝔮)) :=
+  have hT2 : trdeg ℂ θ.range + trdeg θ.range (MvPolynomial K (MvPolynomial (Σ k, ι k) ℂ ⧸ 𝔮)) = trdeg ℂ (MvPolynomial K (MvPolynomial (Σ k, ι k) ℂ ⧸ 𝔮)) :=
     trdeg_add_eq ℂ θ.range
   have h0 : trdeg θ.range (MvPolynomial K (MvPolynomial (Σ k, ι k) ℂ ⧸ 𝔮)) = 0 := trdeg_eq_zero
   rw [h0, add_zero] at hT2
-  have hK
-      : trdeg (MvPolynomial (Σ k, ι k) ℂ ⧸ 𝔮) (MvPolynomial K (MvPolynomial (Σ k, ι k) ℂ ⧸ 𝔮))
-        = (Fintype.card K : Cardinal) := by
+  have hK : trdeg (MvPolynomial (Σ k, ι k) ℂ ⧸ 𝔮) (MvPolynomial K (MvPolynomial (Σ k, ι k) ℂ ⧸ 𝔮)) = (Fintype.card K : Cardinal) := by
     rw [MvPolynomial.trdeg_of_isDomain, Cardinal.lift_id, Cardinal.mk_fintype]
   rw [hK, hAtr, ← hT2, hRtr] at hT1
   have hnat : sA + Fintype.card K = sR := by exact_mod_cast hT1
@@ -252,12 +274,12 @@ theorem ringKrullDim_quotient_le_of_chartIdeal_le
   rw [hAdim]
   exact_mod_cast (by omega : sA ≤ e)
 
+
 open Classical in
 noncomputable def blockWt (k : K) (q : Σ k, ι k) : ℕ := if q.1 = k then 1 else 0
 
-theorem isWeightedHomogeneous_blockWt
-    {f : MvPolynomial (Σ k, ι k) ℂ} {dg : K → ℕ} (hf : IsMultiHomog f dg) (k : K)
-    : IsWeightedHomogeneous (blockWt k) f (dg k) := by
+theorem isWeightedHomogeneous_blockWt {f : MvPolynomial (Σ k, ι k) ℂ} {dg : K → ℕ}
+    (hf : IsMultiHomog f dg) (k : K) : IsWeightedHomogeneous (blockWt k) f (dg k) := by
   intro d hd
   have hs : d ∈ f.support := MvPolynomial.mem_support_iff.mpr hd
   rw [← hf d hs k]
@@ -268,12 +290,11 @@ theorem isWeightedHomogeneous_blockWt
   · intro k' hk'
     simp [blockWt, hk']
 
-theorem sum_blockWt_eval
-    {f : MvPolynomial (Σ k, ι k) ℂ} {dg : K → ℕ} (hf : IsMultiHomog f dg)
-    (k : K) (z : (Σ k, ι k) → ℂ)
-    : ∑ q, (blockWt k q : ℂ) * (z q * eval z (pderiv q f)) = (dg k : ℂ) * eval z f := by
+theorem sum_blockWt_eval {f : MvPolynomial (Σ k, ι k) ℂ} {dg : K → ℕ} (hf : IsMultiHomog f dg)
+    (k : K) (z : (Σ k, ι k) → ℂ) :
+    ∑ q, (blockWt k q : ℂ) * (z q * eval z (pderiv q f)) = (dg k : ℂ) * eval z f := by
   have h := congrArg (eval z) (isWeightedHomogeneous_blockWt hf k).sum_weight_X_mul_pderiv
-  set_option synthInstance.maxHeartbeats 100000 in
+
   simpa [map_sum, nsmul_eq_mul] using h
 
 end ReciprocityTheory.AnForm.R

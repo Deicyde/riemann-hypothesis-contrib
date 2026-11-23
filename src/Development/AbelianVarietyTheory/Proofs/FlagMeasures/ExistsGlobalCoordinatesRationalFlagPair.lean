@@ -1,21 +1,63 @@
 module
 
-public import Mathlib
-public import Formalism.LocalToGlobal.SiegelLatticeTheory.CokernelGLCounts.NGData
-public import Formalism.LocalToGlobal.SiegelLatticeTheory.FlagStabilizerTensors.VolPin
-public import Formalism.LocalToGlobal.SiegelLatticeTheory.ClosedLocalOrbits.GaugeLatticeShifts.Vanish
 public import Development.AbelianVarietyTheory.Definitions.SemilocalFrames.AtBase
 public import Development.AbelianVarietyTheory.Definitions.SemilocalFrames.PlacesOf
+public import Formalism.LocalToGlobal.SiegelLatticeTheory.CokernelGLCounts.RankPointCounts.DualFamilyCounting.SemidefG
+public import Formalism.LocalToGlobal.SiegelLatticeTheory.FlagStabilizerTensors.PoincareConstantEq
+public import Formalism.SharpRestriction.CuspSpanNormBounds.CntPartners
 public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.NotField
-public import Formalism.LocalToGlobal.SiegelLatticeTheory.CokernelGLCounts.RankPointCounts.DualFamilyCounting.ExistsDualGen
 public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.SpanDifferentEqLocalGenerator
+public import Formalism.LocalToGlobal.SiegelLatticeTheory.CokernelGLCounts.RankPointCounts.DualFamilyCounting.ExistsDualGen
+import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.CountNonIntegrality.RingInverseAlgebraMap
+import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.CountingFormula.GoodRDeltaC
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
+import Formalism.LocalToGlobal.SiegelLatticeTheory.CokernelGLCounts.NGData
+import Formalism.LocalToGlobal.SiegelLatticeTheory.CokernelGLCounts.RowsConc
 
 @[expose] public section
 
-open MeasureTheory NumberField Formalism.BasicNotions Formalism.MainNotions.S
-  Formalism.MainNotions.S.Lat Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.HidaSetting
-  Formalism.L2.SG.TermOp Formalism.L2.SG.Full Formalism.L2.SG.RowsConc Formalism.L2.SG.NGData
-  Formalism.L2.SG.TermLoc GlobalTheory.HL GlobalTheory.LocOver
+open MeasureTheory NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.HidaSetting Formalism.L2.SG.TermOp Formalism.L2.SG.Full Formalism.L2.SG.RowsConc Formalism.L2.SG.NGData Formalism.L2.SG.TermLoc GlobalTheory.HL GlobalTheory.LocOver
 open scoped Pointwise ENNReal Classical
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -31,23 +73,18 @@ variable {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F]
 variable {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] [MeasurableSpace E]
 variable {M : Formalism.MainNotions.S.Loc.Model F E} {V : Type} [AddCommGroup V] [Module E V]
 
-theorem h_smul_right (H : Formalism.MainNotions.S.Loc.HermSp M V) (c : E) (x y : V)
-    : H.h x (c • y) = M.L.cj c * H.h x y := by
+theorem h_smul_right (H : Formalism.MainNotions.S.Loc.HermSp M V) (c : E) (x y : V) :
+    H.h x (c • y) = M.L.cj c * H.h x y := by
   rw [H.h_herm (c • y) x, H.h_smul_left, map_mul, ← H.h_herm]
 
-theorem loc_ex
-    (hM : M.OK)
-    (H : Formalism.MainNotions.S.Loc.HermSp M V) (r k : ℕ)
-    (P : Formalism.MainNotions.S.LocNG.FPair H r)
-    (hP : P.RelG (Formalism.MainNotions.S.LocNG.theta M))
-    (b : Module.Basis (Fin (k + 2 * r + 1)) E V) (es es' : Fin r → V)
+theorem loc_ex (hM : M.OK) (H : Formalism.MainNotions.S.Loc.HermSp M V) (r k : ℕ) (P : Formalism.MainNotions.S.LocNG.FPair H r)
+    (hP : P.RelG (Formalism.MainNotions.S.LocNG.theta M)) (b : Module.Basis (Fin (k + 2 * r + 1)) E V) (es es' : Fin r → V)
     (hd : ∀ a j, H.h (P.A.f a) (es j) = if a = j.castSucc then 1 else 0)
     (hd' : ∀ a j, H.h (P.B.f a) (es' j) = if a = j.castSucc then 1 else 0)
-    (hi : ∀ i j, H.h (es i) (es j) = 0) (hi' : ∀ i j, H.h (es' i) (es' j) = 0)
-    : ∃ S : Frames M.L r k,
-      S.Hm = Matrix.of (fun i j => H.h (b i) (b j)) ∧ S.es = (fun j => b.equivFun (es j))
-        ∧ S.es' = (fun j => b.equivFun (es' j)) ∧ S.gg = M.split.isSome
-        ∧ ∃ c : WCoord P S, c.e = b.equivFun := by
+    (hi : ∀ i j, H.h (es i) (es j) = 0) (hi' : ∀ i j, H.h (es' i) (es' j) = 0) :
+    ∃ S : Frames M.L r k, S.Hm = Matrix.of (fun i j => H.h (b i) (b j)) ∧
+      S.es = (fun j => b.equivFun (es j)) ∧ S.es' = (fun j => b.equivFun (es' j)) ∧
+      S.gg = M.split.isSome ∧ ∃ c : WCoord P S, c.e = b.equivFun := by
   obtain ⟨-, -, hG, -, -, ⟨w, hw⟩, hTo, hT, hTo', hT', hgg⟩ := hP
   have := hM.loc
   have := CoordExist.nontriv M.L
@@ -57,8 +94,7 @@ theorem loc_ex
       exact ⟨ϖ, hϖ, fun g hg => by cases hg⟩
     · exact ⟨g.q, g.q_irr, fun g' hg => by cases hg; rfl⟩
   refine ⟨
-    {
-      ϖ := ϖ
+    { ϖ := ϖ
       ϖ_irr := hϖ
       Hm := Matrix.of fun i j => H.h (b i) (b j)
       herm := CoordExist.hermND H b
@@ -78,34 +114,23 @@ theorem loc_ex
       relevant := fun a c => ?_
       G_ne := ?_
       gg := M.split.isSome
-      gg_ok := fun h => ?_
-    },
-    rfl,
-    rfl,
-    rfl,
-    rfl,
-    {
-      e := b.equivFun
+      gg_ok := fun h => ?_ }, rfl, rfl, rfl, rfl,
+    { e := b.equivFun
       h_eq := fun x y => CoordExist.hf_basis H b x y
       f_eq := fun _ => rfl
       f'_eq := fun _ => rfl
       T_eq := rfl
       T'_eq := rfl
       gg_none := fun h => by simp only [h, Option.isSome_none]
-      gg_some := fun g h => ⟨by simp only [h, Option.isSome_some], hϖg g h⟩
-    },
-    rfl
-  ⟩
+      gg_some := fun g h => ⟨by simp only [h, Option.isSome_some], hϖg g h⟩ }, rfl⟩
   · rw [CoordExist.hf_basis, ← hw, mul_right_comm, ← mul_pow]
     simp [Formalism.MainNotions.S.Loc.HermSp.Zhat]
   · simp only [CoordExist.hf_basis]
-    have h1
-        : H.Dl P.A.f P.B.f (r + 1)
-          = lead (Matrix.of fun a c => H.h (P.B.f c) (P.A.f a)) (Fin.last (r + 1)) := by
+    have h1 : H.Dl P.A.f P.B.f (r + 1) =
+        lead (Matrix.of fun a c => H.h (P.B.f c) (P.A.f a)) (Fin.last (r + 1)) := by
       unfold Formalism.MainNotions.S.Loc.HermSp.Dl; rw [dite_eq_left le_rfl]; rfl
-    have h2
-        : H.Dl P.A.f P.B.f r
-          = lead (Matrix.of fun a c => H.h (P.B.f c) (P.A.f a)) (Fin.last r).castSucc := by
+    have h2 : H.Dl P.A.f P.B.f r =
+        lead (Matrix.of fun a c => H.h (P.B.f c) (P.A.f a)) (Fin.last r).castSucc := by
       unfold Formalism.MainNotions.S.Loc.HermSp.Dl; rw [dite_eq_left (Nat.le_succ r)]; rfl
     rw [← h1, ← h2]
     exact hG
@@ -139,51 +164,40 @@ def sg (D : D7) : Fin (D.R.k + 2 * D.R.rS + 1) ≃ Fin (nV D) := finCongr (nV_eq
 def eG (D : D7) : (VS D).V ≃ₗ[D.host.E] (Fin (D.R.k + 2 * D.R.rS + 1) → D.host.E) :=
   (VS D).frame.equivFun.trans (LinearEquiv.funCongrLeft D.host.E D.host.E (sg D))
 
-def eL (D : D7) (p : PlF D)
-    : Vp D p ≃ₗ[(D.s.atP p).Ep] (Fin (D.R.k + 2 * D.R.rS + 1) → (D.s.atP p).Ep) :=
+def eL (D : D7) (p : PlF D) : Vp D p ≃ₗ[(D.s.atP p).Ep] (Fin (D.R.k + 2 * D.R.rS + 1) → (D.s.atP p).Ep) :=
   LinearEquiv.funCongrLeft _ _ (sg D)
 
 def HmG (D : D7) : Matrix (Fin (D.R.k + 2 * D.R.rS + 1)) (Fin (D.R.k + 2 * D.R.rS + 1)) D.host.E :=
   Matrix.of fun i j => gramV D (sg D i) (sg D j)
 
-theorem eL_bcP (Z : LocDat D) (p : PlF D) (x : (VS D).V)
-    : eL D p (baseChange₂ D p x) = (placesOf Z).bc p (eG D x) := by
+theorem eL_bcP (Z : LocDat D) (p : PlF D) (x : (VS D).V) : eL D p (baseChange₂ D p x) = (placesOf Z).bc p (eG D x) := by
   funext i; rfl
 
-theorem sum_sg {R : Type} [AddCommMonoid R] (g : Fin (nV D) → Fin (nV D) → R)
-    : ∑ i, ∑ j, g (sg D i) (sg D j) = ∑ i, ∑ j, g i j := by
-  calc
-    ∑ i, ∑ j, g (sg D i) (sg D j)
-      = ∑ i, ∑ j, g (sg D i) j := Finset.sum_congr rfl fun i _ => Equiv.sum_comp (sg D) (g (sg D i))
+theorem sum_sg {R : Type} [AddCommMonoid R] (g : Fin (nV D) → Fin (nV D) → R) :
+    ∑ i, ∑ j, g (sg D i) (sg D j) = ∑ i, ∑ j, g i j := by
+  calc ∑ i, ∑ j, g (sg D i) (sg D j) = ∑ i, ∑ j, g (sg D i) j :=
+        Finset.sum_congr rfl fun i _ => Equiv.sum_comp (sg D) (g (sg D i))
     _ = ∑ i, ∑ j, g i j := Equiv.sum_comp (sg D) (fun i => ∑ j, g i j)
 
-theorem h_eqG (x y : (VS D).V)
-    : ∑ i, ∑ j, eG D x i * HmG D i j * star (eG D y j) = brS (VS D) x y := by
-  have key
-      : (VS D).hT y x
-        = ∑ j, ∑ i, star ((VS D).frame.repr y j) *
-          ((VS D).frame.repr x i * (VS D).hT ((VS D).frame j) ((VS D).frame i)) := by
+theorem h_eqG (x y : (VS D).V) :
+    ∑ i, ∑ j, eG D x i * HmG D i j * star (eG D y j) = brS (VS D) x y := by
+  have key : (VS D).hT y x = ∑ j, ∑ i, star ((VS D).frame.repr y j) *
+      ((VS D).frame.repr x i * (VS D).hT ((VS D).frame j) ((VS D).frame i)) := by
     conv_lhs => rw [← (VS D).frame.sum_repr y, ← (VS D).frame.sum_repr x]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_smulₛₗ, smul_eq_mul, starRingEnd_apply, LinearMap.sum_apply,
-        LinearMap.smul_apply, RingHom.id_apply, Finset.mul_sum]
+
+    simp only [map_sum, map_smulₛₗ, smul_eq_mul, starRingEnd_apply, LinearMap.sum_apply, LinearMap.smul_apply,
+    RingHom.id_apply, Finset.mul_sum]
     rw [Finset.sum_comm]
     refine Finset.sum_congr rfl fun j _ => Finset.sum_congr rfl fun i _ => ?_
     ring
-  have e1
-      : ∑ i, ∑ j, eG D x i * HmG D i j * star (eG D y j)
-        = ∑ i, ∑ j,
-          (fun a b => (VS D).frame.repr x a * gramV D a b * star ((VS D).frame.repr y b)) (sg D i) (sg D j) :=
-    rfl
-  rw [e1,
-    sum_sg (D := D) (fun a b => (VS D).frame.repr x a * gramV D a b * star ((VS D).frame.repr y b)),
-    brS, key, Finset.sum_comm]
+  have e1 : ∑ i, ∑ j, eG D x i * HmG D i j * star (eG D y j) = ∑ i, ∑ j,
+      (fun a b => (VS D).frame.repr x a * gramV D a b * star ((VS D).frame.repr y b)) (sg D i) (sg D j) := rfl
+  rw [e1, sum_sg (D := D) (fun a b => (VS D).frame.repr x a * gramV D a b * star ((VS D).frame.repr y b)), brS, key, Finset.sum_comm]
   refine Finset.sum_congr rfl fun j _ => Finset.sum_congr rfl fun i _ => ?_
   simp only [gramV, brS]
   ring
 
-theorem split_isSome (Z : LocDat D) (p : PlF D)
-    : (Z.M p).split.isSome = (D.s.atP p).split.isSome := by
+theorem split_isSome (Z : LocDat D) (p : PlF D) : (Z.M p).split.isSome = (D.s.atP p).split.isSome := by
   obtain ⟨-, -, -, -, -, h⟩ := Z.agree p
   revert h
   cases (Z.M p).split <;> cases (D.s.atP p).split <;> simp
@@ -197,30 +211,25 @@ variable {D : D7}
 def bL (D : D7) (p : PlF D) : Module.Basis (Fin (D.R.k + 2 * D.R.rS + 1)) (D.s.atP p).Ep (Vp D p) :=
   Module.Basis.ofEquivFun (eL D p)
 
-theorem bL_apply (p : PlF D) (i : Fin (D.R.k + 2 * D.R.rS + 1))
-    : bL D p i = Pi.single (sg D i) 1 := by
+theorem bL_apply (p : PlF D) (i : Fin (D.R.k + 2 * D.R.rS + 1)) : bL D p i = Pi.single (sg D i) 1 := by
   funext j
   simp only [bL, Module.Basis.coe_ofEquivFun, eL, LinearEquiv.funCongrLeft_symm]
   simp only [LinearEquiv.funCongrLeft_apply, LinearMap.funLeft_apply]
   by_cases h : j = sg D i
   · subst h; simp
   · rw [Pi.single_eq_of_ne h, Pi.single_eq_of_ne]
-    intro h'
-    apply h
-    rw [← h']
-    simp
+    intro h'; apply h; rw [← h']; simp
 
-theorem gram_bL (Z : LocDat D) (p : PlF D)
-    : Matrix.of (fun i j => (locH Z p).h (bL D p i) (bL D p j)) = (HmG D).map (D.s.atP p).ιE := by
+theorem gram_bL (Z : LocDat D) (p : PlF D) :
+    Matrix.of (fun i j => (locH Z p).h (bL D p i) (bL D p j)) = (HmG D).map (D.s.atP p).ιE := by
   ext i j
   simp only [Matrix.of_apply, bL_apply, Matrix.map_apply, HmG]
   show LocFacts₂ Z.M p _ _ = _
   rw [localForm_single]
   simp [Matrix.vecMul, dotProduct, Pi.single_apply]
 
-theorem loc_pair (Z : LocDat D) (p : PlF D) (s t : (D.s.atP p).Ep) (x y : (VS D).V)
-    : (locH Z p).h (s • baseChange₂ D p x) (t • baseChange₂ D p y)
-      = s * ((Z.M p).L.cj t * (D.s.atP p).ιE (brS (VS D) x y)) := by
+theorem loc_pair (Z : LocDat D) (p : PlF D) (s t : (D.s.atP p).Ep) (x y : (VS D).V) :
+    (locH Z p).h (s • baseChange₂ D p x) (t • baseChange₂ D p y) = s * ((Z.M p).L.cj t * (D.s.atP p).ιE (brS (VS D) x y)) := by
   rw [(locH Z p).h_smul_left, h_smul_right]
   congr 2
   exact baseChangeAt_form Z.M p (Z.hcj p) x y
@@ -231,8 +240,7 @@ section Glob3
 
 variable {D : D7}
 
-def cval (Z : LocDat D) (p : PlF D) : (D.s.atP p).Fp :=
-  Z.δ p * (D.s.atP p).ιF ((uP p : ℚ) : D.host.F)
+def cval (Z : LocDat D) (p : PlF D) : (D.s.atP p).Fp := Z.δ p * (D.s.atP p).ιF ((uP p : ℚ) : D.host.F)
 
 theorem unitAt_ne (p : PlF D) : uP p ≠ 0 := by
   have h0 := D.host.g_prime 0
@@ -252,36 +260,29 @@ theorem cval_ne (Z : LocDat D) (p : PlF D) : cval Z p ≠ 0 := by
   rw [map_ne_zero]
   exact_mod_cast unitAt_ne p
 
-theorem cval_E (Z : LocDat D) (p : PlF D)
-    : algebraMap (D.s.atP p).Fp (D.s.atP p).Ep (Z.δ p) * (D.s.atP p).ιE ((uP p : ℚ) : D.host.E)
-      = algebraMap (D.s.atP p).Fp (D.s.atP p).Ep (cval Z p) := by
+theorem cval_E (Z : LocDat D) (p : PlF D) :
+    algebraMap (D.s.atP p).Fp (D.s.atP p).Ep (Z.δ p) * (D.s.atP p).ιE ((uP p : ℚ) : D.host.E) =
+      algebraMap (D.s.atP p).Fp (D.s.atP p).Ep (cval Z p) := by
   rw [cval, map_mul, ← (D.s.atP p).compat, map_ratCast (algebraMap D.host.F D.host.E)]
 
-theorem cval_unitE (Z : LocDat D) (p : PlF D)
-    : IsUnit (algebraMap (D.s.atP p).Fp (D.s.atP p).Ep (cval Z p)) :=
+theorem cval_unitE (Z : LocDat D) (p : PlF D) : IsUnit (algebraMap (D.s.atP p).Fp (D.s.atP p).Ep (cval Z p)) :=
   (isUnit_iff_ne_zero.2 (cval_ne Z p)).map _
 
-theorem frFac_eq (Z : LocDat D) (p : PlF D) (a : Fin (D.R.rS + 1))
-    : frFac Z.δ p a
-      = Ring.inverse (algebraMap (D.s.atP p).Fp (D.s.atP p).Ep
-        (cval Z p ^ (D.R.rS - (a : ℕ)))) := by
+theorem frFac_eq (Z : LocDat D) (p : PlF D) (a : Fin (D.R.rS + 1)) :
+    frFac Z.δ p a = Ring.inverse (algebraMap (D.s.atP p).Fp (D.s.atP p).Ep (cval Z p ^ (D.R.rS - (a : ℕ)))) := by
   rw [frFac, cval_E, map_pow]
 
-theorem frFac_mul (Z : LocDat D) (p : PlF D) (a : Fin (D.R.rS + 1))
-    : algebraMap (D.s.atP p).Fp (D.s.atP p).Ep (cval Z p ^ (D.R.rS - (a : ℕ))) * frFac Z.δ p a
-      = 1 := by
+theorem frFac_mul (Z : LocDat D) (p : PlF D) (a : Fin (D.R.rS + 1)) :
+    algebraMap (D.s.atP p).Fp (D.s.atP p).Ep (cval Z p ^ (D.R.rS - (a : ℕ))) * frFac Z.δ p a = 1 := by
   rw [frFac_eq, map_pow]
   exact Ring.mul_inverse_cancel _ ((cval_unitE Z p).pow _)
 
-theorem loc_dual
-    (Z : LocDat D) (p : PlF D)
-    {N : ℕ} (F0 : FlagG (VS D) D.R.rS (N : D.host.E))
-    (y : Fin D.R.rS → (VS D).V) (hy : Formalism.L2.SG.Pf.Cnt.R1.Dual F0.e y F0.z N)
-    (a : Fin (D.R.rS + 1)) (j : Fin D.R.rS)
-    : (locH Z p).h (scaled Z p F0.fvec a)
-        (algebraMap (D.s.atP p).Fp (D.s.atP p).Ep (cval Z p ^ (D.R.rS - (j : ℕ)))
-          • baseChange₂ D p (y j))
-      = if a = j.castSucc then 1 else 0 := by
+theorem loc_dual (Z : LocDat D) (p : PlF D) {N : ℕ} (F0 : FlagG (VS D) D.R.rS (N : D.host.E))
+    (y : Fin D.R.rS → (VS D).V) (hy : Formalism.L2.SG.Pf.Cnt.R1.Dual F0.e y F0.z N) (a : Fin (D.R.rS + 1))
+    (j : Fin D.R.rS) :
+    (locH Z p).h (scaled Z p F0.fvec a)
+      (algebraMap (D.s.atP p).Fp (D.s.atP p).Ep (cval Z p ^ (D.R.rS - (j : ℕ))) • baseChange₂ D p (y j)) =
+      if a = j.castSucc then 1 else 0 := by
   show (locH Z p).h (frFac Z.δ p a • baseChange₂ D p (F0.fvec a)) _ = _
   rw [loc_pair, AlgEquiv.commutes]
   induction a using Fin.lastCases with
@@ -301,13 +302,9 @@ theorem loc_dual
       rwa [Fin.coe_castSucc] at this
     · rw [map_zero, mul_zero, mul_zero]
 
-theorem loc_iso
-    (Z : LocDat D)
-    (p : PlF D) (s t : (D.s.atP p).Ep)
-    {N : ℕ} (F0 : FlagG (VS D) D.R.rS (N : D.host.E))
-    (y : Fin D.R.rS → (VS D).V) (hy : Formalism.L2.SG.Pf.Cnt.R1.Dual F0.e y F0.z N)
-    (i j : Fin D.R.rS)
-    : (locH Z p).h (s • baseChange₂ D p (y i)) (t • baseChange₂ D p (y j)) = 0 := by
+theorem loc_iso (Z : LocDat D) (p : PlF D) (s t : (D.s.atP p).Ep) {N : ℕ} (F0 : FlagG (VS D) D.R.rS (N : D.host.E))
+    (y : Fin D.R.rS → (VS D).V) (hy : Formalism.L2.SG.Pf.Cnt.R1.Dual F0.e y F0.z N) (i j : Fin D.R.rS) :
+    (locH Z p).h (s • baseChange₂ D p (y i)) (t • baseChange₂ D p (y j)) = 0 := by
   rw [loc_pair]
   simp only [brS, hy.yy, map_zero, mul_zero]
 
@@ -317,19 +314,16 @@ section Fin
 
 variable {D : D7}
 
-theorem unit_of_mem
-    {K : Type} [Field K] [ValuativeRel K] {c : K} (hc : c ≠ 0) (h1 : c ∈ 𝒪[K]) (h2 : c⁻¹ ∈ 𝒪[K])
-    : ∃ u : (𝒪[K])ˣ, ((u : 𝒪[K]) : K) = c :=
+theorem unit_of_mem {K : Type} [Field K] [ValuativeRel K] {c : K} (hc : c ≠ 0) (h1 : c ∈ 𝒪[K])
+    (h2 : c⁻¹ ∈ 𝒪[K]) : ∃ u : (𝒪[K])ˣ, ((u : 𝒪[K]) : K) = c :=
   ⟨⟨⟨c, h1⟩, ⟨c⁻¹, h2⟩, Subtype.ext (mul_inv_cancel₀ hc), Subtype.ext (inv_mul_cancel₀ hc)⟩, rfl⟩
 
-theorem resChar_mem (p : PlF D)
-    : ((Formalism.MainNotions.S.Loc.resChar p : ℕ) : 𝓞 D.host.F) ∈ p.asIdeal := by
+theorem resChar_mem (p : PlF D) : ((Formalism.MainNotions.S.Loc.resChar p : ℕ) : 𝓞 D.host.F) ∈ p.asIdeal := by
   rw [← Ideal.Quotient.eq_zero_iff_mem, map_natCast]
   exact ringChar.Nat.cast_ringChar
 
-theorem iF_unit (p : PlF D) (x : 𝓞 D.host.F) (hx : x ∉ p.asIdeal)
-    : ((D.s.atP p).ιF (x : D.host.F))⁻¹ ∈ 𝒪[(D.s.atP p).Fp]
-      ∧ (D.s.atP p).ιF (x : D.host.F) ≠ 0 := by
+theorem iF_unit (p : PlF D) (x : 𝓞 D.host.F) (hx : x ∉ p.asIdeal) :
+    ((D.s.atP p).ιF (x : D.host.F))⁻¹ ∈ 𝒪[(D.s.atP p).Fp] ∧ (D.s.atP p).ιF (x : D.host.F) ≠ 0 := by
   have hv : p.valuation D.host.F (x : D.host.F) = 1 := by
     rw [IsDedekindDomain.HeightOneSpectrum.valuation_of_algebraMap,
       IsDedekindDomain.HeightOneSpectrum.intValuation_eq_one_iff]
@@ -348,9 +342,8 @@ theorem iF_unit (p : PlF D) (x : 𝓞 D.host.F) (hx : x ∉ p.asIdeal)
 theorem gg_ne_zero (D : D7) : ((D.host.g 0 * D.host.g 1 : ℕ) : 𝓞 D.host.F) ≠ 0 := by
   exact_mod_cast Nat.mul_ne_zero (D.host.g_prime 0).ne_zero (D.host.g_prime 1).ne_zero
 
-theorem not_mem_of
-    (p : PlF D) (hn : ¬ ((D.host.g 0 * D.host.g 1 : ℕ) : 𝓞 D.host.F) ∈ p.asIdeal) (i : Fin 2)
-    : Formalism.MainNotions.S.Loc.resChar p ≠ D.host.g i := by
+theorem not_mem_of (p : PlF D) (hn : ¬ ((D.host.g 0 * D.host.g 1 : ℕ) : 𝓞 D.host.F) ∈ p.asIdeal) (i : Fin 2) :
+    Formalism.MainNotions.S.Loc.resChar p ≠ D.host.g i := by
   intro h
   apply hn
   have hc := resChar_mem p
@@ -361,8 +354,7 @@ theorem not_mem_of
   · exact Ideal.mul_mem_left _ _ hc
 
 theorem split_fin (D : D7) : {p : PlF D | (D.s.atP p).split.isSome = true}.Finite := by
-  refine (Ideal.finite_factors (I := Ideal.span {((D.host.g 0 * D.host.g 1 : ℕ) : 𝓞 D.host.F)})
-    ?_).subset ?_
+  refine (Ideal.finite_factors (I := Ideal.span {((D.host.g 0 * D.host.g 1 : ℕ) : 𝓞 D.host.F)}) ?_).subset ?_
   · rw [Ne, Ideal.zero_eq_bot, Ideal.span_singleton_eq_bot]
     exact gg_ne_zero D
   intro p hp
@@ -375,132 +367,106 @@ theorem split_fin (D : D7) : {p : PlF D | (D.s.atP p).split.isSome = true}.Finit
   · exact not_mem_of p hn 0 h
   · exact not_mem_of p hn 1 h
 
-theorem isUnit_unitAt (D : D7)
-    : {p : PlF D | ¬ ∃ u : (𝒪[(D.s.atP p).Fp])ˣ,
-        ((u : 𝒪[(D.s.atP p).Fp]) : (D.s.atP p).Fp) = (D.s.atP p).ιF ((uP p : ℚ) : D.host.F)}.Finite :=
-  by
-    refine (Ideal.finite_factors (I := Ideal.span {((D.host.g 0 * D.host.g 1 : ℕ) : 𝓞 D.host.F)})
-      ?_).subset ?_
-    · rw [Ne, Ideal.zero_eq_bot, Ideal.span_singleton_eq_bot]
-      exact gg_ne_zero D
-    intro p hp
-    simp only [Set.mem_setOf_eq] at hp ⊢
-    rw [Ideal.dvd_span_singleton]
-    by_contra hn
-    apply hp
-    have hu : uP p = ((D.host.g 0 * D.host.g 1 : ℕ) : ℚ)⁻¹ := by
-      unfold uP gpart
-      rw [if_neg (not_mem_of p hn 0), if_neg (not_mem_of p hn 1)]
-      unfold Formalism.MainNotions.S.Lat.gS
-      push_cast
-      ring
-    obtain ⟨hinv, hx0⟩ := iF_unit p _ hn
-    have e
-        : (D.s.atP p).ιF ((uP p : ℚ) : D.host.F)
-          = ((D.s.atP p).ιF (((D.host.g 0 * D.host.g 1 : ℕ) : 𝓞 D.host.F) : D.host.F))⁻¹ := by
-      rw [hu, ← map_inv₀]
-      congr 1
-      push_cast
-      rfl
-    rw [e]
-    refine unit_of_mem (inv_ne_zero hx0) hinv ?_
-    rw [inv_inv]
-    exact GlobalTheory.LocDiffGen.iF_int p _
+theorem isUnit_unitAt (D : D7) :
+    {p : PlF D | ¬ ∃ u : (𝒪[(D.s.atP p).Fp])ˣ,
+      ((u : 𝒪[(D.s.atP p).Fp]) : (D.s.atP p).Fp) = (D.s.atP p).ιF ((uP p : ℚ) : D.host.F)}.Finite := by
+  refine (Ideal.finite_factors (I := Ideal.span {((D.host.g 0 * D.host.g 1 : ℕ) : 𝓞 D.host.F)}) ?_).subset ?_
+  · rw [Ne, Ideal.zero_eq_bot, Ideal.span_singleton_eq_bot]
+    exact gg_ne_zero D
+  intro p hp
+  simp only [Set.mem_setOf_eq] at hp ⊢
+  rw [Ideal.dvd_span_singleton]
+  by_contra hn
+  apply hp
+  have hu : uP p = ((D.host.g 0 * D.host.g 1 : ℕ) : ℚ)⁻¹ := by
+    unfold uP gpart
+    rw [if_neg (not_mem_of p hn 0), if_neg (not_mem_of p hn 1)]
+    unfold Formalism.MainNotions.S.Lat.gS
+    push_cast
+    ring
+  obtain ⟨hinv, hx0⟩ := iF_unit p _ hn
+  have e : (D.s.atP p).ιF ((uP p : ℚ) : D.host.F) =
+      ((D.s.atP p).ιF (((D.host.g 0 * D.host.g 1 : ℕ) : 𝓞 D.host.F) : D.host.F))⁻¹ := by
+    rw [hu, ← map_inv₀]
+    congr 1
+    push_cast
+    rfl
+  rw [e]
+  refine unit_of_mem (inv_ne_zero hx0) hinv ?_
+  rw [inv_inv]
+  exact GlobalTheory.LocDiffGen.iF_int p _
 
-theorem memF_of
-    (p : PlF D) (c : (D.s.atP p).Fp)
-    (h : algebraMap (D.s.atP p).Fp (D.s.atP p).Ep c ∈ (D.s.atP p).O)
-    : c ∈ 𝒪[(D.s.atP p).Fp] := by
+theorem memF_of (p : PlF D) (c : (D.s.atP p).Fp) (h : algebraMap (D.s.atP p).Fp (D.s.atP p).Ep c ∈ (D.s.atP p).O) :
+    c ∈ 𝒪[(D.s.atP p).Fp] := by
   rw [(D.s.atP p).O_def] at h
   have hi : IsIntegral 𝒪[(D.s.atP p).Fp] c :=
     (isIntegral_algHom_iff (IsScalarTower.toAlgHom 𝒪[(D.s.atP p).Fp] (D.s.atP p).Fp (D.s.atP p).Ep)
       (algebraMap (D.s.atP p).Fp (D.s.atP p).Ep).injective).1 h
   exact PI.UnitaryGroupMassFormula.CntFormula.DeltaC.mem_of_isIntegral_fp (D.s.atP p) hi
 
-theorem delta_unit (D : D7) (Z : LocDat D)
-    : {p : PlF D | ¬ ∃ u : (𝒪[(D.s.atP p).Fp])ˣ, ((u : 𝒪[(D.s.atP p).Fp]) : (D.s.atP p).Fp) = Z.δ p}.Finite :=
-  by
-    refine (Ideal.finite_factors (I := differentIdeal ℤ (𝓞 D.host.F)) ?_).subset ?_
-    · exact differentIdeal_ne_bot
-    intro p hp
-    simp only [Set.mem_setOf_eq] at hp ⊢
-    rw [Ideal.dvd_iff_le]
-    intro x hx
-    by_contra hxp
-    apply hp
-    obtain ⟨-, hδ, -, hO, -, -⟩ := Z.agree p
-    have hspan := GlobalTheory.LocDiffGen.span_different_eq D Z p
-    have himg
-        : ∀ y : 𝓞 D.host.F,
-          (D.s.atP p).ιE (algebraMap D.host.F D.host.E (y : D.host.F))
-            = algebraMap (D.s.atP p).Fp (D.s.atP p).Ep ((D.s.atP p).ιF (y : D.host.F)) := fun y =>
-      (D.s.atP p).compat _
-    have hin : algebraMap (D.s.atP p).Fp (D.s.atP p).Ep (Z.δ p) ∈ (D.s.atP p).O := by
-      have hm
-          : algebraMap (D.s.atP p).Fp (D.s.atP p).Ep (Z.δ p) ∈ Submodule.span (Z.M p).L.O
-            ((fun x : 𝓞 D.host.F => (D.s.atP p).ιE (algebraMap D.host.F D.host.E x))
-              '' (differentIdeal ℤ (𝓞 D.host.F) : Set (𝓞 D.host.F))) := by
-        rw [hspan]; exact Submodule.mem_span_singleton_self _
-      have key
-          : ∀ v
-              ∈ Submodule.span (Z.M p).L.O
-                ((fun x : 𝓞 D.host.F => (D.s.atP p).ιE (algebraMap D.host.F D.host.E x))
-                  '' (differentIdeal ℤ (𝓞 D.host.F) : Set (𝓞 D.host.F))),
-            v ∈ (Z.M p).L.O := by
-        intro v hv
-        induction hv using Submodule.span_induction with
-        | mem z hz =>
-          obtain ⟨y, -, rfl⟩ := hz
-          show (D.s.atP p).ιE (algebraMap D.host.F D.host.E (y : D.host.F)) ∈ (Z.M p).L.O
-          rw [himg, hO]
-          exact PI.CntNotIntW.algMap_mem_O D p _ (GlobalTheory.LocDiffGen.iF_int p y)
-        | zero => exact zero_mem _
-        | add a b _ _ ha hb => exact add_mem ha hb
-        | smul c a _ ha => exact (Z.M p).L.O.mul_mem c.2 ha
-      rw [← hO]
-      exact key _ hm
-    have hx2
-        : (D.s.atP p).ιE (algebraMap D.host.F D.host.E (x : D.host.F))
-          ∈ (Z.M p).L.O ∙ algebraMap (D.s.atP p).Fp (D.s.atP p).Ep (Z.δ p) := by
-      rw [← hspan]
-      exact Submodule.subset_span ⟨x, hx, rfl⟩
-    obtain ⟨o, ho⟩ := Submodule.mem_span_singleton.1 hx2
-    obtain ⟨hinvx, hx0⟩ := iF_unit p x hxp
-    rw [himg] at ho
-    have hinv : algebraMap (D.s.atP p).Fp (D.s.atP p).Ep (Z.δ p)⁻¹ ∈ (D.s.atP p).O := by
-      have e
-          : algebraMap (D.s.atP p).Fp (D.s.atP p).Ep (Z.δ p)⁻¹
-            = (o : (D.s.atP p).Ep)
-              * algebraMap (D.s.atP p).Fp (D.s.atP p).Ep ((D.s.atP p).ιF (x : D.host.F))⁻¹ := by
-        have ho'
-            : (o : (D.s.atP p).Ep) * algebraMap (D.s.atP p).Fp (D.s.atP p).Ep (Z.δ p)
-              = algebraMap (D.s.atP p).Fp (D.s.atP p).Ep ((D.s.atP p).ιF (x : D.host.F)) :=
-          ho
-        have h3
-            : algebraMap (D.s.atP p).Fp (D.s.atP p).Ep (Z.δ p)⁻¹
-              = algebraMap (D.s.atP p).Fp (D.s.atP p).Ep ((D.s.atP p).ιF (x : D.host.F))
-                * algebraMap (D.s.atP p).Fp (D.s.atP p).Ep
-                  (((D.s.atP p).ιF (x : D.host.F))⁻¹ * (Z.δ p)⁻¹) := by
-          rw [← map_mul]; congr 1; field_simp
-        rw [h3, ← ho', map_mul]
-        have h4
-            : algebraMap (D.s.atP p).Fp (D.s.atP p).Ep (Z.δ p)
-                * algebraMap (D.s.atP p).Fp (D.s.atP p).Ep (Z.δ p)⁻¹
-              = 1 := by
-          rw [← map_mul, mul_inv_cancel₀ hδ, map_one]
-        calc
-          (o : (D.s.atP p).Ep) * algebraMap _ _ (Z.δ p)
-                * (algebraMap _ _ ((D.s.atP p).ιF (x : D.host.F))⁻¹ * algebraMap _ _ (Z.δ p)⁻¹)
-              = (o : (D.s.atP p).Ep) * algebraMap _ _ ((D.s.atP p).ιF (x : D.host.F))⁻¹
-                * (algebraMap (D.s.atP p).Fp (D.s.atP p).Ep (Z.δ p)
-                  * algebraMap (D.s.atP p).Fp (D.s.atP p).Ep (Z.δ p)⁻¹) := by
-            ring
-          _ = _ := by rw [h4, mul_one]
-      rw [e, ← hO]
-      refine (Z.M p).L.O.mul_mem o.2 ?_
-      rw [hO]
-      exact PI.CntNotIntW.algMap_mem_O D p _ hinvx
-    exact unit_of_mem hδ (memF_of p _ hin) (memF_of p _ hinv)
+theorem delta_unit (D : D7) (Z : LocDat D) :
+    {p : PlF D | ¬ ∃ u : (𝒪[(D.s.atP p).Fp])ˣ, ((u : 𝒪[(D.s.atP p).Fp]) : (D.s.atP p).Fp) = Z.δ p}.Finite := by
+  refine (Ideal.finite_factors (I := differentIdeal ℤ (𝓞 D.host.F)) ?_).subset ?_
+  · exact differentIdeal_ne_bot
+  intro p hp
+  simp only [Set.mem_setOf_eq] at hp ⊢
+  rw [Ideal.dvd_iff_le]
+  intro x hx
+  by_contra hxp
+  apply hp
+  obtain ⟨-, hδ, -, hO, -, -⟩ := Z.agree p
+  have hspan := GlobalTheory.LocDiffGen.span_different_eq D Z p
+  have himg : ∀ y : 𝓞 D.host.F, (D.s.atP p).ιE (algebraMap D.host.F D.host.E (y : D.host.F)) =
+      algebraMap (D.s.atP p).Fp (D.s.atP p).Ep ((D.s.atP p).ιF (y : D.host.F)) := fun y => (D.s.atP p).compat _
+  have hin : algebraMap (D.s.atP p).Fp (D.s.atP p).Ep (Z.δ p) ∈ (D.s.atP p).O := by
+    have hm : algebraMap (D.s.atP p).Fp (D.s.atP p).Ep (Z.δ p) ∈ Submodule.span (Z.M p).L.O
+        ((fun x : 𝓞 D.host.F => (D.s.atP p).ιE (algebraMap D.host.F D.host.E x)) ''
+          (differentIdeal ℤ (𝓞 D.host.F) : Set (𝓞 D.host.F))) := by
+      rw [hspan]; exact Submodule.mem_span_singleton_self _
+    have key : ∀ v ∈ Submodule.span (Z.M p).L.O
+        ((fun x : 𝓞 D.host.F => (D.s.atP p).ιE (algebraMap D.host.F D.host.E x)) ''
+          (differentIdeal ℤ (𝓞 D.host.F) : Set (𝓞 D.host.F))), v ∈ (Z.M p).L.O := by
+      intro v hv
+      induction hv using Submodule.span_induction with
+      | mem z hz =>
+        obtain ⟨y, -, rfl⟩ := hz
+        show (D.s.atP p).ιE (algebraMap D.host.F D.host.E (y : D.host.F)) ∈ (Z.M p).L.O
+        rw [himg, hO]
+        exact PI.CntNotIntW.algMap_mem_O D p _ (GlobalTheory.LocDiffGen.iF_int p y)
+      | zero => exact zero_mem _
+      | add a b _ _ ha hb => exact add_mem ha hb
+      | smul c a _ ha => exact (Z.M p).L.O.mul_mem c.2 ha
+    rw [← hO]
+    exact key _ hm
+  have hx2 : (D.s.atP p).ιE (algebraMap D.host.F D.host.E (x : D.host.F)) ∈
+      (Z.M p).L.O ∙ algebraMap (D.s.atP p).Fp (D.s.atP p).Ep (Z.δ p) := by
+    rw [← hspan]
+    exact Submodule.subset_span ⟨x, hx, rfl⟩
+  obtain ⟨o, ho⟩ := Submodule.mem_span_singleton.1 hx2
+  obtain ⟨hinvx, hx0⟩ := iF_unit p x hxp
+  rw [himg] at ho
+  have hinv : algebraMap (D.s.atP p).Fp (D.s.atP p).Ep (Z.δ p)⁻¹ ∈ (D.s.atP p).O := by
+    have e : algebraMap (D.s.atP p).Fp (D.s.atP p).Ep (Z.δ p)⁻¹ =
+        (o : (D.s.atP p).Ep) * algebraMap (D.s.atP p).Fp (D.s.atP p).Ep ((D.s.atP p).ιF (x : D.host.F))⁻¹ := by
+      have ho' : (o : (D.s.atP p).Ep) * algebraMap (D.s.atP p).Fp (D.s.atP p).Ep (Z.δ p) =
+          algebraMap (D.s.atP p).Fp (D.s.atP p).Ep ((D.s.atP p).ιF (x : D.host.F)) := ho
+      have h3 : algebraMap (D.s.atP p).Fp (D.s.atP p).Ep (Z.δ p)⁻¹ =
+          algebraMap (D.s.atP p).Fp (D.s.atP p).Ep ((D.s.atP p).ιF (x : D.host.F)) *
+            algebraMap (D.s.atP p).Fp (D.s.atP p).Ep (((D.s.atP p).ιF (x : D.host.F))⁻¹ * (Z.δ p)⁻¹) := by
+        rw [← map_mul]; congr 1; field_simp
+      rw [h3, ← ho', map_mul]
+      have h4 : algebraMap (D.s.atP p).Fp (D.s.atP p).Ep (Z.δ p) * algebraMap (D.s.atP p).Fp (D.s.atP p).Ep (Z.δ p)⁻¹ = 1 := by
+        rw [← map_mul, mul_inv_cancel₀ hδ, map_one]
+      calc (o : (D.s.atP p).Ep) * algebraMap _ _ (Z.δ p) *
+            (algebraMap _ _ ((D.s.atP p).ιF (x : D.host.F))⁻¹ * algebraMap _ _ (Z.δ p)⁻¹)
+          = (o : (D.s.atP p).Ep) * algebraMap _ _ ((D.s.atP p).ιF (x : D.host.F))⁻¹ *
+            (algebraMap (D.s.atP p).Fp (D.s.atP p).Ep (Z.δ p) * algebraMap (D.s.atP p).Fp (D.s.atP p).Ep (Z.δ p)⁻¹) := by ring
+        _ = _ := by rw [h4, mul_one]
+    rw [e, ← hO]
+    refine (Z.M p).L.O.mul_mem o.2 ?_
+    rw [hO]
+    exact PI.CntNotIntW.algMap_mem_O D p _ hinvx
+  exact unit_of_mem hδ (memF_of p _ hin) (memF_of p _ hinv)
 
 end Fin
 
@@ -508,42 +474,31 @@ section Main
 
 variable {D : D7}
 
-theorem cval_unit_fin (Z : LocDat D)
-    : {p : PlF D | ¬ ∃ u : (𝒪[(D.s.atP p).Fp])ˣ, ((u : 𝒪[(D.s.atP p).Fp]) : (D.s.atP p).Fp) = cval Z p}.Finite :=
-  by
-    refine ((delta_unit D Z).union (isUnit_unitAt D)).subset ?_
-    intro p hp
-    simp only [Set.mem_setOf_eq, Set.mem_union] at hp ⊢
-    by_contra h
-    push_neg at h
-    obtain ⟨⟨u, hu⟩, ⟨v, hv⟩⟩ := h
-    refine hp ⟨u * v, ?_⟩
-    rw [cval, ← hu, ← hv, Units.val_mul, MulMemClass.coe_mul]
+theorem cval_unit_fin (Z : LocDat D) :
+    {p : PlF D | ¬ ∃ u : (𝒪[(D.s.atP p).Fp])ˣ, ((u : 𝒪[(D.s.atP p).Fp]) : (D.s.atP p).Fp) = cval Z p}.Finite := by
+  refine ((delta_unit D Z).union (isUnit_unitAt D)).subset ?_
+  intro p hp
+  simp only [Set.mem_setOf_eq, Set.mem_union] at hp ⊢
+  by_contra h
+  push_neg at h
+  obtain ⟨⟨u, hu⟩, ⟨v, hv⟩⟩ := h
+  refine hp ⟨u * v, ?_⟩
+  rw [cval, ← hu, ← hv, Units.val_mul, MulMemClass.coe_mul]
 
-theorem exists_gen
-    (D : D7) (Z : LocDat D)
-    (N N' : ℕ) (hN : 0 < N) (hN' : 0 < N') (F00 : LFlag (D.sp.Y 0) D.R.rS (N : D.host.E))
-    (F'0 : LFlag (D.sp.Y 0) D.R.rS (N' : D.host.E))
+theorem exists_gen (D : D7) (Z : LocDat D) (N N' : ℕ) (hN : 0 < N) (hN' : 0 < N')
+    (F00 : LFlag (D.sp.Y 0) D.R.rS (N : D.host.E)) (F'0 : LFlag (D.sp.Y 0) D.R.rS (N' : D.host.E))
     (FP : ∀ p : PlF D, Formalism.MainNotions.S.LocNG.FPair (locH Z p) D.R.rS)
-    (hFP : ∀ p,
-      AtBase Z p F00 F'0 N N' (FP p) ∧ (FP p).RelG (Formalism.MainNotions.S.LocNG.theta (Z.M p)))
-    : ∃ G : GFrames (placesOf Z) D.R.rS D.R.k, Nonempty (GCoord Z F00 F'0 FP G) := by
+    (hFP : ∀ p, AtBase Z p F00 F'0 N N' (FP p) ∧ (FP p).RelG (Formalism.MainNotions.S.LocNG.theta (Z.M p))) :
+    ∃ G : GFrames (placesOf Z) D.R.rS D.R.k, Nonempty (GCoord Z F00 F'0 FP G) := by
   obtain ⟨y, hy⟩ := Formalism.L2.SG.Pf.Cnt.R1.dual_of_flag D hN F00.fl
   obtain ⟨y', hy'⟩ := Formalism.L2.SG.Pf.Cnt.R1.dual_of_flag D hN' F'0.fl
-  have hloc
-      : ∀ p, ∃ S : Frames (Z.M p).L D.R.rS D.R.k,
-        S.Hm = Matrix.of (fun i j => (locH Z p).h (bL D p i) (bL D p j))
-          ∧ S.es
-            = (fun j : Fin D.R.rS =>
-              (bL D p).equivFun
-                (algebraMap (D.s.atP p).Fp (D.s.atP p).Ep (cval Z p ^ (D.R.rS - (j : ℕ)))
-                  • baseChange₂ D p (y j)))
-          ∧ S.es'
-            = (fun j : Fin D.R.rS =>
-              (bL D p).equivFun
-                (algebraMap (D.s.atP p).Fp (D.s.atP p).Ep (cval Z p ^ (D.R.rS - (j : ℕ)))
-                  • baseChange₂ D p (y' j)))
-          ∧ S.gg = (Z.M p).split.isSome ∧ ∃ c : WCoord (FP p) S, c.e = (bL D p).equivFun := by
+  have hloc : ∀ p, ∃ S : Frames (Z.M p).L D.R.rS D.R.k,
+      S.Hm = Matrix.of (fun i j => (locH Z p).h (bL D p i) (bL D p j)) ∧
+      S.es = (fun j : Fin D.R.rS => (bL D p).equivFun
+        (algebraMap (D.s.atP p).Fp (D.s.atP p).Ep (cval Z p ^ (D.R.rS - (j : ℕ))) • baseChange₂ D p (y j))) ∧
+      S.es' = (fun j : Fin D.R.rS => (bL D p).equivFun
+        (algebraMap (D.s.atP p).Fp (D.s.atP p).Ep (cval Z p ^ (D.R.rS - (j : ℕ))) • baseChange₂ D p (y' j))) ∧
+      S.gg = (Z.M p).split.isSome ∧ ∃ c : WCoord (FP p) S, c.e = (bL D p).equivFun := by
     intro p
     obtain ⟨⟨hA, hB, -, -⟩, hR⟩ := hFP p
     refine loc_ex (Z.agree p).1 (locH Z p) D.R.rS D.R.k (FP p) hR (bL D p) _ _ ?_ ?_ ?_ ?_
@@ -555,8 +510,7 @@ theorem exists_gen
   choose W hW using fun p => (hS p).2.2.2.2
   have heq : ∀ p, (bL D p).equivFun = eL D p := fun p => Module.Basis.equivFun_ofEquivFun _
   refine ⟨
-    {
-      Hm := HmG D
+    { Hm := HmG D
       f := fun a => eG D (frame F00 a)
       f' := fun a => eG D (frame F'0 a)
       es := fun a => eG D (y a)
@@ -569,18 +523,14 @@ theorem exists_gen
       es_eq := ?_
       es'_eq := ?_
       c_unit := ?_
-      gg_fin := ?_
-    },
-    ⟨{
-      e := eG D
+      gg_fin := ?_ }, ⟨
+    { e := eG D
       h_eq := h_eqG
       f_eq := fun a => rfl
       f'_eq := fun a => rfl
       c := W
       compat := ?_
-      c_eq := ?_
-    }⟩
-  ⟩
+      c_eq := ?_ }⟩⟩
   · intro p a
     obtain ⟨⟨hA, -, -, -⟩, -⟩ := hFP p
     rw [(W p).f_eq, hW p, hA, heq, ← eL_bcP Z]
@@ -610,29 +560,14 @@ theorem exists_gen
     rw [← split_isSome Z p, ← (hS p).2.2.2.1]
     exact hp
   · intro p x
-    have h1 :=
-      congrArg
-        (fun e : Vp D p ≃ₗ[(D.s.atP p).Ep] (Fin (D.R.k + 2 * D.R.rS + 1) → (D.s.atP p).Ep) =>
-          e (baseChange₂ D p x))
-        ((hW p).trans (heq p))
+    have h1 := congrArg (fun e : Vp D p ≃ₗ[(D.s.atP p).Ep] (Fin (D.R.k + 2 * D.R.rS + 1) → (D.s.atP p).Ep) =>
+      e (baseChange₂ D p x)) ((hW p).trans (heq p))
     exact h1.trans (eL_bcP Z p x)
   · intro p
     show algebraMap _ _ (cval Z p) = _
     rw [cval_E]
 
-theorem exists_global_coords
-    : ∀ (D : D7) (X : HidaSetting D) (Y : Full X) (u u' : D.what₂.Word),
-      Formalism.MainNotions.S.Cnt.Stand D u u'
-        → ∀ (w : Point D.host.E (D.R.rS + 1))
-            (F00 : LFlag (D.sp.Y 0) D.R.rS (((D.mem u).A.T : ℕ) : D.host.E))
-            (F'0 : LFlag (D.sp.Y 0) D.R.rS (((D.mem u').A.T : ℕ) : D.host.E))
-            (FP : ∀ p : PlF D, LocNG.FPair (locH (⟨Y.δ, Y.M, Y.agree⟩ : LocDat D) p) D.R.rS),
-          ZhatOM (ZhatL F00 F'0) = ptMat w → Gval F00 F'0 ≠ 0
-            → (∀ p,
-              AtBase (⟨Y.δ, Y.M, Y.agree⟩ : LocDat D) p F00 F'0 (Tu D u) (Tu D u') (FP p)
-                ∧ (FP p).RelG (LocNG.theta (Y.M p)))
-            → ∃ G : GFrames (placesOf (⟨Y.δ, Y.M, Y.agree⟩ : LocDat D)) D.R.rS D.R.k,
-              Nonempty (GCoord (⟨Y.δ, Y.M, Y.agree⟩ : LocDat D) F00 F'0 FP G) := by
+theorem exists_global_coords : ∀ (D : D7) (X : HidaSetting D) (Y : Full X) (u u' : D.what₂.Word), Formalism.MainNotions.S.Cnt.Stand D u u' → ∀ (w : Point D.host.E (D.R.rS + 1)) (F00 : LFlag (D.sp.Y 0) D.R.rS (((D.mem u).A.T : ℕ) : D.host.E)) (F'0 : LFlag (D.sp.Y 0) D.R.rS (((D.mem u').A.T : ℕ) : D.host.E)) (FP : ∀ p : PlF D, LocNG.FPair (locH (⟨Y.δ, Y.M, Y.agree⟩ : LocDat D) p) D.R.rS), ZhatOM (ZhatL F00 F'0) = ptMat w → Gval F00 F'0 ≠ 0 → (∀ p, AtBase (⟨Y.δ, Y.M, Y.agree⟩ : LocDat D) p F00 F'0 (Tu D u) (Tu D u') (FP p) ∧ (FP p).RelG (LocNG.theta (Y.M p))) → ∃ G : GFrames (placesOf (⟨Y.δ, Y.M, Y.agree⟩ : LocDat D)) D.R.rS D.R.k, Nonempty (GCoord (⟨Y.δ, Y.M, Y.agree⟩ : LocDat D) F00 F'0 FP G) := by
   intro D X Y u u' hst w F00 F'0 FP _ _ hFP
   have hN : 0 < Tu D u := by have := hst.2.2.2.1; omega
   have hN' : 0 < Tu D u' := by have := hst.2.2.2.2.1; omega

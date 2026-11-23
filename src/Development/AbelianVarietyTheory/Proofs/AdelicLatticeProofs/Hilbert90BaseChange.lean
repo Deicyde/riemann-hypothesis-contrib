@@ -1,7 +1,59 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.Definitions.AdelicHermitianForms.MemPowSub
+public import Mathlib.GroupTheory.OrderOfElement
+public import Mathlib.LinearAlgebra.FiniteDimensional.Defs
+public import Mathlib.RingTheory.Artinian.Defs
+public import Mathlib.RingTheory.TensorProduct.Maps
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+public import Mathlib.GroupTheory.CosetCover
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Coalgebra.IsFrobenius
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.HopfAlgebra.Basic
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
+import Development.AbelianVarietyTheory.Definitions.AdelicHermitianForms.MemPowSub
+import Development.AbelianVarietyTheory.Definitions.AdelicHermitianForms.SqSubLeNormSub
+public import Mathlib.Algebra.CharP.Algebra
+public import Mathlib.RingTheory.Artinian.Module
 
 @[expose] public section
 
@@ -10,13 +62,13 @@ open scoped WithZero TensorProduct
 
 namespace GlobalTheory.CNorm
 
-theorem exists_isUnit_of_forall_maximal
-    {K A : Type} [Field K] [Infinite K] [CommRing A] [Algebra K A] [IsArtinianRing A]
-    (Θ : A →ₗ[K] A) (h : ∀ 𝔪 : Ideal A, 𝔪.IsMaximal → ∃ c, Θ c ∉ 𝔪)
-    : ∃ c, IsUnit (Θ c) := by
+theorem exists_isUnit_of_forall_maximal {K A : Type} [Field K] [Infinite K] [CommRing A]
+    [Algebra K A] [IsArtinianRing A] (Θ : A →ₗ[K] A)
+    (h : ∀ 𝔪 : Ideal A, 𝔪.IsMaximal → ∃ c, Θ c ∉ 𝔪) : ∃ c, IsUnit (Θ c) := by
   classical
   have hfin := IsArtinianRing.setOf_isMaximal_finite A
-  let s : Finset (Subspace K A) := hfin.toFinset.image fun 𝔪 => (𝔪.restrictScalars K).comap Θ
+  let s : Finset (Subspace K A) :=
+    hfin.toFinset.image fun 𝔪 => (𝔪.restrictScalars K).comap Θ
   have hs : ⊤ ∉ s := by
     intro ht
     obtain ⟨𝔪, hm, he⟩ := Finset.mem_image.1 ht
@@ -32,22 +84,15 @@ theorem exists_isUnit_of_forall_maximal
   simp only [Set.mem_iUnion]
   exact ⟨_, Finset.mem_image.2 ⟨𝔪, by simpa using hm, rfl⟩, hle⟩
 
-theorem hilbert90_baseChange
-    : ∀ (F E K : Type) [Field F] [CharZero F] [Field E] [Algebra F E] [FiniteDimensional F E]
-        [Field K] [Algebra F K] (τ : E ≃ₐ[F] E) (m : ℕ),
-      orderOf τ = m
-        → ∀ x : K ⊗[F] E,
-          ∏ i ∈ Finset.range m, (Algebra.TensorProduct.map (AlgHom.id K K) (τ : E →ₐ[F] E))^[i] x
-              = 1
-            → ∃ z : (K ⊗[F] E)ˣ,
-              x * Algebra.TensorProduct.map (AlgHom.id K K) (τ : E →ₐ[F] E) z = z := by
+theorem hilbert90_baseChange : ∀ (F E K : Type) [Field F] [CharZero F] [Field E] [Algebra F E] [FiniteDimensional F E] [Field K] [Algebra F K] (τ : E ≃ₐ[F] E) (m : ℕ), orderOf τ = m → ∀ x : K ⊗[F] E, ∏ i ∈ Finset.range m, (Algebra.TensorProduct.map (AlgHom.id K K) (τ : E →ₐ[F] E))^[i] x = 1 → ∃ z : (K ⊗[F] E)ˣ, x * Algebra.TensorProduct.map (AlgHom.id K K) (τ : E →ₐ[F] E) z = z := by
   intro F E K _ _ _ _ _ _ _ τ m hm x hx
   classical
   set T := Algebra.TensorProduct.map (AlgHom.id K K) (τ : E →ₐ[F] E) with hT
   have hm0 : 0 < m := hm ▸ orderOf_pos τ
   haveI : CharZero K := charZero_of_injective_algebraMap (algebraMap F K).injective
   haveI : IsArtinianRing (K ⊗[F] E) := IsArtinianRing.of_finite K _
-  have hpow : ∀ (i : ℕ) (y : K ⊗[F] E), T^[i] y = (T ^ i) y := fun i y => by rw [AlgHom.coe_pow]
+  have hpow : ∀ (i : ℕ) (y : K ⊗[F] E), T^[i] y = (T ^ i) y := fun i y => by
+    rw [AlgHom.coe_pow]
   have htm : ∀ (i : ℕ) (k : K) (c : E), (T ^ i) (k ⊗ₜ c) = k ⊗ₜ ((τ ^ i) c) := by
     intro i k c
     induction i with
@@ -76,44 +121,39 @@ theorem hilbert90_baseChange
   have hfix : ∀ c, x * T (Θ c) = Θ c := by
     intro c
     have h1 : x * T (Θ c) = ∑ i ∈ Finset.range m, a (i + 1) * (T ^ (i + 1)) c := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [hΘ, map_sum, Finset.mul_sum]
+
+      rw [hΘ, map_sum, Finset.mul_sum]
       refine Finset.sum_congr rfl fun i _ => ?_
       rw [map_mul, ← mul_assoc, ha, pow_succ', AlgHom.mul_apply]
     have h2 := Finset.sum_range_succ' (fun i => a i * (T ^ i) c) m
     rw [Finset.sum_range_succ, ham, ha0, hTm, pow_zero, AlgHom.one_apply] at h2
     rw [h1, hΘ]
     exact (add_right_cancel h2).symm
-  obtain ⟨c, hc⟩ :=
-    exists_isUnit_of_forall_maximal Θ (fun 𝔪 h𝔪 => by
-      by_contra hcon
-      push_neg at hcon
-      letI : Field ((K ⊗[F] E) ⧸ 𝔪) := Ideal.Quotient.field 𝔪
-      let ι : E →+* (K ⊗[F] E) ⧸ 𝔪 :=
-        (Ideal.Quotient.mk 𝔪).comp Algebra.TensorProduct.includeRight.toRingHom
-      let φ : Fin m → (E →* (K ⊗[F] E) ⧸ 𝔪) := fun i =>
-        ι.toMonoidHom.comp ((τ ^ (i : ℕ) : E ≃ₐ[F] E) : E →* E)
-      have hφ : Function.Injective φ := by
-        intro i j hij
-        have : τ ^ (i : ℕ) = τ ^ (j : ℕ) := by
-          ext c
-          exact ι.injective (DFunLike.congr_fun hij c)
-        exact Fin.ext (pow_injOn_Iio_orderOf (by simp [hm]) (by simp [hm]) this)
-      have hli := (linearIndependent_monoidHom E ((K ⊗[F] E) ⧸ 𝔪)).comp φ hφ
-      have :=
-        Fintype.linearIndependent_iff.1 hli
-          (fun i => Ideal.Quotient.mk 𝔪 (a i))
-          (by
-            ext c
-            have h := Ideal.Quotient.eq_zero_iff_mem.2 (hcon (1 ⊗ₜ c))
-            set_option synthInstance.maxHeartbeats 100000 in
-              rw [hΘ, map_sum, Finset.sum_range] at h
-            simp only [htm, map_mul] at h
-            rw [Finset.sum_apply]
-            exact h)
-          ⟨0, hm0⟩
-      simp only [ha0, map_one] at this
-      exact one_ne_zero this)
+  obtain ⟨c, hc⟩ := exists_isUnit_of_forall_maximal Θ (fun 𝔪 h𝔪 => by
+    by_contra hcon
+    push_neg at hcon
+    letI : Field ((K ⊗[F] E) ⧸ 𝔪) := Ideal.Quotient.field 𝔪
+    let ι : E →+* (K ⊗[F] E) ⧸ 𝔪 :=
+      (Ideal.Quotient.mk 𝔪).comp Algebra.TensorProduct.includeRight.toRingHom
+    let φ : Fin m → (E →* (K ⊗[F] E) ⧸ 𝔪) := fun i =>
+      ι.toMonoidHom.comp ((τ ^ (i : ℕ) : E ≃ₐ[F] E) : E →* E)
+    have hφ : Function.Injective φ := by
+      intro i j hij
+      have : τ ^ (i : ℕ) = τ ^ (j : ℕ) := by
+        ext c
+        exact ι.injective (DFunLike.congr_fun hij c)
+      exact Fin.ext (pow_injOn_Iio_orderOf (by simp [hm]) (by simp [hm]) this)
+    have hli := (linearIndependent_monoidHom E ((K ⊗[F] E) ⧸ 𝔪)).comp φ hφ
+    have := Fintype.linearIndependent_iff.1 hli (fun i => Ideal.Quotient.mk 𝔪 (a i)) (by
+      ext c
+      have h := Ideal.Quotient.eq_zero_iff_mem.2 (hcon (1 ⊗ₜ c))
+
+      rw [hΘ, map_sum, Finset.sum_range] at h
+      simp only [htm, map_mul] at h
+      rw [Finset.sum_apply]
+      exact h) ⟨0, hm0⟩
+    simp only [ha0, map_one] at this
+    exact one_ne_zero this)
   exact ⟨hc.unit, hfix c⟩
 
 end GlobalTheory.CNorm

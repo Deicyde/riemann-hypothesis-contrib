@@ -1,59 +1,74 @@
 module
 
-public import Mathlib
+import Development.AbelianVarietyTheory.Proofs.FlagMeasures.ExistsUnitaryLayerCoordsToBlocks
 public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.LowersMulZero
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.LinearAlgebra.Matrix.FiniteDimensional
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.TotallySplit
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
-open MeasureTheory NumberField Matrix Finset Formalism.MainNotions.S GlobalTheory.Count
-  GlobalTheory.FlagMeas GlobalTheory.FlagBase GlobalTheory.RadCov
+open MeasureTheory NumberField Matrix Finset Formalism.MainNotions.S GlobalTheory.Count GlobalTheory.FlagMeas GlobalTheory.FlagBase GlobalTheory.RadCov
 
 namespace GlobalTheory.RadCov.LowDim
 
-variable
-  {n m : ℕ} {W : ℕ → Submodule ℂ (Fin n → ℂ)} {r : ℕ → ℕ} {U : ∀ b, Matrix (Fin n) (Fin (r b)) ℂ}
+variable {n m : ℕ} {W : ℕ → Submodule ℂ (Fin n → ℂ)} {r : ℕ → ℕ}
+  {U : ∀ b, Matrix (Fin n) (Fin (r b)) ℂ}
 
 theorem block_eq_zero (hB : Biorth r m U (fun b => (U b)ᴴ)) {s : ℕ} (hs : m ≤ s) : U s = 0 := by
   obtain ⟨-, h2, h3⟩ := hB
-  calc
-    U s
-      = (∑ b ∈ range m, U b * (U b)ᴴ) * U s := by rw [h3, Matrix.one_mul]
+  calc U s = (∑ b ∈ range m, U b * (U b)ᴴ) * U s := by rw [h3, Matrix.one_mul]
     _ = 0 := by
       rw [Matrix.sum_mul]
       refine Finset.sum_eq_zero fun b hb => ?_
       have hb' : b ≠ s := by have := Finset.mem_range.1 hb; omega
       rw [Matrix.mul_assoc, h2 b s hb', Matrix.mul_zero]
 
-theorem mem_lowers_iff_blocks
-    (hB : Biorth r m U (fun b => (U b)ᴴ)) (hW : ∀ k y, y ∈ W k ↔ ∀ b, k ≤ b → (U b)ᴴ *ᵥ y = 0)
-    (c : ℕ) (Y : Matrix (Fin n) (Fin n) ℂ)
-    : Y ∈ lowers W c ↔ ∀ s t, t ≤ s + c → (U s)ᴴ * Y * U t = 0 := by
-  obtain ⟨-, h2, h3⟩ := hB
-  rw [mem_lowers]
-  constructor
-  · intro h s t hst
-    refine Matrix.ext_of_mulVec_single fun j => ?_
-    have hy : U t *ᵥ Pi.single j 1 ∈ W (s + c + 1) := by
-      rw [hW]
-      intro b hb
-      rw [Matrix.mulVec_mulVec, h2 b t (by omega), Matrix.zero_mulVec]
-    have := (hW _ _).1 (h s _ hy) s le_rfl
-    rw [Matrix.mulVec_mulVec, Matrix.mulVec_mulVec] at this
-    rw [this, Matrix.zero_mulVec]
-  · intro h b y hy
-    rw [hW]
-    intro s hs
-    have e : (U s)ᴴ *ᵥ Y *ᵥ y = ((U s)ᴴ * Y * ∑ t ∈ range m, U t * (U t)ᴴ) *ᵥ y := by
-      rw [h3, Matrix.mul_one, Matrix.mulVec_mulVec]
-    rw [e, Matrix.mul_sum, Matrix.sum_mulVec]
-    refine Finset.sum_eq_zero fun t _ => ?_
-    rw [← Matrix.mul_assoc, ← Matrix.mulVec_mulVec]
-    by_cases hst : t ≤ s + c
-    · rw [h s t hst, Matrix.zero_mulVec]
-    · rw [(hW _ _).1 hy t (by omega), Matrix.mulVec_zero]
+theorem mem_lowers_iff_blocks (hB : Biorth r m U (fun b => (U b)ᴴ))
+    (hW : ∀ k y, y ∈ W k ↔ ∀ b, k ≤ b → (U b)ᴴ *ᵥ y = 0) (c : ℕ) (Y : Matrix (Fin n) (Fin n) ℂ) :
+    Y ∈ lowers W c ↔ ∀ s t, t ≤ s + c → (U s)ᴴ * Y * U t = 0 := by
+  apply GlobalTheory.LayerIso.mem_lowers_iff <;> assumption
 
-noncomputable def layer (m : ℕ) (U : ∀ b, Matrix (Fin n) (Fin (r b)) ℂ) (c : ℕ)
-    : Matrix (Fin n) (Fin n) ℂ →ₗ[ℂ] ∀ b : Fin m, Matrix (Fin (r b)) (Fin (r (b + c + 1))) ℂ where
+noncomputable def layer (m : ℕ) (U : ∀ b, Matrix (Fin n) (Fin (r b)) ℂ) (c : ℕ) :
+    Matrix (Fin n) (Fin n) ℂ →ₗ[ℂ] ∀ b : Fin m, Matrix (Fin (r b)) (Fin (r (b + c + 1))) ℂ where
   toFun Y b := (U b)ᴴ * Y * U (b + c + 1)
   map_add' Y Z := by
     funext b
@@ -66,14 +81,13 @@ end GlobalTheory.RadCov.LowDim
 
 namespace GlobalTheory.RadCov
 
+
 open LowDim in
-theorem finrank_lowers_eq_succ_add
-    (n m : ℕ) (W : ℕ → Submodule ℂ (Fin n → ℂ))
-    (r : ℕ → ℕ) (U : ∀ b, Matrix (Fin n) (Fin (r b)) ℂ)
-    (hB : Biorth r m U (fun b => (U b)ᴴ)) (hW : ∀ k y, y ∈ W k ↔ ∀ b, k ≤ b → (U b)ᴴ *ᵥ y = 0)
-    (c : ℕ)
-    : Module.finrank ℂ (lowers W c)
-      = Module.finrank ℂ (lowers W (c + 1)) + ∑ b ∈ Finset.range m, r b * r (b + c + 1) := by
+theorem finrank_lowers_eq_succ_add (n m : ℕ) (W : ℕ → Submodule ℂ (Fin n → ℂ)) (r : ℕ → ℕ)
+    (U : ∀ b, Matrix (Fin n) (Fin (r b)) ℂ) (hB : Biorth r m U (fun b => (U b)ᴴ))
+    (hW : ∀ k y, y ∈ W k ↔ ∀ b, k ≤ b → (U b)ᴴ *ᵥ y = 0) (c : ℕ) :
+    Module.finrank ℂ (lowers W c) = Module.finrank ℂ (lowers W (c + 1)) +
+      ∑ b ∈ Finset.range m, r b * r (b + c + 1) := by
   have hle : lowers W (c + 1) ≤ lowers W c := by
     intro Y hY
     rw [mem_lowers_iff_blocks hB hW] at hY ⊢
@@ -100,10 +114,8 @@ theorem finrank_lowers_eq_succ_add
     rw [LinearMap.range_eq_top]
     intro Z
     obtain ⟨h1, h2, -⟩ := id hB
-    have key
-        : ∀ s t,
-          (U s)ᴴ * (∑ b : Fin m, U b * Z b * (U (b + c + 1))ᴴ) * U t
-            = ∑ b : Fin m, ((U s)ᴴ * U b) * Z b * ((U (b + c + 1))ᴴ * U t) := by
+    have key : ∀ s t, (U s)ᴴ * (∑ b : Fin m, U b * Z b * (U (b + c + 1))ᴴ) * U t
+        = ∑ b : Fin m, ((U s)ᴴ * U b) * Z b * ((U (b + c + 1))ᴴ * U t) := by
       intro s t
       rw [Matrix.mul_sum, Matrix.sum_mul]
       exact Finset.sum_congr rfl fun b _ => by simp only [Matrix.mul_assoc]
@@ -124,8 +136,7 @@ theorem finrank_lowers_eq_succ_add
       · simp
   have h := LinearMap.finrank_range_add_finrank_ker φ
   rw [hker, hrange, finrank_top, (Submodule.comapSubtypeEquivOfLe hle).finrank_eq,
-      Module.finrank_pi_fintype]
-    at h
+    Module.finrank_pi_fintype] at h
   rw [← h, add_comm, ← Fin.sum_univ_eq_sum_range (fun b => r b * r (b + c + 1)) m]
   simp [Module.finrank_matrix]
 

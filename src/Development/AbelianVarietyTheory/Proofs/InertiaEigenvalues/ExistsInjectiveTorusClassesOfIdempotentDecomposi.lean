@@ -1,10 +1,52 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.UnitLemmaGroup
-public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.LinearDescent
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.DltEqZero
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.CharpolyDvdPowOfAevalEqZero
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -20,11 +62,8 @@ variable {A : Type} [CommRing A] {I : Type} [Fintype I]
 
 def tt (f h c d : I → A) : A := 1 + ∑ i, ((c i - 1) * f i + (d i - 1) * h i)
 
-theorem f_mul_tt
-    (f h c d : I → A)
-    (hf : ∀ i, f i * f i = f i) (hff : ∀ i j, i ≠ j → f i * f j = 0) (hfh : ∀ i j, f i * h j = 0)
-    (j : I)
-    : f j * tt f h c d = c j * f j := by
+theorem f_mul_tt (f h c d : I → A) (hf : ∀ i, f i * f i = f i) (hff : ∀ i j, i ≠ j → f i * f j = 0)
+    (hfh : ∀ i j, f i * h j = 0) (j : I) : f j * tt f h c d = c j * f j := by
   classical
   unfold tt
   rw [mul_add, Finset.mul_sum, Finset.sum_eq_single j]
@@ -38,17 +77,14 @@ theorem tt_swap (f h c d : I → A) : tt f h c d = tt h f d c := by
   congr 1
   exact Finset.sum_congr rfl fun i _ => add_comm _ _
 
-theorem tt_mul
-    (f h c d c' d' : I → A) (hf : ∀ i, f i * f i = f i) (hff : ∀ i j, i ≠ j → f i * f j = 0)
-    (hh : ∀ i, h i * h i = h i) (hhh : ∀ i j, i ≠ j → h i * h j = 0) (hfh : ∀ i j, f i * h j = 0)
-    : tt f h c d * tt f h c' d' = tt f h (c * c') (d * d') := by
+theorem tt_mul (f h c d c' d' : I → A) (hf : ∀ i, f i * f i = f i) (hff : ∀ i j, i ≠ j → f i * f j = 0)
+    (hh : ∀ i, h i * h i = h i) (hhh : ∀ i j, i ≠ j → h i * h j = 0)
+    (hfh : ∀ i j, f i * h j = 0) : tt f h c d * tt f h c' d' = tt f h (c * c') (d * d') := by
   have h1 := f_mul_tt f h c' d' hf hff hfh
   have h2 := f_mul_tt h f d' c' hh hhh (fun i j => by rw [mul_comm]; exact hfh j i)
   rw [← tt_swap] at h2
-  have h3
-      : tt f h c d * tt f h c' d'
-        = tt f h c' d'
-          + ∑ i, ((c i - 1) * (f i * tt f h c' d') + (d i - 1) * (h i * tt f h c' d')) := by
+  have h3 : tt f h c d * tt f h c' d' =
+      tt f h c' d' + ∑ i, ((c i - 1) * (f i * tt f h c' d') + (d i - 1) * (h i * tt f h c' d')) := by
     conv_lhs => arg 1; unfold tt
     rw [add_mul, one_mul, Finset.sum_mul]
     congr 1
@@ -64,19 +100,15 @@ theorem tt_one (f h : I → A) : tt f h 1 1 = 1 := by simp [tt]
 
 end Ring
 
-theorem isIntegral_idem
-    {O A : Type} [CommRing O] [CommRing A] [Algebra O A] {f : A} (hf : f * f = f)
-    : IsIntegral O f := by
+theorem isIntegral_idem {O A : Type} [CommRing O] [CommRing A] [Algebra O A] {f : A} (hf : f * f = f) :
+    IsIntegral O f := by
   nontriviality O
   refine ⟨X ^ 2 - X, ?_, ?_⟩
   · monicity!
   · simp [pow_two, hf]
 
-theorem isIntegral_of_mul_idem
-    {K : UQ} (B : InvAlg K)
-    {f : B.A} (hf : f * f = f) (h0 : f ≠ 0)
-    (x : K.E) (hx : IsIntegral K.O (algebraMap K.E B.A x * f))
-    : IsIntegral K.O x := by
+theorem isIntegral_of_mul_idem {K : UQ} (B : InvAlg K) {f : B.A} (hf : f * f = f) (h0 : f ≠ 0) (x : K.E)
+    (hx : IsIntegral K.O (algebraMap K.E B.A x * f)) : IsIntegral K.O x := by
   let J : Ideal B.A := Ideal.span {1 - f}
   have hJ : J ≠ ⊤ := by
     intro h
@@ -85,25 +117,23 @@ theorem isIntegral_of_mul_idem
     apply h0
     linear_combination (-f) * hr - r * hf
   haveI : Nontrivial (B.A ⧸ J) := Ideal.Quotient.nontrivial_iff.2 hJ
-  let φ : K.E →ₐ[K.O] B.A ⧸ J :=
-    (Ideal.Quotient.mkₐ K.O J).comp (IsScalarTower.toAlgHom K.O K.E B.A)
+  let φ : K.E →ₐ[K.O] B.A ⧸ J := (Ideal.Quotient.mkₐ K.O J).comp (IsScalarTower.toAlgHom K.O K.E B.A)
   have hinj : Function.Injective φ := φ.toRingHom.injective
   rw [← isIntegral_algHom_iff φ hinj]
   have h1 := hx.map (Ideal.Quotient.mkₐ K.O J)
   have h2 : Ideal.Quotient.mkₐ K.O J (algebraMap K.E B.A x * f) = φ x := by
     show Ideal.Quotient.mk J _ = Ideal.Quotient.mk J (algebraMap K.E B.A x)
     rw [Ideal.Quotient.eq]
-    exact Ideal.mem_span_singleton'.2 ⟨- algebraMap K.E B.A x, by ring⟩
+    exact Ideal.mem_span_singleton'.2 ⟨-algebraMap K.E B.A x, by ring⟩
   rwa [h2] at h1
 
-theorem le_of_isIntegral
-    {K : UQ} {a : K.O} (ha : K.Small a)
-    (n m : ℕ) (h : IsIntegral K.O (((algebraMap K.O K.E a) ^ n)⁻¹ * (algebraMap K.O K.E a) ^ m))
-    : n ≤ m := by
+theorem le_of_isIntegral {K : UQ} {a : K.O} (ha : K.Small a) (n m : ℕ)
+    (h : IsIntegral K.O (((algebraMap K.O K.E a) ^ n)⁻¹ * (algebraMap K.O K.E a) ^ m)) : n ≤ m := by
   by_contra hlt
   push Not at hlt
   obtain ⟨r, hr⟩ := (IsIntegrallyClosed.isIntegral_iff).1 h
-  have ha0 : algebraMap K.O K.E a ≠ 0 := by simpa using ha.1
+  have ha0 : algebraMap K.O K.E a ≠ 0 := by
+    simpa using ha.1
   obtain ⟨d, rfl⟩ := Nat.exists_eq_add_of_lt hlt
   have h1 : algebraMap K.O K.E (a * (a ^ d * r)) = algebraMap K.O K.E 1 := by
     simp only [map_mul, map_pow, map_one, hr]
@@ -112,15 +142,7 @@ theorem le_of_isIntegral
   have h2 := IsFractionRing.injective K.O K.E h1
   exact ha.2.1 (IsUnit.of_mul_eq_one _ h2)
 
-theorem torus_points
-    : ∀ (K : UQ) (B : InvAlg K) (ι : Type) [Fintype ι] (e : ι → B.A) (S : Finset ι) (a : K.O),
-      K.Small a → IsPre B e S
-        → ∀ k : ℕ, ∃ f : ({i // i ∉ S} → Fin (k + 1)) → B.T ⧸ (intUnits K.O B.A).subgroupOf B.T,
-          Function.Injective f
-            ∧ ∀ n,
-              IsIntegral K.O
-                ((((Quotient.out (f n) : B.T) : B.Aˣ)⁻¹ : B.Aˣ) * algebraMap K.O B.A a ^ k
-                  : B.A) := by
+theorem torus_points : ∀ (K : UQ) (B : InvAlg K) (ι : Type) [Fintype ι] (e : ι → B.A) (S : Finset ι) (a : K.O), K.Small a → IsPre B e S → ∀ k : ℕ, ∃ f : ({i // i ∉ S} → Fin (k + 1)) → B.T ⧸ (intUnits K.O B.A).subgroupOf B.T, Function.Injective f ∧ ∀ n, IsIntegral K.O ((((Quotient.out (f n) : B.T) : B.Aˣ)⁻¹ : B.Aˣ) * algebraMap K.O B.A a ^ k : B.A) := by
   intro K B ι _ e S a ha hP k
   classical
   obtain ⟨hC, hP⟩ := hP
@@ -149,10 +171,8 @@ theorem torus_points
     · rw [hfe i, hhe j]; linear_combination f i * h j * hee i j hij
   set α : K.E := algebraMap K.O K.E a with hα
   have hα0 : α ≠ 0 := by simpa [hα] using ha.1
-  let c : ({i // i ∉ S} → Fin (k + 1)) → {i // i ∉ S} → B.A := fun n i =>
-    algebraMap K.E B.A (α ^ (n i : ℕ))
-  let d : ({i // i ∉ S} → Fin (k + 1)) → {i // i ∉ S} → B.A := fun n i =>
-    algebraMap K.E B.A (α ^ (n i : ℕ))⁻¹
+  let c : ({i // i ∉ S} → Fin (k + 1)) → {i // i ∉ S} → B.A := fun n i => algebraMap K.E B.A (α ^ (n i : ℕ))
+  let d : ({i // i ∉ S} → Fin (k + 1)) → {i // i ∉ S} → B.A := fun n i => algebraMap K.E B.A (α ^ (n i : ℕ))⁻¹
   have hcd : ∀ n, c n * d n = 1 := fun n => by
     funext i
     show algebraMap K.E B.A _ * algebraMap K.E B.A _ = 1
@@ -163,17 +183,13 @@ theorem torus_points
     rw [tt_swap f h (d n)]
     unfold tt
     have hcα : K.c α = α := ha.2.2
-    set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_add (f := _), map_one, map_sum, map_mul, map_sub, c, d, f, h, B.σ_σ, B.σ_alg,
-      map_inv₀, map_pow, hcα]
+
+    simp only [map_add (f := _), map_one, map_sum, map_mul, map_sub, c, d, f, h, B.σ_σ, B.σ_alg, map_inv₀, map_pow, hcα]
   let u : ({i // i ∉ S} → Fin (k + 1)) → B.Aˣ := fun n =>
     ⟨tt f h (c n) (d n), tt f h (d n) (c n), hinv n, by rw [mul_comm]; exact hinv n⟩
-  let t : ({i // i ∉ S} → Fin (k + 1)) → B.T := fun n => ⟨
-    u n,
-    by
-      show tt f h (c n) (d n) * B.σ (tt f h (c n) (d n)) = 1
-      rw [hσ, hinv]
-  ⟩
+  let t : ({i // i ∉ S} → Fin (k + 1)) → B.T := fun n => ⟨u n, by
+    show tt f h (c n) (d n) * B.σ (tt f h (c n) (d n)) = 1
+    rw [hσ, hinv]⟩
   have hαA : algebraMap K.O B.A a = algebraMap K.E B.A α := IsScalarTower.algebraMap_apply _ _ _ _
   have hia : IsIntegral K.O (algebraMap K.E B.A α) := hαA ▸ isIntegral_algebraMap
   have key : ∀ n m, ((t n)⁻¹ * t m) ∈ (intUnits K.O B.A).subgroupOf B.T → ∀ i, (n i : ℕ) ≤ m i := by
@@ -189,8 +205,7 @@ theorem torus_points
   refine ⟨fun n => QuotientGroup.mk (t n), ?_, ?_⟩
   · intro n m hnm
     funext i
-    exact Fin.ext (le_antisymm (key n m (QuotientGroup.eq.1 hnm) i)
-      (key m n (QuotientGroup.eq.1 hnm.symm) i))
+    exact Fin.ext (le_antisymm (key n m (QuotientGroup.eq.1 hnm) i) (key m n (QuotientGroup.eq.1 hnm.symm) i))
   · intro n
     obtain ⟨w, hw⟩ := QuotientGroup.mk_out_eq_mul ((intUnits K.O B.A).subgroupOf B.T) (t n)
     show IsIntegral K.O (((((QuotientGroup.mk (t n) : B.T ⧸ (intUnits K.O B.A).subgroupOf B.T).out : B.T) : B.Aˣ)⁻¹ : B.Aˣ) * algebraMap K.O B.A a ^ k : B.A)
@@ -208,10 +223,9 @@ theorem torus_points
       generalize (n i : ℕ) = j at hr this
       rw [hr, pow_add]
       linear_combination algebraMap K.E B.A α ^ r * this
-    have h2
-        : ((d n i - 1) * f i + (c n i - 1) * h i) * algebraMap K.E B.A α ^ k
-          = (algebraMap K.E B.A α ^ r - algebraMap K.E B.A α ^ k) * f i
-            + (algebraMap K.E B.A α ^ (n i : ℕ) - 1) * h i * algebraMap K.E B.A α ^ k := by
+    have h2 : ((d n i - 1) * f i + (c n i - 1) * h i) * algebraMap K.E B.A α ^ k =
+        (algebraMap K.E B.A α ^ r - algebraMap K.E B.A α ^ k) * f i +
+          (algebraMap K.E B.A α ^ (n i : ℕ) - 1) * h i * algebraMap K.E B.A α ^ k := by
       rw [← h1]; simp only [c, map_pow]; ring
     rw [h2]
     exact (((hia.pow r).sub (hia.pow k)).mul (isIntegral_idem (hf i))).add

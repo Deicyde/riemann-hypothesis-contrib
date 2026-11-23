@@ -1,13 +1,53 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.Statements.PlaceShiftStatements.NormSmall
-public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.RatInOfUnit
-public import Development.AbelianVarietyTheory.BlockTheory.DivisorBase.WeilTensorModels
-public import Development.AbelianVarietyTheory.Definitions.Divisors.DiscreteSeriesHermitianUnique
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.NegIdxOfIsStd
-public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.IdempotentMulCutSubOneEntry
+public import Development.AbelianVarietyTheory.BlockTheory.TwistedDiscreteSeries.SplitSumStabLattice
+public import Development.AbelianVarietyTheory.BlockTheory.TwistedDiscreteSeries.UnitCharTriangle
+public import Formalism.LocalToGlobal.ProjectiveLattices.FamilyUniformisationBasePointOrthogonalBis
+public import Development.AbelianVarietyTheory.Proofs.AdelicLatticeProofs.MemLatOIffExistsActO
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.IdempotentMulEqZeroOfOrthogonal
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.FirstStandardPairMemberHasThetaFunction
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Std.Tactic.BVDecide.Normalize.Prop
+import Development.AbelianVarietyTheory.Definitions.Divisors.CmHostImaginaryGeneratorNeZero
+import Development.AbelianVarietyTheory.Definitions.Divisors.FinitePrimesUnder
+import Development.AbelianVarietyTheory.Definitions.Divisors.FlatTensorVacuum
+import Development.AbelianVarietyTheory.Definitions.TwistedInnerProducts.ExistsMatchOver
 
 @[expose] public section
 
@@ -131,7 +171,6 @@ private theorem isUnitDet_mul
   · rw [_root_.mul_inv_rev, Units.val_mul, map_mul]
     exact mul_mem hy.2.2 hx.2.2
 
-set_option maxHeartbeats 1000000 in
 private theorem isUnitDet_div
     {e : AE D} {S : Finset (Formalism.L2.DIV.Pl D.host.E)} (he : IsIdemSum e S)
     {k : ℕ} {L κ : Matrix (Fin k) (Fin k) (EAf D)} (hκ : IsIntM κ)
@@ -218,8 +257,6 @@ private theorem exists_unitDet
     GlobalTheory.PlaceDatum.finPart_mem_of_toEAf (c ▸ m2)
   ⟩
 
-set_option synthInstance.maxHeartbeats 100000 in
-set_option maxHeartbeats 1000000 in
 private theorem smul_inv_eq
     {n : ℕ} {ε : EAf D} {g B : GL (Fin n) (EAf D)} (h : ε • g.val = ε • B.val)
     : ε • (g⁻¹).val = ε • (B⁻¹).val := by
@@ -229,8 +266,6 @@ private theorem smul_inv_eq
     _ = (g⁻¹).val * (ε • g.val) * (B⁻¹).val := by rw [h]
     _ = ε • (B⁻¹).val := by rw [Matrix.mul_smul, Units.inv_mul, Matrix.smul_mul, Matrix.one_mul]
 
-set_option synthInstance.maxHeartbeats 100000 in
-set_option maxHeartbeats 2000000 in
 private theorem frMapO_change
     {e : AE D} (A WW : HSp D) (βA βA' : GL (Fin A.rank) (EAf D)) (βW βW' : GL (Fin WW.rank) (EAf D))
     (k : GA D WW)
@@ -267,8 +302,6 @@ namespace GlobalTheory.frameChangeUnitDeterminant
 
 open Formalism.IndefR.Datum
 
-set_option synthInstance.maxHeartbeats 100000 in
-set_option maxHeartbeats 4000000 in
 private theorem stdFst_change_frames
     : ∀ {D : D7} (ν : (AE D)ˣ →* Circle) (e : AE D) (S : Finset (Formalism.L2.DIV.Pl D.host.E)),
       IsIdemSum e S

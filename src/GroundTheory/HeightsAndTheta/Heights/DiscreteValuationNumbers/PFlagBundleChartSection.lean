@@ -1,8 +1,54 @@
 module
 
-public import Mathlib
 public import GroundTheory.HeightsAndTheta.Heights.DiscreteValuationNumbers.StatementsFlagBundleChartSection
 public import GroundTheory.HeightsAndTheta.Heights.DiscreteValuationNumbers.PFlagBundleChartSectionTools
+import GroundTheory.HeightsAndTheta.Heights.DiscreteValuationNumbers.PProjIdealFormValue
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import GroundTheory.HeightsAndTheta.Heights.DiscreteValuationNumbers.StatementsFlagBundleForms
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.IsSemipositiveOn
 
 @[expose] public section
 
@@ -14,6 +60,7 @@ open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
 
 noncomputable section
 
+
 open FlagBundleSectionForms (chartPow chartMono liftNat) in
 open FlagBundleChartSection in
 theorem FlagBundleChartSection.proof : FlagBundleChartSection.Statement := by
@@ -23,17 +70,16 @@ theorem FlagBundleChartSection.proof : FlagBundleChartSection.Statement := by
   have hcpb : chartPow y c (b i) ≠ 0 := chartPow_ne_zero hY _
   obtain ⟨dl, β, f, hfh, hdeg, hfv⟩ := exists_section_form (M := M) y B w b hfl a φ hφ t i c hsc
 
-  obtain ⟨vi, hviL, hviT, hviD⟩
-      : ∃ v ∈ B.lat c, (∀ j, i < j → w.repr v j = 0) ∧ w.repr v i = chartPow y c (b i) := by
+  obtain ⟨vi, hviL, hviT, hviD⟩ : ∃ v ∈ B.lat c, (∀ j, i < j → w.repr v j = 0) ∧
+      w.repr v i = chartPow y c (b i) := by
     have h := hfl.graded c hsc i
     rw [Set.ext_iff] at h
     exact (h (chartPow y c (b i))).2 ⟨1, one_mem _, (one_mul _).symm⟩
 
-  have hr : ∀ l, ∃ r ∈ chartRing F (segreVec y) c, φ l vi = r * chartPow y c a := fun l =>
-    hφ.sections c hsc l vi hviL
+  have hr : ∀ l, ∃ r ∈ chartRing F (segreVec y) c, φ l vi = r * chartPow y c a :=
+    fun l => hφ.sections c hsc l vi hviL
   choose r hrA hrv using hr
-  obtain ⟨n₂, R, hRh, hRe⟩ :=
-    chartRing_forms_fin (M := M) y w φ (truncCoord t ((i : ℕ) + 1)) c hsc hrA
+  obtain ⟨n₂, R, hRh, hRe⟩ := chartRing_forms_fin (M := M) y w φ (truncCoord t ((i : ℕ) + 1)) c hsc hrA
 
   let γ₁ : K → ℕ := fun k => (b i k - a k).toNat
   let γ₂ : K → ℕ := fun k => (a k - b i k).toNat
@@ -48,9 +94,8 @@ theorem FlagBundleChartSection.proof : FlagBundleChartSection.Statement := by
   have hYh : ∀ l, IsMultiHomog (Y l) e := by
     intro l
     refine isMultiHomog_sub ?_ ?_
-    · have h :=
-        (chartMono_homog (F := F) M c δ).mul
-          (isWeightedHomogeneous_X F (blockWeight (bundleIdx ι M)) ⟨none, l⟩)
+    · have h := (chartMono_homog (F := F) M c δ).mul
+        (isWeightedHomogeneous_X F (blockWeight (bundleIdx ι M)) ⟨none, l⟩)
       have he : e = liftNat δ + blockWeight (bundleIdx ι M) ⟨none, l⟩ := by
         funext o
         cases o <;> simp [e, liftNat, blockWeight]
@@ -72,57 +117,41 @@ theorem FlagBundleChartSection.proof : FlagBundleChartSection.Statement := by
           omega
       rw [he]
       exact h
-  have hid
-      : (∏ k, y ⟨k, c k⟩ ^ δ k) * chartPow y c a
-        = (∏ k, y ⟨k, c k⟩ ^ β k) * segreVec y c ^ n₂ * (∏ k, y ⟨k, c k⟩ ^ γ₂ k)
-          * chartPow y c (b i) := by
+  have hid : (∏ k, y ⟨k, c k⟩ ^ δ k) * chartPow y c a =
+      (∏ k, y ⟨k, c k⟩ ^ β k) * segreVec y c ^ n₂ * (∏ k, y ⟨k, c k⟩ ^ γ₂ k) * chartPow y c (b i) := by
     rw [segreVec_pow, ← chartPow_natCast, ← chartPow_natCast, ← chartPow_natCast]
     simp only [← chartPow_add hY]
     congr 1
     funext k
     simp only [Pi.add_apply, Nat.cast_add, δ, γ₁, γ₂]
     omega
-  have hevY
-      : ∀ l,
-        eval₂ ((algebraMap Ω Φ).comp (algebraMap F Ω))
-            (projCoord y w φ (truncCoord t ((i : ℕ) + 1))) (Y l)
-          = algebraMap Ω Φ (∏ k, y ⟨k, c k⟩ ^ δ k)
-              * projCoord y w φ (truncCoord t ((i : ℕ) + 1)) ⟨none, l⟩
-            - algebraMap Ω Φ (∏ k, y ⟨k, c k⟩ ^ δ k) * (t i * algebraMap Ω Φ (chartPow y c (b i))⁻¹)
-              * algebraMap Ω Φ (φ l vi) := by
+  have hevY : ∀ l, eval₂ ((algebraMap Ω Φ).comp (algebraMap F Ω))
+      (projCoord y w φ (truncCoord t ((i : ℕ) + 1))) (Y l) =
+      algebraMap Ω Φ (∏ k, y ⟨k, c k⟩ ^ δ k) * projCoord y w φ (truncCoord t ((i : ℕ) + 1)) ⟨none, l⟩ -
+        algebraMap Ω Φ (∏ k, y ⟨k, c k⟩ ^ δ k) * (t i * algebraMap Ω Φ (chartPow y c (b i))⁻¹) *
+          algebraMap Ω Φ (φ l vi) := by
     intro l
-    have hΩ
-        : r l * segreVec y c ^ n₂ * (∏ k, y ⟨k, c k⟩ ^ γ₂ k) * (∏ k, y ⟨k, c k⟩ ^ β k)
-          = (∏ k, y ⟨k, c k⟩ ^ δ k) * (chartPow y c (b i))⁻¹ * (r l * chartPow y c a) := by
-      rw [show (∏ k, y ⟨k, c k⟩ ^ δ k) * (chartPow y c (b i))⁻¹ * (r l * chartPow y c a)
-            = r l * ((∏ k, y ⟨k, c k⟩ ^ δ k) * chartPow y c a) * (chartPow y c (b i))⁻¹ by
-          ring,
-        hid]
+    have hΩ : r l * segreVec y c ^ n₂ * (∏ k, y ⟨k, c k⟩ ^ γ₂ k) * (∏ k, y ⟨k, c k⟩ ^ β k) =
+        (∏ k, y ⟨k, c k⟩ ^ δ k) * (chartPow y c (b i))⁻¹ * (r l * chartPow y c a) := by
+      rw [show (∏ k, y ⟨k, c k⟩ ^ δ k) * (chartPow y c (b i))⁻¹ * (r l * chartPow y c a) =
+        r l * ((∏ k, y ⟨k, c k⟩ ^ δ k) * chartPow y c a) * (chartPow y c (b i))⁻¹ by ring, hid]
       field_simp
     have h2 := congrArg (algebraMap Ω Φ) hΩ
     simp only [Y, u, eval₂_sub, eval₂_mul, eval₂_X, hRe, eval_chartMono, hfv, hrv]
     simp only [map_mul, map_inv₀] at h2 ⊢
     linear_combination (-(t i)) * h2
 
-  have hgev
-      : (fun v =>
-          eval₂ ((algebraMap Ω Φ).comp (algebraMap F Ω))
-            (projCoord y w φ (truncCoord t ((i : ℕ) + 1))) (g v))
-        = projCoord y w φ
-          (truncCoord
-            (fun j =>
-              algebraMap Ω Φ (∏ k, y ⟨k, c k⟩ ^ δ k)
-                * (t j
-                  - t i * algebraMap Ω Φ (chartPow y c (b i))⁻¹ * algebraMap Ω Φ (w.repr vi j)))
-            i) := by
+  have hgev : (fun v => eval₂ ((algebraMap Ω Φ).comp (algebraMap F Ω))
+      (projCoord y w φ (truncCoord t ((i : ℕ) + 1))) (g v)) =
+      projCoord y w φ (truncCoord (fun j => algebraMap Ω Φ (∏ k, y ⟨k, c k⟩ ^ δ k) *
+        (t j - t i * algebraMap Ω Φ (chartPow y c (b i))⁻¹ * algebraMap Ω Φ (w.repr vi j))) i) := by
     funext v
     rcases v with ⟨_ | k, p⟩
     · show eval₂ _ _ (Y p) = _
-      have hφv
-          : algebraMap Ω Φ (φ p vi)
-            = ∑ j, algebraMap Ω Φ (w.repr vi j) * algebraMap Ω Φ (φ p (w j)) := by
+      have hφv : algebraMap Ω Φ (φ p vi) =
+          ∑ j, algebraMap Ω Φ (w.repr vi j) * algebraMap Ω Φ (φ p (w j)) := by
         conv_lhs => rw [← w.sum_repr vi]
-        set_option synthInstance.maxHeartbeats 100000 in
+
         simp only [map_sum, map_smul, smul_eq_mul, map_mul]
       rw [hevY p, hφv]
       simp only [projCoord]
@@ -137,9 +166,7 @@ theorem FlagBundleChartSection.proof : FlagBundleChartSection.Statement := by
       · subst h
         have h1 : ¬ (j : ℕ) < j := lt_irrefl _
         have h2 : (j : ℕ) < (j : ℕ) + 1 := Nat.lt_succ_self _
-        have hσ
-            : t j * algebraMap Ω Φ (chartPow y c (b j))⁻¹ * algebraMap Ω Φ (chartPow y c (b j))
-              = t j := by
+        have hσ : t j * algebraMap Ω Φ (chartPow y c (b j))⁻¹ * algebraMap Ω Φ (chartPow y c (b j)) = t j := by
           rw [mul_assoc, ← map_mul, inv_mul_cancel₀ hcpb, map_one, mul_one]
         simp only [h1, h2, if_true, if_false, hviD]
         linear_combination (-(algebraMap Ω Φ (∏ k, y ⟨k, c k⟩ ^ δ k) * algebraMap Ω Φ (φ p (w j)))) * hσ
@@ -154,10 +181,9 @@ theorem FlagBundleChartSection.proof : FlagBundleChartSection.Statement := by
     · rw [eval₂_X]
       rfl
 
-  have hform
-      : ∀ (d : Option K → ℕ) (q : MRing (bundleIdx ι M) F),
-        IsMultiHomog q d → q ∈ projIdeal F y w φ (truncCoord t i)
-          → u ^ d none * q ∈ projIdeal F y w φ (truncCoord t ((i : ℕ) + 1)) ⊔ Ideal.span {f} := by
+  have hform : ∀ (d : Option K → ℕ) (q : MRing (bundleIdx ι M) F), IsMultiHomog q d →
+      q ∈ projIdeal F y w φ (truncCoord t i) →
+      u ^ d none * q ∈ projIdeal F y w φ (truncCoord t ((i : ℕ) + 1)) ⊔ Ideal.span {f} := by
     intro d q hq hqI
     have h1 : bind₁ g q ∈ projIdeal F y w φ (truncCoord t ((i : ℕ) + 1)) := by
       rw [ProjIdealFormValue.proof F Ω K ι y N E w M φ Φ _ _ _
@@ -170,43 +196,35 @@ theorem FlagBundleChartSection.proof : FlagBundleChartSection.Statement := by
       rw [← bind₁_scale u hq]
       refine bind₁_sub_mem _ g _ (fun v => ?_) q
       rcases v with ⟨_ | k, p⟩
-      · have h3
-            : u ^ blockWeight (bundleIdx ι M) ⟨none, p⟩ none * X ⟨none, p⟩ - g ⟨none, p⟩
-              = R p * chartMono M c γ₂ * f := by
+      · have h3 : u ^ blockWeight (bundleIdx ι M) ⟨none, p⟩ none * X ⟨none, p⟩ - g ⟨none, p⟩ =
+            R p * chartMono M c γ₂ * f := by
           simp [g, Y, blockWeight]
         rw [h3]
         exact Ideal.mul_mem_left _ _ (Ideal.mem_span_singleton_self f)
-      · have h3
-            : u ^ blockWeight (bundleIdx ι M) ⟨some k, p⟩ none * X ⟨some k, p⟩ - g ⟨some k, p⟩
-              = 0 := by
+      · have h3 : u ^ blockWeight (bundleIdx ι M) ⟨some k, p⟩ none * X ⟨some k, p⟩ - g ⟨some k, p⟩ = 0 := by
           simp [g, blockWeight]
         rw [h3]
         exact zero_mem _
-    have h3
-        : bind₁ g q + (u ^ d none * q - bind₁ g q)
-          ∈ projIdeal F y w φ (truncCoord t ((i : ℕ) + 1)) ⊔ Ideal.span {f} :=
+    have h3 : bind₁ g q + (u ^ d none * q - bind₁ g q) ∈
+        projIdeal F y w φ (truncCoord t ((i : ℕ) + 1)) ⊔ Ideal.span {f} :=
       Ideal.add_mem _ (Ideal.mem_sup_left h1) (Ideal.mem_sup_right h2)
     rwa [add_sub_cancel] at h3
   refine ⟨dl, liftNat β, f, chartMono M c β, β, rfl, hfh, chartMono_homog M c β, hdeg, hfv, ?_⟩
   intro q hq
 
-  have hsat
-      : ∀ d, ∃ n : ℕ,
-        (∏ k, (X ⟨some k, c k⟩ : MRing (bundleIdx ι M) F)) ^ n
-            * weightedHomogeneousComponent (blockWeight (bundleIdx ι M)) d q
-          ∈ projIdeal F y w φ (truncCoord t ((i : ℕ) + 1)) ⊔ Ideal.span {f} := by
+  have hsat : ∀ d, ∃ n : ℕ, (∏ k, (X ⟨some k, c k⟩ : MRing (bundleIdx ι M) F)) ^ n *
+      weightedHomogeneousComponent (blockWeight (bundleIdx ι M)) d q ∈
+      projIdeal F y w φ (truncCoord t ((i : ℕ) + 1)) ⊔ Ideal.span {f} := by
     intro d
-    have hqd :=
-      hform d _ (weightedHomogeneousComponent_isWeightedHomogeneous _ _)
-        (component_mem_projIdeal y w φ _ hq d)
+    have hqd := hform d _ (weightedHomogeneousComponent_isWeightedHomogeneous _ _)
+      (component_mem_projIdeal y w φ _ hq d)
     obtain ⟨r', hr'⟩ := chartMono_pow_dvd (F := F) (M := M) c δ (d none)
     refine ⟨d none * ∑ k, δ k, ?_⟩
     rw [hr', mul_comm (chartMono M c δ ^ d none) r', mul_assoc]
     exact Ideal.mul_mem_left _ _ hqd
   choose nn hnn using hsat
-  obtain ⟨S, hS⟩
-      : ∃ S : Finset (Option K → ℕ),
-        q = ∑ d ∈ S, weightedHomogeneousComponent (blockWeight (bundleIdx ι M)) d q := by
+  obtain ⟨S, hS⟩ : ∃ S : Finset (Option K → ℕ),
+      q = ∑ d ∈ S, weightedHomogeneousComponent (blockWeight (bundleIdx ι M)) d q := by
     have hfin := weightedHomogeneousComponent_finsupp (w := blockWeight (bundleIdx ι M)) q
     refine ⟨hfin.toFinset, ?_⟩
     conv_lhs => rw [← sum_weightedHomogeneousComponent (blockWeight (bundleIdx ι M)) q]

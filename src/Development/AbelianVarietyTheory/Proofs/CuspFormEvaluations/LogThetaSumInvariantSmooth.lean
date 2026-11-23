@@ -1,25 +1,61 @@
 module
 
-public import Mathlib
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArakelovVolumes.UpperBounds.BasePsiLeviLowerBound
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArakelovVolumes.UpperBounds.FundSetMeasStatement
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.SquareIntegrability.TorusAtData
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.FundamentalDomains.FundamentalDomainPointBound
-public import ReciprocityTheory.L2DbarEstimates.LeviForms.OfRealNormSqSumMul
-public import ReciprocityTheory.L2DbarEstimates.ChartDerivatives.HoloSmooth
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArakelovVolumes.UpperBounds.InterpStatementPfH
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.FundamentalDomains.OrthogonalFrameDomain
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.FundamentalDomains.MaximumBoundField
-public import Development.AbelianVarietyTheory.Proofs.TorusHaarMeasure.MajLactRmul
-public import Development.AbelianVarietyTheory.Proofs.CuspFormEvaluations.NormalisedThetaNormInvariant
 public import Development.AbelianVarietyTheory.Proofs.CuspFormEvaluations.LevelTupleSumEqRational
-public import Development.AbelianVarietyTheory.Proofs.CuspFormEvaluations.PointwiseNormCanonicalThetaEqSqThetaConstant
 public import Development.AbelianVarietyTheory.Proofs.CuspFormEvaluations.ExistsGeneratorsLattice
+public import Development.AbelianVarietyTheory.Proofs.CuspFormEvaluations.NormalisedThetaNormInvariant
+public import Development.AbelianVarietyTheory.Proofs.CuspFormEvaluations.PointwiseNormCanonicalThetaEqSqThetaConstant
+import Development.AbelianVarietyTheory.Proofs.TorusHaarMeasure.MajLactRmul
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.InnerProductSpace.Calculus
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+public import ReciprocityTheory.L2DbarEstimates.ChartDerivatives.HoloSmooth
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArakelovVolumes.UpperBounds.ExhaustFStatementPfD
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArakelovVolumes.UpperBounds.InterpStatementPfH
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.FundamentalDomains.MaximumBoundField
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.FundamentalDomains.OrthogonalFrameDomain
 
 @[expose] public section
 
-open NumberField ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.I2
-  ReciprocityTheory.ChartRestriction.G.AR.Up ReciprocityTheory.ChartRestriction.G.AR.Inst
+open NumberField ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.I2 ReciprocityTheory.ChartRestriction.G.AR.Up ReciprocityTheory.ChartRestriction.G.AR.Inst
 open scoped ContDiff
 
 namespace GlobalTheory.ThetaLogSum
@@ -28,28 +64,24 @@ open GlobalTheory.LevelTupleSum
 
 variable {E : Type} [Field E] [NumberField E] {r : ℕ}
 
-theorem gen_map
-    {Λ : Submodule (𝓞 E) (Fin r → E)}
-    (e : (Fin r → E) ≃ₗ[E] (Fin r → E)) (he : ∀ v, v ∈ Λ ↔ e v ∈ Λ)
-    {t : Fin r → Fin r → E} (h : Gen Λ t)
-    : Gen Λ fun j => e (t j) := by
+theorem gen_map {Λ : Submodule (𝓞 E) (Fin r → E)} (e : (Fin r → E) ≃ₗ[E] (Fin r → E))
+    (he : ∀ v, v ∈ Λ ↔ e v ∈ Λ) {t : Fin r → Fin r → E} (h : Gen Λ t) :
+    Gen Λ fun j => e (t j) := by
   refine ⟨fun j => ?_, fun u hu => ?_⟩
   · rw [← map_smul]
     exact (he _).1 (h.1 j)
   · obtain ⟨c, y, hy, h2⟩ := h.2 (e.symm u) ((he _).2 (by simpa using hu))
     refine ⟨c, e y, (he _).1 hy, ?_⟩
     have := congrArg e h2
-    set_option synthInstance.maxHeartbeats 100000 in
+
     simpa only [LinearEquiv.apply_symm_apply, map_add (f := _), map_sum, map_smul] using this
 
-theorem exists_reps_map
-    {Λ : Submodule (𝓞 E) (Fin r → E)}
-    (e : (Fin r → E) ≃ₗ[E] (Fin r → E)) (he : ∀ v, v ∈ Λ ↔ e v ∈ Λ)
-    (𝒯 : Finset (Fin r → Fin r → E))
-    (h1 : ∀ t ∈ 𝒯, Gen Λ t) (h2 : ∀ t, Gen Λ t → ∃! t', t' ∈ 𝒯 ∧ ∀ j, t j - t' j ∈ Λ)
-    : ∃ 𝒯' : Finset (Fin r → Fin r → E),
-      (∀ t ∈ 𝒯', Gen Λ t) ∧ (∀ t, Gen Λ t → ∃! t', t' ∈ 𝒯' ∧ ∀ j, t j - t' j ∈ Λ)
-        ∧ ∀ f : (Fin r → Fin r → E) → ℝ, ∑ t ∈ 𝒯', f t = ∑ t ∈ 𝒯, f fun j => e (t j) := by
+theorem exists_reps_map {Λ : Submodule (𝓞 E) (Fin r → E)} (e : (Fin r → E) ≃ₗ[E] (Fin r → E))
+    (he : ∀ v, v ∈ Λ ↔ e v ∈ Λ) (𝒯 : Finset (Fin r → Fin r → E)) (h1 : ∀ t ∈ 𝒯, Gen Λ t)
+    (h2 : ∀ t, Gen Λ t → ∃! t', t' ∈ 𝒯 ∧ ∀ j, t j - t' j ∈ Λ) :
+    ∃ 𝒯' : Finset (Fin r → Fin r → E), (∀ t ∈ 𝒯', Gen Λ t) ∧
+      (∀ t, Gen Λ t → ∃! t', t' ∈ 𝒯' ∧ ∀ j, t j - t' j ∈ Λ) ∧
+      ∀ f : (Fin r → Fin r → E) → ℝ, ∑ t ∈ 𝒯', f t = ∑ t ∈ 𝒯, f fun j => e (t j) := by
   let ι : (Fin r → Fin r → E) ↪ (Fin r → Fin r → E) :=
     ⟨fun t j => e (t j), fun t t' h => funext fun j => e.injective (congrFun h j)⟩
   refine ⟨𝒯.map ι, fun t ht => ?_, fun t ht => ?_, fun f => Finset.sum_map _ _ _⟩
@@ -69,18 +101,16 @@ theorem exists_reps_map
 
 variable [IsCMField E]
 
-theorem contDiffOn_cpt
-    (X : Data E r) (x0 : Frame X.Ψ r) {F : Frame X.Ψ r → ℂ} (hF : DifferentiableOn ℂ F X.dom)
-    : ContDiffOn ℝ ∞ (fun z => F (cpt X x0 z)) (OmF X x0) := by
+theorem contDiffOn_cpt (X : Data E r) (x0 : Frame X.Ψ r) {F : Frame X.Ψ r → ℂ}
+    (hF : DifferentiableOn ℂ F X.dom) : ContDiffOn ℝ ∞ (fun z => F (cpt X x0 z)) (OmF X x0) := by
   have hc : Differentiable ℂ (cpt X x0) :=
-    differentiable_pi.2 fun τ =>
-      differentiable_pi.2 fun a =>
-        differentiable_pi.2 fun b => (IW.cpt_entry_cd X x0 τ a b).differentiable (by simp)
-  exact (ReciprocityTheory.L2DbarEstimates.contDiffOn_of_differentiableOn _ _ _
-    (ExF.isOpen_OmF X x0) (hF.comp hc.differentiableOn fun z hz => hz)).restrict_scalars ℝ
+    differentiable_pi.2 fun τ => differentiable_pi.2 fun a => differentiable_pi.2 fun b =>
+      (IW.cpt_entry_cd X x0 τ a b).differentiable (by simp)
+  exact (ReciprocityTheory.L2DbarEstimates.contDiffOn_of_differentiableOn _ _ _ (ExF.isOpen_OmF X x0)
+    (hF.comp hc.differentiableOn fun z hz => hz)).restrict_scalars ℝ
 
-theorem contDiffOn_nfac (X : Data E r) (x0 : Frame X.Ψ r) (la : Wt X.Ψ r)
-    : ContDiffOn ℝ ∞ (fun z => X.nfac la (cpt X x0 z)) (OmF X x0) := by
+theorem contDiffOn_nfac (X : Data E r) (x0 : Frame X.Ψ r) (la : Wt X.Ψ r) :
+    ContDiffOn ℝ ∞ (fun z => X.nfac la (cpt X x0 z)) (OmF X x0) := by
   have h : ContDiffOn ℝ ∞ (fun z => Real.exp (phla X la (cpt X x0 z) / (-2))) (OmF X x0) :=
     fun z hz => ((IW.phla_cpt_cdAt X x0 hz la).div_const _).exp.contDiffWithinAt
   refine h.congr fun z hz => ?_

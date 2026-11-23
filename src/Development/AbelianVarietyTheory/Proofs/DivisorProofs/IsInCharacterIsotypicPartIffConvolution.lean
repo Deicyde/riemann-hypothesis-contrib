@@ -1,8 +1,54 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Definitions.Divisors.OrthSubrepresentation
+public import Development.AbelianVarietyTheory.Definitions.CommutativeAlgebra.AbByPOfComm
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsInCharacterIsotypicPartSelfStatement
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Coalgebra.IsFrobenius
+import Mathlib.RingTheory.HopfAlgebra.Basic
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -13,16 +59,15 @@ noncomputable section
 
 namespace GlobalTheory.Shin
 
-theorem isChar_conj_eq {G : Type} [Group G] {Y : G → ℂ} (hY : IsChar ℂ ℂ Y) (g z : G)
-    : Y (z * g * z⁻¹) = Y g := by
+theorem isChar_conj_eq {G : Type} [Group G] {Y : G → ℂ} (hY : IsChar ℂ ℂ Y) (g z : G) :
+    Y (z * g * z⁻¹) = Y g := by
   obtain ⟨n, ρ, h⟩ := hY
   rw [h, h, Representation.char_conj]
 
-theorem conv_op_eq
-    {G V : Type} [Group G] [Fintype G] [AddCommGroup V] [Module ℂ V]
-    (ρ : Representation ℂ G V) (Y h : G → ℂ)
-    : ∑ x, star (∑ y, Y y * h (y⁻¹ * x)) • ρ x
-      = (∑ y, star (Y y) • ρ y) * (∑ z, star (h z) • ρ z) := by
+theorem conv_op_eq {G V : Type} [Group G] [Fintype G] [AddCommGroup V] [Module ℂ V]
+    (ρ : Representation ℂ G V) (Y h : G → ℂ) :
+    ∑ x, star (∑ y, Y y * h (y⁻¹ * x)) • ρ x =
+      (∑ y, star (Y y) • ρ y) * (∑ z, star (h z) • ρ z) := by
   rw [Finset.sum_mul_sum]
   simp_rw [star_sum, star_mul', Finset.sum_smul]
   rw [Finset.sum_comm]
@@ -34,16 +79,14 @@ theorem conv_op_eq
 def convL {G : Type} [Group G] [Fintype G] (Y : G → ℂ) : (G → ℂ) →ₗ[ℂ] (G → ℂ) :=
   ∑ g, star (Y g) • LinearMap.funLeft ℂ ℂ (fun z => g * z)
 
-theorem convL_apply {G : Type} [Group G] [Fintype G] (Y : G → ℂ) (a : G → ℂ) (z : G)
-    : convL Y a z = ∑ g, star (Y g) * a (g * z) := by
+theorem convL_apply {G : Type} [Group G] [Fintype G] (Y : G → ℂ) (a : G → ℂ) (z : G) :
+    convL Y a z = ∑ g, star (Y g) * a (g * z) := by
   simp [convL, LinearMap.funLeft, Finset.sum_apply]
 
-def regKer {G : Type} [Group G] [Fintype G] (Y : G → ℂ)
-    : Representation ℂ G (LinearMap.ker (convL Y)) where
-  toFun g :=
-    (LinearMap.funLeft ℂ ℂ (fun z => z * g)).restrict (p := LinearMap.ker (convL Y))
-      (q := LinearMap.ker (convL Y))
-      (by
+def regKer {G : Type} [Group G] [Fintype G] (Y : G → ℂ) :
+    Representation ℂ G (LinearMap.ker (convL Y)) where
+  toFun g := (LinearMap.funLeft ℂ ℂ (fun z => z * g)).restrict (p := LinearMap.ker (convL Y))
+      (q := LinearMap.ker (convL Y)) (by
         intro a ha
         rw [LinearMap.mem_ker] at ha ⊢
         funext z
@@ -53,14 +96,11 @@ def regKer {G : Type} [Group G] [Fintype G] (Y : G → ℂ)
   map_one' := by ext a z; simp [LinearMap.funLeft]
   map_mul' g h := by ext a z; simp [LinearMap.funLeft, mul_assoc]
 
-theorem regKer_apply
-    {G : Type} [Group G] [Fintype G] (Y : G → ℂ) (g : G) (a : LinearMap.ker (convL Y)) (z : G)
-    : ((regKer Y g a : LinearMap.ker (convL Y)) : G → ℂ) z = (a : G → ℂ) (z * g) :=
-  rfl
+theorem regKer_apply {G : Type} [Group G] [Fintype G] (Y : G → ℂ) (g : G) (a : LinearMap.ker (convL Y))
+    (z : G) : ((regKer Y g a : LinearMap.ker (convL Y)) : G → ℂ) z = (a : G → ℂ) (z * g) := rfl
 
-theorem kills_iff_conv
-    : ∀ (G : Type) [Group G] [Finite G] (φ Y : G → ℂ),
-      IsChar ℂ ℂ Y → (Kills φ Y ↔ ∃ h : G → ℂ, ∀ x, φ x = ∑ᶠ y, Y y * h (y⁻¹ * x)) := by
+theorem kills_iff_conv : ∀ (G : Type) [Group G] [Finite G] (φ Y : G → ℂ), IsChar ℂ ℂ Y →
+    (Kills φ Y ↔ ∃ h : G → ℂ, ∀ x, φ x = ∑ᶠ y, Y y * h (y⁻¹ * x)) := by
   intro G _ _ φ Y hY
   have := Fintype.ofFinite G
   constructor
@@ -81,12 +121,11 @@ theorem kills_iff_conv
       rw [hc]
       congr 2
       group
-    have hK' :=
-      hK K (regKer Y) (by
-        rw [finsum_eq_sum_of_fintype]
-        have := congrArg (LinearMap.trace ℂ K) hT
-        set_option synthInstance.maxHeartbeats 100000 in
-        simpa [map_sum, smul_eq_mul] using this)
+    have hK' := hK K (regKer Y) (by
+      rw [finsum_eq_sum_of_fintype]
+      have := congrArg (LinearMap.trace ℂ K) hT
+
+      simpa [map_sum, smul_eq_mul] using this)
     rw [finsum_eq_sum_of_fintype] at hK'
 
     let ℓ : Module.Dual ℂ (G → ℂ) := ∑ x, star (φ x) • (LinearMap.proj x : (G → ℂ) →ₗ[ℂ] ℂ)
@@ -96,9 +135,8 @@ theorem kills_iff_conv
       intro a ha
       have := congrFun (congrArg Subtype.val (LinearMap.congr_fun hK' ⟨a, ha⟩)) 1
       simp only [LinearMap.sum_apply, LinearMap.smul_apply, Submodule.coe_sum, Submodule.coe_smul,
-          Finset.sum_apply, Pi.smul_apply, regKer_apply, smul_eq_mul, LinearMap.zero_apply,
-          Submodule.coe_zero, Pi.zero_apply]
-        at this
+        Finset.sum_apply, Pi.smul_apply, regKer_apply, smul_eq_mul, LinearMap.zero_apply,
+        Submodule.coe_zero, Pi.zero_apply] at this
       have e : ∀ x, ((regKer Y x ⟨a, ha⟩ : LinearMap.ker (convL Y)) : G → ℂ) 1 = a x := fun x => by
         show a (1 * x) = a x
         rw [one_mul]
@@ -115,11 +153,10 @@ theorem kills_iff_conv
       congr 1
       simp only [Pi.single_apply, eq_inv_mul_iff_mul_eq]
     have h1 := LinearMap.congr_fun hμ (Pi.single x 1)
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [LinearMap.dualMap_apply, hδ, map_sum, hℓ] at h1
+
+    rw [LinearMap.dualMap_apply, hδ, map_sum, hℓ] at h1
     simp only [map_smul, smul_eq_mul, Pi.single_apply, mul_ite, mul_one, mul_zero,
-        Finset.sum_ite_eq', Finset.mem_univ, if_true]
-      at h1
+      Finset.sum_ite_eq', Finset.mem_univ, if_true] at h1
     rw [finsum_eq_sum_of_fintype]
     have h2 := congrArg star h1
     simp only [star_sum, star_mul', star_star] at h2

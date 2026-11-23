@@ -1,9 +1,57 @@
 module
 
-public import Mathlib
 public import Formalism.SharpRestriction.CuspSpanNormBounds.PsiEDef
 public import Formalism.LocalRingCardinality.DataSpaces
 public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.MemIntegersLocalisationIffSumCmDataStatement
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.Order.CompletePartialOrder
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Formalism.SharpRestriction.CuspSpanNormBounds.FractionFieldToGenericStalkAlgebraMapEq
 
 @[expose] public section
 
@@ -12,13 +60,11 @@ open scoped nonZeroDivisors
 
 namespace GlobalTheory.LocAtTopology
 
-variable
-  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
   {sig : E →ₐ[F] E} {p : HeightOneSpectrum (𝓞 F)}
 
-theorem secondCountable_localField
-    (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
-    : SecondCountableTopology k := by
+theorem secondCountable_localField (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k]
+    [IsNonarchimedeanLocalField k] : SecondCountableTopology k := by
   letI := IsTopologicalAddGroup.rightUniformSpace k
   haveI := isUniformAddGroup_of_addCommGroup (G := k)
   letI : (Valued.v (R := k)).RankOne :=
@@ -29,39 +75,37 @@ theorem secondCountable_localField
   haveI : ProperSpace k := .of_nontriviallyNormedField_of_weaklyLocallyCompactSpace k
   exact secondCountable_of_proper
 
-theorem t2Space_of_nonarchimedeanLocalField
-    (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
-    : T2Space k := by
+theorem t2Space_of_nonarchimedeanLocalField (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k]
+    [IsNonarchimedeanLocalField k] : T2Space k := by
   letI := IsTopologicalAddGroup.rightUniformSpace k
   haveI := isUniformAddGroup_of_addCommGroup (G := k)
   infer_instance
 
-theorem isOpen_integer_localField
-    (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
-    : IsOpen (𝒪[k] : Set k) := by
+theorem isOpen_integer_localField (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k]
+    [IsNonarchimedeanLocalField k] : IsOpen (𝒪[k] : Set k) := by
   letI := IsTopologicalAddGroup.rightUniformSpace k
   haveI := isUniformAddGroup_of_addCommGroup (G := k)
   exact Valued.isOpen_integer k
 
-theorem val_le_iff (T : LocAt F E sig p) (x y : F)
-    : valuation T.Fp (T.ιF x) ≤ valuation T.Fp (T.ιF y) ↔ p.valuation F x ≤ p.valuation F y := by
+theorem val_le_iff (T : LocAt F E sig p) (x y : F) :
+    valuation T.Fp (T.ιF x) ≤ valuation T.Fp (T.ιF y) ↔ p.valuation F x ≤ p.valuation F y := by
   rw [← T.val, (valuation T.Fp).vle_iff_le]
 
-theorem mem_closure_int (T : LocAt F E sig p) (c : T.Fp) (hc : c ∈ 𝒪[T.Fp])
-    : c ∈ closure (Set.range fun a : 𝓞 F => T.ιF (algebraMap (𝓞 F) F a)) := by
+theorem mem_closure_int (T : LocAt F E sig p) (c : T.Fp) (hc : c ∈ 𝒪[T.Fp]) :
+    c ∈ closure (Set.range fun a : 𝓞 F => T.ιF (algebraMap (𝓞 F) F a)) := by
   haveI := T.lf
   have hc' : valuation T.Fp c ≤ 1 := hc
   rw [mem_closure_iff_nhds]
   intro U hU
   obtain ⟨γ, hγ⟩ := IsValuativeTopology.mem_nhds_iff'.1 hU
   obtain ⟨t, ht⟩ := ValuativeRel.valuation_surjective (γ : ValueGroupWithZero T.Fp)
-  have hn
-      : ∀ (y : T.Fp) (δ : (ValueGroupWithZero T.Fp)ˣ),
-        {z : T.Fp | valuation T.Fp (z - y) < δ} ∈ nhds y := fun y δ =>
+  have hn : ∀ (y : T.Fp) (δ : (ValueGroupWithZero T.Fp)ˣ),
+      {z : T.Fp | valuation T.Fp (z - y) < δ} ∈ nhds y := fun y δ =>
     IsValuativeTopology.mem_nhds_iff'.2 ⟨δ, fun z hz => hz⟩
   obtain ⟨b, hb⟩ := T.dense.mem_nhds (hn t γ)
   have hb' : valuation T.Fp (T.ιF b - t) < valuation T.Fp t := by rw [ht]; exact hb
-  have hbv : valuation T.Fp (T.ιF b) = γ := by rw [← ht]; exact Valuation.map_eq_of_sub_lt _ hb'
+  have hbv : valuation T.Fp (T.ιF b) = γ := by
+    rw [← ht]; exact Valuation.map_eq_of_sub_lt _ hb'
   have hb0 : b ≠ 0 := by
     rintro rfl
     simp only [map_zero] at hbv
@@ -77,8 +121,8 @@ theorem mem_closure_int (T : LocAt F E sig p) (c : T.Fp) (hc : c ∈ 𝒪[T.Fp])
     have h := val_le_iff T x 1
     simp only [map_one] at h
     exact h.1 hx
-  obtain ⟨a, ha⟩ :=
-    p.exists_valuation_sub_lt_of_integer hxF (Units.mk0 (p.valuation F b) (by simpa using hb0))
+  obtain ⟨a, ha⟩ := p.exists_valuation_sub_lt_of_integer hxF
+    (Units.mk0 (p.valuation F b) (by simpa using hb0))
   refine ⟨T.ιF (algebraMap (𝓞 F) F a), hγ ?_, a, rfl⟩
   have ha' : valuation T.Fp (T.ιF (algebraMap (𝓞 F) F a - x)) < γ := by
     rw [← hbv, ← not_le, val_le_iff, not_le]
@@ -89,17 +133,7 @@ theorem mem_closure_int (T : LocAt F E sig p) (c : T.Fp) (hc : c ∈ 𝒪[T.Fp])
   rw [this]
   exact (valuation T.Fp).map_add_lt ha' hx1'
 
-theorem locAt_topology
-    : ∀ {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [StarRing E] [Algebra F E],
-      Formalism.BasicNotions.CMData F E
-        → ∀ (sig : E →ₐ[F] E),
-          (∀ x, sig x = star x)
-            → ∀ (p : HeightOneSpectrum (𝓞 F)) (A : LocAt F E sig p),
-              IsTopologicalRing A.Ep ∧ T2Space A.Ep ∧ LocallyCompactSpace A.Ep
-                ∧ SecondCountableTopology A.Ep ∧ IsOpen (A.O : Set A.Ep)
-                ∧ IsCompact (A.O : Set A.Ep) ∧ DenseRange A.ιE ∧ Function.Injective A.ιE
-                ∧ (∀ x : E, x ≠ 0 → IsUnit (A.ιE x))
-                ∧ closure (Set.range fun x : 𝓞 E => A.ιE (x : E)) = (A.O : Set A.Ep) := by
+theorem locAt_topology : ∀ {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [StarRing E] [Algebra F E], Formalism.BasicNotions.CMData F E → ∀ (sig : E →ₐ[F] E), (∀ x, sig x = star x) → ∀ (p : HeightOneSpectrum (𝓞 F)) (A : LocAt F E sig p), IsTopologicalRing A.Ep ∧ T2Space A.Ep ∧ LocallyCompactSpace A.Ep ∧ SecondCountableTopology A.Ep ∧ IsOpen (A.O : Set A.Ep) ∧ IsCompact (A.O : Set A.Ep) ∧ DenseRange A.ιE ∧ Function.Injective A.ιE ∧ (∀ x : E, x ≠ 0 → IsUnit (A.ιE x)) ∧ closure (Set.range fun x : 𝓞 E => A.ιE (x : E)) = (A.O : Set A.Ep) := by
   intro F E _ _ _ _ _ _ hc sig hsig p A
   have hO := GlobalTheory.T.mem_integers_localisation_iff_sum_cmData hc sig hsig p A
   haveI := A.lf
@@ -114,11 +148,10 @@ theorem locAt_topology
   haveI : ContinuousSMul A.Fp A.Ep := IsModuleTopology.toContinuousSMul A.Fp A.Ep
   have hcont : Continuous (algebraMap A.Fp A.Ep) := continuous_algebraMap _ _
   let b := Module.finBasis A.Fp A.Ep
-  let h : A.Ep ≃ₜ (Fin (Module.finrank A.Fp A.Ep) → A.Fp) := {
-    toEquiv := b.equivFun.toEquiv
-    continuous_toFun := IsModuleTopology.continuous_of_linearMap b.equivFun.toLinearMap
-    continuous_invFun := IsModuleTopology.continuous_of_linearMap b.equivFun.symm.toLinearMap
-  }
+  let h : A.Ep ≃ₜ (Fin (Module.finrank A.Fp A.Ep) → A.Fp) :=
+    { toEquiv := b.equivFun.toEquiv
+      continuous_toFun := IsModuleTopology.continuous_of_linearMap b.equivFun.toLinearMap
+      continuous_invFun := IsModuleTopology.continuous_of_linearMap b.equivFun.symm.toLinearMap }
   haveI hT2 : T2Space A.Ep := h.symm.t2Space
   have hLC : LocallyCompactSpace A.Ep := h.isClosedEmbedding.locallyCompactSpace
   have hSC : SecondCountableTopology A.Ep := h.secondCountableTopology
@@ -135,9 +168,8 @@ theorem locAt_topology
     rw [← LinearMap.range_eq_top, eq_top_iff, ← A.span, Submodule.span_le]
     rintro _ ⟨x, rfl⟩
     obtain ⟨n, y, hn, hy⟩ : ∃ (n : ℤ) (y : 𝓞 E), n ≠ 0 ∧ (y : E) = n • x := by
-      obtain ⟨n, hn, hi⟩ :=
-        ((IsFractionRing.isAlgebraic_iff ℤ ℚ E).2
-          (Algebra.IsAlgebraic.isAlgebraic (R := ℚ) x)).exists_integral_multiple
+      obtain ⟨n, hn, hi⟩ := ((IsFractionRing.isAlgebraic_iff ℤ ℚ E).2
+        (Algebra.IsAlgebraic.isAlgebraic (R := ℚ) x)).exists_integral_multiple
       exact ⟨n, ⟨_, hi⟩, hn, rfl⟩
     have h1 : A.ιE x = ((n : A.Fp)⁻¹) • A.ιE (y : E) := by
       rw [hy, map_zsmul, ← Int.cast_smul_eq_zsmul A.Fp, smul_smul,
@@ -153,14 +185,13 @@ theorem locAt_topology
       · intro i _
         simp only [Finset.sum_apply, Pi.smul_apply, smul_eq_mul]
         exact Subring.sum_mem _ fun j _ => Subring.mul_mem _ (c j).2 (intCast_mem _ _)
-      set_option synthInstance.maxHeartbeats 100000 in
+
       · rw [map_sum]
         refine Finset.sum_congr rfl fun j _ => ?_
         rw [map_smul, ← hint, Algebra.smul_def]
     · rintro ⟨c, hc, rfl⟩
       rw [hL]
-      refine Subring.sum_mem _ fun i _ =>
-        (hO _).2 ⟨1, fun _ => ⟨c i, hc i trivial⟩, fun _ => w i, ?_⟩
+      refine Subring.sum_mem _ fun i _ => (hO _).2 ⟨1, fun _ => ⟨c i, hc i trivial⟩, fun _ => w i, ?_⟩
       simp [Algebra.smul_def]
   have hopen : IsOpen (A.O : Set A.Ep) := by
     rw [hOeq]
@@ -169,20 +200,10 @@ theorem locAt_topology
   have hcomp : IsCompact (A.O : Set A.Ep) := by
     rw [hOeq]
     exact (isCompact_univ_pi fun _ =>
-        isCompact_iff_compactSpace.2 (inferInstanceAs (CompactSpace 𝒪[A.Fp]))).image
+      isCompact_iff_compactSpace.2 (inferInstanceAs (CompactSpace 𝒪[A.Fp]))).image
       (IsModuleTopology.continuous_of_linearMap L)
-  refine ⟨
-    hR,
-    hT2,
-    hLC,
-    hSC,
-    hopen,
-    hcomp,
-    ?_,
-    A.ιE.injective,
-    fun x hx => (IsUnit.mk0 x hx).map A.ιE,
-    ?_
-  ⟩
+  refine ⟨hR, hT2, hLC, hSC, hopen, hcomp, ?_, A.ιE.injective,
+    fun x hx => (IsUnit.mk0 x hx).map A.ιE, ?_⟩
   · let S : Subring A.Ep := A.ιE.range.topologicalClosure
     have hS : ∀ a : A.Fp, algebraMap A.Fp A.Ep a ∈ S := by
       intro a

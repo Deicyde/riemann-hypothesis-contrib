@@ -1,12 +1,50 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Definitions.Foundations.HTPresNuOfPolys
-public import Development.AbelianVarietyTheory.Statements.CuspidalUnitaryTwists.ZetaUr
-public import Development.AbelianVarietyTheory.Definitions.Foundations.IsLocallyConstantCycMod
 public import Development.AbelianVarietyTheory.Definitions.Foundations.HtCoLOfEq
 public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.UniqTrue
+import Development.AbelianVarietyTheory.Proofs.FoundationProofs.FiniteIndexStabilizer
 public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.RecipConj
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import ReciprocityTheory.NeutralLocalFields.LocalFieldComparison.LocalFieldAutomorphisms.MemRangeOfAevalRatEqZero
 
 @[expose] public section
 
@@ -88,8 +126,8 @@ theorem uniq_fix
       : σ • (∑ i, o i * j (w i)) - ∑ i, o i * j (w i)
         = ∑ i, o i * (j (res j σ.1 (w i)) - j (w i)) := by
     show σ.1 _ - _ = _
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, ← Finset.sum_sub_distrib]
+
+    rw [map_sum, ← Finset.sum_sub_distrib]
     refine Finset.sum_congr rfl fun i _ => ?_
     rw [map_mul, hfix, res_spec]
     ring
@@ -192,8 +230,8 @@ theorem htv_coeff
   rw [hconj] at hZk
   have hPfix : ∀ i, (τ * s * τ⁻¹) ((P i).eval ζ) = (P i).eval ζ := by
     intro i
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [Polynomial.eval_eq_sum_range, map_sum]
+
+    rw [Polynomial.eval_eq_sum_range, map_sum]
     refine Finset.sum_congr rfl fun n _ => ?_
     rw [map_mul, map_pow, hfix hs1']
     by_cases h : (P i).coeff n = 0

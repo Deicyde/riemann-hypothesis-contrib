@@ -1,8 +1,49 @@
 module
 
-public import Mathlib
 public import GroundTheory.HeightsAndTheta.Heights.HeightComparison.HeightOrbitDivVertical
 public import GroundTheory.HeightsAndTheta.Heights.HeightComparison.PHeightRecR
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -12,16 +53,13 @@ namespace GroundTheory.Heights₂.Heights
 
 open MvPolynomial ReciprocityTheory.ChartRestriction.G
 
-theorem exists_int_poly_coeff_zero_ne_zero {τ : AlgebraicClosure ℚ} (hτ : τ ≠ 0)
-    : ∃ P : Polynomial ℤ, P.coeff 0 ≠ 0 ∧ Polynomial.aeval τ P = 0 := by
+theorem exists_int_poly_coeff_zero_ne_zero {τ : AlgebraicClosure ℚ} (hτ : τ ≠ 0) :
+    ∃ P : Polynomial ℤ, P.coeff 0 ≠ 0 ∧ Polynomial.aeval τ P = 0 := by
   have := IsLocalization.isAlgebraic ℚ (nonZeroDivisors ℤ)
-  obtain ⟨Q, hQ, hQτ⟩ := ((AlgebraicClosure.isAlgebraic ℚ).isAlgebraic τ⁻¹).restrictScalars (R := ℤ)
+  obtain ⟨Q, hQ, hQτ⟩ :=
+    ((AlgebraicClosure.isAlgebraic ℚ).isAlgebraic τ⁻¹).restrictScalars (R := ℤ)
   have : Invertible τ⁻¹ := invertibleOfNonzero (inv_ne_zero hτ)
-  refine ⟨
-    Q.reverse,
-    by rw [Polynomial.coeff_zero_reverse]; exact Polynomial.leadingCoeff_ne_zero.mpr hQ,
-    ?_
-  ⟩
+  refine ⟨Q.reverse, by rw [Polynomial.coeff_zero_reverse]; exact Polynomial.leadingCoeff_ne_zero.mpr hQ, ?_⟩
   have h := (Polynomial.eval₂_reverse_eq_zero_iff (algebraMap ℤ (AlgebraicClosure ℚ)) τ⁻¹ Q).mpr hQτ
   rwa [invOf_eq_inv, inv_inv] at h
 
@@ -47,20 +85,18 @@ theorem OrbitDivVertical.proof : OrbitDivVertical.Statement := by
   set μ := eval₂ (Int.castRingHom (AlgebraicClosure ℚ)) y M
   have hφs : Geo.mConeMap (ι := blockIdx n) y s = C σ * T := mConeMap_of_isMultiHomog y s a hsa
   have hφM : Geo.mConeMap (ι := blockIdx n) y M = C μ * T := mConeMap_of_isMultiHomog y M a hMa
-  have hσ : σ ≠ 0 := fun h ↦
-    hsW (by rw [orbitIdeal, Geo.mCoordIdeal, RingHom.mem_ker, hφs, h, map_zero, zero_mul])
-  have hμ : μ ≠ 0 := fun h ↦
-    hMV (hWV (by rw [orbitIdeal, Geo.mCoordIdeal, RingHom.mem_ker, hφM, h, map_zero, zero_mul]))
+  have hσ : σ ≠ 0 := fun h ↦ hsW (by
+    rw [orbitIdeal, Geo.mCoordIdeal, RingHom.mem_ker, hφs, h, map_zero, zero_mul])
+  have hμ : μ ≠ 0 := fun h ↦ hMV (hWV (by
+    rw [orbitIdeal, Geo.mCoordIdeal, RingHom.mem_ker, hφM, h, map_zero, zero_mul]))
   obtain ⟨P, hP0, hP⟩ := exists_int_poly_coeff_zero_ne_zero (div_ne_zero hσ hμ)
   set m := P.natDegree
   let f : ℕ → MvPolynomial (Coord n) ℤ := fun j ↦ C (P.coeff j) * s ^ j * M ^ (m - j)
   have hfW : ∑ j ∈ Finset.range (m + 1), f j ∈ orbitIdeal x := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [orbitIdeal, Geo.mCoordIdeal, RingHom.mem_ker, map_sum]
-    have hterm
-        : ∀ j ∈ Finset.range (m + 1),
-          Geo.mConeMap (ι := blockIdx n) y (f j)
-            = C (algebraMap ℤ (AlgebraicClosure ℚ) (P.coeff j) * (σ / μ) ^ j * μ ^ m) * T ^ m := by
+
+    rw [orbitIdeal, Geo.mCoordIdeal, RingHom.mem_ker, map_sum]
+    have hterm : ∀ j ∈ Finset.range (m + 1), Geo.mConeMap (ι := blockIdx n) y (f j) =
+        C (algebraMap ℤ (AlgebraicClosure ℚ) (P.coeff j) * (σ / μ) ^ j * μ ^ m) * T ^ m := by
       intro j hj
       have hjm : j ≤ m := Nat.lt_succ_iff.mp (Finset.mem_range.mp hj)
       have e1 : (σ / μ) ^ j * μ ^ m = σ ^ j * μ ^ (m - j) := by
@@ -70,12 +106,10 @@ theorem OrbitDivVertical.proof : OrbitDivVertical.Statement := by
       simp only [f, map_mul, map_pow, hφs, hφM, MvPolynomial.algHom_C, mul_assoc, e1, e2]
       simp only [eq_intCast, map_intCast, mul_pow]
       ring
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [Finset.sum_congr rfl hterm, ← Finset.sum_mul, ← map_sum, ← Finset.sum_mul]
-    have hPτ
-        : ∑ j ∈ Finset.range (m + 1), algebraMap ℤ (AlgebraicClosure ℚ) (P.coeff j) *
-            (σ / μ) ^ j
-          = 0 := by
+
+    rw [Finset.sum_congr rfl hterm, ← Finset.sum_mul, ← map_sum, ← Finset.sum_mul]
+    have hPτ : ∑ j ∈ Finset.range (m + 1), algebraMap ℤ (AlgebraicClosure ℚ) (P.coeff j) *
+        (σ / μ) ^ j = 0 := by
       rw [← hP, Polynomial.aeval_eq_sum_range]
       simp [Algebra.smul_def]
       rfl

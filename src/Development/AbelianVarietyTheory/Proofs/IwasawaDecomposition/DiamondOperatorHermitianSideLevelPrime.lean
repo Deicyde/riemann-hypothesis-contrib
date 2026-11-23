@@ -1,15 +1,67 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.MemSmulLk
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.MiddleStepOneLevelProjectionEqChartProjectionStatement
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.AdelicRelationClassesCoordinatesStatement
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.LevelFunctionalEqOfClassesRelatedAtPlaceStatement
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsDiamondElementsStepLevelsStatement
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ClassPairMovedOfMultipliesLocalFunctional
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.UnitaryCompletionMapsDualLattices
+public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.StdLvPr
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.GlESymmApply
 public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.MemStabGLAdeleIff
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.AdelicRelationClassesCoordinatesStatement
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ClassPairMovedOfMultipliesLocalFunctional
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsDiamondElementsStepLevelsStatement
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.LevelFunctionalEqOfClassesRelatedAtPlaceStatement
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.MiddleStepOneLevelProjectionEqChartProjectionStatement
+import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.UnitaryCompletionMapsDualLattices
+import Formalism.LocalRingCardinality.SpanPowerMembership.LocAtA
 public import Formalism.LocalToGlobal.GlobalTheory.BlockActions.FiniteAdeleRingNontrivial
+import Formalism.LocalToGlobal.GlobalTheory.GL6.PBwLocBases
+import Formalism.LocalToGlobal.GlobalTheory.GL6.PRLocV
+import Formalism.SatakeDualWeyl.AdelicIwasawaHecke.Afsplit
+public import Formalism.SatakeDualWeyl.AdelicIwasawaHecke.CsEquiv
+import Formalism.SatakeDualWeyl.AdelicIwasawaHecke.CsGlob
+import Formalism.SatakeDualWeyl.AdelicIwasawaHecke.CsGlobApprox
+import Formalism.SatakeDualWeyl.AdelicIwasawaHecke.InclusionInjective
+import Mathlib.Algebra.Module.StablyFree.Basic
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Coalgebra.IsFrobenius
+import Mathlib.RingTheory.Etale.Weakly
+import Mathlib.RingTheory.HopfAlgebra.Basic
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.TotallySplit
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
 
 @[expose] public section
 
@@ -100,8 +152,8 @@ theorem lat_eq_of_move
         ext j
         simp [Finset.sum_apply, Pi.single_apply]
       conv_lhs => rw [hy]
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum]
+
+      rw [map_sum]
       refine Finset.sum_congr rfl fun i _ => ?_
       rw [map_smul, smul_eq_mul, mul_comm]
     have key : ∀ u ∈ latS (F := F) (FiniteAdeleRing (𝓞 F) F) 𝒮 Λ, ∑ i, ι (c i) * u i = 0 := by
@@ -110,8 +162,8 @@ theorem lat_eq_of_move
       | mem u hu =>
         obtain ⟨y, hy, rfl⟩ := hu
         change ∑ i, ι (c i) * ι (y i) = 0
-        set_option synthInstance.maxHeartbeats 100000 in
-          simp only [← map_mul, ← map_sum]
+
+        simp only [← map_mul, ← map_sum]
         rw [← hfc, hf y hy, map_zero]
       | zero =>
         simp
@@ -127,8 +179,8 @@ theorem lat_eq_of_move
           ring
         rw [h, hu, mul_zero]
     have h1 := key _ hx
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [← map_mul, ← map_sum] at h1
+
+    simp only [← map_mul, ← map_sum] at h1
     rw [← hfc] at h1
     haveI : Nontrivial (FiniteAdeleRing (𝓞 F) F) := by
       obtain ⟨M, hM⟩ := Ideal.exists_maximal (𝓞 F)
@@ -304,8 +356,6 @@ section Steps
 
 variable {D : D7} {u : D.what₂.Word} {Ch : ℕ → Type} {chOf : ∀ i, (D.mem u).C.cls i → Ch i}
 
-set_option maxHeartbeats 2000000 in
-set_option synthInstance.maxHeartbeats 400000 in
 theorem move_end
     (T : FormsTiedSym D u Ch chOf)
     (i : ℕ) (hi : i ≤ D.R.m) (h : i = 0 ∨ i = D.R.m)
@@ -348,8 +398,6 @@ theorem move_end
     rw [← hk]
     exact e1.trans (e3.trans (congrArg (fun t => (k : (D.mem u).A.Fv v) * t) e2.symm))
 
-set_option maxHeartbeats 2000000 in
-set_option synthInstance.maxHeartbeats 400000 in
 theorem move_mid
     (T : FormsTiedSym D u Ch chOf)
     (i : ℕ) (h1 : 1 ≤ i) (h2 : i + 1 ≤ D.R.m)
@@ -398,7 +446,6 @@ theorem move_mid
     rw [← hk]
     exact e1.trans (e3.trans (congrArg (fun t => (k : (D.mem u).A.Fv v) * t) e2.symm))
 
-set_option maxHeartbeats 2000000 in
 theorem dilCl_of_crd
     (A : AtTTied u) (P : ∀ i hi, LvTied u A i hi)
     (i : ℕ) (hi : i ≤ D.R.m)
@@ -432,7 +479,6 @@ theorem dilCl_of_crd
 
 end Steps
 
-set_option maxHeartbeats 4000000 in
 theorem diamond_on_hermitian_side
     : ∀ {B : Base} {X : PreX B.toPre} (I : TC B X),
       I.Ok → TC.Pins B X

@@ -1,7 +1,53 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.Definitions.AdelicHermitianForms.AdelicPair
+public import Mathlib.RingTheory.DedekindDomain.FiniteAdeleRing
+import Mathlib.Algebra.AffineMonoid.Basic
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
+import Development.AbelianVarietyTheory.Definitions.AdelicHermitianForms.AdelicPair
 
 @[expose] public section
 
@@ -21,29 +67,25 @@ def intAdeles : Subring (FiniteAdeleRing (𝓞 F) F) where
   zero_mem' := fun v => zero_mem (HeightOneSpectrum.adicCompletionIntegers F v)
   neg_mem' := fun {a} ha v => neg_mem (ha v)
 
-theorem algebraMap_mem (a : 𝓞 F)
-    : algebraMap F (FiniteAdeleRing (𝓞 F) F) (a : F) ∈ intAdeles F := by
+theorem algebraMap_mem (a : 𝓞 F) :
+    algebraMap F (FiniteAdeleRing (𝓞 F) F) (a : F) ∈ intAdeles F := by
   intro v
   rw [FiniteAdeleRing.algebraMap_apply, RingOfIntegers.coe_eq_algebraMap]
   exact HeightOneSpectrum.coe_algebraMap_mem (𝓞 F) F v a
 
-theorem exists_of_mem (k : F) (h : algebraMap F (FiniteAdeleRing (𝓞 F) F) k ∈ intAdeles F)
-    : ∃ a : 𝓞 F, (a : F) = k := by
-  obtain ⟨a, ha⟩ :=
-    HeightOneSpectrum.mem_integers_of_valuation_le_one F k fun v => by
-      have hv := h v
-      rw [FiniteAdeleRing.algebraMap_apply, HeightOneSpectrum.mem_adicCompletionIntegers,
-          HeightOneSpectrum.valuedAdicCompletion_eq_valuation']
-        at hv
-      exact hv
+theorem exists_of_mem (k : F) (h : algebraMap F (FiniteAdeleRing (𝓞 F) F) k ∈ intAdeles F) :
+    ∃ a : 𝓞 F, (a : F) = k := by
+  obtain ⟨a, ha⟩ := HeightOneSpectrum.mem_integers_of_valuation_le_one F k fun v => by
+    have hv := h v
+    rw [FiniteAdeleRing.algebraMap_apply, HeightOneSpectrum.mem_adicCompletionIntegers,
+      HeightOneSpectrum.valuedAdicCompletion_eq_valuation'] at hv
+    exact hv
   exact ⟨a, ha⟩
 
-theorem dvd_of_eq
-    (x : 𝓞 F)
-    (N : ℕ) (hN : 0 < N)
-    (e : FiniteAdeleRing (𝓞 F) F) (he : e ∈ intAdeles F)
-    (h : algebraMap F (FiniteAdeleRing (𝓞 F) F) (x : F) = (N : FiniteAdeleRing (𝓞 F) F) * e)
-    : ∃ a : 𝓞 F, x = (N : 𝓞 F) * a := by
+theorem dvd_of_eq (x : 𝓞 F) (N : ℕ) (hN : 0 < N) (e : FiniteAdeleRing (𝓞 F) F)
+    (he : e ∈ intAdeles F)
+    (h : algebraMap F (FiniteAdeleRing (𝓞 F) F) (x : F) = (N : FiniteAdeleRing (𝓞 F) F) * e) :
+    ∃ a : 𝓞 F, x = (N : 𝓞 F) * a := by
   have hN' : (N : F) ≠ 0 := Nat.cast_ne_zero.mpr hN.ne'
 
   have hk : algebraMap F (FiniteAdeleRing (𝓞 F) F) ((x : F) / N) = e := by
@@ -57,37 +99,14 @@ theorem dvd_of_eq
   exact ⟨a, by exact_mod_cast hx⟩
 
 theorem int_dvd (z : ℤ) (N : ℕ) (a : 𝓞 F) (h : (z : 𝓞 F) = (N : 𝓞 F) * a) : (N : ℤ) ∣ z := by
+
   have h2 := congrArg (Algebra.norm ℤ) h
   rw [map_mul, ← eq_intCast (algebraMap ℤ (𝓞 F)) z,
-      show (N : 𝓞 F) = algebraMap ℤ (𝓞 F) (N : ℤ) by simp, Algebra.norm_algebraMap,
-      Algebra.norm_algebraMap]
-    at h2
+    show (N : 𝓞 F) = algebraMap ℤ (𝓞 F) (N : ℤ) by simp, Algebra.norm_algebraMap,
+    Algebra.norm_algebraMap] at h2
   exact (Int.pow_dvd_pow_iff Module.finrank_pos.ne').mp ⟨_, h2⟩
 
-theorem coord_divisible
-    : ∀ (F : Type) [Field F] [NumberField F] (β : Type) [Fintype β] (ω : Module.Basis β ℤ (𝓞 F))
-        (r : β → FiniteAdeleRing (𝓞 F) F) (N : ℕ),
-      0 < N
-        → (∀ i,
-          (∀ M : ℕ,
-            0 < M
-              → ∃ (z : ℤ) (c : FiniteAdeleRing (𝓞 F) F),
-                (∀ v,
-                    (c : FiniteAdeleRing (𝓞 F) F) v ∈ HeightOneSpectrum.adicCompletionIntegers F v)
-                  ∧ r i = (z : FiniteAdeleRing (𝓞 F) F) + (M : FiniteAdeleRing (𝓞 F) F) * c))
-        → (∃ e : FiniteAdeleRing (𝓞 F) F,
-          (∀ v, (e : FiniteAdeleRing (𝓞 F) F) v ∈ HeightOneSpectrum.adicCompletionIntegers F v)
-            ∧ ∑ i, r i * algebraMap F (FiniteAdeleRing (𝓞 F) F) (ω i : 𝓞 F)
-              = (N : FiniteAdeleRing (𝓞 F) F) * e)
-        → ∀ i, ∃ s : FiniteAdeleRing (𝓞 F) F,
-          (∀ M : ℕ,
-              0 < M
-                → ∃ (z : ℤ) (c : FiniteAdeleRing (𝓞 F) F),
-                  (∀ v,
-                      (c : FiniteAdeleRing (𝓞 F) F) v
-                        ∈ HeightOneSpectrum.adicCompletionIntegers F v)
-                    ∧ s = (z : FiniteAdeleRing (𝓞 F) F) + (M : FiniteAdeleRing (𝓞 F) F) * c)
-            ∧ r i = (N : FiniteAdeleRing (𝓞 F) F) * s := by
+theorem coord_divisible : ∀ (F : Type) [Field F] [NumberField F] (β : Type) [Fintype β] (ω : Module.Basis β ℤ (𝓞 F)) (r : β → FiniteAdeleRing (𝓞 F) F) (N : ℕ), 0 < N → (∀ i, (∀ M : ℕ, 0 < M → ∃ (z : ℤ) (c : FiniteAdeleRing (𝓞 F) F), (∀ v, (c : FiniteAdeleRing (𝓞 F) F) v ∈ HeightOneSpectrum.adicCompletionIntegers F v) ∧ r i = (z : FiniteAdeleRing (𝓞 F) F) + (M : FiniteAdeleRing (𝓞 F) F) * c)) → (∃ e : FiniteAdeleRing (𝓞 F) F, (∀ v, (e : FiniteAdeleRing (𝓞 F) F) v ∈ HeightOneSpectrum.adicCompletionIntegers F v) ∧ ∑ i, r i * algebraMap F (FiniteAdeleRing (𝓞 F) F) (ω i : 𝓞 F) = (N : FiniteAdeleRing (𝓞 F) F) * e) → ∀ i, ∃ s : FiniteAdeleRing (𝓞 F) F, (∀ M : ℕ, 0 < M → ∃ (z : ℤ) (c : FiniteAdeleRing (𝓞 F) F), (∀ v, (c : FiniteAdeleRing (𝓞 F) F) v ∈ HeightOneSpectrum.adicCompletionIntegers F v) ∧ s = (z : FiniteAdeleRing (𝓞 F) F) + (M : FiniteAdeleRing (𝓞 F) F) * c) ∧ r i = (N : FiniteAdeleRing (𝓞 F) F) * s := by
   intro F _ _ β _ ω r N hN hr hsum i
   obtain ⟨e, he, hsum⟩ := hsum
   have hN' : (N : F) ≠ 0 := Nat.cast_ne_zero.mpr hN.ne'
@@ -95,28 +114,26 @@ theorem coord_divisible
   have hu : IsUnit (N : FiniteAdeleRing (𝓞 F) F) := by
     have := (isUnit_iff_ne_zero.mpr hN').map (algebraMap F (FiniteAdeleRing (𝓞 F) F))
     rwa [map_natCast] at this
-  have hω : ∀ j, algebraMap F (FiniteAdeleRing (𝓞 F) F) ((ω j : 𝓞 F) : F) ∈ intAdeles F := fun j =>
-    algebraMap_mem F (ω j)
+  have hω : ∀ j, algebraMap F (FiniteAdeleRing (𝓞 F) F) ((ω j : 𝓞 F) : F) ∈ intAdeles F :=
+    fun j => algebraMap_mem F (ω j)
   have hint : ∀ z : ℤ, (z : FiniteAdeleRing (𝓞 F) F) ∈ intAdeles F := fun z => intCast_mem _ z
 
   choose z c hc hrc using fun j => hr j N hN
   have hc' : ∀ j, c j ∈ intAdeles F := hc
 
-  have hL
-      : algebraMap F (FiniteAdeleRing (𝓞 F) F) (((∑ j, z j • ω j : 𝓞 F)) : F)
-        = ∑ j, (z j : FiniteAdeleRing (𝓞 F) F) * algebraMap F _ ((ω j : 𝓞 F) : F) := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [RingOfIntegers.coe_eq_algebraMap, map_sum, map_sum]
+  have hL : algebraMap F (FiniteAdeleRing (𝓞 F) F) (((∑ j, z j • ω j : 𝓞 F)) : F) =
+      ∑ j, (z j : FiniteAdeleRing (𝓞 F) F) * algebraMap F _ ((ω j : 𝓞 F) : F) := by
+
+    rw [RingOfIntegers.coe_eq_algebraMap, map_sum, map_sum]
     refine Finset.sum_congr rfl fun j _ => ?_
     rw [map_zsmul, map_zsmul, zsmul_eq_mul, RingOfIntegers.coe_eq_algebraMap]
-  obtain ⟨a, ha⟩ :=
-    dvd_of_eq F (∑ j, z j • ω j) N hN (e - ∑ j, c j * algebraMap F _ ((ω j : 𝓞 F) : F))
-      (sub_mem he (sum_mem fun j _ => mul_mem (hc' j) (hω j)))
-      (by
-        rw [hL, mul_sub, Finset.mul_sum, ← hsum, ← Finset.sum_sub_distrib]
-        refine Finset.sum_congr rfl fun j _ => ?_
-        rw [hrc j]
-        ring)
+  obtain ⟨a, ha⟩ := dvd_of_eq F (∑ j, z j • ω j) N hN
+    (e - ∑ j, c j * algebraMap F _ ((ω j : 𝓞 F) : F))
+    (sub_mem he (sum_mem fun j _ => mul_mem (hc' j) (hω j))) (by
+      rw [hL, mul_sub, Finset.mul_sum, ← hsum, ← Finset.sum_sub_distrib]
+      refine Finset.sum_congr rfl fun j _ => ?_
+      rw [hrc j]
+      ring)
 
   have hm : ∀ j, z j = N * ω.repr a j := by
     intro j
@@ -135,20 +152,16 @@ theorem coord_divisible
   obtain ⟨z', c', hc'', hr'⟩ := hr i (M * N) (Nat.mul_pos hM hN)
   have hs : (ω.repr a i : FiniteAdeleRing (𝓞 F) F) + c i - M * c' ∈ intAdeles F :=
     sub_mem (add_mem (hint _) (hc' i)) (mul_mem (natCast_mem _ M) hc'')
-  obtain ⟨a', ha'⟩ :=
-    dvd_of_eq F (z' : 𝓞 F) N hN _ hs (by
-      have e1
-          : algebraMap F (FiniteAdeleRing (𝓞 F) F) (((z' : 𝓞 F)) : F)
-            = (z' : FiniteAdeleRing (𝓞 F) F) := by
-        rw [RingOfIntegers.coe_eq_algebraMap, map_intCast, map_intCast]
-      have e2
-          : (z' : FiniteAdeleRing (𝓞 F) F)
-            = r i - ((M * N : ℕ) : FiniteAdeleRing (𝓞 F) F) * c' := by
-        rw [hr']
-        ring
-      rw [e1, e2, key i]
-      push_cast
-      ring)
+  obtain ⟨a', ha'⟩ := dvd_of_eq F (z' : 𝓞 F) N hN _ hs (by
+    have e1 : algebraMap F (FiniteAdeleRing (𝓞 F) F) (((z' : 𝓞 F)) : F) =
+        (z' : FiniteAdeleRing (𝓞 F) F) := by
+      rw [RingOfIntegers.coe_eq_algebraMap, map_intCast, map_intCast]
+    have e2 : (z' : FiniteAdeleRing (𝓞 F) F) = r i - ((M * N : ℕ) : FiniteAdeleRing (𝓞 F) F) * c' := by
+      rw [hr']
+      ring
+    rw [e1, e2, key i]
+    push_cast
+    ring)
   obtain ⟨t, ht⟩ := int_dvd F z' N a' ha'
   refine ⟨t, c', hc'', hu.mul_left_cancel ?_⟩
   rw [← key i, hr', ht]

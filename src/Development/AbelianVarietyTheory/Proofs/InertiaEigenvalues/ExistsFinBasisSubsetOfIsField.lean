@@ -1,7 +1,60 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.EqZeroOfForallMemFilV
+import Mathlib.Algebra.Module.StablyFree.Basic
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.LinearAlgebra.Matrix.FiniteDimensional
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Coalgebra.IsFrobenius
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.HopfAlgebra.Basic
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Formalism.SharpRestriction.LevelLetterCocycles.DataNLoc
+import Formalism.SharpRestriction.LevelLetterCocycles.LocCoh
+public import Mathlib.RingTheory.Trace.Basic
 
 @[expose] public section
 
@@ -9,18 +62,15 @@ noncomputable section
 
 namespace GlobalTheory.DRFil
 
-open Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N Formalism.BasicNotions
-  Formalism.BasicNotions.Loc TensorProduct Module
+open Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N Formalism.BasicNotions Formalism.BasicNotions.Loc TensorProduct Module
 
-theorem exists_fin_basis_subset_of_isField
-    {F M : Type} [CommRing F]
-    (hF : IsField F)
-    [AddCommGroup M] [Module F M] [Module.Finite F M]
-    (S : Set M) (h : Submodule.span F S = ⊤)
-    : ∃ (n : ℕ) (b : Basis (Fin n) F M), ∀ i, b i ∈ S := by
+theorem exists_fin_basis_subset_of_isField {F M : Type} [CommRing F] (hF : IsField F) [AddCommGroup M]
+    [Module F M] [Module.Finite F M] (S : Set M) (h : Submodule.span F S = ⊤) :
+    ∃ (n : ℕ) (b : Basis (Fin n) F M), ∀ i, b i ∈ S := by
   let := hF.toField
   obtain ⟨t, htS, hspan, hli⟩ := exists_linearIndependent F S
-  have hsp : ⊤ ≤ Submodule.span F (Set.range ((↑) : t → M)) := by rw [Subtype.range_coe, hspan, h]
+  have hsp : ⊤ ≤ Submodule.span F (Set.range ((↑) : t → M)) := by
+    rw [Subtype.range_coe, hspan, h]
   let bt : Basis t F M := Basis.mk hli hsp
   have : Finite t := Module.Finite.finite_basis bt
   refine ⟨Nat.card t, bt.reindex (Finite.equivFin t), fun i => ?_⟩
@@ -29,41 +79,32 @@ theorem exists_fin_basis_subset_of_isField
 
 section Period
 
-variable
-  {G : Type} [Group G]
-  {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K] [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K]
-  [IsScalarTower Qp K₀ K]
-  {B F : Type}
-  [CommRing B] [CommRing F] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B] [Algebra Qp F]
-  [Algebra K₀ F] [Algebra K F] [IsScalarTower Qp K F] [IsScalarTower K₀ K F] [IsScalarTower Qp K₀ F]
-  (PD : PeriodData G Qp K₀ K B F)
+variable {G : Type} [Group G] {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K]
+    [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K] [IsScalarTower Qp K₀ K]
+    {B F : Type} [CommRing B] [CommRing F] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
+    [Algebra Qp F] [Algebra K₀ F] [Algebra K F] [IsScalarTower Qp K F]
+    [IsScalarTower K₀ K F] [IsScalarTower Qp K₀ F]
+    (PD : PeriodData G Qp K₀ K B F)
 
-def mulRHom
-    (Qp : Type) [Field Qp]
-    (F : Type) [CommRing F] [Algebra Qp F]
-    (V : Type) [AddCommGroup V] [Module Qp V]
-    : F →+* Module.End Qp (V ⊗[Qp] F) where
+def mulRHom (Qp : Type) [Field Qp] (F : Type) [CommRing F] [Algebra Qp F] (V : Type) [AddCommGroup V]
+    [Module Qp V] : F →+* Module.End Qp (V ⊗[Qp] F) where
   toFun b := mulR Qp F Qp V b
-  map_one' :=
-    LinearMap.ext fun x => by rw [← sm_one_tmul, ← Algebra.TensorProduct.one_def, sm_one]; rfl
-  map_mul' a b :=
-    LinearMap.ext fun x => by
-      rw [Module.End.mul_apply, ← sm_one_tmul, ← sm_one_tmul, ← sm_one_tmul, ← sm_mul,
-        Algebra.TensorProduct.tmul_mul_tmul, one_mul]
-  map_zero' := LinearMap.ext fun x => by rw [← sm_one_tmul, TensorProduct.tmul_zero, map_zero]
-  map_add' a b :=
-    LinearMap.ext fun x => by
-      rw [LinearMap.add_apply, ← sm_one_tmul, ← sm_one_tmul, ← sm_one_tmul, TensorProduct.tmul_add,
-        map_add, LinearMap.add_apply]
+  map_one' := LinearMap.ext fun x => by
+    rw [← sm_one_tmul, ← Algebra.TensorProduct.one_def, sm_one]; rfl
+  map_mul' a b := LinearMap.ext fun x => by
+    rw [Module.End.mul_apply, ← sm_one_tmul, ← sm_one_tmul, ← sm_one_tmul, ← sm_mul,
+      Algebra.TensorProduct.tmul_mul_tmul, one_mul]
+  map_zero' := LinearMap.ext fun x => by
+    rw [← sm_one_tmul, TensorProduct.tmul_zero, map_zero]
+  map_add' a b := LinearMap.ext fun x => by
+    rw [LinearMap.add_apply, ← sm_one_tmul, ← sm_one_tmul, ← sm_one_tmul, TensorProduct.tmul_add,
+      map_add, LinearMap.add_apply]
 
-theorem spans_dual_base
-    {V : Type} [AddCommGroup V] [Module Qp V] [FiniteDimensional Qp V]
-    (ρ : Representation Qp G V)
-    {V' : Type} [AddCommGroup V'] [Module Qp V']
-    (ρ' : Representation Qp G V') (β : V →ₗ[Qp] V' →ₗ[Qp] Qp)
-    (hF : IsField F) (hβ : ∀ g x y, β (ρ g x) (ρ' g y) = β x y) (hb : Function.Bijective β.flip)
-    (h : Spans PD ρ)
-    : Spans PD ρ' := by
+theorem spans_dual_base {V : Type} [AddCommGroup V] [Module Qp V] [FiniteDimensional Qp V]
+    (ρ : Representation Qp G V) {V' : Type} [AddCommGroup V'] [Module Qp V']
+    (ρ' : Representation Qp G V') (β : V →ₗ[Qp] V' →ₗ[Qp] Qp) (hF : IsField F)
+    (hβ : ∀ g x y, β (ρ g x) (ρ' g y) = β x y) (hb : Function.Bijective β.flip)
+    (h : Spans PD ρ) : Spans PD ρ' := by
   classical
   let _ : Module F (V ⊗[Qp] F) := Module.compHom (V ⊗[Qp] F) (mulRHom Qp F V)
   have hsm : ∀ (c : F) (y : V ⊗[Qp] F), c • y = mulR Qp F Qp V c y := fun _ _ => rfl
@@ -75,8 +116,7 @@ theorem spans_dual_base
     intro k c y
     induction y using TensorProduct.induction_on with
     | zero => simp only [smul_zero, map_zero, mul_zero]
-    | tmul v a =>
-      simp only [hsm, mulR, AlgebraTensorModule.map_tmul, LinearMap.id_apply,
+    | tmul v a => simp only [hsm, mulR, AlgebraTensorModule.map_tmul, LinearMap.id_apply,
         LinearMap.mulLeft_apply, hκ, mul_smul_comm]
     | add y₁ y₂ h₁ h₂ => simp only [smul_add, map_add (f := _), h₁, h₂, mul_add]
   have hdec : ∀ y : V ⊗[Qp] F, y = ∑ k, κ k y • (bV k ⊗ₜ[Qp] (1 : F)) := by
@@ -106,14 +146,14 @@ theorem spans_dual_base
   obtain ⟨m, E, hE⟩ := exists_fin_basis_subset_of_isField hF (DdR PD ρ : Set (V ⊗[Qp] F)) hspanD
   have hinv : ∀ y : V ⊗[Qp] F, y ∈ DdR PD ρ ↔ ∀ g, actVdR PD ρ g y = y := by
     intro y
-    simp only [DdR, Submodule.mem_iInf, LinearMap.mem_ker, LinearMap.sub_apply, LinearMap.id_apply,
-      sub_eq_zero]
+    simp only [DdR, Submodule.mem_iInf, LinearMap.mem_ker, LinearMap.sub_apply,
+      LinearMap.id_apply, sub_eq_zero]
   have hinv' : ∀ y : V' ⊗[Qp] F, y ∈ DdR PD ρ' ↔ ∀ g, actVdR PD ρ' g y = y := by
     intro y
-    simp only [DdR, Submodule.mem_iInf, LinearMap.mem_ker, LinearMap.sub_apply, LinearMap.id_apply,
-      sub_eq_zero]
-  have hact
-      : ∀ g (c : F) (y : V ⊗[Qp] F), actVdR PD ρ g (c • y) = PD.actdR g c • actVdR PD ρ g y := by
+    simp only [DdR, Submodule.mem_iInf, LinearMap.mem_ker, LinearMap.sub_apply,
+      LinearMap.id_apply, sub_eq_zero]
+  have hact : ∀ g (c : F) (y : V ⊗[Qp] F),
+      actVdR PD ρ g (c • y) = PD.actdR g c • actVdR PD ρ g y := by
     intro g c y
     induction y using TensorProduct.induction_on with
     | zero => simp only [smul_zero, map_zero]
@@ -123,12 +163,12 @@ theorem spans_dual_base
     intro g i y
     have h1 : actVdR PD ρ g y = ∑ j, PD.actdR g (E.repr y j) • E j := by
       conv_lhs => rw [← E.sum_repr y]
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum]
+
+      rw [map_sum]
       refine Finset.sum_congr rfl fun j _ => ?_
       rw [hact, (hinv _).1 (hE j) g]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [h1, map_sum]
+
+    rw [h1, map_sum]
     simp [Basis.coord_apply, Finsupp.single_apply]
   let e := LinearEquiv.ofBijective β.flip hb
   let w : Fin (Module.finrank Qp V) → V' := fun j => e.symm (bV.coord j)
@@ -139,13 +179,13 @@ theorem spans_dual_base
     intro v'
     apply hb.1
     refine LinearMap.ext fun x => ?_
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_smul, LinearMap.sum_apply, LinearMap.smul_apply, LinearMap.flip_apply,
-        hw, smul_eq_mul]
+
+    simp only [map_sum, map_smul, LinearMap.sum_apply, LinearMap.smul_apply,
+    LinearMap.flip_apply, hw, smul_eq_mul]
     conv_lhs => rw [← bV.sum_repr x]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_smul, LinearMap.sum_apply, LinearMap.smul_apply, smul_eq_mul,
-        Basis.coord_apply]
+
+    simp only [map_sum, map_smul, LinearMap.sum_apply, LinearMap.smul_apply,
+    smul_eq_mul, Basis.coord_apply]
     exact Finset.sum_congr rfl fun j _ => mul_comm _ _
   let π : V → (V' ⊗[Qp] F) →ₗ[Qp] F := fun x =>
     (TensorProduct.lid Qp F).toLinearMap ∘ₗ TensorProduct.map (β x) LinearMap.id
@@ -154,15 +194,15 @@ theorem spans_dual_base
     intro x c z
     induction z using TensorProduct.induction_on with
     | zero => simp only [map_zero, mul_zero]
-    | tmul v' a =>
-      simp only [mulR, AlgebraTensorModule.map_tmul, LinearMap.id_apply, LinearMap.mulLeft_apply,
-        hπ, mul_smul_comm]
+    | tmul v' a => simp only [mulR, AlgebraTensorModule.map_tmul, LinearMap.id_apply,
+        LinearMap.mulLeft_apply, hπ, mul_smul_comm]
     | add z₁ z₂ h₁ h₂ => simp only [map_add (f := _), h₁, h₂, mul_add]
   have hπact : ∀ g x z, π (ρ g x) (actVdR PD ρ' g z) = PD.actdR g (π x z) := by
     intro g x z
     induction z using TensorProduct.induction_on with
     | zero => simp only [map_zero]
-    | tmul v' a => simp [actVdR, hπ, hβ, Algebra.smul_def, IsScalarTower.algebraMap_apply Qp K F]
+    | tmul v' a =>
+      simp [actVdR, hπ, hβ, Algebra.smul_def, IsScalarTower.algebraMap_apply Qp K F]
     | add z₁ z₂ h₁ h₂ => simp only [map_add (f := _), h₁, h₂]
   have hzdec : ∀ z : V' ⊗[Qp] F, z = ∑ j, w j ⊗ₜ π (bV j) z := by
     intro z
@@ -184,9 +224,9 @@ theorem spans_dual_base
   let d' : Fin m → V' ⊗[Qp] F := fun i => ∑ j, w j ⊗ₜ[Qp] E.coord i (bV j ⊗ₜ[Qp] (1 : F))
   have hπd' : ∀ x i, π x (d' i) = E.coord i (x ⊗ₜ[Qp] (1 : F)) := by
     intro x i
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hdec (x ⊗ₜ[Qp] (1 : F)), map_sum]
-    set_option synthInstance.maxHeartbeats 100000 in
+
+    rw [hdec (x ⊗ₜ[Qp] (1 : F)), map_sum]
+
     simp only [d', map_sum, hπ, hw, hκ, map_smul, smul_eq_mul, smul_one_mul]
   have hd'inv : ∀ i g, actVdR PD ρ' g (d' i) = d' i := by
     intro i g
@@ -201,8 +241,8 @@ theorem spans_dual_base
   refine ⟨m, c, d', fun i => (hinv' _).2 (hd'inv i), ?_⟩
   apply hπext
   intro x
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+
+  rw [map_sum]
   simp only [hπmul, hπd']
   have hx1 : x ⊗ₜ[Qp] (1 : F) = ∑ i, E.coord i (x ⊗ₜ[Qp] (1 : F)) • E i := by
     simp only [Basis.coord_apply]
@@ -210,26 +250,25 @@ theorem spans_dual_base
   have key : ∀ k, κ k (x ⊗ₜ[Qp] (1 : F)) = ∑ i, E.coord i (x ⊗ₜ[Qp] (1 : F)) * κ k (E i) := by
     intro k
     conv_lhs => rw [hx1]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
-    simp only [hκmul]
-  calc
-    π x y' = ∑ k, bV.coord k x • π (bV k) y' := by
-      conv_lhs => rw [hzdec y']
-      set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, hπ, hw]
-    _ = ∑ k, π (bV k) y' * κ k (x ⊗ₜ[Qp] (1 : F)) := by
-      refine Finset.sum_congr rfl fun k _ => ?_
-      rw [hκ, mul_smul_comm, mul_one]
-    _ = ∑ k, π (bV k) y' * ∑ i, E.coord i (x ⊗ₜ[Qp] (1 : F)) * κ k (E i) := by simp only [key]
-    _ = ∑ i, c i * E.coord i (x ⊗ₜ[Qp] (1 : F)) := by
-      simp only [c, Finset.mul_sum, Finset.sum_mul]
-      rw [Finset.sum_comm]
-      exact Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun k _ => by ring
 
-variable
-  {LL : Type} [Field LL] [Algebra Qp LL]
-  {V : Type} [AddCommGroup V] [Module LL V] [Module Qp V] [IsScalarTower Qp LL V]
+    rw [map_sum]
+    simp only [hκmul]
+  calc π x y' = ∑ k, bV.coord k x • π (bV k) y' := by
+        conv_lhs => rw [hzdec y']
+
+        simp only [map_sum, hπ, hw]
+    _ = ∑ k, π (bV k) y' * κ k (x ⊗ₜ[Qp] (1 : F)) := by
+        refine Finset.sum_congr rfl fun k _ => ?_
+        rw [hκ, mul_smul_comm, mul_one]
+    _ = ∑ k, π (bV k) y' * ∑ i, E.coord i (x ⊗ₜ[Qp] (1 : F)) * κ k (E i) := by
+        simp only [key]
+    _ = ∑ i, c i * E.coord i (x ⊗ₜ[Qp] (1 : F)) := by
+        simp only [c, Finset.mul_sum, Finset.sum_mul]
+        rw [Finset.sum_comm]
+        exact Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun k _ => by ring
+
+variable {LL : Type} [Field LL] [Algebra Qp LL]
+    {V : Type} [AddCommGroup V] [Module LL V] [Module Qp V] [IsScalarTower Qp LL V]
 
 variable (Qp) in
 def resRep (ρ : Representation LL G V) : Representation Qp G V where
@@ -252,31 +291,27 @@ theorem spans_resRep_iff (ρ : Representation LL G V) : Spans PD (resRep Qp ρ) 
       | zero => simp only [map_zero]
       | tmul v c => simp [actVdR, resRep]
       | add x z hx hz => rw [map_add (f := _), map_add (f := _), hx, hz]
-    simp only [DdR, Submodule.mem_iInf, LinearMap.mem_ker, LinearMap.sub_apply, LinearMap.id_apply,
-      ha]
+    simp only [DdR, Submodule.mem_iInf, LinearMap.mem_ker, LinearMap.sub_apply, LinearMap.id_apply, ha]
   unfold Spans
   simp only [hd, hm]
 
-theorem spans_dual
-    [FiniteDimensional Qp LL] [CharZero Qp] [FiniteDimensional LL V]
+theorem spans_dual [FiniteDimensional Qp LL] [CharZero Qp] [FiniteDimensional LL V]
     (ρ : Representation LL G V)
     {V' : Type} [AddCommGroup V'] [Module LL V'] [Module Qp V'] [IsScalarTower Qp LL V']
-    (ρ' : Representation LL G V') (β : V →ₗ[LL] V' →ₗ[LL] LL)
-    (hF : IsField F) (hβ : ∀ g x y, β (ρ g x) (ρ' g y) = β x y) (hb : Function.Bijective β.flip)
-    (h : Spans PD ρ)
-    : Spans PD ρ' := by
+    (ρ' : Representation LL G V') (β : V →ₗ[LL] V' →ₗ[LL] LL) (hF : IsField F)
+    (hβ : ∀ g x y, β (ρ g x) (ρ' g y) = β x y) (hb : Function.Bijective β.flip)
+    (h : Spans PD ρ) : Spans PD ρ' := by
   have hVf : FiniteDimensional Qp V := Module.Finite.trans LL V
   let e := LinearEquiv.ofBijective β.flip hb
   have hV'L : FiniteDimensional LL V' := Module.Finite.equiv e.symm
   have hV'f : FiniteDimensional Qp V' := Module.Finite.trans LL V'
   let tr : LL →ₗ[Qp] Qp := Algebra.trace Qp LL
-  let β₀ : V →ₗ[Qp] V' →ₗ[Qp] Qp :=
-    LinearMap.mk₂ Qp
-      (fun x y => tr (β x y))
-      (fun x₁ x₂ y => by simp only [map_add (f := _), LinearMap.add_apply])
-      (fun c x y => by simp only [LinearMap.map_smul_of_tower, LinearMap.smul_apply, map_smul])
-      (fun x y₁ y₂ => by simp only [map_add (f := _)])
-      (fun c x y => by simp only [LinearMap.map_smul_of_tower, map_smul])
+  let β₀ : V →ₗ[Qp] V' →ₗ[Qp] Qp := LinearMap.mk₂ Qp (fun x y => tr (β x y))
+    (fun x₁ x₂ y => by simp only [map_add (f := _), LinearMap.add_apply])
+    (fun c x y => by
+      simp only [LinearMap.map_smul_of_tower, LinearMap.smul_apply, map_smul])
+    (fun x y₁ y₂ => by simp only [map_add (f := _)])
+    (fun c x y => by simp only [LinearMap.map_smul_of_tower, map_smul])
   have hβ₀ : ∀ g x y, β₀ (resRep Qp ρ g x) (resRep Qp ρ' g y) = β₀ x y := by
     intro g x y
     show tr (β (ρ g x) (ρ' g y)) = tr (β x y)
@@ -298,32 +333,18 @@ theorem spans_dual
     ext x
     exact h1 x
   have hrank : Module.finrank Qp V' = Module.finrank Qp (V →ₗ[Qp] Qp) := by
-    rw [← Module.finrank_mul_finrank Qp LL V', LinearEquiv.finrank_eq e, Subspace.dual_finrank_eq,
-      Module.finrank_mul_finrank]
+    rw [← Module.finrank_mul_finrank Qp LL V', LinearEquiv.finrank_eq e,
+      Subspace.dual_finrank_eq, Module.finrank_mul_finrank]
     exact (Subspace.dual_finrank_eq (K := Qp) (V := V)).symm
   have hb₀ : Function.Bijective β₀.flip :=
     ⟨hinj, (LinearMap.injective_iff_surjective_of_finrank_eq_finrank hrank).1 hinj⟩
   have h₀ : Spans PD (resRep Qp ρ) := (spans_resRep_iff PD ρ).2 h
-  exact (spans_resRep_iff PD ρ').1
-    (spans_dual_base PD (resRep Qp ρ) (resRep Qp ρ') β₀ hF hβ₀ hb₀ h₀)
+  exact (spans_resRep_iff PD ρ').1 (spans_dual_base PD (resRep Qp ρ) (resRep Qp ρ') β₀ hF hβ₀ hb₀ h₀)
 
 end Period
 
-theorem spans_dual_of_spans
-    : ∀ {G : Type} [Group G] {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K] [Algebra Qp K₀]
-        [Algebra Qp K] [Algebra K₀ K] [IsScalarTower Qp K₀ K] {B F : Type} [CommRing B] [CommRing F]
-        [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B] [Algebra Qp F] [Algebra K₀ F]
-        [Algebra K F] [IsScalarTower Qp K F] [IsScalarTower K₀ K F] [IsScalarTower Qp K₀ F]
-        (PD : PeriodData G Qp K₀ K B F) {LL : Type} [Field LL] [Algebra Qp LL]
-        [FiniteDimensional Qp LL] [FiniteDimensional Qp K] [CharZero Qp] {V : Type} [AddCommGroup V]
-        [Module LL V] [Module Qp V] [IsScalarTower Qp LL V] [FiniteDimensional LL V]
-        (ρ : Representation LL G V) {V' : Type} [AddCommGroup V'] [Module LL V'] [Module Qp V']
-        [IsScalarTower Qp LL V'] [FiniteDimensional LL V'] (ρ' : Representation LL G V')
-        (β : V →ₗ[LL] V' →ₗ[LL] LL),
-      IsField F → (∀ g x y, β (ρ g x) (ρ' g y) = β x y) → Function.Bijective β.flip → Spans PD ρ
-        → Spans PD ρ' := by
-  intro G _ Qp K₀ K _ _ _ _ _ _ _ B F _ _ _ _ _ _ _ _ _ _ _ PD LL _ _ _ _ _ V _ _ _ _ _ ρ V' _ _ _ _
-    _ ρ' β hF hβ hb h
+theorem spans_dual_of_spans : ∀ {G : Type} [Group G] {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K] [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K] [IsScalarTower Qp K₀ K] {B F : Type} [CommRing B] [CommRing F] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B] [Algebra Qp F] [Algebra K₀ F] [Algebra K F] [IsScalarTower Qp K F] [IsScalarTower K₀ K F] [IsScalarTower Qp K₀ F] (PD : PeriodData G Qp K₀ K B F) {LL : Type} [Field LL] [Algebra Qp LL] [FiniteDimensional Qp LL] [FiniteDimensional Qp K] [CharZero Qp] {V : Type} [AddCommGroup V] [Module LL V] [Module Qp V] [IsScalarTower Qp LL V] [FiniteDimensional LL V] (ρ : Representation LL G V) {V' : Type} [AddCommGroup V'] [Module LL V'] [Module Qp V'] [IsScalarTower Qp LL V'] [FiniteDimensional LL V'] (ρ' : Representation LL G V') (β : V →ₗ[LL] V' →ₗ[LL] LL), IsField F → (∀ g x y, β (ρ g x) (ρ' g y) = β x y) → Function.Bijective β.flip → Spans PD ρ → Spans PD ρ' := by
+  intro G _ Qp K₀ K _ _ _ _ _ _ _ B F _ _ _ _ _ _ _ _ _ _ _ PD LL _ _ _ _ _ V _ _ _ _ _ ρ V' _ _ _ _ _ ρ' β hF hβ hb h
   exact spans_dual PD ρ ρ' β hF hβ hb h
 
 end GlobalTheory.DRFil

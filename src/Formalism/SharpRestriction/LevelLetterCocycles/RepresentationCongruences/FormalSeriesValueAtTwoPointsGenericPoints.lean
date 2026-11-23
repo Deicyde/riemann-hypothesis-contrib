@@ -1,8 +1,15 @@
 module
 
-public import Formalism.SharpRestriction.LevelLetterCocycles.RepresentationCongruences.DvdCoeffsOfMemSpanDistinguished
-public import Mathlib.RingTheory.PowerSeries.Substitution
-public import Mathlib.Analysis.SpecialFunctions.Log.Base
+public import Formalism.SharpRestriction.LevelLetterCocycles.RepresentationCongruences.MemPairOfMemSingle
+public import Mathlib.Data.Nat.PadicValNat
+import Mathlib.Analysis.SpecialFunctions.Pow.Real
+import Mathlib.Data.Nat.Choose.Multinomial
+public import Mathlib.NumberTheory.Padics.PadicVal.Basic
+import Mathlib.RingTheory.LocalRing.ResidueField.Basic
+import Mathlib.Tactic.Lemma
+import Mathlib.Tactic.NormNum.GCD
+import Mathlib.Tactic.Positivity.Finset
+import Mathlib.Tactic.TypeStar
 
 @[expose] public section
 

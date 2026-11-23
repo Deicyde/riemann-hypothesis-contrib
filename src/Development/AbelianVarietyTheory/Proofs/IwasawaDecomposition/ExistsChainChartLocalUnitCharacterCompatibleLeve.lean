@@ -1,17 +1,43 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.TiedColumnData
-public import Formalism.SharpRestriction.GlobalSchurBounds.ThickPlacesCorollaryOfAnyTranslate
-public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.FixedVectorEqOfStandardData
-public import Formalism.LocalToGlobal.GroupLattices.ComparisonMaps.ComparisonZeroEmbedding
-public import Formalism.SharpRestriction.GrowthBounds.ChartedClasses.ClsChartedLabAt
 public import Formalism.SharpRestriction.GrowthBounds.TwistedLevelAgreement.StepInTwK
-public import Formalism.SharpRestriction.GrowthBounds.BaseLevels.LevelsGEmpty
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.LevelsTwG
 public import Development.AbelianVarietyTheory.Definitions.GaloisGeometry.ChiFinOfGlevH
-public import Formalism.SharpRestriction.GrowthBounds.ChartComparison
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.TwistedChainChartLevelCharactersRationalStatement
+import Formalism.LocalToGlobal.GroupLattices.TiedFamilies.TiePtRec
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
 
 @[expose] public section
 
@@ -39,7 +65,6 @@ variable
   {Uloc : ∀ v : HeightOneSpectrum (𝓞 D.host.F),
     Subgroup (GL (Fin (D.sp.X (i + 1)).rank) (D.host.E ⊗[D.host.F] v.adicCompletion D.host.F))}
 
-set_option maxHeartbeats 4000000 in
 def kapU (hU : SameUlocJ hi S Uloc) (p : ℕ)
     : awayG D.sp.cm.sig (D.sp.X (i + 1)).gram Uloc p →* S.U :=
   ((glue (epsP D.host.F p D.host.E) (isIdempotentElem_placeIdempotent D.host.F p D.host.E)).comp
@@ -86,7 +111,6 @@ theorem kapU_off
   rw [bc_glue_zero _ _ _ (epsP_off D.host.F p D.host.E v hv)]
   rfl
 
-set_option maxHeartbeats 4000000 in
 theorem exists_psiTiedJ
     (hU : SameUlocJ hi S Uloc) (e : D.what₂.LL →+* (D.gat u w hg).Kf)
     [IsFractionRing (D.gat u w hg).O (D.gat u w hg).Kf]
@@ -114,7 +138,6 @@ theorem exists_psiTiedJ
 
 end GlobalTheory.Mem.Top.KerTwPsi
 
-set_option maxHeartbeats 4000000 in
 theorem GlobalTheory.Mem.Top.KerTwPsi.psi_tied
     : ∀ {K : Ctx} {B : Base} {f : Fr B.toPre} {T : TwDat B} (w : ColW B f T),
       K.Over B.toPre → Forced K B T → Pinned K B f T w

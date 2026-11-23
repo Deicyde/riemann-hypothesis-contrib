@@ -1,8 +1,57 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Definitions.ExistenceOfLattices.Hat1
 public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.AdelicCompletionFractionalIdealProperties
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.Order.CompletePartialOrder
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Lemma
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -21,6 +70,7 @@ variable (F : Type) [Field F] [NumberField F]
 
 variable (E : Type) [Field E] [NumberField E] [Algebra F E]
 
+
 variable {F E}
 
 open NumberField IsDedekindDomain in
@@ -28,8 +78,8 @@ open scoped TensorProduct Topology Matrix in
 variable (F : Type) [Field F] [NumberField F] in
 variable (E : Type) [Field E] [NumberField E] [Algebra F E] in
 variable {F E} in
-theorem _root_.GlobalTheory.AdLat.UnitRoot.conj_mem (c : E ≃ₐ[F] E)
-    : ∀ x ∈ Set.range (algebraMap (𝓞 E) E), c x ∈ Set.range (algebraMap (𝓞 E) E) := by
+theorem _root_.GlobalTheory.AdLat.UnitRoot.conj_mem (c : E ≃ₐ[F] E) :
+    ∀ x ∈ Set.range (algebraMap (𝓞 E) E), c x ∈ Set.range (algebraMap (𝓞 E) E) := by
   rintro _ ⟨a, rfl⟩
   exact ⟨⟨c (a : E), a.2.map c.toAlgHom.toRingHom.toIntAlgHom⟩, rfl⟩
 
@@ -211,32 +261,21 @@ private lemma exists_norm_sum_tmul_eq_tmul_one {F E : Type} [Field F] [NumberFie
       map_mul, sg_sg_of_quadratic c h2 hc, hσ]
     linear_combination hN
 
+
 open NumberField IsDedekindDomain in
 open scoped TensorProduct Topology Matrix in
-theorem _root_.GlobalTheory.AdLat.exists_integral_unit_root
-    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-        (c : E ≃ₐ[F] E),
-      Module.finrank F E = 2 → c ≠ 1
-        → (∀ P : Ideal (𝓞 E), P.IsMaximal → ∃ t s : 𝓞 E, (s : E) = c (t : E) ∧ t - s ∉ P)
-        → ∀ u ∈ _root_.GlobalTheory.AdLat.hat1 F (Set.range (algebraMap (𝓞 E) E)),
-          u * _root_.GlobalTheory.AdLat.sg (FiniteAdeleRing (𝓞 F) F) c u = 1
-            → ∃ x ∈ _root_.GlobalTheory.AdLat.hat1 F (Set.range (algebraMap (𝓞 E) E)),
-              (∃ y ∈ _root_.GlobalTheory.AdLat.hat1 F (Set.range (algebraMap (𝓞 E) E)), x * y = 1)
-                ∧ x = u * _root_.GlobalTheory.AdLat.sg (FiniteAdeleRing (𝓞 F) F) c x := by
+theorem _root_.GlobalTheory.AdLat.exists_integral_unit_root : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (c : E ≃ₐ[F] E), Module.finrank F E = 2 → c ≠ 1 → (∀ P : Ideal (𝓞 E), P.IsMaximal → ∃ t s : 𝓞 E, (s : E) = c (t : E) ∧ t - s ∉ P) → ∀ u ∈ _root_.GlobalTheory.AdLat.hat1 F (Set.range (algebraMap (𝓞 E) E)), u * _root_.GlobalTheory.AdLat.sg (FiniteAdeleRing (𝓞 F) F) c u = 1 → ∃ x ∈ _root_.GlobalTheory.AdLat.hat1 F (Set.range (algebraMap (𝓞 E) E)), (∃ y ∈ _root_.GlobalTheory.AdLat.hat1 F (Set.range (algebraMap (𝓞 E) E)), x * y = 1) ∧ x = u * _root_.GlobalTheory.AdLat.sg (FiniteAdeleRing (𝓞 F) F) c x := by
   intro F E _ _ _ _ _ c h2 hc hP u hu hnorm
   classical
-  have hσ
-      : ∀ b (x : E),
-        _root_.GlobalTheory.AdLat.sg (FiniteAdeleRing (𝓞 F) F) c (b ⊗ₜ[F] x)
-          = b ⊗ₜ[F] c x := fun b x => by
-    simp [_root_.GlobalTheory.AdLat.sg]
+  have hσ : ∀ b (x : E), _root_.GlobalTheory.AdLat.sg (FiniteAdeleRing (𝓞 F) F) c (b ⊗ₜ[F] x) =
+      b ⊗ₜ[F] c x := fun b x => by simp [_root_.GlobalTheory.AdLat.sg]
   set σ := _root_.GlobalTheory.AdLat.sg (FiniteAdeleRing (𝓞 F) F) c with hσdef
   have hcc := mul_self_eq_one_of_quadratic c h2 hc
   have hσσ : ∀ z, σ (σ z) = z := sg_sg_of_quadratic c h2 hc
   obtain ⟨n, r, t, s, hs, hrts⟩ := exists_sum_mul_sub_conj_eq_one c hP
   let X : Option (Fin n) → 𝓞 E := fun i => i.elim 1 t
   let CX : Option (Fin n) → 𝓞 E := fun i => i.elim 1 s
-  let Y : Option (Fin n) → 𝓞 E := fun i => i.elim (- ∑ k, r k * s k) r
+  let Y : Option (Fin n) → 𝓞 E := fun i => i.elim (-∑ k, r k * s k) r
   have hCX : ∀ i, (CX i : E) = c (X i : E) := by rintro (_ | k) <;> simp [X, CX, hs]
   have hXY : ∑ i, Y i * X i = 1 := by
     rw [Fintype.sum_option, ← hrts]
@@ -259,14 +298,12 @@ theorem _root_.GlobalTheory.AdLat.exists_integral_unit_root
     simp only [m, map_add (f := _), map_mul, hσX, hσCX]
     linear_combination ρ (X i) * hnorm
   let H := _root_.GlobalTheory.AdLat.hat1 F (Set.range (algebraMap (𝓞 E) E))
-  have hρmem : ∀ x, ρ x ∈ H := fun x =>
-    _root_.GlobalTheory.AdLat.one_tmul_mem_adelicCompletionOfElementSet F ⟨x, rfl⟩
+  have hρmem : ∀ x, ρ x ∈ H := fun x => _root_.GlobalTheory.AdLat.one_tmul_mem_adelicCompletionOfElementSet F ⟨x, rfl⟩
   have hmul : ∀ a b, a ∈ H → b ∈ H → a * b ∈ H := fun a b ha hb =>
-    _root_.GlobalTheory.AdLat.mul_mem_adelicCompletionOfElementSet_of_mul_mem F
-      (by rintro _ ⟨a, rfl⟩ _ ⟨b, rfl⟩; exact ⟨a * b, map_mul _ _ _⟩) ha hb
+    _root_.GlobalTheory.AdLat.mul_mem_adelicCompletionOfElementSet_of_mul_mem F (by
+      rintro _ ⟨a, rfl⟩ _ ⟨b, rfl⟩; exact ⟨a * b, map_mul _ _ _⟩) ha hb
   have hσmem : ∀ z ∈ H, σ z ∈ H := fun z hz =>
-    _root_.GlobalTheory.AdLat.galoisAut_mem_adelicCompletionOfElementSet F c
-      (_root_.GlobalTheory.AdLat.UnitRoot.conj_mem c) hz
+    _root_.GlobalTheory.AdLat.galoisAut_mem_adelicCompletionOfElementSet F c (_root_.GlobalTheory.AdLat.UnitRoot.conj_mem c) hz
   have hmmem : ∀ i, m i ∈ H := fun i => add_mem (hρmem _) (hmul _ _ hu (hρmem _))
   let Pint : FiniteAdeleRing (𝓞 F) F → Prop := fun a => ∀ v, a v ∈ v.adicCompletionIntegers F
   have hsmI : ∀ (f : 𝓞 F) a, Pint a → Pint (algebraMap F _ (f : F) * a) := fun f a ha v =>
@@ -280,9 +317,8 @@ theorem _root_.GlobalTheory.AdLat.exists_integral_unit_root
     _root_.GlobalTheory.AdLat.adele_mul_integral F (ha v) (hb v)
   have hp : ∀ i j, ∃ q, Pint q ∧ m i * σ (m j) = q ⊗ₜ[F] (1 : E) := by
     intro i j
-    obtain ⟨q, hq, e⟩ :=
-      exists_add_sg_eq_tmul_one_of_mem_closure c h2 hc Pint h0I haddI hnegI hsmI (ρ (X i) * σ (m j))
-        (hmul _ _ (hρmem _) (hσmem _ (hmmem j)))
+    obtain ⟨q, hq, e⟩ := exists_add_sg_eq_tmul_one_of_mem_closure c h2 hc Pint h0I haddI hnegI hsmI (ρ (X i) * σ (m j))
+      (hmul _ _ (hρmem _) (hσmem _ (hmmem j)))
     refine ⟨q, hq, ?_⟩
     rw [← e, map_mul, hσσ, hσX]
     have := hum j
@@ -297,98 +333,73 @@ theorem _root_.GlobalTheory.AdLat.exists_integral_unit_root
     push_neg at hcon
     choose cy hcy using fun j => _root_.GlobalTheory.AdLat.UnitRoot.conj_mem c _ ⟨Y j, rfl⟩
     have h1 : ∑ i, ρ (Y i) * m i = 1 := by
-      set_option synthInstance.maxHeartbeats 100000 in
-      simp only [m, mul_add, Finset.sum_add_distrib, mul_left_comm _ u, ← Finset.mul_sum, ← map_mul,
-        ← map_sum, hXY, hCXY, map_one, map_zero, mul_zero, add_zero]
+
+      simp only [m, mul_add, Finset.sum_add_distrib, mul_left_comm _ u, ← Finset.mul_sum,
+      ← map_mul, ← map_sum, hXY, hCXY, map_one, map_zero, mul_zero, add_zero]
     have h1' : ∑ j, ρ (cy j) * σ (m j) = 1 := by
       have := congrArg σ h1
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum, map_one] at this
+
+      rw [map_sum, map_one] at this
       rw [← this]
       refine Finset.sum_congr rfl fun j _ => ?_
       rw [map_mul, hρ (Y j), hσ, ← hcy]
       rfl
-    have hZ
-        : ∑ ij : Option (Fin n) × Option (Fin n),
-            p ij.1 ij.2 ⊗ₜ[F] ((Y ij.1 * cy ij.2 : 𝓞 E) : E)
-          = 1 := by
+    have hZ : ∑ ij : Option (Fin n) × Option (Fin n),
+        p ij.1 ij.2 ⊗ₜ[F] ((Y ij.1 * cy ij.2 : 𝓞 E) : E) = 1 := by
       rw [← mul_one (1 : _root_.GlobalTheory.AdLat.RA F E)]
       nth_rewrite 1 [← h1]
       rw [← h1', Finset.sum_mul_sum, ← Finset.sum_product']
       refine Finset.sum_congr rfl fun ij _ => ?_
-      rw [show ρ (Y ij.1) * m ij.1 * (ρ (cy ij.2) * σ (m ij.2))
-            = ρ (Y ij.1 * cy ij.2) * (m ij.1 * σ (m ij.2)) by
-          rw [map_mul]; ring,
-        hpe, hρ, Algebra.TensorProduct.tmul_mul_tmul, one_mul, mul_one]
-    have h0v : Pv v 0 := ⟨
-      h0I,
-      by
-        show Valued.v (0 : v.adicCompletion F) < 1
-        rw [map_zero]
-        exact zero_lt_one
-    ⟩
-    have haddv : ∀ a b, Pv v a → Pv v b → Pv v (a + b) := fun a b ha hb => ⟨
-      haddI a b ha.1 hb.1,
-      by
+      rw [show ρ (Y ij.1) * m ij.1 * (ρ (cy ij.2) * σ (m ij.2)) =
+          ρ (Y ij.1 * cy ij.2) * (m ij.1 * σ (m ij.2)) by rw [map_mul]; ring, hpe, hρ,
+        Algebra.TensorProduct.tmul_mul_tmul, one_mul, mul_one]
+    have h0v : Pv v 0 := ⟨h0I, by
+      show Valued.v (0 : v.adicCompletion F) < 1
+      rw [map_zero]; exact zero_lt_one⟩
+    have haddv : ∀ a b, Pv v a → Pv v b → Pv v (a + b) := fun a b ha hb =>
+      ⟨haddI a b ha.1 hb.1, by
         show Valued.v (a v + b v) < 1
-        exact Valuation.map_add_lt _ ha.2 hb.2
-    ⟩
-    have hnegv : ∀ a, Pv v a → Pv v (-a) := fun a ha => ⟨
-      hnegI a ha.1,
-      by
+        exact Valuation.map_add_lt _ ha.2 hb.2⟩
+    have hnegv : ∀ a, Pv v a → Pv v (-a) := fun a ha =>
+      ⟨hnegI a ha.1, by
         show Valued.v (-(a v)) < 1
-        rw [Valuation.map_neg]
-        exact ha.2
-    ⟩
-    have hmulv : ∀ a b, Pint a → Pv v b → Pv v (a * b) := fun a b ha hb => ⟨
-      hmulI a b ha hb.1,
-      by
+        rw [Valuation.map_neg]; exact ha.2⟩
+    have hmulv : ∀ a b, Pint a → Pv v b → Pv v (a * b) := fun a b ha hb =>
+      ⟨hmulI a b ha hb.1, by
         show Valued.v (a v * b v) < 1
         rw [map_mul]
-        exact lt_of_le_of_lt
-          (mul_le_of_le_one_left' ((HeightOneSpectrum.mem_adicCompletionIntegers _ _ _).1 (ha v)))
-          hb.2
-    ⟩
-    have hPv : ∀ ij : Option (Fin n) × Option (Fin n), Pv v (p ij.1 ij.2) := fun ij =>
-      ⟨hpint ij.1 ij.2, hcon ij⟩
+        exact lt_of_le_of_lt (mul_le_of_le_one_left' ((HeightOneSpectrum.mem_adicCompletionIntegers _ _ _).1 (ha v))) hb.2⟩
+    have hPv : ∀ ij : Option (Fin n) × Option (Fin n), Pv v (p ij.1 ij.2) :=
+      fun ij => ⟨hpint ij.1 ij.2, hcon ij⟩
     clear_value m ρ H X CX Y
-    obtain ⟨N, hN, eN⟩ :=
-      exists_norm_sum_tmul_eq_tmul_one c h2 hc (Pv v) h0v haddv hnegv
-        (fun f a ha => by
-          have := hmulv _ a (hsmI f 1 (_root_.GlobalTheory.AdLat.adele_one_integral F)) ha
-          rwa [mul_one] at this)
-        (fun a b ha hb => hmulv a b ha.1 hb)
-        Finset.univ
-        (fun ij : Option (Fin n) × Option (Fin n) => p ij.1 ij.2)
-        (fun ij : Option (Fin n) × Option (Fin n) => Y ij.1 * cy ij.2)
-        hPv
+    obtain ⟨N, hN, eN⟩ := exists_norm_sum_tmul_eq_tmul_one c h2 hc (Pv v) h0v haddv hnegv
+      (fun f a ha => by
+        have := hmulv _ a (hsmI f 1 (_root_.GlobalTheory.AdLat.adele_one_integral F)) ha
+        rwa [mul_one] at this)
+      (fun a b ha hb => hmulv a b ha.1 hb) Finset.univ
+      (fun ij : Option (Fin n) × Option (Fin n) => p ij.1 ij.2)
+      (fun ij : Option (Fin n) × Option (Fin n) => Y ij.1 * cy ij.2) hPv
     beta_reduce at eN
     rw [hZ, map_one, mul_one, Algebra.TensorProduct.one_def] at eN
-    have hN1 : N = 1 :=
-      (Algebra.TensorProduct.includeLeft_injective (R := F) (S := F) (A := FiniteAdeleRing (𝓞 F) F)
-        (B := E) (algebraMap F E).injective eN).symm
+    have hN1 : N = 1 := (Algebra.TensorProduct.includeLeft_injective (R := F)
+      (S := F) (A := FiniteAdeleRing (𝓞 F) F) (B := E) (algebraMap F E).injective eN).symm
     have := hN.2
     rw [hN1] at this
     exact absurd this (by
       show ¬ Valued.v (1 : v.adicCompletion F) < 1
-      rw [map_one]
-      exact lt_irrefl 1)
+      rw [map_one]; exact lt_irrefl 1)
   choose ij hij using hkey
   have hval1 : ∀ v, Valued.v (p (ij v).1 (ij v).2 v) = 1 := fun v =>
-    le_antisymm ((HeightOneSpectrum.mem_adicCompletionIntegers _ _ _).1 (hpint _ _ v))
-      (not_lt.1 (hij v))
+    le_antisymm ((HeightOneSpectrum.mem_adicCompletionIntegers _ _ _).1 (hpint _ _ v)) (not_lt.1 (hij v))
   have hne : ∀ v, p (ij v).1 (ij v).2 v ≠ 0 := fun v h => by
     have := hval1 v; rw [h, map_zero] at this; exact zero_ne_one this
-  have hE0
-      : ∀ (q : Option (Fin n) × Option (Fin n)) (v : HeightOneSpectrum (𝓞 F)),
-        (if ij v = q then (1 : v.adicCompletion F) else 0) ∈ v.adicCompletionIntegers F := by
-    intro q v
-    split_ifs
+  have hE0 : ∀ (q : Option (Fin n) × Option (Fin n)) (v : HeightOneSpectrum (𝓞 F)),
+      (if ij v = q then (1 : v.adicCompletion F) else 0) ∈ v.adicCompletionIntegers F := by
+    intro q v; split_ifs
     · exact one_mem _
     · exact zero_mem _
-  have hD0
-      : ∀ v : HeightOneSpectrum (𝓞 F),
-        (p (ij v).1 (ij v).2 v)⁻¹ ∈ v.adicCompletionIntegers F := fun v => by
+  have hD0 : ∀ v : HeightOneSpectrum (𝓞 F),
+      (p (ij v).1 (ij v).2 v)⁻¹ ∈ v.adicCompletionIntegers F := fun v => by
     rw [HeightOneSpectrum.mem_adicCompletionIntegers, map_inv₀, hval1, inv_one]
   let e : Option (Fin n) × Option (Fin n) → FiniteAdeleRing (𝓞 F) F := fun q =>
     ⟨fun v => if ij v = q then 1 else 0, Filter.Eventually.of_forall fun v => hE0 q v⟩
@@ -396,63 +407,42 @@ theorem _root_.GlobalTheory.AdLat.exists_integral_unit_root
     ⟨fun v => (p (ij v).1 (ij v).2 v)⁻¹, Filter.Eventually.of_forall hD0⟩
   have heI : ∀ q, Pint (e q) := fun q v => hE0 q v
   have hdI : Pint d := hD0
-  let ev
-      : ∀ v : HeightOneSpectrum (𝓞 F), FiniteAdeleRing (𝓞 F) F →+* v.adicCompletion F := fun v => {
-    toFun := fun a => a v
-    map_one' := rfl
-    map_mul' := fun _ _ => rfl
-    map_zero' := rfl
-    map_add' := fun _ _ => rfl
-  }
-  have hsum1
-      : d * ∑ q : Option (Fin n) × Option (Fin n), ∑ q' : Option (Fin n) × Option (Fin n),
-          e q * e q' * p q.1 q'.2
-        = 1 := by
+  let ev : ∀ v : HeightOneSpectrum (𝓞 F), FiniteAdeleRing (𝓞 F) F →+* v.adicCompletion F := fun v =>
+    { toFun := fun a => a v, map_one' := rfl, map_mul' := fun _ _ => rfl, map_zero' := rfl,
+      map_add' := fun _ _ => rfl }
+  have hsum1 : d * ∑ q : Option (Fin n) × Option (Fin n), ∑ q' : Option (Fin n) × Option (Fin n),
+      e q * e q' * p q.1 q'.2 = 1 := by
     apply FiniteAdeleRing.ext F
     intro v
-    have :=
-      map_sum (ev v)
-        (fun q => ∑ q' : Option (Fin n) × Option (Fin n), e q * e q' * p q.1 q'.2)
-        Finset.univ
+    have := map_sum (ev v) (fun q => ∑ q' : Option (Fin n) × Option (Fin n), e q * e q' * p q.1 q'.2)
+      Finset.univ
     show d v * (ev v) _ = 1
     rw [this]
     have hevv : ∀ a : FiniteAdeleRing (𝓞 F) F, ev v a = a v := fun _ => rfl
     have hev : ∀ q, e q v = if ij v = q then 1 else 0 := fun _ => rfl
     have hdv : d v = (p (ij v).1 (ij v).2 v)⁻¹ := rfl
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_mul]
-    simp only [hevv, hev, hdv, ite_mul, one_mul, zero_mul, mul_ite, mul_one, mul_zero,
-      Finset.sum_ite_eq, Finset.sum_ite_eq', Finset.mem_univ, if_true]
+
+    simp only [map_sum, map_mul]
+    simp only [hevv, hev, hdv, ite_mul, one_mul, zero_mul, mul_ite, mul_one,
+      mul_zero, Finset.sum_ite_eq, Finset.sum_ite_eq', Finset.mem_univ, if_true]
     exact inv_mul_cancel₀ (hne v)
-  refine ⟨
-    ∑ q, (e q ⊗ₜ[F] (1 : E)) * m q.1,
-    ?_,
-    ⟨(d ⊗ₜ[F] (1 : E)) * ∑ q, (e q ⊗ₜ[F] (1 : E)) * σ (m q.2), ?_, ?_⟩,
-    ?_
-  ⟩
-  · exact AddSubgroup.sum_mem _ fun q _ =>
-      hmul _ _
-        (_root_.GlobalTheory.AdLat.tmul_mem_adelicCompletion_of_integral F (heI q) ⟨1, map_one _⟩)
-        (hmmem _)
-  · exact hmul _ _
-      (_root_.GlobalTheory.AdLat.tmul_mem_adelicCompletion_of_integral F hdI ⟨1, map_one _⟩)
-      (AddSubgroup.sum_mem _ fun q _ =>
-        hmul _ _
-          (_root_.GlobalTheory.AdLat.tmul_mem_adelicCompletion_of_integral F (heI q) ⟨1, map_one _⟩)
-          (hσmem _ (hmmem _)))
+  refine ⟨∑ q, (e q ⊗ₜ[F] (1 : E)) * m q.1, ?_, ⟨(d ⊗ₜ[F] (1 : E)) *
+    ∑ q, (e q ⊗ₜ[F] (1 : E)) * σ (m q.2), ?_, ?_⟩, ?_⟩
+  · exact AddSubgroup.sum_mem _ fun q _ => hmul _ _
+      (_root_.GlobalTheory.AdLat.tmul_mem_adelicCompletion_of_integral F (heI q) ⟨1, map_one _⟩) (hmmem _)
+  · exact hmul _ _ (_root_.GlobalTheory.AdLat.tmul_mem_adelicCompletion_of_integral F hdI ⟨1, map_one _⟩)
+      (AddSubgroup.sum_mem _ fun q _ => hmul _ _
+        (_root_.GlobalTheory.AdLat.tmul_mem_adelicCompletion_of_integral F (heI q) ⟨1, map_one _⟩) (hσmem _ (hmmem _)))
   · rw [mul_left_comm, Finset.sum_mul_sum]
-    have hterm
-        : ∀ q q' : Option (Fin n) × Option (Fin n),
-          (e q ⊗ₜ[F] (1 : E)) * m q.1 * ((e q' ⊗ₜ[F] (1 : E)) * σ (m q'.2))
-            = (e q * e q' * p q.1 q'.2) ⊗ₜ[F] (1 : E) := fun q q' => by
-      rw [show (e q ⊗ₜ[F] (1 : E)) * m q.1 * ((e q' ⊗ₜ[F] (1 : E)) * σ (m q'.2))
-            = (e q ⊗ₜ[F] (1 : E)) * (e q' ⊗ₜ[F] (1 : E)) * (m q.1 * σ (m q'.2)) by
-          ring,
-        hpe, Algebra.TensorProduct.tmul_mul_tmul, Algebra.TensorProduct.tmul_mul_tmul, mul_one,
-        mul_one]
+    have hterm : ∀ q q' : Option (Fin n) × Option (Fin n),
+        (e q ⊗ₜ[F] (1 : E)) * m q.1 * ((e q' ⊗ₜ[F] (1 : E)) * σ (m q'.2)) =
+          (e q * e q' * p q.1 q'.2) ⊗ₜ[F] (1 : E) := fun q q' => by
+      rw [show (e q ⊗ₜ[F] (1 : E)) * m q.1 * ((e q' ⊗ₜ[F] (1 : E)) * σ (m q'.2)) =
+        (e q ⊗ₜ[F] (1 : E)) * (e q' ⊗ₜ[F] (1 : E)) * (m q.1 * σ (m q'.2)) by ring, hpe,
+        Algebra.TensorProduct.tmul_mul_tmul, Algebra.TensorProduct.tmul_mul_tmul, mul_one, mul_one]
     simp only [hterm, ← TensorProduct.sum_tmul, Algebra.TensorProduct.tmul_mul_tmul, mul_one, hsum1]
     rfl
-  set_option synthInstance.maxHeartbeats 100000 in
+
   · rw [map_sum, Finset.mul_sum]
     refine Finset.sum_congr rfl fun q _ => ?_
     rw [map_mul, hσ, map_one, mul_left_comm, hum]

@@ -1,8 +1,50 @@
 module
 
-public import Mathlib
 public import Development.WeilBound.RepresentationTheoryGL.ArchimedeanBaseChange.ArchimedeanBaseChangeProof.ArchimedeanGelfandKernels.FriedrichsKernels.Friedrichs
+public import Mathlib.Analysis.SpecialFunctions.SmoothTransition
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.IntegrableOfContinuousOn
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.LocallyConvex.AbsConvexOpen
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Mathlib.Topology.UniformSpace.Uniformizable
 
 @[expose] public section
 
@@ -173,8 +215,8 @@ theorem Rd_expand
     (f : Mat n → V) {X : Mat n} {c : Bool × Fin n × Fin n → ℝ} (h : X = ∑ p, c p • bs p) (g : Mat n)
     : Rd X f g = ∑ p, c p • Rd (bs p) f g := by
   simp only [Rd]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [h, Matrix.mul_sum, map_sum]
+
+  rw [h, Matrix.mul_sum, map_sum]
   refine Finset.sum_congr rfl fun p _ => ?_
   rw [Matrix.mul_smul, map_smul]
 
@@ -184,8 +226,8 @@ theorem lg_bound (hL : LgFacts) (X : Mat n)
   obtain ⟨C, hC⟩ := (hL n).2.2.2.2.2.2
   refine ⟨∑ p, |c p| * C, fun x hx => ?_⟩
   have e : fderiv ℝ lg x (x * X) = ∑ p, c p * fderiv ℝ lg x (x * bs p) := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hc, Matrix.mul_sum, map_sum]
+
+    rw [hc, Matrix.mul_sum, map_sum]
     refine Finset.sum_congr rfl fun p _ => ?_
     rw [Matrix.mul_smul, map_smul, smul_eq_mul]
   rw [e]

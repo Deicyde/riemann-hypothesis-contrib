@@ -1,9 +1,55 @@
 module
 
-public import Development.AutomorphicArithmetic.AutomorphicVarieties.PadicHodgeTheory.IsInertiaInfiniteCyclotomic
-public import Development.AutomorphicArithmetic.AutomorphicVarieties.PadicHodgeTheory.FiniteCohomology
+public import Development.AutomorphicArithmetic.AutomorphicVarieties.UnitaryThreeGroups.GRepresents
+public import Formalism.SharpRestriction.LevelLetterCocycles.DataNLoc
 public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibrary.LocalRingsCompletion.nakayama
 public import Development.AutomorphicArithmetic.IntegralCasts.CapelliIdentities.PointFinitePower
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+public import Mathlib.RingTheory.AdicCompletion.Noetherian
+import Mathlib.RingTheory.Coalgebra.IsFrobenius
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.HopfAlgebra.Basic
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
+import Development.AutomorphicArithmetic.AutomorphicVarieties.PadicHodgeTheory.FiniteCohomology
+import ReciprocityTheory.GaloisValuations.GlobalA
 
 @[expose] public section
 
@@ -127,8 +173,8 @@ theorem UpperTheory.V.Loc.ptFin
     intro c
     have hc : c ∈ Submodule.span ℤ_[l] (Set.range o) := ho ▸ Submodule.mem_top
     obtain ⟨u, rfl⟩ := (Submodule.mem_span_range_iff_exists_fun _).1 hc
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     refine sum_mem fun i _ => ?_
     rw [Algebra.smul_def, map_mul, ← IsScalarTower.algebraMap_apply,
       IsScalarTower.algebraMap_apply ℤ_[l] ℚ_[l] (PadicAlgCl l)]
@@ -144,8 +190,8 @@ theorem UpperTheory.V.Loc.ptFin
     intro a
     obtain ⟨u, hu⟩ := hdec a
     rw [RingHom.mem_ker, map_sub, sub_eq_zero] at hu
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hu, map_sum]
+
+    rw [hu, map_sum]
     refine sum_mem fun i _ => ?_
     rw [map_smul, Algebra.smul_def]
     exact mul_mem (hOE _) (hTE (Or.inl (Or.inl (Or.inr ⟨i, rfl⟩))))
@@ -165,8 +211,8 @@ theorem UpperTheory.V.Loc.ptFin
   obtain ⟨u, hu⟩ := hdec a
   have h3 := h2 _ (hP ▸ hu)
   have h4 : (F (∑ i, u i • b i)).snd ∈ E := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, TrivSqZeroExt.snd_sum]
+
+    rw [map_sum, TrivSqZeroExt.snd_sum]
     refine sum_mem fun i _ => ?_
     rw [map_smul, TrivSqZeroExt.snd_smul, Algebra.smul_def]
     exact mul_mem (hOE _) (hTE (Or.inl (Or.inr ⟨i, rfl⟩)))

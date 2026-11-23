@@ -1,60 +1,95 @@
 module
 
-public import Mathlib
 public import Formalism.SharpRestriction.Divisibility.SchurIrreducible
-public import Formalism.LocalToGlobal.BesselHermitianTheta.DefsReal
 public import Development.AbelianVarietyTheory.Definitions.Foundations.IsFockIPOfFockData
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+public import Mathlib.RingTheory.MvPolynomial.EulerIdentity
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
 noncomputable section
 namespace GlobalTheory.FockDeg
-open Formalism.BasicNotions.TH Formalism.MainNotions.SchurIrreducible GlobalTheory.FockAlg
-  MvPolynomial Matrix
+open Formalism.BasicNotions.TH Formalism.MainNotions.SchurIrreducible GlobalTheory.FockAlg MvPolynomial Matrix
 
 section General
 variable {σ : Type}
 
-theorem pderiv_eq_zero_of_deg_zero {P : MvPolynomial σ ℂ} (h : P.IsHomogeneous 0) (i : σ)
-    : pderiv i P = 0 := by
+theorem pderiv_eq_zero_of_deg_zero {P : MvPolynomial σ ℂ} (h : P.IsHomogeneous 0) (i : σ) :
+    pderiv i P = 0 := by
   have h0 : P.totalDegree = 0 := Nat.le_zero.mp h.totalDegree_le
   rw [totalDegree_eq_zero_iff_eq_C] at h0
   rw [h0, pderiv_C]
 
-theorem plusPart_add
-    (U D : Module.End ℂ (MvPolynomial σ ℂ)) (hU : ∀ d P, P ∈ homog σ d → U P ∈ homog σ (d + 2))
-    (hD : ∀ d P, P ∈ homog σ d → D P ∈ homog σ (d - 2))
-    (P : MvPolynomial σ ℂ)
-    : plusPart (U + D) P = U P := by
-  have h
-      : ∀ d,
-        homogeneousComponent (d + 2) ((U + D) (homogeneousComponent d P))
-          = U (homogeneousComponent d P) := by
+theorem plusPart_add (U D : Module.End ℂ (MvPolynomial σ ℂ))
+    (hU : ∀ d P, P ∈ homog σ d → U P ∈ homog σ (d + 2))
+    (hD : ∀ d P, P ∈ homog σ d → D P ∈ homog σ (d - 2)) (P : MvPolynomial σ ℂ) :
+    plusPart (U + D) P = U P := by
+  have h : ∀ d, homogeneousComponent (d + 2) ((U + D) (homogeneousComponent d P)) =
+      U (homogeneousComponent d P) := by
     intro d
     have hm := homogeneousComponent_mem d P
     rw [LinearMap.add_apply, map_add (f := _), homogeneousComponent_of_mem (hU d _ hm),
       homogeneousComponent_of_mem (hD d _ hm), if_pos rfl, if_neg (by omega), add_zero]
   unfold plusPart
   simp only [h]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [finsum_eq_sum_of_support_subset (s := Finset.range (P.totalDegree + 1)), ← map_sum,
-      sum_homogeneousComponent]
+
+  rw [finsum_eq_sum_of_support_subset (s := Finset.range (P.totalDegree + 1)), ← map_sum,
+  sum_homogeneousComponent]
   intro d hd
   by_contra hc
   apply hd
   have : P.totalDegree < d := by simpa using hc
   simp [homogeneousComponent_eq_zero _ _ this]
 
-theorem minusPart_add
-    (U D : Module.End ℂ (MvPolynomial σ ℂ)) (hU : ∀ d P, P ∈ homog σ d → U P ∈ homog σ (d + 2))
+theorem minusPart_add (U D : Module.End ℂ (MvPolynomial σ ℂ))
+    (hU : ∀ d P, P ∈ homog σ d → U P ∈ homog σ (d + 2))
     (hD : ∀ d P, P ∈ homog σ d → D P ∈ homog σ (d - 2))
-    (hD0 : ∀ d P, d < 2 → P ∈ homog σ d → D P = 0)
-    (P : MvPolynomial σ ℂ)
-    : minusPart (U + D) P = D P := by
-  have h
-      : ∀ d,
-        homogeneousComponent d ((U + D) (homogeneousComponent (d + 2) P))
-          = D (homogeneousComponent (d + 2) P) := by
+    (hD0 : ∀ d P, d < 2 → P ∈ homog σ d → D P = 0) (P : MvPolynomial σ ℂ) :
+    minusPart (U + D) P = D P := by
+  have h : ∀ d, homogeneousComponent d ((U + D) (homogeneousComponent (d + 2) P)) =
+      D (homogeneousComponent (d + 2) P) := by
     intro d
     have hm := homogeneousComponent_mem (d + 2) P
     rw [LinearMap.add_apply, map_add (f := _), homogeneousComponent_of_mem (hU _ _ hm),
@@ -67,11 +102,11 @@ theorem minusPart_add
         homogeneousComponent_eq_zero _ _ (by omega), homogeneousComponent_eq_zero _ _ (by omega)]
       simp
     conv_rhs => rw [← h2]
-    set_option synthInstance.maxHeartbeats 100000 in
-    rw [Finset.sum_range_succ' _ (P.totalDegree + 1 + 1),
-      Finset.sum_range_succ' _ (P.totalDegree + 1), map_add, map_add, map_sum,
-      hD0 _ _ (by omega) (homogeneousComponent_mem 0 P),
-      hD0 _ _ (by omega) (homogeneousComponent_mem (0 + 1) P), add_zero, add_zero]
+
+    rw [Finset.sum_range_succ' _ (P.totalDegree + 1 + 1), Finset.sum_range_succ' _ (P.totalDegree + 1),
+    map_add, map_add, map_sum,
+    hD0 _ _ (by omega) (homogeneousComponent_mem 0 P),
+    hD0 _ _ (by omega) (homogeneousComponent_mem (0 + 1) P), add_zero, add_zero]
   · intro d hd
     by_contra hc
     apply hd
@@ -80,12 +115,11 @@ theorem minusPart_add
       omega
     simp [homogeneousComponent_eq_zero _ _ this]
 
-theorem prod_factorial_add_single [DecidableEq σ] (i : σ) (α : σ →₀ ℕ)
-    : (α + Finsupp.single i 1).prod (fun _ k => (k.factorial : ℂ))
-      = ((α i : ℂ) + 1) * α.prod (fun _ k => (k.factorial : ℂ)) := by
+theorem prod_factorial_add_single [DecidableEq σ] (i : σ) (α : σ →₀ ℕ) :
+    (α + Finsupp.single i 1).prod (fun _ k => (k.factorial : ℂ)) =
+      ((α i : ℂ) + 1) * α.prod (fun _ k => (k.factorial : ℂ)) := by
   rw [Finsupp.prod_of_support_subset _ (s := insert i α.support) _ _ (by simp),
-    Finsupp.prod_of_support_subset α (s := insert i α.support) (Finset.subset_insert _ _) _
-      (by simp),
+    Finsupp.prod_of_support_subset α (s := insert i α.support) (Finset.subset_insert _ _) _ (by simp),
     ← Finset.mul_prod_erase _ _ (Finset.mem_insert_self i α.support),
     ← Finset.mul_prod_erase _ _ (Finset.mem_insert_self i α.support), ← mul_assoc]
   · congr 1
@@ -100,22 +134,16 @@ theorem prod_factorial_add_single [DecidableEq σ] (i : σ) (α : σ →₀ ℕ)
       simp [Finsupp.single_apply, Ne.symm h] at this
       simp [this]
 
-theorem inner_X_mul
-    [DecidableEq σ]
-    {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
-    {ι : MvPolynomial σ ℂ →ₗ[ℂ] H} (hι : IsFockIP ι)
-    (i : σ) (P Q : MvPolynomial σ ℂ)
-    : inner ℂ (ι (X i * P)) (ι Q) = inner ℂ (ι P) (ι (pderiv i Q)) := by
-  have key
-      : ∀ α β : σ →₀ ℕ,
-        inner ℂ (ι (X i * monomial α 1)) (ι (monomial β 1))
-          = inner ℂ (ι (monomial α 1)) (ι (pderiv i (monomial β (1 : ℂ)))) := by
+theorem inner_X_mul [DecidableEq σ] {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+    {ι : MvPolynomial σ ℂ →ₗ[ℂ] H} (hι : IsFockIP ι) (i : σ) (P Q : MvPolynomial σ ℂ) :
+    inner ℂ (ι (X i * P)) (ι Q) = inner ℂ (ι P) (ι (pderiv i Q)) := by
+  have key : ∀ α β : σ →₀ ℕ, inner ℂ (ι (X i * monomial α 1)) (ι (monomial β 1)) =
+      inner ℂ (ι (monomial α 1)) (ι (pderiv i (monomial β (1 : ℂ)))) := by
     intro α β
     have h1 : (X i : MvPolynomial σ ℂ) * monomial α 1 = monomial (α + Finsupp.single i 1) 1 := by
       rw [X, monomial_mul, add_comm, one_mul]
-    have h2
-        : pderiv i (monomial β (1 : ℂ))
-          = ((β i : ℕ) : ℂ) • monomial (β - Finsupp.single i 1) (1 : ℂ) := by
+    have h2 : pderiv i (monomial β (1 : ℂ)) =
+        ((β i : ℕ) : ℂ) • monomial (β - Finsupp.single i 1) (1 : ℂ) := by
       rw [pderiv_monomial, smul_monomial]; simp
     rw [h1, h2, map_smul, inner_smul_right, hι, hι]
     by_cases h : α + Finsupp.single i 1 = β
@@ -156,10 +184,8 @@ def downOp (M : Matrix (Ln p q r s) (Ln p q r s) ℂ) : Module.End ℂ (Pol p q 
   ∑ l, ∑ l', (if linePos l then 0 else -M l l') •
     ((pderiv l).toLinearMap * (pderiv l').toLinearMap : Module.End ℂ (Pol p q r s))
 
-theorem omE_mem_homog
-    {l l' : Ln p q r s} (h : linePos l = linePos l')
-    {d : ℕ} {P : Pol p q r s} (hP : P ∈ homog (Ix p q × Ix r s) d)
-    : omE l l' P ∈ homog (Ix p q × Ix r s) d := by
+theorem omE_mem_homog {l l' : Ln p q r s} (h : linePos l = linePos l') {d : ℕ} {P : Pol p q r s}
+    (hP : P ∈ homog (Ix p q × Ix r s) d) : omE l l' P ∈ homog (Ix p q × Ix r s) d := by
   have hP' : P.IsHomogeneous d := hP
   unfold omE
   rw [LinearMap.add_apply]
@@ -183,10 +209,9 @@ theorem omE_mem_homog
     · exact Submodule.smul_mem _ _ hP
     · exact Submodule.zero_mem _
 
-theorem omAct_mem_homog
-    {M : Matrix (Ln p q r s) (Ln p q r s) ℂ} (hM : ∀ l l', linePos l ≠ linePos l' → M l l' = 0)
-    {d : ℕ} {P : Pol p q r s} (hP : P ∈ homog (Ix p q × Ix r s) d)
-    : omAct p q r s M P ∈ homog (Ix p q × Ix r s) d := by
+theorem omAct_mem_homog {M : Matrix (Ln p q r s) (Ln p q r s) ℂ}
+    (hM : ∀ l l', linePos l ≠ linePos l' → M l l' = 0) {d : ℕ} {P : Pol p q r s}
+    (hP : P ∈ homog (Ix p q × Ix r s) d) : omAct p q r s M P ∈ homog (Ix p q × Ix r s) d := by
   rw [omAct_apply, LinearMap.sum_apply]
   refine Submodule.sum_mem _ fun l _ => ?_
   rw [LinearMap.sum_apply]
@@ -195,9 +220,9 @@ theorem omAct_mem_homog
   · exact Submodule.smul_mem _ _ (omE_mem_homog h hP)
   · simp [hM l l' h]
 
-theorem omAct_eq_up_add_down
-    {M : Matrix (Ln p q r s) (Ln p q r s) ℂ} (hM : ∀ l l', linePos l = linePos l' → M l l' = 0)
-    : omAct p q r s M = upOp M + downOp M := by
+theorem omAct_eq_up_add_down {M : Matrix (Ln p q r s) (Ln p q r s) ℂ}
+    (hM : ∀ l l', linePos l = linePos l' → M l l' = 0) :
+    omAct p q r s M = upOp M + downOp M := by
   rw [omAct_apply, upOp, downOp, ← Finset.sum_add_distrib]
   refine Finset.sum_congr rfl fun l _ => ?_
   rw [← Finset.sum_add_distrib]
@@ -216,80 +241,70 @@ theorem omAct_eq_up_add_down
       ext1
       simp [mul_assoc]
 
-theorem upOp_apply (M : Matrix (Ln p q r s) (Ln p q r s) ℂ) (P : Pol p q r s)
-    : upOp M P = ∑ l, ∑ l', (if linePos l then M l l' else 0) • (X l * X l' * P) := by
+theorem upOp_apply (M : Matrix (Ln p q r s) (Ln p q r s) ℂ) (P : Pol p q r s) :
+    upOp M P = ∑ l, ∑ l', (if linePos l then M l l' else 0) • (X l * X l' * P) := by
   simp only [upOp, LinearMap.sum_apply, LinearMap.smul_apply, LinearMap.mulLeft_apply]
 
-theorem downOp_apply (M : Matrix (Ln p q r s) (Ln p q r s) ℂ) (P : Pol p q r s)
-    : downOp M P = ∑ l, ∑ l', (if linePos l then 0 else -M l l') • pderiv l (pderiv l' P) := by
+theorem downOp_apply (M : Matrix (Ln p q r s) (Ln p q r s) ℂ) (P : Pol p q r s) :
+    downOp M P = ∑ l, ∑ l', (if linePos l then 0 else -M l l') • pderiv l (pderiv l' P) := by
   simp only [downOp, LinearMap.sum_apply, LinearMap.smul_apply]
   rfl
 
-theorem upOp_mem
-    (M : Matrix (Ln p q r s) (Ln p q r s) ℂ)
-    (d : ℕ) (P : Pol p q r s) (hP : P ∈ homog (Ix p q × Ix r s) d)
-    : upOp M P ∈ homog (Ix p q × Ix r s) (d + 2) := by
+theorem upOp_mem (M : Matrix (Ln p q r s) (Ln p q r s) ℂ) (d : ℕ) (P : Pol p q r s)
+    (hP : P ∈ homog (Ix p q × Ix r s) d) : upOp M P ∈ homog (Ix p q × Ix r s) (d + 2) := by
   rw [upOp_apply]
   refine Submodule.sum_mem _ fun l _ => Submodule.sum_mem _ fun l' _ => Submodule.smul_mem _ _ ?_
   have := ((isHomogeneous_X ℂ l).mul (isHomogeneous_X ℂ l')).mul hP
   rw [show 1 + 1 + d = d + 2 by omega] at this
   exact this
 
-theorem downOp_mem
-    (M : Matrix (Ln p q r s) (Ln p q r s) ℂ)
-    (d : ℕ) (P : Pol p q r s) (hP : P ∈ homog (Ix p q × Ix r s) d)
-    : downOp M P ∈ homog (Ix p q × Ix r s) (d - 2) := by
+theorem downOp_mem (M : Matrix (Ln p q r s) (Ln p q r s) ℂ) (d : ℕ) (P : Pol p q r s)
+    (hP : P ∈ homog (Ix p q × Ix r s) d) : downOp M P ∈ homog (Ix p q × Ix r s) (d - 2) := by
   rw [downOp_apply]
   refine Submodule.sum_mem _ fun l _ => Submodule.sum_mem _ fun l' _ => Submodule.smul_mem _ _ ?_
   exact (IsHomogeneous.pderiv (i := l') hP).pderiv (i := l)
 
-theorem downOp_low
-    (M : Matrix (Ln p q r s) (Ln p q r s) ℂ)
-    (d : ℕ) (P : Pol p q r s) (hd : d < 2) (hP : P ∈ homog (Ix p q × Ix r s) d)
-    : downOp M P = 0 := by
+theorem downOp_low (M : Matrix (Ln p q r s) (Ln p q r s) ℂ) (d : ℕ) (P : Pol p q r s) (hd : d < 2)
+    (hP : P ∈ homog (Ix p q × Ix r s) d) : downOp M P = 0 := by
   rw [downOp_apply]
   refine Finset.sum_eq_zero fun l _ => Finset.sum_eq_zero fun l' _ => ?_
   have := IsHomogeneous.pderiv (i := l') hP
   rw [show d - 1 = 0 by omega] at this
   rw [pderiv_eq_zero_of_deg_zero this, smul_zero]
 
-theorem plusPart_omAct
-    {M : Matrix (Ln p q r s) (Ln p q r s) ℂ} (hM : ∀ l l', linePos l = linePos l' → M l l' = 0)
-    (P : Pol p q r s)
-    : plusPart (omAct p q r s M) P = upOp M P := by
+theorem plusPart_omAct {M : Matrix (Ln p q r s) (Ln p q r s) ℂ}
+    (hM : ∀ l l', linePos l = linePos l' → M l l' = 0) (P : Pol p q r s) :
+    plusPart (omAct p q r s M) P = upOp M P := by
   rw [omAct_eq_up_add_down hM]
   exact plusPart_add _ _ (upOp_mem M) (downOp_mem M) P
 
-theorem minusPart_omAct
-    {M : Matrix (Ln p q r s) (Ln p q r s) ℂ} (hM : ∀ l l', linePos l = linePos l' → M l l' = 0)
-    (P : Pol p q r s)
-    : minusPart (omAct p q r s M) P = downOp M P := by
+theorem minusPart_omAct {M : Matrix (Ln p q r s) (Ln p q r s) ℂ}
+    (hM : ∀ l l', linePos l = linePos l' → M l l' = 0) (P : Pol p q r s) :
+    minusPart (omAct p q r s M) P = downOp M P := by
   rw [omAct_eq_up_add_down hM]
   exact minusPart_add _ _ (upOp_mem M) (downOp_mem M) (downOp_low M) P
 
-theorem omAct_eq_parts
-    {M : Matrix (Ln p q r s) (Ln p q r s) ℂ} (hM : ∀ l l', linePos l = linePos l' → M l l' = 0)
-    (P : Pol p q r s)
-    : omAct p q r s M P = plusPart (omAct p q r s M) P + minusPart (omAct p q r s M) P := by
+theorem omAct_eq_parts {M : Matrix (Ln p q r s) (Ln p q r s) ℂ}
+    (hM : ∀ l l', linePos l = linePos l' → M l l' = 0) (P : Pol p q r s) :
+    omAct p q r s M P = plusPart (omAct p q r s M) P + minusPart (omAct p q r s M) P := by
   rw [plusPart_omAct hM, minusPart_omAct hM, omAct_eq_up_add_down hM, LinearMap.add_apply]
 
-theorem inner_plusPart_omAct
-    {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
-    {ι : Pol p q r s →ₗ[ℂ] H} (hι : IsFockIP ι)
-    {M : Matrix (Ln p q r s) (Ln p q r s) ℂ} (hM : ∀ l l', linePos l = linePos l' → M l l' = 0)
-    (P Q : Pol p q r s)
-    : inner ℂ (ι (plusPart (omAct p q r s M) P)) (ι Q)
-      = - inner ℂ (ι P) (ι (minusPart (omAct p q r s Mᴴ) Q)) := by
-  have hM' : ∀ l l', linePos l = linePos l' → Mᴴ l l' = 0 := by intro l l' h; simp [hM l' l h.symm]
+theorem inner_plusPart_omAct {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+    {ι : Pol p q r s →ₗ[ℂ] H} (hι : IsFockIP ι) {M : Matrix (Ln p q r s) (Ln p q r s) ℂ}
+    (hM : ∀ l l', linePos l = linePos l' → M l l' = 0) (P Q : Pol p q r s) :
+    inner ℂ (ι (plusPart (omAct p q r s M) P)) (ι Q) =
+      - inner ℂ (ι P) (ι (minusPart (omAct p q r s Mᴴ) Q)) := by
+  have hM' : ∀ l l', linePos l = linePos l' → Mᴴ l l' = 0 := by
+    intro l l' h; simp [hM l' l h.symm]
   rw [plusPart_omAct hM, minusPart_omAct hM', upOp_apply, downOp_apply]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, map_smul, sum_inner, inner_sum, inner_smul_left, inner_smul_right,
-      ← Finset.sum_neg_distrib]
+
+  simp only [map_sum, map_smul, sum_inner, inner_sum, inner_smul_left, inner_smul_right,
+  ← Finset.sum_neg_distrib]
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun l' _ => Finset.sum_congr rfl fun l _ => ?_
   rw [mul_assoc, inner_X_mul hι]
-  have e : inner ℂ (ι (X l' * P)) (ι (pderiv l Q)) = inner ℂ (ι P) (ι (pderiv l' (pderiv l Q))) :=
-    inner_X_mul hι _ _ _
+  have e : inner ℂ (ι (X l' * P)) (ι (pderiv l Q)) =
+    inner ℂ (ι P) (ι (pderiv l' (pderiv l Q))) := inner_X_mul hι _ _ _
   rw [e]
   by_cases h : linePos l = linePos l'
   · simp [hM l l' h]
@@ -302,20 +317,20 @@ theorem inner_plusPart_omAct
 theorem conjR_of_isPC {Z : Mat p q} (hZ : IsPC Z) : conjR Z = Zᴴ := by
   have hJ : Jm p q = Matrix.diagonal (Sum.elim (fun _ => 1) (fun _ => -1)) := by
     ext a b
-    rcases a with a | a <;> rcases b with b | b
-      <;> simp [Jm, Formalism.UG.Jpq, Matrix.diagonal_apply, Matrix.one_apply]
+    rcases a with a | a <;> rcases b with b | b <;>
+      simp [Jm, Formalism.UG.Jpq, Matrix.diagonal_apply, Matrix.one_apply]
     split_ifs <;> simp
   ext a b
   have := hZ b a
   rw [conjR, adjZ, hJ, Matrix.neg_apply, Matrix.mul_diagonal, Matrix.diagonal_mul]
   rcases a with a | a <;> rcases b with b | b <;> simp_all [sameBlock]
 
-theorem linePos_eq_iff_fst (a b : Ix p q) (c : Ix r s)
-    : linePos ((a, c) : Ln p q r s) = linePos ((b, c) : Ln p q r s) ↔ sameBlock a b := by
+theorem linePos_eq_iff_fst (a b : Ix p q) (c : Ix r s) :
+    linePos ((a, c) : Ln p q r s) = linePos ((b, c) : Ln p q r s) ↔ sameBlock a b := by
   rcases a with a | a <;> rcases b with b | b <;> rcases c with c | c <;> simp [linePos, sameBlock]
 
-theorem linePos_eq_iff_snd (a : Ix p q) (c d : Ix r s)
-    : linePos ((a, c) : Ln p q r s) = linePos ((a, d) : Ln p q r s) ↔ sameBlock c d := by
+theorem linePos_eq_iff_snd (a : Ix p q) (c d : Ix r s) :
+    linePos ((a, c) : Ln p q r s) = linePos ((a, d) : Ln p q r s) ↔ sameBlock c d := by
   rcases a with a | a <;> rcases c with c | c <;> rcases d with d | d <;> simp [linePos, sameBlock]
 
 def kr1 (r s : ℕ) (Z : Mat p q) : Matrix (Ln p q r s) (Ln p q r s) ℂ :=
@@ -340,36 +355,32 @@ theorem lineMatrixKroneckerRightFactor_conjTranspose (Z : Mat r s) : kr2 p q Z�
   · subst h; simp [kr2]
   · simp [kr2, h, Ne.symm h]
 
-theorem lineMatrixKroneckerLeftFactor_eq_zero_of_isKC
-    {Z : Mat p q} (hZ : IsKC Z) (l l' : Ln p q r s) (h : linePos l ≠ linePos l')
-    : kr1 r s Z l l' = 0 := by
+theorem lineMatrixKroneckerLeftFactor_eq_zero_of_isKC {Z : Mat p q} (hZ : IsKC Z) (l l' : Ln p q r s) (h : linePos l ≠ linePos l') :
+    kr1 r s Z l l' = 0 := by
   obtain ⟨a, c⟩ := l
   obtain ⟨b, d⟩ := l'
   by_cases e : c = d
   · subst e; simp [kr1, hZ a b (fun h' => h ((linePos_eq_iff_fst a b c).mpr h'))]
   · simp [kr1, e]
 
-theorem lineMatrixKroneckerRightFactor_eq_zero_of_isKC
-    {Z : Mat r s} (hZ : IsKC Z) (l l' : Ln p q r s) (h : linePos l ≠ linePos l')
-    : kr2 p q Z l l' = 0 := by
+theorem lineMatrixKroneckerRightFactor_eq_zero_of_isKC {Z : Mat r s} (hZ : IsKC Z) (l l' : Ln p q r s) (h : linePos l ≠ linePos l') :
+    kr2 p q Z l l' = 0 := by
   obtain ⟨a, c⟩ := l
   obtain ⟨b, d⟩ := l'
   by_cases e : a = b
   · subst e; simp [kr2, hZ c d (fun h' => h ((linePos_eq_iff_snd a c d).mpr h'))]
   · simp [kr2, e]
 
-theorem lineMatrixKroneckerLeftFactor_eq_zero_of_isPC
-    {Z : Mat p q} (hZ : IsPC Z) (l l' : Ln p q r s) (h : linePos l = linePos l')
-    : kr1 r s Z l l' = 0 := by
+theorem lineMatrixKroneckerLeftFactor_eq_zero_of_isPC {Z : Mat p q} (hZ : IsPC Z) (l l' : Ln p q r s) (h : linePos l = linePos l') :
+    kr1 r s Z l l' = 0 := by
   obtain ⟨a, c⟩ := l
   obtain ⟨b, d⟩ := l'
   by_cases e : c = d
   · subst e; simp [kr1, hZ a b ((linePos_eq_iff_fst a b c).mp h)]
   · simp [kr1, e]
 
-theorem lineMatrixKroneckerRightFactor_eq_zero_of_isPC
-    {Z : Mat r s} (hZ : IsPC Z) (l l' : Ln p q r s) (h : linePos l = linePos l')
-    : kr2 p q Z l l' = 0 := by
+theorem lineMatrixKroneckerRightFactor_eq_zero_of_isPC {Z : Mat r s} (hZ : IsPC Z) (l l' : Ln p q r s) (h : linePos l = linePos l') :
+    kr2 p q Z l l' = 0 := by
   obtain ⟨a, c⟩ := l
   obtain ⟨b, d⟩ := l'
   by_cases e : a = b
@@ -381,14 +392,10 @@ end Lines
 theorem degrees_and_adjoints : ∀ X : ProvA, admH1 X := by
   intro X p q r s
   have hι := isFockIsometry_of_fockData (X.fock p q r s)
-  refine ⟨
-    fun Z hZ d P hP => omAct_mem_homog (lineMatrixKroneckerLeftFactor_eq_zero_of_isKC hZ) hP,
+  refine ⟨fun Z hZ d P hP => omAct_mem_homog (lineMatrixKroneckerLeftFactor_eq_zero_of_isKC hZ) hP,
     fun Z hZ d P hP => omAct_mem_homog (lineMatrixKroneckerRightFactor_eq_zero_of_isKC hZ) hP,
     fun Z hZ P => omAct_eq_parts (lineMatrixKroneckerLeftFactor_eq_zero_of_isPC hZ) P,
-    fun Z hZ P => omAct_eq_parts (lineMatrixKroneckerRightFactor_eq_zero_of_isPC hZ) P,
-    fun Z hZ P Q => ?_,
-    fun Z hZ P Q => ?_
-  ⟩
+    fun Z hZ P => omAct_eq_parts (lineMatrixKroneckerRightFactor_eq_zero_of_isPC hZ) P, fun Z hZ P Q => ?_, fun Z hZ P Q => ?_⟩
   · rw [conjR_of_isPC hZ]
     simp only [FockData.act1, fockAct1_eq, lineMatrixKroneckerLeftFactor_conjTranspose]
     exact inner_plusPart_omAct hι (lineMatrixKroneckerLeftFactor_eq_zero_of_isPC hZ) P Q

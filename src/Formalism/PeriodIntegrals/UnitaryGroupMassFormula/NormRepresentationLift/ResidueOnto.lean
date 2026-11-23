@@ -1,8 +1,48 @@
 module
 
-public import Mathlib
-public import Formalism.SharpRestriction.CuspSpanNormBounds.IsPrimitiveSub
+public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.NormRepresentationLift.ActsByFrameAct
+public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.NormRepresentationLift.CoeCj
 public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.NormRepresentationLift.HTOsmulRight
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -18,38 +58,32 @@ variable {E : Type} [Field E] [NumberField E] [StarRing E] {S : HSpace E} {r : �
 
 section Prime
 
-variable
-  (Λ : Submodule (𝓞 E) S.V)
-  (hU : Formalism.HermitianLatticesTheory.IsUnimodular S.hT Λ) (hint : IntLat Λ)
-  (e : Fin r → S.V) (hind : LinearIndependent E e) (he : ∀ i, e i ∈ Λ)
-  (P : HeightOneSpectrum (𝓞 E))
-  (hloc : ∀ x ∈ Λ,
-    x ∈ Submodule.span E (Set.range e)
-      → ∃ s : 𝓞 E, s ∉ P.asIdeal ∧ s • x ∈ Submodule.span (𝓞 E) (Set.range e))
+variable (Λ : Submodule (𝓞 E) S.V) (hU : Formalism.HermitianLatticesTheory.IsUnimodular S.hT Λ) (hint : IntLat Λ)
+  (e : Fin r → S.V) (hind : LinearIndependent E e) (he : ∀ i, e i ∈ Λ) (P : HeightOneSpectrum (𝓞 E))
+  (hloc : ∀ x ∈ Λ, x ∈ Submodule.span E (Set.range e) →
+    ∃ s : 𝓞 E, s ∉ P.asIdeal ∧ s • x ∈ Submodule.span (𝓞 E) (Set.range e))
 
 include hU hint hind he hloc in
-theorem residue_onto (c : Fin r)
-    : ∃ y ∈ Λ, ∃ o : Fin r → 𝓞 E,
-      (∀ i, S.hT y (e i) = (o i : E)) ∧ ∀ i, (o i - if i = c then 1 else 0) ∈ P.asIdeal := by
+theorem residue_onto (c : Fin r) :
+    ∃ y ∈ Λ, ∃ o : Fin r → 𝓞 E, (∀ i, S.hT y (e i) = (o i : E)) ∧
+      ∀ i, (o i - if i = c then 1 else 0) ∈ P.asIdeal := by
   haveI := P.isMaximal
   letI : Field (𝓞 E ⧸ P.asIdeal) := Ideal.Quotient.field P.asIdeal
   let mk := Ideal.Quotient.mk P.asIdeal
-  let U : Submodule (𝓞 E ⧸ P.asIdeal) (Fin r → 𝓞 E ⧸ P.asIdeal) := {
-    carrier :=
-      {φ | ∃ y ∈ Λ, ∃ o : Fin r → 𝓞 E, (∀ i, S.hT y (e i) = (o i : E)) ∧ ∀ i, φ i = mk (o i)}
-    zero_mem' := ⟨0, Λ.zero_mem, 0, fun i => by simp, fun i => by simp⟩
-    add_mem' := by
-      rintro φ ψ ⟨y, hy, o, ho, hφ⟩ ⟨y', hy', o', ho', hψ⟩
-      refine ⟨y + y', Λ.add_mem hy hy', o + o', fun i => ?_, fun i => ?_⟩
-      · simp [map_add (f := _), ho, ho']
-      · simp [hφ, hψ]
-    smul_mem' := by
-      rintro κ φ ⟨y, hy, o, ho, hφ⟩
-      obtain ⟨κ', rfl⟩ := Ideal.Quotient.mk_surjective κ
-      refine ⟨cj κ' • y, Λ.smul_mem _ hy, fun i => κ' * o i, fun i => ?_, fun i => ?_⟩
-      · rw [hT_cj_left, ho]; push_cast; ring
-      · simp [hφ, mk]
-  }
+  let U : Submodule (𝓞 E ⧸ P.asIdeal) (Fin r → 𝓞 E ⧸ P.asIdeal) :=
+    { carrier := {φ | ∃ y ∈ Λ, ∃ o : Fin r → 𝓞 E, (∀ i, S.hT y (e i) = (o i : E)) ∧ ∀ i, φ i = mk (o i)}
+      zero_mem' := ⟨0, Λ.zero_mem, 0, fun i => by simp, fun i => by simp⟩
+      add_mem' := by
+        rintro φ ψ ⟨y, hy, o, ho, hφ⟩ ⟨y', hy', o', ho', hψ⟩
+        refine ⟨y + y', Λ.add_mem hy hy', o + o', fun i => ?_, fun i => ?_⟩
+        · simp [map_add (f := _), ho, ho']
+        · simp [hφ, hψ]
+      smul_mem' := by
+        rintro κ φ ⟨y, hy, o, ho, hφ⟩
+        obtain ⟨κ', rfl⟩ := Ideal.Quotient.mk_surjective κ
+        refine ⟨cj κ' • y, Λ.smul_mem _ hy, fun i => κ' * o i, fun i => ?_, fun i => ?_⟩
+        · rw [hT_cj_left, ho]; push_cast; ring
+        · simp [hφ, mk] }
   have hUtop : U = ⊤ := by
     by_contra hne
     obtain ⟨f, hf0, hfU⟩ := Submodule.exists_le_ker_of_lt_top U (lt_top_iff_ne_top.mpr hne)
@@ -66,23 +100,21 @@ theorem residue_onto (c : Fin r)
       rw [hfα, LinearMap.zero_apply]
       exact Finset.sum_eq_zero fun i _ => by rw [h i, mul_zero]
     choose α' hα' using fun i => Ideal.Quotient.mk_surjective (α i)
-    have hmem :=
-      coeff_mem_P Λ hU e hind P hloc α' (by
-        intro y hy
-        choose o ho using fun i => hint y hy (e i) (he i)
-        have hφ : (fun i => mk (o i)) ∈ U := ⟨y, hy, o, ho, fun i => rfl⟩
-        have hz : f (fun i => mk (o i)) = 0 := hfU hφ
-        rw [hfα] at hz
-        refine ⟨∑ i, o i * α' i, ?_, ?_⟩
-        · rw [← Ideal.Quotient.eq_zero_iff_mem]
-          set_option synthInstance.maxHeartbeats 100000 in
-          simpa [map_sum, map_mul, hα', mk] using hz
-        · set_option synthInstance.maxHeartbeats 100000 in
-            rw [map_sum]
-          push_cast
-          refine Finset.sum_congr rfl fun i _ => ?_
-          rw [hT_osmul_right, ho]
-          ring)
+    have hmem := coeff_mem_P Λ hU e hind P hloc α' (by
+      intro y hy
+      choose o ho using fun i => hint y hy (e i) (he i)
+      have hφ : (fun i => mk (o i)) ∈ U := ⟨y, hy, o, ho, fun i => rfl⟩
+      have hz : f (fun i => mk (o i)) = 0 := hfU hφ
+      rw [hfα] at hz
+      refine ⟨∑ i, o i * α' i, ?_, ?_⟩
+      · rw [← Ideal.Quotient.eq_zero_iff_mem]
+
+        simpa [map_sum, map_mul, hα', mk] using hz
+      · set_option synthInstance.maxHeartbeats 100000 in
+          rw [map_sum]
+        push_cast
+        refine Finset.sum_congr rfl fun i _ => ?_
+        rw [hT_osmul_right, ho]; ring)
     obtain ⟨i, hi⟩ := hα0
     apply hi
     rw [← hα' i]
@@ -98,9 +130,8 @@ theorem residue_onto (c : Fin r)
   · simp only [hic, if_false] at this ⊢; rw [map_zero]; exact this.symm
 
 include hU hint hind he hloc in
-theorem exact_dual (c : Fin r)
-    : ∃ y ∈ Λ,
-      (∀ i, i ≠ c → S.hT y (e i) = 0) ∧ ∃ o : 𝓞 E, S.hT y (e c) = (o : E) ∧ o ∉ P.asIdeal := by
+theorem exact_dual (c : Fin r) :
+    ∃ y ∈ Λ, (∀ i, i ≠ c → S.hT y (e i) = 0) ∧ ∃ o : 𝓞 E, S.hT y (e c) = (o : E) ∧ o ∉ P.asIdeal := by
   choose y hy o ho hP using fun j => residue_onto Λ hU hint e hind he P hloc j
   let G : Matrix (Fin r) (Fin r) (𝓞 E) := fun j i => o j i
   have hdet : G.det ∉ P.asIdeal := by
@@ -118,20 +149,14 @@ theorem exact_dual (c : Fin r)
     exact zero_ne_one this
   have key : ∀ i, S.hT (∑ j, cj (G.adjugate c j) • y j) (e i) = ((G.adjugate * G) c i : E) := by
     intro i
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, LinearMap.sum_apply, Matrix.mul_apply]
+
+    rw [map_sum, LinearMap.sum_apply, Matrix.mul_apply]
     push_cast
     refine Finset.sum_congr rfl fun j _ => ?_
     rw [hT_cj_left, ho]
   rw [Matrix.adjugate_mul] at key
-  refine ⟨
-    ∑ j, cj (G.adjugate c j) • y j,
-    Λ.sum_mem fun j _ => Λ.smul_mem _ (hy j),
-    fun i hi => ?_,
-    G.det,
-    ?_,
-    hdet
-  ⟩
+  refine ⟨∑ j, cj (G.adjugate c j) • y j, Λ.sum_mem fun j _ => Λ.smul_mem _ (hy j), fun i hi => ?_,
+    G.det, ?_, hdet⟩
   · rw [key, Matrix.smul_apply, Matrix.one_apply_ne (Ne.symm hi)]; simp
   · rw [key, Matrix.smul_apply, Matrix.one_apply_eq]; simp
 

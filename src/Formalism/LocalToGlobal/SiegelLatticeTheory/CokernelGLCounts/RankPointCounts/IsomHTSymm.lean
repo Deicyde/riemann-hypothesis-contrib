@@ -1,93 +1,112 @@
 module
 
-public import Mathlib
+public import Formalism.LocalToGlobal.SiegelLatticeTheory.ClosedLocalOrbits.TermOp
+public import Formalism.LocalToGlobal.SiegelLatticeTheory.CokernelGLCounts.RankPointCounts.PairingOmegaPrimeZ
+public import Formalism.LocalToGlobal.SiegelLatticeTheory.CokernelGLCounts.RankPointCounts.GflagSwap
 public import Formalism.LocalToGlobal.SiegelLatticeTheory.CokernelGLCounts.RankPointCounts.YvMemUUE
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
 noncomputable section
 
 open Module
-open Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.BasicNotions
-  Formalism.L2.SG.TermOp
+open Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.BasicNotions Formalism.L2.SG.TermOp
 
 namespace Formalism.L2.SG.NGCut.NormalVectorPairings
 
 variable {E : Type} [Field E] [NumberField E] [StarRing E] {S : HSpace E} {r : ℕ} {T T' : E}
 
-theorem isom_hT
-    {γ : S.V ≃ₗ[E] S.V} (h : γ ∈ Formalism.HermitianLatticesTheory.isom S.hT) (x y : S.V)
-    : S.hT (γ x) (γ y) = S.hT x y :=
-  h x y
+theorem isom_hT {γ : S.V ≃ₗ[E] S.V} (h : γ ∈ Formalism.HermitianLatticesTheory.isom S.hT) (x y : S.V) : S.hT (γ x) (γ y) = S.hT x y := h x y
 
-theorem mapLF_fl
-    {γ : S.V ≃ₗ[E] S.V} (h : γ ∈ Formalism.HermitianLatticesTheory.isom S.hT) (L : LFlag S r T')
-    : (mapLF γ L).fl = mapFlag γ h L.fl := by
+theorem mapLF_fl {γ : S.V ≃ₗ[E] S.V} (h : γ ∈ Formalism.HermitianLatticesTheory.isom S.hT) (L : LFlag S r T') :
+    (mapLF γ L).fl = mapFlag γ h L.fl := by
   unfold mapLF; rw [dif_pos h]
 
-theorem mapLF_fl_z
-    {γ : S.V ≃ₗ[E] S.V} (h : γ ∈ Formalism.HermitianLatticesTheory.isom S.hT) (L : LFlag S r T')
-    : (mapLF γ L).fl.z = γ L.fl.z := by
+theorem mapLF_fl_z {γ : S.V ≃ₗ[E] S.V} (h : γ ∈ Formalism.HermitianLatticesTheory.isom S.hT) (L : LFlag S r T') :
+    (mapLF γ L).fl.z = γ L.fl.z := by
   rw [mapLF_fl h]; rfl
 
-private theorem mapFlag_fvec'
-    {T0 : E} {γ : S.V ≃ₗ[E] S.V}
-    (h : γ ∈ Formalism.HermitianLatticesTheory.isom S.hT) (F : FlagG S r T0)
-    (i : Fin (r + 1))
-    : (mapFlag γ h F).fvec i = γ (F.fvec i) := by
+private theorem mapFlag_fvec' {T0 : E} {γ : S.V ≃ₗ[E] S.V} (h : γ ∈ Formalism.HermitianLatticesTheory.isom S.hT)
+    (F : FlagG S r T0) (i : Fin (r + 1)) : (mapFlag γ h F).fvec i = γ (F.fvec i) := by
   refine Fin.lastCases ?_ (fun j => ?_) i
   · simp [FlagG.fvec, mapFlag]
   · simp [FlagG.fvec, mapFlag]
 
-private theorem Zhat_mapFlag'
-    {T0 T1 : E} {γ : S.V ≃ₗ[E] S.V}
-    (h : γ ∈ Formalism.HermitianLatticesTheory.isom S.hT) (F : FlagG S r T0) (F' : FlagG S r T1)
-    : Zhat (mapFlag γ h F) (mapFlag γ h F') = Zhat F F' := by
+private theorem Zhat_mapFlag' {T0 T1 : E} {γ : S.V ≃ₗ[E] S.V} (h : γ ∈ Formalism.HermitianLatticesTheory.isom S.hT)
+    (F : FlagG S r T0) (F' : FlagG S r T1) :
+    Zhat (mapFlag γ h F) (mapFlag γ h F') = Zhat F F' := by
   ext a b
   simp [Zhat, brS, mapFlag_fvec', isom_hT h]
 
-private theorem Gflag_mapFlag
-    {T0 T1 : E} {γ : S.V ≃ₗ[E] S.V}
-    (h : γ ∈ Formalism.HermitianLatticesTheory.isom S.hT) (F : FlagG S r T0) (F' : FlagG S r T1)
-    : Gflag (mapFlag γ h F) (mapFlag γ h F') = Gflag F F' := by
+private theorem Gflag_mapFlag {T0 T1 : E} {γ : S.V ≃ₗ[E] S.V} (h : γ ∈ Formalism.HermitianLatticesTheory.isom S.hT)
+    (F : FlagG S r T0) (F' : FlagG S r T1) :
+    Gflag (mapFlag γ h F) (mapFlag γ h F') = Gflag F F' := by
   simp only [Gflag, Dl, Zhat_mapFlag']
 
-private theorem yv_mapFlag
-    {T0 T1 : E} {γ : S.V ≃ₗ[E] S.V}
-    (h : γ ∈ Formalism.HermitianLatticesTheory.isom S.hT) (F : FlagG S r T0) (F' : FlagG S r T1)
-    : yv (mapFlag γ h F) (mapFlag γ h F') = γ (yv F F') := by
+private theorem yv_mapFlag {T0 T1 : E} {γ : S.V ≃ₗ[E] S.V} (h : γ ∈ Formalism.HermitianLatticesTheory.isom S.hT)
+    (F : FlagG S r T0) (F' : FlagG S r T1) :
+    yv (mapFlag γ h F) (mapFlag γ h F') = γ (yv F F') := by
   simp only [yv, omp, Dl, Zhat_mapFlag', mapFlag_fvec']
-  set_option synthInstance.maxHeartbeats 100000 in
+
   simp [map_sum, map_smul, mapFlag]
 
-private theorem mapFlag_X'
-    {T0 : E} {γ : S.V ≃ₗ[E] S.V}
-    (h : γ ∈ Formalism.HermitianLatticesTheory.isom S.hT) (F : FlagG S r T0)
-    : (mapFlag γ h F).X = F.X.map (γ : S.V →ₗ[E] S.V) := by
+private theorem mapFlag_X' {T0 : E} {γ : S.V ≃ₗ[E] S.V} (h : γ ∈ Formalism.HermitianLatticesTheory.isom S.hT)
+    (F : FlagG S r T0) : (mapFlag γ h F).X = F.X.map (γ : S.V →ₗ[E] S.V) := by
   simp only [FlagG.X, mapFlag]
   rw [Submodule.map_span, ← Set.range_comp]
   rfl
 
-private theorem mem_Hp_iff_orthogonal
-    {T0 T1 : E}
-    (Λ : Submodule (NumberField.RingOfIntegers E) S.V) (hΛ : Submodule.IsFullLattice E Λ)
-    (F : LFlag S r T0) (F' : LFlag S r T1)
-    (hF : IsLift Λ F) (hF' : IsLift Λ F') (h : S.V)
-    : h ∈ Hp Λ F F'
-      ↔ ((∀ x ∈ F.fl.X, S.hT x h = 0) ∧ S.hT F.fl.z h = 0 ∧ (∀ x ∈ F'.fl.X, S.hT x h = 0)
-        ∧ S.hT F'.fl.z h = 0) := by
+private theorem mem_Hp_iff_orthogonal {T0 T1 : E} (Λ : Submodule (NumberField.RingOfIntegers E) S.V)
+    (hΛ : Submodule.IsFullLattice E Λ) (F : LFlag S r T0) (F' : LFlag S r T1)
+    (hF : IsLift Λ F) (hF' : IsLift Λ F') (h : S.V) :
+    h ∈ Hp Λ F F' ↔ ((∀ x ∈ F.fl.X, S.hT x h = 0) ∧ S.hT F.fl.z h = 0 ∧
+      (∀ x ∈ F'.fl.X, S.hT x h = 0) ∧ S.hT F'.fl.z h = 0) := by
   constructor
   · intro hh
-    exact ⟨
-      fun x hx => hT_UUE_Hp Λ F F' hh (X_le_UUE Λ hΛ F F' hF hF' hx),
+    exact ⟨fun x hx => hT_UUE_Hp Λ F F' hh (X_le_UUE Λ hΛ F F' hF hF' hx),
       hT_UUE_Hp Λ F F' hh (z_mem_UUE Λ hΛ.toIsLattice F F' hF hF'),
       fun x hx => hT_UUE_Hp Λ F F' hh (X'_le_UUE Λ hΛ F F' hF hF' hx),
-      hT_UUE_Hp Λ F F' hh (z'_mem_UUE Λ hΛ.toIsLattice F F' hF hF')
-    ⟩
+      hT_UUE_Hp Λ F F' hh (z'_mem_UUE Λ hΛ.toIsLattice F F' hF hF')⟩
   · rintro ⟨h1, h2, h3, h4⟩
-    have hU
-        : UU Λ F F'
-          ≤ (LinearMap.ker (S.hT.flip h)).restrictScalars (NumberField.RingOfIntegers E) := by
+    have hU : UU Λ F F' ≤ (LinearMap.ker (S.hT.flip h)).restrictScalars
+        (NumberField.RingOfIntegers E) := by
       unfold UU
       refine sup_le (sup_le (sup_le ?_ ?_) ?_) ?_
       · intro x hx
@@ -107,16 +126,15 @@ private theorem mem_Hp_iff_orthogonal
     intro u hu
     simpa using key hu
 
-private theorem isLattice_sup_span_singleton
-    (Λ : Submodule (NumberField.RingOfIntegers E) S.V) (hΛ : Submodule.IsFullLattice E Λ) (v : S.V)
-    : Submodule.IsFullLattice E (Λ ⊔ Submodule.span (NumberField.RingOfIntegers E) {v}) := by
+private theorem isLattice_sup_span_singleton (Λ : Submodule (NumberField.RingOfIntegers E) S.V)
+    (hΛ : Submodule.IsFullLattice E Λ) (v : S.V) :
+    Submodule.IsFullLattice E (Λ ⊔ Submodule.span (NumberField.RingOfIntegers E) {v}) := by
   let : Submodule.IsFullLattice E Λ := hΛ
   exact Submodule.IsFullLattice.of_le_of_fg E le_sup_left
     (hΛ.fg.sup (Submodule.fg_span_singleton v))
 
-private theorem flagG_ext_of_e_eq_of_z_eq
-    {T0 : E} (F G : FlagG S r T0) (he : F.e = G.e) (hz : F.z = G.z)
-    : F = G := by
+private theorem flagG_ext_of_e_eq_of_z_eq {T0 : E} (F G : FlagG S r T0) (he : F.e = G.e) (hz : F.z = G.z) :
+    F = G := by
   cases F
   cases G
   simp only at he hz
@@ -124,27 +142,21 @@ private theorem flagG_ext_of_e_eq_of_z_eq
   subst hz
   rfl
 
-theorem line_pair'
-    (k : ℕ) (hdim : finrank E S.V = k + 2 * r + 1)
-    (Λ : Submodule (NumberField.RingOfIntegers E) S.V) (hΛ : Submodule.IsFullLattice E Λ)
-    (Fl : LFlag S r T) (L0 : LFlag S r T')
-    (γ1 γ2 : S.V ≃ₗ[E] S.V) (hγ1 : γ1 ∈ Formalism.HermitianLatticesTheory.isom S.hT)
-    (hγ2 : γ2 ∈ Formalism.HermitianLatticesTheory.isom S.hT)
+theorem line_pair' (k : ℕ) (hdim : finrank E S.V = k + 2 * r + 1) (Λ : Submodule (NumberField.RingOfIntegers E) S.V)
+    (hΛ : Submodule.IsFullLattice E Λ) (Fl : LFlag S r T) (L0 : LFlag S r T') (γ1 γ2 : S.V ≃ₗ[E] S.V)
+    (hγ1 : γ1 ∈ Formalism.HermitianLatticesTheory.isom S.hT) (hγ2 : γ2 ∈ Formalism.HermitianLatticesTheory.isom S.hT)
     (hL : IsLift Λ Fl) (hL1 : IsLift Λ (mapLF γ1 L0)) (hL2 : IsLift Λ (mapLF γ2 L0))
     (hG1 : Gval Fl (mapLF γ1 L0) ≠ 0) (hG12 : Gval Fl (mapLF γ2 L0) = Gval Fl (mapLF γ1 L0))
     (hT' : T' ≠ 0) (hTs' : star T' = T')
-    (hTh : Th Λ Fl (mapLF γ1 L0) (mapLF γ2 L0) (γ2 * γ1⁻¹) = Hp Λ Fl (mapLF γ1 L0))
-    : γ2.symm (yv (mapLF γ2 L0).fl Fl.fl)
-          - (brS S (γ2.symm (yv (mapLF γ2 L0).fl Fl.fl)) (γ1.symm (yv (mapLF γ1 L0).fl Fl.fl))
-              / brS S (γ1.symm (yv (mapLF γ1 L0).fl Fl.fl)) (γ1.symm (yv (mapLF γ1 L0).fl Fl.fl)))
-            • γ1.symm (yv (mapLF γ1 L0).fl Fl.fl)
-        ∈ L0.fl.X
-      ∧ (brS S (γ2.symm (yv (mapLF γ2 L0).fl Fl.fl)) (γ1.symm (yv (mapLF γ1 L0).fl Fl.fl))
-            / brS S (γ1.symm (yv (mapLF γ1 L0).fl Fl.fl)) (γ1.symm (yv (mapLF γ1 L0).fl Fl.fl)))
-          * star
-            (brS S (γ2.symm (yv (mapLF γ2 L0).fl Fl.fl)) (γ1.symm (yv (mapLF γ1 L0).fl Fl.fl))
-              / brS S (γ1.symm (yv (mapLF γ1 L0).fl Fl.fl)) (γ1.symm (yv (mapLF γ1 L0).fl Fl.fl)))
-        = 1 := by
+    (hTh : Th Λ Fl (mapLF γ1 L0) (mapLF γ2 L0) (γ2 * γ1⁻¹) = Hp Λ Fl (mapLF γ1 L0)) :
+    γ2.symm (yv (mapLF γ2 L0).fl Fl.fl) -
+        (brS S (γ2.symm (yv (mapLF γ2 L0).fl Fl.fl)) (γ1.symm (yv (mapLF γ1 L0).fl Fl.fl)) /
+          brS S (γ1.symm (yv (mapLF γ1 L0).fl Fl.fl)) (γ1.symm (yv (mapLF γ1 L0).fl Fl.fl))) •
+        γ1.symm (yv (mapLF γ1 L0).fl Fl.fl) ∈ L0.fl.X ∧
+      (brS S (γ2.symm (yv (mapLF γ2 L0).fl Fl.fl)) (γ1.symm (yv (mapLF γ1 L0).fl Fl.fl)) /
+          brS S (γ1.symm (yv (mapLF γ1 L0).fl Fl.fl)) (γ1.symm (yv (mapLF γ1 L0).fl Fl.fl))) *
+        star (brS S (γ2.symm (yv (mapLF γ2 L0).fl Fl.fl)) (γ1.symm (yv (mapLF γ1 L0).fl Fl.fl)) /
+          brS S (γ1.symm (yv (mapLF γ1 L0).fl Fl.fl)) (γ1.symm (yv (mapLF γ1 L0).fl Fl.fl))) = 1 := by
   have hδ : γ1 * γ2⁻¹ ∈ Formalism.HermitianLatticesTheory.isom S.hT := mul_mem hγ1 (inv_mem hγ2)
   set δ := γ1 * γ2⁻¹ with hδd
   set Λ' := Λ ⊔ Submodule.span (NumberField.RingOfIntegers E) {δ Fl.fl.z} with hΛ'd
@@ -188,8 +200,7 @@ theorem line_pair'
       exact hp.1.1.1
     · intro h hh
       have hh1 := (mem_Hp_iff_orthogonal Λ' hΛ' (mapLF γ1 L0) Fl hL1' hL' h).1 hh
-      have hh0' : h ∈ Hp Λ (mapLF γ1 L0) Fl :=
-        (mem_Hp_iff_orthogonal Λ hΛ (mapLF γ1 L0) Fl hL1 hL h).2 hh1
+      have hh0' : h ∈ Hp Λ (mapLF γ1 L0) Fl := (mem_Hp_iff_orthogonal Λ hΛ (mapLF γ1 L0) Fl hL1 hL h).2 hh1
       have hh0 : h ∈ Hp Λ Fl (mapLF γ1 L0) := by
         rw [Hp_symm]
         exact hh0'
@@ -202,14 +213,14 @@ theorem line_pair'
       have c2 := (mem_Hp_iff_orthogonal Λ hΛ Fl (mapLF γ2 L0) hL hL2 p.2).1 hpb
       have hXF1 : (mapLF γ1 L0).fl.X = ((mapLF γ2 L0).fl.X).map (δ : S.V →ₗ[E] S.V) := by
         rw [eF1, eF2, eflag, mapFlag_X']
-      have hXB : (mapLF δ Fl).fl.X = (Fl.fl.X).map (δ : S.V →ₗ[E] S.V) := by rw [eB, mapFlag_X']
+      have hXB : (mapLF δ Fl).fl.X = (Fl.fl.X).map (δ : S.V →ₗ[E] S.V) := by
+        rw [eB, mapFlag_X']
       have hzF1 : (mapLF γ1 L0).fl.z = δ (mapLF γ2 L0).fl.z := by
         rw [mapLF_fl_z hγ1, mapLF_fl_z hγ2]
         simp [hδd]
       have hzB : (mapLF δ Fl).fl.z = δ Fl.fl.z := mapLF_fl_z hδ Fl
       refine Submodule.mem_map.2 ⟨(h, δ p.2), ⟨⟨⟨hh, ?_⟩, ?_⟩, ?_⟩, rfl⟩
-      · refine (mem_Hp_iff_orthogonal Λ' hΛ' (mapLF γ1 L0) (mapLF δ Fl) hL1' hB (δ p.2)).2
-          ⟨?_, ?_, ?_, ?_⟩
+      · refine (mem_Hp_iff_orthogonal Λ' hΛ' (mapLF γ1 L0) (mapLF δ Fl) hL1' hB (δ p.2)).2 ⟨?_, ?_, ?_, ?_⟩
         · intro x hx
           rw [hXF1] at hx
           obtain ⟨y, hy, rfl⟩ := Submodule.mem_map.1 hx
@@ -235,8 +246,7 @@ theorem line_pair'
         refine Submodule.mem_map.2 ⟨_, hpc', ?_⟩
         rw [← hp1']
         simp [map_sub]
-  have LP :=
-    line_pair k hdim Λ' hΛ' (mapLF γ1 L0) Fl (mapLF δ Fl) δ hL1' hL' hB hGA hGB hT' hTs' hTh'
+  have LP := line_pair k hdim Λ' hΛ' (mapLF γ1 L0) Fl (mapLF δ Fl) δ hL1' hL' hB hGA hGB hT' hTs' hTh'
   rw [hb] at LP
   set w1 := yv (mapLF γ1 L0).fl Fl.fl with hw1
   set w2 := yv (mapLF γ2 L0).fl Fl.fl with hw2
@@ -250,7 +260,8 @@ theorem line_pair'
     simp
   rw [hc1, hc2] at LP
   refine ⟨?_, LP.2⟩
-  have hX : (mapLF γ1 L0).fl.X = L0.fl.X.map (γ1 : S.V →ₗ[E] S.V) := by rw [eF1, mapFlag_X']
+  have hX : (mapLF γ1 L0).fl.X = L0.fl.X.map (γ1 : S.V →ₗ[E] S.V) := by
+    rw [eF1, mapFlag_X']
   have h1 := LP.1
   rw [hX] at h1
   obtain ⟨a, ha, hae⟩ := Submodule.mem_map.1 h1

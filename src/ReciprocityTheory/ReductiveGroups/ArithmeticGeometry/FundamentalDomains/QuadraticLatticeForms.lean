@@ -1,7 +1,49 @@
 module
 
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.FundamentalDomains.FundamentalDomainPointBound
+import Mathlib.Algebra.Order.Archimedean.Real.Hom
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Real
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.FundamentalDomains.RealPlaceEmbeddings
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArakelovVolumes.IntegralModuleBases.DetToMatrixSq
 
 @[expose] public section
 
@@ -83,14 +125,14 @@ theorem ip_pos {u : X.Ψ → Fin r → ℂ} (hu : u ≠ 0) : 0 < ip X u u := by
     by_contra h
     push_neg at h
     exact hτ (funext h)
-  apply Finset.sum_pos' (fun i _ =>
-    mul_nonneg (c_pos X i).le (Finset.sum_nonneg fun b _ => sq_nonneg _))
+  apply Finset.sum_pos' (fun i _ => mul_nonneg (c_pos X i).le
+    (Finset.sum_nonneg fun b _ => sq_nonneg _))
   refine ⟨τ, Finset.mem_univ _, mul_pos (c_pos X τ) ?_⟩
   apply Finset.sum_pos' (fun b _ => sq_nonneg _)
   exact ⟨a, Finset.mem_univ _, pow_pos (norm_pos_iff.mpr ha) 2⟩
 
-noncomputable def Ly (y : X.Ψ → Matrix (Fin r) (Fin r) ℂ)
-    : (X.Ψ → Fin r → ℂ) →ₗ[ℝ] (X.Ψ → Fin r → ℂ) where
+noncomputable def Ly (y : X.Ψ → Matrix (Fin r) (Fin r) ℂ) :
+    (X.Ψ → Fin r → ℂ) →ₗ[ℝ] (X.Ψ → Fin r → ℂ) where
   toFun u τ := (y τ)⁻¹ *ᵥ u τ
   map_add' u w := by funext τ; simp [Matrix.mulVec_add]
   map_smul' k u := by
@@ -107,20 +149,19 @@ noncomputable def Sg : (X.Ψ → Fin r → ℂ) →ₗ[ℝ] (X.Ψ → Fin r → 
 noncomputable def Qy (y : X.Ψ → Matrix (Fin r) (Fin r) ℂ) (v : Fin r → E) : ℝ :=
   ∑ τ, X.c τ * ∑ a, ‖((y τ)⁻¹ *ᵥ Data.emb τ.1 v) a‖ ^ 2
 
-theorem ip_Ly_self (y : X.Ψ → Matrix (Fin r) (Fin r) ℂ) (v : Fin r → E)
-    : ip X (Ly X y (X.embV v)) (Ly X y (X.embV v)) = Qy X y v := by
+theorem ip_Ly_self (y : X.Ψ → Matrix (Fin r) (Fin r) ℂ) (v : Fin r → E) :
+    ip X (Ly X y (X.embV v)) (Ly X y (X.embV v)) = Qy X y v := by
   rw [ip_self]
   rfl
 
 theorem Qy_nonneg (y : X.Ψ → Matrix (Fin r) (Fin r) ℂ) (v : Fin r → E) : 0 ≤ Qy X y v := by
   unfold Qy
-  exact Finset.sum_nonneg fun τ _ =>
-    mul_nonneg (c_pos X τ).le (Finset.sum_nonneg fun a _ => sq_nonneg _)
+  exact Finset.sum_nonneg fun τ _ => mul_nonneg (c_pos X τ).le (Finset.sum_nonneg fun a _ => sq_nonneg _)
 
-theorem embV_sum {ι : Type} (s : Finset ι) (w : ι → Fin r → E)
-    : X.embV (∑ i ∈ s, w i) = ∑ i ∈ s, X.embV (w i) := by
+theorem embV_sum {ι : Type} (s : Finset ι) (w : ι → Fin r → E) :
+    X.embV (∑ i ∈ s, w i) = ∑ i ∈ s, X.embV (w i) := by
   funext τ a
-  set_option synthInstance.maxHeartbeats 100000 in
+
   simp only [Data.embV, Data.emb, Finset.sum_apply, map_sum]
 
 theorem embV_zsmul (n : ℤ) (w : Fin r → E) : X.embV (n • w) = (n : ℝ) • X.embV w := by
@@ -128,8 +169,8 @@ theorem embV_zsmul (n : ℤ) (w : Fin r → E) : X.embV (n • w) = (n : ℝ) �
   simp only [Data.embV, Data.emb, Pi.smul_apply, zsmul_eq_mul, map_mul, map_intCast,
     Complex.real_smul, Complex.ofReal_intCast]
 
-theorem Ly_injective (y : X.Ψ → Matrix (Fin r) (Fin r) ℂ) (hy : ∀ τ, (y τ).det ≠ 0)
-    : Function.Injective (Ly X y) := by
+theorem Ly_injective (y : X.Ψ → Matrix (Fin r) (Fin r) ℂ) (hy : ∀ τ, (y τ).det ≠ 0) :
+    Function.Injective (Ly X y) := by
   intro u u' h
   funext τ
   have h1 : (y τ)⁻¹ *ᵥ u τ = (y τ)⁻¹ *ᵥ u' τ := congrFun h τ
@@ -138,14 +179,13 @@ theorem Ly_injective (y : X.Ψ → Matrix (Fin r) (Fin r) ℂ) (hy : ∀ τ, (y 
   simp only [Matrix.mulVec_mulVec, Matrix.mul_nonsing_inv _ hu, Matrix.one_mulVec] at h2
   exact h2
 
-theorem Ly_surjective (y : X.Ψ → Matrix (Fin r) (Fin r) ℂ) (hy : ∀ τ, (y τ).det ≠ 0)
-    : Function.Surjective (Ly X y) := by
+theorem Ly_surjective (y : X.Ψ → Matrix (Fin r) (Fin r) ℂ) (hy : ∀ τ, (y τ).det ≠ 0) :
+    Function.Surjective (Ly X y) := by
   intro v
   refine ⟨fun τ => y τ *ᵥ v τ, ?_⟩
   funext τ
   change (y τ)⁻¹ *ᵥ (y τ *ᵥ v τ) = v τ
-  rw [Matrix.mulVec_mulVec, Matrix.nonsing_inv_mul _ (isUnit_iff_ne_zero.mpr (hy τ)),
-    Matrix.one_mulVec]
+  rw [Matrix.mulVec_mulVec, Matrix.nonsing_inv_mul _ (isUnit_iff_ne_zero.mpr (hy τ)), Matrix.one_mulVec]
 
 variable {ι : Type} [Fintype ι] [DecidableEq ι]
 
@@ -155,31 +195,29 @@ noncomputable def Am (y : X.Ψ → Matrix (Fin r) (Fin r) ℂ) (g : Basis ι ℤ
 noncomputable def Bm (g : Basis ι ℤ X.Λ) : Matrix ι ι ℝ :=
   Matrix.of fun i j => ∑ τ, X.c τ * (τ.1 (herm X.Gm (g i : Fin r → E) (g j : Fin r → E))).re
 
-theorem quad_eq (y : X.Ψ → Matrix (Fin r) (Fin r) ℂ) (g : Basis ι ℤ X.Λ) (x : ι → ℝ)
-    : x ⬝ᵥ (Am X y g *ᵥ x)
-      = ip X (Ly X y (∑ i, x i • X.embV (g i : Fin r → E)))
-        (Ly X y (∑ i, x i • X.embV (g i : Fin r → E))) := by
-  have hL
-      : Ly X y (∑ i, x i • X.embV (g i : Fin r → E))
-        = ∑ i, x i • Ly X y (X.embV (g i : Fin r → E)) := by
-    set_option synthInstance.maxHeartbeats 100000 in
+theorem quad_eq (y : X.Ψ → Matrix (Fin r) (Fin r) ℂ) (g : Basis ι ℤ X.Λ) (x : ι → ℝ) :
+    x ⬝ᵥ (Am X y g *ᵥ x) = ip X (Ly X y (∑ i, x i • X.embV (g i : Fin r → E)))
+      (Ly X y (∑ i, x i • X.embV (g i : Fin r → E))) := by
+  have hL : Ly X y (∑ i, x i • X.embV (g i : Fin r → E)) =
+      ∑ i, x i • Ly X y (X.embV (g i : Fin r → E)) := by
+
     simp only [map_sum, map_smul]
   rw [hL, ← ipB_apply]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, map_smul, LinearMap.sum_apply, LinearMap.smul_apply, smul_eq_mul, ipB_apply]
+
+  simp only [map_sum, map_smul, LinearMap.sum_apply, LinearMap.smul_apply, smul_eq_mul, ipB_apply]
   simp only [dotProduct, Matrix.mulVec, Am, Matrix.of_apply, Finset.mul_sum]
   refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
   rw [ip_comm X (Ly X y (X.embV (g j : Fin r → E)))]
   ring
 
-theorem quad_int (y : X.Ψ → Matrix (Fin r) (Fin r) ℂ) (g : Basis ι ℤ X.Λ) (x : ι → ℤ)
-    : (fun i => (x i : ℝ)) ⬝ᵥ (Am X y g *ᵥ fun i => (x i : ℝ))
-      = Qy X y (∑ i, x i • (g i : Fin r → E)) := by
+theorem quad_int (y : X.Ψ → Matrix (Fin r) (Fin r) ℂ) (g : Basis ι ℤ X.Λ) (x : ι → ℤ) :
+    (fun i => (x i : ℝ)) ⬝ᵥ (Am X y g *ᵥ fun i => (x i : ℝ)) =
+      Qy X y (∑ i, x i • (g i : Fin r → E)) := by
   rw [quad_eq, ← ip_Ly_self, embV_sum]
   simp only [embV_zsmul]
 
-theorem Am_posDef (y : X.Ψ → Matrix (Fin r) (Fin r) ℂ) (hy : ∀ τ, (y τ).det ≠ 0) (g : Basis ι ℤ X.Λ)
-    : (Am X y g).PosDef := by
+theorem Am_posDef (y : X.Ψ → Matrix (Fin r) (Fin r) ℂ) (hy : ∀ τ, (y τ).det ≠ 0)
+    (g : Basis ι ℤ X.Λ) : (Am X y g).PosDef := by
   refine Matrix.PosDef.of_dotProduct_mulVec_pos ?_ fun x hx => ?_
   · ext i j
     simp only [conjTranspose_apply, star_trivial, Am, of_apply]

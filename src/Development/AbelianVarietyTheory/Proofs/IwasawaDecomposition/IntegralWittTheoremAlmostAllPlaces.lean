@@ -1,33 +1,72 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.T2SpaceNumberFieldInfiniteAdeles
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.IntegralPointsFinitePlaceTensorProperties
 public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.DisjointSpanPerpLat
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.IntegralPointsFinitePlaceTensorProperties
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
-open NumberField IsDedekindDomain MeasureTheory Topology
-  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.GaugeEx
+open NumberField IsDedekindDomain MeasureTheory Topology Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.GaugeEx
 open scoped TensorProduct NNReal ENNReal
 
 namespace GlobalTheory.WittIntegral
 
-theorem exists_isUnit_sub
-    {O : Type} [CommRing O]
-    (s : O →+* O) (hs : ∀ z, s (s z) = z)
-    (β t : O) (hβ : IsUnit β)
-    (u : Fin 3 → O) (hu : ∀ i j, i ≠ j → IsUnit (u i - u j))
-    (hloc : ∀ a : Fin 3 → O, (∀ i, s (a i) = a i) → ∑ i, a i = 2 → ∃ i, IsUnit (a i))
-    : ∃ i, IsUnit (β - u i * t) := by
+theorem exists_isUnit_sub {O : Type} [CommRing O] (s : O →+* O) (hs : ∀ z, s (s z) = z) (β t : O)
+    (hβ : IsUnit β) (u : Fin 3 → O) (hu : ∀ i j, i ≠ j → IsUnit (u i - u j))
+    (hloc : ∀ a : Fin 3 → O, (∀ i, s (a i) = a i) → ∑ i, a i = 2 → ∃ i, IsUnit (a i)) :
+    ∃ i, IsUnit (β - u i * t) := by
   set D : Fin 3 → O := fun i => β - u i * t with hD
   have key : ∀ m : Ideal O, m ≠ ⊤ → ∀ i j, i ≠ j → D i ∈ m → D j ∈ m → False := by
     intro m hm i j hij hi hj
     have h1 : (u i - u j) * t ∈ m := by
       have := m.sub_mem hj hi
       convert this using 1
-      simp only [hD]
-      ring
+      simp only [hD]; ring
     have h2 : t ∈ m := (m.unit_mul_mem_iff_mem (hu i j hij)).1 h1
     have h3 : β ∈ m := by
       have := m.add_mem hi (m.mul_mem_left (u i) h2)
@@ -42,8 +81,7 @@ theorem exists_isUnit_sub
     have k1 := key m hm.ne_top
     have k2 := key _ hm'
     rcases h 0 with h0 | h0 <;> rcases h 1 with h1 | h1 <;> rcases h 2 with h2 | h2
-    all_goals
-      first
+    all_goals first
       | exact k1 0 1 (by decide) h0 h1
       | exact k1 0 2 (by decide) h0 h2
       | exact k1 1 2 (by decide) h1 h2
@@ -53,45 +91,35 @@ theorem exists_isUnit_sub
   obtain ⟨c, hc⟩ := Ideal.mem_span_range_iff_exists_fun.1 ((Ideal.eq_top_iff_one _).1 htop)
   have hc' : ∑ i, s (c i) * (D i * s (D i)) = 1 := by
     have := congrArg s hc
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_mul, hs, map_one] at this
+
+    simp only [map_sum, map_mul, hs, map_one] at this
     rw [← this]
     exact Finset.sum_congr rfl fun i _ => by ring
-  obtain ⟨i, hi⟩ :=
-    hloc
-      (fun i => (c i + s (c i)) * (D i * s (D i)))
-      (fun i => by simp only [map_mul, map_add (f := _), hs]; ring)
-      (by simp only [add_mul, Finset.sum_add_distrib, hc, hc']; norm_num)
+  obtain ⟨i, hi⟩ := hloc (fun i => (c i + s (c i)) * (D i * s (D i)))
+    (fun i => by simp only [map_mul, map_add (f := _), hs]; ring)
+    (by simp only [add_mul, Finset.sum_add_distrib, hc, hc']; norm_num)
   exact ⟨i, isUnit_of_mul_isUnit_left (isUnit_of_mul_isUnit_right hi)⟩
 
-theorem exists_unitary
-    {A : Type} [CommRing A]
-    {M : ℕ}
-    (s : A →+* A) (hs : ∀ z, s (s z) = z)
-    (O : Subring A) (hO : ∀ z ∈ O, s z ∈ O)
-    (J : Matrix (Fin M) (Fin M) A) (hJ : ∀ i j, s (J j i) = J i j) (hJO : ∀ i j, J i j ∈ O)
-    (x y : Fin M → A) (hx : ∀ i, x i ∈ O) (hy : ∀ i, y i ∈ O)
-    (β : A) (hxx : Formalism.UG.hform s J x x = β) (hyy : Formalism.UG.hform s J y y = β)
-    (u : A) (huO : u ∈ O) (hu : s u * u = 1)
-    (c : A) (hcO : c ∈ O) (hc : (β - s u * Formalism.UG.hform s J y x) * c = 1)
-    : ∃ g : GL (Fin M) A,
-      g ∈ Formalism.UG.UJ s J ∧ (g : Matrix (Fin M) (Fin M) A).mulVec x = y
-        ∧ (∀ i j, (g : Matrix (Fin M) (Fin M) A) i j ∈ O)
-        ∧ ∀ i j, ((g⁻¹ : GL (Fin M) A) : Matrix (Fin M) (Fin M) A) i j ∈ O := by
-  have hf
-      : ∀ p q : Fin M → A,
-        Formalism.UG.hform s J p q = (Matrix.vecMul (fun i => s (p i)) J) ⬝ᵥ q := by
+theorem exists_unitary {A : Type} [CommRing A] {M : ℕ} (s : A →+* A) (hs : ∀ z, s (s z) = z)
+    (O : Subring A) (hO : ∀ z ∈ O, s z ∈ O) (J : Matrix (Fin M) (Fin M) A)
+    (hJ : ∀ i j, s (J j i) = J i j) (hJO : ∀ i j, J i j ∈ O) (x y : Fin M → A)
+    (hx : ∀ i, x i ∈ O) (hy : ∀ i, y i ∈ O) (β : A) (hxx : Formalism.UG.hform s J x x = β)
+    (hyy : Formalism.UG.hform s J y y = β) (u : A) (huO : u ∈ O) (hu : s u * u = 1) (c : A) (hcO : c ∈ O)
+    (hc : (β - s u * Formalism.UG.hform s J y x) * c = 1) :
+    ∃ g : GL (Fin M) A, g ∈ Formalism.UG.UJ s J ∧ (g : Matrix (Fin M) (Fin M) A).mulVec x = y ∧
+      (∀ i j, (g : Matrix (Fin M) (Fin M) A) i j ∈ O) ∧
+      ∀ i j, ((g⁻¹ : GL (Fin M) A) : Matrix (Fin M) (Fin M) A) i j ∈ O := by
+  have hf : ∀ p q : Fin M → A, Formalism.UG.hform s J p q = (Matrix.vecMul (fun i => s (p i)) J) ⬝ᵥ q := by
     intro p q
     simp only [Formalism.UG.hform, Matrix.vecMul, dotProduct, Finset.sum_mul]
     exact Finset.sum_comm
   have hsym : ∀ p q : Fin M → A, s (Formalism.UG.hform s J p q) = Formalism.UG.hform s J q p := by
     intro p q
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [Formalism.UG.hform, map_sum, map_mul, hs]
+
+    simp only [Formalism.UG.hform, map_sum, map_mul, hs]
     rw [Finset.sum_comm]
     refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
-    rw [hJ]
-    ring
+    rw [hJ]; ring
   set t := Formalism.UG.hform s J y x with ht
   set w : Fin M → A := fun i => x i - u * y i with hw
   set l : Fin M → A := Matrix.vecMul (fun i => s (w i)) J with hl
@@ -113,18 +141,18 @@ theorem exists_unitary
   set P : Matrix (Fin M) (Fin M) A := Matrix.vecMulVec w l with hP
   have hPP : P * P = (l ⬝ᵥ w) • P := by
     ext i j
-    simp only [hP, Matrix.mul_apply, Matrix.vecMulVec_apply, Matrix.smul_apply, dotProduct,
-      smul_eq_mul, Finset.sum_mul]
+    simp only [hP, Matrix.mul_apply, Matrix.vecMulVec_apply, Matrix.smul_apply, dotProduct, smul_eq_mul,
+      Finset.sum_mul]
     exact Finset.sum_congr rfl fun k _ => by ring
   have hPJ : Formalism.UG.cT s P * J = J * P := by
     ext i j
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [hP, hl, Formalism.UG.cT, Matrix.mul_apply, Matrix.vecMulVec_apply,
-        Matrix.transpose_apply, Matrix.map_apply, Matrix.vecMul, dotProduct, map_mul, map_sum, hs,
-        hJ, Finset.mul_sum, Finset.sum_mul]
+
+    simp only [hP, hl, Formalism.UG.cT, Matrix.mul_apply, Matrix.vecMulVec_apply, Matrix.transpose_apply,
+    Matrix.map_apply, Matrix.vecMul, dotProduct, map_mul, map_sum, hs, hJ, Finset.mul_sum, Finset.sum_mul]
     rw [Finset.sum_comm]
     exact Finset.sum_congr rfl fun k _ => Finset.sum_congr rfl fun k' _ => by ring
-  have hcc : c * s c * (l ⬝ᵥ w) = c + s c := by rw [hlw]; linear_combination s c * hc + c * hc'
+  have hcc : c * s c * (l ⬝ᵥ w) = c + s c := by
+    rw [hlw]; linear_combination s c * hc + c * hc'
   have h1 : (1 - s c • P) * (1 - c • P) = 1 := by
     simp only [Matrix.sub_mul, Matrix.mul_sub, Matrix.one_mul, Matrix.mul_one, Matrix.smul_mul,
       Matrix.mul_smul, hPP, smul_smul, smul_sub]
@@ -144,9 +172,8 @@ theorem exists_unitary
   · change Formalism.UG.cT s (s u • (1 - c • P)) * J * (s u • (1 - c • P)) = J
     have : Formalism.UG.cT s (s u • (1 - c • P)) = u • (1 - s c • Formalism.UG.cT s P) := by
       ext i j
-      simp only [Formalism.UG.cT, Matrix.transpose_apply, Matrix.map_apply, Matrix.smul_apply,
-        Matrix.sub_apply, smul_eq_mul, map_mul, map_sub, hs, Matrix.one_apply, eq_comm (a := j),
-        apply_ite s, map_one, map_zero]
+      simp only [Formalism.UG.cT, Matrix.transpose_apply, Matrix.map_apply, Matrix.smul_apply, Matrix.sub_apply,
+        smul_eq_mul, map_mul, map_sub, hs, Matrix.one_apply, eq_comm (a := j), apply_ite s, map_one, map_zero]
     rw [this]
     have h3 : (u • (1 - s c • Formalism.UG.cT s P)) * J = J * (u • (1 - s c • P)) := by
       simp only [Matrix.sub_mul, Matrix.mul_sub, Matrix.one_mul, Matrix.mul_one, Matrix.smul_mul,
@@ -164,10 +191,9 @@ theorem exists_unitary
   · intro i j
     exact O.mul_mem huO (O.sub_mem (h1O i j) (O.mul_mem (hO _ hcO) (hPO i j)))
 
-theorem exists_three
-    {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-    {σ : E →ₐ[F] E} (h : IsCMExt F E σ)
-    : ∃ u : Fin 3 → E, Function.Injective u ∧ ∀ i, σ (u i) * u i = 1 := by
+theorem exists_three {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+    {σ : E →ₐ[F] E} (h : IsCMExt F E σ) :
+    ∃ u : Fin 3 → E, Function.Injective u ∧ ∀ i, σ (u i) * u i = 1 := by
   have hσ := GlobalTheory.SelfDualLatticeCompare.conj_conj h
   obtain ⟨y, hy⟩ : ∃ y, σ y ≠ y := by
     by_contra hne
@@ -204,15 +230,10 @@ theorem exists_three
   refine ⟨![1, -1, (1 + δ) / (1 - δ)], ?_, ?_⟩
   · intro i j hij
     fin_cases i <;> fin_cases j
-    all_goals
-      first
+    all_goals first
       | rfl
-      | exact absurd hij a1
-      | exact absurd hij a2
-      | exact absurd hij a3
-      | exact absurd hij a1.symm
-      | exact absurd hij a2.symm
-      | exact absurd hij a3.symm
+      | exact absurd hij a1 | exact absurd hij a2 | exact absurd hij a3
+      | exact absurd hij a1.symm | exact absurd hij a2.symm | exact absurd hij a3.symm
   · intro i
     fin_cases i
     · simp
@@ -223,35 +244,31 @@ theorem exists_three
 
 section Loc
 
-variable
-  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
   {d : ℕ} (b : Module.Basis (Fin d) F E)
 
-theorem ae_mem (a : F)
-    : ∀ᶠ v : HeightOneSpectrum (𝓞 F) in Filter.cofinite,
-      algebraMap F (Fv F v) a ∈ v.adicCompletionIntegers F :=
+theorem ae_mem (a : F) : ∀ᶠ v : HeightOneSpectrum (𝓞 F) in Filter.cofinite,
+    algebraMap F (Fv F v) a ∈ v.adicCompletionIntegers F :=
   (algebraMap F (Af F) a).2
 
-theorem ae_incl (e : E)
-    : ∀ᶠ v : HeightOneSpectrum (𝓞 F) in Filter.cofinite,
-      inclR (F := F) (Fv F v) e ∈ intV b v := by
+theorem ae_incl (e : E) : ∀ᶠ v : HeightOneSpectrum (𝓞 F) in Filter.cofinite,
+    inclR (F := F) (Fv F v) e ∈ intV b v := by
   filter_upwards [Filter.eventually_all.2 fun k => ae_mem (b.repr e k)] with v hv k
-  have : (Algebra.TensorProduct.basis (Fv F v) b).repr (inclR (F := F) (Fv F v) e) k
-      = algebraMap F (Fv F v) (b.repr e k) := by
+  have : (Algebra.TensorProduct.basis (Fv F v) b).repr (inclR (F := F) (Fv F v) e) k =
+      algebraMap F (Fv F v) (b.repr e k) := by
     change (Algebra.TensorProduct.basis (Fv F v) b).repr (1 ⊗ₜ e) k = _
     simp [Algebra.TensorProduct.basis_repr_tmul]
   rw [this]
   exact hv k
 
-theorem repr_algebraMap (v : HeightOneSpectrum (𝓞 F)) (a : Fv F v) (k : Fin d)
-    : (Algebra.TensorProduct.basis (Fv F v) b).repr (algebraMap (Fv F v) (Fv F v ⊗[F] E) a) k
-      = a * algebraMap F (Fv F v) (b.repr 1 k) := by
+theorem repr_algebraMap (v : HeightOneSpectrum (𝓞 F)) (a : Fv F v) (k : Fin d) :
+    (Algebra.TensorProduct.basis (Fv F v) b).repr (algebraMap (Fv F v) (Fv F v ⊗[F] E) a) k =
+      a * algebraMap F (Fv F v) (b.repr 1 k) := by
   change (Algebra.TensorProduct.basis (Fv F v) b).repr (a ⊗ₜ 1) k = _
   simp [Algebra.TensorProduct.basis_repr_tmul]
 
-theorem ae_algebraMap
-    : ∀ᶠ v : HeightOneSpectrum (𝓞 F) in Filter.cofinite, ∀ a : Fv F v,
-      algebraMap (Fv F v) (Fv F v ⊗[F] E) a ∈ intV b v ↔ a ∈ v.adicCompletionIntegers F := by
+theorem ae_algebraMap : ∀ᶠ v : HeightOneSpectrum (𝓞 F) in Filter.cofinite, ∀ a : Fv F v,
+    algebraMap (Fv F v) (Fv F v ⊗[F] E) a ∈ intV b v ↔ a ∈ v.adicCompletionIntegers F := by
   obtain ⟨k, hk⟩ : ∃ k, b.repr 1 k ≠ 0 := by
     by_contra hne
     push Not at hne
@@ -339,8 +356,8 @@ theorem witt_integral : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [Nu
   have hxx : Formalism.UG.hform (sigR (Fv F v) σ) (JR (Fv F v) J) (ratTup (F := F) (Fv F v) x 0)
       (ratTup (F := F) (Fv F v) x 0) = algebraMap (Fv F v) _ (algebraMap F (Fv F v) β) := by
     have e := congrArg (inclR (F := F) (Fv F v)) hx
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [hE, Formalism.UG.hform, map_sum, map_mul] at e
+
+    simp only [hE, Formalism.UG.hform, map_sum, map_mul] at e
     refine Eq.trans e ?_
     rw [← IsScalarTower.algebraMap_apply]
     exact (Algebra.TensorProduct.includeRight : E →ₐ[F] Fv F v ⊗[F] E).commutes β

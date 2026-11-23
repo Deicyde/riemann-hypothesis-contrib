@@ -1,11 +1,48 @@
 module
 
 public import Development.AbelianVarietyTheory.Definitions.GlobalTwisting.DecayZero
+import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.T2SpaceNumberFieldInfiniteAdeles
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
-open NumberField IsDedekindDomain MeasureTheory Topology Filter
-  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.GaugeEx GlobalTheory.SWQ
+open NumberField IsDedekindDomain MeasureTheory Topology Filter Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.GaugeEx GlobalTheory.SWQ
 open scoped TensorProduct NNReal ENNReal
 
 noncomputable section
@@ -42,7 +79,7 @@ theorem Bd_smul_right (t : R) (u x : Fin N → R) : Bd R a u (t • x) = t * Bd 
   simp only [Bd, Pi.smul_apply, smul_eq_mul, Finset.mul_sum]
   exact Finset.sum_congr rfl fun l _ => by ring
 
-theorem Bd_neg_left (u x : Fin N → R) : Bd R a (-u) x = - Bd R a u x := by
+theorem Bd_neg_left (u x : Fin N → R) : Bd R a (-u) x = -Bd R a u x := by
   simp only [Bd, Pi.neg_apply, ← Finset.sum_neg_distrib]
   exact Finset.sum_congr rfl fun l _ => by ring
 
@@ -63,74 +100,65 @@ variable [NumberField F]
 theorem half_mul_two_AF : algebraMap F (AF F) (1 / 2) * 2 = 1 := by
   rw [← map_ofNat (algebraMap F (AF F)) 2, ← map_mul, one_div, inv_mul_cancel₀ two_ne_zero, map_one]
 
-theorem qd_rat (a : Fin N → F) (ξ : Fin N → F)
-    : qd (AF F) a (rat ξ) = algebraMap F (AF F) (qd F a ξ) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [qd, rat, map_sum, map_mul, map_pow]
+theorem qd_rat (a : Fin N → F) (ξ : Fin N → F) : qd (AF F) a (rat ξ) = algebraMap F (AF F) (qd F a ξ) := by
+
+  simp only [qd, rat, map_sum, map_mul, map_pow]
   rfl
 
 end HeisenbergBilinear
 
 open HeisenbergBilinear in
-theorem weil_intertwine
-    : ∀ (F : Type) [Field F] [NumberField F] (N : ℕ) (ψ : AddChar (AF F) ℂ)
-        (lam : InfinitePlace F → ℝ) (ν : Measure (AF F)) (a : Fin N → F),
-      Ctx ψ lam ν a
-        → ∀ Φ : (Fin N → AF F) → ℂ,
-          (∀ b x y, rho ψ a x y (Ub ψ a b Φ) = Ub ψ a b (rho ψ a x (y + b • x) Φ))
-            ∧ (∀ (t t' : AF F) x y,
-              t * t' = 1 → rho ψ a x y (Da t Φ) = Da t (rho ψ a (t • x) (t' • y) Φ))
-            ∧ (∀ x y, rho ψ a x y (Fo ψ ν a Φ) = Fo ψ ν a (rho ψ a (-y) x Φ))
-            ∧ (∀ b : F, th (Ub ψ a (algebraMap F (AF F) b) Φ) = th Φ)
-            ∧ ∀ t : F, t ≠ 0 → th (Da (algebraMap F (AF F) t) Φ) = th Φ := by
+theorem weil_intertwine : ∀ (F : Type) [Field F] [NumberField F] (N : ℕ) (ψ : AddChar (AF F) ℂ)
+    (lam : InfinitePlace F → ℝ) (ν : Measure (AF F)) (a : Fin N → F), Ctx ψ lam ν a →
+    ∀ Φ : (Fin N → AF F) → ℂ,
+      (∀ b x y, rho ψ a x y (Ub ψ a b Φ) = Ub ψ a b (rho ψ a x (y + b • x) Φ)) ∧
+      (∀ (t t' : AF F) x y, t * t' = 1 → rho ψ a x y (Da t Φ) = Da t (rho ψ a (t • x) (t' • y) Φ)) ∧
+      (∀ x y, rho ψ a x y (Fo ψ ν a Φ) = Fo ψ ν a (rho ψ a (-y) x Φ)) ∧
+      (∀ b : F, th (Ub ψ a (algebraMap F (AF F) b) Φ) = th Φ) ∧
+      ∀ t : F, t ≠ 0 → th (Da (algebraMap F (AF F) t) Φ) = th Φ := by
   intro F _ _ N ψ lam ν a hC Φ
   obtain ⟨-, ⟨-, -, hchar, -⟩, -, ⟨hHaar, -⟩, -⟩ := hC
   have hh : algebraMap F (AF F) (1 / 2) * 2 = 1 := half_mul_two_AF
   refine ⟨?_, ?_, ?_, ?_, ?_⟩
-  · intro b x y
+  ·
+    intro b x y
     funext u
     simp only [rho, Ub]
-    have key
-        : ψ (Bd (AF F) a u y + algebraMap F (AF F) (1 / 2) * Bd (AF F) a x y)
-            * ψ (b * qd (AF F) a (u + x))
-          = ψ (b * qd (AF F) a u) * ψ
-            (Bd (AF F) a u (y + b • x)
-              + algebraMap F (AF F) (1 / 2) * Bd (AF F) a x (y + b • x)) := by
+    have key : ψ (Bd (AF F) a u y + algebraMap F (AF F) (1 / 2) * Bd (AF F) a x y) *
+          ψ (b * qd (AF F) a (u + x)) =
+        ψ (b * qd (AF F) a u) *
+          ψ (Bd (AF F) a u (y + b • x) + algebraMap F (AF F) (1 / 2) * Bd (AF F) a x (y + b • x)) := by
       rw [← AddChar.map_add_eq_mul, ← AddChar.map_add_eq_mul]
       congr 1
       simp only [qd_add, Bd_add_right, Bd_smul_right, Bd_self]
       linear_combination (-(b * qd (AF F) a x)) * hh
     linear_combination (Φ (u + x)) * key
-  · intro t t' x y htt
+  ·
+    intro t t' x y htt
     funext u
     simp only [rho, Da]
-    have key
-        : Bd (AF F) a u y + algebraMap F (AF F) (1 / 2) * Bd (AF F) a x y
-          = Bd (AF F) a (t • u) (t' • y)
-            + algebraMap F (AF F) (1 / 2) * Bd (AF F) a (t • x) (t' • y) := by
+    have key : Bd (AF F) a u y + algebraMap F (AF F) (1 / 2) * Bd (AF F) a x y =
+        Bd (AF F) a (t • u) (t' • y) + algebraMap F (AF F) (1 / 2) * Bd (AF F) a (t • x) (t' • y) := by
       simp only [Bd_smul_left, Bd_smul_right]
       linear_combination (-(Bd (AF F) a u y + algebraMap F (AF F) (1 / 2) * Bd (AF F) a x y)) * htt
     rw [key, smul_add]
-  · intro x y
+  ·
+    intro x y
     funext u
     have : ν.IsAddHaarMeasure := hHaar
     have : (muV N ν).IsAddRightInvariant := by unfold muV; infer_instance
     simp only [rho, Fo]
-    refine Eq.trans ?_
-      (integral_add_right_eq_self (μ := muV N ν)
-        (fun s =>
-          ψ (Bd (AF F) a s x + algebraMap F (AF F) (1 / 2) * Bd (AF F) a (-y) x) * Φ (s + -y)
-            * ψ (Bd (AF F) a s u))
-        y)
+    refine Eq.trans ?_ (integral_add_right_eq_self (μ := muV N ν)
+      (fun s => ψ (Bd (AF F) a s x + algebraMap F (AF F) (1 / 2) * Bd (AF F) a (-y) x) * Φ (s + -y) *
+        ψ (Bd (AF F) a s u)) y)
     rw [← integral_const_mul]
     refine integral_congr_ae (ae_of_all _ fun s => ?_)
     dsimp only
     rw [add_neg_cancel_right]
-    have key
-        : ψ (Bd (AF F) a u y + algebraMap F (AF F) (1 / 2) * Bd (AF F) a x y)
-            * ψ (Bd (AF F) a s (u + x))
-          = ψ (Bd (AF F) a (s + y) x + algebraMap F (AF F) (1 / 2) * Bd (AF F) a (-y) x)
-            * ψ (Bd (AF F) a (s + y) u) := by
+    have key : ψ (Bd (AF F) a u y + algebraMap F (AF F) (1 / 2) * Bd (AF F) a x y) *
+          ψ (Bd (AF F) a s (u + x)) =
+        ψ (Bd (AF F) a (s + y) x + algebraMap F (AF F) (1 / 2) * Bd (AF F) a (-y) x) *
+          ψ (Bd (AF F) a (s + y) u) := by
       rw [← AddChar.map_add_eq_mul, ← AddChar.map_add_eq_mul]
       congr 1
       have e1 := Bd_comm a u y
@@ -138,11 +166,13 @@ theorem weil_intertwine
       simp only [Bd_add_left, Bd_add_right, Bd_neg_left]
       linear_combination e1 + algebraMap F (AF F) (1 / 2) * e2 + Bd (AF F) a y x * hh
     linear_combination (Φ s) * key
-  · intro b
+  ·
+    intro b
     simp only [th, Ub]
     refine tsum_congr fun ξ => ?_
     rw [qd_rat, ← map_mul, hchar, one_mul]
-  · intro t ht
+  ·
+    intro t ht
     simp only [th, Da]
     have e : ∀ ξ : Fin N → F, algebraMap F (AF F) t • rat ξ = rat (t • ξ) := by
       intro ξ
@@ -150,12 +180,10 @@ theorem weil_intertwine
       simp only [rat, Pi.smul_apply, smul_eq_mul, map_mul]
     simp only [e]
     exact Equiv.tsum_eq
-      {
-        toFun := fun ξ : Fin N → F => t • ξ
+      { toFun := fun ξ : Fin N → F => t • ξ
         invFun := fun ξ => t⁻¹ • ξ
         left_inv := fun ξ => by simp only [smul_smul, inv_mul_cancel₀ ht, one_smul]
-        right_inv := fun ξ => by simp only [smul_smul, mul_inv_cancel₀ ht, one_smul]
-      }
+        right_inv := fun ξ => by simp only [smul_smul, mul_inv_cancel₀ ht, one_smul] }
       (fun ξ => Φ (rat ξ))
 
 end GlobalTheory.SWQ

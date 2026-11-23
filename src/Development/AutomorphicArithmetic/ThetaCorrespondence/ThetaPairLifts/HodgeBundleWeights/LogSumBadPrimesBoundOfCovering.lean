@@ -1,42 +1,52 @@
 module
 
-public import Development.AutomorphicArithmetic.ThetaCorrespondence.ThetaPairLifts.HodgeBundleWeights.TamagawaNumberSpecialUnitary
-public import Mathlib
-public import Development.AutomorphicArithmetic.CyclotomicBounds.RamifiedDiscriminants.BadLog
 public import Development.AbelianVarietyTheory.Definitions.Divisors.MulSmulIdemMem
-public import Development.AbelianVarietyTheory.BlockTheory.DivisorBase.ComponentMassSum
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.EvenDomainWeightBound
 public import Development.AbelianVarietyTheory.Definitions.Divisors.NormNegCmConstantEqAtAllEmbeddings
-public import Formalism.LocalRingCardinality.DataParamsT
-public import Development.AbelianVarietyTheory.Definitions.Divisors.ToKnownTheoremsOf
-public import Development.AbelianVarietyTheory.Definitions.Divisors.CuspIso
-public import Development.AbelianVarietyTheory.Definitions.Divisors.WellChosen
-public import Development.AbelianVarietyTheory.Definitions.Divisors.IntegralBound
-public import Development.AbelianVarietyTheory.Definitions.Divisors.ExistsCoordAtPoints
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.NormalizedPointHeightLatticeSmul
-public import Development.AbelianVarietyTheory.Definitions.Divisors.IsHeightIffOfDegreeEq
-public import Development.AbelianVarietyTheory.Definitions.Divisors.WedgeNrmLeOfWedgeNormLe
-public import Development.AbelianVarietyTheory.Definitions.Divisors.VolMeasureOfAdd
-public import Development.AbelianVarietyTheory.Definitions.Divisors.MemLevEigenIffTransl
-public import Formalism.LocalToGlobal.IndefiniteForms.IndefiniteTree.RealCubicMeans.LogMeanShares.LogMeanStatements.HSClaim
-public import Development.AbelianVarietyTheory.Definitions.Divisors.GenRatios
-public import Development.AbelianVarietyTheory.Definitions.Divisors.BadElt
-public import Development.AbelianVarietyTheory.Definitions.Divisors.EightDvdNCol
-public import Development.AbelianVarietyTheory.Definitions.Divisors.CongModRefl
-public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.ExistsLatticeEmbeddingLiftDatumHermitianSpace
-public import Development.AbelianVarietyTheory.Definitions.ExistenceOfLattices.PermutesRefl
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CompositumIntermediateFieldExistsPlaceValuationEStatement
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsFieldUnramifiedCurve
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsFramedPointLiesOnComponentCmCurveFieldStatement
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsIntegralFramedPointCompletionIndexOneStatement
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ComplexUniformizationLawsOfGoodDeepCoverStatement
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ComplexUniformizationLawsOfGoodDeepCover
-public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsNumberFieldPoint
-public import Development.AbelianVarietyTheory.Proofs.JetHarmonics.WeightExponentsEmbeddingsDegree
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.PullbackSections.HolomorphicFamilies.WeightFloorInequalities
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.DvdOfMemBadPrimes
-public import Development.AbelianVarietyTheory.Proofs.JetHarmonics.NotDvdDiscrHost
 public import Development.AutomorphicArithmetic.ThetaCorrespondence.ThetaPairLifts.HodgeBundleWeights.ToKnownTheoremsOf
+public import Development.AutomorphicArithmetic.CyclotomicBounds.RamifiedDiscriminants.BadLog
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Development.AbelianVarietyTheory.BlockTheory.DivisorBase.ComponentMassSum
+public import Development.AbelianVarietyTheory.BlockTheory.TorsionBlocks.LevelCarrying
+import Development.AbelianVarietyTheory.Definitions.Divisors.BadElt
+import Development.AbelianVarietyTheory.Definitions.Divisors.CuspIso
+import Development.AbelianVarietyTheory.Definitions.Divisors.GenRatios
+public import Development.AbelianVarietyTheory.Definitions.Divisors.IsCoprimeOfNatCast
+import Development.AbelianVarietyTheory.Definitions.Divisors.IsRightActFunPull
+import Development.AbelianVarietyTheory.Definitions.Divisors.IsoOverOfIsOpenImmersion
+public import Development.AbelianVarietyTheory.Definitions.Divisors.MemLevEigenIffTransl
+import Development.AbelianVarietyTheory.Definitions.Divisors.Multiplier
 
 @[expose] public section
 
@@ -57,7 +67,6 @@ open GlobalTheory.FlatLine GlobalTheory.FlatTw
   GlobalTheory.IndefiniteRowSideFullHecke.ComponentMassSum GlobalTheory.ShFam
   GlobalTheory.IndefiniteRowSideFullHecke.DifferentConjugateDefects
   ReciprocityTheory.ChartRestriction.G.FD Formalism.BasicNotions.TH
-set_option maxHeartbeats 400000
 noncomputable section
 namespace GlobalTheory.BadLogCov
 theorem log_sum_bad_primes_le_sq
@@ -131,7 +140,6 @@ open GlobalTheory.FlatLine GlobalTheory.FlatTw
   GlobalTheory.IndefiniteRowSideFullHecke.ComponentMassSum GlobalTheory.ShFam
   GlobalTheory.IndefiniteRowSideFullHecke.DifferentConjugateDefects
   ReciprocityTheory.ChartRestriction.G.FD Formalism.BasicNotions.TH
-set_option maxHeartbeats 1000000 in
 theorem _root_.GlobalTheory.T.log_sum_bad_primes_bound_of_covering
     : _root_.GlobalTheory.CovTop.PublishedHodgeBundleTheorems
       → ∃ C : ℝ,

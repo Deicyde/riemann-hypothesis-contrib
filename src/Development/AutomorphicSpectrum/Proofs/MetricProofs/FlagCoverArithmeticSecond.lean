@@ -1,20 +1,57 @@
 module
 
-public import Mathlib
-public import Development.AutomorphicSpectrum.Definitions.MetricPeriods.Pull1
-public import Development.AutomorphicSpectrum.Definitions.MetricPeriods.IsPeriodOn
+import Development.AutomorphicSpectrum.Proofs.MetricProofs.FlagCoverArithmeticThird
 public import Development.AutomorphicSpectrum.Proofs.MetricProofs.IsImg
 public import Development.AutomorphicSpectrum.Proofs.MetricProofs.FlagModelBaseProjectionPointsStatement
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.InterBridgeB
-public import GroundTheory.HeightsAndTheta.Heights.Intersections.PtsOverPt
+import Development.AutomorphicSpectrum.Proofs.MetricProofs.SameOrbitRefl
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.InterBridgeB
 
 @[expose] public section
 
-open MvPolynomial MeasureTheory Filter Topology Matrix ReciprocityTheory.AnForm
-  ReciprocityTheory.AnForm.M ReciprocityTheory.AnForm.P ReciprocityTheory.ChartRestriction.G.Geo
-  ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I2
-  ReciprocityTheory.ChartRestriction.G.AI.I4 GlobalTheory.CompanionTheory.Ar.PB
-  GroundTheory.Heights₂.Heights GroundTheory.Heights₂.Heights.LowerBoundFree
+open MvPolynomial MeasureTheory Filter Topology Matrix ReciprocityTheory.AnForm ReciprocityTheory.AnForm.M ReciprocityTheory.AnForm.P ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I2 ReciprocityTheory.ChartRestriction.G.AI.I4 GlobalTheory.CompanionTheory.Ar.PB GroundTheory.Heights₂.Heights GroundTheory.Heights₂.Heights.LowerBoundFree
 open scoped ComplexOrder Classical
 
 noncomputable section
@@ -24,52 +61,29 @@ section Orbit
 
 variable {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)]
 
-theorem mCoordIdeal_le_of_sameOrbit {z z' : (Σ k, ι k) → ℂ} (h : SameOrbit z z')
-    : mCoordIdeal z' ≤ mCoordIdeal z := by
-  obtain ⟨c, hc, rfl⟩ := h
-  let θ : MvPolynomial K ℂ →ₐ[ℂ] MvPolynomial K ℂ := aeval fun k => C (c k) * X k
-  have key : ∀ f : MRing ι, mConeMap (fun p => c p.1 * z' p) f = θ (mConeMap z' f) := by
-    intro f
-    induction f using MvPolynomial.induction_on with
-    | C a => simp [mConeMap]
-    | add p q hp hq => simp only [map_add (f := _), hp, hq]
-    | mul_X p i hp =>
-      simp only [map_mul, hp]
-      congr 1
-      simp [mConeMap, θ, mul_assoc, mul_left_comm]
-  intro f hf
-  have hf' : mConeMap z' f = 0 := hf
-  show mConeMap _ f = 0
-  rw [key, hf', map_zero]
+theorem mCoordIdeal_le_of_sameOrbit {z z' : (Σ k, ι k) → ℂ} (h : SameOrbit z z') :
+    mCoordIdeal z' ≤ mCoordIdeal z := by
+  apply GlobalTheory.CompanionTheory.Ar.PB.CovMap.ImgBase.mCoordIdeal_le <;> assumption
 
-theorem mCoordIdeal_eq_of_sameOrbit {z z' : (Σ k, ι k) → ℂ} (h : SameOrbit z z')
-    : mCoordIdeal z = mCoordIdeal z' :=
+theorem mCoordIdeal_eq_of_sameOrbit {z z' : (Σ k, ι k) → ℂ} (h : SameOrbit z z') :
+    mCoordIdeal z = mCoordIdeal z' :=
   le_antisymm (mCoordIdeal_le_of_sameOrbit (Cj.sameOrbit_symm h)) (mCoordIdeal_le_of_sameOrbit h)
 
-theorem coord_ne_of_X_notMem
-    {z : (Σ k, ι k) → ℂ} {q : Σ k, ι k} (h : (X q : MRing ι) ∉ mCoordIdeal z)
-    : z q ≠ 0 := fun e =>
-  h (by
-    show mConeMap z (X q) = 0
-    rw [mConeMap, aeval_X, e, map_zero, zero_mul])
+theorem coord_ne_of_X_notMem {z : (Σ k, ι k) → ℂ} {q : Σ k, ι k} (h : (X q : MRing ι) ∉ mCoordIdeal z) :
+    z q ≠ 0 := fun e => h (by
+  show mConeMap z (X q) = 0
+  rw [mConeMap, aeval_X, e, map_zero, zero_mul])
 
 end Orbit
 
 section Proj
 
-variable
-  {K : Type} [Fintype K]
-  {ι : K → Type} [∀ k, Fintype (ι k)]
-  {K' : Type} [Fintype K']
-  {ι' : K' → Type} [∀ k, Fintype (ι' k)]
-  {Ω Ω' : Type} [Field Ω] [Field Ω']
+variable {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)] {K' : Type} [Fintype K']
+  {ι' : K' → Type} [∀ k, Fintype (ι' k)] {Ω Ω' : Type} [Field Ω] [Field Ω']
 
-theorem comp_mem_mcPts
-    {κ : K → K'} {v : (Σ k, ι k) → (Σ k, ι' k)} (hv : IsBlockMap κ v)
-    (φ : Ω →+* Ω')
+theorem comp_mem_mcPts {κ : K → K'} {v : (Σ k, ι k) → (Σ k, ι' k)} (hv : IsBlockMap κ v) (φ : Ω →+* Ω')
     {x : (Σ k, ι k) → Ω} {x' : (Σ k, ι' k) → Ω'} (hx : ∀ q, x' (v q) = φ (x q))
-    {zb : (Σ k, ι' k) → ℂ} (hz : zb ∈ mcPts (mCoordIdeal x'))
-    : zb ∘ v ∈ mcPts (mCoordIdeal x) := by
+    {zb : (Σ k, ι' k) → ℂ} (hz : zb ∈ mcPts (mCoordIdeal x')) : zb ∘ v ∈ mcPts (mCoordIdeal x) := by
   have key : ∀ f : MRing ι, mConeMap x' (rename v f) = rename κ (map φ (mConeMap x f)) := by
     intro f
     induction f using MvPolynomial.induction_on with
@@ -95,18 +109,13 @@ theorem comp_mem_mcPts
 
 end Proj
 
-variable
-  {K : Type} [Fintype K]
-  {ι : K → Type} [∀ k, Fintype (ι k)]
-  {Φ : Type} [Field Φ]
-  {y : (Σ k, ι k) → Φ} {Ψ : Type} {N j : ℕ}
+variable {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)] {Φ : Type} [Field Φ] {y : (Σ k, ι k) → Φ}
+  {Ψ : Type} {N j : ℕ}
 
-theorem sameOrbit_of_isFlagOf
-    (M : FlagModel y Ψ N j)
-    {F : FrameData ι Ψ N M.Ω M.blk} {z z' : (Σ k, ι k) → ℂ} {h : Ψ → Matrix (Fin N) (Fin N) ℂ}
-    (hb : SameOrbit (basePart M.blk z) (basePart M.blk z')) (H : M.IsFlagOf F z h)
-    (H' : M.IsFlagOf F z' h)
-    : SameOrbit z z' := by
+theorem sameOrbit_of_isFlagOf (M : FlagModel y Ψ N j) {F : FrameData ι Ψ N M.Ω M.blk}
+    {z z' : (Σ k, ι k) → ℂ} {h : Ψ → Matrix (Fin N) (Fin N) ℂ}
+    (hb : SameOrbit (basePart M.blk z) (basePart M.blk z')) (H : M.IsFlagOf F z h) (H' : M.IsFlagOf F z' h) :
+    SameOrbit z z' := by
   have hbase : basePart M.blk z = basePart M.blk z' := by
     obtain ⟨c, -, e⟩ := hb
     have hc : ∀ k, c k = 1 := fun k => by
@@ -119,7 +128,8 @@ theorem sameOrbit_of_isFlagOf
   have blockwise : ∀ k, ∃ t : ℂ, t ≠ 0 ∧ ∀ m : ι k, z ⟨k, m⟩ = t * z' ⟨k, m⟩ := by
     intro k
     by_cases hk : ∀ p, M.blk p ≠ some k
-    · exact ⟨1, one_ne_zero, fun m => by simpa [basePart] using congrFun hbase ⟨⟨k, hk⟩, m⟩⟩
+    · exact ⟨1, one_ne_zero, fun m => by
+        simpa [basePart] using congrFun hbase ⟨⟨k, hk⟩, m⟩⟩
     · push_neg at hk
       obtain ⟨p, hp⟩ := hk
       obtain ⟨a, ha, ea⟩ := H.2.2 p k hp
@@ -130,15 +140,7 @@ theorem sameOrbit_of_isFlagOf
   choose t ht e using blockwise
   exact ⟨t, ht, funext fun p => e p.1 p.2⟩
 
-theorem isImg_unique
-    : ∀ (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fintype (ι k)] (Φ : Type) [Field Φ]
-        (y : (Σ k, ι k) → Φ) (Ψ : Type) [Fintype Ψ] [DecidableEq Ψ] (N j : ℕ)
-        (M : FlagModel y Ψ N j) (K' : Type) [Fintype K'] (ι' : K' → Type) [∀ k, Fintype (ι' k)]
-        (Φ' : Type) [Field Φ'] (y' : (Σ k, ι' k) → Φ') (M' : FlagModel y' Ψ N j)
-        (Cv : FlagCover M' M) (d : ℕ),
-      IsArithVar (mCoordIdeal y) (d + 2) → IsArithVar (mCoordIdeal y') (d + 2)
-        → ∀ z ∈ mcPts (mCoordIdeal y'), ∀ w w',
-          CovMap.IsImg Cv z w → CovMap.IsImg Cv z w' → SameOrbit w w' := by
+theorem isImg_unique : ∀ (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fintype (ι k)] (Φ : Type) [Field Φ] (y : (Σ k, ι k) → Φ) (Ψ : Type) [Fintype Ψ] [DecidableEq Ψ] (N j : ℕ) (M : FlagModel y Ψ N j) (K' : Type) [Fintype K'] (ι' : K' → Type) [∀ k, Fintype (ι' k)] (Φ' : Type) [Field Φ'] (y' : (Σ k, ι' k) → Φ') (M' : FlagModel y' Ψ N j) (Cv : FlagCover M' M) (d : ℕ), IsArithVar (mCoordIdeal y) (d + 2) → IsArithVar (mCoordIdeal y') (d + 2) → ∀ z ∈ mcPts (mCoordIdeal y'), ∀ w w', CovMap.IsImg Cv z w → CovMap.IsImg Cv z w' → SameOrbit w w' := by
   intro K _ ι _ Φ _ y Ψ _ _ N j M K' _ ι' _ Φ' _ y' M' Cv d _ hA' z hz w w' hw hw'
   obtain ⟨-, fr, -⟩ := GlobalTheory.T.flag_model_base_projection_points K ι Φ y Ψ N j M
   obtain ⟨bs', fr', fl'⟩ := GlobalTheory.T.flag_model_base_projection_points K' ι' Φ' y' Ψ N j M'
@@ -147,8 +149,7 @@ theorem isImg_unique
     coord_ne_of_X_notMem (hG'.1 k)
   let c : K' → ℂ := fun k =>
     if h : ∀ p, M'.blk p ≠ some k then (basePart M'.blk z ⟨⟨k, h⟩, F'.c ⟨k, h⟩⟩)⁻¹ else 1
-  have hcb : ∀ k : NonPluckerBlocks M'.blk, c k.1 = (basePart M'.blk z ⟨k, F'.c k⟩)⁻¹ := fun k =>
-    dif_pos k.2
+  have hcb : ∀ k : NonPluckerBlocks M'.blk, c k.1 = (basePart M'.blk z ⟨k, F'.c k⟩)⁻¹ := fun k => dif_pos k.2
   have hc : ∀ k, c k ≠ 0 := fun k => by
     by_cases h : ∀ p, M'.blk p ≠ some k
     · rw [hcb ⟨k, h⟩]
@@ -171,8 +172,7 @@ theorem isImg_unique
   obtain ⟨F, hF, hG⟩ := fr _ (comp_mem_mcPts Cv.block Cv.φ Cv.x_eq (bs' z₁ hz₁))
   obtain ⟨z₀, a, b, e⟩ := hw z₁ h1 F' F hF' hF hG₁ hG h hh
   obtain ⟨z₀', a', b', e'⟩ := hw' z₁ h1 F' F hF' hF hG₁ hG h hh
-  exact Cj.sameOrbit_trans (Cj.sameOrbit_symm a)
-    (Cj.sameOrbit_trans (sameOrbit_of_isFlagOf M (Cj.sameOrbit_trans b (Cj.sameOrbit_symm b')) e e')
-      a')
+  exact Cj.sameOrbit_trans (Cj.sameOrbit_symm a) (Cj.sameOrbit_trans
+    (sameOrbit_of_isFlagOf M (Cj.sameOrbit_trans b (Cj.sameOrbit_symm b')) e e') a')
 
 end GlobalTheory.CompanionTheory.Ar.PB.CovMap

@@ -1,6 +1,53 @@
 module
 
-public import Formalism.HermitianCurvature.HermitianCurvatureProofs.BlockKWave
+public import Formalism.HermitianCurvature.HermitianCurvatureProofs.AeNeZeroComplex
+import Formalism.HermitianCurvature.HermitianCurvatureProofs.ComponentFamilySettingOfSettingBis
+public import Formalism.HermitianCurvature.HermitianCurvatureProofs.CutIntervalLong
+public import Formalism.HermitianCurvature.HermitianCurvatureProofs.FrameThresholdBoundHolds
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.BitVec
+import Std.Tactic.BVDecide.Normalize.Prop
+public import Formalism.HermitianCurvature.HermitianCurvatureProofs.AdmissibleAtOfAdmissibleList
 
 @[expose] public section
 
@@ -126,7 +173,6 @@ theorem xw_K
         * (Real.exp 1 * J.supA S.G S.de S.de' S.T S.T' S.l (decide (j = 0)) (S.pl v)) ^ K
       ≤ (Xw S (j + 1) v) ^ K := by
   obtain ⟨hg, hk⟩ := glob_pos hB
-  have hl := lenI_pos hB v
   rw [T_eq S hg j]
   have hdec : decide (j + 1 = 1 ∧ 0 + 1 = 1) = decide (j = 0) := by by_cases h : j = 0 <;> simp [h]
   have hexp : 2 * (j + 1 - 1) + 0 = 2 * j := by omega
@@ -137,8 +183,6 @@ theorem xw_K
   set Tf := (2 * Real.pi / S.G.g) ^ (-(S6.nuBlock S.G.r (j + 1) 0)) with hTf
   set A := J.supA S.G S.de S.de' S.T S.T' S.l (decide (j = 0)) (S.pl v) with hA
   have hA0 : 0 ≤ A := supA_nonneg S hg hk v _
-  have hgg : 0 < 2 * Real.pi / S.G.g := by positivity
-  have hTf0 : 0 ≤ Tf := by positivity
   have hprod : (∏ b, ∑ i, |F7.lagCo (grid b) i|) ≤ cg ^ K := by
     calc
       (∏ b, ∑ i, |F7.lagCo (grid b) i|) ≤ ∏ _b : Fin K, cg :=

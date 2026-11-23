@@ -1,13 +1,54 @@
 module
 
 public import Development.AutomorphicArithmetic.AutomorphicVarieties.ConjugateRepresentations.CuspidalSupport.HeckeLocalBlock
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.LinearAlgebra.Matrix.FiniteDimensional
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Coalgebra.IsFrobenius
+import Mathlib.RingTheory.Etale.Weakly
+import Mathlib.RingTheory.Finiteness.ModuleFinitePresentation
+import Mathlib.RingTheory.HopfAlgebra.Basic
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.TotallySplit
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Matrix GlobalTheory.CuspRep GlobalTheory.LFun Formalism.UG
-  Formalism.UG.P Formalism.L2.Host UpperTheory.V.Cj.S
-open GroundTheory.Automorphic.AutomorphicForm
-  (UPos unipGL constantTerm archCompact infEmb isExpLieAlgebra)
+open NumberField IsDedekindDomain Matrix GlobalTheory.CuspRep GlobalTheory.LFun Formalism.UG Formalism.UG.P Formalism.L2.Host UpperTheory.V.Cj.S
+open GroundTheory.Automorphic.AutomorphicForm (UPos unipGL constantTerm archCompact infEmb isExpLieAlgebra)
 open UpperTheory.V.Af.Fin (emb e1 e2 blk Bdd)
 open GlobalTheory.PRep (fixed)
 open scoped TensorProduct
@@ -21,18 +62,16 @@ variable {X Y V W : Type} [AddCommGroup V] [Module ℂ V] [AddCommGroup W] [Modu
 private noncomputable def sl1 (jW : W →ₗ[ℂ] (Y → ℂ)) (y : Y) : V ⊗[ℂ] W →ₗ[ℂ] V :=
   (TensorProduct.rid ℂ V).toLinearMap ∘ₗ LinearMap.lTensor V (LinearMap.proj y ∘ₗ jW)
 
-private theorem slice_first_tmul (jW : W →ₗ[ℂ] (Y → ℂ)) (y : Y) (v : V) (w : W)
-    : sl1 jW y (v ⊗ₜ[ℂ] w) = jW w y • v := by
+private theorem slice_first_tmul (jW : W →ₗ[ℂ] (Y → ℂ)) (y : Y) (v : V) (w : W) : sl1 jW y (v ⊗ₜ[ℂ] w) = jW w y • v := by
   simp [sl1]
 
 end SlopeTestRemainingChoices
 
 end UpperTheory.V.Cj.S
 
-private theorem tensor_exists_finBasis_expansion
-    {V W : Type} [AddCommGroup V] [Module ℂ V] [AddCommGroup W] [Module ℂ W] [FiniteDimensional ℂ V]
-    (t : V ⊗[ℂ] W)
-    : ∃ m : Fin (Module.finrank ℂ V) → W, t = ∑ a, Module.finBasis ℂ V a ⊗ₜ[ℂ] m a := by
+private theorem tensor_exists_finBasis_expansion {V W : Type} [AddCommGroup V] [Module ℂ V] [AddCommGroup W] [Module ℂ W]
+    [FiniteDimensional ℂ V] (t : V ⊗[ℂ] W) :
+    ∃ m : Fin (Module.finrank ℂ V) → W, t = ∑ a, Module.finBasis ℂ V a ⊗ₜ[ℂ] m a := by
   induction t using TensorProduct.induction_on with
   | zero => exact ⟨0, by simp⟩
   | tmul v w =>
@@ -46,12 +85,9 @@ private theorem tensor_exists_finBasis_expansion
     obtain ⟨m2, rfl⟩ := h2
     exact ⟨m1 + m2, by simp [TensorProduct.tmul_add, Finset.sum_add_distrib]⟩
 
-private theorem tensor_eq_zero_of_sl1_vanishing
-    {V W Y : Type}
-    [AddCommGroup V] [Module ℂ V] [AddCommGroup W] [Module ℂ W] [FiniteDimensional ℂ V]
-    (jW : W →ₗ[ℂ] (Y → ℂ)) (hjW : Function.Injective jW)
-    (t : V ⊗[ℂ] W) (ht : ∀ y, UpperTheory.V.Cj.S.sl1 jW y t = 0)
-    : t = 0 := by
+private theorem tensor_eq_zero_of_sl1_vanishing {V W Y : Type} [AddCommGroup V] [Module ℂ V] [AddCommGroup W] [Module ℂ W]
+    [FiniteDimensional ℂ V] (jW : W →ₗ[ℂ] (Y → ℂ)) (hjW : Function.Injective jW) (t : V ⊗[ℂ] W)
+    (ht : ∀ y, UpperTheory.V.Cj.S.sl1 jW y t = 0) : t = 0 := by
   obtain ⟨m, rfl⟩ := tensor_exists_finBasis_expansion (V := V) (W := W) t
   have hm : ∀ a, m a = 0 := by
     intro a
@@ -59,32 +95,25 @@ private theorem tensor_eq_zero_of_sl1_vanishing
     rw [map_zero]
     funext y
     have hy := ht y
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, UpperTheory.V.Cj.S.slice_first_tmul] at hy
-    have :=
-      (Fintype.linearIndependent_iff.mp (Module.finBasis ℂ V).linearIndependent)
-        (fun a => jW (m a) y)
-        hy a
+
+    simp only [map_sum, UpperTheory.V.Cj.S.slice_first_tmul] at hy
+    have := (Fintype.linearIndependent_iff.mp (Module.finBasis ℂ V).linearIndependent) (fun a => jW (m a) y) hy a
     simpa using this
   simp [hm]
 
-private theorem exists_vec_of_dual_apply_col
-    {X Y V W : Type}
-    [AddCommGroup V] [Module ℂ V] [AddCommGroup W] [Module ℂ W] [FiniteDimensional ℂ V]
-    (jV : V →ₗ[ℂ] (X → ℂ)) (hjV : Function.Injective jV)
+private theorem exists_vec_of_dual_apply_col {X Y V W : Type} [AddCommGroup V] [Module ℂ V] [AddCommGroup W] [Module ℂ W]
+    [FiniteDimensional ℂ V] (jV : V →ₗ[ℂ] (X → ℂ)) (hjV : Function.Injective jV)
     (jW : W →ₗ[ℂ] (Y → ℂ)) (col : Y → V) (hrow : ∀ x, ∃ w : W, jW w = fun y => jV (col y) x)
-    (φ : Module.Dual ℂ V)
-    : ∃ w : W, jW w = fun y => φ (col y) := by
-  let P : Submodule ℂ (Module.Dual ℂ V) := {
-    carrier := {ψ | ∃ w : W, jW w = fun y => ψ (col y)}
-    add_mem' := by
-      rintro ψ χ ⟨w1, h1⟩ ⟨w2, h2⟩
-      exact ⟨w1 + w2, by rw [map_add (f := _), h1, h2]; rfl⟩
-    zero_mem' := ⟨0, by rw [map_zero]; rfl⟩
-    smul_mem' := by
-      rintro c ψ ⟨w, h⟩
-      exact ⟨c • w, by rw [map_smul, h]; rfl⟩
-  }
+    (φ : Module.Dual ℂ V) : ∃ w : W, jW w = fun y => φ (col y) := by
+  let P : Submodule ℂ (Module.Dual ℂ V) :=
+    { carrier := {ψ | ∃ w : W, jW w = fun y => ψ (col y)}
+      add_mem' := by
+        rintro ψ χ ⟨w1, h1⟩ ⟨w2, h2⟩
+        exact ⟨w1 + w2, by rw [map_add (f := _), h1, h2]; rfl⟩
+      zero_mem' := ⟨0, by rw [map_zero]; rfl⟩
+      smul_mem' := by
+        rintro c ψ ⟨w, h⟩
+        exact ⟨c • w, by rw [map_smul, h]; rfl⟩ }
   have hev : ∀ x, (LinearMap.proj x ∘ₗ jV) ∈ P := by
     intro x
     obtain ⟨w, h⟩ := hrow x
@@ -98,14 +127,14 @@ private theorem exists_vec_of_dual_apply_col
     funext x
     simpa using hv _ (hev x)
   have htop : P = ⊤ := by
-    rw [← Subspace.dualCoannihilator_dualAnnihilator_eq (W := P), hco,
-      Submodule.dualAnnihilator_bot]
+    rw [← Subspace.dualCoannihilator_dualAnnihilator_eq (W := P), hco, Submodule.dualAnnihilator_bot]
   have hφ : φ ∈ P := by
     rw [htop]
     exact Submodule.mem_top
   exact hφ
 
-theorem UpperTheory.V.Cj.S.twoVar : UpperTheory.V.Cj.S.TensEig → UpperTheory.V.Cj.S.TwoVar := by
+theorem UpperTheory.V.Cj.S.twoVar :
+    UpperTheory.V.Cj.S.TensEig → UpperTheory.V.Cj.S.TwoVar := by
   intro hT X Y M N V W hVf hWf ι κ A B hAV hBW hAc hBc F hF hcol hrow
   let jV : V →ₗ[ℂ] (X → ℂ) := M.subtype ∘ₗ V.subtype
   let jW : W →ₗ[ℂ] (Y → ℂ) := N.subtype ∘ₗ W.subtype
@@ -127,8 +156,8 @@ theorem UpperTheory.V.Cj.S.twoVar : UpperTheory.V.Cj.S.TensEig → UpperTheory.V
   let z : V ⊗[ℂ] W := ∑ a, bV a ⊗ₜ[ℂ] w a
   have hz : ∀ y, UpperTheory.V.Cj.S.sl1 jW y z = colV y := by
     intro y
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [z, map_sum, UpperTheory.V.Cj.S.slice_first_tmul, hw]
+
+    simp only [z, map_sum, UpperTheory.V.Cj.S.slice_first_tmul, hw]
     simpa [Module.Basis.coord_apply] using bV.sum_repr (colV y)
   have hFz : ∀ x y, jV (UpperTheory.V.Cj.S.sl1 jW y z) x = F x y := by
     intro x y
@@ -165,11 +194,8 @@ theorem UpperTheory.V.Cj.S.twoVar : UpperTheory.V.Cj.S.TensEig → UpperTheory.V
     have hsumV : ∀ y', (∑ a, jW (w a) y' • bV a) = colV y' := by
       intro y'
       simpa [hw, Module.Basis.coord_apply] using bV.sum_repr (colV y')
-    have key
-        : ∀ i k (Gp : X → Y → ℂ),
-          Act2 (A i) (B k) F Gp
-            → ∀ x y,
-              jV (UpperTheory.V.Cj.S.sl1 jW y (TensorProduct.map (A' i) (B' k) z)) x = Gp x y := by
+    have key : ∀ i k (Gp : X → Y → ℂ), Act2 (A i) (B k) F Gp → ∀ x y,
+        jV (UpperTheory.V.Cj.S.sl1 jW y (TensorProduct.map (A' i) (B' k) z)) x = Gp x y := by
       intro i k Gp hG x y
       obtain ⟨H, h1, h2⟩ := hG
       have hH : ∀ x' y', H x' y' = ∑ a, jW (w a) y' * jV (A' i (bV a)) x' := by
@@ -181,7 +207,7 @@ theorem UpperTheory.V.Cj.S.twoVar : UpperTheory.V.Cj.S.TensEig → UpperTheory.V
           exact (hjcol y').symm
         have := congrFun hf2 x'
         rw [← this, hf]
-        set_option synthInstance.maxHeartbeats 100000 in
+
         simp [map_sum, jV, hA']
       obtain ⟨f', hf'1, hf'2⟩ := h2 x
       have hf' : f' = ((∑ a, jV (A' i (bV a)) x • w a : W) : N) := by
@@ -191,9 +217,8 @@ theorem UpperTheory.V.Cj.S.twoVar : UpperTheory.V.Cj.S.TensEig → UpperTheory.V
         rw [hH]
         simp [jW, jV, Finset.sum_apply, mul_comm]
       rw [← hf'2, hf']
-      set_option synthInstance.maxHeartbeats 100000 in
-      simp [z, map_sum, TensorProduct.map_tmul, UpperTheory.V.Cj.S.slice_first_tmul, jV, jW, hB',
-        mul_comm]
+
+      simp [z, map_sum, TensorProduct.map_tmul, UpperTheory.V.Cj.S.slice_first_tmul, jV, jW, hB', mul_comm]
     apply hprop σ c ip kp e
     rw [← sub_eq_zero]
     apply tensor_eq_zero_of_sl1_vanishing jW hjW
@@ -201,19 +226,11 @@ theorem UpperTheory.V.Cj.S.twoVar : UpperTheory.V.Cj.S.TensEig → UpperTheory.V
     apply hjV
     rw [map_zero]
     funext x
-    have key'
-        : ∀ p,
-          jV (UpperTheory.V.Cj.S.sl1 jW y (TensorProduct.map (A' (ip p)) (B' (kp p)) z)) x
-            = G p x y := fun p =>
-      key _ _ _ (hAct p) x y
-    have hval
-        : jV
-            (UpperTheory.V.Cj.S.sl1 jW y
-              (∑ p, c p • TensorProduct.map (A' (ip p)) (B' (kp p)) z - e • z))
-            x
-          = ∑ p, c p * G p x y - e * F x y := by
-      set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sub, map_sum, map_smul, Pi.sub_apply, Finset.sum_apply, Pi.smul_apply,
-        smul_eq_mul, key', hFz]
+    have key' : ∀ p, jV (UpperTheory.V.Cj.S.sl1 jW y (TensorProduct.map (A' (ip p)) (B' (kp p)) z)) x = G p x y :=
+      fun p => key _ _ _ (hAct p) x y
+    have hval : jV (UpperTheory.V.Cj.S.sl1 jW y
+        (∑ p, c p • TensorProduct.map (A' (ip p)) (B' (kp p)) z - e • z)) x = ∑ p, c p * G p x y - e * F x y := by
+
+      simp only [map_sub, map_sum, map_smul, Pi.sub_apply, Finset.sum_apply, Pi.smul_apply, smul_eq_mul, key', hFz]
     rw [hval, hsum, sub_self]
     rfl

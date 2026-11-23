@@ -1,17 +1,57 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.Definitions.Foundations.IsSelfDualE
-public import Formalism.LocalToGlobal.Columns.CoefficientsModP.PairingNondegenerateHolds
-public import Formalism.LocalToGlobal.Columns.CoefficientsModP.FkPderivBlockEmbNe
-public import Formalism.GradedWeylDivisibility.StatementE
-public import Formalism.HarderNarasimhan.ShiftInvariance
-public import Formalism.QuotientMetricDivisors.ReductionLemmaZero
-public import Formalism.QuotientMetricDivisors.ProdFormula
-public import Formalism.LocalToGlobal.IndefiniteForms.IndefiniteTree.RealCubicMeans.LeafBounds.MeanMaxLeaf.LeafMMFree
+public import Formalism.LocalToGlobal.Divisibility.CoefModLemmas
 public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.LatticeHasBasisAtEveryFinitePlace
 public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.NabIndepAndDelIndepLocalConditionsStatement
 public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.StdWeylLatticesFgAndSpanCoeffSpace
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
+import Formalism.LocalToGlobal.IndefiniteForms.IndefiniteTree.RealCubicMeans.LeafBounds.MeanMaxLeaf.LeafMMFree
+import Formalism.QuotientMetricDivisors.Statement
+public import Mathlib.RingTheory.DedekindDomain.Factorization
 
 @[expose] public section
 
@@ -258,19 +298,6 @@ theorem nabDelLoc_free_leVV : NabDelLoc ∧ NabDelFree ∧ NabLeVV := by
       intro τ
       first
       | exact hM τ
-      | have hcol : Submodule.span K (colLat (B τ) : Set (Fin n → K)) = ⊤ := by
-          rw [colLat, Submodule.span_span_of_tower]
-          change Submodule.span K (Set.range ((B τ : GL (Fin n) K) : Matrix (Fin n) (Fin n) K).col)
-            = ⊤
-          rw [← Matrix.range_mulVecLin]
-          exact LinearMap.range_eq_top.mpr (Matrix.mulVec_surjective_iff_isUnit.mpr (B τ).isUnit)
-        refine { toIsLattice := hM τ, span_eq_top := ?_ }
-        rw [eq_top_iff, ← hcol, Submodule.span_le]
-        intro x hx
-        apply Submodule.span_le_restrictScalars (GlobalTheory.LatBasisAt.locRing w) K _
-        rw [← GlobalTheory.LatBasisAt.mem_localization_iff_mem_span, hB τ,
-          GlobalTheory.LatBasisAt.mem_localization_iff_mem_span]
-        exact Submodule.subset_span hx
     exact ⟨
       locP_transLat lam _ (GlobalTheory.StdLatSpan.std_fg_span K ι n lam).2.2.1 M hMfull
         (fun w B B' => GlobalTheory.T.nabIndep_and_delIndep_local_conditions.1 K ι n lam w M B B')

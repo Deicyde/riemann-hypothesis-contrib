@@ -1,6 +1,41 @@
 module
 
 public import Development.AbelianVarietyTheory.Definitions.Divisors.ActAtApply
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -9,13 +44,10 @@ open Formalism.BasicNotions.TH GlobalTheory.FockAlg GlobalTheory.RealLift Global
 
 namespace GlobalTheory.HoweR.TensQuad
 
-variable
-  {T : Type} [Fintype T] [DecidableEq T]
-  {V : T → Type} [∀ w, AddCommGroup (V w)] [∀ w, Module ℂ (V w)]
+variable {T : Type} [Fintype T] [DecidableEq T] {V : T → Type} [∀ w, AddCommGroup (V w)] [∀ w, Module ℂ (V w)]
 
-theorem atPl_tprod (w : T) (L : Module.End ℂ (V w)) (f : ∀ i, V i)
-    : atPl w L (PiTensorProduct.tprod ℂ f)
-      = PiTensorProduct.tprod ℂ (Function.update f w (L (f w))) := by
+theorem atPl_tprod (w : T) (L : Module.End ℂ (V w)) (f : ∀ i, V i) :
+    atPl w L (PiTensorProduct.tprod ℂ f) = PiTensorProduct.tprod ℂ (Function.update f w (L (f w))) := by
   rw [atPl, PiTensorProduct.map_tprod]
   congr 1
   funext i
@@ -28,8 +60,7 @@ noncomputable def atPlLin (w : T) : Module.End ℂ (V w) →ₗ[ℂ] Module.End 
 
 theorem atPlLin_apply (w : T) (L : Module.End ℂ (V w)) : atPlLin w L = atPl w L := rfl
 
-theorem atPl_mul (w : T) (L₁ L₂ : Module.End ℂ (V w))
-    : atPl w (L₁ * L₂) = atPl w L₁ * atPl w L₂ := by
+theorem atPl_mul (w : T) (L₁ L₂ : Module.End ℂ (V w)) : atPl w (L₁ * L₂) = atPl w L₁ * atPl w L₂ := by
   apply PiTensorProduct.ext
   apply MultilinearMap.ext
   intro f
@@ -41,19 +72,14 @@ theorem atPl_one (w : T) : atPl w (1 : Module.End ℂ (V w)) = 1 := by
   intro f
   simp [atPl_tprod]
 
-theorem qop_atPl
-    {ι : Type} [Fintype ι] [DecidableEq ι]
-    (w : T) (F : ι → ι → Module.End ℂ (V w))
-    (α β : ℂ) (i j : ι)
-    : qop (fun a b => atPl w (F a b)) α β i j = atPl w (qop F α β i j) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [qop, ← atPlLin_apply, map_sub, map_sum, map_smul, apply_ite (atPlLin w), map_zero]
+theorem qop_atPl {ι : Type} [Fintype ι] [DecidableEq ι] (w : T) (F : ι → ι → Module.End ℂ (V w)) (α β : ℂ) (i j : ι) :
+    qop (fun a b => atPl w (F a b)) α β i j = atPl w (qop F α β i j) := by
+
+  simp only [qop, ← atPlLin_apply, map_sub, map_sum, map_smul, apply_ite (atPlLin w), map_zero]
   simp only [atPlLin_apply, atPl_mul, atPl_one]
 
-theorem mem_of_atPl
-    (C : ∀ w, Submodule ℂ (V w)) (w : T) (L : Module.End ℂ (V w)) (hL : ∀ x, L x ∈ C w)
-    (v : ⨂[ℂ] i, V i)
-    : atPl w L v ∈ tensAny C := by
+theorem mem_of_atPl (C : ∀ w, Submodule ℂ (V w)) (w : T) (L : Module.End ℂ (V w)) (hL : ∀ x, L x ∈ C w)
+    (v : ⨂[ℂ] i, V i) : atPl w L v ∈ tensAny C := by
   induction v using PiTensorProduct.induction_on with
   | smul_tprod r f =>
     rw [map_smul, atPl_tprod]
@@ -65,12 +91,7 @@ theorem mem_of_atPl
 end GlobalTheory.HoweR.TensQuad
 
 open GlobalTheory.HoweR.TensQuad in
-theorem GlobalTheory.HoweR.quadMod_actAt
-    : ∀ (T : Type) [Fintype T] [DecidableEq T] (V : T → Type) [∀ w, AddCommGroup (V w)]
-        [∀ w, Module ℂ (V w)],
-      ∀ (C : ∀ w, Submodule ℂ (V w)) (w : T) (p q : ℕ) (a : Mat p q →ₗ[ℂ] Module.End ℂ (V w))
-          (α β α' β' : ℂ),
-        QuadMod a α β α' β' (C w) ⊤ → QuadMod (actAt w a) α β α' β' (tensAny C) ⊤ := by
+theorem GlobalTheory.HoweR.quadMod_actAt : ∀ (T : Type) [Fintype T] [DecidableEq T] (V : T → Type) [∀ w, AddCommGroup (V w)] [∀ w, Module ℂ (V w)], ∀ (C : ∀ w, Submodule ℂ (V w)) (w : T) (p q : ℕ) (a : Mat p q →ₗ[ℂ] Module.End ℂ (V w)) (α β α' β' : ℂ), QuadMod a α β α' β' (C w) ⊤ → QuadMod (actAt w a) α β α' β' (tensAny C) ⊤ := by
   intro T _ _ V _ _ C w p q a α β α' β' h i j v _
   have hu : units (actAt w a) = fun i j => atPl w (units a i j) := rfl
   have hn : negT (units (actAt w a)) = fun i j => atPl w (negT (units a) i j) := by

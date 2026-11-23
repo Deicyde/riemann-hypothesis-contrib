@@ -1,55 +1,82 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.TrivIsCr
-public import Formalism.SharpRestriction.LevelLetterCocycles.LocCoh
-public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.TwistStep
-public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.AcrisTorsionFreeComplete
-public import Development.AbelianVarietyTheory.PublishedTheorems.AutomorphicForms₂.DeRhamPotSemistable
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsDiscMaps
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.GaloisActionExtendsToAinfDiscRings
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.AinfDvdOfClosedDiscDvdEisensteinPowStatement
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.BreuilKisinDiscExistsConstAddXMulStatement
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsDiscMaps
+import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.GaloisActionExtendsToAinfDiscRings
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.LocalPrimeGaloisActionPeriodT
+import Development.AbelianVarietyTheory.Definitions.GaloisGeometry.PolyApproxZeroPadic
+import Formalism.SharpRestriction.LevelLetterCocycles.LocCoh
 
 @[expose] public section
 
-open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc
-  Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N TensorProduct PowerSeries
-  GlobalTheory.Prism GlobalTheory.BKReal GlobalTheory.Per GlobalTheory.BSP GlobalTheory.MemLoc
-  GlobalTheory.Pst GlobalTheory.BKLim GlobalTheory.Cong Matrix
+open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N TensorProduct PowerSeries GlobalTheory.Prism GlobalTheory.BKReal GlobalTheory.Per GlobalTheory.BSP GlobalTheory.MemLoc GlobalTheory.Pst GlobalTheory.BKLim GlobalTheory.Cong Matrix
 open scoped Formalism.Per NNReal
 
 namespace GlobalTheory.BKLim.CrPer
 
 variable {l : ℕ} [Fact l.Prime] {K : FinExt l}
 
-theorem eq_const_add_X_mul
-    (bk : BK K) (ρ : ℝ≥0) (h0 : 0 < ρ) (h1 : ρ < 1) (κ : Disc l (0 : Wq l bk.a) 1 →+* bk.DS ρ)
-    (hκ : IsDiscMap (l := _) (u := _) (ρ := _) (C : Wq l bk.a →+* bk.S) κ) (x : bk.DS ρ)
-    : ∃ (c : Disc l (0 : Wq l bk.a) 1) (x₁ : bk.DS ρ), x = κ c + toDisc l (X : bk.S) ρ X * x₁ :=
+theorem eq_const_add_X_mul (bk : BK K) (ρ : ℝ≥0) (h0 : 0 < ρ) (h1 : ρ < 1)
+    (κ : Disc l (0 : Wq l bk.a) 1 →+* bk.DS ρ) (hκ : IsDiscMap (l := _) (u := _) (ρ := _) (C : Wq l bk.a →+* bk.S) κ) (x : bk.DS ρ) :
+    ∃ (c : Disc l (0 : Wq l bk.a) 1) (x₁ : bk.DS ρ), x = κ c + toDisc l (X : bk.S) ρ X * x₁ :=
   GlobalTheory.T.breuilKisinDisc_exists_const_add_X_mul l K bk ρ h0 h1 κ hκ x
 
-theorem isDiscMap_comp
-    {A A' A'' : Type} [CommRing A] [CommRing A'] [CommRing A'']
-    {u : A} {u' : A'} {u'' : A''} {ρ ρ' ρ'' : ℝ≥0} {f : A →+* A'} {f' : A' →+* A''}
-    {F : Disc l u ρ →+* Disc l u' ρ'} {F' : Disc l u' ρ' →+* Disc l u'' ρ''}
-    (hF : IsDiscMap (l := _) (u := _) (ρ := _) f F)
-    (hF' : IsDiscMap (l := _) (u := _) (ρ := _) f' F')
-    : IsDiscMap (l := _) (u := _) (ρ := _) (f'.comp f) (F'.comp F) :=
+theorem isDiscMap_comp {A A' A'' : Type} [CommRing A] [CommRing A'] [CommRing A''] {u : A} {u' : A'} {u'' : A''}
+    {ρ ρ' ρ'' : ℝ≥0} {f : A →+* A'} {f' : A' →+* A''} {F : Disc l u ρ →+* Disc l u' ρ'}
+    {F' : Disc l u' ρ' →+* Disc l u'' ρ''} (hF : IsDiscMap (l := _) (u := _) (ρ := _) f F) (hF' : IsDiscMap (l := _) (u := _) (ρ := _) f' F') :
+    IsDiscMap (l := _) (u := _) (ρ := _) (f'.comp f) (F'.comp F) :=
   ⟨fun a => by simp [hF.ext, hF'.ext], fun x => (hF'.norm_le _).trans (hF.norm_le x)⟩
 
-theorem dvd_gal_sub
-    (bk : BK K) (g : ↥(GK K)) (G : bk.DA bk.ρ₀ →+* bk.DA bk.ρ₀)
-    (hG : IsDiscMap (l := _) (u := _) (ρ := _) (Per.σA (g : GQ l)) G)
-    (i : bk.DS bk.ρ₀ →+* bk.DA bk.ρ₀) (hi : IsDiscMap (l := _) (u := _) (ρ := _) bk.ev i)
-    (x : bk.DS bk.ρ₀)
-    : bk.iS X ∣ G (i x) - i x := by
+theorem dvd_gal_sub (bk : BK K) (g : ↥(GK K)) (G : bk.DA bk.ρ₀ →+* bk.DA bk.ρ₀) (hG : IsDiscMap (l := _) (u := _) (ρ := _) (Per.σA (g : GQ l)) G)
+    (i : bk.DS bk.ρ₀ →+* bk.DA bk.ρ₀) (hi : IsDiscMap (l := _) (u := _) (ρ := _) bk.ev i) (x : bk.DS bk.ρ₀) :
+    bk.iS X ∣ G (i x) - i x := by
   obtain ⟨hmap, -, -, hρ0, hρ1, -⟩ := GlobalTheory.BSP.exists_discMaps l K bk
   obtain ⟨κ, hκ⟩ := hmap (Wq l bk.a) bk.S C 0 X 1 bk.ρ₀ 0 hρ0 (by simp) (by simp)
   obtain ⟨c, x₁, rfl⟩ := eq_const_add_X_mul bk bk.ρ₀ hρ0 hρ1 κ hκ x
   have hc : G (i (κ c)) = i (κ c) := by
-    have h1 : IsDiscMap (l := _) (u := _) (ρ := _) ((Per.σA (g : GQ l)).comp (bk.ev.comp C))
-        ((G.comp i).comp κ) :=
+    have h1 : IsDiscMap (l := _) (u := _) (ρ := _) ((Per.σA (g : GQ l)).comp (bk.ev.comp C)) ((G.comp i).comp κ) :=
       isDiscMap_comp hκ (isDiscMap_comp hi hG)
     have h2 : IsDiscMap (l := _) (u := _) (ρ := _) (bk.ev.comp C) (i.comp κ) := isDiscMap_comp hκ hi
     have e : (Per.σA (g : GQ l)).comp (bk.ev.comp C) = bk.ev.comp C :=
@@ -60,32 +87,15 @@ theorem dvd_gal_sub
   have hX : i (toDisc l (X : bk.S) bk.ρ₀ X) = bk.iS X := hi.ext X
   have hGX : G (bk.iS X) = bk.iS X * bk.iA w := by
     show G (toDisc l (bk.ev X) bk.ρ₀ (bk.ev X)) = _
-    rw [hG.ext, hw, map_mul]
-    rfl
+    rw [hG.ext, hw, map_mul]; rfl
   rw [map_add i, map_mul i, hX, map_add G, map_mul G, hc, hGX]
   exact ⟨bk.iA w * G (i x₁) - i x₁, by ring⟩
 
 end GlobalTheory.BKLim.CrPer
 
+
 open GlobalTheory.BKLim.CrPer in
-theorem GlobalTheory.BKLim.Frame.isCr_of_wSeed
-    : ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l) (bk : BK K) (τ : Ainf l),
-      bk.IsPer τ
-        → ∀ (d : ℕ) (ρ : ↥(GK K) → Matrix (Fin d) (Fin d) (ℤ_[l])),
-          (∀ g, IsUnit (ρ g))
-            → ∀ (s : WSeed bk d ρ τ) (N : ℕ) (F : Frame bk N d ρ)
-                (Y : Matrix (Fin d) (Fin d) (Ainf l)) (Z : Matrix (Fin d) (Fin d) (bk.DS bk.ρ₀)),
-              Y.map (inclW l) = inclW l τ ^ s.N • F.T → IsUnit Z
-                → (∀ i : bk.DS bk.ρ₀ →+* bk.DA bk.ρ₀,
-                  IsDiscMap (l := _) (u := _) (ρ := _) bk.ev i → s.W * Z.map i = Y.map bk.iA)
-                → (∀ (g : ↥(GK K)) (G : bk.DA bk.ρ₀ →+* bk.DA bk.ρ₀)
-                    (i : bk.DS bk.ρ₀ →+* bk.DA bk.ρ₀),
-                  IsDiscMap (l := _) (u := _) (ρ := _) (Per.σA (g : GQ l)) G
-                    → IsDiscMap (l := _) (u := _) (ρ := _) bk.ev i
-                    → G (bk.iS bk.E) ^ s.N • (s.X.map bk.iS * Z.map i * (F.ε g).map bk.iA)
-                      = bk.iS bk.E ^ s.N • (s.κ g * (s.X.map bk.iS * Z.map i).map G))
-                → (∀ g, s.κ g = 1)
-                → F.IsCr := by
+theorem GlobalTheory.BKLim.Frame.isCr_of_wSeed : ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l) (bk : BK K) (τ : Ainf l), bk.IsPer τ → ∀ (d : ℕ) (ρ : ↥(GK K) → Matrix (Fin d) (Fin d) (ℤ_[l])), (∀ g, IsUnit (ρ g)) → ∀ (s : WSeed bk d ρ τ) (N : ℕ) (F : Frame bk N d ρ) (Y : Matrix (Fin d) (Fin d) (Ainf l)) (Z : Matrix (Fin d) (Fin d) (bk.DS bk.ρ₀)), Y.map (inclW l) = inclW l τ ^ s.N • F.T → IsUnit Z → (∀ i : bk.DS bk.ρ₀ →+* bk.DA bk.ρ₀, IsDiscMap (l := _) (u := _) (ρ := _) bk.ev i → s.W * Z.map i = Y.map bk.iA) → (∀ (g : ↥(GK K)) (G : bk.DA bk.ρ₀ →+* bk.DA bk.ρ₀) (i : bk.DS bk.ρ₀ →+* bk.DA bk.ρ₀), IsDiscMap (l := _) (u := _) (ρ := _) (Per.σA (g : GQ l)) G → IsDiscMap (l := _) (u := _) (ρ := _) bk.ev i → G (bk.iS bk.E) ^ s.N • (s.X.map bk.iS * Z.map i * (F.ε g).map bk.iA) = bk.iS bk.E ^ s.N • (s.κ g * (s.X.map bk.iS * Z.map i).map G)) → (∀ g, s.κ g = 1) → F.IsCr := by
   intro l _ K bk τ _ d ρ _ s N F Y Z _ hZ _ hG hκ g i j
   obtain ⟨hmap, hgal, -, hρ0, -, -⟩ := GlobalTheory.BSP.exists_discMaps l K bk
   obtain ⟨Gm, hGm⟩ := hgal bk.ρ₀ hρ0 (g : GQ l)
@@ -102,21 +112,18 @@ theorem GlobalTheory.BKLim.Frame.isCr_of_wSeed
   have hu0 : q (bk.iS X) = 0 := Ideal.Quotient.eq_zero_iff_mem.2 (Ideal.mem_span_singleton_self _)
   have hE : IsUnit (q (bk.iS bk.E)) := by
     obtain ⟨w, hw⟩ := bk.coeff_zero
-    have e1
-        : bk.E = X * PowerSeries.mk (fun p => coeff (p + 1) bk.E) + C ((l : Wq l bk.a) * w) := by
+    have e1 : bk.E = X * PowerSeries.mk (fun p => coeff (p + 1) bk.E) + C ((l : Wq l bk.a) * w) := by
       conv_lhs => rw [eq_X_mul_shift_add_const bk.E]
       rw [← coeff_zero_eq_constantCoeff_apply, Polynomial.coeff_coe, hw]
     rw [e1]
     simp only [map_add (f := _), map_mul, map_natCast, hu0, zero_mul, zero_add]
     exact (hl.map q).mul ((w.isUnit.map (C : Wq l bk.a →+* bk.S)).map (q.comp bk.iS))
-  have hsm
-      : ∀ (c : bk.DA bk.ρ₀) (M : Matrix (Fin d) (Fin d) (bk.DA bk.ρ₀)),
-        (c • M).map q = q c • M.map q := fun c M => by
-    ext a b; simp
+  have hsm : ∀ (c : bk.DA bk.ρ₀) (M : Matrix (Fin d) (Fin d) (bk.DA bk.ρ₀)), (c • M).map q = q c • M.map q :=
+    fun c M => by ext a b; simp
   set P := s.X.map bk.iS * Z.map im with hPdef
   have hPG : (P.map Gm).map q = P.map q := by
     ext a b
-    set_option synthInstance.maxHeartbeats 100000 in
+
     simp only [hPdef, Matrix.map_apply, Matrix.mul_apply, map_sum, map_mul, hq, hqS]
   have hPu : IsUnit (P.map q) := by
     rw [hPdef, Matrix.map_mul]
@@ -145,5 +152,4 @@ theorem GlobalTheory.BKLim.Frame.isCr_of_wSeed
     have h := congrFun (congrFun k3 i) j
     simp only [Matrix.map_apply, Matrix.sub_apply, Matrix.one_apply] at h ⊢
     split_ifs at h ⊢ <;> simp [h]
-  exact (GlobalTheory.T.ainf_dvd_of_closed_disc_dvd_eisenstein_pow l K bk _).2
-    (Ideal.mem_span_singleton.1 (Ideal.Quotient.eq_zero_iff_mem.1 k5))
+  exact (GlobalTheory.T.ainf_dvd_of_closed_disc_dvd_eisenstein_pow l K bk _).2 (Ideal.mem_span_singleton.1 (Ideal.Quotient.eq_zero_iff_mem.1 k5))

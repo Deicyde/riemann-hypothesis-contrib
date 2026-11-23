@@ -1,14 +1,50 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.Statements.PlaceShiftStatements.NormSmall
-public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.RatInOfUnit
-public import Development.AbelianVarietyTheory.BlockTheory.DivisorBase.WeilTensorModels
-public import Development.AbelianVarietyTheory.Definitions.Divisors.DiscreteSeriesHermitianUnique
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.NegIdxOfIsStd
-public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.IdempotentMulCutSubOneEntry
-public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.FirstStandardPairMemberHasThetaFunction
+public import Development.AbelianVarietyTheory.BlockTheory.TwistedDiscreteSeries.UnitCharTriangle
+public import Development.AbelianVarietyTheory.Proofs.AdelicLatticeProofs.ContinuousCharacterFiniteOrderIntegralUnits
+public import Development.AbelianVarietyTheory.Proofs.HeightProofs.EmbeddingXiZeroNeZero
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsNsmulIntMemLatO
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.GramMapMulInv
+public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.FirstStandardPairMemberHasThetaFunction
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Development.AbelianVarietyTheory.Definitions.Divisors.CmHostImaginaryGeneratorNeZero
+import Development.AbelianVarietyTheory.Definitions.Divisors.FinitePrimesUnder
+import Development.AbelianVarietyTheory.Definitions.Divisors.FlatTensorVacuum
+import Development.AbelianVarietyTheory.Definitions.TwistedInnerProducts.ExistsMatchOver
+public import Development.AbelianVarietyTheory.Proofs.AdelicLatticeProofs.IsSelfDualCLatFrame
 
 @[expose] public section
 
@@ -45,7 +81,6 @@ private theorem rightBlock_shift
   · exact h _ _
   · rw [mul_zero, add_zero]
 
-set_option maxHeartbeats 1000000 in
 private theorem stdSnd_shift
     {ν : (AE D)ˣ →* Circle} {e : AE D} {S : Finset (Pl D.host.E)} (he : IsIdemSum e S)
     {I : Ideal (𝓞 D.host.E)} {n₀ n c : ℕ} (hn₀ : ((n₀ : ℕ) : 𝓞 D.host.E) ∈ I)
@@ -117,7 +152,6 @@ private theorem inv_aux {R : Type} [CommRing R] (k : ℕ) {x x' : R} (h : x' * x
   simp only [nsmul_eq_mul]
   linear_combination (-(k : R) * y) * h
 
-set_option maxHeartbeats 1000000 in
 private theorem dualCoord_up
     (A WW : HSp D) (βA : GL (Fin A.rank) (EAf D)) (βW : GL (Fin WW.rank) (EAf D))
     : ∃ k : ℕ,
@@ -129,7 +163,6 @@ private theorem dualCoord_up
   rw [mul_nsmul_mul_eq_nsmul_mul_nsmul]
   exact mul_mem hx (h x hi i j)
 
-set_option maxHeartbeats 1000000 in
 private theorem dualCoord_down
     (A WW : HSp D) (βA : GL (Fin A.rank) (EAf D)) (βW : GL (Fin WW.rank) (EAf D))
     : ∃ k : ℕ,
@@ -149,7 +182,6 @@ private theorem dualCoord_down
   rw [inv_aux d h1]
   exact mul_mem hx (hi i j)
 
-set_option maxHeartbeats 1000000 in
 private theorem stdSnd_isSB
     {ν : (AE D)ˣ →* Circle} (hν : Continuous ν)
     {e : AE D} {S : Finset (Pl D.host.E)} (he : IsIdemSum e S)
@@ -193,7 +225,6 @@ private theorem stdSnd_isSB
     rw [show (n₀ * (n * c)) * (K * M) = ((n₀ * (n * c)) * M) * K by ring, mul_smul]
     exact nsmul_mem (hC t h.1 h.2) _
 
-set_option maxHeartbeats 1000000 in
 private theorem main
     (ν : (AE D)ˣ →* Circle) (hν : Continuous ν)
     (e : AE D) (S : Finset (Pl D.host.E)) (he : IsIdemSum e S)

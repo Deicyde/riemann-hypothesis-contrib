@@ -1,7 +1,47 @@
 module
 
-public import Mathlib
 public import GroundTheory.ArithmeticGeometry.SchemeCohomology.ProperCohomology.HasFiniteBiproductsModules
+import GroundTheory.ArithmeticGeometry.SchemeCohomology.ProperCohomology.CokernelCoherent
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Lemma
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.TypeStar
 
 @[expose] public section
 
@@ -85,9 +125,9 @@ lemma exists_idealSumMap_smulHom (J₁ J₂ : Ideal A) (a : A)
     ?_⟩
   apply biproduct.hom_ext'
   intro i
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [idealSumMap, biproduct.ι_desc_assoc, biproduct.lift_desc, smulHom_comp_smulHom,
-    ← map_mul, ← smulHom_sum, ← map_sum]
+
+  simp only [idealSumMap, biproduct.ι_desc_assoc, biproduct.lift_desc, smulHom_comp_smulHom,
+  ← map_mul, ← smulHom_sum, ← map_sum]
   rw [hc i, mul_comm]
 
 end Generators
@@ -175,8 +215,8 @@ theorem range_idealPowι_app {V : X.Opens} (hV : IsAffineOpen V) (n : ℕ)
           (biproduct.π (fun _ : Fin (idealGenNum (I ^ n)) => F) k).app V p)
           = _
       conv_rhs => rw [biproduct_app_eq_sum _ V p]
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum]
+
+      rw [map_sum]
       refine Finset.sum_congr rfl fun k _ => ?_
       rw [← ConcreteCategory.comp_apply, ← Scheme.Modules.Hom.comp_app, idealSumMap,
         biproduct.ι_desc, smulHom_app_apply]
@@ -184,8 +224,8 @@ theorem range_idealPowι_app {V : X.Opens} (hV : IsAffineOpen V) (n : ℕ)
     · rintro ⟨x, rfl⟩
       refine ⟨∑ k, (biproduct.ι (fun _ : Fin (idealGenNum (I ^ n)) => F) k).app V (x k), ?_⟩
       change _ = ∑ k, toFunctions V (g k) • x k
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum]
+
+      rw [map_sum]
       refine Finset.sum_congr rfl fun k _ => ?_
       rw [← ConcreteCategory.comp_apply, ← Scheme.Modules.Hom.comp_app, idealSumMap,
         biproduct.ι_desc, smulHom_app_apply]

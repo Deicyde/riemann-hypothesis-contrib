@@ -1,8 +1,45 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.Definitions.Divisors.IsUnimodMod
+public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.SumMulEqZeroOfSumToReal
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsSmulEqSumVecMulVecSpanningFamily
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Lemma
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Development.AbelianVarietyTheory.Definitions.Divisors.IsUnimodMod
 
 @[expose] public section
 
@@ -75,24 +112,24 @@ lemma quadR_nonneg {r : ℕ} (L : Matrix (Fin r) (Fin r) ℤ)
   rw [hdense.closure_range] at this
   exact this (Set.mem_univ x)
 
-theorem posDef_of_pos_int
-    {r : ℕ}
-    (L : Matrix (Fin r) (Fin r) ℤ) (hs : Lᵀ = L) (hp : ∀ v : Fin r → ℤ, v ≠ 0 → 0 < v ⬝ᵥ L *ᵥ v)
-    : (L.map (Int.cast : ℤ → ℝ)).PosDef := by
+theorem posDef_of_pos_int {r : ℕ} (L : Matrix (Fin r) (Fin r) ℤ) (hs : Lᵀ = L)
+    (hp : ∀ v : Fin r → ℤ, v ≠ 0 → 0 < v ⬝ᵥ L *ᵥ v) :
+    (L.map (Int.cast : ℤ → ℝ)).PosDef := by
   have hH : (L.map (Int.cast : ℤ → ℝ)).IsHermitian := by
     ext i j
     have := congrFun (congrFun hs j) i
     simp only [Matrix.transpose_apply] at this
     simp [Matrix.conjTranspose_apply, this]
   have hPSD : (L.map (Int.cast : ℤ → ℝ)).PosSemidef :=
-    Matrix.PosSemidef.of_dotProduct_mulVec_nonneg hH
-      (fun x => by rw [quadR_eq]; exact quadR_nonneg L hp x)
+    Matrix.PosSemidef.of_dotProduct_mulVec_nonneg hH (fun x => by
+      rw [quadR_eq]; exact quadR_nonneg L hp x)
   refine Matrix.PosDef.of_dotProduct_mulVec_pos hH (fun x hx => ?_)
   rw [quadR_eq]
   refine lt_of_le_of_ne (quadR_nonneg L hp x) (fun h0 => ?_)
   have hz : (L.map (Int.cast : ℤ → ℝ)) *ᵥ x = 0 := by
     rw [← hPSD.dotProduct_mulVec_zero_iff, quadR_eq]; exact h0.symm
-  have hdetR : (L.map (Int.cast : ℤ → ℝ)).det = 0 := Matrix.exists_mulVec_eq_zero_iff.mp ⟨x, hx, hz⟩
+  have hdetR : (L.map (Int.cast : ℤ → ℝ)).det = 0 :=
+    Matrix.exists_mulVec_eq_zero_iff.mp ⟨x, hx, hz⟩
   have hdet : L.det = 0 := by
     have := (Int.castRingHom ℝ).map_det L
     rw [RingHom.mapMatrix_apply] at this
@@ -110,14 +147,7 @@ namespace GlobalTheory.Poinc.SumSqFunctional
 
 open Matrix
 
-theorem sumsq_functional
-    : ∀ (X : Type) [AddCommGroup X] [Module.Free ℤ X] [Module.Finite ℤ X]
-        (lam : LinearMap.BilinForm ℤ X →ₗ[ℤ] ℤ),
-      (∀ l : X →ₗ[ℤ] ℤ, l ≠ 0 → 0 < lam (GlobalTheory.PolFan.sqForm l))
-        → ∃ (D m : ℕ) (a : Fin m → X),
-          1 ≤ D ∧ Submodule.span ℤ (Set.range a) = ⊤
-            ∧ ∀ β : LinearMap.BilinForm ℤ X,
-              (∀ x y, β x y = β y x) → ∑ i, β (a i) (a i) = (D : ℤ) * lam β := by
+theorem sumsq_functional : ∀ (X : Type) [AddCommGroup X] [Module.Free ℤ X] [Module.Finite ℤ X] (lam : LinearMap.BilinForm ℤ X →ₗ[ℤ] ℤ), (∀ l : X →ₗ[ℤ] ℤ, l ≠ 0 → 0 < lam (GlobalTheory.PolFan.sqForm l)) → ∃ (D m : ℕ) (a : Fin m → X), 1 ≤ D ∧ Submodule.span ℤ (Set.range a) = ⊤ ∧ ∀ β : LinearMap.BilinForm ℤ X, (∀ x y, β x y = β y x) → ∑ i, β (a i) (a i) = (D : ℤ) * lam β := by
   intro X _ _ _ lam hpos
   let b : Module.Basis (Fin (Fintype.card (Module.Free.ChooseBasisIndex ℤ X))) ℤ X :=
     (Module.Free.chooseBasis ℤ X).reindex (Fintype.equivFin _)
@@ -128,30 +158,25 @@ theorem sumsq_functional
     intro β
     refine b.ext fun k => b.ext fun l => ?_
     simp [C, LinearMap.sum_apply, Finsupp.single_apply]
-  have hbil
-      : ∀ (β : LinearMap.BilinForm ℤ X) (c d : Fin r → ℤ),
-        β (∑ i, c i • b i) (∑ j, d j • b j) = ∑ i, ∑ j, c i * d j * β (b i) (b j) := by
+  have hbil : ∀ (β : LinearMap.BilinForm ℤ X) (c d : Fin r → ℤ),
+      β (∑ i, c i • b i) (∑ j, d j • b j) = ∑ i, ∑ j, c i * d j * β (b i) (b j) := by
     intro β c d
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp [map_sum, map_smul, LinearMap.sum_apply, Finset.mul_sum, mul_comm, mul_left_comm,
-        mul_assoc]
+
+    simp [map_sum, map_smul, LinearMap.sum_apply, Finset.mul_sum, mul_comm, mul_left_comm, mul_assoc]
     rw [Finset.sum_comm]
   let L : Matrix (Fin r) (Fin r) ℤ := Matrix.of fun i j => lam (C i j) + lam (C j i)
-  have hlam
-      : ∀ β : LinearMap.BilinForm ℤ X,
-        (∀ x y, β x y = β y x) → 2 * lam β = ∑ i, ∑ j, L i j * β (b i) (b j) := by
+  have hlam : ∀ β : LinearMap.BilinForm ℤ X, (∀ x y, β x y = β y x) →
+      2 * lam β = ∑ i, ∑ j, L i j * β (b i) (b j) := by
     intro β hβ
     have h1 : lam β = ∑ i, ∑ j, β (b i) (b j) * lam (C i j) := by
       conv_lhs => rw [hexp β]
-      set_option synthInstance.maxHeartbeats 100000 in
+
       simp [map_sum, map_smul]
     have h2 : lam β = ∑ i, ∑ j, β (b i) (b j) * lam (C j i) := by
       rw [h1, Finset.sum_comm]
       refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
       rw [hβ]
-    calc
-      2 * lam β
-        = lam β + lam β := by ring
+    calc 2 * lam β = lam β + lam β := by ring
       _ = _ := by
         nth_rewrite 1 [h1]
         rw [h2]
@@ -159,14 +184,16 @@ theorem sumsq_functional
         refine Finset.sum_congr rfl fun i _ => ?_
         rw [← Finset.sum_add_distrib]
         refine Finset.sum_congr rfl fun j _ => ?_
-        simp only [L, Matrix.of_apply]
-        ring
-  have hs : Lᵀ = L := by ext i j; simp [L, add_comm]
+        simp only [L, Matrix.of_apply]; ring
+  have hs : Lᵀ = L := by
+    ext i j; simp [L, add_comm]
   have hp : ∀ v : Fin r → ℤ, v ≠ 0 → 0 < v ⬝ᵥ L *ᵥ v := by
     intro v hv
     let l : X →ₗ[ℤ] ℤ := ∑ i, v i • b.coord i
-    have hl : ∀ k, l (b k) = v k := by intro k; simp [l, Finsupp.single_apply]
-    have hl0 : l ≠ 0 := by intro h; apply hv; funext k; rw [← hl k, h]; rfl
+    have hl : ∀ k, l (b k) = v k := by
+      intro k; simp [l, Finsupp.single_apply]
+    have hl0 : l ≠ 0 := by
+      intro h; apply hv; funext k; rw [← hl k, h]; rfl
     have hsq : ∀ x y, GlobalTheory.PolFan.sqForm l x y = l x * l y := by
       intro x y; simp [GlobalTheory.PolFan.sqForm]
     have hsym : ∀ x y, GlobalTheory.PolFan.sqForm l x y = GlobalTheory.PolFan.sqForm l y x := by
@@ -176,12 +203,9 @@ theorem sumsq_functional
       rw [h2]
       simp only [hsq, hl, dotProduct, Matrix.mulVec, Finset.mul_sum]
       refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => by ring
-    rw [h3]
-    have := hpos l hl0
-    omega
+    rw [h3]; have := hpos l hl0; omega
   have hPD := posDef_of_pos_int L hs hp
-  obtain ⟨D, m, a', hD, hspan, hsum⟩ :=
-    GlobalTheory.Poinc.SumSq.exists_smul_eq_sum_vecMulVec_span r L hPD
+  obtain ⟨D, m, a', hD, hspan, hsum⟩ := GlobalTheory.Poinc.SumSq.exists_smul_eq_sum_vecMulVec_span r L hPD
   have hentry : ∀ i j, (D : ℤ) * L i j = ∑ k, a' k i * a' k j := by
     intro i j
     have := congrFun (congrFun hsum i) j
@@ -194,8 +218,7 @@ theorem sumsq_functional
   · intro β hβ
     simp only [hbil]
     rw [Finset.sum_comm]
-    have : ∀ i,
-        (∑ y, ∑ x, a' y i * a' y x * β (b i) (b x)) = ∑ j, (D : ℤ) * L i j * β (b i) (b j) := by
+    have : ∀ i, (∑ y, ∑ x, a' y i * a' y x * β (b i) (b x)) = ∑ j, (D : ℤ) * L i j * β (b i) (b j) := by
       intro i
       rw [Finset.sum_comm]
       refine Finset.sum_congr rfl fun j _ => ?_

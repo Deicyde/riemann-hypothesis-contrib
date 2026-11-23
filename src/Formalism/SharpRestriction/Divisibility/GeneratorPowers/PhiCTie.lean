@@ -1,7 +1,43 @@
 module
 
-public import Mathlib
 public import Formalism.SharpRestriction.Divisibility.GeneratorPowers.PhiCSt
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -15,11 +51,8 @@ open NumberField Formalism.MainNotions.ModuliIntegralCharts
 
 section Comparison₂
 
-variable
-  {E : Type} [Field E] [NumberField E]
-  {Y : Type} [AddCommGroup Y] [Module (𝓞 E) Y]
-  {ι : Type} [Fintype ι]
-  (b : Module.Basis ι ℤ Y)
+variable {E : Type} [Field E] [NumberField E] {Y : Type} [AddCommGroup Y] [Module (𝓞 E) Y]
+  {ι : Type} [Fintype ι] (b : Module.Basis ι ℤ Y)
 
 def coordT (x y : Y) : ι × ι → ℤ := fun p => b.repr x p.1 * b.repr y p.2
 
@@ -46,22 +79,20 @@ def evB (B : Y →ₗ[ℤ] Y →ₗ[ℤ] ℝ) : (ι × ι → ℤ) →ₗ[ℤ] �
   map_add' n n' := by simp [add_mul, Finset.sum_add_distrib]
   map_smul' k n := by simp [Finset.mul_sum, mul_assoc]
 
-theorem evB_apply (B : Y →ₗ[ℤ] Y →ₗ[ℤ] ℝ) (n : ι × ι → ℤ)
-    : evB b B n = ∑ p, (n p : ℝ) * B (b p.1) (b p.2) :=
-  rfl
+theorem evB_apply (B : Y →ₗ[ℤ] Y →ₗ[ℤ] ℝ) (n : ι × ι → ℤ) :
+    evB b B n = ∑ p, (n p : ℝ) * B (b p.1) (b p.2) := rfl
 
 theorem evB_coordT (B : Y →ₗ[ℤ] Y →ₗ[ℤ] ℝ) (x y : Y) : evB b B (coordT b x y) = B x y := by
   rw [evB_apply, Fintype.sum_prod_type]
   have hx := b.sum_repr x
   have hy := b.sum_repr y
-  calc
-    _ = ∑ i, ∑ j, ((b.repr x i : ℝ) * (b.repr y j : ℝ)) * B (b i) (b j) := by
-      simp only [coordT, Int.cast_mul]
+  calc _ = ∑ i, ∑ j, ((b.repr x i : ℝ) * (b.repr y j : ℝ)) * B (b i) (b j) := by
+          simp only [coordT, Int.cast_mul]
     _ = B x y := by
       conv_rhs => rw [← hx, ← hy]
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [map_sum, map_zsmul, LinearMap.sum_apply, LinearMap.smul_apply, zsmul_eq_mul,
-          Finset.mul_sum]
+
+      simp only [map_sum, map_zsmul, LinearMap.sum_apply, LinearMap.smul_apply, zsmul_eq_mul,
+      Finset.mul_sum]
       rw [Finset.sum_comm]
       refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
       ring
@@ -69,8 +100,8 @@ theorem evB_coordT (B : Y →ₗ[ℤ] Y →ₗ[ℤ] ℝ) (x y : Y) : evB b B (co
 def annS (cj : E → E) : Submodule ℤ (ι × ι → ℤ) :=
   ⨅ β : SymB cj Y, LinearMap.ker (evB b (β : Y →ₗ[ℤ] Y →ₗ[ℤ] ℝ))
 
-theorem mem_annS (cj : E → E) (n : ι × ι → ℤ)
-    : n ∈ annS b cj ↔ ∀ β : SymB cj Y, evB b (β : Y →ₗ[ℤ] Y →ₗ[ℤ] ℝ) n = 0 := by
+theorem mem_annS (cj : E → E) (n : ι × ι → ℤ) :
+    n ∈ annS b cj ↔ ∀ β : SymB cj Y, evB b (β : Y →ₗ[ℤ] Y →ₗ[ℤ] ℝ) n = 0 := by
   simp only [annS, Submodule.mem_iInf, LinearMap.mem_ker]
 
 theorem noZero_annS (cj : E → E) : NoZeroSMulDivisors ℤ ((ι × ι → ℤ) ⧸ annS b cj) := by
@@ -89,41 +120,31 @@ theorem noZero_annS (cj : E → E) : NoZeroSMulDivisors ℤ ((ι × ι → ℤ) 
   · exact h1
 
 def formOf (f : (ι × ι → ℤ) →ₗ[ℤ] ℤ) : Y →ₗ[ℤ] Y →ₗ[ℤ] ℝ :=
-  LinearMap.mk₂ ℤ
-    (fun x y => ((f (coordT b x y) : ℤ) : ℝ))
+  LinearMap.mk₂ ℤ (fun x y => ((f (coordT b x y) : ℤ) : ℝ))
     (fun x x' y => by simp [coordT_add_left])
     (fun k x y => by rw [coordT_smul_left, map_zsmul]; simp [zsmul_eq_mul])
     (fun x y y' => by simp [coordT_add_right])
     (fun k x y => by rw [coordT_smul_right, map_zsmul]; simp [zsmul_eq_mul])
 
-theorem formOf_apply (f : (ι × ι → ℤ) →ₗ[ℤ] ℤ) (x y : Y)
-    : formOf b f x y = ((f (coordT b x y) : ℤ) : ℝ) :=
-  rfl
+theorem formOf_apply (f : (ι × ι → ℤ) →ₗ[ℤ] ℤ) (x y : Y) :
+    formOf b f x y = ((f (coordT b x y) : ℤ) : ℝ) := rfl
 
-theorem formOf_mem (cj : E → E) (f : ((ι × ι → ℤ) ⧸ annS b cj) →ₗ[ℤ] ℤ)
-    : formOf b (f ∘ₗ (annS b cj).mkQ) ∈ SymB cj Y := by
-  have key
-      : ∀ x y x' y' : Y,
-        (∀ β : SymB cj Y, (β : Y →ₗ[ℤ] Y →ₗ[ℤ] ℝ) x y = (β : Y →ₗ[ℤ] Y →ₗ[ℤ] ℝ) x' y')
-          → formOf b (f ∘ₗ (annS b cj).mkQ) x y = formOf b (f ∘ₗ (annS b cj).mkQ) x' y' := by
+theorem formOf_mem (cj : E → E) (f : ((ι × ι → ℤ) ⧸ annS b cj) →ₗ[ℤ] ℤ) :
+    formOf b (f ∘ₗ (annS b cj).mkQ) ∈ SymB cj Y := by
+  have key : ∀ x y x' y' : Y, (∀ β : SymB cj Y, (β : Y →ₗ[ℤ] Y →ₗ[ℤ] ℝ) x y =
+      (β : Y →ₗ[ℤ] Y →ₗ[ℤ] ℝ) x' y') →
+      formOf b (f ∘ₗ (annS b cj).mkQ) x y = formOf b (f ∘ₗ (annS b cj).mkQ) x' y' := by
     intro x y x' y' h
     rw [formOf_apply, formOf_apply, LinearMap.comp_apply, LinearMap.comp_apply]
     congr 2
     rw [Submodule.mkQ_apply, Submodule.mkQ_apply, Submodule.Quotient.eq, mem_annS]
     intro β
     rw [map_sub, evB_coordT, evB_coordT, h β, sub_self]
-  have mem
-      : ∀ β : SymB cj Y,
-        (∀ a d : Y, (β : Y →ₗ[ℤ] Y →ₗ[ℤ] ℝ) a d = (β : Y →ₗ[ℤ] Y →ₗ[ℤ] ℝ) d a)
-          ∧ ∀ (c c' : 𝓞 E),
-            (c' : E) = cj c
-              → ∀ (a d : Y),
-                (β : Y →ₗ[ℤ] Y →ₗ[ℤ] ℝ) (c • a) d = (β : Y →ₗ[ℤ] Y →ₗ[ℤ] ℝ) a (c' • d) := fun β =>
-    β.2
-  refine ⟨
-    fun a d => key a d d a fun β => (mem β).1 a d,
-    fun c c' hc a d => key _ _ _ _ fun β => (mem β).2 c c' hc a d
-  ⟩
+  have mem : ∀ β : SymB cj Y, (∀ a d : Y, (β : Y →ₗ[ℤ] Y →ₗ[ℤ] ℝ) a d = (β : Y →ₗ[ℤ] Y →ₗ[ℤ] ℝ) d a) ∧
+      ∀ (c c' : 𝓞 E), (c' : E) = cj c → ∀ (a d : Y),
+        (β : Y →ₗ[ℤ] Y →ₗ[ℤ] ℝ) (c • a) d = (β : Y →ₗ[ℤ] Y →ₗ[ℤ] ℝ) a (c' • d) := fun β => β.2
+  refine ⟨fun a d => key a d d a fun β => (mem β).1 a d,
+    fun c c' hc a d => key _ _ _ _ fun β => (mem β).2 c c' hc a d⟩
 
 end Comparison₂
 
@@ -141,17 +162,11 @@ theorem phiCTie_holds : PhiCTieStatement := by
     hl (βk k) (fun x y => ⟨_, formOf_apply b _ x y⟩)
   choose z hz using hint
   obtain ⟨n, hn⟩ := Submodule.Quotient.mk_surjective A (∑ k, z k • eb k)
-  let e :=
-    (Fintype.equivFin (Module.Free.ChooseBasisIndex ℤ Y × Module.Free.ChooseBasisIndex ℤ Y)).symm
-  refine ⟨
-    Fintype.card (Module.Free.ChooseBasisIndex ℤ Y × Module.Free.ChooseBasisIndex ℤ Y),
-    fun t => n (e t) • b (e t).1,
-    fun t => b (e t).2,
-    fun β => ?_
-  ⟩
-  have hR
-      : ∑ t, (β : Y →ₗ[ℤ] Y →ₗ[ℤ] ℝ) (n (e t) • b (e t).1) (b (e t).2)
-        = evB b (β : Y →ₗ[ℤ] Y →ₗ[ℤ] ℝ) n := by
+  let e := (Fintype.equivFin (Module.Free.ChooseBasisIndex ℤ Y × Module.Free.ChooseBasisIndex ℤ Y)).symm
+  refine ⟨Fintype.card (Module.Free.ChooseBasisIndex ℤ Y × Module.Free.ChooseBasisIndex ℤ Y),
+    fun t => n (e t) • b (e t).1, fun t => b (e t).2, fun β => ?_⟩
+  have hR : ∑ t, (β : Y →ₗ[ℤ] Y →ₗ[ℤ] ℝ) (n (e t) • b (e t).1) (b (e t).2) =
+      evB b (β : Y →ₗ[ℤ] Y →ₗ[ℤ] ℝ) n := by
     rw [e.sum_comp (fun p => (β : Y →ₗ[ℤ] Y →ₗ[ℤ] ℝ) (n p • b p.1) (b p.2)), evB_apply]
     simp [zsmul_eq_mul]
   rw [hR]
@@ -168,21 +183,19 @@ theorem phiCTie_holds : PhiCTieStatement := by
       Submodule.mkQ_apply, Module.Basis.coord_apply, smul_eq_mul]
     rw [← evB_coordT b (β : Y →ₗ[ℤ] Y →ₗ[ℤ] ℝ) x y, ← hψ]
     conv_lhs => rw [← eb.sum_repr (Submodule.Quotient.mk (coordT b x y))]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     refine Finset.sum_congr rfl fun k _ => ?_
     rw [map_zsmul, zsmul_eq_mul, mul_comm]
-  calc
-    l β
-      = l (∑ k, ψ (eb k) • βk k) := congrArg l hβ
+  calc l β = l (∑ k, ψ (eb k) • βk k) := congrArg l hβ
     _ = ∑ k, ψ (eb k) * (z k : ℝ) := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum]
+
+      rw [map_sum]
       refine Finset.sum_congr rfl fun k _ => ?_
       rw [map_smul, hz, smul_eq_mul]
     _ = evB b (β : Y →ₗ[ℤ] Y →ₗ[ℤ] ℝ) n := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [← hψ, hn, map_sum]
+
+      rw [← hψ, hn, map_sum]
       refine Finset.sum_congr rfl fun k _ => ?_
       rw [map_zsmul, zsmul_eq_mul, mul_comm]
 

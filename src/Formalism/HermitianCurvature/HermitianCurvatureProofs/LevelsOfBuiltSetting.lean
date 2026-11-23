@@ -1,11 +1,60 @@
 module
 
 public import Formalism.HermitianCurvature.StatementJCT
+public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.LevelTransfer.LzOutRight
 public import Formalism.HermitianCurvature.HermitianCurvatureProofs.InvariantOperatorUnderJacquet
 public import Formalism.HermitianCurvature.HermitianCurvatureProofs.QNFAsm
-public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.LevelTransfer.SecondCapelliMinorLevel
-public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.LevelLiftBasics.LevelGroupUnitaryHermitian
-public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.LevelImageArithmetic.GlevImageOf
+import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.LevelImageArithmetic.GlevImageOf
+import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.LevelLiftBasics.LevelGroupUnitaryHermitian
+import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.LevelTransfer.ExpLz
+import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.LevelTransfer.LzConjTranspose
+import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.LevelTransfer.SecondCapelliMinorLevel
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Int
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Matrix.MeasurableSpace
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -96,7 +145,6 @@ private theorem hpk_levPos_apply_eq_zero_of_outside
     (q : Fin (2 * (i + r') + k + 1)) (hq : ¬(i ≤ q.val ∧ q.val < 2 * r' + k + 1 + i))
     : Hpk k (i + r') (levPos k i r' j) q = 0 := by
   have hj := j.isLt
-  have hq' := q.isLt
   simp only [Hpk, levPos, Fin.ext_iff, Fin.val_mk]
   split_ifs <;> (try split_ifs) <;> (try split_ifs) <;> first | rfl | (exfalso; omega)
 
@@ -573,7 +621,6 @@ theorem rho_bounds (hOK : P.OK) (ρ : M.Ty P) (i : ℕ) (hi1 : 1 ≤ i) (hi2 : i
     first | exact Nat.lt_succ_iff.mp hw | omega
   have hv : ((ρ ⟨i - 1, by omega⟩ : ℕ) : ℝ) ≤ ((⌊P.hi i - P.lo i⌋₊ : ℕ) : ℝ) := by
     exact_mod_cast hv'
-  have h0 : (0 : ℝ) ≤ ((ρ ⟨i - 1, by omega⟩ : ℕ) : ℝ) := Nat.cast_nonneg _
   unfold M.rho
   rw [dif_pos ⟨hi1, hi2⟩]
   constructor

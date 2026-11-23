@@ -1,5 +1,49 @@
 module
 
+public import ReciprocityTheory.DualLattices.MulVecMemPP
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+public import ReciprocityTheory.DualLattices.HasLenLeOfSurj
 public import ReciprocityTheory.DualLattices.ThetaQSurj
 
 @[expose] public section
@@ -44,39 +88,40 @@ theorem u7F3 : FrobeniusLengthBoundStatement := by
         rw [← U.εL_sum, Matrix.sum_apply]
       simp [h1, Matrix.one_apply]
     have hθ : thetaL U τ l = (p : R) • thetaL U τ w' := by
-      set_option synthInstance.maxHeartbeats 100000 in
-      rw [← hl_sum, map_sum, Finset.sum_eq_single τ (fun i _ hi => theta_kill U hi l) (by simp),
-        hw', map_smul]
+
+      rw [← hl_sum, map_sum,
+      Finset.sum_eq_single τ (fun i _ hi => theta_kill U hi l) (by simp), hw', map_smul]
     rw [hθ]
     exact redP_pP ((mem_pP _).2 ⟨_, rfl⟩)
-  have hsx
-      : ∀ d : Ix g → R, sumX D d = ∑ k, d k • (⟨xL D k, D.x_mem k⟩ : augIdeal H.AA.carrier) := by
+  have hsx : ∀ d : Ix g → R,
+      sumX D d = ∑ k, d k • (⟨xL D k, D.x_mem k⟩ : augIdeal H.AA.carrier) := by
     intro d
     apply Subtype.ext
     simp [sumX]
-  let π
-      : (blockL D τ ⧸ N.comap (blockL D τ).subtype) →ₗ[R]
-        (Fin (U.r τ) → R ⧸ Ideal.span {(p : R)}) :=
-    (N.comap (blockL D τ).subtype).liftQ (thetaQ U τ ∘ₗ H.φ ∘ₗ sumX D ∘ₗ (blockL D τ).subtype) (by
-      intro c hc
-      rw [Submodule.mem_comap, Submodule.subtype_apply] at hc
-      obtain ⟨f, hf, hfc⟩ := hNsq _ hc
-      obtain ⟨c', hc', hsub⟩ := sub_lin_mem_sq hv D hdet hbasis (hsqle hf)
-      have hcc : c' = (c : Ix g → R) := funext fun k => hinj ((hc' k).trans (hfc k).symm)
-      rw [hcc] at hsub
-      have hmem : sumX D (c : Ix g → R) ∈ LinearMap.ker H.φ := by
-        rw [H.cotangent_ker_eq, Submodule.mem_comap, Submodule.subtype_apply]
-        have h2 := Submodule.sub_mem _ hf hsub
-        rw [sub_sub_cancel] at h2
-        simpa [sumX] using h2
-      rw [LinearMap.mem_ker] at hmem ⊢
-      simp only [LinearMap.comp_apply, Submodule.subtype_apply, hmem, map_zero])
+  let π : (blockL D τ ⧸ N.comap (blockL D τ).subtype) →ₗ[R]
+      (Fin (U.r τ) → R ⧸ Ideal.span {(p : R)}) :=
+    (N.comap (blockL D τ).subtype).liftQ
+      (thetaQ U τ ∘ₗ H.φ ∘ₗ sumX D ∘ₗ (blockL D τ).subtype) (by
+        intro c hc
+        rw [Submodule.mem_comap, Submodule.subtype_apply] at hc
+        obtain ⟨f, hf, hfc⟩ := hNsq _ hc
+        obtain ⟨c', hc', hsub⟩ := sub_lin_mem_sq hv D hdet hbasis (hsqle hf)
+        have hcc : c' = (c : Ix g → R) := funext fun k => hinj ((hc' k).trans (hfc k).symm)
+        rw [hcc] at hsub
+        have hmem : sumX D (c : Ix g → R) ∈ LinearMap.ker H.φ := by
+          rw [H.cotangent_ker_eq, Submodule.mem_comap, Submodule.subtype_apply]
+          have h2 := Submodule.sub_mem _ hf hsub
+          rw [sub_sub_cancel] at h2
+          simpa [sumX] using h2
+        rw [LinearMap.mem_ker] at hmem ⊢
+        simp only [LinearMap.comp_apply, Submodule.subtype_apply, hmem, map_zero])
   have hsurj : Function.Surjective π := by
     intro w
     obtain ⟨y, rfl⟩ := thetaQ_surj U τ w
     obtain ⟨f, rfl⟩ := H.cotangent_surjective y
     obtain ⟨c0, -, hsub0⟩ := sub_lin_mem_sq hv D hdet hbasis f.2
-    let c : blockL D τ := ⟨fun k => if D.κ k = τ then c0 k else 0, fun k hk => by simp [hk]⟩
+    let c : blockL D τ :=
+      ⟨fun k => if D.κ k = τ then c0 k else 0, fun k hk => by simp [hk]⟩
     refine ⟨Submodule.Quotient.mk c, ?_⟩
     change thetaQ U τ (H.φ (sumX D (c : Ix g → R))) = thetaQ U τ (H.φ f)
     have hf0 : H.φ f = H.φ (sumX D c0) := by
@@ -86,8 +131,8 @@ theorem u7F3 : FrobeniusLengthBoundStatement := by
       simpa [sumX] using hsub0
     rw [hf0]
     have hzero : thetaQ U τ (H.φ (sumX D (c0 - (c : Ix g → R)))) = 0 := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [hsx, map_sum, map_sum]
+
+      rw [hsx, map_sum, map_sum]
       apply Finset.sum_eq_zero
       intro k _
       rw [map_smul, map_smul]

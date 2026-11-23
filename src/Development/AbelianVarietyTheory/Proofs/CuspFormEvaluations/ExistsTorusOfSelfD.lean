@@ -1,20 +1,63 @@
 module
 
-public import Mathlib
+import Development.AbelianVarietyTheory.Proofs.SiegelThetaTransformation.HermitianThetaLevelDataFormsSystem
 public import Development.AbelianVarietyTheory.Definitions.SpanningFamilies.IsStabForm
-public import Development.AbelianVarietyTheory.Definitions.ThetaValues.FlatMemLatIffStdLat
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.FundamentalDomains.IsotropicCoefficientSplitting
 public import Development.AbelianVarietyTheory.Proofs.CuspFormEvaluations.PeriodTorusConstantEqBase
+public import Development.AbelianVarietyTheory.Proofs.SiegelThetaTransformation.HMatMulVecPerCrd
 public import Development.AbelianVarietyTheory.Proofs.SiegelThetaTransformation.HermitianFormAtFrameLaws
 public import Development.AbelianVarietyTheory.Proofs.SiegelThetaTransformation.TensorLatticeSelfDualSemicharacterIndex
+import Development.AbelianVarietyTheory.Proofs.TorusSplitting.TorusAtExistsOfParts
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
-  NumberField Matrix Complex
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
-  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.FD GlobalTheory
-  GlobalTheory.ThFr
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField Matrix Complex
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.FD GlobalTheory GlobalTheory.ThFr
 open ReciprocityTheory.ChartRestriction.G.Geo.Tor hiding Level
 open GlobalTheory.SW hiding Level
 open Formalism.L2.Pj Formalism.L2.PjFree
@@ -30,33 +73,12 @@ open GlobalTheory.PerTorus GlobalTheory.TorusAtAssembly
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {r g : ℕ} {X : Data E r}
 
-theorem nondeg {bas : (Fin g ⊕ Fin g → ℤ) ≃ₗ[ℤ] X.Λ} (hs : IsSympl X bas)
-    : LinearMap.BilinForm.Nondegenerate (EFBil X) := by
-  have key : ∀ u : Fin r → E, (∀ v, EF X u v = 0) → u = 0 := by
-    intro u hu
-    have hc : crd X bas u = 0 := by
-      funext j
-      rcases j with i | i
-      · have h := hu (vecQ X bas (Pi.single (Sum.inr i) 1))
-        rw [EF_crd hs, crd_vecQ hs] at h
-        simpa [Pi.single_apply] using h
-      · have h := hu (vecQ X bas (Pi.single (Sum.inl i) 1))
-        rw [EF_crd hs, crd_vecQ hs] at h
-        simpa [Pi.single_apply] using h
-    rw [← vecQ_crd X bas u, hc, vecQ_zero]
-  have hB : ∀ u v, EFBil X u v = EF X u v := fun _ _ => rfl
-  refine show LinearMap.SeparatingLeft (EFBil X) ∧ LinearMap.SeparatingRight (EFBil X) from
-    ⟨fun u hu => key u fun v => ?_, fun v hv => key v fun u => ?_⟩
-  · rw [← hB]
-    exact hu v
-  · have h := hv u
-    rw [hB] at h
-    rw [TensLat.EF_swap, h, neg_zero]
+theorem nondeg {bas : (Fin g ⊕ Fin g → ℤ) ≃ₗ[ℤ] X.Λ} (hs : IsSympl X bas) :
+    LinearMap.BilinForm.Nondegenerate (EFBil X) := by
+  apply GlobalTheory.SW.RecSys.EFBil_nondegenerate <;> assumption
 
-theorem perf
-    {bas : (Fin g ⊕ Fin g → ℤ) ≃ₗ[ℤ] X.Λ} (hs : IsSympl X bas)
-    {L : Lt E r} (hL : SelfD X L) (φ : L →+ ℤ)
-    : ∃ u ∈ L, ∀ v : L, (φ v : ℚ) = EF X u v := by
+theorem perf {bas : (Fin g ⊕ Fin g → ℤ) ≃ₗ[ℤ] X.Λ} (hs : IsSympl X bas) {L : Lt E r} (hL : SelfD X L)
+    (φ : L →+ ℤ) : ∃ u ∈ L, ∀ v : L, (φ v : ℚ) = EF X u v := by
   classical
   have hnd := nondeg hs
 
@@ -80,8 +102,8 @@ theorem perf
   have hu : ∀ y, EF X u y = ψ y := by
     intro y
     exact LinearMap.BilinForm.apply_toDual_symm_apply (hB := hnd) ψ y
-  have hext
-      : (ψ.restrictScalars ℤ).comp f = (Int.castAddHom ℚ).toIntLinearMap.comp φ.toIntLinearMap := by
+  have hext : (ψ.restrictScalars ℤ).comp f =
+      (Int.castAddHom ℚ).toIntLinearMap.comp φ.toIntLinearMap := by
     refine bZ.ext fun i => ?_
     show ψ (f (bZ i)) = ((φ (bZ i) : ℤ) : ℚ)
     have h1 : ψ0 (bW i) = ((φ (bZ i) : ℤ) : ℚ) := by simp [ψ0]
@@ -95,17 +117,14 @@ theorem perf
   intro y hy
   exact ⟨φ ⟨y, hy⟩, (hu y).trans (hval ⟨y, hy⟩)⟩
 
-private theorem exists_int_ne_zero_smul_mem_of_span_eq_univ
-    {L L' : Lt E r} (hfg : L.FG) (hsp : Submodule.span E (L' : Set (Fin r → E)) = ⊤)
-    : ∃ n : ℤ, n ≠ 0 ∧ ∀ u ∈ L, (n : E) • u ∈ L' := by
+private theorem exists_int_ne_zero_smul_mem_of_span_eq_univ {L L' : Lt E r} (hfg : L.FG)
+    (hsp : Submodule.span E (L' : Set (Fin r → E)) = ⊤) :
+    ∃ n : ℤ, n ≠ 0 ∧ ∀ u ∈ L, (n : E) • u ∈ L' := by
   obtain ⟨N, hN, hNL⟩ := TensLat.exists_mul_le hfg hsp
   have hI : Ideal.span {N} ≠ ⊥ := by rwa [Ne, Ideal.span_singleton_eq_bot]
   obtain ⟨c, hc⟩ := Ideal.mem_span_singleton'.mp (Ideal.absNorm_mem (Ideal.span {N}))
-  refine ⟨
-    (Ideal.absNorm (Ideal.span {N}) : ℤ),
-    by exact_mod_cast mt Ideal.absNorm_eq_zero_iff.mp hI,
-    fun u hu => ?_
-  ⟩
+  refine ⟨(Ideal.absNorm (Ideal.span {N}) : ℤ),
+    by exact_mod_cast mt Ideal.absNorm_eq_zero_iff.mp hI, fun u hu => ?_⟩
   have hcE : ((Ideal.absNorm (Ideal.span {N}) : ℤ) : E) = (c : E) * (N : E) := by
     have h := congrArg (fun z : 𝓞 E => (z : E)) hc
     push_cast at h ⊢
@@ -115,12 +134,12 @@ private theorem exists_int_ne_zero_smul_mem_of_span_eq_univ
   rw [← algebraMap_smul E c] at h
   exact h
 
-theorem exists_basis_of_full
-    {x : Frame X.Ψ r} (ho : X.IsOrtho x)
-    {L : Lt E r} (hfg : L.FG) (hsp : Submodule.span E (L : Set (Fin r → E)) = ⊤)
-    : ∃ b : Module.Basis (Fin (2 * Fintype.card (I2.Idx (dimPer X)))) ℝ (I2.Vsp (dimPer X)), ∀ y,
-      y ∈ I2.lat b ↔ ∃ v ∈ L, scaled X x v = y := by
+theorem exists_basis_of_full {x : Frame X.Ψ r} (ho : X.IsOrtho x) {L : Lt E r} (hfg : L.FG)
+    (hsp : Submodule.span E (L : Set (Fin r → E)) = ⊤) :
+    ∃ b : Module.Basis (Fin (2 * Fintype.card (I2.Idx (dimPer X)))) ℝ (I2.Vsp (dimPer X)),
+      ∀ y, y ∈ I2.lat b ↔ ∃ v ∈ L, scaled X x v = y := by
   classical
+
   obtain ⟨b₀, hb₀⟩ := GlobalTheory.PerTorus.exists_basis (X := X) (x := x) ho
   obtain ⟨n, hn, hnL⟩ := exists_int_ne_zero_smul_mem_of_span_eq_univ hfg X.Λ_span
   obtain ⟨m, hm, hmΛ⟩ := exists_int_ne_zero_smul_mem_of_span_eq_univ X.Λ_fg hsp
@@ -155,17 +174,16 @@ theorem exists_basis_of_full
     exact Submodule.smul_mem _ _ (Submodule.subset_span h1)
   let bZ := Module.Free.chooseBasis ℤ M
   let bR := bZ.ofZLatticeBasis ℝ M
-  have hcard
-      : Fintype.card (Module.Free.ChooseBasisIndex ℤ M)
-        = Fintype.card (Fin (2 * Fintype.card (I2.Idx (dimPer X)))) := by
+  have hcard : Fintype.card (Module.Free.ChooseBasisIndex ℤ M) =
+      Fintype.card (Fin (2 * Fintype.card (I2.Idx (dimPer X)))) := by
     rw [← Module.finrank_eq_card_basis bR, Module.finrank_eq_card_basis b₀]
   refine ⟨bR.reindex (Fintype.equivOfCardEq hcard), fun y => ?_⟩
   rw [← hM]
   show y ∈ Submodule.span ℤ (Set.range (bR.reindex _)) ↔ y ∈ M
   rw [Module.Basis.range_reindex, Module.Basis.ofZLatticeBasis_span]
 
-def scaleEquiv {K : Type} [Fintype K] (e : Fin g ≃ K) (s : ℂ) (hs : s ≠ 0)
-    : (Fin g → ℂ) ≃ₗ[ℂ] EuclideanSpace ℂ K where
+def scaleEquiv {K : Type} [Fintype K] (e : Fin g ≃ K) (s : ℂ) (hs : s ≠ 0) :
+    (Fin g → ℂ) ≃ₗ[ℂ] EuclideanSpace ℂ K where
   toFun z := WithLp.toLp 2 fun i => s * z (e.symm i)
   invFun y j := s⁻¹ * y (e j)
   map_add' z z' := by ext i; simp [mul_add]
@@ -173,41 +191,16 @@ def scaleEquiv {K : Type} [Fintype K] (e : Fin g ≃ K) (s : ℂ) (hs : s ≠ 0)
   left_inv z := by funext j; simp [hs]
   right_inv y := by ext i; simp [hs]
 
-theorem scaleEquiv_apply
-    {K : Type} [Fintype K] (e : Fin g ≃ K) (s : ℂ) (hs : s ≠ 0) (z : Fin g → ℂ) (i : K)
-    : scaleEquiv e s hs z i = s * z (e.symm i) :=
-  rfl
+theorem scaleEquiv_apply {K : Type} [Fintype K] (e : Fin g ≃ K) (s : ℂ) (hs : s ≠ 0) (z : Fin g → ℂ)
+    (i : K) : scaleEquiv e s hs z i = s * z (e.symm i) := rfl
 
 end
 
 end GlobalTheory.Dict.SelfTorus
 
+
 open GlobalTheory.PerTorus GlobalTheory.TorusAtAssembly GlobalTheory.Dict.SelfTorus in
-theorem GlobalTheory.Dict.exists_torus_of_selfD
-    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (r : ℕ) (X : Data E r) (g : ℕ)
-        (bas : (Fin g ⊕ Fin g → ℤ) ≃ₗ[ℤ] X.Λ) (idx : Fin g ≃ X.Ψ × Fin r),
-      IsSympl X bas
-        → ∀ w : 𝓞 E,
-          (w : E) + cc (w : E) = 1
-            → ∀ L : Lt E r,
-              SelfD X L
-                → ∀ x ∈ X.dom,
-                  X.IsOrtho x
-                    → ∀ t : ℝ,
-                      0 < t → (∀ τ, X.c τ = t)
-                        → ∃ (T : I2.PT E) (ψ : (Fin g → ℂ) ≃ₗ[ℂ] I2.Vsp T.dim)
-                            (e : Fin g ≃ I2.Idx T.dim),
-                          T.r = r ∧ (∀ z z', I2.Hf (ψ z) (ψ z') = hx X bas idx x z z')
-                            ∧ (∀ ga, ga ∈ T.L ↔ ∃ u ∈ L, ga = ψ (pv X idx x u))
-                            ∧ (∀ (a : 𝓞 E) u,
-                              ψ (pv X idx x ((a : E) • u)) = I2.act a (ψ (pv X idx x u)))
-                            ∧ (∀ ga ∈ T.L,
-                              (T.eps ga : ℝ) = Real.cos (Real.pi * (I2.Hf ga (I2.act w ga)).im))
-                            ∧ (∀ j,
-                              (e j).1 = rowType X (idx j)
-                                ∧ ψ (Pi.single j 1)
-                                  = ((Real.sqrt t : ℝ) : ℂ)
-                                    • EuclideanSpace.single (e j) (1 : ℂ)) := by
+theorem GlobalTheory.Dict.exists_torus_of_selfD : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (r : ℕ) (X : Data E r) (g : ℕ) (bas : (Fin g ⊕ Fin g → ℤ) ≃ₗ[ℤ] X.Λ) (idx : Fin g ≃ X.Ψ × Fin r), IsSympl X bas → ∀ w : 𝓞 E, (w : E) + cc (w : E) = 1 → ∀ L : Lt E r, SelfD X L → ∀ x ∈ X.dom, X.IsOrtho x → ∀ t : ℝ, 0 < t → (∀ τ, X.c τ = t) → ∃ (T : I2.PT E) (ψ : (Fin g → ℂ) ≃ₗ[ℂ] I2.Vsp T.dim) (e : Fin g ≃ I2.Idx T.dim), T.r = r ∧ (∀ z z', I2.Hf (ψ z) (ψ z') = hx X bas idx x z z') ∧ (∀ ga, ga ∈ T.L ↔ ∃ u ∈ L, ga = ψ (pv X idx x u)) ∧ (∀ (a : 𝓞 E) u, ψ (pv X idx x ((a : E) • u)) = I2.act a (ψ (pv X idx x u))) ∧ (∀ ga ∈ T.L, (T.eps ga : ℝ) = Real.cos (Real.pi * (I2.Hf ga (I2.act w ga)).im)) ∧ (∀ j, (e j).1 = rowType X (idx j) ∧ ψ (Pi.single j 1) = ((Real.sqrt t : ℝ) : ℂ) • EuclideanSpace.single (e j) (1 : ℂ)) := by
   intro E _ _ _ r X g bas idx hs w hw L hL x hxd ho t ht hc
   classical
   have hspL := TensLat.span_of_selfD X hL
@@ -219,8 +212,8 @@ theorem GlobalTheory.Dict.exists_torus_of_selfD
   obtain ⟨b, hb⟩ := exists_basis_of_full ho hL.1 hspL
 
   have hint : ∀ u ∈ L, ∀ v ∈ L, ∃ k : ℤ, EF X u v = k := fun u hu => (hL.2 u).1 hu
-  have him : ∀ u v, (I2.Hf (scaled X x u) (scaled X x v)).im = EF X u v := fun u v =>
-    im_Hf_scaled ho u v
+  have him : ∀ u v, (I2.Hf (scaled X x u) (scaled X x v)).im = EF X u v :=
+    fun u v => im_Hf_scaled ho u v
   have hw' : ((1 - w : 𝓞 E) : E) = cc (w : E) := by
     push_cast
     exact (eq_sub_of_add_eq' hw).symm
@@ -228,9 +221,8 @@ theorem GlobalTheory.Dict.exists_torus_of_selfD
     intro α y hy
     obtain ⟨v, hv, rfl⟩ := (hb y).1 hy
     exact (hb _).2 ⟨(α : E) • v, coe_smul_mem_lemma_2 α hv, scaled_smul X x α v⟩
-  have par
-      : ∀ y ∈ I2.lat b, ∀ z ∈ I2.lat b, ∃ k : ℤ,
-        (I2.Hf y (I2.act w z)).im - (I2.Hf y (I2.act (1 - w) z)).im - (I2.Hf y z).im = 2 * k := by
+  have par : ∀ y ∈ I2.lat b, ∀ z ∈ I2.lat b, ∃ k : ℤ,
+      (I2.Hf y (I2.act w z)).im - (I2.Hf y (I2.act (1 - w) z)).im - (I2.Hf y z).im = 2 * k := by
     intro y hy z hz
     obtain ⟨u, hu, rfl⟩ := (hb y).1 hy
     obtain ⟨v, hv, rfl⟩ := (hb z).1 hz
@@ -247,12 +239,11 @@ theorem GlobalTheory.Dict.exists_torus_of_selfD
     rw [h3, hk1, hk2]
     push_cast
     ring
-  have perfect
-      : ∀ φ : I2.lat b →+ ℤ, ∃ y ∈ I2.lat b, ∀ z : I2.lat b,
-        (φ z : ℝ) = (I2.Hf y (z : I2.Vsp (dimPer X))).im := by
+  have perfect : ∀ φ : I2.lat b →+ ℤ, ∃ y ∈ I2.lat b, ∀ z : I2.lat b,
+      (φ z : ℝ) = (I2.Hf y (z : I2.Vsp (dimPer X))).im := by
     intro φ
-    let j : L →+ I2.lat b :=
-      AddMonoidHom.mk' (fun v => ⟨scaled X x v, (hb _).2 ⟨v, v.2, rfl⟩⟩) (fun a c => by ext; simp)
+    let j : L →+ I2.lat b := AddMonoidHom.mk'
+      (fun v => ⟨scaled X x v, (hb _).2 ⟨v, v.2, rfl⟩⟩) (fun a c => by ext; simp)
     obtain ⟨u, hu, hφ⟩ := perf hs hL (φ.comp j)
     refine ⟨scaled X x u, (hb _).2 ⟨u, hu, rfl⟩, fun z => ?_⟩
     obtain ⟨v, hv, hz⟩ := (hb z).1 z.2
@@ -270,23 +261,23 @@ theorem GlobalTheory.Dict.exists_torus_of_selfD
     ext i
     rw [scaleEquiv_apply, scaled_apply, hc]
     simp [e, pv]
-  have hH
-      : ∀ z z', I2.Hf (ψ z) (ψ z') = hermForm ((t : ℂ) • (1 : Matrix (Fin g) (Fin g) ℂ)) z z' := by
+  have hH : ∀ z z', I2.Hf (ψ z) (ψ z') =
+      hermForm ((t : ℂ) • (1 : Matrix (Fin g) (Fin g) ℂ)) z z' := by
     intro z z'
     have hs2 : ((Real.sqrt t : ℝ) : ℂ) * (starRingEnd ℂ) ((Real.sqrt t : ℝ) : ℂ) = (t : ℂ) := by
       rw [Complex.conj_ofReal, ← Complex.ofReal_mul, Real.mul_self_sqrt ht.le]
     simp only [I2.Hf, ψ, scaleEquiv_apply]
-    rw [e.symm.sum_comp (fun j =>
-      ((Real.sqrt t : ℝ) : ℂ) * z j * (starRingEnd ℂ) (((Real.sqrt t : ℝ) : ℂ) * z' j))]
+    rw [e.symm.sum_comp (fun j => ((Real.sqrt t : ℝ) : ℂ) * z j *
+      (starRingEnd ℂ) (((Real.sqrt t : ℝ) : ℂ) * z' j))]
     simp only [hermForm, dotProduct, Matrix.smul_mulVec, Matrix.one_mulVec, Pi.smul_apply,
       Pi.star_apply, smul_eq_mul, map_mul]
     refine Finset.sum_congr rfl fun j _ => ?_
     rw [Complex.star_def]
     linear_combination (z j * (starRingEnd ℂ) (z' j)) * hs2
   refine ⟨T, ψ, e, rfl, ?_, ?_, ?_, ?_, ?_⟩
-  · intro z z'
-    obtain ⟨-, -, -, -, -, -, huniq, -⟩ :=
-      GlobalTheory.Dict.hx_laws E r X g bas idx 0 hs ⟨0, rfl⟩ x hxd
+  ·
+    intro z z'
+    obtain ⟨-, -, -, -, -, -, huniq, -⟩ := GlobalTheory.Dict.hx_laws E r X g bas idx 0 hs ⟨0, rfl⟩ x hxd
     refine (hH z z').trans ((huniq L hspL).2 _ ?_ ?_ z z')
     · simp [Matrix.IsHermitian, Matrix.conjTranspose_smul]
     · intro u _ v _

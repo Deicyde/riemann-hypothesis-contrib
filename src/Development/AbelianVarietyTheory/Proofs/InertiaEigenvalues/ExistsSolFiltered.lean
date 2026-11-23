@@ -1,18 +1,59 @@
 module
 
-public import Mathlib
-public import Formalism.LocalRingCardinality.RhoDetPrimeEqMuTildeMulChiPow
-public import Formalism.SharpRestriction.LevelLetterCocycles.LocalSituation
-public import Formalism.LocalRingCardinality.AdicCompletionLocal.LocTied
 public import Development.AbelianVarietyTheory.Definitions.Foundations.HTBasis
-public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.ExpStar
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.PowMulMemLatIff
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.GroupTheory.Nilpotent
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+public import Mathlib.RingTheory.PowerSeries.Inverse
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Lemma
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
+import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.PowMulMemLatIff
+import Formalism.SharpRestriction.LevelLetterCocycles.LocCoh
+import Formalism.SharpRestriction.LevelLetterCocycles.LocalSituation
 
 @[expose] public section
 
-open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc
-  Formalism.MainNotions.N Formalism.MainNotions.LocalSituation GlobalTheory.Cyc
-  GlobalTheory.ExpImage
+open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N Formalism.MainNotions.LocalSituation GlobalTheory.Cyc GlobalTheory.ExpImage
 
 open PowerSeries
 
@@ -85,20 +126,15 @@ private lemma sum_mul_triSol_eq {R : Type*} [CommRing R] (M : ℕ → ℕ → R)
   rw [← mul_assoc, Ring.mul_inverse_cancel _ hn, one_mul]
   ring
 
+
 open PowerSeries in
-theorem _root_.GlobalTheory.ExpImage.solve_mod_pow
-    : ∀ (l : ℕ) [Fact l.Prime] (s : ℕ),
-      _root_.GlobalTheory.Cyc.Lev l s
-        → ∀ (m : ℕ),
-          ¬ l ∣ m
-            → ∀ U : ℤ_[l],
-              (l : ℤ_[l]) ^ s ∣ U - 1
-                → ∀ (γ : PowerSeries ℤ_[l] →ₐ[ℤ_[l]] PowerSeries ℤ_[l]) (v : PowerSeries ℤ_[l]),
-                  PowerSeries.X * v = (1 + PowerSeries.X) ^ (1 + l ^ s) - 1
-                    → γ PowerSeries.X = PowerSeries.X * v
-                    → ∀ (k : ℕ) (F : PowerSeries ℤ_[l]), ∃ p F' : PowerSeries ℤ_[l],
-                      PowerSeries.C U * (1 + PowerSeries.X) ^ m * γ p - v ^ k * p
-                        = v ^ k * (PowerSeries.X * F - (l : PowerSeries ℤ_[l]) ^ s * F') := by
+theorem _root_.GlobalTheory.ExpImage.solve_mod_pow : ∀ (l : ℕ) [Fact l.Prime] (s : ℕ), _root_.GlobalTheory.Cyc.Lev l s →
+    ∀ (m : ℕ), ¬ l ∣ m → ∀ U : ℤ_[l], (l : ℤ_[l]) ^ s ∣ U - 1 →
+    ∀ (γ : PowerSeries ℤ_[l] →ₐ[ℤ_[l]] PowerSeries ℤ_[l]) (v : PowerSeries ℤ_[l]),
+    PowerSeries.X * v = (1 + PowerSeries.X) ^ (1 + l ^ s) - 1 →
+    γ PowerSeries.X = PowerSeries.X * v → ∀ (k : ℕ) (F : PowerSeries ℤ_[l]),
+    ∃ p F' : PowerSeries ℤ_[l], PowerSeries.C U * (1 + PowerSeries.X) ^ m * γ p - v ^ k * p =
+      v ^ k * (PowerSeries.X * F - (l : PowerSeries ℤ_[l]) ^ s * F') := by
   intro l _ s hs m hm U hU γ v hv hγ k F
   obtain ⟨hs1, hs2⟩ : 1 ≤ s ∧ (l = 2 → 2 ≤ s) := by
     unfold _root_.GlobalTheory.Cyc.Lev at hs
@@ -106,16 +142,16 @@ theorem _root_.GlobalTheory.ExpImage.solve_mod_pow
   have hlp : l.Prime := Fact.out
 
   let T : PowerSeries ℤ_[l] →ₗ[ℤ_[l]] PowerSeries ℤ_[l] :=
-    LinearMap.mulLeft ℤ_[l] (C U * (1 + X) ^ m) ∘ₗ γ.toLinearMap - LinearMap.mulLeft ℤ_[l] (v ^ k)
+    LinearMap.mulLeft ℤ_[l] (C U * (1 + X) ^ m) ∘ₗ γ.toLinearMap -
+      LinearMap.mulLeft ℤ_[l] (v ^ k)
   have hT : ∀ f, T f = C U * (1 + X) ^ m * γ f - v ^ k * f := fun f => rfl
   have hTX : ∀ i : ℕ, T (X ^ i) = (C U * (1 + X) ^ m * v ^ i - v ^ k) * X ^ i := by
     intro i
     rw [hT, map_pow, hγ]
     ring
 
-  have hloc
-      : ∀ f g : PowerSeries ℤ_[l], ∀ j : ℕ,
-        (∀ i < j + 1, coeff i f = coeff i g) → coeff j (T f) = coeff j (T g) := by
+  have hloc : ∀ f g : PowerSeries ℤ_[l], ∀ j : ℕ, (∀ i < j + 1, coeff i f = coeff i g) →
+      coeff j (T f) = coeff j (T g) := by
     intro f g j h
     obtain ⟨q, hq⟩ : X ^ (j + 1) ∣ f - g :=
       X_pow_dvd_iff.2 fun i hi => by rw [map_sub, h i hi, sub_self]
@@ -126,28 +162,27 @@ theorem _root_.GlobalTheory.ExpImage.solve_mod_pow
       rw [e]
       exact X_pow_dvd_iff.1 (dvd_mul_right _ _) j (Nat.lt_succ_self j)
     rwa [map_sub, sub_eq_zero] at h2
-  have hsum
-      : ∀ (c : ℕ → ℤ_[l]) (j : ℕ),
-        coeff j (T (mk c)) = ∑ i ∈ Finset.range (j + 1), c i * coeff j (T (X ^ i)) := by
+  have hsum : ∀ (c : ℕ → ℤ_[l]) (j : ℕ),
+      coeff j (T (mk c)) = ∑ i ∈ Finset.range (j + 1), c i * coeff j (T (X ^ i)) := by
     intro c j
     rw [hloc (mk c) (∑ i ∈ Finset.range (j + 1), c i • X ^ i) j]
-    set_option synthInstance.maxHeartbeats 100000 in
-      · simp [map_sum, map_smul]
+
+    · simp [map_sum, map_smul]
     · intro i hi
-      set_option synthInstance.maxHeartbeats 100000 in
+
       simp [coeff_mk, map_sum, coeff_X_pow, Finset.mem_range.2 hi]
 
   have hv0 : constantCoeff v = 1 + (l : ℤ_[l]) ^ s := by
     have h := congrArg (coeff 1) hv
-    rw [show (1 : ℕ) = 0 + 1 from rfl, coeff_succ_X_mul, coeff_zero_eq_constantCoeff_apply, map_sub,
-        (constantCoeff_coeff_one_one_add_X_pow (R := ℤ_[l]) (1 + l ^ s)).2]
-      at h
+    rw [show (1 : ℕ) = 0 + 1 from rfl, coeff_succ_X_mul, coeff_zero_eq_constantCoeff_apply,
+      map_sub, (constantCoeff_coeff_one_one_add_X_pow (R := ℤ_[l]) (1 + l ^ s)).2] at h
     rw [h]
     simp
   have hunitv : IsUnit v := by
     rw [isUnit_iff_constantCoeff, hv0]
     refine isUnit_padicInt_of_not_dvd' _ fun hd => ?_
-    have h1 : (l : ℤ_[l]) ∣ 1 := (dvd_add_left (dvd_pow_self (l : ℤ_[l]) (by omega : s ≠ 0))).1 hd
+    have h1 : (l : ℤ_[l]) ∣ 1 :=
+      (dvd_add_left (dvd_pow_self (l : ℤ_[l]) (by omega : s ≠ 0))).1 hd
     have hn := PadicInt.isUnit_iff.1 (isUnit_of_dvd_one h1)
     have h2 := (PadicInt.norm_lt_one_iff_dvd (l : ℤ_[l])).2 dvd_rfl
     linarith
@@ -161,11 +196,9 @@ theorem _root_.GlobalTheory.ExpImage.solve_mod_pow
       (constantCoeff_coeff_one_one_add_X_pow (R := ℤ_[l]) m).1, mul_one]
     have ha : ∀ n : ℕ, (l : ℤ_[l]) ^ s ∣ (1 + (l : ℤ_[l]) ^ s) ^ n - 1 := fun n => by
       simpa using sub_dvd_pow_sub_pow (1 + (l : ℤ_[l]) ^ s) 1 n
-    have e2
-        : U * (1 + (l : ℤ_[l]) ^ s) ^ i - (1 + (l : ℤ_[l]) ^ s) ^ k
-          = (U - 1) * (1 + (l : ℤ_[l]) ^ s) ^ i + ((1 + (l : ℤ_[l]) ^ s) ^ i - 1)
-            - ((1 + (l : ℤ_[l]) ^ s) ^ k - 1) := by
-      ring
+    have e2 : U * (1 + (l : ℤ_[l]) ^ s) ^ i - (1 + (l : ℤ_[l]) ^ s) ^ k =
+        (U - 1) * (1 + (l : ℤ_[l]) ^ s) ^ i + ((1 + (l : ℤ_[l]) ^ s) ^ i - 1) -
+          ((1 + (l : ℤ_[l]) ^ s) ^ k - 1) := by ring
     rw [e2]
     exact dvd_sub (dvd_add (dvd_mul_of_dvd_left hU _) (ha i)) (ha k)
 
@@ -175,8 +208,7 @@ theorem _root_.GlobalTheory.ExpImage.solve_mod_pow
     rw [← toZMod_eq_zero_iff_dvd] at hd
     haveI : CharP (PowerSeries (ZMod l)) l :=
       charP_of_injective_ringHom (PowerSeries.C_injective (R := ZMod l)) l
-    obtain ⟨t, ht⟩ : ∃ t, l ^ s = t + 3 :=
-      ⟨l ^ s - 3, by have := three_le_prime_pow hlp hs1 hs2; omega⟩
+    obtain ⟨t, ht⟩ : ∃ t, l ^ s = t + 3 := ⟨l ^ s - 3, by have := three_le_prime_pow hlp hs1 hs2; omega⟩
     have hvb : PowerSeries.map PadicInt.toZMod v = 1 + X ^ 2 * (X ^ t * (1 + X)) := by
       apply X_mul_cancel
       have h := congrArg (PowerSeries.map (PadicInt.toZMod (p := l))) hv
@@ -184,35 +216,35 @@ theorem _root_.GlobalTheory.ExpImage.solve_mod_pow
       rw [h, pow_add, pow_one, add_pow_char_pow (1 : PowerSeries (ZMod l)) X l s, one_pow, ht]
       ring
     have hU1 : PadicInt.toZMod U = 1 := by
-      have : PadicInt.toZMod (U - 1) = 0 :=
-        (toZMod_eq_zero_iff_dvd _).2 ((dvd_pow_self (l : ℤ_[l]) (by omega : s ≠ 0)).trans hU)
+      have : PadicInt.toZMod (U - 1) = 0 := (toZMod_eq_zero_iff_dvd _).2
+        ((dvd_pow_self (l : ℤ_[l]) (by omega : s ≠ 0)).trans hU)
       rwa [map_sub, map_one, sub_eq_zero] at this
     have hcomp : PadicInt.toZMod (coeff (n + 1) (T (X ^ n))) = (m : ZMod l) := by
       rw [← coeff_map, hTX, add_comm n 1]
       simp only [map_mul, map_sub, map_pow, map_add (f := _), map_one, PowerSeries.map_X,
         PowerSeries.map_C, hU1, one_mul]
       rw [coeff_mul_X_pow, hvb, map_sub, coeff_one_mul_one_add_X_sq_mul_pow,
-        show ((1 : PowerSeries (ZMod l)) + X ^ 2 * (X ^ t * (1 + X))) ^ k
-            = 1 * (1 + X ^ 2 * (X ^ t * (1 + X))) ^ k by
-          rw [one_mul],
+        show ((1 : PowerSeries (ZMod l)) + X ^ 2 * (X ^ t * (1 + X))) ^ k =
+          1 * (1 + X ^ 2 * (X ^ t * (1 + X))) ^ k by rw [one_mul],
         coeff_one_mul_one_add_X_sq_mul_pow, (constantCoeff_coeff_one_one_add_X_pow m).2]
       simp
     rw [hcomp] at hd
     exact (ZMod.natCast_eq_zero_iff m l).1 hd
   let g : ℕ → ℤ_[l] := fun j => coeff j (v ^ k * (X * F))
-  let c : ℕ → ℤ_[l] :=
-    _root_.GlobalTheory.ExpImage.triSol (fun n i => coeff (n + 1) (T (X ^ i))) (fun n => g (n + 1))
+  let c : ℕ → ℤ_[l] := _root_.GlobalTheory.ExpImage.triSol (fun n i => coeff (n + 1) (T (X ^ i)))
+    (fun n => g (n + 1))
   have hcoef : ∀ j : ℕ, (l : ℤ_[l]) ^ s ∣ coeff j (T (mk c) - v ^ k * (X * F)) := by
     intro j
     rw [map_sub, hsum]
     cases j with
     | zero =>
-      have h0 : coeff 0 (v ^ k * (X * F)) = 0 := by simp [coeff_zero_eq_constantCoeff_apply]
+      have h0 : coeff 0 (v ^ k * (X * F)) = 0 := by
+        simp [coeff_zero_eq_constantCoeff_apply]
       rw [h0, sub_zero, Finset.sum_range_one]
       exact dvd_mul_of_dvd_right (hdiag 0) _
     | succ n =>
-      have hs' :=
-        sum_mul_triSol_eq (fun n i => coeff (n + 1) (T (X ^ i))) (fun n => g (n + 1)) n (hsub n)
+      have hs' := sum_mul_triSol_eq (fun n i => coeff (n + 1) (T (X ^ i)))
+        (fun n => g (n + 1)) n (hsub n)
       rw [Finset.sum_range_succ]
       convert dvd_mul_of_dvd_right (hdiag (n + 1)) (c (n + 1)) using 1
       simp only [g, c] at hs' ⊢
@@ -226,7 +258,8 @@ theorem _root_.GlobalTheory.ExpImage.solve_mod_pow
     exact (hcoef j).choose_spec
   obtain ⟨u, hu⟩ := hunitv.pow k
   refine ⟨mk c, -(↑u⁻¹ * E), ?_⟩
-  have hE' : T (mk c) = v ^ k * (X * F) + C ((l : ℤ_[l]) ^ s) * E := by rw [← hE]; ring
+  have hE' : T (mk c) = v ^ k * (X * F) + C ((l : ℤ_[l]) ^ s) * E := by
+    rw [← hE]; ring
   rw [← hT, hE']
   have hl : (l : PowerSeries ℤ_[l]) ^ s = C ((l : ℤ_[l]) ^ s) := by simp
   rw [hl, ← hu]

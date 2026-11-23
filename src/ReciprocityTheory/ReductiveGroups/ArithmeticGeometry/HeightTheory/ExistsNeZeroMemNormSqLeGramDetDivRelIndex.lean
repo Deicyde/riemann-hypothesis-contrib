@@ -1,6 +1,53 @@
 module
 
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.HeightTheory.TransferenceA
+public import Mathlib.Analysis.InnerProductSpace.GramMatrix
+public import Mathlib.Algebra.Module.ZLattice.Covolume
+import Mathlib.Algebra.Order.Archimedean.Real.Hom
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Real
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+public import Mathlib.MeasureTheory.Group.GeometryOfNumbers
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
+public import Mathlib.Algebra.Module.ZLattice.Basic
 
 @[expose] public section
 
@@ -8,21 +55,15 @@ namespace ReciprocityTheory.ChartRestriction.G.T0
 
 open Module Submodule Matrix
 
-theorem relIndex_nsmul_mem {E : Type*} [AddCommGroup E] (H L : AddSubgroup E) {x : E} (hx : x ∈ L)
-    : H.relIndex L • x ∈ H := by
+theorem relIndex_nsmul_mem {E : Type*} [AddCommGroup E] (H L : AddSubgroup E) {x : E}
+    (hx : x ∈ L) : H.relIndex L • x ∈ H := by
   exact AddSubgroup.nsmul_relIndex_mem H hx
 
-theorem exists_ne_zero_mem_norm_sq_le_gram_det_div_relIndex
-    {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℝ E]
-    {N : ℕ} (hN : 0 < N) (w : Fin N → E) (hw : LinearIndependent ℝ w)
-    (Λ : AddSubgroup E)
-    (hΛ : ∀ i, w i ∈ Λ) (hI : (span ℤ (Set.range w)).toAddSubgroup.relIndex Λ ≠ 0)
-    : ∃ v ∈ Λ,
-      v ≠ 0
-        ∧ ‖v‖ ^ 2
-          ≤ N
-            * ((gram ℝ w).det / ((span ℤ (Set.range w)).toAddSubgroup.relIndex Λ : ℝ) ^ 2)
-              ^ (1 / (N : ℝ)) := by
+theorem exists_ne_zero_mem_norm_sq_le_gram_det_div_relIndex {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℝ E] {N : ℕ}
+    (hN : 0 < N) (w : Fin N → E) (hw : LinearIndependent ℝ w) (Λ : AddSubgroup E)
+    (hΛ : ∀ i, w i ∈ Λ) (hI : (span ℤ (Set.range w)).toAddSubgroup.relIndex Λ ≠ 0) :
+    ∃ v ∈ Λ, v ≠ 0 ∧ ‖v‖ ^ 2 ≤ N * ((gram ℝ w).det /
+      ((span ℤ (Set.range w)).toAddSubgroup.relIndex Λ : ℝ) ^ 2) ^ (1 / (N : ℝ)) := by
   classical
   set S : AddSubgroup E := (span ℤ (Set.range w)).toAddSubgroup with hS
   set I : ℕ := S.relIndex Λ with hIdef
@@ -91,7 +132,7 @@ theorem exists_ne_zero_mem_norm_sq_le_gram_det_div_relIndex
       · show ((∑ i, c i • wV i : V) : E) ∈ S
         rw [hS, Submodule.mem_toAddSubgroup, Submodule.mem_span_range_iff_exists_fun ℤ]
         exact ⟨c, by simp [wV]⟩
-      set_option synthInstance.maxHeartbeats 100000 in
+
       · simp [χ, hb, map_sum]
     · rintro ⟨v, hv, rfl⟩
       have hv' : (v : E) ∈ span ℤ (Set.range w) := hv
@@ -109,8 +150,7 @@ theorem exists_ne_zero_mem_norm_sq_le_gram_det_div_relIndex
     have h1 : x ∈ L1.toAddSubgroup := hx
     rw [hL1g] at h1
     exact AddSubgroup.map_mono (AddSubgroup.comap_mono hSΛ) h1
-  let b' : Module.Basis (Fin N) ℝ (Fin N → ℝ) :=
-    b.unitsSMul (fun _ => Units.mk0 ((I : ℝ)⁻¹) (inv_ne_zero hI0))
+  let b' : Module.Basis (Fin N) ℝ (Fin N → ℝ) := b.unitsSMul (fun _ => Units.mk0 ((I : ℝ)⁻¹) (inv_ne_zero hI0))
   have hb' : ∀ i, b' i = (I : ℝ)⁻¹ • b i := fun i => by
     show (b.unitsSMul _) i = _
     rw [Module.Basis.unitsSMul_apply, Units.smul_def, Units.val_mk0]
@@ -132,9 +172,8 @@ theorem exists_ne_zero_mem_norm_sq_le_gram_det_div_relIndex
     exact Submodule.span_le.mpr fun x hx => Submodule.subset_span (hL12 (Submodule.subset_span hx))⟩
   have hcov1 : ZLattice.covolume L1 MeasureTheory.volume = |d| := by
     rw [ZLattice.covolume_eq_measure_fundamentalDomain L1 MeasureTheory.volume
-        (ZSpan.isAddFundamentalDomain b MeasureTheory.volume),
-      MeasureTheory.Measure.real, ZSpan.volume_fundamentalDomain,
-      ENNReal.toReal_ofReal (abs_nonneg _)]
+      (ZSpan.isAddFundamentalDomain b MeasureTheory.volume), MeasureTheory.Measure.real,
+      ZSpan.volume_fundamentalDomain, ENNReal.toReal_ofReal (abs_nonneg _)]
   have hcov2 : ZLattice.covolume L2 MeasureTheory.volume = |d| / I := by
     have h := ZLattice.covolume_div_covolume_eq_relIndex L1 L2 hL12
     have h' : L1.toAddSubgroup.relIndex L2.toAddSubgroup = I := hrel
@@ -144,14 +183,13 @@ theorem exists_ne_zero_mem_norm_sq_le_gram_det_div_relIndex
     linarith
   let b2 := (Module.Free.chooseBasis ℤ L2).ofZLatticeBasis ℝ L2
   have hspan2 : span ℤ (Set.range b2) = L2 := Module.Basis.ofZLatticeBasis_span ℝ L2 _
-  have hF2 : MeasureTheory.IsAddFundamentalDomain L2 (ZSpan.fundamentalDomain b2)
-      MeasureTheory.volume := by
+  have hF2 : MeasureTheory.IsAddFundamentalDomain L2 (ZSpan.fundamentalDomain b2) MeasureTheory.volume := by
     have := ZSpan.isAddFundamentalDomain b2 MeasureTheory.volume
     rwa [hspan2] at this
   have hvolF2 : MeasureTheory.volume (ZSpan.fundamentalDomain b2) = ENNReal.ofReal (|d| / I) := by
     rw [← hcov2, ZLattice.covolume_eq_measure_fundamentalDomain L2 MeasureTheory.volume hF2,
-      MeasureTheory.Measure.real,
-      ENNReal.ofReal_toReal (ZSpan.fundamentalDomain_isBounded b2).measure_lt_top.ne]
+      MeasureTheory.Measure.real, ENNReal.ofReal_toReal
+        (ZSpan.fundamentalDomain_isBounded b2).measure_lt_top.ne]
   haveI : Countable ↥L2.toAddSubgroup := by
     have hc : ((L2.toAddSubgroup : AddSubgroup (Fin N → ℝ)) : Set (Fin N → ℝ)) ⊆
         Set.range (fun c : Fin N → ℤ => ∑ i, c i • b' i) := by
@@ -164,26 +202,24 @@ theorem exists_ne_zero_mem_norm_sq_le_gram_det_div_relIndex
   have hq : 0 ≤ |d| / I := div_nonneg (abs_nonneg _) (Nat.cast_nonneg _)
   have ht0 : 0 ≤ t := Real.rpow_nonneg hq _
   have htN : t ^ N = |d| / I := Real.rpow_inv_natCast_pow hq (by omega)
-  obtain ⟨x, hx0, hxs⟩ :=
-    MeasureTheory.exists_ne_zero_mem_lattice_of_measure_mul_two_pow_le_measure
-      (μ := MeasureTheory.volume) (L := L2.toAddSubgroup)
-      (s := Set.Icc (-(fun _ : Fin N => t)) (fun _ : Fin N => t)) hF2
-      (fun z hz => ⟨neg_le_neg hz.2, by simpa using neg_le_neg hz.1⟩)
-      (convex_Icc _ _) isCompact_Icc
-      (by
-        rw [hvolF2, Real.volume_Icc_pi, Module.finrank_fin_fun]
-        have e2
-            : ∏ i : Fin N, ENNReal.ofReal ((fun _ : Fin N => t) i - (-(fun _ : Fin N => t)) i)
-              = 2 ^ N * ENNReal.ofReal (|d| / I) := by
-          simp only [Pi.neg_apply, sub_neg_eq_add, Finset.prod_const, Finset.card_univ,
-            Fintype.card_fin]
-          rw [← ENNReal.ofReal_pow (by positivity), show t + t = 2 * t by ring, mul_pow, htN,
-            ENNReal.ofReal_mul (by positivity), ENNReal.ofReal_pow (by norm_num)]
-          simp
-        rw [e2, mul_comm])
+  obtain ⟨x, hx0, hxs⟩ := MeasureTheory.exists_ne_zero_mem_lattice_of_measure_mul_two_pow_le_measure
+    (μ := MeasureTheory.volume) (L := L2.toAddSubgroup)
+    (s := Set.Icc (-(fun _ : Fin N => t)) (fun _ : Fin N => t))
+    hF2 (fun z hz => ⟨neg_le_neg hz.2, by simpa using neg_le_neg hz.1⟩) (convex_Icc _ _) isCompact_Icc
+    (by
+      rw [hvolF2, Real.volume_Icc_pi, Module.finrank_fin_fun]
+      have e2 : ∏ i : Fin N, ENNReal.ofReal ((fun _ : Fin N => t) i - (-(fun _ : Fin N => t)) i) =
+          2 ^ N * ENNReal.ofReal (|d| / I) := by
+        simp only [Pi.neg_apply, sub_neg_eq_add, Finset.prod_const, Finset.card_univ,
+          Fintype.card_fin]
+        rw [← ENNReal.ofReal_pow (by positivity), show t + t = 2 * t by ring, mul_pow, htN,
+          ENNReal.ofReal_mul (by positivity), ENNReal.ofReal_pow (by norm_num)]
+        simp
+      rw [e2, mul_comm])
   have hxL2 : (x : Fin N → ℝ) ∈ L2g := x.2
   obtain ⟨v, hv, hvx⟩ := AddSubgroup.mem_map.mp hxL2
-  have hxj : ∀ j, |(x : Fin N → ℝ) j| ≤ t := fun j => abs_le.mpr ⟨by simpa using hxs.1 j, hxs.2 j⟩
+  have hxj : ∀ j, |(x : Fin N → ℝ) j| ≤ t := fun j =>
+    abs_le.mpr ⟨by simpa using hxs.1 j, hxs.2 j⟩
   refine ⟨(v : E), hv, ?_, ?_⟩
   · intro h0
     apply hx0
@@ -193,15 +229,13 @@ theorem exists_ne_zero_mem_norm_sq_le_gram_det_div_relIndex
     rfl
   have hxv : ∀ j, φ v j = (x : Fin N → ℝ) j := fun j => by rw [← hvx]; rfl
   rw [hnorm v]
-  calc
-    ∑ j, (φ v j) ^ 2 ≤ ∑ _j : Fin N, t ^ 2 :=
-      Finset.sum_le_sum fun j _ => by
+  calc ∑ j, (φ v j) ^ 2 ≤ ∑ _j : Fin N, t ^ 2 := Finset.sum_le_sum fun j _ => by
         have := pow_le_pow_left₀ (abs_nonneg _) (hxj j) 2
         rwa [sq_abs, ← hxv j] at this
     _ = N * ((gram ℝ w).det / (I : ℝ) ^ 2) ^ (1 / (N : ℝ)) := by
-      rw [Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul, hgram, ht, one_div]
-      congr 1
-      rw [← Real.rpow_natCast, ← Real.rpow_mul hq, mul_comm, Real.rpow_mul hq, Real.rpow_natCast,
-        div_pow, sq_abs]
+        rw [Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul, hgram, ht, one_div]
+        congr 1
+        rw [← Real.rpow_natCast, ← Real.rpow_mul hq, mul_comm, Real.rpow_mul hq, Real.rpow_natCast,
+          div_pow, sq_abs]
 
 end ReciprocityTheory.ChartRestriction.G.T0

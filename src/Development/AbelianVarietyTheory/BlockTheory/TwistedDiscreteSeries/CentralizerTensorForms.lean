@@ -1,8 +1,50 @@
 module
 
-public import Mathlib
-public import Formalism.SatakeDualWeyl.Statement
 public import Formalism.LocalRingCardinality.DataLevel
+public import Mathlib.NumberTheory.NumberField.AdeleRing
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -29,57 +71,52 @@ def adj (σ : A →+* A) (J l : Matrix n n A) : Matrix n n A := J⁻¹ * cT σ l
 
 def genAlg (γ : Matrix n n A) : Subalgebra A (Matrix n n A) := Algebra.adjoin A {γ}
 
-instance (γ : Matrix n n A) : CommRing (genAlg γ) := {
-  (inferInstance : Ring (genAlg γ)) with
-  mul_comm := fun a b => (Algebra.isMulCommutative_adjoin_singleton A γ).is_comm.comm a b
-}
+instance (γ : Matrix n n A) : CommRing (genAlg γ) :=
+  { (inferInstance : Ring (genAlg γ)) with
+    mul_comm := fun a b =>
+      (Algebra.isMulCommutative_adjoin_singleton A γ).is_comm.comm a b }
 
 def gen (γ : Matrix n n A) : genAlg γ := ⟨γ, Algebra.self_mem_adjoin_singleton A γ⟩
 
 open Matrix NumberField in
 open scoped TensorProduct in
 variable {A : Type} [CommRing A] {n : Type} [Fintype n] [DecidableEq n] in
-theorem _root_.GlobalTheory.IndefiniteRowSideFullHecke.CentralizerTensorForms.adj_eq_iff
-    (σ : A →+* A) {J : Matrix n n A} (hJ : IsUnit J.det) (l m : Matrix n n A)
-    : _root_.GlobalTheory.IndefiniteRowSideFullHecke.CentralizerTensorForms.adj σ J l = m
-      ↔ _root_.Formalism.UG.cT σ l * J = J * m := by
+theorem _root_.GlobalTheory.IndefiniteRowSideFullHecke.CentralizerTensorForms.adj_eq_iff (σ : A →+* A) {J : Matrix n n A} (hJ : IsUnit J.det)
+    (l m : Matrix n n A) :
+    _root_.GlobalTheory.IndefiniteRowSideFullHecke.CentralizerTensorForms.adj σ J l = m ↔ _root_.Formalism.UG.cT σ l * J = J * m := by
   unfold _root_.GlobalTheory.IndefiniteRowSideFullHecke.CentralizerTensorForms.adj
   constructor
   · intro h
-    rw [← h, ← Matrix.mul_assoc, ← Matrix.mul_assoc, Matrix.mul_nonsing_inv _ hJ, Matrix.one_mul]
+    rw [← h, ← Matrix.mul_assoc, ← Matrix.mul_assoc, Matrix.mul_nonsing_inv _ hJ,
+      Matrix.one_mul]
   · intro h
     rw [Matrix.mul_assoc, h, ← Matrix.mul_assoc, Matrix.nonsing_inv_mul _ hJ, Matrix.one_mul]
 
 open Matrix NumberField in
 open scoped TensorProduct in
 variable {A : Type} [CommRing A] {n : Type} [Fintype n] [DecidableEq n] in
-theorem _root_.GlobalTheory.IndefiniteRowSideFullHecke.CentralizerTensorForms.hform_eq
-    (σ : A →+* A) (J : Matrix n n A) (x y : n → A)
-    : _root_.Formalism.UG.hform σ J x y = (fun i => σ (x i)) ⬝ᵥ (J *ᵥ y) := by
+theorem _root_.GlobalTheory.IndefiniteRowSideFullHecke.CentralizerTensorForms.hform_eq (σ : A →+* A) (J : Matrix n n A) (x y : n → A) :
+    _root_.Formalism.UG.hform σ J x y = (fun i => σ (x i)) ⬝ᵥ (J *ᵥ y) := by
   unfold _root_.Formalism.UG.hform
   simp [dotProduct, mulVec, Finset.mul_sum, mul_assoc]
+
 
 open Matrix NumberField in
 open scoped TensorProduct in
 variable {A : Type} [CommRing A] {n : Type} [Fintype n] [DecidableEq n] in
-theorem _root_.GlobalTheory.IndefiniteRowSideFullHecke.CentralizerTensorForms.form_adj
-    (σ : A →+* A) {J : Matrix n n A} (hJ : IsUnit J.det) (l : Matrix n n A) (y y' : n → A)
-    : _root_.GlobalTheory.IndefiniteRowSideFullHecke.CentralizerTensorForms.form σ J y (l *ᵥ y')
-      = _root_.GlobalTheory.IndefiniteRowSideFullHecke.CentralizerTensorForms.form σ J
-        (_root_.GlobalTheory.IndefiniteRowSideFullHecke.CentralizerTensorForms.adj σ J l *ᵥ y)
-        y' := by
-  have hJJ
-      : J * _root_.GlobalTheory.IndefiniteRowSideFullHecke.CentralizerTensorForms.adj σ J l
-        = _root_.Formalism.UG.cT σ l * J := by
+theorem _root_.GlobalTheory.IndefiniteRowSideFullHecke.CentralizerTensorForms.form_adj (σ : A →+* A) {J : Matrix n n A} (hJ : IsUnit J.det)
+    (l : Matrix n n A) (y y' : n → A) :
+    _root_.GlobalTheory.IndefiniteRowSideFullHecke.CentralizerTensorForms.form σ J y (l *ᵥ y') =
+      _root_.GlobalTheory.IndefiniteRowSideFullHecke.CentralizerTensorForms.form σ J (_root_.GlobalTheory.IndefiniteRowSideFullHecke.CentralizerTensorForms.adj σ J l *ᵥ y) y' := by
+  have hJJ : J * _root_.GlobalTheory.IndefiniteRowSideFullHecke.CentralizerTensorForms.adj σ J l = _root_.Formalism.UG.cT σ l * J := by
     unfold _root_.GlobalTheory.IndefiniteRowSideFullHecke.CentralizerTensorForms.adj
     rw [← Matrix.mul_assoc, ← Matrix.mul_assoc, Matrix.mul_nonsing_inv _ hJ, Matrix.one_mul]
-  simp only [_root_.GlobalTheory.IndefiniteRowSideFullHecke.CentralizerTensorForms.form,
-    _root_.GlobalTheory.IndefiniteRowSideFullHecke.CentralizerTensorForms.hform_eq]
+  simp only [_root_.GlobalTheory.IndefiniteRowSideFullHecke.CentralizerTensorForms.form, _root_.GlobalTheory.IndefiniteRowSideFullHecke.CentralizerTensorForms.hform_eq]
   rw [mulVec_mulVec, hJJ, ← mulVec_mulVec, dotProduct_mulVec (fun i => σ (y' i))]
   congr 1
   funext i
   unfold _root_.Formalism.UG.cT
-  set_option synthInstance.maxHeartbeats 100000 in
+
   simp [vecMul, mulVec, dotProduct, map_sum, mul_comm]
 
 end Ring
@@ -102,9 +139,8 @@ def plusAlg (σ : E →ₐ[F] E) (J γ : Matrix n n E) : Subalgebra F (genAlg γ
     intro a b ha hb
     simp only [Set.mem_setOf_eq] at *
     have hd : ((a + b : genAlg γ) : Matrix n n E) = (a : Matrix n n E) + b := rfl
-    have he
-        : cT (σ : E →+* E) ((a : Matrix n n E) + (b : Matrix n n E))
-          = cT (σ : E →+* E) (a : Matrix n n E) + cT (σ : E →+* E) (b : Matrix n n E) := by
+    have he : cT (σ : E →+* E) ((a : Matrix n n E) + (b : Matrix n n E)) =
+        cT (σ : E →+* E) (a : Matrix n n E) + cT (σ : E →+* E) (b : Matrix n n E) := by
       ext i j; simp [cT]
     rw [hd, he, Matrix.add_mul, Matrix.mul_add, ha, hb]
   algebraMap_mem' := by
@@ -114,21 +150,21 @@ def plusAlg (σ : E →ₐ[F] E) (J γ : Matrix n n E) : Subalgebra F (genAlg γ
       rw [Algebra.algebraMap_eq_smul_one]; rfl
     have he : cT (σ : E →+* E) (r • (1 : Matrix n n E)) = r • (1 : Matrix n n E) := by
       ext i j; by_cases h : i = j <;> simp [cT, Matrix.one_apply, h, eq_comm]
-    rw [hd, he]
-    simp
+    rw [hd, he]; simp
 
-def plusTensor (σ : E →ₐ[F] E) (J γ : Matrix n n E) : plusAlg σ J γ ⊗[F] E →ₐ[F] genAlg γ :=
+def plusTensor (σ : E →ₐ[F] E) (J γ : Matrix n n E) :
+    plusAlg σ J γ ⊗[F] E →ₐ[F] genAlg γ :=
   Algebra.TensorProduct.productMap (plusAlg σ J γ).val (IsScalarTower.toAlgHom F E (genAlg γ))
 
 abbrev LPts (σ : E →ₐ[F] E) (J γ : Matrix n n E) (R : Type) [CommRing R] [Algebra F R] : Type :=
   plusAlg σ J γ ⊗[F] (E ⊗[F] R)
 
-def lConj (σ : E →ₐ[F] E) (J γ : Matrix n n E) (R : Type) [CommRing R] [Algebra F R]
-    : LPts σ J γ R →ₐ[F] LPts σ J γ R :=
+def lConj (σ : E →ₐ[F] E) (J γ : Matrix n n E) (R : Type) [CommRing R] [Algebra F R] :
+    LPts σ J γ R →ₐ[F] LPts σ J γ R :=
   Algebra.TensorProduct.map (AlgHom.id F _) (Algebra.TensorProduct.map σ (AlgHom.id F R))
 
-def normOne (σ : E →ₐ[F] E) (J γ : Matrix n n E) (R : Type) [CommRing R] [Algebra F R]
-    : Subgroup (LPts σ J γ R)ˣ where
+def normOne (σ : E →ₐ[F] E) (J γ : Matrix n n E) (R : Type) [CommRing R] [Algebra F R] :
+    Subgroup (LPts σ J γ R)ˣ where
   carrier := {u | (u : LPts σ J γ R) * lConj σ J γ R u = 1}
   one_mem' := by simp
   mul_mem' := by
@@ -138,21 +174,20 @@ def normOne (σ : E →ₐ[F] E) (J γ : Matrix n n E) (R : Type) [CommRing R] [
   inv_mem' := by
     intro a ha
     simp only [Set.mem_setOf_eq] at *
-    have h
-        : ((a⁻¹ : _ˣ) : LPts σ J γ R) * lConj σ J γ R (a⁻¹ : _ˣ) * (a * lConj σ J γ R a) = 1 := by
+    have h : ((a⁻¹ : _ˣ) : LPts σ J γ R) * lConj σ J γ R (a⁻¹ : _ˣ) * (a * lConj σ J γ R a) = 1 := by
       rw [mul_mul_mul_comm, ← map_mul]; simp
     rwa [ha, mul_one] at h
 
-def toMat (σ : E →ₐ[F] E) (J γ : Matrix n n E) (R : Type) [CommRing R] [Algebra F R]
-    : LPts σ J γ R →ₐ[F] Matrix n n (E ⊗[F] R) :=
+def toMat (σ : E →ₐ[F] E) (J γ : Matrix n n E) (R : Type) [CommRing R] [Algebra F R] :
+    LPts σ J γ R →ₐ[F] Matrix n n (E ⊗[F] R) :=
   Algebra.TensorProduct.lift
     ((AlgHom.mapMatrix (Algebra.TensorProduct.includeLeft : E →ₐ[F] E ⊗[F] R)).comp
       (((genAlg γ).val.restrictScalars F).comp (plusAlg σ J γ).val))
     (IsScalarTower.toAlgHom F (E ⊗[F] R) (Matrix n n (E ⊗[F] R)))
     (fun _ a => (Algebra.commutes a _).symm)
 
-def centPts (σ : E →ₐ[F] E) (J : Matrix n n E) (γ : GL n E) (R : Type) [CommRing R] [Algebra F R]
-    : Subgroup (GL n (E ⊗[F] R)) :=
+def centPts (σ : E →ₐ[F] E) (J : Matrix n n E) (γ : GL n E) (R : Type) [CommRing R]
+    [Algebra F R] : Subgroup (GL n (E ⊗[F] R)) :=
   UPts σ J R ⊓ Subgroup.centralizer {bc (inclE (F := F) R) γ}
 
 def centRat (σ : E →ₐ[F] E) (J : Matrix n n E) (γ : GL n E) : Subgroup (GL n E) :=
@@ -162,11 +197,10 @@ structure SplitSubtorus (σ : E →ₐ[F] E) (J : Matrix n n E) (γ : GL n E) (k
   hom : ∀ (R : Type) [CommRing R] [Algebra F R], (Fin k → Rˣ) →* GL n (E ⊗[F] R)
   mem : ∀ (R : Type) [CommRing R] [Algebra F R] (t : Fin k → Rˣ), hom R t ∈ centPts σ J γ R
   inj : ∀ (R : Type) [CommRing R] [Algebra F R], Function.Injective (hom R)
-  natural
-    : ∀ (R S : Type) [CommRing R] [Algebra F R] [CommRing S] [Algebra F S] (f : R →ₐ[F] S)
-        (t : Fin k → Rˣ),
-      hom S (fun i => Units.map (f : R →* S) (t i))
-        = bc (Algebra.TensorProduct.map (AlgHom.id F E) f).toRingHom (hom R t)
+  natural : ∀ (R S : Type) [CommRing R] [Algebra F R] [CommRing S] [Algebra F S]
+    (f : R →ₐ[F] S) (t : Fin k → Rˣ),
+    hom S (fun i => Units.map (f : R →* S) (t i)) =
+      bc (Algebra.TensorProduct.map (AlgHom.id F E) f).toRingHom (hom R t)
 
 def HasSplitRank (σ : E →ₐ[F] E) (J : Matrix n n E) (γ : GL n E) (s : ℕ) : Prop :=
   IsGreatest {k | Nonempty (SplitSubtorus σ J γ k)} s
@@ -180,95 +214,85 @@ structure IsRegular (σ : E →ₐ[F] E) (J : Matrix n n E) (γ : GL n E) : Prop
 
 def ClauseAlg (σ : E →ₐ[F] E) (J : Matrix n n E) (γ : GL n E) : Prop :=
   (∃ e : AdjoinRoot (γ : Matrix n n E).charpoly ≃ₐ[E] genAlg (γ : Matrix n n E),
-      e (AdjoinRoot.root _) = gen (γ : Matrix n n E))
-    ∧ Algebra.Etale E (genAlg (γ : Matrix n n E))
-    ∧ Nonempty (Module.Basis n E (genAlg (γ : Matrix n n E)))
-    ∧ (∃ v : n → E,
-      Function.Bijective (fun l : genAlg (γ : Matrix n n E) => (l : Matrix n n E) *ᵥ v))
-    ∧ (∀ l ∈ genAlg (γ : Matrix n n E), adj (σ : E →+* E) J l ∈ genAlg (γ : Matrix n n E))
-    ∧ adj (σ : E →+* E) J (γ : Matrix n n E) = ((γ⁻¹ : GL n E) : Matrix n n E)
-    ∧ ∀ e : E,
-      adj (σ : E →+* E) J (algebraMap E (Matrix n n E) e) = algebraMap E (Matrix n n E) (σ e)
+      e (AdjoinRoot.root _) = gen (γ : Matrix n n E)) ∧
+  Algebra.Etale E (genAlg (γ : Matrix n n E)) ∧
+  Nonempty (Module.Basis n E (genAlg (γ : Matrix n n E))) ∧
+  (∃ v : n → E, Function.Bijective
+      (fun l : genAlg (γ : Matrix n n E) => (l : Matrix n n E) *ᵥ v)) ∧
+  (∀ l ∈ genAlg (γ : Matrix n n E), adj (σ : E →+* E) J l ∈ genAlg (γ : Matrix n n E)) ∧
+  adj (σ : E →+* E) J (γ : Matrix n n E) = ((γ⁻¹ : GL n E) : Matrix n n E) ∧
+  ∀ e : E, adj (σ : E →+* E) J (algebraMap E (Matrix n n E) e) = algebraMap E (Matrix n n E) (σ e)
 
 def ClausePlus (σ : E →ₐ[F] E) (J : Matrix n n E) (γ : GL n E) : Prop :=
-  Algebra.Etale F (plusAlg σ J (γ : Matrix n n E))
-    ∧ Nonempty (Module.Basis n F (plusAlg σ J (γ : Matrix n n E)))
-    ∧ Function.Bijective (plusTensor σ J (γ : Matrix n n E))
+  Algebra.Etale F (plusAlg σ J (γ : Matrix n n E)) ∧
+  Nonempty (Module.Basis n F (plusAlg σ J (γ : Matrix n n E))) ∧
+  Function.Bijective (plusTensor σ J (γ : Matrix n n E))
 
 def ClauseCent (σ : E →ₐ[F] E) (J : Matrix n n E) (γ : GL n E) : Prop :=
   (∀ (R : Type) [CommRing R] [Algebra F R],
-      Function.Injective (toMat σ J (γ : Matrix n n E) R)
-        ∧ (∀ u,
-          toMat σ J (γ : Matrix n n E) R (lConj σ J (γ : Matrix n n E) R u)
-            = adj (sigR σ R) (J.map (inclE (F := F) R)) (toMat σ J (γ : Matrix n n E) R u))
-        ∧ ∀ g : GL n (E ⊗[F] R),
-          g ∈ centPts σ J γ R
-            ↔ ∃ u ∈ normOne σ J (γ : Matrix n n E) R,
-              toMat σ J (γ : Matrix n n E) R (u : LPts σ J (γ : Matrix n n E) R)
-                = (g : Matrix n n (E ⊗[F] R)))
-    ∧ (∀ g : GL n E,
-      g ∈ centRat σ J γ
-        ↔ (g : Matrix n n E) ∈ genAlg (γ : Matrix n n E)
-          ∧ (g : Matrix n n E) * adj (σ : E →+* E) J (g : Matrix n n E) = 1)
-    ∧ ∀ (Ω : Type) [Field Ω] [Algebra F Ω] [IsAlgClosed Ω],
-      ∃ φ : LPts σ J (γ : Matrix n n E) Ω ≃ₐ[F] (n → Ω × Ω),
-        (∀ ω : Ω, φ (1 ⊗ₜ (1 ⊗ₜ ω)) = fun _ => (ω, ω))
-          ∧ ∀ u i, φ (lConj σ J (γ : Matrix n n E) Ω u) i = (φ u i).swap
+    Function.Injective (toMat σ J (γ : Matrix n n E) R) ∧
+    (∀ u, toMat σ J (γ : Matrix n n E) R (lConj σ J (γ : Matrix n n E) R u) =
+      adj (sigR σ R) (J.map (inclE (F := F) R)) (toMat σ J (γ : Matrix n n E) R u)) ∧
+    ∀ g : GL n (E ⊗[F] R), g ∈ centPts σ J γ R ↔
+      ∃ u ∈ normOne σ J (γ : Matrix n n E) R,
+        toMat σ J (γ : Matrix n n E) R (u : LPts σ J (γ : Matrix n n E) R) =
+          (g : Matrix n n (E ⊗[F] R))) ∧
+  (∀ g : GL n E, g ∈ centRat σ J γ ↔
+    (g : Matrix n n E) ∈ genAlg (γ : Matrix n n E) ∧
+      (g : Matrix n n E) * adj (σ : E →+* E) J (g : Matrix n n E) = 1) ∧
+  ∀ (Ω : Type) [Field Ω] [Algebra F Ω] [IsAlgClosed Ω],
+    ∃ φ : LPts σ J (γ : Matrix n n E) Ω ≃ₐ[F] (n → Ω × Ω),
+      (∀ ω : Ω, φ (1 ⊗ₜ (1 ⊗ₜ ω)) = fun _ => (ω, ω)) ∧
+      ∀ u i, φ (lConj σ J (γ : Matrix n n E) Ω u) i = (φ u i).swap
 
 def ClauseRank (σ : E →ₐ[F] E) (J : Matrix n n E) (γ : GL n E) : Prop :=
   (∃ (k : ℕ) (K : Fin k → Type) (_ : ∀ i, Field (K i)) (_ : ∀ i, Algebra F (K i)),
-      Nonempty (plusAlg σ J (γ : Matrix n n E) ≃ₐ[F] ∀ i, K i))
-    ∧ ∀ (k : ℕ) (K : Fin k → Type) [∀ i, Field (K i)] [∀ i, Algebra F (K i)],
-      Nonempty (plusAlg σ J (γ : Matrix n n E) ≃ₐ[F] ∀ i, K i)
-        → HasSplitRank σ J γ (Nat.card {i : Fin k // ¬ IsField (K i ⊗[F] E)}) ∧ (Nonempty n → 1 ≤ k)
-          ∧ (IsField (genAlg (γ : Matrix n n E)) ↔ k = 1 ∧ ∀ i, IsField (K i ⊗[F] E))
+    Nonempty (plusAlg σ J (γ : Matrix n n E) ≃ₐ[F] ∀ i, K i)) ∧
+  ∀ (k : ℕ) (K : Fin k → Type) [∀ i, Field (K i)] [∀ i, Algebra F (K i)],
+    Nonempty (plusAlg σ J (γ : Matrix n n E) ≃ₐ[F] ∀ i, K i) →
+      HasSplitRank σ J γ (Nat.card {i : Fin k // ¬ IsField (K i ⊗[F] E)}) ∧
+      (Nonempty n → 1 ≤ k) ∧
+      (IsField (genAlg (γ : Matrix n n E)) ↔ k = 1 ∧ ∀ i, IsField (K i ⊗[F] E))
 
 def ClauseProper (σ : E →ₐ[F] E) (J : Matrix n n E) (γ : GL n E) : Prop :=
   (∀ (R : Type) [CommRing R] [Algebra F R], ∀ a ∈ centPts σ J γ R, ∀ b ∈ centPts σ J γ R,
-      a * b = b * a)
-    ∧ (IsField E
-      → ∀ (s : ℕ),
-        1 ≤ s
-          → ∀ A : SplitSubtorus σ J γ s, ∃ g ∈ UPts σ J F, ∃ t : Fin s → Fˣ,
-            g * A.hom F t ≠ A.hom F t * g)
+    a * b = b * a) ∧
+  (IsField E → ∀ (s : ℕ), 1 ≤ s → ∀ A : SplitSubtorus σ J γ s,
+    ∃ g ∈ UPts σ J F, ∃ t : Fin s → Fˣ, g * A.hom F t ≠ A.hom F t * g)
 
 def ClauseTrace (σ : E →ₐ[F] E) (J : Matrix n n E) (γ : GL n E) : Prop :=
   ∃ (x : (plusAlg σ J (γ : Matrix n n E))ˣ) (v : n → E),
-    Function.Bijective (fun l : genAlg (γ : Matrix n n E) => (l : Matrix n n E) *ᵥ v)
-      ∧ ∀ y y' : genAlg (γ : Matrix n n E), ∃ z : genAlg (γ : Matrix n n E),
-        (z : Matrix n n E) = adj (σ : E →+* E) J (y' : Matrix n n E)
-          ∧ form (σ : E →+* E) J ((y : Matrix n n E) *ᵥ v) ((y' : Matrix n n E) *ᵥ v)
-            = Algebra.trace E (genAlg (γ : Matrix n n E))
-              (((x : plusAlg σ J (γ : Matrix n n E)) : genAlg (γ : Matrix n n E)) * y * z)
+    Function.Bijective (fun l : genAlg (γ : Matrix n n E) => (l : Matrix n n E) *ᵥ v) ∧
+    ∀ y y' : genAlg (γ : Matrix n n E), ∃ z : genAlg (γ : Matrix n n E),
+      (z : Matrix n n E) = adj (σ : E →+* E) J (y' : Matrix n n E) ∧
+      form (σ : E →+* E) J ((y : Matrix n n E) *ᵥ v) ((y' : Matrix n n E) *ᵥ v) =
+        Algebra.trace E (genAlg (γ : Matrix n n E))
+          (((x : plusAlg σ J (γ : Matrix n n E)) : genAlg (γ : Matrix n n E)) * y * z)
 
 end Objects
 
-def AdelicCompact
-    {F E : Type} [Field F] [NumberField F] [CommRing E] [Algebra F E]
-    {n : Type} [Fintype n] [DecidableEq n]
-    (σ : E →ₐ[F] E) (J : Matrix n n E) (γ : GL n E)
-    : Prop :=
+def AdelicCompact {F E : Type} [Field F] [NumberField F] [CommRing E] [Algebra F E]
+    {n : Type} [Fintype n] [DecidableEq n] (σ : E →ₐ[F] E) (J : Matrix n n E) (γ : GL n E) : Prop :=
   letI : TopologicalSpace (E ⊗[F] AdeleRing (𝓞 F) F) :=
     Formalism.BasicNotions.tensTopL (F := F) (E := E) (AdeleRing (𝓞 F) F)
-  CompactSpace
-    (centPts σ J γ (AdeleRing (𝓞 F) F) ⧸
-      ((centRat σ J γ).map (bc (inclE (F := F) (AdeleRing (𝓞 F) F)))).subgroupOf
-        (centPts σ J γ (AdeleRing (𝓞 F) F)))
+  CompactSpace (centPts σ J γ (AdeleRing (𝓞 F) F) ⧸
+    ((centRat σ J γ).map (bc (inclE (F := F) (AdeleRing (𝓞 F) F)))).subgroupOf
+      (centPts σ J γ (AdeleRing (𝓞 F) F)))
 
 def RegularStructure : Prop :=
-  ∀ (F E : Type) [Field F] [CharZero F] [CommRing E] [Algebra F E] (n : Type) [Fintype n]
-      [DecidableEq n] (σ : E →ₐ[F] E) (J : Matrix n n E) (γ : GL n E),
-    IsRegular σ J γ
-      → ClauseAlg σ J γ ∧ ClausePlus σ J γ ∧ ClauseCent σ J γ ∧ ClauseRank σ J γ
-        ∧ ClauseProper σ J γ ∧ ClauseTrace σ J γ
+  ∀ (F E : Type) [Field F] [CharZero F] [CommRing E] [Algebra F E]
+    (n : Type) [Fintype n] [DecidableEq n] (σ : E →ₐ[F] E) (J : Matrix n n E) (γ : GL n E),
+    IsRegular σ J γ →
+      ClauseAlg σ J γ ∧ ClausePlus σ J γ ∧ ClauseCent σ J γ ∧ ClauseRank σ J γ ∧
+        ClauseProper σ J γ ∧ ClauseTrace σ J γ
 
 def RegularAdelic : Prop :=
-  ∀ (F E : Type) [Field F] [NumberField F] [CommRing E] [Algebra F E] (n : Type) [Fintype n]
-      [DecidableEq n] (σ : E →ₐ[F] E) (J : Matrix n n E) (γ : GL n E),
-    IsRegular σ J γ
-      → ∀ (k : ℕ) (K : Fin k → Type) [∀ i, Field (K i)] [∀ i, Algebra F (K i)],
-        Nonempty (plusAlg σ J (γ : Matrix n n E) ≃ₐ[F] ∀ i, K i)
-          → (AdelicCompact σ J γ ↔ ∀ i, IsField (K i ⊗[F] E))
+  ∀ (F E : Type) [Field F] [NumberField F] [CommRing E] [Algebra F E]
+    (n : Type) [Fintype n] [DecidableEq n] (σ : E →ₐ[F] E) (J : Matrix n n E) (γ : GL n E),
+    IsRegular σ J γ →
+      ∀ (k : ℕ) (K : Fin k → Type) [∀ i, Field (K i)] [∀ i, Algebra F (K i)],
+        Nonempty (plusAlg σ J (γ : Matrix n n E) ≃ₐ[F] ∀ i, K i) →
+          (AdelicCompact σ J γ ↔ ∀ i, IsField (K i ⊗[F] E))
 
 def RegularSemisimple : Prop := RegularStructure ∧ RegularAdelic
 

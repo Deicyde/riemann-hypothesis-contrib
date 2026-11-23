@@ -1,8 +1,61 @@
 module
 
 public import Formalism.FlagUnipotentLattices.StabiliserComplementDecomposition
-public import Formalism.FlagUnipotentLattices.AlgebraicIdentityHigherDegree
-public import Formalism.FormalDegreeBessel.FinalG
+public import Formalism.FlagUnipotentLattices.MinkowskiFactorialBounds.IntegrableOnIoiTruncatedPowerMoment
+public import Mathlib.CategoryTheory.Category.Basic
+public import Formalism.FormalDegreeBessel.FormalDegreeRatio.GBasic
+public import Formalism.FormalDegreeBessel.FormalDegreeRatio.GNonneg
+public import Formalism.FormalDegreeBessel.FormalDegreeRatio.GroupFactorizationHolds
+public import Formalism.FormalDegreeBessel.FormalDegreeRatio.ReverseCauchySchwarzHolds
+public import Formalism.FormalDegreeBessel.FormalDegreeRatio.UnitaryWeylNormalHolds
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Real
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Lemma
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
@@ -21,11 +74,9 @@ theorem gauge_le_determinant : GfLeD := by
 
 theorem orthogonality_relation : DualVectorOrthogonal := by
   intro V _ _ h r y f' b
-  have h1
-      : h (formalDeterminantVector h y f') (f' b)
-        = ((Matrix.of fun a b => h (y a) (f' b)).adjugate * (Matrix.of fun a b => h (y a) (f' b)))
-          (Fin.last r) b := by
-    set_option synthInstance.maxHeartbeats 100000 in
+  have h1 : h (formalDeterminantVector h y f') (f' b) =
+      ((Matrix.of fun a b => h (y a) (f' b)).adjugate * (Matrix.of fun a b => h (y a) (f' b))) (Fin.last r) b := by
+
     simp [formalDeterminantVector, Matrix.mul_apply, map_sum]
   rw [h1, Matrix.adjugate_mul]
   by_cases hb : b = Fin.last r
@@ -41,8 +92,8 @@ theorem matrix_action_evaluation_holds : RankTwoSkewMatrixApply := by
     rw [Finset.sum_comm]
     refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => by ring
   ext i
-  simp only [rankTwoSkewMatrix, Matrix.mulVec, dotProduct, Matrix.of_apply, Pi.sub_apply,
-    Pi.smul_apply, smul_eq_mul, sub_mul, Finset.sum_sub_distrib]
+  simp only [rankTwoSkewMatrix, Matrix.mulVec, dotProduct, Matrix.of_apply, Pi.sub_apply, Pi.smul_apply, smul_eq_mul,
+    sub_mul, Finset.sum_sub_distrib]
   rw [← key v, ← key e, Finset.sum_mul, Finset.sum_mul]
   congr 1 <;> exact Finset.sum_congr rfl fun j _ => by ring
 
@@ -53,7 +104,8 @@ theorem majorant_cauchy_schwarz_holds : MomentPointwiseBound := by
     exact (norm_sum_le _ _).trans (Finset.sum_le_sum fun i _ => (norm_smul _ _).le)
   have h2 : (∑ i, ‖c i‖ * ‖x i‖) ^ 2 ≤ (∑ i, ‖c i‖ ^ 2) * ∑ i, ‖x i‖ ^ 2 :=
     Finset.sum_mul_sq_le_sq_mul_sq _ _ _
-  have h3 : (‖d‖ * ‖P‖) ^ 2 ≤ (∑ i, ‖c i‖ * ‖x i‖) ^ 2 := pow_le_pow_left₀ (by positivity) h1 2
+  have h3 : (‖d‖ * ‖P‖) ^ 2 ≤ (∑ i, ‖c i‖ * ‖x i‖) ^ 2 :=
+    pow_le_pow_left₀ (by positivity) h1 2
   have hX : 0 ≤ ∑ i, ‖x i‖ ^ 2 := Finset.sum_nonneg fun i _ => by positivity
   have h4 : (‖d‖ * ‖P‖) ^ 2 ≤ 4 * la ^ 2 * ∑ i, ‖x i‖ ^ 2 :=
     h3.trans (h2.trans (mul_le_mul_of_nonneg_right hc hX))
@@ -80,13 +132,9 @@ theorem lie_algebra_nilpotent_part_holds : RankTwoSkewInNilradical := by
     intro b hb hE
     have h1 : (b : ℕ) ≤ (a : ℕ) := hb
     have h2 : (b : ℕ) = r := by rw [hE]; rfl
-    have := a.isLt
-    omega
-  have hsub
-      : Submodule.span ℂ (f '' {b | b < a.castSucc})
-        ≤ Submodule.span ℂ (f '' {b | b ≤ a.castSucc}) :=
-    Submodule.span_mono (Set.image_mono fun b (hb : b < a.castSucc) =>
-      (le_of_lt hb : b ≤ a.castSucc))
+    have := a.isLt; omega
+  have hsub : Submodule.span ℂ (f '' {b | b < a.castSucc}) ≤ Submodule.span ℂ (f '' {b | b ≤ a.castSucc}) :=
+    Submodule.span_mono (Set.image_mono fun b (hb : b < a.castSucc) => (le_of_lt hb : b ≤ a.castSucc))
   have heX : e ∈ Submodule.span ℂ (f '' {b | b ≤ a.castSucc}) := by
     have h1 : f a.castSucc ∈ Submodule.span ℂ (f '' {b | b ≤ a.castSucc}) :=
       Submodule.subset_span ⟨a.castSucc, (le_refl _ : a.castSucc ≤ a.castSucc), rfl⟩
@@ -107,17 +155,12 @@ theorem lie_algebra_nilpotent_part_holds : RankTwoSkewInNilradical := by
     · intro y w _ _ hy hw; simp [hy, hw]
     · intro c y _ hy; simp [hy]
   have hfe : ∀ b, h (f b) e = 0 := by
-    intro b
-    apply hxe
-    intro c hc
-    rw [hG]
-    simp [hlast c hc]
-  have hX
-      : ∀ x, (∀ b : Fin r, h x (f b.castSucc) = 0) → rankTwoSkewOperator h e v x = h x v • e := by
+    intro b; apply hxe; intro c hc
+    rw [hG]; simp [hlast c hc]
+  have hX : ∀ x, (∀ b : Fin r, h x (f b.castSucc) = 0) → rankTwoSkewOperator h e v x = h x v • e := by
     intro x hx
     have : h x e = 0 := by
-      apply hxe
-      intro b hb
+      apply hxe; intro b hb
       have hb' : (b : ℕ) < r := lt_of_le_of_lt (show (b : ℕ) ≤ (a : ℕ) from hb) a.isLt
       have := hx ⟨b, hb'⟩
       simpa using this
@@ -127,10 +170,8 @@ theorem lie_algebra_nilpotent_part_holds : RankTwoSkewInNilradical := by
   refine ⟨heX, hX, hYf, fun b hb => by rw [hYf, hv b hb, zero_smul], ?_, ?_, ?_⟩
   · rw [hYf, ← smul_sub]; exact Submodule.smul_mem _ _ he
   · have hee : h e e = 0 := by
-      apply hxe
-      intro b hb
-      rw [hherm, hfe b]
-      simp
+      apply hxe; intro b hb
+      rw [hherm, hfe b]; simp
     simp [rankTwoSkewOperator, hev, hee]
   · have : h v e = 0 := by rw [hherm, hev]; simp
     simp [rankTwoSkewOperator, this]
@@ -143,12 +184,10 @@ theorem majorant_orthogonal_component : MajorantOrthogonalComponent := by
   have hort : ∀ w ∈ K, inner ℂ (y a - K.starProjection (y a)) w = 0 := by
     intro w hw
     have h := Submodule.sub_starProjection_mem_orthogonal (K := K) (y a)
-    rw [Submodule.mem_orthogonal'] at h
-    exact h _ hw
+    rw [Submodule.mem_orthogonal'] at h; exact h _ hw
   refine ⟨y a - K.starProjection (y a), ?_, ?_, ?_, ?_⟩
   · have : y a - K.starProjection (y a) - y a = -(K.starProjection (y a)) := by abel
-    rw [this]
-    exact K.neg_mem hPm
+    rw [this]; exact K.neg_mem hPm
   · intro b hb
     exact hort _ (Submodule.subset_span ⟨b, hb, rfl⟩)
   · unfold majorantDistance
@@ -156,26 +195,23 @@ theorem majorant_orthogonal_component : MajorantOrthogonalComponent := by
     have := (Submodule.norm_eq_iInf_iff_inner_eq_zero K (u := y a) hPm).mpr hort
     rw [this]
     exact iInf_congr fun w => (dist_eq_norm _ _).symm
-  · have h1
-        : inner ℂ (y a - K.starProjection (y a)) (y a)
-          = inner ℂ (y a - K.starProjection (y a)) (y a - K.starProjection (y a)) := by
+  · have h1 : inner ℂ (y a - K.starProjection (y a)) (y a) =
+        inner ℂ (y a - K.starProjection (y a)) (y a - K.starProjection (y a)) := by
       rw [inner_sub_right (y a - K.starProjection (y a)) (y a), hort _ hPm, sub_zero]
-    rw [h1, inner_self_eq_norm_sq_to_K]
-    push_cast
-    rfl
+    rw [h1, inner_self_eq_norm_sq_to_K]; push_cast; rfl
 
 theorem majorant_parameter_choice_holds : SkewVectorChoice := by
   have hPhase : MajorantPhaseChoice := majorant_phase_estimate_holds
   intro V _ _ θ hθ r y a hl
   obtain ⟨e', he1, _, he3, _⟩ := majorant_orthogonal_component V (r + 1) y a.castSucc
   obtain ⟨u, hu1, hu2, hu3, hu4⟩ := majorant_orthogonal_component V (r + 1) y a.succ
-  have hu0 : u ≠ 0 := by intro h; apply hl; rw [← hu3, h, norm_zero]
-  obtain ⟨p1, p2, p3⟩ :=
-    hPhase V θ hθ u (y a.succ) (y '' {b | b ≤ a.castSucc}) hu0
-      (by
-        rintro w ⟨b, hb, rfl⟩
-        exact hu2 b (lt_of_le_of_lt (show b ≤ a.castSucc from hb) (Fin.castSucc_lt_succ)))
-      hu4
+  have hu0 : u ≠ 0 := by
+    intro h; apply hl; rw [← hu3, h, norm_zero]
+  obtain ⟨p1, p2, p3⟩ := hPhase V θ hθ u (y a.succ) (y '' {b | b ≤ a.castSucc}) hu0
+    (by
+      rintro w ⟨b, hb, rfl⟩
+      exact hu2 b (lt_of_le_of_lt (show b ≤ a.castSucc from hb) (Fin.castSucc_lt_succ)))
+    hu4
   refine ⟨e', _, he1, he3, p1, fun b hb => p2 _ ⟨b, hb, rfl⟩, ?_⟩
   rw [p3, hu3]
 
@@ -190,30 +226,25 @@ theorem matrix_adjoint_action_holds : RankTwoSkewConjugation := by
   apply LinearMap.ext
   intro x
   simp only [Matrix.toLin'_apply]
-  rw [← Matrix.mulVec_mulVec, ← Matrix.mulVec_mulVec, matrix_action_evaluation_holds,
-    matrix_action_evaluation_holds, Matrix.mulVec_sub, Matrix.mulVec_smul, Matrix.mulVec_smul, hu,
-    hu]
+  rw [← Matrix.mulVec_mulVec, ← Matrix.mulVec_mulVec, matrix_action_evaluation_holds, matrix_action_evaluation_holds, Matrix.mulVec_sub,
+    Matrix.mulVec_smul, Matrix.mulVec_smul, hu, hu]
 
-noncomputable def hermitianSesquilinearForm {ι : Type*} [Fintype ι] (H : Matrix ι ι ℂ)
-    : (ι → ℂ) →ₗ[ℂ] (ι → ℂ) →ₗ⋆[ℂ] ℂ :=
-  LinearMap.mk₂'ₛₗ (RingHom.id ℂ) (starRingEnd ℂ)
-    (fun x y => herm H x y)
-    (fun u v w => gk_herm_add_left H u v w)
-    (fun c u w => gk_herm_smul_left H c u w)
-    (fun u v w => gk_herm_add_right H u v w)
-    (fun c u w => gk_herm_smul_right H c u w)
+noncomputable def hermitianSesquilinearForm {ι : Type*} [Fintype ι] (H : Matrix ι ι ℂ) : (ι → ℂ) →ₗ[ℂ] (ι → ℂ) →ₗ⋆[ℂ] ℂ :=
+  LinearMap.mk₂'ₛₗ (RingHom.id ℂ) (starRingEnd ℂ) (fun x y => herm H x y)
+    (fun u v w => gk_herm_add_left H u v w) (fun c u w => gk_herm_smul_left H c u w)
+    (fun u v w => gk_herm_add_right H u v w) (fun c u w => gk_herm_smul_right H c u w)
 
 lemma s1c2_hL_apply {ι : Type*} [Fintype ι] (H : Matrix ι ι ℂ) (x y : ι → ℂ) : hermitianSesquilinearForm H x y = herm H x y := rfl
 
 lemma s1c2_herm_sum_left {ι σ : Type*} [Fintype ι] (H : Matrix ι ι ℂ) (s : Finset σ) (c : σ → ℂ) (a : σ → ι → ℂ)
     (y : ι → ℂ) : herm H (∑ i ∈ s, c i • a i) y = ∑ i ∈ s, c i * herm H (a i) y := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [← s1c2_hL_apply, map_sum, LinearMap.sum_apply, map_smul, LinearMap.smul_apply, smul_eq_mul]
+
+  simp only [← s1c2_hL_apply, map_sum, LinearMap.sum_apply, map_smul, LinearMap.smul_apply, smul_eq_mul]
 
 lemma s1c2_herm_sum_right {ι σ : Type*} [Fintype ι] (H : Matrix ι ι ℂ) (s : Finset σ) (c : σ → ℂ) (a : σ → ι → ℂ)
     (x : ι → ℂ) : herm H x (∑ i ∈ s, c i • a i) = ∑ i ∈ s, star (c i) * herm H x (a i) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [← s1c2_hL_apply, map_sum, map_smulₛₗ, smul_eq_mul]; rfl
+
+  simp only [← s1c2_hL_apply, map_sum, map_smulₛₗ, smul_eq_mul]; rfl
 
 lemma s1c2_herm_sub_left {ι : Type*} [Fintype ι] (H : Matrix ι ι ℂ) (u v w : ι → ℂ) :
     herm H (u - v) w = herm H u w - herm H v w := by
@@ -416,18 +447,11 @@ theorem omega_decomposition : OrthogonalComplementDecomposition := by
     · rw [s1c2_fvec_lt k r z' b hb, s1c2_herm_e]
       exact hW _ (Or.inr (by simp only [esI]; omega))
     · have hbl : fvec k r z' b = z' := by simp [fvec, hb]
-      rw [hbl, s1c2_om_eq k r z z' hz', gk_herm_add_left, gk_herm_smul_left,
-        s1c2_herm_Pm k r z' _ hz', s1c2_hzz]
+      rw [hbl, s1c2_om_eq k r z z' hz', gk_herm_add_left, gk_herm_smul_left, s1c2_herm_Pm k r z' _ hz', s1c2_hzz]
       field_simp
       ring
-  · refine ⟨
-      fun b =>
-        if hb : b.val < r then
-          X (eI k r ⟨b.val, hb⟩)
-        else
-          -(herm (Hpk k r) X z' / (Tz k r z' : ℂ)),
-      ?_
-    ⟩
+  · refine ⟨fun b => if hb : b.val < r then X (eI k r ⟨b.val, hb⟩)
+      else -(herm (Hpk k r) X z' / (Tz k r z' : ℂ)), ?_⟩
     funext i
     simp only [Pi.add_apply, Finset.sum_apply, Pi.smul_apply, smul_eq_mul]
     by_cases hi : i.val < r
@@ -441,8 +465,7 @@ theorem omega_decomposition : OrthogonalComplementDecomposition := by
       · rw [fvec_apply_ge z' _ i hi, if_pos (by simp), dite_eq_right (by simp)]
         by_cases hk : i.val ≤ r + k
         · simp only [N3om]
-          rw [if_pos ⟨hi, hk⟩]
-          ring
+          rw [if_pos ⟨hi, hk⟩]; ring
         · rw [hW i (Or.inr (by omega)), hz' i (Or.inr (by omega)), mul_zero, add_zero]
           exact s1c2_x_top k r z z' g i (by omega)
       · intro c _ hc
@@ -463,12 +486,10 @@ lemma s1c2_UW_sub_S (k r : ℕ) (z : Fin (2 * r + k + 1) → ℂ)
 open Formalism.QuantumDeterminants.WeylGroupFacts in
 theorem dual_vector_unipotent_invariant : DualVectorUnipotentInvariant := by
   intro k r z z' hz hz' g hg n hn n' hn'
-  have hx :=
-    s1c2_N3xM_S k r z z' hz hz' g n n' (s1c2_N_sub_S k r z hz n hn) (s1c2_N_sub_S k r z' hz' n' hn')
+  have hx := s1c2_N3xM_S k r z z' hz hz' g n n' (s1c2_N_sub_S k r z hz n hn) (s1c2_N_sub_S k r z' hz' n' hn')
   set X := formalDeterminantVectorOnGroup k r z z' g with hX
   have hcol : col k r n'⁻¹ := ((nset_iff _).1 (mem_n_inv hn')).2
-  have htop : ∀ i : Fin (2 * r + k + 1), r + k < i.val → X i = 0 := fun i hi =>
-    s1c2_x_top k r z z' g i hi
+  have htop : ∀ i : Fin (2 * r + k + 1), r + k < i.val → X i = 0 := fun i hi => s1c2_x_top k r z z' g i hi
   have hmid : ∀ i : Fin (2 * r + k + 1), r ≤ i.val → (n'⁻¹ *ᵥ X) i = X i := by
     intro i hi
     simp only [Matrix.mulVec, dotProduct]
@@ -487,14 +508,13 @@ theorem dual_vector_unipotent_invariant : DualVectorUnipotentInvariant := by
     split_ifs with h
     · exact hmid i h.1
     · rfl
-  rw [s1c2_om_eq k r z z' hz', s1c2_om_eq k r z z' hz', hx, hP,
-    ← s1c2_herm_Pm k r z' (n'⁻¹ *ᵥ X) hz', hP, s1c2_herm_Pm k r z' X hz']
+  rw [s1c2_om_eq k r z z' hz', s1c2_om_eq k r z z' hz', hx, hP, ← s1c2_herm_Pm k r z' (n'⁻¹ *ᵥ X) hz', hP,
+    s1c2_herm_Pm k r z' X hz']
 
 open Formalism.QuantumDeterminants.WeylGroupFacts in
 theorem dual_vector_equivariant : DualVectorEquivariant := by
   intro k r z z' hz hz' g hg h hh h' hh'
-  have hx :=
-    s1c2_N3xM_S k r z z' hz hz' g h h' (s1c2_UW_sub_S k r z h hh) (s1c2_UW_sub_S k r z' h' hh')
+  have hx := s1c2_N3xM_S k r z z' hz hz' g h h' (s1c2_UW_sub_S k r z h hh) (s1c2_UW_sub_S k r z' h' hh')
   set X := formalDeterminantVectorOnGroup k r z z' g with hX
   have hη : h'⁻¹ ∈ UWset k r z' := uw_inv hh'
   have hb : block k r h'⁻¹ := uw_block hη
@@ -518,8 +538,8 @@ theorem dual_vector_equivariant : DualVectorEquivariant := by
   have hinner : herm (Hpk k r) (h'⁻¹ *ᵥ X) z' = herm (Hpk k r) X z' := by
     conv_lhs => rw [← hη.2.2]
     exact ggHerm_unitary _ _ hη.1 X z'
-  rw [s1c2_om_eq k r z z' hz', s1c2_om_eq k r z z' hz', hx, hP, hinner, Matrix.mulVec_add,
-    Matrix.mulVec_smul, hη.2.2]
+  rw [s1c2_om_eq k r z z' hz', s1c2_om_eq k r z z' hz', hx, hP, hinner, Matrix.mulVec_add, Matrix.mulVec_smul,
+    hη.2.2]
 
 lemma s1c2_det_map_star {n : Type*} [Fintype n] [DecidableEq n] (A : Matrix n n ℂ) :
     (A.map star).det = star A.det := by
@@ -533,49 +553,37 @@ theorem dual_vector_norm_on_group : DualVectorNormOnGroup := by
   have hgu : IsUnit g.det := isUnit_of_uh hg
   have hgi : g⁻¹ ∈ UH (Hpk k r) := uh_inv hg
   obtain ⟨hW, horth, co, hco⟩ := omega_decomposition k r z z' hz hz' hT'.ne' g hg
-  have hM
-      : (Matrix.of fun a b =>
-          hermitianSesquilinearForm (Hpk k r) (g⁻¹ *ᵥ fvec k r z a) (fvec k r z' b))
-        = (Zhat k r z z' g).map star := by
+  have hM : (Matrix.of fun a b => hermitianSesquilinearForm (Hpk k r) (g⁻¹ *ᵥ fvec k r z a) (fvec k r z' b)) =
+      (Zhat k r z z' g).map star := by
     ext a b
     simp only [Matrix.of_apply, Matrix.map_apply, s1c2_hL_apply, Zhat]
-    rw [← ggHerm_unitary _ g hg, Matrix.mulVec_mulVec, Matrix.mul_nonsing_inv g hgu,
-      Matrix.one_mulVec, ggHerm_swap _ (s1c2_Hh k r)]
-  have key :=
-    dual_vector_norm_sq _ (hermitianSesquilinearForm (Hpk k r))
-      (fun x y => by simp only [s1c2_hL_apply]; exact ggHerm_swap _ (s1c2_Hh k r) y x)
-      r
-      (fun a => g⁻¹ *ᵥ fvec k r z a)
-      (fvec k r z') (Tz k r z) (Tz k r z') hT'.ne'
-      (fun a b => by simp only [s1c2_hL_apply]; rw [ggHerm_unitary _ _ hgi, s1c2_gram_f k r z hz])
-      (fun a b => by simp only [s1c2_hL_apply]; rw [s1c2_gram_f k r z' hz'])
-      (∑ b ∈ univ.erase (Fin.last r), co b • fvec k r z' b) (N3om k r z z' g) (co (Fin.last r))
-      (Submodule.sum_mem _ fun b hb =>
-        Submodule.smul_mem _ _ (Submodule.subset_span ⟨b, (Finset.mem_erase.mp hb).1, rfl⟩))
-      horth
-      (by
-        have : (∑ a, (Matrix.of fun a b => hermitianSesquilinearForm (Hpk k r) (g⁻¹ *ᵥ fvec k r z a) (fvec k r z' b)).adjugate
-                 (Fin.last r) a • (g⁻¹ *ᵥ fvec k r z a))
-            = formalDeterminantVectorOnGroup k r z z' g :=
-          rfl
-        rw [this, hco, ← Finset.sum_erase_add _ _ (Finset.mem_univ (Fin.last r))])
-  have hfirst
-      : herm (Hpk k r) (N3om k r z z' g) (N3om k r z z' g)
-        = ((Gf k r z z' g / Tz k r z' : ℝ) : ℂ) := by
+    rw [← ggHerm_unitary _ g hg, Matrix.mulVec_mulVec, Matrix.mul_nonsing_inv g hgu, Matrix.one_mulVec,
+      ggHerm_swap _ (s1c2_Hh k r)]
+  have key := dual_vector_norm_sq _ (hermitianSesquilinearForm (Hpk k r))
+    (fun x y => by simp only [s1c2_hL_apply]; exact ggHerm_swap _ (s1c2_Hh k r) y x) r
+    (fun a => g⁻¹ *ᵥ fvec k r z a) (fvec k r z') (Tz k r z) (Tz k r z') hT'.ne'
+    (fun a b => by simp only [s1c2_hL_apply]; rw [ggHerm_unitary _ _ hgi, s1c2_gram_f k r z hz])
+    (fun a b => by simp only [s1c2_hL_apply]; rw [s1c2_gram_f k r z' hz'])
+    (∑ b ∈ univ.erase (Fin.last r), co b • fvec k r z' b) (N3om k r z z' g) (co (Fin.last r))
+    (Submodule.sum_mem _ fun b hb => Submodule.smul_mem _ _
+      (Submodule.subset_span ⟨b, (Finset.mem_erase.mp hb).1, rfl⟩))
+    horth
+    (by
+      have : (∑ a, (Matrix.of fun a b => hermitianSesquilinearForm (Hpk k r) (g⁻¹ *ᵥ fvec k r z a) (fvec k r z' b)).adjugate
+          (Fin.last r) a • (g⁻¹ *ᵥ fvec k r z a)) = formalDeterminantVectorOnGroup k r z z' g := rfl
+      rw [this, hco, ← Finset.sum_erase_add _ _ (Finset.mem_univ (Fin.last r))])
+  have hfirst : herm (Hpk k r) (N3om k r z z' g) (N3om k r z z' g) =
+      ((Gf k r z z' g / Tz k r z' : ℝ) : ℂ) := by
     rw [s1c2_hL_apply, hM] at key
     rw [key, s1c2_det_map_star]
-    have h2
-        : leadingPrincipalMinor ((Zhat k r z z' g).map star) r
-          = star (leadingPrincipalMinor (Zhat k r z z' g) r) := by
+    have h2 : leadingPrincipalMinor ((Zhat k r z z' g).map star) r = star (leadingPrincipalMinor (Zhat k r z z' g) r) := by
       unfold leadingPrincipalMinor
-      rw [← s1c2_det_map_star]
-      rfl
+      rw [← s1c2_det_map_star]; rfl
     rw [h2]
     have h3 : Dmin k r z z' g (Fin.last (r + 1)) = (Zhat k r z z' g).det := by
       unfold Dmin
       congr 1
-    have h4 : Dmin k r z z' g ⟨r, by omega⟩ = leadingPrincipalMinor (Zhat k r z z' g) r :=
-      minimal_degree_comparison k r z z' g ⟨r, by omega⟩
+    have h4 : Dmin k r z z' g ⟨r, by omega⟩ = leadingPrincipalMinor (Zhat k r z z' g) r := minimal_degree_comparison k r z z' g ⟨r, by omega⟩
     unfold Gf
     rw [h3, h4]
     simp only [Complex.star_def, Complex.normSq_conj]
@@ -605,60 +613,44 @@ theorem nilpotent_model_computation_holds : RankTwoNilpotentGroup := by
   set H := Hpk k r with hHdef
   have hH : Hᴴ = H := s1c2_Hh k r
   set Y := rankTwoSkewMatrix H e v with hY
-  obtain ⟨heX, hX, hYf, hY0, -, hYe, hYv⟩ :=
-    lie_algebra_nilpotent_part_holds _ (hermitianSesquilinearForm H)
-      (fun x y => by simp only [s1c2_hL_apply]; exact ggHerm_swap _ hH y x)
-      r (fvec k r z) (Tz k r z)
-      (fun b c => by simp only [s1c2_hL_apply]; exact s1c2_gram_f k r z hz b c)
-      a e v he
-      (fun b hb => by simp only [s1c2_hL_apply]; exact hv b hb)
-  have hYx : ∀ x, Y *ᵥ x = rankTwoSkewOperator (hermitianSesquilinearForm H) e v x := fun x =>
-    matrix_action_evaluation_holds _ H e v x
-  have hYx' : ∀ x, Y *ᵥ x = herm H x v • e - herm H x e • v := fun x =>
-    matrix_action_evaluation_holds _ H e v x
+  obtain ⟨heX, hX, hYf, hY0, -, hYe, hYv⟩ := lie_algebra_nilpotent_part_holds _ (hermitianSesquilinearForm H)
+    (fun x y => by simp only [s1c2_hL_apply]; exact ggHerm_swap _ hH y x) r (fvec k r z) (Tz k r z)
+    (fun b c => by simp only [s1c2_hL_apply]; exact s1c2_gram_f k r z hz b c) a e v he
+    (fun b hb => by simp only [s1c2_hL_apply]; exact hv b hb)
+  have hYx : ∀ x, Y *ᵥ x = rankTwoSkewOperator (hermitianSesquilinearForm H) e v x := fun x => matrix_action_evaluation_holds _ H e v x
+  have hYx' : ∀ x, Y *ᵥ x = herm H x v • e - herm H x e • v := fun x => matrix_action_evaluation_holds _ H e v x
   have hYe' : Y *ᵥ e = 0 := by rw [hYx]; exact hYe
   have hYv' : Y *ᵥ v = herm H v v • e := by rw [hYx]; exact hYv
   have hYY : ∀ x, Y *ᵥ (Y *ᵥ x) = (-(herm H x e * herm H v v)) • e := by
     intro x
-    rw [hYx' x, Matrix.mulVec_sub, Matrix.mulVec_smul, Matrix.mulVec_smul, hYe', hYv', smul_zero,
-      zero_sub, smul_smul, neg_smul]
+    rw [hYx' x, Matrix.mulVec_sub, Matrix.mulVec_smul, Matrix.mulVec_smul, hYe', hYv', smul_zero, zero_sub,
+      smul_smul, neg_smul]
   have h3 : Y * Y * Y = 0 := by
     apply matrix_eq_of_forall_mulVec_eq
     intro x
-    rw [← Matrix.mulVec_mulVec, ← Matrix.mulVec_mulVec, hYx' x, Matrix.mulVec_sub,
-      Matrix.mulVec_smul, Matrix.mulVec_smul, hYe', hYv', Matrix.mulVec_sub, Matrix.mulVec_smul,
-      Matrix.mulVec_smul, Matrix.mulVec_smul, hYe']
+    rw [← Matrix.mulVec_mulVec, ← Matrix.mulVec_mulVec, hYx' x, Matrix.mulVec_sub, Matrix.mulVec_smul,
+      Matrix.mulVec_smul, hYe', hYv', Matrix.mulVec_sub, Matrix.mulVec_smul, Matrix.mulVec_smul, Matrix.mulVec_smul,
+      hYe']
     simp
-  have hadd
-      : ∀ s t : ℝ,
-        nilpotentExpSquare H e v (s + t)
-          = nilpotentExpSquare H e v s * nilpotentExpSquare H e v t := by
+  have hadd : ∀ s t : ℝ, nilpotentExpSquare H e v (s + t) = nilpotentExpSquare H e v s * nilpotentExpSquare H e v t := by
     intro s t
     unfold nilpotentExpSquare
     rw [← hY]
     push_cast
     exact s1c2_exp_add Y h3 s t
-  have hEx
-      : ∀ (t : ℝ) x,
-        nilpotentExpSquare H e v t *ᵥ x
-          = x + (t : ℂ) • (Y *ᵥ x) + ((t : ℂ) ^ 2 / 2) • (Y *ᵥ (Y *ᵥ x)) := by
+  have hEx : ∀ (t : ℝ) x, nilpotentExpSquare H e v t *ᵥ x = x + (t : ℂ) • (Y *ᵥ x) + ((t : ℂ) ^ 2 / 2) • (Y *ᵥ (Y *ᵥ x)) := by
     intro t x
     unfold nilpotentExpSquare
-    rw [← hY, Matrix.add_mulVec, Matrix.add_mulVec, Matrix.one_mulVec, Matrix.smul_mulVec,
-      Matrix.smul_mulVec, Matrix.mulVec_mulVec]
-  have hskew : ∀ x y, herm H (Y *ᵥ x) y = - herm H x (Y *ᵥ y) := by
+    rw [← hY, Matrix.add_mulVec, Matrix.add_mulVec, Matrix.one_mulVec, Matrix.smul_mulVec, Matrix.smul_mulVec,
+      Matrix.mulVec_mulVec]
+  have hskew : ∀ x y, herm H (Y *ᵥ x) y = -herm H x (Y *ᵥ y) := by
     intro x y
-    have :=
-      rank_two_operator_skew_hermitian _ (hermitianSesquilinearForm H)
-        (fun x y => by simp only [s1c2_hL_apply]; exact ggHerm_swap _ hH y x)
-        e v x y
+    have := rank_two_operator_skew_hermitian _ (hermitianSesquilinearForm H)
+      (fun x y => by simp only [s1c2_hL_apply]; exact ggHerm_swap _ hH y x) e v x y
     simp only [s1c2_hL_apply] at this
     rw [hYx' x, hYx' y]
     exact eq_neg_of_add_eq_zero_left this
-  have hadj
-      : ∀ (t : ℝ) x y,
-        herm H (nilpotentExpSquare H e v t *ᵥ x) y
-          = herm H x (nilpotentExpSquare H e v (-t) *ᵥ y) := by
+  have hadj : ∀ (t : ℝ) x y, herm H (nilpotentExpSquare H e v t *ᵥ x) y = herm H x (nilpotentExpSquare H e v (-t) *ᵥ y) := by
     intro t x y
     rw [hEx, hEx]
     simp only [gk_herm_add_left, gk_herm_add_right, gk_herm_smul_left, gk_herm_smul_right, hskew]
@@ -666,11 +658,8 @@ theorem nilpotent_model_computation_holds : RankTwoNilpotentGroup := by
       rw [Complex.star_def, Complex.conj_ofReal]; push_cast; ring
     have c2 : star (((-t : ℝ) : ℂ) ^ 2 / 2) = (t : ℂ) ^ 2 / 2 := by
       have e2 : (((-t : ℝ) : ℂ) ^ 2 / 2) = (((t ^ 2 / 2 : ℝ)) : ℂ) := by push_cast; ring
-      rw [e2, Complex.star_def, Complex.conj_ofReal]
-      push_cast
-      ring
-    rw [c1, c2]
-    ring
+      rw [e2, Complex.star_def, Complex.conj_ofReal]; push_cast; ring
+    rw [c1, c2]; ring
   have hE0 : nilpotentExpSquare H e v 0 = 1 := by simp [nilpotentExpSquare]
   have hUH : ∀ t : ℝ, nilpotentExpSquare H e v t ∈ UH H := by
     intro t
@@ -678,12 +667,10 @@ theorem nilpotent_model_computation_holds : RankTwoNilpotentGroup := by
     intro x y
     rw [hadj, Matrix.mulVec_mulVec, ← hadd, neg_add_cancel, hE0, Matrix.one_mulVec]
 
-  have hsupp
-      : ∀ y ∈ Submodule.span ℂ (fvec k r z '' {b | b < a.castSucc}), ∀ i : Fin (2 * r + k + 1),
-        a.val ≤ i.val → y i = 0 := by
+  have hsupp : ∀ y ∈ Submodule.span ℂ (fvec k r z '' {b | b < a.castSucc}),
+      ∀ i : Fin (2 * r + k + 1), a.val ≤ i.val → y i = 0 := by
     intro y hy
-    refine Submodule.span_induction
-      (p := fun y _ => ∀ i : Fin (2 * r + k + 1), a.val ≤ i.val → y i = 0)
+    refine Submodule.span_induction (p := fun y _ => ∀ i : Fin (2 * r + k + 1), a.val ≤ i.val → y i = 0)
       ?_ ?_ ?_ ?_ hy
     · rintro y ⟨b, hb, rfl⟩ i hi
       have hb' : b.val < a.val := hb
@@ -698,17 +685,12 @@ theorem nilpotent_model_computation_holds : RankTwoNilpotentGroup := by
     rw [h1, gj_fvec_apply k r z a.castSucc (by simp)]
     rfl
 
-  have hEperp
-      : ∀ (t : ℝ) x,
-        (∀ b : Fin r, herm H x (fvec k r z b.castSucc) = 0)
-          → nilpotentExpSquare H e v t *ᵥ x = x + ((t : ℂ) * herm H x v) • e := by
+  have hEperp : ∀ (t : ℝ) x, (∀ b : Fin r, herm H x (fvec k r z b.castSucc) = 0) →
+      nilpotentExpSquare H e v t *ᵥ x = x + ((t : ℂ) * herm H x v) • e := by
     intro t x hx
     have h1 : Y *ᵥ x = herm H x v • e := by rw [hYx]; exact hX x hx
     rw [hEx, h1, Matrix.mulVec_smul, hYe', smul_zero, smul_zero, add_zero, smul_smul]
-  have hEf
-      : ∀ (t : ℝ) b,
-        nilpotentExpSquare H e v t *ᵥ fvec k r z b
-          = fvec k r z b + ((t : ℂ) * herm H (fvec k r z b) v) • e := by
+  have hEf : ∀ (t : ℝ) b, nilpotentExpSquare H e v t *ᵥ fvec k r z b = fvec k r z b + ((t : ℂ) * herm H (fvec k r z b) v) • e := by
     intro t b
     have h1 : Y *ᵥ fvec k r z b = herm H (fvec k r z b) v • e := by rw [hYx]; exact hYf b
     rw [hEx, h1, Matrix.mulVec_smul, hYe', smul_zero, smul_zero, add_zero, smul_smul]
@@ -742,23 +724,18 @@ theorem nilpotent_model_computation_holds : RankTwoNilpotentGroup := by
     rw [hz0, add_zero]
     simp only [bvec, Pi.single_apply]
   · unfold ell
-    have hterm
-        : ∀ b : Fin r,
-          (if h : b.val + 1 < r then
-             nilpotentExpSquare H e v t (eI k r b) (eI k r ⟨b.val + 1, h⟩)
-           else
-             (nilpotentExpSquare H e v t *ᵥ z) (eI k r b))
-            = (nilpotentExpSquare H e v t *ᵥ fvec k r z b.succ) (eI k r b) := by
+    have hterm : ∀ b : Fin r, (if h : b.val + 1 < r then nilpotentExpSquare H e v t (eI k r b) (eI k r ⟨b.val + 1, h⟩)
+        else (nilpotentExpSquare H e v t *ᵥ z) (eI k r b)) = (nilpotentExpSquare H e v t *ᵥ fvec k r z b.succ) (eI k r b) := by
       intro b
       split_ifs with h
       · rw [s1c2_fvec_lt k r z b.succ (by simpa using h)]
         simp [bvec, Matrix.mulVec, dotProduct, Pi.single_apply]
-      · have : fvec k r z b.succ = z := by simp [fvec, h]
+      · have : fvec k r z b.succ = z := by
+          simp [fvec, h]
         rw [this]
     rw [Finset.sum_congr rfl fun b _ => hterm b, Finset.sum_eq_single a]
-    · rw [hEf, Pi.add_apply, Pi.smul_apply, smul_eq_mul, hei _ (by simp [eI]),
-        if_pos (by simp [eI]), fvec_apply_lt z hz _ _ (by simp [eI]), if_neg (by simp [eI]),
-        zero_add, mul_one]
+    · rw [hEf, Pi.add_apply, Pi.smul_apply, smul_eq_mul, hei _ (by simp [eI]), if_pos (by simp [eI]),
+        fvec_apply_lt z hz _ _ (by simp [eI]), if_neg (by simp [eI]), zero_add, mul_one]
     · intro b _ hb
       rw [hEf, Pi.add_apply, Pi.smul_apply, smul_eq_mul, fvec_apply_lt z hz _ _ (by simp [eI]),
         if_neg (by simp [eI]), zero_add]
@@ -774,9 +751,7 @@ theorem derivative_of_psi_holds : CharacterDerivativeNorm := by
   have h4 := (h3 t).2
   unfold Formalism.QuantumDeterminants.psi
   rw [h4, hl]
-  have h5
-      : (ka : ℂ) * Formalism.QuantumDeterminants.cStd * ((t : ℂ) * (-Complex.I * (l : ℂ)))
-        = ((-(2 * ka * l * t) : ℝ) : ℂ) := by
+  have h5 : (ka : ℂ) * Formalism.QuantumDeterminants.cStd * ((t : ℂ) * (-Complex.I * (l : ℂ))) = ((-(2 * ka * l * t) : ℝ) : ℂ) := by
     unfold Formalism.QuantumDeterminants.cStd
     push_cast
     have : Complex.I * Complex.I = -1 := Complex.I_mul_I

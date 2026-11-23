@@ -1,28 +1,70 @@
 module
 
-public import Mathlib
 public import ReciprocityTheory.DualLattices.EvHtStatement
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Lemma
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 public import ReciprocityTheory.DualLattices.CharR
-public import ReciprocityTheory.DualLattices.ThmAAll
 public import ReciprocityTheory.DualLattices.DualPairInh
+import ReciprocityTheory.DualLattices.IsFibreSq
+import ReciprocityTheory.DualLattices.IsHeightUnique
+public import ReciprocityTheory.DualLattices.IsPairingValueAddRight
 
 @[expose] public section
 
 noncomputable section
 
-open TensorProduct IsLocalRing Matrix ReciprocityTheory.PGsh ReciprocityTheory.PGsh.Up
-  ReciprocityTheory.PGsh.L2 ReciprocityTheory.PGsh.Be2
+open TensorProduct IsLocalRing Matrix ReciprocityTheory.PGsh ReciprocityTheory.PGsh.Up ReciprocityTheory.PGsh.L2 ReciprocityTheory.PGsh.Be2
 
 namespace GlobalTheory
 
-private def htDualRing {R₀ : Type} [CommRing R₀] {Λ S : LAlg R₀} (Dq : DualPair S) (ψ : LHom Λ S)
-    : DualNum.DN Λ →+* (Dq.D : Type) :=
+private def htDualRing {R₀ : Type} [CommRing R₀] {Λ S : LAlg R₀} (Dq : DualPair S) (ψ : LHom Λ S) :
+    DualNum.DN Λ →+* (Dq.D : Type) :=
   Ideal.Quotient.lift _
-    (Polynomial.eval₂RingHom
-      ((Dq.σ.1.comp ψ.1 : (Λ : Type) →ₐ[R₀] (Dq.D : Type)) : (Λ : Type) →+* (Dq.D : Type)) Dq.η)
-    (fun a ha => by
-      obtain ⟨b, rfl⟩ := Ideal.mem_span_singleton'.1 ha
-      rw [map_mul, map_pow, Polynomial.coe_eval₂RingHom, Polynomial.eval₂_X, sq, Dq.η_sq, mul_zero])
+    (Polynomial.eval₂RingHom ((Dq.σ.1.comp ψ.1 : (Λ : Type) →ₐ[R₀] (Dq.D : Type)) :
+      (Λ : Type) →+* (Dq.D : Type)) Dq.η) (fun a ha => by
+    obtain ⟨b, rfl⟩ := Ideal.mem_span_singleton'.1 ha
+    rw [map_mul, map_pow, Polynomial.coe_eval₂RingHom, Polynomial.eval₂_X, sq, Dq.η_sq, mul_zero])
 
 private lemma htDualRing_C {R₀ : Type} [CommRing R₀] {Λ S : LAlg R₀} (Dq : DualPair S)
     (ψ : LHom Λ S) (r : (Λ : Type)) :
@@ -77,27 +119,13 @@ private lemma ht_padic_val {p : ℕ} [Fact p.Prime] (a : ℤ_[p]) :
   obtain ⟨b, hb⟩ := h
   exact ⟨b, by rw [← hb, mul_comm]⟩
 
-theorem evHt_of_lam
-    : (∀ {R₀ : Type} [CommRing R₀] {p : ℕ} [Fact p.Prime] {g : ℕ} {B : BX R₀} {Tw : ATowerL R₀ p}
-          {Dt : DualTower Tw} [Algebra ℤ_[p] (Tw.O : Type)] {Oe : Type} [CommRing Oe]
-          [Algebra ℤ_[p] Oe] {σ : Oe ≃ₐ[ℤ_[p]] Oe} {cp : (Tw.O : Type)}
-          (D : Dat p g B Tw Dt Oe σ cp),
-        0 < g
-          → maximalIdeal (D.K : Type) = ⊥ ∧ IsNilOver D.wd.ρ1
-            ∧ ∀ i : D.fin.ι,
-              ∃ (Λ : LAlg R₀) (μ : LHom (D.fin.AAx i) Λ) (j : LHom (Tw.R 0) Λ) (ρΛ : LHom Λ D.K),
-                IsNilOver ρΛ ∧ Function.Surjective μ.1 ∧ ρΛ.comp j = D.wd.ρ1
-                  ∧ μ.comp (D.fin.sO i) = j.comp (Tw.q 0)
-                  ∧ ∀ φ : LHom (D.fin.AAx i) Tw.O,
-                    φ.comp (D.fin.sO i) = LHom.id Tw.O
-                      → ∃ ψ : LHom Λ (Tw.R 0),
-                        ψ.comp μ = (Tw.q 0).comp φ ∧ ψ.comp j = LHom.id (Tw.R 0)
-                          ∧ D.wd.ρ1.comp ψ = ρΛ)
-      → (∀ {R₀ : Type} [CommRing R₀] {p : ℕ} [Fact p.Prime] {g : ℕ} {B : BX R₀} {Tw : ATowerL R₀ p}
-          {Dt : DualTower Tw} [Algebra ℤ_[p] (Tw.O : Type)] {Oe : Type} [CommRing Oe]
-          [Algebra ℤ_[p] Oe] {σ : Oe ≃ₐ[ℤ_[p]] Oe} {cp : (Tw.O : Type)}
-          (D : Dat p g B Tw Dt Oe σ cp),
-        EvHtStatement D) := by
+theorem evHt_of_lam :
+  (∀ {R₀ : Type} [CommRing R₀] {p : ℕ} [Fact p.Prime] {g : ℕ} {B : BX R₀} {Tw : ATowerL R₀ p} {Dt : DualTower Tw} [Algebra ℤ_[p] (Tw.O : Type)] {Oe : Type} [CommRing Oe] [Algebra ℤ_[p] Oe] {σ : Oe ≃ₐ[ℤ_[p]] Oe} {cp : (Tw.O : Type)} (D : Dat p g B Tw Dt Oe σ cp), 0 < g → maximalIdeal (D.K : Type) = ⊥ ∧ IsNilOver D.wd.ρ1 ∧ ∀ i : D.fin.ι,
+    ∃ (Λ : LAlg R₀) (μ : LHom (D.fin.AAx i) Λ) (j : LHom (Tw.R 0) Λ) (ρΛ : LHom Λ D.K),
+      IsNilOver ρΛ ∧ Function.Surjective μ.1 ∧ ρΛ.comp j = D.wd.ρ1 ∧ μ.comp (D.fin.sO i) = j.comp (Tw.q 0) ∧
+      ∀ φ : LHom (D.fin.AAx i) Tw.O, φ.comp (D.fin.sO i) = LHom.id Tw.O →
+        ∃ ψ : LHom Λ (Tw.R 0), ψ.comp μ = (Tw.q 0).comp φ ∧ ψ.comp j = LHom.id (Tw.R 0) ∧ D.wd.ρ1.comp ψ = ρΛ) →
+  (∀ {R₀ : Type} [CommRing R₀] {p : ℕ} [Fact p.Prime] {g : ℕ} {B : BX R₀} {Tw : ATowerL R₀ p} {Dt : DualTower Tw} [Algebra ℤ_[p] (Tw.O : Type)] {Oe : Type} [CommRing Oe] [Algebra ℤ_[p] Oe] {σ : Oe ≃ₐ[ℤ_[p]] Oe} {cp : (Tw.O : Type)} (D : Dat p g B Tw Dt Oe σ cp), EvHtStatement D) := by
   intro hLam R₀ _ p _ g B Tw Dt _ Oe _ _ σ cp D C _ _ k
   have hg : 0 < g := Nat.zero_lt_of_lt k.2
   obtain ⟨-, -, hL⟩ := hLam D hg
@@ -113,12 +141,10 @@ theorem evHt_of_lam
     B.isHeight_exists hB1 (DualNum.dualPair (Λ i)) (p ^ (0 + 1)) (hcharΛ i) _ (hy i)
   choose F hF using fun i => hμ i (h i (D.ch.gb k))
   refine ⟨D.evAll C F, Submodule.subset_span ⟨F, rfl⟩, fun t => ?_⟩
-  obtain ⟨hs, hyt, -⟩ :=
-    Classical.choose_spec (Classical.choose_spec (D.fin.univ Tw.O (LHom.id Tw.O)
-      (ptOf B D.L.τ (red p g t)) (D.pt_p (red p g t))))
+  obtain ⟨hs, hyt, -⟩ := Classical.choose_spec (Classical.choose_spec
+    (D.fin.univ Tw.O (LHom.id Tw.O) (ptOf B D.L.τ (red p g t)) (D.pt_p (red p g t))))
   change (D.ptMap (red p g t)).comp (D.fin.sO (D.ptIdx (red p g t))) = LHom.id Tw.O at hs
-  change B.map (D.ptMap (red p g t)) (D.fin.y (D.ptIdx (red p g t))) = ptOf B D.L.τ (red p g t)
-    at hyt
+  change B.map (D.ptMap (red p g t)) (D.fin.y (D.ptIdx (red p g t))) = ptOf B D.L.τ (red p g t) at hyt
   obtain ⟨ψ, hψμ, -, -⟩ := hψ _ _ hs
   obtain ⟨f, f1, f2, f3⟩ := htDual_exists (Dt.Dp 0) ψ
   have H1 := B.isHeight_map hB1 _ _ ψ f f1 f2 f3 _ _ _ (hh (D.ptIdx (red p g t)))
@@ -127,44 +153,38 @@ theorem evHt_of_lam
   have hp0 : ((p : ℕ) : (Tw.R 0 : Type)) = 0 := by simpa using hchar
   have hy2 : ∀ i, (p ^ (0 + 1)) • B.map (Tw.q 0) (D.L.τ i 0) = 0 := fun i => by
     rw [← map_nsmul, D.L.τ_tors, map_zero]
-  have H2 :=
-    B.isHeight_sum hB1 (Dt.Dp 0) _ hchar Finset.univ
-      (fun i => (((red p g t i).val : ℕ) : ℤ) • B.map (Tw.q 0) (D.L.τ i 0))
-      (fun i => by rw [smul_comm, hy2, smul_zero])
-      _
-      (fun i => B.isHeight_zsmul hB1 (Dt.Dp 0) _ hchar (hy2 i) (D.L.ht_spec i 0) _)
-  have e1
-      : ∑ i, (((red p g t i).val : ℕ) : ℤ) • B.map (Tw.q 0) (D.L.τ i 0)
-        = B.map (Tw.q 0) (ptOf B D.L.τ (red p g t)) := by
-    set_option synthInstance.maxHeartbeats 100000 in
+  have H2 := B.isHeight_sum hB1 (Dt.Dp 0) _ hchar Finset.univ
+    (fun i => (((red p g t i).val : ℕ) : ℤ) • B.map (Tw.q 0) (D.L.τ i 0))
+    (fun i => by rw [smul_comm, hy2, smul_zero]) _
+    (fun i => B.isHeight_zsmul hB1 (Dt.Dp 0) _ hchar (hy2 i) (D.L.ht_spec i 0) _)
+  have e1 : ∑ i, (((red p g t i).val : ℕ) : ℤ) • B.map (Tw.q 0) (D.L.τ i 0) =
+      B.map (Tw.q 0) (ptOf B D.L.τ (red p g t)) := by
+
     simp only [ptOf, map_sum, map_nsmul, natCast_zsmul]
   rw [e1] at H2
   have hyp : (p ^ (0 + 1)) • B.map (Tw.q 0) (ptOf B D.L.τ (red p g t)) = 0 := by
     rw [← map_nsmul, zero_add, pow_one, D.pt_p, map_zero]
   have hU := LinearMap.congr_fun (B.isHeight_unique hB1 _ _ hchar _ hyp _ _ H1 H2) (D.ch.gb k)
-  have hmem
-      : (D.H.Ht *ᵥ (algebraMap ℤ_[p] (Tw.O : Type) ∘ t)) k
-          - (D.ptMap (red p g t)).1 (F (D.ptIdx (red p g t)))
-        ∈ RingHom.ker (Tw.q 0).1 := by
+  have hmem : (D.H.Ht *ᵥ (algebraMap ℤ_[p] (Tw.O : Type) ∘ t)) k -
+      (D.ptMap (red p g t)).1 (F (D.ptIdx (red p g t))) ∈ RingHom.ker (Tw.q 0).1 := by
     rw [RingHom.mem_ker, map_sub, sub_eq_zero]
-    have e2
-        : (Tw.q 0).1 ((D.ptMap (red p g t)).1 (F (D.ptIdx (red p g t))))
-          = ψ.1 (h (D.ptIdx (red p g t)) (D.ch.gb k)) := by
+    have e2 : (Tw.q 0).1 ((D.ptMap (red p g t)).1 (F (D.ptIdx (red p g t)))) =
+        ψ.1 (h (D.ptIdx (red p g t)) (D.ch.gb k)) := by
       rw [← hF]
       exact (congrArg (fun u : LHom _ _ => u.1 (F (D.ptIdx (red p g t)))) hψμ).symm
     rw [e2]
     refine Eq.trans ?_ hU.symm
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [LinearMap.sum_apply, Matrix.mulVec, dotProduct, map_sum]
+
+    rw [LinearMap.sum_apply, Matrix.mulVec, dotProduct, map_sum]
     refine Finset.sum_congr rfl fun i _ => ?_
     have e3 : t i = ((red p g t i).val : ℤ_[p]) + p * b i := by
       rw [← hb i]
       show t i = ((PadicInt.toZMod (t i)).val : ℤ_[p]) + _
       ring
     rw [D.L.Ht_eq, Function.comp_apply, e3]
-    rw [map_add (f := _), map_mul (algebraMap ℤ_[p] (Tw.O : Type)), map_natCast, map_natCast,
-      map_mul, map_add (f := _), map_mul (Tw.q 0).1, map_natCast, map_natCast, hp0, zero_mul,
-      add_zero, natCast_zsmul, LinearMap.smul_apply, nsmul_eq_mul, mul_comm]
+    rw [map_add (f := _), map_mul (algebraMap ℤ_[p] (Tw.O : Type)), map_natCast, map_natCast, map_mul, map_add (f := _),
+      map_mul (Tw.q 0).1, map_natCast, map_natCast, hp0, zero_mul, add_zero, natCast_zsmul,
+      LinearMap.smul_apply, nsmul_eq_mul, mul_comm]
     rfl
   rw [D.tower_zero_ker, Ideal.mem_span_singleton'] at hmem
   obtain ⟨r, hr⟩ := hmem

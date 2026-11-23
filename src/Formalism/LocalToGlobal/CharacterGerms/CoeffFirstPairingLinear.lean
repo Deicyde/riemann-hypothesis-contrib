@@ -1,10 +1,50 @@
 module
 
-public import Formalism.LocalToGlobal.CharacterGerms.IndependenceBoundRaw
-public import Formalism.LocalToGlobal.CharacterGerms.RowTiePHStab
-public import Formalism.LocalToGlobal.CharacterGerms.RowTiePGerm
-public import Formalism.DropLevelBounds.ConstantCoeffVanishing.UbintConstantCoeffEqZero
+public import Formalism.LocalToGlobal.CharacterGerms.IntSubst
+public import Formalism.LocalToGlobal.CharacterGerms.Interface
 public import Formalism.LocalToGlobal.CharacterGerms.CoeffPowCharFrobenius
+public import Formalism.LocalToGlobal.CharacterGerms.IndependenceBoundRaw
+public import Formalism.LocalToGlobal.CharacterGerms.RowTiePGerm
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
+public import Formalism.LocalToGlobal.CharacterGerms.RowTieFB
 
 @[expose] public section
 
@@ -24,25 +64,21 @@ section Gen
 
 variable {C : Type} [Field C] {V : VF C}
 
-theorem frob_mv {σ : Type} {A B : MvPowerSeries σ C} (hA : IntS V A) (hB : IntS V B) (μ : σ →₀ ℕ)
-    : V.MM (coeff μ ((A + B) ^ V.l - A ^ V.l - B ^ V.l)) := by
-  have e
-      : (A + B) ^ V.l - A ^ V.l - B ^ V.l
-        = MvPowerSeries.C (V.l : C)
-          * ∑ k ∈ Finset.Ioo 0 V.l, A ^ k * B ^ (V.l - k) * MvPowerSeries.C ((V.l.choose k / V.l : ℕ) : C) :=
-    by
-      rw [add_pow_prime_eq' V.l_prime A B]
-      simp only [map_natCast]
-      ring
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [e, coeff_C_mul, map_sum, mul_comm]
+theorem frob_mv {σ : Type} {A B : MvPowerSeries σ C} (hA : IntS V A) (hB : IntS V B) (μ : σ →₀ ℕ) :
+    V.MM (coeff μ ((A + B) ^ V.l - A ^ V.l - B ^ V.l)) := by
+  have e : (A + B) ^ V.l - A ^ V.l - B ^ V.l = MvPowerSeries.C (V.l : C) *
+      ∑ k ∈ Finset.Ioo 0 V.l, A ^ k * B ^ (V.l - k) * MvPowerSeries.C ((V.l.choose k / V.l : ℕ) : C) := by
+    rw [add_pow_prime_eq' V.l_prime A B]
+    simp only [map_natCast]
+    ring
+
+  rw [e, coeff_C_mul, map_sum, mul_comm]
   refine ValuationNonnegativity.mm_mul_int (VF.Ge.sum fun k _ => ?_) FrobP.mm_l
   rw [coeff_mul_C]
   exact VF.Ge.mul_int (intS_mul (intS_pow hA k) (intS_pow hB _) μ) (VF.ge_natCast _)
 
-theorem frob_sum
-    {σ ι : Type} (s : Finset ι) (f : ι → MvPowerSeries σ C) (hf : ∀ i, IntS V (f i)) (μ : σ →₀ ℕ)
-    : V.MM (coeff μ ((∑ i ∈ s, f i) ^ V.l - ∑ i ∈ s, f i ^ V.l)) := by
+theorem frob_sum {σ ι : Type} (s : Finset ι) (f : ι → MvPowerSeries σ C) (hf : ∀ i, IntS V (f i))
+    (μ : σ →₀ ℕ) : V.MM (coeff μ ((∑ i ∈ s, f i) ^ V.l - ∑ i ∈ s, f i ^ V.l)) := by
   induction s using Finset.induction_on with
   | empty =>
     rw [Finset.sum_empty, Finset.sum_empty, zero_pow V.l_prime.ne_zero, sub_zero, map_zero]
@@ -50,31 +86,29 @@ theorem frob_sum
   | insert b s hb ih =>
     rw [Finset.sum_insert hb, Finset.sum_insert hb]
     have hS : IntS V (∑ i ∈ s, f i) := intS_sum _ fun i _ => hf i
-    have e
-        : (f b + ∑ i ∈ s, f i) ^ V.l - (f b ^ V.l + ∑ i ∈ s, f i ^ V.l)
-          = ((f b + ∑ i ∈ s, f i) ^ V.l - f b ^ V.l - (∑ i ∈ s, f i) ^ V.l)
-            + ((∑ i ∈ s, f i) ^ V.l - ∑ i ∈ s, f i ^ V.l) := by
-      ring
+    have e : (f b + ∑ i ∈ s, f i) ^ V.l - (f b ^ V.l + ∑ i ∈ s, f i ^ V.l) =
+        ((f b + ∑ i ∈ s, f i) ^ V.l - f b ^ V.l - (∑ i ∈ s, f i) ^ V.l) +
+          ((∑ i ∈ s, f i) ^ V.l - ∑ i ∈ s, f i ^ V.l) := by ring
     rw [e, map_add (f := _)]
     exact ValuationNonnegativity.mm_add (frob_mv (hf b) hS μ) ih
 
-theorem monomial_pow' {σ : Type} (β : σ →₀ ℕ) (a : C)
-    : ∀ n : ℕ, (monomial β a) ^ n = monomial (n • β) (a ^ n)
+theorem monomial_pow' {σ : Type} (β : σ →₀ ℕ) (a : C) :
+    ∀ n : ℕ, (monomial β a) ^ n = monomial (n • β) (a ^ n)
   | 0 => by
     ext μ
     rw [pow_zero, zero_smul, pow_zero, coeff_one, coeff_monomial]
-  | n + 1 => by rw [pow_succ, monomial_pow' β a n, monomial_mul_monomial, succ_nsmul, pow_succ]
+  | n + 1 => by
+    rw [pow_succ, monomial_pow' β a n, monomial_mul_monomial, succ_nsmul, pow_succ]
 
-def divL {σ : Type} (l : ℕ) (α : σ →₀ ℕ) : σ →₀ ℕ :=
-  Finsupp.mapRange (fun n => n / l) (Nat.zero_div l) α
+def divL {σ : Type} (l : ℕ) (α : σ →₀ ℕ) : σ →₀ ℕ := Finsupp.mapRange (fun n => n / l) (Nat.zero_div l) α
 
-theorem divL_apply {σ : Type} (l : ℕ) (α : σ →₀ ℕ) (t : σ) : divL l α t = α t / l := by simp [divL]
+theorem divL_apply {σ : Type} (l : ℕ) (α : σ →₀ ℕ) (t : σ) : divL l α t = α t / l := by
+  simp [divL]
 
-theorem frobPowMv {σ : Type} (F : MvPowerSeries σ C) (hF : IntS V F) (α : σ →₀ ℕ)
-    : V.MM (coeff α (F ^ V.l) - if ∀ t, V.l ∣ α t then coeff (divL V.l α) F ^ V.l else 0) := by
+theorem frobPowMv {σ : Type} (F : MvPowerSeries σ C) (hF : IntS V F) (α : σ →₀ ℕ) :
+    V.MM (coeff α (F ^ V.l) - if ∀ t, V.l ∣ α t then coeff (divL V.l α) F ^ V.l else 0) := by
   have hl0 : 0 < V.l := V.l_prime.pos
-  obtain ⟨P, hPdef⟩ : ∃ P : MvPowerSeries σ C, P = ∑ β ∈ Finset.Iic α, monomial β (coeff β F) :=
-    ⟨_, rfl⟩
+  obtain ⟨P, hPdef⟩ : ∃ P : MvPowerSeries σ C, P = ∑ β ∈ Finset.Iic α, monomial β (coeff β F) := ⟨_, rfl⟩
   have hmon : ∀ β, IntS V (monomial β (coeff β F)) := fun β μ => by
     rw [coeff_monomial]
     split_ifs
@@ -89,18 +123,17 @@ theorem frobPowMv {σ : Type} (F : MvPowerSeries σ C) (hF : IntS V F) (α : σ 
         rw [← Finset.HasAntidiagonal.mem_antidiagonal.1 hx]
         exact le_self_add
       have hc : coeff x.1 (F - P) = 0 := by
-        set_option synthInstance.maxHeartbeats 100000 in
-          rw [map_sub, sub_eq_zero, hPdef, map_sum]
+
+        rw [map_sub, sub_eq_zero, hPdef, map_sum]
         simp only [coeff_monomial]
         rw [Finset.sum_ite_eq, if_pos (Finset.mem_Iic.2 hx1)]
       rw [hc, zero_mul]
     rwa [map_sub, sub_eq_zero] at h0
   have e2 := frob_sum (Finset.Iic α) (fun β => monomial β (coeff β F)) hmon α
-  have e3
-      : coeff α (∑ β ∈ Finset.Iic α, (monomial β (coeff β F)) ^ V.l)
-        = if ∀ t, V.l ∣ α t then coeff (divL V.l α) F ^ V.l else 0 := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+  have e3 : coeff α (∑ β ∈ Finset.Iic α, (monomial β (coeff β F)) ^ V.l) =
+      if ∀ t, V.l ∣ α t then coeff (divL V.l α) F ^ V.l else 0 := by
+
+    rw [map_sum]
     simp only [monomial_pow', coeff_monomial]
     split_ifs with hdiv
     · have hβ : α = V.l • divL V.l α := by
@@ -143,10 +176,8 @@ end Slice
 
 section FBs
 
-variable
-  {C : Type} [Field C] [CharZero C]
-  {V : VF C} {O : Type} [CommRing O] [StarRing O]
-  {dd : ℕ} (Y : FBChart C V O dd)
+variable {C : Type} [Field C] [CharZero C] {V : VF C} {O : Type} [CommRing O] [StarRing O] {dd : ℕ}
+  (Y : FBChart C V O dd)
 
 end FBs
 

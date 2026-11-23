@@ -1,7 +1,55 @@
 module
 
-public import Mathlib
 public import Formalism.WeaklyAdmissibleFiltrations.Statement
+public import Mathlib.RingTheory.PowerSeries.Basic
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Coalgebra.IsFrobenius
+import Mathlib.RingTheory.Etale.Weakly
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.HopfAlgebra.Basic
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.TotallySplit
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
@@ -20,12 +68,11 @@ variable {LL : Type} [Field LL] {V : Type} [AddCommGroup V] [Module LL V]
 
 def LB (m : ℤ) (f : ℤ → V) : Prop := ∀ k < m, f k = 0
 
-def smulS (g : PowerSeries LL) (f : ℤ → V) : ℤ → V := fun k =>
-  ∑ᶠ j : ℕ, PowerSeries.coeff j g • f (k - j)
+def smulS (g : PowerSeries LL) (f : ℤ → V) : ℤ → V :=
+  fun k => ∑ᶠ j : ℕ, PowerSeries.coeff j g • f (k - j)
 
-theorem smulS_eq_sum
-    {m : ℤ} {f : ℤ → V} (hf : LB m f) (g : PowerSeries LL) (k : ℤ) (N : ℕ) (hN : k - m < N)
-    : smulS g f k = ∑ j ∈ Finset.range N, PowerSeries.coeff j g • f (k - j) := by
+theorem smulS_eq_sum {m : ℤ} {f : ℤ → V} (hf : LB m f) (g : PowerSeries LL) (k : ℤ) (N : ℕ)
+    (hN : k - m < N) : smulS g f k = ∑ j ∈ Finset.range N, PowerSeries.coeff j g • f (k - j) := by
   unfold smulS
   apply finsum_eq_sum_of_support_subset
   intro j hj
@@ -41,8 +88,8 @@ theorem LB_smulS {m : ℤ} {f : ℤ → V} (hf : LB m f) (g : PowerSeries LL) : 
   unfold smulS
   exact finsum_eq_zero_of_forall_eq_zero fun j => by rw [hf _ (by omega), smul_zero]
 
-theorem smulS_X_pow {m : ℤ} {f : ℤ → V} (hf : LB m f) (K : ℕ)
-    : smulS ((PowerSeries.X : PowerSeries LL) ^ K) f = fun k => f (k - K) := by
+theorem smulS_X_pow {m : ℤ} {f : ℤ → V} (hf : LB m f) (K : ℕ) :
+    smulS ((PowerSeries.X : PowerSeries LL) ^ K) f = fun k => f (k - K) := by
   funext k
   unfold smulS
   rw [finsum_eq_single _ K]
@@ -50,25 +97,22 @@ theorem smulS_X_pow {m : ℤ} {f : ℤ → V} (hf : LB m f) (K : ℕ)
   · intro j hj
     rw [PowerSeries.coeff_X_pow, if_neg hj, zero_smul]
 
-theorem smulS_mul {m : ℤ} {f : ℤ → V} (hf : LB m f) (g h : PowerSeries LL)
-    : smulS (g * h) f = smulS g (smulS h f) := by
+theorem smulS_mul {m : ℤ} {f : ℤ → V} (hf : LB m f) (g h : PowerSeries LL) :
+    smulS (g * h) f = smulS g (smulS h f) := by
   funext k
   obtain ⟨N, hN⟩ : ∃ N : ℕ, k - m < N := ⟨(k - m).toNat + 1, by omega⟩
   rw [smulS_eq_sum hf _ k N hN, smulS_eq_sum ((LB_smulS hf) h) _ k N hN]
-  have h1
-      : ∀ n : ℕ,
-        PowerSeries.coeff n (g * h) • f (k - n)
-          = ∑ a ∈ Finset.Ico 0 (n + 1), (PowerSeries.coeff a g * PowerSeries.coeff (n - a) h) • f (k - n) :=
-    by
-      intro n
-      rw [PowerSeries.coeff_mul, Finset.Nat.sum_antidiagonal_eq_sum_range_succ_mk, Finset.sum_smul,
-        Finset.range_eq_Ico]
+  have h1 : ∀ n : ℕ, PowerSeries.coeff n (g * h) • f (k - n) =
+      ∑ a ∈ Finset.Ico 0 (n + 1), (PowerSeries.coeff a g * PowerSeries.coeff (n - a) h) • f (k - n) := by
+    intro n
+    rw [PowerSeries.coeff_mul, Finset.Nat.sum_antidiagonal_eq_sum_range_succ_mk, Finset.sum_smul,
+      Finset.range_eq_Ico]
   simp_rw [h1]
   rw [Finset.range_eq_Ico, ← Finset.sum_Ico_Ico_comm]
   refine Finset.sum_congr rfl fun a ha => ?_
   have haN : a < N := (Finset.mem_Ico.mp ha).2
-  rw [smulS_eq_sum hf h (k - a) (N - a) (by push_cast [haN.le]; omega), Finset.sum_Ico_eq_sum_range,
-    Finset.smul_sum]
+  rw [smulS_eq_sum hf h (k - a) (N - a) (by push_cast [haN.le]; omega),
+    Finset.sum_Ico_eq_sum_range, Finset.smul_sum]
   refine Finset.sum_congr rfl fun b _ => ?_
   rw [mul_smul, Nat.add_sub_cancel_left, Nat.cast_add, sub_add_eq_sub_sub]
 
@@ -81,22 +125,24 @@ variable {LL : Type} [Field LL] {E : Type} [AddCommGroup E] [Module LL E]
 def sumAt {r : ℕ} (e : Fin r → ℤ → E) (j : ℤ) : (Fin r → LL) →ₗ[LL] E :=
   ∑ m, (LinearMap.proj m : (Fin r → LL) →ₗ[LL] LL).smulRight (e m j)
 
-theorem sumAt_apply {r : ℕ} (e : Fin r → ℤ → E) (j : ℤ) (c : Fin r → LL)
-    : sumAt e j c = ∑ m, c m • e m j := by
+theorem sumAt_apply {r : ℕ} (e : Fin r → ℤ → E) (j : ℤ) (c : Fin r → LL) :
+    sumAt e j c = ∑ m, c m • e m j := by
   simp [sumAt]
 
-def Ub {r : ℕ} (Fil : ℤ → Submodule LL E) (e : Fin r → ℤ → E) (j : ℤ) : Submodule LL (Fin r → LL) :=
+def Ub {r : ℕ} (Fil : ℤ → Submodule LL E) (e : Fin r → ℤ → E) (j : ℤ) :
+    Submodule LL (Fin r → LL) :=
   ⨅ (i : ℤ) (_ : i < j), (Fil (-i + 1)).comap (sumAt e i)
 
-theorem mem_Ub {r : ℕ} (Fil : ℤ → Submodule LL E) (e : Fin r → ℤ → E) (j : ℤ) (c : Fin r → LL)
-    : c ∈ Ub Fil e j ↔ ∀ i < j, ∑ m, c m • e m i ∈ Fil (-i + 1) := by
+theorem mem_Ub {r : ℕ} (Fil : ℤ → Submodule LL E) (e : Fin r → ℤ → E) (j : ℤ) (c : Fin r → LL) :
+    c ∈ Ub Fil e j ↔ ∀ i < j, ∑ m, c m • e m i ∈ Fil (-i + 1) := by
   simp only [Ub, Submodule.mem_iInf, Submodule.mem_comap, sumAt_apply]
 
-private theorem Ub_succ_eq_inf_comap_sumAt
-    {r : ℕ} (Fil : ℤ → Submodule LL E) (e : Fin r → ℤ → E) (j : ℤ)
-    : Ub Fil e (j + 1) = Ub Fil e j ⊓ (Fil (-j + 1)).comap (sumAt e j) := by
+private theorem Ub_succ_eq_inf_comap_sumAt {r : ℕ} (Fil : ℤ → Submodule LL E) (e : Fin r → ℤ → E) (j : ℤ) :
+    Ub Fil e (j + 1) =
+      Ub Fil e j ⊓ (Fil (-j + 1)).comap (sumAt e j) := by
   ext c
-  rw [Submodule.mem_inf, Submodule.mem_comap, mem_Ub, mem_Ub, sumAt_apply]
+  rw [Submodule.mem_inf, Submodule.mem_comap, mem_Ub, mem_Ub,
+    sumAt_apply]
   constructor
   · intro h
     exact ⟨fun i hi => h i (by omega), h j (by omega)⟩
@@ -105,42 +151,40 @@ private theorem Ub_succ_eq_inf_comap_sumAt
     · exact h1 i hlt
     · exact h2
 
-private theorem finrank_comap_subtype_eq_finrank_inf (S N : Submodule LL E)
-    : finrank LL ↥(N.comap S.subtype) = finrank LL ↥(S ⊓ N) := by
+private theorem finrank_comap_subtype_eq_finrank_inf (S N : Submodule LL E) :
+    finrank LL ↥(N.comap S.subtype) = finrank LL ↥(S ⊓ N) := by
   rw [← Submodule.finrank_map_subtype_eq S, Submodule.map_comap_subtype]
 
-private theorem finrank_map_mkQ_add_finrank_inf (S N : Submodule LL E) [FiniteDimensional LL S]
-    : finrank LL ↥(S.map N.mkQ) + finrank LL ↥(S ⊓ N) = finrank LL ↥S := by
+private theorem finrank_map_mkQ_add_finrank_inf (S N : Submodule LL E) [FiniteDimensional LL S] :
+    finrank LL ↥(S.map N.mkQ) + finrank LL ↥(S ⊓ N) = finrank LL ↥S := by
   have h := LinearMap.finrank_range_add_finrank_ker (N.mkQ ∘ₗ S.subtype)
   rw [LinearMap.range_comp, Submodule.range_subtype, LinearMap.ker_comp, Submodule.ker_mkQ,
-      finrank_comap_subtype_eq_finrank_inf]
-    at h
+    finrank_comap_subtype_eq_finrank_inf] at h
   exact h
 
-theorem Ub_anti {r : ℕ} (Fil : ℤ → Submodule LL E) (e : Fin r → ℤ → E) {j j' : ℤ} (h : j ≤ j')
-    : Ub Fil e j' ≤ Ub Fil e j := by
+theorem Ub_anti {r : ℕ} (Fil : ℤ → Submodule LL E) (e : Fin r → ℤ → E) {j j' : ℤ} (h : j ≤ j') :
+    Ub Fil e j' ≤ Ub Fil e j := by
   intro c hc
   rw [mem_Ub] at hc ⊢
   exact fun i hi => hc i (lt_of_lt_of_le hi h)
 
-variable
-  {r : ℕ} {Fil : ℤ → Submodule LL E} (hFa : Antitone Fil)
-  (D : Submodule LL E) [FiniteDimensional LL D]
-  {e : Fin r → ℤ → E}
+variable {r : ℕ} {Fil : ℤ → Submodule LL E} (hFa : Antitone Fil) (D : Submodule LL E)
+  [FiniteDimensional LL D] {e : Fin r → ℤ → E}
+
 
 include hFa in
-theorem count_step
-    (he : ∀ m k, e m k ∈ D ⊓ Fil (-k))
+theorem count_step (he : ∀ m k, e m k ∈ D ⊓ Fil (-k))
     (hS : ∀ k : ℤ, ∀ w ∈ D ⊓ Fil (-k), ∃ c : Fin r → LL,
       (∀ j < k, ∑ m, c m • e m j ∈ Fil (-j + 1)) ∧ ∑ m, c m • e m k - w ∈ Fil (-k + 1))
-    (j : ℤ)
-    : finrank LL ↥(Ub Fil e (j + 1)) + finrank LL ↥(D ⊓ Fil (-j))
-      = finrank LL ↥(Ub Fil e j) + finrank LL ↥(D ⊓ Fil (-j + 1)) := by
+    (j : ℤ) :
+    finrank LL ↥(Ub Fil e (j + 1)) + finrank LL ↥(D ⊓ Fil (-j)) =
+      finrank LL ↥(Ub Fil e j) + finrank LL ↥(D ⊓ Fil (-j + 1)) := by
   have hQfin : FiniteDimensional LL ↥(D ⊓ Fil (-j)) := Submodule.finiteDimensional_of_le inf_le_left
   let Φ : ↥(Ub Fil e j) →ₗ[LL] E ⧸ Fil (-j + 1) :=
     (Fil (-j + 1)).mkQ ∘ₗ sumAt e j ∘ₗ (Ub Fil e j).subtype
   have hrk := LinearMap.finrank_range_add_finrank_ker Φ
-  have hker : LinearMap.ker Φ = (Ub Fil e (j + 1)).comap (Ub Fil e j).subtype := by
+  have hker : LinearMap.ker Φ =
+      (Ub Fil e (j + 1)).comap (Ub Fil e j).subtype := by
     ext ⟨c, hc⟩
     rw [LinearMap.mem_ker, Submodule.mem_comap, Ub_succ_eq_inf_comap_sumAt, Submodule.mem_inf,
       Submodule.mem_comap]
@@ -164,24 +208,21 @@ theorem count_step
     rw [inf_assoc, inf_eq_right.mpr (hFa (by omega : -j ≤ -j + 1))]
   rw [hinf] at hL1
   rw [hrange, hker, finrank_comap_subtype_eq_finrank_inf,
-      inf_eq_right.mpr (Ub_anti Fil e (by omega : j ≤ j + 1))]
-    at hrk
+    inf_eq_right.mpr (Ub_anti Fil e (by omega : j ≤ j + 1))] at hrk
   omega
 
+
 include hFa in
-theorem indep_of_span
-    (a₀ a₁ : ℤ) (h₀ : D ≤ Fil a₀) (h₁ : D ⊓ Fil a₁ = ⊥)
+theorem indep_of_span (a₀ a₁ : ℤ) (h₀ : D ≤ Fil a₀) (h₁ : D ⊓ Fil a₁ = ⊥)
     (he : ∀ m k, e m k ∈ D ⊓ Fil (-k))
     (hS : ∀ k : ℤ, ∀ w ∈ D ⊓ Fil (-k), ∃ c : Fin r → LL,
       (∀ j < k, ∑ m, c m • e m j ∈ Fil (-j + 1)) ∧ ∑ m, c m • e m k - w ∈ Fil (-k + 1))
-    (hr : r ≤ finrank LL ↥D)
-    (c : Fin r → LL) (hc : ∀ j, ∑ m, c m • e m j ∈ Fil (-j + 1))
-    : c = 0 := by
+    (hr : r ≤ finrank LL ↥D) (c : Fin r → LL) (hc : ∀ j, ∑ m, c m • e m j ∈ Fil (-j + 1)) :
+    c = 0 := by
   have hstep := count_step hFa D he hS
-  have hconst
-      : ∀ n : ℕ,
-        finrank LL ↥(Ub Fil e (1 - a₁ + n)) + finrank LL ↥(D ⊓ Fil (-(1 - a₁ + n) + 1))
-          = finrank LL ↥(Ub Fil e (1 - a₁)) + finrank LL ↥(D ⊓ Fil (-(1 - a₁) + 1)) := by
+  have hconst : ∀ n : ℕ, finrank LL ↥(Ub Fil e (1 - a₁ + n)) +
+      finrank LL ↥(D ⊓ Fil (-(1 - a₁ + n) + 1)) =
+      finrank LL ↥(Ub Fil e (1 - a₁)) + finrank LL ↥(D ⊓ Fil (-(1 - a₁) + 1)) := by
     intro n
     induction n with
     | zero => rw [Nat.cast_zero, add_zero]
@@ -206,27 +247,28 @@ theorem indep_of_span
   rw [h0, Submodule.mem_bot] at hcmem
   exact hcmem
 
+
 include hFa in
-theorem smulS_sub_cc
-    {M : ℤ} {f : ℤ → E} (hf : LB M f) (hfF : ∀ k, f k ∈ Fil (-k)) (g : PowerSeries LL) (j : ℤ)
-    : smulS g f j - PowerSeries.constantCoeff g • f j ∈ Fil (-j + 1) := by
+theorem smulS_sub_cc {M : ℤ} {f : ℤ → E} (hf : LB M f) (hfF : ∀ k, f k ∈ Fil (-k))
+    (g : PowerSeries LL) (j : ℤ) :
+    smulS g f j - PowerSeries.constantCoeff g • f j ∈ Fil (-j + 1) := by
   obtain ⟨N, hN⟩ : ∃ N : ℕ, j - M < ((N + 1 : ℕ) : ℤ) := ⟨(j - M).toNat, by omega⟩
   rw [smulS_eq_sum hf g j (N + 1) hN, Finset.sum_range_succ',
     PowerSeries.coeff_zero_eq_constantCoeff_apply, Nat.cast_zero, sub_zero, add_sub_cancel_right]
   refine Submodule.sum_mem _ fun n _ => Submodule.smul_mem _ _ ?_
   exact hFa (show -j + 1 ≤ -(j - ((n + 1 : ℕ) : ℤ)) by omega) (hfF _)
 
+
 include hFa in
-theorem dvd_of_dg
-    (a₁ : ℤ) (h₁ : D ⊓ Fil a₁ = ⊥)
-    (he : ∀ m k, e m k ∈ D ⊓ Fil (-k))
-    (hind : ∀ c : Fin r → LL, (∀ j, ∑ m, c m • e m j ∈ Fil (-j + 1)) → c = 0)
-    : ∀ (k : ℕ) (g : Fin r → PowerSeries LL),
+theorem dvd_of_dg (a₁ : ℤ) (h₁ : D ⊓ Fil a₁ = ⊥) (he : ∀ m k, e m k ∈ D ⊓ Fil (-k))
+    (hind : ∀ c : Fin r → LL, (∀ j, ∑ m, c m • e m j ∈ Fil (-j + 1)) → c = 0) :
+    ∀ (k : ℕ) (g : Fin r → PowerSeries LL),
       (∀ j : ℤ, ∑ m, smulS (g m) (e m) j ∈ Fil ((k : ℤ) - j)) → ∀ m, PowerSeries.X ^ k ∣ g m := by
   have hvan : ∀ m, LB (1 - a₁) (e m) := by
     intro m k hk
     have h := Submodule.mem_inf.mp (he m k)
-    have h' : e m k ∈ D ⊓ Fil a₁ := Submodule.mem_inf.mpr ⟨h.1, hFa (show a₁ ≤ -k by omega) h.2⟩
+    have h' : e m k ∈ D ⊓ Fil a₁ :=
+      Submodule.mem_inf.mpr ⟨h.1, hFa (show a₁ ≤ -k by omega) h.2⟩
     rw [h₁] at h'
     exact (Submodule.mem_bot LL).mp h'
   intro k
@@ -245,8 +287,7 @@ theorem dvd_of_dg
       have h1 := hg (j + k)
       simp only [hshift, add_sub_cancel_right] at h1
       rw [show ((k + 1 : ℕ) : ℤ) - (j + k) = -j + 1 by push_cast; ring] at h1
-      have h2
-          : ∑ m, (smulS (q m) (e m) j - PowerSeries.constantCoeff (q m) • e m j) ∈ Fil (-j + 1) :=
+      have h2 : ∑ m, (smulS (q m) (e m) j - PowerSeries.constantCoeff (q m) • e m j) ∈ Fil (-j + 1) :=
         Submodule.sum_mem _ fun m _ =>
           smulS_sub_cc hFa (hvan m) (fun i => (Submodule.mem_inf.mp (he m i)).2) (q m) j
       rw [Finset.sum_sub_distrib] at h2
@@ -266,34 +307,29 @@ section Quo
 
 variable {LL : Type} [Field LL] {E : Type} [AddCommGroup E] [Module LL E]
 
-theorem map_smulS
-    {E' : Type} [AddCommGroup E'] [Module LL E']
-    (π : E →ₗ[LL] E')
-    {M : ℤ} {f : ℤ → E} (hf : LB M f)
-    (g : PowerSeries LL) (j : ℤ)
-    : π (smulS g f j) = smulS g (fun k => π (f k)) j := by
+theorem map_smulS {E' : Type} [AddCommGroup E'] [Module LL E'] (π : E →ₗ[LL] E') {M : ℤ}
+    {f : ℤ → E} (hf : LB M f) (g : PowerSeries LL) (j : ℤ) :
+    π (smulS g f j) = smulS g (fun k => π (f k)) j := by
   obtain ⟨N, hN⟩ : ∃ N : ℕ, j - M < N := ⟨(j - M).toNat + 1, by omega⟩
-  have hf' : LB M (fun k => π (f k)) := fun k hk => by simp only [hf k hk, map_zero]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [smulS_eq_sum hf g j N hN, smulS_eq_sum hf' g j N hN, map_sum]
+  have hf' : LB M (fun k => π (f k)) := fun k hk => by
+    simp only [hf k hk, map_zero]
+
+  rw [smulS_eq_sum hf g j N hN, smulS_eq_sum hf' g j N hN, map_sum]
   simp only [map_smul]
 
-private theorem mkQ_mem_map_mkQ_iff_mem_sup (R S : Submodule LL E) (x : E)
-    : R.mkQ x ∈ S.map R.mkQ ↔ x ∈ S ⊔ R := by
+private theorem mkQ_mem_map_mkQ_iff_mem_sup (R S : Submodule LL E) (x : E) :
+    R.mkQ x ∈ S.map R.mkQ ↔ x ∈ S ⊔ R := by
   rw [← Submodule.mem_comap, Submodule.comap_map_mkQ, sup_comm]
 
-theorem dvd_of_dg_mod
-    {r : ℕ} {F : ℤ → Submodule LL E} (hFa : Antitone F)
-    (D R : Submodule LL E) [FiniteDimensional LL D]
-    (hFD : ∀ a, F a ≤ D) (hDR : D ⊓ R = ⊥)
-    (a₀ a₁ : ℤ) (h₀ : D ≤ F a₀) (h₁ : F a₁ = ⊥)
-    {e : Fin r → ℤ → E} (hLB : ∀ m, ∃ M, LB M (e m)) (he : ∀ m k, e m k ∈ F (-k) ⊔ R)
+theorem dvd_of_dg_mod {r : ℕ} {F : ℤ → Submodule LL E} (hFa : Antitone F) (D R : Submodule LL E)
+    [FiniteDimensional LL D] (hFD : ∀ a, F a ≤ D) (hDR : D ⊓ R = ⊥) (a₀ a₁ : ℤ) (h₀ : D ≤ F a₀)
+    (h₁ : F a₁ = ⊥) {e : Fin r → ℤ → E} (hLB : ∀ m, ∃ M, LB M (e m))
+    (he : ∀ m k, e m k ∈ F (-k) ⊔ R)
     (hS : ∀ k : ℤ, ∀ w ∈ F (-k), ∃ c : Fin r → LL,
       (∀ j < k, ∑ m, c m • e m j ∈ F (-j + 1) ⊔ R) ∧ ∑ m, c m • e m k - w ∈ F (-k + 1) ⊔ R)
-    (hr : r ≤ finrank LL ↥D)
-    (k : ℕ) (g : Fin r → PowerSeries LL)
-    (hg : ∀ j : ℤ, ∑ m, smulS (g m) (e m) j ∈ F ((k : ℤ) - j) ⊔ R)
-    : ∀ m, PowerSeries.X ^ k ∣ g m := by
+    (hr : r ≤ finrank LL ↥D) (k : ℕ) (g : Fin r → PowerSeries LL)
+    (hg : ∀ j : ℤ, ∑ m, smulS (g m) (e m) j ∈ F ((k : ℤ) - j) ⊔ R) :
+    ∀ m, PowerSeries.X ^ k ∣ g m := by
   have hFa' : Antitone (fun a => (F a).map R.mkQ) := fun a b h => Submodule.map_mono (hFa h)
   have hDfin : FiniteDimensional LL ↥(D.map R.mkQ) := by
     have hrg : D.map R.mkQ = LinearMap.range (R.mkQ ∘ₗ D.subtype) := by
@@ -301,20 +337,20 @@ theorem dvd_of_dg_mod
     rw [hrg]
     infer_instance
   have h₀' : D.map R.mkQ ≤ (F a₀).map R.mkQ := Submodule.map_mono h₀
-  have h₁' : D.map R.mkQ ⊓ (F a₁).map R.mkQ = ⊥ := by rw [h₁, Submodule.map_bot, inf_bot_eq]
+  have h₁' : D.map R.mkQ ⊓ (F a₁).map R.mkQ = ⊥ := by
+    rw [h₁, Submodule.map_bot, inf_bot_eq]
   have he' : ∀ m i, R.mkQ (e m i) ∈ D.map R.mkQ ⊓ (F (-i)).map R.mkQ := by
     intro m i
     have h := (mkQ_mem_map_mkQ_iff_mem_sup R (F (-i)) (e m i)).mpr (he m i)
     exact Submodule.mem_inf.mpr ⟨Submodule.map_mono (hFD _) h, h⟩
   have hπ : ∀ (c : Fin r → LL) (j : ℤ), ∑ m, c m • R.mkQ (e m j) = R.mkQ (∑ m, c m • e m j) := by
     intro c j
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     simp only [map_smul]
-  have hS'
-      : ∀ i : ℤ, ∀ w ∈ D.map R.mkQ ⊓ (F (-i)).map R.mkQ, ∃ c : Fin r → LL,
-        (∀ j < i, ∑ m, c m • R.mkQ (e m j) ∈ (F (-j + 1)).map R.mkQ)
-          ∧ ∑ m, c m • R.mkQ (e m i) - w ∈ (F (-i + 1)).map R.mkQ := by
+  have hS' : ∀ i : ℤ, ∀ w ∈ D.map R.mkQ ⊓ (F (-i)).map R.mkQ, ∃ c : Fin r → LL,
+      (∀ j < i, ∑ m, c m • R.mkQ (e m j) ∈ (F (-j + 1)).map R.mkQ) ∧
+        ∑ m, c m • R.mkQ (e m i) - w ∈ (F (-i + 1)).map R.mkQ := by
     intro i w hw
     obtain ⟨w0, hw0, rfl⟩ := (Submodule.mem_inf.mp hw).2
     obtain ⟨c, hc1, hc2⟩ := hS i w0 hw0
@@ -328,25 +364,19 @@ theorem dvd_of_dg_mod
     rw [hDR, finrank_bot] at h
     omega
   have hind : ∀ c : Fin r → LL, (∀ j, ∑ m, c m • R.mkQ (e m j) ∈ (F (-j + 1)).map R.mkQ) → c = 0 :=
-    fun c hc =>
-      indep_of_span
-        (Fil := fun a => (F a).map R.mkQ)
-        (e := fun m i => R.mkQ (e m i))
-        hFa' (D.map R.mkQ) a₀ a₁ h₀' h₁' he' hS' hr' c hc
-  have hg'
-      : ∀ j : ℤ, ∑ m, smulS (g m) (fun i => R.mkQ (e m i)) j ∈ (F ((k : ℤ) - j)).map R.mkQ := by
+    fun c hc => indep_of_span (Fil := fun a => (F a).map R.mkQ)
+      (e := fun m i => R.mkQ (e m i)) hFa' (D.map R.mkQ) a₀ a₁ h₀' h₁' he' hS' hr' c hc
+  have hg' : ∀ j : ℤ, ∑ m, smulS (g m) (fun i => R.mkQ (e m i)) j ∈ (F ((k : ℤ) - j)).map R.mkQ := by
     intro j
     have hsum : ∑ m, smulS (g m) (fun i => R.mkQ (e m i)) j = R.mkQ (∑ m, smulS (g m) (e m) j) := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum]
+
+      rw [map_sum]
       refine Finset.sum_congr rfl fun m _ => ?_
       obtain ⟨M, hM⟩ := hLB m
       exact (map_smulS R.mkQ hM (g m) j).symm
     rw [hsum]
     exact (mkQ_mem_map_mkQ_iff_mem_sup R _ _).mpr (hg j)
-  exact dvd_of_dg
-    (Fil := fun a => (F a).map R.mkQ)
-    (e := fun m i => R.mkQ (e m i))
+  exact dvd_of_dg (Fil := fun a => (F a).map R.mkQ) (e := fun m i => R.mkQ (e m i))
     hFa' (D.map R.mkQ) a₁ h₁' he' hind k g hg'
 
 end Quo
@@ -355,21 +385,19 @@ open Formalism.WeaklyAdmissibleFiltrations TensorProduct
 
 section Fil
 
-variable
-  {G : Type} [Group G]
-  {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K] [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K]
-  [IsScalarTower Qp K₀ K]
-  {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
-  [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
-  [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
-  (PD : PeriodData G Qp K₀ K B BdR)
-  {LL : Type} [Field LL] [Algebra Qp LL]
-  {V : Type} [AddCommGroup V] [Module LL V] [Module Qp V] [IsScalarTower Qp LL V]
+variable {G : Type} [Group G] {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K]
+    [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K] [IsScalarTower Qp K₀ K]
+    {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
+    [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
+    [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
+    (PD : PeriodData G Qp K₀ K B BdR)
+    {LL : Type} [Field LL] [Algebra Qp LL]
+    {V : Type} [AddCommGroup V] [Module LL V] [Module Qp V] [IsScalarTower Qp LL V]
 
 theorem filB_anti : Antitone PD.Fil := antitone_int_of_succ_le PD.Fil_anti
 
-private theorem tmul_mem_FilV_of_mem_Fil (a : ℤ) (x : V) {y : BdR} (hy : y ∈ PD.Fil a)
-    : x ⊗ₜ[Qp] y ∈ Formalism.WeaklyAdmissibleFiltrations.FilV PD (LL := LL) (V := V) a := by
+private theorem tmul_mem_FilV_of_mem_Fil (a : ℤ) (x : V) {y : BdR} (hy : y ∈ PD.Fil a) :
+    x ⊗ₜ[Qp] y ∈ Formalism.WeaklyAdmissibleFiltrations.FilV PD (LL := LL) (V := V) a := by
   refine LinearMap.mem_range.mpr ⟨x ⊗ₜ[Qp] (⟨y, hy⟩ : (PD.Fil a).restrictScalars Qp), ?_⟩
   rw [AlgebraTensorModule.map_tmul]
   rfl
@@ -394,16 +422,12 @@ theorem filV_exh (z : V ⊗[Qp] BdR) : ∃ a : ℤ, z ∈ FilV PD (LL := LL) (V 
   | add u v hu hv =>
     obtain ⟨a, ha⟩ := hu
     obtain ⟨b, hb⟩ := hv
-    exact ⟨
-      min a b,
-      Submodule.add_mem _ (filVB_anti PD (min_le_left a b) ha) (filVB_anti PD (min_le_right a b) hb)
-    ⟩
+    exact ⟨min a b, Submodule.add_mem _ (filVB_anti PD (min_le_left a b) ha)
+      (filVB_anti PD (min_le_right a b) hb)⟩
 
-theorem coord_mem
-    {ι : Type} (b : Basis ι Qp V)
-    (a : ℤ) (z : V ⊗[Qp] BdR) (hz : z ∈ FilV PD (LL := LL) (V := V) a)
-    (i : ι)
-    : TensorProduct.equivFinsuppOfBasisLeft b z i ∈ PD.Fil a := by
+theorem coord_mem {ι : Type} (b : Basis ι Qp V) (a : ℤ) (z : V ⊗[Qp] BdR)
+    (hz : z ∈ FilV PD (LL := LL) (V := V) a) (i : ι) :
+    TensorProduct.equivFinsuppOfBasisLeft b z i ∈ PD.Fil a := by
   obtain ⟨w, rfl⟩ := LinearMap.mem_range.mp hz
   clear hz
   induction w using TensorProduct.induction_on with
@@ -422,11 +446,9 @@ theorem filV_sep (z : V ⊗[Qp] BdR) (hz : ∀ a : ℤ, z ∈ FilV PD (LL := LL)
   have key2 : TensorProduct.equivFinsuppOfBasisLeft b z = 0 := Finsupp.ext key
   exact (LinearEquiv.map_eq_zero_iff _).mp key2
 
-theorem exists_le_filV (D : Submodule LL (V ⊗[Qp] BdR)) [FiniteDimensional LL D]
-    : ∃ a : ℤ, D ≤ FilV PD (LL := LL) (V := V) a := by
-  have key
-      : ∀ S : Finset (V ⊗[Qp] BdR), ∃ a : ℤ, ∀ x ∈ S,
-        x ∈ Formalism.WeaklyAdmissibleFiltrations.FilV PD (LL := LL) (V := V) a := by
+theorem exists_le_filV (D : Submodule LL (V ⊗[Qp] BdR)) [FiniteDimensional LL D] :
+    ∃ a : ℤ, D ≤ FilV PD (LL := LL) (V := V) a := by
+  have key : ∀ S : Finset (V ⊗[Qp] BdR), ∃ a : ℤ, ∀ x ∈ S, x ∈ Formalism.WeaklyAdmissibleFiltrations.FilV PD (LL := LL) (V := V) a := by
     intro S
     refine Finset.induction_on S ⟨0, by simp⟩ ?_
     intro x S hx ih
@@ -442,11 +464,9 @@ theorem exists_le_filV (D : Submodule LL (V ⊗[Qp] BdR)) [FiniteDimensional LL 
   rw [← hS]
   exact Submodule.span_le.mpr ha
 
-theorem exists_inf_filV_eq_bot (D : Submodule LL (V ⊗[Qp] BdR)) [FiniteDimensional LL D]
-    : ∃ a : ℤ, D ⊓ FilV PD (LL := LL) (V := V) a = ⊥ := by
-  have hex
-      : ∃ n : ℕ, ∃ a : ℤ,
-        finrank LL ↥(D ⊓ Formalism.WeaklyAdmissibleFiltrations.FilV PD (LL := LL) (V := V) a) = n :=
+theorem exists_inf_filV_eq_bot (D : Submodule LL (V ⊗[Qp] BdR)) [FiniteDimensional LL D] :
+    ∃ a : ℤ, D ⊓ FilV PD (LL := LL) (V := V) a = ⊥ := by
+  have hex : ∃ n : ℕ, ∃ a : ℤ, finrank LL ↥(D ⊓ Formalism.WeaklyAdmissibleFiltrations.FilV PD (LL := LL) (V := V) a) = n :=
     ⟨_, 0, rfl⟩
   obtain ⟨a, ha⟩ := Nat.find_spec hex
   refine ⟨a, ?_⟩
@@ -456,16 +476,11 @@ theorem exists_inf_filV_eq_bot (D : Submodule LL (V ⊗[Qp] BdR)) [FiniteDimensi
   refine filV_sep PD (LL := LL) x fun b => ?_
   rcases le_total b a with hba | hab
   · exact filVB_anti PD hba (Submodule.mem_inf.mp hx).2
-  · have hle
-        : D ⊓ Formalism.WeaklyAdmissibleFiltrations.FilV PD (LL := LL) (V := V) b
-          ≤ D ⊓ Formalism.WeaklyAdmissibleFiltrations.FilV PD (LL := LL) (V := V) a :=
+  · have hle : D ⊓ Formalism.WeaklyAdmissibleFiltrations.FilV PD (LL := LL) (V := V) b ≤ D ⊓ Formalism.WeaklyAdmissibleFiltrations.FilV PD (LL := LL) (V := V) a :=
       inf_le_inf_left D (filVB_anti PD hab)
-    have hfin : FiniteDimensional LL
-        ↥(D ⊓ Formalism.WeaklyAdmissibleFiltrations.FilV PD (LL := LL) (V := V) a) :=
+    have hfin : FiniteDimensional LL ↥(D ⊓ Formalism.WeaklyAdmissibleFiltrations.FilV PD (LL := LL) (V := V) a) :=
       Submodule.finiteDimensional_of_le inf_le_left
-    have heq
-        : D ⊓ Formalism.WeaklyAdmissibleFiltrations.FilV PD (LL := LL) (V := V) b
-          = D ⊓ Formalism.WeaklyAdmissibleFiltrations.FilV PD (LL := LL) (V := V) a :=
+    have heq : D ⊓ Formalism.WeaklyAdmissibleFiltrations.FilV PD (LL := LL) (V := V) b = D ⊓ Formalism.WeaklyAdmissibleFiltrations.FilV PD (LL := LL) (V := V) a :=
       Submodule.eq_of_le_of_finrank_le hle (by rw [ha]; exact Nat.find_min' hex ⟨b, rfl⟩)
     rw [← heq] at hx
     exact (Submodule.mem_inf.mp hx).2

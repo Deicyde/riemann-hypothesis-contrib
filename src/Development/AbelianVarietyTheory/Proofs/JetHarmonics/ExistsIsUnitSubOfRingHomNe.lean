@@ -1,15 +1,62 @@
 module
 
-public import Mathlib
+public import Mathlib.Data.Nat.Prime.Defs
+public import Mathlib.RingTheory.Finiteness.Defs
+public import Mathlib.RingTheory.LocalRing.Defs
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
+public import Mathlib.Algebra.Ring.GeomSum
+public import Mathlib.RingTheory.Ideal.Maximal
+public import Mathlib.RingTheory.Ideal.Nonunits
+public import Mathlib.RingTheory.Ideal.Operations
+public import Mathlib.RingTheory.Jacobson.Ideal
+public import Mathlib.RingTheory.LocalRing.MaximalIdeal.Basic
+public import Mathlib.RingTheory.LocalRing.ResidueField.Basic
+public import Mathlib.RingTheory.Nakayama
 
 @[expose] public section
 
 namespace GlobalTheory
 
-theorem _root_.GlobalTheory.exists_isUnit_sub_of_ringHom_ne
-    : ∀ (A O : Type) [CommRing A] [Module.Finite ℤ A] [CommRing O] [IsLocalRing O] (g : ℕ),
-      g.Prime → ¬ IsUnit (g : O) → (∀ x : A, x ^ g - x ∈ Ideal.span {(g : A)})
-        → ∀ σ σ' : A →+* O, σ ≠ σ' → ∃ a : A, IsUnit (σ a - σ' a) := by
+theorem _root_.GlobalTheory.exists_isUnit_sub_of_ringHom_ne : ∀ (A O : Type) [CommRing A] [Module.Finite ℤ A] [CommRing O] [IsLocalRing O] (g : ℕ), g.Prime → ¬ IsUnit (g : O) → (∀ x : A, x ^ g - x ∈ Ideal.span {(g : A)}) → ∀ σ σ' : A →+* O, σ ≠ σ' → ∃ a : A, IsUnit (σ a - σ' a) := by
   intro A O _ _ _ _ g hg hgO hA σ σ' hne
   by_contra hcon
   push_neg at hcon
@@ -27,14 +74,15 @@ theorem _root_.GlobalTheory.exists_isUnit_sub_of_ringHom_ne
     | mem y hy => exact Ideal.subset_span ⟨y, hy, rfl⟩
     | zero => simp
     | add y z _ _ hy hz =>
-      have : σ (y + z) - σ' (y + z) = (σ y - σ' y) + (σ z - σ' z) := by
-        rw [map_add (f := _), map_add (f := _)]; ring
-      rw [this]
-      exact J.add_mem hy hz
+        have : σ (y + z) - σ' (y + z) = (σ y - σ' y) + (σ z - σ' z) := by
+          rw [map_add (f := _), map_add (f := _)]; ring
+        rw [this]
+        exact J.add_mem hy hz
     | smul n y _ hy =>
-      have : σ (n • y) - σ' (n • y) = (n : O) * (σ y - σ' y) := by simp [zsmul_eq_mul, mul_sub]
-      rw [this]
-      exact J.mul_mem_left _ hy
+        have : σ (n • y) - σ' (n • y) = (n : O) * (σ y - σ' y) := by
+          simp [zsmul_eq_mul, mul_sub]
+        rw [this]
+        exact J.mul_mem_left _ hy
   have hgk : (g : IsLocalRing.ResidueField O) = 0 := by
     rw [← map_natCast (IsLocalRing.residue O), IsLocalRing.residue_eq_zero_iff]
     exact hgm
@@ -42,37 +90,38 @@ theorem _root_.GlobalTheory.exists_isUnit_sub_of_ringHom_ne
     rw [hJ, Ideal.span_le]
     rintro _ ⟨a, -, rfl⟩
     obtain ⟨c, hc⟩ := Ideal.mem_span_singleton'.mp (hA a)
-    have hc1 : σ c * g = σ a ^ g - σ a := by rw [← map_natCast σ g, ← map_mul, hc, map_sub, map_pow]
+    have hc1 : σ c * g = σ a ^ g - σ a := by
+      rw [← map_natCast σ g, ← map_mul, hc, map_sub, map_pow]
     have hc2 : σ' c * g = σ' a ^ g - σ' a := by
       rw [← map_natCast σ' g, ← map_mul, hc, map_sub, map_pow]
     have hgeom := geom_sum₂_mul (σ a) (σ' a) g
-    have key
-        : (σ a - σ' a) * ((∑ i ∈ Finset.range g, σ a ^ i * σ' a ^ (g - 1 - i)) - 1)
-          = (g : O) * (σ c - σ' c) := by
+    have key : (σ a - σ' a) * ((∑ i ∈ Finset.range g, σ a ^ i * σ' a ^ (g - 1 - i)) - 1) =
+        (g : O) * (σ c - σ' c) := by
       linear_combination hgeom - hc1 + hc2
     have hr : IsLocalRing.residue O (σ' a) = IsLocalRing.residue O (σ a) := by
       rw [eq_comm, ← sub_eq_zero, ← map_sub, IsLocalRing.residue_eq_zero_iff]
       exact (IsLocalRing.mem_maximalIdeal _).mpr (mem_nonunits_iff.mpr (hcon a))
-    have hS
-        : (∑ i ∈ Finset.range g, σ a ^ i * σ' a ^ (g - 1 - i)) ∈ IsLocalRing.maximalIdeal O := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [← IsLocalRing.residue_eq_zero_iff, map_sum]
+    have hS : (∑ i ∈ Finset.range g, σ a ^ i * σ' a ^ (g - 1 - i)) ∈
+        IsLocalRing.maximalIdeal O := by
+
+      rw [← IsLocalRing.residue_eq_zero_iff, map_sum]
       simp_rw [map_mul, map_pow, hr, ← pow_add]
-      rw [Finset.sum_congr rfl
-        (g := fun _ => IsLocalRing.residue O (σ a) ^ (g - 1))
+      rw [Finset.sum_congr rfl (g := fun _ => IsLocalRing.residue O (σ a) ^ (g - 1))
         (fun i hi => by have := Finset.mem_range.mp hi; congr 1; omega)]
       rw [Finset.sum_const, Finset.card_range, nsmul_eq_mul, hgk, zero_mul]
     have hu : IsUnit ((∑ i ∈ Finset.range g, σ a ^ i * σ' a ^ (g - 1 - i)) - 1) := by
       by_contra hu
       have h1 : (1 : O) ∈ IsLocalRing.maximalIdeal O := by
-        have := Ideal.sub_mem _ hS ((IsLocalRing.mem_maximalIdeal _).mpr (mem_nonunits_iff.mpr hu))
+        have := Ideal.sub_mem _ hS
+          ((IsLocalRing.mem_maximalIdeal _).mpr (mem_nonunits_iff.mpr hu))
         simpa using this
       exact (IsLocalRing.maximalIdeal.isMaximal O).ne_top ((Ideal.eq_top_iff_one _).mpr h1)
     have : σ a - σ' a = ((g : O) * (σ c - σ' c)) * ↑hu.unit⁻¹ := by
       rw [← key, mul_assoc, IsUnit.mul_val_inv, mul_one]
     show σ a - σ' a ∈ (Ideal.span {(g : O)} • J : Ideal O)
     rw [this, Ideal.smul_eq_mul]
-    exact Ideal.mul_mem_right _ _ (Ideal.mul_mem_mul (Ideal.mem_span_singleton_self _) (hmem c))
+    exact Ideal.mul_mem_right _ _
+      (Ideal.mul_mem_mul (Ideal.mem_span_singleton_self _) (hmem c))
   have hfg : J.FG := by
     classical
     exact ⟨s.image (fun a => σ a - σ' a), by rw [Finset.coe_image]⟩

@@ -1,8 +1,47 @@
 module
 
-public import Mathlib
-public import Development.WeilBound.CoreStatements.PadicHodgeComparison.EtaleCohomologyComparison.AcrisKummerUnits.ConstantCoeffSurjective
-public import Development.WeilBound.CoreStatements.PadicHodgeComparison.EtaleCohomologyComparison.AcrisKummerUnits.GaloisTwistIdentitySection
+import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.CrystallineFiltrationMultiplicative
+public import Development.WeilBound.CoreStatements.PadicHodgeComparison.EtaleCohomologyComparison.AcrisKummerUnits.MapUgAlgebraMap
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -10,42 +49,18 @@ set_option backward.isDefEq.respectTransparency false
 
 noncomputable section
 
-open CategoryTheory GroundTheory.PAdicHodge CrystallineSemistableComparison
-  CrystallineSemistableComparison.PAlg
+open CategoryTheory GroundTheory.PAdicHodge CrystallineSemistableComparison CrystallineSemistableComparison.PAlg
 
 namespace GlobalTheory.CompanionTheory.PerfFil
 
 variable {l : ℕ} [Fact l.Prime] (A : PAlg l)
 
-theorem divided_power_xi_zero : A.dxi0 0 = 1 := Subtype.ext (by simp [PAlg.dxi0, dpw])
+theorem divided_power_xi_zero : A.dxi0 0 = 1 :=
+  Subtype.ext (by simp [PAlg.dxi0, dpw])
 
-theorem divided_power_xi_mul (i j : ℕ)
-    : A.dxi0 i * A.dxi0 j = (((i + j).choose i : ℕ) : A.Acr0) * A.dxi0 (i + j) := by
-  apply Subtype.ext
-  have hi := A.isUnit_natCast (Nat.factorial_ne_zero i)
-  have hj := A.isUnit_natCast (Nat.factorial_ne_zero j)
-  have hij := A.isUnit_natCast (Nat.factorial_ne_zero (i + j))
-  change dpw i A.xi * dpw j A.xi = (((i + j).choose i : ℕ) : WL l A.A) * dpw (i + j) A.xi
-  simp only [dpw]
-  apply hij.mul_left_cancel
-  have hc
-      : (((i + j).factorial : ℕ) : WL l A.A)
-        = (((i + j).choose i : ℕ) : WL l A.A) * ((i.factorial : ℕ) : WL l A.A)
-          * ((j.factorial : ℕ) : WL l A.A) := by
-    have := Nat.add_choose_mul_factorial_mul_factorial i j
-    rw [← Nat.choose_symm_add] at this
-    rw [← Nat.cast_mul, ← Nat.cast_mul, this]
-  calc
-    _ = (((i + j).choose i : ℕ) : WL l A.A)
-        * (((i.factorial : ℕ) : WL l A.A) * Ring.inverse ((i.factorial : ℕ) : WL l A.A))
-        * (((j.factorial : ℕ) : WL l A.A) * Ring.inverse ((j.factorial : ℕ) : WL l A.A))
-        * (algebraMap _ (WL l A.A) A.xi ^ i * algebraMap _ (WL l A.A) A.xi ^ j) := by
-      rw [hc]; ring
-    _ = (((i + j).choose i : ℕ) : WL l A.A) * (algebraMap _ (WL l A.A) A.xi ^ (i + j)) := by
-      rw [Ring.mul_inverse_cancel _ hi, Ring.mul_inverse_cancel _ hj, pow_add]; ring
-    _ = _ := by
-      rw [mul_left_comm, ← mul_assoc (((i + j).factorial : ℕ) : WL l A.A),
-        Ring.mul_inverse_cancel _ hij, one_mul]
+theorem divided_power_xi_mul (i j : ℕ) :
+    A.dxi0 i * A.dxi0 j = (((i + j).choose i : ℕ) : A.Acr0) * A.dxi0 (i + j) := by
+  apply GlobalTheory.CompanionTheory.FilMul.divided_power_xi_mul <;> assumption
 
 def spanFrom (r : ℕ) : Submodule A.W A.Acr0 :=
   Submodule.span A.W {z : A.Acr0 | ∃ k, r ≤ k ∧ z = A.dxi0 k}
@@ -53,13 +68,13 @@ def spanFrom (r : ℕ) : Submodule A.W A.Acr0 :=
 theorem divided_power_xi_mem_span_from {r k : ℕ} (h : r ≤ k) : A.dxi0 k ∈ spanFrom A r :=
   Submodule.subset_span ⟨k, h, rfl⟩
 
-theorem natCast_mul_mem (r : ℕ) (n : ℕ) {z : A.Acr0} (hz : z ∈ spanFrom A r)
-    : (n : A.Acr0) * z ∈ spanFrom A r := by
+theorem natCast_mul_mem (r : ℕ) (n : ℕ) {z : A.Acr0} (hz : z ∈ spanFrom A r) :
+    (n : A.Acr0) * z ∈ spanFrom A r := by
   rw [← nsmul_eq_mul]
   exact (spanFrom A r).toAddSubmonoid.nsmul_mem hz n
 
-theorem mul_mem_spanFrom (r : ℕ) {a b : A.Acr0} (ha : a ∈ spanFrom A 0) (hb : b ∈ spanFrom A r)
-    : a * b ∈ spanFrom A r := by
+theorem mul_mem_spanFrom (r : ℕ) {a b : A.Acr0} (ha : a ∈ spanFrom A 0) (hb : b ∈ spanFrom A r) :
+    a * b ∈ spanFrom A r := by
   induction ha using Submodule.span_induction with
   | mem x hx =>
     obtain ⟨i, -, rfl⟩ := hx
@@ -89,8 +104,8 @@ theorem mem_spanFrom_zero (z : A.Acr0) : z ∈ spanFrom A 0 := by
   | add x y hx' hy' hx hy => exact add_mem hx hy
   | mul x y hx' hy' hx hy => exact mul_mem_spanFrom A 0 hx hy
 
-theorem mem_crystalline_filtration_iff_span {l : ℕ} [Fact l.Prime] (A : PAlg l) (r : ℕ) (z : A.Acr0)
-    : z ∈ A.Fil0 r ↔ z ∈ Submodule.span A.W {z : A.Acr0 | ∃ k, r ≤ k ∧ z = A.dxi0 k} := by
+theorem mem_crystalline_filtration_iff_span {l : ℕ} [Fact l.Prime] (A : PAlg l) (r : ℕ) (z : A.Acr0) :
+    z ∈ A.Fil0 r ↔ z ∈ Submodule.span A.W {z : A.Acr0 | ∃ k, r ≤ k ∧ z = A.dxi0 k} := by
   constructor
   · intro h
     induction h using Submodule.span_induction with

@@ -1,19 +1,54 @@
 module
 
-public import Mathlib
-public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.GermSys
-public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.IsFlatAnIffIsConstMul
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.UniformisationConclusion
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.HodgeLatticeSpanIndependentStatement
-public import Development.AutomorphicSpectrum.Proofs.AlgebraProofs.FormalIsomorphismTransportStatement
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.IsUnitIffUnitAt
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.ExistsSubMemEigW
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.IntersectionHiddenSecondStatement
+import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.ProjectiveLinePlaceTrivialOnConstants
+public import Development.AutomorphicSpectrum.Proofs.AlgebraProofs.FormalIsomorphismTransportStatement
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.BaseConstantsRegularStatement
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.CharpolySplitsOfEmbeddingsStatement
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.HodgeLatticeGermEigenStatement
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.FibreCurveGermPowersStatement
+public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.HodgeLatticeGermEigenStatement
+public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.HodgeLatticeSpanIndependentStatement
+public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.IntersectionHiddenSecondStatement
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.ValuationBoundedFrameStatement
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Coalgebra.IsFrobenius
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Development.AutomorphicSpectrum.Definitions.AdelicLattices.FactPrimes
 
 @[expose] public section
 
@@ -64,8 +99,8 @@ theorem eigProj_toH_eq_zero
   refine eigW_induction (P := fun w => HT.eigProj 𝓗.ρH σ (toH S p w) = 0) hw ?_ ?_ ?_
   · intro a y
     have hc : HT.eigProj 𝓗.ρH σ (𝓗.ρH a (toH S p y)) = 𝓗.ρH a (HT.eigProj 𝓗.ρH σ (toH S p y)) := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [HT.eigProj, LinearMap.sum_apply, LinearMap.smul_apply, map_sum, map_smul]
+
+      simp only [HT.eigProj, LinearMap.sum_apply, LinearMap.smul_apply, map_sum, map_smul]
       refine Finset.sum_congr rfl fun k _ => ?_
       rw [← Module.End.mul_apply, ← Module.End.mul_apply, ← map_mul, ← map_mul, mul_comm]
     have hm := HT.LatBasic.mem_eigSp.1 (HT.LatBasic.eigProj_mem 𝓗.ρH σ (toH S p y)) a
@@ -126,8 +161,8 @@ theorem exists_trans
       refine (toH_sub S q _ _).trans (congrArg₂ (· - ·) (toH_spec S p q h he (xp j)).symm ?_)
       exact (toH_sum _ S q _).trans (Finset.sum_congr rfl fun l _ => toH_smul S q _ _)
     have h2 := (congrArg (HT.eigProj 𝓗.ρH σ) h1).symm.trans h0
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sub, sub_eq_zero, map_sum] at h2
+
+    rw [map_sub, sub_eq_zero, map_sum] at h2
     refine ((hAp j).symm.trans h2).trans ?_
     simp only [map_smul, hAq, Finset.smul_sum, Matrix.mul_apply, Finset.sum_smul, Matrix.map_apply,
       Matrix.of_apply, smul_smul]

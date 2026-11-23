@@ -1,15 +1,58 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.AlgebraProofs.EigCoordApply
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.DvrAlphaDeterminantOrder
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Coalgebra.IsFrobenius
+import Mathlib.RingTheory.HopfAlgebra.Basic
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.ExistsGenOfIsVBOne
 
 @[expose] public section
 
 open scoped NNReal
-open NumberField GlobalTheory.IndefiniteRowSideFullHecke.QuotientEigenDifference
-  GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Flat
-  GlobalTheory.CompanionTheory.Ar.Flat.ExG
+open NumberField GlobalTheory.IndefiniteRowSideFullHecke.QuotientEigenDifference GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Flat GlobalTheory.CompanionTheory.Ar.Flat.ExG
 
 noncomputable section
 
@@ -19,8 +62,8 @@ section Lemmas
 
 variable {C : Type} [Field C] {w : Valuation C ℝ≥0} {S W : Type} [AddCommGroup W] [Module C W]
 
-theorem isFiltration_kerFil (a : S → w.valuationSubring) (N : ℕ) (g : S → (Fin N → C) →ₗ[C] W)
-    : IsFiltration a (kerFil a N g) := by
+theorem isFiltration_kerFil (a : S → w.valuationSubring) (N : ℕ)
+    (g : S → (Fin N → C) →ₗ[C] W) : IsFiltration a (kerFil a N g) := by
   refine ⟨fun _ hx => hx.1, ?_, ?_⟩
   · rintro x ⟨hx, h0⟩
     refine ⟨fun i => ?_, fun s => ?_⟩
@@ -35,8 +78,8 @@ theorem isFiltration_kerFil (a : S → w.valuationSubring) (N : ℕ) (g : S → 
     rw [show (c • x) s = (c : C) • x s from rfl, map_smul] at h1
     exact (smul_eq_zero.1 h1).resolve_left hc'
 
-theorem exists_clear_denom {N : ℕ} (y : Fin N → C)
-    : ∃ c : w.valuationSubring, c ≠ 0 ∧ ∀ i, (c : C) * y i ∈ w.valuationSubring := by
+theorem exists_clear_denom {N : ℕ} (y : Fin N → C) :
+    ∃ c : w.valuationSubring, c ≠ 0 ∧ ∀ i, (c : C) * y i ∈ w.valuationSubring := by
   have h1 : ∀ i, ∃ c : w.valuationSubring, c ≠ 0 ∧ (c : C) * y i ∈ w.valuationSubring := by
     intro i
     rcases w.valuationSubring.mem_or_inv_mem (y i) with h | h
@@ -54,12 +97,9 @@ theorem exists_clear_denom {N : ℕ} (y : Fin N → C)
   refine mul_mem ?_ (hcy i)
   exact_mod_cast (∏ j ∈ Finset.univ.erase i, c j).2
 
-theorem filSpace_kerFil
-    [Fintype S] [DecidableEq S]
-    (a : S → w.valuationSubring) (ha : Function.Injective a)
-    (N : ℕ) (g : S → (Fin N → C) →ₗ[C] W)
-    (s : S)
-    : filSpace (kerFil a N g) s = LinearMap.ker (g s) := by
+theorem filSpace_kerFil [Fintype S] [DecidableEq S] (a : S → w.valuationSubring)
+    (ha : Function.Injective a) (N : ℕ) (g : S → (Fin N → C) →ₗ[C] W) (s : S) :
+    filSpace (kerFil a N g) s = LinearMap.ker (g s) := by
   apply le_antisymm
   · refine Submodule.span_le.2 ?_
     rintro _ ⟨f, hf, rfl⟩
@@ -82,8 +122,7 @@ theorem filSpace_kerFil
     let d : C := ((Q.eval (a s) : w.valuationSubring) : C) * c
     have hd : d ≠ 0 := mul_ne_zero hQ' hc'
     have hmem : d • y ∈ filSpace (kerFil a N g) s := by
-      refine Submodule.subset_span (Submodule.mem_map.2
-        ⟨Pi.single s (d • y), ⟨fun i => ?_, fun t => ?_⟩, by simp⟩)
+      refine Submodule.subset_span (Submodule.mem_map.2 ⟨Pi.single s (d • y), ⟨fun i => ?_, fun t => ?_⟩, by simp⟩)
       · refine ⟨Polynomial.C ⟨_, hcy i⟩ * Q, fun t => ?_⟩
         by_cases ht : t = s
         · subst ht
@@ -100,18 +139,16 @@ theorem filSpace_kerFil
     have h2 := Submodule.smul_mem _ d⁻¹ hmem
     rwa [smul_smul, inv_mul_cancel₀ hd, one_smul] at h2
 
-variable
-  [Fintype S] [DecidableEq S] [Module w.valuationSubring W] [IsScalarTower w.valuationSubring C W]
+variable [Fintype S] [DecidableEq S] [Module w.valuationSubring W]
+  [IsScalarTower w.valuationSubring C W]
 
-theorem mkQ_mem_eigenSub_iff
-    (a : S → w.valuationSubring) (ha : Function.Injective a)
-    (N : ℕ) (g : S → (Fin N → C) →ₗ[C] W)
-    (τ : S) (L : Submodule w.valuationSubring W)
+theorem mkQ_mem_eigenSub_iff (a : S → w.valuationSubring) (ha : Function.Injective a) (N : ℕ)
+    (g : S → (Fin N → C) →ₗ[C] W) (τ : S) (L : Submodule w.valuationSubring W)
     (hind : ∀ f : S → Fin N → C, ∑ s, g s (f s) = 0 → ∀ s, g s (f s) = 0)
     (hL : ∀ y, y ∈ L ↔ y ∈ LinearMap.range (g τ) ∧ ∃ f ∈ freeLattice a N, ∑ s, g s (f s) = y)
-    (z : Fin N → C)
-    : (filSpace (kerFil a N g) τ).mkQ z ∈ eigenSub (lie (freeLattice a N) (kerFil a N g)) τ
-      ↔ g τ z ∈ L := by
+    (z : Fin N → C) :
+    (filSpace (kerFil a N g) τ).mkQ z ∈ eigenSub (lie (freeLattice a N) (kerFil a N g)) τ ↔
+      g τ z ∈ L := by
   have hfs : ∀ (s : S) (x : Fin N → C), (filSpace (kerFil a N g) s).mkQ x = 0 ↔ g s x = 0 := by
     intro s x
     rw [Submodule.mkQ_apply, Submodule.Quotient.mk_eq_zero, filSpace_kerFil a ha N g s,
@@ -136,24 +173,22 @@ theorem mkQ_mem_eigenSub_iff
     rw [Finset.sum_eq_single τ (fun s _ h => hs s h) (by simp), hτ]
   · intro h
     obtain ⟨-, f, hf, e⟩ := (hL _).1 h
-    have hu
-        : ∀ s, g s (Function.update f τ (f τ - z) s) = g s (f s) - if s = τ then g τ z else 0 := by
+    have hu : ∀ s, g s (Function.update f τ (f τ - z) s) =
+        g s (f s) - if s = τ then g τ z else 0 := by
       intro s
       by_cases hs : s = τ
       · subst hs; simp
       · simp [hs]
-    have h0 :=
-      hind (Function.update f τ (f τ - z)) (by
-        simp only [hu]
-        rw [Finset.sum_sub_distrib, e]
-        simp)
+    have h0 := hind (Function.update f τ (f τ - z)) (by
+      simp only [hu]
+      rw [Finset.sum_sub_distrib, e]
+      simp)
     refine Submodule.mem_comap.2 (Submodule.mem_map.2 ⟨f, hf, funext fun s => ?_⟩)
     by_cases hs : s = τ
     · subst hs
       have h1 := h0 s
       rw [hu, if_pos rfl] at h1
-      have h2 : (filSpace (kerFil a N g) s).mkQ (f s - z) = 0 :=
-        (hfs s _).2 (by rw [map_sub]; exact h1)
+      have h2 : (filSpace (kerFil a N g) s).mkQ (f s - z) = 0 := (hfs s _).2 (by rw [map_sub]; exact h1)
       rw [map_sub, sub_eq_zero] at h2
       rw [LinearMap.single_apply, Pi.single_eq_same]
       exact h2
@@ -162,19 +197,14 @@ theorem mkQ_mem_eigenSub_iff
       rw [LinearMap.single_apply, Pi.single_eq_of_ne hs]
       exact (hfs s _).2 h1
 
-theorem isLatticeBasis_mkQ
-    (a : S → w.valuationSubring) (ha : Function.Injective a)
-    (N : ℕ) (g : S → (Fin N → C) →ₗ[C] W)
-    (τ : S)
-    {p : ℕ} (v : Fin p → W)
+theorem isLatticeBasis_mkQ (a : S → w.valuationSubring) (ha : Function.Injective a) (N : ℕ)
+    (g : S → (Fin N → C) →ₗ[C] W) (τ : S) {p : ℕ} (v : Fin p → W)
     (hind : ∀ f : S → Fin N → C, ∑ s, g s (f s) = 0 → ∀ s, g s (f s) = 0)
     (hv : LinearIndependent C v)
-    (hL : ∀ y,
-      y ∈ Submodule.span w.valuationSubring (Set.range v)
-        ↔ y ∈ LinearMap.range (g τ) ∧ ∃ f ∈ freeLattice a N, ∑ s, g s (f s) = y)
-    (u : Fin p → Fin N → C) (hu : ∀ i, g τ (u i) = v i)
-    : IsLatticeBasis w
-      (fun i => (filSpace (kerFil a N g) τ).mkQ (u i))
+    (hL : ∀ y, y ∈ Submodule.span w.valuationSubring (Set.range v) ↔
+      y ∈ LinearMap.range (g τ) ∧ ∃ f ∈ freeLattice a N, ∑ s, g s (f s) = y)
+    (u : Fin p → Fin N → C) (hu : ∀ i, g τ (u i) = v i) :
+    IsLatticeBasis w (fun i => (filSpace (kerFil a N g) τ).mkQ (u i))
       (eigenSub (lie (freeLattice a N) (kerFil a N g)) τ) := by
   have hfs : ∀ x : Fin N → C, (filSpace (kerFil a N g) τ).mkQ x = 0 ↔ g τ x = 0 := by
     intro x
@@ -184,13 +214,12 @@ theorem isLatticeBasis_mkQ
   constructor
   · rw [Fintype.linearIndependent_iff]
     intro c hc
-    have h1 : g τ (∑ i, c i • u i) = 0 :=
-      (hfs _).1 (by
-        set_option synthInstance.maxHeartbeats 100000 in
-          rw [map_sum]
-        simpa only [map_smul] using hc)
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum] at h1
+    have h1 : g τ (∑ i, c i • u i) = 0 := (hfs _).1 (by
+
+      rw [map_sum]
+      simpa only [map_smul] using hc)
+
+    rw [map_sum] at h1
     simp only [map_smul, hu] at h1
     exact Fintype.linearIndependent_iff.1 hv c h1
   · apply le_antisymm
@@ -199,79 +228,45 @@ theorem isLatticeBasis_mkQ
       exact (hmem _).2 (by rw [hu]; exact Submodule.subset_span ⟨i, rfl⟩)
     · intro zq hz
       obtain ⟨z, rfl⟩ := (filSpace (kerFil a N g) τ).mkQ_surjective zq
-      obtain ⟨c, hc⟩ :=
-        (Submodule.mem_span_range_iff_exists_fun w.valuationSubring).1 ((hmem z).1 hz)
-      have h0 : (filSpace (kerFil a N g) τ).mkQ (z - ∑ i, (c i : C) • u i) = 0 :=
-        (hfs _).2 (by
-          set_option synthInstance.maxHeartbeats 100000 in
-            rw [map_sub, map_sum, sub_eq_zero, ← hc]
-          refine Finset.sum_congr rfl fun i _ => ?_
-          rw [map_smul, hu]
-          exact (algebraMap_smul C (c i) (v i)).symm)
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sub, sub_eq_zero, map_sum] at h0
+      obtain ⟨c, hc⟩ := (Submodule.mem_span_range_iff_exists_fun w.valuationSubring).1
+        ((hmem z).1 hz)
+      have h0 : (filSpace (kerFil a N g) τ).mkQ (z - ∑ i, (c i : C) • u i) = 0 := (hfs _).2 (by
+
+        rw [map_sub, map_sum, sub_eq_zero, ← hc]
+        refine Finset.sum_congr rfl fun i _ => ?_
+        rw [map_smul, hu]
+        exact (algebraMap_smul C (c i) (v i)).symm)
+
+      rw [map_sub, sub_eq_zero, map_sum] at h0
       rw [h0]
       refine sum_mem fun i _ => ?_
       rw [map_smul]
-      rw [show (c i : C) • (filSpace (kerFil a N g) τ).mkQ (u i)
-          = c i • (filSpace (kerFil a N g) τ).mkQ (u i) from
-        algebraMap_smul C (c i) _]
+      rw [show (c i : C) • (filSpace (kerFil a N g) τ).mkQ (u i) =
+        c i • (filSpace (kerFil a N g) τ).mkQ (u i) from algebraMap_smul C (c i) _]
       exact Submodule.smul_mem _ _ (Submodule.subset_span ⟨i, rfl⟩)
 
 end Lemmas
 
-theorem exists_unit_of_val_eq
-    {C : Type} [Field C] {w : Valuation C ℝ≥0} {x y : C} (hy : y ≠ 0) (h : w x = w y)
-    : ∃ ε : (w.valuationSubring)ˣ, x = (ε : w.valuationSubring) * y := by
+theorem exists_unit_of_val_eq {C : Type} [Field C] {w : Valuation C ℝ≥0} {x y : C} (hy : y ≠ 0)
+    (h : w x = w y) : ∃ ε : (w.valuationSubring)ˣ, x = (ε : w.valuationSubring) * y := by
   have hwy : w y ≠ 0 := (w.ne_zero_iff).2 hy
   have hx : x ≠ 0 := (w.ne_zero_iff).1 (h ▸ hwy)
   have ht : x / y ≠ 0 := div_ne_zero hx hy
   have h1 : w (x / y) = 1 := by rw [map_div₀, h, div_self hwy]
   have h2 : w (x / y)⁻¹ = 1 := by rw [map_inv₀, h1, inv_one]
-  refine ⟨
-    ⟨
-      ⟨x / y, (w.mem_valuationSubring_iff _).2 h1.le⟩,
-      ⟨(x / y)⁻¹, (w.mem_valuationSubring_iff _).2 h2.le⟩,
-      Subtype.ext (mul_inv_cancel₀ ht),
-      Subtype.ext (inv_mul_cancel₀ ht)
-    ⟩,
-    ?_
-  ⟩
+  refine ⟨⟨⟨x / y, (w.mem_valuationSubring_iff _).2 h1.le⟩,
+    ⟨(x / y)⁻¹, (w.mem_valuationSubring_iff _).2 h2.le⟩,
+    Subtype.ext (mul_inv_cancel₀ ht), Subtype.ext (inv_mul_cancel₀ ht)⟩, ?_⟩
   show x = x / y * y
   rw [div_mul_cancel₀ _ hy]
 
-theorem det_adapted_core
-    : ∀ (C : Type) [Field C] (w : Valuation C ℝ≥0) (ℓ : C),
-      0 < w ℓ → w ℓ < 1
-        → ∀ (S : Type) [Fintype S] [DecidableEq S] (a : S → w.valuationSubring) (p q : ℕ) (τ : S)
-            (r : S → ℕ) (W : Type) [AddCommGroup W] [Module C W] [Module w.valuationSubring W]
-            [IsScalarTower w.valuationSubring C W] (g : S → (Fin (p + q) → C) →ₗ[C] W)
-            (v : Fin p → W) (U : Fin (p + q) → Fin (p + q) → C)
-            (A : Matrix (Fin (p + q)) (Fin (p + q)) C),
-          Function.Injective a
-            → (∀ f : S → Fin (p + q) → C, ∑ s, g s (f s) = 0 → ∀ s, g s (f s) = 0)
-            → (∀ s, Module.finrank C (LinearMap.ker (g s)) = r s) → r τ = q → LinearIndependent C v
-            → (∀ y,
-              y ∈ Submodule.span w.valuationSubring (Set.range v)
-                ↔ y ∈ LinearMap.range (g τ) ∧ ∃ f ∈ freeLattice a (p + q), ∑ s, g s (f s) = y)
-            → (∀ i, g τ (U (Fin.castAdd q i)) = v i) → (∀ j, g τ (U (Fin.natAdd p j)) = 0)
-            → IsLatticeBasis w
-              (fun j => U (Fin.natAdd p j))
-              (eigenQuot (W := fun _ => Fin (p + q) → C) (kerFil a (p + q) g) τ)
-            → IsLatticeBasis w
-              (fun i => ∑ j, A i j • U j)
-              (eigenQuot (W := fun _ => Fin (p + q) → C) (freeLattice a (p + q)) τ)
-            → ∃ ε : (w.valuationSubring)ˣ,
-              A.det * (∏ s ∈ Finset.univ.erase τ, ((a τ : C) - (a s : C))) ^ (p + q)
-                = (ε : w.valuationSubring)
-                  * ∏ s ∈ Finset.univ.erase τ, ((a τ : C) - (a s : C)) ^ r s := by
+theorem det_adapted_core : ∀ (C : Type) [Field C] (w : Valuation C ℝ≥0) (ℓ : C), 0 < w ℓ → w ℓ < 1 → ∀ (S : Type) [Fintype S] [DecidableEq S] (a : S → w.valuationSubring) (p q : ℕ) (τ : S) (r : S → ℕ) (W : Type) [AddCommGroup W] [Module C W] [Module w.valuationSubring W] [IsScalarTower w.valuationSubring C W] (g : S → (Fin (p + q) → C) →ₗ[C] W) (v : Fin p → W) (U : Fin (p + q) → Fin (p + q) → C) (A : Matrix (Fin (p + q)) (Fin (p + q)) C), Function.Injective a → (∀ f : S → Fin (p + q) → C, ∑ s, g s (f s) = 0 → ∀ s, g s (f s) = 0) → (∀ s, Module.finrank C (LinearMap.ker (g s)) = r s) → r τ = q → LinearIndependent C v → (∀ y, y ∈ Submodule.span w.valuationSubring (Set.range v) ↔ y ∈ LinearMap.range (g τ) ∧ ∃ f ∈ freeLattice a (p + q), ∑ s, g s (f s) = y) → (∀ i, g τ (U (Fin.castAdd q i)) = v i) → (∀ j, g τ (U (Fin.natAdd p j)) = 0) → IsLatticeBasis w (fun j => U (Fin.natAdd p j)) (eigenQuot (W := fun _ => Fin (p + q) → C) (kerFil a (p + q) g) τ) → IsLatticeBasis w (fun i => ∑ j, A i j • U j) (eigenQuot (W := fun _ => Fin (p + q) → C) (freeLattice a (p + q)) τ) → ∃ ε : (w.valuationSubring)ˣ, A.det * (∏ s ∈ Finset.univ.erase τ, ((a τ : C) - (a s : C))) ^ (p + q) = (ε : w.valuationSubring) * ∏ s ∈ Finset.univ.erase τ, ((a τ : C) - (a s : C)) ^ r s := by
   intro C _ w ℓ hℓ0 hℓ1 S _ _ a p q τ r W _ _ _ _ g v U A ha hind hrank hrq hv hspan hU1 hU2 hM hX
   have hFil := isFiltration_kerFil a (p + q) g
-  have hLie :=
-    isLatticeBasis_mkQ a ha (p + q) g τ v hind hv hspan (fun i => U (Fin.castAdd q i)) hU1
-  obtain ⟨c, hc, hdet⟩ :=
-    GlobalTheory.FrameModel.det_append_eq_mul_det C w ℓ hℓ0 hℓ1 S a p q (kerFil a (p + q) g) τ ha
-      hFil _ _ _ hX hLie hM
+  have hLie := isLatticeBasis_mkQ a ha (p + q) g τ v hind hv hspan
+    (fun i => U (Fin.castAdd q i)) hU1
+  obtain ⟨c, hc, hdet⟩ := GlobalTheory.FrameModel.det_append_eq_mul_det C w ℓ hℓ0 hℓ1 S a p q
+    (kerFil a (p + q) g) τ ha hFil _ _ _ hX hLie hM
   have happ : Fin.append (fun i => U (Fin.castAdd q i)) (fun j => U (Fin.natAdd p j)) = U := by
     funext k
     refine Fin.addCases (fun i => ?_) (fun j => ?_) k <;> simp
@@ -298,13 +293,11 @@ theorem det_adapted_core
   have hle : ∀ s, r s ≤ p + q := fun s => by
     rw [← hr s]
     simpa using Submodule.finrank_le (filSpace (kerFil a (p + q) g) s)
-  have hval
-      : w (A.det * (∏ s ∈ Finset.univ.erase τ, ((a τ : C) - (a s : C))) ^ (p + q))
-        = w (∏ s ∈ Finset.univ.erase τ, ((a τ : C) - (a s : C)) ^ r s) := by
+  have hval : w (A.det * (∏ s ∈ Finset.univ.erase τ, ((a τ : C) - (a s : C))) ^ (p + q)) =
+      w (∏ s ∈ Finset.univ.erase τ, ((a τ : C) - (a s : C)) ^ r s) := by
     have hwc : w c * w A.det = 1 := by rw [← map_mul, hcA, map_one]
-    have hsplit
-        : w ((∏ s ∈ Finset.univ.erase τ, ((a τ : C) - (a s : C))) ^ (p + q))
-          = w c * w (∏ s ∈ Finset.univ.erase τ, ((a τ : C) - (a s : C)) ^ r s) := by
+    have hsplit : w ((∏ s ∈ Finset.univ.erase τ, ((a τ : C) - (a s : C))) ^ (p + q)) =
+        w c * w (∏ s ∈ Finset.univ.erase τ, ((a τ : C) - (a s : C)) ^ r s) := by
       simp only [hr] at hc
       rw [hc, map_pow, map_prod, map_prod, ← Finset.prod_pow, ← Finset.prod_mul_distrib]
       refine Finset.prod_congr rfl fun s _ => ?_

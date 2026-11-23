@@ -1,7 +1,54 @@
 module
 
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.HeightTheory.ProdZpowEqZpowSum
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.HeightTheory.KerPLeOfPlace
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Int
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.MvPolynomial.IrreducibleQuadratic
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.HeightTheory.GeneratorNeZeroOfHeight
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.HeightTheory.NormByPlaces
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.HeightTheory.ProdZpowEqZpowSum
+public import Mathlib.Algebra.MvPolynomial.NoZeroDivisors
 
 @[expose] public section
 
@@ -18,14 +65,13 @@ def swapT : TVar D N ≃ TVar D N := Equiv.prodCongr (Equiv.swap 0 1) (Equiv.ref
 def swapS : (Fin (D + 1) × Fin N) ≃ (Fin (D + 1) × Fin N) :=
   Equiv.prodCongr (Equiv.swap 0 1) (Equiv.refl _)
 
-theorem chiP_rename_swap (j₀ : Fin (N + 1)) (x : Fin N → Ω) (g : MvPolynomial (TVar D N) K)
-    : chiP (K := K) j₀ x (rename swapT g) = rename swapS (chiP (K := K) j₀ x g) := by
+theorem chiP_rename_swap (j₀ : Fin (N + 1)) (x : Fin N → Ω) (g : MvPolynomial (TVar D N) K) :
+    chiP (K := K) j₀ x (rename swapT g) = rename swapS (chiP (K := K) j₀ x g) := by
   have key : ∀ p : TVar D N, chiImg j₀ x (swapT p) = rename swapS (chiImg j₀ x p) := by
     rintro ⟨b, j⟩
     rcases Fin.eq_self_or_eq_succAbove j₀ j with rfl | ⟨k, rfl⟩
-    set_option synthInstance.maxHeartbeats 100000 in
-      · simp [chiImg, swapT, swapS, Fin.succAbove_cases_eq_insertNth, Fin.insertNth_apply_same,
-          map_sum, map_neg]
+
+    · simp [chiImg, swapT, swapS, Fin.succAbove_cases_eq_insertNth, Fin.insertNth_apply_same, map_sum, map_neg]
     · simp [chiImg, swapT, swapS, Fin.succAbove_cases_eq_insertNth, Fin.insertNth_apply_succAbove]
   induction g using MvPolynomial.induction_on with
   | C a => simp [chiP]
@@ -34,10 +80,8 @@ theorem chiP_rename_swap (j₀ : Fin (N + 1)) (x : Fin N → Ω) (g : MvPolynomi
     simp only [map_mul, hp, rename_X]
     simp only [chiP, aeval_X, key]
 
-theorem rename_swap_mem_ker_eval
-    (j₀ : Fin (N + 1)) (x : Fin N → Ω) (g : MvPolynomial (TVar D N) K)
-    (hg : g ∈ kerP (K := K) (D := D) j₀ x)
-    : rename swapT g ∈ kerP (K := K) (D := D) j₀ x := by
+theorem rename_swap_mem_ker_eval (j₀ : Fin (N + 1)) (x : Fin N → Ω) (g : MvPolynomial (TVar D N) K)
+    (hg : g ∈ kerP (K := K) (D := D) j₀ x) : rename swapT g ∈ kerP (K := K) (D := D) j₀ x := by
   rw [kerP, RingHom.mem_ker] at hg ⊢
   have hg' : chiP (K := K) j₀ x g = 0 := hg
   show chiP (K := K) j₀ x (rename swapT g) = 0
@@ -51,31 +95,23 @@ namespace ReciprocityTheory.ChartRestriction.G.T0
 
 open NumberField MvPolynomial
 
-variable
-  {K : Type} [Field K] [NumberField K]
-  {ι : Type} [Fintype ι]
+variable {K : Type} [Field K] [NumberField K] {ι : Type} [Fintype ι]
   {Ω : ι → Type} [∀ c, Field (Ω c)] [∀ c, Algebra K (Ω c)]
   {WT : Type} [AddCommGroup WT]
-  {A : ι → Type}
-  [∀ c, CommRing (A c)] [∀ c, Algebra (Ω c) (A c)] [∀ c, Algebra K (A c)] [∀ c, Algebra (𝓞 K) (A c)]
+  {A : ι → Type} [∀ c, CommRing (A c)] [∀ c, Algebra (Ω c) (A c)] [∀ c, Algebra K (A c)]
+  [∀ c, Algebra (𝓞 K) (A c)]
   {𝒜 : (c : ι) → WT → Submodule (Ω c) (A c)}
 
 namespace Data
 
 variable (d : Data K ι Ω WT A)
 
-theorem fZ_factor_height_one_primes
-    (hd : d.AxH 𝒜)
-    (h : d.S1) (c : ι) (F : KTp K d.D d.N)
-    (hF : algebraMap (KTp K d.D d.N) (KTf K d.D d.N) F = d.fZ h c)
-    : ∃ κ : K,
-      κ ≠ 0
-        ∧ ∃ T : Finset (Ideal (KTp K d.D d.N)), ∃ e : Ideal (KTp K d.D d.N) → ℕ,
-          (∀ p ∈ T, p ∈ d.HtOne) ∧ F = C κ * ∏ p ∈ T, d.gen p ^ e p
-            ∧ ∀ p ∈ T,
-              e p ≠ 0
-                → ∃ w ∈ d.OverP c p,
-                  (∀ a : Ω c, a ≠ 0 → d.Wres c w a = 0) ∧ 0 < w (d.rationalBaseRow c) := by
+theorem fZ_factor_height_one_primes (hd : d.AxH 𝒜) (h : d.S1) (c : ι) (F : KTp K d.D d.N)
+    (hF : algebraMap (KTp K d.D d.N) (KTf K d.D d.N) F = d.fZ h c) :
+    ∃ κ : K, κ ≠ 0 ∧ ∃ T : Finset (Ideal (KTp K d.D d.N)), ∃ e : Ideal (KTp K d.D d.N) → ℕ,
+      (∀ p ∈ T, p ∈ d.HtOne) ∧ F = C κ * ∏ p ∈ T, d.gen p ^ e p ∧
+      ∀ p ∈ T, e p ≠ 0 → ∃ w ∈ d.OverP c p, (∀ a : Ω c, a ≠ 0 → d.Wres c w a = 0) ∧
+        0 < w (d.rationalBaseRow c) := by
   classical
   have hy : d.rationalBaseRow c ≠ 0 := d.lineRatio_ne_zero hd c
   obtain ⟨hfin, hall⟩ := d.norm_by_places hd h c
@@ -119,23 +155,18 @@ theorem fZ_factor_height_one_primes
   have hab : ∀ p ∈ d.HtOne, 0 ≤ a p + b p := by
     intro p hp
     have hGf : (d.GoodP c p).Finite := (hfin p hp).subset fun w hw => hw.1
-    have e1
-        : a p
-          = ∑ w ∈ (hfin p hp).toFinset,
-            (d.fze h c w : ℤ) * WithTop.untopD 0 (w (d.rationalBaseRow c)) :=
+    have e1 : a p = ∑ w ∈ (hfin p hp).toFinset,
+        (d.fze h c w : ℤ) * WithTop.untopD 0 (w (d.rationalBaseRow c)) :=
       finsum_mem_eq_finite_toFinset_sum _ (hfin p hp)
-    have e2
-        : b p
-          = ∑ w ∈ (hfin p hp).toFinset,
-            if w ∈ d.GoodP c p then (d.fze h c w : ℤ) * d.ordMM c (d.Wres c w) (d.w (d.jc c) c) else 0 :=
-      by
-        rw [← Finset.sum_filter]
-        simp only [hb, Data.nPMM]
-        rw [finsum_mem_eq_finite_toFinset_sum _ hGf]
-        congr 1
-        ext w
-        simp only [Set.Finite.mem_toFinset, Finset.mem_filter]
-        exact ⟨fun hw => ⟨hw.1, hw⟩, fun hw => hw.2⟩
+    have e2 : b p = ∑ w ∈ (hfin p hp).toFinset,
+        if w ∈ d.GoodP c p then (d.fze h c w : ℤ) * d.ordMM c (d.Wres c w) (d.w (d.jc c) c) else 0 := by
+      rw [← Finset.sum_filter]
+      simp only [hb, Data.nPMM]
+      rw [finsum_mem_eq_finite_toFinset_sum _ hGf]
+      congr 1
+      ext w
+      simp only [Set.Finite.mem_toFinset, Finset.mem_filter]
+      exact ⟨fun hw => ⟨hw.1, hw⟩, fun hw => hw.2⟩
     rw [e1, e2, ← Finset.sum_add_distrib]
     refine Finset.sum_nonneg fun w hw => ?_
     have hwO := (Set.Finite.mem_toFinset _).mp hw
@@ -147,14 +178,12 @@ theorem fZ_factor_height_one_primes
       by_contra hne
       exact hg ⟨hwO, a0, ha0', hne⟩
   have hTsub : (T : Set (Ideal (KTp K d.D d.N))) ⊆ d.HtOne := fun p hp => ((hmemT p).mp hp).1
-  have e1
-      : (∏ᶠ (p : Ideal (KTp K d.D d.N)) (_ : p ∈ d.HtOne), Gm p ^ a p) = ∏ p ∈ T, Gm p ^ a p := by
+  have e1 : (∏ᶠ (p : Ideal (KTp K d.D d.N)) (_ : p ∈ d.HtOne), Gm p ^ a p) = ∏ p ∈ T, Gm p ^ a p := by
     refine finprod_mem_eq_prod_of_subset _ ?_ hTsub
     rintro p ⟨hp, hne⟩
     by_contra hpT
     exact hne (by simp only [ha0 p hp hpT, zpow_zero])
-  have e2
-      : (∏ᶠ (p : Ideal (KTp K d.D d.N)) (_ : p ∈ d.HtOne), Gm p ^ b p) = ∏ p ∈ T, Gm p ^ b p := by
+  have e2 : (∏ᶠ (p : Ideal (KTp K d.D d.N)) (_ : p ∈ d.HtOne), Gm p ^ b p) = ∏ p ∈ T, Gm p ^ b p := by
     refine finprod_mem_eq_prod_of_subset _ ?_ hTsub
     rintro p ⟨hp, hne⟩
     by_contra hpT
@@ -175,23 +204,18 @@ theorem fZ_factor_height_one_primes
     have hp := hTsub hpT
     have hne : a p + b p ≠ 0 := fun h0 => he (by simp only [h0, Int.toNat_zero])
     have hGf : (d.GoodP c p).Finite := (hfin p hp).subset fun w hw => hw.1
-    have e1
-        : a p
-          = ∑ w ∈ (hfin p hp).toFinset,
-            (d.fze h c w : ℤ) * WithTop.untopD 0 (w (d.rationalBaseRow c)) :=
+    have e1 : a p = ∑ w ∈ (hfin p hp).toFinset,
+        (d.fze h c w : ℤ) * WithTop.untopD 0 (w (d.rationalBaseRow c)) :=
       finsum_mem_eq_finite_toFinset_sum _ (hfin p hp)
-    have e2
-        : b p
-          = ∑ w ∈ (hfin p hp).toFinset,
-            if w ∈ d.GoodP c p then (d.fze h c w : ℤ) * d.ordMM c (d.Wres c w) (d.w (d.jc c) c) else 0 :=
-      by
-        rw [← Finset.sum_filter]
-        simp only [hb, Data.nPMM]
-        rw [finsum_mem_eq_finite_toFinset_sum _ hGf]
-        congr 1
-        ext w
-        simp only [Set.Finite.mem_toFinset, Finset.mem_filter]
-        exact ⟨fun hw => ⟨hw.1, hw⟩, fun hw => hw.2⟩
+    have e2 : b p = ∑ w ∈ (hfin p hp).toFinset,
+        if w ∈ d.GoodP c p then (d.fze h c w : ℤ) * d.ordMM c (d.Wres c w) (d.w (d.jc c) c) else 0 := by
+      rw [← Finset.sum_filter]
+      simp only [hb, Data.nPMM]
+      rw [finsum_mem_eq_finite_toFinset_sum _ hGf]
+      congr 1
+      ext w
+      simp only [Set.Finite.mem_toFinset, Finset.mem_filter]
+      exact ⟨fun hw => ⟨hw.1, hw⟩, fun hw => hw.2⟩
     rw [e1, e2, ← Finset.sum_add_distrib] at hne
     obtain ⟨w, hwF, hw0⟩ := Finset.exists_ne_zero_of_sum_ne_zero hne
     have hwO := (Set.Finite.mem_toFinset _).mp hwF
@@ -206,11 +230,9 @@ theorem fZ_factor_height_one_primes
       have hu : WithTop.untopD 0 (w (d.rationalBaseRow c)) ≠ 0 := right_ne_zero_of_mul hw0
       exact ⟨w, hwO, htriv, lt_of_le_of_ne hnn fun h0 => hu (by rw [← h0]; rfl)⟩
 
-theorem rename_swap_F
-    (hd : d.AxH 𝒜)
-    (h : d.S1) (c : ι) (F : KTp K d.D d.N)
-    (hF : algebraMap (KTp K d.D d.N) (KTf K d.D d.N) F = d.fZ h c)
-    : ∃ ρ : K, rename swapT F = C ρ * F := by
+theorem rename_swap_F (hd : d.AxH 𝒜) (h : d.S1) (c : ι) (F : KTp K d.D d.N)
+    (hF : algebraMap (KTp K d.D d.N) (KTf K d.D d.N) F = d.fZ h c) :
+    ∃ ρ : K, rename swapT F = C ρ * F := by
   classical
   obtain ⟨κ, hκ, T, e, hT, hFeq, hplace⟩ := d.fZ_factor_height_one_primes hd h c F hF
   set P := kerP (K := K) (D := d.D) (d.jc c) (d.x c) with hP
@@ -244,8 +266,7 @@ theorem rename_swap_F
       have hmem0 : d.gen P ∈ P := by
         have h1 := Ideal.mem_span_singleton_self (d.gen P)
         rwa [hgspan] at h1
-      have hmem : rename swapT (d.gen P) ∈ P :=
-        rename_swap_mem_ker_eval (K := K) (D := d.D) (d.jc c) (d.x c) _ hmem0
+      have hmem : rename swapT (d.gen P) ∈ P := rename_swap_mem_ker_eval (K := K) (D := d.D) (d.jc c) (d.x c) _ hmem0
       have hmem' : rename swapT (d.gen P) ∈ Ideal.span {d.gen P} := by
         rw [hgspan]
         exact hmem
@@ -271,19 +292,15 @@ theorem rename_swap_F
   · push_neg at hex
     have hF1 : F = C κ := by
       rw [hFeq]
-      have h1 : ∏ p ∈ T, d.gen p ^ e p = 1 :=
-        Finset.prod_eq_one fun p hp => by rw [hex p hp, pow_zero]
+      have h1 : ∏ p ∈ T, d.gen p ^ e p = 1 := Finset.prod_eq_one fun p hp => by rw [hex p hp, pow_zero]
       rw [h1, mul_one]
     exact ⟨1, by rw [hF1, MvPolynomial.rename_C, map_one, one_mul]⟩
 
-theorem fZ_multiHomogeneous_degree_sum
-    (hd : d.AxH 𝒜)
-    (h : d.S1) (c : ι) (F : KTp K d.D d.N)
-    (hF : algebraMap (KTp K d.D d.N) (KTf K d.D d.N) F = d.fZ h c)
-    : ReciprocityTheory.MultiplicativeHeights.IsMultiHomogeneous (fun _ => d.delc c) F
-      ∧ (∑ᶠ (p : Ideal (KTp K d.D d.N)) (_ : p ∈ d.HtOne),
-          d.nPMM h c (d.w (d.jc c) c) p * (d.dg (d.gen p) : ℤ))
-        = d.delc c := by
+theorem fZ_multiHomogeneous_degree_sum (hd : d.AxH 𝒜) (h : d.S1) (c : ι) (F : KTp K d.D d.N)
+    (hF : algebraMap (KTp K d.D d.N) (KTf K d.D d.N) F = d.fZ h c) :
+    ReciprocityTheory.MultiplicativeHeights.IsMultiHomogeneous (fun _ => d.delc c) F ∧
+      (∑ᶠ (p : Ideal (KTp K d.D d.N)) (_ : p ∈ d.HtOne),
+        d.nPMM h c (d.w (d.jc c) c) p * (d.dg (d.gen p) : ℤ)) = d.delc c := by
   classical
   obtain ⟨F', hF', hF'0⟩ := d.componentForm_poly hd h c
   have hFF : F = F' := IsFractionRing.injective (KTp K d.D d.N) (KTf K d.D d.N) (hF.trans hF'.symm)
@@ -295,10 +312,7 @@ theorem fZ_multiHomogeneous_degree_sum
     intro h1
     have h2 := congrArg (fun i : Fin (d.D + 1) => (i : ℕ)) h1
     first
-    | (
-        simp only [Fin.val_zero, Fin.val_one', Nat.mod_eq_of_lt (show 1 < d.D + 1 by omega)] at h2
-        omega
-      )
+    | (simp only [Fin.val_zero, Fin.val_one', Nat.mod_eq_of_lt (show 1 < d.D + 1 by omega)] at h2; omega)
     | (simp at h2; omega)
     | (simp [Fin.val_one'] at h2; omega)
   obtain ⟨s, hs⟩ : F.support.Nonempty := by

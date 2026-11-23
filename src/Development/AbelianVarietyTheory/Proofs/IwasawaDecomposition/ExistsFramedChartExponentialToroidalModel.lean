@@ -1,13 +1,51 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.IsLatBasisZero
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.SpanPeriodLatticeComplexSemiAbelianEqTopStatement
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsSncCoordinatesComplexPointSmoothVarietyStatement
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsRealIndependentBasisLatticeFamilyStatement
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsHolomorphicFibreExponentialsNearCentreStatement
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExponentialKernelsIsHolomorphicLatticeFamilyStatement
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.PerValNeZero
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsExponentialChartRescaleFrameChangeStatement
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsHolomorphicFibreExponentialsNearCentreStatement
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsRealIndependentBasisLatticeFamilyStatement
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsSncCoordinatesComplexPointSmoothVarietyStatement
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExponentialKernelsIsHolomorphicLatticeFamilyStatement
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.SpanPeriodLatticeComplexSemiAbelianEqTopStatement
+import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ExistsDifferentiableOnTransfer
+import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ExistsLinearEquivLift
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
@@ -15,11 +53,8 @@ set_option autoImplicit false
 
 noncomputable section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
-  NumberField
-open ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
-  Formalism.L2.Pj GlobalTheory GlobalTheory.Toroidal GlobalTheory.ShFam GlobalTheory.ShFam.Pad
-  GlobalTheory.ShFam.Hor GlobalTheory.ShFam.Hor.LogCh
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
+open ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj GlobalTheory GlobalTheory.Toroidal GlobalTheory.ShFam GlobalTheory.ShFam.Pad GlobalTheory.ShFam.Hor GlobalTheory.ShFam.Hor.LogCh
 open scoped Matrix CategoryTheory.Obj Topology
 
 attribute [local instance] Over.cartesianMonoidalCategory
@@ -33,40 +68,37 @@ variable {g r : ℕ}
 def colMat (κ : Fin g → Fin r) (f : Fin r → Fin g → ℂ) : Matrix (Fin g) (Fin g) ℂ :=
   Matrix.of fun i j => f (κ j) i
 
-theorem colMat_mulVec_single (κ : Fin g → Fin r) (f : Fin r → Fin g → ℂ) (j : Fin g)
-    : colMat κ f *ᵥ Pi.single j 1 = f (κ j) := by
+theorem colMat_mulVec_single (κ : Fin g → Fin r) (f : Fin r → Fin g → ℂ) (j : Fin g) :
+    colMat κ f *ᵥ Pi.single j 1 = f (κ j) := by
   ext i
   simp [colMat]
 
 theorem continuous_det_colMat (κ : Fin g → Fin r) : Continuous fun f => (colMat κ f).det :=
-  Continuous.matrix_det (continuous_pi fun i =>
-    continuous_pi fun j => (continuous_apply i).comp (continuous_apply (κ j)))
+  Continuous.matrix_det (continuous_pi fun i => continuous_pi fun j =>
+    (continuous_apply i).comp (continuous_apply (κ j)))
 
-theorem mulVec_mulVec_inv {M : Matrix (Fin g) (Fin g) ℂ} (h : IsUnit M.det) (v : Fin g → ℂ)
-    : M *ᵥ (M⁻¹ *ᵥ v) = v := by
+theorem mulVec_mulVec_inv {M : Matrix (Fin g) (Fin g) ℂ} (h : IsUnit M.det) (v : Fin g → ℂ) :
+    M *ᵥ (M⁻¹ *ᵥ v) = v := by
   rw [Matrix.mulVec_mulVec, Matrix.mul_nonsing_inv _ h, Matrix.one_mulVec]
 
-theorem inv_mulVec_mulVec {M : Matrix (Fin g) (Fin g) ℂ} (h : IsUnit M.det) (v : Fin g → ℂ)
-    : M⁻¹ *ᵥ (M *ᵥ v) = v := by
+theorem inv_mulVec_mulVec {M : Matrix (Fin g) (Fin g) ℂ} (h : IsUnit M.det) (v : Fin g → ℂ) :
+    M⁻¹ *ᵥ (M *ᵥ v) = v := by
   rw [Matrix.mulVec_mulVec, Matrix.nonsing_inv_mul _ h, Matrix.one_mulVec]
 
-theorem linearIndependent_inv_mulVec
-    {J : Type} {M : Matrix (Fin g) (Fin g) ℂ} (h : IsUnit M.det)
-    {b : J → Fin g → ℂ} (hb : LinearIndependent ℝ b)
-    : LinearIndependent ℝ fun i => M⁻¹ *ᵥ b i := by
+theorem linearIndependent_inv_mulVec {J : Type} {M : Matrix (Fin g) (Fin g) ℂ} (h : IsUnit M.det)
+    {b : J → Fin g → ℂ} (hb : LinearIndependent ℝ b) : LinearIndependent ℝ fun i => M⁻¹ *ᵥ b i := by
   refine hb.map' ((Matrix.mulVecLin M⁻¹).restrictScalars ℝ) ?_
   refine LinearMap.ker_eq_bot.2 (Function.LeftInverse.injective (g := fun v => M *ᵥ v) fun v => ?_)
   exact mulVec_mulVec_inv h v
 
-theorem IsLatBasis.inv_mulVec
-    {K K' : Set (Fin g → ℂ)} {b : Fin r → Fin g → ℂ} {M : Matrix (Fin g) (Fin g) ℂ}
-    (h : IsUnit M.det) (hb : IsLatBasis K b) (hK : ∀ w, w ∈ K' ↔ M *ᵥ w ∈ K)
-    : IsLatBasis K' fun i => M⁻¹ *ᵥ b i := by
+theorem IsLatBasis.inv_mulVec {K K' : Set (Fin g → ℂ)} {b : Fin r → Fin g → ℂ} {M : Matrix (Fin g) (Fin g) ℂ}
+    (h : IsUnit M.det) (hb : IsLatBasis K b) (hK : ∀ w, w ∈ K' ↔ M *ᵥ w ∈ K) :
+    IsLatBasis K' fun i => M⁻¹ *ᵥ b i := by
   refine ⟨linearIndependent_inv_mulVec h hb.1, fun w => ?_⟩
   rw [hK, hb.2]
   have key : ∀ m : Fin r → ℤ, M⁻¹ *ᵥ (∑ j, m j • b j) = ∑ j, m j • (M⁻¹ *ᵥ b j) := fun m => by
     change Matrix.mulVecLin M⁻¹ (∑ j, m j • b j) = ∑ j, m j • Matrix.mulVecLin M⁻¹ (b j)
-    set_option synthInstance.maxHeartbeats 100000 in
+
     simp only [map_sum, map_zsmul]
   constructor
   · rintro ⟨m, hm⟩
@@ -74,10 +106,8 @@ theorem IsLatBasis.inv_mulVec
   · rintro ⟨m, hm⟩
     exact ⟨m, by rw [hm, ← key, mulVec_mulVec_inv h]⟩
 
-theorem exists_frame
-    {K : Set (Fin g → ℂ)} {b : Fin r → Fin g → ℂ}
-    (hb : IsLatBasis K b) (hs : Submodule.span ℂ K = ⊤)
-    : ∃ κ : Fin g → Fin r, IsUnit (colMat κ b).det := by
+theorem exists_frame {K : Set (Fin g → ℂ)} {b : Fin r → Fin g → ℂ} (hb : IsLatBasis K b)
+    (hs : Submodule.span ℂ K = ⊤) : ∃ κ : Fin g → Fin r, IsUnit (colMat κ b).det := by
   have hsp : Submodule.span ℂ (Set.range b) = ⊤ := by
     refine top_le_iff.1 (hs ▸ Submodule.span_le.2 fun w hw => ?_)
     obtain ⟨m, rfl⟩ := (hb.2 w).1 hw
@@ -109,18 +139,15 @@ section Analytic
 
 variable {V : Type} [NormedAddCommGroup V] [NormedSpace ℂ V] {g : ℕ}
 
-theorem analyticAt_det
-    {M : V → Matrix (Fin g) (Fin g) ℂ} {z : V} (h : ∀ i j, AnalyticAt ℂ (fun x => M x i j) z)
-    : AnalyticAt ℂ (fun x => (M x).det) z := by
+theorem analyticAt_det {M : V → Matrix (Fin g) (Fin g) ℂ} {z : V}
+    (h : ∀ i j, AnalyticAt ℂ (fun x => M x i j) z) : AnalyticAt ℂ (fun x => (M x).det) z := by
   simp only [Matrix.det_apply']
   exact Finset.analyticAt_fun_sum _ fun σ _ =>
     analyticAt_const.mul (Finset.analyticAt_fun_prod _ fun i _ => h _ _)
 
-theorem analyticAt_inv_apply
-    {M : V → Matrix (Fin g) (Fin g) ℂ} {z : V}
-    (h : ∀ i j, AnalyticAt ℂ (fun x => M x i j) z) (hd : (M z).det ≠ 0)
-    (i j : Fin g)
-    : AnalyticAt ℂ (fun x => (M x)⁻¹ i j) z := by
+theorem analyticAt_inv_apply {M : V → Matrix (Fin g) (Fin g) ℂ} {z : V}
+    (h : ∀ i j, AnalyticAt ℂ (fun x => M x i j) z) (hd : (M z).det ≠ 0) (i j : Fin g) :
+    AnalyticAt ℂ (fun x => (M x)⁻¹ i j) z := by
   have hadj : AnalyticAt ℂ (fun x => (M x).adjugate i j) z := by
     simp only [Matrix.adjugate_apply]
     refine analyticAt_det fun a b => ?_
@@ -141,15 +168,12 @@ open Metric
 
 variable {n g r : ℕ}
 
-theorem exists_sections
-    {ρ₁ : ℝ} (hρ : 0 < ρ₁)
-    {K : (Fin n → ℂ) → Set (Fin g → ℂ)} (hK : IsLatFam (ball 0 ρ₁) K)
-    {b : Fin r → Fin g → ℂ} (hb : IsLatBasis (K 0) b)
-    (κ : Fin g → Fin r) (hκ : IsUnit (colMat κ b).det)
-    : ∃ (ρ : ℝ) (ζ : (Fin n → ℂ) → Fin r → Fin g → ℂ),
-      0 < ρ ∧ 2 * ρ ≤ ρ₁ ∧ ζ 0 = b ∧ AnalyticOnNhd ℂ ζ (ball 0 (2 * ρ))
-        ∧ ∀ z ∈ ball (0 : Fin n → ℂ) (2 * ρ),
-          (∀ i, ζ z i ∈ K z) ∧ LinearIndependent ℝ (ζ z) ∧ IsUnit (colMat κ (ζ z)).det := by
+theorem exists_sections {ρ₁ : ℝ} (hρ : 0 < ρ₁) {K : (Fin n → ℂ) → Set (Fin g → ℂ)}
+    (hK : IsLatFam (ball 0 ρ₁) K) {b : Fin r → Fin g → ℂ} (hb : IsLatBasis (K 0) b) (κ : Fin g → Fin r)
+    (hκ : IsUnit (colMat κ b).det) :
+    ∃ (ρ : ℝ) (ζ : (Fin n → ℂ) → Fin r → Fin g → ℂ), 0 < ρ ∧ 2 * ρ ≤ ρ₁ ∧ ζ 0 = b ∧
+      AnalyticOnNhd ℂ ζ (ball 0 (2 * ρ)) ∧ ∀ z ∈ ball (0 : Fin n → ℂ) (2 * ρ),
+        (∀ i, ζ z i ∈ K z) ∧ LinearIndependent ℝ (ζ z) ∧ IsUnit (colMat κ (ζ z)).det := by
   have h1 : ∀ i, b i ∈ K 0 := fun i => (hb.2 _).2 ⟨Pi.single i 1, by simp [Pi.single_apply]⟩
   choose ξ h0 han hgr using fun i => hK.2.2.2 0 (mem_ball_self hρ) (b i) (h1 i)
   let ζ : (Fin n → ℂ) → Fin r → Fin g → ℂ := fun z i => ξ i z
@@ -168,40 +192,31 @@ theorem exists_sections
     have h4 : ∀ᶠ f in 𝓝 b, (colMat κ f).det ≠ 0 :=
       (continuous_det_colMat κ).continuousAt.eventually_ne hκ.ne_zero
     exact (hc.eventually h4).mono fun z h => isUnit_iff_ne_zero.2 h
-  obtain ⟨ε, hε, hall⟩ :=
-    Metric.eventually_nhds_iff_ball.1 (e1.and ((Filter.eventually_all.2 e2).and (e3.and e4)))
+  obtain ⟨ε, hε, hall⟩ := Metric.eventually_nhds_iff_ball.1
+    (e1.and ((Filter.eventually_all.2 e2).and (e3.and e4)))
   have h2 : 2 * (min ε ρ₁ / 2) = min ε ρ₁ := by ring
   have hsub : ball (0 : Fin n → ℂ) (2 * (min ε ρ₁ / 2)) ⊆ ball 0 ε := by
     rw [h2]
     exact ball_subset_ball (min_le_left _ _)
-  refine ⟨
-    min ε ρ₁ / 2,
-    ζ,
-    half_pos (lt_min hε hρ),
-    h2.le.trans (min_le_right _ _),
-    hζ0,
-    fun z hz => (hall z (hsub hz)).1,
-    fun z hz => ?_
-  ⟩
+  refine ⟨min ε ρ₁ / 2, ζ, half_pos (lt_min hε hρ), h2.le.trans (min_le_right _ _), hζ0,
+    fun z hz => (hall z (hsub hz)).1, fun z hz => ?_⟩
   obtain ⟨_, h3, h4, h5⟩ := hall z (hsub hz)
   exact ⟨h3, h4, h5⟩
 
-def frameSec (ρ : ℝ) (κ : Fin g → Fin r) (ζ : (Fin n → ℂ) → Fin r → Fin g → ℂ)
-    : (Fin n → ℂ) → Fin r → Fin g → ℂ := fun z i =>
-  (colMat κ (ζ (ρ • z)))⁻¹ *ᵥ ζ (ρ • z) i
+def frameSec (ρ : ℝ) (κ : Fin g → Fin r) (ζ : (Fin n → ℂ) → Fin r → Fin g → ℂ) :
+    (Fin n → ℂ) → Fin r → Fin g → ℂ :=
+  fun z i => (colMat κ (ζ (ρ • z)))⁻¹ *ᵥ ζ (ρ • z) i
 
-theorem smul_mem_ball {ρ : ℝ} (hρ : 0 < ρ) {z : Fin n → ℂ} {s : ℝ} (hz : z ∈ ball (0 : Fin n → ℂ) s)
-    : ρ • z ∈ ball (0 : Fin n → ℂ) (s * ρ) := by
+theorem smul_mem_ball {ρ : ℝ} (hρ : 0 < ρ) {z : Fin n → ℂ} {s : ℝ} (hz : z ∈ ball (0 : Fin n → ℂ) s) :
+    ρ • z ∈ ball (0 : Fin n → ℂ) (s * ρ) := by
   rw [mem_ball_zero_iff] at hz ⊢
   rw [norm_smul, Real.norm_eq_abs, abs_of_pos hρ, mul_comm]
   exact mul_lt_mul_of_pos_right hz hρ
 
-theorem analyticOnNhd_frameSec
-    {ρ : ℝ} (hρ : 0 < ρ)
-    (κ : Fin g → Fin r)
-    {ζ : (Fin n → ℂ) → Fin r → Fin g → ℂ} (han : AnalyticOnNhd ℂ ζ (ball 0 (2 * ρ)))
-    (hdet : ∀ z ∈ ball (0 : Fin n → ℂ) (2 * ρ), IsUnit (colMat κ (ζ z)).det)
-    : AnalyticOnNhd ℂ (frameSec ρ κ ζ) (ball 0 2) := by
+theorem analyticOnNhd_frameSec {ρ : ℝ} (hρ : 0 < ρ) (κ : Fin g → Fin r) {ζ : (Fin n → ℂ) → Fin r → Fin g → ℂ}
+    (han : AnalyticOnNhd ℂ ζ (ball 0 (2 * ρ)))
+    (hdet : ∀ z ∈ ball (0 : Fin n → ℂ) (2 * ρ), IsUnit (colMat κ (ζ z)).det) :
+    AnalyticOnNhd ℂ (frameSec ρ κ ζ) (ball 0 2) := by
   intro z hz
   have hs := smul_mem_ball hρ hz
   have hscale : AnalyticAt ℂ (fun x : Fin n → ℂ => ρ • x) z :=
@@ -215,24 +230,18 @@ theorem analyticOnNhd_frameSec
   exact Finset.analyticAt_fun_sum _ fun k _ =>
     (analyticAt_inv_apply h3 (hdet _ hs).ne_zero j k).mul (h2 i k)
 
-theorem exists_bound_frameSec
-    {ρ : ℝ} (hρ : 0 < ρ)
-    (κ : Fin g → Fin r)
-    {ζ : (Fin n → ℂ) → Fin r → Fin g → ℂ} (han : AnalyticOnNhd ℂ ζ (ball 0 (2 * ρ)))
-    (hdet : ∀ z ∈ ball (0 : Fin n → ℂ) (2 * ρ), IsUnit (colMat κ (ζ z)).det)
-    : ∃ C : ℝ, ∀ z ∈ ball (0 : Fin n → ℂ) 1, ‖frameSec ρ κ ζ z‖ ≤ C := by
+theorem exists_bound_frameSec {ρ : ℝ} (hρ : 0 < ρ) (κ : Fin g → Fin r) {ζ : (Fin n → ℂ) → Fin r → Fin g → ℂ}
+    (han : AnalyticOnNhd ℂ ζ (ball 0 (2 * ρ)))
+    (hdet : ∀ z ∈ ball (0 : Fin n → ℂ) (2 * ρ), IsUnit (colMat κ (ζ z)).det) :
+    ∃ C : ℝ, ∀ z ∈ ball (0 : Fin n → ℂ) 1, ‖frameSec ρ κ ζ z‖ ≤ C := by
   have hsub : closedBall (0 : Fin n → ℂ) 1 ⊆ ball 0 2 := closedBall_subset_ball (by norm_num)
-  obtain ⟨C, hC⟩ :=
-    (isCompact_closedBall (0 : Fin n → ℂ) 1).exists_bound_of_continuousOn
-      ((analyticOnNhd_frameSec hρ κ han hdet).continuousOn.mono hsub)
+  obtain ⟨C, hC⟩ := (isCompact_closedBall (0 : Fin n → ℂ) 1).exists_bound_of_continuousOn
+    ((analyticOnNhd_frameSec hρ κ han hdet).continuousOn.mono hsub)
   exact ⟨C, fun z hz => hC z (ball_subset_closedBall hz)⟩
 
-theorem frameSec_single
-    {ρ : ℝ}
-    (κ : Fin g → Fin r)
-    {ζ : (Fin n → ℂ) → Fin r → Fin g → ℂ} {z : Fin n → ℂ} (h : IsUnit (colMat κ (ζ (ρ • z))).det)
-    (j : Fin g)
-    : frameSec ρ κ ζ z (κ j) = Pi.single j 1 := by
+theorem frameSec_single {ρ : ℝ} (κ : Fin g → Fin r) {ζ : (Fin n → ℂ) → Fin r → Fin g → ℂ}
+    {z : Fin n → ℂ} (h : IsUnit (colMat κ (ζ (ρ • z))).det) (j : Fin g) :
+    frameSec ρ κ ζ z (κ j) = Pi.single j 1 := by
   rw [frameSec, ← colMat_mulVec_single κ (ζ (ρ • z)) j, inv_mulVec_mulVec h]
 
 end Sections
@@ -241,136 +250,91 @@ section Main
 
 open Metric
 
-variable
-  {E : Type} [Field E] [NumberField E] [IsCMField E]
-  {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E}
+variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E}
 
-theorem span_of_isExpAt
-    {X : Scheme.{0}} (t : SAB H X) (y : Sp ℂ ⟶ X)
-    {g : ℕ} (e : (Fin g → ℂ) → (Over.mk y ⟶ t.G)) (hs : Function.Surjective e)
-    (hh : IsHolTo Set.univ fun z => (e z).left) (he : IsExpAt t y e)
-    : Submodule.span ℂ {z | e z = 1} = ⊤ := by
+theorem span_of_isExpAt {X : Scheme.{0}} (t : SAB H X) (y : Sp ℂ ⟶ X) {g : ℕ}
+    (e : (Fin g → ℂ) → (Over.mk y ⟶ t.G)) (hs : Function.Surjective e)
+    (hh : IsHolTo Set.univ fun z => (e z).left) (he : IsExpAt t y e) :
+    Submodule.span ℂ {z | e z = 1} = ⊤ := by
   have h1 : e 0 = 1 := by
     have h2 := he.1 0 0
     rw [add_zero] at h2
     exact left_eq_mul.1 h2
   have hl : (e 0).left = (1 : Over.mk y ⟶ t.G).left := by rw [h1]
-  refine GlobalTheory.T.span_periodLattice_complexSemiAbelian_eq_top X t.G y g e t.semi
-    ⟨he.1, hs, hh, fun w => ?_, fun v hv => ?_⟩
+  refine GlobalTheory.T.span_periodLattice_complexSemiAbelian_eq_top X t.G y g e t.semi ⟨he.1, hs, hh, fun w => ?_, fun v hv => ?_⟩
   · obtain ⟨v, ⟨hv, hd⟩, hu⟩ := he.2.1 w
     refine ⟨Over.homMk v hv.1, hd, fun v' hv' => ?_⟩
     have h3 : v'.left = v := hu _ ⟨⟨Over.w v', hv'.1.trans hl⟩, hv'⟩
     exact Over.OverMorphism.ext h3
   · exact he.2.2 v.left ⟨Over.w v, hv.trans hl⟩
 
-variable
-  {Dw : Datum H} {l : Level H} {Xo : Moduli Dw l} {c : Coeff l} {O : Type} [CommRing O]
-  {β : O →+* c.F} {Z : Model Xo c β} {σ : c.F →+* ℂ}
+variable {Dw : Datum H} {l : Level H} {Xo : Moduli Dw l} {c : Coeff l} {O : Type} [CommRing O] {β : O →+* c.F}
+  {Z : Model Xo c β} {σ : c.F →+* ℂ}
 
-theorem exists_chart_sections
-    {n : ℕ} (e0 : OpenPartialHomeomorph (CxPts (genStr Z) σ) (Fin n → ℂ))
-    (h0t : (0 : Fin n → ℂ) ∈ e0.target) (hsymm : IsHolTo e0.target (fun z => (e0.symm z).1))
-    : ∃ (g r : ℕ) (ρ : ℝ) (ex : ExpMaps Z σ g) (ζ : (Fin n → ℂ) → Fin r → Fin g → ℂ)
-        (κ : Fin g → Fin r),
-      0 < ρ ∧ Metric.ball 0 (2 * ρ) ⊆ e0.target
-        ∧ IsHolTo (Metric.ball 0 (2 * ρ) ×ˢ Set.univ)
-          (fun zw : (Fin n → ℂ) × (Fin g → ℂ) => (ex (e0.symm zw.1) zw.2).left)
-        ∧ (∀ x ∈ e0.source,
-          ‖e0 x‖ < 2 * ρ → Function.Surjective (ex x) ∧ IsExpAt Z.t (x.1 ≫ genι Z) (ex x))
-        ∧ IsLatBasis {w | ex (e0.symm 0) w = 1} (ζ 0) ∧ AnalyticOnNhd ℂ ζ (ball 0 (2 * ρ))
-        ∧ ∀ z ∈ ball (0 : Fin n → ℂ) (2 * ρ),
-          (∀ i, ex (e0.symm z) (ζ z i) = 1) ∧ LinearIndependent ℝ (ζ z)
-            ∧ IsUnit (colMat κ (ζ z)).det := by
-  obtain ⟨g, ρ₁, ex, hρ₁, hball, hhol2, hexp⟩ :=
-    GlobalTheory.T.exists_holomorphic_fibre_exponentials_near_centre E H Dw l Xo c O β Z σ _ e0 h0t
-      hsymm
-  have hfib : ∀ b ∈ Metric.ball (0 : Fin n → ℂ) ρ₁, e0.symm b ∈ e0.source ∧ ‖e0 (e0.symm b)‖ < ρ₁ :=
-    fun b hb =>
-      ⟨e0.map_target (hball hb), by rw [e0.right_inv (hball hb)]; exact mem_ball_zero_iff.1 hb⟩
+theorem exists_chart_sections {n : ℕ} (e0 : OpenPartialHomeomorph (CxPts (genStr Z) σ) (Fin n → ℂ))
+    (h0t : (0 : Fin n → ℂ) ∈ e0.target) (hsymm : IsHolTo e0.target (fun z => (e0.symm z).1)) :
+    ∃ (g r : ℕ) (ρ : ℝ) (ex : ExpMaps Z σ g) (ζ : (Fin n → ℂ) → Fin r → Fin g → ℂ) (κ : Fin g → Fin r),
+      0 < ρ ∧ Metric.ball 0 (2 * ρ) ⊆ e0.target ∧
+      IsHolTo (Metric.ball 0 (2 * ρ) ×ˢ Set.univ)
+        (fun zw : (Fin n → ℂ) × (Fin g → ℂ) => (ex (e0.symm zw.1) zw.2).left) ∧
+      (∀ x ∈ e0.source, ‖e0 x‖ < 2 * ρ → Function.Surjective (ex x) ∧ IsExpAt Z.t (x.1 ≫ genι Z) (ex x)) ∧
+      IsLatBasis {w | ex (e0.symm 0) w = 1} (ζ 0) ∧ AnalyticOnNhd ℂ ζ (ball 0 (2 * ρ)) ∧
+      ∀ z ∈ ball (0 : Fin n → ℂ) (2 * ρ), (∀ i, ex (e0.symm z) (ζ z i) = 1) ∧
+        LinearIndependent ℝ (ζ z) ∧ IsUnit (colMat κ (ζ z)).det := by
+  obtain ⟨g, ρ₁, ex, hρ₁, hball, hhol2, hexp⟩ := GlobalTheory.T.exists_holomorphic_fibre_exponentials_near_centre E H Dw l Xo c O β Z σ _ e0 h0t hsymm
+  have hfib : ∀ b ∈ Metric.ball (0 : Fin n → ℂ) ρ₁, e0.symm b ∈ e0.source ∧ ‖e0 (e0.symm b)‖ < ρ₁ := fun b hb =>
+    ⟨e0.map_target (hball hb), by rw [e0.right_inv (hball hb)]; exact mem_ball_zero_iff.1 hb⟩
   have hfam : IsLatFam (Metric.ball (0 : Fin n → ℂ) ρ₁) (fun b => {w | ex (e0.symm b) w = 1}) :=
-    GlobalTheory.T.exponentialKernels_isHolomorphicLatticeFamily E H _ Z.t _ g (Metric.ball 0 ρ₁)
-      (fun b => (e0.symm b).1 ≫ genι Z)
-      (fun b => ex (e0.symm b))
-      Metric.isOpen_ball hhol2
-      fun b hb => (hexp _ (hfib b hb).1 (hfib b hb).2).2
+    GlobalTheory.T.exponentialKernels_isHolomorphicLatticeFamily E H _ Z.t _ g (Metric.ball 0 ρ₁) (fun b => (e0.symm b).1 ≫ genι Z) (fun b => ex (e0.symm b))
+      Metric.isOpen_ball hhol2 fun b hb => (hexp _ (hfib b hb).1 (hfib b hb).2).2
   have h00 := Metric.mem_ball_self (x := (0 : Fin n → ℂ)) hρ₁
-  obtain ⟨r, b, hb⟩ :=
-    GlobalTheory.T.exists_real_independent_basis_lattice_family _ g _ _ 0 hfam h00
+  obtain ⟨r, b, hb⟩ := GlobalTheory.T.exists_real_independent_basis_lattice_family _ g _ _ 0 hfam h00
   have hsurj := (hexp _ (hfib 0 h00).1 (hfib 0 h00).2).1
   have hspan : Submodule.span ℂ {w | ex (e0.symm 0) w = 1} = ⊤ := by
     refine span_of_isExpAt Z.t _ (ex (e0.symm 0)) hsurj ?_ (hexp _ (hfib 0 h00).1 (hfib 0 h00).2).2
-    have h :=
-      HolPeriods.isHolTo_comp hhol2 isOpen_univ
-        (φ := fun w : Fin g → ℂ => ((0 : Fin n → ℂ), w))
-        ((differentiableOn_const _).prodMk differentiableOn_id)
-        fun w _ => ⟨h00, trivial⟩
+    have h := HolPeriods.isHolTo_comp hhol2 isOpen_univ (φ := fun w : Fin g → ℂ => ((0 : Fin n → ℂ), w))
+      ((differentiableOn_const _).prodMk differentiableOn_id) fun w _ => ⟨h00, trivial⟩
     exact h
   obtain ⟨κ, hκ⟩ := exists_frame hb hspan
   obtain ⟨ρ, ζ, hρ, hle, hζ0, han, hz⟩ := exists_sections hρ₁ hfam hb κ hκ
   have hsub : Metric.ball (0 : Fin n → ℂ) (2 * ρ) ⊆ Metric.ball 0 ρ₁ := Metric.ball_subset_ball hle
-  refine ⟨
-    g,
-    r,
-    ρ,
-    ex,
-    ζ,
-    κ,
-    hρ,
-    hsub.trans hball,
-    ?_,
-    fun x hx hn => hexp x hx (hn.trans_le hle),
-    hζ0 ▸ hb,
-    han,
-    fun z hz' => ⟨fun i => (hz z hz').1 i, (hz z hz').2⟩
-  ⟩
+  refine ⟨g, r, ρ, ex, ζ, κ, hρ, hsub.trans hball, ?_, fun x hx hn => hexp x hx (hn.trans_le hle),
+    hζ0 ▸ hb, han, fun z hz' => ⟨fun i => (hz z hz').1 i, (hz z hz').2⟩⟩
   exact LocLift.isHolTo_mono hhol2 (Metric.isOpen_ball.prod isOpen_univ)
     (Set.prod_mono hsub subset_rfl)
 
-theorem exists_framed_of_chart
-    {n a : ℕ} (e0 : OpenPartialHomeomorph (CxPts (genStr Z) σ) (Fin n → ℂ))
+theorem exists_framed_of_chart {n a : ℕ} (e0 : OpenPartialHomeomorph (CxPts (genStr Z) σ) (Fin n → ℂ))
     (h0t : (0 : Fin n → ℂ) ∈ e0.target) (hhol : ∀ j, HolAlong e0.source fun x => e0 x j)
     (hsymm : IsHolTo e0.target (fun z => (e0.symm z).1))
-    (hbd : ∀ x ∈ e0.source, Inner x ↔ ∀ k : Fin n, (k : ℕ) < a → e0 x k ≠ 0)
-    : ∃ (g r₀ : ℕ) (e : OpenPartialHomeomorph (CxPts (genStr Z) σ) (Fin n → ℂ)) (ex : ExpMaps Z σ g)
-        (ζ : (Fin n → ℂ) → Fin r₀ → Fin g → ℂ),
-      e0.symm 0 ∈ e.source ∧ e (e0.symm 0) = 0 ∧ IsExpChart e ex
-        ∧ (∀ x ∈ e.source, Inner x ↔ ∀ k : Fin n, (k : ℕ) < a → e x k ≠ 0)
-        ∧ Function.Surjective (ex (e0.symm 0)) ∧ AnalyticOnNhd ℂ ζ (ball 0 1)
-        ∧ (∀ z ∈ ball (0 : Fin n → ℂ) 1, LinearIndependent ℝ (ζ z))
-        ∧ (∀ z ∈ ball (0 : Fin n → ℂ) 1, ∀ i, ex (e.symm z) (ζ z i) = 1)
-        ∧ IsLatBasis {w | ex (e0.symm 0) w = 1} (ζ 0)
-        ∧ (∃ C : ℝ, ∀ z ∈ ball (0 : Fin n → ℂ) 1, ‖ζ z‖ ≤ C)
-        ∧ ∀ j : Fin g, ∃ i, ∀ z ∈ ball (0 : Fin n → ℂ) 1, ζ z i = Pi.single j 1 := by
-  obtain ⟨g, r, ρ, ex, ζ, κ, hρ, hball, hhol2, hexp, hlat, han, hz⟩ :=
-    exists_chart_sections e0 h0t hsymm
+    (hbd : ∀ x ∈ e0.source, Inner x ↔ ∀ k : Fin n, (k : ℕ) < a → e0 x k ≠ 0) :
+    ∃ (g r₀ : ℕ) (e : OpenPartialHomeomorph (CxPts (genStr Z) σ) (Fin n → ℂ)) (ex : ExpMaps Z σ g)
+      (ζ : (Fin n → ℂ) → Fin r₀ → Fin g → ℂ), e0.symm 0 ∈ e.source ∧ e (e0.symm 0) = 0 ∧ IsExpChart e ex ∧
+      (∀ x ∈ e.source, Inner x ↔ ∀ k : Fin n, (k : ℕ) < a → e x k ≠ 0) ∧ Function.Surjective (ex (e0.symm 0)) ∧
+      AnalyticOnNhd ℂ ζ (ball 0 1) ∧ (∀ z ∈ ball (0 : Fin n → ℂ) 1, LinearIndependent ℝ (ζ z)) ∧
+      (∀ z ∈ ball (0 : Fin n → ℂ) 1, ∀ i, ex (e.symm z) (ζ z i) = 1) ∧
+      IsLatBasis {w | ex (e0.symm 0) w = 1} (ζ 0) ∧ (∃ C : ℝ, ∀ z ∈ ball (0 : Fin n → ℂ) 1, ‖ζ z‖ ≤ C) ∧
+      ∀ j : Fin g, ∃ i, ∀ z ∈ ball (0 : Fin n → ℂ) 1, ζ z i = Pi.single j 1 := by
+  obtain ⟨g, r, ρ, ex, ζ, κ, hρ, hball, hhol2, hexp, hlat, han, hz⟩ := exists_chart_sections e0 h0t hsymm
   have hsubρ : ball (0 : Fin n → ℂ) ρ ⊆ ball 0 (2 * ρ) := ball_subset_ball (by linarith)
-  have hdet : ∀ z ∈ ball (0 : Fin n → ℂ) (2 * ρ), IsUnit (colMat κ (ζ z)).det := fun z hz' =>
-    (hz z hz').2.2
+  have hdet : ∀ z ∈ ball (0 : Fin n → ℂ) (2 * ρ), IsUnit (colMat κ (ζ z)).det := fun z hz' => (hz z hz').2.2
   have hdiff : DifferentiableOn ℂ (fun z => colMat κ (ζ z)) (ball 0 ρ) := by
-    have h : DifferentiableOn ℂ
-        (fun z => (fun i j => ζ z (κ j) i : Fin g → Fin g → ℂ))
-        (ball 0 ρ) := by
+    have h : DifferentiableOn ℂ (fun z => (fun i j => ζ z (κ j) i : Fin g → Fin g → ℂ)) (ball 0 ρ) := by
       refine differentiableOn_pi.2 fun i => differentiableOn_pi.2 fun j => fun z hz' => ?_
       have hd : DifferentiableAt ℂ ζ z := (han z (hsubρ hz')).differentiableAt
       exact (differentiableAt_pi.1 (differentiableAt_pi.1 hd (κ j)) i).differentiableWithinAt
     exact h
-  obtain ⟨e, ex', hch, hsrc, hee, hex'⟩ :=
-    GlobalTheory.T.exists_exponentialChart_rescale_frameChange E H Dw l Xo c O β Z σ n g e0 ex ρ
-      (fun z => colMat κ (ζ z))
-      hρ (hsubρ.trans hball) hhol hsymm
-      (LocLift.isHolTo_mono hhol2 (isOpen_ball.prod isOpen_univ) (Set.prod_mono hsubρ subset_rfl))
-      (fun x hx hn => (hexp x hx (by linarith)).2)
-      hdiff
-      (fun z hz' => hdet z (hsubρ hz'))
+  obtain ⟨e, ex', hch, hsrc, hee, hex'⟩ := GlobalTheory.T.exists_exponentialChart_rescale_frameChange E H Dw l Xo c O β Z σ n g e0 ex ρ
+    (fun z => colMat κ (ζ z)) hρ (hsubρ.trans hball) hhol hsymm
+    (LocLift.isHolTo_mono hhol2 (isOpen_ball.prod isOpen_univ) (Set.prod_mono hsubρ subset_rfl))
+    (fun x hx hn => (hexp x hx (by linarith)).2) hdiff (fun z hz' => hdet z (hsubρ hz'))
   have e00 : e0 (e0.symm 0) = 0 := e0.right_inv h0t
   have hx0 : e0.symm 0 ∈ e.source := by
     rw [hsrc]
     refine ⟨e0.map_target h0t, ?_⟩
     simpa [e00] using hρ
   have h0b : (0 : Fin n → ℂ) ∈ ball (0 : Fin n → ℂ) (2 * ρ) := mem_ball_self (by linarith)
-  have key
-      : ∀ z ∈ ball (0 : Fin n → ℂ) 1,
-        e.symm z ∈ e.source ∧ e.symm z = e0.symm (ρ • z) ∧ e0 (e.symm z) = ρ • z := fun z hzb => by
+  have key : ∀ z ∈ ball (0 : Fin n → ℂ) 1, e.symm z ∈ e.source ∧ e.symm z = e0.symm (ρ • z) ∧
+      e0 (e.symm z) = ρ • z := fun z hzb => by
     have hzt : z ∈ e.target := hch.1.symm ▸ hzb
     have hs := e.map_target hzt
     have h1 := e.right_inv hzt
@@ -415,25 +379,10 @@ theorem exists_framed_of_chart
 
 end Main
 
-theorem exists_framed_chart
-    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E]
-        (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (Dw : Datum H) (l : Level H)
-        (Xo : Moduli Dw l) (c : Coeff l) (O : Type) [CommRing O] (β : O →+* c.F) (Y : Model Xo c β)
-        (T : TorModel Y) (σ : c.F →+* ℂ) (x₀ : CxPts (genStr T.Z) σ),
-      ∃ (n a g r₀ : ℕ) (e : OpenPartialHomeomorph (CxPts (genStr T.Z) σ) (Fin n → ℂ))
-          (ex : ExpMaps T.Z σ g) (ζ : (Fin n → ℂ) → Fin r₀ → Fin g → ℂ),
-        x₀ ∈ e.source ∧ e x₀ = 0 ∧ IsExpChart e ex
-          ∧ (∀ x ∈ e.source, Inner x ↔ ∀ k : Fin n, (k : ℕ) < a → e x k ≠ 0)
-          ∧ Function.Surjective (ex x₀) ∧ AnalyticOnNhd ℂ ζ (Metric.ball 0 1)
-          ∧ (∀ z ∈ Metric.ball (0 : Fin n → ℂ) 1, LinearIndependent ℝ (ζ z))
-          ∧ (∀ z ∈ Metric.ball (0 : Fin n → ℂ) 1, ∀ i, ex (e.symm z) (ζ z i) = 1)
-          ∧ IsLatBasis {w | ex x₀ w = 1} (ζ 0)
-          ∧ (∃ C : ℝ, ∀ z ∈ Metric.ball (0 : Fin n → ℂ) 1, ‖ζ z‖ ≤ C)
-          ∧ ∀ j : Fin g, ∃ i, ∀ z ∈ Metric.ball (0 : Fin n → ℂ) 1, ζ z i = Pi.single j 1 := by
+theorem exists_framed_chart : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (Dw : Datum H) (l : Level H) (Xo : Moduli Dw l) (c : Coeff l) (O : Type) [CommRing O] (β : O →+* c.F) (Y : Model Xo c β) (T : TorModel Y) (σ : c.F →+* ℂ) (x₀ : CxPts (genStr T.Z) σ), ∃ (n a g r₀ : ℕ) (e : OpenPartialHomeomorph (CxPts (genStr T.Z) σ) (Fin n → ℂ)) (ex : ExpMaps T.Z σ g) (ζ : (Fin n → ℂ) → Fin r₀ → Fin g → ℂ), x₀ ∈ e.source ∧ e x₀ = 0 ∧ IsExpChart e ex ∧ (∀ x ∈ e.source, Inner x ↔ ∀ k : Fin n, (k : ℕ) < a → e x k ≠ 0) ∧ Function.Surjective (ex x₀) ∧ AnalyticOnNhd ℂ ζ (Metric.ball 0 1) ∧ (∀ z ∈ Metric.ball (0 : Fin n → ℂ) 1, LinearIndependent ℝ (ζ z)) ∧ (∀ z ∈ Metric.ball (0 : Fin n → ℂ) 1, ∀ i, ex (e.symm z) (ζ z i) = 1) ∧ IsLatBasis {w | ex x₀ w = 1} (ζ 0) ∧ (∃ C : ℝ, ∀ z ∈ Metric.ball (0 : Fin n → ℂ) 1, ‖ζ z‖ ≤ C) ∧ ∀ j : Fin g, ∃ i, ∀ z ∈ Metric.ball (0 : Fin n → ℂ) 1, ζ z i = Pi.single j 1 := by
   intro E _ _ _ H Dw l Xo c O _ β Y T σ x₀
   obtain ⟨a, e0, hx₀, he0, hhol, hsymm, hbd⟩ :=
-    GlobalTheory.T.exists_snc_coordinates_complexPoint_smoothVariety c.F (gen T.Z) (genStr T.Z)
-      Dw.dim (genBd T.Z) σ T.smooth T.snc x₀
+    GlobalTheory.T.exists_snc_coordinates_complexPoint_smoothVariety c.F (gen T.Z) (genStr T.Z) Dw.dim (genBd T.Z) σ T.smooth T.snc x₀
   have hsym0 : e0.symm 0 = x₀ := by rw [← he0]; exact e0.left_inv hx₀
   have h0t : (0 : Fin Dw.dim → ℂ) ∈ e0.target := he0 ▸ e0.map_source hx₀
   obtain ⟨g, r₀, e, ex, ζ, h⟩ := exists_framed_of_chart (a := a) e0 h0t hhol hsymm hbd

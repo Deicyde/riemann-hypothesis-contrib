@@ -1,6 +1,53 @@
 module
 
-public import Mathlib
+public import Mathlib.RingTheory.TensorProduct.Free
+public import Mathlib.RingTheory.TensorProduct.Maps
+public import Mathlib.Tactic.Continuity
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
+public import Lean.Elab.MutualDef
 
 @[expose] public section
 
@@ -44,16 +91,16 @@ def lmat (a : R ⊗[K] A) : Matrix κ κ R := fun k => coords b R (a * baseBasis
 
 theorem coords_mul (z x : R ⊗[K] A) : coords b R (z * x) = coords b R z ᵥ* rmat b R x := by
   conv_lhs => rw [eq_sum_coords b R z]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [Finset.sum_mul, map_sum]
+
+  rw [Finset.sum_mul, map_sum]
   funext l
   simp only [smul_mul_assoc, map_smul, Finset.sum_apply, Pi.smul_apply, smul_eq_mul, vecMul,
     dotProduct, rmat]
 
 theorem coords_mul_left (a z : R ⊗[K] A) : coords b R (a * z) = coords b R z ᵥ* lmat b R a := by
   conv_lhs => rw [eq_sum_coords b R z]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [Finset.mul_sum, map_sum]
+
+  rw [Finset.mul_sum, map_sum]
   funext l
   simp only [mul_smul_comm, map_smul, Finset.sum_apply, Pi.smul_apply, smul_eq_mul, vecMul,
     dotProduct, lmat]
@@ -70,15 +117,13 @@ theorem rmat_one : rmat b R 1 = 1 := by
 
 def rmatHom : R ⊗[K] A →ₐ[R] Matrix κ κ R :=
   AlgHom.ofLinearMap
-    {
-      toFun := rmat b R
+    { toFun := rmat b R
       map_add' := fun x y => by
         ext k l
         simp [rmat, mul_add]
       map_smul' := fun c x => by
         ext k l
-        simp [rmat]
-    }
+        simp [rmat] }
     (rmat_one b R) (rmat_mul b R)
 
 @[simp]
@@ -92,9 +137,9 @@ theorem rmat_injective : Function.Injective (rmat b R) := by
   rw [h] at hx
   exact (coords b R).injective (hx.trans hy.symm)
 
-theorem exists_rmat_eq
-    (g : Matrix κ κ R) (hg : ∀ j, lmat b R (baseBasis b R j) * g = g * lmat b R (baseBasis b R j))
-    : ∃ x, rmat b R x = g := by
+theorem exists_rmat_eq (g : Matrix κ κ R)
+    (hg : ∀ j, lmat b R (baseBasis b R j) * g = g * lmat b R (baseBasis b R j)) :
+    ∃ x, rmat b R x = g := by
   let φ : R ⊗[K] A →ₗ[R] R ⊗[K] A :=
     (coords b R).symm.toLinearMap ∘ₗ g.vecMulLinear ∘ₗ (coords b R).toLinearMap
   have hφ : ∀ z, coords b R (φ z) = coords b R z ᵥ* g := by
@@ -106,8 +151,8 @@ theorem exists_rmat_eq
     rw [hφ, coords_mul_left, coords_mul_left, hφ, vecMul_vecMul, vecMul_vecMul, hg]
   have ha : ∀ a z, φ (a * z) = a * φ z := by
     intro a z
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [eq_sum_coords b R a, Finset.sum_mul, Finset.sum_mul, map_sum]
+
+    rw [eq_sum_coords b R a, Finset.sum_mul, Finset.sum_mul, map_sum]
     refine Finset.sum_congr rfl fun j _ => ?_
     rw [smul_mul_assoc, smul_mul_assoc, map_smul, hj]
   refine ⟨φ 1, ?_⟩
@@ -120,22 +165,21 @@ variable {R} {R' : Type*} [CommRing R'] [Algebra K R']
 def baseMap (f : R →ₐ[K] R') : R ⊗[K] A →ₐ[K] R' ⊗[K] A :=
   Algebra.TensorProduct.map f (AlgHom.id K A)
 
-theorem baseMap_baseBasis (f : R →ₐ[K] R') (k : κ)
-    : baseMap f (baseBasis b R k) = baseBasis b R' k := by
+theorem baseMap_baseBasis (f : R →ₐ[K] R') (k : κ) :
+    baseMap f (baseBasis b R k) = baseBasis b R' k := by
   rw [baseBasis_apply, baseBasis_apply, baseMap, Algebra.TensorProduct.map_tmul, map_one]
   rfl
 
-theorem coords_baseMap (f : R →ₐ[K] R') (z : R ⊗[K] A)
-    : coords b R' (baseMap f z) = f ∘ coords b R z := by
-  have h
-      : ∀ k,
-        baseMap f (coords b R z k • baseBasis b R k) = f (coords b R z k) • baseBasis b R' k := by
+theorem coords_baseMap (f : R →ₐ[K] R') (z : R ⊗[K] A) :
+    coords b R' (baseMap f z) = f ∘ coords b R z := by
+  have h : ∀ k, baseMap f (coords b R z k • baseBasis b R k) =
+      f (coords b R z k) • baseBasis b R' k := by
     intro k
     simp only [baseBasis_apply, baseMap, TensorProduct.smul_tmul', smul_eq_mul, mul_one,
       Algebra.TensorProduct.map_tmul, AlgHom.coe_id, id_eq]
   conv_lhs => rw [eq_sum_coords b R z]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum, Finset.sum_congr rfl fun k _ => h k, map_sum]
+
+  rw [map_sum, Finset.sum_congr rfl fun k _ => h k, map_sum]
   funext l
   rw [Finset.sum_apply]
   simp only [map_smul, Pi.smul_apply, coords_baseBasis, smul_eq_mul, Pi.single_apply, mul_ite,
@@ -143,8 +187,8 @@ theorem coords_baseMap (f : R →ₐ[K] R') (z : R ⊗[K] A)
   rw [Finset.sum_ite_eq]
   simp
 
-theorem rmat_baseMap (f : R →ₐ[K] R') (x : R ⊗[K] A)
-    : rmat b R' (baseMap f x) = (rmat b R x).map f := by
+theorem rmat_baseMap (f : R →ₐ[K] R') (x : R ⊗[K] A) :
+    rmat b R' (baseMap f x) = (rmat b R x).map f := by
   ext k l
   simp only [rmat, Matrix.map_apply, ← baseMap_baseBasis b f k, ← map_mul, coords_baseMap,
     Function.comp_apply]
@@ -164,9 +208,8 @@ theorem lmat_eq_rmat (a : R ⊗[K] E) : lmat b R a = rmat b R a := by
 def blockHom : Matrix ι ι (R ⊗[K] E) →ₐ[R] Matrix (ι × κ) (ι × κ) R :=
   (Matrix.compAlgEquiv ι κ R R).toAlgHom.comp (rmatHom b R).mapMatrix
 
-theorem blockHom_apply (M : Matrix ι ι (R ⊗[K] E)) (i j : ι) (k l : κ)
-    : blockHom b R M (i, k) (j, l) = rmat b R (M i j) k l :=
-  rfl
+theorem blockHom_apply (M : Matrix ι ι (R ⊗[K] E)) (i j : ι) (k l : κ) :
+    blockHom b R M (i, k) (j, l) = rmat b R (M i j) k l := rfl
 
 theorem blockHom_injective : Function.Injective (blockHom (ι := ι) b R) := by
   intro M M' h
@@ -177,31 +220,25 @@ theorem blockHom_injective : Function.Injective (blockHom (ι := ι) b R) := by
 
 def coordsVec (x : ι → R ⊗[K] E) : ι × κ → R := fun p => coords b R (x p.1) p.2
 
-theorem coordsVec_vecMul (x : ι → R ⊗[K] E) (M : Matrix ι ι (R ⊗[K] E))
-    : coordsVec b R (x ᵥ* M) = coordsVec b R x ᵥ* blockHom b R M := by
+theorem coordsVec_vecMul (x : ι → R ⊗[K] E) (M : Matrix ι ι (R ⊗[K] E)) :
+    coordsVec b R (x ᵥ* M) = coordsVec b R x ᵥ* blockHom b R M := by
   funext ⟨j, l⟩
-  set_option synthInstance.maxHeartbeats 100000 in
-  simp only [coordsVec, vecMul, dotProduct, map_sum, Finset.sum_apply, coords_mul,
-    Fintype.sum_prod_type, blockHom_apply]
 
-theorem exists_blockHom_eq
-    (g : Matrix (ι × κ) (ι × κ) R)
-    (hg : ∀ j,
-      blockHom b R (Matrix.scalar ι (baseBasis b R j)) * g
-        = g * blockHom b R (Matrix.scalar ι (baseBasis b R j)))
-    : ∃ M, blockHom b R M = g := by
-  have hsc
-      : ∀ j,
-        blockHom b R (Matrix.scalar ι (baseBasis b R j))
-          = Matrix.compAlgEquiv ι κ R R (Matrix.scalar ι (rmat b R (baseBasis b R j))) := by
+  simp only [coordsVec, vecMul, dotProduct, map_sum, Finset.sum_apply, coords_mul,
+  Fintype.sum_prod_type, blockHom_apply]
+
+theorem exists_blockHom_eq (g : Matrix (ι × κ) (ι × κ) R)
+    (hg : ∀ j, blockHom b R (Matrix.scalar ι (baseBasis b R j)) * g =
+      g * blockHom b R (Matrix.scalar ι (baseBasis b R j))) :
+    ∃ M, blockHom b R M = g := by
+  have hsc : ∀ j, blockHom b R (Matrix.scalar ι (baseBasis b R j)) =
+      Matrix.compAlgEquiv ι κ R R (Matrix.scalar ι (rmat b R (baseBasis b R j))) := by
     intro j
     simp only [blockHom, AlgHom.comp_apply, AlgHom.mapMatrix_apply, Matrix.scalar_apply,
       Matrix.diagonal_map (map_zero _), rmatHom_apply]
     rfl
-  have hcomm
-      : ∀ j i i',
-        rmat b R (baseBasis b R j) * (Matrix.comp ι ι κ κ R).symm g i i'
-          = (Matrix.comp ι ι κ κ R).symm g i i' * rmat b R (baseBasis b R j) := by
+  have hcomm : ∀ j i i', rmat b R (baseBasis b R j) * (Matrix.comp ι ι κ κ R).symm g i i' =
+      (Matrix.comp ι ι κ κ R).symm g i i' * rmat b R (baseBasis b R j) := by
     intro j i i'
     have h := hg j
     rw [hsc, ← (Matrix.compAlgEquiv ι κ R R).apply_symm_apply g, ← map_mul, ← map_mul] at h
@@ -218,13 +255,13 @@ theorem exists_blockHom_eq
 
 variable {R}
 
-theorem blockHom_baseMap (f : R →ₐ[K] R') (M : Matrix ι ι (R ⊗[K] E))
-    : blockHom b R' (M.map (baseMap f)) = (blockHom b R M).map f := by
+theorem blockHom_baseMap (f : R →ₐ[K] R') (M : Matrix ι ι (R ⊗[K] E)) :
+    blockHom b R' (M.map (baseMap f)) = (blockHom b R M).map f := by
   ext ⟨i, k⟩ ⟨j, l⟩
   simp only [blockHom_apply, Matrix.map_apply, rmat_baseMap]
 
-theorem coordsVec_baseMap (f : R →ₐ[K] R') (x : ι → R ⊗[K] E)
-    : coordsVec b R' (fun i => baseMap f (x i)) = f ∘ coordsVec b R x := by
+theorem coordsVec_baseMap (f : R →ₐ[K] R') (x : ι → R ⊗[K] E) :
+    coordsVec b R' (fun i => baseMap f (x i)) = f ∘ coordsVec b R x := by
   funext ⟨i, k⟩
   simp only [coordsVec, coords_baseMap, Function.comp_apply]
 

@@ -1,7 +1,58 @@
 module
 
-public import Mathlib
+public import Mathlib.RingTheory.AlgebraicIndependent.Defs
+public import Mathlib.RingTheory.Kaehler.Basic
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.LinearIndependentKaehlerDOfAlgebraicIndependentStatement
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.Order.CompletePartialOrder
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -26,16 +77,16 @@ theorem false_of_dependent_derivatives {k A κ : Type} [Field k] [CharZero k] [C
   set m : Fin n → KaehlerDifferential k κ := fun l => KaehlerDifferential.map k k A κ (ω l) with hm
   have hdψ : ∀ a : A, D k κ (algebraMap A κ a) = ∑ l, algebraMap A κ (δ l a) • m l := by
     intro a
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← KaehlerDifferential.map_D k k A κ, hω a, map_sum]
+
+    rw [← KaehlerDifferential.map_D k k A κ, hω a, map_sum]
     refine Finset.sum_congr rfl fun l _ => ?_
     rw [LinearMap.map_smul, algebraMap_smul]
   have e1 : ∀ i ∈ J, ∑ p, algebraMap A κ (f p) • D k κ (t (i, p)) =
       - ∑ p, t (i, p) • D k κ (algebraMap A κ (f p)) := by
     intro i hi
     have h := congrArg (D k κ) (r1 i hi)
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, map_zero] at h
+
+    rw [map_sum, map_zero] at h
     simp only [Derivation.leibniz, Finset.sum_add_distrib] at h
     rw [eq_neg_iff_add_eq_zero, add_comm]
     exact h
@@ -134,12 +185,12 @@ theorem no_dependence_of_general : ∀ (k A : Type) [Field k] [CharZero k] [Comm
     apply false_of_dependent_derivatives n δ ω hω f M J i₀ p₀ hi₀ _ ht (fun i => π (X (Sum.inr (Sum.inl i))))
     · intro i hi
       have := hπI _ (g1mem i hi)
-      set_option synthInstance.maxHeartbeats 100000 in
-        simpa only [map_sum, map_mul, hπC] using this
+
+      simpa only [map_sum, map_mul, hπC] using this
     · intro l
       have := hπI _ (g2mem l)
-      set_option synthInstance.maxHeartbeats 100000 in
-        simpa only [map_sum, map_mul, hπC] using this
+
+      simpa only [map_sum, map_mul, hπC] using this
     · have h3 : π (X (Sum.inr (Sum.inl i₀)) - 1) = 0 := hπI _ g3mem
       rw [RingHom.map_sub, RingHom.map_one] at h3
       exact h3
@@ -158,11 +209,11 @@ theorem no_dependence_of_general : ∀ (k A : Type) [Field k] [CharZero k] [Comm
     rw [hIdef, relIdeal, Ideal.span_le]
     rintro x (⟨i, hi, rfl⟩ | ⟨l, rfl⟩ | rfl | rfl) <;> simp only [SetLike.mem_coe, RingHom.mem_ker]
     · have := hrel i hi
-      set_option synthInstance.maxHeartbeats 100000 in
-        simpa [e, map_sum, Algebra.smul_def] using this
+
+      simpa [e, map_sum, Algebra.smul_def] using this
     · have := hδ l
-      set_option synthInstance.maxHeartbeats 100000 in
-        simpa [e, map_sum, Algebra.smul_def] using this
+
+      simpa [e, map_sum, Algebra.smul_def] using this
     · simp [e, hc]
     · simp [e, inv_mul_cancel₀ hφ]
   let e' : T →+* K := Ideal.Quotient.lift I e (fun a ha => hI ha)

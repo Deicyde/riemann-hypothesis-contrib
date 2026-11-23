@@ -1,7 +1,52 @@
 module
 
-public import Mathlib
 public import GroundTheory.PAdicHodge.UntiltFrobeniusEquivSymmEpsilonNeOne
+public import GroundTheory.PAdicHodge.BdRGalois
+public import GroundTheory.PAdicHodge.TateCpTwist
+public import GroundTheory.PAdicHodge.BdRLattice
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.RootsOfUnity.AlgebraicallyClosed
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -21,13 +66,13 @@ def logPolyCoeff (k i : ℕ) : ℤ := (-1) ^ (i + 1) * ((k.factorial / i : ℕ) 
 
 def logPoly (k : ℕ) (z : R) : R := ∑ i ∈ Finset.Ico 1 k, (logPolyCoeff k i : R) * z ^ i
 
-theorem map_logPoly {S : Type*} [CommRing S] (f : R →+* S) (k : ℕ) (z : R)
-    : f (logPoly k z) = logPoly k (f z) := by
-  set_option synthInstance.maxHeartbeats 100000 in
+theorem map_logPoly {S : Type*} [CommRing S] (f : R →+* S) (k : ℕ) (z : R) :
+    f (logPoly k z) = logPoly k (f z) := by
+
   simp [logPoly, map_sum, map_mul, map_intCast, map_pow]
 
-theorem logPoly_sub_mem (k : ℕ) {z w : R} {J : Ideal R} (h : z - w ∈ J)
-    : logPoly k z - logPoly k w ∈ J := by
+theorem logPoly_sub_mem (k : ℕ) {z w : R} {J : Ideal R} (h : z - w ∈ J) :
+    logPoly k z - logPoly k w ∈ J := by
   rw [logPoly, logPoly, ← Finset.sum_sub_distrib]
   refine J.sum_mem fun i _ => ?_
   rw [← mul_sub]
@@ -37,8 +82,8 @@ theorem logPoly_sub_mem (k : ℕ) {z w : R} {J : Ideal R} (h : z - w ∈ J)
 
 variable {B : Type*} [CommRing B] [Algebra ℚ B] {I : Ideal B} [IsAdicComplete I B]
 
-theorem factorial_mul_logOnePlus_sub_logPoly_mem {z : B} (hz : z ∈ I) (k : ℕ)
-    : (k.factorial : B) * logOnePlus I z hz - logPoly k z ∈ I ^ k := by
+theorem factorial_mul_logOnePlus_sub_logPoly_mem {z : B} (hz : z ∈ I) (k : ℕ) :
+    (k.factorial : B) * logOnePlus I z hz - logPoly k z ∈ I ^ k := by
   have h := (I ^ k).mul_mem_left (k.factorial : B) (logOnePlus_sub_sum_mem hz k)
   convert h using 1
   rw [mul_sub, logPoly, Finset.mul_sum]
@@ -69,8 +114,8 @@ local notation "𝔹" => BDeRhamPlus 𝒪 p
 local notation "𝔪" => maximalIdeal 𝔹
 local notation "φi" => RingEquiv.symm (_root_.frobeniusEquiv 𝒪♭ p)
 
-theorem exists_coe_eq_of_pow_eq_one {x : ℂ_[p]} {N : ℕ} (hN : N ≠ 0) (hx : x ^ N = 1)
-    : ∃ y : PadicAlgCl p, (y : ℂ_[p]) = x := by
+theorem exists_coe_eq_of_pow_eq_one {x : ℂ_[p]} {N : ℕ} (hN : N ≠ 0) (hx : x ^ N = 1) :
+    ∃ y : PadicAlgCl p, (y : ℂ_[p]) = x := by
   have : NeZero N := ⟨hN⟩
   obtain ⟨ζ, hζ⟩ := HasEnoughRootsOfUnity.exists_isPrimitiveRoot (PadicAlgCl p) N
   have hζ' : IsPrimitiveRoot (algebraMap (PadicAlgCl p) ℂ_[p] ζ) N :=
@@ -78,21 +123,19 @@ theorem exists_coe_eq_of_pow_eq_one {x : ℂ_[p]} {N : ℕ} (hN : N ≠ 0) (hx :
   obtain ⟨i, -, hi⟩ := hζ'.eq_pow_of_pow_eq_one hx
   exact ⟨ζ ^ i, by rw [← hi, ← map_pow]; rfl⟩
 
-theorem gal_smul_eq_pow_of_pow_eq_one
-    {L : IntermediateField ℚ_[p] (PadicAlgCl p)} (σ : Gal(PadicAlgCl p/L))
-    {x : ℂ_[p]} {N : ℕ} (hx : x ^ p ^ N = 1)
-    : σ • x = x ^ (PadicInt.toZModPow N (cycloChar L σ : ℤ_[p])).val := by
+theorem gal_smul_eq_pow_of_pow_eq_one {L : IntermediateField ℚ_[p] (PadicAlgCl p)}
+    (σ : Gal(PadicAlgCl p/L)) {x : ℂ_[p]} {N : ℕ} (hx : x ^ p ^ N = 1) :
+    σ • x = x ^ (PadicInt.toZModPow N (cycloChar L σ : ℤ_[p])).val := by
   obtain ⟨y, rfl⟩ := exists_coe_eq_of_pow_eq_one (pow_ne_zero N (Fact.out : p.Prime).ne_zero) hx
-  have hy : y ^ p ^ N = 1 :=
-    (algebraMap (PadicAlgCl p) ℂ_[p]).injective (by rw [map_pow, map_one]; exact hx)
+  have hy : y ^ p ^ N = 1 := (algebraMap (PadicAlgCl p) ℂ_[p]).injective (by
+    rw [map_pow, map_one]; exact hx)
   rw [gal_smul_coe, cycloChar_spec L σ hy]
   exact map_pow (algebraMap (PadicAlgCl p) ℂ_[p]) y _
 
 theorem iterate_frobSymm_mul (x y : 𝒪♭) (n : ℕ) : φi^[n] (x * y) = φi^[n] x * φi^[n] y := by
   induction n generalizing x y with
   | zero => rfl
-  | succ n ih =>
-    rw [Function.iterate_succ_apply', ih, map_mul, Function.iterate_succ_apply',
+  | succ n ih => rw [Function.iterate_succ_apply', ih, map_mul, Function.iterate_succ_apply',
       Function.iterate_succ_apply']
 
 theorem iterate_frobSymm_one (n : ℕ) : φi^[n] (1 : 𝒪♭) = 1 := by
@@ -108,53 +151,45 @@ theorem iterate_frobSymm_pow (x : 𝒪♭) (m n : ℕ) : φi^[n] (x ^ m) = (φi^
 theorem iterate_frobSymm_pow_p_pow (x : 𝒪♭) (n : ℕ) : (φi^[n] x) ^ p ^ n = x := by
   induction n generalizing x with
   | zero => simp
-  | succ n ih => rw [Function.iterate_succ_apply, pow_succ, pow_mul, ih, frobeniusEquiv_symm_pow_p]
+  | succ n ih =>
+    rw [Function.iterate_succ_apply, pow_succ, pow_mul, ih, frobeniusEquiv_symm_pow_p]
 
-theorem preTiltMap_iterate_frobSymm
-    {L : IntermediateField ℚ_[p] (PadicAlgCl p)} (σ : Gal(PadicAlgCl p/L)) (x : 𝒪♭) (n : ℕ)
-    : preTiltMap p (galCp σ : ℂ_[p] →+* ℂ_[p]) (AInf.norm_galCp_toRingHom σ) (φi^[n] x)
-      = φi^[n] (preTiltMap p (galCp σ : ℂ_[p] →+* ℂ_[p]) (AInf.norm_galCp_toRingHom σ) x) := by
+theorem preTiltMap_iterate_frobSymm {L : IntermediateField ℚ_[p] (PadicAlgCl p)}
+    (σ : Gal(PadicAlgCl p/L)) (x : 𝒪♭) (n : ℕ) :
+    preTiltMap p (galCp σ : ℂ_[p] →+* ℂ_[p]) (AInf.norm_galCp_toRingHom σ) (φi^[n] x) =
+      φi^[n] (preTiltMap p (galCp σ : ℂ_[p] →+* ℂ_[p]) (AInf.norm_galCp_toRingHom σ) x) := by
   induction n with
   | zero => rfl
   | succ n ih =>
     rw [Function.iterate_succ_apply', Function.iterate_succ_apply', ← ih]
     exact RingHom.map_frobeniusEquiv_symm p _ _
 
-theorem gal_smul_muBdR
-    {L : IntermediateField ℚ_[p] (PadicAlgCl p)} (σ : Gal(PadicAlgCl p/L)) (ε : 𝒪♭)
-    : σ • muBdR p ε
-      = wittToBDeRhamPlus 𝒪 p
-          (teichmuller p (preTiltMap p (galCp σ : ℂ_[p] →+* ℂ_[p]) (AInf.norm_galCp_toRingHom σ) ε))
-        - 1 := by
-  rw [muBdR_eq, gal_smul_bdR_def, map_sub, map_one, ← gal_smul_bdR_def, gal_smul_wittToBDeRhamPlus,
-    AInf.gal_smul_teichmuller]
+theorem gal_smul_muBdR {L : IntermediateField ℚ_[p] (PadicAlgCl p)} (σ : Gal(PadicAlgCl p/L))
+    (ε : 𝒪♭) :
+    σ • muBdR p ε = wittToBDeRhamPlus 𝒪 p (teichmuller p
+      (preTiltMap p (galCp σ : ℂ_[p] →+* ℂ_[p]) (AInf.norm_galCp_toRingHom σ) ε)) - 1 := by
+  rw [muBdR_eq, gal_smul_bdR_def, map_sub, map_one, ← gal_smul_bdR_def,
+    gal_smul_wittToBDeRhamPlus, AInf.gal_smul_teichmuller]
 
-theorem gal_smul_fontaineT_eq
-    {L : IntermediateField ℚ_[p] (PadicAlgCl p)} (σ : Gal(PadicAlgCl p/L))
-    {ε : 𝒪♭} (hε : PreTilt.untilt ε = 1)
-    : σ • fontaineT ε hε
-      = logOnePlus 𝔪 (σ • muBdR p ε) (gal_smul_mem_maximalIdeal σ (muBdR_mem hε)) := by
+theorem gal_smul_fontaineT_eq {L : IntermediateField ℚ_[p] (PadicAlgCl p)}
+    (σ : Gal(PadicAlgCl p/L)) {ε : 𝒪♭} (hε : PreTilt.untilt ε = 1) :
+    σ • fontaineT ε hε = logOnePlus 𝔪 (σ • muBdR p ε) (gal_smul_mem_maximalIdeal σ (muBdR_mem hε)) := by
   rw [gal_smul_bdR_def, fontaineT, logOnePlus, logOnePlus]
   exact map_seriesEval (galBdRHom σ)
     (Ideal.map_le_iff_le_comap.2 fun x hx => by
       have h := gal_smul_mem_maximalIdeal σ hx
       rw [gal_smul_bdR_def] at h
-      exact h)
-    _ _ _
+      exact h) _ _ _
 
-theorem gal_smul_fontaineT
-    {L : IntermediateField ℚ_[p] (PadicAlgCl p)} (σ : Gal(PadicAlgCl p/L))
-    {ε : 𝒪♭} (hε : PreTilt.untilt ε = 1)
-    : σ • fontaineT ε hε
-      = algebraMap ℚ_[p] 𝔹 ((cycloChar L σ : ℤ_[p]) : ℚ_[p]) * fontaineT ε hε := by
+theorem gal_smul_fontaineT {L : IntermediateField ℚ_[p] (PadicAlgCl p)} (σ : Gal(PadicAlgCl p/L))
+    {ε : 𝒪♭} (hε : PreTilt.untilt ε = 1) :
+    σ • fontaineT ε hε = algebraMap ℚ_[p] 𝔹 ((cycloChar L σ : ℤ_[p]) : ℚ_[p]) * fontaineT ε hε := by
   set a : ℤ_[p] := (cycloChar L σ : ℤ_[p]) with ha
   rw [← sub_eq_zero]
   refine IsPerfectoidField.eq_zero_of_forall_mem_maximalIdeal_pow fun k => ?_
   have hD : IsUnit ((k.factorial : ℕ) : 𝔹) := by
-    have h :=
-      (isUnit_iff_ne_zero.2
-          (Nat.cast_ne_zero.2 (Nat.factorial_ne_zero k) : ((k.factorial : ℕ) : ℚ) ≠ 0)).map
-        (algebraMap ℚ 𝔹)
+    have h := (isUnit_iff_ne_zero.2 (Nat.cast_ne_zero.2 (Nat.factorial_ne_zero k) :
+      ((k.factorial : ℕ) : ℚ) ≠ 0)).map (algebraMap ℚ 𝔹)
     rwa [map_natCast] at h
   refine (Ideal.unit_mul_mem_iff_mem _ hD).1 ?_
   refine IsPerfectoidField.mem_maximalIdeal_pow_of_forall_sub_mem fun M => ?_
@@ -176,11 +211,9 @@ theorem gal_smul_fontaineT
       rw [hε] at h
       exact congrArg Subtype.val h
     have h1 : ((PreTilt.untilt (φi^[M + k] ε') : 𝒪) : ℂ_[p]) = ((ζ : 𝒪) : ℂ_[p]) ^ aN := by
-      rw [hε', ← preTiltMap_iterate_frobSymm, AInf.coe_untilt_gal,
-        gal_smul_eq_pow_of_pow_eq_one σ hζ]
-    have h2
-        : ((PreTilt.untilt (φi^[M + k] ((hεu.unit⁻¹ : 𝒪♭ˣ) : 𝒪♭)) : 𝒪) : ℂ_[p]) * ((ζ : 𝒪) : ℂ_[p])
-          = 1 := by
+      rw [hε', ← preTiltMap_iterate_frobSymm, AInf.coe_untilt_gal, gal_smul_eq_pow_of_pow_eq_one σ hζ]
+    have h2 : ((PreTilt.untilt (φi^[M + k] ((hεu.unit⁻¹ : 𝒪♭ˣ) : 𝒪♭)) : 𝒪) : ℂ_[p]) *
+        ((ζ : 𝒪) : ℂ_[p]) = 1 := by
       have h3 : φi^[M + k] ((hεu.unit⁻¹ : 𝒪♭ˣ) : 𝒪♭) * φi^[M + k] ε = 1 := by
         rw [← iterate_frobSymm_mul, IsUnit.val_inv_mul, iterate_frobSymm_one]
       have h4 := congrArg (fun x => ((PreTilt.untilt x : 𝒪) : ℂ_[p])) h3
@@ -189,9 +222,8 @@ theorem gal_smul_fontaineT
       exact h4
     apply Subtype.ext
     rw [hν_def, hη_def, iterate_frobSymm_mul, iterate_frobSymm_pow, map_mul, map_pow]
-    change ((PreTilt.untilt (φi^[M + k] ε') : 𝒪) : ℂ_[p])
-        * ((PreTilt.untilt (φi^[M + k] ((hεu.unit⁻¹ : 𝒪♭ˣ) : 𝒪♭)) : 𝒪) : ℂ_[p]) ^ aN
-      = 1
+    change ((PreTilt.untilt (φi^[M + k] ε') : 𝒪) : ℂ_[p]) *
+      ((PreTilt.untilt (φi^[M + k] ((hεu.unit⁻¹ : 𝒪♭ˣ) : 𝒪♭)) : 𝒪) : ℂ_[p]) ^ aN = 1
     rw [h1, ← mul_pow, mul_comm, h2, one_pow]
 
   have hξ := IsPerfectoidField.ker_fontaineTheta_eq_span_kerThetaGenerator ℂ_[p] p
@@ -209,9 +241,8 @@ theorem gal_smul_fontaineT
   set Zμ : 𝕎𝒪♭ := teichmuller p ε - 1 with hZμ
   have hJ : logPoly k Z1 - logPoly k Z0 ∈ span {(p : 𝕎𝒪♭) ^ M} ⊔ span {ξ ^ k} := by
     apply logPoly_sub_mem
-    have h3 :=
-      one_add_pow_prime_pow_sub_one_mem (Fact.out : p.Prime) (ξ * c) (M + k) k k
-        (Nat.lt_pow_self (Fact.out : p.Prime).one_lt).le
+    have h3 := one_add_pow_prime_pow_sub_one_mem (Fact.out : p.Prime) (ξ * c) (M + k) k k
+      (Nat.lt_pow_self (Fact.out : p.Prime).one_lt).le
     rw [show M + k - k = M by omega] at h3
     have h4 : span {(ξ * c) ^ k} ≤ span {ξ ^ k} :=
       span_singleton_le_span_singleton.2 (by rw [mul_pow]; exact dvd_mul_right _ _)
@@ -253,11 +284,11 @@ theorem gal_smul_fontaineT
   have E_P1 : logPoly k (σ • μ) = W (logPoly k Z1) := by rw [hσμ, map_logPoly]
   have E_P0 : logPoly k ((1 + μ) ^ aN - 1) = W (logPoly k Z0) := by rw [hz0, map_logPoly]
   have E_Pμ : logPoly k μ = W (logPoly k Zμ) := by rw [hμ, map_logPoly]
-  have E_αβ : W (logPoly k Z1) - W (logPoly k Z0) = (p : 𝔹) ^ M * W α' + W ξ ^ k * W β' := by
+  have E_αβ : W (logPoly k Z1) - W (logPoly k Z0) =
+      (p : 𝔹) ^ M * W α' + W ξ ^ k * W β' := by
     rw [← map_sub, ← hαβ, map_add (f := _), map_mul, map_mul, map_pow, map_pow, map_natCast]
-  have E_a
-      : algebraMap ℚ_[p] 𝔹 (a : ℚ_[p])
-        = (aN : 𝔹) - (p : 𝔹) ^ (M + k) * W (IsPerfectoidField.padicIntToWitt (K := ℂ_[p]) p γ) := by
+  have E_a : algebraMap ℚ_[p] 𝔹 (a : ℚ_[p]) =
+      (aN : 𝔹) - (p : 𝔹) ^ (M + k) * W (IsPerfectoidField.padicIntToWitt (K := ℂ_[p]) p γ) := by
     have h : a = (aN : ℤ_[p]) - (p : ℤ_[p]) ^ (M + k) * γ := by rw [← hγ]; ring
     rw [h, PadicInt.coe_sub, map_sub, PadicInt.coe_natCast, map_natCast,
       IsPerfectoidField.algebraMap_padic_coe, map_mul, map_mul, map_pow, map_pow, map_natCast,
@@ -268,14 +299,13 @@ theorem gal_smul_fontaineT
       exact mem_span_singleton_self _
     exact Ideal.mul_mem_right _ _ (Ideal.pow_mem_pow h1 k)
   refine ⟨α' + (p : 𝕎𝒪♭) ^ k * IsPerfectoidField.padicIntToWitt (K := ℂ_[p]) p γ * logPoly k Zμ, ?_⟩
-  have key
-      : (k.factorial : 𝔹) * (σ • t - algebraMap ℚ_[p] 𝔹 (a : ℚ_[p]) * t)
-          - (p : 𝔹) ^ M * W
-            (α' + (p : 𝕎𝒪♭) ^ k * IsPerfectoidField.padicIntToWitt (K := ℂ_[p]) p γ * logPoly k Zμ)
-        = ((k.factorial : 𝔹) * L1 - logPoly k (σ • μ))
-          - ((k.factorial : 𝔹) * tN - logPoly k ((1 + μ) ^ aN - 1)) + W ξ ^ k * W β'
-          + (p : 𝔹) ^ (M + k) * W (IsPerfectoidField.padicIntToWitt (K := ℂ_[p]) p γ)
-            * ((k.factorial : 𝔹) * t - logPoly k μ) := by
+  have key : (k.factorial : 𝔹) * (σ • t - algebraMap ℚ_[p] 𝔹 (a : ℚ_[p]) * t) -
+      (p : 𝔹) ^ M * W (α' + (p : 𝕎𝒪♭) ^ k *
+        IsPerfectoidField.padicIntToWitt (K := ℂ_[p]) p γ * logPoly k Zμ) =
+      ((k.factorial : 𝔹) * L1 - logPoly k (σ • μ)) -
+        ((k.factorial : 𝔹) * tN - logPoly k ((1 + μ) ^ aN - 1)) + W ξ ^ k * W β' +
+        (p : 𝔹) ^ (M + k) * W (IsPerfectoidField.padicIntToWitt (K := ℂ_[p]) p γ) *
+          ((k.factorial : 𝔹) * t - logPoly k μ) := by
     rw [map_add (f := _), map_mul, map_mul, map_pow, map_natCast]
     linear_combination (k.factorial : 𝔹) * E_σ + (k.factorial : 𝔹) * E_N -
       (k.factorial : 𝔹) * t * E_a + E_P1 - E_P0 + E_αβ +
@@ -283,8 +313,8 @@ theorem gal_smul_fontaineT
   rw [key]
   exact add_mem (add_mem (sub_mem X1 X0) hξk) (Ideal.mul_mem_left _ _ X2)
 
-theorem gal_smul_tBdR {L : IntermediateField ℚ_[p] (PadicAlgCl p)} (σ : Gal(PadicAlgCl p/L))
-    : σ • tBdR p = algebraMap ℚ_[p] 𝔹 ((cycloChar L σ : ℤ_[p]) : ℚ_[p]) * tBdR p :=
+theorem gal_smul_tBdR {L : IntermediateField ℚ_[p] (PadicAlgCl p)} (σ : Gal(PadicAlgCl p/L)) :
+    σ • tBdR p = algebraMap ℚ_[p] 𝔹 ((cycloChar L σ : ℤ_[p]) : ℚ_[p]) * tBdR p :=
   gal_smul_fontaineT σ untilt_epsilon
 
 end Cp

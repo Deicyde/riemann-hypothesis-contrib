@@ -1,8 +1,50 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Definitions.Divisors.GhostFrobenius
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ConvEqOneOfForallPairing
+import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ConvEqOneOfForallPairing
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Coalgebra.CoassocSimps
+import Mathlib.RingTheory.Radical.NatInt
+public import Mathlib.RingTheory.Valuation.Integral
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
 
 @[expose] public section
 
@@ -33,8 +75,8 @@ theorem exists_eq_apply_of_algHom
       change f _ * f _ = f _
       rw [← map_mul, hsq])
   have hsum : ∑ k, f (Pi.single k 1) = 1 := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← map_sum, ← map_one f]
+
+    rw [← map_sum, ← map_one f]
     congr 1
     ext j
     simp [Finset.sum_apply, Pi.single_apply]
@@ -119,15 +161,15 @@ theorem level_span
     (LinearMap.proj n ∘ₗ G.dual.omegaSub.subtype)
       ∘ₗ Fintype.linearCombination O (fun i => hodgeTate G (b i))
   have hLev : ∀ c, Lev c = ∑ i, c i • (hodgeTate G (b i)).1 n := fun c => by
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [Lev, LinearMap.comp_apply, Fintype.linearCombination_apply, map_sum, map_smul]
+
+    simp only [Lev, LinearMap.comp_apply, Fintype.linearCombination_apply, map_sum, map_smul]
     rfl
   have hpt : ∀ t : G.Tate, (hodgeTate G t).1 n ∈ LinearMap.range Lev := fun t => by
     refine ⟨fun i => (digit n (b.repr t i) : O), ?_⟩
     rw [hLev]
     conv_rhs => rw [← b.sum_repr t]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     change _ = ((∑ i, hodgeTate G (b.repr t i • b i) : G.dual.omega) : ∀ k, Cot O (G.dual.A k)) n
     rw [Submodule.coe_sum, Finset.sum_apply]
     exact Finset.sum_congr rfl fun i _ => (hodgeTate_smul_val G _ _ n).symm
@@ -151,16 +193,16 @@ theorem level_span
     refine WithConv.ofConv_injective ?_
     conv_lhs => rw [← β.sum_dual_apply_smul_coord φ.ofConv]
     change _ = CartierDual.toDual O (G.A n) _
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     refine Finset.sum_congr rfl fun k _ => ?_
     rw [map_smul, hγ]
     rfl
   suffices hw : AugCot.d (counitAlgHom O (G.dual.A n)) φ ∈ LinearMap.range Lev by
     obtain ⟨c, hc⟩ := hw
     exact ⟨c, (hLev c).symm.trans hc⟩
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [hφ, map_sum]
+
+  rw [hφ, map_sum]
   exact Submodule.sum_mem _ fun k _ => by rw [map_smul]; exact Submodule.smul_mem _ _ (hmem k)
 
 end GlobalTheory.ConstHT
@@ -260,8 +302,8 @@ theorem level_indep
     · subst hi; rw [Finsupp.single_eq_same, map_one, hg1, if_pos rfl]
     · rw [Finsupp.single_eq_of_ne (Ne.symm hi), map_zero, map_zero, if_neg hi]
   have h2 := congrArg Dl hc
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum, map_zero] at h2
+
+  rw [map_sum, map_zero] at h2
   simp only [map_smul, hDl, smul_ite, smul_zero, Finset.sum_ite_eq', Finset.mem_univ, if_true] at h2
   rw [← Ideal.mem_span_singleton, ← Ideal.Quotient.eq_zero_iff_mem]
   rw [Algebra.smul_def, mul_one] at h2
@@ -309,8 +351,8 @@ theorem omega_const
     have hcompat : ∀ n i, (p : O) ^ n ∣ c (n + 1) i - c n i := fun n =>
       level_indep p C O G hG h b n _ (by
         simp only [Pi.sub_apply, sub_smul, Finset.sum_sub_distrib]
-        set_option synthInstance.maxHeartbeats 100000 in
-          rw [sub_eq_zero, hc n, ← w.2 n, ← hc (n + 1), map_sum]
+
+        rw [sub_eq_zero, hc n, ← w.2 n, ← hc (n + 1), map_sum]
         refine Finset.sum_congr rfl fun i _ => ?_
         rw [map_smul, (hodgeTate G (b i)).2 n])
     have hL : ∀ i, ∃ L : O, ∀ n, (p : O) ^ n ∣ c n i - L := fun i => by

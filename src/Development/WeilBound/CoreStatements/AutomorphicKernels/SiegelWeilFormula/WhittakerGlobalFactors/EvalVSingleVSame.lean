@@ -1,7 +1,48 @@
 module
 
-public import Development.WeilBound.CoreStatements.AutomorphicKernels.SiegelWeilFormula.WhittakerGlobalFactors.MeasurableSetUH
-public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.ExistsEqAdelicCharMul
+public import Formalism.UnipotentAdelicQuotients.SWXSDefs
+public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.SiegelEisensteinUnfoldingIdentity
+public import Development.AutomorphicSpectrum.Proofs.NonGaloisProofs.ExistsEqAdelicCharMul
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.IsUnitHermOfDet
+import Development.WeilBound.CoreStatements.AutomorphicKernels.SiegelWeilFormula.WhitGenOf
+import Development.WeilBound.CoreStatements.AutomorphicKernels.UnitarySchrodingerModel.LocalDefs
+import Development.WeilBound.RepresentationTheoryGL.SiegelWeilProof.HolomorphicContinuation.IsSingTest
 
 @[expose] public section
 
@@ -9,8 +50,7 @@ noncomputable section
 
 namespace PositivityTheory.SiegelWeilFormula.GFac
 
-open HeckeCharacterZeroLocus.SiegelWeilU NumberField IsDedekindDomain MeasureTheory
-  GlobalTheory.Cont PositivityTheory.PfSWUS.Loc PositivityTheory.Rg.Sw Filter
+open HeckeCharacterZeroLocus.SiegelWeilU NumberField IsDedekindDomain MeasureTheory GlobalTheory.Cont PositivityTheory.PfSWUS.Loc PositivityTheory.Rg.Sw Filter
 open PositivityTheory.SiegelWeilFormula.Gen
 open GlobalTheory.CompanionTheory.SiegelND.Coef (hermInf hermFin hermV latH intH)
 open scoped TensorProduct Matrix
@@ -20,22 +60,19 @@ variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algeb
 theorem evalV_apply (v : HeightOneSpectrum (𝓞 F)) (a : Af F) : evalV F v a = a v := rfl
 
 open Classical in
-theorem evalV_singleV_same (v : HeightOneSpectrum (𝓞 F)) (y : Fv F v)
-    : evalV F v (singleV F v y) = y := by
+theorem evalV_singleV_same (v : HeightOneSpectrum (𝓞 F)) (y : Fv F v) : evalV F v (singleV F v y) = y := by
   rw [evalV_apply]
   unfold singleV
   exact RestrictedProduct.single_eq_same _ _ _
 
 open Classical in
-theorem evalV_singleV_ne {v w : HeightOneSpectrum (𝓞 F)} (h : w ≠ v) (y : Fv F v)
-    : evalV F w (singleV F v y) = 0 := by
+theorem evalV_singleV_ne {v w : HeightOneSpectrum (𝓞 F)} (h : w ≠ v) (y : Fv F v) : evalV F w (singleV F v y) = 0 := by
   rw [evalV_apply]
   unfold singleV
   exact RestrictedProduct.single_eq_of_ne _ _ h
 
-theorem addChar_sum
-    {A M ι : Type} [AddCommMonoid A] [CommMonoid M] (ψ : AddChar A M) (s : Finset ι) (f : ι → A)
-    : ψ (∑ i ∈ s, f i) = ∏ i ∈ s, ψ (f i) := by
+theorem addChar_sum {A M ι : Type} [AddCommMonoid A] [CommMonoid M] (ψ : AddChar A M) (s : Finset ι) (f : ι → A) :
+    ψ (∑ i ∈ s, f i) = ∏ i ∈ s, ψ (f i) := by
   classical
   induction s using Finset.induction_on with
   | empty => simp
@@ -48,35 +85,30 @@ theorem fstA_pairA (x : Ainf F) (y : Af F) : fstA F (pairA F x y) = x := rfl
 
 theorem sndA_pairA (x : Ainf F) (y : Af F) : sndA F (pairA F x y) = y := rfl
 
-theorem psi_split (ψ : AddChar (AF F) ℂ) (hψ : IsCharAF F ψ)
-    : ∃ S₀ : Finset (HeightOneSpectrum (𝓞 F)), ∀ S,
-      S₀ ⊆ S
-        → ∀ x : AF F,
-          (∀ v, v ∉ S → evalV F v (sndA F x) ∈ v.adicCompletionIntegers F)
-            → ψ x = psiInf F ψ (fstA F x) * ∏ v ∈ S, psiV F ψ v (evalV F v (sndA F x)) := by
+theorem psi_split (ψ : AddChar (AF F) ℂ) (hψ : IsCharAF F ψ) :
+    ∃ S₀ : Finset (HeightOneSpectrum (𝓞 F)), ∀ S, S₀ ⊆ S → ∀ x : AF F,
+      (∀ v, v ∉ S → evalV F v (sndA F x) ∈ v.adicCompletionIntegers F) →
+      ψ x = psiInf F ψ (fstA F x) * ∏ v ∈ S, psiV F ψ v (evalV F v (sndA F x)) := by
   classical
   obtain ⟨ξ, hξ⟩ := GlobalTheory.CompanionTheory.AdeleDual.exists_eq_adelicChar_mul ψ hψ.1 hψ.2.2.1
-  have hfin
-      : {v : HeightOneSpectrum (𝓞 F) | ¬ algebraMap F (Fv F v) ξ ∈ v.adicCompletionIntegers F}.Finite :=
+  have hfin : {v : HeightOneSpectrum (𝓞 F) | ¬ algebraMap F (Fv F v) ξ ∈ v.adicCompletionIntegers F}.Finite :=
     Filter.eventually_cofinite.1 (GlobalTheory.CompanionTheory.SiegelND.Coef.Lim.ev_rat ξ)
   refine ⟨hfin.toFinset, fun S hS x hx => ?_⟩
   set xf : Af F := sndA F x with hxf
   set r : Af F := xf - ∑ v ∈ S, singleV F v (evalV F v xf) with hr
-  have hdec
-      : x
-        = pairA F (fstA F x) 0 + ∑ v ∈ S, pairA F 0 (singleV F v (evalV F v xf)) + pairA F 0 r := by
+  have hdec : x = pairA F (fstA F x) 0 + ∑ v ∈ S, pairA F 0 (singleV F v (evalV F v xf)) + pairA F 0 r := by
     refine AF_ext ?_ ?_
-    set_option synthInstance.maxHeartbeats 100000 in
-      · rw [map_add (f := _), map_add (f := _), map_sum, fstA_pairA, fstA_pairA]
-        simp only [fstA_pairA, Finset.sum_const_zero, add_zero]
-    set_option synthInstance.maxHeartbeats 100000 in
+
+    · rw [map_add (f := _), map_add (f := _), map_sum, fstA_pairA, fstA_pairA]
+      simp only [fstA_pairA, Finset.sum_const_zero, add_zero]
+
     · rw [map_add (f := _), map_add (f := _), map_sum, sndA_pairA, sndA_pairA]
       simp only [sndA_pairA, hr, hxf]
       abel
   have hrv : ∀ v, evalV F v r = if v ∈ S then 0 else evalV F v xf := by
     intro v
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hr, map_sub, map_sum]
+
+    rw [hr, map_sub, map_sum]
     by_cases hv : v ∈ S
     · rw [if_pos hv, Finset.sum_eq_single v]
       · rw [evalV_singleV_same, sub_self]
@@ -109,10 +141,7 @@ theorem psi_split (ψ : AddChar (AF F) ℂ) (hψ : IsCharAF F ψ)
       GroundTheory.Global.mem_invDifferentAdeles.mpr hmem
     rw [GroundTheory.Global.adelicChar_of_mem_invDifferentAdeles hm2]
     simp [pairA]
-  have h1
-      : ψ x
-        = ψ
-          (pairA F (fstA F x) 0 + ∑ v ∈ S, pairA F 0 (singleV F v (evalV F v xf)) + pairA F 0 r) :=
+  have h1 : ψ x = ψ (pairA F (fstA F x) 0 + ∑ v ∈ S, pairA F 0 (singleV F v (evalV F v xf)) + pairA F 0 r) :=
     congrArg ψ hdec
   rw [h1, AddChar.map_add_eq_mul, AddChar.map_add_eq_mul, addChar_sum, hr1, mul_one]
   rfl

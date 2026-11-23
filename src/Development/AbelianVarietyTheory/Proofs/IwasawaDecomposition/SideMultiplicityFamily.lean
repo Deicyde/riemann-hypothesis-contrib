@@ -1,6 +1,43 @@
 module
 
 public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.RingSpecNormalisedCharacterEq
+import Formalism.LocalToGlobal.UnitaryNorms.CharUniq
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.TypeStar
+import Formalism.LocalToGlobal.NormalizedHeckeFactors.CoverStdB
 
 @[expose] public section
 
@@ -103,20 +140,7 @@ section Gen
 variable {D : D7} {M : MtFam D}
 
 theorem jMt_inj' (μ : D.what₂.Tup) (j : ℕ) : Function.Injective (D.what₂.jMt μ j) := by
-  classical
-  let b := Module.Free.chooseBasis D.what₂.LL (D.what₂.MtL μ j)
-  have hb := (D.what₂.jMt_basis μ j b).1
-  have : Finite (Module.Free.ChooseBasisIndex D.what₂.LL (D.what₂.MtL μ j)) := hb.finite
-  haveI := Fintype.ofFinite (Module.Free.ChooseBasisIndex D.what₂.LL (D.what₂.MtL μ j))
-  refine (injective_iff_map_eq_zero (D.what₂.jMt μ j)).2 fun y hy => ?_
-  have hsum := b.sum_repr y
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [← hsum, map_sum] at hy
-  simp only [LinearMap.map_smulₛₗ] at hy
-  have hz := Fintype.linearIndependent_iff.1 hb _ hy
-  rw [← hsum]
-  refine Finset.sum_eq_zero fun a _ => ?_
-  rw [(map_eq_zero_iff _ D.what₂.embLL.injective).1 (hz a), zero_smul]
+  apply _root_.Formalism.L2.jMt_injective <;> assumption
 
 theorem hypOutside_transport'
     {μ μ' : D.what₂.Tup} {j j' : ℕ}
@@ -378,8 +402,6 @@ theorem qPl_sub
 
 end Chars
 
-set_option maxHeartbeats 4000000 in
-set_option synthInstance.maxHeartbeats 400000 in
 theorem heckeOpen_withLoc
     : ∀ (D : D7) (cf : CharFrame D) (jE : D.host.E →+* Qb) (A : SideA D cf jE) (low : Finset ℕ)
         (Pq : HeightOneSpectrum (𝓞 (maximalRealSubfield D.host.E)) → PlE D.host) (S : RatDat D.ntw)

@@ -1,11 +1,54 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicArithmetic.OrbitLabellings.ColDefs
-public import Development.AutomorphicArithmetic.OrbitLabellings.ExistsFrobeniusEquivariantLocalBasisCoordinates
 public import Development.AbelianVarietyTheory.Definitions.GaloisGeometry.StdBases
-public import Formalism.LocalRingCardinality.DataForced
-public import Formalism.LocalToGlobal.TorsionIntegrality.GaussSumParity.SingleLetterBiextensionRelation
+public import Formalism.LocalToGlobal.TorsionIntegrality.CMGoodModels.Statement
+public import Formalism.LocalToGlobal.TorsionIntegrality.GaussSumParity.TrDual
+public import Development.AutomorphicArithmetic.OrbitLabellings.ExistsFrobeniusEquivariantLocalBasisCoordinates
+public import Formalism.LocalToGlobal.TorsionIntegrality.GaussSumParity.KummerThetaLogarithms.TraceDualExists
+import Formalism.LocalToGlobal.TorsionIntegrality.GaussSumParity.TransportFirstLevel
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Lemma
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
@@ -52,8 +95,8 @@ private lemma gam_fix (hp : IsPos i pos) {g : Lt → K} (hg : ∀ z, σ (σ (g z
   unfold gam
   rw [← Finset.sum_range (fun m => (σ ^ (2 * m)) c * g (pos r (2 * m)))]
   refine Eq.trans ?_ h3.symm
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, map_mul, hg, hp.add]
+
+  simp only [map_sum, map_mul, hg, hp.add]
   refine Finset.sum_congr rfl fun m _ => ?_
   rw [mul_add, mul_one, add_comm (2 * m) 2, ← pp]
   rfl
@@ -74,8 +117,8 @@ private lemma gam_conj (hp : IsPos i pos) (hi : Odd i) {g h : Lt → K} (hg : �
   have e2 : ∀ z, (σ ^ i) (g z) = h z := fun z => by
     rw [e1, move_even hp hg2, hg, hp.add, ← hj, hp.period]
   rw [← fix_even (gam_fix hp hg2 hc r) j, ← e1]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [gam, map_sum, map_mul, e2, pp, add_comm]
+
+  simp only [gam, map_sum, map_mul, e2, pp, add_comm]
 
 private lemma dual_swap {om oms : Fin i → K}
     (hd : ∀ ρ ρ', ∑ m : Fin i, (σ ^ (2 * m.val)) (om ρ * oms ρ') = if ρ = ρ' then 1 else 0) (t s : Fin i) :
@@ -154,8 +197,8 @@ private lemma gam_lin {C : Type} [Field C] (j : K →+* C) [NeZero i] [Fintype L
   simp only [e1, Finset.mul_sum]
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun s _ => ?_
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [← e2, map_sum, map_sum, Finset.sum_mul]
+
+  rw [← e2, map_sum, map_sum, Finset.sum_mul]
   refine Finset.sum_congr rfl fun ρ _ => ?_
   rw [map_mul, map_mul, mul_assoc]
 
@@ -186,8 +229,8 @@ private lemma subst_lin {σ τ : Type} [Fintype σ] {K : Type} [Field K] {a : σ
     (ha : MvPowerSeries.HasSubst a) (α : σ → K) :
     MvPowerSeries.subst a (∑ j, MvPowerSeries.C (α j) * MvPowerSeries.X j : MvPowerSeries σ K) =
       ∑ j, MvPowerSeries.C (α j) * a j := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [← MvPowerSeries.coe_substAlgHom ha, map_sum]
+
+  rw [← MvPowerSeries.coe_substAlgHom ha, map_sum]
   refine Finset.sum_congr rfl fun j _ => ?_
   rw [MvPowerSeries.coe_substAlgHom ha, MvPowerSeries.subst_mul ha, MvPowerSeries.subst_X ha, MvPowerSeries.subst_C]
 
@@ -218,8 +261,8 @@ private lemma subst_atLin {p : ℕ} [Fact p.Prime] {ν ι s : Type} [Fintype ν]
   simp_rw [Finset.mul_sum]
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun j _ => ?_
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [← mul_assoc, ← map_mul, h k j, map_sum, Finset.sum_mul]
+
+  rw [← mul_assoc, ← map_mul, h k j, map_sum, Finset.sum_mul]
   refine Finset.sum_congr rfl fun i _ => ?_
   rw [map_mul, mul_assoc]
 

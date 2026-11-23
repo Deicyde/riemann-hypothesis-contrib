@@ -1,7 +1,56 @@
 module
 
-public import Mathlib
+import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.AdmissibleUnitarySemisimple
 public import Development.AbelianVarietyTheory.Definitions.Foundations.SmoothPartStable
+public import Mathlib.Basic.Complex.Basic
+public import Mathlib.RepresentationTheory.Irreducible
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.CStarAlgebra.Classes
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
+public import Mathlib.Topology.LocallyConstant.Basic
 
 @[expose] public section
 
@@ -11,104 +60,49 @@ open GlobalTheory.PRep
 
 namespace PositivityTheory.RgUd.Form.U.Asm
 
-theorem mem_fixed_iff_irr
-    {G D : Type} [Group G] [AddCommGroup D] [Module ℂ D]
-    (ρ : Representation ℂ G D) (K : Subgroup G) (v : D)
-    : v ∈ fixed ρ K ↔ ∀ h : K, ρ (h : G) v = v := by
+theorem mem_fixed_iff_irr {G D : Type} [Group G] [AddCommGroup D] [Module ℂ D] (ρ : Representation ℂ G D)
+    (K : Subgroup G) (v : D) : v ∈ fixed ρ K ↔ ∀ h : K, ρ (h : G) v = v := by
   change (∀ h : K, ρ (h : G) v = ((1 : K →* ℂˣ) h : ℂ) • v) ↔ _
   simp
 
-theorem exists_orth_of_finset
-    {D : Type} [AddCommGroup D] [Module ℂ D]
-    (B : D →ₗ[ℂ] D →ₗ⋆[ℂ] ℂ) (hBp : ∀ x, x ≠ 0 → 0 < (B x x).re)
-    (s : Finset D)
-    : ∀ u : D, ∃ w ∈ Submodule.span ℂ (s : Set D), ∀ m ∈ Submodule.span ℂ (s : Set D),
-      B (u - w) m = 0 := by
-  classical
-  induction s using Finset.induction_on with
-  | empty =>
-    intro u
-    refine ⟨0, Submodule.zero_mem _, ?_⟩
-    intro m hm
-    simp only [Finset.coe_empty, Submodule.span_empty, Submodule.mem_bot] at hm
-    simp [hm]
-  | insert a s ha ih =>
-    intro u
-    obtain ⟨wa, hwa, hwa'⟩ := ih a
-    obtain ⟨wu, hwu, hwu'⟩ := ih u
-    obtain ⟨a', ha'⟩ : ∃ a' : D, a' = a - wa := ⟨_, rfl⟩
-    obtain ⟨c, hc⟩ : ∃ c : ℂ, c = B (u - wu) a' / B a' a' := ⟨_, rfl⟩
-    have hsub : Submodule.span ℂ (s : Set D) ≤ Submodule.span ℂ ((insert a s : Finset D) : Set D) :=
-      Submodule.span_mono (by rw [Finset.coe_insert]; exact Set.subset_insert _ _)
-    have hamem : a ∈ Submodule.span ℂ ((insert a s : Finset D) : Set D) :=
-      Submodule.subset_span (by simp)
-    refine ⟨wu + c • a', ?_, ?_⟩
-    · rw [ha']
-      exact Submodule.add_mem _ (hsub hwu)
-        (Submodule.smul_mem _ _ (Submodule.sub_mem _ hamem (hsub hwa)))
-    · have hexp : ∀ m, B (u - (wu + c • a')) m = B (u - wu) m - c * B a' m := by
-        intro m
-        rw [show u - (wu + c • a') = (u - wu) - c • a' by abel, map_sub, map_smul,
-          LinearMap.sub_apply, LinearMap.smul_apply, smul_eq_mul]
-      have hs : ∀ m ∈ Submodule.span ℂ (s : Set D), B (u - (wu + c • a')) m = 0 := by
-        intro m hm
-        rw [hexp, hwu' m hm, ha', hwa' m hm, mul_zero, sub_zero]
-      have key : ∀ m ∈ ((insert a s : Finset D) : Set D), B (u - (wu + c • a')) m = 0 := by
-        intro m hm
-        rw [Finset.coe_insert, Set.mem_insert_iff] at hm
-        rcases hm with hm | hm
-        · have hsplit : m = a' + wa := by rw [hm, ha']; abel
-          rw [hsplit, map_add (f := _), hs wa hwa, add_zero, hexp]
-          by_cases h0 : B a' a' = 0
-          · have h0' : a' = 0 := by
-              by_contra hne
-              have := hBp a' hne
-              rw [h0] at this
-              simp at this
-            simp [h0']
-          · rw [hc, div_mul_cancel₀ _ h0, sub_self]
-        · exact hs m (Submodule.subset_span hm)
-      intro m hm
-      have hle
-          : Submodule.span ℂ ((insert a s : Finset D) : Set D)
-            ≤ LinearMap.ker (B (u - (wu + c • a'))) :=
-        Submodule.span_le.2 (fun m hm => LinearMap.mem_ker.2 (key m hm))
-      exact LinearMap.mem_ker.1 (hle hm)
+theorem exists_orth_of_finset {D : Type} [AddCommGroup D] [Module ℂ D] (B : D →ₗ[ℂ] D →ₗ⋆[ℂ] ℂ)
+    (hBp : ∀ x, x ≠ 0 → 0 < (B x x).re) (s : Finset D) :
+    ∀ u : D, ∃ w ∈ Submodule.span ℂ (s : Set D), ∀ m ∈ Submodule.span ℂ (s : Set D), B (u - w) m = 0 := by
+  apply GlobalTheory.CompanionTheory.UnitSemisimple.exists_proj_finset <;> assumption
 
-theorem exists_orth_decomp
-    {G D : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [AddCommGroup D] [Module ℂ D]
-    (ρ : Representation ℂ G D) (hA : IsAdmissible ρ)
-    (K₁ : Subgroup G) (hK₁o : IsOpen (K₁ : Set G)) (hK₁c : IsCompact (K₁ : Set G))
-    (χ : G → ℝ) (B : D →ₗ[ℂ] D →ₗ⋆[ℂ] ℂ)
-    (hBp : ∀ x, x ≠ 0 → 0 < (B x x).re) (hBe : ∀ g x y, B (ρ g x) (ρ g y) = (χ g : ℂ) * B x y)
-    (W : Submodule ℂ D) (hW : ∀ g, ∀ w ∈ W, ρ g w ∈ W)
-    (u : D)
-    : ∃ w ∈ W, ∀ w' ∈ W, B (u - w) w' = 0 := by
+theorem exists_orth_decomp {G D : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [AddCommGroup D]
+    [Module ℂ D] (ρ : Representation ℂ G D) (hA : IsAdmissible ρ) (K₁ : Subgroup G) (hK₁o : IsOpen (K₁ : Set G))
+    (hK₁c : IsCompact (K₁ : Set G)) (χ : G → ℝ) (B : D →ₗ[ℂ] D →ₗ⋆[ℂ] ℂ)
+    (hBp : ∀ x, x ≠ 0 → 0 < (B x x).re)
+    (hBe : ∀ g x y, B (ρ g x) (ρ g y) = (χ g : ℂ) * B x y) (W : Submodule ℂ D)
+    (hW : ∀ g, ∀ w ∈ W, ρ g w ∈ W) (u : D) :
+    ∃ w ∈ W, ∀ w' ∈ W, B (u - w) w' = 0 := by
   classical
   by_cases hu : u = 0
   · exact ⟨0, W.zero_mem, fun w' _ => by simp [hu]⟩
-  let S : Subgroup G := {
-    carrier := {g | ρ g u = u}
-    mul_mem' := by
-      intro a b (ha : ρ a u = u) (hb : ρ b u = u)
-      show ρ (a * b) u = u
-      rw [map_mul, Module.End.mul_apply, hb, ha]
-    one_mem' := by
-      show ρ 1 u = u
-      simp
-    inv_mem' := by
-      intro a (ha : ρ a u = u)
-      show ρ a⁻¹ u = u
-      conv_lhs => rw [← ha]
-      rw [← Module.End.mul_apply, ← map_mul, inv_mul_cancel, map_one, Module.End.one_apply]
-  }
+  let S : Subgroup G :=
+    { carrier := {g | ρ g u = u}
+      mul_mem' := by
+        intro a b (ha : ρ a u = u) (hb : ρ b u = u)
+        show ρ (a * b) u = u
+        rw [map_mul, Module.End.mul_apply, hb, ha]
+      one_mem' := by
+        show ρ 1 u = u
+        simp
+      inv_mem' := by
+        intro a (ha : ρ a u = u)
+        show ρ a⁻¹ u = u
+        conv_lhs => rw [← ha]
+        rw [← Module.End.mul_apply, ← map_mul, inv_mul_cancel, map_one, Module.End.one_apply] }
   have hSo : IsOpen (S : Set G) := hA.1 u
   let K : Subgroup G := K₁ ⊓ S
-  have hKo : IsOpen (K : Set G) := by rw [Subgroup.coe_inf]; exact hK₁o.inter hSo
+  have hKo : IsOpen (K : Set G) := by
+    rw [Subgroup.coe_inf]; exact hK₁o.inter hSo
   have hKc : IsCompact (K : Set G) := by
     rw [Subgroup.coe_inf]; exact hK₁c.inter_right (Subgroup.isClosed_of_isOpen S hSo)
   have hKS : ∀ k : K, ρ (k : G) u = u := fun k => (Subgroup.mem_inf.1 k.2).2
-  have hBu : B u u ≠ 0 := by intro h; have := hBp u hu; rw [h] at this; simp at this
+  have hBu : B u u ≠ 0 := by
+    intro h; have := hBp u hu; rw [h] at this; simp at this
   have hχ : ∀ k : K, (χ k : ℂ) = 1 := by
     intro k
     have h := hBe k u u
@@ -135,12 +129,8 @@ theorem exists_orth_decomp
   have hf : IsLocallyConstant f := by
     rw [IsLocallyConstant.iff_exists_open]
     intro k0
-    refine ⟨
-      (fun k : K => (k0 : G)⁻¹ * (k : G)) ⁻¹' {g | ρ g w' = w'},
-      (hA.1 w').preimage (continuous_const.mul continuous_subtype_val),
-      ?_,
-      ?_
-    ⟩
+    refine ⟨(fun k : K => (k0 : G)⁻¹ * (k : G)) ⁻¹' {g | ρ g w' = w'},
+      (hA.1 w').preimage (continuous_const.mul continuous_subtype_val), ?_, ?_⟩
     · simp
     · intro k hk
       simp only [Set.mem_preimage, Set.mem_ofPred_eq] at hk
@@ -166,18 +156,13 @@ theorem exists_orth_decomp
     · obtain ⟨k, rfl⟩ := (hTmem v).1 hv; exact hW _ _ hw'
     · rw [mem_fixed_iff_irr]
       intro h
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum]
-      exact Finset.sum_nbij'
-        (fun v => ρ (h : G) v)
-        (fun v => ρ ((h⁻¹ : K) : G) v)
-        (hTst h) (hTst h⁻¹)
-        (fun v _ => hinv h v)
-        (fun v _ => hinv' h v)
-        (fun v _ => rfl)
+
+      rw [map_sum]
+      exact Finset.sum_nbij' (fun v => ρ (h : G) v) (fun v => ρ ((h⁻¹ : K) : G) v) (hTst h) (hTst h⁻¹)
+        (fun v _ => hinv h v) (fun v _ => hinv' h v) (fun v _ => rfl)
   have h0 := hw _ hsumF
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum] at h0
+
+  rw [map_sum] at h0
   have hterm : ∀ v ∈ T, B (u - w) v = B (u - w) w' := by
     intro v hv
     obtain ⟨k, rfl⟩ := (hTmem v).1 hv
@@ -189,33 +174,29 @@ theorem exists_orth_decomp
   · exact absurd h1 hcard
   · exact h1
 
-theorem irr_of_forms
-    {G D : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [AddCommGroup D] [Module ℂ D]
-    [Nontrivial D]
-    (ρ : Representation ℂ G D) (hA : IsAdmissible ρ)
-    (K₁ : Subgroup G) (hK₁o : IsOpen (K₁ : Set G)) (hK₁c : IsCompact (K₁ : Set G))
-    (χ : G → ℝ) (B : D →ₗ[ℂ] D →ₗ⋆[ℂ] ℂ) (hBh : ∀ x y, B y x = starRingEnd ℂ (B x y))
-    (hBp : ∀ x, x ≠ 0 → 0 < (B x x).re) (hBe : ∀ g x y, B (ρ g x) (ρ g y) = (χ g : ℂ) * B x y)
-    (hC : ∀ C : D →ₗ[ℂ] D →ₗ⋆[ℂ] ℂ,
-      (∀ x y, C y x = starRingEnd ℂ (C x y)) → (∀ x, 0 ≤ (C x x).re)
-        → (∀ x, (C x x).re ≤ (B x x).re) → (∀ g x y, C (ρ g x) (ρ g y) = (χ g : ℂ) * C x y)
-        → ∃ c : ℂ, ∀ x y, C x y = c * B x y)
-    : ρ.IsIrreducible := by
+theorem irr_of_forms {G D : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [AddCommGroup D] [Module ℂ D]
+    [Nontrivial D] (ρ : Representation ℂ G D) (hA : IsAdmissible ρ) (K₁ : Subgroup G) (hK₁o : IsOpen (K₁ : Set G))
+    (hK₁c : IsCompact (K₁ : Set G)) (χ : G → ℝ) (B : D →ₗ[ℂ] D →ₗ⋆[ℂ] ℂ)
+    (hBh : ∀ x y, B y x = starRingEnd ℂ (B x y)) (hBp : ∀ x, x ≠ 0 → 0 < (B x x).re)
+    (hBe : ∀ g x y, B (ρ g x) (ρ g y) = (χ g : ℂ) * B x y)
+    (hC : ∀ C : D →ₗ[ℂ] D →ₗ⋆[ℂ] ℂ, (∀ x y, C y x = starRingEnd ℂ (C x y)) → (∀ x, 0 ≤ (C x x).re) →
+      (∀ x, (C x x).re ≤ (B x x).re) → (∀ g x y, C (ρ g x) (ρ g y) = (χ g : ℂ) * C x y) →
+      ∃ c : ℂ, ∀ x y, C x y = c * B x y) :
+    ρ.IsIrreducible := by
   classical
   have key : ∀ W : Subrepresentation ρ, W ≠ ⊥ → W = ⊤ := by
     intro W hWb
     let Wm : Submodule ℂ D := W.toSubmodule
     have hWs : ∀ g, ∀ w ∈ Wm, ρ g w ∈ Wm := fun g w hw => W.apply_mem_toSubmodule g hw
-    let Wp : Submodule ℂ D := {
-      carrier := {x | ∀ w ∈ Wm, B x w = 0}
-      add_mem' := by
-        intro a b ha hb w hw
-        rw [map_add (f := _), LinearMap.add_apply, ha w hw, hb w hw, add_zero]
-      zero_mem' := by intro w _; simp
-      smul_mem' := by
-        intro c x hx w hw
-        rw [map_smul, LinearMap.smul_apply, hx w hw, smul_zero]
-    }
+    let Wp : Submodule ℂ D :=
+      { carrier := {x | ∀ w ∈ Wm, B x w = 0}
+        add_mem' := by
+          intro a b ha hb w hw
+          rw [map_add (f := _), LinearMap.add_apply, ha w hw, hb w hw, add_zero]
+        zero_mem' := by intro w _; simp
+        smul_mem' := by
+          intro c x hx w hw
+          rw [map_smul, LinearMap.smul_apply, hx w hw, smul_zero] }
     have hWp : ∀ x, x ∈ Wp ↔ ∀ w ∈ Wm, B x w = 0 := fun x => Iff.rfl
     have hWps : ∀ g, ∀ x ∈ Wp, ρ g x ∈ Wp := by
       intro g x hx
@@ -245,7 +226,8 @@ theorem irr_of_forms
     have hP0 : ∀ q ∈ Wp, P q = 0 := fun q hq => Submodule.projection_apply_of_mem_right hcompl hq
     have hPρ : ∀ g x, P (ρ g x) = ρ g (P x) := by
       intro g x
-      have hx : ρ g x = ρ g (P x) + ρ g (x - P x) := by rw [← map_add (f := _)]; congr 1; abel
+      have hx : ρ g x = ρ g (P x) + ρ g (x - P x) := by
+        rw [← map_add (f := _)]; congr 1; abel
       rw [hx, map_add (f := _), hPw _ (hWs g _ (hPW x)), hP0 _ (hWps g _ (hPq x)), add_zero]
     let C : D →ₗ[ℂ] D →ₗ⋆[ℂ] ℂ := (B ∘ₗ P).compl₂ P
     have hCapp : ∀ x y, C x y = B (P x) (P y) := fun x y => rfl
@@ -260,15 +242,12 @@ theorem irr_of_forms
       by_cases h : x = 0
       · rw [h]; simp
       · exact (hBp _ h).le
-    obtain ⟨c, hc⟩ :=
-      hC C
-        (fun x y => by rw [hCapp, hCapp, hBh])
-        (fun x => by rw [hCapp]; exact hnn _)
-        (fun x => by
-          rw [hCapp, hBsplit x, Complex.add_re]
-          have := hnn (x - P x)
-          linarith)
-        (fun g x y => by rw [hCapp, hCapp, hPρ, hPρ, hBe])
+    obtain ⟨c, hc⟩ := hC C (fun x y => by rw [hCapp, hCapp, hBh]) (fun x => by rw [hCapp]; exact hnn _)
+      (fun x => by
+        rw [hCapp, hBsplit x, Complex.add_re]
+        have := hnn (x - P x)
+        linarith)
+      (fun g x y => by rw [hCapp, hCapp, hPρ, hPρ, hBe])
     obtain ⟨w0, hw0, hw0ne⟩ : ∃ w ∈ Wm, w ≠ 0 := by
       by_contra hcon
       push Not at hcon
@@ -279,7 +258,8 @@ theorem irr_of_forms
     have hc1 : c = 1 := by
       have h := hc w0 w0
       rw [hCapp, hPw w0 hw0] at h
-      have hB0 : B w0 w0 ≠ 0 := by intro h0; have := hBp w0 hw0ne; rw [h0] at this; simp at this
+      have hB0 : B w0 w0 ≠ 0 := by
+        intro h0; have := hBp w0 hw0ne; rw [h0] at this; simp at this
       have h2 : (c - 1) * B w0 w0 = 0 := by rw [sub_mul, ← h]; ring
       rcases mul_eq_zero.1 h2 with h1 | h1
       · exact sub_eq_zero.1 h1
@@ -301,16 +281,13 @@ theorem irr_of_forms
   have hne : (⊥ : Subrepresentation ρ) ≠ ⊤ := by
     intro h
     obtain ⟨x, hx⟩ := exists_ne (0 : D)
-    have h1 : x ∈ (⊤ : Subrepresentation ρ).toSubmodule :=
-      (Submodule.mem_top : x ∈ (⊤ : Submodule ℂ D))
+    have h1 : x ∈ (⊤ : Subrepresentation ρ).toSubmodule := (Submodule.mem_top : x ∈ (⊤ : Submodule ℂ D))
     rw [← h] at h1
     exact hx ((Submodule.mem_bot ℂ).1 (h1 : x ∈ (⊥ : Submodule ℂ D)))
-  exact {
-    exists_pair_ne := ⟨⊥, ⊤, hne⟩
-    eq_bot_or_eq_top := fun W => by
-      by_cases h : W = ⊥
-      · exact Or.inl h
-      · exact Or.inr (key W h)
-  }
+  exact { exists_pair_ne := ⟨⊥, ⊤, hne⟩
+          eq_bot_or_eq_top := fun W => by
+            by_cases h : W = ⊥
+            · exact Or.inl h
+            · exact Or.inr (key W h) }
 
 end PositivityTheory.RgUd.Form.U.Asm

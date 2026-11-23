@@ -1,22 +1,72 @@
 module
 
-public import Development.AutomorphicArithmetic.AutomorphicVarieties.TheoremsMuLinked.NormsAndPolarizations.CjApply
+public import Development.AutomorphicArithmetic.AutomorphicVarieties.WeilGroupCharacters.UniversalOrdinaryDeterminantRing
+import Mathlib.Algebra.Module.StablyFree.Basic
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.TotallySplit
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
+import Development.AutomorphicArithmetic.AutomorphicVarieties.HeightAndVanishing.DirichletPrimeToLPartMulLPowerPart
+import Development.AutomorphicArithmetic.AutomorphicVarieties.PatchingModules.PairedDualFirstOrderDualMatrixSpace
+import Development.AutomorphicArithmetic.AutomorphicVarieties.TheoremsMuLinked.NormsAndPolarizations.CjApply
+import Development.AutomorphicArithmetic.AutomorphicVarieties.TheoremsMuLinked.OrdinaryHeckeAlgebraIntegral
+import Formalism.ConjugateSelfDual.Statement
+import ReciprocityTheory.GaloisValuations.GlobalA
 
 @[expose] public section
 
-open IsLocalRing Matrix NumberField Formalism.ConjugateSelfDual ReciprocityTheory.Gal UpperTheory.V
-  UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.Pa UpperTheory.V.HV UpperTheory.V.Th
-  UpperTheory.V.Th.Nm GlobalTheory.GalOfCusp
+open IsLocalRing Matrix NumberField Formalism.ConjugateSelfDual ReciprocityTheory.Gal UpperTheory.V UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.Pa UpperTheory.V.HV UpperTheory.V.Th UpperTheory.V.Th.Nm GlobalTheory.GalOfCusp
 
-private theorem UpperTheory.V.Th.Nm.trZero_inner
-    {K : Type} [Field K]
-    {n : ℕ} (D : Matrix (Fin n) (Fin n) K →ₗ[K] Matrix (Fin n) (Fin n) K)
-    (hD : ∀ A B, D (A * B) = D A * B + A * D B)
-    : ∃ Y, ∀ A, D A = A * Y - Y * A := by
+private theorem UpperTheory.V.Th.Nm.trZero_inner {K : Type} [Field K] {n : ℕ}
+    (D : Matrix (Fin n) (Fin n) K →ₗ[K] Matrix (Fin n) (Fin n) K)
+    (hD : ∀ A B, D (A * B) = D A * B + A * D B) : ∃ Y, ∀ A, D A = A * Y - Y * A := by
   rcases Nat.eq_zero_or_pos n with rfl | hn
   · exact ⟨0, fun A => Subsingleton.elim _ _⟩
   let o : Fin n := ⟨0, hn⟩
-  refine ⟨- ∑ i, D (single i o 1) * single o i 1, fun A => ?_⟩
+  refine ⟨-∑ i, D (single i o 1) * single o i 1, fun A => ?_⟩
   have h1 : ∀ i, A * single i o (1 : K) = ∑ j, A j i • single j o (1 : K) := by
     intro i
     ext a b
@@ -34,34 +84,26 @@ private theorem UpperTheory.V.Th.Nm.trZero_inner
   have h3 : ∑ i, single i o (1 : K) * single o i (1 : K) = (1 : Matrix (Fin n) (Fin n) K) := by
     simp only [Matrix.single_mul_single_same, mul_one]
     exact Matrix.sum_single_one
-  have h4
-      : A * ∑ i, D (single i o 1) * single o i 1
-        = (∑ i, D (single i o 1) * single o i 1) * A - D A := by
-    have e1
-        : ∀ i,
-          A * (D (single i o 1) * single o i (1 : K))
-            = D (A * single i o 1) * single o i 1 - D A * (single i o 1 * single o i 1) := by
+  have h4 : A * ∑ i, D (single i o 1) * single o i 1
+      = (∑ i, D (single i o 1) * single o i 1) * A - D A := by
+    have e1 : ∀ i, A * (D (single i o 1) * single o i (1 : K))
+        = D (A * single i o 1) * single o i 1 - D A * (single i o 1 * single o i 1) := by
       intro i
-      rw [hD]
-      noncomm_ring
+      rw [hD]; noncomm_ring
     rw [Finset.mul_sum, Finset.sum_congr rfl fun i _ => e1 i, Finset.sum_sub_distrib,
       ← Finset.mul_sum, h3, mul_one, Finset.sum_mul]
     congr 1
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [h1, map_sum, map_smul, Finset.sum_mul, mul_assoc, h2, Finset.mul_sum,
-        smul_mul_assoc, mul_smul_comm]
-    exact Finset.sum_comm
-  rw [mul_neg, neg_mul, h4]
-  abel
 
-theorem UpperTheory.V.Th.Nm.trZero
-    : ∀ {K G : Type} [Field K] [Group G] {n : ℕ} (ρ : G →* GL (Fin n) K)
-        (z : G → Matrix (Fin n) (Fin n) K),
-      Submodule.span K (Set.range (mat ρ)) = ⊤
-        → (∀ g g', z (g * g') = z g + mat ρ g * z g' * mat ρ g⁻¹) → (∀ g, (z g * mat ρ g).trace = 0)
-        → ∃ Y, ∀ g, z g = mat ρ g * Y * mat ρ g⁻¹ - Y := by
+    simp only [h1, map_sum, map_smul, Finset.sum_mul, mul_assoc, h2, Finset.mul_sum,
+    smul_mul_assoc, mul_smul_comm]
+    exact Finset.sum_comm
+  rw [mul_neg, neg_mul, h4]; abel
+
+theorem UpperTheory.V.Th.Nm.trZero :
+    ∀ {K G : Type} [Field K] [Group G] {n : ℕ} (ρ : G →* GL (Fin n) K) (z : G → Matrix (Fin n) (Fin n) K), Submodule.span K (Set.range (mat ρ)) = ⊤ → (∀ g g', z (g * g') = z g + mat ρ g * z g' * mat ρ g⁻¹) → (∀ g, (z g * mat ρ g).trace = 0) → ∃ Y, ∀ g, z g = mat ρ g * Y * mat ρ g⁻¹ - Y := by
   intro K G _ _ n ρ z hsp hc ht
-  have hmul : ∀ g h, mat ρ (g * h) = mat ρ g * mat ρ h := by intro g h; simp [mat]
+  have hmul : ∀ g h, mat ρ (g * h) = mat ρ g * mat ρ h := by
+    intro g h; simp [mat]
   have hone : mat ρ 1 = 1 := by simp [mat]
   have hinv : ∀ g, mat ρ g⁻¹ * mat ρ g = 1 := fun g => by rw [← hmul, inv_mul_cancel, hone]
   have hinv' : ∀ g, mat ρ g * mat ρ g⁻¹ = 1 := fun g => by rw [← hmul, mul_inv_cancel, hone]
@@ -108,8 +150,7 @@ theorem UpperTheory.V.Th.Nm.trZero
     have h0 : R (s (mat ρ g) - Finsupp.single g 1) = 0 := by
       have := LinearMap.congr_fun hs (mat ρ g)
       simp only [LinearMap.comp_apply, LinearMap.id_apply] at this
-      rw [map_sub, this]
-      simp [R]
+      rw [map_sub, this]; simp [R]
     have := hker _ h0
     rw [map_sub, sub_eq_zero] at this
     simpa [D, E] using this

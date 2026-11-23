@@ -1,8 +1,54 @@
 module
 
-public import Mathlib
 public import GroundTheory.HeightsAndTheta.Heights.ComplexAnalyticSets.StChangeOfVariablesDegree
 public import GroundTheory.HeightsAndTheta.Heights.ComplexAnalyticSets.PChangeOfVariablesDegreePiola
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.LocallyConvex.AbsConvexOpen
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Mathlib.Topology.UniformSpace.Uniformizable
+public import Mathlib.Analysis.Calculus.ParametricIntegral
 
 @[expose] public section
 
@@ -16,53 +62,49 @@ namespace GroundTheory.Heights₂.Heights.IndefiniteRowSideFullHecke.ComplexSets
 
 namespace ChangeOfVariablesDegree
 
-theorem continuous_det_fderiv {n : ℕ} (φ : (Fin n → ℝ) → Fin n → ℝ) (hφ : ContDiff ℝ ∞ φ)
-    : Continuous fun x => (fderiv ℝ φ x).det := by
+theorem continuous_det_fderiv {n : ℕ} (φ : (Fin n → ℝ) → Fin n → ℝ) (hφ : ContDiff ℝ ∞ φ) :
+    Continuous fun x => (fderiv ℝ φ x).det := by
   have : (fun x => (fderiv ℝ φ x).det) = fun x => detCML (entriesCLM (fderiv ℝ φ x)) := by
     funext x; rw [det_fderiv_eq_det_jacobian]; rfl
   rw [this]
   exact detCML.cont.comp (entriesCLM.continuous.comp (hφ.continuous_fderiv (by simp)))
 
-theorem hasCompactSupport_comp_sub
-    {n : ℕ} (φ : (Fin n → ℝ) → Fin n → ℝ)
-    (C : ℝ) (hC : ∀ x, ‖φ x - x‖ ≤ C)
-    (g : (Fin n → ℝ) → ℝ) (hgc : HasCompactSupport g)
-    (y₀ : Fin n → ℝ)
-    : HasCompactSupport fun x => g (φ x - y₀) := by
+theorem hasCompactSupport_comp_sub {n : ℕ} (φ : (Fin n → ℝ) → Fin n → ℝ) (C : ℝ)
+    (hC : ∀ x, ‖φ x - x‖ ≤ C) (g : (Fin n → ℝ) → ℝ) (hgc : HasCompactSupport g)
+    (y₀ : Fin n → ℝ) : HasCompactSupport fun x => g (φ x - y₀) := by
   obtain ⟨r, hr⟩ := hgc.isCompact.isBounded.subset_closedBall 0
-  refine HasCompactSupport.intro (isCompact_closedBall (0 : Fin n → ℝ) (r + ‖y₀‖ + C)) fun x hx =>
-    ?_
+  refine HasCompactSupport.intro (isCompact_closedBall (0 : Fin n → ℝ) (r + ‖y₀‖ + C))
+    fun x hx => ?_
   by_contra hne
   have h1 := hr (subset_tsupport _ hne)
   rw [mem_closedBall_zero_iff] at h1
   apply hx
   rw [mem_closedBall_zero_iff]
   have h2 : ‖x‖ ≤ ‖φ x - y₀‖ + ‖y₀‖ + ‖φ x - x‖ := by
-    calc
-      ‖x‖
-        = ‖(φ x - y₀) + y₀ - (φ x - x)‖ := by congr 1; abel
+    calc ‖x‖ = ‖(φ x - y₀) + y₀ - (φ x - x)‖ := by congr 1; abel
       _ ≤ ‖(φ x - y₀) + y₀‖ + ‖φ x - x‖ := norm_sub_le _ _
       _ ≤ ‖φ x - y₀‖ + ‖y₀‖ + ‖φ x - x‖ := by gcongr; exact norm_add_le _ _
   linarith [hC x]
 
-theorem clm_apply_eq_sum {n : ℕ} (T : (Fin n → ℝ) →L[ℝ] ℝ) (v : Fin n → ℝ)
-    : T v = ∑ k, v k * T (Pi.single k 1) := by
-  have hv : v = ∑ k, v k • (Pi.single k 1 : Fin n → ℝ) := by ext m; simp [Pi.single_apply]
+theorem clm_apply_eq_sum {n : ℕ} (T : (Fin n → ℝ) →L[ℝ] ℝ) (v : Fin n → ℝ) :
+    T v = ∑ k, v k * T (Pi.single k 1) := by
+  have hv : v = ∑ k, v k • (Pi.single k 1 : Fin n → ℝ) := by
+    ext m; simp [Pi.single_apply]
   conv_lhs => rw [hv]
-  set_option synthInstance.maxHeartbeats 100000 in
+
   simp [map_sum, map_smul]
 
 variable {m : ℕ}
 
-theorem integral_fderiv_comp_mul_det_eq_zero
-    (φ : (Fin (m + 1) → ℝ) → Fin (m + 1) → ℝ)
+theorem integral_fderiv_comp_mul_det_eq_zero (φ : (Fin (m + 1) → ℝ) → Fin (m + 1) → ℝ)
     (hφ : ContDiff ℝ ∞ φ) (hu : HasCompactSupport fun x => φ x - x)
-    (g : (Fin (m + 1) → ℝ) → ℝ) (hg : ContDiff ℝ ∞ g) (hgc : HasCompactSupport g)
-    : ∫ x, fderiv ℝ g (φ x) (Pi.single 0 1) * (fderiv ℝ φ x).det = 0 := by
+    (g : (Fin (m + 1) → ℝ) → ℝ) (hg : ContDiff ℝ ∞ g) (hgc : HasCompactSupport g) :
+    ∫ x, fderiv ℝ g (φ x) (Pi.single 0 1) * (fderiv ℝ φ x).det = 0 := by
   obtain ⟨C, hC⟩ := (hφ.continuous.sub continuous_id).bounded_above_of_compact_support hu
   set H : (Fin (m + 1) → ℝ) → Fin (m + 1) → ℝ := fun x => Function.update (φ x) 0 (g (φ x))
     with hH
-  have hH0 : (fun x => H x 0) = fun x => g (φ x) := by funext x; simp [hH]
+  have hH0 : (fun x => H x 0) = fun x => g (φ x) := by
+    funext x; simp [hH]
   have hHk : ∀ k, k ≠ 0 → (fun x => H x k) = fun x => φ x k := by
     intro k hk; funext x; simp [hH, hk]
   have hHs : ContDiff ℝ ∞ H := by
@@ -73,14 +115,14 @@ theorem integral_fderiv_comp_mul_det_eq_zero
   have hHc : HasCompactSupport fun x => H x 0 := by
     rw [hH0]
     simpa using hasCompactSupport_comp_sub φ C hC g hgc 0
-  have hdet : ∀ x, (fderiv ℝ H x).det = fderiv ℝ g (φ x) (Pi.single 0 1) * (fderiv ℝ φ x).det := by
+  have hdet : ∀ x, (fderiv ℝ H x).det =
+      fderiv ℝ g (φ x) (Pi.single 0 1) * (fderiv ℝ φ x).det := by
     intro x
     have hφd : DifferentiableAt ℝ φ x := (hφ.differentiable (by simp)) x
     have hgd : DifferentiableAt ℝ g (φ x) := (hg.differentiable (by simp)) (φ x)
     set c : Fin (m + 1) → ℝ := fun k => fderiv ℝ g (φ x) (Pi.single k 1) with hc
-    have hJ
-        : Matrix.of (jacobian H x)
-          = (Matrix.of (jacobian φ x)).updateRow 0 (∑ k, c k • (Matrix.of (jacobian φ x)) k) := by
+    have hJ : Matrix.of (jacobian H x) = (Matrix.of (jacobian φ x)).updateRow 0
+        (∑ k, c k • (Matrix.of (jacobian φ x)) k) := by
       ext r l
       rw [Matrix.of_apply, jacobian_eq_fderiv_apply H x ((hHs.differentiable (by simp)) x)]
       by_cases hr : r = 0
@@ -92,26 +134,24 @@ theorem integral_fderiv_comp_mul_det_eq_zero
         simp only [Finset.sum_apply, Pi.smul_apply, smul_eq_mul, Matrix.of_apply, hc]
         refine Finset.sum_congr rfl fun k _ => ?_
         rw [jacobian, mul_comm]
-      · rw [hHk r hr, Matrix.updateRow_ne hr, Matrix.of_apply, jacobian_eq_fderiv_apply φ x hφd]
+      · rw [hHk r hr, Matrix.updateRow_ne hr, Matrix.of_apply,
+          jacobian_eq_fderiv_apply φ x hφd]
     rw [det_fderiv_eq_det_jacobian, hJ, Matrix.det_updateRow_sum, det_fderiv_eq_det_jacobian,
       smul_eq_mul]
   simp_rw [← hdet]
   exact integral_det_fderiv_eq_zero H hHs 0 hHc
 
-theorem integral_comp_sub_mul_det_eq
-    (φ : (Fin (m + 1) → ℝ) → Fin (m + 1) → ℝ)
+theorem integral_comp_sub_mul_det_eq (φ : (Fin (m + 1) → ℝ) → Fin (m + 1) → ℝ)
     (hφ : ContDiff ℝ ∞ φ) (hu : HasCompactSupport fun x => φ x - x)
-    (f : (Fin (m + 1) → ℝ) → ℝ) (hf : ContDiff ℝ ∞ f) (hfc : HasCompactSupport f)
-    (s : ℝ)
-    : ∫ x, f (φ x - s • (Pi.single 0 1 : Fin (m + 1) → ℝ)) * (fderiv ℝ φ x).det
-      = ∫ x, f (φ x) * (fderiv ℝ φ x).det := by
+    (f : (Fin (m + 1) → ℝ) → ℝ) (hf : ContDiff ℝ ∞ f) (hfc : HasCompactSupport f) (s : ℝ) :
+    ∫ x, f (φ x - s • (Pi.single 0 1 : Fin (m + 1) → ℝ)) * (fderiv ℝ φ x).det =
+      ∫ x, f (φ x) * (fderiv ℝ φ x).det := by
   set e : Fin (m + 1) → ℝ := Pi.single 0 1 with he
   obtain ⟨C, hC⟩ := (hφ.continuous.sub continuous_id).bounded_above_of_compact_support hu
   have hC' : ∀ x, ‖φ x - x‖ ≤ C := hC
   obtain ⟨r, hr⟩ := hfc.isCompact.isBounded.subset_closedBall 0
-  obtain ⟨Cf, hCf⟩ :=
-    ((hf.continuous_fderiv (by simp)).clm_apply
-      (continuous_const (y := e))).bounded_above_of_compact_support (hfc.fderiv_apply (𝕜 := ℝ) e)
+  obtain ⟨Cf, hCf⟩ := ((hf.continuous_fderiv (by simp)).clm_apply
+    (continuous_const (y := e))).bounded_above_of_compact_support (hfc.fderiv_apply (𝕜 := ℝ) e)
   have hdc := continuous_det_fderiv φ hφ
   set Φ : ℝ → ℝ := fun s => ∫ x, f (φ x - s • e) * (fderiv ℝ φ x).det with hΦ
   have hderiv : ∀ s₀, HasDerivAt Φ 0 s₀ := by
@@ -119,10 +159,9 @@ theorem integral_comp_sub_mul_det_eq
     set R := r + C + (|s₀| + 1) * ‖e‖ with hR
     set F' : ℝ → (Fin (m + 1) → ℝ) → ℝ :=
       fun s x => -(fderiv ℝ f (φ x - s • e) e) * (fderiv ℝ φ x).det with hF'
-    have hbound
-        : ∀ᵐ x ∂(volume : Measure (Fin (m + 1) → ℝ)), ∀ s ∈ ball s₀ 1,
-          ‖F' s x‖ ≤ (closedBall (0 : Fin (m + 1) → ℝ) R).indicator
-            (fun x => Cf * |(fderiv ℝ φ x).det|) x := by
+    have hbound : ∀ᵐ x ∂(volume : Measure (Fin (m + 1) → ℝ)), ∀ s ∈ ball s₀ 1,
+        ‖F' s x‖ ≤ (closedBall (0 : Fin (m + 1) → ℝ) R).indicator
+          (fun x => Cf * |(fderiv ℝ φ x).det|) x := by
       refine Filter.Eventually.of_forall fun x s hs => ?_
       by_cases hx : x ∈ closedBall (0 : Fin (m + 1) → ℝ) R
       · rw [Set.indicator_of_mem hx]
@@ -144,24 +183,20 @@ theorem integral_comp_sub_mul_det_eq
             rw [norm_smul, Real.norm_eq_abs]
             exact mul_le_mul_of_nonneg_right hs' (norm_nonneg _)
           have h2 : ‖x‖ ≤ ‖φ x - s • e‖ + ‖s • e‖ + ‖φ x - x‖ := by
-            calc
-              ‖x‖
-                = ‖(φ x - s • e) + s • e - (φ x - x)‖ := by congr 1; abel
+            calc ‖x‖ = ‖(φ x - s • e) + s • e - (φ x - x)‖ := by congr 1; abel
               _ ≤ ‖(φ x - s • e) + s • e‖ + ‖φ x - x‖ := norm_sub_le _ _
               _ ≤ ‖φ x - s • e‖ + ‖s • e‖ + ‖φ x - x‖ := by gcongr; exact norm_add_le _ _
           linarith [hC' x]
         have h0 : fderiv ℝ f (φ x - s • e) = 0 :=
           image_eq_zero_of_notMem_tsupport fun h => hnot (tsupport_fderiv_subset ℝ h)
         simp [hF', h0]
-    have hdiff
-        : ∀ᵐ x ∂(volume : Measure (Fin (m + 1) → ℝ)), ∀ s ∈ ball s₀ 1,
-          HasDerivAt (fun s => f (φ x - s • e) * (fderiv ℝ φ x).det) (F' s x) s := by
+    have hdiff : ∀ᵐ x ∂(volume : Measure (Fin (m + 1) → ℝ)), ∀ s ∈ ball s₀ 1,
+        HasDerivAt (fun s => f (φ x - s • e) * (fderiv ℝ φ x).det) (F' s x) s := by
       refine Filter.Eventually.of_forall fun x s _ => ?_
       have hl : HasDerivAt (fun s : ℝ => φ x - s • e) (-e) s := by
         simpa using ((hasDerivAt_id s).smul_const e).const_sub (φ x)
-      have :=
-        (((hf.differentiable (by simp)) (φ x - s • e)).hasFDerivAt.comp_hasDerivAt s hl).mul_const
-          ((fderiv ℝ φ x).det)
+      have := (((hf.differentiable (by simp)) (φ x - s • e)).hasFDerivAt.comp_hasDerivAt s
+        hl).mul_const ((fderiv ℝ φ x).det)
       refine this.congr_deriv ?_
       simp only [hF', map_neg, neg_mul]
     have hcF : ∀ s : ℝ, Continuous fun x => f (φ x - s • e) * (fderiv ℝ φ x).det := fun s =>
@@ -170,26 +205,24 @@ theorem integral_comp_sub_mul_det_eq
       (((hf.continuous_fderiv (by simp)).comp (hφ.continuous.sub continuous_const)).clm_apply
         continuous_const).neg.mul hdc
     have hcB : Continuous fun x => Cf * |(fderiv ℝ φ x).det| := continuous_const.mul hdc.abs
-    have key :=
-      hasDerivAt_integral_of_dominated_loc_of_deriv_le (μ := volume)
-        (F := fun s x => f (φ x - s • e) * (fderiv ℝ φ x).det)
-        (F' := F') (x₀ := s₀)
-        (bound := (closedBall (0 : Fin (m + 1) → ℝ) R).indicator fun x => Cf * |(fderiv ℝ φ x).det|)
-        (ball_mem_nhds s₀ one_pos)
-        (Filter.Eventually.of_forall fun s => (hcF s).aestronglyMeasurable)
-        ((hcF s₀).integrable_of_hasCompactSupport
-          (hasCompactSupport_comp_sub φ C hC' f hfc _).mul_right)
-        hcF'.aestronglyMeasurable hbound
-        ((hcB.continuousOn.integrableOn_compact (isCompact_closedBall _ _)).integrable_indicator
-          measurableSet_closedBall)
-        hdiff
+    have key := hasDerivAt_integral_of_dominated_loc_of_deriv_le (μ := volume)
+      (F := fun s x => f (φ x - s • e) * (fderiv ℝ φ x).det) (F' := F') (x₀ := s₀)
+      (bound := (closedBall (0 : Fin (m + 1) → ℝ) R).indicator
+        fun x => Cf * |(fderiv ℝ φ x).det|)
+      (ball_mem_nhds s₀ one_pos)
+      (Filter.Eventually.of_forall fun s => (hcF s).aestronglyMeasurable)
+      ((hcF s₀).integrable_of_hasCompactSupport
+        (hasCompactSupport_comp_sub φ C hC' f hfc _).mul_right)
+      hcF'.aestronglyMeasurable
+      hbound
+      ((hcB.continuousOn.integrableOn_compact
+        (isCompact_closedBall _ _)).integrable_indicator measurableSet_closedBall)
+      hdiff
     have h0 : ∫ x, F' s₀ x = 0 := by
       simp only [hF', neg_mul, integral_neg]
-      have hg :=
-        integral_fderiv_comp_mul_det_eq_zero φ hφ hu
-          (fun y => f (y - s₀ • e))
-          (hf.comp (contDiff_id.sub contDiff_const))
-          (hfc.comp_homeomorph (Homeomorph.subRight (s₀ • e)))
+      have hg := integral_fderiv_comp_mul_det_eq_zero φ hφ hu (fun y => f (y - s₀ • e))
+        (hf.comp (contDiff_id.sub contDiff_const))
+        (hfc.comp_homeomorph (Homeomorph.subRight (s₀ • e)))
       simp only [fderiv_comp_sub] at hg
       rw [hg, neg_zero]
     rw [← h0]
@@ -228,9 +261,7 @@ theorem ChangeOfVariablesDegree.proof : ChangeOfVariablesDegree.Statement := by
           have h1 := hr hmem
           rw [mem_closedBall_zero_iff] at h1
           have h2 : ‖R • e‖ ≤ ‖φ x - R • e‖ + ‖φ x - x‖ + ‖x‖ := by
-            calc
-              ‖R • e‖
-                = ‖-(φ x - R • e) + (φ x - x) + x‖ := by congr 1; abel
+            calc ‖R • e‖ = ‖-(φ x - R • e) + (φ x - x) + x‖ := by congr 1; abel
               _ ≤ ‖-(φ x - R • e) + (φ x - x)‖ + ‖x‖ := norm_add_le _ _
               _ ≤ ‖φ x - R • e‖ + ‖φ x - x‖ + ‖x‖ := by
                 gcongr; exact (norm_add_le _ _).trans (by rw [norm_neg])
@@ -241,9 +272,7 @@ theorem ChangeOfVariablesDegree.proof : ChangeOfVariablesDegree.Statement := by
           have h1 := hr hmem
           rw [mem_closedBall_zero_iff] at h1
           have h2 : ‖R • e‖ ≤ ‖x - R • e‖ + ‖x‖ := by
-            calc
-              ‖R • e‖
-                = ‖-(x - R • e) + x‖ := by congr 1; abel
+            calc ‖R • e‖ = ‖-(x - R • e) + x‖ := by congr 1; abel
               _ ≤ ‖-(x - R • e)‖ + ‖x‖ := norm_add_le _ _
               _ = ‖x - R • e‖ + ‖x‖ := by rw [norm_neg]
           rw [hRe] at h2
@@ -252,13 +281,14 @@ theorem ChangeOfVariablesDegree.proof : ChangeOfVariablesDegree.Statement := by
         rw [hf1, hf2, zero_mul]
       · rw [notMem_tsupport_iff_eventuallyEq] at hx
         have hev : φ =ᶠ[nhds x] id := hx.mono fun y hy => by simpa [sub_eq_zero] using hy
-        have hfd : fderiv ℝ φ x = ContinuousLinearMap.id ℝ _ := by rw [hev.fderiv_eq, fderiv_id]
+        have hfd : fderiv ℝ φ x = ContinuousLinearMap.id ℝ _ := by
+          rw [hev.fderiv_eq, fderiv_id]
         have hφx : φ x = x := hev.self_of_nhds
-        rw [hfd, hφx, ContinuousLinearMap.det, ContinuousLinearMap.coe_id, LinearMap.det_id,
-          mul_one]
-    calc
-      ∫ x, f (φ x) * (fderiv ℝ φ x).det = ∫ x, f (φ x - R • e) * (fderiv ℝ φ x).det :=
-        (ChangeOfVariablesDegree.integral_comp_sub_mul_det_eq φ hφ hu f hf hfc R).symm
+        rw [hfd, hφx, ContinuousLinearMap.det,
+          ContinuousLinearMap.coe_id, LinearMap.det_id, mul_one]
+    calc ∫ x, f (φ x) * (fderiv ℝ φ x).det
+        = ∫ x, f (φ x - R • e) * (fderiv ℝ φ x).det :=
+          (ChangeOfVariablesDegree.integral_comp_sub_mul_det_eq φ hφ hu f hf hfc R).symm
       _ = ∫ x, f (x - R • e) := by simp_rw [hpt]
       _ = ∫ x, f x := integral_sub_right_eq_self f (R • e)
 

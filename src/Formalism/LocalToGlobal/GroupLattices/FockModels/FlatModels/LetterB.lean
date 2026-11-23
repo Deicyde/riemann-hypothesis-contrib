@@ -1,6 +1,59 @@
 module
 
+import Formalism.HermitianCurvature.HermitianCurvatureProofs.CutJDHatJDRInvEig
 public import Formalism.LocalToGlobal.GroupLattices.FockModels.FlatModels.Letter
+public import Formalism.SharpRestriction.GrowthBounds.ObjSeg
+public import Formalism.GradedWeylDivisibility.FinalD
+public import Formalism.GradedWeylDivisibility.FockSpaceTableaux.ColLexInitMinor
+import Formalism.GradedWeylDivisibility.FockSpaceTableaux.LBidetLemmas
+import Formalism.GradedWeylDivisibility.FockSpaceTableaux.LBidetMinor
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.Order.Interval.Finset.Box
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
+import Formalism.SharpRestriction.GrowthBounds.LatticeSystems
 
 @[expose] public section
 
@@ -15,10 +68,9 @@ open Formalism.MainNotions.G Formalism.GradedWeylDivisibility Formalism.MainNoti
 def Hd (R : Type) [CommRing R] (k d : ℕ) : Submodule R (MvPolynomial (Fin k) R) :=
   restrictSupport R {μ | ∑ c, μ c = d}
 
-theorem mem_Hd {R : Type} [CommRing R] {k d : ℕ} {P : MvPolynomial (Fin k) R}
-    : P ∈ Hd R k d ↔ ∀ μ ∈ P.support, ∑ c, μ c = d := by
-  simp only [Hd, MvPolynomial.mem_restrictSupport_iff, Set.subset_def, Finset.mem_coe,
-    Set.mem_setOf_eq]
+theorem mem_Hd {R : Type} [CommRing R] {k d : ℕ} {P : MvPolynomial (Fin k) R} :
+    P ∈ Hd R k d ↔ ∀ μ ∈ P.support, ∑ c, μ c = d := by
+  simp only [Hd, MvPolynomial.mem_restrictSupport_iff, Set.subset_def, Finset.mem_coe, Set.mem_setOf_eq]
 
 theorem Hd_one (R : Type) [CommRing R] (k : ℕ) : (1 : MvPolynomial (Fin k) R) ∈ Hd R k 0 := by
   rw [mem_Hd]
@@ -38,21 +90,17 @@ theorem Hd_X (R : Type) [CommRing R] (k : ℕ) (a : R) (c : Fin k) : C a * X c �
     simp [Finsupp.single_apply]
   · simp at hμ
 
-theorem Hd_mul
-    {R : Type} [CommRing R]
-    {k a b : ℕ} {P Q : MvPolynomial (Fin k) R} (hP : P ∈ Hd R k a) (hQ : Q ∈ Hd R k b)
-    : P * Q ∈ Hd R k (a + b) := by
+theorem Hd_mul {R : Type} [CommRing R] {k a b : ℕ} {P Q : MvPolynomial (Fin k) R} (hP : P ∈ Hd R k a)
+    (hQ : Q ∈ Hd R k b) : P * Q ∈ Hd R k (a + b) := by
   classical
   rw [mem_Hd] at hP hQ ⊢
   intro μ hμ
   obtain ⟨a1, ha1, b1, hb1, rfl⟩ := Finset.mem_add.1 (MvPolynomial.support_mul P Q hμ)
   simp only [Finsupp.coe_add, Pi.add_apply, Finset.sum_add_distrib, hP a1 ha1, hQ b1 hb1]
 
-theorem Hd_prod
-    {R : Type} [CommRing R]
-    {k : ℕ} {J : Type}
-    (s : Finset J) (δ : J → ℕ) (q : J → MvPolynomial (Fin k) R) (h : ∀ i ∈ s, q i ∈ Hd R k (δ i))
-    : ∏ i ∈ s, q i ∈ Hd R k (∑ i ∈ s, δ i) := by
+theorem Hd_prod {R : Type} [CommRing R] {k : ℕ} {J : Type} (s : Finset J) (δ : J → ℕ)
+    (q : J → MvPolynomial (Fin k) R) (h : ∀ i ∈ s, q i ∈ Hd R k (δ i)) :
+    ∏ i ∈ s, q i ∈ Hd R k (∑ i ∈ s, δ i) := by
   classical
   revert h
   refine Finset.induction_on s ?_ ?_
@@ -61,14 +109,12 @@ theorem Hd_prod
     exact Hd_one R k
   · intro j s hj ih h
     rw [Finset.prod_insert hj, Finset.sum_insert hj]
-    exact Hd_mul (h j (Finset.mem_insert_self j s))
-      (ih (fun i hi => h i (Finset.mem_insert_of_mem hi)))
+    exact Hd_mul (h j (Finset.mem_insert_self j s)) (ih (fun i hi => h i (Finset.mem_insert_of_mem hi)))
 
-def nuL (m d : ℕ) (vec : Bool) : Fin (m + 1) → ℕ := fun t =>
-  if vec then (if t = 0 then d else 0) else (if t = Fin.last m then 0 else d)
+def nuL (m d : ℕ) (vec : Bool) : Fin (m + 1) → ℕ :=
+  fun t => if vec then (if t = 0 then d else 0) else (if t = Fin.last m then 0 else d)
 
-theorem nuOf_letterWt (m : ℕ) (hm : 1 ≤ m) (d : ℕ) (vec : Bool)
-    : nuOf (letterWt m d vec) = nuL m d vec := by
+theorem nuOf_letterWt (m : ℕ) (hm : 1 ≤ m) (d : ℕ) (vec : Bool) : nuOf (letterWt m d vec) = nuL m d vec := by
   funext t
   unfold nuOf letterWt nuL
   have hl : (Fin.last m : Fin (m + 1)) ≠ 0 := by
@@ -77,12 +123,12 @@ theorem nuOf_letterWt (m : ℕ) (hm : 1 ≤ m) (d : ℕ) (vec : Bool)
     simp at h2
     omega
   cases vec
-  · simp only [Bool.false_eq_true, ↓ reduceIte]
+  · simp only [Bool.false_eq_true, ↓reduceIte]
     by_cases ht : t = Fin.last m
     · subst ht
       simp
     · simp [ht]
-  · simp only [↓ reduceIte]
+  · simp only [↓reduceIte]
     by_cases ht : t = 0
     · subst ht
       simp [hl]
@@ -94,30 +140,29 @@ theorem nuL_smul (m d : ℕ) (vec : Bool) : nuL m d vec = d • nuL m 1 vec := b
 
 def s0 (m : ℕ) (vec : Bool) : ℕ := if vec then 1 else m
 
-theorem Nv_false_eq (R : Type) [CommRing R] (m : ℕ) (c : Fin (m + 1))
-    : Nv R m false c = (-1) ^ ((c : ℕ) + m) * initMinor R c.succAbove (Nat.le_succ m) := by
+theorem Nv_false_eq (R : Type) [CommRing R] (m : ℕ) (c : Fin (m + 1)) :
+    Nv R m false c = (-1) ^ ((c : ℕ) + m) * initMinor R c.succAbove (Nat.le_succ m) := by
   unfold Nv
-  simp only [Bool.false_eq_true, ↓ reduceIte]
+  simp only [Bool.false_eq_true, ↓reduceIte]
   rw [Matrix.adjugate_fin_succ_eq_det_submatrix, Fin.val_last, Fin.succAbove_last]
   unfold initMinor genM
   rfl
 
-theorem Nv_true_eq (R : Type) [CommRing R] (m : ℕ) (c : Fin (m + 1))
-    : Nv R m true c = initMinor R (fun _ : Fin 1 => c) (Nat.succ_le_succ (Nat.zero_le m)) := by
+theorem Nv_true_eq (R : Type) [CommRing R] (m : ℕ) (c : Fin (m + 1)) :
+    Nv R m true c = initMinor R (fun _ : Fin 1 => c) (Nat.succ_le_succ (Nat.zero_le m)) := by
   rw [lcminor_initMinor_eq, Fintype.sum_subsingleton _ 1]
   simp [Nv, MvPolynomial.X]
 
-theorem Nv_mem (R : Type) [CommRing R] (m : ℕ) (vec : Bool) (c : Fin (m + 1))
-    : Nv R m vec c ∈ dualWeyl R (m + 1) (m + 1) (nuL m 1 vec) := by
+theorem Nv_mem (R : Type) [CommRing R] (m : ℕ) (vec : Bool) (c : Fin (m + 1)) :
+    Nv R m vec c ∈ dualWeyl R (m + 1) (m + 1) (nuL m 1 vec) := by
   cases vec
   · rw [Nv_false_eq]
-    have hmem
-        : initMinor R c.succAbove (Nat.le_succ m) ∈ dualWeyl R (m + 1) (m + 1) (nuL m 1 false) := by
+    have hmem : initMinor R c.succAbove (Nat.le_succ m) ∈ dualWeyl R (m + 1) (m + 1) (nuL m 1 false) := by
       rw [mem_dualWeyl_iff]
       refine ⟨?_, fun l j hlj => initMinor_invariant _ _ l j hlj⟩
       have e : nuL m 1 false = initW (m + 1) m := by
         funext t
-        simp only [nuL, initW, Bool.false_eq_true, ↓ reduceIte]
+        simp only [nuL, initW, Bool.false_eq_true, ↓reduceIte]
         by_cases ht : t = Fin.last m
         · subst ht
           simp
@@ -125,10 +170,9 @@ theorem Nv_mem (R : Type) [CommRing R] (m : ℕ) (vec : Bool) (c : Fin (m + 1))
           simp [ht, h1]
       rw [e]
       exact initMinor_isWeightedHomogeneous _ _
-    have e2
-        : ((-1 : MvPolynomial (Fin (m + 1) × Fin (m + 1)) R) ^ ((c : ℕ) + m))
-            * initMinor R c.succAbove (Nat.le_succ m)
-          = ((-1 : R) ^ ((c : ℕ) + m)) • initMinor R c.succAbove (Nat.le_succ m) := by
+    have e2 : ((-1 : MvPolynomial (Fin (m + 1) × Fin (m + 1)) R) ^ ((c : ℕ) + m)) *
+        initMinor R c.succAbove (Nat.le_succ m) =
+        ((-1 : R) ^ ((c : ℕ) + m)) • initMinor R c.succAbove (Nat.le_succ m) := by
       rw [Algebra.smul_def]
       simp
     rw [e2]
@@ -137,7 +181,7 @@ theorem Nv_mem (R : Type) [CommRing R] (m : ℕ) (vec : Bool) (c : Fin (m + 1))
     refine ⟨?_, fun l j hlj => initMinor_invariant _ _ l j hlj⟩
     have e : nuL m 1 true = initW (m + 1) 1 := by
       funext t
-      simp only [nuL, initW, ↓ reduceIte]
+      simp only [nuL, initW, ↓reduceIte]
       by_cases ht : t = 0
       · subst ht
         simp
@@ -146,18 +190,15 @@ theorem Nv_mem (R : Type) [CommRing R] (m : ℕ) (vec : Bool) (c : Fin (m + 1))
           apply ht
           ext
           first
-          | (rw [Fin.val_zero]; omega)
-          | (simp only [Fin.coe_ofNat_eq_mod, Nat.zero_mod]; omega)
-          | (norm_num; omega)
+            | (rw [Fin.val_zero]; omega)
+            | (simp only [Fin.coe_ofNat_eq_mod, Nat.zero_mod]; omega)
+            | (norm_num; omega)
         simp [ht, h1]
     rw [e]
     exact initMinor_isWeightedHomogeneous _ _
 
-theorem dw_pow
-    {R : Type} [CommRing R]
-    {r n : ℕ} {ν : Fin n → ℕ} {f : MvPolynomial (Fin r × Fin n) R} (hf : f ∈ dualWeyl R r n ν)
-    (a : ℕ)
-    : f ^ a ∈ dualWeyl R r n (a • ν) := by
+theorem dw_pow {R : Type} [CommRing R] {r n : ℕ} {ν : Fin n → ℕ} {f : MvPolynomial (Fin r × Fin n) R}
+    (hf : f ∈ dualWeyl R r n ν) (a : ℕ) : f ^ a ∈ dualWeyl R r n (a • ν) := by
   induction a with
   | zero =>
     have e : (0 : ℕ) • ν = 0 := by
@@ -172,11 +213,9 @@ theorem dw_pow
     rw [pow_succ, e]
     exact Formalism.GradedWeylDivisibility.dualWeyl_mul ih hf
 
-theorem dw_prod
-    {R : Type} [CommRing R]
-    {r n : ℕ} {ν : Fin n → ℕ} {J : Type} (s : Finset J) (f : J → MvPolynomial (Fin r × Fin n) R)
-    (a : J → ℕ) (hf : ∀ i, f i ∈ dualWeyl R r n ν)
-    : ∏ i ∈ s, f i ^ a i ∈ dualWeyl R r n ((∑ i ∈ s, a i) • ν) := by
+theorem dw_prod {R : Type} [CommRing R] {r n : ℕ} {ν : Fin n → ℕ} {J : Type} (s : Finset J)
+    (f : J → MvPolynomial (Fin r × Fin n) R) (a : J → ℕ) (hf : ∀ i, f i ∈ dualWeyl R r n ν) :
+    ∏ i ∈ s, f i ^ a i ∈ dualWeyl R r n ((∑ i ∈ s, a i) • ν) := by
   classical
   refine Finset.induction_on s ?_ ?_
   · have e : (∑ i ∈ (∅ : Finset J), a i) • ν = 0 := by
@@ -191,15 +230,14 @@ theorem dw_prod
     rw [Finset.prod_insert hj, e]
     exact Formalism.GradedWeylDivisibility.dualWeyl_mul (dw_pow (hf j) (a j)) ih
 
-theorem theta_Hd_le (R : Type) [CommRing R] (m d : ℕ) (vec : Bool)
-    : (Hd R (m + 1) d).map (theta R m vec).toLinearMap
-      ≤ dualWeyl R (m + 1) (m + 1) (nuL m d vec) := by
+theorem theta_Hd_le (R : Type) [CommRing R] (m d : ℕ) (vec : Bool) :
+    (Hd R (m + 1) d).map (theta R m vec).toLinearMap ≤ dualWeyl R (m + 1) (m + 1) (nuL m d vec) := by
   classical
   intro y hy
   obtain ⟨P, hP, rfl⟩ := Submodule.mem_map.1 hy
   rw [mem_Hd] at hP
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [AlgHom.toLinearMap_apply, P.as_sum, map_sum]
+
+  rw [AlgHom.toLinearMap_apply, P.as_sum, map_sum]
   refine Submodule.sum_mem _ (fun μ hμ => ?_)
   unfold theta
   rw [MvPolynomial.aeval_monomial, ← Algebra.smul_def]
@@ -212,42 +250,13 @@ theorem theta_Hd_le (R : Type) [CommRing R] (m d : ℕ) (vec : Bool)
   unfold Finsupp.prod
   exact hmem
 
-theorem exists_succAbove {m : ℕ} (I : Fin m → Fin (m + 1)) (hI : StrictMono I)
-    : ∃ c : Fin (m + 1), I = c.succAbove := by
-  classical
-  have hinj := hI.injective
-  have hcard : (Finset.univ \ Finset.univ.image I).card = 1 := by
-    first
-    | rw [Finset.card_sdiff (Finset.subset_univ _), Finset.card_image_of_injective _ hinj]
-    | rw [Finset.card_sdiff_of_subset (Finset.subset_univ _), Finset.card_image_of_injective _ hinj]
-    simp
-  obtain ⟨c, hc⟩ := Finset.card_eq_one.1 hcard
-  refine ⟨c, (StrictMono.range_inj hI (Fin.strictMono_succAbove c)).1 ?_⟩
-  rw [Fin.range_succAbove]
-  ext x
-  simp only [Set.mem_range, Set.mem_compl_iff, Set.mem_singleton_iff]
-  constructor
-  · rintro ⟨y, rfl⟩ hy
-    have h1 : I y ∈ Finset.univ \ Finset.univ.image I := by
-      rw [hc, hy]
-      exact Finset.mem_singleton_self _
-    simp at h1
-  · intro hx
-    by_contra hne
-    have h1 : x ∈ Finset.univ \ Finset.univ.image I := by
-      simp only [Finset.mem_sdiff, Finset.mem_univ, Finset.mem_image, true_and]
-      intro hex
-      apply hne
-      simpa using hex
-    rw [hc] at h1
-    exact hx (Finset.mem_singleton.1 h1)
+theorem exists_succAbove {m : ℕ} (I : Fin m → Fin (m + 1)) (hI : StrictMono I) :
+    ∃ c : Fin (m + 1), I = c.succAbove := by
+  apply Formalism.FourierDecayAlt.P.CutMP.InvEig.smono_succAbove <;> assumption
 
-theorem minor_pre
-    (R : Type) [CommRing R]
-    (m : ℕ) (hm : 1 ≤ m)
-    (vec : Bool) (s : ℕ) (hs : s ≤ m + 1) (I : Fin s → Fin (m + 1))
-    (hI : StrictMono I) (h : s = 0 ∨ s = s0 m vec)
-    : ∃ q ∈ Hd R (m + 1) (if s = 0 then 0 else 1), theta R m vec q = initMinor R I hs := by
+theorem minor_pre (R : Type) [CommRing R] (m : ℕ) (hm : 1 ≤ m) (vec : Bool) (s : ℕ) (hs : s ≤ m + 1)
+    (I : Fin s → Fin (m + 1)) (hI : StrictMono I) (h : s = 0 ∨ s = s0 m vec) :
+    ∃ q ∈ Hd R (m + 1) (if s = 0 then 0 else 1), theta R m vec q = initMinor R I hs := by
   rcases h with rfl | hs0
   · refine ⟨1, ?_, ?_⟩
     · simpa using Hd_one R (m + 1)
@@ -255,17 +264,16 @@ theorem minor_pre
       unfold initMinor
       simp [Matrix.det_isEmpty]
   · cases vec
-    · simp only [s0, Bool.false_eq_true, ↓ reduceIte] at hs0
+    · simp only [s0, Bool.false_eq_true, ↓reduceIte] at hs0
       subst hs0
       obtain ⟨c, rfl⟩ := exists_succAbove I hI
       refine ⟨MvPolynomial.C ((-1 : R) ^ ((c : ℕ) + s)) * X c, ?_, ?_⟩
       · rw [if_neg (by omega)]
         exact Hd_X R (s + 1) _ c
       · unfold theta
-        rw [map_mul, MvPolynomial.aeval_C, MvPolynomial.aeval_X, Nv_false_eq,
-          MvPolynomial.algebraMap_eq, ← mul_assoc, map_pow, map_neg, map_one, ← pow_add,
-          Even.neg_one_pow ⟨_, rfl⟩, one_mul]
-    · simp only [s0, ↓ reduceIte] at hs0
+        rw [map_mul, MvPolynomial.aeval_C, MvPolynomial.aeval_X, Nv_false_eq, MvPolynomial.algebraMap_eq,
+          ← mul_assoc, map_pow, map_neg, map_one, ← pow_add, Even.neg_one_pow ⟨_, rfl⟩, one_mul]
+    · simp only [s0, ↓reduceIte] at hs0
       subst hs0
       refine ⟨X (I 0), ?_, ?_⟩
       · rw [if_neg one_ne_zero]
@@ -275,15 +283,11 @@ theorem minor_pre
         have hI2 : (fun _ : Fin 1 => I 0) = I := funext fun i => by rw [Subsingleton.elim i 0]
         rw [hI2]
 
-theorem shape_sizes
-    (m : ℕ) (hm : 1 ≤ m)
-    (d : ℕ) (vec : Bool)
-    {K : ℕ} (sz : Fin K → ℕ) (hshape : shapeDeg (n := m + 1) sz = nuL m d vec)
-    : (∀ k, sz k = 0 ∨ sz k = s0 m vec) ∧ ∑ k, (if sz k = 0 then 0 else 1) = d := by
+theorem shape_sizes (m : ℕ) (hm : 1 ≤ m) (d : ℕ) (vec : Bool) {K : ℕ} (sz : Fin K → ℕ)
+    (hshape : shapeDeg (n := m + 1) sz = nuL m d vec) :
+    (∀ k, sz k = 0 ∨ sz k = s0 m vec) ∧ ∑ k, (if sz k = 0 then 0 else 1) = d := by
   classical
-  have hA
-      : ∀ t : Fin (m + 1),
-        (Finset.univ.filter fun k : Fin K => t.val < sz k).card = nuL m d vec t := by
+  have hA : ∀ t : Fin (m + 1), (Finset.univ.filter fun k : Fin K => t.val < sz k).card = nuL m d vec t := by
     intro t
     rw [← hshape]
     rfl
@@ -293,9 +297,7 @@ theorem shape_sizes
     simp at h2
     omega
   have hz : ((0 : Fin (m + 1)) : ℕ) = 0 := by simp
-  have hsum
-      : ∑ k, (if sz k = 0 then 0 else 1)
-        = (Finset.univ.filter fun k : Fin K => ((0 : Fin (m + 1)) : ℕ) < sz k).card := by
+  have hsum : ∑ k, (if sz k = 0 then 0 else 1) = (Finset.univ.filter fun k : Fin K => ((0 : Fin (m + 1)) : ℕ) < sz k).card := by
     rw [Finset.card_filter]
     refine Finset.sum_congr rfl (fun k _ => ?_)
     by_cases h : sz k = 0 <;> simp [h, Nat.pos_iff_ne_zero, Fin.val_zero]
@@ -305,7 +307,7 @@ theorem shape_sizes
   refine ⟨?_, hsum.trans h0⟩
   intro k
   cases vec
-  · simp only [s0, Bool.false_eq_true, ↓ reduceIte]
+  · simp only [s0, Bool.false_eq_true, ↓reduceIte]
     have hlast : (Finset.univ.filter fun k : Fin K => m < sz k).card = 0 := by
       have h1 := hA (Fin.last m)
       simpa [nuL] using h1
@@ -320,9 +322,8 @@ theorem shape_sizes
     have hm1 : (Finset.univ.filter fun k : Fin K => m - 1 < sz k).card = d := by
       have h1 := hA ⟨m - 1, by omega⟩
       simpa [nuL, hne] using h1
-    have hsub
-        : (Finset.univ.filter fun k : Fin K => m - 1 < sz k)
-          ⊆ (Finset.univ.filter fun k : Fin K => ((0 : Fin (m + 1)) : ℕ) < sz k) := by
+    have hsub : (Finset.univ.filter fun k : Fin K => m - 1 < sz k) ⊆
+        (Finset.univ.filter fun k : Fin K => ((0 : Fin (m + 1)) : ℕ) < sz k) := by
       intro k hk
       simp only [Finset.mem_filter, Finset.mem_univ, true_and] at hk ⊢
       omega
@@ -337,7 +338,7 @@ theorem shape_sizes
       rw [← heq] at hk0
       simp only [Finset.mem_filter, Finset.mem_univ, true_and] at hk0
       omega
-  · simp only [s0, ↓ reduceIte]
+  · simp only [s0, ↓reduceIte]
     have hne : (⟨1, by omega⟩ : Fin (m + 1)) ≠ 0 := by
       intro h
       have h2 := congrArg Fin.val h
@@ -349,9 +350,8 @@ theorem shape_sizes
     have h4 := h1 (Finset.mem_univ k)
     omega
 
-theorem theta_Hd (R : Type) [CommRing R] [IsDomain R] (m : ℕ) (hm : 1 ≤ m) (d : ℕ) (vec : Bool)
-    : (Hd R (m + 1) d).map (theta R m vec).toLinearMap
-      = dualWeyl R (m + 1) (m + 1) (nuL m d vec) := by
+theorem theta_Hd (R : Type) [CommRing R] [IsDomain R] (m : ℕ) (hm : 1 ≤ m) (d : ℕ) (vec : Bool) :
+    (Hd R (m + 1) d).map (theta R m vec).toLinearMap = dualWeyl R (m + 1) (m + 1) (nuL m d vec) := by
   apply le_antisymm (theta_Hd_le R m d vec)
   obtain ⟨b, hb, h2⟩ := sSBasis R (m + 1) (m + 1) (nuL m d vec)
   rw [← hb.2.1, Submodule.span_le]

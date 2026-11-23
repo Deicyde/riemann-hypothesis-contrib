@@ -1,14 +1,61 @@
 module
 
-public import Mathlib
-public import Development.AutomorphicSpectrum.Definitions.MetricPeriods.IsPeriodOn
+import Development.WeilBound.CoreStatements.MultihomogeneousSquares.EmbImmersion
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ArithmeticHilbertSamuelLowerBound
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.InterRes
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Real
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+public import Mathlib.Analysis.SpecialFunctions.Sqrt
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Development.AutomorphicSpectrum.Definitions.MetricPeriods.PairRelationOfScaledRatio
+import GroundTheory.HeightsAndTheta.Heights.HodgeLowerBound.FrameDefinitions.PermFinTwoUniv
+import ReciprocityTheory.AnalyticForms.LeviForms.IsRegFamilyInhabitStatement
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArithmeticIntersection.MixedFieldContraction.GenericFibreKerTarget
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArithmeticIntersection.MultihomogeneousIdeals.IsFieldIntersection
 
 @[expose] public section
 
-open MvPolynomial Matrix ReciprocityTheory.AnForm ReciprocityTheory.AnForm.M
-  ReciprocityTheory.AnForm.P ReciprocityTheory.ChartRestriction.G.Geo
-  ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I4
-  GlobalTheory.CompanionTheory.Ar.PB GroundTheory.Heights₂.Heights.LowerBoundFree
+open MvPolynomial Matrix ReciprocityTheory.AnForm ReciprocityTheory.AnForm.M ReciprocityTheory.AnForm.P ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I4 GlobalTheory.CompanionTheory.Ar.PB GroundTheory.Heights₂.Heights.LowerBoundFree
 open scoped ComplexOrder Classical
 
 noncomputable section
@@ -19,10 +66,11 @@ variable {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)]
 
 abbrev cj (z : (Σ k, ι k) → ℂ) : (Σ k, ι k) → ℂ := fun q => starRingEnd ℂ (z q)
 
-theorem cj_cj (z : (Σ k, ι k) → ℂ) : cj (cj z) = z := by funext q; simp [cj]
+theorem cj_cj (z : (Σ k, ι k) → ℂ) : cj (cj z) = z := by
+  funext q; simp [cj]
 
-theorem cj_nonzero {z : (Σ k, ι k) → ℂ} (hz : ∀ k, ∃ i, z ⟨k, i⟩ ≠ 0)
-    : ∀ k, ∃ i, cj z ⟨k, i⟩ ≠ 0 := fun k => by
+theorem cj_nonzero {z : (Σ k, ι k) → ℂ} (hz : ∀ k, ∃ i, z ⟨k, i⟩ ≠ 0) :
+    ∀ k, ∃ i, cj z ⟨k, i⟩ ≠ 0 := fun k => by
   obtain ⟨i, hi⟩ := hz k
   exact ⟨i, by simpa [cj] using hi⟩
 
@@ -32,8 +80,8 @@ theorem sameOrbit_symm {z z' : (Σ k, ι k) → ℂ} (h : SameOrbit z z') : Same
   funext p
   simp [← mul_assoc, inv_mul_cancel₀ (hc p.1)]
 
-theorem sameOrbit_trans {z z' z'' : (Σ k, ι k) → ℂ} (h : SameOrbit z z') (h' : SameOrbit z' z'')
-    : SameOrbit z z'' := by
+theorem sameOrbit_trans {z z' z'' : (Σ k, ι k) → ℂ} (h : SameOrbit z z') (h' : SameOrbit z' z'') :
+    SameOrbit z z'' := by
   obtain ⟨c, hc, rfl⟩ := h
   obtain ⟨c', hc', rfl⟩ := h'
   refine ⟨fun k => c k * c' k, fun k => mul_ne_zero (hc k) (hc' k), ?_⟩
@@ -49,29 +97,26 @@ theorem sameOrbit_cj {z z' : (Σ k, ι k) → ℂ} (h : SameOrbit z z') : SameOr
   funext p
   simp [cj]
 
-theorem cj_mem_mcPts {P : Ideal (MRing ι)} {z : (Σ k, ι k) → ℂ} (hz : z ∈ mcPts P)
-    : cj z ∈ mcPts P := by
+theorem cj_mem_mcPts {P : Ideal (MRing ι)} {z : (Σ k, ι k) → ℂ} (hz : z ∈ mcPts P) : cj z ∈ mcPts P := by
   refine ⟨cj_nonzero hz.1, fun f hf => ?_⟩
   have h := hz.2 f hf
-  have key
-      : eval (cj z) (map (Int.castRingHom ℂ) f)
-        = starRingEnd ℂ (eval z (map (Int.castRingHom ℂ) f)) := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [MvPolynomial.eval_map, MvPolynomial.eval_map, MvPolynomial.eval₂_eq,
-        MvPolynomial.eval₂_eq, map_sum]
+  have key : eval (cj z) (map (Int.castRingHom ℂ) f) =
+      starRingEnd ℂ (eval z (map (Int.castRingHom ℂ) f)) := by
+
+    rw [MvPolynomial.eval_map, MvPolynomial.eval_map, MvPolynomial.eval₂_eq, MvPolynomial.eval₂_eq,
+    map_sum]
     refine Finset.sum_congr rfl fun d _ => ?_
     simp [map_mul, map_prod, map_pow]
   rw [key, h, map_zero]
 
-theorem log_sub_orbit
-    (A B : HermLine ι) (hab : A.a = B.a)
-    {z z' : (Σ k, ι k) → ℂ} (hz : ∀ k, ∃ i, z' ⟨k, i⟩ ≠ 0) (h : SameOrbit z z')
-    : Real.log (A.h z) - Real.log (B.h z) = Real.log (A.h z') - Real.log (B.h z') := by
+theorem log_sub_orbit (A B : HermLine ι) (hab : A.a = B.a) {z z' : (Σ k, ι k) → ℂ}
+    (hz : ∀ k, ∃ i, z' ⟨k, i⟩ ≠ 0) (h : SameOrbit z z') :
+    Real.log (A.h z) - Real.log (B.h z) = Real.log (A.h z') - Real.log (B.h z') := by
   obtain ⟨c, hc, rfl⟩ := h
   have hP : 0 < ∏ k, ‖c k‖ ^ A.a k :=
     Finset.prod_pos fun k _ => zpow_pos (norm_pos_iff.mpr (hc k)) _
-  rw [A.smul c z' hc, B.smul c z' hc, ← hab, Real.log_mul hP.ne' (A.pos z' hz).ne',
-    Real.log_mul hP.ne' (B.pos z' hz).ne']
+  rw [A.smul c z' hc, B.smul c z' hc, ← hab,
+    Real.log_mul hP.ne' (A.pos z' hz).ne', Real.log_mul hP.ne' (B.pos z' hz).ne']
   ring
 
 def conjAvg (A : HermLine ι) : HermLine ι where
@@ -79,23 +124,24 @@ def conjAvg (A : HermLine ι) : HermLine ι where
   h z := Real.sqrt |A.h z * A.h (cj z)|
   pos z hz := Real.sqrt_pos.2 (abs_pos.2 (mul_pos (A.pos z hz) (A.pos _ (cj_nonzero hz))).ne')
   smul c z hc := by
-    have hP : 0 ≤ ∏ k, ‖c k‖ ^ A.a k := Finset.prod_nonneg fun k _ => zpow_nonneg (norm_nonneg _) _
-    have e1 : cj (fun p : Σ k, ι k => c p.1 * z p) = fun p => (starRingEnd ℂ (c p.1)) * cj z p := by
+    have hP : 0 ≤ ∏ k, ‖c k‖ ^ A.a k :=
+      Finset.prod_nonneg fun k _ => zpow_nonneg (norm_nonneg _) _
+    have e1 : cj (fun p : Σ k, ι k => c p.1 * z p) =
+        fun p => (starRingEnd ℂ (c p.1)) * cj z p := by
       funext p; simp [cj]
     have hc' : ∀ k, starRingEnd ℂ (c k) ≠ 0 := fun k => by simpa using hc k
     rw [e1, A.smul c z hc, A.smul _ (cj z) hc']
     simp only [RCLike.norm_conj]
-    rw [show (∏ k, ‖c k‖ ^ A.a k) * A.h z * ((∏ k, ‖c k‖ ^ A.a k) * A.h (cj z))
-          = (∏ k, ‖c k‖ ^ A.a k) ^ 2 * (A.h z * A.h (cj z)) by
-        ring,
-      abs_mul, abs_of_nonneg (sq_nonneg _), Real.sqrt_mul (sq_nonneg _), Real.sqrt_sq hP]
+    rw [show (∏ k, ‖c k‖ ^ A.a k) * A.h z * ((∏ k, ‖c k‖ ^ A.a k) * A.h (cj z)) =
+      (∏ k, ‖c k‖ ^ A.a k) ^ 2 * (A.h z * A.h (cj z)) by ring, abs_mul, abs_of_nonneg (sq_nonneg _),
+      Real.sqrt_mul (sq_nonneg _), Real.sqrt_sq hP]
 
 theorem conjAvg_conj (A : HermLine ι) : IsConjInvariantH (conjAvg A) := fun z => by
   change Real.sqrt |A.h (cj z) * A.h (cj (cj z))| = Real.sqrt |A.h z * A.h (cj z)|
   rw [cj_cj, mul_comm]
 
-theorem conjAvg_log (A : HermLine ι) {z : (Σ k, ι k) → ℂ} (hz : ∀ k, ∃ i, z ⟨k, i⟩ ≠ 0)
-    : Real.log ((conjAvg A).h z) = (Real.log (A.h z) + Real.log (A.h (cj z))) / 2 := by
+theorem conjAvg_log (A : HermLine ι) {z : (Σ k, ι k) → ℂ} (hz : ∀ k, ∃ i, z ⟨k, i⟩ ≠ 0) :
+    Real.log ((conjAvg A).h z) = (Real.log (A.h z) + Real.log (A.h (cj z))) / 2 := by
   have h1 := A.pos z hz
   have h2 := A.pos _ (cj_nonzero hz)
   change Real.log (Real.sqrt |A.h z * A.h (cj z)|) = _
@@ -116,40 +162,19 @@ theorem conjAvg_smooth {A : HermLine ι} (hA : IsSmoothHerm A) : IsSmoothHerm (c
   change Real.sqrt |A.h z * A.h (cj z)| = _
   rw [abs_of_pos (mul_pos (A.pos z hz) (A.pos _ (cj_nonzero hz)))]
 
-theorem holoOn_comp
-    {e : ℕ} {X Y : Type} [TopologicalSpace X] [TopologicalSpace Y]
-    {A : FinHolAtlas e X} {B : FinHolAtlas e Y} {g : X → Y} (hg : HoloMap A B g)
-    {V : Set Y} {G : Y → ℂ} (hG : B.HoloOn V G)
-    : A.HoloOn (g ⁻¹' V) (G ∘ g) := by
-  intro j w hw
-  obtain ⟨k, hk⟩ := B.cover (g ((A.chart j).symm w))
-  have hw' : w ∈ (A.chart j).target ∩ (A.chart j).symm ⁻¹' (g ⁻¹' (B.chart k).source) := ⟨hw.1, hk⟩
-  have h1 := hg.2 j k w hw'
-  have h2 : AnalyticAt ℂ (G ∘ (B.chart k).symm) ((B.chart k ∘ g ∘ (A.chart j).symm) w) := by
-    refine hG k _ ⟨(B.chart k).map_source hk, ?_⟩
-    simp only [Function.comp, Set.mem_preimage, (B.chart k).left_inv hk]
-    exact hw.2
-  have h3 := h2.comp h1
-  refine h3.congr ?_
-  have hc : ContinuousAt (g ∘ (A.chart j).symm) w :=
-    hg.1.continuousAt.comp ((A.chart j).continuousAt_symm hw.1)
-  filter_upwards [hc ((B.chart k).open_source.mem_nhds hk)] with w' hw''
-  have hw3 : g ((A.chart j).symm w') ∈ (B.chart k).source := hw''
-  simp only [Function.comp, (B.chart k).left_inv hw3]
+theorem holoOn_comp {e : ℕ} {X Y : Type} [TopologicalSpace X] [TopologicalSpace Y]
+    {A : FinHolAtlas e X} {B : FinHolAtlas e Y} {g : X → Y} (hg : HoloMap A B g) {V : Set Y}
+    {G : Y → ℂ} (hG : B.HoloOn V G) : A.HoloOn (g ⁻¹' V) (G ∘ g) := by
+  apply SquareStatements.emb_holoOn <;> assumption
 
-def IsLiftSys
-    {e : ℕ} {X : Type} [TopologicalSpace X]
-    (A : FinHolAtlas e X) (P : Ideal (MRing ι)) (U : X → Set X) (lift : X → X → (Σ k, ι k) → ℂ)
-    : Prop :=
-  (∀ x, IsOpen (U x)) ∧ (∀ x, x ∈ U x) ∧ (∀ x p, A.HoloOn (U x) fun y => lift x y p)
-    ∧ (∀ x, ∀ y ∈ U x, lift x y ∈ mcPts P)
-    ∧ (∀ x x', ∀ y ∈ U x ∩ U x', SameOrbit (lift x y) (lift x' y))
-    ∧ (∀ z ∈ mcPts P, ∃ x, SameOrbit (lift x x) z)
-    ∧ (∀ x x', SameOrbit (lift x x) (lift x' x') → x = x')
-    ∧ ∀ x, ∀ p : (k : K) → ι k,
-      (∀ k, lift x x ⟨k, p k⟩ ≠ 0)
-        → ∀ j,
-          x ∈ (A.chart j).source
-            → (fderiv ℂ (fun y => affCoord p (lift x ((A.chart j).symm y))) (A.chart j x)).ker = ⊥
+def IsLiftSys {e : ℕ} {X : Type} [TopologicalSpace X] (A : FinHolAtlas e X) (P : Ideal (MRing ι))
+    (U : X → Set X) (lift : X → X → (Σ k, ι k) → ℂ) : Prop :=
+  (∀ x, IsOpen (U x)) ∧ (∀ x, x ∈ U x) ∧ (∀ x p, A.HoloOn (U x) fun y => lift x y p) ∧
+  (∀ x, ∀ y ∈ U x, lift x y ∈ mcPts P) ∧
+  (∀ x x', ∀ y ∈ U x ∩ U x', SameOrbit (lift x y) (lift x' y)) ∧
+  (∀ z ∈ mcPts P, ∃ x, SameOrbit (lift x x) z) ∧
+  (∀ x x', SameOrbit (lift x x) (lift x' x') → x = x') ∧
+  ∀ x, ∀ p : (k : K) → ι k, (∀ k, lift x x ⟨k, p k⟩ ≠ 0) → ∀ j, x ∈ (A.chart j).source →
+    (fderiv ℂ (fun y => affCoord p (lift x ((A.chart j).symm y))) (A.chart j x)).ker = ⊥
 
 end GlobalTheory.CompanionTheory.Ar.PB.Cj

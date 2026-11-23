@@ -1,6 +1,57 @@
 module
 
-public import Mathlib
+public import Mathlib.Algebra.MvPolynomial.Basic
+public import Mathlib.Algebra.Polynomial.Degree.Defs
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+public import Mathlib.Algebra.Polynomial.Degree.IsMonicOfDegree
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.MvPolynomial.IrreducibleQuadratic
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Lemma
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+public import Mathlib.Algebra.BigOperators.Fin
+public import Mathlib.Algebra.MvPolynomial.Degrees
+public import Mathlib.Algebra.MvPolynomial.Equiv
+public import Mathlib.Algebra.Polynomial.BigOperators
 
 @[expose] public section
 
@@ -12,8 +63,8 @@ open MvPolynomial
 
 variable {A : Type u} [CommRing A] {n : ℕ}
 
-private noncomputable def shear (b : ℕ) (c : A)
-    : MvPolynomial (Fin (n + 1)) A →ₐ[A] MvPolynomial (Fin (n + 1)) A :=
+private noncomputable def shear (b : ℕ) (c : A) :
+    MvPolynomial (Fin (n + 1)) A →ₐ[A] MvPolynomial (Fin (n + 1)) A :=
   aeval (Fin.cases (X 0) (fun i : Fin n => X i.succ + C c * X 0 ^ (b ^ (i.succ : ℕ))))
 
 private lemma shear_zero (b : ℕ) (c : A) : shear (n := n) b c (X 0) = X 0 := by
@@ -33,8 +84,8 @@ private lemma shear_comp (b : ℕ) (c d : A) (h : c + d = 0) :
       algHom_C, algebraMap_eq, add_assoc, ← add_mul, ← C_add, h]
     simp
 
-private noncomputable def chart (A : Type u) [CommRing A] (n b : ℕ)
-    : MvPolynomial (Fin (n + 1)) A ≃ₐ[A] Polynomial (MvPolynomial (Fin n) A) :=
+private noncomputable def chart (A : Type u) [CommRing A] (n b : ℕ) :
+    MvPolynomial (Fin (n + 1)) A ≃ₐ[A] Polynomial (MvPolynomial (Fin n) A) :=
   (AlgEquiv.ofAlgHom (shear b 1) (shear b (-1)) (shear_comp b 1 (-1) (by simp))
     (shear_comp b (-1) 1 (by simp))).trans (finSuccEquiv A n)
 
@@ -82,11 +133,8 @@ private lemma weight_inj {m b : ℕ} (v w : Fin m → ℕ) (hv : ∀ i, v i < b)
 end UpperTheory.NoetherNormalizationChart
 
 open UpperTheory.NoetherNormalizationChart in
-theorem UpperTheory.exists_monic_change_of_variables
-    : ∀ (A : Type u) [CommRing A] [IsDomain A] (n : ℕ) (f : MvPolynomial (Fin (n + 1)) A),
-      f ≠ 0
-        → ∃ (e : MvPolynomial (Fin (n + 1)) A ≃ₐ[A] Polynomial (MvPolynomial (Fin n) A)) (a : A),
-          a ≠ 0 ∧ (e f).leadingCoeff = MvPolynomial.C a := by
+theorem UpperTheory.exists_monic_change_of_variables :
+    ∀ (A : Type u) [CommRing A] [IsDomain A] (n : ℕ) (f : MvPolynomial (Fin (n + 1)) A), f ≠ 0 → ∃ (e : MvPolynomial (Fin (n + 1)) A ≃ₐ[A] Polynomial (MvPolynomial (Fin n) A)) (a : A), a ≠ 0 ∧ (e f).leadingCoeff = MvPolynomial.C a := by
   intro A _ _ n f hf
   classical
   set b := f.totalDegree + 1 with hbdef
@@ -95,15 +143,12 @@ theorem UpperTheory.exists_monic_change_of_variables
   have hlt : ∀ v ∈ f.support, ∀ i, v i < b := fun v hv i =>
     Nat.lt_succ_of_le ((MvPolynomial.monomial_le_degreeOf i hv).trans
       (MvPolynomial.degreeOf_le_totalDegree f i))
-  obtain ⟨v, hv, hmax⟩ :=
-    Finset.exists_max_image f.support wt (MvPolynomial.support_nonempty.mpr hf)
+  obtain ⟨v, hv, hmax⟩ := Finset.exists_max_image f.support wt (MvPolynomial.support_nonempty.mpr hf)
   have ha : f.coeff v ≠ 0 := MvPolynomial.mem_support_iff.mp hv
-  have hsum
-      : chart A n b f
-        = ∑ w ∈ f.support,
-          Polynomial.C (MvPolynomial.C (f.coeff w)) * chart A n b (MvPolynomial.monomial w 1) := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      conv_lhs => rw [← f.support_sum_monomial_coeff, map_sum]
+  have hsum : chart A n b f = ∑ w ∈ f.support,
+      Polynomial.C (MvPolynomial.C (f.coeff w)) * chart A n b (MvPolynomial.monomial w 1) := by
+
+    conv_lhs => rw [← f.support_sum_monomial_coeff, map_sum]
     refine Finset.sum_congr rfl fun w _ => ?_
     rw [← chart_C b, ← map_mul, MvPolynomial.C_mul_monomial, mul_one]
   have hdeg : (chart A n b f).natDegree ≤ wt v := by

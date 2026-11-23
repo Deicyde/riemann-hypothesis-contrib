@@ -1,13 +1,49 @@
 module
 
-public import Formalism.AdmissibleDesigns.TheoremFromNormalizedOpenThree
-public import Formalism.AdmissibleDesigns.TrivialBoundTargetOfPsi
-public import Formalism.AdmissibleDesigns.YtTargetOf
-public import Formalism.AdmissibleDesigns.TwistedTargetOfInputs
-public import Formalism.AdmissibleDesigns.MsContW
-public import Formalism.AdmissibleDesigns.TrivialBoundAtRowsOfAdmTB
+public import Formalism.AdmissibleDesigns.CharacterTrivialWhereLattice
+public import Formalism.AdmissibleDesigns.SelmerInequalityOfInputs
+public import Formalism.AdmissibleDesigns.TrCMemZ1D
 public import Formalism.AdmissibleDesigns.CoefChangeRec
-public import Formalism.AdmissibleDesigns.MsWApply
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
+public import Formalism.AdmissibleDesigns.GlobalIndexTheoremPlacesOfRNAdm
+import Formalism.WachLatticeTwists.SplitClassesAll.Statement
 
 @[expose] public section
 
@@ -78,8 +114,8 @@ def ClauseTB : Prop :=
                   divBy (St.FS i r π dc g0 eB e₁ s Dd hD hc c w) (((D.nd.l i : ℕ) : D.nd.O i) ^ cB)).subtype)
             ≤ eON i * (cB : ℕ∞) * ((ReciprocityTheory.Gal.locDeg (plOf i dc w) : ℕ∞) + 1)
 
-set_option maxHeartbeats 4000000 in
-set_option synthInstance.maxHeartbeats 400000 in
+
+
 def ClauseChi : Prop :=
   ∀ c : Fin (D.R.t + 1),
     2 ≤ (c : ℕ)
@@ -89,8 +125,8 @@ def ClauseChi : Prop :=
         (ShaN i ((c : ℕ) - 1)) (St.FS i r π dc g0 eB e₁ s Dd hD hc c) (QS.Io i) (QS.IS i)
         (QS.I i dc) (QS.γQ i dc) (QS.ζ i dc Dd) (QS.ζO i dc) (QS.nQ i dc)
 
-set_option maxHeartbeats 4000000 in
-set_option synthInstance.maxHeartbeats 400000 in
+
+
 def ClauseLoc1 : Prop :=
   InChiLoc (blockRestrictedRepresentationType (RepresentationBoundsCohomology.blk D.R) Dd.ρk QS.c1)
     Dd.r Dd.χ Dd.E (decs D.host.E (Aw i dc)) (qsN i dc) (St.FS i r π dc g0 eB e₁ s Dd hD hc QS.c1)
@@ -141,8 +177,6 @@ theorem first_character_index_ne_zero : (QS.c1 (D := D)) ≠ 0 := by
   have h' := congrArg Fin.val h
   simp [QS.c1] at h'
 
-set_option maxHeartbeats 4000000 in
-set_option synthInstance.maxHeartbeats 400000 in
 theorem first_local_clause_of
     (hN : RepresentationBoundsCohomology.NormAt D.nd r ρ π)
     (hG4 : TruncatedSeriesCountingIdentities.admG4 i r)
@@ -156,8 +190,6 @@ theorem first_local_clause_of
   exact locPos (dc := dc) (hE := hE) (hN := hN) (hG4 := hG4) (hdec := hdec) (hG5 := hG5)
     (h5x := h5x) (hQP := hQP) (c := QS.c1) (hc0 := first_character_index_ne_zero)
 
-set_option maxHeartbeats 4000000 in
-set_option synthInstance.maxHeartbeats 400000 in
 theorem chi_of
     (hN : RepresentationBoundsCohomology.NormAt D.nd r ρ π)
     (hG4 : TruncatedSeriesCountingIdentities.admG4 i r)
@@ -181,8 +213,6 @@ theorem chi_of
 omit [∀ k,
   IsScalarTower Dd.T' Dd.R'
     (blockRestrictedRepresentationType (RepresentationBoundsCohomology.blk D.R) Dd.ρk k)] in
-set_option maxHeartbeats 4000000 in
-set_option synthInstance.maxHeartbeats 400000 in
 theorem FS_row (c : Fin (D.R.t + 1)) (hc0 : c ≠ 0) {w : ℕ} (hw : w ∈ rowsN i dc)
     : St.FS i r π dc g0 eB e₁ s Dd hD hc c w = TB.Fc i dc Dd c w := by
   obtain ⟨c', rfl⟩ := Fin.exists_succ_eq.mpr hc0
@@ -193,8 +223,6 @@ theorem FS_row (c : Fin (D.R.t + 1)) (hc0 : c ≠ 0) {w : ℕ} (hw : w ∈ rowsN
 omit [∀ k,
   IsScalarTower Dd.T' Dd.R'
     (blockRestrictedRepresentationType (RepresentationBoundsCohomology.blk D.R) Dd.ρk k)] in
-set_option maxHeartbeats 1000000 in
-set_option synthInstance.maxHeartbeats 400000 in
 theorem tb_of_target (hT : TB.TBTarget i dc Dd cB) : ClauseTB i r π dc g0 eB e₁ s Dd hD hc cB := by
   intro c hc1 w hw
   have hc0 : c ≠ 0 := fun h => by

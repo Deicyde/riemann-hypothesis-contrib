@@ -1,6 +1,45 @@
 module
 
 public import Formalism.SharpRestriction.GrowthBounds.HermitianTensor.CoeffSumMonomialLinear
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
@@ -8,21 +47,20 @@ noncomputable section
 
 namespace Formalism.MainNotions.flipOneThree.Pf
 
-open Formalism.MainNotions.G Formalism.MainNotions.flipOneThree Formalism.GradedWeylDivisibility
-  MvPolynomial
+open Formalism.MainNotions.G Formalism.MainNotions.flipOneThree Formalism.GradedWeylDivisibility MvPolynomial
 
 section Basic
 
 variable {A : Type} [CommRing A] {r : ℕ}
 
-theorem qa_subY_X_some (v : Fin (r + 1 + 1) × Fin (r + 1 + 1)) (j : Fin r) (h : midOf v.2 = some j)
-    : subY A r (X v) = ∑ i : Fin r, C (X (i, j)) * X (v.1, midI r i) := by
+theorem qa_subY_X_some (v : Fin (r + 1 + 1) × Fin (r + 1 + 1)) (j : Fin r) (h : midOf v.2 = some j) :
+    subY A r (X v) = ∑ i : Fin r, C (X (i, j)) * X (v.1, midI r i) := by
   unfold subY
   rw [aeval_X]
   simp only [h]
 
-theorem qa_subY_X_none (v : Fin (r + 1 + 1) × Fin (r + 1 + 1)) (h : midOf v.2 = none)
-    : subY A r (X v) = X v := by
+theorem qa_subY_X_none (v : Fin (r + 1 + 1) × Fin (r + 1 + 1)) (h : midOf v.2 = none) :
+    subY A r (X v) = X v := by
   unfold subY
   rw [aeval_X]
   simp only [h]
@@ -33,14 +71,13 @@ theorem qa_subY_C (a : A) : subY A r (C a) = C (C a) := by
 
 end Basic
 
-theorem qa_rowAct_X
-    {R : Type} [CommRing R] {k n : ℕ} (g : Matrix (Fin k) (Fin k) R) (x : Fin k × Fin n)
-    : rowAct R g (X x) = ∑ b : Fin k, C (g x.1 b) * X (b, x.2) := by
+theorem qa_rowAct_X {R : Type} [CommRing R] {k n : ℕ} (g : Matrix (Fin k) (Fin k) R) (x : Fin k × Fin n) :
+    rowAct R g (X x) = ∑ b : Fin k, C (g x.1 b) * X (b, x.2) := by
   unfold rowAct
   exact aeval_X _ x
 
-theorem qa_rowAct_C {R : Type} [CommRing R] {k n : ℕ} (g : Matrix (Fin k) (Fin k) R) (c : R)
-    : rowAct R (n := n) g (C c) = C c := by
+theorem qa_rowAct_C {R : Type} [CommRing R] {k n : ℕ} (g : Matrix (Fin k) (Fin k) R) (c : R) :
+    rowAct R (n := n) g (C c) = C c := by
   unfold rowAct
   exact aeval_C _ c
 
@@ -57,16 +94,16 @@ theorem subMapP : SubMapP := by
       cases hm : midOf w.2 with
       | none => rw [qa_subY_X_none w hm, qa_subY_X_none w hm, map_X]
       | some j =>
-        set_option synthInstance.maxHeartbeats 100000 in
-          rw [qa_subY_X_some w j hm, qa_subY_X_some w j hm, map_sum]
+
+        rw [qa_subY_X_some w j hm, qa_subY_X_some w j hm, map_sum]
         refine Finset.sum_congr rfl fun i _ => ?_
         rw [map_mul, map_C, map_X, map_X]
   exact RingHom.congr_fun h v
 
 def rowInd {k n : ℕ} (a : Fin k) : Fin k × Fin n → ℕ := fun v => if v.1 = a then 1 else 0
 
-theorem qa_weight_rowInd {k n : ℕ} (a : Fin k) (u : Fin k × Fin n →₀ ℕ)
-    : Finsupp.weight (rowInd a) u = rowDeg u a := by
+theorem qa_weight_rowInd {k n : ℕ} (a : Fin k) (u : Fin k × Fin n →₀ ℕ) :
+    Finsupp.weight (rowInd a) u = rowDeg u a := by
   rw [Finsupp.weight_apply, Finsupp.sum_fintype _ _ (by simp), Fintype.sum_prod_type, rowDeg]
   rw [Finset.sum_eq_single a]
   · refine Finset.sum_congr rfl fun s _ => ?_
@@ -77,11 +114,8 @@ theorem qa_weight_rowInd {k n : ℕ} (a : Fin k) (u : Fin k × Fin n →₀ ℕ)
   · intro h
     exact absurd (Finset.mem_univ a) h
 
-theorem qa_iwh_pow
-    {σ R M : Type} [CommSemiring R] [AddCommMonoid M]
-    {w : σ → M} {φ : MvPolynomial σ R} {n : M} (h : IsWeightedHomogeneous w φ n)
-    (k : ℕ)
-    : IsWeightedHomogeneous w (φ ^ k) (k • n) := by
+theorem qa_iwh_pow {σ R M : Type} [CommSemiring R] [AddCommMonoid M] {w : σ → M} {φ : MvPolynomial σ R} {n : M}
+    (h : IsWeightedHomogeneous w φ n) (k : ℕ) : IsWeightedHomogeneous w (φ ^ k) (k • n) := by
   induction k with
   | zero =>
     rw [pow_zero, zero_smul]
@@ -102,21 +136,17 @@ theorem subRowP : SubRowP := by
     | some j =>
       rw [qa_subY_X_some x j hm]
       refine IsWeightedHomogeneous.sum _ _ _ fun i _ => ?_
-      have h :=
-        (isWeightedHomogeneous_C (rowInd a) (X (i, j) : MvPolynomial (Fin r × Fin r) A)).mul
-          (isWeightedHomogeneous_X (MvPolynomial (Fin r × Fin r) A) (rowInd a) (x.1, midI r i))
+      have h := (isWeightedHomogeneous_C (rowInd a) (X (i, j) : MvPolynomial (Fin r × Fin r) A)).mul
+        (isWeightedHomogeneous_X (MvPolynomial (Fin r × Fin r) A) (rowInd a) (x.1, midI r i))
       rw [zero_add] at h
       exact h
   have hmain : IsWeightedHomogeneous (rowInd a) (subY A r v) d := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← support_sum_monomial_coeff v, map_sum]
+
+    rw [← support_sum_monomial_coeff v, map_sum]
     refine IsWeightedHomogeneous.sum _ _ _ fun u hu => ?_
     have hd : rowDeg u a = d := hv u (mem_support_iff.1 hu)
-    have e
-        : (monomial u (AddMonoidAlgebra.coeff v u)
-            : MvPolynomial (Fin (r + 1 + 1) × Fin (r + 1 + 1)) A)
-          = C (AddMonoidAlgebra.coeff v u) * ∏ x ∈ u.support, X x ^ u x :=
-      monomial_eq
+    have e : (monomial u (AddMonoidAlgebra.coeff v u) : MvPolynomial (Fin (r + 1 + 1) × Fin (r + 1 + 1)) A) =
+        C (AddMonoidAlgebra.coeff v u) * ∏ x ∈ u.support, X x ^ u x := monomial_eq
     rw [e, map_mul (subY A r), qa_subY_C, map_prod]
     have h1 : IsWeightedHomogeneous (rowInd a) (∏ x ∈ u.support, subY A r (X x ^ u x))
         (∑ x ∈ u.support, u x • rowInd a x) :=
@@ -127,32 +157,26 @@ theorem subRowP : SubRowP := by
       have h0 := qa_weight_rowInd a u
       rw [Finsupp.weight_apply] at h0
       exact h0.trans hd
-    have h3 :=
-      (isWeightedHomogeneous_C (rowInd a)
-        (C (AddMonoidAlgebra.coeff v u) : MvPolynomial (Fin r × Fin r) A)).mul h1
+    have h3 := (isWeightedHomogeneous_C (rowInd a) (C (AddMonoidAlgebra.coeff v u) : MvPolynomial (Fin r × Fin r) A)).mul h1
     rw [zero_add, h2] at h3
     exact h3
   intro u hu
   rw [← qa_weight_rowInd a u]
   exact hmain hu
 
-theorem qa_subY_rowAct
-    {A : Type} [CommRing A]
-    {r : ℕ} (g : Matrix (Fin (r + 1 + 1)) (Fin (r + 1 + 1)) A)
-    (v : MvPolynomial (Fin (r + 1 + 1) × Fin (r + 1 + 1)) A)
-    : subY A r (rowAct A g v) = rowAct (MvPolynomial (Fin r × Fin r) A) (g.map C) (subY A r v) := by
-  have h
-      : (subY A r).toRingHom.comp (rowAct A g).toRingHom
-        = (rowAct (MvPolynomial (Fin r × Fin r) A) (g.map C)).toRingHom.comp
-          (subY A r).toRingHom := by
+theorem qa_subY_rowAct {A : Type} [CommRing A] {r : ℕ} (g : Matrix (Fin (r + 1 + 1)) (Fin (r + 1 + 1)) A)
+    (v : MvPolynomial (Fin (r + 1 + 1) × Fin (r + 1 + 1)) A) :
+    subY A r (rowAct A g v) = rowAct (MvPolynomial (Fin r × Fin r) A) (g.map C) (subY A r v) := by
+  have h : (subY A r).toRingHom.comp (rowAct A g).toRingHom =
+      (rowAct (MvPolynomial (Fin r × Fin r) A) (g.map C)).toRingHom.comp (subY A r).toRingHom := by
     apply MvPolynomial.ringHom_ext
     · intro a
       show subY A r (rowAct A g (C a)) = rowAct _ (g.map C) (subY A r (C a))
       rw [qa_rowAct_C, qa_subY_C, qa_rowAct_C]
     · intro x
       show subY A r (rowAct A g (X x)) = rowAct _ (g.map C) (subY A r (X x))
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [qa_rowAct_X, map_sum]
+
+      rw [qa_rowAct_X, map_sum]
       cases hm : midOf x.2 with
       | none =>
         rw [qa_subY_X_none x hm, qa_rowAct_X]
@@ -160,21 +184,16 @@ theorem qa_subY_rowAct
         rw [map_mul (subY A r), qa_subY_C, qa_subY_X_none (b, x.2) hm]
         try rfl
       | some j =>
-        set_option synthInstance.maxHeartbeats 100000 in
-          rw [qa_subY_X_some x j hm, map_sum]
-        have e1
-            : ∀ b,
-              subY A r (C (g x.1 b) * X (b, x.2))
-                = ∑ i, C (C (g x.1 b)) * (C (X (i, j)) * X (b, midI r i)) := by
+
+        rw [qa_subY_X_some x j hm, map_sum]
+        have e1 : ∀ b, subY A r (C (g x.1 b) * X (b, x.2)) =
+            ∑ i, C (C (g x.1 b)) * (C (X (i, j)) * X (b, midI r i)) := by
           intro b
           rw [map_mul (subY A r), qa_subY_C, qa_subY_X_some (b, x.2) j hm, Finset.mul_sum]
-        have e2
-            : ∀ i,
-              rowAct (MvPolynomial (Fin r × Fin r) A) (g.map C) (C (X (i, j)) * X (x.1, midI r i))
-                = ∑ b, C (X (i, j)) * (C (C (g x.1 b)) * X (b, midI r i)) := by
+        have e2 : ∀ i, rowAct (MvPolynomial (Fin r × Fin r) A) (g.map C) (C (X (i, j)) * X (x.1, midI r i)) =
+            ∑ b, C (X (i, j)) * (C (C (g x.1 b)) * X (b, midI r i)) := by
           intro i
-          rw [map_mul (rowAct (MvPolynomial (Fin r × Fin r) A) (g.map C)), qa_rowAct_C, qa_rowAct_X,
-            Finset.mul_sum]
+          rw [map_mul (rowAct (MvPolynomial (Fin r × Fin r) A) (g.map C)), qa_rowAct_C, qa_rowAct_X, Finset.mul_sum]
           try rfl
         simp only [e1, e2]
         rw [Finset.sum_comm]

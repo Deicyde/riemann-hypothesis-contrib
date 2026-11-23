@@ -1,9 +1,61 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.IsTransition
-public import Development.AutomorphicSpectrum.Proofs.AlgebraProofs.IdealPadicGeneratorLogNormStatement
+public import Development.AutomorphicSpectrum.Definitions.AdelicLattices.FactPrimes
+public import Mathlib.Algebra.AffineMonoid.Basic
 public import Development.AutomorphicArithmetic.IntegralCasts.CapelliIdentities.ExistsCoordinate
+public import Development.AutomorphicSpectrum.Proofs.AlgebraProofs.IdealPadicGeneratorLogNormStatement
+import Mathlib.Algebra.Module.StablyFree.Basic
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Rat
+public import Mathlib.Algebra.Polynomial.SpecificDegree
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.PicardGroup
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.Valuation.Integral
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
 
 @[expose] public section
 
@@ -325,8 +377,8 @@ theorem exists_basis (H : Host E) (ℓ f : ℕ) (b : Fin f → 𝓞 E) (h : IsLo
       ring
     have hz : ∑ k, c' k • b k = 0 := by
       apply inj
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum, map_zero]
+
+      rw [map_sum, map_zero]
       have h1 : ∀ k, algebraMap (𝓞 E) E (c' k • b k) = P * (g k • (b k : E)) := fun k => by
         rw [Subalgebra.smul_def, smul_eq_mul, map_mul, Algebra.smul_def, ← _root_.mul_assoc]
         exact congrArg (· * _) (hc' k)
@@ -480,8 +532,8 @@ theorem orth_of_dual
     sum_dual_embeddings (Ω := Ω) B B.traceDual (by rw [Module.finrank_eq_card_basis B]; simp)
       (trace_dual_apply H B) τ τ'
   have hm : em (∑ k, σ (B.traceDual k) * σ' (B k)) = ∑ k, τ (B.traceDual k) * τ' (B k) := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     exact Finset.sum_congr rfl fun k _ => map_mul em _ _
   rw [← hm] at hs
   have heq : τ' = τ ↔ σ = σ' := by
@@ -509,8 +561,8 @@ theorem trace_dual_mem
   let cK : Fin f → Kf H := fun i => ⟨(((c i : Ord H) : 𝓞 E) : E), mem_Kf_of_ord H (c i).2⟩
   have hx : (n : E) * a = ∑ i, cK i • B i := by
     have h1 := congrArg (algebraMap (𝓞 E) E) hc
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, map_nsmul] at h1
+
+    rw [map_sum, map_nsmul] at h1
     rw [nsmul_eq_mul] at h1
     refine h1.symm.trans (Finset.sum_congr rfl fun i _ => ?_)
     rw [Subalgebra.smul_def, smul_eq_mul, map_mul, Algebra.smul_def, hB]
@@ -590,8 +642,8 @@ theorem relative_dual
     have h2 := bridge_up H y h1
     have h3 : y = ∑ k, (B.traceDual.repr y k) • B.traceDual k := (B.traceDual.sum_repr y).symm
     have h4 : ‖j y‖ ≤ ⨆ k, ‖j (B.traceDual k)‖ := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [h3, map_sum]
+
+      rw [h3, map_sum]
       refine IsUltrametricDist.norm_sum_le_of_forall_le_of_nonneg hnn fun k _ => ?_
       obtain ⟨c, -, hc'⟩ := h2 (b k)
       have e : B.traceDual.repr y k = Algebra.trace (Kf H) E (y * (b k : E)) := by

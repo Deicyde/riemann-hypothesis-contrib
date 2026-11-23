@@ -1,10 +1,54 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.IsIteratedQuotientIntegralFinsetSum
-public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.IntegralIndicatorGivesLocalVacuumSplitPlaceStatement
-public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.SplitPlaceLocalGroupClosedEmbeddingIntegralStatement
+public import Development.AbelianVarietyTheory.Definitions.LatticeFrames.CosInj
+import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.BilinearVacuumCentralCharacter
 public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.DoubleStepAdelicIntegralFiniteTwistPlacesStatement
+public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.DoubleStepEqTwoThetaColumnLifts
+import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.HandBFSmul
+import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.HeisenbergCombinationTwoVariableModelAndLineExte
+public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.IntegralIndicatorGivesLocalVacuumSplitPlaceStatement
+import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.MemSupportAconvPair
+import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.SeeSawUnfoldedDataEqKernelDataAtLevel
+import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.SplitPlaceLocalGroupClosedEmbeddingIntegralStatement
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
@@ -135,7 +179,6 @@ theorem ix₁ (Q : QAt v χ) (h : j + 2 * (σ + 1) + 2 = D.R.m) : j + 1 + (2 * �
 theorem ix₂ (Q : QAt v χ) (h : j + 2 * (σ + 1) + 2 = D.R.m) : j + 1 + 1 + 2 * σ = Q.s := by
   have := Q.hs; omega
 
-set_option maxHeartbeats 1000000 in
 @[reducible]
 def stepOf (H : Chars t χ j σ h χz) (Q : QAt v χ) (α : Q.Ch j) : QStep (dblOf H) := {
   k := Q.k
@@ -273,7 +316,6 @@ theorem fin_dQ {w : VTup t} (F : QFam v t) (hF : F.Pins w) (n : ℕ) (hn : n + 3
   have := (F.Q i).hs
   exact isFinComb_of_half (F.Q i).q ((F.Q i).dL_mid n ((F.Q i).s - (n + 1)) (by omega) _ _).1
 
-set_option maxHeartbeats 1000000 in
 theorem oneChart
     (hc : c.Is) (hv : v.Is) (hW : WeilOK (t := t) v)
     {w : VTup t} (F : QFam v t) (hF : F.Pins w) (H : Chars t F.χ j σ h χz)
@@ -383,7 +425,6 @@ theorem oneChart
     simp only [mul_assoc]
     rfl
 
-set_option maxHeartbeats 1000000 in
 theorem qLaw_of_pin
     : ∀ (D : D7) (c : Comm D) (v : VCom c) (t : Tup c) (w : VTup t),
       c.Is → t.Is → v.Is → WeilOK (t := t) v → QPin v w → QLaw v w := by

@@ -1,8 +1,45 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.PublishedTheorems.AutomorphicForms₂.InterPolyProdSum
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.BlockSymApply
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
@@ -23,12 +60,10 @@ def graph (w : Equiv.Perm α) : α × α →₀ ℕ := ∑ a, Finsupp.single (a,
 def tc (P : MvPolynomial (α × α) ℂ) : ℂ :=
   ∑ w : Equiv.Perm α, ((Equiv.Perm.sign w : ℤ) : ℂ) * AddMonoidAlgebra.coeff P (graph w)
 
-theorem topCoeff_eq_tc {n : ℕ} (P : MvPolynomial (Fin n × Fin n) ℂ)
-    : GlobalTheory.GoodMetric.topCoeff P = tc P :=
-  rfl
+theorem topCoeff_eq_tc {n : ℕ} (P : MvPolynomial (Fin n × Fin n) ℂ) : GlobalTheory.GoodMetric.topCoeff P = tc P := rfl
 
-theorem tc_sum {κ : Type} (s : Finset κ) (f : κ → MvPolynomial (α × α) ℂ)
-    : tc (∑ i ∈ s, f i) = ∑ i ∈ s, tc (f i) := by
+theorem tc_sum {κ : Type} (s : Finset κ) (f : κ → MvPolynomial (α × α) ℂ) :
+    tc (∑ i ∈ s, f i) = ∑ i ∈ s, tc (f i) := by
   simp only [tc, coeff_sum, Finset.mul_sum]
   exact Finset.sum_comm
 
@@ -38,13 +73,11 @@ theorem tc_monomial (u : α × α →₀ ℕ) (c : ℂ) : tc (monomial u c) = c 
   split_ifs <;> ring
 
 theorem graph_apply (w : Equiv.Perm α) (a b : α) : graph w (a, b) = if w a = b then 1 else 0 := by
-  rw [graph, Finsupp.finsetSum_apply,
-    Finset.sum_eq_single a (fun c _ hc => by simp [Finsupp.single_apply, hc]) (by simp)]
+  rw [graph, Finsupp.finsetSum_apply, Finset.sum_eq_single a (fun c _ hc => by simp [Finsupp.single_apply, hc]) (by simp)]
   simp [Finsupp.single_apply]
 
-theorem tc_rename_equiv
-    {β : Type} [Fintype β] [DecidableEq β] (e : α ≃ β) (P : MvPolynomial (α × α) ℂ)
-    : tc (rename (Prod.map e e) P) = tc P := by
+theorem tc_rename_equiv {β : Type} [Fintype β] [DecidableEq β] (e : α ≃ β) (P : MvPolynomial (α × α) ℂ) :
+    tc (rename (Prod.map e e) P) = tc P := by
   unfold tc
   rw [← (Equiv.permCongr e).sum_comp]
   refine Finset.sum_congr rfl fun v _ => ?_
@@ -59,14 +92,12 @@ theorem tc_rename_equiv
     exact Prod.ext h.1 h.2
   rw [hg, coeff_rename_mapDomain _ hinj, Equiv.Perm.sign_permCongr]
 
-theorem prod_monomial' {κ : Type} (s : Finset κ) (f : κ → α × α →₀ ℕ) (c : κ → ℂ)
-    : ∏ i ∈ s, (monomial (f i) (c i) : MvPolynomial (α × α) ℂ)
-      = monomial (∑ i ∈ s, f i) (∏ i ∈ s, c i) := by
+theorem prod_monomial' {κ : Type} (s : Finset κ) (f : κ → α × α →₀ ℕ) (c : κ → ℂ) :
+    ∏ i ∈ s, (monomial (f i) (c i) : MvPolynomial (α × α) ℂ) = monomial (∑ i ∈ s, f i) (∏ i ∈ s, c i) := by
   classical
   induction s using Finset.induction_on with
   | empty => simp
-  | insert a s ha ih =>
-    rw [Finset.prod_insert ha, ih, monomial_mul, Finset.sum_insert ha, Finset.prod_insert ha]
+  | insert a s ha ih => rw [Finset.prod_insert ha, ih, monomial_mul, Finset.sum_insert ha, Finset.prod_insert ha]
 
 end General
 
@@ -108,15 +139,15 @@ theorem glue_injective : Function.Injective (glue (ι := ι) (γ := γ)) := by
   ext v
   rw [← glue_emb, h, glue_emb]
 
-theorem graph_prodCongrRight (σ : ι → Equiv.Perm γ)
-    : graph (Equiv.prodCongrRight σ) = glue fun τ => graph (σ τ) := by
+theorem graph_prodCongrRight (σ : ι → Equiv.Perm γ) :
+    graph (Equiv.prodCongrRight σ) = glue fun τ => graph (σ τ) := by
   unfold glue graph
   simp only [Finsupp.mapDomain_finsetSum, Finsupp.mapDomain_single]
   rw [Fintype.sum_prod_type]
   simp only [Finsupp.mapDomain_finsetSum, Finsupp.mapDomain_single, emb, Equiv.prodCongrRight_apply]
 
-theorem exists_prodCongrRight (w : Equiv.Perm (ι × γ)) (hw : ∀ a, (w a).1 = a.1)
-    : ∃ σ : ι → Equiv.Perm γ, Equiv.prodCongrRight σ = w := by
+theorem exists_prodCongrRight (w : Equiv.Perm (ι × γ)) (hw : ∀ a, (w a).1 = a.1) :
+    ∃ σ : ι → Equiv.Perm γ, Equiv.prodCongrRight σ = w := by
   have hw' : ∀ b, (w.symm b).1 = b.1 := fun b => by
     have := hw (w.symm b)
     rw [Equiv.apply_symm_apply] at this
@@ -132,23 +163,20 @@ theorem exists_prodCongrRight (w : Equiv.Perm (ι × γ)) (hw : ∀ a, (w a).1 =
   · simp [hw]
   · simp
 
-theorem prodCongrRight_injective
-    : Function.Injective (fun σ : ι → Equiv.Perm γ =>
-      (Equiv.prodCongrRight σ : Equiv.Perm (ι × γ))) := by
+theorem prodCongrRight_injective :
+    Function.Injective (fun σ : ι → Equiv.Perm γ => (Equiv.prodCongrRight σ : Equiv.Perm (ι × γ))) := by
   intro σ σ' h
   funext τ
   ext x
   have := congrArg (fun w : Equiv.Perm (ι × γ) => (w (τ, x)).2) h
   simpa using this
 
-theorem tc_monomial_glue (D : ι → (γ × γ →₀ ℕ))
-    : tc (monomial (glue D) (1 : ℂ)) = ∏ τ, tc (monomial (D τ) (1 : ℂ)) := by
+theorem tc_monomial_glue (D : ι → (γ × γ →₀ ℕ)) :
+    tc (monomial (glue D) (1 : ℂ)) = ∏ τ, tc (monomial (D τ) (1 : ℂ)) := by
   simp only [tc, coeff_monomial]
   rw [Finset.prod_univ_sum, Fintype.piFinset_univ]
   set F : Equiv.Perm (ι × γ) → ℂ := fun w => ((Equiv.Perm.sign w : ℤ) : ℂ) * if glue D = graph w then 1 else 0 with hF
-  have h1
-      : ∑ w, F w
-        = ∑ w ∈ Finset.univ.image (fun σ : ι → Equiv.Perm γ => Equiv.prodCongrRight σ), F w := by
+  have h1 : ∑ w, F w = ∑ w ∈ Finset.univ.image (fun σ : ι → Equiv.Perm γ => Equiv.prodCongrRight σ), F w := by
     refine (Finset.sum_subset (Finset.subset_univ _) fun w _ hw => ?_).symm
     simp only [hF]
     rw [if_neg, mul_zero]
@@ -180,30 +208,23 @@ theorem tc_monomial_glue (D : ι → (γ × γ →₀ ℕ))
     symm
     exact Finset.prod_eq_zero (Finset.mem_univ τ) (if_neg hτ)
 
-theorem tc_prod_rename (f : ι → MvPolynomial (γ × γ) ℂ)
-    : tc (∏ τ, rename (emb τ) (f τ)) = ∏ τ, tc (f τ) := by
-  have hL
-      : ∏ τ, rename (emb τ) (f τ)
-        = ∑ x ∈ Fintype.piFinset fun τ => (f τ).support,
-          monomial (glue x) (∏ τ, AddMonoidAlgebra.coeff (f τ) (x τ)) := by
-    calc
-      ∏ τ, rename (emb τ) (f τ)
-          = ∏ τ, ∑ d ∈ (f τ).support, monomial (d.mapDomain (emb τ)) (AddMonoidAlgebra.coeff (f τ) d) :=
-        by
+theorem tc_prod_rename (f : ι → MvPolynomial (γ × γ) ℂ) :
+    tc (∏ τ, rename (emb τ) (f τ)) = ∏ τ, tc (f τ) := by
+  have hL : ∏ τ, rename (emb τ) (f τ) = ∑ x ∈ Fintype.piFinset fun τ => (f τ).support,
+      monomial (glue x) (∏ τ, AddMonoidAlgebra.coeff (f τ) (x τ)) := by
+    calc ∏ τ, rename (emb τ) (f τ)
+        = ∏ τ, ∑ d ∈ (f τ).support, monomial (d.mapDomain (emb τ)) (AddMonoidAlgebra.coeff (f τ) d) := by
           refine Finset.prod_congr rfl fun τ _ => ?_
           conv_lhs => rw [(f τ).as_sum]
-          set_option synthInstance.maxHeartbeats 100000 in
-            rw [map_sum]
+
+          rw [map_sum]
           simp only [rename_monomial]
       _ = _ := by
-        rw [Finset.prod_univ_sum]
-        refine Finset.sum_congr rfl fun x _ => ?_
-        rw [prod_monomial']
-        rfl
-  have hR
-      : ∀ τ,
-        tc (f τ)
-          = ∑ d ∈ (f τ).support, AddMonoidAlgebra.coeff (f τ) d * tc (monomial d (1 : ℂ)) := by
+          rw [Finset.prod_univ_sum]
+          refine Finset.sum_congr rfl fun x _ => ?_
+          rw [prod_monomial']
+          rfl
+  have hR : ∀ τ, tc (f τ) = ∑ d ∈ (f τ).support, AddMonoidAlgebra.coeff (f τ) d * tc (monomial d (1 : ℂ)) := by
     intro τ
     conv_lhs => rw [(f τ).as_sum]
     rw [tc_sum]
@@ -220,46 +241,39 @@ end GlobalTheory.BlockTop
 
 namespace GlobalTheory.BlockTop
 
-def symMat (p q : ℕ)
-    : Matrix (Fin p) (Fin p) (MvPolynomial ((Fin p × Fin q) × (Fin p × Fin q)) ℂ) :=
+def symMat (p q : ℕ) : Matrix (Fin p) (Fin p) (MvPolynomial ((Fin p × Fin q) × (Fin p × Fin q)) ℂ) :=
   Matrix.of fun i j => ∑ b : Fin q, X ((i, b), (j, b))
 
-theorem det_map_rename {σ' : Type} (p q : ℕ) (g : (Fin p × Fin q) × (Fin p × Fin q) → σ')
-    : ((symMat p q).map (rename (R := ℂ) g)).det = rename g (symMat p q).det :=
+theorem det_map_rename {σ' : Type} (p q : ℕ) (g : (Fin p × Fin q) × (Fin p × Fin q) → σ') :
+    ((symMat p q).map (rename (R := ℂ) g)).det = rename g (symMat p q).det :=
   (AlgHom.map_det (rename g) _).symm
 
-theorem blockSym_eq
-    {ι : Type} [Fintype ι] {p q n : ℕ} (h : Fintype.card (ι × Fin p × Fin q) = n) (τ : ι)
-    : GlobalTheory.DomainDens.blockSym h τ
-      = (symMat p q).map
-        (rename (Prod.map (Fintype.equivFinOfCardEq h) (Fintype.equivFinOfCardEq h) ∘ emb τ)) := by
+theorem blockSym_eq {ι : Type} [Fintype ι] {p q n : ℕ} (h : Fintype.card (ι × Fin p × Fin q) = n) (τ : ι) :
+    GlobalTheory.DomainDens.blockSym h τ = (symMat p q).map
+      (rename (Prod.map (Fintype.equivFinOfCardEq h) (Fintype.equivFinOfCardEq h) ∘ emb τ)) := by
   ext i j
-  set_option synthInstance.maxHeartbeats 100000 in
+
   simp [GlobalTheory.DomainDens.blockSym, symMat, map_sum, rename_X, emb]
 
 end GlobalTheory.BlockTop
 
+
 open GlobalTheory.BlockTop in
-theorem GlobalTheory.DomainDens.topCoeff_prod_blockSym_det_pow
-    : ∀ (ι : Type) [Fintype ι] (p q n : ℕ) (h : Fintype.card (ι × Fin p × Fin q) = n)
-        (h1 : Fintype.card (Unit × Fin p × Fin q) = p * q),
-      GlobalTheory.GoodMetric.topCoeff (∏ τ, (GlobalTheory.DomainDens.blockSym h τ).det ^ q)
-        = GlobalTheory.GoodMetric.topCoeff ((GlobalTheory.DomainDens.blockSym h1 ()).det ^ q)
-          ^ Fintype.card ι := by
+theorem GlobalTheory.DomainDens.topCoeff_prod_blockSym_det_pow : ∀ (ι : Type) [Fintype ι] (p q n : ℕ)
+    (h : Fintype.card (ι × Fin p × Fin q) = n) (h1 : Fintype.card (Unit × Fin p × Fin q) = p * q),
+    GlobalTheory.GoodMetric.topCoeff (∏ τ, (GlobalTheory.DomainDens.blockSym h τ).det ^ q) =
+      GlobalTheory.GoodMetric.topCoeff ((GlobalTheory.DomainDens.blockSym h1 ()).det ^ q) ^ Fintype.card ι := by
   intro ι _ p q n h h1
   classical
   set e := Fintype.equivFinOfCardEq h
   set e1 := Fintype.equivFinOfCardEq h1
-  have hL
-      : ∏ τ, (GlobalTheory.DomainDens.blockSym h τ).det ^ q
-        = rename (Prod.map e e) (∏ τ, rename (emb τ) ((symMat p q).det ^ q)) := by
+  have hL : ∏ τ, (GlobalTheory.DomainDens.blockSym h τ).det ^ q =
+      rename (Prod.map e e) (∏ τ, rename (emb τ) ((symMat p q).det ^ q)) := by
     rw [map_prod]
     refine Finset.prod_congr rfl fun τ _ => ?_
     rw [blockSym_eq, det_map_rename, rename_rename, map_pow]
   set e' : Fin p × Fin q ≃ Fin (p * q) := (Equiv.punitProd (Fin p × Fin q)).symm.trans e1
-  have hR
-      : (GlobalTheory.DomainDens.blockSym h1 ()).det ^ q
-        = rename (Prod.map e' e') ((symMat p q).det ^ q) := by
+  have hR : (GlobalTheory.DomainDens.blockSym h1 ()).det ^ q = rename (Prod.map e' e') ((symMat p q).det ^ q) := by
     rw [blockSym_eq, det_map_rename, map_pow]
     rfl
   rw [hL, hR, topCoeff_eq_tc, topCoeff_eq_tc, tc_rename_equiv, tc_rename_equiv, tc_prod_rename,

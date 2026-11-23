@@ -1,6 +1,58 @@
 module
 
 public import Formalism.SatakeDualWeyl.Statement
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+public import Mathlib.LinearAlgebra.Dimension.OrzechProperty
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Coalgebra.IsFrobenius
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.HopfAlgebra.Basic
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -12,7 +64,8 @@ open Matrix Formalism.UG
 
 variable {K : Type} [Field K] {n : ℕ}
 
-def H (σ : K →+* K) (J : Matrix (Fin n) (Fin n) K) (x y : Fin n → K) : K := (σ ∘ x) ⬝ᵥ (J *ᵥ y)
+def H (σ : K →+* K) (J : Matrix (Fin n) (Fin n) K) (x y : Fin n → K) : K :=
+  (σ ∘ x) ⬝ᵥ (J *ᵥ y)
 
 section Form
 
@@ -57,54 +110,52 @@ theorem H_neg_left (x y : Fin n → K) : H σ J (-x) y = - H σ J x y := by
 theorem H_sub_left (x y z : Fin n → K) : H σ J (x - y) z = H σ J x z - H σ J y z := by
   rw [sub_eq_add_neg, H_add_left, H_neg_left, ← sub_eq_add_neg]
 
-theorem H_zero_right (x : Fin n → K) : H σ J x 0 = 0 := by simp [H]
+theorem H_zero_right (x : Fin n → K) : H σ J x 0 = 0 := by
+  simp [H]
 
-theorem H_sum_right {ι : Type} (s : Finset ι) (x : Fin n → K) (v : ι → Fin n → K)
-    : H σ J x (∑ i ∈ s, v i) = ∑ i ∈ s, H σ J x (v i) := by
+theorem H_sum_right {ι : Type} (s : Finset ι) (x : Fin n → K) (v : ι → Fin n → K) :
+    H σ J x (∑ i ∈ s, v i) = ∑ i ∈ s, H σ J x (v i) := by
   simp [H, Matrix.mulVec_sum, dotProduct_sum]
 
-theorem H_symm (hσ : ∀ a, σ (σ a) = a) (hJ : cT σ J = J) (x y : Fin n → K)
-    : H σ J y x = σ (H σ J x y) := by
+theorem H_symm (hσ : ∀ a, σ (σ a) = a) (hJ : cT σ J = J) (x y : Fin n → K) :
+    H σ J y x = σ (H σ J x y) := by
   have hJ' : ∀ i j, σ (J i j) = J j i := by
     intro i j
     have h := congrFun (congrFun hJ j) i
     simpa [cT] using h
   unfold H
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [dotProduct, Matrix.mulVec, Function.comp_apply, map_sum, map_mul, hσ, hJ',
-      Finset.mul_sum]
+
+  simp only [dotProduct, Matrix.mulVec, Function.comp_apply, map_sum, map_mul, hσ, hJ',
+  Finset.mul_sum]
   rw [Finset.sum_comm]
   exact Finset.sum_congr rfl (fun i _ => Finset.sum_congr rfl (fun j _ => by ring))
 
-theorem H_mulVec (M : Matrix (Fin n) (Fin n) K) (x y : Fin n → K)
-    : H σ J (M *ᵥ x) (M *ᵥ y) = H σ (cT σ M * J * M) x y := by
+theorem H_mulVec (M : Matrix (Fin n) (Fin n) K) (x y : Fin n → K) :
+    H σ J (M *ᵥ x) (M *ᵥ y) = H σ (cT σ M * J * M) x y := by
   have e1 : σ ∘ (M *ᵥ x) = (M.map σ) *ᵥ (σ ∘ x) := by
     funext i
-    set_option synthInstance.maxHeartbeats 100000 in
+
     simp [Matrix.mulVec, dotProduct, map_sum]
   unfold H
   rw [e1]
   conv_rhs => rw [← Matrix.mulVec_mulVec, ← Matrix.mulVec_mulVec, Matrix.dotProduct_mulVec]
   simp only [cT, Matrix.vecMul_transpose]
 
-theorem H_single (A : Matrix (Fin n) (Fin n) K) (i j : Fin n)
-    : H σ A (Pi.single i 1) (Pi.single j 1) = A i j := by
+theorem H_single (A : Matrix (Fin n) (Fin n) K) (i j : Fin n) :
+    H σ A (Pi.single i 1) (Pi.single j 1) = A i j := by
   simp [H, dotProduct, Matrix.mulVec, Pi.single_apply, apply_ite σ]
 
-theorem mem_UJ_of
-    (g : GL (Fin n) K)
-    (h : ∀ x y,
-      H σ J ((g : Matrix (Fin n) (Fin n) K) *ᵥ x) ((g : Matrix (Fin n) (Fin n) K) *ᵥ y) = H σ J x y)
-    : g ∈ UJ σ J := by
+theorem mem_UJ_of (g : GL (Fin n) K)
+    (h : ∀ x y, H σ J ((g : Matrix (Fin n) (Fin n) K) *ᵥ x) ((g : Matrix (Fin n) (Fin n) K) *ᵥ y) =
+      H σ J x y) : g ∈ UJ σ J := by
   show cT σ (g : Matrix (Fin n) (Fin n) K) * J * (g : Matrix (Fin n) (Fin n) K) = J
   ext i j
   have h1 := h (Pi.single i 1) (Pi.single j 1)
   rw [H_mulVec, H_single, H_single] at h1
   exact h1
 
-theorem H_of_mem (g : GL (Fin n) K) (hg : g ∈ UJ σ J) (x y : Fin n → K)
-    : H σ J ((g : Matrix (Fin n) (Fin n) K) *ᵥ x) ((g : Matrix (Fin n) (Fin n) K) *ᵥ y)
-      = H σ J x y := by
+theorem H_of_mem (g : GL (Fin n) K) (hg : g ∈ UJ σ J) (x y : Fin n → K) :
+    H σ J ((g : Matrix (Fin n) (Fin n) K) *ᵥ x) ((g : Matrix (Fin n) (Fin n) K) *ᵥ y) = H σ J x y := by
   have hg' : cT σ (g : Matrix (Fin n) (Fin n) K) * J * (g : Matrix (Fin n) (Fin n) K) = J := hg
   rw [H_mulVec, hg']
 
@@ -125,7 +176,8 @@ section Refl
 
 variable (σ : K →+* K) (J : Matrix (Fin n) (Fin n) K)
 
-def Pm (a : Fin n → K) : Matrix (Fin n) (Fin n) K := (H σ J a a)⁻¹ • vecMulVec a ((σ ∘ a) ᵥ* J)
+def Pm (a : Fin n → K) : Matrix (Fin n) (Fin n) K :=
+  (H σ J a a)⁻¹ • vecMulVec a ((σ ∘ a) ᵥ* J)
 
 theorem Pm_mulVec (a z : Fin n → K) : Pm σ J a *ᵥ z = ((H σ J a a)⁻¹ * H σ J a z) • a := by
   have hb : ((σ ∘ a) ᵥ* J) ⬝ᵥ z = H σ J a z := by
@@ -148,15 +200,15 @@ theorem Pm_idem (a : Fin n → K) (ha : H σ J a a ≠ 0) : Pm σ J a * Pm σ J 
 
 def Rm (a : Fin n → K) (α : K) : Matrix (Fin n) (Fin n) K := 1 + (α - 1) • Pm σ J a
 
-theorem Rm_mulVec (a z : Fin n → K) (α : K)
-    : Rm σ J a α *ᵥ z = z + ((α - 1) * ((H σ J a a)⁻¹ * H σ J a z)) • a := by
+theorem Rm_mulVec (a z : Fin n → K) (α : K) :
+    Rm σ J a α *ᵥ z = z + ((α - 1) * ((H σ J a a)⁻¹ * H σ J a z)) • a := by
   have e : ((α - 1) • Pm σ J a) *ᵥ z = (α - 1) • (Pm σ J a *ᵥ z) := by
     funext k
     simp [Matrix.mulVec, dotProduct, Finset.mul_sum, mul_assoc]
   rw [Rm, Matrix.add_mulVec, Matrix.one_mulVec, e, Pm_mulVec, smul_smul]
 
-theorem one_add_smul_mul (P : Matrix (Fin n) (Fin n) K) (hP : P * P = P) (u w : K)
-    : (1 + u • P) * (1 + w • P) = 1 + (u + w + u * w) • P := by
+theorem one_add_smul_mul (P : Matrix (Fin n) (Fin n) K) (hP : P * P = P) (u w : K) :
+    (1 + u • P) * (1 + w • P) = 1 + (u + w + u * w) • P := by
   simp only [add_mul, mul_add, Matrix.one_mul, Matrix.mul_one, Matrix.smul_mul, Matrix.mul_smul,
     smul_smul, hP, add_smul, mul_comm w u]
   abel
@@ -173,29 +225,23 @@ def Rgl (a : Fin n → K) (α : K) (hα : σ α * α = 1) (ha : H σ J a a ≠ 0
     have : σ α - 1 + (α - 1) + (σ α - 1) * (α - 1) = 0 := by linear_combination hα
     rw [this, zero_smul, add_zero]
 
-theorem Rm_H
-    (hσ : ∀ a, σ (σ a) = a) (hJ : cT σ J = J) (a : Fin n → K)
-    (α : K) (hα : σ α * α = 1)
-    (x y : Fin n → K)
-    : H σ J (Rm σ J a α *ᵥ x) (Rm σ J a α *ᵥ y) = H σ J x y := by
+theorem Rm_H (hσ : ∀ a, σ (σ a) = a) (hJ : cT σ J = J) (a : Fin n → K) (α : K) (hα : σ α * α = 1)
+    (x y : Fin n → K) : H σ J (Rm σ J a α *ᵥ x) (Rm σ J a α *ᵥ y) = H σ J x y := by
   rw [Rm_mulVec, Rm_mulVec]
   by_cases hc : H σ J a a = 0
   · simp [hc]
   have hxa : H σ J x a = σ (H σ J a x) := H_symm σ J hσ hJ a x
   have hcs : σ (H σ J a a) = H σ J a a := (H_symm σ J hσ hJ a a).symm
   have hcc : (H σ J a a)⁻¹ * H σ J a a = 1 := inv_mul_cancel₀ hc
-  rw [H_add_left, H_add_right, H_add_right, H_smul_left, H_smul_right, H_smul_right, H_smul_left,
-    hxa]
+  rw [H_add_left, H_add_right, H_add_right, H_smul_left, H_smul_right, H_smul_right, H_smul_left, hxa]
   simp only [map_mul, map_sub, map_one, map_inv₀, hcs]
   linear_combination (σ (H σ J a x) * H σ J a y * (H σ J a a)⁻¹) * hα +
     ((σ α - 1) * (α - 1) * σ (H σ J a x) * H σ J a y * (H σ J a a)⁻¹) * hcc
 
-theorem move
-    (hσ : ∀ a, σ (σ a) = a) (hJ : cT σ J = J)
-    (u y : Fin n → K) (huy : H σ J u u = H σ J y y) (ha : H σ J (u - y) (u - y) ≠ 0)
-    : ∃ α : K,
-      σ α * α = 1 ∧ Rm σ J (u - y) α *ᵥ u = y
-        ∧ ∀ z, H σ J (u - y) z = 0 → Rm σ J (u - y) α *ᵥ z = z := by
+theorem move (hσ : ∀ a, σ (σ a) = a) (hJ : cT σ J = J) (u y : Fin n → K)
+    (huy : H σ J u u = H σ J y y) (ha : H σ J (u - y) (u - y) ≠ 0) :
+    ∃ α : K, σ α * α = 1 ∧ Rm σ J (u - y) α *ᵥ u = y ∧
+      ∀ z, H σ J (u - y) z = 0 → Rm σ J (u - y) α *ᵥ z = z := by
   have hD : H σ J (u - y) u = H σ J u u - H σ J y u := H_sub_left σ J u y u
   have hsD : σ (H σ J (u - y) u) = H σ J u u - H σ J u y := by
     rw [hD, map_sub, ← H_symm σ J hσ hJ u u, ← H_symm σ J hσ hJ y u]
@@ -211,10 +257,8 @@ theorem move
   · rw [map_div₀, map_neg, hσ]
     field_simp
   · rw [Rm_mulVec]
-    have hcoef
-        : (-(σ (H σ J (u - y) u)) / H σ J (u - y) u - 1)
-            * ((H σ J (u - y) (u - y))⁻¹ * H σ J (u - y) u)
-          = -1 := by
+    have hcoef : (-(σ (H σ J (u - y) u)) / H σ J (u - y) u - 1) *
+        ((H σ J (u - y) (u - y))⁻¹ * H σ J (u - y) u) = -1 := by
       rw [hc]
       have hsum : H σ J (u - y) u + σ (H σ J (u - y) u) ≠ 0 := by rw [← hc]; exact ha
       field_simp
@@ -231,79 +275,56 @@ section Gen
 variable (σ : K →+* K) (J : Matrix (Fin n) (Fin n) K)
 
 def S : Subgroup (UJ σ J) :=
-  Subgroup.closure
-    {s : UJ σ J | ∃ (P : Matrix (Fin n) (Fin n) K) (α : K), P * P = P ∧ σ α * α = 1 ∧
-      ((s : GL (Fin n) K) : Matrix (Fin n) (Fin n) K) = 1 + (α - 1) • P}
+  Subgroup.closure {s : UJ σ J | ∃ (P : Matrix (Fin n) (Fin n) K) (α : K), P * P = P ∧ σ α * α = 1 ∧
+    ((s : GL (Fin n) K) : Matrix (Fin n) (Fin n) K) = 1 + (α - 1) • P}
 
 def gm (g : UJ σ J) : Matrix (Fin n) (Fin n) K := ((g : GL (Fin n) K) : Matrix (Fin n) (Fin n) K)
 
 theorem gm_mul (g g' : UJ σ J) : gm σ J (g * g') = gm σ J g * gm σ J g' := rfl
 
-theorem H_gm (g : UJ σ J) (x y : Fin n → K)
-    : H σ J (gm σ J g *ᵥ x) (gm σ J g *ᵥ y) = H σ J x y := by
-  exact H_of_mem σ J g.1 g.2 x y
+theorem H_gm (g : UJ σ J) (x y : Fin n → K) : H σ J (gm σ J g *ᵥ x) (gm σ J g *ᵥ y) = H σ J x y := by exact H_of_mem σ J g.1 g.2 x y
 
-def Rel
-    (hσ : ∀ a, σ (σ a) = a) (hJ : cT σ J = J)
-    (a : Fin n → K)
-    (α : K) (hα : σ α * α = 1)
-    (ha : H σ J a a ≠ 0)
-    : UJ σ J :=
+def Rel (hσ : ∀ a, σ (σ a) = a) (hJ : cT σ J = J) (a : Fin n → K) (α : K) (hα : σ α * α = 1)
+    (ha : H σ J a a ≠ 0) : UJ σ J :=
   ⟨Rgl σ J a α hα ha, mem_UJ_of σ J _ (fun x y => Rm_H σ J hσ hJ a α hα x y)⟩
 
-theorem gm_Rel
-    (hσ : ∀ a, σ (σ a) = a) (hJ : cT σ J = J)
-    (a : Fin n → K)
-    (α : K) (hα : σ α * α = 1)
-    (ha : H σ J a a ≠ 0)
-    : gm σ J (Rel σ J hσ hJ a α hα ha) = Rm σ J a α :=
-  rfl
+theorem gm_Rel (hσ : ∀ a, σ (σ a) = a) (hJ : cT σ J = J) (a : Fin n → K) (α : K) (hα : σ α * α = 1)
+    (ha : H σ J a a ≠ 0) : gm σ J (Rel σ J hσ hJ a α hα ha) = Rm σ J a α := rfl
 
-theorem Rel_mem
-    (hσ : ∀ a, σ (σ a) = a) (hJ : cT σ J = J)
-    (a : Fin n → K)
-    (α : K) (hα : σ α * α = 1)
-    (ha : H σ J a a ≠ 0)
-    : Rel σ J hσ hJ a α hα ha ∈ S σ J := by
-  exact Subgroup.subset_closure ⟨Pm σ J a, α, Pm_idem σ J a ha, hα, rfl⟩
+theorem Rel_mem (hσ : ∀ a, σ (σ a) = a) (hJ : cT σ J = J) (a : Fin n → K) (α : K) (hα : σ α * α = 1)
+    (ha : H σ J a a ≠ 0) : Rel σ J hσ hJ a α hα ha ∈ S σ J := by exact Subgroup.subset_closure ⟨Pm σ J a, α, Pm_idem σ J a ha, hα, rfl⟩
 
-theorem card_le
-    {m : ℕ} (f : Fin m → Fin n → K) (hf : ∀ i, H σ J (f i) (f i) ≠ 0)
-    (ho : ∀ i j, i ≠ j → H σ J (f i) (f j) = 0)
-    : m ≤ n := by
+theorem card_le {m : ℕ} (f : Fin m → Fin n → K)
+    (hf : ∀ i, H σ J (f i) (f i) ≠ 0) (ho : ∀ i j, i ≠ j → H σ J (f i) (f j) = 0) : m ≤ n := by
   have hli : LinearIndependent K f := by
     rw [Fintype.linearIndependent_iff]
     intro g hg j
     have h1 := congrArg (H σ J (f j)) hg
     rw [H_sum_right, H_zero_right] at h1
     simp_rw [H_smul_right] at h1
-    rw [Finset.sum_eq_single j (fun i _ hij => by rw [ho j i (Ne.symm hij), mul_zero]) (by simp)]
-      at h1
+    rw [Finset.sum_eq_single j (fun i _ hij => by rw [ho j i (Ne.symm hij), mul_zero]) (by simp)] at h1
     exact (mul_eq_zero.mp h1).resolve_right (hf j)
   have h2 := hli.fintype_card_le_finrank
   simpa using h2
 
-theorem main (hσ : ∀ a, σ (σ a) = a) (hJ : cT σ J = J) (hdet : J.det ≠ 0) (h2 : (2 : K) ≠ 0) (d : ℕ)
-    : ∀ (k : ℕ) (e : Fin k → Fin n → K),
-      n - k = d → (∀ i, H σ J (e i) (e i) ≠ 0) → (∀ i j, i ≠ j → H σ J (e i) (e j) = 0)
-        → ∀ g : UJ σ J, (∀ i, gm σ J g *ᵥ e i = e i) → g ∈ S σ J := by
+theorem main (hσ : ∀ a, σ (σ a) = a) (hJ : cT σ J = J) (hdet : J.det ≠ 0) (h2 : (2 : K) ≠ 0)
+    (d : ℕ) : ∀ (k : ℕ) (e : Fin k → Fin n → K), n - k = d → (∀ i, H σ J (e i) (e i) ≠ 0) →
+      (∀ i j, i ≠ j → H σ J (e i) (e j) = 0) →
+      ∀ g : UJ σ J, (∀ i, gm σ J g *ᵥ e i = e i) → g ∈ S σ J := by
   classical
   have hHsymm := H_symm σ J hσ hJ
   have horth_rev : ∀ x v, H σ J x v = 0 → H σ J v x = 0 := by
     intro x v h
     rw [hHsymm x v, h, map_zero]
-  have hlin
-      : ∀ {m : ℕ} (f : Fin m → Fin n → K),
-        (∀ i, H σ J (f i) (f i) ≠ 0) → (∀ i j, i ≠ j → H σ J (f i) (f j) = 0)
-          → LinearIndependent K f := by
+  have hlin : ∀ {m : ℕ} (f : Fin m → Fin n → K), (∀ i, H σ J (f i) (f i) ≠ 0) →
+      (∀ i j, i ≠ j → H σ J (f i) (f j) = 0) → LinearIndependent K f := by
     intro m f hf ho
     rw [Fintype.linearIndependent_iff]
     intro c hc j
     have h1 := congrArg (H σ J (f j)) hc
     rw [H_sum_right, H_zero_right] at h1
     simp_rw [H_smul_right] at h1
-    rw [Finset.sum_eq_single j (fun i _ hij => by rw [ho j i (Ne.symm hij), mul_zero]) (by simp)]
-      at h1
+    rw [Finset.sum_eq_single j (fun i _ hij => by rw [ho j i (Ne.symm hij), mul_zero]) (by simp)] at h1
     exact (mul_eq_zero.mp h1).resolve_right (hf j)
   have fixS : ∀ g : UJ σ J, gm σ J g = 1 → g ∈ S σ J := by
     intro g hg
@@ -316,10 +337,9 @@ theorem main (hσ : ∀ a, σ (σ a) = a) (hJ : cT σ J = J) (hdet : J.det ≠ 0
     have h1 := congrFun (hv (Pi.single j 1)) i
     rw [Matrix.mulVec_single_one] at h1
     simpa [Matrix.one_apply, Pi.single_apply] using h1
-  have proj
-      : ∀ {k : ℕ} (e : Fin k → Fin n → K),
-        (∀ i, H σ J (e i) (e i) ≠ 0) → (∀ i j, i ≠ j → H σ J (e i) (e j) = 0)
-          → ∀ z, ∃ v, (∀ i, H σ J (e i) v = 0) ∧ z - v ∈ Submodule.span K (Set.range e) := by
+  have proj : ∀ {k : ℕ} (e : Fin k → Fin n → K), (∀ i, H σ J (e i) (e i) ≠ 0) →
+      (∀ i j, i ≠ j → H σ J (e i) (e j) = 0) →
+      ∀ z, ∃ v, (∀ i, H σ J (e i) v = 0) ∧ z - v ∈ Submodule.span K (Set.range e) := by
     intro k e he ho z
     refine ⟨z - ∑ i, ((H σ J (e i) (e i))⁻¹ * H σ J (e i) z) • e i, ?_, ?_⟩
     · intro j
@@ -329,10 +349,9 @@ theorem main (hσ : ∀ a, σ (σ a) = a) (hJ : cT σ J = J) (hdet : J.det ≠ 0
       rw [mul_comm ((H σ J (e j) (e j))⁻¹), mul_assoc, inv_mul_cancel₀ (he j), mul_one, sub_self]
     · rw [sub_sub_cancel]
       exact Submodule.sum_mem _ (fun i _ => Submodule.smul_mem _ _ (Submodule.subset_span ⟨i, rfl⟩))
-  have aniso
-      : ∀ {k : ℕ} (e : Fin k → Fin n → K),
-        k < n → (∀ i, H σ J (e i) (e i) ≠ 0) → (∀ i j, i ≠ j → H σ J (e i) (e j) = 0)
-          → ∃ w, (∀ i, H σ J (e i) w = 0) ∧ H σ J w w ≠ 0 := by
+  have aniso : ∀ {k : ℕ} (e : Fin k → Fin n → K), k < n → (∀ i, H σ J (e i) (e i) ≠ 0) →
+      (∀ i j, i ≠ j → H σ J (e i) (e j) = 0) →
+      ∃ w, (∀ i, H σ J (e i) w = 0) ∧ H σ J w w ≠ 0 := by
     intro k e hk he ho
     have hspan : Submodule.span K (Set.range e) ≠ ⊤ := by
       intro htop
@@ -376,8 +395,7 @@ theorem main (hσ : ∀ a, σ (σ a) = a) (hJ : cT σ J = J) (hdet : J.det ≠ 0
         · have hsb : σ (H σ J v v2) ≠ 0 := (map_ne_zero σ).mpr hvv2
           intro h0
           rw [H_add_left, H_add_right, H_add_right, H_smul_left, H_smul_right, H_smul_right,
-              H_smul_left, h1, h2', hσ, hHsymm v v2]
-            at h0
+            H_smul_left, h1, h2', hσ, hHsymm v v2] at h0
           exact mul_ne_zero h2 (mul_ne_zero hvv2 hsb) (by linear_combination h0)
       · exact ⟨v2, hv2W, h2'⟩
     · exact ⟨v, hvW, h1⟩
@@ -408,21 +426,14 @@ theorem main (hσ : ∀ a, σ (σ a) = a) (hJ : cT σ J = J) (hdet : J.det ≠ 0
   | succ d ih =>
     intro k e hnk he ho g hg
     obtain ⟨w, hwe, hww⟩ := aniso e (by omega) he ho
-    have he'a
-        : ∀ i,
-          H σ J ((Fin.snoc e w : Fin (k + 1) → Fin n → K) i)
-              ((Fin.snoc e w : Fin (k + 1) → Fin n → K) i)
-            ≠ 0 := by
+    have he'a : ∀ i, H σ J ((Fin.snoc e w : Fin (k + 1) → Fin n → K) i)
+        ((Fin.snoc e w : Fin (k + 1) → Fin n → K) i) ≠ 0 := by
       intro i
       refine Fin.lastCases ?_ (fun j => ?_) i
       · simpa using hww
       · simpa using he j
-    have he'o
-        : ∀ i j,
-          i ≠ j
-            → H σ J ((Fin.snoc e w : Fin (k + 1) → Fin n → K) i)
-                ((Fin.snoc e w : Fin (k + 1) → Fin n → K) j)
-              = 0 := by
+    have he'o : ∀ i j, i ≠ j → H σ J ((Fin.snoc e w : Fin (k + 1) → Fin n → K) i)
+        ((Fin.snoc e w : Fin (k + 1) → Fin n → K) j) = 0 := by
       intro i j
       refine Fin.lastCases ?_ (fun i' => ?_) i <;> refine Fin.lastCases ?_ (fun j' => ?_) j
       · intro hij
@@ -447,9 +458,7 @@ theorem main (hσ : ∀ a, σ (σ a) = a) (hJ : cT σ J = J) (hdet : J.det ≠ 0
     have huu : H σ J (gm σ J g *ᵥ w) (gm σ J g *ᵥ w) = H σ J w w := H_gm σ J g w w
     have hue : ∀ i, H σ J (gm σ J g *ᵥ w) (e i) = 0 := by
       intro i
-      calc
-        H σ J (gm σ J g *ᵥ w) (e i)
-          = H σ J (gm σ J g *ᵥ w) (gm σ J g *ᵥ e i) := by rw [hg i]
+      calc H σ J (gm σ J g *ᵥ w) (e i) = H σ J (gm σ J g *ᵥ w) (gm σ J g *ᵥ e i) := by rw [hg i]
         _ = H σ J w (e i) := H_gm σ J g w (e i)
         _ = 0 := horth_rev _ _ (hwe i)
     by_cases hA : H σ J (gm σ J g *ᵥ w - w) (gm σ J g *ᵥ w - w) = 0
@@ -457,16 +466,15 @@ theorem main (hσ : ∀ a, σ (σ a) = a) (hJ : cT σ J = J) (hdet : J.det ≠ 0
         rw [sub_neg_eq_add]
         intro h0
         apply mul_ne_zero (mul_ne_zero h2 h2) hww
-        have e1
-            : H σ J (gm σ J g *ᵥ w + w) (gm σ J g *ᵥ w + w)
-                + H σ J (gm σ J g *ᵥ w - w) (gm σ J g *ᵥ w - w)
-              = 2 * H σ J (gm σ J g *ᵥ w) (gm σ J g *ᵥ w) + 2 * H σ J w w := by
+        have e1 : H σ J (gm σ J g *ᵥ w + w) (gm σ J g *ᵥ w + w) +
+            H σ J (gm σ J g *ᵥ w - w) (gm σ J g *ᵥ w - w) =
+            2 * H σ J (gm σ J g *ᵥ w) (gm σ J g *ᵥ w) + 2 * H σ J w w := by
           rw [H_add_left, H_add_right, H_add_right, H_sub_left, H_sub_right, H_sub_right]
           ring
         rw [huu, h0, hA] at e1
         linear_combination -e1
-      obtain ⟨α, hα, hαu, hαfix⟩ :=
-        move σ J hσ hJ (gm σ J g *ᵥ w) (-w) (by rw [H_neg_left, H_neg_right, neg_neg, huu]) hpw
+      obtain ⟨α, hα, hαu, hαfix⟩ := move σ J hσ hJ (gm σ J g *ᵥ w) (-w)
+        (by rw [H_neg_left, H_neg_right, neg_neg, huu]) hpw
       have hR1 := Rel_mem σ J hσ hJ _ α hα hpw
       have hm1 : σ (-1) * (-1 : K) = 1 := by simp
       have hR2 := Rel_mem σ J hσ hJ w (-1) hm1 hww
@@ -478,20 +486,15 @@ theorem main (hσ : ∀ a, σ (σ a) = a) (hJ : cT σ J = J) (hdet : J.det ≠ 0
         intro i
         rw [Rm_mulVec, horth_rev _ _ (hwe i), mul_zero, mul_zero, zero_smul, add_zero]
       have hR1e : ∀ i, Rm σ J (gm σ J g *ᵥ w - -w) α *ᵥ e i = e i := fun i =>
-        hαfix (e i)
-          (by rw [H_sub_left, H_neg_left, hue i, horth_rev _ _ (hwe i), neg_zero, sub_zero])
+        hαfix (e i) (by rw [H_sub_left, H_neg_left, hue i, horth_rev _ _ (hwe i), neg_zero, sub_zero])
       have hTS : (Rel σ J hσ hJ w (-1) hm1 hww * Rel σ J hσ hJ _ α hα hpw) * g ∈ S σ J := by
         apply key
         · intro i
           rw [gm_mul, gm_mul, ← Matrix.mulVec_mulVec, ← Matrix.mulVec_mulVec, hg i, gm_Rel, gm_Rel,
             hR1e, hR2e]
-        · rw [gm_mul, gm_mul, ← Matrix.mulVec_mulVec, ← Matrix.mulVec_mulVec, gm_Rel, gm_Rel, hαu,
-            hR2w]
-      have e2
-          : g
-            = (Rel σ J hσ hJ w (-1) hm1 hww * Rel σ J hσ hJ _ α hα hpw)⁻¹
-              * ((Rel σ J hσ hJ w (-1) hm1 hww * Rel σ J hσ hJ _ α hα hpw) * g) := by
-        group
+        · rw [gm_mul, gm_mul, ← Matrix.mulVec_mulVec, ← Matrix.mulVec_mulVec, gm_Rel, gm_Rel, hαu, hR2w]
+      have e2 : g = (Rel σ J hσ hJ w (-1) hm1 hww * Rel σ J hσ hJ _ α hα hpw)⁻¹ *
+          ((Rel σ J hσ hJ w (-1) hm1 hww * Rel σ J hσ hJ _ α hα hpw) * g) := by group
       rw [e2]
       exact (S σ J).mul_mem ((S σ J).inv_mem ((S σ J).mul_mem hR2 hR1)) hTS
     · obtain ⟨α, hα, hαu, hαfix⟩ := move σ J hσ hJ (gm σ J g *ᵥ w) w huu hA
@@ -507,14 +510,8 @@ theorem main (hσ : ∀ a, σ (σ a) = a) (hJ : cT σ J = J) (hdet : J.det ≠ 0
       rw [e2]
       exact (S σ J).mul_mem ((S σ J).inv_mem hR) hTS
 
-theorem mem_S
-    (hσ : ∀ a, σ (σ a) = a) (hJ : cT σ J = J) (hdet : J.det ≠ 0) (h2 : (2 : K) ≠ 0) (g : UJ σ J)
-    : g ∈ S σ J := by
-  exact main σ J hσ hJ hdet h2 n 0 Fin.elim0 (by simp)
-    (fun i => i.elim0)
-    (fun i => i.elim0)
-    g
-    (fun i => i.elim0)
+theorem mem_S (hσ : ∀ a, σ (σ a) = a) (hJ : cT σ J = J) (hdet : J.det ≠ 0) (h2 : (2 : K) ≠ 0)
+    (g : UJ σ J) : g ∈ S σ J := by exact main σ J hσ hJ hdet h2 n 0 Fin.elim0 (by simp) (fun i => i.elim0) (fun i => i.elim0) g (fun i => i.elim0)
 
 end Gen
 

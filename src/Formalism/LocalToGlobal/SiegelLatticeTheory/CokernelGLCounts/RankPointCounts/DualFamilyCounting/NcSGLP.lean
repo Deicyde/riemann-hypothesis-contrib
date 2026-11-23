@@ -1,6 +1,59 @@
 module
 
-public import Mathlib
+public import Mathlib.LinearAlgebra.FiniteDimensional.Defs
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Coalgebra.IsFrobenius
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.HopfAlgebra.Basic
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
+public import Mathlib.LinearAlgebra.Dimension.Constructions
+public import Mathlib.LinearAlgebra.Dimension.Finite
+public import Mathlib.LinearAlgebra.FiniteDimensional.Basic
+public import Mathlib.LinearAlgebra.FiniteDimensional.Lemmas
 
 @[expose] public section
 
@@ -10,39 +63,29 @@ namespace Formalism.L2.SG.Pf.NcS.LT.GLP
 
 variable {K : Type*} [Field K]
 
-private theorem dual_apply_eq_sum_mul_single {a : ℕ} (μ : Module.Dual K (Fin a → K)) (t : Fin a → K)
-    : μ t = ∑ i, t i * μ (Pi.single i 1) := by
+private theorem dual_apply_eq_sum_mul_single {a : ℕ} (μ : Module.Dual K (Fin a → K)) (t : Fin a → K) :
+    μ t = ∑ i, t i * μ (Pi.single i 1) := by
   have ht : t = ∑ i, t i • (Pi.single i 1 : Fin a → K) := by
     ext j
     first
     | simp [Finset.sum_apply, Pi.single_apply]
-    | simp [Finset.sum_apply, Pi.single_apply, eq_comm]
-  calc
-    μ t
-      = μ (∑ i, t i • (Pi.single i 1 : Fin a → K)) := congrArg μ ht
+  calc μ t = μ (∑ i, t i • (Pi.single i 1 : Fin a → K)) := congrArg μ ht
     _ = ∑ i, t i * μ (Pi.single i 1) := by simp [map_sum, map_smul]
 
-theorem pi_surj
-    {V : Type*} [AddCommGroup V] [Module K V]
-    {a : ℕ} (ψ : Fin a → Module.Dual K V) (hψ : LinearIndependent K ψ)
-    : Function.Surjective (LinearMap.pi ψ) := by
+theorem pi_surj {V : Type*} [AddCommGroup V] [Module K V] {a : ℕ} (ψ : Fin a → Module.Dual K V)
+    (hψ : LinearIndependent K ψ) : Function.Surjective (LinearMap.pi ψ) := by
   rw [← LinearMap.range_eq_top]
   by_contra hne
   obtain ⟨μ, hμ0, hμ⟩ : ∃ μ : Module.Dual K (Fin a → K), μ ≠ 0 ∧ ∀ v, μ (LinearMap.pi ψ v) = 0 := by
     first
-    | (
-        obtain ⟨μ, hμ0, hμ⟩ := Submodule.exists_le_ker_of_lt_top _ (lt_top_iff_ne_top.mpr hne)
-        exact ⟨μ, hμ0, fun v => LinearMap.mem_ker.mp (hμ (LinearMap.mem_range_self _ v))⟩
-      )
-    | (
-        obtain ⟨μ, hμ0, hμ⟩ :=
-          Submodule.exists_dual_map_eq_bot_of_lt_top (lt_top_iff_ne_top.mpr hne)
-        refine ⟨μ, hμ0, fun v => ?_⟩
-        have hm : μ (LinearMap.pi ψ v) ∈ (LinearMap.range (LinearMap.pi ψ)).map μ :=
-          Submodule.mem_map_of_mem (LinearMap.mem_range_self _ v)
-        rw [hμ] at hm
-        simpa using hm
-      )
+    | (obtain ⟨μ, hμ0, hμ⟩ := Submodule.exists_le_ker_of_lt_top _ (lt_top_iff_ne_top.mpr hne)
+       exact ⟨μ, hμ0, fun v => LinearMap.mem_ker.mp (hμ (LinearMap.mem_range_self _ v))⟩)
+    | (obtain ⟨μ, hμ0, hμ⟩ := Submodule.exists_dual_map_eq_bot_of_lt_top (lt_top_iff_ne_top.mpr hne)
+       refine ⟨μ, hμ0, fun v => ?_⟩
+       have hm : μ (LinearMap.pi ψ v) ∈ (LinearMap.range (LinearMap.pi ψ)).map μ :=
+         Submodule.mem_map_of_mem (LinearMap.mem_range_self _ v)
+       rw [hμ] at hm
+       simpa using hm)
   have hsum : ∑ i, μ (Pi.single i 1) • ψ i = 0 := by
     refine LinearMap.ext fun v => ?_
     have hv := hμ v
@@ -51,10 +94,9 @@ theorem pi_surj
   have hzero := Fintype.linearIndependent_iff.mp hψ _ hsum
   exact hμ0 (LinearMap.ext fun t => by rw [dual_apply_eq_sum_mul_single μ t]; simp [hzero])
 
-theorem trans_tuple
-    {V : Type*} [AddCommGroup V] [Module K V] [FiniteDimensional K V]
-    {a : ℕ} (x y : Fin a → V) (hx : LinearIndependent K x) (hy : LinearIndependent K y)
-    : ∃ A : V ≃ₗ[K] V, ∀ j, A (x j) = y j := by
+theorem trans_tuple {V : Type*} [AddCommGroup V] [Module K V] [FiniteDimensional K V] {a : ℕ}
+    (x y : Fin a → V) (hx : LinearIndependent K x) (hy : LinearIndependent K y) :
+    ∃ A : V ≃ₗ[K] V, ∀ j, A (x j) = y j := by
   obtain ⟨CX, hX⟩ := Submodule.exists_isCompl (Submodule.span K (Set.range x))
   obtain ⟨CY, hY⟩ := Submodule.exists_isCompl (Submodule.span K (Set.range y))
   have hdim : Module.finrank K CX = Module.finrank K CY := by
@@ -67,47 +109,34 @@ theorem trans_tuple
   let bY := Module.Basis.span hy
   let e1 := bx.equiv bY (Equiv.refl (Fin a))
   let e2 : CX ≃ₗ[K] CY := by
-    first | exact LinearEquiv.ofFinrankEq _ _ hdim | exact LinearEquiv.ofFinrankEq hdim
+    first
+    | exact LinearEquiv.ofFinrankEq _ _ hdim
   let P : (Submodule.span K (Set.range x) × CX) ≃ₗ[K] (Submodule.span K (Set.range y) × CY) := by
-    first | exact LinearEquiv.prodCongr e1 e2 | exact LinearEquiv.prod e1 e2
+    first
+    | exact LinearEquiv.prodCongr e1 e2
   have hsymm : ∀ j, (Submodule.prodEquivOfIsCompl _ _ hX).symm (x j) = (bx j, 0) := by
     intro j
     rw [LinearEquiv.symm_apply_eq]
     first
     | (rw [Submodule.coe_prodEquivOfIsCompl']; simp [bx, Module.Basis.span_apply])
-    | simp [bx, Module.Basis.span_apply]
-    | simp [bx]
-  refine ⟨
-    (Submodule.prodEquivOfIsCompl _ _ hX).symm.trans
-      (P.trans (Submodule.prodEquivOfIsCompl _ _ hY)),
-    fun j => ?_
-  ⟩
+  refine ⟨(Submodule.prodEquivOfIsCompl _ _ hX).symm.trans (P.trans (Submodule.prodEquivOfIsCompl _ _ hY)),
+    fun j => ?_⟩
   rw [LinearEquiv.trans_apply, LinearEquiv.trans_apply, hsymm j]
   have hP : P (bx j, 0) = (bY j, 0) := by
     first
-    | (
-        show (e1 (bx j), e2 0) = (bY j, 0)
-        rw [map_zero]
-        simp [e1, Module.Basis.equiv_apply]
-      )
-    | simp [P, e1, Module.Basis.equiv_apply]
-    | simp [P, e1]
+    | (show (e1 (bx j), e2 0) = (bY j, 0)
+       rw [map_zero]
+       simp [e1, Module.Basis.equiv_apply])
   rw [hP]
   first
   | (rw [Submodule.coe_prodEquivOfIsCompl']; simp [bY, Module.Basis.span_apply])
-  | simp [bY, Module.Basis.span_apply]
-  | simp [bY]
 
-private theorem eq_zero_of_mem_of_disjoint
-    {V : Type*} [AddCommGroup V] [Module K V]
-    {S T : Submodule K V} (h : Disjoint S T)
-    {v : V} (hS : v ∈ S) (hT : v ∈ T)
-    : v = 0 :=
+private theorem eq_zero_of_mem_of_disjoint {V : Type*} [AddCommGroup V] [Module K V] {S T : Submodule K V}
+    (h : Disjoint S T) {v : V} (hS : v ∈ S) (hT : v ∈ T) : v = 0 :=
   (Submodule.mem_bot K).mp (h.le_bot (Submodule.mem_inf.mpr ⟨hS, hT⟩))
 
-private theorem exists_not_mem_of_ne_top_of_ne_top
-    {V : Type*} [AddCommGroup V] [Module K V] (U W : Submodule K V) (hU : U ≠ ⊤) (hW : W ≠ ⊤)
-    : ∃ v, v ∉ U ∧ v ∉ W := by
+private theorem exists_not_mem_of_ne_top_of_ne_top {V : Type*} [AddCommGroup V] [Module K V]
+    (U W : Submodule K V) (hU : U ≠ ⊤) (hW : W ≠ ⊤) : ∃ v, v ∉ U ∧ v ∉ W := by
   obtain ⟨u, hu⟩ : ∃ u, u ∉ U := by
     by_contra hcon
     push_neg at hcon
@@ -124,13 +153,11 @@ private theorem exists_not_mem_of_ne_top_of_ne_top
     · exact ⟨w, hwU, hw⟩
   · exact ⟨u, hu, huW⟩
 
-private theorem exists_common_complement_of_finrank_eq
-    {V : Type*} [AddCommGroup V] [Module K V] [FiniteDimensional K V] (n : ℕ)
-    : ∀ U W : Submodule K V,
-      Module.finrank K U = Module.finrank K W → Module.finrank K V = Module.finrank K U + n
-        → ∃ T : Submodule K V,
-          Disjoint T U ∧ Disjoint T W
-            ∧ Module.finrank K V = Module.finrank K U + Module.finrank K T := by
+private theorem exists_common_complement_of_finrank_eq {V : Type*} [AddCommGroup V] [Module K V] [FiniteDimensional K V]
+    (n : ℕ) : ∀ U W : Submodule K V, Module.finrank K U = Module.finrank K W →
+      Module.finrank K V = Module.finrank K U + n →
+      ∃ T : Submodule K V, Disjoint T U ∧ Disjoint T W ∧
+        Module.finrank K V = Module.finrank K U + Module.finrank K T := by
   induction n with
   | zero =>
     intro U W _ hn
@@ -152,7 +179,8 @@ private theorem exists_common_complement_of_finrank_eq
     have hback : ∀ S : Submodule K V, ∀ c : K, c ≠ 0 → c • v ∈ S → v ∈ S := by
       intro S c hc hcv
       have hm := S.smul_mem c⁻¹ hcv
-      first | (rwa [smul_smul, inv_mul_cancel₀ hc, one_smul] at hm) | simpa [hc] using hm
+      first
+      | (rwa [smul_smul, inv_mul_cancel₀ hc, one_smul] at hm)
     have hinf : ∀ S : Submodule K V, v ∉ S → S ⊓ Submodule.span K {v} = ⊥ := by
       intro S hvS
       rw [eq_bot_iff]
@@ -163,23 +191,18 @@ private theorem exists_common_complement_of_finrank_eq
       by_cases hc : c = 0
       · simp [hc]
       · exact (hvS (hback S c hc hzS)).elim
-    have key
-        : ∀ S : Submodule K V,
-          v ∉ S → Module.finrank K ↥(S ⊔ Submodule.span K {v}) = Module.finrank K S + 1 := by
+    have key : ∀ S : Submodule K V, v ∉ S →
+        Module.finrank K ↥(S ⊔ Submodule.span K {v}) = Module.finrank K S + 1 := by
       intro S hvS
       have h := Submodule.finrank_sup_add_finrank_inf_eq S (Submodule.span K {v})
       rw [hinf S hvS, finrank_bot, finrank_span_singleton hv0] at h
       omega
-    obtain ⟨T, hTU, hTW, hT⟩ :=
-      ih (U ⊔ Submodule.span K {v}) (W ⊔ Submodule.span K {v}) (by rw [key U hvU, key W hvW, hUW])
-        (by rw [key U hvU]; omega)
-    have hvT : v ∉ T := fun h =>
-      hv0 (eq_zero_of_mem_of_disjoint hTU h
-        (Submodule.mem_sup_right (Submodule.mem_span_singleton_self v)))
-    have disj
-        : ∀ S : Submodule K V,
-          v ∉ S → Disjoint T (S ⊔ Submodule.span K {v})
-            → Disjoint (T ⊔ Submodule.span K {v}) S := by
+    obtain ⟨T, hTU, hTW, hT⟩ := ih (U ⊔ Submodule.span K {v}) (W ⊔ Submodule.span K {v})
+      (by rw [key U hvU, key W hvW, hUW]) (by rw [key U hvU]; omega)
+    have hvT : v ∉ T := fun h => hv0 (eq_zero_of_mem_of_disjoint hTU h
+      (Submodule.mem_sup_right (Submodule.mem_span_singleton_self v)))
+    have disj : ∀ S : Submodule K V, v ∉ S → Disjoint T (S ⊔ Submodule.span K {v}) →
+        Disjoint (T ⊔ Submodule.span K {v}) S := by
       intro S hvS hTS
       rw [disjoint_iff, eq_bot_iff]
       intro z hz
@@ -202,11 +225,10 @@ private theorem exists_common_complement_of_finrank_eq
     rw [key U hvU] at hT
     omega
 
-theorem fix_tuple
-    {V : Type*} [AddCommGroup V] [Module K V] [FiniteDimensional K V]
-    {a : ℕ} (x : Fin a → V) (hx : LinearIndependent K x) (φ ψ : Fin a → Module.Dual K V)
-    (hφ : LinearIndependent K φ) (hψ : LinearIndependent K ψ) (h : ∀ i j, φ i (x j) = ψ i (x j))
-    : ∃ B : V ≃ₗ[K] V, (∀ j, B (x j) = x j) ∧ ∀ i v, ψ i (B v) = φ i v := by
+theorem fix_tuple {V : Type*} [AddCommGroup V] [Module K V] [FiniteDimensional K V] {a : ℕ}
+    (x : Fin a → V) (hx : LinearIndependent K x) (φ ψ : Fin a → Module.Dual K V)
+    (hφ : LinearIndependent K φ) (hψ : LinearIndependent K ψ) (h : ∀ i j, φ i (x j) = ψ i (x j)) :
+    ∃ B : V ≃ₗ[K] V, (∀ j, B (x j) = x j) ∧ ∀ i v, ψ i (B v) = φ i v := by
   let Φ : V →ₗ[K] (Fin a → K) := LinearMap.pi φ
   let Ψ : V →ₗ[K] (Fin a → K) := LinearMap.pi ψ
   have hΦ : Function.Surjective Φ := pi_surj φ hφ
@@ -215,15 +237,16 @@ theorem fix_tuple
   have eΨ := LinearMap.finrank_range_add_finrank_ker Ψ
   rw [LinearMap.range_eq_top.mpr hΦ, finrank_top] at eΦ
   rw [LinearMap.range_eq_top.mpr hΨ, finrank_top] at eΨ
-  obtain ⟨T, hTΦ, hTΨ, hT⟩ :=
-    exists_common_complement_of_finrank_eq (Module.finrank K V - Module.finrank K (LinearMap.ker Φ))
-      (LinearMap.ker Φ) (LinearMap.ker Ψ) (by omega) (by omega)
+  obtain ⟨T, hTΦ, hTΨ, hT⟩ := exists_common_complement_of_finrank_eq
+    (Module.finrank K V - Module.finrank K (LinearMap.ker Φ)) (LinearMap.ker Φ) (LinearMap.ker Ψ)
+    (by omega) (by omega)
   have hTdim : Module.finrank K T = Module.finrank K (Fin a → K) := by omega
   let f : T →ₗ[K] (Fin a → K) := Ψ.domRestrict T
   have hfinj : Function.Injective f := by
     refine (injective_iff_map_eq_zero f).mpr fun t ht => ?_
     have h0 : (t : V) = 0 := eq_zero_of_mem_of_disjoint hTΨ t.2 (LinearMap.mem_ker.mpr ht)
-    first | exact Subtype.ext h0 | simpa using h0
+    first
+    | exact Subtype.ext h0
   have hfsurj : Function.Surjective f := by
     first
     | exact (LinearMap.injective_iff_surjective_of_finrank_eq_finrank hTdim).mp hfinj
@@ -235,13 +258,15 @@ theorem fix_tuple
   have hs : ∀ t, Ψ (s t) = t := by
     intro t
     have h1 : Ψ (s t) = eT (eT.symm t) := by
-      first | rfl | exact (LinearEquiv.ofBijective_apply f _ (eT.symm t)).symm
+      first
+      | rfl
     rw [h1, LinearEquiv.apply_symm_apply]
   have hsT : ∀ t, s t ∈ T := fun t => (eT.symm t).2
   let B : V →ₗ[K] V := LinearMap.id + s ∘ₗ (Φ - Ψ)
   have hBv : ∀ v, B v = v + s (Φ v - Ψ v) := by
     intro v
-    first | rfl | simp [B]
+    first
+    | rfl
   have hΨB : ∀ v, Ψ (B v) = Φ v := by
     intro v
     rw [hBv, map_add (f := _), hs]
@@ -259,15 +284,16 @@ theorem fix_tuple
       exact T.neg_mem (hsT _)
     exact eq_zero_of_mem_of_disjoint hTΦ hvT (LinearMap.mem_ker.mpr hΦv)
   refine ⟨LinearEquiv.ofInjectiveEndo B hinj, fun j => ?_, fun i v => ?_⟩
-  · first | exact hBx j | simpa using hBx j
-  · first | exact congrFun (hΨB v) i | simpa using congrFun (hΨB v) i
+  · first
+    | exact hBx j
+  · first
+    | exact congrFun (hΨB v) i
 
-theorem glPair
-    {V : Type*} [AddCommGroup V] [Module K V] [FiniteDimensional K V]
-    {a : ℕ} (x y : Fin a → V) (ξ η : Fin a → Module.Dual K V) (hx : LinearIndependent K x)
+theorem glPair {V : Type*} [AddCommGroup V] [Module K V] [FiniteDimensional K V] {a : ℕ}
+    (x y : Fin a → V) (ξ η : Fin a → Module.Dual K V) (hx : LinearIndependent K x)
     (hy : LinearIndependent K y) (hξ : LinearIndependent K ξ) (hη : LinearIndependent K η)
-    (h : ∀ i j, ξ i (x j) = η i (y j))
-    : ∃ A : V ≃ₗ[K] V, (∀ j, A (x j) = y j) ∧ ∀ i v, η i (A v) = ξ i v := by
+    (h : ∀ i j, ξ i (x j) = η i (y j)) :
+    ∃ A : V ≃ₗ[K] V, (∀ j, A (x j) = y j) ∧ ∀ i v, η i (A v) = ξ i v := by
   obtain ⟨A0, hA0⟩ := trans_tuple x y hx hy
   have hψ' : LinearIndependent K (fun i => (η i).comp A0.toLinearMap) := by
     rw [Fintype.linearIndependent_iff] at hη ⊢
@@ -275,14 +301,12 @@ theorem glPair
     apply hη g
     refine LinearMap.ext fun v => ?_
     have hgv := LinearMap.congr_fun hg (A0.symm v)
-    first | simpa using hgv | simpa [LinearMap.sum_apply] using hgv
-  obtain ⟨B, hB1, hB2⟩ :=
-    fix_tuple x hx ξ
-      (fun i => (η i).comp A0.toLinearMap)
-      hξ hψ'
-      (fun i j => by
-        show ξ i (x j) = η i (A0 (x j))
-        rw [hA0 j, h i j])
+    first
+    | simpa using hgv
+  obtain ⟨B, hB1, hB2⟩ := fix_tuple x hx ξ
+    (fun i => (η i).comp A0.toLinearMap) hξ hψ' (fun i j => by
+      show ξ i (x j) = η i (A0 (x j))
+      rw [hA0 j, h i j])
   refine ⟨B.trans A0, fun j => ?_, fun i v => ?_⟩
   · rw [LinearEquiv.trans_apply, hB1 j, hA0 j]
   · rw [LinearEquiv.trans_apply]

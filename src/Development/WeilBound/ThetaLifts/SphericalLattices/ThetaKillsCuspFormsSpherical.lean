@@ -1,10 +1,60 @@
 module
 
-public import Development.WeilBound.ThetaLifts.CartanFactorisation.Kills0Of
-public import Development.WeilBound.ThetaLifts.CartanFactorisation.KillInf
 public import Development.WeilBound.ThetaLifts.Reductions.JoinDef
-public import Development.WeilBound.ThetaLifts.SphericalLattices.ThetaSubSup
 public import Development.WeilBound.ThetaLifts.SphericalLattices.HoweInert
+public import Development.AbelianVarietyTheory.Definitions.Divisors.MatchingOfParts
+public import Development.WeilBound.ThetaLifts.CartanFactorisation.ExistsBeta
+public import Development.WeilBound.ThetaLifts.CartanFactorisation.UnitDef
+public import Development.WeilBound.ThetaLifts.CartanFactorisation.UpdSelf
+public import Development.WeilBound.CoreStatements.LocalThetaKernels.Locrep
+public import Development.WeilBound.ThetaLifts.CartanFactorisation.ExistsMaximalCompactInfinite
+public import Development.WeilBound.ThetaLifts.CartanFactorisation.KillInf
+public import Development.WeilBound.ThetaLifts.CartanFactorisation.Kills0Of
+import Development.WeilBound.ThetaLifts.CartanFactorisation.RinfZero
+import Development.WeilBound.ThetaLifts.CartanFactorisation.TensOfEval
+import Development.WeilBound.ThetaLifts.CartanFactorisation.Unimod
+import Development.WeilBound.ThetaLifts.ConeHypotheses.PureEqPureA
+public import Development.WeilBound.ThetaLifts.SphericalLattices.ThetaSubSup
+import Formalism.LocalToGlobal.IndefiniteReal.PHeisFC
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Development.WeilBound.CoreStatements.CompactAveragingSplitting.EigenvectorLifting.SplitLoc
 
 @[expose] public section
 
@@ -134,8 +184,8 @@ theorem killFin3
         _ = starRingEnd ℂ (w i) * β sQ y := by
           rw [LinearMap.map_smulₛₗ, LinearMap.smul_apply, iso (k i) (hw i).1, smul_eq_mul]
     have e3 : β sQ z = (∑ i, w i * starRingEnd ℂ (w i)) * β sQ y := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [z, map_sum, map_smul, hk, smul_eq_mul, Finset.sum_mul]
+
+      simp only [z, map_sum, map_smul, hk, smul_eq_mul, Finset.sum_mul]
       exact Finset.sum_congr rfl fun i _ => by ring
     rw [h0] at e3
     have w0 : w 0 ≠ 0 := fun e =>

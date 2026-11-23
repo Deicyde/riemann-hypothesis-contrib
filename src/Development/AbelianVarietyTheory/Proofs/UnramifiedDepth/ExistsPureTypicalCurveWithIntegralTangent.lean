@@ -1,16 +1,61 @@
 module
 
-public import Mathlib
-public import Formalism.LocalToGlobal.CharacterGerms.NondegenerateCharts
-public import Formalism.LocalToGlobal.CharacterGerms.RowTieSelf
-public import Formalism.LocalToGlobal.CharacterGerms.BlockAdmissibleChart
-public import Formalism.LocalToGlobal.CharacterGerms.NegMem
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.PlaceDivisors.StChartF
 public import Development.AbelianVarietyTheory.Definitions.TeichmullerDepth.HasTeich
-public import Development.AbelianVarietyTheory.Proofs.UnramifiedDepth.GaugedFormalGroupCurveLogarithmsAddSubgroupRescaStatement
-public import Development.AbelianVarietyTheory.Proofs.UnramifiedDepth.CurveLogarithmsInvNatCastSmulMemStatement
-public import Development.AbelianVarietyTheory.Proofs.UnramifiedDepth.PowExponentPartMemGaugedCurveLogarithmsStatement
 public import Development.AbelianVarietyTheory.Proofs.UnramifiedDepth.AdjointEndPairMemGaugedCurveLogarithmsStatement
+public import Development.AbelianVarietyTheory.Proofs.UnramifiedDepth.CurveLogarithmsInvNatCastSmulMemStatement
+import Development.AbelianVarietyTheory.Proofs.UnramifiedDepth.GaugedFormalGroupCurveLogarithmsAddSubgroupRescaStatement
+public import Development.AbelianVarietyTheory.Proofs.UnramifiedDepth.PowExponentPartMemGaugedCurveLogarithmsStatement
+import Formalism.LocalToGlobal.CharacterGerms.ConstMemTypeSetOfNonneg
+import Formalism.LocalToGlobal.CharacterGerms.NegMem
+import Formalism.LocalToGlobal.CharacterGerms.ValNonnegLeadingCoeffOfMemTySet
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Formalism.LocalToGlobal.ProjectiveLattices.SubConstMemOrig
 
 @[expose] public section
 
@@ -37,12 +82,12 @@ theorem tyS_sum {l : ℕ} (hl : 2 ≤ l) {ι : Type} (S : Finset ι) (a : ι →
     : tyS l (fun s => ∑ i ∈ S, a i s) = ∑ i ∈ S, tyS l (a i) := by
   apply tyS_eq hl
   · intro s
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     exact Finset.sum_congr rfl fun i _ => coeff_tyS_pow hl _ _
   · intro m hm
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     exact Finset.sum_eq_zero fun i _ => coeff_tyS_of_ne _ m hm
 
 theorem tyS_rescale {l : ℕ} (hl : 2 ≤ l) (c : C) (a : ℕ → C)
@@ -225,8 +270,8 @@ theorem exists_start
   ⟩
   · convert h2 using 1
     refine Prod.ext (funext fun i => ?_) (funext fun q => ?_)
-    set_option synthInstance.maxHeartbeats 100000 in
-      · simp only [emb, typ, map_sum, PowerSeries.coeff_smul, smul_eq_mul, hb1]
+
+    · simp only [emb, typ, map_sum, PowerSeries.coeff_smul, smul_eq_mul, hb1]
     · simp only [emb, typ, one_smul, zero_sub, map_neg]
   · intro q
     simp only [pow_zero]

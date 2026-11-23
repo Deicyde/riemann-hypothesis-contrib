@@ -1,33 +1,64 @@
 module
 
-public import Mathlib
+public import Mathlib.Algebra.BigOperators.Group.Finset.Defs
+public import Mathlib.Algebra.Group.Subgroup.Defs
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
+public import Mathlib.Algebra.BigOperators.Group.Finset.Basic
+public import Mathlib.Algebra.Group.Action.Defs
+public import Mathlib.Algebra.Group.Submonoid.BigOperators
+public import Mathlib.Algebra.GroupWithZero.Action.Defs
 
 @[expose] public section
 
 namespace GlobalTheory
 
-theorem sub_one_bijective_quotient_of_topNilpotent
-    : ∀ (N : Type) [AddCommGroup N] (p : ℕ) (Φ : N →+ N) (M D : AddSubgroup N)
-        (F : ℕ → AddSubgroup N),
-      D ≤ M → (∀ x ∈ M, Φ x ∈ M) → (∀ x ∈ D, Φ x ∈ D) → (∀ m, ∀ x ∈ F m, Φ x ∈ F (m + 1))
-        → (∀ m, F (m + 1) ≤ F m) → (∀ x, p • x ∈ M → x ∈ M) → (∀ x, p • x ∈ D → x ∈ D)
-        → (∀ f : ℕ → N,
-          (∀ i, f i ∈ M) → (∀ i, f i ∈ F i) → ∃ s ∈ M, ∀ m, s - ∑ i ∈ Finset.range m, f i ∈ F m)
-        → (∀ x, (∀ m, ∃ d ∈ D, x - d ∈ F m) → ∃ d ∈ D, ∃ r, x - d = p • r)
-        → (∀ y ∈ M, ∃ j : ℕ, ∃ d ∈ D, Φ^[j] y - d ∈ F 0)
-        → (∀ x : ℕ → N,
-          (∀ i, x i ∈ M) → ∃ s ∈ M, ∀ k, ∃ r, s - ∑ i ∈ Finset.range k, p ^ i • x i = p ^ k • r)
-        → (∀ x, (∀ k : ℕ, ∃ d ∈ D, ∃ r, x - d = p ^ k • r) → x ∈ D)
-        → (∀ y ∈ M, ∃ z ∈ M, y - (Φ z - z) ∈ D) ∧ (∀ z ∈ M, Φ z - z ∈ D → z ∈ D) := by
+theorem sub_one_bijective_quotient_of_topNilpotent :
+    ∀ (N : Type) [AddCommGroup N] (p : ℕ) (Φ : N →+ N) (M D : AddSubgroup N) (F : ℕ → AddSubgroup N), D ≤ M → (∀ x ∈ M, Φ x ∈ M) → (∀ x ∈ D, Φ x ∈ D) → (∀ m, ∀ x ∈ F m, Φ x ∈ F (m + 1)) → (∀ m, F (m + 1) ≤ F m) → (∀ x, p • x ∈ M → x ∈ M) → (∀ x, p • x ∈ D → x ∈ D) → (∀ f : ℕ → N, (∀ i, f i ∈ M) → (∀ i, f i ∈ F i) → ∃ s ∈ M, ∀ m, s - ∑ i ∈ Finset.range m, f i ∈ F m) → (∀ x, (∀ m, ∃ d ∈ D, x - d ∈ F m) → ∃ d ∈ D, ∃ r, x - d = p • r) → (∀ y ∈ M, ∃ j : ℕ, ∃ d ∈ D, Φ^[j] y - d ∈ F 0) → (∀ x : ℕ → N, (∀ i, x i ∈ M) → ∃ s ∈ M, ∀ k, ∃ r, s - ∑ i ∈ Finset.range k, p ^ i • x i = p ^ k • r) → (∀ x, (∀ k : ℕ, ∃ d ∈ D, ∃ r, x - d = p ^ k • r) → x ∈ D) → (∀ y ∈ M, ∃ z ∈ M, y - (Φ z - z) ∈ D) ∧ (∀ z ∈ M, Φ z - z ∈ D → z ∈ D) := by
   intro N _ p Φ M D F hDM hΦM hΦD hΦF hFmono hpM hpD hFcomp hFclosed hnil hpcomp hpclosed
   have hiterM : ∀ (i : ℕ) (x : N), x ∈ M → Φ^[i] x ∈ M := by
     intro i
     induction i with
     | zero => intro x hx; simpa using hx
     | succ i ih => intro x hx; rw [Function.iterate_succ_apply']; exact hΦM _ (ih x hx)
-  have htel
-      : ∀ (x : N) (m : ℕ),
-        Φ (∑ i ∈ Finset.range m, Φ^[i] x) - ∑ i ∈ Finset.range m, Φ^[i] x = Φ^[m] x - x := by
+  have htel : ∀ (x : N) (m : ℕ), Φ (∑ i ∈ Finset.range m, Φ^[i] x) - ∑ i ∈ Finset.range m, Φ^[i] x = Φ^[m] x - x := by
     intro x m
     induction m with
     | zero => simp
@@ -80,9 +111,7 @@ theorem sub_one_bijective_quotient_of_topNilpotent
         obtain ⟨d, hd, r, hr, hrM, hrD⟩ := ih
         obtain ⟨d', hd', r', hr', hr'M, hr'D⟩ := step r hrM hrD
         refine ⟨d + p ^ k • d', D.add_mem hd (nsmul_mem hd' _), r', ?_, hr'M, hr'D⟩
-        calc
-          z - (d + p ^ k • d')
-            = p ^ k • (r - d') := by rw [smul_sub, ← hr]; abel
+        calc z - (d + p ^ k • d') = p ^ k • (r - d') := by rw [smul_sub, ← hr]; abel
           _ = p ^ (k + 1) • r' := by rw [hr', pow_succ, mul_smul]
     apply hpclosed
     intro k
@@ -110,16 +139,9 @@ theorem sub_one_bijective_quotient_of_topNilpotent
         abel
       rw [h]
       exact add_mem (sub_mem (hFmono m (hΦF m _ hsm)) hsm) (hfF m)
-    obtain ⟨d', hd', r, hr⟩ :=
-      hFclosed (Φ s - s + e) (fun m => ⟨0, D.zero_mem, by rw [sub_zero]; exact hx m⟩)
-    refine ⟨
-      -(∑ i ∈ Finset.range j, Φ^[i] y + s),
-      M.neg_mem (M.add_mem (sum_mem fun i _ => hiterM i y hyM) hsM),
-      d + d',
-      D.add_mem hd hd',
-      r,
-      ?_
-    ⟩
+    obtain ⟨d', hd', r, hr⟩ := hFclosed (Φ s - s + e) (fun m => ⟨0, D.zero_mem, by rw [sub_zero]; exact hx m⟩)
+    refine ⟨-(∑ i ∈ Finset.range j, Φ^[i] y + s),
+      M.neg_mem (M.add_mem (sum_mem fun i _ => hiterM i y hyM) hsM), d + d', D.add_mem hd hd', r, ?_⟩
     have hT := htel y j
     generalize ∑ i ∈ Finset.range j, Φ^[i] y = T at hT ⊢
     rw [← hr, map_neg, map_add (f := _), he, show Φ^[j] y = Φ T - T + y by rw [hT]; abel]
@@ -137,39 +159,29 @@ theorem sub_one_bijective_quotient_of_topNilpotent
       induction k with
       | zero => simpa using hyM
       | succ k ih => rw [Function.iterate_succ_apply']; exact hRM _ ih
-    have hexp
-        : ∀ k,
-          y - ∑ i ∈ Finset.range k, p ^ i • (Φ (Z (R^[i] y)) - Z (R^[i] y))
-              - ∑ i ∈ Finset.range k, p ^ i • Dd (R^[i] y)
-            = p ^ k • R^[k] y := by
+    have hexp : ∀ k, y - ∑ i ∈ Finset.range k, p ^ i • (Φ (Z (R^[i] y)) - Z (R^[i] y))
+        - ∑ i ∈ Finset.range k, p ^ i • Dd (R^[i] y) = p ^ k • R^[k] y := by
       intro k
       induction k with
       | zero => simp
       | succ k ih =>
         rw [Finset.sum_range_succ, Finset.sum_range_succ, Function.iterate_succ_apply', pow_succ,
-          mul_smul, ← hR _ (hys k), smul_sub (p ^ k) (R^[k] y - _), smul_sub (p ^ k) (R^[k] y),
-          ← ih]
+          mul_smul, ← hR _ (hys k), smul_sub (p ^ k) (R^[k] y - _), smul_sub (p ^ k) (R^[k] y), ← ih]
         abel
     obtain ⟨W, hWM, hW⟩ := hpcomp (fun i => Z (R^[i] y)) (fun i => hZM _ (hys i))
     refine ⟨W, hWM, hpclosed _ ?_⟩
     intro k
     obtain ⟨r, hr⟩ := hW k
-    refine ⟨
-      ∑ i ∈ Finset.range k, p ^ i • Dd (R^[i] y),
-      sum_mem fun i _ => nsmul_mem (hDd _ (hys i)) _,
-      R^[k] y - (Φ r - r),
-      ?_
-    ⟩
-    have hsum
-        : Φ (∑ i ∈ Finset.range k, p ^ i • Z (R^[i] y)) - ∑ i ∈ Finset.range k, p ^ i • Z (R^[i] y)
-          = ∑ i ∈ Finset.range k, p ^ i • (Φ (Z (R^[i] y)) - Z (R^[i] y)) := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum, ← Finset.sum_sub_distrib]
+    refine ⟨∑ i ∈ Finset.range k, p ^ i • Dd (R^[i] y),
+      sum_mem fun i _ => nsmul_mem (hDd _ (hys i)) _, R^[k] y - (Φ r - r), ?_⟩
+    have hsum : Φ (∑ i ∈ Finset.range k, p ^ i • Z (R^[i] y)) - ∑ i ∈ Finset.range k, p ^ i • Z (R^[i] y)
+        = ∑ i ∈ Finset.range k, p ^ i • (Φ (Z (R^[i] y)) - Z (R^[i] y)) := by
+
+      rw [map_sum, ← Finset.sum_sub_distrib]
       refine Finset.sum_congr rfl fun i _ => ?_
       rw [map_nsmul, smul_sub]
     have hWe : W = ∑ i ∈ Finset.range k, p ^ i • Z (R^[i] y) + p ^ k • r := by rw [← hr]; abel
-    rw [hWe, map_add (f := _), map_nsmul, smul_sub (p ^ k) (R^[k] y), smul_sub (p ^ k) (Φ r),
-      ← hexp k, ← hsum]
+    rw [hWe, map_add (f := _), map_nsmul, smul_sub (p ^ k) (R^[k] y), smul_sub (p ^ k) (Φ r), ← hexp k, ← hsum]
     abel
   exact ⟨hsurj, hinj⟩
 

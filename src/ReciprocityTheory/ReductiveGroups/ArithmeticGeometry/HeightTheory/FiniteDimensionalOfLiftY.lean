@@ -1,6 +1,51 @@
 module
 
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.HeightTheory.BasisExtend
+public import Mathlib.RingTheory.Henselian
+public import Mathlib.RingTheory.RegularLocalRing.Defs
+public import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -12,11 +57,10 @@ section Clear
 
 variable {A : Type} [CommRing A] [IsDomain A] {σ : Type}
 
-theorem clear_denoms (P : MvPolynomial σ (FractionRing A))
-    : ∃ (b : A) (p : MvPolynomial σ A),
-      b ≠ 0
-        ∧ MvPolynomial.map (algebraMap A (FractionRing A)) p
-          = MvPolynomial.C (algebraMap A (FractionRing A) b) * P := by
+theorem clear_denoms (P : MvPolynomial σ (FractionRing A)) :
+    ∃ (b : A) (p : MvPolynomial σ A), b ≠ 0 ∧
+      MvPolynomial.map (algebraMap A (FractionRing A)) p =
+        MvPolynomial.C (algebraMap A (FractionRing A) b) * P := by
   induction P using MvPolynomial.induction_on
   next a =>
     obtain ⟨z, hz⟩ := IsLocalization.surj (nonZeroDivisors A) a
@@ -32,27 +76,23 @@ theorem clear_denoms (P : MvPolynomial σ (FractionRing A))
     obtain ⟨b, q, hb, h⟩ := hp
     exact ⟨b, q * X n, hb, by rw [_root_.map_mul, MvPolynomial.map_X, h, mul_assoc]⟩
 
-noncomputable def toFracY (A : Type) [CommRing A] [IsDomain A] (σ : Type)
-    : MvPolynomial σ A →+* FractionRing (MvPolynomial σ (FractionRing A)) :=
-  (algebraMap (MvPolynomial σ (FractionRing A)) _).comp
-    (MvPolynomial.map (algebraMap A (FractionRing A)))
+noncomputable def toFracY (A : Type) [CommRing A] [IsDomain A] (σ : Type) :
+    MvPolynomial σ A →+* FractionRing (MvPolynomial σ (FractionRing A)) :=
+  (algebraMap (MvPolynomial σ (FractionRing A)) _).comp (MvPolynomial.map (algebraMap A (FractionRing A)))
 
 theorem toFracY_injective : Function.Injective (toFracY A σ) := by
   intro x y h
-  have h'
-      : algebraMap (MvPolynomial σ (FractionRing A))
-          (FractionRing (MvPolynomial σ (FractionRing A)))
-          (MvPolynomial.map (algebraMap A (FractionRing A)) x)
-        = algebraMap (MvPolynomial σ (FractionRing A))
-          (FractionRing (MvPolynomial σ (FractionRing A)))
-          (MvPolynomial.map (algebraMap A (FractionRing A)) y) :=
-    h
+  have h' : algebraMap (MvPolynomial σ (FractionRing A))
+      (FractionRing (MvPolynomial σ (FractionRing A)))
+      (MvPolynomial.map (algebraMap A (FractionRing A)) x) =
+      algebraMap (MvPolynomial σ (FractionRing A)) (FractionRing (MvPolynomial σ (FractionRing A)))
+      (MvPolynomial.map (algebraMap A (FractionRing A)) y) := h
   exact MvPolynomial.map_injective _ (IsFractionRing.injective A (FractionRing A))
     (IsFractionRing.injective _ _ h')
 
-set_option synthInstance.maxHeartbeats 400000 in
-theorem isFractionRing_toFracY
-    : @IsFractionRing (MvPolynomial σ A) _ (FractionRing (MvPolynomial σ (FractionRing A))) _
+
+theorem isFractionRing_toFracY :
+    @IsFractionRing (MvPolynomial σ A) _ (FractionRing (MvPolynomial σ (FractionRing A))) _
       (toFracY A σ).toAlgebra := by
   letI := (toFracY A σ).toAlgebra
   refine ⟨?_, ?_, ?_⟩
@@ -72,12 +112,11 @@ theorem isFractionRing_toFracY
       rw [_root_.map_zero] at h₂
       exact mul_ne_zero (fun h => hβ₂ (MvPolynomial.C_eq_zero.mp h)) hv h₂.symm
     have hp₂ : C b₁ * p₂ ∈ nonZeroDivisors (MvPolynomial σ A) :=
-      mem_nonZeroDivisors_of_ne_zero
-        (mul_ne_zero (fun h => hb₁ (MvPolynomial.C_eq_zero.mp h)) hp₂ne)
+      mem_nonZeroDivisors_of_ne_zero (mul_ne_zero (fun h => hb₁ (MvPolynomial.C_eq_zero.mp h)) hp₂ne)
     refine ⟨⟨C b₂ * p₁, ⟨C b₁ * p₂, hp₂⟩⟩, ?_⟩
     show z * toFracY A σ (C b₁ * p₂) = toFracY A σ (C b₂ * p₁)
-    simp only [toFracY, RingHom.coe_comp, Function.comp_apply, _root_.map_mul, MvPolynomial.map_C,
-      h₁, h₂]
+    simp only [toFracY, RingHom.coe_comp, Function.comp_apply, _root_.map_mul,
+      MvPolynomial.map_C, h₁, h₂]
     linear_combination (algebraMap (MvPolynomial σ (FractionRing A))
       (FractionRing (MvPolynomial σ (FractionRing A))) (C (algebraMap A (FractionRing A) b₁)) *
       algebraMap (MvPolynomial σ (FractionRing A))
@@ -91,64 +130,55 @@ section Disjoint
 
 variable {L E : Type} [Field L] [Field E] [Algebra L E] {σ : Type}
 
-private theorem liftY_algebraMap (x : MvPolynomial σ L)
-    : ReciprocityTheory.ChartRestriction.G.T0.VariableBasisExtension.liftY (L := L) (E := E)
-        (σ := σ) (algebraMap (MvPolynomial σ L) (FractionRing (MvPolynomial σ L)) x)
-      = algebraMap (MvPolynomial σ E) (FractionRing (MvPolynomial σ E))
+private theorem liftY_algebraMap (x : MvPolynomial σ L) :
+    ReciprocityTheory.ChartRestriction.G.T0.VariableBasisExtension.liftY (L := L) (E := E) (σ := σ)
+        (algebraMap (MvPolynomial σ L) (FractionRing (MvPolynomial σ L)) x) =
+      algebraMap (MvPolynomial σ E) (FractionRing (MvPolynomial σ E))
         (MvPolynomial.map (algebraMap L E) x) := by
-  rw [ReciprocityTheory.ChartRestriction.G.T0.VariableBasisExtension.liftY,
-    IsFractionRing.lift_algebraMap, RingHom.comp_apply]
+  rw [ReciprocityTheory.ChartRestriction.G.T0.VariableBasisExtension.liftY, IsFractionRing.lift_algebraMap, RingHom.comp_apply]
 
 private theorem linearIndependent_algebraMap_C_fractionRing
     [Algebra (FractionRing (MvPolynomial σ L)) (FractionRing (MvPolynomial σ E))]
-    (hmap : algebraMap (FractionRing (MvPolynomial σ L)) (FractionRing (MvPolynomial σ E))
-      = ReciprocityTheory.ChartRestriction.G.T0.VariableBasisExtension.liftY)
-    {ι : Type} [Fintype ι]
-    (e : ι → E) (he : LinearIndependent L e)
-    : LinearIndependent (FractionRing (MvPolynomial σ L)) (fun i =>
-      algebraMap (MvPolynomial σ E) (FractionRing (MvPolynomial σ E)) (MvPolynomial.C (e i))) := by
+    (hmap : algebraMap (FractionRing (MvPolynomial σ L)) (FractionRing (MvPolynomial σ E)) =
+      ReciprocityTheory.ChartRestriction.G.T0.VariableBasisExtension.liftY)
+    {ι : Type} [Fintype ι] (e : ι → E) (he : LinearIndependent L e) :
+    LinearIndependent (FractionRing (MvPolynomial σ L))
+      (fun i => algebraMap (MvPolynomial σ E) (FractionRing (MvPolynomial σ E))
+        (MvPolynomial.C (e i))) := by
   rw [Fintype.linearIndependent_iff]
   intro g hg i
-  have hg'
-      : ∑ j, algebraMap (FractionRing (MvPolynomial σ L)) (FractionRing (MvPolynomial σ E)) (g j) *
-          algebraMap (MvPolynomial σ E) (FractionRing (MvPolynomial σ E)) (MvPolynomial.C (e j))
-        = 0 := by
+  have hg' : ∑ j, algebraMap (FractionRing (MvPolynomial σ L)) (FractionRing (MvPolynomial σ E)) (g j) *
+      algebraMap (MvPolynomial σ E) (FractionRing (MvPolynomial σ E)) (MvPolynomial.C (e j)) = 0 := by
     simpa only [Algebra.smul_def] using hg
-  obtain ⟨b, hb⟩ :=
-    IsLocalization.exist_integer_multiples_of_finite (nonZeroDivisors (MvPolynomial σ L)) g
-  have hb'
-      : ∀ j, ∃ c : MvPolynomial σ L,
-        algebraMap (MvPolynomial σ L) (FractionRing (MvPolynomial σ L)) c
-          = algebraMap (MvPolynomial σ L) (FractionRing (MvPolynomial σ L)) (b : MvPolynomial σ L)
-            * g j := by
+  obtain ⟨b, hb⟩ := IsLocalization.exist_integer_multiples_of_finite
+    (nonZeroDivisors (MvPolynomial σ L)) g
+  have hb' : ∀ j, ∃ c : MvPolynomial σ L,
+      algebraMap (MvPolynomial σ L) (FractionRing (MvPolynomial σ L)) c =
+        algebraMap (MvPolynomial σ L) (FractionRing (MvPolynomial σ L)) (b : MvPolynomial σ L) * g j := by
     intro j
     obtain ⟨c, hc⟩ := RingHom.mem_rangeS.mp (hb j)
     exact ⟨c, by rw [hc, Algebra.smul_def]⟩
   choose a ha using hb'
-  have key
-      : ∀ j,
-        algebraMap (MvPolynomial σ E) (FractionRing (MvPolynomial σ E))
-            (MvPolynomial.map (algebraMap L E) (a j) * MvPolynomial.C (e j))
-          = ReciprocityTheory.ChartRestriction.G.T0.VariableBasisExtension.liftY (algebraMap
-              (MvPolynomial σ L) (FractionRing (MvPolynomial σ L)) (b : MvPolynomial σ L))
-            * (algebraMap (FractionRing (MvPolynomial σ L)) (FractionRing (MvPolynomial σ E)) (g j)
-              * algebraMap (MvPolynomial σ E) (FractionRing (MvPolynomial σ E))
-                (MvPolynomial.C (e j))) := by
+  have key : ∀ j, algebraMap (MvPolynomial σ E) (FractionRing (MvPolynomial σ E))
+      (MvPolynomial.map (algebraMap L E) (a j) * MvPolynomial.C (e j)) =
+      ReciprocityTheory.ChartRestriction.G.T0.VariableBasisExtension.liftY
+          (algebraMap (MvPolynomial σ L) (FractionRing (MvPolynomial σ L)) (b : MvPolynomial σ L)) *
+        (algebraMap (FractionRing (MvPolynomial σ L)) (FractionRing (MvPolynomial σ E)) (g j) *
+          algebraMap (MvPolynomial σ E) (FractionRing (MvPolynomial σ E)) (MvPolynomial.C (e j))) := by
     intro j
     rw [_root_.map_mul, ← liftY_algebraMap, ha j, _root_.map_mul, hmap, mul_assoc]
   have hsum : ∑ j, MvPolynomial.map (algebraMap L E) (a j) * MvPolynomial.C (e j) = 0 := by
     apply IsFractionRing.injective (MvPolynomial σ E) (FractionRing (MvPolynomial σ E))
-    set_option synthInstance.maxHeartbeats 100000 in
+
     rw [_root_.map_zero, _root_.map_sum, Finset.sum_congr rfl (fun j _ => key j), ← Finset.mul_sum,
-      hg', mul_zero]
+    hg', mul_zero]
   have hcoeff : ∀ m j, AddMonoidAlgebra.coeff (a j) m = 0 := by
     intro m
     have hsum' : ∑ j, MvPolynomial.C (e j) * MvPolynomial.map (algebraMap L E) (a j) = 0 := by
       simpa only [mul_comm] using hsum
     have h0 := congrArg (AddMonoidAlgebra.coeff · m) hsum'
     simp only [MvPolynomial.coeff_sum, MvPolynomial.coeff_C_mul, MvPolynomial.coeff_map,
-        AddMonoidAlgebra.coeff_zero]
-      at h0
+      AddMonoidAlgebra.coeff_zero] at h0
     have h1 : ∑ j, AddMonoidAlgebra.coeff (a j) m • e j = 0 := by
       simpa [Algebra.smul_def, mul_comm] using h0
     exact Fintype.linearIndependent_iff.mp he (fun j => AddMonoidAlgebra.coeff (a j) m) h1
@@ -157,27 +187,20 @@ private theorem linearIndependent_algebraMap_C_fractionRing
     simpa using hcoeff m i
   have h2 := ha i
   rw [hai, _root_.map_zero] at h2
-  have hβ
-      : algebraMap (MvPolynomial σ L) (FractionRing (MvPolynomial σ L)) (b : MvPolynomial σ L)
-        ≠ 0 :=
+  have hβ : algebraMap (MvPolynomial σ L) (FractionRing (MvPolynomial σ L)) (b : MvPolynomial σ L) ≠ 0 :=
     IsFractionRing.to_map_ne_zero_of_mem_nonZeroDivisors b.2
   exact (mul_eq_zero.mp h2.symm).resolve_left hβ
 
 theorem finiteDimensional_of_liftY
-    (hfin
-      : letI := (VariableBasisExtension.liftY (L := L) (E := E) (σ := σ)).toAlgebra
-        FiniteDimensional (FractionRing (MvPolynomial σ L)) (FractionRing (MvPolynomial σ E)))
-    : FiniteDimensional L E := by
+    (hfin : letI := (VariableBasisExtension.liftY (L := L) (E := E) (σ := σ)).toAlgebra
+      FiniteDimensional (FractionRing (MvPolynomial σ L)) (FractionRing (MvPolynomial σ E))) :
+    FiniteDimensional L E := by
   letI : Algebra (FractionRing (MvPolynomial σ L)) (FractionRing (MvPolynomial σ E)) :=
     (ReciprocityTheory.ChartRestriction.G.T0.VariableBasisExtension.liftY (L := L) (E := E) (σ := σ)).toAlgebra
   haveI : FiniteDimensional (FractionRing (MvPolynomial σ L)) (FractionRing (MvPolynomial σ E)) :=
     hfin
-  have hbound
-      : ∀ s : Finset E,
-        LinearIndependent L (fun x : s => (x : E))
-          → s.card
-            ≤ Module.finrank (FractionRing (MvPolynomial σ L))
-              (FractionRing (MvPolynomial σ E)) := by
+  have hbound : ∀ s : Finset E, LinearIndependent L (fun x : s => (x : E)) →
+      s.card ≤ Module.finrank (FractionRing (MvPolynomial σ L)) (FractionRing (MvPolynomial σ E)) := by
     intro s hs
     have hli := linearIndependent_algebraMap_C_fractionRing (σ := σ) rfl (fun x : s => (x : E)) hs
     simpa using hli.fintype_card_le_finrank

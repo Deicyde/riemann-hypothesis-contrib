@@ -1,15 +1,56 @@
 module
 
-public import Mathlib
 public import ReciprocityTheory.DualLattices.WFrobStatement
-public import Development.AbelianVarietyTheory.Proofs.UnramifiedDepth.ZmodPrimeSqLocal
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Lemma
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
 noncomputable section
 
-open TensorProduct IsLocalRing Matrix ReciprocityTheory.PGsh ReciprocityTheory.PGsh.Up
-  ReciprocityTheory.PGsh.L2 ReciprocityTheory.PGsh.Be2
+open TensorProduct IsLocalRing Matrix ReciprocityTheory.PGsh ReciprocityTheory.PGsh.Up ReciprocityTheory.PGsh.L2 ReciprocityTheory.PGsh.Be2
 
 namespace GlobalTheory.WFrob
 
@@ -115,10 +156,9 @@ private lemma root_term (wd : WData Tw K) {g : ℕ} (m : Fin g →₀ ℕ) (d : 
     rw [RingEquiv.symm_apply_eq, frobeniusEquiv_apply, frobenius_def, ← pow_mul,
       Nat.div_mul_cancel (hd i)]
 
-theorem wFrob
-    : (∀ {R₀ : Type} [CommRing R₀] {p : ℕ} [Fact p.Prime] {Tw : ATowerL R₀ p} {K : LAlg R₀}
-        (wd : WData Tw K) (g : ℕ),
-      WFrobStatement wd g) := by
+theorem wFrob :
+    (∀ {R₀ : Type} [CommRing R₀] {p : ℕ} [Fact p.Prime] {Tw : ATowerL R₀ p} {K : LAlg R₀}
+      (wd : WData Tw K) (g : ℕ), WFrobStatement wd g) := by
   intro R₀ _ p _ Tw K wd g G hG
   classical
   choose d e hde hd using coeff_decomp wd G hG
@@ -128,23 +168,17 @@ theorem wFrob
     intro f
     rw [← Finset.sum_coe_sort G.support f]
     exact (Equiv.sum_comp G.support.equivFin.symm (fun x => f x)).symm
-  refine ⟨
-    MvPolynomial.eval₂ (Int.castRingHom _)
-        (fun j =>
-          MvPolynomial.C (φW wd ((frobeniusEquiv wd.Rb p).symm (d (μ j))))
-            * ∏ i, MvPolynomial.X i ^ (μ j i / p))
-        (wS p n)
-      + ∑ j, MvPolynomial.C (wd.πW.1 (e (μ j))) * ∏ i, MvPolynomial.X i ^ (μ j i),
-    ?_
-  ⟩
+  refine ⟨MvPolynomial.eval₂ (Int.castRingHom _)
+      (fun j => MvPolynomial.C (φW wd ((frobeniusEquiv wd.Rb p).symm (d (μ j)))) *
+        ∏ i, MvPolynomial.X i ^ (μ j i / p)) (wS p n) +
+      ∑ j, MvPolynomial.C (wd.πW.1 (e (μ j))) * ∏ i, MvPolynomial.X i ^ (μ j i), ?_⟩
   intro y hy a ha
   choose η s hy' using fun i => wd.decomp (y i)
   have hπy : ∀ i, wd.πW.1 (y i) = φW wd (η i) := fun i => by
     rw [hy' i, map_add (f := _), π_pmul, add_zero, φW_apply]
   have hw := wd.witt_add n (fun j => d (μ j) * ∏ i, η i ^ μ j i)
-  have hev
-      : MvPolynomial.eval y G
-        = ∑ j, wd.T (d (μ j) * ∏ i, η i ^ μ j i) + p * ∑ j, e (μ j) * ∏ i, y i ^ μ j i := by
+  have hev : MvPolynomial.eval y G = ∑ j, wd.T (d (μ j) * ∏ i, η i ^ μ j i) +
+      p * ∑ j, e (μ j) * ∏ i, y i ^ μ j i := by
     rw [MvPolynomial.eval_eq', hsum, Finset.mul_sum, ← Finset.sum_add_distrib]
     refine Finset.sum_congr rfl fun j _ => ?_
     rw [hde, add_mul, ← teich_term wd (μ j) (d (μ j)) (hd _) η s, mul_assoc]
@@ -167,7 +201,7 @@ theorem wFrob
     · funext j
       rw [Function.comp_apply, Function.comp_apply, root_term wd (μ j) (d (μ j)) (hd _) η]
       simp only [map_mul, map_prod, map_pow, MvPolynomial.eval_C, MvPolynomial.eval_X, hπy]
-  set_option synthInstance.maxHeartbeats 100000 in
+
   · simp only [map_sum, map_mul, map_prod, map_pow, MvPolynomial.eval_C, MvPolynomial.eval_X]
 
 end GlobalTheory.WFrob

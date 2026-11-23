@@ -1,16 +1,44 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.CenUsedOfCenReal
-public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.SettingsFormsExistList
-public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.PlaceModelImp
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.DofOTw
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.SideTw
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsMovedRowLiftDataToFittingStages
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ChainComparisonTransferOtherLaterStages
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.LiftsCompatibleOtherLaterStagesOfSameChoices
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.TypeRepresentativesPartsOtherLaterStages
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.RowBasisCongruenceLengthsOtherLaterStages
+import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ChainComparisonTransferOtherLaterStages
+import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.HdTr
+import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.LiftsCompatibleOtherLaterStagesOfSameChoices
+import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.RowBasisCongruenceLengthsOtherLaterStages
+import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.TypeRepresentativesPartsOtherLaterStages
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
 
 @[expose] public section
 
@@ -87,7 +115,6 @@ end Comp
 
 variable {R : RealDat3 a.D A3 Ks} (F : Face3 a.D A3) (y : Hd R.toRealDat) (y' : HdB b R.toRealDat)
 
-set_option maxHeartbeats 1000000 in
 theorem pkT_move
     (hs : Same b y y')
     {mA : Bool → a.D.what₂.Tup → Mat1 a.D.what₂.LL G} {p : PkD a.D G} (t : PkT F y mA p)
@@ -171,7 +198,6 @@ variable
   {B : Base} {C : Cols B} {a : Late B C} (b c : Late B C)
   {px : PreX B.toPre} {I : ColIn B px} {hX : B.fields.Ok} {T : TwDat B} {Wt : Set B.places.Pl}
 
-set_option maxHeartbeats 1000000 in
 theorem transportModuliCoreWithConstants_comp
     (z₀ : Dat a.st I hX T Wt)
     (Xg : Finset (Gc b.st.B px → b.st.B.LL)) (tr : TrI b.st.B px)
@@ -197,7 +223,6 @@ theorem transportModuliCoreWithConstants_comp
   · exact (by
       with_unfolding_all exact ((heq_of_eq (thru_eq (a := a) b c (iK := z₀.alg) z₀.R).symm) :))
 
-set_option maxHeartbeats 1000000 in
 theorem copy_comp
     (z₀ : Dat a.st I hX T Wt) (z : Dat b.st I hX T Wt)
     (hXg : z.Xg = z₀.Xg) (htr : z.tr = z₀.tr) (hc : HEq z.core (coreJ (a := a) b z₀.core))
@@ -217,7 +242,6 @@ variable
   {B : Base} {f : Fr B.toPre} {T : TwDat B} {w : ColW B f T} {Z₀ : w.Lt} {hX : B.fields.Ok}
   {Wt : Set B.places.Pl} {z₀ : Dat (w.st Z₀) w.I hX T Wt} {q : RowPk w z₀}
 
-set_option maxHeartbeats 2000000 in
 theorem moved_again
     (o o' : q.Over) (s : SameGrp (B := B) (C := w.C) o.Z o'.Z) (m : Moved o)
     (hc : m.Copy) (hh : m.Coh)

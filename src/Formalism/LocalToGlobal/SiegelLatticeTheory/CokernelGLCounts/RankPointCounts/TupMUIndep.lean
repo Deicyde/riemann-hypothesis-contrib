@@ -1,8 +1,54 @@
 module
 
-public import Mathlib
+public import Formalism.SharpRestriction.CuspSpanNormBounds.BlockEnds
+public import Formalism.SharpRestriction.CuspSpanNormBounds.RelevantZeroGramTerms
 public import Formalism.LocalToGlobal.SiegelLatticeTheory.CokernelGLCounts.RankPointCounts.FlagOfUpUni
+public import Formalism.LocalToGlobal.SiegelLatticeTheory.CokernelGLCounts.RankPointCounts.PairingOmegaPrimeZ
 public import Formalism.PeriodIntegrals.OrbitalBoundsConclusion.WittExtensionTheorem
+public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.PairCorankPositivity.EqZeroOfMulVec
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
+import Formalism.LocalToGlobal.SiegelLatticeTheory.ClosedLocalOrbits.TermOp
+import Formalism.SharpRestriction.CuspSpanNormBounds.IsPrimitiveSub
 
 @[expose] public section
 
@@ -10,19 +56,15 @@ noncomputable section
 
 open scoped Classical
 open Module Matrix
-open Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat
-  Formalism.L2.SG.TermOp
+open Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.L2.SG.TermOp
 
 namespace Formalism.L2.SG.NGCut.NormalVectorPairings
 
 variable {E : Type} [Field E] [NumberField E] [StarRing E] {S : HSpace E} {r : ℕ} {T T' : E}
 
-theorem witt_tuple
-    {ι : Type} [Fintype ι]
-    (x y : ι → S.V) (hx : LinearIndependent E x) (hy : LinearIndependent E y)
-    (hG : ∀ i j, S.hT (x i) (x j) = S.hT (y i) (y j))
-    : ∃ g : S.V ≃ₗ[E] S.V,
-      g ∈ Formalism.HermitianLatticesTheory.isom S.hT ∧ ∀ i, g (x i) = y i := by
+theorem witt_tuple {ι : Type} [Fintype ι] (x y : ι → S.V) (hx : LinearIndependent E x) (hy : LinearIndependent E y)
+    (hG : ∀ i j, S.hT (x i) (x j) = S.hT (y i) (y j)) :
+    ∃ g : S.V ≃ₗ[E] S.V, g ∈ Formalism.HermitianLatticesTheory.isom S.hT ∧ ∀ i, g (x i) = y i := by
   set U := Submodule.span E (Set.range x) with hU
   let b : Basis ι E U := Basis.span hx
   have hb : ∀ i, (b i : S.V) = x i := fun i => by
@@ -35,13 +77,12 @@ theorem witt_tuple
     have := congrArg Subtype.val (b.sum_repr u)
     rw [← this, Submodule.coe_sum]
     simp only [Submodule.coe_smul, hb, Basis.equivFun_apply]
-  have hexp
-      : ∀ (z : ι → S.V) (c d : ι → E),
-        S.hT (∑ i, c i • z i) (∑ j, d j • z j) = ∑ i, ∑ j, star (c i) * d j * S.hT (z i) (z j) := by
+  have hexp : ∀ (z : ι → S.V) (c d : ι → E), S.hT (∑ i, c i • z i) (∑ j, d j • z j) =
+      ∑ i, ∑ j, star (c i) * d j * S.hT (z i) (z j) := by
     intro z c d
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, LinearMap.map_smulₛₗ, LinearMap.sum_apply, LinearMap.smul_apply, map_smul,
-        smul_eq_mul, starRingEnd_apply, Finset.mul_sum]
+
+    simp only [map_sum, LinearMap.map_smulₛₗ, LinearMap.sum_apply, LinearMap.smul_apply, map_smul, smul_eq_mul,
+    starRingEnd_apply, Finset.mul_sum]
     rw [Finset.sum_comm]
     refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
     ring
@@ -57,57 +98,46 @@ theorem witt_tuple
     refine (Submodule.mem_bot E).2 (Subtype.ext ?_)
     rw [hu u]
     simp [hc]
-  obtain ⟨g, hg, hgf⟩ :=
-    witt_extension_theorem E S.V S.hT
-      (fun x y => (hT_swap x y).symm)
-      (fun x hx => S.nondeg.1 x hx)
-      U f hinj hiso
+  obtain ⟨g, hg, hgf⟩ := witt_extension_theorem E S.V S.hT (fun x y => (hT_swap x y).symm)
+    (fun x hx => S.nondeg.1 x hx) U f hinj hiso
   refine ⟨g, hg, fun i => ?_⟩
   have := hgf (b i)
   rw [hb] at this
   rw [this]
   exact b.constr_basis E y i
 
-def tupMU (F : FlagG S r T) (F1 : FlagG S r T') (M U : Matrix (Fin (r + 1)) (Fin (r + 1)) E)
-    : Fin (r + 1) ⊕ Fin (r + 1) → S.V :=
+def tupMU (F : FlagG S r T) (F1 : FlagG S r T') (M U : Matrix (Fin (r + 1)) (Fin (r + 1)) E) :
+    Fin (r + 1) ⊕ Fin (r + 1) → S.V :=
   Sum.elim (fun a => ∑ c, M c a • F.fvec c) (fun b => ∑ c, U c b • F1.fvec c)
 
-theorem gram_moved
-    (F : FlagG S r T) (F1 F2 : FlagG S r T') (M U : Matrix (Fin (r + 1)) (Fin (r + 1)) E)
-    (hM : IsUpUni M) (hU : IsUpUni U) (hZ : Zhat F F2 = Mᴴ * Zhat F F1 * U)
-    : ∀ i j,
-      S.hT (tupMU F F1 M U i) (tupMU F F1 M U j)
-        = S.hT (Sum.elim F.fvec F2.fvec i) (Sum.elim F.fvec F2.fvec j) := by
-  have hexp
-      : ∀ (z w : Fin (r + 1) → S.V) (c d : Fin (r + 1) → E),
-        S.hT (∑ i, c i • z i) (∑ j, d j • w j) = ∑ i, ∑ j, star (c i) * d j * S.hT (z i) (w j) := by
+theorem gram_moved (F : FlagG S r T) (F1 F2 : FlagG S r T') (M U : Matrix (Fin (r + 1)) (Fin (r + 1)) E)
+    (hM : IsUpUni M) (hU : IsUpUni U) (hZ : Zhat F F2 = Mᴴ * Zhat F F1 * U) :
+    ∀ i j, S.hT (tupMU F F1 M U i) (tupMU F F1 M U j) =
+      S.hT (Sum.elim F.fvec F2.fvec i) (Sum.elim F.fvec F2.fvec j) := by
+  have hexp : ∀ (z w : Fin (r + 1) → S.V) (c d : Fin (r + 1) → E), S.hT (∑ i, c i • z i) (∑ j, d j • w j) =
+      ∑ i, ∑ j, star (c i) * d j * S.hT (z i) (w j) := by
     intro z w c d
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, LinearMap.map_smulₛₗ, LinearMap.sum_apply, LinearMap.smul_apply, map_smul,
-        smul_eq_mul, starRingEnd_apply, Finset.mul_sum]
+
+    simp only [map_sum, LinearMap.map_smulₛₗ, LinearMap.sum_apply, LinearMap.smul_apply, map_smul, smul_eq_mul,
+    starRingEnd_apply, Finset.mul_sum]
     rw [Finset.sum_comm]
     refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
     ring
-  have hFF
-      : ∀ (G : FlagG S r T) c d,
-        S.hT (G.fvec c) (G.fvec d)
-          = if c = Fin.last r ∧ d = Fin.last r then -T else 0 := fun G c d => by
+  have hFF : ∀ (G : FlagG S r T) c d, S.hT (G.fvec c) (G.fvec d) =
+      if c = Fin.last r ∧ d = Fin.last r then -T else 0 := fun G c d => by
     have := brS_fvec G d c
     simp only [brS] at this
     rw [this]
     by_cases h1 : c = Fin.last r <;> by_cases h2 : d = Fin.last r <;> simp [h1, h2]
-  have hFF'
-      : ∀ (G : FlagG S r T') c d,
-        S.hT (G.fvec c) (G.fvec d)
-          = if c = Fin.last r ∧ d = Fin.last r then -T' else 0 := fun G c d => by
+  have hFF' : ∀ (G : FlagG S r T') c d, S.hT (G.fvec c) (G.fvec d) =
+      if c = Fin.last r ∧ d = Fin.last r then -T' else 0 := fun G c d => by
     have := brS_fvec G d c
     simp only [brS] at this
     rw [this]
     by_cases h1 : c = Fin.last r <;> by_cases h2 : d = Fin.last r <;> simp [h1, h2]
-  have hdiag
-      : ∀ (A : Matrix (Fin (r + 1)) (Fin (r + 1)) E) (hA : IsUpUni A) (t : E) (a b : Fin (r + 1)),
-        ∑ i, ∑ j, star (A i a) * A j b * (if i = Fin.last r ∧ j = Fin.last r then t else 0)
-          = if a = Fin.last r ∧ b = Fin.last r then t else 0 := by
+  have hdiag : ∀ (A : Matrix (Fin (r + 1)) (Fin (r + 1)) E) (hA : IsUpUni A) (t : E) (a b : Fin (r + 1)),
+      ∑ i, ∑ j, star (A i a) * A j b * (if i = Fin.last r ∧ j = Fin.last r then t else 0) =
+        if a = Fin.last r ∧ b = Fin.last r then t else 0 := by
     intro A hA t a b
     simp only [mul_ite, mul_zero, ite_and]
     rw [Finset.sum_eq_single (Fin.last r), Finset.sum_eq_single (Fin.last r)]
@@ -117,10 +147,7 @@ theorem gram_moved
     · simp
     · intro i _ hi; simp [hi]
     · simp
-  have hcross
-      : ∀ a b,
-        S.hT (tupMU F F1 M U (Sum.inl a)) (tupMU F F1 M U (Sum.inr b))
-          = S.hT (F.fvec a) (F2.fvec b) := by
+  have hcross : ∀ a b, S.hT (tupMU F F1 M U (Sum.inl a)) (tupMU F F1 M U (Sum.inr b)) = S.hT (F.fvec a) (F2.fvec b) := by
     intro a b
     simp only [tupMU, Sum.elim_inl, Sum.elim_inr]
     rw [hexp]
@@ -145,23 +172,18 @@ theorem gram_moved
     simp only [hFF']
     exact hdiag U hU (-T') a b
 
-theorem tupMU_indep
-    (F : FlagG S r T) (F1 : FlagG S r T')
-    (M U : Matrix (Fin (r + 1)) (Fin (r + 1)) E) (hM : IsUpUni M) (hU : IsUpUni U)
-    (hG : Gflag F F1 ≠ 0)
-    : LinearIndependent E (tupMU F F1 M U) := by
+theorem tupMU_indep (F : FlagG S r T) (F1 : FlagG S r T') (M U : Matrix (Fin (r + 1)) (Fin (r + 1)) E)
+    (hM : IsUpUni M) (hU : IsUpUni U) (hG : Gflag F F1 ≠ 0) : LinearIndependent E (tupMU F F1 M U) := by
   have hli := PI.PairCorankPos.W.linIndep F F1 hG
   rw [Fintype.linearIndependent_iff] at hli ⊢
   intro g hg
-  have hsum
-      : ∑ i, g i • tupMU F F1 M U i
-        = ∑ s, (Sum.elim (M *ᵥ fun a => g (Sum.inl a)) (U *ᵥ fun b => g (Sum.inr b)) s) •
-            Sum.elim F.fvec F1.fvec s := by
-    simp only [Fintype.sum_sum_type, tupMU, Sum.elim_inl, Sum.elim_inr, Finset.smul_sum, smul_smul,
-      mulVec, dotProduct, Finset.sum_smul]
+  have hsum : ∑ i, g i • tupMU F F1 M U i =
+      ∑ s, (Sum.elim (M *ᵥ fun a => g (Sum.inl a)) (U *ᵥ fun b => g (Sum.inr b)) s) •
+        Sum.elim F.fvec F1.fvec s := by
+    simp only [Fintype.sum_sum_type, tupMU, Sum.elim_inl, Sum.elim_inr, Finset.smul_sum, smul_smul, mulVec,
+      dotProduct, Finset.sum_smul]
     rw [Finset.sum_comm, Finset.sum_comm (f := fun x y => (U x y * g (Sum.inr y)) • F1.fvec x)]
-    congr 1 <;> refine Finset.sum_congr rfl fun c _ => Finset.sum_congr rfl fun d _ => ?_
-      <;> rw [mul_comm]
+    congr 1 <;> refine Finset.sum_congr rfl fun c _ => Finset.sum_congr rfl fun d _ => ?_ <;> rw [mul_comm]
   rw [hsum] at hg
   have h0 := hli _ hg
   have hMd : M.det ≠ 0 := by rw [upUni_det hM]; exact one_ne_zero

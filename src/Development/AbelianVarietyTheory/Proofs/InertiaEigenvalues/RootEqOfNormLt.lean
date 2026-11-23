@@ -1,23 +1,69 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.CrystallinePeriods.RingBasics
-public import Formalism.LocalRingCardinality.RhoDetPrimeEqMuTildeMulChiPow
-public import Formalism.SharpRestriction.LevelLetterCocycles.LocalSituation
+import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.CyclotomicIntegersEqWittZetaSubOne
 public import Formalism.LocalRingCardinality.AdicCompletionLocal.InstIsAdicCompleteOCSpanSingletonSetCast
 public import Development.AbelianVarietyTheory.Definitions.Foundations.HTBasis
-public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.ExpStar
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ContinuousOrbitPadicComplex
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.NormMemCyclotomicLayerPrimeRpow
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.IsAlgClosedTiltFieldAndValuationRing
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.NormEqZpowOfMemMaxUnramifiedSubfield
+public import Development.AbelianVarietyTheory.CrystallinePeriods.RingBasics
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ContinuousOrbitPadicComplex
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.CyclotomicTateMaximalIdealKillsFirstCohomologyStatement
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.CyclotomicTowerFixedIffMemCompletedIntegersStatement
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.EqOfPowEqOneOfNormSubLtOne
+import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.FinrankCyclotomicExtAndCyclotomicCharSurjective
+import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.NormPrimitiveRootPrimePowSubOnePadicComplex
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Real
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RootsOfUnity.AlgebraicallyClosed
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Algebra.Nonarchimedean.Completion
+import Mathlib.Topology.Sheaves.Init
+import Formalism.SharpRestriction.LevelLetterCocycles.LocCoh
+import Formalism.SharpRestriction.LevelLetterCocycles.LocalSituation
 
 @[expose] public section
 
-open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc
-  Formalism.MainNotions.N Formalism.MainNotions.LocalSituation GlobalTheory.Cyc Polynomial
+open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N Formalism.MainNotions.LocalSituation GlobalTheory.Cyc Polynomial
 
 noncomputable section
 
@@ -25,77 +71,14 @@ namespace GlobalTheory.TiltInvariants
 
 variable {l : ℕ} [Fact l.Prime]
 
-theorem norm_coeff_le
-    (K : FinExt l)
-    (N : ℕ) (π : Om l) (hπ : ‖π‖ = (l : ℝ) ^ (-(1 : ℝ) / (N : ℝ)))
-    (p : (↥(K0 K))[X]) (hd : p.natDegree < N) (h1 : ‖aeval π p‖ ≤ 1)
-    (a : ℕ)
-    : ‖((p.coeff a : ↥(K0 K)) : Om l)‖ ≤ 1 := by
-  have hl1 : (1 : ℝ) < l := by exact_mod_cast (Fact.out : l.Prime).one_lt
-  have hl0 : (0 : ℝ) < l := by linarith
-  have hN : (0 : ℝ) < N := by exact_mod_cast (Nat.zero_le _).trans_lt hd
-  have key
-      : ∀ i ∈ p.support, ∃ n : ℤ,
-        ‖((p.coeff i : ↥(K0 K)) : Om l)‖ = (l : ℝ) ^ n
-          ∧ ‖p.coeff i • π ^ i‖ = (l : ℝ) ^ ((n : ℝ) - (i : ℝ) / N) := by
-    intro i hi
-    have h0 : ((p.coeff i : ↥(K0 K)) : Om l) ≠ 0 := by
-      have := mem_support_iff.1 hi
-      exact fun h => this (Subtype.ext h)
-    obtain ⟨n, hn⟩ := GlobalTheory.UnramValue.norm_of_mem_unramified_subfield l K _ (p.coeff i).2 h0
-    refine ⟨n, hn, ?_⟩
-    change ‖((p.coeff i : ↥(K0 K)) : Om l) * π ^ i‖ = _
-    rw [norm_mul, norm_pow, hn, hπ, ← Real.rpow_natCast, ← Real.rpow_mul hl0.le,
-      ← Real.rpow_intCast, ← Real.rpow_add hl0]
-    congr 1
-    ring
-  have hpw : Set.Pairwise (p.support : Set ℕ)
-      (fun i k => ‖p.coeff i • π ^ i‖₊ ≠ ‖p.coeff k • π ^ k‖₊) := by
-    intro i hi k hk hik h
-    obtain ⟨n, -, hn⟩ := key i hi
-    obtain ⟨m, -, hm⟩ := key k hk
-    have h' : ‖p.coeff i • π ^ i‖ = ‖p.coeff k • π ^ k‖ := congrArg NNReal.toReal h
-    rw [hn, hm] at h'
-    have h2 := (Real.rpow_right_inj hl0 hl1.ne').1 h'
-    have h3 : ((n - m) * N : ℝ) = i - k := by
-      field_simp at h2
-      linarith
-    have h4 : ((n - m) * N : ℤ) = i - k := by exact_mod_cast h3
-    have hi' : i < N := (le_natDegree_of_mem_supp i hi).trans_lt hd
-    have hk' : k < N := (le_natDegree_of_mem_supp k hk).trans_lt hd
-    have h5 : (i : ℤ) - k = 0 := by
-      apply Int.eq_zero_of_abs_lt_dvd (m := N) ⟨n - m, by rw [← h4]; ring⟩
-      rw [abs_lt]
-      constructor <;> omega
-    omega
-  have hs : ∑ i ∈ p.support, p.coeff i • π ^ i = aeval π p := by
-    rw [aeval_eq_sum_range' (Nat.lt_succ_self _)]
-    apply Finset.sum_subset supp_subset_range_natDegree_succ
-    intro i _ hi
-    rw [notMem_support_iff.1 hi, zero_smul]
-  have h6 := IsUltrametricDist.nnnorm_sum_eq_sup_of_pairwise_ne hpw
-  rw [hs] at h6
-  by_cases ha : a ∈ p.support
-  · obtain ⟨n, hn, hn'⟩ := key a ha
-    have h7 : ‖p.coeff a • π ^ a‖₊ ≤ ‖aeval π p‖₊ := by
-      rw [h6]
-      exact Finset.le_sup (f := fun i => ‖p.coeff i • π ^ i‖₊) ha
-    have h8 : ‖p.coeff a • π ^ a‖ ≤ 1 := le_trans (by exact_mod_cast h7) h1
-    rw [hn', ← Real.rpow_zero (l : ℝ), Real.rpow_le_rpow_left_iff hl1] at h8
-    have ha' : (a : ℝ) < N := by exact_mod_cast (le_natDegree_of_mem_supp a ha).trans_lt hd
-    have h9 : (a : ℝ) / N < 1 := (div_lt_one hN).2 ha'
-    have h10 : n < 1 := by exact_mod_cast (by linarith : (n : ℝ) < 1)
-    rw [hn]
-    exact zpow_le_one_of_nonpos₀ hl1.le (by omega)
-  · rw [notMem_support_iff.1 ha]; simp
+theorem norm_coeff_le (K : FinExt l) (N : ℕ) (π : Om l)
+    (hπ : ‖π‖ = (l : ℝ) ^ (-(1 : ℝ) / (N : ℝ))) (p : (↥(K0 K))[X])
+    (hd : p.natDegree < N) (h1 : ‖aeval π p‖ ≤ 1) (a : ℕ) : ‖((p.coeff a : ↥(K0 K)) : Om l)‖ ≤ 1 := by
+  apply GlobalTheory.PrismS.Poly.norm_coeff_le <;> assumption
 
-theorem mem_of_mem_Ks
-    (K : FinExt l)
-    (j : ℕ) (hj : 1 ≤ j)
-    (ζ : Om l) (hζ : IsPrimitiveRoot ζ (l ^ j))
+theorem mem_of_mem_Ks (K : FinExt l) (j : ℕ) (hj : 1 ≤ j) (ζ : Om l) (hζ : IsPrimitiveRoot ζ (l ^ j))
     (R : Subring (Om l)) (hζR : ζ ∈ R) (h0 : ∀ c ∈ K0 K, ‖c‖ ≤ 1 → c ∈ R)
-    (x : Om l) (hx : x ∈ Ks K j) (hx1 : ‖x‖ ≤ 1)
-    : x ∈ R := by
+    (x : Om l) (hx : x ∈ Ks K j) (hx1 : ‖x‖ ≤ 1) : x ∈ R := by
   have hlp : l.Prime := Fact.out
   by_cases hx0 : x = 0
   · rw [hx0]; exact zero_mem _
@@ -111,9 +94,8 @@ theorem mem_of_mem_Ks
     push_cast [Nat.cast_sub hlp.one_le]
     rfl
   have hnorm : ‖ζ - 1‖ = (l : ℝ) ^ (-(1 : ℝ) / ((Nat.totient (l ^ j) : ℕ) : ℝ)) := by
-    have h1 :=
-      norm_primitiveRoot_sub_one l j hj (ζ : PadicComplex l)
-        (hζ.map_of_injective (f := algebraMap (Om l) (PadicComplex l)) (RingHom.injective _))
+    have h1 := norm_primitiveRoot_sub_one l j hj (ζ : PadicComplex l)
+      (hζ.map_of_injective (f := algebraMap (Om l) (PadicComplex l)) (RingHom.injective _))
     rw [hcast, ← h1, ← PadicComplex.norm_extends]
     congr 1
     exact (map_sub (algebraMap (Om l) (PadicComplex l)) ζ 1).trans (by rw [map_one]; rfl)
@@ -154,9 +136,10 @@ theorem exists_level (K : FinExt l) {x : Om l} (hx : x ∈ Kinf K) : ∃ i, 1 �
   obtain ⟨i, hi⟩ : ∃ i, x ∈ Ks K i := by simpa using h3
   exact ⟨i + 1, by omega, hmono (Nat.le_succ i) hi⟩
 
+
 open GlobalTheory.UnramValue in
-theorem mem_rootRing {c : Om l} (hc : c ∈ MaximalUnramifiedExtension l) (h1 : ‖c‖ ≤ 1)
-    : ∃ m : ℕ, 0 < m ∧ ¬ l ∣ m ∧ c ∈ rootRing l m := by
+theorem mem_rootRing {c : Om l} (hc : c ∈ MaximalUnramifiedExtension l) (h1 : ‖c‖ ≤ 1) :
+    ∃ m : ℕ, 0 < m ∧ ¬ l ∣ m ∧ c ∈ rootRing l m := by
   have hp : l.Prime := Fact.out
   have hl1 : (1 : ℝ) < l := by exact_mod_cast hp.one_lt
   have hl0 : (l : Om l) ≠ 0 := Nat.cast_ne_zero.mpr hp.ne_zero
@@ -168,19 +151,18 @@ theorem mem_rootRing {c : Om l} (hc : c ∈ MaximalUnramifiedExtension l) (h1 : 
     | zero => simp
     | succ n ih =>
       intro hn
-      obtain ⟨z, hz, e⟩ :=
-        exists_eq_mul hm hl hn (by
-          rw [norm_mul, norm_pow, norm_l]
-          exact mul_lt_one_of_nonneg_of_lt_one_left (by positivity)
-            (pow_lt_one₀ (by positivity) (inv_lt_one_of_one_lt₀ hl1) (Nat.succ_ne_zero n)) h1)
+      obtain ⟨z, hz, e⟩ := exists_eq_mul hm hl hn (by
+        rw [norm_mul, norm_pow, norm_l]
+        exact mul_lt_one_of_nonneg_of_lt_one_left (by positivity)
+          (pow_lt_one₀ (by positivity) (inv_lt_one_of_one_lt₀ hl1) (Nat.succ_ne_zero n)) h1)
       apply ih
       have : (l : Om l) ^ n * c = z := mul_left_cancel₀ hl0 (by rw [← e]; ring)
       rwa [this]
   apply key a.valuation
   have e := PadicInt.unitCoeff_spec ha
   set u := PadicInt.unitCoeff ha
-  have : (l : Om l) ^ a.valuation * c
-      = algebraMap ℤ_[l] (Om l) ((u⁻¹ : ℤ_[l]ˣ) : ℤ_[l]) * (algebraMap ℤ_[l] (Om l) a * c) := by
+  have : (l : Om l) ^ a.valuation * c =
+      algebraMap ℤ_[l] (Om l) ((u⁻¹ : ℤ_[l]ˣ) : ℤ_[l]) * (algebraMap ℤ_[l] (Om l) a * c) := by
     rw [← mul_assoc, ← map_mul]
     congr 1
     conv_rhs => rw [e]
@@ -188,28 +170,20 @@ theorem mem_rootRing {c : Om l} (hc : c ∈ MaximalUnramifiedExtension l) (h1 : 
   rw [this]
   exact mul_mem (Subalgebra.algebraMap_mem _ _) h
 
-theorem root_eq_of_norm_lt
-    {m : ℕ} (hm : 0 < m) (hl : ¬ l ∣ m)
-    {a b : Om l} (ha : a ^ m = 1) (hb : b ^ m = 1) (h : ‖a - b‖ < 1)
-    : a = b := by
+theorem root_eq_of_norm_lt {m : ℕ} (hm : 0 < m) (hl : ¬ l ∣ m) {a b : Om l} (ha : a ^ m = 1)
+    (hb : b ^ m = 1) (h : ‖a - b‖ < 1) : a = b := by
   first
   | exact @_root_.GlobalTheory.RootsOfUnityClose.eq_of_pow_eq_one_of_norm_sub_lt_one
   | exact _root_.GlobalTheory.RootsOfUnityClose.eq_of_pow_eq_one_of_norm_sub_lt_one
   | (apply _root_.GlobalTheory.RootsOfUnityClose.eq_of_pow_eq_one_of_norm_sub_lt_one <;> assumption)
-  | (
-      intros
-      apply _root_.GlobalTheory.RootsOfUnityClose.eq_of_pow_eq_one_of_norm_sub_lt_one <;> assumption
-    )
-  | (
-      intros
-      apply @_root_.GlobalTheory.RootsOfUnityClose.eq_of_pow_eq_one_of_norm_sub_lt_one
-        <;> first | assumption | infer_instance
-    )
+  | (intros; apply _root_.GlobalTheory.RootsOfUnityClose.eq_of_pow_eq_one_of_norm_sub_lt_one <;> assumption)
+  | (intros; apply @_root_.GlobalTheory.RootsOfUnityClose.eq_of_pow_eq_one_of_norm_sub_lt_one <;> first | assumption | infer_instance)
   | (intros; exact _root_.GlobalTheory.RootsOfUnityClose.eq_of_pow_eq_one_of_norm_sub_lt_one ..)
 
+
 open GlobalTheory.UnramValue in
-theorem exists_root (K : FinExt l) {c : Om l} (hc : c ∈ K0 K) (h1 : ‖c‖ = 1)
-    : ∃ ω ∈ K0 K, ∃ m : ℕ, 0 < m ∧ ¬ l ∣ m ∧ ω ^ m = 1 ∧ ‖c - ω‖ < 1 := by
+theorem exists_root (K : FinExt l) {c : Om l} (hc : c ∈ K0 K) (h1 : ‖c‖ = 1) :
+    ∃ ω ∈ K0 K, ∃ m : ℕ, 0 < m ∧ ¬ l ∣ m ∧ ω ^ m = 1 ∧ ‖c - ω‖ < 1 := by
   have hp : l.Prime := Fact.out
   have hl1 : (1 : ℝ) < l := by exact_mod_cast hp.one_lt
   obtain ⟨m, hm, hl, hcm⟩ := mem_rootRing hc.2 h1.le
@@ -227,8 +201,8 @@ theorem exists_root (K : FinExt l) {c : Om l} (hc : c ∈ K0 K) (h1 : ‖c‖ = 
     have := congrArg norm e2
     rw [norm_mul, h1, one_mul, norm_mul, norm_l] at this
     rw [this]
-    exact mul_lt_one_of_nonneg_of_lt_one_left (by positivity) (inv_lt_one_of_one_lt₀ hl1)
-      (norm_le_one hm hz)
+    exact mul_lt_one_of_nonneg_of_lt_one_left (by positivity)
+      (inv_lt_one_of_one_lt₀ hl1) (norm_le_one hm hz)
   haveI : NeZero M := ⟨hM0.ne'⟩
   obtain ⟨μ, hμ⟩ := HasEnoughRootsOfUnity.exists_primitiveRoot (Om l) M
   have hprod := congrArg (eval c) (X_pow_sub_one_eq_prod hM0 hμ)
@@ -237,24 +211,20 @@ theorem exists_root (K : FinExt l) {c : Om l} (hc : c ∈ K0 K) (h1 : ‖c‖ = 
     by_contra hcon
     push Not at hcon
     rw [hprod, norm_prod] at hn
-    exact absurd hn
-      (not_lt.2 (Finset.prod_induction _
-        (fun t : ℝ => 1 ≤ t)
-        (fun a b ha hb => one_le_mul_of_one_le_of_one_le ha hb)
-        le_rfl hcon))
+    exact absurd hn (not_lt.2 (Finset.prod_induction _ (fun t : ℝ => 1 ≤ t)
+      (fun a b ha hb => one_le_mul_of_one_le_of_one_le ha hb) le_rfl hcon))
   rw [mem_nthRootsFinset hM0] at hω
   refine ⟨ω, ?_, M, hM0, hlM, hω, hcω⟩
   rw [← InfiniteGalois.fixedField_fixingSubgroup (K0 K), IntermediateField.mem_fixedField_iff]
   intro σ hσ
   have hσc : σ c = c := (IntermediateField.mem_fixingSubgroup_iff _ _).1 hσ c hc
   refine root_eq_of_norm_lt hM0 hlM (by rw [← map_pow, hω, map_one]) hω ?_
-  have : σ ω - ω = (c - ω) + - σ (c - ω) := by rw [map_sub, hσc]; ring
+  have : σ ω - ω = (c - ω) + -σ (c - ω) := by rw [map_sub, hσc]; ring
   rw [this]
   refine (IsUltrametricDist.norm_add_le_max _ _).trans_lt (max_lt hcω ?_)
   rwa [norm_neg, GlobalTheory.RingBasics.norm_gal]
 
-theorem norm_le_l (K : FinExt l) {c : Om l} (hc : c ∈ K0 K) (h1 : ‖c‖ < 1)
-    : ‖c‖ ≤ ‖(l : Om l)‖ := by
+theorem norm_le_l (K : FinExt l) {c : Om l} (hc : c ∈ K0 K) (h1 : ‖c‖ < 1) : ‖c‖ ≤ ‖(l : Om l)‖ := by
   have hl1 : (1 : ℝ) < l := by exact_mod_cast (Fact.out : l.Prime).one_lt
   by_cases h0 : c = 0
   · simp [h0]
@@ -264,22 +234,22 @@ theorem norm_le_l (K : FinExt l) {c : Om l} (hc : c ∈ K0 K) (h1 : ‖c‖ < 1)
   have : n < 0 := (zpow_lt_one_iff_right₀ hl1).1 h1
   exact zpow_le_zpow_right₀ hl1.le (by omega)
 
-theorem exists_between (K : FinExt l)
-    : ∃ a ∈ inC (Kinf K), ‖(l : PadicComplex l)‖ < ‖a‖ ∧ ‖a‖ < 1 := by
+theorem exists_between (K : FinExt l) :
+    ∃ a ∈ inC (Kinf K), ‖(l : PadicComplex l)‖ < ‖a‖ ∧ ‖a‖ < 1 := by
   have hp : l.Prime := Fact.out
   have hl2 : (2 : ℝ) ≤ l := by exact_mod_cast hp.two_le
   have hl1 : (1 : ℝ) < l := by linarith
   obtain ⟨ζ, hζ⟩ := exists_primitiveRoot_Om (l := l) 2
-  have h1 :=
-    norm_primitiveRoot_sub_one l 2 (by norm_num) (ζ : PadicComplex l)
-      (hζ.map_of_injective (f := algebraMap (Om l) (PadicComplex l)) (RingHom.injective _))
+  have h1 := norm_primitiveRoot_sub_one l 2 (by norm_num) (ζ : PadicComplex l)
+    (hζ.map_of_injective (f := algebraMap (Om l) (PadicComplex l)) (RingHom.injective _))
   have hmem : ζ ∈ Kinf K :=
     (le_sup_right : _ ≤ Kinf K) (IntermediateField.subset_adjoin _ _ ⟨2, hζ.pow_eq_one⟩)
   have hl : ‖(l : PadicComplex l)‖ = (l : ℝ) ^ (-1 : ℝ) := by
     rw [← map_natCast (algebraMap (Om l) (PadicComplex l)), Real.rpow_neg_one,
       ← GlobalTheory.UnramValue.norm_l]
     exact PadicComplex.norm_extends l _
-  have he : (1 : ℝ) < (l : ℝ) ^ (2 - 1) * ((l : ℝ) - 1) := by norm_num; nlinarith
+  have he : (1 : ℝ) < (l : ℝ) ^ (2 - 1) * ((l : ℝ) - 1) := by
+    norm_num; nlinarith
   refine ⟨(ζ : PadicComplex l) - 1, ⟨ζ - 1, sub_mem hmem (one_mem _), ?_⟩, ?_, ?_⟩
   · exact (map_sub (algebraMap (Om l) (PadicComplex l)) ζ 1).trans (by rw [map_one]; rfl)
   · rw [h1, hl, Real.rpow_lt_rpow_left_iff hl1, lt_div_iff₀ (by linarith)]
@@ -287,13 +257,11 @@ theorem exists_between (K : FinExt l)
   · rw [h1]
     exact Real.rpow_lt_one_of_one_lt_of_neg hl1 (div_neg_of_neg_of_pos (by norm_num) (by linarith))
 
-theorem exists_near_Ohat
-    (act : GQ l →* (PadicComplex l ≃+* PadicComplex l)) (hact : IsActC act)
-    (K : FinExt l) (a : PadicComplex l)
-    (ha : a ∈ inC (Kinf K)) (hla : ‖(l : PadicComplex l)‖ < ‖a‖) (ha1 : ‖a‖ < 1)
-    (y : PadicComplex l)
-    (hy : ‖y‖ ≤ 1) (hinv : ∀ h ∈ Hinf K, ‖act h y - y‖ ≤ ‖(l : PadicComplex l)‖)
-    : ∃ y' ∈ Ohat K, ‖y - y'‖ ≤ ‖(l : PadicComplex l)‖ / ‖a‖ := by
+theorem exists_near_Ohat (act : GQ l →* (PadicComplex l ≃+* PadicComplex l)) (hact : IsActC act)
+    (K : FinExt l) (a : PadicComplex l) (ha : a ∈ inC (Kinf K))
+    (hla : ‖(l : PadicComplex l)‖ < ‖a‖) (ha1 : ‖a‖ < 1) (y : PadicComplex l) (hy : ‖y‖ ≤ 1)
+    (hinv : ∀ h ∈ Hinf K, ‖act h y - y‖ ≤ ‖(l : PadicComplex l)‖) :
+    ∃ y' ∈ Ohat K, ‖y - y'‖ ≤ ‖(l : PadicComplex l)‖ / ‖a‖ := by
   have hl0 : (l : PadicComplex l) ≠ 0 := GlobalTheory.RingBasics.p_ne_zero
   have hlpos : 0 < ‖(l : PadicComplex l)‖ := norm_pos_iff.2 hl0
   have hapos : 0 < ‖a‖ := hlpos.trans hla
@@ -302,14 +270,11 @@ theorem exists_near_Ohat
     obtain ⟨a₀, ha₀, rfl⟩ := ha
     intro g hg
     rw [hact.1, (IntermediateField.mem_fixingSubgroup_iff _ _).1 hg a₀ ha₀]
-  have hcoc : CocOn (Hinf K)
-      (fun g y k => act g (y k))
-      (ball l 1)
+  have hcoc : CocOn (Hinf K) (fun g y k => act g (y k)) (ball l 1)
       (fun g _ => (act g y - y) / (l : PadicComplex l)) := by
     refine ⟨?_, ?_, ?_⟩
     · refine Continuous.continuousOn (continuous_pi fun _ => ?_)
-      exact ((GlobalTheory.Cyc.IsActC.continuous_orbit l act hact y).sub continuous_const).div_const
-        _
+      exact ((GlobalTheory.Cyc.IsActC.continuous_orbit l act hact y).sub continuous_const).div_const _
     · intro g hg _
       rw [norm_div, div_le_one hlpos]
       exact hinv g hg
@@ -317,9 +282,7 @@ theorem exists_near_Ohat
       funext k
       simp only [Pi.add_apply, map_mul, RingAut.mul_apply, map_div₀, map_sub, map_natCast]
       ring
-  obtain ⟨b, hb, hb'⟩ :=
-    GlobalTheory.T.cyclotomic_tate_maximalIdeal_kills_first_cohomology l act hact K 1 a ha ha1 _
-      hcoc
+  obtain ⟨b, hb, hb'⟩ := GlobalTheory.T.cyclotomic_tate_maximalIdeal_kills_first_cohomology l act hact K 1 a ha ha1 _ hcoc
   have hn : ‖(l : PadicComplex l) / a * b 0‖ ≤ ‖(l : PadicComplex l)‖ / ‖a‖ := by
     rw [norm_mul, norm_div]
     exact mul_le_of_le_one_right (by positivity) (hb 0)
@@ -340,41 +303,30 @@ def lifts (S : Subring (OCb l)) (N : ℕ) : Subring (PadicComplex l) :=
   ((S.map (PreTilt.coeff N)).comap (Ideal.Quotient.mk (Ideal.span {((l : ℕ) : OC l)}))).map
     (PadicComplexInt l).subtype
 
-theorem mem_lifts {S : Subring (OCb l)} {N : ℕ} {z : PadicComplex l}
-    : z ∈ lifts S N
-      ↔ ∃ y : OC l,
-        (∃ w ∈ S, PreTilt.coeff N w = Ideal.Quotient.mk (Ideal.span {((l : ℕ) : OC l)}) y)
-          ∧ (y : PadicComplex l) = z :=
-  Iff.rfl
+theorem mem_lifts {S : Subring (OCb l)} {N : ℕ} {z : PadicComplex l} :
+    z ∈ lifts S N ↔ ∃ y : OC l, (∃ w ∈ S, PreTilt.coeff N w =
+      Ideal.Quotient.mk (Ideal.span {((l : ℕ) : OC l)}) y) ∧ (y : PadicComplex l) = z := Iff.rfl
 
-theorem mk_eq_iff (x y : OC l)
-    : Ideal.Quotient.mk (Ideal.span {((l : ℕ) : OC l)}) x
-        = Ideal.Quotient.mk (Ideal.span {((l : ℕ) : OC l)}) y
-      ↔ ‖(x : PadicComplex l) - y‖ ≤ ‖(l : PadicComplex l)‖ := by
+theorem mk_eq_iff (x y : OC l) : Ideal.Quotient.mk (Ideal.span {((l : ℕ) : OC l)}) x =
+    Ideal.Quotient.mk (Ideal.span {((l : ℕ) : OC l)}) y ↔
+      ‖(x : PadicComplex l) - y‖ ≤ ‖(l : PadicComplex l)‖ := by
   have := @GlobalTheory.RingBasics.mem_span_pow_OC l _ 1 (x - y)
   rw [pow_one, pow_one] at this
   rw [Ideal.Quotient.eq, this]
   rfl
 
-theorem mem_lifts_of_near
-    {S : Subring (OCb l)} {N : ℕ} {z z' : PadicComplex l}
-    (hz : z ∈ lifts S N) (h : ‖z' - z‖ ≤ ‖(l : PadicComplex l)‖)
-    : z' ∈ lifts S N := by
+theorem mem_lifts_of_near {S : Subring (OCb l)} {N : ℕ} {z z' : PadicComplex l} (hz : z ∈ lifts S N)
+    (h : ‖z' - z‖ ≤ ‖(l : PadicComplex l)‖) : z' ∈ lifts S N := by
   have : z' - z ∈ lifts S N := by
-    refine mem_lifts.2 ⟨
-      ⟨z' - z, (GlobalTheory.RingBasics.mem_OC _).2 (h.trans GlobalTheory.RingBasics.norm_p_lt.le)⟩,
-      ⟨0, zero_mem _, ?_⟩,
-      rfl
-    ⟩
-    rw [map_zero, ← map_zero (Ideal.Quotient.mk (Ideal.span {((l : ℕ) : OC l)})), eq_comm,
-      mk_eq_iff]
+    refine mem_lifts.2 ⟨⟨z' - z, (GlobalTheory.RingBasics.mem_OC _).2 (h.trans GlobalTheory.RingBasics.norm_p_lt.le)⟩,
+      ⟨0, zero_mem _, ?_⟩, rfl⟩
+    rw [map_zero, ← map_zero (Ideal.Quotient.mk (Ideal.span {((l : ℕ) : OC l)})), eq_comm, mk_eq_iff]
     simpa using h
   simpa using add_mem this hz
 
-theorem exists_tilt (ω : Om l) (m : ℕ) (hm : 0 < m) (hl : ¬ l ∣ m) (hc : ω ^ m = 1) (N : ℕ)
-    : ∃ (xb : OCb l) (y : OC l),
-      IsTiltOf (ω ^ l ^ N) m xb ∧ (y : PadicComplex l) = ω
-        ∧ PreTilt.coeff N xb = Ideal.Quotient.mk (Ideal.span {((l : ℕ) : OC l)}) y := by
+theorem exists_tilt (ω : Om l) (m : ℕ) (hm : 0 < m) (hl : ¬ l ∣ m) (hc : ω ^ m = 1) (N : ℕ) :
+    ∃ (xb : OCb l) (y : OC l), IsTiltOf (ω ^ l ^ N) m xb ∧ (y : PadicComplex l) = ω ∧
+      PreTilt.coeff N xb = Ideal.Quotient.mk (Ideal.span {((l : ℕ) : OC l)}) y := by
   have hcC : (ω : PadicComplex l) ^ m = 1 := by
     have := congrArg (algebraMap (Om l) (PadicComplex l)) hc
     rw [map_pow, map_one] at this
@@ -409,13 +361,8 @@ theorem exists_tilt (ω : Om l) (m : ℕ) (hm : 0 < m) (hl : ¬ l ∣ m) (hc : �
     refine pow_eq_pow_of_modEq ?_ hC
     rw [← mul_pow, mul_comm]
     simpa using ha.pow N
-  refine ⟨
-    (⟨fun k => Ideal.Quotient.mk _ (y k), fun k => ?_⟩ : Perfection (ModP (OC l) l) l),
-    W,
-    fun k => ⟨y k, ?_, ?_, rfl⟩,
-    rfl,
-    ?_
-  ⟩
+  refine ⟨(⟨fun k => Ideal.Quotient.mk _ (y k), fun k => ?_⟩ : Perfection (ModP (OC l) l) l), W,
+    fun k => ⟨y k, ?_, ?_, rfl⟩, rfl, ?_⟩
   · rw [← map_pow, hy]
   · have h1 := congrArg Subtype.val (hy0 k)
     have h2 : ((ω ^ l ^ N : Om l) : PadicComplex l) = (ω : PadicComplex l) ^ l ^ N :=
@@ -446,9 +393,8 @@ theorem zeta_primitive (j : ℕ) : IsPrimitiveRoot (AI.ζ (j + 1)) (l ^ (j + 1))
   exact IsPrimitiveRoot.orderOf _
 
 def gen (K : FinExt l) : Subring (OCb l) :=
-  Subring.closure
-    (Set.range AI.εroot
-      ∪ {xb | ∃ c : Om l, c ∈ K0 K ∧ ∃ m : ℕ, 0 < m ∧ ¬ l ∣ m ∧ c ^ m = 1 ∧ IsTiltOf c m xb})
+  Subring.closure (Set.range AI.εroot ∪
+    {xb | ∃ c : Om l, c ∈ K0 K ∧ ∃ m : ℕ, 0 < m ∧ ¬ l ∣ m ∧ c ^ m = 1 ∧ IsTiltOf c m xb})
 
 theorem zeta_mem (K : FinExt l) (N j : ℕ) : (AI.ζ j : PadicComplex l) ∈ lifts (gen AI K) N := by
   have h : (AI.ζ (j + N) : PadicComplex l) ∈ lifts (gen AI K) N := by
@@ -457,34 +403,32 @@ theorem zeta_mem (K : FinExt l) (N j : ℕ) : (AI.ζ j : PadicComplex l) ∈ lif
   have := pow_mem h (l ^ N)
   rwa [← SubmonoidClass.coe_pow, zeta_pow] at this
 
-theorem K0_mem (K : FinExt l) (N : ℕ) (c : Om l) (hc : c ∈ K0 K) (h1 : ‖c‖ ≤ 1)
-    : (c : PadicComplex l) ∈ lifts (gen AI K) N := by
-  have key : ∀ ω ∈ K0 K, ‖c - ω‖ < 1 → ‖(c : PadicComplex l) - ω‖ ≤ ‖(l : PadicComplex l)‖ := by
+theorem K0_mem (K : FinExt l) (N : ℕ) (c : Om l) (hc : c ∈ K0 K) (h1 : ‖c‖ ≤ 1) :
+    (c : PadicComplex l) ∈ lifts (gen AI K) N := by
+  have key : ∀ ω ∈ K0 K, ‖c - ω‖ < 1 →
+      ‖(c : PadicComplex l) - ω‖ ≤ ‖(l : PadicComplex l)‖ := by
     intro ω hω h
     have h2 := norm_le_l K (sub_mem hc hω) h
     rw [← PadicComplex.norm_extends, ← PadicComplex.norm_extends l (l : Om l)] at h2
     have e1 : ((c - ω : Om l) : PadicComplex l) = c - ω :=
       map_sub (algebraMap (Om l) (PadicComplex l)) _ _
-    have e2 : ((l : Om l) : PadicComplex l) = l :=
-      map_natCast (algebraMap (Om l) (PadicComplex l)) _
+    have e2 : ((l : Om l) : PadicComplex l) = l := map_natCast (algebraMap (Om l) (PadicComplex l)) _
     rwa [e1, e2] at h2
   rcases h1.eq_or_lt with h | h
   · obtain ⟨ω, hω, m, hm, hl, hωm, hn⟩ := exists_root K hc h
     obtain ⟨xb, y, ht, hy, hx⟩ := exists_tilt ω m hm hl hωm N
-    refine mem_lifts_of_near
-      (mem_lifts.2
-        ⟨y, ⟨xb, Subring.subset_closure (Or.inr ⟨_, pow_mem hω _, m, hm, hl, ?_, ht⟩), hx⟩, hy⟩)
-      (key ω hω hn)
+    refine mem_lifts_of_near (mem_lifts.2 ⟨y, ⟨xb, Subring.subset_closure (Or.inr
+      ⟨_, pow_mem hω _, m, hm, hl, ?_, ht⟩), hx⟩, hy⟩) (key ω hω hn)
     rw [← pow_mul, mul_comm, pow_mul, hωm, one_pow]
   · have := key 0 (zero_mem _) (by simpa using h)
     have e : ((0 : Om l) : PadicComplex l) = 0 := map_zero (algebraMap (Om l) (PadicComplex l))
     rw [e] at this
     exact mem_lifts_of_near (zero_mem _) this
 
-theorem Ohat_mem (K : FinExt l) (N : ℕ) (z : PadicComplex l) (hz : z ∈ Ohat K)
-    : z ∈ lifts (gen AI K) N := by
-  obtain ⟨z', ⟨⟨x, hx, rfl⟩, hx1⟩, hd⟩ :=
-    Metric.mem_closure_iff.1 hz _ (norm_pos_iff.2 (@GlobalTheory.RingBasics.p_ne_zero l _))
+theorem Ohat_mem (K : FinExt l) (N : ℕ) (z : PadicComplex l) (hz : z ∈ Ohat K) :
+    z ∈ lifts (gen AI K) N := by
+  obtain ⟨z', ⟨⟨x, hx, rfl⟩, hx1⟩, hd⟩ := Metric.mem_closure_iff.1 hz _
+    (norm_pos_iff.2 (@GlobalTheory.RingBasics.p_ne_zero l _))
   rw [dist_eq_norm] at hd
   refine mem_lifts_of_near ?_ hd.le
   obtain ⟨j, hj, hxj⟩ := exists_level K hx
@@ -492,18 +436,14 @@ theorem Ohat_mem (K : FinExt l) (N : ℕ) (z : PadicComplex l) (hz : z ∈ Ohat 
   have hprim : IsPrimitiveRoot (P.ζQ (j + 1)) (l ^ (j + 1)) := by
     refine IsPrimitiveRoot.of_map_of_injective (f := algebraMap (Om l) (PadicComplex l)) ?_
       (RingHom.injective _)
-    have :=
-      (zeta_primitive AI j).map_of_injective (f := (PadicComplexInt l).subtype)
-        Subtype.val_injective
-    have e
-        : algebraMap (Om l) (PadicComplex l) (P.ζQ (j + 1))
-          = (PadicComplexInt l).subtype (AI.ζ (j + 1)) :=
-      (AI.ζ_eq (j + 1)).symm
+    have := (zeta_primitive AI j).map_of_injective (f := (PadicComplexInt l).subtype)
+      Subtype.val_injective
+    have e : algebraMap (Om l) (PadicComplex l) (P.ζQ (j + 1)) =
+        (PadicComplexInt l).subtype (AI.ζ (j + 1)) := (AI.ζ_eq (j + 1)).symm
     rwa [e]
   refine mem_of_mem_Ks K (j + 1) hj _ hprim
     ((lifts (gen AI K) N).comap (algebraMap (Om l) (PadicComplex l))) ?_
-    (fun c hc h1 => K0_mem AI K N c hc h1)
-    x hxj (by simpa using hx1)
+    (fun c hc h1 => K0_mem AI K N c hc h1) x hxj (by simpa using hx1)
   have := zeta_mem AI K N (j + 1)
   rw [AI.ζ_eq] at this
   exact this
@@ -514,31 +454,24 @@ theorem eps_ne_one : AI.ε - 1 ≠ 0 := by
   have hl2 : (2 : ℝ) ≤ l := by exact_mod_cast (Fact.out : l.Prime).two_le
   have hl1 : (1 : ℝ) < l := by linarith
   have h1 := AI.ε_coeff 2
-  rw [h, map_one, ← map_one (Ideal.Quotient.mk (Ideal.span {((l : ℕ) : OC l)})), eq_comm, mk_eq_iff]
-    at h1
-  have h2 :=
-    norm_primitiveRoot_sub_one l 2 (by norm_num) (AI.ζ 2 : PadicComplex l)
-      ((zeta_primitive AI 1).map_of_injective (f := (PadicComplexInt l).subtype)
-        Subtype.val_injective)
+  rw [h, map_one, ← map_one (Ideal.Quotient.mk (Ideal.span {((l : ℕ) : OC l)})), eq_comm,
+    mk_eq_iff] at h1
+  have h2 := norm_primitiveRoot_sub_one l 2 (by norm_num) (AI.ζ 2 : PadicComplex l)
+    ((zeta_primitive AI 1).map_of_injective (f := (PadicComplexInt l).subtype)
+      Subtype.val_injective)
   have hl : ‖(l : PadicComplex l)‖ = (l : ℝ) ^ (-1 : ℝ) := by
     rw [← map_natCast (algebraMap (Om l) (PadicComplex l)), Real.rpow_neg_one,
       ← GlobalTheory.UnramValue.norm_l]
     exact PadicComplex.norm_extends l _
-  have he : (1 : ℝ) < (l : ℝ) ^ (2 - 1) * ((l : ℝ) - 1) := by norm_num; nlinarith
+  have he : (1 : ℝ) < (l : ℝ) ^ (2 - 1) * ((l : ℝ) - 1) := by
+    norm_num; nlinarith
   rw [OneMemClass.coe_one, h2, hl, Real.rpow_le_rpow_left_iff hl1, div_le_iff₀ (by linarith)] at h1
   linarith
 
+
 open scoped Formalism.Per in
 open GlobalTheory.TiltAlgClosed in
-theorem invariant_approx
-    : ∀ (l : ℕ) [Fact l.Prime] (P : LocPrime l) (AI : LocAinf l P) (K : FinExt l) (x : OCb l),
-      (∀ h ∈ Hinf K, AI.actT h x = x)
-        → ∀ n : ℕ,
-          ∃ y
-              ∈ Subring.closure
-                (Set.range AI.εroot
-                  ∪ {xb | ∃ c : Om l, c ∈ K0 K ∧ ∃ m : ℕ, 0 < m ∧ ¬ l ∣ m ∧ c ^ m = 1 ∧ IsTiltOf c m xb}),
-            (AI.ε - 1) ^ n ∣ x - y := by
+theorem invariant_approx : ∀ (l : ℕ) [Fact l.Prime] (P : LocPrime l) (AI : LocAinf l P) (K : FinExt l) (x : OCb l), (∀ h ∈ Hinf K, AI.actT h x = x) → ∀ n : ℕ, ∃ y ∈ Subring.closure (Set.range AI.εroot ∪ {xb | ∃ c : Om l, c ∈ K0 K ∧ ∃ m : ℕ, 0 < m ∧ ¬ l ∣ m ∧ c ^ m = 1 ∧ IsTiltOf c m xb}), (AI.ε - 1) ^ n ∣ x - y := by
   intro l _ P AI K x hx n
   have hp : l.Prime := Fact.out
   obtain ⟨a, ha, hla, ha1⟩ := exists_between K
@@ -559,33 +492,28 @@ theorem invariant_approx
   obtain ⟨N, hN⟩ := exists_pow_lt_of_lt_one (norm_pos_iff.2 he0) hδ1
   have hN' : δ ^ l ^ N ≤ ‖(e.untilt : PadicComplex l)‖ :=
     (pow_le_pow_of_le_one hδ0 hδ1.le (Nat.lt_pow_self hp.one_lt).le).trans hN.le
-  obtain ⟨y, hy⟩ :=
-    Ideal.Quotient.mk_surjective (I := Ideal.span {((l : ℕ) : OC l)}) (PreTilt.coeff N x)
-  obtain ⟨y', hy', hyy'⟩ :=
-    exists_near_Ohat AI.actC ⟨AI.actC_ext, AI.actC_norm⟩ K a ha hla ha1 (y : PadicComplex l)
-      ((GlobalTheory.RingBasics.mem_OC _).1 y.2)
-      (fun h hh => by
-        obtain ⟨y₁, h1, h2⟩ := AI.actT_coeff h x N y hy.symm
-        rw [hx h hh, ← hy, eq_comm, mk_eq_iff, h1] at h2
-        exact h2)
+  obtain ⟨y, hy⟩ := Ideal.Quotient.mk_surjective (I := Ideal.span {((l : ℕ) : OC l)})
+    (PreTilt.coeff N x)
+  obtain ⟨y', hy', hyy'⟩ := exists_near_Ohat AI.actC ⟨AI.actC_ext, AI.actC_norm⟩ K a ha hla ha1
+    (y : PadicComplex l) ((GlobalTheory.RingBasics.mem_OC _).1 y.2) (fun h hh => by
+      obtain ⟨y₁, h1, h2⟩ := AI.actT_coeff h x N y hy.symm
+      rw [hx h hh, ← hy, eq_comm, mk_eq_iff, h1] at h2
+      exact h2)
   obtain ⟨y₂, ⟨w, hw, hwy⟩, rfl⟩ := mem_lifts.1 (Ohat_mem AI K N y' hy')
   refine ⟨w, hw, dvd_of_untilt_dvd ?_⟩
   have h1 := mk_sharpRoot (x - w) N
   rw [map_sub, ← hy, hwy, ← map_sub, mk_eq_iff] at h1
   have h2 : ‖((sharpRoot (x - w) N : OC l) : PadicComplex l)‖ ≤ δ := by
-    have : ((sharpRoot (x - w) N : OC l) : PadicComplex l)
-        = (((sharpRoot (x - w) N : OC l) : PadicComplex l) - ((y - y₂ : OC l) : PadicComplex l))
-          + ((y : PadicComplex l) - y₂) := by
+    have : ((sharpRoot (x - w) N : OC l) : PadicComplex l) =
+        (((sharpRoot (x - w) N : OC l) : PadicComplex l) - ((y - y₂ : OC l) : PadicComplex l)) +
+          ((y : PadicComplex l) - y₂) := by
       push_cast; ring
     rw [this]
     exact (IsUltrametricDist.norm_add_le_max _ _).trans (max_le (h1.trans hlδ) hyy')
   have h3 : ‖((x - w).untilt : PadicComplex l)‖ ≤ ‖(e.untilt : PadicComplex l)‖ := by
     rw [← sharpRoot_pow (x - w) N, SubmonoidClass.coe_pow, norm_pow]
     exact (pow_le_pow_left₀ (norm_nonneg _) h2 _).trans hN'
-  refine ⟨
-    ⟨((x - w).untilt : PadicComplex l) / e.untilt, (GlobalTheory.RingBasics.mem_OC _).2 ?_⟩,
-    Subtype.ext ?_
-  ⟩
+  refine ⟨⟨((x - w).untilt : PadicComplex l) / e.untilt, (GlobalTheory.RingBasics.mem_OC _).2 ?_⟩, Subtype.ext ?_⟩
   · rwa [norm_div, div_le_one (norm_pos_iff.2 he0)]
   · push_cast
     field_simp

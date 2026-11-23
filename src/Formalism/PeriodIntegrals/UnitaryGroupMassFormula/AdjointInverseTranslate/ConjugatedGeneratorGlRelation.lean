@@ -1,6 +1,55 @@
 module
 
+public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.AdjointInverseTranslate.AnaHpartUnique
 public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.AdjointInverseTranslate.SmoothLinear
+import Formalism.RealPlaceAnalysis.RealPlaceTaylor.ComplexifiedDerivativeCommutator
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Calculus.FDeriv.Symmetric
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.LocallyConvex.AbsConvexOpen
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.Normed.Algebra.MatrixExponential
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Lemma
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -15,11 +64,9 @@ open Formalism.REAL Formalism.QuantumDeterminants
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
-def EcH
-    {n : ℕ} {E : Type} [NormedAddCommGroup E] [NormedSpace ℂ E]
-    (H Z : Matrix (Fin n) (Fin n) ℂ) (f : Matrix (Fin n) (Fin n) ℂ → E)
-    : Matrix (Fin n) (Fin n) ℂ → E := fun g =>
-  RdV (hpart1 H Z) f g + Complex.I • RdV (hpart2 H Z) f g
+def EcH {n : ℕ} {E : Type} [NormedAddCommGroup E] [NormedSpace ℂ E] (H Z : Matrix (Fin n) (Fin n) ℂ)
+    (f : Matrix (Fin n) (Fin n) ℂ → E) : Matrix (Fin n) (Fin n) ℂ → E :=
+  fun g => RdV (hpart1 H Z) f g + Complex.I • RdV (hpart2 H Z) f g
 
 section Ec
 
@@ -99,33 +146,22 @@ end Ec
 theorem conjugated_generator_gl_relation : EabHGl := by
   unfold EabHGl
   intro n H E _ _ f a b c d g hH hf hg
-  have hE
-      : ∀ (i j : Fin n) (φ : Matrix (Fin n) (Fin n) ℂ → E),
-        EabH H i j φ = EcH H (Matrix.single i j (1 : ℂ)) φ := fun _ _ _ =>
-    rfl
-  have hm
-      : ∀ (i j k l : Fin n),
-        Matrix.single i j (1 : ℂ) * Matrix.single k l 1
-          = if j = k then Matrix.single i l 1 else 0 := by
+  have hE : ∀ (i j : Fin n) (φ : Matrix (Fin n) (Fin n) ℂ → E),
+      EabH H i j φ = EcH H (Matrix.single i j (1 : ℂ)) φ := fun _ _ _ => rfl
+  have hm : ∀ (i j k l : Fin n), Matrix.single i j (1 : ℂ) * Matrix.single k l 1 =
+      if j = k then Matrix.single i l 1 else 0 := by
     intro i j k l
     by_cases hjk : j = k
     · subst hjk
       rw [if_pos rfl]
       first
       | rw [Matrix.single_mul_single_same, mul_one]
-      | (
-          ext p q
-          simp [Matrix.mul_apply, Matrix.single_apply, ite_and, Finset.sum_ite_eq,
-            Finset.sum_ite_eq']
-        )
+      | (ext p q; simp [Matrix.mul_apply, Matrix.single_apply, ite_and, Finset.sum_ite_eq, Finset.sum_ite_eq'])
     · rw [if_neg hjk]
       first
       | exact Matrix.single_mul_single_of_ne hjk _ _
-      | (
-          ext p q
-          simp [Matrix.mul_apply, Matrix.single_apply, ite_and, hjk, Finset.sum_ite_eq,
-            Finset.sum_ite_eq']
-        )
+      | (ext p q; simp [Matrix.mul_apply, Matrix.single_apply, ite_and, hjk, Finset.sum_ite_eq,
+          Finset.sum_ite_eq'])
   simp only [hE]
   rw [ana_EcComm hH f _ _ g hf hg, ana_Ec_sub hH hf hg, hm, hm]
   split_ifs <;> simp [ana_Ec_zero]
@@ -211,8 +247,8 @@ lemma ana_Phi_smul (hH : HInvol H) (L : Matrix (Fin n) (Fin n) ℂ →L[ℝ] E) 
     Matrix.mul_smul, Matrix.mul_smul, map_sub, map_add, hr, hr, hr, hr]
   match_scalars <;> ring_nf <;> (try simp only [Complex.I_sq]) <;> ring_nf
 
-def anaPhi (hH : HInvol H) (L : Matrix (Fin n) (Fin n) ℂ →L[ℝ] E) (g : Matrix (Fin n) (Fin n) ℂ)
-    : Matrix (Fin n) (Fin n) ℂ →ₗ[ℂ] E where
+def anaPhi (hH : HInvol H) (L : Matrix (Fin n) (Fin n) ℂ →L[ℝ] E) (g : Matrix (Fin n) (Fin n) ℂ) :
+    Matrix (Fin n) (Fin n) ℂ →ₗ[ℂ] E where
   toFun Z := L (g * hpart1 H Z) + Complex.I • L (g * hpart2 H Z)
   map_add' Z W := ana_Phi_add hH L g Z W
   map_smul' c Z := ana_Phi_smul hH L g Z c
@@ -229,20 +265,19 @@ theorem eab_h_right : EabHRight := by
   intro n H E _ _ f a b s g hH hf hs hg
   have hgs := ana_mul hg hs
   obtain ⟨U, F, hU, hgU, hF, hfF⟩ := hf (g * s) hgs
-  change EcH H (Matrix.single a b 1) (fun x => f (x * s)) g
-    = ∑ c, ∑ d, (s⁻¹ c a * s b d) • EcH H (Matrix.single c d 1) f (g * s)
-  have h1
-      : EcH H (Matrix.single a b 1) (fun x => f (x * s)) g
-        = EcH H (s⁻¹ * Matrix.single a b 1 * s) f (g * s) := by
+  change EcH H (Matrix.single a b 1) (fun x => f (x * s)) g =
+    ∑ c, ∑ d, (s⁻¹ c a * s b d) • EcH H (Matrix.single c d 1) f (g * s)
+  have h1 : EcH H (Matrix.single a b 1) (fun x => f (x * s)) g =
+      EcH H (s⁻¹ * Matrix.single a b 1 * s) f (g * s) := by
     unfold EcH
     rw [ana_rdRight hH hs, ana_rdRight hH hs, ana_conj_hpart1 hH hs, ana_conj_hpart2 hH hs]
   rw [h1]
   simp only [ana_EcH_ext hH hU hgU hgs hF hfF]
-  change anaPhi hH (fderiv ℝ F (g * s)) (g * s) (s⁻¹ * Matrix.single a b 1 * s)
-    = ∑ c, ∑ d, (s⁻¹ c a * s b d) • anaPhi hH (fderiv ℝ F (g * s)) (g * s) (Matrix.single c d 1)
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [ana_conj_single, map_sum]
-  set_option synthInstance.maxHeartbeats 100000 in
+  change anaPhi hH (fderiv ℝ F (g * s)) (g * s) (s⁻¹ * Matrix.single a b 1 * s) =
+    ∑ c, ∑ d, (s⁻¹ c a * s b d) • anaPhi hH (fderiv ℝ F (g * s)) (g * s) (Matrix.single c d 1)
+
+  rw [ana_conj_single, map_sum]
+
   simp only [map_sum, map_smul]
 
 end AAInvW

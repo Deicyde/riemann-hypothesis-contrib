@@ -1,12 +1,51 @@
 module
 
-public import Development.AbelianVarietyTheory.Definitions.Divisors.IsActIffIsDiagEnd
 public import Development.AbelianVarietyTheory.Definitions.Divisors.TorMatch
-public import ReciprocityTheory.AnalyticForms.RegularLocalRings.FinalTheorems
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.PowCompMonHom
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.HomExtNormalSt
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsEqAddNsmul
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.PowCompMonHom
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.TorMatchComp
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.TorMatchIdOneMul
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+public import Development.AbelianVarietyTheory.Definitions.Divisors.ExistsToricRankOne
+import Development.AbelianVarietyTheory.Definitions.Divisors.FromBase
+import Development.AbelianVarietyTheory.Definitions.Divisors.IsUnimodMod
+import Development.AbelianVarietyTheory.Definitions.Divisors.SharpOverIff
 
 @[expose] public section
 
@@ -88,8 +127,8 @@ theorem main
         Function.injective_id _ _ h hone₀
   have dsum : ∀ (χ : Fin 8 → D₀.toPre.X) w, d w (∑ u, c u (χ u)) = χ w := by
     intro χ w
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, Finset.sum_eq_single w]
+
+    rw [map_sum, Finset.sum_eq_single w]
     · have := DFunLike.congr_fun (dc w w) (χ w)
       simpa using this
     · intro b _ hb

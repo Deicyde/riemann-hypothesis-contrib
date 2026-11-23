@@ -1,27 +1,63 @@
 module
 
-public import Mathlib
+import CompanionTheory.AutomorphicTheory.ProductFormulaTheory.GrothendieckRingPolynomial.SingleEqSmulSingle
 public import Development.WeilBound.CoreStatements.AutomorphicKernels.GrothendieckRingPolynomial.ProdList
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
+import Development.WeilBound.CoreStatements.TemperedRepresentationTheory.ZelevinskyJacquet.ZelevinskyInterleaving.LInjective
 
 @[expose] public section
 
 noncomputable section
 
-open GlobalTheory.PRep GlobalTheory.SplitWeil GlobalTheory.SmGL GlobalTheory.LocGL
-  GlobalTheory.JHMult Zc Zc.M Zc.Cos
+open GlobalTheory.PRep GlobalTheory.SplitWeil GlobalTheory.SmGL GlobalTheory.LocGL GlobalTheory.JHMult Zc Zc.M Zc.Cos
 
-set_option synthInstance.maxHeartbeats 400000
+
 
 namespace PositivityTheory.Groth
 
-def Steps (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
-    : Prop :=
-  Cls k ∧ MulCls k ∧ Assoc k ∧ Comm k ∧ One k ∧ ProdList k ∧ Tri k ∧ MultOne k ∧ JCls k ∧ JSeg k
-    ∧ AltSum k
+def Steps (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] : Prop :=
+  Cls k ∧ MulCls k ∧ Assoc k ∧ Comm k ∧ One k ∧ ProdList k ∧ Tri k ∧ MultOne k ∧ JCls k ∧ JSeg k ∧ AltSum k
 
-def R (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
-    : Type 1 :=
-  GrothGL k
+def R (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] : Type 1 := GrothGL k
 
 variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
 
@@ -48,9 +84,11 @@ theorem bil_add_left (a b c : ι →₀ ℤ) : bil C (a + b) c = bil C a c + bil
   refine Finsupp.sum_congr fun y _ => ?_
   rw [add_mul, add_smul]
 
-theorem bil_zero_left (b : ι →₀ ℤ) : bil C 0 b = 0 := by simp [bil]
+theorem bil_zero_left (b : ι →₀ ℤ) : bil C 0 b = 0 := by
+  simp [bil]
 
-theorem bil_zero_right (a : ι →₀ ℤ) : bil C a 0 = 0 := by simp [bil]
+theorem bil_zero_right (a : ι →₀ ℤ) : bil C a 0 = 0 := by
+  simp [bil]
 
 theorem bil_smul_left (z : ℤ) (a b : ι →₀ ℤ) : bil C (z • a) b = z • bil C a b := by
   unfold bil
@@ -74,8 +112,7 @@ theorem bil_comm (hC : ∀ x y, C x y = C y x) (a b : ι →₀ ℤ) : bil C a b
   refine Finsupp.sum_congr fun y _ => Finsupp.sum_congr fun x _ => ?_
   rw [mul_comm, hC]
 
-theorem single_eq_smul_single (x : ι) (m : ℤ)
-    : (Finsupp.single x m : ι →₀ ℤ) = m • Finsupp.single x 1 := by
+theorem single_eq_smul_single (x : ι) (m : ℤ) : (Finsupp.single x m : ι →₀ ℤ) = m • Finsupp.single x 1 := by
   rw [Finsupp.smul_single, smul_eq_mul, mul_one]
 
 end Bil
@@ -84,35 +121,13 @@ section BilAssoc
 
 variable {ι : Type*} (C : ι → ι → ι →₀ ℤ)
 
-theorem bil_assoc
-    (hA : ∀ x y z,
-      bil C (bil C (Finsupp.single x 1) (Finsupp.single y 1)) (Finsupp.single z 1)
-        = bil C (Finsupp.single x 1) (bil C (Finsupp.single y 1) (Finsupp.single z 1)))
-    (a b c : ι →₀ ℤ)
-    : bil C (bil C a b) c = bil C a (bil C b c) := by
-  induction a using Finsupp.induction_linear with
-  | zero => simp only [bil_zero_left]
-  | add a a' ha ha' => rw [bil_add_left, bil_add_left, bil_add_left, ha, ha']
-  | single x m =>
-    simp only [single_eq_smul_single x m, bil_smul_left]
-    congr 1
-    induction b using Finsupp.induction_linear with
-    | zero => simp only [bil_zero_left, bil_zero_right]
-    | add b b' hb hb' => rw [bil_add_right, bil_add_left, hb, hb', bil_add_left, bil_add_right]
-    | single y n =>
-      simp only [single_eq_smul_single y n, bil_smul_left, bil_smul_right]
-      congr 1
-      induction c using Finsupp.induction_linear with
-      | zero => simp only [bil_zero_right]
-      | add c c' hc hc' => rw [bil_add_right, bil_add_right, hc, hc', bil_add_right]
-      | single z p =>
-        simp only [single_eq_smul_single z p, bil_smul_right]
-        congr 1
-        exact hA x y z
+theorem bil_assoc (hA : ∀ x y z, bil C (bil C (Finsupp.single x 1) (Finsupp.single y 1)) (Finsupp.single z 1) =
+      bil C (Finsupp.single x 1) (bil C (Finsupp.single y 1) (Finsupp.single z 1))) (a b c : ι →₀ ℤ) :
+    bil C (bil C a b) c = bil C a (bil C b c) := by
+  apply CompanionTheory.Groth.GrothendieckRing.bil_assoc <;> assumption
 
-theorem bil_one
-    (u : ι →₀ ℤ) (h : ∀ x, bil C u (Finsupp.single x 1) = Finsupp.single x 1) (a : ι →₀ ℤ)
-    : bil C u a = a := by
+theorem bil_one (u : ι →₀ ℤ) (h : ∀ x, bil C u (Finsupp.single x 1) = Finsupp.single x 1) (a : ι →₀ ℤ) :
+    bil C u a = a := by
   induction a using Finsupp.induction_linear with
   | zero => rw [bil_zero_right]
   | add a a' ha ha' => rw [bil_add_right, ha, ha']
@@ -138,8 +153,7 @@ theorem mulR_comm' [Fact (Comm k)] (a b : GrothGL k) : mulR a b = mulR b a := by
   rw [mulR_eq, mulR_eq]
   exact bil_comm _ (fun x y => (Fact.out : Comm k) x y) a b
 
-theorem mulR_assoc' [Fact (Assoc k)] (a b c : GrothGL k)
-    : mulR (mulR a b) c = mulR a (mulR b c) := by
+theorem mulR_assoc' [Fact (Assoc k)] (a b c : GrothGL k) : mulR (mulR a b) c = mulR a (mulR b c) := by
   simp only [mulR_eq]
   refine bil_assoc _ (fun x y z => ?_) a b c
   have h := (Fact.out : Assoc k) x y z
@@ -159,19 +173,18 @@ open GrothendieckRing
 
 variable [Fact (Assoc k)] [Fact (Comm k)] [Fact (One k)]
 
-instance instCommRingR : CommRing (R k) := {
-  (inferInstanceAs (AddCommGroup (GrothGL k)) : AddCommGroup (R k)) with
-  mul := fun a b => mulR a b
-  one := GrothGL.unit k
-  left_distrib := fun a b c => mulR_add a b c
-  right_distrib := fun a b c => add_mulR a b c
-  zero_mul := fun a => zero_mulR a
-  mul_zero := fun a => mulR_zero a
-  mul_assoc := fun a b c => mulR_assoc' a b c
-  one_mul := fun a => unit_mulR a
-  mul_one := fun a => (mulR_comm' _ _).trans (unit_mulR a)
-  mul_comm := fun a b => mulR_comm' a b
-}
+instance instCommRingR : CommRing (R k) :=
+  { (inferInstanceAs (AddCommGroup (GrothGL k)) : AddCommGroup (R k)) with
+    mul := fun a b => mulR a b
+    one := GrothGL.unit k
+    left_distrib := fun a b c => mulR_add a b c
+    right_distrib := fun a b c => add_mulR a b c
+    zero_mul := fun a => zero_mulR a
+    mul_zero := fun a => mulR_zero a
+    mul_assoc := fun a b c => mulR_assoc' a b c
+    one_mul := fun a => unit_mulR a
+    mul_one := fun a => (mulR_comm' _ _).trans (unit_mulR a)
+    mul_comm := fun a b => mulR_comm' a b }
 
 def toR : GrothGL k ≃+ R k := { Equiv.refl _ with map_add' := fun _ _ => rfl }
 
@@ -182,8 +195,7 @@ theorem toR_unit : toR (GrothGL.unit k) = 1 := rfl
 def phiOf (f : Segment k → IrrGL (k := k)) : MvPolynomial (Segment k) ℤ →+* R k :=
   MvPolynomial.eval₂Hom (Int.castRingHom (R k)) fun Δ => toR (sg (f Δ))
 
-theorem phiOf_X (f : Segment k → IrrGL (k := k)) (Δ : Segment k)
-    : phiOf f (MvPolynomial.X Δ) = toR (sg (f Δ)) :=
+theorem phiOf_X (f : Segment k → IrrGL (k := k)) (Δ : Segment k) : phiOf f (MvPolynomial.X Δ) = toR (sg (f Δ)) :=
   MvPolynomial.eval₂Hom_X' _ _ _
 
 end PositivityTheory.Groth

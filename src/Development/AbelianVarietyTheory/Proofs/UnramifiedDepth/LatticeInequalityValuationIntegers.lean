@@ -1,28 +1,79 @@
 module
 
-public import Mathlib
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.PlaceDivisors.StChartFH
-public import ReciprocityTheory.DualLattices.TowerZeroSurjective
-public import ReciprocityTheory.DualLattices.LinPairStatement
-public import ReciprocityTheory.DualLattices.LengthDegreeAbelianVariety
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDescent.ChartPullbacks.UniversalCharts.LePreimageOfNil
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.Clauses
-public import ReciprocityTheory.DualLattices.SubMemOfCompat
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.SemiabelianSchemes.Biextensions.GenericFiberCubeInclusion
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.RosVal
-public import Development.AbelianVarietyTheory.Definitions.ModuliSpaces.IsSeparatedOfIsQProjOver
-public import Development.AbelianVarietyTheory.Definitions.TeichmullerDepth.IsEigBasisIff
-public import ReciprocityTheory.DualLattices.HasLenCokerDet
-public import ReciprocityTheory.DualLattices.ProdDvdOfIso
+public import Mathlib.FieldTheory.IsAlgClosed.Basic
+public import ReciprocityTheory.DualLattices.CotangentSurjective
+public import ReciprocityTheory.DualLattices.DiscriminantColengthStatement
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+public import Mathlib.CategoryTheory.Monoidal.Cartesian.Over
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Coalgebra.IsFrobenius
+import Mathlib.RingTheory.Etale.Weakly
+import Mathlib.RingTheory.HopfAlgebra.Basic
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.TotallySplit
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 public import ReciprocityTheory.DualLattices.ColengthSqBlockVandermonde
+public import ReciprocityTheory.DualLattices.HasLenCokerDet
+public import ReciprocityTheory.DualLattices.LengthDegreeAbelianVariety
+import ReciprocityTheory.DualLattices.ProdDvdOfIso
+import Development.AbelianVarietyTheory.Definitions.TeichmullerDepth.IsEigBasisIff
+public import Mathlib.Algebra.Module.Torsion.Basic
+public import Mathlib.LinearAlgebra.Vandermonde
+public import Mathlib.RingTheory.Flat.Basic
+public import Mathlib.RingTheory.Flat.TorsionFree
+public import Mathlib.RingTheory.LocalRing.Module
+import Mathlib.Topology.Sheaves.Presheaf
+import ReciprocityTheory.DualLattices.FormalChartAtZero
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.CocycleRightZeroThd
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDescent.ChartPullbacks.UniversalCharts.LePreimageOfNil
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.PlaceDivisors.StChartF
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.SemiabelianSchemes.CubicalStructures.CubeSymmetricSwapFirst
 
 @[expose] public section
 
-open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
-  TensorProduct Matrix
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
-  ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ ReciprocityTheory.ChartRestriction.G.Pdiv.ChartF
-  ReciprocityTheory.ChartRestriction.G.Pdiv.AvDefs
+open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry TensorProduct Matrix
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ ReciprocityTheory.ChartRestriction.G.Pdiv.ChartF ReciprocityTheory.ChartRestriction.G.Pdiv.AvDefs
 open ReciprocityTheory.PGsh ReciprocityTheory.PGsh.Up ReciprocityTheory.PGsh.Be2 GlobalTheory.ChF
 open ReciprocityTheory.ChartRestriction.G.Chart (sp spMap)
 attribute [local instance] Over.cartesianMonoidalCategory
@@ -33,19 +84,15 @@ section aux
 
 variable {C : Type} [Field C] {v : Valuation C NNReal} {O : Type} [CommRing O] [Algebra O C]
 
-private theorem exists_basisMat
-    (hv : v.Integers O)
-    {κ : Type} [Fintype κ] [DecidableEq κ]
-    (N : Submodule O (κ → O)) (hN : N.FG)
-    (D : O) (hD : D ≠ 0) (hDN : ∀ z, D • z ∈ N)
-    : ∃ B : Matrix κ κ O, B.det ≠ 0 ∧ LinearMap.range B.mulVecLin = N := by
+private theorem exists_basisMat (hv : v.Integers O) {κ : Type} [Fintype κ] [DecidableEq κ]
+    (N : Submodule O (κ → O)) (hN : N.FG) (D : O) (hD : D ≠ 0) (hDN : ∀ z, D • z ∈ N) :
+    ∃ B : Matrix κ κ O, B.det ≠ 0 ∧ LinearMap.range B.mulVecLin = N := by
   have : IsDomain O := hv.hom_inj.isDomain
   have : IsFractionRing O C := hv.isFractionRing
   have : ValuationRing O := ValuationRing.of_integers v hv
   have : Module.Finite O N := Module.Finite.iff_fg.2 hN
   have : Module.Flat O N := by
-    rw [Module.Flat.flat_iff_torsion_eq_bot_of_isBezout,
-      ← Submodule.isTorsionFree_iff_torsion_eq_bot]
+    rw [Module.Flat.flat_iff_torsion_eq_bot_of_isBezout, ← Submodule.isTorsionFree_iff_torsion_eq_bot]
     infer_instance
   have : Module.Free O N := Module.free_of_flat_of_isLocalRing
   have h1 : Module.finrank O N ≤ Module.finrank O (κ → O) :=
@@ -61,9 +108,8 @@ private theorem exists_basisMat
     rw [← Module.finrank_fintype_fun_eq_card O]; omega
   let b : Module.Basis κ O N :=
     (Module.finBasisOfFinrankEq O N h3).reindex (Fintype.equivFin κ).symm
-  have hB
-      : ∀ c : κ → O,
-        (Matrix.of fun i j => (b j : κ → O) i) *ᵥ c = ((∑ j, c j • b j : N) : κ → O) := by
+  have hB : ∀ c : κ → O, (Matrix.of fun i j => (b j : κ → O) i) *ᵥ c =
+      ((∑ j, c j • b j : N) : κ → O) := by
     intro c
     funext i
     simp [Matrix.mulVec, dotProduct, Finset.sum_apply, mul_comm]
@@ -82,16 +128,15 @@ private theorem exists_basisMat
       refine ⟨b.repr ⟨x, hx⟩, ?_⟩
       rw [Matrix.mulVecLin_apply, hB, b.sum_repr]
 
-private theorem det_map_ne
-    (hv : v.Integers O) {κ : Type} [Fintype κ] [DecidableEq κ] {B : Matrix κ κ O} (hB : B.det ≠ 0)
-    : (B.map (algebraMap O C)).det ≠ 0 := by
+private theorem det_map_ne (hv : v.Integers O) {κ : Type} [Fintype κ] [DecidableEq κ]
+    {B : Matrix κ κ O} (hB : B.det ≠ 0) : (B.map (algebraMap O C)).det ≠ 0 := by
   have h := RingHom.map_det (algebraMap O C) B
   rw [RingHom.mapMatrix_apply] at h
   rw [← h]
   exact fun h0 => hB (hv.hom_inj (by rw [h0, map_zero]))
 
-private theorem integral_iff (hv : v.Integers O) {κ : Type} (c : κ → C)
-    : (∀ j, v (c j) ≤ 1) ↔ ∃ c₀ : κ → O, c = fun j => algebraMap O C (c₀ j) := by
+private theorem integral_iff (hv : v.Integers O) {κ : Type} (c : κ → C) :
+    (∀ j, v (c j) ≤ 1) ↔ ∃ c₀ : κ → O, c = fun j => algebraMap O C (c₀ j) := by
   constructor
   · intro hc
     choose c₀ hc₀ using fun j => hv.exists_of_le_one (hc j)
@@ -99,15 +144,11 @@ private theorem integral_iff (hv : v.Integers O) {κ : Type} (c : κ → C)
   · rintro ⟨c₀, rfl⟩ j
     exact hv.map_le_one _
 
-private theorem mem_pts
-    (hv : v.Integers O)
-    {κ : Type} [Fintype κ] [DecidableEq κ]
-    {B : Matrix κ κ O} (L : Lat v κ) (hL : L.B = B.map (algebraMap O C))
-    (x : κ → C)
-    : x ∈ L.pts ↔ ∃ z ∈ LinearMap.range B.mulVecLin, x = fun j => algebraMap O C (z j) := by
-  have key
-      : ∀ c₀ : κ → O,
-        L.B *ᵥ (fun j => algebraMap O C (c₀ j)) = fun j => algebraMap O C ((B *ᵥ c₀) j) := by
+private theorem mem_pts (hv : v.Integers O) {κ : Type} [Fintype κ] [DecidableEq κ]
+    {B : Matrix κ κ O} (L : Lat v κ) (hL : L.B = B.map (algebraMap O C)) (x : κ → C) :
+    x ∈ L.pts ↔ ∃ z ∈ LinearMap.range B.mulVecLin, x = fun j => algebraMap O C (z j) := by
+  have key : ∀ c₀ : κ → O, L.B *ᵥ (fun j => algebraMap O C (c₀ j)) =
+      fun j => algebraMap O C ((B *ᵥ c₀) j) := by
     intro c₀
     funext i
     simp [hL, Matrix.mulVec, dotProduct]
@@ -118,17 +159,15 @@ private theorem mem_pts
   · rintro ⟨_, ⟨c₀, rfl⟩, rfl⟩
     exact ⟨_, (integral_iff hv _).2 ⟨c₀, rfl⟩, (key c₀).symm⟩
 
-private theorem len_eq
-    (hv : v.Integers O)
-    {κ : Type} [Fintype κ] [DecidableEq κ]
-    {B B' : Matrix κ κ O} (hB : B.det ≠ 0)
-    (M M' : Submodule O (κ → O))
-    (hM : LinearMap.range B.mulVecLin = M) (hM' : LinearMap.range B'.mulVecLin = M') (hle : M' ≤ M)
-    {c : NNReal} (hc : HasLen v O (M ⧸ M'.comap M.subtype) c)
-    : c = v (B'.map (algebraMap O C)).det / v (B.map (algebraMap O C)).det := by
+private theorem len_eq (hv : v.Integers O) {κ : Type} [Fintype κ] [DecidableEq κ]
+    {B B' : Matrix κ κ O} (hB : B.det ≠ 0) (M M' : Submodule O (κ → O))
+    (hM : LinearMap.range B.mulVecLin = M) (hM' : LinearMap.range B'.mulVecLin = M')
+    (hle : M' ≤ M) {c : NNReal} (hc : HasLen v O (M ⧸ M'.comap M.subtype) c) :
+    c = v (B'.map (algebraMap O C)).det / v (B.map (algebraMap O C)).det := by
   have : IsDomain O := hv.hom_inj.isDomain
   subst hM hM'
-  have hcol : ∀ j, ∃ x : κ → O, B *ᵥ x = B' *ᵥ Pi.single j 1 := fun j => hle ⟨Pi.single j 1, rfl⟩
+  have hcol : ∀ j, ∃ x : κ → O, B *ᵥ x = B' *ᵥ Pi.single j 1 := fun j =>
+    hle ⟨Pi.single j 1, rfl⟩
   choose X hX using hcol
   have hBX : B * (Matrix.of X)ᵀ = B' := by
     ext i j
@@ -140,10 +179,9 @@ private theorem len_eq
     by_contra h0
     exact hB (Matrix.exists_mulVec_eq_zero_iff.1 ⟨m, h0, hm⟩)
   let e := LinearEquiv.ofInjective B.mulVecLin hinj
-  have hmap
-      : (LinearMap.range ((Matrix.of X)ᵀ).mulVecLin).map
-          (e : (κ → O) →ₗ[O] LinearMap.range B.mulVecLin)
-        = (LinearMap.range B'.mulVecLin).comap (LinearMap.range B.mulVecLin).subtype := by
+  have hmap : (LinearMap.range ((Matrix.of X)ᵀ).mulVecLin).map
+      (e : (κ → O) →ₗ[O] LinearMap.range B.mulVecLin) =
+      (LinearMap.range B'.mulVecLin).comap (LinearMap.range B.mulVecLin).subtype := by
     ext y
     constructor
     · rintro ⟨_, ⟨w, rfl⟩, rfl⟩
@@ -162,17 +200,16 @@ private theorem len_eq
   rw [RingHom.mapMatrix_apply] at h4
   rw [h2, ← hBX, Matrix.map_mul, Matrix.det_mul, map_mul, h4, mul_div_cancel_left₀ _ h3]
 
+
 omit [Algebra O C] in
-private theorem full_of_stable
-    [IsDomain O]
-    {n s : ℕ} (a : Fin n → O) (ha : Function.Injective a) (M : Submodule O (Fin n × Fin s → O))
+private theorem full_of_stable [IsDomain O] {n s : ℕ} (a : Fin n → O) (ha : Function.Injective a)
+    (M : Submodule O (Fin n × Fin s → O))
     (hst : ∀ f ∈ M, (fun y : Fin n × Fin s => a y.1 * f y) ∈ M)
-    (hsur : ∀ (τ : Fin n) (z : Fin s → O), ∃ f ∈ M, ∀ i, f (τ, i) = z i)
-    : ∃ D : O, D ≠ 0 ∧ ∀ z, D • z ∈ M := by
+    (hsur : ∀ (τ : Fin n) (z : Fin s → O), ∃ f ∈ M, ∀ i, f (τ, i) = z i) :
+    ∃ D : O, D ≠ 0 ∧ ∀ z, D • z ∈ M := by
   classical
-  have hprod
-      : ∀ (S : Finset (Fin n)), ∀ f ∈ M,
-        (fun y : Fin n × Fin s => (∏ σ ∈ S, (a y.1 - a σ)) * f y) ∈ M := by
+  have hprod : ∀ (S : Finset (Fin n)), ∀ f ∈ M,
+      (fun y : Fin n × Fin s => (∏ σ ∈ S, (a y.1 - a σ)) * f y) ∈ M := by
     intro S
     induction S using Finset.induction_on with
     | empty => intro f hf; simpa using hf
@@ -188,9 +225,8 @@ private theorem full_of_stable
   · refine Finset.prod_ne_zero_iff.2 fun τ _ => Finset.prod_ne_zero_iff.2 fun σ hσ => ?_
     exact sub_ne_zero.2 fun h => (Finset.ne_of_mem_erase hσ) (ha h).symm
   · choose f hfM hf using fun τ => hsur τ (fun i => z (τ, i))
-    have h1 :=
-      M.sum_mem (t := Finset.univ) fun τ _ =>
-        M.smul_mem (∏ σ ∈ Finset.univ.erase τ, p σ) (hprod (Finset.univ.erase τ) _ (hfM τ))
+    have h1 := M.sum_mem (t := Finset.univ) fun τ _ =>
+      M.smul_mem (∏ σ ∈ Finset.univ.erase τ, p σ) (hprod (Finset.univ.erase τ) _ (hfM τ))
     convert h1 using 1
     funext y
     obtain ⟨τ, i⟩ := y
@@ -199,17 +235,16 @@ private theorem full_of_stable
       rw [← Finset.prod_erase_mul _ _ (Finset.mem_univ τ), _root_.mul_assoc]
     · intro σ _ hσ
       simp only [Pi.smul_apply, smul_eq_mul]
-      rw [Finset.prod_eq_zero (s := Finset.univ.erase σ) (i := τ)
-        (f := fun ρ => a τ - a ρ)
+      rw [Finset.prod_eq_zero (s := Finset.univ.erase σ) (i := τ) (f := fun ρ => a τ - a ρ)
         (Finset.mem_erase.2 ⟨hσ.symm, Finset.mem_univ _⟩) (sub_self _)]
       simp
     · simp
 
-private theorem killed_of_hasLen
-    {M : Type} [AddCommGroup M] [Module O M] {x : NNReal} (h : HasLen v O M x) (hx : x ≠ 0)
-    : ∃ d : O, d ≠ 0 ∧ ∀ y : M, d • y = 0 := by
+private theorem killed_of_hasLen {M : Type} [AddCommGroup M] [Module O M] {x : NNReal}
+    (h : HasLen v O M x) (hx : x ≠ 0) : ∃ d : O, d ≠ 0 ∧ ∀ y : M, d • y = 0 := by
   obtain ⟨m, c, ⟨e⟩, rfl⟩ := h
-  have hd : v (algebraMap O C (∏ i, c i)) = ∏ i, v (algebraMap O C (c i)) := by simp only [map_prod]
+  have hd : v (algebraMap O C (∏ i, c i)) = ∏ i, v (algebraMap O C (c i)) := by
+    simp only [map_prod]
   refine ⟨∏ i, c i, fun h0 => hx (by rw [← hd, h0]; simp), fun y => ?_⟩
   apply e.injective
   rw [map_smul, map_zero]
@@ -220,62 +255,33 @@ private theorem killed_of_hasLen
   rw [← map_mul, Ideal.Quotient.eq_zero_iff_mem, Ideal.mem_span_singleton]
   exact (Finset.dvd_prod_of_mem c (Finset.mem_univ i)).mul_right r
 
+
 omit [Algebra O C] in
-private theorem proj_span
-    {n s h : ℕ} (a : Fin n → O) (φ : Fin h → Fin n × Fin s → O) (τ : Fin n) (z : Fin s → O)
-    : z ∈ Submodule.span O (Set.range fun l => fun i => φ l (τ, i))
-      ↔ ∃ f
-          ∈ Submodule.span O
-            (Set.range fun q : Fin n × Fin h => fun y : Fin n × Fin s =>
-              a y.1 ^ (q.1 : ℕ) * φ q.2 y),
-        z = fun i => f (τ, i) := by
+private theorem proj_span {n s h : ℕ} (a : Fin n → O) (φ : Fin h → Fin n × Fin s → O) (τ : Fin n)
+    (z : Fin s → O) :
+    z ∈ Submodule.span O (Set.range fun l => fun i => φ l (τ, i)) ↔
+      ∃ f ∈ Submodule.span O (Set.range fun q : Fin n × Fin h =>
+        fun y : Fin n × Fin s => a y.1 ^ (q.1 : ℕ) * φ q.2 y), z = fun i => f (τ, i) := by
   constructor
   · intro hz
     obtain ⟨c, rfl⟩ := (Submodule.mem_span_range_iff_exists_fun O).1 hz
-    refine ⟨
-      ∑ l, c l • φ l,
-      Submodule.sum_mem _ fun l _ =>
-        Submodule.smul_mem _ _ (Submodule.subset_span ⟨(⟨0, τ.pos⟩, l), ?_⟩),
-      ?_
-    ⟩
+    refine ⟨∑ l, c l • φ l, Submodule.sum_mem _ fun l _ => Submodule.smul_mem _ _
+      (Submodule.subset_span ⟨(⟨0, τ.pos⟩, l), ?_⟩), ?_⟩
     · funext y; simp
     · funext i; simp [Finset.sum_apply]
   · rintro ⟨f, hf, rfl⟩
     obtain ⟨c, rfl⟩ := (Submodule.mem_span_range_iff_exists_fun O).1 hf
-    have h1 :=
-      Submodule.sum_mem (Submodule.span O (Set.range fun l => fun i => φ l (τ, i)))
-        (t := Finset.univ)
-        (f := fun q : Fin n × Fin h => (c q * a τ ^ (q.1 : ℕ)) • fun i => φ q.2 (τ, i))
-        fun q _ => Submodule.smul_mem _ _ (Submodule.subset_span ⟨q.2, rfl⟩)
+    have h1 := Submodule.sum_mem (Submodule.span O (Set.range fun l => fun i => φ l (τ, i)))
+      (t := Finset.univ) (f := fun q : Fin n × Fin h =>
+        (c q * a τ ^ (q.1 : ℕ)) • fun i => φ q.2 (τ, i))
+      fun q _ => Submodule.smul_mem _ _ (Submodule.subset_span ⟨q.2, rfl⟩)
     convert h1 using 1
     funext i
     simp [Finset.sum_apply, _root_.mul_assoc]
 
 end aux
 
-theorem lattice_ineq_integers
-    : ∀ (C : Type) [Field C] [IsAlgClosed C] (v : Valuation C NNReal) (O : Type) [CommRing O]
-        [Algebra O C],
-      v.Integers O → (∃ c : C, 0 < v c ∧ v c < 1)
-        → ∀ (n s h : ℕ) (a : Fin n → O),
-          Function.Injective a
-            → ∀ (M : Submodule O (Fin n × Fin s → O)),
-              M.FG → (∀ f ∈ M, (fun y : Fin n × Fin s => a y.1 * f y) ∈ M)
-                → (∀ (τ : Fin n) (z : Fin s → O), ∃ f ∈ M, ∀ i, f (τ, i) = z i)
-                → ∀ (φ : Fin h → Fin n × Fin s → O),
-                  (∀ l, φ l ∈ M)
-                    → ∀ c : NNReal,
-                      c ≠ 0
-                        → HasLen v O
-                          (M ⧸ (Submodule.span O (Set.range fun q : Fin n × Fin h => fun y : Fin n × Fin s => a y.1 ^ (q.1 : ℕ) * φ q.2 y)).comap M.subtype)
-                          c
-                        → ∃ x : Fin n → NNReal,
-                          (∀ τ,
-                              HasLen v O
-                                ((Fin s → O) ⧸ Submodule.span O (Set.range fun l => fun i => φ l (τ, i)))
-                                (x τ))
-                            ∧ c ^ 2 * v (discr fun τ => algebraMap O C (a τ)) ^ h
-                              ≤ (∏ τ, x τ) ^ 2 * v (discr fun τ => algebraMap O C (a τ)) ^ s := by
+theorem lattice_ineq_integers : ∀ (C : Type) [Field C] [IsAlgClosed C] (v : Valuation C NNReal) (O : Type) [CommRing O] [Algebra O C], v.Integers O → (∃ c : C, 0 < v c ∧ v c < 1) → ∀ (n s h : ℕ) (a : Fin n → O), Function.Injective a → ∀ (M : Submodule O (Fin n × Fin s → O)), M.FG → (∀ f ∈ M, (fun y : Fin n × Fin s => a y.1 * f y) ∈ M) → (∀ (τ : Fin n) (z : Fin s → O), ∃ f ∈ M, ∀ i, f (τ, i) = z i) → ∀ (φ : Fin h → Fin n × Fin s → O), (∀ l, φ l ∈ M) → ∀ c : NNReal, c ≠ 0 → HasLen v O (M ⧸ (Submodule.span O (Set.range fun q : Fin n × Fin h => fun y : Fin n × Fin s => a y.1 ^ (q.1 : ℕ) * φ q.2 y)).comap M.subtype) c → ∃ x : Fin n → NNReal, (∀ τ, HasLen v O ((Fin s → O) ⧸ Submodule.span O (Set.range fun l => fun i => φ l (τ, i))) (x τ)) ∧ c ^ 2 * v (discr fun τ => algebraMap O C (a τ)) ^ h ≤ (∏ τ, x τ) ^ 2 * v (discr fun τ => algebraMap O C (a τ)) ^ s := by
   intro C _ _ v O _ _ hv hnt n s h a ha M hM hst hsur φ hφ c hc0 hc
   have : IsDomain O := hv.hom_inj.isDomain
   set M' := Submodule.span O (Set.range fun q : Fin n × Fin h =>
@@ -301,20 +307,16 @@ theorem lattice_ineq_integers
   have hDτ : ∀ τ z, (d * D) • z ∈ Submodule.span O (Set.range fun l => fun i => φ l (τ, i)) :=
     fun τ z => (proj_span a φ τ _).2 ⟨_, hDM' (fun y => z y.2), rfl⟩
   obtain ⟨B, hB, hBM⟩ := exists_basisMat hv M hM D hD hDM
-  obtain ⟨B', hB', hBM'⟩ :=
-    exists_basisMat hv M' (Submodule.fg_span (Set.finite_range _)) _ hdD hDM'
+  obtain ⟨B', hB', hBM'⟩ := exists_basisMat hv M' (Submodule.fg_span (Set.finite_range _)) _ hdD hDM'
   choose Bτ hBτ hBMτ using fun τ => exists_basisMat hv _
     (Submodule.fg_span (Set.finite_range _)) _ hdD (hDτ τ)
   have hainj : Function.Injective fun τ => algebraMap O C (a τ) := hv.hom_inj.comp ha
   let L : Lat v (Fin n × Fin s) := ⟨_, det_map_ne hv hB⟩
   let L' : Lat v (Fin n × Fin s) := ⟨_, det_map_ne hv hB'⟩
   let Lτ : Fin n → Lat v (Fin s) := fun τ => ⟨_, det_map_ne hv (hBτ τ)⟩
-  let F : Lat v (Fin n × Fin h) := ⟨
-    freeMat (fun τ => algebraMap O C (a τ)) h,
-    by
-      rw [det_freeMat]
-      exact pow_ne_zero _ (Matrix.det_vandermonde_ne_zero_iff.2 hainj)
-  ⟩
+  let F : Lat v (Fin n × Fin h) := ⟨freeMat (fun τ => algebraMap O C (a τ)) h, by
+    rw [det_freeMat]
+    exact pow_ne_zero _ (Matrix.det_vandermonde_ne_zero_iff.2 hainj)⟩
   have hL := mem_pts hv L rfl
   have hL' := mem_pts hv L' rfl
   have hLτ := fun τ => mem_pts hv (Lτ τ) rfl
@@ -324,44 +326,30 @@ theorem lattice_ineq_integers
   · have h1 := hasLen_coker_det' v O hv _ (Bτ τ)
     rw [hBMτ, RingHom.map_det, RingHom.mapMatrix_apply] at h1
     simpa [colen, Lat.std, Lτ] using h1
-  refine lat_conseq C v O hv hnt n _ hainj
-    (fun τ => hv.map_le_one _)
-    s h
-    (fun τ => Matrix.of fun i l => algebraMap O C (φ l (τ, i)))
-    F L L'
-    (fun _ => Lat.std v (Fin s))
-    Lτ rfl
-    (fun τ => ?_)
-    ?_ ?_
-    (fun τ => ?_)
-    (fun τ => ?_)
-    c (len_eq hv hB M M' hBM hBM' hle hc).le
+  refine lat_conseq C v O hv hnt n _ hainj (fun τ => hv.map_le_one _) s h
+    (fun τ => Matrix.of fun i l => algebraMap O C (φ l (τ, i))) F L L' (fun _ => Lat.std v (Fin s))
+    Lτ rfl (fun τ => ?_) ?_ ?_ (fun τ => ?_) (fun τ => ?_) c (len_eq hv hB M M' hBM hBM' hle hc).le
   · intro w
     have hne : algebraMap O C (d * D) ≠ 0 := fun h0 => hdD (hv.hom_inj (by rw [h0, map_zero]))
     choose r hr using fun j => (Submodule.mem_span_range_iff_exists_fun O).1
       (hDτ τ (Pi.single j 1))
     refine ⟨fun l => ∑ j, w j / algebraMap O C (d * D) * algebraMap O C (r j l), ?_⟩
     funext i
-    have h1
-        : ∀ j,
-          ∑ l, algebraMap O C (φ l (τ, i)) * algebraMap O C (r j l)
-            = if i = j then algebraMap O C (d * D) else 0 := by
+    have h1 : ∀ j, ∑ l, algebraMap O C (φ l (τ, i)) * algebraMap O C (r j l) =
+        if i = j then algebraMap O C (d * D) else 0 := by
       intro j
       have h2 := congrArg (algebraMap O C) (congrFun (hr j) i)
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [Finset.sum_apply, Pi.smul_apply, smul_eq_mul, map_sum, Pi.single_apply, mul_ite,
-            _root_.mul_one, mul_zero]
-          at h2
+
+      simp only [Finset.sum_apply, Pi.smul_apply, smul_eq_mul, map_sum, Pi.single_apply, mul_ite,
+      _root_.mul_one, mul_zero] at h2
       rw [apply_ite (algebraMap O C), map_zero] at h2
       rw [← h2]
       exact Finset.sum_congr rfl fun l _ => by rw [map_mul, mul_comm]
     simp only [Matrix.mulVec, dotProduct, Matrix.of_apply, Finset.mul_sum]
     rw [Finset.sum_comm]
-    have h3
-        : ∀ j,
-          ∑ l, algebraMap O C (φ l (τ, i)) *
-              (w j / algebraMap O C (d * D) * algebraMap O C (r j l))
-            = if i = j then w j else 0 := by
+    have h3 : ∀ j, ∑ l, algebraMap O C (φ l (τ, i)) *
+        (w j / algebraMap O C (d * D) * algebraMap O C (r j l)) =
+        if i = j then w j else 0 := by
       intro j
       simp only [mul_left_comm _ (w j / _), ← Finset.mul_sum, h1]
       split_ifs
@@ -369,22 +357,17 @@ theorem lattice_ineq_integers
       · exact mul_zero _
     simp only [h3]
     simp
-  · have key
-        : ∀ c₀ : Fin n × Fin h → O,
-          (fun y : Fin n × Fin s =>
-              ∑ l, algebraMap O C (φ l (y.1, y.2)) *
-                (F.B *ᵥ fun q => algebraMap O C (c₀ q)) (y.1, l))
-            = fun j =>
-              algebraMap O C
-                ((∑ q : Fin n × Fin h, c₀ q •
-                   fun y : Fin n × Fin s => a y.1 ^ (q.1 : ℕ) * φ q.2 y)
-                  j) := by
+  · have key : ∀ c₀ : Fin n × Fin h → O, (fun y : Fin n × Fin s =>
+        ∑ l, algebraMap O C (φ l (y.1, y.2)) *
+          (F.B *ᵥ fun q => algebraMap O C (c₀ q)) (y.1, l)) =
+        fun j => algebraMap O C ((∑ q : Fin n × Fin h, c₀ q •
+          fun y : Fin n × Fin s => a y.1 ^ (q.1 : ℕ) * φ q.2 y) j) := by
       intro c₀
       funext y
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [F, freeMat, Matrix.mulVec, dotProduct, Matrix.of_apply, Fintype.sum_prod_type,
-          Finset.sum_apply, Pi.smul_apply, smul_eq_mul, map_sum, map_mul, map_pow, ite_mul,
-          zero_mul, Finset.sum_ite_eq, Finset.mem_univ, if_true, Finset.mul_sum]
+
+      simp only [F, freeMat, Matrix.mulVec, dotProduct, Matrix.of_apply, Fintype.sum_prod_type,
+      Finset.sum_apply, Pi.smul_apply, smul_eq_mul, map_sum, map_mul, map_pow, ite_mul, zero_mul,
+      Finset.sum_ite_eq, Finset.mem_univ, if_true, Finset.mul_sum]
       rw [Finset.sum_comm]
       exact Finset.sum_congr rfl fun _ _ => Finset.sum_congr rfl fun _ _ => by ring
     ext x

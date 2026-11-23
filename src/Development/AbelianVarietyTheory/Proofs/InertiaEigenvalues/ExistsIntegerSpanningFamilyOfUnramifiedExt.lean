@@ -1,8 +1,53 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.OverExtAlgebraMap
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.MemRangeOfValNonneg
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -14,35 +59,32 @@ open GlobalTheory.UnitLemma IsDedekindDomain IsLocalRing
 
 variable {K K' : UQ} {d : ℕ} {φ : K.E →+* K'.E}
 
-theorem valuation_map_eq_of_unr (hU : IsUnrExt K K' d φ) (x : K.E)
-    : (IsDiscreteValuationRing.maximalIdeal K'.O).valuation K'.E (φ x)
-      = (IsDiscreteValuationRing.maximalIdeal K.O).valuation K.E x := by
+theorem valuation_map_eq_of_unr (hU : IsUnrExt K K' d φ) (x : K.E) :
+    (IsDiscreteValuationRing.maximalIdeal K'.O).valuation K'.E (φ x) =
+      (IsDiscreteValuationRing.maximalIdeal K.O).valuation K.E x := by
   by_cases hx : x = 0
   · simp [hx]
   have h := hU.2.2.1 x
   unfold val at h
   have h0 : (IsDiscreteValuationRing.maximalIdeal K.O).valuation K.E x ≠ 0 := by simpa using hx
-  have h0' : (IsDiscreteValuationRing.maximalIdeal K'.O).valuation K'.E (φ x) ≠ 0 := by
-    simpa using hx
+  have h0' : (IsDiscreteValuationRing.maximalIdeal K'.O).valuation K'.E (φ x) ≠ 0 := by simpa using hx
   rw [← WithZero.exp_log h0, ← WithZero.exp_log h0']
   congr 1
   omega
 
-theorem exists_intMap_of_unr (hU : IsUnrExt K K' d φ)
-    : ∃ ψ : K.O →+* K'.O, ∀ a, algebraMap K'.O K'.E (ψ a) = φ (algebraMap K.O K.E a) := by
+theorem exists_intMap_of_unr (hU : IsUnrExt K K' d φ) :
+    ∃ ψ : K.O →+* K'.O, ∀ a, algebraMap K'.O K'.E (ψ a) = φ (algebraMap K.O K.E a) := by
   choose f hf using exists_int_image hU
   have inj := IsFractionRing.injective K'.O K'.E
-  let ψ : K.O →+* K'.O := {
-    toFun := f
-    map_one' := inj (by simp only [hf, map_one])
-    map_mul' := fun a b => inj (by simp only [hf, map_mul])
-    map_zero' := inj (by simp only [hf, map_zero])
-    map_add' := fun a b => inj (by simp only [hf, map_add (f := _)])
-  }
+  let ψ : K.O →+* K'.O :=
+    { toFun := f, map_one' := inj (by simp only [hf, map_one]),
+      map_mul' := fun a b => inj (by simp only [hf, map_mul]),
+      map_zero' := inj (by simp only [hf, map_zero]),
+      map_add' := fun a b => inj (by simp only [hf, map_add (f := _)]) }
   exact ⟨ψ, hf⟩
 
-theorem exists_int_basis_of_unr (K K' : UQ) (d : ℕ) (φ : K.E →+* K'.E) (hU : IsUnrExt K K' d φ)
-    : ∃ u : Fin d → K'.O, ∀ y : K'.O, ∃ a : Fin d → K.O,
+theorem exists_int_basis_of_unr (K K' : UQ) (d : ℕ) (φ : K.E →+* K'.E) (hU : IsUnrExt K K' d φ) :
+    ∃ u : Fin d → K'.O, ∀ y : K'.O, ∃ a : Fin d → K.O,
       algebraMap K'.O K'.E y = ∑ i, φ (algebraMap K.O K.E (a i)) * algebraMap K'.O K'.E (u i) := by
   classical
   obtain ⟨ψ, hψ⟩ := exists_intMap_of_unr hU
@@ -69,7 +111,8 @@ theorem exists_int_basis_of_unr (K K' : UQ) (d : ℕ) (φ : K.E →+* K'.E) (hU 
       rw [← Nat.card_eq_fintype_card]; exact K.card_res
     have c2 : Fintype.card (ResidueField K'.O) = (K.q ^ 2) ^ d := by
       rw [← Nat.card_eq_fintype_card, K'.card_res, hU.1, ← pow_mul, ← pow_mul, mul_comm]
-    have h2 : 2 ≤ K.q ^ 2 := by rw [← c1]; exact Fintype.one_lt_card
+    have h2 : 2 ≤ K.q ^ 2 := by
+      rw [← c1]; exact Fintype.one_lt_card
     rw [c1, c2] at h1
     exact (Nat.pow_right_injective h2 h1).symm
   let b := Module.finBasisOfFinrankEq (ResidueField K.O) (ResidueField K'.O) hfr
@@ -78,8 +121,8 @@ theorem exists_int_basis_of_unr (K K' : UQ) (d : ℕ) (φ : K.E →+* K'.E) (hU 
   have hres : ∀ c : Fin d → K.O, ∀ j, c j = 1 → ∑ i, ψ (c i) * u i ∉ maximalIdeal K'.O := by
     intro c j hj hmem
     have h0 : residue K'.O (∑ i, ψ (c i) * u i) = 0 := (IsLocalRing.residue_eq_zero_iff _).2 hmem
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum] at h0
+
+    rw [map_sum] at h0
     simp only [map_mul, ← ResidueField.map_residue, hu] at h0
     have h1 : ∑ i, residue K.O (c i) • b i = 0 := by
       simpa only [Algebra.smul_def, RingHom.algebraMap_toAlgebra] using h0
@@ -89,9 +132,8 @@ theorem exists_int_basis_of_unr (K K' : UQ) (d : ℕ) (φ : K.E →+* K'.E) (hU 
 
   set U : Fin d → K'.E := fun i => algebraMap K'.O K'.E (u i) with hUdef
 
-  have key
-      : ∀ e : Fin d → K.E, ∀ j,
-        (∀ i, v (e i) ≤ v (e j)) → e j ≠ 0 → v (e j) ≤ v' (∑ i, φ (e i) * U i) := by
+  have key : ∀ e : Fin d → K.E, ∀ j, (∀ i, v (e i) ≤ v (e j)) → e j ≠ 0 →
+      v (e j) ≤ v' (∑ i, φ (e i) * U i) := by
     intro e j hmax hj
     have hpos : 0 < v (e j) := zero_lt_iff.2 (by simpa using hj)
     have hc : ∀ i, ∃ a : K.O, algebraMap K.O K.E a = e i / e j := fun i =>
@@ -102,7 +144,7 @@ theorem exists_int_basis_of_unr (K K' : UQ) (d : ℕ) (φ : K.E →+* K'.E) (hU 
     have h1 := hres a j haj
     rw [memK', not_lt] at h1
     have h2 : algebraMap K'.O K'.E (∑ i, ψ (a i) * u i) = ∑ i, φ (e i / e j) * U i := by
-      set_option synthInstance.maxHeartbeats 100000 in
+
       simp only [map_sum, map_mul, hψ, ha, hUdef]
     have h3 : ∑ i, φ (e i) * U i = φ (e j) * ∑ i, φ (e i / e j) * U i := by
       rw [Finset.mul_sum]
@@ -117,8 +159,7 @@ theorem exists_int_basis_of_unr (K K' : UQ) (d : ℕ) (φ : K.E →+* K'.E) (hU 
     rw [Fintype.linearIndependent_iff]
     intro g hg i
     by_contra hi
-    obtain ⟨j, -, hj⟩ :=
-      Finset.exists_max_image Finset.univ (fun i => v (g i)) ⟨i, Finset.mem_univ i⟩
+    obtain ⟨j, -, hj⟩ := Finset.exists_max_image Finset.univ (fun i => v (g i)) ⟨i, Finset.mem_univ i⟩
     have hgi : 0 < v (g i) := zero_lt_iff.2 (by simpa using hi)
     have hgj : g j ≠ 0 := by
       intro h0
@@ -141,8 +182,7 @@ theorem exists_int_basis_of_unr (K K' : UQ) (d : ℕ) (φ : K.E →+* K'.E) (hU 
     intro i
     by_contra hi
     rw [not_le] at hi
-    obtain ⟨j, -, hj⟩ :=
-      Finset.exists_max_image Finset.univ (fun i => v (e i)) ⟨i, Finset.mem_univ i⟩
+    obtain ⟨j, -, hj⟩ := Finset.exists_max_image Finset.univ (fun i => v (e i)) ⟨i, Finset.mem_univ i⟩
     have hej : e j ≠ 0 := by
       intro h0
       have := hj i (Finset.mem_univ i)
@@ -151,10 +191,8 @@ theorem exists_int_basis_of_unr (K K' : UQ) (d : ℕ) (φ : K.E →+* K'.E) (hU 
     have h1 := key e j (fun i => hj i (Finset.mem_univ i)) hej
     simp only [← hsmul] at h1
     rw [he] at h1
-    have h2 :=
-      HeightOneSpectrum.valuation_le_one (IsDiscreteValuationRing.maximalIdeal K'.O) (K := K'.E) y
-    exact absurd (lt_of_lt_of_le hi (le_trans (hj i (Finset.mem_univ i)) (le_trans h1 h2)))
-      (lt_irrefl _)
+    have h2 := HeightOneSpectrum.valuation_le_one (IsDiscreteValuationRing.maximalIdeal K'.O) (K := K'.E) y
+    exact absurd (lt_of_lt_of_le hi (le_trans (hj i (Finset.mem_univ i)) (le_trans h1 h2))) (lt_irrefl _)
   choose a ha using fun i => IsDiscreteValuationRing.exists_lift_of_le_one (hint i)
   refine ⟨a, ?_⟩
   rw [← he]

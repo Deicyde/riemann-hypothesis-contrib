@@ -1,6 +1,62 @@
 module
 
+public import Mathlib.RingTheory.Support
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArithmeticIntersection.LocalLengthAdditivityTorsionFree
+public import Mathlib.Algebra.Module.LocalizedModule.Exact
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.Order.CompletePartialOrder
+import Mathlib.RingTheory.Coalgebra.IsFrobenius
+import Mathlib.RingTheory.HopfAlgebra.Basic
+public import Mathlib.RingTheory.Ideal.AssociatedPrime.Finiteness
+public import Mathlib.RingTheory.KrullDimension.Field
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArithmeticIntersection.LengthEqRangeAddRange
+import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
@@ -15,8 +71,8 @@ section Noeth
 
 variable {A : Type u} [CommRing A] [IsNoetherianRing A]
 
-theorem length_quot_prime_ne_top_iff (q : Ideal A) [q.IsPrime]
-    : length A (A ⧸ q) ≠ ⊤ ↔ q.IsMaximal := by
+theorem length_quot_prime_ne_top_iff (q : Ideal A) [q.IsPrime] :
+    length A (A ⧸ q) ≠ ⊤ ↔ q.IsMaximal := by
   constructor
   · intro h
     haveI : IsArtinian A (A ⧸ q) :=
@@ -30,23 +86,16 @@ theorem length_quot_prime_ne_top_iff (q : Ideal A) [q.IsPrime]
     apply mul_left_cancel₀ hxn
     rw [mul_one, ← mul_assoc, ← pow_succ]
     first
-    | simpa [Algebra.smul_def, Ideal.Quotient.algebraMap_eq] using hy
-    | (
-        rw [Algebra.smul_def, Algebra.smul_def, Ideal.Quotient.algebraMap_eq, map_pow, map_pow,
-            mul_one]
-          at hy
-        exact hy
-      )
+      | simpa [Algebra.smul_def, Ideal.Quotient.algebraMap_eq] using hy
   · intro hq
     have hs : IsSimpleModule A (A ⧸ q) := isSimpleModule_iff_isCoatom.2 hq.out
     rw [Module.length_eq_one_iff.2 hs]
     first | exact ENat.one_ne_top | simp | decide
 
-theorem length_ne_top_iff_support (N : Type v) [AddCommGroup N] [Module A N] [Module.Finite A N]
-    : length A N ≠ ⊤ ↔ ∀ p ∈ support A N, p.asIdeal.IsMaximal := by
+theorem length_ne_top_iff_support (N : Type v) [AddCommGroup N] [Module A N] [Module.Finite A N] :
+    length A N ≠ ⊤ ↔ ∀ p ∈ support A N, p.asIdeal.IsMaximal := by
   refine IsNoetherianRing.induction_on_isQuotientEquivQuotientPrime (A := A) ‹_›
-    (motive := fun N _ _ _ => length A N ≠ ⊤ ↔ ∀ p ∈ support A N, p.asIdeal.IsMaximal)
-    ?_ ?_ ?_
+    (motive := fun N _ _ _ => length A N ≠ ⊤ ↔ ∀ p ∈ support A N, p.asIdeal.IsMaximal) ?_ ?_ ?_
   · intro N _ _ _ _
     simp [Module.length_eq_zero, Module.support_eq_empty]
   · intro N _ _ _ q e
@@ -64,8 +113,7 @@ theorem length_ne_top_iff_support (N : Type v) [AddCommGroup N] [Module A N] [Mo
   · intro N₁ _ _ _ N₂ _ _ _ N₃ _ _ _ f g hf hg hex h1 h3
     rw [Module.length_eq_add_of_exact f g hf hg hex, Module.support_of_exact hex hf hg]
     rw [show length A N₁ + length A N₃ ≠ ⊤ ↔ length A N₁ ≠ ⊤ ∧ length A N₃ ≠ ⊤ from
-        WithTop.add_ne_top,
-      h1, h3]
+      WithTop.add_ne_top, h1, h3]
     simp only [Set.mem_union]
     constructor
     · rintro ⟨a, b⟩ p (hp | hp)
@@ -73,14 +121,14 @@ theorem length_ne_top_iff_support (N : Type v) [AddCommGroup N] [Module A N] [Mo
     · intro h
       exact ⟨fun p hp => h p (Or.inl hp), fun p hp => h p (Or.inr hp)⟩
 
-theorem range_lsmul_eq (N : Type v) [AddCommGroup N] [Module A N] (x : A)
-    : LinearMap.range (LinearMap.lsmul A N x) = x • (⊤ : Submodule A N) := by
+theorem range_lsmul_eq (N : Type v) [AddCommGroup N] [Module A N] (x : A) :
+    LinearMap.range (LinearMap.lsmul A N x) = x • (⊤ : Submodule A N) := by
   ext m
   simp only [LinearMap.mem_range, LinearMap.lsmul_apply, Submodule.mem_smul_pointwise_iff_exists,
     Submodule.mem_top, true_and]
 
-theorem support_coker (N : Type v) [AddCommGroup N] [Module A N] [Module.Finite A N] (x : A)
-    : support A (N ⧸ LinearMap.range (LinearMap.lsmul A N x)) = support A N ∩ zeroLocus {x} := by
+theorem support_coker (N : Type v) [AddCommGroup N] [Module A N] [Module.Finite A N] (x : A) :
+    support A (N ⧸ LinearMap.range (LinearMap.lsmul A N x)) = support A N ∩ zeroLocus {x} := by
   rw [← Module.support_quotSMulTop]
   exact (Submodule.quotEquivOfEq _ _ (range_lsmul_eq N x)).support_eq
 
@@ -93,40 +141,30 @@ variable {A : Type u} [CommRing A]
 noncomputable def locLen (N : Type v) [AddCommGroup N] [Module A N] (p : PrimeSpectrum A) : ℕ∞ :=
   length (Localization.AtPrime p.asIdeal) (LocalizedModule p.asIdeal.primeCompl N)
 
-theorem locLen_add
-    {N₁ N₂ N₃ : Type v}
-    [AddCommGroup N₁] [Module A N₁] [AddCommGroup N₂] [Module A N₂] [AddCommGroup N₃] [Module A N₃]
-    (f : N₁ →ₗ[A] N₂) (g : N₂ →ₗ[A] N₃)
+theorem locLen_add {N₁ N₂ N₃ : Type v} [AddCommGroup N₁] [Module A N₁] [AddCommGroup N₂]
+    [Module A N₂] [AddCommGroup N₃] [Module A N₃] (f : N₁ →ₗ[A] N₂) (g : N₂ →ₗ[A] N₃)
     (hf : Function.Injective f) (hg : Function.Surjective g) (hex : Function.Exact f g)
-    (p : PrimeSpectrum A)
-    : locLen N₂ p = locLen N₁ p + locLen N₃ p := by
+    (p : PrimeSpectrum A) : locLen N₂ p = locLen N₁ p + locLen N₃ p := by
   unfold locLen
   refine Module.length_eq_add_of_exact (LocalizedModule.map p.asIdeal.primeCompl f)
     (LocalizedModule.map p.asIdeal.primeCompl g) ?_ ?_ ?_
   · first
-    | exact LocalizedModule.map_injective _ _ hf
-    | exact LocalizedModule.map_injective _ f hf
-    | exact LocalizedModule.map_injective hf
+      | exact LocalizedModule.map_injective _ _ hf
   · first
-    | exact LocalizedModule.map_surjective _ _ hg
-    | exact LocalizedModule.map_surjective _ g hg
-    | exact LocalizedModule.map_surjective hg
+      | exact LocalizedModule.map_surjective _ _ hg
   · first
-    | exact LocalizedModule.map_exact _ _ _ hex
-    | exact LocalizedModule.map_exact _ f g hex
-    | exact LocalizedModule.map_exact hex
+      | exact LocalizedModule.map_exact _ _ _ hex
 
-theorem locLen_eq_zero_of_notMem
-    {N : Type v} [AddCommGroup N] [Module A N] (p : PrimeSpectrum A) (hp : p ∉ support A N)
-    : locLen N p = 0 := by
+theorem locLen_eq_zero_of_notMem {N : Type v} [AddCommGroup N] [Module A N] (p : PrimeSpectrum A)
+    (hp : p ∉ support A N) : locLen N p = 0 := by
   unfold locLen
   have hs : Subsingleton (LocalizedModule p.asIdeal.primeCompl N) := by
-    first | exact Module.notMem_support_iff.1 hp | exact Module.not_mem_support_iff.1 hp
+    first
+      | exact Module.notMem_support_iff.1 hp
   exact Module.length_eq_zero_iff.2 hs
 
-theorem locLen_self
-    {N : Type v} [AddCommGroup N] [Module A N] (q : PrimeSpectrum A) (e : N ≃ₗ[A] A ⧸ q.asIdeal)
-    : locLen N q = 1 := by
+theorem locLen_self {N : Type v} [AddCommGroup N] [Module A N] (q : PrimeSpectrum A)
+    (e : N ≃ₗ[A] A ⧸ q.asIdeal) : locLen N q = 1 := by
   have key : ∀ (n : N) (s : q.asIdeal.primeCompl), LocalizedModule.mk n s = 0 → n = 0 := by
     intro n s h
     rw [← LocalizedModule.zero_mk 1, LocalizedModule.mk_eq] at h
@@ -137,8 +175,7 @@ theorem locLen_self
     rcases h2 with h2 | h2
     · exact absurd (Ideal.Quotient.eq_zero_iff_mem.mp h2) u.2
     · simpa using h2
-  have : IsSimpleModule (Localization.AtPrime q.asIdeal)
-      (LocalizedModule q.asIdeal.primeCompl N) := by
+  have : IsSimpleModule (Localization.AtPrime q.asIdeal) (LocalizedModule q.asIdeal.primeCompl N) := by
     rw [isSimpleModule_iff_toSpanSingleton_surjective]
     refine ⟨⟨LocalizedModule.mk (e.symm 1) 1, 0, fun h => ?_⟩, ?_⟩
     · have := congrArg e (key _ _ h)
@@ -146,22 +183,21 @@ theorem locLen_self
     · intro y hy z
       induction y using LocalizedModule.induction_on with
       | h n s =>
-        induction z using LocalizedModule.induction_on with
-        | h n' t =>
-          obtain ⟨a, ha⟩ := Ideal.Quotient.mk_surjective (e n)
-          obtain ⟨b, hb⟩ := Ideal.Quotient.mk_surjective (e n')
-          have haq : a ∉ q.asIdeal := by
-            intro h
-            apply hy
-            have : n = 0 :=
-              e.injective (by rw [← ha, map_zero]; exact Ideal.Quotient.eq_zero_iff_mem.mpr h)
-            rw [this, LocalizedModule.zero_mk]
-          refine ⟨Localization.mk (b * s) ⟨a * t, q.asIdeal.primeCompl.mul_mem haq t.2⟩, ?_⟩
-          rw [LinearMap.toSpanSingleton_apply, LocalizedModule.mk_smul_mk, LocalizedModule.mk_eq]
-          refine ⟨1, e.injective ?_⟩
-          simp only [one_smul, map_smul, Submonoid.smul_def, Submonoid.coe_mul, ← ha, ← hb,
-            Algebra.smul_def, Ideal.Quotient.algebraMap_eq, map_mul]
-          ring
+      induction z using LocalizedModule.induction_on with
+      | h n' t =>
+      obtain ⟨a, ha⟩ := Ideal.Quotient.mk_surjective (e n)
+      obtain ⟨b, hb⟩ := Ideal.Quotient.mk_surjective (e n')
+      have haq : a ∉ q.asIdeal := by
+        intro h
+        apply hy
+        have : n = 0 := e.injective (by rw [← ha, map_zero]; exact Ideal.Quotient.eq_zero_iff_mem.mpr h)
+        rw [this, LocalizedModule.zero_mk]
+      refine ⟨Localization.mk (b * s) ⟨a * t, q.asIdeal.primeCompl.mul_mem haq t.2⟩, ?_⟩
+      rw [LinearMap.toSpanSingleton_apply, LocalizedModule.mk_smul_mk, LocalizedModule.mk_eq]
+      refine ⟨1, e.injective ?_⟩
+      simp only [one_smul, map_smul, Submonoid.smul_def, Submonoid.coe_mul, ← ha, ← hb,
+        Algebra.smul_def, Ideal.Quotient.algebraMap_eq, map_mul]
+      ring
   exact Module.length_eq_one _ _
 
 end Loc
@@ -185,8 +221,8 @@ theorem withBot_eq_one {d : WithBot ℕ∞} (h1 : d ≤ 1) (h0 : ¬ d ≤ 0) : d
       subst hn
       first | rfl | norm_cast | simp
 
-theorem dim_quot_eq_one_iff (hdim : ringKrullDim A = 1) (q : Ideal A) [q.IsPrime]
-    : ringKrullDim (A ⧸ q) = 1 ↔ ¬q.IsMaximal := by
+theorem dim_quot_eq_one_iff (hdim : ringKrullDim A = 1) (q : Ideal A) [q.IsPrime] :
+    ringKrullDim (A ⧸ q) = 1 ↔ ¬ q.IsMaximal := by
   constructor
   · intro h hq
     haveI := hq
@@ -196,9 +232,8 @@ theorem dim_quot_eq_one_iff (hdim : ringKrullDim A = 1) (q : Ideal A) [q.IsPrime
     first | exact zero_ne_one h | simp at h | exact absurd h (by decide)
   · intro hq
     apply withBot_eq_one
-    · calc
-        ringKrullDim (A ⧸ q) ≤ ringKrullDim A :=
-          ringKrullDim_le_of_surjective (Ideal.Quotient.mk q) Ideal.Quotient.mk_surjective
+    · calc ringKrullDim (A ⧸ q) ≤ ringKrullDim A :=
+            ringKrullDim_le_of_surjective (Ideal.Quotient.mk q) Ideal.Quotient.mk_surjective
         _ = 1 := hdim
     · intro hle
       have hbot : (IsLocalRing.maximalIdeal A).map (Ideal.Quotient.mk q) ≠ ⊥ := by
@@ -214,58 +249,47 @@ theorem dim_quot_eq_one_iff (hdim : ringKrullDim A = 1) (q : Ideal A) [q.IsPrime
           (by rw [Ideal.mk_ker]; exact IsLocalRing.le_maximalIdeal (Ideal.IsPrime.ne_top ‹_›))
       let P0 : PrimeSpectrum (A ⧸ q) := ⟨⊥, Ideal.isPrime_bot⟩
       let P1 : PrimeSpectrum (A ⧸ q) := ⟨_, hprime⟩
-      have hlt : P0 < P1 :=
-        lt_of_le_of_ne (show P0 ≤ P1 from bot_le)
-          (fun h => hbot (congrArg PrimeSpectrum.asIdeal h).symm)
-      let s : LTSeries (PrimeSpectrum (A ⧸ q)) := {
-        length := 1
-        toFun := ![P0, P1]
-        step := fun i => by
-          fin_cases i
-          first | exact hlt | simpa using hlt
-      }
+      have hlt : P0 < P1 := lt_of_le_of_ne (show P0 ≤ P1 from bot_le)
+        (fun h => hbot (congrArg PrimeSpectrum.asIdeal h).symm)
+      let s : LTSeries (PrimeSpectrum (A ⧸ q)) :=
+        { length := 1
+          toFun := ![P0, P1]
+          step := fun i => by
+            fin_cases i
+            first | exact hlt | simpa using hlt }
       have hs : (s.length : WithBot ℕ∞) ≤ Order.krullDim (PrimeSpectrum (A ⧸ q)) := by
         first
-        | exact Order.LTSeries.length_le_krullDim s
-        | exact LTSeries.length_le_krullDim s
-        | exact Order.length_le_krullDim s
+          | exact Order.LTSeries.length_le_krullDim s
       have hk : (s.length : WithBot ℕ∞) ≤ 0 := hs.trans hle
       have hlen : s.length = 1 := rfl
       rw [hlen] at hk
       have h1 : (1 : ℕ) ≤ 0 := by exact_mod_cast hk
       omega
 
-theorem eq_of_not_max_of_le
-    (hdim : ringKrullDim A = 1)
-    {p q : Ideal A} [p.IsPrime] [q.IsPrime]
-    (hp : ¬p.IsMaximal) (hqp : q ≤ p)
-    : p = q := by
+theorem eq_of_not_max_of_le (hdim : ringKrullDim A = 1) {p q : Ideal A} [p.IsPrime] [q.IsPrime]
+    (hp : ¬ p.IsMaximal) (hqp : q ≤ p) : p = q := by
   by_contra hne
   let P : PrimeSpectrum A := ⟨p, inferInstance⟩
   let Q : PrimeSpectrum A := ⟨q, inferInstance⟩
   let M : PrimeSpectrum A := IsLocalRing.closedPoint A
-  have hQP : Q < P :=
-    lt_of_le_of_ne (show Q ≤ P from hqp) (fun h => hne (congrArg PrimeSpectrum.asIdeal h).symm)
-  have hPM : P < M :=
-    lt_of_le_of_ne (show P ≤ M from IsLocalRing.le_maximalIdeal (Ideal.IsPrime.ne_top ‹_›))
-      (fun h =>
-        hp (by
-          have h' : p = IsLocalRing.maximalIdeal A := congrArg PrimeSpectrum.asIdeal h
-          rw [h']
-          exact IsLocalRing.maximalIdeal.isMaximal A))
-  let s : LTSeries (PrimeSpectrum A) := {
-    length := 2
-    toFun := ![Q, P, M]
-    step := fun i => by
-      fin_cases i
-      · first | exact hQP | simpa using hQP
-      · first | exact hPM | simpa using hPM
-  }
+  have hQP : Q < P := lt_of_le_of_ne (show Q ≤ P from hqp)
+    (fun h => hne (congrArg PrimeSpectrum.asIdeal h).symm)
+  have hPM : P < M := lt_of_le_of_ne
+    (show P ≤ M from IsLocalRing.le_maximalIdeal (Ideal.IsPrime.ne_top ‹_›))
+    (fun h => hp (by
+      have h' : p = IsLocalRing.maximalIdeal A := congrArg PrimeSpectrum.asIdeal h
+      rw [h']
+      exact IsLocalRing.maximalIdeal.isMaximal A))
+  let s : LTSeries (PrimeSpectrum A) :=
+    { length := 2
+      toFun := ![Q, P, M]
+      step := fun i => by
+        fin_cases i
+        · first | exact hQP | simpa using hQP
+        · first | exact hPM | simpa using hPM }
   have hs : (s.length : WithBot ℕ∞) ≤ Order.krullDim (PrimeSpectrum A) := by
     first
-    | exact Order.LTSeries.length_le_krullDim s
-    | exact LTSeries.length_le_krullDim s
-    | exact Order.length_le_krullDim s
+      | exact Order.LTSeries.length_le_krullDim s
   have hlen : s.length = 2 := by
     first | rfl | simp [s, RelSeries.snoc_length, RelSeries.singleton_length]
   have hk : Order.krullDim (PrimeSpectrum A) = 1 := hdim
@@ -273,21 +297,21 @@ theorem eq_of_not_max_of_le
   have h2 : (2 : ℕ) ≤ 1 := by exact_mod_cast hs
   omega
 
-theorem finite_dimOne (hdim : ringKrullDim A = 1)
-    : {p : PrimeSpectrum A | ringKrullDim (A ⧸ p.asIdeal) = 1}.Finite := by
+theorem finite_dimOne (hdim : ringKrullDim A = 1) :
+    {p : PrimeSpectrum A | ringKrullDim (A ⧸ p.asIdeal) = 1}.Finite := by
   have hfin : (minimalPrimes A).Finite := minimalPrimes.finite_of_isNoetherianRing A
   refine (Set.Finite.preimage (fun a _ b _ h => PrimeSpectrum.ext h) hfin).subset ?_
   intro p hp
-  have hp' : ¬p.asIdeal.IsMaximal := (dim_quot_eq_one_iff hdim p.asIdeal).1 hp
+  have hp' : ¬ p.asIdeal.IsMaximal := (dim_quot_eq_one_iff hdim p.asIdeal).1 hp
   show p.asIdeal ∈ minimalPrimes A
   simp only [minimalPrimes, Ideal.minimalPrimes, Set.mem_setOf_eq]
   refine ⟨⟨p.isPrime, bot_le⟩, fun q hq hqp => ?_⟩
   haveI := hq.1
   exact (eq_of_not_max_of_le hdim hp' hqp).le
 
-theorem finsum_dimOne_eq (hdim : ringKrullDim A = 1) (F : PrimeSpectrum A → ℕ∞)
-    : ∑ᶠ (p : PrimeSpectrum A) (_ : ringKrullDim (A ⧸ p.asIdeal) = 1), F p
-      = ∑ p ∈ (finite_dimOne hdim).toFinset, F p := by
+theorem finsum_dimOne_eq (hdim : ringKrullDim A = 1) (F : PrimeSpectrum A → ℕ∞) :
+    ∑ᶠ (p : PrimeSpectrum A) (_ : ringKrullDim (A ⧸ p.asIdeal) = 1), F p =
+      ∑ p ∈ (finite_dimOne hdim).toFinset, F p := by
   exact finsum_mem_eq_finite_toFinset_sum F (finite_dimOne hdim)
 
 end Local
@@ -296,17 +320,15 @@ section Main
 
 variable {A : Type u} [CommRing A] [IsNoetherianRing A] [IsLocalRing A]
 
-theorem support_of_equiv
-    {N : Type v} [AddCommGroup N] [Module A N] (q : PrimeSpectrum A) (e : N ≃ₗ[A] A ⧸ q.asIdeal)
-    : support A N = zeroLocus (q.asIdeal : Set A) := by
+theorem support_of_equiv {N : Type v} [AddCommGroup N] [Module A N] (q : PrimeSpectrum A)
+    (e : N ≃ₗ[A] A ⧸ q.asIdeal) : support A N = zeroLocus (q.asIdeal : Set A) := by
   haveI : Module.Finite A N := Module.Finite.equiv e.symm
   rw [Module.support_eq_zeroLocus, e.annihilator_eq, Ideal.annihilator_quotient]
 
-theorem length_coker_equiv
-    {N N' : Type*} [AddCommGroup N] [Module A N] [AddCommGroup N'] [Module A N']
-    (e : N ≃ₗ[A] N') (x : A)
-    : length A (N ⧸ LinearMap.range (LinearMap.lsmul A N x))
-      = length A (N' ⧸ LinearMap.range (LinearMap.lsmul A N' x)) := by
+theorem length_coker_equiv {N N' : Type*} [AddCommGroup N] [Module A N] [AddCommGroup N']
+    [Module A N'] (e : N ≃ₗ[A] N') (x : A) :
+    length A (N ⧸ LinearMap.range (LinearMap.lsmul A N x)) =
+      length A (N' ⧸ LinearMap.range (LinearMap.lsmul A N' x)) := by
   refine (Submodule.Quotient.equiv _ _ e ?_).length_eq
   ext y
   simp only [Submodule.mem_map, LinearMap.mem_range, LinearMap.lsmul_apply]
@@ -316,12 +338,11 @@ theorem length_coker_equiv
   · rintro ⟨m, rfl⟩
     exact ⟨x • e.symm m, ⟨e.symm m, rfl⟩, by simp⟩
 
-theorem length_coker_quot (q : PrimeSpectrum A) (x : A)
-    : length A ((A ⧸ q.asIdeal) ⧸ LinearMap.range (LinearMap.lsmul A (A ⧸ q.asIdeal) x))
-      = ordMod q x := by
-  have hr
-      : LinearMap.range (LinearMap.lsmul A (A ⧸ q.asIdeal) x)
-        = (Ideal.span {Ideal.Quotient.mk q.asIdeal x}).restrictScalars A := by
+theorem length_coker_quot (q : PrimeSpectrum A) (x : A) :
+    length A ((A ⧸ q.asIdeal) ⧸ LinearMap.range (LinearMap.lsmul A (A ⧸ q.asIdeal) x)) =
+      ordMod q x := by
+  have hr : LinearMap.range (LinearMap.lsmul A (A ⧸ q.asIdeal) x) =
+      (Ideal.span {Ideal.Quotient.mk q.asIdeal x}).restrictScalars A := by
     ext y
     simp only [LinearMap.mem_range, LinearMap.lsmul_apply, Submodule.restrictScalars_mem,
       Ideal.mem_span_singleton']
@@ -335,11 +356,9 @@ theorem length_coker_quot (q : PrimeSpectrum A) (x : A)
     Module.length_eq_of_surjective (S := A) (R := A ⧸ q.asIdeal) Ideal.Quotient.mk_surjective]
   rfl
 
-theorem length_ker_quot_eq_zero
-    {N : Type v} [AddCommGroup N] [Module A N]
-    (q : PrimeSpectrum A) (e : N ≃ₗ[A] A ⧸ q.asIdeal)
-    {x : A} (hx : x ∉ q.asIdeal)
-    : length A (LinearMap.ker (LinearMap.lsmul A N x)) = 0 := by
+theorem length_ker_quot_eq_zero {N : Type v} [AddCommGroup N] [Module A N] (q : PrimeSpectrum A)
+    (e : N ≃ₗ[A] A ⧸ q.asIdeal) {x : A} (hx : x ∉ q.asIdeal) :
+    length A (LinearMap.ker (LinearMap.lsmul A N x)) = 0 := by
   have hsub : Subsingleton (LinearMap.ker (LinearMap.lsmul A N x)) := by
     refine ⟨fun a b => ?_⟩
     suffices h : ∀ c : LinearMap.ker (LinearMap.lsmul A N x), c = 0 by rw [h a, h b]
@@ -352,8 +371,8 @@ theorem length_ker_quot_eq_zero
     have h2 : e n = 0 := by
       obtain ⟨a, ha⟩ := Ideal.Quotient.mk_surjective (e n)
       rw [← ha] at h1 ⊢
-      rw [Algebra.smul_def, Ideal.Quotient.algebraMap_eq, ← map_mul, Ideal.Quotient.eq_zero_iff_mem]
-        at h1
+      rw [Algebra.smul_def, Ideal.Quotient.algebraMap_eq, ← map_mul,
+        Ideal.Quotient.eq_zero_iff_mem] at h1
       rw [Ideal.Quotient.eq_zero_iff_mem]
       exact (q.isPrime.mem_or_mem h1).resolve_left hx
     exact e.injective (by rw [h2, map_zero])
@@ -363,10 +382,9 @@ end Main
 
 section Final
 
-theorem enat_step
-    {k1 k3 c2 k2 c1 c3 s1 s3 : ℕ∞} (h1 : k1 ≠ ⊤) (h3 : k3 ≠ ⊤) (hc1 : c1 ≠ ⊤) (hc3 : c3 ≠ ⊤)
-    (hc2 : c2 ≠ ⊤) (e1 : c1 = k1 + s1) (e3 : c3 = k3 + s3) (eu : k1 + k3 + c2 = k2 + c1 + c3)
-    : k2 ≠ ⊤ ∧ c2 = k2 + (s1 + s3) := by
+theorem enat_step {k1 k3 c2 k2 c1 c3 s1 s3 : ℕ∞} (h1 : k1 ≠ ⊤) (h3 : k3 ≠ ⊤) (hc1 : c1 ≠ ⊤)
+    (hc3 : c3 ≠ ⊤) (hc2 : c2 ≠ ⊤) (e1 : c1 = k1 + s1) (e3 : c3 = k3 + s3)
+    (eu : k1 + k3 + c2 = k2 + c1 + c3) : k2 ≠ ⊤ ∧ c2 = k2 + (s1 + s3) := by
   have hs1 : s1 ≠ ⊤ := by
     rintro rfl
     rw [add_top] at e1
@@ -398,28 +416,24 @@ variable {A : Type u} [CommRing A] [IsNoetherianRing A] [IsLocalRing A]
 noncomputable def dimOneSum (N : Type v) [AddCommGroup N] [Module A N] (x : A) : ℕ∞ :=
   ∑ᶠ (p : PrimeSpectrum A) (_ : ringKrullDim (A ⧸ p.asIdeal) = 1), locLen N p * ordMod p x
 
-theorem length_coker_eq_ker_add_dimOneOrderSum
-    (hdim : ringKrullDim A = 1) (x : A)
-    (M : Type v) [AddCommGroup M] [Module A M] [Module.Finite A M]
-    : (∀ p ∈ support A M, x ∈ p.asIdeal → p.asIdeal.IsMaximal)
-      → length A (LinearMap.ker (LinearMap.lsmul A M x)) ≠ ⊤
-        ∧ length A (M ⧸ LinearMap.range (LinearMap.lsmul A M x))
-          = length A (LinearMap.ker (LinearMap.lsmul A M x)) + dimOneSum M x := by
-  have hc
-      : ∀ (N : Type v) [AddCommGroup N] [Module A N] [Module.Finite A N],
-        (∀ p ∈ support A N, x ∈ p.asIdeal → p.asIdeal.IsMaximal)
-          → length A (N ⧸ LinearMap.range (LinearMap.lsmul A N x)) ≠ ⊤ := by
+theorem length_coker_eq_ker_add_dimOneOrderSum (hdim : ringKrullDim A = 1) (x : A) (M : Type v) [AddCommGroup M] [Module A M]
+    [Module.Finite A M] :
+    (∀ p ∈ support A M, x ∈ p.asIdeal → p.asIdeal.IsMaximal) →
+      length A (LinearMap.ker (LinearMap.lsmul A M x)) ≠ ⊤ ∧
+      length A (M ⧸ LinearMap.range (LinearMap.lsmul A M x)) =
+        length A (LinearMap.ker (LinearMap.lsmul A M x)) + dimOneSum M x := by
+  have hc : ∀ (N : Type v) [AddCommGroup N] [Module A N] [Module.Finite A N],
+      (∀ p ∈ support A N, x ∈ p.asIdeal → p.asIdeal.IsMaximal) →
+      length A (N ⧸ LinearMap.range (LinearMap.lsmul A N x)) ≠ ⊤ := by
     intro N _ _ _ H
     rw [length_ne_top_iff_support, support_coker]
     rintro p ⟨hp, hx⟩
     exact H p hp (by simpa [mem_zeroLocus] using hx)
   refine IsNoetherianRing.induction_on_isQuotientEquivQuotientPrime (A := A) ‹_›
-    (motive := fun N _ _ _ =>
-      (∀ p ∈ support A N, x ∈ p.asIdeal → p.asIdeal.IsMaximal)
-        → length A (LinearMap.ker (LinearMap.lsmul A N x)) ≠ ⊤
-          ∧ length A (N ⧸ LinearMap.range (LinearMap.lsmul A N x))
-            = length A (LinearMap.ker (LinearMap.lsmul A N x)) + dimOneSum N x)
-    ?_ ?_ ?_
+    (motive := fun N _ _ _ => (∀ p ∈ support A N, x ∈ p.asIdeal → p.asIdeal.IsMaximal) →
+      length A (LinearMap.ker (LinearMap.lsmul A N x)) ≠ ⊤ ∧
+      length A (N ⧸ LinearMap.range (LinearMap.lsmul A N x)) =
+        length A (LinearMap.ker (LinearMap.lsmul A N x)) + dimOneSum N x) ?_ ?_ ?_
   · intro N _ _ _ _ _
     have h0 : dimOneSum N x = 0 := by
       rw [dimOneSum, finsum_dimOne_eq hdim]
@@ -439,10 +453,7 @@ theorem length_coker_eq_ker_add_dimOneOrderSum
         intro hp'
         rw [hsupp, mem_zeroLocus, SetLike.coe_subset_coe] at hp'
         exact hp (by rw [← hq.eq_of_le p.isPrime.ne_top hp']; exact hq)
-      refine ⟨
-        ne_top_of_le_ne_top hN (Module.length_le_of_injective _ (Submodule.injective_subtype _)),
-        ?_
-      ⟩
+      refine ⟨ne_top_of_le_ne_top hN (Module.length_le_of_injective _ (Submodule.injective_subtype _)), ?_⟩
       rw [euler_finLength hN x, h0, add_zero]
     · have hx : x ∉ q.asIdeal := fun hx => hq (H q (by rw [hsupp]; simp) hx)
       have hs : dimOneSum N x = ordMod q x := by
@@ -454,9 +465,7 @@ theorem length_coker_eq_ker_add_dimOneOrderSum
           rw [hsupp, mem_zeroLocus, SetLike.coe_subset_coe] at hp'
           exact hpq (PrimeSpectrum.ext (eq_of_not_max_of_le hdim hp hp'))
         · intro hq'
-          exact absurd
-            (by rw [Set.Finite.mem_toFinset, Set.mem_ofPred_eq, dim_quot_eq_one_iff hdim]; exact hq)
-            hq'
+          exact absurd (by rw [Set.Finite.mem_toFinset, Set.mem_ofPred_eq, dim_quot_eq_one_iff hdim]; exact hq) hq'
       rw [length_ker_quot_eq_zero q e hx, hs, length_coker_equiv e x, length_coker_quot, zero_add]
       exact ⟨by simp, rfl⟩
   · intro N₁ _ _ _ N₂ _ _ _ N₃ _ _ _ f g hf hg hex h1 h3 H
@@ -480,7 +489,7 @@ theorem dimOneFormula : LocalLengthAdditivity := by
   intro A _ _ _ M _ _ _ x hdim hfin
   have h := (length_ne_top_iff_support (M ⧸ LinearMap.range (LinearMap.lsmul A M x))).1 hfin
   rw [support_coker] at h
-  exact length_coker_eq_ker_add_dimOneOrderSum hdim x M
-    (fun p hp hx => h p ⟨hp, (PrimeSpectrum.mem_zeroLocus _ _).2 (Set.singleton_subset_iff.2 hx)⟩)
+  exact length_coker_eq_ker_add_dimOneOrderSum hdim x M (fun p hp hx =>
+    h p ⟨hp, (PrimeSpectrum.mem_zeroLocus _ _).2 (Set.singleton_subset_iff.2 hx)⟩)
 
 end ReciprocityTheory.ChartRestriction.G.AI

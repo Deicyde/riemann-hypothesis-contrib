@@ -1,6 +1,44 @@
 module
 
-public import Development.AbelianVarietyTheory.Definitions.Divisors.IsUnimodMod
+public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.SumMulEqZeroOfSumToReal
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Int
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Development.AbelianVarietyTheory.Definitions.Divisors.IsUnimodMod
 
 @[expose] public section
 
@@ -10,13 +48,11 @@ namespace GlobalTheory.Poinc
 
 section IntCone
 
-variable
-  {O : Type} [CommRing O]
-  {bar : O → O} {φ : InvFun O} {X : Type} [AddCommGroup X] [Module O X] [Module.Finite O X]
+variable {O : Type} [CommRing O] {bar : O → O} {φ : InvFun O} {X : Type} [AddCommGroup X] [Module O X]
+  [Module.Finite O X]
 
-theorem intCone_evalZ_sum
-    {n : ℕ} {β : Fin n → LinearMap.BilinForm ℤ X} (h : φ.LinearOn β) (a : Fin n → ℕ)
-    : φ.evalZ (∑ i, a i • β i) = ∑ i, (a i : ℝ) * φ.evalZ (β i) := by
+theorem intCone_evalZ_sum {n : ℕ} {β : Fin n → LinearMap.BilinForm ℤ X} (h : φ.LinearOn β) (a : Fin n → ℕ) :
+    φ.evalZ (∑ i, a i • β i) = ∑ i, (a i : ℝ) * φ.evalZ (β i) := by
   have := h (fun i => (a i : ℝ)) (fun i => Nat.cast_nonneg _)
   refine Eq.trans ?_ this
   unfold InvFun.evalZ
@@ -24,47 +60,36 @@ theorem intCone_evalZ_sum
   funext x y
   simp [LinearMap.sum_apply]
 
-theorem intCone_absorb
-    {n s : ℕ} {β : Fin n → LinearMap.BilinForm ℤ X}
-    (hβ : ∀ i, β i ∈ balForms bar X) (hβp : ∀ i y, 0 ≤ β i y y) (hβl : φ.LinearOn β)
-    {δ : Fin s → LinearMap.BilinForm ℤ X} (hδ : IsCone bar φ δ)
-    (a : Fin n → ℕ) (b : Fin s → ℕ) (h : ∑ i, a i • β i = ∑ l, b l • δ l)
-    (i : Fin n) (hi : 0 < a i)
-    : ∃ (k : ℕ) (e : Fin s → ℕ), 0 < k ∧ k • β i = ∑ l, e l • δ l := by
+theorem intCone_absorb {n s : ℕ} {β : Fin n → LinearMap.BilinForm ℤ X} (hβ : ∀ i, β i ∈ balForms bar X)
+    (hβp : ∀ i y, 0 ≤ β i y y) (hβl : φ.LinearOn β) {δ : Fin s → LinearMap.BilinForm ℤ X} (hδ : IsCone bar φ δ)
+    (a : Fin n → ℕ) (b : Fin s → ℕ) (h : ∑ i, a i • β i = ∑ l, b l • δ l) (i : Fin n) (hi : 0 < a i) :
+    ∃ (k : ℕ) (e : Fin s → ℕ), 0 < k ∧ k • β i = ∑ l, e l • δ l := by
   obtain ⟨N, ℓ, hN, h1, h2, h3⟩ := hδ.strict
   refine h3 (β i) (hβ i) (hβp i) ?_
   have hx1 : (ℓ (∑ i, a i • β i) : ℝ) = N * ∑ i, (a i : ℝ) * φ.evalZ (β i) := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← intCone_evalZ_sum hβl, h, intCone_evalZ_sum hδ.linear, map_sum, Int.cast_sum,
-        Finset.mul_sum]
+
+    rw [← intCone_evalZ_sum hβl, h, intCone_evalZ_sum hδ.linear, map_sum, Int.cast_sum, Finset.mul_sum]
     refine Finset.sum_congr rfl fun l _ => ?_
     rw [map_nsmul, nsmul_eq_mul, Int.cast_mul, Int.cast_natCast, h1]
     ring
   have hx2 : (ℓ (∑ i, a i • β i) : ℝ) = ∑ i, (a i : ℝ) * ℓ (β i) := by
-    set_option synthInstance.maxHeartbeats 100000 in
+
     simp [map_sum, map_nsmul]
   have hle : ∀ j, (a j : ℝ) * (N * φ.evalZ (β j)) ≤ (a j : ℝ) * ℓ (β j) := fun j =>
     mul_le_mul_of_nonneg_left (h2 _ (hβ j) (hβp j)) (Nat.cast_nonneg _)
   have hsum : ∑ j, ((a j : ℝ) * ℓ (β j) - (a j : ℝ) * (N * φ.evalZ (β j))) = 0 := by
     rw [Finset.sum_sub_distrib, ← hx2, hx1, Finset.mul_sum, sub_eq_zero]
     exact Finset.sum_congr rfl fun j _ => by ring
-  have ht :=
-    (Finset.sum_eq_zero_iff_of_nonneg (fun j _ => sub_nonneg.2 (hle j))).1 hsum i
-      (Finset.mem_univ _)
+  have ht := (Finset.sum_eq_zero_iff_of_nonneg (fun j _ => sub_nonneg.2 (hle j))).1 hsum i (Finset.mem_univ _)
   have hai : (a i : ℝ) ≠ 0 := by exact_mod_cast hi.ne'
   have h4 : (a i : ℝ) * (ℓ (β i) - N * φ.evalZ (β i)) = 0 := by rw [mul_sub]; exact ht
   have h5 := (mul_eq_zero.1 h4).resolve_left hai
   linarith
 
-theorem intCone_face
-    : ∀ (O : Type) [CommRing O] (bar : O → O) (φ : InvFun O) (X : Type) [AddCommGroup X]
-        [Module O X] [Module.Finite O X],
-      IsPolFanOn bar φ X
-        → ∀ (r r' : ℕ) (γ : Fin r → LinearMap.BilinForm ℤ X)
-            (γ' : Fin r' → LinearMap.BilinForm ℤ X),
-          IsCone bar φ γ → IsCone bar φ γ'
-            → ∀ (c : Fin r → ℕ) (c' : Fin r' → ℕ),
-              (∀ j, 0 < c j) → ∑ j, c j • γ j = ∑ j, c' j • γ' j → ∀ j, ∃ j', γ j = γ' j' := by
+theorem intCone_face : ∀ (O : Type) [CommRing O] (bar : O → O) (φ : InvFun O) (X : Type) [AddCommGroup X] [Module O X]
+    [Module.Finite O X], IsPolFanOn bar φ X → ∀ (r r' : ℕ) (γ : Fin r → LinearMap.BilinForm ℤ X)
+    (γ' : Fin r' → LinearMap.BilinForm ℤ X), IsCone bar φ γ → IsCone bar φ γ' → ∀ (c : Fin r → ℕ) (c' : Fin r' → ℕ),
+    (∀ j, 0 < c j) → ∑ j, c j • γ j = ∑ j, c' j • γ' j → ∀ j, ∃ j', γ j = γ' j' := by
   intro O _ bar φ X _ _ _ _ r r' γ γ' hγ hγ' c c' hc he j
   obtain ⟨k, d, hk, hd⟩ := intCone_absorb hγ.mem hγ.nonneg hγ.linear hγ' c c' he j (hc j)
   have hd' : ∑ i, d i • γ' i = ∑ l, (Pi.single j k : Fin r → ℕ) l • γ l := by
@@ -84,11 +109,10 @@ theorem intCone_face
     obtain ⟨k', e, hk', he'⟩ := habs i hi
     have h0 : k' • G' i = ∑ m, e m • G m := Subtype.ext (by simp [G, G', he'])
     have h1 := congrArg (f l) h0
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_nsmul, map_sum] at h1
-    simp only [map_nsmul, hfG, smul_ite, smul_zero, Finset.sum_ite_eq, Finset.mem_univ, if_true,
-        nsmul_eq_mul, mul_one]
-      at h1
+
+    rw [map_nsmul, map_sum] at h1
+    simp only [map_nsmul, hfG, smul_ite, smul_zero, Finset.sum_ite_eq, Finset.mem_univ, if_true, nsmul_eq_mul,
+      mul_one] at h1
     have hk'' : (0 : ℤ) < k' := by exact_mod_cast hk'
     by_contra hneg
     push_neg at hneg
@@ -110,8 +134,8 @@ theorem intCone_face
   have hzero : ∀ l, l ≠ j → f l (G' i) = 0 := by
     intro l hl
     have h1 := congrArg (f l) hdG
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_nsmul, map_sum, hfG, if_neg hl, smul_zero] at h1
+
+    rw [map_nsmul, map_sum, hfG, if_neg hl, smul_zero] at h1
     simp only [map_nsmul, nsmul_eq_mul] at h1
     have hnn : ∀ i' ∈ Finset.univ, 0 ≤ (d i' : ℤ) * f l (G' i') := fun i' _ => by
       rcases Nat.eq_zero_or_pos (d i') with h | h
@@ -124,11 +148,10 @@ theorem intCone_face
   have hem : ∀ m, (e m : ℤ) = k' * f m (G' i) := by
     intro m
     have h1 := congrArg (f m) hE
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_nsmul, map_sum] at h1
-    simp only [map_nsmul, hfG, smul_ite, smul_zero, Finset.sum_ite_eq, Finset.mem_univ, if_true,
-        nsmul_eq_mul, mul_one]
-      at h1
+
+    rw [map_nsmul, map_sum] at h1
+    simp only [map_nsmul, hfG, smul_ite, smul_zero, Finset.sum_ite_eq, Finset.mem_univ, if_true, nsmul_eq_mul,
+      mul_one] at h1
     exact h1.symm
   have hEj : k' • G' i = e j • G j := by
     rw [hE]

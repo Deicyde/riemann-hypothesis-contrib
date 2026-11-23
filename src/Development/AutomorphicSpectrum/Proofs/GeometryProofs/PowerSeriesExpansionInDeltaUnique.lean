@@ -1,7 +1,52 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.TranslDiffEq
+public import Mathlib.Tactic.ENatToNat
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.AlgebraicGeometry.Modules.Sheaf
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Development.AutomorphicSpectrum.Definitions.CommutativeAlgebra.GermComp1ZeroPointLeft
+import Development.AutomorphicSpectrum.Definitions.CommutativeAlgebra.IsSplitGaussChars
 
 @[expose] public section
 
@@ -67,8 +112,8 @@ theorem sections_of_affine
           → (Y.presheaf.map (homOfLE (π.preimage_mono h)).op).hom g
             = ∑ i, (π.app U).hom ((Z.presheaf.map (homOfLE h).op).hom (c i)) * e U i := by
     intro U V h g c hg
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hg, map_sum]
+
+    rw [hg, map_sum]
     refine Finset.sum_congr rfl fun i _ => ?_
     rw [map_mul, app_res π h, he U V h]
   have uniq
@@ -212,8 +257,8 @@ theorem spec_case
       : ∀ c : I → A,
         ∑ i, p.appTop.hom (toΓ A (c i)) * q.appTop.hom (toΓ J (b i)) = Φ (∑ i, c i • B i) := by
     intro c
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     refine Finset.sum_congr rfl fun i _ => ?_
     rw [hl, hr, ← map_mul, Algebra.TensorProduct.basis_apply]
     simp [B, Algebra.TensorProduct.basis_apply, TensorProduct.smul_tmul']
@@ -343,8 +388,8 @@ theorem prZ_affine
               ((prZ G x m ⁻¹ᵁ U).ι ≫ (fst (Tm x m) G).left).appTop.hom (toΓ _ (b i)))
           = ∑ i, ((prZ G x m).app U).hom (U.topIso.hom.hom (c i)) * dltOn G x m _ ^ (i : ℕ) := by
     intro c
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     refine Finset.sum_congr rfl fun i _ => ?_
     rw [map_mul, restrict_appTop, fm]
   obtain ⟨c, hc, hu⟩ := affine_case b _ _ _ sq ((prZ G x m ⁻¹ᵁ U).topIso.inv.hom f)

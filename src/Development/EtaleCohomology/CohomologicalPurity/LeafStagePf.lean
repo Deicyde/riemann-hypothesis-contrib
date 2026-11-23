@@ -1,6 +1,7 @@
 module
 
 public import Development.EtaleCohomology.CohomologicalPurity.LeafHensCutDef
+import Mathlib.Algebra.Category.Ring.FilteredColimits
 
 @[expose] public section
 

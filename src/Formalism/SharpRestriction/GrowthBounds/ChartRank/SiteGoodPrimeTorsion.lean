@@ -1,17 +1,51 @@
 module
 
 public import Formalism.SharpRestriction.GrowthBounds.ChartRank.HypVinRec
-public import Formalism.SharpRestriction.GrowthBounds.ChartRank.HypInvLe
-public import Formalism.SharpRestriction.GrowthBounds.ChartRank.HypForms
-public import Formalism.SharpRestriction.GrowthBounds.ChartRank.HypEvChain
-public import Formalism.SharpRestriction.GrowthBounds.ChartRank.HypLat
-public import Formalism.SharpRestriction.GrowthBounds.ChartRank.HypChi
-public import Formalism.SharpRestriction.GrowthBounds.ChartRank.IntWOfPow
-public import Formalism.SharpRestriction.GrowthBounds.ChartRank.HypFin
 public import Formalism.SharpRestriction.GrowthBounds.ChartedClasses.ValIntN
-public import Formalism.SharpRestriction.GrowthBounds.ChartedClasses.ClsChartedLabAt
-public import Formalism.SharpRestriction.GrowthBounds.ChartComparison.LocTiesOf
+import Formalism.SharpRestriction.GrowthBounds.ChartComparison.LocMore
+public import Formalism.SharpRestriction.GrowthBounds.ChartRank.HypChi
+public import Formalism.SharpRestriction.GrowthBounds.ChartRank.HypEvChain
+public import Formalism.SharpRestriction.GrowthBounds.ChartRank.HypFin
+public import Formalism.SharpRestriction.GrowthBounds.ChartRank.HypForms
+public import Formalism.SharpRestriction.GrowthBounds.ChartRank.HypLat
+public import Formalism.SharpRestriction.GrowthBounds.ChartRank.IntWOfPow
+import Formalism.SharpRestriction.GrowthBounds.ChartedClasses.CompInjLocJ
 public import Formalism.SharpRestriction.GrowthBounds.IntegralWeylLatticeSpan
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -39,7 +73,6 @@ variable
   {C : ColumnChain D.R D.what₂.Tau (D.hcW u)} {A : ColumnsAtT D.R C} {P : PeriodMap D.R C}
   {M : MemberForms D.what₂.LL D.what₂.embLL D.what₂.places D.what₂.Tau (D.hcW u) C A P}
 
-set_option maxHeartbeats 2000000 in
 structure StepTies
     (Fo : FormsIn M (j + 1) hj) (Lc : LocIn X0 u w h Lv j Fo.Ch) (Gt : GatTies D) (c : LatCmp D)
     : Prop where
@@ -69,7 +102,6 @@ theorem StepTies.chi (S : StepTies hj Fo Lc Gt c) (β : Fo.Ch) (κ : (Fo.K β).l
     (fun x => c.embW_int u w h x)
     κ
 
-set_option maxHeartbeats 4000000 in
 theorem StepTies.ties (S : StepTies hj Fo Lc Gt c) (β : Fo.Ch)
     : LocTiesR hj Fo Lc (c.embW u w h) β := {
   frRat := S.frRat β

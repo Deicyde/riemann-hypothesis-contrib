@@ -1,9 +1,14 @@
 module
 
 public import Formalism.SharpRestriction.LevelLetterCocycles.RepresentationCongruences.QuotientDistinguishedTorsionFree
-public import Mathlib.RingTheory.DiscreteValuationRing.TFAE
-public import Mathlib.RingTheory.PowerSeries.Ideal
-public import Mathlib.RingTheory.Filtration
+import Mathlib.Data.Nat.Totient
+import Mathlib.Data.Rat.Floor
+public import Mathlib.RingTheory.LocalRing.ResidueField.Basic
+import Mathlib.RingTheory.PowerSeries.NoZeroDivisors
+import Mathlib.Tactic.Continuity.Init
+import Mathlib.Tactic.NormNum.GCD
+import Mathlib.Tactic.Positivity.Finset
+import Mathlib.Tactic.TypeStar
 
 @[expose] public section
 

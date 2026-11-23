@@ -1,35 +1,70 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.PublishedTheorems.SiegelWeil₂.AdelicConjTransposeBlockMatrixTwoByTwoFin
-public import Development.AbelianVarietyTheory.BlockTheory.SiegelEisenstein.GramMatrixAdjoint
-public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.ExistsOrthogonalIdempotentsOfSumMulEqOneStatement
-public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.ExistsHermitianDetNeZeroTwoStatement
-public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.MatrixFieldStableRangeOneDetNeZeroStatement
+public import Development.AbelianVarietyTheory.Definitions.TwistedInnerProducts.CovolOneIntegralAdd
+import Development.AbelianVarietyTheory.Counterexamples.HeightSurvey.StarPurelyImaginaryEqNeg
 public import Development.AbelianVarietyTheory.Counterexamples.LevelGroupExamples.ExistsBaseRingOfConjugationFixedTensor
-public import Development.AbelianVarietyTheory.Counterexamples.HeightSurvey.StarPurelyImaginaryEqNeg
-public import Development.AbelianVarietyTheory.Proofs.HeightProofs.EmbeddingXiZeroNeZero
 public import Development.AbelianVarietyTheory.Proofs.AdelicLatticeProofs.SmulEqZeroOfInf
+public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.ExistsHermitianDetNeZeroTwoStatement
+public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.ExistsOrthogonalIdempotentsOfSumMulEqOneStatement
+public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.MatrixFieldStableRangeOneDetNeZeroStatement
+public import Development.AbelianVarietyTheory.Proofs.HeightProofs.EmbeddingXiZeroNeZero
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
+import Development.AbelianVarietyTheory.Definitions.Foundations.AestronglyMeasurableQuotMeasureIffLift
+import Development.AbelianVarietyTheory.Definitions.Foundations.EventuallyEqOfIsPreconnected
+import Development.AbelianVarietyTheory.Definitions.Foundations.IsIwasawaOfIsCompact
+import Formalism.LocalToGlobal.ProjectiveLattices.ErealAddIInf
 
 @[expose] public section
 
 noncomputable section
 open scoped Matrix NNReal ComplexConjugate TensorProduct
-open Formalism.BasicNotions Formalism.BasicNotions.TH
-  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj
-  Formalism.IndefR.Datum MeasureTheory
-open GlobalTheory.AutomorphicL2Unitary GlobalTheory.AdelicU GlobalTheory.Doubling GlobalTheory.Cont
-  GlobalTheory.MixModel
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj Formalism.IndefR.Datum MeasureTheory
+open GlobalTheory.AutomorphicL2Unitary GlobalTheory.AdelicU GlobalTheory.Doubling GlobalTheory.Cont GlobalTheory.MixModel
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.HermTransversal
 
-theorem isUnit_glue
-    {R ι : Type} [CommRing R] [Fintype ι]
-    {n : ℕ}
-    (e t : ι → R) (A : ι → Matrix (Fin n) (Fin n) R)
-    (h1 : ∑ i, e i = 1) (ho : ∀ i j, i ≠ j → e i * e j = 0) (ht : ∀ i, t i * (A i).det = e i)
-    : IsUnit (∑ i, e i • A i) := by
+theorem isUnit_glue {R ι : Type} [CommRing R] [Fintype ι] {n : ℕ} (e t : ι → R)
+    (A : ι → Matrix (Fin n) (Fin n) R) (h1 : ∑ i, e i = 1) (ho : ∀ i j, i ≠ j → e i * e j = 0)
+    (ht : ∀ i, t i * (A i).det = e i) : IsUnit (∑ i, e i • A i) := by
   classical
   have hee : ∀ i, e i * e i = e i := fun i => by
     have : e i * ∑ j, e j = e i * e i := by
@@ -44,11 +79,9 @@ theorem isUnit_glue
     · simp
   have hB : (∑ i, e i • A i) * (∑ j, (t j * e j) • (A j).adjugate) = 1 := by
     rw [Finset.mul_sum]
-    have : ∀ j,
-        (∑ i, e i • A i) * ((t j * e j) • (A j).adjugate)
-          = e j • (1 : Matrix (Fin n) (Fin n) R) := fun j => by
-      rw [Matrix.mul_smul, mul_smul, ← Matrix.smul_mul (e j), hs, Matrix.smul_mul,
-        Matrix.mul_adjugate, smul_smul, smul_smul]
+    have : ∀ j, (∑ i, e i • A i) * ((t j * e j) • (A j).adjugate) = e j • (1 : Matrix (Fin n) (Fin n) R) := fun j => by
+      rw [Matrix.mul_smul, mul_smul, ← Matrix.smul_mul (e j), hs, Matrix.smul_mul, Matrix.mul_adjugate, smul_smul,
+        smul_smul]
       congr 1
       rw [mul_right_comm, ht, hee]
     simp only [this]
@@ -59,26 +92,21 @@ section Generic
 
 variable {E R : Type} [Field E] [CharZero E] [CommRing R] {n : ℕ}
 
-theorem exists_herm_notMem
-    (σ : E →+* E) (δ : E) (hδ : δ ≠ 0) (hσδ : σ δ = -δ)
-    (ι : E →+* R) (τ : R →+* R) (hτι : ∀ z, τ (ι z) = ι (σ z))
-    (c d p q : Matrix (Fin n) (Fin n) R) (h : c * p + d * q = 1)
-    (M : Ideal R) (hM : M.IsMaximal)
-    : ∃ x : Matrix (Fin n) (Fin n) E,
-      (∀ i j, σ (x i j) = x j i) ∧ (c * x.map ι + d).det * τ (c * x.map ι + d).det ∉ M := by
+theorem exists_herm_notMem (σ : E →+* E) (δ : E) (hδ : δ ≠ 0) (hσδ : σ δ = -δ) (ι : E →+* R) (τ : R →+* R)
+    (hτι : ∀ z, τ (ι z) = ι (σ z)) (c d p q : Matrix (Fin n) (Fin n) R) (h : c * p + d * q = 1) (M : Ideal R)
+    (hM : M.IsMaximal) :
+    ∃ x : Matrix (Fin n) (Fin n) E, (∀ i j, σ (x i j) = x j i) ∧
+      (c * x.map ι + d).det * τ (c * x.map ι + d).det ∉ M := by
   letI := Ideal.Quotient.field M
   let π₀ : R →+* R ⧸ M := Ideal.Quotient.mk M
   let φ : E →+* R ⧸ M := π₀.comp ι
   let π := π₀.mapMatrix (m := Fin n)
   let ψ := (π₀.comp τ).mapMatrix (m := Fin n)
-  have h1 : π c * π p + π d * π q = 1 := by
-    rw [← map_mul, ← map_mul, ← map_add (f := _), h, map_one]
-  have h2 : ψ c * ψ p + ψ d * ψ q = 1 := by
-    rw [← map_mul, ← map_mul, ← map_add (f := _), h, map_one]
+  have h1 : π c * π p + π d * π q = 1 := by rw [← map_mul, ← map_mul, ← map_add (f := _), h, map_one]
+  have h2 : ψ c * ψ p + ψ d * ψ q = 1 := by rw [← map_mul, ← map_mul, ← map_add (f := _), h, map_one]
   obtain ⟨y, hy⟩ := GlobalTheory.T.matrix_field_stableRange_one_det_ne_zero _ n _ _ _ _ h1
   obtain ⟨y', hy'⟩ := GlobalTheory.T.matrix_field_stableRange_one_det_ne_zero _ n _ _ _ _ h2
-  obtain ⟨x, hxs, hx1, hx2⟩ :=
-    GlobalTheory.T.exists_hermitian_two_det_ne_zero E (R ⧸ M) σ φ δ hδ hσδ n _ _ _ _ _ _ hy hy'
+  obtain ⟨x, hxs, hx1, hx2⟩ := GlobalTheory.T.exists_hermitian_two_det_ne_zero E (R ⧸ M) σ φ δ hδ hσδ n _ _ _ _ _ _ hy hy'
   have hx : ∀ i j, σ (x i j) = x j i := fun i j => congrFun (congrFun hxs i) j
   refine ⟨x, hx, fun hmem => ?_⟩
   rcases hM.isPrime.mem_or_mem hmem with h' | h'
@@ -100,18 +128,14 @@ theorem exists_herm_notMem
     rw [e2] at e
     exact e
 
-theorem exists_herm_isUnit_generic
-    {A : Type} [CommRing A]
-    (σ : E →+* E) (δ : E) (hδ : δ ≠ 0) (hσδ : σ δ = -δ)
+theorem exists_herm_isUnit_generic {A : Type} [CommRing A] (σ : E →+* E) (δ : E) (hδ : δ ≠ 0) (hσδ : σ δ = -δ)
     (ι : E →+* R) (τ : R →+* R) (hτι : ∀ z, τ (ι z) = ι (σ z)) (hττ : ∀ z, τ (τ z) = z)
-    (a : A →+* R)
-    (ha : Function.Injective a) (hτa : ∀ z, τ (a z) = a z) (hfix : ∀ y, τ y = y → ∃ z, a z = y)
+    (a : A →+* R) (ha : Function.Injective a) (hτa : ∀ z, τ (a z) = a z) (hfix : ∀ y, τ y = y → ∃ z, a z = y)
     (k : A) (hk : k * 2 = 1)
-    (hid : ∀ (κ : Type) [Fintype κ] (f s : κ → A),
-      ∑ i, s i * f i = 1
-        → ∃ e t : κ → A, ∑ i, e i = 1 ∧ (∀ i j, i ≠ j → e i * e j = 0) ∧ ∀ i, t i * f i = e i)
-    (c d p q : Matrix (Fin n) (Fin n) R) (h : c * p + d * q = 1)
-    : ∃ x : Matrix (Fin n) (Fin n) R, (x.map τ)ᵀ = x ∧ IsUnit (c * x + d) := by
+    (hid : ∀ (κ : Type) [Fintype κ] (f s : κ → A), ∑ i, s i * f i = 1 → ∃ e t : κ → A,
+      ∑ i, e i = 1 ∧ (∀ i j, i ≠ j → e i * e j = 0) ∧ ∀ i, t i * f i = e i)
+    (c d p q : Matrix (Fin n) (Fin n) R) (h : c * p + d * q = 1) :
+    ∃ x : Matrix (Fin n) (Fin n) R, (x.map τ)ᵀ = x ∧ IsUnit (c * x + d) := by
   classical
   let H := {x : Matrix (Fin n) (Fin n) E // ∀ i j, σ (x i j) = x j i}
   let u : H → R := fun x => (c * x.1.map ι + d).det
@@ -136,11 +160,11 @@ theorem exists_herm_isUnit_generic
   have h2 : ∑ i : C.support, s i * g i = 2 := by
     apply ha
     have hc := congrArg τ hC'
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, map_one] at hc
+
+    rw [map_sum, map_one] at hc
     simp only [map_mul τ, hf] at hc
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, map_ofNat]
+
+    rw [map_sum, map_ofNat]
     simp only [map_mul, hg, hs', add_mul]
     rw [Finset.sum_add_distrib, hC', hc, one_add_one_eq_two]
   have h3 : ∑ i : C.support, (k * s i) * g i = 1 := by
@@ -150,12 +174,12 @@ theorem exists_herm_isUnit_generic
   have ha1 : ∑ i, a (e i) = 1 := by rw [← map_sum, he1, map_one]
   refine ⟨∑ i : C.support, a (e i) • i.1.1.map ι, ?_, ?_⟩
   · ext i j
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [Matrix.transpose_apply, Matrix.map_apply, Matrix.sum_apply, Matrix.smul_apply,
-        smul_eq_mul, map_sum, map_mul, hτa, hτι]
+
+    simp only [Matrix.transpose_apply, Matrix.map_apply, Matrix.sum_apply, Matrix.smul_apply, smul_eq_mul, map_sum,
+    map_mul, hτa, hτι]
     exact Finset.sum_congr rfl fun x _ => by rw [x.1.2]
-  · have : c * (∑ i : C.support, a (e i) • i.1.1.map ι) + d
-        = ∑ i : C.support, a (e i) • (c * i.1.1.map ι + d) := by
+  · have : c * (∑ i : C.support, a (e i) • i.1.1.map ι) + d =
+        ∑ i : C.support, a (e i) • (c * i.1.1.map ι + d) := by
       simp only [smul_add]
       rw [Finset.sum_add_distrib, ← Finset.sum_smul, ha1, one_smul, Finset.mul_sum]
       simp only [Matrix.mul_smul]
@@ -166,32 +190,26 @@ theorem exists_herm_isUnit_generic
 
 end Generic
 
-theorem cA_algebraMap {D : D7} (a : AF D.host.F)
-    : cA D (algebraMap (AF D.host.F) (AE D) a) = algebraMap (AF D.host.F) (AE D) a := by
+theorem cA_algebraMap {D : D7} (a : AF D.host.F) :
+    cA D (algebraMap (AF D.host.F) (AE D) a) = algebraMap (AF D.host.F) (AE D) a := by
   rw [Algebra.algebraMap_eq_smul_one, GlobalTheory.FinTranslate.cA_smul, map_one]
 
 theorem algebraMap_inj {D : D7} : Function.Injective (algebraMap (AF D.host.F) (AE D)) :=
-  Algebra.TensorProduct.includeLeft_injective (S := AF D.host.F)
-    (algebraMap D.host.F D.host.E).injective
+  Algebra.TensorProduct.includeLeft_injective (S := AF D.host.F) (algebraMap D.host.F D.host.E).injective
 
-theorem half_mul_two {F A : Type} [Field F] [CharZero F] [CommRing A] [Algebra F A]
-    : algebraMap F A (1 / 2) * 2 = 1 := by
+theorem half_mul_two {F A : Type} [Field F] [CharZero F] [CommRing A] [Algebra F A] :
+    algebraMap F A (1 / 2) * 2 = 1 := by
   rw [← map_ofNat (algebraMap F A) 2, ← map_mul]
   simp
 
-theorem exists_herm_isUnit (D : D7) (n : ℕ) (c d p q : Mx D n n) (h : c * p + d * q = 1)
-    : ∃ x : Mx D n n, GlobalTheory.MixModel.adj x = x ∧ IsUnit (c * x + d) :=
-  exists_herm_isUnit_generic (D.sp.cm.sig : D.host.E →+* D.host.E) D.host.xi0
-    (GlobalTheory.DualPairCompare.embedding_xi_zero_ne_zero D)
-    (GlobalTheory.DualPairCheck.star_purely_imaginary_eq_neg D) (incA D) (cA D)
-    GlobalTheory.DualPairCheck.cA_incA GlobalTheory.DualPairCheck.cA_cA
+theorem exists_herm_isUnit (D : D7) (n : ℕ) (c d p q : Mx D n n) (h : c * p + d * q = 1) :
+    ∃ x : Mx D n n, GlobalTheory.MixModel.adj x = x ∧ IsUnit (c * x + d) :=
+  exists_herm_isUnit_generic (D.sp.cm.sig : D.host.E →+* D.host.E) D.host.xi0 (GlobalTheory.DualPairCompare.embedding_xi_zero_ne_zero D)
+    (GlobalTheory.DualPairCheck.star_purely_imaginary_eq_neg D) (incA D) (cA D) GlobalTheory.DualPairCheck.cA_incA GlobalTheory.DualPairCheck.cA_cA
     (algebraMap (AF D.host.F) (AE D)) algebraMap_inj cA_algebraMap
-    (fun y hy =>
-      GlobalTheory.DetRootRows.exists_baseRing_of_conjugation_fixed_tensor D.sp.cm.sig
-        (fun x => (D.sp.cm.fixed (x + star x)).1 (by rw [star_add, star_star, add_comm]))
-        y hy)
-    (algebraMap D.host.F (AF D.host.F) (1 / 2)) half_mul_two
-    (GlobalTheory.T.exists_orthogonal_idempotents_of_sum_mul_eq_one' D.host.F) c d p q h
+    (fun y hy => GlobalTheory.DetRootRows.exists_baseRing_of_conjugation_fixed_tensor D.sp.cm.sig
+      (fun x => (D.sp.cm.fixed (x + star x)).1 (by rw [star_add, star_star, add_comm])) y hy)
+    (algebraMap D.host.F (AF D.host.F) (1 / 2)) half_mul_two (GlobalTheory.T.exists_orthogonal_idempotents_of_sum_mul_eq_one' D.host.F) c d p q h
 
 end GlobalTheory.HermTransversal
 

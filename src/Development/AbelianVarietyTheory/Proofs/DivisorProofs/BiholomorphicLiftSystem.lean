@@ -1,33 +1,77 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.Definitions.Divisors.ExistsTjCorrDiagModel
+import Development.AutomorphicArithmetic.Foundations.GaloisRepresentations.RadicalStalks.CommutingSurjectivity
+public import Development.AbelianVarietyTheory.Definitions.Divisors.NotCompactOfMEqOne
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Development.AbelianVarietyTheory.Definitions.Divisors.ExistsTjCorrDiagModel
+import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CompEqOneOfTransl
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
-  NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
-  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Hecke
-  GlobalTheory.UPel.HT.ES
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Hecke GlobalTheory.UPel.HT.ES
 
 namespace GlobalTheory.UPel.HT
 
 variable {p : ℕ} [Fact p.Prime]
 
-theorem Datum.algebraMap_injective (D : Datum p) (hm : D.m = 1)
-    : Function.Injective (algebraMap (𝓞 D.F) D.O) := by
+theorem Datum.algebraMap_injective (D : Datum p) (hm : D.m = 1) :
+    Function.Injective (algebraMap (𝓞 D.F) D.O) := by
   haveI := D.freeO
   haveI := D.finO
   haveI : Nontrivial D.O := by
     apply Module.nontrivial_of_finrank_pos (R := ℤ)
     rw [D.rankO, hm]; simpa using Module.finrank_pos (R := ℚ) (M := D.F)
-  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
-    rw [injective_iff_map_eq_zero]
+  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
   intro a ha
   by_contra ha0
   have hF : (a : D.F) ≠ 0 := by exact_mod_cast ha0
-  obtain ⟨y, hy0, hyint⟩ := IsAlgebraic.exists_integral_multiple (a.2.isAlgebraic.inv)
+  obtain ⟨y, hy0, hyint⟩ := IsAlgebraic.exists_integral_multiple
+    (a.2.isAlgebraic.inv)
   set b : 𝓞 D.F := ⟨_, hyint⟩
   have hab : a * b = (y : 𝓞 D.F) := by
     apply RingOfIntegers.coe_injective
@@ -42,8 +86,8 @@ theorem Datum.algebraMap_injective (D : Datum p) (hm : D.m = 1)
   · exact hy0 h
   · exact one_ne_zero h
 
-theorem Datum.exists_zsmul_eq_algebraMap (D : Datum p) (hm : D.m = 1) (x : D.O)
-    : ∃ e : ℤ, e ≠ 0 ∧ ∃ a : 𝓞 D.F, e • x = algebraMap (𝓞 D.F) D.O a := by
+theorem Datum.exists_zsmul_eq_algebraMap (D : Datum p) (hm : D.m = 1) (x : D.O) :
+    ∃ e : ℤ, e ≠ 0 ∧ ∃ a : 𝓞 D.F, e • x = algebraMap (𝓞 D.F) D.O a := by
   haveI := D.freeO
   haveI := D.finO
   let f : 𝓞 D.F →ₗ[ℤ] D.O := (algebraMap (𝓞 D.F) D.O).toAddMonoidHom.toIntLinearMap
@@ -51,9 +95,8 @@ theorem Datum.exists_zsmul_eq_algebraMap (D : Datum p) (hm : D.m = 1) (x : D.O)
   let M := LinearMap.range f
   have h1 := rank_quotient_add_rank_of_isDomain M
   rw [rank_range_of_injective f hf, ← Module.finrank_eq_rank (R := ℤ) (M := 𝓞 D.F),
-      ← Module.finrank_eq_rank (R := ℤ) (M := D.O), RingOfIntegers.rank, D.rankO, hm, one_pow,
-      _root_.one_mul]
-    at h1
+    ← Module.finrank_eq_rank (R := ℤ) (M := D.O), RingOfIntegers.rank, D.rankO, hm, one_pow,
+    _root_.one_mul] at h1
   obtain ⟨k, hk⟩ := Cardinal.lt_aleph0.mp (Module.rank_lt_aleph0 (R := ℤ) (M := D.O ⧸ M))
   rw [hk] at h1
   norm_cast at h1
@@ -63,42 +106,8 @@ theorem Datum.exists_zsmul_eq_algebraMap (D : Datum p) (hm : D.m = 1) (x : D.O)
   obtain ⟨a, ha⟩ := hex
   exact ⟨e, he, a, ha.symm⟩
 
-theorem Datum.algebraMap_surjective_of_m_eq_one
-    : ∀ (p : ℕ) [Fact p.Prime] (D : Datum p),
-      D.m = 1 → Function.Surjective (algebraMap (𝓞 D.F) D.O) := by
-  intro p _ D hm x
-  haveI := D.freeO
-  haveI := D.finO
-  obtain ⟨e, he, a, ha⟩ := D.exists_zsmul_eq_algebraMap hm x
-  haveI : Algebra.IsIntegral ℤ D.O := Algebra.IsIntegral.of_finite ℤ D.O
-  obtain ⟨P, hPm, hP⟩ := Algebra.IsIntegral.isIntegral (R := ℤ) x
-  have h1 : Polynomial.aeval (algebraMap ℤ D.O e * x) (P.scaleRoots e) = 0 :=
-    Polynomial.scaleRoots_aeval_eq_zero (by rwa [Polynomial.aeval_def])
-  rw [← Algebra.smul_def, ha, Polynomial.aeval_algebraMap_apply] at h1
-  have h2 : Polynomial.aeval a (P.scaleRoots e) = 0 :=
-    D.algebraMap_injective hm (by rw [h1, map_zero])
-  have he' : (e : D.F) ≠ 0 := by exact_mod_cast he
-  have h4 : Polynomial.aeval (a : D.F) (P.scaleRoots e) = 0 := by
-    have := congrArg (algebraMap (𝓞 D.F) D.F) h2
-    rwa [← Polynomial.aeval_algebraMap_apply, map_zero] at this
-  have h3 : Polynomial.eval₂ (algebraMap ℤ D.F) ((a : D.F) / e) P = 0 := by
-    have := Polynomial.scaleRoots_eval₂_mul (p := P) (algebraMap ℤ D.F) ((a : D.F) / e) e
-    rw [show algebraMap ℤ D.F e * ((a : D.F) / e) = (a : D.F) by
-        rw [algebraMap_int_eq, eq_intCast]; field_simp]
-      at this
-    rw [← Polynomial.aeval_def, h4] at this
-    exact (mul_eq_zero.mp this.symm).resolve_left (pow_ne_zero _ (by simpa using he'))
-  have hint : IsIntegral ℤ ((a : D.F) / e) := ⟨P, hPm, h3⟩
-  obtain ⟨a', ha'⟩ : ∃ a' : 𝓞 D.F, (a' : D.F) = (a : D.F) / e := ⟨⟨_, hint⟩, rfl⟩
-  refine ⟨a', ?_⟩
-  have hae : a = e • a' := by
-    apply RingOfIntegers.coe_injective
-    rw [zsmul_eq_mul, map_mul, map_intCast]
-    change (a : D.F) = (e : D.F) * (a' : D.F)
-    rw [ha']
-    field_simp
-  apply smul_right_injective D.O he
-  change e • algebraMap (𝓞 D.F) D.O a' = e • x
-  rw [ha, ← map_zsmul, ← hae]
+theorem Datum.algebraMap_surjective_of_m_eq_one :
+    ∀ (p : ℕ) [Fact p.Prime] (D : Datum p), D.m = 1 → Function.Surjective (algebraMap (𝓞 D.F) D.O) := by
+  apply UpperTheory.Gal.Ord.surjO <;> assumption
 
 end GlobalTheory.UPel.HT

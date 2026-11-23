@@ -1,8 +1,50 @@
 module
 
-public import Mathlib
 public import GroundTheory.HeightsAndTheta.Heights.ChowForms.StatementsChartIncOrd
 public import GroundTheory.HeightsAndTheta.Heights.ChowForms.PChartLocalOrder
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -16,8 +58,8 @@ noncomputable section
 
 namespace ChartIncOrd
 
-theorem isPrime_map_C {R : Type*} [CommRing R] (σ : Type*) (p : Ideal R) [p.IsPrime]
-    : (p.map (C : R →+* MvPolynomial σ R)).IsPrime := by
+theorem isPrime_map_C {R : Type*} [CommRing R] (σ : Type*) (p : Ideal R) [p.IsPrime] :
+    (p.map (C : R →+* MvPolynomial σ R)).IsPrime := by
   have h := MvPolynomial.ker_map (σ := σ) (Ideal.Quotient.mk p)
   rw [Ideal.mk_ker] at h
   rw [← h]
@@ -33,65 +75,67 @@ def mkS : MvPolynomial (Fin n ⊕ Fin e × Fin n) F →+* ChartInc I t e := Idea
 
 theorem mkS_surjective : Function.Surjective (mkS I t e) := Ideal.Quotient.mk_surjective
 
-theorem mkS_eq_zero {a : MvPolynomial (Fin n ⊕ Fin e × Fin n) F} (h : a ∈ chartIncIdeal I t e)
-    : mkS I t e a = 0 :=
+theorem mkS_eq_zero {a : MvPolynomial (Fin n ⊕ Fin e × Fin n) F} (h : a ∈ chartIncIdeal I t e) :
+    mkS I t e a = 0 :=
   Ideal.Quotient.eq_zero_iff_mem.mpr h
 
-theorem chartX_apply (x : MvPolynomial (Fin n) F) : chartX I t e x = mkS I t e (rename Sum.inl x) :=
-  rfl
+theorem chartX_apply (x : MvPolynomial (Fin n) F) :
+    chartX I t e x = mkS I t e (rename Sum.inl x) := rfl
 
 def toInc : ChartQ I t →+* ChartInc I t e :=
   Ideal.Quotient.lift _ (chartX I t e) fun a ha => by
     rw [chartX_apply]
     exact mkS_eq_zero I t e (Ideal.mem_sup_left (Ideal.mem_map_of_mem _ ha))
 
-theorem toInc_mk (x : MvPolynomial (Fin n) F) : toInc I t e (mkQ I t x) = chartX I t e x := rfl
+theorem toInc_mk (x : MvPolynomial (Fin n) F) :
+    toInc I t e (mkQ I t x) = chartX I t e x := rfl
 
 theorem sum_tQ : (∑ m, mkQ I t (C (t m) * X m)) = 1 := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [← map_sum, ← map_one (mkQ I t), Ideal.Quotient.eq]
+
+  rw [← map_sum, ← map_one (mkQ I t), Ideal.Quotient.eq]
   exact Ideal.mem_sup_right (Ideal.mem_span_singleton_self _)
 
 theorem sum_tS : (∑ m, chartX I t e (C (t m) * X m)) = 1 := by
   have := congrArg (toInc I t e) (sum_tQ I t)
   set_option synthInstance.maxHeartbeats 100000 in
-  simpa [map_sum, toInc_mk] using this
+    simpa [map_sum, toInc_mk] using this
 
-theorem sum_uS (i : Fin e) : (∑ m, mkS I t e (X (Sum.inr (i, m)) * X (Sum.inl m))) = 0 := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [← map_sum]
+theorem sum_uS (i : Fin e) :
+    (∑ m, mkS I t e (X (Sum.inr (i, m)) * X (Sum.inl m))) = 0 := by
+
+  rw [← map_sum]
   exact mkS_eq_zero I t e (Ideal.mem_sup_right (Ideal.subset_span ⟨i, rfl⟩))
 
 def fwd : MvPolynomial (Fin e × Fin n) (ChartQ I t) →+* MvPolynomial (Fin e) (ChartInc I t e) :=
   eval₂Hom (C.comp (toInc I t e)) fun ij =>
     C (mkS I t e (X (Sum.inr ij))) + X ij.1 * C (chartX I t e (C (t ij.2)))
 
-theorem fwd_C (q : ChartQ I t) : fwd I t e (C q) = C (toInc I t e q) := by simp [fwd]
+theorem fwd_C (q : ChartQ I t) : fwd I t e (C q) = C (toInc I t e q) := by
+  simp [fwd]
 
-theorem fwd_X (ij : Fin e × Fin n)
-    : fwd I t e (X ij)
-      = C (mkS I t e (X (Sum.inr ij))) + X ij.1 * C (chartX I t e (C (t ij.2))) := by
+theorem fwd_X (ij : Fin e × Fin n) :
+    fwd I t e (X ij) = C (mkS I t e (X (Sum.inr ij))) + X ij.1 * C (chartX I t e (C (t ij.2))) := by
   simp [fwd]
 
 def back₀ : MvPolynomial (Fin n ⊕ Fin e × Fin n) F →+* MvPolynomial (Fin e × Fin n) (ChartQ I t) :=
   eval₂Hom (C.comp ((mkQ I t).comp C))
-    (Sum.elim
-      (fun m => C (mkQ I t (X m)))
+    (Sum.elim (fun m => C (mkQ I t (X m)))
       (fun ij => genSubst (fun m => mkQ I t (X m)) (fun m => mkQ I t (C (t m))) ij))
 
-theorem back₀_C (r : F) : back₀ I t e (C r) = C (mkQ I t (C r)) := by simp [back₀]
-
-theorem back₀_inl (m : Fin n) : back₀ I t e (X (Sum.inl m)) = C (mkQ I t (X m)) := by simp [back₀]
-
-theorem back₀_inr (ij : Fin e × Fin n)
-    : back₀ I t e (X (Sum.inr ij))
-      = genSubst (fun m => mkQ I t (X m)) (fun m => mkQ I t (C (t m))) ij := by
+theorem back₀_C (r : F) : back₀ I t e (C r) = C (mkQ I t (C r)) := by
   simp [back₀]
 
-theorem back₀_rename (x : MvPolynomial (Fin n) F)
-    : back₀ I t e (rename Sum.inl x) = C (mkQ I t x) := by
-  have : (back₀ I t e).comp (rename Sum.inl).toRingHom
-      = (C : ChartQ I t →+* MvPolynomial (Fin e × Fin n) (ChartQ I t)).comp (mkQ I t) := by
+theorem back₀_inl (m : Fin n) : back₀ I t e (X (Sum.inl m)) = C (mkQ I t (X m)) := by
+  simp [back₀]
+
+theorem back₀_inr (ij : Fin e × Fin n) :
+    back₀ I t e (X (Sum.inr ij)) = genSubst (fun m => mkQ I t (X m)) (fun m => mkQ I t (C (t m))) ij := by
+  simp [back₀]
+
+theorem back₀_rename (x : MvPolynomial (Fin n) F) :
+    back₀ I t e (rename Sum.inl x) = C (mkQ I t x) := by
+  have : (back₀ I t e).comp (rename Sum.inl).toRingHom =
+      (C : ChartQ I t →+* MvPolynomial (Fin e × Fin n) (ChartQ I t)).comp (mkQ I t) := by
     refine MvPolynomial.ringHom_ext (fun r => ?_) (fun m => ?_)
     · simp [back₀_C]
     · simp [back₀_inl]
@@ -121,9 +165,8 @@ theorem chartIncIdeal_le_ker : chartIncIdeal I t e ≤ RingHom.ker (back₀ I t 
 def back : ChartInc I t e →+* MvPolynomial (Fin e × Fin n) (ChartQ I t) :=
   Ideal.Quotient.lift (chartIncIdeal I t e) (back₀ I t e) fun _ ha => chartIncIdeal_le_ker I t e ha
 
-theorem back_mk (a : MvPolynomial (Fin n ⊕ Fin e × Fin n) F)
-    : back I t e (mkS I t e a) = back₀ I t e a :=
-  rfl
+theorem back_mk (a : MvPolynomial (Fin n ⊕ Fin e × Fin n) F) :
+    back I t e (mkS I t e a) = back₀ I t e a := rfl
 
 def bwd : MvPolynomial (Fin e) (ChartInc I t e) →+* MvPolynomial (Fin e × Fin n) (ChartQ I t) :=
   eval₂Hom (back I t e) fun i => ∑ m, X (i, m) * C (mkQ I t (X m))
@@ -132,24 +175,21 @@ theorem back_toInc (q : ChartQ I t) : back I t e (toInc I t e q) = C q := by
   obtain ⟨x, rfl⟩ := Ideal.Quotient.mk_surjective q
   exact (congrArg (back I t e) (toInc_mk I t e x)).trans (back₀_rename I t e x)
 
-theorem sum_fwd (i : Fin e)
-    : (∑ l, (C (mkS I t e (X (Sum.inr (i, l)))) + X i * C (chartX I t e (C (t l)))) *
-        C (chartX I t e (X l)))
-      = (X i : MvPolynomial (Fin e) (ChartInc I t e)) := by
-  have hu :=
-    congrArg (C : ChartInc I t e →+* MvPolynomial (Fin e) (ChartInc I t e)) (sum_uS I t e i)
+theorem sum_fwd (i : Fin e) :
+    (∑ l, (C (mkS I t e (X (Sum.inr (i, l)))) + X i * C (chartX I t e (C (t l)))) *
+      C (chartX I t e (X l))) = (X i : MvPolynomial (Fin e) (ChartInc I t e)) := by
+  have hu := congrArg (C : ChartInc I t e →+* MvPolynomial (Fin e) (ChartInc I t e)) (sum_uS I t e i)
   have ht := congrArg (C : ChartInc I t e →+* MvPolynomial (Fin e) (ChartInc I t e)) (sum_tS I t e)
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, map_mul, map_one, map_zero] at hu ht
+
+  simp only [map_sum, map_mul, map_one, map_zero] at hu ht
   have hX : ∀ l, chartX I t e (X l) = mkS I t e (X (Sum.inl l)) := fun l => by
     rw [chartX_apply, rename_X]
   simp only [hX] at ht ⊢
-  calc
-    _ = (∑ l, C (mkS I t e (X (Sum.inr (i, l)))) * C (mkS I t e (X (Sum.inl l))))
-        + X i * ∑ l, C (chartX I t e (C (t l))) * C (mkS I t e (X (Sum.inl l))) := by
-      rw [Finset.mul_sum, ← Finset.sum_add_distrib]
-      refine Finset.sum_congr rfl fun l _ => ?_
-      ring
+  calc _ = (∑ l, C (mkS I t e (X (Sum.inr (i, l)))) * C (mkS I t e (X (Sum.inl l)))) +
+        X i * ∑ l, C (chartX I t e (C (t l))) * C (mkS I t e (X (Sum.inl l))) := by
+          rw [Finset.mul_sum, ← Finset.sum_add_distrib]
+          refine Finset.sum_congr rfl fun l _ => ?_
+          ring
     _ = X i := by rw [hu, ht]; ring
 
 theorem fwd_back (s : ChartInc I t e) : fwd I t e (back I t e s) = C s := by
@@ -159,8 +199,8 @@ theorem fwd_back (s : ChartInc I t e) : fwd I t e (back I t e s) = C s := by
     · rcases v with m | ⟨i, m⟩
       · simp only [RingHom.comp_apply, back_mk, back₀_inl, fwd_C, toInc_mk, chartX_apply, rename_X]
       · set_option synthInstance.maxHeartbeats 100000 in
-        simp only [RingHom.comp_apply, back_mk, back₀_inr, genSubst, map_sub, map_mul, map_sum,
-          fwd_X, fwd_C, toInc_mk]
+        simp only [RingHom.comp_apply, back_mk, back₀_inr, genSubst, map_sub, map_mul, map_sum, fwd_X,
+          fwd_C, toInc_mk]
         linear_combination (-(C (chartX I t e (C (t m))))) * sum_fwd I t e i
   obtain ⟨a, rfl⟩ := mkS_surjective I t e s
   exact congrArg (fun f => f a) this
@@ -182,36 +222,24 @@ theorem bwd_fwd : (bwd I t e).comp (fwd I t e) = RingHom.id _ := by
       RingHom.id_apply, chartX_apply, rename_C, back_mk, back₀_C, back₀_inr, genSubst]
     ring
 
-theorem ord_atPrime_ringEquiv
-    {R S : Type*} [CommRing R] [CommRing S]
-    (f : R ≃+* S)
-    (P : Ideal R) [P.IsPrime]
-    (P' : Ideal S) [P'.IsPrime]
-    (h : P = P'.comap f) (x : R)
-    : Ring.ord (Localization.AtPrime P') (algebraMap S _ (f x))
-      = Ring.ord (Localization.AtPrime P) (algebraMap R _ x) := by
+theorem ord_atPrime_ringEquiv {R S : Type*} [CommRing R] [CommRing S] (f : R ≃+* S) (P : Ideal R) [P.IsPrime]
+    (P' : Ideal S) [P'.IsPrime] (h : P = P'.comap f) (x : R) :
+    Ring.ord (Localization.AtPrime P') (algebraMap S _ (f x)) =
+      Ring.ord (Localization.AtPrime P) (algebraMap R _ x) := by
   have := ord_ringEquiv (Localization.localRingEquiv P P' f h) (algebraMap R _ x)
-  exact (congrArg (Ring.ord (Localization.AtPrime P'))
-    (Localization.localRingHom_to_map P P' (f : R →+* S) h x)).symm.trans this
+  exact (congrArg (Ring.ord (Localization.AtPrime P')) (Localization.localRingHom_to_map P P' (f : R →+* S) h x)).symm.trans this
 
 def equiv : MvPolynomial (Fin e × Fin n) (ChartQ I t) ≃+* MvPolynomial (Fin e) (ChartInc I t e) :=
   RingEquiv.ofRingHom (fwd I t e) (bwd I t e) (fwd_bwd I t e) (bwd_fwd I t e)
 
-theorem equiv_apply (y : MvPolynomial (Fin e × Fin n) (ChartQ I t)) : equiv I t e y = fwd I t e y :=
-  rfl
+theorem equiv_apply (y : MvPolynomial (Fin e × Fin n) (ChartQ I t)) : equiv I t e y = fwd I t e y := rfl
 
-theorem map_equiv (W : Ideal (MvPolynomial (Fin n) F))
-    : ((W.map (mkQ I t)).map (C : ChartQ I t →+* MvPolynomial (Fin e × Fin n) (ChartQ I t))).map
-        (equiv I t e
-          : MvPolynomial (Fin e × Fin n) (ChartQ I t) →+* MvPolynomial (Fin e) (ChartInc I t e))
-      = (W.map (chartX I t e)).map
-        (C : ChartInc I t e →+* MvPolynomial (Fin e) (ChartInc I t e)) := by
-  have h1
-      : (equiv I t e
-          : MvPolynomial (Fin e × Fin n) (ChartQ I t)
-            →+* MvPolynomial (Fin e) (ChartInc I t e)).comp C
-        = C.comp (toInc I t e) :=
-    RingHom.ext fun q => fwd_C I t e q
+theorem map_equiv (W : Ideal (MvPolynomial (Fin n) F)) :
+    ((W.map (mkQ I t)).map (C : ChartQ I t →+* MvPolynomial (Fin e × Fin n) (ChartQ I t))).map
+        (equiv I t e : MvPolynomial (Fin e × Fin n) (ChartQ I t) →+* MvPolynomial (Fin e) (ChartInc I t e)) =
+      (W.map (chartX I t e)).map (C : ChartInc I t e →+* MvPolynomial (Fin e) (ChartInc I t e)) := by
+  have h1 : (equiv I t e : MvPolynomial (Fin e × Fin n) (ChartQ I t) →+* MvPolynomial (Fin e) (ChartInc I t e)).comp
+      C = C.comp (toInc I t e) := RingHom.ext fun q => fwd_C I t e q
   have h2 : (toInc I t e).comp (mkQ I t) = chartX I t e := RingHom.ext fun _ => rfl
   rw [Ideal.map_map, h1, ← Ideal.map_map, Ideal.map_map (mkQ I t), h2]
 
@@ -219,10 +247,8 @@ theorem proof (h₁ : OrdPolynomialLocalization.Statement) : ChartIncOrd.Stateme
   intro F _ n e I W t _ _ x
   have := isPrime_map_C (Fin e × Fin n) (W.map (mkQ I t))
   have := isPrime_map_C (Fin e) (W.map (chartX I t e))
-  have hIJ
-      : (W.map (mkQ I t)).map (C : ChartQ I t →+* MvPolynomial (Fin e × Fin n) (ChartQ I t))
-        = ((W.map (chartX I t e)).map
-          (C : ChartInc I t e →+* MvPolynomial (Fin e) (ChartInc I t e))).comap (equiv I t e) := by
+  have hIJ : (W.map (mkQ I t)).map (C : ChartQ I t →+* MvPolynomial (Fin e × Fin n) (ChartQ I t)) =
+      ((W.map (chartX I t e)).map (C : ChartInc I t e →+* MvPolynomial (Fin e) (ChartInc I t e))).comap (equiv I t e) := by
     rw [← Ideal.comap_coe, ← map_equiv]
     exact (Ideal.comap_map_of_bijective _ (equiv I t e).bijective).symm
   have h2 := ord_atPrime_ringEquiv (equiv I t e) _ _ hIJ (C (mkQ I t x))

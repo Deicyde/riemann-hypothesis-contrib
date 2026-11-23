@@ -1,7 +1,51 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicArithmetic.Foundations.Convolution.IntegrableConvolution.TrDefs
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+public import Mathlib.LinearAlgebra.Eigenspace.Triangularizable
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
@@ -34,29 +78,22 @@ private theorem uu_sandwich (a : Fin d) (b : Mt d) : uu a a * b * uu a a = b a a
   simp only [uu, Matrix.single_apply, Matrix.mul_apply, Matrix.smul_apply]
   rcases eq_or_ne a i with rfl | h1 <;> rcases eq_or_ne a j with rfl | h2 <;> simp [*]
 
-private def RR
-    (r : Fin (m + 1) → (Mt d →ₐ[ℂ] Module.End ℂ W))
-    (hc : ∀ i j, i ≠ j → ∀ a b, Commute (r i a) (r j b))
-    : (Fin (m + 1) → Mt d) →* Module.End ℂ W :=
-  MonoidHom.noncommPiCoprod
-    (fun i => MonoidHomClass.toMonoidHom (r i))
-    (show Pairwise (fun i j =>
-        ∀ x y,
-          Commute (MonoidHomClass.toMonoidHom (r i) x) (MonoidHomClass.toMonoidHom (r j) y)) from
-      fun i j h x y => hc i j h x y)
+private def RR (r : Fin (m + 1) → (Mt d →ₐ[ℂ] Module.End ℂ W))
+    (hc : ∀ i j, i ≠ j → ∀ a b, Commute (r i a) (r j b)) :
+    (Fin (m + 1) → Mt d) →* Module.End ℂ W :=
+  MonoidHom.noncommPiCoprod (fun i => MonoidHomClass.toMonoidHom (r i))
+    (show Pairwise (fun i j => ∀ x y, Commute (MonoidHomClass.toMonoidHom (r i) x)
+      (MonoidHomClass.toMonoidHom (r j) y)) from fun i j h x y => hc i j h x y)
 
-variable
-  (r : Fin (m + 1) → (Matrix (Fin d) (Fin d) ℂ →ₐ[ℂ] Module.End ℂ W))
-  (hc : ∀ i j, i ≠ j → ∀ a b, Commute (r i a) (r j b))
+variable (r : Fin (m + 1) → (Matrix (Fin d) (Fin d) ℂ →ₐ[ℂ] Module.End ℂ W))
+    (hc : ∀ i j, i ≠ j → ∀ a b, Commute (r i a) (r j b))
 
 private theorem RR_single (i : Fin (m + 1)) (x : Mt d) : RR r hc (Pi.mulSingle i x) = r i x := by
-  exact (MonoidHom.noncommPiCoprod_mulSingle
-    (N := fun _ => Mt d)
-    (fun i => MonoidHomClass.toMonoidHom (r i))
-    i x).trans rfl
+  exact (MonoidHom.noncommPiCoprod_mulSingle (N := fun _ => Mt d)
+    (fun i => MonoidHomClass.toMonoidHom (r i)) i x).trans rfl
 
-private theorem RR_update (a : Fin (m + 1) → Mt d) (i : Fin (m + 1)) (x : Mt d)
-    : RR r hc (Function.update a i x) = r i x * RR r hc (Function.update a i 1) := by
+private theorem RR_update (a : Fin (m + 1) → Mt d) (i : Fin (m + 1)) (x : Mt d) :
+    RR r hc (Function.update a i x) = r i x * RR r hc (Function.update a i 1) := by
   rw [← RR_single r hc i x, ← map_mul]
   congr 1
   funext j
@@ -64,9 +101,8 @@ private theorem RR_update (a : Fin (m + 1) → Mt d) (i : Fin (m + 1)) (x : Mt d
   · subst h; simp
   · simp [h]
 
-private theorem RR_mem
-    (Q : Submonoid (Module.End ℂ W)) (a : Fin (m + 1) → Mt d) (h : ∀ i, r i (a i) ∈ Q)
-    : RR r hc a ∈ Q := by
+private theorem RR_mem (Q : Submonoid (Module.End ℂ W)) (a : Fin (m + 1) → Mt d)
+    (h : ∀ i, r i (a i) ∈ Q) : RR r hc a ∈ Q := by
   unfold RR
   simp only [MonoidHom.noncommPiCoprod, MonoidHom.coe_mk, OneHom.coe_mk]
   exact Submonoid.noncommProd_mem _ _ _ _ (fun i _ => h i)
@@ -76,8 +112,7 @@ private def RM : (Fin (m + 1) → Mt d) →ₘₗ[ℂ] Module.End ℂ W where
   map_update_add' := by
     intro inst a i x y
     obtain rfl : inst = instDecidableEqFin (m + 1) := Subsingleton.elim _ _
-    rw [RR_update r hc a i (x + y), RR_update r hc a i x, RR_update r hc a i y, map_add (f := _),
-      add_mul]
+    rw [RR_update r hc a i (x + y), RR_update r hc a i x, RR_update r hc a i y, map_add (f := _), add_mul]
   map_update_smul' := by
     intro inst a i c x
     obtain rfl : inst = instDecidableEqFin (m + 1) := Subsingleton.elim _ _
@@ -86,35 +121,29 @@ private def RM : (Fin (m + 1) → Mt d) →ₘₗ[ℂ] Module.End ℂ W where
 
 private theorem RM_apply (a : Fin (m + 1) → Mt d) : RM r hc a = RR r hc a := rfl
 
-private theorem RR_shift
-    (Ue : Module.End ℂ W) (hU : ∀ i a, Ue * r (i + 1) a = r i a * Ue) (a : Fin (m + 1) → Mt d)
-    : Ue * RR r hc a = RR r hc (fun i => a (i + 1)) * Ue := by
-  have key
-      : ∀ s : Finset (Fin (m + 1)),
-        Ue * RR r hc (fun i => if i ∈ s then a i else 1)
-          = RR r hc (fun i => if i + 1 ∈ s then a (i + 1) else 1) * Ue := by
+private theorem RR_shift (Ue : Module.End ℂ W)
+    (hU : ∀ i a, Ue * r (i + 1) a = r i a * Ue) (a : Fin (m + 1) → Mt d) :
+    Ue * RR r hc a = RR r hc (fun i => a (i + 1)) * Ue := by
+  have key : ∀ s : Finset (Fin (m + 1)),
+      Ue * RR r hc (fun i => if i ∈ s then a i else 1) =
+        RR r hc (fun i => if i + 1 ∈ s then a (i + 1) else 1) * Ue := by
     intro s
     induction s using Finset.induction_on with
     | empty =>
       have h1 : (fun i : Fin (m + 1) => if i ∈ (∅ : Finset (Fin (m + 1))) then a i else 1) = 1 := by
         funext i; simp
-      have h2
-          : (fun i : Fin (m + 1) => if i + 1 ∈ (∅ : Finset (Fin (m + 1))) then a (i + 1) else 1)
-            = 1 := by
+      have h2 : (fun i : Fin (m + 1) => if i + 1 ∈ (∅ : Finset (Fin (m + 1))) then a (i + 1) else 1) = 1 := by
         funext i; simp
-      rw [h1, h2]
-      simp
+      rw [h1, h2]; simp
     | insert i s hi ih =>
-      have h1
-          : (fun j => if j ∈ insert i s then a j else 1)
-            = Pi.mulSingle i (a i) * fun j => if j ∈ s then a j else 1 := by
+      have h1 : (fun j => if j ∈ insert i s then a j else 1) =
+          Pi.mulSingle i (a i) * fun j => if j ∈ s then a j else 1 := by
         funext j
         by_cases h : j = i
         · subst h; simp [hi]
         · simp [h, Finset.mem_insert]
-      have h2
-          : (fun j => if j + 1 ∈ insert i s then a (j + 1) else 1)
-            = Pi.mulSingle (i - 1) (a i) * fun j => if j + 1 ∈ s then a (j + 1) else 1 := by
+      have h2 : (fun j => if j + 1 ∈ insert i s then a (j + 1) else 1) =
+          Pi.mulSingle (i - 1) (a i) * fun j => if j + 1 ∈ s then a (j + 1) else 1 := by
         funext j
         by_cases h : j = i - 1
         · subst h; simp [hi]
@@ -141,8 +170,8 @@ private theorem FF_idem (p : Fin (m + 1) → Fin d) : FF r hc p * FF r hc p = FF
   funext i
   simp [uu_same]
 
-private theorem FF_right (p : Fin (m + 1) → Fin d) (j : Fin (m + 1))
-    : FF r hc p * r j (uu (p j) (p j)) = FF r hc p := by
+private theorem FF_right (p : Fin (m + 1) → Fin d) (j : Fin (m + 1)) :
+    FF r hc p * r j (uu (p j) (p j)) = FF r hc p := by
   unfold FF
   rw [← RR_single r hc j, ← map_mul]
   congr 1
@@ -151,8 +180,8 @@ private theorem FF_right (p : Fin (m + 1) → Fin d) (j : Fin (m + 1))
   · subst h; simp [uu_same]
   · simp [h]
 
-private theorem FF_left (p : Fin (m + 1) → Fin d) (j : Fin (m + 1))
-    : r j (uu (p j) (p j)) * FF r hc p = FF r hc p := by
+private theorem FF_left (p : Fin (m + 1) → Fin d) (j : Fin (m + 1)) :
+    r j (uu (p j) (p j)) * FF r hc p = FF r hc p := by
   unfold FF
   rw [← RR_single r hc j, ← map_mul]
   congr 1
@@ -162,10 +191,8 @@ private theorem FF_left (p : Fin (m + 1) → Fin d) (j : Fin (m + 1))
   · simp [h]
 
 open Fin.NatCast Fin.CommRing in
-private theorem const_of
-    {α : Type} (i₀ : Fin (m + 1)) (p : Fin (m + 1) → α) (h : ∀ j, j ≠ i₀ → p j = p (j + 1))
-    (i : Fin (m + 1))
-    : p i = p i₀ := by
+private theorem const_of {α : Type} (i₀ : Fin (m + 1)) (p : Fin (m + 1) → α)
+    (h : ∀ j, j ≠ i₀ → p j = p (j + 1)) (i : Fin (m + 1)) : p i = p i₀ := by
   have key : ∀ k : ℕ, k ≤ m → p (i₀ + 1 + (k : Fin (m + 1))) = p (i₀ + 1) := by
     intro k
     induction k with
@@ -178,9 +205,7 @@ private theorem const_of
           have : i₀ + ((k + 1 : ℕ) : Fin (m + 1)) = i₀ + 0 := by
             push_cast
             rw [add_zero]
-            calc
-              i₀ + ((k : Fin (m + 1)) + 1)
-                = i₀ + 1 + (k : Fin (m + 1)) := by ring
+            calc i₀ + ((k : Fin (m + 1)) + 1) = i₀ + 1 + (k : Fin (m + 1)) := by ring
               _ = i₀ := e
           exact add_left_cancel this
         rw [Fin.natCast_eq_zero] at h0
@@ -190,8 +215,7 @@ private theorem const_of
       congr 1
       push_cast
       ring
-  have h1 :=
-    key ((i - i₀ - 1 : Fin (m + 1)).val) (by have := (i - i₀ - 1 : Fin (m + 1)).isLt; omega)
+  have h1 := key ((i - i₀ - 1 : Fin (m + 1)).val) (by have := (i - i₀ - 1 : Fin (m + 1)).isLt; omega)
   have h2 := key m le_rfl
   have e1 : i₀ + 1 + (((i - i₀ - 1 : Fin (m + 1)).val : ℕ) : Fin (m + 1)) = i := by
     rw [Fin.cast_val_eq_self]
@@ -199,47 +223,42 @@ private theorem const_of
   have e2 : i₀ + 1 + (m : Fin (m + 1)) = i₀ := by
     have : ((m + 1 : ℕ) : Fin (m + 1)) = 0 := Fin.natCast_self _
     push_cast at this
-    calc
-      i₀ + 1 + (m : Fin (m + 1))
-        = i₀ + ((m : Fin (m + 1)) + 1) := by ring
+    calc i₀ + 1 + (m : Fin (m + 1)) = i₀ + ((m : Fin (m + 1)) + 1) := by ring
       _ = i₀ := by rw [this, add_zero]
   rw [e1] at h1
   rw [e2] at h2
   rw [h1, h2]
 
-private theorem tr_nonconst
-    [FiniteDimensional ℂ W]
-    (Ue : Module.End ℂ W) (hU : ∀ i a, Ue * r (i + 1) a = r i a * Ue)
-    (S : Module.End ℂ W) (j : Fin (m + 1)) (hS : ∀ a, Commute S (r j a))
-    (p : Fin (m + 1) → Fin d) (hne : p j ≠ p (j + 1))
-    : LinearMap.trace ℂ W (FF r hc p * (S * Ue)) = 0 := by
+private theorem tr_nonconst [FiniteDimensional ℂ W] (Ue : Module.End ℂ W)
+    (hU : ∀ i a, Ue * r (i + 1) a = r i a * Ue) (S : Module.End ℂ W) (j : Fin (m + 1))
+    (hS : ∀ a, Commute S (r j a)) (p : Fin (m + 1) → Fin d) (hne : p j ≠ p (j + 1)) :
+    LinearMap.trace ℂ W (FF r hc p * (S * Ue)) = 0 := by
   set q : Fin (m + 1) → Fin d := fun i => p (i + 1) with hq
   have hUF : Ue * FF r hc p = FF r hc q * Ue := RR_shift r hc Ue hU _
   have hz : FF r hc p * S * FF r hc q = 0 := by
-    have h1
-        : FF r hc p * S * FF r hc q
-          = FF r hc p * (r j (uu (p j) (p j)) * S * r j (uu (q j) (q j))) * FF r hc q := by
-      calc
-        FF r hc p * S * FF r hc q
-            = (FF r hc p * r j (uu (p j) (p j))) * S * (r j (uu (q j) (q j)) * FF r hc q) := by
-          rw [FF_right, FF_left]
+    have h1 : FF r hc p * S * FF r hc q =
+        FF r hc p * (r j (uu (p j) (p j)) * S * r j (uu (q j) (q j))) * FF r hc q := by
+      calc FF r hc p * S * FF r hc q
+          = (FF r hc p * r j (uu (p j) (p j))) * S * (r j (uu (q j) (q j)) * FF r hc q) := by
+            rw [FF_right, FF_left]
         _ = _ := by simp only [mul_assoc]
     have h2 : r j (uu (p j) (p j)) * S * r j (uu (q j) (q j)) = 0 := by
       rw [← (hS _).eq, mul_assoc, ← map_mul, uu_ne hne, map_zero, mul_zero]
     rw [h1, h2, mul_zero, zero_mul]
-  calc
-    LinearMap.trace ℂ W (FF r hc p * (S * Ue))
-        = LinearMap.trace ℂ W (FF r hc p * (FF r hc p * (S * Ue))) := by
-      rw [← mul_assoc (FF r hc p) (FF r hc p), FF_idem]
-    _ = LinearMap.trace ℂ W (FF r hc p * (S * Ue) * FF r hc p) := by rw [LinearMap.trace_mul_comm]
-    _ = LinearMap.trace ℂ W (FF r hc p * S * (Ue * FF r hc p)) := by simp only [mul_assoc]
-    _ = 0 := by rw [hUF, ← mul_assoc, hz, zero_mul, map_zero]
+  calc LinearMap.trace ℂ W (FF r hc p * (S * Ue))
+      = LinearMap.trace ℂ W (FF r hc p * (FF r hc p * (S * Ue))) := by
+        rw [← mul_assoc (FF r hc p) (FF r hc p), FF_idem]
+    _ = LinearMap.trace ℂ W (FF r hc p * (S * Ue) * FF r hc p) := by
+        rw [LinearMap.trace_mul_comm]
+    _ = LinearMap.trace ℂ W (FF r hc p * S * (Ue * FF r hc p)) := by
+        simp only [mul_assoc]
+    _ = 0 := by
+        rw [hUF, ← mul_assoc, hz, zero_mul, map_zero]
 
-private theorem tr_fib
-    [FiniteDimensional ℂ W]
-    (i₀ : Fin (m + 1)) (S : Module.End ℂ W) (hS : ∀ j, j ≠ i₀ → ∀ a, Commute S (r j a))
-    (p : Fin (m + 1) → Fin d)
-    : LinearMap.trace ℂ W (FF r hc p * S) = LinearMap.trace ℂ W (FF r hc (fun _ => p i₀) * S) := by
+private theorem tr_fib [FiniteDimensional ℂ W] (i₀ : Fin (m + 1)) (S : Module.End ℂ W)
+    (hS : ∀ j, j ≠ i₀ → ∀ a, Commute S (r j a)) (p : Fin (m + 1) → Fin d) :
+    LinearMap.trace ℂ W (FF r hc p * S) =
+      LinearMap.trace ℂ W (FF r hc (fun _ => p i₀) * S) := by
   set X := RR r hc (fun j => if j = i₀ then 1 else uu (p i₀) (p j)) with hX
   set Y := RR r hc (fun j => if j = i₀ then 1 else uu (p j) (p i₀)) with hY
   have h1 : X * FF r hc p * Y = FF r hc (fun _ => p i₀) := by
@@ -268,40 +287,35 @@ private theorem tr_fib
       · simp [h]
       · simpa [h] using (hS j h _).eq
     exact (Submonoid.mem_centralizer_iff.1 this S rfl)
-  calc
-    LinearMap.trace ℂ W (FF r hc p * S)
+  calc LinearMap.trace ℂ W (FF r hc p * S)
       = LinearMap.trace ℂ W (FF r hc p * (Y * X) * S) := by rw [h2]
     _ = LinearMap.trace ℂ W (FF r hc p * Y * S * X) := by
-      rw [mul_assoc (FF r hc p * Y) S X, h3.eq]; simp only [mul_assoc]
+        rw [mul_assoc (FF r hc p * Y) S X, h3.eq]; simp only [mul_assoc]
     _ = LinearMap.trace ℂ W (X * (FF r hc p * Y * S)) := by rw [LinearMap.trace_mul_comm]
-    _ = LinearMap.trace ℂ W (FF r hc (fun _ => p i₀) * S) := by rw [← h1]; simp only [mul_assoc]
+    _ = LinearMap.trace ℂ W (FF r hc (fun _ => p i₀) * S) := by
+        rw [← h1]; simp only [mul_assoc]
 
-private theorem sum_fib {β : Type} [AddCommMonoid β] (i₀ : Fin (m + 1)) (g : Fin d → β)
-    : ∑ p : Fin (m + 1) → Fin d, g (p i₀) = (d ^ m) • ∑ a, g a := by
-  rw [← Fintype.sum_equiv (Fin.insertNthEquiv (fun _ => Fin d) i₀)
-    (fun x => g x.1)
-    (fun p => g (p i₀))
-    (fun x => by simp)]
+private theorem sum_fib {β : Type} [AddCommMonoid β] (i₀ : Fin (m + 1)) (g : Fin d → β) :
+    ∑ p : Fin (m + 1) → Fin d, g (p i₀) = (d ^ m) • ∑ a, g a := by
+  rw [← Fintype.sum_equiv (Fin.insertNthEquiv (fun _ => Fin d) i₀) (fun x => g x.1)
+    (fun p => g (p i₀)) (fun x => by simp)]
   rw [Fintype.sum_prod_type]
   simp [Finset.smul_sum]
 
-private theorem FF_conj (p : Fin (m + 1) → Fin d) (o : Fin d)
-    : FF r hc p
-      = RR r hc (fun i => uu (p i) o) * FF r hc (fun _ => o) * RR r hc (fun i => uu o (p i)) := by
+private theorem FF_conj (p : Fin (m + 1) → Fin d) (o : Fin d) :
+    FF r hc p = RR r hc (fun i => uu (p i) o) * FF r hc (fun _ => o) * RR r hc (fun i => uu o (p i)) := by
   unfold FF
   rw [← map_mul, ← map_mul]
   congr 1
   funext i
   simp [uu_same]
 
-private theorem exists_scalar
-    [FiniteDimensional ℂ W] [Nontrivial W]
-    (o : Fin d) (hirr : ∀ P : Submodule ℂ W, (∀ i a, ∀ w ∈ P, r i a w ∈ P) → P = ⊥ ∨ P = ⊤)
+private theorem exists_scalar [FiniteDimensional ℂ W] [Nontrivial W] (o : Fin d)
+    (hirr : ∀ P : Submodule ℂ W, (∀ i a, ∀ w ∈ P, r i a w ∈ P) → P = ⊥ ∨ P = ⊤)
     (U : W ≃ₗ[ℂ] W)
-    (hU : ∀ i a, ((U : W →ₗ[ℂ] W) : Module.End ℂ W) * r (i + 1) a = r i a * (U : W →ₗ[ℂ] W))
-    : ∃ μ : ℂ,
-      μ ≠ 0
-        ∧ ((U : W →ₗ[ℂ] W) : Module.End ℂ W) * FF r hc (fun _ => o) = μ • FF r hc (fun _ => o) := by
+    (hU : ∀ i a, ((U : W →ₗ[ℂ] W) : Module.End ℂ W) * r (i + 1) a = r i a * (U : W →ₗ[ℂ] W)) :
+    ∃ μ : ℂ, μ ≠ 0 ∧ ((U : W →ₗ[ℂ] W) : Module.End ℂ W) * FF r hc (fun _ => o) =
+      μ • FF r hc (fun _ => o) := by
   set f : Module.End ℂ W := FF r hc (fun _ => o) with hf
   set Ue : Module.End ℂ W := (U : W →ₗ[ℂ] W) with hUe
   have hf0 : f ≠ 0 := by
@@ -340,13 +354,10 @@ private theorem exists_scalar
       induction hx using Submodule.span_induction with
       | mem x h =>
         obtain ⟨b, rfl⟩ := h
-        exact Submodule.subset_span ⟨
-          Pi.mulSingle i a * b,
-          by
-            change RR r hc (Pi.mulSingle i a * b) w = r i a (RR r hc b w)
-            rw [map_mul, RR_single]
-            rfl
-        ⟩
+        exact Submodule.subset_span ⟨Pi.mulSingle i a * b, by
+          change RR r hc (Pi.mulSingle i a * b) w = r i a (RR r hc b w)
+          rw [map_mul, RR_single]
+          rfl⟩
       | zero => simp
       | add x y _ _ hx hy => rw [map_add (f := _)]; exact P.add_mem hx hy
       | smul c x _ hx => rw [map_smul]; exact P.smul_mem c hx
@@ -385,15 +396,12 @@ private theorem exists_scalar
   exact hw0 (U.injective (by simpa [hUe] using hv1))
 
 include hc in
-private theorem core
-    [FiniteDimensional ℂ W] [Nontrivial W]
-    (o : Fin d) (hirr : ∀ P : Submodule ℂ W, (∀ i a, ∀ w ∈ P, r i a w ∈ P) → P = ⊥ ∨ P = ⊤)
-    (U : W ≃ₗ[ℂ] W) (hU : ∀ i a w, U (r (i + 1) a w) = r i a (U w))
-    : ∃ c : ℂ,
-      c ≠ 0
-        ∧ ∀ (i₀ : Fin (m + 1)) (S : Module.End ℂ W),
-          (∀ j, j ≠ i₀ → ∀ a, Commute S (r j a))
-            → LinearMap.trace ℂ W (S ∘ₗ (U : W →ₗ[ℂ] W)) = c * LinearMap.trace ℂ W S := by
+private theorem core [FiniteDimensional ℂ W] [Nontrivial W] (o : Fin d)
+    (hirr : ∀ P : Submodule ℂ W, (∀ i a, ∀ w ∈ P, r i a w ∈ P) → P = ⊥ ∨ P = ⊤)
+    (U : W ≃ₗ[ℂ] W) (hU : ∀ i a w, U (r (i + 1) a w) = r i a (U w)) :
+    ∃ c : ℂ, c ≠ 0 ∧ ∀ (i₀ : Fin (m + 1)) (S : Module.End ℂ W),
+      (∀ j, j ≠ i₀ → ∀ a, Commute S (r j a)) →
+      LinearMap.trace ℂ W (S ∘ₗ (U : W →ₗ[ℂ] W)) = c * LinearMap.trace ℂ W S := by
   set Ue : Module.End ℂ W := (U : W →ₗ[ℂ] W) with hUe
   have hU' : ∀ i a, Ue * r (i + 1) a = r i a * Ue := fun i a => LinearMap.ext (fun w => hU i a w)
   obtain ⟨μ, hμ0, hμ⟩ := exists_scalar r hc o hirr U hU'
@@ -407,20 +415,17 @@ private theorem core
     rw [FF_conj r hc (fun _ => a) o, ← mul_assoc, ← mul_assoc, h2, mul_assoc _ Ue, hμ]
     simp only [mul_smul_comm, smul_mul_assoc]
   refine ⟨μ / (d : ℂ) ^ m, div_ne_zero hμ0 (pow_ne_zero _ hd), fun i₀ S hS => ?_⟩
-  have hone
-      : ∀ T : Module.End ℂ W,
-        LinearMap.trace ℂ W T = ∑ p : Fin (m + 1) → Fin d, LinearMap.trace ℂ W (FF r hc p * T) := by
+  have hone : ∀ T : Module.End ℂ W, LinearMap.trace ℂ W T =
+      ∑ p : Fin (m + 1) → Fin d, LinearMap.trace ℂ W (FF r hc p * T) := by
     intro T
-    set_option synthInstance.maxHeartbeats 100000 in
+
     rw [← map_sum, ← Finset.sum_mul, FF_sum, one_mul]
-  have h1
-      : LinearMap.trace ℂ W (S * Ue)
-        = ∑ a : Fin d, LinearMap.trace ℂ W (FF r hc (fun _ => a) * (S * Ue)) := by
+  have h1 : LinearMap.trace ℂ W (S * Ue) =
+      ∑ a : Fin d, LinearMap.trace ℂ W (FF r hc (fun _ => a) * (S * Ue)) := by
     rw [hone (S * Ue)]
-    have hinj : Function.Injective (fun (a : Fin d) (_ : Fin (m + 1)) => a) := fun a b h =>
-      congrFun h 0
-    rw [← Finset.sum_subset (Finset.subset_univ (Finset.univ.image
-        fun (a : Fin d) (_ : Fin (m + 1)) => a)),
+    have hinj : Function.Injective (fun (a : Fin d) (_ : Fin (m + 1)) => a) :=
+      fun a b h => congrFun h 0
+    rw [← Finset.sum_subset (Finset.subset_univ (Finset.univ.image fun (a : Fin d) (_ : Fin (m + 1)) => a)),
       Finset.sum_image (fun a _ b _ h => hinj h)]
     intro p _ hp
     by_contra hne
@@ -432,19 +437,15 @@ private theorem core
     refine Finset.mem_image.2 ⟨p i₀, Finset.mem_univ _, ?_⟩
     funext i
     exact (const_of i₀ p hcst i).symm
-  have h2
-      : LinearMap.trace ℂ W S
-        = (d : ℂ) ^ m * ∑ a : Fin d, LinearMap.trace ℂ W (FF r hc (fun _ => a) * S) := by
+  have h2 : LinearMap.trace ℂ W S =
+      (d : ℂ) ^ m * ∑ a : Fin d, LinearMap.trace ℂ W (FF r hc (fun _ => a) * S) := by
     rw [hone S, Finset.sum_congr rfl (fun p _ => tr_fib r hc i₀ S hS p),
       sum_fib i₀ (fun a => LinearMap.trace ℂ W (FF r hc (fun _ => a) * S))]
     simp [nsmul_eq_mul]
-  have h3
-      : ∀ a : Fin d,
-        LinearMap.trace ℂ W (FF r hc (fun _ => a) * (S * Ue))
-          = μ * LinearMap.trace ℂ W (FF r hc (fun _ => a) * S) := by
+  have h3 : ∀ a : Fin d, LinearMap.trace ℂ W (FF r hc (fun _ => a) * (S * Ue)) =
+      μ * LinearMap.trace ℂ W (FF r hc (fun _ => a) * S) := by
     intro a
-    calc
-      LinearMap.trace ℂ W (FF r hc (fun _ => a) * (S * Ue))
+    calc LinearMap.trace ℂ W (FF r hc (fun _ => a) * (S * Ue))
         = LinearMap.trace ℂ W (FF r hc (fun _ => a) * S * Ue) := by rw [mul_assoc]
       _ = LinearMap.trace ℂ W (Ue * (FF r hc (fun _ => a) * S)) := LinearMap.trace_mul_comm _ _ _
       _ = LinearMap.trace ℂ W (Ue * FF r hc (fun _ => a) * S) := by rw [mul_assoc]
@@ -457,8 +458,8 @@ end Units
 
 end UpperTheory.ConvolutionTheory.L1
 
-theorem UpperTheory.ConvolutionTheory.L1.unitsTrace
-    : UpperTheory.ConvolutionTheory.L1.UnitsTrace := by
+theorem UpperTheory.ConvolutionTheory.L1.unitsTrace :
+    UpperTheory.ConvolutionTheory.L1.UnitsTrace := by
   intro W _ _ _ m d r hc hirr U hU
   rcases subsingleton_or_nontrivial W with hW | hW
   · refine ⟨1, one_ne_zero, fun i₀ S _ => ?_⟩

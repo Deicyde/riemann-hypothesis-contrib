@@ -1,18 +1,46 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.LocalizationFreeStageTrueGroupColumnChoiceStep
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsRowBasisFromReferenceTupleQuotient
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsJW
-public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsFramesNormAtEqNorm
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.LinearIndependentSemilinearOfBasis
-public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.NonzeroPlacesOverPrimesLifts
-public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.ExistsIsBIffCoreB
-public import Development.AbelianVarietyTheory.PublishedTheorems.AutomorphicForms₂.WeilRepresentationUnitaryPair
-public import Development.AbelianVarietyTheory.PublishedTheorems.AutomorphicForms₂.DsExistsOfDiscreteSeriesExists
-public import Development.AbelianVarietyTheory.PublishedTheorems.AutomorphicForms₂.HarishChandraFinite
-public import Development.AbelianVarietyTheory.PublishedTheorems.AutomorphicForms₂.ExistsNormLeHeightPow
 public import Formalism.LocalToGlobal.IndefiniteReal.LinksStage
+public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.ReadPk
+public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsFramesNormAtEqNorm
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsJW
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsRowBasisFromReferenceTupleQuotient
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.LinearIndependentSemilinearOfBasis
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.LocalizationFreeStageTrueGroupColumnChoiceStep
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
 
 @[expose] public section
 
@@ -77,7 +105,6 @@ end GlobalTheory.Mem.R3.Rw.GoodSideLattices
 
 namespace GlobalTheory.Mem.R3.Rw.GoodSideLattices
 
-set_option maxHeartbeats 1000000 in
 theorem reading_level_zero_of_side_data
     {D : D7} {G : Type} [Group G] [Fintype G]
     {Pl0 I0 T : Type} {A3 : FamIn3 D.what₂.LL G Pl0 I0 (List ℕ) T D.R.m} {Ks : Type}
@@ -255,11 +282,10 @@ variable
   {B : Base} {f : Fr B.toPre} {T : TwDat B} {w : ColW B f T} {Z₀ : w.Lt} {hX : B.fields.Ok}
   {Wt : Set B.places.Pl} {z₀ : Dat (w.st Z₀) w.I hX T Wt} {q : RowPk w z₀} {o : q.Over}
 
-set_option maxHeartbeats 1000000 in
+
 theorem RRset_side (s s' : Side0 o) (μ : (w.D o.Z).what₂.Tup) : s.p0.s.RRset μ = s'.p0.s.RRset μ :=
   RRset_reRow s'.p0.s s.cen s.tie s.RR s.frames s.jEE s.basis s.norm μ
 
-set_option maxHeartbeats 1000000 in
 theorem eq_of_stdIso
     (m : Moved o) (eR : Gc B w.px ≃* G0g (w.D o.Z).nd) (hR : StdIso (w.st o.Z) w.px eR)
     : m.z.R.eG.trans m.z.cG = eR := by
@@ -269,7 +295,6 @@ theorem eq_of_stdIso
   exact (Bare.read_unique g (m.z.R.eG g) (m.z.idG g) (plg kv) (plg₀ kv) ((h1 kv).trans (k1 kv).symm)
     (iso kv) (iso₀ kv) (h2 g kv) (k2 g kv)).symm
 
-set_option maxHeartbeats 1000000 in
 theorem exists_side
     (hF : o.Fits) (m : Moved o)
     {n : ℕ} (c : Module.Basis (Fin n) ℂ (q.p.ch false).EE.T)
@@ -332,7 +357,7 @@ def Good (m : Moved o) (s : Side0 o) : Prop :=
                 (ε x'))
       ∧ s.p0.s.RRDef
 
-set_option maxHeartbeats 1000000 in
+
 theorem exists_good (hF : o.Fits) (m : Moved o) : ∃ s : Side0 o, Good m s := by
   obtain ⟨n, c, Xo, h⟩ :=
     rrT_exists (w.st o.Z).toD7 (Gc B w.px) (PlS B w.px) (PlI B w.px) (TupU w.I (usedOf w.I T Wt))
@@ -349,7 +374,6 @@ theorem exists_good (hF : o.Fits) (m : Moved o) : ∃ s : Side0 o, Good m s := b
   rw [RRset_side s s']
   exact Iff.rfl
 
-set_option maxHeartbeats 1000000 in
 theorem read_of_good
     (hF : o.Fits)
     (m : Moved o) (s : Side0 o) (hs : Good m s) (Y : Read m.z.R.toRealDat m.z.F.lv2 s.p0)
@@ -373,7 +397,6 @@ end GlobalTheory.Mem.R3.Rw.GoodSideLattices
 
 namespace GlobalTheory.Mem.R3.Rw
 
-set_option maxHeartbeats 1000000 in
 theorem exists_side_reading_level_zero
     : ∀ (B : Base) (f : Fr B.toPre) (T : TwDat B) (w : ColW B f T) (Z₀ : w.Lt) (hX : B.fields.Ok)
         (Wt : Set B.places.Pl) (z₀ : Dat (w.st Z₀) w.I hX T Wt),

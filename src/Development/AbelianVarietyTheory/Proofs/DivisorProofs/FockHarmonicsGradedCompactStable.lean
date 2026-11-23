@@ -1,9 +1,49 @@
 module
 
-public import Mathlib
-public import Formalism.SharpRestriction.Divisibility.SchurIrreducible
 public import Development.AbelianVarietyTheory.Definitions.Foundations.IsFockIPOfFockData
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FockOperatorsLieRepresentationCommuteStatement
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+public import Mathlib.RingTheory.MvPolynomial.EulerIdentity
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
+import Formalism.SharpRestriction.Divisibility.SchurIrreducible
 
 @[expose] public section
 
@@ -30,8 +70,8 @@ theorem DegZero.comm
     {K : Module.End ℂ (MvPolynomial σ ℂ)} (hK : DegZero K) (d : ℕ) (P : MvPolynomial σ ℂ)
     : homogeneousComponent d (K P) = K (homogeneousComponent d P) := by
   rw [← sum_homogeneousComponent P]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum]
+
+  simp only [map_sum]
   refine Finset.sum_congr rfl fun e _ => ?_
   rw [homogeneousComponent_of_mem (hK e _ (homogeneousComponent_mem e P)), hc_hc]
   split_ifs <;> simp
@@ -53,8 +93,8 @@ theorem minusPart_eq_zero_iff (A : Module.End ℂ (MvPolynomial σ ℂ)) (P : Mv
       simp [homogeneousComponent_eq_zero _ _ this]
     rw [minusPart, finsum_eq_sum_of_support_subset _ hfin] at h
     have h2 := congrArg (homogeneousComponent d) h
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, map_zero] at h2
+
+    rw [map_sum, map_zero] at h2
     simp only [hc_hc] at h2
     rw [Finset.sum_ite_eq] at h2
     simpa using h2

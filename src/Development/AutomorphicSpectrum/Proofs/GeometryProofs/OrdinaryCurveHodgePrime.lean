@@ -1,21 +1,69 @@
 module
 
-public import Mathlib
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.FromNAdd
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.ArithVarietyPrimeGlobalRelayStatement
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.ArithVarietyModelHodgeRelayStatement
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.ArithVarietyPrimeHodgeTotalStatement
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.ChartDThSqIdealMemAndSmulMemAndEigMemSqIdealStatement
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.ArithVarietyModelPrimeTotalStatement
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.ArithVarietyPrimeHodgeEstimateStatement
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.OrdinaryCurveModelRelayStatement
+public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.IsLatFlagPair
+public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.IsLatFamilyCongr
+public import Development.AutomorphicSpectrum.PublishedTheorems.Algebra₂.FarguesHodgeTate
+public import Development.AutomorphicSpectrum.PublishedTheorems.Algebra₂.QuotientByFiniteFlatStatement
+public import Development.AutomorphicSpectrum.PublishedTheorems.Algebra₂.ZarhinStatement
+public import Development.AutomorphicSpectrum.Statements.AlgebraStatements.HodgeTateDatumStatement
+public import Development.AutomorphicSpectrum.Statements.AlgebraStatements.OrdinaryCurveStatement
+public import Development.AutomorphicSpectrum.Proofs.AlgebraProofs.AbelianFactorTightFieldActionStatement
+public import Development.AutomorphicSpectrum.Proofs.AlgebraProofs.HodgeKernelImageLatticeStatement
+public import Development.AutomorphicSpectrum.Proofs.AlgebraProofs.HopfOrderLatticeBase
 public import Development.AutomorphicSpectrum.Proofs.AlgebraProofs.LatticeBaseChangeLargerRingHoldsStatement
 public import Development.AutomorphicSpectrum.Proofs.AlgebraProofs.MemFirstLatticeIff
-public import Development.AutomorphicSpectrum.Proofs.AlgebraProofs.HopfOrderLatticeBase
-public import Development.AutomorphicSpectrum.Proofs.AlgebraProofs.ValMulLeOfCyclicKer
-public import Development.AutomorphicSpectrum.Proofs.AlgebraProofs.HodgeKernelImageLatticeStatement
-public import Development.AutomorphicSpectrum.Proofs.AlgebraProofs.AbelianFactorTightFieldActionStatement
 public import Development.AutomorphicSpectrum.Proofs.AlgebraProofs.QuotientZarhinHodgeTateSubquotientStatement
+public import Development.AutomorphicSpectrum.Proofs.AlgebraProofs.ValMulLeOfCyclicKer
+public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.ArithVarietyModelHodgeRelayStatement
+public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.ArithVarietyModelPrimeTotalStatement
+public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.ArithVarietyPrimeGlobalRelayStatement
+public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.ArithVarietyPrimeHodgeEstimateStatement
+public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.ArithVarietyPrimeHodgeTotalStatement
+public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.ChartDThSqIdealMemAndSmulMemAndEigMemSqIdealStatement
+public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.OrdinaryCurveModelRelayStatement
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.LinearAlgebra.FreeModule.IdealQuotient
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+public import Development.AutomorphicSpectrum.Definitions.CommutativeAlgebra.StepOrderRes
+import Development.AutomorphicSpectrum.Definitions.DivisibilityTowers.CompactGapsGE
 
 @[expose] public section
 
@@ -65,7 +113,6 @@ theorem af_le_stdLat
   rw [h5] at h4
   exact h4
 
-set_option maxHeartbeats 4000000 in
 theorem testFacts
     (hF : GlobalTheory.CompanionTheory.Ar.HT.FarguesHodgeTate)
     (hQ : GlobalTheory.CompanionTheory.Ar.GR.QuotientByFiniteFlatStatement)

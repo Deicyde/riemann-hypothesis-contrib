@@ -2,6 +2,48 @@ module
 
 public import Formalism.LocalToGlobal.CharacterGerms.RowTiePHStab
 public import Formalism.LocalToGlobal.CharacterGerms.RowTiePCartSelfSt
+import Formalism.LocalToGlobal.CharacterGerms.RowTieCartFB
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
@@ -18,22 +60,18 @@ variable {C : Type} [Field C]
 
 section Rename₂
 
-theorem coeff_rename_outside
-    {σ τ : Type} [Finite σ]
-    (φ : σ → τ)
-    (F : MvPowerSeries σ C)
-    (ν : τ →₀ ℕ)
-    {s : τ} (hs : ν s ≠ 0) (hr : ∀ x, φ x ≠ s)
-    : coeff ν (MvPowerSeries.subst (fun x => (X (φ x) : MvPowerSeries τ C)) F) = 0 := by
+theorem coeff_rename_outside {σ τ : Type} [Finite σ] (φ : σ → τ) (F : MvPowerSeries σ C) (ν : τ →₀ ℕ) {s : τ}
+    (hs : ν s ≠ 0) (hr : ∀ x, φ x ≠ s) :
+    coeff ν (MvPowerSeries.subst (fun x => (X (φ x) : MvPowerSeries τ C)) F) = 0 := by
   refine coeff_subst_rename_out φ F ν fun e' he => hs ?_
   rw [← he]
   exact Finsupp.mapDomain_notin_range _ _ (by rintro ⟨x, hx⟩; exact hr x hx)
 
 variable {dd : ℕ}
 
-theorem coeff_hCol (h : PS C 2 dd) (col c1 c2 : Fin 2) (i j : Fin dd)
-    : coeff (E2 ((0 : Fin 2), (c1, i)) ((1 : Fin 2), (c2, j))) (hCol col h)
-      = if c1 = col ∧ c2 = col then coeff (E2 ((0 : Fin 2), i) ((1 : Fin 2), j)) h else 0 := by
+theorem coeff_hCol (h : PS C 2 dd) (col c1 c2 : Fin 2) (i j : Fin dd) :
+    coeff (E2 ((0 : Fin 2), (c1, i)) ((1 : Fin 2), (c2, j))) (hCol col h) =
+      if c1 = col ∧ c2 = col then coeff (E2 ((0 : Fin 2), i) ((1 : Fin 2), j)) h else 0 := by
   unfold hCol
   split_ifs with hc
   · obtain ⟨h1, h2⟩ := hc
@@ -42,10 +80,8 @@ theorem coeff_hCol (h : PS C 2 dd) (col c1 c2 : Fin 2) (i j : Fin dd)
       intro a b hab
       simp only [Prod.mk.injEq] at hab
       exact Prod.ext hab.1 hab.2.2
-    have he
-        : E2 ((0 : Fin 2), (col, i)) ((1 : Fin 2), (col, j))
-          = (E2 ((0 : Fin 2), i) ((1 : Fin 2), j)).mapDomain
-            (fun p : Fin 2 × Fin dd => (p.1, (col, p.2))) := by
+    have he : E2 ((0 : Fin 2), (col, i)) ((1 : Fin 2), (col, j)) =
+        (E2 ((0 : Fin 2), i) ((1 : Fin 2), j)).mapDomain (fun p : Fin 2 × Fin dd => (p.1, (col, p.2))) := by
       simp [E2, Finsupp.mapDomain_add, Finsupp.mapDomain_single]
     rw [he, coeff_subst_rename_inj _ hφ]
   · by_cases h1 : c1 = col
@@ -65,16 +101,13 @@ end Rename₂
 
 section Self
 
-variable
-  [CharZero C]
-  {V : VF C} {O : Type} [CommRing O] [StarRing O]
-  {dd : ℕ} {d : ℕ} {I0 : Type} [Fintype I0]
+variable [CharZero C] {V : VF C} {O : Type} [CommRing O] [StarRing O] {dd : ℕ} {d : ℕ} {I0 : Type} [Fintype I0]
 
-theorem coeff_E2_sum_hCol_eq_ite (h : PS C 2 dd) (c1 c2 : Fin 2) (i j : Fin dd)
-    : coeff (E2 ((0 : Fin 2), (c1, i)) ((1 : Fin 2), (c2, j))) (∑ col, hCol col h)
-      = if c1 = c2 then coeff (E2 ((0 : Fin 2), i) ((1 : Fin 2), j)) h else 0 := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+theorem coeff_E2_sum_hCol_eq_ite (h : PS C 2 dd) (c1 c2 : Fin 2) (i j : Fin dd) :
+    coeff (E2 ((0 : Fin 2), (c1, i)) ((1 : Fin 2), (c2, j))) (∑ col, hCol col h) =
+      if c1 = c2 then coeff (E2 ((0 : Fin 2), i) ((1 : Fin 2), j)) h else 0 := by
+
+  rw [map_sum]
   simp only [coeff_hCol]
   rw [Fin.sum_univ_two]
   by_cases h12 : c1 = c2
@@ -82,31 +115,23 @@ theorem coeff_E2_sum_hCol_eq_ite (h : PS C 2 dd) (c1 c2 : Fin 2) (i j : Fin dd)
     fin_cases c1 <;> simp
   · fin_cases c1 <;> fin_cases c2 <;> simp_all
 
-theorem FBChart.self_raw_first_pairing_eq
-    (Y : FBChart C V O dd) (p : SelfData Y d I0) (w v : Fin 2 × Fin dd → C)
-    : (Y.rawSelf p).sg1 w v = - ∑ col, bil Y.h (fun i => w (col, i)) (fun j => v (col, j)) := by
-  have hsg
-      : ∀ x : Fin 2 × Fin dd,
-        MvPowerSeries.coeff (Finsupp.single x 1) ((Y.rawSelf p).sg v)
-          = - ∑ i : Fin 2 × Fin dd, v i *
-               (if x.1 = i.1 then MvPowerSeries.coeff (E2 ((0 : Fin 2), x.2) ((1 : Fin 2), i.2)) Y.h else 0) :=
-    by
-      intro x
-      show (-∑ i, v i * MvPowerSeries.coeff ((Finsupp.single x 1).mapDomain (fun y => ((0 : Fin 2), y)) +
-        Finsupp.single ((1 : Fin 2), i) 1) (∑ col, hCol col Y.h)) = _
-      congr 1
-      refine Finset.sum_congr rfl fun i _ => ?_
-      rw [Finsupp.mapDomain_single]
-      rw [show Finsupp.single ((0 : Fin 2), x) 1 + Finsupp.single ((1 : Fin 2), i) 1
-            = E2 ((0 : Fin 2), (x.1, x.2)) ((1 : Fin 2), (i.1, i.2)) from
-          rfl,
-        coeff_E2_sum_hCol_eq_ite]
+theorem FBChart.self_raw_first_pairing_eq (Y : FBChart C V O dd) (p : SelfData Y d I0) (w v : Fin 2 × Fin dd → C) :
+    (Y.rawSelf p).sg1 w v = -∑ col, bil Y.h (fun i => w (col, i)) (fun j => v (col, j)) := by
+  have hsg : ∀ x : Fin 2 × Fin dd, MvPowerSeries.coeff (Finsupp.single x 1) ((Y.rawSelf p).sg v) =
+      -∑ i : Fin 2 × Fin dd, v i *
+        (if x.1 = i.1 then MvPowerSeries.coeff (E2 ((0 : Fin 2), x.2) ((1 : Fin 2), i.2)) Y.h else 0) := by
+    intro x
+    show (-∑ i, v i * MvPowerSeries.coeff ((Finsupp.single x 1).mapDomain (fun y => ((0 : Fin 2), y)) +
+      Finsupp.single ((1 : Fin 2), i) 1) (∑ col, hCol col Y.h)) = _
+    congr 1
+    refine Finset.sum_congr rfl fun i _ => ?_
+    rw [Finsupp.mapDomain_single]
+    rw [show Finsupp.single ((0 : Fin 2), x) 1 + Finsupp.single ((1 : Fin 2), i) 1 =
+      E2 ((0 : Fin 2), (x.1, x.2)) ((1 : Fin 2), (i.1, i.2)) from rfl, coeff_E2_sum_hCol_eq_ite]
   simp only [RawChart.sg1, hsg, bil, Fintype.sum_prod_type, Fin.sum_univ_two]
-  simp only [Fin.isValue, if_true, zero_ne_one, one_ne_zero, if_false, mul_zero,
-    Finset.sum_const_zero, add_zero, zero_add, Finset.mul_sum, mul_neg, Finset.sum_neg_distrib,
-    neg_add]
-  congr 1
-    <;> (congr 1; exact Finset.sum_congr rfl fun a _ => Finset.sum_congr rfl fun b _ => by ring)
+  simp only [Fin.isValue, if_true, zero_ne_one, one_ne_zero, if_false, mul_zero, Finset.sum_const_zero,
+    add_zero, zero_add, Finset.mul_sum, mul_neg, Finset.sum_neg_distrib, neg_add]
+  congr 1 <;> (congr 1; exact Finset.sum_congr rfl fun a _ => Finset.sum_congr rfl fun b _ => by ring)
 
 end Self
 

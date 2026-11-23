@@ -1,12 +1,58 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicArithmetic.OrbitLabellings.RowDefs
 public import Formalism.DropLevelBounds.ThBounds
-public import Formalism.IncomingBounds.IncomingBound
-public import Development.AutomorphicArithmetic.OrbitLabellings.AttainsBlockListOfWeightsAlongOrbits
 public import Development.AbelianVarietyTheory.Proofs.UnramifiedDepth.DropLevelsBasic
 public import Development.AbelianVarietyTheory.Proofs.UnramifiedDepth.MulFlowValLe
+public import Development.AutomorphicArithmetic.OrbitLabellings.AttainsBlockListOfWeightsAlongOrbits
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Real
+public import Mathlib.Analysis.Complex.ExponentialBounds
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -110,9 +156,6 @@ private theorem levelBound
       rw [Nat.cast_sub (by omega)]
       norm_num
     rw [hcast] at hlog
-    have hpos : (0 : ℝ) ≤ (i0 k l : ℝ) - 2 := by
-      have : (5 : ℝ) ≤ i0 k l := by exact_mod_cast h5
-      linarith
     nlinarith
 
 private theorem exists_good {S : ℕ} {G : Set ℕ} (h : Windows S G) {r : ℝ} (hr : 0 ≤ r)
@@ -175,7 +218,6 @@ private theorem rho_mul_le_Fnum (hl : 2 ≤ l) {D : ZMod d → ℝ} (hD : ∀ a,
     : Formalism.IncomingBounds.rho l * ∑ a, D a ≤ Fnum l d D := by
   have hl2 : (2 : ℝ) ≤ l := by exact_mod_cast hl
   have hden : (0 : ℝ) < (l : ℝ) ^ 2 - 1 := by nlinarith
-  have hsum0 : 0 ≤ ∑ a, D a := Finset.sum_nonneg fun a _ => hD a
   have hmf : maxFlow l d D ≤ (∑ a, D a) / ((l : ℝ) + 1) :=
     GlobalTheory.FlowScaling.maxFlow_le hD fun x hx => by
       have := succ_mul_flowVal_le (by omega) hx
@@ -208,7 +250,6 @@ private theorem blockBd_le
   have hlm : (0 : ℝ) < (l : ℝ) - 1 := by linarith
   have hnR : (1 : ℝ) ≤ n := by exact_mod_cast hn
   have hlog : 0 ≤ Real.logb l n := Real.logb_nonneg hl1 hnR
-  have hS0 : (0 : ℝ) ≤ S := Nat.cast_nonneg S
   have hnl : 0 ≤ (n : ℝ) * (Real.logb l n + 1) := mul_nonneg (by linarith) (by linarith)
   unfold blockBd bdP
   by_cases hy : y = 0
@@ -266,7 +307,6 @@ private theorem exists_plan
   intro l d _ hl n m k S hn hk W Ws Good hWs hG
   obtain ⟨_, hI3, _, hthl⟩ := thlEq k l hk (by omega)
   have hl1 : (1 : ℝ) < l := by exact_mod_cast (by omega : 1 < l)
-  have hlm : (0 : ℝ) < (l : ℝ) - 1 := by linarith
   have hnR : (1 : ℝ) ≤ n := by exact_mod_cast hn
   have hn0 : (0 : ℝ) < n := by linarith
   have hD0 : 0 ≤ (fun a => (n : ℝ) * Ws a) := by
@@ -520,7 +560,6 @@ private theorem add_le (l k i : ℕ) (hl : 5 ≤ l) (hk : 4 ≤ k) (hi : (i : �
     apply Real.logb_nonneg hl1
     have : (0 : ℝ) ≤ ((k - 1 : ℕ) : ℝ) := Nat.cast_nonneg _
     linarith
-  have hi0 : (0 : ℝ) ≤ i := Nat.cast_nonneg _
   have hS
       : (S0 l i (k - 1) : ℝ)
         < 64 * ((k - 1 : ℕ) : ℝ) ^ 2 * ((i : ℝ) + 3 + 3 * Real.logb l (((k - 1 : ℕ) : ℝ) + 1))
@@ -551,7 +590,6 @@ private theorem inv_le {l : ℕ} (hl : 5 ≤ l)
   · unfold gam; positivity
   · unfold rho; positivity
 
-set_option maxHeartbeats 800000 in
 private theorem orbit
     (l d : ℕ) [NeZero d]
     (hl : 5 ≤ l)
@@ -588,7 +626,6 @@ private theorem orbit
   refine ⟨p, hp1, hp2, ?_⟩
   rw [← hcast] at hθm ⊢
   set nR : ℝ := ((k - 1 : ℕ) : ℝ) with hnR
-  have hnR0 : 3 ≤ nR := by rw [hcast]; linarith
   have hnRk : nR ≤ k := by rw [hcast]; linarith
   have hL : 1 ≤ Real.log k := one_le_log (by linarith)
   obtain ⟨hinv, hg2, hg0, hrho⟩ := inv_le hl
@@ -845,7 +882,6 @@ theorem UpperTheory.rowBound_le_Fnum_sum_add_error
         mul_le_mul_of_nonneg_right hdeg.rest_le (inv_nonneg.mpr hl0.le)
       _ ≤ _ := mul_le_mul_of_nonneg_left hinv hCn
   have hk4 : (1 : ℝ) ≤ P.k := by exact_mod_cast (show 1 ≤ P.k by omega)
-  have hlog : 0 ≤ Real.log P.k := Real.log_nonneg hk4
   have hw : 0 ≤ ∑ z, P.w z := Finset.sum_nonneg fun z _ => (hdeg.w_pos z).le
   have hthl : 0 ≤ thl P.k l := by
     rw [(thlEq P.k l (by omega) (by omega)).2.2.2]
@@ -853,7 +889,6 @@ theorem UpperTheory.rowBound_le_Fnum_sum_add_error
   have ha : 0 ≤ Real.log P.k * P.m * (∑ z, P.w z) / l := by positivity
   have hb : 0 ≤ (P.f : ℝ) * P.k * P.SE / l := by positivity
   have hc : 0 ≤ (P.k : ℝ) * thl P.k l * (∑ z, P.w z) := by positivity
-  have hk1r : (0 : ℝ) ≤ (P.k : ℝ) - 1 := by linarith
   have he : 0 ≤ Pk.T * P.f * ((P.k : ℝ) - 1) ^ 3 * Real.log P.k ^ 2 := by positivity
   have hid
       : A * (∑ z, P.w z) + P.f * X + C1 * (P.f * P.k * P.SE) * (2 * (l : ℝ)⁻¹)

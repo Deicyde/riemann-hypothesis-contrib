@@ -1,9 +1,49 @@
 module
 
-public import Mathlib
 public import GroundTheory.HeightsAndTheta.Heights.KleimanAmpleness.Statements
 public import GroundTheory.HeightsAndTheta.Heights.KleimanAmpleness.StatementsTildeVanish
 public import GroundTheory.HeightsAndTheta.Heights.KleimanAmpleness.PTildeVanishLoc
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -19,17 +59,13 @@ universe u v w
 
 section Compare
 
-variable
-  {S : Type u} [CommRing S]
-  {Ω : Type w} [Field Ω] [Algebra S Ω]
-  {N : ℕ} {x : Fin (N + 1) → Ω} {E : Type v}
-  [AddCommGroup E] [Module Ω E] [Module S E] [IsScalarTower S Ω E]
+variable {S : Type u} [CommRing S] {Ω : Type w} [Field Ω] [Algebra S Ω] {N : ℕ}
+  {x : Fin (N + 1) → Ω} {E : Type v} [AddCommGroup E] [Module Ω E] [Module S E] [IsScalarTower S Ω E]
 
-theorem coe_d_sub
-    (F : SubSystem S x E)
-    {i : ℕ} (t : Cech.Cochain (fun I : Chart x => ↥(F.sub I)) i) (J : Cech.Idx (support x) (i + 1))
-    : ((Cech.d (fun I : Chart x => ↥(F.sub I)) F.res i t J : F.sub J.1) : E)
-      = ∑ j : J.1.1, Cech.sgn J.1.1 j • (t (Cech.face J j) : E) := by
+theorem coe_d_sub (F : SubSystem S x E) {i : ℕ} (t : Cech.Cochain (fun I : Chart x => ↥(F.sub I)) i)
+    (J : Cech.Idx (support x) (i + 1)) :
+    ((Cech.d (fun I : Chart x => ↥(F.sub I)) F.res i t J : F.sub J.1) : E) =
+      ∑ j : J.1.1, Cech.sgn J.1.1 j • (t (Cech.face J j) : E) := by
   rw [Cech.d_apply, Submodule.coe_sum]
   refine Finset.sum_congr rfl fun j _ => ?_
   rw [Submodule.coe_smul_of_tower]
@@ -37,30 +73,29 @@ theorem coe_d_sub
 
 variable (M : FinGradedSub (S := S) (x := x) E) (c : ℤ)
 
-def liftTilde (I : StdCell N) (hI : I.1 ⊆ support x) (y : M.tilde c ⟨I.1, I.2.1, hI⟩)
-    : LocMod S N M.coneSubE I.1 :=
+def liftTilde (I : StdCell N) (hI : I.1 ⊆ support x) (y : M.tilde c ⟨I.1, I.2.1, hI⟩) :
+    LocMod S N M.coneSubE I.1 :=
   Classical.choose (exists_locConeE_eq M c I hI y.2)
 
-theorem liftTilde_mem (I : StdCell N) (hI : I.1 ⊆ support x) (y : M.tilde c ⟨I.1, I.2.1, hI⟩)
-    : liftTilde M c I hI y ∈ degLoc M.coneGradedE c I :=
+theorem liftTilde_mem (I : StdCell N) (hI : I.1 ⊆ support x) (y : M.tilde c ⟨I.1, I.2.1, hI⟩) :
+    liftTilde M c I hI y ∈ degLoc M.coneGradedE c I :=
   (Classical.choose_spec (exists_locConeE_eq M c I hI y.2)).1
 
-theorem locConeE_liftTilde (I : StdCell N) (hI : I.1 ⊆ support x) (y : M.tilde c ⟨I.1, I.2.1, hI⟩)
-    : locConeE M I.1 hI (liftTilde M c I hI y) = singleE S x E c y :=
+theorem locConeE_liftTilde (I : StdCell N) (hI : I.1 ⊆ support x) (y : M.tilde c ⟨I.1, I.2.1, hI⟩) :
+    locConeE M I.1 hI (liftTilde M c I hI y) = singleE S x E c y :=
   (Classical.choose_spec (exists_locConeE_eq M c I hI y.2)).2
 
-def liftCochain {i : ℕ} (t : Cech.Cochain (fun I : Chart x => ↥((M.tildeSys c).sub I)) i)
-    : Cech.Cochain (locSys S N M.coneSubE) i := fun J =>
+def liftCochain {i : ℕ} (t : Cech.Cochain (fun I : Chart x => ↥((M.tildeSys c).sub I)) i) :
+    Cech.Cochain (locSys S N M.coneSubE) i := fun J =>
   if hJ : J.1.1 ⊆ support x then liftTilde M c J.1 hJ (t ⟨⟨J.1.1, J.1.2.1, hJ⟩, J.2⟩) else 0
 
-theorem liftCochain_of
-    {i : ℕ} (t : Cech.Cochain (fun I : Chart x => ↥((M.tildeSys c).sub I)) i)
-    (J : Cech.Idx (Finset.univ : Finset (Fin (N + 1))) i) (hJ : J.1.1 ⊆ support x)
-    : liftCochain M c t J = liftTilde M c J.1 hJ (t ⟨⟨J.1.1, J.1.2.1, hJ⟩, J.2⟩) :=
+theorem liftCochain_of {i : ℕ} (t : Cech.Cochain (fun I : Chart x => ↥((M.tildeSys c).sub I)) i)
+    (J : Cech.Idx (Finset.univ : Finset (Fin (N + 1))) i) (hJ : J.1.1 ⊆ support x) :
+    liftCochain M c t J = liftTilde M c J.1 hJ (t ⟨⟨J.1.1, J.1.2.1, hJ⟩, J.2⟩) :=
   dif_pos hJ
 
-theorem liftCochain_mem {i : ℕ} (t : Cech.Cochain (fun I : Chart x => ↥((M.tildeSys c).sub I)) i)
-    : liftCochain M c t ∈ Cech.Cdeg (locSys S N M.coneSubE) (degLoc M.coneGradedE c) i := by
+theorem liftCochain_mem {i : ℕ} (t : Cech.Cochain (fun I : Chart x => ↥((M.tildeSys c).sub I)) i) :
+    liftCochain M c t ∈ Cech.Cdeg (locSys S N M.coneSubE) (degLoc M.coneGradedE c) i := by
   intro J _
   by_cases hJ : J.1.1 ⊆ support x
   · rw [liftCochain_of M c t J hJ]
@@ -69,23 +104,21 @@ theorem liftCochain_mem {i : ℕ} (t : Cech.Cochain (fun I : Chart x => ↥((M.t
     rw [dite_eq_right hJ]
     exact zero_mem _
 
-theorem locConeE_d
-    {i : ℕ} (z : Cech.Cochain (locSys S N M.coneSubE) i)
-    (K : Cech.Idx (Finset.univ : Finset (Fin (N + 1))) (i + 1)) (hK : K.1.1 ⊆ support x)
-    : locConeE M K.1.1 hK (Cech.d (locSys S N M.coneSubE) locResS i z K)
-      = ∑ j : K.1.1, Cech.sgn K.1.1 j • locConeE M (Cech.face K j).1.1
-          ((Cech.face_subset K j).trans hK) (z (Cech.face K j)) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [Cech.d_apply, map_sum]
+theorem locConeE_d {i : ℕ} (z : Cech.Cochain (locSys S N M.coneSubE) i)
+    (K : Cech.Idx (Finset.univ : Finset (Fin (N + 1))) (i + 1)) (hK : K.1.1 ⊆ support x) :
+    locConeE M K.1.1 hK (Cech.d (locSys S N M.coneSubE) locResS i z K) =
+      ∑ j : K.1.1, Cech.sgn K.1.1 j • locConeE M (Cech.face K j).1.1
+        ((Cech.face_subset K j).trans hK) (z (Cech.face K j)) := by
+
+  rw [Cech.d_apply, map_sum]
   refine Finset.sum_congr rfl fun j _ => ?_
   rw [map_zsmul]
   congr 1
   exact locConeE_locRes M (Cech.face_subset K j) hK _
 
-theorem d_liftCochain
-    {i : ℕ} (t : Cech.Cochain (fun I : Chart x => ↥((M.tildeSys c).sub I)) (i + 1))
-    (ht : Cech.d (fun I : Chart x => ↥((M.tildeSys c).sub I)) (M.tildeSys c).res (i + 1) t = 0)
-    : Cech.d (locSys S N M.coneSubE) locResS (i + 1) (liftCochain M c t) = 0 := by
+theorem d_liftCochain {i : ℕ} (t : Cech.Cochain (fun I : Chart x => ↥((M.tildeSys c).sub I)) (i + 1))
+    (ht : Cech.d (fun I : Chart x => ↥((M.tildeSys c).sub I)) (M.tildeSys c).res (i + 1) t = 0) :
+    Cech.d (locSys S N M.coneSubE) locResS (i + 1) (liftCochain M c t) = 0 := by
   funext K
   change _ = 0
   by_cases hK : K.1.1 ⊆ support x
@@ -93,33 +126,29 @@ theorem d_liftCochain
     rw [locConeE_d M (liftCochain M c t) K hK, map_zero]
     have h0 := coe_d_sub (M.tildeSys c) t ⟨⟨K.1.1, K.1.2.1, hK⟩, K.2⟩
     rw [ht] at h0
-    calc
-      ∑ j : K.1.1, Cech.sgn K.1.1 j • locConeE M (Cech.face K j).1.1
-       ((Cech.face_subset K j).trans hK) (liftCochain M c t (Cech.face K j))
-          = ∑ j : K.1.1, Cech.sgn K.1.1 j • singleE S x E c
-              (t (Cech.face (⟨⟨K.1.1, K.1.2.1, hK⟩, K.2⟩ : Cech.Idx (support x) (i + 1 + 1)) j) : E) :=
-        by
+    calc ∑ j : K.1.1, Cech.sgn K.1.1 j • locConeE M (Cech.face K j).1.1
+          ((Cech.face_subset K j).trans hK) (liftCochain M c t (Cech.face K j))
+        = ∑ j : K.1.1, Cech.sgn K.1.1 j • singleE S x E c
+            (t (Cech.face (⟨⟨K.1.1, K.1.2.1, hK⟩, K.2⟩ : Cech.Idx (support x) (i + 1 + 1)) j) : E) := by
           refine Finset.sum_congr rfl fun j _ => ?_
           rw [liftCochain_of M c t _ ((Cech.face_subset K j).trans hK)]
           congr 1
           exact locConeE_liftTilde M c _ _ _
-      _ = singleE S x E c
-          (∑ j : K.1.1, Cech.sgn K.1.1 j •
-            (t (Cech.face (⟨⟨K.1.1, K.1.2.1, hK⟩, K.2⟩ : Cech.Idx (support x) (i + 1 + 1)) j) : E)) :=
-        by
-          set_option synthInstance.maxHeartbeats 100000 in
-            rw [map_sum]
+      _ = singleE S x E c (∑ j : K.1.1, Cech.sgn K.1.1 j •
+            (t (Cech.face (⟨⟨K.1.1, K.1.2.1, hK⟩, K.2⟩ : Cech.Idx (support x) (i + 1 + 1)) j) : E)) := by
+
+          rw [map_sum]
           refine Finset.sum_congr rfl fun j _ => ?_
           rw [map_zsmul]
       _ = 0 := by
-        rw [← h0]
-        exact map_zero _
+          rw [← h0]
+          exact map_zero _
   · haveI := locModE_subsingleton (S := S) M (Finset.not_subset.mp hK).choose_spec.1
       (by simpa [mem_support] using (Finset.not_subset.mp hK).choose_spec.2)
     exact Subsingleton.elim _ _
 
-theorem tildeSys_H_subsingleton (k : ℕ) (h : Subsingleton (cohom M.coneGradedE (k + 1) c))
-    : Subsingleton ((M.tildeSys c).H (k + 1)) := by
+theorem tildeSys_H_subsingleton (k : ℕ) (h : Subsingleton (cohom M.coneGradedE (k + 1) c)) :
+    Subsingleton ((M.tildeSys c).H (k + 1)) := by
   unfold cohom Cech.Hdeg at h
   rw [Submodule.Quotient.subsingleton_iff, Submodule.eq_top_iff'] at h
   unfold SubSystem.H Cech.H
@@ -128,23 +157,18 @@ theorem tildeSys_H_subsingleton (k : ℕ) (h : Subsingleton (cohom M.coneGradedE
   rintro ⟨t, ht⟩
   rw [Submodule.mem_comap]
   change t ∈ LinearMap.range (Cech.d _ (M.tildeSys c).res k)
-  have hz
-      : liftCochain M c t
-        ∈ Cech.cocyDeg (locSys S N M.coneSubE) (degLoc M.coneGradedE c) locResS (k + 1) :=
+  have hz : liftCochain M c t ∈
+      Cech.cocyDeg (locSys S N M.coneSubE) (degLoc M.coneGradedE c) locResS (k + 1) :=
     ⟨d_liftCochain M c t (LinearMap.mem_ker.mp ht), liftCochain_mem M c t⟩
   have hb := h ⟨_, hz⟩
   rw [Submodule.mem_comap] at hb
   change liftCochain M c t ∈ (Cech.Cdeg (locSys S N M.coneSubE) (degLoc M.coneGradedE c) k).map
-      (Cech.d (locSys S N M.coneSubE) locResS k)
-    at hb
+    (Cech.d (locSys S N M.coneSubE) locResS k) at hb
   obtain ⟨y, hy, hyz⟩ := hb
-  have hu
-      : ∀ I : Cech.Idx (support x) k,
-        coeffE S x E c (locConeE M I.1.1 I.1.2.2 (y ⟨⟨I.1.1, I.1.2.1, Finset.subset_univ _⟩, I.2⟩))
-          ∈ (M.tildeSys c).sub I.1 := fun I => by
-    obtain ⟨v, hv, hyv⟩ :=
-      locConeE_degLoc M c _ I.1.2.2
-        (hy ⟨⟨I.1.1, I.1.2.1, Finset.subset_univ _⟩, I.2⟩ (Set.mem_univ _))
+  have hu : ∀ I : Cech.Idx (support x) k, coeffE S x E c (locConeE M I.1.1 I.1.2.2
+      (y ⟨⟨I.1.1, I.1.2.1, Finset.subset_univ _⟩, I.2⟩)) ∈ (M.tildeSys c).sub I.1 := fun I => by
+    obtain ⟨v, hv, hyv⟩ := locConeE_degLoc M c _ I.1.2.2
+      (hy ⟨⟨I.1.1, I.1.2.1, Finset.subset_univ _⟩, I.2⟩ (Set.mem_univ _))
     rw [hyv, coeffE_singleE_same]
     exact hv
   refine ⟨fun I => ⟨_, hu I⟩, ?_⟩
@@ -155,9 +179,8 @@ theorem tildeSys_H_subsingleton (k : ℕ) (h : Subsingleton (cohom M.coneGradedE
   have e2 := congrFun hyz ⟨⟨J.1.1, J.1.2.1, Finset.subset_univ _⟩, J.2⟩
   rw [liftCochain_of M c t _ J.1.2.2] at e2
   rw [← coeffE_singleE_same (S := S) (x := x) c (t J : E), ← e1, ← e2]
-  refine Eq.trans ?_
-    (congrArg (coeffE S x E c)
-      (locConeE_d M y ⟨⟨J.1.1, J.1.2.1, Finset.subset_univ _⟩, J.2⟩ J.1.2.2)).symm
+  refine Eq.trans ?_ (congrArg (coeffE S x E c)
+    (locConeE_d M y ⟨⟨J.1.1, J.1.2.1, Finset.subset_univ _⟩, J.2⟩ J.1.2.2)).symm
   set_option synthInstance.maxHeartbeats 100000 in
     rw [map_sum]
   refine Finset.sum_congr rfl fun j _ => ?_

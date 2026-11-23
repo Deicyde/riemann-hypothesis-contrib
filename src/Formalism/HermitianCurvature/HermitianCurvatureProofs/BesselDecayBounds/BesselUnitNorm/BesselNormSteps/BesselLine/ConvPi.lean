@@ -1,7 +1,53 @@
 module
 
+import ReciprocityTheory.ReductiveGroups.DiscreteSeries.LaplaceOperators.LaplaceFoundations.UnitaryHaarColumns
 public import Formalism.HermitianCurvature.HermitianCurvatureProofs.BesselDecayBounds.BesselUnitNorm.BesselNormSteps.BesselLine.SfiniteMuN
 public import Formalism.HermitianCurvature.HermitianCurvatureProofs.BesselDecayBounds.BesselUnitNorm.BesselNormSteps.BesselLine.ConvGrp
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Etale.Weakly
+import Mathlib.RingTheory.Finiteness.ModuleFinitePresentation
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.TotallySplit
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Formalism.HermitianCurvature.HermitianCurvatureProofs.BesselDecayBounds.BesselUnitNorm.BesselLine
 
 @[expose] public section
 
@@ -12,8 +58,7 @@ noncomputable section
 
 namespace PI.WBL.Cv
 
-open Formalism.QuantumDeterminants Formalism.MainNotions.S Formalism.MainNotions.S.ThB
-  Formalism.BasicNotions PI.BesselLine PI.WBL
+open Formalism.QuantumDeterminants Formalism.MainNotions.S Formalism.MainNotions.S.ThB Formalism.BasicNotions PI.BesselLine PI.WBL
 
 section PiRep
 
@@ -36,8 +81,7 @@ theorem eB_inB (m : Fin k) : inB k r (eB k r m) := by
   show r ≤ r + m.val ∧ r + m.val < r + k
   exact ⟨by omega, by omega⟩
 
-theorem eq_eB_of_inB {i : Fin (2 * r + k + 1)} (hi : inB k r i)
-    : i = eB k r ⟨i.val - r, by unfold inB at hi; omega⟩ := by
+theorem eq_eB_of_inB {i : Fin (2 * r + k + 1)} (hi : inB k r i) : i = eB k r ⟨i.val - r, by unfold inB at hi; omega⟩ := by
   unfold inB at hi
   apply Fin.ext
   simp only [eB]
@@ -45,26 +89,23 @@ theorem eq_eB_of_inB {i : Fin (2 * r + k + 1)} (hi : inB k r i)
 
 def ub (c : Mx k r) : Matrix (Fin k) (Fin k) ℂ := fun m m' => c (eB k r m) (eB k r m')
 
-theorem blockW_in
-    {h : Matrix (Fin k) (Fin k) ℂ} {i j : Fin (2 * r + k + 1)} (hi : inB k r i) (hj : inB k r j)
-    : blockW k r h i j
-      = h ⟨i.val - r, by unfold inB at hi; omega⟩ ⟨j.val - r, by unfold inB at hj; omega⟩ := by
+theorem blockW_in {h : Matrix (Fin k) (Fin k) ℂ} {i j : Fin (2 * r + k + 1)} (hi : inB k r i) (hj : inB k r j) :
+    blockW k r h i j = h ⟨i.val - r, by unfold inB at hi; omega⟩ ⟨j.val - r, by unfold inB at hj; omega⟩ := by
   unfold inB at hi hj
   simp only [blockW, dif_pos hi, dif_pos hj]
 
-theorem blockW_in_out
-    {h : Matrix (Fin k) (Fin k) ℂ} {i j : Fin (2 * r + k + 1)} (hi : inB k r i) (hj : ¬ inB k r j)
-    : blockW k r h i j = 0 := by
+theorem blockW_in_out {h : Matrix (Fin k) (Fin k) ℂ} {i j : Fin (2 * r + k + 1)} (hi : inB k r i) (hj : ¬ inB k r j) :
+    blockW k r h i j = 0 := by
   unfold inB at hi hj
   simp only [blockW, dif_pos hi, dif_neg hj]
 
-theorem blockW_out {h : Matrix (Fin k) (Fin k) ℂ} {i j : Fin (2 * r + k + 1)} (hi : ¬ inB k r i)
-    : blockW k r h i j = if i = j then 1 else 0 := by
+theorem blockW_out {h : Matrix (Fin k) (Fin k) ℂ} {i j : Fin (2 * r + k + 1)} (hi : ¬ inB k r i) :
+    blockW k r h i j = if i = j then 1 else 0 := by
   unfold inB at hi
   simp only [blockW, dif_neg hi]
 
-theorem sum_block (F : Fin (2 * r + k + 1) → ℂ) (hF : ∀ l, ¬ inB k r l → F l = 0)
-    : ∑ l, F l = ∑ m : Fin k, F (eB k r m) := by
+theorem sum_block (F : Fin (2 * r + k + 1) → ℂ) (hF : ∀ l, ¬ inB k r l → F l = 0) :
+    ∑ l, F l = ∑ m : Fin k, F (eB k r m) := by
   rw [← Finset.sum_image (fun m _ m' _ h => eB_inj h)]
   symm
   apply Finset.sum_subset (Finset.subset_univ _)
@@ -73,34 +114,17 @@ theorem sum_block (F : Fin (2 * r + k + 1) → ℂ) (hF : ∀ l, ¬ inB k r l �
   intro hin
   exact hl (Finset.mem_image.mpr ⟨_, Finset.mem_univ _, (eq_eB_of_inB hin).symm⟩)
 
-theorem blockW_mul (h₁ h₂ : Matrix (Fin k) (Fin k) ℂ)
-    : blockW k r (h₁ * h₂) = blockW k r h₁ * blockW k r h₂ := by
-  ext i j
-  rw [Matrix.mul_apply]
-  by_cases hi : inB k r i
-  · rw [sum_block _ (fun l hl => by rw [blockW_in_out hi hl, zero_mul])]
-    by_cases hj : inB k r j
-    · rw [blockW_in hi hj, Matrix.mul_apply]
-      refine Finset.sum_congr rfl fun m _ => ?_
-      rw [blockW_in hi (eB_inB m), blockW_in (eB_inB m) hj]
-      simp [eB]
-    · rw [blockW_in_out hi hj]
-      exact (Finset.sum_eq_zero fun m _ => by rw [blockW_in_out (eB_inB m) hj, mul_zero]).symm
-  · rw [blockW_out hi, Finset.sum_eq_single i]
-    · rw [blockW_out (h := h₁) hi, if_pos rfl, one_mul, blockW_out (h := h₂) hi]
-    · intro l _ hl
-      rw [blockW_out (h := h₁) hi, if_neg (Ne.symm hl), zero_mul]
-    · simp
+theorem blockW_mul (h₁ h₂ : Matrix (Fin k) (Fin k) ℂ) :
+    blockW k r (h₁ * h₂) = blockW k r h₁ * blockW k r h₂ := by
+  apply ReciprocityTheory.ChartRestriction.DS.Lap.Base.StandardBasisEmbedding.blockW_mul <;> assumption
 
-theorem hpk_in_col {i m : Fin (2 * r + k + 1)} (hm : inB k r m)
-    : Hpk k r i m = if i = m then 1 else 0 := by
+theorem hpk_in_col {i m : Fin (2 * r + k + 1)} (hm : inB k r m) : Hpk k r i m = if i = m then 1 else 0 := by
   unfold inB at hm
   simp only [Hpk, Fin.ext_iff]
   split_ifs <;> first | rfl | (exfalso; omega)
 
-private theorem Hpk_apply_wp_eq_ite {i : Fin (2 * r + k + 1)} (hi : ¬ inB k r i)
-    : ∃ l : Fin (2 * r + k + 1),
-      ¬ inB k r l ∧ ∃ s : ℂ, s ≠ 0 ∧ ∀ b, Hpk k r l b = if b = i then s else 0 := by
+private theorem Hpk_apply_wp_eq_ite {i : Fin (2 * r + k + 1)} (hi : ¬ inB k r i) :
+    ∃ l : Fin (2 * r + k + 1), ¬ inB k r l ∧ ∃ s : ℂ, s ≠ 0 ∧ ∀ b, Hpk k r l b = if b = i then s else 0 := by
   unfold inB at hi
   have hil := i.isLt
   by_cases h : i.val = r + k
@@ -108,15 +132,13 @@ private theorem Hpk_apply_wp_eq_ite {i : Fin (2 * r + k + 1)} (hi : ¬ inB k r i
     have hbl := b.isLt
     simp only [Hpk, Fin.ext_iff]
     split_ifs <;> first | rfl | (exfalso; omega)
-  · refine
-      ⟨⟨2 * r + k - i.val, by omega⟩, by unfold inB; simp only; omega, 1, one_ne_zero, fun b => ?_⟩
+  · refine ⟨⟨2 * r + k - i.val, by omega⟩, by unfold inB; simp only; omega, 1, one_ne_zero, fun b => ?_⟩
     have hbl := b.isLt
     simp only [Hpk, Fin.ext_iff, Fin.val_mk]
     split_ifs <;> first | rfl | (exfalso; omega)
 
-theorem eq_blockW
-    {c : Mx k r} (hc : c ∈ UH (Hpk k r)) (hfix : ∀ l, ¬ inB k r l → c *ᵥ bvec l = bvec l)
-    : c = blockW k r (ub c) := by
+theorem eq_blockW {c : Mx k r} (hc : c ∈ UH (Hpk k r))
+    (hfix : ∀ l, ¬ inB k r l → c *ᵥ bvec l = bvec l) : c = blockW k r (ub c) := by
   have hcol : ∀ l, ¬ inB k r l → ∀ a, c a l = if a = l then 1 else 0 := by
     intro l hl a
     have := congrFun (hfix l hl) a
@@ -143,16 +165,15 @@ theorem eq_blockW
       obtain ⟨l, hl, s, hs, hrow⟩ := Hpk_apply_wp_eq_ite hi
       have h1 := key l hl j
       rw [Finset.sum_eq_single i (fun b _ hb => by rw [hrow b, if_neg hb, zero_mul]) (by simp),
-          hrow i, if_pos rfl, hpk_in_col hj, if_neg (by rintro rfl; exact hl hj)]
-        at h1
+        hrow i, if_pos rfl, hpk_in_col hj, if_neg (by rintro rfl; exact hl hj)] at h1
       exact (mul_eq_zero.mp h1).resolve_left hs
   · rw [hcol j hj i]
     by_cases hi : inB k r i
     · rw [blockW_in_out hi hj, if_neg (by rintro rfl; exact hj hi)]
     · rw [blockW_out hi]
 
-theorem ub_unitary {c : Mx k r} (hc : c ∈ UH (Hpk k r)) (hb : c = blockW k r (ub c))
-    : ub c ∈ UJset (allPos k) := by
+theorem ub_unitary {c : Mx k r} (hc : c ∈ UH (Hpk k r)) (hb : c = blockW k r (ub c)) :
+    ub c ∈ UJset (allPos k) := by
   have hz : ∀ a m, ¬ inB k r a → c a (eB k r m) = 0 := by
     intro a m ha
     rw [hb, blockW_out ha, if_neg (by rintro rfl; exact ha (eB_inB m))]
@@ -182,10 +203,9 @@ theorem ub_unitary {c : Mx k r} (hc : c ∈ UH (Hpk k r)) (hb : c = blockW k r (
   rw [h1]
   simp [eB_inj.eq_iff]
 
-private theorem ub_conj_mem_UJset_and_eq_blockW
-    {z : Fin (2 * r + k + 1) → ℂ} {g : Mx k r} (hT : 0 < Tz k r z) (hg : IsFrameW k r z g)
-    {a : Mx k r} (ha : a ∈ UWset k r z)
-    : ub (g⁻¹ * a * g) ∈ UJset (allPos k) ∧ a = g * blockW k r (ub (g⁻¹ * a * g)) * g⁻¹ := by
+private theorem ub_conj_mem_UJset_and_eq_blockW {z : Fin (2 * r + k + 1) → ℂ} {g : Mx k r} (hT : 0 < Tz k r z)
+    (hg : IsFrameW k r z g) {a : Mx k r} (ha : a ∈ UWset k r z) :
+    ub (g⁻¹ * a * g) ∈ UJset (allPos k) ∧ a = g * blockW k r (ub (g⁻¹ * a * g)) * g⁻¹ := by
   obtain ⟨hgU, hgfix, hgz⟩ := hg
   obtain ⟨haU, hafix, haz⟩ := ha
   obtain ⟨hg1, hg2, hgi⟩ := uh_inv hgU
@@ -196,24 +216,20 @@ private theorem ub_conj_mem_UJset_and_eq_blockW
     exact uh_mul (uh_mul hgi haU) hgU
   have hinvfix : ∀ v, g *ᵥ v = v → g⁻¹ *ᵥ v = v := by
     intro v hv
-    calc
-      g⁻¹ *ᵥ v
-        = g⁻¹ *ᵥ (g *ᵥ v) := by rw [hv]
+    calc g⁻¹ *ᵥ v = g⁻¹ *ᵥ (g *ᵥ v) := by rw [hv]
       _ = v := by rw [Matrix.mulVec_mulVec, hg2, Matrix.one_mulVec]
   have hfixc : ∀ v, g *ᵥ v = v → a *ᵥ v = v → c *ᵥ v = v := by
     intro v hv hav
     rw [hc_def, ← Matrix.mulVec_mulVec, ← Matrix.mulVec_mulVec, hv, hav, hinvfix v hv]
   have hw : c *ᵥ bvec (wI k r (Fin.last k)) = bvec (wI k r (Fin.last k)) := by
-    have hT' : ((Real.sqrt (Tz k r z) : ℝ) : ℂ) ≠ 0 := by exact_mod_cast (Real.sqrt_pos.mpr hT).ne'
+    have hT' : ((Real.sqrt (Tz k r z) : ℝ) : ℂ) ≠ 0 := by
+      exact_mod_cast (Real.sqrt_pos.mpr hT).ne'
     have hz' : g⁻¹ *ᵥ z = ((Real.sqrt (Tz k r z) : ℝ) : ℂ) • bvec (wI k r (Fin.last k)) := by
-      calc
-        g⁻¹ *ᵥ z
-            = g⁻¹ *ᵥ (g *ᵥ (((Real.sqrt (Tz k r z) : ℝ) : ℂ) • bvec (wI k r (Fin.last k)))) := by
-          rw [hgz]
+      calc g⁻¹ *ᵥ z = g⁻¹ *ᵥ (g *ᵥ (((Real.sqrt (Tz k r z) : ℝ) : ℂ) • bvec (wI k r (Fin.last k)))) := by
+            rw [hgz]
         _ = _ := by rw [Matrix.mulVec_mulVec, hg2, Matrix.one_mulVec]
-    have h1
-        : c *ᵥ (((Real.sqrt (Tz k r z) : ℝ) : ℂ) • bvec (wI k r (Fin.last k)))
-          = ((Real.sqrt (Tz k r z) : ℝ) : ℂ) • bvec (wI k r (Fin.last k)) := by
+    have h1 : c *ᵥ (((Real.sqrt (Tz k r z) : ℝ) : ℂ) • bvec (wI k r (Fin.last k))) =
+        ((Real.sqrt (Tz k r z) : ℝ) : ℂ) • bvec (wI k r (Fin.last k)) := by
       rw [hc_def, ← Matrix.mulVec_mulVec, ← Matrix.mulVec_mulVec, hgz, haz, hz']
     rw [Matrix.mulVec_smul] at h1
     exact smul_right_injective _ hT' h1
@@ -235,10 +251,9 @@ private theorem ub_conj_mem_UJset_and_eq_blockW
         rwa [e] at this
   have hb := eq_blockW hcU hfixall
   refine ⟨ub_unitary hcU hb, ?_⟩
-  calc
-    a = g * c * g⁻¹ := by
-      rw [hc_def, ← Matrix.mul_assoc, ← Matrix.mul_assoc, hg1, Matrix.one_mul, Matrix.mul_assoc,
-        hg1, Matrix.mul_one]
+  calc a = g * c * g⁻¹ := by
+        rw [hc_def, ← Matrix.mul_assoc, ← Matrix.mul_assoc, hg1, Matrix.one_mul, Matrix.mul_assoc, hg1,
+          Matrix.mul_one]
     _ = g * blockW k r (ub c) * g⁻¹ := by rw [← hb]
 
 theorem piAll : PiAll := by
@@ -277,17 +292,14 @@ theorem piAll : PiAll := by
     rw [hea]
     exact hiso _ hua x
 
-theorem frame_block
-    {z : Fin (2 * r + k + 1) → ℂ} {g : Mx k r} (hT : 0 < Tz k r z) (hg : IsFrameW k r z g)
-    {a : Mx k r} (ha : a ∈ UWset k r z)
-    : ub (g⁻¹ * a * g) ∈ UJset (allPos k) ∧ a = g * blockW k r (ub (g⁻¹ * a * g)) * g⁻¹ := by
+theorem frame_block {z : Fin (2 * r + k + 1) → ℂ} {g : Mx k r} (hT : 0 < Tz k r z) (hg : IsFrameW k r z g)
+    {a : Mx k r} (ha : a ∈ UWset k r z) :
+    ub (g⁻¹ * a * g) ∈ UJset (allPos k) ∧ a = g * blockW k r (ub (g⁻¹ * a * g)) * g⁻¹ := by
   exact ub_conj_mem_UJset_and_eq_blockW hT hg ha
 
-theorem piContAll
-    : ∀ (k r : ℕ) (z : Fin (2 * r + k + 1) → ℂ) (u : Fin k → ℝ) (Wp : Type) [NormedAddCommGroup Wp]
-        [InnerProductSpace ℂ Wp] (π : Mx k r → (Wp →L[ℂ] Wp)),
-      inWb k r z → 0 < Tz k r z → IsHCTypeW k r z u π
-        → ∀ x : Wp, ContinuousOn (fun g => π g x) (UWset k r z) := by
+theorem piContAll : ∀ (k r : ℕ) (z : Fin (2 * r + k + 1) → ℂ) (u : Fin k → ℝ)
+    (Wp : Type) [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] (π : Mx k r → (Wp →L[ℂ] Wp)),
+    inWb k r z → 0 < Tz k r z → IsHCTypeW k r z u π → ∀ x : Wp, ContinuousOn (fun g => π g x) (UWset k r z) := by
   intro k r z u Wp _ _ π hz hT hπ x
   obtain ⟨g, hg, hH⟩ := hπ
   obtain ⟨_, _, ⟨_, _, hcont⟩, _⟩ := hH

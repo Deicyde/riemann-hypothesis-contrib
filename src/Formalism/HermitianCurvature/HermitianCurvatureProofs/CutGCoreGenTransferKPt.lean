@@ -1,10 +1,65 @@
 module
 
 public import Formalism.HermitianCurvature.HermitianCurvatureProofs.cut_GCore_GenTransferKapCut
+public import Formalism.FormalDegreeBessel.FinalG
 public import Formalism.HermitianCurvature.HermitianCurvatureProofs.DiagonalTransferAction
-public import Formalism.HermitianCurvature.HermitianCurvatureProofs.SettingConstruction
-public import Formalism.HermitianCurvature.HermitianCurvatureProofs.NFRadRedLocSec
 public import Formalism.HermitianCurvature.HermitianCurvatureProofs.NFRadRedA
+public import Formalism.HermitianCurvature.HermitianCurvatureProofs.NFRadRedLocSec
+public import Formalism.HermitianCurvature.HermitianCurvatureProofs.SettingConstruction
+import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.QuadraticFormTwoTwo.ExistsFrameOfPositiveVector
+import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.QuadraticFormTwoTwo.GANormSqStar
+import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.QuadraticFormTwoTwo.RadialDecompositionOfParts
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.InnerProductSpace.Spectrum
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.LinearAlgebra.Lagrange
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Etale.Weakly
+import Mathlib.RingTheory.Finiteness.ModuleFinitePresentation
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.TotallySplit
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
+public import Formalism.HermitianCurvature.FrameExists2
 
 @[expose] public section
 
@@ -15,8 +70,7 @@ noncomputable section
 
 namespace Formalism.FourierDecayAlt.P.CutMP.Gauge.GC.KPt
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt
-  Formalism.FourierDecayAlt.Q
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt Formalism.FourierDecayAlt.Q
 
 section refl
 
@@ -25,8 +79,8 @@ variable {k r : ℕ} {m : ℕ}
 def reflB (Bs : Fin m → Fin (2 * r + k + 1) → ℂ) : Q.Mx k r :=
   1 - (2 : ℂ) • ∑ a, vecMulVec (Bs a) (star (Bs a)) * Hpk k r
 
-theorem reflB_mulVec (Bs : Fin m → Fin (2 * r + k + 1) → ℂ) (x : Fin (2 * r + k + 1) → ℂ)
-    : reflB (k := k) (r := r) Bs *ᵥ x = x - (2 : ℂ) • ∑ a, herm (Hpk k r) x (Bs a) • Bs a := by
+theorem reflB_mulVec (Bs : Fin m → Fin (2 * r + k + 1) → ℂ) (x : Fin (2 * r + k + 1) → ℂ) :
+    reflB (k := k) (r := r) Bs *ᵥ x = x - (2 : ℂ) • ∑ a, herm (Hpk k r) x (Bs a) • Bs a := by
   unfold reflB
   rw [Matrix.sub_mulVec, Matrix.one_mulVec, Matrix.smul_mulVec, Matrix.sum_mulVec]
   congr 2
@@ -42,62 +96,50 @@ variable {k r : ℕ} {m : ℕ}
 
 theorem hpk_herm' : (Hpk k r)ᴴ = Hpk k r := (Formalism.QuantumDeterminants.hpkFacts k r).1
 
-theorem herm_conj (x y : Fin (2 * r + k + 1) → ℂ)
-    : herm (Hpk k r) y x = star (herm (Hpk k r) x y) :=
+theorem herm_conj (x y : Fin (2 * r + k + 1) → ℂ) : herm (Hpk k r) y x = star (herm (Hpk k r) x y) :=
   (Formalism.FourierDecayAlt.P.SettingConstruction.herm_symm (Hpk k r) hpk_herm' x y).symm
 
-theorem herm_proj
-    {Bs : Fin m → Fin (2 * r + k + 1) → ℂ}
-    (hon : ∀ a b, herm (Hpk k r) (Bs a) (Bs b) = if a = b then 1 else 0)
-    (x : Fin (2 * r + k + 1) → ℂ) (c : Fin m)
-    : herm (Hpk k r) (∑ a, herm (Hpk k r) x (Bs a) • Bs a) (Bs c) = herm (Hpk k r) x (Bs c) := by
-  have hsum
-      : ∀ (s : Finset (Fin m)),
-        herm (Hpk k r) (∑ a ∈ s, herm (Hpk k r) x (Bs a) • Bs a) (Bs c)
-          = ∑ a ∈ s, herm (Hpk k r) x (Bs a) * herm (Hpk k r) (Bs a) (Bs c) := by
+theorem herm_proj {Bs : Fin m → Fin (2 * r + k + 1) → ℂ}
+    (hon : ∀ a b, herm (Hpk k r) (Bs a) (Bs b) = if a = b then 1 else 0) (x : Fin (2 * r + k + 1) → ℂ) (c : Fin m) :
+    herm (Hpk k r) (∑ a, herm (Hpk k r) x (Bs a) • Bs a) (Bs c) = herm (Hpk k r) x (Bs c) := by
+  have hsum : ∀ (s : Finset (Fin m)), herm (Hpk k r) (∑ a ∈ s, herm (Hpk k r) x (Bs a) • Bs a) (Bs c) =
+      ∑ a ∈ s, herm (Hpk k r) x (Bs a) * herm (Hpk k r) (Bs a) (Bs c) := by
     intro s
     induction s using Finset.induction_on with
     | empty => simp [herm]
     | insert a s ha ih =>
-      rw [Finset.sum_insert ha, Finset.sum_insert ha,
-        Formalism.FourierDecayAlt.P.SettingConstruction.herm_add_left,
+      rw [Finset.sum_insert ha, Finset.sum_insert ha, Formalism.FourierDecayAlt.P.SettingConstruction.herm_add_left,
         Formalism.FourierDecayAlt.P.SettingConstruction.herm_smul_left, ih]
   rw [hsum, Finset.sum_eq_single c]
   · rw [hon, if_pos rfl, mul_one]
   · intro b _ hb; rw [hon, if_neg hb, mul_zero]
   · intro h; exact absurd (Finset.mem_univ c) h
 
-theorem reflB_unitary
-    {Bs : Fin m → Fin (2 * r + k + 1) → ℂ}
-    (hon : ∀ a b, herm (Hpk k r) (Bs a) (Bs b) = if a = b then 1 else 0)
-    : (reflB (k := k) (r := r) Bs)ᴴ * Hpk k r * reflB Bs = Hpk k r := by
+theorem reflB_unitary {Bs : Fin m → Fin (2 * r + k + 1) → ℂ}
+    (hon : ∀ a b, herm (Hpk k r) (Bs a) (Bs b) = if a = b then 1 else 0) :
+    (reflB (k := k) (r := r) Bs)ᴴ * Hpk k r * reflB Bs = Hpk k r := by
   refine Formalism.FourierDecayAlt.P.SettingConstruction.unitary_of_form (Hpk k r) _ fun x y => ?_
   rw [reflB_mulVec, reflB_mulVec]
   set Px := ∑ a, herm (Hpk k r) x (Bs a) • Bs a
   set Py := ∑ a, herm (Hpk k r) y (Bs a) • Bs a
 
   have hPxy : herm (Hpk k r) Px y = herm (Hpk k r) Px Py := by
-    have e1
-        : ∀ (s : Finset (Fin m)),
-          herm (Hpk k r) (∑ a ∈ s, herm (Hpk k r) x (Bs a) • Bs a) y
-            = ∑ a ∈ s, herm (Hpk k r) x (Bs a) * herm (Hpk k r) (Bs a) y := by
+
+    have e1 : ∀ (s : Finset (Fin m)), herm (Hpk k r) (∑ a ∈ s, herm (Hpk k r) x (Bs a) • Bs a) y =
+        ∑ a ∈ s, herm (Hpk k r) x (Bs a) * herm (Hpk k r) (Bs a) y := by
       intro s
       induction s using Finset.induction_on with
       | empty => simp [herm]
       | insert a s ha ih =>
-        rw [Finset.sum_insert ha, Finset.sum_insert ha,
-          Formalism.FourierDecayAlt.P.SettingConstruction.herm_add_left,
+        rw [Finset.sum_insert ha, Finset.sum_insert ha, Formalism.FourierDecayAlt.P.SettingConstruction.herm_add_left,
           Formalism.FourierDecayAlt.P.SettingConstruction.herm_smul_left, ih]
-    have e2
-        : ∀ (s : Finset (Fin m)),
-          herm (Hpk k r) (∑ a ∈ s, herm (Hpk k r) x (Bs a) • Bs a) Py
-            = ∑ a ∈ s, herm (Hpk k r) x (Bs a) * herm (Hpk k r) (Bs a) Py := by
+    have e2 : ∀ (s : Finset (Fin m)), herm (Hpk k r) (∑ a ∈ s, herm (Hpk k r) x (Bs a) • Bs a) Py =
+        ∑ a ∈ s, herm (Hpk k r) x (Bs a) * herm (Hpk k r) (Bs a) Py := by
       intro s
       induction s using Finset.induction_on with
       | empty => simp [herm]
       | insert a s ha ih =>
-        rw [Finset.sum_insert ha, Finset.sum_insert ha,
-          Formalism.FourierDecayAlt.P.SettingConstruction.herm_add_left,
+        rw [Finset.sum_insert ha, Finset.sum_insert ha, Formalism.FourierDecayAlt.P.SettingConstruction.herm_add_left,
           Formalism.FourierDecayAlt.P.SettingConstruction.herm_smul_left, ih]
     rw [e1, e2]
     refine Finset.sum_congr rfl fun a _ => ?_
@@ -108,27 +150,21 @@ theorem reflB_unitary
     have h1 : herm (Hpk k r) x Py = star (herm (Hpk k r) Py x) := herm_conj Py x
     have h2 : herm (Hpk k r) Px Py = star (herm (Hpk k r) Py Px) := herm_conj Py Px
 
-    have e1
-        : ∀ (s : Finset (Fin m)),
-          herm (Hpk k r) (∑ a ∈ s, herm (Hpk k r) y (Bs a) • Bs a) x
-            = ∑ a ∈ s, herm (Hpk k r) y (Bs a) * herm (Hpk k r) (Bs a) x := by
+    have e1 : ∀ (s : Finset (Fin m)), herm (Hpk k r) (∑ a ∈ s, herm (Hpk k r) y (Bs a) • Bs a) x =
+        ∑ a ∈ s, herm (Hpk k r) y (Bs a) * herm (Hpk k r) (Bs a) x := by
       intro s
       induction s using Finset.induction_on with
       | empty => simp [herm]
       | insert a s ha ih =>
-        rw [Finset.sum_insert ha, Finset.sum_insert ha,
-          Formalism.FourierDecayAlt.P.SettingConstruction.herm_add_left,
+        rw [Finset.sum_insert ha, Finset.sum_insert ha, Formalism.FourierDecayAlt.P.SettingConstruction.herm_add_left,
           Formalism.FourierDecayAlt.P.SettingConstruction.herm_smul_left, ih]
-    have e2
-        : ∀ (s : Finset (Fin m)),
-          herm (Hpk k r) (∑ a ∈ s, herm (Hpk k r) y (Bs a) • Bs a) Px
-            = ∑ a ∈ s, herm (Hpk k r) y (Bs a) * herm (Hpk k r) (Bs a) Px := by
+    have e2 : ∀ (s : Finset (Fin m)), herm (Hpk k r) (∑ a ∈ s, herm (Hpk k r) y (Bs a) • Bs a) Px =
+        ∑ a ∈ s, herm (Hpk k r) y (Bs a) * herm (Hpk k r) (Bs a) Px := by
       intro s
       induction s using Finset.induction_on with
       | empty => simp [herm]
       | insert a s ha ih =>
-        rw [Finset.sum_insert ha, Finset.sum_insert ha,
-          Formalism.FourierDecayAlt.P.SettingConstruction.herm_add_left,
+        rw [Finset.sum_insert ha, Finset.sum_insert ha, Formalism.FourierDecayAlt.P.SettingConstruction.herm_add_left,
           Formalism.FourierDecayAlt.P.SettingConstruction.herm_smul_left, ih]
     rw [h1, h2, e1, e2]
     congr 1
@@ -136,9 +172,7 @@ theorem reflB_unitary
     congr 1
     rw [herm_conj x (Bs a), herm_conj Px (Bs a)]
     exact congrArg star (herm_proj hon x a).symm
-  simp only [Formalism.FourierDecayAlt.P.SettingConstruction.herm_sub_left,
-    Formalism.FourierDecayAlt.P.SettingConstruction.herm_sub_right,
-    Formalism.FourierDecayAlt.P.SettingConstruction.herm_smul_left,
+  simp only [Formalism.FourierDecayAlt.P.SettingConstruction.herm_sub_left, Formalism.FourierDecayAlt.P.SettingConstruction.herm_sub_right, Formalism.FourierDecayAlt.P.SettingConstruction.herm_smul_left,
     Formalism.FourierDecayAlt.P.SettingConstruction.herm_smul_right]
   rw [hPxy, hxPy]
   have h2 : star (2 : ℂ) = 2 := by simp
@@ -151,42 +185,31 @@ section frame2
 
 variable {k r : ℕ} {m : ℕ}
 
-theorem reflB_fix
-    {Bs : Fin m → Fin (2 * r + k + 1) → ℂ} {x : Fin (2 * r + k + 1) → ℂ}
-    (hx : ∀ a, herm (Hpk k r) x (Bs a) = 0)
-    : reflB (k := k) (r := r) Bs *ᵥ x = x := by
+theorem reflB_fix {Bs : Fin m → Fin (2 * r + k + 1) → ℂ} {x : Fin (2 * r + k + 1) → ℂ}
+    (hx : ∀ a, herm (Hpk k r) x (Bs a) = 0) : reflB (k := k) (r := r) Bs *ᵥ x = x := by
   rw [reflB_mulVec]
   simp [hx]
 
-theorem reflB_sq
-    {Bs : Fin m → Fin (2 * r + k + 1) → ℂ}
-    (hon : ∀ a b, herm (Hpk k r) (Bs a) (Bs b) = if a = b then 1 else 0)
-    : reflB (k := k) (r := r) Bs * reflB Bs = 1 := by
+theorem reflB_sq {Bs : Fin m → Fin (2 * r + k + 1) → ℂ}
+    (hon : ∀ a b, herm (Hpk k r) (Bs a) (Bs b) = if a = b then 1 else 0) :
+    reflB (k := k) (r := r) Bs * reflB Bs = 1 := by
   refine Matrix.ext_of_mulVec_single fun i => ?_
   rw [← Matrix.mulVec_mulVec, Matrix.one_mulVec]
   set x : Fin (2 * r + k + 1) → ℂ := Pi.single i 1
   rw [reflB_mulVec Bs x, reflB_mulVec Bs]
-  have hP
-      : ∀ c,
-        herm (Hpk k r) (x - (2 : ℂ) • ∑ a, herm (Hpk k r) x (Bs a) • Bs a) (Bs c)
-          = - herm (Hpk k r) x (Bs c) := by
+  have hP : ∀ c, herm (Hpk k r) (x - (2 : ℂ) • ∑ a, herm (Hpk k r) x (Bs a) • Bs a) (Bs c) =
+      -herm (Hpk k r) x (Bs c) := by
     intro c
-    rw [Formalism.FourierDecayAlt.P.SettingConstruction.herm_sub_left,
-      Formalism.FourierDecayAlt.P.SettingConstruction.herm_smul_left, herm_proj hon x c]
+    rw [Formalism.FourierDecayAlt.P.SettingConstruction.herm_sub_left, Formalism.FourierDecayAlt.P.SettingConstruction.herm_smul_left, herm_proj hon x c]
     ring
   simp only [hP, neg_smul, Finset.sum_neg_distrib, smul_neg]
   abel
 
-theorem reflB_mem_UWset
-    {Bs : Fin m → Fin (2 * r + k + 1) → ℂ} {w : Fin (2 * r + k + 1) → ℂ}
+theorem reflB_mem_UWset {Bs : Fin m → Fin (2 * r + k + 1) → ℂ} {w : Fin (2 * r + k + 1) → ℂ}
     (hB : ∀ a, inWb k r (Bs a)) (hon : ∀ a b, herm (Hpk k r) (Bs a) (Bs b) = if a = b then 1 else 0)
-    (hw : ∀ a, herm (Hpk k r) (Bs a) w = 0)
-    : reflB (k := k) (r := r) Bs ∈ UWset k r w := by
-  have hout
-      : ∀ i : Fin (2 * r + k + 1),
-        ¬ Formalism.FourierDecayAlt.P.TwoByOneBlock.mid k r i
-          → reflB (k := k) (r := r) Bs *ᵥ bvec i = bvec i := fun i hi =>
-    reflB_fix fun a => Formalism.FourierDecayAlt.P.NFRadRedLocSec.herm_out (hB a) hi
+    (hw : ∀ a, herm (Hpk k r) (Bs a) w = 0) : reflB (k := k) (r := r) Bs ∈ UWset k r w := by
+  have hout : ∀ i : Fin (2 * r + k + 1), ¬ Formalism.FourierDecayAlt.P.TwoByOneBlock.mid k r i → reflB (k := k) (r := r) Bs *ᵥ bvec i = bvec i :=
+    fun i hi => reflB_fix fun a => Formalism.FourierDecayAlt.P.NFRadRedLocSec.herm_out (hB a) hi
   refine ⟨reflB_unitary hon, fun a => ⟨hout _ ?_, hout _ ?_⟩, reflB_fix fun a => ?_⟩
   · simp only [Formalism.FourierDecayAlt.P.TwoByOneBlock.mid, eI]; omega
   · simp only [Formalism.FourierDecayAlt.P.TwoByOneBlock.mid, esI]; omega
@@ -198,22 +221,18 @@ section const
 
 variable {k r : ℕ} {m : ℕ}
 
-theorem frame_const
-    {z z' : Fin (2 * r + k + 1) → ℂ} {μsec : ℂ → Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ}
-    (hsec : CSec k r z z' μsec)
-    {ζ₀ : ℂ} (hζ₀ : Tz k r z * Tz k r z' < Complex.normSq ζ₀)
-    {Bs : Fin m → Fin (2 * r + k + 1) → ℂ} (hB : IsFrameOf k r [(NF.muZ k r μsec ζ₀)⁻¹ *ᵥ z, z'] Bs)
-    {ζ : ℂ} (hζ : Tz k r z * Tz k r z' < Complex.normSq ζ)
-    : IsFrameOf k r [(NF.muZ k r μsec ζ)⁻¹ *ᵥ z, z'] Bs := by
+theorem frame_const {z z' : Fin (2 * r + k + 1) → ℂ} {μsec : ℂ → Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ}
+    (hsec : CSec k r z z' μsec) {ζ₀ : ℂ} (hζ₀ : Tz k r z * Tz k r z' < Complex.normSq ζ₀)
+    {Bs : Fin m → Fin (2 * r + k + 1) → ℂ}
+    (hB : IsFrameOf k r [(NF.muZ k r μsec ζ₀)⁻¹ *ᵥ z, z'] Bs) {ζ : ℂ} (hζ : Tz k r z * Tz k r z' < Complex.normSq ζ) :
+    IsFrameOf k r [(NF.muZ k r μsec ζ)⁻¹ *ᵥ z, z'] Bs := by
   obtain ⟨hBw, hon, horth⟩ := hB
   set g₀ := NF.muZ k r μsec ζ₀ with hg₀def
   set g := NF.muZ k r μsec ζ with hgdef
   have hg₀ : g₀ ∈ Glev k r (Fin.last r) :=
-    Formalism.FourierDecayAlt.P.NFRadRedA.uwb_glev (Formalism.FourierDecayAlt.P.NFRadRedA.muZ_uwb
-      hsec.1 hζ₀)
+    Formalism.FourierDecayAlt.P.NFRadRedA.uwb_glev (Formalism.FourierDecayAlt.P.NFRadRedA.muZ_uwb hsec.1 hζ₀)
   have hg : g ∈ Glev k r (Fin.last r) :=
-    Formalism.FourierDecayAlt.P.NFRadRedA.uwb_glev (Formalism.FourierDecayAlt.P.NFRadRedA.muZ_uwb
-      hsec.1 hζ)
+    Formalism.FourierDecayAlt.P.NFRadRedA.uwb_glev (Formalism.FourierDecayAlt.P.NFRadRedA.muZ_uwb hsec.1 hζ)
   have hy₀ : ∀ a, herm (Hpk k r) (Bs a) (g₀⁻¹ *ᵥ z) = 0 := fun a => horth a _ (by simp)
   have hz'0 : ∀ a, herm (Hpk k r) (Bs a) z' = 0 := fun a => horth a _ (by simp)
   set R := reflB (k := k) (r := r) Bs with hRdef
@@ -230,35 +249,29 @@ theorem frame_const
   have hG := Formalism.QuantumDeterminants.uHGroup _ (Hpk k r) hdetH
   set h₀ := g₀ * R * g₀⁻¹ with hh₀def
   have hg₀inv : g₀⁻¹ ∈ UH (Hpk k r) := (hG.2.2 g₀ hg₀.1).2
-  have hfix₀
-      : ∀ a : Fin r,
-        g₀ *ᵥ bvec (eI k r a) = bvec (eI k r a) ∧ g₀ *ᵥ bvec (esI k r a) = bvec (esI k r a) :=
+  have hfix₀ : ∀ a : Fin r, g₀ *ᵥ bvec (eI k r a) = bvec (eI k r a) ∧ g₀ *ᵥ bvec (esI k r a) = bvec (esI k r a) :=
     fun a => hg₀.2 a (by rw [Fin.val_last]; exact a.isLt)
   have hinvfix : ∀ v : Fin (2 * r + k + 1) → ℂ, g₀ *ᵥ v = v → g₀⁻¹ *ᵥ v = v := by
     intro v hv
-    calc
-      g₀⁻¹ *ᵥ v
-        = g₀⁻¹ *ᵥ (g₀ *ᵥ v) := by rw [hv]
+    calc g₀⁻¹ *ᵥ v = g₀⁻¹ *ᵥ (g₀ *ᵥ v) := by rw [hv]
       _ = v := by rw [Matrix.mulVec_mulVec, hu₀1, Matrix.one_mulVec]
   have hh₀ : h₀ ∈ UWset k r z := by
     refine ⟨hG.2.1 _ (hG.2.1 _ hg₀.1 _ hR.1) _ hg₀inv, fun a => ⟨?_, ?_⟩, ?_⟩
-    · rw [hh₀def, ← Matrix.mulVec_mulVec, ← Matrix.mulVec_mulVec, hinvfix _ (hfix₀ a).1,
-        (hR.2.1 a).1, (hfix₀ a).1]
-    · rw [hh₀def, ← Matrix.mulVec_mulVec, ← Matrix.mulVec_mulVec, hinvfix _ (hfix₀ a).2,
-        (hR.2.1 a).2, (hfix₀ a).2]
+    · rw [hh₀def, ← Matrix.mulVec_mulVec, ← Matrix.mulVec_mulVec, hinvfix _ (hfix₀ a).1, (hR.2.1 a).1, (hfix₀ a).1]
+    · rw [hh₀def, ← Matrix.mulVec_mulVec, ← Matrix.mulVec_mulVec, hinvfix _ (hfix₀ a).2, (hR.2.1 a).2, (hfix₀ a).2]
     · rw [hh₀def, ← Matrix.mulVec_mulVec, ← Matrix.mulVec_mulVec, hRx₀, Matrix.mulVec_mulVec, hu₀2,
         Matrix.one_mulVec]
   have hst₀ : (h₀, R) ∈ NF.Stab k r z z' μsec ζ₀ := by
     refine ⟨hh₀, hR, ?_⟩
     show g₀ * R * g₀⁻¹ * g₀ * R = g₀
     rw [Matrix.mul_assoc (g₀ * R), hu₀1, Matrix.mul_one, Matrix.mul_assoc, hRR, Matrix.mul_one]
-  have hst : (h₀, R) ∈ NF.Stab k r z z' μsec ζ := by rw [← hsec.2 ζ₀ ζ hζ₀ hζ]; exact hst₀
+  have hst : (h₀, R) ∈ NF.Stab k r z z' μsec ζ := by
+    rw [← hsec.2 ζ₀ ζ hζ₀ hζ]; exact hst₀
   have hrel : h₀ * g * R = g := hst.2.2
   have hh₀sq : h₀ * h₀ = 1 := by
     rw [hh₀def]
-    calc
-      g₀ * R * g₀⁻¹ * (g₀ * R * g₀⁻¹)
-        = g₀ * (R * (g₀⁻¹ * g₀) * R) * g₀⁻¹ := by simp only [Matrix.mul_assoc]
+    calc g₀ * R * g₀⁻¹ * (g₀ * R * g₀⁻¹) = g₀ * (R * (g₀⁻¹ * g₀) * R) * g₀⁻¹ := by
+          simp only [Matrix.mul_assoc]
       _ = 1 := by rw [hu₀1, Matrix.mul_one, hRR, Matrix.mul_one, hu₀2]
   set x := g⁻¹ *ᵥ z with hxdef
   have hgx : g *ᵥ x = z := by rw [hxdef, Matrix.mulVec_mulVec, hu2, Matrix.one_mulVec]
@@ -266,14 +279,12 @@ theorem frame_const
     have e1 : h₀ *ᵥ (g *ᵥ (R *ᵥ x)) = z := by
       rw [Matrix.mulVec_mulVec (R *ᵥ x) h₀ g, Matrix.mulVec_mulVec x (h₀ * g) R, hrel, hgx]
     have e2 : g *ᵥ (R *ᵥ x) = z := by
-      calc
-        g *ᵥ (R *ᵥ x) = h₀ *ᵥ (h₀ *ᵥ (g *ᵥ (R *ᵥ x))) := by
-          rw [Matrix.mulVec_mulVec (g *ᵥ (R *ᵥ x)) h₀ h₀, hh₀sq, Matrix.one_mulVec]
+      calc g *ᵥ (R *ᵥ x) = h₀ *ᵥ (h₀ *ᵥ (g *ᵥ (R *ᵥ x))) := by
+            rw [Matrix.mulVec_mulVec (g *ᵥ (R *ᵥ x)) h₀ h₀, hh₀sq, Matrix.one_mulVec]
         _ = h₀ *ᵥ z := by rw [e1]
         _ = z := hh₀.2.2
-    calc
-      R *ᵥ x = g⁻¹ *ᵥ (g *ᵥ (R *ᵥ x)) := by
-        rw [Matrix.mulVec_mulVec (R *ᵥ x) g⁻¹ g, hu1, Matrix.one_mulVec]
+    calc R *ᵥ x = g⁻¹ *ᵥ (g *ᵥ (R *ᵥ x)) := by
+          rw [Matrix.mulVec_mulVec (R *ᵥ x) g⁻¹ g, hu1, Matrix.one_mulVec]
       _ = x := by rw [e2]
   have hPx : ∑ a, herm (Hpk k r) x (Bs a) • Bs a = 0 := by
     have := hRx
@@ -310,9 +321,7 @@ end Formalism.FourierDecayAlt.P.CutMP.Gauge.GC.KPt
 
 namespace Formalism.FourierDecayAlt.P.CutMP.Gauge.GC
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt
-  Formalism.FourierDecayAlt.Q Formalism.FourierDecayAlt.P5.Kfp
-  Formalism.FourierDecayAlt.P.CutMP.Gauge.GC.KPt
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt Formalism.FourierDecayAlt.Q Formalism.FourierDecayAlt.P5.Kfp Formalism.FourierDecayAlt.P.CutMP.Gauge.GC.KPt
 
 theorem gauge_kappa_pointwise_holds : GTKPt := by
   intro Wp Wq _ _ _ _ _ _ P Bs X d hH
@@ -330,17 +339,13 @@ theorem gauge_kappa_pointwise_holds : GTKPt := by
     nlinarith [Real.sqrt_nonneg (Tz P.k P.r Bs.z * Tz P.k P.r Bs.z')]
   set g₀ := NF.muZ P.k P.r Bs.μsec ζ₀
   have hg₀ : g₀ ∈ Glev P.k P.r (Fin.last P.r) :=
-    Formalism.FourierDecayAlt.P.NFRadRedA.uwb_glev (Formalism.FourierDecayAlt.P.NFRadRedA.muZ_uwb
-      hsec.1 hζ₀)
+    Formalism.FourierDecayAlt.P.NFRadRedA.uwb_glev (Formalism.FourierDecayAlt.P.NFRadRedA.muZ_uwb hsec.1 hζ₀)
   have hGG₀ : GGl P.k P.r Bs.z Bs.z' g₀ ≠ 0 := by
-    have :=
-      (Formalism.FourierDecayAlt.P.NFRadRedA.mem_domR hz hz' hsec.1
-        (q := ((fun _ => 1 : Fin P.r → ℂ), ζ₀)) ⟨fun _ => one_ne_zero, hζ₀⟩).2.2
+    have := (Formalism.FourierDecayAlt.P.NFRadRedA.mem_domR hz hz' hsec.1 (q := ((fun _ => 1 : Fin P.r → ℂ), ζ₀))
+      ⟨fun _ => one_ne_zero, hζ₀⟩).2.2
     exact this.ne'
-  obtain ⟨Bs₀, -, -, hB1, -, -, -, -, -, -, -, -⟩ :=
-    Formalism.FourierDecayAlt.Q.LieAlgebraWeightVectors.geom_package hz hz' hT hT' hg₀ hGG₀
-  have hBz' : IsFrameOf P.k P.r [Bs.z'] Bs₀ :=
-    Formalism.FourierDecayAlt.Q.LieAlgebraWeightVectors.frame_sub hB1 (by simp)
+  obtain ⟨Bs₀, -, -, hB1, -, -, -, -, -, -, -, -⟩ := Formalism.FourierDecayAlt.Q.LieAlgebraWeightVectors.geom_package hz hz' hT hT' hg₀ hGG₀
+  have hBz' : IsFrameOf P.k P.r [Bs.z'] Bs₀ := Formalism.FourierDecayAlt.Q.LieAlgebraWeightVectors.frame_sub hB1 (by simp)
   have hπ'r := hπ'.2.1
   have hπ'c := hπ'.2.2.1
   have hu := hπ'.2.2.2.1
@@ -352,7 +357,6 @@ theorem gauge_kappa_pointwise_holds : GTKPt := by
   set n := Module.finrank ℂ Wq with hn
   set b := hC.eigenvectorBasis hn.symm with hbdef
   set lam : Fin n → ℝ := hC.eigenvalues hn.symm with hlamdef
-  have hCb : ∀ i, C (b i) = (lam i : ℂ) • b i := fun i => hC.apply_eigenvectorBasis hn.symm i
 
   classical
   let ρ₀ : M.Ty P := Classical.arbitrary _
@@ -362,23 +366,20 @@ theorem gauge_kappa_pointwise_holds : GTKPt := by
     have h : ∃ ρ', M.xC P ρ' (Y₀ : ℂ) = M.xC P ρ (Y₀ : ℂ) := ⟨ρ, rfl⟩
     simp only [typeOf, dif_pos h]
     exact hY₀ h.choose_spec
-  let QQ : M.Ty P → (Wq →L[ℂ] Wq) := fun ρ =>
-    ∑ i ∈ Finset.univ.filter (fun i => typeOf (lam i) = ρ), rk1 (b i)
-  have hQapply
-      : ∀ ρ v,
-        QQ ρ v = ∑ i ∈ Finset.univ.filter (fun i => typeOf (lam i) = ρ), ⟪b i, v⟫_ℂ • b i := by
+  let QQ : M.Ty P → (Wq →L[ℂ] Wq) := fun ρ => ∑ i ∈ Finset.univ.filter (fun i => typeOf (lam i) = ρ), rk1 (b i)
+  have hQapply : ∀ ρ v, QQ ρ v = ∑ i ∈ Finset.univ.filter (fun i => typeOf (lam i) = ρ), ⟪b i, v⟫_ℂ • b i := by
     intro ρ v
     simp only [QQ, ContinuousLinearMap.sum_apply, rankOneInnerOperator_apply]
   have hon : ∀ i j, ⟪b i, b j⟫_ℂ = if i = j then 1 else 0 := fun i j => by
     rw [orthonormal_iff_ite.mp b.orthonormal i j]
-  have hcoef
-      : ∀ (s : Finset (Fin n)) (v : Wq) (j : Fin n),
-        ⟪b j, ∑ i ∈ s, ⟪b i, v⟫_ℂ • b i⟫_ℂ = if j ∈ s then ⟪b j, v⟫_ℂ else 0 := by
+  have hcoef : ∀ (s : Finset (Fin n)) (v : Wq) (j : Fin n),
+      ⟪b j, ∑ i ∈ s, ⟪b i, v⟫_ℂ • b i⟫_ℂ = if j ∈ s then ⟪b j, v⟫_ℂ else 0 := by
     intro s v j
     rw [inner_sum]
     simp only [inner_smul_right, hon, mul_ite, mul_one, mul_zero, Finset.sum_ite_eq]
   refine ⟨QQ, ?_, ?_, ?_, ?_⟩
-  · intro ρ σ
+  ·
+    intro ρ σ
     ext v
     rw [ContinuousLinearMap.comp_apply, hQapply, hQapply]
     simp only [hcoef, Finset.mem_filter, Finset.mem_univ, true_and]
@@ -392,27 +393,27 @@ theorem gauge_kappa_pointwise_holds : GTKPt := by
       refine Finset.sum_eq_zero fun i hi => ?_
       rw [Finset.mem_filter] at hi
       rw [if_neg (fun h => hρσ (hi.2.symm.trans h)), zero_smul]
-  · ext v
+  ·
+    ext v
     rw [ContinuousLinearMap.sum_apply, ContinuousLinearMap.one_apply]
     simp only [hQapply]
     rw [Finset.sum_fiberwise (Finset.univ) (fun i => typeOf (lam i)) (fun i => ⟪b i, v⟫_ℂ • b i)]
     exact b.sum_repr' v
-  · intro ρ v w
+  ·
+    intro ρ v w
     rw [hQapply, hQapply, sum_inner, inner_sum]
     refine Finset.sum_congr rfl fun i _ => ?_
     rw [inner_smul_left, inner_smul_right, inner_conj_symm]
     ring
-  · intro f Φ q
-    have hq : Tz P.k P.r Bs.z * Tz P.k P.r Bs.z' < Complex.normSq q.1.2 := by
-      rw [← hTT]; exact q.2.2
+  ·
+    intro f Φ q
+    have hq : Tz P.k P.r Bs.z * Tz P.k P.r Bs.z' < Complex.normSq q.1.2 := by rw [← hTT]; exact q.2.2
     set g := NF.muZ P.k P.r Bs.μsec q.1.2
     have hx : (q.1.1, g) ∈ DomR P.k P.r Bs.z Bs.z' :=
       Formalism.FourierDecayAlt.P.NFRadRedA.mem_domR hz hz' hsec.1 (q := q.1) ⟨q.2.1, hq⟩
     have hBg : IsFrameOf P.k P.r [g⁻¹ *ᵥ Bs.z, Bs.z'] Bs₀ := frame_const hsec hζ₀ hB1 hq
 
-    let N : Finset ℂ :=
-      Finset.univ.image (fun ρ => M.xC P ρ (Y₀ : ℂ))
-        ∪ Finset.univ.image (fun i => ((lam i : ℝ) : ℂ))
+    let N : Finset ℂ := Finset.univ.image (fun ρ => M.xC P ρ (Y₀ : ℂ)) ∪ Finset.univ.image (fun i => ((lam i : ℝ) : ℂ))
     let rv : ℂ → ℂ := fun μ => f (typeOf μ)
     set p := Lagrange.interpolate N id rv with hpdef
     have hpN : ∀ μ ∈ N, p.eval μ = f (typeOf μ) := by
@@ -422,26 +423,23 @@ theorem gauge_kappa_pointwise_holds : GTKPt := by
     have hpx : ∀ ρ, p.eval (M.xC P ρ (Y₀ : ℂ)) = f ρ := by
       intro ρ
       rw [hpN _ (Finset.mem_union_left _ (Finset.mem_image_of_mem _ (Finset.mem_univ ρ))), htype]
-    have hpl : ∀ i, p.eval ((lam i : ℝ) : ℂ) = f (typeOf (lam i)) := fun i =>
-      hpN _ (Finset.mem_union_right _ (Finset.mem_image_of_mem _ (Finset.mem_univ i)))
+    have hpl : ∀ i, p.eval ((lam i : ℝ) : ℂ) = f (typeOf (lam i)) :=
+      fun i => hpN _ (Finset.mem_union_right _ (Finset.mem_image_of_mem _ (Finset.mem_univ i)))
     have hκ : d.κ f = Polynomial.aeval (d.x (Y₀ : ℂ)) p := kappa_aeval d (Y₀ : ℂ) p f hpx
     have hx1 : fstAlg _ (d.x (Y₀ : ℂ)) = X.fn 5 * X.t (Y₀ : ℂ) 1 1 := by
       have h : d.x (Y₀ : ℂ) = d.L.GGi * X.QQ (Y₀ : ℂ) 1 1 := by
         rw [hQ]
-        simp only [NFData.QQ, Matrix.of_apply, Matrix.cons_val', Matrix.cons_val_one,
-          Matrix.head_cons, Matrix.cons_val_fin_one, Matrix.empty_val', Matrix.cons_val_zero]
+        simp only [NFData.QQ, Matrix.of_apply, Matrix.cons_val', Matrix.cons_val_one, Matrix.head_cons,
+          Matrix.cons_val_fin_one, Matrix.empty_val', Matrix.cons_val_zero]
         rw [← mul_assoc, d.L.GGi_GG, one_mul]
       rw [h, hL.2.2.2.2.2.2.2.2.2.2.2.1]
       rfl
     have hfst : (d.κ f).1 = Polynomial.aeval (X.fn 5 * X.t (Y₀ : ℂ) 1 1) p := by
       rw [← hx1, Polynomial.aeval_algHom_apply, hκ]
       rfl
-    have hact
-        : ∀ (Ψ : RadSp P.k P.r Bs.z Bs.z' Bs.π Bs.π') (v : Wq),
-          (((X.fn 5 * X.t (Y₀ : ℂ) 1 1) Ψ : RadSp P.k P.r Bs.z Bs.z' Bs.π Bs.π')
-                : Fn P.k P.r (Wq →L[ℂ] Wp))
-              q.1.1 g v
-            = (Ψ : Fn P.k P.r (Wq →L[ℂ] Wp)) q.1.1 g (C v) := by
+    have hact : ∀ (Ψ : RadSp P.k P.r Bs.z Bs.z' Bs.π Bs.π') (v : Wq),
+        (((X.fn 5 * X.t (Y₀ : ℂ) 1 1) Ψ : RadSp P.k P.r Bs.z Bs.z' Bs.π Bs.π') : Fn P.k P.r (Wq →L[ℂ] Wp)) q.1.1 g v =
+          (Ψ : Fn P.k P.r (Wq →L[ℂ] Wp)) q.1.1 g (C v) := by
       intro Ψ v
       rw [diagonal_transfer_action X hz hz' hπ'r hπ'c hx Bs₀ hBg (Y₀ : ℂ) Ψ v]
       congr 2
@@ -451,18 +449,14 @@ theorem gauge_kappa_pointwise_holds : GTKPt := by
     have haev : ∀ v : Wq, Polynomial.aeval C p v = ∑ ρ, f ρ • QQ ρ v := by
       intro v
       conv_lhs => rw [← b.sum_repr' v]
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum]
-      have hb
-          : ∀ i,
-            Polynomial.aeval C p (⟪b i, v⟫_ℂ • b i) = (f (typeOf (lam i)) * ⟪b i, v⟫_ℂ) • b i := by
+
+      rw [map_sum]
+      have hb : ∀ i, Polynomial.aeval C p (⟪b i, v⟫_ℂ • b i) = (f (typeOf (lam i)) * ⟪b i, v⟫_ℂ) • b i := by
         intro i
-        have hev : Module.End.HasEigenvector C ((lam i : ℝ) : ℂ) (b i) :=
-          hC.hasEigenvector_eigenvectorBasis hn.symm i
+        have hev : Module.End.HasEigenvector C ((lam i : ℝ) : ℂ) (b i) := hC.hasEigenvector_eigenvectorBasis hn.symm i
         rw [map_smul, Module.End.aeval_apply_of_hasEigenvector hev, hpl, smul_smul, mul_comm]
       simp only [hb, hQapply, Finset.smul_sum, smul_smul]
-      rw [← Finset.sum_fiberwise (Finset.univ)
-        (fun i => typeOf (lam i))
+      rw [← Finset.sum_fiberwise (Finset.univ) (fun i => typeOf (lam i))
         (fun i => (f (typeOf (lam i)) * ⟪b i, v⟫_ℂ) • b i)]
       refine Finset.sum_congr rfl fun ρ _ => Finset.sum_congr rfl fun i hi => ?_
       rw [Finset.mem_filter] at hi

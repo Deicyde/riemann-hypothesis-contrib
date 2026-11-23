@@ -1,8 +1,46 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.BlockTheory.DivisorBase.TypedPartSplitPrimes
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Real
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.WeightedSumBounds.PtCoeffSingleSubst
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.WeightedSumBounds.PtOrderProdSub
 
 @[expose] public section
 
@@ -13,30 +51,24 @@ noncomputable section
 namespace GlobalTheory.PrimePart
 
 open NumberField MvPowerSeries IsLocalRing
-open ReciprocityTheory.PGsh ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj
-  ReciprocityTheory.ChartRestriction.G.Sh
-open GlobalTheory.FGDepth GlobalTheory.CharDepth GlobalTheory.FactorDepth
-  GlobalTheory.IndefiniteRowSideFullHecke.TypedPartSplitPrimes
+open ReciprocityTheory.PGsh ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj ReciprocityTheory.ChartRestriction.G.Sh
+open GlobalTheory.FGDepth GlobalTheory.CharDepth GlobalTheory.FactorDepth GlobalTheory.IndefiniteRowSideFullHecke.TypedPartSplitPrimes
 
 section Hom
 
 variable {C : Type} [Field C] {v : AddValuation C (WithTop ℝ)}
 
-theorem subst_sum_smul
-    {σ τ ι : Type} [Fintype ι]
-    {a : σ → MvPowerSeries τ C} (ha : HasSubst a)
-    (m : ι → C) (f : ι → MvPowerSeries σ C)
-    : subst a (∑ i, m i • f i) = ∑ i, m i • (subst a (f i) : MvPowerSeries τ C) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [← substAlgHom_apply ha, map_sum]
+theorem subst_sum_smul {σ τ ι : Type} [Fintype ι] {a : σ → MvPowerSeries τ C} (ha : HasSubst a) (m : ι → C)
+    (f : ι → MvPowerSeries σ C) : subst a (∑ i, m i • f i) = ∑ i, m i • (subst a (f i) : MvPowerSeries τ C) := by
+
+  rw [← substAlgHom_apply ha, map_sum]
   simp only [map_smul, substAlgHom_apply]
 
-theorem isIntHom_comp
-    {d d' d'' : ℕ} {G : LogFGL v d} {G' : LogFGL v d'} {G'' : LogFGL v d''}
+theorem isIntHom_comp {d d' d'' : ℕ} {G : LogFGL v d} {G' : LogFGL v d'} {G'' : LogFGL v d''}
     {φ : Fin d' → MvPowerSeries (Fin d) C} {ψ : Fin d'' → MvPowerSeries (Fin d') C}
     {M : Matrix (Fin d') (Fin d) C} {N : Matrix (Fin d'') (Fin d') C}
-    (hφ : IsIntHom G G' φ M) (hψ : IsIntHom G' G'' ψ N)
-    : IsIntHom G G'' (fun b => subst φ (ψ b)) (N * M) := by
+    (hφ : IsIntHom G G' φ M) (hψ : IsIntHom G' G'' ψ N) :
+    IsIntHom G G'' (fun b => subst φ (ψ b)) (N * M) := by
   obtain ⟨hφ0, hφi, hφl⟩ := hφ
   obtain ⟨hψ0, hψi, hψl⟩ := hψ
   have hφs : HasSubst φ := hasSubst_of_constantCoeff_zero hφ0
@@ -57,27 +89,19 @@ variable {c : Coeff l} {T : CDVR} (io : c.F →+* T.Fr) {p : ℕ} [Fact p.Prime]
 
 def embO (σ : E →+* ℂ) : 𝓞 E →+* X.O where
   toFun a := (X.ints.exists_of_le_one (v_embX_le_one io X σ a)).choose
-  map_one' :=
-    X.ints.hom_inj (by
-      rw [(X.ints.exists_of_le_one (v_embX_le_one io X σ _)).choose_spec, map_one, map_one])
-  map_zero' :=
-    X.ints.hom_inj (by
-      rw [(X.ints.exists_of_le_one (v_embX_le_one io X σ _)).choose_spec, map_zero, map_zero])
-  map_mul' a b :=
-    X.ints.hom_inj (by
-      rw [map_mul (algebraMap X.O X.C),
-        (X.ints.exists_of_le_one (v_embX_le_one io X σ _)).choose_spec,
-        (X.ints.exists_of_le_one (v_embX_le_one io X σ _)).choose_spec,
-        (X.ints.exists_of_le_one (v_embX_le_one io X σ _)).choose_spec, map_mul])
-  map_add' a b :=
-    X.ints.hom_inj (by
-      rw [map_add (algebraMap X.O X.C),
-        (X.ints.exists_of_le_one (v_embX_le_one io X σ _)).choose_spec,
-        (X.ints.exists_of_le_one (v_embX_le_one io X σ _)).choose_spec,
-        (X.ints.exists_of_le_one (v_embX_le_one io X σ _)).choose_spec, map_add])
+  map_one' := X.ints.hom_inj (by rw [(X.ints.exists_of_le_one (v_embX_le_one io X σ _)).choose_spec, map_one, map_one])
+  map_zero' := X.ints.hom_inj (by
+    rw [(X.ints.exists_of_le_one (v_embX_le_one io X σ _)).choose_spec, map_zero, map_zero])
+  map_mul' a b := X.ints.hom_inj (by
+    rw [map_mul (algebraMap X.O X.C), (X.ints.exists_of_le_one (v_embX_le_one io X σ _)).choose_spec,
+      (X.ints.exists_of_le_one (v_embX_le_one io X σ _)).choose_spec,
+      (X.ints.exists_of_le_one (v_embX_le_one io X σ _)).choose_spec, map_mul])
+  map_add' a b := X.ints.hom_inj (by
+    rw [map_add (algebraMap X.O X.C), (X.ints.exists_of_le_one (v_embX_le_one io X σ _)).choose_spec,
+      (X.ints.exists_of_le_one (v_embX_le_one io X σ _)).choose_spec,
+      (X.ints.exists_of_le_one (v_embX_le_one io X σ _)).choose_spec, map_add])
 
-theorem algebraMap_embO (σ : E →+* ℂ) (a : 𝓞 E)
-    : algebraMap X.O X.C (embO io X σ a) = embX io X σ a :=
+theorem algebraMap_embO (σ : E →+* ℂ) (a : 𝓞 E) : algebraMap X.O X.C (embO io X σ a) = embX io X σ a :=
   (X.ints.exists_of_le_one (v_embX_le_one io X σ a)).choose_spec
 
 def red (σ : E →+* ℂ) : 𝓞 E →+* ResidueField X.O := (residue X.O).comp (embO io X σ)
@@ -86,8 +110,8 @@ theorem residue_eq_zero_iff_v (x : X.O) : residue X.O x = 0 ↔ X.v (algebraMap 
   rw [residue_eq_zero_iff, mem_maximalIdeal, mem_nonunits_iff, X.ints.isUnit_iff_valuation_eq_one]
   exact ⟨fun h => lt_of_le_of_ne (X.ints.map_le_one x) h, fun h => h.ne⟩
 
-theorem residue_eq_iff_v (x y : X.O)
-    : residue X.O x = residue X.O y ↔ X.v (algebraMap X.O X.C x - algebraMap X.O X.C y) < 1 := by
+theorem residue_eq_iff_v (x y : X.O) :
+    residue X.O x = residue X.O y ↔ X.v (algebraMap X.O X.C x - algebraMap X.O X.C y) < 1 := by
   rw [← sub_eq_zero, ← map_sub, residue_eq_zero_iff_v, map_sub]
 
 theorem primeBelow_eq_ker (σ : E →+* ℂ) : primeBelow io X σ = RingHom.ker (red io X σ) := by
@@ -96,8 +120,8 @@ theorem primeBelow_eq_ker (σ : E →+* ℂ) : primeBelow io X σ = RingHom.ker 
   show X.v (embX io X σ a) < 1 ↔ residue X.O (embO io X σ a) = 0
   rw [residue_eq_zero_iff_v, algebraMap_embO]
 
-theorem red_eq_pow_iff (σ σ' : E →+* ℂ) (a : 𝓞 E) (n : ℕ)
-    : red io X σ' a = red io X σ a ^ n ↔ X.v (embX io X σ' a - embX io X σ a ^ n) < 1 := by
+theorem red_eq_pow_iff (σ σ' : E →+* ℂ) (a : 𝓞 E) (n : ℕ) :
+    red io X σ' a = red io X σ a ^ n ↔ X.v (embX io X σ' a - embX io X σ a ^ n) < 1 := by
   show residue X.O (embO io X σ' a) = residue X.O (embO io X σ a) ^ n ↔ _
   rw [← map_pow, residue_eq_iff_v, map_pow, algebraMap_embO, algebraMap_embO]
 
@@ -140,11 +164,8 @@ theorem vX_vp_pos_iff (x : X.C) : 0 < vX_vp X x ↔ X.v x < 1 := by
 
 end Labels
 
-variable
-  {Dw : Datum H} {Xo : Moduli Dw l} {c : Coeff l} [StarRing (𝓞 E)]
-  {T : CDVR} {io : c.F →+* T.Fr} {y : IntFr Xo c T io} (Ch : IntegralChartA3 Xo c T io y)
-  {p : ℕ} [Fact p.Prime]
-  (X : ValExt T p)
+variable {Dw : Datum H} {Xo : Moduli Dw l} {c : Coeff l} [StarRing (𝓞 E)] {T : CDVR} {io : c.F →+* T.Fr}
+  {y : IntFr Xo c T io} (Ch : IntegralChartA3 Xo c T io y) {p : ℕ} [Fact p.Prime] (X : ValExt T p)
 
 def tanX (a : 𝓞 E) : Matrix (Fin (chD Ch.ch)) (Fin (chD Ch.ch)) X.C :=
   Matrix.of fun i j => jX X (coeff (Finsupp.single ((0 : Fin 1), j) 1) (Ch.actT a i))

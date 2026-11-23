@@ -1,32 +1,67 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.IsBump
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ExistsCIndValue
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
-open Matrix GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.BZMir GlobalTheory.BZMir.Leib
-  GlobalTheory.RgGu.Leib GlobalTheory.CompanionTheory.BZPhiPG
-  GlobalTheory.CompanionTheory.BZPhiPG.OntoO Topology
+open Matrix GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.BZMir GlobalTheory.BZMir.Leib GlobalTheory.RgGu.Leib GlobalTheory.CompanionTheory.BZPhiPG GlobalTheory.CompanionTheory.BZPhiPG.OntoO Topology
 open scoped TensorProduct
 
 noncomputable section
 
 namespace GlobalTheory.CompanionTheory.BZPhiPG.OntoO.Avg
 
-variable
-  {G W : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [AddCommGroup W] [Module ℂ W]
+variable {G W : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [AddCommGroup W] [Module ℂ W]
 
 def evL (H : Subgroup G) (ρ : Representation ℂ H W) (g : G) : cIndSpace H ρ →ₗ[ℂ] W :=
-  (LinearMap.proj g) ∘ₗ (indSpace H ρ).subtype ∘ₗ (smoothPart (ind H ρ)).subtype
-    ∘ₗ (cIndSpace H ρ).subtype
+  (LinearMap.proj g) ∘ₗ (indSpace H ρ).subtype ∘ₗ (smoothPart (ind H ρ)).subtype ∘ₗ (cIndSpace H ρ).subtype
 
-theorem bump_right_inv
-    {H : Subgroup G} {ρ : Representation ℂ H W} {K : Subgroup G} {v : W} {b : cIndSpace H ρ}
-    (hb : IsBump H ρ K 1 v b)
-    (g z : G) (hz : z ∈ K)
-    : b.1.1.1 (g * z) = b.1.1.1 g := by
+theorem bump_right_inv {H : Subgroup G} {ρ : Representation ℂ H W} {K : Subgroup G} {v : W} {b : cIndSpace H ρ}
+    (hb : IsBump H ρ K 1 v b) (g z : G) (hz : z ∈ K) : b.1.1.1 (g * z) = b.1.1.1 g := by
   by_cases h : ∃ a : H, ∃ x ∈ K, g = (a : G) * 1 * x
   · obtain ⟨a, x, hx, rfl⟩ := h
     rw [hb.1 a x hx, mul_assoc, hb.1 a (x * z) (mul_mem hx hz)]
@@ -34,41 +69,32 @@ theorem bump_right_inv
     rintro ⟨a, x, hx, e⟩
     exact h ⟨a, x * z⁻¹, mul_mem hx (inv_mem hz), by rw [← mul_assoc, ← e]; group⟩
 
-theorem sum_translate
-    {M : Type} [AddCommMonoid M]
-    (K₁ K₂ : Subgroup G) (h₂₁ : K₂ ≤ K₁)
-    (φ : G → M) (hφ : ∀ g, ∀ z ∈ K₂, φ (g * z) = φ g)
-    [Fintype (K₁ ⧸ K₂.subgroupOf K₁)]
-    (y : K₁)
-    : ∑ x : K₁ ⧸ K₂.subgroupOf K₁, φ ((y : G) * ((x.out : K₁) : G))
-      = ∑ x : K₁ ⧸ K₂.subgroupOf K₁, φ ((x.out : K₁) : G) := by
+theorem sum_translate {M : Type} [AddCommMonoid M] (K₁ K₂ : Subgroup G) (h₂₁ : K₂ ≤ K₁) (φ : G → M)
+    (hφ : ∀ g, ∀ z ∈ K₂, φ (g * z) = φ g) [Fintype (K₁ ⧸ K₂.subgroupOf K₁)] (y : K₁) :
+    ∑ x : K₁ ⧸ K₂.subgroupOf K₁, φ ((y : G) * ((x.out : K₁) : G)) =
+      ∑ x : K₁ ⧸ K₂.subgroupOf K₁, φ ((x.out : K₁) : G) := by
   have key : ∀ k : K₁, φ ((((k : K₁ ⧸ K₂.subgroupOf K₁).out : K₁)) : G) = φ (k : G) := by
     intro k
     obtain ⟨h, hh⟩ := QuotientGroup.mk_out_eq_mul (K₂.subgroupOf K₁) k
     rw [hh]
     exact hφ _ _ h.2
-  calc
-    ∑ x : K₁ ⧸ K₂.subgroupOf K₁, φ ((y : G) * ((x.out : K₁) : G))
-        = ∑ x : K₁ ⧸ K₂.subgroupOf K₁, φ (((MulAction.toPerm y x).out : K₁) : G) := by
-      refine Finset.sum_congr rfl fun x _ => ?_
-      have e : MulAction.toPerm y x = ((y * x.out : K₁) : K₁ ⧸ K₂.subgroupOf K₁) := by
-        conv_lhs => rw [← QuotientGroup.out_eq' x]
+  calc ∑ x : K₁ ⧸ K₂.subgroupOf K₁, φ ((y : G) * ((x.out : K₁) : G))
+      = ∑ x : K₁ ⧸ K₂.subgroupOf K₁, φ (((MulAction.toPerm y x).out : K₁) : G) := by
+        refine Finset.sum_congr rfl fun x _ => ?_
+        have e : MulAction.toPerm y x = ((y * x.out : K₁) : K₁ ⧸ K₂.subgroupOf K₁) := by
+          conv_lhs => rw [← QuotientGroup.out_eq' x]
+          rfl
+        rw [e, key]
         rfl
-      rw [e, key]
-      rfl
     _ = ∑ x : K₁ ⧸ K₂.subgroupOf K₁, φ ((x.out : K₁) : G) :=
-      Equiv.sum_comp (MulAction.toPerm y) (fun x : K₁ ⧸ K₂.subgroupOf K₁ => φ ((x.out : K₁) : G))
+        Equiv.sum_comp (MulAction.toPerm y) (fun x : K₁ ⧸ K₂.subgroupOf K₁ => φ ((x.out : K₁) : G))
 
-theorem bump_mem_of_bump
-    {G W : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [AddCommGroup W] [Module ℂ W]
-    (H : Subgroup G) (ρ : Representation ℂ H W)
-    (K₁ K₂ : Subgroup G)
-    (h₂₁ : K₂ ≤ K₁) (hK₁c : IsCompact (K₁ : Set G)) (hK₂o : IsOpen (K₂ : Set G))
-    (v : W) (hv : ∀ a : H, (a : G) ∈ K₁ → ρ a v = v)
-    (S : Submodule ℂ (cIndSpace H ρ)) (hS : ∀ g, ∀ b ∈ S, cInd H ρ g b ∈ S)
-    (b : cIndSpace H ρ) (hb : IsBump H ρ K₂ 1 v b) (hbS : b ∈ S)
-    (B : cIndSpace H ρ) (hB : IsBump H ρ K₁ 1 v B)
-    : B ∈ S := by
+theorem bump_mem_of_bump {G W : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [AddCommGroup W] [Module ℂ W]
+    (H : Subgroup G) (ρ : Representation ℂ H W) (K₁ K₂ : Subgroup G) (h₂₁ : K₂ ≤ K₁)
+    (hK₁c : IsCompact (K₁ : Set G)) (hK₂o : IsOpen (K₂ : Set G)) (v : W)
+    (hv : ∀ a : H, (a : G) ∈ K₁ → ρ a v = v) (S : Submodule ℂ (cIndSpace H ρ))
+    (hS : ∀ g, ∀ b ∈ S, cInd H ρ g b ∈ S) (b : cIndSpace H ρ) (hb : IsBump H ρ K₂ 1 v b) (hbS : b ∈ S)
+    (B : cIndSpace H ρ) (hB : IsBump H ρ K₁ 1 v B) : B ∈ S := by
   classical
   haveI : CompactSpace K₁ := isCompact_iff_compactSpace.1 hK₁c
   haveI : Finite (K₁ ⧸ K₂.subgroupOf K₁) :=
@@ -78,25 +104,19 @@ theorem bump_mem_of_bump
   have hTS : T ∈ S := S.sum_mem fun x _ => hS _ _ hbS
   have hTv : ∀ g, T.1.1.1 g = ∑ x : K₁ ⧸ K₂.subgroupOf K₁, b.1.1.1 (g * ((x.out : K₁) : G)) := by
     intro g
-    have e
-        : evL H ρ g T = ∑ x : K₁ ⧸ K₂.subgroupOf K₁, evL H ρ g (cInd H ρ ((x.out : K₁) : G) b) := by
-      set_option synthInstance.maxHeartbeats 100000 in
+    have e : evL H ρ g T = ∑ x : K₁ ⧸ K₂.subgroupOf K₁, evL H ρ g (cInd H ρ ((x.out : K₁) : G) b) := by
+
       rw [hT, map_sum]
     exact e
   have hTr : ∀ g, ∀ y ∈ K₁, T.1.1.1 (g * y) = T.1.1.1 g := by
     intro g y hy
     rw [hTv, hTv]
-    have :=
-      sum_translate K₁ K₂ h₂₁
-        (fun u => b.1.1.1 (g * u))
-        (fun u z hz => by
-          show b.1.1.1 (g * (u * z)) = b.1.1.1 (g * u)
-          rw [← mul_assoc]
-          exact bump_right_inv hb _ z hz)
-        ⟨y, hy⟩
+    have := sum_translate K₁ K₂ h₂₁ (fun u => b.1.1.1 (g * u))
+      (fun u z hz => by
+        show b.1.1.1 (g * (u * z)) = b.1.1.1 (g * u)
+        rw [← mul_assoc]; exact bump_right_inv hb _ z hz) ⟨y, hy⟩
     simpa only [mul_assoc] using this
-  let P : K₁ ⧸ K₂.subgroupOf K₁ → Prop := fun x =>
-    ∃ a : H, ∃ z ∈ K₂, ((x.out : K₁) : G) = (a : G) * 1 * z
+  let P : K₁ ⧸ K₂.subgroupOf K₁ → Prop := fun x => ∃ a : H, ∃ z ∈ K₂, ((x.out : K₁) : G) = (a : G) * 1 * z
   have hval : ∀ x, b.1.1.1 ((x.out : K₁) : G) = if P x then v else 0 := by
     intro x
     by_cases hx : P x

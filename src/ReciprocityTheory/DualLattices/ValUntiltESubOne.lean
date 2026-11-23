@@ -1,7 +1,57 @@
 module
 
-public import Mathlib
 public import ReciprocityTheory.DualLattices.CyclicRecursionStatement
+import Mathlib.Algebra.AffineMonoid.UniqueSums
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Real
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.SimpleRing.Principal
+public import Mathlib.RingTheory.WittVector.DiscreteValuationRing
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Lemma
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
+public import Mathlib.RingTheory.Polynomial.Cyclotomic.Basic
+public import Mathlib.RingTheory.Polynomial.Cyclotomic.Eval
 
 @[expose] public section
 
@@ -55,7 +105,6 @@ private lemma val_sub_one_le {C : Type*} [Field C] (v : Valuation C NNReal) {p :
   obtain ⟨i, -, hi⟩ : ∃ i < p, β ^ i = α := by
     first
     | exact hβ.eq_pow_of_pow_eq_one hα.pow_eq_one
-    | exact hβ.eq_pow_of_pow_eq_one hα.pow_eq_one hp.out.pos
   have hvb : v β = 1 := by
     have h : v β ^ p = 1 := by rw [← map_pow, hβ.pow_eq_one, map_one]
     exact (pow_eq_one_iff_of_nonneg (by positivity) hp.out.ne_zero).mp h
@@ -83,11 +132,9 @@ private lemma val_prim_root {C : Type*} [Field C] (v : Valuation C NNReal) {p : 
 
 section Ainf
 
-variable
-  {p : ℕ} [hp : Fact p.Prime]
-  {C : Type} [Field C]
-  {v : Valuation C NNReal} {O : Type}
-  [CommRing O] [Algebra O C] [Fact ¬ IsUnit (p : O)] [IsAdicComplete (span {(p : O)}) O]
+variable {p : ℕ} [hp : Fact p.Prime] {C : Type} [Field C] {v : Valuation C NNReal}
+  {O : Type} [CommRing O] [Algebra O C] [Fact ¬IsUnit (p : O)]
+  [IsAdicComplete (span {(p : O)}) O]
 
 private lemma untilt_sub_one (x : PreTilt O p) :
     ∃ t : O, (x - 1).untilt = x.untilt - 1 + p * t := by
@@ -132,7 +179,6 @@ private lemma val_untilt_e_sub_one (hv : v.Integers O) (e : PreTilt O p)
     first
     | exact PreTilt.untilt_pow x n
     | exact map_pow _ x n
-    | simp [PreTilt.untilt_pow]
   rcases hp.out.eq_two_or_odd' with h2 | hodd
   · subst h2
     set e' := (frobeniusEquiv (PreTilt O 2) 2).symm e with he'
@@ -141,7 +187,6 @@ private lemma val_untilt_e_sub_one (hv : v.Integers O) (e : PreTilt O p)
       | exact frobeniusEquiv_symm_pow_p 2 e
       | (have h3 := frobenius_apply_frobeniusEquiv_symm (PreTilt O 2) 2 e
          rwa [frobenius_def] at h3)
-      | simp [he']
     have hsub : (e' - 1) ^ 2 = e - 1 := by rw [sub_pow_char, one_pow, hep]
     have hm1 : e.untilt = -1 := hζ.eq_neg_one_of_two_right
     have h2ne : (2 : C) ≠ 0 := by
@@ -174,7 +219,6 @@ private lemma val_untilt_e_sub_one (hv : v.Integers O) (e : PreTilt O p)
       rw [Nat.cast_ofNat, ← hx2]
       first
       | exact pow_lt_self_of_lt_one₀ (pos_iff_ne_zero.mpr hx0) hxl one_lt_two
-      | exact pow_lt_self_of_lt_one (pos_iff_ne_zero.mpr hx0) hxl one_lt_two
     have hval := val_untilt_sub_one hv e' hlt
     rw [← hsub, hpow, map_pow, map_pow, hval, hx2]
     simp
@@ -200,41 +244,31 @@ private lemma val_untilt_e_sub_one (hv : v.Integers O) (e : PreTilt O p)
       rw [← hx]
       first
       | exact pow_lt_self_of_lt_one₀ (pos_iff_ne_zero.mpr hx0) hxl hp3
-      | exact pow_lt_self_of_lt_one (pos_iff_ne_zero.mpr hx0) hxl hp3
     rw [val_untilt_sub_one hv e hlt, hx]
 
 end Ainf
 
-theorem xiNu
-    (p : ℕ) [hp : Fact p.Prime]
-    (C : Type) [Field C]
-    (v : Valuation C NNReal)
-    (O : Type)
-    [CommRing O] [Algebra O C] [Fact ¬ IsUnit (p : O)] [IsAdicComplete (span {(p : O)}) O]
-    (hK : KerThetaStatement p O)
-    : XiNuStatement p C v O := by
+theorem xiNu (p : ℕ) [hp : Fact p.Prime] (C : Type) [Field C] (v : Valuation C NNReal)
+    (O : Type) [CommRing O] [Algebra O C] [Fact ¬IsUnit (p : O)]
+    [IsAdicComplete (span {(p : O)}) O] (hK : KerThetaStatement p O) :
+    XiNuStatement p C v O := by
   intro ε hv hζ
   haveI : IsDomain O := hv.hom_inj.isDomain (algebraMap O C)
   set e := (frobeniusEquiv (PreTilt O p) p).symm ε with he
   have hep : e ^ p = ε := by
     first
     | exact frobeniusEquiv_symm_pow_p p ε
-    | (
-        have h3 := frobenius_apply_frobeniusEquiv_symm (PreTilt O p) p ε
-        rwa [frobenius_def] at h3
-      )
-    | simp [he]
+    | (have h3 := frobenius_apply_frobeniusEquiv_symm (PreTilt O p) p ε
+       rwa [frobenius_def] at h3)
   have hT : ∀ x : PreTilt O p, fontaineTheta O p (teichmuller p x) = x.untilt := by
     intro x
     first
     | exact fontaineTheta_teichmuller x
-    | exact fontaineTheta_teichmuller O p x
-    | simp [fontaineTheta]
-  have h1
-      : teichmuller p ε - 1
-        = (∑ i ∈ Finset.range p, teichmuller p e ^ i) * (teichmuller p e - 1) := by
+  have h1 : teichmuller p ε - 1 =
+      (∑ i ∈ Finset.range p, teichmuller p e ^ i) * (teichmuller p e - 1) := by
     rw [geom_sum_mul, ← map_pow, hep]
-  have h2 : fontaineTheta O p (teichmuller p e - 1) = e.untilt - 1 := by rw [map_sub, map_one, hT]
+  have h2 : fontaineTheta O p (teichmuller p e - 1) = e.untilt - 1 := by
+    rw [map_sub, map_one, hT]
   have hne : algebraMap O C (e.untilt - 1) ≠ 0 := by
     intro h0
     apply hζ.ne_one hp.out.one_lt
@@ -249,26 +283,30 @@ theorem xiNu
     rw [← h3, h2]
     exact pow_ne_zero _ ((Valuation.ne_zero_iff v).mpr hne)
   have hxi : (∑ i ∈ Finset.range p, teichmuller p e ^ i) ∈ RingHom.ker (fontaineTheta O p) := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [RingHom.mem_ker, map_sum]
+
+    rw [RingHom.mem_ker, map_sum]
     simp only [map_pow, hT]
     exact hζ.geom_sum_eq_zero hp.out.one_lt
   rw [hK1] at hxi
   obtain ⟨a, ha⟩ := Ideal.mem_span_singleton'.mp hxi
   have hmul : ∀ x y : PreTilt O p, (x * y).untilt = x.untilt * y.untilt := by
     intro x y
-    first | exact PreTilt.untilt_mul x y | exact map_mul _ x y | simp [PreTilt.untilt_mul]
+    first
+    | exact PreTilt.untilt_mul x y
+    | exact map_mul _ x y
   have hpow : ∀ (x : PreTilt O p) (n : ℕ), (x ^ n).untilt = x.untilt ^ n := by
     intro x n
-    first | exact PreTilt.untilt_pow x n | exact map_pow _ x n | simp [PreTilt.untilt_pow]
+    first
+    | exact PreTilt.untilt_pow x n
+    | exact map_pow _ x n
   have hone : (1 : PreTilt O p).untilt = 1 := by
     have h5 := hpow (1 : PreTilt O p) 0
     rwa [pow_zero, pow_zero] at h5
   have hct : ∀ x : PreTilt O p, WittVector.constantCoeff (teichmuller p x) = x := fun x =>
     WittVector.teichmuller_coeff_zero p x
   have hc := congrArg WittVector.constantCoeff ha
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_mul, map_sub, map_natCast, CharP.cast_eq_zero, zero_sub, hct, map_sum] at hc
+
+  rw [map_mul, map_sub, map_natCast, CharP.cast_eq_zero, zero_sub, hct, map_sum] at hc
   simp only [map_pow, hct] at hc
   have hc2 : WittVector.constantCoeff a * ((-1) * pflat) = (e - 1) ^ (p - 1) := by
     rw [sub_one_pow_pred, ← hc]
@@ -277,14 +315,14 @@ theorem xiNu
   simp only [hmul, hpow, map_mul, map_pow] at hw
   rw [val_untilt_e_sub_one hv e hζ, hpf, map_natCast] at hw
   have hm1 : v (algebraMap O C ((-1 : PreTilt O p).untilt)) = 1 := by
-    have h5 : ((-1 : PreTilt O p).untilt) ^ 2 = 1 := by rw [← hpow, neg_one_sq, hone]
+    have h5 : ((-1 : PreTilt O p).untilt) ^ 2 = 1 := by
+      rw [← hpow, neg_one_sq, hone]
     have h6 : v (algebraMap O C ((-1 : PreTilt O p).untilt)) ^ 2 = 1 := by
       rw [← map_pow, ← map_pow, h5, map_one, map_one]
     exact (pow_eq_one_iff_of_nonneg (by positivity) two_ne_zero).mp h6
   rw [hm1, one_mul] at hw
   have hX : v (algebraMap O C (WittVector.constantCoeff a).untilt) = 1 := by
-    have h7
-        : v (algebraMap O C (WittVector.constantCoeff a).untilt) * v (p : C) = 1 * v (p : C) := by
+    have h7 : v (algebraMap O C (WittVector.constantCoeff a).untilt) * v (p : C) = 1 * v (p : C) := by
       rw [one_mul]
       exact hw
     exact mul_right_cancel₀ hvp h7

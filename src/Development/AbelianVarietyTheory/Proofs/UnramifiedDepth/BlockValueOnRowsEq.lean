@@ -1,8 +1,58 @@
 module
 
-public import Mathlib
 public import Formalism.LocalToGlobal.CharacterGerms.BiadditiveInSingleVariables
 public import Development.AbelianVarietyTheory.Proofs.UnramifiedDepth.DetPowDiagonalRowsBlockJetRestrict
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.Order.CompletePartialOrder
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Lemma
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
+public import Mathlib.Algebra.BigOperators.Field
 
 @[expose] public section
 
@@ -106,8 +156,8 @@ private lemma mvExp_add_unramified_depth [CharZero C] {a b : MvPowerSeries σ C}
           MvPowerSeries.coeff m (a ^ i * b ^ (k - i)) /
             ((i.factorial : C) * ((k - i).factorial : C)) := by
         refine Finset.sum_congr rfl fun k _ => ?_
-        set_option synthInstance.maxHeartbeats 100000 in
-          rw [add_pow, map_sum, Finset.sum_div]
+
+        rw [add_pow, map_sum, Finset.sum_div]
         refine Finset.sum_congr rfl fun i hi => ?_
         have hik : i ≤ k := Nat.lt_succ_iff.1 (Finset.mem_range.1 hi)
         have hch : ((k.choose i : ℕ) : C) ≠ 0 := Nat.cast_ne_zero.2 (Nat.choose_pos hik).ne'
@@ -147,8 +197,8 @@ private lemma mvExp_sum' [CharZero C] {ι : Type} (s : Finset ι) (f : ι → Mv
   | @insert a s ha ih =>
     rw [Finset.sum_insert ha, Finset.prod_insert ha,
       mvExp_add_unramified_depth (h a (Finset.mem_insert_self a s)), ih fun i hi => h i (Finset.mem_insert_of_mem hi)]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     exact Finset.sum_eq_zero fun i hi => h i (Finset.mem_insert_of_mem hi)
 
 open scoped BigOperators in
@@ -199,8 +249,8 @@ private lemma onlyIn_sum {S : σ → Prop} {ι : Type} (s : Finset ι) (f : ι �
     (h : ∀ i ∈ s, _root_.GlobalTheory.BlockValue.OnlyIn S (f i)) :
     _root_.GlobalTheory.BlockValue.OnlyIn S (∑ i ∈ s, f i) := by
   intro m hm
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum] at hm
+
+  rw [map_sum] at hm
   obtain ⟨i, hi, hne⟩ := Finset.exists_ne_zero_of_sum_ne_zero hm
   exact h i hi m hne
 

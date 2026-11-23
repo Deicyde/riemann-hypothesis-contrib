@@ -1,7 +1,56 @@
 module
 
-public import Mathlib
-public import GroundTheory.HeightsAndTheta.Heights.FieldsOfNumbers.Statements
+public import GroundTheory.HeightsAndTheta.Heights.DiscreteValuationNumbers.Objects
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+public import Mathlib.RingTheory.KrullDimension.Field
+public import Mathlib.RingTheory.KrullDimension.NonZeroDivisors
+import Mathlib.RingTheory.KrullDimension.Polynomial
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -19,20 +68,19 @@ section Drop
 
 variable {K : Type*} {ι : K → Type*} {F : Type*} [Field F]
 
-theorem ringKrullDim_add_one_le
-    {P Q : Ideal (MRing ι F)} [P.IsPrime] (hPQ : P ≤ Q) {f : MRing ι F} (hfP : f ∉ P) (hfQ : f ∈ Q)
-    : ringKrullDim (MRing ι F ⧸ Q) + 1 ≤ ringKrullDim (MRing ι F ⧸ P) := by
+theorem ringKrullDim_add_one_le {P Q : Ideal (MRing ι F)} [P.IsPrime] (hPQ : P ≤ Q)
+    {f : MRing ι F} (hfP : f ∉ P) (hfQ : f ∈ Q) :
+    ringKrullDim (MRing ι F ⧸ Q) + 1 ≤ ringKrullDim (MRing ι F ⧸ P) := by
   refine ringKrullDim_succ_le_of_surjective (Ideal.Quotient.factor hPQ)
     (Ideal.Quotient.factor_surjective hPQ) (r := Ideal.Quotient.mk P f) ?_ ?_
   · exact mem_nonZeroDivisors_of_ne_zero (by rwa [ne_eq, Ideal.Quotient.eq_zero_iff_mem])
   · rw [Ideal.Quotient.factor_mk, Ideal.Quotient.eq_zero_iff_mem]
     exact hfQ
 
-theorem ringKrullDim_lt_top [Finite K] [∀ k, Finite (ι k)] (Q : Ideal (MRing ι F))
-    : ringKrullDim (MRing ι F ⧸ Q) < ⊤ := by
+theorem ringKrullDim_lt_top [Finite K] [∀ k, Finite (ι k)] (Q : Ideal (MRing ι F)) :
+    ringKrullDim (MRing ι F ⧸ Q) < ⊤ := by
   refine lt_of_le_of_lt (ringKrullDim_quotient_le Q) ?_
-  rw [MvPolynomial.ringKrullDim_of_isNoetherianRing_of_finite, ringKrullDim_eq_zero_of_field,
-    zero_add]
+  rw [MvPolynomial.ringKrullDim_of_isNoetherianRing_of_finite, ringKrullDim_eq_zero_of_field, zero_add]
   exact WithBot.coe_lt_coe.mpr (ENat.natCast_lt_top _)
 
 end Drop
@@ -44,8 +92,8 @@ variable {K : Type*} [DecidableEq K] {ι : K → Type*} {F : Type*} [Field F]
 def killBlocks (T : Finset K) : MRing ι F →ₐ[F] MRing ι F :=
   aeval fun v => if v.1 ∈ T then 0 else X v
 
-theorem killBlocks_X (T : Finset K) (v : Σ k, ι k)
-    : killBlocks (F := F) T (X v) = if v.1 ∈ T then 0 else X v := by
+theorem killBlocks_X (T : Finset K) (v : Σ k, ι k) :
+    killBlocks (F := F) T (X v) = if v.1 ∈ T then 0 else X v := by
   simp [killBlocks]
 
 theorem killBlocks_empty : killBlocks (ι := ι) (F := F) (∅ : Finset K) = AlgHom.id F _ := by
@@ -53,8 +101,8 @@ theorem killBlocks_empty : killBlocks (ι := ι) (F := F) (∅ : Finset K) = Alg
   intro v
   simp [killBlocks_X]
 
-theorem killBlocks_comp {T T' : Finset K} (h : T ⊆ T')
-    : (killBlocks (ι := ι) (F := F) T').comp (killBlocks T) = killBlocks T' := by
+theorem killBlocks_comp {T T' : Finset K} (h : T ⊆ T') :
+    (killBlocks (ι := ι) (F := F) T').comp (killBlocks T) = killBlocks T' := by
   apply MvPolynomial.algHom_ext
   intro v
   simp only [AlgHom.comp_apply, killBlocks_X]
@@ -62,8 +110,9 @@ theorem killBlocks_comp {T T' : Finset K} (h : T ⊆ T')
   · simp [hv, h hv]
   · simp [hv, killBlocks_X]
 
-theorem killBlocks_monomial (T : Finset K) (d : (Σ k, ι k) →₀ ℕ) (c : F)
-    : killBlocks T (monomial d c) = if ∀ v ∈ d.support, v.1 ∉ T then monomial d c else 0 := by
+theorem killBlocks_monomial (T : Finset K) (d : (Σ k, ι k) →₀ ℕ) (c : F) :
+    killBlocks T (monomial d c) =
+      if ∀ v ∈ d.support, v.1 ∉ T then monomial d c else 0 := by
   rw [killBlocks, aeval_monomial]
   split_ifs with h
   · rw [monomial_eq, algebraMap_eq]
@@ -75,14 +124,12 @@ theorem killBlocks_monomial (T : Finset K) (d : (Σ k, ι k) →₀ ℕ) (c : F)
     dsimp only
     rw [if_pos hT, zero_pow (Finsupp.mem_support_iff.mp hv)]
 
-theorem coeff_killBlocks (T : Finset K) (q : MRing ι F) (d : (Σ k, ι k) →₀ ℕ)
-    : AddMonoidAlgebra.coeff (killBlocks T q) d
-      = if ∀ v ∈ d.support, v.1 ∉ T then AddMonoidAlgebra.coeff q d else 0 := by
+theorem coeff_killBlocks (T : Finset K) (q : MRing ι F) (d : (Σ k, ι k) →₀ ℕ) :
+    AddMonoidAlgebra.coeff (killBlocks T q) d = if ∀ v ∈ d.support, v.1 ∉ T then AddMonoidAlgebra.coeff q d else 0 := by
   classical
   induction q using MvPolynomial.induction_on' with
   | monomial d' c =>
-    rw [killBlocks_monomial, apply_ite (AddMonoidAlgebra.coeff · d), AddMonoidAlgebra.coeff_zero,
-      coeff_monomial]
+    rw [killBlocks_monomial, apply_ite (AddMonoidAlgebra.coeff · d), AddMonoidAlgebra.coeff_zero, coeff_monomial]
     by_cases hd : d' = d
     · subst hd
       simp
@@ -93,8 +140,8 @@ theorem coeff_killBlocks (T : Finset K) (q : MRing ι F) (d : (Σ k, ι k) →�
     rw [hp, hq]
     split_ifs <;> simp
 
-theorem weight_apply_eq_zero_iff (d : (Σ k, ι k) →₀ ℕ) (k : K)
-    : Finsupp.weight (blockWeight ι) d k = 0 ↔ ∀ v ∈ d.support, v.1 ≠ k := by
+theorem weight_apply_eq_zero_iff (d : (Σ k, ι k) →₀ ℕ) (k : K) :
+    Finsupp.weight (blockWeight ι) d k = 0 ↔ ∀ v ∈ d.support, v.1 ≠ k := by
   rw [Finsupp.weight_apply, Finsupp.sum, Finset.sum_apply, Finset.sum_eq_zero_iff]
   refine forall₂_congr fun v hv => ?_
   simp only [Pi.smul_apply, smul_eq_mul, blockWeight, Pi.single_apply, mul_ite, mul_one, mul_zero]
@@ -106,9 +153,8 @@ theorem weight_apply_eq_zero_iff (d : (Σ k, ι k) →₀ ℕ) (k : K)
   · intro h
     rw [if_neg (fun hk => h hk.symm)]
 
-theorem killBlocks_of_isMultiHomog
-    (T : Finset K) {p : MRing ι F} {b : K → ℕ} (hp : IsMultiHomog p b)
-    : killBlocks T p = if ∀ k ∈ T, b k = 0 then p else 0 := by
+theorem killBlocks_of_isMultiHomog (T : Finset K) {p : MRing ι F} {b : K → ℕ}
+    (hp : IsMultiHomog p b) : killBlocks T p = if ∀ k ∈ T, b k = 0 then p else 0 := by
   ext d
   rw [coeff_killBlocks]
   by_cases hd : AddMonoidAlgebra.coeff p d = 0
@@ -129,25 +175,23 @@ theorem killBlocks_of_isMultiHomog
     · rw [if_neg (fun h => hb (key.mp h)), if_neg hb, AddMonoidAlgebra.coeff_zero]
       rfl
 
-theorem killBlocks_mem_of_isMultiHomogIdeal
-    {Q : Ideal (MRing ι F)} (hQ : IsMultiHomogIdeal Q) (T : Finset K) {q : MRing ι F} (hq : q ∈ Q)
-    : killBlocks T q ∈ Q := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [← sum_weightedHomogeneousComponent (blockWeight ι) q,
-      finsum_eq_sum _ (weightedHomogeneousComponent_finsupp q), map_sum]
+theorem killBlocks_mem_of_isMultiHomogIdeal {Q : Ideal (MRing ι F)} (hQ : IsMultiHomogIdeal Q)
+    (T : Finset K) {q : MRing ι F} (hq : q ∈ Q) : killBlocks T q ∈ Q := by
+
+  rw [← sum_weightedHomogeneousComponent (blockWeight ι) q,
+  finsum_eq_sum _ (weightedHomogeneousComponent_finsupp q), map_sum]
   refine Ideal.sum_mem _ fun b _ => ?_
   rw [killBlocks_of_isMultiHomog T (weightedHomogeneousComponent_isWeightedHomogeneous b q)]
   split_ifs
   · exact hQ q hq b
   · exact Q.zero_mem
 
-def killIdeal (Q : Ideal (MRing ι F)) (T : Finset K) : Ideal (MRing ι F) := Q.comap (killBlocks T)
+def killIdeal (Q : Ideal (MRing ι F)) (T : Finset K) : Ideal (MRing ι F) :=
+  Q.comap (killBlocks T)
 
-theorem card_le_ringKrullDim
-    [Fintype K]
-    {Q : Ideal (MRing ι F)} [hQp : Q.IsPrime]
-    (hQ : ∀ (T : Finset K) (q : MRing ι F), q ∈ Q → killBlocks T q ∈ Q) (hrel : IsRelevant Q)
-    : (Fintype.card K : WithBot ℕ∞) ≤ ringKrullDim (MRing ι F ⧸ Q) := by
+theorem card_le_ringKrullDim [Fintype K] {Q : Ideal (MRing ι F)} [hQp : Q.IsPrime]
+    (hQ : ∀ (T : Finset K) (q : MRing ι F), q ∈ Q → killBlocks T q ∈ Q) (hrel : IsRelevant Q) :
+    (Fintype.card K : WithBot ℕ∞) ≤ ringKrullDim (MRing ι F ⧸ Q) := by
   choose i hi using hrel
   have hmono : ∀ {T T' : Finset K}, T ⊆ T' → killIdeal Q T ≤ killIdeal Q T' := by
     intro T T' h q hq
@@ -155,10 +199,9 @@ theorem card_le_ringKrullDim
     rw [← killBlocks_comp h]
     exact hQ T' _ hq
   have hprime : ∀ T, (killIdeal Q T).IsPrime := fun T => Ideal.comap_isPrime _ _
-  have hchain
-      : ∀ T : Finset K,
-        ringKrullDim (MRing ι F ⧸ killIdeal Q T) + (T.card : WithBot ℕ∞)
-          ≤ ringKrullDim (MRing ι F ⧸ Q) := by
+  have hchain : ∀ T : Finset K,
+      ringKrullDim (MRing ι F ⧸ killIdeal Q T) + (T.card : WithBot ℕ∞) ≤
+        ringKrullDim (MRing ι F ⧸ Q) := by
     intro T
     induction T using Finset.induction_on with
     | empty =>
@@ -168,34 +211,29 @@ theorem card_le_ringKrullDim
       rw [this, Finset.card_empty, Nat.cast_zero, add_zero]
     | insert k T hk ih =>
       have := hprime T
-      have hstep :=
-        ringKrullDim_add_one_le (P := killIdeal Q T) (Q := killIdeal Q (insert k T))
-          (hmono (Finset.subset_insert k T)) (f := X ⟨k, i k⟩)
-          (by
-            change killBlocks T (X ⟨k, i k⟩) ∉ Q
-            rw [killBlocks_X, if_neg hk]
-            exact hi k)
-          (by
-            change killBlocks (insert k T) (X ⟨k, i k⟩) ∈ Q
-            rw [killBlocks_X, if_pos (Finset.mem_insert_self k T)]
-            exact Q.zero_mem)
-      calc
-        ringKrullDim (MRing ι F ⧸ killIdeal Q (insert k T)) + ((insert k T).card : WithBot ℕ∞)
-            = (ringKrullDim (MRing ι F ⧸ killIdeal Q (insert k T)) + 1)
-              + (T.card : WithBot ℕ∞) := by
-          rw [Finset.card_insert_of_notMem hk, Nat.cast_add, Nat.cast_one, add_assoc,
-            add_comm (1 : WithBot ℕ∞)]
+      have hstep := ringKrullDim_add_one_le (P := killIdeal Q T) (Q := killIdeal Q (insert k T))
+        (hmono (Finset.subset_insert k T)) (f := X ⟨k, i k⟩)
+        (by
+          change killBlocks T (X ⟨k, i k⟩) ∉ Q
+          rw [killBlocks_X, if_neg hk]
+          exact hi k)
+        (by
+          change killBlocks (insert k T) (X ⟨k, i k⟩) ∈ Q
+          rw [killBlocks_X, if_pos (Finset.mem_insert_self k T)]
+          exact Q.zero_mem)
+      calc ringKrullDim (MRing ι F ⧸ killIdeal Q (insert k T)) + ((insert k T).card : WithBot ℕ∞)
+          = (ringKrullDim (MRing ι F ⧸ killIdeal Q (insert k T)) + 1) + (T.card : WithBot ℕ∞) := by
+            rw [Finset.card_insert_of_notMem hk, Nat.cast_add, Nat.cast_one, add_assoc,
+              add_comm (1 : WithBot ℕ∞)]
         _ ≤ ringKrullDim (MRing ι F ⧸ killIdeal Q T) + (T.card : WithBot ℕ∞) := by gcongr
         _ ≤ _ := ih
   have := hprime Finset.univ
   have h0 := ringKrullDim_nonneg_of_nontrivial (R := MRing ι F ⧸ killIdeal Q Finset.univ)
   have := hchain Finset.univ
   rw [Finset.card_univ] at this
-  calc
-    (Fintype.card K : WithBot ℕ∞)
-      = 0 + (Fintype.card K : WithBot ℕ∞) := (zero_add _).symm
+  calc (Fintype.card K : WithBot ℕ∞) = 0 + (Fintype.card K : WithBot ℕ∞) := (zero_add _).symm
     _ ≤ ringKrullDim (MRing ι F ⧸ killIdeal Q Finset.univ) + (Fintype.card K : WithBot ℕ∞) := by
-      gcongr
+        gcongr
     _ ≤ _ := this
 
 end Kill

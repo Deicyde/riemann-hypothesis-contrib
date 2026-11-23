@@ -1,6 +1,45 @@
 module
 
 public import Development.AutomorphicArithmetic.Foundations.Convolution.HermitianDescent.NormAlmostAll
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -10,22 +49,17 @@ open scoped TensorProduct
 
 namespace UpperTheory.ConvolutionTheory.D
 
-private theorem sum_pow_fix
-    {α M : Type} [Monoid α] [AddCommGroup M] (a : α) (q : ℕ) (h : a ^ q = 1) (f : α → M)
-    : ∑ j ∈ Finset.range q, f (a ^ (j + 1)) = ∑ j ∈ Finset.range q, f (a ^ j) := by
+private theorem sum_pow_fix {α M : Type} [Monoid α] [AddCommGroup M] (a : α) (q : ℕ) (h : a ^ q = 1) (f : α → M) :
+    ∑ j ∈ Finset.range q, f (a ^ (j + 1)) = ∑ j ∈ Finset.range q, f (a ^ j) := by
   have h1 := Finset.sum_range_succ (fun j => f (a ^ j)) q
   have h2 := Finset.sum_range_succ' (fun j => f (a ^ j)) q
   rw [h1, h, pow_zero] at h2
   exact (add_right_cancel h2).symm
 
-private theorem sep_sum
-    {k R : Type} [CommRing k] [CommRing R] [Algebra k R]
-    (σ : R ≃ₐ[k] R)
-    (q : ℕ) (hq : 0 < q)
+private theorem sep_sum {k R : Type} [CommRing k] [CommRing R] [Algebra k R] (σ : R ≃ₐ[k] R) (q : ℕ) (hq : 0 < q)
     {t : ℕ} (x y : Fin t → R) (h : ∀ j < q, ∑ i, x i * (σ ^ j) (y i) = if j = 0 then 1 else 0)
-    {M : Type} [AddCommGroup M] [Module R M]
-    (v : ℕ → M)
-    : ∑ i, x i • ∑ j ∈ Finset.range q, (σ ^ j) (y i) • v j = v 0 := by
+    {M : Type} [AddCommGroup M] [Module R M] (v : ℕ → M) :
+    ∑ i, x i • ∑ j ∈ Finset.range q, (σ ^ j) (y i) • v j = v 0 := by
   simp_rw [Finset.smul_sum, smul_smul]
   rw [Finset.sum_comm]
   simp_rw [← Finset.sum_smul]
@@ -41,8 +75,7 @@ theorem descent : Descent := by
     | zero => intro r m; simp
     | succ j ih =>
       intro r m
-      rw [pow_succ', pow_succ', Module.End.mul_apply, Module.End.mul_apply, AlgEquiv.mul_apply, ih,
-        hs]
+      rw [pow_succ', pow_succ', Module.End.mul_apply, Module.End.mul_apply, AlgEquiv.mul_apply, ih, hs]
   have hfix : ∀ (n : M), s n = n → ∀ j : ℕ, (s ^ j) n = n := by
     intro n hn j
     induction j with
@@ -50,15 +83,15 @@ theorem descent : Descent := by
     | succ j ih => rw [pow_succ', Module.End.mul_apply, ih, hn]
   have hT : ∀ m : M, (∑ j ∈ Finset.range q, s ^ j) m ∈ LinearMap.eqLocus s LinearMap.id := by
     intro m
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [LinearMap.mem_eqLocus, LinearMap.id_apply, LinearMap.sum_apply, map_sum,
-        ← sum_pow_fix s q hq fun a => a m]
+
+    rw [LinearMap.mem_eqLocus, LinearMap.id_apply, LinearMap.sum_apply, map_sum,
+    ← sum_pow_fix s q hq fun a => a m]
     exact Finset.sum_congr rfl fun j _ => by rw [pow_succ', Module.End.mul_apply]
   have htr : ∀ r : R, ∃ c : k, algebraMap k R c = ∑ j ∈ Finset.range q, (σ ^ j) r := by
     intro r
     refine hG.fix _ ?_
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, ← sum_pow_fix σ q hG.pow fun a => a r]
+
+    rw [map_sum, ← sum_pow_fix σ q hG.pow fun a => a r]
     exact Finset.sum_congr rfl fun j _ => by rw [pow_succ', AlgEquiv.mul_apply]
   choose c hc using htr
   let T : M →ₗ[k] LinearMap.eqLocus s LinearMap.id := LinearMap.codRestrict _ _ hT
@@ -81,13 +114,8 @@ theorem descent : Descent := by
         refine Eq.trans (Finset.sum_congr rfl fun i _ => ?_) this
         rw [Algebra.smul_def, hc, smul_eq_mul, mul_comm]
         simp only [map_mul, smul_eq_mul]
-      have h3
-          : TensorProduct.lift
-              ((Algebra.lsmul k k M (A := R)).toLinearMap.compl₂
-                (LinearMap.eqLocus s LinearMap.id).subtype)
-              (r ⊗ₜ[k] n)
-            = r • (n : M) :=
-        rfl
+      have h3 : TensorProduct.lift ((Algebra.lsmul k k M (A := R)).toLinearMap.compl₂
+          (LinearMap.eqLocus s LinearMap.id).subtype) (r ⊗ₜ[k] n) = r • (n : M) := rfl
       rw [h3, hg]
       simp_rw [h1, ← TensorProduct.smul_tmul, ← TensorProduct.sum_tmul, h2]
   · set_option synthInstance.maxHeartbeats 100000 in

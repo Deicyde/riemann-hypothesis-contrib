@@ -1,7 +1,52 @@
 module
 
-public import Formalism.GL3MeanSquares.GenusMeanAsymptotics.UnimodularClassRepresentatives.ExistsMassConstOne
-public import Formalism.GL3MeanSquares.GenusMeanAsymptotics.UnimodularClassRepresentatives.MassLandA
+import Formalism.GL3MeanSquares.GenusMeanAsymptotics.UnimodularClassRepresentatives.ConjOMemHcompl
+public import Formalism.GL3MeanSquares.GenusMeanAsymptotics.UnimodularClassRepresentatives.MassSt
+public import Formalism.GL3MeanSquares.GenusMeanAsymptotics.UnimodularClassRepresentatives.ExistsNeZeroOfIsLattice
+import Formalism.GL3MeanSquares.GenusMeanAsymptotics.UnimodularClassRepresentatives.IsClassRepsMap
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -9,13 +54,12 @@ noncomputable section
 
 namespace Formalism.MainNotions.BridgeLemVR
 
-open NumberField Formalism.HermitianLatticesTheory Formalism.ThetaLiftIndependence
-  Formalism.HermitianLattices.Ext.L3 Formalism.HermitianLattices.Ext.L3.RankOne nonZeroDivisors
+open NumberField Formalism.HermitianLatticesTheory Formalism.ThetaLiftIndependence Formalism.HermitianLattices.Ext.L3 Formalism.HermitianLattices.Ext.L3.RankOne nonZeroDivisors
 
 variable {K : Type} [Field K] [NumberField K] [StarRing K]
 
-theorem hcompl_le_primeCompl {p : Ideal (𝓞 K)} (hp : p.IsMaximal)
-    : hcompl (K := K) p ≤ p.primeCompl := by
+theorem hcompl_le_primeCompl {p : Ideal (𝓞 K)} (hp : p.IsMaximal) :
+    hcompl (K := K) p ≤ p.primeCompl := by
   have := hp.isPrime
   unfold hcompl
   rw [Submonoid.closure_le]
@@ -25,9 +69,8 @@ theorem hcompl_le_primeCompl {p : Ideal (𝓞 K)} (hp : p.IsMaximal)
 theorem one_mem_locR (p : Ideal (𝓞 K)) : (1 : K) ∈ locR (K := K) p :=
   ⟨1, (hcompl (K := K) p).one_mem, by rw [one_smul]; exact Submodule.mem_one.2 ⟨1, map_one _⟩⟩
 
-theorem mul_mem_locR
-    {p : Ideal (𝓞 K)} {x y : K} (hx : x ∈ locR (K := K) p) (hy : y ∈ locR (K := K) p)
-    : x * y ∈ locR (K := K) p := by
+theorem mul_mem_locR {p : Ideal (𝓞 K)} {x y : K} (hx : x ∈ locR (K := K) p) (hy : y ∈ locR (K := K) p) :
+    x * y ∈ locR (K := K) p := by
   obtain ⟨s, hs, hsx⟩ := hx
   obtain ⟨t, ht, hty⟩ := hy
   refine ⟨s * t, (hcompl (K := K) p).mul_mem hs ht, ?_⟩
@@ -37,26 +80,12 @@ theorem mul_mem_locR
   rw [map_mul, hr, hr', Algebra.smul_def, Algebra.smul_def, Algebra.smul_def, map_mul]
   ring
 
-theorem conjO_mem_hcompl {p : Ideal (𝓞 K)} {s : 𝓞 K} (hs : s ∈ hcompl (K := K) p)
-    : conjO K s ∈ hcompl (K := K) p := by
-  have key : hcompl (K := K) p ≤ (hcompl (K := K) p).comap (conjO K : 𝓞 K →* 𝓞 K) := by
-    conv_lhs => unfold hcompl
-    rw [Submonoid.closure_le]
-    intro s hs
-    show conjO K s ∈ hcompl (K := K) p
-    apply Submonoid.subset_closure
-    refine ⟨hs.2 (conjO K s) rfl, fun t ht => ?_⟩
-    have e : t = s := by
-      apply RingOfIntegers.ext
-      have : (t : K) = star (star (s : K)) := ht
-      rw [star_star] at this
-      exact this
-    rw [e]
-    exact hs.1
-  exact key hs
+theorem conjO_mem_hcompl {p : Ideal (𝓞 K)} {s : 𝓞 K} (hs : s ∈ hcompl (K := K) p) :
+    conjO K s ∈ hcompl (K := K) p := by
+  apply Formalism.HermitianLattices.Ext.L3.SplitA.conjO_mem_hcompl <;> assumption
 
-theorem star_mem_locR {p : Ideal (𝓞 K)} {x : K} (hx : x ∈ locR (K := K) p)
-    : star x ∈ locR (K := K) p := by
+theorem star_mem_locR {p : Ideal (𝓞 K)} {x : K} (hx : x ∈ locR (K := K) p) :
+    star x ∈ locR (K := K) p := by
   obtain ⟨s, hs, hsx⟩ := hx
   refine ⟨conjO K s, conjO_mem_hcompl hs, ?_⟩
   obtain ⟨r, hr⟩ := Submodule.mem_one.1 hsx
@@ -66,8 +95,8 @@ theorem star_mem_locR {p : Ideal (𝓞 K)} {x : K} (hx : x ∈ locR (K := K) p)
   have e2 : algebraMap (𝓞 K) K (conjO K s) = star (algebraMap (𝓞 K) K s) := rfl
   rw [e1, e2, hr, star_mul']
 
-theorem mem_one_of_locR {x : K} (hx : ∀ p : Ideal (𝓞 K), p.IsMaximal → x ∈ locR (K := K) p)
-    : x ∈ (1 : Submodule (𝓞 K) K) := by
+theorem mem_one_of_locR {x : K} (hx : ∀ p : Ideal (𝓞 K), p.IsMaximal → x ∈ locR (K := K) p) :
+    x ∈ (1 : Submodule (𝓞 K) K) := by
   let J : Ideal (𝓞 K) := (1 : Submodule (𝓞 K) K).comap (LinearMap.toSpanSingleton (𝓞 K) K x)
   have hJ : J = ⊤ := by
     by_contra hne
@@ -82,12 +111,9 @@ theorem mem_one_of_locR {x : K} (hx : ∀ p : Ideal (𝓞 K), p.IsMaximal → x 
   change LinearMap.toSpanSingleton (𝓞 K) K x 1 ∈ (1 : Submodule (𝓞 K) K) at h1
   rwa [LinearMap.toSpanSingleton_apply, one_smul] at h1
 
-theorem exists_local
-    (h : K →ₗ⋆[K] K →ₗ[K] K) (h1 : h 1 1 ≠ 0)
-    {M : Submodule (𝓞 K) K} (hM : M ∈ genus h (1 : Submodule (𝓞 K) K))
-    {p : Ideal (𝓞 K)} (hp : p.IsMaximal)
-    : ∃ z : K,
-      star z * z = 1 ∧ ∀ y : K, y ∈ loc (K := K) p M ↔ ∃ r ∈ locR (K := K) p, y = r * z := by
+theorem exists_local (h : K →ₗ⋆[K] K →ₗ[K] K) (h1 : h 1 1 ≠ 0) {M : Submodule (𝓞 K) K}
+    (hM : M ∈ genus h (1 : Submodule (𝓞 K) K)) {p : Ideal (𝓞 K)} (hp : p.IsMaximal) :
+    ∃ z : K, star z * z = 1 ∧ ∀ y : K, y ∈ loc (K := K) p M ↔ ∃ r ∈ locR (K := K) p, y = r * z := by
   obtain ⟨g, hg, hgM⟩ := hM.2 p hp
   refine ⟨g 1, (mem_isom_iff h1 g).1 hg, fun y => ?_⟩
   have hgx : ∀ x, g x = x * g 1 := by
@@ -103,15 +129,12 @@ theorem exists_local
     rw [← hgx, LinearEquiv.symm_apply_apply]
     exact hr
 
-theorem norm_unit
-    (h : K →ₗ⋆[K] K →ₗ[K] K) (h1 : h 1 1 ≠ 0)
-    {M M' : Submodule (𝓞 K) K}
-    (hM : M ∈ genus h (1 : Submodule (𝓞 K) K)) (hM' : M' ∈ genus h (1 : Submodule (𝓞 K) K))
-    {a : K} (he : M = Submodule.span (𝓞 K) {a} * M')
-    : a * star a ∈ (1 : Submodule (𝓞 K) K) ∧ (a * star a)⁻¹ ∈ (1 : Submodule (𝓞 K) K) := by
-  have key
-      : ∀ p : Ideal (𝓞 K),
-        p.IsMaximal → a * star a ∈ locR (K := K) p ∧ (a * star a)⁻¹ ∈ locR (K := K) p := by
+theorem norm_unit (h : K →ₗ⋆[K] K →ₗ[K] K) (h1 : h 1 1 ≠ 0) {M M' : Submodule (𝓞 K) K}
+    (hM : M ∈ genus h (1 : Submodule (𝓞 K) K)) (hM' : M' ∈ genus h (1 : Submodule (𝓞 K) K)) {a : K}
+    (he : M = Submodule.span (𝓞 K) {a} * M') :
+    a * star a ∈ (1 : Submodule (𝓞 K) K) ∧ (a * star a)⁻¹ ∈ (1 : Submodule (𝓞 K) K) := by
+  have key : ∀ p : Ideal (𝓞 K), p.IsMaximal →
+      a * star a ∈ locR (K := K) p ∧ (a * star a)⁻¹ ∈ locR (K := K) p := by
     intro p hp
     obtain ⟨z, hz, hzM⟩ := exists_local h h1 hM hp
     obtain ⟨z', hz', hzM'⟩ := exists_local h h1 hM' hp

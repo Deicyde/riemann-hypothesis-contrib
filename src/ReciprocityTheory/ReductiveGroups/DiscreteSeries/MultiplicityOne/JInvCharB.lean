@@ -1,6 +1,47 @@
 module
 
 public import ReciprocityTheory.ReductiveGroups.DiscreteSeries.MultiplicityOne.JInvCharA
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -15,8 +56,7 @@ open Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B Formalism.Fourier
 
 variable {k r : ℕ}
 
-theorem unit_of_frame {γ : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ} (h : γᴴ * Hb k * γ = Hb k)
-    : IsUnit γ.det := by
+theorem unit_of_frame {γ : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ} (h : γᴴ * Hb k * γ = Hb k) : IsUnit γ.det := by
   have h1 := congrArg Matrix.det h
   rw [Matrix.det_mul, Matrix.det_mul] at h1
   have hHb : (Hb k).det ≠ 0 := by
@@ -30,20 +70,18 @@ theorem unit_of_frame {γ : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ} (h : γᴴ *
 
 private theorem wI_val_eq_add (j : Fin (k + 1)) : (wI k r j).val = r + j.val := rfl
 
-private theorem wI_val_mem_block (j : Fin (k + 1))
-    : r ≤ (wI k r j).val ∧ (wI k r j).val ≤ r + k := by
+private theorem wI_val_mem_block (j : Fin (k + 1)) : r ≤ (wI k r j).val ∧ (wI k r j).val ≤ r + k := by
   have := j.isLt
   rw [wI_val_eq_add]
   constructor <;> omega
 
-private theorem wI_val_sub_eq (j : Fin (k + 1))
-    : (⟨(wI k r j).val - r, by rw [wI_val_eq_add]; omega⟩ : Fin (k + 1)) = j := by
+private theorem wI_val_sub_eq (j : Fin (k + 1)) :
+    (⟨(wI k r j).val - r, by rw [wI_val_eq_add]; omega⟩ : Fin (k + 1)) = j := by
   exact Fin.ext (by simp [wI_val_eq_add])
 
-private theorem sum_eq_sum_wI_of_zero_off_block
-    {f : Fin (2 * r + k + 1) → ℂ}
-    (hf : ∀ i : Fin (2 * r + k + 1), ¬(r ≤ i.val ∧ i.val ≤ r + k) → f i = 0)
-    : ∑ i, f i = ∑ j : Fin (k + 1), f (wI k r j) := by
+private theorem sum_eq_sum_wI_of_zero_off_block {f : Fin (2 * r + k + 1) → ℂ}
+    (hf : ∀ i : Fin (2 * r + k + 1), ¬ (r ≤ i.val ∧ i.val ≤ r + k) → f i = 0) :
+    ∑ i, f i = ∑ j : Fin (k + 1), f (wI k r j) := by
   have hinj : Function.Injective (wI k r) := by
     intro a b h
     apply Fin.ext
@@ -51,68 +89,51 @@ private theorem sum_eq_sum_wI_of_zero_off_block
     rw [wI_val_eq_add, wI_val_eq_add] at this
     omega
   symm
-  refine Fintype.sum_of_injective (wI k r) hinj
-    (fun j => f (wI k r j))
-    f
-    (fun i hi => hf i ?_)
-    (fun j => rfl)
+  refine Fintype.sum_of_injective (wI k r) hinj (fun j => f (wI k r j)) f (fun i hi => hf i ?_) (fun j => rfl)
   rintro ⟨h1, h2⟩
   exact hi ⟨⟨i.val - r, by omega⟩, Fin.ext (by simp only [wI_val_eq_add, Fin.val_mk]; omega)⟩
 
-private theorem embWb_apply_of_mem_block
-    (X : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ)
-    {i j : Fin (2 * r + k + 1)} (hi : r ≤ i.val ∧ i.val ≤ r + k) (hj : r ≤ j.val ∧ j.val ≤ r + k)
-    : embWb k r X i j = X ⟨i.val - r, by omega⟩ ⟨j.val - r, by omega⟩ := by
+private theorem embWb_apply_of_mem_block (X : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ) {i j : Fin (2 * r + k + 1)}
+    (hi : r ≤ i.val ∧ i.val ≤ r + k) (hj : r ≤ j.val ∧ j.val ≤ r + k) :
+    embWb k r X i j = X ⟨i.val - r, by omega⟩ ⟨j.val - r, by omega⟩ := by
   simp only [embWb]
   rw [dite_eq_left ⟨hi, hj⟩]
 
-private theorem embWb_apply_of_left_not_mem_block
-    (X : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ)
-    {i j : Fin (2 * r + k + 1)} (hi : ¬(r ≤ i.val ∧ i.val ≤ r + k))
-    : embWb k r X i j = if i = j then 1 else 0 := by
+private theorem embWb_apply_of_left_not_mem_block (X : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ) {i j : Fin (2 * r + k + 1)}
+    (hi : ¬ (r ≤ i.val ∧ i.val ≤ r + k)) : embWb k r X i j = if i = j then 1 else 0 := by
   simp only [embWb]
-  rw [dite_eq_right (show ¬((r ≤ i.val ∧ i.val ≤ r + k) ∧ (r ≤ j.val ∧ j.val ≤ r + k)) from fun h =>
-    hi h.1)]
+  rw [dite_eq_right (show ¬ ((r ≤ i.val ∧ i.val ≤ r + k) ∧ (r ≤ j.val ∧ j.val ≤ r + k)) from fun h => hi h.1)]
   by_cases h : i = j
-  · rw [if_pos (show i = j ∧ ¬(r ≤ i.val ∧ i.val ≤ r + k) from ⟨h, hi⟩), if_pos h]
-  · rw [if_neg (show ¬(i = j ∧ ¬(r ≤ i.val ∧ i.val ≤ r + k)) from fun h' => h h'.1), if_neg h]
+  · rw [if_pos (show i = j ∧ ¬ (r ≤ i.val ∧ i.val ≤ r + k) from ⟨h, hi⟩), if_pos h]
+  · rw [if_neg (show ¬ (i = j ∧ ¬ (r ≤ i.val ∧ i.val ≤ r + k)) from fun h' => h h'.1), if_neg h]
 
-private theorem embWb_apply_of_right_not_mem_block
-    (X : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ)
-    {i j : Fin (2 * r + k + 1)} (hj : ¬(r ≤ j.val ∧ j.val ≤ r + k))
-    : embWb k r X i j = if i = j then 1 else 0 := by
+private theorem embWb_apply_of_right_not_mem_block (X : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ) {i j : Fin (2 * r + k + 1)}
+    (hj : ¬ (r ≤ j.val ∧ j.val ≤ r + k)) : embWb k r X i j = if i = j then 1 else 0 := by
   simp only [embWb]
-  rw [dite_eq_right (show ¬((r ≤ i.val ∧ i.val ≤ r + k) ∧ (r ≤ j.val ∧ j.val ≤ r + k)) from fun h =>
-    hj h.2)]
+  rw [dite_eq_right (show ¬ ((r ≤ i.val ∧ i.val ≤ r + k) ∧ (r ≤ j.val ∧ j.val ≤ r + k)) from fun h => hj h.2)]
   by_cases h : i = j
-  · rw [if_pos (show i = j ∧ ¬(r ≤ i.val ∧ i.val ≤ r + k) from ⟨h, by rw [h]; exact hj⟩), if_pos h]
-  · rw [if_neg (show ¬(i = j ∧ ¬(r ≤ i.val ∧ i.val ≤ r + k)) from fun h' => h h'.1), if_neg h]
+  · rw [if_pos (show i = j ∧ ¬ (r ≤ i.val ∧ i.val ≤ r + k) from ⟨h, by rw [h]; exact hj⟩), if_pos h]
+  · rw [if_neg (show ¬ (i = j ∧ ¬ (r ≤ i.val ∧ i.val ≤ r + k)) from fun h' => h h'.1), if_neg h]
 
-private theorem embWb_mul' (X Y : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ)
-    : embWb k r (X * Y) = embWb k r X * embWb k r Y := by
+private theorem embWb_mul' (X Y : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ) :
+    embWb k r (X * Y) = embWb k r X * embWb k r Y := by
   ext i j
   rw [Matrix.mul_apply]
   by_cases hi : r ≤ i.val ∧ i.val ≤ r + k
   · by_cases hj : r ≤ j.val ∧ j.val ≤ r + k
-    · rw [embWb_apply_of_mem_block _ hi hj,
-        sum_eq_sum_wI_of_zero_off_block
-          (f := fun l => embWb k r X i l * embWb k r Y l j)
-          (fun l hl => by
-            show embWb k r X i l * embWb k r Y l j = 0
-            rw [embWb_apply_of_right_not_mem_block X hl,
-              if_neg (fun h => hl (by rw [← h]; exact hi)), zero_mul])]
-      simp only [embWb_apply_of_mem_block _ hi (wI_val_mem_block _),
-        embWb_apply_of_mem_block _ (wI_val_mem_block _) hj, wI_val_sub_eq, Matrix.mul_apply]
+    · rw [embWb_apply_of_mem_block _ hi hj, sum_eq_sum_wI_of_zero_off_block (f := fun l => embWb k r X i l * embWb k r Y l j)
+        (fun l hl => by
+          show embWb k r X i l * embWb k r Y l j = 0
+          rw [embWb_apply_of_right_not_mem_block X hl, if_neg (fun h => hl (by rw [← h]; exact hi)), zero_mul])]
+      simp only [embWb_apply_of_mem_block _ hi (wI_val_mem_block _), embWb_apply_of_mem_block _ (wI_val_mem_block _) hj, wI_val_sub_eq, Matrix.mul_apply]
     · rw [Finset.sum_eq_single j]
-      · simp [embWb_apply_of_right_not_mem_block X hj, embWb_apply_of_right_not_mem_block Y hj,
-          embWb_apply_of_right_not_mem_block (X * Y) hj]
+      · simp [embWb_apply_of_right_not_mem_block X hj, embWb_apply_of_right_not_mem_block Y hj, embWb_apply_of_right_not_mem_block (X * Y) hj]
       · intro l _ hl
         rw [embWb_apply_of_right_not_mem_block Y hj, if_neg hl, mul_zero]
       · intro h
         exact absurd (Finset.mem_univ j) h
   · rw [Finset.sum_eq_single i]
-    · simp [embWb_apply_of_left_not_mem_block X hi, embWb_apply_of_left_not_mem_block Y hi,
-        embWb_apply_of_left_not_mem_block (X * Y) hi]
+    · simp [embWb_apply_of_left_not_mem_block X hi, embWb_apply_of_left_not_mem_block Y hi, embWb_apply_of_left_not_mem_block (X * Y) hi]
     · intro l _ hl
       rw [embWb_apply_of_left_not_mem_block X hi, if_neg (Ne.symm hl), zero_mul]
     · intro h
@@ -129,8 +150,8 @@ private theorem embWb_one' : embWb k r (1 : Matrix (Fin (k + 1)) (Fin (k + 1)) �
     · rw [embWb_apply_of_right_not_mem_block _ hj]
   · rw [embWb_apply_of_left_not_mem_block _ hi]
 
-theorem unit_embWb {γ : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ} (hγ : IsUnit γ.det)
-    : IsUnit (embWb k r γ).det := by
+theorem unit_embWb {γ : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ} (hγ : IsUnit γ.det) :
+    IsUnit (embWb k r γ).det := by
   have h1 : embWb k r γ * embWb k r γ⁻¹ = 1 := by
     rw [← embWb_mul', Matrix.mul_nonsing_inv _ hγ, embWb_one']
   exact Matrix.isUnit_det_of_right_inverse h1
@@ -152,33 +173,26 @@ section
 variable {γ : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ} (hE : IsUnit (embWb k r γ).det)
 include hE
 
-private theorem embWb_apply_eq_ite_of_left_index_not_isW
-    {i : Fin (2 * r + k + 1)} (hi : ¬ isW k r i) (j : Fin (2 * r + k + 1))
-    : embWb k r γ i j = if i = j then 1 else 0 := by
-  have hi' : ¬(r ≤ i.val ∧ i.val ≤ r + k) := hi
+private theorem embWb_apply_eq_ite_of_left_index_not_isW {i : Fin (2 * r + k + 1)} (hi : ¬ isW k r i) (j : Fin (2 * r + k + 1)) :
+    embWb k r γ i j = if i = j then 1 else 0 := by
+  have hi' : ¬ (r ≤ i.val ∧ i.val ≤ r + k) := hi
   simp only [embWb]
-  rw [dite_eq_right (show ¬((r ≤ i.val ∧ i.val ≤ r + k) ∧ (r ≤ j.val ∧ j.val ≤ r + k)) from fun h =>
-    hi' h.1)]
+  rw [dite_eq_right (show ¬ ((r ≤ i.val ∧ i.val ≤ r + k) ∧ (r ≤ j.val ∧ j.val ≤ r + k)) from fun h => hi' h.1)]
   by_cases h : i = j
-  · rw [if_pos (show i = j ∧ ¬(r ≤ i.val ∧ i.val ≤ r + k) from ⟨h, hi'⟩), if_pos h]
-  · rw [if_neg (show ¬(i = j ∧ ¬(r ≤ i.val ∧ i.val ≤ r + k)) from fun h' => h h'.1), if_neg h]
+  · rw [if_pos (show i = j ∧ ¬ (r ≤ i.val ∧ i.val ≤ r + k) from ⟨h, hi'⟩), if_pos h]
+  · rw [if_neg (show ¬ (i = j ∧ ¬ (r ≤ i.val ∧ i.val ≤ r + k)) from fun h' => h h'.1), if_neg h]
 
-private theorem embWb_apply_eq_ite_of_right_index_not_isW
-    {j : Fin (2 * r + k + 1)} (hj : ¬ isW k r j) (i : Fin (2 * r + k + 1))
-    : embWb k r γ i j = if i = j then 1 else 0 := by
-  have hj' : ¬(r ≤ j.val ∧ j.val ≤ r + k) := hj
+private theorem embWb_apply_eq_ite_of_right_index_not_isW {j : Fin (2 * r + k + 1)} (hj : ¬ isW k r j) (i : Fin (2 * r + k + 1)) :
+    embWb k r γ i j = if i = j then 1 else 0 := by
+  have hj' : ¬ (r ≤ j.val ∧ j.val ≤ r + k) := hj
   simp only [embWb]
-  rw [dite_eq_right (show ¬((r ≤ i.val ∧ i.val ≤ r + k) ∧ (r ≤ j.val ∧ j.val ≤ r + k)) from fun h =>
-    hj' h.2)]
+  rw [dite_eq_right (show ¬ ((r ≤ i.val ∧ i.val ≤ r + k) ∧ (r ≤ j.val ∧ j.val ≤ r + k)) from fun h => hj' h.2)]
   by_cases h : i = j
-  · rw [if_pos (show i = j ∧ ¬(r ≤ i.val ∧ i.val ≤ r + k) from ⟨h, by rw [h]; exact hj'⟩), if_pos h]
-  · rw [if_neg (show ¬(i = j ∧ ¬(r ≤ i.val ∧ i.val ≤ r + k)) from fun h' => h h'.1), if_neg h]
+  · rw [if_pos (show i = j ∧ ¬ (r ≤ i.val ∧ i.val ≤ r + k) from ⟨h, by rw [h]; exact hj'⟩), if_pos h]
+  · rw [if_neg (show ¬ (i = j ∧ ¬ (r ≤ i.val ∧ i.val ≤ r + k)) from fun h' => h h'.1), if_neg h]
 
-private theorem mul_apply_of_left_index_eq_single
-    {A B : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ} {i : Fin (2 * r + k + 1)}
-    (hA : ∀ l, A i l = if i = l then 1 else 0)
-    (j : Fin (2 * r + k + 1))
-    : (A * B) i j = B i j := by
+private theorem mul_apply_of_left_index_eq_single {A B : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ} {i : Fin (2 * r + k + 1)}
+    (hA : ∀ l, A i l = if i = l then 1 else 0) (j : Fin (2 * r + k + 1)) : (A * B) i j = B i j := by
   rw [Matrix.mul_apply, Finset.sum_eq_single i]
   · rw [hA i, if_pos rfl, one_mul]
   · intro l _ hl
@@ -186,11 +200,8 @@ private theorem mul_apply_of_left_index_eq_single
   · intro h
     exact absurd (Finset.mem_univ _) h
 
-private theorem mul_apply_of_right_col_eq_single
-    {A B : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ} {j : Fin (2 * r + k + 1)}
-    (hB : ∀ l, B l j = if l = j then 1 else 0)
-    (i : Fin (2 * r + k + 1))
-    : (A * B) i j = A i j := by
+private theorem mul_apply_of_right_col_eq_single {A B : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ} {j : Fin (2 * r + k + 1)}
+    (hB : ∀ l, B l j = if l = j then 1 else 0) (i : Fin (2 * r + k + 1)) : (A * B) i j = A i j := by
   rw [Matrix.mul_apply, Finset.sum_eq_single j]
   · rw [hB j, if_pos rfl, mul_one]
   · intro l _ hl
@@ -198,23 +209,20 @@ private theorem mul_apply_of_right_col_eq_single
   · intro h
     exact absurd (Finset.mem_univ _) h
 
-private theorem embWb_inv_apply_of_left_index_not_isW
-    {i : Fin (2 * r + k + 1)} (hi : ¬ isW k r i) (j : Fin (2 * r + k + 1))
-    : (embWb k r γ)⁻¹ i j = if i = j then 1 else 0 := by
+private theorem embWb_inv_apply_of_left_index_not_isW {i : Fin (2 * r + k + 1)} (hi : ¬ isW k r i) (j : Fin (2 * r + k + 1)) :
+    (embWb k r γ)⁻¹ i j = if i = j then 1 else 0 := by
   have h1 : (embWb k r γ * (embWb k r γ)⁻¹) i j = if i = j then 1 else 0 := by
     rw [Matrix.mul_nonsing_inv _ hE, Matrix.one_apply]
   rwa [mul_apply_of_left_index_eq_single hE (embWb_apply_eq_ite_of_left_index_not_isW hE hi)] at h1
 
-private theorem embWb_inv_apply_of_right_index_not_isW
-    {j : Fin (2 * r + k + 1)} (hj : ¬ isW k r j) (i : Fin (2 * r + k + 1))
-    : (embWb k r γ)⁻¹ i j = if i = j then 1 else 0 := by
+private theorem embWb_inv_apply_of_right_index_not_isW {j : Fin (2 * r + k + 1)} (hj : ¬ isW k r j) (i : Fin (2 * r + k + 1)) :
+    (embWb k r γ)⁻¹ i j = if i = j then 1 else 0 := by
   have h1 : ((embWb k r γ)⁻¹ * embWb k r γ) i j = if i = j then 1 else 0 := by
     rw [Matrix.nonsing_inv_mul _ hE, Matrix.one_apply]
   rwa [mul_apply_of_right_col_eq_single hE (embWb_apply_eq_ite_of_right_index_not_isW hE hj)] at h1
 
-private theorem embWb_mulVec_apply_of_not_isW
-    {i : Fin (2 * r + k + 1)} (hi : ¬ isW k r i) (w : Fin (2 * r + k + 1) → ℂ)
-    : (embWb k r γ *ᵥ w) i = w i := by
+private theorem embWb_mulVec_apply_of_not_isW {i : Fin (2 * r + k + 1)} (hi : ¬ isW k r i) (w : Fin (2 * r + k + 1) → ℂ) :
+    (embWb k r γ *ᵥ w) i = w i := by
   show ∑ j, embWb k r γ i j * w j = w i
   rw [Finset.sum_eq_single i]
   · rw [embWb_apply_eq_ite_of_left_index_not_isW hE hi i, if_pos rfl, one_mul]
@@ -223,9 +231,8 @@ private theorem embWb_mulVec_apply_of_not_isW
   · intro h
     exact absurd (Finset.mem_univ _) h
 
-theorem embWb_inv_apply_offW
-    (v : Fin (2 * r + k + 1) → ℂ) (i : Fin (2 * r + k + 1)) (hi : ¬ isW k r i)
-    : ((embWb k r γ)⁻¹ *ᵥ v) i = v i := by
+theorem embWb_inv_apply_offW (v : Fin (2 * r + k + 1) → ℂ) (i : Fin (2 * r + k + 1)) (hi : ¬ isW k r i) :
+    ((embWb k r γ)⁻¹ *ᵥ v) i = v i := by
   show ∑ j, (embWb k r γ)⁻¹ i j * v j = v i
   rw [Finset.sum_eq_single i]
   · rw [embWb_inv_apply_of_left_index_not_isW hE hi i, if_pos rfl, one_mul]
@@ -234,22 +241,20 @@ theorem embWb_inv_apply_offW
   · intro h
     exact absurd (Finset.mem_univ _) h
 
-theorem cc_apply_offW (v : Fin (2 * r + k + 1) → ℂ) (i : Fin (2 * r + k + 1)) (hi : ¬ isW k r i)
-    : cc γ v i = conj (v i) := by
+theorem cc_apply_offW (v : Fin (2 * r + k + 1) → ℂ) (i : Fin (2 * r + k + 1)) (hi : ¬ isW k r i) :
+    cc γ v i = conj (v i) := by
   simp only [cc]
   rw [embWb_mulVec_apply_of_not_isW hE hi]
   show conj (((embWb k r γ)⁻¹ *ᵥ v) i) = conj (v i)
   rw [embWb_inv_apply_offW hE v i hi]
 
-theorem frame_conjugation_fixes_vector
-    (z : Fin (2 * r + k + 1) → ℂ) (hT : 0 < Tz k r z)
-    (hfr : embWb k r γ *ᵥ bvec (wI k r (Fin.last k)) = (((Real.sqrt (Tz k r z))⁻¹ : ℝ) : ℂ) • z)
-    : cc γ z = z := by
+theorem frame_conjugation_fixes_vector (z : Fin (2 * r + k + 1) → ℂ) (hT : 0 < Tz k r z)
+    (hfr : embWb k r γ *ᵥ bvec (wI k r (Fin.last k)) = (((Real.sqrt (Tz k r z))⁻¹ : ℝ) : ℂ) • z) :
+    cc γ z = z := by
   have hs : Real.sqrt (Tz k r z) ≠ 0 := (Real.sqrt_pos.mpr hT).ne'
   have hz : z = ((Real.sqrt (Tz k r z) : ℝ) : ℂ) • (embWb k r γ *ᵥ bvec (wI k r (Fin.last k))) := by
     rw [hfr, smul_smul, ← Complex.ofReal_mul, mul_inv_cancel₀ hs, Complex.ofReal_one, one_smul]
-  have hinv
-      : (embWb k r γ)⁻¹ *ᵥ z = ((Real.sqrt (Tz k r z) : ℝ) : ℂ) • bvec (wI k r (Fin.last k)) := by
+  have hinv : (embWb k r γ)⁻¹ *ᵥ z = ((Real.sqrt (Tz k r z) : ℝ) : ℂ) • bvec (wI k r (Fin.last k)) := by
     conv_lhs => rw [hz]
     rw [Matrix.mulVec_smul, Matrix.mulVec_mulVec, Matrix.nonsing_inv_mul _ hE, Matrix.one_mulVec]
   simp only [cc]
@@ -262,52 +267,42 @@ theorem frame_conjugation_fixes_vector
   have hsingle : ∀ i, conj (e i) = e i := by
     intro i
     by_cases hi : i = wI k r (Fin.last k) <;> simp [e, Pi.single_apply, hi]
-  change conj ((((Real.sqrt (Tz k r z) : ℝ) : ℂ) * e i)) = ((Real.sqrt (Tz k r z) : ℝ) : ℂ) * e i
+  change conj ((((Real.sqrt (Tz k r z) : ℝ) : ℂ) * e i)) =
+    ((Real.sqrt (Tz k r z) : ℝ) : ℂ) * e i
   rw [map_mul, Complex.conj_ofReal, hsingle i]
 
-theorem gbar_apply_off
-    (g : Mat k r) (i j : Fin (2 * r + k + 1)) (hi : ¬ isW k r i) (hj : ¬ isW k r j)
-    : gbar k r γ g i j = conj (g i j) := by
+theorem gbar_apply_off (g : Mat k r) (i j : Fin (2 * r + k + 1)) (hi : ¬ isW k r i) (hj : ¬ isW k r j) :
+    gbar k r γ g i j = conj (g i j) := by
   simp only [gbar]
-  rw [mul_apply_of_right_col_eq_single hE (embWb_inv_apply_of_right_index_not_isW hE hj),
-    mul_apply_of_left_index_eq_single hE (embWb_apply_eq_ite_of_left_index_not_isW hE hi),
-    Matrix.map_apply,
-    mul_apply_of_right_col_eq_single hE (embWb_apply_eq_ite_of_right_index_not_isW hE hj),
-    mul_apply_of_left_index_eq_single hE (embWb_inv_apply_of_left_index_not_isW hE hi)]
+  rw [mul_apply_of_right_col_eq_single hE (embWb_inv_apply_of_right_index_not_isW hE hj), mul_apply_of_left_index_eq_single hE (embWb_apply_eq_ite_of_left_index_not_isW hE hi), Matrix.map_apply,
+    mul_apply_of_right_col_eq_single hE (embWb_apply_eq_ite_of_right_index_not_isW hE hj), mul_apply_of_left_index_eq_single hE (embWb_inv_apply_of_left_index_not_isW hE hi)]
 
-theorem gbar_mulVec_off
-    (g : Mat k r)
-    (v : Fin (2 * r + k + 1) → ℂ) (hv : cc γ v = v)
-    (i : Fin (2 * r + k + 1)) (hi : ¬ isW k r i)
-    : (gbar k r γ g *ᵥ v) i = conj ((g *ᵥ v) i) := by
+theorem gbar_mulVec_off (g : Mat k r) (v : Fin (2 * r + k + 1) → ℂ) (hv : cc γ v = v)
+    (i : Fin (2 * r + k + 1)) (hi : ¬ isW k r i) : (gbar k r γ g *ᵥ v) i = conj ((g *ᵥ v) i) := by
   have hu : (fun l => conj (((embWb k r γ)⁻¹ *ᵥ v) l)) = (embWb k r γ)⁻¹ *ᵥ v := by
     have h1 : embWb k r γ *ᵥ (fun l => conj (((embWb k r γ)⁻¹ *ᵥ v) l)) = v := hv
     conv_rhs => rw [← h1]
     rw [Matrix.mulVec_mulVec, Matrix.nonsing_inv_mul _ hE, Matrix.one_mulVec]
-  have hconj
-      : ∀ (Y : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ) (w : Fin (2 * r + k + 1) → ℂ),
-        Y.map (starRingEnd ℂ) *ᵥ (fun l => conj (w l)) = fun l => conj ((Y *ᵥ w) l) := by
+  have hconj : ∀ (Y : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ) (w : Fin (2 * r + k + 1) → ℂ),
+      Y.map (starRingEnd ℂ) *ᵥ (fun l => conj (w l)) = fun l => conj ((Y *ᵥ w) l) := by
     intro Y w
     funext l
-    set_option synthInstance.maxHeartbeats 100000 in
+
     simp [Matrix.mulVec, dotProduct, Matrix.map_apply, map_sum, map_mul]
-  have hY
-      : ((embWb k r γ)⁻¹ * g * embWb k r γ) *ᵥ ((embWb k r γ)⁻¹ *ᵥ v)
-        = (embWb k r γ)⁻¹ *ᵥ (g *ᵥ v) := by
-    rw [Matrix.mulVec_mulVec, Matrix.mulVec_mulVec,
-      Matrix.mul_assoc ((embWb k r γ)⁻¹ * g) (embWb k r γ), Matrix.mul_nonsing_inv _ hE,
-      Matrix.mul_one]
+  have hY : ((embWb k r γ)⁻¹ * g * embWb k r γ) *ᵥ ((embWb k r γ)⁻¹ *ᵥ v) = (embWb k r γ)⁻¹ *ᵥ (g *ᵥ v) := by
+    rw [Matrix.mulVec_mulVec, Matrix.mulVec_mulVec, Matrix.mul_assoc ((embWb k r γ)⁻¹ * g) (embWb k r γ),
+      Matrix.mul_nonsing_inv _ hE, Matrix.mul_one]
   have key : gbar k r γ g *ᵥ v = cc γ (g *ᵥ v) := by
     simp only [gbar, cc]
     rw [← Matrix.mulVec_mulVec, ← Matrix.mulVec_mulVec, ← hu, hconj, hY]
   rw [key]
   exact cc_apply_offW hE (g *ᵥ v) i hi
 
-theorem ell_gbar (z : Fin (2 * r + k + 1) → ℂ) (hz : cc γ z = z) (g : Mat k r)
-    : ell k r z (gbar k r γ g) = conj (ell k r z g) := by
+theorem ell_gbar (z : Fin (2 * r + k + 1) → ℂ) (hz : cc γ z = z) (g : Mat k r) :
+    ell k r z (gbar k r γ g) = conj (ell k r z g) := by
   unfold ell
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+
+  rw [map_sum]
   refine Finset.sum_congr rfl (fun a _ => ?_)
   split_ifs with h
   · exact gbar_apply_off hE g _ _ (not_isW_eI a) (not_isW_eI _)
@@ -315,9 +310,9 @@ theorem ell_gbar (z : Fin (2 * r + k + 1) → ℂ) (hz : cc γ z = z) (g : Mat k
 
 end
 
-theorem N_inv_col (m n : Mat k r) (hm : m ∈ Nset k r) (hnm : n * m = 1)
-    : ∀ (j : ℕ) (hj : j < r) (i : Fin (2 * r + k + 1)),
-      j ≤ i.val → n i (eI k r ⟨j, hj⟩) = if i = eI k r ⟨j, hj⟩ then 1 else 0 := by
+theorem N_inv_col (m n : Mat k r) (hm : m ∈ Nset k r) (hnm : n * m = 1) :
+    ∀ (j : ℕ) (hj : j < r) (i : Fin (2 * r + k + 1)), j ≤ i.val →
+      n i (eI k r ⟨j, hj⟩) = if i = eI k r ⟨j, hj⟩ then 1 else 0 := by
   intro j
   induction j using Nat.strong_induction_on with
   | _ j ih =>
@@ -339,21 +334,14 @@ theorem N_inv_col (m n : Mat k r) (hm : m ∈ Nset k r) (hnm : n * m = 1)
     · intro h
       exact absurd (Finset.mem_univ _) h
 
-private theorem mulVec_apply_eq_sum'
-    (M : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ) (v : Fin (2 * r + k + 1) → ℂ)
-    (i : Fin (2 * r + k + 1))
-    : (M *ᵥ v) i = ∑ j, M i j * v j :=
-  rfl
+private theorem mulVec_apply_eq_sum' (M : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ) (v : Fin (2 * r + k + 1) → ℂ) (i : Fin (2 * r + k + 1)) :
+    (M *ᵥ v) i = ∑ j, M i j * v j := rfl
 
-theorem N_inv_vec
-    (m n : Mat k r) (hm : m ∈ Nset k r) (hnm : n * m = 1)
-    (a : Fin r) (v : Fin (2 * r + k + 1) → ℂ)
-    (hv0 : ∀ p : Fin (2 * r + k + 1), p.val ≤ a.val → v p = 0)
-    (hmv : ∀ p : Fin (2 * r + k + 1), a.val < p.val → (m *ᵥ v) p = v p)
-    : (n *ᵥ v) (eI k r a) = -((m *ᵥ v) (eI k r a)) := by
-  have hrow
-      : ∀ p : Fin (2 * r + k + 1),
-        p.val ≤ a.val → n (eI k r a) p = if p = eI k r a then 1 else 0 := by
+theorem N_inv_vec (m n : Mat k r) (hm : m ∈ Nset k r) (hnm : n * m = 1) (a : Fin r)
+    (v : Fin (2 * r + k + 1) → ℂ) (hv0 : ∀ p : Fin (2 * r + k + 1), p.val ≤ a.val → v p = 0)
+    (hmv : ∀ p : Fin (2 * r + k + 1), a.val < p.val → (m *ᵥ v) p = v p) :
+    (n *ᵥ v) (eI k r a) = -((m *ᵥ v) (eI k r a)) := by
+  have hrow : ∀ p : Fin (2 * r + k + 1), p.val ≤ a.val → n (eI k r a) p = if p = eI k r a then 1 else 0 := by
     intro p hp
     have hpr : p.val < r := by have := a.isLt; omega
     have hel : eI k r ⟨p.val, hpr⟩ = p := Fin.ext rfl
@@ -363,14 +351,11 @@ theorem N_inv_vec
     by_cases h : p = eI k r a
     · rw [if_pos h, if_pos h.symm]
     · rw [if_neg h, if_neg (Ne.symm h)]
-  have hsplit
-      : ∀ p,
-        n (eI k r a) p * (m *ᵥ v) p
-          = n (eI k r a) p * v p + (if p = eI k r a then (m *ᵥ v) p else 0) := by
+  have hsplit : ∀ p, n (eI k r a) p * (m *ᵥ v) p =
+      n (eI k r a) p * v p + (if p = eI k r a then (m *ᵥ v) p else 0) := by
     intro p
     by_cases hp : a.val < p.val
-    · rw [hmv p hp, if_neg (show ¬ p = eI k r a from fun h => by subst h; exact lt_irrefl _ hp),
-        add_zero]
+    · rw [hmv p hp, if_neg (show ¬ p = eI k r a from fun h => by subst h; exact lt_irrefl _ hp), add_zero]
     · have hp' : p.val ≤ a.val := by omega
       rw [hv0 p hp', mul_zero, zero_add, hrow p hp']
       split_ifs <;> simp
@@ -378,38 +363,29 @@ theorem N_inv_vec
     rw [Matrix.mulVec_mulVec, hnm, Matrix.one_mulVec]
     exact hv0 (eI k r a) (le_refl _)
   have hexp : (n *ᵥ (m *ᵥ v)) (eI k r a) = (n *ᵥ v) (eI k r a) + (m *ᵥ v) (eI k r a) := by
-    rw [mulVec_apply_eq_sum' n (m *ᵥ v), mulVec_apply_eq_sum' n v,
-      Finset.sum_congr rfl (fun p _ => hsplit p), Finset.sum_add_distrib, Finset.sum_ite_eq',
-      if_pos (Finset.mem_univ _)]
+    rw [mulVec_apply_eq_sum' n (m *ᵥ v), mulVec_apply_eq_sum' n v, Finset.sum_congr rfl (fun p _ => hsplit p),
+      Finset.sum_add_distrib, Finset.sum_ite_eq', if_pos (Finset.mem_univ _)]
   rw [hexp] at hnmv
   linear_combination hnmv
 
-private theorem mulVec_bvec_apply_multiplicity_one
-    (M : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ) (j i : Fin (2 * r + k + 1))
-    : (M *ᵥ bvec j) i = M i j := by
+private theorem mulVec_bvec_apply_multiplicity_one (M : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ) (j i : Fin (2 * r + k + 1)) : (M *ᵥ bvec j) i = M i j := by
   simp [bvec, Matrix.mulVec, dotProduct, Pi.single_apply, mul_ite]
 
-theorem ell_inv_N
-    (z : Fin (2 * r + k + 1) → ℂ) (hz : inWb k r z)
-    (m n : Mat k r) (hm : m ∈ Nset k r) (hnm : n * m = 1)
-    : ell k r z n = - ell k r z m := by
+theorem ell_inv_N (z : Fin (2 * r + k + 1) → ℂ) (hz : inWb k r z) (m n : Mat k r) (hm : m ∈ Nset k r)
+    (hnm : n * m = 1) : ell k r z n = -ell k r z m := by
   unfold ell
   rw [← Finset.sum_neg_distrib]
   refine Finset.sum_congr rfl (fun a _ => ?_)
   split_ifs with h
   · have hv : (eI k r ⟨a.val + 1, h⟩).val = a.val + 1 := rfl
-    have key :=
-      N_inv_vec m n hm hnm a (bvec (eI k r ⟨a.val + 1, h⟩)) (fun p hp => ?_) (fun p hp => ?_)
+    have key := N_inv_vec m n hm hnm a (bvec (eI k r ⟨a.val + 1, h⟩)) (fun p hp => ?_) (fun p hp => ?_)
     · rw [mulVec_bvec_apply_multiplicity_one, mulVec_bvec_apply_multiplicity_one] at key
       exact key
     · simp only [bvec, Pi.single_apply]
       rw [if_neg (show ¬ p = eI k r ⟨a.val + 1, h⟩ from fun hpe => by rw [hpe] at hp; omega)]
-    · rw [mulVec_bvec_apply_multiplicity_one,
-        hm.2.1 ⟨a.val + 1, h⟩ p (show a.val + 1 ≤ p.val by omega)]
+    · rw [mulVec_bvec_apply_multiplicity_one, hm.2.1 ⟨a.val + 1, h⟩ p (show a.val + 1 ≤ p.val by omega)]
       simp only [bvec, Pi.single_apply]
-  · refine N_inv_vec m n hm hnm a z
-      (fun p hp => hz p (Or.inl (by have := a.isLt; omega)))
-      (fun p hp => ?_)
+  · refine N_inv_vec m n hm hnm a z (fun p hp => hz p (Or.inl (by have := a.isLt; omega))) (fun p hp => ?_)
     have hpr : r ≤ p.val := by have := a.isLt; omega
     rw [mulVec_apply_eq_sum', Finset.sum_eq_single p]
     · by_cases hpw : p.val ≤ r + k

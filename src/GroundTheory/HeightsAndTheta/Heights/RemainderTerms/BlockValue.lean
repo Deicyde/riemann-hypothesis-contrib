@@ -1,7 +1,48 @@
 module
 
-public import Mathlib
 public import GroundTheory.HeightsAndTheta.Heights.RemainderTerms.Expand
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.MvPolynomial.IrreducibleQuadratic
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -18,22 +59,19 @@ open MvPolynomial Finset
 noncomputable section
 
 def gmf (f r a : ℕ) (c : SmallBlock) (q : Fin f → ℕ) (e : ℕ) : RootRing f (r + a) :=
-  (∏ σ, blockEmb f (r + a) σ (yEval r a c (extraFactor r (q σ)))) * smallBlockMu f r a c ^ e
-    * fibreClass f r a c
+  (∏ σ, blockEmb f (r + a) σ (yEval r a c (extraFactor r (q σ)))) * smallBlockMu f r a c ^ e *
+    fibreClass f r a c
 
 def gmfOut (f r a : ℕ) (c : SmallBlock) (κ : ℚ) (q : Fin f → ℕ) (e : ℕ) : RootRing f (r + a) :=
   ∑ m ∈ Finset.piAntidiag (Finset.univ : Finset (Fin f)) e,
     (Nat.multinomial Finset.univ m : ℚ) •
       ∏ σ, blockEmb f (r + a) σ (blockOut r a c κ (q σ) (m σ))
 
-theorem hasDD_gmf
-    (hF : FrobeniusCharacterFormula.Statement)
-    (f r a : ℕ) (c : SmallBlock) (κ : ℚ)
-    (hκ : ∀ lam : Fin r → ℕ,
-      Antitone lam
-        → HasDD 1 (r + a) (yEval r a c (schur (Fin r) lam) * fib1 r a c) (pushOut r a c κ lam))
-    (q : Fin f → ℕ) (e : ℕ)
-    : HasDD f (r + a) (gmf f r a c q e) (gmfOut f r a c κ q e) := by
+theorem hasDD_gmf (hF : FrobeniusCharacterFormula.Statement) (f r a : ℕ) (c : SmallBlock) (κ : ℚ)
+    (hκ : ∀ lam : Fin r → ℕ, Antitone lam →
+        HasDD 1 (r + a) (yEval r a c (schur (Fin r) lam) * fib1 r a c) (pushOut r a c κ lam))
+    (q : Fin f → ℕ) (e : ℕ) :
+    HasDD f (r + a) (gmf f r a c q e) (gmfOut f r a c κ q e) := by
   rw [gmf, expand_blocks, gmfOut]
   refine hasDD_sum _ fun m _ => hasDD_smul _ (hasDD_prod f (r + a) _ _ fun σ => ?_)
   exact hasDD_block hF r a c κ hκ (q σ) (m σ)
@@ -41,12 +79,11 @@ theorem hasDD_gmf
 def toN (N : ℕ) : RootRing 1 N →ₐ[ℚ] MvPolynomial (Fin N) ℚ :=
   aeval (fun p : Fin 1 × Fin N => X p.2)
 
-theorem restrictToBlock_blockEmb (f N : ℕ) (τ σ : Fin f) (P : RootRing 1 N)
-    : restrictToBlock f N τ (blockEmb f N σ P)
-      = if σ = τ then toN N P else C (constantCoeff P) := by
-  have key
-      : (restrictToBlock f N τ).comp (blockEmb f N σ)
-        = aeval (fun p : Fin 1 × Fin N => if σ = τ then X p.2 else 0) := by
+theorem restrictToBlock_blockEmb (f N : ℕ) (τ σ : Fin f) (P : RootRing 1 N) :
+    restrictToBlock f N τ (blockEmb f N σ P) =
+      if σ = τ then toN N P else C (constantCoeff P) := by
+  have key : (restrictToBlock f N τ).comp (blockEmb f N σ) =
+      aeval (fun p : Fin 1 × Fin N => if σ = τ then X p.2 else 0) := by
     apply MvPolynomial.algHom_ext
     intro p
     simp [restrictToBlock, blockEmb]
@@ -58,38 +95,34 @@ theorem restrictToBlock_blockEmb (f N : ℕ) (τ σ : Fin f) (P : RootRing 1 N)
   · rw [show (fun _ : Fin 1 × Fin N => (0 : MvPolynomial (Fin N) ℚ)) = 0 from rfl,
       MvPolynomial.aeval_zero, MvPolynomial.algebraMap_eq]
 
-theorem toN_xSign (r a : ℕ) (c : SmallBlock) (p : MvPolynomial (Fin (r + a)) ℚ)
-    : toN (r + a) (xSign r a c p) = aeval (fun i : Fin (r + a) => C c.sign * X i) p := by
-  have key : (toN (r + a)).comp (xSign r a c) = aeval (fun i : Fin (r + a) => C c.sign * X i) := by
+theorem toN_xSign (r a : ℕ) (c : SmallBlock) (p : MvPolynomial (Fin (r + a)) ℚ) :
+    toN (r + a) (xSign r a c p) = aeval (fun i : Fin (r + a) => C c.sign * X i) p := by
+  have key : (toN (r + a)).comp (xSign r a c) =
+      aeval (fun i : Fin (r + a) => C c.sign * X i) := by
     apply MvPolynomial.algHom_ext
     intro i
     simp [toN, xSign]
-  exact
-    congrArg (fun φ : MvPolynomial (Fin (r + a)) ℚ →ₐ[ℚ] MvPolynomial (Fin (r + a)) ℚ => φ p) key
+  exact congrArg (fun φ : MvPolynomial (Fin (r + a)) ℚ →ₐ[ℚ] MvPolynomial (Fin (r + a)) ℚ => φ p) key
 
-def mstar (f r a : ℕ) (q : Fin f → ℕ) (e : ℕ) (τ : Fin f) : Fin f → ℕ := fun σ =>
-  if σ = τ then e - ∑ σ' ∈ Finset.univ.erase τ, (r * a - q σ') else r * a - q σ
+def mstar (f r a : ℕ) (q : Fin f → ℕ) (e : ℕ) (τ : Fin f) : Fin f → ℕ :=
+  fun σ => if σ = τ then e - ∑ σ' ∈ Finset.univ.erase τ, (r * a - q σ') else r * a - q σ
 
-theorem mstar_mem
-    (f r a : ℕ) (q : Fin f → ℕ)
-    (e : ℕ) (τ : Fin f) (he : ∑ σ' ∈ Finset.univ.erase τ, (r * a - q σ') ≤ e)
-    : mstar f r a q e τ ∈ Finset.piAntidiag (Finset.univ : Finset (Fin f)) e := by
+theorem mstar_mem (f r a : ℕ) (q : Fin f → ℕ) (e : ℕ) (τ : Fin f)
+    (he : ∑ σ' ∈ Finset.univ.erase τ, (r * a - q σ') ≤ e) :
+    mstar f r a q e τ ∈ Finset.piAntidiag (Finset.univ : Finset (Fin f)) e := by
   rw [Finset.mem_piAntidiag]
   refine ⟨?_, fun i _ => Finset.mem_univ i⟩
   rw [← Finset.add_sum_erase _ _ (Finset.mem_univ τ)]
-  have : ∑ x ∈ Finset.univ.erase τ, mstar f r a q e τ x
-      = ∑ σ' ∈ Finset.univ.erase τ, (r * a - q σ') :=
+  have : ∑ x ∈ Finset.univ.erase τ, mstar f r a q e τ x =
+      ∑ σ' ∈ Finset.univ.erase τ, (r * a - q σ') :=
     Finset.sum_congr rfl fun x hx => by simp [mstar, Finset.ne_of_mem_erase hx]
   rw [this]
   simp only [mstar, if_true]
   omega
 
-theorem eq_mstar_of
-    (f r a : ℕ) (q : Fin f → ℕ)
-    (e : ℕ) (τ : Fin f) (m : Fin f → ℕ)
+theorem eq_mstar_of (f r a : ℕ) (q : Fin f → ℕ) (e : ℕ) (τ : Fin f) (m : Fin f → ℕ)
     (hm : m ∈ Finset.piAntidiag (Finset.univ : Finset (Fin f)) e)
-    (h : ∀ σ, σ ≠ τ → m σ = r * a - q σ)
-    : m = mstar f r a q e τ := by
+    (h : ∀ σ, σ ≠ τ → m σ = r * a - q σ) : m = mstar f r a q e τ := by
   funext σ
   by_cases hσ : σ = τ
   · subst hσ
@@ -102,23 +135,21 @@ theorem eq_mstar_of
     omega
   · simp [mstar, hσ, h σ hσ]
 
-theorem restrict_gmfOut
-    (f r a : ℕ)
-    (c : SmallBlock) (κ : ℚ)
-    (q : Fin f → ℕ) (e : ℕ) (τ : Fin f)
-    (hq : ∀ σ, σ ≠ τ → q σ ≤ r * a) (he : ∑ σ' ∈ Finset.univ.erase τ, (r * a - q σ') ≤ e)
-    : restrictToBlock f (r + a) τ (gmfOut f r a c κ q e)
-      = ((Nat.multinomial Finset.univ (mstar f r a q e τ) : ℚ)
-          * ∏ σ ∈ Finset.univ.erase τ, (blockCoeff (q σ) (r * a - q σ) (rectangle r a) * κ))
-        • toN (r + a) (blockOut r a c κ (q τ) (mstar f r a q e τ τ)) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [gmfOut, map_sum]
+theorem restrict_gmfOut (f r a : ℕ) (c : SmallBlock) (κ : ℚ) (q : Fin f → ℕ) (e : ℕ) (τ : Fin f)
+    (hq : ∀ σ, σ ≠ τ → q σ ≤ r * a)
+    (he : ∑ σ' ∈ Finset.univ.erase τ, (r * a - q σ') ≤ e) :
+    restrictToBlock f (r + a) τ (gmfOut f r a c κ q e) =
+      ((Nat.multinomial Finset.univ (mstar f r a q e τ) : ℚ) *
+          ∏ σ ∈ Finset.univ.erase τ, (blockCoeff (q σ) (r * a - q σ) (rectangle r a) * κ)) •
+        toN (r + a) (blockOut r a c κ (q τ) (mstar f r a q e τ τ)) := by
+
+  rw [gmfOut, map_sum]
   rw [Finset.sum_eq_single (mstar f r a q e τ)]
   · rw [map_smul, map_prod, ← Finset.mul_prod_erase _ _ (Finset.mem_univ τ)]
     rw [restrictToBlock_blockEmb, if_pos rfl]
     have : ∏ x ∈ Finset.univ.erase τ, restrictToBlock f (r + a) τ
-          (blockEmb f (r + a) x (blockOut r a c κ (q x) (mstar f r a q e τ x)))
-        = C (∏ σ ∈ Finset.univ.erase τ, (blockCoeff (q σ) (r * a - q σ) (rectangle r a) * κ)) := by
+        (blockEmb f (r + a) x (blockOut r a c κ (q x) (mstar f r a q e τ x))) =
+        C (∏ σ ∈ Finset.univ.erase τ, (blockCoeff (q σ) (r * a - q σ) (rectangle r a) * κ)) := by
       rw [map_prod]
       refine Finset.prod_congr rfl fun σ hσ => ?_
       have hne := Finset.ne_of_mem_erase hσ
@@ -139,28 +170,22 @@ theorem restrict_gmfOut
   · intro h
     exact absurd (mstar_mem f r a q e τ he) h
 
-theorem mem_partitionsOf_iff {m n : ℕ} (lam : Fin m → ℕ)
-    : lam ∈ partitionsOf m n ↔ ∑ i, lam i = n ∧ Antitone lam := by
+theorem mem_partitionsOf_iff {m n : ℕ} (lam : Fin m → ℕ) :
+    lam ∈ partitionsOf m n ↔ ∑ i, lam i = n ∧ Antitone lam := by
   simp only [partitionsOf, Finset.mem_filter, Finset.Nat.mem_antidiagonalTuple]
   exact Iff.rfl
 
-theorem toN_blockOut (r a : ℕ) (c : SmallBlock) (κ : ℚ) (q m k : ℕ) (hk : q + m = k + r * a)
-    : toN (r + a) (blockOut r a c κ q m)
-      = C κ
-        * ∑ nu ∈ partitionsOf r k, C (blockCoeff q m (fun i => a + nu i)) *
-          aeval (fun i : Fin (r + a) => C c.sign * X i) (schur (Fin (r + a)) nu) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [blockOut, map_sum, Finset.mul_sum]
-  have hterm
-      : ∀ lam ∈ partitionsOf r (q + m),
-        toN (r + a) (blockCoeff q m lam • pushOut r a c κ lam)
-          = if ∀ i, a ≤ lam i then
-              C κ
-                * (C (blockCoeff q m lam) * aeval
-                  (fun i : Fin (r + a) => C c.sign * X i)
-                  (schur (Fin (r + a)) (fun i => lam i - a)))
-            else
-              0 := by
+theorem toN_blockOut (r a : ℕ) (c : SmallBlock) (κ : ℚ) (q m k : ℕ) (hk : q + m = k + r * a) :
+    toN (r + a) (blockOut r a c κ q m) =
+      C κ * ∑ nu ∈ partitionsOf r k, C (blockCoeff q m (fun i => a + nu i)) *
+        aeval (fun i : Fin (r + a) => C c.sign * X i) (schur (Fin (r + a)) nu) := by
+
+  rw [blockOut, map_sum, Finset.mul_sum]
+  have hterm : ∀ lam ∈ partitionsOf r (q + m),
+      toN (r + a) (blockCoeff q m lam • pushOut r a c κ lam) =
+        if ∀ i, a ≤ lam i then C κ * (C (blockCoeff q m lam) *
+          aeval (fun i : Fin (r + a) => C c.sign * X i)
+            (schur (Fin (r + a)) (fun i => lam i - a))) else 0 := by
     intro lam _
     rw [map_smul, pushOut]
     split_ifs
@@ -197,12 +222,12 @@ theorem toN_blockOut (r a : ℕ) (c : SmallBlock) (κ : ℚ) (q m k : ℕ) (hk :
   · intro nu _
     simp
 
-theorem blockOut_rect (r a : ℕ) (c : SmallBlock) (κ : ℚ) (q m : ℕ) (h : q + m = r * a)
-    : blockOut r a c κ q m = C (blockCoeff q m (rectangle r a) * κ) := by
+theorem blockOut_rect (r a : ℕ) (c : SmallBlock) (κ : ℚ) (q m : ℕ) (h : q + m = r * a) :
+    blockOut r a c κ q m = C (blockCoeff q m (rectangle r a) * κ) := by
   rw [blockOut, Finset.sum_eq_single (rectangle r a)]
   · have h0 : (fun i : Fin r => rectangle r a i - a) = 0 := funext fun i => by simp [rectangle]
-    rw [pushOut, if_pos (fun i => by simp [rectangle]), h0, schur_zero, map_one, mul_one,
-      smul_eq_C_mul, ← C_mul, mul_comm]
+    rw [pushOut, if_pos (fun i => by simp [rectangle]), h0, schur_zero, map_one, mul_one, smul_eq_C_mul,
+      ← C_mul, mul_comm]
   · intro lam hlam hne
     rw [pushOut, if_neg, smul_zero]
     intro hall
@@ -221,11 +246,10 @@ theorem blockOut_rect (r a : ℕ) (c : SmallBlock) (κ : ℚ) (q m : ℕ) (h : q
   · intro h'
     exact absurd ((rectangle_mem_partitionsOf r a _).mpr h) h'
 
-theorem gmfOut_zero (f r a : ℕ) (c : SmallBlock) (κ : ℚ)
-    : gmfOut f r a c κ 0 (f * (r * a))
-      = C
-        ((Nat.multinomial Finset.univ (fun _ : Fin f => r * a) : ℚ)
-          * (blockCoeff 0 (r * a) (rectangle r a) * κ) ^ f) := by
+theorem gmfOut_zero (f r a : ℕ) (c : SmallBlock) (κ : ℚ) :
+    gmfOut f r a c κ 0 (f * (r * a)) =
+      C ((Nat.multinomial Finset.univ (fun _ : Fin f => r * a) : ℚ) *
+        (blockCoeff 0 (r * a) (rectangle r a) * κ) ^ f) := by
   rw [gmfOut, Finset.sum_eq_single (fun _ : Fin f => r * a)]
   · simp only [Pi.zero_apply]
     rw [Finset.prod_congr rfl fun σ _ => by rw [blockOut_rect r a c κ 0 (r * a) (by simp)]]
@@ -237,7 +261,8 @@ theorem gmfOut_zero (f r a : ℕ) (c : SmallBlock) (κ : ℚ)
       push Not at hcon
       apply hne
       rw [Finset.mem_piAntidiag] at hm
-      have hle : ∀ σ ∈ (Finset.univ : Finset (Fin f)), (fun _ => r * a) σ ≤ m σ := fun σ _ => hcon σ
+      have hle : ∀ σ ∈ (Finset.univ : Finset (Fin f)), (fun _ => r * a) σ ≤ m σ :=
+        fun σ _ => hcon σ
       have hsum : ∑ σ : Fin f, (fun _ => r * a) σ = ∑ σ, m σ := by
         simp only [Finset.sum_const, Finset.card_univ, Fintype.card_fin, smul_eq_mul]
         rw [hm.1]

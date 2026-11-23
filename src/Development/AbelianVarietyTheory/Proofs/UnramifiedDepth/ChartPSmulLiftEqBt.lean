@@ -1,14 +1,54 @@
 module
 
-public import Mathlib
-public import ReciprocityTheory.DualLattices.EvBtStatement
+public import ReciprocityTheory.DualLattices.TowerZeroSurjective
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Lemma
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
 noncomputable section
 
-open TensorProduct IsLocalRing Matrix ReciprocityTheory.PGsh ReciprocityTheory.PGsh.Up
-  ReciprocityTheory.PGsh.L2 ReciprocityTheory.PGsh.Be2
+open TensorProduct IsLocalRing Matrix ReciprocityTheory.PGsh ReciprocityTheory.PGsh.Up ReciprocityTheory.PGsh.L2 ReciprocityTheory.PGsh.Be2
 
 namespace GlobalTheory
 
@@ -16,9 +56,8 @@ section
 
 variable {R₀ : Type} [CommRing R₀] {g : ℕ} {V : Type} [AddCommGroup V] [Module R₀ V]
 
-private def btTanCrd
-    (gb : Module.Basis (Fin g) R₀ V) (M : Type) [AddCommGroup M] [Module R₀ M] (k : Fin g)
-    : V ⊗[R₀] M →ₗ[R₀] M :=
+private def btTanCrd (gb : Module.Basis (Fin g) R₀ V) (M : Type) [AddCommGroup M] [Module R₀ M]
+    (k : Fin g) : V ⊗[R₀] M →ₗ[R₀] M :=
   (TensorProduct.lid R₀ M).toLinearMap ∘ₗ LinearMap.rTensor M (gb.coord k)
 
 private lemma btTanCrd_tmul (gb : Module.Basis (Fin g) R₀ V) {M : Type} [AddCommGroup M]
@@ -86,48 +125,38 @@ private lemma btTan_chi_tg {R₀ : Type} [CommRing R₀] {g : ℕ} {B : BX R₀}
     simp only [map_add (f := _), Submodule.coe_add]
     exact h
 
-theorem chart_p_smul_lift_eq_bt
-    : (∀ {R₀ : Type} [CommRing R₀] {g : ℕ} {B : BX R₀} {K : LAlg R₀} (ch : FormalChartAtZero B K g)
-          (S : Type) [CommRing S] [Algebra R₀ S] (a : Fin g → S),
-        (∀ i, IsNilpotent (a i))
-          → ∃ M : Matrix (Fin g) (Fin g) S,
-            (∀ k j, M k j - (1 : Matrix (Fin g) (Fin g) S) k j ∈ Ideal.span (Set.range a))
-              ∧ ∀ e : Fin g → S, (∀ i j, e i * e j = 0) → fAdd ch.F a e = a + M *ᵥ e)
-      → (∀ {R₀ : Type} [CommRing R₀] {p : ℕ} [Fact p.Prime] {g : ℕ} {B : BX R₀} {Tw : ATowerL R₀ p}
-          {Dt : DualTower Tw} [Algebra ℤ_[p] (Tw.O : Type)] {Oe : Type} [CommRing Oe]
-          [Algebra ℤ_[p] Oe] {σ : Oe ≃ₐ[ℤ_[p]] Oe} {cp : (Tw.O : Type)}
-          (D : Dat p g B Tw Dt Oe σ cp),
-        ∀ t : TT p g, ∃ t' : B.G D.wd.W,
-          B.map D.wd.πW t' = B.map (Tw.q 0) (ptOf B D.L.τ (red p g t))
-            ∧ ∃ h : B.map D.wd.ρW (p • t') = 0, ∀ k : Fin g, ∃ w : (D.wd.W : Type),
-              D.wd.πW.1 w = (Tw.q 0).1 ((D.H.Bt *ᵥ (algebraMap ℤ_[p] (Tw.O : Type) ∘ t)) k)
-                ∧ ((D.ch.χ D.wd.ρW D.sm.nil ⟨p • t', h⟩ k : maximalIdeal (D.wd.W : Type))
-                    : (D.wd.W : Type))
-                  = p * (D.wd.b : (D.wd.W : Type)) * w) := by
+theorem chart_p_smul_lift_eq_bt :
+  (∀ {R₀ : Type} [CommRing R₀] {g : ℕ} {B : BX R₀} {K : LAlg R₀} (ch : FormalChartAtZero B K g) (S : Type) [CommRing S] [Algebra R₀ S] (a : Fin g → S), (∀ i, IsNilpotent (a i)) →
+    ∃ M : Matrix (Fin g) (Fin g) S, (∀ k j, M k j - (1 : Matrix (Fin g) (Fin g) S) k j ∈ Ideal.span (Set.range a)) ∧
+      ∀ e : Fin g → S, (∀ i j, e i * e j = 0) → fAdd ch.F a e = a + M *ᵥ e) →
+  (∀ {R₀ : Type} [CommRing R₀] {p : ℕ} [Fact p.Prime] {g : ℕ} {B : BX R₀} {Tw : ATowerL R₀ p} {Dt : DualTower Tw} [Algebra ℤ_[p] (Tw.O : Type)] {Oe : Type} [CommRing Oe] [Algebra ℤ_[p] Oe] {σ : Oe ≃ₐ[ℤ_[p]] Oe} {cp : (Tw.O : Type)} (D : Dat p g B Tw Dt Oe σ cp), ∀ t : TT p g, ∃ t' : B.G D.wd.W,
+    B.map D.wd.πW t' = B.map (Tw.q 0) (ptOf B D.L.τ (red p g t)) ∧
+    ∃ h : B.map D.wd.ρW (p • t') = 0, ∀ k : Fin g, ∃ w : (D.wd.W : Type),
+      D.wd.πW.1 w = (Tw.q 0).1 ((D.H.Bt *ᵥ (algebraMap ℤ_[p] (Tw.O : Type) ∘ t)) k) ∧
+      ((D.ch.χ D.wd.ρW D.sm.nil ⟨p • t', h⟩ k : maximalIdeal (D.wd.W : Type)) : (D.wd.W : Type)) = p * (D.wd.b : (D.wd.W : Type)) * w) := by
   intro hF R₀ _ p _ g B Tw Dt _ Oe _ _ σ cp D t
   choose th w hth hpth hw using fun i => D.L.bt_spec i 1
-  have hsq : D.wd.πW.SqZero :=
-    D.wd.πW.sqZero_of_span (p : (D.wd.W : Type)) D.wd.πW_surj D.wd.ker_πW
-      (by rw [← pow_two]; exact D.wd.p_sq)
+  have hsq : D.wd.πW.SqZero := D.wd.πW.sqZero_of_span (p : (D.wd.W : Type)) D.wd.πW_surj
+    D.wd.ker_πW (by rw [← pow_two]; exact D.wd.p_sq)
   have hc1 : D.wd.πW.comp D.wd.ψ = (Tw.r 0).comp (Tw.π 1) :=
     Subtype.ext (AlgHom.ext fun a => D.wd.compat a)
-  have hc2 : (Tw.r 0).comp (Tw.q 1) = Tw.q 0 := Subtype.ext (AlgHom.ext fun a => Tw.r_q 0 a)
+  have hc2 : (Tw.r 0).comp (Tw.q 1) = Tw.q 0 :=
+    Subtype.ext (AlgHom.ext fun a => Tw.r_q 0 a)
   have hf : ∀ a ∈ (Tw.π 1).ker, D.wd.ψ.1.toLinearMap a ∈ D.wd.πW.ker := by
     intro a ha
     change D.wd.πW.1 (D.wd.ψ.1 a) = 0
     change (Tw.π 1).1 a = 0 at ha
     rw [D.wd.compat, ha, map_zero]
   let n : Ix g → ℕ := fun i => (red p g t i).val
-  let v : B.gg ⊗[R₀] D.wd.πW.ker :=
-    ∑ i, n i • LinearMap.lTensor B.gg
-      (D.wd.ψ.1.toLinearMap.restrict hf)
-      (TensorProduct.map LinearMap.id (ξmul (Tw.π 1) (Tw.ξ 1) (Tw.ξ_mem 1)) (w i))
+  let v : B.gg ⊗[R₀] D.wd.πW.ker := ∑ i, n i • LinearMap.lTensor B.gg
+    (D.wd.ψ.1.toLinearMap.restrict hf)
+    (TensorProduct.map LinearMap.id (ξmul (Tw.π 1) (Tw.ξ 1) (Tw.ξ_mem 1)) (w i))
   have hpt : p • ∑ i, n i • B.map D.wd.ψ (p • th i) = B.tg D.wd.πW hsq v := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [v, map_sum, map_nsmul (B.tg D.wd.πW hsq), Finset.smul_sum]
+
+    simp only [v, map_sum, map_nsmul (B.tg D.wd.πW hsq), Finset.smul_sum]
     refine Finset.sum_congr rfl fun i _ => ?_
-    rw [B.tg_nat (Tw.π 1) D.wd.πW (Tw.sqZero 1) hsq, ← hpth, smul_comm p, ← map_nsmul, smul_smul,
-      pow_two]
+    rw [B.tg_nat (Tw.π 1) D.wd.πW (Tw.sqZero 1) hsq, ← hpth, smul_comm p, ← map_nsmul,
+      smul_smul, pow_two]
   refine ⟨∑ i, n i • B.map D.wd.ψ (p • th i), ?_, ?_⟩
   · set_option synthInstance.maxHeartbeats 100000 in
       simp only [ptOf, map_sum, map_nsmul]
@@ -158,9 +187,9 @@ theorem chart_p_smul_lift_eq_bt
     · have h := btTan_chi_tg D.ch (hF D.ch _) D.wd.ρW D.sm.nil D.wd.πW hsq D.wd.ρ1 D.wd.ρW_eq v k
       simp only [hpt]
       rw [h]
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [v, map_sum, map_nsmul, AddSubmonoidClass.coe_finsetSum,
-          AddSubmonoidClass.coe_nsmul, Finset.mul_sum]
+
+      simp only [v, map_sum, map_nsmul, AddSubmonoidClass.coe_finsetSum,
+      AddSubmonoidClass.coe_nsmul, Finset.mul_sum]
       refine Finset.sum_congr rfl fun i _ => ?_
       rw [btTanCrd_nat, ← LinearMap.lTensor_def, btTanCrd_nat, ← D.wd.ξ_img, mul_smul_comm,
         ← map_mul]

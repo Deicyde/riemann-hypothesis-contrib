@@ -1,22 +1,60 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Definitions.Jets.IsSelfOf
-public import Development.AbelianVarietyTheory.Definitions.Jets.TwoPlaces
 public import Development.AbelianVarietyTheory.Proofs.UnramifiedDepth.AdjointEndPairMemGaugedCurveLogarithms
-public import Development.AbelianVarietyTheory.Proofs.UnramifiedDepth.ExistsNotMemForallMem
-public import Development.AbelianVarietyTheory.Proofs.JetHarmonics.MvPowerSeriesLthPowerOfPderivVanishModMaximalStatement
-public import Development.AbelianVarietyTheory.Proofs.JetHarmonics.IntegralSmulCurveCoeffSeriesOfChartHOfLinearLogStatement
 public import Development.AbelianVarietyTheory.Proofs.JetHarmonics.FormalGroupCocycleLthPowerCoboundaryModMaximalStatement
+public import Development.AbelianVarietyTheory.Proofs.JetHarmonics.IntegralSmulCurveCoeffSeriesOfChartHOfLinearLogStatement
+public import Development.AbelianVarietyTheory.Proofs.JetHarmonics.MvPowerSeriesLthPowerOfPderivVanishModMaximalStatement
+import Development.AbelianVarietyTheory.Proofs.UnramifiedDepth.ExistsNotMemForallMem
+import Formalism.LocalToGlobal.CharacterGerms.ConstMemTypeSetOfNonneg
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Int
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Development.AbelianVarietyTheory.Definitions.Jets.DepthNumbersThresholdEq
 
 @[expose] public section
 
 open scoped BigOperators TensorProduct
-open Classical NumberField IsDedekindDomain Formalism.L2.FormalSeriesBounds Formalism.IncomingBounds
-  Formalism.L2.Pj Formalism.L2.DIV Formalism.BasicNotions GlobalTheory.RowLaw GlobalTheory.RowAt
-  GlobalTheory.GoodDepth
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor
-  ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ
+open Classical NumberField IsDedekindDomain Formalism.L2.FormalSeriesBounds Formalism.IncomingBounds Formalism.L2.Pj Formalism.L2.DIV Formalism.BasicNotions GlobalTheory.RowLaw GlobalTheory.RowAt GlobalTheory.GoodDepth
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ
 
 noncomputable section
 
@@ -26,8 +64,7 @@ open GlobalTheory.RowLaw.CvEnd GlobalTheory.PlaceProj
 
 variable {C : Type} [Field C] {V : VF C}
 
-theorem mm_sum' {ι : Type} (s : Finset ι) (f : ι → C) (h : ∀ i ∈ s, V.MM (f i))
-    : V.MM (∑ i ∈ s, f i) :=
+theorem mm_sum' {ι : Type} (s : Finset ι) (f : ι → C) (h : ∀ i ∈ s, V.MM (f i)) : V.MM (∑ i ∈ s, f i) :=
   Finset.sum_induction f V.MM (fun _ _ => mm_add) mm_zero h
 
 def ordIdeal (C : Type) [Field C] {τ : Type} (w : τ → ℕ) (n : ℕ) : Ideal (MvPowerSeries τ C) where
@@ -38,14 +75,12 @@ def ordIdeal (C : Type) [Field C] {τ : Type} (w : τ → ℕ) (n : ℕ) : Ideal
     have := ordGe_mul (ordGe_zero (w := w) c) ha
     rwa [zero_add] at this
 
-theorem mem_ordIdeal {τ : Type} {w : τ → ℕ} {n : ℕ} {F : MvPowerSeries τ C}
-    : F ∈ ordIdeal C w n ↔ F ∈ ordGe C w n :=
+theorem mem_ordIdeal {τ : Type} {w : τ → ℕ} {n : ℕ} {F : MvPowerSeries τ C} : F ∈ ordIdeal C w n ↔ F ∈ ordGe C w n :=
   Iff.rfl
 
-theorem subst_congr_ord
-    {σ τ : Type} {w : τ → ℕ} {n : ℕ} {a b : σ → MvPowerSeries τ C} (ha : MvPowerSeries.HasSubst a)
-    (hb : MvPowerSeries.HasSubst b) (h : ∀ s, a s - b s ∈ ordGe C w n) (f : MvPowerSeries σ C)
-    : MvPowerSeries.subst a f - MvPowerSeries.subst b f ∈ ordGe C w n := by
+theorem subst_congr_ord {σ τ : Type} {w : τ → ℕ} {n : ℕ} {a b : σ → MvPowerSeries τ C}
+    (ha : MvPowerSeries.HasSubst a) (hb : MvPowerSeries.HasSubst b) (h : ∀ s, a s - b s ∈ ordGe C w n)
+    (f : MvPowerSeries σ C) : MvPowerSeries.subst a f - MvPowerSeries.subst b f ∈ ordGe C w n := by
   intro e he
   rw [map_sub, MvPowerSeries.coeff_subst ha, MvPowerSeries.coeff_subst hb, sub_eq_zero]
   refine finsum_congr fun μ => ?_
@@ -59,12 +94,9 @@ theorem subst_congr_ord
   have h2 := mem_ordIdeal.1 h1 e he
   rwa [map_sub, sub_eq_zero] at h2
 
-theorem mm_subst
-    {σ τ : Type} {a : σ → MvPowerSeries τ C}
-    (ha : MvPowerSeries.HasSubst a) (hi : ∀ s, IntS V (a s))
-    {F : MvPowerSeries σ C} (hF : ∀ μ, V.MM (MvPowerSeries.coeff μ F))
-    (e : τ →₀ ℕ)
-    : V.MM (MvPowerSeries.coeff e (MvPowerSeries.subst a F)) := by
+theorem mm_subst {σ τ : Type} {a : σ → MvPowerSeries τ C} (ha : MvPowerSeries.HasSubst a) (hi : ∀ s, IntS V (a s))
+    {F : MvPowerSeries σ C} (hF : ∀ μ, V.MM (MvPowerSeries.coeff μ F)) (e : τ →₀ ℕ) :
+    V.MM (MvPowerSeries.coeff e (MvPowerSeries.subst a F)) := by
   rw [MvPowerSeries.coeff_subst ha]
   refine finsum_induction (fun x => V.MM x) mm_zero (fun _ _ => mm_add) fun μ => ?_
   rw [smul_eq_mul, mul_comm]
@@ -84,12 +116,10 @@ theorem intS_X' {τ : Type} (s : τ) : IntS V (MvPowerSeries.X s : MvPowerSeries
   · exact VF.Ge.one
   · exact VF.Ge.zero 0
 
-theorem intS_add' {τ : Type} {F G : MvPowerSeries τ C} (hF : IntS V F) (hG : IntS V G)
-    : IntS V (F + G) := fun e => by
+theorem intS_add' {τ : Type} {F G : MvPowerSeries τ C} (hF : IntS V F) (hG : IntS V G) : IntS V (F + G) := fun e => by
   rw [map_add (f := _)]; exact (hF e).add (hG e)
 
-theorem intS_sub' {τ : Type} {F G : MvPowerSeries τ C} (hF : IntS V F) (hG : IntS V G)
-    : IntS V (F - G) := fun e => by
+theorem intS_sub' {τ : Type} {F G : MvPowerSeries τ C} (hF : IntS V F) (hG : IntS V G) : IntS V (F - G) := fun e => by
   rw [map_sub]; exact (hF e).sub (hG e)
 
 theorem intS_neg' {τ : Type} {F : MvPowerSeries τ C} (hF : IntS V F) : IntS V (-F) := fun e => by
@@ -97,38 +127,26 @@ theorem intS_neg' {τ : Type} {F : MvPowerSeries τ C} (hF : IntS V F) : IntS V 
 
 section Chart
 
-variable
-  {d : ℕ} {I : Fin 2 → Type} [∀ g, Fintype (I g)] {κ : Type} [Fintype κ] {Y : RawChart C d I κ}
+variable {d : ℕ} {I : Fin 2 → Type} [∀ g, Fintype (I g)] {κ : Type} [Fintype κ] {Y : RawChart C d I κ}
 
-theorem formalAdd_const
-    (H : RLaw Y V)
-    {τ : Type} {a b : κ → MvPowerSeries τ C} (ha : ∀ i, MvPowerSeries.constantCoeff (a i) = 0)
-    (hb : ∀ i, MvPowerSeries.constantCoeff (b i) = 0)
-    (i : κ)
-    : MvPowerSeries.constantCoeff (addP Y a b i) = 0 :=
-  constantCoeff_subst_zero
-    (fun x => by
-      rw [map_add (f := _), constantCoeff_subst_zero ha (lg_const H x),
-        constantCoeff_subst_zero hb (lg_const H x), add_zero])
+theorem formalAdd_const (H : RLaw Y V) {τ : Type} {a b : κ → MvPowerSeries τ C}
+    (ha : ∀ i, MvPowerSeries.constantCoeff (a i) = 0) (hb : ∀ i, MvPowerSeries.constantCoeff (b i) = 0) (i : κ) :
+    MvPowerSeries.constantCoeff (addP Y a b i) = 0 :=
+  constantCoeff_subst_zero (fun x => by
+    rw [map_add (f := _), constantCoeff_subst_zero ha (lg_const H x), constantCoeff_subst_zero hb (lg_const H x), add_zero])
     (H.exc i)
 
-theorem cob_root
-    (H : RLaw Y V)
-    {c : MvPowerSeries (Fin 2 × κ) C} (hc : IntS V c)
-    {b : MvPowerSeries κ C}
+theorem cob_root (H : RLaw Y V) {c : MvPowerSeries (Fin 2 × κ) C} (hc : IntS V c) {b : MvPowerSeries κ C}
     (hb : IntS V b) (hd : ∀ i μ, V.MM (MvPowerSeries.coeff μ (MvPowerSeries.pderiv (R := C) i b)))
-    (h : ∀ μ, V.MM (MvPowerSeries.coeff μ (c ^ V.l + cob Y b)))
-    : ∃ b' : MvPowerSeries κ C, IntS V b' ∧ ∀ μ, V.MM (MvPowerSeries.coeff μ (c - cob Y b')) := by
+    (h : ∀ μ, V.MM (MvPowerSeries.coeff μ (c ^ V.l + cob Y b))) :
+    ∃ b' : MvPowerSeries κ C, IntS V b' ∧ ∀ μ, V.MM (MvPowerSeries.coeff μ (c - cob Y b')) := by
   haveI := H.closed
-  obtain ⟨b', hb', hbb⟩ :=
-    (GlobalTheory.T.mvPowerSeries_lthPower_of_pderiv_vanish_mod_maximal C V κ).1 b hb hd
-  obtain ⟨-, hroot, hfr⟩ :=
-    GlobalTheory.T.mvPowerSeries_lthPower_of_pderiv_vanish_mod_maximal C V (Fin 2 × κ)
+  obtain ⟨b', hb', hbb⟩ := (GlobalTheory.T.mvPowerSeries_lthPower_of_pderiv_vanish_mod_maximal C V κ).1 b hb hd
+  obtain ⟨-, hroot, hfr⟩ := GlobalTheory.T.mvPowerSeries_lthPower_of_pderiv_vanish_mod_maximal C V (Fin 2 × κ)
   have s0 := MvPowerSeries.hasSubst_of_constantCoeff_zero (gp_const (C := C) (κ := κ) (0 : Fin 2))
   have s1 := MvPowerSeries.hasSubst_of_constantCoeff_zero (gp_const (C := C) (κ := κ) (1 : Fin 2))
-  have sa :=
-    MvPowerSeries.hasSubst_of_constantCoeff_zero (formalAdd_const H
-      (gp_const (C := C) (κ := κ) (0 : Fin 2)) (gp_const (1 : Fin 2)))
+  have sa := MvPowerSeries.hasSubst_of_constantCoeff_zero
+    (formalAdd_const H (gp_const (C := C) (κ := κ) (0 : Fin 2)) (gp_const (1 : Fin 2)))
   have i0 : ∀ s, IntS V (gp C κ (0 : Fin 2) s) := fun s => intS_X' _
   have i1 : ∀ s, IntS V (gp C κ (1 : Fin 2) s) := fun s => intS_X' _
   have hA := intS_subst sa H.addInt hb'
@@ -140,13 +158,11 @@ theorem cob_root
   rw [MvPowerSeries.subst_sub sa, MvPowerSeries.subst_pow sa] at mA
   rw [MvPowerSeries.subst_sub s0, MvPowerSeries.subst_pow s0] at mB
   rw [MvPowerSeries.subst_sub s1, MvPowerSeries.subst_pow s1] at mD
-  have e
-      : cob Y (-b')
-        = MvPowerSeries.subst (gp C κ (0 : Fin 2)) b' + MvPowerSeries.subst (gp C κ (1 : Fin 2)) b'
-          - MvPowerSeries.subst (addP Y (gp C κ (0 : Fin 2)) (gp C κ 1)) b' := by
+  have e : cob Y (-b') = MvPowerSeries.subst (gp C κ (0 : Fin 2)) b' + MvPowerSeries.subst (gp C κ (1 : Fin 2)) b' -
+      MvPowerSeries.subst (addP Y (gp C κ (0 : Fin 2)) (gp C κ 1)) b' := by
     unfold cob
-    rw [← MvPowerSeries.coe_substAlgHom sa, ← MvPowerSeries.coe_substAlgHom s0,
-      ← MvPowerSeries.coe_substAlgHom s1, map_neg, map_neg, map_neg]
+    rw [← MvPowerSeries.coe_substAlgHom sa, ← MvPowerSeries.coe_substAlgHom s0, ← MvPowerSeries.coe_substAlgHom s1,
+      map_neg, map_neg, map_neg]
     ring
   refine ⟨-b', intS_neg' hb', ?_⟩
   rw [e]
@@ -158,43 +174,31 @@ theorem cob_root
   simp only [cob, map_sub, map_add (f := _)]
   ring
 
-theorem ex_along
-    (H : RLaw Y V)
-    {τ : Type} {a : κ → MvPowerSeries τ C} (ha : ∀ i, MvPowerSeries.constantCoeff (a i) = 0)
-    (i : κ)
-    : MvPowerSeries.subst (fun x => MvPowerSeries.subst a (Y.lg x)) (Y.ex i) = a i := by
+theorem ex_along (H : RLaw Y V) {τ : Type} {a : κ → MvPowerSeries τ C}
+    (ha : ∀ i, MvPowerSeries.constantCoeff (a i) = 0) (i : κ) :
+    MvPowerSeries.subst (fun x => MvPowerSeries.subst a (Y.lg x)) (Y.ex i) = a i := by
   have hA := MvPowerSeries.hasSubst_of_constantCoeff_zero ha
-  have :=
-    MvPowerSeries.subst_comp_subst_apply (MvPowerSeries.hasSubst_of_constantCoeff_zero (lg_const H))
-      hA (Y.ex i)
+  have := MvPowerSeries.subst_comp_subst_apply
+    (MvPowerSeries.hasSubst_of_constantCoeff_zero (lg_const H)) hA (Y.ex i)
   rw [H.exlg, MvPowerSeries.subst_X hA] at this
   exact this.symm
 
-theorem cvAt_const
-    {s : MvPowerSeries (Fin 2) C} (hs : MvPowerSeries.constantCoeff s = 0)
-    {f : PowerSeries C} (hf : PowerSeries.constantCoeff f = 0)
-    : MvPowerSeries.constantCoeff (cvAt s f) = 0 :=
+theorem cvAt_const {s : MvPowerSeries (Fin 2) C} (hs : MvPowerSeries.constantCoeff s = 0) {f : PowerSeries C}
+    (hf : PowerSeries.constantCoeff f = 0) : MvPowerSeries.constantCoeff (cvAt s f) = 0 :=
   constantCoeff_subst_zero (σ := Unit) (fun _ => hs) hf
 
-theorem subst_cvAt
-    {s : MvPowerSeries (Fin 2) C} (hs : MvPowerSeries.constantCoeff s = 0)
-    {γ : κ → PowerSeries C} (hγ : ∀ i, PowerSeries.constantCoeff (γ i) = 0)
-    (f : MvPowerSeries κ C)
-    : MvPowerSeries.subst (fun j => cvAt s (γ j)) f = cvAt s (alongCv γ f) :=
-  (MvPowerSeries.subst_comp_subst_apply
-    (MvPowerSeries.hasSubst_of_constantCoeff_zero (τ := Unit) hγ)
+theorem subst_cvAt {s : MvPowerSeries (Fin 2) C} (hs : MvPowerSeries.constantCoeff s = 0) {γ : κ → PowerSeries C}
+    (hγ : ∀ i, PowerSeries.constantCoeff (γ i) = 0) (f : MvPowerSeries κ C) :
+    MvPowerSeries.subst (fun j => cvAt s (γ j)) f = cvAt s (alongCv γ f) :=
+  (MvPowerSeries.subst_comp_subst_apply (MvPowerSeries.hasSubst_of_constantCoeff_zero (τ := Unit) hγ)
     (MvPowerSeries.hasSubst_of_constantCoeff_zero (σ := Unit) fun _ => hs) f).symm
 
-theorem cvAt_lin
-    {N : ℕ} {s : MvPowerSeries (Fin 2) C} (hs : MvPowerSeries.constantCoeff s = 0)
-    {f : PowerSeries C}
-    (hf : PowerSeries.constantCoeff f = 0) (h : ∀ n, 2 ≤ n → n < N → PowerSeries.coeff n f = 0)
-    : cvAt s f - PowerSeries.coeff 1 f • s ∈ ordGe C (fun _ => 1) N := by
+theorem cvAt_lin {N : ℕ} {s : MvPowerSeries (Fin 2) C} (hs : MvPowerSeries.constantCoeff s = 0) {f : PowerSeries C}
+    (hf : PowerSeries.constantCoeff f = 0) (h : ∀ n, 2 ≤ n → n < N → PowerSeries.coeff n f = 0) :
+    cvAt s f - PowerSeries.coeff 1 f • s ∈ ordGe C (fun _ => 1) N := by
   have hS : MvPowerSeries.HasSubst (fun _ : Unit => s) :=
     MvPowerSeries.hasSubst_of_constantCoeff_zero (σ := Unit) fun _ => hs
-  have h1
-      : (f - PowerSeries.coeff 1 f • PowerSeries.X : MvPowerSeries Unit C)
-        ∈ ordGe C (fun _ => 1) N := by
+  have h1 : (f - PowerSeries.coeff 1 f • PowerSeries.X : MvPowerSeries Unit C) ∈ ordGe C (fun _ => 1) N := by
     intro e he
     have h2 : e = Finsupp.single () (e ()) := Finsupp.unique_single e
     rw [h2, Finsupp.weight_single, smul_eq_mul, mul_one] at he
@@ -203,84 +207,60 @@ theorem cvAt_lin
     rw [map_sub, PowerSeries.coeff_smul, PowerSeries.coeff_X]
     rcases Nat.lt_trichotomy (e ()) 1 with h3 | h3 | h3
     · have : e () = 0 := by omega
-      rw [this, PowerSeries.coeff_zero_eq_constantCoeff_apply, hf]
-      simp
+      rw [this, PowerSeries.coeff_zero_eq_constantCoeff_apply, hf]; simp
     · rw [h3]; simp
     · rw [h _ h3 he, if_neg (by omega)]; simp
   have := ordGe_subst hS (fun _ => ordGe_one_of_const hs) h1
   rw [MvPowerSeries.subst_sub hS, MvPowerSeries.subst_smul hS] at this
   rwa [show MvPowerSeries.subst (fun _ : Unit => s) (PowerSeries.X : PowerSeries C) = s from
-      MvPowerSeries.subst_X hS ()]
-    at this
+    MvPowerSeries.subst_X hS ()] at this
 
-theorem additive_low
-    (H : RLaw Y V)
-    {N : ℕ} {γ : κ → PowerSeries C} (hγ : ∀ i, PowerSeries.constantCoeff (γ i) = 0)
-    (h : ∀ i n, 2 ≤ n → n < N → PowerSeries.coeff n (alongCv γ (Y.lg i)) = 0)
-    (i : κ)
-    : addP Y (fun j => cvAt (MvPowerSeries.X 0) (γ j)) (fun j => cvAt (MvPowerSeries.X 1) (γ j)) i
-        - cvAt (MvPowerSeries.X 0 + MvPowerSeries.X 1) (γ i)
-      ∈ ordGe C (fun _ => 1) N := by
+theorem additive_low (H : RLaw Y V) {N : ℕ} {γ : κ → PowerSeries C}
+    (hγ : ∀ i, PowerSeries.constantCoeff (γ i) = 0)
+    (h : ∀ i n, 2 ≤ n → n < N → PowerSeries.coeff n (alongCv γ (Y.lg i)) = 0) (i : κ) :
+    addP Y (fun j => cvAt (MvPowerSeries.X 0) (γ j)) (fun j => cvAt (MvPowerSeries.X 1) (γ j)) i -
+        cvAt (MvPowerSeries.X 0 + MvPowerSeries.X 1) (γ i) ∈ ordGe C (fun _ => 1) N := by
   have c0 : MvPowerSeries.constantCoeff (MvPowerSeries.X 0 : MvPowerSeries (Fin 2) C) = 0 :=
     MvPowerSeries.constantCoeff_X _
   have c1 : MvPowerSeries.constantCoeff (MvPowerSeries.X 1 : MvPowerSeries (Fin 2) C) = 0 :=
     MvPowerSeries.constantCoeff_X _
-  have cs
-      : MvPowerSeries.constantCoeff
-          (MvPowerSeries.X 0 + MvPowerSeries.X 1 : MvPowerSeries (Fin 2) C)
-        = 0 := by
+  have cs : MvPowerSeries.constantCoeff (MvPowerSeries.X 0 + MvPowerSeries.X 1 : MvPowerSeries (Fin 2) C) = 0 := by
     rw [map_add (f := _), c0, c1, add_zero]
   have hL : ∀ x, PowerSeries.constantCoeff (alongCv γ (Y.lg x)) = 0 := fun x =>
     constantCoeff_subst_zero (τ := Unit) hγ (lg_const H x)
-  rw [← ex_along H
-    (a := fun j => cvAt (MvPowerSeries.X 0 + MvPowerSeries.X 1) (γ j))
-    (fun j => cvAt_const cs (hγ j))
-    i]
+  rw [← ex_along H (a := fun j => cvAt (MvPowerSeries.X 0 + MvPowerSeries.X 1) (γ j))
+    (fun j => cvAt_const cs (hγ j)) i]
   unfold RowLaw.addP
   simp only [subst_cvAt c0 hγ, subst_cvAt c1 hγ, subst_cvAt cs hγ]
   refine subst_congr_ord (MvPowerSeries.hasSubst_of_constantCoeff_zero fun x => ?_)
-    (MvPowerSeries.hasSubst_of_constantCoeff_zero fun x => cvAt_const cs (hL x))
-    (fun x => ?_)
-    _
+    (MvPowerSeries.hasSubst_of_constantCoeff_zero fun x => cvAt_const cs (hL x)) (fun x => ?_) _
   · rw [map_add (f := _), cvAt_const c0 (hL x), cvAt_const c1 (hL x), add_zero]
-  · have :=
-      Submodule.sub_mem _
-        (Submodule.add_mem _ (cvAt_lin c0 (hL x) (h x)) (cvAt_lin c1 (hL x) (h x)))
-        (cvAt_lin cs (hL x) (h x))
+  · have := Submodule.sub_mem _ (Submodule.add_mem _ (cvAt_lin c0 (hL x) (h x)) (cvAt_lin c1 (hL x) (h x)))
+      (cvAt_lin cs (hL x) (h x))
     convert this using 1
     rw [smul_add]
     ring
 
-theorem end_entry_int
-    (H : RLaw Y V)
-    {M : Matrix κ κ C} (hM : ∀ i, IntS V (endP Y M (MvPowerSeries.X : κ → MvPowerSeries κ C) i))
-    (i j : κ)
-    : V.Ge 0 (M i j) := by
-  have h :=
-    matrixEnd_two
-      (w := fun _ => 1)
-      H M (b := (MvPowerSeries.X : κ → MvPowerSeries κ C))
-      (fun i => MvPowerSeries.constantCoeff_X i)
-      (fun i => ordGe_X (w := fun _ => 1) i)
-      i (Finsupp.single j 1) (by simp [Finsupp.weight_single])
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sub, sub_eq_zero, map_sum] at h
+theorem end_entry_int (H : RLaw Y V) {M : Matrix κ κ C}
+    (hM : ∀ i, IntS V (endP Y M (MvPowerSeries.X : κ → MvPowerSeries κ C) i)) (i j : κ) : V.Ge 0 (M i j) := by
+  have h := matrixEnd_two (w := fun _ => 1) H M (b := (MvPowerSeries.X : κ → MvPowerSeries κ C))
+    (fun i => MvPowerSeries.constantCoeff_X i) (fun i => ordGe_X (w := fun _ => 1) i) i (Finsupp.single j 1)
+    (by simp [Finsupp.weight_single])
+
+  rw [map_sub, sub_eq_zero, map_sum] at h
   have h2 := hM i (Finsupp.single j 1)
   rw [h] at h2
   simpa [MvPowerSeries.coeff_X, Finsupp.single_left_inj] using h2
 
-theorem sg_sum (Y : RawChart C d I κ) {ι : Type} [Fintype ι] (b : ι → C) (v : ι → κ → C)
-    : Y.sg (∑ c, b c • v c) = ∑ c, b c • Y.sg (v c) := by
-  simp only [sg_eq, Finset.sum_apply, Pi.smul_apply, smul_eq_mul, Finset.sum_smul, smul_neg,
-    Finset.smul_sum, smul_smul, Finset.sum_neg_distrib]
+theorem sg_sum (Y : RawChart C d I κ) {ι : Type} [Fintype ι] (b : ι → C) (v : ι → κ → C) :
+    Y.sg (∑ c, b c • v c) = ∑ c, b c • Y.sg (v c) := by
+  simp only [sg_eq, Finset.sum_apply, Pi.smul_apply, smul_eq_mul, Finset.sum_smul, smul_neg, Finset.smul_sum,
+    smul_smul, Finset.sum_neg_distrib]
   rw [Finset.sum_comm]
 
-theorem coord_of_sat
-    {g : Fin 2} {ww : κ → I g → C}
-    (hw : ∀ c c' : I g,
-      (c = c' → ∑ x, Y.u g c x * ww x c' = 1) ∧ (c ≠ c' → ∑ x, Y.u g c x * ww x c' = 0))
-    (b : I g → C) (c' : I g)
-    : ∑ x, (∑ c, b c * Y.u g c x) * ww x c' = b c' := by
+theorem coord_of_sat {g : Fin 2} {ww : κ → I g → C}
+    (hw : ∀ c c' : I g, (c = c' → ∑ x, Y.u g c x * ww x c' = 1) ∧ (c ≠ c' → ∑ x, Y.u g c x * ww x c' = 0))
+    (b : I g → C) (c' : I g) : ∑ x, (∑ c, b c * Y.u g c x) * ww x c' = b c' := by
   simp only [Finset.sum_mul, mul_assoc]
   rw [Finset.sum_comm]
   simp only [← Finset.mul_sum]
@@ -291,14 +271,10 @@ theorem coord_of_sat
   · intro h
     exact absurd (Finset.mem_univ _) h
 
-theorem sg_all
-    (H : RLaw Y V) (hP : HasProj Y V)
-    {g : Fin 2} {γ : κ → PowerSeries C} (hγ : IsCv V γ)
+theorem sg_all (H : RLaw Y V) (hP : HasProj Y V) {g : Fin 2} {γ : κ → PowerSeries C} (hγ : IsCv V γ)
     {A : I g → PowerSeries C} (hA : ∀ i, alongCv γ (Y.lg i) = ∑ c, Y.u g c i • A c)
-    (h : ∀ q : I (1 - g),
-      V.MM ((V.l : C) * PowerSeries.coeff V.l (alongCv γ (Y.sg (Y.u (1 - g) q)))))
-    (v : κ → C) (hv : ∀ i, V.Ge 0 (v i))
-    : V.MM ((V.l : C) * PowerSeries.coeff V.l (alongCv γ (Y.sg v))) := by
+    (h : ∀ q : I (1 - g), V.MM ((V.l : C) * PowerSeries.coeff V.l (alongCv γ (Y.sg (Y.u (1 - g) q)))))
+    (v : κ → C) (hv : ∀ i, V.Ge 0 (v i)) : V.MM ((V.l : C) * PowerSeries.coeff V.l (alongCv γ (Y.sg v))) := by
   obtain ⟨M, h01, h10, hfix, -, hspan⟩ := hP
   have hE : IsEnd Y V (M g) (M (1 - g)) := by
     fin_cases g
@@ -310,24 +286,18 @@ theorem sg_all
   have hΓ := MvPowerSeries.hasSubst_of_constantCoeff_zero hγ0
   have hS := MvPowerSeries.hasSubst_of_constantCoeff_zero (matrixEnd_const H (M g) hX)
   have hsg := Y.constantCoeff_sg (H.axes 0)
-  have hK :=
-    (isCv_along hγ
-      (f := fun _ : Unit =>
-        MvPowerSeries.subst (endP Y (M g) (MvPowerSeries.X : κ → MvPowerSeries κ C)) (Y.sg v)
-          - Y.sg ((M (1 - g)).mulVec v))
-      (fun q => by
-        rw [map_sub, constantCoeff_subst_zero (matrixEnd_const H (M g) hX) (hsg _), hsg, sub_self])
-      (fun q => defect_int H hE hv)
-      ()).2 V.l
+  have hK := (isCv_along hγ (f := fun _ : Unit =>
+      MvPowerSeries.subst (endP Y (M g) (MvPowerSeries.X : κ → MvPowerSeries κ C)) (Y.sg v) -
+        Y.sg ((M (1 - g)).mulVec v))
+    (fun q => by rw [map_sub, constantCoeff_subst_zero (matrixEnd_const H (M g) hX) (hsg _), hsg, sub_self])
+    (fun q => defect_int H hE hv) ()).2 V.l
   have hfixγ : ∀ i, endP Y (M g) (τ := Unit) γ i = γ i := by
     intro i
     rw [← ex_along H hγ0 i]
     unfold endP
     congr 1
     funext x
-    have hA'
-        : ∀ i, MvPowerSeries.subst γ (Y.lg i) = ∑ c, Y.u g c i • (A c : MvPowerSeries Unit C) :=
-      hA
+    have hA' : ∀ i, MvPowerSeries.subst γ (Y.lg i) = ∑ c, Y.u g c i • (A c : MvPowerSeries Unit C) := hA
     simp only [hA', Finset.smul_sum, smul_smul]
     rw [Finset.sum_comm]
     refine Finset.sum_congr rfl fun c _ => ?_
@@ -344,18 +314,15 @@ theorem sg_all
     simp only [Finset.sum_apply, Pi.smul_apply, smul_eq_mul] at this
     rw [← this]
     exact VF.Ge.sum fun y _ => (end_entry_int H hE.2.1 x y).mul_int (hv y)
-  have e
-      : alongCv γ
-          (MvPowerSeries.subst (endP Y (M g) (MvPowerSeries.X : κ → MvPowerSeries κ C)) (Y.sg v)
-            - Y.sg ((M (1 - g)).mulVec v))
-        = alongCv γ (Y.sg v) - ∑ c, b c • alongCv γ (Y.sg (Y.u (1 - g) c)) := by
+  have e : alongCv γ (MvPowerSeries.subst (endP Y (M g) (MvPowerSeries.X : κ → MvPowerSeries κ C)) (Y.sg v) -
+        Y.sg ((M (1 - g)).mulVec v)) =
+      alongCv γ (Y.sg v) - ∑ c, b c • alongCv γ (Y.sg (Y.u (1 - g) c)) := by
     unfold alongCv
-    rw [MvPowerSeries.subst_sub hΓ, MvPowerSeries.subst_comp_subst_apply hS hΓ, hb, sg_sum,
-      subst_sum_smul hΓ]
+    rw [MvPowerSeries.subst_sub hΓ, MvPowerSeries.subst_comp_subst_apply hS hΓ, hb, sg_sum, subst_sum_smul hΓ]
     simp only [subst_endP H (M g) hγ0, hfixγ]
   beta_reduce at hK
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [e, map_sub, map_sum] at hK
+
+  rw [e, map_sub, map_sum] at hK
   have := mm_add (mm_l_mul hK) (mm_sum' Finset.univ _ fun c _ => mm_mul (hbi c) (h c))
   convert this using 1
   simp only [PowerSeries.coeff_smul, smul_eq_mul, mul_sub, Finset.mul_sum]
@@ -365,11 +332,7 @@ theorem sg_all
 
 end Chart
 
-theorem tangent_mm_of_nonDeg
-    : ∀ (C : Type) [Field C] (V : VF C) (d : ℕ) [NeZero d] (I : Fin 2 → Type) [∀ g, Fintype (I g)]
-        (κ : Type) [Fintype κ] (X : RawChart C d I κ),
-      RLaw X V → HasProj X V → NonDeg X V
-        → ∀ H : ∀ g, X.CartHyp V g, RawChart.RankMaximalCondition H := by
+theorem tangent_mm_of_nonDeg : ∀ (C : Type) [Field C] (V : VF C) (d : ℕ) [NeZero d] (I : Fin 2 → Type) [∀ g, Fintype (I g)] (κ : Type) [Fintype κ] (X : RawChart C d I κ), RLaw X V → HasProj X V → NonDeg X V → ∀ H : ∀ g, X.CartHyp V g, RawChart.RankMaximalCondition H := by
   intro C _ V d _ I _ κ _ Y H hP hN Hc _ g a _ w x hx hc0
   obtain ⟨⟨hT, hx0, -⟩, hx1⟩ := hx
   obtain ⟨γ, lam, hγ, hlam, h1, h2⟩ : x ∈ Y.TySet V g := hT
@@ -381,8 +344,8 @@ theorem tangent_mm_of_nonDeg
     simpa using coeff_tyS_pow hl s 0
   have hlow : ∀ i n, 2 ≤ n → n < V.l ^ 2 → PowerSeries.coeff n (alongCv γ (Y.lg i)) = 0 := by
     intro i n hn hn'
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [h1, map_sum]
+
+    rw [h1, map_sum]
     refine Finset.sum_eq_zero fun c _ => ?_
     rw [PowerSeries.coeff_smul]
     by_cases hs : ∃ s, V.l ^ s = n
@@ -395,13 +358,11 @@ theorem tangent_mm_of_nonDeg
       rw [coeff_tyS_pow hl, this, hx1 c, smul_zero]
     · push Not at hs
       rw [coeff_tyS_of_ne _ _ hs, smul_zero]
-  have hq
-      : ∀ q : I (1 - g),
-        V.MM ((V.l : C) * PowerSeries.coeff V.l (alongCv γ (Y.sg (Y.u (1 - g) q)))) := by
+  have hq : ∀ q : I (1 - g), V.MM ((V.l : C) * PowerSeries.coeff V.l (alongCv γ (Y.sg (Y.u (1 - g) q)))) := by
     intro q
     have e := congrArg (PowerSeries.coeff V.l) (h2 q)
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [tl, map_add (f := _), map_sub, map_sum, Finset.sum_eq_zero, add_zero] at e
+
+    rw [tl, map_add (f := _), map_sub, map_sum, Finset.sum_eq_zero, add_zero] at e
     · have := mm_sub (mm_l_mul ((hlam q).2 V.l)) (hc0 q)
       convert this using 1
       unfold Cart.c0'
@@ -411,10 +372,8 @@ theorem tangent_mm_of_nonDeg
       split_ifs
       · rw [PowerSeries.coeff_smul, tl, hx1 c, smul_zero]
       · exact map_zero _
-  obtain ⟨hbi, hbd⟩ :=
-    GlobalTheory.T.integral_smul_curveCoeffSeriesOfChartH_of_linear_log C V d I κ Y H γ hγ hlow
-  obtain ⟨hci, hcb⟩ :=
-    GlobalTheory.T.formalGroupCocycle_lthPower_coboundary_mod_maximal C V d I κ Y H γ hγ hlow
+  obtain ⟨hbi, hbd⟩ := GlobalTheory.T.integral_smul_curveCoeffSeriesOfChartH_of_linear_log C V d I κ Y H γ hγ hlow
+  obtain ⟨hci, hcb⟩ := GlobalTheory.T.formalGroupCocycle_lthPower_coboundary_mod_maximal C V d I κ Y H γ hγ hlow
   have hcob := cob_root H hci hbi (hbd (sg_all H hP hγ h1 hq)) hcb
   have htan : ∀ i, V.MM (PowerSeries.coeff 1 (γ i)) := by
     by_contra hne
@@ -426,15 +385,11 @@ theorem tangent_mm_of_nonDeg
       nlinarith
   have hco : ∀ i, PowerSeries.coeff 1 (γ i) = ∑ c, w c * Y.u g c i := by
     intro i
-    have :=
-      lg_two (τ := Unit)
-        (w := fun _ => 1)
-        H (b := γ) hγ0
-        (fun i => ordGe_one_of_const (hγ0 i))
-        i (Finsupp.single () 1) (by simp [Finsupp.weight_single])
+    have := lg_two (τ := Unit) (w := fun _ => 1) H (b := γ) hγ0 (fun i => ordGe_one_of_const (hγ0 i)) i
+      (Finsupp.single () 1) (by simp [Finsupp.weight_single])
     have e : PowerSeries.coeff 1 (alongCv γ (Y.lg i) - γ i) = 0 := this
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sub, sub_eq_zero, h1, map_sum] at e
+
+    rw [map_sub, sub_eq_zero, h1, map_sum] at e
     rw [← e]
     refine Finset.sum_congr rfl fun c _ => ?_
     rw [PowerSeries.coeff_smul, t1, hx0, smul_eq_mul, mul_comm]

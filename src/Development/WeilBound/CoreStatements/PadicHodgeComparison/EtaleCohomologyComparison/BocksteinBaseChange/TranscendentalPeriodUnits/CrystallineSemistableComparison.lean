@@ -1,7 +1,48 @@
 module
 
-public import Mathlib
+public import Development.WeilBound.CoreStatements.PadicHodgeComparison.EtaleCohomologyComparison.BocksteinBaseChange.BcrisRegularPeriodRing
+public import GroundTheory.PAdicHodge.BCrisPlusInvariants
+public import GroundTheory.PAdicHodge.BCrisRegular
 public import Development.WeilBound.CoreStatements.PadicHodgeComparison.EtaleCohomologyComparison.BocksteinBaseChange.TranscendentalPeriodUnits.CrBase
+import GroundTheory.PAdicHodge.BCrisNewton
+public import GroundTheory.PAdicHodge.BCrisRegularFinal
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
 
 @[expose] public section
 
@@ -31,7 +72,6 @@ theorem fix_of_σD {x : BdR l} (h : ∀ g : K.fixingSubgroup, σD g.1 x = x) (σ
   rw [e2, MulEquiv.apply_symm_apply] at e
   exact e
 
-set_option maxHeartbeats 1600000 in
 theorem bcr_frac
     [FiniteDimensional ℚ_[l] K]
     (x : BdR l) (hx : x ∈ Bcr l)
@@ -68,7 +108,6 @@ theorem all_of_σD
   rw [e2, MulEquiv.apply_symm_apply] at e
   exact e
 
-set_option maxHeartbeats 1600000 in
 theorem galB_eigen
     (b : ACris.BCris (untilt_epsilon (p := l)))
     (he : ∀ σ : Gal(PadicAlgCl l/K), ∃ z : ℚ_[l], σ • ιB b = qQ l z * ιB b)
@@ -87,7 +126,6 @@ theorem galB_eigen
     ACris.iotaB_injective (untilt_epsilon (p := l)) untilt_frobeniusEquiv_symm_epsilon_ne_one hz'
   ⟩
 
-set_option maxHeartbeats 1600000 in
 theorem bcr_eig
     [FiniteDimensional ℚ_[l] K]
     (x : BdR l)

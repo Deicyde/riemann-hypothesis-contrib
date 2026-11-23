@@ -1,9 +1,41 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.StdLvPr
-public import Formalism.LocalToGlobal.HermitianForms.TiedTwJSym
+public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.LatAtLattice
 public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.ExistsSmulMemOfMemLocW
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
 
 @[expose] public section
 
@@ -58,7 +90,6 @@ def clsOfChart
   stabI_inj c := K.stabI_inj ⟨c, hβ c⟩
   stabI_range c := K.stabI_range ⟨c, hβ c⟩
 
-set_option maxHeartbeats 4000000 in
 def valOfG
     [Subsingleton Ch]
     (eV : (D.mem u).A.vT ≃ PlT D u)
@@ -109,7 +140,6 @@ def valOfG
   dil v a k hk c δ hδ := hD.dil v a k hk β ⟨c, hβ c⟩ δ hδ
   dilT v a k hk c δ hδ g hg := hD.dilT v a k hk β ⟨c, hβ c⟩ δ hδ g hg
 
-set_option maxHeartbeats 4000000 in
 def lvOfG
     (A : AtTTied u)
     (L : LevelCompatibleLattices (D.fm u) (D.mem u).A.T A.res i hi (fun c => clsCrd D u i hi c))
@@ -134,13 +164,11 @@ variable
       (fun c => clsCrd D u i hi c.1))
   (β : Ch) (hβ : ∀ c, chOf c = β)
 
-set_option maxHeartbeats 4000000 in
 theorem fvOfG
     (fMe : ∀ β v, (K β).lev.fM (A.eV v).1 (A.eV v).2 ≃+ (D.mem u).A.Fv v) (h : FvTieG L A.eV K fMe)
     : FvTie (lvOfG A L) (clsOfChart β hβ (K β)) (fMe β) := fun v c z hz =>
   h v β ⟨c, hβ c⟩ z hz
 
-set_option maxHeartbeats 4000000 in
 theorem upOfG
     (eY : (D.mem u).C.Y i ≃ Fr D i hi) (W : ValTied u A.eV i hi (clsOfChart β hβ (K β)))
     (hY : W.eY = eY)
@@ -152,7 +180,6 @@ theorem upOfG
   rw [hY] at hs
   exact h6 g s s' hs
 
-set_option maxHeartbeats 4000000 in
 theorem dnOfG
     (eY : (D.mem u).C.Y i ≃ Fr D i hi) (W : ValTied u A.eV i hi (clsOfChart β hβ (K β)))
     (hY : W.eY = eY)
@@ -170,7 +197,6 @@ section Gen2
 
 variable {D : D7} {u : D.what₂.Word} {i : ℕ} {hi : i ≤ D.R.m}
 
-set_option maxHeartbeats 4000000 in
 theorem normOfG
     {eV : (D.mem u).A.vT ≃ PlT D u} {K : ClsTied u i hi}
     (eY : (D.mem u).C.Y i ≃ Fr D i hi) (W : ValTied u eV i hi K) (hY : W.eY = eY)
@@ -180,7 +206,6 @@ theorem normOfG
   rw [hY] at hPc
   exact h s x Pc hPc o ho
 
-set_option maxHeartbeats 4000000 in
 theorem bwOfG
     (A : AtTTied u)
     {K : ClsTied u i hi}
@@ -193,7 +218,6 @@ theorem bwOfG
 
 end Gen2
 
-set_option maxHeartbeats 4000000 in
 theorem readsK_one
     {B : Base} {X : PreX B.toPre} (I : TC B X) (l : I.Laws) (Z : TC.Later B (I.cols l))
     {u : B.Word} {a : I.ι} {i : ℕ} {hi : i ≤ B.R.m} {bad : Set (HeightOneSpectrum (𝓞 B.host.F))}

@@ -1,9 +1,52 @@
 module
 
-public import Formalism.LocalToGlobal.CharacterGerms.RowTieFB
-public import Formalism.LocalToGlobal.CharacterGerms.WipDworkInvG
+public import Formalism.LocalToGlobal.CharacterGerms.AltInv
+public import Formalism.LocalToGlobal.CharacterGerms.IntSubst
+public import Formalism.LocalToGlobal.CharacterGerms.Interface
 public import Formalism.FormalGroupWitt.FormalGroupWittProofs.SolveV
-public import Formalism.FormalGroupWitt.FormalGroupWittProofs.EqSingleOfDegreeEqOne
+public import Formalism.LocalToGlobal.CharacterGerms.WipDworkInvG
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -19,33 +62,28 @@ variable {C : Type} [Field C] (V : VF C)
 
 def AbstractGermZeroCondition : Prop :=
   ∀ (I : Fin 2 → Type) [∀ g, Fintype (I g)] (t t₂ φ φ₂ : ∀ g, I g → MvPowerSeries (I g) C),
-    (∀ g c, MvPowerSeries.constantCoeff (t g c) = 0)
-      → (∀ g c, MvPowerSeries.constantCoeff (t₂ g c) = 0)
-      → (∀ g k, MvPowerSeries.constantCoeff (φ g k) = 0) → (∀ g k, IntS V (φ g k))
-      → (∀ g,
-        V.v (Matrix.of fun k c : I g => MvPowerSeries.coeff (Finsupp.single c 1) (φ g k)).det = 0)
-      → (∀ g k, MvPowerSeries.constantCoeff (φ₂ g k) = 0) → (∀ g k, IntS V (φ₂ g k))
-      → (∀ g,
-        V.v (Matrix.of fun k c : I g => MvPowerSeries.coeff (Finsupp.single c 1) (φ₂ g k)).det = 0)
-      → (∀ g k, MvPowerSeries.subst (t g) (φ g k) = MvPowerSeries.subst (t₂ g) (φ₂ g k))
-      → IntGerm V t = IntGerm V t₂
+    (∀ g c, MvPowerSeries.constantCoeff (t g c) = 0) → (∀ g c, MvPowerSeries.constantCoeff (t₂ g c) = 0) →
+    (∀ g k, MvPowerSeries.constantCoeff (φ g k) = 0) → (∀ g k, IntS V (φ g k)) →
+    (∀ g, V.v (Matrix.of fun k c : I g => MvPowerSeries.coeff (Finsupp.single c 1) (φ g k)).det = 0) →
+    (∀ g k, MvPowerSeries.constantCoeff (φ₂ g k) = 0) → (∀ g k, IntS V (φ₂ g k)) →
+    (∀ g, V.v (Matrix.of fun k c : I g => MvPowerSeries.coeff (Finsupp.single c 1) (φ₂ g k)).det = 0) →
+    (∀ g k, MvPowerSeries.subst (t g) (φ g k) = MvPowerSeries.subst (t₂ g) (φ₂ g k)) →
+    IntGerm V t = IntGerm V t₂
 
 theorem intS_iff_alt {σ : Type} (F : MvPowerSeries σ C) : IntS V F ↔ AltInv.IntS V.v F := by
   simp only [IntS, AltInv.IntS, AltInv.IntC]
   exact Iff.rfl
 
-theorem one_group
-    {σ : Type} [Fintype σ]
-    (t t₂ φ φ₂ : σ → MvPowerSeries σ C) (ht0₂ : ∀ c, MvPowerSeries.constantCoeff (t₂ c) = 0)
-    (ht0 : ∀ c, MvPowerSeries.constantCoeff (t c) = 0)
+theorem one_group {σ : Type} [Fintype σ] (t t₂ φ φ₂ : σ → MvPowerSeries σ C)
+    (ht0₂ : ∀ c, MvPowerSeries.constantCoeff (t₂ c) = 0) (ht0 : ∀ c, MvPowerSeries.constantCoeff (t c) = 0)
     (hφ0 : ∀ k, MvPowerSeries.constantCoeff (φ k) = 0) (hφ : ∀ k, IntS V (φ k))
     (hL : V.v (Matrix.of fun k c : σ => MvPowerSeries.coeff (Finsupp.single c 1) (φ k)).det = 0)
     (hφ0₂ : ∀ k, MvPowerSeries.constantCoeff (φ₂ k) = 0) (hφ₂ : ∀ k, IntS V (φ₂ k))
-    (heq : ∀ k, MvPowerSeries.subst t (φ k) = MvPowerSeries.subst t₂ (φ₂ k))
-    : ∃ h : σ → MvPowerSeries σ C,
-      (∀ c, MvPowerSeries.constantCoeff (h c) = 0) ∧ (∀ c, IntS V (h c))
-        ∧ ∀ c, t c = MvPowerSeries.subst t₂ (h c) := by
+    (heq : ∀ k, MvPowerSeries.subst t (φ k) = MvPowerSeries.subst t₂ (φ₂ k)) :
+    ∃ h : σ → MvPowerSeries σ C, (∀ c, MvPowerSeries.constantCoeff (h c) = 0) ∧ (∀ c, IntS V (h c)) ∧
+      ∀ c, t c = MvPowerSeries.subst t₂ (h c) := by
   classical
+
   set L : Matrix σ σ C := Matrix.of fun k c : σ => MvPowerSeries.coeff (Finsupp.single c 1) (φ k)
     with hLdef
   have hdet : IsUnit L.det := by
@@ -56,9 +94,8 @@ theorem one_group
   have hLN : L * N = 1 := Matrix.mul_nonsing_inv L hdet
   have hNL : N * L = 1 := Matrix.nonsing_inv_mul L hdet
 
-  have comb
-      : ∀ {M : Type} [AddCommGroup M] [Module C M] (A B : Matrix σ σ C),
-        A * B = 1 → ∀ (X : σ → M) (i : σ), ∑ j, A i j • ∑ k, B j k • X k = X i := by
+  have comb : ∀ {M : Type} [AddCommGroup M] [Module C M] (A B : Matrix σ σ C), A * B = 1 →
+      ∀ (X : σ → M) (i : σ), ∑ j, A i j • ∑ k, B j k • X k = X i := by
     intro M _ _ A B hAB X i
     simp only [Finset.smul_sum, smul_smul]
     rw [Finset.sum_comm]
@@ -67,16 +104,13 @@ theorem one_group
       rw [← hAB, Matrix.mul_apply]
     simp only [hrow, Matrix.one_apply, ite_smul, one_smul, zero_smul, Finset.sum_ite_eq,
       Finset.mem_univ, if_true]
-  have hcoeff
-      : ∀ (ψ : σ → MvPowerSeries σ C) j μ,
-        MvPowerSeries.coeff μ (∑ k, N j k • ψ k) = ∑ k, N j k * MvPowerSeries.coeff μ (ψ k) := by
+  have hcoeff : ∀ (ψ : σ → MvPowerSeries σ C) j μ,
+      MvPowerSeries.coeff μ (∑ k, N j k • ψ k) = ∑ k, N j k * MvPowerSeries.coeff μ (ψ k) := by
     intro ψ j μ
-    set_option synthInstance.maxHeartbeats 100000 in
+
     simp only [map_sum, MvPowerSeries.coeff_smul]
-  have hcc
-      : ∀ (ψ : σ → MvPowerSeries σ C),
-        (∀ k, MvPowerSeries.constantCoeff (ψ k) = 0)
-          → ∀ j, MvPowerSeries.constantCoeff (∑ k, N j k • ψ k) = 0 := by
+  have hcc : ∀ (ψ : σ → MvPowerSeries σ C), (∀ k, MvPowerSeries.constantCoeff (ψ k) = 0) →
+      ∀ j, MvPowerSeries.constantCoeff (∑ k, N j k • ψ k) = 0 := by
     intro ψ hψ j
     rw [← MvPowerSeries.coeff_zero_eq_constantCoeff_apply, hcoeff]
     simp [MvPowerSeries.coeff_zero_eq_constantCoeff_apply, hψ]
@@ -93,21 +127,14 @@ theorem one_group
     · subst hij
       simp
     · rw [if_neg (Ne.symm hij), if_neg hij]
-  obtain ⟨h, hh0, hhs⟩ :=
-    Formalism.FG.solve_exists_vector C σ σ
-      (fun j => ∑ k, N j k • φ k)
-      (fun j => ∑ k, N j k • φ₂ k)
-      hid (hcc φ₂ hφ0₂)
+  obtain ⟨h, hh0, hhs⟩ := Formalism.FG.solve_exists_vector C σ σ (fun j => ∑ k, N j k • φ k)
+    (fun j => ∑ k, N j k • φ₂ k) hid (hcc φ₂ hφ0₂)
   have hsub_h : MvPowerSeries.HasSubst h := MvPowerSeries.hasSubst_of_constantCoeff_zero hh0
-  have hlin
-      : ∀ (a : σ → MvPowerSeries σ C),
-        MvPowerSeries.HasSubst a
-          → ∀ j,
-            MvPowerSeries.subst a (∑ k, N j k • φ k)
-              = ∑ k, N j k • MvPowerSeries.subst a (φ k) := by
+  have hlin : ∀ (a : σ → MvPowerSeries σ C), MvPowerSeries.HasSubst a → ∀ j,
+      MvPowerSeries.subst a (∑ k, N j k • φ k) = ∑ k, N j k • MvPowerSeries.subst a (φ k) := by
     intro a ha j
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← MvPowerSeries.coe_substAlgHom ha, map_sum, MvPowerSeries.coe_substAlgHom ha]
+
+    rw [← MvPowerSeries.coe_substAlgHom ha, map_sum, MvPowerSeries.coe_substAlgHom ha]
     exact Finset.sum_congr rfl fun k _ => MvPowerSeries.subst_smul ha _ _
 
   have hφh : ∀ k, MvPowerSeries.subst h (φ k) = φ₂ k := by
@@ -121,26 +148,20 @@ theorem one_group
     simp only [h1] at e1
     exact e1.symm.trans e2
   have hhI : ∀ c, IntS V (h c) := by
-    have hint :=
-      AltInv.intS_invG φ h φ₂ hφ0
-        (fun k => (intS_iff_alt V _).mp (hφ k))
-        hL hh0
-        (fun k => (intS_iff_alt V _).mp (hφ₂ k))
-        hφh
+    have hint := AltInv.intS_invG φ h φ₂ hφ0 (fun k => (intS_iff_alt V _).mp (hφ k)) hL hh0
+      (fun k => (intS_iff_alt V _).mp (hφ₂ k)) hφh
     exact fun c => (intS_iff_alt V _).mpr (hint c)
 
   have hsub_t : MvPowerSeries.HasSubst t := MvPowerSeries.hasSubst_of_constantCoeff_zero ht0
   have hsub_t₂ : MvPowerSeries.HasSubst t₂ := MvPowerSeries.hasSubst_of_constantCoeff_zero ht0₂
   set t' : σ → MvPowerSeries σ C := fun c => MvPowerSeries.subst t₂ (h c) with ht'
-  have hL1t : ∀ i, Formalism.FG.SolveVAux.Low 1 (t i) := fun i =>
-    (Formalism.FG.SolveVAux.low_one_iff _).mpr (ht0 i)
+  have hL1t : ∀ i, Formalism.FG.SolveVAux.Low 1 (t i) :=
+    fun i => (Formalism.FG.SolveVAux.low_one_iff _).mpr (ht0 i)
   have hL1t' : ∀ i, Formalism.FG.SolveVAux.Low 1 (t' i) := fun i =>
-    Formalism.FG.SolveVAux.low_subst
-      (fun j => (Formalism.FG.SolveVAux.low_one_iff _).mpr (ht0₂ j))
+    Formalism.FG.SolveVAux.low_subst (fun j => (Formalism.FG.SolveVAux.low_one_iff _).mpr (ht0₂ j))
       ((Formalism.FG.SolveVAux.low_one_iff _).mpr (hh0 i))
   have hsub_t' : MvPowerSeries.HasSubst t' :=
-    MvPowerSeries.hasSubst_of_constantCoeff_zero fun i =>
-      (Formalism.FG.SolveVAux.low_one_iff _).mp (hL1t' i)
+    MvPowerSeries.hasSubst_of_constantCoeff_zero fun i => (Formalism.FG.SolveVAux.low_one_iff _).mp (hL1t' i)
   have hφt : ∀ k, MvPowerSeries.subst t (φ k) = MvPowerSeries.subst t' (φ k) := by
     intro k
     rw [heq k, ← hφh k]
@@ -155,10 +176,8 @@ theorem one_group
       subst hd00
       simp [MvPowerSeries.coeff_zero_eq_constantCoeff_apply, hφ0]
     · obtain ⟨i, rfl⟩ := Formalism.FG.SolveVAux.degree_eq_one d hd1
-      rw [show MvPowerSeries.coeff (Finsupp.single i 1) (∑ k, N j k • φ k)
-            = if i = j then 1 else 0 from
-          hid.2 j i,
-        MvPowerSeries.coeff_X]
+      rw [show MvPowerSeries.coeff (Finsupp.single i 1) (∑ k, N j k • φ k) =
+        if i = j then 1 else 0 from hid.2 j i, MvPowerSeries.coeff_X]
       by_cases hij : i = j
       · subst hij
         simp
@@ -172,30 +191,25 @@ theorem one_group
     | zero => exact fun i => Formalism.FG.SolveVAux.low_zero _
     | succ M ih =>
       intro i
-      have hsplit
-          : ∀ a : σ → MvPowerSeries σ C,
-            MvPowerSeries.HasSubst a
-              → MvPowerSeries.subst a (∑ k, N i k • φ k)
-                = a i + MvPowerSeries.subst a ((∑ k, N i k • φ k) - MvPowerSeries.X i) := by
+      have hsplit : ∀ a : σ → MvPowerSeries σ C, MvPowerSeries.HasSubst a →
+          MvPowerSeries.subst a (∑ k, N i k • φ k) =
+            a i + MvPowerSeries.subst a ((∑ k, N i k • φ k) - MvPowerSeries.X i) := by
         intro a ha
         rw [MvPowerSeries.subst_sub ha, MvPowerSeries.subst_X ha]
         abel
-      have hfeq
-          : MvPowerSeries.subst t (∑ k, N i k • φ k)
-            = MvPowerSeries.subst t' (∑ k, N i k • φ k) := by
+      have hfeq : MvPowerSeries.subst t (∑ k, N i k • φ k) =
+          MvPowerSeries.subst t' (∑ k, N i k • φ k) := by
         rw [hlin t hsub_t, hlin t' hsub_t']
         simp only [hφt]
       have h1 := hsplit t hsub_t
       have h2 := hsplit t' hsub_t'
       rw [hfeq] at h1
-      have hdiff
-          : t i - t' i
-            = -(MvPowerSeries.subst t ((∑ k, N i k • φ k) - MvPowerSeries.X i)
-              - MvPowerSeries.subst t' ((∑ k, N i k • φ k) - MvPowerSeries.X i)) := by
+      have hdiff : t i - t' i =
+          -(MvPowerSeries.subst t ((∑ k, N i k • φ k) - MvPowerSeries.X i) -
+            MvPowerSeries.subst t' ((∑ k, N i k • φ k) - MvPowerSeries.X i)) := by
         linear_combination h2 - h1
       rw [hdiff]
-      exact Formalism.FG.SolveVAux.low_neg (Formalism.FG.SolveVAux.low_subst_sub hL1t hL1t' ih
-        (hg2 i))
+      exact Formalism.FG.SolveVAux.low_neg (Formalism.FG.SolveVAux.low_subst_sub hL1t hL1t' ih (hg2 i))
   have htt : t = t' := by
     funext i
     ext d
@@ -204,11 +218,9 @@ theorem one_group
     exact sub_eq_zero.mp hd
   exact ⟨h, hh0, hhI, fun c => congrFun htt c⟩
 
-private theorem cc_subst_lemma
-    {σ τ A : Type} [Finite σ] [CommRing A]
-    (a : σ → MvPowerSeries τ A) (ha : ∀ s, MvPowerSeries.constantCoeff (a s) = 0)
-    (f : MvPowerSeries σ A)
-    : MvPowerSeries.constantCoeff (MvPowerSeries.subst a f) = MvPowerSeries.constantCoeff f := by
+private theorem cc_subst_lemma {σ τ A : Type} [Finite σ] [CommRing A] (a : σ → MvPowerSeries τ A)
+    (ha : ∀ s, MvPowerSeries.constantCoeff (a s) = 0) (f : MvPowerSeries σ A) :
+    MvPowerSeries.constantCoeff (MvPowerSeries.subst a f) = MvPowerSeries.constantCoeff f := by
   rw [MvPowerSeries.constantCoeff_subst (MvPowerSeries.hasSubst_of_constantCoeff_zero ha)]
   rw [finsum_eq_single _ 0]
   · simp
@@ -221,14 +233,11 @@ private theorem cc_subst_lemma
     simp only [map_pow, ha, Finsupp.prod]
     rw [Finset.prod_eq_zero (Finsupp.mem_support_iff.mpr hs) (zero_pow hs), smul_zero]
 
-theorem upG_subst
-    {I : Fin 2 → Type} [∀ g, Fintype (I g)]
-    (t : ∀ g, I g → MvPowerSeries (I g) C) (ht0 : ∀ g c, MvPowerSeries.constantCoeff (t g c) = 0)
-    (g : Fin 2) (γ : MvPowerSeries (I g) C)
-    : MvPowerSeries.subst (fun w : WV I => upG w.1 (t w.1 w.2)) (upG g γ)
-      = upG g (MvPowerSeries.subst (t g) γ) := by
-  have hX : MvPowerSeries.HasSubst (fun x : I g =>
-      (MvPowerSeries.X (⟨g, x⟩ : WV I) : MvPowerSeries (WV I) C)) :=
+theorem upG_subst {I : Fin 2 → Type} [∀ g, Fintype (I g)] (t : ∀ g, I g → MvPowerSeries (I g) C)
+    (ht0 : ∀ g c, MvPowerSeries.constantCoeff (t g c) = 0) (g : Fin 2) (γ : MvPowerSeries (I g) C) :
+    MvPowerSeries.subst (fun w : WV I => upG w.1 (t w.1 w.2)) (upG g γ) = upG g (MvPowerSeries.subst (t g) γ) := by
+  have hX : MvPowerSeries.HasSubst
+      (fun x : I g => (MvPowerSeries.X (⟨g, x⟩ : WV I) : MvPowerSeries (WV I) C)) :=
     MvPowerSeries.hasSubst_of_constantCoeff_zero (fun x => by simp)
   have hT : MvPowerSeries.HasSubst (fun w : WV I => upG w.1 (t w.1 w.2)) :=
     MvPowerSeries.hasSubst_of_constantCoeff_zero (fun w => by
@@ -236,36 +245,24 @@ theorem upG_subst
       rw [cc_subst_lemma _ (fun x => by simp)]
       exact ht0 w.1 w.2)
   have ht : MvPowerSeries.HasSubst (t g) := MvPowerSeries.hasSubst_of_constantCoeff_zero (ht0 g)
-  have e1
-      : upG g γ
-        = MvPowerSeries.subst
-          (fun x : I g => (MvPowerSeries.X (⟨g, x⟩ : WV I) : MvPowerSeries (WV I) C))
-          γ :=
-    rfl
-  have e2
-      : upG g (MvPowerSeries.subst (t g) γ)
-        = MvPowerSeries.subst
-          (fun x : I g => (MvPowerSeries.X (⟨g, x⟩ : WV I) : MvPowerSeries (WV I) C))
-          (MvPowerSeries.subst (t g) γ) :=
-    rfl
-  rw [e1, e2, MvPowerSeries.subst_comp_subst_apply hX hT,
-    MvPowerSeries.subst_comp_subst_apply ht hX]
+  have e1 : upG g γ = MvPowerSeries.subst
+      (fun x : I g => (MvPowerSeries.X (⟨g, x⟩ : WV I) : MvPowerSeries (WV I) C)) γ := rfl
+  have e2 : upG g (MvPowerSeries.subst (t g) γ) = MvPowerSeries.subst
+      (fun x : I g => (MvPowerSeries.X (⟨g, x⟩ : WV I) : MvPowerSeries (WV I) C)) (MvPowerSeries.subst (t g) γ) := rfl
+  rw [e1, e2, MvPowerSeries.subst_comp_subst_apply hX hT, MvPowerSeries.subst_comp_subst_apply ht hX]
   congr 1
   funext x
   rw [MvPowerSeries.subst_X hT]
   try rfl
 
-theorem germ_sub
-    {I : Fin 2 → Type} [∀ g, Fintype (I g)]
-    (t t₂ h : ∀ g, I g → MvPowerSeries (I g) C)
+theorem germ_sub {I : Fin 2 → Type} [∀ g, Fintype (I g)] (t t₂ h : ∀ g, I g → MvPowerSeries (I g) C)
     (ht0₂ : ∀ g c, MvPowerSeries.constantCoeff (t₂ g c) = 0)
     (hh0 : ∀ g c, MvPowerSeries.constantCoeff (h g c) = 0) (hhI : ∀ g c, IntS V (h g c))
-    (hth : ∀ g c, t g c = MvPowerSeries.subst (t₂ g) (h g c))
-    : IntGerm V t ⊆ IntGerm V t₂ := by
+    (hth : ∀ g c, t g c = MvPowerSeries.subst (t₂ g) (h g c)) :
+    IntGerm V t ⊆ IntGerm V t₂ := by
   rintro F ⟨γ, hγ, rfl⟩
-  have hX
-      : ∀ (g : Fin 2) (x : I g),
-        AltInv.IntS V.v (MvPowerSeries.X (⟨g, x⟩ : WV I) : MvPowerSeries (WV I) C) := fun g x => by
+  have hX : ∀ (g : Fin 2) (x : I g),
+      AltInv.IntS V.v (MvPowerSeries.X (⟨g, x⟩ : WV I) : MvPowerSeries (WV I) C) := fun g x => by
     intro μ
     rw [MvPowerSeries.coeff_X]
     split_ifs
@@ -277,9 +274,7 @@ theorem germ_sub
     exact hh0 w.1 w.2
   have hHI : ∀ w : WV I, IntS V (upG w.1 (h w.1 w.2)) := fun w => by
     rw [intS_iff_alt]
-    exact AltInv.intS_subst (v := V.v)
-      (fun x => by simp)
-      (fun x => hX w.1 x)
+    exact AltInv.intS_subst (v := V.v) (fun x => by simp) (fun x => hX w.1 x)
       ((intS_iff_alt V _).mp (hhI w.1 w.2))
   have hH : MvPowerSeries.HasSubst (fun w : WV I => upG w.1 (h w.1 w.2)) :=
     MvPowerSeries.hasSubst_of_constantCoeff_zero hH0
@@ -289,9 +284,7 @@ theorem germ_sub
       rw [cc_subst_lemma _ (fun x => by simp)]
       exact ht0₂ w.1 w.2)
   refine ⟨MvPowerSeries.subst (fun w : WV I => upG w.1 (h w.1 w.2)) γ, ?_, ?_⟩
-  · exact AltInv.intS_subst (v := V.v) hH0
-      (fun w => (intS_iff_alt V _).mp (hHI w))
-      ((intS_iff_alt V γ).mp hγ)
+  · exact AltInv.intS_subst (v := V.v) hH0 (fun w => (intS_iff_alt V _).mp (hHI w)) ((intS_iff_alt V γ).mp hγ)
   · rw [MvPowerSeries.subst_comp_subst_apply hH hT₂]
     congr 1
     funext w
@@ -303,8 +296,7 @@ theorem abstract_germ_zero : AbstractGermZeroCondition V := by
     (hL g) (hφ0₂ g) (hφ₂ g) (heq g)
   choose h' hh0' hhI' hth' using fun g => one_group V (t₂ g) (t g) (φ₂ g) (φ g) (ht0 g) (ht0₂ g) (hφ0₂ g)
     (hφ₂ g) (hL₂ g) (hφ0 g) (hφ g) (fun k => (heq g k).symm)
-  exact Set.Subset.antisymm (germ_sub V t t₂ h ht0₂ hh0 hhI hth)
-    (germ_sub V t₂ t h' ht0 hh0' hhI' hth')
+  exact Set.Subset.antisymm (germ_sub V t t₂ h ht0₂ hh0 hhI hth) (germ_sub V t₂ t h' ht0 hh0' hhI' hth')
 
 end AbstractGermZero
 end Formalism.L2.FormalSeriesBounds

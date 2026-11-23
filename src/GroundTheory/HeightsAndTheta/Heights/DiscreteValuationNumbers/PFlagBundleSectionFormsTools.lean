@@ -1,7 +1,52 @@
 module
 
-public import Mathlib
-public import GroundTheory.HeightsAndTheta.Heights.DiscreteValuationNumbers.StatementsFlagBundleForms
+public import GroundTheory.HeightsAndTheta.Heights.DiscreteValuationNumbers.BundleObjects
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+public import Mathlib.LinearAlgebra.Dimension.OrzechProperty
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.IsSemipositiveOn
 
 @[expose] public section
 
@@ -17,60 +62,57 @@ set_option linter.unusedSectionVars false
 
 namespace FlagBundleSectionForms
 
-variable
-  {F : Type} [Field F]
-  {Ω : Type} [Field Ω] [Algebra F Ω]
-  {K : Type} [Fintype K] [DecidableEq K]
-  {ι : K → Type} [∀ k, Fintype (ι k)]
+variable {F : Type} [Field F] {Ω : Type} [Field Ω] [Algebra F Ω]
+  {K : Type} [Fintype K] [DecidableEq K] {ι : K → Type} [∀ k, Fintype (ι k)]
 
-def chartPow (y : (Σ k, ι k) → Ω) (c : ∀ k, ι k) (d : K → ℤ) : Ω := ∏ k, y ⟨k, c k⟩ ^ d k
+def chartPow (y : (Σ k, ι k) → Ω) (c : ∀ k, ι k) (d : K → ℤ) : Ω :=
+  ∏ k, y ⟨k, c k⟩ ^ d k
 
-theorem chartPow_add {y : (Σ k, ι k) → Ω} {c : ∀ k, ι k} (hY : ∀ k, y ⟨k, c k⟩ ≠ 0) (d d' : K → ℤ)
-    : chartPow y c (d + d') = chartPow y c d * chartPow y c d' := by
+theorem chartPow_add {y : (Σ k, ι k) → Ω} {c : ∀ k, ι k} (hY : ∀ k, y ⟨k, c k⟩ ≠ 0) (d d' : K → ℤ) :
+    chartPow y c (d + d') = chartPow y c d * chartPow y c d' := by
   simp [chartPow, zpow_add₀ (hY _), Finset.prod_mul_distrib]
 
-theorem chartPow_ne_zero {y : (Σ k, ι k) → Ω} {c : ∀ k, ι k} (hY : ∀ k, y ⟨k, c k⟩ ≠ 0) (d : K → ℤ)
-    : chartPow y c d ≠ 0 :=
+omit [∀ k, Fintype (ι k)] in
+private theorem chartPow_ne_zero_of_coordinates {y : (Σ k, ι k) → Ω} {c : ∀ k, ι k} (hY : ∀ k, y ⟨k, c k⟩ ≠ 0) (d : K → ℤ) :
+    chartPow y c d ≠ 0 :=
   Finset.prod_ne_zero_iff.2 fun k _ => zpow_ne_zero _ (hY k)
 
-theorem chartPow_natCast (y : (Σ k, ι k) → Ω) (c : ∀ k, ι k) (α : K → ℕ)
-    : chartPow y c (fun k => (α k : ℤ)) = ∏ k, y ⟨k, c k⟩ ^ α k := by
+theorem chartPow_ne_zero {y : (Σ k, ι k) → Ω} {c : ∀ k, ι k} (hY : ∀ k, y ⟨k, c k⟩ ≠ 0) (d : K → ℤ) :
+    chartPow y c d ≠ 0 := by
+  apply chartPow_ne_zero_of_coordinates <;> assumption
+
+theorem chartPow_natCast (y : (Σ k, ι k) → Ω) (c : ∀ k, ι k) (α : K → ℕ) :
+    chartPow y c (fun k => (α k : ℤ)) = ∏ k, y ⟨k, c k⟩ ^ α k := by
   simp [chartPow]
 
-theorem segreVec_pow (y : (Σ k, ι k) → Ω) (c : ∀ k, ι k) (n : ℕ)
-    : segreVec y c ^ n = chartPow y c (fun _ => (n : ℤ)) := by
+theorem segreVec_pow (y : (Σ k, ι k) → Ω) (c : ∀ k, ι k) (n : ℕ) :
+    segreVec y c ^ n = chartPow y c (fun _ => (n : ℤ)) := by
   simp [segreVec, chartPow, Finset.prod_pow]
 
 section Dual
 
 variable {N : ℕ} {E : Type} [AddCommGroup E] [Module Ω E]
 
-theorem exists_flag_dual
-    (y : (Σ k, ι k) → Ω) (B : ChartBundle F (segreVec y) N E)
+omit [∀ k, Fintype (ι k)] in
+theorem exists_flag_dual_of_frame (y : (Σ k, ι k) → Ω) (B : ChartBundle F (segreVec y) N E)
     (w : Module.Basis (Fin N) Ω E) (b : Fin N → K → ℤ) (hfl : IsFlagFrame y B w b)
-    (c : ∀ k, ι k) (hc : segreVec y c ≠ 0)
-    (i : Fin N)
-    : ∃ ψ : Module.Dual Ω E,
-      (∀ v ∈ B.lat c, ψ v ∈ chartRing F (segreVec y) c) ∧ (∀ j, j < i → ψ (w j) = 0)
-        ∧ ψ (w i) = (chartPow y c (b i))⁻¹ := by
+    (c : ∀ k, ι k) (hc : segreVec y c ≠ 0) (i : Fin N) :
+    ∃ ψ : Module.Dual Ω E, (∀ v ∈ B.lat c, ψ v ∈ chartRing F (segreVec y) c) ∧
+      (∀ j, j < i → ψ (w j) = 0) ∧ ψ (w i) = (chartPow y c (b i))⁻¹ := by
   have hY : ∀ k, y ⟨k, c k⟩ ≠ 0 := fun k => (Finset.prod_ne_zero_iff.1 hc) k (Finset.mem_univ _)
-  have hp : ∀ j, chartPow y c (b j) ≠ 0 := fun j => chartPow_ne_zero hY _
-  have hgr
-      : ∀ (j : Fin N) (s : Ω),
-        (∃ v ∈ B.lat c, (∀ m, j < m → w.repr v m = 0) ∧ w.repr v j = s)
-          ↔ ∃ r ∈ chartRing F (segreVec y) c, s = r * chartPow y c (b j) := fun j s => by
+  have hp : ∀ j, chartPow y c (b j) ≠ 0 := fun j => chartPow_ne_zero_of_coordinates hY _
+  have hgr : ∀ (j : Fin N) (s : Ω), (∃ v ∈ B.lat c, (∀ m, j < m → w.repr v m = 0) ∧ w.repr v j = s) ↔
+      ∃ r ∈ chartRing F (segreVec y) c, s = r * chartPow y c (b j) := fun j s => by
     have h := hfl.graded c hc j
     rw [Set.ext_iff] at h
     exact h s
-  have he
-      : ∀ j : Fin N, ∃ v ∈ B.lat c,
-        (∀ m, j < m → w.repr v m = 0) ∧ w.repr v j = chartPow y c (b j) := fun j =>
+  have he : ∀ j : Fin N, ∃ v ∈ B.lat c, (∀ m, j < m → w.repr v m = 0) ∧
+      w.repr v j = chartPow y c (b j) := fun j =>
     (hgr j _).2 ⟨1, one_mem _, (one_mul _).symm⟩
   choose e heL heT heD using he
 
-  have hx
-      : ∀ j : Fin N,
-        e j - chartPow y c (b j) • w j ∈ Submodule.span Ω (w '' {m | (m : ℕ) < j}) := by
+  have hx : ∀ j : Fin N, e j - chartPow y c (b j) • w j ∈
+      Submodule.span Ω (w '' {m | (m : ℕ) < j}) := by
     intro j
     rw [w.mem_span_image]
     intro m hm
@@ -85,36 +127,31 @@ theorem exists_flag_dual
     · have : m = j := Fin.ext h.symm
       subst this
       simp [heD]
-  have hspan
-      : ∀ m ≤ N,
-        Submodule.span Ω (e '' {j | (j : ℕ) < m}) = Submodule.span Ω (w '' {j | (j : ℕ) < m}) := by
+  have hspan : ∀ m ≤ N, Submodule.span Ω (e '' {j | (j : ℕ) < m}) =
+      Submodule.span Ω (w '' {j | (j : ℕ) < m}) := by
     intro m
     induction m with
     | zero => intro _; simp
     | succ m ih =>
       intro hm
-      have hS
-          : {j : Fin N | (j : ℕ) < m + 1} = insert (⟨m, hm⟩ : Fin N) {j : Fin N | (j : ℕ) < m} := by
+      have hS : {j : Fin N | (j : ℕ) < m + 1} = insert (⟨m, hm⟩ : Fin N) {j : Fin N | (j : ℕ) < m} := by
         ext j
         simp only [Set.mem_setOf_eq, Set.mem_insert_iff, Fin.ext_iff]
         omega
-      rw [hS, Set.image_insert_eq, Set.image_insert_eq, Submodule.span_insert,
-        Submodule.span_insert, ih (by omega)]
+      rw [hS, Set.image_insert_eq, Set.image_insert_eq, Submodule.span_insert, Submodule.span_insert,
+        ih (by omega)]
       have hxm := hx ⟨m, hm⟩
       apply le_antisymm
       · refine sup_le ?_ le_sup_right
         rw [Submodule.span_singleton_le_iff_mem]
-        have :=
-          Submodule.add_mem_sup
-            (Submodule.smul_mem _ (chartPow y c (b ⟨m, hm⟩))
-              (Submodule.mem_span_singleton_self (w ⟨m, hm⟩)))
-            hxm
+        have := Submodule.add_mem_sup
+          (Submodule.smul_mem _ (chartPow y c (b ⟨m, hm⟩)) (Submodule.mem_span_singleton_self (w ⟨m, hm⟩)))
+          hxm
         simpa using this
       · refine sup_le ?_ le_sup_right
         rw [Submodule.span_singleton_le_iff_mem]
-        have :=
-          Submodule.smul_mem _ (chartPow y c (b ⟨m, hm⟩))⁻¹
-            (Submodule.sub_mem_sup (Submodule.mem_span_singleton_self (e ⟨m, hm⟩)) hxm)
+        have := Submodule.smul_mem _ (chartPow y c (b ⟨m, hm⟩))⁻¹ (Submodule.sub_mem_sup
+          (Submodule.mem_span_singleton_self (e ⟨m, hm⟩)) hxm)
         simpa [smul_smul, inv_mul_cancel₀ (hp _)] using this
   have htop : ⊤ ≤ Submodule.span Ω (Set.range e) := by
     have h := hspan N le_rfl
@@ -122,8 +159,7 @@ theorem exists_flag_dual
     rw [hu, Set.image_univ, Set.image_univ, w.span_eq] at h
     rw [h]
   have hli : LinearIndependent Ω e :=
-    linearIndependent_of_top_le_span_of_card_eq_finrank htop
-      (by rw [Module.finrank_eq_card_basis w])
+    linearIndependent_of_top_le_span_of_card_eq_finrank htop (by rw [Module.finrank_eq_card_basis w])
   let eb := Module.Basis.mk hli htop
   have heb : ⇑eb = e := funext (Module.Basis.mk_apply hli htop)
   have hvan : ∀ x ∈ Submodule.span Ω (w '' {j : Fin N | (j : ℕ) < i}), eb.repr x i = 0 := by
@@ -133,10 +169,8 @@ theorem exists_flag_dual
     exact lt_irrefl (i : ℕ) (hx' (Finsupp.mem_support_iff.2 h))
   have hself : ∀ j m, eb.repr (e j) m = Finsupp.single j 1 m := fun j m => by
     rw [← heb, eb.repr_self]
-  have hint
-      : ∀ m ≤ N, ∀ v ∈ B.lat c,
-        (∀ j : Fin N, m ≤ (j : ℕ) → w.repr v j = 0)
-          → ∀ j, eb.repr v j ∈ chartRing F (segreVec y) c := by
+  have hint : ∀ m ≤ N, ∀ v ∈ B.lat c, (∀ j : Fin N, m ≤ (j : ℕ) → w.repr v j = 0) →
+      ∀ j, eb.repr v j ∈ chartRing F (segreVec y) c := by
     intro m
     induction m with
     | zero =>
@@ -147,14 +181,13 @@ theorem exists_flag_dual
       intro hm v hvL hv j
       obtain ⟨r, hr, hrv⟩ := (hgr ⟨m, hm⟩ (w.repr v ⟨m, hm⟩)).1 ⟨v, hvL, fun j hj => hv j hj, rfl⟩
       have hv' : v - r • e ⟨m, hm⟩ ∈ B.lat c := sub_mem hvL (B.stable c r hr _ (heL _))
-      have h' :=
-        ih (by omega) _ hv' (by
-          intro j hj
-          rcases hj.lt_or_eq with h | h
-          · simp [hv j h, heT ⟨m, hm⟩ j h]
-          · have : j = ⟨m, hm⟩ := Fin.ext h.symm
-            subst this
-            simp [heD, hrv])
+      have h' := ih (by omega) _ hv' (by
+        intro j hj
+        rcases hj.lt_or_eq with h | h
+        · simp [hv j h, heT ⟨m, hm⟩ j h]
+        · have : j = ⟨m, hm⟩ := Fin.ext h.symm
+          subst this
+          simp [heD, hrv])
       have hsplit : eb.repr v j = eb.repr (v - r • e ⟨m, hm⟩) j + r * eb.repr (e ⟨m, hm⟩) j := by
         rw [map_sub, map_smul, Finsupp.sub_apply, Finsupp.smul_apply, smul_eq_mul, sub_add_cancel]
       rw [hsplit, hself]
@@ -172,6 +205,13 @@ theorem exists_flag_dual
       hself, hvan _ (hx i)]
     simp
 
+theorem exists_flag_dual (y : (Σ k, ι k) → Ω) (B : ChartBundle F (segreVec y) N E)
+    (w : Module.Basis (Fin N) Ω E) (b : Fin N → K → ℤ) (hfl : IsFlagFrame y B w b)
+    (c : ∀ k, ι k) (hc : segreVec y c ≠ 0) (i : Fin N) :
+    ∃ ψ : Module.Dual Ω E, (∀ v ∈ B.lat c, ψ v ∈ chartRing F (segreVec y) c) ∧
+      (∀ j, j < i → ψ (w j) = 0) ∧ ψ (w i) = (chartPow y c (b i))⁻¹ := by
+  apply exists_flag_dual_of_frame <;> assumption
+
 end Dual
 
 section Forms
@@ -183,13 +223,13 @@ def liftNat (α : K → ℕ) : Option K → ℕ := fun o => Option.elim o 0 α
 def chartMono (M : ℕ) (c : ∀ k, ι k) (α : K → ℕ) : MRing (bundleIdx ι M) F :=
   ∏ k, X (⟨some k, c k⟩ : Σ o, bundleIdx ι M o) ^ α k
 
-theorem chartMono_homog (M : ℕ) (c : ∀ k, ι k) (α : K → ℕ)
-    : IsMultiHomog (chartMono (F := F) M c α) (liftNat α) := by
-  have h :=
-    IsWeightedHomogeneous.prod (R := F) Finset.univ
-      (fun k => X (⟨some k, c k⟩ : Σ o, bundleIdx ι M o) ^ α k)
-      (fun k => α k • blockWeight (bundleIdx ι M) ⟨some k, c k⟩)
-      (fun k _ => (isWeightedHomogeneous_X F _ _).pow (α k))
+omit [∀ k, Fintype (ι k)] in
+private theorem chartMono_homog_aux (M : ℕ) (c : ∀ k, ι k) (α : K → ℕ) :
+    IsMultiHomog (chartMono (F := F) M c α) (liftNat α) := by
+  have h := IsWeightedHomogeneous.prod (R := F) Finset.univ
+    (fun k => X (⟨some k, c k⟩ : Σ o, bundleIdx ι M o) ^ α k)
+    (fun k => α k • blockWeight (bundleIdx ι M) ⟨some k, c k⟩)
+    (fun k _ => (isWeightedHomogeneous_X F _ _).pow (α k))
   have hw : liftNat α = ∑ k, α k • blockWeight (bundleIdx ι M) ⟨some k, c k⟩ := by
     funext o
     cases o with
@@ -198,38 +238,41 @@ theorem chartMono_homog (M : ℕ) (c : ∀ k, ι k) (α : K → ℕ)
   rw [IsMultiHomog, chartMono, hw]
   exact h
 
-theorem eval_chartMono
-    (y : (Σ k, ι k) → Ω) (w : Module.Basis (Fin N) Ω E) (φ : Fin M → Module.Dual Ω E)
-    (t : Fin N → Φ) (c : ∀ k, ι k) (α : K → ℕ)
-    : eval₂ ((algebraMap Ω Φ).comp (algebraMap F Ω)) (projCoord y w φ t) (chartMono M c α)
-      = algebraMap Ω Φ (∏ k, y ⟨k, c k⟩ ^ α k) := by
+theorem chartMono_homog (M : ℕ) (c : ∀ k, ι k) (α : K → ℕ) :
+    IsMultiHomog (chartMono (F := F) M c α) (liftNat α) := by
+  apply chartMono_homog_aux <;> assumption
+
+omit [∀ k, Fintype (ι k)] in
+private theorem eval_chartMono_aux (y : (Σ k, ι k) → Ω) (w : Module.Basis (Fin N) Ω E) (φ : Fin M → Module.Dual Ω E)
+    (t : Fin N → Φ) (c : ∀ k, ι k) (α : K → ℕ) :
+    eval₂ ((algebraMap Ω Φ).comp (algebraMap F Ω)) (projCoord y w φ t) (chartMono M c α) =
+      algebraMap Ω Φ (∏ k, y ⟨k, c k⟩ ^ α k) := by
   simp [chartMono, eval₂_prod, eval₂_pow, eval₂_X, projCoord, map_prod]
 
-theorem chartRing_forms
-    (y : (Σ k, ι k) → Ω)
-    (w : Module.Basis (Fin N) Ω E) (φ : Fin M → Module.Dual Ω E) (t : Fin N → Φ)
-    (c : ∀ k, ι k) (hc : segreVec y c ≠ 0)
-    {u : Ω} (hu : u ∈ chartRing F (segreVec y) c)
-    : ∃ (n : ℕ) (U : MRing (bundleIdx ι M) F),
-      IsMultiHomog U (liftNat fun _ => n)
-        ∧ eval₂ ((algebraMap Ω Φ).comp (algebraMap F Ω)) (projCoord y w φ t) U
-          = algebraMap Ω Φ (u * segreVec y c ^ n) := by
-  have hlift
-      : ∀ n n' : ℕ,
-        liftNat (K := K) (fun _ => n + n') = liftNat (fun _ => n) + liftNat (fun _ => n') := by
+theorem eval_chartMono (y : (Σ k, ι k) → Ω) (w : Module.Basis (Fin N) Ω E) (φ : Fin M → Module.Dual Ω E)
+    (t : Fin N → Φ) (c : ∀ k, ι k) (α : K → ℕ) :
+    eval₂ ((algebraMap Ω Φ).comp (algebraMap F Ω)) (projCoord y w φ t) (chartMono M c α) =
+      algebraMap Ω Φ (∏ k, y ⟨k, c k⟩ ^ α k) := by
+  apply eval_chartMono_aux <;> assumption
+
+omit [∀ k, Fintype (ι k)] in
+theorem chartRing_forms_of_mem (y : (Σ k, ι k) → Ω) (w : Module.Basis (Fin N) Ω E)
+    (φ : Fin M → Module.Dual Ω E) (t : Fin N → Φ) (c : ∀ k, ι k) (hc : segreVec y c ≠ 0) {u : Ω}
+    (hu : u ∈ chartRing F (segreVec y) c) :
+    ∃ (n : ℕ) (U : MRing (bundleIdx ι M) F), IsMultiHomog U (liftNat fun _ => n) ∧
+      eval₂ ((algebraMap Ω Φ).comp (algebraMap F Ω)) (projCoord y w φ t) U =
+        algebraMap Ω Φ (u * segreVec y c ^ n) := by
+  have hlift : ∀ n n' : ℕ, liftNat (K := K) (fun _ => n + n') = liftNat (fun _ => n) + liftNat (fun _ => n') := by
     intro n n'; funext o; cases o <;> simp [liftNat]
-  have hQ
-      : ∀ n : ℕ,
-        eval₂ ((algebraMap Ω Φ).comp (algebraMap F Ω)) (projCoord y w φ t)
-            (chartMono M c (fun _ => n))
-          = algebraMap Ω Φ (segreVec y c ^ n) := by
+  have hQ : ∀ n : ℕ, eval₂ ((algebraMap Ω Φ).comp (algebraMap F Ω)) (projCoord y w φ t)
+      (chartMono M c (fun _ => n)) = algebraMap Ω Φ (segreVec y c ^ n) := by
     intro n
-    rw [eval_chartMono, segreVec, Finset.prod_pow]
+    rw [eval_chartMono_aux, segreVec, Finset.prod_pow]
   induction hu using Algebra.adjoin_induction with
   | mem z hz =>
     obtain ⟨j, rfl⟩ := hz
-    refine ⟨1, chartMono M j (fun _ => 1), chartMono_homog M j _, ?_⟩
-    rw [eval_chartMono, pow_one, div_mul_cancel₀ _ hc]
+    refine ⟨1, chartMono M j (fun _ => 1), chartMono_homog_aux M j _, ?_⟩
+    rw [eval_chartMono_aux, pow_one, div_mul_cancel₀ _ hc]
     simp [segreVec]
   | algebraMap r =>
     refine ⟨0, C r, ?_, ?_⟩
@@ -242,11 +285,10 @@ theorem chartRing_forms
     obtain ⟨n', U', hU', hUe'⟩ := hz'
     refine ⟨n + n', U * chartMono M c (fun _ => n') + U' * chartMono M c (fun _ => n), ?_, ?_⟩
     · rw [hlift]
-      refine (hU.mul (chartMono_homog M c _)).add ?_
+      refine (hU.mul (chartMono_homog_aux M c _)).add ?_
       rw [add_comm]
-      exact hU'.mul (chartMono_homog M c _)
-    · rw [eval₂_add, eval₂_mul, eval₂_mul, hUe, hUe', hQ, hQ, ← map_mul, ← map_mul,
-        ← map_add (f := _)]
+      exact hU'.mul (chartMono_homog_aux M c _)
+    · rw [eval₂_add, eval₂_mul, eval₂_mul, hUe, hUe', hQ, hQ, ← map_mul, ← map_mul, ← map_add (f := _)]
       congr 1
       ring
   | mul z z' _ _ hz hz' =>
@@ -259,16 +301,22 @@ theorem chartRing_forms
       congr 1
       ring
 
-theorem eval_eq_zero_of_mem_projIdeal
-    (y : (Σ k, ι k) → Ω) (w : Module.Basis (Fin N) Ω E) (φ : Fin M → Module.Dual Ω E)
-    (t : Fin N → Φ)
-    {f : MRing (bundleIdx ι M) F} (hf : f ∈ projIdeal F y w φ t)
-    : eval₂ ((algebraMap Ω Φ).comp (algebraMap F Ω)) (projCoord y w φ t) f = 0 := by
-  have h
-      : (MvPolynomial.eval (fun _ : Option K => (1 : Φ))).comp
-          (eval₂Hom (C.comp ((algebraMap Ω Φ).comp (algebraMap F Ω)))
-            (fun p => C (projCoord y w φ t p) * X p.1))
-        = eval₂Hom ((algebraMap Ω Φ).comp (algebraMap F Ω)) (projCoord y w φ t) := by
+theorem chartRing_forms (y : (Σ k, ι k) → Ω) (w : Module.Basis (Fin N) Ω E)
+    (φ : Fin M → Module.Dual Ω E) (t : Fin N → Φ) (c : ∀ k, ι k) (hc : segreVec y c ≠ 0) {u : Ω}
+    (hu : u ∈ chartRing F (segreVec y) c) :
+    ∃ (n : ℕ) (U : MRing (bundleIdx ι M) F), IsMultiHomog U (liftNat fun _ => n) ∧
+      eval₂ ((algebraMap Ω Φ).comp (algebraMap F Ω)) (projCoord y w φ t) U =
+        algebraMap Ω Φ (u * segreVec y c ^ n) := by
+  apply chartRing_forms_of_mem <;> assumption
+
+theorem eval_eq_zero_of_mem_projIdeal (y : (Σ k, ι k) → Ω) (w : Module.Basis (Fin N) Ω E)
+    (φ : Fin M → Module.Dual Ω E) (t : Fin N → Φ) {f : MRing (bundleIdx ι M) F}
+    (hf : f ∈ projIdeal F y w φ t) :
+    eval₂ ((algebraMap Ω Φ).comp (algebraMap F Ω)) (projCoord y w φ t) f = 0 := by
+  have h : (MvPolynomial.eval (fun _ : Option K => (1 : Φ))).comp
+      (eval₂Hom (C.comp ((algebraMap Ω Φ).comp (algebraMap F Ω)))
+        (fun p => C (projCoord y w φ t p) * X p.1)) =
+      eval₂Hom ((algebraMap Ω Φ).comp (algebraMap F Ω)) (projCoord y w φ t) := by
     apply MvPolynomial.ringHom_ext
     · intro r; simp
     · intro p; simp

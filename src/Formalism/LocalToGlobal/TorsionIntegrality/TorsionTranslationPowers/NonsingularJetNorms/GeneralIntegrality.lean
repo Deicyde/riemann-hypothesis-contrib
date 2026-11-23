@@ -1,8 +1,53 @@
 module
 
 public import Formalism.LocalToGlobal.TorsionIntegrality.TorsionTranslationPowers.StatementN
-public import Formalism.LocalToGlobal.TorsionIntegrality.TorsionTranslationPowers.NonsingularJetNorms.ConstantCoeffInVarEqZero
+public import Mathlib.RingTheory.MvPowerSeries.Rename
+public import Formalism.LocalToGlobal.TorsionIntegrality.SecondCoefficientNorms.BinomialSeriesCoefficients.CoeffPowEqZeroOfCc
+public import Formalism.LocalToGlobal.TorsionIntegrality.SecondCoefficientNorms.BinomialSeriesCoefficients.DegreeLeOfMemAntidiagonal
+public import Formalism.LocalToGlobal.TorsionIntegrality.SecondCoefficientNorms.BinomialSeriesCoefficients.Points
+public import Formalism.LocalToGlobal.TorsionIntegrality.SecondCoefficientNorms.BinomialSeriesCoefficients.UnitaryInverseIdentity
 public import Formalism.LocalToGlobal.TorsionIntegrality.SecondCoefficientNorms.PhNormFromDatum
+public import Formalism.LocalToGlobal.TorsionIntegrality.TorsionTranslationPowers.NonsingularJetNorms.ConstantCoeffInVarEqZero
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -20,8 +65,8 @@ namespace GeneratorMatrix
 
 def blk (n : Type) (a : Fin 4) : n ↪ Fin 4 × n := ⟨fun i => (a, i), fun _ _ h => (Prod.mk.inj h).2⟩
 
-theorem blk_apply {n : Type} (a b : Fin 4) (μ : n →₀ ℕ) (i : n)
-    : Finsupp.embDomain (blk n a) μ (b, i) = if a = b then μ i else 0 := by
+theorem blk_apply {n : Type} (a b : Fin 4) (μ : n →₀ ℕ) (i : n) :
+    Finsupp.embDomain (blk n a) μ (b, i) = if a = b then μ i else 0 := by
   split_ifs with h
   · subst h
     exact Finsupp.embDomain_apply_self (blk n a) μ i
@@ -33,8 +78,8 @@ section Field
 
 variable {K : Type} [Field K] {n : Type}
 
-theorem tensor4_eq_rename (f : MvPowerSeries n K)
-    : tensor4 f = ∏ a, MvPowerSeries.rename (blk n a) f := by
+theorem tensor4_eq_rename (f : MvPowerSeries n K) :
+    tensor4 f = ∏ a, MvPowerSeries.rename (blk n a) f := by
   unfold tensor4
   refine Finset.prod_congr rfl fun a _ => ?_
   rw [MvPowerSeries.rename_eq_subst]
@@ -44,9 +89,9 @@ theorem tensor4_mul (f g : MvPowerSeries n K) : tensor4 (f * g) = tensor4 f * te
   rw [tensor4_eq_rename, tensor4_eq_rename, tensor4_eq_rename, ← Finset.prod_mul_distrib]
   exact Finset.prod_congr rfl fun a _ => map_mul _ _ _
 
-theorem coeff_tensor4 (f : MvPowerSeries n K) (ν : n →₀ ℕ)
-    : MvPowerSeries.coeff (∑ a, Finsupp.embDomain (blk n a) ν) (tensor4 f)
-      = MvPowerSeries.coeff ν f ^ 4 := by
+theorem coeff_tensor4 (f : MvPowerSeries n K) (ν : n →₀ ℕ) :
+    MvPowerSeries.coeff (∑ a, Finsupp.embDomain (blk n a) ν) (tensor4 f) =
+      MvPowerSeries.coeff ν f ^ 4 := by
   classical
   rw [tensor4_eq_rename, MvPowerSeries.coeff_prod]
   rw [Finset.sum_eq_single (Finsupp.equivFunOnFinite.symm fun a => Finsupp.embDomain (blk n a) ν)]
@@ -68,8 +113,7 @@ theorem coeff_tensor4 (f : MvPowerSeries n K) (ν : n →₀ ℕ)
       ext i
       have := DFunLike.congr_fun hL.1 (b, i)
       simp only [Finsupp.coe_finsetSum, Finset.sum_apply, hμ, blk_apply, Finset.sum_ite_eq',
-          Finset.mem_univ, if_true]
-        at this
+        Finset.mem_univ, if_true] at this
       exact this
     ext1 a
     rw [hμ, hμν]
@@ -83,35 +127,30 @@ section Lin
 
 variable {K : Type} [Field K] {O m : Type} [CommRing O] [Fintype m] {l linv : PowerSeries K}
 
-theorem cc_matCoord (h : IsLogPair l linv) (τ : O →+* K) (γ : Matrix m m O) (w : m)
-    : MvPowerSeries.constantCoeff (matCoord l linv τ γ w) = 0 :=
+theorem cc_matCoord (h : IsLogPair l linv) (τ : O →+* K) (γ : Matrix m m O) (w : m) :
+    MvPowerSeries.constantCoeff (matCoord l linv τ γ w) = 0 :=
   Formalism.L2.Th1.C.Pts.constantCoeff_flin h _ fun _ => MvPowerSeries.constantCoeff_X _
 
-theorem matCoord_comp (h : IsLogPair l linv) (τ : O →+* K) (γ δ : Matrix m m O) (w : m)
-    : MvPowerSeries.subst (matCoord l linv τ δ) (matCoord l linv τ γ w)
-      = matCoord l linv τ (γ * δ) w := by
+theorem matCoord_comp (h : IsLogPair l linv) (τ : O →+* K) (γ δ : Matrix m m O) (w : m) :
+    MvPowerSeries.subst (matCoord l linv τ δ) (matCoord l linv τ γ w) =
+      matCoord l linv τ (γ * δ) w := by
   have hδ0 := cc_matCoord h τ δ
   have hs := MvPowerSeries.hasSubst_of_constantCoeff_zero hδ0
-  have hL
-      : ∀ j,
-        PowerSeries.subst (matCoord l linv τ δ j) l
-          = ∑ k, MvPowerSeries.C (τ (δ j k)) *
-              PowerSeries.subst (MvPowerSeries.X k : MvPowerSeries m K) l := fun j =>
+  have hL : ∀ j, PowerSeries.subst (matCoord l linv τ δ j) l =
+      ∑ k, MvPowerSeries.C (τ (δ j k)) *
+        PowerSeries.subst (MvPowerSeries.X k : MvPowerSeries m K) l := fun j =>
     Formalism.L2.Th1.C.Pts.l_flin h _ fun _ => MvPowerSeries.constantCoeff_X _
   conv_lhs => rw [matCoord, Formalism.L2.Th1.C.flin]
   rw [Formalism.L2.Th1.C.Pts.substMv_subst
     (Formalism.L2.Th1.C.Pts.constantCoeff_sum_l h _ fun _ => MvPowerSeries.constantCoeff_X _) hδ0]
   conv_rhs => rw [matCoord, Formalism.L2.Th1.C.flin]
   congr 1
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [← MvPowerSeries.coe_substAlgHom hs, map_sum]
-  have h1
-      : ∀ j,
-        MvPowerSeries.substAlgHom hs
-            (MvPowerSeries.C (τ (γ w j))
-              * PowerSeries.subst (MvPowerSeries.X j : MvPowerSeries m K) l)
-          = ∑ k, MvPowerSeries.C (τ (γ w j * δ j k)) *
-              PowerSeries.subst (MvPowerSeries.X k : MvPowerSeries m K) l := by
+
+  rw [← MvPowerSeries.coe_substAlgHom hs, map_sum]
+  have h1 : ∀ j, MvPowerSeries.substAlgHom hs (MvPowerSeries.C (τ (γ w j)) *
+      PowerSeries.subst (MvPowerSeries.X j : MvPowerSeries m K) l) =
+      ∑ k, MvPowerSeries.C (τ (γ w j * δ j k)) *
+        PowerSeries.subst (MvPowerSeries.X k : MvPowerSeries m K) l := by
     intro j
     rw [map_mul, MvPowerSeries.coe_substAlgHom hs, MvPowerSeries.subst_C,
       Formalism.L2.Th1.C.Pts.substMv_subst (MvPowerSeries.constantCoeff_X j) hδ0,
@@ -120,11 +159,11 @@ theorem matCoord_comp (h : IsLogPair l linv) (τ : O →+* K) (γ δ : Matrix m 
     rw [map_mul, map_mul, mul_assoc]
   rw [Finset.sum_congr rfl fun j _ => h1 j, Finset.sum_comm]
   refine Finset.sum_congr rfl fun k _ => ?_
-  set_option synthInstance.maxHeartbeats 100000 in
+
   rw [Matrix.mul_apply, map_sum, map_sum, Finset.sum_mul]
 
-theorem matCoord_one [DecidableEq m] (h : IsLogPair l linv) (τ : O →+* K) (w : m)
-    : matCoord l linv τ (1 : Matrix m m O) w = MvPowerSeries.X w := by
+theorem matCoord_one [DecidableEq m] (h : IsLogPair l linv) (τ : O →+* K) (w : m) :
+    matCoord l linv τ (1 : Matrix m m O) w = MvPowerSeries.X w := by
   rw [matCoord, Formalism.L2.Th1.C.flin, Finset.sum_eq_single w]
   · rw [Matrix.one_apply_eq, map_one, map_one, one_mul]
     exact Formalism.L2.Th1.C.Pts.subst_linv_l h (MvPowerSeries.constantCoeff_X w)
@@ -139,26 +178,18 @@ section Exp
 
 variable {K : Type} [NormedField K] [CharZero K] {n : Type} [Fintype n]
 
-theorem tensor4_exp {ph : PowerSeries K} (hph : PowerSeries.constantCoeff ph = 0)
-    : tensor4 (mvExp (phSum ph : MvPowerSeries n K))
-      = mvExp (phSum ph : MvPowerSeries (Fin 4 × n) K) := by
-  have h1
-      : ∀ a : Fin 4,
-        MvPowerSeries.subst
-            (fun i => (MvPowerSeries.X (a, i) : MvPowerSeries (Fin 4 × n) K))
-            (mvExp (phSum ph : MvPowerSeries n K))
-          = mvExp (∑ i, at1 (a, i) ph) := by
+theorem tensor4_exp {ph : PowerSeries K} (hph : PowerSeries.constantCoeff ph = 0) :
+    tensor4 (mvExp (phSum ph : MvPowerSeries n K)) =
+      mvExp (phSum ph : MvPowerSeries (Fin 4 × n) K) := by
+  have h1 : ∀ a : Fin 4, MvPowerSeries.subst
+      (fun i => (MvPowerSeries.X (a, i) : MvPowerSeries (Fin 4 × n) K))
+      (mvExp (phSum ph : MvPowerSeries n K)) = mvExp (∑ i, at1 (a, i) ph) := by
     intro a
-    have h0
-        : ∀ i : n,
-          MvPowerSeries.constantCoeff (MvPowerSeries.X (a, i) : MvPowerSeries (Fin 4 × n) K) = 0 :=
+    have h0 : ∀ i : n, MvPowerSeries.constantCoeff
+        (MvPowerSeries.X (a, i) : MvPowerSeries (Fin 4 × n) K) = 0 :=
       fun i => MvPowerSeries.constantCoeff_X _
-    have h2
-        : MvPowerSeries.subst
-            (fun i => (MvPowerSeries.X (a, i) : MvPowerSeries (Fin 4 × n) K))
-            (phSum ph : MvPowerSeries n K)
-          = ∑ i, at1 (a, i) ph :=
-      subst_phSum ph h0
+    have h2 : MvPowerSeries.subst (fun i => (MvPowerSeries.X (a, i) : MvPowerSeries (Fin 4 × n) K))
+        (phSum ph : MvPowerSeries n K) = ∑ i, at1 (a, i) ph := subst_phSum ph h0
     rw [← h2]
     exact Formalism.L2.Th1.C.IntegralMvPolynomialLemmas.substMv_mvExp (cc_phSum hph) h0
   unfold tensor4
@@ -168,8 +199,8 @@ theorem tensor4_exp {ph : PowerSeries K} (hph : PowerSeries.constantCoeff ph = 0
     exact Fintype.sum_prod_type _
   rw [h3]
   refine (Formalism.L2.Th1.C.mvExp_sum _ _ fun a _ => ?_).symm
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+
+  rw [map_sum]
   exact Finset.sum_eq_zero fun i _ => constantCoeff_inVar_eq_zero _ hph
 
 end Exp
@@ -184,10 +215,8 @@ theorem fourth_power : FourthPower := by
   rw [coeff_tensor4, norm_pow] at h1
   exact (pow_le_one_iff_of_nonneg (norm_nonneg _) (by norm_num)).1 h1
 
-theorem GeneralIntOf_of
-    (hF : FourthPower) (hU : Formalism.L2.Th1.C.UnitaryInv) (hP : ProdInt) (hS : SubstExpInt)
-    (hC : CongIffSimeq)
-    : GeneralIntOf := by
+theorem GeneralIntOf_of (hF : FourthPower) (hU : Formalism.L2.Th1.C.UnitaryInv) (hP : ProdInt)
+    (hS : SubstExpInt) (hC : CongIffSimeq) : GeneralIntOf := by
   intro K _ _ _ R hR l linv ph hFr O _ _ τ hEnd hBin hF1 hN hA n _ _ Θ γ hγ hK
   obtain ⟨κ, _, r, V, hr, hV, hEq⟩ := hK
   obtain ⟨hlp, hFG, hph⟩ := hFr
@@ -198,22 +227,17 @@ theorem GeneralIntOf_of
   have hpt : ∀ w, IsPt R (matCoord l linv τ γ.conjTranspose w) := fun w =>
     Formalism.L2.Th1.C.Pts.isPt_flin hlp hFG (fun _ => hEnd _) fun _ => isPt_X _
   obtain ⟨h1, h2⟩ := hP K κ (Fin 4 × n) ph r V hph hr hV
-  obtain ⟨h3, h4, h5⟩ :=
-    hS K (Fin 4 × n) (Fin 4 × n) (matCoord l linv τ γ.conjTranspose)
-      (fun i => (hpt i).1)
-      (fun i => (integral_iff hR _).2 (hpt i).2)
-      (phSum ph) (thetaProd r V) (cc_phSum hph) h2
-  have hT
-      : tensor4 Θ
-        = mvExp (-(MvPowerSeries.subst (matCoord l linv τ γ.conjTranspose) (phSum ph)))
-          * MvPowerSeries.subst (matCoord l linv τ γ.conjTranspose) (thetaProd r V) := by
-    rw [← h3, ← h1, ← hEq,
-      MvPowerSeries.subst_comp_subst_apply
-        (MvPowerSeries.hasSubst_of_constantCoeff_zero (cc_matCoord hlp τ γ))
-        (MvPowerSeries.hasSubst_of_constantCoeff_zero (cc_matCoord hlp τ γ.conjTranspose))]
-    have hX
-        : (fun w => MvPowerSeries.subst (matCoord l linv τ γ.conjTranspose) (matCoord l linv τ γ w))
-          = MvPowerSeries.X := by
+  obtain ⟨h3, h4, h5⟩ := hS K (Fin 4 × n) (Fin 4 × n) (matCoord l linv τ γ.conjTranspose)
+    (fun i => (hpt i).1) (fun i => (integral_iff hR _).2 (hpt i).2) (phSum ph) (thetaProd r V)
+    (cc_phSum hph) h2
+  have hT : tensor4 Θ =
+      mvExp (-(MvPowerSeries.subst (matCoord l linv τ γ.conjTranspose) (phSum ph))) *
+        MvPowerSeries.subst (matCoord l linv τ γ.conjTranspose) (thetaProd r V) := by
+    rw [← h3, ← h1, ← hEq, MvPowerSeries.subst_comp_subst_apply
+      (MvPowerSeries.hasSubst_of_constantCoeff_zero (cc_matCoord hlp τ γ))
+      (MvPowerSeries.hasSubst_of_constantCoeff_zero (cc_matCoord hlp τ γ.conjTranspose))]
+    have hX : (fun w => MvPowerSeries.subst (matCoord l linv τ γ.conjTranspose)
+        (matCoord l linv τ γ w)) = MvPowerSeries.X := by
       funext w
       rw [matCoord_comp hlp, hγδ, matCoord_one hlp]
     rw [hX, MvPowerSeries.subst_self]
@@ -221,22 +245,19 @@ theorem GeneralIntOf_of
   have hcong : Formalism.L2.Th1.C.Cong R (phSum ph : MvPowerSeries (Fin 4 × n) K)
       (MvPowerSeries.subst (matCoord l linv τ γ.conjTranspose) (phSum ph)) := by
     rw [subst_phSum ph fun i => (hpt i).1]
-    exact Formalism.L2.Th1.C.Calc.cong_symm (hU K R l linv ph ⟨hlp, hFG, hph⟩ O τ hEnd hBin hF1 hN
-      hA (Fin 4 × n) γ.conjTranspose hδ (Fin 4 × n) MvPowerSeries.X fun _ => isPt_X _)
+    exact Formalism.L2.Th1.C.Calc.cong_symm (hU K R l linv ph ⟨hlp, hFG, hph⟩ O τ hEnd hBin hF1 hN hA
+      (Fin 4 × n) γ.conjTranspose hδ (Fin 4 × n) MvPowerSeries.X fun _ => isPt_X _)
   have hsim := ((hC K R hR _ _ _).1 hcong).2
   apply hF
   rw [tensor4_mul, tensor4_exp hph, hT, ← mul_assoc]
-  have hadd
-      : mvExp (phSum ph : MvPowerSeries (Fin 4 × n) K)
-          * mvExp (-(MvPowerSeries.subst (matCoord l linv τ γ.conjTranspose) (phSum ph)))
-        = mvExp
-          ((phSum ph : MvPowerSeries (Fin 4 × n) K)
-            - MvPowerSeries.subst (matCoord l linv τ γ.conjTranspose) (phSum ph)) :=
+  have hadd : mvExp (phSum ph : MvPowerSeries (Fin 4 × n) K) *
+      mvExp (-(MvPowerSeries.subst (matCoord l linv τ γ.conjTranspose) (phSum ph))) =
+      mvExp ((phSum ph : MvPowerSeries (Fin 4 × n) K) -
+        MvPowerSeries.subst (matCoord l linv τ γ.conjTranspose) (phSum ph)) :=
     (Formalism.L2.Th1.C.mvExp_sub (cc_phSum hph) h5).symm
   rw [hadd]
-  exact (integral_iff hR _).2
-    (Formalism.L2.Th1.C.IntegralMvPolynomialLemmas.intMv_mul ((integral_iff hR _).1 hsim)
-      ((integral_iff hR _).1 h4))
+  exact (integral_iff hR _).2 (Formalism.L2.Th1.C.IntegralMvPolynomialLemmas.intMv_mul ((integral_iff hR _).1 hsim)
+    ((integral_iff hR _).1 h4))
 
 theorem general_integrality : GeneralIntOf :=
   GeneralIntOf_of fourth_power Formalism.L2.Th1.C.unitaryInv product_integral subst_exp_integral

@@ -1,19 +1,55 @@
 module
 
-public import Mathlib
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.IsSubFibreSubFib
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.IsExcisionNbhdAway
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.FinrankFiniteFlatTorsionSubschemeEqCardPoints
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.ExistsConstStalk
+public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.IsHodgeLine
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.EigenspaceDecompositionInternalStatement
+public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.ExistsConstStalk
+public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.FinrankFiniteFlatTorsionSubschemeEqCardPoints
+public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.IsExcisionNbhdAway
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
-  NumberField TensorProduct Filter Topology Matrix
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo
-  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
-  GlobalTheory.CompanionTheory.Ar
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField TensorProduct Filter Topology Matrix
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CompanionTheory.Ar
 
 set_option backward.isDefEq.respectTransparency false
 
@@ -21,18 +57,12 @@ noncomputable section
 
 namespace GlobalTheory.CompanionTheory.Ar.FlagFrames
 
-theorem mem_of_sum_mem
-    {Ω : Type} [Field Ω]
-    (R : Subring Ω)
-    {Li : Type} [AddCommGroup Li] [Module Ω Li]
-    {O : Type} [CommRing O]
-    (ρ : O →+* Module.End Ω Li)
-    {I : Type} [DecidableEq I]
-    (σ : I → (O →+* Ω))
-    (Λ : Submodule R Li) (hst : ∀ a, ∀ e ∈ Λ, ρ a e ∈ Λ)
-    (hval : ∀ s a, σ s a ∈ R) (hinv : ∀ s s' a, σ s a ≠ σ s' a → (σ s a - σ s' a)⁻¹ ∈ R)
-    (hsep : ∀ s s', s ≠ s' → ∃ a, σ s a ≠ σ s' a) (T : Finset I)
-    : ∀ x : I → Li, (∀ t, x t ∈ eigSp ρ (σ t)) → ∑ t ∈ T, x t ∈ Λ → ∀ t ∈ T, x t ∈ Λ := by
+theorem mem_of_sum_mem {Ω : Type} [Field Ω] (R : Subring Ω) {Li : Type} [AddCommGroup Li] [Module Ω Li]
+    {O : Type} [CommRing O] (ρ : O →+* Module.End Ω Li) {I : Type} [DecidableEq I] (σ : I → (O →+* Ω))
+    (Λ : Submodule R Li) (hst : ∀ a, ∀ e ∈ Λ, ρ a e ∈ Λ) (hval : ∀ s a, σ s a ∈ R)
+    (hinv : ∀ s s' a, σ s a ≠ σ s' a → (σ s a - σ s' a)⁻¹ ∈ R)
+    (hsep : ∀ s s', s ≠ s' → ∃ a, σ s a ≠ σ s' a) (T : Finset I) :
+    ∀ x : I → Li, (∀ t, x t ∈ eigSp ρ (σ t)) → ∑ t ∈ T, x t ∈ Λ → ∀ t ∈ T, x t ∈ Λ := by
   have hact : ∀ (t : I) (a : O) (e : Li), e ∈ eigSp ρ (σ t) → ρ a e = σ t a • e := by
     intro t a e he
     have := (Submodule.mem_iInf _).1 he a
@@ -49,17 +79,16 @@ theorem mem_of_sum_mem
       obtain ⟨a, ha⟩ := hsep t u hne
       have h1 : ρ a (x u + ∑ t ∈ T, x t) - σ u a • (x u + ∑ t ∈ T, x t) ∈ Λ :=
         Λ.sub_mem (hst a _ hs) (hRs _ (hval u a) _ hs)
-      have h2
-          : ρ a (x u + ∑ t ∈ T, x t) - σ u a • (x u + ∑ t ∈ T, x t)
-            = ∑ t ∈ T, (σ t a - σ u a) • x t := by
-        set_option synthInstance.maxHeartbeats 100000 in
-          rw [map_add (f := _), map_sum, hact u a _ (hx u), smul_add, Finset.smul_sum]
+      have h2 : ρ a (x u + ∑ t ∈ T, x t) - σ u a • (x u + ∑ t ∈ T, x t) =
+          ∑ t ∈ T, (σ t a - σ u a) • x t := by
+
+        rw [map_add (f := _), map_sum, hact u a _ (hx u), smul_add, Finset.smul_sum]
         rw [add_sub_add_left_eq_sub, ← Finset.sum_sub_distrib]
         refine Finset.sum_congr rfl fun t _ => ?_
         rw [hact t a _ (hx t), sub_smul]
       rw [h2] at h1
-      have h3 :=
-        ih (fun t => (σ t a - σ u a) • x t) (fun t => (eigSp ρ (σ t)).smul_mem _ (hx t)) h1 t ht
+      have h3 := ih (fun t => (σ t a - σ u a) • x t)
+        (fun t => (eigSp ρ (σ t)).smul_mem _ (hx t)) h1 t ht
       have h4 := hRs _ (hinv t u a ha) _ h3
       rwa [smul_smul, inv_mul_cancel₀ (sub_ne_zero.2 ha), one_smul] at h4
     have hu' : x u ∈ Λ := by
@@ -70,20 +99,14 @@ theorem mem_of_sum_mem
     · exact hu'
     · exact hT t ht
 
-theorem eq_span_sigma
-    {Ω : Type} [Field Ω]
-    (R : Subring Ω)
-    {Li : Type} [AddCommGroup Li] [Module Ω Li]
-    {O : Type} [CommRing O]
-    (ρ : O →+* Module.End Ω Li)
-    {I : Type} [DecidableEq I]
-    (σ : I → (O →+* Ω))
-    (Λ : Submodule R Li) (hst : ∀ a, ∀ e ∈ Λ, ρ a e ∈ Λ)
-    (hval : ∀ s a, σ s a ∈ R) (hinv : ∀ s s' a, σ s a ≠ σ s' a → (σ s a - σ s' a)⁻¹ ∈ R)
-    (hsep : ∀ s s', s ≠ s' → ∃ a, σ s a ≠ σ s' a) (hspan : ⨆ s, eigSp ρ (σ s) = ⊤)
-    {r : I → ℕ} (b : ∀ s, Fin (r s) → Li)
-    (hb : ∀ s, Λ ⊓ (eigSp ρ (σ s)).restrictScalars R = Submodule.span R (Set.range (b s)))
-    : Λ = Submodule.span R (Set.range fun q : Σ s, Fin (r s) => b q.1 q.2) := by
+theorem eq_span_sigma {Ω : Type} [Field Ω] (R : Subring Ω) {Li : Type} [AddCommGroup Li] [Module Ω Li]
+    {O : Type} [CommRing O] (ρ : O →+* Module.End Ω Li) {I : Type} [DecidableEq I] (σ : I → (O →+* Ω))
+    (Λ : Submodule R Li) (hst : ∀ a, ∀ e ∈ Λ, ρ a e ∈ Λ) (hval : ∀ s a, σ s a ∈ R)
+    (hinv : ∀ s s' a, σ s a ≠ σ s' a → (σ s a - σ s' a)⁻¹ ∈ R)
+    (hsep : ∀ s s', s ≠ s' → ∃ a, σ s a ≠ σ s' a)
+    (hspan : ⨆ s, eigSp ρ (σ s) = ⊤) {r : I → ℕ} (b : ∀ s, Fin (r s) → Li)
+    (hb : ∀ s, Λ ⊓ (eigSp ρ (σ s)).restrictScalars R = Submodule.span R (Set.range (b s))) :
+    Λ = Submodule.span R (Set.range fun q : Σ s, Fin (r s) => b q.1 q.2) := by
   apply le_antisymm
   · intro e he
     have hm : e ∈ ⨆ s, eigSp ρ (σ s) := hspan ▸ Submodule.mem_top
@@ -103,14 +126,10 @@ theorem eq_span_sigma
       exact Submodule.subset_span ⟨k, rfl⟩
     exact this.1
 
-theorem mem_span_image_of_mem_flagStep
-    {Ω : Type} [Field Ω]
-    (R : Subring Ω)
-    {Li : Type} [AddCommGroup Li] [Module Ω Li]
-    {r : ℕ} (b : Fin r → Li) (hli : LinearIndependent Ω b)
-    (i : ℕ)
-    {e : Li} (h1 : e ∈ flagStep Ω b i) (h2 : e ∈ Submodule.span R (Set.range b))
-    : e ∈ Submodule.span R (b '' {k | (k : ℕ) < i}) := by
+theorem mem_span_image_of_mem_flagStep {Ω : Type} [Field Ω] (R : Subring Ω) {Li : Type} [AddCommGroup Li]
+    [Module Ω Li] {r : ℕ} (b : Fin r → Li) (hli : LinearIndependent Ω b) (i : ℕ) {e : Li}
+    (h1 : e ∈ flagStep Ω b i) (h2 : e ∈ Submodule.span R (Set.range b)) :
+    e ∈ Submodule.span R (b '' {k | (k : ℕ) < i}) := by
   obtain ⟨w, rfl⟩ := (Submodule.mem_span_range_iff_exists_fun R).1 h2
   obtain ⟨l, hl, hle⟩ := (Finsupp.mem_span_image_iff_linearCombination Ω).1 h1
   have hc : l = Finsupp.equivFunOnFinite.symm (fun k => (w k : Ω)) := by
@@ -133,12 +152,8 @@ section Geo
 
 variable {X : Scheme.{0}} {Ω : Type} [Field Ω]
 
-theorem unitAt_natCast
-    [CharZero Ω]
-    (ξ : Spec (CommRingCat.of Ω) ⟶ X) (p : Cpt ξ)
-    (hu : ∀ n : ℕ, n ≠ 0 → IsUnit ((n : X.presheaf.stalk p.1)))
-    (n : ℕ) (hn : n ≠ 0)
-    : unitAt ξ p (n : Ω) := by
+theorem unitAt_natCast [CharZero Ω] (ξ : Spec (CommRingCat.of Ω) ⟶ X) (p : Cpt ξ)
+    (hu : ∀ n : ℕ, n ≠ 0 → IsUnit ((n : X.presheaf.stalk p.1))) (n : ℕ) (hn : n ≠ 0) : unitAt ξ p (n : Ω) := by
   obtain ⟨u, hu⟩ := hu n hn
   have h1 : genMap ξ p u = (n : Ω) := by rw [hu, map_natCast]
   have h0 : (n : Ω) ≠ 0 := Nat.cast_ne_zero.2 hn
@@ -147,26 +162,16 @@ theorem unitAt_natCast
     rw [← h1, ← map_mul, Units.inv_mul, map_one]
   exact eq_inv_of_mul_eq_one_left h2
 
-theorem not_inFibre
-    [CharZero Ω]
-    (ξ : Spec (CommRingCat.of Ω) ⟶ X) (p : Cpt ξ)
-    (hu : ∀ n : ℕ, n ≠ 0 → IsUnit ((n : X.presheaf.stalk p.1)))
-    (n : ℕ) (hn : n ≠ 0)
-    : ¬ InFibre ξ n p :=
+theorem not_inFibre [CharZero Ω] (ξ : Spec (CommRingCat.of Ω) ⟶ X) (p : Cpt ξ)
+    (hu : ∀ n : ℕ, n ≠ 0 → IsUnit ((n : X.presheaf.stalk p.1))) (n : ℕ) (hn : n ≠ 0) : ¬ InFibre ξ n p :=
   not_not.2 (unitAt_natCast ξ p hu n hn)
 
-variable
-  {G : Over X} [GrpObj G]
-  {ξ : Spec (CommRingCat.of Ω) ⟶ X} {Li : Type} [AddCommGroup Li] [Module Ω Li]
+variable {G : Over X} [GrpObj G] {ξ : Spec (CommRingCat.of Ω) ⟶ X} {Li : Type} [AddCommGroup Li] [Module Ω Li]
+
 
 open LieTangent in
-theorem lat_stable
-    (M : LieModel G ξ Li)
-    (p : Cpt ξ)
-    (f : G ⟶ G) [IsMonHom f]
-    (A : Li →ₗ[Ω] Li) (hA : M.IsDiffOf f A)
-    (e : Li) (he : e ∈ M.lat p)
-    : A e ∈ M.lat p := by
+theorem lat_stable (M : LieModel G ξ Li) (p : Cpt ξ) (f : G ⟶ G) [IsMonHom f] (A : Li →ₗ[Ω] Li)
+    (hA : M.IsDiffOf f A) (e : Li) (he : e ∈ M.lat p) : A e ∈ M.lat p := by
   obtain ⟨v, hv⟩ := (M.mem_lat_iff p e).1 he
   refine (M.mem_lat_iff p _).2 ⟨v ≫ f, ?_⟩
   rw [LieModel.extends_iff] at hv ⊢
@@ -178,22 +183,9 @@ theorem lat_stable
 
 end Geo
 
+
 open HodgeCpt in
-theorem exists_frames
-    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H) (l : Level H)
-        (Xo : Moduli D l) (c : Coeff l) (Y : Model Xo c (algebraMap (𝓞 c.F) c.F)) (S : Finset ℕ)
-        (Ω : Type) [Field Ω] (K : Type) [Fintype K] (J : K → Type) (y : (Σ k, J k) → Ω)
-        (𝔐 : HodgeCpt Y S y) [Fintype (CMType H)] (Fl : 𝔐.Flag) (p : Cpt 𝔐.ξ),
-      (∀ n : ℕ, n ≠ 0 → IsUnit ((n : 𝔐.X.presheaf.stalk p.1)))
-        → ∃ b : ∀ s, Fin (labelRk D s) → 𝔐.Li,
-          (∀ s (i : ℕ), flagStep Ω (b s) i = flagStep Ω (Fl.b s) i)
-            ∧ (∀ s (i : ℕ), ∀ e ∈ flagStep Ω (b s) i,
-              e ∈ 𝔐.M.lat p → e ∈ Submodule.span (regAt 𝔐.ξ p) (b s '' {k | (k : ℕ) < i}))
-            ∧ LinearIndependent Ω (fun q : Σ s, Fin (labelRk D s) => b q.1 q.2)
-            ∧ Submodule.span Ω (Set.range fun q : Σ s, Fin (labelRk D s) => b q.1 q.2) = ⊤
-            ∧ 𝔐.M.lat p
-              = Submodule.span (regAt 𝔐.ξ p) (Set.range fun q : Σ s, Fin (labelRk D s) => b q.1 q.2)
-            ∧ ∀ s, Submodule.span Ω (Set.range (b s)) = 𝔐.Vgen s := by
+theorem exists_frames : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H) (l : Level H) (Xo : Moduli D l) (c : Coeff l) (Y : Model Xo c (algebraMap (𝓞 c.F) c.F)) (S : Finset ℕ) (Ω : Type) [Field Ω] (K : Type) [Fintype K] (J : K → Type) (y : (Σ k, J k) → Ω) (𝔐 : HodgeCpt Y S y) [Fintype (CMType H)] (Fl : 𝔐.Flag) (p : Cpt 𝔐.ξ), (∀ n : ℕ, n ≠ 0 → IsUnit ((n : 𝔐.X.presheaf.stalk p.1))) → ∃ b : ∀ s, Fin (labelRk D s) → 𝔐.Li, (∀ s (i : ℕ), flagStep Ω (b s) i = flagStep Ω (Fl.b s) i) ∧ (∀ s (i : ℕ), ∀ e ∈ flagStep Ω (b s) i, e ∈ 𝔐.M.lat p → e ∈ Submodule.span (regAt 𝔐.ξ p) (b s '' {k | (k : ℕ) < i})) ∧ LinearIndependent Ω (fun q : Σ s, Fin (labelRk D s) => b q.1 q.2) ∧ Submodule.span Ω (Set.range fun q : Σ s, Fin (labelRk D s) => b q.1 q.2) = ⊤ ∧ 𝔐.M.lat p = Submodule.span (regAt 𝔐.ξ p) (Set.range fun q : Σ s, Fin (labelRk D s) => b q.1 q.2) ∧ ∀ s, Submodule.span Ω (Set.range (b s)) = 𝔐.Vgen s := by
   intro E _ _ _ H D l Xo c Y S Ω _ K _ J y 𝔐 _ Fl p hu
   classical
   haveI : CharZero c.F := charZero_of_injective_algebraMap (algebraMap ℚ c.F).injective
@@ -204,17 +196,13 @@ theorem exists_frames
   choose U hU b hflag hfr using fun s => Fl.sub s p (Set.mem_univ p)
   have hF : ∀ s, (𝔐.V s).IsFrameAt (b s) p := fun s => hfr s p (Set.mem_univ p) (hU s)
   have hli : ∀ s, LinearIndependent Ω (b s) := fun s => (hF s).1
-  have hst
-      : ∀ s,
-        𝔐.M.lat p ⊓ (eigSp 𝔐.ρ (𝔐.emb s)).restrictScalars (regAt 𝔐.ξ p)
-          = Submodule.span (regAt 𝔐.ξ p) (Set.range (b s)) := fun s =>
-    (hVd s).symm.trans (hF s).2
+  have hst : ∀ s, 𝔐.M.lat p ⊓ (eigSp 𝔐.ρ (𝔐.emb s)).restrictScalars (regAt 𝔐.ξ p) =
+      Submodule.span (regAt 𝔐.ξ p) (Set.range (b s)) := fun s => (hVd s).symm.trans (hF s).2
 
   have hΩ : ∀ s, Submodule.span Ω (Set.range (b s)) = 𝔐.Vgen s := by
     intro s
     obtain ⟨U', hU', b', hb', hfr'⟩ := 𝔐.vb s p (Set.mem_univ p)
-    have h' : 𝔐.V s p = Submodule.span (regAt 𝔐.ξ p) (Set.range b') :=
-      (hfr' p (Set.mem_univ p) hU').2
+    have h' : 𝔐.V s p = Submodule.span (regAt 𝔐.ξ p) (Set.range b') := (hfr' p (Set.mem_univ p) hU').2
     have e1 := Submodule.span_span_of_tower (regAt 𝔐.ξ p) Ω (Set.range (b s))
     have e2 := Submodule.span_span_of_tower (regAt 𝔐.ξ p) Ω (Set.range b')
     rw [← e1, ← (hF s).2, h', e2]
@@ -223,8 +211,7 @@ theorem exists_frames
   have hlab := GlobalTheory.CompanionTheory.Ar.LabelCount.labels_injective_card E H l c Ω 𝔐.cst
   have hinj : Function.Injective 𝔐.emb := hlab.1
   have hint : DirectSum.IsInternal fun s => eigSp 𝔐.ρ (𝔐.emb s) :=
-    GlobalTheory.T.eigenspace_decomposition_internal Ω 𝔐.Li E 𝔐.ρ (CMType H ⊕ CMType H) 𝔐.emb hinj
-      hlab.2
+    GlobalTheory.T.eigenspace_decomposition_internal Ω 𝔐.Li E 𝔐.ρ (CMType H ⊕ CMType H) 𝔐.emb hinj hlab.2
   let v : ∀ s, Module.Basis (Fin (labelRk D s)) Ω (eigSp 𝔐.ρ (𝔐.emb s)) := fun s =>
     (Module.Basis.span (hli s)).map (LinearEquiv.ofEq _ _ (hΩ s))
   have hB : ⇑(hint.collectedBasis v) = fun q : Σ s, Fin (labelRk D s) => b q.1 q.2 := by
@@ -232,8 +219,7 @@ theorem exists_frames
     funext q
     simp [v, Module.Basis.span_apply]
 
-  obtain ⟨g₀, hg₀⟩ :=
-    GlobalTheory.CompanionTheory.Ar.Flat.KonstReg.exists_const_stalk E H D l Xo c Y S Ω K J y 𝔐 p hu
+  obtain ⟨g₀, hg₀⟩ := GlobalTheory.CompanionTheory.Ar.Flat.KonstReg.exists_const_stalk E H D l Xo c Y S Ω K J y 𝔐 p hu
   have hcst : ∀ x : c.F, 𝔐.cst x ∈ regAt 𝔐.ξ p := fun x =>
     RingHom.mem_range.2 ⟨g₀ x, by rw [← hg₀]; rfl⟩
   have hval : ∀ s a, 𝔐.emb s a ∈ regAt 𝔐.ξ p := fun s a => hcst _

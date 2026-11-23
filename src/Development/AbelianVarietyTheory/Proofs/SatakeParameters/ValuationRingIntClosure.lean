@@ -1,20 +1,55 @@
 module
 
-public import Mathlib
-public import Formalism.LocalRingCardinality.RankBoundMonotoneInDimension
-public import Formalism.LocalRingCardinality.DataKerI
 public import Formalism.SharpRestriction.GlobalSchurBounds.GL3Theta
-public import Formalism.LocalToGlobal.KernelLattices.LateralTheory
-public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.TauPlBijective
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Real
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.Padics.ProperSpace
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Connected.Separation
+import Mathlib.Topology.MetricSpace.Ultra.TotallySeparated
+import Mathlib.Topology.Sheaves.Init
+import Development.AbelianVarietyTheory.Proofs.SatakeParameters.TauPlBijective
 
 @[expose] public section
 
-set_option synthInstance.maxHeartbeats 400000
+
 
 noncomputable section
 
-open NumberField Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.G
-  Formalism.MainNotions.TaylorLogMetric GlobalTheory.InertCompare Classical
+open NumberField Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.G Formalism.MainNotions.TaylorLogMetric GlobalTheory.InertCompare Classical
 
 namespace GlobalTheory.CompletedBasis
 
@@ -22,10 +57,8 @@ section General
 
 variable {l : ℕ} [Fact l.Prime]
 
-theorem isCompact_closure_range
-    {A V : Type} [AddCommGroup A] [Module.Finite ℤ A] [NormedAddCommGroup V] [NormedSpace ℚ_[l] V]
-    (f : A →+ V)
-    : IsCompact (closure (Set.range f)) := by
+theorem isCompact_closure_range {A V : Type} [AddCommGroup A] [Module.Finite ℤ A] [NormedAddCommGroup V]
+    [NormedSpace ℚ_[l] V] (f : A →+ V) : IsCompact (closure (Set.range f)) := by
   obtain ⟨n, b, hb⟩ := Module.Finite.exists_fin (R := ℤ) (M := A)
   let g : (Fin n → ℤ_[l]) → V := fun c => ∑ i, ((c i : ℤ_[l]) : ℚ_[l]) • f (b i)
   have hg : Continuous g := by
@@ -37,16 +70,14 @@ theorem isCompact_closure_range
   have ha : a ∈ Submodule.span ℤ (Set.range b) := hb ▸ Submodule.mem_top
   obtain ⟨c, rfl⟩ := (Submodule.mem_span_range_iff_exists_fun ℤ).1 ha
   refine ⟨fun i => (c i : ℤ_[l]), ?_⟩
-  set_option synthInstance.maxHeartbeats 100000 in
+
   simp only [g, map_sum, map_zsmul, PadicInt.coe_intCast, Int.cast_smul_eq_zsmul]
 
 variable {K : Type} [Field K] [NumberField K] (ρ : K →+* ℂ_[l])
 
 def intClosure : Subring ℂ_[l] := (ρ.comp (algebraMap (𝓞 K) K)).range.topologicalClosure
 
-theorem coe_intClosure
-    : (intClosure ρ : Set ℂ_[l]) = closure (Set.range fun a : 𝓞 K => ρ (a : K)) :=
-  rfl
+theorem coe_intClosure : (intClosure ρ : Set ℂ_[l]) = closure (Set.range fun a : 𝓞 K => ρ (a : K)) := rfl
 
 theorem isCompact_intClosure : IsCompact (intClosure ρ : Set ℂ_[l]) :=
   isCompact_closure_range (l := l) (ρ.comp (algebraMap (𝓞 K) K)).toAddMonoidHom
@@ -62,8 +93,7 @@ theorem norm_le_one_of_mem {x : ℂ_[l]} (hx : x ∈ intClosure ρ) : ‖x‖ �
   rw [norm_pow] at this
   exact absurd hn (not_lt.2 this)
 
-variable
-  {E : Type} [Field E] [NumberField E] [Algebra K E] {ι : Type} [Fintype ι] (σ : ι → E →+* ℂ_[l])
+variable {E : Type} [Field E] [NumberField E] [Algebra K E] {ι : Type} [Fintype ι] (σ : ι → E →+* ℂ_[l])
 
 end General
 
@@ -85,18 +115,13 @@ def rhoK : D.host.K →+* ℂ_[l] := (rhoBase D lam).comp (algebraMap D.host.K D
 
 theorem fst_image_OKp : Prod.fst '' GL3Theta.OKp D lam = (intClosure (rhoK D lam) : Set ℂ_[l]) := by
   let f : 𝓞 D.host.K →+ ℂ_[l] × ℂ_[l] :=
-    (((rhoK D lam).prod
-      (((rhoBase D lam).comp (D.host.conj : D.host.E →+* D.host.E)).comp
-        (algebraMap D.host.K D.host.E))).comp (algebraMap (𝓞 D.host.K) D.host.K)).toAddMonoidHom
-  have hf
-      : (fun a : 𝓞 D.host.K =>
-          (GL3Theta.tauK D lam (a : D.host.K), GL3Theta.tauKc D lam (a : D.host.K)))
-        = f := by
+    (((rhoK D lam).prod (((rhoBase D lam).comp (D.host.conj : D.host.E →+* D.host.E)).comp
+      (algebraMap D.host.K D.host.E))).comp (algebraMap (𝓞 D.host.K) D.host.K)).toAddMonoidHom
+  have hf : (fun a : 𝓞 D.host.K => (GL3Theta.tauK D lam (a : D.host.K), GL3Theta.tauKc D lam (a : D.host.K))) = f := by
     funext a
     exact Prod.ext (rhoBase_apply D lam _).symm (rhoBase_apply D lam _).symm
   unfold GL3Theta.OKp
-  rw [hf,
-    image_closure_of_isCompact (isCompact_closure_range (l := l) f) continuous_fst.continuousOn,
+  rw [hf, image_closure_of_isCompact (isCompact_closure_range (l := l) f) continuous_fst.continuousOn,
     ← Set.range_comp, coe_intClosure]
   rfl
 

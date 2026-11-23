@@ -1,9 +1,53 @@
 module
 
-public import Mathlib
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.ThetaUnifAV
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDescent.SecBaseChangeAnySt
 public import Development.AbelianVarietyTheory.Proofs.CoherentCohomologyProofs.MonomialMemReesAlgIff
+import Mathlib.Algebra.AffineMonoid.UniqueSums
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.AlgebraicGeometry.Modules.Sheaf
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
 
 @[expose] public section
 
@@ -17,20 +61,16 @@ open Polynomial
 
 variable {K A : Type} [Field K] [CommRing A] [Algebra K A]
 
-def polyAlg (M : ℕ → Submodule K A) [SetLike.GradedMonoid M] : Subalgebra K A[X] :=
-  GlobalTheory.ReesAlgebraMembership.reesAlg M
+def polyAlg (M : ℕ → Submodule K A) [SetLike.GradedMonoid M] : Subalgebra K A[X] := GlobalTheory.ReesAlgebraMembership.reesAlg M
 
 variable (M : ℕ → Submodule K A) [SetLike.GradedMonoid M]
 
 def mono (e : ℕ) : M e →ₗ[K] polyAlg M where
-  toFun a := ⟨
-    monomial e (a : A),
-    fun n => by
-      rw [coeff_monomial_apply]
-      split_ifs with h
-      · exact h ▸ a.2
-      · exact (M n).zero_mem
-  ⟩
+  toFun a := ⟨monomial e (a : A), fun n => by
+    rw [coeff_monomial_apply]
+    split_ifs with h
+    · exact h ▸ a.2
+    · exact (M n).zero_mem⟩
   map_add' a b := Subtype.ext ((monomial e).map_add (a : A) (b : A))
   map_smul' c a := Subtype.ext (smul_monomial c e (a : A)).symm
 
@@ -45,14 +85,12 @@ instance : SetLike.GradedMonoid (piece M) where
   one_mem := ⟨⟨1, SetLike.one_mem_graded M⟩, Subtype.ext (by simp [mono_val])⟩
   mul_mem := by
     rintro i j _ _ ⟨a, rfl⟩ ⟨b, rfl⟩
-    exact ⟨
-      ⟨a * b, SetLike.mul_mem_graded a.2 b.2⟩,
-      Subtype.ext (by simp [mono_val, monomial_mul_monomial])
-    ⟩
+    exact ⟨⟨a * b, SetLike.mul_mem_graded a.2 b.2⟩,
+      Subtype.ext (by simp [mono_val, monomial_mul_monomial])⟩
 
-theorem coeff_coe (x : DirectSum ℕ fun e => piece M e) (n : ℕ)
-    : ((DirectSum.coeAddMonoidHom (piece M) x : polyAlg M) : A[X]).coeff n
-      = ((x n : polyAlg M) : A[X]).coeff n := by
+theorem coeff_coe (x : DirectSum ℕ fun e => piece M e) (n : ℕ) :
+    ((DirectSum.coeAddMonoidHom (piece M) x : polyAlg M) : A[X]).coeff n =
+      ((x n : polyAlg M) : A[X]).coeff n := by
   induction x using DirectSum.induction_on with
   | zero => simp
   | of i y =>
@@ -67,8 +105,7 @@ theorem coeff_coe (x : DirectSum ℕ fun e => piece M e) (n : ℕ)
 
 theorem isInternal : DirectSum.IsInternal (piece M) := by
   constructor
-  · set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
-      rw [injective_iff_map_eq_zero]
+  · set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
     intro x hx
     ext1 n
     have h := coeff_coe M x n
@@ -80,13 +117,10 @@ theorem isInternal : DirectSum.IsInternal (piece M) := by
     rw [← ha, ha0, map_zero]
     rfl
   · intro r
-    refine ⟨
-      ∑ n ∈ (r : A[X]).support,
-        DirectSum.of (fun e => piece M e) n ⟨mono M n ⟨_, r.2 n⟩, _, rfl⟩,
-      ?_
-    ⟩
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+    refine ⟨∑ n ∈ (r : A[X]).support,
+      DirectSum.of (fun e => piece M e) n ⟨mono M n ⟨_, r.2 n⟩, _, rfl⟩, ?_⟩
+
+    rw [map_sum]
     apply Subtype.ext
     simp only [DirectSum.coeAddMonoidHom_of, AddSubmonoidClass.coe_finsetSum, mono_val]
     exact (as_sum_support _).symm
@@ -95,12 +129,10 @@ def grading : GradedAlgebra (piece M) where
   toGradedMonoid := inferInstance
   toDecomposition := (isInternal M).chooseDecomposition
 
-theorem isDomain
-    {B : Type} [CommRing B] [IsDomain B] (π : A →+* B) (hπ : ∀ n, ∀ a ∈ M n, π a = 0 → a = 0)
-    : IsDomain (polyAlg M) := by
+theorem isDomain {B : Type} [CommRing B] [IsDomain B] (π : A →+* B)
+    (hπ : ∀ n, ∀ a ∈ M n, π a = 0 → a = 0) : IsDomain (polyAlg M) := by
   refine Function.Injective.isDomain ((mapRingHom π).comp (polyAlg M).val.toRingHom) ?_
-  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
-    rw [injective_iff_map_eq_zero]
+  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
   intro r hr
   apply Subtype.ext
   ext n
@@ -110,10 +142,8 @@ theorem isDomain
 
 end Abstract
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
-  Complex Matrix Filter Topology
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
-  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj Complex Matrix Filter Topology
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped BigOperators Real
 
 section Sections
@@ -123,10 +153,9 @@ variable {K : Type} [Field K] {X : Scheme.{0}} (p : X ⟶ Sp K) (L : LB X)
 def constHom (U : X.Opens) : K →+* Γ(X, U) :=
   (p.appLE ⊤ U (fun _ _ => trivial)).hom.comp (Scheme.ΓSpecIso (CommRingCat.of K)).inv.hom
 
-theorem res_constHom {U V : X.Opens} (h : V ≤ U) (a : K)
-    : (X.presheaf.map (homOfLE h).op).hom (constHom p U a) = constHom p V a :=
-  congrArg
-    (fun φ => φ.hom ((Scheme.ΓSpecIso (CommRingCat.of K)).inv.hom a))
+theorem res_constHom {U V : X.Opens} (h : V ≤ U) (a : K) :
+    (X.presheaf.map (homOfLE h).op).hom (constHom p U a) = constHom p V a :=
+  congrArg (fun φ => φ.hom ((Scheme.ΓSpecIso (CommRingCat.of K)).inv.hom a))
     (Scheme.Hom.appLE_map p (U := ⊤) (V := U) (fun _ _ => trivial) (homOfLE h).op)
 
 abbrev chart (j : PUnit → L.ι) : X.Opens := LB.wchart L (K := PUnit) (fun _ => 𝟙 X) j
@@ -136,13 +165,14 @@ def Fam (_p : X ⟶ Sp K) (L : LB X) : Type := ∀ j : PUnit → L.ι, Γ(X, cha
 instance : CommRing (Fam p L) := inferInstanceAs (CommRing (∀ j : PUnit → L.ι, Γ(X, chart L j)))
 
 instance : Algebra K (Fam p L) :=
-  (Pi.ringHom (fun j => constHom p (chart L j))
-    : K →+* ∀ j : PUnit → L.ι, Γ(X, chart L j)).toAlgebra
+  (Pi.ringHom (fun j => constHom p (chart L j)) :
+    K →+* ∀ j : PUnit → L.ι, Γ(X, chart L j)).toAlgebra
 
 def evalFam (j : PUnit → L.ι) : Fam p L →+* Γ(X, chart L j) :=
   Pi.evalRingHom (fun j : PUnit → L.ι => Γ(X, chart L j)) j
 
-def trans (e : ℕ) (i j : PUnit → L.ι) : Γ(X, chart L i ⊓ chart L j) := ((lbPow L e).g i j).val
+def trans (e : ℕ) (i j : PUnit → L.ι) : Γ(X, chart L i ⊓ chart L j) :=
+  ((lbPow L e).g i j).val
 
 theorem trans_zero (i j : PUnit → L.ι) : trans L 0 i j = 1 := by
   have : (lbPow L 0).g i j = 1 := by
@@ -153,8 +183,8 @@ theorem trans_zero (i j : PUnit → L.ι) : trans L 0 i j = 1 := by
   rw [this]
   rfl
 
-theorem trans_add (e e' : ℕ) (i j : PUnit → L.ι)
-    : trans L (e + e') i j = trans L e i j * trans L e' i j := by
+theorem trans_add (e e' : ℕ) (i j : PUnit → L.ι) :
+    trans L (e + e') i j = trans L e i j * trans L e' i j := by
   unfold trans lbPow LB.LinComb
   dsimp only
   rw [← Units.val_mul, ← Finset.prod_mul_distrib]
@@ -163,14 +193,14 @@ theorem trans_add (e e' : ℕ) (i j : PUnit → L.ι)
   rw [Nat.cast_add, _root_.zpow_add]
 
 def secs (e : ℕ) : Submodule K (Fam p L) where
-  carrier :=
-    {f | ∀ i j,
-      (X.presheaf.map (homOfLE (inf_le_left : chart L i ⊓ chart L j ≤ chart L i)).op).hom
-          (evalFam p L i f) =
-        trans L e i j *
-          (X.presheaf.map (homOfLE (inf_le_right : chart L i ⊓ chart L j ≤ chart L j)).op).hom
-            (evalFam p L j f)}
-  add_mem' := fun {a b} ha hb i j => by simp only [map_add (f := _), ha i j, hb i j, _root_.mul_add]
+  carrier := {f | ∀ i j,
+    (X.presheaf.map (homOfLE (inf_le_left : chart L i ⊓ chart L j ≤ chart L i)).op).hom
+        (evalFam p L i f) =
+      trans L e i j *
+        (X.presheaf.map (homOfLE (inf_le_right : chart L i ⊓ chart L j ≤ chart L j)).op).hom
+          (evalFam p L j f)}
+  add_mem' := fun {a b} ha hb i j => by
+    simp only [map_add (f := _), ha i j, hb i j, _root_.mul_add]
   zero_mem' := fun i j => by simp only [map_zero, MulZeroClass.mul_zero]
   smul_mem' := fun c a ha i j => by
     have h : ∀ k, evalFam p L k (c • a) = constHom p _ c * evalFam p L k a := fun k => rfl
@@ -178,7 +208,8 @@ def secs (e : ℕ) : Submodule K (Fam p L) where
     ring
 
 instance : SetLike.GradedMonoid (secs p L) where
-  one_mem := fun i j => by simp only [map_one, trans_zero, _root_.mul_one]
+  one_mem := fun i j => by
+    simp only [map_one, trans_zero, _root_.mul_one]
   mul_mem := fun e e' a b ha hb i j => by
     simp only [map_mul, ha i j, hb i j, trans_add]
     ring
@@ -189,20 +220,18 @@ def secEquiv (e : ℕ) : (lbPow L e).Sec ≃ secs p L e where
   left_inv _ := rfl
   right_inv _ := rfl
 
-theorem eq_zero_of_chart
-    [IsIntegral X]
-    (j₀ : PUnit → L.ι) [Nonempty (chart L j₀)]
-    (e : ℕ) (a : Fam p L) (ha : a ∈ secs p L e) (h : evalFam p L j₀ a = 0)
-    : a = 0 := by
+theorem eq_zero_of_chart [IsIntegral X] (j₀ : PUnit → L.ι) [Nonempty (chart L j₀)] (e : ℕ)
+    (a : Fam p L) (ha : a ∈ secs p L e) (h : evalFam p L j₀ a = 0) : a = 0 := by
   funext j
   change evalFam p L j a = 0
   by_cases hj : Nonempty (chart L j)
   · obtain ⟨x⟩ := hj
     obtain ⟨y⟩ := ‹Nonempty (chart L j₀)›
-    obtain ⟨z, hz⟩ :=
-      nonempty_preirreducible_inter (chart L j).isOpen (chart L j₀).isOpen ⟨x.1, x.2⟩ ⟨y.1, y.2⟩
+    obtain ⟨z, hz⟩ := nonempty_preirreducible_inter (chart L j).isOpen (chart L j₀).isOpen
+      ⟨x.1, x.2⟩ ⟨y.1, y.2⟩
     haveI : Nonempty (chart L j ⊓ chart L j₀ : X.Opens) := ⟨⟨z, hz⟩⟩
-    apply map_injective_of_isIntegral X (homOfLE (inf_le_left : chart L j ⊓ chart L j₀ ≤ chart L j))
+    apply map_injective_of_isIntegral X
+      (homOfLE (inf_le_left : chart L j ⊓ chart L j₀ ≤ chart L j))
     have h2 := ha j j₀
     rw [h, map_zero, MulZeroClass.mul_zero] at h2
     exact h2.trans (map_zero _).symm
@@ -216,45 +245,21 @@ theorem eq_zero_of_chart
 
 end Sections
 
-theorem exists_sectionRing
-    : (∀ (K : Type) [Field K] (X : Scheme.{0}) [IsIntegral X] (p : X ⟶ Sp K) (L : LB X),
-      L.IsLB
-        → ∃ (R : Type) (_ : CommRing R) (_ : IsDomain R) (_ : Algebra K R) (𝒜 : ℕ → Submodule K R)
-            (_ : GradedAlgebra 𝒜) (Φ : ∀ e : ℕ, (lbPow L e).Sec ≃ 𝒜 e),
-          (∀ e (s s' s'' : (lbPow L e).Sec),
-              (∀ j, s''.f j = s.f j + s'.f j) → Φ e s'' = Φ e s + Φ e s')
-            ∧ (∀ e (a : K) (s s' : (lbPow L e).Sec),
-              (∀ j, s'.f j = constFn p _ a * s.f j) → Φ e s' = a • Φ e s)
-            ∧ (∀ e e' (s : (lbPow L e).Sec) (s' : (lbPow L e').Sec) (s'' : (lbPow L (e + e')).Sec),
-              (∀ j,
-                  s''.f j
-                    = (show Γ(X, (lbPow L (e + e')).U j) from s.f j)
-                      * (show Γ(X, (lbPow L (e + e')).U j) from s'.f j))
-                → (Φ (e + e') s'' : R) = Φ e s * Φ e' s')
-            ∧ ∀ (j : PUnit → L.ι), ∃ ρ : R →+* Γ(X, (lbPow L 0).U j),
-              (∀ a : K, ρ (algebraMap K R a) = constFn p _ a)
-                ∧ ∀ e (s : (lbPow L e).Sec), ρ (Φ e s) = s.f j) := by
+theorem exists_sectionRing :
+    (∀ (K : Type) [Field K] (X : Scheme.{0}) [IsIntegral X] (p : X ⟶ Sp K) (L : LB X), L.IsLB → ∃ (R : Type) (_ : CommRing R) (_ : IsDomain R) (_ : Algebra K R) (𝒜 : ℕ → Submodule K R) (_ : GradedAlgebra 𝒜) (Φ : ∀ e : ℕ, (lbPow L e).Sec ≃ 𝒜 e), (∀ e (s s' s'' : (lbPow L e).Sec), (∀ j, s''.f j = s.f j + s'.f j) → Φ e s'' = Φ e s + Φ e s') ∧ (∀ e (a : K) (s s' : (lbPow L e).Sec), (∀ j, s'.f j = constFn p _ a * s.f j) → Φ e s' = a • Φ e s) ∧ (∀ e e' (s : (lbPow L e).Sec) (s' : (lbPow L e').Sec) (s'' : (lbPow L (e + e')).Sec), (∀ j, s''.f j = (show Γ(X, (lbPow L (e + e')).U j) from s.f j) * (show Γ(X, (lbPow L (e + e')).U j) from s'.f j)) → (Φ (e + e') s'' : R) = Φ e s * Φ e' s') ∧ ∀ (j : PUnit → L.ι), ∃ ρ : R →+* Γ(X, (lbPow L 0).U j), (∀ a : K, ρ (algebraMap K R a) = constFn p _ a) ∧ ∀ e (s : (lbPow L e).Sec), ρ (Φ e s) = s.f j) := by
   intro K _ X _ p L hL
   obtain ⟨x⟩ : Nonempty X := inferInstance
   have hx : x ∈ ⨆ i, L.U i := hL.cover ▸ trivial
   obtain ⟨i, hi⟩ := TopologicalSpace.Opens.mem_iSup.1 hx
   haveI : Nonempty (chart L fun _ => i) := ⟨⟨x, Set.mem_iInter.2 fun _ => hi⟩⟩
-  refine ⟨
-    polyAlg (secs p L),
-    inferInstance,
-    isDomain (secs p L) (evalFam p L fun _ => i) (eq_zero_of_chart p L _),
-    inferInstance,
-    piece (secs p L),
-    grading (secs p L),
-    fun e =>
-      (secEquiv p L e).trans (LinearEquiv.ofInjective _ (mono_injective (secs p L) e)).toEquiv,
-    ?_,
-    ?_,
-    ?_,
-    ?_
-  ⟩
+  refine ⟨polyAlg (secs p L), inferInstance,
+    isDomain (secs p L) (evalFam p L fun _ => i) (eq_zero_of_chart p L _), inferInstance,
+    piece (secs p L), grading (secs p L),
+    fun e => (secEquiv p L e).trans
+      (LinearEquiv.ofInjective _ (mono_injective (secs p L) e)).toEquiv, ?_, ?_, ?_, ?_⟩
   · intro e s s' s'' h
-    have h1 : secEquiv p L e s'' = secEquiv p L e s + secEquiv p L e s' := Subtype.ext (funext h)
+    have h1 : secEquiv p L e s'' = secEquiv p L e s + secEquiv p L e s' :=
+      Subtype.ext (funext h)
     exact (congrArg (LinearEquiv.ofInjective _ (mono_injective (secs p L) e)) h1).trans
       (map_add _ _ _)
   · intro e a s s' h
@@ -262,26 +267,21 @@ theorem exists_sectionRing
     exact (congrArg (LinearEquiv.ofInjective _ (mono_injective (secs p L) e)) h1).trans
       (map_smul _ _ _)
   · intro e e' s s' s'' h
-    have h1
-        : (secEquiv p L (e + e') s'' : Fam p L)
-          = (secEquiv p L e s : Fam p L) * (secEquiv p L e' s' : Fam p L) :=
-      funext h
+    have h1 : (secEquiv p L (e + e') s'' : Fam p L) =
+        (secEquiv p L e s : Fam p L) * (secEquiv p L e' s' : Fam p L) := funext h
     apply Subtype.ext
-    change Polynomial.monomial (e + e') (secEquiv p L (e + e') s'' : Fam p L)
-      = Polynomial.monomial e (secEquiv p L e s : Fam p L)
-        * Polynomial.monomial e' (secEquiv p L e' s' : Fam p L)
+    change Polynomial.monomial (e + e') (secEquiv p L (e + e') s'' : Fam p L) =
+      Polynomial.monomial e (secEquiv p L e s : Fam p L) *
+        Polynomial.monomial e' (secEquiv p L e' s' : Fam p L)
     rw [h1, Polynomial.monomial_mul_monomial]
   · intro j
-    refine ⟨
-      (evalFam p L j).comp ((Polynomial.evalRingHom 1).comp (polyAlg (secs p L)).val.toRingHom),
-      fun a => ?_,
-      fun e s => ?_
-    ⟩
+    refine ⟨(evalFam p L j).comp ((Polynomial.evalRingHom 1).comp
+      (polyAlg (secs p L)).val.toRingHom), fun a => ?_, fun e s => ?_⟩
     · change evalFam p L j (Polynomial.eval 1 (Polynomial.C (algebraMap K (Fam p L) a))) = _
       rw [Polynomial.eval_C]
       rfl
-    · change evalFam p L j (Polynomial.eval 1 (Polynomial.monomial e (secEquiv p L e s : Fam p L)))
-        = _
+    · change evalFam p L j
+        (Polynomial.eval 1 (Polynomial.monomial e (secEquiv p L e s : Fam p L))) = _
       rw [Polynomial.eval_monomial, one_pow, _root_.mul_one]
       rfl
 

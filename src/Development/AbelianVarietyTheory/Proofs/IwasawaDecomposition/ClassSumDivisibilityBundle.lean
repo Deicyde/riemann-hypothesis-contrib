@@ -1,28 +1,44 @@
 module
 
-public import Development.AbelianVarietyTheory.Definitions.GlobalTwisting.GeometricWeakTiesOfStrong
-public import Development.AbelianVarietyTheory.Definitions.HeightFunctions.OntoAlong
-public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.StrictHenselianAcyclic
-public import Development.AbelianVarietyTheory.PublishedTheorems.PublishedFoundations.NonemptyAlgHomOfIsRayOfDvd
 public import Development.AbelianVarietyTheory.Definitions.TwistedInnerProducts.ClassSumPin
-public import Development.AbelianVarietyTheory.Definitions.Divisors.RowSideOfCompatibleThetaPair
-public import Mathlib
-public import Development.AbelianVarietyTheory.Definitions.GlobalTwisting.ColumnCompatibleSelection
-public import Development.AbelianVarietyTheory.Definitions.Divisors.BaseRankDimension
-public import Formalism.LocalToGlobal.IndefiniteReal.NonzeroIndexPlaceIndepConstants
-public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.ThetaChr
-public import Formalism.LocalToGlobal.SiegelLatticeTheory.FlagStabilizerTensors.STiesR
-public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.SameDegreeZeroFormsSelf
-public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.DivisionPairOfAdelicFormsFaceColumnsData
-public import Formalism.LocalToGlobal.CarriedPlMap
-public import Formalism.LocalToGlobal.SelSide
-public import Formalism.LocalToGlobal.IndefiniteReal.DoubleCosetOperators.TwistedCharacterValue
-public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.TwArgs
-public import Development.AbelianVarietyTheory.Definitions.GlobalTwisting.DivRows3GIff
-public import Formalism.LocalToGlobal.Divisibility.ColPins
-public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.RootsOfUnityRingLeWittIntegers
 public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.SubsetTwistExceptionalPlaces
+public import Formalism.LocalToGlobal.IndefiniteReal.WeakCharacterisationWithError
 public import Development.AbelianVarietyTheory.Definitions.TwistedInnerProducts.ClassSumOfPin
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.PositionOfIntro
+import Development.AbelianVarietyTheory.Definitions.GlobalTwisting.ValidForConstructedPointClassesEventuallyWorking
+import Formalism.SharpRestriction.GlobalSchurBounds.TheoremThreeUnderScaleOfGeneral
 
 @[expose] public section
 
@@ -41,8 +57,6 @@ variable
   {Gl : Formalism.MainNotions.G.LatInst D} {Kc : Formalism.MainNotions.G.Consts} {Y : DivX D}
   {cX : ExtraC} {ex : Extra D L hT Gi Gl Kc Y cX} {Csz : ℝ}
 
-set_option maxHeartbeats 2000000 in
-set_option synthInstance.maxHeartbeats 400000 in
 theorem classSumPin_of_read
     (p : PtAt ex Csz) (Yr : R3.Read (A3 := p.P.A3) p.R.toRealDat p.F.lv2 ex.p0)
     (hjW : ∀ (i : Fin D.R.m) (v : Fin ((p.P.A3.indefDown p.P.S0).dW i) → D.what₂.LL)
@@ -77,8 +91,6 @@ namespace GlobalTheory.ClassSumPinLink
 open Formalism.L2 Formalism.L2.Theta Formalism.L2.DIV Formalism.L2.Indef Formalism.L2.Pj
   Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.NX
 
-set_option maxHeartbeats 2000000 in
-set_option synthInstance.maxHeartbeats 400000 in
 theorem eMtTheta_of_pack
     {D : D7} {nch : NChoice D} {X0 : BaseLevelRowSide D} {G G' : Type} {g : Group G} {g' : Group G'}
     {fi : Fintype G} {fi' : Fintype G'} {Pl0 I0 T Pl0' I0' T' : Type}

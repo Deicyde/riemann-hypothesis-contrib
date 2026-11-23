@@ -1,11 +1,55 @@
 module
 
 public import Formalism.AdmissibleDesigns.NonemptyPl
-public import Formalism.SharpRestriction.LevelLetterCocycles.ExistsInertiaCharpolyFactorOfTameType
 public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.FiniteExtensionTopology.AddPreservesExpCongruence
-public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.FiniteExtensionTopology.ExpCongruenceExtendsToSum
-public import Formalism.AdicCompletionExports.AdicCompleteRingEquiv.IsAdicCompleteOfRingEquiv
+public import Formalism.SharpRestriction.LevelLetterCocycles.GoodCongruenceDataOf
+public import Formalism.WachLatticeTwists.RamifiedBlockRings.DistinctEigenvalueCornerPerturbation
+public import Formalism.WachLatticeTwists.RealClassMaps.RealClassMapTheorem
 public import Development.AutomorphicArithmetic.CyclotomicBounds.FactorizationConductorLeLocalLevel
+public import Formalism.AdicCompletionExports.AdicCompleteRingEquiv.IsAdicCompleteOfRingEquiv
+public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.FiniteExtensionTopology.ExpCongruenceExtendsToSum
+public import Formalism.SharpRestriction.LevelLetterCocycles.ExistsInertiaCharpolyFactorOfTameType
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.Padics.ProperSpace
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -240,8 +284,8 @@ theorem int_R' (hD : RingDef O T r₀ π χ₁ ε g₀ eB e₁ s Dd)
   intro a ha x' i j
   obtain ⟨S, c, -, rfl⟩ := (h8 a).1 ha
   refine ⟨∑ g ∈ S, c g x' * r₀ g (Dd.p x') i j, ?_⟩
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [Finset.sum_apply, Matrix.sum_apply, map_sum, map_mul]
+
+  simp only [Finset.sum_apply, Matrix.sum_apply, map_sum, map_mul]
   refine Finset.sum_congr rfl fun g _ => ?_
   have := h7 g x'
   simp only [RingHom.toMonoidHom_eq_coe, MonoidHom.coe_comp, MonoidHom.coe_coe, Function.comp_apply]

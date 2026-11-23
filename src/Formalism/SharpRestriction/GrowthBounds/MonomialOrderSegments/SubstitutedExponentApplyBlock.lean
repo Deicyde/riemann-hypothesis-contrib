@@ -1,8 +1,54 @@
 module
 
-public import Formalism.SharpRestriction.GrowthBounds.MonomialOrderSegments.DigitPartMonomial
-public import Formalism.SharpRestriction.GrowthBounds.MonomialOrderSegments.ProjKeepsLetter
+public import Formalism.SharpRestriction.GrowthBounds.MonomialOrderSegments.CollapseExponent
 public import Formalism.SharpRestriction.GrowthBounds.MonomialOrderSegments.AddMemSupportOfMemSupportCoefOut
+public import Formalism.SharpRestriction.GrowthBounds.MonomialOrderSegments.FockMonomialRight
+public import Formalism.SharpRestriction.GrowthBounds.MonomialOrderSegments.ProjKeepsLetter
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Real
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Presheaf
+import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
@@ -255,16 +301,16 @@ theorem stepP_of
         Pj Z = ∑ ζ ∈ Z.support, Z.coeff ζ • Pr (fun i => ldeg ζ i) (monomial ζ 1) := by
     intro Z
     conv_lhs => rw [Z.as_sum]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     refine Finset.sum_congr rfl (fun ζ _ => ?_)
     rw [hmono, map_smul, hPj]
   have hhom : ∀ (d : D.ML → ℕ), ∀ F ∈ PolK K D.r d, Pj F = Pr d F := by
     intro d F hF
     rw [hlin]
     conv_rhs => rw [F.as_sum]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     refine Finset.sum_congr rfl (fun ζ hζ => ?_)
     have hd : (fun i => ldeg ζ i) = d := funext ((mem_PolK_iff d F).1 hF ζ hζ)
     rw [hd, hmono ζ (F.coeff ζ), map_smul]
@@ -323,8 +369,8 @@ theorem stepP_of
   · intro j m θ Z hZ
     have hsplit : Pj Z = ∑ d ∈ Z.support.image (fun α i => ldeg α i), Pr d (hcomp d Z) := by
       conv_lhs => rw [sum_hcomp Z]
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum]
+
+      rw [map_sum]
       exact Finset.sum_congr rfl (fun d _ => hhom d _ (hcomp_mem_PolK d Z))
     rw [vala_iff_Aset, hsplit]
     apply Aset_sum

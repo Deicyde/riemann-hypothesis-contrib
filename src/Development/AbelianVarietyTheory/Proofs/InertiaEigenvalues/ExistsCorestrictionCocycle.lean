@@ -1,6 +1,52 @@
 module
 
-public import Mathlib
+public import Mathlib.GroupTheory.Index
+public import Mathlib.RepresentationTheory.Basic
+public import Mathlib.Topology.Algebra.Group.Defs
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+public import Mathlib.Topology.Algebra.Monoid
 
 @[expose] public section
 
@@ -8,8 +54,8 @@ namespace GlobalTheory
 
 open scoped BigOperators
 
-theorem corCoc_mem {G : Type} [Group G] (H : Subgroup G) (g : G) (q : G ⧸ H)
-    : (g • q).out⁻¹ * g * q.out ∈ H := by
+theorem corCoc_mem {G : Type} [Group G] (H : Subgroup G) (g : G) (q : G ⧸ H) :
+    (g • q).out⁻¹ * g * q.out ∈ H := by
   have h : (QuotientGroup.mk (g • q).out : G ⧸ H) = QuotientGroup.mk (g * q.out) := by
     rw [QuotientGroup.out_eq']
     conv_lhs => rw [← QuotientGroup.out_eq' q]
@@ -17,30 +63,13 @@ theorem corCoc_mem {G : Type} [Group G] (H : Subgroup G) (g : G) (q : G ⧸ H)
   have := QuotientGroup.eq.mp h
   simpa [mul_assoc] using this
 
-theorem exists_corestriction_cocycle
-    : ∀ (R G X : Type) [CommRing R] [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
-        [AddCommGroup X] [Module R X] [TopologicalSpace X] [IsTopologicalAddGroup X]
-        (ρ : Representation R G X) (H : Subgroup G) [H.Normal] [H.FiniteIndex],
-      IsOpen (H : Set G) → (∀ g, Continuous (ρ g)) → (∀ x, Continuous fun g => ρ g x)
-        → ∀ f : G → X,
-          ContinuousOn f H → (∀ g ∈ H, ∀ h ∈ H, f (g * h) = f g + ρ g (f h))
-            → ∃ F : G → X,
-              Continuous F ∧ (∀ g h, F (g * h) = F g + ρ g (F h))
-                ∧ (∃ x, ∀ h ∈ H,
-                  F h = (∑ᶠ q : G ⧸ H, ρ q.out (f (q.out⁻¹ * h * q.out))) + (ρ h x - x))
-                ∧ ∀ (Y : Submodule R X),
-                  (∀ g, ∀ y ∈ Y, ρ g y ∈ Y)
-                    → ∀ (f₀ : G → X) (x : X),
-                      (∀ g h, f₀ (g * h) - (f₀ g + ρ g (f₀ h)) ∈ Y)
-                        → (∀ h ∈ H, f h - f₀ h - (ρ h x - x) ∈ Y)
-                        → ∃ x', ∀ g, F g - H.index • f₀ g - (ρ g x' - x') ∈ Y := by
+theorem exists_corestriction_cocycle : ∀ (R G X : Type) [CommRing R] [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [AddCommGroup X] [Module R X] [TopologicalSpace X] [IsTopologicalAddGroup X] (ρ : Representation R G X) (H : Subgroup G) [H.Normal] [H.FiniteIndex], IsOpen (H : Set G) → (∀ g, Continuous (ρ g)) → (∀ x, Continuous fun g => ρ g x) → ∀ f : G → X, ContinuousOn f H → (∀ g ∈ H, ∀ h ∈ H, f (g * h) = f g + ρ g (f h)) → ∃ F : G → X, Continuous F ∧ (∀ g h, F (g * h) = F g + ρ g (F h)) ∧ (∃ x, ∀ h ∈ H, F h = (∑ᶠ q : G ⧸ H, ρ q.out (f (q.out⁻¹ * h * q.out))) + (ρ h x - x)) ∧ ∀ (Y : Submodule R X), (∀ g, ∀ y ∈ Y, ρ g y ∈ Y) → ∀ (f₀ : G → X) (x : X), (∀ g h, f₀ (g * h) - (f₀ g + ρ g (f₀ h)) ∈ Y) → (∀ h ∈ H, f h - f₀ h - (ρ h x - x) ∈ Y) → ∃ x', ∀ g, F g - H.index • f₀ g - (ρ g x' - x') ∈ Y := by
   intro R G X _ _ _ _ _ _ _ _ ρ H _ _ hH hρ _ f hf hc
   classical
   haveI : Fintype (G ⧸ H) := Fintype.ofFinite _
   have hmul : ∀ (a b : G) (x : X), ρ a (ρ b x) = ρ (a * b) x := by
     intro a b x
-    rw [map_mul]
-    rfl
+    rw [map_mul]; rfl
   refine ⟨fun g => ∑ q : G ⧸ H, ρ (g • q).out (f ((g • q).out⁻¹ * g * q.out)), ?_, ?_, ?_, ?_⟩
   · refine continuous_finsetSum _ fun q _ => ?_
     rw [continuous_iff_continuousAt]
@@ -62,17 +91,14 @@ theorem exists_corestriction_cocycle
       exact QuotientGroup.eq.mpr (by simpa [mul_assoc] using hg)
     rw [this]
   · intro g h
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum]
+
+    simp only [map_sum]
     rw [← Equiv.sum_comp (MulAction.toPerm h)
-        (fun q : G ⧸ H => ρ (g • q).out (f ((g • q).out⁻¹ * g * q.out))),
-      ← Finset.sum_add_distrib]
+      (fun q : G ⧸ H => ρ (g • q).out (f ((g • q).out⁻¹ * g * q.out))), ← Finset.sum_add_distrib]
     refine Finset.sum_congr rfl fun q _ => ?_
     simp only [MulAction.toPerm_apply, mul_smul]
-    have e
-        : (g • h • q).out⁻¹ * (g * h) * q.out
-          = ((g • h • q).out⁻¹ * g * (h • q).out) * ((h • q).out⁻¹ * h * q.out) := by
-      group
+    have e : (g • h • q).out⁻¹ * (g * h) * q.out =
+        ((g • h • q).out⁻¹ * g * (h • q).out) * ((h • q).out⁻¹ * h * q.out) := by group
     rw [e, hc _ (corCoc_mem H g (h • q)) _ (corCoc_mem H h q), map_add (f := _), hmul, hmul]
     congr 3
     group
@@ -93,12 +119,12 @@ theorem exists_corestriction_cocycle
     refine ⟨∑ q : G ⧸ H, (f₀ q.out + ρ q.out x), fun g => ?_⟩
     have hidx : H.index • f₀ g = ∑ _q : G ⧸ H, f₀ g := by
       rw [Finset.sum_const, Finset.card_univ, Subgroup.index, Nat.card_eq_fintype_card]
-    have hre
-        : ∑ q : G ⧸ H, (f₀ q.out + ρ q.out x) = ∑ q : G ⧸ H, (f₀ (g • q).out + ρ (g • q).out x) :=
+    have hre : ∑ q : G ⧸ H, (f₀ q.out + ρ q.out x) =
+        ∑ q : G ⧸ H, (f₀ (g • q).out + ρ (g • q).out x) :=
       (Equiv.sum_comp (MulAction.toPerm g) (fun q : G ⧸ H => f₀ q.out + ρ q.out x)).symm
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hidx, map_sum, hre, ← Finset.sum_sub_distrib, ← Finset.sum_sub_distrib,
-        ← Finset.sum_sub_distrib]
+
+    rw [hidx, map_sum, hre, ← Finset.sum_sub_distrib, ← Finset.sum_sub_distrib,
+    ← Finset.sum_sub_distrib]
     refine Y.sum_mem fun q _ => ?_
     set s' := (g • q).out
     set s := q.out

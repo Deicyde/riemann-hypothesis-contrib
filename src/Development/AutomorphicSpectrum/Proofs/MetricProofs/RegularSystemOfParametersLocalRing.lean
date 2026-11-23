@@ -1,13 +1,57 @@
 module
 
-public import Mathlib
-public import Development.AutomorphicSpectrum.Proofs.MetricProofs.FiniteMinimalPrimes
-public import Development.AutomorphicSpectrum.Proofs.MetricProofs.ChPrime
-public import ReciprocityTheory.AnalyticForms.RegularLocalRings.ExistsMulMemOfAlgebraMapLocRingEqZero
-public import ReciprocityTheory.AnalyticForms.RegularLocalRings.Monomial
-public import ReciprocityTheory.AnalyticForms.RegularLocalRings.RegDom
-public import ReciprocityTheory.AnalyticForms.RegularLocalRings.StalkLoc
+import Development.AutomorphicSpectrum.Proofs.MetricProofs.UnitTimesParameterMonomial
 public import ReciprocityTheory.AnalyticForms.RegularLocalRings.JacChart
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.CStarAlgebra.Classes
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Tactic.TypeStar
+public import ReciprocityTheory.AnalyticForms.RegularLocalRings.ExistsMulMemOfAlgebraMapLocRingEqZero
+import ReciprocityTheory.AnalyticForms.RegularLocalRings.Monomial
+import ReciprocityTheory.AnalyticForms.RegularLocalRings.RegDom
 
 @[expose] public section
 
@@ -15,73 +59,37 @@ noncomputable section
 
 namespace GlobalTheory.CompanionTheory.Ar.Cmp.BdRad
 
-open MvPolynomial ReciprocityTheory.AnForm.R
-  ReciprocityTheory.AnForm.R.IrreducibleComponentPreimages
+open MvPolynomial ReciprocityTheory.AnForm.R ReciprocityTheory.AnForm.R.IrreducibleComponentPreimages
 
 variable {m : ℕ}
 
-theorem algebraMap_locRing_eq_zero_of_mem
-    (I : Ideal (MvPolynomial (Fin m) ℂ)) (t : Fin m → ℂ) {a : MvPolynomial (Fin m) ℂ} (ha : a ∈ I)
-    : algebraMap _ (locRing I t) a = 0 := by
-  have halg
-      : algebraMap (MvPolynomial (Fin m) ℂ) (locRing I t) a
-        = Ideal.Quotient.mk _ (algebraMap _ (locPt t) a) :=
-    rfl
+theorem algebraMap_locRing_eq_zero_of_mem (I : Ideal (MvPolynomial (Fin m) ℂ)) (t : Fin m → ℂ)
+    {a : MvPolynomial (Fin m) ℂ} (ha : a ∈ I) : algebraMap _ (locRing I t) a = 0 := by
+  have halg : algebraMap (MvPolynomial (Fin m) ℂ) (locRing I t) a =
+      Ideal.Quotient.mk _ (algebraMap _ (locPt t) a) := rfl
   rw [halg, Ideal.Quotient.eq_zero_iff_mem]
   exact Ideal.mem_map_of_mem _ ha
 
-theorem map_ptIdeal_eq_maximalIdeal
-    (I : Ideal (MvPolynomial (Fin m) ℂ)) (t : Fin m → ℂ) (hp : ∀ h ∈ I, eval t h = 0)
-    [IsLocalRing (locRing I t)]
-    : Ideal.map (algebraMap _ (locRing I t)) (ptIdeal t)
-      = IsLocalRing.maximalIdeal (locRing I t) := by
-  apply le_antisymm
-  · rw [Ideal.map_le_iff_le_comap]
-    intro a ha
-    rw [Ideal.mem_comap, IsLocalRing.mem_maximalIdeal, mem_nonunits_iff,
-      isUnit_algebraMap_locRing_iff I t hp, not_not]
-    exact RingHom.mem_ker.mp ha
-  · intro x hx
-    obtain ⟨a, b, hb, hab⟩ := exists_mk_locRing I t x
-    have hbu := (isUnit_algebraMap_locRing_iff I t hp b).mpr hb
-    have hxn : ¬ IsUnit x := hx
-    have ha : eval t a = 0 := by
-      by_contra hne
-      have hau := (isUnit_algebraMap_locRing_iff I t hp a).mpr hne
-      rw [← hab] at hau
-      exact hxn (isUnit_of_mul_isUnit_left hau)
-    obtain ⟨u, hu⟩ := hbu
-    have hx' : x = algebraMap _ (locRing I t) a * ↑u⁻¹ := by
-      rw [← hab, ← hu, mul_assoc, Units.mul_inv, mul_one]
-    rw [hx']
-    exact Ideal.mul_mem_right _ _ (Ideal.mem_map_of_mem _ (RingHom.mem_ker.mpr ha))
+theorem map_ptIdeal_eq_maximalIdeal (I : Ideal (MvPolynomial (Fin m) ℂ)) (t : Fin m → ℂ)
+    (hp : ∀ h ∈ I, eval t h = 0) [IsLocalRing (locRing I t)] :
+    Ideal.map (algebraMap _ (locRing I t)) (ptIdeal t) = IsLocalRing.maximalIdeal (locRing I t) := by
+  apply GlobalTheory.CompanionTheory.Ar.Cmp.SncRes.Par.map_ptIdeal_eq_maximalIdeal_ordAff <;> assumption
 
-theorem exists_den_of_mem_map
-    (I D : Ideal (MvPolynomial (Fin m) ℂ)) (t : Fin m → ℂ)
-    (hID : I ≤ D) (hp : ∀ h ∈ I, eval t h = 0)
-    {f : MvPolynomial (Fin m) ℂ}
-    (hf : algebraMap _ (locRing I t) f ∈ Ideal.map (algebraMap _ (locRing I t)) D)
-    : ∃ s, eval t s ≠ 0 ∧ s * f ∈ D := by
-  have key
-      : ∀ x ∈ Ideal.map (algebraMap (MvPolynomial (Fin m) ℂ) (locRing I t)) D, ∃ a ∈ D, ∃ b,
-        eval t b ≠ 0 ∧ x * algebraMap _ (locRing I t) b = algebraMap _ (locRing I t) a := by
+theorem exists_den_of_mem_map (I D : Ideal (MvPolynomial (Fin m) ℂ)) (t : Fin m → ℂ) (hID : I ≤ D)
+    (hp : ∀ h ∈ I, eval t h = 0) {f : MvPolynomial (Fin m) ℂ}
+    (hf : algebraMap _ (locRing I t) f ∈ Ideal.map (algebraMap _ (locRing I t)) D) :
+    ∃ s, eval t s ≠ 0 ∧ s * f ∈ D := by
+  have key : ∀ x ∈ Ideal.map (algebraMap (MvPolynomial (Fin m) ℂ) (locRing I t)) D,
+      ∃ a ∈ D, ∃ b, eval t b ≠ 0 ∧ x * algebraMap _ (locRing I t) b = algebraMap _ (locRing I t) a := by
     intro x hx
-    refine Submodule.span_induction
-      (p := fun x _ =>
-        ∃ a ∈ D, ∃ b,
-          eval t b ≠ 0 ∧ x * algebraMap _ (locRing I t) b = algebraMap _ (locRing I t) a)
-      ?_ ?_ ?_ ?_ hx
+    refine Submodule.span_induction (p := fun x _ => ∃ a ∈ D, ∃ b, eval t b ≠ 0 ∧
+      x * algebraMap _ (locRing I t) b = algebraMap _ (locRing I t) a) ?_ ?_ ?_ ?_ hx
     · rintro _ ⟨a, ha, rfl⟩
       exact ⟨a, ha, 1, by simp, by simp⟩
     · exact ⟨0, D.zero_mem, 1, by simp, by simp⟩
     · rintro x y _ _ ⟨a, ha, b, hb, hab⟩ ⟨c, hc, d, hd, hcd⟩
-      refine ⟨
-        a * d + c * b,
-        D.add_mem (D.mul_mem_right _ ha) (D.mul_mem_right _ hc),
-        b * d,
-        by simpa using ⟨hb, hd⟩,
-        ?_
-      ⟩
+      refine ⟨a * d + c * b, D.add_mem (D.mul_mem_right _ ha) (D.mul_mem_right _ hc), b * d,
+        by simpa using ⟨hb, hd⟩, ?_⟩
       simp only [map_add (f := _), map_mul, ← hab, ← hcd]
       ring
     · rintro c x _ ⟨a, ha, b, hb, hab⟩
@@ -90,18 +98,17 @@ theorem exists_den_of_mem_map
       simp only [smul_eq_mul, map_mul, ← hab, ← huv]
       ring
   obtain ⟨a, ha, b, hb, hab⟩ := key _ hf
-  have h0 : algebraMap _ (locRing I t) (f * b - a) = 0 := by rw [map_sub, map_mul, hab, sub_self]
+  have h0 : algebraMap _ (locRing I t) (f * b - a) = 0 := by
+    rw [map_sub, map_mul, hab, sub_self]
   obtain ⟨s, hs, hsm⟩ := exists_mul_mem_of_algebraMap_locRing_eq_zero I t h0
   refine ⟨s * b, by simpa using ⟨hs, hb⟩, ?_⟩
   have : s * b * f = s * (f * b - a) + s * a := by ring
   rw [this]
   exact D.add_mem (hID hsm) (D.mul_mem_left _ ha)
 
-theorem radical_span_prod_eq
-    {O ι : Type*} [CommRing O] [IsDomain O]
-    (R : ι → O)
-    (J : Finset ι) (hpr : ∀ i, Prime (R i)) (hna : ∀ i j, i ≠ j → ¬ Associated (R i) (R j))
-    : (Ideal.span {∏ i ∈ J, R i}).radical = Ideal.span {∏ i ∈ J, R i} := by
+theorem radical_span_prod_eq {O ι : Type*} [CommRing O] [IsDomain O] (R : ι → O) (J : Finset ι)
+    (hpr : ∀ i, Prime (R i)) (hna : ∀ i j, i ≠ j → ¬ Associated (R i) (R j)) :
+    (Ideal.span {∏ i ∈ J, R i}).radical = Ideal.span {∏ i ∈ J, R i} := by
   classical
   apply le_antisymm _ Ideal.le_radical
   rintro g ⟨n, hn⟩
@@ -125,23 +132,11 @@ theorem radical_span_prod_eq
 
 end GlobalTheory.CompanionTheory.Ar.Cmp.BdRad
 
-open MvPolynomial ReciprocityTheory.AnForm.R GlobalTheory.CompanionTheory.Ar.Cmp
-  ReciprocityTheory.AnForm.R.IrreducibleComponentPreimages
+open MvPolynomial ReciprocityTheory.AnForm.R GlobalTheory.CompanionTheory.Ar.Cmp ReciprocityTheory.AnForm.R.IrreducibleComponentPreimages
 
 namespace GlobalTheory.CompanionTheory.Ar.Cmp.BdRad
 
-theorem exists_den_prod_params
-    : ∀ (m e : ℕ) (I Dc : Ideal (MvPolynomial (Fin m) ℂ)) (t : Fin m → ℂ)
-        (r : Fin e → MvPolynomial (Fin m) ℂ) (Jf : Finset (Fin e)),
-      I ≤ Dc → (∀ h ∈ I, eval t h = 0) → IsRegularLocalRing (locRing I t)
-        → ringKrullDim (locRing I t) = e
-        → Ideal.span (Set.range fun l => algebraMap _ (locRing I t) (r l))
-          = Ideal.map (algebraMap _ (locRing I t)) (ptIdeal t)
-        → (∀ 𝔮 : Ideal (MvPolynomial (Fin m) ℂ),
-          𝔮.IsPrime → I ≤ 𝔮 → 𝔮 ≤ ptIdeal t → (Dc ≤ 𝔮 ↔ ∃ i ∈ Jf, r i ∈ 𝔮))
-        → ∃ h : MvPolynomial (Fin m) ℂ,
-          eval t h ≠ 0 ∧ h * ∏ l ∈ Jf, r l ∈ Dc.radical
-            ∧ ∀ g ∈ Dc.radical, h * g ∈ Ideal.span {∏ l ∈ Jf, r l} ⊔ I := by
+theorem exists_den_prod_params : ∀ (m e : ℕ) (I Dc : Ideal (MvPolynomial (Fin m) ℂ)) (t : Fin m → ℂ) (r : Fin e → MvPolynomial (Fin m) ℂ) (Jf : Finset (Fin e)), I ≤ Dc → (∀ h ∈ I, eval t h = 0) → IsRegularLocalRing (locRing I t) → ringKrullDim (locRing I t) = e → Ideal.span (Set.range fun l => algebraMap _ (locRing I t) (r l)) = Ideal.map (algebraMap _ (locRing I t)) (ptIdeal t) → (∀ 𝔮 : Ideal (MvPolynomial (Fin m) ℂ), 𝔮.IsPrime → I ≤ 𝔮 → 𝔮 ≤ ptIdeal t → (Dc ≤ 𝔮 ↔ ∃ i ∈ Jf, r i ∈ 𝔮)) → ∃ h : MvPolynomial (Fin m) ℂ, eval t h ≠ 0 ∧ h * ∏ l ∈ Jf, r l ∈ Dc.radical ∧ ∀ g ∈ Dc.radical, h * g ∈ Ideal.span {∏ l ∈ Jf, r l} ⊔ I := by
   classical
   intro m e I Dc t r Jf hID hp hreg hdim hspan hprime
   haveI := hreg
@@ -156,7 +151,8 @@ theorem exists_den_prod_params
   set Q : MvPolynomial (Fin m) ℂ := ∏ l ∈ Jf, r l with hQ
   have hPQ : alg Q = ∏ l ∈ Jf, R l := map_prod alg _ _
 
-  have hpr2 : ∀ 𝔓 : Ideal (locRing I t), 𝔓.IsPrime → (Ideal.map alg Dc ≤ 𝔓 ↔ alg Q ∈ 𝔓) := by
+  have hpr2 : ∀ 𝔓 : Ideal (locRing I t), 𝔓.IsPrime →
+      (Ideal.map alg Dc ≤ 𝔓 ↔ alg Q ∈ 𝔓) := by
     intro 𝔓 h𝔓
     have hq1 : (Ideal.comap alg 𝔓).IsPrime := Ideal.comap_isPrime alg 𝔓
     have hq2 : I ≤ Ideal.comap alg 𝔓 := fun a ha => by
@@ -169,8 +165,7 @@ theorem exists_den_prod_params
     rw [Ideal.map_le_iff_le_comap, hprime _ hq1 hq2 hq3, hPQ, Ideal.IsPrime.prod_mem_iff]
     rfl
   have hrad : (Ideal.map alg Dc).radical = Ideal.span {alg Q} := by
-    rw [hPQ, ← radical_span_prod_eq R Jf hpr hna, ← hPQ, Ideal.radical_eq_sInf,
-      Ideal.radical_eq_sInf]
+    rw [hPQ, ← radical_span_prod_eq R Jf hpr hna, ← hPQ, Ideal.radical_eq_sInf, Ideal.radical_eq_sInf]
     congr 1
     ext 𝔓
     simp only [Set.mem_setOf_eq, Ideal.span_singleton_le_iff_mem]
@@ -203,8 +198,7 @@ theorem exists_den_prod_params
     refine ⟨s * b, by simpa using ⟨hs, hb⟩, ?_⟩
     have : s * b * g = s * (g * b - Q * a) + Q * (s * a) := by ring
     rw [this, add_comm]
-    exact Ideal.add_mem _
-      (Ideal.mem_sup_left (Ideal.mul_mem_right _ _ (Ideal.mem_span_singleton_self _)))
+    exact Ideal.add_mem _ (Ideal.mem_sup_left (Ideal.mul_mem_right _ _ (Ideal.mem_span_singleton_self _)))
       (Ideal.mem_sup_right hsm)
 
   obtain ⟨S, hS⟩ : Dc.radical.FG := IsNoetherian.noetherian _
@@ -215,9 +209,8 @@ theorem exists_den_prod_params
   have hH0 : eval t H ≠ 0 := by
     rw [hH, map_prod]
     exact Finset.prod_ne_zero_iff.mpr hf0
-  have hHS
-      : Dc.radical
-        ≤ Submodule.comap (LinearMap.mulLeft (MvPolynomial (Fin m) ℂ) H) (Ideal.span {Q} ⊔ I) := by
+  have hHS : Dc.radical ≤
+      Submodule.comap (LinearMap.mulLeft (MvPolynomial (Fin m) ℂ) H) (Ideal.span {Q} ⊔ I) := by
     rw [← hS]
     refine Submodule.span_le.mpr fun g hg => ?_
     obtain ⟨w, hw⟩ := Finset.dvd_prod_of_mem f hg

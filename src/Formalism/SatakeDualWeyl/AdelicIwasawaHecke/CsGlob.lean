@@ -1,8 +1,56 @@
 module
 
+import Formalism.LocalToGlobal.GroupLattices.TrivialTransfer.FiniteStabAtOfLocal
 public import Formalism.SatakeDualWeyl.DefsCS
+public import Formalism.SatakeDualWeyl.AdelicIwasawaHecke.Adelstab
 public import Formalism.SatakeDualWeyl.AdelicIwasawaHecke.AdelstabL
 public import Formalism.SatakeDualWeyl.AdelicIwasawaHecke.CsGlobApprox
+import Formalism.SatakeDualWeyl.AdelicIwasawaHecke.Stabfin
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Etale.Weakly
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.TotallySplit
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -16,24 +64,20 @@ open Formalism.UG
 
 section
 
-variable
-  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
   {n : Type} [Fintype n] [DecidableEq n]
 
 local notation "𝒜" => E ⊗[F] FiniteAdeleRing (𝓞 F) F
 local notation "𝒮" => tensInt (F := F) (FiniteAdeleRing (𝓞 F) F) (intOE E) (intAd F)
 local notation "ι" => inclE (F := F) (E := E) (FiniteAdeleRing (𝓞 F) F)
 
-theorem csGlob_eq (g : GL n 𝒜) (Λ : Submodule (𝓞 E) (n → E))
-    : Formalism.UG.CS.globLat g Λ
-      = adelstabLam F E g (latS (F := F) (FiniteAdeleRing (𝓞 F) F) 𝒮 Λ) :=
-  rfl
+theorem csGlob_eq (g : GL n 𝒜) (Λ : Submodule (𝓞 E) (n → E)) :
+    Formalism.UG.CS.globLat g Λ =
+      adelstabLam F E g (latS (F := F) (FiniteAdeleRing (𝓞 F) F) 𝒮 Λ) := rfl
 
-theorem csGlob_lattice
-    (Λ : Submodule (𝓞 E) (n → E))
-    (hfin : Module.Finite (𝓞 E) Λ) (hspan : Submodule.span E (Λ : Set (n → E)) = ⊤)
-    (g : GL n 𝒜)
-    : Submodule.IsFullLattice E (Formalism.UG.CS.globLat g Λ) := by
+theorem csGlob_lattice (Λ : Submodule (𝓞 E) (n → E)) (hfin : Module.Finite (𝓞 E) Λ)
+    (hspan : Submodule.span E (Λ : Set (n → E)) = ⊤) (g : GL n 𝒜) :
+    Submodule.IsFullLattice E (Formalism.UG.CS.globLat g Λ) := by
   obtain ⟨c₁, hc₁, h₁⟩ := adelstabL_lower (F := F) Λ hspan
   obtain ⟨c₂, hc₂, h₂⟩ := adelstabL_upper (F := F) Λ hfin
   obtain ⟨d, hd, c, hc, hcg, hcgi⟩ := levelaf_exists_denom (E := E) g
@@ -44,8 +88,7 @@ theorem csGlob_lattice
   rw [csGlob_eq]
   exact {
     toIsLattice := Submodule.IsLattice.of_fg E (Module.Finite.iff_fg.mp hf)
-    span_eq_top := hs
-  }
+    span_eq_top := hs }
 
 variable (F E) in
 def csGlobN : Submodule (𝓞 F) E where
@@ -90,92 +133,62 @@ theorem csGlob_int (e : E) (he : ι e ∈ 𝒮) : IsIntegral ℤ e := by
     intro h
     have h1 : (1 : E) ∈ csGlobN F E := by
       show ι 1 ∈ 𝒮
-      rw [map_one]
-      exact one_mem _
+      rw [map_one]; exact one_mem _
     rw [h, Submodule.mem_bot] at h1
     exact one_ne_zero h1
-  have hI : IsIntegral (𝓞 F) e :=
-    isIntegral_of_smul_mem_submodule (csGlobN F E) hne csGlob_N_fg e (fun m hm => by
+  have hI : IsIntegral (𝓞 F) e := isIntegral_of_smul_mem_submodule (csGlobN F E) hne csGlob_N_fg e
+    (fun m hm => by
       show ι (e * m) ∈ 𝒮
-      rw [map_mul]
-      exact mul_mem he hm)
+      rw [map_mul]; exact mul_mem he hm)
   exact isIntegral_trans (R := ℤ) (A := 𝓞 F) e hI
 
-theorem csGlob_tmul_int (x : E) (ρ : 𝓞 F)
-    : x ⊗ₜ[F] algebraMap (𝓞 F) (FiniteAdeleRing (𝓞 F) F) ρ = ι (algebraMap (𝓞 F) E ρ * x) := by
+theorem csGlob_tmul_int (x : E) (ρ : 𝓞 F) :
+    x ⊗ₜ[F] algebraMap (𝓞 F) (FiniteAdeleRing (𝓞 F) F) ρ = ι (algebraMap (𝓞 F) E ρ * x) := by
   rw [IsScalarTower.algebraMap_apply (𝓞 F) F (FiniteAdeleRing (𝓞 F) F),
     IsScalarTower.algebraMap_apply (𝓞 F) F E,
     Algebra.algebraMap_eq_smul_one (A := FiniteAdeleRing (𝓞 F) F), ← TensorProduct.smul_tmul,
     ← Algebra.smul_def]
   rfl
 
-theorem csGlob_approx (hA : Formalism.UG.CS.IntAdApprox) (D : 𝓞 F) (hD : D ≠ 0) (s : 𝒜) (hs : s ∈ 𝒮)
-    : ∃ b : 𝓞 E, ∃ t ∈ 𝒮, s = ι (algebraMap (𝓞 E) E b) + levelafC E D * t := by
+theorem csGlob_approx (hA : Formalism.UG.CS.IntAdApprox) (D : 𝓞 F) (hD : D ≠ 0) (s : 𝒜)
+    (hs : s ∈ 𝒮) : ∃ b : 𝓞 E, ∃ t ∈ 𝒮, s = ι (algebraMap (𝓞 E) E b) + levelafC E D * t := by
   classical
   obtain ⟨m, bb, hb⟩ := Module.Finite.exists_fin (R := ℤ) (M := 𝓞 E)
   obtain ⟨r, hr, rfl⟩ := levelaf_decomp bb hb hs
   choose ρ y hy hρ using fun j => hA F D hD (r j) (hr j)
-  refine ⟨
-    ∑ j, algebraMap (𝓞 F) (𝓞 E) (ρ j) * bb j,
-    ∑ j, algebraMap (𝓞 E) E (bb j) ⊗ₜ[F] y j,
-    sum_mem fun j _ => levelaf_tmul_mem _ (hy j),
-    ?_
-  ⟩
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [hρ, TensorProduct.tmul_add, Finset.sum_add_distrib, map_sum, Finset.mul_sum,
-      levelafC, Algebra.TensorProduct.tmul_mul_tmul, one_mul]
+  refine ⟨∑ j, algebraMap (𝓞 F) (𝓞 E) (ρ j) * bb j, ∑ j, algebraMap (𝓞 E) E (bb j) ⊗ₜ[F] y j,
+    sum_mem fun j _ => levelaf_tmul_mem _ (hy j), ?_⟩
+
+  simp only [hρ, TensorProduct.tmul_add, Finset.sum_add_distrib, map_sum, Finset.mul_sum, levelafC,
+  Algebra.TensorProduct.tmul_mul_tmul, one_mul]
   congr 1
   refine Finset.sum_congr rfl fun j _ => ?_
   rw [csGlob_tmul_int, map_mul (algebraMap (𝓞 E) E), ← IsScalarTower.algebraMap_apply (𝓞 F) (𝓞 E) E,
     map_mul]
 
 omit [NumberField F] [Algebra F E] in
-theorem csGlob_single (Λ : Submodule (𝓞 E) (n → E)) (hspan : Submodule.span E (Λ : Set (n → E)) = ⊤)
-    : ∃ m : ℤ, m ≠ 0 ∧ ∀ k, (Pi.single k (m : E) : n → E) ∈ Λ := by
-  classical
-  have hk
-      : ∀ k : n, ∃ N : ℕ, ∃ f : Fin N → E, ∃ w : Fin N → Λ,
-        ∑ j, f j • (w j : n → E) = Pi.single k 1 := by
-    intro k
-    have : (Pi.single k 1 : n → E) ∈ Submodule.span E (Λ : Set (n → E)) := by
-      rw [hspan]; exact Submodule.mem_top
-    obtain ⟨N, f, w, h⟩ := Submodule.mem_span_set'.1 this
-    exact ⟨N, f, fun j => ⟨w j, (w j).2⟩, h⟩
-  choose N f w hw using hk
-  obtain ⟨m, hm0, hm⟩ := adelstabL_den (fun p : Σ k : n, Fin (N k) => f p.1 p.2)
-  refine ⟨m, hm0, fun k => ?_⟩
-  have : (Pi.single k (m : E) : n → E)
-      = ∑ j, (⟨(m : E) * f k j, hm ⟨k, j⟩⟩ : 𝓞 E) • (w k j : n → E) := by
-    have h1 : (Pi.single k (m : E) : n → E) = (m : E) • (Pi.single k 1 : n → E) := by
-      rw [← Pi.single_smul', smul_eq_mul, mul_one]
-    rw [h1, ← hw k, Finset.smul_sum]
-    refine Finset.sum_congr rfl fun j _ => ?_
-    rw [← algebraMap_smul E, smul_smul]
-    rfl
-  rw [this]
-  exact sum_mem fun j _ => Λ.smul_mem _ (w k j).2
+theorem csGlob_single (Λ : Submodule (𝓞 E) (n → E))
+    (hspan : Submodule.span E (Λ : Set (n → E)) = ⊤) :
+    ∃ m : ℤ, m ≠ 0 ∧ ∀ k, (Pi.single k (m : E) : n → E) ∈ Λ := by
+  apply Formalism.L2.G.Triv.den_lower <;> assumption
 
-theorem csGlob_one
-    (hA : Formalism.UG.CS.IntAdApprox)
-    (Λ : Submodule (𝓞 E) (n → E))
-    (hfin : Module.Finite (𝓞 E) Λ) (hspan : Submodule.span E (Λ : Set (n → E)) = ⊤)
-    : Formalism.UG.CS.globLat (F := F) 1 Λ = Λ := by
+theorem csGlob_one (hA : Formalism.UG.CS.IntAdApprox) (Λ : Submodule (𝓞 E) (n → E))
+    (hfin : Module.Finite (𝓞 E) Λ) (hspan : Submodule.span E (Λ : Set (n → E)) = ⊤) :
+    Formalism.UG.CS.globLat (F := F) 1 Λ = Λ := by
   classical
   obtain ⟨m, hm0, hsingle⟩ := csGlob_single Λ hspan
   obtain ⟨c₂, hc₂, h₂⟩ := adelstabL_upper (F := F) Λ hfin
   set c₁ : 𝓞 F := (m : 𝓞 F)
   have hc₁ : c₁ ≠ 0 := Int.cast_ne_zero.2 hm0
   have hcE : algebraMap (𝓞 F) E c₁ = (m : E) := map_intCast _ _
-  have key
-      : ∀ u ∈ latS (F := F) (FiniteAdeleRing (𝓞 F) F) 𝒮 Λ, ∃ y ∈ Λ, ∃ s : n → 𝒜,
-        (∀ i, s i ∈ 𝒮) ∧ u = fun i => ι (y i) + levelafC E c₁ * s i := by
+  have key : ∀ u ∈ latS (F := F) (FiniteAdeleRing (𝓞 F) F) 𝒮 Λ, ∃ y ∈ Λ, ∃ s : n → 𝒜,
+      (∀ i, s i ∈ 𝒮) ∧ u = fun i => ι (y i) + levelafC E c₁ * s i := by
     intro u hu
     induction hu using Submodule.span_induction with
     | mem u hu =>
       obtain ⟨x, hx, rfl⟩ := hu
       exact ⟨x, hx, 0, fun _ => zero_mem _, by ext i; simp⟩
-    | zero =>
-      exact ⟨0, zero_mem _, 0, fun _ => zero_mem _, by ext i; simp⟩
+    | zero => exact ⟨0, zero_mem _, 0, fun _ => zero_mem _, by ext i; simp⟩
     | add u w _ _ hu hw =>
       obtain ⟨y, hy, s, hs, rfl⟩ := hu
       obtain ⟨y', hy', s', hs', rfl⟩ := hw
@@ -185,16 +198,10 @@ theorem csGlob_one
       ring
     | smul a u _ hu =>
       obtain ⟨y, hy, s, hs, rfl⟩ := hu
-      obtain ⟨b, t, ht, hab⟩ :=
-        csGlob_approx (F := F) (E := E) hA (c₁ * c₂) (mul_ne_zero hc₁ hc₂) (a : 𝒜) a.2
+      obtain ⟨b, t, ht, hab⟩ := csGlob_approx (F := F) (E := E) hA (c₁ * c₂) (mul_ne_zero hc₁ hc₂) (a : 𝒜) a.2
       have hy2 : ∀ i, levelafC E c₂ * ι (y i) ∈ 𝒮 := h₂ _ (Submodule.subset_span ⟨y, hy, rfl⟩)
-      refine ⟨
-        b • y,
-        Λ.smul_mem b hy,
-        fun i => levelafC E c₂ * ι (y i) * t + (a : 𝒜) * s i,
-        fun i => add_mem (mul_mem (hy2 i) ht) (mul_mem a.2 (hs i)),
-        ?_
-      ⟩
+      refine ⟨b • y, Λ.smul_mem b hy, fun i => levelafC E c₂ * ι (y i) * t + (a : 𝒜) * s i,
+        fun i => add_mem (mul_mem (hy2 i) ht) (mul_mem a.2 (hs i)), ?_⟩
       ext i
       simp only [Pi.smul_apply, Algebra.smul_def, map_mul]
       rw [show algebraMap 𝒮 𝒜 a = (a : 𝒜) from rfl, hab, levelafC_mul]
@@ -203,9 +210,8 @@ theorem csGlob_one
   constructor
   · intro hx
     have hx' : (fun i => ι (x i)) ∈ latS (F := F) (FiniteAdeleRing (𝓞 F) F) 𝒮 Λ := by
-      have : ((1⁻¹ : GL n 𝒜) : Matrix n n 𝒜) *ᵥ (fun i => ι (x i))
-          ∈ latS (F := F) (FiniteAdeleRing (𝓞 F) F) 𝒮 Λ :=
-        hx
+      have : ((1⁻¹ : GL n 𝒜) : Matrix n n 𝒜) *ᵥ (fun i => ι (x i)) ∈
+          latS (F := F) (FiniteAdeleRing (𝓞 F) F) 𝒮 Λ := hx
       rwa [inv_one, Units.val_one, one_mulVec] at this
     obtain ⟨y, hy, s, hs, he⟩ := key _ hx'
     have hmE : (m : E) ≠ 0 := Int.cast_ne_zero.2 hm0

@@ -1,6 +1,52 @@
 module
 
+import ReciprocityTheory.ReductiveGroups.DiscreteSeries.MultiplicityOne.JInvCharA
 public import Formalism.HermitianCurvature.HermitianCurvatureProofs.BesselDecayBounds.BesselUnitNorm.BesselNormSteps.BesselLine.SfiniteMuN
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Coalgebra.IsFrobenius
+import Mathlib.RingTheory.HopfAlgebra.Basic
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Lemma
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Formalism.HermitianCurvature.HermitianCurvatureProofs.BesselDecayBounds.BesselUnitNorm.BesselLine
 
 @[expose] public section
 
@@ -11,59 +57,35 @@ noncomputable section
 
 namespace PI.WBL.Cv
 
-open Formalism.QuantumDeterminants Formalism.MainNotions.S Formalism.MainNotions.S.ThB
-  Formalism.BasicNotions PI.BesselLine PI.WBL
+open Formalism.QuantumDeterminants Formalism.MainNotions.S Formalism.MainNotions.S.ThB Formalism.BasicNotions PI.BesselLine PI.WBL
 
 section Grp
 
 variable {k r : ℕ}
 
 theorem hpk_sq (k r : ℕ) : Hpk k r * Hpk k r = 1 := by
-  ext i j
-  have hi := i.isLt
-  have hj := j.isLt
-  rw [Matrix.mul_apply,
-    Finset.sum_eq_single
-      (⟨if (i : ℕ) < r ∨ r + k < i then 2 * r + k - i else i, by split_ifs <;> omega⟩
-        : Fin (2 * r + k + 1))]
-  · simp only [Hpk, Matrix.one_apply, Fin.ext_iff, Fin.val_mk]
-    split_ifs <;> first | (exfalso; omega) | norm_num
-  · intro l _ hl
-    have hl' : (l : ℕ) ≠ if (i : ℕ) < r ∨ r + k < i then 2 * r + k - i else i := fun h =>
-      hl (Fin.ext h)
-    have hl2 := l.isLt
-    simp only [Hpk, Fin.ext_iff, Fin.val_mk]
-    split_ifs at hl' ⊢ <;> first | (exfalso; omega) | norm_num
-  · intro h
-    exact absurd (Finset.mem_univ _) h
+  apply ReciprocityTheory.ChartRestriction.DS.Mult1.InvChr.Hpk_sq <;> assumption
 
-theorem uh_mul {a b : Mx k r} (ha : a ∈ UH (Hpk k r)) (hb : b ∈ UH (Hpk k r))
-    : a * b ∈ UH (Hpk k r) := by
+theorem uh_mul {a b : Mx k r} (ha : a ∈ UH (Hpk k r)) (hb : b ∈ UH (Hpk k r)) : a * b ∈ UH (Hpk k r) := by
   show (a * b)ᴴ * Hpk k r * (a * b) = Hpk k r
   have ha' : aᴴ * Hpk k r * a = Hpk k r := ha
   have hb' : bᴴ * Hpk k r * b = Hpk k r := hb
   rw [Matrix.conjTranspose_mul]
-  calc
-    bᴴ * aᴴ * Hpk k r * (a * b)
-      = bᴴ * (aᴴ * Hpk k r * a) * b := by simp only [mul_assoc]
+  calc bᴴ * aᴴ * Hpk k r * (a * b) = bᴴ * (aᴴ * Hpk k r * a) * b := by simp only [mul_assoc]
     _ = Hpk k r := by rw [ha', hb']
 
-theorem uh_inv {a : Mx k r} (ha : a ∈ UH (Hpk k r))
-    : a * a⁻¹ = 1 ∧ a⁻¹ * a = 1 ∧ a⁻¹ ∈ UH (Hpk k r) := by
+theorem uh_inv {a : Mx k r} (ha : a ∈ UH (Hpk k r)) :
+    a * a⁻¹ = 1 ∧ a⁻¹ * a = 1 ∧ a⁻¹ ∈ UH (Hpk k r) := by
   have ha' : aᴴ * Hpk k r * a = Hpk k r := ha
   have hl : (Hpk k r * aᴴ * Hpk k r) * a = 1 := by
-    calc
-      Hpk k r * aᴴ * Hpk k r * a
-        = Hpk k r * (aᴴ * Hpk k r * a) := by simp only [Matrix.mul_assoc]
+    calc Hpk k r * aᴴ * Hpk k r * a = Hpk k r * (aᴴ * Hpk k r * a) := by simp only [Matrix.mul_assoc]
       _ = 1 := by rw [ha', hpk_sq]
   have hinv : a⁻¹ = Hpk k r * aᴴ * Hpk k r := Matrix.inv_eq_left_inv hl
   have h1 : a⁻¹ * a = 1 := by rw [hinv]; exact hl
   have h2 : a * a⁻¹ = 1 := Matrix.mul_nonsing_inv a (Matrix.isUnit_det_of_left_inverse hl)
   refine ⟨h2, h1, ?_⟩
   show (a⁻¹)ᴴ * Hpk k r * a⁻¹ = Hpk k r
-  calc
-    (a⁻¹)ᴴ * Hpk k r * a⁻¹
-      = (a⁻¹)ᴴ * (aᴴ * Hpk k r * a) * a⁻¹ := by rw [ha']
+  calc (a⁻¹)ᴴ * Hpk k r * a⁻¹ = (a⁻¹)ᴴ * (aᴴ * Hpk k r * a) * a⁻¹ := by rw [ha']
     _ = (a * a⁻¹)ᴴ * Hpk k r * (a * a⁻¹) := by simp only [conjTranspose_mul, Matrix.mul_assoc]
     _ = Hpk k r := by rw [h2]; simp
 
@@ -86,12 +108,9 @@ def lowS (k r a : ℕ) : Submodule ℂ (Fin (2 * r + k + 1) → ℂ) where
 
 theorem eI_val (a : Fin r) : (eI k r a).val = a.val := rfl
 
-theorem maps_low
-    {n : Mx k r}
-    (hn : ∀ (a : Fin r) (i : Fin (2 * r + k + 1)),
-      a.val ≤ i.val → n i (eI k r a) = if i = eI k r a then 1 else 0)
-    {a : ℕ} (har : a ≤ r)
-    : ∀ y ∈ lowS k r a, n *ᵥ y ∈ lowS k r a := by
+theorem maps_low {n : Mx k r} (hn : ∀ (a : Fin r) (i : Fin (2 * r + k + 1)), a.val ≤ i.val →
+      n i (eI k r a) = if i = eI k r a then 1 else 0) {a : ℕ} (har : a ≤ r) :
+    ∀ y ∈ lowS k r a, n *ᵥ y ∈ lowS k r a := by
   intro y hy
   have hy' : ∀ i : Fin (2 * r + k + 1), a ≤ i.val → y i = 0 := hy
   show ∀ i : Fin (2 * r + k + 1), a ≤ i.val → (n *ᵥ y) i = 0
@@ -107,9 +126,8 @@ theorem maps_low
     rw [heq] at h1
     rw [h1, if_neg (fun h => by subst h; omega), zero_mul]
 
-theorem onto_low
-    {g : Mx k r} (hg : g⁻¹ * g = 1) {a : ℕ} (hmaps : ∀ y ∈ lowS k r a, g *ᵥ y ∈ lowS k r a)
-    : ∀ y ∈ lowS k r a, ∃ x ∈ lowS k r a, g *ᵥ x = y := by
+theorem onto_low {g : Mx k r} (hg : g⁻¹ * g = 1) {a : ℕ} (hmaps : ∀ y ∈ lowS k r a, g *ᵥ y ∈ lowS k r a) :
+    ∀ y ∈ lowS k r a, ∃ x ∈ lowS k r a, g *ᵥ x = y := by
   let f : lowS k r a →ₗ[ℂ] lowS k r a := (Matrix.mulVecLin g).restrict (fun y hy => hmaps y hy)
   have hinj : Function.Injective f := by
     intro x y hxy
@@ -140,8 +158,8 @@ theorem n_inv {n : Mx k r} (hn : n ∈ Nset k r) : n⁻¹ ∈ Nset k r := by
   simp only [Set.mem_setOf_eq] at hn ⊢
   obtain ⟨hU, hcol, hmid⟩ := hn
   obtain ⟨h1, h2, hUi⟩ := uh_inv hU
-  have key
-      : ∀ a ≤ r, ∀ c, n *ᵥ bvec c - bvec c ∈ lowS k r a → n⁻¹ *ᵥ bvec c - bvec c ∈ lowS k r a := by
+  have key : ∀ a ≤ r, ∀ c, n *ᵥ bvec c - bvec c ∈ lowS k r a →
+      n⁻¹ *ᵥ bvec c - bvec c ∈ lowS k r a := by
     intro a har c hc
     apply mem_lowS_of_apply_mem_lowS h2 (maps_low hcol har)
     have e : n *ᵥ (n⁻¹ *ᵥ bvec c - bvec c) = -(n *ᵥ bvec c - bvec c) := by
@@ -150,9 +168,8 @@ theorem n_inv {n : Mx k r} (hn : n ∈ Nset k r) : n⁻¹ ∈ Nset k r := by
     rw [e]
     exact (lowS k r a).neg_mem hc
   refine ⟨hUi, fun a i hi => ?_, fun i j hj1 hj2 hi => ?_⟩
-  · have h3
-        : ∀ i' : Fin (2 * r + k + 1),
-          a.val ≤ i'.val → (n⁻¹ *ᵥ bvec (eI k r a) - bvec (eI k r a)) i' = 0 := by
+  · have h3 : ∀ i' : Fin (2 * r + k + 1), a.val ≤ i'.val →
+        (n⁻¹ *ᵥ bvec (eI k r a) - bvec (eI k r a)) i' = 0 := by
       apply key a.val a.isLt.le
       show ∀ i' : Fin (2 * r + k + 1), a.val ≤ i'.val →
         (n *ᵥ bvec (eI k r a) - bvec (eI k r a)) i' = 0
@@ -167,7 +184,8 @@ theorem n_inv {n : Mx k r} (hn : n ∈ Nset k r) : n⁻¹ ∈ Nset k r := by
     rw [h4]
     unfold bvec
     rw [Pi.single_apply]
-  · have h3 : ∀ i' : Fin (2 * r + k + 1), r ≤ i'.val → (n⁻¹ *ᵥ bvec j - bvec j) i' = 0 := by
+  · have h3 : ∀ i' : Fin (2 * r + k + 1), r ≤ i'.val →
+        (n⁻¹ *ᵥ bvec j - bvec j) i' = 0 := by
       apply key r le_rfl
       show ∀ i' : Fin (2 * r + k + 1), r ≤ i'.val → (n *ᵥ bvec j - bvec j) i' = 0
       intro i' hi'
@@ -182,9 +200,8 @@ theorem n_inv {n : Mx k r} (hn : n ∈ Nset k r) : n⁻¹ ∈ Nset k r := by
     unfold bvec
     rw [Pi.single_apply]
 
-theorem fix_low
-    {g : Mx k r} (hfix : ∀ b : Fin r, g *ᵥ bvec (eI k r b) = bvec (eI k r b)) {a : ℕ} (har : a ≤ r)
-    : ∀ y ∈ lowS k r a, g *ᵥ y = y := by
+theorem fix_low {g : Mx k r} (hfix : ∀ b : Fin r, g *ᵥ bvec (eI k r b) = bvec (eI k r b)) {a : ℕ}
+    (har : a ≤ r) : ∀ y ∈ lowS k r a, g *ᵥ y = y := by
   intro y hy
   have hy' : ∀ i : Fin (2 * r + k + 1), a ≤ i.val → y i = 0 := hy
   have hdecomp : y = ∑ l, y l • bvec l := by
@@ -206,29 +223,28 @@ theorem fix_low
     rw [show eI k r ⟨l.val, hlr⟩ = l from Fin.ext (eI_val _)] at h1
     rw [h1]
 
-theorem herm_inv {h : Mx k r} (hh : h ∈ UH (Hpk k r)) (x y : Fin (2 * r + k + 1) → ℂ)
-    : herm (Hpk k r) (h *ᵥ x) (h *ᵥ y) = herm (Hpk k r) x y := by
+theorem herm_inv {h : Mx k r} (hh : h ∈ UH (Hpk k r)) (x y : Fin (2 * r + k + 1) → ℂ) :
+    herm (Hpk k r) (h *ᵥ x) (h *ᵥ y) = herm (Hpk k r) x y := by
   unfold herm
   have hh' : hᴴ * Hpk k r * h = Hpk k r := hh
-  rw [Matrix.star_mulVec, ← Matrix.dotProduct_mulVec, Matrix.mulVec_mulVec, Matrix.mulVec_mulVec,
-    hh']
+  rw [Matrix.star_mulVec, ← Matrix.dotProduct_mulVec, Matrix.mulVec_mulVec, Matrix.mulVec_mulVec, hh']
 
-theorem hpk_row_esI (b : Fin r) (l : Fin (2 * r + k + 1))
-    : Hpk k r (esI k r b) l = if l = eI k r b then 1 else 0 := by
+theorem hpk_row_esI (b : Fin r) (l : Fin (2 * r + k + 1)) :
+    Hpk k r (esI k r b) l = if l = eI k r b then 1 else 0 := by
   have hb := b.isLt
   have hl := l.isLt
   simp only [Hpk, esI, eI, Fin.ext_iff, Fin.val_mk]
   split_ifs <;> first | (exfalso; omega) | norm_num
 
-theorem hpk_row_eI (b : Fin r) (l : Fin (2 * r + k + 1))
-    : Hpk k r (eI k r b) l = if l = esI k r b then 1 else 0 := by
+theorem hpk_row_eI (b : Fin r) (l : Fin (2 * r + k + 1)) :
+    Hpk k r (eI k r b) l = if l = esI k r b then 1 else 0 := by
   have hb := b.isLt
   have hl := l.isLt
   simp only [Hpk, esI, eI, Fin.ext_iff, Fin.val_mk]
   split_ifs <;> first | (exfalso; omega) | norm_num
 
-theorem herm_esI (y : Fin (2 * r + k + 1) → ℂ) (b : Fin r)
-    : herm (Hpk k r) y (bvec (esI k r b)) = y (eI k r b) := by
+theorem herm_esI (y : Fin (2 * r + k + 1) → ℂ) (b : Fin r) :
+    herm (Hpk k r) y (bvec (esI k r b)) = y (eI k r b) := by
   have hs : star (bvec (esI k r b) : Fin (2 * r + k + 1) → ℂ) = bvec (esI k r b) := by
     unfold bvec
     ext l
@@ -239,8 +255,8 @@ theorem herm_esI (y : Fin (2 * r + k + 1) → ℂ) (b : Fin r)
   unfold bvec
   simp [dotProduct, Matrix.mulVec, Pi.single_apply, hpk_row_esI]
 
-theorem herm_eI (y : Fin (2 * r + k + 1) → ℂ) (b : Fin r)
-    : herm (Hpk k r) y (bvec (eI k r b)) = y (esI k r b) := by
+theorem herm_eI (y : Fin (2 * r + k + 1) → ℂ) (b : Fin r) :
+    herm (Hpk k r) y (bvec (eI k r b)) = y (esI k r b) := by
   have hs : star (bvec (eI k r b) : Fin (2 * r + k + 1) → ℂ) = bvec (eI k r b) := by
     unfold bvec
     ext l
@@ -251,10 +267,8 @@ theorem herm_eI (y : Fin (2 * r + k + 1) → ℂ) (b : Fin r)
   unfold bvec
   simp [dotProduct, Matrix.mulVec, Pi.single_apply, hpk_row_eI]
 
-theorem uw_inWb
-    {z : Fin (2 * r + k + 1) → ℂ} {h : Mx k r} (hh : h ∈ UWset k r z)
-    {v : Fin (2 * r + k + 1) → ℂ} (hv : inWb k r v)
-    : inWb k r (h *ᵥ v) := by
+theorem uw_inWb {z : Fin (2 * r + k + 1) → ℂ} {h : Mx k r} (hh : h ∈ UWset k r z)
+    {v : Fin (2 * r + k + 1) → ℂ} (hv : inWb k r v) : inWb k r (h *ᵥ v) := by
   unfold UWset at hh
   simp only [Set.mem_setOf_eq] at hh
   obtain ⟨hU, hfix, -⟩ := hh
@@ -270,17 +284,15 @@ theorem uw_inWb
   · have hb : 2 * r + k - i.val < r := by
       have := i.isLt
       omega
-    have e : i = esI k r ⟨2 * r + k - i.val, hb⟩ :=
-      Fin.ext (by
-        have := i.isLt
-        simp only [esI, Fin.val_mk]
-        omega)
+    have e : i = esI k r ⟨2 * r + k - i.val, hb⟩ := Fin.ext (by
+      have := i.isLt
+      simp only [esI, Fin.val_mk]
+      omega)
     rw [e, ← herm_eI (h *ᵥ v) ⟨2 * r + k - i.val, hb⟩, ← (hfix ⟨2 * r + k - i.val, hb⟩).1,
       herm_inv hU, herm_eI, ← e]
     exact hv' i (Or.inr hi)
 
-theorem uw_inv {z : Fin (2 * r + k + 1) → ℂ} {h : Mx k r} (hh : h ∈ UWset k r z)
-    : h⁻¹ ∈ UWset k r z := by
+theorem uw_inv {z : Fin (2 * r + k + 1) → ℂ} {h : Mx k r} (hh : h ∈ UWset k r z) : h⁻¹ ∈ UWset k r z := by
   unfold UWset at *
   simp only [Set.mem_setOf_eq] at hh ⊢
   obtain ⟨hU, hfix, hz⟩ := hh
@@ -290,9 +302,8 @@ theorem uw_inv {z : Fin (2 * r + k + 1) → ℂ} {h : Mx k r} (hh : h ∈ UWset 
     rw [Matrix.mulVec_mulVec, h2, Matrix.one_mulVec]
   exact ⟨hinvU, fun c => ⟨key _ (hfix c).1, key _ (hfix c).2⟩, key _ hz⟩
 
-theorem uw_mul
-    {z : Fin (2 * r + k + 1) → ℂ} {a b : Mx k r} (ha : a ∈ UWset k r z) (hb : b ∈ UWset k r z)
-    : a * b ∈ UWset k r z := by
+theorem uw_mul {z : Fin (2 * r + k + 1) → ℂ} {a b : Mx k r} (ha : a ∈ UWset k r z) (hb : b ∈ UWset k r z) :
+    a * b ∈ UWset k r z := by
   unfold UWset at *
   simp only [Set.mem_setOf_eq] at ha hb ⊢
   obtain ⟨haU, hafix, haz⟩ := ha
@@ -302,8 +313,8 @@ theorem uw_mul
   · rw [← Matrix.mulVec_mulVec, (hbfix c).2, (hafix c).2]
   · rw [← Matrix.mulVec_mulVec, hbz, haz]
 
-theorem n_on_Wb {n : Mx k r} (hn : n ∈ Nset k r) {u : Fin (2 * r + k + 1) → ℂ} (hu : inWb k r u)
-    : n *ᵥ u - u ∈ lowS k r r := by
+theorem n_on_Wb {n : Mx k r} (hn : n ∈ Nset k r) {u : Fin (2 * r + k + 1) → ℂ} (hu : inWb k r u) :
+    n *ᵥ u - u ∈ lowS k r r := by
   unfold Nset at hn
   simp only [Set.mem_setOf_eq] at hn
   obtain ⟨-, -, hmid⟩ := hn
@@ -323,9 +334,8 @@ theorem n_on_Wb {n : Mx k r} (hn : n ∈ Nset k r) {u : Fin (2 * r + k + 1) → 
   · intro h
     exact absurd (Finset.mem_univ _) h
 
-theorem conj_n
-    {z : Fin (2 * r + k + 1) → ℂ} {h n : Mx k r} (hh : h ∈ UWset k r z) (hn : n ∈ Nset k r)
-    : h⁻¹ * n * h ∈ Nset k r := by
+theorem conj_n {z : Fin (2 * r + k + 1) → ℂ} {h n : Mx k r} (hh : h ∈ UWset k r z) (hn : n ∈ Nset k r) :
+    h⁻¹ * n * h ∈ Nset k r := by
   have hh0 := hh
   have hn0 := hn
   unfold UWset at hh
@@ -353,9 +363,8 @@ theorem conj_n
     have hfixw := hlow a.val a.isLt.le _ hw
     have hE : (h⁻¹ * n * h) *ᵥ bvec (eI k r a) = n *ᵥ bvec (eI k r a) := by
       rw [hc]
-      have e
-          : n *ᵥ bvec (eI k r a) = (n *ᵥ bvec (eI k r a) - bvec (eI k r a)) + bvec (eI k r a) := by
-        abel
+      have e : n *ᵥ bvec (eI k r a) =
+          (n *ᵥ bvec (eI k r a) - bvec (eI k r a)) + bvec (eI k r a) := by abel
       rw [e, Matrix.mulVec_add, hfixw, hinvfix _ (hfix a).1]
     have h5 : ((h⁻¹ * n * h) *ᵥ bvec (eI k r a)) i = (h⁻¹ * n * h) i (eI k r a) := by rw [col_eq]
     have h6 : (n *ᵥ bvec (eI k r a)) i = n i (eI k r a) := by rw [col_eq]
@@ -367,8 +376,8 @@ theorem conj_n
       rw [Pi.single_apply, if_neg (fun h => by subst h; omega)]
     have hv := uw_inWb hh0 hej
     have hw := n_on_Wb hn0 hv
-    have hw' : ∀ i' : Fin (2 * r + k + 1), r ≤ i'.val → (n *ᵥ (h *ᵥ bvec j) - h *ᵥ bvec j) i' = 0 :=
-      hw
+    have hw' : ∀ i' : Fin (2 * r + k + 1), r ≤ i'.val →
+        (n *ᵥ (h *ᵥ bvec j) - h *ᵥ bvec j) i' = 0 := hw
     have hfixw := hlow r le_rfl _ hw
     have hinvh : h⁻¹ *ᵥ (h *ᵥ bvec j) = bvec j := by
       rw [Matrix.mulVec_mulVec, h2, Matrix.one_mulVec]
@@ -385,15 +394,9 @@ theorem conj_n
 theorem grpAll : GrpAll := by
   intro k r z
   unfold GrpF
-  refine ⟨
-    fun a ha b hb => uh_mul ha hb,
-    fun a ha => uh_inv ha,
-    fun a ha => uw_inv ha,
-    fun a ha => n_inv ha,
-    fun h hh n hn => conj_n hh hn,
-    fun h hh n hn => ?_,
-    fun a ha b hb => uw_mul ha hb
-  ⟩
+  refine ⟨fun a ha b hb => uh_mul ha hb, fun a ha => uh_inv ha, fun a ha => uw_inv ha,
+    fun a ha => n_inv ha, fun h hh n hn => conj_n hh hn, fun h hh n hn => ?_,
+    fun a ha b hb => uw_mul ha hb⟩
   have h1 := conj_n (uw_inv hh) hn
   have hU : h ∈ UH (Hpk k r) := by
     unfold UWset at hh

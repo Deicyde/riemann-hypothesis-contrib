@@ -1,6 +1,45 @@
 module
 
 public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentations.SphericalCoordinates.PFrameEx
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Real
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
 
 @[expose] public section
 
@@ -8,27 +47,27 @@ namespace UpperTheory.Gal.W2.FA
 
 variable {p : ℕ} [Fact p.Prime]
 
-private theorem exists_ext
-    (L : IntermediateField ℚ_[p] (PadicAlgCl p)) (s : L →ₐ[ℚ_[p]] PadicAlgCl p)
-    : ∃ σ : PadicAlgCl p ≃ₐ[ℚ_[p]] PadicAlgCl p, ∀ y : L, σ y = s y := by
-  obtain ⟨φ, hφ⟩ :=
-    IntermediateField.exists_algHom_of_splits (F := ℚ_[p]) (E := PadicAlgCl p) (K := PadicAlgCl p)
-      (fun t => ⟨Algebra.IsIntegral.isIntegral t, IsAlgClosed.splits _⟩)
-      s
+private theorem exists_ext (L : IntermediateField ℚ_[p] (PadicAlgCl p))
+    (s : L →ₐ[ℚ_[p]] PadicAlgCl p) :
+    ∃ σ : PadicAlgCl p ≃ₐ[ℚ_[p]] PadicAlgCl p, ∀ y : L, σ y = s y := by
+  obtain ⟨φ, hφ⟩ := IntermediateField.exists_algHom_of_splits (F := ℚ_[p]) (E := PadicAlgCl p)
+    (K := PadicAlgCl p) (fun t => ⟨Algebra.IsIntegral.isIntegral t, IsAlgClosed.splits _⟩) s
   refine ⟨AlgEquiv.ofBijective φ (Algebra.IsAlgebraic.algHom_bijective φ), fun y => ?_⟩
   have hy := congrArg (fun f => f y) hφ
   simpa using hy
 
 variable {F : Type} [Field F] {J : Type} [Fintype J]
 
-private theorem span_top
-    (τ : J → F →+* PadicAlgCl p)
-    (L : J → IntermediateField ℚ_[p] (PadicAlgCl p)) [∀ i, FiniteDimensional ℚ_[p] (L i)]
-    (hL : ∀ i, L i = IntermediateField.adjoin ℚ_[p] (Set.range (τ i))) (hm : ∀ i x, τ i x ∈ L i)
+private theorem span_top (τ : J → F →+* PadicAlgCl p)
+    (L : J → IntermediateField ℚ_[p] (PadicAlgCl p))
+    [∀ i, FiniteDimensional ℚ_[p] (L i)]
+    (hL : ∀ i, L i = IntermediateField.adjoin ℚ_[p] (Set.range (τ i)))
+    (hm : ∀ i x, τ i x ∈ L i)
     (hd : ∀ i j (σ : PadicAlgCl p ≃ₐ[ℚ_[p]] PadicAlgCl p),
-      ((σ : PadicAlgCl p ≃+* PadicAlgCl p) : PadicAlgCl p →+* PadicAlgCl p).comp (τ i) = τ j
-        → i = j)
-    : Submodule.span ℚ_[p] (Set.range (fun (x : F) (i : J) => (⟨τ i x, hm i x⟩ : L i))) = ⊤ := by
+      ((σ : PadicAlgCl p ≃+* PadicAlgCl p) : PadicAlgCl p →+* PadicAlgCl p).comp (τ i) = τ j →
+        i = j) :
+    Submodule.span ℚ_[p]
+      (Set.range (fun (x : F) (i : J) => (⟨τ i x, hm i x⟩ : L i))) = ⊤ := by
   classical
   by_contra hne
   obtain ⟨φ, hφ0, hφ⟩ := Submodule.exists_le_ker_of_lt_top _ (lt_top_iff_ne_top.mpr hne)
@@ -38,30 +77,25 @@ private theorem span_top
   have hsum : ∀ w : (∀ i, L i), φ w = ∑ i, ψ i (w i) := by
     intro w
     conv_lhs => rw [← Finset.univ_sum_single w]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     rfl
   have hrep : ∀ i, ∃ a : L i, ∀ y, ψ i y = Algebra.trace ℚ_[p] (L i) (a * y) := by
     intro i
-    refine ⟨
-      ((Algebra.traceForm ℚ_[p] (L i)).toDual (traceForm_nondegenerate ℚ_[p] (L i))).symm (ψ i),
-      fun y => ?_
-    ⟩
-    rw [← Algebra.traceForm_apply,
-      ← LinearMap.BilinForm.toDual_def (traceForm_nondegenerate ℚ_[p] (L i)),
-      LinearEquiv.apply_symm_apply]
+    refine ⟨((Algebra.traceForm ℚ_[p] (L i)).toDual
+      (traceForm_nondegenerate ℚ_[p] (L i))).symm (ψ i), fun y => ?_⟩
+    rw [← Algebra.traceForm_apply, ← LinearMap.BilinForm.toDual_def
+      (traceForm_nondegenerate ℚ_[p] (L i)), LinearEquiv.apply_symm_apply]
   choose a ha using hrep
-  let χ : (Σ i, (L i →ₐ[ℚ_[p]] PadicAlgCl p)) → (F →* PadicAlgCl p) := fun t => {
-    toFun := fun x => t.2 ⟨τ t.1 x, hm t.1 x⟩
-    map_one' := by
-      rw [show (⟨τ t.1 1, hm t.1 1⟩ : L t.1) = 1 from Subtype.ext (map_one _)]
-      exact map_one _
-    map_mul' := fun x y => by
-      rw [show (⟨τ t.1 (x * y), hm t.1 (x * y)⟩ : L t.1)
-          = ⟨τ t.1 x, hm t.1 x⟩ * ⟨τ t.1 y, hm t.1 y⟩ from
-        Subtype.ext (map_mul _ _ _)]
-      exact map_mul _ _ _
-  }
+  let χ : (Σ i, (L i →ₐ[ℚ_[p]] PadicAlgCl p)) → (F →* PadicAlgCl p) := fun t =>
+    { toFun := fun x => t.2 ⟨τ t.1 x, hm t.1 x⟩
+      map_one' := by
+        rw [show (⟨τ t.1 1, hm t.1 1⟩ : L t.1) = 1 from Subtype.ext (map_one _)]
+        exact map_one _
+      map_mul' := fun x y => by
+        rw [show (⟨τ t.1 (x * y), hm t.1 (x * y)⟩ : L t.1) =
+          ⟨τ t.1 x, hm t.1 x⟩ * ⟨τ t.1 y, hm t.1 y⟩ from Subtype.ext (map_mul _ _ _)]
+        exact map_mul _ _ _ }
   have hχ : ∀ t x, χ t x = t.2 ⟨τ t.1 x, hm t.1 x⟩ := fun _ _ => rfl
   have hχinj : Function.Injective χ := by
     rintro ⟨i, s⟩ ⟨j, s'⟩ h
@@ -93,7 +127,8 @@ private theorem span_top
         intro n
         induction n with
         | zero => rfl
-        | succ n ih => rw [pow_succ, AlgEquiv.mul_apply, h0, ih]
+        | succ n ih =>
+          rw [pow_succ, AlgEquiv.mul_apply, h0, ih]
       rcases k with n | n
       · simpa using hpow n
       · rw [zpow_negSucc]
@@ -103,9 +138,8 @@ private theorem span_top
         exact AlgEquiv.symm_apply_apply _ _
     have hss : s = s' := by
       ext y
-      have hy :=
-        (IntermediateField.mem_fixedField_iff _ _).mp (hfix y.2) (σ.trans σ'.symm)
-          (Subgroup.mem_zpowers _)
+      have hy := (IntermediateField.mem_fixedField_iff _ _).mp (hfix y.2) (σ.trans σ'.symm)
+        (Subgroup.mem_zpowers _)
       have hy' : σ'.symm (σ y) = y := hy
       have hy'' := congrArg σ' hy'
       rw [AlgEquiv.apply_symm_apply] at hy''
@@ -115,28 +149,26 @@ private theorem span_top
     rfl
   have hli : LinearIndependent (PadicAlgCl p) (fun t => (χ t : F → PadicAlgCl p)) :=
     (linearIndependent_monoidHom F (PadicAlgCl p)).comp χ hχinj
-  have hzero :=
-    (Fintype.linearIndependent_iff.mp hli) (fun t => t.2 (a t.1)) (by
-      funext x
-      rw [Finset.sum_apply, Pi.zero_apply]
-      simp only [Pi.smul_apply, smul_eq_mul, hχ]
-      rw [Fintype.sum_sigma]
-      have hi
-          : ∀ i,
-            ∑ s : (L i →ₐ[ℚ_[p]] PadicAlgCl p), s (a i) * s ⟨τ i x, hm i x⟩
-              = algebraMap ℚ_[p] (PadicAlgCl p) (ψ i ⟨τ i x, hm i x⟩) := by
-        intro i
-        rw [ha i, trace_eq_sum_embeddings]
-        simp only [map_mul]
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [Finset.sum_congr rfl (fun i _ => hi i), ← map_sum]
-      have := hsum (fun i => (⟨τ i x, hm i x⟩ : L i))
-      rw [← this, hφf x, map_zero])
+  have hzero := (Fintype.linearIndependent_iff.mp hli) (fun t => t.2 (a t.1)) (by
+    funext x
+    rw [Finset.sum_apply, Pi.zero_apply]
+    simp only [Pi.smul_apply, smul_eq_mul, hχ]
+    rw [Fintype.sum_sigma]
+    have hi : ∀ i, ∑ s : (L i →ₐ[ℚ_[p]] PadicAlgCl p), s (a i) * s ⟨τ i x, hm i x⟩ =
+        algebraMap ℚ_[p] (PadicAlgCl p) (ψ i ⟨τ i x, hm i x⟩) := by
+      intro i
+      rw [ha i, trace_eq_sum_embeddings]
+      simp only [map_mul]
+
+    rw [Finset.sum_congr rfl (fun i _ => hi i), ← map_sum]
+    have := hsum (fun i => (⟨τ i x, hm i x⟩ : L i))
+    rw [← this, hφf x, map_zero])
   have ha0 : ∀ i, a i = 0 := by
     intro i
     let s0 : L i →ₐ[ℚ_[p]] PadicAlgCl p := (by
       refine @_root_.IsAlgClosed.lift _ _ _ _ _ _ _ _ _ _ _ ?_ ?_ ?_
-      solve_by_elim* (maxDepth := 2) only [*, @_root_.DivisionSemiring.to_moduleIsTorsionFree,
+      solve_by_elim* (maxDepth := 2) only [*,
+        @_root_.DivisionSemiring.to_moduleIsTorsionFree,
         @_root_.Algebra.IsIntegral.isAlgebraic, @_root_.inferInstance])
     apply (s0 : L i →+* PadicAlgCl p).injective
     rw [map_zero]
@@ -149,17 +181,15 @@ private theorem span_top
   intro i _
   rw [ha i, ha0 i, zero_mul, map_zero]
 
-private theorem approx
-    (τ : J → F →+* PadicAlgCl p)
-    (L : J → IntermediateField ℚ_[p] (PadicAlgCl p)) [∀ i, FiniteDimensional ℚ_[p] (L i)]
+private theorem approx (τ : J → F →+* PadicAlgCl p)
+    (L : J → IntermediateField ℚ_[p] (PadicAlgCl p))
+    [∀ i, FiniteDimensional ℚ_[p] (L i)]
     (hL : ∀ i, L i = IntermediateField.adjoin ℚ_[p] (Set.range (τ i)))
     (hd : ∀ i j (σ : PadicAlgCl p ≃ₐ[ℚ_[p]] PadicAlgCl p),
-      ((σ : PadicAlgCl p ≃+* PadicAlgCl p) : PadicAlgCl p →+* PadicAlgCl p).comp (τ i) = τ j
-        → i = j)
-    [CharZero F]
-    (v : ∀ i, L i)
-    (e : ℝ) (he : 0 < e)
-    : ∃ x : F, ∀ i, ‖τ i x - (v i : PadicAlgCl p)‖ < e := by
+      ((σ : PadicAlgCl p ≃+* PadicAlgCl p) : PadicAlgCl p →+* PadicAlgCl p).comp (τ i) = τ j →
+        i = j)
+    [CharZero F] (v : ∀ i, L i) (e : ℝ) (he : 0 < e) :
+    ∃ x : F, ∀ i, ‖τ i x - (v i : PadicAlgCl p)‖ < e := by
   have hm : ∀ i x, τ i x ∈ L i := fun i x => by
     rw [hL i]
     exact IntermediateField.subset_adjoin _ _ ⟨x, rfl⟩
@@ -185,15 +215,13 @@ private theorem approx
     obtain ⟨x1, hx1⟩ := h1 (e / 2) (by linarith)
     obtain ⟨x2, hx2⟩ := h2 (e / 2) (by linarith)
     refine ⟨x1 + x2, fun i => ?_⟩
-    have hcalc
-        : τ i (x1 + x2) - ((w1 + w2) i : PadicAlgCl p)
-          = (τ i x1 - (w1 i : PadicAlgCl p)) + (τ i x2 - (w2 i : PadicAlgCl p)) := by
+    have hcalc : τ i (x1 + x2) - ((w1 + w2) i : PadicAlgCl p) =
+        (τ i x1 - (w1 i : PadicAlgCl p)) + (τ i x2 - (w2 i : PadicAlgCl p)) := by
       rw [map_add (f := _)]
       show τ i x1 + τ i x2 - ((w1 i : PadicAlgCl p) + (w2 i : PadicAlgCl p)) = _
       ring
     rw [hcalc]
-    calc
-      _ ≤ _ := norm_add_le _ _
+    calc _ ≤ _ := norm_add_le _ _
       _ < e / 2 + e / 2 := add_lt_add (hx1 i) (hx2 i)
       _ = e := by ring
   | smul c w _ h =>
@@ -206,10 +234,8 @@ private theorem approx
     have hwB : ∀ i, ‖(w i : PadicAlgCl p)‖ + 1 ≤ B := by
       intro i
       have : ‖(w i : PadicAlgCl p)‖ ≤ ∑ j, ‖(w j : PadicAlgCl p)‖ :=
-        Finset.single_le_sum
-          (f := fun j => ‖(w j : PadicAlgCl p)‖)
-          (fun j _ => norm_nonneg _)
-          (Finset.mem_univ i)
+        Finset.single_le_sum (f := fun j => ‖(w j : PadicAlgCl p)‖)
+          (fun j _ => norm_nonneg _) (Finset.mem_univ i)
       linarith
     have hcpos : 0 < ‖c‖ + 1 := by positivity
     have hδpos : 0 < min 1 (e / (2 * (‖c‖ + 1))) := lt_min one_pos (by positivity)
@@ -218,21 +244,19 @@ private theorem approx
     refine ⟨(q : F) * x, fun i => ?_⟩
     have hτx : ‖τ i x‖ ≤ B := by
       have h1 : ‖τ i x‖ ≤ ‖τ i x - (w i : PadicAlgCl p)‖ + ‖(w i : PadicAlgCl p)‖ := by
-        calc
-          ‖τ i x‖
-            = ‖(τ i x - (w i : PadicAlgCl p)) + (w i : PadicAlgCl p)‖ := by rw [sub_add_cancel]
+        calc ‖τ i x‖ = ‖(τ i x - (w i : PadicAlgCl p)) + (w i : PadicAlgCl p)‖ := by
+              rw [sub_add_cancel]
           _ ≤ _ := norm_add_le _ _
       have h2 : ‖τ i x - (w i : PadicAlgCl p)‖ < 1 := lt_of_lt_of_le (hx i) (min_le_left _ _)
       linarith [hwB i]
-    have hsm
-        : ((c • w) i : PadicAlgCl p) = algebraMap ℚ_[p] (PadicAlgCl p) c * (w i : PadicAlgCl p) :=
+    have hsm : ((c • w) i : PadicAlgCl p) =
+        algebraMap ℚ_[p] (PadicAlgCl p) c * (w i : PadicAlgCl p) :=
       Algebra.smul_def c (w i : PadicAlgCl p)
     have hq' : τ i ((q : F) * x) = algebraMap ℚ_[p] (PadicAlgCl p) (q : ℚ_[p]) * τ i x := by
       rw [map_mul, map_ratCast, map_ratCast]
-    have hcalc
-        : τ i ((q : F) * x) - ((c • w) i : PadicAlgCl p)
-          = algebraMap ℚ_[p] (PadicAlgCl p) ((q : ℚ_[p]) - c) * τ i x
-            + algebraMap ℚ_[p] (PadicAlgCl p) c * (τ i x - (w i : PadicAlgCl p)) := by
+    have hcalc : τ i ((q : F) * x) - ((c • w) i : PadicAlgCl p) =
+        algebraMap ℚ_[p] (PadicAlgCl p) ((q : ℚ_[p]) - c) * τ i x +
+          algebraMap ℚ_[p] (PadicAlgCl p) c * (τ i x - (w i : PadicAlgCl p)) := by
       rw [hsm, hq', map_sub]
       ring
     rw [hcalc]
@@ -242,33 +266,31 @@ private theorem approx
     have hc2 : ‖τ i x - (w i : PadicAlgCl p)‖ ≤ e / (2 * (‖c‖ + 1)) :=
       (lt_of_lt_of_le (hx i) (min_le_right _ _)).le
     have hk : ‖c‖ * (e / (2 * (‖c‖ + 1))) < e / 2 := by
-      rw [show ‖c‖ * (e / (2 * (‖c‖ + 1))) = (e / 2) * (‖c‖ / (‖c‖ + 1)) by field_simp]
+      rw [show ‖c‖ * (e / (2 * (‖c‖ + 1))) = (e / 2) * (‖c‖ / (‖c‖ + 1)) by
+        field_simp]
       have : ‖c‖ / (‖c‖ + 1) < 1 := (div_lt_one hcpos).mpr (by linarith)
       nlinarith
-    have hb : e / (2 * B) * B = e / 2 := by field_simp
-    calc
-      _ ≤ ‖algebraMap ℚ_[p] (PadicAlgCl p) ((q : ℚ_[p]) - c) * τ i x‖
-          + ‖algebraMap ℚ_[p] (PadicAlgCl p) c * (τ i x - (w i : PadicAlgCl p))‖ :=
-        norm_add_le _ _
-      _ = ‖algebraMap ℚ_[p] (PadicAlgCl p) ((q : ℚ_[p]) - c)‖ * ‖τ i x‖
-          + ‖c‖ * ‖τ i x - (w i : PadicAlgCl p)‖ := by
+    have hb : e / (2 * B) * B = e / 2 := by
+      field_simp
+    calc _ ≤ ‖algebraMap ℚ_[p] (PadicAlgCl p) ((q : ℚ_[p]) - c) * τ i x‖ +
+          ‖algebraMap ℚ_[p] (PadicAlgCl p) c * (τ i x - (w i : PadicAlgCl p))‖ := norm_add_le _ _
+      _ = ‖algebraMap ℚ_[p] (PadicAlgCl p) ((q : ℚ_[p]) - c)‖ * ‖τ i x‖ +
+          ‖c‖ * ‖τ i x - (w i : PadicAlgCl p)‖ := by
         rw [norm_mul, norm_mul, norm_algebraMap' (PadicAlgCl p) c]
-      _ ≤ e / (2 * B) * B + ‖c‖ * (e / (2 * (‖c‖ + 1))) := by gcongr
+      _ ≤ e / (2 * B) * B + ‖c‖ * (e / (2 * (‖c‖ + 1))) := by
+        gcongr
       _ < e := by linarith
 
 end UpperTheory.Gal.W2.FA
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
-  NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
-  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory GlobalTheory.PELU GlobalTheory.UPel.HT
-  GlobalTheory.UPel.HT.Gen
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory GlobalTheory.PELU GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen
 open GlobalTheory.LKTrip GlobalTheory.LKRes GlobalTheory.LKMid GlobalTheory.LKGeo Polynomial
 open scoped Matrix TensorProduct Classical
 open UpperTheory.Gal.W2
 
-private theorem conj_ne {p : ℕ} [Fact p.Prime] (G : HTGroup p)
-    : ∃ x : G.Kq, IsCMField.complexConj G.F (x : G.F) ≠ x := by
+private theorem conj_ne {p : ℕ} [Fact p.Prime] (G : HTGroup p) :
+    ∃ x : G.Kq, IsCMField.complexConj G.F (x : G.F) ≠ x := by
   let φ : G.F →+* ℂ := Classical.choice (inferInstance : Nonempty (G.F →+* ℂ))
   obtain ⟨x, hx, him⟩ := G.hKq.2 φ
   refine ⟨⟨x, hx⟩, fun h => him ?_⟩
@@ -276,26 +298,24 @@ private theorem conj_ne {p : ℕ} [Fact p.Prime] (G : HTGroup p)
   rw [IsCMField.complexEmbedding_complexConj] at h2
   exact Complex.conj_eq_iff_im.mp h2
 
-private theorem no_cross
-    {p : ℕ} [Fact p.Prime]
-    (G : HTGroup p) (w w' : Fin G.m)
+private theorem no_cross {p : ℕ} [Fact p.Prime] (G : HTGroup p) (w w' : Fin G.m)
     (σ : PadicAlgCl p ≃ₐ[ℚ_[p]] PadicAlgCl p)
-    (h : ∀ x, σ (G.emb w x) = G.emb w' (IsCMField.complexConj G.F x))
-    : False := by
+    (h : ∀ x, σ (G.emb w x) = G.emb w' (IsCMField.complexConj G.F x)) : False := by
   obtain ⟨x, hx⟩ := conj_ne G
   apply hx
   apply (G.emb w').injective
   rw [← h, G.emb_over w x, G.emb_over w' x]
   exact σ.commutes _
 
-theorem UpperTheory.Gal.W2.fApprox_of : UpperTheory.Gal.W2.EmbAll → UpperTheory.Gal.W2.FApprox := by
+theorem UpperTheory.Gal.W2.fApprox_of :
+    UpperTheory.Gal.W2.EmbAll → UpperTheory.Gal.W2.FApprox := by
   intro _ p _ G a b e he
   let c : G.F →+* G.F := (IsCMField.complexConj G.F).toRingEquiv.toRingHom
   have hcc : ∀ x, c (c x) = x := fun x => IsCMField.complexConj_apply_apply G.F x
-  let τ : Fin G.m ⊕ Fin G.m → G.F →+* PadicAlgCl p := fun j =>
-    Sum.elim (fun w => G.emb w) (fun w => (G.emb w).comp c) j
-  let L : Fin G.m ⊕ Fin G.m → IntermediateField ℚ_[p] (PadicAlgCl p) := fun j =>
-    G.Fw (Sum.elim id id j)
+  let τ : Fin G.m ⊕ Fin G.m → G.F →+* PadicAlgCl p :=
+    fun j => Sum.elim (fun w => G.emb w) (fun w => (G.emb w).comp c) j
+  let L : Fin G.m ⊕ Fin G.m → IntermediateField ℚ_[p] (PadicAlgCl p) :=
+    fun j => G.Fw (Sum.elim id id j)
   haveI : ∀ j, FiniteDimensional ℚ_[p] (L j) := fun j => G.finiteDimensional_Fw _
   have hL : ∀ j, L j = IntermediateField.adjoin ℚ_[p] (Set.range (τ j)) := by
     intro j
@@ -309,10 +329,9 @@ theorem UpperTheory.Gal.W2.fApprox_of : UpperTheory.Gal.W2.EmbAll → UpperTheor
         exact ⟨c x, by simp only [τ, Sum.elim_inr, RingHom.comp_apply, hcc]⟩
       · rintro ⟨x, rfl⟩
         exact ⟨c x, rfl⟩
-  have hd
-      : ∀ i j (σ : PadicAlgCl p ≃ₐ[ℚ_[p]] PadicAlgCl p),
-        ((σ : PadicAlgCl p ≃+* PadicAlgCl p) : PadicAlgCl p →+* PadicAlgCl p).comp (τ i) = τ j
-          → i = j := by
+  have hd : ∀ i j (σ : PadicAlgCl p ≃ₐ[ℚ_[p]] PadicAlgCl p),
+      ((σ : PadicAlgCl p ≃+* PadicAlgCl p) : PadicAlgCl p →+* PadicAlgCl p).comp (τ i) = τ j →
+        i = j := by
     intro i j σ h
     have hx : ∀ x, σ (τ i x) = τ j x := fun x => congrArg (fun f => f x) h
     rcases i with u | u <;> rcases j with v | v
@@ -332,8 +351,7 @@ theorem UpperTheory.Gal.W2.fApprox_of : UpperTheory.Gal.W2.EmbAll → UpperTheor
         simp only [τ, Sum.elim_inr, RingHom.comp_apply, hcc] at this
         exact this
       exact congrArg _ (G.emb_inj u v σ h')
-  let v : ∀ j, L j := fun j =>
-    match j with
+  let v : ∀ j, L j := fun j => match j with
     | Sum.inl w => a w
     | Sum.inr w => b w
   obtain ⟨x, hx⟩ := UpperTheory.Gal.W2.FA.approx τ L hL hd v e he

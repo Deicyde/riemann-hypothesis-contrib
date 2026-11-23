@@ -1,6 +1,56 @@
 module
 
-public import ReciprocityTheory.SemistableReduction.SemiDegSt
+public import ReciprocityTheory.SemistableReduction.TorsionNonvanishStatement
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Coalgebra.IsFrobenius
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.HopfAlgebra.Basic
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -10,75 +60,66 @@ namespace ReciprocityTheory.MultiplicativeHeights
 
 open Module
 
-def waR {K : Type} [Field K] [NumberField K] {r : ℕ} (S : HermForm K r) (x : Fin r → K)
-    : (Fin r → K) →ₗ[K] K where
+def waR {K : Type} [Field K] [NumberField K] {r : ℕ} (S : HermForm K r) (x : Fin r → K) :
+    (Fin r → K) →ₗ[K] K where
   toFun y := S.h x y
-  map_add' y z := by simp only [HermForm.h, Pi.add_apply, mul_add, Finset.sum_add_distrib]
+  map_add' y z := by
+    simp only [HermForm.h, Pi.add_apply, mul_add, Finset.sum_add_distrib]
   map_smul' a y := by
     simp only [HermForm.h, Pi.smul_apply, smul_eq_mul, RingHom.id_apply, Finset.mul_sum]
     exact Finset.sum_congr rfl fun _ _ => Finset.sum_congr rfl fun _ _ => by ring
 
-theorem waR_apply {K : Type} [Field K] [NumberField K] {r : ℕ} (S : HermForm K r) (x y : Fin r → K)
-    : waR S x y = S.h x y :=
-  rfl
+theorem waR_apply {K : Type} [Field K] [NumberField K] {r : ℕ} (S : HermForm K r)
+    (x y : Fin r → K) : waR S x y = S.h x y := rfl
 
-theorem wa_symm {K : Type} [Field K] [NumberField K] {r : ℕ} (S : HermForm K r) (x y : Fin r → K)
-    : S.h y x = S.c (S.h x y) := by
+theorem wa_symm {K : Type} [Field K] [NumberField K] {r : ℕ} (S : HermForm K r)
+    (x y : Fin r → K) : S.h y x = S.c (S.h x y) := by
   unfold HermForm.h
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, map_mul, S.c_invol, S.G_herm]
+
+  simp only [map_sum, map_mul, S.c_invol, S.G_herm]
   conv_rhs => rw [Finset.sum_comm]
   exact Finset.sum_congr rfl fun _ _ => Finset.sum_congr rfl fun _ _ => by ring
 
-theorem wa_sub_right
-    {K : Type} [Field K] [NumberField K] {r : ℕ} (S : HermForm K r) (x y z : Fin r → K)
-    : S.h x (y - z) = S.h x y - S.h x z := by
+theorem wa_sub_right {K : Type} [Field K] [NumberField K] {r : ℕ} (S : HermForm K r)
+    (x y z : Fin r → K) : S.h x (y - z) = S.h x y - S.h x z := by
   simp only [HermForm.h, Pi.sub_apply, mul_sub, Finset.sum_sub_distrib]
 
-theorem wa_smul_right
-    {K : Type} [Field K] [NumberField K] {r : ℕ} (S : HermForm K r) (a : K) (x y : Fin r → K)
-    : S.h x (a • y) = a * S.h x y := by
+theorem wa_smul_right {K : Type} [Field K] [NumberField K] {r : ℕ} (S : HermForm K r)
+    (a : K) (x y : Fin r → K) : S.h x (a • y) = a * S.h x y := by
   simp only [HermForm.h, Pi.smul_apply, smul_eq_mul, Finset.mul_sum]
   exact Finset.sum_congr rfl fun _ _ => Finset.sum_congr rfl fun _ _ => by ring
 
-theorem wa_zero_right
-    {K : Type} [Field K] [NumberField K] {r : ℕ} (S : HermForm K r) (x : Fin r → K)
-    : S.h x 0 = 0 := by
+theorem wa_zero_right {K : Type} [Field K] [NumberField K] {r : ℕ} (S : HermForm K r)
+    (x : Fin r → K) : S.h x 0 = 0 := by
   simp [HermForm.h]
 
-theorem wa_sub_left
-    {K : Type} [Field K] [NumberField K] {r : ℕ} (S : HermForm K r) (x y z : Fin r → K)
-    : S.h (x - y) z = S.h x z - S.h y z := by
+theorem wa_sub_left {K : Type} [Field K] [NumberField K] {r : ℕ} (S : HermForm K r)
+    (x y z : Fin r → K) : S.h (x - y) z = S.h x z - S.h y z := by
   simp only [HermForm.h, Pi.sub_apply, map_sub, sub_mul, Finset.sum_sub_distrib]
 
-theorem wa_smul_left
-    {K : Type} [Field K] [NumberField K] {r : ℕ} (S : HermForm K r) (a : K) (x y : Fin r → K)
-    : S.h (a • x) y = S.c a * S.h x y := by
+theorem wa_smul_left {K : Type} [Field K] [NumberField K] {r : ℕ} (S : HermForm K r)
+    (a : K) (x y : Fin r → K) : S.h (a • x) y = S.c a * S.h x y := by
   simp only [HermForm.h, Pi.smul_apply, smul_eq_mul, map_mul, Finset.mul_sum]
   exact Finset.sum_congr rfl fun _ _ => Finset.sum_congr rfl fun _ _ => by ring
 
-theorem wa_sum_right
-    {K : Type} [Field K] [NumberField K]
-    {r n : ℕ} (S : HermForm K r) (x : Fin r → K) (t : Fin n → K) (b : Fin n → Fin r → K)
-    : S.h x (∑ i, t i • b i) = ∑ i, t i * S.h x (b i) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [← waR_apply S x, map_sum]
+theorem wa_sum_right {K : Type} [Field K] [NumberField K] {r n : ℕ} (S : HermForm K r)
+    (x : Fin r → K) (t : Fin n → K) (b : Fin n → Fin r → K) :
+    S.h x (∑ i, t i • b i) = ∑ i, t i * S.h x (b i) := by
+
+  rw [← waR_apply S x, map_sum]
   simp only [map_smul, smul_eq_mul, waR_apply]
 
-theorem wa_sum_left
-    {K : Type} [Field K] [NumberField K]
-    {r n : ℕ} (S : HermForm K r) (y : Fin r → K) (t : Fin n → K) (b : Fin n → Fin r → K)
-    : S.h (∑ i, t i • b i) y = ∑ i, S.c (t i) * S.h (b i) y := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [wa_symm S y, wa_sum_right, map_sum]
+theorem wa_sum_left {K : Type} [Field K] [NumberField K] {r n : ℕ} (S : HermForm K r)
+    (y : Fin r → K) (t : Fin n → K) (b : Fin n → Fin r → K) :
+    S.h (∑ i, t i • b i) y = ∑ i, S.c (t i) * S.h (b i) y := by
+
+  rw [wa_symm S y, wa_sum_right, map_sum]
   refine Finset.sum_congr rfl fun i _ => ?_
   rw [map_mul, ← wa_symm S y (b i)]
 
-theorem wa_finrank_inf_ker
-    {K : Type} [Field K]
-    {V : Type} [AddCommGroup V] [Module K V] [FiniteDimensional K V]
-    (W : Submodule K V) (f : V →ₗ[K] K) (z : V) (hz : z ∈ W) (hfz : f z ≠ 0)
-    : finrank K ↥(W ⊓ LinearMap.ker f) + 1 = finrank K W := by
+theorem wa_finrank_inf_ker {K : Type} [Field K] {V : Type} [AddCommGroup V] [Module K V]
+    [FiniteDimensional K V] (W : Submodule K V) (f : V →ₗ[K] K) (z : V) (hz : z ∈ W)
+    (hfz : f z ≠ 0) : finrank K ↥(W ⊓ LinearMap.ker f) + 1 = finrank K W := by
   have hsup : W ⊔ LinearMap.ker f = ⊤ := by
     rw [eq_top_iff]
     intro v _
@@ -98,11 +139,11 @@ theorem wa_finrank_inf_ker
   rw [hsup, finrank_top] at h
   omega
 
-theorem wa_diag {K : Type} [Field K] [NumberField K] {r : ℕ} (S : HermForm K r)
-    : ∀ (n : ℕ) (W : Submodule K (Fin r → K)),
-      finrank K W = n → (∀ x ∈ W, S.h x x = 0 → x = 0)
-        → ∃ b : Fin n → Fin r → K,
-          (∀ i, b i ∈ W) ∧ (∀ i, b i ≠ 0) ∧ ∀ i j, i ≠ j → S.h (b i) (b j) = 0 := by
+theorem wa_diag {K : Type} [Field K] [NumberField K] {r : ℕ} (S : HermForm K r) :
+    ∀ (n : ℕ) (W : Submodule K (Fin r → K)), finrank K W = n →
+      (∀ x ∈ W, S.h x x = 0 → x = 0) →
+      ∃ b : Fin n → Fin r → K, (∀ i, b i ∈ W) ∧ (∀ i, b i ≠ 0) ∧
+        ∀ i j, i ≠ j → S.h (b i) (b j) = 0 := by
   intro n
   induction n with
   | zero =>
@@ -119,8 +160,7 @@ theorem wa_diag {K : Type} [Field K] [NumberField K] {r : ℕ} (S : HermForm K r
     have hW' : finrank K ↥(W ⊓ LinearMap.ker (waR S z)) = n := by
       have h := wa_finrank_inf_ker W (waR S z) z hzW (by rw [waR_apply]; exact hzz)
       omega
-    obtain ⟨b, hbW, hb0, hbo⟩ :=
-      ih (W ⊓ LinearMap.ker (waR S z)) hW' (fun x hx hxx => han x hx.1 hxx)
+    obtain ⟨b, hbW, hb0, hbo⟩ := ih (W ⊓ LinearMap.ker (waR S z)) hW' (fun x hx hxx => han x hx.1 hxx)
     have hk : ∀ k, S.h z (b k) = 0 := fun k => (hbW k).2
     refine ⟨Fin.cons z b, fun i => ?_, fun i => ?_, fun i j hij => ?_⟩
     · cases i using Fin.cases with
@@ -143,12 +183,10 @@ theorem wa_diag {K : Type} [Field K] [NumberField K] {r : ℕ} (S : HermForm K r
           simp only [Fin.cons_succ]
           exact hbo i j fun h => hij (by rw [h])
 
-theorem wa_hyp
-    {K : Type} [Field K] [NumberField K]
-    {r : ℕ}
-    (S : HermForm K r) (W : Submodule K (Fin r → K)) (hnd : ∀ x ∈ W, (∀ y ∈ W, S.h x y = 0) → x = 0)
-    (x : Fin r → K) (hxW : x ∈ W) (hx0 : x ≠ 0) (hxx : S.h x x = 0)
-    : ∃ y ∈ W, S.h x y = 1 ∧ S.h y y = 0 := by
+theorem wa_hyp {K : Type} [Field K] [NumberField K] {r : ℕ} (S : HermForm K r)
+    (W : Submodule K (Fin r → K)) (hnd : ∀ x ∈ W, (∀ y ∈ W, S.h x y = 0) → x = 0)
+    (x : Fin r → K) (hxW : x ∈ W) (hx0 : x ≠ 0) (hxx : S.h x x = 0) :
+    ∃ y ∈ W, S.h x y = 1 ∧ S.h y y = 0 := by
   obtain ⟨w, hwW, hw⟩ : ∃ w ∈ W, S.h x w ≠ 0 := by
     by_contra hc
     push Not at hc
@@ -166,12 +204,11 @@ theorem wa_hyp
     rw [ht]
     ring
 
-theorem wa_perp_nondeg
-    {K : Type} [Field K] [NumberField K]
-    {r : ℕ} (S : HermForm K r) (W : Submodule K (Fin r → K))
-    (hnd : ∀ x ∈ W, (∀ y ∈ W, S.h x y = 0) → x = 0) (x y : Fin r → K) (hxW : x ∈ W) (hyW : y ∈ W)
-    (hxx : S.h x x = 0) (hxy : S.h x y = 1) (hyy : S.h y y = 0)
-    : ∀ z ∈ W ⊓ LinearMap.ker (waR S x) ⊓ LinearMap.ker (waR S y),
+theorem wa_perp_nondeg {K : Type} [Field K] [NumberField K] {r : ℕ} (S : HermForm K r)
+    (W : Submodule K (Fin r → K)) (hnd : ∀ x ∈ W, (∀ y ∈ W, S.h x y = 0) → x = 0)
+    (x y : Fin r → K) (hxW : x ∈ W) (hyW : y ∈ W) (hxx : S.h x x = 0) (hxy : S.h x y = 1)
+    (hyy : S.h y y = 0) :
+    ∀ z ∈ W ⊓ LinearMap.ker (waR S x) ⊓ LinearMap.ker (waR S y),
       (∀ w ∈ W ⊓ LinearMap.ker (waR S x) ⊓ LinearMap.ker (waR S y), S.h z w = 0) → z = 0 := by
   intro z hz hzo
   obtain ⟨⟨hzW, hzx⟩, hzy⟩ := hz
@@ -180,8 +217,7 @@ theorem wa_perp_nondeg
   apply hnd z hzW
   intro w hwW
   have hyx : S.h y x = 1 := by rw [wa_symm S x y, hxy, map_one]
-  have hw'
-      : w - S.h y w • x - S.h x w • y ∈ W ⊓ LinearMap.ker (waR S x) ⊓ LinearMap.ker (waR S y) := by
+  have hw' : w - S.h y w • x - S.h x w • y ∈ W ⊓ LinearMap.ker (waR S x) ⊓ LinearMap.ker (waR S y) := by
     refine ⟨⟨W.sub_mem (W.sub_mem hwW (W.smul_mem _ hxW)) (W.smul_mem _ hyW), ?_⟩, ?_⟩
     · show S.h x _ = 0
       simp only [wa_sub_right, wa_smul_right, hxx, hxy]

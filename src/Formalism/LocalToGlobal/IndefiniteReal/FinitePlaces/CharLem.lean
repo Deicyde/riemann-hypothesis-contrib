@@ -1,16 +1,52 @@
 module
 
 public import Formalism.LocalToGlobal.IndefiniteReal.DatumLemmas
+import Formalism.LocalToGlobal.BesselHermitianTheta.LemmasWeil
 public import Formalism.LocalToGlobal.IndefiniteReal.PHeisThA
-public import Formalism.LocalToGlobal.IndefiniteReal.FinitePlaces.StdCharExists
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH
-  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
-  Formalism.L2.Theta Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField Matrix
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR.Datum MeasureTheory
+  IsDedekindDomain NumberField Matrix
 open scoped TensorProduct
 
 namespace Formalism.IndefR.Fin
@@ -27,13 +63,11 @@ theorem hO_add_right (x y y' : WO S T) : hO S T x (y + y') = hO S T x y + hO S T
   unfold hO
   simp only [Matrix.add_apply, map_add (f := _), mul_add, add_mul, Finset.sum_add_distrib]
 
-theorem symplO_add_left (x x' y : WO S T)
-    : symplO S T (x + x') y = symplO S T x y + symplO S T x' y := by
+theorem symplO_add_left (x x' y : WO S T) : symplO S T (x + x') y = symplO S T x y + symplO S T x' y := by
   unfold symplO
   rw [hO_add_left, mul_add, map_add (f := _)]
 
-theorem symplO_add_right (x y y' : WO S T)
-    : symplO S T x (y + y') = symplO S T x y + symplO S T x y' := by
+theorem symplO_add_right (x y y' : WO S T) : symplO S T x (y + y') = symplO S T x y + symplO S T x y' := by
   unfold symplO
   rw [hO_add_right, mul_add, map_add (f := _)]
 
@@ -47,13 +81,13 @@ theorem symplO_zero_right (x : WO S T) : symplO S T x 0 = 0 := by
   rw [add_zero] at h
   linear_combination -1 * h
 
-theorem symplO_neg_left (x y : WO S T) : symplO S T (-x) y = - symplO S T x y := by
+theorem symplO_neg_left (x y : WO S T) : symplO S T (-x) y = -symplO S T x y := by
   have h := symplO_add_left S T x (-x) y
   have h0 : x + -x = 0 := by simp
   rw [h0, symplO_zero_left] at h
   linear_combination -1 * h
 
-theorem symplO_neg_right (x y : WO S T) : symplO S T x (-y) = - symplO S T x y := by
+theorem symplO_neg_right (x y : WO S T) : symplO S T x (-y) = -symplO S T x y := by
   have h := symplO_add_right S T x y (-y)
   have h0 : y + -y = 0 := by simp
   rw [h0, symplO_zero_right] at h
@@ -73,45 +107,41 @@ theorem hO_eq_trace (x y : MO S T) : hO S T x y = (hOM S T x y).trace := by
   rw [Finset.sum_comm]
   conv_lhs => arg 2; ext d; rw [Finset.sum_comm]
 
-theorem cA_trace {k : ℕ} (M : Matrix (Fin k) (Fin k) (AE D))
-    : cA D M.trace = ((M.map (cA D))ᵀ).trace := by
+theorem cA_trace {k : ℕ} (M : Matrix (Fin k) (Fin k) (AE D)) : cA D M.trace = ((M.map (cA D))ᵀ).trace := by
   rw [Matrix.trace_transpose]
-  set_option synthInstance.maxHeartbeats 100000 in
+
   simp only [Matrix.trace, Matrix.diag, Matrix.map_apply, map_sum]
 
 theorem hO_swap (x y : MO S T) : hO S T y x = cA D (hO S T x y) := by
   have e0 : (y.map (cA D)).map (cA D) = y := by ext i j; simp [cA_cA]
-  have e2
-      : ((hOM S T x y).map (cA D))ᵀ
-        = HMul.hMul (HMul.hMul (HMul.hMul (x.map (cA D))ᵀ (Brg.GG T)) y) (Brg.GI S) := by
+  have e2 : ((hOM S T x y).map (cA D))ᵀ =
+      HMul.hMul (HMul.hMul (HMul.hMul (x.map (cA D))ᵀ (Brg.GG T)) y) (Brg.GI S) := by
     unfold hOM
     rw [Matrix.map_mul, Matrix.map_mul, Matrix.map_mul, Matrix.transpose_mul, Matrix.transpose_mul,
-      Matrix.transpose_mul, Brg.GI_herm, Brg.GG_herm, Matrix.transpose_map, e0,
-      Matrix.transpose_transpose]
+      Matrix.transpose_mul, Brg.GI_herm, Brg.GG_herm, Matrix.transpose_map, e0, Matrix.transpose_transpose]
     simp only [Matrix.mul_assoc]
   rw [hO_eq_trace, hO_eq_trace, cA_trace, e2, Matrix.trace_mul_comm]
   unfold hOM
   simp only [Matrix.mul_assoc]
 
-theorem symplO_swap (x y : WO S T) : symplO S T y x = - symplO S T x y := by
+theorem symplO_swap (x y : WO S T) : symplO S T y x = -symplO S T x y := by
   unfold symplO
   rw [hO_swap S T x y]
-  have e
-      : incA D D.host.xi0 * cA D (hO S T x y) = cA D (cA D (incA D D.host.xi0) * hO S T x y) := by
+  have e : incA D D.host.xi0 * cA D (hO S T x y) = cA D (cA D (incA D D.host.xi0) * hO S T x y) := by
     rw [map_mul, cA_cA]
   rw [e, Brg.trace_cA, Brg.cA_inc, Brg.star_purely_imaginary_eq_neg, map_neg, neg_mul, map_neg]
 
-theorem symplOH_add_left (x x' y : WO S T)
-    : symplOH S T (x + x') y = symplOH S T x y + symplOH S T x' y := by
+theorem symplOH_add_left (x x' y : WO S T) :
+    symplOH S T (x + x') y = symplOH S T x y + symplOH S T x' y := by
   unfold symplOH
   rw [symplO_add_left, mul_add]
 
-theorem symplOH_add_right (x y y' : WO S T)
-    : symplOH S T x (y + y') = symplOH S T x y + symplOH S T x y' := by
+theorem symplOH_add_right (x y y' : WO S T) :
+    symplOH S T x (y + y') = symplOH S T x y + symplOH S T x y' := by
   unfold symplOH
   rw [symplO_add_right, mul_add]
 
-theorem symplOH_swap (x y : WO S T) : symplOH S T y x = - symplOH S T x y := by
+theorem symplOH_swap (x y : WO S T) : symplOH S T y x = -symplOH S T x y := by
   unfold symplOH
   rw [symplO_swap, mul_neg]
 
@@ -122,9 +152,8 @@ theorem symplOH_two (x y : WO S T) : symplOH S T x y + symplOH S T x y = symplO 
 
 theorem incA_eq_tmul (e : D.host.E) : incA D e = (1 : AF D.host.F) ⊗ₜ[D.host.F] e := rfl
 
-theorem trace_incA (e : D.host.E)
-    : Algebra.trace (AF D.host.F) (AE D) (incA D e)
-      = algebraMap D.host.F (AF D.host.F) (Algebra.trace D.host.F D.host.E e) := by
+theorem trace_incA (e : D.host.E) :
+    Algebra.trace (AF D.host.F) (AE D) (incA D e) = algebraMap D.host.F (AF D.host.F) (Algebra.trace D.host.F D.host.E e) := by
   rw [incA_eq_tmul]
   exact Formalism.IndefR.PHeisTh.trace_tmul _
 

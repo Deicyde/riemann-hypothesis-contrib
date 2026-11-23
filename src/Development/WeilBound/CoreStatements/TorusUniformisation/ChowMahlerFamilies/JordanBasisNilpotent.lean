@@ -1,15 +1,62 @@
 module
 
-public import Mathlib
+public import Mathlib.LinearAlgebra.FiniteDimensional.Defs
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+public import Mathlib.LinearAlgebra.Dimension.RankNullity
+public import Mathlib.LinearAlgebra.FiniteDimensional.Lemmas
 
 @[expose] public section
 
 namespace PositivityTheory.Xgn.JordanBasis
 
-theorem exists_span_sup_range
-    {k W : Type} [Field k] [AddCommGroup W] [Module k W] [FiniteDimensional k W]
-    (π : Module.End k W) (r : ℕ) (h : Module.finrank k (LinearMap.ker π) ≤ r)
-    : ∃ x : Fin r → W, ∀ v : W, ∃ a ∈ Submodule.span k (Set.range x), ∃ u : W, v = a + π u := by
+theorem exists_span_sup_range {k W : Type} [Field k] [AddCommGroup W] [Module k W]
+    [FiniteDimensional k W] (π : Module.End k W) (r : ℕ)
+    (h : Module.finrank k (LinearMap.ker π) ≤ r) :
+    ∃ x : Fin r → W, ∀ v : W, ∃ a ∈ Submodule.span k (Set.range x), ∃ u : W, v = a + π u := by
   classical
   have hd : Module.finrank k (W ⧸ LinearMap.range π) ≤ r := by
     have h1 := Submodule.finrank_quotient_add_finrank (LinearMap.range π)
@@ -26,26 +73,22 @@ theorem exists_span_sup_range
     refine ⟨⟨j, lt_of_lt_of_le j.2 hd⟩, ?_⟩
     simp [x, j.2]
   refine ⟨x, fun v => ?_⟩
-  refine ⟨
-    ∑ j, b.repr ((LinearMap.range π).mkQ v) j • g (b j),
-    Submodule.sum_mem _ fun j _ => Submodule.smul_mem _ _ (hspan j),
-    ?_
-  ⟩
-  have hq
-      : (LinearMap.range π).mkQ (v - ∑ j, b.repr ((LinearMap.range π).mkQ v) j • g (b j)) = 0 := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sub, map_sum]
+  refine ⟨∑ j, b.repr ((LinearMap.range π).mkQ v) j • g (b j),
+    Submodule.sum_mem _ fun j _ => Submodule.smul_mem _ _ (hspan j), ?_⟩
+  have hq : (LinearMap.range π).mkQ
+      (v - ∑ j, b.repr ((LinearMap.range π).mkQ v) j • g (b j)) = 0 := by
+
+    rw [map_sub, map_sum]
     simp only [map_smul, hg]
     rw [b.sum_repr, sub_self]
   rw [Submodule.mkQ_apply, Submodule.Quotient.mk_eq_zero] at hq
   obtain ⟨u, hu⟩ := LinearMap.mem_range.mp hq
   exact ⟨u, by rw [hu]; abel⟩
 
-theorem span_eq_top
-    {k W : Type} [Field k] [AddCommGroup W] [Module k W]
+theorem span_eq_top {k W : Type} [Field k] [AddCommGroup W] [Module k W]
     (π : Module.End k W) (e r : ℕ) (hπ : π ^ e = 0) (x : Fin r → W)
-    (hx : ∀ v : W, ∃ a ∈ Submodule.span k (Set.range x), ∃ u : W, v = a + π u)
-    : Submodule.span k (Set.range fun q : Fin r × Fin e => (π ^ (q.2 : ℕ)) (x q.1)) = ⊤ := by
+    (hx : ∀ v : W, ∃ a ∈ Submodule.span k (Set.range x), ∃ u : W, v = a + π u) :
+    Submodule.span k (Set.range fun q : Fin r × Fin e => (π ^ (q.2 : ℕ)) (x q.1)) = ⊤ := by
   classical
   set S := Submodule.span k (Set.range fun q : Fin r × Fin e => (π ^ (q.2 : ℕ)) (x q.1)) with hS
   rcases Nat.eq_zero_or_pos e with he | he

@@ -1,7 +1,53 @@
 module
 
-public import Mathlib
+import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.CuspidalBlockAverageLastColumnEqZero
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.UnipotentBlockColumnIndex
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
+import Development.AutomorphicArithmetic.IntegralCasts.IsOpenStabOfMemNhds
 
 @[expose] public section
 
@@ -15,32 +61,14 @@ section Entries
 
 variable {R : Type} [CommRing R] {a : ℕ}
 
-theorem posM_block_entry {r m : ℕ} (x : UnipotentBlockColumnIndex a r m → R) (i j : Fin a)
-    : posM (Subtype.val : UnipotentBlockColumnIndex a r m → Fin a × Fin a) x i j
-      = if h : (i : ℕ) < r ∧ r ≤ (j : ℕ) ∧ (j : ℕ) ≤ m then x ⟨(i, j), h⟩ else 0 := by
-  simp only [posM, Matrix.sum_apply, Matrix.single_apply]
-  split_ifs with h
-  · rw [Finset.sum_eq_single ⟨(i, j), h⟩]
-    · simp
-    · intro t _ ht
-      rw [if_neg]
-      rintro ⟨e1, e2⟩
-      exact ht (Subtype.ext (Prod.ext e1 e2))
-    · simp
-  · refine Finset.sum_eq_zero fun t _ => ?_
-    rw [if_neg]
-    rintro ⟨e1, e2⟩
-    apply h
-    have := t.2
-    rw [← e1, ← e2]
-    exact this
+theorem posM_block_entry {r m : ℕ} (x : UnipotentBlockColumnIndex a r m → R) (i j : Fin a) :
+    posM (Subtype.val : UnipotentBlockColumnIndex a r m → Fin a × Fin a) x i j =
+      if h : (i : ℕ) < r ∧ r ≤ (j : ℕ) ∧ (j : ℕ) ≤ m then x ⟨(i, j), h⟩ else 0 := by
+  apply GlobalTheory.CuspGeneric.posM_apply_of_blkIx <;> assumption
 
-theorem posM_col_mul
-    {n : ℕ} (x : UnipotentBlockColumnIndex a n n → R)
-    (M : Matrix (Fin a) (Fin a) R)
-    (h : ∀ k : Fin a, (k : ℕ) = n → ∀ j, M k j = (1 : Matrix (Fin a) (Fin a) R) k j)
-    : posM (Subtype.val : UnipotentBlockColumnIndex a n n → Fin a × Fin a) x * M
-      = posM Subtype.val x := by
+theorem posM_col_mul {n : ℕ} (x : UnipotentBlockColumnIndex a n n → R) (M : Matrix (Fin a) (Fin a) R)
+    (h : ∀ k : Fin a, (k : ℕ) = n → ∀ j, M k j = (1 : Matrix (Fin a) (Fin a) R) k j) :
+    posM (Subtype.val : UnipotentBlockColumnIndex a n n → Fin a × Fin a) x * M = posM Subtype.val x := by
   simp only [posM, Finset.sum_mul]
   refine Finset.sum_congr rfl fun t _ => ?_
   have ht : ((t.1.2 : Fin a) : ℕ) = n := by have := t.2; omega
@@ -53,9 +81,9 @@ theorem posM_col_mul
     rintro ⟨e1, _⟩
     exact hi e1.symm
 
-theorem sum_posM_col {n : ℕ} (x : UnipotentBlockColumnIndex a n n → R)
-    : (∑ p : Fin a × Fin a with (p.2 : ℕ) = p.1 + 1, posM (Subtype.val : UnipotentBlockColumnIndex a n n → Fin a × Fin a) x p.1 p.2)
-      = ∑ t : UnipotentBlockColumnIndex a n n, if (t.1.1 : ℕ) + 1 = n then x t else 0 := by
+theorem sum_posM_col {n : ℕ} (x : UnipotentBlockColumnIndex a n n → R) :
+    (∑ p : Fin a × Fin a with (p.2 : ℕ) = p.1 + 1, posM (Subtype.val : UnipotentBlockColumnIndex a n n → Fin a × Fin a) x p.1 p.2) =
+      ∑ t : UnipotentBlockColumnIndex a n n, if (t.1.1 : ℕ) + 1 = n then x t else 0 := by
   simp only [posM, Matrix.sum_apply, Matrix.single_apply]
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun t _ => ?_
@@ -82,18 +110,11 @@ end Entries
 
 variable {E : Type} [Field E] [NumberField E] {a : ℕ}
 
-theorem whittakerLaw_upperUnipotent_identityColumns
-    (ψ : AddChar (Ad E) ℂ) (f : GA E a → ℂ)
-    (hf : ∀ k,
-      0 < k
-        → ∀ (y : UnipotentBlockColumnIndex a k k → Ad E) (g : GA E a),
-          f (blkU y * g) = ψ (dot (eLast a k) y) * f g)
-    (n : ℕ)
-    : ∀ u : GL (Fin a) (Ad E),
-      (∀ i j : Fin a, j < i → u.val i j = 0) → (∀ j : Fin a, u.val j j = 1)
-        → (∀ i j : Fin a, n ≤ (j : ℕ) → i ≠ j → u.val i j = 0)
-        → ∀ g : GA E a,
-          f (u * g) = ψ (∑ p : Fin a × Fin a with (p.2 : ℕ) = p.1 + 1, u.val p.1 p.2) * f g := by
+theorem whittakerLaw_upperUnipotent_identityColumns (ψ : AddChar (Ad E) ℂ) (f : GA E a → ℂ)
+    (hf : ∀ k, 0 < k → ∀ (y : UnipotentBlockColumnIndex a k k → Ad E) (g : GA E a), f (blkU y * g) = ψ (dot (eLast a k) y) * f g) (n : ℕ) :
+    ∀ u : GL (Fin a) (Ad E), (∀ i j : Fin a, j < i → u.val i j = 0) → (∀ j : Fin a, u.val j j = 1) →
+      (∀ i j : Fin a, n ≤ (j : ℕ) → i ≠ j → u.val i j = 0) →
+      ∀ g : GA E a, f (u * g) = ψ (∑ p : Fin a × Fin a with (p.2 : ℕ) = p.1 + 1, u.val p.1 p.2) * f g := by
   induction n with
   | zero =>
     intro u _ hd hc g
@@ -104,9 +125,7 @@ theorem whittakerLaw_upperUnipotent_identityColumns
       · subst h; simp [hd]
       · simp [hc i j (Nat.zero_le _) h, h]
     subst hu
-    have hs
-        : (∑ p : Fin a × Fin a with (p.2 : ℕ) = p.1 + 1, (1 : GL (Fin a) (Ad E)).val p.1 p.2)
-          = 0 := by
+    have hs : (∑ p : Fin a × Fin a with (p.2 : ℕ) = p.1 + 1, (1 : GL (Fin a) (Ad E)).val p.1 p.2) = 0 := by
       refine Finset.sum_eq_zero fun p hp => ?_
       have hp2 := (Finset.mem_filter.1 hp).2
       have : p.1 ≠ p.2 := fun e => by rw [e] at hp2; omega
@@ -121,8 +140,7 @@ theorem whittakerLaw_upperUnipotent_identityColumns
       · exact hc i j (by have : (i : ℕ) < j := h; omega) hij
       · exact ht i j h
     set y : UnipotentBlockColumnIndex a n n → Ad E := fun t => u.val t.1.1 t.1.2 with hy
-    have hrow
-        : ∀ k : Fin a, (k : ℕ) = n → ∀ j, u.val k j = (1 : Matrix (Fin a) (Fin a) (Ad E)) k j := by
+    have hrow : ∀ k : Fin a, (k : ℕ) = n → ∀ j, u.val k j = (1 : Matrix (Fin a) (Fin a) (Ad E)) k j := by
       intro k hk j
       by_cases h : k = j
       · subst h; simp [hd]
@@ -134,10 +152,7 @@ theorem whittakerLaw_upperUnipotent_identityColumns
       intro i j
       have e : ((blkU y)⁻¹ * u).val = (1 - posM Subtype.val y) * u.val := rfl
       rw [e, sub_mul, one_mul, posM_col_mul y _ hrow, Matrix.sub_apply]
-    have hz
-        : ∀ i j : Fin a,
-          ¬((i : ℕ) < n ∧ (j : ℕ) = n)
-            → posM (Subtype.val : UnipotentBlockColumnIndex a n n → Fin a × Fin a) y i j = 0 := by
+    have hz : ∀ i j : Fin a, ¬ ((i : ℕ) < n ∧ (j : ℕ) = n) → posM (Subtype.val : UnipotentBlockColumnIndex a n n → Fin a × Fin a) y i j = 0 := by
       intro i j h
       rw [posM_block_entry, dite_eq_right]
       rintro ⟨h1, h2, h3⟩
@@ -147,9 +162,8 @@ theorem whittakerLaw_upperUnipotent_identityColumns
       rw [e2, hf n (by omega), e1, ← mul_assoc, ← AddChar.map_add_eq_mul]
       congr 2
       simp only [hval, Finset.sum_sub_distrib, sum_posM_col, dot, eLast]
-      have hd2
-          : (∑ t : UnipotentBlockColumnIndex a n n, algebraMap E (Ad E) (if (t.1.1 : ℕ) + 1 = n then 1 else 0) * y t)
-            = ∑ t : UnipotentBlockColumnIndex a n n, if (t.1.1 : ℕ) + 1 = n then y t else 0 := by
+      have hd2 : (∑ t : UnipotentBlockColumnIndex a n n, algebraMap E (Ad E) (if (t.1.1 : ℕ) + 1 = n then 1 else 0) * y t) =
+          ∑ t : UnipotentBlockColumnIndex a n n, if (t.1.1 : ℕ) + 1 = n then y t else 0 := by
         refine Finset.sum_congr rfl fun t _ => ?_
         split_ifs <;> simp
       rw [hd2, add_sub_cancel]
@@ -175,19 +189,10 @@ theorem whittakerLaw_upperUnipotent_identityColumns
             exact this)
       · rw [hc i j (by omega) hij, hz i j (fun h => hjn h.2), sub_zero]
 
-theorem tri_law
-    (E : Type) [Field E] [NumberField E]
-    (a : ℕ) (ψ : AddChar (Ad E) ℂ) (f : GA E a → ℂ)
-    (hf : ∀ k,
-      0 < k
-        → ∀ (y : UnipotentBlockColumnIndex a k k → Ad E) (g : GA E a),
-          f (blkU y * g) = ψ (dot (eLast a k) y) * f g)
-    (u : GL (Fin a) (Ad E))
-    (ht : ∀ i j : Fin a, j < i → u.val i j = 0) (hd : ∀ j : Fin a, u.val j j = 1)
-    (g : GA E a)
-    : f (u * g) = ψ (∑ p : Fin a × Fin a with (p.2 : ℕ) = p.1 + 1, u.val p.1 p.2) * f g :=
-  whittakerLaw_upperUnipotent_identityColumns ψ f hf a u ht hd
-    (fun _ j h => absurd j.2 (by omega))
-    g
+theorem tri_law (E : Type) [Field E] [NumberField E] (a : ℕ) (ψ : AddChar (Ad E) ℂ) (f : GA E a → ℂ)
+    (hf : ∀ k, 0 < k → ∀ (y : UnipotentBlockColumnIndex a k k → Ad E) (g : GA E a), f (blkU y * g) = ψ (dot (eLast a k) y) * f g)
+    (u : GL (Fin a) (Ad E)) (ht : ∀ i j : Fin a, j < i → u.val i j = 0) (hd : ∀ j : Fin a, u.val j j = 1) (g : GA E a) :
+    f (u * g) = ψ (∑ p : Fin a × Fin a with (p.2 : ℕ) = p.1 + 1, u.val p.1 p.2) * f g :=
+  whittakerLaw_upperUnipotent_identityColumns ψ f hf a u ht hd (fun _ j h => absurd j.2 (by omega)) g
 
 end GlobalTheory.CuspGeneric

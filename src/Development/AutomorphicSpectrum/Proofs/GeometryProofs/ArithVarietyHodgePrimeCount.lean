@@ -1,28 +1,71 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.IsLatFamilyCongr
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.MulMemSqOfSmulEqZero
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.LemmaBTHolds
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.LatticeEigenVectorBundle
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.IsExcisionNbhdAway
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.ExistsLieModel
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.LieModelFiniteBaseChange
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.LieOmegaLatticeVectorBundle
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.SpecStalkSpecializesComp
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.IsDerAtOneCompEndo
-public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.ChartRingNoetherianNormalFraction
+public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.IsLatFlagPair
+public import Development.AutomorphicSpectrum.Proofs.AlgebraProofs.DifferentGeneratorDualIntegral
+public import Development.AutomorphicSpectrum.Proofs.AlgebraProofs.RelatedPairsOrbitalTermEq
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.ChartPointInChartDominated
+public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.ChartRingNoetherianNormalFraction
+public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.ExistsLieModel
+public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.IsDerAtOneCompEndo
+public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.IsExcisionNbhdAway
+import Development.AutomorphicSpectrum.Proofs.GeometryProofs.LatticeEigenVectorBundle
+public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.LemmaBTHolds
+import Development.AutomorphicSpectrum.Proofs.GeometryProofs.LieModelFiniteBaseChange
+public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.LieOmegaLatticeVectorBundle
+public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.MulMemSqOfSmulEqZero
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.SpMapEqFromSpecStalk
+import Development.AutomorphicSpectrum.Proofs.GeometryProofs.SpecStalkSpecializesComp
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+public import Mathlib.LinearAlgebra.FreeModule.IdealQuotient
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Coalgebra.IsFrobenius
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Development.AutomorphicSpectrum.Definitions.DivisibilityTowers.CompactGapsGE
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory NumberField MvPolynomial ReciprocityTheory.ChartRestriction.G
-  ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.Geo.Tor
-  ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CompanionTheory.Ar
-  GlobalTheory.CompanionTheory.Ar.Num GlobalTheory.CompanionTheory.Ar.Top
-open GroundTheory.Heights₂.Heights.NumbersDVR
-  (pointIdeal segreVec IsFlagFrame IsFlagPair SameGenericFibre IsModelOver divCycle)
+open AlgebraicGeometry CategoryTheory NumberField MvPolynomial ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Num GlobalTheory.CompanionTheory.Ar.Top
+open GroundTheory.Heights₂.Heights.NumbersDVR (pointIdeal segreVec IsFlagFrame IsFlagPair SameGenericFibre IsModelOver divCycle)
 open GroundTheory.Heights₂.Heights.IndefiniteRowSideFullHecke.NumbersDVR.Bundles (mseg fnField)
 open Limits MonoidalCategory CartesianMonoidalCategory MonObj
 open GlobalTheory.CompanionTheory.Ar.Num.FamEx GlobalTheory.CompanionTheory.Ar.BT
@@ -31,8 +74,7 @@ noncomputable section
 
 namespace GlobalTheory.CompanionTheory.Ar.Num.FamEx.FunPart
 
-open GlobalTheory.CompanionTheory.Ar.Num.FamEx.FunAlg GlobalTheory.CompanionTheory.Ar.LieVB
-  GlobalTheory.CompanionTheory.Ar.LieTangent
+open GlobalTheory.CompanionTheory.Ar.Num.FamEx.FunAlg GlobalTheory.CompanionTheory.Ar.LieVB GlobalTheory.CompanionTheory.Ar.LieTangent
 
 section Order
 
@@ -45,6 +87,7 @@ def augSub (A : Subalgebra R (T → R)) : Submodule R (T → R) where
   smul_mem' := fun c _ h => ⟨A.smul_mem h.1 c, by simp [h.2]⟩
 
 def toAug {A : Subalgebra R (T → R)} (f : augSub A) : augIdeal A := ⟨⟨f.1, f.2.1⟩, f.2.2⟩
+
 
 set_option synthInstance.maxHeartbeats 400000 in
 set_option maxHeartbeats 1000000 in
@@ -66,11 +109,8 @@ theorem augCl_surjective (A : Subalgebra R (T → R)) : Function.Surjective (aug
 
 end Order
 
-theorem spec_field_ext
-    {K K' : Type} [Field K] [Field K']
-    (φ : K →+* K')
-    {Y : Scheme.{0}} {v v' : Spec (CommRingCat.of K) ⟶ Y} (h : spMap φ ≫ v = spMap φ ≫ v')
-    : v = v' := by
+theorem spec_field_ext {K K' : Type} [Field K] [Field K'] (φ : K →+* K') {Y : Scheme.{0}}
+    {v v' : Spec (CommRingCat.of K) ⟶ Y} (h : spMap φ ≫ v = spMap φ ≫ v') : v = v' := by
   refine ext_of_injective φ.injective ?_ h
   let z : Spec (CommRingCat.of K') := IsLocalRing.closedPoint K'
   have e : (spMap φ) z = IsLocalRing.closedPoint K := Subsingleton.elim (α := PrimeSpectrum K) _ _
@@ -80,16 +120,15 @@ theorem spec_field_ext
 
 section Tors
 
-variable
-  {E : Type} [Field E] [NumberField E] [IsCMField E]
-  {F : Type} [Field F]
-  {N p : ℕ} (pq : (𝓞 E ⧸ Ideal.span {(p : 𝓞 E)}) →+* F) (sc : F →+ (𝓞 E ⧸ Ideal.span {(p : 𝓞 E)}))
+variable {E : Type} [Field E] [NumberField E] [IsCMField E] {F : Type} [Field F] {N p : ℕ}
+  (pq : (𝓞 E ⧸ Ideal.span {(p : 𝓞 E)}) →+* F) (sc : F →+ (𝓞 E ⧸ Ideal.span {(p : 𝓞 E)}))
 
 variable {pq sc} in
 theorem fromN_toN (h : IsSec pq sc) (a : Fin N → F) : fromN pq (toN sc a : TorsT E N p) = a :=
   funext fun i => h.1 _
 
-theorem fromN_one : fromN pq (1 : TorsT E N p) = 0 := funext fun i => by simp [fromN]
+theorem fromN_one : fromN pq (1 : TorsT E N p) = 0 :=
+  funext fun i => by simp [fromN]
 
 theorem toN_zero : (toN sc (0 : Fin N → F) : TorsT E N p) = 1 :=
   Multiplicative.toAdd.injective (funext fun i => by simp [toN])
@@ -99,11 +138,10 @@ def idem : TorsT E N p →* TorsT E N p where
   map_one' := by rw [fromN_one, toN_zero]
   map_mul' s t := Multiplicative.toAdd.injective (funext fun i => by simp [toN, fromN])
 
+
 variable {pq sc} in
-theorem exists_eps (h : IsSec pq sc)
-    : ∃ ε : 𝓞 E,
-      pq (Ideal.Quotient.mk _ ε) = 1
-        ∧ ∀ u, Ideal.Quotient.mk (Ideal.span {(p : 𝓞 E)}) ε * u = sc (pq u) := by
+theorem exists_eps (h : IsSec pq sc) : ∃ ε : 𝓞 E, pq (Ideal.Quotient.mk _ ε) = 1 ∧
+    ∀ u, Ideal.Quotient.mk (Ideal.span {(p : 𝓞 E)}) ε * u = sc (pq u) := by
   obtain ⟨ε, hε⟩ := Ideal.Quotient.mk_surjective (sc 1)
   refine ⟨ε, by rw [hε]; exact h.1 1, fun u => ?_⟩
   rw [hε]
@@ -112,10 +150,8 @@ theorem exists_eps (h : IsSec pq sc)
   linear_combination h1 + h2
 
 variable {pq sc} in
-theorem idem_qmk
-    {ε : 𝓞 E} (hε : ∀ u, Ideal.Quotient.mk (Ideal.span {(p : 𝓞 E)}) ε * u = sc (pq u))
-    (x : Fin N → 𝓞 E)
-    : idem pq sc (qmk p x) = qmk p (ε • x) :=
+theorem idem_qmk {ε : 𝓞 E} (hε : ∀ u, Ideal.Quotient.mk (Ideal.span {(p : 𝓞 E)}) ε * u = sc (pq u))
+    (x : Fin N → 𝓞 E) : idem pq sc (qmk p x) = qmk p (ε • x) :=
   Multiplicative.toAdd.injective (funext fun i => by
     change sc (pq (Ideal.Quotient.mk _ (x i))) = Ideal.Quotient.mk _ (ε * x i)
     rw [map_mul, hε])
@@ -128,30 +164,20 @@ end Tors
 
 section Chart
 
-variable
-  {E : Type} [Field E] [NumberField E] [IsCMField E]
-  {H : Host E} {D : Datum H} {l : Level H} {Xo : Moduli D l} {c : Coeff l} {O₀ : Type} [CommRing O₀]
-  {β : O₀ →+* c.F} {Y : Model Xo c β} {S : Finset ℕ} {Ω : Type} [Field Ω]
-  {K : Type} [Fintype K]
-  {J : K → Type} [∀ k, Fintype (J k)]
-  {y : (Σ k, J k) → Ω} {𝔐 : HodgeCpt Y S y} {p : ℕ} {G : GenTors 𝔐 p} {O : Type}
-  [CommRing O] [Algebra O Ω]
-  {c' : ∀ k, J k}
+variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {D : Datum H} {l : Level H}
+  {Xo : Moduli D l} {c : Coeff l} {O₀ : Type} [CommRing O₀] {β : O₀ →+* c.F} {Y : Model Xo c β} {S : Finset ℕ}
+  {Ω : Type} [Field Ω] {K : Type} [Fintype K] {J : K → Type} [∀ k, Fintype (J k)] {y : (Σ k, J k) → Ω}
+  {𝔐 : HodgeCpt Y S y} {p : ℕ} {G : GenTors 𝔐 p} {O : Type} [CommRing O] [Algebra O Ω] {c' : ∀ k, J k}
 
-theorem toLi_rho (P : ChartPack G O c') (a : 𝓞 E) (v : P.L)
-    : P.toLi (P.ρ a v) = 𝔐.ρ a (P.toLi v) := by
+theorem toLi_rho (P : ChartPack G O c') (a : 𝓞 E) (v : P.L) : P.toLi (P.ρ a v) = 𝔐.ρ a (P.toLi v) := by
   apply 𝔐.M.inj
   apply Over.OverMorphism.ext
-  rw [P.toLi_pt, 𝔐.act a (P.toLi v), P.act a v, Over.comp_left, Over.comp_left, P.toLi_pt,
-    Category.assoc]
+  rw [P.toLi_pt, 𝔐.act a (P.toLi v), P.act a v, Over.comp_left, Over.comp_left, P.toLi_pt, Category.assoc]
 
-theorem pts_idem
-    (P : ChartPack G O c')
-    {F : Type} [Field F]
+theorem pts_idem (P : ChartPack G O c') {F : Type} [Field F]
     {pq : (𝓞 E ⧸ Ideal.span {(p : 𝓞 E)}) →+* F} {sc : F →+ (𝓞 E ⧸ Ideal.span {(p : 𝓞 E)})} {ε : 𝓞 E}
-    (hε : ∀ u, Ideal.Quotient.mk (Ideal.span {(p : 𝓞 E)}) ε * u = sc (pq u))
-    (t : TorsT E (D.p + D.q) p)
-    : (P.Γ₁.pt (idem pq sc t)).left ≫ P.i₁ = (P.Γ₁.pt t).left ≫ P.i₁ ≫ (𝔐.t.act.act ε).left := by
+    (hε : ∀ u, Ideal.Quotient.mk (Ideal.span {(p : 𝓞 E)}) ε * u = sc (pq u)) (t : TorsT E (D.p + D.q) p) :
+    (P.Γ₁.pt (idem pq sc t)).left ≫ P.i₁ = (P.Γ₁.pt t).left ≫ P.i₁ ≫ (𝔐.t.act.act ε).left := by
   obtain ⟨x, rfl⟩ := exists_qmk t
   rw [idem_qmk hε]
   apply spec_field_ext (fracToField (CR O y c'))
@@ -162,38 +188,33 @@ theorem pts_idem
   rw [← h1, h3, h2]
   simp only [Category.assoc]
 
+
 set_option backward.isDefEq.respectTransparency false in
-theorem lat_eq_span
-    [Smooth 𝔐.t.G.hom]
-    (P : ChartPack G O c') (q : Cpt 𝔐.ξ) (ψ : CR O y c' →+* 𝔐.X.presheaf.stalk q.1)
-    (h1 : spMap ψ ≫ P.x = 𝔐.X.fromSpecStalk q.1)
-    (h2 : (genMap 𝔐.ξ q).comp ψ = algebraMap (CR O y c') Ω)
-    : 𝔐.M.lat q = Submodule.span (regAt 𝔐.ξ q) (Set.range P.toLi) := by
-  obtain ⟨Fq, _, _, ⟨Mq⟩⟩ :=
-    lieModel_exists 𝔐.X 𝔐.t.G (𝔐.X.presheaf.stalk q.1) (𝔐.X.fromSpecStalk q.1)
-  obtain ⟨jq, hjq⟩ :=
-    exists_tr (A := 𝔐.X.presheaf.stalk q.1) (𝔐.X.fromSpecStalk q.1) 𝔐.ξ (genMap 𝔐.ξ q)
-      (spec_genMap 𝔐.ξ q) Mq 𝔐.M
-  obtain ⟨b₀, hb₀⟩ :=
-    exists_tr (A := CR O y c') (B := 𝔐.X.presheaf.stalk q.1) P.x (𝔐.X.fromSpecStalk q.1) ψ h1 P.M Mq
-  have hcomp : ∀ e, jq (b₀ e) = P.toLi e := fun e =>
-    pt_left_inj 𝔐.M (by rw [hjq, hb₀, ← Category.assoc, spMap_dual_comp, h2, P.toLi_pt])
+theorem lat_eq_span [Smooth 𝔐.t.G.hom] (P : ChartPack G O c') (q : Cpt 𝔐.ξ)
+    (ψ : CR O y c' →+* 𝔐.X.presheaf.stalk q.1) (h1 : spMap ψ ≫ P.x = 𝔐.X.fromSpecStalk q.1)
+    (h2 : (genMap 𝔐.ξ q).comp ψ = algebraMap (CR O y c') Ω) :
+    𝔐.M.lat q = Submodule.span (regAt 𝔐.ξ q) (Set.range P.toLi) := by
+  obtain ⟨Fq, _, _, ⟨Mq⟩⟩ := lieModel_exists 𝔐.X 𝔐.t.G (𝔐.X.presheaf.stalk q.1) (𝔐.X.fromSpecStalk q.1)
+  obtain ⟨jq, hjq⟩ := exists_tr (A := 𝔐.X.presheaf.stalk q.1) (𝔐.X.fromSpecStalk q.1) 𝔐.ξ (genMap 𝔐.ξ q)
+    (spec_genMap 𝔐.ξ q) Mq 𝔐.M
+  obtain ⟨b₀, hb₀⟩ := exists_tr (A := CR O y c') (B := 𝔐.X.presheaf.stalk q.1) P.x (𝔐.X.fromSpecStalk q.1) ψ h1
+    P.M Mq
+  have hcomp : ∀ e, jq (b₀ e) = P.toLi e := fun e => pt_left_inj 𝔐.M (by
+    rw [hjq, hb₀, ← Category.assoc, spMap_dual_comp, h2, P.toLi_pt])
   letI : Algebra (CR O y c') (𝔐.X.presheaf.stalk q.1) := ψ.toAlgebra
   letI : Module (CR O y c') Fq := Module.compHom Fq ψ
   haveI : IsScalarTower (CR O y c') (𝔐.X.presheaf.stalk q.1) Fq :=
     ⟨fun s r e => by
       change (ψ s * r) • e = ψ s • r • e
       rw [mul_smul]⟩
-  let b' : P.L →ₗ[CR O y c'] Fq := {
-    toFun := b₀
-    map_add' := b₀.map_add
-    map_smul' := fun r e => b₀.map_smulₛₗ r e
-  }
+  let b' : P.L →ₗ[CR O y c'] Fq :=
+    { toFun := b₀
+      map_add' := b₀.map_add
+      map_smul' := fun r e => b₀.map_smulₛₗ r e }
   have hbc : IsBaseChange (𝔐.X.presheaf.stalk q.1) b' :=
-    (GlobalTheory.CompanionTheory.Ar.LieProj.lie_finite_projective_baseChange 𝔐.X 𝔐.t.G (CR O y c')
-        P.x P.L P.M).2.2 (𝔐.X.presheaf.stalk q.1) Fq
-      (LieVB.cast (R := 𝔐.X.presheaf.stalk q.1) h1.symm Mq) b'
-      fun e => (LieVB.cast_left (R := 𝔐.X.presheaf.stalk q.1) h1.symm Mq (b' e)).trans (hb₀ e)
+    (GlobalTheory.CompanionTheory.Ar.LieProj.lie_finite_projective_baseChange 𝔐.X 𝔐.t.G (CR O y c') P.x P.L P.M).2.2 (𝔐.X.presheaf.stalk q.1) Fq
+      (LieVB.cast (R := 𝔐.X.presheaf.stalk q.1) h1.symm Mq) b' fun e =>
+        (LieVB.cast_left (R := 𝔐.X.presheaf.stalk q.1) h1.symm Mq (b' e)).trans (hb₀ e)
   have hsp : ∀ z : Fq, jq z ∈ Submodule.span (regAt 𝔐.ξ q) (Set.range P.toLi) := fun z =>
     hbc.inductionOn z
       (fun m => Submodule.subset_span ⟨m, (hcomp m).symm⟩)
@@ -211,14 +232,10 @@ theorem lat_eq_span
     rw [hy]
     exact hsp z
   · rintro _ ⟨v, rfl⟩
-    exact (𝔐.M.mem_lat_iff q _).2 ⟨
-      Mq.pt (b₀ v),
-      Mq.tan _,
-      by
-        change (𝔐.M.pt (P.toLi v)).left = _
-        rw [← hcomp]
-        exact hjq _
-    ⟩
+    exact (𝔐.M.mem_lat_iff q _).2 ⟨Mq.pt (b₀ v), Mq.tan _, by
+      change (𝔐.M.pt (P.toLi v)).left = _
+      rw [← hcomp]
+      exact hjq _⟩
 
 end Chart
 
@@ -226,47 +243,35 @@ end GlobalTheory.CompanionTheory.Ar.Num.FamEx.FunPart
 
 namespace GlobalTheory.CompanionTheory.Ar.Num.FamEx.FunPart
 
-open GlobalTheory.CompanionTheory.Ar.Num.FamEx.FunAlg GlobalTheory.CompanionTheory.Ar.LieVB
-  GlobalTheory.CompanionTheory.Ar.LieTangent
+open GlobalTheory.CompanionTheory.Ar.Num.FamEx.FunAlg GlobalTheory.CompanionTheory.Ar.LieVB GlobalTheory.CompanionTheory.Ar.LieTangent
 
 section Sec
 
-variable
-  {E : Type} [Field E] [NumberField E] [IsCMField E]
-  {H : Host E} {D : Datum H} {l : Level H} {Xo : Moduli D l} {c : Coeff l} {O₀ : Type} [CommRing O₀]
-  {β : O₀ →+* c.F} {Y : Model Xo c β} {S : Finset ℕ} {Ω : Type} [Field Ω]
-  {K : Type} [Fintype K]
-  {J : K → Type} [∀ k, Fintype (J k)]
-  {y : (Σ k, J k) → Ω} {𝔐 : HodgeCpt Y S y} {p : ℕ} {G : GenTors 𝔐 p} {O : Type}
-  [CommRing O] [Algebra O Ω]
-  {c' : ∀ k, J k}
+variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {D : Datum H} {l : Level H}
+  {Xo : Moduli D l} {c : Coeff l} {O₀ : Type} [CommRing O₀] {β : O₀ →+* c.F} {Y : Model Xo c β} {S : Finset ℕ}
+  {Ω : Type} [Field Ω] {K : Type} [Fintype K] {J : K → Type} [∀ k, Fintype (J k)] {y : (Σ k, J k) → Ω}
+  {𝔐 : HodgeCpt Y S y} {p : ℕ} {G : GenTors 𝔐 p} {O : Type} [CommRing O] [Algebra O Ω] {c' : ∀ k, J k}
 
-abbrev OnChart
-    (𝔐 : HodgeCpt Y S y) (O : Type) [CommRing O] [Algebra O Ω] (c' : ∀ k, J k) (q : Cpt 𝔐.ξ)
-    : Prop :=
+abbrev OnChart (𝔐 : HodgeCpt Y S y) (O : Type) [CommRing O] [Algebra O Ω] (c' : ∀ k, J k) (q : Cpt 𝔐.ξ) : Prop :=
   InChart 𝔐.ξ (mseg y) c' q ∧ ∀ o : O, algebraMap O Ω o ∈ regAt 𝔐.ξ q
 
 def Dominated (P : ChartPack G O c') : Prop :=
-  ∀ z : Spec (CommRingCat.of (CR O y c')),
-    OnChart 𝔐 O c' ⟨P.x z, 𝔐.all _⟩
-      ∧ ∀ a ∈ regAt 𝔐.ξ ⟨P.x z, 𝔐.all _⟩, ∃ r s : CR O y c', s ∉ z.asIdeal ∧ (s : Ω) * a = r
+  ∀ z : Spec (CommRingCat.of (CR O y c')), OnChart 𝔐 O c' ⟨P.x z, 𝔐.all _⟩ ∧
+    ∀ a ∈ regAt 𝔐.ξ ⟨P.x z, 𝔐.all _⟩, ∃ r s : CR O y c', s ∉ z.asIdeal ∧ (s : Ω) * a = r
 
-theorem mem_chart_of_forall
-    (P : ChartPack G O c') (hpt : Dominated P)
-    (a : Ω) (ha : ∀ q, OnChart 𝔐 O c' q → a ∈ regAt 𝔐.ξ q)
-    : a ∈ CR O y c' := by
-  let I : Ideal (CR O y c') := {
-    carrier := {r | (r : Ω) * a ∈ CR O y c'}
-    add_mem' := fun {u v} hu hv => by
-      have h := (CR O y c').add_mem hu hv
-      simpa [add_mul] using h
-    zero_mem' := by simp [(CR O y c').zero_mem]
-    smul_mem' := fun s r hr => by
-      have h := (CR O y c').mul_mem s.2 hr
-      change (s : Ω) * (r : Ω) * a ∈ CR O y c'
-      rw [_root_.mul_assoc]
-      exact h
-  }
+theorem mem_chart_of_forall (P : ChartPack G O c') (hpt : Dominated P) (a : Ω)
+    (ha : ∀ q, OnChart 𝔐 O c' q → a ∈ regAt 𝔐.ξ q) : a ∈ CR O y c' := by
+  let I : Ideal (CR O y c') :=
+    { carrier := {r | (r : Ω) * a ∈ CR O y c'}
+      add_mem' := fun {u v} hu hv => by
+        have h := (CR O y c').add_mem hu hv
+        simpa [add_mul] using h
+      zero_mem' := by simp [(CR O y c').zero_mem]
+      smul_mem' := fun s r hr => by
+        have h := (CR O y c').mul_mem s.2 hr
+        change (s : Ω) * (r : Ω) * a ∈ CR O y c'
+        rw [_root_.mul_assoc]
+        exact h }
   by_cases hI : I = ⊤
   · have h1 : (1 : CR O y c') ∈ I := hI ▸ Submodule.mem_top
     simpa [I] using h1
@@ -276,15 +281,10 @@ theorem mem_chart_of_forall
     obtain ⟨r, s, hs, hsr⟩ := h2 a (ha _ h1)
     exact absurd (hle (show s ∈ I from show (s : Ω) * a ∈ CR O y c' by rw [hsr]; exact r.2)) hs
 
-theorem mem_range_toLi_iff
-    [Smooth 𝔐.t.G.hom]
-    (P : ChartPack G O c') (hpt : Dominated P)
-    (hψ : ∀ q,
-      OnChart 𝔐 O c' q
-        → ∃ ψ : CR O y c' →+* 𝔐.X.presheaf.stalk q.1,
-          spMap ψ ≫ P.x = 𝔐.X.fromSpecStalk q.1 ∧ (genMap 𝔐.ξ q).comp ψ = algebraMap (CR O y c') Ω)
-    (e : 𝔐.Li)
-    : (∃ v, P.toLi v = e) ↔ ∀ q, OnChart 𝔐 O c' q → e ∈ 𝔐.M.lat q := by
+theorem mem_range_toLi_iff [Smooth 𝔐.t.G.hom] (P : ChartPack G O c') (hpt : Dominated P)
+    (hψ : ∀ q, OnChart 𝔐 O c' q → ∃ ψ : CR O y c' →+* 𝔐.X.presheaf.stalk q.1,
+      spMap ψ ≫ P.x = 𝔐.X.fromSpecStalk q.1 ∧ (genMap 𝔐.ξ q).comp ψ = algebraMap (CR O y c') Ω) (e : 𝔐.Li) :
+    (∃ v, P.toLi v = e) ↔ ∀ q, OnChart 𝔐 O c' q → e ∈ 𝔐.M.lat q := by
   constructor
   · rintro ⟨v, rfl⟩ q hq
     obtain ⟨ψ, h1, h2⟩ := hψ q hq
@@ -299,7 +299,7 @@ theorem mem_range_toLi_iff
       intro v
       have h1 : f (h v) = v := LinearMap.congr_fun hh v
       conv_lhs => rw [← h1, pi_eq_sum_univ' (h v)]
-      set_option synthInstance.maxHeartbeats 100000 in
+
       simp only [map_sum, map_smul]
     let g : Fin n → (P.L →ₗ[CR O y c'] Ω) := fun i =>
       (Algebra.linearMap (CR O y c') Ω) ∘ₗ (LinearMap.proj i) ∘ₗ h
@@ -318,8 +318,7 @@ theorem mem_range_toLi_iff
         obtain ⟨v, rfl⟩ := hx
         rw [hFi]
         exact Fam.chartRing_le_regAt O y c' q hq.1 hq.2 (h v i).2
-      | zero =>
-        simp [(regAt 𝔐.ξ q).zero_mem]
+      | zero => simp [(regAt 𝔐.ξ q).zero_mem]
       | add x x' _ _ hx hx' =>
         rw [map_add (f := _)]
         exact (regAt 𝔐.ξ q).add_mem hx hx'
@@ -334,8 +333,8 @@ theorem mem_range_toLi_iff
       refine P.toLi_bc.inductionOn w ?_ ?_ ?_
       · intro m
         conv_lhs => rw [hv m]
-        set_option synthInstance.maxHeartbeats 100000 in
-          rw [map_sum]
+
+        rw [map_sum]
         refine Finset.sum_congr rfl fun i _ => ?_
         rw [hFi, map_smul]
         exact (algebraMap_smul Ω (h m i) _).symm
@@ -347,8 +346,8 @@ theorem mem_range_toLi_iff
         simp only [map_add (f := _), add_smul, Finset.sum_add_distrib]
     refine ⟨∑ i, (⟨Fi i e, hmem i⟩ : CR O y c') • f (Pi.single i 1), ?_⟩
     conv_rhs => rw [hsum e]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     refine Finset.sum_congr rfl fun i _ => ?_
     rw [map_smul]
     exact algebraMap_smul Ω (⟨Fi i e, hmem i⟩ : CR O y c') _
@@ -359,26 +358,19 @@ end GlobalTheory.CompanionTheory.Ar.Num.FamEx.FunPart
 
 namespace GlobalTheory.CompanionTheory.Ar.Num.FamEx.FunPart
 
-open GlobalTheory.CompanionTheory.Ar.Num.FamEx.FunAlg GlobalTheory.CompanionTheory.Ar.LieVB
-  GlobalTheory.CompanionTheory.Ar.LieTangent
+open GlobalTheory.CompanionTheory.Ar.Num.FamEx.FunAlg GlobalTheory.CompanionTheory.Ar.LieVB GlobalTheory.CompanionTheory.Ar.LieTangent
 
 section Form
 
-variable
-  {E : Type} [Field E] [NumberField E] [IsCMField E]
-  {H : Host E} {D : Datum H} {l : Level H} {Xo : Moduli D l} {c : Coeff l} {O₀ : Type} [CommRing O₀]
-  {β : O₀ →+* c.F} {Y : Model Xo c β} {S : Finset ℕ} {Ω : Type} [Field Ω]
-  {K : Type} [Fintype K]
-  {J : K → Type} [∀ k, Fintype (J k)]
-  {y : (Σ k, J k) → Ω} {𝔐 : HodgeCpt Y S y} {p : ℕ} {G : GenTors 𝔐 p} {O : Type}
-  [CommRing O] [Algebra O Ω]
-  {c' : ∀ k, J k}
+variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {D : Datum H} {l : Level H}
+  {Xo : Moduli D l} {c : Coeff l} {O₀ : Type} [CommRing O₀] {β : O₀ →+* c.F} {Y : Model Xo c β} {S : Finset ℕ}
+  {Ω : Type} [Field Ω] {K : Type} [Fintype K] {J : K → Type} [∀ k, Fintype (J k)] {y : (Σ k, J k) → Ω}
+  {𝔐 : HodgeCpt Y S y} {p : ℕ} {G : GenTors 𝔐 p} {O : Type} [CommRing O] [Algebra O Ω] {c' : ∀ k, J k}
 
-theorem mem_coordLat_dR_iff
-    (P : ChartPack G O c') (hsec : ∀ e, (∃ v, P.toLi v = e) ↔ ∀ q, OnChart 𝔐 O c' q → e ∈ 𝔐.M.lat q)
-    (s : CMType H ⊕ CMType H)
-    {r : ℕ} (b : Fin r → 𝔐.Li) (hb : ∀ k, b k ∈ 𝔐.Vgen s) (a : Fin r → Ω)
-    : a ∈ coordLat O y (𝔐.dR s) b c' ↔ ∃ v, P.toLi v = ∑ k, a k • b k := by
+theorem mem_coordLat_dR_iff (P : ChartPack G O c')
+    (hsec : ∀ e, (∃ v, P.toLi v = e) ↔ ∀ q, OnChart 𝔐 O c' q → e ∈ 𝔐.M.lat q)
+    (s : CMType H ⊕ CMType H) {r : ℕ} (b : Fin r → 𝔐.Li) (hb : ∀ k, b k ∈ 𝔐.Vgen s) (a : Fin r → Ω) :
+    a ∈ coordLat O y (𝔐.dR s) b c' ↔ ∃ v, P.toLi v = ∑ k, a k • b k := by
   rw [Fam.mem_coordLat_iff, hsec]
   have hV : ∑ k, a k • b k ∈ 𝔐.Vgen s := sum_mem fun k _ => Submodule.smul_mem _ _ (hb k)
   constructor
@@ -387,33 +379,28 @@ theorem mem_coordLat_dR_iff
   · intro h q h1 h2
     exact Submodule.mem_inf.2 ⟨h q ⟨h1, h2⟩, hV⟩
 
-theorem ev_mem_dotDual
-    (P : ChartPack G O c') (hsec : ∀ e, (∃ v, P.toLi v = e) ↔ ∀ q, OnChart 𝔐 O c' q → e ∈ 𝔐.M.lat q)
-    (s : CMType H ⊕ CMType H)
-    {r : ℕ} (b : Fin r → 𝔐.Li) (hb : ∀ k, b k ∈ 𝔐.Vgen s)
-    (u : Module.Dual (CR O y c') P.L)
-    : (fun k => P.j u (b k)) ∈ dotDual (CR O y c') (coordLat O y (𝔐.dR s) b c') := by
+theorem ev_mem_dotDual (P : ChartPack G O c')
+    (hsec : ∀ e, (∃ v, P.toLi v = e) ↔ ∀ q, OnChart 𝔐 O c' q → e ∈ 𝔐.M.lat q)
+    (s : CMType H ⊕ CMType H) {r : ℕ} (b : Fin r → 𝔐.Li) (hb : ∀ k, b k ∈ 𝔐.Vgen s)
+    (u : Module.Dual (CR O y c') P.L) :
+    (fun k => P.j u (b k)) ∈ dotDual (CR O y c') (coordLat O y (𝔐.dR s) b c') := by
   rw [mem_dotDual_iff]
   intro l hl
   obtain ⟨v, hv⟩ := (mem_coordLat_dR_iff P hsec s b hb l).1 hl
   have h1 : l ⬝ᵥ (fun k => P.j u (b k)) = P.j u (∑ k, l k • b k) := by
-    set_option synthInstance.maxHeartbeats 100000 in
+
     simp [dotProduct, map_sum, smul_eq_mul]
   rw [h1, ← hv, P.j_apply]
   exact (u v).2
 
-theorem exists_form
-    [CharZero Ω]
-    (P : ChartPack G O c') (hsec : ∀ e, (∃ v, P.toLi v = e) ↔ ∀ q, OnChart 𝔐 O c' q → e ∈ 𝔐.M.lat q)
-    (s : CMType H ⊕ CMType H)
-    {r : ℕ} (b : Fin r → 𝔐.Li) (hli : LinearIndependent Ω b)
-    (hsp : Submodule.span Ω (Set.range b) = 𝔐.Vgen s)
-    (hemb : ∀ a, 𝔐.emb s a ∈ CR O y c') (hd : (((discr E : ℤ) : Ω))⁻¹ ∈ CR O y c')
-    (hd0 : ((discr E : ℤ) : Ω) ≠ 0)
-    (m : Fin r → Ω) (hm : m ∈ dotDual (CR O y c') (coordLat O y (𝔐.dR s) b c'))
-    : ∃ u : Module.Dual (CR O y c') P.L,
-      (∀ k, P.j u (b k) = m k)
-        ∧ ∀ (a : 𝓞 E) v, ((u (P.ρ a v) : CR O y c') : Ω) = 𝔐.emb s a * ((u v : CR O y c') : Ω) := by
+theorem exists_form [CharZero Ω] (P : ChartPack G O c')
+    (hsec : ∀ e, (∃ v, P.toLi v = e) ↔ ∀ q, OnChart 𝔐 O c' q → e ∈ 𝔐.M.lat q)
+    (s : CMType H ⊕ CMType H) {r : ℕ} (b : Fin r → 𝔐.Li) (hli : LinearIndependent Ω b)
+    (hsp : Submodule.span Ω (Set.range b) = 𝔐.Vgen s) (hemb : ∀ a, 𝔐.emb s a ∈ CR O y c')
+    (hd : (((discr E : ℤ) : Ω))⁻¹ ∈ CR O y c') (hd0 : ((discr E : ℤ) : Ω) ≠ 0) (m : Fin r → Ω)
+    (hm : m ∈ dotDual (CR O y c') (coordLat O y (𝔐.dR s) b c')) :
+    ∃ u : Module.Dual (CR O y c') P.L, (∀ k, P.j u (b k) = m k) ∧
+      ∀ (a : 𝓞 E) v, ((u (P.ρ a v) : CR O y c') : Ω) = 𝔐.emb s a * ((u v : CR O y c') : Ω) := by
   classical
   have hb : ∀ k, b k ∈ 𝔐.Vgen s := fun k => hsp ▸ Submodule.subset_span ⟨k, rfl⟩
   let τ : E →+* Ω := IsFractionRing.lift (EigSplit.injective_of_charZero E (𝔐.emb s))
@@ -421,8 +408,7 @@ theorem exists_form
     IsFractionRing.lift_algebraMap (EigSplit.injective_of_charZero E (𝔐.emb s)) a
   have heig : 𝔐.Vgen s = HT.eigSp 𝔐.ρ τ := by
     ext v
-    simp [HodgeCpt.Vgen, GlobalTheory.CompanionTheory.Ar.eigSp, HT.eigSp, Submodule.mem_iInf,
-      sub_eq_zero, hτ]
+    simp [HodgeCpt.Vgen, GlobalTheory.CompanionTheory.Ar.eigSp, HT.eigSp, Submodule.mem_iInf, sub_eq_zero, hτ]
   obtain ⟨s1, s2, -, s4⟩ := HT.ProjEig.eigProj_spec Ω 𝔐.Li E 𝔐.ρ τ
   have hcoef : ∀ k, τ (HT.dualInt E k) ∈ CR O y c' := by
     intro k
@@ -437,8 +423,8 @@ theorem exists_form
   have hproj : ∀ x : P.L, ∃ x', P.toLi x' = HT.eigProj 𝔐.ρ τ (P.toLi x) := by
     intro x
     refine ⟨∑ k, (⟨_, hcoef k⟩ : CR O y c') • P.ρ (RingOfIntegers.basis E k) x, ?_⟩
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     simp only [HT.eigProj, LinearMap.sum_apply]
     refine Finset.sum_congr rfl fun k _ => ?_
     rw [map_smul, toLi_rho]
@@ -463,23 +449,22 @@ theorem exists_form
     have h3 := (mem_dotDual_iff _ _ _).1 hm a h2
     have h4 : Ψ (P.toLi x) = a ⬝ᵥ m := by
       change ψ (HT.eigProj 𝔐.ρ τ (P.toLi x)) = _
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [← ha, map_sum]
+
+      rw [← ha, map_sum]
       simp [dotProduct, hψb]
     rw [h4]
     exact h3
-  let u : Module.Dual (CR O y c') P.L := {
-    toFun := fun x => ⟨_, hΨ x⟩
-    map_add' := fun x x' => Subtype.ext (by simp)
-    map_smul' := fun t x =>
-      Subtype.ext (by
+  let u : Module.Dual (CR O y c') P.L :=
+    { toFun := fun x => ⟨_, hΨ x⟩
+      map_add' := fun x x' => Subtype.ext (by simp)
+      map_smul' := fun t x => Subtype.ext (by
         change Ψ (P.toLi (t • x)) = (t : Ω) * Ψ (P.toLi x)
         rw [map_smul, ← algebraMap_smul Ω t (P.toLi x), map_smul]
-        rfl)
-  }
+        rfl) }
   have hju : ∀ w, P.j u w = Ψ w := by
     intro w
-    refine P.toLi_bc.inductionOn w (fun v => ?_) (fun t n hn => ?_) (fun a a' ha ha' => ?_)
+    refine P.toLi_bc.inductionOn w (fun v => ?_) (fun t n hn => ?_)
+      (fun a a' ha ha' => ?_)
     · rw [P.j_apply]
       rfl
     · rw [map_smul, map_smul, hn]
@@ -506,70 +491,15 @@ end GlobalTheory.CompanionTheory.Ar.Num.FamEx.FunPart
 
 namespace GlobalTheory.CompanionTheory.Ar.Num.FamEx
 
-open GlobalTheory.CompanionTheory.Ar.Num.FamEx.FunAlg
-  GlobalTheory.CompanionTheory.Ar.Num.FamEx.FunPart
+open GlobalTheory.CompanionTheory.Ar.Num.FamEx.FunAlg GlobalTheory.CompanionTheory.Ar.Num.FamEx.FunPart
 
-theorem chartD_fun_clauses
-    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H) (l : Level H)
-        (Xo : Moduli D l) (c : Coeff l) (O₀ : Type) [CommRing O₀] (β : O₀ →+* c.F)
-        (Y : Model Xo c β) (S : Finset ℕ) (Ω : Type) [Field Ω] (K : Type) [Fintype K]
-        [DecidableEq K] (J : K → Type) [∀ k, Fintype (J k)] (y : (Σ k, J k) → Ω)
-        (𝔐 : HodgeCpt Y S y) (d : ℕ),
-      IsArithVar (mCoordIdeal y) (d + 1) → 0 < D.p + D.q
-        → ∀ (p : ℕ) [Fact p.Prime],
-          p ∈ S → HT.HTFree 𝔐 p → p ≠ 2 → ¬ (p : ℤ) ∣ NumberField.discr E
-            → ∀ (b : ∀ t, Fin (labelRk D t) → 𝔐.Li),
-              (∀ t, LinearIndependent Ω (b t) ∧ Submodule.span Ω (Set.range (b t)) = 𝔐.Vgen t)
-                → ∀ φ : Equiv.Perm (CMType H ⊕ CMType H),
-                  IsFrobLabels c p φ
-                    → ∀ (A : Type) [CommRing A] [Algebra A Ω] [IsIntegralClosure A ℤ Ω]
-                        (m : Ideal A) [m.IsPrime],
-                      (p : A) ∈ m
-                        → ∀ (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
-                            [Algebra A O] [IsLocalization.AtPrime O m] [Algebra O Ω]
-                            [IsScalarTower A O Ω],
-                          ∀ (t₀ : CMType H ⊕ CMType H) (Sg : Type) [Fintype Sg]
-                              (e : Sg → CMType H ⊕ CMType H) (φ' : Equiv.Perm Sg) (F : Type)
-                              [Field F] [Fintype F] [CharP F p]
-                              (pq : (𝓞 E ⧸ Ideal.span {(p : 𝓞 E)}) →+* F)
-                              (sc : F →+ (𝓞 E ⧸ Ideal.span {(p : 𝓞 E)})) (w : O)
-                              (σ : Sg → F →+* IsLocalRing.ResidueField O),
-                            IsOrbit O 𝔐 p φ t₀ e φ' pq w σ → IsSec pq sc
-                              → ∀ (G : GenTors 𝔐 p) (c' : ∀ k, J k),
-                                mseg y c' ≠ 0
-                                  → ∀ (P : ChartPack G O c')
-                                      (i : ∀ τ,
-                                        (Fin (labelRk D (e τ)) → Ω) →ₗ[Ω] (Fin (D.p + D.q) → Ω)),
-                                    LocFree (CR O y c') (Fintype.card F ^ (D.p + D.q))
-                                        (chartD e b pq sc w P i).M
-                                      ∧ (chartD e b pq sc w P i).M ≤ stdLat (CR O y c') _
-                                      ∧ (∃ m : ℕ,
-                                        mulLat ((p : Ω) ^ m) (stdLat (CR O y c') _)
-                                          ≤ (chartD e b pq sc w P i).M)
-                                      ∧ (1 : (Fin (D.p + D.q) → F) → Ω) ∈ (chartD e b pq sc w P i).M
-                                      ∧ ∀ τ,
-                                        (∀ a ∈ CR O y c', ∀ v ∈ (chartD e b pq sc w P i).Th τ,
-                                            a • v ∈ (chartD e b pq sc w P i).Th τ)
-                                          ∧ (∀ g,
-                                            (∃ m, (g, m) ∈ (chartD e b pq sc w P i).Th τ)
-                                              ↔ g ∈ (chartD e b pq sc w P i).M ∧ g 0 = 0)
-                                          ∧ (∀ m,
-                                            (∃ g, (g, m) ∈ (chartD e b pq sc w P i).Th τ)
-                                              ↔ m ∈ dotDual (CR O y c')
-                                                ((chartD e b pq sc w P i).lie τ))
-                                          ∧ ∀ m,
-                                            (0, m) ∈ (chartD e b pq sc w P i).Th τ
-                                              ↔ m ∈ mulLat (p : Ω)
-                                                (dotDual (CR O y c')
-                                                  ((chartD e b pq sc w P i).lie τ)) := by
-  intro E _ _ _ H D l Xo c O₀ _ β Y S Ω _ K _ _ J _ y 𝔐 d harith hpq p _ hpS hHT hp2 hdisc b hb φ hφ
-    A _ _ _ m _ hpm O _ _ _ _ _ _ _ t₀ Sg _ e φ' F _ _ _ pq sc w σ hO hsc G c' hc P i
+theorem chartD_fun_clauses : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H) (l : Level H) (Xo : Moduli D l) (c : Coeff l) (O₀ : Type) [CommRing O₀] (β : O₀ →+* c.F) (Y : Model Xo c β) (S : Finset ℕ) (Ω : Type) [Field Ω] (K : Type) [Fintype K] [DecidableEq K] (J : K → Type) [∀ k, Fintype (J k)] (y : (Σ k, J k) → Ω) (𝔐 : HodgeCpt Y S y) (d : ℕ), IsArithVar (mCoordIdeal y) (d + 1) → 0 < D.p + D.q → ∀ (p : ℕ) [Fact p.Prime], p ∈ S → HT.HTFree 𝔐 p → p ≠ 2 → ¬ (p : ℤ) ∣ NumberField.discr E → ∀ (b : ∀ t, Fin (labelRk D t) → 𝔐.Li), (∀ t, LinearIndependent Ω (b t) ∧ Submodule.span Ω (Set.range (b t)) = 𝔐.Vgen t) → ∀ φ : Equiv.Perm (CMType H ⊕ CMType H), IsFrobLabels c p φ → ∀ (A : Type) [CommRing A] [Algebra A Ω] [IsIntegralClosure A ℤ Ω] (m : Ideal A) [m.IsPrime], (p : A) ∈ m → ∀ (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Algebra A O] [IsLocalization.AtPrime O m] [Algebra O Ω] [IsScalarTower A O Ω], ∀ (t₀ : CMType H ⊕ CMType H) (Sg : Type) [Fintype Sg] (e : Sg → CMType H ⊕ CMType H) (φ' : Equiv.Perm Sg) (F : Type) [Field F] [Fintype F] [CharP F p] (pq : (𝓞 E ⧸ Ideal.span {(p : 𝓞 E)}) →+* F) (sc : F →+ (𝓞 E ⧸ Ideal.span {(p : 𝓞 E)})) (w : O) (σ : Sg → F →+* IsLocalRing.ResidueField O), IsOrbit O 𝔐 p φ t₀ e φ' pq w σ → IsSec pq sc → ∀ (G : GenTors 𝔐 p) (c' : ∀ k, J k), mseg y c' ≠ 0 → ∀ (P : ChartPack G O c') (i : ∀ τ, (Fin (labelRk D (e τ)) → Ω) →ₗ[Ω] (Fin (D.p + D.q) → Ω)), LocFree (CR O y c') (Fintype.card F ^ (D.p + D.q)) (chartD e b pq sc w P i).M ∧ (chartD e b pq sc w P i).M ≤ stdLat (CR O y c') _ ∧ (∃ m : ℕ, mulLat ((p : Ω) ^ m) (stdLat (CR O y c') _) ≤ (chartD e b pq sc w P i).M) ∧ (1 : (Fin (D.p + D.q) → F) → Ω) ∈ (chartD e b pq sc w P i).M ∧ ∀ τ, (∀ a ∈ CR O y c', ∀ v ∈ (chartD e b pq sc w P i).Th τ, a • v ∈ (chartD e b pq sc w P i).Th τ) ∧ (∀ g, (∃ m, (g, m) ∈ (chartD e b pq sc w P i).Th τ) ↔ g ∈ (chartD e b pq sc w P i).M ∧ g 0 = 0) ∧ (∀ m, (∃ g, (g, m) ∈ (chartD e b pq sc w P i).Th τ) ↔ m ∈ dotDual (CR O y c') ((chartD e b pq sc w P i).lie τ)) ∧ ∀ m, (0, m) ∈ (chartD e b pq sc w P i).Th τ ↔ m ∈ mulLat (p : Ω) (dotDual (CR O y c') ((chartD e b pq sc w P i).lie τ)) := by
+  intro E _ _ _ H D l Xo c O₀ _ β Y S Ω _ K _ _ J _ y 𝔐 d harith hpq p _ hpS hHT hp2 hdisc b hb φ hφ A _ _ _ m _ hpm
+    O _ _ _ _ _ _ _ t₀ Sg _ e φ' F _ _ _ pq sc w σ hO hsc G c' hc P i
   classical
   obtain ⟨-, -, -, -, hres, -, ⟨-, -, hpnu⟩, -⟩ := hO
   have hpp : p.Prime := Fact.out
-  obtain ⟨hnoeth, hint, -⟩ :=
-    GlobalTheory.CompanionTheory.Ar.Num.FamEx.chartRing_noetherian_normal_fraction E H D l Xo c O₀ β
-      Y S Ω K J y 𝔐 d harith p hpS A m hpm O c' hc
+  obtain ⟨hnoeth, hint, -⟩ := GlobalTheory.CompanionTheory.Ar.Num.FamEx.chartRing_noetherian_normal_fraction E H D l Xo c O₀ β Y S Ω K J y 𝔐 d harith p hpS A m hpm O c' hc
   haveI := hnoeth
   haveI := hint
   haveI hsm : Smooth 𝔐.t.G.hom := 𝔐.t.semi.smooth
@@ -578,23 +508,20 @@ theorem chartD_fun_clauses
   haveI : Finite (𝓞 E ⧸ Ideal.span {(p : 𝓞 E)}) := Ideal.finiteQuotientOfFreeOfNeBot _ (by
     simpa [Ideal.span_singleton_eq_bot] using hpp.ne_zero)
   haveI : Finite (TorsT E (D.p + D.q) p) := inferInstanceAs (Finite (Multiplicative _))
-  obtain ⟨hHopf, -, -, hend, -, hθ⟩ :=
-    GlobalTheory.CompanionTheory.Ar.BT.lemmaBT_holds (CR O y c') (TorsT E (D.p + D.q) p) P.Γ₁ 𝔐.X
-      𝔐.t.G P.x p P.i₁ P.tors₁ hsm
+  obtain ⟨hHopf, -, -, hend, -, hθ⟩ := GlobalTheory.CompanionTheory.Ar.BT.lemmaBT_holds (CR O y c') (TorsT E (D.p + D.q) p) P.Γ₁ 𝔐.X 𝔐.t.G P.x p P.i₁
+    P.tors₁ hsm
   obtain ⟨θ, ⟨hsurj, hder⟩, hker, -⟩ := hθ P.L P.M
   obtain ⟨ε, hε1, hε⟩ := exists_eps hsc
   haveI : IsMonHom (𝔐.t.act.act ε) := 𝔐.t.act.hom ε
-  have hst : ∀ f ∈ P.Γ₁.btOrder ⊤, (fun t => f (toN sc (fromN pq t))) ∈ P.Γ₁.btOrder ⊤ :=
-    fun f hf => hend (𝔐.t.act.act ε) (idem pq sc) (pts_idem P hε) f hf
+  have hst : ∀ f ∈ P.Γ₁.btOrder ⊤, (fun t => f (toN sc (fromN pq t))) ∈ P.Γ₁.btOrder ⊤ := fun f hf =>
+    hend (𝔐.t.act.act ε) (idem pq sc) (pts_idem P hε) f hf
   have hn : ∀ x : omega (P.Γ₁.btOrder ⊤), (p : CR O y c') • x = 0 := by
     intro x
     obtain ⟨u, rfl⟩ := hsurj x
     rw [← LinearMap.map_smul]
     exact (hker _).2 ⟨u, Nat.cast_smul_eq_nsmul _ _ _⟩
   obtain ⟨k, hk⟩ := exists_pow_smul_mem hHopf (p : CR O y c') hn
-  have hM
-      : ∀ g,
-        g ∈ funLat P sc ↔ ∃ f ∈ P.Γ₁.btOrder ⊤, ∀ a, ((f (toN sc a) : CR O y c') : Ω) = g a := by
+  have hM : ∀ g, g ∈ funLat P sc ↔ ∃ f ∈ P.Γ₁.btOrder ⊤, ∀ a, ((f (toN sc a) : CR O y c') : Ω) = g a := by
     intro g
     constructor
     · rintro ⟨f, hf, rfl⟩
@@ -608,51 +535,35 @@ theorem chartD_fun_clauses
     change a * ((f (toN sc x) : CR O y c') : Ω) = a * g x
     rw [h]
   have hck : (((p : CR O y c') ^ k : CR O y c') : Ω) = (p : Ω) ^ k := by simp
-  obtain ⟨l1, l2, l3, l4⟩ :=
-    lat_clauses (CR O y c') hHopf (toN sc) (fromN pq) (fromN_toN hsc) hst ((p : CR O y c') ^ k)
-      (by rw [hck]; exact pow_ne_zero _ hpΩ) hk (funLat P sc) hM
+  obtain ⟨l1, l2, l3, l4⟩ := lat_clauses (CR O y c') hHopf (toN sc) (fromN pq) (fromN_toN hsc) hst
+    ((p : CR O y c') ^ k) (by rw [hck]; exact pow_ne_zero _ hpΩ) hk (funLat P sc) hM
   have hP : Dominated P := fun z => by
-    obtain ⟨h1, h2, h3⟩ :=
-      GlobalTheory.CompanionTheory.Ar.Num.FamEx.chartPoint_inChart_dominated E H D l Xo c O₀ β Y S Ω
-        K J y 𝔐 d harith p hpS A m hpm O G c' hc P z
+    obtain ⟨h1, h2, h3⟩ := GlobalTheory.CompanionTheory.Ar.Num.FamEx.chartPoint_inChart_dominated E H D l Xo c O₀ β Y S Ω K J y 𝔐 d harith p hpS A m hpm O G c' hc P z
     exact ⟨⟨h1, h2⟩, h3⟩
-  have hψ
-      : ∀ q,
-        OnChart 𝔐 O c' q
-          → ∃ ψ : CR O y c' →+* 𝔐.X.presheaf.stalk q.1,
-            spMap ψ ≫ P.x = 𝔐.X.fromSpecStalk q.1
-              ∧ (genMap 𝔐.ξ q).comp ψ = algebraMap (CR O y c') Ω := by
+  have hψ : ∀ q, OnChart 𝔐 O c' q → ∃ ψ : CR O y c' →+* 𝔐.X.presheaf.stalk q.1,
+      spMap ψ ≫ P.x = 𝔐.X.fromSpecStalk q.1 ∧ (genMap 𝔐.ξ q).comp ψ = algebraMap (CR O y c') Ω := by
     intro q hq
     obtain ⟨U, hU, hUq⟩ := 𝔐.tie.affine c' hc
-    let ψ₀ : CR O y c' →+* regAt 𝔐.ξ q :=
-      (algebraMap (CR O y c') Ω).codRestrict (regAt 𝔐.ξ q) fun a =>
-        Fam.chartRing_le_regAt O y c' q hq.1 hq.2 a.2
+    let ψ₀ : CR O y c' →+* regAt 𝔐.ξ q := (algebraMap (CR O y c') Ω).codRestrict (regAt 𝔐.ξ q)
+      fun a => Fam.chartRing_le_regAt O y c' q hq.1 hq.2 a.2
     let ψ : CR O y c' →+* 𝔐.X.presheaf.stalk q.1 :=
       ((LieStalk.regIso 𝔐.tie.gen q).symm : regAt 𝔐.ξ q →+* 𝔐.X.presheaf.stalk q.1).comp ψ₀
     have h2 : (genMap 𝔐.ξ q).comp ψ = algebraMap (CR O y c') Ω := by
       ext a
       exact LieStalk.genMap_regIso_symm 𝔐.tie.gen q (ψ₀ a)
-    exact ⟨
-      ψ,
-      GlobalTheory.CompanionTheory.Ar.Num.FamEx.StalkPt.spMap_eq_fromSpecStalk 𝔐.X Ω 𝔐.ξ 𝔐.tie.gen U
-        hU (CR O y c') (algebraMap (CR O y c') Ω) P.x P.x_gen
-        (fun z => (hUq _).2 ⟨𝔐.all _, (hP z).1.1⟩)
-        q ((hUq _).2 ⟨q.2, hq.1⟩) ψ h2,
-      h2
-    ⟩
+    exact ⟨ψ, GlobalTheory.CompanionTheory.Ar.Num.FamEx.StalkPt.spMap_eq_fromSpecStalk 𝔐.X Ω 𝔐.ξ 𝔐.tie.gen U hU (CR O y c') (algebraMap (CR O y c') Ω) P.x P.x_gen
+      (fun z => (hUq _).2 ⟨𝔐.all _, (hP z).1.1⟩) q ((hUq _).2 ⟨q.2, hq.1⟩) ψ h2, h2⟩
   have hsec := mem_range_toLi_iff P hP hψ
 
   obtain ⟨dv, hdv⟩ : ∃ u : O, u * ((discr E : ℤ) : O) = 1 := by
     have hcop : IsCoprime (p : ℤ) (discr E) :=
       (Nat.prime_iff_prime_int.1 hpp).irreducible.coprime_iff_not_dvd.2 hdisc
     obtain ⟨a', b', hab⟩ := hcop
-    have h1 : (a' : O) * (p : O) + (b' : O) * ((discr E : ℤ) : O) = 1 := by
-      exact_mod_cast congrArg (Int.cast (R := O)) hab
+    have h1 : (a' : O) * (p : O) + (b' : O) * ((discr E : ℤ) : O) = 1 := by exact_mod_cast congrArg (Int.cast (R := O)) hab
     by_contra hne
-    have hnu : ¬ IsUnit (((discr E : ℤ) : O)) := fun hu =>
-      hne (by
-        obtain ⟨v, hv⟩ := hu.exists_left_inv
-        exact ⟨v, hv⟩)
+    have hnu : ¬ IsUnit (((discr E : ℤ) : O)) := fun hu => hne (by
+      obtain ⟨v, hv⟩ := hu.exists_left_inv
+      exact ⟨v, hv⟩)
     have hm1 : (a' : O) * (p : O) ∈ IsLocalRing.maximalIdeal O :=
       Ideal.mul_mem_left _ _ ((IsLocalRing.mem_maximalIdeal _).2 hpnu)
     have hm2 : (b' : O) * ((discr E : ℤ) : O) ∈ IsLocalRing.maximalIdeal O :=
@@ -675,17 +586,15 @@ theorem chartD_fun_clauses
     have := l3 h hh
     rw [hck] at this
     exact this
-  · have hbτ : ∀ k, b (e τ) k ∈ 𝔐.Vgen (e τ) := fun k =>
-      (hb (e τ)).2 ▸ Submodule.subset_span ⟨k, rfl⟩
+  · have hbτ : ∀ k, b (e τ) k ∈ 𝔐.Vgen (e τ) := fun k => (hb (e τ)).2 ▸ Submodule.subset_span ⟨k, rfl⟩
     have hemb : ∀ a, 𝔐.emb (e τ) a ∈ CR O y c' := fun a => by
       obtain ⟨o, ho, -⟩ := hres τ a
       rw [← ho]
       exact Subalgebra.algebraMap_mem _ o
-    let ev : Module.Dual (CR O y c') P.L →ₗ[CR O y c'] (Fin (labelRk D (e τ)) → Ω) := {
-      toFun := fun u k => P.j u (b (e τ) k)
-      map_add' := fun u u' => funext fun k => by simp
-      map_smul' := fun t u => funext fun k => by simp
-    }
+    let ev : Module.Dual (CR O y c') P.L →ₗ[CR O y c'] (Fin (labelRk D (e τ)) → Ω) :=
+      { toFun := fun u k => P.j u (b (e τ) k)
+        map_add' := fun u u' => funext fun k => by simp
+        map_smul' := fun t u => funext fun k => by simp }
     have H1 : ∀ u, ev u ∈ dotDual (CR O y c') (coordLat O y (𝔐.dR (e τ)) (b (e τ)) c') := fun u =>
       ev_mem_dotDual P hsec (e τ) (b (e τ)) hbτ u
 
@@ -705,24 +614,17 @@ theorem chartD_fun_clauses
       have h3 : 𝔐.emb (e τ) ε * 𝔐.emb (e τ) ε - 𝔐.emb (e τ) ε = (p : Ω) * 𝔐.emb (e τ) c₀ := by
         have := congrArg (𝔐.emb (e τ)) hc₀
         simpa using this
-      have h4 : algebraMap O Ω v₀ * 𝔐.emb (e τ) ε = 1 := by rw [← ho, ← map_mul, hv₀, map_one]
-      refine ⟨
-        ⟨
-          algebraMap O Ω v₀ * 𝔐.emb (e τ) c₀,
-          (CR O y c').mul_mem (Subalgebra.algebraMap_mem _ v₀) (hemb c₀)
-        ⟩,
-        ?_
-      ⟩
+      have h4 : algebraMap O Ω v₀ * 𝔐.emb (e τ) ε = 1 := by
+        rw [← ho, ← map_mul, hv₀, map_one]
+      refine ⟨⟨algebraMap O Ω v₀ * 𝔐.emb (e τ) c₀,
+        (CR O y c').mul_mem (Subalgebra.algebraMap_mem _ v₀) (hemb c₀)⟩, ?_⟩
       change 𝔐.emb (e τ) ε = 1 + (p : Ω) * (algebraMap O Ω v₀ * 𝔐.emb (e τ) c₀)
       linear_combination (algebraMap O Ω v₀) * h3 + (1 - 𝔐.emb (e τ) ε) * h4
-    have H2
-        : ∀ m ∈ dotDual (CR O y c') (coordLat O y (𝔐.dR (e τ)) (b (e τ)) c'), ∃ u,
-          ev u = m
-            ∧ ∃ f : augSub (P.Γ₁.btOrder ⊤),
-              (∀ t, f.1 (toN sc (fromN pq t)) = f.1 t) ∧ θ u = augCl (P.Γ₁.btOrder ⊤) f := by
+    have H2 : ∀ m ∈ dotDual (CR O y c') (coordLat O y (𝔐.dR (e τ)) (b (e τ)) c'), ∃ u, ev u = m ∧
+        ∃ f : augSub (P.Γ₁.btOrder ⊤), (∀ t, f.1 (toN sc (fromN pq t)) = f.1 t) ∧
+          θ u = augCl (P.Γ₁.btOrder ⊤) f := by
       intro m' hm'
-      obtain ⟨u, hu1, hu2⟩ :=
-        exists_form P hsec (e τ) (b (e τ)) (hb (e τ)).1 (hb (e τ)).2 hemb hdinv hd0 m' hm'
+      obtain ⟨u, hu1, hu2⟩ := exists_form P hsec (e τ) (b (e τ)) (hb (e τ)).1 (hb (e τ)).2 hemb hdinv hd0 m' hm'
       have hw : u ∘ₗ P.ρ ε = u + p • (κ • u) := by
         ext v
         change ((u (P.ρ ε v) : CR O y c') : Ω) = ((u v + p • (κ * u v) : CR O y c') : Ω)
@@ -731,32 +633,23 @@ theorem chartD_fun_clauses
         ring
       obtain ⟨f₀, hf₀⟩ := augCl_surjective (P.Γ₁.btOrder ⊤) (θ u)
       have d₀ := (hder (toAug f₀) u).1 hf₀.symm
-      have d₁ :=
-        GlobalTheory.CompanionTheory.Ar.Num.FamEx.isDerAtOne_comp_endo (CR O y c')
-          (TorsT E (D.p + D.q) p) P.Γ₁ 𝔐.X 𝔐.t.G P.x P.i₁ p P.tors₁ P.L P.M (𝔐.t.act.act ε) (P.ρ ε)
-          (P.act ε) (idem pq sc) (pts_idem P hε) _ u d₀
-      let f₁ : augSub (P.Γ₁.btOrder ⊤) := ⟨
-        fun t => f₀.1 (idem pq sc t),
-        hst _ f₀.2.1,
-        by
-          change f₀.1 (idem pq sc 1) = 0
-          rw [map_one]
-          exact f₀.2.2
-      ⟩
+      have d₁ := GlobalTheory.CompanionTheory.Ar.Num.FamEx.isDerAtOne_comp_endo (CR O y c') (TorsT E (D.p + D.q) p) P.Γ₁ 𝔐.X 𝔐.t.G P.x P.i₁ p P.tors₁ P.L P.M
+        (𝔐.t.act.act ε) (P.ρ ε) (P.act ε) (idem pq sc) (pts_idem P hε) _ u d₀
+      let f₁ : augSub (P.Γ₁.btOrder ⊤) := ⟨fun t => f₀.1 (idem pq sc t), hst _ f₀.2.1, by
+        change f₀.1 (idem pq sc 1) = 0
+        rw [map_one]
+        exact f₀.2.2⟩
       have h3 : θ (u ∘ₗ P.ρ ε) = augCl (P.Γ₁.btOrder ⊤) f₁ := (hder (toAug f₁) _).2 d₁
-      have h4 : θ (u ∘ₗ P.ρ ε) = θ u := by rw [hw, map_add (f := _), (hker _).2 ⟨_, rfl⟩, add_zero]
+      have h4 : θ (u ∘ₗ P.ρ ε) = θ u := by
+        rw [hw, map_add (f := _), (hker _).2 ⟨_, rfl⟩, add_zero]
       refine ⟨u, funext hu1, f₁, fun t => ?_, h4.symm.trans h3⟩
       change f₀.1 (idem pq sc (idem pq sc t)) = f₀.1 (idem pq sc t)
       have hi : idem pq sc (idem pq sc t) = idem pq sc t := by
         change toN sc (fromN pq (toN sc (fromN pq t))) = toN sc (fromN pq t)
         rw [fromN_toN hsc]
       rw [hi]
-    exact th_clauses (CR O y c') (toN sc) (fromN pq) (fromN_one pq) (toN_zero sc) (fromN_toN hsc)
-      hst (funLat P sc) hM hMR (augSub (P.Γ₁.btOrder ⊤))
-      (fun f => Iff.rfl)
-      (augCl (P.Γ₁.btOrder ⊤)) θ hsurj
-      (fun f u => P.Γ₁.IsDerAtOne P.i₁ P.M p f u)
-      (fun f w => hder (toAug f) w)
-      p hker ev _ H1 H2 _ rfl
+    exact th_clauses (CR O y c') (toN sc) (fromN pq) (fromN_one pq) (toN_zero sc) (fromN_toN hsc) hst (funLat P sc) hM
+      hMR (augSub (P.Γ₁.btOrder ⊤)) (fun f => Iff.rfl) (augCl (P.Γ₁.btOrder ⊤)) θ hsurj
+      (fun f u => P.Γ₁.IsDerAtOne P.i₁ P.M p f u) (fun f w => hder (toAug f) w) p hker ev _ H1 H2 _ rfl
 
 end GlobalTheory.CompanionTheory.Ar.Num.FamEx

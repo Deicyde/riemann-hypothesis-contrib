@@ -1,7 +1,56 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Definitions.QuasicoherentCohomology.ToAbSheafPreservesFiniteLimits
+public import Mathlib.AlgebraicGeometry.Modules.Tilde
+public import Mathlib.Logic.Equiv.PartialEquiv
+public import Mathlib.Tactic.Bound
+public import Mathlib.Tactic.Monotonicity.Lemmas
+public import Mathlib.Topology.Sheaves.Abelian
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.CategoryTheory.Abelian.GrothendieckCategory.HasExt
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Lemma
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+public import Mathlib.LinearAlgebra.AffineSpace.Basis
 
 @[expose] public section
 
@@ -15,21 +64,17 @@ namespace GlobalTheory
 
 variable {X : Scheme.{u}}
 
-instance hasSheafify_topCat (T : TopCat.{u})
-    : HasSheafify (Opens.grothendieckTopology T) AddCommGrpCat.{u} :=
-  inferInstance
+instance hasSheafify_topCat (T : TopCat.{u}) :
+    HasSheafify (Opens.grothendieckTopology T) AddCommGrpCat.{u} := inferInstance
 
-instance hasExt_sheaf_topCat (T : TopCat.{u})
-    : HasExt.{u} (Sheaf (Opens.grothendieckTopology T) AddCommGrpCat.{u}) :=
-  inferInstance
+instance hasExt_sheaf_topCat (T : TopCat.{u}) :
+    HasExt.{u} (Sheaf (Opens.grothendieckTopology T) AddCommGrpCat.{u}) := inferInstance
 
-instance hasSheafify_scheme (X : Scheme.{u})
-    : HasSheafify (Opens.grothendieckTopology X) AddCommGrpCat.{u} :=
-  inferInstance
+instance hasSheafify_scheme (X : Scheme.{u}) :
+    HasSheafify (Opens.grothendieckTopology X) AddCommGrpCat.{u} := inferInstance
 
-instance hasExt_sheaf_scheme (X : Scheme.{u})
-    : HasExt.{u} (Sheaf (Opens.grothendieckTopology X) AddCommGrpCat.{u}) :=
-  inferInstance
+instance hasExt_sheaf_scheme (X : Scheme.{u}) :
+    HasExt.{u} (Sheaf (Opens.grothendieckTopology X) AddCommGrpCat.{u}) := inferInstance
 
 def cohOn (F : X.Modules) (U : X.Opens) (n : ℕ) : Type u :=
   Sheaf.H'.{u} ((toAbSheaf (X := X)).obj F) n U
@@ -38,8 +83,8 @@ abbrev coh (F : X.Modules) (n : ℕ) : Type u := cohOn F ⊤ n
 
 namespace cohOn
 
-def action (F : X.Modules) (U : X.Opens) (n : ℕ)
-    : Γ(X, ⊤) →+* AddMonoid.End (Sheaf.H'.{u} ((toAbSheaf (X := X)).obj F) n U) :=
+def action (F : X.Modules) (U : X.Opens) (n : ℕ) :
+    Γ(X, ⊤) →+* AddMonoid.End (Sheaf.H'.{u} ((toAbSheaf (X := X)).obj F) n U) :=
   (SiteCoh.endAction (F := (toAbSheaf (X := X)).obj F) (n := n) (U := U)).comp
     ((functorEndRingHom (toAbSheaf (X := X)) F).comp (smulEnd F))
 
@@ -49,21 +94,20 @@ lemma action_apply (F : X.Modules) (U : X.Opens) (n : ℕ) (r : Γ(X, ⊤))
   SiteCoh.endAction_apply _ x
 
 instance instAddCommGroup (F : X.Modules) (U : X.Opens) (n : ℕ) : AddCommGroup (cohOn F U n) :=
-  addCommGroupOfAction (M := Sheaf.H'.{u} ((toAbSheaf (X := X)).obj F) n U) inferInstance
-    (action F U n)
+  addCommGroupOfAction (M := Sheaf.H'.{u} ((toAbSheaf (X := X)).obj F) n U) inferInstance (action F U n)
 
-def toH' (F : X.Modules) (U : X.Opens) (n : ℕ)
-    : cohOn F U n ≃+ Sheaf.H'.{u} ((toAbSheaf (X := X)).obj F) n U :=
+def toH' (F : X.Modules) (U : X.Opens) (n : ℕ) :
+    cohOn F U n ≃+ Sheaf.H'.{u} ((toAbSheaf (X := X)).obj F) n U :=
   WithAction.toBase (action F U n)
 
 section Module
 
 variable (R : Type v) [CommRing R] [Algebra R Γ(X, ⊤)]
 
-instance instModule (F : X.Modules) (U : X.Opens) (n : ℕ) : Module R (cohOn F U n) := {
-  WithAction.instModule (action F U n) R with
-  smul := fun r x ↦ action F U n (algebraMap R Γ(X, ⊤) r) x
-}
+instance instModule (F : X.Modules) (U : X.Opens) (n : ℕ) : Module R (cohOn F U n) :=
+  { WithAction.instModule (action F U n) R with
+    smul := fun r x ↦ action F U n (algebraMap R Γ(X, ⊤) r) x }
+
 
 variable {R} in
 lemma toH'_smul {F : X.Modules} {U : X.Opens} {n : ℕ} (r : R) (x : cohOn F U n) :
@@ -71,23 +115,21 @@ lemma toH'_smul {F : X.Modules} {U : X.Opens} {n : ℕ} (r : R) (x : cohOn F U n
       SiteCoh.map ((toAbSheaf (X := X)).map (smulHom F (algebraMap R Γ(X, ⊤) r))) n U (toH' F U n x) :=
   (WithAction.toBase_smul (R := R) (action F U n) r x).trans (action_apply F U n _ _)
 
-instance instIsScalarTower
-    (S : Type t) [CommRing S] [Algebra S Γ(X, ⊤)] [Algebra R S] [IsScalarTower R S Γ(X, ⊤)]
-    (F : X.Modules) (U : X.Opens) (n : ℕ)
-    : IsScalarTower R S (cohOn F U n) :=
+instance instIsScalarTower (S : Type t) [CommRing S] [Algebra S Γ(X, ⊤)] [Algebra R S]
+    [IsScalarTower R S Γ(X, ⊤)] (F : X.Modules) (U : X.Opens) (n : ℕ) :
+    IsScalarTower R S (cohOn F U n) :=
   WithAction.instIsScalarTower (action F U n) R S
 
 def map {F G : X.Modules} (φ : F ⟶ G) (U : X.Opens) (n : ℕ) : cohOn F U n →ₗ[R] cohOn G U n :=
   WithAction.linearMap (action F U n) (action G U n) R
-    (SiteCoh.map ((toAbSheaf (X := X)).map φ) n U).hom
-    fun r x ↦ by
+    (SiteCoh.map ((toAbSheaf (X := X)).map φ) n U).hom fun r x ↦ by
       rw [action_apply, action_apply, ← SiteCoh.map_comp_apply, ← SiteCoh.map_comp_apply,
         ← Functor.map_comp, ← Functor.map_comp, smulHom_comp]
 
 def res (F : X.Modules) {U V : X.Opens} (h : V ≤ U) (n : ℕ) : cohOn F U n →ₗ[R] cohOn F V n :=
   WithAction.linearMap (action F U n) (action F V n) R
-    (SiteCoh.res ((toAbSheaf (X := X)).obj F) n (homOfLE h)).hom
-    fun r x ↦ by rw [action_apply, action_apply, SiteCoh.res_map_apply]
+    (SiteCoh.res ((toAbSheaf (X := X)).obj F) n (homOfLE h)).hom fun r x ↦ by
+      rw [action_apply, action_apply, SiteCoh.res_map_apply]
 
 variable {F G H : X.Modules} {U V W : X.Opens} {n : ℕ}
 
@@ -101,11 +143,13 @@ lemma toH'_res (h : V ≤ U) (x : cohOn F U n) :
 lemma smul_eq_map (r : R) (x : cohOn F U n) :
     r • x = map R (smulHom F (algebraMap R Γ(X, ⊤) r)) U n x := rfl
 
+
 variable (F U n) in
 @[simp] lemma map_id : map R (𝟙 F) U n = LinearMap.id := by
   ext x
   apply (toH' F U n).injective
   rw [toH'_map, CategoryTheory.Functor.map_id, SiteCoh.map_id_apply, LinearMap.id_apply]
+
 
 variable (U n) in
 lemma map_comp (φ : F ⟶ G) (ψ : G ⟶ H) :
@@ -119,6 +163,7 @@ lemma map_map (φ : F ⟶ G) (ψ : G ⟶ H) (x : cohOn F U n) :
     map R ψ U n (map R φ U n x) = map R (φ ≫ ψ) U n x := by
   rw [map_comp]; rfl
 
+
 variable (U n) in
 lemma map_add_hom (φ ψ : F ⟶ G) : map R (φ + ψ) U n = map R φ U n + map R ψ U n := by
   ext x
@@ -126,21 +171,27 @@ lemma map_add_hom (φ ψ : F ⟶ G) : map R (φ + ψ) U n = map R φ U n + map R
   rw [LinearMap.add_apply, map_add (f := toH' G U n), toH'_map, toH'_map, toH'_map,
     Functor.map_add (toAbSheaf (X := X)), SiteCoh.map_add_apply]
 
+
 variable (F G U n) in
-@[simps! apply]
-def mapAddHom : (F ⟶ G) →+ (cohOn F U n →ₗ[R] cohOn G U n) :=
+@[simps! apply] def mapAddHom : (F ⟶ G) →+ (cohOn F U n →ₗ[R] cohOn G U n) :=
   AddMonoidHom.mk' (fun φ ↦ map R φ U n) (map_add_hom R U n)
+
 
 variable (F G U n) in
 @[simp] lemma map_zero_hom : map R (0 : F ⟶ G) U n = 0 := map_zero (mapAddHom R F G U n)
 
+
 variable (U n) in
 lemma map_neg_hom (φ : F ⟶ G) : map R (-φ) U n = -map R φ U n := map_neg (mapAddHom R F G U n) φ
+
+
 
 variable (U n) in
 lemma map_sum_hom {ι : Type t} (s : Finset ι) (φ : ι → (F ⟶ G)) :
     map R (∑ i ∈ s, φ i) U n = ∑ i ∈ s, map R (φ i) U n :=
   map_sum (mapAddHom R F G U n) φ s
+
+
 
 variable (F U n) in
 @[simp] lemma res_refl : res R F (le_refl U) n = LinearMap.id := by
@@ -148,6 +199,7 @@ variable (F U n) in
   apply (toH' F U n).injective
   rw [toH'_res, show homOfLE (le_refl U) = 𝟙 U from rfl, SiteCoh.res_id_apply,
     LinearMap.id_apply]
+
 
 variable (F n) in
 lemma res_comp_res (h : V ≤ U) (h' : W ≤ V) :
@@ -162,11 +214,14 @@ lemma res_map (φ : F ⟶ G) (h : V ≤ U) (x : cohOn F U n) :
   apply (toH' G V n).injective
   rw [toH'_res, toH'_map, toH'_map, toH'_res, SiteCoh.res_map_apply]
 
+
+
 variable (U n) in
-@[simps! apply symm_apply]
-def mapIso (e : F ≅ G) : cohOn F U n ≃ₗ[R] cohOn G U n :=
+@[simps! apply symm_apply] def mapIso (e : F ≅ G) : cohOn F U n ≃ₗ[R] cohOn G U n :=
   LinearEquiv.ofLinearMap (map R e.hom U n) (map R e.inv U n)
     (by rw [← map_comp, e.inv_hom_id, map_id]) (by rw [← map_comp, e.hom_inv_id, map_id])
+
+
 
 end Module
 
@@ -176,21 +231,21 @@ lemma subsingleton_of_isZero {F : X.Modules} (h : IsZero F) (U : X.Opens) (n : �
     have h₁ : map ℤ (𝟙 F) U n x = x := by rw [map_id]; rfl
     rw [← h₁, h.eq_of_src (𝟙 F) 0, map_zero_hom]; rfl
 
+
 section Products
 
 variable (R : Type v) [CommRing R] [Algebra R Γ(X, ⊤)] {ι : Type t} (U : X.Opens) (n : ℕ)
 
-@[simps! apply symm_apply]
-def biconeEquiv [Fintype ι] {F : ι → X.Modules} {c : Bicone F} (hc : c.IsBilimit)
-    : cohOn c.pt U n ≃ₗ[R] ∀ i, cohOn (F i) U n :=
+@[simps! apply symm_apply] def biconeEquiv [Fintype ι] {F : ι → X.Modules} {c : Bicone F}
+    (hc : c.IsBilimit) : cohOn c.pt U n ≃ₗ[R] ∀ i, cohOn (F i) U n :=
   LinearEquiv.ofLinearMap (LinearMap.pi fun i ↦ map R (c.π i) U n)
     (∑ i, map R (c.ι i) U n ∘ₗ LinearMap.proj i)
     (by
       classical
       refine LinearMap.ext fun x ↦ funext fun i ↦ ?_
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [LinearMap.comp_apply, LinearMap.pi_apply, LinearMap.sum_apply, map_sum,
-          LinearMap.proj_apply, LinearMap.id_apply, map_map]
+
+      simp only [LinearMap.comp_apply, LinearMap.pi_apply, LinearMap.sum_apply, map_sum,
+      LinearMap.proj_apply, LinearMap.id_apply, map_map]
       rw [Finset.sum_eq_single i]
       · rw [bicone_ι_π_self, map_id, LinearMap.id_apply]
       · intro j _ hj
@@ -207,8 +262,8 @@ lemma pi_map_bijective [Finite ι] {F : ι → X.Modules} {c : Fan F} (hc : IsLi
   cases nonempty_fintype ι
   exact (biconeEquiv R U n (biconeIsBilimitOfLimitConeOfIsLimit hc)).bijective
 
-def fanEquiv [Finite ι] {F : ι → X.Modules} {c : Fan F} (hc : IsLimit c)
-    : cohOn c.pt U n ≃ₗ[R] ∀ i, cohOn (F i) U n :=
+def fanEquiv [Finite ι] {F : ι → X.Modules} {c : Fan F} (hc : IsLimit c) :
+    cohOn c.pt U n ≃ₗ[R] ∀ i, cohOn (F i) U n :=
   LinearEquiv.ofBijective _ (pi_map_bijective R U n hc)
 
 def piEquiv [Finite ι] (F : ι → X.Modules) : cohOn (∏ᶜ F) U n ≃ₗ[R] ∀ i, cohOn (F i) U n :=
@@ -219,7 +274,8 @@ def piEquiv [Finite ι] (F : ι → X.Modules) : cohOn (∏ᶜ F) U n ≃ₗ[R] 
 
 attribute [local instance] Abelian.hasFiniteBiproducts
 
-def biproductEquiv [Finite ι] (F : ι → X.Modules) : cohOn (⨁ F) U n ≃ₗ[R] ∀ i, cohOn (F i) U n :=
+def biproductEquiv [Finite ι] (F : ι → X.Modules) :
+    cohOn (⨁ F) U n ≃ₗ[R] ∀ i, cohOn (F i) U n :=
   fanEquiv R U n (c := Fan.mk (⨁ F) (biproduct.π F)) (biproduct.isLimit F)
 
 @[simp] lemma biproductEquiv_apply [Finite ι] (F : ι → X.Modules) (x : cohOn (⨁ F) U n) (i : ι) :
@@ -245,28 +301,26 @@ def toΓ (F : X.Modules) (U : X.Opens) : sectionsOn F U ≃+ Γ(F, U) := WithAct
 
 variable (R : Type v) [CommRing R] [Algebra R Γ(X, ⊤)]
 
-instance instModule (F : X.Modules) (U : X.Opens) : Module R (sectionsOn F U) := {
-  WithAction.instModule (action F U) R with
-  smul := fun r x ↦ action F U (algebraMap R Γ(X, ⊤) r) x
-}
+instance instModule (F : X.Modules) (U : X.Opens) : Module R (sectionsOn F U) :=
+  { WithAction.instModule (action F U) R with
+    smul := fun r x ↦ action F U (algebraMap R Γ(X, ⊤) r) x }
+
 
 variable {R} in
 lemma toΓ_smul {F : X.Modules} {U : X.Opens} (r : R) (x : sectionsOn F U) :
     toΓ F U (r • x) = restrictGlobal X U (algebraMap R Γ(X, ⊤) r) • toΓ F U x := rfl
 
-instance instIsScalarTower
-    (S : Type t) [CommRing S] [Algebra S Γ(X, ⊤)] [Algebra R S] [IsScalarTower R S Γ(X, ⊤)]
-    (F : X.Modules) (U : X.Opens)
-    : IsScalarTower R S (sectionsOn F U) :=
+instance instIsScalarTower (S : Type t) [CommRing S] [Algebra S Γ(X, ⊤)] [Algebra R S]
+    [IsScalarTower R S Γ(X, ⊤)] (F : X.Modules) (U : X.Opens) : IsScalarTower R S (sectionsOn F U) :=
   WithAction.instIsScalarTower (action F U) R S
 
 def map {F G : X.Modules} (φ : F ⟶ G) (U : X.Opens) : sectionsOn F U →ₗ[R] sectionsOn G U :=
-  WithAction.linearMap (action F U) (action G U) R (φ.app U).hom fun r x ↦
-    φ.app_smul (restrictGlobal X U r) x
+  WithAction.linearMap (action F U) (action G U) R (φ.app U).hom
+    fun r x ↦ φ.app_smul (restrictGlobal X U r) x
 
 def res (F : X.Modules) {U V : X.Opens} (h : V ≤ U) : sectionsOn F U →ₗ[R] sectionsOn F V :=
-  WithAction.linearMap (action F U) (action F V) R (F.presheaf.map (homOfLE h).op).hom fun r x ↦ by
-    rw [action_apply, action_apply, F.map_smul, map_restrictGlobal]
+  WithAction.linearMap (action F U) (action F V) R (F.presheaf.map (homOfLE h).op).hom
+    fun r x ↦ by rw [action_apply, action_apply, F.map_smul, map_restrictGlobal]
 
 variable {F G H : X.Modules} {U V W : X.Opens}
 
@@ -276,14 +330,18 @@ variable {F G H : X.Modules} {U V W : X.Opens}
 @[simp] lemma toΓ_res (h : V ≤ U) (x : sectionsOn F U) :
     toΓ F V (res R F h x) = F.presheaf.map (homOfLE h).op (toΓ F U x) := rfl
 
+
 variable (F U) in
 @[simp] lemma map_id : map R (𝟙 F) U = LinearMap.id := rfl
+
 
 variable (U) in
 lemma map_comp (φ : F ⟶ G) (ψ : G ⟶ H) : map R (φ ≫ ψ) U = map R ψ U ∘ₗ map R φ U := rfl
 
+
 variable (U) in
 lemma map_add_hom (φ ψ : F ⟶ G) : map R (φ + ψ) U = map R φ U + map R ψ U := rfl
+
 
 variable (F U) in
 @[simp] lemma res_refl : res R F (le_refl U) = LinearMap.id := by
@@ -291,6 +349,7 @@ variable (F U) in
   apply (toΓ F U).injective
   rw [toΓ_res, show homOfLE (le_refl U) = 𝟙 U from rfl, op_id, CategoryTheory.Functor.map_id]
   rfl
+
 
 variable (F) in
 lemma res_comp_res (h : V ≤ U) (h' : W ≤ V) : res R F h' ∘ₗ res R F h = res R F (h'.trans h) := by
@@ -304,21 +363,20 @@ lemma res_map (φ : F ⟶ G) (h : V ≤ U) (x : sectionsOn F U) :
     res R G h (map R φ U x) = map R φ V (res R F h x) :=
   (ConcreteCategory.congr_hom (φ.mapPresheaf.naturality (homOfLE h).op) x).symm
 
+
 variable (F U) in
-def equivOfSMul
-    [Module R Γ(F, U)]
-    (h : ∀ (r : R) (x : Γ(F, U)), r • x = restrictGlobal X U (algebraMap R Γ(X, ⊤) r) • x)
-    : sectionsOn F U ≃ₗ[R] Γ(F, U) := {
-  toΓ F U with
-  map_smul' := fun r x ↦ (toΓ_smul r x).trans (h r _).symm
-}
+def equivOfSMul [Module R Γ(F, U)]
+    (h : ∀ (r : R) (x : Γ(F, U)), r • x = restrictGlobal X U (algebraMap R Γ(X, ⊤) r) • x) :
+    sectionsOn F U ≃ₗ[R] Γ(F, U) :=
+  { toΓ F U with map_smul' := fun r x ↦ (toΓ_smul r x).trans (h r _).symm }
+
 
 variable (F) in
 def topEquiv : sectionsOn F ⊤ ≃ₗ[Γ(X, ⊤)] Γ(F, ⊤) :=
   equivOfSMul Γ(X, ⊤) F ⊤ fun r x ↦ by rw [restrictGlobal_top]; rfl
 
-def specEquiv {A : CommRingCat.{u}} (F : (Spec A).Modules) (U : (Spec A).Opens)
-    : sectionsOn F U ≃ₗ[A] Γ(F, U) :=
+def specEquiv {A : CommRingCat.{u}} (F : (Spec A).Modules) (U : (Spec A).Opens) :
+    sectionsOn F U ≃ₗ[A] Γ(F, U) :=
   equivOfSMul A F U fun r x ↦ by
     rw [Scheme.Modules.smul_Spec_def]
     congr 1
@@ -331,8 +389,7 @@ variable (R : Type v) [CommRing R] [Algebra R Γ(X, ⊤)]
 
 def zeroEquiv (F : X.Modules) (U : X.Opens) : cohOn F U 0 ≃ₗ[R] sectionsOn F U :=
   WithAction.linearEquiv (action F U 0) (sectionsOn.action F U) R
-    (SiteCoh.zeroEquiv ((toAbSheaf (X := X)).obj F) U)
-    fun r x ↦ by
+    (SiteCoh.zeroEquiv ((toAbSheaf (X := X)).obj F) U) fun r x ↦ by
       rw [action_apply]
       exact SiteCoh.zeroEquiv_map ((toAbSheaf (X := X)).map (smulHom F r)) U x
 
@@ -342,16 +399,17 @@ lemma toΓ_zeroEquiv (x : cohOn F U 0) :
     sectionsOn.toΓ F U (zeroEquiv R F U x) =
       SiteCoh.zeroEquiv ((toAbSheaf (X := X)).obj F) U (toH' F U 0 x) := rfl
 
-def zeroEquivSpec {A : CommRingCat.{u}} (F : (Spec A).Modules) (U : (Spec A).Opens)
-    : cohOn F U 0 ≃ₗ[A] Γ(F, U) :=
+
+def zeroEquivSpec {A : CommRingCat.{u}} (F : (Spec A).Modules) (U : (Spec A).Opens) :
+    cohOn F U 0 ≃ₗ[A] Γ(F, U) :=
   (zeroEquiv A F U).trans (sectionsOn.specEquiv F U)
 
 end cohOn
 
 abbrev structureModule (X : Scheme.{u}) : X.Modules := SheafOfModules.unit X.ringCatSheaf
 
-def structureModuleΓEquiv (X : Scheme.{u}) (U : X.Opens)
-    : Γ(structureModule X, U) ≃ₗ[Γ(X, U)] Γ(X, U) where
+def structureModuleΓEquiv (X : Scheme.{u}) (U : X.Opens) :
+    Γ(structureModule X, U) ≃ₗ[Γ(X, U)] Γ(X, U) where
   toFun x := x
   invFun x := x
   left_inv _ := rfl
@@ -372,10 +430,12 @@ lemma toH_map (R : Type v) [CommRing R] [Algebra R Γ(X, ⊤)] {F G : X.Modules}
     toH G n (cohOn.map R φ ⊤ n x) = Sheaf.H.map ((toAbSheaf (X := X)).map φ) n (toH F n x) :=
   SiteCoh.terminalEquiv_map ((toAbSheaf (X := X)).map φ) n isTerminalTop (cohOn.toH' F ⊤ n x)
 
-def zeroUnitEquiv (X : Scheme.{u}) : coh (structureModule X) 0 ≃ₗ[Γ(X, ⊤)] Γ(X, ⊤) :=
+def zeroUnitEquiv (X : Scheme.{u}) :
+    coh (structureModule X) 0 ≃ₗ[Γ(X, ⊤)] Γ(X, ⊤) :=
   (zeroEquiv (structureModule X)).trans (structureModuleΓEquiv X ⊤)
 
-def zeroUnitSpecEquiv (A : CommRingCat.{u}) : coh (structureModule (Spec A)) 0 ≃ₗ[A] A :=
+def zeroUnitSpecEquiv (A : CommRingCat.{u}) :
+    coh (structureModule (Spec A)) 0 ≃ₗ[A] A :=
   ((zeroUnitEquiv (Spec A)).restrictScalars A).trans
     (LinearEquiv.ofBijective (Algebra.linearMap A Γ(Spec A, ⊤)) (by
       have h : ⇑(Algebra.linearMap A Γ(Spec A, ⊤)) = (Scheme.ΓSpecIso A).inv :=
@@ -389,15 +449,13 @@ section Functors
 
 variable (R : Type v) [CommRing R] [Algebra R Γ(X, ⊤)]
 
-@[simps]
-def cohPresheaf (F : X.Modules) (n : ℕ) : X.Opensᵒᵖ ⥤ ModuleCat.{u} R where
+@[simps] def cohPresheaf (F : X.Modules) (n : ℕ) : X.Opensᵒᵖ ⥤ ModuleCat.{u} R where
   obj U := ModuleCat.of R (cohOn F U.unop n)
   map i := ModuleCat.ofHom (cohOn.res R F i.unop.le n)
   map_id U := ModuleCat.hom_ext (cohOn.res_refl R F U.unop n)
   map_comp i j := ModuleCat.hom_ext (cohOn.res_comp_res R F n i.unop.le j.unop.le).symm
 
-@[simps]
-def sectionsPresheaf (F : X.Modules) : X.Opensᵒᵖ ⥤ ModuleCat.{u} R where
+@[simps] def sectionsPresheaf (F : X.Modules) : X.Opensᵒᵖ ⥤ ModuleCat.{u} R where
   obj U := ModuleCat.of R (sectionsOn F U.unop)
   map i := ModuleCat.ofHom (sectionsOn.res R F i.unop.le)
   map_id U := ModuleCat.hom_ext (sectionsOn.res_refl R F U.unop)
@@ -414,8 +472,8 @@ lemma algebraΓOfHom_algebraMap {R : Type u} [CommRing R] (f : X ⟶ Spec (.of R
 
 abbrev algebraΓSpec (A : CommRingCat.{u}) : Algebra A Γ(Spec A, ⊤) := inferInstance
 
-abbrev algebraΓOfOver (R : Type u) [CommRing R] (X : Scheme.{u}) [X.Over (Spec (.of R))]
-    : Algebra R Γ(X, ⊤) :=
+abbrev algebraΓOfOver (R : Type u) [CommRing R] (X : Scheme.{u}) [X.Over (Spec (.of R))] :
+    Algebra R Γ(X, ⊤) :=
   algebraΓOfHom (X ↘ Spec (.of R))
 
 namespace OverSpec

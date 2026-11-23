@@ -1,6 +1,54 @@
 module
 
-public import Development.WeilBound.CoreStatements.AmpleLineBundles.SpanLeOfMem
+public import GroundTheory.HeightsAndTheta.Heights.HeightsOfSets.Slopes
+public import GroundTheory.HeightsAndTheta.Heights.HeightsOfSets.DegreeTopEqArithDegree
+import GroundTheory.HeightsAndTheta.Heights.HeightsOfSets.FiniteSupportHeight
+import GroundTheory.HeightsAndTheta.Heights.HeightsOfSets.LinearIndependentSumElimOfExact
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Development.AutomorphicSpectrum.Definitions.MetricPeriods.IsOrthFull
+public import GroundTheory.HeightsAndTheta.Heights.ArithDegree
+public import GroundTheory.HeightsAndTheta.Heights.ArithDegreeExact
 
 @[expose] public section
 
@@ -132,7 +180,6 @@ private theorem exists_injective_quotient_span_map
       obtain ⟨c, hc⟩ := Submodule.mem_span_singleton.1 hxy
       exact Submodule.mem_span_singleton.2 ⟨c, hφ (by rw [map_smul, map_sub]; exact hc)⟩
 
-set_option maxHeartbeats 400000 in
 theorem integers_deg_le (G : Submodule (𝓞 K) (HermitianBundle.integers K).carrier)
     : (HermitianBundle.integers K).degree G ≤ 0 := by
   by_cases hG : G = ⊥
@@ -200,22 +247,6 @@ theorem integers_deg_le (G : Submodule (𝓞 K) (HermitianBundle.integers K).car
   have hlog :=
     Real.log_le_log (by exact_mod_cast hpos)
       (Nat.cast_le.2 hle : (Nat.card (G ⧸ Submodule.span (𝓞 K) {sG 0}) : ℝ) ≤ _)
-  have e1
-      : (HermitianBundle.integers K).degree G
-        = Real.log (Nat.card (G ⧸ Submodule.span (𝓞 K) {sG 0}))
-          - 1 / 2
-            * ∑ σ : K →+* ℂ, Real.log (gramDet (HermitianBundle.integers K).metric σ
-              fun i => (sT i : (HermitianBundle.integers K).carrier)) :=
-    hGd
-  have e2
-      : (HermitianBundle.integers K).degree ⊤
-        = Real.log (Nat.card
-            ((⊤ : Submodule (𝓞 K) (HermitianBundle.integers K).carrier) ⧸
-              Submodule.span (𝓞 K) {sT 0}))
-          - 1 / 2
-            * ∑ σ : K →+* ℂ, Real.log (gramDet (HermitianBundle.integers K).metric σ
-              fun i => (sT i : (HermitianBundle.integers K).carrier)) :=
-    hTd
   linarith
 
 theorem std_deg (r : ℕ)

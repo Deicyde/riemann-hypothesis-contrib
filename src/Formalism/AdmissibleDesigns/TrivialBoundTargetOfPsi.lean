@@ -1,8 +1,48 @@
 module
 
-public import Formalism.AdmissibleDesigns.URepApply
-public import Formalism.AdmissibleDesigns.TrivialBoundGeneral
+public import Formalism.AdmissibleDesigns.TrivialBoundTargetOfDict
+public import Formalism.AdmissibleDesigns.URecApply
 public import Formalism.AdmissibleDesigns.CycMatchRec
+public import Formalism.AdmissibleDesigns.H1MapMemLcH1
+public import Formalism.AdmissibleDesigns.TrivialBoundGeneral
+public import Formalism.AdmissibleDesigns.URepApply
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -113,7 +153,7 @@ variable
     IsScalarTower Dd.T' Dd.R'
       (blockRestrictedRepresentationType (RepresentationBoundsCohomology.blk D.R) Dd.ρk k)]
 
-set_option maxHeartbeats 1000000 in
+
 theorem coefDict_of
     (hD : RingDef (D.nd.O i) (D.nd.T i) (RepresentationBoundsCohomology.repX D.nd r) π
       (chiU D.nd i 1) (epsU D.nd i) g0 eB e₁ s Dd)
@@ -145,7 +185,6 @@ variable
     SMulCommClass Dd.R' (D.nd.O i)
       (blockRestrictedRepresentationType (RepresentationBoundsCohomology.blk D.R) Dd.ρk k)]
 
-set_option maxHeartbeats 1000000 in
 theorem lenMap_of
     (cB : ℕ) (hTB : TrivialBoundAtRows i dc r π cB)
     {w : HeightOneSpectrum (𝓞 D.host.E)}
@@ -211,7 +250,6 @@ def YtPsi : Prop :=
                   (Jr i r π (TruncatedSeriesCountingIdentities.CoefExt.self i w hw))
                 ∧ PsiExt (selfO i hw) Dd.r Dd.χ Dd.E (Dw i dc (idx i dc w)) (eW i dc hw) Y Cd
 
-set_option maxHeartbeats 4000000 in
 theorem tbDict2_of
     (cB : ℕ)
     (hD : RingDef (D.nd.O i) (D.nd.T i) (RepresentationBoundsCohomology.repX D.nd r) π

@@ -1,7 +1,52 @@
 module
 
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.Splits
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDescent.OLinBaseChangeSt
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.SabPull
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.AlgebraicGeometry.Modules.Sheaf
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Coalgebra.IsFrobenius
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Lemma
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.TypeStar
 
 @[expose] public section
 
@@ -205,9 +250,6 @@ private lemma germ_app_presheaf_map_eq_germ_app {A B : Scheme.{0}} (f : A ⟶ B)
   rw [nat]
   first
     | exact TopCat.Presheaf.germ_res_apply _ _ _ _ _
-    | exact TopCat.Presheaf.germ_res_apply _ _ _ _ _ _
-    | (erw [TopCat.Presheaf.germ_res_apply])
-    | (simp; done)
 
 private lemma germ_app_app_eq_germ_app_comp {A B C : Scheme.{0}} (r : A ⟶ B) (h : B ⟶ C) (y : A) (W : C.Opens)
     (hy : h (r y) ∈ W) (a : Γ(C, W)) :
@@ -215,8 +257,6 @@ private lemma germ_app_app_eq_germ_app_comp {A B C : Scheme.{0}} (r : A ⟶ B) (
       (A.presheaf.germ ((r ≫ h) ⁻¹ᵁ W) y hy).hom (((r ≫ h).app W).hom a) := by
   first
     | rfl
-    | (simp only [Scheme.Hom.comp_app, CommRingCat.hom_comp, RingHom.comp_apply]; rfl)
-    | (simp [Scheme.Hom.comp_app]; done)
 
 private lemma gm_res_toroidal_compactification {A B : Scheme.{0}} (f : A ⟶ B) (y : A) {U V : B.Opens} (hVU : V ≤ U)
     (hy : f y ∈ V) (u : Γ(B, U)ˣ) : gm f y V (res hVU u) = gm f y U u := by
@@ -277,8 +317,6 @@ theorem top_le_iff_mem (x : Sp F ⟶ X) (U : X.Opens) (z : Sp F) : ⊤ ≤ x ⁻
     have hwz : w = z := by
       first
       | exact Subsingleton.elim _ _
-      | exact PrimeSpectrum.ext ((Ideal.eq_bot_of_prime _).trans (Ideal.eq_bot_of_prime _).symm)
-      | exact PrimeSpectrum.ext (by simp)
     subst hwz
     exact hz
 
@@ -298,18 +336,6 @@ theorem toStk_valF (x : Sp F ⟶ X) (U : X.Opens) (z : Sp F) (h : x z ∈ U) (a 
   | (
       simp only [Scheme.Hom.appLE, CommRingCat.hom_comp, RingHom.comp_apply]
       exact TopCat.Presheaf.germ_res_apply _ _ _ _ _
-    )
-  | (
-      simp only [Scheme.Hom.appLE, CommRingCat.hom_comp, RingHom.comp_apply]
-      erw [TopCat.Presheaf.germ_res_apply]
-    )
-  | (
-      simp only [Scheme.Hom.appLE, CommRingCat.hom_comp, RingHom.comp_apply]
-      exact (TopCat.Presheaf.germ_res_apply _ _ _ _ _).trans rfl
-    )
-  | (
-      simp only [Scheme.Hom.appLE, CommRingCat.hom_comp, RingHom.comp_apply]
-      exact Eq.refl _
     )
 
 variable

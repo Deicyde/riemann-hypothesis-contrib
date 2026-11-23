@@ -1,7 +1,54 @@
 module
 
-public import Mathlib
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.StrongApproximation.EichAlongSub
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.StrongApproximation.SAOpenStatement
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Coalgebra.IsFrobenius
+import Mathlib.RingTheory.HopfAlgebra.Basic
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -85,8 +132,8 @@ theorem OFam.sub_proj_orth {r : ℕ} (F : OFam (σ := σ) (J := J) e f r) (x : �
     ring
   have hsym : ∀ x y, hf σ J y x = σ (hf σ J x y) := by
     intro x y
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [hf, map_sum, map_mul, hσ]
+
+    simp only [hf, map_sum, map_mul, hσ]
     rw [Finset.sum_comm]
     refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
     have hJij : J j i = σ (J i j) := congrFun (congrFun hJ i) j
@@ -172,20 +219,12 @@ include hσ hJ he hff hef hdet hfix h2 hδ hσδ in
 theorem OFam.extend {r : ℕ} (F : OFam (σ := σ) (J := J) e f r) (hns : ¬F.Spans)
     : Nonempty (OFam (σ := σ) (J := J) e f (r + 1)) := by
   classical
-  have hadd1 : ∀ x y z, hf σ J (x + y) z = hf σ J x z + hf σ J y z := by
-    intro x y z
-    simp only [hf, Pi.add_apply, add_mul, Finset.sum_add_distrib]
   have hadd2 : ∀ x y z, hf σ J x (y + z) = hf σ J x y + hf σ J x z := by
     intro x y z
     simp only [hf, Pi.add_apply, map_add (f := _), mul_add, Finset.sum_add_distrib]
   have hsub2 : ∀ x y z, hf σ J x (y - z) = hf σ J x y - hf σ J x z := by
     intro x y z
     simp only [hf, Pi.sub_apply, map_sub, mul_sub, Finset.sum_sub_distrib]
-  have hsm1 : ∀ (c : K) x y, hf σ J (c • x) y = c * hf σ J x y := by
-    intro c x y
-    simp only [hf, Pi.smul_apply, smul_eq_mul, Finset.mul_sum]
-    refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
-    ring
   have hsm2 : ∀ (c : K) x y, hf σ J x (c • y) = σ c * hf σ J x y := by
     intro c x y
     simp only [hf, Pi.smul_apply, smul_eq_mul, map_mul, Finset.mul_sum]
@@ -193,8 +232,8 @@ theorem OFam.extend {r : ℕ} (F : OFam (σ := σ) (J := J) e f r) (hns : ¬F.Sp
     ring
   have hsym : ∀ x y, hf σ J y x = σ (hf σ J x y) := by
     intro x y
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [hf, map_sum, map_mul, hσ]
+
+    simp only [hf, map_sum, map_mul, hσ]
     rw [Finset.sum_comm]
     refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
     have hJij : J j i = σ (J i j) := congrFun (congrFun hJ i) j
@@ -278,29 +317,15 @@ include hσ hJ he hff hef in
 theorem OFam.card_le [Nontrivial K] {r : ℕ} (F : OFam (σ := σ) (J := J) e f r)
     : r + 2 ≤ Fintype.card ι := by
   classical
-  have hadd1 : ∀ x y z, hf σ J (x + y) z = hf σ J x z + hf σ J y z := by
-    intro x y z
-    simp only [hf, Pi.add_apply, add_mul, Finset.sum_add_distrib]
-  have hadd2 : ∀ x y z, hf σ J x (y + z) = hf σ J x y + hf σ J x z := by
-    intro x y z
-    simp only [hf, Pi.add_apply, map_add (f := _), mul_add, Finset.sum_add_distrib]
-  have hsub2 : ∀ x y z, hf σ J x (y - z) = hf σ J x y - hf σ J x z := by
-    intro x y z
-    simp only [hf, Pi.sub_apply, map_sub, mul_sub, Finset.sum_sub_distrib]
   have hsm1 : ∀ (c : K) x y, hf σ J (c • x) y = c * hf σ J x y := by
     intro c x y
     simp only [hf, Pi.smul_apply, smul_eq_mul, Finset.mul_sum]
     refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
     ring
-  have hsm2 : ∀ (c : K) x y, hf σ J x (c • y) = σ c * hf σ J x y := by
-    intro c x y
-    simp only [hf, Pi.smul_apply, smul_eq_mul, map_mul, Finset.mul_sum]
-    refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
-    ring
   have hsym : ∀ x y, hf σ J y x = σ (hf σ J x y) := by
     intro x y
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [hf, map_sum, map_mul, hσ]
+
+    simp only [hf, map_sum, map_mul, hσ]
     rw [Finset.sum_comm]
     refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
     have hJij : J j i = σ (J i j) := congrFun (congrFun hJ i) j

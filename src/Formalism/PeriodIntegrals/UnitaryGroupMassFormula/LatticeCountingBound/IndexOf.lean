@@ -1,7 +1,52 @@
 module
 
-public import Mathlib
 public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.LatticeCountingBound.IndexDefs
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
@@ -17,23 +62,21 @@ variable {E : Type} [Field E] [StarRing E] {n : ℕ}
 
 def sv (w : Fin n → E) : Fin n → E := fun i => starRingEnd E (w i)
 
-theorem hform_dot (J : Matrix (Fin n) (Fin n) E) (w z : Fin n → E)
-    : Formalism.UG.hform (starRingEnd E) J w z = (sv w ᵥ* J) ⬝ᵥ z := by
+theorem hform_dot (J : Matrix (Fin n) (Fin n) E) (w z : Fin n → E) :
+    Formalism.UG.hform (starRingEnd E) J w z = (sv w ᵥ* J) ⬝ᵥ z := by
   unfold Formalism.UG.hform
   simp only [dotProduct, vecMul, sv, Finset.sum_mul]
   exact Finset.sum_comm
 
-theorem hform_herm
-    (J : Matrix (Fin n) (Fin n) E) (hJ : Formalism.UG.IsHerm (starRingEnd E) J) (w z : Fin n → E)
-    : starRingEnd E (Formalism.UG.hform (starRingEnd E) J w z)
-      = Formalism.UG.hform (starRingEnd E) J z w := by
+theorem hform_herm (J : Matrix (Fin n) (Fin n) E) (hJ : Formalism.UG.IsHerm (starRingEnd E) J) (w z : Fin n → E) :
+    starRingEnd E (Formalism.UG.hform (starRingEnd E) J w z) = Formalism.UG.hform (starRingEnd E) J z w := by
   have hJ' : ∀ i j, starRingEnd E (J i j) = J j i := by
     intro i j
     have := congrFun (congrFun hJ j) i
     simpa [Formalism.UG.cT] using this
   unfold Formalism.UG.hform
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, map_mul, starRingEnd_self_apply, hJ']
+
+  simp only [map_sum, map_mul, starRingEnd_self_apply, hJ']
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun j _ => Finset.sum_congr rfl fun i _ => ?_
   ring
@@ -44,8 +87,8 @@ section Aux2
 
 variable {E : Type} [Field E] [NumberField E]
 
-theorem star_range [StarRing E] {x : E} (hx : x ∈ (algebraMap (𝓞 E) E).range)
-    : starRingEnd E x ∈ (algebraMap (𝓞 E) E).range := by
+theorem star_range [StarRing E] {x : E} (hx : x ∈ (algebraMap (𝓞 E) E).range) :
+    starRingEnd E x ∈ (algebraMap (𝓞 E) E).range := by
   obtain ⟨o, rfl⟩ := RingHom.mem_range.mp hx
   have hint : IsIntegral ℤ (starRingEnd E (algebraMap (𝓞 E) E o)) := by
     first
@@ -53,8 +96,8 @@ theorem star_range [StarRing E] {x : E} (hx : x ∈ (algebraMap (𝓞 E) E).rang
     | exact (o.2).map (starRingEnd E).toIntAlgHom
   exact RingHom.mem_range.mpr ⟨⟨_, hint⟩, rfl⟩
 
-theorem mem_oLat {k : ℕ} (v : Fin k → E)
-    : v ∈ oLat E k ↔ ∃ x : Fin k → 𝓞 E, (fun c => algebraMap (𝓞 E) E (x c)) = v := by
+theorem mem_oLat {k : ℕ} (v : Fin k → E) :
+    v ∈ oLat E k ↔ ∃ x : Fin k → 𝓞 E, (fun c => algebraMap (𝓞 E) E (x c)) = v := by
   unfold oLat
   first
   | (rw [LinearMap.mem_range]; rfl)
@@ -82,25 +125,21 @@ theorem dualL_oLat (k : ℕ) : dualL (oLat E k) = oLat E k := by
     obtain ⟨x, rfl⟩ := (mem_oLat t).mp ht
     obtain ⟨y, rfl⟩ := (mem_oLat s).mp hs
     refine RingHom.mem_range.mpr ⟨∑ c, y c * x c, ?_⟩
-    set_option synthInstance.maxHeartbeats 100000 in
+
     simp [dotProduct, map_sum, map_mul]
 
-theorem card_quot_relIndex {M : Type*} [AddCommGroup M] [Module (𝓞 E) M] (S B : Submodule (𝓞 E) M)
-    : Nat.card (B ⧸ S.comap B.subtype) = S.toAddSubgroup.relIndex B.toAddSubgroup :=
-  rfl
+theorem card_quot_relIndex {M : Type*} [AddCommGroup M] [Module (𝓞 E) M] (S B : Submodule (𝓞 E) M) :
+    Nat.card (B ⧸ S.comap B.subtype) = S.toAddSubgroup.relIndex B.toAddSubgroup := rfl
 
 end Aux2
 
-private theorem relIndex_comap_eq_of_le_range
-    {G H : Type*} [AddGroup G] [AddGroup H] (f : G →+ H) (A B : AddSubgroup H) (hB : B ≤ f.range)
-    : (A.comap f).relIndex (B.comap f) = A.relIndex B := by
+private theorem relIndex_comap_eq_of_le_range {G H : Type*} [AddGroup G] [AddGroup H] (f : G →+ H)
+    (A B : AddSubgroup H) (hB : B ≤ f.range) : (A.comap f).relIndex (B.comap f) = A.relIndex B := by
   rw [AddSubgroup.relIndex_comap, AddSubgroup.map_comap_eq, inf_eq_right.2 hB]
 
-private theorem sum_smul_mem_span_iff_of_linearIndependent
-    {K : Type} [Field K] [NumberField K]
-    {n k : ℕ} (v : Fin k → Fin n → K) (hv : LinearIndependent K v) (t : Fin k → K)
-    : (∑ c, t c • v c) ∈ Submodule.span (𝓞 K) (Set.range v)
-      ↔ ∀ c, t c ∈ (algebraMap (𝓞 K) K).range := by
+private theorem sum_smul_mem_span_iff_of_linearIndependent {K : Type} [Field K] [NumberField K] {n k : ℕ} (v : Fin k → Fin n → K)
+    (hv : LinearIndependent K v) (t : Fin k → K) :
+    (∑ c, t c • v c) ∈ Submodule.span (𝓞 K) (Set.range v) ↔ ∀ c, t c ∈ (algebraMap (𝓞 K) K).range := by
   constructor
   · intro h
     obtain ⟨o, ho⟩ := (Submodule.mem_span_range_iff_exists_fun (𝓞 K)).1 h
@@ -123,20 +162,16 @@ theorem lattice_indexOf : IndexOf := by
   intro I Λ hfg hspan hdual δ k u b' hu hδu hδspan hb' hb'li hperp hperpspan hidx1 hidx2
   let v : Fin k → Fin I.n → I.E := fun c => δ *ᵥ u c
 
-  let ιL : (Fin k → I.E) →ₗ[𝓞 I.E] (Fin I.n → I.E) := {
-    toFun := fun t => ∑ c, t c • v c
-    map_add' := fun s t => by simp only [Pi.add_apply, add_smul, Finset.sum_add_distrib]
-    map_smul' := fun o t => by
-      simp only [Pi.smul_apply, smul_assoc, RingHom.id_apply, Finset.smul_sum]
-  }
+  let ιL : (Fin k → I.E) →ₗ[𝓞 I.E] (Fin I.n → I.E) :=
+    { toFun := fun t => ∑ c, t c • v c
+      map_add' := fun s t => by simp only [Pi.add_apply, add_smul, Finset.sum_add_distrib]
+      map_smul' := fun o t => by simp only [Pi.smul_apply, smul_assoc, RingHom.id_apply, Finset.smul_sum] }
   let β : (Fin k → I.E) →+ (Fin I.n → I.E) :=
-    AddMonoidHom.mk'
-      (fun s => ∑ a, starRingEnd I.E (s a) • b' a)
-      (fun s t => by simp only [Pi.add_apply, map_add (f := _), add_smul, Finset.sum_add_distrib])
+    AddMonoidHom.mk' (fun s => ∑ a, starRingEnd I.E (s a) • b' a) (fun s t => by
+      simp only [Pi.add_apply, map_add (f := _), add_smul, Finset.sum_add_distrib])
   have hι : ∀ t, ιL t = ∑ c, t c • v c := fun t => rfl
   have hβ : ∀ s, β s = ∑ a, starRingEnd I.E (s a) • b' a := fun s => rfl
-  have hint_v
-      : ∀ t : Fin k → I.E, ιL t ∈ Submodule.span (𝓞 I.E) (Set.range v) ↔ t ∈ oLat I.E k := by
+  have hint_v : ∀ t : Fin k → I.E, ιL t ∈ Submodule.span (𝓞 I.E) (Set.range v) ↔ t ∈ oLat I.E k := by
     intro t
     rw [hι, sum_smul_mem_span_iff_of_linearIndependent v hδu t, mem_oLat]
     constructor
@@ -145,8 +180,7 @@ theorem lattice_indexOf : IndexOf := by
       exact ⟨x, funext hx⟩
     · rintro ⟨x, rfl⟩ c
       exact ⟨x c, rfl⟩
-  have hint_b
-      : ∀ s : Fin k → I.E, β s ∈ Submodule.span (𝓞 I.E) (Set.range b') ↔ s ∈ oLat I.E k := by
+  have hint_b : ∀ s : Fin k → I.E, β s ∈ Submodule.span (𝓞 I.E) (Set.range b') ↔ s ∈ oLat I.E k := by
     intro s
     rw [hβ, sum_smul_mem_span_iff_of_linearIndependent b' hb'li, mem_oLat]
     constructor
@@ -168,23 +202,19 @@ theorem lattice_indexOf : IndexOf := by
   have hrange_b : (perpSub I Λ δ).toAddSubgroup ≤ β.range := by
     intro w hw
     have hw' : PerpKer I δ w := by
-      simp only [perpSub, Submodule.mem_toAddSubgroup, Submodule.mem_inf,
-          Submodule.restrictScalars_mem]
-        at hw
+      simp only [perpSub, Submodule.mem_toAddSubgroup, Submodule.mem_inf, Submodule.restrictScalars_mem] at hw
       exact hw.2
     obtain ⟨g, hg⟩ := (Submodule.mem_span_range_iff_exists_fun I.E).1 (hperpspan w hw')
     refine AddMonoidHom.mem_range.2 ⟨fun a => starRingEnd I.E (g a), ?_⟩
     rw [hβ]
     simpa only [starRingEnd_self_apply] using hg
-  have hoL_v
-      : (oLat I.E k).toAddSubgroup
-        = (Submodule.span (𝓞 I.E) (Set.range v)).toAddSubgroup.comap ιL.toAddMonoidHom := by
+  have hoL_v : (oLat I.E k).toAddSubgroup =
+      (Submodule.span (𝓞 I.E) (Set.range v)).toAddSubgroup.comap ιL.toAddMonoidHom := by
     ext t
     simp only [Submodule.mem_toAddSubgroup, AddSubgroup.mem_comap, LinearMap.toAddMonoidHom_coe]
     exact (hint_v t).symm
-  have hoL_b
-      : (oLat I.E k).toAddSubgroup
-        = (Submodule.span (𝓞 I.E) (Set.range b')).toAddSubgroup.comap β := by
+  have hoL_b : (oLat I.E k).toAddSubgroup =
+      (Submodule.span (𝓞 I.E) (Set.range b')).toAddSubgroup.comap β := by
     ext s
     simp only [Submodule.mem_toAddSubgroup, AddSubgroup.mem_comap]
     exact (hint_b s).symm
@@ -193,15 +223,11 @@ theorem lattice_indexOf : IndexOf := by
   have hRQ : R.toAddSubgroup = (imSub I Λ δ).toAddSubgroup.comap ιL.toAddMonoidHom := by
     ext t
     exact Iff.rfl
-  have hidxv
-      : idx I (imSub I Λ δ) v
-        = (Submodule.span (𝓞 I.E) (Set.range v)).toAddSubgroup.relIndex
-          (imSub I Λ δ).toAddSubgroup :=
+  have hidxv : idx I (imSub I Λ δ) v =
+      (Submodule.span (𝓞 I.E) (Set.range v)).toAddSubgroup.relIndex (imSub I Λ δ).toAddSubgroup :=
     card_quot_relIndex _ _
-  have hidxb
-      : idx I (perpSub I Λ δ) b'
-        = (Submodule.span (𝓞 I.E) (Set.range b')).toAddSubgroup.relIndex
-          (perpSub I Λ δ).toAddSubgroup :=
+  have hidxb : idx I (perpSub I Λ δ) b' =
+      (Submodule.span (𝓞 I.E) (Set.range b')).toAddSubgroup.relIndex (perpSub I Λ δ).toAddSubgroup :=
     card_quot_relIndex _ _
   have hRidx : (oLat I.E k).toAddSubgroup.relIndex R.toAddSubgroup = idx I (imSub I Λ δ) v := by
     rw [hidxv, hoL_v, hRQ, relIndex_comap_eq_of_le_range _ _ _ hrange_v]
@@ -235,15 +261,12 @@ theorem lattice_indexOf : IndexOf := by
 
   have hadd : ∀ x y z, hf I (x + y) z = hf I x z + hf I y z := by
     intro x y z
-    simp only [hf, Formalism.UG.hform, Pi.add_apply, map_add (f := _), add_mul,
-      Finset.sum_add_distrib]
+    simp only [hf, Formalism.UG.hform, Pi.add_apply, map_add (f := _), add_mul, Finset.sum_add_distrib]
   have hsmul : ∀ (a : I.E) x z, hf I (a • x) z = starRingEnd I.E a * hf I x z := by
     intro a x z
     simp only [hf, Formalism.UG.hform, Pi.smul_apply, smul_eq_mul, map_mul, mul_assoc]
     simp only [← Finset.mul_sum]
-  have hsum
-      : ∀ z (g : Fin k → I.E),
-        hf I (∑ a, g a • b' a) z = ∑ a, starRingEnd I.E (g a) * hf I (b' a) z := by
+  have hsum : ∀ z (g : Fin k → I.E), hf I (∑ a, g a • b' a) z = ∑ a, starRingEnd I.E (g a) * hf I (b' a) z := by
     intro z g
     let φ : (Fin I.n → I.E) →+ I.E := AddMonoidHom.mk' (fun x => hf I x z) (fun x y => hadd x y z)
     have e := map_sum φ (fun a => g a • b' a) Finset.univ
@@ -258,7 +281,9 @@ theorem lattice_indexOf : IndexOf := by
     have hG : ∀ z, δ *ᵥ z = ∑ c, G z c • v c := by
       intro z
       have e : Finsupp.linearCombination I.E v (hδu.repr ⟨δ *ᵥ z, hδspan z⟩) = δ *ᵥ z := by
-        first | exact hδu.linearCombination_repr _ | exact hδu.total_repr _
+        first
+        | exact hδu.linearCombination_repr _
+        | exact hδu.total_repr _
       rw [Finsupp.linearCombination_apply, Finsupp.sum_fintype _ _ (by simp)] at e
       exact e.symm
     have hGu : ∀ c, G (u c) = Finsupp.single c 1 := fun c => hδu.repr_eq_single c _ rfl
@@ -298,15 +323,15 @@ theorem lattice_indexOf : IndexOf := by
         simp only [imSub, Submodule.mem_map, LinearMap.coe_restrictScalars, Matrix.mulVecLin_apply]
         exact ⟨y, hy, hG y⟩
       have h2 := hr' _ htR
-      rw [show (∑ c, r c * G y c) = ∑ c, G y c * r c from
-        Finset.sum_congr rfl fun c _ => mul_comm _ _]
+      rw [show (∑ c, r c * G y c) = ∑ c, G y c * r c from Finset.sum_congr rfl fun c _ => mul_comm _ _]
       exact h2
     have hwperp : PerpKer I δ w := by
       intro z hz
       rw [hw, hgL]
       have h0 : (Matrix.mulVecLin δ).codRestrict (Submodule.span I.E (Set.range v)) hδspan z = 0 :=
         Subtype.ext hz
-      have hG0 : G z = 0 := by simp only [G, LinearMap.comp_apply, h0, map_zero]
+      have hG0 : G z = 0 := by
+        simp only [G, LinearMap.comp_apply, h0, map_zero]
       simp [hG0]
     have hwperpSub : w ∈ perpSub I Λ δ := by
       simp only [perpSub, Submodule.mem_inf, Submodule.restrictScalars_mem]
@@ -324,22 +349,17 @@ theorem lattice_indexOf : IndexOf := by
       simp [Finsupp.single_apply]
   have hd := hDual I.E k (oLat I.E k) R hoR (by rw [hRidx]; exact hidx1)
   rw [dualL_oLat] at hd
-  have hmain :=
-    hDet I.E k (pairM I b' u) Q (dualL R).toAddSubgroup hoQ (by rw [hQidx]; exact hidx2)
-      (fun x hx => hDo hx)
-      hd.1 hkey
-  have h3
-      : (dualL R).toAddSubgroup.relIndex (oLat I.E k).toAddSubgroup ≤ idx I (imSub I Λ δ) v := by
+  have hmain := hDet I.E k (pairM I b' u) Q (dualL R).toAddSubgroup hoQ (by rw [hQidx]; exact hidx2)
+    (fun x hx => hDo hx) hd.1 hkey
+  have h3 : (dualL R).toAddSubgroup.relIndex (oLat I.E k).toAddSubgroup ≤ idx I (imSub I Λ δ) v := by
     rw [← hRidx]
     exact hd.2
-  calc
-    |((Algebra.norm ℚ (pairM I b' u).det : ℚ) : ℝ)|
-        ≤ ((oLat I.E k).toAddSubgroup.relIndex Q : ℝ)
-          * ((dualL R).toAddSubgroup.relIndex (oLat I.E k).toAddSubgroup : ℝ) :=
-      hmain
+  calc |((Algebra.norm ℚ (pairM I b' u).det : ℚ) : ℝ)|
+      ≤ ((oLat I.E k).toAddSubgroup.relIndex Q : ℝ) *
+          ((dualL R).toAddSubgroup.relIndex (oLat I.E k).toAddSubgroup : ℝ) := hmain
     _ ≤ (idx I (perpSub I Λ δ) b' : ℝ) * (idx I (imSub I Λ δ) v : ℝ) := by
-      rw [hQidx]
-      gcongr
+        rw [hQidx]
+        gcongr
     _ = _ := mul_comm _ _
 
 end PI.UnitaryGroupMassFormula.LCG

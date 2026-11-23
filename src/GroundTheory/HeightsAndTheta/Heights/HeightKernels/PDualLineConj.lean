@@ -1,7 +1,47 @@
 module
 
-public import Mathlib
 public import GroundTheory.HeightsAndTheta.Heights.HeightKernels.StatementsLineDegreeDual
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Coalgebra.CoassocSimps
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -15,47 +55,44 @@ noncomputable section
 
 namespace DualLineConjugation
 
-variable
-  {K : Type} [Field K] [NumberField K]
-  {i : ℕ} {F : HermLattice K i} {T : Type} [Fintype T] [DecidableEq T]
+variable {K : Type} [Field K] [NumberField K] {i : ℕ} {F : HermLattice K i}
+  {T : Type} [Fintype T] [DecidableEq T]
 
 def conjPerm (K : Type) [Field K] : Equiv.Perm (K →+* ℂ) :=
   Function.Involutive.toPerm _ (involutive_conjugate K)
 
+
 omit [Fintype T] [DecidableEq T] in
-theorem conj_mulVec (b : Module.Basis T ℤ (dualLattice F)) (w : (K →+* ℂ) × Fin i → ℂ)
-    : (fun t => starRingEnd ℂ ((dualEmbMatrix b *ᵥ w) t))
-      = dualEmbMatrix b *ᵥ fun p => starRingEnd ℂ (w (conjugate p.1, p.2)) := by
+theorem conj_mulVec (b : Module.Basis T ℤ (dualLattice F)) (w : (K →+* ℂ) × Fin i → ℂ) :
+    (fun t => starRingEnd ℂ ((dualEmbMatrix b *ᵥ w) t)) =
+      dualEmbMatrix b *ᵥ fun p => starRingEnd ℂ (w (conjugate p.1, p.2)) := by
   funext t
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [mulVec, dotProduct, map_sum, map_mul]
+
+  simp only [mulVec, dotProduct, map_sum, map_mul]
   refine Fintype.sum_equiv ((conjPerm K).prodCongr (Equiv.refl _)) _ _ fun p => ?_
   simp [conjPerm, dualEmbMatrix]
 
-theorem recover_conj
-    (b : Module.Basis T ℤ (dualLattice F))
-    (hb : Function.Bijective (Matrix.mulVecLin (dualEmbMatrix b)))
-    (z : T → ℂ)
-    : dualRecover b hb (fun t => starRingEnd ℂ (z t))
-      = fun p => starRingEnd ℂ (dualRecover b hb z (conjugate p.1, p.2)) := by
-  have h1 : ∀ w, (dualRecover b hb).symm w = dualEmbMatrix b *ᵥ w := fun w => by simp [dualRecover]
+theorem recover_conj (b : Module.Basis T ℤ (dualLattice F))
+    (hb : Function.Bijective (Matrix.mulVecLin (dualEmbMatrix b))) (z : T → ℂ) :
+    dualRecover b hb (fun t => starRingEnd ℂ (z t)) =
+      fun p => starRingEnd ℂ (dualRecover b hb z (conjugate p.1, p.2)) := by
+  have h1 : ∀ w, (dualRecover b hb).symm w = dualEmbMatrix b *ᵥ w := fun w => by
+    simp [dualRecover]
   apply (dualRecover b hb).symm.injective
   rw [LinearEquiv.symm_apply_apply, h1, ← conj_mulVec b (dualRecover b hb z), ← h1,
     LinearEquiv.symm_apply_apply]
 
-theorem re_conj_form {n : Type} [Fintype n] (H : Matrix n n ℂ) (v : n → ℂ)
-    : (star (fun j => starRingEnd ℂ (v j)) ⬝ᵥ (H *ᵥ fun j => starRingEnd ℂ (v j))).re
-      = (star v ⬝ᵥ (H.map (starRingEnd ℂ) *ᵥ v)).re := by
+theorem re_conj_form {n : Type} [Fintype n] (H : Matrix n n ℂ) (v : n → ℂ) :
+    (star (fun j => starRingEnd ℂ (v j)) ⬝ᵥ (H *ᵥ fun j => starRingEnd ℂ (v j))).re =
+      (star v ⬝ᵥ (H.map (starRingEnd ℂ) *ᵥ v)).re := by
   rw [← Complex.conj_re (star v ⬝ᵥ _)]
   congr 1
-  set_option synthInstance.maxHeartbeats 100000 in
+
   simp [dotProduct, mulVec, map_sum, map_mul]
 
-theorem normSq_conj
-    (b : Module.Basis T ℤ (dualLattice F))
-    (hb : Function.Bijective (Matrix.mulVecLin (dualEmbMatrix b)))
-    (z : T → ℂ)
-    : dualNormSq b hb (fun t => starRingEnd ℂ (z t)) = dualNormSq b hb z := by
+theorem normSq_conj (b : Module.Basis T ℤ (dualLattice F))
+    (hb : Function.Bijective (Matrix.mulVecLin (dualEmbMatrix b))) (z : T → ℂ) :
+    dualNormSq b hb (fun t => starRingEnd ℂ (z t)) = dualNormSq b hb z := by
   unfold dualNormSq
   rw [recover_conj]
   refine Fintype.sum_equiv (conjPerm K) _ _ fun σ => ?_

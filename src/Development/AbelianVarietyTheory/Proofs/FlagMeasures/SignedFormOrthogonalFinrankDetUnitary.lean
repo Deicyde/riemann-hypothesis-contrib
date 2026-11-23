@@ -1,8 +1,50 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.Definitions.SemilocalFrames.IsGaugeAll
+public import Development.AbelianVarietyTheory.Definitions.SemilocalFrames.DefClassNum
+public import Mathlib.RingTheory.Coalgebra.IsFrobenius
+public import Mathlib.RingTheory.Etale.Weakly
+public import Mathlib.RingTheory.Finiteness.ModuleFinitePresentation
+public import Mathlib.RingTheory.HopfAlgebra.Basic
+public import Mathlib.RingTheory.TotallySplit
 public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.IsotropicFlagLeviMaxCompactClosedSubgroups
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -46,14 +88,14 @@ theorem rank_basisMat (V : Submodule ℂ (Fin n → ℂ)) : (basisMat V).rank = 
     · intro x hx
       refine ⟨(Module.finBasis ℂ V).equivFun ⟨x, hx⟩, ?_⟩
       rw [Matrix.mulVecLin_apply, basisMat_mulVec, LinearEquiv.symm_apply_apply]
-  rw [Matrix.rank, hr]
+  rw [← Matrix.finrank_range_mulVecLin, hr]
 
 theorem pairMap_surj (V : Submodule ℂ (Fin n → ℂ)) : Function.Surjective (pairMap ε V) := by
   have hJ : IsUnit (Formalism.REAL.Jm ε).det :=
     Matrix.isUnit_det_of_right_inverse (Formalism.REAL.Jm_mul_self ε)
   have hrk : ((basisMat V)ᴴ * Formalism.REAL.Jm ε).rank = Module.finrank ℂ V := by
     rw [Matrix.rank_mul_eq_left_of_isUnit_det _ _ hJ, Matrix.rank_conjTranspose, rank_basisMat]
-  unfold Matrix.rank at hrk
+  simp only [← Matrix.finrank_range_mulVecLin] at hrk
   have htop : LinearMap.range (pairMap ε V) = ⊤ := by
     apply Submodule.eq_top_of_finrank_eq
     rw [Module.finrank_fin_fun]
@@ -67,8 +109,8 @@ theorem pair_sum (V : Submodule ℂ (Fin n → ℂ)) (x : V) (y : Fin n → ℂ)
       : (x : Fin n → ℂ)
         = ∑ i, (Module.finBasis ℂ V).repr x i • ((Module.finBasis ℂ V i : V) : Fin n → ℂ) := by
     have hs := congrArg V.subtype ((Module.finBasis ℂ V).sum_repr x)
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum] at hs
+
+    rw [map_sum] at hs
     simp only [map_smul, Submodule.subtype_apply] at hs
     exact hs.symm
   rw [hx, star_sum, sum_dotProduct]

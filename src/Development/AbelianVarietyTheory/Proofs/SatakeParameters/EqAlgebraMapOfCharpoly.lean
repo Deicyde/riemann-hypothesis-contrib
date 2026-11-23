@@ -1,41 +1,80 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.Definitions.GaloisGeometry.ThetaMod
-public import Development.AbelianVarietyTheory.PublishedTheorems.AutomorphicForms₂.DeRhamPotSemistable
-public import Formalism.SharpRestriction.LevelLetterCocycles.SumRepresentations
+public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.WeilDeligneParamMonodromyEqZeroIff
+public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsContinuousPadic
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.WeilDeligneParamMonodromyEqZeroIff
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.CStarAlgebra.Classes
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.NStageTrivialCharacterCoeffEqAlt
+import Development.AbelianVarietyTheory.Definitions.GaloisGeometry.ExistsReadingLaws
+import Development.AbelianVarietyTheory.Definitions.GaloisGeometry.RankOneUnitary
+import Development.AbelianVarietyTheory.Definitions.GaloisGeometry.ThetaMod
+import Formalism.AlgebraicWeights.IsAlgWeight
+import Formalism.LocalToGlobal.NormalizedHeckeFactors.TypesDefs
+import Formalism.LocalToGlobal.UnitaryNorms.IsUnitaryNormOf
+import ReciprocityTheory.Automorphisms.PlaceA
 
 @[expose] public section
 
 noncomputable section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Polynomial
-  Module IsNilpotent
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Polynomial Module IsNilpotent
 
 namespace GlobalTheory.WeilDeligne.InertiaSplit
 
 variable {l : ℕ} [Fact l.Prime]
 
-theorem toEndC_coord
-    (ι : Qbar l ≃+* ℂ)
-    {n : Type} [Fintype n] [DecidableEq n]
-    (M : Matrix n n (Qbar l)) (v : n → Qbar l)
-    : toEndC ι M (fun k => ι (v k)) = fun i => ι ((M.mulVec v) i) := by
+theorem toEndC_coord (ι : Qbar l ≃+* ℂ) {n : Type} [Fintype n] [DecidableEq n]
+    (M : Matrix n n (Qbar l)) (v : n → Qbar l) :
+    toEndC ι M (fun k => ι (v k)) = fun i => ι ((M.mulVec v) i) := by
   funext i
   rw [toEndC_apply, Matrix.toLin'_apply]
   exact (RingHom.map_mulVec ι.toRingHom M v i).symm
 
-theorem mem_of_exp
-    (ι : Qbar l ≃+* ℂ)
-    {n : Type} [Fintype n] [DecidableEq n]
-    (S : Submodule ℂ (n → ℂ))
-    {M : Matrix n n (Qbar l)} (hM : IsNilpotent M) (hS : ∀ v ∈ S, toEndC ι M v ∈ S)
-    : ∀ v ∈ S, toEndC ι (exp M) v ∈ S := by
+theorem mem_of_exp (ι : Qbar l ≃+* ℂ) {n : Type} [Fintype n] [DecidableEq n]
+    (S : Submodule ℂ (n → ℂ)) {M : Matrix n n (Qbar l)} (hM : IsNilpotent M)
+    (hS : ∀ v ∈ S, toEndC ι M v ∈ S) : ∀ v ∈ S, toEndC ι (exp M) v ∈ S := by
   obtain ⟨k, hk⟩ := hM
   intro v hv
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [exp_eq_sum hk, map_sum, LinearMap.sum_apply]
+
+  rw [exp_eq_sum hk, map_sum, LinearMap.sum_apply]
   refine S.sum_mem fun i hi => ?_
   clear hi
   rw [map_rat_smul, LinearMap.smul_apply, map_pow]
@@ -44,71 +83,59 @@ theorem mem_of_exp
   | zero => simpa using hv
   | succ i ih => rw [pow_succ', mul_apply_eq_comp]; exact hS _ ih
 
-theorem exp_apply_of_eq_zero
-    (ι : Qbar l ≃+* ℂ)
-    {n : Type} [Fintype n] [DecidableEq n]
-    {M : Matrix n n (Qbar l)} (hM : IsNilpotent M)
-    {v : n → ℂ} (hv : toEndC ι M v = 0)
-    : toEndC ι (exp M) v = v := by
+theorem exp_apply_of_eq_zero (ι : Qbar l ≃+* ℂ) {n : Type} [Fintype n] [DecidableEq n]
+    {M : Matrix n n (Qbar l)} (hM : IsNilpotent M) {v : n → ℂ} (hv : toEndC ι M v = 0) :
+    toEndC ι (exp M) v = v := by
   obtain ⟨k, hk⟩ := hM
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [exp_eq_sum (k := k + 1) (pow_eq_zero_of_le (Nat.le_succ k) hk), Finset.sum_range_succ',
-      map_add (f := _), map_sum, LinearMap.add_apply, LinearMap.sum_apply, Finset.sum_eq_zero]
+
+  rw [exp_eq_sum (k := k + 1) (pow_eq_zero_of_le (Nat.le_succ k) hk), Finset.sum_range_succ', map_add (f := _),
+  map_sum, LinearMap.add_apply, LinearMap.sum_apply, Finset.sum_eq_zero]
   · simp
   · intro i _
-    rw [map_rat_smul, LinearMap.smul_apply, map_pow, _root_.pow_succ, mul_apply_eq_comp, hv,
-      map_zero, smul_zero]
+    rw [map_rat_smul, LinearMap.smul_apply, map_pow, _root_.pow_succ, mul_apply_eq_comp, hv, map_zero,
+      smul_zero]
 
-theorem eq_algebraMap_of_charpoly
-    {V : Type} [AddCommGroup V] [Module ℂ V] [FiniteDimensional ℂ V]
-    {x : Module.End ℂ V} (hs : x.IsSemisimple)
-    {z : ℂ} (hc : x.charpoly = (X - C z) ^ finrank ℂ V)
-    : x = algebraMap ℂ (Module.End ℂ V) z := by
+theorem eq_algebraMap_of_charpoly {V : Type} [AddCommGroup V] [Module ℂ V] [FiniteDimensional ℂ V]
+    {x : Module.End ℂ V} (hs : x.IsSemisimple) {z : ℂ}
+    (hc : x.charpoly = (X - C z) ^ finrank ℂ V) : x = algebraMap ℂ (Module.End ℂ V) z := by
   have h0 := LinearMap.aeval_self_charpoly x
   rw [hc, map_pow, map_sub, aeval_X, aeval_C] at h0
   have hs' : (x - algebraMap ℂ (Module.End ℂ V) z).IsSemisimple :=
     Module.End.isSemisimple_sub_algebraMap_iff.2 hs
   exact sub_eq_zero.1 (Module.End.eq_zero_of_isNilpotent_isSemisimple ⟨_, h0⟩ hs')
 
-def pull (ι : Qbar l ≃+* ℂ) {a n m : ℕ} (f : (Fin a → ℂ) ≃ₗ[ℂ] (Fin n → ℂ) × (Fin m → ℂ))
-    : (Fin a → Qbar l) ≃ₗ[Qbar l] (Fin n → Qbar l) × (Fin m → Qbar l) where
-  toFun v :=
-    (fun j => ι.symm ((f (fun k => ι (v k))).1 j), fun j => ι.symm ((f (fun k => ι (v k))).2 j))
+def pull (ι : Qbar l ≃+* ℂ) {a n m : ℕ} (f : (Fin a → ℂ) ≃ₗ[ℂ] (Fin n → ℂ) × (Fin m → ℂ)) :
+    (Fin a → Qbar l) ≃ₗ[Qbar l] (Fin n → Qbar l) × (Fin m → Qbar l) where
+  toFun v := (fun j => ι.symm ((f (fun k => ι (v k))).1 j), fun j => ι.symm ((f (fun k => ι (v k))).2 j))
   invFun y := fun k => ι.symm (f.symm (fun j => ι (y.1 j), fun j => ι (y.2 j)) k)
   map_add' v v' := by
-    have e : (fun k => ι ((v + v') k)) = (fun k => ι (v k)) + fun k => ι (v' k) := by funext k; simp
+    have e : (fun k => ι ((v + v') k)) = (fun k => ι (v k)) + fun k => ι (v' k) := by
+      funext k; simp
     simp only [e, map_add (f := _)]
     ext j <;> simp
   map_smul' c v := by
     have e : (fun k => ι ((c • v) k)) = ι c • fun k => ι (v k) := by funext k; simp
     simp only [e, map_smul]
     ext j <;> simp
-  left_inv v := by funext k; simp
-  right_inv y := by ext j <;> simp
+  left_inv v := by
+    funext k; simp
+  right_inv y := by
+    ext j <;> simp
 
-theorem pull_apply
-    (ι : Qbar l ≃+* ℂ)
-    {a n m : ℕ} (f : (Fin a → ℂ) ≃ₗ[ℂ] (Fin n → ℂ) × (Fin m → ℂ)) (v : Fin a → Qbar l)
-    : pull ι f v
-      = (
-        fun j => ι.symm ((f (fun k => ι (v k))).1 j),
-        fun j => ι.symm ((f (fun k => ι (v k))).2 j)
-      ) :=
-  rfl
+theorem pull_apply (ι : Qbar l ≃+* ℂ) {a n m : ℕ} (f : (Fin a → ℂ) ≃ₗ[ℂ] (Fin n → ℂ) × (Fin m → ℂ))
+    (v : Fin a → Qbar l) :
+    pull ι f v = (fun j => ι.symm ((f (fun k => ι (v k))).1 j),
+      fun j => ι.symm ((f (fun k => ι (v k))).2 j)) := rfl
 
-theorem pull_fst_eq_zero
-    (ι : Qbar l ≃+* ℂ)
-    {a n m : ℕ} (f : (Fin a → ℂ) ≃ₗ[ℂ] (Fin n → ℂ) × (Fin m → ℂ)) (v : Fin a → Qbar l)
-    : (pull ι f v).1 = 0 ↔ (f (fun k => ι (v k))).1 = 0 := by
+theorem pull_fst_eq_zero (ι : Qbar l ≃+* ℂ) {a n m : ℕ} (f : (Fin a → ℂ) ≃ₗ[ℂ] (Fin n → ℂ) × (Fin m → ℂ))
+    (v : Fin a → Qbar l) : (pull ι f v).1 = 0 ↔ (f (fun k => ι (v k))).1 = 0 := by
   rw [pull_apply]
   constructor
   · intro e; funext j; simpa using congrFun e j
   · intro e; funext j; simp [e]
 
-theorem pull_snd_eq_zero
-    (ι : Qbar l ≃+* ℂ)
-    {a n m : ℕ} (f : (Fin a → ℂ) ≃ₗ[ℂ] (Fin n → ℂ) × (Fin m → ℂ)) (v : Fin a → Qbar l)
-    : (pull ι f v).2 = 0 ↔ (f (fun k => ι (v k))).2 = 0 := by
+theorem pull_snd_eq_zero (ι : Qbar l ≃+* ℂ) {a n m : ℕ} (f : (Fin a → ℂ) ≃ₗ[ℂ] (Fin n → ℂ) × (Fin m → ℂ))
+    (v : Fin a → Qbar l) : (pull ι f v).2 = 0 ↔ (f (fun k => ι (v k))).2 = 0 := by
   rw [pull_apply]
   constructor
   · intro e; funext j; simpa using congrFun e j
@@ -122,24 +149,19 @@ variable {l : ℕ} [Fact l.Prime]
 variable {E Ω : Type} [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω]
 variable {A : ValuationSubring Ω} {w : HeightOneSpectrum (𝓞 E)} {h : IsPlaceOver A w}
 
-theorem split_away
-    (hl : ((l : ℕ) : 𝓞 E) ∉ w.asIdeal) (ι : Qbar l ≃+* ℂ)
-    {a : ℕ} (r : G E Ω →* GL (Fin a) (Qbar l))
+theorem split_away (hl : ((l : ℕ) : 𝓞 E) ∉ w.asIdeal) (ι : Qbar l ≃+* ℂ) {a : ℕ}
+    (r : G E Ω →* GL (Fin a) (Qbar l))
     (hr : Continuous fun g => ((r g : GL (Fin a) (Qbar l)) : Matrix (Fin a) (Fin a) (Qbar l)))
-    (x y : WD h) (hxy : wdOf (h := h) hl ι r = x.lpSum y)
-    : ∃ U U' : Submodule (Qbar l) (Fin a → Qbar l),
-      IsCompl U U' ∧ finrank (Qbar l) U = x.lpDim ∧ finrank (Qbar l) U' = y.lpDim
-        ∧ (∀ σ ∈ Ine (F := E) A,
-          (∀ v ∈ U, ((r σ : GL _ _) : Matrix (Fin a) (Fin a) (Qbar l)).mulVec v ∈ U)
-            ∧ (∀ v ∈ U', ((r σ : GL _ _) : Matrix (Fin a) (Fin a) (Qbar l)).mulVec v ∈ U'))
-        ∧ (y.mono0
-          → ∀ σ ∈ Ine (F := E) A, ∀ c : Qbar l,
-            y.inePol σ = (X - C (ι c)) ^ y.lpDim
-              → ∀ v ∈ U', ((r σ : GL _ _) : Matrix (Fin a) (Fin a) (Qbar l)).mulVec v = c • v) := by
-  induction x using WD.ind with
-  | hP n b => ?_
-  induction y using WD.ind with
-  | hP m c => ?_
+    (x y : WD h) (hxy : wdOf (h := h) hl ι r = x.lpSum y) :
+    ∃ U U' : Submodule (Qbar l) (Fin a → Qbar l), IsCompl U U' ∧ finrank (Qbar l) U = x.lpDim ∧
+      finrank (Qbar l) U' = y.lpDim ∧
+      (∀ σ ∈ Ine (F := E) A,
+        (∀ v ∈ U, ((r σ : GL _ _) : Matrix (Fin a) (Fin a) (Qbar l)).mulVec v ∈ U) ∧
+        (∀ v ∈ U', ((r σ : GL _ _) : Matrix (Fin a) (Fin a) (Qbar l)).mulVec v ∈ U')) ∧
+      (y.mono0 → ∀ σ ∈ Ine (F := E) A, ∀ c : Qbar l, y.inePol σ = (X - C (ι c)) ^ y.lpDim →
+        ∀ v ∈ U', ((r σ : GL _ _) : Matrix (Fin a) (Fin a) (Qbar l)).mulVec v = c • v) := by
+  induction x using WD.ind with | hP n b => ?_
+  induction y using WD.ind with | hP m c => ?_
   have ht := isTameChar_tameL h hl
   obtain ⟨N, hN⟩ := exists_isMonodromy h hl ht hr
   obtain ⟨z, hz⟩ := IsMonodromy.exists_isFrobSS hl ht hN (deg_frob (h := h)) ι
@@ -151,53 +173,43 @@ theorem split_away
   rw [e, WD.lpSum_mk, WD.mk_eq_mk] at hxy
   obtain ⟨f, hfρ, hfN⟩ := hxy
 
-  have hin
-      : ∀ σ (hσ : σ ∈ Ine (F := E) A) (u : Fin a → ℂ),
-        toEndC ι ((r σ : GL _ _) : Matrix (Fin a) (Fin a) (Qbar l)) u
-          = z.ρ (ineIncl h ⟨σ, hσ⟩) (toEndC ι (exp (tval (tameL h hl) ⟨σ, hσ⟩ • N)) u) := by
+  have hin : ∀ σ (hσ : σ ∈ Ine (F := E) A) (u : Fin a → ℂ),
+      toEndC ι ((r σ : GL _ _) : Matrix (Fin a) (Fin a) (Qbar l)) u =
+        z.ρ (ineIncl h ⟨σ, hσ⟩) (toEndC ι (exp (tval (tameL h hl) ⟨σ, hσ⟩ • N)) u) := by
     intro σ hσ u
-    have hm
-        : ((r σ : GL _ _) : Matrix (Fin a) (Fin a) (Qbar l))
-          = wdMat (tameL h hl) (deg_frob (h := h)) r N (ineIncl h ⟨σ, hσ⟩)
-            * exp (tval (tameL h hl) ⟨σ, hσ⟩ • N) := by
+    have hm : ((r σ : GL _ _) : Matrix (Fin a) (Fin a) (Qbar l)) =
+        wdMat (tameL h hl) (deg_frob (h := h)) r N (ineIncl h ⟨σ, hσ⟩) *
+          exp (tval (tameL h hl) ⟨σ, hσ⟩ • N) := by
       rw [wdMat_ineIncl, mul_assoc, ← exp_add_smul hN.1, neg_add_cancel, zero_smul,
         IsNilpotent.exp_zero, mul_one]
     rw [hm, map_mul, mul_apply_eq_comp, ← hN.rep_apply hl ht deg_frob ι,
       ← hz.ρ_ineIncl (hN.isSmooth_rep hl ht deg_frob ι)]
 
-  have stρ2 : ∀ g u, (f u).2 = 0 → (f (z.ρ g u)).2 = 0 := fun g u hu => by rw [hfρ]; simp [hu]
-  have stρ1 : ∀ g u, (f u).1 = 0 → (f (z.ρ g u)).1 = 0 := fun g u hu => by rw [hfρ]; simp [hu]
-  have stN2 : ∀ u, (f u).2 = 0 → (f (z.N u)).2 = 0 := fun u hu => by rw [hfN]; simp [hu]
-  have stN1 : ∀ u, (f u).1 = 0 → (f (z.N u)).1 = 0 := fun u hu => by rw [hfN]; simp [hu]
+  have stρ2 : ∀ g u, (f u).2 = 0 → (f (z.ρ g u)).2 = 0 := fun g u hu => by
+    rw [hfρ]; simp [hu]
+  have stρ1 : ∀ g u, (f u).1 = 0 → (f (z.ρ g u)).1 = 0 := fun g u hu => by
+    rw [hfρ]; simp [hu]
+  have stN2 : ∀ u, (f u).2 = 0 → (f (z.N u)).2 = 0 := fun u hu => by
+    rw [hfN]; simp [hu]
+  have stN1 : ∀ u, (f u).1 = 0 → (f (z.N u)).1 = 0 := fun u hu => by
+    rw [hfN]; simp [hu]
   have ste2 : ∀ (s : Qbar l) u, (f u).2 = 0 → (f (toEndC ι (exp (s • N)) u)).2 = 0 := by
     intro s u hu
-    have :=
-      mem_of_exp ι
-        (LinearMap.ker ((LinearMap.snd ℂ (Fin n → ℂ) (Fin m → ℂ)).comp
-          (f : (Fin a → ℂ) →ₗ[ℂ] (Fin n → ℂ) × (Fin m → ℂ))))
-        (hN.1.smul s)
-        (fun v hv => by
-          simp only [LinearMap.mem_ker, LinearMap.coe_comp, Function.comp_apply,
-              LinearMap.snd_apply, LinearEquiv.coe_coe]
-            at hv ⊢
-          rw [toEndC_smul, LinearMap.smul_apply, ← hz.1, map_smul, Prod.smul_snd, stN2 v hv,
-            smul_zero])
-        u (by simpa using hu)
+    have := mem_of_exp ι (LinearMap.ker ((LinearMap.snd ℂ (Fin n → ℂ) (Fin m → ℂ)).comp
+      (f : (Fin a → ℂ) →ₗ[ℂ] (Fin n → ℂ) × (Fin m → ℂ)))) (hN.1.smul s) (fun v hv => by
+        simp only [LinearMap.mem_ker, LinearMap.coe_comp, Function.comp_apply, LinearMap.snd_apply,
+          LinearEquiv.coe_coe] at hv ⊢
+        rw [toEndC_smul, LinearMap.smul_apply, ← hz.1, map_smul, Prod.smul_snd, stN2 v hv, smul_zero])
+      u (by simpa using hu)
     simpa using this
   have ste1 : ∀ (s : Qbar l) u, (f u).1 = 0 → (f (toEndC ι (exp (s • N)) u)).1 = 0 := by
     intro s u hu
-    have :=
-      mem_of_exp ι
-        (LinearMap.ker ((LinearMap.fst ℂ (Fin n → ℂ) (Fin m → ℂ)).comp
-          (f : (Fin a → ℂ) →ₗ[ℂ] (Fin n → ℂ) × (Fin m → ℂ))))
-        (hN.1.smul s)
-        (fun v hv => by
-          simp only [LinearMap.mem_ker, LinearMap.coe_comp, Function.comp_apply,
-              LinearMap.fst_apply, LinearEquiv.coe_coe]
-            at hv ⊢
-          rw [toEndC_smul, LinearMap.smul_apply, ← hz.1, map_smul, Prod.smul_fst, stN1 v hv,
-            smul_zero])
-        u (by simpa using hu)
+    have := mem_of_exp ι (LinearMap.ker ((LinearMap.fst ℂ (Fin n → ℂ) (Fin m → ℂ)).comp
+      (f : (Fin a → ℂ) →ₗ[ℂ] (Fin n → ℂ) × (Fin m → ℂ)))) (hN.1.smul s) (fun v hv => by
+        simp only [LinearMap.mem_ker, LinearMap.coe_comp, Function.comp_apply, LinearMap.fst_apply,
+          LinearEquiv.coe_coe] at hv ⊢
+        rw [toEndC_smul, LinearMap.smul_apply, ← hz.1, map_smul, Prod.smul_fst, stN1 v hv, smul_zero])
+      u (by simpa using hu)
     simpa using this
 
   have hC : IsCompl (LinearMap.ker (LinearMap.snd (Qbar l) (Fin n → Qbar l) (Fin m → Qbar l)))
@@ -206,18 +218,12 @@ theorem split_away
     exact LinearMap.isCompl_range_inl_inr
   have hC' := (Submodule.orderIsoMapComap (pull ι f).symm).isCompl hC
   simp only [Submodule.orderIsoMapComap_apply] at hC'
-  have memU
-      : ∀ v : Fin a → Qbar l,
-        v ∈ (LinearMap.ker (LinearMap.snd (Qbar l) (Fin n → Qbar l) (Fin m → Qbar l))).map
-            ((pull ι f).symm : (Fin n → Qbar l) × (Fin m → Qbar l) →ₗ[Qbar l] (Fin a → Qbar l))
-          ↔ (f (fun k => ι (v k))).2 = 0 := fun v => by
+  have memU : ∀ v : Fin a → Qbar l, v ∈ (LinearMap.ker (LinearMap.snd (Qbar l) (Fin n → Qbar l) (Fin m → Qbar l))).map
+      ((pull ι f).symm : (Fin n → Qbar l) × (Fin m → Qbar l) →ₗ[Qbar l] (Fin a → Qbar l)) ↔ (f (fun k => ι (v k))).2 = 0 := fun v => by
     rw [Submodule.mem_map_equiv, LinearEquiv.symm_symm, LinearMap.mem_ker, LinearMap.snd_apply,
       pull_snd_eq_zero]
-  have memU'
-      : ∀ v : Fin a → Qbar l,
-        v ∈ (LinearMap.ker (LinearMap.fst (Qbar l) (Fin n → Qbar l) (Fin m → Qbar l))).map
-            ((pull ι f).symm : (Fin n → Qbar l) × (Fin m → Qbar l) →ₗ[Qbar l] (Fin a → Qbar l))
-          ↔ (f (fun k => ι (v k))).1 = 0 := fun v => by
+  have memU' : ∀ v : Fin a → Qbar l, v ∈ (LinearMap.ker (LinearMap.fst (Qbar l) (Fin n → Qbar l) (Fin m → Qbar l))).map
+      ((pull ι f).symm : (Fin n → Qbar l) × (Fin m → Qbar l) →ₗ[Qbar l] (Fin a → Qbar l)) ↔ (f (fun k => ι (v k))).1 = 0 := fun v => by
     rw [Submodule.mem_map_equiv, LinearEquiv.symm_symm, LinearMap.mem_ker, LinearMap.fst_apply,
       pull_fst_eq_zero]
   refine ⟨_, _, hC', ?_, ?_, fun σ hσ => ⟨fun v hv => ?_, fun v hv => ?_⟩, ?_⟩
@@ -240,15 +246,12 @@ theorem split_away
     have hNu : z.N u = 0 := by
       rw [← f.map_eq_zero_iff, hfN]
       ext j <;> simp [hv, hm]
-    suffices H
-        : (fun i => ι ((((r σ : GL _ _) : Matrix (Fin a) (Fin a) (Qbar l)).mulVec v) i))
-          = fun i => ι ((c0 • v) i) by
+    suffices H : (fun i => ι ((((r σ : GL _ _) : Matrix (Fin a) (Fin a) (Qbar l)).mulVec v) i)) =
+        fun i => ι ((c0 • v) i) by
       funext i; exact ι.injective (congrFun H i)
     have hcu : (fun i => ι ((c0 • v) i)) = ι c0 • u := by funext i; simp [hu]
-    rw [← toEndC_coord, hin σ hσ,
-      exp_apply_of_eq_zero ι (hN.1.smul _)
-        (by rw [toEndC_smul, LinearMap.smul_apply, ← hz.1, hNu, smul_zero]),
-      hcu]
+    rw [← toEndC_coord, hin σ hσ, exp_apply_of_eq_zero ι (hN.1.smul _)
+      (by rw [toEndC_smul, LinearMap.smul_apply, ← hz.1, hNu, smul_zero]), hcu]
     apply f.injective
     rw [hfρ, map_smul]
     refine Prod.ext ?_ ?_
@@ -257,8 +260,5 @@ theorem split_away
 
 end GlobalTheory.WeilDeligne.InertiaSplit
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
-  Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP
-  Formalism.L2 Formalism.L2.Host Formalism.L2.NT NumberField IsDedekindDomain Polynomial
-  GlobalTheory.HeightCounting GlobalTheory.RowTie GlobalTheory.SplitRead GlobalTheory.NPin
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP Formalism.L2 Formalism.L2.Host Formalism.L2.NT NumberField IsDedekindDomain Polynomial GlobalTheory.HeightCounting GlobalTheory.RowTie GlobalTheory.SplitRead GlobalTheory.NPin
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField

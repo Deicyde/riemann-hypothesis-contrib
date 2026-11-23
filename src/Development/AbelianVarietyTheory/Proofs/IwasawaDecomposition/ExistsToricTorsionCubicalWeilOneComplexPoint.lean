@@ -7,6 +7,7 @@ public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ExistsToricTo
 public import Development.AbelianVarietyTheory.Proofs.AbelianSchemeLawProofs.Laws3
 public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.NonemptyFamilyUnifIffUnifAt
 public import Development.AbelianVarietyTheory.Statements.FundamentalDomains.ExistsIsAddFundamentalDomain
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.PerValNeZero
 
 @[expose] public section
 

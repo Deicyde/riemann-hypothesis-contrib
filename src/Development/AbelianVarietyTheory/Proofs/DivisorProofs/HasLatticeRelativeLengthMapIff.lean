@@ -1,22 +1,68 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.BlockTheory.DivisorBase.MultiplicationKernelIdentity
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.PreEig
 public import Development.AbelianVarietyTheory.Proofs.CoherentCohomologyProofs.IsSaturatedSubmoduleIffExistsIsComplOfValuationR
+import Mathlib.Algebra.Module.StablyFree.Basic
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
+import Development.AbelianVarietyTheory.Proofs.DivisorProofs.PreEig
 
 @[expose] public section
 
-open GlobalTheory.IndefiniteRowSideFullHecke.MultiplicationKernelIdentity
-  GlobalTheory.HermitianPreEigenvalues Polynomial Module
+open GlobalTheory.IndefiniteRowSideFullHecke.MultiplicationKernelIdentity GlobalTheory.HermitianPreEigenvalues Polynomial Module
 
 namespace GlobalTheory.LenMap
 
-theorem isTorsionFree_submodule
-    {R : Type*} [CommRing R] [IsDomain R]
-    {M : Type*} [AddCommGroup M] [Module R M]
-    (h : ∀ (c : R) (x : M), c ≠ 0 → c • x = 0 → x = 0) (N : Submodule R M)
-    : Module.IsTorsionFree R N := by
+theorem isTorsionFree_submodule {R : Type*} [CommRing R] [IsDomain R] {M : Type*} [AddCommGroup M]
+    [Module R M] (h : ∀ (c : R) (x : M), c ≠ 0 → c • x = 0 → x = 0) (N : Submodule R M) :
+    Module.IsTorsionFree R N := by
   refine ⟨fun r hr x y hxy => ?_⟩
   have hr0 : r ≠ 0 := hr.ne_zero
   have h1 : r • ((x : M) - y) = 0 := by
@@ -25,14 +71,11 @@ theorem isTorsionFree_submodule
     rw [smul_sub, this, sub_self]
   exact Subtype.ext (sub_eq_zero.1 (h r _ hr0 h1))
 
-theorem exists_basis_sum
-    {R : Type*} [CommRing R]
-    {M M' : Type*} [AddCommGroup M] [Module R M] [AddCommGroup M'] [Module R M']
-    (f : M →ₗ[R] M') (Z : Submodule R M)
-    {ι κ : Type*} [Fintype ι] [Fintype κ]
-    (d : Basis ι R ↥(Z ⊓ LinearMap.ker f))
-    (e : Basis κ R ↥(Z.map f)) (σ : κ → M) (hσZ : ∀ j, σ j ∈ Z) (hσf : ∀ j, f (σ j) = e j)
-    : ∃ b : Basis (ι ⊕ κ) R Z, ∀ k, (b k : M) = Sum.elim (fun i => (d i : M)) σ k := by
+theorem exists_basis_sum {R : Type*} [CommRing R] {M M' : Type*} [AddCommGroup M] [Module R M]
+    [AddCommGroup M'] [Module R M'] (f : M →ₗ[R] M') (Z : Submodule R M) {ι κ : Type*}
+    [Fintype ι] [Fintype κ] (d : Basis ι R ↥(Z ⊓ LinearMap.ker f)) (e : Basis κ R ↥(Z.map f))
+    (σ : κ → M) (hσZ : ∀ j, σ j ∈ Z) (hσf : ∀ j, f (σ j) = e j) :
+    ∃ b : Basis (ι ⊕ κ) R Z, ∀ k, (b k : M) = Sum.elim (fun i => (d i : M)) σ k := by
   classical
   let w : ι ⊕ κ → M := Sum.elim (fun i => (d i : M)) σ
   have hwZ : ∀ k, w k ∈ Z := by
@@ -53,7 +96,7 @@ theorem exists_basis_sum
       simpa [Fintype.sum_sum_type, u, w] using hg
     have h2 : ∑ j, g (Sum.inr j) • (e j : M') = 0 := by
       have := congrArg f hg'
-      set_option synthInstance.maxHeartbeats 100000 in
+
       simpa [map_add (f := _), map_sum, map_smul, hdf, hσf] using this
     have hr : ∀ j, g (Sum.inr j) = 0 := Fintype.linearIndependent_iff.1 heli _ h2
     have h1 : ∑ i, g (Sum.inl i) • (d i : M) = 0 := by simpa [hr] using hg'
@@ -72,8 +115,8 @@ theorem exists_basis_sum
       simpa only [Submodule.coe_smul] using h0
     have hk : z - ∑ j, bb j • σ j ∈ Z ⊓ LinearMap.ker f := by
       refine Submodule.mem_inf.2 ⟨Z.sub_mem hz (Z.sum_mem fun j _ => Z.smul_mem _ (hσZ j)), ?_⟩
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [LinearMap.mem_ker, map_sub, map_sum]
+
+      rw [LinearMap.mem_ker, map_sub, map_sum]
       simp only [map_smul, hσf]
       rw [hy, sub_self]
     have hkk := congrArg Subtype.val (d.sum_repr ⟨_, hk⟩)
@@ -89,22 +132,16 @@ end GlobalTheory.LenMap
 
 namespace GlobalTheory.LenMap
 
-variable
-  {C : Type} [Field C]
-  (v : AddValuation C (WithTop ℝ))
-  {M : Type} [AddCommGroup M] [Module (Int0 v) M]
+variable {C : Type} [Field C] (v : AddValuation C (WithTop ℝ)) {M : Type} [AddCommGroup M]
+  [Module (Int0 v) M]
 
-theorem val_det_eq
-    {ι : Type} [Fintype ι] [DecidableEq ι]
-    {X' X : Submodule (Int0 v) M}
+theorem val_det_eq {ι : Type} [Fintype ι] [DecidableEq ι] {X' X : Submodule (Int0 v) M}
     (hle : X' ≤ X) (b c : Basis ι (Int0 v) X) (b' c' : Basis ι (Int0 v) X')
-    (A B : Matrix ι ι (Int0 v))
-    (hA : ∀ k, (b' k : M) = ∑ i, A i k • (b i : M)) (hB : ∀ k, (c' k : M) = ∑ i, B i k • (c i : M))
-    : v (A.det : C) = v (B.det : C) := by
-  have key
-      : ∀ (b : Basis ι (Int0 v) X) (b' : Basis ι (Int0 v) X') (A : Matrix ι ι (Int0 v)),
-        (∀ k, (b' k : M) = ∑ i, A i k • (b i : M))
-          → LinearMap.toMatrix b' b (Submodule.inclusion hle) = A := by
+    (A B : Matrix ι ι (Int0 v)) (hA : ∀ k, (b' k : M) = ∑ i, A i k • (b i : M))
+    (hB : ∀ k, (c' k : M) = ∑ i, B i k • (c i : M)) : v (A.det : C) = v (B.det : C) := by
+  have key : ∀ (b : Basis ι (Int0 v) X) (b' : Basis ι (Int0 v) X')
+      (A : Matrix ι ι (Int0 v)), (∀ k, (b' k : M) = ∑ i, A i k • (b i : M)) →
+      LinearMap.toMatrix b' b (Submodule.inclusion hle) = A := by
     intro b b' A hA
     ext i k
     have : Submodule.inclusion hle (b' k) = ∑ i, A i k • b i := by
@@ -120,15 +157,13 @@ theorem val_det_eq
   have u2 : IsUnit (c'.toMatrix b').det := by
     letI := c'.invertibleToMatrix b'
     exact Matrix.isUnit_det_of_invertible _
-  rw [hAB, Matrix.det_mul, Matrix.det_mul, Subring.coe_mul, Subring.coe_mul, v.map_mul, v.map_mul,
-    v_unit v u1, v_unit v u2, zero_add, add_zero]
+  rw [hAB, Matrix.det_mul, Matrix.det_mul, Subring.coe_mul, Subring.coe_mul, v.map_mul,
+    v.map_mul, v_unit v u1, v_unit v u2, zero_add, add_zero]
 
-theorem relLen_iff_of_basis
-    {ι : Type} [Fintype ι] [DecidableEq ι]
-    {X' X : Submodule (Int0 v) M} (hle : X' ≤ X) (b : Basis ι (Int0 v) X) (b' : Basis ι (Int0 v) X')
-    (A : Matrix ι ι (Int0 v)) (hA : ∀ k, (b' k : M) = ∑ i, A i k • (b i : M))
-    (r : ℝ)
-    : RelLen v X' X r ↔ v (A.det : C) = r := by
+theorem relLen_iff_of_basis {ι : Type} [Fintype ι] [DecidableEq ι] {X' X : Submodule (Int0 v) M}
+    (hle : X' ≤ X) (b : Basis ι (Int0 v) X) (b' : Basis ι (Int0 v) X')
+    (A : Matrix ι ι (Int0 v)) (hA : ∀ k, (b' k : M) = ∑ i, A i k • (b i : M)) (r : ℝ) :
+    RelLen v X' X r ↔ v (A.det : C) = r := by
   constructor
   · rintro ⟨n, c, c', B, hB, hr⟩
     let e := b.indexEquiv c
@@ -145,11 +180,9 @@ theorem relLen_iff_of_basis
       exact (Equiv.sum_comp e.symm (fun i => A i (e.symm k) • (b i : M))).symm
     · rw [Matrix.det_reindex_self]; exact h
 
-theorem card_eq_of_relLen
-    {ι ι' : Type} [Fintype ι] [Fintype ι']
-    {X' X : Submodule (Int0 v) M} {r : ℝ}
-    (h : RelLen v X' X r) (b : Basis ι (Int0 v) X) (b' : Basis ι' (Int0 v) X')
-    : Fintype.card ι = Fintype.card ι' := by
+theorem card_eq_of_relLen {ι ι' : Type} [Fintype ι] [Fintype ι'] {X' X : Submodule (Int0 v) M}
+    {r : ℝ} (h : RelLen v X' X r) (b : Basis ι (Int0 v) X) (b' : Basis ι' (Int0 v) X') :
+    Fintype.card ι = Fintype.card ι' := by
   obtain ⟨n, c, c', -, -, -⟩ := h
   rw [Fintype.card_congr (b.indexEquiv c), Fintype.card_congr (b'.indexEquiv c')]
 
@@ -157,14 +190,7 @@ end GlobalTheory.LenMap
 
 namespace GlobalTheory.LenMap
 
-theorem relLen_map_iff
-    : ∀ (C : Type) [Field C] (v : AddValuation C (WithTop ℝ)) (M M' : Type) [AddCommGroup M]
-        [Module (Int0 v) M] [AddCommGroup M'] [Module (Int0 v) M'],
-      (∀ (c : Int0 v) (x : M), c ≠ 0 → c • x = 0 → x = 0)
-        → (∀ (c : Int0 v) (x : M'), c ≠ 0 → c • x = 0 → x = 0)
-        → ∀ (f : M →ₗ[Int0 v] M') (X' X : Submodule (Int0 v) M),
-          X' ≤ X → X ⊓ LinearMap.ker f ≤ X' → Module.Finite (Int0 v) X → Module.Finite (Int0 v) X'
-            → ∀ r : ℝ, (RelLen v X' X r ↔ RelLen v (X'.map f) (X.map f) r) := by
+theorem relLen_map_iff : ∀ (C : Type) [Field C] (v : AddValuation C (WithTop ℝ)) (M M' : Type) [AddCommGroup M] [Module (Int0 v) M] [AddCommGroup M'] [Module (Int0 v) M'], (∀ (c : Int0 v) (x : M), c ≠ 0 → c • x = 0 → x = 0) → (∀ (c : Int0 v) (x : M'), c ≠ 0 → c • x = 0 → x = 0) → ∀ (f : M →ₗ[Int0 v] M') (X' X : Submodule (Int0 v) M), X' ≤ X → X ⊓ LinearMap.ker f ≤ X' → Module.Finite (Int0 v) X → Module.Finite (Int0 v) X' → ∀ r : ℝ, (RelLen v X' X r ↔ RelLen v (X'.map f) (X.map f) r) := by
   intro C _ v M M' _ _ _ _ htM htM' f X' X hle hker hX hX' r
   classical
   haveI := isTorsionFree_submodule htM' (X.map f)
@@ -221,8 +247,8 @@ theorem relLen_map_iff
     have hB : ∀ k, (c' k : M') = ∑ j, B j k • (c j : M') := by
       intro k
       have h1 := congrArg f (hA (Sum.inr k))
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [hb', Sum.elim_inr, hσf', map_sum, Fintype.sum_sum_type] at h1
+
+      rw [hb', Sum.elim_inr, hσf', map_sum, Fintype.sum_sum_type] at h1
       simpa [hb, hdf, hσf, B, Matrix.toBlocks₂₂] using h1
     rw [relLen_iff_of_basis v (Submodule.map_mono hle) c c' B hB]
     have hinl : ∀ i, Submodule.inclusion hle (b' (Sum.inl i)) = b (Sum.inl i) := by

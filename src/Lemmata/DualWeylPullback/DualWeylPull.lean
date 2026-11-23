@@ -1,192 +1,51 @@
 module
 
-public import Mathlib
-public import Formalism.SharpRestriction.GrowthBounds.ColumnSpanDensity.LatRetract
-public import Formalism.SharpRestriction.GrowthBounds.ColumnSpanDensity.TensorKP
-public import Formalism.SharpRestriction.GrowthBounds.ColumnSpanDensity.LemmaSMat
-public import Formalism.PolynomialDimension.MultinomialDepth.WeylDimPosOfAntitone
-public import Formalism.GradedWeylDivisibility.FinalD
-public import Formalism.SharpRestriction.GrowthBounds.ColumnSpanDensity.HarProjEqZeroIff
-public import Formalism.PolynomialDimension.DigitClassSize
-public import Formalism.PolynomialDimension.DigitClassCount
-public import Formalism.SharpRestriction.GrowthBounds.ObjSeg
-public import Formalism.SharpRestriction.GrowthBounds.ObjBridge
-public import Formalism.LocalRingCardinality.Params
-public import Formalism.LocalRingCardinality.DataSpaces
-public import Formalism.LocalRingCardinality.DataCoeff
-public import Formalism.LocalRingCardinality.DataArith
-public import Formalism.LocalRingCardinality.DataKernels
-public import Formalism.LocalRingCardinality.DataRows
-public import Formalism.SharpRestriction.CuspSpanNormBounds.DataS
-public import Formalism.SharpRestriction.GrowthBounds.DataG
-public import Formalism.LocalRingCardinality.DataCD
-public import Formalism.SharpRestriction.GrowthBounds.ObjPol
-public import Formalism.MahlerMeasure.WithMargin
-public import Formalism.SubspaceCounting.ChoiceOfTopsRefined
-public import Formalism.GrowthSums.LemmaATwoFactList
-public import Formalism.FrobeniusOrbits.DiscrMaximalRealCyclotomic
-public import Formalism.FrobeniusOrbits.HostOrbitsPlaces
-public import Formalism.FrobeniusOrbits.HostDiffSupport
-public import Formalism.FrobeniusOrbits.HostThickExists
-public import Formalism.SharpRestriction.RamificationFrobenius.TotientGaloisClasses.ConjEMemHostFIff
-public import Formalism.CoboundaryTransfers.Statement
-public import Formalism.DegreeFormula.FlagDegFormula
-public import Formalism.SharpRestriction.GlobalSchurBounds.GeneralLinearActions.FrameTransport
 public import Formalism.SharpRestriction.GrowthBounds.UnramifiedQuadraticSetting
-public import Formalism.SharpRestriction.GrowthBounds.DataGChain
-public import Formalism.SharpRestriction.GrowthBounds.SegRing
-public import Formalism.PolynomialDimension.DetMulEqSumAdjugate
-public import Formalism.PolynomialDimension.FinalNum
 public import Formalism.GradedWeylDivisibility.DualWeylDominanceOf
-public import Formalism.GradedWeylDivisibility.FinalB
-public import Formalism.GradedWeylDivisibility.StatementE
-public import Formalism.FrobeniusOrbits.FrobeniusOrbitsProofs.RealCyclotomicSubfield
-public import Formalism.LocalRingCardinality.DataLevel
-public import Formalism.SatakeDualWeyl.Statement
-public import Formalism.FormalDegreeBessel.StatementG
-public import Formalism.SharpRestriction.GrowthBounds.Imports
-public import Formalism.ThetaLiftIndependence.Statement
-public import Formalism.ThetaLiftIndependence.ThetaOrbitSums.LatLiftIndep
-public import Formalism.ThetaLiftIndependence.ThetaOrbitSums.GaussOp
-public import Formalism.FrobeniusOrbits.FrobeniusOrbitsProofs.DiscriminantRealSubfield
-public import Formalism.FrobeniusOrbits.FrobeniusOrbitsProofs.ThickOrbit
-public import Formalism.SharpRestriction.RamificationFrobenius.TotientGaloisClasses.ZsmulGeneratorEqZeroOfProjection
-public import Formalism.HarderNarasimhan.HarderNarasimhanProofs.DegSupermodZ
-public import Formalism.HarderNarasimhan.HarderNarasimhanProofs.ExistsSmulMemOfFinrankEq
-public import Formalism.HarderNarasimhan.HarderNarasimhanProofs.FinSup
-public import Formalism.HarderNarasimhan.HarderNarasimhanProofs.SatBasic
-public import Formalism.HarderNarasimhan.HarderNarasimhanProofs.RatioMax
-public import Formalism.HarderNarasimhan.HarderNarasimhanProofs.DegSupermod
-public import Formalism.HarderNarasimhan.HarderNarasimhanProofs.MuChar
-public import Formalism.HarderNarasimhan.HarderNarasimhanProofs.HNStep
-public import Formalism.HarderNarasimhan.HarderNarasimhanProofs.SlopeIneq
-public import Formalism.HarderNarasimhan.HarderNarasimhanProofs.PolygonSlopeSum
-public import Formalism.HarderNarasimhan.HarderNarasimhanProofs.HNSlopes
-public import Formalism.HarderNarasimhan.HarderNarasimhanProofs.ShiftInvariance
-public import Formalism.HarderNarasimhan.HarderNarasimhanProofs.Duality
-public import Formalism.HarderNarasimhan.DegSupermodZ
-public import Formalism.LatticeSlopes.ExistsSaturatedSlopeEqMuMax
-public import Formalism.LatticeSlopes.LatticeSlopesProofs.DiscreteTopologyOfLe
-public import Formalism.LatticeSlopes.LatticeSlopesProofs.ShortVector
-public import Formalism.HarderNarasimhan.HarderNarasimhanProofs.DiscreteSpanOfLinIndep
-public import Formalism.HarderNarasimhan.HarderNarasimhanProofs.SizeMu
-public import Formalism.HarderNarasimhan.HarderNarasimhanProofs.PlaceSplit
-public import Formalism.HarderNarasimhan.HarderNarasimhanProofs.GramBlock
-public import Formalism.HarderNarasimhan.HarderNarasimhanProofs.RescaleCovol
-public import Formalism.HarderNarasimhan.HarderNarasimhanProofs.TwistFinrankEq
-public import Formalism.HarderNarasimhan.HarderNarasimhanProofs.SlopeIneqMean
-public import Formalism.HarderNarasimhan.HarderNarasimhanProofs.HtGram
-public import Formalism.HarderNarasimhan.HarderNarasimhanProofs.HtImage
-public import Formalism.HarderNarasimhan.HarderNarasimhanProofs.Rerealize
-public import Formalism.HarderNarasimhan.HarderNarasimhanProofs.QuotRealize
-public import Formalism.HarderNarasimhan.HarderNarasimhanProofs.FrameLinearAlgebraFirst
-public import Formalism.SatakeDualWeyl.AdelicIwasawaHecke.Actions
-public import Formalism.SatakeDualWeyl.AdelicIwasawaHecke.AutomorphicFormsDecompositionHolds
-public import Formalism.SatakeDualWeyl.AdelicIwasawaHecke.HeckeAssoc
-public import Formalism.SatakeDualWeyl.AdelicIwasawaHecke.RationalPointsLeHolds
-public import Formalism.SatakeDualWeyl.AdelicIwasawaHecke.Bridge
-public import Formalism.SatakeDualWeyl.AdelicIwasawaHecke.HeckeConvolutionMemHolds
-public import Formalism.SatakeDualWeyl.AdelicIwasawaHecke.LocalAlgebraInertPrime
-public import Formalism.SatakeDualWeyl.AdelicIwasawaHecke.Heckebasic
-public import Formalism.SatakeDualWeyl.AdelicIwasawaHecke.InclusionInjective
-public import Formalism.SatakeDualWeyl.AdelicIwasawaHecke.Ipindep
-public import Formalism.SatakeDualWeyl.AdelicIwasawaHecke.Levelvsplit
-public import Formalism.SatakeDualWeyl.AdelicIwasawaHecke.LinSubstIsHomogeneous
-public import Formalism.SatakeDualWeyl.AdelicIwasawaHecke.SignatureConjugationInvariant
-public import Formalism.SatakeDualWeyl.AdelicIwasawaHecke.SignatureExists
-public import Formalism.SatakeDualWeyl.AdelicIwasawaHecke.SplitUnitaryGroupIso
-public import Formalism.SatakeDualWeyl.AdelicIwasawaHecke.Stabfin
-public import Formalism.SatakeDualWeyl.AdelicIwasawaHecke.Stabstd
-public import Formalism.SatakeDualWeyl.AdelicIwasawaHecke.Stdform
-public import Formalism.SatakeDualWeyl.AdelicIwasawaHecke.Transport
-public import Formalism.SatakeDualWeyl.AdelicIwasawaHecke.Upqcpt
-public import Formalism.SatakeDualWeyl.AdelicIwasawaHecke.DualWeylModuleStable
-public import Formalism.SatakeDualWeyl.AdelicIwasawaHecke.Wlocal
-public import Formalism.SatakeDualWeyl.DualWeylRepApply
-public import Formalism.FrobeniusOrbits.Statement
-public import Formalism.FormalDegreeBessel.StatementDS
-public import Formalism.SharpRestriction.CuspSpanNormBounds.Point
-public import Formalism.HarderNarasimhan.StatementPl
-public import Formalism.CorankShare.StatementFR
-public import Formalism.CorankShare.CorankShareProofs.LayerCakeFormula
-public import Formalism.CorankShare.CorankShareProofs.SumNormSqLeHilbertSchmidt
-public import Formalism.HarderNarasimhan.StatementFrameF
-public import Formalism.SatakeDualWeyl.StatementC
-public import Formalism.SatakeDualWeyl.StatementE
-public import Formalism.SatakeDualWeyl.AdelicIwasawaHecke.Heckecomm
-public import Formalism.SatakeDualWeyl.StatementF
-public import Formalism.SatakeDualWeyl.AdelicIwasawaHecke.SphericalA
-public import Formalism.TameInertiaTowers.CentralOrderTwo.OrderOfThreeUnitsTwoPow
-public import Formalism.TameInertiaTowers.CentralOrderTwo.TwoAdic
-public import Formalism.TameInertiaTowers.CentralOrderTwo.MemDecompositionSubgroupIff
-public import Formalism.TameInertiaTowers.CentralOrderTwo.NegOneNeOneUnitsZmodFour
-public import Formalism.TameInertiaTowers.CentralOrderTwo.Groups
-public import Formalism.TameInertiaTowers.CentralOrderTwo.NormalOrderTwoCentral
-public import Formalism.TameInertiaTowers.CentralOrderTwo.Galois
-public import Formalism.TameInertiaTowers.CentralOrderTwo.ConjEqInvOfPowEqOne
-public import Formalism.FormalDegreeBessel.StatementBF
-public import Formalism.FormalDegreeBessel.StatementWR
-public import Formalism.HermitianLattices.HermitianLatticesProofs.DualBasic
-public import Formalism.HermitianLattices.HermitianLatticesProofs.IsomAct
-public import Formalism.HermitianLattices.HermitianLatticesProofs.LocBasic
-public import Formalism.HermitianLattices.StatementTheta
-public import Formalism.HermitianLattices.StatementLat
-public import Formalism.HermitianLattices.HermitianLatticesProofs.LocDual
-public import Formalism.HermitianLattices.HermitianLatticesProofs.GenusBasic
-public import Formalism.HermitianLattices.HermitianLatticesProofs.DualLattice
-public import Formalism.HermitianLattices.HermitianLatticesProofs.FinIntermediate
-public import Formalism.HermitianLattices.HermitianLatticesProofs.IsomOfTrace
-public import Formalism.HermitianLattices.HermitianLatticesProofs.DualOrthSum
-public import Formalism.HermitianLattices.HermitianLatticesProofs.GenusScale
-public import Formalism.HermitianLattices.HermitianLatticesProofs.GenusCovolBound
-public import Formalism.HermitianLattices.HermitianLatticesProofs.ClassSetAssembly
-public import Formalism.HermitianLattices.StatementMaj
-public import Formalism.HermitianLattices.HermitianLatticesProofs.MajBasic
-public import Formalism.HermitianLattices.HermitianLatticesProofs.GenusCovol
-public import Formalism.HermitianLattices.HermitianLatticesProofs.UnimodUnramUnique
-public import Formalism.DirichletDensity.DirichletDensityProofs.QuadDiscr
-public import Formalism.DirichletDensity.DirichletDensityProofs.APLogDensity
-public import Formalism.DirichletDensity.Statement
-public import Formalism.CMTypeGalois.CMTypeFrobenius.MQGalois
-public import Formalism.CMTypeGalois.CMTypeFrobenius.MQKummer
-public import Formalism.CMTypeGalois.StatementField
-public import Formalism.StatementCM
-public import Formalism.SatakeDualWeyl.AdelicIwasawaHecke.SatakeComb
-public import Formalism.SatakeDualWeyl.AdelicIwasawaHecke.SatakeMat
-public import Formalism.SatakeDualWeyl.AdelicIwasawaHecke.TjcosetsFF
-public import Formalism.RealPlaceAnalysis.StatementE
-public import Formalism.HermitianLattices.DefsCS
-public import Formalism.HermitianLattices.GenusCovolBound
-public import Formalism.HermitianLattices.DiscrFinite
-public import Formalism.LatticeTheta.ThetaShiftInversion
-public import Formalism.SatakeDualWeyl.StatementB
-public import Formalism.RealPlaceAnalysis.RealPlaceTaylor.CompactCasimirHighestWeight
-public import Formalism.RealPlaceAnalysis.RealPlaceTaylor.IsCompactInvariantCompactSpan
-public import Formalism.RealPlaceAnalysis.RealPlaceTaylor.IsCompactInvariantOrthogonalInf
-public import Formalism.RealPlaceAnalysis.RealPlaceTaylor.FirstSlotSliceSlotMixedCasimirZero
-public import Formalism.SuccessiveMinima.SuccessiveMinimaProofs.MinkCore
-public import Formalism.SuccessiveMinima.SuccessiveMinimaProofs.GjLevel
-public import Formalism.SuccessiveMinima.SuccessiveMinimaProofs.GjScale
-public import Formalism.SuccessiveMinima.SuccessiveMinimaProofs.SuccMin
-public import Formalism.SuccessiveMinima.SuccessiveMinimaProofs.AdaptedBasis
-public import Formalism.SuccessiveMinima.SuccessiveMinimaProofs.MeasureEqCovolumeMulVolumeImage
-public import Formalism.SuccessiveMinima.DefsMink
-public import Formalism.RealPlaceAnalysis.RealPlaceTaylor.IndefiniteUnitaryPreservesForm
-public import Formalism.RealPlaceAnalysis.RealPlaceTaylor.CartanInvolutionConjTransposeMul
-public import Formalism.RealPlaceAnalysis.RealPlaceTaylor.ComplexifiedDerivativeCommutator
-public import Formalism.RealPlaceAnalysis.StatementU
-public import Formalism.RealPlaceAnalysis.RealPlaceTaylor.MemUnitaryGroupIffMulConjTranspose
-public import Formalism.RealPlaceAnalysis.StatementA
-public import Formalism.RealPlaceAnalysis.RealPlaceTaylor.QuadraticInequalityBoundHolds
-public import Formalism.RealPlaceAnalysis.RealPlaceTaylor.SumOfSquaresIdentityHolds
-public import Formalism.RealPlaceAnalysis.RealPlaceTaylor.CasKHW
-public import Formalism.RealPlaceAnalysis.RealPlaceTaylor.HWDiag
-public import Formalism.RealPlaceAnalysis.RealPlaceTaylor.TrPowSumFilterZero
-public import Formalism.RealPlaceAnalysis.RealPlaceTaylor.QuantumDetHighestWeightHolds
-public import Formalism.RealPlaceAnalysis.RealPlaceTaylor.ShiftedGeneratorEqIteSmulAdd
-public import Formalism.RealPlaceAnalysis.RealPlaceTaylor.GeneratorCommutatorQuantumDet
-public import Formalism.RealPlaceAnalysis.SmoothOnG
-public import Formalism.RealPlaceAnalysis.StatementC
+public import Formalism.GradedWeylDivisibility.FinalD
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Lemma
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -209,8 +68,8 @@ private lemma rowAct_map {O K : Type} [CommRing O] [CommRing K] (φ : O →+* K)
   congr 1
   congr 1
   funext v
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp [map_sum]
+
+  simp [map_sum]
 
 private lemma colAddGen_map {O K : Type} [CommRing O] [CommRing K] (φ : O →+* K) {k n : ℕ}
     (l j : Fin n) (f : MvPolynomial (Fin k × Fin n) O) :

@@ -1,15 +1,54 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.TwistStep
-public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.FiltrationZeroMembership
 public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.ImportsAlt
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsBcrisPlusSeriesWithThetaResiduesStatement
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.UntiltFrobeniusSeriesLinearIndependentOfFirstTerStatement
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsSortedNormalizedOrthBasisComplexPAdicStatement
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsOrthogonalFamilyResidueZerosStatement
-public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.BcrisPlusFrobeniusStableSubringInFilZero
 public import Development.AbelianVarietyTheory.CrystallinePeriods.RingBasics
+public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.FiltrationZeroMembership
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.BcrisPlusFrobeniusStableSubringInFilZero
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsBcrisPlusSeriesWithThetaResiduesStatement
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsOrthogonalFamilyResidueZerosStatement
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsSortedNormalizedOrthBasisComplexPAdicStatement
+public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.UntiltFrobeniusSeriesLinearIndependentOfFirstTerStatement
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -74,8 +113,8 @@ theorem exII : ExII := by
     have he : (⟨_, hm⟩ : S) = ∑ j, (⟨_, hqS (c j)⟩ : S) * ⟨lam j, hlS j⟩ := by
       apply Subtype.ext; simp [Algebra.smul_def]
     have h0 : θ ⟨_, hm⟩ = 0 := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [he, map_sum, ← hc]
+
+      rw [he, map_sum, ← hc]
       refine Finset.sum_congr rfl fun j _ => ?_
       rw [map_mul, hθq]
     exact (hker ⟨_, hm⟩).1 h0
@@ -122,8 +161,8 @@ theorem exII : ExII := by
       : ∀ (i : ℕ) (j : Fin h),
         ev P i (a j) = ∑ k, algebraMap ℚ_[l] P.R.BdR (Pm k j) * ev P i (b k) := by
     intro i j
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [a, ← evHom_apply, map_sum, map_mul]
+
+    simp only [a, ← evHom_apply, map_sum, map_mul]
     refine Finset.sum_congr rfl fun k _ => ?_
     rw [evHom_apply, evHom_apply, ev_algebraMap]
   refine ⟨a, ?_, ?_, ?_, ?_⟩
@@ -137,8 +176,8 @@ theorem exII : ExII := by
           ∑ j, algebraMap ℚ_[l] P.R.B (Pm⁻¹ j j0 * Pm k j) * b k
             = algebraMap ℚ_[l] P.R.B ((Pm * Pm⁻¹) k j0) * b k := by
         intro k
-        set_option synthInstance.maxHeartbeats 100000 in
-          rw [← Finset.sum_mul, ← map_sum, Matrix.mul_apply]
+
+        rw [← Finset.sum_mul, ← map_sum, Matrix.mul_apply]
         simp only [mul_comm]
       simp only [this, hinv, Matrix.one_apply]
       simp
@@ -150,8 +189,8 @@ theorem exII : ExII := by
     exact (hPring _ _ (hPq _) (hbP k)).2
   · intro j
     simp only [a]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← AlgHom.coe_pow, map_sum, Finset.mul_sum]
+
+    rw [← AlgHom.coe_pow, map_sum, Finset.mul_sum]
     refine Finset.sum_congr rfl fun k _ => ?_
     rw [map_mul, AlgHom.commutes, AlgHom.coe_pow, hbφ k]
     ring
@@ -167,8 +206,8 @@ theorem exII : ExII := by
       simp only [hev, Finset.mul_sum]
       simp
     rw [he]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_mul, hθq, hθb]
+
+    simp only [map_sum, map_mul, hθq, hθb]
     rw [Finset.sum_comm]
     rw [← hzero i]
     refine Finset.sum_congr rfl fun k _ => ?_

@@ -1,11 +1,58 @@
 module
 
 public import ReciprocityTheory.L2DbarEstimates.Localization.UnweightBackStatement
-public import ReciprocityTheory.L2DbarEstimates.ChartDerivatives.Imports
-public import ReciprocityTheory.L2DbarEstimates.MinimalSolutions.CvxOfConvex
-public import ReciprocityTheory.L2DbarEstimates.MinimalSolutions.MinimalSolution
-public import ReciprocityTheory.L2DbarEstimates.MinimalSolutions.HormanderLemma
-public import ReciprocityTheory.L2DbarEstimates.MinimalSolutions.OntoWithBoundTop
+public import Mathlib.MeasureTheory.Function.L2Space
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
+public import ReciprocityTheory.L2DbarEstimates.ChartDerivatives.ChartSymmEventuallyEq
+public import ReciprocityTheory.L2DbarEstimates.ChartDerivatives.MeasurableSetImageOfIsLocalHomeomorph
+public import ReciprocityTheory.L2DbarEstimates.ChartDerivatives.TsupportDbSubset
+public import Mathlib.Analysis.Calculus.ContDiff.Basic
+public import Mathlib.Analysis.Calculus.ContDiff.Comp
+public import Mathlib.Analysis.SpecialFunctions.ExpDeriv
 
 @[expose] public section
 
@@ -18,14 +65,11 @@ noncomputable section
 
 section SplitHelpers
 
-variable
-  {M : Type*}
-  [TopologicalSpace M] [T2Space M] [SecondCountableTopology M] [MeasurableSpace M] [BorelSpace M]
-  {n : ℕ} {z : M → V n}
+variable {M : Type*} [TopologicalSpace M] [T2Space M] [SecondCountableTopology M]
+  [MeasurableSpace M] [BorelSpace M] {n : ℕ} {z : M → V n}
 
-theorem splitT_meas_dens (ph : M → ℝ) (hph : Continuous ph)
-    : Measurable (fun x => ENNReal.ofReal (Real.exp (- ph x))) :=
-  (ENNReal.continuous_ofReal.comp (Real.continuous_exp.comp hph.neg)).measurable
+theorem splitT_meas_dens (ph : M → ℝ) (hph : Continuous ph) :
+    Measurable (fun x => ENNReal.ofReal (Real.exp (-ph x))) := (ENNReal.continuous_ofReal.comp (Real.continuous_exp.comp hph.neg)).measurable
 
 theorem splitT_ac (ph : M → ℝ) (hph : Continuous ph) : vol n z ≪ wvol n z ph := by
   unfold wvol
@@ -33,39 +77,35 @@ theorem splitT_ac (ph : M → ℝ) (hph : Continuous ph) : vol n z ≪ wvol n z 
     (Filter.Eventually.of_forall fun x => ?_)
   simp [Real.exp_pos]
 
-theorem splitT_ae
-    {X : Type*} (ph : M → ℝ) (hph : Continuous ph) {F G : M → X} (h : F =ᵐ[wvol n z ph] G)
-    : F =ᵐ[vol n z] G :=
-  (splitT_ac ph hph).ae_le h
+theorem splitT_ae {X : Type*} (ph : M → ℝ) (hph : Continuous ph) {F G : M → X}
+    (h : F =ᵐ[wvol n z ph] G) : F =ᵐ[vol n z] G := (splitT_ac ph hph).ae_le h
 
-theorem splitT_fin (hz : IsLocalHomeomorph z) (ph : M → ℝ) (hph : Continuous ph)
-    : IsFiniteMeasureOnCompacts (wvol n z ph) := by
+theorem splitT_fin (hz : IsLocalHomeomorph z) (ph : M → ℝ) (hph : Continuous ph) :
+    IsFiniteMeasureOnCompacts (wvol n z ph) := by
   haveI := vol_isFiniteMeasureOnCompacts n z hz
   unfold wvol
   refine ⟨fun K hK => ?_⟩
   obtain ⟨C, hC⟩ := hK.exists_bound_of_continuousOn (Real.continuous_exp.comp hph.neg).continuousOn
-  have hC' : ∀ x ∈ K, Real.exp (- ph x) ≤ C := fun x hx => by
+  have hC' : ∀ x ∈ K, Real.exp (-ph x) ≤ C := fun x hx => by
     have h1 := hC x hx
     rw [Real.norm_eq_abs] at h1
     exact (le_abs_self _).trans h1
   rw [withDensity_apply _ hK.isClosed.measurableSet]
-  calc
-    ∫⁻ x in K, ENNReal.ofReal (Real.exp (-ph x)) ∂vol n z ≤ ∫⁻ _ in K, ENNReal.ofReal C ∂vol n z :=
-      setLIntegral_mono measurable_const fun x hx => ENNReal.ofReal_le_ofReal (hC' x hx)
+  calc ∫⁻ x in K, ENNReal.ofReal (Real.exp (-ph x)) ∂vol n z
+      ≤ ∫⁻ _ in K, ENNReal.ofReal C ∂vol n z :=
+        setLIntegral_mono measurable_const fun x hx => ENNReal.ofReal_le_ofReal (hC' x hx)
     _ = ENNReal.ofReal C * vol n z K := setLIntegral_const _ _
     _ < ⊤ := ENNReal.mul_lt_top ENNReal.ofReal_lt_top hK.measure_lt_top
 
-theorem splitT_memLp_iff
-    {E : Type*} [NormedAddCommGroup E]
-    (ph : M → ℝ) (hph : Continuous ph)
-    (u : M → E) (hu : AEStronglyMeasurable u (vol n z))
-    : MemLp u 2 (wvol n z ph)
-      ↔ ∫⁻ x, ENNReal.ofReal (‖u x‖ ^ 2 * Real.exp (-ph x)) ∂vol n z < ⊤ := by
+theorem splitT_memLp_iff {E : Type*} [NormedAddCommGroup E] (ph : M → ℝ) (hph : Continuous ph)
+    (u : M → E) (hu : AEStronglyMeasurable u (vol n z)) :
+    MemLp u 2 (wvol n z ph) ↔
+      ∫⁻ x, ENNReal.ofReal (‖u x‖ ^ 2 * Real.exp (-ph x)) ∂vol n z < ⊤ := by
   have hac : wvol n z ph ≪ vol n z := withDensity_absolutelyContinuous _ _
   have hu' : AEStronglyMeasurable u (wvol n z ph) := hu.mono_ac hac
-  have he : ∀ x, (ENNReal.ofReal (Real.exp (- ph x))).toReal = Real.exp (- ph x) := fun x =>
-    ENNReal.toReal_ofReal (Real.exp_nonneg _)
-  have hm : AEStronglyMeasurable (fun x => ‖u x‖ ^ 2 * Real.exp (- ph x)) (vol n z) :=
+  have he : ∀ x, (ENNReal.ofReal (Real.exp (-ph x))).toReal = Real.exp (-ph x) :=
+    fun x => ENNReal.toReal_ofReal (Real.exp_nonneg _)
+  have hm : AEStronglyMeasurable (fun x => ‖u x‖ ^ 2 * Real.exp (-ph x)) (vol n z) :=
     (hu.norm.pow 2).mul (Real.continuous_exp.comp hph.neg).aestronglyMeasurable
   have h0 : (0 : M → ℝ) ≤ᵐ[vol n z] fun x => ‖u x‖ ^ 2 * Real.exp (-ph x) :=
     Filter.Eventually.of_forall fun x => by
@@ -82,13 +122,11 @@ theorem splitT_memLp_iff
   · intro hI
     exact ⟨hm, (hasFiniteIntegral_iff_ofReal h0).2 hI⟩
 
-theorem splitT_inner
-    {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℂ E]
-    (ph : M → ℝ) (hph : Continuous ph)
-    (F : M → E) (hF : MemLp F 2 (wvol n z ph))
-    (G : Lp E 2 (wvol n z ph))
-    : ⟪hF.toLp F, G⟫_ℂ = ∫ x, ⟪F x, G x⟫_ℂ * (Real.exp (-ph x) : ℂ) ∂vol n z := by
-  have hd : Measurable (fun x => (Real.exp (- ph x)).toNNReal) :=
+theorem splitT_inner {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℂ E]
+    (ph : M → ℝ) (hph : Continuous ph) (F : M → E) (hF : MemLp F 2 (wvol n z ph))
+    (G : Lp E 2 (wvol n z ph)) :
+    ⟪hF.toLp F, G⟫_ℂ = ∫ x, ⟪F x, G x⟫_ℂ * (Real.exp (-ph x) : ℂ) ∂vol n z := by
+  have hd : Measurable (fun x => (Real.exp (-ph x)).toNNReal) :=
     (Real.continuous_exp.comp hph.neg).measurable.real_toNNReal
   have hae : (fun a => ⟪(hF.toLp F) a, G a⟫_ℂ) =ᵐ[wvol n z ph] fun a => ⟪F a, G a⟫_ℂ :=
     hF.coeFn_toLp.mono fun x hx => by dsimp only; rw [hx]
@@ -99,21 +137,18 @@ theorem splitT_inner
   funext x
   rw [NNReal.smul_def, Real.coe_toNNReal _ (Real.exp_nonneg _), Complex.real_smul, mul_comm]
 
-theorem splitT_inner2
-    {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℂ E]
-    (ph : M → ℝ) (hph : Continuous ph)
-    (F G : M → E) (hF : MemLp F 2 (wvol n z ph)) (hG : MemLp G 2 (wvol n z ph))
-    : ⟪hF.toLp F, hG.toLp G⟫_ℂ = ∫ x, ⟪F x, G x⟫_ℂ * (Real.exp (-ph x) : ℂ) ∂vol n z := by
+theorem splitT_inner2 {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℂ E]
+    (ph : M → ℝ) (hph : Continuous ph) (F G : M → E) (hF : MemLp F 2 (wvol n z ph))
+    (hG : MemLp G 2 (wvol n z ph)) :
+    ⟪hF.toLp F, hG.toLp G⟫_ℂ = ∫ x, ⟪F x, G x⟫_ℂ * (Real.exp (-ph x) : ℂ) ∂vol n z := by
   rw [splitT_inner ph hph F hF (hG.toLp G)]
   refine integral_congr_ae ?_
   have h1 := splitT_ae (n := n) (z := z) ph hph hG.coeFn_toLp
   filter_upwards [h1] with x hx
   rw [hx]
 
-theorem splitT_hcs
-    {X : Type*} [Zero X]
-    (u : M → X) (S : Fin n → Set M) (hS : ∀ j, IsCompact (S j)) (h : ∀ x, (∀ j, x ∉ S j) → u x = 0)
-    : HasCompactSupport u := by
+theorem splitT_hcs {X : Type*} [Zero X] (u : M → X) (S : Fin n → Set M)
+    (hS : ∀ j, IsCompact (S j)) (h : ∀ x, (∀ j, x ∉ S j) → u x = 0) : HasCompactSupport u := by
   refine HasCompactSupport.intro (K := ⋃ j, S j) (isCompact_iUnion hS) fun x hx => ?_
   exact h x fun j hj => hx (Set.mem_iUnion.2 ⟨j, hj⟩)
 
@@ -123,9 +158,8 @@ theorem splitT_cont (f : M → V n) (h : ∀ j, Continuous fun x => f x j) : Con
   | exact (EuclideanSpace.equiv (Fin n) ℂ).symm.continuous.comp (continuous_pi h)
   | exact continuous_induced_rng.2 (continuous_pi h)
 
-theorem splitT_weakS
-    (F G : M → V n) (hFG : F =ᵐ[vol n z] G) (σ : M → Fin n → Fin n → ℂ) (h : IsWeakS n z F σ)
-    : IsWeakS n z G σ := by
+theorem splitT_weakS (F G : M → V n) (hFG : F =ᵐ[vol n z] G) (σ : M → Fin n → Fin n → ℂ)
+    (h : IsWeakS n z F σ) : IsWeakS n z G σ := by
   unfold IsWeakS at h ⊢
   intro φ hφ j k
   rw [← h φ hφ j k]
@@ -135,17 +169,11 @@ theorem splitT_weakS
 
 end SplitHelpers
 
-private theorem d_db_eq_zero_of_not_mem_compact_support
-    {M : Type*} [TopologicalSpace M] [T2Space M]
-    (n : ℕ) (z : M → V n)
-    (K0 : Set M) (hK0 : IsCompact K0)
-    (u : M → ℂ) (hu : ∀ x, x ∉ K0 → u x = 0)
-    (x : M) (hx : x ∉ K0)
-    (j : Fin n)
-    : d n z j u x = 0 ∧ db n z j u x = 0 := by
-  have key
-      : ∀ h : ∃ e : OpenPartialHomeomorph M (V n), IsChart n z e ∧ x ∈ e.source,
-        fderiv ℝ (u ∘ (Classical.choose h).symm) (z x) = 0 := by
+private theorem d_db_eq_zero_of_not_mem_compact_support {M : Type*} [TopologicalSpace M] [T2Space M] (n : ℕ) (z : M → V n)
+    (K0 : Set M) (hK0 : IsCompact K0) (u : M → ℂ) (hu : ∀ x, x ∉ K0 → u x = 0) (x : M)
+    (hx : x ∉ K0) (j : Fin n) : d n z j u x = 0 ∧ db n z j u x = 0 := by
+  have key : ∀ h : ∃ e : OpenPartialHomeomorph M (V n), IsChart n z e ∧ x ∈ e.source,
+      fderiv ℝ (u ∘ (Classical.choose h).symm) (z x) = 0 := by
     intro h
     obtain ⟨he, hx'⟩ := Classical.choose_spec h
     set e := Classical.choose h
@@ -172,11 +200,8 @@ private theorem d_db_eq_zero_of_not_mem_compact_support
       simp
     · rfl
 
-private theorem smooth_exp_ofReal_of_smooth
-    {M : Type*} [TopologicalSpace M]
-    (n : ℕ) (z : M → V n)
-    (u : M → ℝ) (hu : Smooth n z (fun y => (u y : ℂ)))
-    : Smooth n z (fun y => (Real.exp (u y) : ℂ)) := by
+private theorem smooth_exp_ofReal_of_smooth {M : Type*} [TopologicalSpace M] (n : ℕ) (z : M → V n) (u : M → ℝ)
+    (hu : Smooth n z (fun y => (u y : ℂ))) : Smooth n z (fun y => (Real.exp (u y) : ℂ)) := by
   unfold Smooth at hu ⊢
   intro e he
   have hg : ContDiff ℝ ∞ (fun w : ℂ => ((Real.exp w.re : ℝ) : ℂ)) := by
@@ -186,13 +211,9 @@ private theorem smooth_exp_ofReal_of_smooth
   refine (hg.comp_contDiffOn (hu e he)).congr fun p _ => ?_
   simp [Function.comp]
 
-theorem splitTest
-    (n : ℕ)
-    (M : Type*)
-    [TopologicalSpace M] [T2Space M] [SecondCountableTopology M] [MeasurableSpace M] [BorelSpace M]
-    (hK : KSubStatement n M) (hWS : WeakSSmoothStatement n M) (hSD : SbarDbarStatement n M)
-    (hTI : TStarIbpStatement n M)
-    : SplitTestStatement n M := by
+theorem splitTest (n : ℕ) (M : Type*) [TopologicalSpace M] [T2Space M]
+    [SecondCountableTopology M] [MeasurableSpace M] [BorelSpace M] (hK : KSubStatement n M) (hWS : WeakSSmoothStatement n M)
+    (hSD : SbarDbarStatement n M) (hTI : TStarIbpStatement n M) : SplitTestStatement n M := by
   unfold SplitTestStatement
   unfold KSubStatement at hK
   unfold WeakSSmoothStatement at hWS
@@ -216,47 +237,41 @@ theorem splitTest
     simpa using h0
   have hfL : MemLp f 2 (wvol n z ph₂) := hfcont.memLp_of_hasCompactSupport hfsupp
 
-  have hE1 : Smooth n z (fun y => (Real.exp (ph₁ y) : ℂ)) :=
-    smooth_exp_ofReal_of_smooth n z ph₁ hph₁
-  have hE2 : Smooth n z (fun y => (Real.exp (- ph₂ y) : ℂ)) := by
-    apply smooth_exp_ofReal_of_smooth n z (fun y => - ph₂ y)
+  have hE1 : Smooth n z (fun y => (Real.exp (ph₁ y) : ℂ)) := smooth_exp_ofReal_of_smooth n z ph₁ hph₁
+  have hE2 : Smooth n z (fun y => (Real.exp (-ph₂ y) : ℂ)) := by
+    apply smooth_exp_ofReal_of_smooth n z (fun y => -ph₂ y)
     show Smooth n z (fun y => ((-ph₂ y : ℝ) : ℂ))
     have h := Smooth.mul n z (fun _ => (-1 : ℂ)) (fun y => (ph₂ y : ℂ)) (Smooth.const n z (-1)) hph₂
-    have he : (fun y => ((- ph₂ y : ℝ) : ℂ)) = fun y => (-1 : ℂ) * (ph₂ y : ℂ) := by
+    have he : (fun y => ((-ph₂ y : ℝ) : ℂ)) = fun y => (-1 : ℂ) * (ph₂ y : ℂ) := by
       funext y
       push_cast
       ring
     rw [he]
     exact h
-  have hprod : ∀ j, Ck n z 2 (fun y => (Real.exp (- ph₂ y) : ℂ) * f y j) := fun j =>
+  have hprod : ∀ j, Ck n z 2 (fun y => (Real.exp (-ph₂ y) : ℂ) * f y j) := fun j =>
     Ck.mul n z 2 _ _ (Smooth.ck n z 2 _ hE2) (hf j).1
-  have hdj : ∀ j, Continuous (d n z j (fun y => (Real.exp (- ph₂ y) : ℂ) * f y j)) := fun j =>
+  have hdj : ∀ j, Continuous (d n z j (fun y => (Real.exp (-ph₂ y) : ℂ) * f y j)) := fun j =>
     Ck.continuous n z hz 1 _ (Ck.d n z 1 j _ (hprod j))
   have htc : Continuous (tstar n z ph₁ ph₂ f) := by
     unfold tstar
     exact ((Smooth.continuous n z hz _ hE1).mul (continuous_finsetSum _ fun j _ => hdj j)).neg
-  have hoff
-      : ∀ j x,
-        x ∉ tsupport (fun y => (Real.exp (- ph₂ y) : ℂ) * f y j)
-          → d n z j (fun y => (Real.exp (- ph₂ y) : ℂ) * f y j) x = 0 := fun j x hx =>
-    (d_db_eq_zero_of_not_mem_compact_support n z
-      (tsupport fun y => (Real.exp (- ph₂ y) : ℂ) * f y j)
-      ((hf j).2.mul_left (f := fun y => (Real.exp (- ph₂ y) : ℂ))) _
-      (fun y hy => image_eq_zero_of_notMem_tsupport hy)
-      x hx j).1
+  have hoff : ∀ j x, x ∉ tsupport (fun y => (Real.exp (-ph₂ y) : ℂ) * f y j) →
+      d n z j (fun y => (Real.exp (-ph₂ y) : ℂ) * f y j) x = 0 := fun j x hx =>
+    (d_db_eq_zero_of_not_mem_compact_support n z (tsupport fun y => (Real.exp (-ph₂ y) : ℂ) * f y j)
+      ((hf j).2.mul_left (f := fun y => (Real.exp (-ph₂ y) : ℂ))) _
+      (fun y hy => image_eq_zero_of_notMem_tsupport hy) x hx j).1
   have htsupp : HasCompactSupport (tstar n z ph₁ ph₂ f) := by
-    refine splitT_hcs _
-      (fun j => tsupport fun y => (Real.exp (- ph₂ y) : ℂ) * f y j)
-      (fun j => (hf j).2.mul_left (f := fun y => (Real.exp (- ph₂ y) : ℂ)))
-      fun x hx => ?_
-    have h0 : ∀ j, d n z j (fun y => (Real.exp (- ph₂ y) : ℂ) * f y j) x = 0 := fun j =>
+    refine splitT_hcs _ (fun j => tsupport fun y => (Real.exp (-ph₂ y) : ℂ) * f y j)
+      (fun j => (hf j).2.mul_left (f := fun y => (Real.exp (-ph₂ y) : ℂ))) fun x hx => ?_
+    have h0 : ∀ j, d n z j (fun y => (Real.exp (-ph₂ y) : ℂ) * f y j) x = 0 := fun j =>
       hoff j x (hx j)
     unfold tstar
     simp only [h0, Finset.sum_const_zero, mul_zero, neg_zero]
   have hMF : MemWeightedL2 n z (tstar n z ph₁ ph₂ f) ph₁ := by
     have hm : MemLp (tstar n z ph₁ ph₂ f) 2 (wvol n z ph₁) := htc.memLp_of_hasCompactSupport htsupp
     unfold MemWeightedL2 wint
-    exact ⟨htc.aestronglyMeasurable, (splitT_memLp_iff ph₁ hc1 _ htc.aestronglyMeasurable).1 hm⟩
+    exact ⟨htc.aestronglyMeasurable,
+      (splitT_memLp_iff ph₁ hc1 _ htc.aestronglyMeasurable).1 hm⟩
 
   unfold MemWeightedL2OneForm nV at hv
   have hv' : MemLp v 2 (wvol n z ph₂) := (splitT_memLp_iff ph₂ hc2 v hv.1).2 hv.2
@@ -266,9 +281,7 @@ theorem splitTest
   obtain ⟨F₁, hF₁K, G, hGperp, hdec⟩ := K.exists_add_mem_mem_orthogonal (hfL.toLp f)
   have hoffg : ∀ g : M → ℂ, HasCompactSupport g → ∀ j x, x ∉ tsupport g → db n z j g x = 0 :=
     fun g hg j x hx =>
-      (d_db_eq_zero_of_not_mem_compact_support n z (tsupport g) hg g
-        (fun y hy => image_eq_zero_of_notMem_tsupport hy)
-        x hx j).2
+      (d_db_eq_zero_of_not_mem_compact_support n z (tsupport g) hg g (fun y hy => image_eq_zero_of_notMem_tsupport hy) x hx j).2
   refine ⟨hMF, fun x => F₁ x, ?_, (hKiff F₁).1 hF₁K, ?_, ?_⟩
   · unfold MemWeightedL2OneForm nV
     have ha : AEStronglyMeasurable (fun x => F₁ x) (vol n z) :=
@@ -294,36 +307,35 @@ theorem splitTest
     have hck2 : CkR n z 1 ph₂ := Smooth.ck n z 1 _ hph₂
     have hfc : ∀ j, Ck n z 1 (fun x => f x j) ∧ HasCompactSupport (fun x => f x j) := fun j =>
       ⟨Ck.mono n z 1 2 (by norm_num) _ (hf j).1, (hf j).2⟩
-    calc
-      ∫ x, ⟪dbarF n z g x, F₁ x⟫_ℂ * (Real.exp (-ph₂ x) : ℂ) ∂vol n z
+    calc ∫ x, ⟪dbarF n z g x, F₁ x⟫_ℂ * (Real.exp (-ph₂ x) : ℂ) ∂vol n z
         = ⟪hDg.toLp (dbarF n z g), F₁⟫_ℂ := (splitT_inner ph₂ hc2 _ hDg F₁).symm
       _ = ⟪hDg.toLp (dbarF n z g), hfL.toLp f⟫_ℂ := by
-        rw [hdec, inner_add_right, Submodule.inner_right_of_mem_orthogonal hDK hGperp, add_zero]
+          rw [hdec, inner_add_right, Submodule.inner_right_of_mem_orthogonal hDK hGperp, add_zero]
       _ = ∫ x, ⟪dbarF n z g x, f x⟫_ℂ * (Real.exp (-ph₂ x) : ℂ) ∂vol n z :=
-        splitT_inner2 ph₂ hc2 _ _ hDg hfL
+          splitT_inner2 ph₂ hc2 _ _ hDg hfL
       _ = ∫ x, conj ((∑ j, db n z j g x * conj (f x j)) * (Real.exp (-ph₂ x) : ℂ)) ∂vol n z := by
-        congr 1
-        funext x
-        set_option synthInstance.maxHeartbeats 100000 in
+          congr 1
+          funext x
+
           rw [map_mul, Complex.conj_ofReal, map_sum, PiLp.inner_apply]
-        congr 1
-        refine Finset.sum_congr rfl fun j _ => ?_
-        rw [map_mul, Complex.conj_conj]
-        show ⟪db n z j g x, f x j⟫_ℂ = _
-        first
-        | rfl
-        | (simp only [RCLike.inner_apply]; ring)
-        | (simp only [RCLike.inner_apply])
-        | (simp [mul_comm])
+          congr 1
+          refine Finset.sum_congr rfl fun j _ => ?_
+          rw [map_mul, Complex.conj_conj]
+          show ⟪db n z j g x, f x j⟫_ℂ = _
+          first
+          | rfl
+          | (simp only [RCLike.inner_apply]; ring)
+          | (simp only [RCLike.inner_apply])
+          | (simp [mul_comm])
       _ = conj (∫ x, (∑ j, db n z j g x * conj (f x j)) * (Real.exp (-ph₂ x) : ℂ) ∂vol n z) :=
-        integral_conj
+          integral_conj
       _ = conj (∫ x, g x * conj (tstar n z ph₁ ph₂ f x) * (Real.exp (-ph₁ x) : ℂ) ∂vol n z) := by
-        rw [hTI z hz ph₁ ph₂ g f hck1 hck2 (Smooth.ck n z 1 g hg.1) hfc]
+          rw [hTI z hz ph₁ ph₂ g f hck1 hck2 (Smooth.ck n z 1 g hg.1) hfc]
       _ = ∫ x, conj (g x) * tstar n z ph₁ ph₂ f x * (Real.exp (-ph₁ x) : ℂ) ∂vol n z := by
-        rw [← integral_conj]
-        congr 1
-        funext x
-        rw [map_mul, map_mul, Complex.conj_conj, Complex.conj_ofReal]
+          rw [← integral_conj]
+          congr 1
+          funext x
+          rw [map_mul, map_mul, Complex.conj_conj, Complex.conj_ofReal]
   · have e1 : ipV n z v f ph₂ = ⟪hv'.toLp v, hfL.toLp f⟫_ℂ := by
       unfold ipV
       exact (splitT_inner2 ph₂ hc2 v f hv' hfL).symm

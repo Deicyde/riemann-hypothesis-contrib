@@ -1,14 +1,57 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.Definitions.PlaceAdaptation.AdaptStd
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.PullbackSections.PlaceIdem
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.PullbackSections.HolomorphicFamilies.ChartValJ
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.PullbackSections.HolomorphicFamilies.EigRamData
+public import Formalism.LocalToGlobal.ProjectiveLattices.ChartDirectionsIntegral
+public import Mathlib.Algebra.AffineMonoid.Basic
+public import Mathlib.NumberTheory.NumberField.Discriminant.Defs
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.TaylorDiscriminants.GermSC
+public import Development.AbelianVarietyTheory.Proofs.RingsOfIntegers.ExistsRingOfIntegersLift
+public import Development.AbelianVarietyTheory.Proofs.RingsOfIntegers.IntegralChartFormalBiextensionGaugeBound
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Int
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+public import Mathlib.NumberTheory.NumberField.Discriminant.Different
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.PullbackSections.HolomorphicFamilies.EigRamLift
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.PullbackSections.HolomorphicFamilies.EigRamVal
-public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.PullbackSections.HolomorphicFamilies.EigRamData
-public import Development.AbelianVarietyTheory.Proofs.RingsOfIntegers.IntegralChartFormalBiextensionGaugeBound
-public import Development.AbelianVarietyTheory.Proofs.RingsOfIntegers.ExistsRingOfIntegersLift
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.PullbackSections.HolomorphicFamilies.PadicValNatAbsNormEqZero
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.TaylorDiscriminants.DiscriminantEstimates.DiscriminantTheorems.TBIdemDen
+import Std.Tactic.BVDecide.Normalize.BitVec
+import Std.Tactic.BVDecide.Normalize.Prop
+public import Development.AbelianVarietyTheory.Definitions.PlaceAdaptation.AdaptStd
 
 @[expose] public section
 
@@ -181,8 +224,8 @@ theorem isIntegral_mul_dual
     exact RingOfIntegers.isIntegral_coe _
   · refine ⟨fun i => (RingOfIntegers.basis E).repr x i, ?_⟩
     have h1 := congrArg (algebraMap (𝓞 E) E) ((RingOfIntegers.basis E).sum_repr x)
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum] at h1
+
+    rw [map_sum] at h1
     show algebraMap (𝓞 E) E x = _
     rw [← h1]
     refine Finset.sum_congr rfl fun i _ => ?_
@@ -308,12 +351,12 @@ theorem GlobalTheory.PlaceInt.exists_ramified_eigenLifts
     intro x
     have h1 : ∑ t, embF c t x = ((Algebra.trace ℚ E x : ℚ) : c.F) := by
       apply (algebraMap c.F ℂ).injective
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum, map_ratCast, ← sum_embeddings]
+
+      rw [map_sum, map_ratCast, ← sum_embeddings]
       rfl
     have h2 := congrArg io h1
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, map_ratCast] at h2
+
+    rw [map_sum, map_ratCast] at h2
     exact h2
   have hNmem : (((discr E).natAbs : ℕ) : 𝓞 E) ∈ differentIdeal ℤ (𝓞 E) := by
     have h1 := Ideal.absNorm_mem (differentIdeal ℤ (𝓞 E))

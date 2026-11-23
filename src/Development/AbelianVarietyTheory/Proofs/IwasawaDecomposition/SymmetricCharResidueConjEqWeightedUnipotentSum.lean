@@ -1,23 +1,63 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.OtherInstanceCharacterEqPsiSymmetricArgument
-public import Formalism.LocalToGlobal.SiegelLatticeTheory.HaarTransversals.UnitaryHaarProducts.LevelSubgroupCharacterUnitary
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.IsMatrixModPlaceInFamilyInvStatement
+public import Development.AbelianVarietyTheory.BlockTheory.HeightDefect.LevelCuspCharacters
+import Development.AbelianVarietyTheory.Proofs.FlagMeasures.ProjectionMovesTypeVectorsModLevel
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ConjIdempotentSubOneMemPlaceIdealStatement
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.HermitianE0SymmetricFrameStatement
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.HermitianZ0SymmetricFrameStatement
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.HermitianFormMiddleSymmetricFrameNotOneAtStatement
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.HermitianZ0SymmetricFrameStatement
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.IsMatrixModPlaceInFamilyInvStatement
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.SymEdgeConjWeightedSumEqFlagAndUnipotentPairsStatement
+import Formalism.LocalToGlobal.SiegelLatticeTheory.HaarTransversals.UnitaryHaarProducts.LevelSubgroupCharacterUnitary
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.BitVec
+import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.ConcreteLevelAdelicSubset
+import Formalism.LocalToGlobal.IndefiniteReal.AutomorphicEvaluation
+import Formalism.LocalToGlobal.SiegelLatticeTheory.FlagStabilizerTensors.RowLevelMatch
+import Formalism.LocalToGlobal.SiegelLatticeTheory.FlagStabilizerTensors.RowsJoinPinned
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.L2.Theta Formalism.IndefR.Mult
-  Formalism.IndefR.Links Formalism.IndefR.Lev Formalism.IndefR.AutomorphicEvaluation
-  Formalism.L2.DIV Formalism.L2.SG.RowDict Formalism.L2.SG.RowsJoinPinned
-  Formalism.L2.SG.RowLevelMatch Formalism.L2.SG.HidaSetting
-  Formalism.L2.SG.PoincareInHH.PoincareSetting Formalism.L2.SG.ConcreteSettingExists MeasureTheory
-  NumberField IsDedekindDomain GlobalTheory.Mem GlobalTheory.Mem.SRe
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.L2.Theta Formalism.IndefR.Mult Formalism.IndefR.Links Formalism.IndefR.Lev Formalism.IndefR.AutomorphicEvaluation Formalism.L2.DIV Formalism.L2.SG.RowDict Formalism.L2.SG.RowsJoinPinned Formalism.L2.SG.RowLevelMatch Formalism.L2.SG.HidaSetting Formalism.L2.SG.PoincareInHH.PoincareSetting Formalism.L2.SG.ConcreteSettingExists MeasureTheory NumberField IsDedekindDomain GlobalTheory.Mem GlobalTheory.Mem.SRe
 open scoped TensorProduct Matrix
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -27,48 +67,39 @@ namespace GlobalTheory.Mem.SymChar.ResBar
 
 variable {D : D7}
 
-theorem unip_inv_sup
-    {κ : Type} [CommRing κ]
-    {r : ℕ} {N : GL (Fin r) κ} (hN : N ∈ unip κ r) (i j : Fin r) (hij : j.val = i.val + 1)
-    : ((N⁻¹ : GL (Fin r) κ) : Matrix (Fin r) (Fin r) κ) i j
-      = - (N : Matrix (Fin r) (Fin r) κ) i j := by
+theorem unip_inv_sup {κ : Type} [CommRing κ] {r : ℕ} {N : GL (Fin r) κ} (hN : N ∈ unip κ r) (i j : Fin r)
+    (hij : j.val = i.val + 1) :
+    ((N⁻¹ : GL (Fin r) κ) : Matrix (Fin r) (Fin r) κ) i j = -(N : Matrix (Fin r) (Fin r) κ) i j := by
   have hi := Subgroup.inv_mem _ hN
-  have h :=
-    unip_mul_entry hi hN (i := i) (j := j) (show i.val < j.val by omega) (fun l h1 h2 => by
-      exfalso
-      have : i.val < l.val := h1
-      have : l.val < j.val := h2
-      omega)
+  have h := unip_mul_entry hi hN (i := i) (j := j) (show i.val < j.val by omega) (fun l h1 h2 => by
+    exfalso
+    have : i.val < l.val := h1
+    have : l.val < j.val := h2
+    omega)
   rw [inv_mul_cancel, Units.val_one, Matrix.one_apply_ne (by intro e; rw [e] at hij; omega)] at h
   linear_combination -h
 
 abbrev QW (X : HidaSetting D) (w : HeightOneSpectrum (𝓞 D.host.E)) : Type :=
   (X.B.I.E ⊗[X.B.I.F] Formalism.MainNotions.S.Af X.B.I.F) ⧸ (wInt X w).toAddSubgroup
 
-abbrev mkW (X : HidaSetting D) (w : HeightOneSpectrum (𝓞 D.host.E))
-    : (X.B.I.E ⊗[X.B.I.F] Formalism.MainNotions.S.Af X.B.I.F) →+ QW X w :=
+abbrev mkW (X : HidaSetting D) (w : HeightOneSpectrum (𝓞 D.host.E)) :
+    (X.B.I.E ⊗[X.B.I.F] Formalism.MainNotions.S.Af X.B.I.F) →+ QW X w :=
   QuotientAddGroup.mk' _
 
-theorem mkW_eq
-    {X : HidaSetting D} {w : HeightOneSpectrum (𝓞 D.host.E)}
-    {a b : X.B.I.E ⊗[X.B.I.F] Formalism.MainNotions.S.Af X.B.I.F} (h : a - b ∈ wInt X w)
-    : mkW X w a = mkW X w b := by
+theorem mkW_eq {X : HidaSetting D} {w : HeightOneSpectrum (𝓞 D.host.E)}
+    {a b : X.B.I.E ⊗[X.B.I.F] Formalism.MainNotions.S.Af X.B.I.F} (h : a - b ∈ wInt X w) : mkW X w a = mkW X w b := by
   show (QuotientAddGroup.mk a : QW X w) = QuotientAddGroup.mk b
   rw [QuotientAddGroup.eq_iff_sub_mem]
   exact h
 
-theorem mkW_zero
-    {X : HidaSetting D} {w : HeightOneSpectrum (𝓞 D.host.E)}
-    {a : X.B.I.E ⊗[X.B.I.F] Formalism.MainNotions.S.Af X.B.I.F} (h : a ∈ wInt X w)
-    : mkW X w a = 0 := by
+theorem mkW_zero {X : HidaSetting D} {w : HeightOneSpectrum (𝓞 D.host.E)}
+    {a : X.B.I.E ⊗[X.B.I.F] Formalism.MainNotions.S.Af X.B.I.F} (h : a ∈ wInt X w) : mkW X w a = 0 := by
   rw [← map_zero (mkW X w)]
   exact mkW_eq (by rw [sub_zero]; exact h)
 
-theorem phi_exists
-    (X : HidaSetting D) (w : HeightOneSpectrum (𝓞 D.host.E))
-    (g : ℕ) [NeZero g]
-    (hg : ((g : ℕ) : X.B.I.E ⊗[X.B.I.F] Formalism.MainNotions.S.Af X.B.I.F) ∈ wInt X w)
-    : ∃ φ : ZMod g →+ QW X w, ∀ t : ZMod g, φ t = t.val • mkW X w 1 := by
+theorem phi_exists (X : HidaSetting D) (w : HeightOneSpectrum (𝓞 D.host.E)) (g : ℕ) [NeZero g]
+    (hg : ((g : ℕ) : X.B.I.E ⊗[X.B.I.F] Formalism.MainNotions.S.Af X.B.I.F) ∈ wInt X w) :
+    ∃ φ : ZMod g →+ QW X w, ∀ t : ZMod g, φ t = t.val • mkW X w 1 := by
   refine ⟨ZMod.lift g ⟨zmultiplesHom _ (mkW X w 1), ?_⟩, fun t => ?_⟩
   · rw [zmultiplesHom_apply, natCast_zsmul, ← map_nsmul, nsmul_one]
     exact mkW_zero hg
@@ -76,35 +107,25 @@ theorem phi_exists
     have e : ((t.val : ℕ) : ZMod g) = ((t.val : ℤ) : ZMod g) := by simp
     rw [e, ZMod.lift_coe, zmultiplesHom_apply, natCast_zsmul]
 
-theorem modW_of
-    {X : HidaSetting D} {w : HeightOneSpectrum (𝓞 D.host.E)} {g : ℕ} {φ : ZMod g →+ QW X w}
-    (hφ : ∀ t : ZMod g, φ t = t.val • mkW X w 1)
-    {c : X.B.I.E ⊗[X.B.I.F] Formalism.MainNotions.S.Af X.B.I.F} {t : ZMod g} (h : mkW X w c = φ t)
-    : ModW X w c t := by
+theorem modW_of {X : HidaSetting D} {w : HeightOneSpectrum (𝓞 D.host.E)} {g : ℕ}
+    {φ : ZMod g →+ QW X w} (hφ : ∀ t : ZMod g, φ t = t.val • mkW X w 1)
+    {c : X.B.I.E ⊗[X.B.I.F] Formalism.MainNotions.S.Af X.B.I.F} {t : ZMod g} (h : mkW X w c = φ t) : ModW X w c t := by
   unfold ModW
   rw [hφ, ← map_nsmul, nsmul_one] at h
   show (c - ((t.val : ℕ) : X.B.I.E ⊗[X.B.I.F] Formalism.MainNotions.S.Af X.B.I.F)) ∈ (wInt X w).toAddSubgroup
   rw [← QuotientAddGroup.eq_iff_sub_mem]
   exact h
 
-theorem read
-    (X : HidaSetting D)
-    (w : HeightOneSpectrum (𝓞 D.host.E))
-    {g : ℕ} {u : Fin D.R.r → VA X.B.I} {x : X.B.I.Gf} {M : Matrix (Fin D.R.r) (Fin D.R.r) (ZMod g)}
-    (hM : GlobalTheory.Mem.SymFrame.IsMatIn X w u x M)
-    {v : VA X.B.I} (hv : v ∈ X.B.I.Lf)
-    (p q : Fin D.R.r) (c : X.B.I.E ⊗[X.B.I.F] Formalism.MainNotions.S.Af X.B.I.F)
-    (hG : ∀ j, hA X.B.I v (u j) - (if j = q then c else 0) ∈ wInt X w)
-    : mkW X w (hA X.B.I v (X.B.I.fmat x *ᵥ u p)) = (M q p).val • mkW X w c := by
+theorem read (X : HidaSetting D) (w : HeightOneSpectrum (𝓞 D.host.E)) {g : ℕ} {u : Fin D.R.r → VA X.B.I}
+    {x : X.B.I.Gf} {M : Matrix (Fin D.R.r) (Fin D.R.r) (ZMod g)} (hM : GlobalTheory.Mem.SymFrame.IsMatIn X w u x M)
+    {v : VA X.B.I} (hv : v ∈ X.B.I.Lf) (p q : Fin D.R.r) (c : X.B.I.E ⊗[X.B.I.F] Formalism.MainNotions.S.Af X.B.I.F)
+    (hG : ∀ j, hA X.B.I v (u j) - (if j = q then c else 0) ∈ wInt X w) :
+    mkW X w (hA X.B.I v (X.B.I.fmat x *ᵥ u p)) = (M q p).val • mkW X w c := by
   classical
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [mkW_eq (hA_isMatIn X w hM hv p), map_sum]
-  have e
-      : ∀ j,
-        mkW X w
-            ((((M j p).val : ℕ) : X.B.I.E ⊗[X.B.I.F] Formalism.MainNotions.S.Af X.B.I.F)
-              * hA X.B.I v (u j))
-          = if j = q then (M q p).val • mkW X w c else 0 := by
+
+  rw [mkW_eq (hA_isMatIn X w hM hv p), map_sum]
+  have e : ∀ j, mkW X w ((((M j p).val : ℕ) : X.B.I.E ⊗[X.B.I.F] Formalism.MainNotions.S.Af X.B.I.F) * hA X.B.I v (u j)) =
+      if j = q then (M q p).val • mkW X w c else 0 := by
     intro j
     rw [← nsmul_eq_mul, map_nsmul, mkW_eq (hG j)]
     split_ifs with hj
@@ -118,10 +139,9 @@ theorem r_eq (D : D7) : D.R.r = 2 * D.R.rS + D.R.k + 1 := by
   unfold Formalism.BasicNotions.Ranks.r Formalism.BasicNotions.Ranks.rS
   omega
 
-theorem symVec_mem (X : HidaSetting D) (w : HeightOneSpectrum (𝓞 D.host.E)) (j : Fin D.R.r)
-    : GlobalTheory.Mem.SymFrame.symVec X w j ∈ X.B.I.Lf := by
-  unfold GlobalTheory.Mem.SymFrame.symVec GlobalTheory.SeeConjRead.flagV
-    GlobalTheory.Mem.SymFrame.epsW
+theorem symVec_mem (X : HidaSetting D) (w : HeightOneSpectrum (𝓞 D.host.E)) (j : Fin D.R.r) :
+    GlobalTheory.Mem.SymFrame.symVec X w j ∈ X.B.I.Lf := by
+  unfold GlobalTheory.Mem.SymFrame.symVec GlobalTheory.SeeConjRead.flagV GlobalTheory.Mem.SymFrame.epsW
   split_ifs
   · exact (X.vectorsInLattice.1 _).1
   · exact (X.vectorsInLattice.2.2 _).1
@@ -130,34 +150,28 @@ theorem symVec_mem (X : HidaSetting D) (w : HeightOneSpectrum (𝓞 D.host.E)) (
   · exact (X.vectorsInLattice.1 _).2
   · exact zero_mem _
 
-theorem symmetricOrderFrameModPlace_last_block
-    (X : HidaSetting D) (w : HeightOneSpectrum (𝓞 D.host.E))
-    (a : Fin D.R.rS) (p : Fin D.R.r) (hp : p.val = 2 * D.R.rS + D.R.k - a.val)
-    : GlobalTheory.Mem.SymFrame.symVec X w p = X.f0 a := by
+theorem symmetricOrderFrameModPlace_last_block (X : HidaSetting D) (w : HeightOneSpectrum (𝓞 D.host.E)) (a : Fin D.R.rS) (p : Fin D.R.r)
+    (hp : p.val = 2 * D.R.rS + D.R.k - a.val) : GlobalTheory.Mem.SymFrame.symVec X w p = X.f0 a := by
   have hr := r_eq D
   unfold GlobalTheory.Mem.SymFrame.symVec GlobalTheory.SeeConjRead.flagV
-  rw [dite_eq_right (by omega), dite_eq_right (by omega), dite_eq_right (by omega),
-    dite_eq_left (by omega)]
+  rw [dite_eq_right (by omega), dite_eq_right (by omega), dite_eq_right (by omega), dite_eq_left (by omega)]
   congr 1
   ext
   simp only
   omega
 
-theorem symVec_bwd
-    (X : HidaSetting D) (w : HeightOneSpectrum (𝓞 D.host.E))
-    (hE : ¬ GlobalTheory.Mem.SymFrame.EwAt X w)
-    (i : Fin D.R.k) (p : Fin D.R.r) (hp : p.val = D.R.rS + D.R.k - 1 - i.val)
-    : GlobalTheory.Mem.SymFrame.symVec X w p = X.bwd i := by
-  unfold GlobalTheory.Mem.SymFrame.symVec GlobalTheory.SeeConjRead.flagV
-    GlobalTheory.Mem.SymFrame.epsW
+theorem symVec_bwd (X : HidaSetting D) (w : HeightOneSpectrum (𝓞 D.host.E)) (hE : ¬ GlobalTheory.Mem.SymFrame.EwAt X w)
+    (i : Fin D.R.k) (p : Fin D.R.r) (hp : p.val = D.R.rS + D.R.k - 1 - i.val) :
+    GlobalTheory.Mem.SymFrame.symVec X w p = X.bwd i := by
+  unfold GlobalTheory.Mem.SymFrame.symVec GlobalTheory.SeeConjRead.flagV GlobalTheory.Mem.SymFrame.epsW
   rw [if_neg hE, dite_eq_right (by omega), dite_eq_left (by omega)]
   congr 1
   ext
   simp only [Fin.val_rev]
   omega
 
-theorem ite_val {r : ℕ} {R : Type} [Zero R] (j q : Fin r) (n : ℕ) (hq : q.val = n) (c : R)
-    : (if j.val = n then c else 0) = (if j = q then c else 0) := by
+theorem ite_val {r : ℕ} {R : Type} [Zero R] (j q : Fin r) (n : ℕ) (hq : q.val = n) (c : R) :
+    (if j.val = n then c else 0) = (if j = q then c else 0) := by
   by_cases h : j = q
   · subst h; simp [hq]
   · have : j.val ≠ n := fun e => h (Fin.ext (by omega))
@@ -181,8 +195,8 @@ theorem resBar : ∀ (D : D7) (X : HidaSetting D) (h : X.B.I = Formalism.L2.SG.I
   have hU : N ∈ unip _ _ := unipCol_le _ _ _ hNu
   rw [GlobalTheory.T.symEdge_conjWeighted_sum_eq_flag_and_unipotent_pairs _ _ _ hr]
   apply modW_of hφ
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [argS, map_add (f := _), map_sum]
+
+  simp only [argS, map_add (f := _), map_sum]
   congr 1
   · refine Finset.sum_congr rfl fun a _ => ?_
     rw [← Formalism.L2.SG.Pf.unitaryCongruence.hA_symm]
@@ -221,8 +235,8 @@ theorem resBar : ∀ (D : D7) (X : HidaSetting D) (h : X.B.I = Formalism.L2.SG.I
       · rw [dite_eq_right hi, map_zero, map_zero]
     · have hs : side X w = false := by simp [side, hE]
       have hew := GlobalTheory.T.conj_idempotent_sub_one_mem_placeIdeal D X h hι kv hgw hE
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [hs, if_neg (by simp), map_sum]
+
+      rw [hs, if_neg (by simp), map_sum]
       refine Finset.sum_congr rfl fun i _ => ?_
       by_cases hi : i.val + 1 < D.R.k
       · rw [dite_eq_left hi, dite_eq_left hi]

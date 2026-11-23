@@ -1,12 +1,50 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.LatAtLattice
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.IsPtOfOfDecoRaw
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.TrueColumnSpacesStandardInFrameCoords
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.MemHJsymIffJSymG
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.CoarseLast
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.LamJsymRead
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.MemHJsymIffJSymG
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.TrueColumnSpacesStandardInFrameCoords
+import Formalism.LocalToGlobal.Columns.BaseLemmas
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.LinearAlgebra.FreeModule.IdealQuotient
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
@@ -66,7 +104,6 @@ local instance neZero_top (R : Ranks) : NeZero (R.N R.m) := ⟨by have := N_m_su
 local instance neZero_rankPred (R : Ranks) : NeZero (R.N R.m - 1) :=
   ⟨by have := rank_X'_eq R; have := rSym_rSD R; unfold rSym at this; omega⟩
 
-set_option maxHeartbeats 1000000 in
 theorem rdM
     (hPr : (B.primes X).Ok)
     (u : B.Word)
@@ -107,7 +144,6 @@ theorem rdM
       (fun x κ h1 h2 => h.chr c x κ h1 h2)
   rwa [levGAt_of_le _ _ _ _ le_rfl, topLev_levG_m] at this
 
-set_option maxHeartbeats 1000000 in
 theorem rdP {Lb U chi y lat st} (h : I.ReadsP I.mu0 Lb U chi y lat st) (c : (I.stX I.mu0).Cl)
     : RdLev (E := B.fields.E) B.sp.cm U chi (badB B) (rowTyG I.Ch I.Ps) B.embLL :=
   rdLev_of_reads (X := B.fields) (hc := B.sp.cm) (bad := badB B) (rowTyG I.Ch I.Ps)
@@ -157,7 +193,6 @@ theorem exists_nat (hPr : (B.primes X).Ok) (w : (B.primes X).vGs) (c : 𝓞 B.fi
       (h ▸ AddSubgroup.mem_top c : c ∈ AddSubgroup.zmultiples (1 : 𝓞 B.fields.E ⧸ w.1.asIdeal))
   exact ⟨n, by simpa using hn.symm⟩
 
-set_option maxHeartbeats 1000000 in
 theorem main_base
     (hPr : (B.primes X).Ok)
     (u : B.Word)
@@ -309,7 +344,6 @@ end GlobalTheory.Mem.Col2.TypeLev
 
 end
 
-set_option maxHeartbeats 2000000 in
 theorem GlobalTheory.Mem.Col2.TC.levels_top_row_sym
     : ∀ {B : Base} {X : PreX B.toPre} (I : TC B X),
       I.Ok → TC.Pins B X

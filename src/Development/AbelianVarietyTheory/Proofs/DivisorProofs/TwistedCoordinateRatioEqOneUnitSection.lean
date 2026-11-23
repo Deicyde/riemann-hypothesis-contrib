@@ -1,10 +1,12 @@
 module
 
+public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.MapsAtExpLeB
 public import Development.AbelianVarietyTheory.Proofs.UniformizationProofs.UnifPreCharacterGroupIso
 public import Development.AbelianVarietyTheory.Proofs.UniformizationProofs.UniformisationTrivialisationsCorrespond
 public import Development.AbelianVarietyTheory.Proofs.UniformizationProofs.UnifPreCAndCoordCorrespond
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.CocycleIdentityIso
+public import Development.AbelianVarietyTheory.Definitions.Divisors.ExistsToricRankOne
 
 @[expose] public section
 

@@ -1,16 +1,59 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ConjRelEquiv
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.LeftMulMatrixTransfer
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.ReducedFreeAlgebraTraceFormPerfect
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.LinearAlgebra.Matrix.FiniteDimensional
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Artinian.Instances
+import Mathlib.RingTheory.Coalgebra.IsFrobenius
+import Mathlib.RingTheory.HopfAlgebra.Basic
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
 noncomputable section
 
-open NumberField GlobalTheory.UnitaryBC IsDedekindDomain Matrix Polynomial GlobalTheory.CuspRep
-  Formalism.UG GlobalTheory.BCT GlobalTheory.KapLat
+open NumberField GlobalTheory.UnitaryBC IsDedekindDomain Matrix Polynomial GlobalTheory.CuspRep Formalism.UG GlobalTheory.BCT GlobalTheory.KapLat
 open scoped Classical
 
 namespace GlobalTheory.KapLat.ExModel
@@ -21,45 +64,40 @@ section Herm
 
 variable (w : Pl E) {n : ℕ}
 
-theorem stdH_add_left (a b c : Fin n → w.adicCompletion E)
-    : stdH w (a + b) c = stdH w a c + stdH w b c := by
+theorem stdH_add_left (a b c : Fin n → w.adicCompletion E) :
+    stdH w (a + b) c = stdH w a c + stdH w b c := by
   simp [stdH, add_mul, Finset.sum_add_distrib]
 
-theorem stdH_add_right (a b c : Fin n → w.adicCompletion E)
-    : stdH w a (b + c) = stdH w a b + stdH w a c := by
+theorem stdH_add_right (a b c : Fin n → w.adicCompletion E) :
+    stdH w a (b + c) = stdH w a b + stdH w a c := by
   simp [stdH, mul_add, Finset.sum_add_distrib]
 
-theorem stdH_smul_left (r : w.adicCompletion E) (a b : Fin n → w.adicCompletion E)
-    : stdH w (r • a) b = r * stdH w a b := by
+theorem stdH_smul_left (r : w.adicCompletion E) (a b : Fin n → w.adicCompletion E) :
+    stdH w (r • a) b = r * stdH w a b := by
   simp [stdH, Finset.mul_sum, mul_assoc]
 
-theorem stdH_smul_right (r : w.adicCompletion E) (a b : Fin n → w.adicCompletion E)
-    : stdH w a (r • b) = cj w r * stdH w a b := by
+theorem stdH_smul_right (r : w.adicCompletion E) (a b : Fin n → w.adicCompletion E) :
+    stdH w a (r • b) = cj w r * stdH w a b := by
   simp only [stdH, Pi.smul_apply, smul_eq_mul, map_mul, Finset.mul_sum]
   exact Finset.sum_congr rfl fun k _ => by ring
 
-theorem stdH_single (a : Fin n → w.adicCompletion E) (k : Fin n)
-    : stdH w a (Pi.single k 1) = a k := by
+theorem stdH_single (a : Fin n → w.adicCompletion E) (k : Fin n) :
+    stdH w a (Pi.single k 1) = a k := by
   simp [stdH, Pi.single_apply, apply_ite (cj w)]
 
-theorem cj_cj
-    {K : GlobalTheory.UnitLemma.UQ} {e : K.E ≃+* w.adicCompletion E} (hB : Bridge w K e)
-    (z : w.adicCompletion E)
-    : cj w (cj w z) = z := by
+theorem cj_cj {K : GlobalTheory.UnitLemma.UQ} {e : K.E ≃+* w.adicCompletion E} (hB : Bridge w K e)
+    (z : w.adicCompletion E) : cj w (cj w z) = z := by
   obtain ⟨x, rfl⟩ := e.surjective z
   rw [← hB.1, ← hB.1, K.c_c]
 
-theorem stdH_symm
-    {K : GlobalTheory.UnitLemma.UQ} {e : K.E ≃+* w.adicCompletion E} (hB : Bridge w K e)
-    (a b : Fin n → w.adicCompletion E)
-    : stdH w b a = cj w (stdH w a b) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [stdH, map_sum, map_mul, cj_cj w hB]
+theorem stdH_symm {K : GlobalTheory.UnitLemma.UQ} {e : K.E ≃+* w.adicCompletion E} (hB : Bridge w K e)
+    (a b : Fin n → w.adicCompletion E) : stdH w b a = cj w (stdH w a b) := by
+
+  simp only [stdH, map_sum, map_mul, cj_cj w hB]
   exact Finset.sum_congr rfl fun k _ => mul_comm _ _
 
-theorem stdH_unitary
-    (γ : GLw n w) (hγ : cT (cj w) γ.val * 1 * γ.val = 1) (a b : Fin n → w.adicCompletion E)
-    : stdH w (γ.val *ᵥ a) (γ.val *ᵥ b) = stdH w a b := by
+theorem stdH_unitary (γ : GLw n w) (hγ : cT (cj w) γ.val * 1 * γ.val = 1)
+    (a b : Fin n → w.adicCompletion E) : stdH w (γ.val *ᵥ a) (γ.val *ᵥ b) = stdH w a b := by
   have h1 : γ.valᵀ * γ.val.map (cj w) = 1 := by
     have h0 : (γ.val.map (cj w))ᵀ * γ.val = 1 := by simpa [cT] using hγ
     have h2 : γ.val * (γ.val.map (cj w))ᵀ = 1 := mul_eq_one_comm.mp h0
@@ -67,9 +105,8 @@ theorem stdH_unitary
       have := congrArg Matrix.transpose h2
       simpa [Matrix.transpose_mul] using this
     exact mul_eq_one_comm.mp h3
-  have hc
-      : ∀ z : Fin n → w.adicCompletion E,
-        (fun k => cj w ((γ.val *ᵥ z) k)) = γ.val.map (cj w) *ᵥ (fun k => cj w (z k)) := by
+  have hc : ∀ z : Fin n → w.adicCompletion E,
+      (fun k => cj w ((γ.val *ᵥ z) k)) = γ.val.map (cj w) *ᵥ (fun k => cj w (z k)) := by
     intro z; funext k; exact RingHom.map_mulVec (cj w) γ.val z k
   have hs : ∀ a b : Fin n → w.adicCompletion E, stdH w a b = a ⬝ᵥ (fun k => cj w (b k)) :=
     fun a b => rfl
@@ -82,9 +119,8 @@ section Alg
 
 variable {K : GlobalTheory.UnitLemma.UQ} {B : GlobalTheory.UnitLemma.InvAlg K} {n : ℕ}
 
-theorem aeval_eq_sum_fin
-    {R A : Type*} [CommSemiring R] [Semiring A] [Algebra R A] (x : A) (p : R[X]) (hp : p.degree < n)
-    : aeval x p = ∑ i : Fin n, p.coeff i • x ^ (i : ℕ) := by
+theorem aeval_eq_sum_fin {R A : Type*} [CommSemiring R] [Semiring A] [Algebra R A] (x : A) (p : R[X])
+    (hp : p.degree < n) : aeval x p = ∑ i : Fin n, p.coeff i • x ^ (i : ℕ) := by
   by_cases h0 : p = 0
   · simp [h0]
   rw [aeval_eq_sum_range' ((natDegree_lt_iff_degree_lt h0).mpr hp) x,
@@ -92,33 +128,27 @@ theorem aeval_eq_sum_fin
 
 variable {u : B.A} {Q' : K.E[X]}
 
-theorem exists_aeval_lt
-    (hQm : Q'.Monic) (hdeg : Q'.natDegree = n) (hadj : Algebra.adjoin K.E {u} = ⊤)
-    (hroot : aeval u Q' = 0) (y : B.A)
-    : ∃ p : K.E[X], p.degree < n ∧ aeval u p = y := by
+theorem exists_aeval_lt (hQm : Q'.Monic) (hdeg : Q'.natDegree = n)
+    (hadj : Algebra.adjoin K.E {u} = ⊤) (hroot : aeval u Q' = 0) (y : B.A) :
+    ∃ p : K.E[X], p.degree < n ∧ aeval u p = y := by
   have hy : y ∈ Algebra.adjoin K.E {u} := hadj ▸ Algebra.mem_top
   rw [Algebra.adjoin_singleton_eq_range_aeval] at hy
   obtain ⟨p, rfl⟩ := hy
   refine ⟨p %ₘ Q', ?_, aeval_modByMonic_eq_self_of_root hroot⟩
-  calc
-    (p %ₘ Q').degree
-      < Q'.degree := degree_modByMonic_lt p hQm
+  calc (p %ₘ Q').degree < Q'.degree := degree_modByMonic_lt p hQm
     _ = n := by rw [degree_eq_natDegree hQm.ne_zero, hdeg]
 
-theorem span_pow
-    (hQm : Q'.Monic) (hdeg : Q'.natDegree = n) (hadj : Algebra.adjoin K.E {u} = ⊤)
-    (hroot : aeval u Q' = 0)
-    : ⊤ ≤ Submodule.span K.E (Set.range fun i : Fin n => u ^ (i : ℕ)) := by
+theorem span_pow (hQm : Q'.Monic) (hdeg : Q'.natDegree = n)
+    (hadj : Algebra.adjoin K.E {u} = ⊤) (hroot : aeval u Q' = 0) :
+    ⊤ ≤ Submodule.span K.E (Set.range fun i : Fin n => u ^ (i : ℕ)) := by
   intro y _
   obtain ⟨p, hp, rfl⟩ := exists_aeval_lt hQm hdeg hadj hroot y
   rw [aeval_eq_sum_fin u p hp]
   exact Submodule.sum_mem _ fun i _ => Submodule.smul_mem _ _ (Submodule.subset_span ⟨i, rfl⟩)
 
-theorem dvd_of_aeval_eq_zero
-    (hli : LinearIndependent K.E (fun i : Fin n => u ^ (i : ℕ))) (hQm : Q'.Monic)
-    (hdeg : Q'.natDegree = n) (hroot : aeval u Q' = 0)
-    (p : K.E[X]) (hp : aeval u p = 0)
-    : Q' ∣ p := by
+theorem dvd_of_aeval_eq_zero (hli : LinearIndependent K.E (fun i : Fin n => u ^ (i : ℕ)))
+    (hQm : Q'.Monic) (hdeg : Q'.natDegree = n) (hroot : aeval u Q' = 0) (p : K.E[X])
+    (hp : aeval u p = 0) : Q' ∣ p := by
   rw [← modByMonic_eq_zero_iff_dvd hQm]
   have hr : (p %ₘ Q').degree < n :=
     (degree_modByMonic_lt p hQm).trans_eq (by rw [degree_eq_natDegree hQm.ne_zero, hdeg])
@@ -131,15 +161,12 @@ theorem dvd_of_aeval_eq_zero
   · exact hc ⟨k, hk⟩
   · exact coeff_eq_zero_of_degree_lt (hr.trans_le (by exact_mod_cast not_lt.mp hk))
 
-theorem isReduced_of
-    (hli : LinearIndependent K.E (fun i : Fin n => u ^ (i : ℕ))) (hQm : Q'.Monic)
-    (hdeg : Q'.natDegree = n) (hadj : Algebra.adjoin K.E {u} = ⊤) (hroot : aeval u Q' = 0)
-    (hsep : Q'.Separable)
-    : IsReduced B.A := by
+theorem isReduced_of (hli : LinearIndependent K.E (fun i : Fin n => u ^ (i : ℕ)))
+    (hQm : Q'.Monic) (hdeg : Q'.natDegree = n) (hadj : Algebra.adjoin K.E {u} = ⊤)
+    (hroot : aeval u Q' = 0) (hsep : Q'.Separable) : IsReduced B.A := by
   refine ⟨fun a ⟨k, hk⟩ => ?_⟩
   obtain ⟨p, -, rfl⟩ := exists_aeval_lt hQm hdeg hadj hroot a
-  have hd : Q' ∣ p ^ k :=
-    dvd_of_aeval_eq_zero hli hQm hdeg hroot (p ^ k) (by rw [map_pow]; exact hk)
+  have hd : Q' ∣ p ^ k := dvd_of_aeval_eq_zero hli hQm hdeg hroot (p ^ k) (by rw [map_pow]; exact hk)
   obtain ⟨r, rfl⟩ := hsep.squarefree.isRadical k p hd
   simp [hroot]
 
@@ -149,17 +176,10 @@ end GlobalTheory.KapLat.ExModel
 
 namespace GlobalTheory.KapLat.ExModel
 
-theorem exists_isModel
-    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (w : Pl E),
-      ¬ IsSplitAt w
-        → ∀ (K : GlobalTheory.UnitLemma.UQ) (e : K.E ≃+* w.adicCompletion E),
-          Bridge w K e
-            → ∀ (n : ℕ) (Q : (w.adicCompletion E)[X]) (B : GlobalTheory.UnitLemma.InvAlg K)
-                (u : B.A),
-              Q.Separable → Fits w e B Q u
-                → ∀ γ : GLw n w,
-                  γ ∈ UL n w → γ.val.charpoly = Q
-                    → ∃ x : B.A, B.σ x = x ∧ IsUnit x ∧ IsModel w e B u x γ := by
+theorem exists_isModel : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (w : Pl E), ¬ IsSplitAt w →
+    ∀ (K : GlobalTheory.UnitLemma.UQ) (e : K.E ≃+* w.adicCompletion E), Bridge w K e → ∀ (n : ℕ)
+    (Q : (w.adicCompletion E)[X]) (B : GlobalTheory.UnitLemma.InvAlg K) (u : B.A), Q.Separable → Fits w e B Q u →
+    ∀ γ : GLw n w, γ ∈ UL n w → γ.val.charpoly = Q → ∃ x : B.A, B.σ x = x ∧ IsUnit x ∧ IsModel w e B u x γ := by
   intro E _ _ _ w hsplit K e hB n Q B u hsep hF γ hγU hQ
   obtain ⟨hadj, hroot, hrank, huσ⟩ := hF
   subst hQ
@@ -182,9 +202,8 @@ theorem exists_isModel
 
   obtain ⟨v, hv⟩ := GlobalTheory.ClassParam.exists_cyclic_field γ.val hsep
   have hliV : LinearIndependent (w.adicCompletion E) (fun j : Fin n => (γ.val ^ (j : ℕ)) *ᵥ v) := by
-    have :=
-      Matrix.linearIndependent_cols_iff_isUnit.mpr ((Matrix.isUnit_iff_isUnit_det _).mpr
-        (isUnit_iff_ne_zero.mpr hv))
+    have := Matrix.linearIndependent_cols_iff_isUnit.mpr
+      ((Matrix.isUnit_iff_isUnit_det _).mpr (isUnit_iff_ne_zero.mpr hv))
     convert this using 1
     funext j i
     rfl
@@ -192,8 +211,8 @@ theorem exists_isModel
     basisOfLinearIndependentOfCardEqFinrank' _ hliV (by simp)
   have hbV : ∀ j, bV j = (γ.val ^ (j : ℕ)) *ᵥ v := fun j => by simp [bV]
   let ψ : B.A ≃+ (Fin n → w.adicCompletion E) :=
-    bA.equivFun.toAddEquiv.trans ((AddEquiv.piCongrRight fun _ : Fin n => e.toAddEquiv).trans
-      bV.equivFun.symm.toAddEquiv)
+    bA.equivFun.toAddEquiv.trans
+      ((AddEquiv.piCongrRight fun _ : Fin n => e.toAddEquiv).trans bV.equivFun.symm.toAddEquiv)
   have hψ : ∀ y, ψ y = bV.equivFun.symm (fun i => e (bA.equivFun y i)) := fun y => rfl
   have hψs : ∀ (c : K.E) (y : B.A), ψ (c • y) = e c • ψ y := by
     intro c y
@@ -213,14 +232,16 @@ theorem exists_isModel
     refine Finset.sum_congr rfl fun i _ => ?_
     rw [hbV, coeff_map, Matrix.smul_mulVec]
     rfl
-  have hmapQ : Q'.map e.toRingHom = γ.val.charpoly := by ext i; simp [hQ']
+  have hmapQ : Q'.map e.toRingHom = γ.val.charpoly := by
+    ext i; simp [hQ']
   have hP2 : ∀ p : K.E[X], ψ (aeval u p) = aeval γ.val (p.map e.toRingHom) *ᵥ v := by
     intro p
     have hr : (p %ₘ Q').degree < n :=
       (degree_modByMonic_lt p hQm).trans_eq (by rw [degree_eq_natDegree hQm.ne_zero, hdeg])
     rw [← aeval_modByMonic_eq_self_of_root hroot, hP1 _ hr, map_modByMonic _ hQm, hmapQ,
       aeval_modByMonic_eq_self_of_root (aeval_self_charpoly γ.val)]
-  have hψ1 : ψ 1 = v := by simpa using hP2 1
+  have hψ1 : ψ 1 = v := by
+    simpa using hP2 1
   have hmul : ∀ y, ψ (u * y) = γ.val *ᵥ ψ y := by
     intro y
     obtain ⟨p, -, rfl⟩ := exists_aeval_lt hQm hdeg hadj hroot y
@@ -239,26 +260,24 @@ theorem exists_isModel
       rw [hmul, h1, stdH_unitary w γ hU]
     | algebraMap r =>
       intro y z
-      rw [B.σ_alg, ← Algebra.smul_def, ← Algebra.smul_def, hψs, hψs, stdH_smul_left,
-        stdH_smul_right, hB.1, cj_cj w hB]
+      rw [B.σ_alg, ← Algebra.smul_def, ← Algebra.smul_def, hψs, hψs, stdH_smul_left, stdH_smul_right,
+        hB.1, cj_cj w hB]
     | add a b _ _ ha hb =>
       intro y z
-      rw [add_mul, map_add ψ, stdH_add_left, ha, hb, map_add B.σ, add_mul, map_add ψ,
-        stdH_add_right]
+      rw [add_mul, map_add ψ, stdH_add_left, ha, hb, map_add B.σ, add_mul, map_add ψ, stdH_add_right]
     | mul a b _ _ ha hb =>
       intro y z
       rw [mul_assoc, ha, hb, map_mul B.σ]
       congr 2
       ring
 
-  let lam : B.A →ₗ[K.E] K.E := {
-    toFun := fun a => e.symm (stdH w (ψ a) v)
-    map_add' := by intro a b; rw [map_add (f := _), stdH_add_left, map_add (f := _)]
-    map_smul' := by
-      intro r a
-      rw [hψs, stdH_smul_left, map_mul, RingEquiv.symm_apply_apply]
-      rfl
-  }
+  let lam : B.A →ₗ[K.E] K.E :=
+    { toFun := fun a => e.symm (stdH w (ψ a) v)
+      map_add' := by intro a b; rw [map_add (f := _), stdH_add_left, map_add (f := _)]
+      map_smul' := by
+        intro r a
+        rw [hψs, stdH_smul_left, map_mul, RingEquiv.symm_apply_apply]
+        rfl }
   haveI := isReduced_of hli hQm hdeg hadj hroot hsep'
   have hnd : ∀ a : B.A, (∀ y, Algebra.trace K.E B.A (a * y) = 0) → a = 0 := fun a ha =>
     GlobalTheory.RegSS.eq_zero_of_trace_mul_eq_zero a ha
@@ -280,8 +299,8 @@ theorem exists_isModel
     intro y z
     have h1 := hadjP (B.σ z) y 1
     rw [B.σ_σ, mul_one] at h1
-    rw [← h1, hψ1, GlobalTheory.UnitLemma.InvAlg.herm, show x * y * B.σ z = x * (B.σ z * y) by ring,
-      hxa, RingEquiv.apply_symm_apply]
+    rw [← h1, hψ1, GlobalTheory.UnitLemma.InvAlg.herm, show x * y * B.σ z = x * (B.σ z * y) by ring, hxa,
+      RingEquiv.apply_symm_apply]
   have htr : ∀ a, Algebra.trace K.E B.A (x * B.σ a) = K.c (Algebra.trace K.E B.A (x * a)) := by
     intro a
     apply e.injective
@@ -300,9 +319,8 @@ theorem exists_isModel
     apply hnd
     intro a
     rw [sub_mul, map_sub, sub_eq_zero]
-    calc
-      Algebra.trace K.E B.A (B.σ x * a)
-        = Algebra.trace K.E B.A (B.σ (x * B.σ a)) := by rw [map_mul B.σ, B.σ_σ]
+    calc Algebra.trace K.E B.A (B.σ x * a) = Algebra.trace K.E B.A (B.σ (x * B.σ a)) := by
+          rw [map_mul B.σ, B.σ_σ]
       _ = K.c (Algebra.trace K.E B.A (x * B.σ a)) := htrσ _
       _ = K.c (K.c (Algebra.trace K.E B.A (x * a))) := by rw [htr]
       _ = Algebra.trace K.E B.A (x * a) := K.c_c _

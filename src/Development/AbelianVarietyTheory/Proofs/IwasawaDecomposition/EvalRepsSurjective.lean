@@ -1,7 +1,53 @@
 module
 
-public import Mathlib
 public import Formalism.SharpRestriction.GrowthBounds.DataG
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Etale.Weakly
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.TotallySplit
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -11,29 +57,26 @@ noncomputable section
 
 namespace GlobalTheory.ClassRank
 
-variable
-  {p : ℕ} {O Kf : Type}
-  [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field Kf] [Algebra O Kf]
+variable {p : ℕ} {O Kf : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field Kf] [Algebra O Kf]
   {P : Places p O Kf}
 
-theorem gPos_mul
-    (v : Fin P.nV) (s : Fin (P.n' v)) (A B : Matrix (Fin (P.m + 1)) (Fin (P.m + 1)) (P.Qq v))
-    : P.gPos v s (A * B) = P.gPos v s A * P.gPos v s B := by
+theorem gPos_mul (v : Fin P.nV) (s : Fin (P.n' v)) (A B : Matrix (Fin (P.m + 1)) (Fin (P.m + 1)) (P.Qq v)) :
+    P.gPos v s (A * B) = P.gPos v s A * P.gPos v s B := by
   ext a b
-  set_option synthInstance.maxHeartbeats 100000 in
+
   simp only [Places.gPos, Matrix.mul_apply, map_sum, map_mul]
 
 theorem gPos_one (v : Fin P.nV) (s : Fin (P.n' v)) : P.gPos v s 1 = 1 := by
   ext a b
   by_cases h : a = b <;> simp [Places.gPos, Matrix.one_apply, h]
 
-theorem subst_comp (G H : ∀ v, Fin (P.n' v) → Matrix (Fin (P.m + 1)) (Fin (P.m + 1)) Kf)
-    : (P.subst G).comp (P.subst H) = P.subst fun v s => H v s * G v s := by
+theorem subst_comp (G H : ∀ v, Fin (P.n' v) → Matrix (Fin (P.m + 1)) (Fin (P.m + 1)) Kf) :
+    (P.subst G).comp (P.subst H) = P.subst fun v s => H v s * G v s := by
   apply MvPolynomial.algHom_ext
   intro x
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [Places.subst, AlgHom.comp_apply, aeval_X, map_sum, map_mul, algHom_C, algebraMap_eq,
-      Matrix.mul_apply, Finset.mul_sum, Finset.sum_mul]
+
+  simp only [Places.subst, AlgHom.comp_apply, aeval_X, map_sum, map_mul, algHom_C, algebraMap_eq,
+  Matrix.mul_apply, Finset.mul_sum, Finset.sum_mul]
   rw [Finset.sum_comm]
   simp only [mul_assoc]
 
@@ -47,22 +90,19 @@ theorem subst_one : (P.subst fun _ _ => 1) = AlgHom.id Kf _ := by
     simp [Ne.symm hb]
   · simp
 
-theorem natAct_mul (A B : ∀ v, GL (Fin (P.m + 1)) (P.Qq v)) (F : P.Xsp)
-    : P.natAct (fun v => A v * B v) F = P.natAct A (P.natAct B F) := by
-  have h :=
-    congrArg
-      (fun φ => φ F)
-      (subst_comp (P := P)
-        (fun v s => P.gPos v s ((A v)⁻¹ : GL (Fin (P.m + 1)) (P.Qq v)))
-        (fun v s => P.gPos v s ((B v)⁻¹ : GL (Fin (P.m + 1)) (P.Qq v))))
+theorem natAct_mul (A B : ∀ v, GL (Fin (P.m + 1)) (P.Qq v)) (F : P.Xsp) :
+    P.natAct (fun v => A v * B v) F = P.natAct A (P.natAct B F) := by
+  have h := congrArg (fun φ => φ F) (subst_comp (P := P)
+    (fun v s => P.gPos v s ((A v)⁻¹ : GL (Fin (P.m + 1)) (P.Qq v)))
+    (fun v s => P.gPos v s ((B v)⁻¹ : GL (Fin (P.m + 1)) (P.Qq v))))
   simp only [AlgHom.comp_apply] at h
   simp only [Places.natAct, LinearMap.smul_apply, AlgHom.toLinearMap_apply, map_smul, smul_smul, h,
     mul_inv_rev, Units.val_mul, gPos_mul, Matrix.det_mul, mul_zpow, Finset.prod_mul_distrib]
   first | rfl | (congr 1; exact mul_comm _ _)
 
 theorem natAct_one (F : P.Xsp) : P.natAct (fun _ => 1) F = F := by
-  simp only [Places.natAct, inv_one, Units.val_one, gPos_one, Matrix.det_one, one_zpow,
-    Finset.prod_const_one, one_smul, subst_one, AlgHom.toLinearMap_apply, AlgHom.id_apply]
+  simp only [Places.natAct, inv_one, Units.val_one, gPos_one, Matrix.det_one, one_zpow, Finset.prod_const_one,
+    one_smul, subst_one, AlgHom.toLinearMap_apply, AlgHom.id_apply]
 
 variable (C : Level P)
 
@@ -98,30 +138,27 @@ theorem isLatTup_smul_iff (γ : C.Γ) (L : P.Tup) : P.IsLatTup (C.smul γ L) ↔
   have := isLatTup_smul C γ⁻¹ h
   rwa [← smul_mul, inv_mul_cancel, smul_one] at this
 
-theorem mem_funMod_iff (Hv : P.Tup → Submodule O P.Xsp) (F : P.Tup → P.Xsp)
-    : F ∈ C.funMod Hv
-      ↔ (∀ L, P.IsLatTup L → F L ∈ Hv L) ∧ (∀ L, ¬ P.IsLatTup L → F L = 0)
-        ∧ ∀ γ L, F (C.smul γ L) = (C.χ γ : O) • C.actX γ (F L) := by
-  simp only [Level.funMod, Submodule.mem_inf, Submodule.mem_iInf, Submodule.mem_comap,
-    LinearMap.mem_ker, LinearMap.proj_apply, LinearMap.sub_apply, LinearMap.comp_apply,
-    LinearMap.smul_apply, sub_eq_zero, and_assoc, LinearMap.restrictScalars_apply]
+theorem mem_funMod_iff (Hv : P.Tup → Submodule O P.Xsp) (F : P.Tup → P.Xsp) :
+    F ∈ C.funMod Hv ↔ (∀ L, P.IsLatTup L → F L ∈ Hv L) ∧ (∀ L, ¬ P.IsLatTup L → F L = 0) ∧
+      ∀ γ L, F (C.smul γ L) = (C.χ γ : O) • C.actX γ (F L) := by
+  simp only [Level.funMod, Submodule.mem_inf, Submodule.mem_iInf, Submodule.mem_comap, LinearMap.mem_ker,
+    LinearMap.proj_apply, LinearMap.sub_apply, LinearMap.comp_apply, LinearMap.smul_apply, sub_eq_zero, and_assoc,
+    LinearMap.restrictScalars_apply]
 
 structure IsReps {ι : Type} (rep : ι → P.Tup) : Prop where
   lat : ∀ i, P.IsLatTup (rep i)
   surj : ∀ L, P.IsLatTup L → ∃ i γ, L = C.smul γ (rep i)
   inj : ∀ i j γ, C.smul γ (rep i) = rep j → i = j
 
-def evalReps (Hv : P.Tup → Submodule O P.Xsp) {ι : Type} {rep : ι → P.Tup} (hr : IsReps C rep)
-    : C.funMod Hv →ₗ[O] ∀ i, Hv (rep i) where
+def evalReps (Hv : P.Tup → Submodule O P.Xsp) {ι : Type} {rep : ι → P.Tup} (hr : IsReps C rep) :
+    C.funMod Hv →ₗ[O] ∀ i, Hv (rep i) where
   toFun F i := ⟨F.1 (rep i), ((mem_funMod_iff C Hv F.1).1 F.2).1 _ (hr.lat i)⟩
   map_add' _ _ := rfl
   map_smul' _ _ := rfl
 
-theorem evalReps_injective
-    (Hv : P.Tup → Submodule O P.Xsp) {ι : Type} {rep : ι → P.Tup} (hr : IsReps C rep)
-    : Function.Injective (evalReps C Hv hr) := by
-  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
-    rw [injective_iff_map_eq_zero]
+theorem evalReps_injective (Hv : P.Tup → Submodule O P.Xsp) {ι : Type} {rep : ι → P.Tup} (hr : IsReps C rep) :
+    Function.Injective (evalReps C Hv hr) := by
+  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
   intro F hF
   obtain ⟨-, h0, hγ⟩ := (mem_funMod_iff C Hv F.1).1 F.2
   apply Subtype.ext
@@ -133,13 +170,11 @@ theorem evalReps_injective
     rfl
   · exact h0 L hL
 
-theorem evalReps_surjective
-    (Hv : P.Tup → Submodule O P.Xsp)
-    (hact : ∀ (γ : C.Γ) (L : P.Tup),
-      P.IsLatTup L → (Hv L).map ((C.actX γ).restrictScalars O) = Hv (C.smul γ L))
-    (htriv : C.TrivStab)
-    {ι : Type} {rep : ι → P.Tup} (hr : IsReps C rep)
-    : Function.Surjective (evalReps C Hv hr) := by
+theorem evalReps_surjective (Hv : P.Tup → Submodule O P.Xsp)
+    (hact : ∀ (γ : C.Γ) (L : P.Tup), P.IsLatTup L →
+      (Hv L).map ((C.actX γ).restrictScalars O) = Hv (C.smul γ L))
+    (htriv : C.TrivStab) {ι : Type} {rep : ι → P.Tup} (hr : IsReps C rep) :
+    Function.Surjective (evalReps C Hv hr) := by
   classical
   intro x
   choose idx gam hgam using hr.surj
@@ -157,8 +192,7 @@ theorem evalReps_surjective
     obtain rfl := hr.inj _ _ _ e'
     obtain rfl : δ = γ := inv_mul_eq_one.1 (htriv _ _ (hr.lat i) e')
     rfl
-  refine
-    ⟨⟨F, (mem_funMod_iff C Hv F).2 ⟨fun L hL => ?_, fun L hL => dif_neg hL, fun γ L => ?_⟩⟩, ?_⟩
+  refine ⟨⟨F, (mem_funMod_iff C Hv F).2 ⟨fun L hL => ?_, fun L hL => dif_neg hL, fun γ L => ?_⟩⟩, ?_⟩
   · obtain ⟨i, γ, rfl⟩ := hr.surj L hL
     rw [key, ← hact γ _ (hr.lat i)]
     exact Submodule.smul_mem _ _ ⟨_, (x i).2, rfl⟩
@@ -176,40 +210,31 @@ theorem evalReps_surjective
     rw [smul_one, map_one, Units.val_one, one_smul, actX_one] at this
     exact this
 
-def evalRepsEquiv
-    (Hv : P.Tup → Submodule O P.Xsp)
-    (hact : ∀ (γ : C.Γ) (L : P.Tup),
-      P.IsLatTup L → (Hv L).map ((C.actX γ).restrictScalars O) = Hv (C.smul γ L))
-    (htriv : C.TrivStab)
-    {ι : Type} {rep : ι → P.Tup} (hr : IsReps C rep)
-    : C.funMod Hv ≃ₗ[O] ∀ i, Hv (rep i) :=
-  LinearEquiv.ofBijective (evalReps C Hv hr)
-    ⟨evalReps_injective C Hv hr, evalReps_surjective C Hv hact htriv hr⟩
+def evalRepsEquiv (Hv : P.Tup → Submodule O P.Xsp)
+    (hact : ∀ (γ : C.Γ) (L : P.Tup), P.IsLatTup L →
+      (Hv L).map ((C.actX γ).restrictScalars O) = Hv (C.smul γ L))
+    (htriv : C.TrivStab) {ι : Type} {rep : ι → P.Tup} (hr : IsReps C rep) :
+    C.funMod Hv ≃ₗ[O] ∀ i, Hv (rep i) :=
+  LinearEquiv.ofBijective (evalReps C Hv hr) ⟨evalReps_injective C Hv hr, evalReps_surjective C Hv hact htriv hr⟩
 
-theorem d_eq_card_mul
-    (G : GAtP p) (hinj : Function.Injective (algebraMap G.O G.Kf)) (htriv : G.TrivStab)
-    (hact : ∀ c, (G.lev c).ActHW)
-    {ι : G.comp → Type} [∀ c, Fintype (ι c)]
-    (rep : ∀ c, ι c → G.P.Tup)
-    (hr : ∀ c, IsReps (G.lev c) (rep c)) (hfg : ∀ c i, (G.P.HtupW (rep c i)).FG)
-    (n : ℕ) (hn : ∀ c i, Module.finrank G.O (G.P.HtupW (rep c i)) = n)
-    : G.d = (∑ c, Fintype.card (ι c)) * n := by
+theorem d_eq_card_mul (G : GAtP p) (hinj : Function.Injective (algebraMap G.O G.Kf)) (htriv : G.TrivStab)
+    (hact : ∀ c, (G.lev c).ActHW) {ι : G.comp → Type} [∀ c, Fintype (ι c)] (rep : ∀ c, ι c → G.P.Tup)
+    (hr : ∀ c, IsReps (G.lev c) (rep c)) (hfg : ∀ c i, (G.P.HtupW (rep c i)).FG) (n : ℕ)
+    (hn : ∀ c i, Module.finrank G.O (G.P.HtupW (rep c i)) = n) :
+    G.d = (∑ c, Fintype.card (ι c)) * n := by
   have : FaithfulSMul G.O G.Kf := (faithfulSMul_iff_algebraMap_injective _ _).2 hinj
   have : Module.IsTorsionFree G.O G.P.Xsp := Module.IsTorsionFree.trans G.Kf
-  have : ∀ c i, Module.Finite G.O (G.P.HtupW (rep c i)) := fun c i =>
-    Module.Finite.iff_fg.2 (hfg c i)
+  have : ∀ c i, Module.Finite G.O (G.P.HtupW (rep c i)) := fun c i => Module.Finite.iff_fg.2 (hfg c i)
   have : ∀ c i, Module.Free G.O (G.P.HtupW (rep c i)) := fun c i => inferInstance
-  let e0 : G.M ≃ₗ[G.O] ∀ c, (G.lev c).funMod G.P.HtupW := {
-    toFun := fun F c => ⟨F.1 c, F.2 c (Set.mem_univ c)⟩
-    invFun := fun F => ⟨fun c => (F c).1, fun c _ => (F c).2⟩
-    map_add' := fun _ _ => rfl
-    map_smul' := fun _ _ => rfl
-    left_inv := fun _ => rfl
-    right_inv := fun _ => rfl
-  }
-  let e1 :=
-    e0.trans (LinearEquiv.piCongrRight fun c =>
-      evalRepsEquiv (G.lev c) G.P.HtupW (hact c) (htriv c) (hr c))
+  let e0 : G.M ≃ₗ[G.O] ∀ c, (G.lev c).funMod G.P.HtupW :=
+    { toFun := fun F c => ⟨F.1 c, F.2 c (Set.mem_univ c)⟩
+      invFun := fun F => ⟨fun c => (F c).1, fun c _ => (F c).2⟩
+      map_add' := fun _ _ => rfl
+      map_smul' := fun _ _ => rfl
+      left_inv := fun _ => rfl
+      right_inv := fun _ => rfl }
+  let e1 := e0.trans (LinearEquiv.piCongrRight fun c =>
+    evalRepsEquiv (G.lev c) G.P.HtupW (hact c) (htriv c) (hr c))
   rw [GAtP.d, e1.finrank_eq, Module.finrank_pi_fintype, Finset.sum_mul]
   refine Finset.sum_congr rfl fun c _ => ?_
   rw [Module.finrank_pi_fintype]

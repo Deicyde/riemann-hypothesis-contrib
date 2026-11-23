@@ -1,7 +1,58 @@
 module
 
 public import Formalism.HermitianCurvature.CapelliDeterminantAndBranching
+public import Mathlib.LinearAlgebra.Lagrange
 public import Formalism.HermitianCurvature.HermitianCurvatureProofs.QuantumMinorCommutation
+import Formalism.RealPlaceAnalysis.RealPlaceTaylor.GeneratorCommutatorQuantumDet
+import Formalism.RealPlaceAnalysis.RealPlaceTaylor.QuantumDetHighestWeightHolds
+import Formalism.RealPlaceAnalysis.RealPlaceTaylor.ShiftedGeneratorEqIteSmulAdd
+import Mathlib.Algebra.Module.StablyFree.Basic
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -117,8 +168,8 @@ theorem polyVanish
   have hroot : ∀ u : ℂ, u ∉ F → p.eval u = 0 := by
     intro u hu
     have h1 := congrArg φ (h u hu)
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_smul, smul_eq_mul, map_zero] at h1
+
+    simp only [map_sum, map_smul, smul_eq_mul, map_zero] at h1
     rw [hp, Polynomial.eval_finsetSum]
     simp only [Polynomial.eval_mul, Polynomial.eval_C, Polynomial.eval_pow, Polynomial.eval_X]
     calc
@@ -328,8 +379,8 @@ theorem comat (hE : GlRel E) (u : ℂ) (X : Fin (N + 1) → V) (i : Fin (N + 1))
   have h2 : ∑ l, (if i = l then qdet E u (X l) else 0) = qdet E u (X i) := by simp
   rw [← h2, ← Finset.sum_congr rfl (fun l _ => h l), Finset.sum_comm, Th_apply]
   refine Finset.sum_congr rfl (fun j _ => ?_)
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [← Finset.smul_sum, ← map_sum]
+
+  rw [← Finset.smul_sum, ← map_sum]
   congr 2
   simp only [Tm_apply, Finset.sum_add_distrib, Finset.sum_ite_eq, Finset.mem_univ, if_true,
     Pi.add_apply, Pi.smul_apply, EE_apply]
@@ -536,8 +587,8 @@ theorem covUp_succ
   · have hs : ∑ i, Lagrange.basis Finset.univ (fun j => -m j) i = 1 :=
       Lagrange.sum_basis (fun a _ b _ h => hm (neg_injective h)) Finset.univ_nonempty
     have hsum : ∑ i, Y i = Z := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [hYdef, ← LinearMap.sum_apply, ← map_sum, hs, map_one]
+
+      rw [hYdef, ← LinearMap.sum_apply, ← map_sum, hs, map_one]
       rfl
     have h1 := congrFun hsum x
     rw [Finset.sum_apply] at h1

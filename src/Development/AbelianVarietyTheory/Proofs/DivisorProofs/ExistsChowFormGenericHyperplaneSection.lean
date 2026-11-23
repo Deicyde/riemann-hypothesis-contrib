@@ -1,10 +1,55 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.Definitions.Divisors.AevalEqZeroOfMemConeIdeal
-public import Development.AbelianVarietyTheory.Definitions.ThetaMetrics.ExistsAlgebraicIndependentGenericPoint
-public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ProjPointIdealMemProjComponentsOfIsProjPureDim
-public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsFormDegreeLeHilbertDegreeEvalNeZero
+public import Development.AbelianVarietyTheory.Definitions.Divisors.IrreducibleOfIrreducibleMap
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.Order.CompletePartialOrder
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.MvPolynomial.IrreducibleQuadratic
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
+import Development.AbelianVarietyTheory.Definitions.Divisors.AevalEqZeroOfMemConeIdeal
 
 @[expose] public section
 
@@ -19,44 +64,37 @@ namespace GlobalTheory.ChowSpec
 
 attribute [local instance] MvPolynomial.gradedAlgebra MvPolynomial.algebraMvPolynomial
 
-def lastSubst {A : Type} [CommRing A] {N : ℕ} (D : ℕ) (t : Fin N → A)
-    : Fin (D + 1) × Fin N → MvPolynomial (Fin D × Fin N) A := fun v =>
-  Fin.lastCases
-    (motive := fun _ => MvPolynomial (Fin D × Fin N) A)
-    (C (t v.2))
-    (fun i => X (i, v.2))
-    v.1
+def lastSubst {A : Type} [CommRing A] {N : ℕ} (D : ℕ) (t : Fin N → A) :
+    Fin (D + 1) × Fin N → MvPolynomial (Fin D × Fin N) A :=
+  fun v => Fin.lastCases (motive := fun _ => MvPolynomial (Fin D × Fin N) A)
+    (C (t v.2)) (fun i => X (i, v.2)) v.1
 
 set_option autoImplicit false in
 open MvPolynomial Filter in
 open scoped ENNReal in
 attribute [local instance] MvPolynomial.gradedAlgebra MvPolynomial.algebraMvPolynomial in
-@[simp]
-theorem _root_.GlobalTheory.ChowSpec.lastSubst_last
-    {A : Type} [CommRing A] {N : ℕ} (D : ℕ) (t : Fin N → A) (j : Fin N)
-    : _root_.GlobalTheory.ChowSpec.lastSubst D t (Fin.last D, j) = C (t j) := by
+@[simp] theorem _root_.GlobalTheory.ChowSpec.lastSubst_last {A : Type} [CommRing A] {N : ℕ} (D : ℕ)
+    (t : Fin N → A) (j : Fin N) : _root_.GlobalTheory.ChowSpec.lastSubst D t (Fin.last D, j) = C (t j) := by
   simp [_root_.GlobalTheory.ChowSpec.lastSubst]
 
 set_option autoImplicit false in
 open MvPolynomial Filter in
 open scoped ENNReal in
 attribute [local instance] MvPolynomial.gradedAlgebra MvPolynomial.algebraMvPolynomial in
-@[simp]
-theorem _root_.GlobalTheory.ChowSpec.lastSubst_castSucc
-    {A : Type} [CommRing A] {N : ℕ} (D : ℕ) (t : Fin N → A) (i : Fin D) (j : Fin N)
-    : _root_.GlobalTheory.ChowSpec.lastSubst D t (i.castSucc, j) = X (i, j) := by
+@[simp] theorem _root_.GlobalTheory.ChowSpec.lastSubst_castSucc {A : Type} [CommRing A] {N : ℕ} (D : ℕ)
+    (t : Fin N → A) (i : Fin D) (j : Fin N) :
+    _root_.GlobalTheory.ChowSpec.lastSubst D t (i.castSucc, j) = X (i, j) := by
   simp [_root_.GlobalTheory.ChowSpec.lastSubst]
 
-def lastEquiv (K : Type) [CommRing K] (N D : ℕ)
-    : MvPolynomial (Fin (D + 1) × Fin N) K
-      ≃+* MvPolynomial (Fin D × Fin N) (MvPolynomial (Fin N) K) :=
-  RingEquiv.ofRingHom (aeval (R := K) (lastSubst D (X : Fin N → MvPolynomial (Fin N) K))).toRingHom
+def lastEquiv (K : Type) [CommRing K] (N D : ℕ) :
+    MvPolynomial (Fin (D + 1) × Fin N) K ≃+* MvPolynomial (Fin D × Fin N) (MvPolynomial (Fin N) K) :=
+  RingEquiv.ofRingHom
+    (aeval (R := K) (lastSubst D (X : Fin N → MvPolynomial (Fin N) K))).toRingHom
     (eval₂Hom (aeval (R := K) (fun j => X (Fin.last D, j))).toRingHom
       (fun v => X (v.1.castSucc, v.2)))
     (by
       refine MvPolynomial.ringHom_ext' (MvPolynomial.ringHom_ext (fun r => ?_) (fun j => ?_))
-          (fun v => ?_)
-        <;> simp)
+        (fun v => ?_) <;> simp)
     (by
       refine MvPolynomial.ringHom_ext (fun r => by simp) ?_
       rintro ⟨i, j⟩
@@ -66,47 +104,31 @@ set_option autoImplicit false in
 open MvPolynomial Filter in
 open scoped ENNReal in
 attribute [local instance] MvPolynomial.gradedAlgebra MvPolynomial.algebraMvPolynomial in
-private theorem isWeightedHomogeneous_aeval_of_forall
-    {R S σ τ Γ Δ : Type}
-    [CommSemiring R] [CommSemiring S] [Algebra R S] [AddCommMonoid Γ] [AddCommMonoid Δ]
-    {w : σ → Γ} {w' : τ → Δ}
-    (g : Γ →+ Δ)
-    {p : MvPolynomial σ R} {m : Γ} (hp : IsWeightedHomogeneous w p m)
-    (φ : σ → MvPolynomial τ S) (hφ : ∀ v, IsWeightedHomogeneous w' (φ v) (g (w v)))
-    : IsWeightedHomogeneous w' (aeval φ p) (g m) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [p.as_sum, map_sum, ← mem_weightedHomogeneousSubmodule]
+private theorem isWeightedHomogeneous_aeval_of_forall {R S σ τ Γ Δ : Type} [CommSemiring R]
+    [CommSemiring S] [Algebra R S] [AddCommMonoid Γ] [AddCommMonoid Δ] {w : σ → Γ}
+    {w' : τ → Δ} (g : Γ →+ Δ) {p : MvPolynomial σ R} {m : Γ}
+    (hp : IsWeightedHomogeneous w p m) (φ : σ → MvPolynomial τ S)
+    (hφ : ∀ v, IsWeightedHomogeneous w' (φ v) (g (w v))) :
+    IsWeightedHomogeneous w' (aeval φ p) (g m) := by
+
+  rw [p.as_sum, map_sum, ← mem_weightedHomogeneousSubmodule]
   refine Submodule.sum_mem _ fun s hs => ?_
   rw [mem_weightedHomogeneousSubmodule, aeval_monomial, Finsupp.prod]
   have hw : Finsupp.weight w s = m := hp (mem_support_iff.mp hs)
   have hm : g m = 0 + ∑ v ∈ s.support, s v • g (w v) := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [zero_add, ← hw, Finsupp.weight_apply, Finsupp.sum, map_sum]
+
+    rw [zero_add, ← hw, Finsupp.weight_apply, Finsupp.sum, map_sum]
     simp [map_nsmul]
   rw [hm, MvPolynomial.algebraMap_apply]
   exact (isWeightedHomogeneous_C w' _).mul
     (IsWeightedHomogeneous.prod _ _ _ fun v _ => (hφ v).pow _)
 
+
 set_option autoImplicit false in
 open MvPolynomial Filter in
 open scoped ENNReal in
 attribute [local instance] MvPolynomial.gradedAlgebra MvPolynomial.algebraMvPolynomial in
-theorem _root_.GlobalTheory.ChowSpec.exists_isChowFormInt_generic_section
-    : ∀ (K L : Type) [Field K] [Field L] (N : ℕ) [Algebra K L] [Algebra (MvPolynomial (Fin N) K) L]
-        [IsScalarTower K (MvPolynomial (Fin N) K) L] [IsFractionRing (MvPolynomial (Fin N) K) L]
-        (P : Ideal (MvPolynomial (Fin N) K)) (D δ : ℕ)
-        (f : MvPolynomial (Fin (D + 1 + 1) × Fin N) K),
-      (∀ g ∈ P, ∀ n : ℕ, homogeneousComponent n g ∈ P)
-        → _root_.GlobalTheory.ChowHt.IsChowFormInt P (D + 1) δ f
-        → ∃ f' : MvPolynomial (Fin (D + 1) × Fin N) L,
-          _root_.GlobalTheory.ChowHt.IsChowFormInt
-            (P.map
-                (MvPolynomial.map (algebraMap K L)
-                  : MvPolynomial (Fin N) K →+* MvPolynomial (Fin N) L)
-              ⊔ Ideal.span
-                {(∑ j : Fin N, C (algebraMap (MvPolynomial (Fin N) K) L (X j)) * X j
-                  : MvPolynomial (Fin N) L)})
-            D δ f' := by
+theorem _root_.GlobalTheory.ChowSpec.exists_isChowFormInt_generic_section : ∀ (K L : Type) [Field K] [Field L] (N : ℕ) [Algebra K L] [Algebra (MvPolynomial (Fin N) K) L] [IsScalarTower K (MvPolynomial (Fin N) K) L] [IsFractionRing (MvPolynomial (Fin N) K) L] (P : Ideal (MvPolynomial (Fin N) K)) (D δ : ℕ) (f : MvPolynomial (Fin (D + 1 + 1) × Fin N) K), (∀ g ∈ P, ∀ n : ℕ, homogeneousComponent n g ∈ P) → _root_.GlobalTheory.ChowHt.IsChowFormInt P (D + 1) δ f → ∃ f' : MvPolynomial (Fin (D + 1) × Fin N) L, _root_.GlobalTheory.ChowHt.IsChowFormInt (P.map (MvPolynomial.map (algebraMap K L) : MvPolynomial (Fin N) K →+* MvPolynomial (Fin N) L) ⊔ Ideal.span {(∑ j : Fin N, C (algebraMap (MvPolynomial (Fin N) K) L (X j)) * X j : MvPolynomial (Fin N) L)}) D δ f' := by
   intro K L _ _ N _ _ _ _ P D δ f hP hf
   set t : Fin N → L := fun j => algebraMap (MvPolynomial (Fin N) K) L (X j) with ht
   set φ := _root_.GlobalTheory.ChowSpec.lastSubst (D + 1) t with hφ
@@ -115,11 +137,8 @@ theorem _root_.GlobalTheory.ChowSpec.exists_isChowFormInt_generic_section
     _root_.GlobalTheory.ChowHt.isMultiHomogeneous_iff_block.1 hf.homog
   have hf'hom : _root_.GlobalTheory.Chow.IsBlockHomogeneous f' (fun _ => δ) := by
     unfold _root_.GlobalTheory.Chow.IsBlockHomogeneous at hfhom ⊢
-    let g : (Fin (D + 1 + 1) → ℕ) →+ (Fin (D + 1) → ℕ) := {
-      toFun := fun a i => a i.castSucc
-      map_zero' := rfl
-      map_add' := fun _ _ => rfl
-    }
+    let g : (Fin (D + 1 + 1) → ℕ) →+ (Fin (D + 1) → ℕ) :=
+      { toFun := fun a i => a i.castSucc, map_zero' := rfl, map_add' := fun _ _ => rfl }
     refine isWeightedHomogeneous_aeval_of_forall (S := L) g hfhom φ ?_
     rintro ⟨i, j⟩
     induction i using Fin.lastCases with
@@ -130,23 +149,17 @@ theorem _root_.GlobalTheory.ChowSpec.exists_isChowFormInt_generic_section
       rw [hφ, _root_.GlobalTheory.ChowSpec.lastSubst_last, hg]
       exact isWeightedHomogeneous_C _ _
     | cast i =>
-      have hg
-          : g (_root_.GlobalTheory.Chow.blockWeight (i.castSucc, j))
-            = _root_.GlobalTheory.Chow.blockWeight (i, j) := by
+      have hg : g (_root_.GlobalTheory.Chow.blockWeight (i.castSucc, j)) = _root_.GlobalTheory.Chow.blockWeight (i, j) := by
         funext i'
         simp [g, _root_.GlobalTheory.Chow.blockWeight, Pi.single_apply]
       rw [hφ, _root_.GlobalTheory.ChowSpec.lastSubst_castSucc, hg]
       exact isWeightedHomogeneous_X _ _ _
   refine ⟨f', _root_.GlobalTheory.ChowHt.isMultiHomogeneous_iff_block.2 hf'hom, ?_, ?_⟩
-  · have hkey
-        : MvPolynomial.map (algebraMap (MvPolynomial (Fin N) K) L)
-            (_root_.GlobalTheory.ChowSpec.lastEquiv K N (D + 1) f)
-          = f' := by
+  · have hkey : MvPolynomial.map (algebraMap (MvPolynomial (Fin N) K) L)
+        (_root_.GlobalTheory.ChowSpec.lastEquiv K N (D + 1) f) = f' := by
       rw [hf']
       change ((MvPolynomial.map (algebraMap (MvPolynomial (Fin N) K) L)).comp
-            (_root_.GlobalTheory.ChowSpec.lastEquiv K N (D + 1)).toRingHom)
-          f
-        = (aeval φ).toRingHom f
+        (_root_.GlobalTheory.ChowSpec.lastEquiv K N (D + 1)).toRingHom) f = (aeval φ).toRingHom f
       congr 1
       refine MvPolynomial.ringHom_ext (fun r => ?_) (fun v => ?_)
       · simp [_root_.GlobalTheory.ChowSpec.lastEquiv, MvPolynomial.algebraMap_apply,
@@ -155,7 +168,8 @@ theorem _root_.GlobalTheory.ChowSpec.exists_isChowFormInt_generic_section
         induction i using Fin.lastCases <;> simp [_root_.GlobalTheory.ChowSpec.lastEquiv, hφ, ht]
     set F := _root_.GlobalTheory.ChowSpec.lastEquiv K N (D + 1) f with hF
     have hFirr : Irreducible F :=
-      (MulEquiv.irreducible_iff (_root_.GlobalTheory.ChowSpec.lastEquiv K N (D + 1))).2 hf.irred
+      (MulEquiv.irreducible_iff (_root_.GlobalTheory.ChowSpec.lastEquiv K N (D + 1))).2
+        hf.irred
     have hF0 : F ≠ 0 := hFirr.ne_zero
     have hFprime : Prime F := UniqueFactorizationMonoid.irreducible_iff_prime.1 hFirr
     have hδ : 0 < δ := by
@@ -174,9 +188,8 @@ theorem _root_.GlobalTheory.ChowSpec.exists_isChowFormInt_generic_section
       · exact h
     have hf'0 : f' ≠ 0 := by
       rw [← hkey]
-      exact fun h =>
-        hF0 ((map_eq_zero_iff _
-          (MvPolynomial.map_injective _ (IsFractionRing.injective (MvPolynomial (Fin N) K) L))).1 h)
+      exact fun h => hF0 ((map_eq_zero_iff _
+        (MvPolynomial.map_injective _ (IsFractionRing.injective (MvPolynomial (Fin N) K) L))).1 h)
     have hnotunit : ¬ IsUnit f' := by
       intro hu
       obtain ⟨r, hr, hfr⟩ := (MvPolynomial.isUnit_iff_eq_C_of_isReduced).1 hu
@@ -185,15 +198,11 @@ theorem _root_.GlobalTheory.ChowSpec.exists_isChowFormInt_generic_section
       have h0 := hh (show AddMonoidAlgebra.coeff (C r) 0 ≠ 0 by simpa using hr.ne_zero)
       simp at h0
       omega
-    have hdisj : Disjoint
-        ((Submonoid.map
-            (C
-              : MvPolynomial (Fin N) K
-                →+* MvPolynomial (Fin (D + 1) × Fin N) (MvPolynomial (Fin N) K))
-            (nonZeroDivisors (MvPolynomial (Fin N) K)))
-          : Set (MvPolynomial (Fin (D + 1) × Fin N) (MvPolynomial (Fin N) K)))
-        (↑(Ideal.span {F})
-          : Set (MvPolynomial (Fin (D + 1) × Fin N) (MvPolynomial (Fin N) K))) := by
+    have hdisj : Disjoint ((Submonoid.map (C : MvPolynomial (Fin N) K →+*
+        MvPolynomial (Fin (D + 1) × Fin N) (MvPolynomial (Fin N) K))
+          (nonZeroDivisors (MvPolynomial (Fin N) K))) :
+            Set (MvPolynomial (Fin (D + 1) × Fin N) (MvPolynomial (Fin N) K)))
+        (↑(Ideal.span {F}) : Set (MvPolynomial (Fin (D + 1) × Fin N) (MvPolynomial (Fin N) K))) := by
       rw [Set.disjoint_left]
       rintro _ ⟨s, hs, rfl⟩ hmem
       obtain ⟨g, hg⟩ := Ideal.mem_span_singleton'.1 hmem
@@ -203,21 +212,15 @@ theorem _root_.GlobalTheory.ChowSpec.exists_isChowFormInt_generic_section
       have hmapped := congrArg (MvPolynomial.map (algebraMap (MvPolynomial (Fin N) K) L)) hg
       rw [map_mul, hkey, map_C] at hmapped
       exact isUnit_of_mul_isUnit_right (hmapped ▸ hs0.isUnit.map C)
-    have hprime :=
-      IsLocalization.isPrime_of_isPrime_disjoint
-        (Submonoid.map
-          (C
-            : MvPolynomial (Fin N) K
-              →+* MvPolynomial (Fin (D + 1) × Fin N) (MvPolynomial (Fin N) K))
+    have hprime := IsLocalization.isPrime_of_isPrime_disjoint
+      (Submonoid.map (C : MvPolynomial (Fin N) K →+*
+        MvPolynomial (Fin (D + 1) × Fin N) (MvPolynomial (Fin N) K))
           (nonZeroDivisors (MvPolynomial (Fin N) K)))
-        (MvPolynomial (Fin (D + 1) × Fin N) L) (Ideal.span {F})
-        ((Ideal.span_singleton_prime hF0).2 hFprime) hdisj
+      (MvPolynomial (Fin (D + 1) × Fin N) L) (Ideal.span {F})
+      ((Ideal.span_singleton_prime hF0).2 hFprime) hdisj
     rw [Ideal.map_span, Set.image_singleton] at hprime
-    have hF'
-        : algebraMap (MvPolynomial (Fin (D + 1) × Fin N) (MvPolynomial (Fin N) K))
-            (MvPolynomial (Fin (D + 1) × Fin N) L) F
-          = f' :=
-      hkey
+    have hF' : algebraMap (MvPolynomial (Fin (D + 1) × Fin N) (MvPolynomial (Fin N) K))
+        (MvPolynomial (Fin (D + 1) × Fin N) L) F = f' := hkey
     rw [hF'] at hprime
     exact ((Ideal.span_singleton_prime hf'0).1 hprime).irreducible
   · intro u
@@ -245,23 +248,15 @@ theorem _root_.GlobalTheory.ChowSpec.exists_isChowFormInt_generic_section
           homogeneousComponent_eq_zero i r (by simp at hi; omega)
         rw [h0, DirectSum.decompose_zero]
         rfl
-    have hideal
-        : ∀ y : Fin N → AlgebraicClosure L,
-          (∀ g
-                ∈ P.map
-                    (MvPolynomial.map (algebraMap K L)
-                      : MvPolynomial (Fin N) K →+* MvPolynomial (Fin N) L)
-                  ⊔ Ideal.span {(∑ j : Fin N, C (t j) * X j : MvPolynomial (Fin N) L)},
-              aeval y g = 0)
-            ↔ (∀ g ∈ P, aeval y g = 0) ∧ ∑ j, ũ (Fin.last (D + 1), j) * y j = 0 := by
+    have hideal : ∀ y : Fin N → AlgebraicClosure L,
+        (∀ g ∈ P.map (MvPolynomial.map (algebraMap K L) : MvPolynomial (Fin N) K →+* MvPolynomial (Fin N) L) ⊔
+          Ideal.span {(∑ j : Fin N, C (t j) * X j : MvPolynomial (Fin N) L)}, aeval y g = 0) ↔
+        (∀ g ∈ P, aeval y g = 0) ∧ ∑ j, ũ (Fin.last (D + 1), j) * y j = 0 := by
       intro y
-      have hmap
-          : ∀ g : MvPolynomial (Fin N) K,
-            aeval y (MvPolynomial.map (algebraMap K L) g) = aeval y g := fun g =>
-        aeval_map_algebraMap L y g
-      have hlin
-          : aeval y (∑ j : Fin N, C (t j) * X j : MvPolynomial (Fin N) L)
-            = ∑ j, ũ (Fin.last (D + 1), j) * y j := by
+      have hmap : ∀ g : MvPolynomial (Fin N) K,
+          aeval y (MvPolynomial.map (algebraMap K L) g) = aeval y g := fun g => aeval_map_algebraMap L y g
+      have hlin : aeval y (∑ j : Fin N, C (t j) * X j : MvPolynomial (Fin N) L) =
+          ∑ j, ũ (Fin.last (D + 1), j) * y j := by
         simp [hũ]
       constructor
       · intro H
@@ -271,14 +266,10 @@ theorem _root_.GlobalTheory.ChowSpec.exists_isChowFormInt_generic_section
         · rw [← hlin]
           exact H _ (Ideal.mem_sup_right (Ideal.mem_span_singleton_self _))
       · rintro ⟨H1, H2⟩ g hg
-        have hle
-            : P.map
-                  (MvPolynomial.map (algebraMap K L)
-                    : MvPolynomial (Fin N) K →+* MvPolynomial (Fin N) L)
-                ⊔ Ideal.span {(∑ j : Fin N, C (t j) * X j : MvPolynomial (Fin N) L)}
-              ≤ RingHom.ker (aeval y : MvPolynomial (Fin N) L →ₐ[L] AlgebraicClosure L) := by
-          refine sup_le (Ideal.map_le_iff_le_comap.2 fun g hg => ?_)
-            ((Ideal.span_singleton_le_iff_mem _).2 ?_)
+        have hle : P.map (MvPolynomial.map (algebraMap K L) : MvPolynomial (Fin N) K →+* MvPolynomial (Fin N) L) ⊔
+            Ideal.span {(∑ j : Fin N, C (t j) * X j : MvPolynomial (Fin N) L)} ≤
+            RingHom.ker (aeval y : MvPolynomial (Fin N) L →ₐ[L] AlgebraicClosure L) := by
+          refine sup_le (Ideal.map_le_iff_le_comap.2 fun g hg => ?_) ((Ideal.span_singleton_le_iff_mem _).2 ?_)
           · simpa [RingHom.mem_ker, hmap] using H1 g hg
           · simpa [RingHom.mem_ker, hlin] using H2
         exact RingHom.mem_ker.1 (hle hg)

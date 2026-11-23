@@ -1,39 +1,79 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentations.LocalMaximality.LiftFactorization
+public import Development.AbelianVarietyTheory.Definitions.Divisors.BicechC
 public import Development.AutomorphicArithmetic.Foundations.EtaleClopenDescent.BicechCohomologyKunnethDecomposition
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
+public import Development.AbelianVarietyTheory.Definitions.Divisors.ProdFam
 
 @[expose] public section
 
-open KaehlerDifferential GlobalTheory.CechDR GlobalTheory.PD GlobalTheory.WH GlobalTheory.W1
-  UpperTheory.Gal.productCup_of_system
+open KaehlerDifferential GlobalTheory.CechDR GlobalTheory.PD GlobalTheory.WH GlobalTheory.W1 UpperTheory.Gal.productCup_of_system
 open scoped TensorProduct
 
 section
 variable {ι G : Type} [LinearOrder ι] [AddCommGroup G] [Module ℂ G]
 
-private def kdTw (c : Finset (ι ⊕ₗ ι) → G) : Finset ι × Finset ι → G := fun x =>
-  ((-1 : ℤ) ^ x.2.card) • c (uni x.1 x.2)
+private def kdTw (c : Finset (ι ⊕ₗ ι) → G) : Finset ι × Finset ι → G :=
+  fun x => ((-1 : ℤ) ^ x.2.card) • c (uni x.1 x.2)
 
 private def kdUn : (Finset ι × Finset ι → G) →ₗ[ℂ] (Finset (ι ⊕ₗ ι) → G) :=
-  LinearMap.pi fun s =>
-    ((-1 : ℤ) ^ (rgt s).card)
-      • LinearMap.proj (R := ℂ) (φ := fun _ : Finset ι × Finset ι => G) (lft s, rgt s)
+  LinearMap.pi fun s => ((-1 : ℤ) ^ (rgt s).card) •
+    LinearMap.proj (R := ℂ) (φ := fun _ : Finset ι × Finset ι => G) (lft s, rgt s)
 
-private theorem kdUn_apply (z : Finset ι × Finset ι → G) (s : Finset (ι ⊕ₗ ι))
-    : kdUn z s = ((-1 : ℤ) ^ (rgt s).card) • z (lft s, rgt s) := by
+private theorem kdUn_apply (z : Finset ι × Finset ι → G) (s : Finset (ι ⊕ₗ ι)) :
+    kdUn z s = ((-1 : ℤ) ^ (rgt s).card) • z (lft s, rgt s) := by
   simp [kdUn]
 
-private theorem kd_wd_one (c : Finset ι → G) (t : Finset ι)
-    : wd (fun _ => (1 : Module.End ℂ G)) c t
-      = ∑ i ∈ t, (GlobalTheory.cubeSign t i : ℤ) • c (t.erase i) := by
+private theorem kd_wd_one (c : Finset ι → G) (t : Finset ι) :
+    wd (fun _ => (1 : Module.End ℂ G)) c t = ∑ i ∈ t, (GlobalTheory.cubeSign t i : ℤ) • c (t.erase i) := by
   simp [wd, LinearMap.sum_apply]
 
-private theorem kd_biD (z : Finset ι × Finset ι → G) (I J : Finset ι)
-    : biD ℂ ι ι G z (I, J)
-      = ∑ i ∈ I, GlobalTheory.cubeSign I i • z (I.erase i, J)
-        + ((-1 : ℤ) ^ (I.card + 1)) • ∑ j ∈ J, GlobalTheory.cubeSign J j • z (I, J.erase j) := by
+private theorem kd_biD (z : Finset ι × Finset ι → G) (I J : Finset ι) :
+    biD ℂ ι ι G z (I, J) = ∑ i ∈ I, GlobalTheory.cubeSign I i • z (I.erase i, J) +
+      ((-1 : ℤ) ^ (I.card + 1)) • ∑ j ∈ J, GlobalTheory.cubeSign J j • z (I, J.erase j) := by
   simp [biD, LinearMap.sum_apply]
 
 private theorem kd_neg_sq (n : ℕ) (x : G) : ((-1 : ℤ) ^ n) • ((-1 : ℤ) ^ n) • x = x := by
@@ -54,8 +94,8 @@ private theorem kdTw_un (hU : WdUni) (z : Finset ι × Finset ι → G) : kdTw (
   rw [kdUn_apply, h.2.1, h.2.2.1]
   exact kd_neg_sq _ _
 
-private theorem kd_biD_tw (hU : WdUni) (c : Finset (ι ⊕ₗ ι) → G)
-    : biD ℂ ι ι G (kdTw c) = kdTw (wd (fun _ => (1 : Module.End ℂ G)) c) := by
+private theorem kd_biD_tw (hU : WdUni) (c : Finset (ι ⊕ₗ ι) → G) :
+    biD ℂ ι ι G (kdTw c) = kdTw (wd (fun _ => (1 : Module.End ℂ G)) c) := by
   funext x
   obtain ⟨I, J⟩ := x
   have h := hU ι ι G (fun _ => 1) c I J
@@ -74,8 +114,8 @@ private theorem kd_biD_tw (hU : WdUni) (c : Finset (ι ⊕ₗ ι) → G)
     congr 1
     ring
 
-private theorem kd_wd_un (hU : WdUni) (y : Finset ι × Finset ι → G)
-    : wd (fun _ => (1 : Module.End ℂ G)) (kdUn y) = kdUn (biD ℂ ι ι G y) := by
+private theorem kd_wd_un (hU : WdUni) (y : Finset ι × Finset ι → G) :
+    wd (fun _ => (1 : Module.End ℂ G)) (kdUn y) = kdUn (biD ℂ ι ι G y) := by
   have h := kd_biD_tw hU (kdUn y)
   rw [kdTw_un hU] at h
   rw [h, kdUn_tw hU]
@@ -83,23 +123,19 @@ private theorem kd_wd_un (hU : WdUni) (y : Finset ι × Finset ι → G)
 end
 
 section
-variable
-  {ι E E' G : Type} [LinearOrder ι] [AddCommGroup E] [Module ℂ E] [AddCommGroup E'] [Module ℂ E']
+variable {ι E E' G : Type} [LinearOrder ι] [AddCommGroup E] [Module ℂ E] [AddCommGroup E'] [Module ℂ E']
   [AddCommGroup G] [Module ℂ G]
 
-private theorem kd_cech_val
-    {A : Finset ι → Submodule ℂ E} {a : Finset ι → E} {p : ℤ} (ha : a ∈ (cech A).Z p)
-    {s : Finset ι} (hs : (s.card : ℤ) ≠ p + 1)
-    : a s = 0 := by
+private theorem kd_cech_val {A : Finset ι → Submodule ℂ E} {a : Finset ι → E} {p : ℤ} (ha : a ∈ (cech A).Z p)
+    {s : Finset ι} (hs : (s.card : ℤ) ≠ p + 1) : a s = 0 := by
   unfold cech Cx.Z at ha
   simp [cechC] at ha
   have h := ha.1 s
   rw [if_neg (fun h' => hs h'.2)] at h
   simpa using h
 
-private theorem kd_cech_zero
-    {A : Finset ι → Submodule ℂ E} {a : Finset ι → E} {p : ℤ} (ha : a ∈ (cech A).Z p) (hp : p < 0)
-    : a = 0 := by
+private theorem kd_cech_zero {A : Finset ι → Submodule ℂ E} {a : Finset ι → E} {p : ℤ} (ha : a ∈ (cech A).Z p)
+    (hp : p < 0) : a = 0 := by
   unfold cech Cx.Z at ha
   simp [cechC] at ha
   funext s
@@ -110,14 +146,10 @@ private theorem kd_cech_zero
     have := hne.card_pos
     omega
 
-private theorem kd_single
-    (μ : E →ₗ[ℂ] E' →ₗ[ℂ] G)
-    (A : Finset ι → Submodule ℂ E) (B : Finset ι → Submodule ℂ E') (d : ℕ) (p : ℤ)
-    (a : Finset ι → E) (b : Finset ι → E')
-    (ha : a ∈ (cech A).Z p) (hb : b ∈ (cech B).Z ((d : ℤ) - p))
-    : ∃ (q : ℕ) (a' : Finset ι → E) (b' : Finset ι → E'),
-      (q ≤ d ∧ a' ∈ (cech A).Z ((d : ℤ) - q) ∧ b' ∈ (cech B).Z q)
-        ∧ join μ a' b' = kdUn (boxC μ a b) := by
+private theorem kd_single (μ : E →ₗ[ℂ] E' →ₗ[ℂ] G) (A : Finset ι → Submodule ℂ E) (B : Finset ι → Submodule ℂ E')
+    (d : ℕ) (p : ℤ) (a : Finset ι → E) (b : Finset ι → E') (ha : a ∈ (cech A).Z p) (hb : b ∈ (cech B).Z ((d : ℤ) - p)) :
+    ∃ (q : ℕ) (a' : Finset ι → E) (b' : Finset ι → E'),
+      (q ≤ d ∧ a' ∈ (cech A).Z ((d : ℤ) - q) ∧ b' ∈ (cech B).Z q) ∧ join μ a' b' = kdUn (boxC μ a b) := by
   rcases lt_or_ge p 0 with hp | hp
   · refine ⟨0, 0, 0, ⟨Nat.zero_le _, Submodule.zero_mem _, Submodule.zero_mem _⟩, ?_⟩
     rw [kd_cech_zero ha hp]
@@ -143,26 +175,24 @@ private theorem kd_single
     · have h0 : b (rgt s) = 0 := kd_cech_val hb (by omega)
       simp [h0]
 
-private theorem kd_disj (A : Finset ι → Submodule ℂ E) (B : Finset ι → Submodule ℂ E')
-    : Disjoint₂ (TensorProduct.mk ℂ E E') A B := by
+private theorem kd_disj (A : Finset ι → Submodule ℂ E) (B : Finset ι → Submodule ℂ E') :
+    Disjoint₂ (TensorProduct.mk ℂ E E') A B := by
   intro I J
-  exact TensorProduct.map_injective_of_flat_flat (A I).subtype (B J).subtype (A I).injective_subtype
-    (B J).injective_subtype
+  exact TensorProduct.map_injective_of_flat_flat (A I).subtype (B J).subtype
+    (A I).injective_subtype (B J).injective_subtype
 
 end
 
-private theorem kdTw_mem_bicech_Z_of_mem_acx_Z
-    {ι E E' : Type} [LinearOrder ι] [AddCommGroup E] [Module ℂ E] [AddCommGroup E'] [Module ℂ E']
-    (hU : WdUni)
-    (A : Finset ι → Submodule ℂ E) (B : Finset ι → Submodule ℂ E') (d : ℕ)
-    (t : Finset (ι ⊕ₗ ι) → E ⊗[ℂ] E')
-    (ht : t ∈ (acx (mixF fun I J => Submodule.map₂ (TensorProduct.mk ℂ E E') (A I) (B J)) fun _ =>
-      (1 : Module.End ℂ (E ⊗[ℂ] E'))).Z ((d : ℤ) + 2))
-    : kdTw t ∈ (bicech (TensorProduct.mk ℂ E E') A B).Z d := by
+private theorem kdTw_mem_bicech_Z_of_mem_acx_Z {ι E E' : Type} [LinearOrder ι] [AddCommGroup E] [Module ℂ E]
+    [AddCommGroup E'] [Module ℂ E'] (hU : WdUni) (A : Finset ι → Submodule ℂ E)
+    (B : Finset ι → Submodule ℂ E') (d : ℕ) (t : Finset (ι ⊕ₗ ι) → E ⊗[ℂ] E')
+    (ht : t ∈ (acx (mixF fun I J => Submodule.map₂ (TensorProduct.mk ℂ E E') (A I) (B J))
+      fun _ => (1 : Module.End ℂ (E ⊗[ℂ] E'))).Z ((d : ℤ) + 2)) :
+    kdTw t ∈ (bicech (TensorProduct.mk ℂ E E') A B).Z d := by
   unfold acx Cx.Z at ht
   dsimp only at ht
-  simp only [Submodule.mem_inf, LinearMap.mem_ker, Submodule.mem_pi, Set.mem_univ, true_implies]
-    at ht
+  simp only [Submodule.mem_inf, LinearMap.mem_ker, Submodule.mem_pi, Set.mem_univ,
+    true_implies] at ht
   obtain ⟨ht1, ht2⟩ := ht
   unfold bicech Cx.Z
   dsimp only
@@ -193,13 +223,12 @@ private theorem kdTw_mem_bicech_Z_of_mem_acx_Z
     funext x
     simp [kdTw]
 
-private theorem kdUn_mem_acx_B_of_mem_bicech_B
-    {ι E E' : Type} [LinearOrder ι] [AddCommGroup E] [Module ℂ E] [AddCommGroup E'] [Module ℂ E']
-    (hU : WdUni)
-    (A : Finset ι → Submodule ℂ E) (B : Finset ι → Submodule ℂ E') (d : ℕ)
-    (y : Finset ι × Finset ι → E ⊗[ℂ] E') (hy : y ∈ (bicech (TensorProduct.mk ℂ E E') A B).B d)
-    : kdUn y ∈ (acx (mixF fun I J => Submodule.map₂ (TensorProduct.mk ℂ E E') (A I) (B J)) fun _ =>
-      (1 : Module.End ℂ (E ⊗[ℂ] E'))).B ((d : ℤ) + 2) := by
+private theorem kdUn_mem_acx_B_of_mem_bicech_B {ι E E' : Type} [LinearOrder ι] [AddCommGroup E] [Module ℂ E]
+    [AddCommGroup E'] [Module ℂ E'] (hU : WdUni) (A : Finset ι → Submodule ℂ E)
+    (B : Finset ι → Submodule ℂ E') (d : ℕ) (y : Finset ι × Finset ι → E ⊗[ℂ] E')
+    (hy : y ∈ (bicech (TensorProduct.mk ℂ E E') A B).B d) :
+    kdUn y ∈ (acx (mixF fun I J => Submodule.map₂ (TensorProduct.mk ℂ E E') (A I) (B J))
+      fun _ => (1 : Module.End ℂ (E ⊗[ℂ] E'))).B ((d : ℤ) + 2) := by
   unfold bicech Cx.B at hy
   obtain ⟨w, hw, rfl⟩ := Submodule.mem_map.1 hy
   show kdUn (biD ℂ ι ι (E ⊗[ℂ] E') w) ∈ _
@@ -212,12 +241,12 @@ private theorem kdUn_mem_acx_B_of_mem_bicech_B
   intro s
   rw [kdUn_apply]
   have h := hU ι ι (E ⊗[ℂ] E') (fun _ => 1) (fun _ => 0) (lft s) (rgt s)
-  have hcs : s.card = (lft s).card + (rgt s).card := by rw [← h.2.2.2.1, h.2.2.2.2 s]
+  have hcs : s.card = (lft s).card + (rgt s).card := by
+    rw [← h.2.2.2.1, h.2.2.2.2 s]
   have hw' := hw (lft s, rgt s)
   dsimp only at hw'
-  by_cases hc
-    : (lft s).Nonempty ∧ (rgt s).Nonempty
-      ∧ (((lft s).card + (rgt s).card : ℕ) : ℤ) = (d : ℤ) - 1 + 2
+  by_cases hc : (lft s).Nonempty ∧ (rgt s).Nonempty ∧
+      (((lft s).card + (rgt s).card : ℕ) : ℤ) = (d : ℤ) - 1 + 2
   · rw [if_pos hc] at hw'
     have hcard : ((s.card : ℕ) : ℤ) = (d : ℤ) + 2 - 1 := by
       rw [hcs]
@@ -232,24 +261,22 @@ private theorem kdUn_mem_acx_B_of_mem_bicech_B
     rw [h0, smul_zero]
     exact Submodule.zero_mem _
 
-theorem UpperTheory.Gal.productCup_of_system.kunDec_of : WdUni → KunDec := by
+theorem UpperTheory.Gal.productCup_of_system.kunDec_of :
+    WdUni → KunDec := by
   intro hU
   unfold KunDec
   intro ι E E' _ _ _ _ _ _ A B d hA hB t ht
   have hz := kdTw_mem_bicech_Z_of_mem_acx_Z hU A B d t ht
-  obtain ⟨m, p, a, b, hab, hB'⟩ :=
-    UpperTheory.Cb.bicech_cohomology_kunneth_decomposition ℂ ι ι E E' (E ⊗[ℂ] E')
-      (TensorProduct.mk ℂ E E') A B hA hB (kd_disj A B) (d : ℤ) (kdTw t) hz
-  have hs := fun l =>
-    kd_single (TensorProduct.mk ℂ E E') A B d (p l) (a l) (b l) (hab l).1 (hab l).2
+  obtain ⟨m, p, a, b, hab, hB'⟩ := UpperTheory.Cb.bicech_cohomology_kunneth_decomposition ℂ ι ι E E' (E ⊗[ℂ] E')
+    (TensorProduct.mk ℂ E E') A B hA hB (kd_disj A B) (d : ℤ) (kdTw t) hz
+  have hs := fun l => kd_single (TensorProduct.mk ℂ E E') A B d (p l) (a l) (b l) (hab l).1 (hab l).2
   choose q a' b' hq hj using hs
   refine ⟨m, q, a', b', fun l => hq l, ?_⟩
   have key := kdUn_mem_acx_B_of_mem_bicech_B hU A B d _ hB'
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sub, kdUn_tw hU, map_sum] at key
-  have e
-      : ∑ l, kdUn (boxC (TensorProduct.mk ℂ E E') (a l) (b l))
-        = ∑ l, join (TensorProduct.mk ℂ E E') (a' l) (b' l) :=
+
+  rw [map_sub, kdUn_tw hU, map_sum] at key
+  have e : ∑ l, kdUn (boxC (TensorProduct.mk ℂ E E') (a l) (b l)) =
+      ∑ l, join (TensorProduct.mk ℂ E E') (a' l) (b' l) :=
     Finset.sum_congr rfl fun l _ => (hj l).symm
   rw [e] at key
   exact key

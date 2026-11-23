@@ -1,6 +1,59 @@
 module
 
-public import Mathlib
+public import Mathlib.Algebra.MvPolynomial.Monad
+public import Mathlib.Algebra.Polynomial.Eval.Defs
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
+public import Mathlib.Algebra.MvPolynomial.Funext
+public import Mathlib.Algebra.Polynomial.Coeff
+public import Mathlib.Algebra.Polynomial.Roots
+public import Mathlib.Data.Matrix.Basic
+public import Mathlib.LinearAlgebra.Matrix.Determinant.Basic
+public import Mathlib.LinearAlgebra.Matrix.NonsingularInverse
 
 @[expose] public section
 
@@ -8,22 +61,17 @@ open MvPolynomial
 
 namespace GlobalTheory
 
-theorem eval_rowOps_eq
-    {K σ : Type*} [Field K] [DecidableEq σ]
-    {p n : ℕ} (z : Fin p × Fin n → σ) (hz : Function.Injective z)
-    (P : MvPolynomial σ K)
-    (hinv : ∀ a b : Fin p,
-      a < b
-        → ∀ t : K, bind₁ (fun s => X s + ∑ k, if s = z (b, k) then C t * X (z (a, k)) else 0) P = P)
-    (i : ℕ)
-    (c : Fin p × Fin p → K) (x : σ → K)
-    (T : Finset (Fin p × Fin p)) (hT : ∀ q ∈ T, (q.1 : ℕ) < i ∧ i ≤ (q.2 : ℕ))
-    : eval (fun s => x s + ∑ q ∈ T, ∑ k, if s = z (q.2, k) then c q * x (z (q.1, k)) else 0) P
+theorem eval_rowOps_eq {K σ : Type*} [Field K] [DecidableEq σ] {p n : ℕ} (z : Fin p × Fin n → σ)
+    (hz : Function.Injective z) (P : MvPolynomial σ K)
+    (hinv : ∀ a b : Fin p, a < b → ∀ t : K,
+      bind₁ (fun s => X s + ∑ k, if s = z (b, k) then C t * X (z (a, k)) else 0) P = P)
+    (i : ℕ) (c : Fin p × Fin p → K) (x : σ → K) (T : Finset (Fin p × Fin p))
+    (hT : ∀ q ∈ T, (q.1 : ℕ) < i ∧ i ≤ (q.2 : ℕ)) :
+    eval (fun s => x s + ∑ q ∈ T, ∑ k, if s = z (q.2, k) then c q * x (z (q.1, k)) else 0) P
       = eval x P := by
-  have hb
-      : ∀ (y : σ → K) (f : σ → MvPolynomial σ K) (Q : MvPolynomial σ K),
-        eval y (bind₁ f Q) = eval (fun s => eval y (f s)) Q := fun y f Q =>
-    eval₂Hom_bind₁ _ _ _ _
+  have hb : ∀ (y : σ → K) (f : σ → MvPolynomial σ K) (Q : MvPolynomial σ K),
+      eval y (bind₁ f Q) = eval (fun s => eval y (f s)) Q :=
+    fun y f Q => eval₂Hom_bind₁ _ _ _ _
   revert hT
   refine Finset.induction_on T ?_ ?_
   · intro _
@@ -46,32 +94,26 @@ theorem eval_rowOps_eq
       simp only at h2
       rw [h2] at this
       exact lt_irrefl _ this
-    have hfun
-        : (fun s =>
-            x s
-              + ∑ q' ∈ insert q T, ∑ k,
-                if s = z (q'.2, k) then c q' * x (z (q'.1, k)) else 0)
-          = fun s =>
-            eval y (X s + ∑ k, if s = z (q.2, k) then C (c q) * X (z (q.1, k)) else 0) := by
+    have hfun : (fun s => x s + ∑ q' ∈ insert q T, ∑ k,
+        if s = z (q'.2, k) then c q' * x (z (q'.1, k)) else 0) =
+        fun s => eval y (X s + ∑ k, if s = z (q.2, k) then C (c q) * X (z (q.1, k)) else 0) := by
       funext s
-      have he
-          : ∀ k,
-            eval y (if s = z (q.2, k) then C (c q) * X (z (q.1, k)) else 0)
-              = if s = z (q.2, k) then c q * x (z (q.1, k)) else 0 := by
+      have he : ∀ k, eval y (if s = z (q.2, k) then C (c q) * X (z (q.1, k)) else 0) =
+          if s = z (q.2, k) then c q * x (z (q.1, k)) else 0 := by
         intro k
         split_ifs
         · simp [hy]
         · simp
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_add (f := _), eval_X, map_sum, Finset.sum_congr rfl fun k _ => he k,
-          Finset.sum_insert hq, hy_def]
+
+      rw [map_add (f := _), eval_X, map_sum, Finset.sum_congr rfl fun k _ => he k, Finset.sum_insert hq, hy_def]
       ring
     rw [hfun, ← hb, hinv q.1 q.2 hab (c q), ih fun q' h => hT q' (Finset.mem_insert_of_mem h)]
 
-theorem eval_scale_eq {K σ : Type*} [Field K] (w : σ → ℕ) (P : MvPolynomial σ K) (x : σ → K) (t : K)
-    : eval (fun s => t ^ w s * x s) P
-      = (∑ m ∈ P.support, Polynomial.monomial (∑ s ∈ m.support, w s * m s)
-          (AddMonoidAlgebra.coeff P m * ∏ s ∈ m.support, x s ^ m s)).eval t := by
+theorem eval_scale_eq {K σ : Type*} [Field K] (w : σ → ℕ) (P : MvPolynomial σ K) (x : σ → K)
+    (t : K) :
+    eval (fun s => t ^ w s * x s) P =
+      (∑ m ∈ P.support, Polynomial.monomial (∑ s ∈ m.support, w s * m s)
+        (AddMonoidAlgebra.coeff P m * ∏ s ∈ m.support, x s ^ m s)).eval t := by
   rw [eval_eq, Polynomial.eval_finsetSum]
   refine Finset.sum_congr rfl fun m _ => ?_
   rw [Polynomial.eval_monomial]
@@ -79,18 +121,12 @@ theorem eval_scale_eq {K σ : Type*} [Field K] (w : σ → ℕ) (P : MvPolynomia
   rw [Finset.prod_pow_eq_pow_sum]
   ring
 
-theorem column_degree_le
-    {K σ : Type*} [Field K] [CharZero K] [DecidableEq σ]
-    {p n : ℕ} (z : Fin p × Fin n → σ) (hz : Function.Injective z)
+theorem column_degree_le {K σ : Type*} [Field K] [CharZero K] [DecidableEq σ] {p n : ℕ} (z : Fin p × Fin n → σ) (hz : Function.Injective z)
     (P : MvPolynomial σ K) (lam : Fin p → ℕ)
     (hrow : ∀ a, ∀ m ∈ P.support, ∑ k, m (z (a, k)) = lam a)
-    (hinv : ∀ a b : Fin p,
-      a < b
-        → ∀ t : K, bind₁ (fun s => X s + ∑ k, if s = z (b, k) then C t * X (z (a, k)) else 0) P = P)
-    (S : Finset (Fin n))
-    : ∀ m ∈ P.support,
-      ∑ a, ∑ k ∈ S, m (z (a, k))
-        ≤ ∑ a ∈ Finset.univ.filter (fun a : Fin p => (a : ℕ) < S.card), lam a := by
+    (hinv : ∀ a b : Fin p, a < b → ∀ t : K, bind₁ (fun s => X s + ∑ k, if s = z (b, k) then C t * X (z (a, k)) else 0) P = P)
+    (S : Finset (Fin n)) : ∀ m ∈ P.support,
+      ∑ a, ∑ k ∈ S, m (z (a, k)) ≤ ∑ a ∈ Finset.univ.filter (fun a : Fin p => (a : ℕ) < S.card), lam a := by
   classical
   intro m0 hm0
   by_cases hpr : p ≤ S.card
@@ -125,11 +161,8 @@ theorem column_degree_le
       by_contra h
       exact hs (Finset.mem_inter.2 ⟨Finsupp.mem_support_iff.2 h, hsZ⟩)
     rw [h1, Finset.sum_ite_mem, h2, Finset.sum_image hz.injOn, Finset.sum_product]
-  have hlow
-      : ∀ m ∈ P.support,
-        ∑ a ∈ Finset.univ.filter (fun a : Fin p => (a : ℕ) < S.card),
-            ∑ k ∈ S, m (z (a, k))
-          ≤ ∑ a ∈ Finset.univ.filter (fun a : Fin p => (a : ℕ) < S.card), lam a := by
+  have hlow : ∀ m ∈ P.support, ∑ a ∈ Finset.univ.filter (fun a : Fin p => (a : ℕ) < S.card),
+      ∑ k ∈ S, m (z (a, k)) ≤ ∑ a ∈ Finset.univ.filter (fun a : Fin p => (a : ℕ) < S.card), lam a := by
     intro m hm
     refine Finset.sum_le_sum fun a _ => ?_
     rw [← hrow a m hm]
@@ -156,8 +189,7 @@ theorem column_degree_le
     exact this
   let D : MvPolynomial σ K :=
     (Matrix.of fun a b : Fin S.card => (X (z (top a, ee b)) : MvPolynomial σ K)).det
-  have hevD
-      : ∀ y : σ → K, eval y D = (Matrix.of fun a b : Fin S.card => y (z (top a, ee b))).det := by
+  have hevD : ∀ y : σ → K, eval y D = (Matrix.of fun a b : Fin S.card => y (z (top a, ee b))).det := by
     intro y
     simp only [D]
     rw [RingHom.map_det]
@@ -186,31 +218,25 @@ theorem column_degree_le
       rw [Matrix.of_apply, hx0, Matrix.one_apply]
     rw [h2, Matrix.det_one] at h1
     exact zero_ne_one h1
-  let Q : (σ → K) → Polynomial K := fun y =>
-    ∑ m ∈ P.support,
-      Polynomial.monomial (∑ s ∈ m.support, w s * m s) (AddMonoidAlgebra.coeff P m * ∏ s ∈ m.support, y s ^ m s)
-  have hQcoeff
-      : ∀ y : σ → K,
-        (Q y).coeff j
-          = ∑ m ∈ P.support,
-            if ∑ a, ∑ k ∈ S, m (z (a, k)) = j then AddMonoidAlgebra.coeff P m * ∏ s ∈ m.support, y s ^ m s else 0 :=
-    by
-      intro y
-      simp only [Q, Polynomial.finsetSum_coeff, Polynomial.coeff_monomial_apply, he]
+  let Q : (σ → K) → Polynomial K := fun y => ∑ m ∈ P.support,
+    Polynomial.monomial (∑ s ∈ m.support, w s * m s) (AddMonoidAlgebra.coeff P m * ∏ s ∈ m.support, y s ^ m s)
+  have hQcoeff : ∀ y : σ → K, (Q y).coeff j = ∑ m ∈ P.support,
+      if ∑ a, ∑ k ∈ S, m (z (a, k)) = j then AddMonoidAlgebra.coeff P m * ∏ s ∈ m.support, y s ^ m s else 0 := by
+    intro y
+    simp only [Q, Polynomial.finsetSum_coeff, Polynomial.coeff_monomial_apply, he]
   have key : ∀ x : σ → K, eval x D ≠ 0 → eval x R = 0 := by
     intro x hdet
     let M : Matrix (Fin S.card) (Fin S.card) K := Matrix.of fun a b => x (z (top a, ee b))
     have hMu : IsUnit M.det := isUnit_iff_ne_zero.2 (by rw [← hevD]; exact hdet)
     let v : Fin p → Fin S.card → K := fun b i => x (z (b, ee i))
     let c : Fin p × Fin p → K := fun q =>
-      if h : (q.1 : ℕ) < S.card then - (Matrix.vecMul (v q.2) M⁻¹) ⟨q.1, h⟩ else 0
+      if h : (q.1 : ℕ) < S.card then -(Matrix.vecMul (v q.2) M⁻¹) ⟨q.1, h⟩ else 0
     let B : Finset (Fin p) := Finset.univ.filter fun b : Fin p => S.card ≤ (b : ℕ)
     let T : Finset (Fin p × Fin p) := (Finset.univ.image top) ×ˢ B
     have hT : ∀ q ∈ T, (q.1 : ℕ) < S.card ∧ S.card ≤ (q.2 : ℕ) := by
       intro q hq
       simp only [T, B, Finset.mem_product, Finset.mem_image, Finset.mem_univ, true_and,
-          Finset.mem_filter]
-        at hq
+        Finset.mem_filter] at hq
       obtain ⟨⟨a, ha⟩, hb⟩ := hq
       refine ⟨?_, hb⟩
       rw [← ha]
@@ -233,20 +259,14 @@ theorem column_degree_le
       · simp
     have hsum : ∀ b : Fin p, ∀ i, ∑ a, (Matrix.vecMul (v b) M⁻¹) a * M a i = v b i := by
       intro b i
-      have h :=
-        congrFun
-          (show Matrix.vecMul (Matrix.vecMul (v b) M⁻¹) M = v b by
-            rw [Matrix.vecMul_vecMul, Matrix.nonsing_inv_mul _ hMu, Matrix.vecMul_one])
-          i
+      have h := congrFun (show Matrix.vecMul (Matrix.vecMul (v b) M⁻¹) M = v b by
+        rw [Matrix.vecMul_vecMul, Matrix.nonsing_inv_mul _ hMu, Matrix.vecMul_one]) i
       simpa [Matrix.vecMul, dotProduct] using h
     have hx'0 : ∀ b : Fin p, S.card ≤ (b : ℕ) → ∀ k ∈ S, op x (z (b, k)) = 0 := by
       intro b hb k hk
       obtain ⟨i, rfl⟩ := hee k hk
-      have hinner
-          : ∀ q : Fin p × Fin p,
-            (∑ k, if z (b, ee i) = z (q.2, k)
-              then c q * x (z (q.1, k)) else 0)
-              = if b = q.2 then c q * x (z (q.1, ee i)) else 0 := by
+      have hinner : ∀ q : Fin p × Fin p, (∑ k, if z (b, ee i) = z (q.2, k)
+          then c q * x (z (q.1, k)) else 0) = if b = q.2 then c q * x (z (q.1, ee i)) else 0 := by
         intro q
         simp only [hz.eq_iff, Prod.mk.injEq, ite_and]
         split_ifs with h
@@ -257,7 +277,7 @@ theorem column_degree_le
       have hbB : b ∈ B := Finset.mem_filter.2 ⟨Finset.mem_univ _, hb⟩
       simp only [Finset.sum_ite_eq, hbB, if_true]
       rw [Finset.sum_image fun a _ a' _ h => htop h]
-      have hc : ∀ a : Fin S.card, c (top a, b) = - (Matrix.vecMul (v b) M⁻¹) a := by
+      have hc : ∀ a : Fin S.card, c (top a, b) = -(Matrix.vecMul (v b) M⁻¹) a := by
         intro a
         simp only [c]
         rw [dite_eq_left (show ((top a : Fin p) : ℕ) < S.card from a.isLt)]
@@ -275,26 +295,23 @@ theorem column_degree_le
       exact (eval_rowOps_eq z hz P hinv S.card c (sc t x) T hT).symm
     have hRx : eval x R = (Q x).coeff j := by
       rw [hQcoeff, ← Finset.sum_filter]
-      set_option synthInstance.maxHeartbeats 100000 in
+
       simp only [R, map_sum, eval_monomial, Finsupp.prod]
     rw [hRx, hQ, hQcoeff]
     refine Finset.sum_eq_zero fun m hm => ?_
     split_ifs with hmj
-    · have hsplit :=
-        Finset.sum_filter_add_sum_filter_not Finset.univ
-          (fun a : Fin p => (a : ℕ) < S.card)
-          (fun a => ∑ k ∈ S, m (z (a, k)))
-      have hup
-          : ∑ a ∈ Finset.univ.filter (fun a : Fin p => ¬ (a : ℕ) < S.card),
-              ∑ k ∈ S, m (z (a, k))
-            ≠ 0 := by
+    · have hsplit := Finset.sum_filter_add_sum_filter_not Finset.univ
+        (fun a : Fin p => (a : ℕ) < S.card) (fun a => ∑ k ∈ S, m (z (a, k)))
+      have hup : ∑ a ∈ Finset.univ.filter (fun a : Fin p => ¬ (a : ℕ) < S.card),
+          ∑ k ∈ S, m (z (a, k)) ≠ 0 := by
         intro h0
         have := hlow m hm
         omega
       obtain ⟨a, ha, ha0⟩ := Finset.exists_ne_zero_of_sum_ne_zero hup
       obtain ⟨k, hk, hk0⟩ := Finset.exists_ne_zero_of_sum_ne_zero ha0
       have hs : z (a, k) ∈ m.support := Finsupp.mem_support_iff.2 hk0
-      have hza : op x (z (a, k)) = 0 := hx'0 a (not_lt.1 (Finset.mem_filter.1 ha).2) k hk
+      have hza : op x (z (a, k)) = 0 :=
+        hx'0 a (not_lt.1 (Finset.mem_filter.1 ha).2) k hk
       rw [Finset.prod_eq_zero hs (by rw [hza, zero_pow hk0]), mul_zero]
     · rfl
   have hRD : R * D = 0 := by

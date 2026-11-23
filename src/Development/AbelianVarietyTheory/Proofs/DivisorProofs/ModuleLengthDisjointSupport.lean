@@ -1,7 +1,49 @@
 module
 
-public import Mathlib
+public import Development.AbelianVarietyTheory.Definitions.QuasicoherentCohomology.HdimEqZeroOfSubsingleton
+public import Development.AbelianVarietyTheory.Definitions.QuasicoherentCohomology.TopologicalKrullDimLeOfIrreducibleCloseds
+public import Mathlib.RingTheory.Length
+public import Mathlib.Tactic.ENatToNat
+public import Development.AbelianVarietyTheory.Proofs.CoherentCohomologyProofs.ExistsSmulEqMapOfIsCompactOfIsQuasiSeparated
 public import Development.AbelianVarietyTheory.Proofs.CoherentCohomologyProofs.IsFiniteLengthOfIsArtinianRingAnnihilator
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
 
 @[expose] public section
 
@@ -14,15 +56,13 @@ noncomputable section
 
 namespace GlobalTheory
 
-theorem sectionsOn_res_pi_bijective_of_separating
-    {X : Scheme.{0}} (F : X.Modules) [IsFiniteQC F]
-    (R : Type) [CommRing R] [Algebra R Γ(X, ⊤)]
-    {ι : Type} [Fintype ι]
-    (W : ι → X.Opens) (hcov : support F ⊆ ⋃ i, (W i : Set X))
-    (hdisj : ∀ i j, i ≠ j → ∀ x ∈ support F, x ∈ W i → x ∉ W j)
-    : Function.Bijective
-      (LinearMap.pi fun i => sectionsOn.res R F (le_top : W i ≤ ⊤)
-        : sectionsOn F ⊤ →ₗ[R] ∀ i, sectionsOn F (W i)) := by
+theorem sectionsOn_res_pi_bijective_of_separating {X : Scheme.{0}} (F : X.Modules) [IsFiniteQC F]
+    (R : Type) [CommRing R] [Algebra R Γ(X, ⊤)] {ι : Type} [Fintype ι] (W : ι → X.Opens)
+    (hcov : support F ⊆ ⋃ i, (W i : Set X))
+    (hdisj : ∀ i j, i ≠ j → ∀ x ∈ support F, x ∈ W i → x ∉ W j) :
+    Function.Bijective
+      (LinearMap.pi fun i => sectionsOn.res R F (le_top : W i ≤ ⊤) :
+        sectionsOn F ⊤ →ₗ[R] ∀ i, sectionsOn F (W i)) := by
   classical
   refine ⟨?_, fun t => ?_⟩
   · rw [← LinearMap.ker_eq_bot, LinearMap.ker_eq_bot']
@@ -37,10 +77,8 @@ theorem sectionsOn_res_pi_bijective_of_separating
       simp only [sectionsOn.toΓ_res, map_zero] at this
       rwa [F.presheaf.germ_res_apply] at this
     · exact (notMem_support_iff.1 hxs).elim _ _
-  have key (i : ι)
-      : ∃ s : sectionsOn F ⊤,
-        sectionsOn.res R F (le_top : W i ≤ ⊤) s = t i
-          ∧ ∀ j, j ≠ i → sectionsOn.res R F (le_top : W j ≤ ⊤) s = 0 := by
+  have key (i : ι) : ∃ s : sectionsOn F ⊤, sectionsOn.res R F (le_top : W i ≤ ⊤) s = t i ∧
+      ∀ j, j ≠ i → sectionsOn.res R F (le_top : W j ≤ ⊤) s = 0 := by
     let C : X.Opens := ⟨(support F)ᶜ, (isClosed_support F).isOpen_compl⟩
     let V : X.Opens := (⨆ (j : ι) (_ : j ≠ i), W j) ⊔ C
     have hWV (j : ι) (hj : j ≠ i) : W j ≤ V :=
@@ -52,20 +90,16 @@ theorem sectionsOn_res_pi_bijective_of_separating
         · exact Or.inl (hji ▸ hj)
         · exact Or.inr (hWV j hji hj)
       · exact Or.inr (Or.inr hxs)
-    have : Subsingleton Γ(F, W i ⊓ V) :=
-      subsingleton_sections_of_notMem_support fun y hy hys => by
-        rcases hy.2 with hy' | hy'
-        · obtain ⟨j, hj, hyj⟩ : ∃ j, j ≠ i ∧ y ∈ W j := by simpa [Opens.mem_iSup] using hy'
-          exact hdisj i j (Ne.symm hj) y hys hy.1 hyj
-        · exact hy' hys
-    obtain ⟨s, h₁, h₂⟩ :=
-      Qcqs.exists_section_glue₂ F (V₁ := W i) (V₂ := V) (W := ⊤) le_top le_top hcovV
-        (sectionsOn.toΓ F (W i) (t i)) 0 (Subsingleton.elim _ _)
-    refine ⟨
-      (sectionsOn.toΓ F ⊤).symm s,
-      (sectionsOn.toΓ F (W i)).injective ?_,
-      fun j hj => (sectionsOn.toΓ F (W j)).injective ?_
-    ⟩
+    have : Subsingleton Γ(F, W i ⊓ V) := subsingleton_sections_of_notMem_support fun y hy hys => by
+      rcases hy.2 with hy' | hy'
+      · obtain ⟨j, hj, hyj⟩ : ∃ j, j ≠ i ∧ y ∈ W j := by
+          simpa [Opens.mem_iSup] using hy'
+        exact hdisj i j (Ne.symm hj) y hys hy.1 hyj
+      · exact hy' hys
+    obtain ⟨s, h₁, h₂⟩ := Qcqs.exists_section_glue₂ F (V₁ := W i) (V₂ := V) (W := ⊤) le_top le_top
+      hcovV (sectionsOn.toΓ F (W i) (t i)) 0 (Subsingleton.elim _ _)
+    refine ⟨(sectionsOn.toΓ F ⊤).symm s, (sectionsOn.toΓ F (W i)).injective ?_, fun j hj =>
+      (sectionsOn.toΓ F (W j)).injective ?_⟩
     · rw [sectionsOn.toΓ_res, AddEquiv.apply_symm_apply]
       exact h₁
     · rw [sectionsOn.toΓ_res, AddEquiv.apply_symm_apply, map_zero]
@@ -74,18 +108,18 @@ theorem sectionsOn_res_pi_bijective_of_separating
       exact e
   choose s h₁ h₂ using key
   refine ⟨∑ i, s i, funext fun j => ?_⟩
-  set_option synthInstance.maxHeartbeats 100000 in
-  rw [LinearMap.pi_apply, map_sum, Finset.sum_eq_single j (fun i _ hi => h₂ i j hi.symm) (by simp),
-    h₁]
 
-theorem length_sectionsOn_top_eq_sum_of_separating
-    : ∀ {X : Scheme.{0}} (F : X.Modules) [IsFiniteQC F] (R : Type) [CommRing R] [Algebra R Γ(X, ⊤)]
-        {ι : Type} [Fintype ι] (W : ι → X.Opens),
-      support F ⊆ ⋃ i, (W i : Set X) → (∀ i j, i ≠ j → ∀ x ∈ support F, x ∈ W i → x ∉ W j)
-        → Module.length R (sectionsOn F ⊤) = ∑ i, Module.length R (sectionsOn F (W i)) := by
+  rw [LinearMap.pi_apply, map_sum, Finset.sum_eq_single j (fun i _ hi => h₂ i j hi.symm) (by simp),
+  h₁]
+
+theorem length_sectionsOn_top_eq_sum_of_separating :
+    ∀ {X : Scheme.{0}} (F : X.Modules) [IsFiniteQC F] (R : Type) [CommRing R]
+      [Algebra R Γ(X, ⊤)] {ι : Type} [Fintype ι] (W : ι → X.Opens),
+      support F ⊆ ⋃ i, (W i : Set X) → (∀ i j, i ≠ j → ∀ x ∈ support F, x ∈ W i → x ∉ W j) →
+      Module.length R (sectionsOn F ⊤) = ∑ i, Module.length R (sectionsOn F (W i)) := by
   intro X F _ R _ _ ι _ W hcov hdisj
   rw [(LinearEquiv.ofBijective _
-      (sectionsOn_res_pi_bijective_of_separating F R W hcov hdisj)).length_eq,
+    (sectionsOn_res_pi_bijective_of_separating F R W hcov hdisj)).length_eq,
     Module.length_pi_of_fintype]
 
 end GlobalTheory

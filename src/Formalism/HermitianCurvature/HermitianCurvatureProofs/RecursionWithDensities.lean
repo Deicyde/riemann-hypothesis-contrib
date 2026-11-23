@@ -1,10 +1,56 @@
 module
 
 public import Formalism.HermitianCurvature.StatementTC
-public import Formalism.HermitianCurvature.StatementTA
-public import Mathlib
 public import Formalism.HermitianCurvature.HermitianCurvatureProofs.AntidiagMulDiagonal
+public import Formalism.HermitianCurvature.HermitianCurvatureProofs.FinitePointSets
+public import Formalism.HermitianCurvature.HermitianCurvatureProofs.OneLevelCoefficients
 public import Formalism.HermitianCurvature.HermitianCurvatureProofs.OneLevelInequalitySplitBySize
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Real
+public import Mathlib.Analysis.Complex.ExponentialBounds
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Lemma
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
@@ -427,7 +473,6 @@ theorem theoremAAfterOfSteps : TC.TheoremAAfterOfSteps := by
   set C : ℝ := max C₀ CJ with hC
   have hCC0 : C₀ ≤ C := le_max_left _ _
   have hCCJ : CJ ≤ C := le_max_right _ _
-  have hCpos : 0 ≤ C := by linarith
   have hΘ1 : 1 ≤ Θ := le_trans (le_max_right _ _) hC'
   have hΘ3 : 3 * C₁ ≤ Θ := le_trans (le_trans (le_max_right _ _) (le_max_left _ _)) hC'
   have hΘJ : C'J ≤ Θ := le_trans (le_trans (le_max_left _ _) (le_max_left _ _)) hC'
@@ -556,7 +601,6 @@ theorem theoremAAfterOfSteps : TC.TheoremAAfterOfSteps := by
       apply mul_le_mul_of_nonneg_right _ (Real.sqrt_nonneg _)
       apply Real.sqrt_le_iff.mpr
       refine ⟨by positivity, ?_⟩
-      have q1 : 0 ≤ 2 ^ D.f * ep := by positivity
       nlinarith
     · apply Finset.sum_le_sum
       intro s hs
@@ -605,7 +649,6 @@ theorem t_DensLeTwo : DensLeTwo := by
   have hy : 0 < ((2 : ℝ) ^ n)⁻¹ := inv_pos.mpr hpos
   have hy1 : ((2 : ℝ) ^ n)⁻¹ * 2 ^ n = 1 := inv_mul_cancel₀ (ne_of_gt hpos)
   have hm := mul_le_mul_of_nonneg_left h' hy.le
-  have hx : 12 * (f : ℝ) * ((2 : ℝ) ^ n)⁻¹ ≤ 2 / 3 := by nlinarith
   have hl := Real.log_two_gt_d9
   have h3 : Real.exp (12 * (f : ℝ) * ((2 : ℝ) ^ n)⁻¹) ≤ Real.exp (Real.log 2) :=
     Real.exp_le_exp.mpr (by linarith)

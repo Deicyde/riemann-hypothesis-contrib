@@ -2,6 +2,53 @@ module
 
 public import Formalism.SharpRestriction.GrowthBounds.MixedCoefficientClosed
 public import Formalism.LocalToGlobal.CharacterGerms.FirstPartialLawAtPoints
+public import Formalism.LocalToGlobal.CharacterGerms.RankMaximalOfNondegenerate
+import Formalism.LocalToGlobal.CharacterGerms.RowTieAxes
+import Formalism.LocalToGlobal.CharacterGerms.RowTieCartAdd
+import Formalism.LocalToGlobal.CharacterGerms.RowTieCartFB
+import Formalism.LocalToGlobal.CharacterGerms.RowTieJet
+public import Formalism.LocalToGlobal.CharacterGerms.RowTiePCartSelfSt
+import Formalism.LocalToGlobal.CharacterGerms.TripleSubstSecondCoordinate
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
 
 @[expose] public section
 
@@ -37,8 +84,8 @@ theorem exp_sum_range
   | zero => simp [rtj_mvExp_zero]
   | succ n ih =>
     have h0 : MvPowerSeries.constantCoeff (∑ k ∈ Finset.range n, f k) = 0 := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum]
+
+      rw [map_sum]
       exact Finset.sum_eq_zero fun k _ => hf k
     rw [Finset.sum_range_succ, VP.exp_add h0 (hf n), ih, List.range_succ, List.map_append,
       List.prod_append]
@@ -198,8 +245,8 @@ theorem col_left
     VP.cc_hAt Y (ha k).1 hc.1
   have c2 : MvPowerSeries.constantCoeff (VP.hAt Y s c) = 0 := VP.cc_hAt Y hs.1 hc.1
   have cS : MvPowerSeries.constantCoeff (∑ k ∈ Finset.range n, VP.hAt Y (a k) c) = 0 := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     exact Finset.sum_eq_zero fun k _ => c1 k
   have c2' : MvPowerSeries.constantCoeff (- VP.hAt Y s c) = 0 := by rw [map_neg, c2, neg_zero]
   have hU' : mvExp (∑ k ∈ Finset.range n, VP.hAt Y (a k) c) = mvExp (VP.hAt Y s c) * U := by
@@ -274,8 +321,8 @@ theorem col_right
     VP.cc_hAt Y hc.1 (ha k).1
   have c2 : MvPowerSeries.constantCoeff (VP.hAt Y c s) = 0 := VP.cc_hAt Y hc.1 hs.1
   have cS : MvPowerSeries.constantCoeff (∑ k ∈ Finset.range n, VP.hAt Y c (a k)) = 0 := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     exact Finset.sum_eq_zero fun k _ => c1 k
   have c2' : MvPowerSeries.constantCoeff (- VP.hAt Y c s) = 0 := by rw [map_neg, c2, neg_zero]
   have hU' : mvExp (∑ k ∈ Finset.range n, VP.hAt Y c (a k)) = mvExp (VP.hAt Y c s) * U := by

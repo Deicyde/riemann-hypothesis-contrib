@@ -1,17 +1,57 @@
 module
 
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.TypesTrueOfRayClass
-public import Development.AutomorphicArithmetic.ThetaCorrespondence.ThetaPairLifts.ThirdPlaceSeries.CohomologicalCsdTempered
 public import Development.AutomorphicArithmetic.ThetaCorrespondence.ThetaPairLifts.ThirdPlaceSeries.HeckeOpen
-public import Development.AutomorphicArithmetic.ThetaCorrespondence.ThetaPairLifts.ThirdPlaceSeries.MRowTame
-public import Development.AutomorphicArithmetic.ThetaCorrespondence.ThetaPairLifts.ThirdPlaceSeries.ExistsNbcAuSideStatement
-public import Development.AutomorphicArithmetic.Foundations.LocalLanglands.IsRecTOfIsRec
-public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.CGTrueT
+public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.LabConj
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.TypeIdempotentCoeffAcrossLayers
+public import Development.AbelianVarietyTheory.PublishedTheorems.AutomorphicForms₂.DeRhamPotSemistable
+public import Development.AbelianVarietyTheory.PublishedTheorems.GaloisCohomology₂.ChebotarevDegreeOneIffCheb
+public import Development.AbelianVarietyTheory.PublishedTheorems.PublishedFoundations.NonemptyAlgHomOfIsRayOfDvd
+public import Formalism.LocalToGlobal.SiegelLatticeTheory.CokernelGLCounts.RankPointCounts.NormalIntegrality
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsSetAutWdTieLabConj
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsTameGeneratorsGreenCuspidalLabellingStatement
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsTypes
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsWdSide
+import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.NonemptyResidueFieldUnitBallEquiv
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.TypesTrueOfRayClass
 public import Development.AutomorphicArithmetic.Foundations.UnitarySphericalFixing.SatakeParameters.ExistsCgTrueCharSide
+public import Development.AutomorphicArithmetic.ThetaCorrespondence.ThetaPairLifts.ThirdPlaceSeries.ExistsNbcAuSideStatement
+public import Development.AutomorphicArithmetic.ThetaCorrespondence.ThetaPairLifts.ThirdPlaceSeries.MRowTame
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
 
 @[expose] public section
 
-set_option synthInstance.maxHeartbeats 200000
+
 
 section
 open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
@@ -42,8 +82,6 @@ def ConclAlt
       ∧ HEq (@NData.instOm _ _ _ L.nd) (@NData.instOm _ _ _ D.nd)
       ∧ HEq (@NData.algOm _ _ _ L.nd) (@NData.algOm _ _ _ D.nd)
       ∧ HEq (@NData.plOm _ _ _ L.nd) (@NData.plOm _ _ _ D.nd) ∧ LabConj _ A.wdT
-set_option maxHeartbeats 4000000 in
-set_option synthInstance.maxHeartbeats 400000 in
 theorem conclusion_of_au_true_and_types_true
     (hL : _root_.UpperTheory.Zero.LLC.RecTExists) (D : D7)
     (cf : CharFrame D) (jE : D.host.E →+* Qb) (rep : D.what₂.FT → NG.FinTyp D.host.E D.R.r)
@@ -79,8 +117,6 @@ theorem conclusion_of_au_true_and_types_true
   HEq.rfl,
   h6
 ⟩
-set_option maxHeartbeats 4000000 in
-set_option synthInstance.maxHeartbeats 400000 in
 theorem concl_setK_alt
     (hL : _root_.UpperTheory.Zero.LLC.RecTExists) (D : D7) (cf : CharFrame D) (jE : D.host.E →+* Qb)
     (rep : D.what₂.FT → NG.FinTyp D.host.E D.R.r) (L : Lay0 D) (hZ : L.ZOk) (hη : L.EtaOk)
@@ -115,8 +151,6 @@ theorem concl_setK_alt
     e9.trans k9,
     h6
   ⟩
-set_option maxHeartbeats 4000000 in
-set_option synthInstance.maxHeartbeats 400000 in
 theorem conclusion_of_automorphic_side_true
     (hL : _root_.UpperTheory.Zero.LLC.RecTExists)
     (hdR : GlobalTheory.Published.DeRhamPotSemistable) (hR : GlobalTheory.Published.RayClassFieldSt)
@@ -201,8 +235,6 @@ theorem conclusion_of_automorphic_side_true
   exact _root_.GlobalTheory.HeightCounting.TopA.concl_setK_alt hL D cf jE rep
     (lay0 (setTy D hE X h1 h0)) ⟨fun i => hE.elim i, fun i => hE.elim i⟩ D.etaJ_tie rfl HEq.rfl
     (heq_of_eq e4) (heq_of_eq e5) rfl HEq.rfl HEq.rfl HEq.rfl HEq.rfl H
-set_option maxHeartbeats 4000000 in
-set_option synthInstance.maxHeartbeats 400000 in
 theorem conclusion_of_cusp_galois_true
     (hL : _root_.UpperTheory.Zero.LLC.RecTExists)
     (hdR : GlobalTheory.Published.DeRhamPotSemistable) (hR : GlobalTheory.Published.RayClassFieldSt)
@@ -244,8 +276,6 @@ theorem conclusion_of_cusp_galois_true
   exact _root_.GlobalTheory.HeightCounting.TopA.concl_setK_alt hL D cf jE rep (lay0 (setBC D C))
     ⟨fun i => hE.elim i, fun i => hE.elim i⟩ D.etaJ_tie rfl HEq.rfl HEq.rfl HEq.rfl rfl HEq.rfl
     HEq.rfl HEq.rfl HEq.rfl H
-set_option maxHeartbeats 4000000 in
-set_option synthInstance.maxHeartbeats 400000 in
 theorem conclusion_of_local_parameters_true
     (hA : GlobalTheory.Published.AutomorphicFormsFiniteGL)
     (hL : _root_.UpperTheory.Zero.LLC.RecTExists)
@@ -274,8 +304,6 @@ theorem conclusion_of_local_parameters_true
   exact _root_.GlobalTheory.HeightCounting.TopA.concl_setK_alt hL D cf jE rep (lay0 (setCG D hE K))
     ⟨fun i => hE.elim i, fun i => hE.elim i⟩ D.etaJ_tie rfl HEq.rfl HEq.rfl HEq.rfl rfl HEq.rfl
     HEq.rfl HEq.rfl HEq.rfl H
-set_option maxHeartbeats 4000000 in
-set_option synthInstance.maxHeartbeats 400000 in
 theorem conclusion_of_group_side
     (hA : GlobalTheory.Published.AutomorphicFormsFiniteGL)
     (hL : _root_.UpperTheory.Zero.LLC.RecTExists) (hdR : GlobalTheory.Published.DeRhamPotSemistable)
@@ -334,8 +362,6 @@ theorem conclusion_of_group_side
     (lay0 (setAut D hE lab h A C tm tg hl)) ⟨fun i => hE.elim i, fun i => hE.elim i⟩ D.etaJ_tie rfl
     (heq_of_eq (funext fun k => funext fun v => hpl k v)) HEq.rfl HEq.rfl rfl HEq.rfl HEq.rfl
     HEq.rfl HEq.rfl H
-set_option maxHeartbeats 4000000 in
-set_option synthInstance.maxHeartbeats 400000 in
 theorem exists_sideA_alt
     : ∀ hL : _root_.UpperTheory.Zero.LLC.RecTExists,
       GlobalTheory.Published.AutomorphicFormsFiniteGL → GlobalTheory.Published.DeRhamPotSemistable

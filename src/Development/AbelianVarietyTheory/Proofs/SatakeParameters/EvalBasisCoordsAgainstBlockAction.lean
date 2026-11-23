@@ -1,57 +1,79 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.Definitions.GaloisGeometry.RkLe
+public import Development.AbelianVarietyTheory.Definitions.GaloisGeometry.Realises
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
-open Formalism.BasicNotions NumberField IsDedekindDomain Formalism.MainNotions.G
-  Formalism.MainNotions.FormalGroupSystem Formalism.L2.G.Pend Formalism.MainNotions Formalism.L2.Ker
-  Formalism.L2.PairingIndexBounds.F Formalism.L2.KerInert Formalism.UG Formalism.L2.G.Cmp
-  Formalism.L2.Forms Formalism.L2.KerInert.SecondKernelProjection
-  Formalism.L2.KerInert.QuadraticBaseChangeGL3 Formalism.L2.KerInert.SecondKernelDifference
-  Formalism.L2.KerInert.SecondKernelHermitian GlobalTheory.TwV.DelA
+open Formalism.BasicNotions NumberField IsDedekindDomain Formalism.MainNotions.G Formalism.MainNotions.FormalGroupSystem Formalism.L2.G.Pend Formalism.MainNotions Formalism.L2.Ker Formalism.L2.PairingIndexBounds.F Formalism.L2.KerInert Formalism.UG Formalism.L2.G.Cmp Formalism.L2.Forms Formalism.L2.KerInert.SecondKernelProjection Formalism.L2.KerInert.QuadraticBaseChangeGL3 Formalism.L2.KerInert.SecondKernelDifference Formalism.L2.KerInert.SecondKernelHermitian GlobalTheory.TwV.DelA
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 noncomputable section
 
 namespace GlobalTheory.TwV.DelA
 
-open Formalism.BasicNotions NumberField Formalism.MainNotions.G
-  Formalism.MainNotions.FormalGroupSystem Formalism.L2.G.Pend Formalism.MainNotions Formalism.L2.Ker
-  Formalism.L2.PairingIndexBounds.F Formalism.L2.KerInert Formalism.UG
-open Formalism.L2.G.Cmp Formalism.L2.Forms Formalism.L2.KerInert.SecondKernelProjection
-  Formalism.L2.KerInert.QuadraticBaseChangeGL3 Formalism.L2.KerInert.SecondKernelDifference
-  Formalism.L2.KerInert.SecondKernelHermitian
+open Formalism.BasicNotions NumberField Formalism.MainNotions.G Formalism.MainNotions.FormalGroupSystem Formalism.L2.G.Pend Formalism.MainNotions Formalism.L2.Ker Formalism.L2.PairingIndexBounds.F Formalism.L2.KerInert Formalism.UG
+open Formalism.L2.G.Cmp Formalism.L2.Forms Formalism.L2.KerInert.SecondKernelProjection Formalism.L2.KerInert.QuadraticBaseChangeGL3 Formalism.L2.KerInert.SecondKernelDifference Formalism.L2.KerInert.SecondKernelHermitian
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 section Act
 
-variable
-  {p : ℕ} {O Kf : Type}
-  [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field Kf] [Algebra O Kf]
+variable {p : ℕ} {O Kf : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field Kf] [Algebra O Kf]
   (P : Places p O Kf)
 
-theorem substR_substR
-    (R : Type) [CommRing R]
-    (G G' : ∀ v, Fin (P.n' v) → Matrix (Fin (P.m + 1)) (Fin (P.m + 1)) R) (Q : XR P R)
-    : substR P R G (substR P R G' Q) = substR P R (fun v s => G' v s * G v s) Q := by
+theorem substR_substR (R : Type) [CommRing R] (G G' : ∀ v, Fin (P.n' v) → Matrix (Fin (P.m + 1)) (Fin (P.m + 1)) R)
+    (Q : XR P R) : substR P R G (substR P R G' Q) = substR P R (fun v s => G' v s * G v s) Q := by
   have hc : (substR P R G).comp (substR P R G') = substR P R (fun v s => G' v s * G v s) := by
     apply MvPolynomial.algHom_ext
     rintro ⟨v, s, a, t⟩
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [AlgHom.comp_apply, substR, MvPolynomial.aeval_X, map_sum, map_mul,
-        MvPolynomial.aeval_C, MvPolynomial.algebraMap_eq, Matrix.mul_apply, Finset.mul_sum,
-        Finset.sum_mul]
+
+    simp only [AlgHom.comp_apply, substR, MvPolynomial.aeval_X, map_sum, map_mul, MvPolynomial.aeval_C,
+    MvPolynomial.algebraMap_eq, Matrix.mul_apply, Finset.mul_sum, Finset.sum_mul]
     rw [Finset.sum_comm]
     refine Finset.sum_congr rfl fun c _ => Finset.sum_congr rfl fun b _ => ?_
     rw [← mul_assoc, ← MvPolynomial.C_mul]
   exact congrArg (fun φ : XR P R →ₐ[R] XR P R => φ Q) hc
 
-theorem natActR_natActR
-    (R : Type) [Field R] (g g' : ∀ v, Fin (P.n' v) → GL (Fin (P.m + 1)) R) (Q : XR P R)
-    : natActR P R g (natActR P R g' Q) = natActR P R (fun v s => g v s * g' v s) Q := by
+theorem natActR_natActR (R : Type) [Field R] (g g' : ∀ v, Fin (P.n' v) → GL (Fin (P.m + 1)) R) (Q : XR P R) :
+    natActR P R g (natActR P R g' Q) = natActR P R (fun v s => g v s * g' v s) Q := by
   unfold natActR
   simp only [LinearMap.smul_apply, AlgHom.toLinearMap_apply, map_smul, smul_smul, substR_substR]
   congr 1
@@ -75,8 +97,7 @@ theorem natActR_one (R : Type) [Field R] (Q : XR P R) : natActR P R (fun _ _ => 
 
 end Act
 
-theorem invT_mul {k : Type} [Fintype k] [DecidableEq k] (A B : GL k ℂ)
-    : invT (A * B) = invT A * invT B := by
+theorem invT_mul {k : Type} [Fintype k] [DecidableEq k] (A B : GL k ℂ) : invT (A * B) = invT A * invT B := by
   ext : 1
   simp only [invT, Units.val_mk, Units.val_mul, mul_inv_rev, Matrix.transpose_mul]
 
@@ -86,29 +107,19 @@ theorem invT_one {k : Type} [Fintype k] [DecidableEq k] : invT (1 : GL k ℂ) = 
 
 variable {p : ℕ} [Fact p.Prime]
 
-theorem evC_crdB_actC
-    (X : Sys p) (D : D7) (pos : (Σ v : X.Pl, Fin (X.G.P.n' v)) ≃ D.what₂.Tau)
-    (i : ℕ)
-    {n : ℕ} (h : (X.Pj i).m + 1 = n) (Gr : D.what₂.Tau → Matrix (Fin n) (Fin n) ℂ)
-    (B M : GL (Fin n) D.host.E)
-    (V : XR (X.Pj i) ℂ)
-    (z : Frames Gr) (f : Fr1 D n)
-    (hf : ∀ τ, f.1 τ = (atR D (M * B⁻¹) τ : Matrix (Fin n) (Fin n) ℂ) * z.1 τ)
-    : evC (X.Pj i) h (posJ X D pos i) Gr (crdB (embT D) B) V z
-        = ev1 X D pos i h (actC X D pos i h M V) f
-      ∧ actC X D pos i h M (actC X D pos i h M⁻¹ V) = V := by
+theorem evC_crdB_actC (X : Sys p) (D : D7) (pos : (Σ v : X.Pl, Fin (X.G.P.n' v)) ≃ D.what₂.Tau) (i : ℕ) {n : ℕ}
+    (h : (X.Pj i).m + 1 = n) (Gr : D.what₂.Tau → Matrix (Fin n) (Fin n) ℂ) (B M : GL (Fin n) D.host.E)
+    (V : XR (X.Pj i) ℂ) (z : Frames Gr) (f : Fr1 D n)
+    (hf : ∀ τ, f.1 τ = (atR D (M * B⁻¹) τ : Matrix (Fin n) (Fin n) ℂ) * z.1 τ) :
+    evC (X.Pj i) h (posJ X D pos i) Gr (crdB (embT D) B) V z = ev1 X D pos i h (actC X D pos i h M V) f ∧
+      actC X D pos i h M (actC X D pos i h M⁻¹ V) = V := by
   have hcr : ∀ τ, crdB (embT D) B τ = (atR D B⁻¹ τ : Matrix (Fin n) (Fin n) ℂ) := fun τ => rfl
-  let y : Fr1 D n := ⟨
-    fun τ => crdB (embT D) B τ * z.1 τ,
-    fun τ => by
-      rw [Matrix.det_mul, hcr]
-      exact ((Matrix.isUnit_iff_isUnit_det _).1 (atR D B⁻¹ τ).isUnit).mul (z.2 τ)
-  ⟩
+  let y : Fr1 D n := ⟨fun τ => crdB (embT D) B τ * z.1 τ, fun τ => by
+    rw [Matrix.det_mul, hcr]
+    exact ((Matrix.isUnit_iff_isUnit_det _).1 (atR D B⁻¹ τ).isUnit).mul (z.2 τ)⟩
   refine ⟨?_, ?_⟩
-  · have hz
-        : ∀ v s,
-          zAt (X.Pj i) h (posJ X D pos i) (crdB (embT D) B) z.1 v s
-            = zAt (X.Pj i) h (posJ X D pos i) (fun _ => 1) y.1 v s := by
+  · have hz : ∀ v s, zAt (X.Pj i) h (posJ X D pos i) (crdB (embT D) B) z.1 v s =
+        zAt (X.Pj i) h (posJ X D pos i) (fun _ => 1) y.1 v s := by
       intro v s
       simp only [zAt, y, one_mul]
     have h1 : evC (X.Pj i) h (posJ X D pos i) Gr (crdB (embT D) B) V z = ev1 X D pos i h V y := by
@@ -126,17 +137,10 @@ theorem evC_crdB_actC
     exact h2.symm
   · unfold actC
     rw [natActR_natActR]
-    have he
-        : (fun v s =>
-            hAt (X.Pj i) h (posJ X D pos i) (fun _ => 1) (atR D M) v s
-              * hAt (X.Pj i) h (posJ X D pos i) (fun _ => 1) (atR D M⁻¹) v s)
-          = fun _ _ => 1 := by
+    have he : (fun v s => hAt (X.Pj i) h (posJ X D pos i) (fun _ => 1) (atR D M) v s *
+        hAt (X.Pj i) h (posJ X D pos i) (fun _ => 1) (atR D M⁻¹) v s) = fun _ _ => 1 := by
       funext v s
-      have hm
-          : ∀ τ,
-            ((1 : GL (Fin n) ℂ) * atR D M τ * (1 : GL (Fin n) ℂ)⁻¹)
-                * ((1 : GL (Fin n) ℂ) * atR D M⁻¹ τ * (1 : GL (Fin n) ℂ)⁻¹)
-              = (1 : GL (Fin n) ℂ) := by
+      have hm : ∀ τ, ((1 : GL (Fin n) ℂ) * atR D M τ * (1 : GL (Fin n) ℂ)⁻¹) * ((1 : GL (Fin n) ℂ) * atR D M⁻¹ τ * (1 : GL (Fin n) ℂ)⁻¹) = (1 : GL (Fin n) ℂ) := by
         intro τ
         simp only [one_mul, inv_one, mul_one, atR, ← map_mul, mul_inv_cancel, map_one]
       unfold hAt

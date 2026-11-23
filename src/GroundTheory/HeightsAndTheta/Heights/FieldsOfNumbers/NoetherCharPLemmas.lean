@@ -1,6 +1,54 @@
 module
 
-public import Mathlib
+public import Mathlib.Algebra.MvPolynomial.Expand
+public import Mathlib.FieldTheory.Separable
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Henselian
+public import Mathlib.RingTheory.MvPolynomial.Expand
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.TotallySplit
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
+public import Mathlib.RingTheory.Ideal.GoingUp
 
 @[expose] public section
 
@@ -10,26 +58,23 @@ namespace GroundTheory.Heights₂.Heights.FieldNumbers
 
 open Polynomial
 
-theorem exists_pow_eq_map_expand
-    {σ k k' : Type*} [Field k] [Field k'] [Algebra k k']
-    (p : ℕ) [Fact p.Prime] [CharP k' p]
-    (e : ℕ) (N : MvPolynomial σ k) (hN : ∀ m, ∃ z : k', z ^ p ^ e = algebraMap k k' (N.coeff m))
-    : ∃ N' : MvPolynomial σ k',
+theorem exists_pow_eq_map_expand {σ k k' : Type*} [Field k] [Field k'] [Algebra k k'] (p : ℕ)
+    [Fact p.Prime] [CharP k' p] (e : ℕ) (N : MvPolynomial σ k)
+    (hN : ∀ m, ∃ z : k', z ^ p ^ e = algebraMap k k' (N.coeff m)) :
+    ∃ N' : MvPolynomial σ k',
       N' ^ p ^ e = MvPolynomial.map (algebraMap k k') (MvPolynomial.expand (p ^ e) N) := by
   choose r hr using hN
   refine ⟨∑ m ∈ N.support, MvPolynomial.monomial m (r m), ?_⟩
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [← MvPolynomial.map_iterateFrobenius_expand p, map_sum, map_sum]
-  set_option synthInstance.maxHeartbeats 100000 in
-    conv_rhs => rw [N.as_sum, map_sum, map_sum]
+
+  rw [← MvPolynomial.map_iterateFrobenius_expand p, map_sum, map_sum]
+
+  conv_rhs => rw [N.as_sum, map_sum, map_sum]
   refine Finset.sum_congr rfl fun m _ => ?_
   simp [MvPolynomial.expand_monomial, iterateFrobenius_def, hr]
 
-theorem finite_mapExpand
-    (k k' : Type*) [Field k] [Field k'] [Algebra k k'] [FiniteDimensional k k']
-    (σ : Type*) [Finite σ]
-    (q : ℕ) (hq : 0 < q)
-    : ((MvPolynomial.mapAlgHom (σ := σ) (Algebra.ofId k k')).comp
+theorem finite_mapExpand (k k' : Type*) [Field k] [Field k'] [Algebra k k']
+    [FiniteDimensional k k'] (σ : Type*) [Finite σ] (q : ℕ) (hq : 0 < q) :
+    ((MvPolynomial.mapAlgHom (σ := σ) (Algebra.ofId k k')).comp
       (MvPolynomial.expand q)).toRingHom.Finite := by
   set θ := (MvPolynomial.mapAlgHom (σ := σ) (Algebra.ofId k k')).comp (MvPolynomial.expand q)
   let : Algebra (MvPolynomial σ k) (MvPolynomial σ k') := θ.toRingHom.toAlgebra
@@ -38,8 +83,8 @@ theorem finite_mapExpand
   have hX : ∀ i, IsIntegral (MvPolynomial σ k) (MvPolynomial.X i : MvPolynomial σ k') := by
     intro i
     refine IsIntegral.of_pow hq ?_
-    have : (MvPolynomial.X i : MvPolynomial σ k') ^ q
-        = algebraMap (MvPolynomial σ k) (MvPolynomial σ k') (MvPolynomial.X i) := by
+    have : (MvPolynomial.X i : MvPolynomial σ k') ^ q =
+        algebraMap (MvPolynomial σ k) (MvPolynomial σ k') (MvPolynomial.X i) := by
       change _ = θ (MvPolynomial.X i)
       simp [θ]
     rw [this]
@@ -61,32 +106,27 @@ theorem finite_mapExpand
     Algebra.FiniteType.of_restrictScalars_finiteType k _ _
   exact Algebra.IsIntegral.finite
 
-theorem injective_of_isIntegral
-    {B B' Ω : Type*} [CommRing B] [Nontrivial B] [CommRing B'] [IsDomain B'] [CommRing Ω]
-    [Algebra B B'] [Algebra.IsIntegral B B']
-    (ψ : B' →+* Ω) (h : Function.Injective (ψ.comp (algebraMap B B')))
-    : Function.Injective ψ := by
+theorem injective_of_isIntegral {B B' Ω : Type*} [CommRing B] [Nontrivial B] [CommRing B']
+    [IsDomain B'] [CommRing Ω] [Algebra B B'] [Algebra.IsIntegral B B'] (ψ : B' →+* Ω)
+    (h : Function.Injective (ψ.comp (algebraMap B B'))) : Function.Injective ψ := by
   have : RingHom.ker ψ = ⊥ := by
     apply Ideal.eq_bot_of_comap_eq_bot (R := B)
     rw [Ideal.under_def, RingHom.comap_ker]
     exact (RingHom.injective_iff_ker_eq_bot _).mp h
   exact (RingHom.injective_iff_ker_eq_bot ψ).mpr this
 
-theorem isSeparable_of_pow_coeff
-    {F F' Ω : Type*} [Field F] [Field F'] [Field Ω] [Algebra F Ω] [Algebra F' Ω]
-    (p : ℕ) [Fact p.Prime] [CharP Ω p]
-    (e : ℕ)
-    (g : F[X]) (hg : g.Separable)
+theorem isSeparable_of_pow_coeff {F F' Ω : Type*} [Field F] [Field F'] [Field Ω] [Algebra F Ω]
+    [Algebra F' Ω] (p : ℕ) [Fact p.Prime] [CharP Ω p] (e : ℕ) (g : F[X]) (hg : g.Separable)
     (ω : Ω) (hω : aeval (ω ^ p ^ e) g = 0)
-    (hc : ∀ i, ∃ d : F', algebraMap F' Ω d ^ p ^ e = algebraMap F Ω (g.coeff i))
-    : IsSeparable F' ω := by
+    (hc : ∀ i, ∃ d : F', algebraMap F' Ω d ^ p ^ e = algebraMap F Ω (g.coeff i)) :
+    IsSeparable F' ω := by
   choose d hd using hc
   set h : F'[X] := ∑ i ∈ Finset.range (g.natDegree + 1), C (d i) * X ^ i
   have hmap : (h.map (algebraMap F' Ω)).map (iterateFrobenius Ω p e) = g.map (algebraMap F Ω) := by
     ext i
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [h, coeff_map, Polynomial.map_sum, Polynomial.map_mul, Polynomial.map_pow, map_X,
-        map_C, finsetSum_coeff, coeff_C_mul_X_pow]
+
+    simp only [h, coeff_map, Polynomial.map_sum, Polynomial.map_mul, Polynomial.map_pow, map_X,
+    map_C, finsetSum_coeff, coeff_C_mul_X_pow]
     rw [Finset.sum_ite_eq]
     split_ifs with hi
     · rw [iterateFrobenius_def, hd]
@@ -97,8 +137,8 @@ theorem isSeparable_of_pow_coeff
   have hsep : h.Separable := (separable_map (algebraMap F' Ω)).mp hsepΩ
   have hroot : aeval ω h = 0 := by
     have : (aeval ω h) ^ p ^ e = 0 := by
-      rw [aeval_def, ← eval_map, ← iterateFrobenius_def (R := Ω) p e, ← eval₂_hom, ← eval_map, hmap,
-        eval_map, iterateFrobenius_def, ← aeval_def, hω]
+      rw [aeval_def, ← eval_map, ← iterateFrobenius_def (R := Ω) p e, ← eval₂_hom,
+        ← eval_map, hmap, eval_map, iterateFrobenius_def, ← aeval_def, hω]
     exact pow_eq_zero_iff (pow_ne_zero _ (Fact.out : p.Prime).ne_zero) |>.mp this
   exact hsep.of_dvd (minpoly.dvd F' ω hroot)
 

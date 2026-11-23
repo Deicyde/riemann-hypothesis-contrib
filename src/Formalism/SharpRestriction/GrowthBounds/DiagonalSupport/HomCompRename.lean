@@ -1,8 +1,45 @@
 module
 
-public import Formalism.SharpRestriction.GrowthBounds.DiagonalSupport.MembAlgF
-public import Formalism.SharpRestriction.GrowthBounds.DiagonalSupport.MembLabF
-public import Formalism.SharpRestriction.GrowthBounds.DiagonalSupport.Proposition5OfThreeParts
+public import Formalism.SharpRestriction.GrowthBounds.DiagonalSupport.MembDefs
+public import Formalism.SharpRestriction.GrowthBounds.DiagonalSupport.NoMonMultideg
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
@@ -12,17 +49,15 @@ open MvPolynomial Finset Classical
 
 namespace Formalism.MainNotions.Proposition5Numerics
 
-open Formalism.MainNotions.G Formalism.GradedWeylDivisibility Formalism.MainNotions.SourceCleaning
-  Formalism.MainNotions.Pf14 Formalism.MainNotions.PlaneGramData
-  Formalism.MainNotions.TestSideCounting Formalism.MainNotions.TestSideWords
+open Formalism.MainNotions.G Formalism.GradedWeylDivisibility Formalism.MainNotions.SourceCleaning Formalism.MainNotions.Pf14 Formalism.MainNotions.PlaneGramData Formalism.MainNotions.TestSideCounting Formalism.MainNotions.TestSideWords
 open Formalism.MainNotions.G.WittFrameLocaliserOrders Formalism.MainNotions.G.symbolGeneratorData
 
 section Comp
 
 variable {R : Type} [CommRing R] {ι κ : Type} {n : ℕ}
 
-theorem coeff_homComp (δ : ι → ℕ) (F : MvPolynomial (ι × Fin n) R) (a : ι × Fin n →₀ ℕ)
-    : (homComp δ F).coeff a = if (∀ i, multideg a i = δ i) then F.coeff a else 0 := by
+theorem coeff_homComp (δ : ι → ℕ) (F : MvPolynomial (ι × Fin n) R) (a : ι × Fin n →₀ ℕ) :
+    (homComp δ F).coeff a = if (∀ i, multideg a i = δ i) then F.coeff a else 0 := by
   classical
   unfold homComp
   rw [coeff_sum]
@@ -31,16 +66,11 @@ theorem coeff_homComp (δ : ι → ℕ) (F : MvPolynomial (ι × Fin n) R) (a : 
   simp only [Finset.mem_filter, mem_support_iff]
   by_cases h : ∀ i, multideg a i = δ i <;> by_cases hc : F.coeff a = 0 <;> simp [h, hc]
 
-theorem homComp_rename (f : κ × Fin n → ι × Fin n) (δ : ι → ℕ) (G : MvPolynomial (κ × Fin n) R)
-    : ∃ G' : MvPolynomial (κ × Fin n) R,
-      G'.support ⊆ G.support ∧ rename f G' = homComp δ (rename f G) := by
+theorem homComp_rename (f : κ × Fin n → ι × Fin n) (δ : ι → ℕ) (G : MvPolynomial (κ × Fin n) R) :
+    ∃ G' : MvPolynomial (κ × Fin n) R, G'.support ⊆ G.support ∧ rename f G' = homComp δ (rename f G) := by
   classical
-  refine ⟨
-    ∑ mo ∈ G.support.filter (fun mo => ∀ i, multideg (Finsupp.mapDomain f mo) i = δ i),
-      monomial mo (G.coeff mo),
-    ?_,
-    ?_
-  ⟩
+  refine ⟨∑ mo ∈ G.support.filter (fun mo => ∀ i, multideg (Finsupp.mapDomain f mo) i = δ i),
+    monomial mo (G.coeff mo), ?_, ?_⟩
   · intro mo hmo
     obtain ⟨x, hx, h2⟩ := Finset.mem_biUnion.mp (MvPolynomial.support_sum hmo)
     rw [Finset.mem_singleton.mp (support_monomial_subset h2)]
@@ -48,8 +78,8 @@ theorem homComp_rename (f : κ × Fin n → ι × Fin n) (δ : ι → ℕ) (G : 
   · ext a
     rw [coeff_homComp]
     conv_rhs => rw [G.as_sum]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, coeff_sum, rename_monomial, coeff_monomial]
+
+    simp only [map_sum, coeff_sum, rename_monomial, coeff_monomial]
     rw [Finset.sum_filter]
     split_ifs with h
     · apply Finset.sum_congr rfl
@@ -69,18 +99,13 @@ end Comp
 
 section Big
 
-variable
-  {n' r K m : ℕ} [NeZero n']
-  (Fr : Frames n' r) (p : ℕ)
-  (O : Type) [CommRing O] [IsDomain O]
-  (hk : m + 1 = r + K)
-  {J : ℕ} [NeZero J]
-  (nL : ZMod J → ℕ)
+variable {n' r K m : ℕ} [NeZero n'] (Fr : Frames n' r) (p : ℕ) (O : Type) [CommRing O] [IsDomain O]
+  (hk : m + 1 = r + K) {J : ℕ} [NeZero J] (nL : ZMod J → ℕ)
 
-private theorem upPl_monomial_eq_monomial_mPl (bp : TL J nL r × Fin r →₀ ℕ) (c : KK O)
-    : upPl Fr p O hk nL (monomial bp c) = monomial (mPl Fr p hk nL bp) c := by
+private theorem upPl_monomial_eq_monomial_mPl (bp : TL J nL r × Fin r →₀ ℕ) (c : KK O) :
+    upPl Fr p O hk nL (monomial bp c) = monomial (mPl Fr p hk nL bp) c := by
   rw [show monomial (mPl Fr p hk nL bp) c = C c * monomial (mPl Fr p hk nL bp) 1 by
-    rw [C_mul_monomial, mul_one]]
+      rw [C_mul_monomial, mul_one]]
   simp only [upPl, aeval_monomial, algebraMap_eq]
   rw [Finsupp.prod_fintype _ _ (fun _ => pow_zero _), mPl, MvPolynomial.monomial_sum_one]
   congr 1
@@ -88,10 +113,10 @@ private theorem upPl_monomial_eq_monomial_mPl (bp : TL J nL r × Fin r →₀ �
   intro v _
   rw [← pow_mul, X_pow_eq_monomial]
 
-private theorem upNo_monomial_eq_monomial_mNo (bn : TL J nL r × Fin K →₀ ℕ) (c : KK O)
-    : upNo Fr p O hk nL (monomial bn c) = monomial (mNo Fr p hk nL bn) c := by
+private theorem upNo_monomial_eq_monomial_mNo (bn : TL J nL r × Fin K →₀ ℕ) (c : KK O) :
+    upNo Fr p O hk nL (monomial bn c) = monomial (mNo Fr p hk nL bn) c := by
   rw [show monomial (mNo Fr p hk nL bn) c = C c * monomial (mNo Fr p hk nL bn) 1 by
-    rw [C_mul_monomial, mul_one]]
+      rw [C_mul_monomial, mul_one]]
   simp only [upNo, aeval_monomial, algebraMap_eq]
   rw [Finsupp.prod_fintype _ _ (fun _ => pow_zero _), mNo, MvPolynomial.monomial_sum_one]
   congr 1
@@ -99,20 +124,16 @@ private theorem upNo_monomial_eq_monomial_mNo (bn : TL J nL r × Fin K →₀ �
   intro v _
   rw [← pow_mul, X_pow_eq_monomial]
 
-theorem asm_support
-    (rho : TL J nL r × Fin (r + K) → ℕ) (A : MvPolynomial (TL J nL r × Fin r) (KK O))
+theorem asm_support (rho : TL J nL r × Fin (r + K) → ℕ) (A : MvPolynomial (TL J nL r × Fin r) (KK O))
     (N : MvPolynomial (TL J nL r × Fin K) (KK O)) (mm : TV n' (m + 1) →₀ ℕ)
-    (h : mm ∈ (asm Fr p O hk nL rho A N).support)
-    : ∃ bp ∈ A.support, ∃ bn ∈ N.support, mm = bigM Fr p hk nL rho bp bn := by
+    (h : mm ∈ (asm Fr p O hk nL rho A N).support) :
+    ∃ bp ∈ A.support, ∃ bn ∈ N.support, mm = bigM Fr p hk nL rho bp bn := by
   classical
-  have e
-      : asm Fr p O hk nL rho A N
-        = ∑ bp ∈ A.support, ∑ bn ∈ N.support,
-          monomial (bigM Fr p hk nL rho bp bn) (A.coeff bp * N.coeff bn) := by
+  have e : asm Fr p O hk nL rho A N = ∑ bp ∈ A.support, ∑ bn ∈ N.support,
+      monomial (bigM Fr p hk nL rho bp bn) (A.coeff bp * N.coeff bn) := by
     conv_lhs => rw [asm, A.as_sum, N.as_sum]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, upPl_monomial_eq_monomial_mPl, upNo_monomial_eq_monomial_mNo,
-        Finset.mul_sum, Finset.sum_mul]
+
+    simp only [map_sum, upPl_monomial_eq_monomial_mPl, upNo_monomial_eq_monomial_mNo, Finset.mul_sum, Finset.sum_mul]
     rw [Finset.sum_comm]
     apply Finset.sum_congr rfl
     intro bp _
@@ -124,35 +145,28 @@ theorem asm_support
   obtain ⟨bn, hbn, h3⟩ := Finset.mem_biUnion.mp (MvPolynomial.support_sum h2)
   exact ⟨bp, hbp, bn, hbn, Finset.mem_singleton.mp (support_monomial_subset h3)⟩
 
-theorem bigM_off
-    (htop : ∀ x : TL J nL r, posOf n' (posTL Fr x) ∈ Fr.TT) (rho : TL J nL r × Fin (r + K) → ℕ)
-    (bp : TL J nL r × Fin r →₀ ℕ) (bn : TL J nL r × Fin K →₀ ℕ)
-    (s : Fin n') (hs : s ∉ Set.range fun x : TL J nL r => posOf n' (posTL Fr x))
-    (c : Fin (m + 1))
-    : bigM Fr p hk nL rho bp bn (s, c) = 0 := by
+theorem bigM_off (htop : ∀ x : TL J nL r, posOf n' (posTL Fr x) ∈ Fr.TT)
+    (rho : TL J nL r × Fin (r + K) → ℕ) (bp : TL J nL r × Fin r →₀ ℕ) (bn : TL J nL r × Fin K →₀ ℕ)
+    (s : Fin n') (hs : s ∉ Set.range fun x : TL J nL r => posOf n' (posTL Fr x)) (c : Fin (m + 1)) :
+    bigM Fr p hk nL rho bp bn (s, c) = 0 := by
   apply bigM_notin
   rintro ⟨v, hv⟩
   exact hs ⟨v.1, congrArg Prod.fst hv⟩
 
-theorem multideg_bigM
-    (hinj : Function.Injective fun x : TL J nL r => posOf n' (posTL Fr x))
+theorem multideg_bigM (hinj : Function.Injective fun x : TL J nL r => posOf n' (posTL Fr x))
     (hsurj : ∀ s ∈ Fr.TT, ∃ x : TL J nL r, posOf n' (posTL Fr x) = s)
     (htop : ∀ x : TL J nL r, posOf n' (posTL Fr x) ∈ Fr.TT)
     (d : Fin n' → ℕ) (hd : ∀ s, s ∉ Fr.TT → d s = 0)
-    (rho : TL J nL r × Fin (r + K) → ℕ) (dPl dNo : TL J nL r → ℕ)
-    (hB : BlockOK Fr p nL d rho dPl dNo)
-    (bp : TL J nL r × Fin r →₀ ℕ) (bn : TL J nL r × Fin K →₀ ℕ)
-    (h1 : ∀ x, multideg bp x = dPl x) (h2 : ∀ x, multideg bn x = dNo x) (s : Fin n')
-    : multideg (bigM Fr p hk nL rho bp bn) s = d s := by
+    (rho : TL J nL r × Fin (r + K) → ℕ) (dPl dNo : TL J nL r → ℕ) (hB : BlockOK Fr p nL d rho dPl dNo)
+    (bp : TL J nL r × Fin r →₀ ℕ) (bn : TL J nL r × Fin K →₀ ℕ) (h1 : ∀ x, multideg bp x = dPl x)
+    (h2 : ∀ x, multideg bn x = dNo x) (s : Fin n') : multideg (bigM Fr p hk nL rho bp bn) s = d s := by
   by_cases hs : s ∈ Set.range fun x : TL J nL r => posOf n' (posTL Fr x)
   · obtain ⟨x, rfl⟩ := hs
-    have hsc
-        : multideg (bigM Fr p hk nL rho bp bn) (posOf n' (posTL Fr x))
-          = ∑ a : Fin r, bigM Fr p hk nL rho bp bn (plVar Fr hk nL x a)
-            + ∑ b : Fin K, bigM Fr p hk nL rho bp bn (noVar Fr hk nL x b) := by
+    have hsc : multideg (bigM Fr p hk nL rho bp bn) (posOf n' (posTL Fr x)) =
+        ∑ a : Fin r, bigM Fr p hk nL rho bp bn (plVar Fr hk nL x a) +
+          ∑ b : Fin K, bigM Fr p hk nL rho bp bn (noVar Fr hk nL x b) := by
       unfold multideg
-      rw [← Equiv.sum_comp (finCongr hk.symm)
-          (fun c => bigM Fr p hk nL rho bp bn (posOf n' (posTL Fr x), c)),
+      rw [← Equiv.sum_comp (finCongr hk.symm) (fun c => bigM Fr p hk nL rho bp bn (posOf n' (posTL Fr x), c)),
         Fin.sum_univ_add]
       rfl
     rw [hsc]

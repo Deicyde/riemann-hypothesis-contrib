@@ -1,43 +1,71 @@
 module
 
 public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentations.PAdicWittLattices.TransCancel
-public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.PushEquivSymmLeft
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ZarhinOrderIsRingActionOnProduct
+public import Development.AbelianVarietyTheory.Definitions.ShimuraVarieties.PowObjGeometricallyConnected
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.HarrisTaylorObjectMapsComposeCancel
+import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ClsLinCombSingle
+import Development.AbelianVarietyTheory.Proofs.ModuliProofs.PushEquivSymmLeft
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
-  NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
-  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen
-  GlobalTheory.LKTrip GlobalTheory.LKGeo UpperTheory.Gal.G3
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen GlobalTheory.LKTrip GlobalTheory.LKGeo UpperTheory.Gal.G3
 open UpperTheory.Gal.Int.Geo (Lv IsTrans Integ KS Mem FEt KSEx KSNice)
 open scoped TensorProduct
 universe u
 
-private theorem square_map_isSquare
-    {S : Scheme.{0}} {A B : Over S} [GrpObj A] [IsCommMonObj A] [GrpObj B] [IsCommMonObj B]
-    (ψ : A ⟶ B)
-    : Geo.Tor.IsSquare ψ.left (Hecke.sq2 ψ) := by
+private theorem square_map_isSquare {S : Scheme.{0}} {A B : Over S} [GrpObj A] [IsCommMonObj A] [GrpObj B] [IsCommMonObj B] (ψ : A ⟶ B) :
+    Geo.Tor.IsSquare ψ.left (Hecke.sq2 ψ) := by
   constructor
   · rw [Hecke.sq2, ← Over.comp_left, lift_fst, Over.comp_left]
   · rw [Hecke.sq2, ← Over.comp_left, lift_snd, Over.comp_left]
 
-theorem UpperTheory.Gal.G3.pHomPull : HomPull := by
+theorem UpperTheory.Gal.G3.pHomPull :
+    HomPull := by
   intro G₀ R _ _ gb S S' s s' f N₁ N₂ o₁ o₂ o₁' o₂' m₁ m₂ ψ
-  let g : Over.mk (o₁'.A.hom ≫ f) ⟶ o₂.A :=
-    GlobalTheory.ObjPull.pushEquiv m₁.cart o₁'.A (𝟙 o₁'.A) ≫ ψ
+  let g : Over.mk (o₁'.A.hom ≫ f) ⟶ o₂.A := GlobalTheory.ObjPull.pushEquiv m₁.cart o₁'.A (𝟙 o₁'.A) ≫ ψ
   refine ⟨(GlobalTheory.ObjPull.pushEquiv m₂.cart o₁'.A).symm g, ?_⟩
   set ψ' := (GlobalTheory.ObjPull.pushEquiv m₂.cart o₁'.A).symm g with hψ'eq
   have hψ' : ψ'.left ≫ m₂.φ = m₁.φ ≫ ψ.left := by
     rw [← GlobalTheory.ObjPull.pushEquiv_left m₂.cart, hψ'eq, MulEquiv.apply_symm_apply]
-    simp only [g, Over.comp_left, GlobalTheory.ObjPull.pushEquiv_left, Over.id_left,
-      Category.id_comp]
-  have key
-      : ∀ (T : Over S') (z : T ⟶ o₁'.A),
-        GlobalTheory.ObjPull.pushEquiv m₂.cart T (z ≫ ψ')
-          = GlobalTheory.ObjPull.pushEquiv m₁.cart T z ≫ ψ := by
+    simp only [g, Over.comp_left, GlobalTheory.ObjPull.pushEquiv_left, Over.id_left, Category.id_comp]
+  have key : ∀ (T : Over S') (z : T ⟶ o₁'.A),
+      GlobalTheory.ObjPull.pushEquiv m₂.cart T (z ≫ ψ') = GlobalTheory.ObjPull.pushEquiv m₁.cart T z ≫ ψ := by
     intro T z
     apply Over.OverMorphism.ext
     simp only [GlobalTheory.ObjPull.pushEquiv_left, Over.comp_left, Category.assoc, hψ']
@@ -64,18 +92,16 @@ theorem UpperTheory.Gal.G3.pHomPull : HomPull := by
       ← Over.comp_left, ← Over.comp_left, hc c]
   · intro c hc
     obtain ⟨e⟩ := hc
-    have h1 :=
-      (GlobalTheory.CechPic.cls_eq_iff (LB.isLB_linComb o₁.isLB _ _) (pull_isLB o₂.isLB _)).2 e
+    have h1 := (GlobalTheory.CechPic.cls_eq_iff (LB.isLB_linComb o₁.isLB _ _) (pull_isLB o₂.isLB _)).2 e
     have hP1 := (GlobalTheory.CechPic.cls_eq_iff o₁'.isLB (pull_isLB o₁.isLB m₁.φ₂)).2 m₁.pol
     have hP2 := (GlobalTheory.CechPic.cls_eq_iff o₂'.isLB (pull_isLB o₂.isLB m₂.φ₂)).2 m₂.pol
     rw [GlobalTheory.CechPic.cls_pull o₁.isLB] at hP1
     rw [GlobalTheory.CechPic.cls_pull o₂.isLB] at hP2
     rw [GlobalTheory.CechPic.cls_pull o₂.isLB, GlobalTheory.CechPic.cls_linComb o₁.isLB] at h1
     simp only [GlobalTheory.CechPic.pull_id] at h1
-    refine
-      ⟨(GlobalTheory.CechPic.cls_eq_iff (LB.isLB_linComb o₁'.isLB _ _) (pull_isLB o₂'.isLB _)).1 ?_⟩
+    refine ⟨(GlobalTheory.CechPic.cls_eq_iff (LB.isLB_linComb o₁'.isLB _ _) (pull_isLB o₂'.isLB _)).1 ?_⟩
     rw [GlobalTheory.CechPic.cls_linComb o₁'.isLB, GlobalTheory.CechPic.cls_pull o₂'.isLB, hP1, hP2]
     simp only [GlobalTheory.CechPic.pull_id]
     rw [← GlobalTheory.CechPic.pull_comp, ← hsq, GlobalTheory.CechPic.pull_comp, ← h1]
-    set_option synthInstance.maxHeartbeats 100000 in
+
     simp [map_sum, map_zsmul]

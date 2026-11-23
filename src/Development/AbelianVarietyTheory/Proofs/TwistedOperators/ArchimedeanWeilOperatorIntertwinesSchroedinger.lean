@@ -1,15 +1,50 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.ArchActOne
-public import GroundTheory.GlobalFields.Adele.Compact
 public import GroundTheory.GlobalFields.Adele.Approximation
+public import GroundTheory.GlobalFields.Adele.Compact
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
-  GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
-  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
+open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
 open GlobalTheory.ArchUniq GlobalTheory.ArchUniq.Coord GlobalTheory.ArchLine
 open scoped Matrix Classical SchwartzMap
 
@@ -20,16 +55,12 @@ namespace GlobalTheory.ArchHeis
 variable {F : Type} [Field F] [NumberField F]
 
 def intFin (κ : Type) : (κ → FiniteAdeleRing (𝓞 F) F) → ℂ :=
-  (Set.pi Set.univ fun _ : κ =>
-    (GroundTheory.Global.integralFiniteAdeles (𝓞 F) F : Set (FiniteAdeleRing (𝓞 F) F))).indicator 1
+  (Set.pi Set.univ fun _ : κ => (GroundTheory.Global.integralFiniteAdeles (𝓞 F) F : Set (FiniteAdeleRing (𝓞 F) F))).indicator 1
 
-theorem intFin_mem (κ : Type) [Fintype κ]
-    : intFin (F := F) κ ∈ SB (κ → FiniteAdeleRing (𝓞 F) F) := by
+theorem intFin_mem (κ : Type) [Fintype κ] : intFin (F := F) κ ∈ SB (κ → FiniteAdeleRing (𝓞 F) F) := by
   set B := Set.pi Set.univ fun _ : κ => (GroundTheory.Global.integralFiniteAdeles (𝓞 F) F : Set (FiniteAdeleRing (𝓞 F) F)) with hB
-  have hO : IsOpen B :=
-    isOpen_set_pi Set.finite_univ fun _ _ => GroundTheory.Global.isOpen_integralFiniteAdeles
-  have hK : IsCompact B :=
-    isCompact_univ_pi fun _ => GroundTheory.Global.isCompact_integralFiniteAdeles F
+  have hO : IsOpen B := isOpen_set_pi Set.finite_univ fun _ _ => GroundTheory.Global.isOpen_integralFiniteAdeles
+  have hK : IsCompact B := isCompact_univ_pi fun _ => GroundTheory.Global.isCompact_integralFiniteAdeles F
   have hC : IsClosed B := hK.isClosed
   refine ⟨?_, HasCompactSupport.intro hK fun x hx => Set.indicator_of_notMem hx _⟩
   rw [IsLocallyConstant.iff_exists_open]
@@ -48,32 +79,31 @@ theorem fst_eq_zero_of_ev {a : AF F} (h : evI F a = 0) : a.1 = 0 :=
 theorem snd_eq_zero_of_at {κ : Type} {z : κ → AF F} (hz : At (evI F) z) (i : κ) : (z i).2 = 0 := by
   have h0 : evI F ((0, 1) : AF F) = 0 := map_zero (InfiniteAdeleRing.ringEquiv_mixedSpace F)
   have := congrArg Prod.snd (congrFun (hz (0, 1) h0) i)
-  change (((0, 1) : InfiniteAdeleRing F × FiniteAdeleRing (𝓞 F) F).2 * (z i).2) = (0 : AF F).2
-    at this
+  change (((0, 1) : InfiniteAdeleRing F × FiniteAdeleRing (𝓞 F) F).2 * (z i).2) = (0 : AF F).2 at this
   rw [one_mul] at this
   exact this
 
 theorem refFin_of_zero (κ : Type) (x : κ → AF F) (hx : ∀ i, (x i).2 = 0) : refFin κ x = 1 := by
   have : (fun i => (x i).2) = 0 := funext hx
   simp only [refFin, this, intFin]
-  rw [Set.indicator_of_mem (show (0 : κ → FiniteAdeleRing (𝓞 F) F) ∈ Set.pi Set.univ fun _ : κ =>
-      (GroundTheory.Global.integralFiniteAdeles (𝓞 F) F : Set (FiniteAdeleRing (𝓞 F) F)) from
-    fun i _ => zero_mem (GroundTheory.Global.integralFiniteAdeles (𝓞 F) F))]
+  rw [Set.indicator_of_mem (show (0 : κ → FiniteAdeleRing (𝓞 F) F) ∈ Set.pi Set.univ
+    fun _ : κ => (GroundTheory.Global.integralFiniteAdeles (𝓞 F) F : Set (FiniteAdeleRing (𝓞 F) F)) from
+      fun i _ => zero_mem (GroundTheory.Global.integralFiniteAdeles (𝓞 F) F))]
   rfl
 
 theorem refFin_liftV {κ : Type} (y : κ → mixedEmbedding.mixedSpace F) : refFin κ (liftV y) = 1 :=
   refFin_of_zero κ _ fun _ => rfl
 
-theorem refFin_add_liftV {κ : Type} (x : κ → AF F) (y : κ → mixedEmbedding.mixedSpace F)
-    : refFin κ (x + liftV y) = refFin κ x := by
+theorem refFin_add_liftV {κ : Type} (x : κ → AF F) (y : κ → mixedEmbedding.mixedSpace F) :
+    refFin κ (x + liftV y) = refFin κ x := by
   have : (fun i => ((x + liftV y) i).2) = fun i => (x i).2 := by
     funext i
     change (x i).2 + 0 = (x i).2
     rw [add_zero]
   simp only [refFin, this]
 
-theorem rest_refFin (κ : Type) [Fintype κ] (f : SInf F κ)
-    : Rest (evI F) (f : (κ → mixedEmbedding.mixedSpace F) → ℂ) (refFin κ) := by
+theorem rest_refFin (κ : Type) [Fintype κ] (f : SInf F κ) :
+    Rest (evI F) (f : (κ → mixedEmbedding.mixedSpace F) → ℂ) (refFin κ) := by
   refine ⟨fun x z hz => ?_, Submodule.subset_span ⟨f, intFin κ, intFin_mem κ, rfl⟩⟩
   have : (fun i => ((x + z) i).2) = fun i => (x i).2 := by
     funext i
@@ -87,36 +117,28 @@ theorem liftV_locV_of_at {κ : Type} {z : κ → AF F} (hz : At (evI F) z) : lif
   · exact (InfiniteAdeleRing.ringEquiv_mixedSpace F).symm_apply_apply _
   · exact (snd_eq_zero_of_at hz i).symm
 
-theorem evI_liftV {κ : Type} (y : κ → mixedEmbedding.mixedSpace F) (i : κ)
-    : evI F (liftV y i) = y i :=
+theorem evI_liftV {κ : Type} (y : κ → mixedEmbedding.mixedSpace F) (i : κ) : evI F (liftV y i) = y i :=
   (InfiniteAdeleRing.ringEquiv_mixedSpace F).apply_symm_apply _
 
 theorem evH_invTwo : evH F (⅟(2 : AF F)) = algebraMap ℝ (mixedEmbedding.mixedSpace F) (1 / 2) := by
   have h1 : evH F (⅟(2 : AF F)) * 2 = 1 := by
     rw [← map_ofNat (evH F) 2, ← map_mul, invOf_mul_self, map_one]
-  have h2
-      : (2 : mixedEmbedding.mixedSpace F) * algebraMap ℝ (mixedEmbedding.mixedSpace F) (1 / 2)
-        = 1 := by
+  have h2 : (2 : mixedEmbedding.mixedSpace F) * algebraMap ℝ (mixedEmbedding.mixedSpace F) (1 / 2) = 1 := by
     rw [← map_ofNat (algebraMap ℝ (mixedEmbedding.mixedSpace F)) 2, ← map_mul]
     norm_num
-  calc
-    evH F (⅟(2 : AF F))
-      = evH F (⅟(2 : AF F)) * (2 * algebraMap ℝ _ (1 / 2)) := by rw [h2, mul_one]
+  calc evH F (⅟(2 : AF F)) = evH F (⅟(2 : AF F)) * (2 * algebraMap ℝ _ (1 / 2)) := by rw [h2, mul_one]
     _ = algebraMap ℝ _ (1 / 2) := by rw [← mul_assoc, h1, one_mul]
 
-theorem schr_tens
-    {κ : Type} [Fintype κ]
-    (ψ : AddChar (AF F) ℂ) (hψ : IsStd ψ)
+theorem schr_tens {κ : Type} [Fintype κ] (ψ : AddChar (AF F) ℂ) (hψ : IsStd ψ)
     (v : (κ → mixedEmbedding.mixedSpace F) × (κ → mixedEmbedding.mixedSpace F))
-    (g : (κ → mixedEmbedding.mixedSpace F) → ℂ)
-    : schr ψ (liftV v.1, liftV v.2) (tens (evI F) g (refFin κ))
-      = tens (evI F) (schrF (trP F κ) v g) (refFin κ) := by
+    (g : (κ → mixedEmbedding.mixedSpace F) → ℂ) :
+    schr ψ (liftV v.1, liftV v.2) (tens (evI F) g (refFin κ)) = tens (evI F) (schrF (trP F κ) v g) (refFin κ) := by
   funext x
   set z : AF F := x ⬝ᵥ liftV v.2 + ⅟(2 : AF F) * (liftV v.1 ⬝ᵥ liftV v.2) with hz
   let finH : AF F →+* FiniteAdeleRing (𝓞 F) F := RingHom.snd _ _
   have hfin : finH z = 0 := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [hz, dotProduct, map_add (f := _), map_mul, map_sum]
+
+    simp only [hz, dotProduct, map_add (f := _), map_mul, map_sum]
     have e : ∀ i, finH (liftV v.2 i) = 0 := fun _ => rfl
     simp only [e, mul_zero, Finset.sum_const_zero, add_zero]
   have hAt : At (evI F) z := by
@@ -126,15 +148,14 @@ theorem schr_tens
       rw [fst_eq_zero_of_ev hc, zero_mul]
     · change c.2 * finH z = 0
       rw [hfin, mul_zero]
-  have htr
-      : Algebra.trace ℝ (mixedEmbedding.mixedSpace F) (evI F z)
-        = trP F κ (fun i => evI F (x i)) v.2 + trP F κ v.1 v.2 / 2 := by
+  have htr : Algebra.trace ℝ (mixedEmbedding.mixedSpace F) (evI F z) =
+      trP F κ (fun i => evI F (x i)) v.2 + trP F κ v.1 v.2 / 2 := by
     rw [evI_eq, hz]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [dotProduct, map_add (f := _), map_mul, map_sum, ← evI_eq, evI_liftV, trP]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [show evI F (⅟(2 : AF F)) = algebraMap ℝ _ (1 / 2) from evH_invTwo, ← Algebra.smul_def,
-        map_smul, map_sum, smul_eq_mul]
+
+    simp only [dotProduct, map_add (f := _), map_mul, map_sum, ← evI_eq, evI_liftV, trP]
+
+    rw [show evI F (⅟(2 : AF F)) = algebraMap ℝ _ (1 / 2) from evH_invTwo, ← Algebra.smul_def, map_smul, map_sum,
+    smul_eq_mul]
     ring
   have hloc : (fun i => evI F ((x + liftV v.1) i)) = (fun i => evI F (x i)) + v.1 := by
     funext i
@@ -148,20 +169,13 @@ end GlobalTheory.ArchHeis
 
 namespace GlobalTheory.ArchHeis
 
-theorem archOp_schrF
-    : ∀ {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-        {σ : E →ₐ[F] E} {n d : ℕ} {X : Spc F E n} {W : Spc F E d} (M : Model σ X W)
-        (ψ : AddChar (AF F) ℂ) (χX χW : Chr F E) (om : Rep σ X W),
-      IsStd ψ → M.IsWeil ψ χX χW om
-        → (∀ h ∈ UAt σ W (evI F), ∀ f : SInf F (Fin n × Fin d), ∃ f₁ : SInf F (Fin n × Fin d),
-          Acts (evI F) (om (1, h)) ⇑f ⇑f₁)
-        → ∀ h ∈ UAt σ W (evI F),
-          ∀ (v : (Fin n × Fin d → mixedEmbedding.mixedSpace F)
-              × (Fin n × Fin d → mixedEmbedding.mixedSpace F))
-              (f f₁ : SInf F (Fin n × Fin d)),
-            ⇑f₁ = schrF (trP F (Fin n × Fin d)) v ⇑f
-              → ⇑(archOp om h f₁)
-                = schrF (trP F (Fin n × Fin d)) (archAct M h v) ⇑(archOp om h f) := by
+theorem archOp_schrF : ∀ {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E} {n d : ℕ}
+    {X : Spc F E n} {W : Spc F E d} (M : Model σ X W) (ψ : AddChar (AF F) ℂ) (χX χW : Chr F E) (om : Rep σ X W),
+    IsStd ψ → M.IsWeil ψ χX χW om → (∀ h ∈ UAt σ W (evI F), ∀ f : SInf F (Fin n × Fin d), ∃ f₁ : SInf F (Fin n × Fin d),
+      Acts (evI F) (om (1, h)) ⇑f ⇑f₁) →
+    ∀ h ∈ UAt σ W (evI F), ∀ (v : (Fin n × Fin d → mixedEmbedding.mixedSpace F) × (Fin n × Fin d → mixedEmbedding.mixedSpace F))
+      (f f₁ : SInf F (Fin n × Fin d)), ⇑f₁ = schrF (trP F (Fin n × Fin d)) v ⇑f →
+      ⇑(archOp om h f₁) = schrF (trP F (Fin n × Fin d)) (archAct M h v) ⇑(archOp om h f) := by
   intro F E _ _ _ _ _ σ n d X W M ψ χX χW om hψ hW hex h hh v f f₁ hf₁
   have hS := IsUWeilPair.isUSplitting hW
   set u := M.co.e.symm (liftV v.1, liftV v.2) with hu
@@ -197,10 +211,8 @@ theorem archOp_schrF
   have h1 : M.co.rho ψ u (tens (evI F) ⇑f (refFin _)) = tens (evI F) ⇑f₁ (refFin _) := by
     simp only [Darboux.rho, hu, LinearEquiv.apply_symm_apply]
     rw [schr_tens ψ hψ v, hf₁]
-  have h2
-      : M.co.rho ψ u' (tens (evI F) ⇑(archOp om h f) (refFin _))
-        = tens (evI F) (schrF (trP F (Fin n × Fin d)) (archAct M h v) ⇑(archOp om h f))
-          (refFin _) := by
+  have h2 : M.co.rho ψ u' (tens (evI F) ⇑(archOp om h f) (refFin _)) =
+      tens (evI F) (schrF (trP F (Fin n × Fin d)) (archAct M h v) ⇑(archOp om h f)) (refFin _) := by
     simp only [Darboux.rho]
     rw [he', schr_tens ψ hψ]
   rw [h1, hA₁, hA, ← hu', h2] at himpl

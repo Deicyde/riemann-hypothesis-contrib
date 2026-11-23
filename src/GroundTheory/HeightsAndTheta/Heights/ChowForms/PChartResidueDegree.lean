@@ -1,9 +1,56 @@
 module
 
-public import Mathlib
 public import GroundTheory.HeightsAndTheta.Heights.ChowForms.ImportsBis
 public import GroundTheory.HeightsAndTheta.Heights.ChowForms.Imports
 public import GroundTheory.HeightsAndTheta.Heights.ChowForms.PChowFormSection
+import Mathlib.Algebra.AffineMonoid.UniqueSums
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
@@ -17,16 +64,13 @@ noncomputable section
 
 namespace ChartResidueDegree
 
-theorem aeval_mul_of_isHomogeneous
-    {F : Type} [Field F]
-    {n : ℕ} {A : Type*} [CommRing A] [Algebra F A]
-    {g : MvPolynomial (Fin n) F} {d : ℕ} (hg : g.IsHomogeneous d)
-    (a : A) (x : Fin n → A)
-    : aeval (fun m => a * x m) g = a ^ d * aeval x g := by
+theorem aeval_mul_of_isHomogeneous {F : Type} [Field F] {n : ℕ} {A : Type*} [CommRing A] [Algebra F A]
+    {g : MvPolynomial (Fin n) F} {d : ℕ} (hg : g.IsHomogeneous d) (a : A) (x : Fin n → A) :
+    aeval (fun m => a * x m) g = a ^ d * aeval x g := by
   conv_lhs => rw [g.as_sum]
   conv_rhs => rw [g.as_sum]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum, map_sum, Finset.mul_sum]
+
+  rw [map_sum, map_sum, Finset.mul_sum]
   refine Finset.sum_congr rfl fun s hs => ?_
   have hd := hg (mem_support_iff.mp hs)
   simp only [aeval_monomial, mul_pow]
@@ -35,25 +79,17 @@ theorem aeval_mul_of_isHomogeneous
   simp only [smul_eq_mul, Pi.one_apply, mul_one]
   ring
 
-theorem exists_chartHom
-    {F : Type} [Field F]
-    {n e : ℕ} {I W : Ideal (MvPolynomial (Fin n) F)} [W.IsPrime]
-    (hWh : IsHomogIdeal W) (hIW : I ≤ W)
-    {t : Fin n → F}
+theorem exists_chartHom {F : Type} [Field F] {n e : ℕ} {I W : Ideal (MvPolynomial (Fin n) F)} [W.IsPrime]
+    (hWh : IsHomogIdeal W) (hIW : I ≤ W) {t : Fin n → F}
     (ξ : Fin n → FractionRing (MvPolynomial (Fin n) F ⧸ W))
-    (hξ : ∀ h,
-      aeval ξ h = algebraMap _ (FractionRing (MvPolynomial (Fin n) F ⧸ W)) (Ideal.Quotient.mk W h))
+    (hξ : ∀ h, aeval ξ h = algebraMap _ (FractionRing (MvPolynomial (Fin n) F ⧸ W)) (Ideal.Quotient.mk W h))
     (ℓ : FractionRing (MvPolynomial (Fin n) F ⧸ W)) (hℓdef : ℓ = aeval ξ (linForm t)) (hℓ : ℓ ≠ 0)
-    (c : Fin n → FractionRing (MvPolynomial (Fin n) F ⧸ W)) (hc : ∑ j, c j * ξ j = 1)
-    : ∃ ΦI : ChartInc I t e
-        →+* MvPolynomial (Fin e × Fin n) (FractionRing (MvPolynomial (Fin n) F ⧸ W)),
-      (∀ s,
-          ΦI (algebraMap (MvPolynomial (Fin e × Fin n) F) (ChartInc I t e) s)
-            = aeval (genSubst ξ c) s)
-        ∧ (∀ h, ΦI (chartX I t e h) = C (aeval (fun m => ξ m / ℓ) h))
-        ∧ ∀ h ∈ W, aeval (fun m => ξ m / ℓ) h = 0 := by
-  let Φ
-      : MvPolynomial (Fin n ⊕ Fin e × Fin n) F →ₐ[F] MvPolynomial (Fin e × Fin n) (FractionRing (MvPolynomial (Fin n) F ⧸ W)) :=
+    (c : Fin n → FractionRing (MvPolynomial (Fin n) F ⧸ W)) (hc : ∑ j, c j * ξ j = 1) :
+    ∃ ΦI : ChartInc I t e →+* MvPolynomial (Fin e × Fin n) (FractionRing (MvPolynomial (Fin n) F ⧸ W)),
+      (∀ s, ΦI (algebraMap (MvPolynomial (Fin e × Fin n) F) (ChartInc I t e) s) = aeval (genSubst ξ c) s) ∧
+      (∀ h, ΦI (chartX I t e h) = C (aeval (fun m => ξ m / ℓ) h)) ∧
+      ∀ h ∈ W, aeval (fun m => ξ m / ℓ) h = 0 := by
+  let Φ : MvPolynomial (Fin n ⊕ Fin e × Fin n) F →ₐ[F] MvPolynomial (Fin e × Fin n) (FractionRing (MvPolynomial (Fin n) F ⧸ W)) :=
     aeval (Sum.elim (fun m => C (ξ m / ℓ)) (genSubst ξ c))
   have hΦinl : ∀ h, Φ (rename Sum.inl h) = C (aeval (fun m => ξ m / ℓ) h) := by
     intro h
@@ -81,8 +117,8 @@ theorem exists_chartHom
     · rw [Ideal.map_le_iff_le_comap]
       refine sup_le (fun h hh => ?_) ?_
       · rw [Ideal.mem_comap, RingHom.mem_ker, hΦinl, hdeh h (hIW hh), C_0]
-      · rw [Ideal.span_le, Set.singleton_subset_iff, SetLike.mem_coe, Ideal.mem_comap,
-          RingHom.mem_ker, hΦinl, hlt1, C_0]
+      · rw [Ideal.span_le, Set.singleton_subset_iff, SetLike.mem_coe, Ideal.mem_comap, RingHom.mem_ker,
+          hΦinl, hlt1, C_0]
     · rw [Ideal.span_le]
       rintro _ ⟨i, rfl⟩
       set_option synthInstance.maxHeartbeats 100000 in
@@ -102,13 +138,9 @@ theorem exists_chartHom
       simp_rw [sub_mul, Finset.sum_sub_distrib]
       rw [h1, h2, sub_self]
 
-  let ΦI
-      : ChartInc I t e
-        →+* MvPolynomial (Fin e × Fin n) (FractionRing (MvPolynomial (Fin n) F ⧸ W)) :=
+  let ΦI : ChartInc I t e →+* MvPolynomial (Fin e × Fin n) (FractionRing (MvPolynomial (Fin n) F ⧸ W)) :=
     Ideal.Quotient.lift (chartIncIdeal I t e) Φ.toRingHom fun a ha => hJ ha
-  have hΦIS
-      : ∀ s : MvPolynomial (Fin e × Fin n) F,
-        ΦI (algebraMap _ (ChartInc I t e) s) = aeval (genSubst ξ c) s := by
+  have hΦIS : ∀ s : MvPolynomial (Fin e × Fin n) F, ΦI (algebraMap _ (ChartInc I t e) s) = aeval (genSubst ξ c) s := by
     intro s
     show ΦI (Ideal.Quotient.mk _ (rename Sum.inr s)) = _
     exact hΦinr s
@@ -118,32 +150,26 @@ theorem exists_chartHom
     exact hΦinl h
   exact ⟨ΦI, hΦIS, hΦIX, hdeh⟩
 
-theorem ratio
-    {K σ : Type*} [Field K]
-    {n : ℕ} (ξ τ : Fin n → K) (A : Fin n → MvPolynomial σ K)
-    (B : MvPolynomial σ K) (ℓ' : K)
-    (hB : B ≠ 0) (hℓ : ∑ l, τ l * ξ l ≠ 0) (hrel : ∀ m, A m * C ℓ' = B * C (ξ m))
-    : ∑ l, C (τ l) * A l ≠ 0 ∧ ∀ m, A m = C (ξ m / ∑ l, τ l * ξ l) * ∑ l, C (τ l) * A l := by
+theorem ratio {K σ : Type*} [Field K] {n : ℕ} (ξ τ : Fin n → K) (A : Fin n → MvPolynomial σ K)
+    (B : MvPolynomial σ K) (ℓ' : K) (hB : B ≠ 0) (hℓ : ∑ l, τ l * ξ l ≠ 0)
+    (hrel : ∀ m, A m * C ℓ' = B * C (ξ m)) :
+    ∑ l, C (τ l) * A l ≠ 0 ∧ ∀ m, A m = C (ξ m / ∑ l, τ l * ξ l) * ∑ l, C (τ l) * A l := by
   set ℓ := ∑ l, τ l * ξ l
   have hCℓ : (C ℓ : MvPolynomial σ K) ≠ 0 := by rwa [Ne, C_eq_zero]
   have hsum : (∑ l, C (τ l) * A l) * C ℓ' = B * C ℓ := by
-    calc
-      (∑ l, C (τ l) * A l) * C ℓ'
-        = ∑ l, C (τ l) * (A l * C ℓ') := by rw [Finset.sum_mul]; simp only [mul_assoc]
+    calc (∑ l, C (τ l) * A l) * C ℓ' = ∑ l, C (τ l) * (A l * C ℓ') := by
+          rw [Finset.sum_mul]; simp only [mul_assoc]
       _ = ∑ l, B * C (τ l * ξ l) := Finset.sum_congr rfl fun l _ => by rw [hrel l, C_mul]; ring
       _ = B * C ℓ := by rw [← Finset.mul_sum, ← map_sum]
   have hprod : (∑ l, C (τ l) * A l) * C ℓ' ≠ 0 := by rw [hsum]; exact mul_ne_zero hB hCℓ
   refine ⟨left_ne_zero_of_mul hprod, fun m => ?_⟩
-  have hηC : C (ξ m / ℓ) * C ℓ = (C (ξ m) : MvPolynomial σ K) := by
-    rw [← C_mul, div_mul_cancel₀ _ hℓ]
+  have hηC : C (ξ m / ℓ) * C ℓ = (C (ξ m) : MvPolynomial σ K) := by rw [← C_mul, div_mul_cancel₀ _ hℓ]
   apply mul_right_cancel₀ (mul_ne_zero (right_ne_zero_of_mul hprod) hCℓ)
   linear_combination (C ℓ) * hrel m - (C (ξ m / ℓ) * C ℓ) * hsum - (B * C ℓ) * hηC
 
-theorem length_quotient_eq_one
-    {O R : Type*} [CommRing O] [CommRing R] [Algebra O R]
-    (𝔓 : Ideal R) (hmax : (𝔓.comap (algebraMap O R)).IsMaximal)
-    (hsurj : ∀ x : R, ∃ o : O, x - algebraMap O R o ∈ 𝔓)
-    : Module.length O (R ⧸ 𝔓) = 1 := by
+theorem length_quotient_eq_one {O R : Type*} [CommRing O] [CommRing R] [Algebra O R] (𝔓 : Ideal R)
+    (hmax : (𝔓.comap (algebraMap O R)).IsMaximal) (hsurj : ∀ x : R, ∃ o : O, x - algebraMap O R o ∈ 𝔓) :
+    Module.length O (R ⧸ 𝔓) = 1 := by
   have hs : Function.Surjective (algebraMap O (R ⧸ 𝔓)) := by
     intro y
     obtain ⟨x, rfl⟩ := Ideal.Quotient.mk_surjective y
@@ -155,27 +181,24 @@ theorem length_quotient_eq_one
     ext o
     rw [RingHom.mem_ker, Ideal.mem_comap, Algebra.ofId_apply, ← Ideal.Quotient.mk_algebraMap,
       Ideal.Quotient.eq_zero_iff_mem]
-  rw [← (Ideal.quotientKerAlgEquivOfSurjective (f := Algebra.ofId O (R ⧸ 𝔓))
-      hs).toLinearEquiv.length_eq,
+  rw [← (Ideal.quotientKerAlgEquivOfSurjective (f := Algebra.ofId O (R ⧸ 𝔓)) hs).toLinearEquiv.length_eq,
     Module.length_eq_one_iff, isSimpleModule_iff_isCoatom, ← Ideal.isMaximal_def, hkerf]
   exact hmax
 
 end ChartResidueDegree
 
+
 open ChartResidueDegree in
-theorem ChartResidueDegree.proof
-    (h₁ : ChowFormBirational.Statement) (h₂ : ChartFinite.Statement) (h₃ : ChartKernel.Statement)
-    (h₄ : ConeDimOfChowForm.Statement) (h₅ : ConeDimComponent.Statement)
-    (h₆ : ChowFormExists.Statement) (h₇ : IncidenceGeneric.Statement)
-    (h₈ : ChartLocalOrder.Statement)
-    : ChartResidueDegree.Statement := by
+theorem ChartResidueDegree.proof (h₁ : ChowFormBirational.Statement) (h₂ : ChartFinite.Statement)
+    (h₃ : ChartKernel.Statement) (h₄ : ConeDimOfChowForm.Statement) (h₅ : ConeDimComponent.Statement)
+    (h₆ : ChowFormExists.Statement) (h₇ : IncidenceGeneric.Statement) (h₈ : ChartLocalOrder.Statement) :
+    ChartResidueDegree.Statement := by
   intro F _ _ n e I W f t u q p _ hI hf hu hq hp hqt hW hqW htW
   obtain ⟨k, rfl⟩ : ∃ k, e = k + 1 := by
     cases e with
     | zero =>
       exfalso
-      have h0 : AddMonoidAlgebra.coeff q 0 ≠ 0 := fun h =>
-        hq.ne_zero (by rw [eq_C_of_isEmpty q, h, C_0])
+      have h0 : AddMonoidAlgebra.coeff q 0 ≠ 0 := fun h => hq.ne_zero (by rw [eq_C_of_isEmpty q, h, C_0])
       exact hq.not_isUnit (by rw [eq_C_of_isEmpty q]; exact (Ne.isUnit h0).map C)
     | succ k => exact ⟨k, rfl⟩
 
@@ -189,22 +212,19 @@ theorem ChartResidueDegree.proof
   set ξ := genPt W with hξdef
   have hξ : ∀ h : MvPolynomial (Fin n) F, aeval ξ h = algebraMap _ K (Ideal.Quotient.mk W h) := by
     intro h
-    have : (aeval ξ : MvPolynomial (Fin n) F →ₐ[F] K)
-        = (IsScalarTower.toAlgHom F (MvPolynomial (Fin n) F ⧸ W) K).comp
-          (Ideal.Quotient.mkₐ F W) := by
-      ext m
-      simp [ξ, genPt]
+    have : (aeval ξ : MvPolynomial (Fin n) F →ₐ[F] K) =
+        (IsScalarTower.toAlgHom F (MvPolynomial (Fin n) F ⧸ W) K).comp (Ideal.Quotient.mkₐ F W) := by
+      ext m; simp [ξ, genPt]
       all_goals rfl
-    rw [this]
-    rfl
+    rw [this]; rfl
   set ℓ := aeval ξ (linForm t) with hℓdef
   have hℓ : ℓ ≠ 0 := by
     rw [hℓdef, hξ]
-    exact (map_ne_zero_iff _ (IsFractionRing.injective _ K)).mpr fun h =>
-      htW (Ideal.Quotient.eq_zero_iff_mem.mp h)
+    exact (map_ne_zero_iff _ (IsFractionRing.injective _ K)).mpr
+      fun h => htW (Ideal.Quotient.eq_zero_iff_mem.mp h)
   have hℓsum : ℓ = ∑ l, algebraMap F K (t l) * ξ l := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp [hℓdef, linForm, map_sum]
+
+    simp [hℓdef, linForm, map_sum]
     all_goals rfl
   set c : Fin n → K := fun m => algebraMap F K (t m) / ℓ with hcdef
   have hc : ∑ j, c j * ξ j = 1 := by
@@ -230,9 +250,8 @@ theorem ChartResidueDegree.proof
     · exact Ideal.span_singleton_eq_span_singleton.mpr (Associated.symm ⟨hu'.unit, ha.symm⟩)
 
   set L := FractionRing (MvPolynomial (Fin (k + 1) × Fin n) K)
-  have hunit
-      : ∀ y : Algebra.algebraMapSubmonoid (ChartInc I t (k + 1)) p.primeCompl,
-        IsUnit ((algebraMap _ L).comp ΦI y) := by
+  have hunit : ∀ y : Algebra.algebraMapSubmonoid (ChartInc I t (k + 1)) p.primeCompl,
+      IsUnit ((algebraMap _ L).comp ΦI y) := by
     rintro ⟨_, s, hs, rfl⟩
     refine isUnit_iff_ne_zero.mpr ?_
     rw [RingHom.comp_apply, hΦIS]
@@ -240,35 +259,28 @@ theorem ChartResidueDegree.proof
     rw [hpinc]
     exact (hIG s).mpr h0
   let ψ : ChartLoc I t (k + 1) p →+* L := IsLocalization.lift hunit
-  have hψ : ∀ a, ψ (algebraMap _ (ChartLoc I t (k + 1) p) a) = algebraMap _ L (ΦI a) := fun a =>
-    IsLocalization.lift_eq hunit a
-  have hω
-      : ∀ h : MvPolynomial (Fin (k + 1) × Fin n) F,
-        ψ (algebraMap (Localization.AtPrime p) (ChartLoc I t (k + 1) p)
-            (algebraMap _ (Localization.AtPrime p) h))
-          = algebraMap _ L (aeval (genSubst ξ c) h) := by
+  have hψ : ∀ a, ψ (algebraMap _ (ChartLoc I t (k + 1) p) a) = algebraMap _ L (ΦI a) :=
+    fun a => IsLocalization.lift_eq hunit a
+  have hω : ∀ h : MvPolynomial (Fin (k + 1) × Fin n) F, ψ (algebraMap (Localization.AtPrime p) (ChartLoc I t (k + 1) p)
+      (algebraMap _ (Localization.AtPrime p) h)) = algebraMap _ L (aeval (genSubst ξ c) h) := by
     intro h
     rw [← IsScalarTower.algebraMap_apply,
       IsScalarTower.algebraMap_apply _ (ChartInc I t (k + 1)) (ChartLoc I t (k + 1) p), hψ, hΦIS]
 
   set 𝔓 := chartIdeal I t (k + 1) p W with h𝔓def
   obtain ⟨h𝔓prime, -⟩ := h₈ F n (k + 1) I W f t u q p hI hf hu hq hp hqt hW hqW htW
-  have hJW
-      : chartIncIdeal W t (k + 1)
-        ≤ (W.map (chartX I t (k + 1))).comap (Ideal.Quotient.mk (chartIncIdeal I t (k + 1))) := by
-    have hz
-        : ∀ a ∈ chartIncIdeal I t (k + 1),
-          Ideal.Quotient.mk (chartIncIdeal I t (k + 1)) a
-            ∈ W.map (chartX I t (k + 1)) := fun a ha => by
+  have hJW : chartIncIdeal W t (k + 1) ≤
+      (W.map (chartX I t (k + 1))).comap (Ideal.Quotient.mk (chartIncIdeal I t (k + 1))) := by
+    have hz : ∀ a ∈ chartIncIdeal I t (k + 1),
+        Ideal.Quotient.mk (chartIncIdeal I t (k + 1)) a ∈ W.map (chartX I t (k + 1)) := fun a ha => by
       rw [Ideal.Quotient.eq_zero_iff_mem.mpr ha]; exact Ideal.zero_mem _
     refine sup_le ?_ ?_
     · rw [Ideal.map_le_iff_le_comap]
       refine sup_le (fun h hh => ?_) ?_
       · exact Ideal.mem_map_of_mem (chartX I t (k + 1)) hh
       · rw [Ideal.span_le, Set.singleton_subset_iff, SetLike.mem_coe]
-        exact hz _
-          (Ideal.mem_sup_left (Ideal.mem_map_of_mem _
-            (Ideal.mem_sup_right (Ideal.mem_span_singleton_self _))))
+        exact hz _ (Ideal.mem_sup_left (Ideal.mem_map_of_mem _
+          (Ideal.mem_sup_right (Ideal.mem_span_singleton_self _))))
     · rw [Ideal.span_le]
       rintro _ ⟨i, rfl⟩
       exact hz _ (Ideal.mem_sup_right (Ideal.subset_span ⟨i, rfl⟩))
@@ -277,18 +289,14 @@ theorem ChartResidueDegree.proof
       rw [← RingHom.mem_ker, h₃ F n (k + 1) W t hWp htW]; exact hqW
     change Ideal.Quotient.mk _ (rename Sum.inr q) = 0 at h0
     exact hJW (Ideal.Quotient.eq_zero_iff_mem.mp h0)
-  have h𝔓q
-      : algebraMap (Localization.AtPrime p) (ChartLoc I t (k + 1) p)
-          (algebraMap _ (Localization.AtPrime p) q)
-        ∈ 𝔓 := by
+  have h𝔓q : algebraMap (Localization.AtPrime p) (ChartLoc I t (k + 1) p)
+      (algebraMap _ (Localization.AtPrime p) q) ∈ 𝔓 := by
     rw [← IsScalarTower.algebraMap_apply,
       IsScalarTower.algebraMap_apply _ (ChartInc I t (k + 1)) (ChartLoc I t (k + 1) p)]
     exact Ideal.mem_map_of_mem _ hqS
-  have hcomap
-      : (𝔓.comap (algebraMap (Localization.AtPrime p) (ChartLoc I t (k + 1) p))).IsMaximal := by
-    have hle
-        : IsLocalRing.maximalIdeal (Localization.AtPrime p)
-          ≤ 𝔓.comap (algebraMap (Localization.AtPrime p) (ChartLoc I t (k + 1) p)) := by
+  have hcomap : (𝔓.comap (algebraMap (Localization.AtPrime p) (ChartLoc I t (k + 1) p))).IsMaximal := by
+    have hle : IsLocalRing.maximalIdeal (Localization.AtPrime p) ≤
+        𝔓.comap (algebraMap (Localization.AtPrime p) (ChartLoc I t (k + 1) p)) := by
       rw [← IsLocalization.AtPrime.map_eq_maximalIdeal p, Ideal.map_le_iff_le_comap]
       intro x hx
       rw [hp, Ideal.mem_span_singleton] at hx
@@ -299,8 +307,7 @@ theorem ChartResidueDegree.proof
     exact IsLocalRing.maximalIdeal.isMaximal _
   have : Module.Finite (Localization.AtPrime p) (ChartLoc I t (k + 1) p) :=
     h₂ F n (k + 1) I f t p hI hf fun h => hqt (by rw [hp] at h; exact Ideal.mem_span_singleton.mp h)
-  have h𝔓max : 𝔓.IsMaximal :=
-    Ideal.isMaximal_of_isIntegral_of_isMaximal_under (R := Localization.AtPrime p) 𝔓 hcomap
+  have h𝔓max : 𝔓.IsMaximal := Ideal.isMaximal_of_isIntegral_of_isMaximal_under (R := Localization.AtPrime p) 𝔓 hcomap
   have h𝔓ker : 𝔓 ≤ RingHom.ker ψ := by
     rw [h𝔓def, chartIdeal, Ideal.map_le_iff_le_comap, Ideal.map_le_iff_le_comap]
     intro h hh
@@ -310,68 +317,49 @@ theorem ChartResidueDegree.proof
   obtain ⟨t', hD', hrel⟩ := h₁ F n k W g c hWp hg hc'
   rw [← hξdef] at hrel
   set Dt : MvPolynomial (Fin (k + 1) × Fin n) F := ∑ l, C (t l) * pderiv (0, l) g with hDtdef
-  have hωC
-      : ∀ a : F,
-        aeval (genSubst ξ c) (C a : MvPolynomial (Fin (k + 1) × Fin n) F)
-          = C (algebraMap F K a) := fun a => by
-    rw [aeval_C, MvPolynomial.algebraMap_apply]
-  have hB : aeval (genSubst ξ c) (∑ l, C (t' l) * pderiv (0, l) g) ≠ 0 := fun h0 =>
-    hD' ((hIG _).mpr h0)
+  have hωC : ∀ a : F, aeval (genSubst ξ c) (C a : MvPolynomial (Fin (k + 1) × Fin n) F) =
+      C (algebraMap F K a) := fun a => by rw [aeval_C, MvPolynomial.algebraMap_apply]
+  have hB : aeval (genSubst ξ c) (∑ l, C (t' l) * pderiv (0, l) g) ≠ 0 := fun h0 => hD' ((hIG _).mpr h0)
   generalize aeval (genSubst ξ c) (∑ l, C (t' l) * pderiv (0, l) g) = B at hrel hB
   generalize ∑ l, algebraMap F K (t' l) * ξ l = ℓ' at hrel
-  obtain ⟨hAt', hη'⟩ :=
-    ratio ξ
-      (fun l => algebraMap F K (t l))
-      (fun m => aeval (genSubst ξ c) (pderiv (0, m) g))
-      B ℓ' hB (hℓsum ▸ hℓ) hrel
-  have hDtω
-      : aeval (genSubst ξ c) Dt
-        = ∑ l, C (algebraMap F K (t l)) * aeval (genSubst ξ c) (pderiv (0, l) g) := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hDtdef, map_sum]
+  obtain ⟨hAt', hη'⟩ := ratio ξ (fun l => algebraMap F K (t l))
+    (fun m => aeval (genSubst ξ c) (pderiv (0, m) g)) B ℓ' hB (hℓsum ▸ hℓ) hrel
+  have hDtω : aeval (genSubst ξ c) Dt =
+      ∑ l, C (algebraMap F K (t l)) * aeval (genSubst ξ c) (pderiv (0, l) g) := by
+
+    rw [hDtdef, map_sum]
     simp only [map_mul, hωC]
   have hAt : aeval (genSubst ξ c) Dt ≠ 0 := by rw [hDtω]; exact hAt'
-  have hη
-      : ∀ m, aeval (genSubst ξ c) (pderiv (0, m) g) = C (ξ m / ℓ) * aeval (genSubst ξ c) Dt := by
+  have hη : ∀ m, aeval (genSubst ξ c) (pderiv (0, m) g) = C (ξ m / ℓ) * aeval (genSubst ξ c) Dt := by
     intro m; rw [hDtω, hℓsum]; exact hη' m
   have hDt : Dt ∈ p.primeCompl := fun h => hAt ((hIG Dt).mp (by rw [← hpinc]; exact h))
 
-  have hgoodS
-      : ∀ h : MvPolynomial (Fin (k + 1) × Fin n) F,
-        ψ (algebraMap (ChartInc I t (k + 1)) (ChartLoc I t (k + 1) p)
-            (algebraMap (MvPolynomial (Fin (k + 1) × Fin n) F) (ChartInc I t (k + 1)) h))
-          = ψ (algebraMap (Localization.AtPrime p) (ChartLoc I t (k + 1) p)
-            (algebraMap (MvPolynomial (Fin (k + 1) × Fin n) F) (Localization.AtPrime p) h)) := by
+  have hgoodS : ∀ h : MvPolynomial (Fin (k + 1) × Fin n) F,
+      ψ (algebraMap (ChartInc I t (k + 1)) (ChartLoc I t (k + 1) p)
+          (algebraMap (MvPolynomial (Fin (k + 1) × Fin n) F) (ChartInc I t (k + 1)) h)) =
+        ψ (algebraMap (Localization.AtPrime p) (ChartLoc I t (k + 1) p)
+          (algebraMap (MvPolynomial (Fin (k + 1) × Fin n) F) (Localization.AtPrime p) h)) := by
     intro h
     rw [← IsScalarTower.algebraMap_apply, ← IsScalarTower.algebraMap_apply]
-  have hgoodX
-      : ∀ m,
-        ψ (algebraMap (ChartInc I t (k + 1)) (ChartLoc I t (k + 1) p) (chartX I t (k + 1) (X m)))
-          = ψ (algebraMap (Localization.AtPrime p) (ChartLoc I t (k + 1) p)
-            (IsLocalization.mk' (Localization.AtPrime p) (pderiv (0, m) g)
-              (⟨Dt, hDt⟩ : p.primeCompl))) := by
+  have hgoodX : ∀ m, ψ (algebraMap (ChartInc I t (k + 1)) (ChartLoc I t (k + 1) p) (chartX I t (k + 1) (X m))) =
+      ψ (algebraMap (Localization.AtPrime p) (ChartLoc I t (k + 1) p)
+        (IsLocalization.mk' (Localization.AtPrime p) (pderiv (0, m) g) (⟨Dt, hDt⟩ : p.primeCompl))) := by
     intro m
-    have hne
-        : ψ (algebraMap (Localization.AtPrime p) (ChartLoc I t (k + 1) p)
-            (algebraMap (MvPolynomial (Fin (k + 1) × Fin n) F) (Localization.AtPrime p) Dt))
-          ≠ 0 := by
+    have hne : ψ (algebraMap (Localization.AtPrime p) (ChartLoc I t (k + 1) p)
+        (algebraMap (MvPolynomial (Fin (k + 1) × Fin n) F) (Localization.AtPrime p) Dt)) ≠ 0 := by
       rw [hω]; exact (map_ne_zero_iff _ (IsFractionRing.injective _ L)).mpr hAt
     apply mul_right_cancel₀ hne
-    have hspec
-        : IsLocalization.mk' (Localization.AtPrime p) (pderiv (0, m) g) (⟨Dt, hDt⟩ : p.primeCompl)
-            * algebraMap (MvPolynomial (Fin (k + 1) × Fin n) F) (Localization.AtPrime p) Dt
-          = algebraMap _ (Localization.AtPrime p) (pderiv (0, m) g) :=
-      IsLocalization.mk'_spec _ _ _
-    rw [← map_mul ψ
-        (algebraMap (Localization.AtPrime p) (ChartLoc I t (k + 1) p) (IsLocalization.mk' _ _ _)),
-      ← map_mul (algebraMap (Localization.AtPrime p) (ChartLoc I t (k + 1) p)), hspec, hω, hω, hψ,
-      hΦIX, aeval_X, ← map_mul, hη m]
+    have hspec : IsLocalization.mk' (Localization.AtPrime p) (pderiv (0, m) g) (⟨Dt, hDt⟩ : p.primeCompl) *
+        algebraMap (MvPolynomial (Fin (k + 1) × Fin n) F) (Localization.AtPrime p) Dt =
+          algebraMap _ (Localization.AtPrime p) (pderiv (0, m) g) := IsLocalization.mk'_spec _ _ _
+    rw [← map_mul ψ (algebraMap (Localization.AtPrime p) (ChartLoc I t (k + 1) p) (IsLocalization.mk' _ _ _)),
+      ← map_mul (algebraMap (Localization.AtPrime p) (ChartLoc I t (k + 1) p)), hspec, hω, hω, hψ, hΦIX,
+      aeval_X, ← map_mul, hη m]
   let χ : MvPolynomial (Fin n ⊕ Fin (k + 1) × Fin n) F →+* ChartLoc I t (k + 1) p :=
     (algebraMap (ChartInc I t (k + 1)) (ChartLoc I t (k + 1) p)).comp
       (Ideal.Quotient.mk (chartIncIdeal I t (k + 1)))
-  have hgP
-      : ∀ P : MvPolynomial (Fin n ⊕ Fin (k + 1) × Fin n) F, ∃ o : Localization.AtPrime p,
-        ψ (χ P) = ψ (algebraMap (Localization.AtPrime p) (ChartLoc I t (k + 1) p) o) := by
+  have hgP : ∀ P : MvPolynomial (Fin n ⊕ Fin (k + 1) × Fin n) F, ∃ o : Localization.AtPrime p,
+      ψ (χ P) = ψ (algebraMap (Localization.AtPrime p) (ChartLoc I t (k + 1) p) o) := by
     intro P
     induction P using MvPolynomial.induction_on with
     | C a =>
@@ -388,64 +376,46 @@ theorem ChartResidueDegree.proof
       obtain ⟨o₁, e₁⟩ := ih
       cases v with
       | inl m =>
-        refine ⟨
-          o₁ * IsLocalization.mk' (Localization.AtPrime p) (pderiv (0, m) g)
-            (⟨Dt, hDt⟩ : p.primeCompl),
-          ?_
-        ⟩
-        have e₂
-            : ψ (χ (X (Sum.inl m)))
-              = ψ (algebraMap (Localization.AtPrime p) (ChartLoc I t (k + 1) p)
-                (IsLocalization.mk' (Localization.AtPrime p) (pderiv (0, m) g)
-                  (⟨Dt, hDt⟩ : p.primeCompl))) := by
+        refine ⟨o₁ * IsLocalization.mk' (Localization.AtPrime p) (pderiv (0, m) g) (⟨Dt, hDt⟩ : p.primeCompl), ?_⟩
+        have e₂ : ψ (χ (X (Sum.inl m))) = ψ (algebraMap (Localization.AtPrime p) (ChartLoc I t (k + 1) p)
+            (IsLocalization.mk' (Localization.AtPrime p) (pderiv (0, m) g) (⟨Dt, hDt⟩ : p.primeCompl))) := by
           rw [← hgoodX m]
           show _ = ψ (χ (rename Sum.inl (X m)))
           rw [rename_X]
         simpa only [map_mul] using congrArg₂ (· * ·) e₁ e₂
       | inr ij =>
         refine ⟨o₁ * algebraMap _ _ (X ij : MvPolynomial (Fin (k + 1) × Fin n) F), ?_⟩
-        have e₂
-            : ψ (χ (X (Sum.inr ij)))
-              = ψ (algebraMap (Localization.AtPrime p) (ChartLoc I t (k + 1) p)
-                (algebraMap _ _ (X ij : MvPolynomial (Fin (k + 1) × Fin n) F))) := by
+        have e₂ : ψ (χ (X (Sum.inr ij))) = ψ (algebraMap (Localization.AtPrime p) (ChartLoc I t (k + 1) p)
+            (algebraMap _ _ (X ij : MvPolynomial (Fin (k + 1) × Fin n) F))) := by
           rw [← hgoodS (X ij)]
           show _ = ψ (χ (rename Sum.inr (X ij)))
           rw [rename_X]
         simpa only [map_mul] using congrArg₂ (· * ·) e₁ e₂
-  have hgood
-      : ∀ x : ChartLoc I t (k + 1) p, ∃ o : Localization.AtPrime p,
-        ψ x = ψ (algebraMap (Localization.AtPrime p) (ChartLoc I t (k + 1) p) o) := by
+  have hgood : ∀ x : ChartLoc I t (k + 1) p, ∃ o : Localization.AtPrime p,
+      ψ x = ψ (algebraMap (Localization.AtPrime p) (ChartLoc I t (k + 1) p) o) := by
     intro x
     obtain ⟨⟨a, s⟩, rfl⟩ :=
-      IsLocalization.mk'_surjective
-        (Algebra.algebraMapSubmonoid (ChartInc I t (k + 1)) p.primeCompl) x
+      IsLocalization.mk'_surjective (Algebra.algebraMapSubmonoid (ChartInc I t (k + 1)) p.primeCompl) x
     dsimp only
     obtain ⟨P, rfl⟩ := Ideal.Quotient.mk_surjective (I := chartIncIdeal I t (k + 1)) a
     obtain ⟨s₀, hs₀, hs⟩ := s.2
     obtain ⟨o, ho⟩ := hgP P
-    have ho'
-        : ψ (algebraMap (ChartInc I t (k + 1)) (ChartLoc I t (k + 1) p)
-            (Ideal.Quotient.mk (chartIncIdeal I t (k + 1)) P))
-          = ψ (algebraMap (Localization.AtPrime p) (ChartLoc I t (k + 1) p) o) :=
-      ho
+    have ho' : ψ (algebraMap (ChartInc I t (k + 1)) (ChartLoc I t (k + 1) p)
+        (Ideal.Quotient.mk (chartIncIdeal I t (k + 1)) P)) =
+          ψ (algebraMap (Localization.AtPrime p) (ChartLoc I t (k + 1) p) o) := ho
     have hne : ψ (algebraMap (ChartInc I t (k + 1)) (ChartLoc I t (k + 1) p) s) ≠ 0 := by
       rw [hψ]; exact (hunit s).ne_zero
-    refine ⟨
-      o * IsLocalization.mk' (Localization.AtPrime p) (1 : MvPolynomial (Fin (k + 1) × Fin n) F)
-        ⟨s₀, hs₀⟩,
-      mul_right_cancel₀ hne ?_
-    ⟩
-    have hx
-        : IsLocalization.mk' (R := ChartInc I t (k + 1)) (ChartLoc I t (k + 1) p)
-              (Ideal.Quotient.mk (chartIncIdeal I t (k + 1)) P) s
-            * algebraMap (ChartInc I t (k + 1)) (ChartLoc I t (k + 1) p) s
-          = algebraMap (ChartInc I t (k + 1)) (ChartLoc I t (k + 1) p)
-            (Ideal.Quotient.mk (chartIncIdeal I t (k + 1)) P) :=
-      IsLocalization.mk'_spec _ _ _
-    rw [← map_mul ψ, hx, ho', ← hs, ← IsScalarTower.algebraMap_apply,
+    refine ⟨o * IsLocalization.mk' (Localization.AtPrime p) (1 : MvPolynomial (Fin (k + 1) × Fin n) F)
+      ⟨s₀, hs₀⟩, mul_right_cancel₀ hne ?_⟩
+    have hx : IsLocalization.mk' (R := ChartInc I t (k + 1)) (ChartLoc I t (k + 1) p)
+        (Ideal.Quotient.mk (chartIncIdeal I t (k + 1)) P) s *
+        algebraMap (ChartInc I t (k + 1)) (ChartLoc I t (k + 1) p) s =
+          algebraMap (ChartInc I t (k + 1)) (ChartLoc I t (k + 1) p)
+            (Ideal.Quotient.mk (chartIncIdeal I t (k + 1)) P) := IsLocalization.mk'_spec _ _ _
+    rw [← map_mul ψ, hx, ho', ← hs,
+      ← IsScalarTower.algebraMap_apply,
       IsScalarTower.algebraMap_apply (MvPolynomial (Fin (k + 1) × Fin n) F) (Localization.AtPrime p)
-        (ChartLoc I t (k + 1) p),
-      ← map_mul ψ, ← map_mul (algebraMap (Localization.AtPrime p) _), mul_assoc,
+        (ChartLoc I t (k + 1) p), ← map_mul ψ, ← map_mul (algebraMap (Localization.AtPrime p) _), mul_assoc,
       IsLocalization.mk'_spec_mk, map_one, mul_one]
 
   refine length_quotient_eq_one 𝔓 hcomap fun x => ?_

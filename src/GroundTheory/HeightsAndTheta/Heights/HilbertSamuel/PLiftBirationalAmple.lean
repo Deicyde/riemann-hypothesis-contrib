@@ -1,9 +1,56 @@
 module
 
-public import Mathlib
+import Development.AutomorphicSpectrum.Proofs.GeometryProofs.ReferenceGeometryMultihomogForm
 public import GroundTheory.HeightsAndTheta.Heights.HilbertSamuel.StatementsLiftBirationalAmple
 public import GroundTheory.HeightsAndTheta.Heights.HilbertSamuel.StatementsGeneratedNonzeroSection
 public import GroundTheory.HeightsAndTheta.Heights.HilbertSamuel.PGenOnFibres
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -11,8 +58,7 @@ set_option maxSynthPendingDepth 1
 
 namespace GroundTheory.Heights₂.Heights.HilbertSamuel
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
-  ReciprocityTheory.ChartRestriction.G.ArakelovGeometry
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.ArakelovGeometry
 
 noncomputable section
 
@@ -22,28 +68,24 @@ set_option linter.unusedSectionVars false
 
 section Sections
 
-variable
-  {K : Type} [Fintype K]
-  {ι : K → Type} [∀ k, Fintype (ι k)]
-  {Ω : Type} [Field Ω]
+variable {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)] {Ω : Type} [Field Ω]
   (y : (Σ k, ι k) → Ω)
 
-theorem mem_chartLat_one {a : K → ℤ} {s : Ω}
-    : s ∈ chartLat y a 1
-      ↔ ∀ c : ∀ k, ι k, (∀ k, y ⟨k, c k⟩ ≠ 0) → s * ∏ k, y ⟨k, c k⟩ ^ (-a k) ∈ chartRingZ y c := by
+theorem mem_chartLat_one {a : K → ℤ} {s : Ω} :
+    s ∈ chartLat y a 1 ↔
+      ∀ c : ∀ k, ι k, (∀ k, y ⟨k, c k⟩ ≠ 0) → s * ∏ k, y ⟨k, c k⟩ ^ (-a k) ∈ chartRingZ y c := by
   show (∀ c : ∀ k, ι k, (∀ k, y ⟨k, c k⟩ ≠ 0) →
       s * ∏ k, y ⟨k, c k⟩ ^ (-(((1 : ℕ) : ℤ) * a k)) ∈ chartRingZ y c) ↔ _
   simp only [Nat.cast_one, one_mul]
 
 variable {y}
 
-theorem chartLat_mul {a b : K → ℤ} {s u : Ω} (hs : s ∈ chartLat y a 1) (hu : u ∈ chartLat y b 1)
-    : s * u ∈ chartLat y (a + b) 1 := by
+theorem chartLat_mul {a b : K → ℤ} {s u : Ω} (hs : s ∈ chartLat y a 1) (hu : u ∈ chartLat y b 1) :
+    s * u ∈ chartLat y (a + b) 1 := by
   rw [mem_chartLat_one] at hs hu ⊢
   intro c hc
-  have e
-      : s * u * ∏ k, y ⟨k, c k⟩ ^ (-(a + b) k)
-        = (s * ∏ k, y ⟨k, c k⟩ ^ (-a k)) * (u * ∏ k, y ⟨k, c k⟩ ^ (-b k)) := by
+  have e : s * u * ∏ k, y ⟨k, c k⟩ ^ (-(a + b) k) =
+      (s * ∏ k, y ⟨k, c k⟩ ^ (-a k)) * (u * ∏ k, y ⟨k, c k⟩ ^ (-b k)) := by
     rw [mul_mul_mul_comm, ← Finset.prod_mul_distrib]
     congr 1
     refine Finset.prod_congr rfl fun k _ => ?_
@@ -59,24 +101,21 @@ theorem chartLat_one_mem : (1 : Ω) ∈ chartLat y 0 1 := by
   intro c _
   simp
 
-theorem chartLat_pow {a : K → ℤ} {s : Ω} (hs : s ∈ chartLat y a 1) (n : ℕ)
-    : s ^ n ∈ chartLat y (n • a) 1 := by
+theorem chartLat_pow {a : K → ℤ} {s : Ω} (hs : s ∈ chartLat y a 1) (n : ℕ) : s ^ n ∈ chartLat y (n • a) 1 := by
   induction n with
   | zero => simpa using (chartLat_one_mem (y := y))
   | succ n ih =>
     rw [pow_succ, succ_nsmul]
     exact chartLat_mul ih hs
 
-theorem chartLat_prod
-    {β : Type} (t : Finset β) (f : β → Ω) (a : β → K → ℤ) (h : ∀ b ∈ t, f b ∈ chartLat y (a b) 1)
-    : ∏ b ∈ t, f b ∈ chartLat y (∑ b ∈ t, a b) 1 := by
+theorem chartLat_prod {β : Type} (t : Finset β) (f : β → Ω) (a : β → K → ℤ)
+    (h : ∀ b ∈ t, f b ∈ chartLat y (a b) 1) : ∏ b ∈ t, f b ∈ chartLat y (∑ b ∈ t, a b) 1 := by
   classical
   induction t using Finset.induction_on with
   | empty => simpa using (chartLat_one_mem (y := y))
   | insert b t hb ih =>
     rw [Finset.prod_insert hb, Finset.sum_insert hb]
-    exact chartLat_mul (h b (Finset.mem_insert_self b t))
-      (ih fun b' hb' => h b' (Finset.mem_insert_of_mem hb'))
+    exact chartLat_mul (h b (Finset.mem_insert_self b t)) (ih fun b' hb' => h b' (Finset.mem_insert_of_mem hb'))
 
 theorem chartLat_var [DecidableEq K] (p : Σ k, ι k) : y p ∈ chartLat y (Pi.single p.1 1) 1 := by
   rw [mem_chartLat_one]
@@ -87,28 +126,11 @@ theorem chartLat_var [DecidableEq K] (p : Σ k, ι k) : y p ∈ chartLat y (Pi.s
   rw [e, ← div_eq_mul_inv]
   exact Algebra.subset_adjoin ⟨p, rfl⟩
 
+
 open Classical in
-theorem chartLat_form {g : MRing ι} {d : K → ℕ} (hg : IsMultiHomog g d)
-    : aeval y g ∈ chartLat y (fun k => (d k : ℤ)) 1 := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [g.as_sum, map_sum]
-  refine AddSubgroup.sum_mem _ fun m hm => ?_
-  rw [aeval_monomial, Finsupp.prod_fintype _ _ (fun _ => pow_zero _), algebraMap_int_eq, eq_intCast,
-    ← zsmul_eq_mul]
-  refine AddSubgroup.zsmul_mem _ ?_ _
-  have hdeg : (fun k => (d k : ℤ)) = ∑ p : Σ k, ι k, (m p) • (Pi.single p.1 1 : K → ℤ) := by
-    funext k
-    rw [Finset.sum_apply, Fintype.sum_sigma, Finset.sum_eq_single k]
-    · simp only [Pi.smul_apply, Pi.single_eq_same, nsmul_eq_mul, mul_one]
-      rw [← hg m hm k]
-      push_cast
-      rfl
-    · intro k' _ hk'
-      refine Finset.sum_eq_zero fun i _ => ?_
-      simp [Ne.symm hk']
-    · simp
-  rw [hdeg]
-  exact chartLat_prod _ _ _ fun p _ => chartLat_pow (chartLat_var p) _
+theorem chartLat_form {g : MRing ι} {d : K → ℕ} (hg : IsMultiHomog g d) :
+    aeval y g ∈ chartLat y (fun k => (d k : ℤ)) 1 := by
+  apply GlobalTheory.CompanionTheory.Ar.ExRefEff.BdForm.mem_chartLat <;> assumption
 
 end Sections
 
@@ -117,11 +139,10 @@ section Ratios
 variable {Ω : Type} [Field Ω] {J : Type} [Fintype J] (z : (Σ _ : Unit, J) → Ω)
 
 def IsRatio (w : Ω) : Prop :=
-  ∃ (d : Unit → ℕ) (g h : MRing (fun _ : Unit => J)),
-    IsMultiHomog g d ∧ IsMultiHomog h d ∧ aeval z h ≠ 0 ∧ aeval z g = w * aeval z h
+  ∃ (d : Unit → ℕ) (g h : MRing (fun _ : Unit => J)), IsMultiHomog g d ∧ IsMultiHomog h d ∧
+    aeval z h ≠ 0 ∧ aeval z g = w * aeval z h
 
-theorem homog_X_unit (j : J)
-    : IsMultiHomog (X ⟨(), j⟩ : MRing (fun _ : Unit => J)) (fun _ => 1) := by
+theorem homog_X_unit (j : J) : IsMultiHomog (X ⟨(), j⟩ : MRing (fun _ : Unit => J)) (fun _ => 1) := by
   have h := GenOnFibres.homog_X (R := ℤ) (ι := fun _ : Unit => J) () j
   intro m hm k
   rw [h m hm k]
@@ -136,30 +157,16 @@ theorem IsRatio.intCast (r : ℤ) : IsRatio z (r : Ω) :=
 theorem IsRatio.add {w w' : Ω} (hw : IsRatio z w) (hw' : IsRatio z w') : IsRatio z (w + w') := by
   obtain ⟨d, g, h, hg, hh, h0, e⟩ := hw
   obtain ⟨d', g', h', hg', hh', h0', e'⟩ := hw'
-  refine ⟨
-    d + d',
-    g * h' + h * g',
-    h * h',
-    GenOnFibres.homog_add (GenOnFibres.homog_mul hg hh') (GenOnFibres.homog_mul hh hg'),
-    GenOnFibres.homog_mul hh hh',
-    by simp [h0, h0'],
-    ?_
-  ⟩
+  refine ⟨d + d', g * h' + h * g', h * h', GenOnFibres.homog_add (GenOnFibres.homog_mul hg hh')
+    (GenOnFibres.homog_mul hh hg'), GenOnFibres.homog_mul hh hh', by simp [h0, h0'], ?_⟩
   simp only [map_add (f := _), map_mul, e, e']
   ring
 
 theorem IsRatio.mul {w w' : Ω} (hw : IsRatio z w) (hw' : IsRatio z w') : IsRatio z (w * w') := by
   obtain ⟨d, g, h, hg, hh, h0, e⟩ := hw
   obtain ⟨d', g', h', hg', hh', h0', e'⟩ := hw'
-  refine ⟨
-    d + d',
-    g * g',
-    h * h',
-    GenOnFibres.homog_mul hg hg',
-    GenOnFibres.homog_mul hh hh',
-    by simp [h0, h0'],
-    ?_
-  ⟩
+  refine ⟨d + d', g * g', h * h', GenOnFibres.homog_mul hg hg', GenOnFibres.homog_mul hh hh',
+    by simp [h0, h0'], ?_⟩
   simp only [map_mul, e, e']
   ring
 
@@ -175,9 +182,9 @@ end Ratios
 
 end LiftBirationalAmple
 
+
 open LiftBirationalAmple in
-theorem LiftBirationalAmple.proof (h : GeneratedNonzeroSection.Statement)
-    : LiftBirationalAmple.Statement := by
+theorem LiftBirationalAmple.proof (h : GeneratedNonzeroSection.Statement) : LiftBirationalAmple.Statement := by
   classical
   intro K _ _ ι _ _ Ω _ _ y D N c hvar hbir hc hample
   obtain ⟨q', hq', hgen, -⟩ := hample
@@ -200,19 +207,15 @@ theorem LiftBirationalAmple.proof (h : GeneratedNonzeroSection.Statement)
     have hy1 : ∀ k, y ⟨k, c0 k⟩ ^ E p k ∈ chartLat y (E p k • (Pi.single k (1 : ℤ) : K → ℤ)) 1 :=
       fun k => chartLat_pow (chartLat_var (y := y) ⟨k, c0 k⟩) _
     have hyp : y p ∈ chartLat y (Pi.single p.1 (1 : ℤ) : K → ℤ) 1 := chartLat_var (y := y) p
-    have hpr :=
-      chartLat_prod Finset.univ
-        (fun k => y ⟨k, c0 k⟩ ^ E p k)
-        (fun k => E p k • (Pi.single k (1 : ℤ) : K → ℤ))
-        fun k _ => hy1 k
+    have hpr := chartLat_prod Finset.univ (fun k => y ⟨k, c0 k⟩ ^ E p k)
+      (fun k => E p k • (Pi.single k (1 : ℤ) : K → ℤ)) fun k _ => hy1 k
     have h1 := chartLat_mul (chartLat_pow hs t) (chartLat_mul hyp hpr)
-    have hdeg
-        : (t * (q' * c)) • N
-          = t • (q' • (c • N - fun _ => (1 : ℤ)))
-            + ((Pi.single p.1 (1 : ℤ) : K → ℤ) + ∑ k, E p k • (Pi.single k (1 : ℤ) : K → ℤ)) := by
+    have hdeg : (t * (q' * c)) • N = t • (q' • (c • N - fun _ => (1 : ℤ))) +
+        ((Pi.single p.1 (1 : ℤ) : K → ℤ) + ∑ k, E p k • (Pi.single k (1 : ℤ) : K → ℤ)) := by
       funext k
       have hs1 : (∑ b, E p b • (Pi.single b (1 : ℤ) : K → ℤ)) k = (E p k : ℤ) := by
-        rw [Finset.sum_apply, Finset.sum_eq_single k (fun b _ hb => by simp [Ne.symm hb]) (by simp)]
+        rw [Finset.sum_apply, Finset.sum_eq_single k (fun b _ hb => by simp [Ne.symm hb])
+          (by simp)]
         simp
       by_cases hk : k = p.1
       · rw [hk] at hs1 ⊢
@@ -242,16 +245,13 @@ theorem LiftBirationalAmple.proof (h : GeneratedNonzeroSection.Statement)
   let e := Fintype.equivFin (Σ k, ι k)
   refine ⟨Fintype.card (Σ k, ι k), fun j => xx (e.symm j), fun j => hxx _, ?_⟩
   set z : (Σ _ : Unit, Fin (Fintype.card (Σ k, ι k))) → Ω := fun p => xx (e.symm p.2) with hz
-  have hzX
-      : ∀ p : Σ k, ι k,
-        aeval z (X ⟨(), e p⟩ : MRing (fun _ : Unit => Fin (Fintype.card (Σ k, ι k)))) = xx p := by
+  have hzX : ∀ p : Σ k, ι k, aeval z (X ⟨(), e p⟩ : MRing (fun _ : Unit => Fin (Fintype.card (Σ k, ι k)))) = xx p := by
     intro p
     simp [hz]
 
   have hgen' : ∀ p : Σ k, ι k, IsRatio z (y p / y ⟨p.1, c0 p.1⟩) := by
     intro p
-    refine
-      ⟨fun _ => 1, X ⟨(), e p⟩, X ⟨(), e ⟨p.1, c0 p.1⟩⟩, homog_X_unit _, homog_X_unit _, ?_, ?_⟩
+    refine ⟨fun _ => 1, X ⟨(), e p⟩, X ⟨(), e ⟨p.1, c0 p.1⟩⟩, homog_X_unit _, homog_X_unit _, ?_, ?_⟩
     · rw [hzX]; exact hxx0 p.1
     · rw [hzX, hzX]; exact hratio p
   have hring : ∀ w ∈ chartRingZ y c0, IsRatio z w := by
@@ -270,10 +270,8 @@ theorem LiftBirationalAmple.proof (h : GeneratedNonzeroSection.Statement)
   have hB := (mem_chartLat_one y).mp (chartLat_form (y := y) hhh) c0 hc0
   have hP : ∏ k, y ⟨k, c0 k⟩ ^ (-(d k : ℤ)) ≠ 0 :=
     Finset.prod_ne_zero_iff.mpr fun k _ => zpow_ne_zero _ (hc0 k)
-  have hw
-      : w
-        = (aeval y g * ∏ k, y ⟨k, c0 k⟩ ^ (-(d k : ℤ)))
-          * (aeval y hh * ∏ k, y ⟨k, c0 k⟩ ^ (-(d k : ℤ)))⁻¹ := by
+  have hw : w = (aeval y g * ∏ k, y ⟨k, c0 k⟩ ^ (-(d k : ℤ))) *
+      (aeval y hh * ∏ k, y ⟨k, c0 k⟩ ^ (-(d k : ℤ)))⁻¹ := by
     rw [hgh, mul_assoc w, mul_inv_cancel_right₀ (mul_ne_zero hh0 hP)]
   rw [hw]
   exact (hring _ hA).mul (hring _ hB).inv

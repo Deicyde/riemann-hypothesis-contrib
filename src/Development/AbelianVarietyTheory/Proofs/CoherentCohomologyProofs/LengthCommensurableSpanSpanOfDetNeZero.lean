@@ -1,13 +1,60 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Definitions.QuasicoherentCohomology.LengthCommensurableMapIffOfInjective
+public import Mathlib.LinearAlgebra.Determinant
+public import Mathlib.RingTheory.KrullDimension.PID
+public import Mathlib.RingTheory.OrderOfVanishing.Basic
+public import Mathlib.RingTheory.RegularLocalRing.Defs
 public import Development.AbelianVarietyTheory.Proofs.CoherentCohomologyProofs.ExistsDualNeZeroCompEqZero
+public import Development.AbelianVarietyTheory.Proofs.CoherentCohomologyProofs.Imports
 public import Development.AbelianVarietyTheory.Proofs.CoherentCohomologyProofs.LengthQuotientSpanSingleton
 public import Development.AbelianVarietyTheory.Proofs.CoherentCohomologyProofs.LengthSelfEqTop
-public import Development.AbelianVarietyTheory.Proofs.CoherentCohomologyProofs.Imports
-public import Development.AbelianVarietyTheory.Proofs.CoherentCohomologyProofs.RelLengthSpanEqAddValDet
 public import Development.AbelianVarietyTheory.Proofs.CoherentCohomologyProofs.RelLengthSpanMatrix
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Coalgebra.IsFrobenius
+import Mathlib.RingTheory.HopfAlgebra.Basic
+import Mathlib.RingTheory.OrderOfVanishing.Noetherian
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.TotallySplit
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -29,8 +76,6 @@ theorem addVal_finset_prod {ι : Type*} (s : Finset ι) (a : ι → R)
       revert R h_1 h_2 h_3 ι s a
       exact @_root_.GlobalTheory.AdditiveValuationProduct.addVal_prod
     )
-  | exact @_root_.GlobalTheory.AdditiveValuationProduct.addVal_prod
-  | exact _root_.GlobalTheory.AdditiveValuationProduct.addVal_prod
   | (apply _root_.GlobalTheory.AdditiveValuationProduct.addVal_prod <;> assumption)
   | (intros; apply _root_.GlobalTheory.AdditiveValuationProduct.addVal_prod <;> assumption)
   | (
@@ -49,8 +94,6 @@ theorem length_quotient_range_eq_top_of_det_eq_zero
       revert R h_1 h_2 h_3 M h_5 h_6 h_7 h_8 f hf
       exact @_root_.GlobalTheory.LengthDualFunctional.main
     )
-  | exact @_root_.GlobalTheory.LengthDualFunctional.main
-  | exact _root_.GlobalTheory.LengthDualFunctional.main
   | (apply _root_.GlobalTheory.LengthDualFunctional.main <;> assumption)
   | (intros; apply _root_.GlobalTheory.LengthDualFunctional.main <;> assumption)
   | (
@@ -68,8 +111,6 @@ theorem length_quotient_eq_addVal_det_equiv
       revert R h_1 h_2 h_3 M h_5 h_6 h_7 h_8 N e
       exact @_root_.GlobalTheory.LengthQuotientValuationDet.length_quotient_eq_addVal_det
     )
-  | exact @_root_.GlobalTheory.LengthQuotientValuationDet.length_quotient_eq_addVal_det
-  | exact _root_.GlobalTheory.LengthQuotientValuationDet.length_quotient_eq_addVal_det
   | (
       apply _root_.GlobalTheory.LengthQuotientValuationDet.length_quotient_eq_addVal_det
         <;> assumption
@@ -116,8 +157,6 @@ theorem length_quotient_range_eq_addVal_det_toMatrix
       revert R h_1 h_2 h_3 M h_5 h_6 ι h_8 h_9 M' h_11 h_12 b' b f
       exact @_root_.GlobalTheory.LengthQuotientSpanValuation.main
     )
-  | exact @_root_.GlobalTheory.LengthQuotientSpanValuation.main
-  | exact _root_.GlobalTheory.LengthQuotientSpanValuation.main
   | (apply _root_.GlobalTheory.LengthQuotientSpanValuation.main <;> assumption)
   | (intros; apply _root_.GlobalTheory.LengthQuotientSpanValuation.main <;> assumption)
   | (
@@ -176,8 +215,6 @@ theorem signedLength_span_eq_of_det_eq_unit_mul_zpow
       revert R h_1 h_2 h_3 K h_5 h_6 h_7 V h_9 h_10 h_11 h_12 ι h_14 h_15 a b ha g hb ϖ hϖ u n hg
       exact @_root_.GlobalTheory.SignedLengthTower.signedLength_span_eq
     )
-  | exact @_root_.GlobalTheory.SignedLengthTower.signedLength_span_eq
-  | exact _root_.GlobalTheory.SignedLengthTower.signedLength_span_eq
   | (apply _root_.GlobalTheory.SignedLengthTower.signedLength_span_eq <;> assumption)
   | (intros; apply _root_.GlobalTheory.SignedLengthTower.signedLength_span_eq <;> assumption)
   | (

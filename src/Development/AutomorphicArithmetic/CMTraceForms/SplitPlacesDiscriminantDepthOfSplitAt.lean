@@ -1,17 +1,62 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicArithmetic.CMTraceForms.Places
+public import Mathlib.NumberTheory.NumberField.Discriminant.Defs
+public import Development.AutomorphicArithmetic.CMTraceForms.DiscrCMDatumEqProdPlaces
 public import Development.AutomorphicArithmetic.CMTraceForms.ExistsPrimitiveOrthogonalIdempotentsSumEqOfNoeth
 public import Development.AutomorphicArithmetic.CMTraceForms.ExistsSplitIdempotentOfSplitAt
 public import Development.AutomorphicArithmetic.CMTraceForms.TraceFormDecompositionCMDatum
-public import Development.AutomorphicArithmetic.CMTraceForms.DiscrCMDatumEqProdPlaces
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Real
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
 
 @[expose] public section
 
 open NumberField TensorProduct
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor
-  ReciprocityTheory.ChartRestriction.G.Pdiv.AvDefs Formalism.L2.Pj UpperTheory.Depth
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Pdiv.AvDefs Formalism.L2.Pj UpperTheory.Depth
 
 namespace UpperTheory.Depth.SplitPl
 
@@ -40,18 +85,14 @@ private theorem exists_inPsi (H : Host E) : ∃ τ : E →+* ℂ, τ (H.rt : E) 
       nlinarith [mul_self_nonneg H.rt0.re]
     apply Complex.ext <;> simp [h0]
 
-private theorem existsUnique_one
-    {A O : Type} [CommRing A] [CommRing O] [IsDomain O]
-    {F : Type} [FunLike F A O] [RingHomClass F A O]
-    (φ : F)
-    {s : ℕ} (g : Fin s → A) (h1 : ∀ i, g i * g i = g i) (h2 : ∀ i j, i ≠ j → g i * g j = 0)
-    (h : φ (∑ i, g i) = 1)
-    : ∃! i, φ (g i) = 1 := by
+private theorem existsUnique_one {A O : Type} [CommRing A] [CommRing O] [IsDomain O] {F : Type} [FunLike F A O]
+    [RingHomClass F A O] (φ : F) {s : ℕ} (g : Fin s → A) (h1 : ∀ i, g i * g i = g i)
+    (h2 : ∀ i j, i ≠ j → g i * g j = 0) (h : φ (∑ i, g i) = 1) : ∃! i, φ (g i) = 1 := by
   have hex : ∃ i, φ (g i) ≠ 0 := by
     by_contra hc
     push Not at hc
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, Finset.sum_eq_zero fun i _ => hc i] at h
+
+    rw [map_sum, Finset.sum_eq_zero fun i _ => hc i] at h
     exact zero_ne_one h
   obtain ⟨i, hi⟩ := hex
   have hi1 : φ (g i) = 1 := by
@@ -66,13 +107,9 @@ private theorem existsUnique_one
 end UpperTheory.Depth.SplitPl
 
 open UpperTheory.Depth.SplitPl in
-theorem UpperTheory.splitPlaces_discriminantDepth_of_splitAt
-    : ∀ (p : ℕ) [Fact p.Prime] (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E),
-      SplitAt H.d p
-        → ∀ f : ℕ,
-          Module.finrank ℚ E = 2 * f
-            → SplitPlaces p H f
-              ((padicValInt p (NumberField.discr E) : ℝ) / (Module.finrank ℚ E : ℝ)) := by
+theorem UpperTheory.splitPlaces_discriminantDepth_of_splitAt :
+    ∀ (p : ℕ) [Fact p.Prime] (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E), SplitAt H.d p →
+      ∀ f : ℕ, Module.finrank ℚ E = 2 * f → SplitPlaces p H f ((padicValInt p (NumberField.discr E) : ℝ) / (Module.finrank ℚ E : ℝ)) := by
   intro p _ E _ _ _ H hsp f hf
   letI := H.starRing
   intro C _ _ _ v O _ _ hv _ _ τO hinj hrt
@@ -80,13 +117,15 @@ theorem UpperTheory.splitPlaces_discriminantDepth_of_splitAt
   haveI : CharZero O := (algebraMap O C).charZero
   obtain ⟨τ₀, hτ₀⟩ := exists_inPsi H
   have hpos : 0 < Module.finrank ℚ E := Module.finrank_pos
-  have hsq : ∀ σ : 𝓞 E →+* O, σ H.rt ^ 2 = -(H.d : O) := fun σ => by rw [← map_pow, H.rt_sq]; simp
+  have hsq : ∀ σ : 𝓞 E →+* O, σ H.rt ^ 2 = -(H.d : O) := fun σ => by
+    rw [← map_pow, H.rt_sq]; simp
   have hsurj : Function.Surjective τO := by
     have hc := (UpperTheory.trace_form_decomposition_CMDatum E p C v O hv 0 (by simp)).2
     haveI : Finite (𝓞 E →+* O) := Nat.finite_of_card_ne_zero (by omega)
     refine (hinj.bijective_of_nat_card_le ?_).2
     rw [hc, Nat.card_eq_fintype_card, Embeddings.card E ℂ]
-  have hpsi : ∀ τ, InPsi H τ ↔ τO τ H.rt = τO τ₀ H.rt := fun τ => by rw [← hrt, hτ₀]; rfl
+  have hpsi : ∀ τ, InPsi H τ ↔ τO τ H.rt = τO τ₀ H.rt := fun τ => by
+    rw [← hrt, hτ₀]; rfl
   have hneg : ∀ τ, τO τ H.rt = - τO τ₀ H.rt → ¬ InPsi H τ := by
     intro τ h h'
     rw [hpsi] at h'
@@ -99,11 +138,9 @@ theorem UpperTheory.splitPlaces_discriminantDepth_of_splitAt
     exact H.d_prime.ne_zero (by exact_mod_cast this)
   haveI : IsNoetherianRing (ℤ_[p] ⊗[ℤ] 𝓞 E) :=
     IsNoetherianRing.of_finite ℤ_[p] (ℤ_[p] ⊗[ℤ] 𝓞 E)
-  obtain ⟨e, he, hs, hp, hm⟩
-      : ∃ e : ℤ_[p] ⊗[ℤ] 𝓞 E,
-        e * e = e ∧ e + sig p (𝓞 E) e = 1
-          ∧ (∀ σ : 𝓞 E →+* O, σ ∈ Emb (O := O) e ↔ σ H.rt = τO τ₀ H.rt)
-          ∧ (∀ σ : 𝓞 E →+* O, σ ∈ Emb (O := O) (1 - e) ↔ σ H.rt = - τO τ₀ H.rt) := by
+  obtain ⟨e, he, hs, hp, hm⟩ : ∃ e : ℤ_[p] ⊗[ℤ] 𝓞 E, e * e = e ∧ e + sig p (𝓞 E) e = 1 ∧
+      (∀ σ : 𝓞 E →+* O, σ ∈ Emb (O := O) e ↔ σ H.rt = τO τ₀ H.rt) ∧
+      (∀ σ : 𝓞 E →+* O, σ ∈ Emb (O := O) (1 - e) ↔ σ H.rt = - τO τ₀ H.rt) := by
     obtain ⟨e, α, he, -, -, hs, hα, hemb⟩ := UpperTheory.exists_splitIdempotent_of_splitAt p E H hsp
     have hα' : algebraMap ℤ_[p] O α ^ 2 = -(H.d : O) := by rw [← map_pow, hα]; simp
     rcases sq_eq_sq_iff_eq_or_eq_neg.1 ((hsq (τO τ₀)).trans hα'.symm) with h | h
@@ -115,8 +152,7 @@ theorem UpperTheory.splitPlaces_discriminantDepth_of_splitAt
       · rw [h]; exact (hemb O σ).2
       · rw [h, neg_neg, sub_sub_cancel]; exact (hemb O σ).1
   have hbar : sig p (𝓞 E) e = 1 - e := by linear_combination hs
-  obtain ⟨s, g, hg, horth, hsum⟩ :=
-    UpperTheory.exists_primitive_orthogonal_idempotents_sum_eq_of_noetherian _ e he
+  obtain ⟨s, g, hg, horth, hsum⟩ := UpperTheory.exists_primitive_orthogonal_idempotents_sum_eq_of_noetherian _ e he
   have hge : ∀ i, g i * e = g i := fun i => by
     rw [← hsum, Finset.mul_sum, Finset.sum_eq_single i]
     · exact (hg i).1
@@ -136,31 +172,19 @@ theorem UpperTheory.splitPlaces_discriminantDepth_of_splitAt
   let w : Fin s → Place p (𝓞 E) := fun i => ⟨g i, (hg i).1, (hg i).2.1, (hg i).2.2, hsplit i⟩
   have hone : (∑ i, (w i).e) + (∑ i, (w i).bar) = 1 := by
     show (∑ i, g i) + (∑ i, sig p (𝓞 E) (g i)) = 1
-    set_option synthInstance.maxHeartbeats 100000 in
+
     rw [← map_sum, hsum, hs]
   obtain ⟨hn, hvd⟩ := UpperTheory.discr_CMDatum_eq_prod_places E p C v O hv s w horth hone hcross
   have t : ∀ i, Fin (w i).n ≃ Emb (O := O) (w i).e := fun i =>
     (UpperTheory.trace_form_decomposition_CMDatum E p C v O hv (g i) (hg i).1).1.some
   obtain ⟨vdi, hv1, hv2⟩ := hvd t
-  have hup
-      : ∀ (x y : ℤ_[p] ⊗[ℤ] 𝓞 E) (σ : 𝓞 E →+* O),
-        x * y = x → σ ∈ Emb (O := O) x → σ ∈ Emb (O := O) y := by
+  have hup : ∀ (x y : ℤ_[p] ⊗[ℤ] 𝓞 E) (σ : 𝓞 E →+* O), x * y = x → σ ∈ Emb (O := O) x → σ ∈ Emb (O := O) y := by
     intro x y σ hxy hx
     have hx' : tauExt σ x = 1 := hx
     have := congrArg (tauExt (p := p) σ) hxy
     rw [map_mul, hx', one_mul] at this
     exact this
-  refine ⟨
-    s,
-    w,
-    vdi,
-    by omega,
-    ?_,
-    fun i σ h => ?_,
-    fun τ hτ => ?_,
-    fun i σ h => ?_,
-    fun i => ⟨t i, hv1 i⟩
-  ⟩
+  refine ⟨s, w, vdi, by omega, ?_, fun i σ h => ?_, fun τ hτ => ?_, fun i σ h => ?_, fun i => ⟨t i, hv1 i⟩⟩
   · have hf0 : (f : ℝ) ≠ 0 := by
       have : f ≠ 0 := by omega
       exact_mod_cast this

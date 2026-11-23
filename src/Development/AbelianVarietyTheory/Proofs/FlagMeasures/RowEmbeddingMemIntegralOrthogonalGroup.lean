@@ -1,15 +1,54 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.IsVolData
 public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.FrameDualTupleIdealsCastAdd
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Formalism.SharpRestriction.CuspSpanNormBounds.Point
 
 @[expose] public section
 
-open NumberField IsDedekindDomain MeasureTheory Matrix
-  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.QuantumDeterminants
-  Formalism.MainNotions.S GlobalTheory.SgAlg GlobalTheory.SgGlob GlobalTheory.SnMass
-  GlobalTheory.SnMass.VolN
+open NumberField IsDedekindDomain MeasureTheory Matrix Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.QuantumDeterminants Formalism.MainNotions.S GlobalTheory.SgAlg GlobalTheory.SgGlob GlobalTheory.SnMass GlobalTheory.SnMass.VolN
 open scoped TensorProduct ENNReal nonZeroDivisors
 
 namespace GlobalTheory.SnMass.VolN.RowIso
@@ -17,53 +56,47 @@ namespace GlobalTheory.SnMass.VolN.RowIso
 section Alg
 variable {E : Type} [Field E] (σ : E →+* E) {n : ℕ} (J : Matrix (Fin n) (Fin n) E)
 
-theorem form_add_left (x x' y : Fin n → E)
-    : form σ J (x + x') y = form σ J x y + form σ J x' y := by
+theorem form_add_left (x x' y : Fin n → E) : form σ J (x + x') y = form σ J x y + form σ J x' y := by
   simp [form, Matrix.mulVec_add, dotProduct_add]
 
-theorem form_sub_left (x x' y : Fin n → E)
-    : form σ J (x - x') y = form σ J x y - form σ J x' y := by
+theorem form_sub_left (x x' y : Fin n → E) : form σ J (x - x') y = form σ J x y - form σ J x' y := by
   simp [form, Matrix.mulVec_sub, dotProduct_sub]
 
 theorem form_smul_left (c : E) (x y : Fin n → E) : form σ J (c • x) y = c * form σ J x y := by
   simp [form, Matrix.mulVec_smul, dotProduct_smul]
 
-theorem form_add_right (x y y' : Fin n → E)
-    : form σ J x (y + y') = form σ J x y + form σ J x y' := by
+theorem form_add_right (x y y' : Fin n → E) : form σ J x (y + y') = form σ J x y + form σ J x y' := by
   simp [form, dotProduct, add_mul, Finset.sum_add_distrib]
 
-theorem form_sub_right (x y y' : Fin n → E)
-    : form σ J x (y - y') = form σ J x y - form σ J x y' := by
+theorem form_sub_right (x y y' : Fin n → E) : form σ J x (y - y') = form σ J x y - form σ J x y' := by
   simp [form, dotProduct, sub_mul, Finset.sum_sub_distrib]
 
-theorem form_neg_right (x y : Fin n → E) : form σ J x (-y) = - form σ J x y := by
+theorem form_neg_right (x y : Fin n → E) : form σ J x (-y) = -form σ J x y := by
   simp [form, dotProduct]
 
-theorem form_neg_left (x y : Fin n → E) : form σ J (-x) y = - form σ J x y := by
+theorem form_neg_left (x y : Fin n → E) : form σ J (-x) y = -form σ J x y := by
   simp [form, Matrix.mulVec_neg]
 
 theorem form_smul_right (c : E) (x y : Fin n → E) : form σ J x (c • y) = σ c * form σ J x y := by
   simp [form, dotProduct, Finset.mul_sum, mul_assoc]
 
-theorem form_herm (hσ : ∀ x, σ (σ x) = x) (hJ : ∀ i j, σ (J j i) = J i j) (x y : Fin n → E)
-    : form σ J x y = σ (form σ J y x) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [form, dotProduct, mulVec, map_sum, map_mul, hσ, hJ, Finset.mul_sum]
+theorem form_herm (hσ : ∀ x, σ (σ x) = x) (hJ : ∀ i j, σ (J j i) = J i j) (x y : Fin n → E) :
+    form σ J x y = σ (form σ J y x) := by
+
+  simp only [form, dotProduct, mulVec, map_sum, map_mul, hσ, hJ, Finset.mul_sum]
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
   ring
 
-theorem rowE_mulVec (e y : Fin n → E) (t : E) (x : Fin n → E)
-    : rowE σ J e y t *ᵥ x = x + form σ J x e • (y + t • e) - form σ J x y • e := by
+theorem rowE_mulVec (e y : Fin n → E) (t : E) (x : Fin n → E) :
+    rowE σ J e y t *ᵥ x = x + form σ J x e • (y + t • e) - form σ J x y • e := by
   ext i
   simp only [rowE, mulVec, dotProduct, form, vecMul, add_mul, sub_mul, Finset.sum_add_distrib,
     Finset.sum_sub_distrib, ite_mul, one_mul, zero_mul, Finset.sum_ite_eq, Finset.mem_univ, if_true,
-    Pi.add_apply, Pi.sub_apply, Pi.smul_apply, smul_eq_mul, Finset.mul_sum, Finset.sum_mul,
-    mul_assoc]
+    Pi.add_apply, Pi.sub_apply, Pi.smul_apply, smul_eq_mul, Finset.mul_sum, Finset.sum_mul, mul_assoc]
   rw [Finset.sum_comm (f := fun (a b : Fin n) => y i * (σ (e b) * (J b a * x a))),
     Finset.sum_comm (f := fun (a b : Fin n) => t * (e i * (σ (e b) * (J b a * x a)))),
-    Finset.sum_comm (f := fun (a b : Fin n) => e i * (σ (y b) * (J b a * x a))),
-    ← Finset.sum_add_distrib]
+    Finset.sum_comm (f := fun (a b : Fin n) => e i * (σ (y b) * (J b a * x a))), ← Finset.sum_add_distrib]
   congr 2
   · refine Finset.sum_congr rfl fun a _ => ?_
     rw [← Finset.sum_add_distrib]
@@ -73,18 +106,14 @@ theorem rowE_mulVec (e y : Fin n → E) (t : E) (x : Fin n → E)
     refine Finset.sum_congr rfl fun b _ => ?_
     ring
 
-theorem isUn_of_form
-    (g : Matrix (Fin n) (Fin n) E) (h : ∀ x x', form σ J (g *ᵥ x) (g *ᵥ x') = form σ J x x')
-    : IsUn σ J g := by
+theorem isUn_of_form (g : Matrix (Fin n) (Fin n) E)
+    (h : ∀ x x', form σ J (g *ᵥ x) (g *ᵥ x') = form σ J x x') : IsUn σ J g := by
   ext i j
   have := h (Pi.single j 1) (Pi.single i 1)
   simp only [form, dotProduct, mulVec, Pi.single_apply, mul_ite, mul_one, mul_zero,
-      Finset.sum_ite_eq', Finset.mem_univ, if_true, apply_ite σ, map_one, map_zero, ite_mul,
-      one_mul, zero_mul]
-    at this
+    Finset.sum_ite_eq', Finset.mem_univ, if_true, apply_ite σ, map_one, map_zero, ite_mul, one_mul, zero_mul] at this
   rw [← this]
-  simp only [IsUn, cT, Matrix.mul_apply, Matrix.transpose_apply, Matrix.map_apply, Finset.sum_mul,
-    Finset.mul_sum]
+  simp only [IsUn, cT, Matrix.mul_apply, Matrix.transpose_apply, Matrix.map_apply, Finset.sum_mul, Finset.mul_sum]
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun a _ => Finset.sum_congr rfl fun b _ => ?_
   ring
@@ -95,32 +124,28 @@ end GlobalTheory.SnMass.VolN.RowIso
 namespace GlobalTheory.SnMass.VolN.RowIso
 
 section Iso
-variable
-  {E : Type} [Field E]
-  {σ : E →+* E} (hσ : ∀ x, σ (σ x) = x)
-  {n : ℕ} {J : Matrix (Fin n) (Fin n) E} (hJ : ∀ i j, σ (J j i) = J i j)
-  {e y : Fin n → E} {t : E}
-  (he : form σ J e e = 0) (hye : form σ J y e = 0) (ht : form σ J y y + t + σ t = 0)
+variable {E : Type} [Field E] {σ : E →+* E} (hσ : ∀ x, σ (σ x) = x) {n : ℕ} {J : Matrix (Fin n) (Fin n) E}
+  (hJ : ∀ i j, σ (J j i) = J i j) {e y : Fin n → E} {t : E} (he : form σ J e e = 0)
+  (hye : form σ J y e = 0) (ht : form σ J y y + t + σ t = 0)
 include hσ hJ he hye ht
 
-theorem form_rowE (x x' : Fin n → E)
-    : form σ J (rowE σ J e y t *ᵥ x) (rowE σ J e y t *ᵥ x') = form σ J x x' := by
+theorem form_rowE (x x' : Fin n → E) :
+    form σ J (rowE σ J e y t *ᵥ x) (rowE σ J e y t *ᵥ x') = form σ J x x' := by
   have hey : form σ J e y = 0 := by rw [form_herm σ J hσ hJ, hye, map_zero]
   have h1 : form σ J y x' = σ (form σ J x' y) := form_herm σ J hσ hJ _ _
   have h2 : form σ J e x' = σ (form σ J x' e) := form_herm σ J hσ hJ _ _
-  simp only [rowE_mulVec, form_add_left, form_sub_left, form_smul_left, form_add_right,
-    form_sub_right, form_smul_right, map_add, map_sub, map_mul, hσ, he, hye, hey, h1, h2]
+  simp only [rowE_mulVec, form_add_left, form_sub_left, form_smul_left, form_add_right, form_sub_right,
+    form_smul_right, map_add, map_sub, map_mul, hσ, he, hye, hey, h1, h2]
   linear_combination (form σ J x e * σ (form σ J x' e)) * ht
 
-theorem rowE_inv (x : Fin n → E) : rowE σ J e y t *ᵥ (rowE σ J e (-y) (σ t) *ᵥ x) = x := by
+theorem rowE_inv (x : Fin n → E) :
+    rowE σ J e y t *ᵥ (rowE σ J e (-y) (σ t) *ᵥ x) = x := by
   have hey : form σ J e y = 0 := by rw [form_herm σ J hσ hJ, hye, map_zero]
   have hα : form σ J (rowE σ J e (-y) (σ t) *ᵥ x) e = form σ J x e := by
     simp only [rowE_mulVec, form_add_left, form_sub_left, form_smul_left, form_neg_left, he, hye]
     ring
-  have hβ
-      : form σ J (rowE σ J e (-y) (σ t) *ᵥ x) y = form σ J x y - form σ J x e * form σ J y y := by
-    simp only [rowE_mulVec, form_add_left, form_sub_left, form_smul_left, form_neg_left,
-      form_neg_right, hey]
+  have hβ : form σ J (rowE σ J e (-y) (σ t) *ᵥ x) y = form σ J x y - form σ J x e * form σ J y y := by
+    simp only [rowE_mulVec, form_add_left, form_sub_left, form_smul_left, form_neg_left, form_neg_right, hey]
     ring
   rw [rowE_mulVec σ J e y t, hα, hβ, rowE_mulVec σ J e (-y) (σ t) x]
   ext i
@@ -132,15 +157,13 @@ end Iso
 section Lat
 variable {E : Type} [Field E] [NumberField E]
 
+
 open GlobalTheory.SnMass.FrameDual in
-theorem rowE_mem
-    {σ : E →+* E} (hσ : ∀ x, σ (σ x) = x)
-    {n : ℕ} {J : Matrix (Fin n) (Fin n) E} {Λ : Submodule (𝓞 E) (Fin n → E)}
-    (hΛ : GlobalTheory.SgGlob.SelfDual σ J Λ)
-    {𝔞 : FractionalIdeal (𝓞 E)⁰ E} (h0 : 𝔞 ≠ 0) (hs : Stab σ 𝔞)
-    {e y : Fin n → E} {t : E} (he : ∀ c ∈ 𝔞, c • e ∈ Λ) (hy : ∀ c ∈ 𝔞⁻¹, c • y ∈ Λ) (ht : t ∈ 𝔞 * 𝔞)
-    {v : Fin n → E} (hv : v ∈ Λ)
-    : rowE σ J e y t *ᵥ v ∈ Λ := by
+theorem rowE_mem {σ : E →+* E} (hσ : ∀ x, σ (σ x) = x) {n : ℕ} {J : Matrix (Fin n) (Fin n) E}
+    {Λ : Submodule (𝓞 E) (Fin n → E)} (hΛ : GlobalTheory.SgGlob.SelfDual σ J Λ) {𝔞 : FractionalIdeal (𝓞 E)⁰ E}
+    (h0 : 𝔞 ≠ 0) (hs : Stab σ 𝔞) {e y : Fin n → E} {t : E} (he : ∀ c ∈ 𝔞, c • e ∈ Λ)
+    (hy : ∀ c ∈ 𝔞⁻¹, c • y ∈ Λ) (ht : t ∈ 𝔞 * 𝔞) {v : Fin n → E} (hv : v ∈ Λ) :
+    rowE σ J e y t *ᵥ v ∈ Λ := by
   have hO : ∀ w ∈ Λ, form σ J v w ∈ (algebraMap (𝓞 E) E).range := (hΛ.2 v).1 hv
   have hα : form σ J v e ∈ 𝔞⁻¹ := by
     rw [FractionalIdeal.mem_inv_iff h0]
@@ -160,8 +183,8 @@ theorem rowE_mem
   have hγ : t * form σ J v e ∈ 𝔞 := by
     have := FractionalIdeal.mul_mem_mul ht hα
     rwa [mul_assoc, mul_inv_cancel₀ h0, mul_one] at this
-  have hvec
-      : rowE σ J e y t *ᵥ v = v + form σ J v e • y + (t * form σ J v e) • e - form σ J v y • e := by
+  have hvec : rowE σ J e y t *ᵥ v =
+      v + form σ J v e • y + (t * form σ J v e) • e - form σ J v y • e := by
     rw [rowE_mulVec, smul_add, smul_smul, mul_comm (form σ J v e) t, add_assoc]
   rw [hvec]
   exact Λ.sub_mem (Λ.add_mem (Λ.add_mem hv (hy _ hα)) (he _ hγ)) (he _ hβ)
@@ -172,32 +195,18 @@ end GlobalTheory.SnMass.VolN.RowIso
 
 namespace GlobalTheory.SnMass.VolN.RowIso
 
-theorem form_col_col
-    {E : Type} [Field E]
-    (σ : E →+* E)
-    {n m : ℕ} (J : Matrix (Fin n) (Fin n) E) (P : Matrix (Fin n) (Fin m) E) (b c : Fin m)
-    : form σ J (fun i => P i b) (fun i => P i c) = pairM σ J P P c b := by
+theorem form_col_col {E : Type} [Field E] (σ : E →+* E) {n m : ℕ} (J : Matrix (Fin n) (Fin n) E)
+    (P : Matrix (Fin n) (Fin m) E) (b c : Fin m) :
+    form σ J (fun i => P i b) (fun i => P i c) = pairM σ J P P c b := by
   simp only [form, pairM, cT, Matrix.mul_apply, dotProduct, mulVec, Matrix.transpose_apply,
     Matrix.map_apply, Finset.sum_mul, Finset.mul_sum]
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun a _ => Finset.sum_congr rfl fun d _ => ?_
   ring
 
+
 open GlobalTheory.SnMass.FrameDual in
-theorem rowE_mem_GN
-    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-        (σ : E →ₐ[F] E) (k r : ℕ) (J : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) E)
-        (Λ : Submodule (𝓞 E) (Fin (2 * r + k + 1) → E))
-        (P : Matrix (Fin (2 * r + k + 1)) (Fin (r + 1)) E)
-        (f : Matrix (Fin (2 * r + k + 1)) (Fin r) E) (T : F)
-        (A : InfinitePlace E → Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ)
-        (s : Fin r → ℝ),
-      IsVolData σ J Λ P f T A s
-        → ∀ (a : Fin r) (y : Fin (2 * r + k + 1) → E) (t : E),
-          (∀ c : Fin r, c ≤ a → form (σ : E →+* E) J y (fun i => P i c.castSucc) = 0)
-            → form (σ : E →+* E) J y y + t + σ t = 0 → (∀ c ∈ (dInv E (r - a.val))⁻¹, c • y ∈ Λ)
-            → t ∈ dInv E (2 * (r - a.val))
-            → rowE (σ : E →+* E) J (fun i => P i a.castSucc) y t ∈ GN (σ : E →+* E) J Λ P := by
+theorem rowE_mem_GN : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E) (k r : ℕ) (J : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) E) (Λ : Submodule (𝓞 E) (Fin (2 * r + k + 1) → E)) (P : Matrix (Fin (2 * r + k + 1)) (Fin (r + 1)) E) (f : Matrix (Fin (2 * r + k + 1)) (Fin r) E) (T : F) (A : InfinitePlace E → Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ) (s : Fin r → ℝ), IsVolData σ J Λ P f T A s → ∀ (a : Fin r) (y : Fin (2 * r + k + 1) → E) (t : E), (∀ c : Fin r, c ≤ a → form (σ : E →+* E) J y (fun i => P i c.castSucc) = 0) → form (σ : E →+* E) J y y + t + σ t = 0 → (∀ c ∈ (dInv E (r - a.val))⁻¹, c • y ∈ Λ) → t ∈ dInv E (2 * (r - a.val)) → rowE (σ : E →+* E) J (fun i => P i a.castSucc) y t ∈ GN (σ : E →+* E) J Λ P := by
   intro F E _ _ _ _ _ σ k r J Λ P f T A s hV a y t hyc hyt hyΛ htI
   obtain ⟨hcm, -, hJ, hΛ, hP, -, htup, -⟩ := hV
   set σ' : E →+* E := (σ : E →+* E) with hσ'
@@ -232,12 +241,8 @@ theorem rowE_mem_GN
     rw [h𝔞, dInv, ← pow_add, ← two_mul]
     exact htI
   refine ⟨⟨isUn_of_form σ' J _ (form_rowE hσ hJ' hee hye hyt'), ?_, ?_⟩, ?_⟩
-  · refine ⟨
-      Matrix.of fun i j =>
-        (if i = j then 1 else 0) - (if i = a then form σ' J (fun l => P l j.castSucc) y else 0),
-      ?_,
-      ?_
-    ⟩
+  · refine ⟨Matrix.of fun i j => (if i = j then 1 else 0) -
+        (if i = a then form σ' J (fun l => P l j.castSucc) y else 0), ?_, ?_⟩
     · intro i j
       refine ⟨fun hji => ?_, fun hij => ?_⟩
       · have hne : i ≠ j := (ne_of_lt hji).symm
@@ -251,20 +256,19 @@ theorem rowE_mem_GN
           simp [hyb i le_rfl]
         · simp [hia]
     · ext l j
-      change (rowE σ' J e y t *ᵥ fun m => P m j.castSucc) l
-        = ∑ i : Fin r, P l i.castSucc *
-          ((if i = j then 1 else 0) - (if i = a then form σ' J (fun l => P l j.castSucc) y else 0))
+      change (rowE σ' J e y t *ᵥ fun m => P m j.castSucc) l = ∑ i : Fin r, P l i.castSucc *
+        ((if i = j then 1 else 0) - (if i = a then form σ' J (fun l => P l j.castSucc) y else 0))
       rw [rowE_mulVec, heb j a]
-      simp only [Matrix.of_apply, eOf, Matrix.submatrix_apply, id, mul_sub, Finset.sum_sub_distrib,
-        mul_ite, mul_one, mul_zero, Finset.sum_ite_eq', Finset.sum_ite_eq, Finset.mem_univ, if_true,
-        Pi.add_apply, Pi.sub_apply, Pi.smul_apply, smul_eq_mul, zero_mul, add_zero, he_def]
+      simp only [Matrix.of_apply, eOf, Matrix.submatrix_apply, id, mul_sub, Finset.sum_sub_distrib, mul_ite, mul_one, mul_zero,
+        Finset.sum_ite_eq', Finset.sum_ite_eq, Finset.mem_univ, if_true, Pi.add_apply, Pi.sub_apply,
+        Pi.smul_apply, smul_eq_mul, zero_mul, add_zero, he_def]
       ring
   · intro v hv
     have hve : form σ' J v e = 0 := by
       have := congrFun hv a
       rw [← Matrix.mulVec_mulVec] at this
       simpa [form, cT, mulVec, dotProduct, eOf, he_def] using this
-    refine ⟨Pi.single a (- form σ' J v y), ?_⟩
+    refine ⟨Pi.single a (-form σ' J v y), ?_⟩
     rw [rowE_mulVec, hve, Matrix.mulVec_single]
     ext l
     simp [eOf, he_def] <;> ring
@@ -272,7 +276,8 @@ theorem rowE_mem_GN
     · rintro _ ⟨v, hv, rfl⟩
       exact rowE_mem hσ hΛ h0 hs he𝔞 hyΛ ht2 hv
     · intro v hv
-      have hy' : ∀ c ∈ 𝔞⁻¹, c • (-y) ∈ Λ := fun c hc => by rw [smul_neg]; exact Λ.neg_mem (hyΛ c hc)
+      have hy' : ∀ c ∈ 𝔞⁻¹, c • (-y) ∈ Λ := fun c hc => by
+        rw [smul_neg]; exact Λ.neg_mem (hyΛ c hc)
       refine ⟨rowE σ' J e (-y) (σ' t) *ᵥ v, rowE_mem hσ hΛ h0 hs he𝔞 hy' (hs.mul hs t ht2) hv, ?_⟩
       exact rowE_inv hσ hJ' hee hye hyt' v
 

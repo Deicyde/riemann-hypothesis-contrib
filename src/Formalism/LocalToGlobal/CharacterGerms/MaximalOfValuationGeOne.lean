@@ -2,6 +2,46 @@ module
 
 public import Formalism.LocalToGlobal.CharacterGerms.FirstStepSecondHalfCondition
 public import Formalism.LocalToGlobal.CharacterGerms.RowTiePGerm
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+public import Mathlib.Data.Nat.Choose.Dvd
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
 
 @[expose] public section
 
@@ -161,8 +201,8 @@ theorem MMS.sub {f g : MvPowerSeries σ C} (hf : MMS V f) (hg : MMS V g) : MMS V
 theorem mms_sum {ι : Type} (s : Finset ι) {f : ι → MvPowerSeries σ C} (hf : ∀ i ∈ s, MMS V (f i))
     : MMS V (∑ i ∈ s, f i) := by
   intro μ
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+
+  rw [map_sum]
   exact mm_sum s _ (fun i hi => hf i hi μ)
 
 theorem MMS.mul_left {f g : MvPowerSeries σ C} (hf : IntS V f) (hg : MMS V g) : MMS V (f * g) := by
@@ -391,8 +431,8 @@ theorem mms_pow_frobTw [Finite σ] {f : MvPowerSeries σ C} (hf : IntS V f)
   set P : MvPowerSeries σ C := ∑ ν ∈ S, MvPowerSeries.monomial ν (MvPowerSeries.coeff ν f) with hP
   have hcoeffP : ∀ ν, MvPowerSeries.coeff ν P = if ν ∈ S then MvPowerSeries.coeff ν f else 0 := by
     intro ν
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hP, map_sum]
+
+    rw [hP, map_sum]
     simp only [MvPowerSeries.coeff_monomial]
     rw [Finset.sum_ite_eq]
   have hlow : ∀ ν, ν ≤ μ → MvPowerSeries.coeff ν (f - P) = 0 := by
@@ -420,8 +460,8 @@ theorem mms_pow_frobTw [Finite σ] {f : MvPowerSeries σ C} (hf : IntS V f)
   have h4 : frobTw V.l P = ∑ ν ∈ S, (MvPowerSeries.monomial ν (MvPowerSeries.coeff ν f)) ^ V.l := by
     ext μ'
     rw [coeff_frobTw]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [hP, map_sum, monomial_pow_lemma_9, MvPowerSeries.coeff_monomial]
+
+    simp only [hP, map_sum, monomial_pow_lemma_9, MvPowerSeries.coeff_monomial]
     split_ifs with hd
     · rw [Finset.sum_ite_eq]
       have e

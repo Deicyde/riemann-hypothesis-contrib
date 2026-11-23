@@ -1,9 +1,39 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.ComplexSidePlacesIffMemNonzeroIndexPlaces
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.GeoHalfUpd
-public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.NonzeroPlacesOverPrimesLifts
+public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.DefiniteSideNonzeroIndexPlacesAnyColumnsScale
+public import Formalism.LocalToGlobal.IndefiniteReal.LinksExistW
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
 
 @[expose] public section
 
@@ -29,7 +59,6 @@ variable
   {Pl0 I0 T T' : Type} {A3 : FamIn3 D.what₂.LL G Pl0 I0 (List ℕ) T D.R.m} {Ks : Type}
   [Field Ks] [NumberField Ks] [Algebra Ks D.what₂.LL]
 
-set_option maxHeartbeats 2000000 in
 theorem baseWeight_scalar_update_invariant
     {A : FamIn D.what₂.LL G Pl0 T D.R.m} {R : RealDat D A Ks} {F : Face D A} (h : R.BaseW F) (k l)
     : (R.upd6 k l).BaseW F := ⟨
@@ -72,13 +101,11 @@ theorem baseWeight_scalar_update_invariant
   RealDat.weak_theta_props_of_scalar_update h.thP k l
 ⟩
 
-set_option maxHeartbeats 2000000 in
 theorem intertwinersExist_scalar_update_invariant
     {A : FamIn D.what₂.LL G Pl0 T D.R.m} {R : RealDat D A Ks} (e : R.ExAt) (k l)
     : (R.upd6 k l).ExAt :=
   ⟨e.ItY, e.ItX, e.ioY, e.ioX, e.Th, e.ioP, e.thF, e.thG⟩
 
-set_option maxHeartbeats 2000000 in
 theorem nz_updS
     (R : RealDat3 D A3 Ks) (F : Face3 D A3) (k l)
     (F0 : HeightOneSpectrum (𝓞 D.what₂.LL) → Fin D.R.m → ℝ) (w : HeightOneSpectrum (𝓞 D.what₂.LL))
@@ -115,7 +142,6 @@ theorem kapOf_eq
   rw [dite_eq_left h]
   exact Lift.IsKap.unique h.choose_spec.1 hκ t p hp hl
 
-set_option maxHeartbeats 2000000 in
 theorem isScal_kapOf
     (S : RealDat3 D A3 Ks) (F : Face3 D A3)
     (h0 : S.eigenvalue_at_base_of_scalar) (h1 : S.scal_off F)
@@ -141,7 +167,6 @@ variable
   {mu : HeightOneSpectrum (𝓞 D.what₂.LL) → T'} {tw : Finset (HeightOneSpectrum (𝓞 D.what₂.LL))}
   {P0 : Subgroup G} {ψ0 : P0 →* D.what₂.LLˣ} {P1 : Subgroup G} {ψ1 : P1 →* D.what₂.LLˣ}
 
-set_option maxHeartbeats 4000000 in
 theorem pins_updS
     (hf : Function.Injective f)
     {cG : G0 R.Pg D.R.r ≃* G0g D.nd} (h : Pins R (bare3 _ P0 ψ0 P1 ψ1) cG)
@@ -180,7 +205,6 @@ theorem pins_updS
     h.trSem
   ⟩
 
-set_option maxHeartbeats 4000000 in
 theorem pins_kapOf
     (hf : Function.Injective f)
     {cG : G0 R.Pg D.R.r ≃* G0g D.nd} (h : Pins R (bare3 _ P0 ψ0 P1 ψ1) cG)
@@ -203,14 +227,12 @@ variable
   {X : Stages} {px : PreX X.B.toPre}
   {I : ColIn X.B px} {hX : X.B.fields.Ok} {T : Top.TwDat X.B} {Wt Wt' : Set X.B.places.Pl}
 
-set_option maxHeartbeats 4000000 in
 theorem exAt_res (z : Dat X I hX T Wt) (h : Wt' ⊆ Wt) (e : z.R.toRealDat.ExAt)
     : (z.resR h).toRealDat.ExAt :=
   Res.exAt (A := (famR X I hX (usedOf I T Wt) z.Xg z.tr).A) (f := inclU I (usedOf_mono I T h))
     (μ := mu0F (X := X.B.fields) (tuOf I (usedOf I T Wt'))) (R := z.R.toRealDat) (z.resMu h)
     (z.resTw Wt') e
 
-set_option maxHeartbeats 4000000 in
 theorem pins_resK
     (z : Dat X I hX T Wt) (h : Wt' ⊆ Wt) (hc : ConjStable X Wt') (e : z.R.toRealDat.ExAt)
     : Pins ((z.resR h).updS (kapOf (z.resR h)) (z.resR h).lam3)

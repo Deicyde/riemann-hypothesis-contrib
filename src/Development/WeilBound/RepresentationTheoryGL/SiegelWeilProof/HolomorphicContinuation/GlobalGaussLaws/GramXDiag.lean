@@ -1,7 +1,45 @@
 module
 
-public import Development.WeilBound.RepresentationTheoryGL.SiegelWeilProof.HolomorphicContinuation.GlobalGaussLaws.DetNeOfInG
 public import Development.WeilBound.RepresentationTheoryGL.SiegelWeilProof.HolomorphicContinuation.GlobalGaussLaws.GaussScalar
+public import Development.WeilBound.RepresentationTheoryGL.SiegelWeilProof.HolomorphicContinuation.GlobalGaussLaws.GaussSt
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -21,14 +59,13 @@ theorem sgn_eq (ε : Fin m → Bool) (a : Fin m) : sgn ε a = ((sigR ε a : ℝ)
   unfold sgn sigR
   by_cases h : ε a <;> simp [h]
 
-theorem ftLoc_eq (ε : Fin m → Bool) (s : ℝ) (f : (Fin m → Fin n → ℂ) → ℂ) (u : Fin m → Fin n → ℂ)
-    : ftLoc ε s f u = ftG (sigR ε) s f u := by
+theorem ftLoc_eq (ε : Fin m → Bool) (s : ℝ) (f : (Fin m → Fin n → ℂ) → ℂ) (u : Fin m → Fin n → ℂ) :
+    ftLoc ε s f u = ftG (sigR ε) s f u := by
   simp only [ftLoc, ftG]
   congr 1
   funext y
-  have key
-      : ((of u)ᴴ * diagonal (sgn ε) * of y).trace.re
-        = ∑ a, ∑ j, sigR ε a * ((starRingEnd ℂ) (u a j) * y a j).re := by
+  have key : ((of u)ᴴ * diagonal (sgn ε) * of y).trace.re =
+      ∑ a, ∑ j, sigR ε a * ((starRingEnd ℂ) (u a j) * y a j).re := by
     simp only [Matrix.trace, Matrix.diag, Matrix.mul_apply, Matrix.conjTranspose_apply,
       Matrix.of_apply, Complex.re_sum]
     rw [Finset.sum_comm]
@@ -39,26 +76,23 @@ theorem ftLoc_eq (ε : Fin m → Bool) (s : ℝ) (f : (Fin m → Fin n → ℂ) 
     rfl
   rw [key]
 
-theorem gramX_diag (ε : Fin m → Bool) (u : Fin m → Fin n → ℂ) (j : Fin n)
-    : gramX ε u j j = ∑ a, ((sigR ε a : ℝ) : ℂ) * ((‖u a j‖ ^ 2 : ℝ) : ℂ) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [gramX, Qp, Qb, evX, map_sub, map_sum, map_mul, MvPolynomial.eval_X, if_true,
-      Bool.false_eq_true, if_false, Finset.sum_filter]
+theorem gramX_diag (ε : Fin m → Bool) (u : Fin m → Fin n → ℂ) (j : Fin n) :
+    gramX ε u j j = ∑ a, ((sigR ε a : ℝ) : ℂ) * ((‖u a j‖ ^ 2 : ℝ) : ℂ) := by
+
+  simp only [gramX, Qp, Qb, evX, map_sub, map_sum, map_mul, MvPolynomial.eval_X, if_true,
+  Bool.false_eq_true, if_false, Finset.sum_filter]
   rw [← Finset.sum_sub_distrib]
   refine Finset.sum_congr rfl fun a _ => ?_
   by_cases h : ε a <;> simp [h, sigR, Complex.conj_mul']
 
-theorem chN_DG
-    (ε : Fin m → Bool) (t : ℝ) (β : Fin n → ℝ) (K : ℂ) (γ : Fin m → Fin n → ℂ)
-    (u : Fin m → Fin n → ℂ)
-    : chN ε t (diagonal fun j => (β j : ℂ)) u * DG K γ u
-      = DG K (fun a j => γ a j - I * t * (sigR ε a : ℂ) * (β j : ℂ)) u := by
+theorem chN_DG (ε : Fin m → Bool) (t : ℝ) (β : Fin n → ℝ) (K : ℂ) (γ : Fin m → Fin n → ℂ) (u : Fin m → Fin n → ℂ) :
+    chN ε t (diagonal fun j => (β j : ℂ)) u * DG K γ u =
+      DG K (fun a j => γ a j - I * t * (sigR ε a : ℂ) * (β j : ℂ)) u := by
   simp only [chN, DG]
   simp only [← Complex.exp_sum]
   rw [mul_left_comm, ← Complex.exp_add]
   congr 2
-  have htr
-      : (diagonal (fun j => (β j : ℂ)) * gramX ε u).trace = ∑ j, (β j : ℂ) * gramX ε u j j := by
+  have htr : (diagonal (fun j => (β j : ℂ)) * gramX ε u).trace = ∑ j, (β j : ℂ) * gramX ε u j j := by
     simp [Matrix.trace, Matrix.diagonal_mul]
   rw [htr]
   simp_rw [gramX_diag, Finset.mul_sum]
@@ -69,8 +103,8 @@ theorem chN_DG
   refine Finset.sum_congr rfl fun j _ => ?_
   ring
 
-theorem dg_const (K γ0 : ℂ) (v : Fin m → Fin n → ℂ)
-    : DG K (fun _ _ => γ0) v = K * cexp (-γ0 * ∑ a, ∑ j, ((‖v a j‖ ^ 2 : ℝ) : ℂ)) := by
+theorem dg_const (K γ0 : ℂ) (v : Fin m → Fin n → ℂ) :
+    DG K (fun _ _ => γ0) v = K * cexp (-γ0 * ∑ a, ∑ j, ((‖v a j‖ ^ 2 : ℝ) : ℂ)) := by
   simp only [DG]
   congr 1
   rw [Finset.mul_sum, Complex.exp_sum]
@@ -82,25 +116,24 @@ theorem vac_eq (ε : Fin m → Bool) (t c : ℝ) : vac (n := n) ε t c = DG 1 (f
   rw [dg_const, one_mul]
   simp only [vac, gZf]
   congr 1
-  have hsum
-      : (gramB (epsT t ε) true y).trace + (gramB (epsT t ε) false y).trace
-        = ∑ a, ∑ j, ((‖y a j‖ ^ 2 : ℝ) : ℂ) := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [Matrix.trace, Matrix.diag, gramB, Qb, evX, map_sum, Finset.sum_filter]
+  have hsum : (gramB (epsT t ε) true y).trace + (gramB (epsT t ε) false y).trace =
+      ∑ a, ∑ j, ((‖y a j‖ ^ 2 : ℝ) : ℂ) := by
+
+    simp only [Matrix.trace, Matrix.diag, gramB, Qb, evX, map_sum, Finset.sum_filter]
     rw [← Finset.sum_add_distrib, Finset.sum_comm]
     refine Finset.sum_congr rfl fun j _ => ?_
     rw [← Finset.sum_add_distrib]
     refine Finset.sum_congr rfl fun a _ => ?_
     by_cases h : epsT t ε a <;> simp [h, Complex.conj_mul']
-  rw [smul_mul_assoc, one_mul, Matrix.conjTranspose_smul, Matrix.conjTranspose_one, smul_mul_assoc,
-    one_mul, Matrix.trace_smul, Matrix.trace_smul]
+  rw [smul_mul_assoc, one_mul, Matrix.conjTranspose_smul, Matrix.conjTranspose_one,
+    smul_mul_assoc, one_mul, Matrix.trace_smul, Matrix.trace_smul]
   simp only [smul_eq_mul, Complex.star_def, Complex.conj_I]
   linear_combination ((c : ℂ) * ((gramB (epsT t ε) true y).trace + (gramB (epsT t ε) false y).trace)) *
     Complex.I_sq + (-(c : ℂ)) * hsum
 
-theorem levF_diag (e : ℤ) (δ : Fin n → ℝ) (hδ : ∀ j, 0 < δ j) (K : ℂ) (γ : Fin m → Fin n → ℂ)
-    : levF e (diagonal fun j => (δ j : ℂ)) (DG K γ)
-      = DG (K * (∏ j, (δ j : ℂ)) ^ m) (fun a j => γ a j * ((δ j : ℂ) ^ 2)) := by
+theorem levF_diag (e : ℤ) (δ : Fin n → ℝ) (hδ : ∀ j, 0 < δ j) (K : ℂ) (γ : Fin m → Fin n → ℂ) :
+    levF e (diagonal fun j => (δ j : ℂ)) (DG K γ) =
+      DG (K * (∏ j, (δ j : ℂ)) ^ m) (fun a j => γ a j * ((δ j : ℂ) ^ 2)) := by
   funext u
   simp only [levF, DG, Matrix.det_diagonal]
   have hD : (∏ j, (δ j : ℂ)) ≠ 0 :=

@@ -1,6 +1,58 @@
 module
 
-public import Mathlib
+public import Mathlib.NumberTheory.NumberField.Basic
+public import Mathlib.RingTheory.DiscreteValuationRing.Basic
+import Mathlib.Algebra.NoZeroSMulDivisors.Pi
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+public import Mathlib.Algebra.Algebra.Hom.Rat
+public import Mathlib.RingTheory.Discriminant
 
 @[expose] public section
 
@@ -8,11 +60,10 @@ open NumberField Matrix
 
 namespace GlobalTheory.PrimAnnih
 
-theorem exists_unit_coeff
-    {W V ι : Type} [CommRing W] [IsDomain W] [IsDiscreteValuationRing W] [AddCommGroup V]
-    [Module W V] [NoZeroSMulDivisors W V] [Fintype ι]
-    (u : ι → V) (w : ι → W) (hw : w ≠ 0) (h : ∑ i, w i • u i = 0)
-    : ∃ v : ι → W, (∃ i, IsUnit (v i)) ∧ ∑ i, v i • u i = 0 := by
+theorem exists_unit_coeff {W V ι : Type} [CommRing W] [IsDomain W] [IsDiscreteValuationRing W]
+    [AddCommGroup V] [Module W V] [NoZeroSMulDivisors W V] [Fintype ι] (u : ι → V) (w : ι → W)
+    (hw : w ≠ 0) (h : ∑ i, w i • u i = 0) :
+    ∃ v : ι → W, (∃ i, IsUnit (v i)) ∧ ∑ i, v i • u i = 0 := by
   classical
   let I : Ideal W := Ideal.span (Set.range w)
   obtain ⟨c, hc⟩ := (IsPrincipalIdealRing.principal I).principal
@@ -25,17 +76,13 @@ theorem exists_unit_coeff
   obtain ⟨a, ha⟩ := Ideal.mem_span_range_iff_exists_fun.1 hcI
   have hc0 : c ≠ 0 := by
     rintro rfl
-    apply hw
-    funext i
-    rw [hv i, zero_mul]
-    rfl
+    apply hw; funext i; rw [hv i, zero_mul]; rfl
   have hsum : ∑ i, a i * v i = 1 := by
     apply mul_left_cancel₀ hc0
     rw [mul_one, Finset.mul_sum]
     conv_rhs => rw [← ha]
     refine Finset.sum_congr rfl fun i _ => ?_
-    rw [hv i]
-    ring
+    rw [hv i]; ring
   refine ⟨v, ?_, ?_⟩
   · by_contra hnu
     push_neg at hnu
@@ -50,12 +97,10 @@ theorem exists_unit_coeff
       rw [smul_smul, ← hv i]
     exact (smul_eq_zero.1 h2).resolve_left hc0
 
-theorem exists_vecMul_eq_zero
-    {W Ω ι κ : Type}
-    [CommRing W] [IsDomain W] [Field Ω] [Fintype ι] [DecidableEq ι] [Fintype κ] [DecidableEq κ]
-    (f : W →+* Ω) (hf : Function.Injective f)
-    (A : Matrix ι κ W) (x : ι → Ω) (hx : x ≠ 0) (h : x ᵥ* A.map f = 0)
-    : ∃ w : ι → W, w ≠ 0 ∧ w ᵥ* A = 0 := by
+theorem exists_vecMul_eq_zero {W Ω ι κ : Type} [CommRing W] [IsDomain W] [Field Ω] [Fintype ι]
+    [DecidableEq ι] [Fintype κ] [DecidableEq κ] (f : W →+* Ω) (hf : Function.Injective f)
+    (A : Matrix ι κ W) (x : ι → Ω) (hx : x ≠ 0) (h : x ᵥ* A.map f = 0) :
+    ∃ w : ι → W, w ≠ 0 ∧ w ᵥ* A = 0 := by
   classical
   by_contra H
   push_neg at H
@@ -80,7 +125,8 @@ theorem exists_vecMul_eq_zero
       have := congrFun hl' j
       simp only [Matrix.vecMul, dotProduct, Pi.zero_apply] at this ⊢
       simp only [mul_assoc, ← Finset.mul_sum, this, mul_zero, AL]
-    have hw0 : w = 0 := by by_contra hw0; exact H w hw0 h1
+    have hw0 : w = 0 := by
+      by_contra hw0; exact H w hw0 h1
     funext i
     have e1 := hw i
     rw [hw0, Pi.zero_apply, map_zero, Algebra.smul_def] at e1
@@ -94,9 +140,7 @@ theorem exists_vecMul_eq_zero
     simp only [LinearMap.comp_apply, LinearMap.id_apply] at this
     rw [← LinearMap.toMatrix'_mulVec G] at this
     rw [Matrix.mul_apply, Matrix.one_apply,
-      show (if i = j then (1 : L) else 0) = (Pi.single i (1 : L) : ι → L) j by
-        simp [Pi.single_apply, eq_comm],
-      ← this]
+      show (if i = j then (1:L) else 0) = (Pi.single i (1:L) : ι → L) j by simp [Pi.single_apply, eq_comm], ← this]
     simp [Matrix.mulVec, dotProduct, P, mul_comm, Matrix.vecMulLinear_apply]
   have hAf : AL.map g = A.map f := by ext i j; simp [AL, hg]
   have hP' : A.map f * (P.transpose.map g) = 1 := by
@@ -108,27 +152,18 @@ end GlobalTheory.PrimAnnih
 
 namespace GlobalTheory.PrimAnnih
 
-theorem exists_extend (F Ω : Type) [Field F] [NumberField F] [Field Ω] [CharZero Ω] (σ : 𝓞 F →+* Ω)
-    : ∃ σ' : F →ₐ[ℚ] Ω, ∀ a : 𝓞 F, σ' (algebraMap (𝓞 F) F a) = σ a := by
+theorem exists_extend (F Ω : Type) [Field F] [NumberField F] [Field Ω] [CharZero Ω]
+    (σ : 𝓞 F →+* Ω) : ∃ σ' : F →ₐ[ℚ] Ω, ∀ a : 𝓞 F, σ' (algebraMap (𝓞 F) F a) = σ a := by
   have hk : RingHom.ker σ = ⊥ := by
     apply Ideal.eq_bot_of_comap_eq_bot (R := ℤ)
-    rw [Ideal.under_def, RingHom.comap_ker,
-      show σ.comp (algebraMap ℤ (𝓞 F)) = Int.castRingHom Ω from RingHom.ext_int _ _]
+    rw [Ideal.under_def, RingHom.comap_ker, show σ.comp (algebraMap ℤ (𝓞 F)) = Int.castRingHom Ω from
+      RingHom.ext_int _ _]
     exact (RingHom.injective_iff_ker_eq_bot _).1 Int.cast_injective
   have hinj : Function.Injective σ := (RingHom.injective_iff_ker_eq_bot σ).2 hk
-  exact ⟨
-    (IsFractionRing.lift hinj : F →+* Ω).toRatAlgHom,
-    fun a => IsFractionRing.lift_algebraMap hinj a
-  ⟩
+  exact ⟨(IsFractionRing.lift hinj : F →+* Ω).toRatAlgHom,
+    fun a => IsFractionRing.lift_algebraMap hinj a⟩
 
-theorem exists_primitive_annihilator
-    : ∀ (F : Type) [Field F] [NumberField F] (W Ω : Type) [CommRing W] [IsDomain W]
-        [IsDiscreteValuationRing W] [Field Ω] [CharZero Ω] [IsAlgClosed Ω] (f : W →+* Ω),
-      Function.Injective f
-        → ∀ (n : ℕ) (M : 𝓞 F →+* Matrix (Fin n) (Fin n) W) (σ : 𝓞 F →+* Ω),
-          (∀ c : Fin n → Ω, (∀ a, ((M a).map f).mulVec c = σ a • c) → c = 0)
-            → ∀ (ι : Type) [Fintype ι] (b : Module.Basis ι ℤ (𝓞 F)), ∃ w : ι → W,
-              (∃ i, IsUnit (w i)) ∧ ∑ i, w i • M (b i) = 0 := by
+theorem exists_primitive_annihilator : ∀ (F : Type) [Field F] [NumberField F] (W Ω : Type) [CommRing W] [IsDomain W] [IsDiscreteValuationRing W] [Field Ω] [CharZero Ω] [IsAlgClosed Ω] (f : W →+* Ω), Function.Injective f → ∀ (n : ℕ) (M : 𝓞 F →+* Matrix (Fin n) (Fin n) W) (σ : 𝓞 F →+* Ω), (∀ c : Fin n → Ω, (∀ a, ((M a).map f).mulVec c = σ a • c) → c = 0) → ∀ (ι : Type) [Fintype ι] (b : Module.Basis ι ℤ (𝓞 F)), ∃ w : ι → W, (∃ i, IsUnit (w i)) ∧ ∑ i, w i • M (b i) = 0 := by
   intro F _ _ W Ω _ _ _ _ _ _ f hf n M σ hσ ι _ b
   classical
   let b' : Module.Basis ι ℚ F := Module.Basis.localizationLocalization ℚ (nonZeroDivisors ℤ) F b
@@ -164,66 +199,55 @@ theorem exists_primitive_annihilator
   have hΦ : ∀ a, Φ a = (M a).map f := fun a => rfl
   have hcoef : ∀ (a : 𝓞 F) j, ∑ i, x i * (b.repr (a * b i) j : Ω) = σ a * x j := by
     intro a
-    have hrep
-        : ∀ i (τ : F →ₐ[ℚ] Ω),
-          ∑ j, (b.repr (a * b i) j : Ω) * τ (b' j) = τ (algebraMap (𝓞 F) F a) * τ (b' i) := by
+    have hrep : ∀ i (τ : F →ₐ[ℚ] Ω), ∑ j, (b.repr (a * b i) j : Ω) * τ (b' j) =
+        τ (algebraMap (𝓞 F) F a) * τ (b' i) := by
       intro i τ
       have e := congrArg (fun t : 𝓞 F => τ (algebraMap (𝓞 F) F t)) (b.sum_repr (a * b i))
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [map_sum, map_zsmul, map_mul, zsmul_eq_mul] at e
+
+      simp only [map_sum, map_zsmul, map_mul, zsmul_eq_mul] at e
       simpa [hb'] using e
-    have :=
-      inj
-        (fun j => ∑ i, x i * (b.repr (a * b i) j : Ω) - σ a * x j)
-        (fun τ => by
-          have key
-              : ∑ j, (∑ i, x i * (b.repr (a * b i) j : Ω)) * τ (b' j)
-                = τ (algebraMap (𝓞 F) F a) * ∑ i, x i * τ (b' i) := by
-            calc
-              ∑ j, (∑ i, x i * (b.repr (a * b i) j : Ω)) * τ (b' j)
-                  = ∑ j, ∑ i, x i * ((b.repr (a * b i) j : Ω) * τ (b' j)) := by
-                simp only [Finset.sum_mul, mul_assoc]
-              _ = ∑ i, x i * ∑ j, (b.repr (a * b i) j : Ω) * τ (b' j) := by
-                rw [Finset.sum_comm]; simp only [Finset.mul_sum]
-              _ = ∑ i, x i * (τ (algebraMap (𝓞 F) F a) * τ (b' i)) := by simp only [hrep]
-              _ = τ (algebraMap (𝓞 F) F a) * ∑ i, x i * τ (b' i) := by
-                rw [Finset.mul_sum]; exact Finset.sum_congr rfl fun i _ => by ring
-          have e2
-              : ∑ j, (∑ i, x i * (b.repr (a * b i) j : Ω) - σ a * x j) * τ (b' j)
-                = ∑ j, (∑ i, x i * (b.repr (a * b i) j : Ω)) * τ (b' j)
-                  - σ a * ∑ j, x j * τ (b' j) := by
-            simp only [sub_mul, Finset.sum_sub_distrib, Finset.mul_sum, mul_assoc]
-          rw [e2, key, hx]
-          split_ifs with hτ
-          · subst hτ; rw [hσ']; ring
-          · ring)
+    have := inj (fun j => ∑ i, x i * (b.repr (a * b i) j : Ω) - σ a * x j) (fun τ => by
+      have key : ∑ j, (∑ i, x i * (b.repr (a * b i) j : Ω)) * τ (b' j) =
+          τ (algebraMap (𝓞 F) F a) * ∑ i, x i * τ (b' i) := by
+        calc ∑ j, (∑ i, x i * (b.repr (a * b i) j : Ω)) * τ (b' j)
+            = ∑ j, ∑ i, x i * ((b.repr (a * b i) j : Ω) * τ (b' j)) := by
+              simp only [Finset.sum_mul, mul_assoc]
+          _ = ∑ i, x i * ∑ j, (b.repr (a * b i) j : Ω) * τ (b' j) := by
+              rw [Finset.sum_comm]; simp only [Finset.mul_sum]
+          _ = ∑ i, x i * (τ (algebraMap (𝓞 F) F a) * τ (b' i)) := by simp only [hrep]
+          _ = τ (algebraMap (𝓞 F) F a) * ∑ i, x i * τ (b' i) := by
+              rw [Finset.mul_sum]; exact Finset.sum_congr rfl fun i _ => by ring
+      have e2 : ∑ j, (∑ i, x i * (b.repr (a * b i) j : Ω) - σ a * x j) * τ (b' j) =
+          ∑ j, (∑ i, x i * (b.repr (a * b i) j : Ω)) * τ (b' j) -
+            σ a * ∑ j, x j * τ (b' j) := by
+        simp only [sub_mul, Finset.sum_sub_distrib, Finset.mul_sum, mul_assoc]
+      rw [e2, key, hx]
+      split_ifs with hτ
+      · subst hτ; rw [hσ']; ring
+      · ring)
     intro j
     exact sub_eq_zero.1 (congrFun this j)
   let N : Matrix (Fin n) (Fin n) Ω := ∑ i, x i • Φ (b i)
   have hN : ∀ a, Φ a * N = σ a • N := by
     intro a
-    calc
-      Φ a * N
-        = ∑ i, x i • Φ (a * b i) := by simp only [N, Finset.mul_sum, Matrix.mul_smul, map_mul]
+    calc Φ a * N = ∑ i, x i • Φ (a * b i) := by
+          simp only [N, Finset.mul_sum, Matrix.mul_smul, map_mul]
       _ = ∑ i, x i • ∑ j, (b.repr (a * b i) j : Ω) • Φ (b j) := by
-        refine Finset.sum_congr rfl fun i _ => ?_
-        conv_lhs => rw [← b.sum_repr (a * b i)]
-        set_option synthInstance.maxHeartbeats 100000 in
-        simp only [map_sum, map_zsmul, Int.cast_smul_eq_zsmul]
+          refine Finset.sum_congr rfl fun i _ => ?_
+          conv_lhs => rw [← b.sum_repr (a * b i)]
+
+          simp only [map_sum, map_zsmul, Int.cast_smul_eq_zsmul]
       _ = ∑ j, (∑ i, x i * (b.repr (a * b i) j : Ω)) • Φ (b j) := by
-        simp only [Finset.smul_sum, smul_smul, Finset.sum_smul]
-        rw [Finset.sum_comm]
+          simp only [Finset.smul_sum, smul_smul, Finset.sum_smul]
+          rw [Finset.sum_comm]
       _ = ∑ j, (σ a * x j) • Φ (b j) := by simp only [hcoef]
       _ = σ a • N := by simp only [N, Finset.smul_sum, smul_smul]
   have hN0 : N = 0 := by
     ext j k
-    have :=
-      hσ
-        (fun j => N j k)
-        (fun a => by
-          funext r
-          have e := congrFun (congrFun (hN a) r) k
-          simpa [Matrix.mulVec, dotProduct, Matrix.mul_apply, hΦ] using e)
+    have := hσ (fun j => N j k) (fun a => by
+      funext r
+      have e := congrFun (congrFun (hN a) r) k
+      simpa [Matrix.mulVec, dotProduct, Matrix.mul_apply, hΦ] using e)
     simpa using congrFun this j
   let A : Matrix ι (Fin n × Fin n) W := Matrix.of fun i p => M (b i) p.1 p.2
   have hx0 : x ≠ 0 := by

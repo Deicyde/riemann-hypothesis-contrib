@@ -1,6 +1,49 @@
 module
 
 public import Formalism.SharpRestriction.LevelLetterCocycles.CoordStepsOf
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+public import Mathlib.RingTheory.PowerSeries.Inverse
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
+import Formalism.DistinguishedUnitIdeals.ExistsConstOfInvariantMod
 
 @[expose] public section
 
@@ -73,8 +116,8 @@ theorem isUnit_of_unit_coefficient
     ⟨_, rfl⟩
   have hcL : ∀ d, PowerSeries.coeff d Lp = if d < k₀ then PowerSeries.coeff d (a i) else 0 := by
     intro d
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [hLp, map_sum, PowerSeries.coeff_C_mul_X_pow]
+
+    simp only [hLp, map_sum, PowerSeries.coeff_C_mul_X_pow]
     rw [Finset.sum_ite_eq]
     simp only [Finset.mem_range]
   have hdvd : (PowerSeries.X : PowerSeries O) ^ k₀ ∣ a i - Lp := by
@@ -161,8 +204,8 @@ theorem isUnit_of_unit_coefficient
     exact Ideal.mul_mem_left _ _ ha
   have hunit : IsUnit (x * algebraMap (LetA O n) W.EE (letπ ^ m) + (1 - k17e W i)) := by
     apply isUnit_of_isUnit_mod_l
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hq, hdec, map_add (f := _), map_add (f := _), map_sum, map_sum]
+
+    rw [hq, hdec, map_add (f := _), map_add (f := _), map_sum, map_sum]
     exact (isNilpotent_sum hnil).isUnit_add_right_of_commute (hγ.map _) (Commute.all _ _)
   have hprod
       : (x + (1 - k17e W i)) * (k17e W i * algebraMap (LetA O n) W.EE (letπ ^ m) + (1 - k17e W i))

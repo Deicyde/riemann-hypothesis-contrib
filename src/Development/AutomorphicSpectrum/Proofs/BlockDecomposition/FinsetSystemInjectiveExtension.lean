@@ -1,8 +1,49 @@
 module
 
-public import Mathlib
-public import Development.WeilBound.CoreStatements.PadicHodgeComparison.HodgeSurjectivity.NLeA
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.AlgebraMapConeRing
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
@@ -14,21 +55,20 @@ open CrystallineSemistableComparison.Onto GlobalTheory.CompanionTheory.Surjectio
 section Tuples
 variable {ι : Type}
 
-theorem cons_comp_zero {n : ℕ} (a : ι) (i : Fin (n + 1) → ι)
-    : (Fin.cons a i : Fin (n + 2) → ι) ∘ (0 : Fin (n + 2)).succAbove = i := by
+theorem cons_comp_zero {n : ℕ} (a : ι) (i : Fin (n + 1) → ι) :
+    (Fin.cons a i : Fin (n + 2) → ι) ∘ (0 : Fin (n + 2)).succAbove = i := by
   funext k
   simp [Fin.succAbove_zero]
 
-theorem cons_comp_succ {n : ℕ} (a : ι) (i : Fin (n + 1) → ι) (k : Fin (n + 1))
-    : (Fin.cons a i : Fin (n + 2) → ι) ∘ k.succ.succAbove = Fin.cons a (i ∘ k.succAbove) := by
+theorem cons_comp_succ {n : ℕ} (a : ι) (i : Fin (n + 1) → ι) (k : Fin (n + 1)) :
+    (Fin.cons a i : Fin (n + 2) → ι) ∘ k.succ.succAbove = Fin.cons a (i ∘ k.succAbove) := by
   funext t
   cases t using Fin.cases with
   | zero => simp only [Function.comp_apply, Fin.succ_succAbove_zero, Fin.cons_zero]
   | succ t => simp only [Function.comp_apply, Fin.succ_succAbove_succ, Fin.cons_succ]
 
-theorem mem_ent_cons
-    [DecidableEq ι] {n : ℕ} {a x : ι} {i : Fin n → ι} (h : x ∈ ent (Fin.cons a i : Fin (n + 1) → ι))
-    : x = a ∨ x ∈ ent i := by
+theorem mem_ent_cons [DecidableEq ι] {n : ℕ} {a x : ι} {i : Fin n → ι}
+    (h : x ∈ ent (Fin.cons a i : Fin (n + 1) → ι)) : x = a ∨ x ∈ ent i := by
   simp only [ent, Finset.mem_image, Finset.mem_univ, true_and] at h ⊢
   obtain ⟨k, rfl⟩ := h
   cases k using Fin.cases with
@@ -42,16 +82,13 @@ theorem mem_ent_cons
 end Tuples
 
 section Coordinates
-variable
-  {K : Type} [CommRing K]
-  {ι : Type} [DecidableEq ι] [Fintype ι]
-  {W : Type} [AddCommGroup W] [Module K W]
-  {Λ : Type} (b : Module.Basis Λ K W) (good' : Λ → Prop) (T : Λ → Finset ι)
+variable {K : Type} [CommRing K] {ι : Type} [DecidableEq ι] [Fintype ι] {W : Type} [AddCommGroup W] [Module K W] {Λ : Type}
+  (b : Module.Basis Λ K W) (good' : Λ → Prop) (T : Λ → Finset ι)
 
 def Sup (S : Finset ι) (w : W) : Prop := ∀ l, b.repr w l ≠ 0 → good' l ∧ T l ⊆ S
 
-theorem mem_span_iff (S : Finset ι) (w : W)
-    : w ∈ Submodule.span K (b '' {l | good' l ∧ T l ⊆ S}) ↔ Sup b good' T S w := by
+theorem mem_span_iff (S : Finset ι) (w : W) :
+    w ∈ Submodule.span K (b '' {l | good' l ∧ T l ⊆ S}) ↔ Sup b good' T S w := by
   rw [Module.Basis.mem_span_image]
   constructor
   · intro h l hl
@@ -60,20 +97,18 @@ theorem mem_span_iff (S : Finset ι) (w : W)
     rw [Finset.mem_coe, Finsupp.mem_support_iff] at hl
     exact h l hl
 
-theorem coord_sum {n : ℕ} (D : Fin n → W) (l : Λ)
-    : b.repr (∑ k : Fin n, (-1 : ℤ) ^ (k : ℕ) • D k) l
-      = ∑ k : Fin n, (-1 : ℤ) ^ (k : ℕ) • b.repr (D k) l := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum, Finsupp.coe_finsetSum, Finset.sum_apply]
+theorem coord_sum {n : ℕ} (D : Fin n → W) (l : Λ) :
+    b.repr (∑ k : Fin n, (-1 : ℤ) ^ (k : ℕ) • D k) l = ∑ k : Fin n, (-1 : ℤ) ^ (k : ℕ) • b.repr (D k) l := by
+
+  rw [map_sum, Finsupp.coe_finsetSum, Finset.sum_apply]
   refine Finset.sum_congr rfl fun k _ => ?_
   rw [map_zsmul, Finsupp.smul_apply]
 
+
 open Classical in
 def contr {n : ℕ} (C : (Fin (n + 1) → ι) → W) (a : ∀ l, good' l → ι) (i : Fin n → ι) : W :=
-  b.repr.symm (Finsupp.onFinset
-    (Finset.univ.biUnion fun a' : ι => (b.repr (C (Fin.cons a' i))).support)
-    (fun l => if h : good' l then b.repr (C (Fin.cons (a l h) i)) l else 0)
-    (by
+  b.repr.symm (Finsupp.onFinset (Finset.univ.biUnion fun a' : ι => (b.repr (C (Fin.cons a' i))).support)
+    (fun l => if h : good' l then b.repr (C (Fin.cons (a l h) i)) l else 0) (by
       intro l hl
       by_cases h : good' l
       · rw [dif_pos h] at hl
@@ -82,18 +117,14 @@ def contr {n : ℕ} (C : (Fin (n + 1) → ι) → W) (a : ∀ l, good' l → ι)
         exact absurd rfl hl))
 
 open Classical in
-theorem contr_apply
-    {n : ℕ} (C : (Fin (n + 1) → ι) → W) (a : ∀ l, good' l → ι) (i : Fin n → ι) (l : Λ)
-    : b.repr (contr b good' C a i) l
-      = if h : good' l then b.repr (C (Fin.cons (a l h) i)) l else 0 := by
+theorem contr_apply {n : ℕ} (C : (Fin (n + 1) → ι) → W) (a : ∀ l, good' l → ι) (i : Fin n → ι) (l : Λ) :
+    b.repr (contr b good' C a i) l = if h : good' l then b.repr (C (Fin.cons (a l h) i)) l else 0 := by
   unfold contr
   rw [LinearEquiv.apply_symm_apply, Finsupp.onFinset_apply]
 
-theorem contr_sup
-    {n : ℕ} (C : (Fin (n + 1) → ι) → W) (hC : ∀ i, Sup b good' T (ent i) (C i))
-    (a : ∀ l, good' l → ι) (ha : ∀ l h, a l h ∉ T l)
-    (i : Fin n → ι)
-    : Sup b good' T (ent i) (contr b good' C a i) := by
+theorem contr_sup {n : ℕ} (C : (Fin (n + 1) → ι) → W) (hC : ∀ i, Sup b good' T (ent i) (C i))
+    (a : ∀ l, good' l → ι) (ha : ∀ l h, a l h ∉ T l) (i : Fin n → ι) :
+    Sup b good' T (ent i) (contr b good' C a i) := by
   intro l hl
   rw [contr_apply] at hl
   by_cases h : good' l
@@ -106,11 +137,10 @@ theorem contr_sup
   · rw [dif_neg h] at hl
     exact absurd rfl hl
 
-theorem homotopy
-    {n : ℕ} (C : (Fin (n + 1) → ι) → W) (hC : ∀ i, Sup b good' T (ent i) (C i))
+theorem homotopy {n : ℕ} (C : (Fin (n + 1) → ι) → W) (hC : ∀ i, Sup b good' T (ent i) (C i))
     (hZ : ∀ i : Fin (n + 2) → ι, ∑ k : Fin (n + 2), (-1 : ℤ) ^ (k : ℕ) • C (i ∘ k.succAbove) = 0)
-    (a : ∀ l, good' l → ι) (i : Fin (n + 1) → ι)
-    : ∑ k : Fin (n + 1), (-1 : ℤ) ^ (k : ℕ) • contr b good' C a (i ∘ k.succAbove) = C i := by
+    (a : ∀ l, good' l → ι) (i : Fin (n + 1) → ι) :
+    ∑ k : Fin (n + 1), (-1 : ℤ) ^ (k : ℕ) • contr b good' C a (i ∘ k.succAbove) = C i := by
   apply b.repr.injective
   ext l
   rw [coord_sum]
@@ -119,12 +149,11 @@ theorem homotopy
   · simp only [dif_pos h]
     have hz := congrArg (fun w => b.repr w l) (hZ (Fin.cons (a l h) i))
     rw [Fin.sum_univ_succ] at hz
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [Fin.val_zero, pow_zero, one_smul, cons_comp_zero, Fin.val_succ, cons_comp_succ,
-          map_add, map_sum, map_zsmul, Finsupp.add_apply, Finsupp.coe_finsetSum, Finset.sum_apply,
-          Finsupp.smul_apply, map_zero, Finsupp.coe_zero, Pi.zero_apply, pow_succ, mul_neg, mul_one,
-          neg_smul, Finset.sum_neg_distrib, map_neg, Finsupp.coe_neg, Pi.neg_apply]
-        at hz
+
+    simp only [Fin.val_zero, pow_zero, one_smul, cons_comp_zero, Fin.val_succ, cons_comp_succ,
+    map_add, map_sum, map_zsmul, Finsupp.add_apply, Finsupp.coe_finsetSum, Finset.sum_apply,
+    Finsupp.smul_apply, map_zero, Finsupp.coe_zero, Pi.zero_apply, pow_succ, mul_neg, mul_one,
+    neg_smul, Finset.sum_neg_distrib, map_neg, Finsupp.coe_neg, Pi.neg_apply] at hz
     rw [← sub_eq_add_neg, sub_eq_zero] at hz
     exact hz.symm
   · simp only [dif_neg h, smul_zero, Finset.sum_const_zero]
@@ -135,28 +164,20 @@ end Coordinates
 
 section Main
 
-theorem j_dZ
-    {ι : Type} [DecidableEq ι]
-    {W : Type} [AddCommGroup W]
-    (M : Finset ι → Type) [∀ S, AddCommGroup (M S)]
+theorem j_dZ {ι : Type} [DecidableEq ι] {W : Type} [AddCommGroup W] (M : Finset ι → Type) [∀ S, AddCommGroup (M S)]
     (r : ∀ {S S' : Finset ι}, S ⊆ S' → M S → M S') (j : ∀ S, M S →+ W)
-    (hr : ∀ {S S' : Finset ι} (h : S ⊆ S') x, j S' (r h x) = j S x)
-    (m : ℕ) (c : ∀ i : Fin (m + 1) → ι, M (ent i)) (i : Fin (m + 2) → ι)
-    : j (ent i) (dZ M r m c i)
-      = ∑ k : Fin (m + 2), (-1 : ℤ) ^ (k : ℕ) • j _ (c (i ∘ k.succAbove)) := by
-  set_option synthInstance.maxHeartbeats 100000 in
+    (hr : ∀ {S S' : Finset ι} (h : S ⊆ S') x, j S' (r h x) = j S x) (m : ℕ)
+    (c : ∀ i : Fin (m + 1) → ι, M (ent i)) (i : Fin (m + 2) → ι) :
+    j (ent i) (dZ M r m c i) = ∑ k : Fin (m + 2), (-1 : ℤ) ^ (k : ℕ) • j _ (c (i ∘ k.succAbove)) := by
+
   simp only [dZ, map_sum, map_zsmul, hr]
 
-theorem exP_of_basis
-    : ∀ {K : Type} [CommRing K] {ι : Type} [DecidableEq ι] [Fintype ι] {W : Type} [AddCommGroup W]
-        [Module K W] {Λ : Type} (b : Module.Basis Λ K W) (good' : Λ → Prop) (T : Λ → Finset ι),
-      (∀ l, good' l → T l ≠ Finset.univ)
-        → ∀ (M : Finset ι → Type) [∀ S, AddCommGroup (M S)]
-            (r : ∀ {S S' : Finset ι}, S ⊆ S' → M S → M S') (j : ∀ S, M S →+ W),
-          (∀ S, Function.Injective (j S))
-            → (∀ {S S' : Finset ι} (h : S ⊆ S') x, j S' (r h x) = j S x)
-            → (∀ S w, (∃ x, j S x = w) ↔ w ∈ Submodule.span K (b '' {l | good' l ∧ T l ⊆ S}))
-            → ExP M r := by
+theorem exP_of_basis : ∀ {K : Type} [CommRing K] {ι : Type} [DecidableEq ι] [Fintype ι] {W : Type} [AddCommGroup W]
+    [Module K W] {Λ : Type} (b : Module.Basis Λ K W) (good' : Λ → Prop) (T : Λ → Finset ι),
+    (∀ l, good' l → T l ≠ Finset.univ) → ∀ (M : Finset ι → Type) [∀ S, AddCommGroup (M S)]
+    (r : ∀ {S S' : Finset ι}, S ⊆ S' → M S → M S') (j : ∀ S, M S →+ W), (∀ S, Function.Injective (j S)) →
+    (∀ {S S' : Finset ι} (h : S ⊆ S') x, j S' (r h x) = j S x) →
+    (∀ S w, (∃ x, j S x = w) ↔ w ∈ Submodule.span K (b '' {l | good' l ∧ T l ⊆ S})) → ExP M r := by
   intro K _ ι _ _ W _ _ Λ b good' T hT M _ r j hj hr hspan
   have hout : ∀ l, good' l → ∃ y, y ∉ T l := by
     intro l hl
@@ -181,13 +202,11 @@ theorem exP_of_basis
       rw [← h0] at hne
       exact hne (by rw [map_zero, Finsupp.coe_zero, Pi.zero_apply])
     exact hj ∅ (hw.trans (map_zero (j ∅)).symm)
-  · have hZ
-        : ∀ i : Fin (0 + 2) → ι,
-          ∑ k : Fin (0 + 2), (-1 : ℤ) ^ (k : ℕ) • j _ (c (i ∘ k.succAbove)) = 0 := by
+  · have hZ : ∀ i : Fin (0 + 2) → ι,
+        ∑ k : Fin (0 + 2), (-1 : ℤ) ^ (k : ℕ) • j _ (c (i ∘ k.succAbove)) = 0 := by
       intro i
       rw [← j_dZ M r j hr 0 c i, hc, Pi.zero_apply, map_zero]
-    have hCs : ∀ i : Fin (0 + 1) → ι, Sup b good' T (ent i) (j (ent i) (c i)) := fun i =>
-      hsup _ (c i)
+    have hCs : ∀ i : Fin (0 + 1) → ι, Sup b good' T (ent i) (j (ent i) (c i)) := fun i => hsup _ (c i)
     have hw := contr_sup b good' T (fun i : Fin (0 + 1) → ι => j (ent i) (c i)) hCs a ha Fin.elim0
     have he : ent (Fin.elim0 : Fin 0 → ι) = ∅ := by simp [ent]
     rw [he] at hw
@@ -196,19 +215,17 @@ theorem exP_of_basis
     rw [hr, hx]
     have hh := homotopy b good' T (fun i : Fin (0 + 1) → ι => j (ent i) (c i)) hCs hZ a i
     rw [Fin.sum_univ_succ] at hh
-    simp only [Finset.univ_eq_empty, Finset.sum_empty, add_zero, Fin.val_zero, pow_zero, one_smul]
-      at hh
+    simp only [Finset.univ_eq_empty, Finset.sum_empty, add_zero, Fin.val_zero, pow_zero,
+      one_smul] at hh
     convert hh using 2
-  · have hZ
-        : ∀ i : Fin (m + 1 + 2) → ι,
-          ∑ k : Fin (m + 1 + 2), (-1 : ℤ) ^ (k : ℕ) • j _ (c (i ∘ k.succAbove)) = 0 := by
+  · have hZ : ∀ i : Fin (m + 1 + 2) → ι,
+        ∑ k : Fin (m + 1 + 2), (-1 : ℤ) ^ (k : ℕ) • j _ (c (i ∘ k.succAbove)) = 0 := by
       intro i
       rw [← j_dZ M r j hr (m + 1) c i, hc, Pi.zero_apply, map_zero]
-    have hCs : ∀ i : Fin (m + 1 + 1) → ι, Sup b good' T (ent i) (j (ent i) (c i)) := fun i =>
-      hsup _ (c i)
-    have hb
-        : ∀ i' : Fin (m + 1) → ι, ∃ x : M (ent i'),
-          j (ent i') x = contr b good' (fun i : Fin (m + 1 + 1) → ι => j (ent i) (c i)) a i' :=
+    have hCs : ∀ i : Fin (m + 1 + 1) → ι, Sup b good' T (ent i) (j (ent i) (c i)) :=
+      fun i => hsup _ (c i)
+    have hb : ∀ i' : Fin (m + 1) → ι, ∃ x : M (ent i'),
+        j (ent i') x = contr b good' (fun i : Fin (m + 1 + 1) → ι => j (ent i) (c i)) a i' :=
       fun i' => hlift _ _ (contr_sup b good' T _ hCs a ha i')
     choose b' hb' using hb
     refine ⟨b', funext fun i => hj _ ?_⟩

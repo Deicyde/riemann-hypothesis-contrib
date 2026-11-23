@@ -1,7 +1,51 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Definitions.ExistenceOfLattices.Hat1
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -23,14 +67,13 @@ def adCoord (e : Module.Basis (Fin n) E (Fin n → E)) (b : Fin n) : (Fin n → 
 open NumberField IsDedekindDomain in
 open scoped TensorProduct Matrix nonZeroDivisors in
 variable (F : Type) {E : Type} [Field F] [NumberField F] [Field E] [Algebra F E] {n : ℕ} in
-theorem _root_.GlobalTheory.AdLat.adCoord_tmul
-    (e : Module.Basis (Fin n) E (Fin n → E)) (b : Fin n) (a : FiniteAdeleRing (𝓞 F) F)
-    (x : Fin n → E)
-    : _root_.GlobalTheory.AdLat.adCoord F e b (fun i => a ⊗ₜ x i) = a ⊗ₜ e.repr x b := by
+theorem _root_.GlobalTheory.AdLat.adCoord_tmul (e : Module.Basis (Fin n) E (Fin n → E)) (b : Fin n)
+    (a : FiniteAdeleRing (𝓞 F) F) (x : Fin n → E) :
+    _root_.GlobalTheory.AdLat.adCoord F e b (fun i => a ⊗ₜ x i) = a ⊗ₜ e.repr x b := by
   have hx : e.repr x b = ∑ i, x i * e.repr (Pi.single i 1) b := by
     conv_lhs => rw [← Finset.univ_sum_single x]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, Finsupp.coe_finsetSum, Finset.sum_apply]
+
+    simp only [map_sum, Finsupp.coe_finsetSum, Finset.sum_apply]
     refine Finset.sum_congr rfl fun i _ => ?_
     rw [show Pi.single i (x i) = x i • (Pi.single i 1 : Fin n → E) by
         ext j; by_cases h : j = i <;> simp [Pi.single_apply, h],
@@ -41,56 +84,40 @@ theorem _root_.GlobalTheory.AdLat.adCoord_tmul
 open NumberField IsDedekindDomain in
 open scoped TensorProduct Matrix nonZeroDivisors in
 variable (F : Type) {E : Type} [Field F] [NumberField F] [Field E] [Algebra F E] {n : ℕ} in
-theorem _root_.GlobalTheory.AdLat.adCoord_smul
-    (e : Module.Basis (Fin n) E (Fin n → E)) (b : Fin n) (r : _root_.GlobalTheory.AdLat.RA F E)
-    (w : Fin n → _root_.GlobalTheory.AdLat.RA F E)
-    : _root_.GlobalTheory.AdLat.adCoord F e b (r • w)
-      = r * _root_.GlobalTheory.AdLat.adCoord F e b w := by
+theorem _root_.GlobalTheory.AdLat.adCoord_smul (e : Module.Basis (Fin n) E (Fin n → E)) (b : Fin n)
+    (r : _root_.GlobalTheory.AdLat.RA F E) (w : Fin n → _root_.GlobalTheory.AdLat.RA F E) :
+    _root_.GlobalTheory.AdLat.adCoord F e b (r • w) = r * _root_.GlobalTheory.AdLat.adCoord F e b w := by
   change ∑ i, (r • w) i * _ = r * ∑ i, w i * _
   simp [Finset.mul_sum, mul_assoc]
 
 open NumberField IsDedekindDomain in
 open scoped TensorProduct Matrix nonZeroDivisors in
 variable (F : Type) {E : Type} [Field F] [NumberField F] [Field E] [Algebra F E] {n : ℕ} in
-theorem _root_.GlobalTheory.AdLat.adCoord_sum
-    (e : Module.Basis (Fin n) E (Fin n → E)) (z : Fin n → _root_.GlobalTheory.AdLat.RA F E)
-    (b : Fin n)
-    : _root_.GlobalTheory.AdLat.adCoord F e b (∑ a, z a • _root_.GlobalTheory.AdLat.fv F (e a))
-      = z b := by
-  have h1
-      : ∀ a,
-        _root_.GlobalTheory.AdLat.adCoord F e b (_root_.GlobalTheory.AdLat.fv F (e a))
-          = if a = b then 1 else 0 := by
+theorem _root_.GlobalTheory.AdLat.adCoord_sum (e : Module.Basis (Fin n) E (Fin n → E))
+    (z : Fin n → _root_.GlobalTheory.AdLat.RA F E) (b : Fin n) :
+    _root_.GlobalTheory.AdLat.adCoord F e b (∑ a, z a • _root_.GlobalTheory.AdLat.fv F (e a)) = z b := by
+  have h1 : ∀ a, _root_.GlobalTheory.AdLat.adCoord F e b (_root_.GlobalTheory.AdLat.fv F (e a)) =
+      if a = b then 1 else 0 := by
     intro a
     have := _root_.GlobalTheory.AdLat.adCoord_tmul F e b 1 (e a)
     unfold _root_.GlobalTheory.AdLat.fv
     rw [this, Module.Basis.repr_self, Finsupp.single_apply]
     split_ifs <;> simp [Algebra.TensorProduct.one_def]
-  set_option synthInstance.maxHeartbeats 100000 in
+
   simp only [map_sum, _root_.GlobalTheory.AdLat.adCoord_smul, h1, mul_ite, mul_one, mul_zero,
-    Finset.sum_ite_eq', Finset.mem_univ, if_true]
+  Finset.sum_ite_eq', Finset.mem_univ, if_true]
 
 end
 
 open NumberField IsDedekindDomain in
 open scoped TensorProduct Matrix nonZeroDivisors in
-theorem _root_.GlobalTheory.AdLat.mem_hat_pseudoBasis_iff
-    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (n : ℕ)
-        (L : Submodule (𝓞 E) (Fin n → E)) (e : Module.Basis (Fin n) E (Fin n → E))
-        (cI : Fin n → FractionalIdeal (𝓞 E)⁰ E),
-      (∀ v, v ∈ L ↔ ∀ a, e.repr v a ∈ cI a)
-        → ∀ z : Fin n → _root_.GlobalTheory.AdLat.RA F E,
-          (∑ a, z a • _root_.GlobalTheory.AdLat.fv F (e a))
-              ∈ (_root_.GlobalTheory.AdLat.hat F (L : Set (Fin n → E)))
-            ↔ ∀ a, z a ∈ _root_.GlobalTheory.AdLat.hat1 F (cI a : Set E) := by
+theorem _root_.GlobalTheory.AdLat.mem_hat_pseudoBasis_iff : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (n : ℕ) (L : Submodule (𝓞 E) (Fin n → E)) (e : Module.Basis (Fin n) E (Fin n → E)) (cI : Fin n → FractionalIdeal (𝓞 E)⁰ E), (∀ v, v ∈ L ↔ ∀ a, e.repr v a ∈ cI a) → ∀ z : Fin n → _root_.GlobalTheory.AdLat.RA F E, (∑ a, z a • _root_.GlobalTheory.AdLat.fv F (e a)) ∈ (_root_.GlobalTheory.AdLat.hat F (L : Set (Fin n → E))) ↔ ∀ a, z a ∈ _root_.GlobalTheory.AdLat.hat1 F (cI a : Set E) := by
   intro F E _ _ _ _ _ n L e cI hL z
   constructor
   · intro hz b
     rw [← _root_.GlobalTheory.AdLat.adCoord_sum F e z b]
-    have key
-        : _root_.GlobalTheory.AdLat.hat F (L : Set (Fin n → E))
-          ≤ (_root_.GlobalTheory.AdLat.hat1 F (cI b : Set E)).comap
-            (_root_.GlobalTheory.AdLat.adCoord F e b) := by
+    have key : _root_.GlobalTheory.AdLat.hat F (L : Set (Fin n → E)) ≤
+        (_root_.GlobalTheory.AdLat.hat1 F (cI b : Set E)).comap (_root_.GlobalTheory.AdLat.adCoord F e b) := by
       unfold _root_.GlobalTheory.AdLat.hat
       rw [AddSubgroup.closure_le]
       rintro _ ⟨c, hc, x, hx, rfl⟩
@@ -101,17 +128,15 @@ theorem _root_.GlobalTheory.AdLat.mem_hat_pseudoBasis_iff
     exact key hz
   · intro hz
     refine AddSubgroup.sum_mem _ fun a _ => ?_
-    have key
-        : _root_.GlobalTheory.AdLat.hat1 F (cI a : Set E)
-          ≤ (_root_.GlobalTheory.AdLat.hat F (L : Set (Fin n → E))).comap
-            ((smulAddHom (_root_.GlobalTheory.AdLat.RA F E)
-                (Fin n → _root_.GlobalTheory.AdLat.RA F E)).flip
-              (_root_.GlobalTheory.AdLat.fv F (e a))) := by
+    have key : _root_.GlobalTheory.AdLat.hat1 F (cI a : Set E) ≤
+        (_root_.GlobalTheory.AdLat.hat F (L : Set (Fin n → E))).comap
+          ((smulAddHom (_root_.GlobalTheory.AdLat.RA F E)
+            (Fin n → _root_.GlobalTheory.AdLat.RA F E)).flip (_root_.GlobalTheory.AdLat.fv F (e a))) := by
       unfold _root_.GlobalTheory.AdLat.hat1
       rw [AddSubgroup.closure_le]
       rintro _ ⟨c, hc, y, hy, rfl⟩
-      simp only [AddSubgroup.coe_comap, Set.mem_preimage, SetLike.mem_coe, AddMonoidHom.flip_apply,
-        smulAddHom_apply]
+      simp only [AddSubgroup.coe_comap, Set.mem_preimage, SetLike.mem_coe,
+        AddMonoidHom.flip_apply, smulAddHom_apply]
       have hmem : y • e a ∈ L := by
         rw [hL]
         intro a'

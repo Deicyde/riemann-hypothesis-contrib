@@ -1,7 +1,52 @@
 module
 
-public import Mathlib
 public import GroundTheory.HeightsAndTheta.Heights.KleimanAmpleness.ImportsTerFurther
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
@@ -20,18 +65,16 @@ variable {S : Type} [CommRing S] {K : Type} [Fintype K] {ι : K → Type}
 
 abbrev blockDeg (e : (Σ k, ι k) →₀ ℕ) : K →₀ ℕ := e.mapDomain Sigma.fst
 
-theorem prod_block_pow {R : Type} [CommMonoid R] (e : (Σ k, ι k) →₀ ℕ) (v : K → R)
-    : (e.prod fun p n => v p.1 ^ n) = ∏ k, v k ^ blockDeg e k := by
-  have h :=
-    Finsupp.prod_mapDomain_index (f := Sigma.fst) (s := e)
-      (h := fun k n => v k ^ n)
-      (fun _ => pow_zero _)
-      (fun _ _ _ => pow_add _ _ _)
+theorem prod_block_pow {R : Type} [CommMonoid R] (e : (Σ k, ι k) →₀ ℕ) (v : K → R) :
+    (e.prod fun p n => v p.1 ^ n) = ∏ k, v k ^ blockDeg e k := by
+  have h := Finsupp.prod_mapDomain_index (f := Sigma.fst) (s := e) (h := fun k n => v k ^ n)
+    (fun _ => pow_zero _) (fun _ _ _ => pow_add _ _ _)
   exact h.symm.trans (Finsupp.prod_fintype _ _ (fun _ => pow_zero _))
 
+
 omit [Fintype K] in
-theorem blockDeg_le_totalDegree (g : MvPolynomial (Σ k, ι k) S)
-    : ∀ e ∈ g.support, ∀ k, blockDeg e k ≤ g.totalDegree := by
+theorem blockDeg_le_totalDegree (g : MvPolynomial (Σ k, ι k) S) :
+    ∀ e ∈ g.support, ∀ k, blockDeg e k ≤ g.totalDegree := by
   intro e he k
   refine le_trans ?_ (le_totalDegree he)
   rw [← Finsupp.sum_mapDomain_index (h := fun _ n => n) (fun _ => rfl) (fun _ _ _ => rfl)]
@@ -44,48 +87,41 @@ def homog (c : ∀ k, ι k) (D : ℕ) (g : MvPolynomial (Σ k, ι k) S) : MvPoly
 
 variable {Ω : Type} [Field Ω] [Algebra S Ω]
 
-theorem mConeMapOver_monomial (y : (Σ k, ι k) → Ω) (e : (Σ k, ι k) →₀ ℕ) (a : S)
-    : mConeMapOver S y (monomial e a) = C (aeval y (monomial e a)) * ∏ k, X k ^ blockDeg e k := by
+theorem mConeMapOver_monomial (y : (Σ k, ι k) → Ω) (e : (Σ k, ι k) →₀ ℕ) (a : S) :
+    mConeMapOver S y (monomial e a) = C (aeval y (monomial e a)) * ∏ k, X k ^ blockDeg e k := by
   simp only [mConeMapOver, aeval_monomial, mul_pow, Finsupp.prod_mul]
   rw [prod_block_pow e (fun k => (X k : MvPolynomial K Ω))]
   simp only [Finsupp.prod, map_mul, map_prod, map_pow, MvPolynomial.algebraMap_apply]
   ring
 
-theorem mConeMapOver_homog
-    (y : (Σ k, ι k) → Ω) (c : ∀ k, ι k)
-    {D : ℕ} {g : MvPolynomial (Σ k, ι k) S} (hD : ∀ e ∈ g.support, ∀ k, blockDeg e k ≤ D)
-    : mConeMapOver S y (homog c D g) = C (aeval y (homog c D g)) * ∏ k, X k ^ D := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [homog, map_sum, Finset.sum_mul]
+theorem mConeMapOver_homog (y : (Σ k, ι k) → Ω) (c : ∀ k, ι k) {D : ℕ} {g : MvPolynomial (Σ k, ι k) S}
+    (hD : ∀ e ∈ g.support, ∀ k, blockDeg e k ≤ D) :
+    mConeMapOver S y (homog c D g) = C (aeval y (homog c D g)) * ∏ k, X k ^ D := by
+
+  simp only [homog, map_sum, Finset.sum_mul]
   refine Finset.sum_congr rfl fun e he => ?_
-  have hX
-      : ∏ k, (X k : MvPolynomial K Ω) ^ D
-        = (∏ k, X k ^ blockDeg e k) * ∏ k, X k ^ (D - blockDeg e k) := by
+  have hX : ∏ k, (X k : MvPolynomial K Ω) ^ D =
+      (∏ k, X k ^ blockDeg e k) * ∏ k, X k ^ (D - blockDeg e k) := by
     rw [← Finset.prod_mul_distrib]
     exact Finset.prod_congr rfl fun k _ => by rw [← pow_add, Nat.add_sub_cancel' (hD e he k)]
   rw [map_mul, mConeMapOver_monomial, hX]
   simp only [map_mul, map_prod, map_pow, mConeMapOver, aeval_X, mul_pow, Finset.prod_mul_distrib]
   ring
 
-theorem aeval_homog
-    (w : (Σ k, ι k) → Ω)
-    {c : ∀ k, ι k} (hw : ∀ k, w ⟨k, c k⟩ ≠ 0)
-    {D : ℕ} {g : MvPolynomial (Σ k, ι k) S} (hD : ∀ e ∈ g.support, ∀ k, blockDeg e k ≤ D)
-    : aeval w (homog c D g) = (∏ k, w ⟨k, c k⟩ ^ D) * aeval (fun p => w p / w ⟨p.1, c p.1⟩) g := by
+theorem aeval_homog (w : (Σ k, ι k) → Ω) {c : ∀ k, ι k} (hw : ∀ k, w ⟨k, c k⟩ ≠ 0) {D : ℕ}
+    {g : MvPolynomial (Σ k, ι k) S} (hD : ∀ e ∈ g.support, ∀ k, blockDeg e k ≤ D) :
+    aeval w (homog c D g) = (∏ k, w ⟨k, c k⟩ ^ D) * aeval (fun p => w p / w ⟨p.1, c p.1⟩) g := by
   conv_rhs => rw [g.as_sum]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [homog, map_sum, Finset.mul_sum]
+
+  simp only [homog, map_sum, Finset.mul_sum]
   refine Finset.sum_congr rfl fun e he => ?_
-  have hP
-      : ∏ k, w ⟨k, c k⟩ ^ D
-        = (∏ k, w ⟨k, c k⟩ ^ (D - blockDeg e k)) * ∏ k, w ⟨k, c k⟩ ^ blockDeg e k := by
+  have hP : ∏ k, w ⟨k, c k⟩ ^ D =
+      (∏ k, w ⟨k, c k⟩ ^ (D - blockDeg e k)) * ∏ k, w ⟨k, c k⟩ ^ blockDeg e k := by
     rw [← Finset.prod_mul_distrib]
     exact Finset.prod_congr rfl fun k _ => by rw [← pow_add, Nat.sub_add_cancel (hD e he k)]
-  have hne : ∏ k, w ⟨k, c k⟩ ^ blockDeg e k ≠ 0 :=
-    Finset.prod_ne_zero_iff.mpr fun k _ => pow_ne_zero _ (hw k)
-  have hq
-      : (e.prod fun p n => (w p / w ⟨p.1, c p.1⟩) ^ n)
-        = (e.prod fun p n => w p ^ n) / ∏ k, w ⟨k, c k⟩ ^ blockDeg e k := by
+  have hne : ∏ k, w ⟨k, c k⟩ ^ blockDeg e k ≠ 0 := Finset.prod_ne_zero_iff.mpr fun k _ => pow_ne_zero _ (hw k)
+  have hq : (e.prod fun p n => (w p / w ⟨p.1, c p.1⟩) ^ n) =
+      (e.prod fun p n => w p ^ n) / ∏ k, w ⟨k, c k⟩ ^ blockDeg e k := by
     rw [← prod_block_pow e (fun k => w ⟨k, c k⟩)]
     simp only [Finsupp.prod, div_pow, Finset.prod_div_distrib]
   rw [map_mul, aeval_monomial, aeval_monomial, hq, hP]
@@ -97,13 +133,12 @@ end ChartKernel
 theorem ChartKernel.proof : ChartKernel.Statement := by
   intro S _ K _ _ ι Ω _ _ y Ω' _ _ y' hle c hc g hg
   classical
-  have hyc : ∀ k, y ⟨k, c k⟩ ≠ 0 := fun k h0 =>
-    hc k (by
-      have hm : (X ⟨k, c k⟩ : MvPolynomial (Σ k, ι k) S) ∈ mIdealOver S y := by
-        change mConeMapOver S y (X _) = 0
-        simp [mConeMapOver, h0]
-      have h' : mConeMapOver S y' (X ⟨k, c k⟩) = 0 := hle hm
-      simpa [mConeMapOver, X_ne_zero] using h')
+  have hyc : ∀ k, y ⟨k, c k⟩ ≠ 0 := fun k h0 => hc k (by
+    have hm : (X ⟨k, c k⟩ : MvPolynomial (Σ k, ι k) S) ∈ mIdealOver S y := by
+      change mConeMapOver S y (X _) = 0
+      simp [mConeMapOver, h0]
+    have h' : mConeMapOver S y' (X ⟨k, c k⟩) = 0 := hle hm
+    simpa [mConeMapOver, X_ne_zero] using h')
   have hD := ChartKernel.blockDeg_le_totalDegree g
   have h1 : aeval y (ChartKernel.homog c g.totalDegree g) = 0 := by
     rw [ChartKernel.aeval_homog y hyc hD, hg, mul_zero]
@@ -117,8 +152,7 @@ theorem ChartKernel.proof : ChartKernel.Statement := by
     · exact C_eq_zero.mp h
     · exact absurd h (Finset.prod_ne_zero_iff.mpr fun k _ => pow_ne_zero _ (X_ne_zero k))
   rw [ChartKernel.aeval_homog y' hc hD] at h4
-  exact (mul_eq_zero.mp h4).resolve_left
-    (Finset.prod_ne_zero_iff.mpr fun k _ => pow_ne_zero _ (hc k))
+  exact (mul_eq_zero.mp h4).resolve_left (Finset.prod_ne_zero_iff.mpr fun k _ => pow_ne_zero _ (hc k))
 
 end
 

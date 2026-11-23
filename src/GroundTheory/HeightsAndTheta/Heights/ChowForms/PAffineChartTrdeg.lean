@@ -1,8 +1,58 @@
 module
 
-public import Mathlib
 public import GroundTheory.HeightsAndTheta.Heights.ChowForms.ImportsAlt
 public import GroundTheory.ArithmeticGeometry.AbelianVarieties.JacobianSmoothness.RingKrullDimLeRingKrullDimQuotientAddOne
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.LocalProperties.Reduced
+import Mathlib.RingTheory.MvPolynomial.IrreducibleQuadratic
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.TotallySplit
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -16,28 +66,27 @@ namespace AffineChartTrdeg
 
 variable {F : Type} [Field F] {n : ℕ} (P : Ideal (MvPolynomial (Fin n) F)) [P.IsPrime]
 
+
 omit [P.IsPrime] in
-theorem aeval_genPt (f : MvPolynomial (Fin n) F)
-    : aeval (genPt P) f
-      = algebraMap (MvPolynomial (Fin n) F ⧸ P) (FractionRing (MvPolynomial (Fin n) F ⧸ P))
-        (Ideal.Quotient.mk P f) := by
-  have h
-      : aeval (genPt P)
-        = (IsScalarTower.toAlgHom F (MvPolynomial (Fin n) F ⧸ P)
-          (FractionRing (MvPolynomial (Fin n) F ⧸ P))).comp (Ideal.Quotient.mkₐ F P) :=
+theorem aeval_genPt (f : MvPolynomial (Fin n) F) :
+    aeval (genPt P) f = algebraMap (MvPolynomial (Fin n) F ⧸ P)
+      (FractionRing (MvPolynomial (Fin n) F ⧸ P)) (Ideal.Quotient.mk P f) := by
+  have h : aeval (genPt P) = (IsScalarTower.toAlgHom F (MvPolynomial (Fin n) F ⧸ P)
+      (FractionRing (MvPolynomial (Fin n) F ⧸ P))).comp (Ideal.Quotient.mkₐ F P) :=
     MvPolynomial.algHom_ext fun i => by simp [genPt]
   rw [h]
   rfl
 
+
 omit [P.IsPrime] in
-theorem aeval_genPt_eq_zero_iff (f : MvPolynomial (Fin n) F) : aeval (genPt P) f = 0 ↔ f ∈ P := by
+theorem aeval_genPt_eq_zero_iff (f : MvPolynomial (Fin n) F) :
+    aeval (genPt P) f = 0 ↔ f ∈ P := by
   rw [aeval_genPt, IsFractionRing.to_map_eq_zero_iff, Ideal.Quotient.eq_zero_iff_mem]
 
-theorem exists_isHomogeneous
-    (j : Fin n) (hj : genPt P j ≠ 0)
+theorem exists_isHomogeneous (j : Fin n) (hj : genPt P j ≠ 0)
     {a : FractionRing (MvPolynomial (Fin n) F ⧸ P)}
-    (ha : a ∈ Algebra.adjoin F (Set.range fun m => genPt P m * (genPt P j)⁻¹))
-    : ∃ D : ℕ, ∀ D' ≥ D, ∃ h : MvPolynomial (Fin n) F,
+    (ha : a ∈ Algebra.adjoin F (Set.range fun m => genPt P m * (genPt P j)⁻¹)) :
+    ∃ D : ℕ, ∀ D' ≥ D, ∃ h : MvPolynomial (Fin n) F,
       h.IsHomogeneous D' ∧ aeval (genPt P) h = a * genPt P j ^ D' := by
   induction ha using Algebra.adjoin_induction with
   | mem x hx =>
@@ -66,8 +115,8 @@ theorem exists_isHomogeneous
     obtain ⟨g, hg, eg⟩ := h₂ e (by omega)
     exact ⟨f * g, hf.mul hg, by rw [map_mul, ef, eg, pow_add]; ring⟩
 
-theorem transcendental (hP : IsHomogIdeal P) (j : Fin n) (hj : X j ∉ P)
-    : Transcendental (Algebra.adjoin F (Set.range fun m => genPt P m * (genPt P j)⁻¹))
+theorem transcendental (hP : IsHomogIdeal P) (j : Fin n) (hj : X j ∉ P) :
+    Transcendental (Algebra.adjoin F (Set.range fun m => genPt P m * (genPt P j)⁻¹))
       (genPt P j) := by
   classical
   set A' := Algebra.adjoin F (Set.range fun m => genPt P m * (genPt P j)⁻¹)
@@ -77,9 +126,8 @@ theorem transcendental (hP : IsHomogIdeal P) (j : Fin n) (hj : X j ∉ P)
   set N := p.natDegree + 1
   choose D hD using fun e => exists_isHomogeneous P j hξ (p.coeff e).2
   set M := (Finset.range N).sup D
-  have hh
-      : ∀ e, ∃ h : MvPolynomial (Fin n) F,
-        h.IsHomogeneous M ∧ aeval ξ h = (p.coeff e : _) * ξ j ^ M := by
+  have hh : ∀ e, ∃ h : MvPolynomial (Fin n) F,
+      h.IsHomogeneous M ∧ aeval ξ h = (p.coeff e : _) * ξ j ^ M := by
     intro e
     by_cases he : e < N
     · exact hD e M (Finset.le_sup (Finset.mem_range.2 he))
@@ -93,23 +141,21 @@ theorem transcendental (hP : IsHomogIdeal P) (j : Fin n) (hj : X j ∉ P)
     have h0 : Polynomial.aeval (ξ j) p = ∑ e ∈ Finset.range N, (p.coeff e : _) * ξ j ^ e := by
       rw [Polynomial.aeval_eq_sum_range]
       rfl
-    calc
-      aeval ξ G = ξ j ^ M * ∑ e ∈ Finset.range N, (p.coeff e : _) * ξ j ^ e := by
-        set_option synthInstance.maxHeartbeats 100000 in
+    calc aeval ξ G = ξ j ^ M * ∑ e ∈ Finset.range N, (p.coeff e : _) * ξ j ^ e := by
+
           simp only [G, map_sum, map_mul, map_pow, aeval_X, heval, Finset.mul_sum]
-        refine Finset.sum_congr rfl fun e _ => by ring
+          refine Finset.sum_congr rfl fun e _ => by ring
       _ = 0 := by rw [← h0, hpe, mul_zero]
   have hcoeff : ∀ e < N, p.coeff e = 0 := by
     intro e he
     have hcomp : homogeneousComponent (M + e) G = h e * X j ^ e := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [G, map_sum]
+
+      simp only [G, map_sum]
       rw [Finset.sum_eq_single e]
       · exact homogeneousComponent_eq_self ((hhom e).mul (isHomogeneous_X_pow j e))
       · intro b _ hb
         rw [homogeneousComponent_of_mem ((mem_homogeneousSubmodule _ _).2
-            ((hhom b).mul (isHomogeneous_X_pow j b))),
-          if_neg (by omega)]
+          ((hhom b).mul (isHomogeneous_X_pow j b))), if_neg (by omega)]
       · intro hne
         exact absurd (Finset.mem_range.2 he) hne
     have hmem : h e * X j ^ e ∈ P := hcomp ▸ hP G hG (M + e)
@@ -137,7 +183,8 @@ theorem proof : AffineChartTrdeg.Statement := by
 
   have hK : Algebra.trdeg F K = ((d + 1 : ℕ) : Cardinal) := by
     have : Algebra.FiniteType F R :=
-      Algebra.FiniteType.of_surjective (Ideal.Quotient.mkₐ F P) (Ideal.Quotient.mkₐ_surjective F P)
+      Algebra.FiniteType.of_surjective (Ideal.Quotient.mkₐ F P)
+        (Ideal.Quotient.mkₐ_surjective F P)
     rw [GroundTheory.Arith.Abelian.Jacobian.trdeg_eq_of_isFractionRing (k := F) (A := R) K]
     rw [GroundTheory.Arith.Abelian.Jacobian.ringKrullDim_eq_trdeg F] at hdim
     have h2 : (Algebra.trdeg F R).toENat = ((d + 1 : ℕ) : ℕ∞) := by exact_mod_cast hdim
@@ -166,16 +213,12 @@ theorem proof : AffineChartTrdeg.Statement := by
   have halg : Algebra.IsAlgebraic S K := by
     refine ⟨fun x => ?_⟩
     obtain ⟨a, b, hb, rfl⟩ := IsFractionRing.div_surjective (A := R) x
-    have hb0 : algebraMap R K b ≠ 0 := IsFractionRing.to_map_ne_zero_of_mem_nonZeroDivisors hb
-    refine ⟨
-      Polynomial.C (⟨_, hRS b⟩ : S) * Polynomial.X - Polynomial.C (⟨_, hRS a⟩ : S),
-      fun h => hb0 ?_,
-      ?_
-    ⟩
+    have hb0 : algebraMap R K b ≠ 0 :=
+      IsFractionRing.to_map_ne_zero_of_mem_nonZeroDivisors hb
+    refine ⟨Polynomial.C (⟨_, hRS b⟩ : S) * Polynomial.X - Polynomial.C (⟨_, hRS a⟩ : S), fun h => hb0 ?_, ?_⟩
     · have := congrArg (AddMonoidAlgebra.coeff · 1) h
-      simp only [Polynomial.coeff_sub, Polynomial.coeff_C_mul_X, Polynomial.coeff_C, ↓ reduceIte,
-          one_ne_zero, Polynomial.coeff_zero]
-        at this
+      simp only [Polynomial.coeff_sub, Polynomial.coeff_C_mul_X, Polynomial.coeff_C, ↓reduceIte,
+        one_ne_zero, Polynomial.coeff_zero] at this
       have h' := congrArg Subtype.val this
       simp only [Subalgebra.coe_sub, Subalgebra.coe_zero, sub_zero] at h'
       exact h'
@@ -190,7 +233,8 @@ theorem proof : AffineChartTrdeg.Statement := by
       hind.isTranscendenceBasis_iff_isAlgebraic.mpr halg
     rw [← hb.cardinalMk_eq_trdeg, Cardinal.mk_fintype, Fintype.card_unit, Nat.cast_one]
 
-  have : FaithfulSMul A' K := (faithfulSMul_iff_algebraMap_injective _ _).2 Subtype.val_injective
+  have : FaithfulSMul A' K :=
+    (faithfulSMul_iff_algebraMap_injective _ _).2 Subtype.val_injective
   have : FaithfulSMul F A' :=
     (faithfulSMul_iff_algebraMap_injective _ _).2 (algebraMap F A').injective
   have hadd := trdeg_add_eq F A' (A := K)

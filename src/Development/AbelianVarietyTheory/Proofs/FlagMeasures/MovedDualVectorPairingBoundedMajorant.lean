@@ -1,14 +1,56 @@
 module
 
-public import Mathlib
+import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.StabilizerPairs.IsUnitDetOfMemGV
 public import Development.AbelianVarietyTheory.Definitions.SemilocalFrames.IsNormalFormStabilizerMeasure
-public import Formalism.FormalDegreeBessel.FinalG
-public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.NormLeadingMinorMonomial
-public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.NormDetInnerLeOfDetEqOne
 public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.GramSchmidtLengths
-public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.MajorantFlagLengthsInvarianceTorusPositivity
 public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.IsotropicLeviEmbeddingHomomorphismProperties
 public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.IsotropicStabilizerRadicalStructure
+public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.MajorantFlagLengthsInvarianceTorusPositivity
+public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.NormDetInnerLeOfDetEqOne
+public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.NormLeadingMinorMonomial
+import Formalism.FormalDegreeBessel.FinalG
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Lemma
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
@@ -50,43 +92,11 @@ lemma herm_symm (k r : ℕ) (v w : Fin (2 * r + k + 1) → ℂ) :
 
 lemma herm_e (k r : ℕ) (v : Fin (2 * r + k + 1) → ℂ) (a : Fin r) :
     herm (Hpk k r) v (bvec (eI k r a)) = v (esI k r a) := by
-  unfold herm bvec
-  have : star (Pi.single (eI k r a) (1 : ℂ) : Fin (2 * r + k + 1) → ℂ) = Pi.single (eI k r a) 1 := by
-    rw [Pi.star_single]; simp
-  rw [this, single_dotProduct, one_mul, Matrix.mulVec, dotProduct, Finset.sum_eq_single (esI k r a)]
-  · have := a.2
-    have h : Hpk k r (eI k r a) (esI k r a) = 1 := by
-      unfold Hpk eI esI
-      rw [if_pos]; constructor <;> simp; omega
-    rw [h, one_mul]
-  · intro i _ hi
-    have := a.2
-    have hi' : i.val ≠ 2 * r + k - a.val := fun h => hi (Fin.ext h)
-    have h : Hpk k r (eI k r a) i = 0 := by
-      unfold Hpk eI
-      rw [if_neg, if_neg, if_neg] <;> simp <;> omega
-    rw [h, zero_mul]
-  · simp
+  apply PI.StabPairsW.herm_e <;> assumption
 
 lemma herm_es (k r : ℕ) (v : Fin (2 * r + k + 1) → ℂ) (a : Fin r) :
     herm (Hpk k r) v (bvec (esI k r a)) = v (eI k r a) := by
-  unfold herm bvec
-  have : star (Pi.single (esI k r a) (1 : ℂ) : Fin (2 * r + k + 1) → ℂ) = Pi.single (esI k r a) 1 := by
-    rw [Pi.star_single]; simp
-  rw [this, single_dotProduct, one_mul, Matrix.mulVec, dotProduct, Finset.sum_eq_single (eI k r a)]
-  · have := a.2
-    have h : Hpk k r (esI k r a) (eI k r a) = 1 := by
-      unfold Hpk eI esI
-      rw [if_neg, if_pos] <;> simp <;> omega
-    rw [h, one_mul]
-  · intro i _ hi
-    have := a.2
-    have hi' : i.val ≠ a.val := fun h => hi (Fin.ext h)
-    have h : Hpk k r (esI k r a) i = 0 := by
-      unfold Hpk esI
-      rw [if_neg, if_neg, if_neg] <;> simp <;> omega
-    rw [h, zero_mul]
-  · simp
+  apply PI.StabPairsW.herm_es <;> assumption
 
 lemma herm_smul_left {n : ℕ} (H : Matrix (Fin n) (Fin n) ℂ) (c : ℂ) (v w : Fin n → ℂ) :
     herm H (c • v) w = c * herm H v w := by

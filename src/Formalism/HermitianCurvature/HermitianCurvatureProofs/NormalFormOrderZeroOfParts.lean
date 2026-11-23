@@ -2,7 +2,68 @@ module
 
 public import Formalism.HermitianCurvature.ActualZetaSmooth
 public import Formalism.HermitianCurvature.HermitianCurvatureProofs.ActualAdjointnessFromHermitian
+public import Formalism.HermitianCurvature.HermitianCurvatureProofs.EulerZetaGammaInvIdentity
+public import Formalism.HermitianCurvature.HermitianCurvatureProofs.InterlaceSignTwo
+public import Formalism.HermitianCurvature.HermitianCurvatureProofs.LevelNablaStarRelations
 public import Formalism.HermitianCurvature.HermitianCurvatureProofs.ModelLevelMultiplier
+public import Formalism.HermitianCurvature.HermitianCurvatureProofs.MultiplicationOpHom
+public import Formalism.HermitianCurvature.HermitianCurvatureProofs.QuasiDeterminantFromEntries
+import Formalism.HermitianCurvature.HermitianCurvatureProofs.RegularisedPairingViaPhase
+public import Formalism.HermitianCurvature.HermitianCurvatureProofs.TransferRtt
+public import Formalism.HermitianCurvature.HermitianCurvatureProofs.WeightedSumDifferenceIdentity
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Int
+public import Mathlib.Analysis.Calculus.FDeriv.Star
+import Mathlib.Analysis.Calculus.FDeriv.Symmetric
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Bool
+import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
@@ -1362,8 +1423,8 @@ theorem Pj_idem (ρ : M.Ty P) : Pj d ρ * Pj d ρ = Pj d ρ := by
 
 theorem sum_Pj : ∑ ρ, Pj d ρ = 1 := by
   unfold Pj
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [← map_sum, ← map_one d.κ]
+
+  rw [← map_sum, ← map_one d.κ]
   congr 1
   ext τ
   simp [Finset.sum_apply]
@@ -2377,8 +2438,6 @@ theorem box_down
     {δ : ℕ → ℤ} {ρ σ : M.Ty P} (h : Off δ ρ σ) {l : ℕ} (hl : l ∈ Icc 1 (P.k - 1)) (hδ : δ l = -1)
     : ∃ τ, M.Up P l τ ρ := by
   rw [Finset.mem_Icc] at hl
-  have hρ : 1 ≤ ((ρ ⟨l - 1, by omega⟩ : Fin _) : ℕ) := by
-    have := h ⟨l - 1, by omega⟩; simp only [show l - 1 + 1 = l by omega, hδ] at this; omega
   refine ⟨
     fun i => if hi : (i : ℕ) + 1 = l then ⟨(ρ i : ℕ) - 1, by have := (ρ i).isLt; omega⟩ else ρ i,
     ?_

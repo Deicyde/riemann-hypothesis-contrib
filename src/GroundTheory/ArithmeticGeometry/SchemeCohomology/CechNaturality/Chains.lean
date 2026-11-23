@@ -1,7 +1,57 @@
 module
 
-public import Mathlib
+public import Mathlib.Algebra.Category.Grp.Preadditive
+public import Mathlib.AlgebraicTopology.AlternatingFaceMapComplex
+public import Mathlib.LinearAlgebra.Finsupp.Supported
+public import Mathlib.Tactic.Continuity
 public import GroundTheory.ArithmeticGeometry.SchemeCohomology.ConsCompSuccAboveZero
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.Finsupp.Pointwise
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.Order.CompletePartialOrder
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Lemma
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -78,15 +128,15 @@ lemma map_mem_supported {m n : ℕ} (L : Chain ι m →+ Chain ι n) {S : Set (F
     {T : Set (Fin (n + 1) → ι)}
     (h : ∀ j ∈ S, ∀ z : ℤ, L (Finsupp.single j z) ∈ Finsupp.supported ℤ ℤ T) {c : Chain ι m}
     (hc : c ∈ Finsupp.supported ℤ ℤ S) : L c ∈ Finsupp.supported ℤ ℤ T := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [← Finsupp.sum_single c, Finsupp.sum, map_sum]
+
+  rw [← Finsupp.sum_single c, Finsupp.sum, map_sum]
   exact Submodule.sum_mem _ fun j hj => h j ((Finsupp.mem_supported ℤ c).1 hc hj) _
 
 lemma eq_of_supported {m : ℕ} {M : Type*} [AddCommGroup M] (L L' : Chain ι m →+ M)
     {S : Set (Fin (m + 1) → ι)} (h : ∀ j ∈ S, ∀ z : ℤ, L (Finsupp.single j z) = L' (Finsupp.single j z))
     {c : Chain ι m} (hc : c ∈ Finsupp.supported ℤ ℤ S) : L c = L' c := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [← Finsupp.sum_single c, Finsupp.sum, map_sum, map_sum]
+
+  rw [← Finsupp.sum_single c, Finsupp.sum, map_sum, map_sum]
   exact Finset.sum_congr rfl fun j hj => h j ((Finsupp.mem_supported ℤ c).1 hc hj) _
 
 def rangeIn {n : ℕ} (S : Set ι) : Set (Fin (n + 1) → ι) := {j | Set.range j ⊆ S}
@@ -132,8 +182,8 @@ lemma bd_cone_add_cone_bd (n : ℕ) (s : ι) (c : Chain ι (n + 1)) :
     simp only [map_add (f := _)]
     rw [add_add_add_comm, hf, hg]
   | single i z =>
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [cone_single, bd_single, Fin.sum_univ_succ, bd_single, map_sum]
+
+    rw [cone_single, bd_single, Fin.sum_univ_succ, bd_single, map_sum]
     simp only [Fin.val_zero, pow_zero, one_smul, cons_comp_succAbove_zero,
       cons_comp_succAbove_succ, Fin.val_succ, pow_succ, mul_neg_one, neg_smul, map_zsmul,
       cone_single]
@@ -209,8 +259,8 @@ lemma bd_ocone_add_ocone_bd (n : ℕ) (s : ι) {c : Chain ι (n + 1)}
   · have h1 : ocone s (Finsupp.single j z) = cone s (Finsupp.single j z) := by
       rw [ocone_single_of_lt hlt, cone_single]
     have h2 : ocone s (bd n (Finsupp.single j z)) = cone s (bd n (Finsupp.single j z)) := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [bd_single, map_sum, map_sum]
+
+      rw [bd_single, map_sum, map_sum]
       refine Finset.sum_congr rfl fun k _ => ?_
       rw [map_zsmul, map_zsmul, ocone_single_of_lt (i := j ∘ k.succAbove)
         (show s < j (k.succAbove 0) from hlt.trans_le (hmono.monotone (Fin.zero_le _))),
@@ -218,8 +268,8 @@ lemma bd_ocone_add_ocone_bd (n : ℕ) (s : ι) {c : Chain ι (n + 1)}
     rw [h1, h2]
     exact bd_cone_add_cone_bd n s _
   · have hs : s = j 0 := le_antisymm hsj (not_lt.1 hlt)
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [ocone_single_of_not_lt hlt, map_zero, zero_add, bd_single, map_sum, Fin.sum_univ_succ]
+
+    rw [ocone_single_of_not_lt hlt, map_zero, zero_add, bd_single, map_sum, Fin.sum_univ_succ]
     have h0 : s < (j ∘ (0 : Fin (n + 2)).succAbove) 0 := by
       rw [hs]
       exact hmono (by simp)
@@ -356,8 +406,8 @@ theorem rho_of_strictMono
   | 0, _, _ => rfl
   | n + 1, i, hi => by
     have h1 : lin (rho n) (bd n (Finsupp.single i 1)) = bd n (Finsupp.single i 1) := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [bd_single, map_sum]
+
+      rw [bd_single, map_sum]
       refine Finset.sum_congr rfl fun k _ => ?_
       rw [map_zsmul, lin_single, one_smul,
         rho_of_strictMono n _ (hi.comp (Fin.strictMono_succAbove k))]

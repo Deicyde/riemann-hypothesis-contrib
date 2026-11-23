@@ -1,18 +1,50 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.LengthPosOfPosDef
-public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.AdjFormula
 public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.ParamsEx
 public import Formalism.LocalToGlobal.IndefiniteReal.LinksStage
-public import Development.AbelianVarietyTheory.PublishedTheorems.AutomorphicForms₂.ExistsNormLeHeightPow
-public import Development.AbelianVarietyTheory.PublishedTheorems.GaloisGeometry₂.HoweUnram
-public import Development.AbelianVarietyTheory.BlockTheory.TwistedDiscreteSeries.GaussianBinomialClosedForm
-public import Development.AbelianVarietyTheory.Definitions.TwistedInnerProducts.SqNormIntegralFundamentalDomainEqL2NormSq
+public import Development.AbelianVarietyTheory.Definitions.TwistedInnerProducts.RealLowestKTypeCoeffSquareIntegrable
+public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.SetIntegralFundamentalDomainRightTranslateInvari
 public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.MemRangeSrcForm
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.IntegrableOnDownwardThetaLiftIntegrandStatement
-public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.SetIntegralFundamentalDomainRightTranslateInvari
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.RealFockAction
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.LinearAlgebra.Eigenspace.Triangularizable
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
 
 @[expose] public section
 
@@ -94,8 +126,8 @@ theorem integral_expand
   have e : ∀ h, θ h * l (F h) = ∑ k, l (b k) * (θ h * b.coord k (F h)) := by
     intro h
     conv_lhs => rw [← b.sum_repr (F h)]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, Finset.mul_sum]
+
+    rw [map_sum, Finset.mul_sum]
     refine Finset.sum_congr rfl fun k _ => ?_
     rw [map_smul, smul_eq_mul, Module.Basis.coord_apply]
     ring
@@ -197,8 +229,8 @@ theorem theta_expand
       = ∑ k, thetaKO (R.ωP i t) h g (phi R i t x (b k)) * b.coord k w := by
   conv_lhs => rw [← b.sum_repr w]
   unfold phi
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum, pureTensor_sum, thetaKO_eq_lin, map_sum]
+
+  rw [map_sum, pureTensor_sum, thetaKO_eq_lin, map_sum]
   refine Finset.sum_congr rfl fun k _ => ?_
   rw [map_smul, pureTensor_smul, map_smul, smul_eq_mul, mul_comm, Module.Basis.coord_apply,
     ← thetaKO_eq_lin]
@@ -241,8 +273,8 @@ theorem exists_op
     simp only [hsm, mul_smul, RingHom.id_apply, Finset.smul_sum]
   · intro w l
     show l (∑ k, downInt R i t y (phi R i t x w) (b.coord k) g • b k) = _
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, downInt_expand R i t y _ g b (fun k => hint _ _ (hth _)) l]
+
+    rw [map_sum, downInt_expand R i t y _ g b (fun k => hint _ _ (hth _)) l]
     refine Finset.sum_congr rfl fun k _ => ?_
     rw [map_smul, smul_eq_mul, mul_comm]
 

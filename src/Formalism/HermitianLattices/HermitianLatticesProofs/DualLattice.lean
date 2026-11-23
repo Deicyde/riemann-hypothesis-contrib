@@ -1,8 +1,61 @@
 module
 
-public import Mathlib
 public import Formalism.HermitianLattices.StatementLat
 public import Formalism.HermitianLattices.HermitianLatticesProofs.DualBasic
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Coalgebra.IsFrobenius
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.HopfAlgebra.Basic
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
+public import Mathlib.Algebra.Module.FinitePresentation
+public import Mathlib.Algebra.Module.Torsion.Basic
+public import Mathlib.RingTheory.Flat.EquationalCriterion
+public import Mathlib.RingTheory.Flat.TorsionFree
 
 @[expose] public section
 
@@ -11,14 +64,12 @@ noncomputable section
 namespace Formalism.HermitianLatticesTheory
 
 section
-variable
-  {R K V : Type*} [CommRing R] [IsDedekindDomain R] [Field K] [Algebra R K] [IsFractionRing R K]
-  [AddCommGroup V] [Module K V] [Module R V] [IsScalarTower R K V]
+variable {R K V : Type*} [CommRing R] [IsDedekindDomain R] [Field K] [Algebra R K]
+  [IsFractionRing R K] [AddCommGroup V] [Module K V] [Module R V] [IsScalarTower R K V]
 
 omit [IsFractionRing R K] in
-theorem finitely_generated_projective_coords
-    (L : Submodule R V) (hL : L.FG) (hK : Function.Injective (algebraMap R K))
-    : ∃ (n : ℕ) (g : Fin n → L) (f : Fin n → (L →ₗ[R] R)), ∀ y : L, y = ∑ i, f i y • g i := by
+theorem finitely_generated_projective_coords (L : Submodule R V) (hL : L.FG) (hK : Function.Injective (algebraMap R K)) :
+    ∃ (n : ℕ) (g : Fin n → L) (f : Fin n → (L →ₗ[R] R)), ∀ y : L, y = ∑ i, f i y • g i := by
   classical
   haveI : Module.Finite R L := Module.Finite.iff_fg.mpr hL
   haveI : Module.FinitePresentation R L := Module.finitePresentation_of_finite R L
@@ -43,24 +94,23 @@ theorem finitely_generated_projective_coords
     ext j
     simp [Finset.sum_apply, Pi.single_apply]
   conv_lhs => rw [← e1, e2]
-  set_option synthInstance.maxHeartbeats 100000 in
+
   simp [map_sum, map_smul]
 
-theorem dualLattice_basis
-    [FiniteDimensional K V] (L : Submodule R V) (hsp : Submodule.span K (L : Set V) = ⊤)
-    : ∃ (s : Set V) (_ : Fintype s) (b : Basis s K V), (∀ i, b i = (i : V)) ∧ s ⊆ L := by
+theorem dualLattice_basis [FiniteDimensional K V] (L : Submodule R V)
+    (hsp : Submodule.span K (L : Set V) = ⊤) :
+    ∃ (s : Set V) (_ : Fintype s) (b : Basis s K V), (∀ i, b i = (i : V)) ∧ s ⊆ L := by
   obtain ⟨s, hsL, hspan, hli⟩ := exists_linearIndependent K (L : Set V)
   have hfin : s.Finite := hli.setFinite
   refine ⟨s, hfin.fintype, Basis.mk hli (by rw [Subtype.range_coe, hspan, hsp]), fun i => ?_, hsL⟩
   simp
 
-theorem dualLattice_denom {ι : Type*} [Fintype ι] (b : Basis ι K V) (L : Submodule R V) (hL : L.FG)
-    : ∃ d : R, d ≠ 0 ∧ ∀ y ∈ L, d • y ∈ Submodule.span R (Set.range b) := by
+theorem dualLattice_denom {ι : Type*} [Fintype ι] (b : Basis ι K V) (L : Submodule R V)
+    (hL : L.FG) : ∃ d : R, d ≠ 0 ∧ ∀ y ∈ L, d • y ∈ Submodule.span R (Set.range b) := by
   classical
   obtain ⟨S, hS⟩ := hL
-  obtain ⟨⟨d, hd⟩, hint⟩ :=
-    IsLocalization.exist_integer_multiples_of_finset (nonZeroDivisors R)
-      (Finset.image (fun p : V × ι => b.repr p.1 p.2) (S ×ˢ Finset.univ))
+  obtain ⟨⟨d, hd⟩, hint⟩ := IsLocalization.exist_integer_multiples_of_finset (nonZeroDivisors R)
+    (Finset.image (fun p : V × ι => b.repr p.1 p.2) (S ×ˢ Finset.univ))
   refine ⟨d, nonZeroDivisors.ne_zero hd, ?_⟩
   have key : ∀ v ∈ S, d • v ∈ Submodule.span R (Set.range b) := by
     intro v hv
@@ -70,9 +120,8 @@ theorem dualLattice_denom {ι : Type*} [Fintype ι] (b : Basis ι K V) (L : Subm
     have hr' : algebraMap R K r = d • b.repr v i := hr
     rw [← smul_assoc, ← hr', algebraMap_smul]
     exact Submodule.smul_mem _ r (Submodule.subset_span ⟨i, rfl⟩)
-  have hle
-      : Submodule.span R (S : Set V)
-        ≤ (Submodule.span R (Set.range b)).comap (d • LinearMap.id : V →ₗ[R] V) := by
+  have hle : Submodule.span R (S : Set V) ≤
+      (Submodule.span R (Set.range b)).comap (d • LinearMap.id : V →ₗ[R] V) := by
     rw [Submodule.span_le]
     intro v hv
     simpa using key v hv
@@ -82,11 +131,9 @@ theorem dualLattice_denom {ι : Type*} [Fintype ι] (b : Basis ι K V) (L : Subm
 
 variable [StarRing K]
 
-theorem dualLattice_dualBasis
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (h : V →ₗ⋆[K] V →ₗ[K] K) (hnd : h.Nondegenerate)
-    (b : Basis ι K V)
-    : ∃ bs : ι → V, ∀ i j, h (b i) (bs j) = if i = j then 1 else 0 := by
+theorem dualLattice_dualBasis {ι : Type*} [Fintype ι] [DecidableEq ι] (h : V →ₗ⋆[K] V →ₗ[K] K)
+    (hnd : h.Nondegenerate) (b : Basis ι K V) :
+    ∃ bs : ι → V, ∀ i j, h (b i) (bs j) = if i = j then 1 else 0 := by
   classical
   haveI := Module.Finite.of_basis b
   let T : V →ₗ[K] (ι → K) := LinearMap.pi fun i => h (b i)
@@ -96,38 +143,33 @@ theorem dualLattice_dualBasis
     have h0 : ∀ i, h (b i) x = 0 := fun i => congrFun hx i
     have hflip : h.flip x = 0 := b.ext fun i => by simp [h0 i]
     exact hnd.2 x fun y => by simpa using LinearMap.congr_fun hflip y
-  have hsurj :=
-    (LinearMap.injective_iff_surjective_of_finrank_eq_finrank (by
-      simp [Module.finrank_eq_card_basis b])).mp hinj
+  have hsurj := (LinearMap.injective_iff_surjective_of_finrank_eq_finrank
+    (by simp [Module.finrank_eq_card_basis b])).mp hinj
   choose bs hbs using fun j => hsurj (Pi.single j 1)
   refine ⟨bs, fun i j => ?_⟩
   have := congrFun (hbs j) i
   simpa [T, Pi.single_apply] using this
 
-theorem dualLattice_expand
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (h : V →ₗ⋆[K] V →ₗ[K] K) (hnd : h.Nondegenerate)
-    (b : Basis ι K V) (bs : ι → V) (hbs : ∀ i j, h (b i) (bs j) = if i = j then 1 else 0)
-    (x : V)
-    : x = ∑ j, h (b j) x • bs j := by
+theorem dualLattice_expand {ι : Type*} [Fintype ι] [DecidableEq ι] (h : V →ₗ⋆[K] V →ₗ[K] K)
+    (hnd : h.Nondegenerate) (b : Basis ι K V) (bs : ι → V)
+    (hbs : ∀ i j, h (b i) (bs j) = if i = j then 1 else 0) (x : V) :
+    x = ∑ j, h (b j) x • bs j := by
   classical
   set z := x - ∑ j, h (b j) x • bs j with hzdef
   have hz : ∀ i, h (b i) z = 0 := by
     intro i
-    set_option synthInstance.maxHeartbeats 100000 in
+
     simp [z, map_sub, map_sum, map_smul, hbs, smul_eq_mul]
   have hflip : h.flip z = 0 := b.ext fun i => by simp [hz i]
   have hz0 : z = 0 := hnd.2 z fun y => by simpa using LinearMap.congr_fun hflip y
   exact sub_eq_zero.mp hz0
 
-theorem dualLattice_repr
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (h : V →ₗ⋆[K] V →ₗ[K] K) (hs : h.IsSymm)
-    (b : Basis ι K V) (bs : ι → V) (hbs : ∀ i j, h (b i) (bs j) = if i = j then 1 else 0)
-    (L : Submodule R V) (hb : ∀ i, b i ∈ L)
-    (d : R) (hd : d ≠ 0) (hdL : ∀ y ∈ L, d • y ∈ Submodule.span R (Set.range b))
-    (f : L →ₗ[R] R)
-    : ∃ w : V, ∀ y (hy : y ∈ L), h w y = algebraMap R K (f ⟨y, hy⟩) := by
+theorem dualLattice_repr {ι : Type*} [Fintype ι] [DecidableEq ι] (h : V →ₗ⋆[K] V →ₗ[K] K)
+    (hs : h.IsSymm) (b : Basis ι K V) (bs : ι → V)
+    (hbs : ∀ i j, h (b i) (bs j) = if i = j then 1 else 0) (L : Submodule R V)
+    (hb : ∀ i, b i ∈ L) (d : R) (hd : d ≠ 0)
+    (hdL : ∀ y ∈ L, d • y ∈ Submodule.span R (Set.range b)) (f : L →ₗ[R] R) :
+    ∃ w : V, ∀ y (hy : y ∈ L), h w y = algebraMap R K (f ⟨y, hy⟩) := by
   classical
   let w : V := ∑ j, star (algebraMap R K (f ⟨b j, hb j⟩)) • bs j
   have hsym : ∀ i j, h (bs j) (b i) = if i = j then 1 else 0 := by
@@ -136,12 +178,12 @@ theorem dualLattice_repr
     split_ifs <;> simp
   have hwb : ∀ i, h w (b i) = algebraMap R K (f ⟨b i, hb i⟩) := by
     intro i
-    set_option synthInstance.maxHeartbeats 100000 in
+
     simp [w, map_sum, LinearMap.map_smulₛₗ₂, hsym, starRingEnd_apply, star_star, Algebra.smul_def]
   have hspL : Submodule.span R (Set.range b) ≤ L :=
     Submodule.span_le.mpr (by rintro _ ⟨i, rfl⟩; exact hb i)
-  have hspan
-      : ∀ z ∈ Submodule.span R (Set.range b), ∀ hz : z ∈ L, h w z = algebraMap R K (f ⟨z, hz⟩) := by
+  have hspan : ∀ z ∈ Submodule.span R (Set.range b), ∀ hz : z ∈ L,
+      h w z = algebraMap R K (f ⟨z, hz⟩) := by
     intro z hz
     induction hz using Submodule.span_induction with
     | mem x hx =>
@@ -175,23 +217,19 @@ theorem dualLattice_repr
 
 end
 
-theorem dualLattice
-    : ∀ (R K V : Type) [CommRing R] [IsDedekindDomain R] [Field K] [StarRing K] [Algebra R K]
-        [IsFractionRing R K] [AddCommGroup V] [Module K V] [FiniteDimensional K V] [Module R V]
-        [IsScalarTower R K V] (h : V →ₗ⋆[K] V →ₗ[K] K),
-      h.IsSymm → h.Nondegenerate → (∀ r : R, star (algebraMap R K r) ∈ Set.range (algebraMap R K))
-        → ∀ L : Submodule R V,
-          Submodule.IsFullLattice K L
-            → Submodule.IsFullLattice K (dual h L) ∧ dual h (dual h L) = L
-              ∧ ∀ a : K,
-                a ≠ 0
-                  → dual h (L.map ((LinearMap.lsmul K V a).restrictScalars R))
-                    = (dual h L).map ((LinearMap.lsmul K V (star a)⁻¹).restrictScalars R) := by
+theorem dualLattice :
+    ∀ (R K V : Type) [CommRing R] [IsDedekindDomain R] [Field K] [StarRing K] [Algebra R K]
+    [IsFractionRing R K] [AddCommGroup V] [Module K V] [FiniteDimensional K V] [Module R V]
+    [IsScalarTower R K V] (h : V →ₗ⋆[K] V →ₗ[K] K), h.IsSymm → h.Nondegenerate →
+    (∀ r : R, star (algebraMap R K r) ∈ Set.range (algebraMap R K)) →
+    ∀ L : Submodule R V, Submodule.IsFullLattice K L →
+      Submodule.IsFullLattice K (dual h L) ∧ dual h (dual h L) = L ∧
+      ∀ a : K, a ≠ 0 → dual h (L.map ((LinearMap.lsmul K V a).restrictScalars R)) =
+        (dual h L).map ((LinearMap.lsmul K V (star a)⁻¹).restrictScalars R) := by
   intro R K V _ _ _ _ _ _ _ _ _ _ _ h hs hnd hst L hL
   classical
-  have mem_dual
-      : ∀ (M : Submodule R V) (x : V),
-        x ∈ dual h M ↔ ∀ y ∈ M, ∃ r : R, algebraMap R K r = h y x := by
+  have mem_dual : ∀ (M : Submodule R V) (x : V),
+      x ∈ dual h M ↔ ∀ y ∈ M, ∃ r : R, algebraMap R K r = h y x := by
     intro M x
     simp only [dual, Formalism.E.hdual, Submodule.mem_iInf, Submodule.mem_comap,
       LinearMap.restrictScalars_apply, Submodule.mem_one]
@@ -215,8 +253,7 @@ theorem dualLattice
       refine ⟨if i = j then 1 else 0, ?_⟩
       rw [hbs]
       split_ifs <;> simp
-    | zero =>
-      intro j; exact ⟨0, by simp⟩
+    | zero => intro j; exact ⟨0, by simp⟩
     | add x y _ _ ihx ihy =>
       intro j
       obtain ⟨r1, hr1⟩ := ihx j
@@ -237,7 +274,8 @@ theorem dualLattice
     obtain ⟨r, hr⟩ := (mem_dual L x).mp hx (b j) (hbL j)
     rw [← hr, algebraMap_smul]
     exact Submodule.smul_mem _ r (Submodule.subset_span ⟨j, rfl⟩)
-  have hfg : (dual h L).FG := Submodule.FG.of_le (Submodule.fg_span (Set.finite_range bs)) hle
+  have hfg : (dual h L).FG :=
+    Submodule.FG.of_le (Submodule.fg_span (Set.finite_range bs)) hle
 
   have hbsK : ∀ j, bs j ∈ Submodule.span K (dual h L : Set V) := by
     intro j
@@ -264,9 +302,9 @@ theorem dualLattice
     rw [hexp x]
     exact Submodule.sum_mem _ fun j _ => Submodule.smul_mem _ _ (hbsK j)
   refine ⟨{ toIsLattice := Submodule.IsLattice.of_fg K hfg, span_eq_top := hspd }, ?_, ?_⟩
-  · refine le_antisymm ?_ ((dualBasic R K V h hs hst).2.1 L)
-    obtain ⟨n, g, f, hgf⟩ :=
-      finitely_generated_projective_coords L hLfg (IsFractionRing.injective R K)
+  ·
+    refine le_antisymm ?_ ((dualBasic R K V h hs hst).2.1 L)
+    obtain ⟨n, g, f, hgf⟩ := finitely_generated_projective_coords L hLfg (IsFractionRing.injective R K)
     choose w hw using fun k => dualLattice_repr h hs b bs hbs L hbL d hd0 hdL (f k)
     have hwd : ∀ k, w k ∈ dual h L := by
       intro k
@@ -281,8 +319,8 @@ theorem dualLattice
       intro y hy
       have e := congrArg Subtype.val (hgf ⟨y, hy⟩)
       simp only [Submodule.coe_sum, Submodule.coe_smul] at e
-      simp only [Pm, LinearMap.sum_apply, LinearMap.smulRight_apply, LinearMap.id_apply, hw _ y hy,
-        algebraMap_smul]
+      simp only [Pm, LinearMap.sum_apply, LinearMap.smulRight_apply,
+        LinearMap.id_apply, hw _ y hy, algebraMap_smul]
       exact e.symm
     intro x hx
     have ex : x = ∑ k, h (w k) x • (g k : V) := by
@@ -293,7 +331,8 @@ theorem dualLattice
     obtain ⟨r, hr⟩ := (mem_dual _ x).mp hx (w k) (hwd k)
     rw [← hr, algebraMap_smul]
     exact Submodule.smul_mem _ r (g k).2
-  · intro a ha
+  ·
+    intro a ha
     have hsa : star a ≠ 0 := star_ne_zero.mpr ha
     ext x
     simp only [Submodule.mem_map, LinearMap.restrictScalars_apply, LinearMap.lsmul_apply]

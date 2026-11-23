@@ -1,19 +1,57 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.Definitions.LatticeFrames.ProdDat
-public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.TensorOneApply
-public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.OneSubIdemQMulSelf
+public import Development.AbelianVarietyTheory.Definitions.LatticeFrames.IsSumFrame
 public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.LatticesAgreeAlmostEverywhere
+public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.OneSubIdemQMulSelf
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Development.AbelianVarietyTheory.Definitions.LatticeFrames.ExistsUnitarySupportedAtPlaceOfMulEqIdem
+import Development.AbelianVarietyTheory.Definitions.LatticeFrames.JointSmooth
+import Formalism.LocalToGlobal.IndefiniteReal.LinksDefs
+import Formalism.LocalToGlobal.IndefiniteReal.SelfDualFullLattice
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH
-  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
-  Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Mult
-  Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField Matrix
-open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Grow GlobalTheory.Unf
-  GlobalTheory.SeeSaw GlobalTheory.FinPl
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField Matrix
+open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Grow GlobalTheory.Unf GlobalTheory.SeeSaw GlobalTheory.FinPl
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.LocMod GlobalTheory.SplitWeil ValuativeRel
@@ -26,20 +64,18 @@ open GlobalTheory.FinPl.SetCut
 
 variable {D : D7}
 
-theorem latV_mono' (V : HSp D) (L : Lat V) {P P' : Pl D → Prop} (h : ∀ w, P w → P' w)
-    : latV V L P ≤ latV V L P' := by
+theorem latV_mono' (V : HSp D) (L : Lat V) {P P' : Pl D → Prop} (h : ∀ w, P w → P' w) :
+    latV V L P ≤ latV V L P' := by
   apply AddSubgroup.closure_mono
   rintro y ⟨α, hα, h0, r⟩
   exact ⟨α, hα, fun v hv => h0 v fun h' => hv (h v h'), r⟩
 
-theorem latO_le_right
-    (S T : HSp D) (LS : Set (Fin S.rank → D.host.E)) (N' M' : Lat T)
-    (P : Pl D → Prop) (h : latV T N' P ≤ latV T M' P)
-    : latO S T LS (N' : Set _) P ≤ latO S T LS (M' : Set _) P := by
+theorem latO_le_right (S T : HSp D) (LS : Set (Fin S.rank → D.host.E)) (N' M' : Lat T) (P : Pl D → Prop)
+    (h : latV T N' P ≤ latV T M' P) :
+    latO S T LS (N' : Set _) P ≤ latO S T LS (M' : Set _) P := by
   refine (AddSubgroup.closure_le _).2 ?_
   rintro _ ⟨α, hα, hP, a, ha, s, hs, t, ht, rfl⟩
-  let c : Fin S.rank → AE D := fun j =>
-    (1 : AF D.host.F) ⊗ₜ[D.host.F] (a * ∑ k, star (s k) * S.gram k j)
+  let c : Fin S.rank → AE D := fun j => (1 : AF D.host.F) ⊗ₜ[D.host.F] (a * ∑ k, star (s k) * S.gram k j)
   let Φ : (Fin T.rank → AE D) →+ WO S T :=
     AddMonoidHom.mk' (fun u => Matrix.of fun i j => u i * c j) (by
       intro u u'; ext i j; simp [add_mul])
@@ -50,51 +86,38 @@ theorem latO_le_right
     subst hb
     refine AddSubgroup.subset_closure ⟨γ, hγ, hγP, a, ha, s, hs, m, hm, ?_⟩
     ext i j
-    simp only [Φ, c, AddMonoidHom.mk'_apply, Matrix.of_apply, Algebra.TensorProduct.tmul_mul_tmul,
-      mul_one]
+    simp only [Φ, c, AddMonoidHom.mk'_apply, Matrix.of_apply, Algebra.TensorProduct.tmul_mul_tmul, mul_one]
     congr 1
     ring
   have hmem : (fun i => pairA D.host.F 0 α ⊗ₜ[D.host.F] (1 * t i)) ∈ latV T N' P :=
     AddSubgroup.subset_closure ⟨α, hα, hP, 1, rfl, t, ht, rfl⟩
-  have e
-      : Φ (fun i => pairA D.host.F 0 α ⊗ₜ[D.host.F] (1 * t i))
-        = Matrix.of fun i j =>
-          pairA D.host.F 0 α ⊗ₜ[D.host.F] (a * t i * ∑ k, star (s k) * S.gram k j) := by
+  have e : Φ (fun i => pairA D.host.F 0 α ⊗ₜ[D.host.F] (1 * t i)) =
+      Matrix.of fun i j => pairA D.host.F 0 α ⊗ₜ[D.host.F] (a * t i * ∑ k, star (s k) * S.gram k j) := by
     ext i j
-    simp only [Φ, c, AddMonoidHom.mk'_apply, Matrix.of_apply, Algebra.TensorProduct.tmul_mul_tmul,
-      mul_one]
+    simp only [Φ, c, AddMonoidHom.mk'_apply, Matrix.of_apply, Algebra.TensorProduct.tmul_mul_tmul, mul_one]
     congr 1
     ring
   have h2 := AddSubgroup.mem_comap.1 (key (h hmem))
   rw [e] at h2
   exact h2
 
-theorem latO_le_left
-    (S T : HSp D) (N M : Lat S) (LT : Set (Fin T.rank → D.host.E))
-    (P : Pl D → Prop) (h : latV S N P ≤ latV S M P)
-    : latO S T (N : Set _) LT P ≤ latO S T (M : Set _) LT P := by
+theorem latO_le_left (S T : HSp D) (N M : Lat S) (LT : Set (Fin T.rank → D.host.E)) (P : Pl D → Prop)
+    (h : latV S N P ≤ latV S M P) :
+    latO S T (N : Set _) LT P ≤ latO S T (M : Set _) LT P := by
   refine (AddSubgroup.closure_le _).2 ?_
   rintro _ ⟨α, hα, hP, a, ha, s, hs, t, ht, rfl⟩
   let Φ : (Fin S.rank → AE D) →+ WO S T :=
-    AddMonoidHom.mk'
-      (fun y =>
-        Matrix.of fun i j =>
-          ((1 : AF D.host.F) ⊗ₜ[D.host.F] (a * t i))
-            * ∑ k, cA D (y k) * ((1 : AF D.host.F) ⊗ₜ[D.host.F] S.gram k j))
-      (by intro u u'; ext i j; simp [map_add (f := _), add_mul, Finset.sum_add_distrib, mul_add])
-  have gen
-      : ∀ (γ : Af D.host.F) (x : Fin S.rank → D.host.E),
-        Φ (fun k => pairA D.host.F 0 γ ⊗ₜ[D.host.F] (1 * x k))
-          = Matrix.of fun i j =>
-            pairA D.host.F 0 γ ⊗ₜ[D.host.F] (a * t i * ∑ k, star (x k) * S.gram k j) := by
+    AddMonoidHom.mk' (fun y => Matrix.of fun i j => ((1 : AF D.host.F) ⊗ₜ[D.host.F] (a * t i)) *
+      ∑ k, cA D (y k) * ((1 : AF D.host.F) ⊗ₜ[D.host.F] S.gram k j)) (by
+      intro u u'; ext i j; simp [map_add (f := _), add_mul, Finset.sum_add_distrib, mul_add])
+  have gen : ∀ (γ : Af D.host.F) (x : Fin S.rank → D.host.E),
+      Φ (fun k => pairA D.host.F 0 γ ⊗ₜ[D.host.F] (1 * x k)) =
+        Matrix.of fun i j => pairA D.host.F 0 γ ⊗ₜ[D.host.F] (a * t i * ∑ k, star (x k) * S.gram k j) := by
     intro γ x
     ext i j
     simp only [Φ, AddMonoidHom.mk'_apply, Matrix.of_apply, one_mul]
-    change (1 ⊗ₜ[D.host.F] (a * t i))
-        * ∑ k, (pairA D.host.F 0 γ ⊗ₜ[D.host.F] star (x k)) * (1 ⊗ₜ[D.host.F] S.gram k j)
-      = _
-    simp only [Algebra.TensorProduct.tmul_mul_tmul, mul_one, Finset.mul_sum, one_mul,
-      ← TensorProduct.tmul_sum]
+    change (1 ⊗ₜ[D.host.F] (a * t i)) * ∑ k, (pairA D.host.F 0 γ ⊗ₜ[D.host.F] star (x k)) * (1 ⊗ₜ[D.host.F] S.gram k j) = _
+    simp only [Algebra.TensorProduct.tmul_mul_tmul, mul_one, Finset.mul_sum, one_mul, ← TensorProduct.tmul_sum]
   have key : latV S M P ≤ (latO S T (M : Set _) LT P).comap Φ := by
     refine (AddSubgroup.closure_le _).2 ?_
     rintro _ ⟨γ, hγ, hγP, b, hb, m, hm, rfl⟩
@@ -108,18 +131,15 @@ theorem latO_le_left
   rw [gen] at h2
   exact h2
 
-set_option maxHeartbeats 2000000 in
-theorem latV_le_of_local
-    (S : HSp D) (N M : Lat S)
-    (hN : Submodule.IsLattice D.host.E N) (hM : Submodule.IsFullLattice D.host.E M)
-    (P : Pl D → Prop) (h : ∀ p, P p → latV S N (· = p) ≤ latV S M (· = p))
-    : latV S N P ≤ latV S M P := by
+
+
+theorem latV_le_of_local (S : HSp D) (N M : Lat S) (hN : Submodule.IsLattice D.host.E N)
+    (hM : Submodule.IsFullLattice D.host.E M) (P : Pl D → Prop)
+    (h : ∀ p, P p → latV S N (· = p) ≤ latV S M (· = p)) : latV S N P ≤ latV S M P := by
   classical
   obtain ⟨d, hd, hNM⟩ := exists_int_smul_le N M hN.fg hM.span_eq_top
-  obtain ⟨B, hB⟩ : ∃ B : Finset (Pl D), ∀ w : Pl D, w ∉ B → ((d : 𝓞 D.host.F)) ∉ w.asIdeal := ⟨
-    (finite_places_int (D := D) d hd).toFinset,
-    fun w hw h' => hw ((Set.Finite.mem_toFinset _).2 h')
-  ⟩
+  obtain ⟨B, hB⟩ : ∃ B : Finset (Pl D), ∀ w : Pl D, w ∉ B → ((d : 𝓞 D.host.F)) ∉ w.asIdeal :=
+    ⟨(finite_places_int (D := D) d hd).toFinset, fun w hw h' => hw ((Set.Finite.mem_toFinset _).2 h')⟩
   refine (AddSubgroup.closure_le _).2 ?_
   rintro _ ⟨α, hα, hP, b, hb, x, hx, rfl⟩
   rw [Set.mem_singleton_iff] at hb
@@ -135,13 +155,12 @@ theorem latV_le_of_local
     have e : indQ D B = ∑ v ∈ B, indQ D {v} := by simp only [indQ, Finset.sum_singleton]
     rw [← Finset.mul_sum, ← e, ← mul_add, add_sub_cancel, mul_one]
   show Ψ α ∈ latV S M P
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [hsplit, map_add (f := _), map_sum]
+
+  rw [hsplit, map_add (f := _), map_sum]
   refine add_mem (AddSubgroup.sum_mem _ fun v _ => ?_) ?_
   · by_cases hv : P v
     · have h1 : Ψ (α * indQ D {v}) ∈ latV S N (· = v) := by
-        refine AddSubgroup.subset_closure
-          ⟨α * indQ D {v}, fun w => ?_, fun w hw => ?_, 1, rfl, x, hx, rfl⟩
+        refine AddSubgroup.subset_closure ⟨α * indQ D {v}, fun w => ?_, fun w hw => ?_, 1, rfl, x, hx, rfl⟩
         · rw [map_mul, evalV_indQ]
           split_ifs
           · rw [mul_one]; exact hα w
@@ -167,21 +186,17 @@ theorem latV_le_of_local
       split_ifs
       · rw [sub_self, mul_zero]
       · rw [sub_zero, mul_one]
-    have hsm
-        : ∀ w,
-          evalV D.host.F w (((d : D.host.F))⁻¹ • β)
-            = algebraMap D.host.F (w.adicCompletion D.host.F) ((d : D.host.F))⁻¹
-              * evalV D.host.F w β := by
+    have hsm : ∀ w, evalV D.host.F w (((d : D.host.F))⁻¹ • β) =
+        algebraMap D.host.F (w.adicCompletion D.host.F) ((d : D.host.F))⁻¹ * evalV D.host.F w β := by
       intro w
       rw [map_smul, Algebra.smul_def]
-    refine AddSubgroup.subset_closure
-      ⟨((d : D.host.F))⁻¹ • β, fun w => ?_, fun w hw => ?_, 1, rfl, d • x, hNM x hx, ?_⟩
+    refine AddSubgroup.subset_closure ⟨((d : D.host.F))⁻¹ • β, fun w => ?_, fun w hw => ?_,
+      1, rfl, d • x, hNM x hx, ?_⟩
     · by_cases hw : w ∈ B
       · rw [hsm, hβB, if_pos hw, mul_zero]
         exact zero_mem _
       · have hwv : ((d : 𝓞 D.host.F)) ∉ w.asIdeal := hB w hw
-        have hval
-            : Valued.v (algebraMap D.host.F (w.adicCompletion D.host.F) (d : D.host.F)) = 1 := by
+        have hval : Valued.v (algebraMap D.host.F (w.adicCompletion D.host.F) (d : D.host.F)) = 1 := by
           have h1 := (w.valuation_eq_one_iff_notMem (K := D.host.F)).mpr hwv
           have h2 := w.valuedAdicCompletion_eq_valuation' (K := D.host.F) ((d : D.host.F))
           have h4 : (((d : 𝓞 D.host.F)) : D.host.F) = ((d : D.host.F)) :=
@@ -205,83 +220,21 @@ theorem latV_le_of_local
         pairA D.host.F 0 (((d : D.host.F))⁻¹ • β) ⊗ₜ[D.host.F] (1 * (d • x i))
       exact pairA_tmul_int_gen d hd β (x i)
 
-theorem latO_congr
-    : ∀ (D : D7) (S T : HSp D) (N M : Lat S) (N' M' : Lat T),
-      IsSelfDualC S N → IsSelfDualC S M → IsSelfDualC T N' → IsSelfDualC T M'
-        → ∀ (P : Pl D → Prop),
-          (∀ p, P p → latV S N (· = p) = latV S M (· = p) ∧ latV T N' (· = p) = latV T M' (· = p))
-            → latO S T (N : Set _) (N' : Set _) P = latO S T (M : Set _) (M' : Set _) P := by
+theorem latO_congr : ∀ (D : D7) (S T : HSp D) (N M : Lat S) (N' M' : Lat T), IsSelfDualC S N → IsSelfDualC S M →
+    IsSelfDualC T N' → IsSelfDualC T M' → ∀ (P : Pl D → Prop),
+    (∀ p, P p → latV S N (· = p) = latV S M (· = p) ∧ latV T N' (· = p) = latV T M' (· = p)) →
+    latO S T (N : Set _) (N' : Set _) P = latO S T (M : Set _) (M' : Set _) P := by
   intro D S T N M N' M' hN hM hN' hM' P hloc
-  have hfull
-      : ∀ (V : HSp D) (Λ : Submodule (𝓞 D.host.E) (Fin V.rank → D.host.E)),
-        IsSelfDualC V Λ → Submodule.IsFullLattice D.host.E Λ := by
+  have hfull : ∀ (V : HSp D) (Λ : Submodule (𝓞 D.host.E) (Fin V.rank → D.host.E)),
+      IsSelfDualC V Λ → Submodule.IsFullLattice D.host.E Λ := by
     intro V Λ hΛ
-    haveI : Submodule.IsLattice D.host.E Λ := hΛ.1
-    refine ⟨?_⟩
-    obtain ⟨s, hs⟩ := hΛ.1.fg
-    apply eq_top_iff.mpr
-    intro y _
-    let f : (Fin V.rank → D.host.E) → D.host.E := fun x => ∑ i, ∑ j, star (x i) * V.gram i j * y j
-    obtain ⟨a, ha⟩ := IsLocalization.exist_integer_multiples (nonZeroDivisors (𝓞 D.host.E)) s f
-    have ha0 : (algebraMap (𝓞 D.host.E) D.host.E a) ≠ 0 := by
-      exact (FaithfulSMul.algebraMap_injective _ _).ne (mem_nonZeroDivisors_iff_ne_zero.mp a.2)
-    let P : Submodule (𝓞 D.host.E) (Fin V.rank → D.host.E) := {
-      carrier := {x | ∃ b : 𝓞 D.host.E, (b : D.host.E) = (algebraMap (𝓞 D.host.E) D.host.E a) * f x}
-      zero_mem' := by refine ⟨0, ?_⟩; simp [f]
-      add_mem' := by
-        rintro x z ⟨b, hb⟩ ⟨c, hc⟩
-        refine ⟨b + c, ?_⟩
-        change (b : D.host.E) + c = _
-        rw [hb, hc]
-        simp [f, map_add, add_mul, Finset.sum_add_distrib, mul_add]
-      smul_mem' := by
-        rintro c x ⟨b, hb⟩
-        refine ⟨RingOfIntegers.mapRingHom (starRingEnd D.host.E) c * b, ?_⟩
-        simp only [map_mul, hb, f, Pi.smul_apply, Algebra.smul_def, map_mul,
-          RingOfIntegers.mapRingHom_apply, star_mul]
-        simp only [Finset.mul_sum]
-        apply Finset.sum_congr rfl
-        intro i _
-        apply Finset.sum_congr rfl
-        intro j _
-        change star (c : D.host.E) * _ = _
-        ring
-    }
-    have hsP : (s : Set (Fin V.rank → D.host.E)) ⊆ P := by
-      intro x hx
-      obtain ⟨b, hb⟩ := ha x hx
-      exact ⟨b, by simpa [Algebra.smul_def] using hb⟩
-    have hy : (algebraMap (𝓞 D.host.E) D.host.E a) • y ∈ Λ := by
-      apply (hΛ.2 _).2
-      intro x hx
-      have hxP : x ∈ P := (hs ▸ Submodule.span_le.mpr hsP) hx
-      obtain ⟨b, hb⟩ := hxP
-      refine ⟨b, ?_⟩
-      rw [hb]
-      dsimp only [f, Pi.smul_apply]
-      simp only [smul_eq_mul, Finset.mul_sum]
-      apply Finset.sum_congr rfl
-      intro i _
-      apply Finset.sum_congr rfl
-      intro j _
-      ring
-    have hy'
-        : (algebraMap (𝓞 D.host.E) D.host.E a) • y
-          ∈ Submodule.span D.host.E (Λ : Set (Fin V.rank → D.host.E)) :=
-      Submodule.subset_span hy
-    have :=
-      (Submodule.span D.host.E (Λ : Set (Fin V.rank → D.host.E))).smul_mem
-        (algebraMap (𝓞 D.host.E) D.host.E a)⁻¹ hy'
-    change (algebraMap (𝓞 D.host.E) D.host.E a)⁻¹ • ((algebraMap (𝓞 D.host.E) D.host.E a) • y) ∈ _
-      at this
-    rw [← smul_assoc, smul_eq_mul, inv_mul_cancel₀ ha0, one_smul] at this
-    exact this
-  have hS : latV S N P = latV S M P :=
-    le_antisymm (latV_le_of_local S N M hN.1 (hfull S M hM) P fun p hp => (hloc p hp).1.le)
-      (latV_le_of_local S M N hM.1 (hfull S N hN) P fun p hp => (hloc p hp).1.ge)
-  have hT : latV T N' P = latV T M' P :=
-    le_antisymm (latV_le_of_local T N' M' hN'.1 (hfull T M' hM') P fun p hp => (hloc p hp).2.le)
-      (latV_le_of_local T M' N' hM'.1 (hfull T N' hN') P fun p hp => (hloc p hp).2.ge)
+    exact Formalism.IndefR.Datum.IsSelfDualC.isFullLattice V Λ hΛ
+  have hS : latV S N P = latV S M P := le_antisymm
+    (latV_le_of_local S N M hN.1 (hfull S M hM) P fun p hp => (hloc p hp).1.le)
+    (latV_le_of_local S M N hM.1 (hfull S N hN) P fun p hp => (hloc p hp).1.ge)
+  have hT : latV T N' P = latV T M' P := le_antisymm
+    (latV_le_of_local T N' M' hN'.1 (hfull T M' hM') P fun p hp => (hloc p hp).2.le)
+    (latV_le_of_local T M' N' hM'.1 (hfull T N' hN') P fun p hp => (hloc p hp).2.ge)
   apply le_antisymm
   · exact (latO_le_right S T _ N' M' P hT.le).trans (latO_le_left S T N M _ P hS.le)
   · exact (latO_le_right S T _ M' N' P hT.ge).trans (latO_le_left S T M N _ P hS.ge)

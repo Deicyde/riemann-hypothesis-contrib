@@ -1,20 +1,62 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.Definitions.Divisors.SemiposAtOfPositive
-public import Development.AbelianVarietyTheory.Definitions.Divisors.ToKnownTheoremsOf
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsModelOf
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.NefFibOfIsGenerated
-public import Development.AbelianVarietyTheory.Definitions.Divisors.IsHomogeneousCompIdeal
-public import Development.AbelianVarietyTheory.Proofs.CovolumeBounds.IsProjOverMorphismRestrictOfRelAmple
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.JGenSpecializes
+import Development.AbelianVarietyTheory.Proofs.CovolumeBounds.IsProjOverMorphismRestrictOfRelAmple
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.RingKrullDimIntegers
+import Development.AbelianVarietyTheory.Definitions.Divisors.AevalEqZeroOfMemConeIdeal
+import Development.AbelianVarietyTheory.Definitions.Divisors.FirstChernLeviEqConstant
+import Development.AbelianVarietyTheory.Definitions.Divisors.NormNegCmConstantEqAtAllEmbeddings
+import Development.AbelianVarietyTheory.Definitions.Divisors.SemiposAtOfPositive
+import Development.AbelianVarietyTheory.Definitions.Divisors.SlopeTestRemainingChoices
+import Development.AbelianVarietyTheory.Definitions.Foundations.IsProbabilityMeasureMuPart
+import Formalism.LocalRingCardinality.DataTheta
+import Formalism.LocalToGlobal.BesselHermitianTheta.NoncompactGapAtLeastRange
+import Formalism.LocalToGlobal.ProjectiveLattices.ErealAddIInf
+import Formalism.SharpRestriction.CuspSpanNormBounds.Point
+import Formalism.SharpRestriction.LevelLetterCocycles.DataNLoc
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.FundamentalDomains.OnbPerp
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Pj
-  Formalism.BasicNotions.TH Formalism.L2.Theta ReciprocityTheory.ChartRestriction.G.Geo.Tor
-  ReciprocityTheory.ChartRestriction.G.FD GlobalTheory.AllWt GlobalTheory.CompHt GlobalTheory.CovTop
-  GlobalTheory.CovHt GlobalTheory.Mean4 GlobalTheory.Mean4O
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Pj Formalism.BasicNotions.TH Formalism.L2.Theta ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD GlobalTheory.AllWt GlobalTheory.CompHt GlobalTheory.CovTop GlobalTheory.CovHt GlobalTheory.Mean4 GlobalTheory.Mean4O
 open scoped ENNReal Classical
 
 open CategoryTheory AlgebraicGeometry
@@ -25,16 +67,12 @@ open GlobalTheory GlobalTheory.Cartier GlobalTheory.CechPic GlobalTheory.CxPts G
 
 namespace GlobalTheory.FubiniStudyFrame
 
-theorem exists_ne_zero_of_rel
-    {K V : Type} [Field K] [AddCommGroup V] [Module K V]
-    {n N : ℕ}
-    (σ : K →+* ℂ)
-    (u : Fin n → V)
-    (b : Module.Basis (Fin N) K V) (c : Matrix (Fin n) (Fin N) K) (A : Matrix (Fin N) (Fin N) ℂ)
-    (w : Fin n → ℂ)
-    (hw : w ≠ 0) (hrel : ∀ lam : Fin n → K, ∑ k, lam k • u k = 0 → ∑ k, σ (lam k) * w k = 0)
-    (hb : ∀ j, b j = ∑ k, c k j • u k) (hA : A.det ≠ 0)
-    : ∃ a, ∑ k, (c.map σ * A) k a * w k ≠ 0 := by
+theorem exists_ne_zero_of_rel {K V : Type} [Field K] [AddCommGroup V] [Module K V] {n N : ℕ}
+    (σ : K →+* ℂ) (u : Fin n → V) (b : Module.Basis (Fin N) K V) (c : Matrix (Fin n) (Fin N) K)
+    (A : Matrix (Fin N) (Fin N) ℂ) (w : Fin n → ℂ) (hw : w ≠ 0)
+    (hrel : ∀ lam : Fin n → K, ∑ k, lam k • u k = 0 → ∑ k, σ (lam k) * w k = 0)
+    (hb : ∀ j, b j = ∑ k, c k j • u k) (hA : A.det ≠ 0) :
+    ∃ a, ∑ k, (c.map σ * A) k a * w k ≠ 0 := by
   classical
   have hx : Matrix.vecMul w (c.map σ) ≠ 0 := by
     intro hx
@@ -43,11 +81,10 @@ theorem exists_ne_zero_of_rel
     set r := b.repr (u l)
     have hl : ∑ k, ((Pi.single l (1 : K) : Fin n → K) k - ∑ j, c k j * r j) • u k = 0 := by
       have e : ∑ k, (∑ j, c k j * r j) • u k = u l := by
-        calc
-          ∑ k, (∑ j, c k j * r j) • u k = ∑ j, r j • ∑ k, c k j • u k := by
-            simp only [Finset.sum_smul, Finset.smul_sum, smul_smul]
-            rw [Finset.sum_comm]
-            exact Finset.sum_congr rfl fun _ _ => Finset.sum_congr rfl fun _ _ => by rw [mul_comm]
+        calc ∑ k, (∑ j, c k j * r j) • u k = ∑ j, r j • ∑ k, c k j • u k := by
+              simp only [Finset.sum_smul, Finset.smul_sum, smul_smul]
+              rw [Finset.sum_comm]
+              exact Finset.sum_congr rfl fun _ _ => Finset.sum_congr rfl fun _ _ => by rw [mul_comm]
           _ = ∑ j, r j • b j := by simp only [hb]
           _ = u l := b.sum_repr (u l)
       simp only [sub_smul, Finset.sum_sub_distrib, e, Pi.single_apply, ite_smul, one_smul,
@@ -56,12 +93,11 @@ theorem exists_ne_zero_of_rel
     have h3 : ∀ j, ∑ k, w k * σ (c k j) = 0 := fun j => by
       have := congrFun hx j
       simpa [Matrix.vecMul, dotProduct] using this
-    have h4
-        : ∑ k, σ ((Pi.single l (1 : K) : Fin n → K) k - ∑ j, c k j * r j) * w k
-          = w l - ∑ j, σ (r j) * ∑ k, w k * σ (c k j) := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [map_sub, map_sum, map_mul, sub_mul, Finset.sum_sub_distrib, Finset.mul_sum,
-          Finset.sum_mul]
+    have h4 : ∑ k, σ ((Pi.single l (1 : K) : Fin n → K) k - ∑ j, c k j * r j) * w k =
+        w l - ∑ j, σ (r j) * ∑ k, w k * σ (c k j) := by
+
+      simp only [map_sub, map_sum, map_mul, sub_mul, Finset.sum_sub_distrib, Finset.mul_sum,
+      Finset.sum_mul]
       congr 1
       · rw [Finset.sum_eq_single l]
         · simp
@@ -82,17 +118,16 @@ theorem exists_ne_zero_of_rel
     exact Finset.sum_congr rfl fun _ _ => mul_comm _ _
   exact hA (Matrix.exists_vecMul_eq_zero_iff.1 ⟨_, hx, h0⟩)
 
-theorem rel_field_of_rel_int
-    {K V : Type} [Field K] [NumberField K] [AddCommGroup V] [Module K V] [Module (𝓞 K) V]
-    [IsScalarTower (𝓞 K) K V]
-    {n : ℕ} (τ : 𝓞 K →+* ℂ) (u : Fin n → V) (w : Fin n → ℂ)
+theorem rel_field_of_rel_int {K V : Type} [Field K] [NumberField K] [AddCommGroup V] [Module K V]
+    [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V] {n : ℕ} (τ : 𝓞 K →+* ℂ) (u : Fin n → V)
+    (w : Fin n → ℂ)
     (H : ∀ lam : Fin n → 𝓞 K, ∑ k, lam k • u k = 0 → ∑ k, τ (lam k) * w k = 0)
-    (lam : Fin n → K) (h : ∑ k, lam k • u k = 0)
-    : ∑ k, OfLattice.extEmb τ (lam k) * w k = 0 := by
+    (lam : Fin n → K) (h : ∑ k, lam k • u k = 0) :
+    ∑ k, OfLattice.extEmb τ (lam k) * w k = 0 := by
   classical
   set σ := OfLattice.extEmb τ
-  obtain ⟨⟨d, hd⟩, hint⟩ :=
-    IsLocalization.exist_integer_multiples_of_finset (nonZeroDivisors (𝓞 K)) (Finset.univ.image lam)
+  obtain ⟨⟨d, hd⟩, hint⟩ := IsLocalization.exist_integer_multiples_of_finset
+    (nonZeroDivisors (𝓞 K)) (Finset.univ.image lam)
   have hk : ∀ k, IsLocalization.IsInteger (𝓞 K) (d • lam k) := fun k =>
     hint _ (Finset.mem_image_of_mem _ (Finset.mem_univ k))
   choose lam' hlam' using hk
@@ -100,7 +135,8 @@ theorem rel_field_of_rel_int
     RingHom.congr_fun (OfLattice.extEmb_comp τ) x
   have h1 : ∑ k, lam' k • u k = 0 := by
     have : ∀ k, lam' k • u k = d • (lam k • u k) := fun k => by
-      rw [← algebraMap_smul K (lam' k) (u k), hlam' k, Algebra.smul_def, mul_smul, algebraMap_smul]
+      rw [← algebraMap_smul K (lam' k) (u k), hlam' k, Algebra.smul_def, mul_smul,
+        algebraMap_smul]
     simp only [this, ← Finset.smul_sum, h, smul_zero]
   have h2 := H lam' h1
   have h3 : ∀ k, τ (lam' k) = σ (algebraMap (𝓞 K) K d) * σ (lam k) := fun k => by
@@ -114,40 +150,29 @@ theorem rel_field_of_rel_int
 
 end GlobalTheory.FubiniStudyFrame
 
+
 open GlobalTheory.FubiniStudyFrame in
-theorem GlobalTheory.FubiniStudyFrame.noCommonZero_comb
-    : ∀ (K V : Type) [Field K] [NumberField K] [AddCommGroup V] [Module K V] [Module (𝓞 K) V]
-        [IsScalarTower (𝓞 K) K V] (m N : ℕ) (X : Scheme.{0}) [IsIntegral X] (p : X ⟶ Sp (𝓞 K))
-        (g : X ⟶ PSpace (𝓞 K) m) (u : Fin (m + 1) → V) (b : Module.Basis (Fin N) K V)
-        (c : Matrix (Fin (m + 1)) (Fin N) K) (A : (K →+* ℂ) → Matrix (Fin N) (Fin N) ℂ),
-      g ≫ PSpace.str (𝓞 K) m = p
-        → (∀ lam : Fin (m + 1) → 𝓞 K,
-          ∑ k, lam k • u k = 0
-            → ∑ k, algX p ⊤ (lam k) • GlobalTheory.Cartier.secPull (ProjSpace.coord (𝓞 K) m k) g
-              = 0)
-        → (∀ j, b j = ∑ k, c k j • u k) → (∀ σ, (A σ).det ≠ 0)
-        → ∀ τ : 𝓞 K →+* ℂ,
-          Weight.NoCommonZero fun a =>
-            ∑ k, (c.map (OfLattice.extEmb τ) * A (OfLattice.extEmb τ)) k a • secVal p τ (GlobalTheory.Cartier.secPull (ProjSpace.coord (𝓞 K) m k) g) :=
-  by
-    intro K V _ _ _ _ _ _ m N X _ p g u b c A _hg hrel hb hA τ i y hy
-    classical
-    set s := fun k => GlobalTheory.Cartier.secPull (ProjSpace.coord (𝓞 K) m k) g with hs
-    set w : Fin (m + 1) → ℂ := fun k => secVal p τ (s k) i y with hw_def
-    have hsup := ProjSpace.iSup_nonzeroLocus_secPull (ProjSpace.iSup_nonzeroLocus_coord (𝓞 K) m) g
-    have hw : w ≠ 0 := by
-      obtain ⟨k, hk⟩ :=
-        TopologicalSpace.Opens.mem_iSup.1
-          (show y.1 (IsLocalRing.closedPoint ℂ) ∈ ⨆ k, nonzeroLocus (s k) by rw [hsup]; trivial)
-      intro h0
-      exact (secVal_ne_zero_iff (s k) hy).2 (mem_ptsIn.2 hk) (congrFun h0 k)
-    have H : ∀ lam : Fin (m + 1) → 𝓞 K, ∑ k, lam k • u k = 0 → ∑ k, τ (lam k) * w k = 0 := by
-      intro lam h
-      have e := congrArg (fun t => secVal p τ t i y) (hrel lam h)
-      set_option synthInstance.maxHeartbeats 100000 in
-      simpa [map_sum, secVal_smul, Finset.sum_apply, hw_def] using e
-    obtain ⟨a, ha⟩ :=
-      exists_ne_zero_of_rel (OfLattice.extEmb τ) u b c (A (OfLattice.extEmb τ)) w hw
-        (rel_field_of_rel_int τ u w H) hb (hA _)
-    refine ⟨a, ?_⟩
-    simpa [Finset.sum_apply, hw_def] using ha
+theorem GlobalTheory.FubiniStudyFrame.noCommonZero_comb : ∀ (K V : Type) [Field K] [NumberField K] [AddCommGroup V] [Module K V] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V] (m N : ℕ) (X : Scheme.{0}) [IsIntegral X] (p : X ⟶ Sp (𝓞 K)) (g : X ⟶ PSpace (𝓞 K) m) (u : Fin (m + 1) → V) (b : Module.Basis (Fin N) K V) (c : Matrix (Fin (m + 1)) (Fin N) K) (A : (K →+* ℂ) → Matrix (Fin N) (Fin N) ℂ),
+    g ≫ PSpace.str (𝓞 K) m = p →
+    (∀ lam : Fin (m + 1) → 𝓞 K, ∑ k, lam k • u k = 0 → ∑ k, algX p ⊤ (lam k) • GlobalTheory.Cartier.secPull (ProjSpace.coord (𝓞 K) m k) g = 0) →
+    (∀ j, b j = ∑ k, c k j • u k) → (∀ σ, (A σ).det ≠ 0) →
+    ∀ τ : 𝓞 K →+* ℂ, Weight.NoCommonZero fun a => ∑ k, (c.map (OfLattice.extEmb τ) * A (OfLattice.extEmb τ)) k a • secVal p τ (GlobalTheory.Cartier.secPull (ProjSpace.coord (𝓞 K) m k) g) := by
+  intro K V _ _ _ _ _ _ m N X _ p g u b c A _hg hrel hb hA τ i y hy
+  classical
+  set s := fun k => GlobalTheory.Cartier.secPull (ProjSpace.coord (𝓞 K) m k) g with hs
+  set w : Fin (m + 1) → ℂ := fun k => secVal p τ (s k) i y with hw_def
+  have hsup := ProjSpace.iSup_nonzeroLocus_secPull (ProjSpace.iSup_nonzeroLocus_coord (𝓞 K) m) g
+  have hw : w ≠ 0 := by
+    obtain ⟨k, hk⟩ := TopologicalSpace.Opens.mem_iSup.1
+      (show y.1 (IsLocalRing.closedPoint ℂ) ∈ ⨆ k, nonzeroLocus (s k) by rw [hsup]; trivial)
+    intro h0
+    exact (secVal_ne_zero_iff (s k) hy).2 (mem_ptsIn.2 hk) (congrFun h0 k)
+  have H : ∀ lam : Fin (m + 1) → 𝓞 K, ∑ k, lam k • u k = 0 → ∑ k, τ (lam k) * w k = 0 := by
+    intro lam h
+    have e := congrArg (fun t => secVal p τ t i y) (hrel lam h)
+
+    simpa [map_sum, secVal_smul, Finset.sum_apply, hw_def] using e
+  obtain ⟨a, ha⟩ := exists_ne_zero_of_rel (OfLattice.extEmb τ) u b c (A (OfLattice.extEmb τ)) w hw
+    (rel_field_of_rel_int τ u w H) hb (hA _)
+  refine ⟨a, ?_⟩
+  simpa [Finset.sum_apply, hw_def] using ha

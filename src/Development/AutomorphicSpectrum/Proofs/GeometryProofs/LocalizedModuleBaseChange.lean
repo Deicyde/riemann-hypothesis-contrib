@@ -1,6 +1,56 @@
 module
 
-public import Mathlib
+public import Mathlib.Algebra.Module.LocalizedModule.Basic
+public import Mathlib.Algebra.Module.Projective
+public import Mathlib.GroupTheory.GroupAction.Ring
+public import Mathlib.GroupTheory.MonoidLocalization.Away
+public import Mathlib.RingTheory.Finiteness.Defs
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+public import Mathlib.RingTheory.TensorProduct.IsBaseChangePi
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
+public import Mathlib.RingTheory.Finiteness.Cardinality
+public import Mathlib.RingTheory.Localization.Basic
 
 @[expose] public section
 
@@ -8,15 +58,13 @@ namespace GlobalTheory.CompanionTheory.LocHom
 
 variable {R : Type*} [CommRing R]
 
-theorem isLocalizedModule_of_retract
-    {M M' N N' : Type*} [AddCommGroup M] [AddCommGroup M'] [AddCommGroup N] [AddCommGroup N']
-    [Module R M] [Module R M'] [Module R N] [Module R N']
-    (S : Submonoid R)
-    (g : M →ₗ[R] M')
-    (h : N →ₗ[R] N') [IsLocalizedModule S h]
-    (i : M →ₗ[R] N) (j : N →ₗ[R] M) (i' : M' →ₗ[R] N') (j' : N' →ₗ[R] M') (hji : ∀ x, j (i x) = x)
-    (hji' : ∀ x, j' (i' x) = x) (hi : ∀ x, h (i x) = i' (g x)) (hj : ∀ y, g (j y) = j' (h y))
-    : IsLocalizedModule S g := by
+theorem isLocalizedModule_of_retract {M M' N N' : Type*} [AddCommGroup M] [AddCommGroup M']
+    [AddCommGroup N] [AddCommGroup N'] [Module R M] [Module R M'] [Module R N] [Module R N']
+    (S : Submonoid R) (g : M →ₗ[R] M') (h : N →ₗ[R] N') [IsLocalizedModule S h]
+    (i : M →ₗ[R] N) (j : N →ₗ[R] M) (i' : M' →ₗ[R] N') (j' : N' →ₗ[R] M')
+    (hji : ∀ x, j (i x) = x) (hji' : ∀ x, j' (i' x) = x)
+    (hi : ∀ x, h (i x) = i' (g x)) (hj : ∀ y, g (j y) = j' (h y)) :
+    IsLocalizedModule S g := by
   refine ⟨?_, ?_, ?_⟩
   · intro s
     rw [Module.End.isUnit_iff]
@@ -45,11 +93,10 @@ theorem isLocalizedModule_of_retract
     have h1 := congrArg j hc
     simpa only [Submonoid.smul_def, map_smul, hji] using h1
 
-theorem map_away_smul
-    {f : R} {P D : Type*} [AddCommGroup P] [Module R P] [Module (Localization.Away f) P]
-    [IsScalarTower R (Localization.Away f) P] [CommRing D] [Algebra R D]
-    (ρ : Localization.Away f →ₐ[R] D) (φ : P →ₗ[R] D) (a : Localization.Away f) (p : P)
-    : φ (a • p) = ρ a * φ p := by
+theorem map_away_smul {f : R} {P D : Type*} [AddCommGroup P] [Module R P]
+    [Module (Localization.Away f) P] [IsScalarTower R (Localization.Away f) P]
+    [CommRing D] [Algebra R D] (ρ : Localization.Away f →ₐ[R] D) (φ : P →ₗ[R] D)
+    (a : Localization.Away f) (p : P) : φ (a • p) = ρ a * φ p := by
   obtain ⟨⟨r, s⟩, hrs⟩ := IsLocalization.surj (Submonoid.powers f) a
   simp only at hrs
   have hs : IsUnit (algebraMap R D s) := by
@@ -68,38 +115,36 @@ theorem map_away_smul
 
 section retraction
 
-variable
-  {A P D : Type*}
-  [CommRing A] [Algebra R A] [AddCommGroup P] [Module R P] [CommRing D] [Algebra R D]
-  {n : ℕ}
+variable {A P D : Type*} [CommRing A] [Algebra R A] [AddCommGroup P] [Module R P]
+  [CommRing D] [Algebra R D] {n : ℕ}
 
 noncomputable def coord (s : P →ₗ[R] (Fin n → A)) (ρ : A →ₐ[R] D) (k : Fin n) : P →ₗ[R] D :=
   ρ.toLinearMap ∘ₗ LinearMap.proj k ∘ₗ s
 
-noncomputable def assemble (s : P →ₗ[R] (Fin n → A)) (ρ : A →ₐ[R] D)
-    : (Fin n → D) →ₗ[R] (P →ₗ[R] D) where
+noncomputable def assemble (s : P →ₗ[R] (Fin n → A)) (ρ : A →ₐ[R] D) :
+    (Fin n → D) →ₗ[R] (P →ₗ[R] D) where
   toFun v := ∑ k, v k • coord s ρ k
   map_add' v w := by simp [add_smul, Finset.sum_add_distrib]
   map_smul' r v := by simp [Finset.smul_sum, smul_assoc]
 
-def evalAt (D : Type*) [CommRing D] [Algebra R D] (b : Fin n → P)
-    : (P →ₗ[R] D) →ₗ[R] (Fin n → D) where
+def evalAt (D : Type*) [CommRing D] [Algebra R D] (b : Fin n → P) :
+    (P →ₗ[R] D) →ₗ[R] (Fin n → D) where
   toFun φ k := φ (b k)
   map_add' _ _ := rfl
   map_smul' _ _ := rfl
 
 end retraction
 
-theorem isLocalizedModule_compRight_away
-    : ∀ (R P C C' : Type) [CommRing R] [CommRing C] [CommRing C'] [Algebra R C] [Algebra R C']
-        (f t : R) [AddCommGroup P] [Module R P] [Module (Localization.Away f) P]
-        [IsScalarTower R (Localization.Away f) P] [Module.Finite (Localization.Away f) P]
-        [Module.Projective (Localization.Away f) P],
-      IsUnit (algebraMap R C f)
-        → ∀ c : C →ₐ[R] C',
-          IsLocalizedModule (Submonoid.powers t) c.toLinearMap
-            → IsLocalizedModule (Submonoid.powers t)
-              (LinearMap.compRight R c.toLinearMap : (P →ₗ[R] C) →ₗ[R] (P →ₗ[R] C')) := by
+theorem isLocalizedModule_compRight_away :
+    ∀ (R P C C' : Type) [CommRing R] [CommRing C] [CommRing C'] [Algebra R C] [Algebra R C']
+      (f t : R) [AddCommGroup P] [Module R P]
+      [Module (Localization.Away f) P] [IsScalarTower R (Localization.Away f) P]
+      [Module.Finite (Localization.Away f) P]
+      [Module.Projective (Localization.Away f) P], IsUnit (algebraMap R C f) →
+      ∀ c : C →ₐ[R] C',
+      IsLocalizedModule (Submonoid.powers t) c.toLinearMap →
+      IsLocalizedModule (Submonoid.powers t)
+        (LinearMap.compRight R c.toLinearMap : (P →ₗ[R] C) →ₗ[R] (P →ₗ[R] C')) := by
   intro R P C C' _ _ _ _ _ f t _ _ _ _ _ _ hf c hc
   have hunit : ∀ y : Submonoid.powers f, IsUnit ((Algebra.ofId R C) (y : R)) := by
     rintro ⟨_, k, rfl⟩
@@ -117,25 +162,25 @@ theorem isLocalizedModule_compRight_away
     simp only [LinearMap.comp_apply, LinearMap.id_apply] at h1
     rw [h1] at h2
     exact h2.symm
-  have hret
-      : ∀ {D : Type} [CommRing D] [Algebra R D] (σ : Localization.Away f →ₐ[R] D) (φ : P →ₗ[R] D),
-        assemble s₀ σ (evalAt D b φ) = φ := by
+  have hret : ∀ {D : Type} [CommRing D] [Algebra R D] (σ : Localization.Away f →ₐ[R] D)
+      (φ : P →ₗ[R] D), assemble s₀ σ (evalAt D b φ) = φ := by
     intro D _ _ σ φ
     ext p
     conv_rhs => rw [← hexp p]
-    set_option synthInstance.maxHeartbeats 100000 in
+
     simp [assemble, evalAt, coord, s₀, map_sum, map_away_smul σ, mul_comm]
   haveI : IsLocalizedModule (Submonoid.powers t)
       (LinearMap.pi fun k : Fin n => c.toLinearMap ∘ₗ LinearMap.proj k) :=
     IsLocalizedModule.pi (Submonoid.powers t) (fun _ : Fin n => c.toLinearMap)
   refine isLocalizedModule_of_retract (Submonoid.powers t) _
-    (LinearMap.pi fun k : Fin n => c.toLinearMap ∘ₗ LinearMap.proj k) (evalAt C b) (assemble s₀ ρ)
-    (evalAt C' b) (assemble s₀ ρ') (hret ρ) (hret ρ') ?_ ?_
+    (LinearMap.pi fun k : Fin n => c.toLinearMap ∘ₗ LinearMap.proj k)
+    (evalAt C b) (assemble s₀ ρ) (evalAt C' b) (assemble s₀ ρ')
+    (hret ρ) (hret ρ') ?_ ?_
   · intro φ
     rfl
   · intro v
     ext p
-    set_option synthInstance.maxHeartbeats 100000 in
+
     simp [assemble, coord, ρ', map_sum]
 
 end GlobalTheory.CompanionTheory.LocHom

@@ -1,7 +1,51 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Definitions.Foundations.CyclotomicDvdExpandOfCoprime
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+public import Mathlib.Data.Nat.Choose.Dvd
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.PowerSeries.Expand
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Lemma
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -107,8 +151,8 @@ open PowerSeries in
 variable {R : Type} [CommRing R] (p : ℕ) [hp : Fact p.Prime] in
 private lemma coeff_sum_expand_mul_X_pow (g : Fin p → R⟦X⟧) (n : ℕ) (j : Fin p) :
     coeff (p * n + j) (∑ i, expand p hp.out.ne_zero (g i) * X ^ (i : ℕ)) = coeff n (g j) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum, Finset.sum_eq_single j]
+
+  rw [map_sum, Finset.sum_eq_single j]
   · rw [coeff_mul_X_pow, coeff_expand_mul]
   · intro i _ hij
     rw [coeff_mul_X_pow']
@@ -137,12 +181,8 @@ private lemma eq_zero_of_sum_expand_mul_X_pow_eq_zero (g : Fin p → R⟦X⟧)
 open PowerSeries in
 variable {R : Type} [CommRing R] (p : ℕ) [hp : Fact p.Prime] in
 variable [IsAdicComplete (Ideal.span {(p : R)}) R] in
-theorem _root_.GlobalTheory.Col.Model.indep
-    (hu : (p : R) ∈ nonunits R)
-    (g : Fin p → PowerSeries R)
-    (hg : ∑ i, _root_.GlobalTheory.Col.phi p hp.out.pos (g i) * X ^ (i : ℕ) = 0)
-    (i : Fin p)
-    : g i = 0 := by
+theorem _root_.GlobalTheory.Col.Model.indep (hu : (p : R) ∈ nonunits R) (g : Fin p → PowerSeries R)
+    (hg : ∑ i, _root_.GlobalTheory.Col.phi p hp.out.pos (g i) * X ^ (i : ℕ) = 0) (i : Fin p) : g i = 0 := by
   have key : ∀ k : ℕ, ∃ w : Fin p → R⟦X⟧, ∀ i, g i = ((p : R) ^ k) • w i := by
     intro k
     induction k with
@@ -150,21 +190,17 @@ theorem _root_.GlobalTheory.Col.Model.indep
     | succ k ih =>
       obtain ⟨w, hw⟩ := ih
       obtain ⟨D, hD⟩ := exists_sum_phi_eq_sum_expand_add_smul p w
-      have hψ
-          : ((p : R) ^ k) • ∑ i, _root_.GlobalTheory.Col.phi p hp.out.pos (w i) * X ^ (i : ℕ)
-            = 0 := by
+      have hψ : ((p : R) ^ k) • ∑ i, _root_.GlobalTheory.Col.phi p hp.out.pos (w i) * X ^ (i : ℕ) = 0 := by
         rw [← hg, Finset.smul_sum]
         refine Finset.sum_congr rfl fun i _ => ?_
         rw [hw i, map_smul, smul_mul_assoc]
       rw [hD, smul_add, smul_smul, ← pow_succ] at hψ
-      have h0
-          : ∑ i, expand p hp.out.ne_zero
-              (g i + ((p : R) ^ (k + 1)) • PowerSeries.mk fun n => coeff (p * n + i) D) * X ^ (i : ℕ)
-            = 0 := by
-        simp only [map_add (f := _), map_smul, add_mul, smul_mul_assoc, Finset.sum_add_distrib,
-          ← Finset.smul_sum, sum_expand_mk_coeff_mul_X_pow_eq, hw]
+      have h0 : ∑ i, expand p hp.out.ne_zero
+          (g i + ((p : R) ^ (k + 1)) • PowerSeries.mk fun n => coeff (p * n + i) D) * X ^ (i : ℕ) = 0 := by
+        simp only [map_add (f := _), map_smul, add_mul, smul_mul_assoc, Finset.sum_add_distrib, ← Finset.smul_sum,
+          sum_expand_mk_coeff_mul_X_pow_eq, hw]
         exact hψ
-      refine ⟨fun i => - PowerSeries.mk fun n => coeff (p * n + i) D, fun i => ?_⟩
+      refine ⟨fun i => -PowerSeries.mk fun n => coeff (p * n + i) D, fun i => ?_⟩
       have := eq_zero_of_sum_expand_mul_X_pow_eq_zero p _ h0 i
       rw [smul_neg, eq_neg_iff_add_eq_zero]
       exact this
@@ -173,8 +209,7 @@ theorem _root_.GlobalTheory.Col.Model.indep
   refine IsHausdorff.haus' (I := Ideal.span {(p : R)}) (coeff n (g i)) fun k => ?_
   obtain ⟨w, hw⟩ := key k
   rw [SModEq.sub_mem, sub_zero, hw i, coeff_smul]
-  exact Submodule.smul_mem_smul (Ideal.pow_mem_pow (Ideal.mem_span_singleton_self _) k)
-    Submodule.mem_top
+  exact Submodule.smul_mem_smul (Ideal.pow_mem_pow (Ideal.mem_span_singleton_self _) k) Submodule.mem_top
 
 open PowerSeries in
 variable {R : Type} [CommRing R] (p : ℕ) [hp : Fact p.Prime] in
@@ -190,9 +225,8 @@ private lemma mem_span_pow_smul_univ_iff_eq_pow_mul (K : ℕ) (x : R) :
 open PowerSeries in
 variable {R : Type} [CommRing R] (p : ℕ) [hp : Fact p.Prime] in
 variable [IsAdicComplete (Ideal.span {(p : R)}) R] in
-theorem _root_.GlobalTheory.Col.Model.spans (hu : (p : R) ∈ nonunits R) (h : PowerSeries R)
-    : ∃ g : Fin p → PowerSeries R,
-      h = ∑ i, _root_.GlobalTheory.Col.phi p hp.out.pos (g i) * X ^ (i : ℕ) := by
+theorem _root_.GlobalTheory.Col.Model.spans (hu : (p : R) ∈ nonunits R) (h : PowerSeries R) :
+    ∃ g : Fin p → PowerSeries R, h = ∑ i, _root_.GlobalTheory.Col.phi p hp.out.pos (g i) * X ^ (i : ℕ) := by
   set ψ : (Fin p → R⟦X⟧) → R⟦X⟧ := fun g => ∑ i, _root_.GlobalTheory.Col.phi p hp.out.pos (g i) * X ^ (i : ℕ)
     with hψdef
   have ψ_add : ∀ a b, ψ (a + b) = ψ a + ψ b := fun a b => by
@@ -202,8 +236,7 @@ theorem _root_.GlobalTheory.Col.Model.spans (hu : (p : R) ∈ nonunits R) (h : P
   have ψ_zero : ψ 0 = 0 := by simp [hψdef]
   have step : ∀ h : R⟦X⟧, ∃ g : Fin p → R⟦X⟧, ∃ h' : R⟦X⟧, h = ψ g + (p : R) • h' := by
     intro h
-    obtain ⟨D, hD⟩ :=
-      exists_sum_phi_eq_sum_expand_add_smul p (fun i => PowerSeries.mk fun n => coeff (p * n + i) h)
+    obtain ⟨D, hD⟩ := exists_sum_phi_eq_sum_expand_add_smul p (fun i => PowerSeries.mk fun n => coeff (p * n + i) h)
     rw [sum_expand_mk_coeff_mul_X_pow_eq] at hD
     refine ⟨fun i => PowerSeries.mk fun n => coeff (p * n + i) h, -D, ?_⟩
     simp only [hψdef]
@@ -221,34 +254,30 @@ theorem _root_.GlobalTheory.Col.Model.spans (hu : (p : R) ∈ nonunits R) (h : P
       rw [Finset.sum_range_zero, ψ_zero, pow_zero, one_smul, zero_add]
     | succ K ih =>
       conv_lhs => rw [ih]
-      rw [show A (K + 1) = A K + ((p : R) ^ K) • G (hs K) from Finset.sum_range_succ _ _, ψ_add,
-        ψ_smul, hs_succ]
+      rw [show A (K + 1) = A K + ((p : R) ^ K) • G (hs K) from Finset.sum_range_succ _ _, ψ_add, ψ_smul,
+        hs_succ]
       conv_lhs => rw [hGH (hs K)]
       rw [smul_add, smul_smul, ← pow_succ]
       abel
-  have hcauchy
-      : ∀ (i : Fin p) (n : ℕ) {a b : ℕ},
-        a ≤ b
-          → coeff n (A a i) ≡ coeff n (A b i) [SMOD ((Ideal.span {(p : R)}) ^ a • ⊤ : Submodule R R)] :=
-    by
-      intro i n a b hab
-      rw [SModEq.sub_mem, mem_span_pow_smul_univ_iff_eq_pow_mul]
-      have hsplit : A b = A a + ∑ k ∈ Finset.Ico a b, ((p : R) ^ k) • G (hs k) := by
-        simp only [A]
-        rw [Finset.sum_range_add_sum_Ico _ hab]
-      rw [hsplit]
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [Pi.add_apply, Finset.sum_apply, Pi.smul_apply, map_add (f := _), map_sum,
-          coeff_smul, smul_eq_mul, sub_add_cancel_left]
-      refine ⟨- ∑ k ∈ Finset.Ico a b, (p : R) ^ (k - a) * coeff n (G (hs k) i), ?_⟩
-      rw [mul_neg, Finset.mul_sum]
-      congr 1
-      refine Finset.sum_congr rfl fun k hk => ?_
-      rw [← mul_assoc, ← pow_add, Nat.add_sub_cancel' (Finset.mem_Ico.1 hk).1]
-  have hlim
-      : ∀ (i : Fin p) (n : ℕ), ∃ L : R, ∀ K,
-        coeff n (A K i) ≡ L [SMOD ((Ideal.span {(p : R)}) ^ K • ⊤ : Submodule R R)] := fun i n =>
-    IsPrecomplete.prec' _ (hcauchy i n)
+  have hcauchy : ∀ (i : Fin p) (n : ℕ) {a b : ℕ}, a ≤ b →
+      coeff n (A a i) ≡ coeff n (A b i) [SMOD ((Ideal.span {(p : R)}) ^ a • ⊤ : Submodule R R)] := by
+    intro i n a b hab
+    rw [SModEq.sub_mem, mem_span_pow_smul_univ_iff_eq_pow_mul]
+    have hsplit : A b = A a + ∑ k ∈ Finset.Ico a b, ((p : R) ^ k) • G (hs k) := by
+      simp only [A]
+      rw [Finset.sum_range_add_sum_Ico _ hab]
+    rw [hsplit]
+
+    simp only [Pi.add_apply, Finset.sum_apply, Pi.smul_apply, map_add (f := _), map_sum, coeff_smul, smul_eq_mul,
+    sub_add_cancel_left]
+    refine ⟨-∑ k ∈ Finset.Ico a b, (p : R) ^ (k - a) * coeff n (G (hs k) i), ?_⟩
+    rw [mul_neg, Finset.mul_sum]
+    congr 1
+    refine Finset.sum_congr rfl fun k hk => ?_
+    rw [← mul_assoc, ← pow_add, Nat.add_sub_cancel' (Finset.mem_Ico.1 hk).1]
+  have hlim : ∀ (i : Fin p) (n : ℕ), ∃ L : R, ∀ K,
+      coeff n (A K i) ≡ L [SMOD ((Ideal.span {(p : R)}) ^ K • ⊤ : Submodule R R)] :=
+    fun i n => IsPrecomplete.prec' _ (hcauchy i n)
   choose L hL using hlim
   refine ⟨fun i => PowerSeries.mk (L i), ?_⟩
   show h = ψ (fun i => PowerSeries.mk (L i))
@@ -257,23 +286,16 @@ theorem _root_.GlobalTheory.Col.Model.spans (hu : (p : R) ∈ nonunits R) (h : P
   rw [map_zero]
   refine IsHausdorff.haus' (I := Ideal.span {(p : R)}) _ fun K => ?_
   rw [SModEq.sub_mem, sub_zero, mem_span_pow_smul_univ_iff_eq_pow_mul]
-  have hΔ : ∀ (i : Fin p) (n : ℕ), ∃ c, coeff n (A K i) - L i n = (p : R) ^ K * c := fun i n =>
-    (mem_span_pow_smul_univ_iff_eq_pow_mul p K _).1 (SModEq.sub_mem.1 (hL i n K))
+  have hΔ : ∀ (i : Fin p) (n : ℕ), ∃ c, coeff n (A K i) - L i n = (p : R) ^ K * c :=
+    fun i n => (mem_span_pow_smul_univ_iff_eq_pow_mul p K _).1 (SModEq.sub_mem.1 (hL i n K))
   choose c hc using hΔ
-  have hdiff
-      : A K - (fun i => PowerSeries.mk (L i))
-        = ((p : R) ^ K) • (fun i => PowerSeries.mk (c i)) := by
+  have hdiff : A K - (fun i => PowerSeries.mk (L i)) = ((p : R) ^ K) • (fun i => PowerSeries.mk (c i)) := by
     funext i
     ext n
     simp [hc]
-  have e1
-      : ψ (A K)
-        = ψ (fun i => PowerSeries.mk (L i))
-          + ((p : R) ^ K) • ψ (fun i => PowerSeries.mk (c i)) := by
+  have e1 : ψ (A K) = ψ (fun i => PowerSeries.mk (L i)) + ((p : R) ^ K) • ψ (fun i => PowerSeries.mk (c i)) := by
     rw [← ψ_smul, ← ψ_add, ← hdiff, add_sub_cancel]
-  have e2
-      : h - ψ (fun i => PowerSeries.mk (L i))
-        = ((p : R) ^ K) • (hs K + ψ (fun i => PowerSeries.mk (c i))) := by
+  have e2 : h - ψ (fun i => PowerSeries.mk (L i)) = ((p : R) ^ K) • (hs K + ψ (fun i => PowerSeries.mk (c i))) := by
     conv_lhs => rw [hA K]
     rw [e1, smul_add]
     abel
@@ -284,8 +306,7 @@ end Free
 
 def Up (R : Type) [CommRing R] (_p : ℕ) : Type := PowerSeries R
 
-instance (R : Type) [CommRing R] (p : ℕ) : CommRing (Up R p) :=
-  inferInstanceAs (CommRing (PowerSeries R))
+instance (R : Type) [CommRing R] (p : ℕ) : CommRing (Up R p) := inferInstanceAs (CommRing (PowerSeries R))
 
 instance (R : Type) [CommRing R] (p : ℕ) [hp : Fact p.Prime] : Algebra (PowerSeries R) (Up R p) :=
   RingHom.toAlgebra (S := Up R p) (phi (R := R) p hp.out.pos).toRingHom
@@ -296,8 +317,7 @@ variable {R : Type} [CommRing R] (p : ℕ) [hp : Fact p.Prime]
 variable [IsAdicComplete (Ideal.span {(p : R)}) R]
 
 def basis (hu : (p : R) ∈ nonunits R) : Module.Basis (Fin p) (PowerSeries R) (Up R p) :=
-  Module.Basis.mk
-    (v := fun i => (show Up R p from (X : PowerSeries R) ^ (i : ℕ)))
+  Module.Basis.mk (v := fun i => (show Up R p from (X : PowerSeries R) ^ (i : ℕ)))
     (Fintype.linearIndependent_iff.2 fun g hg i => indep p hu g hg i)
     (fun h _ => by
       obtain ⟨g, hg⟩ := spans p hu h
@@ -308,11 +328,9 @@ end Basis
 
 def UpL (R : Type) [CommRing R] (p m : ℕ) (_hm : 1 ≤ m) : Type := lev R p (m + 1)
 
-instance (R : Type) [CommRing R] (p m : ℕ) (hm : 1 ≤ m) : CommRing (UpL R p m hm) :=
-  inferInstanceAs (CommRing (lev R p (m + 1)))
+instance (R : Type) [CommRing R] (p m : ℕ) (hm : 1 ≤ m) : CommRing (UpL R p m hm) := inferInstanceAs (CommRing (lev R p (m + 1)))
 
-instance (R : Type) [CommRing R] (p m : ℕ) [Fact p.Prime] (hm : 1 ≤ m)
-    : Algebra (lev R p m) (UpL R p m hm) :=
+instance (R : Type) [CommRing R] (p m : ℕ) [Fact p.Prime] (hm : 1 ≤ m) : Algebra (lev R p m) (UpL R p m hm) :=
   RingHom.toAlgebra (S := UpL R p m hm) (up (R := R) p m hm)
 
 section Level
@@ -322,39 +340,27 @@ def toUp (p : ℕ) (h : PowerSeries R) : Up R p := h
 
 def toUpL (p m : ℕ) (hm : 1 ≤ m) (x : lev R p (m + 1)) : UpL R p m hm := x
 
-theorem up_ev (g : PowerSeries R) : up p m hm (ev R p m g) = ev R p (m + 1) (phi p hp.out.pos g) :=
-  rfl
+theorem up_ev (g : PowerSeries R) : up p m hm (ev R p m g) = ev R p (m + 1) (phi p hp.out.pos g) := rfl
 
 variable [IsAdicComplete (Ideal.span {(p : R)}) R]
 
 open PowerSeries in
 variable {R : Type} [CommRing R] (p : ℕ) [hp : Fact p.Prime] (m : ℕ) (hm : 1 ≤ m) in
 variable [IsAdicComplete (Ideal.span {(p : R)}) R] in
-theorem _root_.GlobalTheory.Col.Model.indepL
-    (hu : (p : R) ∈ nonunits R)
-    (x : Fin p → _root_.GlobalTheory.Col.lev R p m)
-    (hx
-      : ∑ i, _root_.GlobalTheory.Col.up p m hm (x i) * _root_.GlobalTheory.Col.ev R p (m + 1) (X ^ (i : ℕ))
-        = 0)
-    (i : Fin p)
-    : x i = 0 := by
-  have hsurj : Function.Surjective (_root_.GlobalTheory.Col.ev R p m) :=
-    Ideal.Quotient.mk_surjective
+theorem _root_.GlobalTheory.Col.Model.indepL (hu : (p : R) ∈ nonunits R) (x : Fin p → _root_.GlobalTheory.Col.lev R p m)
+    (hx : ∑ i, _root_.GlobalTheory.Col.up p m hm (x i) * _root_.GlobalTheory.Col.ev R p (m + 1) (X ^ (i : ℕ)) = 0) (i : Fin p) : x i = 0 := by
+  have hsurj : Function.Surjective (_root_.GlobalTheory.Col.ev R p m) := Ideal.Quotient.mk_surjective
   choose g hg using fun i => hsurj (x i)
-  have hzero
-      : _root_.GlobalTheory.Col.ev R p (m + 1)
-          (∑ i, _root_.GlobalTheory.Col.phi p hp.out.pos (g i) * X ^ (i : ℕ))
-        = 0 := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, ← hx]
+  have hzero : _root_.GlobalTheory.Col.ev R p (m + 1)
+      (∑ i, _root_.GlobalTheory.Col.phi p hp.out.pos (g i) * X ^ (i : ℕ)) = 0 := by
+
+    rw [map_sum, ← hx]
     refine Finset.sum_congr rfl fun k _ => ?_
     rw [map_mul, ← _root_.GlobalTheory.Col.Model.up_ev p m hm, hg]
   obtain ⟨k, hk⟩ := Ideal.mem_span_singleton'.1 (Ideal.Quotient.eq_zero_iff_mem.1 hzero)
   obtain ⟨d, hd⟩ := _root_.GlobalTheory.Col.Model.spans p hu k
-  have hdiff
-      : ∑ i, _root_.GlobalTheory.Col.phi p hp.out.pos
-          (g i - d i * _root_.GlobalTheory.Col.cyc R p m) * X ^ (i : ℕ)
-        = 0 := by
+  have hdiff : ∑ i, _root_.GlobalTheory.Col.phi p hp.out.pos
+      (g i - d i * _root_.GlobalTheory.Col.cyc R p m) * X ^ (i : ℕ) = 0 := by
     simp only [map_sub, map_mul, sub_mul, Finset.sum_sub_distrib]
     rw [sub_eq_zero, ← hk, hd, Finset.sum_mul, ← _root_.GlobalTheory.Col.phi_cyc p m hm]
     refine Finset.sum_congr rfl fun j _ => ?_
@@ -364,34 +370,29 @@ theorem _root_.GlobalTheory.Col.Model.indepL
   rw [← hg, hgi, map_mul, _root_.GlobalTheory.Col.ev_cyc_self, mul_zero]
 
 def basisL (hu : (p : R) ∈ nonunits R) : Module.Basis (Fin p) (lev R p m) (UpL R p m hm) :=
-  Module.Basis.mk
-    (v := fun i => toUpL p m hm (ev R p (m + 1) ((X : PowerSeries R) ^ (i : ℕ))))
+  Module.Basis.mk (v := fun i => toUpL p m hm (ev R p (m + 1) ((X : PowerSeries R) ^ (i : ℕ))))
     (Fintype.linearIndependent_iff.2 fun g hg i => indepL p m hm hu g hg i)
     (fun x _ => by
       obtain ⟨h, rfl⟩ := Ideal.Quotient.mk_surjective (show lev R p (m + 1) from x)
       obtain ⟨g, hg⟩ := spans p hu h
       refine (Submodule.mem_span_range_iff_exists_fun _).2 ⟨fun i => ev R p m (g i), ?_⟩
       change ∑ i, up p m hm (ev R p m (g i)) * ev R p (m + 1) (X ^ (i : ℕ)) = ev R p (m + 1) h
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [hg, map_sum]
+
+      rw [hg, map_sum]
       refine Finset.sum_congr rfl fun j _ => ?_
       rw [map_mul, up_ev])
+
 
 open PowerSeries in
 variable {R : Type} [CommRing R] (p : ℕ) [hp : Fact p.Prime] (m : ℕ) (hm : 1 ≤ m) in
 variable [IsAdicComplete (Ideal.span {(p : R)}) R] in
-theorem _root_.GlobalTheory.Col.Model.nrm_ev (hu : (p : R) ∈ nonunits R) (h : PowerSeries R)
-    : _root_.GlobalTheory.Col.nrm p m hm (_root_.GlobalTheory.Col.ev R p (m + 1) h)
-      = _root_.GlobalTheory.Col.ev R p m (_root_.GlobalTheory.Col.normOp p h) := by
-  have hN1
-      : _root_.GlobalTheory.Col.normOp p h
-        = Algebra.norm (PowerSeries R) (_root_.GlobalTheory.Col.Model.toUp p h) :=
-    rfl
-  have hN2
-      : _root_.GlobalTheory.Col.nrm p m hm (_root_.GlobalTheory.Col.ev R p (m + 1) h)
-        = Algebra.norm (_root_.GlobalTheory.Col.lev R p m)
-          (_root_.GlobalTheory.Col.Model.toUpL p m hm (_root_.GlobalTheory.Col.ev R p (m + 1) h)) :=
-    rfl
+theorem _root_.GlobalTheory.Col.Model.nrm_ev (hu : (p : R) ∈ nonunits R) (h : PowerSeries R) :
+    _root_.GlobalTheory.Col.nrm p m hm (_root_.GlobalTheory.Col.ev R p (m + 1) h) = _root_.GlobalTheory.Col.ev R p m (_root_.GlobalTheory.Col.normOp p h) := by
+  have hN1 : _root_.GlobalTheory.Col.normOp p h =
+      Algebra.norm (PowerSeries R) (_root_.GlobalTheory.Col.Model.toUp p h) := rfl
+  have hN2 : _root_.GlobalTheory.Col.nrm p m hm (_root_.GlobalTheory.Col.ev R p (m + 1) h) =
+      Algebra.norm (_root_.GlobalTheory.Col.lev R p m)
+        (_root_.GlobalTheory.Col.Model.toUpL p m hm (_root_.GlobalTheory.Col.ev R p (m + 1) h)) := rfl
   rw [hN1, hN2, Algebra.norm_eq_matrix_det (_root_.GlobalTheory.Col.Model.basis p hu),
     Algebra.norm_eq_matrix_det (_root_.GlobalTheory.Col.Model.basisL p m hm hu), RingHom.map_det]
   congr 1
@@ -401,35 +402,29 @@ theorem _root_.GlobalTheory.Col.Model.nrm_ev (hu : (p : R) ∈ nonunits R) (h : 
   set c : Fin p → PowerSeries R := fun k =>
     (_root_.GlobalTheory.Col.Model.basis p hu).repr
       (_root_.GlobalTheory.Col.Model.toUp p h * _root_.GlobalTheory.Col.Model.basis p hu j) k with hcdef
-  have hb
-      : ∀ k : Fin p,
-        _root_.GlobalTheory.Col.Model.basis p hu k
-          = _root_.GlobalTheory.Col.Model.toUp p (X ^ (k : ℕ)) := fun k => by
+  have hb : ∀ k : Fin p, _root_.GlobalTheory.Col.Model.basis p hu k =
+      _root_.GlobalTheory.Col.Model.toUp p (X ^ (k : ℕ)) := fun k => by
     unfold _root_.GlobalTheory.Col.Model.basis
     rw [Module.Basis.mk_apply]
     rfl
-  have hc
-      : _root_.GlobalTheory.Col.Model.toUp p h * _root_.GlobalTheory.Col.Model.basis p hu j
-        = ∑ k, c k • _root_.GlobalTheory.Col.Model.basis p hu k :=
+  have hc : _root_.GlobalTheory.Col.Model.toUp p h * _root_.GlobalTheory.Col.Model.basis p hu j =
+      ∑ k, c k • _root_.GlobalTheory.Col.Model.basis p hu k :=
     ((_root_.GlobalTheory.Col.Model.basis p hu).sum_repr _).symm
-  have hc'
-      : h * X ^ (j : ℕ) = ∑ k, _root_.GlobalTheory.Col.phi p hp.out.pos (c k) * X ^ (k : ℕ) := by
+  have hc' : h * X ^ (j : ℕ) =
+      ∑ k, _root_.GlobalTheory.Col.phi p hp.out.pos (c k) * X ^ (k : ℕ) := by
     simp only [Algebra.smul_def, hb] at hc
     exact hc
-  have key
-      : _root_.GlobalTheory.Col.Model.toUpL p m hm (_root_.GlobalTheory.Col.ev R p (m + 1) h)
-          * _root_.GlobalTheory.Col.Model.basisL p m hm hu j
-        = ∑ k, _root_.GlobalTheory.Col.ev R p m (c k) • _root_.GlobalTheory.Col.Model.basisL p m hm hu k :=
-    by
-      simp only [_root_.GlobalTheory.Col.Model.basisL, Module.Basis.mk_apply, Algebra.smul_def]
-      change _root_.GlobalTheory.Col.ev R p (m + 1) h
-          * _root_.GlobalTheory.Col.ev R p (m + 1) (X ^ (j : ℕ))
-        = ∑ k, _root_.GlobalTheory.Col.up p m hm (_root_.GlobalTheory.Col.ev R p m (c k)) *
-            _root_.GlobalTheory.Col.ev R p (m + 1) (X ^ (k : ℕ))
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [← map_mul, hc', map_sum]
-      refine Finset.sum_congr rfl fun k _ => ?_
-      rw [map_mul, _root_.GlobalTheory.Col.Model.up_ev]
+  have key : _root_.GlobalTheory.Col.Model.toUpL p m hm (_root_.GlobalTheory.Col.ev R p (m + 1) h) *
+      _root_.GlobalTheory.Col.Model.basisL p m hm hu j =
+      ∑ k, _root_.GlobalTheory.Col.ev R p m (c k) • _root_.GlobalTheory.Col.Model.basisL p m hm hu k := by
+    simp only [_root_.GlobalTheory.Col.Model.basisL, Module.Basis.mk_apply, Algebra.smul_def]
+    change _root_.GlobalTheory.Col.ev R p (m + 1) h * _root_.GlobalTheory.Col.ev R p (m + 1) (X ^ (j : ℕ)) =
+      ∑ k, _root_.GlobalTheory.Col.up p m hm (_root_.GlobalTheory.Col.ev R p m (c k)) *
+        _root_.GlobalTheory.Col.ev R p (m + 1) (X ^ (k : ℕ))
+
+    rw [← map_mul, hc', map_sum]
+    refine Finset.sum_congr rfl fun k _ => ?_
+    rw [map_mul, _root_.GlobalTheory.Col.Model.up_ev]
   rw [key, Module.Basis.repr_sum_self]
 
 end Level

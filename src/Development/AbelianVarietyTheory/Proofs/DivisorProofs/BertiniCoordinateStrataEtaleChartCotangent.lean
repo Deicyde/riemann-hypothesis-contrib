@@ -1,28 +1,64 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.SmoothCoordinateStratumEtaleChartStatement
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.LinearIndependentCotangentOfIsTopFormFrameOfVaniStatement
+public import Development.AbelianVarietyTheory.Definitions.Divisors.IsUnitMkOfFormallyUnramified
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.GenericResidueLinearIndependence
-public import Development.AbelianVarietyTheory.Definitions.Divisors.CentreAtOfIsAt
-public import Development.AbelianVarietyTheory.Definitions.Divisors.ExistsIsLogMult
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.LinearIndependentCotangentOfIsTopFormFrameOfVaniStatement
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.SmoothCoordinateStratumEtaleChartStatement
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.TypeStar
+import Development.AbelianVarietyTheory.Definitions.Divisors.CentreAtOfIsAt
+import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.IsLogCanonicalMultipleCanonical
 
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace Filter
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
-  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.AnForm.R
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.AnForm.R
 open ReciprocityTheory.ChartRestriction.G.Out (nonzeroLocus)
 open ReciprocityTheory.ChartRestriction.G.DVR.FlatBC (algX)
-open GlobalTheory GlobalTheory.CechPic GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.QCoh
-  GlobalTheory.Discrepancy GlobalTheory.PairStep
+open GlobalTheory GlobalTheory.CechPic GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.QCoh GlobalTheory.Discrepancy GlobalTheory.PairStep
 namespace GlobalTheory.StrataBertini
 
-theorem isLocalization_atPrime_quotient
-    {A S : Type*} [CommRing A] [CommRing S] [Algebra A S]
-    (p : Ideal A) [p.IsPrime] [IsLocalization.AtPrime S p]
-    (I : Ideal A) (hI : I ≤ p) [(p.map (Ideal.Quotient.mk I)).IsPrime]
-    : IsLocalization.AtPrime (S ⧸ I.map (algebraMap A S)) (p.map (Ideal.Quotient.mk I)) := by
+theorem isLocalization_atPrime_quotient {A S : Type*} [CommRing A] [CommRing S] [Algebra A S]
+    (p : Ideal A) [p.IsPrime] [IsLocalization.AtPrime S p] (I : Ideal A) (hI : I ≤ p)
+    [(p.map (Ideal.Quotient.mk I)).IsPrime] :
+    IsLocalization.AtPrime (S ⧸ I.map (algebraMap A S)) (p.map (Ideal.Quotient.mk I)) := by
   constructor
   refine ⟨?_, ?_, ?_⟩
   · rintro ⟨x, hx⟩
@@ -58,32 +94,27 @@ end GlobalTheory.StrataBertini
 namespace GlobalTheory.StrataBertini
 
 open IsLocalRing in
-theorem linearIndependent_option_cotangent
-    {S : Type*} [CommRing S] [IsLocalRing S]
-    {J : Type*} [Fintype J]
-    (w : Option J → S) (hw : ∀ j, w j ∈ maximalIdeal S)
+theorem linearIndependent_option_cotangent {S : Type*} [CommRing S] [IsLocalRing S] {J : Type*}
+    [Fintype J] (w : Option J → S) (hw : ∀ j, w j ∈ maximalIdeal S)
     (hind : LinearIndependent (ResidueField S)
       (fun j : J => ((maximalIdeal S).toCotangent ⟨w (some j), hw (some j)⟩ : CotangentSpace S)))
-    (hnot : w none ∉ maximalIdeal S ^ 2 ⊔ Ideal.span (Set.range (fun j : J => w (some j))))
-    : LinearIndependent (ResidueField S)
+    (hnot : w none ∉ maximalIdeal S ^ 2 ⊔ Ideal.span (Set.range (fun j : J => w (some j)))) :
+    LinearIndependent (ResidueField S)
       (fun j : Option J => ((maximalIdeal S).toCotangent ⟨w j, hw j⟩ : CotangentSpace S)) := by
   rw [linearIndependent_option]
   refine ⟨hind, fun hmem => hnot ?_⟩
   rw [Submodule.mem_span_range_iff_exists_fun] at hmem
   obtain ⟨c, hc⟩ := hmem
   choose b hb using fun j => IsLocalRing.residue_surjective (c j)
-  have hc'
-      : ∑ j, b j • (maximalIdeal S).toCotangent ⟨w (some j), hw (some j)⟩
-        = (maximalIdeal S).toCotangent ⟨w none, hw none⟩ := by
+  have hc' : ∑ j, b j • (maximalIdeal S).toCotangent ⟨w (some j), hw (some j)⟩ =
+      (maximalIdeal S).toCotangent ⟨w none, hw none⟩ := by
     rw [← hc]
     refine Finset.sum_congr rfl fun j _ => ?_
-    simp only [Function.comp_apply, ← hb j, ← IsLocalRing.ResidueField.algebraMap_eq,
-      algebraMap_smul]
-  have h0
-      : (maximalIdeal S).toCotangent (⟨w none, hw none⟩ - ∑ j, b j • ⟨w (some j), hw (some j)⟩)
-        = 0 := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sub, map_sum]
+    simp only [Function.comp_apply, ← hb j, ← IsLocalRing.ResidueField.algebraMap_eq, algebraMap_smul]
+  have h0 : (maximalIdeal S).toCotangent
+      (⟨w none, hw none⟩ - ∑ j, b j • ⟨w (some j), hw (some j)⟩) = 0 := by
+
+    rw [map_sub, map_sum]
     simp only [map_smul]
     rw [hc', sub_self]
   rw [Ideal.toCotangent_eq_zero] at h0
@@ -98,55 +129,41 @@ end GlobalTheory.StrataBertini
 namespace GlobalTheory.StrataBertini
 
 open IsLocalRing in
-theorem key
-    (Y : Scheme.{0}) [IsIntegral Y] [IsLocallyNoetherian Y]
-    (q : Y ⟶ Sp ℂ) (n : ℕ) [SmoothOfRelativeDimension n q]
-    (U : Y.Opens) (z : Fin n → Γ(Y, U)) (hfr : IsFrame (dOn q z))
-    (ι : Type) [Fintype ι]
-    (f : ι → Γ(Y, U)) (J : Finset (Fin n))
-    : ∃ Q : MvPolynomial ι ℂ,
-      Q ≠ 0
-        ∧ ∀ u : ι → ℂ,
-          MvPolynomial.eval u Q ≠ 0
-            → ∀ (y : Y) (hy : y ∈ U),
-              (∃ i, y ∈ Y.basicOpen (f i))
-                → (∀ j : J, Y.presheaf.germ U y hy (z j) ∈ maximalIdeal (Y.presheaf.stalk y))
-                → Y.presheaf.germ U y hy (∑ i, algX q U (u i) * f i)
-                  ∈ maximalIdeal (Y.presheaf.stalk y)
-                → Y.presheaf.germ U y hy (∑ i, algX q U (u i) * f i)
-                  ∉ maximalIdeal (Y.presheaf.stalk y) ^ 2
-                    ⊔ Ideal.span (Set.range (fun j : J => Y.presheaf.germ U y hy (z j))) := by
+theorem key (Y : Scheme.{0}) [IsIntegral Y] [IsLocallyNoetherian Y] (q : Y ⟶ Sp ℂ) (n : ℕ)
+    [SmoothOfRelativeDimension n q] (U : Y.Opens) (z : Fin n → Γ(Y, U)) (hfr : IsFrame (dOn q z))
+    (ι : Type) [Fintype ι] (f : ι → Γ(Y, U)) (J : Finset (Fin n)) :
+    ∃ Q : MvPolynomial ι ℂ, Q ≠ 0 ∧ ∀ u : ι → ℂ, MvPolynomial.eval u Q ≠ 0 →
+      ∀ (y : Y) (hy : y ∈ U), (∃ i, y ∈ Y.basicOpen (f i)) →
+      (∀ j : J, Y.presheaf.germ U y hy (z j) ∈ maximalIdeal (Y.presheaf.stalk y)) →
+      Y.presheaf.germ U y hy (∑ i, algX q U (u i) * f i) ∈ maximalIdeal (Y.presheaf.stalk y) →
+      Y.presheaf.germ U y hy (∑ i, algX q U (u i) * f i) ∉
+        maximalIdeal (Y.presheaf.stalk y) ^ 2 ⊔
+          Ideal.span (Set.range (fun j : J => Y.presheaf.germ U y hy (z j))) := by
   have hU : IsAffineOpen U := hfr.affine
   set I : Ideal Γ(Y, U) := Ideal.span (z '' (J : Set (Fin n))) with hIdef
   letI : Algebra ℂ (Γ(Y, U) ⧸ I) := ((Ideal.Quotient.mk I).comp (algX q U)).toAlgebra
   haveI : Algebra.Smooth ℂ (Γ(Y, U) ⧸ I) := GlobalTheory.T.smooth_coordinateStratum_etaleChart Y q n U z hfr J
   obtain ⟨Q1, hQ1, hQ1u⟩ :=
-    GlobalTheory.bertini_cotangent_independent ℂ (Γ(Y, U) ⧸ I)
-      (fun i => Ideal.Quotient.mk I (f i))
-      1
-  have hinj : Function.Injective (Prod.snd : Fin 1 × ι → ι) := fun a b h =>
-    Prod.ext (Subsingleton.elim _ _) h
-  refine ⟨
-    MvPolynomial.rename Prod.snd Q1,
-    fun h0 => hQ1 (MvPolynomial.rename_injective _ hinj (by rw [h0, map_zero])),
-    ?_
-  ⟩
+    GlobalTheory.bertini_cotangent_independent ℂ (Γ(Y, U) ⧸ I) (fun i => Ideal.Quotient.mk I (f i)) 1
+  have hinj : Function.Injective (Prod.snd : Fin 1 × ι → ι) :=
+    fun a b h => Prod.ext (Subsingleton.elim _ _) h
+  refine ⟨MvPolynomial.rename Prod.snd Q1, fun h0 => hQ1 (MvPolynomial.rename_injective _ hinj
+    (by rw [h0, map_zero])), ?_⟩
   intro u hu y hy hf hz ht
   have hu' : MvPolynomial.eval (u ∘ Prod.snd) Q1 ≠ 0 := by rwa [MvPolynomial.eval_rename] at hu
   letI : Algebra Γ(Y, U) (Y.presheaf.stalk y) :=
     TopCat.Presheaf.algebra_section_stalk Y.presheaf ⟨y, hy⟩
   set p := (hU.primeIdealOf ⟨y, hy⟩).asIdeal with hpdef
   haveI : IsLocalization.AtPrime (Y.presheaf.stalk y) p := hU.isLocalization_stalk ⟨y, hy⟩
-  have hgerm : ∀ a, algebraMap Γ(Y, U) (Y.presheaf.stalk y) a = Y.presheaf.germ U y hy a := fun a =>
-    rfl
+  have hgerm : ∀ a, algebraMap Γ(Y, U) (Y.presheaf.stalk y) a = Y.presheaf.germ U y hy a :=
+    fun a => rfl
   have hpm : ∀ a, a ∈ p ↔ Y.presheaf.germ U y hy a ∈ maximalIdeal (Y.presheaf.stalk y) := by
     intro a
     rw [← hgerm]
     exact (IsLocalization.AtPrime.to_map_mem_maximal_iff (Y.presheaf.stalk y) p a).symm
-  have hIp : I ≤ p :=
-    Ideal.span_le.2 (by
-      rintro _ ⟨j, hj, rfl⟩
-      exact (hpm _).2 (hz ⟨j, hj⟩))
+  have hIp : I ≤ p := Ideal.span_le.2 (by
+    rintro _ ⟨j, hj, rfl⟩
+    exact (hpm _).2 (hz ⟨j, hj⟩))
   haveI : (p.map (Ideal.Quotient.mk I)).IsPrime :=
     Ideal.map_isPrime_of_surjective Ideal.Quotient.mk_surjective (by rw [Ideal.mk_ker]; exact hIp)
   set IS := I.map (algebraMap Γ(Y, U) (Y.presheaf.stalk y)) with hISdef
@@ -158,9 +175,8 @@ theorem key
     IsLocalRing.of_surjective' (Ideal.Quotient.mk IS) Ideal.Quotient.mk_surjective
   haveI : IsLocalization.AtPrime (Y.presheaf.stalk y ⧸ IS) (p.map (Ideal.Quotient.mk I)) :=
     isLocalization_atPrime_quotient p I hIp
-  have hmk
-      : ∀ a ∈ maximalIdeal (Y.presheaf.stalk y),
-        Ideal.Quotient.mk IS a ∈ maximalIdeal (Y.presheaf.stalk y ⧸ IS) := by
+  have hmk : ∀ a ∈ maximalIdeal (Y.presheaf.stalk y),
+      Ideal.Quotient.mk IS a ∈ maximalIdeal (Y.presheaf.stalk y ⧸ IS) := by
     intro a ha
     rw [IsLocalRing.mem_maximalIdeal, mem_nonunits_iff]
     intro hun
@@ -176,20 +192,18 @@ theorem key
     refine ⟨i, ?_⟩
     rw [Ideal.mem_quotient_iff_mem hIp, hpm]
     exact fun h => ((IsLocalRing.mem_maximalIdeal _).1 h) ((Y.mem_basicOpen _ _ hy).1 hi)
-  have htR
-      : algebraMap (Γ(Y, U) ⧸ I) (Y.presheaf.stalk y ⧸ IS)
-          (∑ i, (u ∘ Prod.snd) ((0 : Fin 1), i) • Ideal.Quotient.mk I (f i))
-        = Ideal.Quotient.mk IS (Y.presheaf.germ U y hy (∑ i, algX q U (u i) * f i)) := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← hgerm, map_sum, map_sum, map_sum]
+  have htR : algebraMap (Γ(Y, U) ⧸ I) (Y.presheaf.stalk y ⧸ IS)
+      (∑ i, (u ∘ Prod.snd) ((0 : Fin 1), i) • Ideal.Quotient.mk I (f i)) =
+      Ideal.Quotient.mk IS (Y.presheaf.germ U y hy (∑ i, algX q U (u i) * f i)) := by
+
+    rw [← hgerm, map_sum, map_sum, map_sum]
     refine Finset.sum_congr rfl fun i _ => ?_
     rw [Algebra.smul_def, map_mul, map_mul, map_mul]
     rfl
   have hli := hQ1u (u ∘ Prod.snd) hu' (p.map (Ideal.Quotient.mk I)) (Y.presheaf.stalk y ⧸ IS) hfi
-  have hmemR
-      : algebraMap (Γ(Y, U) ⧸ I) (Y.presheaf.stalk y ⧸ IS)
-          (∑ i, (u ∘ Prod.snd) ((0 : Fin 1), i) • Ideal.Quotient.mk I (f i))
-        ∈ maximalIdeal (Y.presheaf.stalk y ⧸ IS) := by
+  have hmemR : algebraMap (Γ(Y, U) ⧸ I) (Y.presheaf.stalk y ⧸ IS)
+      (∑ i, (u ∘ Prod.snd) ((0 : Fin 1), i) • Ideal.Quotient.mk I (f i)) ∈
+      maximalIdeal (Y.presheaf.stalk y ⧸ IS) := by
     rw [htR]; exact hmk _ ht
   have hne := hli.ne_zero ⟨0, hmemR⟩
   rw [Ne, Ideal.toCotangent_eq_zero] at hne
@@ -202,12 +216,9 @@ theorem key
   have hbI : b ∈ IS := by
     refine (Ideal.span_le.2 ?_) hb
     rintro _ ⟨j, rfl⟩
-    exact Ideal.mem_map_of_mem (algebraMap Γ(Y, U) (Y.presheaf.stalk y))
-      (Ideal.subset_span ⟨j, j.2, rfl⟩)
+    exact Ideal.mem_map_of_mem (algebraMap Γ(Y, U) (Y.presheaf.stalk y)) (Ideal.subset_span ⟨j, j.2, rfl⟩)
   rw [← hab, map_add (f := _), Ideal.Quotient.eq_zero_iff_mem.2 hbI, add_zero]
-  have hma
-      : Ideal.Quotient.mk IS a
-        ∈ (maximalIdeal (Y.presheaf.stalk y)).map (Ideal.Quotient.mk IS) ^ 2 := by
+  have hma : Ideal.Quotient.mk IS a ∈ (maximalIdeal (Y.presheaf.stalk y)).map (Ideal.Quotient.mk IS) ^ 2 := by
     rw [← Ideal.map_pow]; exact Ideal.mem_map_of_mem _ ha
   exact Ideal.pow_right_mono (Ideal.map_le_iff_le_comap.2 hmk) 2 hma
 
@@ -215,41 +226,15 @@ end GlobalTheory.StrataBertini
 
 namespace GlobalTheory.StrataBertini
 
-theorem bertini_strata_cotangent
-    : ∀ (Y : Scheme.{0}) [IsIntegral Y] [IsLocallyNoetherian Y] (q : Y ⟶ Sp ℂ) (n : ℕ)
-        [SmoothOfRelativeDimension n q],
-      ∀ (U : Y.Opens) (z : Fin n → Γ(Y, U)),
-        IsFrame (dOn q z)
-          → ∀ (ι : Type) [Fintype ι] (f : ι → Γ(Y, U)), ∃ Q : MvPolynomial ι ℂ,
-            Q ≠ 0
-              ∧ ∀ u : ι → ℂ,
-                MvPolynomial.eval u Q ≠ 0
-                  → ∀ (y : Y) (hy : y ∈ U),
-                    (∃ i, y ∈ Y.basicOpen (f i))
-                      → ∀ (J : Finset (Fin n))
-                          (h : ∀ j : Option J,
-                            Y.presheaf.germ U y hy (j.elim (∑ i, algX q U (u i) * f i) fun j => z j)
-                              ∈ IsLocalRing.maximalIdeal (Y.presheaf.stalk y)),
-                        LinearIndependent (IsLocalRing.ResidueField (Y.presheaf.stalk y))
-                          (fun j : Option J =>
-                            ((IsLocalRing.maximalIdeal (Y.presheaf.stalk y)).toCotangent ⟨
-                                (fun j : Option J =>
-                                    Y.presheaf.germ U y hy
-                                      (j.elim (∑ i, algX q U (u i) * f i) fun j => z j))
-                                  j,
-                                h j
-                              ⟩
-                              : IsLocalRing.CotangentSpace (Y.presheaf.stalk y))) := by
+theorem bertini_strata_cotangent : ∀ (Y : Scheme.{0}) [IsIntegral Y] [IsLocallyNoetherian Y] (q : Y ⟶ Sp ℂ) (n : ℕ) [SmoothOfRelativeDimension n q], ∀ (U : Y.Opens) (z : Fin n → Γ(Y, U)), IsFrame (dOn q z) → ∀ (ι : Type) [Fintype ι] (f : ι → Γ(Y, U)), ∃ Q : MvPolynomial ι ℂ, Q ≠ 0 ∧ ∀ u : ι → ℂ, MvPolynomial.eval u Q ≠ 0 → ∀ (y : Y) (hy : y ∈ U), (∃ i, y ∈ Y.basicOpen (f i)) → ∀ (J : Finset (Fin n)) (h : ∀ j : Option J, Y.presheaf.germ U y hy (j.elim (∑ i, algX q U (u i) * f i) fun j => z j) ∈ IsLocalRing.maximalIdeal (Y.presheaf.stalk y)), LinearIndependent (IsLocalRing.ResidueField (Y.presheaf.stalk y)) (fun j : Option J => ((IsLocalRing.maximalIdeal (Y.presheaf.stalk y)).toCotangent ⟨(fun j : Option J => Y.presheaf.germ U y hy (j.elim (∑ i, algX q U (u i) * f i) fun j => z j)) j, h j⟩ : IsLocalRing.CotangentSpace (Y.presheaf.stalk y))) := by
   intro Y _ _ q n _ U z hfr ι _ f
   choose Q hQ0 hQ using fun J : Finset (Fin n) => key Y q n U z hfr ι f J
   refine ⟨∏ J, Q J, Finset.prod_ne_zero_iff.2 fun J _ => hQ0 J, fun u hu y hy hf J h => ?_⟩
   rw [map_prod] at hu
   have huJ := Finset.prod_ne_zero_iff.1 hu J (Finset.mem_univ _)
   exact linearIndependent_option_cotangent
-    (fun j : Option J => Y.presheaf.germ U y hy (j.elim (∑ i, algX q U (u i) * f i) fun j => z j))
-    h
-    (GlobalTheory.T.linearIndependent_cotangent_of_isTopFormFrame_of_vanishing Y q n U z hfr y hy J
-      (fun j => h (some j)))
+    (fun j : Option J => Y.presheaf.germ U y hy (j.elim (∑ i, algX q U (u i) * f i) fun j => z j)) h
+    (GlobalTheory.T.linearIndependent_cotangent_of_isTopFormFrame_of_vanishing Y q n U z hfr y hy J (fun j => h (some j)))
     (hQ J u huJ y hy hf (fun j => h (some j)) (h none))
 
 end GlobalTheory.StrataBertini

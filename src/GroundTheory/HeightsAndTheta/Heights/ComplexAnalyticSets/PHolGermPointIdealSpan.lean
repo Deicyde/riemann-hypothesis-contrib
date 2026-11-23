@@ -1,8 +1,51 @@
 module
 
-public import Mathlib
-public import GroundTheory.HeightsAndTheta.Heights.ComplexAnalyticSets.StZariskiObjects
 public import GroundTheory.HeightsAndTheta.Heights.ComplexAnalyticSets.StHolGermPointIdealSpan
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+public import Mathlib.RingTheory.Ideal.BigOperators
 
 @[expose] public section
 
@@ -12,10 +55,10 @@ namespace GroundTheory.Heights₂.Heights.IndefiniteRowSideFullHecke.ComplexSets
 
 open MvPolynomial Topology Filter
 
-theorem hadamard_decomposition
-    {σ : Type} [Fintype σ] {w : σ → ℂ} {f : (σ → ℂ) → ℂ} (hf : AnalyticAt ℂ f w)
-    : ∃ g : σ → (σ → ℂ) → ℂ,
-      (∀ i, AnalyticAt ℂ (g i) w) ∧ ∀ᶠ z in 𝓝 w, f z = f w + ∑ i, (z i - w i) * g i z := by
+theorem hadamard_decomposition {σ : Type} [Fintype σ] {w : σ → ℂ} {f : (σ → ℂ) → ℂ}
+    (hf : AnalyticAt ℂ f w) :
+    ∃ g : σ → (σ → ℂ) → ℂ, (∀ i, AnalyticAt ℂ (g i) w) ∧
+      ∀ᶠ z in 𝓝 w, f z = f w + ∑ i, (z i - w i) * g i z := by
   classical
   obtain ⟨p, r, hp⟩ := hf
   have hrad : p.shift.radius = p.radius := FormalMultilinearSeries.radius_shift p
@@ -24,7 +67,8 @@ theorem hadamard_decomposition
     p.shift.hasFPowerSeriesOnBall hq
   refine ⟨fun i z => p.shift.sum (z - w) (Pi.single i 1), fun i => ?_, ?_⟩
   · have h2 : AnalyticAt ℂ (fun z : σ → ℂ => z - w) w := analyticAt_id.sub analyticAt_const
-    have h3 : AnalyticAt ℂ p.shift.sum ((fun z : σ → ℂ => z - w) w) := by simpa using hG.analyticAt
+    have h3 : AnalyticAt ℂ p.shift.sum ((fun z : σ → ℂ => z - w) w) := by
+      simpa using hG.analyticAt
     exact ((ContinuousLinearMap.apply ℂ ℂ (Pi.single i (1 : ℂ))).analyticAt _).comp
       (AnalyticAt.comp (g := p.shift.sum) (f := fun z : σ → ℂ => z - w) h3 h2)
   · filter_upwards [Metric.eball_mem_nhds w hp.r_pos] with z hz
@@ -38,8 +82,8 @@ theorem hadamard_decomposition
     have h2 := hG.hasSum hy1
     rw [zero_add] at h2
     have h3 := (ContinuousLinearMap.apply ℂ ℂ y).hasSum h2
-    have h4
-        : ∀ n, (ContinuousLinearMap.apply ℂ ℂ y) (p.shift n fun _ => y) = p (n + 1) fun _ => y := by
+    have h4 : ∀ n, (ContinuousLinearMap.apply ℂ ℂ y) (p.shift n fun _ => y) =
+        p (n + 1) fun _ => y := by
       intro n
       simp only [ContinuousLinearMap.apply_apply, FormalMultilinearSeries.shift,
         ContinuousMultilinearMap.curryRight_apply]
@@ -55,15 +99,13 @@ theorem hadamard_decomposition
     have e2 : p.shift.sum y y = ∑ i, (z i - w i) * p.shift.sum y (Pi.single i 1) := by
       have hyy : p.shift.sum y y = p.shift.sum y (∑ i, Pi.single i (y i)) := by
         rw [Finset.univ_sum_single]
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [hyy, map_sum]
+
+      rw [hyy, map_sum]
       refine Finset.sum_congr rfl fun i _ => ?_
       rw [show (Pi.single i (y i) : σ → ℂ) = y i • Pi.single i 1 by
-          ext j
-          by_cases h : j = i
-          · subst h; simp
-          · simp [h],
-        map_smul, smul_eq_mul, hy, Pi.sub_apply]
+        ext j; by_cases h : j = i
+        · subst h; simp
+        · simp [h], map_smul, smul_eq_mul, hy, Pi.sub_apply]
     rw [← e2, ← e]
     ring
 
@@ -73,28 +115,22 @@ theorem HolGermPointIdealSpan.proof : HolGermPointIdealSpan.Statement := by
   · rintro ⟨_, f, hf, rfl⟩ hφ
     have hfw : f w = 0 := hφ
     obtain ⟨g, hg, hfg⟩ := hadamard_decomposition hf
-    have key
-        : (⟨(f : Germ (𝓝 w) ℂ), f, hf, rfl⟩ : holGerms w)
-          = ∑ i, polyGerm w (X i - C (w i)) * ⟨(g i : Germ (𝓝 w) ℂ), g i, hg i, rfl⟩ := by
+    have key : (⟨(f : Germ (𝓝 w) ℂ), f, hf, rfl⟩ : holGerms w) =
+        ∑ i, polyGerm w (X i - C (w i)) * ⟨(g i : Germ (𝓝 w) ℂ), g i, hg i, rfl⟩ := by
       apply Subtype.ext
       change (f : Germ (𝓝 w) ℂ) = (holGerms w).subtype (∑ i, _)
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum]
+
+      rw [map_sum]
       simp only [map_mul, Subring.coe_subtype]
-      have hsum
-          : ((fun z => ∑ i, (z i - w i) * g i z : (σ → ℂ) → ℂ) : Germ (𝓝 w) ℂ)
-            = ∑ i, ((fun z : σ → ℂ => z i - w i : (σ → ℂ) → ℂ) : Germ (𝓝 w) ℂ) * (g i : Germ (𝓝 w) ℂ) :=
-        by
-          change Germ.coeRingHom (𝓝 w) (fun z => ∑ i, (z i - w i) * g i z) = _
-          set_option synthInstance.maxHeartbeats 100000 in
-            rw [show (fun z => ∑ i, (z i - w i) * g i z : (σ → ℂ) → ℂ)
-                  = ∑ i, (fun z : σ → ℂ => z i - w i) * g i by
-                funext z; simp [Finset.sum_apply],
-              map_sum]
-          rfl
-      have hfe
-          : (f : Germ (𝓝 w) ℂ)
-            = ((fun z => ∑ i, (z i - w i) * g i z : (σ → ℂ) → ℂ) : Germ (𝓝 w) ℂ) :=
+      have hsum : ((fun z => ∑ i, (z i - w i) * g i z : (σ → ℂ) → ℂ) : Germ (𝓝 w) ℂ) =
+          ∑ i, ((fun z : σ → ℂ => z i - w i : (σ → ℂ) → ℂ) : Germ (𝓝 w) ℂ) * (g i : Germ (𝓝 w) ℂ) := by
+        change Germ.coeRingHom (𝓝 w) (fun z => ∑ i, (z i - w i) * g i z) = _
+
+        rw [show (fun z => ∑ i, (z i - w i) * g i z : (σ → ℂ) → ℂ) =
+          ∑ i, (fun z : σ → ℂ => z i - w i) * g i by
+        funext z; simp [Finset.sum_apply], map_sum]
+        rfl
+      have hfe : (f : Germ (𝓝 w) ℂ) = ((fun z => ∑ i, (z i - w i) * g i z : (σ → ℂ) → ℂ) : Germ (𝓝 w) ℂ) :=
         Germ.coe_eq.mpr (hfg.mono fun z hz => by rw [hz, hfw, zero_add])
       rw [hfe, hsum]
       refine Finset.sum_congr rfl fun i _ => ?_

@@ -1,7 +1,62 @@
 module
 
-public import Mathlib
+import Formalism.SharpRestriction.CuspSpanNormBounds.LocalOrbitGerms
 public import Formalism.SharpRestriction.CuspSpanNormBounds.FractionFieldToGenericStalkAlgebraMapEq
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Coalgebra.IsFrobenius
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.HopfAlgebra.Basic
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.TotallySplit
+import Mathlib.RingTheory.Valuation.Extension
+public import Mathlib.RingTheory.Valuation.Integral
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Separation.CompletelyRegular
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
@@ -13,53 +68,26 @@ section Field
 variable (F : Type) [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
 
 theorem localField_secondCountable : SecondCountableTopology F := by
-  have hZ : Countable (WithZero (Multiplicative ℤ)) := by
-    have : Countable (Multiplicative ℤ) := inferInstanceAs (Countable ℤ)
-    exact inferInstanceAs (Countable (Option (Multiplicative ℤ)))
-  have hcount : Countable (ValueGroupWithZero F) :=
-    (IsNonarchimedeanLocalField.valueGroupWithZeroIsoInt F).injective.countable
-  have : Countable (ValueGroupWithZero F)ˣ := Units.val_injective.countable
-  have hsig : SigmaCompactSpace F := by
-    refine SigmaCompactSpace.of_countable
-      (Set.range fun γ : ValueGroupWithZero F => {x : F | valuation F x ≤ γ})
-      (Set.countable_range _) ?_ ?_
-    · rintro _ ⟨γ, rfl⟩
-      exact IsNonarchimedeanLocalField.isCompact_closedBall F γ
-    · refine Set.eq_univ_of_forall fun x => ?_
-      exact Set.mem_sUnion.mpr
-        ⟨_, ⟨valuation F x, rfl⟩, show valuation F x ≤ valuation F x from le_rfl⟩
-  let := IsTopologicalAddGroup.rightUniformSpace F
-  have := isUniformAddGroup_of_addCommGroup (G := F)
-  have : (nhds (0 : F)).IsCountablyGenerated :=
-    (IsValuativeTopology.hasBasis_nhds_zero F).isCountablyGenerated
-  have := IsUniformAddGroup.uniformity_countably_generated (α := F)
-  infer_instance
+  apply Formalism.MainNotions.LocalOrbitGerms.Top.sc_F <;> assumption
 
 theorem t2Space_of_isNonarchimedeanLocalField_flag_measures : T2Space F := by
   refine IsTopologicalAddGroup.t2Space_of_zero_sep fun x hx => ?_
-  refine ⟨
-    {y | valuation F y < valuation F x},
-    (IsValuativeTopology.hasBasis_nhds_zero' F).mem_of_mem (by simpa using hx),
-    ?_
-  ⟩
+  refine ⟨{y | valuation F y < valuation F x},
+    (IsValuativeTopology.hasBasis_nhds_zero' F).mem_of_mem (by simpa using hx), ?_⟩
   exact lt_irrefl (valuation F x)
 
 theorem localField_isOpen_integer : IsOpen (𝒪[F] : Set F) := (valuation F).isOpen_integer
 
-theorem localField_isCompact_integer : IsCompact (𝒪[F] : Set F) :=
-  IsNonarchimedeanLocalField.isCompact_closedBall F 1
+theorem localField_isCompact_integer : IsCompact (𝒪[F] : Set F) := IsNonarchimedeanLocalField.isCompact_closedBall F 1
 
 variable {F}
 
-theorem isOpen_mul_integer {c : F} (hc : c ≠ 0) : IsOpen ((fun x => c * x) '' (𝒪[F] : Set F)) :=
-  (Homeomorph.mulLeft₀ c hc).isOpenMap _ (localField_isOpen_integer F)
+theorem isOpen_mul_integer {c : F} (hc : c ≠ 0) : IsOpen ((fun x => c * x) '' (𝒪[F] : Set F)) := (Homeomorph.mulLeft₀ c hc).isOpenMap _ (localField_isOpen_integer F)
 
-theorem isCompact_mul_integer (c : F) : IsCompact ((fun x => c * x) '' (𝒪[F] : Set F)) :=
-  (localField_isCompact_integer F).image (continuous_const.mul continuous_id)
+theorem isCompact_mul_integer (c : F) : IsCompact ((fun x => c * x) '' (𝒪[F] : Set F)) := (localField_isCompact_integer F).image (continuous_const.mul continuous_id)
 
 omit [TopologicalSpace F] [IsNonarchimedeanLocalField F] in
-theorem mem_integer_of_isIntegral {a : F} (h : IsIntegral 𝒪[F] a) : a ∈ 𝒪[F] :=
-  (Valuation.integer.integers (valuation F)).mem_of_integral h
+theorem mem_integer_of_isIntegral {a : F} (h : IsIntegral 𝒪[F] a) : a ∈ 𝒪[F] := (Valuation.integer.integers (valuation F)).mem_of_integral h
 
 end Field
 
@@ -70,20 +98,20 @@ theorem locE_nontrivial (L : LocE F E) : Nontrivial E := by
   have := L.free
   exact Module.nontrivial_of_finrank_pos (R := F) (by rw [L.rank]; norm_num)
 
-theorem locE_exists_pure [CharZero F] (L : LocE F E)
-    : ∃ (d : E) (D : F), D ≠ 0 ∧ D ∈ 𝒪[F] ∧ L.cj d = -d ∧ d * d = algebraMap F E D := by
+theorem locE_exists_pure [CharZero F] (L : LocE F E) :
+    ∃ (d : E) (D : F), D ≠ 0 ∧ D ∈ 𝒪[F] ∧ L.cj d = -d ∧ d * d = algebraMap F E D := by
   have := L.free
   have := L.reduced
   have hnt := locE_nontrivial L
   obtain ⟨x, hx⟩ : ∃ x : E, ∀ a : F, algebraMap F E a ≠ x := by
     by_contra! h
-    have e :=
-      LinearEquiv.ofBijective (Algebra.linearMap F E) ⟨(algebraMap F E).injective, fun y => h y⟩
+    have e := LinearEquiv.ofBijective (Algebra.linearMap F E) ⟨(algebraMap F E).injective, fun y => h y⟩
     have := e.finrank_eq
     rw [Module.finrank_self, L.rank] at this
     norm_num at this
   set d0 := x - L.cj x with hd0def
-  have hcj0 : L.cj d0 = -d0 := by rw [hd0def, map_sub, L.cj_cj]; ring
+  have hcj0 : L.cj d0 = -d0 := by
+    rw [hd0def, map_sub, L.cj_cj]; ring
   have hd0 : d0 ≠ 0 := by
     intro h0
     obtain ⟨a, ha⟩ := (L.cj_fix x).mp (by rw [hd0def, sub_eq_zero] at h0; exact h0.symm)
@@ -100,22 +128,20 @@ theorem locE_exists_pure [CharZero F] (L : LocE F E)
       rw [map_inv₀]
       exact inv_le_one_of_one_le₀ (le_of_lt (not_le.mp hD))
     · rw [map_mul, AlgEquiv.commutes, hcj0, mul_neg]
-    · rw [show (algebraMap F E D0⁻¹ * d0) * (algebraMap F E D0⁻¹ * d0)
-          = algebraMap F E (D0⁻¹ * D0⁻¹ * D0) by
-        rw [map_mul, map_mul, hD0]; ring]
+    · rw [show (algebraMap F E D0⁻¹ * d0) * (algebraMap F E D0⁻¹ * d0) =
+          algebraMap F E (D0⁻¹ * D0⁻¹ * D0) by rw [map_mul, map_mul, hD0]; ring]
       congr 1
       field_simp
 
-theorem locE_exists_coords [CharZero F] (L : LocE F E)
-    : ∃ (ψ : (F × F) ≃ₗ[F] E) (D : F),
-      D ≠ 0 ∧ (∀ p : F × F, p.1 ∈ 𝒪[F] → p.2 ∈ 𝒪[F] → ψ p ∈ L.O)
-        ∧ (∀ p : F × F, ψ p ∈ L.O → 2 * p.1 ∈ 𝒪[F] ∧ 2 * D * p.2 ∈ 𝒪[F]) := by
+theorem locE_exists_coords [CharZero F] (L : LocE F E) :
+    ∃ (ψ : (F × F) ≃ₗ[F] E) (D : F), D ≠ 0 ∧
+      (∀ p : F × F, p.1 ∈ 𝒪[F] → p.2 ∈ 𝒪[F] → ψ p ∈ L.O) ∧
+      (∀ p : F × F, ψ p ∈ L.O → 2 * p.1 ∈ 𝒪[F] ∧ 2 * D * p.2 ∈ 𝒪[F]) := by
   obtain ⟨d, D, hD0, hDO, hcj, hdd⟩ := locE_exists_pure L
   have := L.free
   have hnt := locE_nontrivial L
   have hfin : FiniteDimensional F E := Module.finite_of_finrank_pos (by rw [L.rank]; norm_num)
-  let φ : (F × F) →ₗ[F] E :=
-    (LinearMap.fst F F F).smulRight (1 : E) + (LinearMap.snd F F F).smulRight d
+  let φ : (F × F) →ₗ[F] E := (LinearMap.fst F F F).smulRight (1 : E) + (LinearMap.snd F F F).smulRight d
   have hφ : ∀ p : F × F, φ p = algebraMap F E p.1 + algebraMap F E p.2 * d := by
     intro p
     simp [φ, Algebra.smul_def]
@@ -127,8 +153,7 @@ theorem locE_exists_coords [CharZero F] (L : LocE F E)
     have hc : algebraMap F E p.1 - algebraMap F E p.2 * d = 0 := by
       have h' := congrArg L.cj hp
       rw [map_add (f := _), map_mul, AlgEquiv.commutes, AlgEquiv.commutes, hcj, map_zero] at h'
-      rw [← h']
-      ring
+      rw [← h']; ring
     have hb : algebraMap F E (2 * p.2 * D) = 0 := by
       rw [map_mul, map_mul, ← hdd, map_ofNat]
       linear_combination d * hp - d * hc
@@ -146,8 +171,7 @@ theorem locE_exists_coords [CharZero F] (L : LocE F E)
     rw [isIntegral_algebraMap_iff]
     exact (show IsIntegral 𝒪[F] (algebraMap 𝒪[F] F ⟨a, ha⟩) from isIntegral_algebraMap)
   have hdI : IsIntegral 𝒪[F] d := by
-    refine
-      ⟨Polynomial.X ^ 2 - Polynomial.C ⟨D, hDO⟩, Polynomial.monic_X_pow_sub_C _ two_ne_zero, ?_⟩
+    refine ⟨Polynomial.X ^ 2 - Polynomial.C ⟨D, hDO⟩, Polynomial.monic_X_pow_sub_C _ two_ne_zero, ?_⟩
     rw [Polynomial.eval₂_sub, Polynomial.eval₂_X_pow, Polynomial.eval₂_C,
       IsScalarTower.algebraMap_apply 𝒪[F] F E, pow_two, hdd]
     exact sub_self _
@@ -158,44 +182,28 @@ theorem locE_exists_coords [CharZero F] (L : LocE F E)
   · intro p hp
     rw [LinearMap.linearEquivOfInjective_apply, hφ, L.O_def] at hp
     have hq := hp.map (L.cj.toAlgHom.restrictScalars 𝒪[F])
-    have hcx
-        : (L.cj.toAlgHom.restrictScalars 𝒪[F]) (algebraMap F E p.1 + algebraMap F E p.2 * d)
-          = algebraMap F E p.1 - algebraMap F E p.2 * d := by
+    have hcx : (L.cj.toAlgHom.restrictScalars 𝒪[F]) (algebraMap F E p.1 + algebraMap F E p.2 * d) =
+        algebraMap F E p.1 - algebraMap F E p.2 * d := by
       change L.cj _ = _
-      rw [map_add (f := _), map_mul, AlgEquiv.commutes, AlgEquiv.commutes, hcj]
-      ring
+      rw [map_add (f := _), map_mul, AlgEquiv.commutes, AlgEquiv.commutes, hcj]; ring
     rw [hcx] at hq
     constructor
     · have h' := hp.add hq
-      rw [show algebraMap F E p.1 + algebraMap F E p.2 * d
-                + (algebraMap F E p.1 - algebraMap F E p.2 * d)
-              = algebraMap F E (2 * p.1) by
-            rw [map_mul, map_ofNat]; ring,
-          isIntegral_algebraMap_iff]
-        at h'
+      rw [show algebraMap F E p.1 + algebraMap F E p.2 * d + (algebraMap F E p.1 - algebraMap F E p.2 * d) =
+        algebraMap F E (2 * p.1) by rw [map_mul, map_ofNat]; ring, isIntegral_algebraMap_iff] at h'
       exact mem_integer_of_isIntegral h'
     · have h' := (hp.sub hq).mul hdI
-      rw [show (algebraMap F E p.1 + algebraMap F E p.2 * d
-                  - (algebraMap F E p.1 - algebraMap F E p.2 * d))
-                * d
-              = algebraMap F E (2 * D * p.2) by
-            rw [map_mul, map_mul, map_ofNat, ← hdd]; ring,
-          isIntegral_algebraMap_iff]
-        at h'
+      rw [show (algebraMap F E p.1 + algebraMap F E p.2 * d - (algebraMap F E p.1 - algebraMap F E p.2 * d)) * d =
+        algebraMap F E (2 * D * p.2) by rw [map_mul, map_mul, map_ofNat, ← hdd]; ring, isIntegral_algebraMap_iff] at h'
       exact mem_integer_of_isIntegral h'
 
-theorem locE_homeo [IsNonarchimedeanLocalField F] (L : LocE F E) (ψ : (F × F) ≃ₗ[F] E)
-    : ∃ h : (F × F) ≃ₜ E, ∀ p, h p = ψ p := by
+theorem locE_homeo [IsNonarchimedeanLocalField F] (L : LocE F E) (ψ : (F × F) ≃ₗ[F] E) :
+    ∃ h : (F × F) ≃ₜ E, ∀ p, h p = ψ p := by
   have := L.top
   have := IsModuleTopology.toContinuousAdd F E
-  exact ⟨
-    {
-      toEquiv := ψ.toEquiv
-      continuous_toFun := IsModuleTopology.continuous_of_linearMap ψ.toLinearMap
-      continuous_invFun := IsModuleTopology.continuous_of_linearMap ψ.symm.toLinearMap
-    },
-    fun _ => rfl
-  ⟩
+  exact ⟨{ toEquiv := ψ.toEquiv
+           continuous_toFun := IsModuleTopology.continuous_of_linearMap ψ.toLinearMap
+           continuous_invFun := IsModuleTopology.continuous_of_linearMap ψ.symm.toLinearMap }, fun _ => rfl⟩
 
 theorem locE_topRing [IsNonarchimedeanLocalField F] (L : LocE F E) : IsTopologicalRing E := by
   have := L.top
@@ -203,8 +211,8 @@ theorem locE_topRing [IsNonarchimedeanLocalField F] (L : LocE F E) : IsTopologic
   have : Module.Finite F E := Module.finite_of_finrank_pos (by rw [L.rank]; norm_num)
   exact IsModuleTopology.isTopologicalRing F E
 
-theorem locE_integers [IsNonarchimedeanLocalField F] [CharZero F] (L : LocE F E)
-    : IsCompact (L.O : Set E) ∧ IsOpen (L.O : Set E) := by
+theorem locE_integers [IsNonarchimedeanLocalField F] [CharZero F] (L : LocE F E) :
+    IsCompact (L.O : Set E) ∧ IsOpen (L.O : Set E) := by
   obtain ⟨ψ, D, hD0, h1, h2⟩ := locE_exists_coords L
   obtain ⟨h, hh⟩ := locE_homeo L ψ
   have := locE_topRing L
@@ -217,20 +225,14 @@ theorem locE_integers [IsNonarchimedeanLocalField F] [CharZero F] (L : LocE F E)
   have h0 : (0 : E) ∈ h '' ((𝒪[F] : Set F) ×ˢ (𝒪[F] : Set F)) :=
     ⟨0, ⟨zero_mem _, zero_mem _⟩, by rw [hh, map_zero]⟩
   have hOo : IsOpen (L.O : Set E) :=
-    AddSubgroup.isOpen_of_mem_nhds L.O.toAddSubgroup (g := 0)
-      (Filter.mem_of_superset (hAo.mem_nhds h0) hAO)
+    AddSubgroup.isOpen_of_mem_nhds L.O.toAddSubgroup (g := 0) (Filter.mem_of_superset (hAo.mem_nhds h0) hAO)
   have hOc : IsClosed (L.O : Set E) := AddSubgroup.isClosed_of_isOpen L.O.toAddSubgroup hOo
   have h2ne : (2 : F) ≠ 0 := two_ne_zero
-  have hBc : IsCompact
-      (h
-        '' (((fun x => (2 : F)⁻¹ * x) '' (𝒪[F] : Set F))
-          ×ˢ ((fun x => (2 * D)⁻¹ * x) '' (𝒪[F] : Set F)))) :=
+  have hBc : IsCompact (h '' (((fun x => (2 : F)⁻¹ * x) '' (𝒪[F] : Set F)) ×ˢ
+      ((fun x => (2 * D)⁻¹ * x) '' (𝒪[F] : Set F)))) :=
     ((isCompact_mul_integer _).prod (isCompact_mul_integer _)).image h.continuous
-  have hOB
-      : (L.O : Set E)
-        ⊆ h
-          '' (((fun x => (2 : F)⁻¹ * x) '' (𝒪[F] : Set F))
-            ×ˢ ((fun x => (2 * D)⁻¹ * x) '' (𝒪[F] : Set F))) := by
+  have hOB : (L.O : Set E) ⊆ h '' (((fun x => (2 : F)⁻¹ * x) '' (𝒪[F] : Set F)) ×ˢ
+      ((fun x => (2 * D)⁻¹ * x) '' (𝒪[F] : Set F))) := by
     intro x hx
     have hx' := h2 (ψ.symm x) (by rw [LinearEquiv.apply_symm_apply]; exact hx)
     refine ⟨ψ.symm x, ⟨⟨2 * (ψ.symm x).1, hx'.1, ?_⟩, ⟨2 * D * (ψ.symm x).2, hx'.2, ?_⟩⟩, ?_⟩
@@ -241,8 +243,8 @@ theorem locE_integers [IsNonarchimedeanLocalField F] [CharZero F] (L : LocE F E)
 
 variable [MeasurableSpace E]
 
-theorem mem_R_split (M : Model F E) (g : SplitG M.L) (hg : M.split = some g) (x : E)
-    : x ∈ M.R ↔ ∃ a b : 𝒪[F], g.q ∣ a - b ∧ g.e x = ((a : F), (b : F)) := by
+theorem mem_R_split (M : Model F E) (g : SplitG M.L) (hg : M.split = some g) (x : E) :
+    x ∈ M.R ↔ ∃ a b : 𝒪[F], g.q ∣ a - b ∧ g.e x = ((a : F), (b : F)) := by
   simp only [Model.R, hg]
   rw [Subring.mem_comap, Subring.mem_map]
   constructor
@@ -268,14 +270,11 @@ theorem R_le_O (M : Model F E) : M.R ≤ M.L.O := by
     obtain ⟨a, b, -, hx'⟩ := (mem_R_split M g hs x).mp hx
     rw [M.L.O_def]
     have hab : IsIntegral 𝒪[F] ((a : F), (b : F)) := by
-      refine ⟨
-        (Polynomial.X - Polynomial.C a) * (Polynomial.X - Polynomial.C b),
-        (Polynomial.monic_X_sub_C a).mul (Polynomial.monic_X_sub_C b),
-        ?_
-      ⟩
+      refine ⟨(Polynomial.X - Polynomial.C a) * (Polynomial.X - Polynomial.C b),
+        (Polynomial.monic_X_sub_C a).mul (Polynomial.monic_X_sub_C b), ?_⟩
       simp only [Polynomial.eval₂_mul, Polynomial.eval₂_sub, Polynomial.eval₂_X, Polynomial.eval₂_C,
-        IsScalarTower.algebraMap_apply 𝒪[F] F (F × F), Prod.algebraMap_apply,
-        Algebra.algebraMap_self, RingHom.id_apply]
+        IsScalarTower.algebraMap_apply 𝒪[F] F (F × F), Prod.algebraMap_apply, Algebra.algebraMap_self,
+        RingHom.id_apply]
       ext
       · simp
         left
@@ -287,8 +286,8 @@ theorem R_le_O (M : Model F E) : M.R ≤ M.L.O := by
     rw [hxe]
     exact hab.map (g.e.symm.toAlgHom.restrictScalars 𝒪[F])
 
-theorem isOpen_R [IsNonarchimedeanLocalField F] [CharZero F] (M : Model F E)
-    : IsOpen (M.R : Set E) := by
+theorem isOpen_R [IsNonarchimedeanLocalField F] [CharZero F] (M : Model F E) :
+    IsOpen (M.R : Set E) := by
   have := locE_topRing M.L
   cases hs : M.split with
   | none =>
@@ -301,37 +300,27 @@ theorem isOpen_R [IsNonarchimedeanLocalField F] [CharZero F] (M : Model F E)
     have hec : Continuous (g.e : E → F × F) :=
       IsModuleTopology.continuous_of_linearMap g.e.toLinearEquiv.toLinearMap
     have hq : (g.q : F) ≠ 0 := fun h => g.q_irr.ne_zero (Subtype.ext h)
-    have hU : IsOpen
-        (((fun x => (g.q : F) * x) '' (𝒪[F] : Set F))
-          ×ˢ ((fun x => (g.q : F) * x) '' (𝒪[F] : Set F))) :=
+    have hU : IsOpen (((fun x => (g.q : F) * x) '' (𝒪[F] : Set F)) ×ˢ ((fun x => (g.q : F) * x) '' (𝒪[F] : Set F))) :=
       (isOpen_mul_integer hq).prod (isOpen_mul_integer hq)
-    have hsub
-        : (g.e : E → F × F)
-            ⁻¹' (((fun x => (g.q : F) * x) '' (𝒪[F] : Set F))
-              ×ˢ ((fun x => (g.q : F) * x) '' (𝒪[F] : Set F)))
-          ⊆ (M.R : Set E) := by
+    have hsub : (g.e : E → F × F) ⁻¹' (((fun x => (g.q : F) * x) '' (𝒪[F] : Set F)) ×ˢ
+        ((fun x => (g.q : F) * x) '' (𝒪[F] : Set F))) ⊆ (M.R : Set E) := by
       rintro x ⟨⟨a, ha, h1⟩, ⟨b, hb, h2⟩⟩
       rw [SetLike.mem_coe, mem_R_split M g hs]
       refine ⟨⟨g.q * a, mul_mem g.q.2 ha⟩, ⟨g.q * b, mul_mem g.q.2 hb⟩, ⟨⟨a, ha⟩ - ⟨b, hb⟩, ?_⟩, ?_⟩
       · exact Subtype.ext (by simp [mul_sub])
       · exact Prod.ext h1.symm h2.symm
-    have h0
-        : (0 : E)
-          ∈ (g.e : E → F × F)
-            ⁻¹' (((fun x => (g.q : F) * x) '' (𝒪[F] : Set F))
-              ×ˢ ((fun x => (g.q : F) * x) '' (𝒪[F] : Set F))) := by
+    have h0 : (0 : E) ∈ (g.e : E → F × F) ⁻¹' (((fun x => (g.q : F) * x) '' (𝒪[F] : Set F)) ×ˢ
+        ((fun x => (g.q : F) * x) '' (𝒪[F] : Set F))) := by
       rw [Set.mem_preimage, map_zero]
       exact ⟨⟨0, zero_mem _, mul_zero _⟩, ⟨0, zero_mem _, mul_zero _⟩⟩
     exact AddSubgroup.isOpen_of_mem_nhds M.R.toAddSubgroup (g := 0)
       (Filter.mem_of_superset ((hU.preimage hec).mem_nhds h0) hsub)
 
-theorem model_topology
-    : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] {E : Type} [CommRing E]
-        [Algebra F E] [TopologicalSpace E] [MeasurableSpace E] (M : Model F E),
-      M.OK
-        → IsTopologicalRing E ∧ T2Space E ∧ LocallyCompactSpace E ∧ SecondCountableTopology E
-          ∧ ContinuousSMul F E ∧ IsCompact (M.R : Set E) ∧ IsOpen (M.R : Set E)
-          ∧ IsCompact (M.L.O : Set E) ∧ IsOpen (M.L.O : Set E) ∧ M.R ≤ M.L.O := by
+theorem model_topology : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] {E : Type}
+    [CommRing E] [Algebra F E] [TopologicalSpace E] [MeasurableSpace E] (M : Model F E), M.OK →
+    IsTopologicalRing E ∧ T2Space E ∧ LocallyCompactSpace E ∧ SecondCountableTopology E ∧
+    ContinuousSMul F E ∧ IsCompact (M.R : Set E) ∧ IsOpen (M.R : Set E) ∧
+    IsCompact (M.L.O : Set E) ∧ IsOpen (M.L.O : Set E) ∧ M.R ≤ M.L.O := by
   intro F _ _ _ E _ _ _ _ M hM
   have := hM.loc
   have := hM.char0
@@ -344,17 +333,8 @@ theorem model_topology
   have hRo := isOpen_R M
   have hO := locE_integers M.L
   have hRc : IsClosed (M.R : Set E) := AddSubgroup.isClosed_of_isOpen M.R.toAddSubgroup hRo
-  exact ⟨
-    hTR,
-    h.symm.isEmbedding.t2Space,
-    h.symm.isClosedEmbedding.locallyCompactSpace,
-    h.symm.isEmbedding.secondCountableTopology,
-    inferInstance,
-    hO.1.of_isClosed_subset hRc (R_le_O M),
-    hRo,
-    hO.1,
-    hO.2,
-    R_le_O M
-  ⟩
+  exact ⟨hTR, h.symm.isEmbedding.t2Space, h.symm.isClosedEmbedding.locallyCompactSpace,
+    h.symm.isEmbedding.secondCountableTopology, inferInstance,
+    hO.1.of_isClosed_subset hRc (R_le_O M), hRo, hO.1, hO.2, R_le_O M⟩
 
 end GlobalTheory.SgLoc.Top

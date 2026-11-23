@@ -1,9 +1,56 @@
 module
 
 public import Formalism.HermitianCurvature.StatementSz
-public import Formalism.HermitianCurvature.HermitianCurvatureProofs.MassRatioFormula
 public import Formalism.HermitianCurvature.HermitianCurvatureProofs.CorollaryAOfPropositionA
 public import Formalism.HermitianCurvature.HermitianCurvatureProofs.SumInvSqLeSub
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Real
+import Mathlib.Analysis.Complex.ExponentialBounds
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Lemma
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -240,8 +287,6 @@ theorem tcritWords_of (hVW : VandWords) : TcritWords := by
     have ht : (c.k : ℝ) * (1 / (c.k : ℝ)) = 1 := by
       first | exact mul_one_div_cancel hkne | field_simp
     have ht4 : (1 : ℝ) / (c.k : ℝ) ≤ 1 / 4 := one_div_le_one_div_of_le (by norm_num) hk4
-    have e3 : ((c.k : ℝ) / 2 + 1) * (1 / (c.k : ℝ)) = 1 / 2 + 1 / (c.k : ℝ) := by
-      linear_combination (1/2:ℝ) * ht
     have u1 := mul_le_mul_of_nonneg_right hL2 ht0.le
     have u2 := mul_le_mul_of_nonneg_right hL1 ht0.le
     constructor
@@ -318,7 +363,6 @@ lemma fac_bound (n : ℕ) (hn : 2 ≤ n) :
       nlinarith
   have hQ := key n hn
   have hA : 0 ≤ 2 * (0.38:ℝ) ^ (n + 2) := by positivity
-  have hY : 0 ≤ ((n:ℝ) + 2) ^ n := by positivity
   have hZ : 0 ≤ Real.exp (1/4) ^ (n + 1) := by positivity
   have hW : 0 ≤ (2.72:ℝ) ^ (n + 2) * (n.factorial : ℝ) := by positivity
   calc 2 * (0.38:ℝ) ^ (n + 2) * ((n:ℝ) + 2) ^ n * Real.exp (1/4) ^ (n + 1)
@@ -358,7 +402,6 @@ lemma non_top_final_inequality (k : ℕ) (hk : 1 ≤ k) (e B α Vv Vu : ℝ) (h�
   obtain ⟨n, rfl⟩ : ∃ n, k = n + 1 := ⟨k - 1, by omega⟩
   rw [show n + 1 - 1 = n by omega] at hVu ⊢
   have hα0 : 0 < α := by linarith
-  have hB0 : 0 ≤ B := by linarith
   have hbase : 0 ≤ 0.38 * e / (1 + 0) * B / α := by positivity
   have key3 : ∀ x y z w : ℝ, 0 ≤ x → x ≤ 1 → 0 ≤ y → y ≤ 1 → 0 ≤ z → z ≤ 1 → 0 ≤ w →
       x * y * z * w ≤ w := by
@@ -366,7 +409,6 @@ lemma non_top_final_inequality (k : ℕ) (hk : 1 ≤ k) (e B α Vv Vu : ℝ) (h�
     have h1 : x * y ≤ 1 := by nlinarith
     have h1' : 0 ≤ x * y := mul_nonneg hx hy
     have h2 : x * y * z ≤ 1 := by nlinarith
-    have h2' : 0 ≤ x * y * z := mul_nonneg h1' hz
     nlinarith
   have hE1 : 2 * 0.38 * Real.exp (1/4) ≤ 1 := by linarith [E_le]
   have hE0 : 0 ≤ 2 * 0.38 * Real.exp (1/4) := by positivity
@@ -405,8 +447,6 @@ lemma top_final_inequality (k : ℕ) (hk : 4 ≤ k) (e B a b Del θ W Vu : ℝ) 
   rw [show n + 2 - 2 = n by omega, show n + 2 - 1 = n + 1 by omega] at hVu ⊢
   push_cast at hq ⊢
   have hθ0 : 0 < θ := by linarith
-  have hB0 : 0 ≤ B := by linarith
-  have hK0 : 0 < ((n:ℝ) + 2) * Del := by positivity
   have hbase : 0 ≤ 0.38 * e / θ * B / (a * b / (((n:ℝ) + 2) * Del)) := by positivity
   have key3 : ∀ x y z w : ℝ, 0 ≤ x → x ≤ 1 → 0 ≤ y → y ≤ 1 → 0 ≤ z → z ≤ 1 → 0 ≤ w →
       x * y * z * w ≤ w := by
@@ -414,7 +454,6 @@ lemma top_final_inequality (k : ℕ) (hk : 4 ≤ k) (e B a b Del θ W Vu : ℝ) 
     have h1 : x * y ≤ 1 := by nlinarith
     have h1' : 0 ≤ x * y := mul_nonneg hx hy
     have h2 : x * y * z ≤ 1 := by nlinarith
-    have h2' : 0 ≤ x * y * z := mul_nonneg h1' hz
     nlinarith
   have hX2 : (((n:ℝ) + 2) * Del) ^ 2 * (a + b) / (a ^ 2 * b ^ 2) ≤ 1 := by
     have hd : 0 < a ^ 2 * b ^ 2 := by positivity
@@ -601,7 +640,6 @@ lemma key_top (hTp : VandTop) (c : Cfg) (bb : ℝ) (de : ℕ → ℝ) (h : c.Ok)
   have hD := h.hDel
   have hD0 : 0 < c.Del := by linarith
   obtain ⟨hbp1, hbp2⟩ := h.htop htop
-  have hb1 := h.hb1
   have hbp0 : 3 ≤ c.bp := by linarith
   have hbpne : c.bp ≠ 0 := (by linarith : (0:ℝ) < c.bp).ne'
   have hvthp : c.vthp = 4 * c.k * c.Del / c.bp := by simp [Cfg.vthp, htop]
@@ -693,13 +731,6 @@ lemma key_top (hTp : VandTop) (c : Cfg) (bb : ℝ) (de : ℕ → ℝ) (h : c.Ok)
           | (rw [Finset.prod_const, Nat.card_Ioc]; done)
           | (rw [Finset.prod_const, Nat.card_Ioc, Nat.sub_sub])
           | (rw [Finset.prod_const, Nat.card_Ioc]; congr 1; omega)
-  have hA10 : 0 ≤ ∏ i ∈ Ioc 1 (c.k - 1), (c.a - c.u de i) := by
-    apply Finset.prod_nonneg
-    intro i hi
-    rw [Finset.mem_Ioc] at hi
-    obtain ⟨j, rfl⟩ : ∃ j, i = j + 1 := ⟨i - 1, by omega⟩
-    have hb := u_mid_bounds c h de hw j (by omega) (by omega)
-    linarith [hb.2]
   have hP2split : Vand (c.k - 1) (fun i => c.u de (i + 1)) =
       Vand (c.k - 2) (fun i => c.u de (i + 1)) * ∏ i ∈ Icc 1 (c.k - 2), (c.u de (i + 1) + c.bp) := by
     have hk2 : c.k - 1 = (c.k - 2) + 1 := by omega
@@ -795,7 +826,6 @@ theorem tcritLower_of
         | exact (Real.pow_nat_rpow_nat_inv hcP0 hk0).symm
       _ ≤ (VV / Vand c.k (c.u de)) ^ ((1 : ℝ) / (c.k : ℝ)) :=
         Real.rpow_le_rpow (pow_nonneg hcP0 _) hkV (by positivity)
-  have hrd0 : 0 < rd := by linarith
   have hka0 : 0 < ka := by rw [hka]; positivity
   have hg0 : 0 < g := by linarith [Real.pi_pos]
   have hA : 0 < (ka ^ (c.m - 1))⁻¹ * g ^ c.m := by positivity
@@ -804,7 +834,6 @@ theorem tcritLower_of
   rw [hT]
   have fin : ∀ A om Y cP : ℝ, 0 < A → 1 ≤ om → 0 ≤ cP → cP ≤ Y → A * cP ≤ A * om * Y := by
     intro A om Y cP hA' hom hc hY
-    have hY0 : 0 ≤ Y := le_trans hc hY
     have h1 : cP ≤ om * Y := by nlinarith
     calc
       A * cP

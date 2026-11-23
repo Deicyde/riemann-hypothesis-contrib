@@ -1,11 +1,44 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.HasTuplesOfLaws
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsModelsExt
-public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.IntValuationEqOfMem
-public import Formalism.LocalToGlobal.IndefiniteReal.LinksW
-public import Development.AbelianVarietyTheory.Definitions.TwistedInnerProducts.IsStepWeil
+import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsMeasY
+import Development.AbelianVarietyTheory.Proofs.FoundationProofs.IntValuationEqOfMem
+import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.LiftsAtAndSeedFacts
+import Formalism.LocalToGlobal.IndefiniteReal.LinksExist
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
 
 @[expose] public section
 
@@ -196,7 +229,6 @@ theorem sep_new (hL' : (extL R.toLevCh V).Is (.inl A.μ0)) (n : N)
   GlobalTheory.HeckeCharacterRestriction.not_isConjPl_union hL' (.inr n) (Or.inr h') (Or.inl h)
 ⟩
 
-set_option maxHeartbeats 2000000 in
 theorem exists_sideX
     (hS : SideLev)
     {F : Face D A} (hC : GlobalTheory.Hk3.Core R F)
@@ -238,7 +270,6 @@ theorem exists_sideX
   obtain ⟨hq, e⟩ := h1 q
   exact (congrArg R.eG e).trans (hC.grp.red_R A.μ0 ⟨q, hq⟩)
 
-set_option maxHeartbeats 2000000 in
 theorem exists_sideV
     (hS : SideLev)
     {F : Face D A} (hC : GlobalTheory.Hk3.Core R F)
@@ -281,7 +312,6 @@ theorem exists_sideV
   obtain ⟨hq, e⟩ := h1 q
   exact (congrArg R.eG e).trans (hC.grp.red_L i A.μ0 ⟨q, hq⟩)
 
-set_option maxHeartbeats 2000000 in
 def newRealOfSideData
     {X : NewFam A N}
     (BR : ∀ n,
@@ -319,7 +349,6 @@ def newRealOfSideData
   thF _ _ := 0
   thG _ _ := 0
 
-set_option maxHeartbeats 2000000 in
 theorem fam_stage
     (hS : SideLev)
     {F : Face D A} (hC : GlobalTheory.Hk3.Core R F)

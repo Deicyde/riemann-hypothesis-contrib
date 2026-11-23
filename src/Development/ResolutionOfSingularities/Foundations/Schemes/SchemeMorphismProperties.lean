@@ -1,6 +1,49 @@
 module
 
-public import Mathlib
+import Development.WeilBound.CoreStatements.PadicHodgeComparison.EtaleCohomologyComparison.BocksteinBaseChange.SmoothGaloisGeometry.IsOpenConnectedComponentOfNoetherianSpace
+public import Mathlib.AlgebraicGeometry.IdealSheaf.Functorial
+public import Mathlib.Combinatorics.Quiver.ReflQuiver
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.AlgebraicGeometry.Morphisms.Immersion
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.TypeStar
 
 @[expose] public section
 
@@ -10,108 +53,74 @@ open CategoryTheory CategoryTheory.Limits AlgebraicGeometry TopologicalSpace Opp
 
 namespace FunctorialResolution.Blowup
 
-theorem noetherianSpace_toScheme (X : Scheme.{u}) [NoetherianSpace ↥X] (U : X.Opens)
-    : NoetherianSpace ↥(U.toScheme) := by
-  have h : Topology.IsInducing (fun x : {y : ↥X // y ∈ U} => (x : ↥X)) := ⟨rfl⟩
+theorem noetherianSpace_toScheme (X : Scheme.{u}) [NoetherianSpace ↥X] (U : X.Opens) :
+    NoetherianSpace ↥(U.toScheme) := by
+  have h : Topology.IsInducing (fun x : { y : ↥X // y ∈ U } => (x : ↥X)) := ⟨rfl⟩
   exact h.noetherianSpace
 
-instance instNoetherianSpaceToScheme (X : Scheme.{u}) [NoetherianSpace ↥X] (U : X.Opens)
-    : NoetherianSpace ↥(U.toScheme) :=
+instance instNoetherianSpaceToScheme (X : Scheme.{u}) [NoetherianSpace ↥X] (U : X.Opens) :
+    NoetherianSpace ↥(U.toScheme) :=
   noetherianSpace_toScheme X U
 
-private theorem isAffineHom_specMap {R S : CommRingCat.{u}} (φ : R ⟶ S)
-    : AlgebraicGeometry.IsAffineHom (Spec.map φ) :=
+private theorem isAffineHom_specMap {R S : CommRingCat.{u}} (φ : R ⟶ S) :
+    AlgebraicGeometry.IsAffineHom (Spec.map φ) :=
   inferInstance
 
-private theorem isAffineHom_pullback_fst
-    {X Y S : Scheme.{u}} (f : X ⟶ S) (g : Y ⟶ S) [AlgebraicGeometry.IsAffineHom g]
-    : AlgebraicGeometry.IsAffineHom (pullback.fst f g) :=
+private theorem isAffineHom_pullback_fst {X Y S : Scheme.{u}} (f : X ⟶ S) (g : Y ⟶ S)
+    [AlgebraicGeometry.IsAffineHom g] :
+    AlgebraicGeometry.IsAffineHom (pullback.fst f g) :=
   MorphismProperty.of_isPullback (P := @AlgebraicGeometry.IsAffineHom)
     (IsPullback.of_hasPullback f g).flip ‹AlgebraicGeometry.IsAffineHom g›
 
-theorem isAffineHom_pullback_fst_specMap_of_field
-    {k K : Type u} [Field k] [Field K]
-    {X : Scheme.{u}} (p : X ⟶ Spec (CommRingCat.of k))
-    (φ : CommRingCat.of k ⟶ CommRingCat.of K)
-    : AlgebraicGeometry.IsAffineHom (pullback.fst p (Spec.map φ)) :=
+theorem isAffineHom_pullback_fst_specMap_of_field {k K : Type u} [Field k] [Field K] {X : Scheme.{u}}
+    (p : X ⟶ Spec (CommRingCat.of k)) (φ : CommRingCat.of k ⟶ CommRingCat.of K) :
+    AlgebraicGeometry.IsAffineHom (pullback.fst p (Spec.map φ)) :=
   @isAffineHom_pullback_fst X _ _ p (Spec.map φ) (isAffineHom_specMap φ)
 
-instance instIsAffineHomSpecMapPullbackFst
-    {k K : Type u} [Field k] [Field K]
-    {X : Scheme.{u}} (p : X ⟶ Spec (CommRingCat.of k))
-    (φ : CommRingCat.of k ⟶ CommRingCat.of K)
-    : AlgebraicGeometry.IsAffineHom (pullback.fst p (Spec.map φ)) :=
+instance instIsAffineHomSpecMapPullbackFst {k K : Type u} [Field k] [Field K] {X : Scheme.{u}}
+    (p : X ⟶ Spec (CommRingCat.of k)) (φ : CommRingCat.of k ⟶ CommRingCat.of K) :
+    AlgebraicGeometry.IsAffineHom (pullback.fst p (Spec.map φ)) :=
   isAffineHom_pullback_fst_specMap_of_field p φ
 
-private theorem le_comap_map_of_isClosedImmersion
-    {S X : Scheme.{u}} (ι : S ⟶ X) [IsClosedImmersion ι] (Z : S.IdealSheafData)
-    : Z ≤ (Z.map ι).comap ι := by
+private theorem le_comap_map_of_isClosedImmersion {S X : Scheme.{u}} (ι : S ⟶ X)
+    [IsClosedImmersion ι] (Z : S.IdealSheafData) : Z ≤ (Z.map ι).comap ι := by
   have hmapdef : Z.map ι = Scheme.Hom.ker (Z.subschemeι ≫ ι) := rfl
-  have hcomapdef : (Z.map ι).comap ι = Scheme.Hom.ker (pullback.fst ι (Z.map ι).subschemeι) := rfl
-  have hle : Scheme.Hom.ker (Z.subschemeι ≫ ι) ≤ Scheme.Hom.ker (Z.map ι).subschemeι := by
+  have hcomapdef : (Z.map ι).comap ι
+      = Scheme.Hom.ker (pullback.fst ι (Z.map ι).subschemeι) := rfl
+  have hle : Scheme.Hom.ker (Z.subschemeι ≫ ι)
+      ≤ Scheme.Hom.ker (Z.map ι).subschemeι := by
     rw [Scheme.IdealSheafData.ker_subschemeι, ← hmapdef]
-  have hu
-      : IsClosedImmersion.lift (Z.subschemeι ≫ ι) (Z.map ι).subschemeι hle ≫ (Z.subschemeι ≫ ι)
-        = (Z.map ι).subschemeι :=
+  have hu : IsClosedImmersion.lift (Z.subschemeι ≫ ι) (Z.map ι).subschemeι hle
+      ≫ (Z.subschemeι ≫ ι) = (Z.map ι).subschemeι :=
     IsClosedImmersion.lift_fac _ _ hle
   set u := IsClosedImmersion.lift (Z.subschemeι ≫ ι) (Z.map ι).subschemeι hle with hudef
-  have hk
-      : (pullback.snd ι (Z.map ι).subschemeι ≫ u) ≫ Z.subschemeι
-        = pullback.fst ι (Z.map ι).subschemeι := by
-    have h2
-        : ((pullback.snd ι (Z.map ι).subschemeι ≫ u) ≫ Z.subschemeι) ≫ ι
-          = pullback.fst ι (Z.map ι).subschemeι ≫ ι := by
+  have hk : (pullback.snd ι (Z.map ι).subschemeι ≫ u) ≫ Z.subschemeι
+      = pullback.fst ι (Z.map ι).subschemeι := by
+    have h2 : ((pullback.snd ι (Z.map ι).subschemeι ≫ u) ≫ Z.subschemeι) ≫ ι
+        = pullback.fst ι (Z.map ι).subschemeι ≫ ι := by
       rw [Category.assoc, Category.assoc, hu]
       exact pullback.condition.symm
     exact (cancel_mono ι).mp h2
   rw [hcomapdef, ← hk, Scheme.Hom.ker_comp]
-  calc
-    Z = (⊥ : Z.subscheme.IdealSheafData).map Z.subschemeι := by
-      rw [Scheme.IdealSheafData.map_bot, Scheme.IdealSheafData.ker_subschemeι]
+  calc Z = (⊥ : Z.subscheme.IdealSheafData).map Z.subschemeι := by
+        rw [Scheme.IdealSheafData.map_bot, Scheme.IdealSheafData.ker_subschemeι]
     _ ≤ _ := Scheme.IdealSheafData.map_mono Z.subschemeι bot_le
 
-theorem comap_map_of_isClosedImmersion
-    {S X : Scheme.{u}} (ι : S ⟶ X) [IsClosedImmersion ι] (Z : S.IdealSheafData)
-    : (Z.map ι).comap ι = Z :=
+theorem comap_map_of_isClosedImmersion {S X : Scheme.{u}} (ι : S ⟶ X)
+    [IsClosedImmersion ι] (Z : S.IdealSheafData) :
+    (Z.map ι).comap ι = Z :=
   le_antisymm (Scheme.IdealSheafData.comap_map_le Z ι) (le_comap_map_of_isClosedImmersion ι Z)
 
-theorem isOpen_connectedComponent_of_noetherianSpace
-    (T : Type v) [TopologicalSpace T] [TopologicalSpace.NoetherianSpace T] (x : T)
-    : IsOpen (connectedComponent x) := by
-  classical
-  have hfin : {Z : Set T | Z ∈ irreducibleComponents T ∧ ¬ Z ⊆ connectedComponent x}.Finite := by
-    refine Set.Finite.subset (TopologicalSpace.NoetherianSpace.finite_irreducibleComponents) ?_
-    rintro Z ⟨hZ, -⟩
-    exact hZ
-  have heq
-      : (connectedComponent x)ᶜ
-        = ⋃ Z ∈ {Z : Set T | Z ∈ irreducibleComponents T ∧ ¬ Z ⊆ connectedComponent x}, Z := by
-    apply Set.Subset.antisymm
-    · intro y hy
-      exact Set.mem_biUnion
-        (⟨
-           irreducibleComponent_mem_irreducibleComponents y,
-           fun h => hy (h mem_irreducibleComponent)
-         ⟩
-          : irreducibleComponent y
-            ∈ {Z : Set T | Z ∈ irreducibleComponents T ∧ ¬ Z ⊆ connectedComponent x})
-        mem_irreducibleComponent
-    · intro z hz
-      simp only [Set.mem_iUnion, Set.mem_ofPred_eq, exists_prop] at hz
-      obtain ⟨Z, ⟨hZ, hZ'⟩, hzZ⟩ := hz
-      intro hzc
-      have h1 : Z ⊆ connectedComponent z := hZ.1.2.isPreconnected.subset_connectedComponent hzZ
-      rw [← connectedComponent_eq hzc] at h1
-      exact hZ' h1
-  rw [← isClosed_compl_iff, heq]
-  exact hfin.isClosed_biUnion (fun Z hZ => isClosed_of_mem_irreducibleComponents _ hZ.1)
+theorem isOpen_connectedComponent_of_noetherianSpace (T : Type v) [TopologicalSpace T]
+    [TopologicalSpace.NoetherianSpace T] (x : T) : IsOpen (connectedComponent x) := by
+  apply CrystallineSemistableComparison.isOpen_connectedComponent_of_noetherianSpace <;> assumption
 
 end FunctorialResolution.Blowup
 
 namespace TopologicalSpace.NoetherianSpace
 
-theorem finite_range_connectedComponent (Y : Type*) [TopologicalSpace Y] [NoetherianSpace Y]
-    : (Set.range fun x : Y => connectedComponent x).Finite := by
+theorem finite_range_connectedComponent (Y : Type*) [TopologicalSpace Y] [NoetherianSpace Y] :
+    (Set.range fun x : Y => connectedComponent x).Finite := by
   classical
   have hfin : (irreducibleComponents Y).Finite :=
     TopologicalSpace.NoetherianSpace.finite_irreducibleComponents
@@ -129,22 +138,20 @@ theorem finite_range_connectedComponent (Y : Type*) [TopologicalSpace Y] [Noethe
   · intro y hy
     exact Set.mem_biUnion mem_irreducibleComponent hy
 
-theorem isClosed_setOf_connectedComponent_subset
-    (Y : Type*) [TopologicalSpace Y] [NoetherianSpace Y] (A : Set Y)
-    : IsClosed {x : Y | connectedComponent x ⊆ A} := by
+theorem isClosed_setOf_connectedComponent_subset (Y : Type*) [TopologicalSpace Y]
+    [NoetherianSpace Y] (A : Set Y) : IsClosed {x : Y | connectedComponent x ⊆ A} := by
   classical
-  have hfin : {C : Set Y | C ∈ Set.range (fun x : Y => connectedComponent x) ∧ C ⊆ A}.Finite := by
+  have hfin :
+      {C : Set Y | C ∈ Set.range (fun x : Y => connectedComponent x) ∧ C ⊆ A}.Finite := by
     refine (finite_range_connectedComponent Y).subset ?_
     rintro C ⟨hC, -⟩
     exact hC
-  have heq
-      : {x : Y | connectedComponent x ⊆ A}
-        = ⋃ C ∈ {C : Set Y | C ∈ Set.range (fun x : Y => connectedComponent x) ∧ C ⊆ A}, C := by
+  have heq : {x : Y | connectedComponent x ⊆ A}
+      = ⋃ C ∈ {C : Set Y | C ∈ Set.range (fun x : Y => connectedComponent x) ∧ C ⊆ A}, C := by
     apply Set.Subset.antisymm
     · intro x hx
-      have hmem
-          : connectedComponent x
-            ∈ {C : Set Y | C ∈ Set.range (fun x : Y => connectedComponent x) ∧ C ⊆ A} :=
+      have hmem : connectedComponent x ∈
+          {C : Set Y | C ∈ Set.range (fun x : Y => connectedComponent x) ∧ C ⊆ A} :=
         ⟨⟨x, rfl⟩, hx⟩
       exact Set.mem_biUnion hmem mem_connectedComponent
     · intro x hx
@@ -168,21 +175,20 @@ namespace AlgebraicGeometry
 
 namespace Scheme
 
-theorem presheaf_map_eq_of_parallel (X₁ : Scheme.{u}) {A B : (X₁.Opens)ᵒᵖ} (g₁ g₂ : A ⟶ B)
-    : X₁.presheaf.map g₁ = X₁.presheaf.map g₂ :=
+theorem presheaf_map_eq_of_parallel (X₁ : Scheme.{u}) {A B : (X₁.Opens)ᵒᵖ} (g₁ g₂ : A ⟶ B) :
+    X₁.presheaf.map g₁ = X₁.presheaf.map g₂ :=
   congrArg X₁.presheaf.map (Quiver.Hom.unop_inj (Subsingleton.elim _ _))
 
 namespace Hom
 
-theorem appLE_congr_hom
-    {A B : Scheme.{u}} {f g : A ⟶ B}
-    (hfg : f = g) (O : B.Opens) (S : A.Opens) (h1 : S ≤ f ⁻¹ᵁ O) (h2 : S ≤ g ⁻¹ᵁ O)
-    : Scheme.Hom.appLE f O S h1 = Scheme.Hom.appLE g O S h2 := by
+theorem appLE_congr_hom {A B : Scheme.{u}} {f g : A ⟶ B} (hfg : f = g) (O : B.Opens)
+    (S : A.Opens) (h1 : S ≤ f ⁻¹ᵁ O) (h2 : S ≤ g ⁻¹ᵁ O) :
+    Scheme.Hom.appLE f O S h1 = Scheme.Hom.appLE g O S h2 := by
   subst hfg
   rfl
 
-theorem range_comp_base {A B C : Scheme.{u}} (f : A ⟶ B) (g : B ⟶ C)
-    : Set.range (f ≫ g).base = g.base '' Set.range f.base := by
+theorem range_comp_base {A B C : Scheme.{u}} (f : A ⟶ B) (g : B ⟶ C) :
+    Set.range (f ≫ g).base = g.base '' Set.range f.base := by
   have hcomp : ∀ x : A, (f ≫ g).base x = g.base (f.base x) := fun _ => rfl
   apply Set.Subset.antisymm
   · rintro z ⟨x, rfl⟩
@@ -194,9 +200,8 @@ end Hom
 
 end Scheme
 
-theorem quasiCompact_of_compactSpace_of_subsingleton
-    {W S : Scheme.{u}} (f : W ⟶ S) [CompactSpace ↥W] [Subsingleton ↥S]
-    : QuasiCompact f := by
+theorem quasiCompact_of_compactSpace_of_subsingleton {W S : Scheme.{u}} (f : W ⟶ S)
+    [CompactSpace ↥W] [Subsingleton ↥S] : QuasiCompact f := by
   constructor
   intro U _ _
   rcases Set.eq_empty_or_nonempty (f.base ⁻¹' U) with h | ⟨w, hw⟩

@@ -1,13 +1,58 @@
 module
 
-public import Mathlib
 public import GroundTheory.HeightsAndTheta.Heights.Intersections.StatementsBlockRatioAlg
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ArithmeticHilbertSamuelLowerBound
+public import GroundTheory.HeightsAndTheta.Heights.HeightKernels.PCoordConeArithVar
+public import GroundTheory.HeightsAndTheta.Heights.HilbertSamuel.PBirationalModelExists
 public import GroundTheory.HeightsAndTheta.Heights.Intersections.AvoidRing
 public import GroundTheory.HeightsAndTheta.Heights.Intersections.IsHorizontalImageZ
-public import GroundTheory.HeightsAndTheta.Heights.WeightedHomogeneous.PConeTrdeg
+import GroundTheory.HeightsAndTheta.Heights.WeightedHomogeneous.PConeTrdeg
 public import GroundTheory.HeightsAndTheta.Heights.WeightedHomogeneous.PIntDomainDim
-public import GroundTheory.HeightsAndTheta.Heights.HilbertSamuel.PBirationalModelExists
-public import GroundTheory.HeightsAndTheta.Heights.HeightKernels.PCoordConeArithVar
+import Mathlib.Algebra.MvPolynomial.Nilpotent
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Henselian
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.RegularLocalRing.Defs
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.TotallySplit
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 
@@ -17,27 +62,21 @@ noncomputable section
 
 namespace GroundTheory.Heights₂.Heights.Inter
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
-  ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I4
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I4
 
 namespace BlockRatioAlgebraic
 
-variable
-  {K : Type} [Fintype K]
-  {ι : K → Type} [∀ k, Fintype (ι k)]
-  {K' : Type} [Fintype K']
-  {ι' : K' → Type} [∀ k, Fintype (ι' k)]
-  {Ω : Type} [Field Ω]
+variable {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)]
+  {K' : Type} [Fintype K'] {ι' : K' → Type} [∀ k, Fintype (ι' k)] {Ω : Type} [Field Ω]
+
 
 omit [Fintype K] [∀ k, Fintype (ι k)] [Fintype K'] [∀ k, Fintype (ι' k)] in
-theorem mCoordIdeal_comp_v
-    {κ : K → K'} {v : (Σ k, ι k) → (Σ k', ι' k')} (hv : IsBlockMap κ v) (y' : (Σ k', ι' k') → Ω)
-    : mCoordIdeal (fun p ↦ y' (v p)) = imageZ v (mCoordIdeal y') := by
+theorem mCoordIdeal_comp_v {κ : K → K'} {v : (Σ k, ι k) → (Σ k', ι' k')} (hv : IsBlockMap κ v)
+    (y' : (Σ k', ι' k') → Ω) : mCoordIdeal (fun p ↦ y' (v p)) = imageZ v (mCoordIdeal y') := by
   have e : ∀ f : MRing ι, mConeMap y' (rename v f) = rename κ (mConeMap (fun p ↦ y' (v p)) f) := by
     intro f
-    have h
-        : ((mConeMap y').comp (rename v) : MRing ι →ₐ[ℤ] MvPolynomial K' Ω)
-          = ((rename κ).restrictScalars ℤ).comp (mConeMap fun p ↦ y' (v p)) := by
+    have h : ((mConeMap y').comp (rename v) : MRing ι →ₐ[ℤ] MvPolynomial K' Ω) =
+        ((rename κ).restrictScalars ℤ).comp (mConeMap fun p ↦ y' (v p)) := by
       refine MvPolynomial.algHom_ext fun p ↦ ?_
       simp [mConeMap, hv.2.2.1 p]
     exact congrArg (fun φ : MRing ι →ₐ[ℤ] MvPolynomial K' Ω ↦ φ f) h
@@ -46,17 +85,18 @@ theorem mCoordIdeal_comp_v
   simp only [mCoordIdeal, RingHom.mem_ker, e]
   exact (map_eq_zero_iff _ (rename_injective κ hv.1)).symm
 
+
 omit [Fintype K] [∀ k, Fintype (ι k)] in
-theorem algebraMap_int_injective (y : (Σ k, ι k) → Ω) (h : IsHorizontal (mCoordIdeal y))
-    : Function.Injective (algebraMap ℤ Ω) := by
-  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
-    rw [injective_iff_map_eq_zero]
+theorem algebraMap_int_injective (y : (Σ k, ι k) → Ω) (h : IsHorizontal (mCoordIdeal y)) :
+    Function.Injective (algebraMap ℤ Ω) := by
+  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
   intro a ha
   have hm : a ∈ (mCoordIdeal y).comap (C : ℤ →+* MRing ι) := by
     rw [Ideal.mem_comap, mCoordIdeal, RingHom.mem_ker, ← algebraMap_eq, AlgHom.commutes,
       MvPolynomial.algebraMap_apply, ha, C_0]
   rw [show (mCoordIdeal y).comap (C : ℤ →+* MRing ι) = ⊥ from h] at hm
   exact (Submodule.mem_bot ℤ).mp hm
+
 
 omit [Fintype K] in
 theorem isMultiHomog_C (a : ℤ) : IsMultiHomog (C a : MRing ι) 0 := by
@@ -70,44 +110,34 @@ theorem isMultiHomog_C (a : ℤ) : IsMultiHomog (C a : MRing ι) 0 := by
 def homogN (c : ∀ k, ι k) (N : ℕ) (f : MRing ι) : MRing ι :=
   ∑ m ∈ f.support, C (AddMonoidAlgebra.coeff f m) * ∏ p : Σ k, ι k, X p ^ m p * X ⟨p.1, c p.1⟩ ^ (N - m p)
 
-theorem isMultiHomog_homogN
-    [DecidableEq K] (c : ∀ k, ι k) (N : ℕ) (f : MRing ι) (hN : f.totalDegree ≤ N)
-    : IsMultiHomog (homogN c N f) (∑ p : Σ k, ι k, N • (Pi.single p.1 1 : K → ℕ)) := by
+theorem isMultiHomog_homogN [DecidableEq K] (c : ∀ k, ι k) (N : ℕ) (f : MRing ι)
+    (hN : f.totalDegree ≤ N) :
+    IsMultiHomog (homogN c N f) (∑ p : Σ k, ι k, N • (Pi.single p.1 1 : K → ℕ)) := by
   refine AvoidRing.isMultiHomog_sum _ _ fun m hm ↦ ?_
   have hle : ∀ p, m p ≤ N := fun p ↦
     ((monomial_le_degreeOf p hm).trans (degreeOf_le_totalDegree f p)).trans hN
-  have h :=
-    AvoidRing.isMultiHomog_mul (isMultiHomog_C (ι := ι) (AddMonoidAlgebra.coeff f m))
-      (AvoidRing.isMultiHomog_prod Finset.univ
-        (fun p : Σ k, ι k ↦ (X p : MRing ι) ^ m p * X ⟨p.1, c p.1⟩ ^ (N - m p))
-        (fun p ↦ N • (Pi.single p.1 1 : K → ℕ))
-        fun p _ ↦ by
-          have h1 :=
-            AvoidRing.isMultiHomog_mul
-              (AvoidRing.isMultiHomog_pow (AvoidRing.isMultiHomog_X (R := ℤ) (ι := ι) p.1 p.2)
-                (m p))
-              (AvoidRing.isMultiHomog_pow (AvoidRing.isMultiHomog_X (R := ℤ) (ι := ι) p.1 (c p.1))
-                (N - m p))
-          rwa [← add_smul, Nat.add_sub_cancel' (hle p)] at h1)
+  have h := AvoidRing.isMultiHomog_mul (isMultiHomog_C (ι := ι) (AddMonoidAlgebra.coeff f m))
+    (AvoidRing.isMultiHomog_prod Finset.univ
+      (fun p : Σ k, ι k ↦ (X p : MRing ι) ^ m p * X ⟨p.1, c p.1⟩ ^ (N - m p))
+      (fun p ↦ N • (Pi.single p.1 1 : K → ℕ)) fun p _ ↦ by
+        have h1 := AvoidRing.isMultiHomog_mul
+          (AvoidRing.isMultiHomog_pow (AvoidRing.isMultiHomog_X (R := ℤ) (ι := ι) p.1 p.2) (m p))
+          (AvoidRing.isMultiHomog_pow (AvoidRing.isMultiHomog_X (R := ℤ) (ι := ι) p.1 (c p.1)) (N - m p))
+        rwa [← add_smul, Nat.add_sub_cancel' (hle p)] at h1)
   rwa [zero_add] at h
 
-theorem aeval_homogN
-    {F : Type} [Field F]
-    (c : ∀ k, ι k)
-    (N : ℕ) (f : MRing ι) (hN : f.totalDegree ≤ N)
-    (w : (Σ k, ι k) → F) (hw : ∀ k, w ⟨k, c k⟩ ≠ 0)
-    : aeval w (homogN c N f)
-      = (∏ p : Σ k, ι k, w ⟨p.1, c p.1⟩) ^ N * aeval (fun p ↦ w p / w ⟨p.1, c p.1⟩) f := by
+theorem aeval_homogN {F : Type} [Field F] (c : ∀ k, ι k) (N : ℕ) (f : MRing ι)
+    (hN : f.totalDegree ≤ N) (w : (Σ k, ι k) → F) (hw : ∀ k, w ⟨k, c k⟩ ≠ 0) :
+    aeval w (homogN c N f) = (∏ p : Σ k, ι k, w ⟨p.1, c p.1⟩) ^ N *
+      aeval (fun p ↦ w p / w ⟨p.1, c p.1⟩) f := by
   classical
-  have hsum
-      : aeval (fun p ↦ w p / w ⟨p.1, c p.1⟩) f
-        = ∑ m ∈ f.support, aeval (fun p ↦ w p / w ⟨p.1, c p.1⟩) (monomial m (AddMonoidAlgebra.coeff f m)) :=
-    by
-      conv_lhs => rw [f.as_sum]
-      set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [hsum, Finset.mul_sum, homogN, map_sum]
+  have hsum : aeval (fun p ↦ w p / w ⟨p.1, c p.1⟩) f =
+      ∑ m ∈ f.support, aeval (fun p ↦ w p / w ⟨p.1, c p.1⟩) (monomial m (AddMonoidAlgebra.coeff f m)) := by
+    conv_lhs => rw [f.as_sum]
+
+    rw [map_sum]
+
+  rw [hsum, Finset.mul_sum, homogN, map_sum]
   refine Finset.sum_congr rfl fun m hm ↦ ?_
   have hle : ∀ p, m p ≤ N := fun p ↦
     ((monomial_le_degreeOf p hm).trans (degreeOf_le_totalDegree f p)).trans hN
@@ -122,6 +152,7 @@ theorem aeval_homogN
 
 end BlockRatioAlgebraic
 
+
 open BlockRatioAlgebraic CoordinateConeArithVar in
 theorem BlockRatioAlg.proof : BlockRatioAlg.Statement := by
   classical
@@ -129,8 +160,8 @@ theorem BlockRatioAlg.proof : BlockRatioAlg.Statement := by
   obtain ⟨Ω, _, y', hy', hbir⟩ := HilbertSamuel.BirationalModelExists.proof K' ι' P' (n + 1) hP'
 
   choose c' hc' using hP'.2.1.2.2
-  have hy'c : ∀ k', y' ⟨k', c' k'⟩ ≠ 0 := fun k' h0 ↦
-    hc' k' (by rw [← hy', mCoordIdeal, RingHom.mem_ker, mConeMap, aeval_X, h0, C_0, zero_mul])
+  have hy'c : ∀ k', y' ⟨k', c' k'⟩ ≠ 0 := fun k' h0 ↦ hc' k' (by
+    rw [← hy', mCoordIdeal, RingHom.mem_ker, mConeMap, aeval_X, h0, C_0, zero_mul])
   obtain ⟨_, ⟨hprime', -, -⟩, hhor', hdim'⟩ := hP'
   have hZ : Function.Injective (algebraMap ℤ Ω) := algebraMap_int_injective y' (hy' ▸ hhor')
 
@@ -138,13 +169,10 @@ theorem BlockRatioAlg.proof : BlockRatioAlg.Statement := by
     have htr := ConeTrdeg.proof K' ι' Ω y' hbir (fun k ↦ ⟨c' k, hy'c k⟩) (hy' ▸ hhor')
     rw [hy'] at htr
     have := hprime'
-    have hA :=
-      IntDomainDim.proof (MRing ι' ⧸ P') (CoordinateConeArithVar.algebraMap_injective P' hhor')
+    have hA := IntDomainDim.proof (MRing ι' ⧸ P') (CoordinateConeArithVar.algebraMap_injective P' hhor')
     rw [hdim', htr, map_add (f := _), map_natCast] at hA
-    have hA'
-        : ((n + 1 + Fintype.card K' : ℕ) : ℕ∞)
-          = Cardinal.toENat (Algebra.trdeg ℤ Ω) + Fintype.card K' + 1 := by
-      exact_mod_cast hA
+    have hA' : ((n + 1 + Fintype.card K' : ℕ) : ℕ∞) =
+        Cardinal.toENat (Algebra.trdeg ℤ Ω) + Fintype.card K' + 1 := by exact_mod_cast hA
     obtain ⟨t, ht⟩ : ∃ t : ℕ, Cardinal.toENat (Algebra.trdeg ℤ Ω) = t := by
       refine ENat.ne_top_iff_exists.mp (fun htop ↦ ?_) |>.imp fun _ h ↦ h.symm
       rw [htop] at hA'
@@ -159,8 +187,8 @@ theorem BlockRatioAlg.proof : BlockRatioAlg.Statement := by
   set y : (Σ k, ι k) → Ω := fun p ↦ y' (v p) with hydef
   have hyP : mCoordIdeal y = imageZ v P' := by rw [← hy']; exact mCoordIdeal_comp_v hv y'
   choose c0 hc0 using hP.2.1.2.2
-  have hy0 : ∀ k, y ⟨k, c0 k⟩ ≠ 0 := fun k h0 ↦
-    hc0 k (by rw [← hyP, mCoordIdeal, RingHom.mem_ker, mConeMap, aeval_X, h0, C_0, zero_mul])
+  have hy0 : ∀ k, y ⟨k, c0 k⟩ ≠ 0 := fun k h0 ↦ hc0 k (by
+    rw [← hyP, mCoordIdeal, RingHom.mem_ker, mConeMap, aeval_X, h0, C_0, zero_mul])
   set A : Subalgebra ℤ Ω := Algebra.adjoin ℤ (Set.range (ratioPt y c0)) with hAdef
   have hZA : Function.Injective (algebraMap ℤ A) := fun a b h ↦ hZ (congrArg Subtype.val h)
   have : FaithfulSMul ℤ A := (faithfulSMul_iff_algebraMap_injective ℤ A).mpr hZA
@@ -172,9 +200,8 @@ theorem BlockRatioAlg.proof : BlockRatioAlg.Statement := by
     aeval fun p ↦ C ⟨ratioPt y c0 p, Algebra.subset_adjoin ⟨p, rfl⟩⟩ * X p.1
   have hΨ : ∀ f, MvPolynomial.map (algebraMap A Ω) (Ψ f) = mConeMap (ratioPt y c0) f := by
     intro f
-    have e
-        : ((MvPolynomial.map (algebraMap A Ω)).comp (Ψ : MRing ι →+* MvPolynomial K A))
-          = (mConeMap (ratioPt y c0) : MRing ι →+* MvPolynomial K Ω) := by
+    have e : ((MvPolynomial.map (algebraMap A Ω)).comp (Ψ : MRing ι →+* MvPolynomial K A)) =
+        (mConeMap (ratioPt y c0) : MRing ι →+* MvPolynomial K Ω) := by
       refine MvPolynomial.ringHom_ext (fun a ↦ ?_) (fun p ↦ ?_)
       · simp [Ψ, mConeMap]
       · simp [Ψ, mConeMap]
@@ -186,15 +213,12 @@ theorem BlockRatioAlg.proof : BlockRatioAlg.Statement := by
   obtain ⟨_, ⟨hprime, -, -⟩, hhor, hdim⟩ := hP
   rw [← hker] at hprime hhor hdim
   have := hprime
-  have hB :=
-    IntDomainDim.proof (MRing ι ⧸ RingHom.ker Ψ)
-      (CoordinateConeArithVar.algebraMap_injective _ hhor)
+  have hB := IntDomainDim.proof (MRing ι ⧸ RingHom.ker Ψ)
+    (CoordinateConeArithVar.algebraMap_injective _ hhor)
   rw [hdim] at hB
-  have hB'
-      : Cardinal.toENat (Algebra.trdeg ℤ (MRing ι ⧸ RingHom.ker Ψ)) = (n + Fintype.card K : ℕ) := by
-    have : ((n + 1 + Fintype.card K : ℕ) : ℕ∞)
-        = Cardinal.toENat (Algebra.trdeg ℤ (MRing ι ⧸ RingHom.ker Ψ)) + 1 := by
-      exact_mod_cast hB
+  have hB' : Cardinal.toENat (Algebra.trdeg ℤ (MRing ι ⧸ RingHom.ker Ψ)) = (n + Fintype.card K : ℕ) := by
+    have : ((n + 1 + Fintype.card K : ℕ) : ℕ∞) =
+        Cardinal.toENat (Algebra.trdeg ℤ (MRing ι ⧸ RingHom.ker Ψ)) + 1 := by exact_mod_cast hB
     obtain ⟨t, ht⟩ : ∃ t : ℕ, Cardinal.toENat (Algebra.trdeg ℤ (MRing ι ⧸ RingHom.ker Ψ)) = t := by
       refine ENat.ne_top_iff_exists.mp (fun htop ↦ ?_) |>.imp fun _ h ↦ h.symm
       rw [htop] at this
@@ -207,17 +231,14 @@ theorem BlockRatioAlg.proof : BlockRatioAlg.Statement := by
   have hle : Algebra.trdeg ℤ (MRing ι ⧸ RingHom.ker Ψ) ≤ Algebra.trdeg ℤ (MvPolynomial K A) :=
     trdeg_le_of_injective (Ideal.kerLiftAlg Ψ) (Ideal.kerLiftAlg_injective Ψ)
   rw [← trdeg_add_eq ℤ A (A := MvPolynomial K A), MvPolynomial.trdeg_of_isDomain, Cardinal.lift_id,
-      Cardinal.mk_fintype, hB']
-    at hle
+    Cardinal.mk_fintype, hB'] at hle
 
   have hsum := trdeg_add_eq ℤ A (A := Ω)
   rw [hΩ] at hsum
-  obtain ⟨a, ha⟩ :=
-    Cardinal.lt_aleph0.1 ((le_self_add.trans hsum.le).trans_lt
-      (Cardinal.natCast_lt_aleph0 (n := n)))
-  obtain ⟨b, hb⟩ :=
-    Cardinal.lt_aleph0.1 ((le_add_self.trans hsum.le).trans_lt
-      (Cardinal.natCast_lt_aleph0 (n := n)))
+  obtain ⟨a, ha⟩ := Cardinal.lt_aleph0.1
+    ((le_self_add.trans hsum.le).trans_lt (Cardinal.natCast_lt_aleph0 (n := n)))
+  obtain ⟨b, hb⟩ := Cardinal.lt_aleph0.1
+    ((le_add_self.trans hsum.le).trans_lt (Cardinal.natCast_lt_aleph0 (n := n)))
   rw [ha, hb] at hsum
   rw [ha] at hle
   have h1 : a + b = n := by exact_mod_cast hsum
@@ -225,8 +246,8 @@ theorem BlockRatioAlg.proof : BlockRatioAlg.Statement := by
   have hb0 : Algebra.trdeg A Ω = 0 := by rw [hb]; norm_cast; omega
   have : Algebra.IsAlgebraic A Ω := trdeg_eq_zero_iff.mp hb0
 
-  have hyc : y' c ≠ 0 := fun h0 ↦
-    hc (by rw [← hy', mCoordIdeal, RingHom.mem_ker, mConeMap, aeval_X, h0, C_0, zero_mul])
+  have hyc : y' c ≠ 0 := fun h0 ↦ hc (by
+    rw [← hy', mCoordIdeal, RingHom.mem_ker, mConeMap, aeval_X, h0, C_0, zero_mul])
   obtain ⟨p, hp0, hpr⟩ := Algebra.IsAlgebraic.isAlgebraic (R := A) (y' q / y' c)
   have hF : ∀ j : ℕ, ∃ F : MRing ι, aeval (ratioPt y c0) F = (p.coeff j : Ω) := by
     intro j
@@ -238,9 +259,7 @@ theorem BlockRatioAlg.proof : BlockRatioAlg.Statement := by
   set m := p.natDegree with hm
   set N := ∑ j ∈ Finset.range (m + 1), (F j).totalDegree with hN
   have hNle : ∀ j : Fin (m + 1), (F j).totalDegree ≤ N := fun j ↦
-    Finset.single_le_sum
-      (f := fun j ↦ (F j).totalDegree)
-      (fun _ _ ↦ Nat.zero_le _)
+    Finset.single_le_sum (f := fun j ↦ (F j).totalDegree) (fun _ _ ↦ Nat.zero_le _)
       (Finset.mem_range.2 j.2)
   set D := (∏ p : Σ k, ι k, y ⟨p.1, c0 p.1⟩) ^ N with hD
   have hD0 : D ≠ 0 := pow_ne_zero _ (Finset.prod_ne_zero_iff.2 fun p _ ↦ hy0 p.1)
@@ -250,57 +269,45 @@ theorem BlockRatioAlg.proof : BlockRatioAlg.Statement := by
     rfl
   have hdeg := fun j : Fin (m + 1) ↦ isMultiHomog_homogN c0 N (F j) (hNle j)
   refine ⟨m, fun j ↦ homogN c0 N (F j), _, hdeg, ?_, ?_⟩
-  · rw [← hyP]
+  ·
+    rw [← hyP]
     intro hmem
     rw [mCoordIdeal, RingHom.mem_ker, ConeTrdeg.mConeMap_of_isMultiHomog y (hdeg _)] at hmem
-    have hX
-        : (∏ k, (X k : MvPolynomial K Ω) ^ (∑ p : Σ k, ι k, N • (Pi.single p.1 1 : K → ℕ)) k) ≠ 0 :=
+    have hX : (∏ k, (X k : MvPolynomial K Ω) ^ (∑ p : Σ k, ι k, N • (Pi.single p.1 1 : K → ℕ)) k) ≠ 0 :=
       Finset.prod_ne_zero_iff.2 fun k _ ↦ pow_ne_zero _ (X_ne_zero k)
     have h0 := (mul_eq_zero.1 hmem).resolve_right hX
     rw [C_eq_zero, hval] at h0
     have hlc : (p.coeff m : Ω) ≠ 0 := fun h ↦
       (Polynomial.leadingCoeff_ne_zero.2 hp0) (Subtype.ext h)
     exact mul_ne_zero hD0 hlc h0
-  · have hG : IsMultiHomog
-        (∑ j : Fin (m + 1), rename v (homogN c0 N (F j)) * X q ^ (j : ℕ) *
-          X c ^ (m - j : ℕ))
-        (Function.extend κ (∑ p : Σ k, ι k, N • (Pi.single p.1 1 : K → ℕ)) 0
-          + m • (Pi.single q.1 1 : K' → ℕ)) := by
+  ·
+    have hG : IsMultiHomog (∑ j : Fin (m + 1), rename v (homogN c0 N (F j)) * X q ^ (j : ℕ) *
+        X c ^ (m - j : ℕ)) (Function.extend κ (∑ p : Σ k, ι k, N • (Pi.single p.1 1 : K → ℕ)) 0 +
+          m • (Pi.single q.1 1 : K' → ℕ)) := by
       refine AvoidRing.isMultiHomog_sum _ _ fun j _ ↦ ?_
-      have h1 :=
-        AvoidRing.isMultiHomog_mul
-          (AvoidRing.isMultiHomog_mul
-            (ArithmeticIntersectionHorizontal.isMultiHomog_rename hv (hdeg j))
-            (AvoidRing.isMultiHomog_pow (AvoidRing.isMultiHomog_X (R := ℤ) (ι := ι') q.1 q.2)
-              (j : ℕ)))
-          (AvoidRing.isMultiHomog_pow (AvoidRing.isMultiHomog_X (R := ℤ) (ι := ι') c.1 c.2)
-            (m - j : ℕ))
+      have h1 := AvoidRing.isMultiHomog_mul (AvoidRing.isMultiHomog_mul
+        (ArithmeticIntersectionHorizontal.isMultiHomog_rename hv (hdeg j))
+        (AvoidRing.isMultiHomog_pow (AvoidRing.isMultiHomog_X (R := ℤ) (ι := ι') q.1 q.2) (j : ℕ)))
+        (AvoidRing.isMultiHomog_pow (AvoidRing.isMultiHomog_X (R := ℤ) (ι := ι') c.1 c.2) (m - j : ℕ))
       rw [show (Pi.single c.1 1 : K' → ℕ) = Pi.single q.1 1 by rw [hqc]] at h1
       rwa [add_assoc, ← add_smul, Nat.add_sub_cancel' (Nat.lt_succ_iff.1 j.2)] at h1
     rw [← hy', mCoordIdeal, RingHom.mem_ker, ConeTrdeg.mConeMap_of_isMultiHomog y' hG]
-    suffices h
-        : aeval y'
-            (∑ j : Fin (m + 1), rename v (homogN c0 N (F j)) * X q ^ (j : ℕ) *
-              X c ^ (m - j : ℕ))
-          = 0 by
-      rw [h, C_0, zero_mul]
+    suffices h : aeval y' (∑ j : Fin (m + 1), rename v (homogN c0 N (F j)) * X q ^ (j : ℕ) *
+        X c ^ (m - j : ℕ)) = 0 by rw [h, C_0, zero_mul]
     have hpr' : ∑ j ∈ Finset.range (m + 1), (p.coeff j : Ω) * (y' q / y' c) ^ j = 0 := by
       rw [← hpr, Polynomial.aeval_eq_sum_range]
       rfl
     rw [← Fin.sum_univ_eq_sum_range (fun j ↦ (p.coeff j : Ω) * (y' q / y' c) ^ j)] at hpr'
-    have e
-        : ∀ j : Fin (m + 1),
-          aeval y' (rename v (homogN c0 N (F j)) * X q ^ (j : ℕ) * X c ^ (m - j : ℕ))
-            = D * y' c ^ m * ((p.coeff j : Ω) * (y' q / y' c) ^ (j : ℕ)) := by
+    have e : ∀ j : Fin (m + 1), aeval y' (rename v (homogN c0 N (F j)) * X q ^ (j : ℕ) * X c ^ (m - j : ℕ)) =
+        D * y' c ^ m * ((p.coeff j : Ω) * (y' q / y' c) ^ (j : ℕ)) := by
       intro j
       have hj : (j : ℕ) ≤ m := Nat.lt_succ_iff.1 j.2
       rw [map_mul, map_mul, map_pow, map_pow, aeval_X, aeval_X, aeval_rename]
       have hv' : aeval (y' ∘ v) (homogN c0 N (F j)) = D * (p.coeff j : Ω) := hval j
-      rw [hv', div_pow,
-        show y' c ^ m = y' c ^ (j : ℕ) * y' c ^ (m - j : ℕ) by
-          rw [← pow_add, Nat.add_sub_cancel' hj]]
+      rw [hv', div_pow, show y' c ^ m = y' c ^ (j : ℕ) * y' c ^ (m - j : ℕ) by
+        rw [← pow_add, Nat.add_sub_cancel' hj]]
       field_simp
-    set_option synthInstance.maxHeartbeats 100000 in
+
     rw [map_sum, Finset.sum_congr rfl fun j _ ↦ e j, ← Finset.mul_sum, hpr', mul_zero]
 
 end GroundTheory.Heights₂.Heights.Inter

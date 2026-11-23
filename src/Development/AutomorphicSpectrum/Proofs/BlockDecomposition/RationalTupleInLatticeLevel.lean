@@ -1,28 +1,70 @@
 module
 
-public import Mathlib
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ThetaPartD
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsBoundUnitary
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.HermInf
-public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.HermOf
-public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.TensorLocallyCompactRingStatement
-public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.FiniteAdeleTopologyStatement
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.RatTuple
-public import Development.AutomorphicSpectrum.Proofs.GlobalProofs.SchwartzBruhatEqSumPure
-public import Development.AutomorphicSpectrum.Proofs.GlobalProofs.AdelicCharacterArchimedeanFormStatement
-public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.StandardAdelicCharacterStatement
-public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.InfiniteAdeleHaarMapEqScaledVolumeStatement
+public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.FiniteAdeleTopologyStatement
 public import Development.AutomorphicArithmetic.IntegralCasts.CapelliIdentities.ExistsNatMulMem
+import Formalism.LocalRingCardinality.DataHost
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
+public import Development.AbelianVarietyTheory.BlockTheory.TwistedDiscreteSeries.ModerateGrowthSchwartz
+import Development.AbelianVarietyTheory.Definitions.Foundations.AestronglyMeasurableQuotMeasureIffLift
+import Development.AbelianVarietyTheory.Definitions.Foundations.EventuallyEqOfIsPreconnected
+import Development.AbelianVarietyTheory.Definitions.Foundations.IsIwasawaOfIsCompact
+import Development.AbelianVarietyTheory.Definitions.TwistedInnerProducts.CovolOneIntegralAdd
+import Development.AbelianVarietyTheory.PublishedTheorems.SiegelWeil₂.SiegelWeilUnitarySchrodinger
+import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.HermInf
+import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.HermOf
+import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ThetaPartD
+import Development.WeilBound.CoreStatements.TemperedRepresentationTheory.WeilSiegelTheta.BigCellDefs
+import Development.WeilBound.CoreStatements.TemperedRepresentationTheory.WeilSiegelTheta.ThetaOrbits
+import Formalism.LocalRingCardinality.DataTheta
+import Formalism.LocalToGlobal.BesselHermitianTheta.NoncompactGapAtLeastRange
+import Formalism.LocalToGlobal.IndefiniteReal.LocalNewformFunction
+import Formalism.LocalToGlobal.ProjectiveLattices.ErealAddIInf
 
 @[expose] public section
 
 open scoped Matrix NNReal ENNReal ComplexConjugate TensorProduct
-open Formalism.BasicNotions Formalism.BasicNotions.TH
-  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj
-  Formalism.IndefR.Datum MeasureTheory
-open GlobalTheory.AutomorphicL2Unitary GlobalTheory.AdelicU GlobalTheory.Doubling GlobalTheory.Cont
-  GlobalTheory.MixModel GlobalTheory.StdUnn PositivityTheory.GramSchwartzFunctions
-  PositivityTheory.GramSchwartzFunctions.BC GlobalTheory.CompanionTheory.SiegelND
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj Formalism.IndefR.Datum MeasureTheory
+open GlobalTheory.AutomorphicL2Unitary GlobalTheory.AdelicU GlobalTheory.Doubling GlobalTheory.Cont GlobalTheory.MixModel GlobalTheory.StdUnn PositivityTheory.GramSchwartzFunctions PositivityTheory.GramSchwartzFunctions.BC GlobalTheory.CompanionTheory.SiegelND
 open GlobalTheory.IndefiniteRowSideFullHecke.ModerateGrowthSchwartz (schwartzA)
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.CompanionTheory.SiegelND.Integ GlobalTheory.CompanionTheory.SiegelND.Integ.Hua
@@ -31,37 +73,30 @@ open GlobalTheory.CompanionTheory.SiegelND.Integ.Weyl GlobalTheory.CompanionTheo
 
 namespace GlobalTheory.CompanionTheory.SiegelND.Integ.Weyl.RatMem
 
-theorem exists_nat_mul_mem (F : Type) [Field F] [NumberField F] (x : F)
-    : ∃ m : ℕ, 0 < m ∧ ∃ r : 𝓞 F, (r : F) = (m : F) * x :=
+theorem exists_nat_mul_mem (F : Type) [Field F] [NumberField F] (x : F) :
+    ∃ m : ℕ, 0 < m ∧ ∃ r : 𝓞 F, (r : F) = (m : F) * x :=
   _root_.UpperTheory.Reformulated.B.ExistsNatMulMem.exists_nat_mul_mem F x
 
-theorem repr_inclR
-    {F E : Type} [Field F] [NumberField F] [Field E] [Algebra F E]
-    {d : ℕ} (b : Module.Basis (Fin d) F E)
-    (x : E) (k : Fin d)
-    : (Algebra.TensorProduct.basis (Af F) b).repr (inclR (Af F) x) k
+theorem repr_inclR {F E : Type} [Field F] [NumberField F] [Field E] [Algebra F E] {d : ℕ}
+    (b : Module.Basis (Fin d) F E) (x : E) (k : Fin d) :
+    (Algebra.TensorProduct.basis (Af F) b).repr (inclR (Af F) x) k
       = algebraMap F (Af F) (b.repr x k) := by
   have h : inclR (Af F) x = (1 : Af F) ⊗ₜ[F] x := rfl
   rw [h, Algebra.TensorProduct.basis_repr_tmul]
   simp
 
-theorem natCast_mul_eq_smul {F E : Type} [Field F] [Field E] [Algebra F E] (n : ℕ) (z : E)
-    : (n : E) * z = (n : F) • z := by
+theorem natCast_mul_eq_smul {F E : Type} [Field F] [Field E] [Algebra F E] (n : ℕ) (z : E) :
+    (n : E) * z = (n : F) • z := by
   rw [Algebra.smul_def, map_natCast]
 
-theorem intCast_mul_eq_smul {F E : Type} [Field F] [Field E] [Algebra F E] (n : ℤ) (z : E)
-    : (n : E) * z = (n : F) • z := by
+theorem intCast_mul_eq_smul {F E : Type} [Field F] [Field E] [Algebra F E] (n : ℤ) (z : E) :
+    (n : E) * z = (n : F) • z := by
   rw [Algebra.smul_def, map_intCast]
 
-theorem exists_clear_family
-    {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-    {d : ℕ} (b : Module.Basis (Fin d) F E)
-    {ι : Type} [Fintype ι]
-    (e : ι → E)
-    : ∃ D : ℕ,
-      0 < D
-        ∧ ∀ (t : ι) (o : 𝓞 E) (k : Fin d), ∃ r : 𝓞 F,
-          (r : F) = b.repr ((D : E) * (e t * (o : E))) k := by
+theorem exists_clear_family {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E]
+    [Algebra F E] {d : ℕ} (b : Module.Basis (Fin d) F E) {ι : Type} [Fintype ι] (e : ι → E) :
+    ∃ D : ℕ, 0 < D ∧ ∀ (t : ι) (o : 𝓞 E) (k : Fin d),
+      ∃ r : 𝓞 F, (r : F) = b.repr ((D : E) * (e t * (o : E))) k := by
   classical
   let B := RingOfIntegers.basis E
   choose m hm hr using fun p : ι × Module.Free.ChooseBasisIndex ℤ (𝓞 E) × Fin d =>
@@ -83,36 +118,32 @@ theorem exists_clear_family
   refine ⟨∑ l, (B.repr o l) • r l, ?_⟩
   have ho : (o : E) = ∑ l, ((B.repr o l : ℤ) : E) * (B l : E) := by
     have h3 := congrArg (algebraMap (𝓞 E) E) (B.sum_repr o)
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum] at h3
+
+    rw [map_sum] at h3
     rw [show (o : E) = algebraMap (𝓞 E) E o from rfl, ← h3]
     refine Finset.sum_congr rfl fun l _ => ?_
     simp [zsmul_eq_mul]
-  have hsum
-      : (D : E) * (e t * (o : E))
-        = ∑ l, ((B.repr o l : ℤ) : F) • ((D : E) * (e t * (B l : E))) := by
+  have hsum : (D : E) * (e t * (o : E))
+      = ∑ l, ((B.repr o l : ℤ) : F) • ((D : E) * (e t * (B l : E))) := by
     rw [ho, Finset.mul_sum, Finset.mul_sum]
     refine Finset.sum_congr rfl fun l _ => ?_
     rw [← intCast_mul_eq_smul]
     ring
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [hsum, map_sum, Finsupp.finsetSum_apply]
+
+  rw [hsum, map_sum, Finsupp.finsetSum_apply]
   have h4 : ((∑ l, (B.repr o l) • r l : 𝓞 F) : F) = ∑ l, ((B.repr o l : ℤ) : F) * (r l : F) := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [show ((∑ l, (B.repr o l) • r l : 𝓞 F) : F)
-            = algebraMap (𝓞 F) F (∑ l, (B.repr o l) • r l) from
-          rfl,
-        map_sum]
+
+    rw [show ((∑ l, (B.repr o l) • r l : 𝓞 F) : F)
+    = algebraMap (𝓞 F) F (∑ l, (B.repr o l) • r l) from rfl, map_sum]
     refine Finset.sum_congr rfl fun l _ => ?_
     simp [zsmul_eq_mul]
   rw [h4]
   refine Finset.sum_congr rfl fun l _ => ?_
   rw [map_smul, Finsupp.smul_apply, smul_eq_mul, hr']
 
-theorem ratTuple_mem_latN
-    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (d : ℕ)
-        (b : Module.Basis (Fin d) F E) (M : ℕ) (J : Matrix (Fin M) (Fin M) E) (n N : ℕ),
-      0 < N → ∃ s : ℕ, 0 < s ∧ ∀ ρ : Fin M → Fin n → 𝓞 E, ratTuple J s ρ ∈ latN b n M N := by
+theorem ratTuple_mem_latN : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+    (d : ℕ) (b : Module.Basis (Fin d) F E) (M : ℕ) (J : Matrix (Fin M) (Fin M) E) (n N : ℕ), 0 < N →
+    ∃ s : ℕ, 0 < s ∧ ∀ ρ : Fin M → Fin n → 𝓞 E, ratTuple J s ρ ∈ latN b n M N := by
   intro F E _ _ _ _ _ d b M J n N hN
   obtain ⟨D, hD0, hD⟩ := exists_clear_family b (fun p : Fin M × Fin M => J⁻¹ p.1 p.2)
   refine ⟨N * D, Nat.mul_pos hN hD0, fun ρ => ?_⟩
@@ -125,17 +156,16 @@ theorem ratTuple_mem_latN
       (inclR (Af F) (((N * D : ℕ) : E) *
         (J⁻¹ *ᵥ fun i => algebraMap (𝓞 E) E (ρ i a)) j)) k = _
     rw [repr_inclR]
-    have h1
-        : ((N * D : ℕ) : E) * (J⁻¹ *ᵥ fun i => algebraMap (𝓞 E) E (ρ i a)) j
-          = (N : F) • ∑ i, (D : E) * (J⁻¹ j i * (ρ i a : E)) := by
+    have h1 : ((N * D : ℕ) : E) * (J⁻¹ *ᵥ fun i => algebraMap (𝓞 E) E (ρ i a)) j
+        = (N : F) • ∑ i, (D : E) * (J⁻¹ j i * (ρ i a : E)) := by
       rw [← natCast_mul_eq_smul, Nat.cast_mul, Matrix.mulVec, dotProduct, ← Finset.mul_sum,
         mul_assoc]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [h1, map_smul, Finsupp.smul_apply, smul_eq_mul, map_sum, Finsupp.finsetSum_apply, map_mul,
-        map_natCast]
+
+    rw [h1, map_smul, Finsupp.smul_apply, smul_eq_mul, map_sum, Finsupp.finsetSum_apply,
+    map_mul, map_natCast]
     congr 2
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [show ((∑ i, r i : 𝓞 F) : F) = algebraMap (𝓞 F) F (∑ i, r i) from rfl, map_sum]
+
+    rw [show ((∑ i, r i : 𝓞 F) : F) = algebraMap (𝓞 F) F (∑ i, r i) from rfl, map_sum]
     exact Finset.sum_congr rfl fun i _ => (hr i).symm
 
 end GlobalTheory.CompanionTheory.SiegelND.Integ.Weyl.RatMem

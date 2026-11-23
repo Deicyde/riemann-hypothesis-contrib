@@ -1,7 +1,60 @@
 module
 
+import Formalism.HermitianCurvature.HermitianCurvatureProofs.BesselDecayBounds.BesselUnitNorm.BesselNormSteps.UnitNorm.UnrealifyRealify
 public import Formalism.PeriodIntegrals.HaarDefs
+public import Mathlib.Analysis.Calculus.Deriv.Basic
+public import Mathlib.Analysis.LocallyConvex.AbsConvexOpen
 public import Formalism.FormalDegreeBessel.FinalG
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+public import Mathlib.Analysis.Calculus.Deriv.Prod
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+public import Mathlib.Analysis.Matrix.Normed
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+public import Mathlib.Analysis.Normed.Algebra.MatrixExponential
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.LinearAlgebra.Matrix.FiniteDimensional
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.SimpleRing.Principal
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+public import Mathlib.Analysis.Calculus.Deriv.Comp
+public import Mathlib.Analysis.Calculus.FDeriv.Linear
+public import Mathlib.Analysis.SpecialFunctions.Exponential
 
 @[expose] public section
 
@@ -26,22 +79,18 @@ attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 variable {n : ℕ}
 
 open scoped Matrix.Norms.Operator in
-theorem exp_entry (X : Matrix (Fin n) (Fin n) ℂ) (i j : Fin n)
-    : HasDerivAt (fun t : ℝ => (NormedSpace.exp ((t : ℂ) • X)) i j) (X i j) 0 := by
+theorem exp_entry (X : Matrix (Fin n) (Fin n) ℂ) (i j : Fin n) :
+    HasDerivAt (fun t : ℝ => (NormedSpace.exp ((t : ℂ) • X)) i j) (X i j) 0 := by
   have h := hasDerivAt_exp_smul_const (𝕂 := ℝ) X (0 : ℝ)
   simp only [zero_smul, NormedSpace.exp_zero, one_mul] at h
-  let L : Matrix (Fin n) (Fin n) ℂ →L[ℝ] ℂ :=
-    LinearMap.toContinuousLinearMap (Matrix.entryLinearMap ℝ ℂ i j)
+  let L : Matrix (Fin n) (Fin n) ℂ →L[ℝ] ℂ := LinearMap.toContinuousLinearMap (Matrix.entryLinearMap ℝ ℂ i j)
   have := L.hasFDerivAt.comp_hasDerivAt (0 : ℝ) h
   simp only [Complex.coe_smul]
   exact this
 
-theorem exp_deriv (X : Matrix (Fin n) (Fin n) ℂ)
-    : HasDerivAt (fun t : ℝ => NormedSpace.exp ((t : ℂ) • X)) X 0 := by
-  have : HasDerivAt
-      (fun t : ℝ => (fun i j => (NormedSpace.exp ((t : ℂ) • X)) i j : Fin n → Fin n → ℂ))
-      (fun i j => X i j)
-      0 := by
+theorem exp_deriv (X : Matrix (Fin n) (Fin n) ℂ) :
+    HasDerivAt (fun t : ℝ => NormedSpace.exp ((t : ℂ) • X)) X 0 := by
+  have : HasDerivAt (fun t : ℝ => (fun i j => (NormedSpace.exp ((t : ℂ) • X)) i j : Fin n → Fin n → ℂ)) (fun i j => X i j) 0 := by
     rw [hasDerivAt_pi]
     intro i
     rw [hasDerivAt_pi]
@@ -66,41 +115,12 @@ theorem Hpk_unit (k r : ℕ) : IsUnit (Hpk k r).det := by
   have : (Hpk k r).det * (Hpk k r).det = 1 := by rw [← Matrix.det_mul, h, Matrix.det_one]
   exact IsUnit.of_mul_eq_one _ this
 
-theorem UH_mul {a b : Mx k r} (ha : a ∈ UH (Hpk k r)) (hb : b ∈ UH (Hpk k r))
-    : a * b ∈ UH (Hpk k r) :=
+theorem UH_mul {a b : Mx k r} (ha : a ∈ UH (Hpk k r)) (hb : b ∈ UH (Hpk k r)) : a * b ∈ UH (Hpk k r) :=
   (uHGroup _ _ (Hpk_unit k r)).2.1 a ha b hb
 
-theorem exp_mem_UH {X : Mx k r} (hX : InLieHpk k r X) (t : ℝ)
-    : NormedSpace.exp ((t : ℂ) • X) ∈ UH (Hpk k r) := by
-  have hH2 := (hpkFacts k r).2.1
-  have hinv : (Hpk k r)⁻¹ = Hpk k r := Matrix.inv_eq_right_inv hH2
-  have hXs : Xᴴ = Hpk k r * (-X) * (Hpk k r)⁻¹ := by
-    rw [hinv]
-    have h1 : Xᴴ * Hpk k r = -(Hpk k r * X) := eq_neg_of_add_eq_zero_left hX
-    calc
-      Xᴴ
-        = Xᴴ * (Hpk k r * Hpk k r) := by rw [hH2, Matrix.mul_one]
-      _ = (Xᴴ * Hpk k r) * Hpk k r := by rw [Matrix.mul_assoc]
-      _ = Hpk k r * (-X) * Hpk k r := by rw [h1]; simp
-  show (NormedSpace.exp ((t : ℂ) • X))ᴴ * Hpk k r * NormedSpace.exp ((t : ℂ) • X) = Hpk k r
-  rw [← Matrix.exp_conjTranspose, Matrix.conjTranspose_smul, hXs]
-  have hst : star (t : ℂ) = (t : ℂ) := Complex.conj_ofReal t
-  rw [hst]
-  have e1
-      : (t : ℂ) • (Hpk k r * (-X) * (Hpk k r)⁻¹) = Hpk k r * (-((t : ℂ) • X)) * (Hpk k r)⁻¹ := by
-    simp
-  rw [e1, Matrix.exp_conj _ _ ((Matrix.isUnit_iff_isUnit_det _).2 (Hpk_unit k r)), hinv]
-  have e2 : NormedSpace.exp (-((t : ℂ) • X)) * NormedSpace.exp ((t : ℂ) • X) = 1 := by
-    rw [← Matrix.exp_add_of_commute _ _ ((Commute.refl ((t : ℂ) • X)).neg_left)]
-    simp
-  calc
-    Hpk k r * NormedSpace.exp (-((t : ℂ) • X)) * Hpk k r * Hpk k r * NormedSpace.exp ((t : ℂ) • X)
-        = Hpk k r * NormedSpace.exp (-((t : ℂ) • X)) * (Hpk k r * Hpk k r)
-          * NormedSpace.exp ((t : ℂ) • X) := by
-      simp only [Matrix.mul_assoc]
-    _ = Hpk k r * (NormedSpace.exp (-((t : ℂ) • X)) * NormedSpace.exp ((t : ℂ) • X)) := by
-      rw [hH2, Matrix.mul_one, Matrix.mul_assoc]
-    _ = Hpk k r := by rw [e2, Matrix.mul_one]
+theorem exp_mem_UH {X : Mx k r} (hX : InLieHpk k r X) (t : ℝ) :
+    NormedSpace.exp ((t : ℂ) • X) ∈ UH (Hpk k r) := by
+  apply PI.WUN.exp_mem_UH <;> assumption
 
 end Grp
 
@@ -109,31 +129,13 @@ attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 variable {k r : ℕ}
 
 def InA (k r : ℕ) (X : Mx k r) : Prop :=
-  (∀ (a : Fin r) (i : Fin (2 * r + k + 1)), a.val ≤ i.val → X i (eI k r a) = 0)
-    ∧ ∀ i j : Fin (2 * r + k + 1), r ≤ j.val → j.val ≤ r + k → r ≤ i.val → X i j = 0
+  (∀ (a : Fin r) (i : Fin (2 * r + k + 1)), a.val ≤ i.val → X i (eI k r a) = 0) ∧
+    ∀ i j : Fin (2 * r + k + 1), r ≤ j.val → j.val ≤ r + k → r ≤ i.val → X i j = 0
 
 def InLieN (k r : ℕ) (X : Mx k r) : Prop := InLieHpk k r X ∧ InA k r X
 
 theorem InA.mul {X Y : Mx k r} (hX : InA k r X) (hY : InA k r Y) : InA k r (X * Y) := by
-  constructor
-  · intro a i hai
-    rw [Matrix.mul_apply]
-    apply Finset.sum_eq_zero
-    intro l _
-    by_cases hl : a.val ≤ l.val
-    · rw [hY.1 a l hl, mul_zero]
-    · have hl' : l.val < r := by have := a.2; omega
-      have : l = eI k r ⟨l.val, hl'⟩ := rfl
-      rw [this, hX.1 ⟨l.val, hl'⟩ i (by simp only; omega), zero_mul]
-  · intro i j h1 h2 h3
-    rw [Matrix.mul_apply]
-    apply Finset.sum_eq_zero
-    intro l _
-    by_cases hl : r ≤ l.val
-    · rw [hY.2 l j h1 h2 hl, mul_zero]
-    · have hl' : l.val < r := by omega
-      have : l = eI k r ⟨l.val, hl'⟩ := rfl
-      rw [this, hX.1 ⟨l.val, hl'⟩ i (by simp only; omega), zero_mul]
+  apply PI.WUN.InA.mul <;> assumption
 
 theorem InA.pow {X : Mx k r} (hX : InA k r X) : ∀ n : ℕ, InA k r (X ^ (n + 1)) := by
   intro n
@@ -142,20 +144,17 @@ theorem InA.pow {X : Mx k r} (hX : InA k r X) : ∀ n : ℕ, InA k r (X ^ (n + 1
   | succ n ih => rw [pow_succ]; exact ih.mul hX
 
 open scoped Matrix.Norms.Operator in
-theorem exp_entry_hasSum (X : Mx k r) (i j : Fin (2 * r + k + 1))
-    : HasSum (fun n : ℕ => ((n.factorial : ℂ)⁻¹) * (X ^ n) i j) ((NormedSpace.exp X) i j) := by
+theorem exp_entry_hasSum (X : Mx k r) (i j : Fin (2 * r + k + 1)) :
+    HasSum (fun n : ℕ => ((n.factorial : ℂ)⁻¹) * (X ^ n) i j) ((NormedSpace.exp X) i j) := by
   have h := NormedSpace.exp_series_hasSum_exp' (𝕂 := ℂ) X
   let L : Mx k r →L[ℂ] ℂ := LinearMap.toContinuousLinearMap (Matrix.entryLinearMap ℂ ℂ i j)
   have := L.hasSum h
   exact this
 
-theorem exp_entry_of_InA
-    {X : Mx k r} (i j : Fin (2 * r + k + 1)) (h : ∀ n : ℕ, (X ^ (n + 1)) i j = 0)
-    : (NormedSpace.exp X) i j = if i = j then 1 else 0 := by
+theorem exp_entry_of_InA {X : Mx k r} (i j : Fin (2 * r + k + 1)) (h : ∀ n : ℕ, (X ^ (n + 1)) i j = 0) :
+    (NormedSpace.exp X) i j = if i = j then 1 else 0 := by
   have h1 := exp_entry_hasSum X i j
-  have h2 : HasSum
-      (fun n : ℕ => ((n.factorial : ℂ)⁻¹) * (X ^ n) i j)
-      (((Nat.factorial 0 : ℂ)⁻¹) * (X ^ 0) i j) := by
+  have h2 : HasSum (fun n : ℕ => ((n.factorial : ℂ)⁻¹) * (X ^ n) i j) (((Nat.factorial 0 : ℂ)⁻¹) * (X ^ 0) i j) := by
     apply hasSum_single 0
     intro n hn
     obtain ⟨m, rfl⟩ := Nat.exists_eq_succ_of_ne_zero hn
@@ -173,19 +172,7 @@ theorem exp_mem_N {X : Mx k r} (hX : InLieN k r X) : NormedSpace.exp X ∈ Nset 
     exact exp_entry_of_InA i j (fun n => (hX.2.pow n).2 i j h1 h2 h3)
 
 theorem InLieN.add {X Y : Mx k r} (hX : InLieN k r X) (hY : InLieN k r Y) : InLieN k r (X + Y) := by
-  refine ⟨?_, ?_, ?_⟩
-  · show (X + Y)ᴴ * Hpk k r + Hpk k r * (X + Y) = 0
-    have h1 : Xᴴ * Hpk k r + Hpk k r * X = 0 := hX.1
-    have h2 : Yᴴ * Hpk k r + Hpk k r * Y = 0 := hY.1
-    rw [Matrix.conjTranspose_add, Matrix.add_mul, Matrix.mul_add]
-    calc
-      Xᴴ * Hpk k r + Yᴴ * Hpk k r + (Hpk k r * X + Hpk k r * Y)
-        = (Xᴴ * Hpk k r + Hpk k r * X) + (Yᴴ * Hpk k r + Hpk k r * Y) := by abel
-      _ = 0 := by rw [h1, h2, add_zero]
-  · intro a i hai
-    rw [Matrix.add_apply, hX.2.1 a i hai, hY.2.1 a i hai, add_zero]
-  · intro i j h1 h2 h3
-    rw [Matrix.add_apply, hX.2.2 i j h1 h2 h3, hY.2.2 i j h1 h2 h3, add_zero]
+  apply PI.WUN.InLieN.add <;> assumption
 
 theorem InLieN.smul {X : Mx k r} (hX : InLieN k r X) (c : ℝ) : InLieN k r ((c : ℂ) • X) := by
   refine ⟨?_, ?_, ?_⟩
@@ -205,21 +192,19 @@ theorem InLieN.zero : InLieN k r (0 : Mx k r) := by
   · intro a i _; rfl
   · intro i j _ _ _; rfl
 
-theorem unrealify_add (x y : EuclideanSpace ℝ (Fin (2 * r + k + 1) × Fin (2 * r + k + 1) × Bool))
-    : unrealify (x + y) = unrealify x + unrealify y := by
+theorem unrealify_add (x y : EuclideanSpace ℝ (Fin (2 * r + k + 1) × Fin (2 * r + k + 1) × Bool)) :
+    unrealify (x + y) = unrealify x + unrealify y := by
   ext i j
   apply Complex.ext <;> simp [unrealify]
 
-theorem unrealify_smul
-    (c : ℝ) (x : EuclideanSpace ℝ (Fin (2 * r + k + 1) × Fin (2 * r + k + 1) × Bool))
-    : unrealify (c • x) = (c : ℂ) • unrealify x := by
+theorem unrealify_smul (c : ℝ) (x : EuclideanSpace ℝ (Fin (2 * r + k + 1) × Fin (2 * r + k + 1) × Bool)) :
+    unrealify (c • x) = (c : ℂ) • unrealify x := by
   ext i j
   apply Complex.ext <;> simp [unrealify]
 
 theorem continuous_of : Continuous (fun x : Mt k r => (Matrix.of x : Mx k r)) := continuous_id
 
-def unrealL (k r : ℕ)
-    : EuclideanSpace ℝ (Fin (2 * r + k + 1) × Fin (2 * r + k + 1) × Bool) →ₗ[ℝ] Mx k r where
+def unrealL (k r : ℕ) : EuclideanSpace ℝ (Fin (2 * r + k + 1) × Fin (2 * r + k + 1) × Bool) →ₗ[ℝ] Mx k r where
   toFun := unrealify
   map_add' := unrealify_add
   map_smul' := by

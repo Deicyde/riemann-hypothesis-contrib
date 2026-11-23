@@ -1,8 +1,56 @@
 module
 
-public import Mathlib
 public import GroundTheory.HeightsAndTheta.Heights.HilbertSamuel.StatementsPullFSExtension
 public import GroundTheory.HeightsAndTheta.Heights.HilbertSamuel.StatementsProjFrameBasePtFree
+public import GroundTheory.HeightsAndTheta.Heights.HilbertSamuel.ArithModel
+public import Mathlib.Analysis.SpecialFunctions.SmoothTransition
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Real
+import Mathlib.Algebra.Ring.IsFormallyReal
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.InnerProductSpace.Calculus
+import Mathlib.Analysis.LocallyConvex.AbsConvexOpen
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.Order.CompletePartialOrder
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.ReduceModChar
+public import Mathlib.Topology.Algebra.MvPolynomial
+import Mathlib.Topology.Sheaves.Init
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArakelovGeometry.CNormSt
 
 @[expose] public section
@@ -11,26 +59,22 @@ set_option maxSynthPendingDepth 1
 
 namespace GroundTheory.Heights₂.Heights.HilbertSamuel
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
-  ReciprocityTheory.ChartRestriction.G.ArakelovGeometry ReciprocityTheory.ChartRestriction.G.AI.I4
-  ProjLine
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.ArakelovGeometry ReciprocityTheory.ChartRestriction.G.AI.I4 ProjLine
 open scoped Topology
 
 noncomputable section
 
 namespace PullFSExtension
 
-theorem leviForm_comp_clm
-    {E F : Type} [Fintype E] [Fintype F]
-    (L : (E → ℂ) →L[ℂ] (F → ℂ)) (φ : (F → ℂ) → ℝ) (z w : E → ℂ) (hφ : ContDiffAt ℝ 2 φ (L z))
-    : leviForm (fun y => φ (L y)) z w = leviForm φ (L z) (L w) := by
+theorem leviForm_comp_clm {E F : Type} [Fintype E] [Fintype F] (L : (E → ℂ) →L[ℂ] (F → ℂ))
+    (φ : (F → ℂ) → ℝ) (z w : E → ℂ) (hφ : ContDiffAt ℝ 2 φ (L z)) :
+    leviForm (fun y => φ (L y)) z w = leviForm φ (L z) (L w) := by
   set Lr : (E → ℂ) →L[ℝ] (F → ℂ) := L.restrictScalars ℝ with hLr
   have hLr' : ∀ y, Lr y = L y := fun _ => rfl
   have hev : ∀ᶠ y in 𝓝 z, ContDiffAt ℝ 2 φ (L y) :=
     (L.continuous.tendsto z).eventually (hφ.eventually (by simp))
-  have hfd
-      : fderiv ℝ (fun y => φ (L y)) =ᶠ[𝓝 z]
-        fun y => (ContinuousLinearMap.compL ℝ (E → ℂ) (F → ℂ) ℝ).flip Lr (fderiv ℝ φ (Lr y)) := by
+  have hfd : fderiv ℝ (fun y => φ (L y)) =ᶠ[𝓝 z]
+      fun y => (ContinuousLinearMap.compL ℝ (E → ℂ) (F → ℂ) ℝ).flip Lr (fderiv ℝ φ (Lr y)) := by
     filter_upwards [hev] with y hy
     have h := (hy.differentiableAt (by norm_num)).hasFDerivAt.comp y Lr.hasFDerivAt
     exact h.fderiv
@@ -39,8 +83,7 @@ theorem leviForm_comp_clm
   have hD : HasFDerivAt
       (fun y => (ContinuousLinearMap.compL ℝ (E → ℂ) (F → ℂ) ℝ).flip Lr (fderiv ℝ φ (Lr y)))
       (((ContinuousLinearMap.compL ℝ (E → ℂ) (F → ℂ) ℝ).flip Lr).comp
-        ((fderiv ℝ (fderiv ℝ φ) (Lr z)).comp Lr))
-      z :=
+        ((fderiv ℝ (fderiv ℝ φ) (Lr z)).comp Lr)) z :=
     ((ContinuousLinearMap.compL ℝ (E → ℂ) (F → ℂ) ℝ).flip Lr).hasFDerivAt.comp z
       (hd2.hasFDerivAt.comp z Lr.hasFDerivAt)
   unfold leviForm
@@ -50,9 +93,8 @@ theorem leviForm_comp_clm
     ContinuousLinearMap.compL_apply, hI]
   rfl
 
-theorem leviForm_congr
-    {E : Type} [Fintype E] {φ ψ : (E → ℂ) → ℝ} {z : E → ℂ} (h : φ =ᶠ[𝓝 z] ψ) (w : E → ℂ)
-    : leviForm φ z w = leviForm ψ z w := by
+theorem leviForm_congr {E : Type} [Fintype E] {φ ψ : (E → ℂ) → ℝ} {z : E → ℂ} (h : φ =ᶠ[𝓝 z] ψ)
+    (w : E → ℂ) : leviForm φ z w = leviForm ψ z w := by
   have h1 : fderiv ℝ φ =ᶠ[𝓝 z] fderiv ℝ ψ := by
     filter_upwards [h.eventuallyEq_nhds] with y hy
     exact hy.fderiv_eq
@@ -63,18 +105,18 @@ theorem normSqE_eq {J : Type} [Fintype J] (z : J → ℂ) : normSqE z = ∑ i, �
   unfold normSqE
   rw [eL_apply, EuclideanSpace.norm_eq, Real.sq_sqrt (by positivity)]
 
-theorem normSqE_smul {J : Type} [Fintype J] (c : ℂ) (z : J → ℂ)
-    : normSqE (c • z) = ‖c‖ ^ 2 * normSqE z := by
+theorem normSqE_smul {J : Type} [Fintype J] (c : ℂ) (z : J → ℂ) :
+    normSqE (c • z) = ‖c‖ ^ 2 * normSqE z := by
   simp only [normSqE_eq, Pi.smul_apply, smul_eq_mul, norm_mul, mul_pow, Finset.mul_sum]
 
-theorem normSqE_conj {J : Type} [Fintype J] (z : J → ℂ)
-    : normSqE (fun i => (starRingEnd ℂ) (z i)) = normSqE z := by
+theorem normSqE_conj {J : Type} [Fintype J] (z : J → ℂ) :
+    normSqE (fun i => (starRingEnd ℂ) (z i)) = normSqE z := by
   simp only [normSqE_eq, Complex.norm_conj]
 
-theorem normSqE_zero {J : Type} [Fintype J] : normSqE (0 : J → ℂ) = 0 := by simp [normSqE_eq]
+theorem normSqE_zero {J : Type} [Fintype J] : normSqE (0 : J → ℂ) = 0 := by
+  simp [normSqE_eq]
 
-theorem contDiff_normSqE {J : Type} [Fintype J] {n : WithTop ℕ∞}
-    : ContDiff ℝ n (normSqE (J := J)) := by
+theorem contDiff_normSqE {J : Type} [Fintype J] {n : WithTop ℕ∞} : ContDiff ℝ n (normSqE (J := J)) := by
   have : normSqE (J := J) = fun z => ‖eL z‖ ^ 2 := rfl
   rw [this]
   exact (contDiff_norm_sq ℝ).comp (eL (J := J)).contDiff
@@ -86,22 +128,22 @@ def pr (e : Fin (D + 1) → Ix κ) : (Ix κ → ℂ) →L[ℂ] (Fin (D + 1) → 
 
 def ratio (e : Fin (D + 1) → Ix κ) (z : Ix κ → ℂ) : ℝ := normSqE (pr e z) / normSqE z
 
-theorem ratio_smul (e : Fin (D + 1) → Ix κ) {c : ℂ} (hc : c ≠ 0) (z : Ix κ → ℂ)
-    : ratio e (c • z) = ratio e z := by
+theorem ratio_smul (e : Fin (D + 1) → Ix κ) {c : ℂ} (hc : c ≠ 0) (z : Ix κ → ℂ) :
+    ratio e (c • z) = ratio e z := by
   unfold ratio
   rw [map_smul, normSqE_smul, normSqE_smul]
   exact mul_div_mul_left _ _ (pow_ne_zero 2 (norm_ne_zero_iff.mpr hc))
 
-theorem ratio_conj (e : Fin (D + 1) → Ix κ) (z : Ix κ → ℂ)
-    : ratio e (fun i => (starRingEnd ℂ) (z i)) = ratio e z := by
+theorem ratio_conj (e : Fin (D + 1) → Ix κ) (z : Ix κ → ℂ) :
+    ratio e (fun i => (starRingEnd ℂ) (z i)) = ratio e z := by
   unfold ratio
   have : pr e (fun i => (starRingEnd ℂ) (z i)) = fun k => (starRingEnd ℂ) (pr e z k) := rfl
   rw [this, normSqE_conj, normSqE_conj]
 
-theorem contDiffAt_ratio (e : Fin (D + 1) → Ix κ) {z : Ix κ → ℂ} (hz : z ≠ 0) {n : WithTop ℕ∞}
-    : ContDiffAt ℝ n (ratio e) z :=
-  (contDiff_normSqE.comp ((pr e).restrictScalars ℝ).contDiff).contDiffAt.div
-    contDiff_normSqE.contDiffAt (normSqE_pos hz).ne'
+theorem contDiffAt_ratio (e : Fin (D + 1) → Ix κ) {z : Ix κ → ℂ} (hz : z ≠ 0) {n : WithTop ℕ∞} :
+    ContDiffAt ℝ n (ratio e) z :=
+  (contDiff_normSqE.comp ((pr e).restrictScalars ℝ).contDiff).contDiffAt.div contDiff_normSqE.contDiffAt
+    (normSqE_pos hz).ne'
 
 def cut (δ t : ℝ) : ℝ := Real.smoothTransition ((t - δ / 4) / (δ / 4))
 
@@ -140,23 +182,18 @@ def metric (e : Fin (D + 1) → Ix κ) (δ : ℝ) : ConeMetric ℂ (Ix κ) where
     by_cases hc : c = 0
     · subst hc
       simp [normSqE_zero]
-    rw [ratio_smul e hc, normSqE_smul, Real.sqrt_mul (sq_nonneg _), Real.sqrt_sq (norm_nonneg _),
-      mul_assoc]
+    rw [ratio_smul e hc, normSqE_smul, Real.sqrt_mul (sq_nonneg _), Real.sqrt_sq (norm_nonneg _), mul_assoc]
 
-theorem metric_rho (e : Fin (D + 1) → Ix κ) (δ : ℝ) (z : Ix κ → ℂ)
-    : (metric e δ).ρ z = Real.sqrt (normSqE z) * gfac δ (ratio e z) :=
-  rfl
+theorem metric_rho (e : Fin (D + 1) → Ix κ) (δ : ℝ) (z : Ix κ → ℂ) :
+    (metric e δ).ρ z = Real.sqrt (normSqE z) * gfac δ (ratio e z) := rfl
 
-theorem metric_of_ge
-    (e : Fin (D + 1) → Ix κ)
-    {δ : ℝ} (hδ : 0 < δ)
-    {z : Ix κ → ℂ} (hz : z ≠ 0) (hr : δ / 2 ≤ ratio e z)
-    : (metric e δ).ρ z = Real.sqrt (normSqE (pr e z)) := by
+theorem metric_of_ge (e : Fin (D + 1) → Ix κ) {δ : ℝ} (hδ : 0 < δ) {z : Ix κ → ℂ} (hz : z ≠ 0)
+    (hr : δ / 2 ≤ ratio e z) : (metric e δ).ρ z = Real.sqrt (normSqE (pr e z)) := by
   rw [metric_rho, gfac_of_ge hδ hr, ← Real.sqrt_mul (normSqE_pos hz).le, ratio,
     mul_div_cancel₀ _ (normSqE_pos hz).ne']
 
-theorem isSmoothMetric_metric (e : Fin (D + 1) → Ix κ) {δ : ℝ} (hδ : 0 < δ)
-    : IsSmoothMetric (metric e δ) := by
+theorem isSmoothMetric_metric (e : Fin (D + 1) → Ix κ) {δ : ℝ} (hδ : 0 < δ) :
+    IsSmoothMetric (metric e δ) := by
   intro z hz
   have hz' : z ≠ 0 := hz
   refine ContDiffAt.contDiffWithinAt ?_
@@ -172,10 +209,8 @@ theorem isConjInvariant_metric (e : Fin (D + 1) → Ix κ) (δ : ℝ) : IsConjIn
 
 variable {Ω : Type} [Field Ω] [CharZero Ω] {x : Ix κ → Ω} {e : Fin (D + 1) → Ix κ}
 
-theorem pr_ne_zero
-    (hBP : ProjFrameBasePtFree.Statement) (hfr : IsProjFrame x e)
-    {z : Ix κ → ℂ} (hz : z ∈ pts (coordIdeal ℤ x))
-    : pr e z ≠ 0 := by
+theorem pr_ne_zero (hBP : ProjFrameBasePtFree.Statement) (hfr : IsProjFrame x e) {z : Ix κ → ℂ}
+    (hz : z ∈ pts (coordIdeal ℤ x)) : pr e z ≠ 0 := by
   intro h0
   apply hz.1
   funext i
@@ -183,47 +218,38 @@ theorem pr_ne_zero
   cases u
   obtain ⟨N, hN⟩ := hBP D Ω κ x e hfr () (fun _ => j)
   set ψ : MvPolynomial (Ix κ) ℤ →+* ℂ := (eval z).comp (map (Int.castRingHom ℂ)) with hψ
-  have hle
-      : coordIdeal ℤ x ⊔ Ideal.span (Set.range fun k : Fin (D + 1) =>
-          linForm (ι := GlobalTheory κ) (ι₂ := GlobalTheory (Fin (D + 1))) (projMat e) ⟨(), k⟩)
-        ≤ RingHom.ker ψ := by
+  have hle : coordIdeal ℤ x ⊔ Ideal.span (Set.range fun k : Fin (D + 1) =>
+      linForm (ι := GlobalTheory κ) (ι₂ := GlobalTheory (Fin (D + 1))) (projMat e) ⟨(), k⟩) ≤ RingHom.ker ψ := by
     refine sup_le (fun f hf => RingHom.mem_ker.mpr (hz.2 f hf)) (Ideal.span_le.mpr ?_)
     rintro _ ⟨k, rfl⟩
     have hk : z (e k) = 0 := congrFun h0 k
     have he : (⟨(), (e k).2⟩ : Ix κ) = e k := rfl
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [SetLike.mem_coe, RingHom.mem_ker, hψ, RingHom.comp_apply, linForm, map_sum,
-        map_mul, map_C, map_X, eval_C, eval_X, projMat]
+
+    simp only [SetLike.mem_coe, RingHom.mem_ker, hψ, RingHom.comp_apply, linForm, map_sum, map_mul,
+    map_C, map_X, eval_C, eval_X, projMat]
     simp only [eq_intCast, Int.cast_ite, Int.cast_one, Int.cast_zero, ite_mul, one_mul, zero_mul]
-    rw [Finset.sum_eq_single (e k).2
-        (fun i _ hi => if_neg (Ne.symm hi))
-        (fun h => absurd (Finset.mem_univ _) h),
-      if_pos rfl, he]
+    rw [Finset.sum_eq_single (e k).2 (fun i _ hi => if_neg (Ne.symm hi))
+      (fun h => absurd (Finset.mem_univ _) h), if_pos rfl, he]
     exact hk
   have h1 := hle hN
   rw [RingHom.mem_ker] at h1
   simp only [hψ, RingHom.comp_apply, map_pow, map_X, eval_X, Finset.univ_unique,
-      Finset.prod_singleton]
-    at h1
+    Finset.prod_singleton] at h1
   exact eq_zero_of_pow_eq_zero h1
 
-theorem ratio_pos
-    (hBP : ProjFrameBasePtFree.Statement) (hfr : IsProjFrame x e)
-    {z : Ix κ → ℂ} (hz : z ∈ pts (coordIdeal ℤ x))
-    : 0 < ratio e z :=
+theorem ratio_pos (hBP : ProjFrameBasePtFree.Statement) (hfr : IsProjFrame x e) {z : Ix κ → ℂ}
+    (hz : z ∈ pts (coordIdeal ℤ x)) : 0 < ratio e z :=
   div_pos (normSqE_pos (pr_ne_zero hBP hfr hz)) (normSqE_pos hz.1)
 
-theorem exists_ratio_lb (hBP : ProjFrameBasePtFree.Statement) (hfr : IsProjFrame x e)
-    : ∃ δ > 0, ∀ z ∈ pts (coordIdeal ℤ x), δ ≤ ratio e z := by
+theorem exists_ratio_lb (hBP : ProjFrameBasePtFree.Statement) (hfr : IsProjFrame x e) :
+    ∃ δ > 0, ∀ z ∈ pts (coordIdeal ℤ x), δ ≤ ratio e z := by
   set S : Set (Ix κ → ℂ) :=
     {z | (∀ f ∈ coordIdeal ℤ x, eval z (map (Int.castRingHom ℂ) f) = 0) ∧ normSqE z = 1} with hSdef
-  have hSpts : ∀ z ∈ S, z ∈ pts (coordIdeal ℤ x) := fun z hz => ⟨
-    fun h0 => by
+  have hSpts : ∀ z ∈ S, z ∈ pts (coordIdeal ℤ x) := fun z hz =>
+    ⟨fun h0 => by
       have h1 := hz.2
       rw [h0, normSqE_zero] at h1
-      exact zero_ne_one h1,
-    hz.1
-  ⟩
+      exact zero_ne_one h1, hz.1⟩
   have hnorm : ∀ z ∈ pts (coordIdeal ℤ x), ∃ z' ∈ S, ratio e z' = ratio e z := by
     intro z hz
     have hq := normSqE_pos hz.1
@@ -241,24 +267,19 @@ theorem exists_ratio_lb (hBP : ProjFrameBasePtFree.Statement) (hfr : IsProjFrame
     apply Metric.isCompact_of_isClosed_isBounded
     · have hA : IsClosed
           {z : Ix κ → ℂ | ∀ f ∈ coordIdeal ℤ x, eval z (map (Int.castRingHom ℂ) f) = 0} := by
-        have h
-            : {z : Ix κ → ℂ | ∀ f ∈ coordIdeal ℤ x, eval z (map (Int.castRingHom ℂ) f) = 0}
-              = ⋂ f ∈ coordIdeal ℤ x, {z | eval z (map (Int.castRingHom ℂ) f) = 0} := by
+        have h : {z : Ix κ → ℂ | ∀ f ∈ coordIdeal ℤ x, eval z (map (Int.castRingHom ℂ) f) = 0} =
+            ⋂ f ∈ coordIdeal ℤ x, {z | eval z (map (Int.castRingHom ℂ) f) = 0} := by
           ext z
           simp
         rw [h]
-        exact isClosed_biInter fun f _ =>
-          isClosed_eq (MvPolynomial.continuous_eval _) continuous_const
+        exact isClosed_biInter fun f _ => isClosed_eq (MvPolynomial.continuous_eval _) continuous_const
       exact hA.inter (isClosed_eq (contDiff_normSqE (n := 0)).continuous continuous_const)
     · refine (Metric.isBounded_closedBall (x := (0 : Ix κ → ℂ)) (r := 1)).subset fun z hz => ?_
       rw [Metric.mem_closedBall, dist_zero_right]
       refine (pi_norm_le_iff_of_nonneg zero_le_one).mpr fun i => ?_
       have h1 : ‖z i‖ ^ 2 ≤ 1 := by
         rw [← hz.2, normSqE_eq]
-        exact Finset.single_le_sum
-          (f := fun i => ‖z i‖ ^ 2)
-          (fun _ _ => sq_nonneg _)
-          (Finset.mem_univ i)
+        exact Finset.single_le_sum (f := fun i => ‖z i‖ ^ 2) (fun _ _ => sq_nonneg _) (Finset.mem_univ i)
       nlinarith [norm_nonneg (z i)]
   have hcont : ContinuousOn (ratio e) S := fun z hz =>
     (contDiffAt_ratio e (hSpts z hz).1 (n := 0)).continuousAt.continuousWithinAt
@@ -275,9 +296,9 @@ theorem exists_ratio_lb (hBP : ProjFrameBasePtFree.Statement) (hfr : IsProjFrame
 
 end PullFSExtension
 
+
 open PullFSExtension in
-theorem PullFSExtension.proof (hBP : ProjFrameBasePtFree.Statement)
-    : PullFSExtension.Statement := by
+theorem PullFSExtension.proof (hBP : ProjFrameBasePtFree.Statement) : PullFSExtension.Statement := by
   intro D Ω _ _ κ _ x e hfr
   obtain ⟨δ, hδ, hlb⟩ := exists_ratio_lb hBP hfr
   have hsm := isSmoothMetric_metric e hδ
@@ -289,9 +310,8 @@ theorem PullFSExtension.proof (hBP : ProjFrameBasePtFree.Statement)
     have hzp : z ∈ pts (coordIdeal ℤ x) :=
       ⟨fun h0 => by obtain ⟨i, hi⟩ := hz.1 (); exact hi (congrFun h0 _), hz.2⟩
     have hpz := pr_ne_zero hBP hfr hzp
-    have hev
-        : (fun y => Real.log ((HermLine.ofCone (metric e δ)).h y)) =ᶠ[𝓝 z]
-          fun y => Real.log ((fsMetric (ι := Fin (D + 1))).ρ (pr e y)) := by
+    have hev : (fun y => Real.log ((HermLine.ofCone (metric e δ)).h y)) =ᶠ[𝓝 z]
+        fun y => Real.log ((fsMetric (ι := Fin (D + 1))).ρ (pr e y)) := by
       have hr : ∀ᶠ y in 𝓝 z, δ / 2 < ratio e y :=
         (contDiffAt_ratio e hzp.1 (n := 0)).continuousAt.eventually
           (lt_mem_nhds (by linarith [hlb z hzp]))
@@ -303,8 +323,7 @@ theorem PullFSExtension.proof (hBP : ProjFrameBasePtFree.Statement)
     have hφ : ContDiffAt ℝ 2 (fun u => Real.log ((fsMetric (ι := Fin (D + 1))).ρ u)) (pr e z) := by
       rw [log_fs_eq]
       exact contDiffAt_const.mul (contDiff_normSqE.contDiffAt.log (normSqE_pos hpz).ne')
-    have key :=
-      leviForm_comp_clm (pr e) (fun u => Real.log ((fsMetric (ι := Fin (D + 1))).ρ u)) z w hφ
+    have key := leviForm_comp_clm (pr e) (fun u => Real.log ((fsMetric (ι := Fin (D + 1))).ρ u)) z w hφ
     beta_reduce at key
     rw [leviForm_congr hev w, key]
     exact leviForm_log_fs_nonneg hpz (pr e w)

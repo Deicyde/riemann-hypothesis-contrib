@@ -1,45 +1,49 @@
 module
 
-public import Formalism.SharpRestriction.GenusPolyhedralBounds.RelativeIndexClassSets.LevGapFacts
-public import Formalism.SharpRestriction.GenusPolyhedralBounds.RelativeIndexClassSets.LevGapLat
-public import Formalism.SharpRestriction.GenusPolyhedralBounds.RelativeIndexClassSets.LevGapSplit
-public import Formalism.SharpRestriction.GenusPolyhedralBounds.RelativeIndexClassSets.LevGapLoc
-public import Formalism.SharpRestriction.GenusPolyhedralBounds.RelativeIndexClassSets.LevGapStab
-public import Formalism.SatakeDualWeyl.AdelicIwasawaHecke.ClassSet
+public import Formalism.LocalRingCardinality.DataLevel
 public import Formalism.SatakeDualWeyl.AdelicIwasawaHecke.Afsplit
-public import Formalism.SatakeDualWeyl.AdelicIwasawaHecke.Stdform
+public import Formalism.SharpRestriction.GenusPolyhedralBounds.RelativeIndexClassSets.LevGapStab
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
+public import Formalism.LocalRingCardinality.DataHost
 public import Formalism.SatakeDualWeyl.AdelicIwasawaHecke.Levelaf
-public import Formalism.SharpRestriction.GenusPolyhedralBounds.RelativeIndexClassSets.LevGapTop
-public import Formalism.SatakeDualWeyl.AdelicIwasawaHecke.CsSpan
-public import Formalism.SatakeDualWeyl.AdelicIwasawaHecke.CsGlob
-public import Formalism.SatakeDualWeyl.AdelicIwasawaHecke.CsApprox
-public import Formalism.LocalRingCardinality.DataExtra
-public import Formalism.LocalRingCardinality.PrincipalHermitianLattice
-public import Formalism.LocalRingCardinality.DataDIVDefs
-public import Formalism.LocalRingCardinality.SpanPowerMembership.ExampleClassGroupCardPos
-public import Formalism.LocalRingCardinality.DataKerP
-public import Formalism.LocalRingCardinality.DataLatDefs
-public import Formalism.LocalRingCardinality.SpanPowerMembership.ClassRecordRowDimensionZero
-public import Formalism.LocalRingCardinality.DataNChoice
-public import Formalism.SharpRestriction.InertJacobiLevels.ExtraTheta
-public import Formalism.SharpRestriction.InertJacobiLevels.ExtraVal
-public import Formalism.SharpRestriction.InertJacobiLevels.ExtraNum
-public import Formalism.SharpRestriction.InertJacobiLevels.ExtraGat
-public import Formalism.LocalRingCardinality.DataKerI
-public import Formalism.LocalRingCardinality.DataNChTie
-public import Formalism.LocalRingCardinality.SpanPowerMembership.ExistsHomOfBasis
-public import Formalism.LocalRingCardinality.DataMink
-public import Formalism.SharpRestriction.InertJacobiLevels.ExtraGatC
-public import Formalism.LocalRingCardinality.KernelPlaceMeanBound
-public import Formalism.LocalRingCardinality.RhoDetPrimeEqMuTildeMulChiPow
-public import Formalism.LocalRingCardinality.DataTies
-public import Formalism.LocalRingCardinality.SpanPowerMembership.RankRecordRowDimensionZero
-public import Formalism.LocalRingCardinality.SpanPowerMembership.SignSplitEquivInl
-public import Formalism.LocalRingCardinality.SpanPowerMembership.DivXExample
-public import Formalism.SharpRestriction.GlobalSchurBounds.GeneralLinearActions.GapAtLeast
-public import Formalism.SatakeDualWeyl.DefsCS
-public import Formalism.ThetaLiftIndependence.Statement
-public import Formalism.HermitianLattices.StatementMass
+public import Formalism.SharpRestriction.GenusPolyhedralBounds.RelativeIndexClassSets.LevGapFacts
 
 @[expose] public section
 
@@ -105,8 +109,8 @@ theorem mem_S_of_loc (x : E ⊗[F] FiniteAdeleRing (𝓞 F) F) (h : ∀ w, prV (
     rw [← sub_eq_zero]
     apply afsplit_inj
     intro w
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sub, map_add (f := _), map_sum, map_mul, map_mul, sub_eq_zero, afsplit_prV_tmul]
+
+    rw [map_sub, map_add (f := _), map_sum, map_mul, map_mul, sub_eq_zero, afsplit_prV_tmul]
     unfold levelafC
     rw [afsplit_prV_tmul]
     by_cases hw : w ∈ hfin.toFinset

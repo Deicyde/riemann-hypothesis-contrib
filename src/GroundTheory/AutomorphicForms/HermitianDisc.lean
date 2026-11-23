@@ -1,8 +1,56 @@
 module
 
-public import Mathlib
-public import GroundTheory.AutomorphicForms.HermitianWitt
-public import GroundTheory.LocalFields.ExistsUnitFiltrationUnitsLeRangeNormUnits
+public import GroundTheory.AutomorphicForms.HermitianSpaces
+public import Mathlib.FieldTheory.Separable
+public import GroundTheory.AutomorphicForms.HermitianOrthogonal
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
+import GroundTheory.LocalFields.Interface
 
 @[expose] public section
 
@@ -19,8 +67,8 @@ namespace HermitianForm
 
 variable [Algebra.IsSeparable F E]
 
-def detUnit (h : HermitianForm F E V) {ι : Type*} [Fintype ι] [DecidableEq ι] (b : Basis ι E V)
-    : Fˣ := by
+def detUnit (h : HermitianForm F E V) {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (b : Basis ι E V) : Fˣ := by
   have hdet : (gram h.toSesq b).det ∈ Set.range (algebraMap F E) := by
     apply conj_eq_self_iff.1
     rw [← conjHom_apply, RingHom.map_det, RingHom.mapMatrix_apply, ← det_transpose,
@@ -33,30 +81,28 @@ def detUnit (h : HermitianForm F E V) {ι : Type*} [Fintype ι] [DecidableEq ι]
 
 end HermitianForm
 
-def diagForm {ι : Type*} [Fintype ι] [DecidableEq ι] (a : ι → Fˣ) : HermitianForm F E (ι → E) where
-  toSesq :=
-    LinearMap.mk₂'ₛₗ (conjHom F E) (RingHom.id E)
-      (fun x y => ∑ i, conj F E (x i) * algebraMap F E (a i) * y i)
-      (fun x x' y => by simp only [Pi.add_apply, map_add (f := _), add_mul, Finset.sum_add_distrib])
-      (fun c x y => by
-        simp only [Pi.smul_apply, smul_eq_mul, map_mul, conjHom_apply, Finset.mul_sum]
-        exact Finset.sum_congr rfl fun i _ => by ring)
-      (fun x y y' => by simp only [Pi.add_apply, mul_add, Finset.sum_add_distrib])
-      (fun c x y => by
-        simp only [Pi.smul_apply, smul_eq_mul, RingHom.id_apply, Finset.mul_sum]
-        exact Finset.sum_congr rfl fun i _ => by ring)
-  isSymm :=
-    ⟨fun x y => by
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [LinearMap.mk₂'ₛₗ_apply, conjHom_apply, map_sum, map_mul, conj_conj,
-          conj_algebraMap]
-      exact Finset.sum_congr rfl fun i _ => by ring⟩
+def diagForm {ι : Type*} [Fintype ι] [DecidableEq ι] (a : ι → Fˣ) :
+    HermitianForm F E (ι → E) where
+  toSesq := LinearMap.mk₂'ₛₗ (conjHom F E) (RingHom.id E)
+    (fun x y => ∑ i, conj F E (x i) * algebraMap F E (a i) * y i)
+    (fun x x' y => by simp only [Pi.add_apply, map_add (f := _), add_mul, Finset.sum_add_distrib])
+    (fun c x y => by
+      simp only [Pi.smul_apply, smul_eq_mul, map_mul, conjHom_apply, Finset.mul_sum]
+      exact Finset.sum_congr rfl fun i _ => by ring)
+    (fun x y y' => by simp only [Pi.add_apply, mul_add, Finset.sum_add_distrib])
+    (fun c x y => by
+      simp only [Pi.smul_apply, smul_eq_mul, RingHom.id_apply, Finset.mul_sum]
+      exact Finset.sum_congr rfl fun i _ => by ring)
+  isSymm := ⟨fun x y => by
+
+    simp only [LinearMap.mk₂'ₛₗ_apply, conjHom_apply, map_sum, map_mul, conj_conj,
+    conj_algebraMap]
+    exact Finset.sum_congr rfl fun i _ => by ring⟩
   nonsingular := by
     have ha : ∀ i, algebraMap F E (a i) ≠ 0 := fun i => by simp
-    have key
-        : ∀ (x : ι → E) (j : ι),
-          (∑ i, conj F E (x i) * algebraMap F E (a i) * (Pi.single j 1 : ι → E) i)
-            = conj F E (x j) * algebraMap F E (a j) := by
+    have key : ∀ (x : ι → E) (j : ι),
+        (∑ i, conj F E (x i) * algebraMap F E (a i) * (Pi.single j 1 : ι → E) i) =
+          conj F E (x j) * algebraMap F E (a j) := by
       intro x j
       rw [Finset.sum_eq_single j]
       · simp
@@ -70,10 +116,8 @@ def diagForm {ι : Type*} [Fintype ι] [DecidableEq ι] (a : ι → Fˣ) : Hermi
       have h2 := mul_right_cancel₀ (ha j) h1
       rw [← conj_conj (F := F) (x j), h2, conj_conj]
     · intro f
-      refine ⟨
-        fun j => conj F E (f (Pi.single j 1) * (algebraMap F E (a j))⁻¹),
-        LinearMap.ext fun y => ?_
-      ⟩
+      refine ⟨fun j => conj F E (f (Pi.single j 1) * (algebraMap F E (a j))⁻¹),
+        LinearMap.ext fun y => ?_⟩
       simp only [LinearMap.mk₂'ₛₗ_apply, conj_conj]
       conv_rhs => rw [LinearMap.pi_apply_eq_sum_univ f y]
       refine Finset.sum_congr rfl fun i _ => ?_

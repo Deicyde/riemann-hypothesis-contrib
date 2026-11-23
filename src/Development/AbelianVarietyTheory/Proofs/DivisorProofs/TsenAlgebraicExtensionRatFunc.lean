@@ -1,9 +1,66 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.COnePropertyFiniteExtensionStatement
+public import Mathlib.FieldTheory.IsAlgClosed.Basic
+public import Mathlib.FieldTheory.RatFunc.Basic
+public import Mathlib.RingTheory.MvPolynomial.Homogeneous
+public import Mathlib.RingTheory.SimpleRing.Principal
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.COnePropertyFiniteExtension
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsNonzeroZeroFormPolynomialIsAlgClosed
-public import Development.AbelianVarietyTheory.Definitions.Foundations.IsFirstChernClassOfLineBundle
+import Mathlib.Algebra.AffineMonoid.UniqueSums
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Int
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.Order.CompletePartialOrder
+import Mathlib.RingTheory.Coalgebra.IsFrobenius
+import Mathlib.RingTheory.HopfAlgebra.Basic
+public import Mathlib.RingTheory.Ideal.KrullsHeightTheorem
+public import Mathlib.RingTheory.Nullstellensatz
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+public import ReciprocityTheory.CommutativeAlgebra.PolynomialHeights.HeightAddRingKrullDimQuotientMvPolynomialField
+import Std.Tactic.BVDecide.Normalize.Prop
+public import Mathlib.RingTheory.Ideal.Height
 
 @[expose] public section
 
@@ -12,11 +69,9 @@ open Polynomial
 namespace GlobalTheory
 
 open Polynomial in
-private theorem isHomogeneous_of_map_of_injective
-    {R S : Type} [CommRing R] [CommRing S]
-    {φ : R →+* S} (hφ : Function.Injective φ)
-    {n d : ℕ} {p : MvPolynomial (Fin n) R} (hp : (MvPolynomial.map φ p).IsHomogeneous d)
-    : p.IsHomogeneous d := by
+private theorem isHomogeneous_of_map_of_injective {R S : Type} [CommRing R] [CommRing S] {φ : R →+* S}
+    (hφ : Function.Injective φ) {n d : ℕ} {p : MvPolynomial (Fin n) R}
+    (hp : (MvPolynomial.map φ p).IsHomogeneous d) : p.IsHomogeneous d := by
   intro ν hν
   apply hp
   rw [MvPolynomial.coeff_map]
@@ -24,23 +79,21 @@ private theorem isHomogeneous_of_map_of_injective
   exact hν (hφ (h.trans (map_zero φ).symm))
 
 open Polynomial in
-private theorem mvPolynomial_eval_map_comp
-    {R S : Type} [CommRing R] [CommRing S]
-    (φ : R →+* S)
-    {n : ℕ} (x : Fin n → R) (p : MvPolynomial (Fin n) R)
-    : MvPolynomial.eval (φ ∘ x) (MvPolynomial.map φ p) = φ (MvPolynomial.eval x p) := by
+private theorem mvPolynomial_eval_map_comp {R S : Type} [CommRing R] [CommRing S] (φ : R →+* S) {n : ℕ}
+    (x : Fin n → R) (p : MvPolynomial (Fin n) R) :
+    MvPolynomial.eval (φ ∘ x) (MvPolynomial.map φ p) = φ (MvPolynomial.eval x p) := by
   induction p using MvPolynomial.induction_on with
   | C a => simp
   | add p q hp hq => simp [hp, hq]
   | mul_X p i hp => simp [hp]
 
 open Polynomial in
-private theorem exists_ne_zero_homogeneous_zero_of_forall_subfield
-    {F K : Type} [Field F] [Field K] [Algebra F K] [Algebra.IsAlgebraic F K]
-    (hF : ∀ (n d : ℕ) (f : MvPolynomial (Fin n) F),
-      f.IsHomogeneous d → 0 < d → d < n → ∃ x : Fin n → F, x ≠ 0 ∧ MvPolynomial.eval x f = 0)
-    (n d : ℕ) (f : MvPolynomial (Fin n) K) (hf : f.IsHomogeneous d) (hd : 0 < d) (hdn : d < n)
-    : ∃ x : Fin n → K, x ≠ 0 ∧ MvPolynomial.eval x f = 0 := by
+private theorem exists_ne_zero_homogeneous_zero_of_forall_subfield {F K : Type} [Field F] [Field K] [Algebra F K]
+    [Algebra.IsAlgebraic F K]
+    (hF : ∀ (n d : ℕ) (f : MvPolynomial (Fin n) F), f.IsHomogeneous d → 0 < d → d < n →
+      ∃ x : Fin n → F, x ≠ 0 ∧ MvPolynomial.eval x f = 0)
+    (n d : ℕ) (f : MvPolynomial (Fin n) K) (hf : f.IsHomogeneous d) (hd : 0 < d) (hdn : d < n) :
+    ∃ x : Fin n → K, x ≠ 0 ∧ MvPolynomial.eval x f = 0 := by
   classical
   set E := IntermediateField.adjoin F (f.coeffs : Set K) with hE
   haveI : FiniteDimensional F E := IntermediateField.finiteDimensional_adjoin
@@ -61,30 +114,25 @@ private theorem exists_ne_zero_homogeneous_zero_of_forall_subfield
 
 open Polynomial in
 variable {σ k : Type} [CommRing k] in
-private theorem coeffHom_sum
-    {ι : Type} (s : Finset ι)
-    {e : ℕ}
-    (p : ι → (MvPolynomial σ k)[X]) (hp : ∀ i ∈ s, _root_.GlobalTheory.TsenCount.CoeffHom e (p i))
-    : _root_.GlobalTheory.TsenCount.CoeffHom e (∑ i ∈ s, p i) := fun j => by
+private theorem coeffHom_sum {ι : Type} (s : Finset ι) {e : ℕ} (p : ι → (MvPolynomial σ k)[X])
+    (hp : ∀ i ∈ s, _root_.GlobalTheory.TsenCount.CoeffHom e (p i)) :
+    _root_.GlobalTheory.TsenCount.CoeffHom e (∑ i ∈ s, p i) := fun j => by
   rw [Polynomial.finsetSum_coeff]
   exact MvPolynomial.IsHomogeneous.sum _ _ _ fun i hi => hp i hi j
 
 open Polynomial in
 variable {σ k : Type} [CommRing k] in
-private theorem coeffHom_mul
-    {e e' : ℕ} {p q : (MvPolynomial σ k)[X]} (hp : _root_.GlobalTheory.TsenCount.CoeffHom e p)
-    (hq : _root_.GlobalTheory.TsenCount.CoeffHom e' q)
-    : _root_.GlobalTheory.TsenCount.CoeffHom (e + e') (p * q) := fun j => by
+private theorem coeffHom_mul {e e' : ℕ} {p q : (MvPolynomial σ k)[X]}
+    (hp : _root_.GlobalTheory.TsenCount.CoeffHom e p) (hq : _root_.GlobalTheory.TsenCount.CoeffHom e' q) :
+    _root_.GlobalTheory.TsenCount.CoeffHom (e + e') (p * q) := fun j => by
   rw [Polynomial.coeff_mul]
   exact MvPolynomial.IsHomogeneous.sum _ _ _ fun x _ => (hp x.1).mul (hq x.2)
 
 open Polynomial in
 variable {σ k : Type} [CommRing k] in
-private theorem coeffHom_prod
-    {ι : Type} [DecidableEq ι]
-    (s : Finset ι) (e : ι → ℕ) (p : ι → (MvPolynomial σ k)[X])
-    (hp : ∀ i ∈ s, _root_.GlobalTheory.TsenCount.CoeffHom (e i) (p i))
-    : _root_.GlobalTheory.TsenCount.CoeffHom (∑ i ∈ s, e i) (∏ i ∈ s, p i) := by
+private theorem coeffHom_prod {ι : Type} [DecidableEq ι] (s : Finset ι) (e : ι → ℕ)
+    (p : ι → (MvPolynomial σ k)[X]) (hp : ∀ i ∈ s, _root_.GlobalTheory.TsenCount.CoeffHom (e i) (p i)) :
+    _root_.GlobalTheory.TsenCount.CoeffHom (∑ i ∈ s, e i) (∏ i ∈ s, p i) := by
   induction s using Finset.induction_on with
   | empty =>
     intro j
@@ -99,17 +147,15 @@ private theorem coeffHom_prod
 
 open Polynomial in
 variable {σ k : Type} [CommRing k] in
-private theorem coeffHom_pow
-    {e : ℕ} {p : (MvPolynomial σ k)[X]} (hp : _root_.GlobalTheory.TsenCount.CoeffHom e p) (m : ℕ)
-    : _root_.GlobalTheory.TsenCount.CoeffHom (m * e) (p ^ m) := by
+private theorem coeffHom_pow {e : ℕ} {p : (MvPolynomial σ k)[X]}
+    (hp : _root_.GlobalTheory.TsenCount.CoeffHom e p) (m : ℕ) :
+    _root_.GlobalTheory.TsenCount.CoeffHom (m * e) (p ^ m) := by
   have := coeffHom_prod (Finset.range m) (fun _ => e) (fun _ => p) (fun _ _ => hp)
   simpa using this
 
-private theorem exists_ne_zero_common_zero_of_lt
-    {k : Type} [Field k] [IsAlgClosed k]
-    {m r : ℕ}
-    (g : Fin r → MvPolynomial (Fin m) k) (hg : ∀ i, MvPolynomial.eval 0 (g i) = 0) (hr : r < m)
-    : ∃ x : Fin m → k, x ≠ 0 ∧ ∀ i, MvPolynomial.eval x (g i) = 0 := by
+private theorem exists_ne_zero_common_zero_of_lt {k : Type} [Field k] [IsAlgClosed k] {m r : ℕ}
+    (g : Fin r → MvPolynomial (Fin m) k) (hg : ∀ i, MvPolynomial.eval 0 (g i) = 0) (hr : r < m) :
+    ∃ x : Fin m → k, x ≠ 0 ∧ ∀ i, MvPolynomial.eval x (g i) = 0 := by
   classical
   have hM0 : (MvPolynomial.vanishingIdeal k {(0 : Fin m → k)}).IsMaximal :=
     MvPolynomial.isMaximal_iff_eq_vanishingIdeal_singleton.2 ⟨0, rfl⟩
@@ -123,23 +169,20 @@ private theorem exists_ne_zero_common_zero_of_lt
   have hht : Q.height ≤ r := by
     refine (Ideal.height_le_spanRank_toENat_of_mem_minimalPrimes _ Q hQmin).trans ?_
     have h1 := Submodule.spanRank_span_le_card (R := MvPolynomial (Fin m) k) (Set.range g)
-    have h2 : Cardinal.mk (Set.range g) ≤ r := by simpa using Cardinal.mk_range_le (f := g)
-    calc
-      Cardinal.toENat (Submodule.spanRank (Ideal.span (Set.range g)))
+    have h2 : Cardinal.mk (Set.range g) ≤ r := by
+      simpa using Cardinal.mk_range_le (f := g)
+    calc Cardinal.toENat (Submodule.spanRank (Ideal.span (Set.range g)))
         ≤ Cardinal.toENat (r : Cardinal) := Cardinal.toENat.monotone' (h1.trans h2)
       _ = r := by simp
   have hQne : Q ≠ MvPolynomial.vanishingIdeal k {(0 : Fin m → k)} := by
     intro hQ
-    have hm :=
-      (_root_.ReciprocityTheory.CA.height_maximal_mvPolynomial_field k m
-        (MvPolynomial.vanishingIdeal k {(0 : Fin m → k)})).2
+    have hm := (_root_.ReciprocityTheory.CA.height_maximal_mvPolynomial_field k m (MvPolynomial.vanishingIdeal k {(0 : Fin m → k)})).2
     have hm' : Q.height = m := hQ ▸ hm
     rw [hm'] at hht
     have : m ≤ r := by exact_mod_cast hht
     omega
-  have hex
-      : ∃ J : Ideal (MvPolynomial (Fin m) k),
-        J.IsMaximal ∧ Q ≤ J ∧ J ≠ MvPolynomial.vanishingIdeal k {(0 : Fin m → k)} := by
+  have hex : ∃ J : Ideal (MvPolynomial (Fin m) k), J.IsMaximal ∧ Q ≤ J ∧
+      J ≠ MvPolynomial.vanishingIdeal k {(0 : Fin m → k)} := by
     by_contra hcon
     push_neg at hcon
     have hjac : Q.jacobson = Q := isJacobsonRing_iff_prime_eq.1 inferInstance Q hQprime
@@ -159,10 +202,9 @@ private theorem exists_ne_zero_common_zero_of_lt
     rwa [MvPolynomial.mem_vanishingIdeal_singleton_iff, MvPolynomial.aeval_eq_eval] at hx
 
 open Polynomial in
-private theorem exists_ne_zero_polynomial_zero_of_homogeneous
-    {k : Type} [Field k] [IsAlgClosed k]
-    {n d : ℕ} (F : MvPolynomial (Fin n) k[X]) (hF : F.IsHomogeneous d) (hd : 0 < d) (hdn : d < n)
-    : ∃ x : Fin n → k[X], x ≠ 0 ∧ MvPolynomial.eval x F = 0 := by
+private theorem exists_ne_zero_polynomial_zero_of_homogeneous {k : Type} [Field k] [IsAlgClosed k] {n d : ℕ}
+    (F : MvPolynomial (Fin n) k[X]) (hF : F.IsHomogeneous d) (hd : 0 < d) (hdn : d < n) :
+    ∃ x : Fin n → k[X], x ≠ 0 ∧ MvPolynomial.eval x F = 0 := by
   classical
   set D := F.support.sup fun ν => (F.coeff ν).natDegree with hD
   have hDle : ∀ ν, (F.coeff ν).natDegree ≤ D := by
@@ -202,11 +244,8 @@ private theorem exists_ne_zero_polynomial_zero_of_homogeneous
       intro l
       rw [Polynomial.coe_mapRingHom, Polynomial.coeff_map]
       exact MvPolynomial.isHomogeneous_C _ _
-    have h2 :=
-      coeffHom_prod Finset.univ
-        (fun i => ν i * 1)
-        (fun i => y i ^ ν i)
-        (fun i _ => coeffHom_pow (hy i) (ν i))
+    have h2 := coeffHom_prod Finset.univ (fun i => ν i * 1) (fun i => y i ^ ν i)
+      (fun i _ => coeffHom_pow (hy i) (ν i))
     have h3 := coeffHom_mul h1 h2
     simpa [hdeg] using h3
   have hΦdeg : Φ.natDegree ≤ D + d * s := by
@@ -219,22 +258,18 @@ private theorem exists_ne_zero_polynomial_zero_of_homogeneous
     refine (Polynomial.natDegree_mul_le).trans (add_le_add ?_ ?_)
     · exact (Polynomial.natDegree_map_le).trans (hDle ν)
     · refine (Polynomial.natDegree_prod_le _ _).trans ?_
-      calc
-        ∑ i, (y i ^ ν i).natDegree ≤ ∑ i, ν i * s :=
-          Finset.sum_le_sum fun i _ =>
-            (Polynomial.natDegree_pow_le).trans (Nat.mul_le_mul_left _ (hyd i))
+      calc ∑ i, (y i ^ ν i).natDegree ≤ ∑ i, ν i * s :=
+            Finset.sum_le_sum fun i _ => (Polynomial.natDegree_pow_le).trans
+              (Nat.mul_le_mul_left _ (hyd i))
         _ = d * s := by rw [← Finset.sum_mul, hdeg]
   set r := D + d * s + 1
   have hrm : r < m := by
     simp only [r, m, s]
     nlinarith
-  obtain ⟨a, ha0, ha⟩ :=
-    exists_ne_zero_common_zero_of_lt (k := k) (m := m) (r := r)
-      (fun j => Φ.coeff j)
-      (fun j => by
-        rw [MvPolynomial.eval_zero]
-        exact (hΦ j).coeff_eq_zero (by simp; omega))
-      hrm
+  obtain ⟨a, ha0, ha⟩ := exists_ne_zero_common_zero_of_lt (k := k) (m := m) (r := r)
+    (fun j => Φ.coeff j) (fun j => by
+      rw [MvPolynomial.eval_zero]
+      exact (hΦ j).coeff_eq_zero (by simp; omega)) hrm
   let x : Fin n → k[X] := fun i =>
     ∑ j : Fin (s + 1), Polynomial.C (a (e (i, j))) * Polynomial.X ^ (j : ℕ)
   have hmapΦ : Polynomial.map (MvPolynomial.eval a) Φ = 0 := by
@@ -244,25 +279,22 @@ private theorem exists_ne_zero_polynomial_zero_of_homogeneous
     · exact ha ⟨j, hj⟩
     · rw [Polynomial.coeff_eq_zero_of_natDegree_lt (by omega), map_zero]
   have hΦx : Polynomial.map (MvPolynomial.eval a) Φ = MvPolynomial.eval x F := by
-    have h1 :=
-      MvPolynomial.eval₂_comp_left (Polynomial.mapRingHom (MvPolynomial.eval a))
-        (Polynomial.mapRingHom (MvPolynomial.C (σ := Fin m))) y F
+    have h1 := MvPolynomial.eval₂_comp_left (Polynomial.mapRingHom (MvPolynomial.eval a))
+      (Polynomial.mapRingHom (MvPolynomial.C (σ := Fin m))) y F
     rw [Polynomial.coe_mapRingHom] at h1
     simp only [Φ]
     rw [h1]
-    have h2
-        : (Polynomial.mapRingHom (MvPolynomial.eval a)).comp
-            (Polynomial.mapRingHom (MvPolynomial.C (σ := Fin m)))
-          = RingHom.id k[X] := by
+    have h2 : (Polynomial.mapRingHom (MvPolynomial.eval a)).comp
+        (Polynomial.mapRingHom (MvPolynomial.C (σ := Fin m))) = RingHom.id k[X] := by
       refine RingHom.ext fun p => ?_
       have hc : (MvPolynomial.eval a).comp (MvPolynomial.C (σ := Fin m)) = RingHom.id k := by
         ext c
         simp
-      rw [RingHom.comp_apply, Polynomial.coe_mapRingHom, Polynomial.coe_mapRingHom,
-        Polynomial.map_map, hc, Polynomial.map_id, RingHom.id_apply]
+      rw [RingHom.comp_apply, Polynomial.coe_mapRingHom, Polynomial.coe_mapRingHom, Polynomial.map_map, hc,
+        Polynomial.map_id, RingHom.id_apply]
     have h3 : Polynomial.map (MvPolynomial.eval a) ∘ y = x := by
       funext i
-      set_option synthInstance.maxHeartbeats 100000 in
+
       simp [y, x, Polynomial.map_sum]
     rw [h2, h3]
     rfl
@@ -288,18 +320,15 @@ private theorem exists_ne_zero_polynomial_zero_of_homogeneous
   exact ht (hc.symm.trans hxi)
 
 open Polynomial in
-private theorem exists_ne_zero_ratFunc_homogeneous_zero
-    {k : Type} [Field k] [IsAlgClosed k]
-    (n d : ℕ) (f : MvPolynomial (Fin n) (RatFunc k))
-    (hf : f.IsHomogeneous d) (hd : 0 < d) (hdn : d < n)
-    : ∃ x : Fin n → RatFunc k, x ≠ 0 ∧ MvPolynomial.eval x f = 0 := by
+private theorem exists_ne_zero_ratFunc_homogeneous_zero {k : Type} [Field k] [IsAlgClosed k] (n d : ℕ)
+    (f : MvPolynomial (Fin n) (RatFunc k)) (hf : f.IsHomogeneous d) (hd : 0 < d) (hdn : d < n) :
+    ∃ x : Fin n → RatFunc k, x ≠ 0 ∧ MvPolynomial.eval x f = 0 := by
   classical
   obtain ⟨b, hb⟩ := IsLocalization.exist_integer_multiples_of_finset (nonZeroDivisors k[X]) f.coeffs
   have hc0 : algebraMap k[X] (RatFunc k) b ≠ 0 :=
     IsFractionRing.to_map_ne_zero_of_mem_nonZeroDivisors b.2
-  obtain ⟨F, hF⟩
-      : MvPolynomial.C (algebraMap k[X] (RatFunc k) b) * f
-        ∈ Set.range (MvPolynomial.map (algebraMap k[X] (RatFunc k))) := by
+  obtain ⟨F, hF⟩ : MvPolynomial.C (algebraMap k[X] (RatFunc k) b) * f ∈
+      Set.range (MvPolynomial.map (algebraMap k[X] (RatFunc k))) := by
     rw [MvPolynomial.mem_range_map_iff_coeffs_subset]
     intro a ha
     obtain ⟨ν, hν, rfl⟩ := MvPolynomial.mem_coeffs_iff.1 ha
@@ -326,14 +355,14 @@ private theorem exists_ne_zero_ratFunc_homogeneous_zero
     simp only [map_mul, MvPolynomial.eval_C] at key
     exact (mul_eq_zero.1 key).resolve_left hc0
 
+
 open Polynomial in
-theorem _root_.GlobalTheory.tsen_algebraic_extension_ratFunc
-    : ∀ (k K : Type) [Field k] [IsAlgClosed k] [Field K] [Algebra (RatFunc k) K]
-        [Algebra.IsAlgebraic (RatFunc k) K] (n d : ℕ) (f : MvPolynomial (Fin n) K),
+theorem _root_.GlobalTheory.tsen_algebraic_extension_ratFunc :
+    ∀ (k K : Type) [Field k] [IsAlgClosed k] [Field K] [Algebra (RatFunc k) K]
+      [Algebra.IsAlgebraic (RatFunc k) K] (n d : ℕ) (f : MvPolynomial (Fin n) K),
       f.IsHomogeneous d → 0 < d → d < n → ∃ x : Fin n → K, x ≠ 0 ∧ MvPolynomial.eval x f = 0 := by
   intro k K _ _ _ _ _ n d f hf hd hdn
   exact exists_ne_zero_homogeneous_zero_of_forall_subfield (F := RatFunc k)
-    (fun n d f hf hd hdn => exists_ne_zero_ratFunc_homogeneous_zero (k := k) n d f hf hd hdn)
-    n d f hf hd hdn
+    (fun n d f hf hd hdn => exists_ne_zero_ratFunc_homogeneous_zero (k := k) n d f hf hd hdn) n d f hf hd hdn
 
 end GlobalTheory

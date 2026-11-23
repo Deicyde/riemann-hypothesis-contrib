@@ -1,31 +1,63 @@
 module
 
-public import Development.AutomorphicArithmetic.AutomorphicVarieties.HeckeAlgebras.Distinct
-public import Development.AutomorphicArithmetic.AutomorphicVarieties.AutomorphicForms.WdDefs
-public import Development.AutomorphicArithmetic.AutomorphicVarieties.PadicHodgeTheory.LocalPublishedTheorems
-public import Development.AbelianVarietyTheory.PublishedTheorems.AutomorphicForms₂.DeRhamPotSemistable
-public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.CharAbove
+public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.FiniteDimensionalWdSpace
+public import Development.AutomorphicArithmetic.AutomorphicVarieties.CommutativeAlgebra.ResMapBijective
+public import Mathlib.RingTheory.AdicCompletion.Noetherian
+public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsContinuousPadic
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.WdParameterMonodromyZeroIffPotentiallyCrystallin
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.FiniteDimensionalFilDR
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
+import Development.AutomorphicArithmetic.AutomorphicVarieties.HeckeAlgebras.ContinuousTorusCharacter
+import Development.AutomorphicArithmetic.AutomorphicVarieties.WeilGroupCharacters.RepAlg
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
-  Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations
-  Formalism.MainNotions.N GlobalTheory.WeilDeligne GlobalTheory.Pst Polynomial Module Matrix
-  UpperTheory.V.W UpperTheory.V.Hi
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N GlobalTheory.WeilDeligne GlobalTheory.Pst Polynomial Module Matrix UpperTheory.V.W UpperTheory.V.Hi
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
-private theorem UpperTheory.fixed_vector_descends_weil_group
-    {Γ I K D W : Type} [Group Γ] [Group I] [Field K] [CharZero K] [AddCommGroup D] [Module K D]
-    [FiniteDimensional K D] [AddCommGroup W] [Module ℂ W] [FiniteDimensional ℂ W]
-    (j : I →* Γ) (φ : Γ)
-    (hn : ∀ s, ∃ t, j s * φ = φ * j t) (hg : ∀ σ, ∃ (n : ℤ) (t : I), σ = φ ^ n * j t)
+private theorem UpperTheory.fixed_vector_descends_weil_group {Γ I K D W : Type} [Group Γ] [Group I] [Field K] [CharZero K]
+    [AddCommGroup D] [Module K D] [FiniteDimensional K D]
+    [AddCommGroup W] [Module ℂ W] [FiniteDimensional ℂ W]
+    (j : I →* Γ) (φ : Γ) (hn : ∀ s, ∃ t, j s * φ = φ * j t) (hg : ∀ σ, ∃ (n : ℤ) (t : I), σ = φ ^ n * j t)
     (a : Γ →* Module.End K D) (b : Γ →* Module.End ℂ W) (mk : D →+ W)
     (hs : Submodule.span ℂ (Set.range mk) = ⊤) (hc : ∀ g x, b g (mk x) = mk (a g x))
-    [Finite (I ⧸ (a.comp j).ker)]
-    (y : W) (hy : y ≠ 0) (hi : ∀ g, b g y = y)
-    : ∃ x : D, x ≠ 0 ∧ ∀ g, a g x = x := by
+    [Finite (I ⧸ (a.comp j).ker)] (y : W) (hy : y ≠ 0) (hi : ∀ g, b g y = y) :
+    ∃ x : D, x ≠ 0 ∧ ∀ g, a g x = x := by
   classical
   by_contra hno
   let := Fintype.ofFinite (I ⧸ (a.comp j).ker)
@@ -38,8 +70,8 @@ private theorem UpperTheory.fixed_vector_descends_weil_group
   let E : Module.End K D := ∑ q : I ⧸ (a.comp j).ker, a (j q.out)
   let E' : Module.End ℂ W := ∑ q : I ⧸ (a.comp j).ker, b (j q.out)
   have hE : ∀ x s, a (j s) (E x) = E x := fun x s => by
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [E, LinearMap.sum_apply, map_sum, ha]
+
+    simp only [E, LinearMap.sum_apply, map_sum, ha]
     refine Fintype.sum_equiv (Equiv.mulLeft (s : I ⧸ (a.comp j).ker)) _ _ fun q => ?_
     rw [Equiv.coe_mulLeft, map_mul, Module.End.mul_apply]
     rfl
@@ -48,7 +80,7 @@ private theorem UpperTheory.fixed_vector_descends_weil_group
   have hE2 : E' y = n • y := by
     simp only [E', LinearMap.sum_apply, hi, Finset.sum_const, Finset.card_univ, n]
   have hEE : ∀ x, E' (mk x) = mk (E x) := fun x => by
-    set_option synthInstance.maxHeartbeats 100000 in
+
     simp only [E, E', LinearMap.sum_apply, hc, map_sum]
   have hcan : ∀ z : D, n • z = 0 → z = 0 := fun z hz => by
     rw [← Nat.cast_smul_eq_nsmul K] at hz
@@ -58,16 +90,14 @@ private theorem UpperTheory.fixed_vector_descends_weil_group
   have hS : ∀ x, S x = a φ (E x) - E x + n • x - E x := fun x => rfl
   have hS' : ∀ x, S' x = b φ (E' x) - E' x + n • x - E' x := fun x => rfl
   have hinj : Function.Injective S := by
-    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
-      rw [injective_iff_map_eq_zero]
+    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
     intro x hx
     have h1 : ∀ s, a (j s) (a φ (E x)) = a φ (E x) := fun s => by
       obtain ⟨t, ht⟩ := hn s
       rw [← Module.End.mul_apply, ← map_mul, ht, map_mul, Module.End.mul_apply, hE]
     have h2 := congrArg E hx
-    rw [hS, map_sub, map_add (f := _), map_sub, map_nsmul, hE1 _ h1, hE1 _ (hE x), map_zero,
-        add_sub_cancel_right, ← smul_sub]
-      at h2
+    rw [hS, map_sub, map_add (f := _), map_sub, map_nsmul, hE1 _ h1, hE1 _ (hE x), map_zero, add_sub_cancel_right,
+      ← smul_sub] at h2
     have h3 : a φ (E x) = E x := sub_eq_zero.mp (hcan _ h2)
     have h4 : E x = 0 := by
       by_contra h0
@@ -87,29 +117,17 @@ private theorem UpperTheory.fixed_vector_descends_weil_group
   refine hy (LinearMap.injective_iff_surjective.mpr hsur' ?_)
   rw [hS', hE2, map_nsmul, hi, map_zero, sub_self, zero_add, sub_self]
 
-theorem UpperTheory.exists_weil_invariant_in_Dpst_of_weilDeligne_invariant
-    : ∀ {F Ω : Type} [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω] {l : ℕ}
-        [Fact l.Prime] (ι : Qbar l ≃+* ℂ) {A : ValuationSubring Ω} {w : HeightOneSpectrum (𝓞 F)}
-        (h : IsPlaceOver A w) {O : Type} [CommRing O] [Algebra ℤ_[l] O] [TopologicalSpace O]
-        (Bw : LocBridge l F Ω (Dec (F := F) A) O) (hj : GlobalTheory.Pst.Induces Bw)
-        (P : LocPrime l) {L : FinExt l} {V : Type} [AddCommGroup V] [Module ↥L.1 V] [Module ℚ_[l] V]
-        [IsScalarTower ℚ_[l] ↥L.1 V] [FiniteDimensional ↥L.1 V]
-        (ρ : Representation ↥L.1 ↥(GK Bw.Kw) V)
-        [FiniteDimensional ↥(MaximalUnramifiedExtension l) (DpstUr P ρ)],
-      (∃ y : WDSpace P ι ρ, y ≠ 0 ∧ ∀ σ, wdRho P ι Bw h hj ρ σ y = y)
-        → ∃ x : ↥(Dpst P ρ), x ≠ 0 ∧ ∀ σ, weilD Bw h P ρ σ x = x := by
+theorem UpperTheory.exists_weil_invariant_in_Dpst_of_weilDeligne_invariant :
+    ∀ {F Ω : Type} [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω] {l : ℕ} [Fact l.Prime] (ι : Qbar l ≃+* ℂ) {A : ValuationSubring Ω} {w : HeightOneSpectrum (𝓞 F)} (h : IsPlaceOver A w) {O : Type} [CommRing O] [Algebra ℤ_[l] O] [TopologicalSpace O] (Bw : LocBridge l F Ω (Dec (F := F) A) O) (hj : GlobalTheory.Pst.Induces Bw) (P : LocPrime l) {L : FinExt l} {V : Type} [AddCommGroup V] [Module ↥L.1 V] [Module ℚ_[l] V] [IsScalarTower ℚ_[l] ↥L.1 V] [FiniteDimensional ↥L.1 V] (ρ : Representation ↥L.1 ↥(GK Bw.Kw) V) [FiniteDimensional ↥(MaximalUnramifiedExtension l) (DpstUr P ρ)], (∃ y : WDSpace P ι ρ, y ≠ 0 ∧ ∀ σ, wdRho P ι Bw h hj ρ σ y = y) → ∃ x : ↥(Dpst P ρ), x ≠ 0 ∧ ∀ σ, weilD Bw h P ρ σ x = x := by
   intro F Ω _ _ _ _ _ l _ ι A w h O _ _ _ Bw hj P L V _ _ _ _ _ ρ _ h1
   obtain ⟨y, hy, hi⟩ := h1
-  let a : ↥(Weil h) →* Module.End ↥(MaximalUnramifiedExtension l) (DpstUr P ρ) := {
-    toFun := fun σ => urEnd P ρ (weilD Bw h P ρ σ) (weilD_mulD Bw h P ρ hj σ)
-    map_one' :=
-      LinearMap.ext fun x => LinearMap.congr_fun (map_one (weilD Bw h P ρ)) ((toUr P ρ).symm x)
-    map_mul' := fun σ τ =>
-      LinearMap.ext fun x => LinearMap.congr_fun (map_mul (weilD Bw h P ρ) σ τ) ((toUr P ρ).symm x)
-  }
+  let a : ↥(Weil h) →* Module.End ↥(MaximalUnramifiedExtension l) (DpstUr P ρ) :=
+    { toFun := fun σ => urEnd P ρ (weilD Bw h P ρ σ) (weilD_mulD Bw h P ρ hj σ)
+      map_one' := LinearMap.ext fun x => LinearMap.congr_fun (map_one (weilD Bw h P ρ)) ((toUr P ρ).symm x)
+      map_mul' := fun σ τ => LinearMap.ext fun x =>
+        LinearMap.congr_fun (map_mul (weilD Bw h P ρ) σ τ) ((toUr P ρ).symm x) }
   have := compactSpace_Ine (E := F) A
-  have hle
-      : (MonoidHom.comp (weilD Bw h P ρ) (ineIncl h)).ker ≤ (a.comp (ineIncl h)).ker := fun s hs =>
+  have hle : (MonoidHom.comp (weilD Bw h P ρ) (ineIncl h)).ker ≤ (a.comp (ineIncl h)).ker := fun s hs =>
     LinearMap.ext fun x => LinearMap.congr_fun (MonoidHom.mem_ker.mp hs) ((toUr P ρ).symm x)
   have : Finite (Ine (F := F) A ⧸ (a.comp (ineIncl h)).ker) :=
     Subgroup.quotient_finite_of_isOpen _ (Subgroup.isOpen_mono hle (isSmooth_weilD Bw h P ρ hj))
@@ -118,12 +136,8 @@ theorem UpperTheory.exists_weil_invariant_in_Dpst_of_weilDeligne_invariant
     refine ⟨t, ?_⟩
     rw [deg_mul, deg_ineIncl, deg_frob, zero_add, zpow_one] at ht
     exact ht
-  obtain ⟨x, hx, hf⟩ :=
-    UpperTheory.fixed_vector_descends_weil_group (ineIncl h) (frob h) hn
-      (fun σ => ⟨deg σ, exists_eq_zpow_mul (deg_frob (h := h)) σ⟩)
-      a (wdRho P ι Bw h hj ρ)
-      ((AddMonoidHom.mk' (wdMk P ι ρ) (wdMk_add P ι ρ)).comp (toUr P ρ).symm.toAddMonoidHom)
-      (span_wdMk P ι ρ)
-      (fun g x => wdRho_mk P ι Bw h hj ρ g ((toUr P ρ).symm x))
-      y hy hi
+  obtain ⟨x, hx, hf⟩ := UpperTheory.fixed_vector_descends_weil_group (ineIncl h) (frob h) hn
+    (fun σ => ⟨deg σ, exists_eq_zpow_mul (deg_frob (h := h)) σ⟩) a (wdRho P ι Bw h hj ρ)
+    ((AddMonoidHom.mk' (wdMk P ι ρ) (wdMk_add P ι ρ)).comp (toUr P ρ).symm.toAddMonoidHom) (span_wdMk P ι ρ)
+    (fun g x => wdRho_mk P ι Bw h hj ρ g ((toUr P ρ).symm x)) y hy hi
   exact ⟨(toUr P ρ).symm x, hx, hf⟩

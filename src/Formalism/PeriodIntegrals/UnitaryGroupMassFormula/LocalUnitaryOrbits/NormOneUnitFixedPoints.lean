@@ -1,11 +1,58 @@
 module
 
-public import Mathlib
-public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.LocalUnitaryOrbits.GramInvOHolds
-public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.LocalUnitaryOrbits.SigRAlgebraMap
-public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.LocalUnitaryOrbits.NormLeOfNear
+import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.LocalUnitaryOrbits.TwoNeZeroV
 public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.LocalUnitaryOrbits.OBas1OfUnitV
+public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.LocalUnitaryOrbits.OrbAllOfNorm
+public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.StabilizerOrbitVolume.LocDensCntRes
+public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.LocalUnitaryOrbits.GramInvOHolds
 public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.LocalUnitaryOrbits.MemUnifOIff
+public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.LocalUnitaryOrbits.MemUniformizerHermitianIdeal
+public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.LocalUnitaryOrbits.NormLeOfNear
+public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.LocalUnitaryOrbits.SigRAlgebraMap
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
+public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.LocalUnitaryOrbits.CrossMSmulRight
 
 @[expose] public section
 
@@ -13,16 +60,13 @@ noncomputable section
 
 namespace PI.OmLocU.NormOneUnitFixedPoints
 
-open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub
-  Formalism.L2.SG.LocVol NumberField IsDedekindDomain
+open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub Formalism.L2.SG.LocVol NumberField IsDedekindDomain
 open PI.VolStabSW PI.OmLocU
 open scoped TensorProduct
 
-variable
-  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-  (σ : E →ₐ[F] E)
-  {n : ℕ} (J : Matrix (Fin n) (Fin n) E)
-  (ψ : AddChar (AF F) ℂ) (v : HeightOneSpectrum (𝓞 F))
+variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+  (σ : E →ₐ[F] E) {n : ℕ} (J : Matrix (Fin n) (Fin n) E) (ψ : AddChar (AF F) ℂ)
+  (v : HeightOneSpectrum (𝓞 F))
 
 theorem gr_sig_ne (h : IsCMExt F E σ) : σ ≠ AlgHom.id F E := by
   intro hs
@@ -34,13 +78,11 @@ theorem gr_sig_ne (h : IsCMExt F E σ) : σ ≠ AlgHom.id F E := by
     rw [ComplexEmbedding.conjugate_coe_eq]
     have := h4 τ x
     rw [hs, AlgHom.id_apply] at this
-    rw [starRingEnd_apply]
-    exact this.symm
+    rw [starRingEnd_apply]; exact this.symm
   exact InfinitePlace.not_isReal_iff_isComplex.2 (htc.isComplex (InfinitePlace.mk τ))
     (InfinitePlace.isReal_mk_iff.2 hr)
 
-theorem gr_fix_range (h : IsCMExt F E σ) {y : E} (hy : σ y = y)
-    : ∃ c : F, algebraMap F E c = y := by
+theorem gr_fix_range (h : IsCMExt F E σ) {y : E} (hy : σ y = y) : ∃ c : F, algebraMap F E c = y := by
   by_contra hne
   push Not at hne
   have li : LinearIndependent F ![(1 : E), y] := by
@@ -53,8 +95,7 @@ theorem gr_fix_range (h : IsCMExt F E σ) {y : E} (hy : σ y = y)
     · exfalso
       apply hne (-(t⁻¹ * s))
       have hy' : y = t⁻¹ • (t • y) := by rw [smul_smul, inv_mul_cancel₀ ht, one_smul]
-      rw [hy', eq_neg_of_add_eq_zero_right hst, smul_neg, smul_smul, Algebra.algebraMap_eq_smul_one,
-        neg_smul]
+      rw [hy', eq_neg_of_add_eq_zero_right hst, smul_neg, smul_smul, Algebra.algebraMap_eq_smul_one, neg_smul]
   have hsp := li.span_eq_top_of_card_eq_finrank' (by simpa using h.2.2.1.symm)
   apply gr_sig_ne σ h
   have hl : σ.toLinearMap = LinearMap.id := by
@@ -64,8 +105,8 @@ theorem gr_fix_range (h : IsCMExt F E σ) {y : E} (hy : σ y = y)
     · simpa using hy
   exact AlgHom.ext fun x => LinearMap.congr_fun hl x
 
-theorem span_le_jac {q : Fv F v} (hq : q ∈ v.adicCompletionIntegers F) (h1 : Valued.v q < 1)
-    : Ideal.span {(⟨q, hq⟩ : v.adicCompletionIntegers F)} ≤ Ideal.jacobson ⊥ := by
+theorem span_le_jac {q : Fv F v} (hq : q ∈ v.adicCompletionIntegers F) (h1 : Valued.v q < 1) :
+    Ideal.span {(⟨q, hq⟩ : v.adicCompletionIntegers F)} ≤ Ideal.jacobson ⊥ := by
   rw [IsLocalRing.jacobson_eq_maximalIdeal ⊥ bot_ne_top, Ideal.span_le, Set.singleton_subset_iff,
     SetLike.mem_coe, IsLocalRing.mem_maximalIdeal, mem_nonunits_iff]
   intro hu
@@ -78,14 +119,11 @@ theorem span_le_jac {q : Fv F v} (hq : q ∈ v.adicCompletionIntegers F) (h1 : V
   rw [this] at hle
   exact absurd (lt_of_le_of_lt hle h1) (lt_irrefl _)
 
-theorem sc_mul_ne_one
-    {q : Fv F v} (hq : q ∈ v.adicCompletionIntegers F) (h1 : Valued.v q < 1)
-    {c : Fv F v ⊗[F] E} (hc : c ∈ OEv (E := E) v)
-    : sc (E := E) v q * c ≠ 1 := by
+theorem sc_mul_ne_one {q : Fv F v} (hq : q ∈ v.adicCompletionIntegers F) (h1 : Valued.v q < 1)
+    {c : Fv F v ⊗[F] E} (hc : c ∈ OEv (E := E) v) : sc (E := E) v q * c ≠ 1 := by
   intro hqc
-  have hle
-      : oEvS (E := E) v
-        ≤ Ideal.span {(⟨q, hq⟩ : v.adicCompletionIntegers F)} • oEvS (E := E) v := by
+  have hle : oEvS (E := E) v ≤
+      Ideal.span {(⟨q, hq⟩ : v.adicCompletionIntegers F)} • oEvS (E := E) v := by
     intro z hz
     have e : z = (⟨q, hq⟩ : v.adicCompletionIntegers F) • (c * z) := by
       have e1 : (⟨q, hq⟩ : v.adicCompletionIntegers F) • (c * z) = sc (E := E) v q * (c * z) := by
@@ -94,9 +132,7 @@ theorem sc_mul_ne_one
       rw [e1, ← mul_assoc, hqc, one_mul]
     rw [e]
     exact Submodule.smul_mem_smul (Ideal.mem_span_singleton_self _) (oEv_mul v hc hz)
-  have hbot :=
-    Submodule.eq_bot_of_le_smul_of_le_jacobson_bot _ _ (oEvS_fg (E := E) v) hle
-      (span_le_jac v hq h1)
+  have hbot := Submodule.eq_bot_of_le_smul_of_le_jacobson_bot _ _ (oEvS_fg (E := E) v) hle (span_le_jac v hq h1)
   have h1m : (1 : Fv F v ⊗[F] E) ∈ oEvS (E := E) v := oEv_one (E := E) v
   rw [hbot, Submodule.mem_bot] at h1m
   exact one_ne_zero h1m
@@ -106,8 +142,7 @@ theorem sc_mul_sc (r s : Fv F v) : sc (E := E) v r * sc (E := E) v s = sc (E := 
 
 theorem sc_one : sc (E := E) v 1 = 1 := rfl
 
-theorem int_of_sc {r : Fv F v} (h : sc (E := E) v r ∈ OEv (E := E) v)
-    : r ∈ v.adicCompletionIntegers F := by
+theorem int_of_sc {r : Fv F v} (h : sc (E := E) v r ∈ OEv (E := E) v) : r ∈ v.adicCompletionIntegers F := by
   rw [HeightOneSpectrum.mem_adicCompletionIntegers]
   by_contra hr
   push Not at hr
@@ -121,49 +156,12 @@ theorem int_of_sc {r : Fv F v} (h : sc (E := E) v r ∈ OEv (E := E) v)
   apply sc_mul_ne_one v (hv.le : r⁻¹ ∈ v.adicCompletionIntegers F) hv h
   rw [sc_mul_sc, inv_mul_cancel₀ hr0, sc_one]
 
-theorem fix_sc (hcm : IsCMExt F E σ) (s : Fv F v ⊗[F] E) (hs : sigR (Fv F v) σ s = s)
-    : ∃ r : Fv F v, s = sc (E := E) v r := by
-  have key : ∀ t : Fv F v ⊗[F] E, ∃ r : Fv F v, t + sigR (Fv F v) σ t = sc (E := E) v r := by
-    intro t
-    induction t using TensorProduct.induction_on with
-    | zero => exact ⟨0, by simp [sc]⟩
-    | tmul a e =>
-      have hfix : σ (e + σ e) = e + σ e := by
-        rw [map_add (f := _), PI.OmLocU.Orb.sigma_invol σ hcm, add_comm]
-      obtain ⟨c, hc⟩ := gr_fix_range σ hcm hfix
-      refine ⟨c • a, ?_⟩
-      have hs1 : sigR (Fv F v) σ (a ⊗ₜ[F] e) = a ⊗ₜ[F] σ e := by
-        simp [sigR, Algebra.TensorProduct.map_tmul]
-      rw [hs1, ← TensorProduct.tmul_add, ← hc, Algebra.algebraMap_eq_smul_one,
-        TensorProduct.tmul_smul, TensorProduct.smul_tmul']
-      rfl
-    | add x y hx hy =>
-      obtain ⟨rx, hx⟩ := hx
-      obtain ⟨ry, hy⟩ := hy
-      refine ⟨rx + ry, ?_⟩
-      rw [map_add (f := _),
-        show x + y + (sigR (Fv F v) σ x + sigR (Fv F v) σ y)
-            = (x + sigR (Fv F v) σ x) + (y + sigR (Fv F v) σ y) by
-          abel,
-        hx, hy]
-      simp [sc, TensorProduct.add_tmul]
-  obtain ⟨r, hr⟩ := key s
-  have h2 : (2 : Fv F v) ≠ 0 := by
-    intro h
-    apply two_ne_zero (α := F)
-    apply (algebraMap F (Fv F v)).injective
-    rw [map_ofNat, map_zero]
-    exact h
-  refine ⟨(1 / 2 : Fv F v) * r, ?_⟩
-  have e : sc (E := E) v ((1 / 2 : Fv F v) * r) = (1 / 2 : Fv F v) • sc (E := E) v r := by
-    simp only [sc]
-    rw [TensorProduct.smul_tmul', smul_eq_mul]
-  rw [e, ← hr, hs, ← two_smul (Fv F v) s, smul_smul, one_div, inv_mul_cancel₀ h2, one_smul]
+theorem fix_sc (hcm : IsCMExt F E σ) (s : Fv F v ⊗[F] E) (hs : sigR (Fv F v) σ s = s) :
+    ∃ r : Fv F v, s = sc (E := E) v r := by
+  apply PI.OmLocU.UnN.fix_sc <;> assumption
 
-theorem fix_int_sc
-    (hcm : IsCMExt F E σ)
-    {s : Fv F v ⊗[F] E} (hs0 : s ∈ OEv (E := E) v) (hs : sigR (Fv F v) σ s = s)
-    : ∃ r ∈ v.adicCompletionIntegers F, s = sc (E := E) v r := by
+theorem fix_int_sc (hcm : IsCMExt F E σ) {s : Fv F v ⊗[F] E} (hs0 : s ∈ OEv (E := E) v)
+    (hs : sigR (Fv F v) σ s = s) : ∃ r ∈ v.adicCompletionIntegers F, s = sc (E := E) v r := by
   obtain ⟨r, hr⟩ := fix_sc σ v hcm s hs
   exact ⟨r, int_of_sc v (hr ▸ hs0), hr⟩
 
@@ -177,14 +175,12 @@ def redR : v.adicCompletionIntegers F →+* 𝓞 F ⧸ v.asIdeal where
 theorem redR_eq_zero (x : v.adicCompletionIntegers F) : redR v x = 0 ↔ Valued.v (x : Fv F v) < 1 :=
   red_eq_zero_iff v x.2
 
-theorem sc_mem {r : Fv F v} (hr : r ∈ v.adicCompletionIntegers F)
-    : sc (E := E) v r ∈ OEv (E := E) v := by
+theorem sc_mem {r : Fv F v} (hr : r ∈ v.adicCompletionIntegers F) : sc (E := E) v r ∈ OEv (E := E) v := by
   have := sc_mul_mem_oEv v hr (oEv_one (E := E) v)
   rwa [mul_one] at this
 
-theorem sc_eq (r : Fv F v)
-    : sc (E := E) v r = (Algebra.TensorProduct.includeLeftRingHom : Fv F v →+* Fv F v ⊗[F] E) r :=
-  rfl
+theorem sc_eq (r : Fv F v) :
+    sc (E := E) v r = (Algebra.TensorProduct.includeLeftRingHom : Fv F v →+* Fv F v ⊗[F] E) r := rfl
 
 theorem sigR_sc' (r : Fv F v) : sigR (Fv F v) σ (sc (E := E) v r) = sc (E := E) v r := by
   simp [sigR, sc, Algebra.TensorProduct.map_tmul]
@@ -192,15 +188,11 @@ theorem sigR_sc' (r : Fv F v) : sigR (Fv F v) σ (sc (E := E) v r) = sc (E := E)
 theorem norm_le_one_of {x : Fv F v} (hx : x ∈ v.adicCompletionIntegers F) : ‖x‖ ≤ 1 :=
   Valued.toNormedField.norm_le_one_iff.2 hx
 
-theorem norm_eq_one_of {x : Fv F v} (hx : x ∈ v.adicCompletionIntegers F) (h : ¬ Valued.v x < 1)
-    : ‖x‖ = 1 :=
-  le_antisymm (norm_le_one_of v hx)
-    (not_lt.1 fun h' => h (Valued.toNormedField.norm_lt_one_iff.1 h'))
+theorem norm_eq_one_of {x : Fv F v} (hx : x ∈ v.adicCompletionIntegers F) (h : ¬ Valued.v x < 1) : ‖x‖ = 1 :=
+  le_antisymm (norm_le_one_of v hx) (not_lt.1 fun h' => h (Valued.toNormedField.norm_lt_one_iff.1 h'))
 
-theorem exists_theta
-    (hRes : PI.OmLocU.Red.ResAlg σ J ψ v) (hstd : StdHyp σ J ψ) (hun : UnramAt (E := E) v)
-    {ϖ : Fv F v} (hϖ : IsUnif v ϖ)
-    : ∃ θ ∈ OEv (E := E) v,
+theorem exists_theta (hRes : PI.OmLocU.Red.ResAlg σ J ψ v) (hstd : StdHyp σ J ψ) (hun : UnramAt (E := E) v)
+    {ϖ : Fv F v} (hϖ : IsUnif v ϖ) : ∃ θ ∈ OEv (E := E) v,
       (θ - sigR (Fv F v) σ θ) * (θ - sigR (Fv F v) σ θ) ∉ PO (E := E) v ϖ := by
   classical
   obtain ⟨k, _, _, -, hcase⟩ := hRes hstd hun ϖ hϖ
@@ -234,16 +226,13 @@ theorem normOne_of (hRes : PI.OmLocU.Red.ResAlg σ J ψ v) : PI.OmLocU.Orb.NormO
   set θs := sigR (Fv F v) σ θ with hθs
   have hθs0 : θs ∈ OEv (E := E) v := PI.OmLocU.UnN.sigR_mem σ v hθ0
   have hθinv : sigR (Fv F v) σ θs = θ := PI.OmLocU.Orb.sigR_invol (v := v) σ hcm θ
-  obtain ⟨t, ht, hT⟩ :=
-    fix_int_sc σ v hcm (oEv_add v hθ0 hθs0) (by rw [map_add (f := _), hθinv, add_comm])
+  obtain ⟨t, ht, hT⟩ := fix_int_sc σ v hcm (oEv_add v hθ0 hθs0) (by rw [map_add (f := _), hθinv, add_comm])
   obtain ⟨m, hm, hM⟩ := fix_int_sc σ v hcm (oEv_mul v hθ0 hθs0) (by rw [map_mul, hθinv, mul_comm])
   obtain ⟨ε, hε, hU⟩ := fix_int_sc σ v hcm hu0 hus
   have hus' : sigR (Fv F v) σ u' = u' := by
     have h1 : sigR (Fv F v) σ u' * u = 1 := by
       rw [← hus, ← map_mul, show u' * u = 1 by rw [mul_comm]; exact huu', map_one]
-    calc
-      sigR (Fv F v) σ u'
-        = sigR (Fv F v) σ u' * (u * u') := by rw [huu', mul_one]
+    calc sigR (Fv F v) σ u' = sigR (Fv F v) σ u' * (u * u') := by rw [huu', mul_one]
       _ = (sigR (Fv F v) σ u' * u) * u' := by ring
       _ = u' := by rw [h1, one_mul]
   obtain ⟨ε', hε', hU'⟩ := fix_int_sc σ v hcm hu'0 hus'
@@ -301,40 +290,27 @@ theorem normOne_of (hRes : PI.OmLocU.Red.ResAlg σ J ψ v) : PI.OmLocU.Orb.NormO
       rw [hyO]
       exact hy0r
     rw [ex, ey, hxy, sub_self]
-  have hrc
-      : ((xO ^ 2 + tO * xO * yO + mO * yO ^ 2 - eO : v.adicCompletionIntegers F) : Fv F v)
-        = x0 ^ 2 + t * x0 * y0 + m * y0 ^ 2 - ε' := by
+  have hrc : ((xO ^ 2 + tO * xO * yO + mO * yO ^ 2 - eO : v.adicCompletionIntegers F) : Fv F v) =
+      x0 ^ 2 + t * x0 * y0 + m * y0 ^ 2 - ε' := by
     push_cast
     rw [hxO, hyO, htO, hmO, heO]
   have h0 : ‖x0 ^ 2 + t * x0 * y0 + m * y0 ^ 2 - ε'‖ < 1 := by
     have h3 := (redR_eq_zero v _).1 hres
     rw [hrc] at h3
     exact Valued.toNormedField.norm_lt_one_iff.2 h3
-  obtain ⟨x, y, hx, hy, hq⟩ :=
-    PI.OmLocU.Nrm.solve_int t m ε' x0 y0 (norm_le_one_of v ht) (norm_le_one_of v hm)
-      (norm_eq_one_of v hDint hDv) (norm_eq_one_of v hε' hε'1) (norm_le_one_of v hx0)
-      (norm_le_one_of v hy0) h0
+  obtain ⟨x, y, hx, hy, hq⟩ := PI.OmLocU.Nrm.solve_int t m ε' x0 y0 (norm_le_one_of v ht) (norm_le_one_of v hm)
+    (norm_eq_one_of v hDint hDv) (norm_eq_one_of v hε' hε'1) (norm_le_one_of v hx0) (norm_le_one_of v hy0) h0
   have hxi : x ∈ v.adicCompletionIntegers F := Valued.toNormedField.norm_le_one_iff.1 hx
   have hyi : y ∈ v.adicCompletionIntegers F := Valued.toNormedField.norm_le_one_iff.1 hy
-  refine ⟨
-    sc (E := E) v x + sc (E := E) v y * θ,
-    oEv_add v (sc_mem v hxi) (oEv_mul v (sc_mem v hyi) hθ0),
-    ?_
-  ⟩
-  have hl
-      : sigR (Fv F v) σ (sc (E := E) v x + sc (E := E) v y * θ)
-        = sc (E := E) v x + sc (E := E) v y * θs := by
+  refine ⟨sc (E := E) v x + sc (E := E) v y * θ, oEv_add v (sc_mem v hxi) (oEv_mul v (sc_mem v hyi) hθ0), ?_⟩
+  have hl : sigR (Fv F v) σ (sc (E := E) v x + sc (E := E) v y * θ) = sc (E := E) v x + sc (E := E) v y * θs := by
     rw [map_add (f := _), map_mul, sigR_sc', sigR_sc']
   rw [hl]
-  have e1
-      : (sc (E := E) v x + sc (E := E) v y * θs) * (sc (E := E) v x + sc (E := E) v y * θ)
-        = sc (E := E) v x * sc (E := E) v x + sc (E := E) v x * sc (E := E) v y * (θ + θs)
-          + sc (E := E) v y * sc (E := E) v y * (θ * θs) := by
-    ring
-  have e2
-      : sc (E := E) v x * sc (E := E) v x + sc (E := E) v x * sc (E := E) v y * sc (E := E) v t
-          + sc (E := E) v y * sc (E := E) v y * sc (E := E) v m
-        = sc (E := E) v (x ^ 2 + t * x * y + m * y ^ 2) := by
+  have e1 : (sc (E := E) v x + sc (E := E) v y * θs) * (sc (E := E) v x + sc (E := E) v y * θ) =
+      sc (E := E) v x * sc (E := E) v x + sc (E := E) v x * sc (E := E) v y * (θ + θs) +
+        sc (E := E) v y * sc (E := E) v y * (θ * θs) := by ring
+  have e2 : sc (E := E) v x * sc (E := E) v x + sc (E := E) v x * sc (E := E) v y * sc (E := E) v t +
+      sc (E := E) v y * sc (E := E) v y * sc (E := E) v m = sc (E := E) v (x ^ 2 + t * x * y + m * y ^ 2) := by
     simp only [sc_eq, map_add (f := _), map_mul, map_pow]
     ring
   rw [e1, hT, hM, e2, hq, ← hU', mul_comm]
