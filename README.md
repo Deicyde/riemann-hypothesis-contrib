@@ -2,7 +2,6 @@
 
 [![checks](https://github.com/leanprover-community/riemann-hypothesis/actions/workflows/checks.yml/badge.svg)](https://github.com/leanprover-community/riemann-hypothesis/actions/workflows/checks.yml)
 
-
 A community-led effort to clean up and maintain a Lean formalization of the 2026 proof of the Riemann Hypothesis and of GRH for Dirichlet L-functions.
 
 The purpose of this repo is to create an artifact that is:
@@ -18,6 +17,9 @@ Please note: we are **not** looking for:
 - adding files which are not necessary for the Riemann Hypothesis proof
 
 This work is taking place on the `main` branch. The `original` branch preserves the first publicly-released version of the proof retrieved on 2026-11-20 from <https://alpo.ge/remark.pdf>.
+If you want to open the original proof without compiling it, use
+[riemann-hypothesis-original](https://github.com/homeowmorphism/riemann-hypothesis-original).
+It keeps the published Lean source unchanged and provides a prebuilt cache for it.
 
 ## Theorem Statements
 
@@ -45,9 +47,13 @@ lake exe cache get
 lake build --no-build
 ```
 
-## Checking the proof
+A full build makes Lean check every proof on your machine. The cache downloads files that were
+compiled elsewhere, so you can read and edit the project within minutes, but Lean does not
+re-check them.
 
-To check the proof yourself, without the cache, take a fresh clone on a Linux machine with
+## Checking the proof yourself
+
+Take a fresh clone on a Linux machine with
 [bubblewrap](https://github.com/containers/bubblewrap) installed and run:
 
 ```bash
@@ -58,7 +64,9 @@ lake comparator
 The first command fetches Mathlib's compiled files and nothing of ours. Don't use
 `lake exe cache get` here, because that also downloads our prebuilt copy of the submission. The
 second reads `comparator.json`, builds `Challenge` and `Main` in a sandbox with no network, and
-makes the checks described under [What is claimed](#what-is-claimed).
+makes the checks described under [Theorem Statements](#theorem-statements).
+
+Compiling the submission runs its code, so you may want to do it in a VM or your own sandbox. To do that, fetch Mathlib's cache as above, then run the check in three steps:
 
 ```bash
 export LEAN_ABORT_ON_PANIC=1        # as Comparator does
@@ -77,10 +85,9 @@ lake comparator --config comparator.json \
   --challenge-from-export challenge.export --solution-from-export solution.export
 ```
 
-The published source was written for Lean 4.33.1, which has neither `lake comparator` nor
-`leanexport`, so checking `40e56bab` itself takes two toolchains.
+The published source uses Lean 4.33.1, which has neither `lake comparator` nor `leanexport`.
 [An older version of this README](https://github.com/leanprover-community/riemann-hypothesis/blob/7cce738ba719a32964ca3822d0994f4c6952c7ae/README.md#checking-it)
-has those steps.
+has the two-toolchain steps for checking it.
 
 ## The formal-conjectures statement
 
@@ -93,9 +100,8 @@ and what has been checked so far.
 
 ## CI
 
-If you have a Linux machine with
-plenty of memory and disk to spare, [CI-RUNNERS.md](verification/CI-RUNNERS.md) explains how to
-lend it. The scripts behind all this are in [`scripts/`](scripts/) and
+To lend a Linux machine with plenty of memory and disk, see
+[CI-RUNNERS.md](verification/CI-RUNNERS.md). The CI scripts are in [`scripts/`](scripts/) and
 [`tools/ci_native/`](tools/ci_native/README.md).
 
 ## License
