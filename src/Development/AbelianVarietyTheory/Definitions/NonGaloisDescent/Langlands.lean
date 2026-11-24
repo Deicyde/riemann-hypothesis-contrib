@@ -1,6 +1,7 @@
 module
 
 public import Development.AbelianVarietyTheory.PublishedTheorems.AutomorphicForms₂.LocalLanglandsGL
+import Lemmata.Cite
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -96,10 +97,9 @@ Deligne's ε-factor of the tensor product, matches cuspidal representations with
 and the Langlands classification with sums over segments, and respects twists, central characters
 and contragredients.
 
-Such a map exists by [Harris and Taylor, *The geometry and cohomology of some simple Shimura
-varieties*][harris2001] and [Henniart, *Une preuve simple des conjectures de Langlands pour GL(n)
-sur un corps p-adique*][henniart2000]. The proof of the main theorems does not use this; it uses
-the weaker `UpperTheory.Zero.LLC.IsRecT`, which it proves. -/
+Such a map exists by Harris and Taylor and by Henniart. The proof of the main theorems does not
+use this; it uses the weaker `UpperTheory.Zero.LLC.IsRecT`, which it proves. -/
+@[cite "harris2001", cite "henniart2000"]
 def IsRecLit (rc : IrrGL (k := w.adicCompletion E) → WD h) : Prop :=
   ∃ (a : Weil h →* (w.adicCompletion E)ˣ) (ha : IsLocalArtin h a) (ε : EpsFamily A),
     IsDeligneEps ε ∧ LawsLit a ha (ε E w h) rc

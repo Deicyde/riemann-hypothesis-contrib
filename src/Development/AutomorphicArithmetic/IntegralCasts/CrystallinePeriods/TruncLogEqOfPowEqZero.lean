@@ -2,6 +2,7 @@ module
 
 public import Mathlib.RingTheory.Perfectoid.BDeRham
 public import Mathlib.RingTheory.WittVector.Compare
+import Lemmata.Cite
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -131,14 +132,12 @@ variable (U : Type w) [CommRing U] [Fact ¬IsUnit (p : U)]
 
 abbrev Tilt : Type u := PreTilt R p
 
-/-- The period ring `A_{inf} = W(R♭)` associated to the ring `R`.
-
-See [Bhatt–Morrow–Scholze, *Integral p-adic Hodge theory*
-(§3.1, Definition 3.1, p. 244)][bhattMorrowScholze2018]. This generalises a classical definition
-in the case `R = 𝒪_[ℂ_[p]]`, see
-[Fontaine, *Le corps des périodes p-adiques* (§1.3.3, p. 66, with `K = ℚ_[p]`)][fontaine1994].
+/-- The period ring `A_{inf} = W(R♭)` associated to the ring `R`. This generalises Fontaine's
+definition in the case `R = 𝒪_[ℂ_[p]]`, with `K = ℚ_[p]`.
 
 TODO: Unify this with `GroundTheory.PAdicHodge.AInf`. -/
+@[cite "bhattMorrowScholze2018" "§3.1, Definition 3.1, p. 244",
+  cite "fontaine1994" "§1.3.3, p. 66"]
 abbrev Ainf : Type u := WittVector p (Tilt p R)
 
 abbrev AinfInv : Type u := Localization.Away (p : Ainf p R)
@@ -571,13 +570,11 @@ variable {p R} in
 def AcrisZero.gamma (n : ℕ) (x : Ainf p R) (hx : Ainf.theta p R x = 0) : AcrisZero p R :=
   ⟨AinfInv.gamma n (algebraMap _ _ x), Algebra.subset_adjoin ⟨n, x, hx, rfl⟩⟩
 
-/-- The period ring `A_{cris}`, defined as the `p`-adic completion of `AcrisZero p R`.
-
-See [Fontaine, *Le corps des périodes p-adiques* (§2.2.2, p. 76)][fontaine1994] and
-[Bhatt–Morrow–Scholze, *Integral p-adic Hodge theory* (§1.2, p. 223)][bhattMorrowScholze2018],
-where the latter denotes this ring by `A_{crys}`.
+/-- The period ring `A_{cris}`, defined as the `p`-adic completion of `AcrisZero p R`. Bhatt,
+Morrow and Scholze denote this ring by `A_{crys}`.
 
 TODO: Unify this with `GroundTheory.PAdicHodge.ACris.ACris`. -/
+@[cite "fontaine1994" "§2.2.2, p. 76", cite "bhattMorrowScholze2018" "§1.2, p. 223"]
 def Acris : Type u := AdicCompletion (span {(p : AcrisZero p R)}) (AcrisZero p R)
 
 namespace Acris
@@ -646,13 +643,11 @@ variable {p R} in
 def IsPrimitive (ε : tateModule p R) : Prop :=
   PreTilt.untilt ((frobeniusEquiv (Tilt p R) p).symm ε.1) ≠ 1
 
-/-- Fontaine's period ring `B⁺_{cris} = A_{cris}[1/p]`.
-
-See [Fontaine, *Le corps des périodes p-adiques* (§2.3.1, p. 78)][fontaine1994].
-In the notation of [Bhatt–Morrow–Scholze, *Integral p-adic Hodge theory*
-(§1.2, p. 223)][bhattMorrowScholze2018], this is `A_{crys}[1/p]`.
+/-- Fontaine's period ring `B⁺_{cris} = A_{cris}[1/p]`. In the notation of Bhatt, Morrow and
+Scholze, this is `A_{crys}[1/p]`.
 
 TODO: Unify this with `GroundTheory.PAdicHodge.ACris.BCrisPlus`. -/
+@[cite "fontaine1994" "§2.3.1, p. 78", cite "bhattMorrowScholze2018" "§1.2, p. 223"]
 def BcrisPlus : Type u := Localization.Away (p : Acris p R)
 
 namespace BcrisPlus
@@ -680,14 +675,14 @@ end BcrisPlus
 /-- The localization of `BcrisPlus p R` obtained by inverting the logarithmic periods
 `t = log [ε]` for all primitive `ε : tateModule p R`, avoiding a choice of `ε`.
 
-In the classical case, this is Fontaine's period ring `B_{cris}`; see
-[Fontaine, *Le corps des périodes p-adiques* (§2.3.4, pp. 78–79)][fontaine1994].
+In the classical case, this is Fontaine's period ring `B_{cris}`.
 
-[Bhatt–Morrow–Scholze, *Integral p-adic Hodge theory* (§1.2, p. 223)][bhattMorrowScholze2018]
-denote this ring by `B_{crys}` and construct it by inverting `μ = [ε] - 1` in `A_{crys}`.
-Their Lemma 12.2(iii), pp. 358–359, identifies `t` with `μ` times a unit in `A_{crys}`.
+Bhatt, Morrow and Scholze denote this ring by `B_{crys}` and construct it by inverting
+`μ = [ε] - 1` in `A_{crys}`. Their Lemma 12.2(iii), pp. 358–359, identifies `t` with `μ` times a
+unit in `A_{crys}`.
 
 TODO: Unify this with `GroundTheory.PAdicHodge.ACris.BCris`. -/
+@[cite "fontaine1994" "§2.3.4, pp. 78–79", cite "bhattMorrowScholze2018" "§1.2, p. 223"]
 def Bcris : Type u := Localization (BcrisPlus.periods p R)
 
 namespace Bcris

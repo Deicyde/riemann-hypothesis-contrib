@@ -2,6 +2,7 @@ module
 
 public import Mathlib.LinearAlgebra.Finsupp.VectorSpace
 public import Mathlib.RingTheory.AlgebraicIndependent.Defs
+import Lemmata.Cite
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -598,10 +599,8 @@ namespace Published
 /-- **Radford's theorem on shuffle algebras**: over a field `K` of characteristic zero, the shuffle
 algebra on a totally ordered alphabet `A` is freely generated as a commutative polynomial algebra
 by the Lyndon words: the canonical evaluation homomorphism from the polynomial algebra on Lyndon
-words to the shuffle algebra is an isomorphism (bijective).
-
-Proposed reference:
-[Radford, *A natural ring basis for the shuffle algebra and an application to group schemes* (Theorem 2.1, p. 437)][radford1979]. -/
+words to the shuffle algebra is an isomorphism (bijective). -/
+@[cite "radford1979" "Theorem 2.1, p. 437" "proposed"]
 def RadfordShufflePolynomial : Prop :=
   ∀ (K : Type) [Field K] [CharZero K] (A : Type) [LinearOrder A],
     Function.Bijective

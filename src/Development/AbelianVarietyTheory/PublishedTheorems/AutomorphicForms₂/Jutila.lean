@@ -1,6 +1,7 @@
 module
 
 public import Mathlib.NumberTheory.LSeries.DirichletContinuation
+import Lemmata.Cite
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -54,9 +55,8 @@ for any `ε > 0`, there exists a constant `c` such that for all `4 / 5 ≤ α �
 conductor at most `Q` satisfying `β ≥ α` and `|γ| ≤ T` is bounded by
 `c * (Q ^ 2 * T) ^ ((2 + ε) * (1 - α))`.
 
-Proposed reference:
-[M. Jutila, *Zero-density estimates for L-functions* (Theorem 1, p. 55)][jutila1977], which proves
-the estimate `N(α, T, Q) ≪ (Q² T)^((2 + ε)(1 - α))` for `4/5 ≤ α ≤ 1`. -/
+Jutila proves the estimate `N(α, T, Q) ≪ (Q² T)^((2 + ε)(1 - α))` for `4/5 ≤ α ≤ 1`. -/
+@[cite "jutila1977" "Theorem 1, p. 55" "proposed"]
 def Jutila : Prop :=
   ∀ ε : ℝ, 0 < ε → ∃ c : ℝ, ∀ α Q T : ℝ, 4 / 5 ≤ α → α ≤ 1 → 1 ≤ Q → 1 ≤ T →
     (({p : (Σ q : ℕ, DirichletCharacter ℂ (q + 1)) × ℂ | 1 ≤ p.1.1 ∧ ((p.1.1 + 1 : ℕ) : ℝ) ≤ Q ∧ p.1.2.IsPrimitive ∧

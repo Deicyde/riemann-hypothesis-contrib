@@ -1,6 +1,7 @@
 module
 
 public import Mathlib.Analysis.SpecialFunctions.Pow.Real
+import Lemmata.Cite
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -53,16 +54,14 @@ noncomputable def leastPrimeMod (a q : ℕ) : ℕ := sInf (primesInProgression a
 that, for all coprime `a, q ≥ 1`, the least prime congruent to `a` modulo `q` is at most
 `C * q ^ L`. No value of `L` and no effectivity of the constants is asserted.
 
-The theorem is due to
-[U. V. Linnik, *On the least prime in an arithmetic progression. I. The basic theorem*][linnik1944].
-It is recalled in this form, with effectively computable constants, at the start of
-[T. Xylouris, *On the least prime in an arithmetic progression and estimates for the zeros of
-Dirichlet L-functions* (Section 1, p. 65)][xylouris2011], which proves the bound with `L = 5.18`
-(Theorem 1.1). The same statement is equation (1.5) of the earlier text
-[T. Xylouris, *On Linnik's constant*][xylouris2009], which has `L = 5.2`. Linnik's paper was not
-read in preparing this reference. This reference is a reader's proposal and has not been checked
-by a mathematician. -/
-@[wikidata Q2703389]
+The theorem is due to Linnik. It is recalled in this form, with effectively computable constants,
+at the start of Xylouris's 2011 paper, which proves the bound with `L = 5.18` (Theorem 1.1). The
+same statement is equation (1.5) of Xylouris's earlier text, which has `L = 5.2`. Linnik's paper
+was not read in preparing this reference. This reference is a reader's proposal and has not been
+checked by a mathematician. -/
+@[wikidata Q2703389, cite "linnik1944" "" "proposed",
+  cite "xylouris2011" "Section 1, p. 65" "proposed",
+  cite "xylouris2009" "Equation (1.5)" "proposed"]
 def Linnik : Prop :=
   ∃ C L : ℝ, 0 < C ∧ 0 < L ∧ ∀ a q : ℕ, 1 ≤ a → 1 ≤ q → a.Coprime q →
     (leastPrimeMod a q : ℝ) ≤ C * (q : ℝ) ^ L

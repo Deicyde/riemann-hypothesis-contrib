@@ -1,6 +1,7 @@
 module
 
 public import Mathlib.NumberTheory.LSeries.DirichletContinuation
+import Lemmata.Cite
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -53,9 +54,9 @@ constant `c > 0` such that for every `Q ≥ 3`, among all primitive quadratic Di
 with conductor at most `Q`, there is at most one character whose L-function has a real zero
 in the interval `(1 - c / log Q, 1)`.
 
-Proposed reference:
-[A. Page, *On the number of primes in an arithmetic progression*][page1935], which proves that at
-most one real primitive character with conductor `q ≤ Q` has a real zero `β > 1 - c / log Q`. -/
+Page proves that at most one real primitive character with conductor `q ≤ Q` has a real zero
+`β > 1 - c / log Q`. -/
+@[cite "page1935" "" "proposed"]
 def PageThm : Prop :=
   ∃ c : ℝ, 0 < c ∧ ∀ Q : ℝ, 3 ≤ Q → ∀ (q₁ q₂ : ℕ) [NeZero q₁] [NeZero q₂]
     (χ₁ : DirichletCharacter ℂ q₁) (χ₂ : DirichletCharacter ℂ q₂) (β₁ β₂ : ℝ),

@@ -1,6 +1,7 @@
 module
 
 public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.CrysToDRBijective
+import Lemmata.Cite
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -99,8 +100,8 @@ end GrothendieckMessing
 /-- The Grothendieck--Messing deformation theorem for abelian schemes over nilpotent divided-power
 thickenings `R → R₀` with `p` nilpotent in `R`: deformations of an abelian scheme `A₀ / Spec R₀`
 correspond to admissible lifts of the Hodge filtration inside de Rham homology (`Canonical`,
-`LiftObj`, and `LiftHom`).
-See [Messing, *The Crystals Associated to Barsotti-Tate Groups* (Chapter V, Theorem 1.6 and Section 2)][messing1972]. -/
+`LiftObj`, and `LiftHom`). -/
+@[cite "messing1972" "Chapter V, Theorem 1.6 and Section 2"]
 def GrothendieckMessing : Prop :=
   ∀ (p : ℕ), p.Prime → ∀ (R : Type) [CommRing R], IsNilpotent (p : R) →
     ∀ (I : Ideal R) (κ : DividedPowers I), IsNilDP κ →

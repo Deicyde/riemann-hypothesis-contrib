@@ -4,6 +4,7 @@ public import Formalism.LocalToGlobal.IndefiniteReal.LocalNewformFunction
 public import Development.AbelianVarietyTheory.Definitions.Divisors.HilbertNinetyQuotientHomEqIff
 public import Development.AbelianVarietyTheory.Definitions.Foundations.T2SpaceAdeleRing
 public import Development.AbelianVarietyTheory.Definitions.Foundations.AnalyticOnNhdTsumNpow
+import Lemmata.Cite
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -93,10 +94,8 @@ open GlobalTheory.SiegelFormula
 
 /-- **Siegel–Weil formula for unitary groups**: identifies the integral of a theta series
 associated with a Schwartz function over the automorphic quotient of a unitary group with
-the value (or residue) of an Eisenstein series formed from the corresponding section.
-
-Proposed reference:
-[A. Weil, *Sur la formule de Siegel dans la théorie des groupes classiques*][weil1965]. -/
+the value (or residue) of an Eisenstein series formed from the corresponding section. -/
+@[cite "weil1965" "" "proposed"]
 def WeilSiegelFormulaUnitary : Prop :=
   ∀ (D : D7) (A B : HSp D) (m : Measure (GA D B)), m.IsHaarMeasure → 1 ≤ A.rank →
     (Formalism.MainNotions.SchurIrreducible.wittIdx B = 0 ∨ A.rank + Formalism.MainNotions.SchurIrreducible.wittIdx B < B.rank) →

@@ -1,11 +1,12 @@
-# The works cited in docstrings under `src/`, in the format of Mathlib's `docs/references.bib`.
+# The works cited under `src/`, in the format of Mathlib's `docs/references.bib`.
 #
 # To normalize:
 # bibtool --preserve.key.case=on --preserve.keys=on --pass.comments=on --print.use.tab=off -s -i docs/references.bib -o docs/references.bib
 #
 # Please only use alphanumeric characters, '-', '_', and ':' for the key of bibliography items.
 #
-# To cite an entry in a docstring, use the format
+# To cite an entry for a declaration, put `@[cite "bibkey" "optional location"]` on it (see
+# `src/Lemmata/Cite.lean`). Elsewhere in a docstring, such as a module docstring, use the format
 #   [Author, *Title* (optional location)][bibkey]
 
 @Article{         berger2002,

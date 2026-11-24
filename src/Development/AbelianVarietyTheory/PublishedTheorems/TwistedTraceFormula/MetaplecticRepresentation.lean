@@ -3,6 +3,7 @@ module
 public import Development.AbelianVarietyTheory.Definitions.Divisors.HilbertNinetyQuotientHomEqIff
 public import Mathlib.LinearAlgebra.SymplecticGroup
 public import Mathlib.Topology.Covering.Basic
+import Lemmata.Cite
 import Mathlib.Tactic.NormNum.Irrational
 import Mathlib.Tactic.NormNum.IsCoprime
 import Mathlib.Tactic.NormNum.IsSquare
@@ -130,10 +131,9 @@ linear operators on `L²(ℝⁿ)` and `ω` to those on Schwartz functions, and a
 * if `pr g` is orthogonal, then `ω g φ₀ = c • φ₀` for some `c` with
   `c ^ 2 * det (holPart (pr g)) = 1`.
 
-This is the Segal–Shale–Weil representation; see
-[G. B. Folland, *Harmonic analysis in phase space* (Chapter 4)][folland1989] and
-[A. Weil, *Sur certains groupes d'opérateurs unitaires*][weil1964]. It is proved in
+This is the Segal–Shale–Weil representation. It is proved in
 `GlobalTheory.metaplecticRepresentation_holds`. -/
+@[cite "folland1989" "Chapter 4", cite "weil1964"]
 def MetaplecticRepresentation : Prop :=
   ∀ (ι : Type) [Fintype ι] [DecidableEq ι],
     ∃ (G : Type) (_ : Group G) (_ : TopologicalSpace G) (_ : IsTopologicalGroup G)

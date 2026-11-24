@@ -5,6 +5,7 @@ public import Mathlib.Analysis.CStarAlgebra.Classes
 public import Mathlib.Analysis.Distribution.SchwartzSpace.Deriv
 public import Mathlib.Analysis.LocallyConvex.AbsConvexOpen
 public import Mathlib.Topology.Covering.Basic
+import Lemmata.Cite
 import Mathlib.Algebra.Order.Archimedean.Real.Hom
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
@@ -475,10 +476,9 @@ topological group `G` and homomorphisms `pr : G →* Sp(2n, ℝ)`, `om` to the u
   `pr (γ t) = exp (t • X)`, and for a Schwartz function `f` the derivative of `t ↦ om (γ t) f`
   at `0` is `quad X f`.
 
-This is the Segal–Shale–Weil representation; see
-[G. B. Folland, *Harmonic analysis in phase space* (Chapter 4)][folland1989] and
-[A. Weil, *Sur certains groupes d'opérateurs unitaires*][weil1964]. It is proved in
+This is the Segal–Shale–Weil representation. It is proved in
 `CompanionTheory.ThKR.realMetaplecticRepresentation_holds`. -/
+@[cite "folland1989" "Chapter 4", cite "weil1964"]
 def RealMetaplecticRepresentation : Prop :=
   ∀ (l : Type) [Fintype l] [DecidableEq l] [Nonempty l],
     ∃ (G : Type) (_ : Group G) (_ : TopologicalSpace G) (_ : IsTopologicalGroup G)

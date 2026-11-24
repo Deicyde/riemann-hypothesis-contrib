@@ -3,6 +3,7 @@ module
 public import Formalism.LocalToGlobal.BesselHermitianTheta.TiedSmooth
 public import Development.AbelianVarietyTheory.Proofs.HeightProofs.AdelicUnitaryRealPointsStructureRealPlaces
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ImportsRest
+import Lemmata.Cite
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -90,10 +91,8 @@ open AutFin in
 a number field, the space of automorphic forms of a given level (open compact subgroup `U`),
 given K-type (finite-dimensional continuous representation `ρ`), and given infinitesimal
 character (eigenvalues `c` under the Casimir / center of the universal enveloping algebra)
-is finite-dimensional.
-
-Proposed reference:
-[Harish-Chandra, *Automorphic Forms on Semisimple Lie Groups* (Theorem 1, p. 7)][harishChandra1968]. -/
+is finite-dimensional. -/
+@[cite "harishChandra1968" "Theorem 1, p. 7" "proposed"]
 def HarishChandraFinite : Prop :=
   ∀ (D : D7) (θ : D.what₂.Tau → (Ainf D.host.F ⊗[D.host.F] D.host.E →+* ℂ)), IsInfFam θ →
   ∀ (V : HSp D) (U : Subgroup (GA D V)), IsOpen (U : Set (GA D V)) →

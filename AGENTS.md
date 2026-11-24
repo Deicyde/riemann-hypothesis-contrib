@@ -65,6 +65,15 @@ removes, renames or moves.>
 
 Drop the part from `---` on if the pull request depends on no other.
 
+## Citations
+
+The works cited in `src/` are listed in `docs/references.bib`. To say that a declaration states
+or defines something from one of them, import `Lemmata.Cite` and put the attribute
+`@[cite "key" "location"]` on the declaration, for example
+`@[cite "milne2006" "Chapter I, Theorem 2.8, p. 31"]`. It adds the reference to the docstring, so
+don't write it there as well. If nobody has checked the reference against the Lean statement,
+add `"proposed"` as a third string: `@[cite "berger2002" "" "proposed"]`.
+
 ## Do not
 
 - change the Comparator challenge files: `src/Challenge.lean`, `comparator.json`,

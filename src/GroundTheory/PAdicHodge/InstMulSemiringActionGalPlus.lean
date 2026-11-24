@@ -2,6 +2,7 @@ module
 
 public import GroundTheory.PAdicHodge.ACrisPhi
 public import GroundTheory.PAdicHodge.ACrisGalois
+import Lemmata.Cite
 
 /-!
 # Construction of `B^+_{cris}` and `B_{cris}`
@@ -27,13 +28,11 @@ section Defs
 variable (K : Type*) [NontriviallyNormedField K] [IsUltrametricDist K]
 variable (p : ℕ) [hp : Fact p.Prime] [IsPerfectoidField K p]
 
-/-- Fontaine's period ring `B⁺_{cris} = A_{cris}[1/p]`.
-
-See [Fontaine, *Le corps des périodes p-adiques* (§2.3.1, p. 78)][fontaine1994].
-In the notation of [Bhatt–Morrow–Scholze, *Integral p-adic Hodge theory*
-(§1.2, p. 223)][bhattMorrowScholze2018], this is `A_{crys}[1/p]`.
+/-- Fontaine's period ring `B⁺_{cris} = A_{cris}[1/p]`. In the notation of Bhatt, Morrow and
+Scholze, this is `A_{crys}[1/p]`.
 
 TODO: Unify this with `Reformulated.AutPerF.BcrisPlus`. -/
+@[cite "fontaine1994" "§2.3.1, p. 78", cite "bhattMorrowScholze2018" "§1.2, p. 223"]
 abbrev BCrisPlus : Type _ := Localization.Away (p : ACris (K := K) (p := p))
 
 -- Provide named, `rfl`-defeq instances for `BCrisPlus` so downstream terms and kernel
@@ -124,14 +123,14 @@ variable {ε : PreTilt (normInteger K) p}
 /-- The localization `B⁺_{cris}[1/t]`, where `t = periodT hε = log [ε]`.
 
 When `ε` comes from a compatible system of primitive `p`-power roots of unity,
-this is Fontaine's period ring `B_{cris}`; see
-[Fontaine, *Le corps des périodes p-adiques* (§2.3.4, pp. 78–79)][fontaine1994].
+this is Fontaine's period ring `B_{cris}`.
 
-[Bhatt–Morrow–Scholze, *Integral p-adic Hodge theory* (§1.2, p. 223)][bhattMorrowScholze2018]
-denote this ring by `B_{crys}` and construct it by inverting `μ = [ε] - 1` in `A_{crys}`.
-Their Lemma 12.2(iii), pp. 358–359, identifies `t` with `μ` times a unit in `A_{crys}`.
+Bhatt, Morrow and Scholze denote this ring by `B_{crys}` and construct it by inverting
+`μ = [ε] - 1` in `A_{crys}`. Their Lemma 12.2(iii), pp. 358–359, identifies `t` with `μ` times a
+unit in `A_{crys}`.
 
 TODO: Unify this with `Reformulated.AutPerF.Bcris`. -/
+@[cite "fontaine1994" "§2.3.4, pp. 78–79", cite "bhattMorrowScholze2018" "§1.2, p. 223"]
 abbrev BCris (hε : PreTilt.untilt ε = 1) : Type _ :=
   Localization.Away (algebraMap (ACris (K := K) (p := p)) (BCrisPlus K p) (periodT hε))
 

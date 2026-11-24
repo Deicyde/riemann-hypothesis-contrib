@@ -5,6 +5,7 @@ public import Mathlib.Analysis.Normed.Lp.ProdLp
 public import Mathlib.MeasureTheory.Integral.Bochner.Basic
 public import Development.AbelianVarietyTheory.Proofs.HeightProofs.HilbertSchurUnitaryIrreducibleScalar
 public import Development.AbelianVarietyTheory.Proofs.HeightProofs.SchurOrthogonalityIndefiniteUnitaryGroup
+import Lemmata.Cite
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -62,10 +63,8 @@ unitary representation on a Hilbert space `H` of a unimodular locally compact gr
 has at least one non-zero square-integrable matrix coefficient, then all matrix coefficients
 are square-integrable with respect to Haar measure `μ`, and there exists a positive formal
 degree `d > 0` such that the matrix coefficients satisfy the Schur orthogonality relations
-`∫ ⟪w, π g v⟫ * star ⟪w', π g v'⟫ ∂μ = ⟪v', v⟫ * ⟪w, w'⟫ / d`.
-
-Proposed reference:
-[A. W. Knapp, *Representation Theory of Semisimple Groups: An Overview Based on Examples* (Proposition 1.43, p. 24)][knapp2002]. -/
+`∫ ⟪w, π g v⟫ * star ⟪w', π g v'⟫ ∂μ = ⟪v', v⟫ * ⟪w, w'⟫ / d`. -/
+@[cite "knapp2002" "Proposition 1.43, p. 24" "proposed"]
 def SchurOrthogonalitySquareIntegrable : Prop :=
   ∀ (G : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [LocallyCompactSpace G] [T2Space G]
     [MeasurableSpace G] [BorelSpace G] (μ : Measure G) [μ.IsHaarMeasure] [μ.Regular]

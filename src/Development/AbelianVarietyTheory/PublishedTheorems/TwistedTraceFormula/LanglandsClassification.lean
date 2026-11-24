@@ -1,6 +1,7 @@
 module
 
 public import Development.AbelianVarietyTheory.PublishedTheorems.TwistedTraceFormula.ExistsStandardIndModule
+import Lemmata.Cite
 import Mathlib.Algebra.Order.Floor.Extended
 import Mathlib.Algebra.Order.Floor.Semifield
 import Mathlib.Algebra.Order.Interval.Basic
@@ -131,10 +132,8 @@ open Langlands in
 /-- **Langlands classification**: every irreducible admissible representation of a real
 reductive group (or unitary matrix group) is realized as the unique irreducible quotient
 of a standard parabolically induced representation from tempered data (a tempered
-representation on a Levi factor twisted by a positive character in the open Weyl chamber).
-
-Proposed reference:
-[R. P. Langlands, *On the classification of irreducible representations of real algebraic groups* (pp. 101–170)][langlands1989]. -/
+representation on a Levi factor twisted by a positive character in the open Weyl chamber). -/
+@[cite "langlands1989" "pp. 101–170" "proposed"]
 def LanglandsClassification : Prop :=
   Induced ∧ Quotient ∧ Classification ∧ Limit ∧ StandardSpan ∧ StandardIndependent ∧ TemperedLevi
 
