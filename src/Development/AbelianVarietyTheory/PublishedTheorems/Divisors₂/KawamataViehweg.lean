@@ -52,12 +52,14 @@ open GlobalTheory.CechPic
 
 namespace GlobalTheory.Published
 
+set_option doc.verso true in
+set_option doc.verso.suggestions false in
 /-- The Kawamata-Viehweg vanishing theorem for nef and big line bundles on smooth projective
 integral varieties over an algebraically closed field of characteristic zero: if `K` is the
 canonical bundle and `N` is nef and big, then `H^q(X, K ⊗ N) = 0` for all `q > 0`.
 
-See [Kawamata, *A generalization of Kodaira-Ramanujam's vanishing theorem*, Theorem 1][kawamata1982]
-and [Viehweg, *Vanishing theorems*, Theorem I][viehweg1982]. -/
+See {cite "kawamata1982"}[Kawamata, _A generalization of Kodaira-Ramanujam's vanishing theorem_,
+Theorem 1] and {cite "viehweg1982"}[Viehweg, _Vanishing theorems_, Theorem I]. -/
 def KawamataViehweg : Prop :=
   ∀ (k : Type) [Field k] [IsAlgClosed k] [CharZero k] (X : Scheme.{0}) [Algebra k Γ(X, ⊤)]
     [IsIntegral X] (D : ℕ) [SmoothOfRelativeDimension D (strHom k X)],

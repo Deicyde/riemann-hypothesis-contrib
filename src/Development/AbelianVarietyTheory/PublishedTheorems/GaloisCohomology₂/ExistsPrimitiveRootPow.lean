@@ -54,6 +54,8 @@ namespace GlobalTheory.Published
 
 open PoitouTate
 
+set_option doc.verso true in
+set_option doc.verso.suggestions false in
 /-- **Poitou–Tate duality** for finite Galois modules killed by `l ^ r`, over a number field `F`
 in which `l` is odd or which is totally complex: there are local invariant maps `inv`, bijections
 `H²(D_v, μ_{l^r}) → ZMod (l ^ r)` normalised with respect to `ζ` and compatible under
@@ -63,7 +65,7 @@ Poitou–Tate sequence is exact, `Ш¹` and `Ш²` of `M` and of its twisted dua
 to each other, and `Hⁿ(G_S, M)` vanishes for `n ≥ 3`.
 
 Proposed reference:
-[J. S. Milne, *Arithmetic Duality Theorems* (Chapter I, Theorem 4.10, pp. 56–57)][milne2006],
+{cite "milne2006"}[J. S. Milne, _Arithmetic Duality Theorems_ (Chapter I, Theorem 4.10, pp. 56–57)],
 which proves these for every finite `G_S`-module whose order is a unit away from `S`. This
 statement is a special case: `S` is finite and `M` is killed by `l ^ r`, and the condition on `l`
 and `F` makes every archimedean term in Milne's sequence vanish, which is why only finite primes

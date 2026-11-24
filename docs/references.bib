@@ -5,8 +5,11 @@
 #
 # Please only use alphanumeric characters, '-', '_', and ':' for the key of bibliography items.
 #
-# To cite an entry in a docstring, use the format
-#   [Author, *Title* (optional location)][bibkey]
+# To cite an entry in a docstring, write
+#   {cite "bibkey"}[Author, _Title_ (optional location)]
+# and make the docstring a Verso docstring by putting these two lines in front of it:
+#   set_option doc.verso true in
+#   set_option doc.verso.suggestions false in
 
 @Article{         berger2002,
   author        = {Berger, Laurent},

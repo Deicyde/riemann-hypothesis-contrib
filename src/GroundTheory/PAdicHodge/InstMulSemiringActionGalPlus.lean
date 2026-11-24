@@ -27,11 +27,13 @@ section Defs
 variable (K : Type*) [NontriviallyNormedField K] [IsUltrametricDist K]
 variable (p : ℕ) [hp : Fact p.Prime] [IsPerfectoidField K p]
 
+set_option doc.verso true in
+set_option doc.verso.suggestions false in
 /-- Fontaine's period ring `B⁺_{cris} = A_{cris}[1/p]`.
 
-See [Fontaine, *Le corps des périodes p-adiques* (§2.3.1, p. 78)][fontaine1994].
-In the notation of [Bhatt–Morrow–Scholze, *Integral p-adic Hodge theory*
-(§1.2, p. 223)][bhattMorrowScholze2018], this is `A_{crys}[1/p]`.
+See {cite "fontaine1994"}[Fontaine, _Le corps des périodes p-adiques_ (§2.3.1, p. 78)]. In the
+notation of {cite "bhattMorrowScholze2018"}[Bhatt–Morrow–Scholze, _Integral p-adic Hodge theory_
+(§1.2, p. 223)], this is `A_{crys}[1/p]`.
 
 TODO: Unify this with `Reformulated.AutPerF.BcrisPlus`. -/
 abbrev BCrisPlus : Type _ := Localization.Away (p : ACris (K := K) (p := p))
@@ -121,13 +123,15 @@ theorem phiPlus_algebraMap (x : ACris (K := K) (p := p)) :
 
 variable {ε : PreTilt (normInteger K) p}
 
+set_option doc.verso true in
+set_option doc.verso.suggestions false in
 /-- The localization `B⁺_{cris}[1/t]`, where `t = periodT hε = log [ε]`.
 
 When `ε` comes from a compatible system of primitive `p`-power roots of unity,
 this is Fontaine's period ring `B_{cris}`; see
-[Fontaine, *Le corps des périodes p-adiques* (§2.3.4, pp. 78–79)][fontaine1994].
+{cite "fontaine1994"}[Fontaine, _Le corps des périodes p-adiques_ (§2.3.4, pp. 78–79)].
 
-[Bhatt–Morrow–Scholze, *Integral p-adic Hodge theory* (§1.2, p. 223)][bhattMorrowScholze2018]
+{cite "bhattMorrowScholze2018"}[Bhatt–Morrow–Scholze, _Integral p-adic Hodge theory_ (§1.2, p. 223)]
 denote this ring by `B_{crys}` and construct it by inverting `μ = [ε] - 1` in `A_{crys}`.
 Their Lemma 12.2(iii), pp. 358–359, identifies `t` with `μ` times a unit in `A_{crys}`.
 

@@ -46,12 +46,14 @@ import Mathlib.Topology.Sheaves.Init
 open NumberField
 
 namespace GlobalTheory.Published
+set_option doc.verso true in
+set_option doc.verso.suggestions false in
 /-- **Chevalley's theorem on units.** For every number field `E` and all positive integers
 `m` and `b`, there exists a positive integer `a` coprime to `b` such that every unit
 `u` of `𝓞 E` with `a ∣ u - 1` is an `m`-th power of a unit of `𝓞 E`.
 
 Proposed reference:
-[C. Chevalley, *Deux théorèmes d'arithmétique*][chevalley1951],
+{cite "chevalley1951"}[C. Chevalley, _Deux théorèmes d'arithmétique_],
 the theorem on the unit group of a number field: units congruent to 1 modulo a suitable
 integer are `m`-th powers in the unit group. The Lean statement includes the coprimality
 of `a` with a given `b`, so the modulus can avoid finitely many primes. The other theorem

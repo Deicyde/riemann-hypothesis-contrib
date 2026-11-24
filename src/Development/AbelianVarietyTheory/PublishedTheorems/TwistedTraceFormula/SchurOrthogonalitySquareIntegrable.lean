@@ -57,6 +57,8 @@ namespace GlobalTheory
 
 namespace Published
 
+set_option doc.verso true in
+set_option doc.verso.suggestions false in
 /-- **Schur orthogonality for square-integrable representations**: if `π` is an irreducible
 unitary representation on a Hilbert space `H` of a unimodular locally compact group `G` that
 has at least one non-zero square-integrable matrix coefficient, then all matrix coefficients
@@ -64,8 +66,8 @@ are square-integrable with respect to Haar measure `μ`, and there exists a posi
 degree `d > 0` such that the matrix coefficients satisfy the Schur orthogonality relations
 `∫ ⟪w, π g v⟫ * star ⟪w', π g v'⟫ ∂μ = ⟪v', v⟫ * ⟪w, w'⟫ / d`.
 
-Proposed reference:
-[A. W. Knapp, *Representation Theory of Semisimple Groups: An Overview Based on Examples* (Proposition 1.43, p. 24)][knapp2002]. -/
+Proposed reference: {cite "knapp2002"}[A. W. Knapp, _Representation Theory of Semisimple Groups: An
+Overview Based on Examples_ (Proposition 1.43, p. 24)]. -/
 def SchurOrthogonalitySquareIntegrable : Prop :=
   ∀ (G : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [LocallyCompactSpace G] [T2Space G]
     [MeasurableSpace G] [BorelSpace G] (μ : Measure G) [μ.IsHaarMeasure] [μ.Regular]

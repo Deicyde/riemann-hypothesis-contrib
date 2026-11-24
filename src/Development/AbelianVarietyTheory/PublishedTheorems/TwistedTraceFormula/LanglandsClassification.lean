@@ -128,13 +128,15 @@ end Langlands
 
 
 open Langlands in
+set_option doc.verso true in
+set_option doc.verso.suggestions false in
 /-- **Langlands classification**: every irreducible admissible representation of a real
 reductive group (or unitary matrix group) is realized as the unique irreducible quotient
 of a standard parabolically induced representation from tempered data (a tempered
 representation on a Levi factor twisted by a positive character in the open Weyl chamber).
 
-Proposed reference:
-[R. P. Langlands, *On the classification of irreducible representations of real algebraic groups* (pp. 101–170)][langlands1989]. -/
+Proposed reference: {cite "langlands1989"}[R. P. Langlands, _On the classification of irreducible
+representations of real algebraic groups_ (pp. 101–170)]. -/
 def LanglandsClassification : Prop :=
   Induced ∧ Quotient ∧ Classification ∧ Limit ∧ StandardSpan ∧ StandardIndependent ∧ TemperedLevi
 

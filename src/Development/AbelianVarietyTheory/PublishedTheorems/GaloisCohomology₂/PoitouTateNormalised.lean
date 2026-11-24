@@ -51,11 +51,13 @@ namespace GlobalTheory.Published
 
 
 open PoitouTate in
+set_option doc.verso true in
+set_option doc.verso.suggestions false in
 /-- **Poitou–Tate duality**, as `PoitouTateDuality` but without the requirement (`ConjCompatible`)
 that the local invariant maps be compatible under conjugation.
 
 Proposed reference: as for `PoitouTateDuality`,
-[J. S. Milne, *Arithmetic Duality Theorems* (Chapter I, Theorem 4.10, pp. 56–57)][milne2006].
+{cite "milne2006"}[J. S. Milne, _Arithmetic Duality Theorems_ (Chapter I, Theorem 4.10, pp. 56–57)].
 This reference is a reader's proposal and has not been checked by a mathematician. -/
 def PoitouTateNormalised : Prop :=
   ∀ (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω]

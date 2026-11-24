@@ -226,12 +226,14 @@ theorem acrisZero_eq_adjoin {ξ : AInf K p} (hξ : RingHom.ker θ = Ideal.span {
 
 
 variable (K p) in
+set_option doc.verso true in
+set_option doc.verso.suggestions false in
 /-- The period ring `A_{cris}`, defined as the `p`-adic completion of `ACrisZero K` (i.e. the
 divided power completion of `AInf K = W(K♭)`).
 
-See [Fontaine, *Le corps des périodes p-adiques* (§2.2.2, p. 76)][fontaine1994] and
-[Bhatt–Morrow–Scholze, *Integral p-adic Hodge theory* (§1.2, p. 223)][bhattMorrowScholze2018],
-where the latter denotes this ring by `A_{crys}`.
+See {cite "fontaine1994"}[Fontaine, _Le corps des périodes p-adiques_ (§2.2.2, p. 76)] and
+{cite "bhattMorrowScholze2018"}[Bhatt–Morrow–Scholze, _Integral p-adic Hodge theory_ (§1.2, p.
+223)], where the latter denotes this ring by `A_{crys}`.
 
 TODO: Unify this with `Reformulated.AutPerF.Acris`. -/
 abbrev ACris [Fact (¬ IsUnit (p : normInteger K))] : Type _ :=

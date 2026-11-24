@@ -88,6 +88,8 @@ structure LawsLit (a : Weil h →* (w.adicCompletion E)ˣ) (ha : IsLocalArtin h 
     rc (cls π') = (rc (cls π)).lpDual
 
 variable (h) in
+set_option doc.verso true in
+set_option doc.verso.suggestions false in
 /-- `rc` satisfies the characterization of the local Langlands correspondence for `GL_n` over
 `w.adicCompletion E`, with Deligne's ε-factors (`LawsLit`): it is a bijection onto Weil–Deligne
 representations that preserves dimensions, agrees with local class field theory on characters,
@@ -96,10 +98,10 @@ Deligne's ε-factor of the tensor product, matches cuspidal representations with
 and the Langlands classification with sums over segments, and respects twists, central characters
 and contragredients.
 
-Such a map exists by [Harris and Taylor, *The geometry and cohomology of some simple Shimura
-varieties*][harris2001] and [Henniart, *Une preuve simple des conjectures de Langlands pour GL(n)
-sur un corps p-adique*][henniart2000]. The proof of the main theorems does not use this; it uses
-the weaker `UpperTheory.Zero.LLC.IsRecT`, which it proves. -/
+Such a map exists by {cite "harris2001"}[Harris and Taylor, _The geometry and cohomology of some
+simple Shimura varieties_] and {cite "henniart2000"}[Henniart, _Une preuve simple des conjectures de
+Langlands pour GL(n) sur un corps p-adique_]. The proof of the main theorems does not use this; it
+uses the weaker `UpperTheory.Zero.LLC.IsRecT`, which it proves. -/
 def IsRecLit (rc : IrrGL (k := w.adicCompletion E) → WD h) : Prop :=
   ∃ (a : Weil h →* (w.adicCompletion E)ˣ) (ha : IsLocalArtin h a) (ε : EpsFamily A),
     IsDeligneEps ε ∧ LawsLit a ha (ε E w h) rc

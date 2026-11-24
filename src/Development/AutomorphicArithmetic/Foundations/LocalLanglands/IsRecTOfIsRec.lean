@@ -144,15 +144,17 @@ variable (h) in
 /-- `rc` satisfies `LawsT` for some local Artin map. -/
 def IsRecT (rc : IrrGL (k := w.adicCompletion E) → WD h) : Prop := ∃ a ha, LawsT (h := h) a ha rc
 
+set_option doc.verso true in
+set_option doc.verso.suggestions false in
 /-- For every finite place `w` of a number field `E`, there is a map `rc` from the irreducible smooth
 representations of the groups `GL_n(E_w)` to Weil–Deligne representations satisfying `IsRecT`.
 
 This is the form of the local Langlands correspondence for `GL_n` that the proof of the main
 theorems uses, and it is proved in this repository as `UpperTheory.Zero.LLC.recTExists`. The full
 correspondence, characterized by `GlobalTheory.LocLanglands.IsRecLit`, exists by
-[Harris and Taylor, *The geometry and cohomology of some simple Shimura varieties*][harris2001]
-and [Henniart, *Une preuve simple des conjectures de Langlands pour GL(n) sur un corps
-p-adique*][henniart2000]; the proof does not use it. -/
+{cite "harris2001"}[Harris and Taylor, _The geometry and cohomology of some simple Shimura
+varieties_] and {cite "henniart2000"}[Henniart, _Une preuve simple des conjectures de Langlands pour
+GL(n) sur un corps p-adique_]; the proof does not use it. -/
 def RecTExists : Prop :=
   ∀ (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω] (A : ValuationSubring Ω)
     (w : HeightOneSpectrum (𝓞 E)) (h : IsPlaceOver A w), ∃ rc, IsRecT h rc

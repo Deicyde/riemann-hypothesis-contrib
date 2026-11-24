@@ -16,6 +16,8 @@ import Mathlib.Tactic.NormNum.Parity
 import Mathlib.Tactic.NormNum.Prime
 import Mathlib.Tactic.NormNum.RealSqrt
 
+set_option doc.verso true in
+set_option doc.verso.suggestions false in
 /-!
 # The metaplectic representation over `ℝ` and the Gaussian
 
@@ -38,8 +40,8 @@ infinitesimal generators instead of the Gaussian.
 
 ## References
 
-* [G. B. Folland, *Harmonic analysis in phase space* (Chapter 4)][folland1989]
-* [A. Weil, *Sur certains groupes d'opérateurs unitaires*][weil1964]
+* {cite "folland1989"}[G. B. Folland, _Harmonic analysis in phase space_ (Chapter 4)]
+* {cite "weil1964"}[A. Weil, _Sur certains groupes d'opérateurs unitaires_]
 -/
 
 @[expose] public section
@@ -112,6 +114,8 @@ end Metaplectic
 
 open Metaplectic
 
+set_option doc.verso true in
+set_option doc.verso.suggestions false in
 /-- **The metaplectic representation** of the real symplectic group `Sp(2n, ℝ)`, here
 `Matrix.symplecticGroup ι ℝ`, with the Gaussian. For every finite type `ι` there are a
 topological group `G`, a homomorphism `pr : G →* Sp(2n, ℝ)`, homomorphisms `Ω` to the continuous
@@ -131,8 +135,8 @@ linear operators on `L²(ℝⁿ)` and `ω` to those on Schwartz functions, and a
   `c ^ 2 * det (holPart (pr g)) = 1`.
 
 This is the Segal–Shale–Weil representation; see
-[G. B. Folland, *Harmonic analysis in phase space* (Chapter 4)][folland1989] and
-[A. Weil, *Sur certains groupes d'opérateurs unitaires*][weil1964]. It is proved in
+{cite "folland1989"}[G. B. Folland, _Harmonic analysis in phase space_ (Chapter 4)] and
+{cite "weil1964"}[A. Weil, _Sur certains groupes d'opérateurs unitaires_]. It is proved in
 `GlobalTheory.metaplecticRepresentation_holds`. -/
 def MetaplecticRepresentation : Prop :=
   ∀ (ι : Type) [Fintype ι] [DecidableEq ι],

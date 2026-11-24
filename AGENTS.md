@@ -65,6 +65,15 @@ removes, renames or moves.>
 
 Drop the part from `---` on if the pull request depends on no other.
 
+## Citations
+
+The works cited in `src/` are listed in `docs/references.bib`. Cite one with Mathlib's Verso role,
+`{cite "key"}[Author, _Title_ (location)]`, which warns if the key is not in the file. The role
+only works in a Verso docstring, so put `set_option doc.verso true in` and
+`set_option doc.verso.suggestions false in` in front of the declaration. Verso is not Markdown:
+`_text_` is italic and `*text*` bold, math is written ``$`x` `` rather than `$x$`, and an
+underscore inside a word needs a backslash.
+
 ## Do not
 
 - change the Comparator challenge files: `src/Challenge.lean`, `comparator.json`,

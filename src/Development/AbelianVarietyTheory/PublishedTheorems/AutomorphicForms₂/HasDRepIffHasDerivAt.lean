@@ -92,13 +92,15 @@ namespace GlobalTheory.Published
 
 open GlobalTheory.SmoothGlob
 
+set_option doc.verso true in
+set_option doc.verso.suggestions false in
 /-- **Casselman–Wallach canonical globalization theorem**: for any admissible representation of a
-real reductive group, any morphism from the underlying $(\mathfrak{g}, K)$-module of $K$-finite vectors
-into a smooth Fréchet representation of moderate growth extends uniquely to a continuous $G$-equivariant
-morphism on the smooth vectors.
+real reductive group, any morphism from the underlying $`(\mathfrak{g}, K)`-module of $`K`-finite
+vectors into a smooth Fréchet representation of moderate growth extends uniquely to a continuous
+$`G`-equivariant morphism on the smooth vectors.
 
-Proposed reference:
-[N. R. Wallach, *Real Reductive Groups II* (Chapter 11, Theorem 11.6.7, p. 296)][wallach1992]. -/
+Proposed reference: {cite "wallach1992"}[N. R. Wallach, _Real Reductive Groups II_ (Chapter 11,
+Theorem 11.6.7, p. 296)]. -/
 def CasselmanWallach : Prop :=
   ∀ (n : ℕ) (ε : Fin n → Bool)
     (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]

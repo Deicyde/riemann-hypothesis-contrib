@@ -53,6 +53,8 @@ import Mathlib.Tactic.Polynomial.Basic
 import Mathlib.Tactic.ReduceModChar
 import Mathlib.Topology.Sheaves.Init
 
+set_option doc.verso true in
+set_option doc.verso.suggestions false in
 /-!
 # The Schrödinger and metaplectic representations over `ℝ`
 
@@ -84,10 +86,10 @@ Schwartz functions and has the operators `quad X` as infinitesimal generators. I
 
 ## References
 
-* [G. B. Folland, *Harmonic analysis in phase space* (Chapters 1 and 4)][folland1989]:
+* {cite "folland1989"}[G. B. Folland, _Harmonic analysis in phase space_ (Chapters 1 and 4)]:
   Chapter 1 treats the Heisenberg group and its representations, Chapter 4 the metaplectic
   representation.
-* [A. Weil, *Sur certains groupes d'opérateurs unitaires*][weil1964]
+* {cite "weil1964"}[A. Weil, _Sur certains groupes d'opérateurs unitaires_]
 -/
 
 @[expose] public section
@@ -458,6 +460,8 @@ namespace GlobalTheory.Published
 
 open GlobalTheory.RealWeil
 
+set_option doc.verso true in
+set_option doc.verso.suggestions false in
 /-- **The metaplectic representation** of the real symplectic group `Sp(2n, ℝ)`, here
 `Matrix.symplecticGroup l ℝ`. For every nonempty finite index type `l` (so `n ≥ 1`) there are a
 topological group `G` and homomorphisms `pr : G →* Sp(2n, ℝ)`, `om` to the unitary operators on
@@ -476,8 +480,8 @@ topological group `G` and homomorphisms `pr : G →* Sp(2n, ℝ)`, `om` to the u
   at `0` is `quad X f`.
 
 This is the Segal–Shale–Weil representation; see
-[G. B. Folland, *Harmonic analysis in phase space* (Chapter 4)][folland1989] and
-[A. Weil, *Sur certains groupes d'opérateurs unitaires*][weil1964]. It is proved in
+{cite "folland1989"}[G. B. Folland, _Harmonic analysis in phase space_ (Chapter 4)] and
+{cite "weil1964"}[A. Weil, _Sur certains groupes d'opérateurs unitaires_]. It is proved in
 `CompanionTheory.ThKR.realMetaplecticRepresentation_holds`. -/
 def RealMetaplecticRepresentation : Prop :=
   ∀ (l : Type) [Fintype l] [DecidableEq l] [Nonempty l],

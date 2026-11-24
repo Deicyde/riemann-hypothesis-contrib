@@ -49,11 +49,12 @@ open CategoryTheory UpperTheory.V.KL
 
 namespace UpperTheory.V.Published
 
+set_option doc.verso true in
+set_option doc.verso.suggestions false in
 /-- If `R` has stable rank at most `s` and `n ≥ 2 * i + s + 2`, then `A ↦ diag(A, 1)` induces an
-isomorphism `H_i(GL_n(R); ℤ) → H_i(GL_{n+1}(R); ℤ)`.
-[O. Randal-Williams and N. Wahl, *Homological stability for automorphism groups*
-(Theorem 5.11)][randalWilliamsWahl2017].
-This is its case with coefficients `ℤ`; the theorem is due to [van der Kallen][vanderKallen1980].
+isomorphism `H_i(GL_n(R); ℤ) → H_i(GL_{n+1}(R); ℤ)`. {cite "randalWilliamsWahl2017"}[O.
+Randal-Williams and N. Wahl, _Homological stability for automorphism groups_ (Theorem 5.11)]. This
+is its case with coefficients `ℤ`; the theorem is due to {cite "vanderKallen1980"}[van der Kallen].
 This reference is a reader's proposal and has not been checked by a mathematician. -/
 def KStability : Prop :=
   ∀ (R : Type) [CommRing R] (s : ℕ), StableRangeLe R s → ∀ i n : ℕ, 2 * i + s + 2 ≤ n →

@@ -91,12 +91,14 @@ namespace GlobalTheory.Published
 
 open GlobalTheory.SiegelFormula
 
+set_option doc.verso true in
+set_option doc.verso.suggestions false in
 /-- **Siegel–Weil formula for unitary groups**: identifies the integral of a theta series
 associated with a Schwartz function over the automorphic quotient of a unitary group with
 the value (or residue) of an Eisenstein series formed from the corresponding section.
 
 Proposed reference:
-[A. Weil, *Sur la formule de Siegel dans la théorie des groupes classiques*][weil1965]. -/
+{cite "weil1965"}[A. Weil, _Sur la formule de Siegel dans la théorie des groupes classiques_]. -/
 def WeilSiegelFormulaUnitary : Prop :=
   ∀ (D : D7) (A B : HSp D) (m : Measure (GA D B)), m.IsHaarMeasure → 1 ≤ A.rank →
     (Formalism.MainNotions.SchurIrreducible.wittIdx B = 0 ∨ A.rank + Formalism.MainNotions.SchurIrreducible.wittIdx B < B.rank) →
